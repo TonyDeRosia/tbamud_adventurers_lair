@@ -8,35 +8,36 @@
 #include "interpreter.h"
 #include "quest.h"
 #include "prompt.h"
+#include "screen.h"
 
 static const char *default_prompt_template = "[%h / %H] [%m / %M] [%v / %V] [%X] ";
 
 static const char *translate_color_brace(char code)
 {
   switch (code) {
-  case 'n': case 'N': case 'x': case 'X': return "\tn"; /* normal/reset */
-  case 'd': return "\td"; /* dark grey / black */
-  case 'D': return "\tD"; /* light grey */
-  case 'a': return "\ta"; /* dark azure */
-  case 'A': return "\tA"; /* light azure */
-  case 'r': return "\tr"; /* dark red */
-  case 'R': return "\tR"; /* light red */
-  case 'g': return "\tg"; /* dark green */
-  case 'G': return "\tG"; /* light green */
-  case 'y': return "\ty"; /* dark yellow */
-  case 'Y': return "\tY"; /* light yellow */
-  case 'b': return "\tb"; /* dark blue */
-  case 'B': return "\tB"; /* light blue */
-  case 'm': return "\tm"; /* dark magenta */
-  case 'M': return "\tM"; /* light magenta */
-  case 'c': return "\tc"; /* dark cyan */
-  case 'C': return "\tC"; /* light cyan */
-  case 'w': return "\tw"; /* dark white */
-  case 'W': return "\tW"; /* light white */
-  case 'o': return "\to"; /* dark orange */
-  case 'O': return "\tO"; /* light orange */
-  case 'p': return "\tp"; /* dark pink */
-  case 'P': return "\tP"; /* light pink */
+  case 'n': case 'N': case 'x': case 'X': return KNRM; /* normal/reset */
+  case 'd': return "\x1B[90m"; /* dark grey / black */
+  case 'D': return "\x1B[37m"; /* light grey */
+  case 'a': return "\x1B[36m"; /* dark azure */
+  case 'A': return "\x1B[96m"; /* light azure */
+  case 'r': return KRED; /* dark red */
+  case 'R': return BRED; /* light red */
+  case 'g': return KGRN; /* dark green */
+  case 'G': return BGRN; /* light green */
+  case 'y': return KYEL; /* dark yellow */
+  case 'Y': return BYEL; /* light yellow */
+  case 'b': return KBLU; /* dark blue */
+  case 'B': return BBLU; /* light blue */
+  case 'm': return KMAG; /* dark magenta */
+  case 'M': return BMAG; /* light magenta */
+  case 'c': return KCYN; /* dark cyan */
+  case 'C': return BCYN; /* light cyan */
+  case 'w': return KWHT; /* dark white */
+  case 'W': return BWHT; /* light white */
+  case 'o': return "\x1B[38;5;208m"; /* dark orange */
+  case 'O': return "\x1B[38;5;214m"; /* light orange */
+  case 'p': return "\x1B[38;5;205m"; /* dark pink */
+  case 'P': return "\x1B[38;5;218m"; /* light pink */
   default:  return NULL;
   }
 }
