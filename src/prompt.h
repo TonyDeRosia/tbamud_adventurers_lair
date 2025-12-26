@@ -9,4 +9,6 @@ char *make_prompt(struct descriptor_data *d);
 /* Queue the current prompt for a descriptor. */
 void queue_prompt(struct descriptor_data *d);
 
+ACMD(do_prompt);
+
 #endif /* PROMPT_H */
