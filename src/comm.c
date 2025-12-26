@@ -1602,13 +1602,14 @@ static char *make_prompt(struct descriptor_data *d)
     strcpy(prompt, "] ");       /* strcpy: OK (for 'MAX_PROMPT_LENGTH >= 3') */
   else if (STATE(d) == CON_PLAYING && !IS_NPC(d->character)) {
     size_t len = 0;
-    const bool has_prompt = *GET_PROMPT(d->character) != '\0';
-    const char *prompt_template = has_prompt ? GET_PROMPT(d->character) : PFDEF_PROMPT;
+    const char *prompt_template;
+
+    if (*GET_PROMPT(d->character) == '\0')
+      strlcpy(GET_PROMPT(d->character), PFDEF_PROMPT, MAX_PROMPT_LENGTH + 1);
+
+    prompt_template = GET_PROMPT(d->character);
 
     *prompt = '\0';
-
-    if (!has_prompt)
-      strlcpy(GET_PROMPT(d->character), PFDEF_PROMPT, MAX_PROMPT_LENGTH + 1);
 
     if (GET_INVIS_LEV(d->character) && len < sizeof(prompt))
       len = append_prompt(prompt, len, sizeof(prompt), "i%d ", GET_INVIS_LEV(d->character));
@@ -1992,24 +1993,13 @@ static int process_output(struct descriptor_data *t)
   if (t->bufspace == 0)
     strcat(osb, "**OVERFLOW**\r\n");	/* strcpy: OK (osb:MAX_SOCK_BUF-2 reserves space) */
 
-  /* add the extra CRLF if the person isn't in compact mode */
-  if (STATE(t) == CON_PLAYING && t->character && !IS_NPC(t->character) && !PRF_FLAGGED(t->character, PRF_COMPACT))
-    if ( !t->pProtocol->WriteOOB ) 
-      strcat(osb, "\r\n");	/* strcpy: OK (osb:MAX_SOCK_BUF-2 reserves space) */
-
-  if (!t->pProtocol->WriteOOB) /* add a prompt */
-    strcat(i, make_prompt(t));	/* strcpy: OK (i:MAX_SOCK_BUF reserves space) */
-
-  /* now, send the output.  If this is an 'interruption', use the prepended
-   * CRLF, otherwise send the straight output sans CRLF. */
-  if (t->has_prompt && !t->pProtocol->WriteOOB) {
-    t->has_prompt = FALSE;
-    result = write_to_descriptor(t->descriptor, i);
-    if (result >= 2)
-      result -= 2;
-  } else
-    result = write_to_descriptor(t->descriptor, osb);
-
+  if (STATE(t) == CON_PLAYING && t->character && !IS_NPC(t->character)) {
+    strcat(osb, "\r\n");	/* strcpy: OK (osb:MAX_SOCK_BUF-2 reserves space) */
+    strcat(osb, make_prompt(t));	/* strcpy: OK (osb:MAX_SOCK_BUF-2 reserves space) */
+    t->has_prompt = TRUE;
+  }
+  /* now, send the output. */
+  result = write_to_descriptor(t->descriptor, osb);
   if (result < 0) {	/* Oops, fatal error. Bye! */
 //    close_socket(t); // close_socket is called after return of negative result
     return (-1);

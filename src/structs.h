@@ -232,9 +232,9 @@
 #define PRF_COMPACT       1   /**< No extra CRLF pair before prompts */
 #define PRF_NOSHOUT       2   /**< Can't hear shouts */
 #define PRF_NOTELL        3   /**< Can't receive tells */
-#define PRF_DISPHP        4   /**< Display hit points in prompt */
-#define PRF_DISPMANA      5   /**< Display mana points in prompt */
-#define PRF_DISPMOVE      6   /**< Display move points in prompt */
+#define PRF_UNUSED_PROMPT_HP   4   /**< (unused legacy prompt flag) */
+#define PRF_UNUSED_PROMPT_MANA 5   /**< (unused legacy prompt flag) */
+#define PRF_UNUSED_PROMPT_MOVE 6   /**< (unused legacy prompt flag) */
 #define PRF_AUTOEXIT      7   /**< Display exits in a room */
 #define PRF_NOHASSLE      8   /**< Aggr mobs won't attack */
 #define PRF_QUEST         9   /**< On quest */
@@ -250,7 +250,7 @@
 #define PRF_NOGOSS       19   /**< Can't hear gossip channel */
 #define PRF_NOGRATZ      20   /**< Can't hear grats channel */
 #define PRF_SHOWVNUMS    21   /**< Can see VNUMs */
-#define PRF_DISPAUTO     22   /**< Show prompt HP, MP, MV when < 25% */
+#define PRF_UNUSED_PROMPT_AUTO 22   /**< (unused legacy prompt flag) */
 #define PRF_CLS          23   /**< Clear screen in OLC */
 #define PRF_BUILDWALK    24   /**< Build new rooms while walking */
 #define PRF_AFK          25   /**< AFK flag */

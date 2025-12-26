@@ -2536,13 +2536,13 @@ If the victim is higher level than caster, the spell will inflict
 
 See also: DISPEL-EVIL
 #0
-DISPLAYS PROMPTS HIT-PNT-DISPLAY
+PROMPT PROMPTS
 
 Usage: prompt reset | prompt <template>
 
-"prompt" now stores a full template string.  With no argument it shows your
-current template.  Use @Yprompt reset@n to restore the default template of
-@W{R%h{W/{r%H{X {B%m{W/{b%M{X {G%v{W/{g%V{X >@n.
+The legacy prompt toggles have been removed.  The @Yprompt@n command now stores
+only a template string.  With no argument it shows your current template.  Use
+@Yprompt reset@n to restore the default template of @W{R%h{W/{r%H{X {B%m{W/{b%M{X {G%v{W/{g%V{X >@n.
 
 Templates support the familiar percent tokens and color codes in {braces}.
 Common tokens include:
@@ -12230,7 +12230,7 @@ VISIBLE                         - Break an invisibility spell.
 CLS CLEAR                       - Clears screen.
 HOUSE                           - Set your guests.
 COLOR ANSI BRIEF COMPACT        - Change the way the mud displays.
-PROMPT DISPLAY                  - Alter your prompt.
+PROMPT                          - Alter your prompt.
 SOCIALS                         - Act nice!
 BUG IDEA TYPO                   - Tell us what YOU think!
 ! ^ ALIAS                       - Alias commands.
@@ -13501,12 +13501,15 @@ zlock - Locks one or all zones. Type zlock for usage.
 zunlock - Locks one or all zones. Type zunlock for usage.
 
 #31
-PROMPT DISPLAY
+PROMPT
 
 Usage: prompt <template>
        prompt reset
 
 Customize the prompt shown while playing by supplying a template with %tokens.
+The old display-style toggles are gone; everything is controlled by the prompt
+template you set.  Type @Wprompt@n with no arguments to see your saved
+template, or use @Wprompt reset@n to restore the default.
 Color codes such as {R or @R work inside prompts.
 
 Common tokens:
