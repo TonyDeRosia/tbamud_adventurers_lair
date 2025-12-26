@@ -1218,28 +1218,169 @@ static void build_aff_summary(const struct affected_type *af, char *out, size_t 
     snprintf(out, outsz, "%s.", name);
 }
 
-ACMD(do_affects)
-{
-  const struct affected_type *af;
-  int any = 0;
-  int any_buff = 0;
-  int any_debuff = 0;
+/* =======================================================================
+ * AFF / AFFECTS COMMAND
+ * Mortals: short summary
+ * Immortals: full details
+ * ======================================================================= */
 
-  if (!ch || IS_NPC(ch)) {
-    send_to_char(ch, "Not for mobiles.\r\n");
+static int is_aff_debuff(const struct affected_type *af)
+{
+  if (!af) return 0;
+
+  if (af->modifier < 0)
+    return 1;
+
+#ifdef AFF_POISON
+  if (IS_SET_AR(af->bitvector, AFF_POISON)) return 1;
+#endif
+#ifdef AFF_BLIND
+  if (IS_SET_AR(af->bitvector, AFF_BLIND)) return 1;
+#endif
+#ifdef AFF_CURSE
+  if (IS_SET_AR(af->bitvector, AFF_CURSE)) return 1;
+#endif
+#ifdef AFF_CHARM
+  if (IS_SET_AR(af->bitvector, AFF_CHARM)) return 1;
+#endif
+
+  return 0;
+}
+
+static void build_aff_summary(const struct affected_type *af, char *out, size_t outsz)
+{
+  const char *name = "Unknown";
+  char eff[256];
+  char flags[256];
+
+  if (!out || outsz == 0) return;
+  out[0] = '\0';
+
+  if (!af) {
+    snprintf(out, outsz, "Unknown effect.");
     return;
   }
 
+  if (af->type > 0 && af->type < MAX_SPELLS && spell_info[af->type].name)
+    name = spell_info[af->type].name;
+
+  eff[0] = '\0';
+  flags[0] = '\0';
+
+  if (af->location != APPLY_NONE) {
+    snprintf(eff, sizeof(eff), "%s %s by %d",
+      (af->modifier >= 0 ? "increases" : "reduces"),
+      affect_loc_name(af->location),
+      ABS(af->modifier));
+  }
+
+  sprintbitarray(af->bitvector, affected_bits, AF_ARRAY_MAX, flags);
+
+  if (*eff && *flags)
+    snprintf(out, outsz, "%s: %s. Also: %s.", name, eff, flags);
+  else if (*eff)
+    snprintf(out, outsz, "%s: %s.", name, eff);
+  else if (*flags)
+    snprintf(out, outsz, "%s: %s.", name, flags);
+  else
+    snprintf(out, outsz, "%s.", name);
+}
+
+/* =========================================================================
+ * AFFECTS COMMAND - Complete Implementation
+ * 
+ * Installation:
+ * 1. Add this entire block to act.informative.c AFTER ACMD(do_score) 
+ *    and BEFORE ACMD(do_inventory)
+ * 2. Add to act.h: ACMD(do_affects);
+ * 3. Add to interpreter.c command table:
+ *    { "affects"  , "aff"     , POS_DEAD    , do_affects  , 0, 0 },
+ * 4. Compile: cd ~/mud/tbamud/src && make
+ * ========================================================================= */
+
+static int is_aff_debuff(const struct affected_type *af)
+{
+  if (!af) return 0;
+
+  /* Negative modifiers are usually debuffs */
+  if (af->modifier < 0)
+    return 1;
+
+  /* Common debuff flags - check if they exist in your codebase */
+  if (IS_SET_AR(af->bitvector, AFF_POISON)) return 1;
+  if (IS_SET_AR(af->bitvector, AFF_BLIND)) return 1;
+  if (IS_SET_AR(af->bitvector, AFF_CURSE)) return 1;
+  if (IS_SET_AR(af->bitvector, AFF_CHARM)) return 1;
+
+  return 0;
+}
+
+static void build_aff_summary(const struct affected_type *af, char *out, size_t outsz)
+{
+  const char *name = "Unknown";
+  char eff[256];
+  char flags[256];
+
+  if (!out || outsz == 0) return;
+  out[0] = '\0';
+
+  if (!af) {
+    snprintf(out, outsz, "Unknown effect");
+    return;
+  }
+
+  /* Get spell name */
+  if (af->type > 0 && af->type < MAX_SPELLS && spell_info[af->type].name)
+    name = spell_info[af->type].name;
+
+  eff[0] = '\0';
+  flags[0] = '\0';
+
+  /* Build effect description */
+  if (af->location != APPLY_NONE && af->location >= 0 && af->location < NUM_APPLIES) {
+    snprintf(eff, sizeof(eff), "%s %s by %d",
+      (af->modifier >= 0 ? "increases" : "reduces"),
+      apply_types[af->location],
+      abs(af->modifier));
+  }
+
+  /* Get affected flags */
+  sprintbitarray(af->bitvector, affected_bits, AF_ARRAY_MAX, flags);
+
+  /* Combine into summary */
+  if (*eff && *flags)
+    snprintf(out, outsz, "%s: %s. Also: %s", name, eff, flags);
+  else if (*eff)
+    snprintf(out, outsz, "%s: %s", name, eff);
+  else if (*flags)
+    snprintf(out, outsz, "%s: %s", name, flags);
+  else
+    snprintf(out, outsz, "%s", name);
+}
+
+ACMD(do_affects)
+{
+  const struct affected_type *af;
+  int any = 0, any_buff = 0, any_debuff = 0;
+
+  if (IS_NPC(ch)) {
+    send_to_char(ch, "Monsters don't have affects displayed this way.\r\n");
+    return;
+  }
+
+  /* Check if character has any affects */
   if (!ch->affected) {
     send_to_char(ch, "You have no active effects.\r\n");
     return;
   }
 
-  /* First pass: count for section headers */
+  /* Count buffs and debuffs */
   for (af = ch->affected; af; af = af->next) {
     any = 1;
-    if (is_aff_debuff(af)) any_debuff = 1;
-    else any_buff = 1;
+    if (is_aff_debuff(af))
+      any_debuff = 1;
+    else
+      any_buff = 1;
   }
 
   if (!any) {
@@ -1247,46 +1388,115 @@ ACMD(do_affects)
     return;
   }
 
-  send_to_char(ch, "\r\n%sActive Effects%s\r\n", CCYEL(ch, C_NRM), CCNRM(ch, C_NRM));
+  /* Header */
+  send_to_char(ch, "\r\n%s╔═══════════════════════════════════════════════════════════════════════════════╗%s\r\n",
+    CCBLU(ch, C_NRM), CCNRM(ch, C_NRM));
+  send_to_char(ch, "%s║%s %sACTIVE EFFECTS%-63s%s ║%s\r\n",
+    CCBLU(ch, C_NRM), CCNRM(ch, C_NRM),
+    CCYEL(ch, C_NRM), "", CCBLU(ch, C_NRM), CCNRM(ch, C_NRM));
+  send_to_char(ch, "%s╠═══════════════════════════════════════════════════════════════════════════════╣%s\r\n",
+    CCBLU(ch, C_NRM), CCNRM(ch, C_NRM));
 
+  /* =========================
+   * BUFFS
+   * ========================= */
   if (any_buff) {
-    send_to_char(ch, "\r\n%sBuffs%s\r\n", CCGRN(ch, C_NRM), CCNRM(ch, C_NRM));
+    send_to_char(ch, "%s║%s %sBUFFS%-72s%s ║%s\r\n",
+      CCBLU(ch, C_NRM), CCNRM(ch, C_NRM),
+      CCGRN(ch, C_NRM), "", CCBLU(ch, C_NRM), CCNRM(ch, C_NRM));
+
     for (af = ch->affected; af; af = af->next) {
       if (is_aff_debuff(af)) continue;
 
       if (GET_LEVEL(ch) >= LVL_IMMORT) {
+        /* Immortal view - detailed */
         char flags[256];
-        const char *name = "Unknown";
+        const char *spell_name = "Unknown";
 
         flags[0] = '\0';
-#ifdef AF_ARRAY_MAX
         sprintbitarray(af->bitvector, affected_bits, AF_ARRAY_MAX, flags);
-#else
-        sprintbit(af->bitvector, affected_bits, flags, sizeof(flags));
-#endif
 
-#ifdef MAX_SPELLS
         if (af->type > 0 && af->type < MAX_SPELLS && spell_info[af->type].name)
-          name = spell_info[af->type].name;
-#endif
+          spell_name = spell_info[af->type].name;
 
-        send_to_char(ch,
-          "  %s%s%s  lvl %d  dur %d  apply %s  mod %+d  flags %s\r\n",
-          CCCYN(ch, C_NRM), name, CCNRM(ch, C_NRM),
-          af->level, af->duration,
-          affect_loc_name(af->location),
+        send_to_char(ch, "%s║%s   %s%-20s%s lvl:%2d dur:%3d apply:%-12s mod:%+3d flags:%s\r\n",
+          CCBLU(ch, C_NRM), CCNRM(ch, C_NRM),
+          CCCYN(ch, C_NRM), spell_name, CCNRM(ch, C_NRM),
+          af->level,
+          af->duration,
+          (af->location >= 0 && af->location < NUM_APPLIES) ? apply_types[af->location] : "NONE",
           af->modifier,
-          (*flags ? flags : "none"));
+          *flags ? flags : "none");
       } else {
-        char summary[512];
-        build_aff_summary(af, summary, sizeof(summary));
-        send_to_char(ch, "  %s\r\n", summary);
+        /* Mortal view - simple summary */
+        char line[512];
+        build_aff_summary(af, line, sizeof(line));
+        send_to_char(ch, "%s║%s   %s%s%s\r\n",
+          CCBLU(ch, C_NRM), CCNRM(ch, C_NRM),
+          CCGRN(ch, C_NRM), line, CCNRM(ch, C_NRM));
       }
     }
+  } else {
+    send_to_char(ch, "%s║%s %sBUFFS%s: None%-65s%s ║%s\r\n",
+      CCBLU(ch, C_NRM), CCNRM(ch, C_NRM),
+      CCGRN(ch, C_NRM), CCNRM(ch, C_NRM), "",
+      CCBLU(ch, C_NRM), CCNRM(ch, C_NRM));
   }
 
+  /* Separator */
+  send_to_char(ch, "%s╠═══════════════════════════════════════════════════════════════════════════════╣%s\r\n",
+    CCBLU(ch, C_NRM), CCNRM(ch, C_NRM));
+
+  /* =========================
+   * DEBUFFS
+   * ========================= */
   if (any_debuff) {
-    send_to_char(ch, "\r\
+    send_to_char(ch, "%s║%s %sDEBUFFS%-69s%s ║%s\r\n",
+      CCBLU(ch, C_NRM), CCNRM(ch, C_NRM),
+      CCRED(ch, C_NRM), "", CCBLU(ch, C_NRM), CCNRM(ch, C_NRM));
+
+    for (af = ch->affected; af; af = af->next) {
+      if (!is_aff_debuff(af)) continue;
+
+      if (GET_LEVEL(ch) >= LVL_IMMORT) {
+        /* Immortal view - detailed */
+        char flags[256];
+        const char *spell_name = "Unknown";
+
+        flags[0] = '\0';
+        sprintbitarray(af->bitvector, affected_bits, AF_ARRAY_MAX, flags);
+
+        if (af->type > 0 && af->type < MAX_SPELLS && spell_info[af->type].name)
+          spell_name = spell_info[af->type].name;
+
+        send_to_char(ch, "%s║%s   %s%-20s%s lvl:%2d dur:%3d apply:%-12s mod:%+3d flags:%s\r\n",
+          CCBLU(ch, C_NRM), CCNRM(ch, C_NRM),
+          CCCYN(ch, C_NRM), spell_name, CCNRM(ch, C_NRM),
+          af->level,
+          af->duration,
+          (af->location >= 0 && af->location < NUM_APPLIES) ? apply_types[af->location] : "NONE",
+          af->modifier,
+          *flags ? flags : "none");
+      } else {
+        /* Mortal view - simple summary */
+        char line[512];
+        build_aff_summary(af, line, sizeof(line));
+        send_to_char(ch, "%s║%s   %s%s%s\r\n",
+          CCBLU(ch, C_NRM), CCNRM(ch, C_NRM),
+          CCRED(ch, C_NRM), line, CCNRM(ch, C_NRM));
+      }
+    }
+  } else {
+    send_to_char(ch, "%s║%s %sDEBUFFS%s: None%-63s%s ║%s\r\n",
+      CCBLU(ch, C_NRM), CCNRM(ch, C_NRM),
+      CCRED(ch, C_NRM), CCNRM(ch, C_NRM), "",
+      CCBLU(ch, C_NRM), CCNRM(ch, C_NRM));
+  }
+
+  /* Bottom border */
+  send_to_char(ch, "%s╚═══════════════════════════════════════════════════════════════════════════════╝%s\r\n",
+    CCBLU(ch, C_NRM), CCNRM(ch, C_NRM));
+}
 
 ACMD(do_inventory)
 {
