@@ -1,12 +1,15 @@
 #!/usr/bin/env bash
-# Diagnostic helper to track down the legacy prompt usage string.
-# Run from the repository root.
+# Diagnostic helper to ensure the legacy prompt handler is gone and the
+# modern template-based prompt is what ships. Run from the repository
+# root.
 
 set -euo pipefail
 
 REPO_ROOT=$(pwd)
 BIN_PATH="$REPO_ROOT/bin/circle"
 LEGACY_USAGE="Usage: prompt { { H | M | V } | all | auto | none }"
+MODERN_USAGE="Usage: prompt <template>"
+DEFAULT_PROMPT="[%h / %H] [%m / %M] [%v / %V] [%tnl]"
 
 step() {
   printf "\n=== %s ===\n" "$1"
@@ -33,6 +36,20 @@ if [[ -x "$BIN_PATH" ]]; then
       "(Binary: $BIN_PATH)"
   else
     echo "OK: legacy usage string not in this binary."
+  fi
+
+  if strings "$BIN_PATH" | grep -F "$MODERN_USAGE" >/dev/null; then
+    echo "OK: modern prompt usage text detected."
+  else
+    echo "Modern prompt usage text not found in binary." \
+      "(Expected: '$MODERN_USAGE')"
+  fi
+
+  if strings "$BIN_PATH" | grep -F "$DEFAULT_PROMPT" >/dev/null; then
+    echo "OK: default prompt template detected."
+  else
+    echo "Default prompt template not found in binary." \
+      "(Expected: '$DEFAULT_PROMPT')"
   fi
 else
   echo "Binary $BIN_PATH not found or not executable; build before running this check."
