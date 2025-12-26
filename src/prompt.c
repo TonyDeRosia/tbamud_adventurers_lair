@@ -89,9 +89,11 @@ static size_t translate_prompt_escapes(const char *src, char *dest, size_t dest_
           dest[pos++] = (char) strtol(hex, NULL, 16);
           src += 2;
         } else {
-          dest[pos++] = '\\';
-          if (pos + 1 < dest_size)
-            dest[pos++] = 'x';
+          if (pos + 1 < dest_size) {
+            dest[pos++] = '\\';
+            if (pos + 1 < dest_size)
+              dest[pos++] = 'x';
+          }
         }
         break;
       default:
@@ -101,12 +103,12 @@ static size_t translate_prompt_escapes(const char *src, char *dest, size_t dest_
     } else if (*src == '{' && src[1]) {
       const char *color = translate_color_brace(src[1]);
 
-      if (color) {
+      if (color && src[2] == '}') {
         size_t add_len = MIN(dest_size - pos - 1, strlen(color));
 
         memcpy(dest + pos, color, add_len);
         pos += add_len;
-        src++;
+        src += 2;
       } else
         dest[pos++] = *src;
     } else
@@ -310,43 +312,30 @@ static const struct prompt_token_info *find_prompt_token(char code)
   return NULL;
 }
 
-static void finalize_prompt_output(char *prompt)
-{
-  char translated[(MAX_PROMPT_LENGTH * 4) + 1];
-  char colorized[(MAX_PROMPT_LENGTH * 4) + 1];
-
-  translate_prompt_escapes(prompt, translated, sizeof(translated));
-  translate_prompt_escapes(translated, colorized, sizeof(colorized));
-
-  strlcpy(prompt, colorized, MAX_PROMPT_LENGTH);
-
-  if (strlen(prompt) + strlen(KNRM) < MAX_PROMPT_LENGTH)
-    strlcat(prompt, KNRM, MAX_PROMPT_LENGTH);
-}
-
 static void build_custom_prompt(char *prompt, struct descriptor_data *d)
 {
   const char *tpl = GET_PROMPT(d->character);
-  char processed_tpl[MAX_PROMPT_LENGTH + 1];
-  char processed_prompt[MAX_PROMPT_LENGTH + 1];
+  char processed_tpl[MAX_PROMPT_LENGTH * 4];
   size_t pos = 0;
 
   if (tpl == NULL || *tpl == '\0')
     tpl = default_prompt_template;
 
+  /* First pass: translate escape sequences and color codes in the template */
   translate_prompt_escapes(tpl, processed_tpl, sizeof(processed_tpl));
   tpl = processed_tpl;
 
-  for (; *tpl && pos < MAX_PROMPT_LENGTH; tpl++) {
+  /* Second pass: expand prompt tokens (%, %h, %m, etc.) */
+  for (; *tpl && pos < sizeof(processed_tpl) - 1; tpl++) {
     if (*tpl != '%') {
-      append_prompt_text(prompt, &pos, (char[2]){ *tpl, '\0' });
+      prompt[pos++] = *tpl;
       continue;
     }
 
     tpl++;
 
     if (*tpl == '\0') {
-      append_prompt_text(prompt, &pos, "%");
+      prompt[pos++] = '%';
       break;
     }
 
@@ -355,13 +344,17 @@ static void build_custom_prompt(char *prompt, struct descriptor_data *d)
     if (token)
       token->append(prompt, &pos, d);
     else {
-      append_prompt_text(prompt, &pos, "%");
-      append_prompt_text(prompt, &pos, (char[2]){ *tpl, '\0' });
+      prompt[pos++] = '%';
+      if (pos < sizeof(processed_tpl) - 1)
+        prompt[pos++] = *tpl;
     }
   }
 
-  translate_prompt_escapes(prompt, processed_prompt, sizeof(processed_prompt));
-  strlcpy(prompt, processed_prompt, MAX_PROMPT_LENGTH + 1);
+  prompt[pos] = '\0';
+
+  /* Append color reset at the end if there's room */
+  if (strlen(prompt) + strlen(KNRM) < MAX_PROMPT_LENGTH)
+    strlcat(prompt, KNRM, MAX_PROMPT_LENGTH);
 }
 
 static void render_prompt_preview(struct char_data *ch, char *out, size_t out_size)
@@ -392,9 +385,6 @@ char *make_prompt(struct descriptor_data *d)
   else if (STATE(d) == CON_PLAYING && d->character)
     build_custom_prompt(prompt, d);
 
-  if (*prompt)
-    finalize_prompt_output(prompt);
-
   return prompt;
 }
 
@@ -411,8 +401,8 @@ void queue_prompt(struct descriptor_data *d)
 
 ACMD(do_prompt)
 {
-  char processed[MAX_PROMPT_LENGTH + 1];
-  char preview[MAX_PROMPT_LENGTH + 1];
+  char processed[MAX_PROMPT_LENGTH * 4];
+  char preview[MAX_PROMPT_LENGTH];
   size_t processed_len = 0;
 
   if (IS_NPC(ch))
@@ -428,15 +418,19 @@ ACMD(do_prompt)
                  (current && *current) ? current : default_prompt_template,
                  default_prompt_template);
 
-    send_to_char(ch, "Use %%<code> to insert the values below:\r\n");
+    send_to_char(ch, "\r\nUse %%<code> to insert the values below:\r\n");
 
     for (i = 0; i < sizeof(prompt_tokens) / sizeof(prompt_tokens[0]); i++)
       send_to_char(ch, "  %%%c - %s\r\n", prompt_tokens[i].code, prompt_tokens[i].description);
 
+    send_to_char(ch, "\r\nColor codes:\r\n");
+    send_to_char(ch, "  \\tX or {X} where X is a color code (r=red, g=green, b=blue, etc.)\r\n");
+    send_to_char(ch, "  Example: \\tG[%%h/%%H\\tn] creates a green prompt with reset\r\n");
+
     render_prompt_preview(ch, preview, sizeof(preview));
 
     if (*preview)
-      send_to_char(ch, "Preview: %s\r\n", preview);
+      send_to_char(ch, "\r\nCurrent preview: %s\r\n", preview);
 
     return;
   }
@@ -452,20 +446,12 @@ ACMD(do_prompt)
     return;
   }
 
-  processed_len = translate_prompt_escapes(argument, processed, sizeof(processed));
-
-  if (processed_len > MAX_PROMPT_LENGTH) {
-    send_to_char(ch, "Prompt may not exceed %d characters after processing color codes.\r\n", MAX_PROMPT_LENGTH);
-    return;
-  }
-
-  strlcpy(GET_PROMPT(ch), processed, MAX_PROMPT_LENGTH + 1);
+  /* Store the raw template (with escape codes) */
+  strlcpy(GET_PROMPT(ch), argument, MAX_PROMPT_LENGTH + 1);
   send_to_char(ch, "Prompt set.\r\n");
 
   render_prompt_preview(ch, preview, sizeof(preview));
 
   if (*preview)
     send_to_char(ch, "Preview: %s\r\n", preview);
-
-  /* Sanity check: \tG[%h/%H\tn] should render with ANSI color codes and expanded values. */
 }
