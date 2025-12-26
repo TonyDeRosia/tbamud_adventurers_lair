@@ -10304,21 +10304,21 @@ This command can also be used to change these values, if used with the correct
 argument. When a toggle is set, it will be saved in that state until the next
 time you change it. Level IMP toggle includes:
 
- SlowNameserver: OFF                            Trackthru Doors: ON 
+ SlowNameserver: OFF                            Trackthru Doors: ON
       Buildwalk: OFF              NoWiz: OFF             ClsOLC: OFF
-       NoHassle: ON           Holylight: ON           ShowVnums: ON 
+       NoHassle: ON           Holylight: ON           ShowVnums: ON
          Syslog: normal
-Hit Pnt Display: OFF              Brief: OFF         Summonable: OFF
-   Move Display: OFF            Compact: ON               Quest: OFF
-   Mana Display: OFF             NoTell: OFF           NoRepeat: OFF
       AutoExits: OFF            NoShout: OFF              Wimpy: OFF
        NoGossip: OFF          NoAuction: OFF            NoGrats: OFF
-       AutoLoot: ON            AutoGold: ON           AutoSplit: ON 
+       AutoLoot: ON            AutoGold: ON           AutoSplit: ON
         AutoSac: ON          AutoAssist: ON             AutoMap: ON
      Pagelength: 32         Screenwidth: 80                 AFK: OFF
-        Autokey: OFF           Autodoor: OFF              Color: on     
+        Autokey: OFF           Autodoor: OFF
 
-See also: DISPLAY, NOSHOUT, NOSUMM, NOTELL, QUEST, REPEAT, WIMP
+Prompts are now configured solely with the PROMPT command; the old display
+toggles no longer control prompt output.
+
+See also: PROMPT, NOSHOUT, NOSUMM, NOTELL, QUEST, REPEAT, WIMP
 #0
 TOGGLES CONFIGURE SETTINGS
 
@@ -10328,18 +10328,18 @@ Usage: toggle
 TOGGLE shows you the current values of various toggles available on the MUD.
 This command can also be used to change these values, if used with the correct
 argument. When a toggle is set, it will be saved in that state until the next
-time you change it. 
+time you change it.
 
-Hit Pnt Display: OFF              Brief: OFF         Summonable: OFF
-   Move Display: OFF            Compact: ON               Quest: OFF
-   Mana Display: OFF             NoTell: OFF           NoRepeat: OFF
       AutoExits: OFF            NoShout: OFF              Wimpy: OFF
        NoGossip: OFF          NoAuction: OFF            NoGrats: OFF
-       AutoLoot: ON            AutoGold: ON           AutoSplit: ON 
+       AutoLoot: ON            AutoGold: ON           AutoSplit: ON
         AutoSac: ON          AutoAssist: ON                 AFK: OFF
-     Pagelength: 23               Color: off     
+     Pagelength: 23               Color: off
 
-See also: DISPLAY, NOSHOUT, NOSUMM, NOTELL, QUEST, REPEAT, WIMP
+Prompts are now configured solely with the PROMPT command; the old display
+toggles no longer control prompt output.
+
+See also: PROMPT, NOSHOUT, NOSUMM, NOTELL, QUEST, REPEAT, WIMP
 #0
 TRACK TRAIL 
 
