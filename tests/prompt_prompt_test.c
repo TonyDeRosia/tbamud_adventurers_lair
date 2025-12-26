@@ -83,14 +83,14 @@ int main(void)
   failures += expect_string_equals("default prompt", rendered, "[42 / 99] [10 / 20] [5 / 15] [150] ");
 
   translate_prompt_escapes("{R[%h{n", buffer, sizeof(buffer));
-  failures += expect_string_equals("brace escape translation", buffer, "\tR[%h\tn");
+  failures += expect_string_equals("brace escape translation", buffer, "\x1B[1;31m[%h\x1B[0m");
 
   translate_prompt_escapes("\\tG%h\\tn", buffer, sizeof(buffer));
   failures += expect_string_equals("backslash escape translation", buffer, "\tG%h\tn");
 
   set_prompt_from_input(&ch, "{G[%h/{r%H]{n");
   build_custom_prompt(buffer, &d);
-  failures += expect_string_equals("brace prompt render", buffer, "\tG[42/\tr99]\tn");
+  failures += expect_string_equals("brace prompt render", buffer, "\x1B[1;32m[42/\x1B[0;31m99]\x1B[0m");
 
   set_prompt_from_input(&ch, "\\tR%h\\tn> ");
   build_custom_prompt(buffer, &d);
