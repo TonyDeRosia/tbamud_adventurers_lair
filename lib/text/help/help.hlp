@@ -376,7 +376,7 @@ ACTOR.LEVEL ACTOR-LEVEL %ACTOR.LEVEL%
 This is used in scripts to find the mortal level of a player, or to adjust it.
 
 %actor.level%        - return the level of actor
-%actor.level(<val>)% - set the actor to mortal level 'val' (range 1-30)
+%actor.level(<val>)% - set the actor to mortal level 'val' (range 1-100)
 
 Note that the level of a player should never be adjusted in a script unless you
 have a very good reason for it.  This simply changes the mortal level and does
@@ -394,8 +394,8 @@ level the wizlist or immlist will automatically be updated.
    Advance can also be used to demote players.
 
 Example:
-  > advance Rumble 30
-  > advance Rumble admin 4 
+  > advance Rumble 100
+  > advance Rumble admin 4
 
 See also: SET, PROMOTION, ADMIN
 #31
@@ -2821,8 +2821,8 @@ to all.
  
 4: SYSERR: Object # (oedit-s-desc) has out of range level #.
 
-   A simple one. Limit spell levels to the levels available, on TBA that would 
-be 1-30.
+   A simple one. Limit spell levels to the levels available, on TBA that would
+be 1-100.
 
 5: SYSERR: Object # (oedit-s-desc) has negative weight (-2147483644).
    SYSERR: Object # (oedit-s-desc) has out of range level #2147483647.
@@ -4315,7 +4315,7 @@ If you feel claustrophobic, typing 'leave' will make you use the nearest
 obvious exit to the outside.
 
 #0
-LEVELS ATTAINING-LEVELS LEVEL-REQUIREMENTS
+LEVEL LEVELS ATTAINING-LEVELS LEVEL-REQUIREMENTS
 @n
 Usage: @ylevels [<min>-<max> | <range>]@n
 @n
@@ -4325,7 +4325,7 @@ the specified number of levels either side of your current level.  You can also
 specify a level range.
 @n
 Examples:
-@clevels       @n- shows all levels (1-30)
+@clevels       @n- shows all levels (1-100)
 @clevels 5     @n- shows 5 levels either side of your current level
 @clevels 10-20 @n- shows level 10 to level 20
 @n
@@ -4995,15 +4995,15 @@ MEDIT-LEVEL MOB-STANDARDS MOB-LIMITS AUTOROLL AUTOGENERATE GENERATE MEDIT-STANDA
 (1) Level:       [  #]
 (2) Auto Set Stats (based on level)
 
-   The level of the monster, from 1 to 30. Instead of having to manually
+   The level of the monster, from 1 to 100. Instead of having to manually
 enter all the data below, you can simply enter the level and then select option
-2 to autoroll all other fields so they will be calculated for you. This is a 
-guideline for builders, not a set standard. Feel free to modify any of these 
-values. Keep it reasonable. The level of the mob is used in the consider 
-command, and when gaining experience. 
+2 to autoroll all other fields so they will be calculated for you. This is a
+guideline for builders, not a set standard. Feel free to modify any of these
+values. Keep it reasonable. The level of the mob is used in the consider
+command, and when gaining experience.
 
 Here is our autoroll standard, entering mob level will calculate the following:
-      GET_LEVEL(OLC_MOB(d))   = LIMIT(i, 1, 30);
+      GET_LEVEL(OLC_MOB(d))   = LIMIT(i, 1, 100);
       GET_BONUS(OLC_MOB(d))   = mob_lev*10;          /* hit point bonus         */
       GET_HIT(OLC_MOB(d))     = mob_lev/5;           /* number of hitpoint dice */
       GET_MANA(OLC_MOB(d))    = mob_lev/5;           /* size of hitpoint dice   */
@@ -9060,7 +9060,7 @@ STAFF DUTY DUTIES STAFF-DUTIES TBA-STAFF-DUTIES TBASTAFF
 
 1.  Have them fill out the application at: @Chttp://tbamud.com/@n
     They must submit the application before being advanced. 
-2.  Advance them to Immortal.  <advance Rumble 31>
+2.  Advance them to Immortal.  <advance Rumble 101>
 3.  Transfer or teleport them to 3, Socrates will greet them with instructions. 
 4.  Tell them to read through the entire zone and follow its instructions. 
     Remind them that if they get confused they can ask for help over wiznet.
@@ -13248,7 +13248,8 @@ The Builder Academy
 tbamud.com 9091
 rumble@*tbamud.com
 
-   This is a listing of the current areas available:
+   This is a listing of the current areas available (player levels run 1-100;
+the ranges below show suggested mortal levels):
  
              Area                         Creator                    Levels
    1 SANCTUS                            -- Rumble                      1-34
@@ -13268,8 +13269,8 @@ rumble@*tbamud.com
   19 SPIDER Swamp                       -- Detta                      15-20
   20 ARENA                              -- Rumble                     10-20
   22 TOWER of the Undead                -- Rumble                     30-35
-  25 High Tower of Magic                -- Skylar                      1-30
-  26 High Tower Of Magic II             -- Skylar                      1-30
+  25 High Tower of Magic                -- Skylar                      1-100
+  26 High Tower Of Magic II             -- Skylar                      1-100
   27 MEMLIN Caves                       -- Detta                      17-25
   28 MUDSCHOOL                          -- Welcor                      1- 3
   30 Northern MIDGAARD                  -- DikuMUD                     1-33
@@ -13292,9 +13293,9 @@ rumble@*tbamud.com
   51 Drow City                          -- Rorschach                   1-25
   52 City Of Thalos                     -- Rorschach                   3-25
   53 Great Pyramid                      -- Andersen                    5-30
-  54 New Thalos                         -- Duke                        1-30
-  55 New Thalos II                      -- Duke                        1-30
-  56 New Thalos Wilderness              -- Duke                        1-30
+  54 New Thalos                         -- Duke                        1-100
+  55 New Thalos II                      -- Duke                        1-100
+  56 New Thalos Wilderness              -- Duke                        1-100
   57 ZODIAC                             -- Gatia                      10-14
   60 Haon-Dor, Light Forest             -- Quifael                     1- 8
   61 Haon-Dor, Light Forest II          -- Quifael                     5-30
@@ -13334,7 +13335,7 @@ rumble@*tbamud.com
  187 CIRCUS                             -- Wolfgaar Arina              2- 4
  200 WESTERN Highway                    -- Talandra                    3- 7
  201 SAPPHIRE Islands                   -- Elixias                      all
- 211 TAROT                              -- Parnassus                   1-30 
+ 211 TAROT                              -- Parnassus                   1-100
  220 The Enchanted KITCHEN              -- Exa                        10-20
  232 TERRINGHAM                         -- Ferret                     21-24 
  233 DRAGON Plains                      -- Unknown                    15-17
@@ -13401,7 +13402,7 @@ rumble@*tbamud.com
  294 TRADE Road                         -- C.A.W                       1-18
  295 Makira's JUNGLE zone               -- Martin                      5-20
  296 FROBOZ Factory                     -- C.A.W                       1- 6
- 298 Castle Of DESIRE                   -- HoneyBear                   1-30
+ 298 Castle Of DESIRE                   -- HoneyBear                   1-100
  299 Abandoned CATHEDRAL                -- Matrix of C.A.W.           30-34
  300 ANCALADOR                          -- Mercutio of C.A.W.         6-20
  301 CAMPUS                             -- Matrix of C.A.W.            1-15
@@ -13431,8 +13432,8 @@ rumble@*tbamud.com
  325 REVELRY                            -- Kaan                        6-30
  326 Army PERIMETER                     -- Kaan                        8-30
  345 ASYLUM for the Insane              -- Duluth                      6-10
- 555 ULTIMA                             -- Casret                      1-30
- 556 Ultima II                          -- Casret                      1-30
+ 555 ULTIMA                             -- Casret                      1-100
+ 556 Ultima II                          -- Casret                      1-100
  
 Zone names CAPITALIZED are accessed by teleporter. i.e. "teleport sanctus"
 Uncapitalized zones are linked through a capitalized zone.
