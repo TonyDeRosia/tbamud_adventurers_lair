@@ -4319,8 +4319,9 @@ LEVEL LEVELS ATTAINING-LEVELS LEVEL-REQUIREMENTS
 @n
 Usage: @ylevels [<min>-<max> | <range>]@n
 @n
-The levels command displays the experience points required to attain all levels
-in the game.  When followed by a number, it shows the required experience for
+The game uses mortal levels 1-100 and immortal ranks 101-104. The levels
+command displays the experience points required to attain all mortal levels.
+When followed by a number, it shows the required experience for
 the specified number of levels either side of your current level.  You can also
 specify a level range.
 @n
