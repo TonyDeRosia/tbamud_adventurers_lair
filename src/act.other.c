@@ -612,18 +612,27 @@ ACMD(do_use)
 
 ACMD(do_display)
 {
+  do_prompt(ch, argument, cmd, subcmd);
+}
+
+ACMD(do_prompt)
+{
   size_t max_len;
+  const char *current;
 
   if (IS_NPC(ch)) {
-    send_to_char(ch, "Monsters don't need displays.  Go away.\r\n");
+    send_to_char(ch, "Monsters don't need prompts.  Go away.\r\n");
     return;
   }
+
   skip_spaces(&argument);
+  current = *GET_PROMPT(ch) ? GET_PROMPT(ch) : PFDEF_PROMPT;
 
   if (!*argument) {
-    send_to_char(ch, "Usage: prompt reset | <custom template>\r\n");
-    send_to_char(ch, "Default: %s\r\n", PFDEF_PROMPT);
-    send_to_char(ch, "Example: prompt %s\r\n", PFDEF_PROMPT);
+    send_to_char(ch, "Current prompt: %s\r\n", current);
+    send_to_char(ch, "Use 'prompt <template>' to set a new prompt or 'prompt reset' to restore the default.\r\n");
+    send_to_char(ch, "Tokens: %%h %%H %%p %%m %%M %%q %%v %%V %%P %%n %%l %%c %%s %%t %%x %%X %%tnl\r\n");
+    send_to_char(ch, "Color codes like {R are supported inside the template.\r\n");
     return;
   }
 
@@ -640,10 +649,7 @@ ACMD(do_display)
     send_to_char(ch, "Prompt too long; truncated to %zu characters.\r\n", max_len);
   } else {
     strlcpy(GET_PROMPT(ch), argument, sizeof(GET_PROMPT(ch)));
-    send_to_char(ch, "Custom prompt set. Use %% to escape percents and combine color codes with tokens.\r\n");
-    send_to_char(ch, "Vitals: %%h/%%H/%%p, %%m/%%M/%%q, %%v/%%V/%%P. Identity: %%n %%l %%c %%s %%t.\r\n");
-    send_to_char(ch, "XP & combat: %%x %%X %%f %%F. Location: %%pos %%room %%zone. Admin: %%inv %%olc %%players %%uptime.\r\n");
-    send_to_char(ch, "Example: prompt {R%%h{W/{r%%H{X {B%%m{W/{b%%M{X {G%%v{W/{g%%V{x{X {M%%tnl{X\r\n");
+    send_to_char(ch, "Custom prompt saved.\r\n");
   }
 }
 
