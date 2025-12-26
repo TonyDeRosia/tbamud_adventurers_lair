@@ -1638,6 +1638,8 @@ void init_spell_levels(void)
 
 #define MORTAL_MAX_LEVEL   (LVL_IMMORT - 1)
 #define MORTAL_EXP_CAP     20000000
+/* Immortality should be reachable only by advancing beyond the mortal cap. */
+#define IMMORTAL_EXP       (MORTAL_EXP_CAP + 1)
 /* This is the exp given to implementors -- it must always be greater than the
  * exp required for immortality, plus at least 20,000 or so. */
 #define EXP_MAX  40000000
@@ -1705,7 +1707,7 @@ int level_exp(int chclass, int level)
       case 28: return 6400000;
       case 29: return 6850000;
       case 30: return 7400000;
-      case LVL_IMMORT: return MORTAL_EXP_CAP + 1000000;
+      case LVL_IMMORT: return IMMORTAL_EXP;
       default:
         if (level > 30 && level < LVL_IMMORT)
           return interpolate_mortal_exp(level, 30, 7400000, MORTAL_EXP_CAP);
@@ -1745,7 +1747,7 @@ int level_exp(int chclass, int level)
       case 28: return 5600000;
       case 29: return 6000000;
       case 30: return 6400000;
-      case LVL_IMMORT: return MORTAL_EXP_CAP + 1000000;
+      case LVL_IMMORT: return IMMORTAL_EXP;
       default:
         if (level > 30 && level < LVL_IMMORT)
           return interpolate_mortal_exp(level, 30, 6400000, MORTAL_EXP_CAP);
@@ -1785,7 +1787,7 @@ int level_exp(int chclass, int level)
       case 28: return 5900000;
       case 29: return 6300000;
       case 30: return 6650000;
-      case LVL_IMMORT: return MORTAL_EXP_CAP + 1000000;
+      case LVL_IMMORT: return IMMORTAL_EXP;
       default:
         if (level > 30 && level < LVL_IMMORT)
           return interpolate_mortal_exp(level, 30, 6650000, MORTAL_EXP_CAP);
@@ -1825,7 +1827,7 @@ int level_exp(int chclass, int level)
       case 28: return 6400000;
       case 29: return 6850000;
       case 30: return 7400000;
-      case LVL_IMMORT: return MORTAL_EXP_CAP + 1000000;
+      case LVL_IMMORT: return IMMORTAL_EXP;
       default:
         if (level > 30 && level < LVL_IMMORT)
           return interpolate_mortal_exp(level, 30, 7400000, MORTAL_EXP_CAP);
