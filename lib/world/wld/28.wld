@@ -325,15 +325,17 @@ Mudschool 10th Lesson: Shortcuts~
 
 By now you will have noticed the > that keeps appearing every time, you enter
 a command. This is your prompt, and it can be set to display various
-characteristics of your character. Right now type <prompt all>.
+characteristics of your character. Set a template like this:
+<prompt HP:%h/%H MP:%m/%M MV:%v/%V>
 
 A line looking something like this will appear as your prompt:
-12H 8M 31V >
-The numbers are the same as the ones in <score>. Current hitpoints (H), mana
-(M), and move (V).
+HP:12/12 MP:8/8 MV:31/31 >
+The numbers are the same as the ones in <score>. They show your current and
+maximum hitpoints (HP), mana (MP), and movement (MV).
 
 Remember: All commands can be abbreviated, to some extend.
-Example : <pr all> will work just as good as <prompt all>
+Example : <pr HP:%h/%H MP:%m/%M MV:%v/%V> will work just as good as the full
+command.
 
 Now move east for some basic manouvres.
 ~
