@@ -299,6 +299,7 @@ int load_char(const char *name, struct char_data *ch)
     GET_NUM_QUESTS(ch) = PFDEF_COMPQUESTS;
     GET_LAST_MOTD(ch) = PFDEF_LASTMOTD;
     GET_LAST_NEWS(ch) = PFDEF_LASTNEWS;
+    *GET_PROMPT(ch) = '\0';
 
     for (i = 0; i < AF_ARRAY_MAX; i++)
       AFF_FLAGS(ch)[i] = PFDEF_AFFFLAGS;
@@ -411,6 +412,7 @@ int load_char(const char *name, struct char_data *ch)
 	else if (!strcmp(tag, "Plyd"))	ch->player.time.played	= atoi(line);
 	else if (!strcmp(tag, "PfIn"))	POOFIN(ch)		= strdup(line);
 	else if (!strcmp(tag, "PfOt"))	POOFOUT(ch)		= strdup(line);
+	else if (!strcmp(tag, "Prmt"))	strlcpy(GET_PROMPT(ch), line, MAX_PROMPT_LENGTH + 1);
         else if (!strcmp(tag, "Pref")) {
           if (sscanf(line, "%s %s %s %s", f1, f2, f3, f4) == 4) {
             PRF_FLAGS(ch)[0] = asciiflag_conv(f1);
@@ -578,6 +580,7 @@ void save_char(struct char_data * ch)
   }
   if (POOFIN(ch))				fprintf(fl, "PfIn: %s\n", POOFIN(ch));
   if (POOFOUT(ch))				fprintf(fl, "PfOt: %s\n", POOFOUT(ch));
+  if (*GET_PROMPT(ch))				fprintf(fl, "Prmt: %s\n", GET_PROMPT(ch));
   if (GET_SEX(ch)	     != PFDEF_SEX)	fprintf(fl, "Sex : %d\n", GET_SEX(ch));
   if (GET_CLASS(ch)	   != PFDEF_CLASS)	fprintf(fl, "Clas: %d\n", GET_CLASS(ch));
   if (GET_LEVEL(ch)	   != PFDEF_LEVEL)	fprintf(fl, "Levl: %d\n", GET_LEVEL(ch));
