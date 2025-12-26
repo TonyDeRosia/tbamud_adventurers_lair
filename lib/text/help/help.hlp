@@ -2538,23 +2538,11 @@ See also: DISPEL-EVIL
 #0
 PROMPT PROMPTS
 
-Usage: prompt reset | prompt <template>
+The game prompt is now fixed for all characters.  It always displays:
 
-The legacy prompt toggles have been removed.  The @Yprompt@n command now stores
-only a template string.  With no argument it shows your current template.  Use
-@Yprompt reset@n to restore the default template of @W[%h / %H] [%m / %M] [%v / %V] [%tnl]@n.
+@W[current health / max health] [current mana / max mana] [current moves / max moves] [xp tnl]@n
 
-Templates support the familiar percent tokens and color codes in {braces}.
-Common tokens include:
-  %h/%H/%p   Current, maximum, and percent hit points
-  %m/%M/%q   Current, maximum, and percent mana
-  %v/%V/%P   Current, maximum, and percent movement
-  %n %l %c %s %t  Name, level, class, sex, and title
-  %x %X or %tnl   Current experience and XP to next level
-
-Examples:
-  prompt HP:%h/%H MP:%m/%M MV:%v/%V
-  prompt [%h / %H] [%m / %M] [%v / %V] [%tnl]
+Existing characters are automatically updated to use this standardized prompt.
 
 See also: TOGGLE
 #0
