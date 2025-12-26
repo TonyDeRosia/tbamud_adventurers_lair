@@ -3579,14 +3579,11 @@ void init_char(struct char_data *ch)
   /* Set Beginning Toggles Here */
   SET_BIT_AR(PRF_FLAGS(ch), PRF_AUTOEXIT);
   if (ch->desc)
-    if (ch->desc->pProtocol->pVariables[eMSDP_ANSI_COLORS] || 
+    if (ch->desc->pProtocol->pVariables[eMSDP_ANSI_COLORS] ||
       ch->desc->pProtocol->pVariables[eMSDP_XTERM_256_COLORS]) {
       SET_BIT_AR(PRF_FLAGS(ch), PRF_COLOR_1);
       SET_BIT_AR(PRF_FLAGS(ch), PRF_COLOR_2);
-    } 
-  SET_BIT_AR(PRF_FLAGS(ch), PRF_DISPHP);  
-  SET_BIT_AR(PRF_FLAGS(ch), PRF_DISPMANA);
-  SET_BIT_AR(PRF_FLAGS(ch), PRF_DISPMOVE);
+    }
 }
 
 /* returns the real number of the room with given virtual number */

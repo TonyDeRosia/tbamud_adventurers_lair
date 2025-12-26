@@ -13493,12 +13493,42 @@ See also: ZLOCK
 #31
 ZUNLOCK ZLOCK
 
-Zone locking and unlocking prevents any OLC from being used in the zone. Only 
+Zone locking and unlocking prevents any OLC from being used in the zone. Only
 an IMPL or GRGOD can lock/unlock all zones. A builder can lock and unlock their
-own zone if their name is in the zone's builders list. 
+own zone if their name is in the zone's builders list.
 
-zlock - Locks one or all zones. Type zlock for usage. 
-zunlock - Locks one or all zones. Type zunlock for usage. 
+zlock - Locks one or all zones. Type zlock for usage.
+zunlock - Locks one or all zones. Type zunlock for usage.
+
+#31
+PROMPT DISPLAY
+
+Usage: prompt <template>
+       prompt reset
+
+Customize the prompt shown while playing by supplying a template with %tokens.
+Color codes such as {R or @R work inside prompts.
+
+Common tokens:
+  %h %H %p    - Current/max/percent hit points
+  %m %M %q    - Current/max/percent mana
+  %v %V %P    - Current/max/percent movement points
+  %n          - Character name
+  %l %lvl     - Level (%level is also available)
+  %c %s %t    - Class, sex/gender, title
+  %x %exp     - Current experience
+  %X %tnl     - Experience needed for next level
+  %f %F       - Fight target name and hit percent
+  %pos        - Current position (standing, fighting, etc.)
+  %room %zone - Room vnum and zone number
+  %inv %olc   - Invisibility level, OLC editing context (immortals only)
+  %players    - Connected player count (immortals only)
+  %uptime     - Server uptime (immortals only)
+  %str %int %wis %dex %con %cha - Ability scores
+  %gold %bank %qp %prac %ac %hr %dr %align - Currency, practice, and combat stats
+
+Use %% to place a literal percent sign in the prompt. Type 'prompt reset' to
+restore the default prompt.
 
 #31
 $~
