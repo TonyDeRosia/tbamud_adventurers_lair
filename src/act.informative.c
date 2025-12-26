@@ -1799,7 +1799,7 @@ ACMD(do_levels)
       send_to_char(ch, "Displays exp required for levels.\r\n");
       send_to_char(ch, "%slevels       %s- shows all levels (1-%d)\r\n", QCYN, QNRM, (LVL_IMMORT-1));
       send_to_char(ch, "%slevels 5     %s- shows 5 levels either side of your current level\r\n", QCYN, QNRM);
-      send_to_char(ch, "%slevels 10-40 %s- shows level 10 to level 40\r\n",QCYN, QNRM);
+      send_to_char(ch, "%slevels 10-20 %s- shows level 10 to level 20\r\n",QCYN, QNRM);
       return;
     }
   }
