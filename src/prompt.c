@@ -14,30 +14,31 @@ static const char *default_prompt_template = "[%h / %H] [%m / %M] [%v / %V] [%X]
 
 static const char *translate_color_brace(char code)
 {
+  /* Return @* color codes that ProtocolOutput will process */
   switch (code) {
-  case 'n': case 'N': case 'x': case 'X': return KNRM; /* normal/reset */
-  case 'd': return "\x1B[90m"; /* dark grey / black */
-  case 'D': return "\x1B[37m"; /* light grey */
-  case 'a': return "\x1B[36m"; /* dark azure */
-  case 'A': return "\x1B[96m"; /* light azure */
-  case 'r': return KRED; /* dark red */
-  case 'R': return BRED; /* light red */
-  case 'g': return KGRN; /* dark green */
-  case 'G': return BGRN; /* light green */
-  case 'y': return KYEL; /* dark yellow */
-  case 'Y': return BYEL; /* light yellow */
-  case 'b': return KBLU; /* dark blue */
-  case 'B': return BBLU; /* light blue */
-  case 'm': return KMAG; /* dark magenta */
-  case 'M': return BMAG; /* light magenta */
-  case 'c': return KCYN; /* dark cyan */
-  case 'C': return BCYN; /* light cyan */
-  case 'w': return KWHT; /* dark white */
-  case 'W': return BWHT; /* light white */
-  case 'o': return "\x1B[38;5;208m"; /* dark orange */
-  case 'O': return "\x1B[38;5;214m"; /* light orange */
-  case 'p': return "\x1B[38;5;205m"; /* dark pink */
-  case 'P': return "\x1B[38;5;218m"; /* light pink */
+  case 'n': case 'N': case 'x': case 'X': return "@*n"; /* normal/reset */
+  case 'd': return "@*d"; /* dark grey / black */
+  case 'D': return "@*D"; /* light grey */
+  case 'a': return "@*a"; /* dark azure */
+  case 'A': return "@*A"; /* light azure */
+  case 'r': return "@*r"; /* dark red */
+  case 'R': return "@*R"; /* light red */
+  case 'g': return "@*g"; /* dark green */
+  case 'G': return "@*G"; /* light green */
+  case 'y': return "@*y"; /* dark yellow */
+  case 'Y': return "@*Y"; /* light yellow */
+  case 'b': return "@*b"; /* dark blue */
+  case 'B': return "@*B"; /* light blue */
+  case 'm': return "@*m"; /* dark magenta */
+  case 'M': return "@*M"; /* light magenta */
+  case 'c': return "@*c"; /* dark cyan */
+  case 'C': return "@*C"; /* light cyan */
+  case 'w': return "@*w"; /* dark white */
+  case 'W': return "@*W"; /* light white */
+  case 'o': return "@*o"; /* dark orange */
+  case 'O': return "@*O"; /* light orange */
+  case 'p': return "@*p"; /* dark pink */
+  case 'P': return "@*P"; /* light pink */
   default:  return NULL;
   }
 }
@@ -50,11 +51,6 @@ static size_t translate_prompt_escapes(const char *src, char *dest, size_t dest_
     return 0;
 
   for (; *src && pos + 1 < dest_size; src++) {
-    /* Debug output */
-    if (*src == '{' && src[1] && src[2] == '}') {
-      mudlog(BRF, LVL_IMMORT, TRUE, "PROMPT DEBUG: Found {%c} sequence", src[1]);
-    }
-    
     if (*src == '\\' && src[1]) {
       src++;
 
@@ -110,15 +106,12 @@ static size_t translate_prompt_escapes(const char *src, char *dest, size_t dest_
 
       if (color) {
         size_t add_len = MIN(dest_size - pos - 1, strlen(color));
-        
-        mudlog(BRF, LVL_IMMORT, TRUE, "PROMPT DEBUG: Translating {%c} to color code", src[1]);
+
         memcpy(dest + pos, color, add_len);
         pos += add_len;
-        src += 2;  /* Skip the color char and closing brace; loop increment handles { */
-      } else {
-        mudlog(BRF, LVL_IMMORT, TRUE, "PROMPT DEBUG: {%c} not recognized as color", src[1]);
+        src += 2;
+      } else
         dest[pos++] = *src;
-      }
     } else
       dest[pos++] = *src;
   }
@@ -369,8 +362,8 @@ static void build_custom_prompt(char *prompt, struct descriptor_data *d)
   prompt[pos] = '\0';
 
   /* Append color reset at the end if there's room */
-  if (strlen(prompt) + strlen(KNRM) < MAX_PROMPT_LENGTH)
-    strlcat(prompt, KNRM, MAX_PROMPT_LENGTH);
+  if (strlen(prompt) + 3 < MAX_PROMPT_LENGTH)
+    strlcat(prompt, "@*n", MAX_PROMPT_LENGTH);
 }
 
 static void render_prompt_preview(struct char_data *ch, char *out, size_t out_size)
