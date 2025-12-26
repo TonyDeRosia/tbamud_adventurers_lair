@@ -952,6 +952,7 @@ struct player_special_data_saved
   struct txt_block *comm_hist[NUM_HIST]; /**< Communication history */
   ubyte page_length;      /**< Max number of rows of text to send at once */
   ubyte screen_width;     /**< How wide the display page is */
+  char prompt[MAX_PROMPT_LENGTH + 1]; /**< Custom prompt string */
   int spells_to_learn;    /**< Remaining number of practice sessions */
   int olc_zone;           /**< Current olc permissions */
   int questpoints;        /**< Number of quest points earned */

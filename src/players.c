@@ -290,6 +290,7 @@ int load_char(const char *name, struct char_data *ch)
     GET_OLC_ZONE(ch) = PFDEF_OLC;
     GET_PAGE_LENGTH(ch) = PFDEF_PAGELENGTH;
     GET_SCREEN_WIDTH(ch) = PFDEF_SCREENWIDTH;
+    strlcpy(GET_PROMPT(ch), PFDEF_PROMPT, sizeof(GET_PROMPT(ch)));
     GET_ALIASES(ch) = NULL;
     SITTING(ch) = NULL;
     NEXT_SITTING(ch) = NULL;
@@ -411,6 +412,7 @@ int load_char(const char *name, struct char_data *ch)
 	else if (!strcmp(tag, "Plyd"))	ch->player.time.played	= atoi(line);
 	else if (!strcmp(tag, "PfIn"))	POOFIN(ch)		= strdup(line);
 	else if (!strcmp(tag, "PfOt"))	POOFOUT(ch)		= strdup(line);
+	else if (!strcmp(tag, "Prmt"))	strlcpy(GET_PROMPT(ch), line, sizeof(GET_PROMPT(ch)));
         else if (!strcmp(tag, "Pref")) {
           if (sscanf(line, "%s %s %s %s", f1, f2, f3, f4) == 4) {
             PRF_FLAGS(ch)[0] = asciiflag_conv(f1);
@@ -656,6 +658,7 @@ void save_char(struct char_data * ch)
   if (GET_OLC_ZONE(ch)     != PFDEF_OLC)        fprintf(fl, "Olc : %d\n", GET_OLC_ZONE(ch));
   if (GET_PAGE_LENGTH(ch)  != PFDEF_PAGELENGTH) fprintf(fl, "Page: %d\n", GET_PAGE_LENGTH(ch));
   if (GET_SCREEN_WIDTH(ch) != PFDEF_SCREENWIDTH) fprintf(fl, "ScrW: %d\n", GET_SCREEN_WIDTH(ch));
+  if (*GET_PROMPT(ch))                         fprintf(fl, "Prmt: %s\n", GET_PROMPT(ch));
   if (GET_QUESTPOINTS(ch)  != PFDEF_QUESTPOINTS) fprintf(fl, "Qstp: %d\n", GET_QUESTPOINTS(ch));
   if (GET_QUEST_COUNTER(ch)!= PFDEF_QUESTCOUNT)  fprintf(fl, "Qcnt: %d\n", GET_QUEST_COUNTER(ch));
   if (GET_NUM_QUESTS(ch)   != PFDEF_COMPQUESTS) {
