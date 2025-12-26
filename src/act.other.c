@@ -18,6 +18,7 @@
 #include "db.h"
 #include "spells.h"
 #include "screen.h"
+#include "prompt.h"
 #include "house.h"
 #include "constants.h"
 #include "dg_scripts.h"
@@ -612,28 +613,25 @@ ACMD(do_use)
 
 ACMD(do_prompt)
 {
-  const char *current;
-
   if (IS_NPC(ch)) {
     send_to_char(ch, "Monsters don't need prompts.  Go away.\r\n");
     return;
   }
 
   skip_spaces(&argument);
-  current = *GET_PROMPT(ch) ? GET_PROMPT(ch) : PFDEF_PROMPT;
 
   if (!*argument) {
-    send_to_char(ch, "Current prompt:\r\n%s\r\n", current);
+    send_to_char(ch, "Set a new prompt template or use 'prompt reset'.\r\n");
     return;
   }
 
   if (!str_cmp(argument, "reset")) {
-    strlcpy(GET_PROMPT(ch), PFDEF_PROMPT, MAX_PROMPT_LENGTH + 1);
+    set_prompt_template(ch, "");
     send_to_char(ch, "Prompt reset.\r\n");
     return;
   }
 
-  strlcpy(GET_PROMPT(ch), argument, MAX_PROMPT_LENGTH + 1);
+  set_prompt_template(ch, argument);
   send_to_char(ch, "Prompt set.\r\n");
 }
 
