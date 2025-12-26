@@ -11,6 +11,36 @@
 
 static const char *default_prompt_template = "[%h / %H] [%m / %M] [%v / %V] [%X] ";
 
+static const char *translate_color_brace(char code)
+{
+  switch (code) {
+  case 'n': case 'N': case 'x': case 'X': return "\tn"; /* normal/reset */
+  case 'd': return "\td"; /* dark grey / black */
+  case 'D': return "\tD"; /* light grey */
+  case 'a': return "\ta"; /* dark azure */
+  case 'A': return "\tA"; /* light azure */
+  case 'r': return "\tr"; /* dark red */
+  case 'R': return "\tR"; /* light red */
+  case 'g': return "\tg"; /* dark green */
+  case 'G': return "\tG"; /* light green */
+  case 'y': return "\ty"; /* dark yellow */
+  case 'Y': return "\tY"; /* light yellow */
+  case 'b': return "\tb"; /* dark blue */
+  case 'B': return "\tB"; /* light blue */
+  case 'm': return "\tm"; /* dark magenta */
+  case 'M': return "\tM"; /* light magenta */
+  case 'c': return "\tc"; /* dark cyan */
+  case 'C': return "\tC"; /* light cyan */
+  case 'w': return "\tw"; /* dark white */
+  case 'W': return "\tW"; /* light white */
+  case 'o': return "\to"; /* dark orange */
+  case 'O': return "\tO"; /* light orange */
+  case 'p': return "\tp"; /* dark pink */
+  case 'P': return "\tP"; /* light pink */
+  default:  return NULL;
+  }
+}
+
 static size_t translate_prompt_escapes(const char *src, char *dest, size_t dest_size)
 {
   size_t pos = 0;
@@ -54,6 +84,17 @@ static size_t translate_prompt_escapes(const char *src, char *dest, size_t dest_
         dest[pos++] = *src;
         break;
       }
+    } else if (*src == '{' && src[1]) {
+      const char *color = translate_color_brace(src[1]);
+
+      if (color) {
+        size_t add_len = MIN(dest_size - pos - 1, strlen(color));
+
+        memcpy(dest + pos, color, add_len);
+        pos += add_len;
+        src++;
+      } else
+        dest[pos++] = *src;
     } else
       dest[pos++] = *src;
   }
@@ -258,10 +299,14 @@ static const struct prompt_token_info *find_prompt_token(char code)
 static void build_custom_prompt(char *prompt, struct descriptor_data *d)
 {
   const char *tpl = GET_PROMPT(d->character);
+  char processed_tpl[MAX_PROMPT_LENGTH + 1];
   size_t pos = 0;
 
   if (tpl == NULL || *tpl == '\0')
     tpl = default_prompt_template;
+
+  translate_prompt_escapes(tpl, processed_tpl, sizeof(processed_tpl));
+  tpl = processed_tpl;
 
   for (; *tpl && pos < MAX_PROMPT_LENGTH; tpl++) {
     if (*tpl != '%') {
@@ -285,6 +330,19 @@ static void build_custom_prompt(char *prompt, struct descriptor_data *d)
       append_prompt_text(prompt, &pos, (char[2]){ *tpl, '\0' });
     }
   }
+}
+
+static void render_prompt_preview(struct char_data *ch, char *out, size_t out_size)
+{
+  if (out_size == 0)
+    return;
+
+  if (ch == NULL || ch->desc == NULL) {
+    *out = '\0';
+    return;
+  }
+
+  build_custom_prompt(out, ch->desc);
 }
 
 char *make_prompt(struct descriptor_data *d)
@@ -319,6 +377,7 @@ void queue_prompt(struct descriptor_data *d)
 ACMD(do_prompt)
 {
   char processed[MAX_PROMPT_LENGTH + 1];
+  char preview[MAX_PROMPT_LENGTH + 1];
   size_t processed_len = 0;
 
   if (IS_NPC(ch))
@@ -338,6 +397,11 @@ ACMD(do_prompt)
 
     for (i = 0; i < sizeof(prompt_tokens) / sizeof(prompt_tokens[0]); i++)
       send_to_char(ch, "  %%%c - %s\r\n", prompt_tokens[i].code, prompt_tokens[i].description);
+
+    render_prompt_preview(ch, preview, sizeof(preview));
+
+    if (*preview)
+      send_to_char(ch, "Preview: %s\r\n", preview);
 
     return;
   }
@@ -362,4 +426,9 @@ ACMD(do_prompt)
 
   strlcpy(GET_PROMPT(ch), processed, MAX_PROMPT_LENGTH + 1);
   send_to_char(ch, "Prompt set.\r\n");
+
+  render_prompt_preview(ch, preview, sizeof(preview));
+
+  if (*preview)
+    send_to_char(ch, "Preview: %s\r\n", preview);
 }

@@ -17,6 +17,10 @@ time_t boot_time = 0;
 void basic_mud_log(const char *format, ...) { (void)format; }
 size_t write_to_output(struct descriptor_data *d, const char *txt, ...) { (void)d; (void)txt; return 0; }
 int level_exp(int class_num, int level) { (void)class_num; return level * 100; }
+int compute_armor_class(struct char_data *ch) { (void) ch; return 0; }
+struct time_info_data *real_time_passed(time_t t2, time_t t1) { static struct time_info_data dummy; (void) t2; (void) t1; return &dummy; }
+void send_to_char(struct char_data *ch, const char *messg, ...) { (void) ch; (void) messg; }
+void skip_spaces(char **string) { (void) string; }
 
 #include "prompt.c"
 
@@ -48,19 +52,49 @@ static void init_test_character(struct descriptor_data *d, struct char_data *ch)
   ch->points.exp = 50;
 }
 
+static int expect_string_equals(const char *label, const char *actual, const char *expected)
+{
+  if (strcmp(actual, expected) != 0) {
+    fprintf(stderr, "%s: expected '%s' but got '%s'\n", label, expected, actual);
+    return 1;
+  }
+
+  return 0;
+}
+
+static void set_prompt_from_input(struct char_data *ch, const char *input)
+{
+  char processed[MAX_PROMPT_LENGTH + 1];
+
+  translate_prompt_escapes(input, processed, sizeof(processed));
+  strlcpy(GET_PROMPT(ch), processed, MAX_PROMPT_LENGTH + 1);
+}
+
 int main(void)
 {
   struct descriptor_data d;
   struct char_data ch;
+  char buffer[MAX_PROMPT_LENGTH + 1];
+  int failures = 0;
 
   init_test_character(&d, &ch);
 
   const char *rendered = make_prompt(&d);
-  if (rendered == NULL)
-    return 1;
+  failures += expect_string_equals("default prompt", rendered, "[42 / 99] [10 / 20] [5 / 15] [150] ");
 
-  if (strcmp(rendered, "[42 / 99] [10 / 20] [5 / 15] [150] ") != 0)
-    return 1;
+  translate_prompt_escapes("{R[%h{n", buffer, sizeof(buffer));
+  failures += expect_string_equals("brace escape translation", buffer, "\tR[%h\tn");
 
-  return 0;
+  translate_prompt_escapes("\\tG%h\\tn", buffer, sizeof(buffer));
+  failures += expect_string_equals("backslash escape translation", buffer, "\tG%h\tn");
+
+  set_prompt_from_input(&ch, "{G[%h/{r%H]{n");
+  build_custom_prompt(buffer, &d);
+  failures += expect_string_equals("brace prompt render", buffer, "\tG[42/\tr99]\tn");
+
+  set_prompt_from_input(&ch, "\\tR%h\\tn> ");
+  build_custom_prompt(buffer, &d);
+  failures += expect_string_equals("backslash prompt render", buffer, "\tR42\tn> ");
+
+  return failures;
 }
