@@ -224,6 +224,8 @@ void gain_exp(struct char_data *ch, int gain)
 {
   int is_altered = FALSE;
   int num_levels = 0;
+  int max_mortal_level = LVL_IMMORT - 1;
+  int target_level = MIN(LVL_IMMORT - CONFIG_NO_MORT_TO_IMMORT, max_mortal_level);
 
   if (!IS_NPC(ch) && ((GET_LEVEL(ch) < 1 || GET_LEVEL(ch) >= LVL_IMMORT)))
     return;
@@ -238,8 +240,8 @@ void gain_exp(struct char_data *ch, int gain)
 
     gain = MIN(CONFIG_MAX_EXP_GAIN, gain);	/* put a cap on the max gain per kill */
     GET_EXP(ch) += gain;
-    while (GET_LEVEL(ch) < LVL_IMMORT - CONFIG_NO_MORT_TO_IMMORT &&
-	GET_EXP(ch) >= level_exp(GET_CLASS(ch), GET_LEVEL(ch) + 1)) {
+    while (GET_LEVEL(ch) < target_level &&
+        GET_EXP(ch) >= level_exp(GET_CLASS(ch), GET_LEVEL(ch) + 1)) {
       GET_LEVEL(ch) += 1;
       num_levels++;
       advance_level(ch);
@@ -267,10 +269,11 @@ void gain_exp(struct char_data *ch, int gain)
     run_autowiz();
   }
 
-void gain_exp_regardless(struct char_data *ch, int gain)
+void gain_exp_regardless(struct char_data *ch, int gain, int max_level)
 {
   int is_altered = FALSE;
   int num_levels = 0;
+  int level_cap = MIN(max_level, LVL_IMPL);
 
   if ((IS_HAPPYHOUR) && (IS_HAPPYEXP))
     gain += (int)((float)gain * ((float)HAPPY_EXP / (float)(100)));
@@ -280,8 +283,8 @@ void gain_exp_regardless(struct char_data *ch, int gain)
     GET_EXP(ch) = 0;
 
   if (!IS_NPC(ch)) {
-    while (GET_LEVEL(ch) < LVL_IMPL &&
-	GET_EXP(ch) >= level_exp(GET_CLASS(ch), GET_LEVEL(ch) + 1)) {
+    while (GET_LEVEL(ch) < level_cap &&
+        GET_EXP(ch) >= level_exp(GET_CLASS(ch), GET_LEVEL(ch) + 1)) {
       GET_LEVEL(ch) += 1;
       num_levels++;
       advance_level(ch);
