@@ -326,7 +326,7 @@ static void build_custom_prompt(char *prompt, struct descriptor_data *d)
   tpl = processed_tpl;
 
   /* Second pass: expand prompt tokens (%, %h, %m, etc.) */
-  for (; *tpl && pos < sizeof(processed_tpl) - 1; tpl++) {
+  for (; *tpl && pos < MAX_PROMPT_LENGTH - 1; tpl++) {
     if (*tpl != '%') {
       prompt[pos++] = *tpl;
       continue;
@@ -344,8 +344,9 @@ static void build_custom_prompt(char *prompt, struct descriptor_data *d)
     if (token)
       token->append(prompt, &pos, d);
     else {
-      prompt[pos++] = '%';
-      if (pos < sizeof(processed_tpl) - 1)
+      if (pos < MAX_PROMPT_LENGTH - 1)
+        prompt[pos++] = '%';
+      if (pos < MAX_PROMPT_LENGTH - 1)
         prompt[pos++] = *tpl;
     }
   }
