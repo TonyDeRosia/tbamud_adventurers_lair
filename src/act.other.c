@@ -610,11 +610,6 @@ ACMD(do_use)
   mag_objectmagic(ch, mag_item, buf);
 }
 
-ACMD(do_display)
-{
-  do_prompt(ch, argument, cmd, subcmd);
-}
-
 ACMD(do_prompt)
 {
   size_t max_len;

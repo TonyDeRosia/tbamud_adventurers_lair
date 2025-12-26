@@ -237,7 +237,6 @@ ACMD(do_use);
 #define SCMD_QUAFF  1
 #define SCMD_RECITE 2
 /* Functions without subcommands */
-ACMD(do_display);
 ACMD(do_prompt);
 ACMD(do_group);
 ACMD(do_happyhour);
