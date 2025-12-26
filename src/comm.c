@@ -1612,19 +1612,16 @@ static char *make_prompt(struct descriptor_data *d)
     len = expand_prompt_template(d, prompt_template, prompt, len, sizeof(prompt));
 
     if (PRF_FLAGGED(d->character, PRF_BUILDWALK) && len < sizeof(prompt))
-      len = append_prompt(prompt, len, sizeof(prompt), "BUILDWALKING ");
+      len = append_prompt(prompt, len, sizeof(prompt), " BUILDWALKING ");
 
     if (PRF_FLAGGED(d->character, PRF_AFK) && len < sizeof(prompt))
-      len = append_prompt(prompt, len, sizeof(prompt), "AFK ");
+      len = append_prompt(prompt, len, sizeof(prompt), " AFK ");
 
-     if (GET_LAST_NEWS(d->character) < newsmod)
-       len = append_prompt(prompt, len, sizeof(prompt), "(news) ");
+    if (GET_LAST_NEWS(d->character) < newsmod)
+      len = append_prompt(prompt, len, sizeof(prompt), " (news) ");
 
-     if (GET_LAST_MOTD(d->character) < motdmod)
-       len = append_prompt(prompt, len, sizeof(prompt), "(motd) ");
-
-    if (len < sizeof(prompt))
-      strncat(prompt, "> ", sizeof(prompt) - len - 1);  /* strncat: OK */
+    if (GET_LAST_MOTD(d->character) < motdmod)
+      len = append_prompt(prompt, len, sizeof(prompt), " (motd) ");
   } else if (STATE(d) == CON_PLAYING && IS_NPC(d->character))
     snprintf(prompt, sizeof(prompt), "%s> ", GET_NAME(d->character));
   else

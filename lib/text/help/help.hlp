@@ -2538,36 +2538,23 @@ See also: DISPEL-EVIL
 #0
 DISPLAYS PROMPTS HIT-PNT-DISPLAY
 
-Usage: prompt < H | M | V | all | auto | none | reset | <custom template> >
+Usage: prompt reset | prompt <template>
 
-Adjust the prompt to show hit points, mana, and/or movement points, or replace
-it with your own template string.
+"prompt" now stores a full template string.  With no argument it shows your
+current template.  Use @Yprompt reset@n to restore the default template of
+@W{R%h{W/{r%H{X {B%m{W/{b%M{X {G%v{W/{g%V{X >@n.
 
-Letter switches toggle the legacy flags:
-  > prompt hv         Display hit points and movement points.
-  > prompt all        Display hit, mana, and movement points.
-  > prompt auto       Only show the prompt if a value is below 30%% of max.
-  > prompt none/off   Return to no prompt and clear custom text.
+Templates support the familiar percent tokens and color codes in {braces}.
+Common tokens include:
+  %h/%H/%p   Current, maximum, and percent hit points
+  %m/%M/%q   Current, maximum, and percent mana
+  %v/%V/%P   Current, maximum, and percent movement
+  %n %l %c %s %t  Name, level, class, sex, and title
+  %x %X or %tnl   Current experience and XP to next level
 
-Supplying any other text sets a custom prompt.  You can mix plain text,
-color codes in {braces}, and percent tokens. Use %% to print a literal
-percent sign. Tokens:
-  %%h/%%H/%%p            Current, maximum, and percent hit points
-  %%m/%%M/%%q            Current, maximum, and percent mana
-  %%v/%%V/%%P            Current, maximum, and percent movement
-  %%n %%l %%c %%s %%t     Name, level, class, sex, and title
-  %%x %%X (or %%tnl)      Current experience and XP to next level
-  %%f %%F                Fighting target name and target HP percent
-  %%pos %%room %%zone    Position string, room vnum, and zone number
-  %%inv %%olc %%players %%uptime (immortal only)
-  Legacy stats: %%str %%int %%wis %%dex %%con %%cha %%gold %%bank %%qp %%prac %%ac %%hr %%dr %%align
-  %%r will be blank until races are enabled.
-
-Example:
-  prompt {R%%h{W/{r%%H{X {B%%m{W/{b%%M{X {G%%v{W/{g%%V{x{X {M%%tnl{X
-
-Use @Yprompt reset@n to clear your saved template and return to flag-based
-prompts.
+Examples:
+  prompt HP:%h/%H MP:%m/%M MV:%v/%V
+  prompt {R%h{W/{r%H{X {B%m{W/{b%M{X {G%v{W/{g%V{X >
 
 See also: TOGGLE
 #0
