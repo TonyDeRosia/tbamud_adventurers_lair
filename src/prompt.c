@@ -9,6 +9,15 @@
 #include "quest.h"
 #include "prompt.h"
 #include "screen.h"
+#include "db.h"
+
+/* External variables */
+extern struct room_data *world;
+extern const char *position_types[];
+extern room_rnum top_of_world;
+
+/* External functions */
+int compute_armor_class(struct char_data *ch);
 
 static const char *default_prompt_template = "[%h / %H] [%m / %M] [%v / %V] [%X] ";
 
@@ -410,9 +419,7 @@ void queue_prompt(struct descriptor_data *d)
 
 ACMD(do_prompt)
 {
-  char processed[MAX_PROMPT_LENGTH * 4];
   char preview[MAX_PROMPT_LENGTH];
-  size_t processed_len = 0;
 
   if (IS_NPC(ch))
     return;
