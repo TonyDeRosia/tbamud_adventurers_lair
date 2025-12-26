@@ -97,14 +97,16 @@ static void prefedit_save_to_char(struct descriptor_data *d)
 static void prefedit_disp_main_menu(struct descriptor_data *d)
 {
   struct char_data *vict;
-  char prompt_string[10], color_string[10], syslog_string[10];
+  char prompt_preview[20], color_string[10], syslog_string[10];
+  const char *prompt_template;
   const char *multi_types[] = { "Off", "Brief", "Normal", "Complete", "\n" };
 
   /* Set up the required variables and strings */
   vict = PREFEDIT_GET_CHAR;
 
-  sprintf(prompt_string, "%s%s%s", PREFEDIT_FLAGGED(PRF_DISPHP) ? "H" : "",   PREFEDIT_FLAGGED(PRF_DISPMANA) ? "M" : "",
-                                   PREFEDIT_FLAGGED(PRF_DISPMOVE) ? "V" : "" );
+  prompt_template = *GET_PROMPT(vict) ? GET_PROMPT(vict) : PFDEF_PROMPT;
+  snprintf(prompt_preview, sizeof(prompt_preview), "%.17s%s", prompt_template,
+           strlen(prompt_template) > 17 ? "..." : "");
 
   sprintf(color_string, "%s", multi_types[(PREFEDIT_FLAGGED(PRF_COLOR_1) ? 1 : 0) + (PREFEDIT_FLAGGED(PRF_COLOR_2) ? 2 : 0)]);
 
@@ -117,13 +119,13 @@ static void prefedit_disp_main_menu(struct descriptor_data *d)
   /* The mortal preferences section of the actual menu */
   send_to_char(d->character, "\r\n"
                              "%sPreferences\r\n"
-                             "%sP%s) Prompt : %s[%s%-3s%s]         %sL%s) Pagelength : %s[%s%-3d%s]\r\n"
+                             "%sP%s) Prompt : %s[%s%-19s%s]  %sL%s) Pagelength : %s[%s%-3d%s]\r\n"
                              "%sC%s) Color  : %s[%s%-8s%s]    %sS%s) Screenwidth: %s[%s%-3d%s]\r\n"
                              "%sW%s) Wimpy  : %s[%s%-4d%s]%s\r\n",
              CCWHT(d->character, C_NRM),
 /* Line 1 - prompt and pagelength */
              CBYEL(d->character, C_NRM), CCNRM(d->character, C_NRM), CCCYN(d->character, C_NRM), CCYEL(d->character, C_NRM),
-             prompt_string, CCCYN(d->character, C_NRM), CBYEL(d->character, C_NRM), CCNRM(d->character, C_NRM),
+             prompt_preview, CCCYN(d->character, C_NRM), CBYEL(d->character, C_NRM), CCNRM(d->character, C_NRM),
              CCCYN(d->character, C_NRM), CCYEL(d->character, C_NRM), PREFEDIT_GET_PAGELENGTH, CCCYN(d->character, C_NRM),
 /* Line 2 - color and screenwidth */
              CBYEL(d->character, C_NRM), CCNRM(d->character, C_NRM), CCCYN(d->character, C_NRM), CCYEL(d->character, C_NRM),
@@ -300,29 +302,16 @@ static void prefedit_disp_toggles_menu(struct descriptor_data *d)
 
 static void prefedit_disp_prompt_menu(struct descriptor_data *d)
 {
-  char prompt_string[7];
+  const char *prompt_template = *GET_PROMPT(PREFEDIT_GET_CHAR) ? GET_PROMPT(PREFEDIT_GET_CHAR) : PFDEF_PROMPT;
 
-  if (PREFEDIT_FLAGGED(PRF_DISPAUTO))
-    sprintf(prompt_string, "<Auto>");
-  else
-    sprintf(prompt_string, "%s%s%s", PREFEDIT_FLAGGED(PRF_DISPHP) ? "H" : "",   PREFEDIT_FLAGGED(PRF_DISPMANA) ? "M" : "",
-                                     PREFEDIT_FLAGGED(PRF_DISPMOVE) ? "V" : "");
+  send_to_char(d->character, "%sPrompt Template\r\n"
+                             "%sCurrent:%s %s\r\n\r\n"
+                             "Enter a new prompt (max %d characters) or 'default' to restore the game default.\r\n"
+                             "See 'help prompt' for the token list.\r\n> ",
+                             CBWHT(d->character, C_NRM),
+                             CCCYN(d->character, C_NRM), CCNRM(d->character, C_NRM), prompt_template,
+                             MAX_PROMPT_LENGTH);
 
-  send_to_char(d->character, "%sPrompt Settings\r\n"
-                             "%s1%s) Toggle HP\r\n"
-                             "%s2%s) Toggle Mana\r\n"
-                             "%s3%s) Toggle Moves\r\n"
-                             "%s4%s) Toggle auto flag\r\n\r\n"
-                             "%sCurrent Prompt: %s%s%s\r\n\r\n"
-                             "%s0%s) Quit (to main menu)\r\n",
-                             CBWHT(d->character, C_NRM), CBYEL(d->character, C_NRM), CCNRM(d->character, C_NRM),
-                             CBYEL(d->character, C_NRM), CCNRM(d->character, C_NRM),
-                             CBYEL(d->character, C_NRM), CCNRM(d->character, C_NRM),
-                             CBYEL(d->character, C_NRM), CCNRM(d->character, C_NRM),
-                             CCNRM(d->character, C_NRM), CCCYN(d->character, C_NRM), prompt_string, CCNRM(d->character, C_NRM),
-                             CBYEL(d->character, C_NRM), CCNRM(d->character, C_NRM) );
-
-  send_to_char(d->character, "Enter Choice :");
   OLC_MODE(d) = PREFEDIT_PROMPT;
 }
 
@@ -727,48 +716,25 @@ void prefedit_parse(struct descriptor_data * d, char *arg)
 
   /* Sub-menu's and flag toggle menu's */
   case PREFEDIT_PROMPT:
-    number = atoi(arg);
-    if ((number < 0) || (number > 7)) {
-      send_to_char(d->character, "%sThat's not a valid choice!%s\r\n", CBRED(d->character, C_NRM), CCNRM(d->character, C_NRM));
+    skip_spaces(&arg);
+    if (!*arg) {
       prefedit_disp_prompt_menu(d);
-    } else {
-      if (number == 0)
-        break;
-      else
-      {
-        /* toggle bits */
-        if (number == 1)
-        {
-          if (PREFEDIT_FLAGGED(PRF_DISPHP))
-            REMOVE_BIT_AR(PREFEDIT_GET_FLAGS, PRF_DISPHP);
-          else
-            SET_BIT_AR(PREFEDIT_GET_FLAGS, PRF_DISPHP);
-        }
-        else if (number == 2)
-        {
-          if (PREFEDIT_FLAGGED(PRF_DISPMANA))
-            REMOVE_BIT_AR(PREFEDIT_GET_FLAGS, PRF_DISPMANA);
-          else
-            SET_BIT_AR(PREFEDIT_GET_FLAGS, PRF_DISPMANA);
-        }
-        else if (number == 3)
-        {
-          if (PREFEDIT_FLAGGED(PRF_DISPMOVE))
-            REMOVE_BIT_AR(PREFEDIT_GET_FLAGS, PRF_DISPMOVE);
-          else
-            SET_BIT_AR(PREFEDIT_GET_FLAGS, PRF_DISPMOVE);
-        }
-        else if (number == 4)
-        {
-          if (PREFEDIT_FLAGGED(PRF_DISPAUTO))
-            REMOVE_BIT_AR(PREFEDIT_GET_FLAGS, PRF_DISPAUTO);
-          else
-            SET_BIT_AR(PREFEDIT_GET_FLAGS, PRF_DISPAUTO);
-        }
-        prefedit_disp_prompt_menu(d);
-      }
+      return;
     }
-    return;
+
+    if (!str_cmp(arg, "default")) {
+      strlcpy(GET_PROMPT(PREFEDIT_GET_CHAR), PFDEF_PROMPT, MAX_PROMPT_LENGTH + 1);
+      send_to_char(d->character, "Prompt reset to default.\r\n");
+    } else {
+      size_t prompt_len = strlen(arg);
+      strlcpy(GET_PROMPT(PREFEDIT_GET_CHAR), arg, MAX_PROMPT_LENGTH + 1);
+
+      if (prompt_len > MAX_PROMPT_LENGTH)
+        send_to_char(d->character, "Prompt too long; truncated to %d characters.\r\n", MAX_PROMPT_LENGTH);
+      else
+        send_to_char(d->character, "Prompt updated.\r\n");
+    }
+    break;
 
   default:
     /* we should never get here */
@@ -799,17 +765,8 @@ void prefedit_Restore_Defaults(struct descriptor_data *d)
   if (PREFEDIT_FLAGGED(PRF_NOTELL))
      REMOVE_BIT_AR(PREFEDIT_GET_FLAGS, PRF_NOTELL);
 
-  /* PRF_DISPHP     - On */
-  if (!PREFEDIT_FLAGGED(PRF_DISPHP))
-     SET_BIT_AR(PREFEDIT_GET_FLAGS, PRF_DISPHP);
-
-  /* PRF_DISPMANA   - On */
-  if (!PREFEDIT_FLAGGED(PRF_DISPMANA))
-     SET_BIT_AR(PREFEDIT_GET_FLAGS, PRF_DISPMANA);
-
-  /* PRF_DISPMOVE   - On */
-  if (!PREFEDIT_FLAGGED(PRF_DISPMOVE))
-     SET_BIT_AR(PREFEDIT_GET_FLAGS, PRF_DISPMOVE);
+  /* Reset prompt template to default */
+  strlcpy(GET_PROMPT(PREFEDIT_GET_CHAR), PFDEF_PROMPT, MAX_PROMPT_LENGTH + 1);
 
   /* PRF_AUTOEXIT   - On */
   if (!PREFEDIT_FLAGGED(PRF_AUTOEXIT))
@@ -874,10 +831,6 @@ void prefedit_Restore_Defaults(struct descriptor_data *d)
      SET_BIT_AR(PREFEDIT_GET_FLAGS, PRF_SHOWVNUMS);
   else
      REMOVE_BIT_AR(PREFEDIT_GET_FLAGS, PRF_SHOWVNUMS);
-
-  /* PRF_DISPAUTO   - Off */
-  if (PREFEDIT_FLAGGED(PRF_DISPAUTO))
-     REMOVE_BIT_AR(PREFEDIT_GET_FLAGS, PRF_DISPAUTO);
 
   /* PRF_CLS - Off */
   if (PREFEDIT_FLAGGED(PRF_CLS))

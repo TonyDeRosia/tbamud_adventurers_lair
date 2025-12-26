@@ -631,24 +631,23 @@ ACMD(do_prompt)
   if (!*argument) {
     send_to_char(ch, "Current prompt: %s\r\n", current);
     send_to_char(ch, "Use 'prompt <template>' to set a new prompt or 'prompt reset' to restore the default.\r\n");
-    send_to_char(ch, "Tokens: %%h %%H %%p %%m %%M %%q %%v %%V %%P %%n %%l %%c %%s %%t %%x %%X %%tnl\r\n");
-    send_to_char(ch, "Color codes like {R are supported inside the template.\r\n");
+    send_to_char(ch, "See 'help prompt' for the full list of prompt tokens and color codes.\r\n");
     return;
   }
 
   if (!str_cmp(argument, "reset")) {
-    strlcpy(GET_PROMPT(ch), PFDEF_PROMPT, sizeof(GET_PROMPT(ch)));
+    strlcpy(GET_PROMPT(ch), PFDEF_PROMPT, MAX_PROMPT_LENGTH + 1);
     send_to_char(ch, "Prompt reset to the default template.\r\n");
     return;
   }
 
-  max_len = sizeof(GET_PROMPT(ch)) - 1;
+  max_len = MAX_PROMPT_LENGTH;
 
   if (strlen(argument) > max_len) {
-    strlcpy(GET_PROMPT(ch), argument, sizeof(GET_PROMPT(ch)));
+    strlcpy(GET_PROMPT(ch), argument, MAX_PROMPT_LENGTH + 1);
     send_to_char(ch, "Prompt too long; truncated to %zu characters.\r\n", max_len);
   } else {
-    strlcpy(GET_PROMPT(ch), argument, sizeof(GET_PROMPT(ch)));
+    strlcpy(GET_PROMPT(ch), argument, MAX_PROMPT_LENGTH + 1);
     send_to_char(ch, "Custom prompt saved.\r\n");
   }
 }
