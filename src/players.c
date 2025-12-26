@@ -290,7 +290,7 @@ int load_char(const char *name, struct char_data *ch)
     GET_OLC_ZONE(ch) = PFDEF_OLC;
     GET_PAGE_LENGTH(ch) = PFDEF_PAGELENGTH;
     GET_SCREEN_WIDTH(ch) = PFDEF_SCREENWIDTH;
-    strlcpy(GET_PROMPT(ch), PFDEF_PROMPT, sizeof(GET_PROMPT(ch)));
+    strlcpy(GET_PROMPT(ch), PFDEF_PROMPT, MAX_PROMPT_LENGTH + 1);
     GET_ALIASES(ch) = NULL;
     SITTING(ch) = NULL;
     NEXT_SITTING(ch) = NULL;
@@ -412,7 +412,7 @@ int load_char(const char *name, struct char_data *ch)
 	else if (!strcmp(tag, "Plyd"))	ch->player.time.played	= atoi(line);
 	else if (!strcmp(tag, "PfIn"))	POOFIN(ch)		= strdup(line);
 	else if (!strcmp(tag, "PfOt"))	POOFOUT(ch)		= strdup(line);
-	else if (!strcmp(tag, "Prmt"))	strlcpy(GET_PROMPT(ch), line, sizeof(GET_PROMPT(ch)));
+	else if (!strcmp(tag, "Prmt"))	strlcpy(GET_PROMPT(ch), line, MAX_PROMPT_LENGTH + 1);
         else if (!strcmp(tag, "Pref")) {
           if (sscanf(line, "%s %s %s %s", f1, f2, f3, f4) == 4) {
             PRF_FLAGS(ch)[0] = asciiflag_conv(f1);
