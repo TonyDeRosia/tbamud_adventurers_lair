@@ -26,7 +26,6 @@ static void prefedit_setup(struct descriptor_data *d, struct char_data *vict);
 static void prefedit_save_to_char(struct descriptor_data *d);
 static void prefedit_disp_main_menu(struct descriptor_data *d);
 static void prefedit_disp_toggles_menu(struct descriptor_data *d);
-static void prefedit_disp_prompt_menu(struct descriptor_data *d);
 static void prefedit_disp_color_menu(struct descriptor_data *d);
 static void prefedit_disp_syslog_menu(struct descriptor_data *d);
 
@@ -97,16 +96,11 @@ static void prefedit_save_to_char(struct descriptor_data *d)
 static void prefedit_disp_main_menu(struct descriptor_data *d)
 {
   struct char_data *vict;
-  char prompt_preview[20], color_string[10], syslog_string[10];
-  const char *prompt_template;
+  char color_string[10], syslog_string[10];
   const char *multi_types[] = { "Off", "Brief", "Normal", "Complete", "\n" };
 
   /* Set up the required variables and strings */
   vict = PREFEDIT_GET_CHAR;
-
-  prompt_template = *GET_PROMPT(vict) ? GET_PROMPT(vict) : PFDEF_PROMPT;
-  snprintf(prompt_preview, sizeof(prompt_preview), "%.17s%s", prompt_template,
-           strlen(prompt_template) > 17 ? "..." : "");
 
   sprintf(color_string, "%s", multi_types[(PREFEDIT_FLAGGED(PRF_COLOR_1) ? 1 : 0) + (PREFEDIT_FLAGGED(PRF_COLOR_2) ? 2 : 0)]);
 
@@ -119,21 +113,17 @@ static void prefedit_disp_main_menu(struct descriptor_data *d)
   /* The mortal preferences section of the actual menu */
   send_to_char(d->character, "\r\n"
                              "%sPreferences\r\n"
-                             "%sP%s) Prompt : %s[%s%-19s%s]  %sL%s) Pagelength : %s[%s%-3d%s]\r\n"
-                             "%sC%s) Color  : %s[%s%-8s%s]    %sS%s) Screenwidth: %s[%s%-3d%s]\r\n"
-                             "%sW%s) Wimpy  : %s[%s%-4d%s]%s\r\n",
+                             "%sL%s) Pagelength : %s[%s%-3d%s]  %sC%s) Color  : %s[%s%-8s%s]\r\n"
+                             "%sS%s) Screenwidth: %s[%s%-3d%s]  %sW%s) Wimpy  : %s[%s%-4d%s]%s\r\n",
              CCWHT(d->character, C_NRM),
-/* Line 1 - prompt and pagelength */
+/* Line 1 - pagelength and color */
              CBYEL(d->character, C_NRM), CCNRM(d->character, C_NRM), CCCYN(d->character, C_NRM), CCYEL(d->character, C_NRM),
-             prompt_preview, CCCYN(d->character, C_NRM), CBYEL(d->character, C_NRM), CCNRM(d->character, C_NRM),
-             CCCYN(d->character, C_NRM), CCYEL(d->character, C_NRM), PREFEDIT_GET_PAGELENGTH, CCCYN(d->character, C_NRM),
-/* Line 2 - color and screenwidth */
+             PREFEDIT_GET_PAGELENGTH, CCCYN(d->character, C_NRM), CBYEL(d->character, C_NRM), CCNRM(d->character, C_NRM),
+             CCCYN(d->character, C_NRM), CCYEL(d->character, C_NRM), color_string, CCCYN(d->character, C_NRM),
+/* Line 2 - screenwidth and wimpy */
              CBYEL(d->character, C_NRM), CCNRM(d->character, C_NRM), CCCYN(d->character, C_NRM), CCYEL(d->character, C_NRM),
-             color_string, CCCYN(d->character, C_NRM), CBYEL(d->character, C_NRM), CCNRM(d->character, C_NRM),
-             CCCYN(d->character, C_NRM), CCYEL(d->character, C_NRM), PREFEDIT_GET_SCREENWIDTH, CCCYN(d->character, C_NRM),
-/* Line 2 - wimpy                 */
-             CBYEL(d->character, C_NRM), CCNRM(d->character, C_NRM), CCCYN(d->character, C_NRM), CCYEL(d->character, C_NRM),
-             PREFEDIT_GET_WIMP_LEV, CCCYN(d->character, C_NRM), CCNRM(d->character, C_NRM)
+             PREFEDIT_GET_SCREENWIDTH, CCCYN(d->character, C_NRM), CBYEL(d->character, C_NRM), CCNRM(d->character, C_NRM),
+             CCCYN(d->character, C_NRM), CCYEL(d->character, C_NRM), PREFEDIT_GET_WIMP_LEV, CCCYN(d->character, C_NRM), CCNRM(d->character, C_NRM)
              );
 
   send_to_char(d->character, "%sT%s) Toggle Preferences...\r\n",
@@ -300,21 +290,6 @@ static void prefedit_disp_toggles_menu(struct descriptor_data *d)
   OLC_MODE(d) = PREFEDIT_TOGGLE_MENU;
 }
 
-static void prefedit_disp_prompt_menu(struct descriptor_data *d)
-{
-  const char *prompt_template = *GET_PROMPT(PREFEDIT_GET_CHAR) ? GET_PROMPT(PREFEDIT_GET_CHAR) : PFDEF_PROMPT;
-
-  send_to_char(d->character, "%sPrompt Template\r\n"
-                             "%sCurrent:%s %s\r\n\r\n"
-                             "Enter a new prompt (max %d characters) or 'default' to restore the game default.\r\n"
-                             "See 'help prompt' for the token list.\r\n> ",
-                             CBWHT(d->character, C_NRM),
-                             CCCYN(d->character, C_NRM), CCNRM(d->character, C_NRM), prompt_template,
-                             MAX_PROMPT_LENGTH);
-
-  OLC_MODE(d) = PREFEDIT_PROMPT;
-}
-
 static void prefedit_disp_color_menu(struct descriptor_data *d)
 {
   send_to_char(d->character, "%sColor level\r\n"
@@ -386,11 +361,6 @@ void prefedit_parse(struct descriptor_data * d, char *arg)
         OLC_MODE(d) = PREFEDIT_CONFIRM_SAVE;
       } else
         cleanup_olc(d, CLEANUP_ALL);
-      return;
-
-    case 'p':
-    case 'P':
-      prefedit_disp_prompt_menu(d);
       return;
 
     case 'c':
@@ -714,28 +684,6 @@ void prefedit_parse(struct descriptor_data * d, char *arg)
 
     break;
 
-  /* Sub-menu's and flag toggle menu's */
-  case PREFEDIT_PROMPT:
-    skip_spaces(&arg);
-    if (!*arg) {
-      prefedit_disp_prompt_menu(d);
-      return;
-    }
-
-    if (!str_cmp(arg, "default")) {
-      strlcpy(GET_PROMPT(PREFEDIT_GET_CHAR), PFDEF_PROMPT, MAX_PROMPT_LENGTH + 1);
-      send_to_char(d->character, "Prompt reset to default.\r\n");
-    } else {
-      size_t prompt_len = strlen(arg);
-      strlcpy(GET_PROMPT(PREFEDIT_GET_CHAR), arg, MAX_PROMPT_LENGTH + 1);
-
-      if (prompt_len > MAX_PROMPT_LENGTH)
-        send_to_char(d->character, "Prompt too long; truncated to %d characters.\r\n", MAX_PROMPT_LENGTH);
-      else
-        send_to_char(d->character, "Prompt updated.\r\n");
-    }
-    break;
-
   default:
     /* we should never get here */
     mudlog(BRF,LVL_BUILDER,TRUE,"SYSERR: Reached default case in parse_prefedit");
@@ -764,9 +712,6 @@ void prefedit_Restore_Defaults(struct descriptor_data *d)
   /* PRF_NOTELL     - Off */
   if (PREFEDIT_FLAGGED(PRF_NOTELL))
      REMOVE_BIT_AR(PREFEDIT_GET_FLAGS, PRF_NOTELL);
-
-  /* Reset prompt template to default */
-  strlcpy(GET_PROMPT(PREFEDIT_GET_CHAR), PFDEF_PROMPT, MAX_PROMPT_LENGTH + 1);
 
   /* PRF_AUTOEXIT   - On */
   if (!PREFEDIT_FLAGGED(PRF_AUTOEXIT))
