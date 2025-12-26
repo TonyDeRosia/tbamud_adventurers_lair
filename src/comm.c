@@ -1112,6 +1112,88 @@ void echo_on(struct descriptor_data *d)
   write_to_output(d, "%s", on_string);
 }
 
+static size_t append_prompt(char *prompt, size_t len, size_t size, const char *format, ...)
+{
+  va_list args;
+
+  if (len >= size)
+    return len;
+
+  va_start(args, format);
+  int count = vsnprintf(prompt + len, size - len, format, args);
+  va_end(args);
+
+  if (count < 0)
+    return len;
+
+  if ((size_t)count >= size - len)
+    return size - 1;
+
+  return len + count;
+}
+
+static size_t append_custom_prompt(struct descriptor_data *d, char *prompt, size_t len, size_t size)
+{
+  const char *src = GET_PROMPT(d->character);
+
+  while (*src && len < size - 1) {
+    if (*src != '%') {
+      prompt[len++] = *src++;
+      prompt[len] = '\0';
+      continue;
+    }
+
+    src++;
+    if (!*src)
+      break;
+
+    switch (*src) {
+    case '%':
+      prompt[len++] = '%';
+      prompt[len] = '\0';
+      break;
+    case 'h':
+      len = append_prompt(prompt, len, size, "%d", GET_HIT(d->character));
+      break;
+    case 'H':
+      len = append_prompt(prompt, len, size, "%d", GET_MAX_HIT(d->character));
+      break;
+    case 'm':
+      len = append_prompt(prompt, len, size, "%d", GET_MANA(d->character));
+      break;
+    case 'M':
+      len = append_prompt(prompt, len, size, "%d", GET_MAX_MANA(d->character));
+      break;
+    case 'v':
+      len = append_prompt(prompt, len, size, "%d", GET_MOVE(d->character));
+      break;
+    case 'V':
+      len = append_prompt(prompt, len, size, "%d", GET_MAX_MOVE(d->character));
+      break;
+    case 'p':
+      len = append_prompt(prompt, len, size, "%d", (GET_HIT(d->character) * 100) / MAX(1, GET_MAX_HIT(d->character)));
+      break;
+    case 'P':
+      len = append_prompt(prompt, len, size, "%d", (GET_MANA(d->character) * 100) / MAX(1, GET_MAX_MANA(d->character)));
+      break;
+    case 'q':
+      len = append_prompt(prompt, len, size, "%d", (GET_MOVE(d->character) * 100) / MAX(1, GET_MAX_MOVE(d->character)));
+      break;
+    default:
+      prompt[len++] = '%';
+      if (len < size - 1) {
+        prompt[len++] = *src;
+        prompt[len] = '\0';
+      } else
+        prompt[size - 1] = '\0';
+      break;
+    }
+    src++;
+  }
+
+  return len;
+}
+
 static char *make_prompt(struct descriptor_data *d)
 {
   static char prompt[MAX_PROMPT_LENGTH];
@@ -1123,84 +1205,51 @@ static char *make_prompt(struct descriptor_data *d)
       "[ Return to continue, (q)uit, (r)efresh, (b)ack, or page number (%d/%d) ]",
       d->showstr_page, d->showstr_count);
   else if (d->str)
-    strcpy(prompt, "] ");	/* strcpy: OK (for 'MAX_PROMPT_LENGTH >= 3') */
+    strcpy(prompt, "] ");       /* strcpy: OK (for 'MAX_PROMPT_LENGTH >= 3') */
   else if (STATE(d) == CON_PLAYING && !IS_NPC(d->character)) {
-    int count;
     size_t len = 0;
 
     *prompt = '\0';
 
-    if (GET_INVIS_LEV(d->character) && len < sizeof(prompt)) {
-      count = snprintf(prompt + len, sizeof(prompt) - len, "i%d ", GET_INVIS_LEV(d->character));
-      if (count >= 0)
-        len += count;
-    }
-    /* show only when below 25% */
-    if (PRF_FLAGGED(d->character, PRF_DISPAUTO) && len < sizeof(prompt)) {
+    if (GET_INVIS_LEV(d->character) && len < sizeof(prompt))
+      len = append_prompt(prompt, len, sizeof(prompt), "i%d ", GET_INVIS_LEV(d->character));
+
+    if (*GET_PROMPT(d->character)) {
+      len = append_custom_prompt(d, prompt, len, sizeof(prompt));
+    } else if (PRF_FLAGGED(d->character, PRF_DISPAUTO) && len < sizeof(prompt)) {
+      /* show only when below 25% */
       struct char_data *ch = d->character;
-      if (GET_HIT(ch) << 2 < GET_MAX_HIT(ch) ) {
-        count = snprintf(prompt + len, sizeof(prompt) - len, "%dH ", GET_HIT(ch));
-        if (count >= 0)
-          len += count;
-      }
-      if (GET_MANA(ch) << 2 < GET_MAX_MANA(ch) && len < sizeof(prompt)) {
-        count = snprintf(prompt + len, sizeof(prompt) - len, "%dM ", GET_MANA(ch));
-        if (count >= 0)
-          len += count;
-      }
-      if (GET_MOVE(ch) << 2 < GET_MAX_MOVE(ch) && len < sizeof(prompt)) {
-        count = snprintf(prompt + len, sizeof(prompt) - len, "%dV ", GET_MOVE(ch));
-        if (count >= 0)
-          len += count;
-      }
+      if (GET_HIT(ch) << 2 < GET_MAX_HIT(ch) )
+        len = append_prompt(prompt, len, sizeof(prompt), "%dH ", GET_HIT(ch));
+      if (GET_MANA(ch) << 2 < GET_MAX_MANA(ch) && len < sizeof(prompt))
+        len = append_prompt(prompt, len, sizeof(prompt), "%dM ", GET_MANA(ch));
+      if (GET_MOVE(ch) << 2 < GET_MAX_MOVE(ch) && len < sizeof(prompt))
+        len = append_prompt(prompt, len, sizeof(prompt), "%dV ", GET_MOVE(ch));
     } else { /* not auto prompt */
-      if (PRF_FLAGGED(d->character, PRF_DISPHP) && len < sizeof(prompt)) {
-        count = snprintf(prompt + len, sizeof(prompt) - len, "%dH ", GET_HIT(d->character));
-        if (count >= 0)
-          len += count;
-      }
+      if (PRF_FLAGGED(d->character, PRF_DISPHP) && len < sizeof(prompt))
+        len = append_prompt(prompt, len, sizeof(prompt), "%dH ", GET_HIT(d->character));
 
-      if (PRF_FLAGGED(d->character, PRF_DISPMANA) && len < sizeof(prompt)) {
-        count = snprintf(prompt + len, sizeof(prompt) - len, "%dM ", GET_MANA(d->character));
-        if (count >= 0)
-          len += count;
-      }
+      if (PRF_FLAGGED(d->character, PRF_DISPMANA) && len < sizeof(prompt))
+        len = append_prompt(prompt, len, sizeof(prompt), "%dM ", GET_MANA(d->character));
 
-      if (PRF_FLAGGED(d->character, PRF_DISPMOVE) && len < sizeof(prompt)) {
-        count = snprintf(prompt + len, sizeof(prompt) - len, "%dV ", GET_MOVE(d->character));
-        if (count >= 0)
-          len += count;
-      }
+      if (PRF_FLAGGED(d->character, PRF_DISPMOVE) && len < sizeof(prompt))
+        len = append_prompt(prompt, len, sizeof(prompt), "%dV ", GET_MOVE(d->character));
     }
 
-    if (PRF_FLAGGED(d->character, PRF_BUILDWALK) && len < sizeof(prompt)) {
-      count = snprintf(prompt + len, sizeof(prompt) - len, "BUILDWALKING ");
-      if (count >= 0)
-        len += count;
-    }
+    if (PRF_FLAGGED(d->character, PRF_BUILDWALK) && len < sizeof(prompt))
+      len = append_prompt(prompt, len, sizeof(prompt), "BUILDWALKING ");
 
-    if (PRF_FLAGGED(d->character, PRF_AFK) && len < sizeof(prompt)) {
-      count = snprintf(prompt + len, sizeof(prompt) - len, "AFK ");
-      if (count >= 0)
-        len += count;
-    }
+    if (PRF_FLAGGED(d->character, PRF_AFK) && len < sizeof(prompt))
+      len = append_prompt(prompt, len, sizeof(prompt), "AFK ");
 
      if (GET_LAST_NEWS(d->character) < newsmod)
-     {
-       count = snprintf(prompt + len, sizeof(prompt) - len, "(news) ");
-       if (count >= 0)
-         len += count;
-     }
+       len = append_prompt(prompt, len, sizeof(prompt), "(news) ");
 
      if (GET_LAST_MOTD(d->character) < motdmod)
-     {
-       count = snprintf(prompt + len, sizeof(prompt) - len, "(motd) ");
-       if (count >= 0)
-         len += count;
-     }
+       len = append_prompt(prompt, len, sizeof(prompt), "(motd) ");
 
     if (len < sizeof(prompt))
-      strncat(prompt, "> ", sizeof(prompt) - len - 1);	/* strncat: OK */
+      strncat(prompt, "> ", sizeof(prompt) - len - 1);  /* strncat: OK */
   } else if (STATE(d) == CON_PLAYING && IS_NPC(d->character))
     snprintf(prompt, sizeof(prompt), "%s> ", GET_NAME(d->character));
   else
@@ -1208,6 +1257,7 @@ static char *make_prompt(struct descriptor_data *d)
 
   return (prompt);
 }
+
 
 /* NOTE: 'txt' must be at most MAX_INPUT_LENGTH big. */
 void write_to_q(const char *txt, struct txt_q *queue, int aliased)

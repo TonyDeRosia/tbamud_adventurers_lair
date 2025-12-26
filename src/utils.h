@@ -600,6 +600,8 @@ do                                                              \
 #define GET_PAGE_LENGTH(ch)     CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.page_length))
 /** Return the page width for ch */
 #define GET_SCREEN_WIDTH(ch)    CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.screen_width))
+/** Return the custom prompt string for ch */
+#define GET_PROMPT(ch)          CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.prompt))
 /* Autoquests data */
 /** Return the number of questpoints ch has. */
 #define GET_QUESTPOINTS(ch)     CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.questpoints))
