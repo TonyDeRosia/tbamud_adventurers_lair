@@ -629,6 +629,8 @@ ACMD(do_prompt)
   current = *GET_PROMPT(ch) ? GET_PROMPT(ch) : PFDEF_PROMPT;
 
   if (!*argument) {
+    send_to_char(ch, "Prompt\r\n");
+    send_to_char(ch, "Usage: prompt reset | prompt <template>\r\n\r\n");
     send_to_char(ch, "Current prompt: %s\r\n", current);
     send_to_char(ch, "Use 'prompt <template>' to set a new prompt or 'prompt reset' to restore the default.\r\n");
     send_to_char(ch, "See 'help prompt' for the full list of prompt tokens and color codes.\r\n");
