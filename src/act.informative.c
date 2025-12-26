@@ -2061,20 +2061,19 @@ ACMD(do_toggle)
         ONOFF(PRF_FLAGGED(ch, PRF_ZONERESETS)));
     }
 
+  send_to_char(ch, "Prompt template: %s\r\n",
+               *GET_PROMPT(ch) ? GET_PROMPT(ch) : PFDEF_PROMPT);
+
   send_to_char(ch,
-    "Hit Pnt Display: %-3s    "
     "          Brief: %-3s    "
-    "     Summonable: %-3s\r\n"
+    "     Summonable: %-3s    "
+    "      AutoExits: %-3s\r\n"
 
-    "   Move Display: %-3s    "
     "        Compact: %-3s    "
-    "          Quest: %-3s\r\n"
+    "          Quest: %-3s    "
+    "        NoTell: %-3s\r\n"
 
-    "   Mana Display: %-3s    "
-    "         NoTell: %-3s    "
-    "       NoRepeat: %-3s\r\n"
-
-    "      AutoExits: %-3s    "
+    "       NoRepeat: %-3s    "
     "        NoShout: %-3s    "
     "          Wimpy: %-3s\r\n"
 
@@ -2098,19 +2097,15 @@ ACMD(do_toggle)
     "       Autodoor: %-3s    "
     "          Color: %s     \r\n ",
 
-    ONOFF(PRF_FLAGGED(ch, PRF_DISPHP)),
     ONOFF(PRF_FLAGGED(ch, PRF_BRIEF)),
     ONOFF(PRF_FLAGGED(ch, PRF_SUMMONABLE)),
+    ONOFF(PRF_FLAGGED(ch, PRF_AUTOEXIT)),
 
-    ONOFF(PRF_FLAGGED(ch, PRF_DISPMOVE)),
     ONOFF(PRF_FLAGGED(ch, PRF_COMPACT)),
     ONOFF(PRF_FLAGGED(ch, PRF_QUEST)),
-
-    ONOFF(PRF_FLAGGED(ch, PRF_DISPMANA)),
     ONOFF(PRF_FLAGGED(ch, PRF_NOTELL)),
-    ONOFF(PRF_FLAGGED(ch, PRF_NOREPEAT)),
 
-    ONOFF(PRF_FLAGGED(ch, PRF_AUTOEXIT)),
+    ONOFF(PRF_FLAGGED(ch, PRF_NOREPEAT)),
     ONOFF(PRF_FLAGGED(ch, PRF_NOSHOUT)),
     buf2,
 
