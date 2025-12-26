@@ -11,6 +11,57 @@
 
 static const char *default_prompt_template = "[%h / %H] [%m / %M] [%v / %V] [%X] ";
 
+static size_t translate_prompt_escapes(const char *src, char *dest, size_t dest_size)
+{
+  size_t pos = 0;
+
+  if (dest_size == 0)
+    return 0;
+
+  for (; *src && pos + 1 < dest_size; src++) {
+    if (*src == '\\' && src[1]) {
+      src++;
+
+      switch (*src) {
+      case '\\':
+        dest[pos++] = '\\';
+        break;
+      case 'e':
+        dest[pos++] = '\x1B';
+        break;
+      case 't':
+        dest[pos++] = '\t';
+        break;
+      case 'n':
+        dest[pos++] = '\n';
+        break;
+      case 'r':
+        dest[pos++] = '\r';
+        break;
+      case 'x':
+        if (isxdigit((unsigned char) src[1]) && isxdigit((unsigned char) src[2])) {
+          char hex[3] = { src[1], src[2], '\0' };
+
+          dest[pos++] = (char) strtol(hex, NULL, 16);
+          src += 2;
+        } else {
+          dest[pos++] = '\\';
+          if (pos + 1 < dest_size)
+            dest[pos++] = 'x';
+        }
+        break;
+      default:
+        dest[pos++] = *src;
+        break;
+      }
+    } else
+      dest[pos++] = *src;
+  }
+
+  dest[pos] = '\0';
+  return pos;
+}
+
 static int prompt_tnl(struct char_data *ch)
 {
   if (GET_LEVEL(ch) >= LVL_IMMORT)
@@ -267,6 +318,9 @@ void queue_prompt(struct descriptor_data *d)
 
 ACMD(do_prompt)
 {
+  char processed[MAX_PROMPT_LENGTH + 1];
+  size_t processed_len = 0;
+
   if (IS_NPC(ch))
     return;
 
@@ -299,6 +353,13 @@ ACMD(do_prompt)
     return;
   }
 
-  strlcpy(GET_PROMPT(ch), argument, MAX_PROMPT_LENGTH + 1);
+  processed_len = translate_prompt_escapes(argument, processed, sizeof(processed));
+
+  if (processed_len > MAX_PROMPT_LENGTH) {
+    send_to_char(ch, "Prompt may not exceed %d characters after processing color codes.\r\n", MAX_PROMPT_LENGTH);
+    return;
+  }
+
+  strlcpy(GET_PROMPT(ch), processed, MAX_PROMPT_LENGTH + 1);
   send_to_char(ch, "Prompt set.\r\n");
 }
