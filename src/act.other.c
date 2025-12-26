@@ -609,10 +609,19 @@ ACMD(do_use)
   mag_objectmagic(ch, mag_item, buf);
 }
 
+static bool is_prompt_flag_string(const char *arg)
+{
+  for (; *arg; arg++) {
+    if (!isspace((unsigned char)*arg) && !strchr("hmvHMV", *arg))
+      return FALSE;
+  }
+
+  return TRUE;
+}
+
 ACMD(do_display)
 {
   size_t i;
-  int flags_only = TRUE;
 
   if (IS_NPC(ch)) {
     send_to_char(ch, "Monsters don't need displays.  Go away.\r\n");
@@ -623,13 +632,6 @@ ACMD(do_display)
   if (!*argument) {
     send_to_char(ch, "Usage: prompt { { H | M | V } | all | auto | none | reset | <custom text> }\r\n");
     return;
-  }
-
-  for (i = 0; argument[i]; i++) {
-    if (isspace((unsigned char)argument[i]) || !strchr("hmvHMV", argument[i])) {
-      flags_only = FALSE;
-      break;
-    }
   }
 
   if (!str_cmp(argument, "reset")) {
@@ -649,11 +651,21 @@ ACMD(do_display)
     SET_BIT_AR(PRF_FLAGS(ch), PRF_DISPHP);
     SET_BIT_AR(PRF_FLAGS(ch), PRF_DISPMANA);
     SET_BIT_AR(PRF_FLAGS(ch), PRF_DISPMOVE);
-  } else if (!str_cmp(argument, "off") || !str_cmp(argument, "none")) {
+    *GET_PROMPT(ch) = '\0';
+    send_to_char(ch, "%s", CONFIG_OK);
+    return;
+  }
+
+  if (!str_cmp(argument, "off") || !str_cmp(argument, "none")) {
     REMOVE_BIT_AR(PRF_FLAGS(ch), PRF_DISPHP);
     REMOVE_BIT_AR(PRF_FLAGS(ch), PRF_DISPMANA);
     REMOVE_BIT_AR(PRF_FLAGS(ch), PRF_DISPMOVE);
-  } else if (flags_only) {
+    *GET_PROMPT(ch) = '\0';
+    send_to_char(ch, "%s", CONFIG_OK);
+    return;
+  }
+
+  if (is_prompt_flag_string(argument)) {
     REMOVE_BIT_AR(PRF_FLAGS(ch), PRF_DISPHP);
     REMOVE_BIT_AR(PRF_FLAGS(ch), PRF_DISPMANA);
     REMOVE_BIT_AR(PRF_FLAGS(ch), PRF_DISPMOVE);
@@ -662,33 +674,33 @@ ACMD(do_display)
       switch (LOWER(argument[i])) {
       case 'h':
         SET_BIT_AR(PRF_FLAGS(ch), PRF_DISPHP);
-	break;
+        break;
       case 'm':
         SET_BIT_AR(PRF_FLAGS(ch), PRF_DISPMANA);
-	break;
+        break;
       case 'v':
         SET_BIT_AR(PRF_FLAGS(ch), PRF_DISPMOVE);
         break;
       default:
-        send_to_char(ch, "Usage: prompt { { H | M | V } | all | auto | none | reset | <custom text> }\r\n");
-        return;
+        /* ignore spaces and any characters already screened out */
+        break;
       }
     }
-  } else {
-    size_t max_len = sizeof(GET_PROMPT(ch)) - 1;
 
-    if (strlen(argument) > max_len) {
-      strlcpy(GET_PROMPT(ch), argument, sizeof(GET_PROMPT(ch)));
-      send_to_char(ch, "Prompt too long; truncated to %zu characters.\r\n", max_len);
-    } else {
-      strlcpy(GET_PROMPT(ch), argument, sizeof(GET_PROMPT(ch)));
-      send_to_char(ch, "Custom prompt set. Use %%h/%%H for hit points, %%m/%%M for mana, %%v/%%V for moves, and %%p/%%P/%%q for percentages.\r\n");
-    }
+    *GET_PROMPT(ch) = '\0';
+    send_to_char(ch, "%s", CONFIG_OK);
     return;
   }
 
-  *GET_PROMPT(ch) = '\0';
-  send_to_char(ch, "%s", CONFIG_OK);
+  size_t max_len = sizeof(GET_PROMPT(ch)) - 1;
+
+  if (strlen(argument) > max_len) {
+    strlcpy(GET_PROMPT(ch), argument, sizeof(GET_PROMPT(ch)));
+    send_to_char(ch, "Prompt too long; truncated to %zu characters.\r\n", max_len);
+  } else {
+    strlcpy(GET_PROMPT(ch), argument, sizeof(GET_PROMPT(ch)));
+    send_to_char(ch, "Custom prompt set. Use %%h/%%H/%%p for hit points, %%m/%%M/%%P for mana, %%v/%%V/%%q for moves, and tokens like %%str, %%dex, %%lvl, %%exp, %%tnl, %%gold, %%bank, %%qp, %%prac, %%ac, %%hr, %%dr, and %%align for other stats. Color codes in {braces are supported}.\r\n");
+  }
 }
 
 #define TOG_OFF 0
