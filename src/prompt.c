@@ -2,6 +2,7 @@
 #include "sysdep.h"
 
 #include "structs.h"
+#include "db.h"
 #include "utils.h"
 #include "class.h"
 #include "comm.h"
