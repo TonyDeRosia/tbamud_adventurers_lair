@@ -2546,9 +2546,10 @@ arguments shows the current and default prompt plus the full list of %tokens
 you can insert. PROMPT RESET restores the standard bracketed vitals display.
 
 Escape sequences are translated so you can add ANSI color: \t<code> uses the
-tbaMUD color table (for example \tR for bright red and \tn to reset), \e sends
-a raw escape, and \xHH accepts a two-digit hex byte such as \x1B for ESC. Use
-\\ if you need a literal backslash.
+tbaMUD color table (for example \tR for bright red and \tn to reset), {<code>
+is a shorthand for the same table ({R, {n, etc.), \e sends a raw escape, and
+\xHH accepts a two-digit hex byte such as \x1B for ESC. Use \\ if you need a
+literal backslash.
 
 Common %tokens:
   %h %H %m %M %v %V - Current/max hit points, mana, and movement
@@ -2559,6 +2560,7 @@ Common %tokens:
 Examples:
   prompt \tG[%h/%H\tn \tC%m/%M\tn \tY%v/%V\tn \tW%X\tn] >
   prompt \e[32mHP:%h\e[0m MN:%m MV:%v TNL:%X >
+  prompt {R[%h{W/{r%H{Y %v/%V{n %X] >
   prompt [%n in %p] Gold:%g Quest:%q
 
 See also: TOGGLE
@@ -13516,8 +13518,9 @@ current and default prompts plus the full set of %tokens. PROMPT RESET restores
 the standard bracketed vitals display.
 
 Escape sequences are interpreted for color: \t<code> inserts the tbaMUD color
-table (\tR bright red, \tn reset, etc.), \e sends a raw escape, and \xHH
-allows a two-digit hex byte such as \x1B. Use \\ for a literal backslash.
+table (\tR bright red, \tn reset, etc.), {<code> is a shorthand for the same
+table ({R, {n, etc.), \e sends a raw escape, and \xHH allows a two-digit hex
+byte such as \x1B. Use \\ for a literal backslash.
 
 Common tokens:
   %h %H %m %M %v %V - Current/max hit points, mana, and movement
@@ -13528,6 +13531,7 @@ Common tokens:
 Examples:
   prompt \tG[%h/%H\tn \tC%m/%M\tn \tY%v/%V\tn] \tW%X\tn>
   prompt \e[36m%n\e[0m in %p HP:%h/%H Quest:%q
+  prompt {R[%h{W/{r%H]{Y %v/%V{n {W%X{n>
   prompt [%n] XP:%x TNL:%X Gold:%g
   %str %int %wis %dex %con %cha - Ability scores
   %gold %bank %qp %prac %ac %hr %dr %align - Currency, practice, and combat stats
