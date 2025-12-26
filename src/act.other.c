@@ -29,6 +29,7 @@
 #include "shop.h"
 #include "quest.h"
 #include "modify.h"
+#include "pfdefaults.h"
 
 /* Local defined utility functions */
 /* do_group utility functions */
@@ -611,8 +612,7 @@ ACMD(do_use)
 
 ACMD(do_display)
 {
-  size_t i;
-  int flags_only = TRUE;
+  size_t max_len;
 
   if (IS_NPC(ch)) {
     send_to_char(ch, "Monsters don't need displays.  Go away.\r\n");
@@ -621,77 +621,30 @@ ACMD(do_display)
   skip_spaces(&argument);
 
   if (!*argument) {
-    send_to_char(ch, "Usage: prompt { { H | M | V } | all | auto | none | reset | <custom template> }\r\n");
+    send_to_char(ch, "Usage: prompt reset | <custom template>\r\n");
+    send_to_char(ch, "Default: %s\r\n", PFDEF_PROMPT);
+    send_to_char(ch, "Example: prompt %s\r\n", PFDEF_PROMPT);
     return;
-  }
-
-  for (i = 0; argument[i]; i++) {
-    if (isspace((unsigned char)argument[i]) || !strchr("hmvHMV", argument[i])) {
-      flags_only = FALSE;
-      break;
-    }
   }
 
   if (!str_cmp(argument, "reset")) {
-    *GET_PROMPT(ch) = '\0';
-    send_to_char(ch, "Custom prompt cleared.\r\n");
+    strlcpy(GET_PROMPT(ch), PFDEF_PROMPT, sizeof(GET_PROMPT(ch)));
+    send_to_char(ch, "Prompt reset to the default template.\r\n");
     return;
   }
 
-  if (!str_cmp(argument, "auto")) {
-    TOGGLE_BIT_AR(PRF_FLAGS(ch), PRF_DISPAUTO);
-    send_to_char(ch, "Auto prompt %sabled.\r\n", PRF_FLAGGED(ch, PRF_DISPAUTO) ? "en" : "dis");
-    *GET_PROMPT(ch) = '\0';
-    return;
-  }
+  max_len = sizeof(GET_PROMPT(ch)) - 1;
 
-  if (!str_cmp(argument, "on") || !str_cmp(argument, "all")) {
-    SET_BIT_AR(PRF_FLAGS(ch), PRF_DISPHP);
-    SET_BIT_AR(PRF_FLAGS(ch), PRF_DISPMANA);
-    SET_BIT_AR(PRF_FLAGS(ch), PRF_DISPMOVE);
-  } else if (!str_cmp(argument, "off") || !str_cmp(argument, "none")) {
-    REMOVE_BIT_AR(PRF_FLAGS(ch), PRF_DISPHP);
-    REMOVE_BIT_AR(PRF_FLAGS(ch), PRF_DISPMANA);
-    REMOVE_BIT_AR(PRF_FLAGS(ch), PRF_DISPMOVE);
-  } else if (flags_only) {
-    REMOVE_BIT_AR(PRF_FLAGS(ch), PRF_DISPHP);
-    REMOVE_BIT_AR(PRF_FLAGS(ch), PRF_DISPMANA);
-    REMOVE_BIT_AR(PRF_FLAGS(ch), PRF_DISPMOVE);
-
-    for (i = 0; i < strlen(argument); i++) {
-      switch (LOWER(argument[i])) {
-      case 'h':
-        SET_BIT_AR(PRF_FLAGS(ch), PRF_DISPHP);
-	break;
-      case 'm':
-        SET_BIT_AR(PRF_FLAGS(ch), PRF_DISPMANA);
-	break;
-      case 'v':
-        SET_BIT_AR(PRF_FLAGS(ch), PRF_DISPMOVE);
-        break;
-      default:
-        send_to_char(ch, "Usage: prompt { { H | M | V } | all | auto | none | reset | <custom template> }\r\n");
-        return;
-      }
-    }
+  if (strlen(argument) > max_len) {
+    strlcpy(GET_PROMPT(ch), argument, sizeof(GET_PROMPT(ch)));
+    send_to_char(ch, "Prompt too long; truncated to %zu characters.\r\n", max_len);
   } else {
-    size_t max_len = sizeof(GET_PROMPT(ch)) - 1;
-
-    if (strlen(argument) > max_len) {
-      strlcpy(GET_PROMPT(ch), argument, sizeof(GET_PROMPT(ch)));
-      send_to_char(ch, "Prompt too long; truncated to %zu characters.\r\n", max_len);
-    } else {
-      strlcpy(GET_PROMPT(ch), argument, sizeof(GET_PROMPT(ch)));
-      send_to_char(ch, "Custom prompt set. Use %% to escape percents and combine color codes with tokens.\r\n");
-      send_to_char(ch, "Vitals: %%h/%%H/%%p, %%m/%%M/%%q, %%v/%%V/%%P. Identity: %%n %%l %%c %%s %%t.\r\n");
-      send_to_char(ch, "XP & combat: %%x %%X %%f %%F. Location: %%pos %%room %%zone. Admin: %%inv %%olc %%players %%uptime.\r\n");
-      send_to_char(ch, "Example: prompt {R%%h{W/{r%%H{X {B%%m{W/{b%%M{X {G%%v{W/{g%%V{X {M%%Xtnl{X\r\n");
-    }
-    return;
+    strlcpy(GET_PROMPT(ch), argument, sizeof(GET_PROMPT(ch)));
+    send_to_char(ch, "Custom prompt set. Use %% to escape percents and combine color codes with tokens.\r\n");
+    send_to_char(ch, "Vitals: %%h/%%H/%%p, %%m/%%M/%%q, %%v/%%V/%%P. Identity: %%n %%l %%c %%s %%t.\r\n");
+    send_to_char(ch, "XP & combat: %%x %%X %%f %%F. Location: %%pos %%room %%zone. Admin: %%inv %%olc %%players %%uptime.\r\n");
+    send_to_char(ch, "Example: prompt {R%%h{W/{r%%H{X {B%%m{W/{b%%M{X {G%%v{W/{g%%V{x{X {M%%tnl{X\r\n");
   }
-
-  *GET_PROMPT(ch) = '\0';
-  send_to_char(ch, "%s", CONFIG_OK);
 }
 
 #define TOG_OFF 0

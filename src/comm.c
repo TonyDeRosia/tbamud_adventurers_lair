@@ -73,6 +73,7 @@
 #include "dg_event.h"
 #include "screen.h" /* to support the gemote act type command */
 #include "constants.h" /* For mud versions */
+#include "pfdefaults.h"
 #include "boards.h"
 #include "act.h"
 #include "ban.h"
@@ -1601,33 +1602,14 @@ static char *make_prompt(struct descriptor_data *d)
     strcpy(prompt, "] ");       /* strcpy: OK (for 'MAX_PROMPT_LENGTH >= 3') */
   else if (STATE(d) == CON_PLAYING && !IS_NPC(d->character)) {
     size_t len = 0;
+    const char *prompt_template = *GET_PROMPT(d->character) ? GET_PROMPT(d->character) : PFDEF_PROMPT;
 
     *prompt = '\0';
 
     if (GET_INVIS_LEV(d->character) && len < sizeof(prompt))
       len = append_prompt(prompt, len, sizeof(prompt), "i%d ", GET_INVIS_LEV(d->character));
 
-    if (*GET_PROMPT(d->character)) {
-      len = expand_prompt_template(d, GET_PROMPT(d->character), prompt, len, sizeof(prompt));
-    } else if (PRF_FLAGGED(d->character, PRF_DISPAUTO) && len < sizeof(prompt)) {
-      /* show only when below 25% */
-      struct char_data *ch = d->character;
-      if (GET_HIT(ch) << 2 < GET_MAX_HIT(ch) )
-        len = append_prompt(prompt, len, sizeof(prompt), "%dH ", GET_HIT(ch));
-      if (GET_MANA(ch) << 2 < GET_MAX_MANA(ch) && len < sizeof(prompt))
-        len = append_prompt(prompt, len, sizeof(prompt), "%dM ", GET_MANA(ch));
-      if (GET_MOVE(ch) << 2 < GET_MAX_MOVE(ch) && len < sizeof(prompt))
-        len = append_prompt(prompt, len, sizeof(prompt), "%dV ", GET_MOVE(ch));
-    } else { /* not auto prompt */
-      if (PRF_FLAGGED(d->character, PRF_DISPHP) && len < sizeof(prompt))
-        len = append_prompt(prompt, len, sizeof(prompt), "%dH ", GET_HIT(d->character));
-
-      if (PRF_FLAGGED(d->character, PRF_DISPMANA) && len < sizeof(prompt))
-        len = append_prompt(prompt, len, sizeof(prompt), "%dM ", GET_MANA(d->character));
-
-      if (PRF_FLAGGED(d->character, PRF_DISPMOVE) && len < sizeof(prompt))
-        len = append_prompt(prompt, len, sizeof(prompt), "%dV ", GET_MOVE(d->character));
-    }
+    len = expand_prompt_template(d, prompt_template, prompt, len, sizeof(prompt));
 
     if (PRF_FLAGGED(d->character, PRF_BUILDWALK) && len < sizeof(prompt))
       len = append_prompt(prompt, len, sizeof(prompt), "BUILDWALKING ");
