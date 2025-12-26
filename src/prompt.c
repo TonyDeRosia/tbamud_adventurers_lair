@@ -50,6 +50,11 @@ static size_t translate_prompt_escapes(const char *src, char *dest, size_t dest_
     return 0;
 
   for (; *src && pos + 1 < dest_size; src++) {
+    /* Debug output */
+    if (*src == '{' && src[1] && src[2] == '}') {
+      mudlog(BRF, LVL_IMMORT, TRUE, "PROMPT DEBUG: Found {%c} sequence", src[1]);
+    }
+    
     if (*src == '\\' && src[1]) {
       src++;
 
@@ -105,12 +110,15 @@ static size_t translate_prompt_escapes(const char *src, char *dest, size_t dest_
 
       if (color) {
         size_t add_len = MIN(dest_size - pos - 1, strlen(color));
-
+        
+        mudlog(BRF, LVL_IMMORT, TRUE, "PROMPT DEBUG: Translating {%c} to color code", src[1]);
         memcpy(dest + pos, color, add_len);
         pos += add_len;
-        src += 2;
-      } else
+        src += 2;  /* Skip the color char and closing brace; loop increment handles { */
+      } else {
+        mudlog(BRF, LVL_IMMORT, TRUE, "PROMPT DEBUG: {%c} not recognized as color", src[1]);
         dest[pos++] = *src;
+      }
     } else
       dest[pos++] = *src;
   }
