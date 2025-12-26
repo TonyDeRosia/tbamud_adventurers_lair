@@ -155,7 +155,7 @@ very often.
 
 will generate a message that looks like:
 
-[ Room 57700 :: Fizban, a level 34 Magic-User just typed log example ]
+[ Room 57700 :: Fizban, a level 104 Magic-User just typed log example ]
 
 The part before the :: shows what the script that logged the message was attached to.
 #0
@@ -7071,22 +7071,22 @@ AUTOASSIST - Player has Autoassist enabled.
 
 See also: FLAGS, PLR
 #31
-PROMOTE PROMOTIONS ADVANCEMENTS RAISES LVLS LEVELS GAINS 31 32 33 34 RANKS RANKING HIRING JOBS STAFFING
+PROMOTE PROMOTIONS ADVANCEMENTS RAISES LVLS LEVELS GAINS 101 102 103 104 RANKS RANKING HIRING JOBS STAFFING
 
 Here at The Builder Academy, the level of an immortal generally reflects that
 immortal's building skill and willingness to help others.  If you have
-questions, you may want to ask someone whose level is at least 32.  Of course,
+questions, you may want to ask someone whose level is at least 102.  Of course,
 everyone is encouraged to help everyone else, but know that those who are not
-at least level 32 may have relatively little experience.
+at least level 102 may have relatively little experience.
 
-Level 31 (Immortal)    Anyone who is new to TBA and is working on their trial
+Level 101 (Immortal)   Anyone who is new to TBA and is working on their trial
                        vnum or zone.
-Level 32 (God)         An experienced builder with proven knowledge that is
-                       willing to teach others. Immortals of level 32 and above
+Level 102 (God)        An experienced builder with proven knowledge that is
+                       willing to teach others. Immortals of level 102 and above
                        are considered staff.
-Level 33 (Greater God) An experienced builder that has contributed significantly
+Level 103 (Greater God) An experienced builder that has contributed significantly
                        to TBA.
-Level 34 (Implementor) Current developers: Welcor, Wyld, and Opie.
+Level 104 (Implementor) Current developers: Welcor, Wyld, and Opie.
 
 Please do not bother asking to be advanced.  If your goal is merely to rise in
 the ranks, you are wasting your time.  The Gods here are dedicated to helping
@@ -9854,7 +9854,7 @@ q
 y
 toggle nohassle off
 load obj 1332
-set self level 32
+set self level 102
 tbalim test 61165
 return
 toggle nohassle on
@@ -9873,7 +9873,7 @@ set test gold 1000000
 wiznet Okay test, you have zone 348 vnum's 34800 to 34899. Help buildwalk and help dig to learn how to create and link your rooms. If you have any questions just ask.
 toggle nohassle off
 load obj 1332
-set self level 32
+set self level 102
 tbalim test purge
 return
 restore test
@@ -9902,7 +9902,7 @@ wiznet Okay test, you have zone 348 vnum's 34800 to 34899. Help buildwalk and he
 to create and link your rooms. If you have any questions just ask.
 toggle nohassle off
 load obj 1332
-set self level 32
+set self level 102
 tbalim test purge
 return
 restore test
@@ -10409,7 +10409,7 @@ send("q")
 send("y")
 send("toggle nohassle off")
 send("load obj 1332")
-send("set self level 32")
+send("set self level 102")
 send("tbalim " .. matches[3] .. " " .. matches[2])
 send("return")
 send("toggle nohassle on")
@@ -12050,12 +12050,12 @@ trigger and you will see the mob try to execute the trigger commands to help you
 troubleshoot. If you see a "Huh?" or a "that person is not here" it can help fix 
 your problem.
  
-4. Command Triggers - Arguments: * means all commands. This is an easy way to 
-freeze yourself (all commands you enter are captured by the trigger). To protect 
-against this and other possibly malicious uses of triggers level 32 and above may 
-not be able to fully test some triggers (specifically damage and command come to 
-mind). So either create a mortal character or set your level to 31 to fully test 
-all triggers. The return command can be setup to allow you to restore your level 
+4. Command Triggers - Arguments: * means all commands. This is an easy way to
+freeze yourself (all commands you enter are captured by the trigger). To protect
+against this and other possibly malicious uses of triggers level 102 and above may
+not be able to fully test some triggers (specifically damage and command come to
+mind). So either create a mortal character or set your level to 101 to fully test
+all triggers. The return command can be setup to allow you to restore your level
 back to original, ask your coder to add your ID.
  
 See Also: TRIGEDIT-ADVANCED
@@ -12071,8 +12071,8 @@ There are numerous reasons a trigger would not fire.
 3. Mobs - If a mob can not see the player a trigger may not fire. Be wary of blind mobs, dark rooms, invis/sneaking players. Also switch into the mob to test the trigger and you will see the mob try to execute the trigger commands to help you troubleshoo
 . If you see a "Huh?" or a "that person is not here" it can help you fix your problem.
  
-4. Command Triggers - Arguments: * means all commands. This is an easy way to freeze yourself (all commands you enter are captured by the trigger). To protect against this and other possibly malicious uses of triggers level 32 and above may not be able t
- fully test some triggers (specifically damage and command come to mind). So either create a mortal character or set your level to 31 to fully test all triggers. The return command can be setup to allow you to restore your level back to original, ask you
+4. Command Triggers - Arguments: * means all commands. This is an easy way to freeze yourself (all commands you enter are captured by the trigger). To protect against this and other possibly malicious uses of triggers level 102 and above may not be able t
+ fully test some triggers (specifically damage and command come to mind). So either create a mortal character or set your level to 101 to fully test all triggers. The return command can be setup to allow you to restore your level back to original, ask you
 
 
 
@@ -12621,26 +12621,26 @@ Usage: wizhelp <name>
 Gives a list of the special commands available to you or the name you provide.
 Disabled commands will be gray.
 
-Level 34 (Implementor):
+Level 104 (Implementor):
 cedit        changelog    export       reload       shutdow      shutdown
 wizlock
 
-Level 33 (Great God):
-ban          copyover     freeze       hcontrol     reroll       skillset     
-thaw         unban        wizupdate    
+Level 103 (Great God):
+ban          copyover     freeze       hcontrol     reroll       skillset
+thaw         unban        wizupdate
 
-Level 32 (God):
-advance      aedit        checkload    dc           file         force        
-gecho        hedit        helpcheck    hsedit       last         links        
-mcopy        mute         notitle      ocopy        pardon       plist        
-qecho        rcopy        restore      scopy        send         snoop        
-switch       tcopy        tedit        transfer     unaffect     uptime       
-users        zlock        zunlock      
+Level 102 (God):
+advance      aedit        checkload    dc           file         force
+gecho        hedit        helpcheck    hsedit       last         links
+mcopy        mute         notitle      ocopy        pardon       plist
+qecho        rcopy        restore      scopy        send         snoop
+switch       tcopy        tedit        transfer     unaffect     uptime
+users        zlock        zunlock
 
-Level 31 (Immortal):
-;            at           attach       buildwalk    date         
-detach       dig          echo         handbook     holylight    imotd        
-invis        load         medit        mlist        nohassle     nowiz        
+Level 101 (Immortal):
+;            at           attach       buildwalk    date
+detach       dig          echo         handbook     holylight    imotd
+invis        load         medit        mlist        nohassle     nowiz
 oedit        olc          olist        peace        purge        qedit        
 qlist        recent       redit        rlist        roomflags    saveall      
 sedit        set          show         slist        stat         teleport     

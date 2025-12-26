@@ -18,6 +18,7 @@
 #include "dg_scripts.h"
 #include "comm.h"
 #include "interpreter.h"
+#include "class.h"
 #include "genolc.h" /* for strip_cr */
 #include "config.h" /* for pclean_criteria[] */
 #include "dg_scripts.h" /* To enable saving of player variables to disk */
@@ -38,6 +39,7 @@
 static void load_affects(FILE *fl, struct char_data *ch);
 static void load_skills(FILE *fl, struct char_data *ch);
 static void load_quests(FILE *fl, struct char_data *ch);
+static int upgrade_legacy_immortal_levels(struct char_data *ch);
 static void load_HMVS(struct char_data *ch, const char *line, int mode);
 static void write_aliases_ascii(FILE *file, struct char_data *ch);
 static void read_aliases_ascii(FILE *file, struct char_data *ch, int count);
@@ -473,6 +475,9 @@ int load_char(const char *name, struct char_data *ch)
     }
   }
 
+  if (upgrade_legacy_immortal_levels(ch))
+    mudlog(CMP, LVL_IMMORT, TRUE, "%s converted to updated immortal tier (level %d).", GET_NAME(ch), GET_LEVEL(ch));
+
   affect_total(ch);
 
   /* initialization for imms */
@@ -882,6 +887,32 @@ void load_quests(FILE *fl, struct char_data *ch)
     if (num != NOTHING)
       add_completed_quest(ch, num);
   } while (num != NOTHING);
+}
+
+static int upgrade_legacy_immortal_levels(struct char_data *ch)
+{
+  int new_level = 0, old_level = GET_LEVEL(ch);
+
+  if (old_level < 31 || old_level > 34)
+    return FALSE;
+
+  switch (old_level) {
+  case 31: new_level = LVL_IMMORT; break;
+  case 32: new_level = LVL_GOD; break;
+  case 33: new_level = LVL_GRGOD; break;
+  case 34: new_level = LVL_IMPL; break;
+  default: return FALSE;
+  }
+
+  GET_LEVEL(ch) = new_level;
+
+  if (GET_EXP(ch) < level_exp(GET_CLASS(ch), new_level))
+    GET_EXP(ch) = level_exp(GET_CLASS(ch), new_level);
+
+  log("Updating %s from legacy immortal level %d to %d.",
+      GET_NAME(ch) ? GET_NAME(ch) : "<unknown>", old_level, new_level);
+
+  return TRUE;
 }
 
 static void load_HMVS(struct char_data *ch, const char *line, int mode)
