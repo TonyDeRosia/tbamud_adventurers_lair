@@ -332,6 +332,19 @@ static void build_custom_prompt(char *prompt, struct descriptor_data *d)
   }
 }
 
+static void render_prompt_preview(struct char_data *ch, char *out, size_t out_size)
+{
+  if (out_size == 0)
+    return;
+
+  if (ch == NULL || ch->desc == NULL) {
+    *out = '\0';
+    return;
+  }
+
+  build_custom_prompt(out, ch->desc);
+}
+
 char *make_prompt(struct descriptor_data *d)
 {
   static char prompt[MAX_PROMPT_LENGTH];
@@ -364,6 +377,7 @@ void queue_prompt(struct descriptor_data *d)
 ACMD(do_prompt)
 {
   char processed[MAX_PROMPT_LENGTH + 1];
+  char preview[MAX_PROMPT_LENGTH + 1];
   size_t processed_len = 0;
 
   if (IS_NPC(ch))
@@ -383,6 +397,11 @@ ACMD(do_prompt)
 
     for (i = 0; i < sizeof(prompt_tokens) / sizeof(prompt_tokens[0]); i++)
       send_to_char(ch, "  %%%c - %s\r\n", prompt_tokens[i].code, prompt_tokens[i].description);
+
+    render_prompt_preview(ch, preview, sizeof(preview));
+
+    if (*preview)
+      send_to_char(ch, "Preview: %s\r\n", preview);
 
     return;
   }
@@ -407,4 +426,9 @@ ACMD(do_prompt)
 
   strlcpy(GET_PROMPT(ch), processed, MAX_PROMPT_LENGTH + 1);
   send_to_char(ch, "Prompt set.\r\n");
+
+  render_prompt_preview(ch, preview, sizeof(preview));
+
+  if (*preview)
+    send_to_char(ch, "Preview: %s\r\n", preview);
 }
