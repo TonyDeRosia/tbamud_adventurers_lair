@@ -19,7 +19,7 @@ extern room_rnum top_of_world;
 /* External functions */
 int compute_armor_class(struct char_data *ch);
 
-static const char *default_prompt_template = "[%h / %H] [%m / %M] [%v / %V] [%X] ";
+static const char *default_prompt_template = "{W}[{R}%h{W}/{r}%H{W}]{X} {W}[{B}%m{W}/{b}%M{W}]{X} {W}[{G}%v{W}/{g}%V{W}]{X} {W}[{Y}%X{W}]{X} ";
 
 static const char *translate_color_brace(char code)
 {
