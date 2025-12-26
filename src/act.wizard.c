@@ -1510,6 +1510,10 @@ ACMD(do_advance)
     send_to_char(ch, "%d is the highest possible level.\r\n", LVL_IMPL);
     return;
   }
+  if (newlevel > (LVL_IMMORT - 1) && GET_LEVEL(ch) < LVL_IMMORT) {
+    send_to_char(ch, "Only immortals can advance players beyond level %d.\r\n", LVL_IMMORT - 1);
+    return;
+  }
   if (newlevel > GET_LEVEL(ch)) {
     send_to_char(ch, "Yeah, right.\r\n");
     return;
@@ -1564,7 +1568,7 @@ ACMD(do_advance)
    GET_COND(victim, DRUNK)  = -1;
   }
 
-  gain_exp_regardless(victim, level_exp(GET_CLASS(victim), newlevel) - GET_EXP(victim));
+  gain_exp_regardless(victim, level_exp(GET_CLASS(victim), newlevel) - GET_EXP(victim), GET_LEVEL(ch));
   save_char(victim);
 }
 
