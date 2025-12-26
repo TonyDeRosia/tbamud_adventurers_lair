@@ -4315,7 +4315,7 @@ If you feel claustrophobic, typing 'leave' will make you use the nearest
 obvious exit to the outside.
 
 #0
-LEVELS ATTAINING-LEVELS LEVEL-REQUIREMENTS
+LEVEL LEVELS ATTAINING-LEVELS LEVEL-REQUIREMENTS
 @n
 Usage: @ylevels [<min>-<max> | <range>]@n
 @n
@@ -4995,15 +4995,15 @@ MEDIT-LEVEL MOB-STANDARDS MOB-LIMITS AUTOROLL AUTOGENERATE GENERATE MEDIT-STANDA
 (1) Level:       [  #]
 (2) Auto Set Stats (based on level)
 
-   The level of the monster, from 1 to 30. Instead of having to manually
+   The level of the monster, from 1 to 100. Instead of having to manually
 enter all the data below, you can simply enter the level and then select option
-2 to autoroll all other fields so they will be calculated for you. This is a 
-guideline for builders, not a set standard. Feel free to modify any of these 
-values. Keep it reasonable. The level of the mob is used in the consider 
-command, and when gaining experience. 
+2 to autoroll all other fields so they will be calculated for you. This is a
+guideline for builders, not a set standard. Feel free to modify any of these
+values. Keep it reasonable. The level of the mob is used in the consider
+command, and when gaining experience.
 
 Here is our autoroll standard, entering mob level will calculate the following:
-      GET_LEVEL(OLC_MOB(d))   = LIMIT(i, 1, 30);
+      GET_LEVEL(OLC_MOB(d))   = LIMIT(i, 1, 100);
       GET_BONUS(OLC_MOB(d))   = mob_lev*10;          /* hit point bonus         */
       GET_HIT(OLC_MOB(d))     = mob_lev/5;           /* number of hitpoint dice */
       GET_MANA(OLC_MOB(d))    = mob_lev/5;           /* size of hitpoint dice   */
