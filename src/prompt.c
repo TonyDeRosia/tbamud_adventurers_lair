@@ -371,8 +371,9 @@ static void build_custom_prompt(char *prompt, struct descriptor_data *d)
   prompt[pos] = '\0';
 
   /* Append color reset at the end if there's room */
-  if (strlen(prompt) + 3 < MAX_PROMPT_LENGTH)
-    strlcat(prompt, "@*n", MAX_PROMPT_LENGTH);
+  if (pos + 3 < MAX_PROMPT_LENGTH) {
+    strcat(prompt, "@*n");  /* strcat: OK (size checked above) */
+  }
 }
 
 static void render_prompt_preview(struct char_data *ch, char *out, size_t out_size)
