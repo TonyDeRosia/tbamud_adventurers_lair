@@ -2538,16 +2538,32 @@ See also: DISPEL-EVIL
 #0
 DISPLAYS PROMPTS HIT-PNT-DISPLAY
 
-Usage: prompt < H | M | V | all | auto | off >
+Usage: prompt < H | M | V | all | auto | none | reset | <custom text> >
 
-Modify your prompt to show your hit points, mana, and/or movement points.
+Adjust the prompt to show hit points, mana, and/or movement points, or replace
+it with your own text template.
 
-  > prompt hv       Display hit points and movement points.
-  > prompt off      Return to no prompt.
-  > prompt all      Display hit, mana, and movement points.
+Letter switches toggle the legacy flags:
+  > prompt hv         Display hit points and movement points.
+  > prompt all        Display hit, mana, and movement points.
+  > prompt auto       Only show the prompt if a value is below 30%% of max.
+  > prompt none/off   Return to no prompt and clear custom text.
 
-  > prompt auto     A separate toggle that will only display your selected 
-                    prompt if the values drop below 30% of max.
+Supplying any other text sets a custom prompt.  You can mix plain text, mud
+colors, and the following codes (use %% to print a literal percent sign):
+  %%h / %%H   Current / maximum hit points
+  %%m / %%M   Current / maximum mana
+  %%v / %%V   Current / maximum moves
+  %%p / %%P / %%q   Percent hit / mana / moves
+
+Examples:
+  > prompt HP:<H/%h> MP:<M/%m> MV:<V/%v>
+  > prompt <H/%h> <M/%m> <V/%v>
+  > prompt {RHP:<H{w/{r%h>{x {BMP:<M{W/{b%m>{x {GMV:<V{W/{g%v>{x
+
+Use @Yprompt reset@n to clear your saved template and return to flag-based
+prompts.
+
 See also: TOGGLE
 #0
 DONATE
