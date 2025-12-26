@@ -612,6 +612,7 @@ ACMD(do_use)
 ACMD(do_display)
 {
   size_t i;
+  int flags_only = TRUE;
 
   if (IS_NPC(ch)) {
     send_to_char(ch, "Monsters don't need displays.  Go away.\r\n");
@@ -620,13 +621,27 @@ ACMD(do_display)
   skip_spaces(&argument);
 
   if (!*argument) {
-    send_to_char(ch, "Usage: prompt { { H | M | V } | all | auto | none }\r\n");
+    send_to_char(ch, "Usage: prompt { { H | M | V } | all | auto | none | reset | <custom text> }\r\n");
+    return;
+  }
+
+  for (i = 0; argument[i]; i++) {
+    if (isspace((unsigned char)argument[i]) || !strchr("hmvHMV", argument[i])) {
+      flags_only = FALSE;
+      break;
+    }
+  }
+
+  if (!str_cmp(argument, "reset")) {
+    *GET_PROMPT(ch) = '\0';
+    send_to_char(ch, "Custom prompt cleared.\r\n");
     return;
   }
 
   if (!str_cmp(argument, "auto")) {
     TOGGLE_BIT_AR(PRF_FLAGS(ch), PRF_DISPAUTO);
     send_to_char(ch, "Auto prompt %sabled.\r\n", PRF_FLAGGED(ch, PRF_DISPAUTO) ? "en" : "dis");
+    *GET_PROMPT(ch) = '\0';
     return;
   }
 
@@ -638,7 +653,7 @@ ACMD(do_display)
     REMOVE_BIT_AR(PRF_FLAGS(ch), PRF_DISPHP);
     REMOVE_BIT_AR(PRF_FLAGS(ch), PRF_DISPMANA);
     REMOVE_BIT_AR(PRF_FLAGS(ch), PRF_DISPMOVE);
-  } else {
+  } else if (flags_only) {
     REMOVE_BIT_AR(PRF_FLAGS(ch), PRF_DISPHP);
     REMOVE_BIT_AR(PRF_FLAGS(ch), PRF_DISPMANA);
     REMOVE_BIT_AR(PRF_FLAGS(ch), PRF_DISPMOVE);
@@ -653,14 +668,26 @@ ACMD(do_display)
 	break;
       case 'v':
         SET_BIT_AR(PRF_FLAGS(ch), PRF_DISPMOVE);
-	break;
+        break;
       default:
-	send_to_char(ch, "Usage: prompt { { H | M | V } | all | auto | none }\r\n");
-	return;
+        send_to_char(ch, "Usage: prompt { { H | M | V } | all | auto | none | reset | <custom text> }\r\n");
+        return;
       }
     }
+  } else {
+    size_t max_len = sizeof(GET_PROMPT(ch)) - 1;
+
+    if (strlen(argument) > max_len) {
+      strlcpy(GET_PROMPT(ch), argument, sizeof(GET_PROMPT(ch)));
+      send_to_char(ch, "Prompt too long; truncated to %zu characters.\r\n", max_len);
+    } else {
+      strlcpy(GET_PROMPT(ch), argument, sizeof(GET_PROMPT(ch)));
+      send_to_char(ch, "Custom prompt set. Use %%h/%%H for hit points, %%m/%%M for mana, %%v/%%V for moves, and %%p/%%P/%%q for percentages.\r\n");
+    }
+    return;
   }
 
+  *GET_PROMPT(ch) = '\0';
   send_to_char(ch, "%s", CONFIG_OK);
 }
 

@@ -55,6 +55,7 @@
 #define PFDEF_OLC               NOWHERE 
 #define PFDEF_PAGELENGTH        22
 #define PFDEF_SCREENWIDTH       80
+#define PFDEF_PROMPT            ""
 #define PFDEF_QUESTPOINTS       0
 #define PFDEF_QUESTCOUNT        0
 #define PFDEF_COMPQUESTS        0
