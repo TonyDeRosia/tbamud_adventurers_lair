@@ -23,31 +23,31 @@ static const char *default_prompt_template = "[%h / %H] [%m / %M] [%v / %V] [%X]
 
 static const char *translate_color_brace(char code)
 {
-  /* Return @* color codes that ProtocolOutput will process */
+  /* Return @ color codes that ProtocolOutput will process */
   switch (code) {
-  case 'n': case 'N': case 'x': case 'X': return "@*n"; /* normal/reset */
-  case 'd': return "@*d"; /* dark grey / black */
-  case 'D': return "@*D"; /* light grey */
-  case 'a': return "@*a"; /* dark azure */
-  case 'A': return "@*A"; /* light azure */
-  case 'r': return "@*r"; /* dark red */
-  case 'R': return "@*R"; /* light red */
-  case 'g': return "@*g"; /* dark green */
-  case 'G': return "@*G"; /* light green */
-  case 'y': return "@*y"; /* dark yellow */
-  case 'Y': return "@*Y"; /* light yellow */
-  case 'b': return "@*b"; /* dark blue */
-  case 'B': return "@*B"; /* light blue */
-  case 'm': return "@*m"; /* dark magenta */
-  case 'M': return "@*M"; /* light magenta */
-  case 'c': return "@*c"; /* dark cyan */
-  case 'C': return "@*C"; /* light cyan */
-  case 'w': return "@*w"; /* dark white */
-  case 'W': return "@*W"; /* light white */
-  case 'o': return "@*o"; /* dark orange */
-  case 'O': return "@*O"; /* light orange */
-  case 'p': return "@*p"; /* dark pink */
-  case 'P': return "@*P"; /* light pink */
+  case 'n': case 'N': case 'x': case 'X': return "@n"; /* normal/reset */
+  case 'd': return "@d"; /* dark grey / black */
+  case 'D': return "@D"; /* light grey */
+  case 'a': return "@a"; /* dark azure */
+  case 'A': return "@A"; /* light azure */
+  case 'r': return "@r"; /* dark red */
+  case 'R': return "@R"; /* light red */
+  case 'g': return "@g"; /* dark green */
+  case 'G': return "@G"; /* light green */
+  case 'y': return "@y"; /* dark yellow */
+  case 'Y': return "@Y"; /* light yellow */
+  case 'b': return "@b"; /* dark blue */
+  case 'B': return "@B"; /* light blue */
+  case 'm': return "@m"; /* dark magenta */
+  case 'M': return "@M"; /* light magenta */
+  case 'c': return "@c"; /* dark cyan */
+  case 'C': return "@C"; /* light cyan */
+  case 'w': return "@w"; /* dark white */
+  case 'W': return "@W"; /* light white */
+  case 'o': return "@o"; /* dark orange */
+  case 'O': return "@O"; /* light orange */
+  case 'p': return "@p"; /* dark pink */
+  case 'P': return "@P"; /* light pink */
   default:  return NULL;
   }
 }
@@ -371,8 +371,8 @@ static void build_custom_prompt(char *prompt, struct descriptor_data *d)
   prompt[pos] = '\0';
 
   /* Append color reset at the end if there's room */
-  if (pos + 3 < MAX_PROMPT_LENGTH) {
-    strcat(prompt, "@*n");  /* strcat: OK (size checked above) */
+  if (pos + 2 < MAX_PROMPT_LENGTH) {
+    strcat(prompt, "@n");  /* strcat: OK (size checked above) */
   }
 }
 
