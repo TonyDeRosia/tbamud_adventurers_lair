@@ -805,27 +805,6 @@ ACMD(do_gold)
 
 /* Put these helpers above ACMD(do_score) in the same .c file */
 
-static size_t visible_strlen_mud(const char *s)
-{
-  size_t vis = 0;
-  while (*s) {
-    /* Circle/derivatives style \tX color codes */
-    if (*s == '\t' && s[1]) { s += 2; continue; }
-
-    /* ANSI escape sequences */
-    if ((unsigned char)*s == 27 && s[1] == '[') {
-      s += 2;
-      while (*s && *s != 'm') s++;
-      if (*s == 'm') s++;
-      continue;
-    }
-
-    vis++;
-    s++;
-  }
-  return vis;
-}
-
 static size_t copy_trunc_visible(char *dst, size_t dstsz, const char *src, size_t max_vis)
 {
   size_t out = 0;
