@@ -66,6 +66,7 @@
 #include "handler.h"
 #include "db.h"
 #include "house.h"
+#include "class.h"
 #include "oasis.h"
 #include "genolc.h"
 #include "dg_scripts.h"
@@ -1132,6 +1133,74 @@ static size_t append_prompt(char *prompt, size_t len, size_t size, const char *f
   return len + count;
 }
 
+static int prompt_tnl(struct char_data *ch)
+{
+  if (GET_LEVEL(ch) >= LVL_IMMORT)
+    return 0;
+
+  int next_level = GET_LEVEL(ch) + 1;
+  return MAX(0, level_exp(GET_CLASS(ch), next_level) - GET_EXP(ch));
+}
+
+static size_t append_named_prompt_token(struct descriptor_data *d, char *prompt, size_t len, size_t size,
+                                        const char *token, size_t tok_len)
+{
+  /* Copy to a lowercase buffer for comparisons. */
+  char lowered[16];
+  size_t copy_len = MIN(tok_len, sizeof(lowered) - 1);
+  size_t i;
+
+  for (i = 0; i < copy_len; i++)
+    lowered[i] = LOWER(token[i]);
+  lowered[copy_len] = '\0';
+
+  long value = 0;
+  int handled = TRUE;
+
+  if (!strcmp(lowered, "str"))
+    value = GET_STR(d->character);
+  else if (!strcmp(lowered, "int"))
+    value = GET_INT(d->character);
+  else if (!strcmp(lowered, "wis"))
+    value = GET_WIS(d->character);
+  else if (!strcmp(lowered, "dex"))
+    value = GET_DEX(d->character);
+  else if (!strcmp(lowered, "con"))
+    value = GET_CON(d->character);
+  else if (!strcmp(lowered, "cha"))
+    value = GET_CHA(d->character);
+  else if (!strcmp(lowered, "lvl") || !strcmp(lowered, "level"))
+    value = GET_LEVEL(d->character);
+  else if (!strcmp(lowered, "exp"))
+    value = GET_EXP(d->character);
+  else if (!strcmp(lowered, "tnl"))
+    value = prompt_tnl(d->character);
+  else if (!strcmp(lowered, "gold"))
+    value = GET_GOLD(d->character);
+  else if (!strcmp(lowered, "bank"))
+    value = GET_BANK_GOLD(d->character);
+  else if (!strcmp(lowered, "qp") || !strcmp(lowered, "quest"))
+    value = GET_QUESTPOINTS(d->character);
+  else if (!strcmp(lowered, "prac") || !strcmp(lowered, "practice"))
+    value = GET_PRACTICES(d->character);
+  else if (!strcmp(lowered, "ac"))
+    value = GET_AC(d->character);
+  else if (!strcmp(lowered, "hr") || !strcmp(lowered, "hitroll"))
+    value = GET_HITROLL(d->character);
+  else if (!strcmp(lowered, "dr") || !strcmp(lowered, "damroll"))
+    value = GET_DAMROLL(d->character);
+  else if (!strcmp(lowered, "align") || !strcmp(lowered, "alignment"))
+    value = GET_ALIGNMENT(d->character);
+  else {
+    handled = FALSE;
+  }
+
+  if (handled)
+    return append_prompt(prompt, len, size, "%ld", value);
+
+  return append_prompt(prompt, len, size, "%%%.*s", (int)tok_len, token);
+}
+
 static size_t append_custom_prompt(struct descriptor_data *d, char *prompt, size_t len, size_t size)
 {
   const char *src = GET_PROMPT(d->character);
@@ -1151,43 +1220,65 @@ static size_t append_custom_prompt(struct descriptor_data *d, char *prompt, size
     case '%':
       prompt[len++] = '%';
       prompt[len] = '\0';
-      break;
+      src++;
+      continue;
     case 'h':
       len = append_prompt(prompt, len, size, "%d", GET_HIT(d->character));
-      break;
+      src++;
+      continue;
     case 'H':
       len = append_prompt(prompt, len, size, "%d", GET_MAX_HIT(d->character));
-      break;
+      src++;
+      continue;
     case 'm':
       len = append_prompt(prompt, len, size, "%d", GET_MANA(d->character));
-      break;
+      src++;
+      continue;
     case 'M':
       len = append_prompt(prompt, len, size, "%d", GET_MAX_MANA(d->character));
-      break;
+      src++;
+      continue;
     case 'v':
       len = append_prompt(prompt, len, size, "%d", GET_MOVE(d->character));
-      break;
+      src++;
+      continue;
     case 'V':
       len = append_prompt(prompt, len, size, "%d", GET_MAX_MOVE(d->character));
-      break;
+      src++;
+      continue;
     case 'p':
       len = append_prompt(prompt, len, size, "%d", (GET_HIT(d->character) * 100) / MAX(1, GET_MAX_HIT(d->character)));
-      break;
+      src++;
+      continue;
     case 'P':
       len = append_prompt(prompt, len, size, "%d", (GET_MANA(d->character) * 100) / MAX(1, GET_MAX_MANA(d->character)));
-      break;
+      src++;
+      continue;
     case 'q':
       len = append_prompt(prompt, len, size, "%d", (GET_MOVE(d->character) * 100) / MAX(1, GET_MAX_MOVE(d->character)));
-      break;
+      src++;
+      continue;
     default:
-      prompt[len++] = '%';
-      if (len < size - 1) {
-        prompt[len++] = *src;
-        prompt[len] = '\0';
-      } else
-        prompt[size - 1] = '\0';
       break;
     }
+
+    if (isalpha((unsigned char)*src)) {
+      const char *token_start = src;
+      while (isalpha((unsigned char)*src))
+        src++;
+
+      size_t tok_len = src - token_start;
+      len = append_named_prompt_token(d, prompt, len, size, token_start, tok_len);
+      continue;
+    }
+
+    /* Unrecognized token, keep the literal percent sign and following character. */
+    prompt[len++] = '%';
+    if (len < size - 1) {
+      prompt[len++] = *src;
+      prompt[len] = '\0';
+    } else
+      prompt[size - 1] = '\0';
     src++;
   }
 

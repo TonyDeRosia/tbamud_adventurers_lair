@@ -2549,17 +2549,27 @@ Letter switches toggle the legacy flags:
   > prompt auto       Only show the prompt if a value is below 30%% of max.
   > prompt none/off   Return to no prompt and clear custom text.
 
-Supplying any other text sets a custom prompt.  You can mix plain text, mud
-colors, and the following codes (use %% to print a literal percent sign):
-  %%h / %%H   Current / maximum hit points
-  %%m / %%M   Current / maximum mana
-  %%v / %%V   Current / maximum moves
-  %%p / %%P / %%q   Percent hit / mana / moves
+Supplying any other text sets a custom prompt.  You can mix plain text,
+color codes in {braces}, and the following percent tokens (use %% to print
+a literal percent sign):
+  %%h / %%H             Current / maximum hit points
+  %%m / %%M             Current / maximum mana
+  %%v / %%V             Current / maximum moves
+  %%p / %%P / %%q       Percent hit / mana / moves
+  %%str %%int %%wis     Ability scores
+  %%dex %%con %%cha
+  %%lvl or %%level      Character level
+  %%exp / %%tnl         Experience and XP to next level
+  %%gold / %%bank       On-hand and banked gold
+  %%qp / %%prac         Quest points and practice sessions
+  %%ac %%hr %%dr        Armor class, hitroll, and damroll
+  %%align               Alignment value
+Only percent-prefixed codes are tokens; plain letters stay as text.
 
 Examples:
-  > prompt HP:<H/%h> MP:<M/%m> MV:<V/%v>
-  > prompt <H/%h> <M/%m> <V/%v>
-  > prompt {RHP:<H{w/{r%h>{x {BMP:<M{W/{b%m>{x {GMV:<V{W/{g%v>{x
+  > prompt HP:<%h/%H> MP:<%m/%M> MV:<%v/%V>
+  > prompt <%h/%H> <%m/%M> <%v/%V>
+  > prompt {RHP:<%h{w/{r%H>{x {BMP:<%m{W/{b%M>{x {GMV:<%v{W/{g%V>{x
 
 Use @Yprompt reset@n to clear your saved template and return to flag-based
 prompts.
