@@ -881,19 +881,123 @@ static int append_box_line(char *buf, int len, size_t bufsz,
  *  4. Test in-game with 'score' command
  * ========================================================================= */
 
+/* =========================================================================
+ *  ENHANCED SCORE DISPLAY - Complete Safe Version with Proper Padding
+ *  
+ *  Instructions:
+ *  1. In act.informative.c, find the existing ACMD(do_score) function
+ *  2. ADD the three helper functions BEFORE ACMD(do_score)
+ *  3. Replace the ENTIRE ACMD(do_score) function with the version below
+ *  4. Recompile: cd ~/mud/tbamud/src && make
+ * ========================================================================= */
+
+/* ========================================================================= 
+ * HELPER FUNCTIONS - Add these BEFORE ACMD(do_score)
+ * ========================================================================= */
+
+static size_t visible_strlen_mud(const char *s)
+{
+  size_t vis = 0;
+
+  while (s && *s) {
+    /* \tX color code */
+    if (*s == '\t' && s[1]) {
+      s += 2;
+      continue;
+    }
+
+    /* ANSI ESC[...m */
+    if ((unsigned char)*s == 27 && s[1] == '[') {
+      s += 2;
+      while (*s && *s != 'm') s++;
+      if (*s == 'm') s++;
+      continue;
+    }
+
+    vis++;
+    s++;
+  }
+
+  return vis;
+}
+
+static size_t copy_trunc_visible(char *dst, size_t dstsz, const char *src, size_t max_vis)
+{
+  size_t out = 0;
+  size_t vis = 0;
+
+  if (dstsz == 0) return 0;
+  if (!src) { dst[0] = '\0'; return 0; }
+
+  while (*src && out + 1 < dstsz) {
+    /* \tX */
+    if (*src == '\t' && src[1]) {
+      if (out + 2 >= dstsz) break;
+      dst[out++] = *src++;
+      dst[out++] = *src++;
+      continue;
+    }
+
+    /* ANSI ESC[...m */
+    if ((unsigned char)*src == 27 && src[1] == '[') {
+      if (out + 2 >= dstsz) break;
+      dst[out++] = *src++;
+      dst[out++] = *src++;
+      while (*src && *src != 'm' && out + 1 < dstsz) dst[out++] = *src++;
+      if (*src == 'm' && out + 1 < dstsz) dst[out++] = *src++;
+      continue;
+    }
+
+    if (vis >= max_vis) break;
+    dst[out++] = *src++;
+    vis++;
+  }
+
+  dst[out] = '\0';
+  return vis;
+}
+
+static int append_box_line(char *buf, int len, size_t bufsz,
+                           const char *border_color, const char *reset_color,
+                           const char *content, size_t inner_width)
+{
+  char trimmed[2048];
+  size_t vis;
+  size_t pad;
+
+  vis = copy_trunc_visible(trimmed, sizeof(trimmed), content, inner_width);
+  pad = (vis < inner_width) ? (inner_width - vis) : 0;
+
+  if ((size_t)len < bufsz) {
+    len += snprintf(buf + len, bufsz - (size_t)len,
+      "%s║%s %s%*s %s║%s\r\n",
+      border_color, reset_color,
+      trimmed, (int)pad, "",
+      border_color, reset_color);
+  }
+
+  return len;
+}
+
+/* ========================================================================= 
+ * MAIN SCORE FUNCTION - Replace your entire ACMD(do_score) with this
+ * ========================================================================= */
+
 ACMD(do_score)
 {
   struct time_info_data playing_time;
   char buf[MAX_STRING_LENGTH];
-  char line[512];
+  char line[2048];
   int len = 0;
+  const size_t W = 77;  /* Inner width of the box */
+  
   const char *B = CCBLU(ch, C_NRM);   /* Border color */
   const char *R = CCNRM(ch, C_NRM);   /* Reset/normal */
   const char *Y = CCYEL(ch, C_NRM);   /* Yellow/gold */
   const char *C = CCCYN(ch, C_NRM);   /* Cyan */
   const char *G = CCGRN(ch, C_NRM);   /* Green */
   const char *M = CCMAG(ch, C_NRM);   /* Magenta */
-  const char *W = CCWHT(ch, C_NRM);   /* White */
+  const char *W_CLR = CCWHT(ch, C_NRM);   /* White */
   const char *RED = CCRED(ch, C_NRM); /* Red */
 
   if (IS_NPC(ch))
@@ -904,8 +1008,8 @@ ACMD(do_score)
     "\r\n%s╔═══════════════════════════════════════════════════════════════════════════════╗%s\r\n", B, R);
 
   /* Title */
-  len += snprintf(buf + len, sizeof(buf) - len,
-    "%s║%s %sCHARACTER STATUS%-60s%s ║%s\r\n", B, R, Y, "", B, R);
+  snprintf(line, sizeof(line), "%sCHARACTER STATUS%s", Y, R);
+  len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
 
   /* Separator */
   len += snprintf(buf + len, sizeof(buf) - len,
@@ -914,20 +1018,17 @@ ACMD(do_score)
   /* Name and Title */
   snprintf(line, sizeof(line), "%sName:%s %-20s  %sTitle:%s %s",
     C, R, GET_NAME(ch), C, R, GET_TITLE(ch));
-  len += snprintf(buf + len, sizeof(buf) - len,
-    "%s║%s %-77s %s║%s\r\n", B, R, line, B, R);
+  len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
 
   /* Level and Age */
   snprintf(line, sizeof(line), "%sLevel:%s %-18d  %sAge:%s %d year%s old",
     C, R, GET_LEVEL(ch), C, R, GET_AGE(ch), (GET_AGE(ch) == 1 ? "" : "s"));
-  len += snprintf(buf + len, sizeof(buf) - len,
-    "%s║%s %-77s %s║%s\r\n", B, R, line, B, R);
+  len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
 
   /* Birthday message */
   if (age(ch)->month == 0 && age(ch)->day == 0) {
     snprintf(line, sizeof(line), "%s*** It's your birthday today! ***%s", Y, R);
-    len += snprintf(buf + len, sizeof(buf) - len,
-      "%s║%s %-77s %s║%s\r\n", B, R, line, B, R);
+    len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
   }
 
   /* Separator */
@@ -936,34 +1037,30 @@ ACMD(do_score)
 
   /* HP, Mana, Move */
   snprintf(line, sizeof(line), "%sHP:%s %s%d%s/%s%d%s  %sMana:%s %s%d%s/%s%d%s  %sMove:%s %s%d%s/%s%d%s",
-    C, R, G, GET_HIT(ch), R, W, GET_MAX_HIT(ch), R,
-    C, R, M, GET_MANA(ch), R, W, GET_MAX_MANA(ch), R,
-    C, R, Y, GET_MOVE(ch), R, W, GET_MAX_MOVE(ch), R);
-  len += snprintf(buf + len, sizeof(buf) - len,
-    "%s║%s %-77s %s║%s\r\n", B, R, line, B, R);
+    C, R, G, GET_HIT(ch), R, W_CLR, GET_MAX_HIT(ch), R,
+    C, R, M, GET_MANA(ch), R, W_CLR, GET_MAX_MANA(ch), R,
+    C, R, Y, GET_MOVE(ch), R, W_CLR, GET_MAX_MOVE(ch), R);
+  len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
 
   /* Separator */
   len += snprintf(buf + len, sizeof(buf) - len,
     "%s╠═══════════════════════════════════════════════════════════════════════════════╣%s\r\n", B, R);
 
   /* Armor and Alignment */
-  snprintf(line, sizeof(line), "%sArmor:%s %-18d  %sAlignment:%s %d",
+  snprintf(line, sizeof(line), "%sArmor:%s %d/10                %sAlignment:%s %d",
     C, R, compute_armor_class(ch), C, R, GET_ALIGNMENT(ch));
-  len += snprintf(buf + len, sizeof(buf) - len,
-    "%s║%s %-77s %s║%s\r\n", B, R, line, B, R);
+  len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
 
   /* Gold, Exp, Quest Points */
-  snprintf(line, sizeof(line), "%sGold:%s %-18d  %sExp:%s %-12d  %sQuest Points:%s %d",
+  snprintf(line, sizeof(line), "%sGold:%s %d                %sExp:%s %d                %sQuest Points:%s %d",
     Y, R, GET_GOLD(ch), C, R, GET_EXP(ch), M, R, GET_QUESTPOINTS(ch));
-  len += snprintf(buf + len, sizeof(buf) - len,
-    "%s║%s %-77s %s║%s\r\n", B, R, line, B, R);
+  len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
 
   /* Next Level (if mortal) */
   if (GET_LEVEL(ch) < LVL_IMMORT) {
     snprintf(line, sizeof(line), "%sNext level in:%s %d exp",
       C, R, level_exp(GET_CLASS(ch), GET_LEVEL(ch) + 1) - GET_EXP(ch));
-    len += snprintf(buf + len, sizeof(buf) - len,
-      "%s║%s %-77s %s║%s\r\n", B, R, line, B, R);
+    len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
   }
 
   /* Separator */
@@ -973,25 +1070,21 @@ ACMD(do_score)
   /* Quest Information */
   snprintf(line, sizeof(line), "%sQuests completed:%s %d",
     C, R, GET_NUM_QUESTS(ch));
-  len += snprintf(buf + len, sizeof(buf) - len,
-    "%s║%s %-77s %s║%s\r\n", B, R, line, B, R);
+  len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
 
   if (GET_QUEST(ch) != NOTHING) {
     snprintf(line, sizeof(line), "%sCurrent quest:%s %s",
       Y, R, QST_NAME(real_quest(GET_QUEST(ch))));
-    len += snprintf(buf + len, sizeof(buf) - len,
-      "%s║%s %-77s %s║%s\r\n", B, R, line, B, R);
+    len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
 
     if (!IS_NPC(ch) && PRF_FLAGGED(ch, PRF_SHOWVNUMS)) {
       snprintf(line, sizeof(line), "%s[Quest VNUM: %d]%s",
-        W, GET_QUEST(ch), R);
-      len += snprintf(buf + len, sizeof(buf) - len,
-        "%s║%s %-77s %s║%s\r\n", B, R, line, B, R);
+        W_CLR, GET_QUEST(ch), R);
+      len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
     }
   } else {
     snprintf(line, sizeof(line), "%sNot currently on a quest.%s", RED, R);
-    len += snprintf(buf + len, sizeof(buf) - len,
-      "%s║%s %-77s %s║%s\r\n", B, R, line, B, R);
+    len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
   }
 
   /* Separator */
@@ -1003,14 +1096,12 @@ ACMD(do_score)
   snprintf(line, sizeof(line), "%sPlay time:%s %d day%s, %d hour%s",
     C, R, playing_time.day, (playing_time.day == 1 ? "" : "s"),
     playing_time.hours, (playing_time.hours == 1 ? "" : "s"));
-  len += snprintf(buf + len, sizeof(buf) - len,
-    "%s║%s %-77s %s║%s\r\n", B, R, line, B, R);
+  len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
 
   /* Rank */
   snprintf(line, sizeof(line), "%sThis ranks you as%s %s %s %s(level %d)%s",
-    C, R, GET_NAME(ch), GET_TITLE(ch), W, GET_LEVEL(ch), R);
-  len += snprintf(buf + len, sizeof(buf) - len,
-    "%s║%s %-77s %s║%s\r\n", B, R, line, B, R);
+    C, R, GET_NAME(ch), GET_TITLE(ch), W_CLR, GET_LEVEL(ch), R);
+  len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
 
   /* Position/Status */
   switch (GET_POS(ch)) {
@@ -1049,71 +1140,54 @@ ACMD(do_score)
       snprintf(line, sizeof(line), "%sStatus:%s Floating", C, R);
       break;
   }
-  len += snprintf(buf + len, sizeof(buf) - len,
-    "%s║%s %-77s %s║%s\r\n", B, R, line, B, R);
+  len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
 
   /* Conditions */
   if (GET_COND(ch, DRUNK) > 10) {
     snprintf(line, sizeof(line), "%sYou are intoxicated.%s", Y, R);
-    len += snprintf(buf + len, sizeof(buf) - len,
-      "%s║%s %-77s %s║%s\r\n", B, R, line, B, R);
+    len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
   }
   if (GET_COND(ch, HUNGER) == 0) {
     snprintf(line, sizeof(line), "%sYou are hungry.%s", RED, R);
-    len += snprintf(buf + len, sizeof(buf) - len,
-      "%s║%s %-77s %s║%s\r\n", B, R, line, B, R);
+    len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
   }
   if (GET_COND(ch, THIRST) == 0) {
     snprintf(line, sizeof(line), "%sYou are thirsty.%s", RED, R);
-    len += snprintf(buf + len, sizeof(buf) - len,
-      "%s║%s %-77s %s║%s\r\n", B, R, line, B, R);
+    len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
   }
 
   /* Active Effects/Affects */
   if (AFF_FLAGGED(ch, AFF_BLIND) && GET_LEVEL(ch) < LVL_IMMORT) {
     snprintf(line, sizeof(line), "%sYou have been blinded!%s", RED, R);
-    len += snprintf(buf + len, sizeof(buf) - len,
-      "%s║%s %-77s %s║%s\r\n", B, R, line, B, R);
+    len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
   }
   if (AFF_FLAGGED(ch, AFF_INVISIBLE)) {
     snprintf(line, sizeof(line), "%sYou are invisible.%s", M, R);
-    len += snprintf(buf + len, sizeof(buf) - len,
-      "%s║%s %-77s %s║%s\r\n", B, R, line, B, R);
+    len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
   }
   if (AFF_FLAGGED(ch, AFF_DETECT_INVIS)) {
     snprintf(line, sizeof(line), "%sYou sense invisible things.%s", C, R);
-    len += snprintf(buf + len, sizeof(buf) - len,
-      "%s║%s %-77s %s║%s\r\n", B, R, line, B, R);
+    len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
   }
   if (AFF_FLAGGED(ch, AFF_SANCTUARY)) {
-    snprintf(line, sizeof(line), "%sYou are protected by Sanctuary.%s", W, R);
-    len += snprintf(buf + len, sizeof(buf) - len,
-      "%s║%s %-77s %s║%s\r\n", B, R, line, B, R);
+    snprintf(line, sizeof(line), "%sYou are protected by Sanctuary.%s", W_CLR, R);
+    len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
   }
   if (AFF_FLAGGED(ch, AFF_POISON)) {
     snprintf(line, sizeof(line), "%sYou are poisoned!%s", RED, R);
-    len += snprintf(buf + len, sizeof(buf) - len,
-      "%s║%s %-77s %s║%s\r\n", B, R, line, B, R);
+    len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
   }
   if (AFF_FLAGGED(ch, AFF_CHARM)) {
     snprintf(line, sizeof(line), "%sYou have been charmed!%s", Y, R);
-    len += snprintf(buf + len, sizeof(buf) - len,
-      "%s║%s %-77s %s║%s\r\n", B, R, line, B, R);
-  }
-  if (affected_by_spell(ch, SPELL_ARMOR)) {
-    snprintf(line, sizeof(line), "%sYou feel protected.%s", C, R);
-    len += snprintf(buf + len, sizeof(buf) - len,
-      "%s║%s %-77s %s║%s\r\n", B, R, line, B, R);
+    len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
   }
   if (AFF_FLAGGED(ch, AFF_INFRAVISION)) {
     snprintf(line, sizeof(line), "%sYour eyes are glowing red.%s", RED, R);
-    len += snprintf(buf + len, sizeof(buf) - len,
-      "%s║%s %-77s %s║%s\r\n", B, R, line, B, R);
+    len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
   }
   if (PRF_FLAGGED(ch, PRF_SUMMONABLE)) {
     snprintf(line, sizeof(line), "%sYou are summonable by other players.%s", Y, R);
-    len += snprintf(buf + len, sizeof(buf) - len,
-      "%s║%s %-77s %s║%s\r\n", B, R, line, B, R);
+    len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
   }
 
   /* Immortal Information */
@@ -1127,8 +1201,7 @@ ACMD(do_score)
     else
       snprintf(line, sizeof(line), "%sPOOFIN:%s %s appears with an ear-splitting bang.",
         Y, R, GET_NAME(ch));
-    len += snprintf(buf + len, sizeof(buf) - len,
-      "%s║%s %-77s %s║%s\r\n", B, R, line, B, R);
+    len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
 
     if (POOFOUT(ch))
       snprintf(line, sizeof(line), "%sPOOFOUT:%s %s %s",
@@ -1136,13 +1209,11 @@ ACMD(do_score)
     else
       snprintf(line, sizeof(line), "%sPOOFOUT:%s %s disappears in a puff of smoke.",
         Y, R, GET_NAME(ch));
-    len += snprintf(buf + len, sizeof(buf) - len,
-      "%s║%s %-77s %s║%s\r\n", B, R, line, B, R);
+    len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
 
     snprintf(line, sizeof(line), "%sYour current zone:%s %d",
       C, R, GET_OLC_ZONE(ch));
-    len += snprintf(buf + len, sizeof(buf) - len,
-      "%s║%s %-77s %s║%s\r\n", B, R, line, B, R);
+    len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
   }
 
   /* Bottom border */
@@ -1155,7 +1226,6 @@ ACMD(do_score)
   /* Send to character */
   send_to_char(ch, "%s", buf);
 }
-
 
 ACMD(do_inventory)
 {
