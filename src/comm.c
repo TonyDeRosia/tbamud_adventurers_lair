@@ -1602,13 +1602,14 @@ static char *make_prompt(struct descriptor_data *d)
     strcpy(prompt, "] ");       /* strcpy: OK (for 'MAX_PROMPT_LENGTH >= 3') */
   else if (STATE(d) == CON_PLAYING && !IS_NPC(d->character)) {
     size_t len = 0;
-    const bool has_prompt = *GET_PROMPT(d->character) != '\0';
-    const char *prompt_template = has_prompt ? GET_PROMPT(d->character) : PFDEF_PROMPT;
+    const char *prompt_template;
+
+    if (*GET_PROMPT(d->character) == '\0')
+      strlcpy(GET_PROMPT(d->character), PFDEF_PROMPT, MAX_PROMPT_LENGTH + 1);
+
+    prompt_template = GET_PROMPT(d->character);
 
     *prompt = '\0';
-
-    if (!has_prompt)
-      strlcpy(GET_PROMPT(d->character), PFDEF_PROMPT, MAX_PROMPT_LENGTH + 1);
 
     if (GET_INVIS_LEV(d->character) && len < sizeof(prompt))
       len = append_prompt(prompt, len, sizeof(prompt), "i%d ", GET_INVIS_LEV(d->character));
