@@ -100,10 +100,10 @@ static size_t translate_prompt_escapes(const char *src, char *dest, size_t dest_
         dest[pos++] = *src;
         break;
       }
-    } else if (*src == '{' && src[1]) {
+    } else if (*src == '{' && src[1] && src[2] == '}') {
       const char *color = translate_color_brace(src[1]);
 
-      if (color && src[2] == '}') {
+      if (color) {
         size_t add_len = MIN(dest_size - pos - 1, strlen(color));
 
         memcpy(dest + pos, color, add_len);
@@ -321,8 +321,15 @@ static void build_custom_prompt(char *prompt, struct descriptor_data *d)
   if (tpl == NULL || *tpl == '\0')
     tpl = default_prompt_template;
 
+  /* Debug: log what we're translating */
+  log("DEBUG: Original template: %s", tpl);
+  
   /* First pass: translate escape sequences and color codes in the template */
   translate_prompt_escapes(tpl, processed_tpl, sizeof(processed_tpl));
+  
+  /* Debug: log what we got after translation */
+  log("DEBUG: After translation: %s", processed_tpl);
+  
   tpl = processed_tpl;
 
   /* Second pass: expand prompt tokens (%, %h, %m, etc.) */
