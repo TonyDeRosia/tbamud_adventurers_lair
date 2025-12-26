@@ -1640,6 +1640,19 @@ void init_spell_levels(void)
  * exp required for immortality, plus at least 20,000 or so. */
 #define EXP_MAX  10000000
 
+/* Extend mortal experience requirements past the explicit tables by
+ * linearly interpolating between the last defined mortal level and the
+ * experience required for immortality. */
+static int interpolate_mortal_exp(int level, int base_level, int base_exp, int target_exp)
+{
+  int mortal_span = (LVL_IMMORT - 1) - base_level;
+
+  if (mortal_span <= 0)
+    return target_exp;
+
+  return base_exp + ((level - base_level) * (target_exp - base_exp)) / mortal_span;
+}
+
 /* Function to return the exp required for each class/level */
 int level_exp(int chclass, int level)
 {
@@ -1690,8 +1703,10 @@ int level_exp(int chclass, int level)
       case 28: return 6400000;
       case 29: return 6850000;
       case 30: return 7400000;
-      /* add new levels here */
       case LVL_IMMORT: return 8000000;
+      default:
+        if (level > 30 && level < LVL_IMMORT)
+          return interpolate_mortal_exp(level, 30, 7400000, 8000000);
     }
     break;
 
@@ -1728,8 +1743,10 @@ int level_exp(int chclass, int level)
       case 28: return 5600000;
       case 29: return 6000000;
       case 30: return 6400000;
-      /* add new levels here */
       case LVL_IMMORT: return 7000000;
+      default:
+        if (level > 30 && level < LVL_IMMORT)
+          return interpolate_mortal_exp(level, 30, 6400000, 7000000);
     }
     break;
 
@@ -1766,8 +1783,10 @@ int level_exp(int chclass, int level)
       case 28: return 5900000;
       case 29: return 6300000;
       case 30: return 6650000;
-      /* add new levels here */
       case LVL_IMMORT: return 7000000;
+      default:
+        if (level > 30 && level < LVL_IMMORT)
+          return interpolate_mortal_exp(level, 30, 6650000, 7000000);
     }
     break;
 
@@ -1804,8 +1823,10 @@ int level_exp(int chclass, int level)
       case 28: return 6400000;
       case 29: return 6850000;
       case 30: return 7400000;
-      /* add new levels here */
       case LVL_IMMORT: return 8000000;
+      default:
+        if (level > 30 && level < LVL_IMMORT)
+          return interpolate_mortal_exp(level, 30, 7400000, 8000000);
     }
     break;
   }
