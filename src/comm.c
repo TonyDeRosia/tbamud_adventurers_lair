@@ -1993,24 +1993,13 @@ static int process_output(struct descriptor_data *t)
   if (t->bufspace == 0)
     strcat(osb, "**OVERFLOW**\r\n");	/* strcpy: OK (osb:MAX_SOCK_BUF-2 reserves space) */
 
-  /* add the extra CRLF if the person isn't in compact mode */
-  if (STATE(t) == CON_PLAYING && t->character && !IS_NPC(t->character) && !PRF_FLAGGED(t->character, PRF_COMPACT))
-    if ( !t->pProtocol->WriteOOB ) 
-      strcat(osb, "\r\n");	/* strcpy: OK (osb:MAX_SOCK_BUF-2 reserves space) */
-
-  if (!t->pProtocol->WriteOOB) /* add a prompt */
-    strcat(i, make_prompt(t));	/* strcpy: OK (i:MAX_SOCK_BUF reserves space) */
-
-  /* now, send the output.  If this is an 'interruption', use the prepended
-   * CRLF, otherwise send the straight output sans CRLF. */
-  if (t->has_prompt && !t->pProtocol->WriteOOB) {
-    t->has_prompt = FALSE;
-    result = write_to_descriptor(t->descriptor, i);
-    if (result >= 2)
-      result -= 2;
-  } else
-    result = write_to_descriptor(t->descriptor, osb);
-
+  if (!t->pProtocol->WriteOOB && STATE(t) == CON_PLAYING && t->character && !IS_NPC(t->character)) {
+    strcat(osb, "\r\n");	/* strcpy: OK (osb:MAX_SOCK_BUF-2 reserves space) */
+    strcat(osb, make_prompt(t));	/* strcpy: OK (osb:MAX_SOCK_BUF-2 reserves space) */
+    t->has_prompt = TRUE;
+  }
+  /* now, send the output. */
+  result = write_to_descriptor(t->descriptor, osb);
   if (result < 0) {	/* Oops, fatal error. Bye! */
 //    close_socket(t); // close_socket is called after return of negative result
     return (-1);
