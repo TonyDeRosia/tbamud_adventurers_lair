@@ -11,6 +11,36 @@
 
 static const char *default_prompt_template = "[%h / %H] [%m / %M] [%v / %V] [%X] ";
 
+static const char *translate_color_brace(char code)
+{
+  switch (code) {
+  case 'n': case 'N': case 'x': case 'X': return "\tn"; /* normal/reset */
+  case 'd': return "\td"; /* dark grey / black */
+  case 'D': return "\tD"; /* light grey */
+  case 'a': return "\ta"; /* dark azure */
+  case 'A': return "\tA"; /* light azure */
+  case 'r': return "\tr"; /* dark red */
+  case 'R': return "\tR"; /* light red */
+  case 'g': return "\tg"; /* dark green */
+  case 'G': return "\tG"; /* light green */
+  case 'y': return "\ty"; /* dark yellow */
+  case 'Y': return "\tY"; /* light yellow */
+  case 'b': return "\tb"; /* dark blue */
+  case 'B': return "\tB"; /* light blue */
+  case 'm': return "\tm"; /* dark magenta */
+  case 'M': return "\tM"; /* light magenta */
+  case 'c': return "\tc"; /* dark cyan */
+  case 'C': return "\tC"; /* light cyan */
+  case 'w': return "\tw"; /* dark white */
+  case 'W': return "\tW"; /* light white */
+  case 'o': return "\to"; /* dark orange */
+  case 'O': return "\tO"; /* light orange */
+  case 'p': return "\tp"; /* dark pink */
+  case 'P': return "\tP"; /* light pink */
+  default:  return NULL;
+  }
+}
+
 static size_t translate_prompt_escapes(const char *src, char *dest, size_t dest_size)
 {
   size_t pos = 0;
@@ -54,6 +84,17 @@ static size_t translate_prompt_escapes(const char *src, char *dest, size_t dest_
         dest[pos++] = *src;
         break;
       }
+    } else if (*src == '{' && src[1]) {
+      const char *color = translate_color_brace(src[1]);
+
+      if (color) {
+        size_t add_len = MIN(dest_size - pos - 1, strlen(color));
+
+        memcpy(dest + pos, color, add_len);
+        pos += add_len;
+        src++;
+      } else
+        dest[pos++] = *src;
     } else
       dest[pos++] = *src;
   }
@@ -258,10 +299,14 @@ static const struct prompt_token_info *find_prompt_token(char code)
 static void build_custom_prompt(char *prompt, struct descriptor_data *d)
 {
   const char *tpl = GET_PROMPT(d->character);
+  char processed_tpl[MAX_PROMPT_LENGTH + 1];
   size_t pos = 0;
 
   if (tpl == NULL || *tpl == '\0')
     tpl = default_prompt_template;
+
+  translate_prompt_escapes(tpl, processed_tpl, sizeof(processed_tpl));
+  tpl = processed_tpl;
 
   for (; *tpl && pos < MAX_PROMPT_LENGTH; tpl++) {
     if (*tpl != '%') {
