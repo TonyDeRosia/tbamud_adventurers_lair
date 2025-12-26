@@ -37,6 +37,7 @@
 #include "prefedit.h"
 #include "ibt.h"
 #include "mud_event.h"
+#include "prompt.h"
 
 /* local (file scope) functions */
 static int perform_dupe_check(struct descriptor_data *d);
@@ -242,6 +243,7 @@ cpp_extern const struct command_info cmd_info[] = {
   { "policy"   , "pol"     , POS_DEAD    , do_gen_ps   , 0, SCMD_POLICIES },
   { "pour"     , "pour"    , POS_STANDING, do_pour     , 0, SCMD_POUR },
   { "prefedit" , "pre"     , POS_DEAD    , do_oasis_prefedit , 0, 0 },
+  { "prompt"   , "prom"    , POS_DEAD    , do_prompt   , 0, 0 },
   { "purge"    , "purge"   , POS_DEAD    , do_purge    , LVL_BUILDER, 0 },
 
   { "qedit"    , "qedit"   , POS_DEAD    , do_oasis_qedit, LVL_BUILDER, 0 },
