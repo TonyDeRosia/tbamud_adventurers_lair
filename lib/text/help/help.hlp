@@ -2538,10 +2538,10 @@ See also: DISPEL-EVIL
 #0
 DISPLAYS PROMPTS HIT-PNT-DISPLAY
 
-Usage: prompt < H | M | V | all | auto | none | reset | <custom text> >
+Usage: prompt < H | M | V | all | auto | none | reset | <custom template> >
 
 Adjust the prompt to show hit points, mana, and/or movement points, or replace
-it with your own text template.
+it with your own template string.
 
 Letter switches toggle the legacy flags:
   > prompt hv         Display hit points and movement points.
@@ -2550,26 +2550,21 @@ Letter switches toggle the legacy flags:
   > prompt none/off   Return to no prompt and clear custom text.
 
 Supplying any other text sets a custom prompt.  You can mix plain text,
-color codes in {braces}, and the following percent tokens (use %% to print
-a literal percent sign):
-  %%h / %%H             Current / maximum hit points
-  %%m / %%M             Current / maximum mana
-  %%v / %%V             Current / maximum moves
-  %%p / %%P / %%q       Percent hit / mana / moves
-  %%str %%int %%wis     Ability scores
-  %%dex %%con %%cha
-  %%lvl or %%level      Character level
-  %%exp / %%tnl         Experience and XP to next level
-  %%gold / %%bank       On-hand and banked gold
-  %%qp / %%prac         Quest points and practice sessions
-  %%ac %%hr %%dr        Armor class, hitroll, and damroll
-  %%align               Alignment value
-Only percent-prefixed codes are tokens; plain letters stay as text.
+color codes in {braces}, and percent tokens. Use %% to print a literal
+percent sign. Tokens:
+  %%h/%%H/%%p            Current, maximum, and percent hit points
+  %%m/%%M/%%q            Current, maximum, and percent mana
+  %%v/%%V/%%P            Current, maximum, and percent movement
+  %%n %%l %%c %%s %%t     Name, level, class, sex, and title
+  %%x %%X (or %%tnl)      Current experience and XP to next level
+  %%f %%F                Fighting target name and target HP percent
+  %%pos %%room %%zone    Position string, room vnum, and zone number
+  %%inv %%olc %%players %%uptime (immortal only)
+  Legacy stats: %%str %%int %%wis %%dex %%con %%cha %%gold %%bank %%qp %%prac %%ac %%hr %%dr %%align
+  %%r will be blank until races are enabled.
 
-Examples:
-  > prompt HP:<%h/%H> MP:<%m/%M> MV:<%v/%V>
-  > prompt <%h/%H> <%m/%M> <%v/%V>
-  > prompt {RHP:<%h{w/{r%H>{x {BMP:<%m{W/{b%M>{x {GMV:<%v{W/{g%V>{x
+Example:
+  prompt {R%%h{W/{r%%H{X {B%%m{W/{b%%M{X {G%%v{W/{g%%V{x{X {M%%tnl{X
 
 Use @Yprompt reset@n to clear your saved template and return to flag-based
 prompts.
