@@ -1137,6 +1137,157 @@ ACMD(do_score)
   send_to_char(ch, "%s", buf);
 }
 
+/* =======================================================================
+ * AFF / AFFECTS COMMAND
+ * Mortals: short, readable summary (spell name + simple effect)
+ * Immortals: full details (duration, level, apply, modifier, flags)
+ * ======================================================================= */
+
+static int is_aff_debuff(const struct affected_type *af)
+{
+  /* Best effort classification.
+     Negative modifiers are debuffs, and some common flags imply debuff. */
+  if (!af) return 0;
+
+  if (af->modifier < 0)
+    return 1;
+
+#ifdef AFF_POISON
+  if (IS_SET_AR(af->bitvector, AFF_POISON)) return 1;
+#endif
+#ifdef AFF_BLIND
+  if (IS_SET_AR(af->bitvector, AFF_BLIND)) return 1;
+#endif
+#ifdef AFF_CURSE
+  if (IS_SET_AR(af->bitvector, AFF_CURSE)) return 1;
+#endif
+#ifdef AFF_CHARM
+  if (IS_SET_AR(af->bitvector, AFF_CHARM)) return 1;
+#endif
+
+  return 0;
+}
+
+static void build_aff_summary(const struct affected_type *af, char *out, size_t outsz)
+{
+  /* Mortals see: name + basic effect line */
+  const char *name = "Unknown";
+  char eff[256];
+  char flags[256];
+
+  if (!out || outsz == 0) return;
+  out[0] = '\0';
+
+  if (!af) {
+    snprintf(out, outsz, "Unknown effect.");
+    return;
+  }
+
+#ifdef MAX_SPELLS
+  if (af->type > 0 && af->type < MAX_SPELLS && spell_info[af->type].name)
+    name = spell_info[af->type].name;
+#else
+  /* If your codebase uses different spell tables, you can change name resolution here. */
+  (void)name;
+#endif
+
+  eff[0] = '\0';
+  flags[0] = '\0';
+
+  if (af->location != APPLY_NONE) {
+    snprintf(eff, sizeof(eff), "%s %s by %d",
+      (af->modifier >= 0 ? "increases" : "reduces"),
+      affect_loc_name(af->location),
+      ABS(af->modifier));
+  }
+
+  /* Show a single short flag label if it exists */
+#ifdef AF_ARRAY_MAX
+  sprintbitarray(af->bitvector, affected_bits, AF_ARRAY_MAX, flags);
+#else
+  sprintbit(af->bitvector, affected_bits, flags, sizeof(flags));
+#endif
+
+  if (*eff && *flags)
+    snprintf(out, outsz, "%s: %s. Also: %s.", name, eff, flags);
+  else if (*eff)
+    snprintf(out, outsz, "%s: %s.", name, eff);
+  else if (*flags)
+    snprintf(out, outsz, "%s: %s.", name, flags);
+  else
+    snprintf(out, outsz, "%s.", name);
+}
+
+ACMD(do_affects)
+{
+  const struct affected_type *af;
+  int any = 0;
+  int any_buff = 0;
+  int any_debuff = 0;
+
+  if (!ch || IS_NPC(ch)) {
+    send_to_char(ch, "Not for mobiles.\r\n");
+    return;
+  }
+
+  if (!ch->affected) {
+    send_to_char(ch, "You have no active effects.\r\n");
+    return;
+  }
+
+  /* First pass: count for section headers */
+  for (af = ch->affected; af; af = af->next) {
+    any = 1;
+    if (is_aff_debuff(af)) any_debuff = 1;
+    else any_buff = 1;
+  }
+
+  if (!any) {
+    send_to_char(ch, "You have no active effects.\r\n");
+    return;
+  }
+
+  send_to_char(ch, "\r\n%sActive Effects%s\r\n", CCYEL(ch, C_NRM), CCNRM(ch, C_NRM));
+
+  if (any_buff) {
+    send_to_char(ch, "\r\n%sBuffs%s\r\n", CCGRN(ch, C_NRM), CCNRM(ch, C_NRM));
+    for (af = ch->affected; af; af = af->next) {
+      if (is_aff_debuff(af)) continue;
+
+      if (GET_LEVEL(ch) >= LVL_IMMORT) {
+        char flags[256];
+        const char *name = "Unknown";
+
+        flags[0] = '\0';
+#ifdef AF_ARRAY_MAX
+        sprintbitarray(af->bitvector, affected_bits, AF_ARRAY_MAX, flags);
+#else
+        sprintbit(af->bitvector, affected_bits, flags, sizeof(flags));
+#endif
+
+#ifdef MAX_SPELLS
+        if (af->type > 0 && af->type < MAX_SPELLS && spell_info[af->type].name)
+          name = spell_info[af->type].name;
+#endif
+
+        send_to_char(ch,
+          "  %s%s%s  lvl %d  dur %d  apply %s  mod %+d  flags %s\r\n",
+          CCCYN(ch, C_NRM), name, CCNRM(ch, C_NRM),
+          af->level, af->duration,
+          affect_loc_name(af->location),
+          af->modifier,
+          (*flags ? flags : "none"));
+      } else {
+        char summary[512];
+        build_aff_summary(af, summary, sizeof(summary));
+        send_to_char(ch, "  %s\r\n", summary);
+      }
+    }
+  }
+
+  if (any_debuff) {
+    send_to_char(ch, "\r\
+
 ACMD(do_inventory)
 {
   send_to_char(ch, "You are carrying:\r\n");
