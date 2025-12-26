@@ -301,6 +301,7 @@ static void build_custom_prompt(char *prompt, struct descriptor_data *d)
 {
   const char *tpl = GET_PROMPT(d->character);
   char processed_tpl[MAX_PROMPT_LENGTH + 1];
+  char processed_prompt[MAX_PROMPT_LENGTH + 1];
   size_t pos = 0;
 
   if (tpl == NULL || *tpl == '\0')
@@ -331,6 +332,9 @@ static void build_custom_prompt(char *prompt, struct descriptor_data *d)
       append_prompt_text(prompt, &pos, (char[2]){ *tpl, '\0' });
     }
   }
+
+  translate_prompt_escapes(prompt, processed_prompt, sizeof(processed_prompt));
+  strlcpy(prompt, processed_prompt, MAX_PROMPT_LENGTH + 1);
 }
 
 static void render_prompt_preview(struct char_data *ch, char *out, size_t out_size)
