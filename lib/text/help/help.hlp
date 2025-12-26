@@ -13511,6 +13511,10 @@ The old display-style toggles are gone; everything is controlled by the prompt
 template you set.
 Color codes such as {R or @R work inside prompts.
 
+Type 'prompt' with no arguments to see your current and default templates. Use
+'prompt reset' (or 'prompt default') to restore the standard bracketed vitals
+prompt at any time.
+
 Common tokens:
   %h %H %p    - Current/max/percent hit points
   %m %M %q    - Current/max/percent mana
