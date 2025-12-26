@@ -13493,36 +13493,40 @@ PROMPT
 
 Usage: prompt <template>
        prompt reset
+       prompt default
 
 Customize the prompt shown while playing by supplying a template with %tokens.
 The old display-style toggles are gone; everything is controlled by the prompt
 template you set.
-Color codes such as {R or @R work inside prompts.
+Color codes such as @R (converted to ANSI automatically) work inside prompts.
 
 Type 'prompt' with no arguments to see your current and default templates. Use
 'prompt reset' (or 'prompt default') to restore the standard bracketed vitals
 prompt at any time.
 
 Common tokens:
-  %h %H %p    - Current/max/percent hit points
-  %m %M %q    - Current/max/percent mana
-  %v %V %P    - Current/max/percent movement points
+  %h %H       - Current/max hit points
+  %m %M       - Current/max mana
+  %v %V       - Current/max movement points
+  %x %X       - Experience (current / to next level)
+  %l          - Level
+  %a          - Armor class
+  %A          - Alignment
+  %g          - Gold carried
+  %q %Q %c    - Quest points / completed quests / current quest vnum
+  %p          - Position (standing, fighting, etc.)
+  %r          - Room vnum
   %n          - Character name
-  %l %lvl     - Level (%level is also available)
-  %c %s %t    - Class, sex/gender, title
-  %x %exp     - Current experience
-  %X %tnl     - Experience needed for next level
-  %f %F       - Fight target name and hit percent
-  %pos        - Current position (standing, fighting, etc.)
-  %room %zone - Room vnum and zone number
-  %inv %olc   - Invisibility level, OLC editing context (immortals only)
-  %players    - Connected player count (immortals only)
-  %uptime     - Server uptime (immortals only)
-  %str %int %wis %dex %con %cha - Ability scores
-  %gold %bank %qp %prac %ac %hr %dr %align - Currency, practice, and combat stats
+  %y          - Age in years
+  %t          - Total playtime (days/hours)
 
 Use %% to place a literal percent sign in the prompt. Type 'prompt reset' to
 restore the default prompt.
+
+Examples:
+  prompt [@R%h@D/@R%H@n hp] [@B%m@D/@B%M@n mana] [@G%v@D/@G%V@n mv]
+  prompt <@Y%n@n> @c%p@n in room %r -- XP: %X
+  prompt default
 
 #31
 $~
