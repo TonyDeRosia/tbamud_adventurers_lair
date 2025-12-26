@@ -682,7 +682,7 @@ ACMD(do_display)
       send_to_char(ch, "Prompt too long; truncated to %zu characters.\r\n", max_len);
     } else {
       strlcpy(GET_PROMPT(ch), argument, sizeof(GET_PROMPT(ch)));
-      send_to_char(ch, "Custom prompt set. Use %%h/%%H for hit points, %%m/%%M for mana, %%v/%%V for moves, and %%p/%%P/%%q for percentages.\r\n");
+      send_to_char(ch, "Custom prompt set. Use %%h/%%H/%%p for hit points, %%m/%%M/%%P for mana, %%v/%%V/%%q for moves, and tokens like %%str, %%dex, %%lvl, %%exp, %%tnl, %%gold, %%bank, %%qp, %%prac, %%ac, %%hr, %%dr, and %%align for other stats. Color codes in {braces are supported}.\r\n");
     }
     return;
   }
