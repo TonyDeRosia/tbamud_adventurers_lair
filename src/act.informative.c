@@ -870,184 +870,290 @@ static int append_box_line(char *buf, int len, size_t bufsz,
 } while (0)
 
 
+/* =========================================================================
+ *  ENHANCED SCORE DISPLAY - Complete Replacement
+ *  
+ *  Instructions:
+ *  1. In act.informative.c, find the existing ACMD(do_score) function
+ *  2. Replace the ENTIRE function (from ACMD(do_score) to the closing brace)
+ *     with this code
+ *  3. Recompile: cd ~/mud/tbamud/src && make
+ *  4. Test in-game with 'score' command
+ * ========================================================================= */
+
 ACMD(do_score)
 {
   struct time_info_data playing_time;
   char buf[MAX_STRING_LENGTH];
-  char line[2048];
+  char line[512];
   int len = 0;
-
-  /* Box interior width (characters inside the borders, not counting the leading/trailing space) */
-  const size_t W = 75;
-
-  const char *B = CCBLU(ch, C_NRM);
-  const char *R = CCNRM(ch, C_NRM);
+  const char *B = CCBLU(ch, C_NRM);   /* Border color */
+  const char *R = CCNRM(ch, C_NRM);   /* Reset/normal */
+  const char *Y = CCYEL(ch, C_NRM);   /* Yellow/gold */
+  const char *C = CCCYN(ch, C_NRM);   /* Cyan */
+  const char *G = CCGRN(ch, C_NRM);   /* Green */
+  const char *M = CCMAG(ch, C_NRM);   /* Magenta */
+  const char *W = CCWHT(ch, C_NRM);   /* White */
+  const char *RED = CCRED(ch, C_NRM); /* Red */
 
   if (IS_NPC(ch))
     return;
 
-  /* Top */
-  APPEND_FMT("\r\n%s╔═══════════════════════════════════════════════════════════════════════════╗%s\r\n", B, R);
+  /* Top border */
+  len += snprintf(buf + len, sizeof(buf) - len,
+    "\r\n%s╔═══════════════════════════════════════════════════════════════════════════════╗%s\r\n", B, R);
 
-  /* Title header (centered-ish, simple) */
-  snprintf(line, sizeof(line), "%sCHARACTER STATUS%s", CCYEL(ch, C_NRM), R);
-  len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
+  /* Title */
+  len += snprintf(buf + len, sizeof(buf) - len,
+    "%s║%s %sCHARACTER STATUS%-60s%s ║%s\r\n", B, R, Y, "", B, R);
 
-  APPEND_FMT("%s╠═══════════════════════════════════════════════════════════════════════════╣%s\r\n", B, R);
+  /* Separator */
+  len += snprintf(buf + len, sizeof(buf) - len,
+    "%s╠═══════════════════════════════════════════════════════════════════════════════╣%s\r\n", B, R);
 
-  /* Name / Title */
-  snprintf(line, sizeof(line), "%sName:%s %s   %sTitle:%s %s",
-    CCCYN(ch, C_NRM), R, GET_NAME(ch),
-    CCCYN(ch, C_NRM), R, GET_TITLE(ch));
-  len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
+  /* Name and Title */
+  snprintf(line, sizeof(line), "%sName:%s %-20s  %sTitle:%s %s",
+    C, R, GET_NAME(ch), C, R, GET_TITLE(ch));
+  len += snprintf(buf + len, sizeof(buf) - len,
+    "%s║%s %-77s %s║%s\r\n", B, R, line, B, R);
 
-  /* Level / Age */
-  snprintf(line, sizeof(line), "%sLevel:%s %d   %sAge:%s %d year%s old",
-    CCCYN(ch, C_NRM), R, GET_LEVEL(ch),
-    CCCYN(ch, C_NRM), R, GET_AGE(ch), (GET_AGE(ch) == 1 ? "" : "s"));
-  len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
+  /* Level and Age */
+  snprintf(line, sizeof(line), "%sLevel:%s %-18d  %sAge:%s %d year%s old",
+    C, R, GET_LEVEL(ch), C, R, GET_AGE(ch), (GET_AGE(ch) == 1 ? "" : "s"));
+  len += snprintf(buf + len, sizeof(buf) - len,
+    "%s║%s %-77s %s║%s\r\n", B, R, line, B, R);
 
+  /* Birthday message */
   if (age(ch)->month == 0 && age(ch)->day == 0) {
-    snprintf(line, sizeof(line), "%sIt is your birthday today.%s", CCYEL(ch, C_NRM), R);
-    len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
+    snprintf(line, sizeof(line), "%s*** It's your birthday today! ***%s", Y, R);
+    len += snprintf(buf + len, sizeof(buf) - len,
+      "%s║%s %-77s %s║%s\r\n", B, R, line, B, R);
   }
 
-  APPEND_FMT("%s╠═══════════════════════════════════════════════════════════════════════════╣%s\r\n", B, R);
+  /* Separator */
+  len += snprintf(buf + len, sizeof(buf) - len,
+    "%s╠═══════════════════════════════════════════════════════════════════════════════╣%s\r\n", B, R);
 
-  /* Vitals */
-  snprintf(line, sizeof(line),
-    "%sHP:%s %s%d%s/%s%d%s   %sMana:%s %s%d%s/%s%d%s   %sMove:%s %s%d%s/%s%d%s",
-    CCCYN(ch, C_NRM), R,
-    CCGRN(ch, C_NRM), GET_HIT(ch), R, CCWHT(ch, C_NRM), GET_MAX_HIT(ch), R,
-    CCCYN(ch, C_NRM), R,
-    CCMAG(ch, C_NRM), GET_MANA(ch), R, CCWHT(ch, C_NRM), GET_MAX_MANA(ch), R,
-    CCCYN(ch, C_NRM), R,
-    CCYEL(ch, C_NRM), GET_MOVE(ch), R, CCWHT(ch, C_NRM), GET_MAX_MOVE(ch), R);
-  len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
+  /* HP, Mana, Move */
+  snprintf(line, sizeof(line), "%sHP:%s %s%d%s/%s%d%s  %sMana:%s %s%d%s/%s%d%s  %sMove:%s %s%d%s/%s%d%s",
+    C, R, G, GET_HIT(ch), R, W, GET_MAX_HIT(ch), R,
+    C, R, M, GET_MANA(ch), R, W, GET_MAX_MANA(ch), R,
+    C, R, Y, GET_MOVE(ch), R, W, GET_MAX_MOVE(ch), R);
+  len += snprintf(buf + len, sizeof(buf) - len,
+    "%s║%s %-77s %s║%s\r\n", B, R, line, B, R);
 
-  APPEND_FMT("%s╠═══════════════════════════════════════════════════════════════════════════╣%s\r\n", B, R);
+  /* Separator */
+  len += snprintf(buf + len, sizeof(buf) - len,
+    "%s╠═══════════════════════════════════════════════════════════════════════════════╣%s\r\n", B, R);
 
-  /* Combat */
-  snprintf(line, sizeof(line), "%sArmor:%s %d/10   %sAlignment:%s %d",
-    CCCYN(ch, C_NRM), R, compute_armor_class(ch),
-    CCCYN(ch, C_NRM), R, GET_ALIGNMENT(ch));
-  len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
+  /* Armor and Alignment */
+  snprintf(line, sizeof(line), "%sArmor:%s %-18d  %sAlignment:%s %d",
+    C, R, compute_armor_class(ch), C, R, GET_ALIGNMENT(ch));
+  len += snprintf(buf + len, sizeof(buf) - len,
+    "%s║%s %-77s %s║%s\r\n", B, R, line, B, R);
 
-  /* Wealth / Exp */
-  snprintf(line, sizeof(line), "%sGold:%s %d   %sExp:%s %d   %sQuest Points:%s %d",
-    CCYEL(ch, C_NRM), R, GET_GOLD(ch),
-    CCCYN(ch, C_NRM), R, GET_EXP(ch),
-    CCMAG(ch, C_NRM), R, GET_QUESTPOINTS(ch));
-  len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
+  /* Gold, Exp, Quest Points */
+  snprintf(line, sizeof(line), "%sGold:%s %-18d  %sExp:%s %-12d  %sQuest Points:%s %d",
+    Y, R, GET_GOLD(ch), C, R, GET_EXP(ch), M, R, GET_QUESTPOINTS(ch));
+  len += snprintf(buf + len, sizeof(buf) - len,
+    "%s║%s %-77s %s║%s\r\n", B, R, line, B, R);
 
+  /* Next Level (if mortal) */
   if (GET_LEVEL(ch) < LVL_IMMORT) {
     snprintf(line, sizeof(line), "%sNext level in:%s %d exp",
-      CCCYN(ch, C_NRM), R,
-      level_exp(GET_CLASS(ch), GET_LEVEL(ch) + 1) - GET_EXP(ch));
-    len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
+      C, R, level_exp(GET_CLASS(ch), GET_LEVEL(ch) + 1) - GET_EXP(ch));
+    len += snprintf(buf + len, sizeof(buf) - len,
+      "%s║%s %-77s %s║%s\r\n", B, R, line, B, R);
   }
 
-  APPEND_FMT("%s╠═══════════════════════════════════════════════════════════════════════════╣%s\r\n", B, R);
+  /* Separator */
+  len += snprintf(buf + len, sizeof(buf) - len,
+    "%s╠═══════════════════════════════════════════════════════════════════════════════╣%s\r\n", B, R);
 
-  /* Quest info */
+  /* Quest Information */
   snprintf(line, sizeof(line), "%sQuests completed:%s %d",
-    CCCYN(ch, C_NRM), R, GET_NUM_QUESTS(ch));
-  len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
+    C, R, GET_NUM_QUESTS(ch));
+  len += snprintf(buf + len, sizeof(buf) - len,
+    "%s║%s %-77s %s║%s\r\n", B, R, line, B, R);
 
   if (GET_QUEST(ch) != NOTHING) {
     snprintf(line, sizeof(line), "%sCurrent quest:%s %s",
-      CCYEL(ch, C_NRM), R, QST_NAME(real_quest(GET_QUEST(ch))));
-    len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
+      Y, R, QST_NAME(real_quest(GET_QUEST(ch))));
+    len += snprintf(buf + len, sizeof(buf) - len,
+      "%s║%s %-77s %s║%s\r\n", B, R, line, B, R);
 
-    if (PRF_FLAGGED(ch, PRF_SHOWVNUMS)) {
-      snprintf(line, sizeof(line), "%sQuest VNUM:%s %d",
-        CCWHT(ch, C_NRM), R, GET_QUEST(ch));
-      len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
+    if (!IS_NPC(ch) && PRF_FLAGGED(ch, PRF_SHOWVNUMS)) {
+      snprintf(line, sizeof(line), "%s[Quest VNUM: %d]%s",
+        W, GET_QUEST(ch), R);
+      len += snprintf(buf + len, sizeof(buf) - len,
+        "%s║%s %-77s %s║%s\r\n", B, R, line, B, R);
     }
   } else {
-    snprintf(line, sizeof(line), "%sNot currently on a quest.%s", CCRED(ch, C_NRM), R);
-    len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
+    snprintf(line, sizeof(line), "%sNot currently on a quest.%s", RED, R);
+    len += snprintf(buf + len, sizeof(buf) - len,
+      "%s║%s %-77s %s║%s\r\n", B, R, line, B, R);
   }
 
-  APPEND_FMT("%s╠═══════════════════════════════════════════════════════════════════════════╣%s\r\n", B, R);
+  /* Separator */
+  len += snprintf(buf + len, sizeof(buf) - len,
+    "%s╠═══════════════════════════════════════════════════════════════════════════════╣%s\r\n", B, R);
 
-  /* Play time */
+  /* Play Time */
   playing_time = *real_time_passed((time(0) - ch->player.time.logon) + ch->player.time.played, 0);
   snprintf(line, sizeof(line), "%sPlay time:%s %d day%s, %d hour%s",
-    CCCYN(ch, C_NRM), R,
-    playing_time.day, (playing_time.day == 1 ? "" : "s"),
+    C, R, playing_time.day, (playing_time.day == 1 ? "" : "s"),
     playing_time.hours, (playing_time.hours == 1 ? "" : "s"));
-  len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
+  len += snprintf(buf + len, sizeof(buf) - len,
+    "%s║%s %-77s %s║%s\r\n", B, R, line, B, R);
 
-  /* Position */
+  /* Rank */
+  snprintf(line, sizeof(line), "%sThis ranks you as%s %s %s %s(level %d)%s",
+    C, R, GET_NAME(ch), GET_TITLE(ch), W, GET_LEVEL(ch), R);
+  len += snprintf(buf + len, sizeof(buf) - len,
+    "%s║%s %-77s %s║%s\r\n", B, R, line, B, R);
+
+  /* Position/Status */
   switch (GET_POS(ch)) {
-    case POS_DEAD:        snprintf(line, sizeof(line), "%sStatus:%s %sDEAD%s", CCCYN(ch, C_NRM), R, CCRED(ch, C_NRM), R); break;
-    case POS_MORTALLYW:   snprintf(line, sizeof(line), "%sStatus:%s %sMortally wounded%s", CCCYN(ch, C_NRM), R, CCRED(ch, C_NRM), R); break;
-    case POS_INCAP:       snprintf(line, sizeof(line), "%sStatus:%s %sIncapacitated%s", CCCYN(ch, C_NRM), R, CCRED(ch, C_NRM), R); break;
-    case POS_STUNNED:     snprintf(line, sizeof(line), "%sStatus:%s %sStunned%s", CCCYN(ch, C_NRM), R, CCYEL(ch, C_NRM), R); break;
-    case POS_SLEEPING:    snprintf(line, sizeof(line), "%sStatus:%s Sleeping", CCCYN(ch, C_NRM), R); break;
-    case POS_RESTING:     snprintf(line, sizeof(line), "%sStatus:%s Resting", CCCYN(ch, C_NRM), R); break;
+    case POS_DEAD:
+      snprintf(line, sizeof(line), "%sStatus:%s %sYou are DEAD!%s", C, R, RED, R);
+      break;
+    case POS_MORTALLYW:
+      snprintf(line, sizeof(line), "%sStatus:%s %sMortally wounded!%s", C, R, RED, R);
+      break;
+    case POS_INCAP:
+      snprintf(line, sizeof(line), "%sStatus:%s %sIncapacitated%s", C, R, RED, R);
+      break;
+    case POS_STUNNED:
+      snprintf(line, sizeof(line), "%sStatus:%s %sStunned%s", C, R, Y, R);
+      break;
+    case POS_SLEEPING:
+      snprintf(line, sizeof(line), "%sStatus:%s Sleeping", C, R);
+      break;
+    case POS_RESTING:
+      snprintf(line, sizeof(line), "%sStatus:%s Resting", C, R);
+      break;
     case POS_SITTING:
       if (!SITTING(ch))
-        snprintf(line, sizeof(line), "%sStatus:%s Sitting", CCCYN(ch, C_NRM), R);
+        snprintf(line, sizeof(line), "%sStatus:%s Sitting", C, R);
       else
-        snprintf(line, sizeof(line), "%sStatus:%s Sitting on %s", CCCYN(ch, C_NRM), R, SITTING(ch)->short_description);
+        snprintf(line, sizeof(line), "%sStatus:%s Sitting on %s", C, R, SITTING(ch)->short_description);
       break;
     case POS_FIGHTING:
       snprintf(line, sizeof(line), "%sStatus:%s %sFighting %s%s",
-        CCCYN(ch, C_NRM), R, CCRED(ch, C_NRM),
-        (FIGHTING(ch) ? PERS(FIGHTING(ch), ch) : "thin air"), R);
+        C, R, RED, (FIGHTING(ch) ? PERS(FIGHTING(ch), ch) : "thin air"), R);
       break;
-    case POS_STANDING:    snprintf(line, sizeof(line), "%sStatus:%s Standing", CCCYN(ch, C_NRM), R); break;
-    default:              snprintf(line, sizeof(line), "%sStatus:%s Floating", CCCYN(ch, C_NRM), R); break;
+    case POS_STANDING:
+      snprintf(line, sizeof(line), "%sStatus:%s Standing", C, R);
+      break;
+    default:
+      snprintf(line, sizeof(line), "%sStatus:%s Floating", C, R);
+      break;
   }
-  len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
+  len += snprintf(buf + len, sizeof(buf) - len,
+    "%s║%s %-77s %s║%s\r\n", B, R, line, B, R);
 
-  /* Simple conditions block (kept clean) */
-  if (GET_COND(ch, DRUNK) > 10 || GET_COND(ch, HUNGER) == 0 || GET_COND(ch, THIRST) == 0) {
-    APPEND_FMT("%s╠═══════════════════════════════════════════════════════════════════════════╣%s\r\n", B, R);
-
-    if (GET_COND(ch, DRUNK) > 10) {
-      snprintf(line, sizeof(line), "%sCondition:%s Intoxicated", CCYEL(ch, C_NRM), R);
-      len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
-    }
-    if (GET_COND(ch, HUNGER) == 0) {
-      snprintf(line, sizeof(line), "%sCondition:%s Hungry", CCRED(ch, C_NRM), R);
-      len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
-    }
-    if (GET_COND(ch, THIRST) == 0) {
-      snprintf(line, sizeof(line), "%sCondition:%s Thirsty", CCRED(ch, C_NRM), R);
-      len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
-    }
+  /* Conditions */
+  if (GET_COND(ch, DRUNK) > 10) {
+    snprintf(line, sizeof(line), "%sYou are intoxicated.%s", Y, R);
+    len += snprintf(buf + len, sizeof(buf) - len,
+      "%s║%s %-77s %s║%s\r\n", B, R, line, B, R);
+  }
+  if (GET_COND(ch, HUNGER) == 0) {
+    snprintf(line, sizeof(line), "%sYou are hungry.%s", RED, R);
+    len += snprintf(buf + len, sizeof(buf) - len,
+      "%s║%s %-77s %s║%s\r\n", B, R, line, B, R);
+  }
+  if (GET_COND(ch, THIRST) == 0) {
+    snprintf(line, sizeof(line), "%sYou are thirsty.%s", RED, R);
+    len += snprintf(buf + len, sizeof(buf) - len,
+      "%s║%s %-77s %s║%s\r\n", B, R, line, B, R);
   }
 
-  /* Immortal extras */
+  /* Active Effects/Affects */
+  if (AFF_FLAGGED(ch, AFF_BLIND) && GET_LEVEL(ch) < LVL_IMMORT) {
+    snprintf(line, sizeof(line), "%sYou have been blinded!%s", RED, R);
+    len += snprintf(buf + len, sizeof(buf) - len,
+      "%s║%s %-77s %s║%s\r\n", B, R, line, B, R);
+  }
+  if (AFF_FLAGGED(ch, AFF_INVISIBLE)) {
+    snprintf(line, sizeof(line), "%sYou are invisible.%s", M, R);
+    len += snprintf(buf + len, sizeof(buf) - len,
+      "%s║%s %-77s %s║%s\r\n", B, R, line, B, R);
+  }
+  if (AFF_FLAGGED(ch, AFF_DETECT_INVIS)) {
+    snprintf(line, sizeof(line), "%sYou sense invisible things.%s", C, R);
+    len += snprintf(buf + len, sizeof(buf) - len,
+      "%s║%s %-77s %s║%s\r\n", B, R, line, B, R);
+  }
+  if (AFF_FLAGGED(ch, AFF_SANCTUARY)) {
+    snprintf(line, sizeof(line), "%sYou are protected by Sanctuary.%s", W, R);
+    len += snprintf(buf + len, sizeof(buf) - len,
+      "%s║%s %-77s %s║%s\r\n", B, R, line, B, R);
+  }
+  if (AFF_FLAGGED(ch, AFF_POISON)) {
+    snprintf(line, sizeof(line), "%sYou are poisoned!%s", RED, R);
+    len += snprintf(buf + len, sizeof(buf) - len,
+      "%s║%s %-77s %s║%s\r\n", B, R, line, B, R);
+  }
+  if (AFF_FLAGGED(ch, AFF_CHARM)) {
+    snprintf(line, sizeof(line), "%sYou have been charmed!%s", Y, R);
+    len += snprintf(buf + len, sizeof(buf) - len,
+      "%s║%s %-77s %s║%s\r\n", B, R, line, B, R);
+  }
+  if (affected_by_spell(ch, SPELL_ARMOR)) {
+    snprintf(line, sizeof(line), "%sYou feel protected.%s", C, R);
+    len += snprintf(buf + len, sizeof(buf) - len,
+      "%s║%s %-77s %s║%s\r\n", B, R, line, B, R);
+  }
+  if (AFF_FLAGGED(ch, AFF_INFRAVISION)) {
+    snprintf(line, sizeof(line), "%sYour eyes are glowing red.%s", RED, R);
+    len += snprintf(buf + len, sizeof(buf) - len,
+      "%s║%s %-77s %s║%s\r\n", B, R, line, B, R);
+  }
+  if (PRF_FLAGGED(ch, PRF_SUMMONABLE)) {
+    snprintf(line, sizeof(line), "%sYou are summonable by other players.%s", Y, R);
+    len += snprintf(buf + len, sizeof(buf) - len,
+      "%s║%s %-77s %s║%s\r\n", B, R, line, B, R);
+  }
+
+  /* Immortal Information */
   if (GET_LEVEL(ch) >= LVL_IMMORT) {
-    APPEND_FMT("%s╠═══════════════════════════════════════════════════════════════════════════╣%s\r\n", B, R);
+    len += snprintf(buf + len, sizeof(buf) - len,
+      "%s╠═══════════════════════════════════════════════════════════════════════════════╣%s\r\n", B, R);
 
     if (POOFIN(ch))
-      snprintf(line, sizeof(line), "%sPOOFIN:%s %s", CCYEL(ch, C_NRM), R, POOFIN(ch));
+      snprintf(line, sizeof(line), "%sPOOFIN:%s %s %s",
+        Y, R, GET_NAME(ch), POOFIN(ch));
     else
-      snprintf(line, sizeof(line), "%sPOOFIN:%s %s appears with an ear-splitting bang.", CCYEL(ch, C_NRM), R, GET_NAME(ch));
-    len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
+      snprintf(line, sizeof(line), "%sPOOFIN:%s %s appears with an ear-splitting bang.",
+        Y, R, GET_NAME(ch));
+    len += snprintf(buf + len, sizeof(buf) - len,
+      "%s║%s %-77s %s║%s\r\n", B, R, line, B, R);
 
     if (POOFOUT(ch))
-      snprintf(line, sizeof(line), "%sPOOFOUT:%s %s", CCYEL(ch, C_NRM), R, POOFOUT(ch));
+      snprintf(line, sizeof(line), "%sPOOFOUT:%s %s %s",
+        Y, R, GET_NAME(ch), POOFOUT(ch));
     else
-      snprintf(line, sizeof(line), "%sPOOFOUT:%s %s disappears in a puff of smoke.", CCYEL(ch, C_NRM), R, GET_NAME(ch));
-    len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
+      snprintf(line, sizeof(line), "%sPOOFOUT:%s %s disappears in a puff of smoke.",
+        Y, R, GET_NAME(ch));
+    len += snprintf(buf + len, sizeof(buf) - len,
+      "%s║%s %-77s %s║%s\r\n", B, R, line, B, R);
 
-    snprintf(line, sizeof(line), "%sZone:%s %d", CCCYN(ch, C_NRM), R, GET_OLC_ZONE(ch));
-    len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
+    snprintf(line, sizeof(line), "%sYour current zone:%s %d",
+      C, R, GET_OLC_ZONE(ch));
+    len += snprintf(buf + len, sizeof(buf) - len,
+      "%s║%s %-77s %s║%s\r\n", B, R, line, B, R);
   }
 
-  /* Bottom */
-  APPEND_FMT("%s╚═══════════════════════════════════════════════════════════════════════════╝%s\r\n", B, R);
+  /* Bottom border */
+  len += snprintf(buf + len, sizeof(buf) - len,
+    "%s╚═══════════════════════════════════════════════════════════════════════════════╝%s\r\n", B, R);
 
+  /* Ensure null termination */
   buf[sizeof(buf) - 1] = '\0';
+  
+  /* Send to character */
   send_to_char(ch, "%s", buf);
-
-  #undef APPEND_FMT
 }
 
 
