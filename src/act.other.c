@@ -18,7 +18,6 @@
 #include "db.h"
 #include "spells.h"
 #include "screen.h"
-#include "prompt.h"
 #include "house.h"
 #include "constants.h"
 #include "dg_scripts.h"
@@ -609,38 +608,6 @@ ACMD(do_use)
   }
 
   mag_objectmagic(ch, mag_item, buf);
-}
-
-ACMD(do_prompt)
-{
-  if (IS_NPC(ch)) {
-    send_to_char(ch, "Monsters don't need prompts.  Go away.\r\n");
-    return;
-  }
-
-  skip_spaces(&argument);
-
-  if (!*argument) {
-    const char *active_prompt = *GET_PROMPT(ch) ? GET_PROMPT(ch) : PFDEF_PROMPT;
-
-    send_to_char(ch,
-      "Customize your prompt with tokens and color codes.\r\n"
-      "Usage: prompt <template>\r\n"
-      "       prompt reset\r\n"
-      "Current: %s\r\n"
-      "Default: %s\r\n",
-      active_prompt, PFDEF_PROMPT);
-    return;
-  }
-
-  if (!str_cmp(argument, "reset") || !str_cmp(argument, "default")) {
-    set_prompt_template(ch, "");
-    send_to_char(ch, "Prompt reset to default template.\r\n");
-    return;
-  }
-
-  set_prompt_template(ch, argument);
-  send_to_char(ch, "Prompt updated. Use 'prompt reset' to restore the default.\r\n");
 }
 
 #define TOG_OFF 0

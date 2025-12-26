@@ -2061,9 +2061,6 @@ ACMD(do_toggle)
         ONOFF(PRF_FLAGGED(ch, PRF_ZONERESETS)));
     }
 
-  send_to_char(ch, "Prompt template: %s\r\n",
-               *GET_PROMPT(ch) ? GET_PROMPT(ch) : PFDEF_PROMPT);
-
   send_to_char(ch,
     "          Brief: %-3s    "
     "     Summonable: %-3s    "

@@ -1,29 +1,22 @@
 #include "conf.h"
 #include "sysdep.h"
 
-#include "pfdefaults.h"
 #include "structs.h"
 
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 
 /* Stubs and globals required by prompt.c */
-const char *pc_class_types[] = { "Adventurer" };
-const char *position_types[] = { "Dead", "Here" };
 struct descriptor_data *descriptor_list = NULL;
 struct room_data *world = NULL;
 struct zone_data *zone_table = NULL;
 zone_rnum top_of_zone_table = 0;
 room_rnum top_of_world = 0;
 time_t boot_time = 0;
-time_t newsmod = 0;
-time_t motdmod = 0;
-struct player_special_data dummy_mob;
 
 void basic_mud_log(const char *format, ...) { (void)format; }
-const char *olc_modes(struct descriptor_data *d) { (void)d; return NULL; }
-int level_exp(int class_num, int level) { (void)class_num; (void)level; return 0; }
 size_t write_to_output(struct descriptor_data *d, const char *txt, ...) { (void)d; (void)txt; return 0; }
+int level_exp(int class_num, int level) { (void)class_num; return level * 100; }
 
 #include "prompt.c"
 
@@ -48,6 +41,11 @@ static void init_test_character(struct descriptor_data *d, struct char_data *ch)
 
   ch->points.hit = 42;
   ch->points.max_hit = 99;
+  ch->points.mana = 10;
+  ch->points.max_mana = 20;
+  ch->points.move = 5;
+  ch->points.max_move = 15;
+  ch->points.exp = 50;
 }
 
 int main(void)
@@ -56,10 +54,12 @@ int main(void)
   struct char_data ch;
 
   init_test_character(&d, &ch);
-  set_prompt_template(&ch, "HP:%h/%H");
 
   const char *rendered = make_prompt(&d);
-  if (rendered == NULL || strstr(rendered, "HP:") == NULL)
+  if (rendered == NULL)
+    return 1;
+
+  if (strcmp(rendered, "[42 / 99] [10 / 20] [5 / 15] [150] ") != 0)
     return 1;
 
   return 0;
