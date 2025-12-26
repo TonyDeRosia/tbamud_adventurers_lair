@@ -610,14 +610,8 @@ ACMD(do_use)
   mag_objectmagic(ch, mag_item, buf);
 }
 
-ACMD(do_display)
-{
-  do_prompt(ch, argument, cmd, subcmd);
-}
-
 ACMD(do_prompt)
 {
-  size_t max_len;
   const char *current;
 
   if (IS_NPC(ch)) {
@@ -626,32 +620,25 @@ ACMD(do_prompt)
   }
 
   skip_spaces(&argument);
-  current = *GET_PROMPT(ch) ? GET_PROMPT(ch) : PFDEF_PROMPT;
+
+  if (!*GET_PROMPT(ch))
+    strlcpy(GET_PROMPT(ch), PFDEF_PROMPT, MAX_PROMPT_LENGTH + 1);
+
+  current = GET_PROMPT(ch);
 
   if (!*argument) {
-    send_to_char(ch, "Prompt\r\n");
-    send_to_char(ch, "Usage: prompt reset | prompt <template>\r\n\r\n");
-    send_to_char(ch, "Current prompt: %s\r\n", current);
-    send_to_char(ch, "Use 'prompt <template>' to set a new prompt or 'prompt reset' to restore the default.\r\n");
-    send_to_char(ch, "See 'help prompt' for the full list of prompt tokens and color codes.\r\n");
+    send_to_char(ch, "Current prompt:\r\n%s\r\n", current);
     return;
   }
 
   if (!str_cmp(argument, "reset")) {
     strlcpy(GET_PROMPT(ch), PFDEF_PROMPT, MAX_PROMPT_LENGTH + 1);
-    send_to_char(ch, "Prompt reset to the default template.\r\n");
+    send_to_char(ch, "Prompt reset.\r\n");
     return;
   }
 
-  max_len = MAX_PROMPT_LENGTH;
-
-  if (strlen(argument) > max_len) {
-    strlcpy(GET_PROMPT(ch), argument, MAX_PROMPT_LENGTH + 1);
-    send_to_char(ch, "Prompt too long; truncated to %zu characters.\r\n", max_len);
-  } else {
-    strlcpy(GET_PROMPT(ch), argument, MAX_PROMPT_LENGTH + 1);
-    send_to_char(ch, "Custom prompt saved.\r\n");
-  }
+  strlcpy(GET_PROMPT(ch), argument, MAX_PROMPT_LENGTH + 1);
+  send_to_char(ch, "Prompt set.\r\n");
 }
 
 #define TOG_OFF 0
