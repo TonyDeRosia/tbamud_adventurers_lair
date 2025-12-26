@@ -2542,7 +2542,7 @@ Usage: prompt reset | prompt <template>
 
 The legacy prompt toggles have been removed.  The @Yprompt@n command now stores
 only a template string.  With no argument it shows your current template.  Use
-@Yprompt reset@n to restore the default template of @W{R%h{W/{r%H{X {B%m{W/{b%M{X {G%v{W/{g%V{X >@n.
+@Yprompt reset@n to restore the default template of @W[%h / %H] [%m / %M] [%v / %V] [%tnl]@n.
 
 Templates support the familiar percent tokens and color codes in {braces}.
 Common tokens include:
@@ -2554,7 +2554,7 @@ Common tokens include:
 
 Examples:
   prompt HP:%h/%H MP:%m/%M MV:%v/%V
-  prompt {R%h{W/{r%H{X {B%m{W/{b%M{X {G%v{W/{g%V{X >
+  prompt [%h / %H] [%m / %M] [%v / %V] [%tnl]
 
 See also: TOGGLE
 #0
