@@ -1612,7 +1612,7 @@ void nanny(struct descriptor_data *d, char *arg)
     if (load_result == CLASS_UNDEFINED) {
       write_to_output(d, "\r\nThat's not a class.\r\nClass: ");
       return;
-    } else
+    } else {
       GET_CLASS(d->character) = load_result;
 
       if (d->olc) {
@@ -1620,7 +1620,8 @@ void nanny(struct descriptor_data *d, char *arg)
         d->olc = NULL;
       }
       if (GET_PFILEPOS(d->character) < 0)
-      GET_PFILEPOS(d->character) = create_entry(GET_PC_NAME(d->character));
+        GET_PFILEPOS(d->character) = create_entry(GET_PC_NAME(d->character));
+    }
     /* Now GET_NAME() will work properly. */
     init_char(d->character);
     save_char(d->character);
