@@ -31,6 +31,10 @@
 /** direct all log() references to basic_mud_log() function. */
 #define log			basic_mud_log
 
+/* Forward declaration for CHECK_PLAYER_SPECIAL macro users. */
+struct player_special_data;
+extern struct player_special_data dummy_mob;
+
 /** Standard line size, used for many string limits. */
 #define READ_SIZE	256
 
