@@ -61,6 +61,19 @@ static size_t translate_prompt_escapes(const char *src, char *dest, size_t dest_
         dest[pos++] = '\x1B';
         break;
       case 't':
+        if (src[1]) {
+          const char *color = translate_color_brace(src[1]);
+
+          if (color) {
+            size_t add_len = MIN(dest_size - pos - 1, strlen(color));
+
+            memcpy(dest + pos, color, add_len);
+            pos += add_len;
+            src++;
+            break;
+          }
+        }
+
         dest[pos++] = '\t';
         break;
       case 'n':
@@ -297,6 +310,20 @@ static const struct prompt_token_info *find_prompt_token(char code)
   return NULL;
 }
 
+static void finalize_prompt_output(char *prompt)
+{
+  char translated[(MAX_PROMPT_LENGTH * 4) + 1];
+  char colorized[(MAX_PROMPT_LENGTH * 4) + 1];
+
+  translate_prompt_escapes(prompt, translated, sizeof(translated));
+  translate_prompt_escapes(translated, colorized, sizeof(colorized));
+
+  strlcpy(prompt, colorized, MAX_PROMPT_LENGTH);
+
+  if (strlen(prompt) + strlen(KNRM) < MAX_PROMPT_LENGTH)
+    strlcat(prompt, KNRM, MAX_PROMPT_LENGTH);
+}
+
 static void build_custom_prompt(char *prompt, struct descriptor_data *d)
 {
   const char *tpl = GET_PROMPT(d->character);
@@ -364,6 +391,9 @@ char *make_prompt(struct descriptor_data *d)
     strcpy(prompt, "] ");       /* strcpy: OK (for 'MAX_PROMPT_LENGTH >= 3') */
   else if (STATE(d) == CON_PLAYING && d->character)
     build_custom_prompt(prompt, d);
+
+  if (*prompt)
+    finalize_prompt_output(prompt);
 
   return prompt;
 }
@@ -436,4 +466,6 @@ ACMD(do_prompt)
 
   if (*preview)
     send_to_char(ch, "Preview: %s\r\n", preview);
+
+  /* Sanity check: \tG[%h/%H\tn] should render with ANSI color codes and expanded values. */
 }
