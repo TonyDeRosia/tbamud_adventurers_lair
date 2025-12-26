@@ -24,6 +24,8 @@
 #include "dg_scripts.h" /* To enable saving of player variables to disk */
 #include "quest.h"
 
+static const char *LEGACY_DEFAULT_PROMPT = "{R%h{W/{r%H{X {B%m{W/{b%M{X {G%v{W/{g%V{X >";
+
 #define LOAD_HIT	0
 #define LOAD_MANA	1
 #define LOAD_MOVE	2
@@ -472,10 +474,13 @@ int load_char(const char *name, struct char_data *ch)
 	break;
 
       default:
-	sprintf(buf, "SYSERR: Unknown tag %s in pfile %s", tag, name);
+        sprintf(buf, "SYSERR: Unknown tag %s in pfile %s", tag, name);
       }
     }
   }
+
+  if (!*GET_PROMPT(ch) || !strcmp(GET_PROMPT(ch), LEGACY_DEFAULT_PROMPT))
+    strlcpy(GET_PROMPT(ch), PFDEF_PROMPT, MAX_PROMPT_LENGTH + 1);
 
   if (upgrade_legacy_immortal_levels(ch))
     mudlog(CMP, LVL_IMMORT, TRUE, "%s converted to updated immortal tier (level %d).", GET_NAME(ch), GET_LEVEL(ch));
