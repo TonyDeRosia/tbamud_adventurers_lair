@@ -1542,6 +1542,18 @@ static size_t expand_prompt_template(struct descriptor_data *d, const char *temp
       break;
 
     if (*src == '%') {
+      /* Treat double-percent followed by a token as a token expansion. */
+      if (*(src + 1) && isalpha((unsigned char)*(src + 1))) {
+        const char *token_start = src + 1;
+
+        while (isalpha((unsigned char)*(++src)))
+          ;
+
+        size_t tok_len = src - token_start;
+        len = append_prompt_token(d, prompt, len, size, token_start, tok_len);
+        continue;
+      }
+
       prompt[len++] = '%';
       prompt[len] = '\0';
       src++;
