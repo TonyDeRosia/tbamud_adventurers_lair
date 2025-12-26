@@ -2538,11 +2538,28 @@ See also: DISPEL-EVIL
 #0
 PROMPT PROMPTS
 
-The game prompt is now fixed for all characters.  It always displays:
+Usage: prompt [template]
+       prompt reset
 
-@W[current health / max health] [current mana / max mana] [current moves / max moves] [xp tnl]@n
+Use PROMPT to configure the text shown while you play. Entering PROMPT with no
+arguments shows the current and default prompt plus the full list of %tokens
+you can insert. PROMPT RESET restores the standard bracketed vitals display.
 
-Existing characters are automatically updated to use this standardized prompt.
+Escape sequences are translated so you can add ANSI color: \t<code> uses the
+tbaMUD color table (for example \tR for bright red and \tn to reset), \e sends
+a raw escape, and \xHH accepts a two-digit hex byte such as \x1B for ESC. Use
+\\ if you need a literal backslash.
+
+Common %tokens:
+  %h %H %m %M %v %V - Current/max hit points, mana, and movement
+  %x %X %l %a %A    - Total XP, XP to next level, level, armor, alignment
+  %g %q %Q %c       - Gold carried, quest points, quests completed, quest vnum
+  %p %r %n %y %t    - Position, room vnum, name, age in years, playtime
+
+Examples:
+  prompt \tG[%h/%H\tn \tC%m/%M\tn \tY%v/%V\tn \tW%X\tn] >
+  prompt \e[32mHP:%h\e[0m MN:%m MV:%v TNL:%X >
+  prompt [%n in %p] Gold:%g Quest:%q
 
 See also: TOGGLE
 #0
@@ -13491,33 +13508,27 @@ zunlock - Locks one or all zones. Type zunlock for usage.
 #31
 PROMPT
 
-Usage: prompt <template>
+Usage: prompt [template]
        prompt reset
 
-Customize the prompt shown while playing by supplying a template with %tokens.
-The old display-style toggles are gone; everything is controlled by the prompt
-template you set.
-Color codes such as {R or @R work inside prompts.
+PROMPT sets the text shown while you play. Running PROMPT alone lists your
+current and default prompts plus the full set of %tokens. PROMPT RESET restores
+the standard bracketed vitals display.
 
-Type 'prompt' with no arguments to see your current and default templates. Use
-'prompt reset' (or 'prompt default') to restore the standard bracketed vitals
-prompt at any time.
+Escape sequences are interpreted for color: \t<code> inserts the tbaMUD color
+table (\tR bright red, \tn reset, etc.), \e sends a raw escape, and \xHH
+allows a two-digit hex byte such as \x1B. Use \\ for a literal backslash.
 
 Common tokens:
-  %h %H %p    - Current/max/percent hit points
-  %m %M %q    - Current/max/percent mana
-  %v %V %P    - Current/max/percent movement points
-  %n          - Character name
-  %l %lvl     - Level (%level is also available)
-  %c %s %t    - Class, sex/gender, title
-  %x %exp     - Current experience
-  %X %tnl     - Experience needed for next level
-  %f %F       - Fight target name and hit percent
-  %pos        - Current position (standing, fighting, etc.)
-  %room %zone - Room vnum and zone number
-  %inv %olc   - Invisibility level, OLC editing context (immortals only)
-  %players    - Connected player count (immortals only)
-  %uptime     - Server uptime (immortals only)
+  %h %H %m %M %v %V - Current/max hit points, mana, and movement
+  %x %X %l %a %A    - Total XP, XP to next level, level, armor, alignment
+  %g %q %Q %c       - Gold carried, quest points, quests completed, quest vnum
+  %p %r %n %y %t    - Position, room vnum, name, age in years, playtime
+
+Examples:
+  prompt \tG[%h/%H\tn \tC%m/%M\tn \tY%v/%V\tn] \tW%X\tn>
+  prompt \e[36m%n\e[0m in %p HP:%h/%H Quest:%q
+  prompt [%n] XP:%x TNL:%X Gold:%g
   %str %int %wis %dex %con %cha - Ability scores
   %gold %bank %qp %prac %ac %hr %dr %align - Currency, practice, and combat stats
 
