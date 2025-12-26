@@ -895,8 +895,8 @@ void game_loop(socket_t local_mother_desc)
         command_interpreter(d->character, comm); /* Send it to interpreter */
       }
 
-      if (d->character && STATE(d) == CON_PLAYING && !IS_NPC(d->character))
-        queue_prompt(d);
+      if (STATE(d) == CON_PLAYING && d->character)
+        write_to_output(d, "%s", make_prompt(d));
     }
 
     /* Send queued output out to the operating system (ultimately to user). */
