@@ -621,7 +621,7 @@ ACMD(do_display)
   skip_spaces(&argument);
 
   if (!*argument) {
-    send_to_char(ch, "Usage: prompt { { H | M | V } | all | auto | none | reset | <custom text> }\r\n");
+    send_to_char(ch, "Usage: prompt { { H | M | V } | all | auto | none | reset | <custom template> }\r\n");
     return;
   }
 
@@ -670,7 +670,7 @@ ACMD(do_display)
         SET_BIT_AR(PRF_FLAGS(ch), PRF_DISPMOVE);
         break;
       default:
-        send_to_char(ch, "Usage: prompt { { H | M | V } | all | auto | none | reset | <custom text> }\r\n");
+        send_to_char(ch, "Usage: prompt { { H | M | V } | all | auto | none | reset | <custom template> }\r\n");
         return;
       }
     }
@@ -682,7 +682,10 @@ ACMD(do_display)
       send_to_char(ch, "Prompt too long; truncated to %zu characters.\r\n", max_len);
     } else {
       strlcpy(GET_PROMPT(ch), argument, sizeof(GET_PROMPT(ch)));
-      send_to_char(ch, "Custom prompt set. Use %%h/%%H/%%p for hit points, %%m/%%M/%%P for mana, %%v/%%V/%%q for moves, and tokens like %%str, %%dex, %%lvl, %%exp, %%tnl, %%gold, %%bank, %%qp, %%prac, %%ac, %%hr, %%dr, and %%align for other stats. Color codes in {braces are supported}.\r\n");
+      send_to_char(ch, "Custom prompt set. Use %% to escape percents and combine color codes with tokens.\r\n");
+      send_to_char(ch, "Vitals: %%h/%%H/%%p, %%m/%%M/%%q, %%v/%%V/%%P. Identity: %%n %%l %%c %%s %%t.\r\n");
+      send_to_char(ch, "XP & combat: %%x %%X %%f %%F. Location: %%pos %%room %%zone. Admin: %%inv %%olc %%players %%uptime.\r\n");
+      send_to_char(ch, "Example: prompt {R%%h{W/{r%%H{X {B%%m{W/{b%%M{X {G%%v{W/{g%%V{X {M%%Xtnl{X\r\n");
     }
     return;
   }

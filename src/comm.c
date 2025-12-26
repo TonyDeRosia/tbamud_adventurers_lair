@@ -1142,68 +1142,393 @@ static int prompt_tnl(struct char_data *ch)
   return MAX(0, level_exp(GET_CLASS(ch), next_level) - GET_EXP(ch));
 }
 
-static size_t append_named_prompt_token(struct descriptor_data *d, char *prompt, size_t len, size_t size,
-                                        const char *token, size_t tok_len)
+static int prompt_percent(int current, int maximum)
 {
-  /* Copy to a lowercase buffer for comparisons. */
-  char lowered[16];
-  size_t copy_len = MIN(tok_len, sizeof(lowered) - 1);
-  size_t i;
+  if (maximum <= 0)
+    return 0;
 
-  for (i = 0; i < copy_len; i++)
-    lowered[i] = LOWER(token[i]);
-  lowered[copy_len] = '\0';
-
-  long value = 0;
-  int handled = TRUE;
-
-  if (!strcmp(lowered, "str"))
-    value = GET_STR(d->character);
-  else if (!strcmp(lowered, "int"))
-    value = GET_INT(d->character);
-  else if (!strcmp(lowered, "wis"))
-    value = GET_WIS(d->character);
-  else if (!strcmp(lowered, "dex"))
-    value = GET_DEX(d->character);
-  else if (!strcmp(lowered, "con"))
-    value = GET_CON(d->character);
-  else if (!strcmp(lowered, "cha"))
-    value = GET_CHA(d->character);
-  else if (!strcmp(lowered, "lvl") || !strcmp(lowered, "level"))
-    value = GET_LEVEL(d->character);
-  else if (!strcmp(lowered, "exp"))
-    value = GET_EXP(d->character);
-  else if (!strcmp(lowered, "tnl"))
-    value = prompt_tnl(d->character);
-  else if (!strcmp(lowered, "gold"))
-    value = GET_GOLD(d->character);
-  else if (!strcmp(lowered, "bank"))
-    value = GET_BANK_GOLD(d->character);
-  else if (!strcmp(lowered, "qp") || !strcmp(lowered, "quest"))
-    value = GET_QUESTPOINTS(d->character);
-  else if (!strcmp(lowered, "prac") || !strcmp(lowered, "practice"))
-    value = GET_PRACTICES(d->character);
-  else if (!strcmp(lowered, "ac"))
-    value = GET_AC(d->character);
-  else if (!strcmp(lowered, "hr") || !strcmp(lowered, "hitroll"))
-    value = GET_HITROLL(d->character);
-  else if (!strcmp(lowered, "dr") || !strcmp(lowered, "damroll"))
-    value = GET_DAMROLL(d->character);
-  else if (!strcmp(lowered, "align") || !strcmp(lowered, "alignment"))
-    value = GET_ALIGNMENT(d->character);
-  else {
-    handled = FALSE;
-  }
-
-  if (handled)
-    return append_prompt(prompt, len, size, "%ld", value);
-
-  return append_prompt(prompt, len, size, "%%%.*s", (int)tok_len, token);
+  return (current * 100) / maximum;
 }
 
-static size_t append_custom_prompt(struct descriptor_data *d, char *prompt, size_t len, size_t size)
+static size_t append_prompt_str(char *prompt, size_t len, size_t size, const char *value)
 {
-  const char *src = GET_PROMPT(d->character);
+  if (!value)
+    value = "";
+
+  return append_prompt(prompt, len, size, "%s", value);
+}
+
+static size_t append_prompt_int(char *prompt, size_t len, size_t size, long value)
+{
+  return append_prompt(prompt, len, size, "%ld", value);
+}
+
+static size_t prompt_token_hp_current(struct descriptor_data *d, char *prompt, size_t len, size_t size)
+{
+  return append_prompt_int(prompt, len, size, GET_HIT(d->character));
+}
+
+static size_t prompt_token_hp_max(struct descriptor_data *d, char *prompt, size_t len, size_t size)
+{
+  return append_prompt_int(prompt, len, size, GET_MAX_HIT(d->character));
+}
+
+static size_t prompt_token_hp_percent(struct descriptor_data *d, char *prompt, size_t len, size_t size)
+{
+  return append_prompt_int(prompt, len, size, prompt_percent(GET_HIT(d->character), GET_MAX_HIT(d->character)));
+}
+
+static size_t prompt_token_mana_current(struct descriptor_data *d, char *prompt, size_t len, size_t size)
+{
+  return append_prompt_int(prompt, len, size, GET_MANA(d->character));
+}
+
+static size_t prompt_token_mana_max(struct descriptor_data *d, char *prompt, size_t len, size_t size)
+{
+  return append_prompt_int(prompt, len, size, GET_MAX_MANA(d->character));
+}
+
+static size_t prompt_token_mana_percent(struct descriptor_data *d, char *prompt, size_t len, size_t size)
+{
+  return append_prompt_int(prompt, len, size, prompt_percent(GET_MANA(d->character), GET_MAX_MANA(d->character)));
+}
+
+static size_t prompt_token_move_current(struct descriptor_data *d, char *prompt, size_t len, size_t size)
+{
+  return append_prompt_int(prompt, len, size, GET_MOVE(d->character));
+}
+
+static size_t prompt_token_move_max(struct descriptor_data *d, char *prompt, size_t len, size_t size)
+{
+  return append_prompt_int(prompt, len, size, GET_MAX_MOVE(d->character));
+}
+
+static size_t prompt_token_move_percent(struct descriptor_data *d, char *prompt, size_t len, size_t size)
+{
+  return append_prompt_int(prompt, len, size, prompt_percent(GET_MOVE(d->character), GET_MAX_MOVE(d->character)));
+}
+
+static size_t prompt_token_strength(struct descriptor_data *d, char *prompt, size_t len, size_t size)
+{
+  return append_prompt_int(prompt, len, size, GET_STR(d->character));
+}
+
+static size_t prompt_token_intelligence(struct descriptor_data *d, char *prompt, size_t len, size_t size)
+{
+  return append_prompt_int(prompt, len, size, GET_INT(d->character));
+}
+
+static size_t prompt_token_wisdom(struct descriptor_data *d, char *prompt, size_t len, size_t size)
+{
+  return append_prompt_int(prompt, len, size, GET_WIS(d->character));
+}
+
+static size_t prompt_token_dexterity(struct descriptor_data *d, char *prompt, size_t len, size_t size)
+{
+  return append_prompt_int(prompt, len, size, GET_DEX(d->character));
+}
+
+static size_t prompt_token_constitution(struct descriptor_data *d, char *prompt, size_t len, size_t size)
+{
+  return append_prompt_int(prompt, len, size, GET_CON(d->character));
+}
+
+static size_t prompt_token_charisma(struct descriptor_data *d, char *prompt, size_t len, size_t size)
+{
+  return append_prompt_int(prompt, len, size, GET_CHA(d->character));
+}
+
+static size_t prompt_token_char_name(struct descriptor_data *d, char *prompt, size_t len, size_t size)
+{
+  return append_prompt_str(prompt, len, size, GET_NAME(d->character));
+}
+
+static size_t prompt_token_level(struct descriptor_data *d, char *prompt, size_t len, size_t size)
+{
+  return append_prompt_int(prompt, len, size, GET_LEVEL(d->character));
+}
+
+static size_t prompt_token_class(struct descriptor_data *d, char *prompt, size_t len, size_t size)
+{
+  return append_prompt_str(prompt, len, size, pc_class_types[(int) GET_CLASS(d->character)]);
+}
+
+static size_t prompt_token_race(struct descriptor_data *d, char *prompt, size_t len, size_t size)
+{
+  /* TODO: Add race prompt data when race support is enabled. */
+  return len;
+}
+
+static size_t prompt_token_sex(struct descriptor_data *d, char *prompt, size_t len, size_t size)
+{
+  const char *gender = genders[(int) GET_SEX(d->character)];
+  char abbr[2] = "";
+
+  if (gender && *gender)
+    abbr[0] = UPPER(*gender);
+
+  return append_prompt_str(prompt, len, size, abbr);
+}
+
+static size_t prompt_token_title(struct descriptor_data *d, char *prompt, size_t len, size_t size)
+{
+  return append_prompt_str(prompt, len, size, GET_TITLE(d->character));
+}
+
+static size_t prompt_token_exp(struct descriptor_data *d, char *prompt, size_t len, size_t size)
+{
+  return append_prompt_int(prompt, len, size, GET_EXP(d->character));
+}
+
+static size_t prompt_token_tnl(struct descriptor_data *d, char *prompt, size_t len, size_t size)
+{
+  return append_prompt_int(prompt, len, size, prompt_tnl(d->character));
+}
+
+static size_t prompt_token_gold(struct descriptor_data *d, char *prompt, size_t len, size_t size)
+{
+  return append_prompt_int(prompt, len, size, GET_GOLD(d->character));
+}
+
+static size_t prompt_token_bank(struct descriptor_data *d, char *prompt, size_t len, size_t size)
+{
+  return append_prompt_int(prompt, len, size, GET_BANK_GOLD(d->character));
+}
+
+static size_t prompt_token_quest_points(struct descriptor_data *d, char *prompt, size_t len, size_t size)
+{
+  return append_prompt_int(prompt, len, size, GET_QUESTPOINTS(d->character));
+}
+
+static size_t prompt_token_practices(struct descriptor_data *d, char *prompt, size_t len, size_t size)
+{
+  return append_prompt_int(prompt, len, size, GET_PRACTICES(d->character));
+}
+
+static size_t prompt_token_ac(struct descriptor_data *d, char *prompt, size_t len, size_t size)
+{
+  return append_prompt_int(prompt, len, size, GET_AC(d->character));
+}
+
+static size_t prompt_token_hitroll(struct descriptor_data *d, char *prompt, size_t len, size_t size)
+{
+  return append_prompt_int(prompt, len, size, GET_HITROLL(d->character));
+}
+
+static size_t prompt_token_damroll(struct descriptor_data *d, char *prompt, size_t len, size_t size)
+{
+  return append_prompt_int(prompt, len, size, GET_DAMROLL(d->character));
+}
+
+static size_t prompt_token_alignment(struct descriptor_data *d, char *prompt, size_t len, size_t size)
+{
+  return append_prompt_int(prompt, len, size, GET_ALIGNMENT(d->character));
+}
+
+static size_t prompt_token_fighting_target(struct descriptor_data *d, char *prompt, size_t len, size_t size)
+{
+  if (!FIGHTING(d->character))
+    return len;
+
+  return append_prompt_str(prompt, len, size, GET_NAME(FIGHTING(d->character)));
+}
+
+static size_t prompt_token_fighting_percent(struct descriptor_data *d, char *prompt, size_t len, size_t size)
+{
+  if (!FIGHTING(d->character))
+    return len;
+
+  return append_prompt_int(prompt, len, size,
+                           prompt_percent(GET_HIT(FIGHTING(d->character)), GET_MAX_HIT(FIGHTING(d->character))));
+}
+
+static size_t prompt_token_position(struct descriptor_data *d, char *prompt, size_t len, size_t size)
+{
+  return append_prompt_str(prompt, len, size, position_types[(int) GET_POS(d->character)]);
+}
+
+static size_t prompt_token_room(struct descriptor_data *d, char *prompt, size_t len, size_t size)
+{
+  if (IN_ROOM(d->character) == NOWHERE)
+    return len;
+
+  return append_prompt_int(prompt, len, size, GET_ROOM_VNUM(IN_ROOM(d->character)));
+}
+
+static size_t prompt_token_zone(struct descriptor_data *d, char *prompt, size_t len, size_t size)
+{
+  room_rnum location = IN_ROOM(d->character);
+
+  if (location == NOWHERE)
+    return len;
+
+  return append_prompt_int(prompt, len, size, zone_table[world[location].zone].number);
+}
+
+static size_t prompt_token_invis(struct descriptor_data *d, char *prompt, size_t len, size_t size)
+{
+  if (GET_INVIS_LEV(d->character) <= 0)
+    return len;
+
+  return append_prompt_int(prompt, len, size, GET_INVIS_LEV(d->character));
+}
+
+static const char *prompt_olc_mode_name(struct descriptor_data *d)
+{
+  if (!d->olc)
+    return NULL;
+
+  if (OLC_TRIG(d))
+    return "trigedit";
+  if (OLC_ROOM(d))
+    return "redit";
+  if (OLC_OBJ(d))
+    return "oedit";
+  if (OLC_MOB(d))
+    return "medit";
+  if (OLC_ZONE(d))
+    return "zedit";
+  if (OLC_SHOP(d))
+    return "sedit";
+  if (OLC_CONFIG(d))
+    return "cedit";
+  if (OLC_QUEST(d))
+    return "qedit";
+  if (OLC_PREFS(d))
+    return "prefedit";
+  if (OLC_IBT(d))
+    return "ibtedit";
+  if (OLC_MSG_LIST(d))
+    return "msgedit";
+  if (OLC_ACTION(d))
+    return "aedit";
+  if (OLC_HELP(d))
+    return "hedit";
+
+  return "olc";
+}
+
+static size_t prompt_token_olc(struct descriptor_data *d, char *prompt, size_t len, size_t size)
+{
+  const char *mode = prompt_olc_mode_name(d);
+
+  if (!mode)
+    return len;
+
+  if (OLC_NUM(d) > 0)
+    return append_prompt(prompt, len, size, "%s:%d", mode, OLC_NUM(d));
+
+  return append_prompt_str(prompt, len, size, mode);
+}
+
+static size_t prompt_token_player_count(struct descriptor_data *d, char *prompt, size_t len, size_t size)
+{
+  struct descriptor_data *iter;
+  int count = 0;
+
+  for (iter = descriptor_list; iter; iter = iter->next)
+    if (STATE(iter) == CON_PLAYING)
+      count++;
+
+  return append_prompt_int(prompt, len, size, count);
+}
+
+static size_t prompt_token_uptime(struct descriptor_data *d, char *prompt, size_t len, size_t size)
+{
+  time_t diff = time(0) - boot_time;
+  int days = diff / 86400;
+  int hours = (diff / 3600) % 24;
+  int minutes = (diff / 60) % 60;
+
+  return append_prompt(prompt, len, size, "%dd %02d:%02d", days, hours, minutes);
+}
+
+struct prompt_token_entry {
+  const char *token;
+  const char *description;
+  bool immortal_only;
+  size_t (*render)(struct descriptor_data *d, char *prompt, size_t len, size_t size);
+};
+
+/* Add new prompt tokens by adding a single entry to this table. */
+static const struct prompt_token_entry prompt_tokens[] = {
+  {"h",   "Current hit points",                         FALSE, prompt_token_hp_current},
+  {"H",   "Maximum hit points",                         FALSE, prompt_token_hp_max},
+  {"p",   "Hit point percent",                         FALSE, prompt_token_hp_percent},
+  {"m",   "Current mana",                               FALSE, prompt_token_mana_current},
+  {"M",   "Maximum mana",                               FALSE, prompt_token_mana_max},
+  {"q",   "Mana percent",                               FALSE, prompt_token_mana_percent},
+  {"v",   "Current move points",                        FALSE, prompt_token_move_current},
+  {"V",   "Maximum move points",                        FALSE, prompt_token_move_max},
+  {"P",   "Move percent",                               FALSE, prompt_token_move_percent},
+  {"n",   "Character name",                             FALSE, prompt_token_char_name},
+  {"l",   "Character level",                            FALSE, prompt_token_level},
+  {"c",   "Class name",                                 FALSE, prompt_token_class},
+  {"r",   "Race name (if enabled)",                     FALSE, prompt_token_race},
+  {"s",   "Sex/Gender",                                 FALSE, prompt_token_sex},
+  {"t",   "Title",                                      FALSE, prompt_token_title},
+  {"x",   "Current experience",                         FALSE, prompt_token_exp},
+  {"X",   "Experience to next level",                   FALSE, prompt_token_tnl},
+  {"f",   "Current fight target",                       FALSE, prompt_token_fighting_target},
+  {"F",   "Fight target hit percent",                   FALSE, prompt_token_fighting_percent},
+  {"pos", "Current position",                           FALSE, prompt_token_position},
+  {"room","Room vnum",                                  FALSE, prompt_token_room},
+  {"zone","Zone number",                                FALSE, prompt_token_zone},
+  {"inv", "Invisibility level",                         TRUE,  prompt_token_invis},
+  {"olc", "OLC editing context",                        TRUE,  prompt_token_olc},
+  {"players", "Connected player count",                 TRUE,  prompt_token_player_count},
+  {"uptime",  "Server uptime",                           TRUE,  prompt_token_uptime},
+
+  /* Legacy tokens kept for backwards compatibility. */
+  {"str",  "Strength score",                             FALSE, prompt_token_strength},
+  {"int",  "Intelligence score",                         FALSE, prompt_token_intelligence},
+  {"wis",  "Wisdom score",                               FALSE, prompt_token_wisdom},
+  {"dex",  "Dexterity score",                            FALSE, prompt_token_dexterity},
+  {"con",  "Constitution score",                         FALSE, prompt_token_constitution},
+  {"cha",  "Charisma score",                             FALSE, prompt_token_charisma},
+  {"lvl",  "Character level",                            FALSE, prompt_token_level},
+  {"level","Character level",                            FALSE, prompt_token_level},
+  {"exp",  "Current experience",                         FALSE, prompt_token_exp},
+  {"tnl",  "Experience to next level",                   FALSE, prompt_token_tnl},
+  {"gold", "Gold on hand",                                FALSE, prompt_token_gold},
+  {"bank", "Gold in bank",                                FALSE, prompt_token_bank},
+  {"qp",   "Quest points",                                FALSE, prompt_token_quest_points},
+  {"prac", "Practice sessions",                           FALSE, prompt_token_practices},
+  {"ac",   "Armor class",                                 FALSE, prompt_token_ac},
+  {"hr",   "Hitroll",                                     FALSE, prompt_token_hitroll},
+  {"dr",   "Damroll",                                     FALSE, prompt_token_damroll},
+  {"align","Alignment",                                   FALSE, prompt_token_alignment},
+};
+
+#define NUM_PROMPT_TOKENS (sizeof(prompt_tokens) / sizeof(prompt_tokens[0]))
+
+static size_t append_prompt_token(struct descriptor_data *d, char *prompt, size_t len, size_t size,
+                                  const char *token, size_t tok_len)
+{
+  size_t i;
+
+  for (i = 0; i < NUM_PROMPT_TOKENS; i++) {
+    const struct prompt_token_entry *entry = &prompt_tokens[i];
+
+    if (strlen(entry->token) != tok_len)
+      continue;
+
+    if (strncmp(entry->token, token, tok_len))
+      continue;
+
+    if (entry->immortal_only && GET_LEVEL(d->character) < LVL_IMMORT)
+      return len;
+
+    return entry->render(d, prompt, len, size);
+  }
+
+  /* TODO: Register unsupported prompt tokens in prompt_tokens to activate them. */
+  return len;
+}
+
+static size_t expand_prompt_template(struct descriptor_data *d, const char *template, char *prompt, size_t len, size_t size)
+{
+  const char *src = template;
 
   while (*src && len < size - 1) {
     if (*src != '%') {
@@ -1216,63 +1541,25 @@ static size_t append_custom_prompt(struct descriptor_data *d, char *prompt, size
     if (!*src)
       break;
 
-    switch (*src) {
-    case '%':
+    if (*src == '%') {
       prompt[len++] = '%';
       prompt[len] = '\0';
       src++;
       continue;
-    case 'h':
-      len = append_prompt(prompt, len, size, "%d", GET_HIT(d->character));
-      src++;
-      continue;
-    case 'H':
-      len = append_prompt(prompt, len, size, "%d", GET_MAX_HIT(d->character));
-      src++;
-      continue;
-    case 'm':
-      len = append_prompt(prompt, len, size, "%d", GET_MANA(d->character));
-      src++;
-      continue;
-    case 'M':
-      len = append_prompt(prompt, len, size, "%d", GET_MAX_MANA(d->character));
-      src++;
-      continue;
-    case 'v':
-      len = append_prompt(prompt, len, size, "%d", GET_MOVE(d->character));
-      src++;
-      continue;
-    case 'V':
-      len = append_prompt(prompt, len, size, "%d", GET_MAX_MOVE(d->character));
-      src++;
-      continue;
-    case 'p':
-      len = append_prompt(prompt, len, size, "%d", (GET_HIT(d->character) * 100) / MAX(1, GET_MAX_HIT(d->character)));
-      src++;
-      continue;
-    case 'P':
-      len = append_prompt(prompt, len, size, "%d", (GET_MANA(d->character) * 100) / MAX(1, GET_MAX_MANA(d->character)));
-      src++;
-      continue;
-    case 'q':
-      len = append_prompt(prompt, len, size, "%d", (GET_MOVE(d->character) * 100) / MAX(1, GET_MAX_MOVE(d->character)));
-      src++;
-      continue;
-    default:
-      break;
     }
 
     if (isalpha((unsigned char)*src)) {
       const char *token_start = src;
+
       while (isalpha((unsigned char)*src))
         src++;
 
       size_t tok_len = src - token_start;
-      len = append_named_prompt_token(d, prompt, len, size, token_start, tok_len);
+      len = append_prompt_token(d, prompt, len, size, token_start, tok_len);
       continue;
     }
 
-    /* Unrecognized token, keep the literal percent sign and following character. */
+    /* Literal percent followed by non-alpha character. */
     prompt[len++] = '%';
     if (len < size - 1) {
       prompt[len++] = *src;
@@ -1281,6 +1568,9 @@ static size_t append_custom_prompt(struct descriptor_data *d, char *prompt, size
       prompt[size - 1] = '\0';
     src++;
   }
+
+  if (size > 0)
+    prompt[MIN(len, size - 1)] = '\0';
 
   return len;
 }
@@ -1306,7 +1596,7 @@ static char *make_prompt(struct descriptor_data *d)
       len = append_prompt(prompt, len, sizeof(prompt), "i%d ", GET_INVIS_LEV(d->character));
 
     if (*GET_PROMPT(d->character)) {
-      len = append_custom_prompt(d, prompt, len, sizeof(prompt));
+      len = expand_prompt_template(d, GET_PROMPT(d->character), prompt, len, sizeof(prompt));
     } else if (PRF_FLAGGED(d->character, PRF_DISPAUTO) && len < sizeof(prompt)) {
       /* show only when below 25% */
       struct char_data *ch = d->character;
