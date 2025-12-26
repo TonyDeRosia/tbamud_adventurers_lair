@@ -44,14 +44,13 @@ struct prefs_data
 
 /* Prefedit OLC sub-modes */
 #define PREFEDIT_MAIN_MENU                0
-#define PREFEDIT_PROMPT                   1
-#define PREFEDIT_COLOR                    2
-#define PREFEDIT_PAGELENGTH               3
-#define PREFEDIT_SCREENWIDTH              4
-#define PREFEDIT_WIMPY                    5
-#define PREFEDIT_CONFIRM_SAVE             6
-#define PREFEDIT_SYSLOG                   7
-#define PREFEDIT_TOGGLE_MENU              8
+#define PREFEDIT_COLOR                    1
+#define PREFEDIT_PAGELENGTH               2
+#define PREFEDIT_SCREENWIDTH              3
+#define PREFEDIT_WIMPY                    4
+#define PREFEDIT_CONFIRM_SAVE             5
+#define PREFEDIT_SYSLOG                   6
+#define PREFEDIT_TOGGLE_MENU              7
 
 /* External Functions in prefedit.c */
 void prefedit_Restore_Defaults(struct descriptor_data *d);
