@@ -225,7 +225,7 @@ void gain_exp(struct char_data *ch, int gain)
   int is_altered = FALSE;
   int num_levels = 0;
   int max_mortal_level = LVL_IMMORT - 1;
-  int target_level = MIN(LVL_IMMORT - CONFIG_NO_MORT_TO_IMMORT, max_mortal_level);
+  bool hit_mortal_cap = FALSE;
 
   if (!IS_NPC(ch) && ((GET_LEVEL(ch) < 1 || GET_LEVEL(ch) >= LVL_IMMORT)))
     return;
@@ -238,9 +238,9 @@ void gain_exp(struct char_data *ch, int gain)
     if ((IS_HAPPYHOUR) && (IS_HAPPYEXP))
       gain += (int)((float)gain * ((float)HAPPY_EXP / (float)(100)));
 
-    gain = MIN(CONFIG_MAX_EXP_GAIN, gain);	/* put a cap on the max gain per kill */
+    gain = MIN(CONFIG_MAX_EXP_GAIN, gain);      /* put a cap on the max gain per kill */
     GET_EXP(ch) += gain;
-    while (GET_LEVEL(ch) < target_level &&
+    while (GET_LEVEL(ch) < max_mortal_level &&
         GET_EXP(ch) >= level_exp(GET_CLASS(ch), GET_LEVEL(ch) + 1)) {
       GET_LEVEL(ch) += 1;
       num_levels++;
@@ -248,19 +248,31 @@ void gain_exp(struct char_data *ch, int gain)
       is_altered = TRUE;
     }
 
+    if (GET_LEVEL(ch) >= max_mortal_level) {
+      int immort_exp = level_exp(GET_CLASS(ch), LVL_IMMORT);
+
+      if (immort_exp > 0 && GET_EXP(ch) >= immort_exp) {
+        GET_EXP(ch) = immort_exp - 1;
+        hit_mortal_cap = TRUE;
+      }
+    }
+
     if (is_altered) {
-      mudlog(BRF, MAX(LVL_IMMORT, GET_INVIS_LEV(ch)), TRUE, "%s advanced %d level%s to level %d.",
-		GET_NAME(ch), num_levels, num_levels == 1 ? "" : "s", GET_LEVEL(ch));
+      mudlog(BRF, MAX(LVL_IMMORT, GET_INVIS_LEV(ch)), TRUE, "%s advanced %d level%s to level %d.\r\n",
+                GET_NAME(ch), num_levels, num_levels == 1 ? "" : "s", GET_LEVEL(ch));
       if (num_levels == 1)
         send_to_char(ch, "You rise a level!\r\n");
       else
-	send_to_char(ch, "You rise %d levels!\r\n", num_levels);
+        send_to_char(ch, "You rise %d levels!\r\n", num_levels);
       set_title(ch, NULL);
       if (GET_LEVEL(ch) >= LVL_IMMORT && !PLR_FLAGGED(ch, PLR_NOWIZLIST))
         run_autowiz();
     }
+
+    if (hit_mortal_cap)
+      send_to_char(ch, "You have reached the mortal level cap. Immortality requires immortal approval.\r\n");
   } else if (gain < 0) {
-    gain = MAX(-CONFIG_MAX_EXP_LOSS, gain);	/* Cap max exp lost per death */
+    gain = MAX(-CONFIG_MAX_EXP_LOSS, gain);     /* Cap max exp lost per death */
     GET_EXP(ch) += gain;
     if (GET_EXP(ch) < 0)
       GET_EXP(ch) = 0;
