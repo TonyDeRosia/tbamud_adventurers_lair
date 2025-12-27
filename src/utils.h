@@ -492,6 +492,7 @@ do                                                              \
 /** Class of ch. */
 #define GET_CLASS(ch)   ((ch)->player.chclass)
 /** Height of ch. */
+#define GET_RACE(ch)    ((ch)->player.race)
 #define GET_HEIGHT(ch)	((ch)->player.height)
 /** Weight of ch. */
 #define GET_WEIGHT(ch)	((ch)->player.weight)
