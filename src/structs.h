@@ -866,6 +866,7 @@ struct char_player_data
   char *title;                   /**< PC / NPC title */
   byte sex;                      /**< PC / NPC sex */
   byte chclass;                  /**< PC / NPC class */
+  byte race;                     /* character race (RACE_*) - added */
   byte level;                    /**< PC / NPC level */
   struct time_data time;         /**< PC AGE in days */
   ubyte weight;                  /**< PC / NPC weight */
