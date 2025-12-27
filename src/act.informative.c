@@ -1675,15 +1675,15 @@ ACMD(do_who)
         continue;
 
       if (short_list) {
-        send_to_char(ch, "%s[%2d %s] %-12.12s%s%s",
+        send_to_char(ch, "%s[%2d %3s] %-12.12s%s%s",
           (GET_LEVEL(tch) >= LVL_IMMORT ? CCYEL(ch, C_SPR) : ""),
-          GET_LEVEL(tch), CLASS_ABBR(tch), GET_NAME(tch),
+          GET_LEVEL(tch), get_archetype_abbrev(tch), GET_NAME(tch),
           CCNRM(ch, C_SPR), ((!(++num_can_see % 4)) ? "\r\n" : ""));
       } else {
         num_can_see++;
-        send_to_char(ch, "%s[%2d %s] %s%s%s%s",
+        send_to_char(ch, "%s[%2d %3s] %s%s%s%s",
             (GET_LEVEL(tch) >= LVL_IMMORT ? CCYEL(ch, C_SPR) : ""),
-            GET_LEVEL(tch), CLASS_ABBR(tch),
+            GET_LEVEL(tch), get_archetype_abbrev(tch),
             GET_NAME(tch), (*GET_TITLE(tch) ? " " : ""), GET_TITLE(tch),
             CCNRM(ch, C_SPR));
 
@@ -1861,10 +1861,10 @@ ACMD(do_users)
         continue;
 
       if (d->original)
-    sprintf(classname, "[%2d %s]", GET_LEVEL(d->original),
+    sprintf(classname, "[%2d %3s]", GET_LEVEL(d->original),
         CLASS_ABBR(d->original));
       else
-    sprintf(classname, "[%2d %s]", GET_LEVEL(d->character),
+    sprintf(classname, "[%2d %3s]", GET_LEVEL(d->character),
         CLASS_ABBR(d->character));
     } else
       strcpy(classname, "   -   ");
