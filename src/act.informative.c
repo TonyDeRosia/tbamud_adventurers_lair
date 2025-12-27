@@ -25,6 +25,7 @@
 #include "mud_event.h"
 #include "mail.h"         /**< For the has_mail function */
 #include "act.h"
+#include "race.h"
 #include "class.h"
 #include "fight.h"
 #include "modify.h"
@@ -930,6 +931,12 @@ ACMD(do_score)
   /* Name and Title */
   snprintf(line, sizeof(line), "%sName:%s %-20s  %sTitle:%s %s",
     C, R, GET_NAME(ch), C, R, GET_TITLE(ch));
+  len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
+
+    /* Race and Class */
+  snprintf(line, sizeof(line), "%sRace:%s %-20s  %sClass:%s %-20s",
+    C, R, pc_race_types[GET_RACE(ch)],
+    C, R, pc_class_types[GET_CLASS(ch)]);
   len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
 
   /* Level and Age */
