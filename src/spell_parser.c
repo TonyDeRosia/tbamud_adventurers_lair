@@ -142,6 +142,85 @@ const char *skill_name(int num) {
     return ("UNDEFINED");
 }
 
+static bool is_available_spell(int spellnum) {
+  return (spellnum > 0 && spellnum <= MAX_SPELLS && spell_info[spellnum].name
+      && str_cmp(spell_info[spellnum].name, unused_spellname) != 0);
+}
+
+static void append_match(char *buffer, size_t buf_size, const char *name,
+    int *count) {
+  if (*count > 0)
+    strlcat(buffer, ", ", buf_size);
+  strlcat(buffer, name, buf_size);
+  (*count)++;
+}
+
+static int find_spell_by_prefix(const char *name, char *ambig_buf,
+    size_t ambig_len) {
+  int prefix_spell = -1, prefix_count = 0, spellnum;
+
+  *ambig_buf = '\0';
+
+  for (spellnum = 1; spellnum <= MAX_SPELLS; spellnum++) {
+    if (!is_available_spell(spellnum))
+      continue;
+    if (!strcasecmp(name, spell_info[spellnum].name))
+      return spellnum;
+    if (is_abbrev(name, spell_info[spellnum].name)) {
+      prefix_spell = spellnum;
+      append_match(ambig_buf, ambig_len, spell_info[spellnum].name,
+          &prefix_count);
+    }
+  }
+
+  if (prefix_count == 1)
+    return prefix_spell;
+  else if (prefix_count > 1)
+    return -2;
+
+  return -1;
+}
+
+static struct char_data *find_char_prefix(struct char_data *ch,
+    const char *name, int number, bool include_fighting, char *ambig_buf,
+    size_t ambig_len) {
+  struct char_data *i, *vict = NULL;
+  int count = 0;
+
+  *ambig_buf = '\0';
+
+  if (number < 1)
+    number = 1;
+
+  if (include_fighting && FIGHTING(ch) && CAN_SEE(ch, FIGHTING(ch))
+      && is_abbrev(name, GET_NAME(FIGHTING(ch)))) {
+    append_match(ambig_buf, ambig_len, GET_NAME(FIGHTING(ch)), &count);
+    if (count == number)
+      vict = FIGHTING(ch);
+  }
+
+  for (i = world[IN_ROOM(ch)].people; i; i = i->next_in_room) {
+    if (!CAN_SEE(ch, i))
+      continue;
+    if (include_fighting && i == FIGHTING(ch))
+      continue;
+    if (is_abbrev(name, GET_NAME(i))) {
+      append_match(ambig_buf, ambig_len, GET_NAME(i), &count);
+      if (count == number)
+        vict = i;
+    }
+  }
+
+  if (vict && (number > 1 || count == 1))
+    return vict;
+
+  if (count > 1)
+    return NULL;
+
+  *ambig_buf = '\0';
+  return NULL;
+}
+
 int find_skill_num(char *name) {
   int skindex, ok;
   char *temp, *temp2;
@@ -505,33 +584,56 @@ int cast_spell(struct char_data *ch, struct char_data *tch,
 ACMD(do_cast) {
   struct char_data *tch = NULL;
   struct obj_data *tobj = NULL;
-  char *s, *t;
+  char *spell_argument, *target_argument;
+  char spell_input[MAX_INPUT_LENGTH], target_input[MAX_INPUT_LENGTH];
+  char target_name[MAX_INPUT_LENGTH];
+  char ambiguity[MAX_STRING_LENGTH];
   int number, mana, spellnum, i, target = 0;
 
   if (IS_NPC(ch))
     return;
 
   /* get: blank, spell name, target name */
-  s = strtok(argument, "'");
+  spell_argument = NULL;
+  target_argument = NULL;
+  skip_spaces(&argument);
 
-  if (s == NULL) {
+  if (*argument == '\0') {
     send_to_char(ch, "Cast what where?\r\n");
     return;
   }
-  s = strtok(NULL, "'");
-  if (s == NULL) {
-    send_to_char(ch,
-        "Spell names must be enclosed in the Holy Magic Symbols: '\r\n");
+
+  if (strchr(argument, '\'')) {
+    spell_argument = strtok(argument, "'");
+    spell_argument = strtok(NULL, "'");
+    target_argument = strtok(NULL, "\0");
+  } else {
+    target_argument = any_one_arg(argument, spell_input);
+    spell_argument = spell_input;
+  }
+
+  if (spell_argument == NULL) {
+    send_to_char(ch, "Cast what where?\r\n");
     return;
   }
-  t = strtok(NULL, "\0");
 
-  skip_spaces(&s);
+  skip_spaces(&spell_argument);
+  if (target_argument)
+    skip_spaces(&target_argument);
 
-  /* spellnum = search_block(s, spells, 0); */
-  spellnum = find_skill_num(s);
+  strlcpy(spell_input, spell_argument, sizeof(spell_input));
+  strlcpy(target_input, target_argument ? target_argument : "",
+      sizeof(target_input));
 
-  if ((spellnum < 1) || (spellnum > MAX_SPELLS) || !*s) {
+  spellnum = find_spell_by_prefix(spell_input, ambiguity, sizeof(ambiguity));
+
+  if (spellnum == -2) {
+    send_to_char(ch, "Ambiguous spell name. Did you mean: %s?\r\n",
+        ambiguity);
+    return;
+  }
+
+  if ((spellnum < 1) || (spellnum > MAX_SPELLS) || !*spell_input) {
     send_to_char(ch, "Cast what?!?\r\n");
     return;
   }
@@ -544,61 +646,80 @@ ACMD(do_cast) {
     return;
   }
   /* Find the target */
-  if (t != NULL) {
-    char arg[MAX_INPUT_LENGTH];
-
-    strlcpy(arg, t, sizeof(arg));
-    one_argument(arg, t);
-    skip_spaces(&t);
+  if (target_argument != NULL) {
+    strlcpy(target_name, target_input, sizeof(target_name));
+    one_argument(target_name, target_name);
+    target_argument = target_name;
+    skip_spaces(&target_argument);
 
     /* Copy target to global cast_arg2, for use in spells like locate object */
-    strcpy(cast_arg2, t);
+    strcpy(cast_arg2, target_argument);
   }
   if (IS_SET(SINFO.targets, TAR_IGNORE)) {
     target = TRUE;
-  } else if (t != NULL && *t) {
-    number = get_number(&t);
+  } else if (target_argument != NULL && *target_argument) {
+    number = get_number(&target_argument);
     if (!target && (IS_SET(SINFO.targets, TAR_CHAR_ROOM))) {
-      if ((tch = get_char_vis(ch, t, &number, FIND_CHAR_ROOM)) != NULL)
+      if ((tch = get_char_vis(ch, target_argument, &number, FIND_CHAR_ROOM)) != NULL)
         target = TRUE;
     }
     if (!target && IS_SET(SINFO.targets, TAR_CHAR_WORLD))
-      if ((tch = get_char_vis(ch, t, &number, FIND_CHAR_WORLD)) != NULL)
+      if ((tch = get_char_vis(ch, target_argument, &number, FIND_CHAR_WORLD)) != NULL)
         target = TRUE;
 
     if (!target && IS_SET(SINFO.targets, TAR_OBJ_INV))
-      if ((tobj = get_obj_in_list_vis(ch, t, &number, ch->carrying)) != NULL)
+      if ((tobj = get_obj_in_list_vis(ch, target_argument, &number, ch->carrying)) != NULL)
         target = TRUE;
 
     if (!target && IS_SET(SINFO.targets, TAR_OBJ_EQUIP)) {
       for (i = 0; !target && i < NUM_WEARS; i++)
-        if (GET_EQ(ch, i) && isname(t, GET_EQ(ch, i)->name)) {
+        if (GET_EQ(ch, i) && isname(target_argument, GET_EQ(ch, i)->name)) {
           tobj = GET_EQ(ch, i);
           target = TRUE;
         }
     }
     if (!target && IS_SET(SINFO.targets, TAR_OBJ_ROOM))
-      if ((tobj = get_obj_in_list_vis(ch, t, &number,
+      if ((tobj = get_obj_in_list_vis(ch, target_argument, &number,
           world[IN_ROOM(ch)].contents)) != NULL)
         target = TRUE;
 
     if (!target && IS_SET(SINFO.targets, TAR_OBJ_WORLD))
-      if ((tobj = get_obj_vis(ch, t, &number)) != NULL)
+      if ((tobj = get_obj_vis(ch, target_argument, &number)) != NULL)
         target = TRUE;
 
-  } else { /* if target string is empty */
-    if (!target && IS_SET(SINFO.targets, TAR_FIGHT_SELF))
-      if (FIGHTING(ch) != NULL) {
-        tch = ch;
+    if (!target && (IS_SET(SINFO.targets, TAR_CHAR_ROOM) ||
+        IS_SET(SINFO.targets, TAR_CHAR_WORLD))) {
+      bool include_fighting = IS_SET(SINFO.targets, TAR_FIGHT_VICT);
+      tch = find_char_prefix(ch, target_argument, number, include_fighting,
+          ambiguity, sizeof(ambiguity));
+      if (tch)
         target = TRUE;
+      else if (*ambiguity) {
+        send_to_char(ch, "Ambiguous target. Did you mean: %s?\r\n",
+            ambiguity);
+        return;
       }
+    }
+
+  } else { /* if target string is empty */
     if (!target && IS_SET(SINFO.targets, TAR_FIGHT_VICT))
       if (FIGHTING(ch) != NULL) {
         tch = FIGHTING(ch);
         target = TRUE;
       }
-    /* if no target specified, and the spell isn't violent, default to self */
-    if (!target && IS_SET(SINFO.targets, TAR_CHAR_ROOM) && !SINFO.violent) {
+    if (!target && SINFO.violent && IS_SET(SINFO.targets, TAR_CHAR_ROOM)
+        && !IS_SET(SINFO.targets, TAR_SELF_ONLY) && FIGHTING(ch) != NULL) {
+      tch = FIGHTING(ch);
+      target = TRUE;
+    }
+    if (!target && IS_SET(SINFO.targets, TAR_FIGHT_SELF))
+      if (FIGHTING(ch) != NULL) {
+        tch = ch;
+        target = TRUE;
+      }
+    if (!target && (IS_SET(SINFO.targets, TAR_CHAR_ROOM) ||
+        IS_SET(SINFO.targets, TAR_CHAR_WORLD)) &&
+        (!SINFO.violent || IS_SET(SINFO.targets, TAR_SELF_ONLY))) {
       tch = ch;
       target = TRUE;
     }
