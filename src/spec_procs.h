@@ -35,6 +35,8 @@ const char *get_spec_func_name(SPECIAL(*func));
 /* Utility functions */
 void sort_spells(void);
 void list_skills(struct char_data *ch);
+void list_spells(struct char_data *ch);
+void list_known_abilities(struct char_data *ch);
 
 /* Special functions */
 SPECIAL(guild);
