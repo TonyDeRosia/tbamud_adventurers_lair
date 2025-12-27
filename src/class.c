@@ -34,6 +34,20 @@ const char *class_abbrevs[] = {
   "\n"
 };
 
+const char *get_archetype_abbrev(struct char_data *ch)
+{
+  if (IS_NPC(ch))
+    return "--";
+
+  switch (GET_CLASS(ch)) {
+    case CLASS_WARRIOR:     return "Mar";
+    case CLASS_THIEF:       return "Rog";
+    case CLASS_CLERIC:      return "Div";
+    case CLASS_MAGIC_USER:  return "Spl";
+    default:                return "UNK";
+  }
+}
+
 const char *pc_class_types[] = {
   "Magic User",
   "Cleric",
