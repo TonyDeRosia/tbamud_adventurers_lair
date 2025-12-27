@@ -1139,317 +1139,20 @@ ACMD(do_score)
 
 /* =======================================================================
  * AFF / AFFECTS COMMAND
- * Mortals: short, readable summary (spell name + simple effect)
- * Immortals: full details (duration, level, apply, modifier, flags)
+ * Lists current affects on a character.
  * ======================================================================= */
 
-static int is_aff_debuff(const struct affected_type *af)
+static const char *affect_apply_name(int loc)
 {
-  /* Best effort classification.
-     Negative modifiers are debuffs, and some common flags imply debuff. */
-  if (!af) return 0;
+  if (loc >= 0 && loc < NUM_APPLIES && apply_types[loc])
+    return apply_types[loc];
 
-  if (af->modifier < 0)
-    return 1;
-
-#ifdef AFF_POISON
-  if (IS_SET_AR(af->bitvector, AFF_POISON)) return 1;
-#endif
-#ifdef AFF_BLIND
-  if (IS_SET_AR(af->bitvector, AFF_BLIND)) return 1;
-#endif
-#ifdef AFF_CURSE
-  if (IS_SET_AR(af->bitvector, AFF_CURSE)) return 1;
-#endif
-#ifdef AFF_CHARM
-  if (IS_SET_AR(af->bitvector, AFF_CHARM)) return 1;
-#endif
-
-  return 0;
-}
-
-static void build_aff_summary(const struct affected_type *af, char *out, size_t outsz)
-{
-  /* Mortals see: name + basic effect line */
-  const char *name = "Unknown";
-  char eff[256];
-  char flags[256];
-
-  if (!out || outsz == 0) return;
-  out[0] = '\0';
-
-  if (!af) {
-    snprintf(out, outsz, "Unknown effect.");
-    return;
-  }
-
-#ifdef MAX_SPELLS
-  if (af->type > 0 && af->type < MAX_SPELLS && spell_info[af->type].name)
-    name = spell_info[af->type].name;
-#else
-  /* If your codebase uses different spell tables, you can change name resolution here. */
-  (void)name;
-#endif
-
-  eff[0] = '\0';
-  flags[0] = '\0';
-
-  if (af->location != APPLY_NONE) {
-    snprintf(eff, sizeof(eff), "%s %s by %d",
-      (af->modifier >= 0 ? "increases" : "reduces"),
-      affect_loc_name(af->location),
-      ABS(af->modifier));
-  }
-
-  /* Show a single short flag label if it exists */
-#ifdef AF_ARRAY_MAX
-  sprintbitarray(af->bitvector, affected_bits, AF_ARRAY_MAX, flags);
-#else
-  sprintbit(af->bitvector, affected_bits, flags, sizeof(flags));
-#endif
-
-  if (*eff && *flags)
-    snprintf(out, outsz, "%s: %s. Also: %s.", name, eff, flags);
-  else if (*eff)
-    snprintf(out, outsz, "%s: %s.", name, eff);
-  else if (*flags)
-    snprintf(out, outsz, "%s: %s.", name, flags);
-  else
-    snprintf(out, outsz, "%s.", name);
-}
-
-/* =======================================================================
- * AFF / AFFECTS COMMAND
- * Mortals: short summary
- * Immortals: full details
- * ======================================================================= */
-
-static int is_aff_debuff(const struct affected_type *af)
-{
-  if (!af) return 0;
-
-  if (af->modifier < 0)
-    return 1;
-
-#ifdef AFF_POISON
-  if (IS_SET_AR(af->bitvector, AFF_POISON)) return 1;
-#endif
-#ifdef AFF_BLIND
-  if (IS_SET_AR(af->bitvector, AFF_BLIND)) return 1;
-#endif
-#ifdef AFF_CURSE
-  if (IS_SET_AR(af->bitvector, AFF_CURSE)) return 1;
-#endif
-#ifdef AFF_CHARM
-  if (IS_SET_AR(af->bitvector, AFF_CHARM)) return 1;
-#endif
-
-  return 0;
-}
-
-static void build_aff_summary(const struct affected_type *af, char *out, size_t outsz)
-{
-  const char *name = "Unknown";
-  char eff[256];
-  char flags[256];
-
-  if (!out || outsz == 0) return;
-  out[0] = '\0';
-
-  if (!af) {
-    snprintf(out, outsz, "Unknown effect.");
-    return;
-  }
-
-  if (af->type > 0 && af->type < MAX_SPELLS && spell_info[af->type].name)
-    name = spell_info[af->type].name;
-
-  eff[0] = '\0';
-  flags[0] = '\0';
-
-  if (af->location != APPLY_NONE) {
-    snprintf(eff, sizeof(eff), "%s %s by %d",
-      (af->modifier >= 0 ? "increases" : "reduces"),
-      affect_loc_name(af->location),
-      ABS(af->modifier));
-  }
-
-  sprintbitarray(af->bitvector, affected_bits, AF_ARRAY_MAX, flags);
-
-  if (*eff && *flags)
-    snprintf(out, outsz, "%s: %s. Also: %s.", name, eff, flags);
-  else if (*eff)
-    snprintf(out, outsz, "%s: %s.", name, eff);
-  else if (*flags)
-    snprintf(out, outsz, "%s: %s.", name, flags);
-  else
-    snprintf(out, outsz, "%s.", name);
-}
-
-/* =========================================================================
- * AFFECTS COMMAND - Complete Implementation
- * 
- * Installation:
- * 1. Add this entire block to act.informative.c AFTER ACMD(do_score) 
- *    and BEFORE ACMD(do_inventory)
- * 2. Add to act.h: ACMD(do_affects);
- * 3. Add to interpreter.c command table:
- *    { "affects"  , "aff"     , POS_DEAD    , do_affects  , 0, 0 },
- * 4. Compile: cd ~/mud/tbamud/src && make
- * ========================================================================= */
-
-static int is_aff_debuff(const struct affected_type *af)
-{
-  if (!af) return 0;
-
-  /* Negative modifiers are usually debuffs */
-  if (af->modifier < 0)
-    return 1;
-
-  /* Common debuff flags - check if they exist in your codebase */
-  if (IS_SET_AR(af->bitvector, AFF_POISON)) return 1;
-  if (IS_SET_AR(af->bitvector, AFF_BLIND)) return 1;
-  if (IS_SET_AR(af->bitvector, AFF_CURSE)) return 1;
-  if (IS_SET_AR(af->bitvector, AFF_CHARM)) return 1;
-
-  return 0;
-}
-
-static void build_aff_summary(const struct affected_type *af, char *out, size_t outsz)
-{
-  const char *name = "Unknown";
-  char eff[256];
-  char flags[256];
-
-  if (!out || outsz == 0) return;
-  out[0] = '\0';
-
-  if (!af) {
-    snprintf(out, outsz, "Unknown effect");
-    return;
-  }
-
-  /* Get spell name */
-  if (af->type > 0 && af->type < MAX_SPELLS && spell_info[af->type].name)
-    name = spell_info[af->type].name;
-
-  eff[0] = '\0';
-  flags[0] = '\0';
-
-  /* Build effect description */
-  if (af->location != APPLY_NONE && af->location >= 0 && af->location < NUM_APPLIES) {
-    snprintf(eff, sizeof(eff), "%s %s by %d",
-      (af->modifier >= 0 ? "increases" : "reduces"),
-      apply_types[af->location],
-      abs(af->modifier));
-  }
-
-  /* Get affected flags */
-  sprintbitarray(af->bitvector, affected_bits, AF_ARRAY_MAX, flags);
-
-  /* Combine into summary */
-  if (*eff && *flags)
-    snprintf(out, outsz, "%s: %s. Also: %s", name, eff, flags);
-  else if (*eff)
-    snprintf(out, outsz, "%s: %s", name, eff);
-  else if (*flags)
-    snprintf(out, outsz, "%s: %s", name, flags);
-  else
-    snprintf(out, outsz, "%s", name);
-}
-
-/* =======================================================================
- * AFF / AFFECTS COMMAND
- * Mortals: short summary (spell name + simple effect)
- * Immortals: more details (duration, apply, modifier, flags)
- * Place this block above ACMD(do_inventory) in act.informative.c
- * ======================================================================= */
-
-static const char *aff_apply_name(int loc)
-{
-  /* tbaMUD has apply_types[] in spell_parser.c (or similar) */
-  extern const char *apply_types[];
-
-  if (loc <= APPLY_NONE)
-    return "none";
-  if (!apply_types)
-    return "unknown";
-  if (!apply_types[loc])
-    return "unknown";
-
-  return apply_types[loc];
-}
-
-static int is_aff_debuff(const struct affected_type *af)
-{
-  if (!af) return 0;
-
-  /* Negative modifiers are usually debuffs */
-  if (af->modifier < 0)
-    return 1;
-
-  /* Common debuff flags */
-#ifdef AFF_POISON
-  if (IS_SET_AR(af->bitvector, AFF_POISON)) return 1;
-#endif
-#ifdef AFF_BLIND
-  if (IS_SET_AR(af->bitvector, AFF_BLIND)) return 1;
-#endif
-#ifdef AFF_CURSE
-  if (IS_SET_AR(af->bitvector, AFF_CURSE)) return 1;
-#endif
-#ifdef AFF_CHARM
-  if (IS_SET_AR(af->bitvector, AFF_CHARM)) return 1;
-#endif
-
-  return 0;
-}
-
-static void build_aff_summary(const struct affected_type *af, char *out, size_t outsz)
-{
-  const char *name = "Unknown";
-  char eff[256];
-  char flags[256];
-
-  if (!out || outsz == 0) return;
-  out[0] = '\0';
-
-  if (!af) {
-    snprintf(out, outsz, "Unknown effect.");
-    return;
-  }
-
-  /* In tbaMUD, affected_type usually stores the spell as af->spell */
-  if (af->spell > 0 && af->spell < MAX_SPELLS && spell_info[af->spell].name)
-    name = spell_info[af->spell].name;
-
-  eff[0] = '\0';
-  flags[0] = '\0';
-
-  if (af->location != APPLY_NONE && af->modifier != 0) {
-    snprintf(eff, sizeof(eff), "%s %s by %d",
-      (af->modifier >= 0 ? "increases" : "reduces"),
-      aff_apply_name(af->location),
-      abs(af->modifier));
-  }
-
-  /* sprintbitarray wants int[], but bitvector is treated like an array */
-  sprintbitarray((int *)af->bitvector, affected_bits, AF_ARRAY_MAX, flags);
-
-  if (*eff && *flags)
-    snprintf(out, outsz, "%s: %s. Also: %s.", name, eff, flags);
-  else if (*eff)
-    snprintf(out, outsz, "%s: %s.", name, eff);
-  else if (*flags)
-    snprintf(out, outsz, "%s: %s.", name, flags);
-  else
-    snprintf(out, outsz, "%s.", name);
+  return "unknown";
 }
 
 ACMD(do_affects)
 {
-  const struct affected_type *af;
-  int any = 0, any_buff = 0, any_debuff = 0;
+  struct affected_type *af;
 
   if (!ch || IS_NPC(ch)) {
     send_to_char(ch, "Not for mobiles.\r\n");
@@ -1457,92 +1160,35 @@ ACMD(do_affects)
   }
 
   if (!ch->affected) {
-    send_to_char(ch, "You have no active effects.\r\n");
+    send_to_char(ch, "You are not affected by any spells.\r\n");
     return;
   }
+
+  send_to_char(ch, "You are affected by:\r\n");
 
   for (af = ch->affected; af; af = af->next) {
-    any = 1;
-    if (is_aff_debuff(af)) any_debuff = 1;
-    else any_buff = 1;
-  }
+    const char *spell_name = "unknown";
+    const char *apply_name = "none";
+    char flags[MAX_STRING_LENGTH];
+    int bitv[AF_ARRAY_MAX];
+    int i;
 
-  if (!any) {
-    send_to_char(ch, "You have no active effects.\r\n");
-    return;
-  }
+    if (af->spell > 0 && af->spell < MAX_SPELLS && spell_info[af->spell].name)
+      spell_name = spell_info[af->spell].name;
 
-  send_to_char(ch, "\r\n%sActive Effects%s\r\n", CCYEL(ch, C_NRM), CCNRM(ch, C_NRM));
+    if (af->location != APPLY_NONE)
+      apply_name = affect_apply_name(af->location);
 
-  /* Buffs */
-  if (any_buff) {
-    send_to_char(ch, "\r\n%sBuffs%s\r\n", CCGRN(ch, C_NRM), CCNRM(ch, C_NRM));
+    for (i = 0; i < AF_ARRAY_MAX; i++)
+      bitv[i] = af->bitvector[i];
 
-    for (af = ch->affected; af; af = af->next) {
-      if (is_aff_debuff(af)) continue;
+    flags[0] = '\0';
+    sprintbitarray(bitv, affected_bits, AF_ARRAY_MAX, flags);
 
-      if (GET_LEVEL(ch) >= LVL_IMMORT) {
-        char flags[256];
-        const char *spell_name = "Unknown";
-
-        flags[0] = '\0';
-        sprintbitarray((int *)af->bitvector, affected_bits, AF_ARRAY_MAX, flags);
-
-        if (af->spell > 0 && af->spell < MAX_SPELLS && spell_info[af->spell].name)
-          spell_name = spell_info[af->spell].name;
-
-        send_to_char(ch,
-          "  %s%s%s  dur %d  apply %s  mod %+d  flags %s\r\n",
-          CCCYN(ch, C_NRM), spell_name, CCNRM(ch, C_NRM),
-          af->duration,
-          aff_apply_name(af->location),
-          af->modifier,
-          flags);
-      } else {
-        char line[512];
-        build_aff_summary(af, line, sizeof(line));
-        send_to_char(ch, "  %s\r\n", line);
-      }
-    }
-  } else {
-    send_to_char(ch, "\r\n%sBuffs%s\r\n  None.\r\n", CCGRN(ch, C_NRM), CCNRM(ch, C_NRM));
-  }
-
-  /* Debuffs */
-  if (any_debuff) {
-    send_to_char(ch, "\r\n%sDebuffs%s\r\n", CCRED(ch, C_NRM), CCNRM(ch, C_NRM));
-
-    for (af = ch->affected; af; af = af->next) {
-      if (!is_aff_debuff(af)) continue;
-
-      if (GET_LEVEL(ch) >= LVL_IMMORT) {
-        char flags[256];
-        const char *spell_name = "Unknown";
-
-        flags[0] = '\0';
-        sprintbitarray((int *)af->bitvector, affected_bits, AF_ARRAY_MAX, flags);
-
-        if (af->spell > 0 && af->spell < MAX_SPELLS && spell_info[af->spell].name)
-          spell_name = spell_info[af->spell].name;
-
-        send_to_char(ch,
-          "  %s%s%s  dur %d  apply %s  mod %+d  flags %s\r\n",
-          CCCYN(ch, C_NRM), spell_name, CCNRM(ch, C_NRM),
-          af->duration,
-          aff_apply_name(af->location),
-          af->modifier,
-          flags);
-      } else {
-        char line[512];
-        build_aff_summary(af, line, sizeof(line));
-        send_to_char(ch, "  %s\r\n", line);
-      }
-    }
-  } else {
-    send_to_char(ch, "\r\n%sDebuffs%s\r\n  None.\r\n", CCRED(ch, C_NRM), CCNRM(ch, C_NRM));
+    send_to_char(ch, "  %-20s Dur %4d  Apply %-12s Mod %+d  Flags %s\r\n",
+      spell_name, af->duration, apply_name, af->modifier, flags);
   }
 }
-
 ACMD(do_inventory)
 {
   send_to_char(ch, "You are carrying:\r\n");
