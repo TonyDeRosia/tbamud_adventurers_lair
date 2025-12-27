@@ -10,6 +10,8 @@
 
 #include "conf.h"
 #include "sysdep.h"
+
+#include <stdlib.h>  /* abs */
 #include "structs.h"
 #include "utils.h"
 #include "comm.h"
