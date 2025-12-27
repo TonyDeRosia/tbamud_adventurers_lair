@@ -2858,8 +2858,9 @@ ACMD(do_whois)
   send_to_char(ch, "Name: %s %s\r\nSex: %s\r\n", GET_NAME(victim),
                    (victim->player.title ? victim->player.title : ""), buf);
 
-  sprinttype (victim->player.chclass, pc_class_types, buf, sizeof(buf));
+  strlcpy(buf, archetype_name(victim->player.chclass), sizeof(buf));
   send_to_char(ch, "Class: %s\r\n", buf);
+
 
   send_to_char(ch, "Level: %d\r\n", GET_LEVEL(victim));
 
