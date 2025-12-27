@@ -4,7 +4,7 @@
 #include "structs.h"
 #include "utils.h"
 #include "race.h"
-#include "handler.h"
+#include "handler.h"   /* affect_total */
 
 #include <ctype.h>
 #include <stdlib.h>
@@ -48,7 +48,6 @@ int parse_race(const char *arg)
   if (!arg || !*arg)
     return RACE_UNDEFINED;
 
-  /* skip leading whitespace so inputs like " 2" work */
   while (*arg && isspace((unsigned char)*arg))
     arg++;
 
@@ -78,86 +77,8 @@ int parse_race(const char *arg)
   }
 }
 
-void apply_racial_bonuses(struct char_data *ch)
+static void clamp_abils(struct char_data *ch)
 {
-  if (!ch)
-    return;
-
-  switch (GET_RACE(ch)) {
-    case RACE_HUMAN:
-      /* No changes */
-      break;
-
-    case RACE_ELF:
-      ch->real_abils.intel  += 1;
-      ch->real_abils.wis    += 1;
-      ch->real_abils.con    -= 1;
-      break;
-
-    case RACE_DWARF:
-      ch->real_abils.con    += 1;
-      ch->real_abils.dex    -= 1;
-      ch->real_abils.cha    -= 1;
-      GET_MAX_HIT(ch) += 5;
-      GET_HIT(ch)     += 5;
-      GET_AC(ch)      -= 1; /* improve AC by 1 (lower is better) */
-      break;
-
-    case RACE_ORC:
-      ch->real_abils.str    += 1;
-      ch->real_abils.dex    += 1;
-      ch->real_abils.intel  -= 1;
-      ch->real_abils.wis    -= 1;
-      break;
-
-    case RACE_HALFLING:
-      ch->real_abils.dex    += 1;
-      ch->real_abils.cha    += 1;
-      ch->real_abils.str    -= 1;
-      break;
-
-    case RACE_TROLL:
-      ch->real_abils.con    += 1;
-      ch->real_abils.str    += 1;
-      ch->real_abils.intel  -= 1;
-      ch->real_abils.wis    -= 1;
-      break;
-
-    case RACE_GOBLIN:
-      ch->real_abils.dex    += 1;
-      ch->real_abils.intel  += 1;
-      ch->real_abils.cha    -= 2;
-      break;
-
-    case RACE_WEREWOLF:
-      ch->real_abils.str    += 2;
-      ch->real_abils.cha    -= 1;
-      ch->real_abils.intel  -= 1;
-      break;
-
-    case RACE_SATYR:
-      ch->real_abils.cha    += 1;
-      ch->real_abils.dex    += 1;
-      ch->real_abils.wis    -= 2;
-      break;
-
-    case RACE_MINOTAUR:
-      ch->real_abils.str    += 2;
-      ch->real_abils.dex    -= 1;
-      ch->real_abils.intel  -= 1;
-      break;
-
-    case RACE_VAMPIRE:
-      ch->real_abils.intel  += 1;
-      ch->real_abils.cha    += 1;
-      ch->real_abils.con    -= 1;
-      break;
-
-    default:
-      break;
-  }
-
-  /* lower clamp (safety) */
   if (ch->real_abils.str < 3) ch->real_abils.str = 3;
   if (ch->real_abils.dex < 3) ch->real_abils.dex = 3;
   if (ch->real_abils.con < 3) ch->real_abils.con = 3;
@@ -165,14 +86,96 @@ void apply_racial_bonuses(struct char_data *ch)
   if (ch->real_abils.wis < 3) ch->real_abils.wis = 3;
   if (ch->real_abils.cha < 3) ch->real_abils.cha = 3;
 
-  /* upper clamp to stay within tbaMUD usual bounds */
   if (ch->real_abils.str > 25) ch->real_abils.str = 25;
   if (ch->real_abils.dex > 25) ch->real_abils.dex = 25;
   if (ch->real_abils.con > 25) ch->real_abils.con = 25;
   if (ch->real_abils.intel > 25) ch->real_abils.intel = 25;
   if (ch->real_abils.wis > 25) ch->real_abils.wis = 25;
   if (ch->real_abils.cha > 25) ch->real_abils.cha = 25;
+}
 
-  /* refresh derived values */
+/*
+  Apply racial bonuses once at creation time.
+  Do not call this on login or load.
+*/
+void apply_racial_bonuses(struct char_data *ch)
+{
+  if (!ch)
+    return;
+
+  switch (GET_RACE(ch)) {
+    case RACE_HUMAN:
+      break;
+
+    case RACE_ELF:
+      ch->real_abils.intel += 1;
+      ch->real_abils.wis   += 1;
+      ch->real_abils.con   -= 1;
+      break;
+
+    case RACE_DWARF:
+      ch->real_abils.con   += 1;
+      ch->real_abils.dex   -= 1;
+      ch->real_abils.cha   -= 1;
+      GET_MAX_HIT(ch) += 5;
+      GET_HIT(ch)     += 5;
+      GET_AC(ch)      -= 1;
+      break;
+
+    case RACE_ORC:
+      ch->real_abils.str   += 1;
+      ch->real_abils.dex   += 1;
+      ch->real_abils.intel -= 1;
+      ch->real_abils.wis   -= 1;
+      break;
+
+    case RACE_HALFLING:
+      ch->real_abils.dex   += 1;
+      ch->real_abils.cha   += 1;
+      ch->real_abils.str   -= 1;
+      break;
+
+    case RACE_TROLL:
+      ch->real_abils.con   += 1;
+      ch->real_abils.str   += 1;
+      ch->real_abils.intel -= 1;
+      ch->real_abils.wis   -= 1;
+      break;
+
+    case RACE_GOBLIN:
+      ch->real_abils.dex   += 1;
+      ch->real_abils.intel += 1;
+      ch->real_abils.cha   -= 2;
+      break;
+
+    case RACE_WEREWOLF:
+      ch->real_abils.str   += 2;
+      ch->real_abils.cha   -= 1;
+      ch->real_abils.intel -= 1;
+      break;
+
+    case RACE_SATYR:
+      ch->real_abils.cha   += 1;
+      ch->real_abils.dex   += 1;
+      ch->real_abils.wis   -= 2;
+      break;
+
+    case RACE_MINOTAUR:
+      ch->real_abils.str   += 2;
+      ch->real_abils.dex   -= 1;
+      ch->real_abils.intel -= 1;
+      break;
+
+    case RACE_VAMPIRE:
+      ch->real_abils.intel += 1;
+      ch->real_abils.cha   += 1;
+      ch->real_abils.con   -= 1;
+      break;
+
+    default:
+      break;
+  }
+
+  clamp_abils(ch);
   affect_total(ch);
 }
