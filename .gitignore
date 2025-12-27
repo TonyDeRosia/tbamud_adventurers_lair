@@ -22,3 +22,15 @@ src/util/depend
 bin/circle
 bin/*.core
 core
+
+# build and runtime
+syslog
+syslog.*
+lib/etc/last
+
+# local backup artifacts from scripts
+src/*.bak_*
+src/*.bak.*
+src/*.BROKEN_*
+src/*.CORRUPT_*
+src/*.pre_*
