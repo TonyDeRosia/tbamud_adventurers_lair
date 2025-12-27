@@ -1,36 +1,16 @@
-# Runtime logs and pid files
-log/
-syslog
-*.log
-*.pid
-
-# Player and world runtime data
-lib/plrfiles/
-lib/plrobjs/
-lib/plrvars/
-lib/house/
-lib/etc/*.bak
-lib/etc/plrmail
-lib/etc/time
-lib/etc/hcontrol
-
 # Build outputs
-src/*.o
-src/util/*.o
-src/depend
-src/util/depend
-bin/circle
-bin/*.core
-core
+bin/
+*.o
+*.a
+*.so
+*.exe
 
-# build and runtime
-syslog
-syslog.*
+# Runtime / generated data
 lib/etc/last
 
-# local backup artifacts from scripts
-src/*.bak_*
-src/*.bak.*
-src/*.BROKEN_*
-src/*.CORRUPT_*
-src/*.pre_*
+# Local scripts
+*.sh
+
+# Backups
+*.backup_*
+*.bak_*
