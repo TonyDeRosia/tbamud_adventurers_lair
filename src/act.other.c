@@ -280,8 +280,13 @@ ACMD(do_spellbook)
   if (IS_NPC(ch))
     return;
 
+  send_to_char(ch, "\r\nSKILLS:\r\n");
+  list_skills(ch);
+
+  send_to_char(ch, "\r\nSPELLS:\r\n");
   list_spells(ch);
 }
+
 
 ACMD(do_practice)
 {

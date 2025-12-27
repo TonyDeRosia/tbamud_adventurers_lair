@@ -14,3 +14,15 @@ lib/etc/last
 # Backups
 *.backup_*
 *.bak_*
+
+# Runtime and generated files
+mudrun.log
+syslog.*
+syslog.CRASH
+log/
+lib/plrfiles/
+lib/plrobjs/
+lib/etc/plrmail
+lib/etc/time
+src/depend
+src/util/depend
