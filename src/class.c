@@ -20,6 +20,7 @@
 #include "db.h"
 #include "spells.h"
 #include "interpreter.h"
+#include "race.h"
 #include "constants.h"
 #include "act.h"
 #include "class.h"
@@ -1455,6 +1456,8 @@ void do_start(struct char_data *ch)
 
   if (CONFIG_SITEOK_ALL)
     SET_BIT_AR(PLR_FLAGS(ch), PLR_SITEOK);
+
+  apply_racial_bonuses(ch);
 }
 
 /* This function controls the change to maxmove, maxmana, and maxhp for each
