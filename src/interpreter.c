@@ -14,6 +14,7 @@
 #include "utils.h"
 #include "comm.h"
 #include "interpreter.h"
+#include "race.h"
 #include "db.h"
 #include "spells.h"
 #include "handler.h"
@@ -37,7 +38,6 @@
 #include "prefedit.h"
 #include "ibt.h"
 #include "mud_event.h"
-#include "prompt.h"
 
 /* local (file scope) functions */
 static int perform_dupe_check(struct descriptor_data *d);
@@ -87,7 +87,6 @@ cpp_extern const struct command_info cmd_info[] = {
   { "alias"    , "ali"     , POS_DEAD    , do_alias    , 0, 0 },
   { "afk"      , "afk"     , POS_DEAD    , do_gen_tog  , 0, SCMD_AFK },
   { "areas"    , "are"     , POS_DEAD    , do_areas    , 0, 0 },
-  { "affects"  , "aff"     , POS_DEAD    , do_affects  , 0, 0 },
   { "assist"   , "as"      , POS_FIGHTING, do_assist   , 1, 0 },
   { "ask"      , "ask"     , POS_RESTING , do_spec_comm, 0, SCMD_ASK },
   { "astat"    , "ast"     , POS_DEAD    , do_astat    , 0, 0 },
@@ -133,6 +132,7 @@ cpp_extern const struct command_info cmd_info[] = {
   { "detach"   , "detach"  , POS_DEAD    , do_detach   , LVL_BUILDER, 0 },
   { "diagnose" , "diag"    , POS_RESTING , do_diagnose , 0, 0 },
   { "dig"      , "dig"     , POS_DEAD    , do_dig      , LVL_BUILDER, 0 },
+// //   { "display"  , "disp"    , POS_DEAD    , do_display  , 0, 0 },
   { "donate"   , "don"     , POS_RESTING , do_drop     , 0, SCMD_DONATE },
   { "drink"    , "dri"     , POS_RESTING , do_drink    , 0, SCMD_DRINK },
   { "drop"     , "dro"     , POS_RESTING , do_drop     , 0, SCMD_DROP },
@@ -237,17 +237,14 @@ cpp_extern const struct command_info cmd_info[] = {
   { "put"      , "p"       , POS_RESTING , do_put      , 0, 0 },
   { "peace"    , "pe"      , POS_DEAD    , do_peace    , LVL_BUILDER, 0 },
   { "pick"     , "pi"      , POS_STANDING, do_gen_door , 1, SCMD_PICK },
-  { "skills"   , "skills"  , POS_RESTING , do_skills   , 1, 0 },
-  { "spellbook", "spell"   , POS_RESTING , do_spellbook, 1, 0 },
-  { "spells"   , "spellbook", POS_RESTING , do_spellbook, 1, 0 },
   { "practice" , "pr"      , POS_RESTING , do_practice , 1, 0 },
   { "page"     , "pag"     , POS_DEAD    , do_page     , 1, 0 },
   { "pardon"   , "pardon"  , POS_DEAD    , do_wizutil  , LVL_GOD, SCMD_PARDON },
   { "plist"    , "plist"   , POS_DEAD    , do_plist    , LVL_GOD, 0 },
   { "policy"   , "pol"     , POS_DEAD    , do_gen_ps   , 0, SCMD_POLICIES },
   { "pour"     , "pour"    , POS_STANDING, do_pour     , 0, SCMD_POUR },
+//   { "prompt"   , "pro"     , POS_DEAD    , do_display  , 0, 0 },
   { "prefedit" , "pre"     , POS_DEAD    , do_oasis_prefedit , 0, 0 },
-  { "prompt"   , "prom"    , POS_DEAD    , do_prompt   , 0, 0 },
   { "purge"    , "purge"   , POS_DEAD    , do_purge    , LVL_BUILDER, 0 },
 
   { "qedit"    , "qedit"   , POS_DEAD    , do_oasis_qedit, LVL_BUILDER, 0 },
@@ -1590,26 +1587,44 @@ void nanny(struct descriptor_data *d, char *arg)
       STATE(d) = CON_MENU;
     }
     break;
+  case CON_QSEX:           /* query sex of new user         */
+    switch (LOWER(*arg)) {
+      case 'm':
+        GET_SEX(d->character) = SEX_MALE;
+        break;
+      case 'f':
+        GET_SEX(d->character) = SEX_FEMALE;
+        break;
+      default:
+        write_to_output(d, "That is not a sex... What IS your sex? (M/F) ");
+        return;
+    }
 
-  case CON_QSEX:		/* query sex of new user         */
-    switch (*arg) {
-    case 'm':
-    case 'M':
-      d->character->player.sex = SEX_MALE;
-      break;
-    case 'f':
-    case 'F':
-      d->character->player.sex = SEX_FEMALE;
-      break;
-    default:
-      write_to_output(d, "That is not a sex..\r\n"
-		"What IS your sex? ");
+    STATE(d) = CON_QRACE;
+    write_to_output(d, "%s", race_menu);
+    return;
+
+  case CON_QRACE: {
+    int race = parse_race(arg);
+
+    if (race == RACE_UNDEFINED) {
+      write_to_output(d, "Invalid race.\r\n");
+      write_to_output(d, "%s", race_menu);
       return;
     }
 
-    write_to_output(d, "%s\r\nClass: ", class_menu);
+    GET_RACE(d->character) = race;
+
     STATE(d) = CON_QCLASS;
-    break;
+    write_to_output(d, "\r\nSelect a class:\r\n"
+                      "  [C]leric\r\n"
+                      "  [T]hief\r\n"
+                      "  [W]arrior\r\n"
+                      "  [M]agic-user\r\n"
+                      "\r\nClass: ");
+    return;
+  }
+
 
   case CON_QCLASS:
     load_result = parse_class(*arg);
@@ -1624,7 +1639,7 @@ void nanny(struct descriptor_data *d, char *arg)
         d->olc = NULL;
       }
       if (GET_PFILEPOS(d->character) < 0)
-        GET_PFILEPOS(d->character) = create_entry(GET_PC_NAME(d->character));
+      GET_PFILEPOS(d->character) = create_entry(GET_PC_NAME(d->character));
     }
     /* Now GET_NAME() will work properly. */
     init_char(d->character);
@@ -1652,7 +1667,12 @@ void nanny(struct descriptor_data *d, char *arg)
       write_to_output(d, "\tyThere is currently a Happyhour!\tn\r\n");
       write_to_output(d, "\r\n");
     }
-    add_llog_entry(d->character, LAST_CONNECT);
+    /* Defensive: avoid RMOTD disconnect if last-login logging hits NULL data */
+    if (d->character) {
+      if (!GET_HOST(d->character))
+        GET_HOST(d->character) = strdup(d->host ? d->host : "unknown");
+      add_llog_entry(d->character, LAST_CONNECT);
+    }
     STATE(d) = CON_MENU;
     break;
 
