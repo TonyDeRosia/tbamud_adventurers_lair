@@ -4,6 +4,7 @@
 #include "structs.h"
 #include "utils.h"
 #include "race.h"
+#include "handler.h"
 
 #include <ctype.h>
 #include <stdlib.h>
