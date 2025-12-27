@@ -247,7 +247,7 @@ int load_char(const char *name, struct char_data *ch)
   if ((id = get_ptable_by_name(name)) < 0)
     return (-1);
   else {
-    if (!get_filename(filename, sizeof(filename), PLR_FILE, player_table[id].name))
+    if (!get_filename(filename, sizeof(filename), PLR_FILE, GET_NAME(ch)))
       
       return (-1);
     if (!(fl = fopen(filename, "r"))) {
@@ -535,7 +535,7 @@ void save_char(struct char_data * ch)
     }
   }
 
-  if (!get_filename(filename, sizeof(filename), PLR_FILE, player_table[id].name))
+  if (!get_filename(filename, sizeof(filename), PLR_FILE, GET_NAME(ch)))
     return;
   if (!(fl = fopen(filename, "w"))) {
     mudlog(NRM, LVL_GOD, TRUE, "SYSERR: Couldn't open player file %s for write", filename);
