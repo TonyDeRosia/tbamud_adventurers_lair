@@ -1,0 +1,6 @@
+# tbaMUD minimal config
+
+lib_directory: lib
+logfile: syslog
+port: 4000
+max_players: 100
