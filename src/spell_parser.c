@@ -828,7 +828,13 @@ void unused_spell(int spl) {
   spell_info[spl].name = unused_spellname;
 }
 
-#define skillo(skill, name) spello(skill, name, 0, 0, 0, 0, 0, 0, 0, NULL);
+/* Skills use MOVE costs. We store the cost in spell_info[].mana_* fields
+ * and your cast_skill / cast_spell logic decides whether to charge MOVE or MANA.
+ */
+#define SKILL_DEFAULT_COST 10
+#define skillo(skill, name) spello(skill, name, SKILL_DEFAULT_COST, SKILL_DEFAULT_COST, 0, 0, 0, 0, 0, NULL);
+#define skillo_cost(skill, name, cost) spello(skill, name, (cost), (cost), 0, 0, 0, 0, 0, NULL);
+
 /* Arguments for spello calls:
  * spellnum, maxmana, minmana, manachng, minpos, targets, violent?, routines.
  * spellnum:  Number of the spell.  Usually the symbolic name as defined in
@@ -1043,16 +1049,16 @@ void mag_assign_spells(void) {
   /* Declaration of skills - this actually doesn't do anything except set it up
    * so that immortals can use these skills by default.  The min level to use
    * the skill for other classes is set up in class.c. */
-  skillo(SKILL_BACKSTAB, "backstab");
-  skillo(SKILL_BASH, "bash");
-  skillo(SKILL_HIDE, "hide");
-  skillo(SKILL_KICK, "kick");
-  skillo(SKILL_PICK_LOCK, "pick lock");
-  skillo(SKILL_RESCUE, "rescue");
-  skillo(SKILL_SNEAK, "sneak");
-  skillo(SKILL_STEAL, "steal");
-  skillo(SKILL_TRACK, "track");
-  skillo(SKILL_WHIRLWIND, "whirlwind");
-  skillo(SKILL_BANDAGE, "bandage");
+  skillo_cost(SKILL_BACKSTAB, "backstab", 20);
+  skillo_cost(SKILL_BASH, "bash", 15);
+  skillo_cost(SKILL_HIDE, "hide", 5);
+  skillo_cost(SKILL_KICK, "kick", 10);
+  skillo_cost(SKILL_PICK_LOCK, "pick lock", 5);
+  skillo_cost(SKILL_RESCUE, "rescue", 10);
+  skillo_cost(SKILL_SNEAK, "sneak", 5);
+  skillo_cost(SKILL_STEAL, "steal", 5);
+  skillo_cost(SKILL_TRACK, "track", 5);
+  skillo_cost(SKILL_WHIRLWIND, "whirlwind", 20);
+  skillo_cost(SKILL_BANDAGE, "bandage", 8);
 }
 

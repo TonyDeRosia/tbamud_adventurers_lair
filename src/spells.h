@@ -290,3 +290,8 @@ extern char cast_arg2[];
 extern const char *unused_spellname;
 
 #endif /* _SPELLS_H_ */
+
+/* Ability type helpers */
+#define FIRST_SKILL   SKILL_BACKSTAB
+#define IS_SKILL(num) ((num) >= FIRST_SKILL)
+#define IS_SPELL(num) ((num) > 0 && (num) < FIRST_SKILL)
