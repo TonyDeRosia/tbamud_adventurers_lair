@@ -805,7 +805,7 @@ ACMD(do_gold)
 
 /* Put these helpers above ACMD(do_score) in the same .c file */
 
-static size_t visible_strlen_mud(const char *s)
+__attribute__((unused)) static size_t visible_strlen_mud(const char *s)
 {
   size_t vis = 0;
 
@@ -1151,8 +1151,6 @@ static const char *aff_apply_name(int loc)
 
   if (loc <= APPLY_NONE)
     return "none";
-  if (!apply_types)
-    return "unknown";
   if (loc < 0 || loc >= NUM_APPLIES)
     return "unknown";
   if (!apply_types[loc])
@@ -1211,7 +1209,7 @@ static void build_aff_summary(const struct affected_type *af, char *out, size_t 
     snprintf(eff, sizeof(eff), "%s %s by %d",
       (af->modifier >= 0 ? "increases" : "reduces"),
       aff_apply_name(af->location),
-      ABS(af->modifier));
+      abs(af->modifier));
   }
 
   /* sprintbitarray wants int[], but bitvector is treated like an array */
