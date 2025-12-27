@@ -244,6 +244,7 @@ ACMD(do_hide);
 ACMD(do_not_here);
 ACMD(do_skills);
 ACMD(do_spellbook);
+ACMD(do_spells);
 ACMD(do_practice);
 ACMD(do_report);
 ACMD(do_save);

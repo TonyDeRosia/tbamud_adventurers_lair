@@ -280,12 +280,11 @@ ACMD(do_spellbook)
   if (IS_NPC(ch))
     return;
 
-  send_to_char(ch, "\r\nSKILLS:\r\n");
   list_skills(ch);
-
-  send_to_char(ch, "\r\nSPELLS:\r\n");
+  send_to_char(ch, "\r\n");
   list_spells(ch);
 }
+
 
 
 ACMD(do_practice)
@@ -935,4 +934,12 @@ ACMD(do_happyhour)
                      CCYEL(ch, C_NRM), CCNRM(ch, C_NRM),
                      (3600 / SECS_PER_MUD_HOUR) );
   }
+}
+
+ACMD(do_spells)
+{
+  if (IS_NPC(ch))
+    return;
+
+  list_spells(ch);
 }
