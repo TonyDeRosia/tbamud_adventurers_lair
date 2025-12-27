@@ -267,6 +267,22 @@ ACMD(do_steal)
     hit(vict, ch, TYPE_UNDEFINED);
 }
 
+ACMD(do_skills)
+{
+  if (IS_NPC(ch))
+    return;
+
+  list_skills(ch);
+}
+
+ACMD(do_spellbook)
+{
+  if (IS_NPC(ch))
+    return;
+
+  list_spells(ch);
+}
+
 ACMD(do_practice)
 {
   char arg[MAX_INPUT_LENGTH];
@@ -279,7 +295,7 @@ ACMD(do_practice)
   if (*arg)
     send_to_char(ch, "You can only practice skills in your guild.\r\n");
   else
-    list_skills(ch);
+    list_known_abilities(ch);
 }
 
 ACMD(do_visible)

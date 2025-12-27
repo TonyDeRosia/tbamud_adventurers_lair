@@ -16,6 +16,7 @@
 #include "structs.h"
 #include "utils.h"
 #include "comm.h"
+#include "screen.h"
 #include "interpreter.h"
 #include "handler.h"
 #include "db.h"
@@ -30,8 +31,9 @@
 
 /* locally defined functions of local (file) scope */
 static int compare_spells(const void *x, const void *y);
-static const char *how_good(int percent);
 static void npc_steal(struct char_data *ch, struct char_data *victim);
+static void show_known_abilities(struct char_data *ch, bool include_spells, bool include_skills);
+static size_t append_ability_section(struct char_data *ch, bool spells, char *buf, size_t buf_size);
 
 /* Special procedures for mobiles. */
 static int spell_sort_info[MAX_SKILLS + 1];
@@ -57,69 +59,124 @@ void sort_spells(void)
   qsort(&spell_sort_info[1], MAX_SKILLS, sizeof(int), compare_spells);
 }
 
-static const char *how_good(int percent)
-{
-  if (percent < 0)
-    return " (error)";
-  if (percent == 0)
-    return " (not learned)";
-  if (percent <= 10)
-    return " (awful)";
-  if (percent <= 20)
-    return " (bad)";
-  if (percent <= 40)
-    return " (poor)";
-  if (percent <= 55)
-    return " (average)";
-  if (percent <= 70)
-    return " (fair)";
-  if (percent <= 80)
-    return " (good)";
-  if (percent <= 85)
-    return " (very good)";
-
-  return " (superb)";
-}
-
 static const char *prac_types[] = {
   "spell",
   "skill"
 };
 
-#define LEARNED_LEVEL	0	/* % known which is considered "learned" */
-#define MAX_PER_PRAC	1	/* max percent gain in skill per practice */
-#define MIN_PER_PRAC	2	/* min percent gain in skill per practice */
-#define PRAC_TYPE	3	/* should it say 'spell' or 'skill'?	 */
+#define ABILITY_COL_WIDTH 20
+#define ABILITIES_PER_LINE 2
+#define LEVEL_LABEL_PADDING 14
+
+#define LEARNED_LEVEL   0       /* % known which is considered "learned" */
+#define MAX_PER_PRAC    1       /* max percent gain in skill per practice */
+#define MIN_PER_PRAC    2       /* min percent gain in skill per practice */
+#define PRAC_TYPE       3       /* should it say 'spell' or 'skill'?     */
 
 #define LEARNED(ch) (prac_params[LEARNED_LEVEL][(int)GET_CLASS(ch)])
 #define MINGAIN(ch) (prac_params[MIN_PER_PRAC][(int)GET_CLASS(ch)])
 #define MAXGAIN(ch) (prac_params[MAX_PER_PRAC][(int)GET_CLASS(ch)])
 #define SPLSKL(ch) (prac_types[prac_params[PRAC_TYPE][(int)GET_CLASS(ch)]])
 
-void list_skills(struct char_data *ch)
+static bool ability_is_spell(int ability)
+{
+  return ability > SPELL_RESERVED_DBC && ability <= MAX_SPELLS;
+}
+
+static bool ability_is_skill(int ability)
+{
+  return ability > MAX_SPELLS && ability <= MAX_SKILLS;
+}
+
+static size_t append_ability_section(struct char_data *ch, bool spells, char *buf, size_t buf_size)
+{
+  const char *title = spells ? "SPELLS" : "SKILLS";
+  int sortpos, ability, required_level, level, column = 0, total = 0;
+  size_t len = 0;
+
+  len += snprintf(buf + len, buf_size - len, "%s:\r\n", title);
+
+  for (level = 1; level <= GET_LEVEL(ch); level++) {
+    bool level_started = FALSE;
+
+    for (sortpos = 1; sortpos <= MAX_SKILLS; sortpos++) {
+      ability = spell_sort_info[sortpos];
+
+      if (!spell_info[ability].name)
+        continue;
+
+      if (spells ? !ability_is_spell(ability) : !ability_is_skill(ability))
+        continue;
+
+      required_level = spell_info[ability].min_level[(int) GET_CLASS(ch)];
+
+      if (required_level != level)
+        continue;
+
+      if (!level_started) {
+        len += snprintf(buf + len, buf_size - len, "%sLevel %-2d%s:%s ",
+                        CCCYN(ch, C_NRM), level, CCWHT(ch, C_NRM), CCNRM(ch, C_NRM));
+        level_started = TRUE;
+        column = 0;
+      } else if (column % ABILITIES_PER_LINE == 0) {
+        len += snprintf(buf + len, buf_size - len, "\r\n%*s", LEVEL_LABEL_PADDING, "");
+      } else {
+        len += snprintf(buf + len, buf_size - len, "  ");
+      }
+
+      len += snprintf(buf + len, buf_size - len, "%-*s", ABILITY_COL_WIDTH, spell_info[ability].name);
+      column++;
+      total++;
+    }
+
+    if (level_started)
+      len += snprintf(buf + len, buf_size - len, "\r\n");
+  }
+
+  if (!total)
+    len += snprintf(buf + len, buf_size - len, "  You have not learned any %s yet.\r\n",
+                    spells ? "spells" : "skills");
+  else
+    len += snprintf(buf + len, buf_size - len, "\r\n");
+
+  return len;
+}
+
+static void show_known_abilities(struct char_data *ch, bool include_spells, bool include_skills)
 {
   const char *overflow = "\r\n**OVERFLOW**\r\n";
-  int i, sortpos, ret;
   size_t len = 0;
   char buf2[MAX_STRING_LENGTH];
 
-  len = snprintf(buf2, sizeof(buf2), "You have %d practice session%s remaining.\r\n"
-	"You know of the following %ss:\r\n", GET_PRACTICES(ch),
-	GET_PRACTICES(ch) == 1 ? "" : "s", SPLSKL(ch));
+  len += snprintf(buf2 + len, sizeof(buf2) - len,
+                  "You have %d practice session%s remaining.\r\n",
+                  GET_PRACTICES(ch), GET_PRACTICES(ch) == 1 ? "" : "s");
 
-  for (sortpos = 1; sortpos <= MAX_SKILLS; sortpos++) {
-    i = spell_sort_info[sortpos];
-    if (GET_LEVEL(ch) >= spell_info[i].min_level[(int) GET_CLASS(ch)]) {
-    ret = snprintf(buf2 + len, sizeof(buf2) - len, "%-20s %s\r\n", spell_info[i].name, how_good(GET_SKILL(ch, i)));
-      if (ret < 0 || len + ret >= sizeof(buf2))
-        break;
-      len += ret;
-    }
-  }
+  if (include_skills)
+    len += append_ability_section(ch, FALSE, buf2 + len, sizeof(buf2) - len);
+
+  if (include_spells)
+    len += append_ability_section(ch, TRUE, buf2 + len, sizeof(buf2) - len);
+
   if (len >= sizeof(buf2))
     strcpy(buf2 + sizeof(buf2) - strlen(overflow) - 1, overflow); /* strcpy: OK */
 
   page_string(ch->desc, buf2, TRUE);
+}
+
+void list_skills(struct char_data *ch)
+{
+  show_known_abilities(ch, FALSE, TRUE);
+}
+
+void list_spells(struct char_data *ch)
+{
+  show_known_abilities(ch, TRUE, FALSE);
+}
+
+void list_known_abilities(struct char_data *ch)
+{
+  show_known_abilities(ch, TRUE, TRUE);
 }
 
 SPECIAL(guild)
@@ -132,7 +189,7 @@ SPECIAL(guild)
   skip_spaces(&argument);
 
   if (!*argument) {
-    list_skills(ch);
+    list_known_abilities(ch);
     return (TRUE);
   }
   if (GET_PRACTICES(ch) <= 0) {
