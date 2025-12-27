@@ -149,9 +149,15 @@ static bool is_available_spell(int spellnum) {
 
 static void append_match(char *buffer, size_t buf_size, const char *name,
     int *count) {
-  if (*count > 0)
-    strlcat(buffer, ", ", buf_size);
-  strlcat(buffer, name, buf_size);
+  size_t offset = strlen(buffer);
+
+  if (*count > 0 && offset + 1 < buf_size) {
+    strlcpy(buffer + offset, ", ", buf_size - offset);
+    offset = strlen(buffer);
+  }
+
+  if (offset < buf_size)
+    strlcpy(buffer + offset, name, buf_size - offset);
   (*count)++;
 }
 
