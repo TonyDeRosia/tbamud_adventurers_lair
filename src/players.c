@@ -24,6 +24,13 @@
 #include "dg_scripts.h" /* To enable saving of player variables to disk */
 #include "quest.h"
 
+#include "race.h"
+
+/* Backward compatibility: old pfiles may have race=0 (Undefined). */
+#define DEFAULT_RACE_ON_LOAD(ch) do { \
+  if (GET_RACE(ch) <= RACE_UNDEFINED) GET_RACE(ch) = RACE_HUMAN; \
+} while (0)
+
 #define LOAD_HIT	0
 #define LOAD_MANA	1
 #define LOAD_MOVE	2
@@ -241,6 +248,7 @@ int load_char(const char *name, struct char_data *ch)
     return (-1);
   else {
     if (!get_filename(filename, sizeof(filename), PLR_FILE, player_table[id].name))
+      
       return (-1);
     if (!(fl = fopen(filename, "r"))) {
       mudlog(NRM, LVL_GOD, TRUE, "SYSERR: Couldn't open player file %s", filename);
@@ -491,6 +499,7 @@ int load_char(const char *name, struct char_data *ch)
     GET_COND(ch, DRUNK) = -1;
   }
   fclose(fl);
+  DEFAULT_RACE_ON_LOAD(ch);
   return(id);
 }
 
@@ -526,7 +535,7 @@ void save_char(struct char_data * ch)
     }
   }
 
-  if (!get_filename(filename, sizeof(filename), PLR_FILE, GET_NAME(ch)))
+  if (!get_filename(filename, sizeof(filename), PLR_FILE, player_table[id].name))
     return;
   if (!(fl = fopen(filename, "w"))) {
     mudlog(NRM, LVL_GOD, TRUE, "SYSERR: Couldn't open player file %s for write", filename);
