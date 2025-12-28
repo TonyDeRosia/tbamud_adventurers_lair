@@ -938,7 +938,12 @@ ACMD(do_score)
 
   /* Separator */
   len += snprintf(buf + len, sizeof(buf) - len,
-    "%s╠═══════════════════════════════════════════════════════════════════════════════╣%s\r\n", B, R);
+    len += snprintf(buf + len, sizeof(buf) - len,
+
+  /* Separator */
+  len += snprintf(buf + len, sizeof(buf) - len,
+    "%s╠═══════════════════════════════════════════════════════════════════════════════╣%s
+", B, R);
 
   /* Name and Title */
   snprintf(line, sizeof(line), "%sName:%s %-20s  %sTitle:%s %s",
@@ -966,7 +971,12 @@ ACMD(do_score)
   len += snprintf(buf + len, sizeof(buf) - len,
 /* Separator */
 len += snprintf(buf + len, sizeof(buf) - len,
-  "%s╠═══════════════════════════════════════════════════════════════════════════════╣%s\r\n", B, R);
+  len += snprintf(buf + len, sizeof(buf) - len,
+
+  /* Separator */
+  len += snprintf(buf + len, sizeof(buf) - len,
+    "%s╠═══════════════════════════════════════════════════════════════════════════════╣%s
+", B, R);
 
   /* HP, Mana, Move, Exp (no extra gap before Exp) */
   snprintf(line, sizeof(line),
@@ -992,8 +1002,12 @@ len += snprintf(buf + len, sizeof(buf) - len,
     IS_CARRYING_W(ch), CAN_CARRY_W(ch), encumbrance_text(ch));
   len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
 
-  "%s╠═══════════════════════════════════════════════════════════════════════════════╣%s\r\n", B, R);
+  len += snprintf(buf + len, sizeof(buf) - len,
 
+  /* Separator */
+  len += snprintf(buf + len, sizeof(buf) - len,
+    "%s╠═══════════════════════════════════════════════════════════════════════════════╣%s
+", B, R);
 
   /* Armor and Alignment */
   snprintf(line, sizeof(line), "%sArmor:%s %d/10                %sAlignment:%s %d",
@@ -1146,8 +1160,12 @@ snprintf(line, sizeof(line),
   }
   /* Separator */
   len += snprintf(buf + len, sizeof(buf) - len,
-    "%s╠═══════════════════════════════════════════════════════════════════════════════╣%s\r\n", B, R);
+    len += snprintf(buf + len, sizeof(buf) - len,
 
+  /* Separator */
+  len += snprintf(buf + len, sizeof(buf) - len,
+    "%s╠═══════════════════════════════════════════════════════════════════════════════╣%s
+", B, R);
 
 /* Currencies */
 snprintf(line, sizeof(line), "%sCurrencies%s", Y, R);
@@ -1166,7 +1184,12 @@ snprintf(line, sizeof(line), "%sCurrencies%s", Y, R);
 
   /* Separator */
   len += snprintf(buf + len, sizeof(buf) - len,
-    "%s╠═══════════════════════════════════════════════════════════════════════════════╣%s\r\n", B, R);
+    len += snprintf(buf + len, sizeof(buf) - len,
+
+  /* Separator */
+  len += snprintf(buf + len, sizeof(buf) - len,
+    "%s╠═══════════════════════════════════════════════════════════════════════════════╣%s
+", B, R);
 
   /* Quest Information */
   snprintf(line, sizeof(line),
@@ -1191,7 +1214,12 @@ snprintf(line, sizeof(line), "%sCurrencies%s", Y, R);
 
   /* Separator */
   len += snprintf(buf + len, sizeof(buf) - len,
-    "%s╠═══════════════════════════════════════════════════════════════════════════════╣%s\r\n", B, R);
+    len += snprintf(buf + len, sizeof(buf) - len,
+
+  /* Separator */
+  len += snprintf(buf + len, sizeof(buf) - len,
+    "%s╠═══════════════════════════════════════════════════════════════════════════════╣%s
+", B, R);
 
   /* Play Time */
   playing_time = *real_time_passed((time(0) - ch->player.time.logon) + ch->player.time.played, 0);
@@ -1295,7 +1323,12 @@ snprintf(line, sizeof(line), "%sCurrencies%s", Y, R);
   /* Immortal Information */
   if (GET_LEVEL(ch) >= LVL_IMMORT) {
     len += snprintf(buf + len, sizeof(buf) - len,
-      "%s╠═══════════════════════════════════════════════════════════════════════════════╣%s\r\n", B, R);
+      len += snprintf(buf + len, sizeof(buf) - len,
+
+  /* Separator */
+  len += snprintf(buf + len, sizeof(buf) - len,
+    "%s╠═══════════════════════════════════════════════════════════════════════════════╣%s
+", B, R);
 
     if (POOFIN(ch))
       snprintf(line, sizeof(line), "%sPOOFIN:%s %s %s",
