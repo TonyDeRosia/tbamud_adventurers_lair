@@ -1027,8 +1027,6 @@ len = append_box_line(buf, len, sizeof(buf), B, R, "", W);
   snprintf(line, sizeof(line), "Carry Capacity: %d / %d  (%s)", cur, cap, encumbrance_text(ch));
   len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
 }
-/* Blank spacer line */
-len = append_box_line(buf, len, sizeof(buf), B, R, "", W);
 
 /* Separator */
   len += snprintf(buf + len, sizeof(buf) - len,
