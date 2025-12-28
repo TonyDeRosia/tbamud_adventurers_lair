@@ -964,9 +964,11 @@ ACMD(do_score)
 
   /* Separator */
   len += snprintf(buf + len, sizeof(buf) - len,
-"%s╠═══════════════════════════════════════════════════════════════════════════════╣%s\r\n", B, R);
+/* Separator */
+len += snprintf(buf + len, sizeof(buf) - len,
+  "%s╠═══════════════════════════════════════════════════════════════════════════════╣%s\r\n", B, R);
 
-  /* HP, Mana, Move */
+  /* HP, Mana, Move, Exp (no extra gap before Exp) */
   snprintf(line, sizeof(line),
     "%sHP:%s %s%d%s/%s%d%s  %sMana:%s %s%d%s/%s%d%s  %sMove:%s %s%d%s/%s%d%s  %sExp:%s %d",
     C, R, G, GET_HIT(ch), R, W_CLR, GET_MAX_HIT(ch), R,
@@ -974,9 +976,22 @@ ACMD(do_score)
     C, R, Y, GET_MOVE(ch), R, W_CLR, GET_MAX_MOVE(ch), R,
     C, R, GET_EXP(ch));
   len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
+  
+  /* Next level (no blank line between HP and Next level) */
+  snprintf(line, sizeof(line),
+    "Next level in: %d exp",
+    (GET_LEVEL(ch) >= LVL_IMMORT) ? 0 : (exp_needed(ch) - GET_EXP(ch)));
+  len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
+  
+  /* Single spacer line (exactly one) */
+  len = append_box_line(buf, len, sizeof(buf), B, R, "", W);
+  
+  /* Carry Capacity (no double spaces before (Light)) */
+  snprintf(line, sizeof(line),
+    "Carry Capacity: %d / %d (%s)",
+    IS_CARRYING_W(ch), CAN_CARRY_W(ch), encumbrance_text(ch));
+  len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
 
-  /* Separator */
-  len += snprintf(buf + len, sizeof(buf) - len,
   "%s╠═══════════════════════════════════════════════════════════════════════════════╣%s\r\n", B, R);
 
 
