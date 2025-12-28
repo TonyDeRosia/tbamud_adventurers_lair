@@ -342,7 +342,12 @@ int load_char(const char *name, struct char_data *ch)
 	if (!strcmp(tag, "Affs")) 	load_affects(fl, ch);
         else if (!strcmp(tag, "Alin"))	GET_ALIGNMENT(ch)	= atoi(line);
 	else if (!strcmp(tag, "Alis"))	read_aliases_ascii(fl, ch, atoi(line));
-	          else if (!strcmp(tag, "Acct"))  GET_ACCOUNT_ID(ch)       = atol(line);
+	          else if (!strcmp(tag, "Acct"))  GET_ACCOUNT_ID(ch) = atol(line);
+                if (ch->desc && ch->desc->acct_authed && ch->desc->acct_id > 0 &&
+                    GET_ACCOUNT_ID(ch) > 0 && GET_ACCOUNT_ID(ch) != ch->desc->acct_id) {
+                  /* Wrong account trying to load this character */
+                  GET_ACCOUNT_ID(ch) = -1;
+                }
           break;
 
       case 'B':
@@ -598,6 +603,8 @@ void save_char(struct char_data * ch)
   if (GET_LEVEL(ch)	   != PFDEF_LEVEL)	fprintf(fl, "Levl: %d\n", GET_LEVEL(ch));
 
   fprintf(fl, "Id  : %ld\n", GET_IDNUM(ch));
+    if (ch->desc && ch->desc->acct_authed && ch->desc->acct_id > 0)
+      GET_ACCOUNT_ID(ch) = ch->desc->acct_id;
     fprintf(fl, "Acct: %ld\n", GET_ACCOUNT_ID(ch));
   fprintf(fl, "Brth: %ld\n", (long)ch->player.time.birth);
   fprintf(fl, "Plyd: %d\n",  ch->player.time.played);
