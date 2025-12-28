@@ -28,9 +28,9 @@ void account_load(long account_id, struct account_data *acct)
   if (!(fp = fopen(fname, "r")))
     return;
 
-  fscanf(fp, "%d\n", &acct->num_chars);
+  if (fscanf(fp, "%d\n", &acct->num_chars) != 1) { fclose(fp); acct->num_chars = 0; return; }
   for (int i = 0; i < acct->num_chars && i < MAX_CHARS_PER_ACCOUNT; i++)
-    fscanf(fp, "%ld %s\n", &acct->chars[i].char_id, acct->chars[i].name);
+    if (fscanf(fp, "%ld %s\n", &acct->chars[i].char_id, acct->chars[i].name) != 2) { fclose(fp); acct->num_chars = 0; return; }
 
   fclose(fp);
 }
