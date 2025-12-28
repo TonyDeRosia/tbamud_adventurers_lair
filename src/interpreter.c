@@ -1220,8 +1220,7 @@ static bool perform_new_char_dupe_check(struct descriptor_data *d)
         d->original = NULL;
         write_to_output(d, "\r\nSorry, due to multiple connections, all your connections are being closed.\r\n");
         write_to_output(d, "\r\nPlease reconnect.\r\n");
-        STATE(d) = CON_CLOSE;
-
+        STATE(d) = CON_GET_NAME;
         mudlog(NRM, LVL_GOD, TRUE, "SYSERR: Multiple logins with 1st in-game and the 2nd in char creation.");
 
         found = TRUE;
@@ -1316,7 +1315,9 @@ EVENTFUNC(get_protocols)
   write_to_output(d, buf, 0);
     
   write_to_output(d, GREETINGS, 0); 
-  STATE(d) = CON_GET_NAME;
+  write_to_output(d, "\r\nAccount name (or NEW): ");
+  write_to_output(d, "\r\nAccount name (or NEW): ");
+  STATE(d) = CON_ACCT_NAME;
   return 0;
 }
 
@@ -1361,7 +1362,91 @@ void nanny(struct descriptor_data *d, char *arg)
   case CON_GET_PROTOCOL:
     write_to_output(d, "Collecting Protocol Information... Please Wait.\r\n"); 
     return;
-  case CON_GET_NAME:		/* wait for input of name */
+
+    case CON_ACCT_NAME:
+      d->acct_id = 0;
+      d->acct_authed = 0;
+      d->acct_name[0] = '\0';
+      d->acct_tmp_pass[0] = '\0';
+      write_to_output(d, "\r\nAccount name (or NEW): ");
+      STATE(d) = CON_ACCT_PASS;
+      return;
+
+    case CON_ACCT_PASS:
+      if (!d->acct_name[0]) {
+        if (!*arg) { STATE(d) = CON_ACCT_NAME; return; }
+        strlcpy(d->acct_name, arg, sizeof(d->acct_name));
+        if (!strcasecmp(d->acct_name, "new")) {
+          d->acct_name[0] = '\0';
+          write_to_output(d, "\r\nNew account name: ");
+          STATE(d) = CON_ACCT_CREATE_NAME;
+          return;
+        }
+        write_to_output(d, "\r\nAccount password: ");
+        echo_off(d);
+        return;
+      } else {
+        long aid = 0;
+        echo_on(d);
+        if (!account_authenticate(d->acct_name, arg, &aid)) {
+          d->acct_name[0] = '\0';
+          write_to_output(d, "\r\nInvalid account or password.\r\n");
+          STATE(d) = CON_GET_NAME;
+          return;
+        }
+        d->acct_id = aid;
+        d->acct_authed = 1;
+        STATE(d) = CON_GET_NAME;
+        write_to_output(d, "\r\nBy what name do you wish to be known?\r\n");
+        return;
+      }
+
+    case CON_ACCT_CREATE_NAME:
+      if (!*arg) { STATE(d) = CON_ACCT_NAME; return; }
+      strlcpy(d->acct_name, arg, sizeof(d->acct_name));
+      write_to_output(d, "\r\nNew account password: ");
+      echo_off(d);
+      STATE(d) = CON_ACCT_CREATE_PASS1;
+      return;
+
+    case CON_ACCT_CREATE_PASS1:
+      if (!*arg) { write_to_output(d, "\r\nNew account password: "); return; }
+      strlcpy(d->acct_tmp_pass, arg, sizeof(d->acct_tmp_pass));
+      write_to_output(d, "\r\nConfirm password: ");
+      STATE(d) = CON_ACCT_CREATE_PASS2;
+      return;
+
+    case CON_ACCT_CREATE_PASS2: {
+      long aid = 0;
+      echo_on(d);
+      if (strcmp(d->acct_tmp_pass, arg) != 0) {
+        d->acct_name[0] = '\0';
+        d->acct_tmp_pass[0] = '\0';
+        write_to_output(d, "\r\nPasswords do not match.\r\n");
+        STATE(d) = CON_ACCT_NAME;
+        return;
+      }
+      if (!account_create(d->acct_name, d->acct_tmp_pass, &aid)) {
+        d->acct_name[0] = '\0';
+        d->acct_tmp_pass[0] = '\0';
+        write_to_output(d, "\r\nCould not create account.\r\n");
+        STATE(d) = CON_ACCT_NAME;
+        return;
+      }
+      d->acct_tmp_pass[0] = '\0';
+      d->acct_id = aid;
+      d->acct_authed = 1;
+      STATE(d) = CON_GET_NAME;
+      write_to_output(d, "\r\nAccount created.\r\nBy what name do you wish to be known?\r\n");
+      return;
+    }
+case CON_GET_NAME:             /* wait for input of name */
+  /* Account-first enforcement */
+  if (!(d->acct_id > 0)) {
+    STATE(d) = CON_ACCT_NAME;
+    write_to_output(d, "\r\nAccount name (or NEW): ");
+    return;
+  }
     if (d->character == NULL) {
       CREATE(d->character, struct char_data, 1);
       clear_char(d->character);
@@ -1384,11 +1469,19 @@ void nanny(struct descriptor_data *d, char *arg)
           return;
       }
       if ((player_i = load_char(tmp_name, d->character)) > -1) {
+        /* Account migration: bind legacy characters to authenticated account */
+        if (d->acct_authed && d->acct_id > 0 && GET_ACCOUNT_ID(d->character) <= 0) {
+          GET_ACCOUNT_ID(d->character) = d->acct_id;
+          account_attach_char(d->character);
+          save_char(d->character);
+        }
         GET_PFILEPOS(d->character) = player_i;
 
       account_init_for_char(d->character);
-      account_add_char(GET_ACCOUNT_ID(d->character), GET_IDNUM(d->character), GET_NAME(d->character));
-        if (PLR_FLAGGED(d->character, PLR_DELETED)) {
+        if (d->acct_authed && d->acct_id > 0)
+          GET_ACCOUNT_ID(d->character) = d->acct_id;
+      account_attach_char(d->character);
+if (PLR_FLAGGED(d->character, PLR_DELETED)) {
           /* Make sure old files are removed so the new player doesn't get the
            * deleted player's equipment. */
           if ((player_i = get_ptable_by_name(tmp_name)) >= 0)

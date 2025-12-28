@@ -299,6 +299,14 @@
 #define CON_PLAYING       0 /**< Playing - Nominal state 		*/
 #define CON_CLOSE         1 /**< User disconnect, remove character.	*/
 #define CON_GET_NAME      2 /**< Login with name */
+
+/* Account login flow states */
+#define CON_ACCT_NAME        34
+#define CON_ACCT_PASS        35
+#define CON_ACCT_CREATE_NAME 36
+#define CON_ACCT_CREATE_PASS1 37
+#define CON_ACCT_CREATE_PASS2 38
+#define CON_ACCT_CHARSEL   39 /**< Account character select */
 #define CON_NAME_CNFRM    3 /**< New character, confirm name */
 #define CON_PASSWORD      4 /**< Login with password */
 #define CON_NEWPASSWD     5 /**< New character, create password */
@@ -1078,6 +1086,13 @@ struct txt_q
  * is the soul. */
 struct descriptor_data
 {
+
+  long acct_id;
+  int acct_claim; /* 1 if selecting an existing legacy character to bind */
+  char acct_name[64];
+  int acct_authed;
+  char acct_tmp_pass[128];
+
   socket_t descriptor;      /**< file descriptor for socket */
   char host[HOST_LENGTH+1]; /**< hostname */
   byte bad_pws;             /**< number of bad pw attemps this login */
