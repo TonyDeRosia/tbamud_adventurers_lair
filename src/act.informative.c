@@ -967,10 +967,12 @@ ACMD(do_score)
     "%s╠═══════════════════════════════════════════════════════════════════════════════╣%s\r\n", B, R);
 
   /* HP, Mana, Move */
-  snprintf(line, sizeof(line), "%sHP:%s %s%d%s/%s%d%s  %sMana:%s %s%d%s/%s%d%s  %sMove:%s %s%d%s/%s%d%s",
+  snprintf(line, sizeof(line),
+    "%sHP:%s %s%d%s/%s%d%s  %sMana:%s %s%d%s/%s%d%s  %sMove:%s %s%d%s/%s%d%s     %sExp:%s %d",
     C, R, G, GET_HIT(ch), R, W_CLR, GET_MAX_HIT(ch), R,
     C, R, M, GET_MANA(ch), R, W_CLR, GET_MAX_MANA(ch), R,
-    C, R, Y, GET_MOVE(ch), R, W_CLR, GET_MAX_MOVE(ch), R);
+    C, R, Y, GET_MOVE(ch), R, W_CLR, GET_MAX_MOVE(ch), R,
+    C, R, GET_EXP(ch));
   len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
 
   /* Separator */
@@ -1035,12 +1037,15 @@ ACMD(do_score)
     }
     len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
   }
-/* Gold, Exp, Quest Points */
-  snprintf(line, sizeof(line), "%sGold:%s %d                %sExp:%s %d                %sQuest Points:%s %d",
-    Y, R, GET_GOLD(ch), C, R, GET_EXP(ch), M, R, GET_QUESTPOINTS(ch));
+/* Currencies */
+  snprintf(line, sizeof(line), "%sCurrencies%s", Y, R);
   len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
 
-  /* Next Level (if mortal) */
+  snprintf(line, sizeof(line), "%sGold:%s %d",
+    C, R, GET_GOLD(ch));
+  len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
+
+/* Next Level (if mortal) */
   if (GET_LEVEL(ch) < LVL_IMMORT) {
     snprintf(line, sizeof(line), "%sNext level in:%s %d exp",
       C, R, level_exp(GET_CLASS(ch), GET_LEVEL(ch) + 1) - GET_EXP(ch));
@@ -1052,8 +1057,9 @@ ACMD(do_score)
     "%s╠═══════════════════════════════════════════════════════════════════════════════╣%s\r\n", B, R);
 
   /* Quest Information */
-  snprintf(line, sizeof(line), "%sQuests completed:%s %d",
-    C, R, GET_NUM_QUESTS(ch));
+  snprintf(line, sizeof(line),
+    "%sQuests completed:%s %d                                   %sQuest Points:%s %d",
+    C, R, GET_NUM_QUESTS(ch), M, R, GET_QUESTPOINTS(ch));
   len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
 
   if (GET_QUEST(ch) != NOTHING) {
