@@ -1045,6 +1045,7 @@ len = append_box_line(buf, len, sizeof(buf), B, R, "", W);
     C, R, GET_ALIGNMENT(ch));
 }
 len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
+len = append_box_line(buf, len, sizeof(buf), B, R, "", W);
 
 
   
@@ -1140,6 +1141,7 @@ len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
           b_wis, r_wis,
           b_cha, r_cha);
       len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
+      len = append_box_line(buf, len, sizeof(buf), B, R, "", W);
 
 
       }
