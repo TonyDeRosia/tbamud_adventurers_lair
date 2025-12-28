@@ -179,3 +179,104 @@ void apply_racial_bonuses(struct char_data *ch)
   clamp_abils(ch);
   affect_total(ch);
 }
+
+
+/*
+  Return the racial ability bonus for a given race.
+  abil: 0 Str, 1 Dex, 2 Con, 3 Int, 4 Wis, 5 Cha
+*/
+int race_abil_bonus(int race, int abil)
+{
+  if (abil < 0 || abil > 5)
+    return 0;
+
+  switch (race) {
+    case RACE_HUMAN:
+      return 0;
+
+    case RACE_ELF:
+      switch (abil) {
+        case 2: return -1; /* Con */
+        case 3: return +1; /* Int */
+        case 4: return +1; /* Wis */
+        default: return 0;
+      }
+
+    case RACE_DWARF:
+      switch (abil) {
+        case 1: return -1; /* Dex */
+        case 2: return +1; /* Con */
+        case 5: return -1; /* Cha */
+        default: return 0;
+      }
+
+    case RACE_ORC:
+      switch (abil) {
+        case 0: return +1; /* Str */
+        case 1: return +1; /* Dex */
+        case 3: return -1; /* Int */
+        case 4: return -1; /* Wis */
+        default: return 0;
+      }
+
+    case RACE_HALFLING:
+      switch (abil) {
+        case 0: return -1; /* Str */
+        case 1: return +1; /* Dex */
+        case 5: return +1; /* Cha */
+        default: return 0;
+      }
+
+    case RACE_TROLL:
+      switch (abil) {
+        case 0: return +1; /* Str */
+        case 2: return +1; /* Con */
+        case 3: return -1; /* Int */
+        case 4: return -1; /* Wis */
+        default: return 0;
+      }
+
+    case RACE_GOBLIN:
+      switch (abil) {
+        case 1: return +1; /* Dex */
+        case 3: return +1; /* Int */
+        case 5: return -2; /* Cha */
+        default: return 0;
+      }
+
+    case RACE_WEREWOLF:
+      switch (abil) {
+        case 0: return +2; /* Str */
+        case 3: return -1; /* Int */
+        case 5: return -1; /* Cha */
+        default: return 0;
+      }
+
+    case RACE_SATYR:
+      switch (abil) {
+        case 1: return +1; /* Dex */
+        case 4: return -2; /* Wis */
+        case 5: return +1; /* Cha */
+        default: return 0;
+      }
+
+    case RACE_MINOTAUR:
+      switch (abil) {
+        case 0: return +2; /* Str */
+        case 1: return -1; /* Dex */
+        case 3: return -1; /* Int */
+        default: return 0;
+      }
+
+    case RACE_VAMPIRE:
+      switch (abil) {
+        case 2: return -1; /* Con */
+        case 3: return +1; /* Int */
+        case 5: return +1; /* Cha */
+        default: return 0;
+      }
+
+    default:
+      return 0;
+  }
+}
