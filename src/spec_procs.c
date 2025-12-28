@@ -64,7 +64,7 @@ static const char *prac_types[] = {
   "skill"
 };
 
-#define ABILITY_COL_WIDTH 20
+#define ABILITY_COL_WIDTH 27
 #define ABILITIES_PER_LINE 2
 #define LEVEL_LABEL_PADDING 14
 
@@ -124,7 +124,17 @@ static size_t append_ability_section(struct char_data *ch, bool spells, char *bu
         len += snprintf(buf + len, buf_size - len, "  ");
       }
 
-      len += snprintf(buf + len, buf_size - len, "%-*s", ABILITY_COL_WIDTH, spell_info[ability].name);
+      /* PCT_PATCH_SKILL_SPELL_LIST */
+      {
+        int abil_pct = GET_SKILL(ch, ability);
+        char abil_with_pct[256];
+
+        if (abil_pct < 0) abil_pct = 0;
+        if (abil_pct > 100) abil_pct = 100;
+
+        snprintf(abil_with_pct, sizeof(abil_with_pct), "%s [%d%%]", spell_info[ability].name, abil_pct);
+        len += snprintf(buf + len, buf_size - len, "%-*s", ABILITY_COL_WIDTH, abil_with_pct);
+      }
       column++;
       total++;
     }
