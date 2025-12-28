@@ -1043,8 +1043,6 @@ ACMD(do_score)
 
 
 /* Currencies */
-    len = append_box_line(buf, len, sizeof(buf), B, R, "", W);
-
 snprintf(line, sizeof(line), "%sCurrencies%s", Y, R);
   len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
 
