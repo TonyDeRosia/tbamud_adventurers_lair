@@ -441,7 +441,8 @@ int load_char(const char *name, struct char_data *ch)
         break;
 
       case 'R':
-	     if (!strcmp(tag, "Room"))	GET_LOADROOM(ch)	= atoi(line);
+             if (!strcmp(tag, "Race"))  GET_RACE(ch) = atoi((line[0] ? (strchr(line,':') ? strchr(line,':')+1 : line) : line));
+        else	     if (!strcmp(tag, "Room"))	GET_LOADROOM(ch)	= atoi(line);
 	break;
 
       case 'S':
@@ -592,6 +593,7 @@ void save_char(struct char_data * ch)
   if (*GET_PROMPT(ch))				fprintf(fl, "Prmt: %s\n", GET_PROMPT(ch));
   if (GET_SEX(ch)	     != PFDEF_SEX)	fprintf(fl, "Sex : %d\n", GET_SEX(ch));
   if (GET_CLASS(ch)	   != PFDEF_CLASS)	fprintf(fl, "Clas: %d\n", GET_CLASS(ch));
+  fprintf(fl, "Race: %d\n", GET_RACE(ch));
   if (GET_LEVEL(ch)	   != PFDEF_LEVEL)	fprintf(fl, "Levl: %d\n", GET_LEVEL(ch));
 
   fprintf(fl, "Id  : %ld\n", GET_IDNUM(ch));

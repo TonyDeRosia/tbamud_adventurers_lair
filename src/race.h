@@ -23,4 +23,7 @@ extern const char *race_menu;
 int parse_race(const char *arg);
 void apply_racial_bonuses(struct char_data *ch);
 
+/* Racial bonuses helper (abil: 0 Str, 1 Dex, 2 Con, 3 Int, 4 Wis, 5 Cha) */
+int race_abil_bonus(int race, int abil);
+
 #endif /* _RACE_H_ */
