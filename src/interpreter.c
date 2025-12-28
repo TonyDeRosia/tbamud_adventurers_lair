@@ -1710,7 +1710,8 @@ break;
       /* Clear their load room if it's not persistant. */
       if (!PLR_FLAGGED(d->character, PLR_LOADROOM))
         GET_LOADROOM(d->character) = NOWHERE;
-      save_char(d->character);
+              account_attach_char(d->character);
+save_char(d->character);
 
       greet_mtrigger(d->character, -1);
       greet_memory_mtrigger(d->character);
