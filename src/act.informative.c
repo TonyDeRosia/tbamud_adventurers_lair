@@ -982,7 +982,60 @@ ACMD(do_score)
     C, R, compute_armor_class(ch), C, R, GET_ALIGNMENT(ch));
   len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
 
-  /* Gold, Exp, Quest Points */
+  
+  /* Combat Stats */
+  {
+    int raw_ac = compute_armor_class(ch);
+    int shown_ac = raw_ac / 10;
+
+    int base_thaco = thaco(GET_CLASS(ch), GET_LEVEL(ch));
+    int str_to_hit = str_app[STRENGTH_APPLY_INDEX(ch)].tohit;
+    int str_to_dam = str_app[STRENGTH_APPLY_INDEX(ch)].todam;
+    int dex_def    = dex_app[GET_DEX(ch)].defensive;
+
+    /* To Hit (vs AC 0): your hit target number versus Armor Class 0.
+       Lower is better. In combat, the target's Armor Class shifts this number. */
+    int to_hit_ac0 = base_thaco - str_to_hit - GET_HITROLL(ch);
+
+    snprintf(line, sizeof(line),
+      "%sBase Stats:%s  Str %d  Dex %d  Con %d  Int %d  Wis %d  Cha %d",
+      C, R,
+      GET_STR(ch), GET_DEX(ch), GET_CON(ch),
+      GET_INT(ch), GET_WIS(ch), GET_CHA(ch));
+    len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
+
+    snprintf(line, sizeof(line),
+      "%sOffense:%s  Hitroll %+d  Damroll %+d  To Hit (vs AC 0) %d (lower is better)",
+      C, R,
+      GET_HITROLL(ch), GET_DAMROLL(ch), to_hit_ac0);
+    len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
+
+    /* Dex AC bonus: defensive modifier from Dex that contributes to Armor Class. */
+    snprintf(line, sizeof(line),
+      "%sBonuses:%s  Str to-hit %+d  Str to-dam %+d  Dex AC bonus %+d  Armor Class %d",
+      C, R,
+      str_to_hit, str_to_dam, dex_def, shown_ac);
+    len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
+
+    /* Saves: these are your saving throw modifiers. Negative is better (helps saves). */
+    if (GET_EQ(ch, WEAR_WIELD) && GET_OBJ_TYPE(GET_EQ(ch, WEAR_WIELD)) == ITEM_WEAPON) {
+      struct obj_data *wobj = GET_EQ(ch, WEAR_WIELD);
+      int nd = GET_OBJ_VAL(wobj, 1);
+      int sd = GET_OBJ_VAL(wobj, 2);
+      snprintf(line, sizeof(line),
+        "%sSaving Throws:%s Paralyze %d  Rod %d  Spell %d   Weapon: %s (%dD%d)",
+        C, R,
+        GET_SAVE(ch, 0), GET_SAVE(ch, 1), GET_SAVE(ch, 4),
+        wobj->short_description, nd, sd);
+    } else {
+      snprintf(line, sizeof(line),
+        "%sSaving Throws:%s Paralyze %d  Rod %d  Spell %d",
+        C, R,
+        GET_SAVE(ch, 0), GET_SAVE(ch, 1), GET_SAVE(ch, 4));
+    }
+    len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
+  }
+/* Gold, Exp, Quest Points */
   snprintf(line, sizeof(line), "%sGold:%s %d                %sExp:%s %d                %sQuest Points:%s %d",
     Y, R, GET_GOLD(ch), C, R, GET_EXP(ch), M, R, GET_QUESTPOINTS(ch));
   len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
