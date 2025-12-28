@@ -1005,7 +1005,7 @@ len = append_box_line(buf, len, sizeof(buf), B, R, "", W);
     int next_level = GET_LEVEL(ch) + 1;
     next_need = level_exp(GET_CLASS(ch), next_level) - GET_EXP(ch);
   }
-  snprintf(line, sizeof(line), "Next level in: %d exp", next_need);
+  snprintf(line, sizeof(line), "%sNext level in:%s %d exp", C, R, next_need);
 }
 len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
 
@@ -1024,7 +1024,7 @@ len = append_box_line(buf, len, sizeof(buf), B, R, "", W);
     else if (pct < 75) enc = "Heavy";
     else enc = "Overloaded";
   }
-  snprintf(line, sizeof(line), "Carry Capacity: %d / %d  (%s)", cur, cap, encumbrance_text(ch));
+  snprintf(line, sizeof(line), "%sCarry Capacity:%s %d / %d  (%s)", C, R, cur, cap, encumbrance_text(ch));
   len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
 }
 
