@@ -964,11 +964,11 @@ ACMD(do_score)
 
   /* Separator */
   len += snprintf(buf + len, sizeof(buf) - len,
-    "%s╠═══════════════════════════════════════════════════════════════════════════════╣%s\r\n", B, R);
+"%s╠═══════════════════════════════════════════════════════════════════════════════╣%s\r\n", B, R);
 
   /* HP, Mana, Move */
   snprintf(line, sizeof(line),
-    "%sHP:%s %s%d%s/%s%d%s  %sMana:%s %s%d%s/%s%d%s  %sMove:%s %s%d%s/%s%d%s     %sExp:%s %d",
+    "%sHP:%s %s%d%s/%s%d%s  %sMana:%s %s%d%s/%s%d%s  %sMove:%s %s%d%s/%s%d%s  %sExp:%s %d",
     C, R, G, GET_HIT(ch), R, W_CLR, GET_MAX_HIT(ch), R,
     C, R, M, GET_MANA(ch), R, W_CLR, GET_MAX_MANA(ch), R,
     C, R, Y, GET_MOVE(ch), R, W_CLR, GET_MAX_MOVE(ch), R,
@@ -977,7 +977,8 @@ ACMD(do_score)
 
   /* Separator */
   len += snprintf(buf + len, sizeof(buf) - len,
-    "%s╠═══════════════════════════════════════════════════════════════════════════════╣%s\r\n", B, R);
+  "%s╠═══════════════════════════════════════════════════════════════════════════════╣%s\r\n", B, R);
+
 
   /* Armor and Alignment */
   snprintf(line, sizeof(line), "%sArmor:%s %d/10                %sAlignment:%s %d",
