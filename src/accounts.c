@@ -5,6 +5,7 @@
 #include "utils.h"
 #include "db.h"
 
+#include "comm.h"
 #define ACCT_INDEX_FILE (LIB_ACCTFILES "index.txt")
 
 static void get_account_filename(char *out, size_t len, long account_id)
@@ -244,3 +245,39 @@ void account_attach_char(struct char_data *ch)
 
   account_save_any(&acct);
 }
+
+
+/* Account character menu helper.
+ * This is intentionally conservative: it compiles first, then you can expand listing logic.
+ */
+void acct_show_character_menu(struct descriptor_data *d)
+{
+  struct account_data acct;
+  int i;
+
+  if (!d) return;
+
+  memset(&acct, 0, sizeof(acct));
+  if (d->acct_id > 0 && !account_load_any(d->acct_id, &acct)) {
+    /* If load fails, show empty but do not crash. */
+    memset(&acct, 0, sizeof(acct));
+    acct.account_id = d->acct_id;
+  }
+
+  write_to_output(d, "\r\nCharacters on this account:\r\n");
+  if (acct.num_chars <= 0) {
+    write_to_output(d, "  (none yet)\r\n");
+  } else {
+    for (i = 0; i < acct.num_chars && i < MAX_CHARS_PER_ACCOUNT; i++) {
+      if (!acct.chars[i].name[0]) continue;
+      write_to_output(d, "  %2d) %s\r\n", i + 1, acct.chars[i].name);
+    }
+  }
+
+  write_to_output(d, "\r\nOptions:\r\n");
+  write_to_output(d, "  NEW   Create a new character\r\n");
+  write_to_output(d, "  0     Disconnect\r\n");
+  write_to_output(d, "\r\nSelect: ");
+}
+
+
