@@ -47,6 +47,9 @@
 #define LIB_PLRVARS	"plrvars/"
 #define LIB_HOUSE	"house/"
 #define LIB_PLRFILES    "plrfiles/"
+
+#define LIB_ACCTFILES       "plrfiles/accounts/"
+#define SUF_ACCT            "acct"
 #define SLASH		"/"
 #else
 #error "Unknown path components."

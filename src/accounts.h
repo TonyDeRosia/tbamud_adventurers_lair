@@ -21,4 +21,7 @@ void account_load(long account_id, struct account_data *acct);
 void account_save(const struct account_data *acct);
 void account_attach_char(struct char_data *ch);
 
+
+void account_init_for_char(struct char_data *ch);
+void account_add_char(long account_id, long char_id, const char *name);
 #endif

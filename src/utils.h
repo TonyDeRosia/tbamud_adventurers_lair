@@ -166,6 +166,7 @@ void char_from_furniture(struct char_data *ch);
 #define ETEXT_FILE       1 /**< ???? */
 #define SCRIPT_VARS_FILE 2 /**< Reference to a global variable file. */
 #define PLR_FILE         3 /**< The standard player file */
+#define ACCOUNT_FILE    4 /**< Account file */
 
 #define MAX_FILES        4 /**< Max number of files types vailable */
 
@@ -543,6 +544,7 @@ do                                                              \
 #define GET_POS(ch)	  ((ch)->char_specials.position)
 /** Unique ID of ch. */
 #define GET_IDNUM(ch)	  ((ch)->char_specials.saved.idnum)
+#define GET_ACCOUNT_ID(ch) ((ch)->player_specials->saved.account_id)
 /** Returns contents of id field from x. */
 /** Warning: GET_ID is deprecated and you should use char_script_id, obj_script_id, room_script_id */
 /** #define GET_ID(x)         ((x)->id) */

@@ -72,3 +72,38 @@ void account_attach_char(struct char_data *ch)
 
   account_save(&acct);
 }
+
+
+void account_add_char(long account_id, long char_id, const char *name)
+{
+  struct account_data acct;
+  int i;
+
+  if (account_id <= 0 || char_id <= 0 || !name || !*name)
+    return;
+
+  memset(&acct, 0, sizeof(acct));
+  acct.account_id = account_id;
+
+  /* Load existing if present */
+  account_load(account_id, &acct);
+
+  /* Already present */
+  for (i = 0; i < acct.num_chars; i++) {
+    if (acct.chars[i].char_id == char_id) {
+      /* refresh name */
+      snprintf(acct.chars[i].name, sizeof(acct.chars[i].name), "%s", name);
+      account_save(&acct);
+      return;
+    }
+  }
+
+  /* Append if room */
+  if (acct.num_chars < (int)(sizeof(acct.chars)/sizeof(acct.chars[0]))) {
+    acct.chars[acct.num_chars].char_id = char_id;
+    snprintf(acct.chars[acct.num_chars].name, sizeof(acct.chars[acct.num_chars].name), "%s", name);
+    acct.num_chars++;
+    account_save(&acct);
+  }
+}
+
