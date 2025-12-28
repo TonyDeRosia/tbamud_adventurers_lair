@@ -307,6 +307,8 @@
 #define CON_ACCT_CREATE_PASS1 37
 #define CON_ACCT_CREATE_PASS2 38
 #define CON_ACCT_CHARSEL   39 /**< Account character select */
+#define CON_ACCT_MENU 40 /**< Account character select/create menu */
+
 #define CON_NAME_CNFRM    3 /**< New character, confirm name */
 #define CON_PASSWORD      4 /**< Login with password */
 #define CON_NEWPASSWD     5 /**< New character, create password */
@@ -1128,6 +1130,10 @@ struct descriptor_data
   protocol_t *pProtocol;    /**< Kavir plugin */
   
   struct list_data * events;
+
+  /* Account login UI latches */
+  int acct_prompted_name;
+  int acct_prompted_menu;
 };
 
 /* other miscellaneous structures */

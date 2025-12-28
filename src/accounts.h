@@ -26,4 +26,6 @@ void account_save_any(const struct account_data *acct);
 void account_init_for_char(struct char_data *ch);
 void account_attach_char(struct char_data *ch);
 
+void acct_show_character_menu(struct descriptor_data *d);
+
 #endif

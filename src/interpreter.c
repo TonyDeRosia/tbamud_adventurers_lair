@@ -1364,6 +1364,12 @@ void nanny(struct descriptor_data *d, char *arg)
     return;
 
     case CON_ACCT_NAME:
+      if (!*arg) {
+        if (d->acct_prompted_name) return;
+        d->acct_prompted_name = 1;
+        write_to_output(d, "Account name (or NEW): ");
+        return;
+      }
       d->acct_id = 0;
       d->acct_authed = 0;
       d->acct_name[0] = '\0';
@@ -1391,13 +1397,18 @@ void nanny(struct descriptor_data *d, char *arg)
         if (!account_authenticate(d->acct_name, arg, &aid)) {
           d->acct_name[0] = '\0';
           write_to_output(d, "\r\nInvalid account or password.\r\n");
-          STATE(d) = CON_GET_NAME;
+          STATE(d) = CON_ACCT_MENU;
+      acct_show_character_menu(d);
+      return;
           return;
         }
         d->acct_id = aid;
         d->acct_authed = 1;
-        STATE(d) = CON_GET_NAME;
-        write_to_output(d, "\r\nBy what name do you wish to be known?\r\n");
+        STATE(d) = CON_ACCT_MENU;
+      d->acct_prompted_menu = 0;
+      acct_show_character_menu(d);
+      return;
+write_to_output(d, "\r\nBy what name do you wish to be known?\r\n");
         return;
       }
 
@@ -1438,6 +1449,76 @@ void nanny(struct descriptor_data *d, char *arg)
       d->acct_authed = 1;
       STATE(d) = CON_GET_NAME;
       write_to_output(d, "\r\nAccount created.\r\nBy what name do you wish to be known?\r\n");
+      return;
+    }
+
+    case CON_ACCT_MENU: {
+      if (!*arg) {
+        if (!d->acct_prompted_menu) {
+          d->acct_prompted_menu = 1;
+          acct_show_character_menu(d);
+        }
+        return;
+      }
+      struct account_data acct;
+      int i, choice;
+
+      memset(&acct, 0, sizeof(acct));
+      if (d->acct_id > 0)
+        account_load_any(d->acct_id, &acct);
+
+      if (!*arg) {
+        acct_show_character_menu(d);
+        return;
+      }
+
+      while (*arg == ' ' || *arg == '	') arg++;
+      if (!*arg) {
+        acct_show_character_menu(d);
+        return;
+      }
+
+      if (!str_cmp(arg, "0") || !str_cmp(arg, "quit") || !str_cmp(arg, "exit")) {
+        STATE(d) = CON_CLOSE;
+        return;
+      }
+
+      if (!str_cmp(arg, "new")) {
+        write_to_output(d, "\r\nBy what name do you wish to be known?\r\n");
+        STATE(d) = CON_GET_NAME;
+        return;
+      }
+
+      if (isdigit((unsigned char)*arg)) {
+        choice = atoi(arg);
+        if (choice < 1 || choice > acct.num_chars) {
+          write_to_output(d, "\r\nInvalid selection.\r\n");
+          acct_show_character_menu(d);
+          return;
+        }
+
+        if (!acct.chars[choice - 1].name[0]) {
+          write_to_output(d, "\r\nInvalid selection.\r\n");
+          acct_show_character_menu(d);
+          return;
+        }
+
+        STATE(d) = CON_GET_NAME;
+        nanny(d, acct.chars[choice - 1].name);
+        return;
+      }
+
+      for (i = 0; i < acct.num_chars && i < MAX_CHARS_PER_ACCOUNT; i++) {
+        if (!acct.chars[i].name[0]) continue;
+        if (!str_cmp(arg, acct.chars[i].name)) {
+          STATE(d) = CON_GET_NAME;
+          nanny(d, acct.chars[i].name);
+          return;
+        }
+      }
+
+      write_to_output(d, "\r\nThat character is not on this account.\r\n");
+      acct_show_character_menu(d);
       return;
     }
 case CON_GET_NAME:             /* wait for input of name */
