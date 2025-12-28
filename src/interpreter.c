@@ -14,6 +14,7 @@
 #include "utils.h"
 #include "comm.h"
 #include "interpreter.h"
+#include "accounts.h"
 #include "race.h"
 #include "db.h"
 #include "spells.h"
@@ -1385,6 +1386,8 @@ void nanny(struct descriptor_data *d, char *arg)
       if ((player_i = load_char(tmp_name, d->character)) > -1) {
         GET_PFILEPOS(d->character) = player_i;
 
+      account_init_for_char(d->character);
+      account_add_char(GET_ACCOUNT_ID(d->character), GET_IDNUM(d->character), GET_NAME(d->character));
         if (PLR_FLAGGED(d->character, PLR_DELETED)) {
           /* Make sure old files are removed so the new player doesn't get the
            * deleted player's equipment. */

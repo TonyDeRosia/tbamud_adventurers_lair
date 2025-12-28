@@ -965,6 +965,8 @@ struct player_special_data_saved
   int    quest_counter;         /**< Count of targets left to get  */
   time_t   lastmotd;            /**< Last time player read motd */
   time_t   lastnews;            /**< Last time player read news */
+  long account_id; /* account linkage id */
+
 };
 
 /** Specials needed only by PCs, not NPCs.  Space for this structure is

@@ -342,7 +342,8 @@ int load_char(const char *name, struct char_data *ch)
 	if (!strcmp(tag, "Affs")) 	load_affects(fl, ch);
         else if (!strcmp(tag, "Alin"))	GET_ALIGNMENT(ch)	= atoi(line);
 	else if (!strcmp(tag, "Alis"))	read_aliases_ascii(fl, ch, atoi(line));
-	break;
+	          else if (!strcmp(tag, "Acct"))  GET_ACCOUNT_ID(ch)       = atol(line);
+          break;
 
       case 'B':
 	     if (!strcmp(tag, "Badp"))	GET_BAD_PWS(ch)		= atoi(line);
@@ -597,6 +598,7 @@ void save_char(struct char_data * ch)
   if (GET_LEVEL(ch)	   != PFDEF_LEVEL)	fprintf(fl, "Levl: %d\n", GET_LEVEL(ch));
 
   fprintf(fl, "Id  : %ld\n", GET_IDNUM(ch));
+    fprintf(fl, "Acct: %ld\n", GET_ACCOUNT_ID(ch));
   fprintf(fl, "Brth: %ld\n", (long)ch->player.time.birth);
   fprintf(fl, "Plyd: %d\n",  ch->player.time.played);
   fprintf(fl, "Last: %ld\n", (long)ch->player.time.logon);
