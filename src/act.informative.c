@@ -1033,16 +1033,23 @@ len = append_box_line(buf, len, sizeof(buf), B, R, "", W);
     "%s╠═══════════════════════════════════════════════════════════════════════════════╣%s\r\n", B, R);
 
   /* Armor and Alignment */
-  snprintf(line, sizeof(line), "%sArmor:%s %d/10                %sAlignment:%s %d",
-    C, R, compute_armor_class(ch), C, R, GET_ALIGNMENT(ch));
-  len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
+  {
+  int raw_ac   = compute_armor_class(ch);   /* internal, scaled by 10 */
+  int shown_ac = raw_ac / 10;               /* player facing */
+  int base_ac  = GET_AC(ch) / 10;           /* without dex */
+  int dex_ac   = dex_app[GET_DEX(ch)].defensive;
+
+  snprintf(line, sizeof(line),
+    "%sArmor Class:%s %d  (Base %d  Dex %+d  Raw %d)        %sAlignment:%s %d",
+    C, R, shown_ac, base_ac, dex_ac, raw_ac,
+    C, R, GET_ALIGNMENT(ch));
+}
+len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
+
 
   
   /* Combat Stats */
   {
-    int raw_ac = compute_armor_class(ch);
-    int shown_ac = raw_ac / 10;
-
     int base_thaco = thaco(GET_CLASS(ch), GET_LEVEL(ch));
     int str_to_hit = str_app[STRENGTH_APPLY_INDEX(ch)].tohit;
     int str_to_dam = str_app[STRENGTH_APPLY_INDEX(ch)].todam;
@@ -1158,9 +1165,10 @@ snprintf(line, sizeof(line),
 
     /* Dex AC bonus: defensive modifier from Dex that contributes to Armor Class. */
     snprintf(line, sizeof(line),
-      "%sBonuses:%s  Str to-hit %+d  Str to-dam %+d  Dex AC bonus %+d  Armor Class %d",
+      "%sBonuses:%s  Str to-hit %+d  Str to-dam %+d  Dex AC bonus %+d",
       C, R,
-      str_to_hit, str_to_dam, dex_def, shown_ac);
+      str_to_hit, str_to_dam, dex_def);
+
     len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
 
     /* Saves: these are your saving throw modifiers. Negative is better (helps saves). */
