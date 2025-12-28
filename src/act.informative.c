@@ -1024,7 +1024,7 @@ len = append_box_line(buf, len, sizeof(buf), B, R, "", W);
     else if (pct < 75) enc = "Heavy";
     else enc = "Overloaded";
   }
-  snprintf(line, sizeof(line), "Carry Capacity: %d / %d  (%s)", cur, cap, encumbrance_text(ch));
+  snprintf(line, sizeof(line), "%sCarry Capacity%s: %d / %d  (%s)", cur, cap, encumbrance_text(ch));
   len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
 }
 
