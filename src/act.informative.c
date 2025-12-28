@@ -11,6 +11,7 @@
 #include "conf.h"
 #include "sysdep.h"
 
+
 #include <stdlib.h>  /* abs */
 #include "structs.h"
 #include "utils.h"
@@ -31,6 +32,26 @@
 #include "modify.h"
 #include "asciimap.h"
 #include "quest.h"
+
+
+/* Encumbrance label for score display */
+static const char *encumbrance_text(struct char_data *ch)
+{
+  int cap = CAN_CARRY_W(ch);
+  int cur = IS_CARRYING_W(ch);
+
+  if (cap <= 0)
+    return "None";
+
+  /* Percent carried (integer math) */
+  int pct = (cur * 100) / cap;
+
+  if (pct < 25) return "Light";
+  if (pct < 50) return "Moderate";
+  if (pct < 75) return "Heavy";
+  return "Overloaded";
+}
+
 
 /* prototypes of local functions */
 /* do_diagnose utility functions */
@@ -920,7 +941,6 @@ ACMD(do_score)
   const char *R = CCNRM(ch, C_NRM);   /* Reset/normal */
   const char *Y = CCYEL(ch, C_NRM);   /* Yellow/gold */
   const char *C = CCCYN(ch, C_NRM);   /* Cyan */
-  const char *G = CCGRN(ch, C_NRM);   /* Green */
   const char *M = CCMAG(ch, C_NRM);   /* Magenta */
   const char *W_CLR = CCWHT(ch, C_NRM);   /* White */
   const char *RED = CCRED(ch, C_NRM); /* Red */
@@ -967,15 +987,60 @@ ACMD(do_score)
     "%s╠═══════════════════════════════════════════════════════════════════════════════╣%s\r\n", B, R);
 
   /* HP, Mana, Move */
-  snprintf(line, sizeof(line),
-    "%sHP:%s %s%d%s/%s%d%s  %sMana:%s %s%d%s/%s%d%s  %sMove:%s %s%d%s/%s%d%s     %sExp:%s %d",
-    C, R, G, GET_HIT(ch), R, W_CLR, GET_MAX_HIT(ch), R,
-    C, R, M, GET_MANA(ch), R, W_CLR, GET_MAX_MANA(ch), R,
-    C, R, Y, GET_MOVE(ch), R, W_CLR, GET_MAX_MOVE(ch), R,
-    C, R, GET_EXP(ch));
-  len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
+/* Separator */
+len += snprintf(buf + len, sizeof(buf) - len,
+  "%s╠═══════════════════════════════════════════════════════════════════════════════╣%s\r\n",
+  B, R);
 
-  /* Separator */
+/* HP, Mana, Move, Exp */
+snprintf(line, sizeof(line),
+  "%sHP:%s %d/%d  %sMana:%s %d/%d  %sMove:%s %d/%d     %sExp:%s %d",
+  C, R, GET_HIT(ch), GET_MAX_HIT(ch),
+  C, R, GET_MANA(ch), GET_MAX_MANA(ch),
+  C, R, GET_MOVE(ch), GET_MAX_MOVE(ch),
+  C, R, GET_EXP(ch));
+len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
+
+/* Blank spacer line */
+len = append_box_line(buf, len, sizeof(buf), B, R, "", W);
+
+/* Next level in */
+{
+  int next_need = 0;
+  if (GET_LEVEL(ch) < LVL_IMMORT) {
+    int next_level = GET_LEVEL(ch) + 1;
+    next_need = level_exp(GET_CLASS(ch), next_level) - GET_EXP(ch);
+  }
+  snprintf(line, sizeof(line), "Next level in: %d exp", next_need);
+}
+len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
+
+/* Blank spacer line */
+len = append_box_line(buf, len, sizeof(buf), B, R, "", W);
+
+/* Carry Capacity */
+{
+  int cap = CAN_CARRY_W(ch);
+  int cur = IS_CARRYING_W(ch);
+  const char *enc = "None";
+  if (cap > 0) {
+    int pct = (cur * 100) / cap;
+    if (pct < 25) enc = "Light";
+    else if (pct < 50) enc = "Moderate";
+    else if (pct < 75) enc = "Heavy";
+    else enc = "Overloaded";
+  }
+  snprintf(line, sizeof(line), "Carry Capacity: %d / %d  (%s)", cur, cap, encumbrance_text(ch));
+  len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
+}
+/* Blank spacer line */
+len = append_box_line(buf, len, sizeof(buf), B, R, "", W);
+
+/* Separator */
+len += snprintf(buf + len, sizeof(buf) - len,
+  "%s╠═══════════════════════════════════════════════════════════════════════════════╣%s\r\n",
+  B, R);
+/* Separator */
   len += snprintf(buf + len, sizeof(buf) - len,
     "%s╠═══════════════════════════════════════════════════════════════════════════════╣%s\r\n", B, R);
 
