@@ -1037,8 +1037,15 @@ ACMD(do_score)
     }
     len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
   }
+  /* Separator */
+  len += snprintf(buf + len, sizeof(buf) - len,
+    "%s╠═══════════════════════════════════════════════════════════════════════════════╣%s\r\n", B, R);
+
+
 /* Currencies */
-  snprintf(line, sizeof(line), "%sCurrencies%s", Y, R);
+    len = append_box_line(buf, len, sizeof(buf), B, R, "", W);
+
+snprintf(line, sizeof(line), "%sCurrencies%s", Y, R);
   len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
 
   snprintf(line, sizeof(line), "%sGold:%s %d",
