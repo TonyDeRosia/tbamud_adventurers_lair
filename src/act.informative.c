@@ -1126,35 +1126,24 @@ len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
 
 
         snprintf(line, sizeof(line),
-
-
-          "%sBase Stats:%s  Str %d (%+d)  Dex %d (%+d)  Con %d (%+d)  Int %d (%+d)  Wis %d (%+d)  Cha %d (%+d)",
-
-
+          "%sBase Stats:%s  Str %d (%+d)  Dex %d (%+d)  Con %d (%+d)",
           C, R,
-
-
           b_str, r_str,
-
-
           b_dex, r_dex,
+          b_con, r_con);
+      len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
 
-
-          b_con, r_con,
-
-
+        snprintf(line, sizeof(line),
+          "%s            %s  Int %d (%+d)  Wis %d (%+d)  Cha %d (%+d)",
+          C, R,
           b_int, r_int,
-
-
           b_wis, r_wis,
-
-
           b_cha, r_cha);
+      len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
 
 
       }
 
-      len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
     }
 
 snprintf(line, sizeof(line),
@@ -1165,7 +1154,6 @@ snprintf(line, sizeof(line),
 
     /* Dex AC bonus: defensive modifier from Dex that contributes to Armor Class. */
     snprintf(line, sizeof(line),
-      "%sBonuses:%s  Str to-hit %+d  Str to-dam %+d  Dex AC bonus %+d",
       C, R,
       str_to_hit, str_to_dam, dex_def);
 
