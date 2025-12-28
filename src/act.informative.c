@@ -986,12 +986,6 @@ ACMD(do_score)
   len += snprintf(buf + len, sizeof(buf) - len,
     "%s╠═══════════════════════════════════════════════════════════════════════════════╣%s\r\n", B, R);
 
-  /* HP, Mana, Move */
-/* Separator */
-len += snprintf(buf + len, sizeof(buf) - len,
-  "%s╠═══════════════════════════════════════════════════════════════════════════════╣%s\r\n",
-  B, R);
-
 /* HP, Mana, Move, Exp */
 snprintf(line, sizeof(line),
   "%sHP:%s %d/%d  %sMana:%s %d/%d  %sMove:%s %d/%d     %sExp:%s %d",
@@ -1036,10 +1030,6 @@ len = append_box_line(buf, len, sizeof(buf), B, R, "", W);
 /* Blank spacer line */
 len = append_box_line(buf, len, sizeof(buf), B, R, "", W);
 
-/* Separator */
-len += snprintf(buf + len, sizeof(buf) - len,
-  "%s╠═══════════════════════════════════════════════════════════════════════════════╣%s\r\n",
-  B, R);
 /* Separator */
   len += snprintf(buf + len, sizeof(buf) - len,
     "%s╠═══════════════════════════════════════════════════════════════════════════════╣%s\r\n", B, R);
