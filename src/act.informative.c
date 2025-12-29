@@ -1160,6 +1160,9 @@ len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
 
 
   
+
+  len = append_box_line(buf, len, sizeof(buf), B, R, "", W);
+
 /* Saves: these are your saving throw modifiers. Negative is better (helps saves). */
 if (GET_EQ(ch, WEAR_WIELD) && GET_OBJ_TYPE(GET_EQ(ch, WEAR_WIELD)) == ITEM_WEAPON) {
   struct obj_data *wobj = GET_EQ(ch, WEAR_WIELD);
