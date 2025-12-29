@@ -620,10 +620,19 @@ ACMD(do_cast) {
     return;
   }
 
-  if (strchr(argument, '\'')) {
-    spell_argument = strtok(argument, "'");
+  /*
+   * Support quoted multi word spell names:
+   *   cast 'remove poison' self
+   *   cast 'color spray' <target>
+   */
+  if (*argument == '\'') {
+    spell_argument = strtok(argument + 1, "'");
+    target_argument = strtok(NULL, "");
+  } else if (strchr(argument, '\'')) {
+    /* Quote appears later, keep compatibility */
+    (void)strtok(argument, "'");
     spell_argument = strtok(NULL, "'");
-    target_argument = strtok(NULL, "\0");
+    target_argument = strtok(NULL, "");
   } else {
     target_argument = any_one_arg(argument, spell_input);
     spell_argument = spell_input;

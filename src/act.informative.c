@@ -1237,12 +1237,6 @@ snprintf(line, sizeof(line), "%sCurrencies%s", Y, R);
     C, R, playing_time.day, (playing_time.day == 1 ? "" : "s"),
     playing_time.hours, (playing_time.hours == 1 ? "" : "s"));
   len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
-
-  /* Rank */
-  snprintf(line, sizeof(line), "%sThis ranks you as%s %s %s %s(level %d)%s",
-    C, R, GET_NAME(ch), GET_TITLE(ch), W_CLR, GET_LEVEL(ch), R);
-  len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
-
   /* Position/Status */
   switch (GET_POS(ch)) {
     case POS_DEAD:
