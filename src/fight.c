@@ -859,8 +859,13 @@ static int compute_thaco(struct char_data *ch, struct char_data *victim)
   calc_thaco -= GET_HITROLL(ch);
   calc_thaco -= (int) ((GET_INT(ch) - 13) / 1.5);	/* Intelligence helps! */
   calc_thaco -= (int) ((GET_WIS(ch) - 13) / 1.5);	/* So does wisdom */
-
-  return calc_thaco;
+  /* high level thaco floor: prevent endgame thaco from drifting into nonsense */
+  int __thaco = (calc_thaco);
+  __thaco -= GET_HITROLL(ch);
+  __thaco = MAX(1, __thaco);
+  if (GET_LEVEL(ch) >= 50)
+    __thaco = MIN(__thaco, 15);
+  return __thaco;
 }
 
 void hit(struct char_data *ch, struct char_data *victim, int type)
