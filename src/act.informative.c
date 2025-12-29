@@ -1612,9 +1612,13 @@ ACMD(do_equipment)
     int pos = eq_order[i];
     struct obj_data *obj = GET_EQ(ch, pos);
 
+    const char *label = eq_labels[i];
+    if (pos == WEAR_HOLD && obj && GET_OBJ_TYPE(obj) == ITEM_WEAPON && OBJ_FLAGGED(obj, ITEM_OFFHAND) && GET_SKILL(ch, SKILL_DUAL_WIELD))
+      label = "Offhand";
+
     /* Slot labels bright yellow */
     send_to_char(ch, "%s%-14s%s ",
-      CBYEL(ch, C_NRM), eq_labels[i], CCNRM(ch, C_NRM));
+      CBYEL(ch, C_NRM), label, CCNRM(ch, C_NRM));
 
     if (!obj) {
       /* [NOTHING] bright white */
@@ -1630,10 +1634,6 @@ ACMD(do_equipment)
     }
   }
 
-  /* Float is display-only for now (no real slot implemented yet). */
-  send_to_char(ch, "%s%-14s%s %s[NOTHING]%s\r\n",
-    CBYEL(ch, C_NRM), "Float", CCNRM(ch, C_NRM),
-    CBWHT(ch, C_NRM), CCNRM(ch, C_NRM));
 }
 
 
