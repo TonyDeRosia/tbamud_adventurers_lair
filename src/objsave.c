@@ -229,10 +229,18 @@ static void auto_equip(struct char_data *ch, struct obj_data *obj, int location)
         location = LOC_INVENTORY;
       break;
     case WEAR_HOLD:
+      /* Normal HOLD items */
       if (CAN_WEAR(obj, ITEM_WEAR_HOLD))
         break;
+
+      /* Legacy warrior exception: allow weapon-in-hold behavior */
       if (IS_WARRIOR(ch) && CAN_WEAR(obj, ITEM_WEAR_WIELD) && GET_OBJ_TYPE(obj) == ITEM_WEAPON)
         break;
+
+      /* Offhand system: allow OFFHAND weapons to load into WEAR_HOLD */
+      if (GET_OBJ_TYPE(obj) == ITEM_WEAPON && OBJ_FLAGGED(obj, ITEM_OFFHAND) && CAN_WEAR(obj, ITEM_WEAR_WIELD))
+        break;
+
       location = LOC_INVENTORY;
       break;
     default:
