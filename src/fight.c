@@ -414,6 +414,7 @@ static void dam_message(int dam, struct char_data *ch, struct char_data *victim,
   char *buf;
   int msgnum;
 
+  int pct = 0;
   static struct dam_weapon_type {
     const char *to_room;
     const char *to_char;
@@ -423,73 +424,83 @@ static void dam_message(int dam, struct char_data *ch, struct char_data *victim,
     /* use #w for singular (i.e. "slash") and #W for plural (i.e. "slashes") */
 
     {
-      "$n tries to #w $N, but misses.",	/* 0: 0     */
+      "$n tries to #w $N, but misses.",        /* 0: miss */
       "You try to #w $N, but miss.",
       "$n tries to #w you, but misses."
     },
 
     {
-      "$n tickles $N as $e #W $M.",	/* 1: 1..2  */
-      "You tickle $N as you #w $M.",
-      "$n tickles you as $e #W you."
+      "$n lands a \tGgrazing\tn #w on $N.",          /* 1: 1 to 4 percent */
+      "You land a \tGgrazing\tn #w on $N.",
+      "$n lands a \tGgrazing\tn #w on you."
     },
 
     {
-      "$n barely #W $N.",		/* 2: 3..4  */
-      "You barely #w $N.",
-      "$n barely #W you."
+      "$n delivers a \tGglancing\tn #w to $N.",      /* 2: 5 to 9 percent */
+      "You deliver a \tGglancing\tn #w to $N.",
+      "$n delivers a \tGglancing\tn #w to you."
     },
 
     {
-      "$n #W $N.",			/* 3: 5..6  */
-      "You #w $N.",
-      "$n #W you."
+      "$n hits $N with a \tWclean\tn #w.",           /* 3: 10 to 19 percent */
+      "You hit $N with a \tWclean\tn #w.",
+      "$n hits you with a \tWclean\tn #w."
     },
 
     {
-      "$n #W $N hard.",			/* 4: 7..10  */
-      "You #w $N hard.",
-      "$n #W you hard."
+      "$n strikes $N with a \tWsolid\tn #w.",        /* 4: 20 to 29 percent */
+      "You strike $N with a \tWsolid\tn #w.",
+      "$n strikes you with a \tWsolid\tn #w."
     },
 
     {
-      "$n #W $N very hard.",		/* 5: 11..14  */
-      "You #w $N very hard.",
-      "$n #W you very hard."
+      "$n slams $N with a \tyheavy\tn #w.",          /* 5: 30 to 44 percent */
+      "You slam $N with a \tyheavy\tn #w.",
+      "$n slams you with a \tyheavy\tn #w."
     },
 
     {
-      "$n #W $N extremely hard.",	/* 6: 15..19  */
-      "You #w $N extremely hard.",
-      "$n #W you extremely hard."
+      "$n crushes $N with a \tYbrutal\tn #w.",       /* 6: 45 to 59 percent */
+      "You crush $N with a \tYbrutal\tn #w.",
+      "$n crushes you with a \tYbrutal\tn #w."
     },
 
     {
-      "$n massacres $N to small fragments with $s #w.",	/* 7: 19..23 */
-      "You massacre $N to small fragments with your #w.",
-      "$n massacres you to small fragments with $s #w."
+      "$n \tRdevastates\tn $N with a \tRsavage\tn #w.",    /* 7: 60 to 74 percent */
+      "You \tRdevastate\tn $N with a \tRsavage\tn #w.",
+      "$n \tRdevastates\tn you with a \tRsavage\tn #w."
     },
 
     {
-      "$n OBLITERATES $N with $s deadly #w!!",	/* 8: > 23   */
-      "You OBLITERATE $N with your deadly #w!!",
-      "$n OBLITERATES you with $s deadly #w!!"
+      "$n \tMmaims\tn $N with a \tMvicious\tn #w!",        /* 8: 75 to 89 percent */
+      "You \tMmaim\tn $N with a \tMvicious\tn #w!",
+      "$n \tMmaims\tn you with a \tMvicious\tn #w!"
+    },
+
+    {
+      "$n \tRannihilates\tn $N with a \tRlethal\tn #w!!",  /* 9: 90 percent and up */
+      "You \tRannihilate\tn $N with a \tRlethal\tn #w!!",
+      "$n \tRannihilates\tn you with a \tRlethal\tn #w!!"
     }
   };
 
   w_type -= TYPE_HIT;		/* Change to base of table with text */
+  if (dam <= 0) {
+    msgnum = 0;
+  } else {
+    pct = (dam * 100) / MAX(1, GET_MAX_HIT(victim));
 
-  if (dam == 0)		msgnum = 0;
-  else if (dam <= 2)    msgnum = 1;
-  else if (dam <= 4)    msgnum = 2;
-  else if (dam <= 6)    msgnum = 3;
-  else if (dam <= 10)   msgnum = 4;
-  else if (dam <= 14)   msgnum = 5;
-  else if (dam <= 19)   msgnum = 6;
-  else if (dam <= 23)   msgnum = 7;
-  else			msgnum = 8;
-
-  /* damage message to onlookers */
+    if (pct <= 4)        msgnum = 1;
+    else if (pct <= 9)   msgnum = 2;
+    else if (pct <= 19)  msgnum = 3;
+    else if (pct <= 29)  msgnum = 4;
+    else if (pct <= 44)  msgnum = 5;
+    else if (pct <= 59)  msgnum = 6;
+    else if (pct <= 74)  msgnum = 7;
+    else if (pct <= 89)  msgnum = 8;
+    else                 msgnum = 9;
+  }
+/* damage message to onlookers */
   buf = replace_string(dam_weapons[msgnum].to_room,
 	  attack_hit_text[w_type].singular, attack_hit_text[w_type].plural);
   act(buf, FALSE, ch, NULL, victim, TO_NOTVICT);
@@ -511,6 +522,28 @@ static void dam_message(int dam, struct char_data *ch, struct char_data *victim,
   send_to_char(victim, CCNRM(victim, C_CMP));
 }
 
+/* Weight sentence based on percent of victim max HP.
+ * Used to give spells and skills the same impact as weapon hits. */
+static const char *damage_weight_sentence(int dam, struct char_data *victim)
+{
+int pct;
+
+  if (dam <= 0 || !victim)
+    return "";
+
+  pct = (dam * 100) / MAX(1, GET_MAX_HIT(victim));
+
+  if (pct <= 4)        return " \tGIt is a grazing hit.\tn";
+  else if (pct <= 9)   return " \tGIt is a glancing hit.\tn";
+  else if (pct <= 19)  return " \tWIt lands cleanly.\tn";
+  else if (pct <= 29)  return " \tWIt hits solidly.\tn";
+  else if (pct <= 44)  return " \tyIt hits hard.\tn";
+  else if (pct <= 59)  return " \tYIt hits brutally.\tn";
+  else if (pct <= 74)  return " \tRIt is devastating.\tn";
+  else if (pct <= 89)  return " \tMIt is vicious.\tn";
+  else                 return " \tRIt is annihilating.\tn";
+}
+
 /*  message for doing damage with a spell or skill. Also used for weapon
  *  damage on miss and death blows. */
 int skill_message(int dam, struct char_data *ch, struct char_data *vict,
@@ -519,12 +552,17 @@ int skill_message(int dam, struct char_data *ch, struct char_data *vict,
   int i, j, nr;
   struct message_type *msg;
 
+  char wmsg_att[MAX_STRING_LENGTH];
+  char wmsg_vic[MAX_STRING_LENGTH];
+  char wmsg_room[MAX_STRING_LENGTH];
+  const char *wgt;
   struct obj_data *weap = GET_EQ(ch, WEAR_WIELD);
 
   /* @todo restructure the messages library to a pointer based system as
    * opposed to the current cyclic location system. */
   for (i = 0; i < MAX_MESSAGES; i++) {
     if (fight_messages[i].a_type == attacktype) {
+      wgt = damage_weight_sentence(dam, vict);
       nr = dice(1, fight_messages[i].number_of_attacks);
       for (j = 1, msg = fight_messages[i].msg; (j < nr) && msg; j++)
         msg = msg->next;
@@ -553,15 +591,18 @@ int skill_message(int dam, struct char_data *ch, struct char_data *vict,
         } else {
           if (msg->hit_msg.attacker_msg) {
             send_to_char(ch, CCYEL(ch, C_CMP));
-            act(msg->hit_msg.attacker_msg, FALSE, ch, weap, vict, TO_CHAR);
+            snprintf(wmsg_att, sizeof(wmsg_att), "%s%s", msg->hit_msg.attacker_msg, wgt);
+            act(wmsg_att, FALSE, ch, weap, vict, TO_CHAR);
             send_to_char(ch, CCNRM(ch, C_CMP));
           }
 
           send_to_char(vict, CCRED(vict, C_CMP));
-          act(msg->hit_msg.victim_msg, FALSE, ch, weap, vict, TO_VICT | TO_SLEEP);
+          snprintf(wmsg_vic, sizeof(wmsg_vic), "%s%s", msg->hit_msg.victim_msg, wgt);
+          act(wmsg_vic, FALSE, ch, weap, vict, TO_VICT | TO_SLEEP);
           send_to_char(vict, CCNRM(vict, C_CMP));
 
-          act(msg->hit_msg.room_msg, FALSE, ch, weap, vict, TO_NOTVICT);
+          snprintf(wmsg_room, sizeof(wmsg_room), "%s%s", msg->hit_msg.room_msg, wgt);
+          act(wmsg_room, FALSE, ch, weap, vict, TO_NOTVICT);
         }
       } else if (ch != vict) {	/* Dam == 0 */
         if (msg->miss_msg.attacker_msg) {

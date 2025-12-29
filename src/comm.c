@@ -959,6 +959,32 @@ void game_loop(socket_t local_mother_desc)
   }
 }
 
+
+/* Refresh prompts for idle players on tick so sleeping/resting regen feels live. */
+static void refresh_idle_prompts_on_tick(void)
+{
+  struct descriptor_data *d;
+
+  for (d = descriptor_list; d; d = d->next) {
+    if (!IS_PLAYING(d) || d->character == NULL)
+      continue;
+
+    /* Don't interrupt pagers or editors. */
+    if (d->showstr_count || d->str)
+      continue;
+
+    /* Avoid spamming prompts during combat. */
+    if (FIGHTING(d->character))
+      continue;
+
+    /* Only refresh when the player is not actively standing around. */
+    if (GET_POS(d->character) != POS_SLEEPING && GET_POS(d->character) != POS_RESTING)
+      continue;
+
+    queue_prompt(d);
+  }
+}
+
 void heartbeat(int heart_pulse)
 {
   static int mins_since_crashsave = 0;
@@ -991,6 +1017,7 @@ void heartbeat(int heart_pulse)
     check_time_triggers();
     affect_update();
     point_update();
+    refresh_idle_prompts_on_tick();
     check_timed_quests();
   }
 
