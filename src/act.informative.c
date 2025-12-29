@@ -1046,6 +1046,7 @@ len = append_box_line(buf, len, sizeof(buf), B, R, "", W);
     C, R, GET_ALIGNMENT(ch));
 }
 len = append_box_line(buf, len, sizeof(buf), B, R, line, W);/* Combat Stats */
+  len = append_box_line(buf, len, sizeof(buf), B, R, "", W);
   {
     int base_thaco = thaco(GET_CLASS(ch), GET_LEVEL(ch));
     int str_to_hit = str_app[STRENGTH_APPLY_INDEX(ch)].tohit;
@@ -1126,6 +1127,8 @@ len = append_box_line(buf, len, sizeof(buf), B, R, line, W);/* Combat Stats */
           b_dex, r_dex,
           b_con, r_con);
       len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
+
+  len = append_box_line(buf, len, sizeof(buf), B, R, "", W);
 
         snprintf(line, sizeof(line),
           "%s            %s  Int %d (%+d)  Wis %d (%+d)  Cha %d (%+d)",
