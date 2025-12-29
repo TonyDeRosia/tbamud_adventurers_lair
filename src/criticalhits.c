@@ -14,10 +14,10 @@
 const char *crit_banner_for_mult(int mult)
 {
   if (mult >= 400)
-    return "{Y#{W#{Y#{W#{Y C{W E{Y N{W S{Y O{W R{Y #{W#{Y#{W#{x";
+    return "\tY#\tW#\tY#\tW#\tY C\tW E\tY N\tW S\tY O\tW R\tY #\tW#\tY#\tW#\tn";
   if (mult >= 300)
-    return "{R#{Y#{R#{Y#{R C{Y E{R N{Y S{R O{Y R{R #{Y#{R#{Y#{x";
-  return "{D#{W#{D#{W#{D C{W E{D N{W S{D O{W R{D #{W#{D#{W#{x";
+    return "\tR#\tY#\tR#\tY#\tR C\tY E\tR N\tY S\tR O\tY R\tR #\tY#\tR#\tY#\tn";
+  return "\tD#\tW#\tD#\tW#\tD C\tW E\tD N\tW S\tD O\tW R\tD #\tW#\tD#\tW#\tn";
 }
 
 
