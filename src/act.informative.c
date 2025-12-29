@@ -1156,13 +1156,14 @@ snprintf(line, sizeof(line),
     len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
 
     
-  /* Crit chances */
-  len = append_box_line(buf, len, sizeof(buf), B, R, "", W);
-  snprintf(line, sizeof(line),
-           "%sCritical hit:%s %d   %sCritical Spell:%s %d   %sCritical Heal:%s %d",
-           C, R, GET_MELEE_CRIT(ch), C, R, GET_SPELL_CRIT(ch), C, R, GET_HEAL_CRIT(ch));
-  len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
-  len = append_box_line(buf, len, sizeof(buf), B, R, "", W);
+/* Crit chances */
+snprintf(line, sizeof(line),
+         "%sCritical hit:%s %d   %sCritical Spell:%s %d   %sCritical Heal:%s %d",
+         C, R, GET_MELEE_CRIT(ch),
+         C, R, GET_SPELL_CRIT(ch),
+         C, R, GET_HEAL_CRIT(ch));
+len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
+len = append_box_line(buf, len, sizeof(buf), B, R, "", W);
 /* Dex AC bonus: defensive modifier from Dex that contributes to Armor Class. */
     snprintf(line, sizeof(line),
       C, R,
