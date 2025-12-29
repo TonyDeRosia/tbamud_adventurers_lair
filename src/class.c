@@ -1431,8 +1431,7 @@ void do_start(struct char_data *ch)
   GET_EXP(ch) = 1;
 
   set_title(ch, NULL);
-  roll_real_abils(ch);
-
+  /* Stats are now set during character creation (point allocation). */
   GET_MAX_HIT(ch)  = 10;
   GET_MAX_MANA(ch) = 100;
   GET_MAX_MOVE(ch) = 82;
@@ -1470,8 +1469,7 @@ void do_start(struct char_data *ch)
 
   if (CONFIG_SITEOK_ALL)
     SET_BIT_AR(PLR_FLAGS(ch), PLR_SITEOK);
-
-  apply_racial_bonuses(ch);
+  /* Racial bonuses are applied during character creation. */
 }
 
 /* This function controls the change to maxmove, maxmana, and maxhp for each

@@ -86,12 +86,13 @@ static void clamp_abils(struct char_data *ch)
   if (ch->real_abils.wis < 3) ch->real_abils.wis = 3;
   if (ch->real_abils.cha < 3) ch->real_abils.cha = 3;
 
-  if (ch->real_abils.str > 25) ch->real_abils.str = 25;
-  if (ch->real_abils.dex > 25) ch->real_abils.dex = 25;
-  if (ch->real_abils.con > 25) ch->real_abils.con = 25;
-  if (ch->real_abils.intel > 25) ch->real_abils.intel = 25;
-  if (ch->real_abils.wis > 25) ch->real_abils.wis = 25;
-  if (ch->real_abils.cha > 25) ch->real_abils.cha = 25;
+  /* Adventurers Lair: allow limited stat allocation above 25 during creation. */
+  if (ch->real_abils.str > 30) ch->real_abils.str = 30;
+  if (ch->real_abils.dex > 30) ch->real_abils.dex = 30;
+  if (ch->real_abils.con > 30) ch->real_abils.con = 30;
+  if (ch->real_abils.intel > 30) ch->real_abils.intel = 30;
+  if (ch->real_abils.wis > 30) ch->real_abils.wis = 30;
+  if (ch->real_abils.cha > 30) ch->real_abils.cha = 30;
 }
 
 /*
