@@ -865,11 +865,48 @@ void mag_unaffects(int level, struct char_data *ch, struct char_data *victim,
     to_vict = "Your vision returns!";
     to_room = "There's a momentary gleam in $n's eyes.";
     break;
-  case SPELL_REMOVE_POISON:
-    spell = SPELL_POISON;
-    to_vict = "A warm feeling runs through your body!";
-    to_room = "$n looks better.";
+  case SPELL_REMOVE_POISON: {
+    int removed = 0;
+    struct affected_type *af, *next_af;
+
+    /* Remove poison affect by spell id */
+    if (affected_by_spell(victim, SPELL_POISON)) {
+      affect_from_char(victim, SPELL_POISON);
+      removed = 1;
+    }
+
+    /* Remove any affects that set AFF_POISON, regardless of spell id */
+    for (af = victim->affected; af; af = next_af) {
+      next_af = af->next;
+      if (IS_SET_AR(af->bitvector, AFF_POISON)) {
+        affect_remove(victim, af);
+        removed = 1;
+      }
+    }
+
+    /* Clear the flag if it was set directly */
+    if (AFF_FLAGGED(victim, AFF_POISON)) {
+      REMOVE_BIT_AR(AFF_FLAGS(victim), AFF_POISON);
+      removed = 1;
+    }
+
+    if (!removed) {
+      act("Nothing seems to happen.", FALSE, ch, 0, victim, TO_CHAR);
+    } else {
+      act("You feel less sick.", FALSE, victim, 0, 0, TO_CHAR);
+      act("$n looks less sick.", TRUE, victim, 0, 0, TO_ROOM);
+    }
+
+    /* Message handling */
+    if (removed) {
+      to_vict = "You feel less sick.";
+      to_room = "$n looks less sick.";
+    } else {
+      to_vict = "Nothing seems to happen.";
+    }
+
     break;
+  }
   case SPELL_REMOVE_CURSE:
     spell = SPELL_CURSE;
     to_vict = "You don't feel so unlucky.";
@@ -878,6 +915,15 @@ void mag_unaffects(int level, struct char_data *ch, struct char_data *victim,
     log("SYSERR: unknown spellnum %d passed to mag_unaffects.", spellnum);
     return;
   }
+  /* remove poison handled here: avoid generic 'Nothing seems to happen.' */
+  if (spellnum == SPELL_REMOVE_POISON) {
+    if (to_vict != NULL)
+      act(to_vict, FALSE, ch, 0, victim, TO_VICT);
+    if (to_room != NULL)
+      act(to_room, FALSE, ch, 0, victim, TO_NOTVICT);
+    return;
+  }
+
 
   if (!affected_by_spell(victim, spell)) {
     if (msg_not_affected)
