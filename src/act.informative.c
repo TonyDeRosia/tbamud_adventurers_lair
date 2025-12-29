@@ -3332,3 +3332,62 @@ ACMD(do_scan)
     send_to_char(ch, "You don't see anything nearby!\r\n");
   }
 } // end of do_scan
+
+ACMD(do_stataudit)
+{
+  int base_m, base_s, base_h;
+  int bonus_m, bonus_s, bonus_h;
+  int total_m, total_s, total_h;
+
+  int mbonus_m, mbonus_s, mbonus_h;
+  int mult_m, mult_s, mult_h;
+
+  char line[256];
+
+  if (GET_LEVEL(ch) < LVL_IMMORT) {
+    send_to_char(ch, "You are not authorized to use this command.\r\n");
+    return;
+  }
+
+  base_m  = crit_base_melee(ch);
+  base_s  = crit_base_spell(ch);
+  base_h  = crit_base_heal(ch);
+
+  bonus_m = GET_MELEE_CRIT(ch);
+  bonus_s = GET_SPELL_CRIT(ch);
+  bonus_h = GET_HEAL_CRIT(ch);
+
+  total_m = crit_total_melee(ch);
+  total_s = crit_total_spell(ch);
+  total_h = crit_total_heal(ch);
+
+  mbonus_m = GET_MELEE_CRIT_MULT(ch);
+  mbonus_s = GET_SPELL_CRIT_MULT(ch);
+  mbonus_h = GET_HEAL_CRIT_MULT(ch);
+
+  mult_m = crit_mult_melee(ch);
+  mult_s = crit_mult_spell(ch);
+  mult_h = crit_mult_heal(ch);
+
+  send_to_char(ch, "╔══════════════════════════════════════════════════════════════════════════════╗\r\n");
+  send_to_char(ch, "║ Stat Audit                                                                    ║\r\n");
+  send_to_char(ch, "╠══════════════════════════════════════════════════════════════════════════════╣\r\n");
+
+  snprintf(line, sizeof(line),
+           "║ Melee Crit: base %2d + bonus %2d = total %3d   mult base 200 + bonus %3d = %3d ║\r\n",
+           base_m, bonus_m, total_m, mbonus_m, mult_m);
+  send_to_char(ch, "%s", line);
+
+  snprintf(line, sizeof(line),
+           "║ Spell Crit: base %2d + bonus %2d = total %3d   mult base 200 + bonus %3d = %3d ║\r\n",
+           base_s, bonus_s, total_s, mbonus_s, mult_s);
+  send_to_char(ch, "%s", line);
+
+  snprintf(line, sizeof(line),
+           "║ Heal  Crit: base %2d + bonus %2d = total %3d   mult base 200 + bonus %3d = %3d ║\r\n",
+           base_h, bonus_h, total_h, mbonus_h, mult_h);
+  send_to_char(ch, "%s", line);
+
+  send_to_char(ch, "╚══════════════════════════════════════════════════════════════════════════════╝\r\n");
+}
+
