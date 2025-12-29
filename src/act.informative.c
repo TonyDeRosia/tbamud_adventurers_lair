@@ -1155,7 +1155,6 @@ snprintf(line, sizeof(line),
       GET_HITROLL(ch), GET_DAMROLL(ch), to_hit_ac0);
     len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
 
-    
 /* Crit chances */
 snprintf(line, sizeof(line),
          "%sCritical hit:%s %d   %sCritical Spell:%s %d   %sCritical Heal:%s %d",
@@ -1163,31 +1162,30 @@ snprintf(line, sizeof(line),
          C, R, GET_SPELL_CRIT(ch),
          C, R, GET_HEAL_CRIT(ch));
 len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
-len = append_box_line(buf, len, sizeof(buf), B, R, "", W);
+
 /* Dex AC bonus: defensive modifier from Dex that contributes to Armor Class. */
-    snprintf(line, sizeof(line),
-      C, R,
-      str_to_hit, str_to_dam, dex_def);
+snprintf(line, sizeof(line),
+         C, R,
+         str_to_hit, str_to_dam, dex_def);
+len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
 
-    len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
-
-    /* Saves: these are your saving throw modifiers. Negative is better (helps saves). */
-    if (GET_EQ(ch, WEAR_WIELD) && GET_OBJ_TYPE(GET_EQ(ch, WEAR_WIELD)) == ITEM_WEAPON) {
-      struct obj_data *wobj = GET_EQ(ch, WEAR_WIELD);
-      int nd = GET_OBJ_VAL(wobj, 1);
-      int sd = GET_OBJ_VAL(wobj, 2);
-      snprintf(line, sizeof(line),
-        "%sSaving Throws:%s Paralyze %d  Rod %d  Spell %d   Weapon: %s (%dD%d)",
-        C, R,
-        GET_SAVE(ch, 0), GET_SAVE(ch, 1), GET_SAVE(ch, 4),
-        wobj->short_description, nd, sd);
-    } else {
-      snprintf(line, sizeof(line),
-        "%sSaving Throws:%s Paralyze %d  Rod %d  Spell %d",
-        C, R,
-        GET_SAVE(ch, 0), GET_SAVE(ch, 1), GET_SAVE(ch, 4));
-    }
-    len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
+/* Saves: these are your saving throw modifiers. Negative is better (helps saves). */
+if (GET_EQ(ch, WEAR_WIELD) && GET_OBJ_TYPE(GET_EQ(ch, WEAR_WIELD)) == ITEM_WEAPON) {
+  struct obj_data *wobj = GET_EQ(ch, WEAR_WIELD);
+  int nd = GET_OBJ_VAL(wobj, 1);
+  int sd = GET_OBJ_VAL(wobj, 2);
+  snprintf(line, sizeof(line),
+           "%sSaving Throws:%s Paralyze %d  Rod %d  Spell %d   Weapon: %s (%dD%d)",
+           C, R,
+           GET_SAVE(ch, 0), GET_SAVE(ch, 1), GET_SAVE(ch, 4),
+           wobj->short_description, nd, sd);
+} else {
+  snprintf(line, sizeof(line),
+           "%sSaving Throws:%s Paralyze %d  Rod %d  Spell %d",
+           C, R,
+           GET_SAVE(ch, 0), GET_SAVE(ch, 1), GET_SAVE(ch, 4));
+}
+len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
   }
   /* Separator */
   len += snprintf(buf + len, sizeof(buf) - len,
