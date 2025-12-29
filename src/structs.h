@@ -309,6 +309,9 @@
 #define CON_ACCT_CHARSEL   39 /**< Account character select */
 #define CON_ACCT_MENU 40 /**< Account character select/create menu */
 
+/* Character creation: allocate base stats */
+#define CON_QSTATS        41
+
 #define CON_NAME_CNFRM    3 /**< New character, confirm name */
 #define CON_PASSWORD      4 /**< Login with password */
 #define CON_NEWPASSWD     5 /**< New character, create password */
@@ -1148,6 +1151,10 @@ struct descriptor_data
   /* Account login UI latches */
   int acct_prompted_name;
   int acct_prompted_menu;
+
+  /* Character creation: stat allocation */
+  int stat_alloc_pool;
+  int stat_alloc_base[6]; /* Str, Dex, Con, Int, Wis, Cha */
 };
 
 /* other miscellaneous structures */
