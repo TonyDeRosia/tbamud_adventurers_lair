@@ -586,8 +586,53 @@ int skill_message(int dam, struct char_data *ch, struct char_data *vict,
  *	< 0	Victim died.
  *	= 0	No damage.
  *	> 0	How much damage done. */
+
+/* dual wield offhand system */
+#define OFFHAND_DAMAGE_PCT 60
+
+static int g_offhand_attack = 0;
+
+static int can_offhand_attack(struct char_data *ch)
+{
+  struct obj_data *prim = GET_EQ(ch, WEAR_WIELD);
+  struct obj_data *off  = GET_EQ(ch, WEAR_HOLD);
+
+  if (!ch) return 0;
+  if (!prim || !off) return 0;
+  if (GET_OBJ_TYPE(prim) != ITEM_WEAPON) return 0;
+  if (GET_OBJ_TYPE(off)  != ITEM_WEAPON) return 0;
+
+  if (!GET_SKILL(ch, SKILL_DUAL_WIELD)) return 0;
+  if (OBJ_FLAGGED(prim, ITEM_TWO_HANDER)) return 0;
+  if (!OBJ_FLAGGED(off, ITEM_OFFHAND)) return 0;
+  if (GET_EQ(ch, WEAR_SHIELD)) return 0;
+  if (GET_OBJ_WEIGHT(off) > GET_OBJ_WEIGHT(prim)) return 0;
+
+  return 1;
+}
+
+static void do_offhand_attack(struct char_data *ch, struct char_data *victim)
+{
+  struct obj_data *prim = GET_EQ(ch, WEAR_WIELD);
+  struct obj_data *off  = GET_EQ(ch, WEAR_HOLD);
+
+  if (!can_offhand_attack(ch)) return;
+  if (!victim) return;
+
+  ch->equipment[WEAR_WIELD] = off;
+  g_offhand_attack = 1;
+  hit(ch, victim, TYPE_UNDEFINED);
+  g_offhand_attack = 0;
+  ch->equipment[WEAR_WIELD] = prim;
+}
+
 int damage(struct char_data *ch, struct char_data *victim, int dam, int attacktype)
 {
+  /* OFFHAND DAMAGE SCALE */
+  if (g_offhand_attack) {
+    dam = (dam * OFFHAND_DAMAGE_PCT) / 100;
+  }
+
   long local_gold = 0, happy_gold = 0;
   char local_buf[256];
   struct char_data *tmp_char;
@@ -971,7 +1016,8 @@ void perform_violence(void)
     }
 
     hit(ch, FIGHTING(ch), TYPE_UNDEFINED);
-    if (MOB_FLAGGED(ch, MOB_SPEC) && GET_MOB_SPEC(ch) && !MOB_FLAGGED(ch, MOB_NOTDEADYET)) {
+    
+        do_offhand_attack(ch, FIGHTING(ch));if (MOB_FLAGGED(ch, MOB_SPEC) && GET_MOB_SPEC(ch) && !MOB_FLAGGED(ch, MOB_NOTDEADYET)) {
       char actbuf[MAX_INPUT_LENGTH] = "";
       (GET_MOB_SPEC(ch)) (ch, ch, 0, actbuf);
     }

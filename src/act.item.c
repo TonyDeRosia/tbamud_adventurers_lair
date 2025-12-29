@@ -22,6 +22,17 @@
 #include "oasis.h"
 #include "act.h"
 #include "quest.h"
+/* Helpers for handedness and offhand logic */
+static int is_two_hander(const struct obj_data *obj)
+{
+  return (obj && GET_OBJ_TYPE(obj) == ITEM_WEAPON && OBJ_FLAGGED(obj, ITEM_TWO_HANDER));
+}
+
+static int is_offhand_weapon(const struct obj_data *obj)
+{
+  return (obj && GET_OBJ_TYPE(obj) == ITEM_WEAPON && OBJ_FLAGGED(obj, ITEM_OFFHAND));
+}
+
 
 
 /* local function prototypes */
@@ -1221,6 +1232,88 @@ static void wear_message(struct char_data *ch, struct obj_data *obj, int where)
 
 static void perform_wear(struct char_data *ch, struct obj_data *obj, int where)
 {
+  /* dual wield + two hander rules begin */
+  {
+    struct obj_data *prim = GET_EQ(ch, WEAR_WIELD);
+    struct obj_data *sh = GET_EQ(ch, WEAR_SHIELD);
+    struct obj_data *held = GET_EQ(ch, WEAR_HOLD);
+
+    /* With a primary weapon equipped: shield XOR hold (not both). */
+    if (prim && GET_OBJ_TYPE(prim) == ITEM_WEAPON) {
+      if (sh && held) {
+        send_to_char(ch, "You cannot use both a shield and a held item while wielding a weapon.\r\n");
+        return;
+      }
+      if (is_two_hander(prim) && (sh || held)) {
+        send_to_char(ch, "Your weapon requires two hands. Remove your shield and held item first.\r\n");
+        return;
+      }
+    }
+
+    if (where == WEAR_WIELD) {
+      if (is_two_hander(obj) && (sh || held)) {
+        send_to_char(ch, "That weapon requires two hands. Remove your shield and held item first.\r\n");
+        return;
+      }
+      if (sh && held) {
+        send_to_char(ch, "You cannot wield a weapon while using both a shield and a held item.\r\n");
+        return;
+      }
+    }
+
+    if (where == WEAR_SHIELD) {
+      if (held) {
+        send_to_char(ch, "You cannot use a shield while holding an item.\r\n");
+        return;
+      }
+      if (prim && is_two_hander(prim)) {
+        send_to_char(ch, "Your weapon requires two hands. You cannot use a shield.\r\n");
+        return;
+      }
+    }
+
+    if (where == WEAR_HOLD) {
+      /* If holding a weapon, treat as offhand (dual wield). */
+      if (obj && GET_OBJ_TYPE(obj) == ITEM_WEAPON) {
+        if (!GET_SKILL(ch, SKILL_DUAL_WIELD)) {
+          send_to_char(ch, "You do not know how to dual wield.\r\n");
+          return;
+        }
+        if (!prim || GET_OBJ_TYPE(prim) != ITEM_WEAPON) {
+          send_to_char(ch, "You need a primary weapon wielded first.\r\n");
+          return;
+        }
+        if (is_two_hander(prim)) {
+          send_to_char(ch, "Your weapon requires two hands. You cannot dual wield.\r\n");
+          return;
+        }
+        if (sh) {
+          send_to_char(ch, "You cannot dual wield while using a shield.\r\n");
+          return;
+        }
+        if (!is_offhand_weapon(obj)) {
+          send_to_char(ch, "That weapon is not balanced for offhand use.\r\n");
+          return;
+        }
+        if (GET_OBJ_WEIGHT(obj) > GET_OBJ_WEIGHT(prim)) {
+          send_to_char(ch, "Your offhand weapon must be the same weight or lighter than your primary weapon.\r\n");
+          return;
+        }
+      } else {
+        /* Non-weapon hold item: cannot be used with a shield. Also blocked by two handers. */
+        if (sh) {
+          send_to_char(ch, "You cannot hold an item while using a shield.\r\n");
+          return;
+        }
+        if (prim && is_two_hander(prim)) {
+          send_to_char(ch, "Your weapon requires two hands. You cannot hold an item.\r\n");
+          return;
+        }
+      }
+    }
+  }
+  /* dual wield + two hander rules end */
+
   /*
    * ITEM_WEAR_TAKE is used for objects that do not require special bits
    * to be put into that position (e.g. you can hold any object, not just

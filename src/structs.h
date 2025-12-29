@@ -441,7 +441,9 @@
 #define ITEM_NOSELL           16   /**< Shopkeepers won't touch it */
 #define ITEM_QUEST            17   /**< Item is a quest item         */
 /** Total number of item flags */
-#define NUM_ITEM_FLAGS    18
+#define ITEM_TWO_HANDER 18  /**< Weapon requires two hands */
+#define ITEM_OFFHAND   19  /**< Weapon allowed in offhand */
+#define NUM_ITEM_FLAGS 20
 
 /* Modifier constants used with obj affects ('A' fields) */
 #define APPLY_NONE              0	/**< No effect			*/
