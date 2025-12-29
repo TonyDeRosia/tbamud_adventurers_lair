@@ -1060,5 +1060,7 @@ void mag_assign_spells(void) {
   skillo_cost(SKILL_TRACK, "track", 5);
   skillo_cost(SKILL_WHIRLWIND, "whirlwind", 20);
   skillo_cost(SKILL_BANDAGE, "bandage", 8);
+
+  skillo_cost(SKILL_DUAL_WIELD, "dual wield", 0);
 }
 
