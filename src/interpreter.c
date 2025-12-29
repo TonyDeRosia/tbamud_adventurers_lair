@@ -2198,6 +2198,20 @@ save_char(d->character);
         }
 
       delete_variables(GET_NAME(d->character));
+        if (d->acct_id > 0) {
+          struct account_data acct;
+          account_load_any(d->acct_id, &acct);
+          account_remove_character(&acct, GET_NAME(d->character));
+          account_save_any(&acct);
+        }
+
+      if (d->acct_id > 0) {
+        struct account_data acct;
+        account_load_any(d->acct_id, &acct);
+        account_remove_character(&acct, GET_NAME(d->character));
+        account_save_any(&acct);
+      }
+
       write_to_output(d, "Character '%s' deleted! Goodbye.\r\n", GET_NAME(d->character));
       mudlog(NRM, MAX(LVL_GOD, GET_INVIS_LEV(d->character)), TRUE, "%s (lev %d) has self-deleted.",
        GET_NAME(d->character), GET_LEVEL(d->character));
