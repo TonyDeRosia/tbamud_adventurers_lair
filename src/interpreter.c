@@ -1322,6 +1322,135 @@ EVENTFUNC(get_protocols)
 }
 
 /* deal with newcomers and other non-playing sockets */
+
+/* ------------------------------------------------------------------------- */
+/* Character creation: stat allocation                                       */
+/* Base stats start at 25 (set in init_char). Players can spend a small pool */
+/* to increase stats. CON costs 2 points per +1.                             */
+
+#define STAT_ALLOC_POOL 15
+#define STAT_ALLOC_CAP  30
+
+static int stat_alloc_cost(int idx)
+{
+  /* 0 Str, 1 Dex, 2 Con, 3 Int, 4 Wis, 5 Cha */
+  return (idx == 2) ? 2 : 1;
+}
+
+static int stat_alloc_get_real(struct char_data *ch, int idx)
+{
+  switch (idx) {
+    case 0: return ch->real_abils.str;
+    case 1: return ch->real_abils.dex;
+    case 2: return ch->real_abils.con;
+    case 3: return ch->real_abils.intel;
+    case 4: return ch->real_abils.wis;
+    case 5: return ch->real_abils.cha;
+    default: return 0;
+  }
+}
+
+static void stat_alloc_inc_real(struct char_data *ch, int idx)
+{
+  switch (idx) {
+    case 0: ch->real_abils.str++; break;
+    case 1: ch->real_abils.dex++; break;
+    case 2: ch->real_abils.con++; break;
+    case 3: ch->real_abils.intel++; break;
+    case 4: ch->real_abils.wis++; break;
+    case 5: ch->real_abils.cha++; break;
+    default: break;
+  }
+}
+
+static int stat_alloc_spent(struct descriptor_data *d)
+{
+  int i, spent = 0;
+  struct char_data *ch = d->character;
+
+  for (i = 0; i < 6; i++) {
+    int delta = stat_alloc_get_real(ch, i) - d->stat_alloc_base[i];
+    if (delta > 0)
+      spent += delta * stat_alloc_cost(i);
+  }
+  return spent;
+}
+
+static int stat_alloc_remaining(struct descriptor_data *d)
+{
+  return d->stat_alloc_pool - stat_alloc_spent(d);
+}
+
+static void stat_alloc_snapshot_base(struct descriptor_data *d)
+{
+  struct char_data *ch = d->character;
+
+  d->stat_alloc_pool = STAT_ALLOC_POOL;
+  d->stat_alloc_base[0] = ch->real_abils.str;
+  d->stat_alloc_base[1] = ch->real_abils.dex;
+  d->stat_alloc_base[2] = ch->real_abils.con;
+  d->stat_alloc_base[3] = ch->real_abils.intel;
+  d->stat_alloc_base[4] = ch->real_abils.wis;
+  d->stat_alloc_base[5] = ch->real_abils.cha;
+}
+
+static void stat_alloc_reset(struct descriptor_data *d)
+{
+  struct char_data *ch = d->character;
+
+  ch->real_abils.str   = d->stat_alloc_base[0];
+  ch->real_abils.dex   = d->stat_alloc_base[1];
+  ch->real_abils.con   = d->stat_alloc_base[2];
+  ch->real_abils.intel = d->stat_alloc_base[3];
+  ch->real_abils.wis   = d->stat_alloc_base[4];
+  ch->real_abils.cha   = d->stat_alloc_base[5];
+
+  affect_total(ch);
+}
+
+static void stat_alloc_show(struct descriptor_data *d)
+{
+  int rem = stat_alloc_remaining(d);
+  struct char_data *ch = d->character;
+
+  write_to_output(d,
+    "\r\nBase stat allocation\r\n"
+    "Points remaining: %d  (CON costs 2)  Cap: %d\r\n\r\n"
+    "Str %d   Dex %d   Con %d   Int %d   Wis %d   Cha %d\r\n\r\n"
+    "1) Str +1  (1)\r\n"
+    "2) Dex +1  (1)\r\n"
+    "3) Con +1  (2)\r\n"
+    "4) Int +1  (1)\r\n"
+    "5) Wis +1  (1)\r\n"
+    "6) Cha +1  (1)\r\n"
+    "7) Done\r\n"
+    "8) Reset\r\n"
+    "\r\nChoice: ",
+    rem, STAT_ALLOC_CAP,
+    ch->real_abils.str, ch->real_abils.dex, ch->real_abils.con,
+    ch->real_abils.intel, ch->real_abils.wis, ch->real_abils.cha);
+}
+
+static void stat_alloc_try_add(struct descriptor_data *d, int idx)
+{
+  struct char_data *ch = d->character;
+  int cost = stat_alloc_cost(idx);
+  int cur = stat_alloc_get_real(ch, idx);
+  int rem = stat_alloc_remaining(d);
+
+  if (cur >= STAT_ALLOC_CAP) {
+    write_to_output(d, "\r\nThat stat is already at the cap (%d).\r\n", STAT_ALLOC_CAP);
+    return;
+  }
+  if (rem < cost) {
+    write_to_output(d, "\r\nNot enough points remaining.\r\n");
+    return;
+  }
+
+  stat_alloc_inc_real(ch, idx);
+  affect_total(ch);
+}
+
 void nanny(struct descriptor_data *d, char *arg)
 {
   int load_result;	/* Overloaded variable */
@@ -1848,10 +1977,14 @@ if (load_result == CLASS_UNDEFINED) {
 
 /* Now GET_NAME() will work properly. */
 init_char(d->character);
-save_char(d->character);
-save_player_index();
-write_to_output(d, "%s\r\n*** PRESS RETURN: ", motd);
-STATE(d) = CON_RMOTD;
+
+	/* Apply racial bonuses once, then allow limited point allocation. */
+	apply_racial_bonuses(d->character);
+	stat_alloc_snapshot_base(d);
+
+	STATE(d) = CON_QSTATS;
+	stat_alloc_show(d);
+	return;
 /* make sure the last log is updated correctly. */
 GET_PREF(d->character)= rand_number(1, 128000);
 GET_HOST(d->character)= strdup(d->host);
@@ -1865,6 +1998,60 @@ if (AddRecentPlayer(GET_NAME(d->character), d->host, TRUE, FALSE) == FALSE)
          "Failure to AddRecentPlayer (returned FALSE).");
 }
 break;
+
+  case CON_QSTATS: {
+    int choice = atoi(arg);
+    int rem;
+
+    if (!*arg) {
+      stat_alloc_show(d);
+      return;
+    }
+
+    switch (choice) {
+      case 1: stat_alloc_try_add(d, 0); break; /* Str */
+      case 2: stat_alloc_try_add(d, 1); break; /* Dex */
+      case 3: stat_alloc_try_add(d, 2); break; /* Con */
+      case 4: stat_alloc_try_add(d, 3); break; /* Int */
+      case 5: stat_alloc_try_add(d, 4); break; /* Wis */
+      case 6: stat_alloc_try_add(d, 5); break; /* Cha */
+      case 8: stat_alloc_reset(d); break;
+      case 7:
+        rem = stat_alloc_remaining(d);
+        if (rem < 0) {
+          write_to_output(d, "
+You have overspent your points.
+");
+          stat_alloc_show(d);
+          return;
+        }
+
+        save_char(d->character);
+        save_player_index();
+        write_to_output(d, "%s
+*** PRESS RETURN: ", motd);
+        STATE(d) = CON_RMOTD;
+
+        /* make sure the last log is updated correctly. */
+        GET_PREF(d->character) = rand_number(1, 128000);
+        GET_HOST(d->character) = strdup(d->host);
+        mudlog(NRM, LVL_GOD, TRUE, "%s [%s] new player.", GET_NAME(d->character), d->host);
+        if (AddRecentPlayer(GET_NAME(d->character), d->host, TRUE, FALSE) == FALSE) {
+          mudlog(BRF, MAX(LVL_IMMORT, GET_INVIS_LEV(d->character)), TRUE,
+                 "Failure to AddRecentPlayer (returned FALSE).");
+        }
+        return;
+      default:
+        write_to_output(d, "
+Invalid choice.
+");
+        break;
+    }
+
+    stat_alloc_show(d);
+    return;
+  }
+
 
   case CON_RMOTD:		/* read CR after printing motd   */
     write_to_output(d, "%s", CONFIG_MENU);
