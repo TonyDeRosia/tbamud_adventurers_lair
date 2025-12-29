@@ -27,5 +27,6 @@ void account_init_for_char(struct char_data *ch);
 void account_attach_char(struct char_data *ch);
 
 void acct_show_character_menu(struct descriptor_data *d);
+void account_remove_character(struct account_data *acct, const char *name);
 
 #endif

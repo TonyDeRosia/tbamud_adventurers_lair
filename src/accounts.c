@@ -281,3 +281,29 @@ void acct_show_character_menu(struct descriptor_data *d)
 }
 
 
+
+
+void account_remove_character(struct account_data *acct, const char *name)
+{
+  int i, j;
+
+  if (!acct || !name)
+    return;
+
+  for (i = 0; i < acct->num_chars; i++) {
+    if (!acct->chars[i].name[0])
+      continue;
+
+    if (!str_cmp(acct->chars[i].name, name)) {
+      for (j = i; j < acct->num_chars - 1; j++)
+        acct->chars[j] = acct->chars[j + 1];
+
+      memset(&acct->chars[acct->num_chars - 1], 0, sizeof(acct->chars[acct->num_chars - 1]));
+      acct->num_chars--;
+      break;
+    }
+  }
+}
+
+
+
