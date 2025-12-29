@@ -267,6 +267,13 @@ ACMD(do_flee)
 
 ACMD(do_bash)
 {
+  int move_cost = 15;
+  if (GET_MOVE(ch) < move_cost) {
+    send_to_char(ch, "You are too exhausted to bash.\r\n");
+    return;
+  }
+  GET_MOVE(ch) = MAX(0, GET_MOVE(ch) - move_cost);
+
   char arg[MAX_INPUT_LENGTH];
   struct char_data *vict;
   int percent, prob;
@@ -407,6 +414,14 @@ EVENTFUNC(event_whirlwind)
   pMudEvent = (struct mud_event_data *) event_obj;
   ch = (struct char_data *) pMudEvent->pStruct;    
   
+  /* Spend moves each whirlwind tick */
+  const int WHIRL_TICK_COST = 12;
+  if (!ch || GET_MOVE(ch) < WHIRL_TICK_COST) {
+    if (ch) send_to_char(ch, "You are too exhausted to keep spinning.\r\n");
+    return 0;
+  }
+  GET_MOVE(ch) = MAX(0, GET_MOVE(ch) - WHIRL_TICK_COST);
+
   /* When using a list, we have to make sure to allocate the list as it
    * uses dynamic memory */
   room_list = create_list();
@@ -432,10 +447,22 @@ EVENTFUNC(event_whirlwind)
   /* Lets grab some a random NPC from the list, and hit() them up */
   for (count = dice(1, 4); count > 0; count--) {
     tch = random_from_list(room_list);
+
+    /* Target may be gone or dead by the time we pick it */
+    if (!tch)
+      continue;
+    if (IN_ROOM(tch) != IN_ROOM(ch))
+      continue;
+    if (GET_POS(tch) <= POS_DEAD)
+      continue;
+
     hit(ch, tch, TYPE_UNDEFINED);
+
+    /* If we got extracted or moved, stop safely */
+    if (IN_ROOM(ch) == NOWHERE)
+      break;
   }
-  
-  /* Now that our attack is done, let's free out list */
+/* Now that our attack is done, let's free out list */
   free_list(room_list);
   
   /* The "return" of the event function is the time until the event is called
@@ -490,6 +517,13 @@ ACMD(do_whirlwind)
 
 ACMD(do_kick)
 {
+  int move_cost = 10;
+  if (GET_MOVE(ch) < move_cost) {
+    send_to_char(ch, "You are too exhausted to kick.\r\n");
+    return;
+  }
+  GET_MOVE(ch) = MAX(0, GET_MOVE(ch) - move_cost);
+
   char arg[MAX_INPUT_LENGTH];
   struct char_data *vict;
   int percent, prob;
