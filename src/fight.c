@@ -34,7 +34,7 @@ struct char_data *combat_list = NULL;
 /* Weapon attack texts */
 struct attack_hit_type attack_hit_text[] =
 {
-  {"hit", "hits"},    /* 0 */
+  { "fist", "fists" },    /* 0 */
   {"sting", "stings"},
   {"whip", "whips"},
   {"slash", "slashes"},
@@ -63,6 +63,124 @@ static void group_gain(struct char_data *ch, struct char_data *victim);
 static void solo_gain(struct char_data *ch, struct char_data *victim);
 /** @todo refactor this function name */
 static char *replace_string(const char *str, const char *weapon_singular, const char *weapon_plural);
+
+
+static int damage_severity_tier(int dam, struct char_data *victim)
+{
+  int pct;
+
+  if (dam <= 0 || !victim)
+    return 0;
+
+  pct = (dam * 100) / MAX(1, GET_MAX_HIT(victim));
+
+  if (pct <= 4)        return 1;
+  else if (pct <= 9)   return 2;
+  else if (pct <= 19)  return 3;
+  else if (pct <= 29)  return 4;
+  else if (pct <= 44)  return 5;
+  else if (pct <= 59)  return 6;
+  else if (pct <= 74)  return 7;
+  else if (pct <= 89)  return 8;
+  else                 return 9;
+}
+
+static const char *severity_color(int tier)
+{
+  switch (tier) {
+    case 1: case 2: return "\tG";
+    case 3: case 4: return "\tW";
+    case 5: return "\ty";
+    case 6: return "\tY";
+    case 7: return "\tR";
+    case 8: return "\tM";
+    case 9: return "\tR";
+    default: return "\tn";
+  }
+}
+
+static const char *severity_verb_base(int tier)
+{
+  switch (tier) {
+    case 1: return "graze";
+    case 2: return "glance";
+    case 3: return "hit";
+    case 4: return "strike";
+    case 5: return "slam";
+    case 6: return "crush";
+    case 7: return "devastate";
+    case 8: return "maim";
+    case 9: return "annihilate";
+    default: return "hit";
+  }
+}
+
+static const char *severity_verb_third(int tier)
+{
+  switch (tier) {
+    case 1: return "grazes";
+    case 2: return "glances";
+    case 3: return "hits";
+    case 4: return "strikes";
+    case 5: return "slams";
+    case 6: return "crushes";
+    case 7: return "devastates";
+    case 8: return "maims";
+    case 9: return "annihilates";
+    default: return "hits";
+  }
+}
+
+static void apply_severity_verb(char *out, size_t outsz, const char *in, int tier)
+{
+  const char *col = severity_color(tier);
+  const char *vb  = severity_verb_base(tier);
+  const char *vt  = severity_verb_third(tier);
+
+  char *pos;
+
+  if (!in || !*in) {
+    if (outsz) out[0] = '\0';
+    return;
+  }
+
+  snprintf(out, outsz, "%s", in);
+
+  /* Prefer replacing " hit" (base) first (skills often use "You hit $N"). */
+  if ((pos = strstr(out, " hit "))) {
+    char tmp[MAX_STRING_LENGTH];
+    *pos = '\0';
+    snprintf(tmp, sizeof(tmp), "%s %s%s\tn %s%s", out, col, vb, pos + 5, "");
+    snprintf(out, outsz, "%s", tmp);
+    return;
+  }
+  if ((pos = strstr(out, " hit!"))) {
+    char tmp[MAX_STRING_LENGTH];
+    *pos = '\0';
+    snprintf(tmp, sizeof(tmp), "%s %s%s\tn!%s", out, col, vb, pos + 5);
+    snprintf(out, outsz, "%s", tmp);
+    return;
+  }
+
+  /* Then replace third person " hits" (many spell messages use "X hits $N"). */
+  if ((pos = strstr(out, " hits "))) {
+    char tmp[MAX_STRING_LENGTH];
+    *pos = '\0';
+    snprintf(tmp, sizeof(tmp), "%s %s%s\tn %s%s", out, col, vt, pos + 6, "");
+    snprintf(out, outsz, "%s", tmp);
+    return;
+  }
+  if ((pos = strstr(out, " hits!"))) {
+    char tmp[MAX_STRING_LENGTH];
+    *pos = '\0';
+    snprintf(tmp, sizeof(tmp), "%s %s%s\tn!%s", out, col, vt, pos + 6);
+    snprintf(out, outsz, "%s", tmp);
+    return;
+  }
+
+  /* If we cannot find a generic verb, leave as is. */
+}
+
 static int compute_thaco(struct char_data *ch, struct char_data *vict);
 
 
@@ -421,66 +539,66 @@ static void dam_message(int dam, struct char_data *ch, struct char_data *victim,
     const char *to_victim;
   } dam_weapons[] = {
 
-    /* use #w for singular (i.e. "slash") and #W for plural (i.e. "slashes") */
+    /* #w is weapon singular text (used as a noun here: "with your slash"). */
 
     {
-      "$n tries to #w $N, but misses.",        /* 0: miss */
-      "You try to #w $N, but miss.",
-      "$n tries to #w you, but misses."
+      "$n tries to use $s #w on $N, but misses.",
+      "You try to use your #w on $N, but miss.",
+      "$n tries to use $s #w on you, but misses."
     },
 
     {
-      "$n lands a \tGgrazing\tn #w on $N.",          /* 1: 1 to 4 percent */
-      "You land a \tGgrazing\tn #w on $N.",
-      "$n lands a \tGgrazing\tn #w on you."
+      "$n 	Ggrazes	n $N with $s #w.",
+      "You 	Ggraze	n $N with your #w.",
+      "$n 	Ggrazes	n you with $s #w."
     },
 
     {
-      "$n delivers a \tGglancing\tn #w to $N.",      /* 2: 5 to 9 percent */
-      "You deliver a \tGglancing\tn #w to $N.",
-      "$n delivers a \tGglancing\tn #w to you."
+      "$n 	Gglances	n $N with $s #w.",
+      "You 	Gglance	n $N with your #w.",
+      "$n 	Gglances	n you with $s #w."
     },
 
     {
-      "$n hits $N with a \tWclean\tn #w.",           /* 3: 10 to 19 percent */
-      "You hit $N with a \tWclean\tn #w.",
-      "$n hits you with a \tWclean\tn #w."
+      "$n 	Whits	n $N with $s #w.",
+      "You 	Whit	n $N with your #w.",
+      "$n 	Whits	n you with $s #w."
     },
 
     {
-      "$n strikes $N with a \tWsolid\tn #w.",        /* 4: 20 to 29 percent */
-      "You strike $N with a \tWsolid\tn #w.",
-      "$n strikes you with a \tWsolid\tn #w."
+      "$n 	Wstrikes	n $N with $s #w.",
+      "You 	Wstrike	n $N with your #w.",
+      "$n 	Wstrikes	n you with $s #w."
     },
 
     {
-      "$n slams $N with a \tyheavy\tn #w.",          /* 5: 30 to 44 percent */
-      "You slam $N with a \tyheavy\tn #w.",
-      "$n slams you with a \tyheavy\tn #w."
+      "$n 	yslams	n $N with $s #w.",
+      "You 	yslam	n $N with your #w.",
+      "$n 	yslams	n you with $s #w."
     },
 
     {
-      "$n crushes $N with a \tYbrutal\tn #w.",       /* 6: 45 to 59 percent */
-      "You crush $N with a \tYbrutal\tn #w.",
-      "$n crushes you with a \tYbrutal\tn #w."
+      "$n 	Ycrushes	n $N with $s #w.",
+      "You 	Ycrush	n $N with your #w.",
+      "$n 	Ycrushes	n you with $s #w."
     },
 
     {
-      "$n \tRdevastates\tn $N with a \tRsavage\tn #w.",    /* 7: 60 to 74 percent */
-      "You \tRdevastate\tn $N with a \tRsavage\tn #w.",
-      "$n \tRdevastates\tn you with a \tRsavage\tn #w."
+      "$n 	Rdevastates	n $N with $s #w!",
+      "You 	Rdevastate	n $N with your #w!",
+      "$n 	Rdevastates	n you with $s #w!"
     },
 
     {
-      "$n \tMmaims\tn $N with a \tMvicious\tn #w!",        /* 8: 75 to 89 percent */
-      "You \tMmaim\tn $N with a \tMvicious\tn #w!",
-      "$n \tMmaims\tn you with a \tMvicious\tn #w!"
+      "$n 	Mmaims	n $N with $s #w!",
+      "You 	Mmaim	n $N with your #w!",
+      "$n 	Mmaims	n you with $s #w!"
     },
 
     {
-      "$n \tRannihilates\tn $N with a \tRlethal\tn #w!!",  /* 9: 90 percent and up */
-      "You \tRannihilate\tn $N with a \tRlethal\tn #w!!",
-      "$n \tRannihilates\tn you with a \tRlethal\tn #w!!"
+      "$n 	Rannihilates	n $N with $s #w!!",
+      "You 	Rannihilate	n $N with your #w!!",
+      "$n 	Rannihilates	n you with $s #w!!"
     }
   };
 
@@ -522,27 +640,6 @@ static void dam_message(int dam, struct char_data *ch, struct char_data *victim,
   send_to_char(victim, CCNRM(victim, C_CMP));
 }
 
-/* Weight sentence based on percent of victim max HP.
- * Used to give spells and skills the same impact as weapon hits. */
-static const char *damage_weight_sentence(int dam, struct char_data *victim)
-{
-int pct;
-
-  if (dam <= 0 || !victim)
-    return "";
-
-  pct = (dam * 100) / MAX(1, GET_MAX_HIT(victim));
-
-  if (pct <= 4)        return " \tGIt is a grazing hit.\tn";
-  else if (pct <= 9)   return " \tGIt is a glancing hit.\tn";
-  else if (pct <= 19)  return " \tWIt lands cleanly.\tn";
-  else if (pct <= 29)  return " \tWIt hits solidly.\tn";
-  else if (pct <= 44)  return " \tyIt hits hard.\tn";
-  else if (pct <= 59)  return " \tYIt hits brutally.\tn";
-  else if (pct <= 74)  return " \tRIt is devastating.\tn";
-  else if (pct <= 89)  return " \tMIt is vicious.\tn";
-  else                 return " \tRIt is annihilating.\tn";
-}
 
 /*  message for doing damage with a spell or skill. Also used for weapon
  *  damage on miss and death blows. */
@@ -555,15 +652,12 @@ int skill_message(int dam, struct char_data *ch, struct char_data *vict,
   char wmsg_att[MAX_STRING_LENGTH];
   char wmsg_vic[MAX_STRING_LENGTH];
   char wmsg_room[MAX_STRING_LENGTH];
-  const char *wgt;
   struct obj_data *weap = GET_EQ(ch, WEAR_WIELD);
 
   /* @todo restructure the messages library to a pointer based system as
    * opposed to the current cyclic location system. */
   for (i = 0; i < MAX_MESSAGES; i++) {
-    if (fight_messages[i].a_type == attacktype) {
-      wgt = damage_weight_sentence(dam, vict);
-      nr = dice(1, fight_messages[i].number_of_attacks);
+    if (fight_messages[i].a_type == attacktype) {      nr = dice(1, fight_messages[i].number_of_attacks);
       for (j = 1, msg = fight_messages[i].msg; (j < nr) && msg; j++)
         msg = msg->next;
 
@@ -591,17 +685,17 @@ int skill_message(int dam, struct char_data *ch, struct char_data *vict,
         } else {
           if (msg->hit_msg.attacker_msg) {
             send_to_char(ch, CCYEL(ch, C_CMP));
-            snprintf(wmsg_att, sizeof(wmsg_att), "%s%s", msg->hit_msg.attacker_msg, wgt);
+            apply_severity_verb(wmsg_att, sizeof(wmsg_att), msg->hit_msg.attacker_msg, damage_severity_tier(dam, vict));
             act(wmsg_att, FALSE, ch, weap, vict, TO_CHAR);
             send_to_char(ch, CCNRM(ch, C_CMP));
           }
 
           send_to_char(vict, CCRED(vict, C_CMP));
-          snprintf(wmsg_vic, sizeof(wmsg_vic), "%s%s", msg->hit_msg.victim_msg, wgt);
+          apply_severity_verb(wmsg_vic, sizeof(wmsg_vic), msg->hit_msg.victim_msg, damage_severity_tier(dam, vict));
           act(wmsg_vic, FALSE, ch, weap, vict, TO_VICT | TO_SLEEP);
           send_to_char(vict, CCNRM(vict, C_CMP));
 
-          snprintf(wmsg_room, sizeof(wmsg_room), "%s%s", msg->hit_msg.room_msg, wgt);
+          apply_severity_verb(wmsg_room, sizeof(wmsg_room), msg->hit_msg.room_msg, damage_severity_tier(dam, vict));
           act(wmsg_room, FALSE, ch, weap, vict, TO_NOTVICT);
         }
       } else if (ch != vict) {	/* Dam == 0 */
