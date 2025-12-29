@@ -1200,6 +1200,55 @@ NOTE: Buildwalk does not autosave on exit. You must type SAVEALL. This way if
  
 See also: TOGGLE, SAVEALL, REDIT, OLC, RLIST, DIG
 #31
+BUILDXP
+BUILDXP
+Recommended mob and quest XP values for builder reference.
+====================
+RECOMMENDED MOB EXP
+====================
+These examples use a 3.3 percent baseline for an even con solo kill.
+Level 10
+- Player XP per kill: ~300
+- Mob EXP to set: ~900
+Level 20
+- Player XP per kill: ~1,000
+- Mob EXP to set: ~3,000
+Level 30
+- Player XP per kill: ~2,200
+- Mob EXP to set: ~6,600
+Level 40
+- Player XP per kill: ~3,700
+- Mob EXP to set: ~11,000
+Level 50
+- Player XP per kill: ~5,400
+- Mob EXP to set: ~16,000
+Level 60
+- Player XP per kill: ~7,500
+- Mob EXP to set: ~22,500
+Level 70
+- Player XP per kill: ~9,800
+- Mob EXP to set: ~29,000
+Level 80
+- Player XP per kill: ~12,500
+- Mob EXP to set: ~37,000
+Level 90
+- Player XP per kill: ~15,300
+- Mob EXP to set: ~46,000
+====================
+QUEST BUILDING XP
+====================
+Quest XP should reward time, travel, and risk.
+It should not replace core leveling from combat.
+Recommended quest rewards (measured in kills worth):
+- Small quest: 3 to 8 kills worth
+- Medium quest: 8 to 15 kills worth
+- Major quest or chain completion: 15 to 30 kills worth
+Example at level 30:
+- Even kill XP: ~2,200
+- Small quest: ~11,000 XP
+- Medium quest: ~26,000 XP
+- Major quest: ~55,000 XP
+#0
 BULLETINS BOARDS BULLETIN-BOARDS MESSAGE-BOARDS POSTING
 
 Bulletin boards are the forum of inter-player communication on the MUD.
@@ -2535,35 +2584,6 @@ If the victim is higher level than caster, the spell will inflict
 (caster_level)d4 damage points, saving throw versus half damage.
 
 See also: DISPEL-EVIL
-#0
-PROMPT PROMPTS
-
-Usage: prompt [template]
-       prompt reset
-
-Use PROMPT to configure the text shown while you play. Entering PROMPT with no
-arguments shows the current and default prompt plus the full list of %tokens
-you can insert. PROMPT RESET restores the standard bracketed vitals display.
-
-Escape sequences are translated so you can add ANSI color: \t<code> uses the
-tbaMUD color table (for example \tR for bright red and \tn to reset), {<code>
-is a shorthand for the same table ({R, {n, etc.), \e sends a raw escape, and
-\xHH accepts a two-digit hex byte such as \x1B for ESC. Use \\ if you need a
-literal backslash.
-
-Common %tokens:
-  %h %H %m %M %v %V - Current/max hit points, mana, and movement
-  %x %X %l %a %A    - Total XP, XP to next level, level, armor, alignment
-  %g %q %Q %c       - Gold carried, quest points, quests completed, quest vnum
-  %p %r %n %y %t    - Position, room vnum, name, age in years, playtime
-
-Examples:
-  prompt \tG[%h/%H\tn \tC%m/%M\tn \tY%v/%V\tn \tW%X\tn] >
-  prompt \e[32mHP:%h\e[0m MN:%m MV:%v TNL:%X >
-  prompt {R[%h{W/{r%H{Y %v/%V{n %X] >
-  prompt [%n in %p] Gold:%g Quest:%q
-
-See also: TOGGLE
 #0
 DONATE
 
@@ -4228,6 +4248,180 @@ Always make them unique, there are already plenty of swords and citizens on
 most MUDs. 
 
 See also: OEDIT-KEYWORD, MEDIT-KEYWORDS, EXTRA, COLORCODES
+#31
+KEYWORDS
+
+This help file is unfinished.
+====================
+RECOMMENDED MOB EXP
+====================
+These examples use a 3.3 percent baseline for an even con solo kill.
+Level 10
+- Player XP per kill: ~300
+- Mob EXP to set: ~900
+Level 20
+- Player XP per kill: ~1,000
+- Mob EXP to set: ~3,000
+Level 30
+- Player XP per kill: ~2,200
+- Mob EXP to set: ~6,600
+Level 40
+- Player XP per kill: ~3,700
+- Mob EXP to set: ~11,000
+Level 50
+- Player XP per kill: ~5,400
+- Mob EXP to set: ~16,000
+Level 60
+- Player XP per kill: ~7,500
+- Mob EXP to set: ~22,500
+Level 70
+- Player XP per kill: ~9,800
+- Mob EXP to set: ~29,000
+Level 80
+- Player XP per kill: ~12,500
+- Mob EXP to set: ~37,000
+Level 90
+- Player XP per kill: ~15,300
+- Mob EXP to set: ~46,000
+====================
+QUEST BUILDING XP
+====================
+Quest XP should reward time, travel, and risk.
+It should not replace core leveling from combat.
+Recommended quest rewards (measured in kills worth):
+- Small quest: 3 to 8 kills worth
+- Medium quest: 8 to 15 kills worth
+- Major quest or chain completion: 15 to 30 kills worth
+Example at level 30:
+- Even kill XP: ~2,200
+- Small quest: ~11,000 XP
+- Medium quest: ~26,000 XP
+- Major quest: ~55,000 XP
+====================
+RECOMMENDED MOB EXP
+====================
+These examples use a 3.3 percent baseline for an even con solo kill.
+Level 10
+- Player XP per kill: ~300
+- Mob EXP to set: ~900
+Level 20
+- Player XP per kill: ~1,000
+- Mob EXP to set: ~3,000
+Level 30
+- Player XP per kill: ~2,200
+- Mob EXP to set: ~6,600
+Level 40
+- Player XP per kill: ~3,700
+- Mob EXP to set: ~11,000
+Level 50
+- Player XP per kill: ~5,400
+- Mob EXP to set: ~16,000
+Level 60
+- Player XP per kill: ~7,500
+- Mob EXP to set: ~22,500
+Level 70
+- Player XP per kill: ~9,800
+- Mob EXP to set: ~29,000
+Level 80
+- Player XP per kill: ~12,500
+- Mob EXP to set: ~37,000
+Level 90
+- Player XP per kill: ~15,300
+- Mob EXP to set: ~46,000
+====================
+QUEST BUILDING XP
+====================
+Quest XP should reward time, travel, and risk.
+It should not replace core leveling from combat.
+Recommended quest rewards (measured in kills worth):
+- Small quest: 3 to 8 kills worth
+- Medium quest: 8 to 15 kills worth
+- Major quest or chain completion: 15 to 30 kills worth
+Example at level 30:
+- Even kill XP: ~2,200
+- Small quest: ~11,000 XP
+- Medium quest: ~26,000 XP
+- Major quest: ~55,000 XP
+====================
+RECOMMENDED MOB EXP
+====================
+These examples use a 3.3 percent baseline for an even con solo kill.
+Level 10
+- Player XP per kill: ~300
+- Mob EXP to set: ~900
+Level 20
+- Player XP per kill: ~1,000
+- Mob EXP to set: ~3,000
+Level 30
+- Player XP per kill: ~2,200
+- Mob EXP to set: ~6,600
+Level 40
+- Player XP per kill: ~3,700
+- Mob EXP to set: ~11,000
+Level 50
+- Player XP per kill: ~5,400
+- Mob EXP to set: ~16,000
+Level 60
+- Player XP per kill: ~7,500
+- Mob EXP to set: ~22,500
+Level 70
+- Player XP per kill: ~9,800
+- Mob EXP to set: ~29,000
+Level 80
+- Player XP per kill: ~12,500
+- Mob EXP to set: ~37,000
+Level 90
+- Player XP per kill: ~15,300
+- Mob EXP to set: ~46,000
+====================
+QUEST BUILDING XP
+====================
+Quest XP should reward time, travel, and risk.
+It should not replace core leveling from combat.
+Recommended quest rewards (measured in kills worth):
+- Small quest: 3 to 8 kills worth
+- Medium quest: 8 to 15 kills worth
+- Major quest or chain completion: 15 to 30 kills worth
+Example at level 30:
+- Even kill XP: ~2,200
+- Small quest: ~11,000 XP
+- Medium quest: ~26,000 XP
+- Major quest: ~55,000 XP
+#31
+KEYWORDS
+
+This help file is unfinished.
+====================
+RECOMMENDED MOB EXP
+====================
+These examples use a 3.3 percent baseline for an even con solo kill.
+Level 10
+- Player XP per kill: ~300
+- Mob EXP to set: ~900
+Level 20
+- Player XP per kill: ~1,000
+- Mob EXP to set: ~3,000
+Level 30
+- Player XP per kill: ~2,200
+- Mob EXP to set: ~6,600
+Level 40
+- Player XP per kill: ~3,700
+- Mob EXP to set: ~11,000
+Level 50
+- Player XP per kill: ~5,400
+- Mob EXP to set: ~16,000
+Level 60
+- Player XP per kill: ~7,500
+- Mob EXP to set: ~22,500
+Level 70
+- Player XP per kill: ~9,800
+- Mob EXP to set: ~29,000
+Level 80
+- Player XP per kill: ~12,500
+- Mob EXP to set: ~37,000
+Level 90
+- Player XP per kill: ~15,300
+- Mob EXP to set: ~46,000
 #31
 KICK
 
@@ -7112,6 +7306,67 @@ to give back to the tbaMUD community and have the requisite skills, you will be
 advanced and given further tools to teach others via your level.  Generally, if
 you ask for a promotion, you will be less likely to receive it.
 #0
+PROMPT PROMPTS
+
+Usage: prompt [template]
+       prompt reset
+
+Use PROMPT to configure the text shown while you play. Entering PROMPT with no
+arguments shows the current and default prompt plus the full list of %tokens
+you can insert. PROMPT RESET restores the standard bracketed vitals display.
+
+Escape sequences are translated so you can add ANSI color: \t<code> uses the
+tbaMUD color table (for example \tR for bright red and \tn to reset), {<code>
+is a shorthand for the same table ({R, {n, etc.), \e sends a raw escape, and
+\xHH accepts a two-digit hex byte such as \x1B for ESC. Use \\ if you need a
+literal backslash.
+
+Common %tokens:
+  %h %H %m %M %v %V - Current/max hit points, mana, and movement
+  %x %X %l %a %A    - Total XP, XP to next level, level, armor, alignment
+  %g %q %Q %c       - Gold carried, quest points, quests completed, quest vnum
+  %p %r %n %y %t    - Position, room vnum, name, age in years, playtime
+
+Examples:
+  prompt \tG[%h/%H\tn \tC%m/%M\tn \tY%v/%V\tn \tW%X\tn] >
+  prompt \e[32mHP:%h\e[0m MN:%m MV:%v TNL:%X >
+  prompt {R[%h{W/{r%H{Y %v/%V{n %X] >
+  prompt [%n in %p] Gold:%g Quest:%q
+
+See also: TOGGLE
+#0
+PROMPT
+
+Usage: prompt [template]
+       prompt reset
+
+PROMPT sets the text shown while you play. Running PROMPT alone lists your
+current and default prompts plus the full set of %tokens. PROMPT RESET restores
+the standard bracketed vitals display.
+
+Escape sequences are interpreted for color: \t<code> inserts the tbaMUD color
+table (\tR bright red, \tn reset, etc.), {<code> is a shorthand for the same
+table ({R, {n, etc.), \e sends a raw escape, and \xHH allows a two-digit hex
+byte such as \x1B. Use \\ for a literal backslash.
+
+Common tokens:
+  %h %H %m %M %v %V - Current/max hit points, mana, and movement
+  %x %X %l %a %A    - Total XP, XP to next level, level, armor, alignment
+  %g %q %Q %c       - Gold carried, quest points, quests completed, quest vnum
+  %p %r %n %y %t    - Position, room vnum, name, age in years, playtime
+
+Examples:
+  prompt \tG[%h/%H\tn \tC%m/%M\tn \tY%v/%V\tn] \tW%X\tn>
+  prompt \e[36m%n\e[0m in %p HP:%h/%H Quest:%q
+  prompt {R[%h{W/{r%H]{Y %v/%V{n {W%X{n>
+  prompt [%n] XP:%x TNL:%X Gold:%g
+  %str %int %wis %dex %con %cha - Ability scores
+  %gold %bank %qp %prac %ac %hr %dr %align - Currency, practice, and combat stats
+
+Use %% to place a literal percent sign in the prompt. Type 'prompt reset' to
+restore the default prompt.
+
+#31
 PROPOSALS GUIDELINES ZONE-PROPOSALS PROPOSITIONS PROPOSE REQUESTS CRITERIA
 
 Congratulations, you must have completed your first trial of building one
@@ -7559,6 +7814,16 @@ or character.  If the target is not specified it will be used upon yourself.
 
 See also: SPELLS
 #0
+RECOMMENDATION
+
+Type @<send link="Help buildrecs">help buildrecs@</send> to view the builder XP recommendations.
+
+#31
+RECOMMENDATIONS
+
+Type @<send link="Help buildrecs">help buildrecs@</send> to view the builder XP recommendations.
+
+#31
 RECRUITING ADVERTISING ADVERTISEMENTS ADVERTIZING ADVERTIZEMENTS
 
    For those wishing to help spread the word about TBA, thank you! The
@@ -12087,8 +12352,10 @@ There are numerous reasons a trigger would not fire.
 3. Mobs - If a mob can not see the player a trigger may not fire. Be wary of blind mobs, dark rooms, invis/sneaking players. Also switch into the mob to test the trigger and you will see the mob try to execute the trigger commands to help you troubleshoo
 . If you see a "Huh?" or a "that person is not here" it can help you fix your problem.
  
-4. Command Triggers - Arguments: * means all commands. This is an easy way to freeze yourself (all commands you enter are captured by the trigger). To protect against this and other possibly malicious uses of triggers level 102 and above may not be able t
- fully test some triggers (specifically damage and command come to mind). So either create a mortal character or set your level to 101 to fully test all triggers. The return command can be setup to allow you to restore your level back to original, ask you
+4. Command Triggers - Arguments: * means all commands. This is an easy way to freeze yourself (all commands you enter are captured by the trigger). To protect against this and other possibly malicious uses of triggers level 102 and above may not be able 
+
+ fully test some triggers (specifically damage and command come to mind). So either create a mortal character or set your level to 101 to fully test all triggers. The return command can be setup to allow you to restore your level back to original, ask yo
+
 
 
 
@@ -13506,115 +13773,6 @@ own zone if their name is in the zone's builders list.
 
 zlock - Locks one or all zones. Type zlock for usage.
 zunlock - Locks one or all zones. Type zunlock for usage.
-
-#31
-PROMPT
-
-Usage: prompt [template]
-       prompt reset
-
-PROMPT sets the text shown while you play. Running PROMPT alone lists your
-current and default prompts plus the full set of %tokens. PROMPT RESET restores
-the standard bracketed vitals display.
-
-Escape sequences are interpreted for color: \t<code> inserts the tbaMUD color
-table (\tR bright red, \tn reset, etc.), {<code> is a shorthand for the same
-table ({R, {n, etc.), \e sends a raw escape, and \xHH allows a two-digit hex
-byte such as \x1B. Use \\ for a literal backslash.
-
-Common tokens:
-  %h %H %m %M %v %V - Current/max hit points, mana, and movement
-  %x %X %l %a %A    - Total XP, XP to next level, level, armor, alignment
-  %g %q %Q %c       - Gold carried, quest points, quests completed, quest vnum
-  %p %r %n %y %t    - Position, room vnum, name, age in years, playtime
-
-Examples:
-  prompt \tG[%h/%H\tn \tC%m/%M\tn \tY%v/%V\tn] \tW%X\tn>
-  prompt \e[36m%n\e[0m in %p HP:%h/%H Quest:%q
-  prompt {R[%h{W/{r%H]{Y %v/%V{n {W%X{n>
-  prompt [%n] XP:%x TNL:%X Gold:%g
-  %str %int %wis %dex %con %cha - Ability scores
-  %gold %bank %qp %prac %ac %hr %dr %align - Currency, practice, and combat stats
-
-Use %% to place a literal percent sign in the prompt. Type 'prompt reset' to
-restore the default prompt.
-
-#31
-
-
-BUILDERRECS
-
-Type 	<send link="Help buildrecs">help buildrecs	</send> to view the builder XP recommendations.
-
-#31
-RECOMMENDATION
-
-Type 	<send link="Help buildrecs">help buildrecs	</send> to view the builder XP recommendations.
-
-#31
-RECOMMENDATIONS
-
-Type 	<send link="Help buildrecs">help buildrecs	</send> to view the builder XP recommendations.
-
-#31
-
-BUILDRECS
-Builder guide for fair XP pacing with the level 1 to 100 curve.
-
-Mob building basics:
-1. Set the mob level to match the zone difficulty.
-2. Set the mob EXP value so an even con kill feels consistent at that level.
-3. Use specials, skills, spells, equipment, and flags to make difficulty, not raw EXP, define the fight.
-
-How kill XP is calculated:
-1. On kill, the game starts from the mob EXP field.
-2. Solo kill award is roughly mob_exp divided by 3, with a bonus if the mob is higher level.
-3. Group kills split a shared pool, so per player XP is lower unless the fight is harder.
-
-Recommended baseline target:
-An even con solo kill should be about 3.3 percent of the XP needed for the next level.
-This is a baseline for normal mobs. Hard elites can be worth more because they take longer and hit harder.
-
-Quick formula for builders:
-1. Find XP needed for the next level for that range of players.
-2. Decide what the kill should be worth as a percent of that level.
-3. Set mob EXP to about kill_award times 3.
-
-Suggested percent targets:
-1. Easy trash: 1.5 to 2.5 percent.
-2. Normal even con: 3.0 to 3.5 percent.
-3. Hard elite: 4.0 to 6.0 percent.
-
-Recommended mob EXP examples using 3.3 percent baseline:
-Columns: level, XP needed, player XP per even kill, mob EXP to set
-Level 10: need 9,197, kill 304, mob_exp 912
-Level 20: need 32,358, kill 1,068, mob_exp 3,204
-Level 30: need 66,770, kill 2,203, mob_exp 6,609
-Level 40: need 111,282, kill 3,672, mob_exp 11,016
-Level 50: need 165,171, kill 5,451, mob_exp 16,353
-Level 60: need 227,918, kill 7,521, mob_exp 22,563
-Level 70: need 299,119, kill 9,871, mob_exp 29,613
-Level 80: need 378,454, kill 12,489, mob_exp 37,467
-Level 90: need 465,650, kill 15,366, mob_exp 46,098
-
-Quest building basics:
-1. Keep short quests simple and repeatable.
-2. Use quest XP to reward time, travel, and risk, not to skip the whole game.
-3. Prefer quest points and items for long term value, with XP as a strong bonus.
-
-Recommended quest XP in kills worth:
-1. Small quest: 3 to 8 kills worth.
-2. Medium quest: 8 to 15 kills worth.
-3. Major quest or chain finish: 15 to 30 kills worth.
-
-Quest XP examples at level 30 baseline:
-At level 30, baseline even kill award is about 2,203 XP.
-Small quest: 11,015 XP. Medium quest: 26,436 XP. Major quest: 55,075 XP.
-
-Notes:
-1. If a zone has unusually high mob EXP values, it will powerlevel players even if the fights are easy.
-2. If fights are long or dangerous, higher EXP is fine because XP per hour stays sane.
-3. Always test with real kill speed. The goal is steady progress, not perfect math.
 
 #31
 $~

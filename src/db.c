@@ -151,6 +151,19 @@ static void free_extra_descriptions(struct extra_descr_data *edesc);
 static bitvector_t asciiflag_conv_aff(char *flag);
 static int hsort(const void *a, const void *b);
 
+
+/* Help table must be sorted for binary search in do_help(). */
+static int help_table_qsort_cmp(const void *a, const void *b)
+{
+  const struct help_index_element *ha = (const struct help_index_element *)a;
+  const struct help_index_element *hb = (const struct help_index_element *)b;
+
+  if (!ha || !ha->keywords) return -1;
+  if (!hb || !hb->keywords) return 1;
+
+  return str_cmp(ha->keywords, hb->keywords);
+}
+
 /* routines for booting the system */
 char *fread_action(FILE *fl, int nr)
 {
@@ -963,6 +976,11 @@ void index_boot(int mode)
     break;
   case DB_BOOT_HLP:
     prefix = HLP_PREFIX;
+
+    /* Ensure help_table is sorted for binary search in do_help(). */
+    if (help_table && top_of_helpt > 1)
+      qsort(help_table, top_of_helpt, sizeof(struct help_index_element), help_table_qsort_cmp);
+
     break;
   case DB_BOOT_TRG:
     prefix = TRG_PREFIX;
