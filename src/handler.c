@@ -1532,4 +1532,10 @@ void join_group(struct char_data *ch, struct group_data *group)
     send_to_group(NULL, group, "%s becomes leader of the group.\r\n", GET_NAME(ch));
   else
     send_to_group(NULL, group, "%s joins the group.\r\n", GET_NAME(ch));		
+
+  /* Base crit chance from stats */
+  ch->points.melee_crit += MAX(0, GET_DEX(ch) - 12);
+  ch->points.spell_crit += MAX(0, GET_INT(ch) - 12);
+  ch->points.heal_crit  += MAX(0, GET_WIS(ch) - 12);
+
 }
