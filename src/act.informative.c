@@ -1048,9 +1048,7 @@ len = append_box_line(buf, len, sizeof(buf), B, R, "", W);
 len = append_box_line(buf, len, sizeof(buf), B, R, line, W);/* Combat Stats */
   {
     int base_thaco = thaco(GET_CLASS(ch), GET_LEVEL(ch));
-    int str_to_hit = str_app[STRENGTH_APPLY_INDEX(ch)].tohit;
-    int str_to_dam = str_app[STRENGTH_APPLY_INDEX(ch)].todam;
-    int dex_def    = dex_app[GET_DEX(ch)].defensive;
+    int str_to_hit = str_app[STRENGTH_APPLY_INDEX(ch)].tohit;int dex_def    = dex_app[GET_DEX(ch)].defensive;
 
     /* To Hit (vs AC 0): your hit target number versus Armor Class 0.
        Lower is better. In combat, the target's Armor Class shifts this number. */
@@ -1163,13 +1161,6 @@ len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
 
 
   
-  len = append_box_line(buf, len, sizeof(buf), B, R, "", W);
-/* Dex AC bonus: defensive modifier from Dex that contributes to Armor Class. */
-snprintf(line, sizeof(line),
-         C, R,
-         str_to_hit, str_to_dam, dex_def);
-len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
-
 /* Saves: these are your saving throw modifiers. Negative is better (helps saves). */
 if (GET_EQ(ch, WEAR_WIELD) && GET_OBJ_TYPE(GET_EQ(ch, WEAR_WIELD)) == ITEM_WEAPON) {
   struct obj_data *wobj = GET_EQ(ch, WEAR_WIELD);
