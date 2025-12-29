@@ -106,17 +106,13 @@ int roll_heal_crit(struct char_data *ch)
  */
 void crit_show_banner(struct char_data *ch, struct char_data *victim, int mult)
 {
-  const char *b;
-
-  if (!ch)
-    return;
-
-  b = crit_banner_for_mult(mult);
-  send_to_char(ch, "%s\r\n", b);
-
-  if (victim && victim != ch)
-    send_to_char(victim, "%s\r\n", b);
+  /* Inline crit presentation is handled in the main damage line.
+   * Keep this function as a no-op to avoid duplicate or confusing output. */
+  (void)ch;
+  (void)victim;
+  (void)mult;
 }
+
 
 /* These use the points fields added by your crit system: ch->points.melee_crit, etc.
  * They return 1 if a crit happens and set *mult to 200/300/400.

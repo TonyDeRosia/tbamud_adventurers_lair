@@ -65,6 +65,10 @@ static void solo_gain(struct char_data *ch, struct char_data *victim);
 static char *replace_string(const char *str, const char *weapon_singular, const char *weapon_plural);
 
 
+/* Per-hit crit multiplier for message shaping (0 means no crit for this hit). */
+static int current_crit_mult_for_msgs = 0;
+
+
 static int damage_severity_tier(int dam, struct char_data *victim)
 {
   int pct;
@@ -137,6 +141,13 @@ static void apply_severity_verb(char *out, size_t outsz, const char *in, int tie
   const char *vb  = severity_verb_base(tier);
   const char *vt  = severity_verb_third(tier);
 
+
+  /* Max crit tier: swap the action verb to an inline censor token. */
+  if (current_crit_mult_for_msgs >= 400) {
+    col = "	W";
+    vb  = "###CENSORED###";
+    vt  = "###CENSORED###";
+  }
   char *pos;
 
   if (!in || !*in) {
@@ -837,7 +848,9 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
     int mult = 200;
     if (crit_check_melee(ch, &mult)) {
       dam = (dam * mult) / 100;
+      current_crit_mult_for_msgs = mult;
       crit_show_banner(ch, victim, mult);
+      current_crit_mult_for_msgs = mult;
     }
   }
 
@@ -877,6 +890,8 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
       dam_message(dam, ch, victim, attacktype);
     }
   }
+  current_crit_mult_for_msgs = 0;
+
 
   /* Use send_to_char -- act() doesn't send message if you are DEAD. */
   switch (GET_POS(victim)) {
