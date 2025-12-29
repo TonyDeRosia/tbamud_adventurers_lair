@@ -1631,7 +1631,7 @@ ACMD(do_equipment)
   }
 
   /* Float is display-only for now (no real slot implemented yet). */
-  send_to_char(ch, "%s%-12s%s %s[NOTHING]%s\r\n",
+  send_to_char(ch, "%s%-14s%s %s[NOTHING]%s\r\n",
     CBYEL(ch, C_NRM), "Float", CCNRM(ch, C_NRM),
     CBWHT(ch, C_NRM), CCNRM(ch, C_NRM));
 }
