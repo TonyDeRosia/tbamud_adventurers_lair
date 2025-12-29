@@ -1560,24 +1560,82 @@ ACMD(do_inventory)
 
 ACMD(do_equipment)
 {
-  int i, found = 0;
+  /* Custom EQ display: always show all slots in a fixed order. */
+  static const int eq_order[] = {
+    WEAR_HEAD,
+    WEAR_NECK_1,
+    WEAR_NECK_2,
+    WEAR_ABOUT,     /* Back */
+    WEAR_BODY,
+    WEAR_ARMS,
+    WEAR_WRIST_R,
+    WEAR_WRIST_L,
+    WEAR_HANDS,
+    WEAR_FINGER_R,
+    WEAR_FINGER_L,
+    WEAR_WAIST,
+    WEAR_LEGS,
+    WEAR_FEET,
+    WEAR_WIELD,
+    WEAR_HOLD,
+    WEAR_SHIELD,
+    WEAR_LIGHT
+  };
+
+  static const char *eq_labels[] = {
+    "Head",
+    "Neck 1",
+    "Neck 2",
+    "Back",
+    "Body",
+    "Arms",
+    "Wrist Right",
+    "Wrist Left",
+    "Hands",
+    "Finger Right",
+    "Finger Left",
+    "Waist",
+    "Legs",
+    "Feet",
+    "Wield",
+    "Hold",
+    "Shield",
+    "Light"
+  };
+
+  size_t n = sizeof(eq_order) / sizeof(eq_order[0]);
+  size_t i;
 
   send_to_char(ch, "You are using:\r\n");
-  for (i = 0; i < NUM_WEARS; i++) {
-    if (GET_EQ(ch, i)) {
-      found = TRUE;
-      if (CAN_SEE_OBJ(ch, GET_EQ(ch, i))) {
-        send_to_char(ch, "%s", wear_where[i]);
-        show_obj_to_char(GET_EQ(ch, i), ch, SHOW_OBJ_SHORT);
-      } else {
-        send_to_char(ch, "%s", wear_where[i]);
-        send_to_char(ch, "Something.\r\n");
-      }
+
+  for (i = 0; i < n; i++) {
+    int pos = eq_order[i];
+    struct obj_data *obj = GET_EQ(ch, pos);
+
+    /* Slot labels bright yellow */
+    send_to_char(ch, "%s%-14s%s ",
+      CBYEL(ch, C_NRM), eq_labels[i], CCNRM(ch, C_NRM));
+
+    if (!obj) {
+      /* [NOTHING] bright white */
+      send_to_char(ch, "%s[NOTHING]%s\r\n",
+        CBWHT(ch, C_NRM), CCNRM(ch, C_NRM));
+      continue;
+    }
+
+    if (CAN_SEE_OBJ(ch, obj)) {
+      show_obj_to_char(obj, ch, SHOW_OBJ_SHORT); /* prints newline */
+    } else {
+      send_to_char(ch, "Something.\r\n");
     }
   }
-  if (!found)
-    send_to_char(ch, " Nothing.\r\n");
+
+  /* Float is display-only for now (no real slot implemented yet). */
+  send_to_char(ch, "%s%-12s%s %s[NOTHING]%s\r\n",
+    CBYEL(ch, C_NRM), "Float", CCNRM(ch, C_NRM),
+    CBWHT(ch, C_NRM), CCNRM(ch, C_NRM));
 }
+
 
 ACMD(do_time)
 {
