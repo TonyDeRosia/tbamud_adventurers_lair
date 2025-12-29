@@ -3469,6 +3469,13 @@ void reset_char(struct char_data *ch)
 /* clear ALL the working variables of a char; do NOT free any space alloc'ed */
 void clear_char(struct char_data *ch)
 {
+  ch->points.melee_crit = 0;
+  ch->points.spell_crit = 0;
+  ch->points.heal_crit = 0;
+  ch->points.melee_crit_mult = 0;
+  ch->points.spell_crit_mult = 0;
+  ch->points.heal_crit_mult = 0;
+
   memset((char *) ch, 0, sizeof(struct char_data));
 
   IN_ROOM(ch) = NOWHERE;

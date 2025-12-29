@@ -198,6 +198,26 @@ static void aff_apply_modify(struct char_data *ch, byte loc, sbyte mod, char *ms
     GET_SAVE(ch, SAVING_SPELL) += mod;
     break;
 
+
+  case APPLY_MELEE_CRIT:
+    GET_MELEE_CRIT(ch) += mod;
+    break;
+  case APPLY_SPELL_CRIT:
+    GET_SPELL_CRIT(ch) += mod;
+    break;
+  case APPLY_HEAL_CRIT:
+    GET_HEAL_CRIT(ch) += mod;
+    break;
+
+  case APPLY_MELEE_CRIT_MULT:
+    GET_MELEE_CRIT_MULT(ch) += mod;
+    break;
+  case APPLY_SPELL_CRIT_MULT:
+    GET_SPELL_CRIT_MULT(ch) += mod;
+    break;
+  case APPLY_HEAL_CRIT_MULT:
+    GET_HEAL_CRIT_MULT(ch) += mod;
+    break;
   default:
     log("SYSERR: Unknown apply adjust %d attempt (%s, affect_modify).", loc, __FILE__);
     break;

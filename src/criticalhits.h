@@ -19,4 +19,15 @@ int roll_melee_crit(struct char_data *ch, int diceroll);
 int roll_spell_crit(struct char_data *ch);
 int roll_heal_crit(struct char_data *ch);
 
+const char *crit_banner_for_mult(int mult);
+
+/* Crit banner helpers (mult is percent: 200=2x, 300=3x, 400=4x) */
+const char *crit_banner_for_mult(int mult);
+void crit_show_banner(struct char_data *ch, struct char_data *victim, int mult);
+
+/* Simple crit checks wired at damage/mag_damage/mag_points */
+int crit_check_melee(struct char_data *ch, int *mult);
+int crit_check_spell(struct char_data *ch, int *mult);
+int crit_check_heal(struct char_data *ch, int *mult);
+
 #endif

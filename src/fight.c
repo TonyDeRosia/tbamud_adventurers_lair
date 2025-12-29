@@ -25,6 +25,7 @@
 #include "fight.h"
 #include "shop.h"
 #include "quest.h"
+#include "criticalhits.h"
 
 
 /* locally defined global variables, used externally */
@@ -650,6 +651,16 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
   if (AFF_FLAGGED(victim, AFF_SANCTUARY) && dam >= 2)
     dam /= 2;
 
+
+  /* Melee crits (only weapon attacks) */
+  if (dam > 0 && ch && victim && ch != victim && IS_WEAPON(attacktype)) {
+    int mult = 200;
+    if (crit_check_melee(ch, &mult)) {
+      dam = (dam * mult) / 100;
+      crit_show_banner(ch, victim, mult);
+    }
+  }
+
   /* Check for PK if this is not a PK MUD */
   if (!CONFIG_PK_ALLOWED) {
     check_killer(ch, victim);
@@ -658,7 +669,7 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
   }
 
   /* Set the maximum damage per round and subtract the hit points */
-  dam = MAX(MIN(dam, 100), 0);
+  dam = MAX(MIN(dam, 1000), 0);
   GET_HIT(victim) -= dam;
 
   /* Gain exp for the hit */

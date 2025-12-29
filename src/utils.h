@@ -539,6 +539,14 @@ do                                                              \
 #define GET_HITROLL(ch)	  ((ch)->points.hitroll)
 /** Current damage roll modifier for ch. */
 #define GET_DAMROLL(ch)   ((ch)->points.damroll)
+#define GET_MELEE_CRIT(ch)        ((ch)->points.melee_crit)
+#define GET_SPELL_CRIT(ch)        ((ch)->points.spell_crit)
+#define GET_HEAL_CRIT(ch)         ((ch)->points.heal_crit)
+
+#define GET_MELEE_CRIT_MULT(ch)   ((ch)->points.melee_crit_mult)
+#define GET_SPELL_CRIT_MULT(ch)   ((ch)->points.spell_crit_mult)
+#define GET_HEAL_CRIT_MULT(ch)    ((ch)->points.heal_crit_mult)
+
 
 /** Current position (standing, sitting) of ch. */
 #define GET_POS(ch)	  ((ch)->char_specials.position)

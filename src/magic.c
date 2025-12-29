@@ -22,6 +22,7 @@
 #include "class.h"
 #include "fight.h"
 #include "mud_event.h"
+#include "criticalhits.h"
 
 
 /* local file scope function prototypes */
@@ -291,9 +292,18 @@ int mag_damage(int level, struct char_data *ch, struct char_data *victim,
     dam /= 2;
 
   /* and finally, inflict the damage */
+
+  /* Spell crits (mag_damage) */
+  if (dam > 0 && ch && victim) {
+    int mult = 200;
+    if (crit_check_spell(ch, &mult)) {
+      dam = (dam * mult) / 100;
+      crit_show_banner(ch, victim, mult);
+    }
+  }
+
   return (damage(ch, victim, dam, spellnum));
 }
-
 
 /* Every spell that does an affect comes through here.  This determines the
  * effect, whether it is added or replacement, whether it is legal or not, etc.
@@ -820,7 +830,17 @@ void mag_points(int level, struct char_data *ch, struct char_data *victim,
     send_to_char(victim, "A warm feeling floods your body.\r\n");
     break;
   }
-  GET_HIT(victim) = MIN(GET_MAX_HIT(victim), GET_HIT(victim) + healing);
+  
+  /* Heal crits (mag_points), even out of combat */
+  if (healing > 0 && ch && victim) {
+    int mult = 200;
+    if (crit_check_heal(ch, &mult)) {
+      healing = (healing * mult) / 100;
+      crit_show_banner(ch, victim, mult);
+    }
+  }
+
+GET_HIT(victim) = MIN(GET_MAX_HIT(victim), GET_HIT(victim) + healing);
   GET_MOVE(victim) = MIN(GET_MAX_MOVE(victim), GET_MOVE(victim) + move);
   update_pos(victim);
 }
