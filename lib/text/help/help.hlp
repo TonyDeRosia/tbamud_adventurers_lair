@@ -13541,8 +13541,24 @@ restore the default prompt.
 
 #31
 
-BUILDRECS BUILDERRECS RECOMMENDATION RECOMMENDATIONS
 
+BUILDERRECS
+
+Type 	<send link="Help buildrecs">help buildrecs	</send> to view the builder XP recommendations.
+
+#31
+RECOMMENDATION
+
+Type 	<send link="Help buildrecs">help buildrecs	</send> to view the builder XP recommendations.
+
+#31
+RECOMMENDATIONS
+
+Type 	<send link="Help buildrecs">help buildrecs	</send> to view the builder XP recommendations.
+
+#31
+
+BUILDRECS
 Builder guide for fair XP pacing with the level 1 to 100 curve.
 
 Mob building basics:
