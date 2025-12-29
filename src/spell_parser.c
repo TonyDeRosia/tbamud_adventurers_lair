@@ -578,6 +578,17 @@ int cast_spell(struct char_data *ch, struct char_data *tch,
     return (0);
   }
   send_to_char(ch, "%s", CONFIG_OK);
+  /* cast feedback message */
+  if (!IS_NPC(ch)) {
+    if (tch) {
+      send_to_char(ch, "You cast %s on %s.\r\n", skill_name(spellnum), (tch == ch) ? "yourself" : GET_NAME(tch));
+    } else if (tobj) {
+      send_to_char(ch, "You cast %s on %s.\r\n", skill_name(spellnum), GET_OBJ_SHORT(tobj));
+    } else {
+      send_to_char(ch, "You cast %s.\r\n", skill_name(spellnum));
+    }
+  }
+
   say_spell(ch, spellnum, tch, tobj);
 
   return (call_magic(ch, tch, tobj, spellnum, GET_LEVEL(ch), CAST_SPELL));
