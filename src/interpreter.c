@@ -182,6 +182,8 @@ cpp_extern const struct command_info cmd_info[] = {
   { "hit"      , "hit"     , POS_FIGHTING, do_hit      , 0, SCMD_HIT },
   { "hold"     , "hold"    , POS_RESTING , do_grab     , 1, 0 },
   {"offhand", "offhand", POS_RESTING, do_offhand, 0, 0},
+  {"dual", "dual", POS_RESTING, do_offhand, 0, 0},
+  {"dual wield", "dual wield", POS_RESTING, do_offhand, 0, 0},
   { "holler"   , "holler"  , POS_RESTING , do_gen_comm , 1, SCMD_HOLLER },
   { "holylight", "holy"    , POS_DEAD    , do_gen_tog  , LVL_IMMORT, SCMD_HOLYLIGHT },
   { "house"    , "house"   , POS_RESTING , do_house    , 0, 0 },
