@@ -13540,4 +13540,65 @@ Use %% to place a literal percent sign in the prompt. Type 'prompt reset' to
 restore the default prompt.
 
 #31
+
+BUILD RECOMMENDATIONS BUILDER RECOMMENDATIONS BUILDING RECOMMENDATIONS QUEST XP MOB XP
+
+Builder guide for fair XP pacing with the level 1 to 100 curve.
+
+Mob building basics:
+1. Set the mob level to match the zone difficulty.
+2. Set the mob EXP value so an even con kill feels consistent at that level.
+3. Use specials, skills, spells, equipment, and flags to make difficulty, not raw EXP, define the fight.
+
+How kill XP is calculated:
+1. On kill, the game starts from the mob EXP field.
+2. Solo kill award is roughly mob_exp divided by 3, with a bonus if the mob is higher level.
+3. Group kills split a shared pool, so per player XP is lower unless the fight is harder.
+
+Recommended baseline target:
+An even con solo kill should be about 3.3 percent of the XP needed for the next level.
+This is a baseline for normal mobs. Hard elites can be worth more because they take longer and hit harder.
+
+Quick formula for builders:
+1. Find XP needed for the next level for that range of players.
+2. Decide what the kill should be worth as a percent of that level.
+3. Set mob EXP to about kill_award times 3.
+
+Suggested percent targets:
+1. Easy trash: 1.5 to 2.5 percent.
+2. Normal even con: 3.0 to 3.5 percent.
+3. Hard elite: 4.0 to 6.0 percent.
+
+Recommended mob EXP examples using 3.3 percent baseline:
+Columns: level, XP needed, player XP per even kill, mob EXP to set
+Level 10: need 9,197, kill 304, mob_exp 912
+Level 20: need 32,358, kill 1,068, mob_exp 3,204
+Level 30: need 66,770, kill 2,203, mob_exp 6,609
+Level 40: need 111,282, kill 3,672, mob_exp 11,016
+Level 50: need 165,171, kill 5,451, mob_exp 16,353
+Level 60: need 227,918, kill 7,521, mob_exp 22,563
+Level 70: need 299,119, kill 9,871, mob_exp 29,613
+Level 80: need 378,454, kill 12,489, mob_exp 37,467
+Level 90: need 465,650, kill 15,366, mob_exp 46,098
+
+Quest building basics:
+1. Keep short quests simple and repeatable.
+2. Use quest XP to reward time, travel, and risk, not to skip the whole game.
+3. Prefer quest points and items for long term value, with XP as a strong bonus.
+
+Recommended quest XP in kills worth:
+1. Small quest: 3 to 8 kills worth.
+2. Medium quest: 8 to 15 kills worth.
+3. Major quest or chain finish: 15 to 30 kills worth.
+
+Quest XP examples at level 30 baseline:
+At level 30, baseline even kill award is about 2,203 XP.
+Small quest: 11,015 XP. Medium quest: 26,436 XP. Major quest: 55,075 XP.
+
+Notes:
+1. If a zone has unusually high mob EXP values, it will powerlevel players even if the fights are easy.
+2. If fights are long or dangerous, higher EXP is fine because XP per hour stays sane.
+3. Always test with real kill speed. The goal is steady progress, not perfect math.
+
+#31
 $~
