@@ -466,6 +466,13 @@
 #define APPLY_SAVING_PETRI     22	/**< Apply to save throw: petrif	*/
 #define APPLY_SAVING_BREATH    23	/**< Apply to save throw: breath	*/
 #define APPLY_SAVING_SPELL     24	/**< Apply to save throw: spells	*/
+#define APPLY_MELEE_CRIT        25
+#define APPLY_SPELL_CRIT        26
+#define APPLY_HEAL_CRIT         27
+#define APPLY_MELEE_CRIT_MULT   28
+#define APPLY_SPELL_CRIT_MULT   29
+#define APPLY_HEAL_CRIT_MULT    30
+
 /** Total number of applies */
 #define NUM_APPLIES   25
 
@@ -920,6 +927,13 @@ struct char_point_data
 
   sbyte hitroll;   /**< Any bonus or penalty to the hit roll */
   sbyte damroll;   /**< Any bonus or penalty to the damage roll */
+  int melee_crit;
+  int spell_crit;
+  int heal_crit;
+  int melee_crit_mult;
+  int spell_crit_mult;
+  int heal_crit_mult;
+
 };
 
 /** char_special_data_saved: specials which both a PC and an NPC have in
