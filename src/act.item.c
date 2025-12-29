@@ -1506,6 +1506,50 @@ ACMD(do_wield)
   }
 }
 
+ACMD(do_offhand)
+{
+  char arg[MAX_INPUT_LENGTH];
+  struct obj_data *obj;
+
+  one_argument(argument, arg);
+
+  if (!*arg) {
+    send_to_char(ch, "Usage: offhand <weapon>\r\n");
+    return;
+  }
+
+  if (!GET_SKILL(ch, SKILL_DUAL_WIELD)) {
+    send_to_char(ch, "You do not know how to dual wield.\r\n");
+    return;
+  }
+
+  if (!GET_EQ(ch, WEAR_WIELD) || GET_OBJ_TYPE(GET_EQ(ch, WEAR_WIELD)) != ITEM_WEAPON) {
+    send_to_char(ch, "You need a primary weapon wielded first.\r\n");
+    return;
+  }
+
+    int number = 1;
+
+  obj = get_obj_in_list_vis(ch, arg, &number, ch->carrying);
+  if (!obj) {
+    send_to_char(ch, "You don't seem to have %s.\r\n", arg);
+    return;
+  }
+
+  if (GET_OBJ_TYPE(obj) != ITEM_WEAPON) {
+    send_to_char(ch, "You can only offhand weapons.\r\n");
+    return;
+  }
+
+  if (!OBJ_FLAGGED(obj, ITEM_OFFHAND)) {
+    send_to_char(ch, "That weapon is not balanced for offhand use.\r\n");
+    return;
+  }
+
+  perform_wear(ch, obj, WEAR_HOLD);
+}
+
+
 ACMD(do_grab)
 {
   char arg[MAX_INPUT_LENGTH];
