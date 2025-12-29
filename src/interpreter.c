@@ -1329,8 +1329,7 @@ EVENTFUNC(get_protocols)
 /* to increase stats. CON costs 2 points per +1.                             */
 
 #define STAT_ALLOC_POOL 15
-#define STAT_ALLOC_CAP  30
-
+#define STAT_ALLOC_CAP  20
 static int stat_alloc_cost(int idx)
 {
   /* 0 Str, 1 Dex, 2 Con, 3 Int, 4 Wis, 5 Cha */
@@ -1978,6 +1977,16 @@ if (load_result == CLASS_UNDEFINED) {
 /* Now GET_NAME() will work properly. */
 init_char(d->character);
 
+       /* Stat allocation baseline (pre racial bonuses, pre allocation). */
+       d->character->real_abils.str = 10;
+       d->character->real_abils.dex = 10;
+       d->character->real_abils.con = 10;
+       d->character->real_abils.intel = 10;
+       d->character->real_abils.wis = 10;
+       d->character->real_abils.cha = 10;
+       affect_total(d->character);
+
+
 	/* Apply racial bonuses once, then allow limited point allocation. */
 	apply_racial_bonuses(d->character);
 	stat_alloc_snapshot_base(d);
@@ -2019,17 +2028,14 @@ break;
       case 7:
         rem = stat_alloc_remaining(d);
         if (rem < 0) {
-          write_to_output(d, "
-You have overspent your points.
-");
+          write_to_output(d, "You have overspent your points.");
           stat_alloc_show(d);
           return;
         }
 
         save_char(d->character);
         save_player_index();
-        write_to_output(d, "%s
-*** PRESS RETURN: ", motd);
+        write_to_output(d, "%s\r\n*** PRESS RETURN: ", motd);
         STATE(d) = CON_RMOTD;
 
         /* make sure the last log is updated correctly. */
@@ -2042,9 +2048,7 @@ You have overspent your points.
         }
         return;
       default:
-        write_to_output(d, "
-Invalid choice.
-");
+        write_to_output(d, "Invalid choice.");
         break;
     }
 
