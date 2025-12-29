@@ -15,6 +15,7 @@
 
 #include "conf.h"
 #include "sysdep.h"
+#include <math.h>
 #include "structs.h"
 #include "utils.h"
 #include "db.h"
@@ -1662,200 +1663,45 @@ void init_spell_levels(void)
 /* Extend mortal experience requirements past the explicit tables by
  * linearly interpolating between the last defined mortal level and the
  * experience required for immortality. */
-static int interpolate_mortal_exp(int level, int base_level, int base_exp, int target_exp)
-{
-  int mortal_span = MORTAL_MAX_LEVEL - base_level;
 
-  if (mortal_span <= 0)
-    return target_exp;
-
-  return base_exp + ((level - base_level) * (target_exp - base_exp)) / mortal_span;
-}
 
 /* Function to return the exp required for each class/level */
 int level_exp(int chclass, int level)
 {
-  if (level > LVL_IMPL || level < 0) {
-    log("SYSERR: Requesting exp for invalid level %d!", level);
+  /*
+   * Smooth 1..(LVL_IMMORT-1) leveling curve.
+   *
+   * Tune:
+   *   MORTAL_XP_CAP  total XP required to reach LVL_IMMORT
+   *   XP_CURVE_EXP   exponent (higher slows late game more)
+   */
+  const double MORTAL_XP_CAP = 20000000.0;
+  const double XP_CURVE_EXP  = 2.75;
+
+  (void)chclass;
+
+  if (level <= 1)
     return 0;
+
+  if (level < LVL_IMMORT) {
+    const double max_mortal = (double)(LVL_IMMORT - 1);
+    const double x = ((double)(level - 1)) / max_mortal; /* 0..1 */
+    long xp = (long)(MORTAL_XP_CAP * pow(x, XP_CURVE_EXP));
+
+    if (xp < 0) xp = 0;
+    if (xp >= (long)MORTAL_XP_CAP) xp = (long)MORTAL_XP_CAP - 1;
+    return (int)xp;
   }
 
-  /* Gods have exp close to EXP_MAX.  This statement should never have to
-   * changed, regardless of how many mortal or immortal levels exist. */
-   if (level > LVL_IMMORT) {
-     return EXP_MAX - ((LVL_IMPL - level) * 1000);
-   }
+  if (level == LVL_IMMORT)
+    return (int)MORTAL_XP_CAP + 1;
 
-  /* Exp required for normal mortals is below */
-  switch (chclass) {
+  if (level > LVL_IMPL)
+    return EXP_MAX;
 
-    case CLASS_MAGIC_USER:
-    switch (level) {
-      case  0: return 0;
-      case  1: return 1;
-      case  2: return 2500;
-      case  3: return 5000;
-      case  4: return 10000;
-      case  5: return 20000;
-      case  6: return 40000;
-      case  7: return 60000;
-      case  8: return 90000;
-      case  9: return 135000;
-      case 10: return 250000;
-      case 11: return 375000;
-      case 12: return 750000;
-      case 13: return 1125000;
-      case 14: return 1500000;
-      case 15: return 1875000;
-      case 16: return 2250000;
-      case 17: return 2625000;
-      case 18: return 3000000;
-      case 19: return 3375000;
-      case 20: return 3750000;
-      case 21: return 4000000;
-      case 22: return 4300000;
-      case 23: return 4600000;
-      case 24: return 4900000;
-      case 25: return 5200000;
-      case 26: return 5500000;
-      case 27: return 5950000;
-      case 28: return 6400000;
-      case 29: return 6850000;
-      case 30: return 7400000;
-      case LVL_IMMORT: return IMMORTAL_EXP;
-      default:
-        if (level > 30 && level < LVL_IMMORT)
-          return interpolate_mortal_exp(level, 30, 7400000, MORTAL_EXP_CAP);
-    }
-    break;
-
-    case CLASS_CLERIC:
-    switch (level) {
-      case  0: return 0;
-      case  1: return 1;
-      case  2: return 1500;
-      case  3: return 3000;
-      case  4: return 6000;
-      case  5: return 13000;
-      case  6: return 27500;
-      case  7: return 55000;
-      case  8: return 110000;
-      case  9: return 225000;
-      case 10: return 450000;
-      case 11: return 675000;
-      case 12: return 900000;
-      case 13: return 1125000;
-      case 14: return 1350000;
-      case 15: return 1575000;
-      case 16: return 1800000;
-      case 17: return 2100000;
-      case 18: return 2400000;
-      case 19: return 2700000;
-      case 20: return 3000000;
-      case 21: return 3250000;
-      case 22: return 3500000;
-      case 23: return 3800000;
-      case 24: return 4100000;
-      case 25: return 4400000;
-      case 26: return 4800000;
-      case 27: return 5200000;
-      case 28: return 5600000;
-      case 29: return 6000000;
-      case 30: return 6400000;
-      case LVL_IMMORT: return IMMORTAL_EXP;
-      default:
-        if (level > 30 && level < LVL_IMMORT)
-          return interpolate_mortal_exp(level, 30, 6400000, MORTAL_EXP_CAP);
-    }
-    break;
-
-    case CLASS_THIEF:
-    switch (level) {
-      case  0: return 0;
-      case  1: return 1;
-      case  2: return 1250;
-      case  3: return 2500;
-      case  4: return 5000;
-      case  5: return 10000;
-      case  6: return 20000;
-      case  7: return 40000;
-      case  8: return 70000;
-      case  9: return 110000;
-      case 10: return 160000;
-      case 11: return 220000;
-      case 12: return 440000;
-      case 13: return 660000;
-      case 14: return 880000;
-      case 15: return 1100000;
-      case 16: return 1500000;
-      case 17: return 2000000;
-      case 18: return 2500000;
-      case 19: return 3000000;
-      case 20: return 3500000;
-      case 21: return 3650000;
-      case 22: return 3800000;
-      case 23: return 4100000;
-      case 24: return 4400000;
-      case 25: return 4700000;
-      case 26: return 5100000;
-      case 27: return 5500000;
-      case 28: return 5900000;
-      case 29: return 6300000;
-      case 30: return 6650000;
-      case LVL_IMMORT: return IMMORTAL_EXP;
-      default:
-        if (level > 30 && level < LVL_IMMORT)
-          return interpolate_mortal_exp(level, 30, 6650000, MORTAL_EXP_CAP);
-    }
-    break;
-
-    case CLASS_WARRIOR:
-    switch (level) {
-      case  0: return 0;
-      case  1: return 1;
-      case  2: return 2000;
-      case  3: return 4000;
-      case  4: return 8000;
-      case  5: return 16000;
-      case  6: return 32000;
-      case  7: return 64000;
-      case  8: return 125000;
-      case  9: return 250000;
-      case 10: return 500000;
-      case 11: return 750000;
-      case 12: return 1000000;
-      case 13: return 1250000;
-      case 14: return 1500000;
-      case 15: return 1850000;
-      case 16: return 2200000;
-      case 17: return 2550000;
-      case 18: return 2900000;
-      case 19: return 3250000;
-      case 20: return 3600000;
-      case 21: return 3900000;
-      case 22: return 4200000;
-      case 23: return 4500000;
-      case 24: return 4800000;
-      case 25: return 5150000;
-      case 26: return 5500000;
-      case 27: return 5950000;
-      case 28: return 6400000;
-      case 29: return 6850000;
-      case 30: return 7400000;
-      case LVL_IMMORT: return IMMORTAL_EXP;
-      default:
-        if (level > 30 && level < LVL_IMMORT)
-          return interpolate_mortal_exp(level, 30, 7400000, MORTAL_EXP_CAP);
-    }
-    break;
-  }
-
-  /* This statement should never be reached if the exp tables in this function
-   * are set up properly.  If you see exp of 123456 then the tables above are
-   * incomplete. */
-  log("SYSERR: XP tables not set up correctly in class.c!");
-  return 123456;
+  return EXP_MAX - ((LVL_IMPL - level) * 1000);
 }
+
 
 /* Default titles of male characters. */
 const char *title_male(int chclass, int level)

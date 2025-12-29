@@ -10,6 +10,7 @@
 
 #include "conf.h"
 #include "sysdep.h"
+#include <limits.h>
 #include "structs.h"
 #include "utils.h"
 #include "db.h"
@@ -234,6 +235,36 @@ char *get_name_by_id(long id)
 /* Stuff related to the save/load player system. */
 /* New load_char reads ASCII Player Files. Load a char, TRUE if loaded, FALSE
  * if not. */
+/*
+ * After changing the leveling curve, older pfiles may have XP that no longer matches
+ * the saved level. Clamp XP into the valid band for the current level so players
+ * do not instantly gain multiple levels from a tiny XP award, and so TNL is sane.
+ */
+static void clamp_player_exp_to_level(struct char_data *ch)
+{
+  int lvl, min_xp, max_xp;
+
+  if (!ch)
+    return;
+
+  lvl = GET_LEVEL(ch);
+  if (lvl < 1)
+    return;
+
+  min_xp = level_exp(GET_CLASS(ch), lvl);
+
+  if (lvl + 1 < LVL_IMMORT)
+    max_xp = level_exp(GET_CLASS(ch), lvl + 1) - 1;
+  else
+    max_xp = INT_MAX;
+
+  if (GET_EXP(ch) < min_xp)
+    GET_EXP(ch) = min_xp;
+
+  if (GET_EXP(ch) > max_xp)
+    GET_EXP(ch) = max_xp;
+}
+
 int load_char(const char *name, struct char_data *ch)
 {
   int id, i;
@@ -494,6 +525,7 @@ int load_char(const char *name, struct char_data *ch)
 
   if (upgrade_legacy_immortal_levels(ch))
     mudlog(CMP, LVL_IMMORT, TRUE, "%s converted to updated immortal tier (level %d).", GET_NAME(ch), GET_LEVEL(ch));
+  clamp_player_exp_to_level(ch);
 
   affect_total(ch);
 

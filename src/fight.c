@@ -867,7 +867,6 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
 
   /* Gain exp for the hit */
   if (ch != victim)
-    gain_exp(ch, GET_LEVEL(victim) * dam);
 
   update_pos(victim);
 
