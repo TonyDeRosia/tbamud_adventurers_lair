@@ -1105,10 +1105,10 @@ len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
   len = append_box_line(buf, len, sizeof(buf), B, R, "", W);
 
 /* Saves: these are your saving throw modifiers. Negative is better (helps saves). */
-if (GET_EQ(ch, WEAR_WIELD) && GET_OBJ_TYPE(GET_EQ(ch, WEAR_WIELD)) == ITEM_WEAPON) {
-  struct obj_data *wobj = GET_EQ(ch, WEAR_WIELD);
-  int nd = GET_OBJ_VAL(wobj, 1);
-  int sd = GET_OBJ_VAL(wobj, 2);
+  if (GET_EQ(ch, WEAR_WIELD) && GET_OBJ_TYPE(GET_EQ(ch, WEAR_WIELD)) == ITEM_WEAPON) {
+    struct obj_data *wobj = GET_EQ(ch, WEAR_WIELD);
+    int nd = GET_OBJ_VAL(wobj, 1);
+    int sd = GET_OBJ_VAL(wobj, 2);
   snprintf(line, sizeof(line),
            "%sSaving Throws:%s Paralyze %d  Rod %d  Spell %d   Weapon: %s (%dD%d)",
            C, R,
@@ -1116,12 +1116,11 @@ if (GET_EQ(ch, WEAR_WIELD) && GET_OBJ_TYPE(GET_EQ(ch, WEAR_WIELD)) == ITEM_WEAPO
            wobj->short_description, nd, sd);
 } else {
   snprintf(line, sizeof(line),
-           "%sSaving Throws:%s Paralyze %d  Rod %d  Spell %d",
-           C, R,
-           GET_SAVE(ch, 0), GET_SAVE(ch, 1), GET_SAVE(ch, 4));
-}
-len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
+             "%sSaving Throws:%s Paralyze %d  Rod %d  Spell %d",
+             C, R,
+             GET_SAVE(ch, 0), GET_SAVE(ch, 1), GET_SAVE(ch, 4));
   }
+  len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
   /* Separator */
   len += snprintf(buf + len, sizeof(buf) - len,
     "%s╠═══════════════════════════════════════════════════════════════════════════════╣%s\r\n", B, R);
