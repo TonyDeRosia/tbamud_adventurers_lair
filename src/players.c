@@ -266,6 +266,25 @@ static void clamp_player_exp_to_level(struct char_data *ch)
     GET_EXP(ch) = max_xp;
 }
 
+/* Parse a numeric value from a tag line, handling optional label prefixes. */
+static long long parse_numeric_value(const char *line)
+{
+  const char *value = line;
+
+  if (!line)
+    return 0;
+
+  value = strchr(line, ':');
+  if (value != NULL) {
+    value++;
+    while (*value == ' ' || *value == '\t')
+      value++;
+  } else
+    value = line;
+
+  return atoll(value);
+}
+
 int load_char(const char *name, struct char_data *ch)
 {
   int id, i;
@@ -275,6 +294,9 @@ int load_char(const char *name, struct char_data *ch)
   char f1[128], f2[128], f3[128], f4[128];
   trig_data *t = NULL;
   trig_rnum t_rnum = NOTHING;
+  bool money_seen = FALSE, bank_money_seen = FALSE;
+  long long __loaded_money_copper = -1;
+  long long __loaded_gold_units = -1;
 
   if ((id = get_ptable_by_name(name)) < 0)
     return (-1);
@@ -349,8 +371,6 @@ int load_char(const char *name, struct char_data *ch)
     for (i = 0; i < PR_ARRAY_MAX; i++)
       PRF_FLAGS(ch)[i] = PFDEF_PREFFLAGS;
 
-    bool money_seen = FALSE, bank_money_seen = FALSE;
-
     while (get_line(fl, line)) {
       tag_argument(line, tag);
 
@@ -421,17 +441,10 @@ int load_char(const char *name, struct char_data *ch)
 	break;
 
       case 'G':
-        if (!strcmp(tag, "Gold") && !money_seen) SET_GOLD(ch, atoi(line));
-        else if (!strcmp(tag, "Money")) {
-          long long copper = atoll(line);
-          if (copper < 0)
-            copper = 0;
-
-          GET_MONEY(ch) = copper;
-          money_seen = TRUE;
-        }
+        if (!strcmp(tag, "Gold"))
+          __loaded_gold_units = parse_numeric_value(line);
         else if (!strcmp(tag, "Diamonds")) GET_DIAMONDS(ch) = atoi(line);
-	break;
+        break;
 
       case 'H':
 	     if (!strcmp(tag, "Hit "))	load_HMVS(ch, line, LOAD_HIT);
@@ -462,6 +475,14 @@ int load_char(const char *name, struct char_data *ch)
       case 'M':
 	     if (!strcmp(tag, "Mana"))	load_HMVS(ch, line, LOAD_MANA);
 	else if (!strcmp(tag, "Move"))	load_HMVS(ch, line, LOAD_MOVE);
+        else if (!strcmp(tag, "Mone") || !strcmp(tag, "Money")) {
+          long long copper = parse_numeric_value(line);
+          if (copper < 0)
+            copper = 0;
+
+          __loaded_money_copper = copper;
+          money_seen = TRUE;
+        }
 	break;
 
       case 'N':
@@ -544,8 +565,16 @@ int load_char(const char *name, struct char_data *ch)
     }
   }
 
-  if (upgrade_legacy_immortal_levels(ch))
-    mudlog(CMP, LVL_IMMORT, TRUE, "%s converted to updated immortal tier (level %d).", GET_NAME(ch), GET_LEVEL(ch));
+    if (money_seen && __loaded_money_copper >= 0) {
+      GET_MONEY(ch) = __loaded_money_copper;
+      SET_GOLD(ch, (int)(GET_MONEY(ch) / (long long)COPPER_PER_GOLD));
+    } else if (!money_seen && __loaded_gold_units >= 0) {
+      SET_GOLD(ch, (int)__loaded_gold_units);
+      GET_MONEY(ch) = (long long)__loaded_gold_units * (long long)COPPER_PER_GOLD;
+    }
+
+    if (upgrade_legacy_immortal_levels(ch))
+      mudlog(CMP, LVL_IMMORT, TRUE, "%s converted to updated immortal tier (level %d).", GET_NAME(ch), GET_LEVEL(ch));
   clamp_player_exp_to_level(ch);
 
   affect_total(ch);
