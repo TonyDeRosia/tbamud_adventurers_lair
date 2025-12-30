@@ -24,6 +24,7 @@
 #include "fight.h"
 #include "quest.h"
 #include "mud_event.h"
+#include "race.h"
 
 /* local file scope variables */
 static int extractions_pending = 0;
@@ -265,10 +266,19 @@ void affect_total(struct char_data *ch)
 
   ch->aff_abils = ch->real_abils;
 
+  if (!IS_NPC(ch)) {
+    ch->aff_abils.str   += race_abil_bonus(GET_RACE(ch), 0);
+    ch->aff_abils.dex   += race_abil_bonus(GET_RACE(ch), 1);
+    ch->aff_abils.con   += race_abil_bonus(GET_RACE(ch), 2);
+    ch->aff_abils.intel += race_abil_bonus(GET_RACE(ch), 3);
+    ch->aff_abils.wis   += race_abil_bonus(GET_RACE(ch), 4);
+    ch->aff_abils.cha   += race_abil_bonus(GET_RACE(ch), 5);
+  }
+
   for (i = 0; i < NUM_WEARS; i++) {
     if (GET_EQ(ch, i))
       for (j = 0; j < MAX_OBJ_AFFECT; j++)
-	affect_modify_ar(ch, GET_EQ(ch, i)->affected[j].location,
+        affect_modify_ar(ch, GET_EQ(ch, i)->affected[j].location,
 		      GET_EQ(ch, i)->affected[j].modifier,
 		      GET_OBJ_AFFECT(GET_EQ(ch, i)), TRUE);
   }
