@@ -22,6 +22,14 @@ extern const char *race_menu;
 
 int parse_race(const char *arg);
 void apply_racial_bonuses(struct char_data *ch);
+void clamp_base_stats(struct char_data *ch);
+
+/*
+ * Hard limits for base stats. Creation uses a 20-point cap; keep a shared
+ * definition so creation menus and clamping agree.
+ */
+#define BASE_STAT_MIN 3
+#define BASE_STAT_CAP 20
 
 /* Racial bonuses helper (abil: 0 Str, 1 Dex, 2 Con, 3 Int, 4 Wis, 5 Cha) */
 int race_abil_bonus(int race, int abil);
