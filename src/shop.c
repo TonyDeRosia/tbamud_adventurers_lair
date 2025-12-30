@@ -26,6 +26,77 @@
 #include "spells.h"  /* for skill_name() */
 #include "screen.h"
 
+
+/* shop currency helpers (display and payment in copper total) */
+static long long shop_units_to_copper(long long units)
+{
+#if SHOP_PRICE_IN_COPPER
+  return units; /* units already copper */
+#else
+  return units * (long long)COPPER_PER_GOLD; /* units are gold */
+#endif
+}
+
+static void shop_format_price(char *out, size_t outsz, long long total_copper)
+{
+  long long g = 0, s = 0, c = 0;
+
+  if (total_copper < 0)
+    total_copper = 0;
+
+  g = total_copper / (long long)COPPER_PER_GOLD;
+  total_copper %= (long long)COPPER_PER_GOLD;
+
+  s = total_copper / (long long)COPPER_PER_SILVER;
+  c = total_copper % (long long)COPPER_PER_SILVER;
+
+  if (g > 0)
+    snprintf(out, outsz, "%lldg %llds %lldc", g, s, c);
+  else if (s > 0)
+    snprintf(out, outsz, "%llds %lldc", s, c);
+  else
+    snprintf(out, outsz, "%lldc", c);
+}
+
+static void shop_charge(struct char_data *ch, long long cost_copper)
+{
+  if (cost_copper < 0)
+    cost_copper = 0;
+  GET_MONEY(ch) = (long long)GET_MONEY(ch) - cost_copper;
+  if (GET_MONEY(ch) < 0)
+    GET_MONEY(ch) = 0;
+}
+
+/* Add copper to a character (keeper/player). */
+static void shop_pay(struct char_data *ch, long long amount_copper)
+{
+  if (!ch || amount_copper <= 0)
+    return;
+
+  GET_MONEY(ch) += amount_copper;
+}
+
+
+static void shop_pay_copper(struct char_data *ch, long long amt_copper)
+{
+  if (amt_copper < 0)
+    return;
+  GET_MONEY(ch) = (long long)GET_MONEY(ch) + amt_copper;
+  if (GET_MONEY(ch) < 0)
+    GET_MONEY(ch) = 0;
+}
+
+
+#ifndef COPPER_PER_GOLD
+#define COPPER_PER_GOLD 1000
+#endif
+#ifndef COPPER_PER_SILVER
+#define COPPER_PER_SILVER 100
+#endif
+
+/* SHOP_PRICE_IN_COPPER: 0=OBJ_COST is gold units (legacy), 1=OBJ_COST is copper units (new) */
+#define SHOP_PRICE_IN_COPPER 1
+
 /* Global variables definitions used externally */
 /* Constant list for printing out who we sell to */
 const char *trade_letters[] = {
@@ -511,8 +582,8 @@ static void shopping_buy(char *arg, struct char_data *ch, struct char_data *keep
       do_tell(keeper, actbuf, cmd_tell, 0);
       return;
     }
-  } else { /*has the player got enough gold? */
-  if (buy_price(obj, shop_nr, keeper, ch) > GET_GOLD(ch) && !IS_GOD(ch)) {
+  } else { /*has the player got enough money? */
+  if (buy_price(obj, shop_nr, keeper, ch) > GET_MONEY(ch) && !IS_GOD(ch)) {
     char actbuf[MAX_INPUT_LENGTH];
 
     snprintf(actbuf, sizeof(actbuf), shop_index[shop_nr].missing_cash2, GET_NAME(ch));
@@ -568,7 +639,7 @@ static void shopping_buy(char *arg, struct char_data *ch, struct char_data *keep
         break;
     }
   } else {
-  while (obj && (GET_GOLD(ch) >= buy_price(obj, shop_nr, keeper, ch) || IS_GOD(ch))
+  while (obj && (GET_MONEY(ch) >= shop_units_to_copper((long long)buy_price(obj, shop_nr, keeper, ch)) || IS_GOD(ch))
 	 && IS_CARRYING_N(ch) < CAN_CARRY_N(ch) && bought < buynum
 	 && IS_CARRYING_W(ch) + GET_OBJ_WEIGHT(obj) <= CAN_CARRY_W(ch)) {
     int charged;
@@ -586,7 +657,7 @@ static void shopping_buy(char *arg, struct char_data *ch, struct char_data *keep
     charged = buy_price(obj, shop_nr, keeper, ch);
     goldamt += charged;
     if (!IS_GOD(ch))
-      decrease_gold(ch, charged);
+      shop_charge(ch, shop_units_to_copper((long long)charged));
 
     last_obj = obj;
     obj = get_purchase_obj(ch, arg, keeper, shop_nr, FALSE);
@@ -600,7 +671,7 @@ static void shopping_buy(char *arg, struct char_data *ch, struct char_data *keep
     if (!obj || !same_obj(last_obj, obj))
       snprintf(buf, sizeof(buf), "%s I only have %d to sell you.", GET_NAME(ch), bought);
     else if (!OBJ_FLAGGED(obj, ITEM_QUEST) &&
-      GET_GOLD(ch) < buy_price(obj, shop_nr, keeper, ch))
+      GET_MONEY(ch) < shop_units_to_copper((long long)buy_price(obj, shop_nr, keeper, ch)))
       snprintf(buf, sizeof(buf), "%s You can only afford %d.", GET_NAME(ch), bought);
     else if (OBJ_FLAGGED(obj, ITEM_QUEST) &&
       GET_QUESTPOINTS(ch) < GET_OBJ_COST(obj))
@@ -615,7 +686,7 @@ static void shopping_buy(char *arg, struct char_data *ch, struct char_data *keep
     do_tell(keeper, buf, cmd_tell, 0);
   }
   if (!IS_GOD(ch) && obj && !OBJ_FLAGGED(obj, ITEM_QUEST)) {
-    increase_gold(keeper, goldamt);
+    shop_pay(keeper, shop_units_to_copper((long long)goldamt));
     if (SHOP_USES_BANK(shop_nr))
       if (GET_GOLD(keeper) > MAX_OUTSIDE_BANK) {
         SHOP_BANK(shop_nr) += (GET_GOLD(keeper) - MAX_OUTSIDE_BANK);
@@ -776,8 +847,7 @@ static void shopping_sell(char *arg, struct char_data *ch, struct char_data *kee
 
     goldamt += charged;
     if (!IS_SET(SHOP_BITVECTOR(shop_nr), HAS_UNLIMITED_CASH))
-      decrease_gold(keeper, charged);
-
+      shop_charge(keeper, shop_units_to_copper((long long)charged));
     sold++;
     obj_from_char(obj);
     slide_obj(obj, keeper, shop_nr);	/* Seems we don't use return value. */
@@ -796,7 +866,7 @@ static void shopping_sell(char *arg, struct char_data *ch, struct char_data *kee
 
     do_tell(keeper, buf, cmd_tell, 0);
   }
-  increase_gold(ch, goldamt);
+  shop_pay_copper(ch, shop_units_to_copper((long long)goldamt));
 
   strlcpy(tempstr, times_message(0, name, sold), sizeof(tempstr));
   snprintf(tempbuf, sizeof(tempbuf), "$n sells %s.", tempstr);
@@ -810,7 +880,7 @@ static void shopping_sell(char *arg, struct char_data *ch, struct char_data *kee
   if (GET_GOLD(keeper) < MIN_OUTSIDE_BANK) {
     goldamt = MIN(MAX_OUTSIDE_BANK - GET_GOLD(keeper), SHOP_BANK(shop_nr));
     SHOP_BANK(shop_nr) -= goldamt;
-    increase_gold(keeper, goldamt);
+    shop_pay(keeper, shop_units_to_copper((long long)goldamt));
   }
 }
 
@@ -831,12 +901,16 @@ static void shopping_value(char *arg, struct char_data *ch, struct char_data *ke
   if (!(obj = get_selling_obj(ch, name, keeper, shop_nr, TRUE)))
     return;
 
-  snprintf(buf, sizeof(buf), "%s I'll give you %d gold coins for that!", GET_NAME(ch), sell_price(obj, shop_nr, keeper, ch));
+  { long long _sp = shop_units_to_copper((long long)sell_price(obj, shop_nr, keeper, ch)); char _pb[64]; shop_format_price(_pb, sizeof(_pb), _sp); snprintf(buf, sizeof(buf), "%s I\'ll give you %s for that!", GET_NAME(ch), _pb); }
   do_tell(keeper, buf, cmd_tell, 0);
 }
 
 static char *list_object(struct obj_data *obj, int cnt, int aindex, int shop_nr, struct char_data *keeper, struct char_data *ch)
 {
+  char pricebuf[64];
+  long long price_copper = 0;
+  price_copper = shop_units_to_copper((long long)buy_price(obj, shop_nr, keeper, ch));
+  shop_format_price(pricebuf, sizeof(pricebuf), price_copper);
   static char result[256];
   char	itemname[128],
 	quantity[16];	/* "Unlimited" or "%d" */
@@ -866,11 +940,10 @@ static char *list_object(struct obj_data *obj, int cnt, int aindex, int shop_nr,
   }
   CAP(itemname);
 
-  snprintf(result, sizeof(result), " %2d)  %9s   %-*s %6d%s\r\n",
-      aindex, quantity, count_color_chars(itemname)+48, itemname,
-      buy_price(obj, shop_nr, keeper, ch), OBJ_FLAGGED(obj, ITEM_QUEST) ? " qp" : "");
-
-  return (result);
+  snprintf(result, sizeof(result), " %2d)  %9s   %-*s %12s%s\r\n",
+        aindex, quantity, count_color_chars(itemname)+48, itemname,
+        pricebuf, OBJ_FLAGGED(obj, ITEM_QUEST) ? " qp" : "");
+return (result);
 }
 
 static void shopping_list(char *arg, struct char_data *ch, struct char_data *keeper, int shop_nr)
