@@ -512,62 +512,6 @@ static int perform_drop(struct char_data *ch, struct obj_data *obj,
   return (0);
 }
 
-static void perform_drop_currency(struct char_data *ch, int amount, int denom, int subcmd)
-{
-  long long amount_copper = 0;
-  const char *metal = "copper";
-
-  if (amount <= 0) {
-    send_to_char(ch, "Drop how much?\r\n");
-    return;
-  }
-
-  if (denom == 2) {
-    metal = "silver";
-    amount_copper = (long long)amount * (long long)COPPER_PER_SILVER;
-  } else if (denom == 3) {
-    metal = "gold";
-    amount_copper = (long long)amount * (long long)COPPER_PER_GOLD;
-  } else {
-    metal = "copper";
-    amount_copper = (long long)amount;
-  }
-
-  if (amount_copper <= 0) {
-    send_to_char(ch, "Drop how much?\r\n");
-    return;
-  }
-
-  if (GET_MONEY(ch) < amount_copper) {
-    send_to_char(ch, "You don't have that much currency.\r\n");
-    return;
-  }
-
-  /* JUNK: delete money instead of creating a pile */
-  if (subcmd == SCMD_JUNK) {
-    GET_MONEY(ch) -= amount_copper;
-    send_to_char(ch, "You junk %d %s coin%s.\r\n", amount, metal, (amount == 1 ? "" : "s"));
-    act("$n junks some coins.", FALSE, ch, 0, 0, TO_ROOM);
-    return;
-  }
-
-  /* DONATE: behave like normal drop into room (your donate rooms logic is separate) */
-  {
-    struct obj_data *obj = create_money((int)amount_copper);
-    if (!obj) {
-      send_to_char(ch, "Something went wrong.\r\n");
-      return;
-    }
-    GET_MONEY(ch) -= amount_copper;
-
-    send_to_char(ch, "You drop %d %s coin%s.\r\n", amount, metal, (amount == 1 ? "" : "s"));
-    act("$n drops some coins.", FALSE, ch, 0, 0, TO_ROOM);
-
-    obj_to_room(obj, IN_ROOM(ch));
-  }
-}
-
-
 ACMD(do_drop)
 {
   char arg[MAX_INPUT_LENGTH];
@@ -1144,15 +1088,6 @@ ACMD(do_pour)
   int amount = 0;
 
   two_arguments(argument, arg1, arg2);
-
-  /* Currency drop: drop <amount> <copper|silver|gold> */
-  if (*arg1 && is_number(arg1) && *arg2) {
-    int denom = parse_money_denom(arg2);
-    if (denom) {
-      perform_drop_currency(ch, atoi(arg1), denom, subcmd);
-      return;
-    }
-  }
 
   if (subcmd == SCMD_POUR) {
     if (!*arg1) { /* No arguments */
