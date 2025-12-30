@@ -751,7 +751,7 @@ static void Crash_cryosave(struct char_data *ch, int cost)
   Crash_extract_norent_eq(ch);
   Crash_extract_norents(ch->carrying);
 
-  GET_GOLD(ch) = MAX(0, GET_GOLD(ch) - cost);
+  increase_money_copper(ch, -(long long)cost * COPPER_PER_GOLD);
 
   if (!objsave_write_rentcode(fp, RENT_CRYO, 0, ch))
   	return;
@@ -1230,8 +1230,8 @@ static int Crash_load_objs(struct char_data *ch) {
       Crash_crashsave(ch);
       return 2;
     } else {
-      GET_BANK_GOLD(ch) -= MAX(cost - GET_GOLD(ch), 0);
-      GET_GOLD(ch) = MAX(GET_GOLD(ch) - cost, 0);
+      increase_bank_copper(ch, -(long long)MAX(cost - GET_GOLD(ch), 0) * COPPER_PER_GOLD);
+      increase_money_copper(ch, -(long long)cost * COPPER_PER_GOLD);
       save_char(ch);
     }
   }

@@ -2960,7 +2960,7 @@ static int perform_set(struct char_data *ch, struct char_data *vict, int mode, c
       affect_total(vict);
       break;
     case 4: /* bank */
-      GET_BANK_GOLD(vict) = RANGE(0, 100000000);
+      SET_BANK_GOLD(vict, RANGE(0, 100000000));
       break;
     case 5: /* brief */
       SET_OR_REMOVE(PRF_FLAGS(vict), PRF_BRIEF);
@@ -3032,7 +3032,7 @@ static int perform_set(struct char_data *ch, struct char_data *vict, int mode, c
       SET_OR_REMOVE(PLR_FLAGS(vict), PLR_FROZEN);
       break;
     case 16: /* gold */
-      GET_GOLD(vict) = RANGE(0, 100000000);
+      SET_GOLD(vict, RANGE(0, 100000000));
       break;
     case 17: /* height */
       GET_HEIGHT(vict) = value;

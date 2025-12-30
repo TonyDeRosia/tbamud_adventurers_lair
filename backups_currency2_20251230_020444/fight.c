@@ -352,7 +352,7 @@ static void make_corpse(struct char_data *ch)
       money = create_money(GET_GOLD(ch));
       obj_to_obj(money, corpse);
     }
-    GET_MONEY(ch) = 0;
+    GET_GOLD(ch) = 0;
   }
   ch->carrying = NULL;
   IS_CARRYING_N(ch) = 0;

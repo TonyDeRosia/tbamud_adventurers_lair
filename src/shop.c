@@ -619,7 +619,7 @@ static void shopping_buy(char *arg, struct char_data *ch, struct char_data *keep
     if (SHOP_USES_BANK(shop_nr))
       if (GET_GOLD(keeper) > MAX_OUTSIDE_BANK) {
         SHOP_BANK(shop_nr) += (GET_GOLD(keeper) - MAX_OUTSIDE_BANK);
-        GET_GOLD(keeper) = MAX_OUTSIDE_BANK;
+        SET_GOLD(keeper, MAX_OUTSIDE_BANK);
       }
   }
   strlcpy(tempstr, times_message(ch->carrying, 0, bought), sizeof(tempstr));

@@ -1302,21 +1302,21 @@ const char *money_desc(int amount)
   return ("an absolutely colossal mountain of gold coins");
 }
 
-struct obj_data *create_money(int amount_copper)
+struct obj_data *create_money(int amount)
 {
   struct obj_data *obj;
   struct extra_descr_data *new_descr;
   char buf[200];
   int y;
 
-  if (amount_copper <= 0) {
-    log("SYSERR: Try to create negative or 0 money. (%d)", amount_copper);
+  if (amount <= 0) {
+    log("SYSERR: Try to create negative or 0 money. (%d)", amount);
     return (NULL);
   }
   obj = create_obj();
   CREATE(new_descr, struct extra_descr_data, 1);
 
-  if (amount_copper == 1) {
+  if (amount == 1) {
     obj->name = strdup("coin gold");
     obj->short_description = strdup("a gold coin");
     obj->description = strdup("One miserable gold coin is lying here.");
@@ -1324,20 +1324,20 @@ struct obj_data *create_money(int amount_copper)
     new_descr->description = strdup("It's just one miserable little gold coin.");
   } else {
     obj->name = strdup("coins gold");
-    obj->short_description = strdup(money_desc(amount_copper));
-    snprintf(buf, sizeof(buf), "%s is lying here.", money_desc(amount_copper));
+    obj->short_description = strdup(money_desc(amount));
+    snprintf(buf, sizeof(buf), "%s is lying here.", money_desc(amount));
     obj->description = strdup(CAP(buf));
 
     new_descr->keyword = strdup("coins gold");
-    if (amount_copper < 10)
-      snprintf(buf, sizeof(buf), "There are %d coins.", amount_copper);
-    else if (amount_copper < 100)
-      snprintf(buf, sizeof(buf), "There are about %d coins.", 10 * (amount_copper / 10));
-    else if (amount_copper < 1000)
-      snprintf(buf, sizeof(buf), "It looks to be about %d coins.", 100 * (amount_copper / 100));
-    else if (amount_copper < 100000)
+    if (amount < 10)
+      snprintf(buf, sizeof(buf), "There are %d coins.", amount);
+    else if (amount < 100)
+      snprintf(buf, sizeof(buf), "There are about %d coins.", 10 * (amount / 10));
+    else if (amount < 1000)
+      snprintf(buf, sizeof(buf), "It looks to be about %d coins.", 100 * (amount / 100));
+    else if (amount < 100000)
       snprintf(buf, sizeof(buf), "You guess there are, maybe, %d coins.",
-	      1000 * ((amount_copper / 1000) + rand_number(0, (amount_copper / 1000))));
+	      1000 * ((amount / 1000) + rand_number(0, (amount / 1000))));
     else
       strcpy(buf, "There are a LOT of coins.");	/* strcpy: OK (is < 200) */
     new_descr->description = strdup(buf);
@@ -1350,8 +1350,8 @@ struct obj_data *create_money(int amount_copper)
   for(y = 0; y < TW_ARRAY_MAX; y++)
     obj->obj_flags.wear_flags[y] = 0;
   SET_BIT_AR(GET_OBJ_WEAR(obj), ITEM_WEAR_TAKE);
-  GET_OBJ_VAL(obj, 0) = amount_copper;
-  GET_OBJ_COST(obj) = MAX(1, amount_copper / (int)COPPER_PER_GOLD);
+  GET_OBJ_VAL(obj, 0) = amount;
+  GET_OBJ_COST(obj) = amount;
   obj->item_number = NOTHING;
 
   return (obj);
