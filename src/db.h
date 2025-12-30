@@ -284,7 +284,7 @@ SPECIAL(receptionist);
 SPECIAL(cryogenicist);
 
 /* Functions from players.c */
-void   tag_argument(char *argument, char *tag);
+void   tag_argument(char *argument, char *tag, size_t taglen);
 int    load_char(const char *name, struct char_data *ch);
 void   save_char(struct char_data *ch);
 void   init_char(struct char_data *ch);
