@@ -1602,7 +1602,7 @@ static void parse_simple_mob(FILE *mob_f, int i, int nr)
     exit(1);
   }
 
-  GET_GOLD(mob_proto + i) = t[0];
+  SET_GOLD(mob_proto + i, t[0]);
   GET_EXP(mob_proto + i) = t[1];
 
   if (!get_line(mob_f, line)) {

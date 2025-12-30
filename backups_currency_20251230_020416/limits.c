@@ -485,81 +485,62 @@ void point_update(void)
   }
 }
 
-
-long long increase_money_copper(struct char_data *ch, long long amt)
+/* Note: amt may be negative */
+int increase_gold(struct char_data *ch, int amt)
 {
-  long long curr = GET_MONEY(ch);
+  int curr_gold;
+
+  curr_gold = GET_GOLD(ch);
 
   if (amt < 0) {
-    GET_MONEY(ch) = MAX(0LL, curr + amt);
-    if (GET_MONEY(ch) > curr) GET_MONEY(ch) = 0LL;
+    GET_GOLD(ch) = MAX(0, curr_gold+amt);
+    /* Validate to prevent overflow */
+    if (GET_GOLD(ch) > curr_gold) GET_GOLD(ch) = 0;
   } else {
-    GET_MONEY(ch) = MIN(MAX_MONEY, curr + amt);
-    if (GET_MONEY(ch) < curr) GET_MONEY(ch) = MAX_MONEY;
+    GET_GOLD(ch) = MIN(MAX_GOLD, curr_gold+amt);
+    /* Validate to prevent overflow */
+    if (GET_GOLD(ch) < curr_gold) GET_GOLD(ch) = MAX_GOLD;
   }
+  if (GET_GOLD(ch) == MAX_GOLD)
+    send_to_char(ch, "%sYou have reached the maximum gold!\r\n%sYou must spend it or bank it before you can gain any more.\r\n", QBRED, QNRM);
 
-  if (GET_MONEY(ch) == MAX_MONEY)
-    send_to_char(ch, "%sYou have reached the maximum currency!\r\n%sSpend or bank it before gaining more.\r\n", QBRED, QNRM);
-
-  return GET_MONEY(ch);
+  return (GET_GOLD(ch));
 }
 
-long long increase_bank_copper(struct char_data *ch, long long amt)
+int decrease_gold(struct char_data *ch, int deduction)
 {
-  long long curr;
+  int amt;
+  amt = (deduction * -1);
+  increase_gold(ch, amt);
+  return (GET_GOLD(ch));
+}
+
+int increase_bank(struct char_data *ch, int amt)
+{
+  int curr_bank;
+
   if (IS_NPC(ch)) return 0;
 
-  curr = GET_BANK_MONEY(ch);
+  curr_bank = GET_BANK_GOLD(ch);
 
   if (amt < 0) {
-    GET_BANK_MONEY(ch) = MAX(0LL, curr + amt);
-    if (GET_BANK_MONEY(ch) > curr) GET_BANK_MONEY(ch) = 0LL;
+    GET_BANK_GOLD(ch) = MAX(0, curr_bank+amt);
+    /* Validate to prevent overflow */
+    if (GET_BANK_GOLD(ch) > curr_bank) GET_BANK_GOLD(ch) = 0;
   } else {
-    GET_BANK_MONEY(ch) = MIN(MAX_BANK, curr + amt);
-    if (GET_BANK_MONEY(ch) < curr) GET_BANK_MONEY(ch) = MAX_BANK;
+    GET_BANK_GOLD(ch) = MIN(MAX_BANK, curr_bank+amt);
+    /* Validate to prevent overflow */
+    if (GET_BANK_GOLD(ch) < curr_bank) GET_BANK_GOLD(ch) = MAX_BANK;
   }
-
-  if (GET_BANK_MONEY(ch) == MAX_BANK)
-    send_to_char(ch, "%sYou have reached the maximum bank balance!\r\n%sWithdraw before depositing more.\r\n", QBRED, QNRM);
-
-  return GET_BANK_MONEY(ch);
+  if (GET_BANK_GOLD(ch) == MAX_BANK)
+    send_to_char(ch, "%sYou have reached the maximum bank balance!\r\n%sYou cannot put more into your account unless you withdraw some first.\r\n", QBRED, QNRM);
+  return (GET_BANK_GOLD(ch));
 }
 
-
-int increase_diamonds(struct char_data *ch, int amt)
+int decrease_bank(struct char_data *ch, int deduction)
 {
-  if (amt == 0) return GET_DIAMONDS(ch);
-  if (amt < 0) GET_DIAMONDS(ch) = MAX(0, GET_DIAMONDS(ch) + amt);
-  else {
-    if (GET_DIAMONDS(ch) > 2000000000 - amt) GET_DIAMONDS(ch) = 2000000000;
-    else GET_DIAMONDS(ch) += amt;
-  }
-  return GET_DIAMONDS(ch);
+  int amt;
+  amt = (deduction * -1);
+  increase_bank(ch, amt);
+  return (GET_BANK_GOLD(ch));
 }
-
-int decrease_diamonds(struct char_data *ch, int deduction)
-{
-  return increase_diamonds(ch, -deduction);
-}
-
-/* Legacy API: arguments are in gold units, converted to copper units internally. */
-int increase_gold(struct char_data *ch, int amt_gold)
-{
-  return (int)(increase_money_copper(ch, (long long)amt_gold * COPPER_PER_GOLD) / COPPER_PER_GOLD);
-}
-
-int decrease_gold(struct char_data *ch, int deduction_gold)
-{
-  return increase_gold(ch, -deduction_gold);
-}
-
-int increase_bank(struct char_data *ch, int amt_gold)
-{
-  return (int)(increase_bank_copper(ch, (long long)amt_gold * COPPER_PER_GOLD) / COPPER_PER_GOLD);
-}
-
-int decrease_bank(struct char_data *ch, int deduction_gold)
-{
-  return increase_bank(ch, -deduction_gold);
-}
-

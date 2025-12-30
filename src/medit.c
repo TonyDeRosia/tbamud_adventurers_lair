@@ -969,8 +969,7 @@ void medit_parse(struct descriptor_data *d, char *arg)
     return;
 
   case MEDIT_GOLD:
-    GET_GOLD(OLC_MOB(d)) = LIMIT(i, 0, MAX_MOB_GOLD);
-    OLC_VAL(d) = TRUE;
+    SET_GOLD(OLC_MOB(d), LIMIT(i, 0, MAX_MOB_GOLD));OLC_VAL(d) = TRUE;
     medit_disp_stats_menu(d);
     return;
 
@@ -1131,8 +1130,7 @@ void medit_autoroll_stats(struct descriptor_data *d)
 
   GET_HITROLL(OLC_MOB(d)) = mob_lev/3;           /* hitroll 0-10            */
   GET_EXP(OLC_MOB(d))     = (mob_lev*mob_lev*100);
-  GET_GOLD(OLC_MOB(d))    = (mob_lev*10);
-  GET_AC(OLC_MOB(d))      = (100-(mob_lev*6));   /* AC 94 to -80            */
+  SET_GOLD(OLC_MOB(d), (mob_lev*10));GET_AC(OLC_MOB(d))      = (100-(mob_lev*6));   /* AC 94 to -80            */
 
   /* 'Advanced' stats are only rolled if advanced options are enabled */
   if (CONFIG_MEDIT_ADVANCED) {

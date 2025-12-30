@@ -1189,24 +1189,11 @@ len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
 
 /* Currencies */
 snprintf(line, sizeof(line), "%sCurrencies%s", Y, R);
-len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
-
-{
-  long long rem = GET_MONEY(ch);
-  long long gold = rem / COPPER_PER_GOLD;
-  rem %= COPPER_PER_GOLD;
-  long long silver = rem / COPPER_PER_SILVER;
-  rem %= COPPER_PER_SILVER;
-  long long copper = rem;
-
-  snprintf(line, sizeof(line),
-    "%sCopper:%s %lld   %sSilver:%s %lld   %sGold:%s %lld   %sDiamond:%s %d",
-    C, R, copper,
-    C, R, silver,
-    C, R, gold,
-    C, R, GET_DIAMONDS(ch));
   len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
-}
+
+  snprintf(line, sizeof(line), "%sGold:%s %d",
+    C, R, GET_GOLD(ch));
+  len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
 
 /* Next Level (if mortal) */
   if (GET_LEVEL(ch) < LVL_IMMORT) {

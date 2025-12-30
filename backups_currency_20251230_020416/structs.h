@@ -634,15 +634,9 @@
 #define MAX_HELP_ENTRY        MAX_STRING_LENGTH /**< Max size of help entry */
 #define MAX_COMPLETED_QUESTS  1024   /**< Maximum number of completed quests allowed */
 
-#define COPPER_PER_SILVER   100LL
-#define SILVER_PER_GOLD     10LL
-#define GOLD_PER_DIAMOND    1000LL
-#define COPPER_PER_GOLD     (COPPER_PER_SILVER * SILVER_PER_GOLD)
-#define COPPER_PER_DIAMOND  (COPPER_PER_GOLD * GOLD_PER_DIAMOND)
+#define MAX_GOLD 2140000000 /**< Maximum possible on hand gold (2.14 Billion) */
+#define MAX_BANK 2140000000 /**< Maximum possible in bank gold (2.14 Billion) */
 
-/* Stored in copper units for copper silver gold */
-#define MAX_MONEY 2140000000LL
-#define MAX_BANK  2140000000LL
 /** Define the largest set of commands for a trigger.
  * 16k should be plenty and then some. */
 #define MAX_CMD_LENGTH 16384
@@ -932,9 +926,8 @@ struct char_point_data
    * Dungeons and Dragons method of dealing with character defense, or
    * Armor class. */
   sh_int armor;
-  long long money;      /**< Currency carried, stored in copper units */
-  long long bank_money; /**< Currency in bank, stored in copper units */
-  int diamonds;         /**< Premium currency, stored as diamonds */
+  int gold;        /**< Current gold carried on character */
+  int bank_gold;   /**< Gold the char has in a bank account	*/
   int exp;         /**< The experience points, or value, of the character. */
 
   sbyte hitroll;   /**< Any bonus or penalty to the hit roll */

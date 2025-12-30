@@ -307,9 +307,8 @@ int load_char(const char *name, struct char_data *ch)
     GET_COND(ch, DRUNK) = PFDEF_DRUNK;
     GET_BAD_PWS(ch) = PFDEF_BADPWS;
     GET_PRACTICES(ch) = PFDEF_PRACTICES;
-    SET_GOLD(ch, PFDEF_GOLD);
-    GET_DIAMONDS(ch) = 0;
-    SET_BANK_GOLD(ch, PFDEF_BANK);
+    GET_GOLD(ch) = PFDEF_GOLD;
+    GET_BANK_GOLD(ch) = PFDEF_BANK;
     GET_EXP(ch) = PFDEF_EXP;
     GET_HITROLL(ch) = PFDEF_HITROLL;
     GET_DAMROLL(ch) = PFDEF_DAMROLL;
@@ -384,8 +383,7 @@ int load_char(const char *name, struct char_data *ch)
 
       case 'B':
 	     if (!strcmp(tag, "Badp"))	GET_BAD_PWS(ch)		= atoi(line);
-        else if (!strcmp(tag, "Bank")) SET_BANK_GOLD(ch, atoi(line));
-        else if (!strcmp(tag, "BankMoney")) GET_BANK_MONEY(ch) = atoll(line);
+	else if (!strcmp(tag, "Bank"))	GET_BANK_GOLD(ch)	= atoi(line);
 	else if (!strcmp(tag, "Brth"))	ch->player.time.birth	= atol(line);
 	break;
 
@@ -411,9 +409,7 @@ int load_char(const char *name, struct char_data *ch)
 	break;
 
       case 'G':
-        if (!strcmp(tag, "Gold")) SET_GOLD(ch, atoi(line));
-        else if (!strcmp(tag, "Money")) GET_MONEY(ch) = atoll(line);
-        else if (!strcmp(tag, "Diamonds")) GET_DIAMONDS(ch) = atoi(line);
+	     if (!strcmp(tag, "Gold"))	GET_GOLD(ch)		= atoi(line);
 	break;
 
       case 'H':
