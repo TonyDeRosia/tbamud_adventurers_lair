@@ -3035,8 +3035,16 @@ static int perform_set(struct char_data *ch, struct char_data *vict, int mode, c
       SET_OR_REMOVE(PLR_FLAGS(vict), PLR_FROZEN);
       break;
     case 16: /* gold */
-      SET_GOLD(vict, RANGE(0, 100000000));
-      break;
+        {
+          long long cur = (long long)GET_MONEY(vict);
+          long long rem = cur % 1000LL;
+          long long ng = (long long)RANGE(0, 100000000);
+          long long after = (ng * 1000LL) + rem;
+          if (after < 0) after = 0;
+          if (after > 2147483647LL) after = 2147483647LL;
+          GET_MONEY(vict) = (int)after;
+        }
+        break;
     case 17: /* height */
       GET_HEIGHT(vict) = value;
       affect_total(vict);
