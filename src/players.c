@@ -337,6 +337,12 @@ int load_char(const char *name, struct char_data *ch)
     GET_EXP(ch) = PFDEF_EXP;
     GET_HITROLL(ch) = PFDEF_HITROLL;
     GET_DAMROLL(ch) = PFDEF_DAMROLL;
+    GET_MELEE_CRIT(ch) = 0;
+    GET_SPELL_CRIT(ch) = 0;
+    GET_HEAL_CRIT(ch) = 0;
+    GET_MELEE_CRIT_MULT(ch) = 0;
+    GET_SPELL_CRIT_MULT(ch) = 0;
+    GET_HEAL_CRIT_MULT(ch) = 0;
     GET_AC(ch) = PFDEF_AC;
     ch->real_abils.str = PFDEF_STR;
     ch->real_abils.str_add = PFDEF_STRADD;
@@ -475,6 +481,12 @@ int load_char(const char *name, struct char_data *ch)
       case 'M':
              if (!strcmp(tag, "Mana"))    load_HMVS(ch, line, LOAD_MANA);
         else if (!strcmp(tag, "Move"))    load_HMVS(ch, line, LOAD_MOVE);
+        else if (!strcmp(tag, "MCrt"))    GET_MELEE_CRIT(ch)      = atoi(line);
+        else if (!strcmp(tag, "SCrt"))    GET_SPELL_CRIT(ch)      = atoi(line);
+        else if (!strcmp(tag, "HCrt"))    GET_HEAL_CRIT(ch)       = atoi(line);
+        else if (!strcmp(tag, "MCmt"))    GET_MELEE_CRIT_MULT(ch) = atoi(line);
+        else if (!strcmp(tag, "SCmt"))    GET_SPELL_CRIT_MULT(ch) = atoi(line);
+        else if (!strcmp(tag, "HCmt"))    GET_HEAL_CRIT_MULT(ch)  = atoi(line);
         else if (!strcmp(tag, "Mone") || !strcmp(tag, "Money")) {
           long long copper = (long long)strtoll(line, NULL, 10);
           if (copper < 0)
@@ -756,12 +768,20 @@ void save_char(struct char_data * ch)
   /* Copper-level currency is canonical; always write it once. */
   fprintf(fl, "Money: %lld\n", GET_MONEY(ch));
   fprintf(fl, "BankMoney: %lld\n", GET_BANK_MONEY(ch));
+  if (GET_DIAMONDS(ch))
+    fprintf(fl, "Diamonds: %d\n", GET_DIAMONDS(ch));
 
   if (GET_GOLD(ch)         != PFDEF_GOLD)       fprintf(fl, "Gold: %d\n", GET_GOLD(ch));
   if (GET_BANK_GOLD(ch)    != PFDEF_BANK)       fprintf(fl, "Bank: %d\n", GET_BANK_GOLD(ch));
   if (GET_EXP(ch)	   != PFDEF_EXP)	fprintf(fl, "Exp : %d\n", GET_EXP(ch));
   if (GET_HITROLL(ch)	   != PFDEF_HITROLL)	fprintf(fl, "Hrol: %d\n", GET_HITROLL(ch));
   if (GET_DAMROLL(ch)	   != PFDEF_DAMROLL)	fprintf(fl, "Drol: %d\n", GET_DAMROLL(ch));
+  if (GET_MELEE_CRIT(ch))                  fprintf(fl, "MCrt: %d\n", GET_MELEE_CRIT(ch));
+  if (GET_SPELL_CRIT(ch))                  fprintf(fl, "SCrt: %d\n", GET_SPELL_CRIT(ch));
+  if (GET_HEAL_CRIT(ch))                   fprintf(fl, "HCrt: %d\n", GET_HEAL_CRIT(ch));
+  if (GET_MELEE_CRIT_MULT(ch))             fprintf(fl, "MCmt: %d\n", GET_MELEE_CRIT_MULT(ch));
+  if (GET_SPELL_CRIT_MULT(ch))             fprintf(fl, "SCmt: %d\n", GET_SPELL_CRIT_MULT(ch));
+  if (GET_HEAL_CRIT_MULT(ch))              fprintf(fl, "HCmt: %d\n", GET_HEAL_CRIT_MULT(ch));
   if (GET_OLC_ZONE(ch)     != PFDEF_OLC)        fprintf(fl, "Olc : %d\n", GET_OLC_ZONE(ch));
   if (GET_PAGE_LENGTH(ch)  != PFDEF_PAGELENGTH) fprintf(fl, "Page: %d\n", GET_PAGE_LENGTH(ch));
   if (GET_SCREEN_WIDTH(ch) != PFDEF_SCREENWIDTH) fprintf(fl, "ScrW: %d\n", GET_SCREEN_WIDTH(ch));
