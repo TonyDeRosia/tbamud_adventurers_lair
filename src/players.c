@@ -471,20 +471,18 @@ int load_char(const char *name, struct char_data *ch)
         else if (!strcmp(tag, "Lmot"))   GET_LAST_MOTD(ch)   = atoi(line);
         else if (!strcmp(tag, "Lnew"))   GET_LAST_NEWS(ch)   = atoi(line);
 	break;
-
       case 'M':
-	     if (!strcmp(tag, "Mana"))	load_HMVS(ch, line, LOAD_MANA);
-	else if (!strcmp(tag, "Move"))	load_HMVS(ch, line, LOAD_MOVE);
+             if (!strcmp(tag, "Mana"))    load_HMVS(ch, line, LOAD_MANA);
+        else if (!strcmp(tag, "Move"))    load_HMVS(ch, line, LOAD_MOVE);
         else if (!strcmp(tag, "Mone") || !strcmp(tag, "Money")) {
-          long long copper = parse_numeric_value(line);
+          long long copper = (long long)pfile_atoll(line);
           if (copper < 0)
             copper = 0;
 
           __loaded_money_copper = copper;
-          money_seen = TRUE;
+          money_seen = 1;
         }
-	break;
-
+        break;
       case 'N':
 	     if (!strcmp(tag, "Name"))	GET_PC_NAME(ch)	= strdup(line);
 	break;
