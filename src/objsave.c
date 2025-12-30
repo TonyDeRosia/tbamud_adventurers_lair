@@ -998,7 +998,7 @@ obj_save_data *objsave_parse_objects(FILE *fl)
 
   temp = NULL;
   while (TRUE) {
-    char tag[6];
+    char tag[64];
     int num;
 
     /* if the file is done, wrap it all up */
@@ -1078,7 +1078,7 @@ obj_save_data *objsave_parse_objects(FILE *fl)
     if (temp == NULL)
       continue;
 
-    tag_argument(line, tag);
+    tag_argument(line, tag, sizeof(tag));
     num = atoi(line);
 
     switch(*tag) {
