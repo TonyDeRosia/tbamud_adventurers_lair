@@ -1,3 +1,4 @@
+#include <stdlib.h>
 /**************************************************************************
 *  File: players.c                                         Part of tbaMUD *
 *  Usage: Player loading/saving and utility routines.                     *
@@ -475,7 +476,7 @@ int load_char(const char *name, struct char_data *ch)
              if (!strcmp(tag, "Mana"))    load_HMVS(ch, line, LOAD_MANA);
         else if (!strcmp(tag, "Move"))    load_HMVS(ch, line, LOAD_MOVE);
         else if (!strcmp(tag, "Mone") || !strcmp(tag, "Money")) {
-          long long copper = (long long)pfile_atoll(line);
+          long long copper = (long long)strtoll(line, NULL, 10);
           if (copper < 0)
             copper = 0;
 
