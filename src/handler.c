@@ -286,19 +286,16 @@ void affect_total(struct char_data *ch)
   for (af = ch->affected; af; af = af->next)
     affect_modify_ar(ch, af->location, af->modifier, af->bitvector, TRUE);
 
-  /* Make certain values are between 0..25, not < 0 and not > 25! */
-  i = (IS_NPC(ch) || GET_LEVEL(ch) >= LVL_GRGOD) ? 25 : 18;
+  /* Clamp fully modified stats. */
+  ch->aff_abils.str   = MAX(0, MIN(ch->aff_abils.str,   EFFECTIVE_STAT_CAP));
+  ch->aff_abils.dex   = MAX(0, MIN(ch->aff_abils.dex,   EFFECTIVE_STAT_CAP));
+  ch->aff_abils.con   = MAX(0, MIN(ch->aff_abils.con,   EFFECTIVE_STAT_CAP));
+  ch->aff_abils.intel = MAX(0, MIN(ch->aff_abils.intel, EFFECTIVE_STAT_CAP));
+  ch->aff_abils.wis   = MAX(0, MIN(ch->aff_abils.wis,   EFFECTIVE_STAT_CAP));
+  ch->aff_abils.cha   = MAX(0, MIN(ch->aff_abils.cha,   EFFECTIVE_STAT_CAP));
 
-  GET_DEX(ch) = MAX(0, MIN(GET_DEX(ch), i));
-  GET_INT(ch) = MAX(0, MIN(GET_INT(ch), i));
-  GET_WIS(ch) = MAX(0, MIN(GET_WIS(ch), i));
-  GET_CON(ch) = MAX(0, MIN(GET_CON(ch), i));
-  GET_CHA(ch) = MAX(0, MIN(GET_CHA(ch), i));
-  GET_STR(ch) = MAX(0, GET_STR(ch));
-
-  if (IS_NPC(ch) || GET_LEVEL(ch) >= LVL_GRGOD) {
-    GET_STR(ch) = MIN(GET_STR(ch), i);
-  } else {
+  /* Convert mortal strength beyond 18 into exceptional strength. */
+  if (!(IS_NPC(ch) || GET_LEVEL(ch) >= LVL_GRGOD)) {
     if (GET_STR(ch) > 18) {
       i = GET_ADD(ch) + ((GET_STR(ch) - 18) * 10);
       GET_ADD(ch) = MIN(i, 100);
