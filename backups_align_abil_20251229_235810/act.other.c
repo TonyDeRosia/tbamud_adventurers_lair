@@ -31,147 +31,6 @@
 #include "modify.h"
 #include "pfdefaults.h"
 
-/* ABILITY LIST FORMATTER v4 */
-#ifndef ABIL_COL_WIDTH
-#define ABIL_COL_WIDTH 38
-#endif
-
-struct abil_row {
-  int id;
-  int lvl;
-  const char *name;
-  int pct;
-};
-
-static int abil_row_cmp(const void *va, const void *vb)
-{
-  const struct abil_row *a = (const struct abil_row *)va;
-  const struct abil_row *b = (const struct abil_row *)vb;
-
-  if (a->lvl != b->lvl)
-    return (a->lvl - b->lvl);
-
-#ifdef HAVE_STRCASECMP
-  return strcasecmp(a->name, b->name);
-#else
-  return strcmp(a->name, b->name);
-#endif
-}
-
-static int is_spell_id(int i)
-{
-#ifdef IS_SPELL
-  return IS_SPELL(i);
-#else
-  /* Fallback: treat everything as a spell unless it is explicitly a skill. */
-#ifdef IS_SKILL
-  return !IS_SKILL(i);
-#else
-  return 1;
-#endif
-#endif
-}
-
-static int is_skill_id(int i)
-{
-#ifdef IS_SKILL
-  return IS_SKILL(i);
-#else
-#ifdef IS_SPELL
-  return !IS_SPELL(i);
-#else
-  return 0;
-#endif
-#endif
-}
-static void show_ability_table_aligned(struct char_data *ch, int show_spells)
-{
-  int i;
-  int cls = GET_CLASS(ch);
-  int col = 0;
-  int last_lvl = -1;
-
-  /* "Level 101: " is 11 chars. Keep continuation indent identical. */
-  const char *cont = "           ";
-
-  struct abil_row rows[TOP_SPELL_DEFINE + 1];
-  int n = 0;
-
-  send_to_char(ch, "%s:\r\n", show_spells ? "SPELLS" : "SKILLS");
-
-  /* Collect rows */
-  for (i = 1; i <= TOP_SPELL_DEFINE; i++) {
-    int lvl;
-    int pct;
-    const char *nm;
-
-    if (show_spells) {
-      if (!is_spell_id(i)) continue;
-    } else {
-      if (!is_skill_id(i)) continue;
-    }
-
-    lvl = spell_info[i].min_level[cls];
-    if (lvl <= 0) continue;
-
-    pct = GET_SKILL(ch, i);
-    if (pct <= 0) continue;
-
-    nm = spell_info[i].name;
-    if (!nm || !*nm) continue;
-
-    /* filter placeholders */
-    if (!strcmp(nm, "!UNUSED!")) continue;
-
-    if (pct < 0) pct = 0;
-    if (pct > 100) pct = 100;
-
-    rows[n].id = i;
-    rows[n].lvl = lvl;
-    rows[n].name = nm;
-    rows[n].pct = pct;
-    n++;
-  }
-
-  if (n == 0) {
-    send_to_char(ch, "None.\r\n");
-    return;
-  }
-
-  qsort(rows, (size_t)n, sizeof(rows[0]), abil_row_cmp);
-
-  /* Print */
-  for (i = 0; i < n; i++) {
-    char cell[256];
-
-    if (rows[i].lvl != last_lvl) {
-      if (col != 0) {
-        send_to_char(ch, "\r\n");
-        col = 0;
-      }
-      send_to_char(ch, "Level %3d: ", rows[i].lvl);
-      last_lvl = rows[i].lvl;
-    } else if (col == 0) {
-      send_to_char(ch, "%s", cont);
-    }
-
-    snprintf(cell, sizeof(cell), "%-24s [%3d%%]",
-         rows[i].name,
-         rows[i].pct);
-    send_to_char(ch, "%-*s", ABIL_COL_WIDTH, cell);
-
-    col++;
-    if (col >= 2) {
-      send_to_char(ch, "\r\n");
-      col = 0;
-    }
-  }
-
-  if (col != 0)
-    send_to_char(ch, "\r\n");
-}
-
-
 /* Local defined utility functions */
 /* do_group utility functions */
 static void print_group(struct char_data *ch);
@@ -407,10 +266,13 @@ ACMD(do_steal)
   if (ohoh && IS_NPC(vict) && AWAKE(vict))
     hit(vict, ch, TYPE_UNDEFINED);
 }
+
 ACMD(do_skills)
 {
-  send_to_char(ch, "You have %d practice sessions remaining.\r\n", GET_PRACTICES(ch));
-  show_ability_table_aligned(ch, 0);
+  if (IS_NPC(ch))
+    return;
+
+  list_skills(ch);
 }
 
 ACMD(do_spellbook)
@@ -1073,8 +935,11 @@ ACMD(do_happyhour)
                      (3600 / SECS_PER_MUD_HOUR) );
   }
 }
+
 ACMD(do_spells)
 {
-  send_to_char(ch, "You have %d practice sessions remaining.\r\n", GET_PRACTICES(ch));
-  show_ability_table_aligned(ch, 1);
+  if (IS_NPC(ch))
+    return;
+
+  list_spells(ch);
 }
