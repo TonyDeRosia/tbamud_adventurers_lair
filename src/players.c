@@ -18,6 +18,7 @@
 #include "db.h"
 #include "handler.h"
 #include "pfdefaults.h"
+#include "race.h"
 #include "dg_scripts.h"
 #include "comm.h"
 #include "interpreter.h"
@@ -584,9 +585,12 @@ int load_char(const char *name, struct char_data *ch)
       GET_MONEY(ch) = (long long)__loaded_gold_units * (long long)COPPER_PER_GOLD;
     }
 
-    if (upgrade_legacy_immortal_levels(ch))
+  if (upgrade_legacy_immortal_levels(ch))
       mudlog(CMP, LVL_IMMORT, TRUE, "%s converted to updated immortal tier (level %d).", GET_NAME(ch), GET_LEVEL(ch));
   clamp_player_exp_to_level(ch);
+
+  /* Ensure persisted base stats stay within the creation caps on load. */
+  clamp_base_stats(ch);
 
   affect_total(ch);
 

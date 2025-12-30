@@ -77,22 +77,17 @@ int parse_race(const char *arg)
   }
 }
 
-static void clamp_abils(struct char_data *ch)
+void clamp_base_stats(struct char_data *ch)
 {
-  if (ch->real_abils.str < 3) ch->real_abils.str = 3;
-  if (ch->real_abils.dex < 3) ch->real_abils.dex = 3;
-  if (ch->real_abils.con < 3) ch->real_abils.con = 3;
-  if (ch->real_abils.intel < 3) ch->real_abils.intel = 3;
-  if (ch->real_abils.wis < 3) ch->real_abils.wis = 3;
-  if (ch->real_abils.cha < 3) ch->real_abils.cha = 3;
+  if (!ch)
+    return;
 
-  /* Adventurers Lair: allow limited stat allocation above 25 during creation. */
-  if (ch->real_abils.str > 30) ch->real_abils.str = 30;
-  if (ch->real_abils.dex > 30) ch->real_abils.dex = 30;
-  if (ch->real_abils.con > 30) ch->real_abils.con = 30;
-  if (ch->real_abils.intel > 30) ch->real_abils.intel = 30;
-  if (ch->real_abils.wis > 30) ch->real_abils.wis = 30;
-  if (ch->real_abils.cha > 30) ch->real_abils.cha = 30;
+  ch->real_abils.str   = MIN(MAX(ch->real_abils.str,   BASE_STAT_MIN), BASE_STAT_CAP);
+  ch->real_abils.dex   = MIN(MAX(ch->real_abils.dex,   BASE_STAT_MIN), BASE_STAT_CAP);
+  ch->real_abils.con   = MIN(MAX(ch->real_abils.con,   BASE_STAT_MIN), BASE_STAT_CAP);
+  ch->real_abils.intel = MIN(MAX(ch->real_abils.intel, BASE_STAT_MIN), BASE_STAT_CAP);
+  ch->real_abils.wis   = MIN(MAX(ch->real_abils.wis,   BASE_STAT_MIN), BASE_STAT_CAP);
+  ch->real_abils.cha   = MIN(MAX(ch->real_abils.cha,   BASE_STAT_MIN), BASE_STAT_CAP);
 }
 
 /*
@@ -177,7 +172,9 @@ void apply_racial_bonuses(struct char_data *ch)
       break;
   }
 
-  clamp_abils(ch);
+  /* Racial adjustments can push stats over/under creation caps; clamp once */
+  /* they're finalized so what the player selected is what gets saved.      */
+  clamp_base_stats(ch);
   affect_total(ch);
 }
 
