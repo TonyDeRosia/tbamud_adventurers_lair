@@ -1045,111 +1045,51 @@ len = append_box_line(buf, len, sizeof(buf), B, R, "", W);
     C, R, shown_ac, base_ac, dex_ac, raw_ac,
     C, R, GET_ALIGNMENT(ch));
 }
-len = append_box_line(buf, len, sizeof(buf), B, R, line, W);/* Combat Stats */
+  len = append_box_line(buf, len, sizeof(buf), B, R, line, W);/* Combat Stats */
   len = append_box_line(buf, len, sizeof(buf), B, R, "", W);
   {
     int base_thaco = thaco(GET_CLASS(ch), GET_LEVEL(ch));
     int str_to_hit = str_app[STRENGTH_APPLY_INDEX(ch)].tohit;
 /* To Hit (vs AC 0): your hit target number versus Armor Class 0.
        Lower is better. In combat, the target's Armor Class shifts this number. */
-    int to_hit_ac0 = base_thaco - str_to_hit - GET_HITROLL(ch);    {
-      int b_str = ch->real_abils.str;
-      int b_dex = ch->real_abils.dex;
-      int b_con = ch->real_abils.con;
-      int b_int = ch->real_abils.intel;
-      int b_wis = ch->real_abils.wis;
-      int b_cha = ch->real_abils.cha;
+    int to_hit_ac0 = base_thaco - str_to_hit - GET_HITROLL(ch);
+    int b_str = ch->real_abils.str;
+    int b_dex = ch->real_abils.dex;
+    int b_con = ch->real_abils.con;
+    int b_int = ch->real_abils.intel;
+    int b_wis = ch->real_abils.wis;
+    int b_cha = ch->real_abils.cha;
 
-      int m_str = GET_STR(ch) - b_str;
-      int m_dex = GET_DEX(ch) - b_dex;
-      int m_con = GET_CON(ch) - b_con;
-      int m_int = GET_INT(ch) - b_int;
-      int m_wis = GET_WIS(ch) - b_wis;
-      int m_cha = GET_CHA(ch) - b_cha;
+    int m_str = GET_STR(ch) - b_str;
+    int m_dex = GET_DEX(ch) - b_dex;
+    int m_con = GET_CON(ch) - b_con;
+    int m_int = GET_INT(ch) - b_int;
+    int m_wis = GET_WIS(ch) - b_wis;
+    int m_cha = GET_CHA(ch) - b_cha;
 
-      char s_str[16], s_dex[16], s_con[16], s_int[16], s_wis[16], s_cha[16];
+    snprintf(line, sizeof(line),
+      "%sBase Stats:%s  Str %d (%+d)  Dex %d (%+d)  Con %d (%+d)",
+      C, R,
+      b_str, m_str,
+      b_dex, m_dex,
+      b_con, m_con);
+    len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
 
-      if (m_str) snprintf(s_str, sizeof(s_str), "%d (%+d)", b_str, m_str); else snprintf(s_str, sizeof(s_str), "%d", b_str);
-      if (m_dex) snprintf(s_dex, sizeof(s_dex), "%d (%+d)", b_dex, m_dex); else snprintf(s_dex, sizeof(s_dex), "%d", b_dex);
-      if (m_con) snprintf(s_con, sizeof(s_con), "%d (%+d)", b_con, m_con); else snprintf(s_con, sizeof(s_con), "%d", b_con);
-      if (m_int) snprintf(s_int, sizeof(s_int), "%d (%+d)", b_int, m_int); else snprintf(s_int, sizeof(s_int), "%d", b_int);
-      if (m_wis) snprintf(s_wis, sizeof(s_wis), "%d (%+d)", b_wis, m_wis); else snprintf(s_wis, sizeof(s_wis), "%d", b_wis);
-      if (m_cha) snprintf(s_cha, sizeof(s_cha), "%d (%+d)", b_cha, m_cha); else snprintf(s_cha, sizeof(s_cha), "%d", b_cha);
+    snprintf(line, sizeof(line),
+      "%s            %s  Int %d (%+d)  Wis %d (%+d)  Cha %d (%+d)",
+      C, R,
+      b_int, m_int,
+      b_wis, m_wis,
+      b_cha, m_cha);
+    len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
+    len = append_box_line(buf, len, sizeof(buf), B, R, "", W);
 
-      {
-
-
-        int r = GET_RACE(ch);
-
-
-        int r_str = race_abil_bonus(r, 0);
-
-
-        int r_dex = race_abil_bonus(r, 1);
-
-
-        int r_con = race_abil_bonus(r, 2);
-
-
-        int r_int = race_abil_bonus(r, 3);
-
-
-        int r_wis = race_abil_bonus(r, 4);
-
-
-        int r_cha = race_abil_bonus(r, 5);
-
-
-
-        int b_str = GET_STR(ch) - r_str;
-
-
-        int b_dex = GET_DEX(ch) - r_dex;
-
-
-        int b_con = GET_CON(ch) - r_con;
-
-
-        int b_int = GET_INT(ch) - r_int;
-
-
-        int b_wis = GET_WIS(ch) - r_wis;
-
-
-        int b_cha = GET_CHA(ch) - r_cha;
-
-
-
-        snprintf(line, sizeof(line),
-          "%sBase Stats:%s  Str %d (%+d)  Dex %d (%+d)  Con %d (%+d)",
-          C, R,
-          b_str, r_str,
-          b_dex, r_dex,
-          b_con, r_con);
-      len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
-
-        snprintf(line, sizeof(line),
-          "%s            %s  Int %d (%+d)  Wis %d (%+d)  Cha %d (%+d)",
-          C, R,
-          b_int, r_int,
-          b_wis, r_wis,
-          b_cha, r_cha);
-      len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
-      len = append_box_line(buf, len, sizeof(buf), B, R, "", W);
-
-
-      }
-
-    }
-
-snprintf(line, sizeof(line),
+    snprintf(line, sizeof(line),
       "%sOffense:%s  Hitroll %+d  Damroll %+d  To Hit (vs AC 0) %d (lower is better)",
       C, R,
       GET_HITROLL(ch), GET_DAMROLL(ch), to_hit_ac0);
     len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
-
-
-  
+  }
   len = append_box_line(buf, len, sizeof(buf), B, R, "", W);
 /* Crit chances */
 snprintf(line, sizeof(line),
