@@ -1340,7 +1340,7 @@ EVENTFUNC(get_protocols)
 /* to increase stats. CON costs 2 points per +1.                             */
 
 #define STAT_ALLOC_POOL 15
-#define STAT_ALLOC_CAP  20
+#define STAT_ALLOC_CAP  BASE_STAT_CAP
 static int stat_alloc_cost(int idx)
 {
   /* 0 Str, 1 Dex, 2 Con, 3 Int, 4 Wis, 5 Cha */
@@ -2044,6 +2044,8 @@ break;
           return;
         }
 
+        /* Finalize base stats after racial modifiers and point spend. */
+        clamp_base_stats(d->character);
         save_char(d->character);
         save_player_index();
         write_to_output(d, "%s\r\n*** PRESS RETURN: ", motd);
