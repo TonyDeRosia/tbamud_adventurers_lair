@@ -29,6 +29,27 @@
 #include "modify.h"
 
 
+
+static void format_price_gsc(char *out, size_t outsz, long long total_copper)
+{
+  long long g = 0, s = 0, c = 0;
+
+  if (total_copper < 0)
+    total_copper = 0;
+
+  g = total_copper / (long long)COPPER_PER_GOLD;
+  total_copper %= (long long)COPPER_PER_GOLD;
+
+  s = total_copper / (long long)COPPER_PER_SILVER;
+  c = total_copper % (long long)COPPER_PER_SILVER;
+
+  if (g > 0)
+    snprintf(out, outsz, "%lldg %llds %lldc", g, s, c);
+  else if (s > 0)
+    snprintf(out, outsz, "%llds %lldc", s, c);
+  else
+    snprintf(out, outsz, "%lldc", c);
+}
 /* locally defined functions of local (file) scope */
 static int compare_spells(const void *x, const void *y);
 static void npc_steal(struct char_data *ch, struct char_data *victim);
@@ -673,7 +694,7 @@ SPECIAL(pet_shops)
       /* No, you can't have the Implementor as a pet if he's in there. */
       if (!IS_NPC(pet))
         continue;
-      send_to_char(ch, "%8d - %s\r\n", PET_PRICE(pet), GET_NAME(pet));
+      { long long _pc = (long long)PET_PRICE(pet); char _pb[64]; format_price_gsc(_pb, sizeof(_pb), _pc); send_to_char(ch, "%8s - %s\r\n", _pb, GET_NAME(pet)); }
     }
     return (TRUE);
   } else if (CMD_IS("buy")) {
@@ -684,11 +705,11 @@ SPECIAL(pet_shops)
       send_to_char(ch, "There is no such pet!\r\n");
       return (TRUE);
     }
-    if (GET_GOLD(ch) < PET_PRICE(pet)) {
-      send_to_char(ch, "You don't have enough gold!\r\n");
+    if ((long long)GET_MONEY(ch) < (long long)PET_PRICE(pet)) {
+      char _pb[64]; format_price_gsc(_pb, sizeof(_pb), (long long)PET_PRICE(pet)); send_to_char(ch, "You do not have enough money. Cost is %s.\r\n", _pb);
       return (TRUE);
     }
-    decrease_gold(ch, PET_PRICE(pet));
+    GET_MONEY(ch) = (long long)GET_MONEY(ch) - (long long)PET_PRICE(pet); if (GET_MONEY(ch) < 0) GET_MONEY(ch) = 0;
 
     pet = read_mobile(GET_MOB_RNUM(pet), REAL);
     GET_EXP(pet) = 0;
