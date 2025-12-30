@@ -389,7 +389,11 @@ int load_char(const char *name, struct char_data *ch)
 	     if (!strcmp(tag, "Badp"))	GET_BAD_PWS(ch)		= atoi(line);
         else if (!strcmp(tag, "Bank") && !bank_money_seen) SET_BANK_GOLD(ch, atoi(line));
         else if (!strcmp(tag, "BankMoney")) {
-          GET_BANK_MONEY(ch) = atoll(line);
+          long long copper = atoll(line);
+          if (copper < 0)
+            copper = 0;
+
+          GET_BANK_MONEY(ch) = copper;
           bank_money_seen = TRUE;
         }
 	else if (!strcmp(tag, "Brth"))	ch->player.time.birth	= atol(line);
@@ -419,7 +423,11 @@ int load_char(const char *name, struct char_data *ch)
       case 'G':
         if (!strcmp(tag, "Gold") && !money_seen) SET_GOLD(ch, atoi(line));
         else if (!strcmp(tag, "Money")) {
-          GET_MONEY(ch) = atoll(line);
+          long long copper = atoll(line);
+          if (copper < 0)
+            copper = 0;
+
+          GET_MONEY(ch) = copper;
           money_seen = TRUE;
         }
         else if (!strcmp(tag, "Diamonds")) GET_DIAMONDS(ch) = atoi(line);
