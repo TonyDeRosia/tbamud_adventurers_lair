@@ -978,9 +978,6 @@ static void refresh_idle_prompts_on_tick(void)
       continue;
 
     /* Only refresh when the player is not actively standing around. */
-    if (GET_POS(d->character) != POS_SLEEPING && GET_POS(d->character) != POS_RESTING)
-      continue;
-
     queue_prompt(d);
   }
 }
