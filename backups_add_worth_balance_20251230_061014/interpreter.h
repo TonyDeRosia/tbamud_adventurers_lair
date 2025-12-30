@@ -125,8 +125,4 @@ extern int *cmd_sort_info;
 extern struct command_info *complete_cmd_info;
 extern const struct command_info cmd_info[];
 
-ACMD(do_worth);
-ACMD(do_balance);
-
-
 #endif /* _INTERPRETER_H_ */

@@ -109,7 +109,7 @@ cpp_extern const struct command_info cmd_info[] = {
   { "backstab" , "ba"      , POS_STANDING, do_backstab , 1, 0 },
   { "ban"      , "ban"     , POS_DEAD    , do_ban      , LVL_GRGOD, 0 },
   { "bandage"  , "band"    , POS_RESTING , do_bandage  , 1, 0 },
-
+  { "balance"  , "bal"     , POS_STANDING, do_not_here , 1, 0 },
   { "bash"     , "bas"     , POS_FIGHTING, do_bash     , 1, 0 },
   { "brief"    , "br"      , POS_DEAD    , do_gen_tog  , 0, SCMD_BRIEF },
   { "buildwalk", "buildwalk", POS_STANDING, do_gen_tog , LVL_BUILDER, SCMD_BUILDWALK },
@@ -375,12 +375,8 @@ cpp_extern const struct command_info cmd_info[] = {
   { "zunlock"  , "zunlock" , POS_DEAD    , do_zunlock  , LVL_GOD, 0 },
   { "zcheck"   , "zcheck"  , POS_DEAD    , do_zcheck   , LVL_BUILDER, 0 },
   { "zpurge"   , "zpurge"  , POS_DEAD    , do_zpurge   , LVL_BUILDER, 0 },
-  { "balance", "bal", POS_DEAD, do_balance, 0, 0 },
-  { "worth",   "wor", POS_DEAD, do_worth,   0, 0 },
 
-  { "\n", "zzzzzzz", 0, 0, 0, 0 }   
-  
-};    /* this must be last */
+  { "\n", "zzzzzzz", 0, 0, 0, 0 } };    /* this must be last */
 
 
   /* Thanks to Melzaren for this change to allow DG Scripts to be attachable

@@ -1374,59 +1374,6 @@ len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
   send_to_char(ch, "%s", buf);
 }
 
-/* Currency-only display used by worth and balance. */
-static void show_currency_only(struct char_data *ch)
-{
-  long long money = (long long)GET_MONEY(ch);
-  long long gold = money / 1000LL;
-  long long silver = (money % 1000LL) / 100LL;
-  long long copper = money % 100LL;
-  long long diamonds = 0;
-
-#ifdef GET_DIAMONDS
-  diamonds = (long long)GET_DIAMONDS(ch);
-#endif
-
-  if (gold <= 0 && silver <= 0 && copper <= 0 && diamonds <= 0) {
-    send_to_char(ch, "You have no currency.\r\n");
-    return;
-  }
-
-  send_to_char(ch, "Currencies\r\n");
-
-  {
-    char out[256];
-    size_t len = 0;
-    out[0] = '\0';
-
-    if (copper > 0)
-      len += (size_t)snprintf(out + len, sizeof(out) - len, "Copper: %lld  ", copper);
-    if (silver > 0)
-      len += (size_t)snprintf(out + len, sizeof(out) - len, "Silver: %lld  ", silver);
-    if (gold > 0)
-      len += (size_t)snprintf(out + len, sizeof(out) - len, "Gold: %lld  ", gold);
-    if (diamonds > 0)
-      len += (size_t)snprintf(out + len, sizeof(out) - len, "Diamond: %lld  ", diamonds);
-
-    while (len > 0 && out[len - 1] == ' ')
-      out[--len] = '\0';
-
-    send_to_char(ch, "%s\r\n", out);
-  }
-}
-
-ACMD(do_worth)
-{
-  show_currency_only(ch);
-}
-
-ACMD(do_balance)
-{
-  show_currency_only(ch);
-}
-
-
-
 /* =======================================================================
  * AFF / AFFECTS COMMAND
  * Mortals: short summary (spell name + simple effect)
