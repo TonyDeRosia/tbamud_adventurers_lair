@@ -12,7 +12,6 @@
 #include "sysdep.h"
 #include <ctype.h>
 #include <limits.h>
-#include <stdbool.h>
 #include "structs.h"
 #include "utils.h"
 #include "db.h"
