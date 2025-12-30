@@ -3359,17 +3359,7 @@ ACMD(do_set)
 {
   struct char_data *vict = NULL, *cbuf = NULL;
   char field[MAX_INPUT_LENGTH], name[MAX_INPUT_LENGTH], buf[MAX_INPUT_LENGTH];
-    snprintf(field, sizeof(field), "%s", "money");
-  if (!strcmp(field, "diamond"))
-    snprintf(field, sizeof(field), "%s", "diamonds");
-  if (!strcmp(field, "silver")) {
-    send_to_char(ch, "Silver is not implemented as a settable field yet.\r\n");
-    return;
-  }
-
-  int mode, len, player_i = 0, retval;
-  int currency_req = 0; /* 0 none, 1 copper, 2 silver, 3 gold */
-  long long currency_in = 0;
+  int mode, len, player_i = 0, retval = 0;
   char is_file = 0, is_player = 0;
 
   half_chop(argument, name, buf);
@@ -3388,103 +3378,192 @@ ACMD(do_set)
 
   half_chop(buf, field, buf);
 
+  if (!*name || !*field) {
+    send_to_char(ch, "Usage: set <victim> <field> <value>\r\n");
+    send_to_char(ch, "       %sset help%s will display valid fields\r\n", CCYEL(ch, C_NRM), CCNRM(ch, C_NRM));
+    return;
+  }
+
+  /* find the target */
+  if (!is_file) {
+    if (is_player) {
+      if (!(vict = get_player_vis(ch, name, NULL, FIND_CHAR_WORLD))) {
+        send_to_char(ch, "There is no such player.\r\n");
+        return;
+      }
+    } else { /* is_mob */
+      if (!(vict = get_char_vis(ch, name, NULL, FIND_CHAR_WORLD))) {
+        send_to_char(ch, "There is no such creature.\r\n");
+        return;
+      }
+    }
+  } else if (is_file) {
+    /* try to load the player off disk */
+    CREATE(cbuf, struct char_data, 1);
+    clear_char(cbuf);
+    CREATE(cbuf->player_specials, struct player_special_data, 1);
+    new_mobile_data(cbuf);
+    if ((player_i = load_char(name, cbuf)) > -1) {
+      if (GET_LEVEL(cbuf) > GET_LEVEL(ch)) {
+        free_char(cbuf);
+        send_to_char(ch, "Sorry, you can't do that.\r\n");
+        return;
+      }
+      vict = cbuf;
+    } else {
+      free_char(cbuf);
+      send_to_char(ch, "There is no such player.\r\n");
+      return;
+    }
+  }
+
+    if (!strcmp(field, "diamond") || !strcmp(field, "diamonds")) {
+    char *endp = NULL;
+    long long req = strtoll(buf, &endp, 10);
+
+    if (endp == buf) {
+      send_to_char(ch, "Value must be a number.\r\n");
+      retval = 0;
+      goto do_set_save_and_cleanup;
+    }
+
+    if (req < 0) req = 0;
+    if (req > 2147483647LL) req = 2147483647LL;
+
+    GET_DIAMONDS(vict) = (int)req;
+
+    send_to_char(ch, "%s set %s's diamonds to %lld.\r\n",
+      GET_NAME(ch), GET_NAME(vict), req);
+
+    retval = 1;
+    goto do_set_save_and_cleanup;
+  }
+
   /* Direct currency set: canonical total is GET_MONEY (copper units). */
   if (!strcmp(field, "copper") || !strcmp(field, "silver") || !strcmp(field, "gold") || !strcmp(field, "money")) {
-    long long req = 0, total = 0;
+    long long req = 0;
+    long long before = (long long)GET_MONEY(vict);
+    long long after = 0;
     long long g = 0, s = 0, c = 0;
+    long long mult = 1;
+    long long delta = 0;
+    int delta_mode = 0; /* + / - means adjust; otherwise set exact denomination */
     char *endp = NULL;
-    int mult = 1;
+    char *valp = buf;
 
-    if (!*buf) {
-      send_to_char(ch, "Usage: set <victim> <copper|silver|gold|money> <amount>\r\n");
-      /* free the memory if we allocated it earlier */
-      if (is_file)
-        free_char(cbuf);
-      return;
+    skip_spaces(&valp);
+    if (!*valp) {
+      send_to_char(ch, "Usage: set <victim> <copper|silver|gold|money> <number | +number | -number>\r\n");
+      retval = 0;
+      goto do_set_save_and_cleanup;
     }
 
-    req = strtoll(buf, &endp, 10);
-    if (endp == buf) {
+    /* Detect delta mode */
+    if (*valp == '+' || *valp == '-')
+      delta_mode = 1;
+
+    req = strtoll(valp, &endp, 10);
+    if (endp == valp) {
       send_to_char(ch, "Amount must be a number.\r\n");
-      if (is_file)
-        free_char(cbuf);
-      return;
-    }
-    if (req < 0) req = 0;
-
-    if (!strcmp(field, "copper") || !strcmp(field, "money")) mult = 1;
-    else if (!strcmp(field, "silver")) mult = 100;
-    else if (!strcmp(field, "gold")) mult = 1000;
-
-    total = req * (long long)mult;
-    if (total < 0) total = 0; /* overflow guard */
-
-    GET_MONEY(vict) = (int)MIN(total, 2147483647LL);
-
-    /* Normalize for display message using 1000 copper per gold, 100 copper per silver. */
-    g = (long long)GET_MONEY(vict) / 1000LL;
-    s = ((long long)GET_MONEY(vict) % 1000LL) / 100LL;
-    c = (long long)GET_MONEY(vict) % 100LL;
-
-    send_to_char(ch,
-      "%s set %s's %s to %lld.\r\n"
-      "Stored as money=%lld (copper units), which normalizes to %lld gold %lld silver %lld copper.\r\n",
-      GET_NAME(ch), GET_NAME(vict), field, req, GET_MONEY(vict), g, s, c);
-
-    /* save the character if a change was made */
-    if (!is_file && !IS_NPC(vict))
-      save_char(vict);
-    if (is_file) {
-      GET_PFILEPOS(cbuf) = player_i;
-      save_char(cbuf);
-      send_to_char(ch, "Saved in file.\r\n");
+      retval = 0;
+      goto do_set_save_and_cleanup;
     }
 
-    /* free the memory if we allocated it earlier */
-    if (is_file)
-      free_char(cbuf);
-    return;
+    if (!strcmp(field, "copper") || !strcmp(field, "money"))
+      mult = 1;
+    else if (!strcmp(field, "silver"))
+      mult = 100;
+    else if (!strcmp(field, "gold"))
+      mult = 1000;
+
+    if (delta_mode) {
+      /* Adjust total money by req * mult */
+      delta = req * mult;
+      after = before + delta;
+    } else {
+      /* Set EXACT denomination, keep other parts the same */
+      long long cur = before;
+      long long cur_g = cur / 1000LL;
+      long long cur_s = (cur % 1000LL) / 100LL;
+      long long cur_c = cur % 100LL;
+
+      if (!strcmp(field, "gold")) {
+        after = (req * 1000LL) + (cur_s * 100LL) + cur_c;
+      } else if (!strcmp(field, "silver")) {
+        after = (cur_g * 1000LL) + (req * 100LL) + cur_c;
+      } else { /* copper or money */
+        after = (cur_g * 1000LL) + (cur_s * 100LL) + req;
+      }
+    }
+
+    /* Clamp so money never goes below 0, and stays within int range */
+    if (after < 0)
+      after = 0;
+    if (after > 2147483647LL)
+      after = 2147483647LL;
+
+    GET_MONEY(vict) = (int)after;
+
+    g = after / 1000LL;
+    s = (after % 1000LL) / 100LL;
+    c = after % 100LL;
+
+    if (delta_mode) {
+      send_to_char(ch,
+        "%s adjusted %s's %s by %lld.\r\n"
+        "Money: %lld -> %lld (copper units). Normalized: %lld gold %lld silver %lld copper.\r\n",
+        GET_NAME(ch), GET_NAME(vict), field, req,
+        before, after, g, s, c);
+    } else {
+      send_to_char(ch,
+        "%s set %s's %s to %lld.\r\n"
+        "Money: %lld -> %lld (copper units). Normalized: %lld gold %lld silver %lld copper.\r\n",
+        GET_NAME(ch), GET_NAME(vict), field, req,
+        before, after, g, s, c);
+    }
+
+    retval = 1;
+    goto do_set_save_and_cleanup;
   }
 
-  /* Diamonds are a separate currency field. */
+  /* Diamonds are a separate currency field (additive, clamped). */
   if (!strcmp(field, "diamond") || !strcmp(field, "diamonds")) {
     long long req = 0;
+    long long before = (long long)GET_DIAMONDS(vict);
+    long long after = 0;
     char *endp = NULL;
+    char *valp = buf;
 
-    if (!*buf) {
-      send_to_char(ch, "Usage: set <victim> <diamond|diamonds> <amount>\r\n");
-      if (is_file)
-        free_char(cbuf);
-      return;
+    skip_spaces(&valp);
+    if (!*valp) {
+      send_to_char(ch, "Usage: set <victim> <diamond|diamonds> <number>\r\n");
+      retval = 0;
+      goto do_set_save_and_cleanup;
     }
 
-    req = strtoll(buf, &endp, 10);
-    if (endp == buf) {
+    req = strtoll(valp, &endp, 10);
+    if (endp == valp) {
       send_to_char(ch, "Amount must be a number.\r\n");
-      if (is_file)
-        free_char(cbuf);
-      return;
+      retval = 0;
+      goto do_set_save_and_cleanup;
     }
-    if (req < 0) req = 0;
 
-    GET_DIAMONDS(vict) = (int)MIN(req, 2147483647LL);
+    after = before + req;
+    if (after < 0)
+      after = 0;
+    if (after > 2147483647LL)
+      after = 2147483647LL;
 
-    send_to_char(ch, "%s set %s's diamonds to %d.\r\n",
-      GET_NAME(ch), GET_NAME(vict), GET_DIAMONDS(vict));
+    GET_DIAMONDS(vict) = (int)after;
 
-    if (!is_file && !IS_NPC(vict))
-      save_char(vict);
-    if (is_file) {
-      GET_PFILEPOS(cbuf) = player_i;
-      save_char(cbuf);
-      send_to_char(ch, "Saved in file.\r\n");
-    }
-    if (is_file)
-      free_char(cbuf);
-    return;
+    send_to_char(ch,
+      "%s adjusted %s's diamonds by %lld.\r\n"
+      "Diamonds: %lld -> %lld.\r\n",
+      GET_NAME(ch), GET_NAME(vict), req, before, after);
+
+    retval = 1;
+    goto do_set_save_and_cleanup;
   }
-
-
 
 
   /* find the command in the list */
@@ -3496,26 +3575,12 @@ ACMD(do_set)
   if (*(set_fields[mode].cmd) == '\n') {
     retval = 0; /* skips saving below */
     send_to_char(ch, "Can't set that!\r\n");
-  } else
-  /* perform the set */
-  retval = perform_set(ch, vict, mode, buf);
-
-  if (retval && currency_req) {
-    long long total = (long long)GET_MONEY(vict);
-    long long g = 0, s = 0, c = 0;
-    const char *req = (currency_req == 1 ? "copper" : (currency_req == 2 ? "silver" : "gold"));
-
-    g = total / (long long)COPPER_PER_GOLD;
-    total %= (long long)COPPER_PER_GOLD;
-    s = total / (long long)COPPER_PER_SILVER;
-    c = total % (long long)COPPER_PER_SILVER;
-
-    send_to_char(ch,
-      "%s requested %s %lld. Stored as money=%lld (copper units), normalized to %lld gold %lld silver %lld copper.\r\n",
-      GET_NAME(vict), req, currency_in, GET_MONEY(vict), g, s, c);
+  } else {
+    /* perform the set */
+    retval = perform_set(ch, vict, mode, buf);
   }
 
-
+do_set_save_and_cleanup:
   /* save the character if a change was made */
   if (retval) {
     if (!is_file && !IS_NPC(vict))
@@ -3531,6 +3596,7 @@ ACMD(do_set)
   if (is_file)
     free_char(cbuf);
 }
+
 
 ACMD(do_saveall)
 {
