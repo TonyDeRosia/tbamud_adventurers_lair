@@ -91,91 +91,25 @@ void clamp_base_stats(struct char_data *ch)
 }
 
 /*
-  Apply racial bonuses once at creation time.
-  Do not call this on login or load.
-*/
-void apply_racial_bonuses(struct char_data *ch)
+ * Apply one-time racial perks that should be permanently baked into the
+ * character record. Do not add or subtract from real_abils here; racial
+ * ability modifiers are applied dynamically in affect_total.
+ */
+void apply_racial_perks_once(struct char_data *ch)
 {
   if (!ch)
     return;
 
   switch (GET_RACE(ch)) {
-    case RACE_HUMAN:
-      break;
-
-    case RACE_ELF:
-      ch->real_abils.intel += 1;
-      ch->real_abils.wis   += 1;
-      ch->real_abils.con   -= 1;
-      break;
-
     case RACE_DWARF:
-      ch->real_abils.con   += 1;
-      ch->real_abils.dex   -= 1;
-      ch->real_abils.cha   -= 1;
       GET_MAX_HIT(ch) += 5;
       GET_HIT(ch)     += 5;
       GET_AC(ch)      -= 1;
       break;
 
-    case RACE_ORC:
-      ch->real_abils.str   += 1;
-      ch->real_abils.dex   += 1;
-      ch->real_abils.intel -= 1;
-      ch->real_abils.wis   -= 1;
-      break;
-
-    case RACE_HALFLING:
-      ch->real_abils.dex   += 1;
-      ch->real_abils.cha   += 1;
-      ch->real_abils.str   -= 1;
-      break;
-
-    case RACE_TROLL:
-      ch->real_abils.con   += 1;
-      ch->real_abils.str   += 1;
-      ch->real_abils.intel -= 1;
-      ch->real_abils.wis   -= 1;
-      break;
-
-    case RACE_GOBLIN:
-      ch->real_abils.dex   += 1;
-      ch->real_abils.intel += 1;
-      ch->real_abils.cha   -= 2;
-      break;
-
-    case RACE_WEREWOLF:
-      ch->real_abils.str   += 2;
-      ch->real_abils.cha   -= 1;
-      ch->real_abils.intel -= 1;
-      break;
-
-    case RACE_SATYR:
-      ch->real_abils.cha   += 1;
-      ch->real_abils.dex   += 1;
-      ch->real_abils.wis   -= 2;
-      break;
-
-    case RACE_MINOTAUR:
-      ch->real_abils.str   += 2;
-      ch->real_abils.dex   -= 1;
-      ch->real_abils.intel -= 1;
-      break;
-
-    case RACE_VAMPIRE:
-      ch->real_abils.intel += 1;
-      ch->real_abils.cha   += 1;
-      ch->real_abils.con   -= 1;
-      break;
-
     default:
       break;
   }
-
-  /* Racial adjustments can push stats over/under creation caps; clamp once */
-  /* they're finalized so what the player selected is what gets saved.      */
-  clamp_base_stats(ch);
-  affect_total(ch);
 }
 
 

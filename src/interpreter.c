@@ -1998,9 +1998,9 @@ init_char(d->character);
        affect_total(d->character);
 
 
-	/* Apply racial bonuses once, then allow limited point allocation. */
-	apply_racial_bonuses(d->character);
-	stat_alloc_snapshot_base(d);
+        /* Apply one-time racial perks (non-stat) before allocation. */
+        apply_racial_perks_once(d->character);
+        stat_alloc_snapshot_base(d);
 
 	STATE(d) = CON_QSTATS;
 	stat_alloc_show(d);
