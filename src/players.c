@@ -291,7 +291,7 @@ int load_char(const char *name, struct char_data *ch)
   int id, i;
   FILE *fl;
   char filename[40];
-  char buf[128], buf2[128], line[MAX_INPUT_LENGTH + 1], tag[6];
+  char buf[128], buf2[128], line[MAX_INPUT_LENGTH + 1], tag[64];
   char f1[128], f2[128], f3[128], f4[128];
   trig_data *t = NULL;
   trig_rnum t_rnum = NOTHING;
@@ -379,7 +379,7 @@ int load_char(const char *name, struct char_data *ch)
       PRF_FLAGS(ch)[i] = PFDEF_PREFFLAGS;
 
     while (get_line(fl, line)) {
-      tag_argument(line, tag);
+      tag_argument(line, tag, sizeof(tag));
 
       switch (*tag) {
       case 'A':
@@ -877,16 +877,23 @@ void save_char(struct char_data * ch)
     save_player_index();
 }
 
-/* Separate a 4-character id tag from the data it precedes */
-void tag_argument(char *argument, char *tag)
+/* Separate an id tag from the data it precedes */
+void tag_argument(char *argument, char *tag, size_t taglen)
 {
-  char *tmp = argument, *ttag = tag, *wrt = argument;
+  char *tmp = argument, *wrt = argument;
+  size_t n = 0;
+
+  if (taglen == 0) return;
+
+  while (*tmp && *tmp != ':' && n + 1 < taglen) {
+    tag[n++] = *tmp++;
+  }
+  tag[n] = '\0';
 
   while (*tmp && *tmp != ':')
-    *(ttag++) = *(tmp++);
-  *ttag = '\0';
+    tmp++;
 
-  while (*tmp == ':' || isspace((unsigned char) *tmp))
+  while (*tmp == ':' || isspace((unsigned char)*tmp))
     tmp++;
 
   while (*tmp)
