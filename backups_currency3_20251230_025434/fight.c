@@ -341,24 +341,17 @@ static void make_corpse(struct char_data *ch)
       obj_to_obj(unequip_char(ch, i), corpse);
     }
 
-    /* transfer gold */
-  if (!IS_NPC(ch)) {
-    /* transfer gold */
-    if (GET_GOLD(ch) > 0) {
+  /* transfer gold */
+  if (GET_GOLD(ch) > 0) {
     /* following 'if' clause added to fix gold duplication loophole. The above
-    * line apparently refers to the old "partially log in, kill the game
-    * character, then finish login sequence" duping bug. The duplication has
-    * been fixed (knock on wood) but the test below shall live on, for a
-    * while. -gg 3/3/2002 */
+     * line apparently refers to the old "partially log in, kill the game
+     * character, then finish login sequence" duping bug. The duplication has
+     * been fixed (knock on wood) but the test below shall live on, for a
+     * while. -gg 3/3/2002 */
     if (IS_NPC(ch) || ch->desc) {
-    money = create_money(GET_GOLD(ch));
-    obj_to_obj(money, corpse);
+      money = create_money(GET_GOLD(ch));
+      obj_to_obj(money, corpse);
     }
-  } else {
-    /* NPC money should be handled by reward logic, not corpse piles. */
-    GET_MONEY(ch) = 0;
-  }
-
     GET_MONEY(ch) = 0;
   }
   ch->carrying = NULL;
