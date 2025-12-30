@@ -1413,6 +1413,7 @@ static void build_aff_summary(const struct affected_type *af, char *out, size_t 
   const char *name = "Unknown";
   char eff[256];
   char flags[256];
+  char firstflag[64];
   char dur[64];
 
   if (!out || outsz == 0) return;
@@ -1446,6 +1447,20 @@ static void build_aff_summary(const struct affected_type *af, char *out, size_t 
 
   /* sprintbitarray wants int[], but bitvector is treated like an array */
   sprintbitarray((int *)af->bitvector, affected_bits, AF_ARRAY_MAX, flags);
+
+  /* AL: affects duration column + unknown fallback (clean) */
+  /* If spell name is Unknown, use the first flag token as the label (ex: SNEAK). */
+  if ((!name || !*name || !str_cmp(name, "Unknown")) && flags[0]) {
+    size_t i = 0;
+    while (flags[i] && flags[i] != ' ' && i < sizeof(firstflag) - 1) {
+      firstflag[i] = flags[i];
+      i++;
+    }
+    firstflag[i] = '\0';
+    if (firstflag[0])
+      name = firstflag;
+  }
+
 
   if (*eff && *flags)
     snprintf(out, outsz, "%s (%s): %s. Also: %s.", name, dur, eff, flags);
@@ -1510,10 +1525,30 @@ ACMD(do_affects)
         if (af->spell > 0 && af->spell < MAX_SPELLS && spell_info[af->spell].name)
           spell_name = spell_info[af->spell].name;
 
+        /* duration column + Unknown fallback label */
+        char adur[16];
+              char lab[64];
+        size_t i = 0;
+        lab[0] = '\0';
+        if (af->duration < 0)
+          snprintf(adur, sizeof(adur), "perm");
+        else
+          snprintf(adur, sizeof(adur), "%d", af->duration);
+
+        if ((!spell_name || !*spell_name || !str_cmp(spell_name, "Unknown")) && flags[0]) {
+          while (flags[i] && flags[i] != ' ' && i < sizeof(lab) - 1) {
+            lab[i] = flags[i];
+            i++;
+          }
+          lab[i] = '\0';
+          if (lab[0])
+            spell_name = lab;
+        }
+
         send_to_char(ch,
-          "  %s%s%s  dur %d  apply %s  mod %+d  flags %s\r\n",
+          "  %-6s %s%s%s  apply %s  mod %+d  flags %s\r\n",
+          adur,
           CCCYN(ch, C_NRM), spell_name, CCNRM(ch, C_NRM),
-          af->duration,
           aff_apply_name(af->location),
           af->modifier,
           flags);
@@ -1552,10 +1587,30 @@ ACMD(do_affects)
         if (af->spell > 0 && af->spell < MAX_SPELLS && spell_info[af->spell].name)
           spell_name = spell_info[af->spell].name;
 
+        /* duration column + Unknown fallback label */
+        char adur[16];
+              char lab[64];
+        size_t i = 0;
+        lab[0] = '\0';
+        if (af->duration < 0)
+          snprintf(adur, sizeof(adur), "perm");
+        else
+          snprintf(adur, sizeof(adur), "%d", af->duration);
+
+        if ((!spell_name || !*spell_name || !str_cmp(spell_name, "Unknown")) && flags[0]) {
+          while (flags[i] && flags[i] != ' ' && i < sizeof(lab) - 1) {
+            lab[i] = flags[i];
+            i++;
+          }
+          lab[i] = '\0';
+          if (lab[0])
+            spell_name = lab;
+        }
+
         send_to_char(ch,
-          "  %s%s%s  dur %d  apply %s  mod %+d  flags %s\r\n",
+          "  %-6s %s%s%s  apply %s  mod %+d  flags %s\r\n",
+          adur,
           CCCYN(ch, C_NRM), spell_name, CCNRM(ch, C_NRM),
-          af->duration,
           aff_apply_name(af->location),
           af->modifier,
           flags);
