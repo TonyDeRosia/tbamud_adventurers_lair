@@ -1413,6 +1413,7 @@ static void build_aff_summary(const struct affected_type *af, char *out, size_t 
   const char *name = "Unknown";
   char eff[256];
   char flags[256];
+  char dur[64];
 
   if (!out || outsz == 0) return;
   out[0] = '\0';
@@ -1428,6 +1429,13 @@ static void build_aff_summary(const struct affected_type *af, char *out, size_t 
 
   eff[0] = '\0';
   flags[0] = '\0';
+  dur[0] = '\0';
+
+  if (af->duration < 0)
+    snprintf(dur, sizeof(dur), "permanent");
+  else
+    snprintf(dur, sizeof(dur), "dur %d", af->duration);
+
 
   if (af->location != APPLY_NONE && af->modifier != 0) {
     snprintf(eff, sizeof(eff), "%s %s by %d",
@@ -1440,13 +1448,13 @@ static void build_aff_summary(const struct affected_type *af, char *out, size_t 
   sprintbitarray((int *)af->bitvector, affected_bits, AF_ARRAY_MAX, flags);
 
   if (*eff && *flags)
-    snprintf(out, outsz, "%s: %s. Also: %s.", name, eff, flags);
+    snprintf(out, outsz, "%s (%s): %s. Also: %s.", name, dur, eff, flags);
   else if (*eff)
-    snprintf(out, outsz, "%s: %s.", name, eff);
+    snprintf(out, outsz, "%s (%s): %s.", name, dur, eff);
   else if (*flags)
-    snprintf(out, outsz, "%s: %s.", name, flags);
+    snprintf(out, outsz, "%s (%s): %s.", name, dur, flags);
   else
-    snprintf(out, outsz, "%s.", name);
+    snprintf(out, outsz, "%s (%s).", name, dur);
 }
 
 ACMD(do_affects)
@@ -1486,9 +1494,17 @@ ACMD(do_affects)
 
       if (GET_LEVEL(ch) >= LVL_IMMORT) {
         char flags[256];
+  char dur[64];
         const char *spell_name = "Unknown";
 
         flags[0] = '\0';
+  dur[0] = '\0';
+
+  if (af->duration < 0)
+    snprintf(dur, sizeof(dur), "permanent");
+  else
+    snprintf(dur, sizeof(dur), "dur %d", af->duration);
+
         sprintbitarray((int *)af->bitvector, affected_bits, AF_ARRAY_MAX, flags);
 
         if (af->spell > 0 && af->spell < MAX_SPELLS && spell_info[af->spell].name)
@@ -1520,9 +1536,17 @@ ACMD(do_affects)
 
       if (GET_LEVEL(ch) >= LVL_IMMORT) {
         char flags[256];
+  char dur[64];
         const char *spell_name = "Unknown";
 
         flags[0] = '\0';
+  dur[0] = '\0';
+
+  if (af->duration < 0)
+    snprintf(dur, sizeof(dur), "permanent");
+  else
+    snprintf(dur, sizeof(dur), "dur %d", af->duration);
+
         sprintbitarray((int *)af->bitvector, affected_bits, AF_ARRAY_MAX, flags);
 
         if (af->spell > 0 && af->spell < MAX_SPELLS && spell_info[af->spell].name)
