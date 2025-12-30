@@ -31,6 +31,9 @@ void clamp_base_stats(struct char_data *ch);
 #define BASE_STAT_MIN 3
 #define BASE_STAT_CAP 20
 
+/* Cap for fully modified stats (racial, equipment, spells, etc.) */
+#define EFFECTIVE_STAT_CAP 30
+
 /* Racial bonuses helper (abil: 0 Str, 1 Dex, 2 Con, 3 Int, 4 Wis, 5 Cha) */
 int race_abil_bonus(int race, int abil);
 

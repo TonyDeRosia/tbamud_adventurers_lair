@@ -2044,7 +2044,7 @@ break;
           return;
         }
 
-        /* Finalize base stats after racial modifiers and point spend. */
+        /* Finalize base stats after point spend (racial bonuses are applied at runtime). */
         clamp_base_stats(d->character);
         save_char(d->character);
         save_player_index();
