@@ -21,7 +21,7 @@ extern const char *pc_race_types[];
 extern const char *race_menu;
 
 int parse_race(const char *arg);
-void apply_racial_bonuses(struct char_data *ch);
+void apply_racial_perks_once(struct char_data *ch);
 void clamp_base_stats(struct char_data *ch);
 
 /*
