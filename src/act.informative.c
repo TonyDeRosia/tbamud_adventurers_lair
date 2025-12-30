@@ -1060,12 +1060,12 @@ len = append_box_line(buf, len, sizeof(buf), B, R, "", W);
     int b_wis = ch->real_abils.wis;
     int b_cha = ch->real_abils.cha;
 
-    int m_str = GET_STR(ch) - b_str;
-    int m_dex = GET_DEX(ch) - b_dex;
-    int m_con = GET_CON(ch) - b_con;
-    int m_int = GET_INT(ch) - b_int;
-    int m_wis = GET_WIS(ch) - b_wis;
-    int m_cha = GET_CHA(ch) - b_cha;
+    int m_str = ch->aff_abils.str - b_str;
+    int m_dex = ch->aff_abils.dex - b_dex;
+    int m_con = ch->aff_abils.con - b_con;
+    int m_int = ch->aff_abils.intel - b_int;
+    int m_wis = ch->aff_abils.wis - b_wis;
+    int m_cha = ch->aff_abils.cha - b_cha;
 
     snprintf(line, sizeof(line),
       "%sBase Stats:%s  Str %d (%+d)  Dex %d (%+d)  Con %d (%+d)",

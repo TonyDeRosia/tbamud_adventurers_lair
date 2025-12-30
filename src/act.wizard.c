@@ -28,6 +28,7 @@
 #include "class.h"
 #include "genolc.h"
 #include "genobj.h"
+#include "race.h"
 #include "fight.h"
 #include "house.h"
 #include "modify.h"
@@ -1617,13 +1618,14 @@ ACMD(do_restore)
           SET_SKILL(vict, i, 100);
 
       if (GET_LEVEL(vict) >= LVL_GRGOD) {
-	vict->real_abils.str_add = 100;
-	vict->real_abils.intel = 25;
-	vict->real_abils.wis = 25;
-	vict->real_abils.dex = 25;
-	vict->real_abils.str = 25;
-	vict->real_abils.con = 25;
-	vict->real_abils.cha = 25;
+        vict->real_abils.str_add = 100;
+        vict->real_abils.intel = BASE_STAT_CAP;
+        vict->real_abils.wis = BASE_STAT_CAP;
+        vict->real_abils.dex = BASE_STAT_CAP;
+        vict->real_abils.str = BASE_STAT_CAP;
+        vict->real_abils.con = BASE_STAT_CAP;
+        vict->real_abils.cha = BASE_STAT_CAP;
+        clamp_base_stats(vict);
       }
     }
     update_pos(vict);
@@ -2969,10 +2971,7 @@ static int perform_set(struct char_data *ch, struct char_data *vict, int mode, c
       SET_OR_REMOVE(PRF_FLAGS(vict), PRF_BRIEF);
       break;
     case 6:  /* cha */
-      if (IS_NPC(vict) || GET_LEVEL(vict) >= LVL_GRGOD)
-        RANGE(3, 25);
-      else
-        RANGE(3, 18);
+      value = MIN(MAX(value, BASE_STAT_MIN), BASE_STAT_CAP);
       vict->real_abils.cha = value;
       affect_total(vict);
       break;
@@ -2988,10 +2987,7 @@ static int perform_set(struct char_data *ch, struct char_data *vict, int mode, c
       SET_OR_REMOVE(PRF_FLAGS(vict), (PRF_COLOR_2));
       break;
     case 9: /* con */
-      if (IS_NPC(vict) || GET_LEVEL(vict) >= LVL_GRGOD)
-        RANGE(3, 25);
-      else
-        RANGE(3, 18);
+      value = MIN(MAX(value, BASE_STAT_MIN), BASE_STAT_CAP);
       vict->real_abils.con = value;
       affect_total(vict);
       break;
@@ -3003,10 +2999,7 @@ static int perform_set(struct char_data *ch, struct char_data *vict, int mode, c
       SET_OR_REMOVE(PLR_FLAGS(vict), PLR_DELETED);
       break;
     case 12: /* dex */
-      if (IS_NPC(vict) || GET_LEVEL(vict) >= LVL_GRGOD)
-        RANGE(3, 25);
-      else
-        RANGE(3, 18);
+      value = MIN(MAX(value, BASE_STAT_MIN), BASE_STAT_CAP);
       vict->real_abils.dex = value;
       affect_total(vict);
       break;
@@ -3072,10 +3065,7 @@ static int perform_set(struct char_data *ch, struct char_data *vict, int mode, c
        }
        break;
    case 21: /* int */
-      if (IS_NPC(vict) || GET_LEVEL(vict) >= LVL_GRGOD)
-        RANGE(3, 25);
-      else
-        RANGE(3, 18);
+      value = MIN(MAX(value, BASE_STAT_MIN), BASE_STAT_CAP);
       vict->real_abils.intel = value;
       affect_total(vict);
       break;
@@ -3249,10 +3239,7 @@ static int perform_set(struct char_data *ch, struct char_data *vict, int mode, c
       SET_OR_REMOVE(PLR_FLAGS(vict), PLR_SITEOK);
       break;
     case 48: /* str */
-      if (IS_NPC(vict) || GET_LEVEL(vict) >= LVL_GRGOD)
-        RANGE(3, 25);
-      else
-        RANGE(3, 18);
+      value = MIN(MAX(value, BASE_STAT_MIN), BASE_STAT_CAP);
       vict->real_abils.str = value;
       vict->real_abils.str_add = 0;
       affect_total(vict);
@@ -3291,10 +3278,7 @@ static int perform_set(struct char_data *ch, struct char_data *vict, int mode, c
       affect_total(vict);
       break;
     case 55: /* wis */
-      if (IS_NPC(vict) || GET_LEVEL(vict) >= LVL_GRGOD)
-        RANGE(3, 25);
-      else
-        RANGE(3, 18);
+      value = MIN(MAX(value, BASE_STAT_MIN), BASE_STAT_CAP);
       vict->real_abils.wis = value;
       affect_total(vict);
       break;
