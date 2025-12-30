@@ -10,7 +10,9 @@
 
 #include "conf.h"
 #include "sysdep.h"
+#include <ctype.h>
 #include <limits.h>
+#include <stdbool.h>
 #include "structs.h"
 #include "utils.h"
 #include "db.h"
@@ -348,6 +350,8 @@ int load_char(const char *name, struct char_data *ch)
     for (i = 0; i < PR_ARRAY_MAX; i++)
       PRF_FLAGS(ch)[i] = PFDEF_PREFFLAGS;
 
+    bool money_seen = FALSE, bank_money_seen = FALSE;
+
     while (get_line(fl, line)) {
       tag_argument(line, tag);
 
@@ -384,8 +388,11 @@ int load_char(const char *name, struct char_data *ch)
 
       case 'B':
 	     if (!strcmp(tag, "Badp"))	GET_BAD_PWS(ch)		= atoi(line);
-        else if (!strcmp(tag, "Bank")) SET_BANK_GOLD(ch, atoi(line));
-        else if (!strcmp(tag, "BankMoney")) GET_BANK_MONEY(ch) = atoll(line);
+        else if (!strcmp(tag, "Bank") && !bank_money_seen) SET_BANK_GOLD(ch, atoi(line));
+        else if (!strcmp(tag, "BankMoney")) {
+          GET_BANK_MONEY(ch) = atoll(line);
+          bank_money_seen = TRUE;
+        }
 	else if (!strcmp(tag, "Brth"))	ch->player.time.birth	= atol(line);
 	break;
 
@@ -411,8 +418,11 @@ int load_char(const char *name, struct char_data *ch)
 	break;
 
       case 'G':
-        if (!strcmp(tag, "Gold")) SET_GOLD(ch, atoi(line));
-        else if (!strcmp(tag, "Money")) GET_MONEY(ch) = atoll(line);
+        if (!strcmp(tag, "Gold") && !money_seen) SET_GOLD(ch, atoi(line));
+        else if (!strcmp(tag, "Money")) {
+          GET_MONEY(ch) = atoll(line);
+          money_seen = TRUE;
+        }
         else if (!strcmp(tag, "Diamonds")) GET_DIAMONDS(ch) = atoi(line);
 	break;
 
@@ -706,9 +716,14 @@ void save_char(struct char_data * ch)
   if (GET_CON(ch)	   != PFDEF_CON)	fprintf(fl, "Con : %d\n", GET_CON(ch));
   if (GET_CHA(ch)	   != PFDEF_CHA)	fprintf(fl, "Cha : %d\n", GET_CHA(ch));
 
-  if (GET_AC(ch)	   != PFDEF_AC)		fprintf(fl, "Ac  : %d\n", GET_AC(ch));
-  if (GET_GOLD(ch)	   != PFDEF_GOLD)	fprintf(fl, "Gold: %d\n", GET_GOLD(ch));
-  if (GET_BANK_GOLD(ch)	   != PFDEF_BANK)	fprintf(fl, "Bank: %d\n", GET_BANK_GOLD(ch));
+  if (GET_AC(ch)   != PFDEF_AC)         fprintf(fl, "Ac  : %d\n", GET_AC(ch));
+
+  /* Copper-level currency is canonical; always write it once. */
+  fprintf(fl, "Money: %lld\n", GET_MONEY(ch));
+  fprintf(fl, "BankMoney: %lld\n", GET_BANK_MONEY(ch));
+
+  if (GET_GOLD(ch)         != PFDEF_GOLD)       fprintf(fl, "Gold: %d\n", GET_GOLD(ch));
+  if (GET_BANK_GOLD(ch)    != PFDEF_BANK)       fprintf(fl, "Bank: %d\n", GET_BANK_GOLD(ch));
   if (GET_EXP(ch)	   != PFDEF_EXP)	fprintf(fl, "Exp : %d\n", GET_EXP(ch));
   if (GET_HITROLL(ch)	   != PFDEF_HITROLL)	fprintf(fl, "Hrol: %d\n", GET_HITROLL(ch));
   if (GET_DAMROLL(ch)	   != PFDEF_DAMROLL)	fprintf(fl, "Drol: %d\n", GET_DAMROLL(ch));
@@ -811,13 +826,12 @@ void save_char(struct char_data * ch)
 void tag_argument(char *argument, char *tag)
 {
   char *tmp = argument, *ttag = tag, *wrt = argument;
-  int i;
 
-  for (i = 0; i < 4; i++)
+  while (*tmp && *tmp != ':')
     *(ttag++) = *(tmp++);
   *ttag = '\0';
 
-  while (*tmp == ':' || *tmp == ' ')
+  while (*tmp == ':' || isspace((unsigned char) *tmp))
     tmp++;
 
   while (*tmp)

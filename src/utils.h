@@ -547,8 +547,14 @@ do                                                              \
 #define GET_BANK_GOLD(ch)  ((int)(GET_BANK_MONEY(ch) / COPPER_PER_GOLD))
 
 /* Lvalue helpers for old code paths that used assignments */
-#define SET_GOLD(ch,g)       do { GET_MONEY(ch) = (long long)(g) * COPPER_PER_GOLD; } while (0)
-#define SET_BANK_GOLD(ch,g)  do { GET_BANK_MONEY(ch) = (long long)(g) * COPPER_PER_GOLD; } while (0)
+#define SET_GOLD(ch,g)       do { \
+  long long _rem = GET_MONEY(ch) % COPPER_PER_GOLD; \
+  GET_MONEY(ch) = (long long)(g) * COPPER_PER_GOLD + _rem; \
+} while (0)
+#define SET_BANK_GOLD(ch,g)  do { \
+  long long _rem = GET_BANK_MONEY(ch) % COPPER_PER_GOLD; \
+  GET_BANK_MONEY(ch) = (long long)(g) * COPPER_PER_GOLD + _rem; \
+} while (0)
 /** Current to-hit roll modifier for ch. */
 #define GET_HITROLL(ch)	  ((ch)->points.hitroll)
 /** Current damage roll modifier for ch. */
