@@ -48,10 +48,7 @@ static struct char_data *give_find_vict(struct char_data *ch, char *arg);
 static void perform_give(struct char_data *ch, struct char_data *vict, struct obj_data *obj);
 /* do_drop utility functions */
 static int perform_drop(struct char_data *ch, struct obj_data *obj, byte mode, const char *sname, room_rnum RDR);
-static const long long MONEY_LOG_THRESHOLD = 50LL * COPPER_PER_GOLD;
-static bool parse_money_amount(const char *argument, long long available, long long *amount_out);
-static bool split_money_target(char *argument, char *amount_part, size_t amount_sz, char *target, size_t target_sz);
-static void log_large_money(const char *action, struct char_data *ch, long long amount, struct char_data *target, room_rnum room);
+static void perform_drop_gold(struct char_data *ch, int amount, byte mode, room_rnum RDR);
 /* do_put utility functions */
 static void perform_put(struct char_data *ch, struct obj_data *obj, struct obj_data *cont);
 /* do_remove utility functions */
@@ -200,16 +197,17 @@ if (!IS_NPC(ch) && !PRF_FLAGGED(ch, PRF_NOHASSLE)) {
 
 static void get_check_money(struct char_data *ch, struct obj_data *obj)
 {
-  long long value = GET_OBJ_VAL(obj, 0);
-  char buf[MAX_STRING_LENGTH];
+  int value = GET_OBJ_VAL(obj, 0);
 
   if (GET_OBJ_TYPE(obj) != ITEM_MONEY || value <= 0)
     return;
 
   extract_obj(obj);
-  increase_money_copper(ch, value);
-  format_copper_as_currency(buf, sizeof(buf), value);
-  send_to_char(ch, "You pick up %s worth of coins.\r\n", buf);
+  increase_money_copper(ch, (long long)value);
+  if (value == 1)
+    send_to_char(ch, "There was 1 coin.\r\n");
+  else
+    send_to_char(ch, "There were %d coins.\r\n", value);
 }
 
 static void perform_get_from_container(struct char_data *ch, struct obj_data *obj,
@@ -407,120 +405,51 @@ ACMD(do_get)
   }
 }
 
-static bool parse_money_amount(const char *argument, long long available, long long *amount_out)
+static void perform_drop_gold(struct char_data *ch, int amount, byte mode, room_rnum RDR)
 {
-  char buf[MAX_INPUT_LENGTH];
-  char *token, *save_ptr;
-  long long gold = 0, silver = 0, copper = 0;
-  bool saw_token = FALSE;
+  struct obj_data *obj;
 
-  if (!argument || !*argument || !amount_out)
-    return FALSE;
+  if (amount <= 0)
+    send_to_char(ch, "Heh heh heh.. we are jolly funny today, eh?\r\n");
+  else if (GET_GOLD(ch) < amount)
+    send_to_char(ch, "You don't have that many coins!\r\n");
+  else {
+    if (mode != SCMD_JUNK) {
+      WAIT_STATE(ch, PULSE_VIOLENCE); /* to prevent coin-bombing */
+      obj = create_money(amount);
+      if (mode == SCMD_DONATE) {
+	      send_to_char(ch, "You throw some gold into the air where it disappears in a puff of smoke!\r\n");
+	      act("$n throws some gold into the air where it disappears in a puff of smoke!",
+	          FALSE, ch, 0, 0, TO_ROOM);
+	      obj_to_room(obj, RDR);
+	      act("$p suddenly appears in a puff of orange smoke!", 0, 0, obj, 0, TO_ROOM);
+      } else {
+        char buf[MAX_STRING_LENGTH];
+        long object_id = obj_script_id(obj);
 
-  strlcpy(buf, argument, sizeof(buf));
-  skip_spaces(&buf);
+        if (!drop_wtrigger(obj, ch)) {
+          if (has_obj_by_uid_in_lookup_table(object_id))
+            extract_obj(obj);
 
-  if (!*buf)
-    return FALSE;
+          return;
+        }
 
-  if (!str_cmp(buf, "all")) {
-    if (available <= 0)
-      return FALSE;
-    *amount_out = available;
-    return TRUE;
+	      snprintf(buf, sizeof(buf), "$n drops %s.", money_desc(amount));
+	      act(buf, TRUE, ch, 0, 0, TO_ROOM);
+
+	      send_to_char(ch, "You drop some gold.\r\n");
+	      obj_to_room(obj, IN_ROOM(ch));
+      }
+    } else {
+      char buf[MAX_STRING_LENGTH];
+
+      snprintf(buf, sizeof(buf), "$n drops %s which disappears in a puff of smoke!", money_desc(amount));
+      act(buf, FALSE, ch, 0, 0, TO_ROOM);
+
+      send_to_char(ch, "You drop some gold which disappears in a puff of smoke!\r\n");
+    }
+    decrease_gold(ch, amount);
   }
-
-  if (!str_cmp(buf, "half")) {
-    *amount_out = available / 2;
-    return (*amount_out > 0);
-  }
-
-  for (token = strtok_r(buf, " ", &save_ptr); token; token = strtok_r(NULL, " ", &save_ptr)) {
-    size_t len = strlen(token);
-    char last;
-
-    if (!str_cmp(token, "coin") || !str_cmp(token, "coins") || !str_cmp(token, "money"))
-      continue;
-
-    if (len == 0)
-      continue;
-
-    last = LOWER(token[len - 1]);
-
-    if (last == 'g' || last == 's' || last == 'c') {
-      char numbuf[MAX_INPUT_LENGTH];
-      long long value;
-
-      if (len <= 1)
-        return FALSE;
-
-      strlcpy(numbuf, token, sizeof(numbuf));
-      numbuf[len - 1] = '\0';
-
-      if (!is_number(numbuf))
-        return FALSE;
-
-      value = atoll(numbuf);
-      if (value <= 0)
-        return FALSE;
-
-      if (last == 'g')
-        gold += value;
-      else if (last == 's')
-        silver += value;
-      else
-        copper += value;
-
-      saw_token = TRUE;
-    } else
-      return FALSE;
-  }
-
-  if (!saw_token)
-    return FALSE;
-
-  *amount_out = gold * COPPER_PER_GOLD + silver * COPPER_PER_SILVER + copper;
-  return (*amount_out > 0);
-}
-
-static bool split_money_target(char *argument, char *amount_part, size_t amount_sz, char *target, size_t target_sz)
-{
-  char *last_space;
-
-  skip_spaces(&argument);
-  if (!argument || !*argument)
-    return FALSE;
-
-  last_space = strrchr(argument, ' ');
-  if (!last_space)
-    return FALSE;
-
-  *last_space = '\0';
-  last_space++;
-  skip_spaces(&last_space);
-  skip_spaces(&argument);
-
-  if (!*last_space || !*argument)
-    return FALSE;
-
-  strlcpy(target, last_space, target_sz);
-  strlcpy(amount_part, argument, amount_sz);
-  return TRUE;
-}
-
-static void log_large_money(const char *action, struct char_data *ch, long long amount, struct char_data *target, room_rnum room)
-{
-  char buf[MAX_INPUT_LENGTH];
-
-  if (amount < MONEY_LOG_THRESHOLD)
-    return;
-
-  format_copper_as_currency(buf, sizeof(buf), amount);
-
-  if (target)
-    log("MONEY: %s %s %s to %s in room %d", GET_NAME(ch), buf, action, GET_NAME(target), GET_ROOM_VNUM(room));
-  else
-    log("MONEY: %s %s %s in room %d", GET_NAME(ch), buf, action, GET_ROOM_VNUM(room));
 }
 
 #define VANISH(mode) ((mode == SCMD_DONATE || mode == SCMD_JUNK) ? \
@@ -583,16 +512,70 @@ static int perform_drop(struct char_data *ch, struct obj_data *obj,
   return (0);
 }
 
+static void perform_drop_currency(struct char_data *ch, int amount, int denom, int subcmd)
+{
+  long long amount_copper = 0;
+  const char *metal = "copper";
+
+  if (amount <= 0) {
+    send_to_char(ch, "Drop how much?\r\n");
+    return;
+  }
+
+  if (denom == 2) {
+    metal = "silver";
+    amount_copper = (long long)amount * (long long)COPPER_PER_SILVER;
+  } else if (denom == 3) {
+    metal = "gold";
+    amount_copper = (long long)amount * (long long)COPPER_PER_GOLD;
+  } else {
+    metal = "copper";
+    amount_copper = (long long)amount;
+  }
+
+  if (amount_copper <= 0) {
+    send_to_char(ch, "Drop how much?\r\n");
+    return;
+  }
+
+  if (GET_MONEY(ch) < amount_copper) {
+    send_to_char(ch, "You don't have that much currency.\r\n");
+    return;
+  }
+
+  /* JUNK: delete money instead of creating a pile */
+  if (subcmd == SCMD_JUNK) {
+    GET_MONEY(ch) -= amount_copper;
+    send_to_char(ch, "You junk %d %s coin%s.\r\n", amount, metal, (amount == 1 ? "" : "s"));
+    act("$n junks some coins.", FALSE, ch, 0, 0, TO_ROOM);
+    return;
+  }
+
+  /* DONATE: behave like normal drop into room (your donate rooms logic is separate) */
+  {
+    struct obj_data *obj = create_money((int)amount_copper);
+    if (!obj) {
+      send_to_char(ch, "Something went wrong.\r\n");
+      return;
+    }
+    GET_MONEY(ch) -= amount_copper;
+
+    send_to_char(ch, "You drop %d %s coin%s.\r\n", amount, metal, (amount == 1 ? "" : "s"));
+    act("$n drops some coins.", FALSE, ch, 0, 0, TO_ROOM);
+
+    obj_to_room(obj, IN_ROOM(ch));
+  }
+}
+
+
 ACMD(do_drop)
 {
   char arg[MAX_INPUT_LENGTH];
-  char original_args[MAX_INPUT_LENGTH];
   struct obj_data *obj, *next_obj;
   room_rnum RDR = 0;
   byte mode = SCMD_DROP;
   int dotmode, amount = 0, multi, num_don_rooms;
   const char *sname;
-  long long money_amount = 0;
 
   switch (subcmd) {
   case SCMD_JUNK:
@@ -628,48 +611,7 @@ ACMD(do_drop)
     break;
   }
 
-  strlcpy(original_args, argument, sizeof(original_args));
   argument = one_argument(argument, arg);
-
-  if (parse_money_amount(original_args, GET_MONEY(ch), &money_amount)) {
-    char amt_buf[MAX_STRING_LENGTH];
-    room_rnum drop_room = (mode == SCMD_DONATE) ? RDR : IN_ROOM(ch);
-
-    if (money_amount <= 0) {
-      send_to_char(ch, "Drop how much?\r\n");
-      return;
-    }
-
-    if (money_amount > GET_MONEY(ch)) {
-      format_copper_as_currency(amt_buf, sizeof(amt_buf), GET_MONEY(ch));
-      send_to_char(ch, "You only have %s.\r\n", amt_buf);
-      return;
-    }
-
-    if (mode == SCMD_JUNK) {
-      increase_money_copper(ch, -money_amount);
-      format_copper_as_currency(amt_buf, sizeof(amt_buf), money_amount);
-      send_to_char(ch, "You junk %s worth of coins.\r\n", amt_buf);
-      act("$n junks some coins.", FALSE, ch, 0, 0, TO_ROOM);
-      log_large_money("junked", ch, money_amount, NULL, IN_ROOM(ch));
-      return;
-    }
-
-    struct obj_data *money_obj = create_money(money_amount);
-    if (!money_obj) {
-      send_to_char(ch, "Something went wrong.\r\n");
-      return;
-    }
-
-    increase_money_copper(ch, -money_amount);
-    merge_money_in_room(drop_room, money_obj);
-
-    format_copper_as_currency(amt_buf, sizeof(amt_buf), money_amount);
-    send_to_char(ch, "You %s %s.\r\n", sname, amt_buf);
-    act("$n drops some coins.", FALSE, ch, 0, 0, TO_ROOM);
-    log_large_money("dropped", ch, money_amount, NULL, drop_room);
-    return;
-  }
 
   if (!*arg) {
     send_to_char(ch, "What do you want to %s?\r\n", sname);
@@ -677,7 +619,9 @@ ACMD(do_drop)
   } else if (is_number(arg)) {
     multi = atoi(arg);
     one_argument(argument, arg);
-    if (multi <= 0)
+    if (!str_cmp("coins", arg) || !str_cmp("coin", arg))
+      perform_drop_gold(ch, multi, mode, RDR);
+    else if (multi <= 0)
       send_to_char(ch, "Yeah, that makes sense.\r\n");
     else if (!*arg)
       send_to_char(ch, "What do you want to %s %d of?\r\n", sname, multi);
@@ -767,6 +711,87 @@ static void perform_give(struct char_data *ch, struct char_data *vict,
 }
 
 
+/* Currency helpers for give: copper/silver/gold auto-convert, diamonds separate */
+static int parse_money_denom(const char *w)
+{
+  if (!w || !*w) return 0;
+  if (!str_cmp(w, "copper") || !str_cmp(w, "c")) return 1;
+  if (!str_cmp(w, "silver") || !str_cmp(w, "s")) return 2;
+  if (!str_cmp(w, "gold") || !str_cmp(w, "g")) return 3;
+  if (!str_cmp(w, "diamond") || !str_cmp(w, "d")) return 4;
+  if (!str_cmp(w, "coin") || !str_cmp(w, "coins")) return 3;
+  return 0;
+}
+
+static long long money_to_copper_ll(int amount, int denom)
+{
+  long long a = (long long)amount;
+  if (denom == 1) return a;
+  if (denom == 2) return a * COPPER_PER_SILVER;
+  if (denom == 3) return a * COPPER_PER_GOLD;
+  return 0;
+}
+
+static const char *denom_name(int denom, int amount)
+{
+  if (denom == 1) return amount == 1 ? "copper coin" : "copper coins";
+  if (denom == 2) return amount == 1 ? "silver coin" : "silver coins";
+  if (denom == 3) return amount == 1 ? "gold coin" : "gold coins";
+  if (denom == 4) return amount == 1 ? "diamond" : "diamonds";
+  return amount == 1 ? "coin" : "coins";
+}
+
+static void perform_give_currency(struct char_data *ch, struct char_data *vict, int amount, int denom)
+{
+  char buf[MAX_STRING_LENGTH];
+
+  if (amount <= 0) {
+    send_to_char(ch, "Heh heh heh ... we are jolly funny today, eh?\r\n");
+    return;
+  }
+
+  if (denom == 4) {
+    if ((GET_DIAMONDS(ch) < amount) && (IS_NPC(ch) || (GET_LEVEL(ch) < LVL_GOD))) {
+      send_to_char(ch, "You don't have that many diamonds!\r\n");
+      return;
+    }
+
+    snprintf(buf, sizeof(buf), "$n gives you %d %s.", amount, denom_name(denom, amount));
+    act(buf, FALSE, ch, 0, vict, TO_VICT);
+
+    snprintf(buf, sizeof(buf), "$n gives %d %s to $N.", amount, denom_name(denom, amount));
+    act(buf, TRUE, ch, 0, vict, TO_NOTVICT);
+
+    if (IS_NPC(ch) || (GET_LEVEL(ch) < LVL_GOD))
+      decrease_diamonds(ch, amount);
+
+    increase_diamonds(vict, amount);
+    return;
+  }
+
+  long long copper = money_to_copper_ll(amount, denom);
+  if (copper <= 0) {
+    send_to_char(ch, "Give how much of what?\r\n");
+    return;
+  }
+
+  if ((GET_MONEY(ch) < copper) && (IS_NPC(ch) || (GET_LEVEL(ch) < LVL_GOD))) {
+    send_to_char(ch, "You don't have that much currency!\r\n");
+    return;
+  }
+
+  snprintf(buf, sizeof(buf), "$n gives you %d %s.", amount, denom_name(denom, amount));
+  act(buf, FALSE, ch, 0, vict, TO_VICT);
+
+  snprintf(buf, sizeof(buf), "$n gives %d %s to $N.", amount, denom_name(denom, amount));
+  act(buf, TRUE, ch, 0, vict, TO_NOTVICT);
+
+  if (IS_NPC(ch) || (GET_LEVEL(ch) < LVL_GOD))
+    increase_money_copper(ch, -copper);
+
+  increase_money_copper(vict, copper);
+}
+
 /* utility function for give */
 static struct char_data *give_find_vict(struct char_data *ch, char *arg)
 {
@@ -789,52 +814,25 @@ static struct char_data *give_find_vict(struct char_data *ch, char *arg)
 ACMD(do_give)
 {
   char arg[MAX_STRING_LENGTH];
-  char original_args[MAX_STRING_LENGTH];
   int amount, dotmode;
   struct char_data *vict;
   struct obj_data *obj, *next_obj;
-  char amount_part[MAX_INPUT_LENGTH];
-  char target_buf[MAX_INPUT_LENGTH];
-  long long money_amount = 0;
 
-  strlcpy(original_args, argument, sizeof(original_args));
   argument = one_argument(argument, arg);
-
-  if (split_money_target(original_args, amount_part, sizeof(amount_part), target_buf, sizeof(target_buf)) &&
-      parse_money_amount(amount_part, GET_MONEY(ch), &money_amount)) {
-    char buf[MAX_STRING_LENGTH];
-
-    if (!(vict = give_find_vict(ch, target_buf)))
-      return;
-
-    if (money_amount <= 0) {
-      send_to_char(ch, "Give how much?\r\n");
-      return;
-    }
-
-    if (money_amount > GET_MONEY(ch)) {
-      format_copper_as_currency(buf, sizeof(buf), GET_MONEY(ch));
-      send_to_char(ch, "You only have %s.\r\n", buf);
-      return;
-    }
-
-    format_copper_as_currency(buf, sizeof(buf), money_amount);
-    increase_money_copper(ch, -money_amount);
-    increase_money_copper(vict, money_amount);
-
-    act("You give $N some coins (worth \"$t\").", FALSE, ch, buf, vict, TO_CHAR);
-    act("$n gives you some coins (worth \"$t\").", FALSE, ch, buf, vict, TO_VICT);
-    act("$n gives $N some coins.", TRUE, ch, NULL, vict, TO_NOTVICT);
-    log_large_money("gave", ch, money_amount, vict, IN_ROOM(ch));
-    return;
-  }
 
   if (!*arg)
     send_to_char(ch, "Give what to who?\r\n");
   else if (is_number(arg)) {
+    int denom;
     amount = atoi(arg);
     argument = one_argument(argument, arg);
-    if (!*arg) /* Give multiple code. */
+    denom = parse_money_denom(arg);
+    if (denom) {
+      one_argument(argument, arg);
+      if ((vict = give_find_vict(ch, arg)) != NULL)
+        perform_give_currency(ch, vict, amount, denom);
+      return;
+    } else if (!*arg) /* Give multiple code. */
       send_to_char(ch, "What do you want to give %d of?\r\n", amount);
     else if (!(vict = give_find_vict(ch, argument)))
       return;
@@ -842,9 +840,9 @@ ACMD(do_give)
       send_to_char(ch, "You don't seem to have any %ss.\r\n", arg);
     else {
       while (obj && amount--) {
-        next_obj = get_obj_in_list_vis(ch, arg, NULL, obj->next_content);
-        perform_give(ch, vict, obj);
-        obj = next_obj;
+	next_obj = get_obj_in_list_vis(ch, arg, NULL, obj->next_content);
+	perform_give(ch, vict, obj);
+	obj = next_obj;
       }
     }
   } else {
@@ -856,23 +854,23 @@ ACMD(do_give)
     dotmode = find_all_dots(arg);
     if (dotmode == FIND_INDIV) {
       if (!(obj = get_obj_in_list_vis(ch, arg, NULL, ch->carrying)))
-        send_to_char(ch, "You don't seem to have %s %s.\r\n", AN(arg), arg);
+	send_to_char(ch, "You don't seem to have %s %s.\r\n", AN(arg), arg);
       else
-        perform_give(ch, vict, obj);
+	perform_give(ch, vict, obj);
     } else {
       if (dotmode == FIND_ALLDOT && !*arg) {
-        send_to_char(ch, "All of what?\r\n");
-        return;
+	send_to_char(ch, "All of what?\r\n");
+	return;
       }
       if (!ch->carrying)
-        send_to_char(ch, "You don't seem to be holding anything.\r\n");
+	send_to_char(ch, "You don't seem to be holding anything.\r\n");
       else
-        for (obj = ch->carrying; obj; obj = next_obj) {
-          next_obj = obj->next_content;
-          if (CAN_SEE_OBJ(ch, obj) &&
-              ((dotmode == FIND_ALL || isname(arg, obj->name))))
-            perform_give(ch, vict, obj);
-        }
+	for (obj = ch->carrying; obj; obj = next_obj) {
+	  next_obj = obj->next_content;
+	  if (CAN_SEE_OBJ(ch, obj) &&
+	      ((dotmode == FIND_ALL || isname(arg, obj->name))))
+	    perform_give(ch, vict, obj);
+	}
     }
   }
 }
@@ -1146,6 +1144,15 @@ ACMD(do_pour)
   int amount = 0;
 
   two_arguments(argument, arg1, arg2);
+
+  /* Currency drop: drop <amount> <copper|silver|gold> */
+  if (*arg1 && is_number(arg1) && *arg2) {
+    int denom = parse_money_denom(arg2);
+    if (denom) {
+      perform_drop_currency(ch, atoi(arg1), denom, subcmd);
+      return;
+    }
+  }
 
   if (subcmd == SCMD_POUR) {
     if (!*arg1) { /* No arguments */
