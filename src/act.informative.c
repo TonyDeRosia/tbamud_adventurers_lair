@@ -1644,9 +1644,10 @@ ACMD(do_bounty)
 static void show_currency_only(struct char_data *ch)
 {
   long long money = (long long)GET_MONEY(ch);
-  long long gold = money / 1000LL;
-  long long silver = (money % 1000LL) / 100LL;
-  long long copper = money % 100LL;
+  long long gold = money / COPPER_PER_GOLD;
+  long long rem = money % COPPER_PER_GOLD;
+  long long silver = rem / COPPER_PER_SILVER;
+  long long copper = rem % COPPER_PER_SILVER;
   long long diamonds = 0;
 
 #ifdef GET_DIAMONDS
