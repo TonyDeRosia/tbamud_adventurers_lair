@@ -351,7 +351,7 @@ static void make_corpse(struct char_data *ch)
     * been fixed (knock on wood) but the test below shall live on, for a
     * while. -gg 3/3/2002 */
     if (IS_NPC(ch) || ch->desc) {
-    money = create_money(GET_GOLD(ch));
+    money = create_money(GET_MONEY(ch));
     obj_to_obj(money, corpse);
     }
   } else {
