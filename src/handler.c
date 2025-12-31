@@ -1273,80 +1273,105 @@ int get_obj_pos_in_equip_vis(struct char_data *ch, char *arg, int *number, struc
   return (-1);
 }
 
-const char *money_desc(int amount)
+const char *money_desc(int amount, const char *metal)
 {
   int cnt;
+  static char buf[128];
   struct {
     int limit;
-    const char *description;
+    const char *description_fmt;
   } money_table[] = {
-    {          1, "a gold coin"				},
-    {         10, "a tiny pile of gold coins"		},
-    {         20, "a handful of gold coins"		},
-    {         75, "a little pile of gold coins"		},
-    {        200, "a small pile of gold coins"		},
-    {       1000, "a pile of gold coins"		},
-    {       5000, "a big pile of gold coins"		},
-    {      10000, "a large heap of gold coins"		},
-    {      20000, "a huge mound of gold coins"		},
-    {      75000, "an enormous mound of gold coins"	},
-    {     150000, "a small mountain of gold coins"	},
-    {     250000, "a mountain of gold coins"		},
-    {     500000, "a huge mountain of gold coins"	},
-    {    1000000, "an enormous mountain of gold coins"	},
-    {          0, NULL					},
+    {          1, "a %s coin"                         },
+    {         10, "a tiny pile of %s coins"           },
+    {         20, "a handful of %s coins"             },
+    {         75, "a little pile of %s coins"         },
+    {        200, "a small pile of %s coins"          },
+    {       1000, "a pile of %s coins"                },
+    {       5000, "a big pile of %s coins"            },
+    {      10000, "a large heap of %s coins"          },
+    {      20000, "a huge mound of %s coins"          },
+    {      75000, "an enormous mound of %s coins"     },
+    {     150000, "a small mountain of %s coins"      },
+    {     250000, "a mountain of %s coins"            },
+    {     500000, "a huge mountain of %s coins"       },
+    {    1000000, "an enormous mountain of %s coins"  },
+    {          0, NULL                                },
   };
 
-  if (amount <= 0) {
+  if (amount <= 0 || metal == NULL) {
     log("SYSERR: Try to create negative or 0 money (%d).", amount);
-    return (NULL);
+    return NULL;
   }
 
-  for (cnt = 0; money_table[cnt].limit; cnt++)
-    if (amount <= money_table[cnt].limit)
-      return (money_table[cnt].description);
+  for (cnt = 0; money_table[cnt].limit; cnt++) {
+    if (amount <= money_table[cnt].limit) {
+      snprintf(buf, sizeof(buf), money_table[cnt].description_fmt, metal);
+      return buf;
+    }
+  }
 
-  return ("an absolutely colossal mountain of gold coins");
+  snprintf(buf, sizeof(buf), "an absolutely colossal mountain of %s coins", metal);
+  return buf;
 }
 
-struct obj_data *create_money(int amount_copper)
+struct obj_data *create_money(int amount_copper, int denom_hint)
 {
   struct obj_data *obj;
   struct extra_descr_data *new_descr;
   char buf[200];
-  int y;
+  int y, denom;
+  long long unit = 1;
+  const char *metal = "copper";
 
   if (amount_copper <= 0) {
     log("SYSERR: Try to create negative or 0 money. (%d)", amount_copper);
     return (NULL);
   }
+
+  if (denom_hint >= 1 && denom_hint <= 3)
+    denom = denom_hint;
+  else if (amount_copper >= COPPER_PER_GOLD)
+    denom = 3;
+  else if (amount_copper >= COPPER_PER_SILVER)
+    denom = 2;
+  else
+    denom = 1;
+
+  if (denom == 2) {
+    unit = COPPER_PER_SILVER;
+    metal = "silver";
+  } else if (denom == 3) {
+    unit = COPPER_PER_GOLD;
+    metal = "gold";
+  }
+
+  long long denom_count = amount_copper / unit;
+  if (denom_count < 1)
+    denom_count = 1;
+
   obj = create_obj();
   CREATE(new_descr, struct extra_descr_data, 1);
 
   if (amount_copper == 1) {
-    obj->name = strdup("coin gold");
-    obj->short_description = strdup("a gold coin");
-    obj->description = strdup("One miserable gold coin is lying here.");
-    new_descr->keyword = strdup("coin gold");
-    new_descr->description = strdup("It's just one miserable little gold coin.");
+    obj->name = strdup(denom == 1 ? "coin copper" : (denom == 2 ? "coin silver" : "coin gold"));
+    obj->short_description = strdup(money_desc(amount_copper, metal));
+    snprintf(buf, sizeof(buf), "One miserable %s coin is lying here.", metal);
+    obj->description = strdup(buf);
+    new_descr->keyword = strdup(denom == 1 ? "coin copper" : (denom == 2 ? "coin silver" : "coin gold"));
+    snprintf(buf, sizeof(buf), "It's just one miserable little %s coin.", metal);
+    new_descr->description = strdup(buf);
   } else {
-    obj->name = strdup("coins gold");
-    obj->short_description = strdup(money_desc(amount_copper));
-    snprintf(buf, sizeof(buf), "%s is lying here.", money_desc(amount_copper));
+    obj->name = strdup(denom == 1 ? "coins copper" : (denom == 2 ? "coins silver" : "coins gold"));
+    obj->short_description = strdup(money_desc(amount_copper, metal));
+    snprintf(buf, sizeof(buf), "%s is lying here.", money_desc(amount_copper, metal));
     obj->description = strdup(CAP(buf));
 
-    new_descr->keyword = strdup("coins gold");
-    if (amount_copper < 10)
-      snprintf(buf, sizeof(buf), "There are %d coins.", amount_copper);
-    else if (amount_copper < 100)
-      snprintf(buf, sizeof(buf), "There are about %d coins.", 10 * (amount_copper / 10));
-    else if (amount_copper < 1000)
-      snprintf(buf, sizeof(buf), "It looks to be about %d coins.", 100 * (amount_copper / 100));
-    else if (amount_copper < 100000)
-      snprintf(buf, sizeof(buf), "You guess there are, maybe, %d coins.",
-	      1000 * ((amount_copper / 1000) + rand_number(0, (amount_copper / 1000))));
-    else
-      strcpy(buf, "There are a LOT of coins.");	/* strcpy: OK (is < 200) */
+    new_descr->keyword = strdup(denom == 1 ? "coins copper" : (denom == 2 ? "coins silver" : "coins gold"));
+    snprintf(buf, sizeof(buf), "There %s %lld %s coin%s.",
+            denom_count == 1 ? "is" : "are",
+            denom_count,
+            metal,
+            denom_count == 1 ? "" : "s");
     new_descr->description = strdup(buf);
   }
 
@@ -1358,6 +1383,7 @@ struct obj_data *create_money(int amount_copper)
     obj->obj_flags.wear_flags[y] = 0;
   SET_BIT_AR(GET_OBJ_WEAR(obj), ITEM_WEAR_TAKE);
   GET_OBJ_VAL(obj, 0) = amount_copper;
+  GET_OBJ_VAL(obj, 1) = denom;
   GET_OBJ_COST(obj) = MAX(1, amount_copper);
   obj->item_number = NOTHING;
 
