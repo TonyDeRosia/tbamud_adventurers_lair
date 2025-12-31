@@ -79,6 +79,37 @@ int MAX(int a, int b)
   return (a > b ? a : b);
 }
 
+/**
+ * Format a copper total into gold/silver/copper string form.
+ *
+ * @param out         Buffer to receive the formatted string.
+ * @param outsz       Size of the output buffer.
+ * @param total_copper Total amount in copper units; negative values are clamped to zero.
+ */
+void format_copper_as_currency(char *out, size_t outsz, long long total_copper)
+{
+  long long g = 0, s = 0, c = 0;
+
+  if (!out || outsz == 0)
+    return;
+
+  if (total_copper < 0)
+    total_copper = 0;
+
+  g = total_copper / (long long)COPPER_PER_GOLD;
+  total_copper %= (long long)COPPER_PER_GOLD;
+
+  s = total_copper / (long long)COPPER_PER_SILVER;
+  c = total_copper % (long long)COPPER_PER_SILVER;
+
+  if (g > 0)
+    snprintf(out, outsz, "%lldg %llds %lldc", g, s, c);
+  else if (s > 0)
+    snprintf(out, outsz, "%llds %lldc", s, c);
+  else
+    snprintf(out, outsz, "%lldc", c);
+}
+
 /** Used to capitalize a string. Will not change any mud specific color codes.
  * @param txt The string to capitalize. */
 char *CAP(char *txt)

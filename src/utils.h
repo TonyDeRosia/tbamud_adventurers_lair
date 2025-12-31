@@ -146,6 +146,7 @@ long long increase_money_copper(struct char_data *ch, long long amt);
 long long increase_bank_copper(struct char_data *ch, long long amt);
 int increase_diamonds(struct char_data *ch, int amt);
 int decrease_diamonds(struct char_data *ch, int amt);
+void format_copper_as_currency(char *out, size_t outsz, long long total_copper);
 /* in class.c */
 void    advance_level(struct char_data *ch);
 
