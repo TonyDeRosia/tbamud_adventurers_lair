@@ -3,6 +3,7 @@
 
 #include "structs.h"
 #include "utils.h"
+#include "comm.h"
 #include "shop_prices.h"
 
 float shop_charisma_discount(const struct char_data *ch)
@@ -29,6 +30,19 @@ long shop_calculate_buy_price(long base_cost, float buyprofit, int keeper_cha, c
 {
   float price = base_cost * buyprofit * (1 + (keeper_cha - GET_CHA(buyer)) / 70.0f);
   long final_price = (long)(price * shop_charisma_discount(buyer) + 0.5f);
+
+#ifdef SHOP_DISCOUNT_DEBUG
+  if (buyer && !IS_NPC(buyer)) {
+    char buf[MAX_INPUT_LENGTH];
+    float discount = shop_charisma_discount(buyer);
+    long profit_price = (long)(price + 0.5f);
+
+    snprintf(buf, sizeof(buf),
+             "Base cost: %ld | Profit price: %ld | CHA: %d | Discount: %.2f | Final: %ld\r\n",
+             base_cost, profit_price, GET_CHA(buyer), discount, final_price);
+    send_to_char(buyer, "%s", buf);
+  }
+#endif
 
   if (final_price < 1)
     final_price = 1;
