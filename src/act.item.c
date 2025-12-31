@@ -197,17 +197,43 @@ if (!IS_NPC(ch) && !PRF_FLAGGED(ch, PRF_NOHASSLE)) {
 
 static void get_check_money(struct char_data *ch, struct obj_data *obj)
 {
-  int value = GET_OBJ_VAL(obj, 0);
+  long long amount_copper = GET_OBJ_VAL(obj, 0);
+  int denom = GET_OBJ_VAL(obj, 1);
+  long long unit = 1;
+  const char *metal = "copper";
 
-  if (GET_OBJ_TYPE(obj) != ITEM_MONEY || value <= 0)
+  if (GET_OBJ_TYPE(obj) != ITEM_MONEY || amount_copper <= 0)
     return;
 
+  if (denom == 2) {
+    unit = COPPER_PER_SILVER;
+    metal = "silver";
+  } else if (denom == 3) {
+    unit = COPPER_PER_GOLD;
+    metal = "gold";
+  } else {
+    if (amount_copper >= COPPER_PER_GOLD) {
+      unit = COPPER_PER_GOLD;
+      metal = "gold";
+    } else if (amount_copper >= COPPER_PER_SILVER) {
+      unit = COPPER_PER_SILVER;
+      metal = "silver";
+    }
+  }
+
+  long long count = amount_copper / unit;
+  if (count < 1)
+    count = 1;
+
   extract_obj(obj);
-  increase_money_copper(ch, (long long)value);
-  if (value == 1)
-    send_to_char(ch, "The pile of coins was worth %d copper coins.\r\n", value);
+  increase_money_copper(ch, amount_copper);
+
+  if (count == 1)
+    send_to_char(ch, "There was 1 %s coin.\r\n", metal);
   else
-    send_to_char(ch, "The pile of coins was worth %d copper coins.\r\n", value);
+    send_to_char(ch, "There were %lld %s coins.\r\n", count, metal);
+
+  send_to_char(ch, "(Worth %lld copper.)\r\n", amount_copper);
 }
 
 static void perform_get_from_container(struct char_data *ch, struct obj_data *obj,
@@ -416,7 +442,7 @@ static void perform_drop_gold(struct char_data *ch, int amount, byte mode, room_
   else {
     if (mode != SCMD_JUNK) {
       WAIT_STATE(ch, PULSE_VIOLENCE); /* to prevent coin-bombing */
-      obj = create_money((int)((long long)amount * (long long)COPPER_PER_GOLD), 3);
+      obj = create_money(amount * COPPER_PER_GOLD, 3);
       if (mode == SCMD_DONATE) {
 	      send_to_char(ch, "You throw some gold into the air where it disappears in a puff of smoke!\r\n");
 	      act("$n throws some gold into the air where it disappears in a puff of smoke!",
@@ -434,7 +460,7 @@ static void perform_drop_gold(struct char_data *ch, int amount, byte mode, room_
           return;
         }
 
-	      snprintf(buf, sizeof(buf), "$n drops %s.", money_desc(amount));
+              snprintf(buf, sizeof(buf), "$n drops %s.", money_desc(amount, "gold"));
 	      act(buf, TRUE, ch, 0, 0, TO_ROOM);
 
 	      send_to_char(ch, "You drop some gold.\r\n");
@@ -443,7 +469,7 @@ static void perform_drop_gold(struct char_data *ch, int amount, byte mode, room_
     } else {
       char buf[MAX_STRING_LENGTH];
 
-      snprintf(buf, sizeof(buf), "$n drops %s which disappears in a puff of smoke!", money_desc(amount));
+      snprintf(buf, sizeof(buf), "$n drops %s which disappears in a puff of smoke!", money_desc(amount, "gold"));
       act(buf, FALSE, ch, 0, 0, TO_ROOM);
 
       send_to_char(ch, "You drop some gold which disappears in a puff of smoke!\r\n");
@@ -568,11 +594,6 @@ static void perform_drop_currency(struct char_data *ch, int amount, int denom, i
 }
 
 
-
-/* Forward declarations for currency drop helpers */
-static int parse_money_denom(const char *w);
-static int parse_compact_money_token(const char *tok, int *out_amount, int *out_denom);
-
 ACMD(do_drop)
 {
   char arg[MAX_INPUT_LENGTH];
@@ -618,34 +639,15 @@ ACMD(do_drop)
 
   argument = one_argument(argument, arg);
 
-
-  /* Currency drop support: 10g, 5s, 2c */
-  {
-    int c_amt = 0, c_denom = 0;
-    if (parse_compact_money_token(arg, &c_amt, &c_denom)) {
-      perform_drop_currency(ch, c_amt, c_denom, subcmd);
-      return;
-    }
-  }
   if (!*arg) {
     send_to_char(ch, "What do you want to %s?\r\n", sname);
     return;
   } else if (is_number(arg)) {
-    int denom = 0;
     multi = atoi(arg);
     one_argument(argument, arg);
-
-    if (!str_cmp("coins", arg) || !str_cmp("coin", arg)) {
+    if (!str_cmp("coins", arg) || !str_cmp("coin", arg))
       perform_drop_gold(ch, multi, mode, RDR);
-      return;
-    }
-
-    denom = parse_money_denom(arg);
-    if (denom == 1 || denom == 2 || denom == 3) {
-      perform_drop_currency(ch, multi, denom, subcmd);
-      return;
-    }
-else if (multi <= 0)
+    else if (multi <= 0)
       send_to_char(ch, "Yeah, that makes sense.\r\n");
     else if (!*arg)
       send_to_char(ch, "What do you want to %s %d of?\r\n", sname, multi);
@@ -747,38 +749,6 @@ static int parse_money_denom(const char *w)
   return 0;
 }
 
-
-
-/* Parse tokens like 10g, 5s, 2c */
-static int parse_compact_money_token(const char *tok, int *out_amount, int *out_denom)
-{
-  int len;
-  char last;
-
-  if (!tok || !*tok || !out_amount || !out_denom)
-    return 0;
-
-  len = (int)strlen(tok);
-  if (len < 2)
-    return 0;
-
-  last = tok[len - 1];
-  if (last != 'c' && last != 'C' &&
-      last != 's' && last != 'S' &&
-      last != 'g' && last != 'G')
-    return 0;
-
-  for (int i = 0; i < len - 1; i++)
-    if (!isdigit((unsigned char)tok[i]))
-      return 0;
-
-  *out_amount = atoi(tok);
-  if (last == 'c' || last == 'C') *out_denom = 1;
-  else if (last == 's' || last == 'S') *out_denom = 2;
-  else *out_denom = 3;
-
-  return 1;
-}
 static long long money_to_copper_ll(int amount, int denom)
 {
   long long a = (long long)amount;
