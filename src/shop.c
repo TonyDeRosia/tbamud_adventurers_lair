@@ -27,6 +27,17 @@
 #include "screen.h"
 
 
+/* default currency unit sizes */
+#ifndef COPPER_PER_GOLD
+#define COPPER_PER_GOLD 1000
+#endif
+#ifndef COPPER_PER_SILVER
+#define COPPER_PER_SILVER 100
+#endif
+
+/* SHOP_PRICE_IN_COPPER: 0=OBJ_COST is gold units (legacy), 1=OBJ_COST is copper units (new) */
+#define SHOP_PRICE_IN_COPPER 0
+
 /* shop currency helpers (display and payment in copper total) */
 static long long shop_units_to_copper(long long units)
 {
@@ -85,17 +96,6 @@ static void shop_pay_copper(struct char_data *ch, long long amt_copper)
   if (GET_MONEY(ch) < 0)
     GET_MONEY(ch) = 0;
 }
-
-
-#ifndef COPPER_PER_GOLD
-#define COPPER_PER_GOLD 1000
-#endif
-#ifndef COPPER_PER_SILVER
-#define COPPER_PER_SILVER 100
-#endif
-
-/* SHOP_PRICE_IN_COPPER: 0=OBJ_COST is gold units (legacy), 1=OBJ_COST is copper units (new) */
-#define SHOP_PRICE_IN_COPPER 1
 
 /* Global variables definitions used externally */
 /* Constant list for printing out who we sell to */
@@ -574,7 +574,7 @@ static void shopping_buy(char *arg, struct char_data *ch, struct char_data *keep
     return;
 
   if (OBJ_FLAGGED(obj, ITEM_QUEST)) {
-    if (GET_OBJ_COST(obj) > GET_QUESTPOINTS(ch) && !IS_GOD(ch)) {
+    if (GET_OBJ_COST(obj) > GET_QUESTPOINTS(ch)) {
       char actbuf[MAX_INPUT_LENGTH];
       snprintf(actbuf, sizeof(actbuf),
         "%s You haven't earned enough quest points for such an item.",
@@ -583,7 +583,7 @@ static void shopping_buy(char *arg, struct char_data *ch, struct char_data *keep
       return;
     }
   } else { /*has the player got enough money? */
-  if (buy_price(obj, shop_nr, keeper, ch) > GET_MONEY(ch) && !IS_GOD(ch)) {
+  if (shop_units_to_copper((long long)buy_price(obj, shop_nr, keeper, ch)) > GET_MONEY(ch)) {
     char actbuf[MAX_INPUT_LENGTH];
 
     snprintf(actbuf, sizeof(actbuf), shop_index[shop_nr].missing_cash2, GET_NAME(ch));
@@ -615,7 +615,7 @@ static void shopping_buy(char *arg, struct char_data *ch, struct char_data *keep
   
   if (OBJ_FLAGGED(obj, ITEM_QUEST)) {
     while (obj &&
-           (GET_QUESTPOINTS(ch) >= GET_OBJ_COST(obj) || IS_GOD(ch))
+           (GET_QUESTPOINTS(ch) >= GET_OBJ_COST(obj))
     && IS_CARRYING_N(ch) < CAN_CARRY_N(ch)
     && bought < buynum
     && IS_CARRYING_W(ch) + GET_OBJ_WEIGHT(obj) <= CAN_CARRY_W(ch)) {
@@ -630,8 +630,7 @@ static void shopping_buy(char *arg, struct char_data *ch, struct char_data *keep
       obj_to_char(obj, ch);
 
       goldamt += GET_OBJ_COST(obj);
-      if (!IS_GOD(ch))
-        GET_QUESTPOINTS(ch) -= GET_OBJ_COST(obj);
+      GET_QUESTPOINTS(ch) -= GET_OBJ_COST(obj);
 
       last_obj = obj;
       obj = get_purchase_obj(ch, arg, keeper, shop_nr, FALSE);
@@ -639,9 +638,9 @@ static void shopping_buy(char *arg, struct char_data *ch, struct char_data *keep
         break;
     }
   } else {
-  while (obj && (GET_MONEY(ch) >= shop_units_to_copper((long long)buy_price(obj, shop_nr, keeper, ch)) || IS_GOD(ch))
-	 && IS_CARRYING_N(ch) < CAN_CARRY_N(ch) && bought < buynum
-	 && IS_CARRYING_W(ch) + GET_OBJ_WEIGHT(obj) <= CAN_CARRY_W(ch)) {
+  while (obj && (GET_MONEY(ch) >= shop_units_to_copper((long long)buy_price(obj, shop_nr, keeper, ch)))
+         && IS_CARRYING_N(ch) < CAN_CARRY_N(ch) && bought < buynum
+         && IS_CARRYING_W(ch) + GET_OBJ_WEIGHT(obj) <= CAN_CARRY_W(ch)) {
     int charged;
 
     bought++;
@@ -656,8 +655,7 @@ static void shopping_buy(char *arg, struct char_data *ch, struct char_data *keep
 
     charged = buy_price(obj, shop_nr, keeper, ch);
     goldamt += charged;
-    if (!IS_GOD(ch))
-      shop_charge(ch, shop_units_to_copper((long long)charged));
+    shop_charge(ch, shop_units_to_copper((long long)charged));
 
     last_obj = obj;
     obj = get_purchase_obj(ch, arg, keeper, shop_nr, FALSE);
@@ -685,7 +683,7 @@ static void shopping_buy(char *arg, struct char_data *ch, struct char_data *keep
       snprintf(buf, sizeof(buf), "%s Something screwy only gave you %d.", GET_NAME(ch), bought);
     do_tell(keeper, buf, cmd_tell, 0);
   }
-  if (!IS_GOD(ch) && obj && !OBJ_FLAGGED(obj, ITEM_QUEST)) {
+  if (obj && !OBJ_FLAGGED(obj, ITEM_QUEST)) {
     shop_pay(keeper, shop_units_to_copper((long long)goldamt));
     if (SHOP_USES_BANK(shop_nr))
       if (GET_GOLD(keeper) > MAX_OUTSIDE_BANK) {
