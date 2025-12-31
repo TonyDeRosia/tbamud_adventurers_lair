@@ -641,8 +641,8 @@
 #define COPPER_PER_DIAMOND  (COPPER_PER_GOLD * GOLD_PER_DIAMOND)
 
 /* Stored in copper units for copper silver gold */
-#define MAX_MONEY 2140000000LL
-#define MAX_BANK  2140000000LL
+#define MAX_MONEY (999999LL * COPPER_PER_GOLD + (COPPER_PER_GOLD - 1))
+#define MAX_BANK  MAX_MONEY
 /** Define the largest set of commands for a trigger.
  * 16k should be plenty and then some. */
 #define MAX_CMD_LENGTH 16384
