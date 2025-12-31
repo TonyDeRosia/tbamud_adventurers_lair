@@ -94,6 +94,7 @@ struct player_special_data_saved_plrtoascii {
    ubyte spare4;
    ubyte page_length;
    int spells_to_learn;		/* How many can you learn yet this level*/
+   int trains;
    int olc_zone;
    int spare8;
    int spare9;
@@ -271,6 +272,8 @@ void convert(char *filename)
       fprintf(outfile, "Drnk: %d\n", (int)psds->conditions[2]);
     if (psds->spells_to_learn != PFDEF_PRACTICES)
       fprintf(outfile, "Lern: %d\n", (int)psds->spells_to_learn);
+    if (psds->trains != PFDEF_TRAINS)
+      fprintf(outfile, "Trns: %d\n", psds->trains);
 
 /* char_ability_data */
     cad = &(player.abilities);
