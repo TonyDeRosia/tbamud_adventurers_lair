@@ -154,6 +154,12 @@ static int same_obj(struct obj_data *obj1, struct obj_data *obj2);
 static int shop_producing(struct obj_data *item, int shop_nr);
 static int transaction_amt(char *arg);
 static char *times_message(struct obj_data *obj, char *name, int num);
+struct buy_price_info {
+  float base_price;
+  float discount_factor;
+  int final_price;
+};
+
 static int buy_price(struct obj_data *obj, int shop_nr, struct char_data *keeper, struct char_data *buyer);
 static int sell_price(struct obj_data *obj, int shop_nr, struct char_data *keeper, struct char_data *seller);
 static int ok_shop_room(int shop_nr, room_vnum room);
@@ -550,18 +556,57 @@ static float cha_buy_discount_factor(const struct char_data *buyer)
   }
 }
 
-static int buy_price(struct obj_data *obj, int shop_nr, struct char_data *keeper, struct char_data *buyer)
+static int buy_price_internal(struct obj_data *obj, int shop_nr, struct char_data *keeper, struct char_data *buyer, struct buy_price_info *out)
 {
   float base = (float)GET_OBJ_COST(obj) * (float)SHOP_BUYPROFIT(shop_nr);
-  float final = base * cha_buy_discount_factor(buyer);
+  float discount = cha_buy_discount_factor(buyer);
+  float final = base * discount;
+  int rounded;
 
   (void)keeper;
 
   if (final < 1.0f)
     final = 1.0f;
 
-  return (int)(final + 0.5f);
+  rounded = (int)(final + 0.5f);
+
+  if (out) {
+    out->base_price = base;
+    out->discount_factor = discount;
+    out->final_price = rounded;
+  }
+
+  return rounded;
 }
+
+static int buy_price(struct obj_data *obj, int shop_nr, struct char_data *keeper, struct char_data *buyer)
+{
+  return buy_price_internal(obj, shop_nr, keeper, buyer, NULL);
+}
+
+#ifdef SHOP_PRICE_DEBUG
+static void shop_debug_price(struct char_data *viewer, struct obj_data *obj, int shop_nr, const struct buy_price_info *info)
+{
+  char buf[MAX_STRING_LENGTH];
+
+  if (!viewer || !info || IS_NPC(viewer))
+    return;
+
+  if (GET_LEVEL(viewer) < LVL_IMMORT)
+    return;
+
+  snprintf(buf, sizeof(buf),
+           "[SHOP_PRICE_DEBUG] item '%s' cost %d | buyprofit %.2f | base %.2f | discount %.3f | final %d\r\n",
+           obj ? obj->short_description : "<unknown>",
+           obj ? GET_OBJ_COST(obj) : 0,
+           SHOP_BUYPROFIT(shop_nr),
+           info->base_price,
+           info->discount_factor,
+           info->final_price);
+
+  send_to_char(viewer, "%s", buf);
+}
+#endif
 
 /* When the shopkeeper is buying, we reverse the discount. Also make sure
    we don't buy for more than we sell for, to prevent infinite money-making. */
@@ -686,7 +731,15 @@ static void shopping_buy(char *arg, struct char_data *ch, struct char_data *keep
     }
     obj_to_char(obj, ch);
 
+#ifdef SHOP_PRICE_DEBUG
+    {
+      struct buy_price_info price_info;
+      charged = buy_price_internal(obj, shop_nr, keeper, ch, &price_info);
+      shop_debug_price(ch, obj, shop_nr, &price_info);
+    }
+#else
     charged = buy_price(obj, shop_nr, keeper, ch);
+#endif
     goldamt += charged;
     shop_charge(ch, shop_units_to_copper((long long)charged));
 
@@ -940,16 +993,23 @@ static char *list_object(struct obj_data *obj, int cnt, int aindex, int shop_nr,
 {
   char pricebuf[64];
   long long price_copper = 0;
-  price_copper = shop_units_to_copper((long long)buy_price(obj, shop_nr, keeper, ch));
+#ifdef SHOP_PRICE_DEBUG
+  struct buy_price_info info;
+  int price = buy_price_internal(obj, shop_nr, keeper, ch, &info);
+  shop_debug_price(ch, obj, shop_nr, &info);
+#else
+  int price = buy_price(obj, shop_nr, keeper, ch);
+#endif
+  price_copper = shop_units_to_copper((long long)price);
   shop_format_price(pricebuf, sizeof(pricebuf), price_copper);
   static char result[256];
-  char	itemname[128],
-	quantity[16];	/* "Unlimited" or "%d" */
+  char  itemname[128],
+        quantity[16];   /* "Unlimited" or "%d" */
 
   if (shop_producing(obj, shop_nr))
-    strcpy(quantity, "Unlimited");	/* strcpy: OK (for 'quantity >= 10') */
+    strcpy(quantity, "Unlimited");      /* strcpy: OK (for 'quantity >= 10') */
   else
-    sprintf(quantity, "%d", cnt);	/* sprintf: OK (for 'quantity >= 11', 32-bit int) */
+    sprintf(quantity, "%d", cnt);       /* sprintf: OK (for 'quantity >= 11', 32-bit int) */
 
   switch (GET_OBJ_TYPE(obj)) {
   case ITEM_DRINKCON:
@@ -962,7 +1022,7 @@ static char *list_object(struct obj_data *obj, int cnt, int aindex, int shop_nr,
   case ITEM_WAND:
   case ITEM_STAFF:
     snprintf(itemname, sizeof(itemname), "%s%s", obj->short_description,
-	GET_OBJ_VAL(obj, 2) < GET_OBJ_VAL(obj, 1) ? " (partially used)" : "");
+        GET_OBJ_VAL(obj, 2) < GET_OBJ_VAL(obj, 1) ? " (partially used)" : "");
     break;
 
   default:
@@ -974,7 +1034,7 @@ static char *list_object(struct obj_data *obj, int cnt, int aindex, int shop_nr,
   snprintf(result, sizeof(result), " %2d)  %9s   %-*s %12s%s\r\n",
         aindex, quantity, count_color_chars(itemname)+48, itemname,
         pricebuf, OBJ_FLAGGED(obj, ITEM_QUEST) ? " qp" : "");
-return (result);
+  return (result);
 }
 
 static void shopping_list(char *arg, struct char_data *ch, struct char_data *keeper, int shop_nr)
