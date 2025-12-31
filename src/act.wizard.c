@@ -3433,90 +3433,85 @@ ACMD(do_set)
 
   /* Direct currency set: canonical total is GET_MONEY (copper units). */
   if (!strcmp(field, "copper") || !strcmp(field, "silver") || !strcmp(field, "gold") || !strcmp(field, "money")) {
-    long long req = 0;
-    long long before = (long long)GET_MONEY(vict);
-    long long after = 0;
-    long long g = 0, s = 0, c = 0;
-    long long mult = 1;
-    long long delta = 0;
-    int delta_mode = 0; /* + / - means adjust; otherwise set exact denomination */
-    char *endp = NULL;
-    char *valp = buf;
+      /* Direct currency set: canonical total is GET_MONEY (copper units). */
+      long long amount = 0;
+      char *endp = NULL;
+      char *valp = buf;
 
-    skip_spaces(&valp);
-    if (!*valp) {
-      send_to_char(ch, "Usage: set <victim> <copper|silver|gold|money> <number | +number | -number>\r\n");
-      retval = 0;
-      goto do_set_save_and_cleanup;
-    }
-
-    /* Detect delta mode */
-    if (*valp == '+' || *valp == '-')
-      delta_mode = 1;
-
-    req = strtoll(valp, &endp, 10);
-    if (endp == valp) {
-      send_to_char(ch, "Amount must be a number.\r\n");
-      retval = 0;
-      goto do_set_save_and_cleanup;
-    }
-
-    if (!strcmp(field, "copper") || !strcmp(field, "money"))
-      mult = 1;
-    else if (!strcmp(field, "silver"))
-      mult = 100;
-    else if (!strcmp(field, "gold"))
-      mult = 1000;
-
-    if (delta_mode) {
-      /* Adjust total money by req * mult */
-      delta = req * mult;
-      after = before + delta;
-    } else {
-      /* Set EXACT denomination, keep other parts the same */
-      long long cur = before;
-      long long cur_g = cur / 1000LL;
-      long long cur_s = (cur % 1000LL) / 100LL;
-      long long cur_c = cur % 100LL;
-
-      if (!strcmp(field, "gold")) {
-        after = (req * 1000LL) + (cur_s * 100LL) + cur_c;
-      } else if (!strcmp(field, "silver")) {
-        after = (cur_g * 1000LL) + (req * 100LL) + cur_c;
-      } else { /* copper or money */
-        after = (cur_g * 1000LL) + (cur_s * 100LL) + req;
+      skip_spaces(&valp);
+      if (!*valp) {
+        send_to_char(ch, "Usage: set <victim> <copper|silver|gold|money> <number>\r\n");
+        retval = 0;
+        goto do_set_save_and_cleanup;
       }
+
+      amount = strtoll(valp, &endp, 10);
+      if (endp == valp) {
+        send_to_char(ch, "Value must be a number.\r\n");
+        retval = 0;
+        goto do_set_save_and_cleanup;
+      }
+
+      if (amount < 0) amount = 0;
+
+      /* Break current total into denoms using current conversion macros. */
+      {
+        long long total = (long long)GET_MONEY(vict);
+        if (total < 0) total = 0;
+
+        long long gold = total / COPPER_PER_GOLD;
+        long long silver = (total % COPPER_PER_GOLD) / COPPER_PER_SILVER;
+        long long copper = total % COPPER_PER_SILVER;
+
+        long long new_total = total;
+
+        if (!strcmp(field, "money")) {
+          /* money is total copper units */
+          new_total = amount;
+        } else if (!strcmp(field, "copper")) {
+          /* copper is the remainder below 1 silver */
+          if (amount >= COPPER_PER_SILVER) amount = COPPER_PER_SILVER - 1;
+          new_total =
+              gold * COPPER_PER_GOLD +
+              silver * COPPER_PER_SILVER +
+              amount;
+        } else if (!strcmp(field, "silver")) {
+          /* silver is the remainder below 1 gold */
+          if (amount >= SILVER_PER_GOLD) amount = SILVER_PER_GOLD - 1;
+          new_total =
+              gold * COPPER_PER_GOLD +
+              amount * COPPER_PER_SILVER +
+              copper;
+        } else { /* gold */
+          new_total =
+              amount * COPPER_PER_GOLD +
+              silver * COPPER_PER_SILVER +
+              copper;
+        }
+
+        /* Clamp to int range because GET_MONEY is stored as int. */
+        if (new_total < 0) new_total = 0;
+        if (new_total > 2147483647LL) new_total = 2147483647LL;
+
+        GET_MONEY(vict) = (int)new_total;
+
+        /* Debug style output that matches what you’ve been seeing. */
+        {
+          long long after = (long long)GET_MONEY(vict);
+          long long ng = after / COPPER_PER_GOLD;
+          long long ns = (after % COPPER_PER_GOLD) / COPPER_PER_SILVER;
+          long long nc = after % COPPER_PER_SILVER;
+
+          send_to_char(ch, "%s set %s's %s to %lld.\r\n",
+            GET_NAME(ch), GET_NAME(vict), field, amount);
+          send_to_char(ch, "Money: %lld (copper units). Normalized: %lld gold %lld silver %lld copper.\r\n",
+            after, ng, ns, nc);
+        }
+      }
+
+      retval = 1;
+      goto do_set_save_and_cleanup;
     }
-
-    /* Clamp so money never goes below 0, and stays within int range */
-    if (after < 0)
-      after = 0;
-    if (after > 2147483647LL)
-      after = 2147483647LL;
-
-    GET_MONEY(vict) = (int)after;
-
-    g = after / 1000LL;
-    s = (after % 1000LL) / 100LL;
-    c = after % 100LL;
-
-    if (delta_mode) {
-      send_to_char(ch,
-        "%s adjusted %s's %s by %lld.\r\n"
-        "Money: %lld -> %lld (copper units). Normalized: %lld gold %lld silver %lld copper.\r\n",
-        GET_NAME(ch), GET_NAME(vict), field, req,
-        before, after, g, s, c);
-    } else {
-      send_to_char(ch,
-        "%s set %s's %s to %lld.\r\n"
-        "Money: %lld -> %lld (copper units). Normalized: %lld gold %lld silver %lld copper.\r\n",
-        GET_NAME(ch), GET_NAME(vict), field, req,
-        before, after, g, s, c);
-    }
-
-    retval = 1;
-    goto do_set_save_and_cleanup;
-  }
 
   /* Diamonds are a separate currency field (additive, clamped). */
   if (!strcmp(field, "diamond") || !strcmp(field, "diamonds")) {
