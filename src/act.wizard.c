@@ -3030,9 +3030,9 @@ static int perform_set(struct char_data *ch, struct char_data *vict, int mode, c
     case 16: /* gold */
         {
           long long cur = (long long)GET_MONEY(vict);
-          long long rem = cur % 1000LL;
+          long long rem = cur % COPPER_PER_GOLD;
           long long ng = (long long)RANGE(0, 100000000);
-          long long after = (ng * 1000LL) + rem;
+          long long after = (ng * COPPER_PER_GOLD) + rem;
           if (after < 0) after = 0;
           if (after > 2147483647LL) after = 2147483647LL;
           GET_MONEY(vict) = (int)after;
