@@ -3031,11 +3031,11 @@ static int perform_set(struct char_data *ch, struct char_data *vict, int mode, c
         {
           long long cur = (long long)GET_MONEY(vict);
           long long rem = cur % COPPER_PER_GOLD;
-          long long ng = (long long)RANGE(0, 100000000);
+          long long ng = (long long)RANGE(0, 999999);
           long long after = (ng * COPPER_PER_GOLD) + rem;
           if (after < 0) after = 0;
-          if (after > 2147483647LL) after = 2147483647LL;
-          GET_MONEY(vict) = (int)after;
+          if (after > MAX_MONEY) after = MAX_MONEY;
+          GET_MONEY(vict) = after;
         }
         break;
     case 17: /* height */
@@ -3489,11 +3489,11 @@ ACMD(do_set)
               copper;
         }
 
-        /* Clamp to int range because GET_MONEY is stored as int. */
+        /* Clamp to the configured maximum. */
         if (new_total < 0) new_total = 0;
-        if (new_total > 2147483647LL) new_total = 2147483647LL;
+        if (new_total > MAX_MONEY) new_total = MAX_MONEY;
 
-        GET_MONEY(vict) = (int)new_total;
+        GET_MONEY(vict) = new_total;
 
         /* Debug style output that matches what you’ve been seeing. */
         {
