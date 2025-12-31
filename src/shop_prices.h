@@ -3,7 +3,7 @@
 
 #include "structs.h"
 
-float shop_charisma_discount(const struct char_data *ch);
+float shop_charisma_discount(const struct char_data *buyer, int keeper_cha);
 long shop_calculate_buy_price(long base_cost, float buyprofit, int keeper_cha, const struct char_data *buyer);
 
 #endif /* SHOP_PRICES_H */

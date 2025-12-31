@@ -46,24 +46,27 @@ int main(void)
   init_character(&buyer, 13, 1, FALSE);
   init_character(&keeper, 11, 1, TRUE);
 
-  failures += expect_float_close("baseline discount", 1.0f, shop_charisma_discount(&buyer), 0.0001f);
+  init_character(&keeper, 13, 1, TRUE);
+
+  failures += expect_float_close("baseline discount", 1.0f, shop_charisma_discount(&buyer, GET_CHA(&keeper)), 0.0001f);
 
   init_character(&buyer, 18, 1, FALSE);
-  failures += expect_float_close("player discount applied", 0.9375f, shop_charisma_discount(&buyer), 0.0001f);
+  init_character(&keeper, 11, 1, TRUE);
+  failures += expect_float_close("player discount applied", 0.9000f, shop_charisma_discount(&buyer, GET_CHA(&keeper)), 0.0001f);
 
   init_character(&buyer, 30, LVL_IMMORT, FALSE);
-  failures += expect_float_close("immortal has no discount", 1.0f, shop_charisma_discount(&buyer), 0.0001f);
+  failures += expect_float_close("immortal has no discount", 1.0f, shop_charisma_discount(&buyer, GET_CHA(&keeper)), 0.0001f);
 
   init_character(&buyer, 18, 1, FALSE);
   long price = shop_calculate_buy_price(1000, 1.0f, GET_CHA(&keeper), &buyer);
-  failures += expect_long_eq("charisma-adjusted price", 938, price);
+  failures += expect_long_eq("charisma-adjusted price", 900, price);
 
   long undiscounted = shop_calculate_buy_price(1000, 1.0f, GET_CHA(&keeper), NULL);
   failures += expect_long_eq("no buyer leaves price unchanged", 1000, undiscounted);
 
   init_character(&buyer, 25, 1, FALSE);
   long high_cha_price = shop_calculate_buy_price(1000, 1.0f, GET_CHA(&keeper), &buyer);
-  failures += expect_long_eq("higher charisma decreases price", 850, high_cha_price);
+  failures += expect_long_eq("higher charisma decreases price", 800, high_cha_price);
 
   return failures;
 }
