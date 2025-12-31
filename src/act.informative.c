@@ -1307,7 +1307,7 @@ len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
   long long copper = rem;
 
   snprintf(line, sizeof(line),
-    "%sCopper:%s %3lld   %sSilver:%s %2lld   %sGold:%s %8lld   %sDiamond:%s %d",
+    "%sCopper:%s %3lld   %sSilver:%s %2lld   %sGold:%s %6lld   %sDiamond:%s %d",
     C, R, copper,
     C, R, silver,
     C, R, gold,
