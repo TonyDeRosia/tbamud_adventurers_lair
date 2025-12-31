@@ -58,5 +58,12 @@ int main(void)
   long price = shop_calculate_buy_price(1000, 1.0f, GET_CHA(&keeper), &buyer);
   failures += expect_long_eq("charisma-adjusted price", 938, price);
 
+  long undiscounted = shop_calculate_buy_price(1000, 1.0f, GET_CHA(&keeper), NULL);
+  failures += expect_long_eq("no buyer leaves price unchanged", 1000, undiscounted);
+
+  init_character(&buyer, 25, 1, FALSE);
+  long high_cha_price = shop_calculate_buy_price(1000, 1.0f, GET_CHA(&keeper), &buyer);
+  failures += expect_long_eq("higher charisma decreases price", 850, high_cha_price);
+
   return failures;
 }
