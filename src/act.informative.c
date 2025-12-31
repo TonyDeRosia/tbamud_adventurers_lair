@@ -914,7 +914,10 @@ static bool load_player_target(struct char_data *ch, const char *name, struct ch
   new_mobile_data(vict);
   CREATE(vict->player_specials, struct player_special_data, 1);
 
-  if (load_char(name, vict) > -1) {
+  const int pfilepos = load_char(name, vict);
+
+  if (pfilepos > -1) {
+    GET_PFILEPOS(vict) = pfilepos;
     if (from_file)
       *from_file = TRUE;
     *out = vict;
