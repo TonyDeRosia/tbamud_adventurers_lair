@@ -483,7 +483,7 @@ ACMD(do_train)
   one_argument(argument, arg);
 
   if (!can_use_practice_trainer(ch)) {
-    send_to_char(ch, "You can only practice skills in your guild.\r\n");
+    send_to_char(ch, "You can only train at your guild.\r\n");
     return;
   }
 
