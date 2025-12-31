@@ -91,6 +91,26 @@ static void shop_pay(struct char_data *ch, long long amount_copper)
   increase_money_copper(ch, amount_copper);
 }
 
+static float cha_discount_factor(const struct char_data *ch)
+{
+  int cha = GET_CHA(ch);
+
+  if (!ch || IS_NPC(ch) || GET_LEVEL(ch) >= LVL_IMMORT)
+    return 1.0f;
+
+  if (cha <= 13)
+    return 1.0f;
+
+  if (cha > 25)
+    cha = 25;
+
+  /* CHA 13 -> 1.00, CHA 25 -> 0.85 (max 15% discount) */
+  {
+    float t = (float)(cha - 13) / (float)(25 - 13);
+    return 1.0f - (0.15f * t);
+  }
+}
+
 
 static void shop_pay_copper(struct char_data *ch, long long amt_copper)
 {
@@ -529,8 +549,14 @@ static struct obj_data *get_purchase_obj(struct char_data *ch, char *arg, struct
    having a 3. */
 static int buy_price(struct obj_data *obj, int shop_nr, struct char_data *keeper, struct char_data *buyer)
 {
-  return (int) (GET_OBJ_COST(obj) * SHOP_BUYPROFIT(shop_nr)
-	* (1 + (GET_CHA(keeper) - GET_CHA(buyer)) / (float)70));
+  float price = GET_OBJ_COST(obj) * SHOP_BUYPROFIT(shop_nr)
+        * (1 + (GET_CHA(keeper) - GET_CHA(buyer)) / (float)70);
+  long final_price = (long)(price * cha_discount_factor(buyer) + 0.5f);
+
+  if (final_price < 1)
+    final_price = 1;
+
+  return (int)final_price;
 }
 
 /* When the shopkeeper is buying, we reverse the discount. Also make sure
