@@ -489,14 +489,19 @@ void point_update(void)
 long long increase_money_copper(struct char_data *ch, long long amt)
 {
   long long curr = GET_MONEY(ch);
+  long long updated = curr + amt;
 
   if (amt < 0) {
-    GET_MONEY(ch) = MAX(0LL, curr + amt);
-    if (GET_MONEY(ch) > curr) GET_MONEY(ch) = 0LL;
+    if (amt < LLONG_MIN - curr)
+      updated = 0LL;
+    else if (updated < 0)
+      updated = 0LL;
   } else {
-    GET_MONEY(ch) = MIN(MAX_MONEY, curr + amt);
-    if (GET_MONEY(ch) < curr) GET_MONEY(ch) = MAX_MONEY;
+    if (amt > LLONG_MAX - curr || updated > MAX_MONEY)
+      updated = MAX_MONEY;
   }
+
+  GET_MONEY(ch) = updated;
 
   if (GET_MONEY(ch) == MAX_MONEY)
     send_to_char(ch, "%sYou have reached the maximum currency!\r\n%sSpend or bank it before gaining more.\r\n", QBRED, QNRM);
@@ -507,17 +512,23 @@ long long increase_money_copper(struct char_data *ch, long long amt)
 long long increase_bank_copper(struct char_data *ch, long long amt)
 {
   long long curr;
+  long long updated;
   if (IS_NPC(ch)) return 0;
 
   curr = GET_BANK_MONEY(ch);
+  updated = curr + amt;
 
   if (amt < 0) {
-    GET_BANK_MONEY(ch) = MAX(0LL, curr + amt);
-    if (GET_BANK_MONEY(ch) > curr) GET_BANK_MONEY(ch) = 0LL;
+    if (amt < LLONG_MIN - curr)
+      updated = 0LL;
+    else if (updated < 0)
+      updated = 0LL;
   } else {
-    GET_BANK_MONEY(ch) = MIN(MAX_BANK, curr + amt);
-    if (GET_BANK_MONEY(ch) < curr) GET_BANK_MONEY(ch) = MAX_BANK;
+    if (amt > LLONG_MAX - curr || updated > MAX_BANK)
+      updated = MAX_BANK;
   }
+
+  GET_BANK_MONEY(ch) = updated;
 
   if (GET_BANK_MONEY(ch) == MAX_BANK)
     send_to_char(ch, "%sYou have reached the maximum bank balance!\r\n%sWithdraw before depositing more.\r\n", QBRED, QNRM);
