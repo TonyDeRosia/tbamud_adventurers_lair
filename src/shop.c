@@ -544,24 +544,17 @@ static float cha_buy_discount_factor(const struct char_data *keeper, const struc
 static int buy_price_internal(struct obj_data *obj, int shop_nr, struct char_data *keeper, struct char_data *buyer, struct buy_price_info *out)
 {
   float base = (float)GET_OBJ_COST(obj) * (float)SHOP_BUYPROFIT(shop_nr);
-  float discount = cha_buy_discount_factor(keeper, buyer);
-  float final = base * discount;
-  int rounded;
-
-  (void)keeper;
-
-  if (final < 1.0f)
-    final = 1.0f;
-
-  rounded = (int)(final + 0.5f);
+  int keeper_cha = keeper ? GET_CHA(keeper) : 13;
+  float discount = shop_charisma_discount(buyer, keeper_cha);
+  long final_price = shop_calculate_buy_price(GET_OBJ_COST(obj), SHOP_BUYPROFIT(shop_nr), keeper_cha, buyer);
 
   if (out) {
     out->base_price = base;
     out->discount_factor = discount;
-    out->final_price = rounded;
+    out->final_price = (int)final_price;
   }
 
-  return rounded;
+  return (int)final_price;
 }
 
 static int buy_price(struct obj_data *obj, int shop_nr, struct char_data *keeper, struct char_data *buyer)
