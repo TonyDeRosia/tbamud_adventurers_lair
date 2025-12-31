@@ -534,13 +534,6 @@ static struct obj_data *get_purchase_obj(struct char_data *ch, char *arg, struct
    discount beyond the basic price.  That assumes they put a lot of points
    into charisma, because on the flip side they'd get 11% inflation by
    having a 3. */
-static float cha_buy_discount_factor(const struct char_data *keeper, const struct char_data *buyer)
-{
-  int keeper_cha = keeper ? GET_CHA(keeper) : 13;
-
-  return shop_charisma_discount(buyer, keeper_cha);
-}
-
 static int buy_price_internal(struct obj_data *obj, int shop_nr, struct char_data *keeper, struct char_data *buyer, struct buy_price_info *out)
 {
   float base = (float)GET_OBJ_COST(obj) * (float)SHOP_BUYPROFIT(shop_nr);
