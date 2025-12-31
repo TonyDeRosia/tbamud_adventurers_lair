@@ -3464,9 +3464,9 @@ ACMD(do_set)
     if (!strcmp(field, "copper") || !strcmp(field, "money"))
       mult = 1;
     else if (!strcmp(field, "silver"))
-      mult = 100;
+      mult = COPPER_PER_SILVER;
     else if (!strcmp(field, "gold"))
-      mult = 1000;
+      mult = COPPER_PER_GOLD;
 
     if (delta_mode) {
       /* Adjust total money by req * mult */
@@ -3475,16 +3475,16 @@ ACMD(do_set)
     } else {
       /* Set EXACT denomination, keep other parts the same */
       long long cur = before;
-      long long cur_g = cur / 1000LL;
-      long long cur_s = (cur % 1000LL) / 100LL;
-      long long cur_c = cur % 100LL;
+      long long cur_g = cur / COPPER_PER_GOLD;
+      long long cur_s = (cur % COPPER_PER_GOLD) / COPPER_PER_SILVER;
+      long long cur_c = cur % COPPER_PER_SILVER;
 
       if (!strcmp(field, "gold")) {
-        after = (req * 1000LL) + (cur_s * 100LL) + cur_c;
+        after = (req * COPPER_PER_GOLD) + (cur_s * COPPER_PER_SILVER) + cur_c;
       } else if (!strcmp(field, "silver")) {
-        after = (cur_g * 1000LL) + (req * 100LL) + cur_c;
+        after = (cur_g * COPPER_PER_GOLD) + (req * COPPER_PER_SILVER) + cur_c;
       } else { /* copper or money */
-        after = (cur_g * 1000LL) + (cur_s * 100LL) + req;
+        after = (cur_g * COPPER_PER_GOLD) + (cur_s * COPPER_PER_SILVER) + req;
       }
     }
 
@@ -3496,9 +3496,9 @@ ACMD(do_set)
 
     GET_MONEY(vict) = (int)after;
 
-    g = after / 1000LL;
-    s = (after % 1000LL) / 100LL;
-    c = after % 100LL;
+    g = after / COPPER_PER_GOLD;
+    s = (after % COPPER_PER_GOLD) / COPPER_PER_SILVER;
+    c = after % COPPER_PER_SILVER;
 
     if (delta_mode) {
       send_to_char(ch,
