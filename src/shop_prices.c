@@ -28,8 +28,10 @@ float shop_charisma_discount(const struct char_data *ch)
 
 long shop_calculate_buy_price(long base_cost, float buyprofit, int keeper_cha, const struct char_data *buyer)
 {
-  float price = base_cost * buyprofit * (1 + (keeper_cha - GET_CHA(buyer)) / 70.0f);
+  float price = base_cost * buyprofit;
   long final_price = (long)(price * shop_charisma_discount(buyer) + 0.5f);
+
+  (void)keeper_cha;
 
 #ifdef SHOP_DISCOUNT_DEBUG
   if (buyer && !IS_NPC(buyer)) {
