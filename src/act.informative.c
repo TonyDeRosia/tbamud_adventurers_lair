@@ -1307,7 +1307,7 @@ len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
   long long copper = rem;
 
   snprintf(line, sizeof(line),
-    "%sCopper:%s %lld   %sSilver:%s %lld   %sGold:%s %lld   %sDiamond:%s %d",
+    "%sCopper:%s %3lld   %sSilver:%s %2lld   %sGold:%s %8lld   %sDiamond:%s %d",
     C, R, copper,
     C, R, silver,
     C, R, gold,
@@ -1644,9 +1644,9 @@ ACMD(do_bounty)
 static void show_currency_only(struct char_data *ch)
 {
   long long money = (long long)GET_MONEY(ch);
-  long long gold = money / 1000LL;
-  long long silver = (money % 1000LL) / 100LL;
-  long long copper = money % 100LL;
+  long long gold = money / COPPER_PER_GOLD;
+  long long silver = (money % COPPER_PER_GOLD) / COPPER_PER_SILVER;
+  long long copper = money % COPPER_PER_SILVER;
   long long diamonds = 0;
 
 #ifdef GET_DIAMONDS
