@@ -8,10 +8,10 @@
 
 float shop_charisma_discount(const struct char_data *ch)
 {
-  int cha = GET_CHA(ch);
-
   if (!ch || IS_NPC(ch) || GET_LEVEL(ch) >= LVL_IMMORT)
     return 1.0f;
+
+  int cha = GET_CHA(ch);
 
   if (cha <= 13)
     return 1.0f;
