@@ -5,7 +5,7 @@ A secret key lies here.~
 ~
 18 ab 0 0 0 ao 0 0 0 0 0 0 0
 2 0 0 0
-1 100 0 0
+1 100000 0 0
 E
 key secret~
    It is a itty bitty secret key.
@@ -17,7 +17,7 @@ A key to a trapdoor has been left here.~
 ~
 18 a 0 0 0 ao 0 0 0 0 0 0 0
 2 0 0 0
-1 100 0 0
+1 100000 0 0
 E
 key trap trapdoor~
    It is a tiny key meant to open a trapdoor.
@@ -29,7 +29,7 @@ An intricate ebony key is here.~
 ~
 18 ab 0 0 0 ao 0 0 0 0 0 0 0
 2 0 0 0
-1 100 0 0
+1 100000 0 0
 E
 key ebony~
    Look's like it would open an ebony door.
@@ -41,7 +41,7 @@ An ivory key has been left here.~
 ~
 18 ab 0 0 0 ao 0 0 0 0 0 0 0
 2 0 0 0
-1 100 0 0
+1 100000 0 0
 E
 key ivory~
    Look like it would open an ivory door.
@@ -53,7 +53,7 @@ The chronicles of Graye rest on the desk here.~
 ~
 12 a 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-1 100 0 0
+1 100000 0 0
 E
 book chronicles~
    You open the book and begin to read:
@@ -88,7 +88,7 @@ A green stick lies here.~
 ~
 3 ab 0 0 0 ao 0 0 0 0 0 0 0
 15 1 1 3
-3 123 0 0
+3 123000 0 0
 E
 sapling wand~
    It is a fresh green stick.
@@ -102,7 +102,7 @@ A woodsman's cloak is crumpled up here.~
 ~
 15 0 0 0 0 ak 0 0 0 0 0 0 0
 60 5 -1 0
-2 1000 0 0
+2 1000000 0 0
 E
 cloak woodsman~
    It has a lot of pockets.
@@ -118,7 +118,7 @@ A woodsman's belt lies coiled here.~
 ~
 9 0 0 0 0 al 0 0 0 0 0 0 0
 7 0 0 0
-2 1000 0 0
+2 1000000 0 0
 E
 belt woodsman~
    What a nice leather belt!
@@ -132,7 +132,7 @@ A pair of walking boots have been left here.~
 ~
 22 0 0 0 0 ag 0 0 0 0 0 0 0
 0 0 0 0
-3 100 0 0
+3 100000 0 0
 E
 boots walking~
    I bet you could go anywhere wearing these.
@@ -144,7 +144,7 @@ A plumed helmet lies on the ground here.~
 ~
 9 abk 0 0 0 ae 0 0 0 0 0 0 0
 10 0 0 0
-5 1000 0 0
+5 1000000 0 0
 E
 helmet plumed~
    It's a nice thing to wear on your head.
@@ -158,7 +158,7 @@ A crimson cape lies on the ground here.~
 ~
 9 abk 0 0 0 ac 0 0 0 0 0 0 0
 6 0 0 0
-2 1000 0 0
+2 1000000 0 0
 E
 cape crimson emblazoned~
    It's a nice thing to wear around your neck.
@@ -172,7 +172,7 @@ A crimson emblazoned longsword is stuck in the ground here.~
 ~
 5 abk 0 0 0 an 0 0 0 0 0 0 0
 0 4 4 2
-15 1000 0 0
+15 1000000 0 0
 E
 sword long longsword crimson emblazoned~
    It is a finely balanced weapon..  Standard eq for Graye guards.
@@ -184,7 +184,7 @@ A severed claw lies on the ground here, making a puddle.~
 ~
 4 abj 0 0 0 aho 0 0 0 0 0 0 0
 15 5 5 33
-5 1000 0 0
+5 1000000 0 0
 E
 claw bloodied~
    It seems to have been severed off a demons corpse.
@@ -198,7 +198,7 @@ Armbands of pure mist lie hoover here.~
 ~
 9 abj 0 0 0 ai 0 0 0 0 0 0 0
 10 0 0 0
-5 1000 0 10
+5 1000000 0 10
 E
 mist arm armbands~
    They are fascinating..  All mist...  Cool.
@@ -214,7 +214,7 @@ A whip, encrusted with dried blood, is coiled up here.~
 ~
 5 abj 0 0 0 an 0 0 0 0 0 0 0
 0 4 5 2
-15 1000 0 0
+15 1000000 0 0
 E
 whip bloodied~
    It looks well used.
@@ -226,7 +226,7 @@ A black candle rests here, making sooty smoke.~
 ~
 1 abj 0 0 0 ao 0 0 0 0 0 0 0
 0 0 -1 0
-3 500 0 0
+3 500000 0 0
 E
 candle black~
    It just RADIATES evil.
@@ -242,7 +242,7 @@ The dark shield of Scrytin rests here.~
 ~
 4 abj 0 0 0 ajo 0 0 0 0 0 0 0
 15 3 3 27
-10 500 0 0
+10 500000 0 0
 E
 shield scrytin~
    It is a powerful shield.
@@ -258,7 +258,7 @@ The legendary visor of Graye rests here.~
 ~
 9 abk 0 0 0 ae 0 0 0 0 0 0 0
 6 0 0 0
-8 800 0 20
+8 800000 0 20
 E
 visor graye~
    It is finely crafted and old.
@@ -272,7 +272,7 @@ The legendary breastplate of Graye rests here.~
 ~
 4 abk 0 0 0 ado 0 0 0 0 0 0 0
 15 3 3 28
-10 1000 0 0
+10 1000000 0 0
 E
 breastplate plate graye~
    It is finely crafted and old.
@@ -288,7 +288,7 @@ A personal journal, written by the king is here.~
 ~
 12 0 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-1 1 0 0
+1 1000 0 0
 E
 note personal journal~
    The last entry reads:
@@ -312,7 +312,7 @@ A hastily scrawled note lies here.~
 ~
 12 0 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-1 1 0 0
+1 1000 0 0
 E
 note hastily scrawled~
    The note reads:
@@ -337,7 +337,7 @@ An inconspicuous rock is tucked in a corner here.~
 ~
 18 0 0 0 0 a 0 0 0 0 0 0 0
 2 0 0 0
-1 1 0 0
+1 1000 0 0
 E
 key magic rock~
    Huh..  Somethin kinda funny about that rock.

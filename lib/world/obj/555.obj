@@ -5,7 +5,7 @@ Mu, the Mantra of Compassion is here.~
 ~
 18 b 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-1 25 0 0 0
+1 25000 0 0 0
 #55501
 lum mantra humility~
 Lum~
@@ -13,7 +13,7 @@ Lum, the Mantra of Humility, is here.~
 ~
 18 b 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-1 25 0 0 0
+1 25000 0 0 0
 #55502
 beh mantra justice~
 Beh~
@@ -21,7 +21,7 @@ Beh, the Mantra of Justice, is here.~
 ~
 18 b 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-1 25 0 0 0
+1 25000 0 0 0
 #55503
 ohm mantra spirituality~
 Ohm~
@@ -29,7 +29,7 @@ Ohm, the Mantra of Spirituality, is here.~
 ~
 18 b 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-1 25 0 0 0
+1 25000 0 0 0
 #55504
 ahm mantra honesty~
 Ahm~
@@ -37,7 +37,7 @@ Ahm, the Mantra of Honesty, is here.~
 ~
 18 b 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-1 25 0 0 0
+1 25000 0 0 0
 #55505
 cah mantra sacrifice~
 Cah~
@@ -45,7 +45,7 @@ Cah, the Mantra of Sacrifice, is here.~
 ~
 18 b 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-1 25 0 0 0
+1 25000 0 0 0
 #55506
 ra mantra valor~
 Ra~
@@ -53,7 +53,7 @@ Ra, the Mantra of Valor, is here.~
 ~
 18 b 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-1 25 0 0 0
+1 25000 0 0 0
 #55507
 summ mantra honor~
 Summ~
@@ -61,7 +61,7 @@ Summ, the Mantra of Honor, is here.~
 ~
 18 b 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-1 25 0 0 0
+1 25000 0 0 0
 #55508
 moonstone~
 Moonstone~
@@ -69,7 +69,7 @@ A totally featureless Moonstone is here.~
 ~
 18 b 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-1 25 0 0 0
+1 25000 0 0 0
 #55509
 moonstone~
 Moonstone~
@@ -77,7 +77,7 @@ A totally featureless Moonstone is here.~
 ~
 18 b 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-1 25 0 0 0
+1 25000 0 0 0
 #55510
 moonstone~
 Moonstone~
@@ -85,7 +85,7 @@ A totally featureless Moonstone is here.~
 ~
 18 b 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-1 25 0 0 0
+1 25000 0 0 0
 #55511
 moonstone~
 Moonstone~
@@ -93,7 +93,7 @@ A totally featureless Moonstone is here.~
 ~
 18 b 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-1 25 0 0 0
+1 25000 0 0 0
 #55512
 moonstone~
 Moonstone~
@@ -101,7 +101,7 @@ A totally featureless Moonstone is here.~
 ~
 18 b 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-1 25 0 0 0
+1 25000 0 0 0
 #55513
 moonstone~
 Moonstone~
@@ -109,7 +109,7 @@ A totally featureless Moonstone is here.~
 ~
 18 b 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-1 25 0 0 0
+1 25000 0 0 0
 #55514
 moonstone~
 Moonstone~
@@ -117,7 +117,7 @@ A totally featureless Moonstone is here.~
 ~
 18 b 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-1 25 0 0 0
+1 25000 0 0 0
 #55515
 moonstone~
 Moonstone~
@@ -125,7 +125,7 @@ A totally featureless Moonstone is here.~
 ~
 18 b 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-1 25 0 0 0
+1 25000 0 0 0
 #55516
 hourglass~
 the Hourglass~
@@ -133,7 +133,7 @@ You feel an aura of power emanating from the Hourglass~
 ~
 18 b 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-1 50 0 0 0
+1 50000 0 0 0
 A
 4 2
 #55517
@@ -143,7 +143,7 @@ The crook lies here.~
 ~
 5 0 0 0 0 an 0 0 0 0 0 0 0
 0 1 11 7
-4 200 0 0 0
+4 200000 0 0 0
 #55518
 doll~
 the doll~
@@ -151,7 +151,7 @@ An old rag doll is here.~
 ~
 13 h 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-30 1 0 0 0
+30 1000 0 0 0
 E
 doll~
    The rag doll seems to take on the weight of the child you killed.
@@ -163,7 +163,7 @@ Katrina's sword gleams prettily.~
 ~
 5 k 0 0 0 an 0 0 0 0 0 0 0
 0 6 1 3
-2 200 0 5 0
+2 200000 0 5 0
 E
 sword~
    The sword has been polished and tended with much care.  It glows with the
@@ -176,7 +176,7 @@ A scroll has been rescued from the spider's web.~
 ~
 2 0 0 0 0 a 0 0 0 0 0 0 0
 5 35 -1 -1
-1 500 0 5 0
+1 500000 0 5 0
 #55521
 dagger~
 a magic dagger~
@@ -184,7 +184,7 @@ The magic dagger lies here, pulsating.~
 ~
 5 b 0 0 0 an 0 0 0 0 0 0 0
 0 9 4 11
-4 500 0 8 0
+4 500000 0 8 0
 A
 3 2
 A
@@ -196,7 +196,7 @@ The robes of a mage lies here.~
 ~
 9 0 0 0 0 ak 0 0 0 0 0 0 0
 3 0 0 0
-5 250 0 0 0
+5 250000 0 0 0
 E
 robe robes~
    These robes are comfortable and clean.
@@ -208,7 +208,7 @@ Smithy's horseshoes are here.~
 ~
 9 a 0 0 0 ag 0 0 0 0 0 0 0
 10 0 0 0
-7 200 0 20 0
+7 200000 0 20 0
 A
 14 50
 A
@@ -220,7 +220,7 @@ The fine instrument lies here.~
 ~
 5 0 0 0 0 an 0 0 0 0 0 0 0
 0 5 2 6
-5 250 0 5 0
+5 250000 0 5 0
 #55525
 cup~
 a cup~
@@ -228,7 +228,7 @@ The beggar's cup is here.~
 ~
 15 0 0 0 0 ac 0 0 0 0 0 0 0
 2 0 -1 0
-1 200 0 0 0
+1 200000 0 0 0
 #55526
 gold pieces $$50~
 some gold pieces~
@@ -236,7 +236,7 @@ Gold pieces.~
 ~
 20 0 0 0 0 a 0 0 0 0 0 0 0
 50 0 0 0
-1 50 0 0 0
+1 50000 0 0 0
 #55527
 bottle~
 the bottle~
@@ -244,7 +244,7 @@ Iolo's bottle sits here.~
 ~
 10 0 0 0 0 a 0 0 0 0 0 0 0
 11 15 26 -1
-1 500 0 10 0
+1 500000 0 10 0
 #55528
 bow~
 Iolo's bow~
@@ -252,7 +252,7 @@ Iolo's bow stands against a wall.~
 ~
 5 ab 0 0 0 an 0 0 0 0 0 0 0
 0 4 4 11
-4 700 0 10 0
+4 700000 0 10 0
 E
 bow~
    Crafted by the master himself, Iolo, the bow is finely made.  It's wood
@@ -267,7 +267,7 @@ A chicken is lying on the ground.~
 ~
 5 0 0 0 0 a 0 0 0 0 0 0 0
 0 1 2 2
-6 250 0 20 0
+6 250000 0 20 0
 E
 chicken~
    As you look closer you see this isn't a real chicken, it's one of those gag
@@ -282,7 +282,7 @@ The Infinity Bow floats here.~
 ~
 5 a 0 0 0 an 0 0 0 0 0 0 0
 0 4 12 12
-3 1000 0 20 0
+3 1000000 0 20 0
 E
 bow infinity~
    The bow is immense, yet light.  You see no string, but as your hands touch
@@ -299,7 +299,7 @@ A simple wooden spear lies here.~
 ~
 5 0 0 0 0 an 0 0 0 0 0 0 0
 0 5 3 14
-4 200 0 10 0
+4 200000 0 10 0
 #55532
 club~
 a stone club~
@@ -307,7 +307,7 @@ A stone club is here.~
 ~
 5 0 0 0 0 an 0 0 0 0 0 0 0
 0 5 3 7
-10 50 0 10 0
+10 50000 0 10 0
 #55533
 gavel~
 a gavel~
@@ -315,7 +315,7 @@ The Judge's gavel lies here.~
 ~
 5 k 0 0 0 an 0 0 0 0 0 0 0
 0 3 17 7
-5 300 0 20 0
+5 300000 0 20 0
 E
 judge gavel~
    The Gavel is made of ironwood, and seems to have some of the qualities of
@@ -332,7 +332,7 @@ Janna's staff lies here.~
 ~
 5 ak 0 0 0 an 0 0 0 0 0 0 0
 0 1 25 6
-7 300 0 15 0
+7 300000 0 15 0
 E
 staff~
    Jaana's staff is strangely shaped, in a double helix form.  As you look at
@@ -347,7 +347,7 @@ Geoffrey's sword gleams in the sun.~
 ~
 5 ak 0 0 0 an 0 0 0 0 0 0 0
 0 5 5 3
-7 300 0 15 0
+7 300000 0 15 0
 E
 geoffrey sword~
    Geoffrey's sword is heavy but sharp.  When you touch the jeweled hilt, power
@@ -362,7 +362,7 @@ A simple sword is here.~
 ~
 5 0 0 0 0 an 0 0 0 0 0 0 0
 0 3 9 3
-5 300 0 10 0
+5 300000 0 10 0
 #55537
 sword bastard~
 a bastard sword~
@@ -370,7 +370,7 @@ Simon's monstrous bastard sword lies here.~
 ~
 5 ak 0 0 0 an 0 0 0 0 0 0 0
 0 5 11 3
-18 1000 0 20 0
+18 1000000 0 20 0
 E
 sword bastard~
    This is the biggest and best sword you've ever seen.  Its balance is perfect
@@ -390,7 +390,7 @@ A tinker's hammer lies here.~
 ~
 5 0 0 0 0 an 0 0 0 0 0 0 0
 0 6 5 7
-12 300 0 15 0
+12 300000 0 15 0
 #55539
 sword~
 a sword~
@@ -398,7 +398,7 @@ Julia's hot, glowing sword lies here.~
 ~
 5 ak 0 0 0 an 0 0 0 0 0 0 0
 0 5 7 3
-8 300 0 20 0
+8 300000 0 20 0
 E
 glowing sword hot~
    Julia was working on this sword when she was killed.  Though it has been
@@ -418,7 +418,7 @@ A most beautiful amulet lies in a pile here.~
 ~
 9 adkq 0 0 0 ac 0 0 0 0 0 0 0
 10 0 0 0
-1 500 0 15 0
+1 500000 0 15 0
 A
 22 -2
 A
@@ -432,7 +432,7 @@ A sword lies on the ground.~
 ~
 5 0 0 0 0 an 0 0 0 0 0 0 0
 0 13 3 3
-10 300 0 15 0
+10 300000 0 15 0
 A
 18 2
 #55542
@@ -442,7 +442,7 @@ A paladin's suit of armor lies here.~
 ~
 9 0 0 0 0 ad 0 0 0 0 0 0 0
 3 0 0 0
-15 500 0 15 0
+15 500000 0 15 0
 A
 1 1
 A
@@ -454,7 +454,7 @@ Dupre's rapier is here.~
 ~
 5 ak 0 0 0 an 0 0 0 0 0 0 0
 0 6 9 11
-13 300 0 20 0
+13 300000 0 20 0
 A
 1 1
 A
@@ -466,7 +466,7 @@ A gargoyle's boomerang is here.~
 ~
 5 b 0 0 0 an 0 0 0 0 0 0 0
 0 32 1 6
-6 300 0 20 0
+6 300000 0 20 0
 E
 boomerang~
    Though this seems like your basic boomerang, it is much more.  It hums with
@@ -483,7 +483,7 @@ A corroded, rusty sword is here.~
 ~
 5 h 0 0 0 an 0 0 0 0 0 0 0
 0 9 5 3
-9 50 0 20 0
+9 50000 0 20 0
 A
 1 -5
 #55546
@@ -493,7 +493,7 @@ A spiked rusty shield lies here.~
 ~
 9 h 0 0 0 aj 0 0 0 0 0 0 0
 5 0 0 0
-5 50 0 20 0
+5 50000 0 20 0
 A
 17 3
 A
@@ -505,7 +505,7 @@ A magic cloak is here.~
 ~
 9 a 0 0 0 ak 0 0 0 0 0 0 0
 8 0 0 0
-6 500 0 25 0
+6 500000 0 25 0
 A
 12 10
 A
@@ -517,7 +517,7 @@ A bright light of power shoots into the air.~
 ~
 9 a 0 0 0 ak 0 0 0 0 0 0 0
 8 0 0 0
-1 500 0 25 0
+1 500000 0 25 0
 A
 4 2
 A
@@ -529,7 +529,7 @@ The empty shell of the Guardian head lies here.~
 ~
 9 0 0 0 0 ae 0 0 0 0 0 0 0
 6 0 0 0
-10 250 0 25 0
+10 250000 0 25 0
 E
 face head red~
    When you slew the evil Guardian, all that was left was his corporal form that
@@ -546,7 +546,7 @@ Waves of corruption come off this evilly enchanted spiked mace.~
 ~
 5 0 0 0 0 an 0 0 0 0 0 0 0
 0 5 15 7
-5 300 0 25 0
+5 300000 0 25 0
 A
 18 5
 A
@@ -558,7 +558,7 @@ This completely black armor reeks of death.~
 ~
 9 0 0 0 0 ad 0 0 0 0 0 0 0
 8 0 0 0
-9 500 0 25 0
+9 500000 0 25 0
 A
 17 5
 A
@@ -572,7 +572,7 @@ You see a very oddly shaped charm... it might be worth it to look at its shape.~
 ~
 9 0 0 0 0 ac 0 0 0 0 0 0 0
 5 0 0 0
-3 250 0 25 0
+3 250000 0 25 0
 E
 shape~
    The charm looks to be a mummified part of a body.  It is about 3 inches long,
@@ -589,7 +589,7 @@ The evil gem pulsates.~
 ~
 4 0 0 0 0 ao 0 0 0 0 0 0 0
 30 1 1 27
-1 200 0 25 0
+1 200000 0 25 0
 A
 12 50
 A
@@ -601,7 +601,7 @@ Sentri's helmet is here.~
 ~
 9 k 0 0 0 ae 0 0 0 0 0 0 0
 6 0 0 0
-30 500 0 20 0
+30 500000 0 20 0
 A
 4 2
 A
@@ -613,7 +613,7 @@ Sentri's sleeves lie here.~
 ~
 9 k 0 0 0 ai 0 0 0 0 0 0 0
 6 0 0 0
-40 500 0 20 0
+40 500000 0 20 0
 A
 1 2
 A
@@ -625,7 +625,7 @@ Sentri's girth is here.~
 ~
 9 k 0 0 0 al 0 0 0 0 0 0 0
 6 0 0 0
-40 500 0 20 0
+40 500000 0 20 0
 A
 13 15
 A
@@ -637,7 +637,7 @@ Sentri's two-handed sword is here.~
 ~
 5 k 0 0 0 an 0 0 0 0 0 0 0
 0 1 30 3
-20 500 0 20 0
+20 500000 0 20 0
 A
 18 3
 A
@@ -649,7 +649,7 @@ Sentri's gloves are here.~
 ~
 9 k 0 0 0 ah 0 0 0 0 0 0 0
 6 0 0 0
-20 500 0 20 0
+20 500000 0 20 0
 A
 13 15
 A
@@ -661,7 +661,7 @@ Sentri's boots are here.~
 ~
 9 k 0 0 0 ag 0 0 0 0 0 0 0
 6 0 0 0
-40 500 0 20 0
+40 500000 0 20 0
 A
 2 1
 A
@@ -673,7 +673,7 @@ Sentri left his leggings here.~
 ~
 9 k 0 0 0 af 0 0 0 0 0 0 0
 6 0 0 0
-40 500 0 20 0
+40 500000 0 20 0
 A
 2 1
 A
@@ -685,7 +685,7 @@ Sentri left his armor here.~
 ~
 9 k 0 0 0 ad 0 0 0 0 0 0 0
 6 0 0 0
-30 500 0 20 0
+30 500000 0 20 0
 A
 13 20
 A
@@ -697,7 +697,7 @@ A triangular shaped medallion is here.~
 ~
 9 0 0 0 0 ac 0 0 0 0 0 0 0
 7 0 0 0
-6 200 0 25 0
+6 200000 0 25 0
 A
 4 -1
 A
@@ -709,7 +709,7 @@ The most amazingly well crafted sword lies here.~
 ~
 5 f 0 0 0 an 0 0 0 0 0 0 0
 0 6 12 3
-4 1000 0 30 0
+4 1000000 0 30 0
 E
 glass sword~
    Invisible to the naked eye, this sword is the best crafted.  As you look at
@@ -727,7 +727,7 @@ A jewel encrusted crown is here.~
 ~
 9 a 0 0 0 ae 0 0 0 0 0 0 0
 10 0 0 0
-10 1000 0 30 0
+10 1000000 0 30 0
 E
 british crown~
    Legend has it that this most perfect of crowns has within one of its jewels,
@@ -744,7 +744,7 @@ A pure gold sceptre is topped with a perfect crystal orb of power.~
 ~
 9 a 0 0 0 a 0 0 0 0 0 0 0
 10 0 0 0
-10 1000 0 30 0
+10 1000000 0 30 0
 E
 sceptre~
    The second of the crown jewels, this sceptre is amazingly light, and
@@ -766,7 +766,7 @@ A silver amulet lies here.~
 ~
 9 a 0 0 0 ac 0 0 0 0 0 0 0
 8 0 0 0
-1 500 0 30 0
+1 500000 0 30 0
 E
 amulet~
    British's amulet is in the shape of the great earth serpent.
@@ -792,5 +792,5 @@ A boat lies here.~
 ~
 22 0 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-20 500 0 0 0
+20 500000 0 0 0
 $~

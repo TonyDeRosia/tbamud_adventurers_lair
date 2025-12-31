@@ -5,7 +5,7 @@ A very petite sword lies here on the ground, you almost didn't see it.~
 ~
 5 k 0 0 0 an 0 0 0 0 0 0 0
 0 1 4 11
-1 10 1 0
+1 10000 1 0
 E
 sword pixie~
    This elegant sword appears to have served its previous owner very well, but
@@ -22,7 +22,7 @@ A small white claw is sitting here, lost.~
 ~
 18 m 0 0 0 ao 0 0 0 0 0 0 0
 2 0 0 0
-1 1 0 0
+1 1000 0 0
 E
 key claw white dragon~
    This key appears to have been fashioned from the claw of a dragon.  You are
@@ -35,7 +35,7 @@ There is a door key sitting here.~
 ~
 18 m 0 0 0 ao 0 0 0 0 0 0 0
 2 0 0 0
-1 1 0 0
+1 1000 0 0
 E
 key door~
    This is a small nondescript key, with nothing special about it.
@@ -47,7 +47,7 @@ A large bronze key sits upon the ground, covered with dust.~
 ~
 18 m 0 0 0 ao 0 0 0 0 0 0 0
 2 0 0 0
-1 1 0 0
+1 1000 0 0
 E
 gate keeper key~
    This is the key to the gate.  It belongs to the gatekeeper, and he is
@@ -60,7 +60,7 @@ A small copper claw lies here, abonded by everyone~
 ~
 18 m 0 0 0 ao 0 0 0 0 0 0 0
 2 0 0 0
-1 1 0 0
+1 1000 0 0
 E
 copper dragon claw key~
    This key appears to have been fashioned from a dragon's claw.  It is quite
@@ -73,7 +73,7 @@ The key to the Pixie King's bedroom is here, it is almost impossible find.~
 ~
 18 m 0 0 0 ao 0 0 0 0 0 0 0
 2 0 0 0
-1 1 0 0
+1 1000 0 0
 E
 pixie king key~
    This is a very small key, you cannot imagine what door this would go to.
@@ -85,7 +85,7 @@ Upon the ground lies a solid white pendant, it issues forth an aura of cold.~
 ~
 9 agi 0 0 0 aco 0 0 0 0 0 0 0
 5 0 0 0
-5 1000 50 0
+5 1000000 50 0
 E
 white pendant dragon scale~
    This pendant appears to be very ancient.  It is solid white, with a blue
@@ -102,7 +102,7 @@ Upon the ground lies a solid copper pendant, as you reach for it, time seems to 
 ~
 9 agi 0 0 0 aco 0 0 0 0 0 0 0
 5 0 0 0
-5 1000 50 0
+5 1000000 50 0
 E
 copper pendant dragon scale~
    The pendant you now own appears to be very new, in fact it looks freshly
@@ -120,7 +120,7 @@ A pair of translucent wings lie upon the ground, their is an eerie glow about th
 ~
 1 0 0 0 0 ao 0 0 0 0 0 0 0
 0 0 -1 0
-1 250 150 0
+1 250000 150 0
 E
 pixie wings~
    Just what they are called.  You feel sorry for the pixie who used to own
@@ -135,7 +135,7 @@ A small pendant is here on the ground, you almost ignore it, til it calls out yo
 ~
 9 agi 0 0 0 aco 0 0 0 0 0 0 0
 5 0 0 0
-1 1 0 0
+1 1000 0 0
 E
 pendant eternity~
    As you stare at the pendant, you begin to feel as if you are being sucked in.
@@ -148,7 +148,7 @@ A shimmering white breast plate lies here, it is cold to the touch.~
 ~
 9 0 0 0 0 ad 0 0 0 0 0 0 0
 4 0 0 0
-12 200 100 0
+12 200000 100 0
 E
 white dragon scale breast plate~
    This is a very quickly strewn together breast plate.  It looks like it was
@@ -163,7 +163,7 @@ An elegant copper breast plate lies here, it looks very new.~
 ~
 9 0 0 0 0 ad 0 0 0 0 0 0 0
 5 0 0 0
-12 200 100 0
+12 200000 100 0
 E
 copper dragon scale breast plate~
    This is a very hastely strewn together breast plate.  It looks like it was
@@ -194,7 +194,7 @@ A can of spraypaint is sitting here.~
 ~
 12 0 0 0 0 ao 0 0 0 0 0 0 0
 0 0 0 0
-5 10 25 0
+5 10000 25 0
 #25014
 pixie stick~
 a Pixie Stick~
@@ -202,7 +202,7 @@ A Pixie Stick lies here on the ground, it looks tasty.~
 ~
 5 a 0 0 0 an 0 0 0 0 0 0 0
 0 2 4 6
-2 1 1 0
+2 1000 1 0
 E
 pixie stick~
    This is a Pixie Stick.  While you may be used to eating these "sugar sticks",
@@ -219,7 +219,7 @@ There is a very small piece of metal lying here.~
 ~
 9 a 0 0 0 ad 0 0 0 0 0 0 0
 3 0 0 0
-5 1000 100 0
+5 1000000 100 0
 E
 plate pixie breast~
    This is a piece of Pixie armor.  It looks very well crafted, but has an odd
@@ -236,7 +236,7 @@ A pair of very small metallic pants lie here.~
 ~
 9 a 0 0 0 af 0 0 0 0 0 0 0
 3 0 0 0
-3 1000 100 0
+3 1000000 100 0
 E
 pixie greaves~
    These are VERY small pants....  Although they do seem fairly stretchy.....
@@ -252,7 +252,7 @@ A pair of small metal sleeves lie here, glowing~
 ~
 9 a 0 0 0 ai 0 0 0 0 0 0 0
 3 0 0 0
-3 1000 100 0
+3 1000000 100 0
 E
 pixie arm plates~
    These arm plates would be a tad bit to small for you.....  IF YOU WERE A
@@ -269,7 +269,7 @@ There is a small flame sitting here.~
 ~
 1 a 0 0 0 ao 0 0 0 0 0 0 0
 0 0 -1 0
-2 1000 100 0
+2 1000000 100 0
 E
 flame wisp dragon fyre fire~
    You aren't quite sure how it is, but the DragonFyre is existing without its
@@ -284,7 +284,7 @@ A white dragon scale helm with a plume of dragon mane lies here.~
 ~
 9 a 0 0 0 ae 0 0 0 0 0 0 0
 4 0 0 0
-6 500 50 0
+6 500000 50 0
 E
 helm dragon~
    This helm appears to have been created from the scales of a freshly dead
@@ -301,7 +301,7 @@ A copper helm made from the scales of a dragon is here.~
 ~
 9 a 0 0 0 ae 0 0 0 0 0 0 0
 4 0 0 0
-5 500 50 0
+5 500000 50 0
 E
 helm dragon~
    This helm appears to be made from the scales of a recently dead dragon.  The
@@ -319,7 +319,7 @@ A gnarled wooden shaft lies here, pulsing slightly.~
 ~
 5 abcfg 0 0 0 an 0 0 0 0 0 0 0
 0 3 4 7
-4 900 100 0
+4 900000 100 0
 E
 staff magius~
    This is the Staff of the Magius.  Rumored to bring untold mystical power to

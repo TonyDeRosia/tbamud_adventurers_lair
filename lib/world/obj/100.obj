@@ -87,7 +87,7 @@ A small trout is squirming in your hands.~
 ~
 19 0 0 0 0 a 0 0 0 0 0 0 0
 5 0 0 0
-1 1 0 0 0
+1 1000 0 0 0
 E
 trout~
    This poor little fella wants to get back into some water before he dies.
@@ -100,7 +100,7 @@ A pair of dirty pants lies crumpled on the ground.~
 ~
 11 e 0 0 0 af 0 0 0 0 0 0 0
 0 0 0 0
-3 3 0 0 0
+3 3000 0 0 0
 E
 pants~
    These pants are filthy. They look like they have not been washed in years.
@@ -115,7 +115,7 @@ A filthy looking shirt has been left here.~
 ~
 11 e 0 0 0 ad 0 0 0 0 0 0 0
 0 0 0 0
-3 3 0 0 0
+3 3000 0 0 0
 E
 shirt~
    Although the shirt is dirty, it looks very useable.  The fabric is a fine
@@ -130,7 +130,7 @@ A few coins have been left here.~
 ~
 20 e 0 0 0 a 0 0 0 0 0 0 0
 50 7 2 0
-1 1 0 0 0
+1 1000 0 0 0
 E
 coins~
    The pile sparkles, coins of platinum, gold, silver, and bronze.
@@ -198,7 +198,7 @@ A brass lantern is extinguished here.~
 ~
 1 0 0 0 0 ao 0 0 0 0 0 0 0
 0 0 8 0
-6 120 12 0 0
+6 120000 12 0 0
 E
 brass lantern~
    The brass hood can be opened and closed allowing for dimming the light
@@ -212,7 +212,7 @@ A pile of fur with straps on it looks like it might be a backpack.~
 ~
 15 0 0 0 0 ak 0 0 0 0 0 0 0
 50 1 -1 0
-5 25 2 0 0
+5 25000 2 0 0
 E
 fur backpack~
    This backpack is made from deer hide and is extremely durable.  It can be
@@ -225,7 +225,7 @@ This slab of venison is from a large, well-fed deer.~
 ~
 19 0 0 0 0 a 0 0 0 0 0 0 0
 10 0 0 0
-3 10 0 0 0
+3 10000 0 0 0
 E
 deer meat venison~
    This large slab of meat has been recently cooked and, though dry, looks

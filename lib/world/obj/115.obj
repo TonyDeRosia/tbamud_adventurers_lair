@@ -5,7 +5,7 @@ An odd length looking sword lays here, too long for a dagger and not really a sw
 ~
 5 jm 0 0 0 an 0 0 0 0 0 0 0
 5 2 4 3
-1 1 0 0
+1 1000 0 0
 #11501
 chainmail~
 copper pressed chainmail~
@@ -13,7 +13,7 @@ A really flat chainmail made of copper lies on the ground.~
 ~
 9 0 0 0 0 ad 0 0 0 0 0 0 0
 4 0 0 0
-2 40 4 0
+2 40000 4 0
 #11502
 handaxe~
 a stout handaxe~
@@ -21,7 +21,7 @@ A handaxe of centaur craftsmanship lays here gleming in the sun.~
 ~
 5 0 0 0 0 an 0 0 0 0 0 0 0
 1 2 4 10
-4 20 2 0
+4 20000 2 0
 #11503
 broad sword~
 a copper broad sword~
@@ -29,7 +29,7 @@ A copper broad sword of centaur make is stuck to the ground.~
 ~
 5 0 0 0 0 an 0 0 0 0 0 0 0
 6 3 3 12
-1 1 0 0
+1 1000 0 0
 #11504
 tarnished copper bracelet~
 a tarnished copper bracelet~
@@ -37,7 +37,7 @@ A tarnished copper bracelet lies here.~
 ~
 12 g 0 0 0 am 0 0 0 0 0 0 0
 0 0 0 0
-1 100 10 0
+1 100000 10 0
 A
 1 -1
 #11505
@@ -47,7 +47,7 @@ A roughly pressed copper horse shoe lays here.~
 ~
 12 g 0 0 0 ao 0 0 0 0 0 0 0
 0 0 0 0
-1 20 2 0
+1 20000 2 0
 A
 23 2
 A
@@ -59,7 +59,7 @@ A monk's robe is here crumbled on the ground, covered in blood~
 ~
 11 gj 0 0 0 ak 0 0 0 0 0 0 0
 0 0 0 0
-10 10 1 0
+10 10000 1 0
 A
 17 -6
 A
@@ -71,7 +71,7 @@ A gray color leather bounded book lays here.~
 ~
 3 bcgp 0 0 0 a 0 0 0 0 0 0 0
 12 1 1 20
-3 50 5 0
+3 50000 5 0
 #11508
 intangible kris~
 an intangible kris~
@@ -79,7 +79,7 @@ There is nothing here as a weapon.~
 ~
 5 g 0 0 0 an 0 0 0 0 0 0 0
 5 3 3 11
-5 200 20 0
+5 200000 20 0
 A
 12 -35
 A
@@ -91,7 +91,7 @@ A goblin helmet lays here on the ground collecting water.~
 ~
 9 0 0 0 0 ae 0 0 0 0 0 0 0
 4 0 0 0
-1 1 0 0
+1 1000 0 0
 #11510
 goblin shield~
 a wooden goblin shield~
@@ -99,7 +99,7 @@ A round piece of wood shaped out to be a shield lays here.~
 ~
 9 0 0 0 0 aj 0 0 0 0 0 0 0
 3 0 0 0
-1 1 0 0
+1 1000 0 0
 #11511
 key~
 a key~
@@ -107,7 +107,7 @@ It is an old rusty key.~
 ~
 18 c 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-1 1 0 0
+1 1000 0 0
 E
 look key~
    There is a small area with the words western hall etched on it.
@@ -119,7 +119,7 @@ A key marked eastern room.~
 ~
 18 c 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-1 1 0 0
+1 1000 0 0
 #11513
 pewter ring~
 a pewter ring~
@@ -127,7 +127,7 @@ A very small piece of rounded alloy glems in the sunlight.~
 ~
 11 g 0 0 0 ab 0 0 0 0 0 0 0
 0 0 0 0
-1 150 15 0
+1 150000 15 0
 A
 1 -2
 A
@@ -139,7 +139,7 @@ This key looks very expensive and valuable.~
 ~
 18 ac 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-1 1 0 0
+1 1000 0 0
 E
 look key~
    There are the words Northern Hall etched in this key.
@@ -151,7 +151,7 @@ A short stick with a stone head on the end trys to pass as a spear is lying here
 ~
 5 0 0 0 0 an 0 0 0 0 0 0 0
 4 3 3 11
-1 1 0 0
+1 1000 0 0
 #11516
 copper gauntlets~
 some copper gauntlets~
@@ -159,7 +159,7 @@ A badly finished pair of gauntlets lay here.~
 ~
 9 0 0 0 0 ah 0 0 0 0 0 0 0
 3 0 0 0
-3 60 6 0
+3 60000 6 0
 #11517
 kicking boots~
 a pair of kicking boots~
@@ -167,7 +167,7 @@ A small solid pair of kickers lay here.~
 ~
 9 0 0 0 0 ag 0 0 0 0 0 0 0
 2 0 0 0
-3 30 3 0
+3 30000 3 0
 #11518
 little bow peeks staff~
 little bow peek's staff~
@@ -175,7 +175,7 @@ A small shepard girl's stick lays here.~
 ~
 11 g 0 0 0 ao 0 0 0 0 0 0 0
 0 0 0 0
-3 315 31 0
+3 315000 31 0
 A
 3 1
 A
@@ -187,7 +187,7 @@ There is nothing here to hold anything at all.~
 ~
 15 0 0 0 0 ak 0 0 0 0 0 0 0
 600 0 -1 0
-10 500 100 0
+10 500000 100 0
 #11520
 intangible light~
 an intangible light~
@@ -195,7 +195,7 @@ There is nothing here to light the way~
 ~
 1 g 0 0 0 ao 0 0 0 0 0 0 0
 0 0 -1 0
-1 1 0 0
+1 1000 0 0
 A
 12 10
 #11521
