@@ -5269,3 +5269,101 @@ ACMD(do_oset)
      }
   }
 }
+
+ACMD(do_pull)
+{
+  char arg[MAX_INPUT_LENGTH];
+  struct char_data *vict = NULL;
+  int player_i, load_result;
+
+  one_argument(argument, arg);
+
+  if (!*arg) {
+    send_to_char(ch, "Usage: pull <playername>\r\n");
+    return;
+  }
+
+  if ((player_i = get_ptable_by_name(arg)) < 0) {
+    send_to_char(ch, "No such player.\r\n");
+    return;
+  }
+
+  if (is_in_game(player_table[player_i].id)) {
+    send_to_char(ch, "That player is already in the world.\r\n");
+    return;
+  }
+
+  CREATE(vict, struct char_data, 1);
+  clear_char(vict);
+  CREATE(vict->player_specials, struct player_special_data, 1);
+  new_mobile_data(vict);
+
+  vict->desc = NULL;
+
+  if ((load_result = load_char(player_table[player_i].name, vict)) < 0 || PLR_FLAGGED(vict, PLR_DELETED)) {
+    send_to_char(ch, "Failed to load that player file.\r\n");
+    free_char(vict);
+    return;
+  }
+
+  GET_PFILEPOS(vict) = load_result;
+
+  if (GET_LEVEL(vict) >= GET_LEVEL(ch)) {
+    send_to_char(ch, "You cannot pull an immortal of equal or higher level.\r\n");
+    free_char(vict);
+    return;
+  }
+
+  reset_char(vict);
+  vict->script_id = GET_IDNUM(vict);
+  add_to_lookup_table(vict->script_id, (void *)vict);
+
+  if (!SCRIPT(vict))
+    read_saved_vars(vict);
+
+  vict->next = character_list;
+  character_list = vict;
+
+  char_to_room(vict, IN_ROOM(ch));
+  GET_POS(vict) = POS_STANDING;
+  Crash_load(vict);
+
+  act("$n appears in a swirl of magic.", FALSE, vict, 0, 0, TO_ROOM);
+  send_to_char(ch, "You pull %s into the world.\r\n", GET_NAME(vict));
+  mudlog(BRF, MAX(LVL_GOD, GET_LEVEL(ch)), TRUE, "%s pulled %s into room %d", GET_NAME(ch),
+         GET_NAME(vict), GET_ROOM_VNUM(IN_ROOM(ch)));
+}
+
+ACMD(do_unpull)
+{
+  char arg[MAX_INPUT_LENGTH];
+  struct char_data *vict;
+
+  one_argument(argument, arg);
+
+  if (!*arg) {
+    send_to_char(ch, "Usage: unpull <playername>\r\n");
+    return;
+  }
+
+  if (!(vict = get_player_vis(ch, arg, NULL, FIND_CHAR_WORLD)) || IS_NPC(vict)) {
+    send_to_char(ch, "You do not see that player here.\r\n");
+    return;
+  }
+
+  if (vict->desc) {
+    send_to_char(ch, "They are currently connected; unpull aborted.\r\n");
+    return;
+  }
+
+  GET_LOADROOM(vict) = GET_ROOM_VNUM(IN_ROOM(vict));
+  Crash_rentsave(vict, 0);
+  save_char(vict);
+
+  mudlog(NRM, MAX(LVL_GOD, GET_LEVEL(ch)), TRUE, "%s unpulled %s from room %d", GET_NAME(ch),
+         GET_NAME(vict), GET_ROOM_VNUM(IN_ROOM(vict)));
+
+  act("$n vanishes in a swirl of magic.", FALSE, vict, 0, 0, TO_ROOM);
+  send_to_char(ch, "You unpull %s.\r\n", GET_NAME(vict));
+  extract_char(vict);
+}

@@ -160,6 +160,7 @@ static int ok_shop_room(int shop_nr, room_vnum room);
 static int add_to_shop_list(struct shop_buy_data *list, int type, int *len, int *val);
 static int end_read_list(struct shop_buy_data *list, int len, int error);
 static void read_line(FILE *shop_f, const char *string, void *data);
+ACMD(do_shopdisc);
 
 /* Local file scope only variables */
 static int cmd_say;
@@ -1744,4 +1745,82 @@ bool shopping_identify(char *arg, struct char_data *ch, struct char_data *keeper
       send_to_char(ch, "%s\r\n", buf);
 
   return TRUE;
+}
+
+ACMD(do_shopdisc)
+{
+  char arg[MAX_INPUT_LENGTH], price_buf[64];
+  struct char_data *keeper = NULL;
+  struct obj_data *obj = NULL;
+  int shop_nr = -1, i;
+  const int samples[] = { 10, 13, 18, 25 };
+
+  if (IS_NPC(ch))
+    return;
+
+  for (keeper = world[IN_ROOM(ch)].people; keeper; keeper = keeper->next_in_room) {
+    if (!IS_MOB(keeper) || GET_MOB_RNUM(keeper) == NOBODY)
+      continue;
+    if (mob_index[GET_MOB_RNUM(keeper)].func != shop_keeper)
+      continue;
+
+    for (shop_nr = 0; shop_nr <= top_shop; shop_nr++) {
+      if (SHOP_KEEPER(shop_nr) != keeper->nr)
+        continue;
+      if (ok_shop_room(shop_nr, GET_ROOM_VNUM(IN_ROOM(ch))))
+        break;
+    }
+
+    if (shop_nr <= top_shop)
+      break;
+  }
+
+  if (!keeper || shop_nr < 0 || shop_nr > top_shop) {
+    send_to_char(ch, "You must be in a shop to use that command.\r\n");
+    return;
+  }
+
+  one_argument(argument, arg);
+
+  if (!*arg) {
+    send_to_char(ch, "Usage: shopdisc <item keyword>\r\n");
+    return;
+  }
+
+  if (!is_ok(keeper, ch, shop_nr))
+    return;
+
+  if (!(obj = get_purchase_obj(ch, arg, keeper, shop_nr, TRUE)))
+    return;
+
+  send_to_char(ch, "Item: %s\r\n", obj->short_description ? obj->short_description : obj->name);
+
+  {
+    long price = shop_calculate_buy_price(GET_OBJ_COST(obj), SHOP_BUYPROFIT(shop_nr),
+                                          GET_CHA(keeper), ch);
+    float factor = shop_charisma_discount(ch);
+
+    shop_format_price(price_buf, sizeof(price_buf), shop_units_to_copper(price));
+    send_to_char(ch, "CHA %2d factor %.2f price %s\r\n", GET_CHA(ch), factor, price_buf);
+  }
+
+  for (i = 0; i < (int)(sizeof(samples) / sizeof(samples[0])); i++) {
+    struct char_data dummy;
+    long price;
+    float factor;
+
+    if (samples[i] == GET_CHA(ch))
+      continue;
+
+    memset(&dummy, 0, sizeof(dummy));
+    dummy.player.level = 1;
+    dummy.real_abils.cha = samples[i];
+
+    price = shop_calculate_buy_price(GET_OBJ_COST(obj), SHOP_BUYPROFIT(shop_nr),
+                                     GET_CHA(keeper), &dummy);
+    factor = shop_charisma_discount(&dummy);
+
+    shop_format_price(price_buf, sizeof(price_buf), shop_units_to_copper(price));
+    send_to_char(ch, "CHA %2d factor %.2f price %s\r\n", samples[i], factor, price_buf);
+  }
 }
