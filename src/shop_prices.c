@@ -8,17 +8,27 @@
 
 float shop_charisma_discount(const struct char_data *buyer, int keeper_cha)
 {
+  int cha;
+
+  (void)keeper_cha; /* keeper charisma does not affect buy price */
+
   if (!buyer || IS_NPC(buyer) || GET_LEVEL(buyer) >= LVL_IMMORT)
     return 1.0f;
 
-  int cha_diff = keeper_cha - GET_CHA(buyer);
+  cha = GET_CHA(buyer);
 
-  if (cha_diff > 15)
-    cha_diff = 15;
-  else if (cha_diff < -15)
-    cha_diff = -15;
+  /* No penalty for low or average charisma */
+  if (cha <= 13)
+    return 1.0f;
 
-  return 1.0f + (cha_diff / 70.0f);
+  if (cha > 25)
+    cha = 25;
+
+  /* CHA 13 -> 1.00, CHA 25 -> 0.85 (max 15 percent off) */
+  {
+    float t = (float)(cha - 13) / (float)(25 - 13);
+    return 1.0f - (0.40f * t);
+  }
 }
 
 long shop_calculate_buy_price(long base_cost, float buyprofit, int keeper_cha, const struct char_data *buyer)
@@ -29,6 +39,8 @@ long shop_calculate_buy_price(long base_cost, float buyprofit, int keeper_cha, c
   (void)keeper_cha;
 
 #ifdef SHOP_DISCOUNT_DEBUG
+
+#ifdef SHOP_PRICE_DEBUG
   if (buyer && !IS_NPC(buyer)) {
     char buf[MAX_INPUT_LENGTH];
     float discount = shop_charisma_discount(buyer, keeper_cha);
@@ -39,6 +51,7 @@ long shop_calculate_buy_price(long base_cost, float buyprofit, int keeper_cha, c
              base_cost, profit_price, GET_CHA(buyer), discount, final_price);
     send_to_char(buyer, "%s", buf);
   }
+#endif
 #endif
 
   if (final_price < 1)
