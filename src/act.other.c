@@ -424,6 +424,34 @@ ACMD(do_spellbook)
 }
 
 
+static int can_use_practice_trainer(struct char_data *ch)
+{
+  struct obj_data *obj;
+  struct char_data *mob;
+  int i;
+
+  if (GET_ROOM_SPEC(IN_ROOM(ch)) == guild)
+    return TRUE;
+
+  for (i = 0; i < NUM_WEARS; i++)
+    if (GET_EQ(ch, i) && GET_OBJ_SPEC(GET_EQ(ch, i)) == guild)
+      return TRUE;
+
+  for (obj = ch->carrying; obj; obj = obj->next_content)
+    if (GET_OBJ_SPEC(obj) == guild)
+      return TRUE;
+
+  for (mob = world[IN_ROOM(ch)].people; mob; mob = mob->next_in_room)
+    if (!MOB_FLAGGED(mob, MOB_NOTDEADYET) && GET_MOB_SPEC(mob) == guild)
+      return TRUE;
+
+  for (obj = world[IN_ROOM(ch)].contents; obj; obj = obj->next_content)
+    if (GET_OBJ_SPEC(obj) == guild)
+      return TRUE;
+
+  return FALSE;
+}
+
 
 ACMD(do_practice)
 {
@@ -434,10 +462,113 @@ ACMD(do_practice)
 
   one_argument(argument, arg);
 
-  if (*arg)
+  if (*arg) {
+    if (!can_use_practice_trainer(ch))
+      send_to_char(ch, "You can only practice skills in your guild.\r\n");
+    return;
+  }
+
+  list_known_abilities(ch);
+}
+
+ACMD(do_train)
+{
+  char arg[MAX_INPUT_LENGTH];
+  sbyte *stat_field = NULL;
+  const char *stat_name = NULL;
+
+  if (IS_NPC(ch))
+    return;
+
+  one_argument(argument, arg);
+
+  if (!can_use_practice_trainer(ch)) {
     send_to_char(ch, "You can only practice skills in your guild.\r\n");
-  else
-    list_known_abilities(ch);
+    return;
+  }
+
+  if (!*arg) {
+    send_to_char(ch, "You have %d training sessions available.\r\n", GET_TRAINS(ch));
+    send_to_char(ch, "Train hit, mana, move (cost 1) or str dex con int wis cha (cost 10, cap 20).\r\n");
+    return;
+  }
+
+  if (!str_cmp(arg, "hit")) {
+    if (GET_TRAINS(ch) < 1) {
+      send_to_char(ch, "You do not have enough training sessions.\r\n");
+      return;
+    }
+
+    GET_TRAINS(ch)--;
+    GET_MAX_HIT(ch) += 5;
+    send_to_char(ch, "You spend one training session and feel hardier.\r\n");
+    return;
+  }
+
+  if (!str_cmp(arg, "mana")) {
+    if (GET_TRAINS(ch) < 1) {
+      send_to_char(ch, "You do not have enough training sessions.\r\n");
+      return;
+    }
+
+    GET_TRAINS(ch)--;
+    GET_MAX_MANA(ch) += 5;
+    send_to_char(ch, "You spend one training session and feel hardier.\r\n");
+    return;
+  }
+
+  if (!str_cmp(arg, "move")) {
+    if (GET_TRAINS(ch) < 1) {
+      send_to_char(ch, "You do not have enough training sessions.\r\n");
+      return;
+    }
+
+    GET_TRAINS(ch)--;
+    GET_MAX_MOVE(ch) += 10;
+    send_to_char(ch, "You spend one training session and feel hardier.\r\n");
+    return;
+  }
+
+  if (!str_cmp(arg, "str")) {
+    stat_field = &ch->real_abils.str;
+    stat_name = "strength";
+  } else if (!str_cmp(arg, "dex")) {
+    stat_field = &ch->real_abils.dex;
+    stat_name = "dexterity";
+  } else if (!str_cmp(arg, "con")) {
+    stat_field = &ch->real_abils.con;
+    stat_name = "constitution";
+  } else if (!str_cmp(arg, "int")) {
+    stat_field = &ch->real_abils.intel;
+    stat_name = "intelligence";
+  } else if (!str_cmp(arg, "wis")) {
+    stat_field = &ch->real_abils.wis;
+    stat_name = "wisdom";
+  } else if (!str_cmp(arg, "cha")) {
+    stat_field = &ch->real_abils.cha;
+    stat_name = "charisma";
+  }
+
+  if (stat_field != NULL) {
+    if (GET_TRAINS(ch) < 10) {
+      send_to_char(ch, "You do not have enough training sessions.\r\n");
+      return;
+    }
+
+    if (*stat_field >= 20) {
+      send_to_char(ch, "That base stat is already at 20 and cannot be trained higher.\r\n");
+      return;
+    }
+
+    GET_TRAINS(ch) -= 10;
+    (*stat_field)++;
+    affect_total(ch);
+    send_to_char(ch, "You spend ten training sessions and feel your %s improve.\r\n", stat_name);
+    return;
+  }
+
+  send_to_char(ch, "You have %d training sessions available.\r\n", GET_TRAINS(ch));
+  send_to_char(ch, "Train hit, mana, move (cost 1) or str dex con int wis cha (cost 10, cap 20).\r\n");
 }
 
 ACMD(do_visible)
