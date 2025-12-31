@@ -1519,6 +1519,9 @@ ACMD(do_finger)
   const char *clan = "None";
   long long bounty = GET_BOUNTY(vict);
   const char *bounty_color = bounty > 0 ? BY : R;
+  char bounty_buf[64];
+
+  format_copper_as_currency(bounty_buf, sizeof(bounty_buf), bounty);
 
   /* Top border */
   len += snprintf(buf + len, sizeof(buf) - len,
@@ -1536,7 +1539,7 @@ ACMD(do_finger)
   snprintf(line, sizeof(line), "%sClass:%s %-19s  %sLevel:%s %-5d", C, R, archetype_name(GET_CLASS(vict)), C, R, GET_LEVEL(vict));
   len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
 
-  snprintf(line, sizeof(line), "%sClan:%s %-20s  %sBounty:%s %s%lld%s", C, R, clan, C, R, bounty_color, bounty, R);
+  snprintf(line, sizeof(line), "%sClan:%s %-20s  %sBounty:%s %s%s%s", C, R, clan, C, R, bounty_color, bounty_buf, R);
   len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
 
   len += snprintf(buf + len, sizeof(buf) - len,
@@ -1626,9 +1629,11 @@ ACMD(do_bounty)
   save_char(ch);
   save_char(vict);
 
-  send_to_char(ch, "You place a bounty of %lld copper on %s.\r\n", amount, GET_NAME(vict));
+  format_copper_as_currency(bounty_buf, sizeof(bounty_buf), amount);
+
+  send_to_char(ch, "You place a bounty of %s on %s.\r\n", bounty_buf, GET_NAME(vict));
   if (!from_file && vict->desc)
-    send_to_char(vict, "%s has placed a bounty of %lld copper on you!\r\n", GET_NAME(ch), amount);
+    send_to_char(vict, "%s has placed a bounty of %s on you!\r\n", GET_NAME(ch), bounty_buf);
 
   if (from_file)
     free_char(vict);
