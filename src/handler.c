@@ -1273,132 +1273,95 @@ int get_obj_pos_in_equip_vis(struct char_data *ch, char *arg, int *number, struc
   return (-1);
 }
 
-static const char *money_keywords = "coin coins money gold silver copper pile";
-
-static void set_money_strings(struct obj_data *obj)
+const char *money_desc(int amount)
 {
-  char short_desc[MAX_INPUT_LENGTH];
-  char long_desc[MAX_INPUT_LENGTH];
-  char exact_desc[MAX_INPUT_LENGTH];
-  const char *unit = "copper";
-  long long amount_copper = GET_OBJ_VAL(obj, 0);
-  long long unit_value = 1;
-  long long unit_count;
-  struct extra_descr_data *ed;
+  int cnt;
+  struct {
+    int limit;
+    const char *description;
+  } money_table[] = {
+    {          1, "a gold coin"				},
+    {         10, "a tiny pile of gold coins"		},
+    {         20, "a handful of gold coins"		},
+    {         75, "a little pile of gold coins"		},
+    {        200, "a small pile of gold coins"		},
+    {       1000, "a pile of gold coins"		},
+    {       5000, "a big pile of gold coins"		},
+    {      10000, "a large heap of gold coins"		},
+    {      20000, "a huge mound of gold coins"		},
+    {      75000, "an enormous mound of gold coins"	},
+    {     150000, "a small mountain of gold coins"	},
+    {     250000, "a mountain of gold coins"		},
+    {     500000, "a huge mountain of gold coins"	},
+    {    1000000, "an enormous mountain of gold coins"	},
+    {          0, NULL					},
+  };
 
-  if (amount_copper < 0)
-    amount_copper = 0;
-
-  if (amount_copper >= COPPER_PER_GOLD) {
-    unit = "gold";
-    unit_value = COPPER_PER_GOLD;
-  } else if (amount_copper >= COPPER_PER_SILVER) {
-    unit = "silver";
-    unit_value = COPPER_PER_SILVER;
+  if (amount <= 0) {
+    log("SYSERR: Try to create negative or 0 money (%d).", amount);
+    return (NULL);
   }
 
-  unit_count = amount_copper / unit_value;
-  if (unit_count == 1 && (amount_copper % unit_value) == 0)
-    snprintf(short_desc, sizeof(short_desc), "a %s coin", unit);
-  else
-    snprintf(short_desc, sizeof(short_desc), "a pile of %s coins", unit);
+  for (cnt = 0; money_table[cnt].limit; cnt++)
+    if (amount <= money_table[cnt].limit)
+      return (money_table[cnt].description);
 
-  strlcpy(long_desc, short_desc, sizeof(long_desc));
-  CAP(long_desc);
-  strlcat(long_desc, " is here.", sizeof(long_desc));
-
-  format_copper_as_currency(exact_desc, sizeof(exact_desc), amount_copper);
-
-  if (obj->name)
-    free(obj->name);
-  obj->name = strdup(money_keywords);
-
-  if (obj->short_description)
-    free(obj->short_description);
-  obj->short_description = strdup(short_desc);
-
-  if (obj->description)
-    free(obj->description);
-  obj->description = strdup(long_desc);
-
-  ed = obj->ex_description;
-  if (!ed) {
-    CREATE(ed, struct extra_descr_data, 1);
-    ed->next = NULL;
-    obj->ex_description = ed;
-  }
-
-  if (ed->keyword)
-    free(ed->keyword);
-  ed->keyword = strdup(money_keywords);
-
-  if (ed->description)
-    free(ed->description);
-  snprintf(long_desc, sizeof(long_desc), "It looks like about %s.", exact_desc);
-  ed->description = strdup(long_desc);
-
-  GET_OBJ_WEIGHT(obj) = MAX(1, (int)(amount_copper / 1000));
-  GET_OBJ_COST(obj) = MAX(1, (int)MIN(amount_copper, (long long)INT_MAX));
-  GET_OBJ_VAL(obj, 0) = amount_copper;
-  GET_OBJ_VAL(obj, 1) = 0;
-  GET_OBJ_VAL(obj, 2) = 0;
-  GET_OBJ_VAL(obj, 3) = 0;
+  return ("an absolutely colossal mountain of gold coins");
 }
 
-void refresh_money_object(struct obj_data *obj)
-{
-  if (!obj)
-    return;
-
-  set_money_strings(obj);
-}
-
-struct obj_data *create_money(long long amount_copper)
+struct obj_data *create_money(int amount_copper)
 {
   struct obj_data *obj;
+  struct extra_descr_data *new_descr;
+  char buf[200];
   int y;
 
   if (amount_copper <= 0) {
-    log("SYSERR: Try to create negative or 0 money. (%lld)", amount_copper);
+    log("SYSERR: Try to create negative or 0 money. (%d)", amount_copper);
     return (NULL);
   }
   obj = create_obj();
+  CREATE(new_descr, struct extra_descr_data, 1);
+
+  if (amount_copper == 1) {
+    obj->name = strdup("coin gold");
+    obj->short_description = strdup("a gold coin");
+    obj->description = strdup("One miserable gold coin is lying here.");
+    new_descr->keyword = strdup("coin gold");
+    new_descr->description = strdup("It's just one miserable little gold coin.");
+  } else {
+    obj->name = strdup("coins gold");
+    obj->short_description = strdup(money_desc(amount_copper));
+    snprintf(buf, sizeof(buf), "%s is lying here.", money_desc(amount_copper));
+    obj->description = strdup(CAP(buf));
+
+    new_descr->keyword = strdup("coins gold");
+    if (amount_copper < 10)
+      snprintf(buf, sizeof(buf), "There are %d coins.", amount_copper);
+    else if (amount_copper < 100)
+      snprintf(buf, sizeof(buf), "There are about %d coins.", 10 * (amount_copper / 10));
+    else if (amount_copper < 1000)
+      snprintf(buf, sizeof(buf), "It looks to be about %d coins.", 100 * (amount_copper / 100));
+    else if (amount_copper < 100000)
+      snprintf(buf, sizeof(buf), "You guess there are, maybe, %d coins.",
+	      1000 * ((amount_copper / 1000) + rand_number(0, (amount_copper / 1000))));
+    else
+      strcpy(buf, "There are a LOT of coins.");	/* strcpy: OK (is < 200) */
+    new_descr->description = strdup(buf);
+  }
+
+  new_descr->next = NULL;
+  obj->ex_description = new_descr;
 
   GET_OBJ_TYPE(obj) = ITEM_MONEY;
   for(y = 0; y < TW_ARRAY_MAX; y++)
     obj->obj_flags.wear_flags[y] = 0;
   SET_BIT_AR(GET_OBJ_WEAR(obj), ITEM_WEAR_TAKE);
-  obj->item_number = NOTHING;
   GET_OBJ_VAL(obj, 0) = amount_copper;
-
-  refresh_money_object(obj);
+  GET_OBJ_COST(obj) = MAX(1, amount_copper);
+  obj->item_number = NOTHING;
 
   return (obj);
-}
-
-void merge_money_in_room(room_rnum room, struct obj_data *money)
-{
-  struct obj_data *existing;
-
-  if (!money)
-    return;
-
-  if (room == NOWHERE) {
-    extract_obj(money);
-    return;
-  }
-
-  for (existing = world[room].contents; existing; existing = existing->next_content) {
-    if (existing != money && GET_OBJ_TYPE(existing) == ITEM_MONEY) {
-      GET_OBJ_VAL(existing, 0) += GET_OBJ_VAL(money, 0);
-      refresh_money_object(existing);
-      extract_obj(money);
-      return;
-    }
-  }
-
-  obj_to_room(money, room);
-  refresh_money_object(money);
 }
 
 /* Generic Find, designed to find any object orcharacter.

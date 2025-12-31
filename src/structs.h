@@ -635,7 +635,7 @@
 #define MAX_COMPLETED_QUESTS  1024   /**< Maximum number of completed quests allowed */
 
 #define COPPER_PER_SILVER   100LL
-#define SILVER_PER_GOLD     100LL
+#define SILVER_PER_GOLD     10LL
 #define GOLD_PER_DIAMOND    1000LL
 #define COPPER_PER_GOLD     (COPPER_PER_SILVER * SILVER_PER_GOLD)
 #define COPPER_PER_DIAMOND  (COPPER_PER_GOLD * GOLD_PER_DIAMOND)
