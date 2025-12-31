@@ -896,7 +896,11 @@ static size_t copy_trunc_visible(char *dst, size_t dstsz, const char *src, size_
 
 static bool load_player_target(struct char_data *ch, const char *name, struct char_data **out, bool *from_file)
 {
-  struct char_data *vict = get_player_vis(ch, name, NULL, FIND_CHAR_WORLD);
+  char mutable_name[MAX_INPUT_LENGTH];
+  struct char_data *vict;
+
+  strlcpy(mutable_name, name, sizeof(mutable_name));
+  vict = get_player_vis(ch, mutable_name, NULL, FIND_CHAR_WORLD);
 
   if (vict) {
     if (from_file)
