@@ -957,7 +957,7 @@ static bool parse_bounty_amount(const char *arg, long long *amount_out)
         case 'g': multiplier = COPPER_PER_GOLD; break;
         case 's': multiplier = COPPER_PER_SILVER; break;
         case 'c': multiplier = 1; break;
-        default: return FALSE;
+        default: return FALSE; /* Unknown suffix */
       }
     }
 
@@ -966,7 +966,7 @@ static bool parse_bounty_amount(const char *arg, long long *amount_out)
 
     char *end = NULL;
     long long value = strtoll(token, &end, 10);
-    if (end == NULL || *end != '\0' || value < 0)
+    if (end == NULL || *end != '\0' || value <= 0)
       return FALSE;
 
     if (multiplier != 0 && value > LLONG_MAX / multiplier)
