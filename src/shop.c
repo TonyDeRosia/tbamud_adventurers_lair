@@ -30,10 +30,10 @@
 
 /* default currency unit sizes */
 #ifndef COPPER_PER_GOLD
-#define COPPER_PER_GOLD 1000
+#define COPPER_PER_GOLD 100000
 #endif
 #ifndef COPPER_PER_SILVER
-#define COPPER_PER_SILVER 100
+#define COPPER_PER_SILVER 1000
 #endif
 
 /* shop currency helpers (display and payment in copper total) */
