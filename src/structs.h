@@ -636,13 +636,17 @@
 
 #define COPPER_PER_SILVER   1000LL
 #define SILVER_PER_GOLD     100LL
+
+/* Money caps (canonical storage is copper units). Target max display: 999999g 99s 999c */
+#define MAX_MONEY (999999LL * (long long)COPPER_PER_GOLD + (long long)(SILVER_PER_GOLD - 1) * (long long)COPPER_PER_SILVER + (long long)(COPPER_PER_SILVER - 1))
+#define MAX_BANK  MAX_MONEY
+
 #define GOLD_PER_DIAMOND    1000LL
 #define COPPER_PER_GOLD     (COPPER_PER_SILVER * SILVER_PER_GOLD)
 #define COPPER_PER_DIAMOND  (COPPER_PER_GOLD * GOLD_PER_DIAMOND)
 
 /* Stored in copper units for copper silver gold */
-#define MAX_MONEY (999999LL * COPPER_PER_GOLD + (COPPER_PER_GOLD - 1))
-#define MAX_BANK  MAX_MONEY
+
 /** Define the largest set of commands for a trigger.
  * 16k should be plenty and then some. */
 #define MAX_CMD_LENGTH 16384
