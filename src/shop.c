@@ -71,11 +71,18 @@ static void shop_format_price(char *out, size_t outsz, long long total_copper)
 
 static void shop_charge(struct char_data *ch, long long cost_copper)
 {
+  if (!ch)
+    return;
+
   if (cost_copper < 0)
     cost_copper = 0;
-  GET_MONEY(ch) = (long long)GET_MONEY(ch) - cost_copper;
-  if (GET_MONEY(ch) < 0)
-    GET_MONEY(ch) = 0;
+
+  /*
+   * Use the shared currency helper to avoid overflow/underflow edge cases and
+   * keep deductions consistent with other money adjustments (e.g. object
+   * save/load and coin handling commands).
+   */
+  increase_money_copper(ch, -cost_copper);
 }
 
 /* Add copper to a character (keeper/player). */
@@ -84,17 +91,16 @@ static void shop_pay(struct char_data *ch, long long amount_copper)
   if (!ch || amount_copper <= 0)
     return;
 
-  GET_MONEY(ch) += amount_copper;
+  increase_money_copper(ch, amount_copper);
 }
 
 
 static void shop_pay_copper(struct char_data *ch, long long amt_copper)
 {
-  if (amt_copper < 0)
+  if (!ch || amt_copper < 0)
     return;
-  GET_MONEY(ch) = (long long)GET_MONEY(ch) + amt_copper;
-  if (GET_MONEY(ch) < 0)
-    GET_MONEY(ch) = 0;
+
+  increase_money_copper(ch, amt_copper);
 }
 
 /* Global variables definitions used externally */
