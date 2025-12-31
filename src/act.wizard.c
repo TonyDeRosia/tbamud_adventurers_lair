@@ -2037,13 +2037,13 @@ static void list_llog_entries(struct char_data *ch)
 }
 
 static struct char_data *is_in_game(long idnum) {
-  struct descriptor_data *i;
+  struct char_data *i;
 
-  for (i = descriptor_list; i; i = i->next) {
-    if (i->character && GET_IDNUM(i->character) == idnum) {
-      return i->character;
-    }
+  for (i = character_list; i; i = i->next) {
+    if (!IS_NPC(i) && GET_IDNUM(i) == idnum)
+      return i;
   }
+
   return NULL;
 }
 
@@ -5273,8 +5273,8 @@ ACMD(do_oset)
 ACMD(do_pull)
 {
   char arg[MAX_INPUT_LENGTH];
-  struct char_data *vict = NULL;
-  int player_i, load_result;
+  struct char_data *vict = NULL, *iter;
+  int load_result;
 
   one_argument(argument, arg);
 
@@ -5283,15 +5283,11 @@ ACMD(do_pull)
     return;
   }
 
-  if ((player_i = get_ptable_by_name(arg)) < 0) {
-    send_to_char(ch, "No such player.\r\n");
-    return;
-  }
-
-  if (is_in_game(player_table[player_i].id)) {
-    send_to_char(ch, "That player is already in the world.\r\n");
-    return;
-  }
+  for (iter = character_list; iter; iter = iter->next)
+    if (!IS_NPC(iter) && GET_NAME(iter) && !str_cmp(GET_NAME(iter), arg)) {
+      send_to_char(ch, "That player is already in the game.\r\n");
+      return;
+    }
 
   CREATE(vict, struct char_data, 1);
   clear_char(vict);
@@ -5300,7 +5296,7 @@ ACMD(do_pull)
 
   vict->desc = NULL;
 
-  if ((load_result = load_char(player_table[player_i].name, vict)) < 0 || PLR_FLAGGED(vict, PLR_DELETED)) {
+  if ((load_result = load_char(arg, vict)) < 0 || PLR_FLAGGED(vict, PLR_DELETED)) {
     send_to_char(ch, "Failed to load that player file.\r\n");
     free_char(vict);
     return;
