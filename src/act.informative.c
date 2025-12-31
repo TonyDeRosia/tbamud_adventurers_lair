@@ -1589,13 +1589,6 @@ ACMD(do_bounty)
     return;
   }
 
-  if (vict == ch) {
-    send_to_char(ch, "You cannot place a bounty on yourself.\r\n");
-    if (from_file)
-      free_char(vict);
-    return;
-  }
-
   if (IS_NPC(vict)) {
     send_to_char(ch, "You can only place bounties on players.\r\n");
     if (from_file)
