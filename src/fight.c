@@ -293,6 +293,8 @@ void stop_fighting(struct char_data *ch)
 
 static void make_corpse(struct char_data *ch)
 {
+  int inv_dropped = 0;
+  long long dropped_copper = 0;
   char buf2[MAX_NAME_LENGTH + 64];
   struct obj_data *corpse, *o;
   struct obj_data *money;
@@ -338,30 +340,34 @@ static void make_corpse(struct char_data *ch)
   for (i = 0; i < NUM_WEARS; i++)
     if (GET_EQ(ch, i)) {
       remove_otrigger(GET_EQ(ch, i), ch);
+  if (IS_NPC(ch)) {
       obj_to_obj(unequip_char(ch, i), corpse);
     }
 
-    /* transfer gold */
+    
+  }
+/* transfer gold */
   if (!IS_NPC(ch)) {
-    /* transfer gold */
-    if (GET_GOLD(ch) > 0) {
-    /* following 'if' clause added to fix gold duplication loophole. The above
-    * line apparently refers to the old "partially log in, kill the game
-    * character, then finish login sequence" duping bug. The duplication has
-    * been fixed (knock on wood) but the test below shall live on, for a
-    * while. -gg 3/3/2002 */
-    if (IS_NPC(ch) || ch->desc) {
-    money = create_money((int)GET_MONEY(ch), 0);
-    obj_to_obj(money, corpse);
+    long long have = (long long)GET_MONEY(ch);
+    dropped_copper = have / 10;
+    if (dropped_copper > 0) {
+      money = create_money((int)dropped_copper, 0);
+      obj_to_obj(money, corpse);
+      GET_MONEY(ch) = (long long)GET_MONEY(ch) - dropped_copper;
+    }
+
+    /* Death drop summary for items and money. */
+    if (inv_dropped > 0 || dropped_copper > 0) {
+      send_to_char(ch, "Death penalty: You drop %lld copper and %d inventory item(s) on your corpse.\r\n",
+                   dropped_copper, inv_dropped);
+    } else {
+      send_to_char(ch, "Death penalty: You drop nothing.\r\n");
     }
   } else {
-    /* NPC money should be handled by reward logic, not corpse piles. */
-    GET_MONEY(ch) = 0;
-  }
+    /* NPC money handled elsewhere */
 
-    GET_MONEY(ch) = 0;
   }
-  ch->carrying = NULL;
+ch->carrying = NULL;
   IS_CARRYING_N(ch) = 0;
   IS_CARRYING_W(ch) = 0;
 
@@ -422,8 +428,27 @@ struct char_data *i;
   update_pos(ch);
 
   make_corpse(ch);
-  extract_char(ch);
 
+  /* NPCs: original behavior. PCs: do NOT extract (extraction puts them into the menu).
+     Instead, respawn them at the mortal start room and keep the descriptor playing. */
+  if (IS_NPC(ch)) {
+    extract_char(ch);
+  } else {
+    /* Clear combat state and ensure valid vitals. */
+    GET_HIT(ch) = MAX(1, GET_HIT(ch));
+    GET_POS(ch) = POS_RESTING;
+
+    if (IN_ROOM(ch) != NOWHERE)
+      char_from_room(ch);
+    char_to_room(ch, r_mortal_start_room);
+
+    /* Optional: clear target and stop any lingering fighting. */
+    if (FIGHTING(ch))
+      stop_fighting(ch);
+
+    look_at_room(ch, 0);
+    send_to_char(ch, "You have died. Your spirit reforms at the temple.\r\n");
+  }
   if (killer) {
     autoquest_trigger_check(killer, NULL, NULL, AQ_MOB_SAVE);
     autoquest_trigger_check(killer, NULL, NULL, AQ_ROOM_CLEAR);
@@ -443,8 +468,18 @@ void die(struct char_data * ch, struct char_data * killer)
     save_char(killer);
     send_to_char(killer, "You claim %s for the bounty on %s.\r\n", reward_buf, GET_NAME(ch));
   }
-
-  gain_exp(ch, -(GET_EXP(ch) / 2));
+  /* Death penalty: lose half current XP (prints exact amount lost). */
+  if (!IS_NPC(ch) && GET_LEVEL(ch) < LVL_IMMORT) {
+    long long before = (long long)GET_EXP(ch);
+    long long lost = before / 2;
+    if (lost < 0) lost = 0;
+    send_to_char(ch, "Death penalty: You lose %lld experience.\r\n", lost);
+    /* gain_exp uses int in stock code; clamp to int range to be safe. */
+    if (lost > 2147483647LL) lost = 2147483647LL;
+    gain_exp(ch, (int)(-lost));
+  } else {
+    gain_exp(ch, -(GET_EXP(ch) / 2));
+  }
   if (!IS_NPC(ch)) {
     REMOVE_BIT_AR(PLR_FLAGS(ch), PLR_KILLER);
     REMOVE_BIT_AR(PLR_FLAGS(ch), PLR_THIEF);
