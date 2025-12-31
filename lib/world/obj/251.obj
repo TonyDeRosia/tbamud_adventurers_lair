@@ -5,7 +5,7 @@ A short black ape rifle is lying here.~
 ~
 5 0 0 0 0 an 0 0 0 0 0 0 0
 0 2 3 12
-7 600 25 0
+7 600000 25 0
 E
 rifle gun~
    These rifles are the main weapons of the Gorilla Soliders.  Their .308
@@ -20,7 +20,7 @@ A black ape shotgun is lying here.~
 ~
 5 0 0 0 0 an 0 0 0 0 0 0 0
 0 3 4 12
-7 800 35 0
+7 800000 35 0
 E
 shotgun gun~
    These shotguns are used mainly by Gorilla Hunters for hunting humans.  Since
@@ -35,7 +35,7 @@ A thick green ape cloak is lying here.~
 ~
 9 0 0 0 0 ak 0 0 0 0 0 0 0
 6 0 0 0
-10 200 45 0
+10 200000 45 0
 E
 green thick cloak~
    Green ape cloaks are worn mainly by the chimpanzees.  Due to their thickness,
@@ -50,7 +50,7 @@ A small ape doll is lying here.~
 ~
 12 0 0 0 0 ao 0 0 0 0 0 0 0
 0 0 0 0
-1 600 150 0
+1 600000 150 0
 E
 small ape doll~
    Most ape children own one of these ape dolls.  This particular one resembles
@@ -67,7 +67,7 @@ Some black leather gorilla armor is lying here.~
 ~
 9 0 0 0 0 ad 0 0 0 0 0 0 0
 7 0 0 0
-5 600 20 0
+5 600000 20 0
 E
 black leather gorilla armor armor~
    This black leather ape armor is worn only by Gorillas.  It doesn't offer
@@ -80,7 +80,7 @@ Ursus's black leather helmet is lying here.~
 ~
 9 a 0 0 0 ae 0 0 0 0 0 0 0
 6 0 0 0
-3 250 20 0
+3 250000 20 0
 E
 ursus black helm helmet leather black~
    This is Ursus's black helm.  Ursus is the captain of the Gorilla Soldiers, so
@@ -95,7 +95,7 @@ A simple wooden club is lying here.~
 ~
 5 0 0 0 0 an 0 0 0 0 0 0 0
 0 2 2 5
-5 100 50 0
+5 100000 50 0
 E
 club wood wooden~
    This is your basic wooden club.  Some Gorilla Soldiers use these weapons, and
@@ -108,7 +108,7 @@ A polished ape machine gun is lying here.~
 ~
 5 0 0 0 0 an 0 0 0 0 0 0 0
 0 3 5 12
-7 1000 350 0
+7 1000000 350 0
 E
 ape machine gun~
    These machine guns are used mainly for village defense.  It shoots 10 rounds
@@ -123,7 +123,7 @@ An old rusty spike is lying here.~
 ~
 5 b 0 0 0 an 0 0 0 0 0 0 0
 0 4 6 11
-5 250 25 0
+5 250000 25 0
 E
 rusty spike~
    This old spike seems to have once been part of a metal structure.  It

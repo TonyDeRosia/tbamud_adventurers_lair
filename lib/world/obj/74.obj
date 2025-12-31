@@ -49,7 +49,7 @@ A handful of edible roots juts up from the dirt.~
 ~
 19 0 0 0 0 a 0 0 0 0 0 0 0
 4 0 0 0
-2 25 5 0
+2 25000 5 0
 E
 handful edible roots~
    These roots are small and colored a tasty russet.  Aside from the dirt and
@@ -62,7 +62,7 @@ Petals scattered, a bunch of hyacinths has been tossed to the ground here.~
 ~
 13 0 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-1 15 5 0
+1 15000 5 0
 E
 bunch hyacinths white flowers~
    Pure white and refreshing, the blossoms on these flowers drip gracefully
@@ -78,7 +78,7 @@ Someone has left a pair of boots lying around.~
 ~
 9 o 0 0 0 ag 0 0 0 0 0 0 0
 2 0 0 0
-10 100 10 0
+10 100000 10 0
 E
 pair leather boots sturdy~
    Worked of good, sensible leather, these boots are well-made and should last
@@ -94,7 +94,7 @@ A battered iron shovel has been discarded here.~
 ~
 5 jm 0 0 0 an 0 0 0 l 0 0 0
 0 3 2 7
-5 250 25 0
+5 250000 25 0
 E
 shovel iron battered~
    A little dented around the iron spade, the handle still seems to be in good
@@ -107,7 +107,7 @@ A small, marble tombstone lies here, marking an unknown grave.~
 ~
 9 jm 0 0 0 aj 0 0 0 o 0 0 0
 3 0 0 0
-10 50 5 0
+10 50000 5 0
 E
 small round tombstone marble~
    Small and round, this thin marble tombstone has a thick brass strap attached
@@ -121,7 +121,7 @@ A heap of cloth collects dust as it lies here.~
 ~
 9 gp 0 0 0 ak 0 0 0 0 0 0 0
 1 0 0 0
-2 2 0 0
+2 2000 0 0
 E
 patchwork cloak heap cloth~
    This cloak is patched together from various unmatched bits of fabric of all
@@ -137,7 +137,7 @@ An earthenware jug lies on its side on the ground.~
 ~
 17 0 0 0 0 ao 0 0 0 0 0 0 0
 10 5 15 0
-5 75 7 0
+5 75000 7 0
 E
 simple earthenware jug~
    Red clay and completely unadorned, this jug looks functional and watertight.
@@ -150,7 +150,7 @@ A small pile of black silk lies crumpled on the ground.~
 ~
 11 0 0 0 0 ah 0 0 0 0 0 0 0
 0 0 0 0
-1 1 1 0
+1 1000 1 0
 E
 black silk gloves~
    Dainty enough for a woman, but large enough for a man, these fine silk
@@ -165,7 +165,7 @@ A silk veil is tossed around in the breeze.~
 ~
 11 dgh 0 0 0 ae 0 0 0 0 0 0 0
 0 0 0 0
-2 2 0 0
+2 2000 0 0
 E
 long black silk veil~
    A length of fine black silk, thie veil appears to be the sort used by
@@ -180,7 +180,7 @@ A heavy canvas bag has been tossed aside here.~
 ~
 15 0 0 0 0 ad 0 0 0 0 0 0 0
 200 0 -1 0
-2 10 1 0
+2 10000 1 0
 E
 heavy canvas bag~
    Constructed of heavy canvas, this bag is fairly large and comes with a
@@ -194,7 +194,7 @@ A bright, copper oil lamp lies here, burning merrily.~
 ~
 1 k 0 0 0 a 0 0 0 e 0 0 0
 0 0 10 0
-3 60 6 0
+3 60000 6 0
 E
 bright copper oil lamp~
    Made of a shoddy burnished copper, this lamp is functional, but
@@ -211,7 +211,7 @@ A wide, ivory bracelet is here, collecting dust.~
 ~
 9 b 0 0 0 am 0 0 0 0 0 0 0
 1 0 0 0
-2 50 5 0
+2 50000 5 0
 E
 wide ivory bracelet~
    This wide bracelet is formed of delicately carved ivory and has yellowed
@@ -227,7 +227,7 @@ Something shiny has been left lying here.~
 ~
 18 c 0 0 0 alm 0 0 0 0 0 0 0
 0 0 0 0
-1 20 2 0
+1 20000 2 0
 E
 shiny copper key~
    This key is small and made of soft copper.  Not widely used for tools as
@@ -241,7 +241,7 @@ Someone's beltpouch was left here.~
 ~
 15 0 0 0 0 al 0 0 0 0 0 0 0
 13 0 -1 0
-3 25 1 0
+3 25000 1 0
 E
 worn wide beltpouch belt pouch hide~
    Animal hide of some sort has been tanned and sewn together with thick strips
@@ -258,7 +258,7 @@ An odd shaped stone is lying here.~
 ~
 18 c 0 0 0 ag 0 0 0 0 0 0 0
 0 0 0 0
-2 10 1 0
+2 10000 1 0
 E
 square stone key~
    This key is a very intricate piece of stonework.  A chip of granite has been
@@ -272,7 +272,7 @@ A long, knobby staff lies here.~
 ~
 5 p 0 0 0 an 0 0 0 0 0 0 0
 4 2 2 7
-5 100 10 0
+5 100000 10 0
 E
 long knobby ashwood staff~
    This is a simple staff, roughly six feet in length and shaped of smooth
@@ -287,7 +287,7 @@ Nearly unnoticeable, a small ring glints in the dust.~
 ~
 11 gk 0 0 0 ab 0 0 0 g 0 0 0
 0 0 0 0
-1 300 30 0
+1 300000 30 0
 E
 platinum circlet ring small~
    This small circlet of platinum is plain and unadorned, but made of a very
@@ -303,7 +303,7 @@ A slender bit of steel has been discarded here.~
 ~
 18 c 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-1 75 7 0
+1 75000 7 0
 E
 slender steel key~
    Hardly unusual, this is a simple steel key.  It is worn from use, but it
@@ -316,7 +316,7 @@ A pile of black cloth lies in the dirt.~
 ~
 9 j 0 0 0 ak 0 0 0 0 0 0 0
 2 0 0 0
-3 100 10 0
+3 100000 10 0
 E
 sweeping black cape~
    A cape of heavy cloth, this simple bit of finery is dyed a deep, shadowy
@@ -332,7 +332,7 @@ There is a leather whip lying here, unclaimed.~
 ~
 5 bj 0 0 0 an 0 0 0 0 0 0 0
 7 1 5 10
-5 150 15 0
+5 150000 15 0
 E
 sinuous leather whip~
    Not unlike the whip a horse driver would use, this is little more than a
@@ -348,7 +348,7 @@ A charred mail suit was thrown aside here.~
 ~
 9 jmo 0 0 0 ad 0 0 0 0 0 0 0
 3 0 0 0
-20 400 40 0
+20 400000 40 0
 E
 charred suit mail~
    Seared by fire and blackened with ash, this suit of mail hardly seems
@@ -362,7 +362,7 @@ Someone's chain sleeves lie here, badly burned.~
 ~
 9 0 0 0 0 ai 0 0 0 0 0 0 0
 2 0 0 0
-10 250 25 0
+10 250000 25 0
 E
 pair chain blackened sleeves~
    This pair of chainmail sleeves has suffered grievous damage in a fire.  The
@@ -380,7 +380,7 @@ A pair of blackened leggings lies here, smouldering.~
 ~
 9 0 0 0 0 af 0 0 0 0 0 0 0
 2 0 0 0
-10 275 27 0
+10 275000 27 0
 E
 pair blackened chain leggings~
    Chain links woven together to make these sleeves have been damaged in a
@@ -398,7 +398,7 @@ A glowing length of chain was cast aside here.~
 ~
 9 a 0 0 0 al 0 0 0 0 0 0 0
 1 0 0 0
-8 350 35 0
+8 350000 35 0
 E
 glowing length chain~
    About two feet in length, this thick iron chain glows vibrantly with an
@@ -414,7 +414,7 @@ A bottle of fizzing green liquid has been set here carefully.~
 ~
 10 cg 0 0 0 a 0 0 0 0 0 0 0
 12 -1 -1 -1
-2 400 40 0
+2 400000 40 0
 E
 bottle fizzing green liquid potion~
    A rotund glass bottle with a tall, narrow neck contains a substance of
@@ -428,7 +428,7 @@ A stone vial filled with a foul-smelling oil is here.~
 ~
 10 cg 0 0 0 a 0 0 0 0 0 0 0
 12 1 -1 -1
-5 500 50 0
+5 500000 50 0
 E
 stone vial oil potion~
    This squat, stone vial is filled with an awful smelling liquid that brings
@@ -442,7 +442,7 @@ A breastplate of blue steel lies here, glowing softly.~
 ~
 9 n 0 0 0 ad 0 0 0 0 0 0 0
 5 0 0 0
-10 400 40 0
+10 400000 40 0
 E
 fine bluesteel steel blue breastplate~
    This breastplate is a gorgeous piece of work.  Crafted of fine bluesteel, an
@@ -456,7 +456,7 @@ A wicked-looking warhammer has been left here.~
 ~
 5 g 0 0 0 an 0 0 0 0 0 0 0
 2 3 2 6
-15 900 100 0
+15 900000 100 0
 E
 blue steel bluesteel warhammer hammer~
    A historic weapon, Lord Mycea's warhammer has a bluesteel head strapped to a
@@ -470,7 +470,7 @@ A band of copper lies here.~
 ~
 12 gk 0 0 0 am 0 0 0 0 0 0 0
 0 0 0 0
-5 100 10 0
+5 100000 10 0
 E
 ancient band copper~
    This copper band has deteriorated somewhat with age and is showing signs of
@@ -484,7 +484,7 @@ Someone left their little helm here.~
 ~
 9 a 0 0 0 ae 0 0 0 0 0 0 0
 2 0 0 0
-8 300 30 0
+8 300000 30 0
 E
 tiny little horned half helm~
    This helm is truly more of a metal hat.  Built like a bascinet, it lacks the
@@ -515,7 +515,7 @@ A lace handkerchief blows around on the breeze.~
 ~
 2 g 0 0 0 a 0 0 0 0 0 0 0
 12 35 -1 -1
-1 250 30 0
+1 250000 30 0
 E
 lace black handkerchief~
    A square of lace about twelve inches across, this handkerchief is dyed black

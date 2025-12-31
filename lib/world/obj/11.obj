@@ -96,7 +96,7 @@ A silver flame writhes silently on a crystal stand.~
 ~
 1 dq 0 0 0 a 0 0 0 0 0 0 0
 0 0 -1 0
-1 1000 0 0 0
+1 1000000 0 0 0
 E
 silver flame crystal stand~
    Slowly undulating, the ripples of this fire are cool and reflective, giving
@@ -112,7 +112,7 @@ Blossoms of edelweiss nod sorrowfully in the stirring air.~
 ~
 11 0 0 0 0 ae 0 0 0 0 0 0 0
 0 0 0 0
-1 10 0 0 0
+1 10000 0 0 0
 E
 blossoms flowers edelweiss~
    Delicately star-shaped, and the pure color of spun white wool, these tiny
@@ -126,7 +126,7 @@ A diamond bracelet glints brightly from the shadows.~
 ~
 11 0 0 0 0 am 0 0 0 0 0 0 0
 0 0 0 0
-1 400 0 0 0
+1 400000 0 0 0
 T 1109
 E
 diamond bracelet~
@@ -158,7 +158,7 @@ A crystal chalice sparkles with holy light.~
 ~
 15 0 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-1 10 0 0 0
+1 10000 0 0 0
 E
 crystal chalice~
    Clear as pure water, this delicate chalice sparkles as though imbued with its
@@ -172,7 +172,7 @@ A pewter blade glints sharply.~
 ~
 5 0 0 0 0 ano 0 0 0 0 0 0 0
 0 0 0 0
-1 5 0 0 0
+1 5000 0 0 0
 E
 pewter blade~
    Beautifully fashioned, this blade is extremely sharp along both its edges.
@@ -187,7 +187,7 @@ A sleep ring lies here~
 ~
 11 0 0 0 0 ab 0 0 0 0 0 0 0
 0 0 0 0
-2 4 0 0 0
+2 4000 0 0 0
 #1113
 rosewood bed~
 a rosewood bed, covered with satin~
@@ -241,7 +241,7 @@ A frosted plum has been left here.~
 ~
 19 0 0 0 0 a 0 0 0 0 0 0 0
 5 0 0 0
-1 1 0 0 0
+1 1000 0 0 0
 E
 frosted plum~
    Richly purple, this fruit is blossoming with beads of frozen juice.  Its
@@ -255,7 +255,7 @@ A brick of cheese stands frozen in place.~
 ~
 19 0 0 0 0 a 0 0 0 0 0 0 0
 7 0 0 0
-1 1 0 0 0
+1 1000 0 0 0
 E
 frozen brick cheese~
    This rich-colored cheese looks as though it was once smooth and creamy.
@@ -269,7 +269,7 @@ A pewter goblet glints subtly.~
 ~
 17 0 0 0 0 a 0 0 0 0 0 0 0
 30 30 15 0
-35 10 0 0 0
+35 10000 0 0 0
 E
 pewter goblet~
    This pretty goblet has been engraved with the image of a winged dragon.  The
@@ -343,7 +343,7 @@ A gold coin shines brightly here.~
 ~
 8 0 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-1 1 0 0 0
+1 1000 0 0 0
 E
 gold coin~
    This shiny, round coin has been abandoned for some strange reason.  Perhaps
@@ -356,7 +356,7 @@ A handful of sludge lies in a lumpy pile.~
 ~
 13 0 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-1 1 0 0 0
+1 1000 0 0 0
 E
 handful sludge~
    Mostly consisting of mud and a few green tufts of moss or fungi, this handful
@@ -378,7 +378,7 @@ white key~
 ~
 18 0 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-1 1 0 0 0
+1 1000 0 0 0
 E
 white key~
    This pale key is elegant and intricately carved.  It seems to have been
@@ -392,7 +392,7 @@ dark key~
 ~
 18 0 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-1 1 0 0 0
+1 1000 0 0 0
 E
 dark key~
    Oily black and glistening, this dark key looks as though it has been carved
@@ -406,7 +406,7 @@ crystal tiara~
 ~
 11 0 0 0 0 ae 0 0 0 0 0 0 0
 0 0 0 0
-1 300 0 0 0
+1 300000 0 0 0
 E
 crystal tiara~
    Delicate and shimmering, a thin band of crystal has been twisted by some
@@ -422,7 +422,7 @@ snow-speckled gown~
 ~
 11 0 0 0 0 ad 0 0 0 0 0 0 0
 0 0 0 0
-2 400 0 0 0
+2 400000 0 0 0
 E
 snow-speckled gown~
    Long and flowing, this elegant white gown appears to made out of an extremely
@@ -439,7 +439,7 @@ A DG test map lies here.~
 ~
 12 0 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-1 1 0 0 0
+1 1000 0 0 0
 T 1134
 E
 DG test map~

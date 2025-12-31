@@ -5,7 +5,7 @@ A half eaten chestnut lies here.~
 ~
 19 0 0 0 0 a 0 0 0 0 0 0 0
 2 0 0 0
-1 10 1 0
+1 10000 1 0
 E
 nut chest chestnut~
    A squirrel has cracked the shell open and half-eaten the juicy yellow
@@ -18,7 +18,7 @@ A blue rapier, glowing with energy hovers above the floor.~
 ~
 5 0 0 0 0 an 0 0 0 n 0 0 0
 5 5 3 11
-3 225 22 0
+3 225000 22 0
 E
 blue rapier sword~
    The finely forged blade glows with a strange blue light.  It seems
@@ -32,7 +32,7 @@ A small iron key lays here, collecting dust.~
 ~
 18 c 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-5 250 25 0
+5 250000 25 0
 #9604
 purple potion glowing~
 a purple potion~
@@ -40,7 +40,7 @@ A glowing purple potion rests here.~
 ~
 10 a 0 0 0 a 0 0 0 0 0 0 0
 12 16 1 -1
-3 500 45 0
+3 500000 45 0
 #9606
 silver thin vial~
 a vial of silver fluid~
@@ -48,7 +48,7 @@ A long vial of thin silver fluid balances precariously here.~
 ~
 10 0 0 0 0 a 0 0 0 0 0 0 0
 12 -1 -1 -1
-4 800 90 0
+4 800000 90 0
 #9608
 armor steel engraved breast plate breastplate~
 an engraved breastplate~
@@ -56,7 +56,7 @@ An engraved breastplate of steel lies here.~
 ~
 9 i 0 0 0 ad 0 0 0 0 0 0 0
 10 0 0 0
-12 900 90 0
+12 900000 90 0
 #9615
 thick green potion~
 a thick green potion~
@@ -64,7 +64,7 @@ A thick green potion sits on the floor, bubbling furiously.~
 ~
 10 0 0 0 0 a 0 0 0 0 0 0 0
 12 29 -1 -1
-1 450 35 0
+1 450000 35 0
 #9626
 claws bear~
 a pair of bear claws~
@@ -72,7 +72,7 @@ A pair of large, blunt bear claws await an owner.~
 ~
 5 0 0 0 0 an 0 0 0 0 0 0 0
 0 4 4 8
-12 120 12 0
+12 120000 12 0
 #9646
 key silvery~
 a silvery key~
@@ -80,7 +80,7 @@ A silvery key lies on the floor here.~
 ~
 18 cd 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-3 90 9 0
+3 90000 9 0
 #9652
 key roughly~
 a roughly made key~
@@ -88,7 +88,7 @@ A roughly crafted key of iron lies here.~
 ~
 18 c 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-1 1 0 0
+1 1000 0 0
 #9666
 head knight~
 an old knight's head~
@@ -96,5 +96,5 @@ The head of an old knight rolls around, looking for an owner.~
 ~
 13 0 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-5 1 0 0
+5 1000 0 0
 $~

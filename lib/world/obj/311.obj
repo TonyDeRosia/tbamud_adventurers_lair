@@ -5,7 +5,7 @@ A green drgaon's hide has been left here.~
 ~
 9 0 0 0 0 ad 0 0 0 0 0 0 0
 10 0 0 0
-11 800 0 20
+11 800000 0 20
 A
 13 25
 A
@@ -19,7 +19,7 @@ The scale from a red dragon has been dropped here.~
 ~
 9 0 0 0 0 aj 0 0 0 0 0 0 0
 9 0 0 0
-10 700 0 25
+10 700000 0 25
 A
 3 2
 A
@@ -33,7 +33,7 @@ The icy claw of a white dragon has been dropped here.~
 ~
 5 0 0 0 0 ano 0 0 0 0 0 0 0
 0 6 8 8
-5 1000 0 27
+5 1000000 0 27
 A
 19 2
 A
@@ -47,7 +47,7 @@ A fang dripping with black ooze has been left here.~
 ~
 12 0 0 0 0 ao 0 0 0 0 0 0 0
 0 0 0 0
-8 300 0 28
+8 300000 0 28
 A
 12 30
 #31104
@@ -65,7 +65,7 @@ A pile of blue sapphires lie upon the ground.~
 ~
 8 a 0 0 0 ao 0 0 0 0 0 0 0
 0 0 0 0
-10 900 0 1
+10 900000 0 1
 #31106
 gleaming blue blade~
 a gleaming blue blade~
@@ -73,7 +73,7 @@ A gleaming blue blade lies on the ground.~
 ~
 5 0 0 0 0 an 0 0 0 0 0 0 0
 0 6 9 3
-11 654 0 29
+11 654000 0 29
 A
 18 4
 A
@@ -87,7 +87,7 @@ A set of gleaming blue scale mail armor lies tossed to the ground.~
 ~
 9 0 0 0 0 ad 0 0 0 0 0 0 0
 10 0 0 0
-50 1000 0 21
+50 1000000 0 21
 A
 19 4
 A
@@ -101,7 +101,7 @@ A deep blue potion lies thrown to the ground, unbroken.~
 ~
 10 ac 0 0 0 a 0 0 0 0 0 0 0
 30 16 -1 -1
-1 100 0 0
+1 100000 0 0
 #31109
 scale tiny blue~
 a tiny blue scale~
@@ -109,7 +109,7 @@ A tiny blue scale lies upon the ground.~
 ~
 18 ac 0 0 0 ao 0 0 0 0 0 0 0
 0 0 0 0
-2 1 0 1
+2 1000 0 1
 #31110
 eye dragon~
 the Eye of the Dragon~
@@ -117,7 +117,7 @@ A dragon's eye has been left on the ground.~
 ~
 12 0 0 0 0 ao 0 0 0 0 0 0 0
 0 0 0 0
-4 100 0 22
+4 100000 0 22
 A
 12 30
 A

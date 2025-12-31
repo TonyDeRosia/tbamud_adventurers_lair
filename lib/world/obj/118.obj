@@ -47,7 +47,7 @@ A dingy white piece of cloth lies crumpled on the ground.~
 ~
 11 0 0 0 0 al 0 0 0 0 0 0 0
 0 0 0 0
-1 15 0 0
+1 15000 0 0
 E
 cloth nappy dingy white piece~
    This triangular piece of fabric is obviously meant to be folded for use as a
@@ -61,7 +61,7 @@ A pretty little sundress lies crumpled here.~
 ~
 11 0 0 0 0 ad 0 0 0 0 0 0 0
 0 0 0 0
-1 50 0 0
+1 50000 0 0
 E
 tiny blue sundress dress little pretty~
    This pretty little thing is obviously meant for a child, baby blue material
@@ -75,7 +75,7 @@ A large eye sits unblinking here.~
 ~
 13 0 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-1 1 0 0
+1 1000 0 0
 T 11805
 T 11806
 E
@@ -117,7 +117,7 @@ A leather-strapped journal lies on the ground.~
 ~
 12 dq 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-1 1 0 0
+1 1000 0 0
 T 11891
 E
 leather-strapped journal~
@@ -133,7 +133,7 @@ A little red crayon lies here.~
 ~
 21 dq 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-1 1 0 0
+1 1000 0 0
 E
 little red crayon~
    This shiny wax crayon looks just like any other, a bright blood-red it has
@@ -147,7 +147,7 @@ A little doll, dressed in blue, lies gathering dust here.~
 ~
 13 dgq 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-1 1 0 0
+1 1000 0 0
 T 11803
 E
 little doll blue~
@@ -165,7 +165,7 @@ A children's bible lies open here.~
 ~
 13 0 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-1 1 0 0
+1 1000 0 0
 E
 children's bible book~
    This little book has been designed for a child to read, colored pictures
@@ -180,7 +180,7 @@ A slightly dented billiard ball has been left lying on the floor.~
 ~
 5 0 0 0 0 an 0 0 0 0 0 0 0
 2 3 4 5
-1 1 0 0
+1 1000 0 0
 E
 slightly dented billiard ball~
    This polished red ball is smooth to the touch and extremely heavy.  It looks
@@ -209,7 +209,7 @@ A tiny humming-bird flits rapidly about.~
 ~
 12 0 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-1 1 0 0
+1 1000 0 0
 T 11809
 #11814
 fridge tall~
@@ -246,7 +246,7 @@ A carton of milk stands here.~
 ~
 17 0 0 0 0 a 0 0 0 0 0 0 0
 10 10 10 0
-25 1 0 0
+25 1000 0 0
 T 11810
 E
 milk carton~
@@ -261,7 +261,7 @@ A shiny red apple lies here.~
 ~
 19 0 0 0 0 a 0 0 0 0 0 0 0
 8 0 0 0
-1 1 0 0
+1 1000 0 0
 T 11810
 E
 shiny red apple~
@@ -276,7 +276,7 @@ A long orange carrot lies here.~
 ~
 19 0 0 0 0 a 0 0 0 0 0 0 0
 8 0 0 0
-1 1 0 0
+1 1000 0 0
 T 11810
 E
 long orange carrot~
@@ -306,7 +306,7 @@ A bright yellow fluffy towel lies neatly folded here.~
 ~
 11 0 0 0 0 adkl 0 0 0 0 0 0 0
 0 0 0 0
-1 100 0 0
+1 100000 0 0
 E
 bright yellow fluffy towels~
    This sweet citrus-smelling towel is large and vivid yellow, beautifully soft,
@@ -321,7 +321,7 @@ A shiny brass trumpet lies here.~
 ~
 12 0 0 0 0 ao 0 0 0 0 0 0 0
 0 0 0 0
-1 100 0 0
+1 100000 0 0
 E
 shiny brass trumpet~
    This brand new trumpet is made of shiny, reflective brass metal.  Three keys
@@ -336,7 +336,7 @@ Some child's dress shoes lie dropped here.~
 ~
 11 0 0 0 0 ag 0 0 0 0 0 0 0
 0 0 0 0
-1 50 0 0
+1 50000 0 0
 E
 child's dress shoes~
    These smart little shoes are obviously designed for formal occasions, but
@@ -350,7 +350,7 @@ A little white key is lying on the ground.~
 ~
 18 q 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-1 1 0 0
+1 1000 0 0
 E
 little white key~
    This tiny white key has been carved from aging wood and painted a bright
@@ -380,7 +380,7 @@ Some fresh baked bread sits here, filling the air with a warm scent.~
 ~
 19 0 0 0 0 a 0 0 0 0 0 0 0
 14 0 0 0
-1 10 0 0
+1 10000 0 0
 E
 fresh baked bread~
    This large loaf of bread has been freshly made, golden brown crispy crust and
@@ -394,7 +394,7 @@ The smell of apples and cinnamon waft from a golden pie.~
 ~
 19 0 0 0 0 a 0 0 0 0 0 0 0
 14 0 0 0
-1 10 0 0
+1 10000 0 0
 E
 golden apple pie cinnamon~
    This flaky pie is still steaming hot, cooked a delicious golden brown and
@@ -422,7 +422,7 @@ A golden pear lies here.~
 ~
 19 dq 0 0 0 a 0 0 0 0 0 0 0
 8 0 0 5
-1 1 0 0
+1 1000 0 0
 E
 pear~
    This golden curvaceous fruit is ripe and overflowing with juices.  There is a
@@ -453,7 +453,7 @@ A pile of alphabet blocks lie scattered here.~
 ~
 13 0 0 0 0 ao 0 0 0 0 0 0 0
 0 0 0 0
-1 50 0 0
+1 50000 0 0
 E
 alphabet blocks pile~
    These little wooden cubes have been painted in bright colors, each carefully
@@ -470,7 +470,7 @@ A baby bottle has been dropped on the ground, left to sour.~
 ~
 17 0 0 0 0 ao 0 0 0 0 0 0 0
 8 8 10 0
-13 50 0 0
+13 50000 0 0
 E
 baby bottle~
    This little plastic cylinder is topped with a rubber teat for small children
@@ -485,7 +485,7 @@ violet flower~
 ~
 13 0 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-1 10 0 0
+1 10000 0 0
 E
 violet flower~
    Deep morose purple, this little flower stands alone amongst a pile of
@@ -500,7 +500,7 @@ A tiny insect lies as if dead here.~
 ~
 13 dq 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-1 1 0 0
+1 1000 0 0
 T 11830
 T 11897
 E
@@ -516,7 +516,7 @@ A little black box has been set here.~
 ~
 15 dq 0 0 0 a 0 0 0 0 0 0 0
 99 1 -1 0
-1 1 0 0
+1 1000 0 0
 E
 box little black~
    This dark glistening box is set with black onyx stones, the smooth reflective
@@ -530,7 +530,7 @@ A sword lies gathering dust here.~
 ~
 5 dgq 0 0 0 an 0 0 0 0 0 0 0
 2 6 2 3
-1 1 0 0
+1 1000 0 0
 E
 sword words~
    This long sword is made of dark shimmering metal, the silvery hilt is carved
@@ -602,7 +602,7 @@ A little cluster of red berries lie fallen here.~
 ~
 19 0 0 0 0 a 0 0 0 0 0 0 0
 8 0 0 0
-1 15 0 0
+1 15000 0 0
 E
 cluster little red berries~
    These plump, juicy berries are a vibrant red color and look perfectly
@@ -631,7 +631,7 @@ A screwdriver has been left here.~
 ~
 5 jl 0 0 0 an 0 0 0 0 0 0 0
 2 5 2 11
-1 30 0 0
+1 30000 0 0
 E
 screwdriver~
    This simple tool has a chilled feeling to it as though touched with some
@@ -646,7 +646,7 @@ A toolbox sits unobtrusively off to the side.~
 ~
 15 0 0 0 0 a 0 0 0 0 0 0 0
 99 1 -1 0
-4 40 0 0
+4 40000 0 0
 E
 toolbox box~
    This rusting toolbox has been painted bright red, the old paint flaking off
@@ -660,7 +660,7 @@ A piece of twine lies coiled up.~
 ~
 11 0 0 0 0 am 0 0 0 k 0 0 0
 0 0 0 0
-1 10 0 0
+1 10000 0 0
 E
 piece twine~
    This dirty and stained piece of a twine has a sinister feel to it, almost as
@@ -675,7 +675,7 @@ A pair of pliers glint dangerously.~
 ~
 5 jl 0 0 0 an 0 0 0 0 0 0 0
 2 4 3 11
-2 20 0 0
+2 20000 0 0
 E
 pair pliers~
    This long sleek pair of pliers has a red rubber handle for easy gripping.
@@ -689,7 +689,7 @@ A long black skirt lies crumpled on the ground.~
 ~
 11 0 0 0 0 af 0 0 0 0 0 0 0
 0 0 0 0
-2 50 0 0
+2 50000 0 0
 E
 long black skirt~
    Made of black, heavy fabric, this skirt looks almost more like it is woven
@@ -705,7 +705,7 @@ A little pile of cornflakes lies scattered here.~
 ~
 19 0 0 0 0 a 0 0 0 0 0 0 0
 8 0 0 0
-1 1 0 0
+1 1000 0 0
 E
 little pile cornflakes~
    This crispy yellow cereal looks reasonably safe to eat although it is not the
@@ -764,7 +764,7 @@ A pair of eyes lie unblinking on the ground.~
 ~
 11 q 0 0 0 ae 0 0 0 0 0 0 0
 0 0 0 0
-1 1 0 0
+1 1000 0 0
 T 11848
 T 11849
 E
@@ -795,7 +795,7 @@ A sharp knife lies glinting cruelly on the ground.~
 ~
 5 0 0 0 0 an 0 0 0 0 0 0 0
 2 6 2 3
-2 200 0 0
+2 200000 0 0
 E
 sharp knife~
    This long, frightful looking blade is razor-sharp and already rust-colored
@@ -811,7 +811,7 @@ A bloody dress lies dumped in a heap.~
 ~
 11 0 0 0 0 ad 0 0 0 0 0 0 0
 0 0 0 0
-1 100 0 0
+1 100000 0 0
 E
 bloody dress~
    A faded blue color, the vague pattern of flowers can be seen on the parts of
@@ -828,7 +828,7 @@ A little black key lies forgotten here.~
 ~
 18 dq 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-1 1 0 0
+1 1000 0 0
 E
 little black key~
    This tiny black key has been carved from naturally dark wood that has then
@@ -844,7 +844,7 @@ The corpse of the red trout is lying here.~
 ~
 15 dq 0 0 0 a 0 0 0 0 0 0 0
 0 0 -1 0
-1 1 0 0
+1 1000 0 0
 T 11865
 T 11898
 #11857
@@ -854,7 +854,7 @@ The corpse of the taildove is lying here.~
 ~
 15 dq 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-1 1 0 0
+1 1000 0 0
 T 11865
 T 11898
 #11858
@@ -864,7 +864,7 @@ The corpse of the vile toad is lying here.~
 ~
 15 dq 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-1 1 0 0
+1 1000 0 0
 T 11865
 T 11898
 #11859
@@ -874,7 +874,7 @@ A darkly beautiful pearl glints from the ground.~
 ~
 11 0 0 0 0 ac 0 0 0 0 0 0 0
 0 0 0 0
-1 500 0 0
+1 500000 0 0
 E
 ana pearl darkly beautiful~
    Perfectly smooth and round, this pearl is black as the darkest depths of an
@@ -893,7 +893,7 @@ A hotdog lies gathering dust.~
 ~
 19 0 0 0 0 ao 0 0 0 0 0 0 0
 0 0 0 0
-1 1 0 0
+1 1000 0 0
 T 11871
 E
 hotdog~
@@ -924,7 +924,7 @@ A black egg lies forgotten on the ground.~
 ~
 12 cdq 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-1 1 0 0
+1 1000 0 0
 T 11880
 T 11897
 E
@@ -940,7 +940,7 @@ The severed tongue of a serpent has been left to rot.~
 ~
 11 0 0 0 0 am 0 0 0 0 0 0 0
 0 0 0 0
-1 1000 0 0
+1 1000000 0 0
 E
 serpent's tongue~
    Deep blood-red, this long tongue coils around in a spiral, its forked end
@@ -959,7 +959,7 @@ A glass of deep red wine stands here.~
 ~
 17 0 0 0 0 ao 0 0 0 0 0 0 0
 10 10 2 1
-15 1 0 0
+15 1000 0 0
 E
 wine glass red wine~
    This long stemmed glass has a delicate oval body, sparkling when any light
@@ -990,7 +990,7 @@ A black page lies gathering dust.~
 ~
 13 dq 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-1 1 0 0
+1 1000 0 0
 E
 black page~
    This dark page looks as though it is the remnants of some burned tree, the
@@ -1005,7 +1005,7 @@ A flickering candle casts long shadows about itself.~
 ~
 1 0 0 0 0 ao 0 0 0 0 0 0 0
 0 0 -1 0
-1 30 0 0
+1 30000 0 0
 E
 flickering candle~
    This is a regular candle made from soft white wax and fixed into a delicate
@@ -1019,7 +1019,7 @@ book shadows dark~
 ~
 12 q 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-1 1 0 0
+1 1000 0 0
 E
 book shadows dark~
    This thick shadowy book is made from the crispy bark of some fire-blackened
@@ -1033,7 +1033,7 @@ The corpse of a ghostly girl is lying here.~
 ~
 15 dq 0 0 0 a 0 0 0 0 0 0 0
 1 0 -1 0
-1 1 0 0
+1 1000 0 0
 T 11865
 T 11892
 T 11898
@@ -1059,7 +1059,7 @@ A fiery amulet lies flickering on the ground.~
 ~
 11 g 0 0 0 ac 0 0 0 0 0 0 0
 0 0 0 0
-1 700 0 0
+1 700000 0 0
 T 11819
 T 11894
 E
@@ -1077,7 +1077,7 @@ A little silver ring lies gathering dust.~
 ~
 11 0 0 0 0 ab 0 0 0 0 0 0 0
 0 0 0 0
-1 100 0 0
+1 100000 0 0
 E
 little silver ring~
    This delicate little ring is made from beautiful untarnished silver, a
@@ -1093,7 +1093,7 @@ A small embroidery has been left crumpled here.~
 ~
 8 0 0 0 0 ao 0 0 0 0 0 0 0
 0 0 0 0
-1 20 0 0
+1 20000 0 0
 E
 small embroidery~
    A little wooden loop has been fastened around a square piece of fabric,
@@ -1107,7 +1107,7 @@ Some lego bricks lie abandoned.~
 ~
 13 0 0 0 0 ao 0 0 0 0 0 0 0
 0 0 0 0
-1 1 0 0
+1 1000 0 0
 E
 lego bricks~
    These tiny plastic bricks are meant to be fastened together to build various
@@ -1121,7 +1121,7 @@ A box of cornflakes lies on the ground.~
 ~
 15 0 0 0 0 a 0 0 0 0 0 0 0
 30 0 -1 0
-1 1 0 0
+1 1000 0 0
 E
 box cornflakes~
    Made of white cardboard, this box has the trademark logo of cornflakes on the
@@ -1135,7 +1135,7 @@ A box of kraft macaroni and cheese lies on the ground.~
 ~
 19 0 0 0 0 a 0 0 0 0 0 0 0
 6 0 0 0
-1 1 0 0
+1 1000 0 0
 E
 box kraft cheese macaroni~
    About the size of a video tape, this blue cardboard box holds a packet of

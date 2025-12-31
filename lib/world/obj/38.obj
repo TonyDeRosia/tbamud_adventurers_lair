@@ -5,7 +5,7 @@ A disgusting, fat tail is slowly rotting away here.~
 ~
 5 0 0 0 0 an 0 0 0 0 0 0 0
 7 1 10 2
-3 15 1 0
+3 15000 1 0
 E
 rat tail~
    The apparant tail of what seems to be an unusually large rat.  Though it
@@ -35,7 +35,7 @@ The legendary Backstabber has been left here.~
 ~
 5 bc 0 0 0 an 0 0 0 0 0 0 0
 5 2 6 11
-5 250 25 0
+5 250000 25 0
 T 3802
 E
 Backstabber~
@@ -60,7 +60,7 @@ A huge pile of stolen riches lies here!~
 ~
 20 0 0 0 0 a 0 0 0 0 0 0 0
 1000 0 0 0
-1 1000 0 0
+1 1000000 0 0
 E
 pile riches~
    A huge pile of riches.  There must be thousands of coins here!  The gold and
@@ -73,7 +73,7 @@ A smelly key with flaking red paint is lying on the floor.~
 ~
 18 c 0 0 0 ao 0 0 0 0 0 0 0
 0 0 0 0
-2 100 10 0
+2 100000 10 0
 E
 smelly red key~
    It is an iron key.  It seems to have flakes of red paint that give the key a
@@ -91,5 +91,5 @@ A stinking pile of crap is lying here, filling the whole place with a nasty stin
 ~
 19 d 0 0 0 a 0 0 0 0 0 0 0
 24 0 0 1
-10 1 0 0
+10 1000 0 0
 $~

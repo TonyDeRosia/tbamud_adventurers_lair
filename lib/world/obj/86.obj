@@ -19,7 +19,7 @@ A small gold key shines here.~
 ~
 18 ac 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-1 50 5 0
+1 50000 5 0
 E
 small gold key~
    This small golden key has a singular word written upon it.  'home'
@@ -31,7 +31,7 @@ A small dagger is laying here.~
 ~
 5 0 0 0 0 an 0 0 0 0 0 0 0
 5 1 5 11
-1 40 4 0
+1 40000 4 0
 #8610
 spider key~
 a spidery key~
@@ -39,7 +39,7 @@ A silver spider shaped key is laying in the dust here.~
 ~
 18 c 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-1 50 5 0
+1 50000 5 0
 E
 silver small spider~
    A small spider that appears to have been cast in solid silver.
@@ -51,7 +51,7 @@ A tattered and faded picture lays on the floor here.~
 ~
 2 0 0 0 0 a 0 0 0 l 0 0 0
 12 1 -1 -1
-2 2 0 0
+2 2000 0 0
 E
 picture emily tattered faded~
    Emily smiles out from this faded picture.  Her long curly chocolate colored
@@ -65,7 +65,7 @@ A short sword is rusting here.~
 ~
 5 0 0 0 0 an 0 0 0 0 0 0 0
 5 2 4 3
-2 100 10 0
+2 100000 10 0
 #8613
 dirty bracers~
 a pair of dirty bracers~
@@ -73,7 +73,7 @@ Something dirty is laying here.~
 ~
 9 0 0 0 0 ai 0 0 0 0 0 0 0
 2 0 0 0
-2 80 8 0
+2 80000 8 0
 #8614
 dresser~
 an old wooden dresser~
@@ -89,7 +89,7 @@ A long whip lays curled up here.~
 ~
 5 p 0 0 0 an 0 0 0 0 0 0 0
 7 3 4 2
-5 50 5 0
+5 50000 5 0
 #8616
 rock-shaped key~
 a rock-shaped key~
@@ -97,7 +97,7 @@ An oddly shaped rock has been tossed away here.~
 ~
 18 ce 0 0 0 ao 0 0 0 0 0 0 0
 0 0 0 0
-2 100 10 0
+2 100000 10 0
 E
 stone rock odd~
    Marked with various small knobs and rods, this rock is much different from
@@ -124,7 +124,7 @@ A bandit's journal lays open on the ground here.~
 ~
 2 ch 0 0 0 a 0 0 0 0 0 0 0
 12 2 -1 -1
-5 50 5 0
+5 50000 5 0
 E
 journal bandit~
    I have traveled far in these last few months with little success in my
@@ -154,7 +154,7 @@ A small sliver of jade is laying on the ground here.~
 ~
 8 cd 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-2 250 25 0
+2 250000 25 0
 E
 small jade~
    This small piece of jade has been smoothed out to perfection by some loving

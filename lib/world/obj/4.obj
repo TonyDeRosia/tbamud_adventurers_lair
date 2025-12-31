@@ -5,7 +5,7 @@ A pair of rabbit skin gloves.~
 ~
 9 0 0 0 0 aho 0 0 0 0 0 0 0
 2 0 0 0
-6 250 0 10 0
+6 250000 0 10 0
 E
 rabbit skin gloves glove~
    The gloves are very furry.  They are made from the skin and fur of a
@@ -19,7 +19,7 @@ A pair of rabbit skin boots.~
 ~
 9 0 0 0 0 ag 0 0 0 0 0 0 0
 2 0 0 0
-8 400 0 10 0
+8 400000 0 10 0
 E
 rabbit skin boots boot~
    The boots are very well made, and look like they would protect you well.
@@ -46,7 +46,7 @@ A rawhide whip~
 ~
 5 b 0 0 0 ano 0 0 0 0 0 0 0
 2 2 3 2
-7 300 0 10 0
+7 300000 0 10 0
 E
 rawhide whip~
    The weapon looks rather strong and would defend you well in battle.  The
@@ -73,7 +73,7 @@ A teddybear was abandoned here.~
 ~
 12 0 0 0 0 ao 0 0 0 0 0 0 0
 0 0 0 0
-4 450 0 0 0
+4 450000 0 0 0
 E
 teddybear~
    The bear is rather cute looking.  There seems to be a small glow within his
@@ -86,7 +86,7 @@ A suit of wooden armor~
 ~
 9 0 0 0 0 ad 0 0 0 0 0 0 0
 5 0 0 0
-11 300 0 10 0
+11 300000 0 10 0
 E
 Wooden armor~
    The armor is quite solid, giving you the best protection available.  A
@@ -99,7 +99,7 @@ A wooden warhelm~
 ~
 9 0 0 0 0 a 0 0 0 0 0 0 0
 3 0 0 0
-8 550 0 10 0
+8 550000 0 10 0
 E
 wooden wood warhelm helmet~
    The helmet is quite solid and would protect you quite well in battle.  You
@@ -112,7 +112,7 @@ An onyx pebble is lying on the ground.~
 ~
 8 0 0 0 0 ao 0 0 0 0 0 0 0
 0 0 0 0
-1 300 0 10 0
+1 300000 0 10 0
 E
 onyx pebble rock~
    The black pebble shines as you look at it.  You feel that it must contain
@@ -142,7 +142,7 @@ A large torch.~
 ~
 1 0 0 0 0 ao 0 0 0 0 0 0 0
 0 0 24 0
-1 20 0 0 0
+1 20000 0 0 0
 E
 torch~
    Your basic torch, nothing very remarkeable about it.
@@ -154,7 +154,7 @@ A backpack is here.~
 ~
 15 0 0 0 0 ao 0 0 0 0 0 0 0
 40 5 -1 0
-5 250 0 0 0
+5 250000 0 0 0
 E
 backpack~
    A hefty backpack that can carry more than a bag.
@@ -166,7 +166,7 @@ A dagger with a long thin blade is here.~
 ~
 5 n 0 0 0 an 0 0 0 0 0 0 0
 0 1 4 11
-2 30 0 0 0
+2 30000 0 0 0
 E
 dagger~
    A simple dagger used by thieves and hoodlums to relieve the unwary of their
@@ -179,7 +179,7 @@ A mace is here.~
 ~
 5 0 0 0 0 an 0 0 0 0 0 0 0
 0 1 7 5
-6 60 0 0 0
+6 60000 0 0 0
 E
 mace~
    This mace is made of a heavy polished metal with small spikes on the end.
@@ -192,7 +192,7 @@ A long, single-edged knife lies here.~
 ~
 5 n 0 0 0 an 0 0 0 0 0 0 0
 0 1 4 11
-1 15 0 0 0
+1 15000 0 0 0
 #427
 plant~
 colorful plant~
@@ -213,7 +213,7 @@ A bird egg is lying on the ground.~
 ~
 12 0 0 0 0 ao 0 0 0 0 0 0 0
 0 0 0 0
-1 125 0 0 0
+1 125000 0 0 0
 E
 bird egg~
    The egg is speckled with shades of blue.  It's in excellent condition.
@@ -225,7 +225,7 @@ An apple~
 ~
 19 0 0 0 0 ao 0 0 0 0 0 0 0
 1 0 0 0
-3 50 0 0 0
+3 50000 0 0 0
 E
 apple~
    The red apples shines in the light, making it look more delicious.
@@ -237,7 +237,7 @@ A magical rock~
 ~
 8 a 0 0 0 ao 0 0 0 0 0 0 0
 0 0 0 0
-2 400 0 0 0
+2 400000 0 0 0
 E
 magical rock~
    The rocks seems to hold some sort of magic.  You feel the power running

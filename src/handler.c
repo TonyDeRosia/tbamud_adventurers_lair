@@ -1358,7 +1358,7 @@ struct obj_data *create_money(int amount_copper)
     obj->obj_flags.wear_flags[y] = 0;
   SET_BIT_AR(GET_OBJ_WEAR(obj), ITEM_WEAR_TAKE);
   GET_OBJ_VAL(obj, 0) = amount_copper;
-  GET_OBJ_COST(obj) = MAX(1, amount_copper / (int)COPPER_PER_GOLD);
+  GET_OBJ_COST(obj) = MAX(1, amount_copper);
   obj->item_number = NOTHING;
 
   return (obj);

@@ -5,7 +5,7 @@ A tray that was once used by an underpaid waiter lies here.~
 ~
 15 0 0 0 0 ao 0 0 0 0 0 0 0
 400 0 -1 0
-1 1000 0 0
+1 1000000 0 0
 #31701
 sash~
 a satin teal sash~
@@ -13,7 +13,7 @@ A expensive silk sash lies here waiting for you.~
 ~
 9 bkq 0 0 0 al 0 0 0 0 0 0 0
 2 0 0 0
-4 1000 0 18
+4 1000000 0 18
 A
 19 2
 A
@@ -25,7 +25,7 @@ A stained shirt lies here folded nicely.~
 ~
 9 0 0 0 0 ad 0 0 0 0 0 0 0
 4 0 0 0
-3 500 0 10
+3 500000 0 10
 A
 12 5
 A
@@ -37,7 +37,7 @@ A shiny topaz ring was left here.~
 ~
 11 0 0 0 0 abo 0 0 0 0 0 0 0
 0 0 0 0
-1 500 0 12
+1 500000 0 12
 A
 12 10
 A
@@ -49,7 +49,7 @@ A pair of shiny black shoes are on the ground.~
 ~
 9 0 0 0 0 ag 0 0 0 0 0 0 0
 5 0 0 0
-5 12 0 11
+5 12000 0 11
 E
 shoes shiny pair black~
    These shoes are perfectly spotless, meticulously kept clean by someone with a
@@ -62,7 +62,7 @@ A dirty old shovel lies against the wall.~
 ~
 5 0 0 0 0 an 0 0 0 0 0 0 0
 0 1 1 6
-7 9 0 1
+7 9000 0 1
 #31706
 dusty lantern~
 a dusty lantern~
@@ -70,7 +70,7 @@ A dusty lantern lies tipped over on the ground.~
 ~
 1 0 0 0 0 ao 0 0 0 0 0 0 0
 0 0 -1 0
-6 10 0 17
+6 10000 0 17
 A
 2 1
 A
@@ -82,7 +82,7 @@ A pair of gold sandals are buried under some dirt.~
 ~
 11 0 0 0 0 ag 0 0 0 0 0 0 0
 0 0 0 0
-2 10 0 10
+2 10000 0 10
 A
 14 15
 A
@@ -96,7 +96,7 @@ A plain looking sachel hangs here.~
 ~
 15 0 0 0 0 ao 0 0 0 0 0 0 0
 25 1 -1 0
-12 10 0 1
+12 10000 0 1
 #31709
 whisky flask silver whisky~
 an engraved silver flask~
@@ -104,7 +104,7 @@ A small flask has been left here.~
 ~
 17 0 0 0 0 ao 0 0 0 0 0 0 0
 5 5 5 0
-10 10 0 1
+10 10000 0 1
 E
 whisky flask silver whisky~
    The engraving on the side reads CTW, whatever that means..
@@ -116,7 +116,7 @@ A small piece of jewelry is on the ground.~
 ~
 11 0 0 0 0 ac 0 0 0 0 0 0 0
 0 0 0 0
-5 100 0 13
+5 100000 0 13
 E
 locket golden~
    You try and try to prise this thing open, but it will not budge.
@@ -134,7 +134,7 @@ A pile of cloth is on the ground.~
 ~
 11 0 0 0 0 al 0 0 0 0 0 0 0
 0 0 0 0
-5 200 0 11
+5 200000 0 11
 E
 sash cloth embroidered~
    Woven from the finest silk, this was obviously made for a woman of stature.
@@ -151,7 +151,7 @@ A dark pile of cloth is crumpled in the corner.~
 ~
 9 f 0 0 0 ak 0 0 0 0 0 0 0
 6 0 0 0
-5 10 0 15
+5 10000 0 15
 A
 2 2
 A
@@ -165,7 +165,7 @@ A deadly stiletto stands upright between two stones.~
 ~
 5 0 0 0 0 an 0 0 0 0 0 0 0
 3 5 3 11
-1 50 0 20
+1 50000 0 20
 A
 1 1
 A
@@ -177,7 +177,7 @@ It looks as if the floor has wrinkles.~
 ~
 9 bf 0 0 0 ak 0 0 0 0 0 0 0
 7 0 0 0
-10 1 0 15
+10 1000 0 15
 E
 cape blending~
    This wonderful cape can camouflage you in almost any setting.
@@ -193,7 +193,7 @@ A rake has been dropped on the ground.~
 ~
 12 0 0 0 0 ao 0 0 0 0 0 0 0
 0 0 0 0
-7 10 0 1
+7 10000 0 1
 E
 rake~
    Metal pronged teeth and a wooden handle.  Looks a lot like a rake.
@@ -205,7 +205,7 @@ Someone left their banana peel here... tsk, tsk, someone could fall!~
 ~
 12 0 0 0 0 ao 0 0 0 0 0 0 0
 0 0 0 0
-1 1 0 1
+1 1000 0 1
 E
 peel banana~
    No banana stuff inside, sorry, just the peel.
@@ -217,7 +217,7 @@ A pair of gardening gloves have been left here.~
 ~
 9 0 0 0 0 ah 0 0 0 0 0 0 0
 4 0 0 0
-3 10 0 1
+3 10000 0 1
 E
 gloves gardening~
    They have a bit of dirt smudged on the fingertips, but other than that, they
@@ -230,7 +230,7 @@ A small gardening shovel is laying in the ground.~
 ~
 12 0 0 0 0 ao 0 0 0 0 0 0 0
 0 0 0 0
-3 1 0 1
+3 1000 0 1
 E
 shovel gardening~
    Looks like it could dig a mean hole or two...
@@ -242,7 +242,7 @@ A shovel is propped up against a tree.~
 ~
 12 0 0 0 0 ao 0 0 0 0 0 0 0
 0 0 0 0
-9 1 0 1
+9 1000 0 1
 E
 shovel~
    Kind of makes you queasy to know that this shovel is used only for burying
@@ -274,7 +274,7 @@ A sparkling goblet full of beer has been left here.~
 ~
 17 0 0 0 0 ao 0 0 0 0 0 0 0
 3 3 1 0
-5 19 0 0
+5 19000 0 0
 #31722
 wine decanter crystal wine~
 a crystal decanter~
@@ -282,7 +282,7 @@ A crystal decanter filled with expensive wine has been left here.~
 ~
 17 0 0 0 0 ao 0 0 0 0 0 0 0
 7 7 2 0
-9 38 0 0
+9 38000 0 0
 #31723
 meat plate sizzling~
 a sizzling plate of rare szgina meat~
@@ -290,7 +290,7 @@ Someone left a REALLY tasty looking plate of food here.~
 ~
 19 0 0 0 0 ao 0 0 0 0 0 0 0
 4 0 0 0
-6 40 0 0
+6 40000 0 0
 #31724
 tray vegetable steaming~
 a steaming vegetable tray~
@@ -298,7 +298,7 @@ A steaming vegetable is here, steaming.~
 ~
 19 0 0 0 0 ao 0 0 0 0 0 0 0
 1 0 0 0
-4 20 0 0
+4 20000 0 0
 #31725
 leg yantha beast~
 leg of Yantha Beast~
@@ -306,7 +306,7 @@ Someone left their leg of Yantha Beast here - what a waste of a delicacy!~
 ~
 19 0 0 0 0 ao 0 0 0 0 0 0 0
 3 0 0 0
-5 66 0 0
+5 66000 0 0
 #31726
 ribs ilzaak pomegranete sauce~
 some Ilzaak ribs in pomegranete sauce~
@@ -314,7 +314,7 @@ There is a plate of Ilzaak ribs here steaming in pomegranete sauce.~
 ~
 19 0 0 0 0 ao 0 0 0 0 0 0 0
 5 0 0 0
-6 85 0 0
+6 85000 0 0
 #31727
 banana red~
 a red banana~
@@ -322,7 +322,7 @@ A red banana has been dropped here.~
 ~
 19 0 0 0 0 ao 0 0 0 0 0 0 0
 1 0 0 0
-2 25 0 0
+2 25000 0 0
 #31728
 chupacabre rotisseri~
 some rotiserrie chupacabre~
@@ -330,7 +330,7 @@ A warm, steaming rotiserri chupacabre has been left here.~
 ~
 19 0 0 0 0 ao 0 0 0 0 0 0 0
 10 0 0 0
-10 100 0 0
+10 100000 0 0
 #31729
 wine glass green wine~
 a beveled green glass~
@@ -338,5 +338,5 @@ A beautifully beveled green glass has been left here.~
 ~
 17 0 0 0 0 ao 0 0 0 0 0 0 0
 3 3 2 0
-3 30 0 0
+3 30000 0 0
 $~
