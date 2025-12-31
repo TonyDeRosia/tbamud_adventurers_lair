@@ -4,6 +4,9 @@
 #ifndef _CONF_H_
 #define _CONF_H_
 
+/* Currency configuration: set to 1 to store object/shop prices in copper. */
+#define SHOP_PRICE_IN_COPPER 1
+
 /* Define to empty if the keyword does not work.  */
 /* #undef const */
 

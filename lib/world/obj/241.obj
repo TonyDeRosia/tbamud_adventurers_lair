@@ -5,7 +5,7 @@ A standard issue Starfleet phaser has been left here.~
 ~
 5 a 0 0 0 an 0 0 0 0 0 0 0
 0 5 5 12
-3 200 500 0
+3 200000 500 0
 E
 phaser~
    These phasers are the standard weapon of Starfleet officers.  It offers
@@ -20,7 +20,7 @@ A large phaser rifle is lying here.~
 ~
 5 a 0 0 0 an 0 0 0 0 0 0 0
 0 7 6 12
-8 400 1000 0
+8 400000 1000 0
 E
 phaser rifle~
    This phaser rifle looks pretty powerful.  These weapons are used mainly on
@@ -35,7 +35,7 @@ A neatly folded burgandy Starfleet command uniform is lying here.~
 ~
 9 0 0 0 0 ak 0 0 0 0 0 0 0
 10 0 0 0
-5 400 500 0
+5 400000 500 0
 E
 burgandy command uniform~
    These uniforms are worn by command officers on Federation starships.  It's
@@ -54,7 +54,7 @@ A neatly folded gold Starfleet engineering uniform is lying here.~
 ~
 9 0 0 0 0 ak 0 0 0 0 0 0 0
 10 0 0 0
-5 400 500 0
+5 400000 500 0
 E
 gold engineering uniform~
    These uniforms are worn by engineering officers on Federation starships.
@@ -73,7 +73,7 @@ A neatly folded blue Starfleet medical uniform is lying here.~
 ~
 9 0 0 0 0 ak 0 0 0 0 0 0 0
 10 0 0 0
-5 400 500 0
+5 400000 500 0
 E
 blue medical uniform~
    These uniforms are worn by medical officers on Federation starships.  It's
@@ -92,7 +92,7 @@ A pair of Starfleet black boots are sitting here.~
 ~
 9 0 0 0 0 ag 0 0 0 0 0 0 0
 5 0 0 0
-3 500 250 0
+3 500000 250 0
 E
 starfleet black boots~
    These boots must be worn by all Starfleet officers while on duty.  They're
@@ -107,7 +107,7 @@ A Starfleet communication badge is lying here.~
 ~
 9 0 0 0 0 ac 0 0 0 0 0 0 0
 1 0 0 0
-1 500 500 0
+1 500000 500 0
 T 24105
 E
 starfleet communication badge~
@@ -133,7 +133,7 @@ Worf's silver chain sash has been left here.~
 ~
 9 0 0 0 0 ad 0 0 0 0 0 0 0
 8 0 0 0
-6 500 300 0
+6 500000 300 0
 E
 worf's worf sash~
    Worf's sash is some sort of Klingon clothing.  Worf always wears it, which
@@ -148,7 +148,7 @@ Geordi's VISOR is lying here.~
 ~
 9 0 0 0 0 ae 0 0 0 0 0 0 0
 2 0 0 0
-6 500 750 0
+6 500000 750 0
 T 24116
 E
 geordi geordi's visor~
@@ -167,7 +167,7 @@ A medical Tricorder is lying here, ready to be used.~
 ~
 3 0 0 0 0 ao 0 0 0 0 0 0 0
 10 5 5 28
-6 500 500 0
+6 500000 500 0
 T 24136
 E
 medical tricorder~
@@ -182,7 +182,7 @@ A shard of dilithium crystal is lying here.~
 ~
 1 a 0 0 0 ao 0 0 0 0 0 0 0
 0 0 -1 0
-2 500 250 0
+2 500000 250 0
 E
 dilithium crystal~
    Dilithium crystals are used to power warp cores of starships.  This
@@ -197,7 +197,7 @@ Captain Picard's wooden flute is sitting here.~
 ~
 12 b 0 0 0 ao 0 0 0 0 0 0 0
 0 0 0 0
-3 500 250 0
+3 500000 250 0
 T 24103
 E
 picard picard's flute~
@@ -215,7 +215,7 @@ Commander Riker's trombone has been placed here.~
 ~
 12 b 0 0 0 ao 0 0 0 0 0 0 0
 0 0 0 0
-5 500 250 0
+5 500000 250 0
 T 24106
 E
 riker riker's trombone~
@@ -233,7 +233,7 @@ A small cup of tea is sitting here.~
 ~
 17 0 0 0 0 ao 0 0 0 0 0 0 0
 4 4 11 0
-9 15 10 0
+9 15000 10 0
 #24121
 wine bottle synthehol wine~
 a synthehol~
@@ -241,7 +241,7 @@ A bottle of synthehol is standing here.~
 ~
 17 0 0 0 0 ao 0 0 0 0 0 0 0
 8 8 2 0
-13 30 10 0
+13 30000 10 0
 #24122
 ale ferengi bottle ale~
 a Ferengi bottle~
@@ -249,7 +249,7 @@ A bottle of Ferengi ale is sitting here.~
 ~
 17 0 0 0 0 ao 0 0 0 0 0 0 0
 8 8 3 0
-13 30 10 0
+13 30000 10 0
 #24123
 hisky whiskey romulan bottle whisky~
 a Romulan bottle~
@@ -257,7 +257,7 @@ A bottle of Romulan whiskey is sitting here.~
 ~
 17 0 0 0 0 ao 0 0 0 0 0 0 0
 8 8 5 0
-13 45 10 0
+13 45000 10 0
 #24124
 lemonade prune juice glass lemonade~
 a small glass~
@@ -265,7 +265,7 @@ A small glass of prune juice is sitting here.~
 ~
 17 0 0 0 0 ao 0 0 0 0 0 0 0
 8 8 6 0
-13 10 10 0
+13 10000 10 0
 #24125
 beer vulcan bottle beer~
 a Vulcan bottle~
@@ -273,7 +273,7 @@ A bottle of Vulcan beer is standing here.~
 ~
 17 0 0 0 0 ao 0 0 0 0 0 0 0
 8 8 1 0
-13 10 10 0
+13 10000 10 0
 #24126
 spacesuit suit~
 a Starfleet regulation spacesuit~
@@ -281,7 +281,7 @@ A Starfleet regulation spacesuit lies, crumpled on the floor.~
 ~
 9 0 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-3 1 0 0
+3 1000 0 0
 E
 spacesuit suit~
    These suits come in pale shades of red, blue and gold, depending on ones
@@ -335,7 +335,7 @@ A cup of earl gray tea has been discarded.~
 ~
 17 0 0 0 0 a 0 0 0 0 0 0 0
 1 1 11 0
-1 1 0 0
+1 1000 0 0
 E
 cup earl gray tea~
    This is captain Picard's favorite beverage.
@@ -347,7 +347,7 @@ A loaf of warm bread has been dropped here.~
 ~
 19 0 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-1 1 0 0
+1 1000 0 0
 E
 loaf warm bread~
    A delicious-looking loaf of warm bread.
@@ -359,7 +359,7 @@ A mug of black coffee lies steaming on the floor.~
 ~
 17 0 0 0 0 a 0 0 0 0 0 0 0
 1 1 12 0
-1 1 0 0
+1 1000 0 0
 E
 mug black coffee~
    A lovely big mug of hot black coffee.
@@ -371,7 +371,7 @@ A very dangerous-looking batleth has been carefully placed here.~
 ~
 5 0 0 0 0 an 0 0 0 0 0 0 0
 0 8 8 3
-10 1 0 0
+10 1000 0 0
 T 24117
 E
 worf batleth~
@@ -387,7 +387,7 @@ Spot seems to have lost his small red collar.~
 ~
 9 0 0 0 0 ac 0 0 0 0 0 0 0
 1 0 0 0
-1 1 0 0
+1 1000 0 0
 E
 spots collar red~
    A very fine-looking red cat's collar.  It has a small metal tag that reads

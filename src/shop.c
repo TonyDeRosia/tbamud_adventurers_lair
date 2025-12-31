@@ -35,9 +35,6 @@
 #define COPPER_PER_SILVER 100
 #endif
 
-/* SHOP_PRICE_IN_COPPER: 0=OBJ_COST is gold units (legacy), 1=OBJ_COST is copper units (new) */
-#define SHOP_PRICE_IN_COPPER 0
-
 /* shop currency helpers (display and payment in copper total) */
 static long long shop_units_to_copper(long long units)
 {

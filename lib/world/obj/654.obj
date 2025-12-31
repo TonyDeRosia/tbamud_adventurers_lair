@@ -41,7 +41,7 @@ Someone left a keychain lying here.~
 ~
 8 a 0 0 0 ao 0 0 0 0 0 0 0
 0 0 0 0
-1 1 0 0 0
+1 1000 0 0 0
 T 65400
 E
 keychain subdivision~
@@ -57,7 +57,7 @@ Someone left a keychain lying here.~
 ~
 8 a 0 0 0 ao 0 0 0 0 0 0 0
 0 0 0 0
-1 1 0 0 0
+1 1000 0 0 0
 T 65400
 E
 keychain subdivision~
@@ -73,7 +73,7 @@ Someone left a keychain lying here.~
 ~
 8 a 0 0 0 ao 0 0 0 0 0 0 0
 0 0 0 0
-1 1 0 0 0
+1 1000 0 0 0
 T 65400
 E
 keychain subdivision~
@@ -89,7 +89,7 @@ Someone left a keychain lying here.~
 ~
 8 a 0 0 0 ao 0 0 0 0 0 0 0
 0 0 0 0
-1 1 0 0 0
+1 1000 0 0 0
 T 65400
 E
 keychain subdivision~

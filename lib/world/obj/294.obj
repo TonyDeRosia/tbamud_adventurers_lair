@@ -5,7 +5,7 @@ A dangerous piece of cutlery sits here.~
 ~
 5 0 0 0 0 an 0 0 0 0 0 0 0
 0 4 3 11
-6 50 0 0
+6 50000 0 0
 E
 Knife madman madmans piece cutlery~
    There's dried blood on the blade.
@@ -19,7 +19,7 @@ A discarded awl lies here.~
 ~
 5 0 0 0 0 ano 0 0 0 0 0 0 0
 0 3 1 11
-1 5 0 0
+1 5000 0 0
 E
 awl~
    Looks like a normal awl, used to punch holes through leather.
@@ -31,7 +31,7 @@ An architect's T-Square lies forgotten here.~
 ~
 13 0 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-1 30 0 0
+1 30000 0 0
 E
 T-Square square t~
    You think its used for angles and lines and ...  Stuff.
@@ -43,7 +43,7 @@ A huge meat cleaver gathers rust here.~
 ~
 5 0 0 0 0 an 0 0 0 0 0 0 0
 0 4 4 6
-15 100 0 0
+15 100000 0 0
 E
 Cleaver knife meat meatcleaver~
    Looks like you could really hack through some meat with that thing!
@@ -59,7 +59,7 @@ A silver ring lies here.~
 ~
 9 0 0 0 0 abo 0 0 0 0 0 0 0
 2 0 0 0
-1 1000 0 0
+1 1000000 0 0
 E
 ring silver~
    Small and silver, Nice.
@@ -71,7 +71,7 @@ A pair of Leather Boots are sitting here.~
 ~
 9 0 0 0 0 ag 0 0 0 0 0 0 0
 4 0 0 0
-6 200 0 0
+6 200000 0 0
 E
 boots pair leather~
    A nice set of heavy leather boots.
@@ -83,7 +83,7 @@ A Leather tie is here.  Fashionable!~
 ~
 9 0 0 0 0 ac 0 0 0 0 0 0 0
 1 0 0 0
-1 450 0 0
+1 450000 0 0
 E
 Tie leather necktie~
    A black leather necktie.  It would go well with nothing you have.
@@ -95,7 +95,7 @@ A nice leather jacket gathers dust on the ground.~
 ~
 9 0 0 0 0 ad 0 0 0 0 0 0 0
 5 0 0 0
-15 300 0 0
+15 300000 0 0
 E
 jacket leather~
    A heavy-duty leather jacket, made for warmth and protection.
@@ -107,7 +107,7 @@ A pair of leather gloves have been discarded in a pile.~
 ~
 9 0 0 0 0 ah 0 0 0 0 0 0 0
 2 0 0 0
-1 30 0 0
+1 30000 0 0
 E
 Gloves leather~
    These heavy-duty leather gloves seem to offer a lot of hand protection for
@@ -120,7 +120,7 @@ A glittering blue gem sits here.~
 ~
 8 0 0 0 0 ao 0 0 0 0 0 0 0
 0 0 0 0
-1 1000 0 0
+1 1000000 0 0
 E
 Sapphire gem jewel~
    Pretty.  It's a sapphire, isn't it?
@@ -132,7 +132,7 @@ A sparkling green jewel sits here.~
 ~
 8 0 0 0 0 ao 0 0 0 0 0 0 0
 0 0 0 0
-1 500 0 0
+1 500000 0 0
 E
 Emerald gem jewel~
    Exquisite...  A fantastic stone.
@@ -144,7 +144,7 @@ A diamond gathers dust here.~
 ~
 8 0 0 0 0 ao 0 0 0 0 0 0 0
 0 0 0 0
-1 200 0 0
+1 200000 0 0
 E
 Diamond gem jewel~
    Wow!  A real Diamond!
@@ -158,7 +158,7 @@ A fresh slab of beef is wrapped up here.~
 ~
 19 0 0 0 0 ao 0 0 0 0 0 0 0
 15 0 0 0
-10 50 0 0
+10 50000 0 0
 E
 Slab beef~
    It's a big, bloody hunk of meat.  Mmmm.
@@ -170,7 +170,7 @@ A haunch of fresh mutton is sitting here.~
 ~
 19 0 0 0 0 ao 0 0 0 0 0 0 0
 8 0 0 0
-7 25 0 0
+7 25000 0 0
 E
 Haunch mutton~
    Looks like it came from a nice, fat sheep.
@@ -182,7 +182,7 @@ A steak of deer meat is wrapped in paper here.~
 ~
 19 0 0 0 0 ao 0 0 0 0 0 0 0
 9 0 0 0
-5 30 0 0
+5 30000 0 0
 E
 Steak deer~
    Smells gamy, but seems edible.
@@ -194,7 +194,7 @@ A length of rope is neatly coiled here.~
 ~
 13 0 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-25 250 0 0
+25 250000 0 0
 E
 Rope coil~
    The rope seems to be made of a good quality hemp.
@@ -206,7 +206,7 @@ A large metal anchor sits here.~
 ~
 13 0 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-50 1000 0 0
+50 1000000 0 0
 #29417
 Net~
 a net~
@@ -214,7 +214,7 @@ A fishing net is lying on the ground.~
 ~
 5 0 0 0 0 ano 0 0 0 0 0 0 0
 0 2 4 3
-10 1000 0 0
+10 1000000 0 0
 E
 Net~
    Its a fishing net, with little fishing hooks attached to the knots.
@@ -226,7 +226,7 @@ A stray fishhook is lying here.~
 ~
 5 0 0 0 0 ano 0 0 0 0 0 0 0
 0 1 1 11
-1 1 0 0
+1 1000 0 0
 E
 Fishhook hook~
    Its a tiny wire fishhook.  You've seen these before...
@@ -238,7 +238,7 @@ A glass of beer sits forgotten here.~
 ~
 17 0 0 0 0 ao 0 0 0 0 0 0 0
 1 1 1 0
-2 5 0 0
+2 5000 0 0
 E
 Beer glass~
    A nice glass filled with 'Mr.  Beer' brand beer.
@@ -250,7 +250,7 @@ A big glass of mead sits here, cool and frosty.~
 ~
 17 0 0 0 0 ao 0 0 0 0 0 0 0
 1 1 3 0
-2 8 0 0
+2 8000 0 0
 E
 Mead glass~
    Looks good.  Looks cold.  You sure could use some cold and alcoholic right
@@ -263,7 +263,7 @@ A shot of Whiskey is sitting here.~
 ~
 17 0 0 0 0 ao 0 0 0 0 0 0 0
 1 1 5 0
-1 10 0 0
+1 10000 0 0
 E
 Whiskey shot~
    Whew!  Looks like potent stuff!
@@ -275,7 +275,7 @@ A long sword gathers rust here.~
 ~
 5 0 0 0 0 an 0 0 0 0 0 0 0
 0 1 8 3
-12 600 0 0
+12 600000 0 0
 E
 Sword Long Longsword~
    Looks like your generic long sword.

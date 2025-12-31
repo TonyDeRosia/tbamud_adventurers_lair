@@ -5,7 +5,7 @@ A large stone club lies here.~
 ~
 5 jmop 0 0 0 an 0 0 0 0 0 0 0
 0 3 8 6
-17 500 0 20
+17 500000 0 20
 A
 18 2
 A
@@ -17,7 +17,7 @@ A huge trollhelm lies here.~
 ~
 9 jlm 0 0 0 ae 0 0 0 0 0 0 0
 6 0 0 0
-10 200 0 30
+10 200000 0 30
 A
 1 1
 #27002
@@ -27,7 +27,7 @@ A large ice club lies here.~
 ~
 5 jmo 0 0 0 an 0 0 0 0 0 0 0
 0 4 6 6
-18 200 0 30
+18 200000 0 30
 A
 19 3
 #27003
@@ -37,7 +37,7 @@ A white robe lies on the ground.~
 ~
 9 agjnop 0 0 0 ak 0 0 0 0 0 0 0
 8 0 0 0
-1 120 0 30
+1 120000 0 30
 A
 12 30
 A
@@ -49,7 +49,7 @@ A dull cloak lies here.~
 ~
 9 agjp 0 0 0 ac 0 0 0 0 0 0 0
 6 0 0 0
-1 120 0 0
+1 120000 0 0
 A
 13 30
 #27005
@@ -59,7 +59,7 @@ A pair of iron sleeves lies on the ground.~
 ~
 9 0 0 0 0 ai 0 0 0 0 0 0 0
 7 0 0 0
-10 245 0 20
+10 245000 0 20
 A
 18 -4
 A
@@ -71,7 +71,7 @@ Someone has left a translucent ice cube here.~
 ~
 8 gh 0 0 0 ao 0 0 0 0 0 0 0
 0 0 0 0
-10 500 0 0
+10 500000 0 0
 A
 2 1
 A
@@ -83,7 +83,7 @@ Someone has left a white ice cube here.~
 ~
 8 gj 0 0 0 ao 0 0 0 0 0 0 0
 0 0 0 0
-10 550 0 0
+10 550000 0 0
 A
 2 1
 A
@@ -95,7 +95,7 @@ Someone has left a white ice cube here.~
 ~
 8 gh 0 0 0 ao 0 0 0 0 0 0 0
 0 0 0 0
-10 500 0 0
+10 500000 0 0
 A
 13 -20
 A
@@ -107,7 +107,7 @@ Someone has left a white ice cube here.~
 ~
 8 gj 0 0 0 ao 0 0 0 0 0 0 0
 0 0 0 0
-10 500 0 0
+10 500000 0 0
 A
 2 2
 A
@@ -119,7 +119,7 @@ Someone has left a pearly blue ice cube here.~
 ~
 8 gj 0 0 0 ao 0 0 0 0 0 0 0
 0 0 0 0
-10 550 0 0
+10 550000 0 0
 A
 17 10
 A
@@ -131,7 +131,7 @@ A golden crystal lies here.~
 ~
 8 agjlnop 0 0 0 ao 0 0 0 0 0 0 0
 0 0 0 0
-10 1000 0 30
+10 1000000 0 30
 A
 3 3
 A

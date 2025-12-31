@@ -5,7 +5,7 @@ A lot of useless trinkets, nothing of value.~
 ~
 13 0 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-8 100 0 0 0
+8 100000 0 0 0
 E
 useless trinkets~
    Bits of discarded metal have been strung together by a piece of twine, too
@@ -18,7 +18,7 @@ A large tempered broadsword was left here.~
 ~
 5 g 0 0 0 an 0 0 0 0 0 0 0
 6 2 12 3
-8 400 40 0 0
+8 400000 40 0 0
 E
 tempered silver broadsword~
    The fine blade of silver looks magnificently crafted and forged.  The hilt is
@@ -33,7 +33,7 @@ Some chain armor made of silver is lying here.~
 ~
 9 g 0 0 0 ad 0 0 0 0 0 0 0
 4 0 0 0
-8 400 40 0 0
+8 400000 40 0 0
 E
 silver chain armor~
    Links of silver chain have been woven into this fine vest meant to be worn
@@ -49,7 +49,7 @@ Someone left a silver wristguard here.~
 ~
 9 g 0 0 0 am 0 0 0 0 0 0 0
 1 0 0 0
-8 340 34 0 0
+8 340000 34 0 0
 E
 silver wristguard~
    A thick band of silver looking to fit around a wrist.  It is superbly crafted
@@ -78,7 +78,7 @@ A belt of silver chain links was left here.~
 ~
 9 h 0 0 0 al 0 0 0 0 0 0 0
 2 0 0 0
-5 100 10 0 0
+5 100000 10 0 0
 E
 silver link chain belt~
    The links of silver have been placed over a leather belt that could easily
@@ -93,7 +93,7 @@ A silver shield with the crest of Camelot engraved on the front.~
 ~
 9 g 0 0 0 aj 0 0 0 0 0 0 0
 3 0 0 0
-12 500 50 0 0
+12 500000 50 0 0
 E
 silver shield~
    The crest of Camelot adorns both sides of this sturdy shield.  The weight is
@@ -108,7 +108,7 @@ A fine coat trimmed with silver.~
 ~
 9 0 0 0 0 ak 0 0 0 0 0 0 0
 2 0 0 0
-3 200 0 0 0
+3 200000 0 0 0
 E
 silver trimmed coat~
    A fine hooded woolen coat with wide sleeves that are trimmed with silver.
@@ -122,7 +122,7 @@ A pair of silver bracers.~
 ~
 9 0 0 0 0 ai 0 0 0 0 0 0 0
 4 0 0 0
-5 150 15 0 0
+5 150000 15 0 0
 E
 pair silver bracers~
    A shiny pair of silver bracers that can be worn upon the arms.  They are
@@ -135,7 +135,7 @@ A set of silver gauntlets engraved with the crest of Camelot.~
 ~
 9 g 0 0 0 ah 0 0 0 0 0 0 0
 4 0 0 0
-5 200 25 0 0
+5 200000 25 0 0
 E
 set silver gauntlets~
    The crest of Camelot is engraved on the palm of these fine gauntlets of
@@ -150,7 +150,7 @@ A set of silver boots with the crest of Camelot.~
 ~
 9 0 0 0 0 ag 0 0 0 0 0 0 0
 4 0 0 0
-5 150 15 0 0
+5 150000 15 0 0
 E
 silver set boots~
    A set of sturdy silver boots engraved with the crest of Camelot.  They are
@@ -163,7 +163,7 @@ A set of silver greaves with the crest of Camelot on them.~
 ~
 9 0 0 0 0 af 0 0 0 0 0 0 0
 4 0 0 0
-4 120 12 0 0
+4 120000 12 0 0
 E
 set silver greaves~
    A set of silver greaves with the crest of Camelot engraved on them appear to
@@ -176,7 +176,7 @@ A fine silver helm with the crest of Camelot on the forehead.~
 ~
 9 0 0 0 0 ae 0 0 0 0 0 0 0
 4 0 0 0
-5 150 15 0 0
+5 150000 15 0 0
 E
 fine silver helm~
    The helm's polished surface gleams around the crest of Camelot embossed upon
@@ -189,7 +189,7 @@ A silver chain made from small links with the crest of Camelot hanging from it.~
 ~
 9 0 0 0 0 ac 0 0 0 0 0 0 0
 1 0 0 0
-5 150 15 0 0
+5 150000 15 0 0
 E
 silver chain~
    A silver chain with a medallion hanging from it that resembles the crest of
@@ -203,7 +203,7 @@ A silver ring with the crest of Camelot upon it.~
 ~
 12 0 0 0 0 ab 0 0 0 0 0 0 0
 0 0 0 0
-3 90 9 0 0
+3 90000 9 0 0
 E
 silver ring~
    The surface of the ring is engraved with the crest of Camelot with the sword
@@ -217,7 +217,7 @@ A silver sceptre with the crest of Camelot upon it.~
 ~
 1 gk 0 0 0 ao 0 0 0 0 0 0 0
 0 0 -1 0
-4 500 50 0 0
+4 500000 50 0 0
 E
 silver sceptre~
    The crest of Camelot is embossed in gold upon the face of this silver
@@ -248,7 +248,7 @@ A wooden bowl with a screen mesh on its bottom was left here.~
 ~
 12 0 0 0 0 ao 0 0 0 0 0 0 0
 0 0 0 0
-3 10 0 0 0
+3 10000 0 0 0
 E
 gold panning bowl~
    The bowl is worn from use.  It looks like it is meant to pan for gold.  You
@@ -261,7 +261,7 @@ A small nugget of gold is glittering here.~
 ~
 8 0 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-1 1 0 0 0
+1 1000 0 0 0
 E
 gold nugget~
    The small nugget is probably not worth very much, but it is gold.

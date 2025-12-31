@@ -5,7 +5,7 @@ The Starstone lies here on the ground collecting dust.~
 ~
 1 abgk 0 0 0 ao 0 0 0 c 0 0 0
 0 0 -1 0
-2 600 1 0
+2 600000 1 0
 A
 14 20
 A
@@ -25,7 +25,7 @@ The Rune Saber lies here.~
 ~
 5 abg 0 0 0 an 0 0 0 0 0 0 0
 6 4 8 3
-8 200 250 0
+8 200000 250 0
 E
 rune~
    These runes appear to be ancient.  Whatever race created this sword was
@@ -53,7 +53,7 @@ A Rune Blade lies here.~
 ~
 5 abg 0 0 0 an 0 0 0 0 0 0 0
 5 4 2 3
-7 280 28 0
+7 280000 28 0
 A
 3 -2
 #5734
@@ -75,7 +75,7 @@ A suit of Scorpion Platemail lies here.~
 ~
 9 abgm 0 0 0 ad 0 0 0 0 0 0 0
 5 0 0 0
-10 250 30 0
+10 250000 30 0
 A
 14 -15
 A

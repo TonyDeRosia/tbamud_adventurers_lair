@@ -5,7 +5,7 @@ An Atomie spear has been left here.~
 ~
 5 0 0 0 0 ano 0 0 0 0 0 0 0
 0 3 2 14
-4 10 0 3
+4 10000 0 3
 A
 13 5
 #30601
@@ -15,7 +15,7 @@ A story of high adventure has been dropped here.~
 ~
 2 a 0 0 0 ao 0 0 0 0 0 0 0
 1 1 20 44
-6 10 0 1
+6 10000 0 1
 #30602
 boots grig leaping~
 the Grig Boots of Leaping~
@@ -23,7 +23,7 @@ The Grig Boots of Leaping have been dropped here.~
 ~
 9 b 0 0 0 ag 0 0 0 0 0 0 0
 6 0 0 0
-5 10 0 2
+5 10000 0 2
 A
 14 10
 #30603
@@ -33,7 +33,7 @@ A pair of Grig wings have been left here.~
 ~
 11 a 0 0 0 ak 0 0 0 0 0 0 0
 0 0 0 0
-3 111 0 3
+3 111000 0 3
 #30604
 ring small glowing~
 a small glowing ring~
@@ -41,7 +41,7 @@ A small glowing ring has been left here.~
 ~
 9 0 0 0 0 ab 0 0 0 0 0 0 0
 2 0 0 0
-2 100 0 1
+2 100000 0 1
 A
 13 10
 #30605
@@ -51,7 +51,7 @@ A small green chest is resting in the far corner.~
 ~
 15 a 0 0 0 ao 0 0 0 0 0 0 0
 1000 5 -1 0
-1 1 0 0
+1 1000 0 0
 #30606
 newbie potion~
 a newbie potion~
@@ -59,5 +59,5 @@ A newbie potion has been left here.~
 ~
 10 a 0 0 0 a 0 0 0 0 0 0 0
 1 16 3 18
-1 1 0 1
+1 1000 0 1
 $~
