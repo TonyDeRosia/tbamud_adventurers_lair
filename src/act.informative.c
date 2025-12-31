@@ -1568,6 +1568,7 @@ ACMD(do_bounty)
 {
   char target[MAX_INPUT_LENGTH];
   char amount_buf[MAX_INPUT_LENGTH];
+  char bounty_buf[MAX_INPUT_LENGTH];
   long long amount = 0;
   struct char_data *vict = NULL;
   bool from_file = FALSE;
