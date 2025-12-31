@@ -40,6 +40,9 @@
 #include "ibt.h"
 #include "mud_event.h"
 ACMD(do_stataudit);
+ACMD(do_shopdisc);
+ACMD(do_pull);
+ACMD(do_unpull);
 
 ACMD(do_offhand);
 ACMD(do_bounty);
@@ -260,6 +263,7 @@ cpp_extern const struct command_info cmd_info[] = {
 //   { "prompt"   , "pro"     , POS_DEAD    , do_display  , 0, 0 },
   { "prefedit" , "pre"     , POS_DEAD    , do_oasis_prefedit , 0, 0 },
   { "purge"    , "purge"   , POS_DEAD    , do_purge    , LVL_BUILDER, 0 },
+  { "pull"     , "pull"    , POS_DEAD    , do_pull     , LVL_GRGOD, 0 },
 
   { "qedit"    , "qedit"   , POS_DEAD    , do_oasis_qedit, LVL_BUILDER, 0 },
   { "qlist"    , "qlist"   , POS_DEAD    , do_oasis_list, LVL_BUILDER, SCMD_OASIS_QLIST },
@@ -305,6 +309,7 @@ cpp_extern const struct command_info cmd_info[] = {
   { "set"      , "set"     , POS_DEAD    , do_set      , LVL_IMMORT, 0 },
   { "shout"    , "sho"     , POS_RESTING , do_gen_comm , 0, SCMD_SHOUT },
   { "show"     , "show"    , POS_DEAD    , do_show     , LVL_IMMORT, 0 },
+  { "shopdisc" , "shopdisc", POS_STANDING, do_shopdisc , LVL_GOD, 0 },
   { "shutdow"  , "shutdow" , POS_DEAD    , do_shutdown , LVL_IMPL, 0 },
   { "shutdown" , "shutdown", POS_DEAD    , do_shutdown , LVL_IMPL, SCMD_SHUTDOWN },
   { "sip"      , "sip"     , POS_RESTING , do_drink    , 0, SCMD_SIP },
@@ -340,6 +345,7 @@ cpp_extern const struct command_info cmd_info[] = {
   { "unlock"   , "unlock"  , POS_SITTING , do_gen_door , 0, SCMD_UNLOCK },
   { "unban"    , "unban"   , POS_DEAD    , do_unban    , LVL_GRGOD, 0 },
   { "unaffect" , "unaffect", POS_DEAD    , do_wizutil  , LVL_GOD, SCMD_UNAFFECT },
+  { "unpull"   , "unpull"  , POS_DEAD    , do_unpull   , LVL_GRGOD, 0 },
   { "unfollow" , "unf"     , POS_RESTING , do_unfollow , 0, 0 },
   { "uptime"   , "uptime"  , POS_DEAD    , do_date     , LVL_GOD, SCMD_UPTIME },
   { "use"      , "use"     , POS_SITTING , do_use      , 1, SCMD_USE },
