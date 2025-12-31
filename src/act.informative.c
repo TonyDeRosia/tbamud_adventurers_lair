@@ -3796,8 +3796,10 @@ ACMD(do_scan)
   }
 } // end of do_scan
 
-ACMD(do_stataudit)
+ACMD(do_saudit)
 {
+  char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
+  struct char_data *vict = NULL;
   int base_m, base_s, base_h;
   int bonus_m, bonus_s, bonus_h;
   int total_m, total_s, total_h;
@@ -3812,25 +3814,44 @@ ACMD(do_stataudit)
     return;
   }
 
-  base_m  = crit_base_melee(ch);
-  base_s  = crit_base_spell(ch);
-  base_h  = crit_base_heal(ch);
+  half_chop(argument, arg1, arg2);
 
-  bonus_m = GET_MELEE_CRIT(ch);
-  bonus_s = GET_SPELL_CRIT(ch);
-  bonus_h = GET_HEAL_CRIT(ch);
+  if (!*arg1) {
+    vict = ch;
+  } else if (is_abbrev(arg1, "mob")) {
+    if (!*arg2) {
+      send_to_char(ch, "Audit which mobile?\r\n");
+      return;
+    } else if ((vict = get_char_vis(ch, arg2, NULL, FIND_CHAR_WORLD)) == NULL) {
+      send_to_char(ch, "No such mobile around.\r\n");
+      return;
+    }
+  } else {
+    if ((vict = get_char_vis(ch, arg1, NULL, FIND_CHAR_WORLD)) == NULL) {
+      send_to_char(ch, "They don't seem to be around.\r\n");
+      return;
+    }
+  }
 
-  total_m = crit_total_melee(ch);
-  total_s = crit_total_spell(ch);
-  total_h = crit_total_heal(ch);
+  base_m  = crit_base_melee(vict);
+  base_s  = crit_base_spell(vict);
+  base_h  = crit_base_heal(vict);
 
-  mbonus_m = GET_MELEE_CRIT_MULT(ch);
-  mbonus_s = GET_SPELL_CRIT_MULT(ch);
-  mbonus_h = GET_HEAL_CRIT_MULT(ch);
+  bonus_m = GET_MELEE_CRIT(vict);
+  bonus_s = GET_SPELL_CRIT(vict);
+  bonus_h = GET_HEAL_CRIT(vict);
 
-  mult_m = crit_mult_melee(ch);
-  mult_s = crit_mult_spell(ch);
-  mult_h = crit_mult_heal(ch);
+  total_m = crit_total_melee(vict);
+  total_s = crit_total_spell(vict);
+  total_h = crit_total_heal(vict);
+
+  mbonus_m = GET_MELEE_CRIT_MULT(vict);
+  mbonus_s = GET_SPELL_CRIT_MULT(vict);
+  mbonus_h = GET_HEAL_CRIT_MULT(vict);
+
+  mult_m = crit_mult_melee(vict);
+  mult_s = crit_mult_spell(vict);
+  mult_h = crit_mult_heal(vict);
 
   send_to_char(ch, "╔══════════════════════════════════════════════════════════════════════════════╗\r\n");
   send_to_char(ch, "║ Stat Audit                                                                    ║\r\n");

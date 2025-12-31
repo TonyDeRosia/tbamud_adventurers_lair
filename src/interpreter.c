@@ -39,7 +39,7 @@
 #include "prefedit.h"
 #include "ibt.h"
 #include "mud_event.h"
-ACMD(do_stataudit);
+ACMD(do_saudit);
 ACMD(do_shopdisc);
 ACMD(do_pull);
 ACMD(do_unpull);
@@ -296,7 +296,7 @@ cpp_extern const struct command_info cmd_info[] = {
   { "sacrifice", "sac"     , POS_RESTING , do_sac      , 0, 0 },
   { "say"      , "s"       , POS_RESTING , do_say      , 0, 0 },
   { "score"    , "sc"      , POS_DEAD    , do_score    , 0, 0 },
-  { "stataudit", "stataudit", POS_DEAD    , do_stataudit, LVL_IMMORT, 0 },
+  { "saudit"   , "saudit"   , POS_DEAD    , do_saudit   , LVL_IMMORT, 0 },
   { "scan"     , "sca"     , POS_RESTING , do_scan     , 0, 0 },
   { "scopy"    , "scopy"   , POS_DEAD    , do_oasis_copy, LVL_GOD, CON_SEDIT },
   { "sit"      , "si"      , POS_RESTING , do_sit      , 0, 0 },
