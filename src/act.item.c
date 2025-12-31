@@ -197,17 +197,43 @@ if (!IS_NPC(ch) && !PRF_FLAGGED(ch, PRF_NOHASSLE)) {
 
 static void get_check_money(struct char_data *ch, struct obj_data *obj)
 {
-  int value = GET_OBJ_VAL(obj, 0);
+  long long amount_copper = GET_OBJ_VAL(obj, 0);
+  int denom = GET_OBJ_VAL(obj, 1);
+  long long unit = 1;
+  const char *metal = "copper";
 
-  if (GET_OBJ_TYPE(obj) != ITEM_MONEY || value <= 0)
+  if (GET_OBJ_TYPE(obj) != ITEM_MONEY || amount_copper <= 0)
     return;
 
+  if (denom == 2) {
+    unit = COPPER_PER_SILVER;
+    metal = "silver";
+  } else if (denom == 3) {
+    unit = COPPER_PER_GOLD;
+    metal = "gold";
+  } else {
+    if (amount_copper >= COPPER_PER_GOLD) {
+      unit = COPPER_PER_GOLD;
+      metal = "gold";
+    } else if (amount_copper >= COPPER_PER_SILVER) {
+      unit = COPPER_PER_SILVER;
+      metal = "silver";
+    }
+  }
+
+  long long count = amount_copper / unit;
+  if (count < 1)
+    count = 1;
+
   extract_obj(obj);
-  increase_money_copper(ch, (long long)value);
-  if (value == 1)
-    send_to_char(ch, "There was 1 coin.\r\n");
+  increase_money_copper(ch, amount_copper);
+
+  if (count == 1)
+    send_to_char(ch, "There was 1 %s coin.\r\n", metal);
   else
-    send_to_char(ch, "There were %d coins.\r\n", value);
+    send_to_char(ch, "There were %lld %s coins.\r\n", count, metal);
+
+  send_to_char(ch, "(Worth %lld copper.)\r\n", amount_copper);
 }
 
 static void perform_get_from_container(struct char_data *ch, struct obj_data *obj,
@@ -416,7 +442,7 @@ static void perform_drop_gold(struct char_data *ch, int amount, byte mode, room_
   else {
     if (mode != SCMD_JUNK) {
       WAIT_STATE(ch, PULSE_VIOLENCE); /* to prevent coin-bombing */
-      obj = create_money(amount);
+      obj = create_money(amount * COPPER_PER_GOLD, 3);
       if (mode == SCMD_DONATE) {
 	      send_to_char(ch, "You throw some gold into the air where it disappears in a puff of smoke!\r\n");
 	      act("$n throws some gold into the air where it disappears in a puff of smoke!",
@@ -434,7 +460,7 @@ static void perform_drop_gold(struct char_data *ch, int amount, byte mode, room_
           return;
         }
 
-	      snprintf(buf, sizeof(buf), "$n drops %s.", money_desc(amount));
+              snprintf(buf, sizeof(buf), "$n drops %s.", money_desc(amount, "gold"));
 	      act(buf, TRUE, ch, 0, 0, TO_ROOM);
 
 	      send_to_char(ch, "You drop some gold.\r\n");
@@ -443,7 +469,7 @@ static void perform_drop_gold(struct char_data *ch, int amount, byte mode, room_
     } else {
       char buf[MAX_STRING_LENGTH];
 
-      snprintf(buf, sizeof(buf), "$n drops %s which disappears in a puff of smoke!", money_desc(amount));
+      snprintf(buf, sizeof(buf), "$n drops %s which disappears in a puff of smoke!", money_desc(amount, "gold"));
       act(buf, FALSE, ch, 0, 0, TO_ROOM);
 
       send_to_char(ch, "You drop some gold which disappears in a puff of smoke!\r\n");
@@ -553,7 +579,7 @@ static void perform_drop_currency(struct char_data *ch, int amount, int denom, i
 
   /* DONATE: behave like normal drop into room (your donate rooms logic is separate) */
   {
-    struct obj_data *obj = create_money((int)amount_copper);
+    struct obj_data *obj = create_money((int)amount_copper, denom);
     if (!obj) {
       send_to_char(ch, "Something went wrong.\r\n");
       return;
