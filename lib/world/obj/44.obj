@@ -5,7 +5,7 @@ A big sword with crude edges is lying here.~
 ~
 5 fgjn 0 0 0 an 0 0 0 0 0 0 0
 6 3 3 3
-12 480 48 0
+12 480000 48 0
 E
 sword~
    A bastard sword, made from an unknown metal, probably a mix of iron and
@@ -24,7 +24,7 @@ A longsword of orcish origin has been thrown here.~
 ~
 5 gjn 0 0 0 an 0 0 0 0 0 0 0
 6 1 8 3
-5 100 10 0
+5 100000 10 0
 A
 19 2
 A
@@ -36,7 +36,7 @@ A wicked looking spiked iron mace has been left here.~
 ~
 5 gjo 0 0 0 an 0 0 0 0 0 0 0
 3 2 3 5
-10 200 20 0
+10 200000 20 0
 A
 18 -2
 A
@@ -48,7 +48,7 @@ A dagger with a bloodstain on its tip has been plunged into the ground here.~
 ~
 5 aghj 0 0 0 an 0 0 0 0 0 0 0
 5 2 2 14
-1 150 15 0
+1 150000 15 0
 A
 4 -1
 A
@@ -62,7 +62,7 @@ A pile of purple cloth is here on the ground.~
 ~
 9 gjl 0 0 0 ak 0 0 0 0 0 0 0
 1 0 0 0
-4 4 0 0
+4 4000 0 0
 A
 4 -1
 A
@@ -76,7 +76,7 @@ A bubbling cauldron is sending peculiar smells in your direction.~
 ~
 10 ag 0 0 0 ao 0 0 0 0 0 0 0
 12 1 36 2
-6 300 30 0
+6 300000 30 0
 E
 pot cauldron magic~
    A small iron pot with a strange green glowing liquid fills the room with a
@@ -90,7 +90,7 @@ A bronze ringmail in on the ground.~
 ~
 9 g 0 0 0 ad 0 0 0 0 0 0 0
 6 0 0 0
-12 480 48 0
+12 480000 48 0
 #4408
 leather scalemail mail~
 a studded leather scalemail~
@@ -98,7 +98,7 @@ A studded leather scalemail has been left here.~
 ~
 9 g 0 0 0 ad 0 0 0 0 0 0 0
 4 0 0 0
-6 250 25 0
+6 250000 25 0
 A
 13 10
 #4409
@@ -108,7 +108,7 @@ A leather strap with iron spikes has been thrown in the corner.~
 ~
 12 gjmno 0 0 0 ac 0 0 0 0 0 0 0
 0 0 0 0
-1 150 15 0
+1 150000 15 0
 A
 17 -5
 A
@@ -122,7 +122,7 @@ A leather pouch with a string at the opening is lying here.~
 ~
 15 c 0 0 0 a 0 0 0 0 0 0 0
 10 5 -1 0
-1 10 1 0
+1 10000 1 0
 #4411
 money coins~
 some coins~
@@ -130,5 +130,5 @@ Some coins have been dropped here.~
 ~
 20 0 0 0 0 a 0 0 0 0 0 0 0
 100 0 0 0
-1 100 0 0
+1 100000 0 0
 $~

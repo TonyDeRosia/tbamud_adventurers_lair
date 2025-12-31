@@ -5,7 +5,7 @@ An intricate gold ring is lying here, sinking into the dirt.~
 ~
 13 0 0 0 0 ab 0 0 0 0 0 0 0
 0 0 0 0
-1 400 40 0 0
+1 400000 40 0 0
 #16902
 gibberling shortsword~
 a bluish shortsword~
@@ -13,7 +13,7 @@ A bluish shortsword is lying here.~
 ~
 5 0 0 0 0 an 0 0 0 0 0 0 0
 0 0 1 0
-1 10 0 0 0
+1 10000 0 0 0
 E
 gibberling shortsword~
    You see a crudely constructed shortsword, made exclusively for dismembering
@@ -28,7 +28,7 @@ A corpse is decaying here on the ground.~
 ~
 12 0 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-20 200 20 0 0
+20 200000 20 0 0
 E
 small carcass~
    You look closely and realize this stinking mass of flesh is actually the
@@ -43,7 +43,7 @@ A small twig litters the ground here.~
 ~
 13 0 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-1 1 0 0 0
+1 1000 0 0 0
 E
 brittle twig stick branch~
    A small twig litters the ground here. It's just a small, useless, dry twig.
@@ -55,7 +55,7 @@ A wicked looking butcher knife is lying here.~
 ~
 5 0 0 0 0 an 0 0 0 0 0 0 0
 1 2 2 3
-3 90 9 0 0
+3 90000 9 0 0
 E
 knife~
    It's an extra large, chipped butcher knife that looks like it has chopped
@@ -68,7 +68,7 @@ A shapeless mass of meat has been thrown here.~
 ~
 19 0 0 0 0 a 0 0 0 0 0 0 0
 2 0 0 0
-1 10 0 0 0
+1 10000 0 0 0
 E
 meat~
    It is the meat of some poor animal ripped into large chunks.  You can't even
@@ -82,7 +82,7 @@ A bejeweled, gnarled, stick is lying here.~
 ~
 3 b 0 0 0 an 0 0 0 0 0 0 0
 12 5 5 -1
-2 10 1 0 0
+2 10000 1 0 0
 E
 gibberling shaman's wand~
    It's a long, gnarled staff encrusted with jewels around one end and a large,
@@ -95,7 +95,7 @@ Some wild berries are lying on the ground.~
 ~
 19 0 0 0 0 a 0 0 0 0 0 0 0
 1 0 0 0
-1 1 0 0 0
+1 1000 0 0 0
 E
 berries ~
    You see a small bunch of fresh wild berries gathered in the mountains.
@@ -107,7 +107,7 @@ A large wooden keg is here.~
 ~
 17 0 0 0 0 a 0 0 0 0 0 0 0
 35 20 4 0
-25 15 1 0 0
+25 15000 1 0 0
 E
 keg~
    You observe a large, iron banded, wooden keg of gibberling workmanship,
@@ -120,7 +120,7 @@ Some hide trousers have been thrown on the ground here.~
 ~
 9 0 0 0 0 af 0 0 0 0 0 0 0
 0 0 0 0
-2 10 1 0 0
+2 10000 1 0 0
 E
 hide trousers~
    You see a ruggedly constructed pair of comfortable hide pants, apparently
@@ -157,7 +157,7 @@ An animal carcass is rotting in the dirt.~
 ~
 12 0 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-3 3 0 0 0
+3 3000 0 0 0
 E
 rotting animal carcass~
    It is the mangled, half-eaten carcass, of some poor, hapless creature, torn
@@ -172,7 +172,7 @@ A shiny brass skullcap is on the ground here.~
 ~
 9 a 0 0 0 ae 0 0 0 0 0 0 0
 0 0 0 0
-5 100 10 0 0
+5 100000 10 0 0
 E
 brass skullcap~
    You see a shiny brass skullcap with spikes arranged in a cirle around the
@@ -185,7 +185,7 @@ Some tough leather trousers have been tossed here.~
 ~
 9 a 0 0 0 af 0 0 0 0 0 0 0
 4 0 0 0
-2 20 2 0 0
+2 20000 2 0 0
 E
 leather tough trousers~
    You see a thick pair of leather pants, made of 4 different kinds of leather
@@ -198,7 +198,7 @@ A great bluish imperial sword lies here.~
 ~
 5 ag 0 0 0 an 0 0 0 0 0 0 0
 6 2 6 3
-12 545 55 0 0
+12 545000 55 0 0
 E
 sword imperial~
    It is a very large battlesword bearing many magical symbols, and apparently
@@ -238,7 +238,7 @@ A hand-made bowl or pot is laying in the dirt.~
 ~
 17 0 0 0 0 a 0 0 0 0 0 0 0
 4 0 0 0
-2 2 0 0 0
+2 2000 0 0 0
 #16919
 gib potion~
 a gib potion~
@@ -246,7 +246,7 @@ A gibberling potion is lying here.~
 ~
 10 0 0 0 0 a 0 0 0 0 0 0 0
 12 28 -1 -1
-1 1 0 0 0
+1 1000 0 0 0
 E
 potion~
    It's a small, painted, clay bottle of gibberling energy tonic, the only
@@ -259,7 +259,7 @@ A small fortune is lying here, sparkling!~
 ~
 20 0 0 0 0 a 0 0 0 0 0 0 0
 1000 0 0 0
-1 1 0 0 0
+1 1000 0 0 0
 E
 fortune~
    You see a pile of coins.
@@ -271,7 +271,7 @@ A large green bottle of whiskey has been left here.~
 ~
 17 0 0 0 0 a 0 0 0 0 0 0 0
 10 10 5 5
-15 50 0 0 0
+15 50000 0 0 0
 E
 bottle whisky whiskey~
    The bottle is large and green!  The label on the side says, 'XXX'.  Only the

@@ -5,7 +5,7 @@ A list of the staff's emails has been left here.~
 ~
 12 0 0 0 0 ao 0 0 0 0 0 0 0
 0 0 0 0
-1 1 0 0 0
+1 1000 0 0 0
 T 1205
 E
 list email staff~
@@ -18,7 +18,7 @@ A small pamphlet advertising the wonderful world of Trigedit.~
 ~
 12 0 0 0 0 an 0 0 0 0 0 0 0
 0 0 0 0
-1 1 0 0 0
+1 1000 0 0 0
 E
 pamphlet trigedit~
    Are you looking to pour in life into your mobs?  To enliven your rooms?  Or
@@ -35,7 +35,7 @@ A scroll.~
 ~
 2 0 0 0 0 a 0 0 0 0 0 0 0
 1 31 -1 -1
-1 7 0 0 0
+1 7000 0 0 0
 #1203
 color test object~
 a color test object~
@@ -43,7 +43,7 @@ This is a @Rred@n test object~
 ~
 1 0 0 0 0 a 0 0 0 0 0 0 0
 0 0 23 0
-1 1 0 0 0
+1 1000 0 0 0
 #1204
 wand~
 the wand~
@@ -51,7 +51,7 @@ A test wand~
 ~
 3 0 0 0 0 a 0 0 0 0 0 0 0
 1 1 1 31
-1 1 0 0 0
+1 1000 0 0 0
 T 1284
 #1205
 staff~
@@ -60,7 +60,7 @@ Staff~
 ~
 4 0 0 0 0 a 0 0 0 0 0 0 0
 1 3 3 31
-1 1 0 0 0
+1 1000 0 0 0
 #1207
 neon sign~
 a neon sign~
@@ -104,7 +104,7 @@ You can't see it...it isn't here.~
 ~
 9 0 0 0 0 ad 0 0 0 0 0 0 0
 0 0 0 0
-1 1 0 0 0
+1 1000 0 0 0
 #1211
 neon sign~
 a @Rn@Ge@Yo@Wn @Bs@Ci@Mg@Rn@n~
@@ -150,7 +150,7 @@ A pile of sheer silk is here, almost transparent.~
 ~
 11 0 0 0 0 ad 0 0 0 0 0 0 0
 0 0 0 0
-1 1 0 0 0
+1 1000 0 0 0
 E
 near-transparent small garmet silk sheer transparent~
    The tiny silk dress is cut so thin it is almost transparent, and it doesn't
@@ -206,7 +206,7 @@ It looks like a half finished spell~
 ~
 2 g 0 0 0 ao 0 0 0 0 0 0 0
 12 51 -1 -1
-1 250 10 0 0
+1 250000 10 0 0
 #1231
 test object~
 the test object~
@@ -214,7 +214,7 @@ A test object.~
 ~
 15 0 0 0 0 a 0 0 0 0 0 0 0
 1 0 0 0
-1 1 0 0 0
+1 1000 0 0 0
 #1233
 weapon level 34~
 a level 34 weapon~
@@ -222,7 +222,7 @@ A level 34 weapon is used to test level restrictions.~
 ~
 5 0 0 0 0 ano 0 0 0 0 0 0 0
 11 2 2 0
-1 1 0 34 0
+1 1000 0 34 0
 #1266
 Black Staff of Immortality~
 the black staff of immortality~
@@ -230,7 +230,7 @@ A Gigantic Black Staff rests here.~
 ~
 4 b 0 0 0 ao 0 0 0 0 0 0 0
 1 10 10 23
-5 1 0 30 0
+5 1000 0 30 0
 E
 staff black~
    A Huge staff sits here eminating a tremendous power.
@@ -242,7 +242,7 @@ A magical switch from a willow tree has carelessly been discarded here.~
 ~
 5 b 0 0 0 an 0 0 0 0 0 0 0
 7 10 5 2
-2 1000 0 0 0
+2 1000000 0 0 0
 T 1270
 E
 switch willow~
@@ -255,7 +255,7 @@ A Builder Academy uniform has been left here.~
 ~
 11 0 0 0 0 ad 0 0 0 0 0 0 0
 0 0 0 0
-1 1 0 0 0
+1 1000 0 0 0
 #1290
 fountain poisoned~
 poisoned fountain~
@@ -279,7 +279,7 @@ An American flag waves proudly in the wind, marking wishes for the safe return o
 ~
 12 0 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-1 1 0 0 0
+1 1000 0 0 0
 E
 flag american~
    The proud stars and stripes are set strongly against the blue background of
@@ -295,7 +295,7 @@ Elaseth's notebook~
 ~
 9 0 0 0 0 ao 0 0 0 0 0 0 0
 0 0 0 0
-1 1 0 0 0
+1 1000 0 0 0
 #1296
 lamp hanukah~
 a hanukah lamp~

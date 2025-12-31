@@ -35,7 +35,7 @@ A face mask gathering the surrounding forces of nature lays here translucent.~
 ~
 9 f 0 0 0 ae 0 0 0 0 0 0 0
 6 0 0 0
-4 200 20 0
+4 200000 20 0
 E
 odylic face mask~
    The face mask is transparent, practically invisble and covers the entire
@@ -48,7 +48,7 @@ An enchanted translucent breastplate lays here.~
 ~
 9 f 0 0 0 ad 0 0 0 0 0 0 0
 7 0 0 0
-4 200 20 0
+4 200000 20 0
 E
 odylic breastplate~
    The breastplate is unbelievably light and made from a see through material.
@@ -61,7 +61,7 @@ A pair of barely visible odylic sandals lay here collecting energy.~
 ~
 9 f 0 0 0 ag 0 0 0 0 0 0 0
 3 0 0 0
-4 40 4 0
+4 40000 4 0
 E
 odylic sandals~
    The sandals are made from a strange transparent material, they fit snuggly
@@ -74,7 +74,7 @@ Looks like someone has escaped an odylic wristlock, and just left it here.~
 ~
 12 g 0 0 0 am 0 0 0 0 0 0 0
 0 0 0 0
-1 310 31 0
+1 310000 31 0
 E
 odylic wristlock~
    These strange restraints can now be worn about the wrists, offering greater
@@ -94,7 +94,7 @@ Small rings eluminating with odylic energy lays here nearly unseen.~
 ~
 12 fg 0 0 0 ab 0 0 0 0 0 0 0
 0 0 0 0
-1 500 50 0
+1 500000 50 0
 E
 odylic ring~
    The transparaent ring glows with an unearthly light.  It emanates a feeling
@@ -111,7 +111,7 @@ A large shield bursting with energy lays here.~
 ~
 9 f 0 0 0 aj 0 0 0 0 0 0 0
 8 0 0 0
-10 750 75 0
+10 750000 75 0
 E
 shield odylic~
    The shield has a strange feeling of other worldly power and protection, it's
@@ -124,7 +124,7 @@ An odylic amulet lays here collecting impurities.~
 ~
 12 f 0 0 0 ac 0 0 0 0 0 0 0
 0 0 0 0
-4 470 47 0
+4 470000 47 0
 E
 odylic amulet~
    The powerful amulet brings forth a lust for battle and blood.  It's power
@@ -141,7 +141,7 @@ A pair of darken, battered odylic leg plates lay here.~
 ~
 9 f 0 0 0 af 0 0 0 0 0 0 0
 7 0 0 0
-6 450 45 0
+6 450000 45 0
 E
 odylic greaves leg plates~
    The odylic greaves though transparent have a dark presence that seems to be
@@ -154,7 +154,7 @@ Some odylic should plates lay here.~
 ~
 9 f 0 0 0 ai 0 0 0 0 0 0 0
 7 0 0 0
-5 375 37 0
+5 375000 37 0
 E
 odylic shoulder plates~
    The plates seem to magically mold into the desired shape of whom ever
@@ -167,7 +167,7 @@ A stunning cloak made from an erotic red velvet lays here wasted.~
 ~
 9 p 0 0 0 ak 0 0 0 0 0 0 0
 3 0 0 0
-6 350 35 0
+6 350000 35 0
 E
 vampire cloak~
    This blood red cloak is made from a thick velvet material that seems to flow
@@ -182,7 +182,7 @@ Some odylic gauntlets lay here absorbing odylic energy.~
 ~
 9 f 0 0 0 ah 0 0 0 0 0 0 0
 7 0 0 0
-4 300 30 0
+4 300000 30 0
 E
 odylic gauntlets~
    The strange transparent material is very flexible and seems to form to the
@@ -195,7 +195,7 @@ A piece of odylic slate lays here.~
 ~
 9 f 0 0 0 al 0 0 0 0 0 0 0
 3 0 0 0
-4 40 4 0
+4 40000 4 0
 E
 odylic piece scabbard slate~
    The strange transparent material seems to have been the scabbard from a
@@ -208,7 +208,7 @@ A really long bone, belonging to a incredibly huge creature lays here now.~
 ~
 5 0 0 0 0 an 0 0 0 0 0 0 0
 3 3 4 7
-4 40 4 0
+4 40000 4 0
 E
 long bone~
    This strange bone has a feeling of power and anger about it.  It would make
@@ -221,7 +221,7 @@ A handwrap with elugated spikes pertuding is here on the ground.~
 ~
 5 0 0 0 0 an 0 0 0 0 0 0 0
 8 3 3 8
-4 40 4 0
+4 40000 4 0
 E
 spiked handwrap~
    This handwrapping is inlayed with deadly spikes with which would do a number
@@ -234,7 +234,7 @@ An enormously huge fillet knife is here, ready to fillet the world's largest tun
 ~
 12 0 0 0 0 an 0 0 0 0 0 0 0
 0 0 0 0
-16 800 80 0
+16 800000 80 0
 E
 broad tempered scimitar~
    The blade is long and polished, making it a deadly weapon.
@@ -246,7 +246,7 @@ A rough looking weapon is here burnt for all it's made for.~
 ~
 5 0 0 0 0 an 0 0 0 0 0 0 0
 0 1 25 0
-4 20 2 0
+4 20000 2 0
 E
 dancing fire soul weapon~
    This abandoned soul has been transformed into a weapon, and now seems
@@ -259,7 +259,7 @@ A spikey twig lays on the ground waiting for you to step on.~
 ~
 3 0 0 0 0 ao 0 0 0 0 0 0 0
 12 2 2 19
-3 150 15 0
+3 150000 15 0
 E
 spikey twig~
    This strange twig has a strange feeling to it.  It seems to fade in and out
@@ -272,7 +272,7 @@ A greeny moss covered piece of wood lays here.~
 ~
 3 0 0 0 0 ao 0 0 0 0 0 0 0
 12 2 2 18
-1 1000 100 0
+1 1000000 100 0
 E
 water soaked branch moss wood greeny~
    The branch seems to glow red and blue on each end seeming to detect some
@@ -285,7 +285,7 @@ A green and blue stick covered in algae lays here on the ground.~
 ~
 3 0 0 0 0 ao 0 0 0 0 0 0 0
 12 2 2 21
-1 550 55 0
+1 550000 55 0
 E
 algae green blue stick~
    The stick seems rotten, and diseased, but it's magical qualities make it
@@ -298,7 +298,7 @@ A red and yellow algae covered stick lays here.~
 ~
 3 0 0 0 0 ao 0 0 0 0 0 0 0
 12 2 2 39
-1 175 17 0
+1 175000 17 0
 E
 red yellow algae stick~
    The stick is remarkably strong for it's size and condition.
@@ -310,7 +310,7 @@ A blue and brown algae covered stick lays here on the ground.~
 ~
 3 0 0 0 0 ao 0 0 0 0 0 0 0
 12 2 2 42
-1 250 25 0
+1 250000 25 0
 E
 blue brown algae stick~
    This stick has a homey feeling to it.
@@ -322,7 +322,7 @@ A brown and marron algae covered stick lays here.~
 ~
 3 0 0 0 0 ao 0 0 0 0 0 0 0
 12 2 2 51
-1 180 18 0
+1 180000 18 0
 E
 brown maroon algae stick~
    The stick smells faintly of the ocean and is extremely sodden.
@@ -334,7 +334,7 @@ A slimy green moss covered twig lays here on the ground.~
 ~
 3 0 0 0 0 ao 0 0 0 0 0 0 0
 12 2 2 -1
-1 500 50 0
+1 500000 50 0
 E
 slimy green moss covered twig~
    The stick has a strange evil blessing emanating from within itself.
@@ -346,7 +346,7 @@ A twig taken from a dead olive tree lays here.~
 ~
 3 0 0 0 0 ao 0 0 0 0 0 0 0
 12 2 2 43
-1 1000 100 0
+1 1000000 100 0
 E
 dead olive twig~
    This twig seemed to have once been ill and diseased but has now miraculously
@@ -359,7 +359,7 @@ A piece of bark ripped from a tree has been left here rotting.~
 ~
 3 0 0 0 0 ao 0 0 0 0 0 0 0
 12 2 2 -1
-1 120 12 0
+1 120000 12 0
 E
 rotting white bark~
    The bark seems to have aged beyond it's normal years.  As if it's life had
@@ -372,7 +372,7 @@ A tree bark soaked too long in water has been left here.~
 ~
 3 0 0 0 0 ao 0 0 0 0 0 0 0
 12 2 2 20
-1 750 75 0
+1 750000 75 0
 E
 water damaged tree bark~
    The bark has the strange ability to detect forms of magic.
@@ -384,7 +384,7 @@ A dried up animal's groin lays here smelling really bad.~
 ~
 3 0 0 0 0 ao 0 0 0 0 0 0 0
 12 2 2 35
-1 600 60 0
+1 600000 60 0
 E
 dried up deer's penis~
    This disgusting extremity could make you drop or junk anything.
@@ -396,7 +396,7 @@ A rhino's horn lays here on the ground.~
 ~
 3 0 0 0 0 ao 0 0 0 0 0 0 0
 12 2 2 29
-1 160 16 0
+1 160000 16 0
 E
 rhino horn~
    The horn is dull and worn from age.  It seems to fade in and out of
@@ -409,7 +409,7 @@ A very disgusting nipple has been ripped off some poor woman and sits here.~
 ~
 3 0 0 0 0 ao 0 0 0 0 0 0 0
 12 2 2 -1
-1 900 90 0
+1 900000 90 0
 E
 nun's nipple~
    The nipple has a strange ability to rejuvenate it's user.
@@ -421,7 +421,7 @@ A pair of very small testicles sits here.~
 ~
 3 0 0 0 0 ao 0 0 0 0 0 0 0
 12 2 2 50
-1 120 12 0
+1 120000 12 0
 E
 good knight testicle~
    The testicle is shriveled and extremely small.  After seeing this you
@@ -434,7 +434,7 @@ A bag sits here on the ground smelling very tempting.~
 ~
 3 0 0 0 0 ao 0 0 0 0 0 0 0
 12 2 2 -1
-1 200 20 0
+1 200000 20 0
 E
 mind altering smelling bag~
    This strange bag has the ability to rejuvenate those who dwell in the
@@ -447,7 +447,7 @@ A brass rim made from badly forged brass lays here.~
 ~
 9 0 0 0 0 ae 0 0 0 0 0 0 0
 2 0 0 0
-3 60 6 0
+3 60000 6 0
 E
 brass visor~
    The brass visor is poorly made and in need of a good shining.
@@ -459,7 +459,7 @@ A long slate of brass lays here covering a lot of other equipment.~
 ~
 9 0 0 0 0 ad 0 0 0 0 0 0 0
 4 0 0 0
-15 300 30 0
+15 300000 30 0
 E
 brass chestplate~
    The chestplate has been beaten and bloodied from use.  Not very appealing,
@@ -472,7 +472,7 @@ A sleeve made from boiled and cut horn lays here.~
 ~
 9 0 0 0 0 ai 0 0 0 0 0 0 0
 5 0 0 0
-3 30 3 0
+3 30000 3 0
 E
 horn scaled sleeves~
    These sleeves are very unique, made from horns of an unidentifiable beast
@@ -485,7 +485,7 @@ A longish plate made from scaled horns lay here~
 ~
 9 0 0 0 0 af 0 0 0 0 0 0 0
 5 0 0 0
-4 40 4 0
+4 40000 4 0
 E
 orn scaled leg plates~
    These leg plates are made from durable horns, very strange and unique
@@ -498,7 +498,7 @@ A pair of gauntlets made from shining brass lays here.~
 ~
 9 0 0 0 0 ah 0 0 0 0 0 0 0
 3 0 0 0
-3 60 6 0
+3 60000 6 0
 E
 brass gautlets~
    A set of brass hammered gauntlets.  Very stiff and unflexible, they are not
@@ -511,7 +511,7 @@ A piece of cloth with a brass bar in the middle lays here on the ground.~
 ~
 12 0 0 0 0 am 0 0 0 0 0 0 0
 0 0 0 0
-2 40 4 0
+2 40000 4 0
 E
 brass wrist wrap~
    The brass piece is completely wrapped in cloth.  Making a very stiff and
@@ -526,7 +526,7 @@ A ring of brass lays here on the ground.~
 ~
 12 g 0 0 0 ac 0 0 0 0 0 0 0
 0 0 0 0
-3 250 25 0
+3 250000 25 0
 E
 brass neck piece~
    The ring of brass has a small clasp that can be opened to place it around
@@ -543,7 +543,7 @@ A pair of green covered slimy mossy feet lay here.~
 ~
 12 0 0 0 0 ag 0 0 0 0 0 0 0
 0 0 0 0
-3 135 13 0
+3 135000 13 0
 E
 mossy webbed feet~
    This strange footwear is extremely awkward looking, but it may be useful
@@ -556,7 +556,7 @@ A flat piece of black wood lays here.~
 ~
 9 0 0 0 0 aj 0 0 0 0 0 0 0
 4 0 0 0
-7 35 3 0
+7 35000 3 0
 E
 black wood buckler~
    The black wood appears to have been hardened by flame.  The tempering has
@@ -569,7 +569,7 @@ A pair of red and gold wings is here half burried.~
 ~
 12 g 0 0 0 ak 0 0 0 0 0 0 0
 0 0 0 0
-4 350 35 0
+4 350000 35 0
 E
 phoenix wings~
    These strange wings can be placed about your body.
@@ -581,7 +581,7 @@ A broadsword made from an incredible weaponsmith lays here.~
 ~
 12 0 0 0 0 an 0 0 0 0 0 0 0
 0 0 0 0
-7 525 52 0
+7 525000 52 0
 E
 broadsword Iuel~
    The blade is finely honed and polished.  An excellent weapon for almost any
@@ -594,7 +594,7 @@ A medium sized sword made from a land far away sits here.~
 ~
 5 0 0 0 0 an 0 0 0 0 0 0 0
 6 4 5 3
-5 375 37 0
+5 375000 37 0
 E
 Ieulish gray sword~
    The sword is made from an unkown material.  It's gray shine like that of
@@ -607,7 +607,7 @@ A battleaxe from the land of Ieul is sits here humming.~
 ~
 5 b 0 0 0 an 0 0 0 0 0 0 0
 1 10 4 3
-20 150 15 0
+20 150000 15 0
 E
 ieulish battleaxe~
    The axehead is two-headed, made from a strange gray material.  The head is
@@ -620,7 +620,7 @@ A polearm from the land of Ieul stands against the wall.~
 ~
 5 0 0 0 0 an 0 0 0 0 0 0 0
 5 5 5 3
-9 675 67 0
+9 675000 67 0
 E
 ieulish polearm~
    The polearm is about two spans in length equipped with a nasty looking blade
@@ -633,7 +633,7 @@ A large headed war mallet from the land of Iuel is here.~
 ~
 5 0 0 0 0 an 0 0 0 0 0 0 0
 2 5 5 7
-15 112 11 0
+15 112000 11 0
 E
 war mallet iuel~
    The mallet is made from a strange gray material.  It's head large and blunt.
@@ -646,7 +646,7 @@ The tooth of a grand sabertooth now lays here.~
 ~
 5 0 0 0 0 an 0 0 0 0 0 0 0
 8 5 5 4
-3 30 3 0
+3 30000 3 0
 E
 tiger sabertooth tooth~
    The long tooth is over a hands length.  It's point very sharp, making it an
@@ -659,7 +659,7 @@ A spiked ball connected to a long wooden handle lays here.~
 ~
 5 0 0 0 0 an 0 0 0 0 0 0 0
 3 6 3 6
-10 750 75 0
+10 750000 75 0
 E
 ieulic spiked ball chain~
    The spike ball is about the size of a human head.  Attach to a long chain
@@ -672,7 +672,7 @@ A short rope made from vines lay here.~
 ~
 5 0 0 0 0 an 0 0 0 0 0 0 0
 7 4 4 2
-3 30 3 0
+3 30000 3 0
 E
 weed vine iuel~
    The vine has been weaved into a makeshift whip.
@@ -684,7 +684,7 @@ A sharp very long spiked jets out from the ground here.~
 ~
 5 0 0 0 0 an 0 0 0 0 0 0 0
 4 3 4 11
-2 100 10 0
+2 100000 10 0
 E
 odylic spike iuel~
    The spike is about an arms length long and sharpened to a fine point.
@@ -712,7 +712,7 @@ A gem, sparkling and rare in all favors is stuck in the ground~
 ~
 18 c 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-1 5 0 0
+1 5000 0 0
 #10753
 lower gem~
 a lower gem~
@@ -720,7 +720,7 @@ A blackish gem with the weight of a dead corpse is stuck here in the ground~
 ~
 18 c 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-1 5 0 0
+1 5000 0 0
 #10774
 middle gem~
 a middle gem~
@@ -728,7 +728,7 @@ A piece of mud like solid is stuck in the ground.~
 ~
 18 c 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-1 5 0 0
+1 5000 0 0
 #10775
 level gem~
 a level gem~
@@ -736,5 +736,5 @@ A long flat gem is here balancing itself one a small twig~
 ~
 18 c 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-1 5 0 0
+1 5000 0 0
 $~

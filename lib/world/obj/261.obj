@@ -33,7 +33,7 @@ A black maid's dress lies crumpled on the floor here.~
 ~
 9 0 0 0 0 ad 0 0 0 0 0 0 0
 5 0 0 0
-1 600 0 0 0
+1 600000 0 0 0
 #26103
 jade jewel~
 a piece of jade~
@@ -41,7 +41,7 @@ A small jewel gleams here.~
 ~
 8 0 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-1 1000 0 0 0
+1 1000000 0 0 0
 #26104
 smock white~
 a white maid's smock~
@@ -49,7 +49,7 @@ A maid's white smock is tossed carelessly in a corner.~
 ~
 9 0 0 0 0 ak 0 0 0 0 0 0 0
 5 0 0 0
-10 123 0 0 0
+10 123000 0 0 0
 E
 sculpture~
    It is of a beautiful woman, straining beneath a heavy weight.  She looks
@@ -70,7 +70,7 @@ An amulet was hidden here.~
 ~
 9 f 0 0 0 ac 0 0 0 0 0 0 0
 6 0 0 0
-3 854 0 0 0
+3 854000 0 0 0
 A
 4 3
 A
@@ -82,7 +82,7 @@ A bottle sits here.~
 ~
 17 0 0 0 0 a 0 0 0 0 0 0 0
 3 3 1 0
-8 1 0 0 0
+8 1000 0 0 0
 #26108
 beer bottle dark beer~
 a dark bottle~
@@ -90,7 +90,7 @@ A dark bottle of beer sits here.~
 ~
 17 0 0 0 0 a 0 0 0 0 0 0 0
 3 3 3 0
-8 1 0 0 0
+8 1000 0 0 0
 #26109
 wine fine bottle wine~
 a bottle~
@@ -98,7 +98,7 @@ There is a bottle of fine wine here.~
 ~
 17 0 0 0 0 a 0 0 0 0 0 0 0
 3 3 2 0
-8 1 0 0 0
+8 1000 0 0 0
 #26110
 ale mug ale~
 a mug~
@@ -106,7 +106,7 @@ A mug of foamy ale is here.~
 ~
 17 0 0 0 0 a 0 0 0 0 0 0 0
 3 3 4 0
-8 1 0 0 0
+8 1000 0 0 0
 #26111
 whisky shot whiskey whisky~
 a shot~
@@ -114,7 +114,7 @@ There is a small shot glass here.~
 ~
 17 0 0 0 0 a 0 0 0 0 0 0 0
 1 1 5 0
-1 1 0 0 0
+1 1000 0 0 0
 #26112
 firebreather hot stuff bottle flaming firebreather~
 a Flaming Bottle~
@@ -122,7 +122,7 @@ A bottle of Hot Stuff has been left here.~
 ~
 17 0 0 0 0 a 0 0 0 0 0 0 0
 3 3 7 0
-8 1 0 0 0
+8 1000 0 0 0
 #26113
 local speciality marty's malt local~
 a mug (Marty's Own Malt)~
@@ -130,7 +130,7 @@ A mug of Marty's Own Malt has been left here.~
 ~
 17 0 0 0 0 a 0 0 0 0 0 0 0
 3 3 8 0
-8 1 0 0 0
+8 1000 0 0 0
 #26114
 coffee cup coffee~
 a coffee cup~
@@ -138,7 +138,7 @@ There is a cup of coffee here.~
 ~
 17 0 0 0 0 a 0 0 0 0 0 0 0
 3 3 12 0
-8 9 0 0 0
+8 9000 0 0 0
 #26115
 tea cup tea~
 a cup~
@@ -146,7 +146,7 @@ There is a cup of tea here.~
 ~
 17 0 0 0 0 a 0 0 0 0 0 0 0
 3 3 11 0
-8 1 0 0 0
+8 1000 0 0 0
 #26116
 shirt white~
 a white shirt~
@@ -154,7 +154,7 @@ A white servant's shirt has been left here.~
 ~
 9 0 0 0 0 ad 0 0 0 0 0 0 0
 5 0 0 0
-1 1 0 0 0
+1 1000 0 0 0
 #26117
 slacks black~
 some black slacks~
@@ -162,7 +162,7 @@ A pait of black servant's slacks lay on the ground here.~
 ~
 9 0 0 0 0 af 0 0 0 0 0 0 0
 5 0 0 0
-1 1 0 0 0
+1 1000 0 0 0
 #26118
 overcoat black~
 a black overcoat~
@@ -170,7 +170,7 @@ There is a black overcoat here.~
 ~
 9 0 0 0 0 ak 0 0 0 0 0 0 0
 5 0 0 0
-1 1 0 0 0
+1 1000 0 0 0
 E
 coat overcoat~
    This looks almost to be a formal dinner jacket.
@@ -182,7 +182,7 @@ A whittlin' knife is on the ground here.~
 ~
 5 0 0 0 0 an 0 0 0 0 0 0 0
 2 2 5 14
-1 1 0 0 0
+1 1000 0 0 0
 #26120
 wood whittled~
 some whittled wood~
@@ -190,7 +190,7 @@ A piece of whittled wood lays on the ground.~
 ~
 11 0 0 0 0 ao 0 0 0 0 0 0 0
 0 0 0 0
-1 20 0 0 0
+1 20000 0 0 0
 E
 food~
    It is just random and assorted food.  Don't ask questions.  It is only a
@@ -209,7 +209,7 @@ Some knitting needles lie here, forgotten.~
 ~
 5 0 0 0 0 an 0 0 0 0 0 0 0
 1 2 5 10
-1 1 0 0 0
+1 1000 0 0 0
 #26122
 secret medallion Inna~
 Inna's secret~
@@ -217,7 +217,7 @@ Inna's secret lies on the floor here.~
 ~
 11 bg 0 0 0 ac 0 0 0 0 0 0 0
 0 0 0 0
-5 1 0 0 0
+5 1000 0 0 0
 E
 secret medallion~
    It is a small medallion carved in a strange shape that really has no
@@ -236,7 +236,7 @@ A pair of diamond chip glasses lay on the ground.~
 ~
 11 a 0 0 0 ae 0 0 0 0 0 0 0
 0 0 0 0
-5 1 0 0 0
+5 1000 0 0 0
 #26124
 painting portrait picture purgepic~
 a painting~

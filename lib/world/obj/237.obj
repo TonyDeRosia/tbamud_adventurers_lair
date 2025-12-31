@@ -5,7 +5,7 @@ An axe, obviously of dwarven manufacture, has been left here.~
 ~
 5 n 0 0 0 an 0 0 0 0 0 0 0
 1 3 6 3
-12 600 60 0
+12 600000 60 0
 E
 axe dwarven~
    A nicely made battle axe, with the rune 'T' engraved on the haft.
@@ -17,7 +17,7 @@ A short sword with a broad blade has been left here.~
 ~
 5 gn 0 0 0 an 0 0 0 0 0 0 0
 5 2 6 11
-8 700 70 0
+8 700000 70 0
 E
 short sword shortsword dwarven~
    This sword is typical dwarven manufacture.  The forge in the mountain has
@@ -33,7 +33,7 @@ A large dagger, almost resembling a small sword, is here.~
 ~
 5 gn 0 0 0 an 0 0 0 0 0 0 0
 5 2 4 11
-1 175 17 0
+1 175000 17 0
 A
 19 1
 #23703
@@ -43,7 +43,7 @@ A small pick has been left here, gathering dust.~
 ~
 5 mn 0 0 0 an 0 0 0 0 0 0 0
 0 3 5 10
-4 200 20 0
+4 200000 20 0
 E
 pick dwarven~
    A pick, made for someone not quite as tall as you.
@@ -55,7 +55,7 @@ A hammer, ready for pounding on armor, worn or not, is here.~
 ~
 5 mo 0 0 0 an 0 0 0 0 0 0 0
 2 2 8 7
-6 300 30 0
+6 300000 30 0
 E
 hammer dwarven~
    A large hammer for dwarven standards, the head of this weapon can also be
@@ -70,7 +70,7 @@ A dwarven made studded leather armor has been thrown in a pile here.~
 ~
 9 g 0 0 0 ad 0 0 0 0 0 0 0
 4 0 0 0
-6 160 6 0
+6 160000 6 0
 A
 17 -3
 #23706
@@ -80,7 +80,7 @@ A ringmail has been thrown in a heap here.~
 ~
 9 o 0 0 0 ad 0 0 0 0 0 0 0
 5 0 0 0
-2 750 75 0
+2 750000 75 0
 #23707
 chain chainmail dwarven~
 a dwarven chainmail~
@@ -88,7 +88,7 @@ A chainmail is here, abandoned.~
 ~
 9 mo 0 0 0 ad 0 0 0 0 0 0 0
 6 0 0 0
-3 850 85 0
+3 850000 85 0
 #23708
 shield dwarven kite~
 a dwarven shield~
@@ -96,7 +96,7 @@ A shield, bearing the insignia of the dwarves, has been left here.~
 ~
 9 o 0 0 0 aj 0 0 0 0 0 0 0
 5 0 0 0
-2 100 10 0
+2 100000 10 0
 E
 shield dwarven kite~
    A hammer and an axe crossed over 3 rocks is the insignia of the dwarves.
@@ -109,7 +109,7 @@ A small round shield has been thrown here.~
 ~
 9 0 0 0 0 aj 0 0 0 0 0 0 0
 2 0 0 0
-1 50 5 0
+1 50000 5 0
 E
 buckler dwarven shield~
    A small round 'target' shield, it offers little protection when fighting.
@@ -122,7 +122,7 @@ Some plate gauntlets, with the dwarven insignia on them, are here.~
 ~
 9 go 0 0 0 ah 0 0 0 0 0 0 0
 7 0 0 0
-1 250 25 0
+1 250000 25 0
 E
 gauntlets plate dwarven insignia~
    A hammer and an axe crossed over 3 rocks is the insignia of the dwarves.
@@ -137,7 +137,7 @@ Some chain mail sleeves has been abandoned here.~
 ~
 9 o 0 0 0 ai 0 0 0 0 0 0 0
 7 0 0 0
-3 150 15 0
+3 150000 15 0
 #23712
 chain leggings~
 a set of chain leggings~
@@ -145,7 +145,7 @@ Some chain mail leggings are here on the ground.~
 ~
 9 o 0 0 0 af 0 0 0 0 0 0 0
 7 0 0 0
-3 150 15 0
+3 150000 15 0
 #23713
 overalls dwarven dwarf~
 some overalls~
@@ -153,7 +153,7 @@ A pair of workers overalls lie here in an uneven pile.~
 ~
 11 g 0 0 0 af 0 0 0 0 0 0 0
 0 0 0 0
-1 2 1 0
+1 2000 1 0
 A
 2 -1
 #23714
@@ -163,7 +163,7 @@ A helmet bearing the dwarven insignia has been thrown here.~
 ~
 9 o 0 0 0 ae 0 0 0 0 0 0 0
 7 0 0 0
-3 150 15 0
+3 150000 15 0
 E
 helmet plate dwarven~
    A hammer and an axe crossed over 3 rocks is the insignia of the dwarves.
@@ -176,7 +176,7 @@ A large leather purse with the dwarven insignia has been thrown here.~
 ~
 15 e 0 0 0 a 0 0 0 0 0 0 0
 30 5 -1 0
-5 50 5 0
+5 50000 5 0
 E
 purse traders leather~
    A hammer and an axe crossed over 3 rocks is the insignia of the dwarves.
@@ -189,7 +189,7 @@ Quite a large amount of coins is lying here.~
 ~
 20 0 0 0 0 a 0 0 0 0 0 0 0
 1000 0 0 0
-1 1000 0 0
+1 1000000 0 0
 #23717
 looking glass dwarven~
 a looking glass~
@@ -197,7 +197,7 @@ A copper tube about 3' long has been left here.~
 ~
 12 g 0 0 0 ao 0 0 0 0 0 0 0
 0 0 0 0
-1 220 22 0
+1 220000 22 0
 E
 looking glass dwarven~
    In either end of the tube a small piece of glass is inserted.  When you look
@@ -210,7 +210,7 @@ A skullcap, made from iron, has been thrown here.~
 ~
 9 m 0 0 0 ae 0 0 0 0 0 0 0
 6 0 0 0
-2 100 10 0
+2 100000 10 0
 #23719
 boots leather~
 some soft leather boots~
@@ -218,7 +218,7 @@ Some rather soft leather boots have been left behind.~
 ~
 9 g 0 0 0 ag 0 0 0 0 0 0 0
 2 0 0 0
-2 220 22 0
+2 220000 22 0
 A
 2 1
 $~

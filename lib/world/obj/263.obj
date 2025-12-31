@@ -5,7 +5,7 @@ A small metal pail is lying here on the floor.~
 ~
 17 0 0 0 0 a 0 0 0 0 0 0 0
 20 20 0 0
-20 150 0 0
+20 150000 0 0
 E
 water pail water~
    Looks to be a very sturdy little pail.
@@ -17,7 +17,7 @@ A patchwork bag lies on the ground here.~
 ~
 15 0 0 0 0 a 0 0 0 0 0 0 0
 500 0 -1 0
-2 1 0 0
+2 1000 0 0
 E
 bag patchwork~
    Looks like a bag which has seen a great many years.
@@ -29,7 +29,7 @@ A pair of rubber boots have been left here.~
 ~
 9 0 0 0 0 ag 0 0 0 0 0 0 0
 4 0 0 0
-2 1 0 0
+2 1000 0 0
 E
 boots rubber~
    I would be VERY careful not to touch the bottoms of those.
@@ -41,7 +41,7 @@ A cowhide jacket has been left here.~
 ~
 9 0 0 0 0 ak 0 0 0 0 0 0 0
 7 0 0 0
-2 1 0 0
+2 1000 0 0
 E
 jacket cowhide~
    Looks VERY manly, strong, even.
@@ -53,7 +53,7 @@ A floppy cloth hat has been tossed on the ground here.~
 ~
 9 0 0 0 0 ae 0 0 0 0 0 0 0
 5 0 0 0
-2 1 0 0
+2 1000 0 0
 E
 hat floppy cloth~
    You have to wonder which side is the front with this raggety piece of cloth.
@@ -66,7 +66,7 @@ A patchwork cloak lies here, discarded.~
 ~
 9 a 0 0 0 ak 0 0 0 0 0 0 0
 6 0 0 0
-2 1 0 0
+2 1000 0 0
 E
 cloak patchwork~
    Looks as if this cloak has been worn many a year, over many a road.
@@ -82,7 +82,7 @@ A flowered dress has been tossed away in a corner.~
 ~
 9 0 0 0 0 ad 0 0 0 0 0 0 0
 5 0 0 0
-2 79 0 0
+2 79000 0 0
 E
 dress flowered~
    The dress is made from fine fabric and fits very tightly.  Real plain jane
@@ -97,7 +97,7 @@ A milking stool sits here.~
 ~
 12 0 0 0 0 ao 0 0 0 0 0 0 0
 0 0 0 0
-1 1 0 0
+1 1000 0 0
 E
 stool~
    Small, wood, and rickety - three legs, be careful.
@@ -123,7 +123,7 @@ A horse whip has been left here.~
 ~
 5 0 0 0 0 an 0 0 0 0 0 0 0
 0 3 5 2
-2 1 0 0
+2 1000 0 0
 E
 whip horse~
    It is made of brown leather.  Looks like a sex toy more than a horse whip!
@@ -143,7 +143,7 @@ A pair of riding boots have been left here.~
 ~
 9 0 0 0 0 ag 0 0 0 0 0 0 0
 4 0 0 0
-2 1 0 0
+2 1000 0 0
 E
 boots riding~
    Spurs and all, these are a FINE pair of boots.
@@ -157,7 +157,7 @@ A horseman's hat has been left here.~
 ~
 9 0 0 0 0 ae 0 0 0 0 0 0 0
 9 0 0 0
-2 1 0 0
+2 1000 0 0
 E
 hat horseman~
    Kind of makes you look like Indiana Jones.  Maybe even better than that.
@@ -169,7 +169,7 @@ A piece of straw has been left here.~
 ~
 9 0 0 0 0 a 0 0 0 0 0 0 0
 1 0 0 0
-1 1 0 0
+1 1000 0 0
 E
 straw piece~
    It's all chewed at one end, maybe you should wash it first...
@@ -181,7 +181,7 @@ A pair of rawhide pants have been left here.~
 ~
 9 0 0 0 0 af 0 0 0 0 0 0 0
 7 0 0 0
-2 1 0 0
+2 1000 0 0
 E
 pants rawhide~
    They look really stiff and uncomfortable, but then it's better than being
@@ -194,7 +194,7 @@ A field scythe is laying on the floor.~
 ~
 5 0 0 0 0 an 0 0 0 0 0 0 0
 0 2 7 3
-1 1 0 0
+1 1000 0 0
 E
 scythe~
    Not quite as cool as the Grim Reaper's, but cool just the same.
@@ -206,7 +206,7 @@ A round, flattened stone is here.~
 ~
 12 a 0 0 0 ao 0 0 0 0 0 0 0
 0 0 0 0
-1 1 0 0
+1 1000 0 0
 E
 stone skipping ~
    Looks like it would be a great candidate for a skipper.
@@ -220,7 +220,7 @@ A bamboo fishing pole has been left here.~
 ~
 12 0 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-1 1 0 0
+1 1000 0 0
 E
 pole fishing bamboo~
    A simple branch of bamboo with some string and a hook tied to it.
@@ -232,7 +232,7 @@ A straw hat has been left here.~
 ~
 9 0 0 0 0 ae 0 0 0 0 0 0 0
 5 0 0 0
-2 1 0 0
+2 1000 0 0
 E
 hat straw~
    Big huge brim, looks like it would DEFINITELY keep the sun out of your eyes.
@@ -245,7 +245,7 @@ Some steel-toed, rubber boots are here.~
 ~
 9 0 0 0 0 ag 0 0 0 0 0 0 0
 4 0 0 0
-2 300 0 0
+2 300000 0 0
 E
 boots steel toed rubber~
    A shudder goes down your spine as you just think about being kicked by these

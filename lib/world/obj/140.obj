@@ -5,7 +5,7 @@ Some tough blue tinged scale armor has been left here.~
 ~
 9 agimo 0 0 0 ad 0 0 0 0 0 0 0
 8 0 0 0
-5 200 0 0
+5 200000 0 0
 E
 wyvern scale armor~
    This armor is made from the scales of a great wyvern.  The blue plates of
@@ -22,7 +22,7 @@ A glowing red ball floats in the air here.~
 ~
 3 aghjl 0 0 0 ao 0 0 0 0 0 0 0
 30 3 1 36
-4 600 0 0
+4 600000 0 0
 E
 red dragon orb~
    This sphere of deep red scales has been endowed with the evil essence of a
@@ -37,7 +37,7 @@ A dull red claw has been dropped here.~
 ~
 5 b 0 0 0 an 0 0 0 0 0 0 0
 1 1 6 8
-2 500 0 0
+2 500000 0 0
 E
 claw wyvern~
    This sturdy claw was once the weapon of a mighty wyvern.  It is scratched and
@@ -52,7 +52,7 @@ The great foreclaw of a wyvern lies here.~
 ~
 9 0 0 0 0 aho 0 0 0 0 0 0 0
 6 0 0 0
-2 500 0 0
+2 500000 0 0
 E
 foreclaw wyvern~
    This is the foreclaw of a great wyvern.  Its tough material and deadly
@@ -70,7 +70,7 @@ A helm made of blue scales has been dropped here.~
 ~
 9 agim 0 0 0 ae 0 0 0 0 0 0 0
 5 0 0 0
-2 100 0 0
+2 100000 0 0
 E
 crested wyvern helm~
    This is the blue crested helm of a wyvern sentry.  The blue ridges of bone
@@ -88,7 +88,7 @@ A huge talon rests here looking very dangerous.~
 ~
 5 bimn 0 0 0 an 0 0 0 0 0 0 0
 1 2 8 3
-6 300 0 0
+6 300000 0 0
 E
 greater wyvern talon~
    This huge claw was once wielded in battle by the commander of all the wyvern
@@ -107,7 +107,7 @@ Someone has left a set of wyvern claws here.~
 ~
 9 ai 0 0 0 ag 0 0 0 0 0 0 0
 5 0 0 0
-4 300 0 0
+4 300000 0 0
 E
 hind claws wyvern~
    These were once the hind claws of a wyvern warrior.  Someone has set them
@@ -124,7 +124,7 @@ A ring made of an old claw has been dropped here.~
 ~
 9 abfgi 0 0 0 abo 0 0 0 0 0 0 0
 4 0 0 0
-1 400 0 0
+1 400000 0 0
 E
 claw ring~
    This ring was made from a very old claw by soaking it in water for 2 years
@@ -145,7 +145,7 @@ A huge set of wings float in the air here.~
 ~
 22 dfh 0 0 0 ak 0 0 0 0 0 0 0
 0 0 0 0
-8 700 0 0
+8 700000 0 0
 E
 wyvern wings~
    These wings came from the mighty Lord of all the wyverns.  The oldest and
@@ -164,7 +164,7 @@ A shield of red and blue scales lies here.~
 ~
 9 agimo 0 0 0 aj 0 0 0 0 0 0 0
 8 0 0 0
-5 500 0 0
+5 500000 0 0
 E
 shield royal wyvern~
    This shield is crafted of overlapping blue and red scales to provide maximum
@@ -180,7 +180,7 @@ The glowing eyes of some great animal have been forgotten here.~
 ~
 1 aghijn 0 0 0 aeo 0 0 0 0 0 0 0
 0 0 -1 0
-3 800 0 0
+3 800000 0 0
 E
 glowing red eyes wyvern~
    These were once the eyes of a mighty wyvern, now dead.  They still retain
@@ -280,7 +280,7 @@ A scroll of recall has been dropped here.~
 ~
 2 g 0 0 0 a 0 0 0 0 0 0 0
 30 42 -1 -1
-1 200 0 0
+1 200000 0 0
 #14017
 scroll seeing wyv~
 a scroll of seeing~
@@ -288,7 +288,7 @@ A magical scroll has been left here.~
 ~
 2 g 0 0 0 a 0 0 0 0 0 0 0
 30 19 44 50
-1 800 0 0
+1 800000 0 0
 #14018
 water cup wyv water~
 a cup~
@@ -296,7 +296,7 @@ A small cup is here.~
 ~
 17 0 0 0 0 a 0 0 0 0 0 0 0
 2 2 15 -1
-2 10 0 0
+2 10000 0 0
 #14019
 water Barrel wyv water~
 a barrel~
@@ -304,7 +304,7 @@ A large barrel has been dropped here.~
 ~
 17 0 0 0 0 a 0 0 0 0 0 0 0
 10 10 15 0
-10 1000 0 0
+10 1000000 0 0
 #14020
 ring holding wyv~
 a ring of holding~
@@ -312,7 +312,7 @@ An old ring of brass has been dropped here.~
 ~
 15 agi 0 0 0 abo 0 0 0 0 0 0 0
 200 5 -1 0
-2 1000 0 0
+2 1000000 0 0
 #14021
 pine torch wyv~
 a pine torch~
@@ -320,7 +320,7 @@ Someone left you a perfectly good torch.~
 ~
 1 a 0 0 0 ao 0 0 0 0 0 0 0
 0 0 24 0
-1 100 0 0
+1 100000 0 0
 #14022
 wyvern fang wyv~
 a wyvern fang~
@@ -328,7 +328,7 @@ A sharp animal's fang is in the dirt here.~
 ~
 5 i 0 0 0 ano 0 0 0 0 0 0 0
 1 1 5 11
-3 110 0 0
+3 110000 0 0
 A
 19 1
 #14023
@@ -338,7 +338,7 @@ The tail of a wyvern is in the dust here.~
 ~
 5 i 0 0 0 an 0 0 0 0 0 0 0
 1 2 5 10
-4 200 0 0
+4 200000 0 0
 A
 18 1
 A
@@ -350,7 +350,7 @@ A helm of tanned hide is here.~
 ~
 9 0 0 0 0 ae 0 0 0 0 0 0 0
 3 0 0 0
-3 150 0 0
+3 150000 0 0
 #14025
 hide cloak wyv~
 a hide cloak~
@@ -358,7 +358,7 @@ A cloak of tough hide is here.~
 ~
 9 0 0 0 0 ack 0 0 0 0 0 0 0
 4 0 0 0
-15 400 0 0
+15 400000 0 0
 #14026
 hide bracer wyv~
 a hide bracer~
@@ -366,7 +366,7 @@ A strip of thick hide is here.~
 ~
 9 0 0 0 0 aim 0 0 0 0 0 0 0
 3 0 0 0
-3 1000 0 0
+3 1000000 0 0
 A
 13 5
 #14027
@@ -376,7 +376,7 @@ Someone has left you a suit of hide armor.~
 ~
 9 0 0 0 0 ad 0 0 0 0 0 0 0
 6 0 0 0
-10 200 0 0
+10 200000 0 0
 A
 13 8
 #14028
@@ -386,7 +386,7 @@ Some sturdy hide gauntlets are here.~
 ~
 9 0 0 0 0 ah 0 0 0 0 0 0 0
 3 0 0 0
-2 150 0 0
+2 150000 0 0
 #14029
 hide leggings wyv~
 some hide leggings~
@@ -394,7 +394,7 @@ A set of hide leggings have been dropped here.~
 ~
 9 0 0 0 0 af 0 0 0 0 0 0 0
 4 0 0 0
-3 150 0 0
+3 150000 0 0
 #14030
 hide boots wyv~
 a pair of hide boots~
@@ -402,7 +402,7 @@ Some heavy hide boots have been left here.~
 ~
 9 0 0 0 0 ag 0 0 0 0 0 0 0
 4 0 0 0
-4 170 0 0
+4 170000 0 0
 #14031
 hide shield wyv~
 a hide shield~
@@ -410,7 +410,7 @@ A tough hide shield was dropped here.~
 ~
 9 0 0 0 0 aj 0 0 0 0 0 0 0
 0 0 0 0
-4 170 0 0
+4 170000 0 0
 A
 13 5
 #14032
@@ -420,7 +420,7 @@ A pint of thick dark stout is here.~
 ~
 17 0 0 0 0 a 0 0 0 0 0 0 0
 2 2 4 0
-7 20 0 0
+7 20000 0 0
 #14033
 ale keg wyv ale~
 a large Keg~
@@ -428,7 +428,7 @@ A large keg is standing here.~
 ~
 17 0 0 0 0 a 0 0 0 0 0 0 0
 10 10 4 0
-20 200 0 0
+20 200000 0 0
 #14034
 steak wyv~
 a 16oz steak~
@@ -436,7 +436,7 @@ A huge steak has been left on a plate here.~
 ~
 19 0 0 0 0 a 0 0 0 0 0 0 0
 36 0 0 0
-1 90 0 0
+1 90000 0 0
 #14035
 huge roast wyv~
 a huge roast~
@@ -444,7 +444,7 @@ A huge slab of meat is on a spit here.~
 ~
 19 0 0 0 0 a 0 0 0 0 0 0 0
 24 0 0 0
-3 200 0 0
+3 200000 0 0
 #14036
 scroll remove curse wyv~
 a scroll of remove curse~
@@ -452,7 +452,7 @@ A scroll of great power is here.~
 ~
 2 gi 0 0 0 a 0 0 0 0 0 0 0
 30 35 -1 -1
-1 300 0 0
+1 300000 0 0
 #14037
 potion healing wyv~
 a potion of healing~
@@ -460,7 +460,7 @@ A potion of great curative power lies here.~
 ~
 10 agi 0 0 0 a 0 0 0 0 0 0 0
 1 16 -1 -1
-10 1000 0 0
+10 1000000 0 0
 #14038
 wand aid wyv~
 a wand of aid~
@@ -468,7 +468,7 @@ A long thin wand lies here.~
 ~
 3 bgi 0 0 0 ao 0 0 0 0 0 0 0
 30 1 1 1
-10 1000 0 0
+10 1000000 0 0
 #14039
 staff wounding wyv~
 a staff of wounding~
@@ -476,7 +476,7 @@ A heavy black staff lies here in a corner.~
 ~
 4 abgi 0 0 0 ao 0 0 0 0 0 0 0
 30 6 6 27
-2 600 0 0
+2 600000 0 0
 A
 12 10
 #14040

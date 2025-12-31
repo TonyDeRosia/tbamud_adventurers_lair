@@ -74,7 +74,7 @@ A Ruby Emerald Necklace has fallen here.~
 ~
 11 a 0 0 0 ac 0 0 0 0 0 0 0
 0 0 0 0
-1 1 0 0
+1 1000 0 0
 T 10308
 #10308
 sign~
@@ -131,7 +131,7 @@ It looks like an ordinary headband, but it looks a bit different.~
 ~
 9 0 0 0 0 aen 0 0 0 0 0 0 0
 0 0 0 0
-1 1 0 0
+1 1000 0 0
 T 10330
 #10333
 Turtle Shell~
@@ -140,7 +140,7 @@ A Turtle Shell that looks like Master Roshis' is here.~
 ~
 9 dq 0 0 0 ak 0 0 0 0 0 0 0
 0 0 0 0
-50 25 0 0
+50 25000 0 0
 A
 17 10
 #10355
@@ -150,7 +150,7 @@ A book lies here open on the table~
 ~
 12 0 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-1 1 0 0
+1 1000 0 0
 E
 book~
              +--------------+
@@ -197,7 +197,7 @@ A torch rest in a crevice in the wall.~
 ~
 1 a 0 0 0 ao 0 0 0 0 0 0 0
 0 0 0 0
-1 1 0 0
+1 1000 0 0
 #10376
 orb~
 a orb~

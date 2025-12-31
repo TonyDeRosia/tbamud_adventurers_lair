@@ -5,7 +5,7 @@ A small boat is tied up here.~
 ~
 22 0 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-10 100 10 0
+10 100000 10 0
 E
 small boat dingy~
    It may not be big, it may not be pretty, but it's a boat.  Appears to be
@@ -42,7 +42,7 @@ A dirty, old mop lies here in a puddle of its own filth.~
 ~
 5 0 0 0 0 ano 0 0 0 0 0 0 0
 5 5 5 7
-3 1 1 0
+3 1000 1 0
 #8304
 rations iron~
 some iron rations~
@@ -50,7 +50,7 @@ A packet of iron rations lies here.~
 ~
 19 0 0 0 0 a 0 0 0 0 0 0 0
 12 0 0 0
-1 2 1 0
+1 2000 1 0
 E
 rations iron~
    This packet of rations contains food high in iron and other nutrients.
@@ -64,7 +64,7 @@ A small key made of solid gold lies here.~
 ~
 18 c 0 0 0 ac 0 0 0 0 0 0 0
 0 0 0 0
-1 1000 0 0
+1 1000000 0 0
 #8306
 crate wooden~
 a large crate~
@@ -84,7 +84,7 @@ A large, iron key lies here.~
 ~
 18 c 0 0 0 ac 0 0 0 0 0 0 0
 0 0 0 0
-3 1 0 0
+3 1000 0 0
 #8308
 money gold cash coins~
 a huge mound of gold coins~
@@ -92,7 +92,7 @@ A huge mound of gold coins is lying here.~
 ~
 20 0 0 0 0 a 0 0 0 0 0 0 0
 842 0 0 0
-10 842 0 0
+10 842000 0 0
 #8309
 key small steel~
 a small, steel key~
@@ -100,7 +100,7 @@ A small, steel key lies here.~
 ~
 18 c 0 0 0 ac 0 0 0 0 0 0 0
 0 0 0 0
-1 1 0 0
+1 1000 0 0
 #8312
 saber sabre pirate sword~
 a pirate's saber~
@@ -108,7 +108,7 @@ A pirate has left his saber here.~
 ~
 5 0 0 0 0 an 0 0 0 0 0 0 0
 3 3 10 3
-3 500 10 0
+3 500000 10 0
 #8313
 eyepatch patch pirate~
 an eyepatch~
@@ -116,7 +116,7 @@ Someone is missing an eye, and also an eyepatch, since it is lying here.~
 ~
 9 0 0 0 0 ae 0 0 0 0 0 0 0
 1 0 0 0
-1 10 1 0
+1 10000 1 0
 A
 6 -3
 #8314
@@ -139,7 +139,7 @@ A bucket of steaming tar sits here.~
 ~
 12 0 0 0 0 ao 0 0 0 0 0 0 0
 0 0 0 0
-20 50 5 0
+20 50000 5 0
 T 8315
 T 8316
 E
@@ -155,7 +155,7 @@ A bucket of tar sits here.~
 ~
 12 0 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-20 1 1 0
+20 1000 1 0
 E
 bucket tar oil~
    The tar has cooled and sealed itself into the bucket.  The only way to
@@ -182,7 +182,7 @@ A steel hook, often used to replace a hand, lies here.~
 ~
 5 0 0 0 0 ano 0 0 0 0 0 0 0
 3 1 10 8
-2 100 10 0
+2 100000 10 0
 A
 6 -3
 #8319
@@ -192,7 +192,7 @@ A piece of crab meat is lying here.~
 ~
 19 0 0 0 0 a 0 0 0 0 0 0 0
 5 0 0 0
-1 25 1 0
+1 25000 1 0
 #8320
 life boat dingy~
 a life boat~
@@ -200,7 +200,7 @@ A life boat hangs from the side of the ship here.~
 ~
 22 0 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-10 100 10 0
+10 100000 10 0
 T 8320
 #8397
 dice die chinchirorin bones~
@@ -209,7 +209,7 @@ dice die chinchirorin bones~
 ~
 12 0 0 0 0 ao 0 0 0 0 0 0 0
 0 0 0 0
-1 200 10 0
+1 200000 10 0
 T 8397
 #8398
 fish~
@@ -218,5 +218,5 @@ A small fish is lying here.~
 ~
 19 0 0 0 0 a 0 0 0 0 0 0 0
 3 0 0 0
-1 10 1 0
+1 10000 1 0
 $~

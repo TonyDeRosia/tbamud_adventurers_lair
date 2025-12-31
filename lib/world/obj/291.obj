@@ -5,7 +5,7 @@ A Dark Amulet rests amulet here, bathed in its unholy glow.~
 ~
 9 agj 0 0 0 ac 0 0 0 0 0 0 0
 3 0 0 0
-1 100 0 0
+1 100000 0 0
 E
 triangled wheel~
    Attached to a chain, this unholy symbol is made of an unknown alloy.  It is
@@ -25,7 +25,7 @@ A rusty lantern hangs on a peg on the wall here~
 ~
 1 0 0 0 0 a 0 0 0 0 0 0 0
 0 0 24 0
-3 55 0 0
+3 55000 0 0
 E
 rusty lantern~
    An aged light giving device, rusted with the passage of the years.  It still
@@ -38,7 +38,7 @@ A torch is set in a mounting in the wall here.~
 ~
 1 0 0 0 0 a 0 0 0 0 0 0 0
 0 0 5 0
-1 15 0 0
+1 15000 0 0
 E
 torch~
    This is a simple torch.  It looks like it is of at least decent quality.
@@ -50,7 +50,7 @@ A metallic feather rests here in the dust.~
 ~
 8 ik 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-1 1000 0 0
+1 1000000 0 0
 E
 silver feather~
    A piece of metallic down donated from the wing of the silver angel.
@@ -66,7 +66,7 @@ A night black scimitar.~
 ~
 5 bgn 0 0 0 an 0 0 0 0 0 0 0
 0 8 5 3
-10 250 0 20
+10 250000 0 20
 E
 black horseman scimitar~
    This just black sword is made of an unnatural metal.  It hums with the
@@ -85,7 +85,7 @@ Some green herbs grow in the ground here.~
 ~
 10 0 0 0 0 a 0 0 0 0 0 0 0
 20 43 -1 -1
-1 900 0 0
+1 900000 0 0
 E
 green herb~
    A small cluster of bright green leaves sprouts out of the ground.  Even in
@@ -98,7 +98,7 @@ A Crystal orb bound in black, wrought iron rests here.~
 ~
 1 ajl 0 0 0 a 0 0 0 0 0 0 0
 0 0 -1 0
-5 150 0 0
+5 150000 0 0
 A
 12 20
 A
@@ -110,7 +110,7 @@ The breastplate of a Doomguard lies here, gathering dust.~
 ~
 9 p 0 0 0 ad 0 0 0 0 0 0 0
 10 0 0 0
-30 1000 0 20
+30 1000000 0 20
 A
 6 2
 A
@@ -122,7 +122,7 @@ A glowing aura of energy hovers near the floor.~
 ~
 5 a 0 0 0 an 0 0 0 0 0 0 0
 0 4 8 12
-10 830 0 20
+10 830000 0 20
 #29111
 Sign~
 a sign~
@@ -145,7 +145,7 @@ Death's Key lis lying here amongst much debris.~
 ~
 18 0 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-1 1 0 0
+1 1000 0 0
 #29116
 Telescope~
 the Telescope~
@@ -161,7 +161,7 @@ The Key of C rests here.~
 ~
 18 0 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-10 1 0 0
+10 1000 0 0
 #29118
 shelf bookshelf~
 a Bookshelf~
@@ -181,7 +181,7 @@ to the above which stands amongst the pillars of this world.
 ~
 16 0 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-15 100 0 0
+15 100000 0 0
 #29120
 tome red book ~
 the Tome of Infernal Burning~
@@ -190,7 +190,7 @@ $n recites the ancient words "Incenderius Diabolicius!  "
 ~
 2 d 0 0 0 a 0 0 0 0 0 0 0
 30 26 17 35
-15 200 0 0
+15 200000 0 0
 #29121
 tome book blue icy~
 the Tome of Icy Chill~
@@ -199,7 +199,7 @@ $n recites the ancient words "Subthermae Aeterna!"
 ~
 2 0 0 0 0 a 0 0 0 0 0 0 0
 30 1 2 36
-15 100 0 30
+15 100000 0 30
 #29122
 tome book yellow~
 the Tome of Maximum Zappage~
@@ -208,7 +208,7 @@ $n recites the ancient words "Volteaic Electrum Teslagrate!"
 ~
 2 0 0 0 0 a 0 0 0 0 0 0 0
 30 23 28 39
-15 200 0 15
+15 200000 0 15
 #29130
 Key D~
 the Key of D~
@@ -216,7 +216,7 @@ The Key of D is lying here.~
 ~
 18 0 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-35 100 0 0
+35 100000 0 0
 #29131
 key sharp~
 the Key of A Sharp~
@@ -224,7 +224,7 @@ The Key of A sharp is lying here.~
 ~
 5 0 0 0 0 an 0 0 0 0 0 0 0
 0 3 15 3
-20 100 0 0
+20 100000 0 0
 #29132
 key B~
 the Key of B~
@@ -232,7 +232,7 @@ The Key of B is lying here.~
 ~
 3 0 0 0 0 a 0 0 0 0 0 0 0
 25 7 7 29
-10 200 0 0
+10 200000 0 0
 #29133
 Key F sharp Fsharp~
 the Key of F sharp~
@@ -240,7 +240,7 @@ The key of F sharp is lying here.~
 ~
 18 0 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-35 100 0 0
+35 100000 0 0
 A
 18 -3
 A
@@ -254,7 +254,7 @@ The Key of G is lying here.~
 ~
 18 0 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-9 100 0 0
+9 100000 0 0
 A
 12 25
 A
@@ -268,7 +268,7 @@ The Key of E is lying here.~
 ~
 18 abgh 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-50 100 0 0
+50 100000 0 0
 A
 1 -1
 A
@@ -290,7 +290,7 @@ A black iron guantlet rests here.~
 ~
 9 o 0 0 0 ah 0 0 0 0 0 0 0
 10 0 0 0
-10 500 0 0
+10 500000 0 0
 A
 12 -15
 A
@@ -302,7 +302,7 @@ A thick black iron helmet is here.~
 ~
 9 gm 0 0 0 ae 0 0 0 0 0 0 0
 10 0 0 0
-20 500 0 0
+20 500000 0 0
 A
 13 20
 A
@@ -316,7 +316,7 @@ Scarlet Fever's Sword, The Fever Pitch is here.~
 ~
 5 0 0 0 0 an 0 0 0 0 0 0 0
 1 4 8 14
-10 543 0 20
+10 543000 0 20
 #29151
 Tome Book manule golem~
 the Manule of the Golems~
@@ -324,7 +324,7 @@ An old book with a humanoid symbol on it rests here.~
 ~
 8 0 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-15 1000 0 0
+15 1000000 0 0
 A
 3 2
 $~

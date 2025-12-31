@@ -40,7 +40,7 @@ A beaten gold cross with a leather strap lies on the ground.~
 ~
 9 a 0 0 0 ac 0 0 0 0 0 0 0
 3 0 0 0
-4 500 0 25
+4 500000 0 25
 A
 19 3
 A
@@ -54,7 +54,7 @@ A plain cloak of wool lies on the ground.~
 ~
 9 0 0 0 0 ak 0 0 0 0 0 0 0
 8 0 0 0
-9 100 0 25
+9 100000 0 25
 A
 4 3
 A
@@ -68,7 +68,7 @@ A prayer book has been left here.~
 ~
 2 a 0 0 0 ao 0 0 0 0 0 0 0
 30 3 -1 -1
-6 50 0 25
+6 50000 0 25
 A
 13 25
 A
@@ -80,7 +80,7 @@ A willow switch has been left here.~
 ~
 5 a 0 0 0 an 0 0 0 0 0 0 0
 0 6 5 1
-4 10 0 25
+4 10000 0 25
 A
 18 2
 A

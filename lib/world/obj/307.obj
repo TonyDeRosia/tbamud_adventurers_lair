@@ -5,7 +5,7 @@ A brass eyepiece has been left here.~
 ~
 11 0 0 0 0 ae 0 0 0 0 0 0 0
 0 0 0 0
-3 10 0 21
+3 10000 0 21
 A
 17 -2
 A
@@ -19,7 +19,7 @@ A suit of elegant finery has been tossed aside.~
 ~
 9 0 0 0 0 ad 0 0 0 0 0 0 0
 4 0 0 0
-6 10 0 21
+6 10000 0 21
 A
 4 1
 A
@@ -31,7 +31,7 @@ A delicate bracelet has been left on the ground.~
 ~
 11 a 0 0 0 am 0 0 0 0 0 0 0
 0 0 0 0
-2 10 0 21
+2 10000 0 21
 A
 17 -2
 A
@@ -45,7 +45,7 @@ An elegant dress has been left here.~
 ~
 9 0 0 0 0 ad 0 0 0 0 0 0 0
 4 0 0 0
-4 10 0 1
+4 10000 0 1
 A
 2 -2
 #30704
@@ -55,7 +55,7 @@ A string of pearls have been left behind.~
 ~
 11 a 0 0 0 ac 0 0 0 0 0 0 0
 0 0 0 0
-3 10 0 21
+3 10000 0 21
 A
 17 -1
 A
@@ -69,7 +69,7 @@ A maiden's veil lies crumple on the floor.~
 ~
 11 0 0 0 0 ae 0 0 0 0 0 0 0
 0 0 0 0
-1 10 0 21
+1 10000 0 21
 A
 13 20
 A
@@ -83,7 +83,7 @@ The servant's light has been left on the floor.~
 ~
 1 a 0 0 0 ao 0 0 0 0 0 0 0
 0 0 -1 0
-4 10 0 21
+4 10000 0 21
 A
 13 20
 A
@@ -97,7 +97,7 @@ A bottle of whiskey lies thrown to the floor.~
 ~
 17 0 0 0 0 ao 0 0 0 0 0 0 0
 10 10 5 0
-15 10 0 21
+15 10000 0 21
 A
 19 2
 A
@@ -109,7 +109,7 @@ A thick belt with an embossed buckle has been left here.~
 ~
 9 b 0 0 0 al 0 0 0 0 0 0 0
 5 0 0 0
-3 10 0 21
+3 10000 0 21
 A
 6 1
 A
@@ -123,7 +123,7 @@ A worked steel mask has been left on the ground.~
 ~
 9 0 0 0 0 ae 0 0 0 0 0 0 0
 0 0 0 0
-4 10 0 21
+4 10000 0 21
 A
 18 2
 A
@@ -137,7 +137,7 @@ A pair of cuffed leather boots have been left here.~
 ~
 9 0 0 0 0 ag 0 0 0 0 0 0 0
 5 0 0 0
-6 10 0 21
+6 10000 0 21
 A
 19 1
 A
@@ -151,7 +151,7 @@ A pair of elbow-length leather gloves have been laft here.~
 ~
 9 0 0 0 0 ah 0 0 0 0 0 0 0
 0 0 0 0
-3 10 0 21
+3 10000 0 21
 A
 1 2
 A
@@ -165,7 +165,7 @@ A full-length iron shield has been dropped to the ground.~
 ~
 9 0 0 0 0 aj 0 0 0 0 0 0 0
 0 0 0 0
-9 9 0 21
+9 9000 0 21
 A
 18 2
 A
@@ -179,7 +179,7 @@ A pair of white gloves have been left here. ~
 ~
 9 0 0 0 0 ah 0 0 0 0 0 0 0
 0 0 0 0
-3 10 0 1
+3 10000 0 1
 #30714
 specs wire pair~
 a pair of wire specs~
@@ -187,7 +187,7 @@ A pair of wire specs have been left here.~
 ~
 11 0 0 0 0 aeo 0 0 0 0 0 0 0
 0 0 0 0
-3 10 0 15
+3 10000 0 15
 A
 17 -1
 A
@@ -201,7 +201,7 @@ A book bag lies on the ground.~
 ~
 15 0 0 0 0 ao 0 0 0 0 0 0 0
 300 0 -1 0
-1 10 0 11
+1 10000 0 11
 A
 19 2
 #30716
@@ -211,7 +211,7 @@ A bowed fiddle lies on its back on the ground.~
 ~
 12 0 0 0 0 ao 0 0 0 0 0 0 0
 0 0 0 0
-3 10 0 1
+3 10000 0 1
 #30717
 shoes work~
 a pair of work shoes~
@@ -219,7 +219,7 @@ A pair of work shoes have been left here.~
 ~
 9 0 0 0 0 ag 0 0 0 0 0 0 0
 0 0 0 0
-5 10 0 1
+5 10000 0 1
 #30718
 ring thumb gaudy~
 a gaudy thumb ring~
@@ -227,7 +227,7 @@ A gaudy thumb ring has been dropped here.~
 ~
 11 a 0 0 0 ab 0 0 0 0 0 0 0
 0 0 0 0
-2 10 0 21
+2 10000 0 21
 A
 17 -2
 A
@@ -241,7 +241,7 @@ A jeweled headband has been left here.~
 ~
 11 a 0 0 0 ae 0 0 0 0 0 0 0
 0 0 0 0
-2 10 0 21
+2 10000 0 21
 A
 13 20
 A
@@ -253,7 +253,7 @@ A webbed full-finger ring has been left here.~
 ~
 11 b 0 0 0 ab 0 0 0 0 0 0 0
 0 0 0 0
-2 10 0 21
+2 10000 0 21
 A
 18 2
 A
@@ -265,7 +265,7 @@ The Book of Life has been left here by someone very careless.~
 ~
 2 ac 0 0 0 ao 0 0 0 0 0 0 0
 21 34 43 44
-5 10 0 21
+5 10000 0 21
 #30722
 cassock black~
 a black cassock~
@@ -273,7 +273,7 @@ A black cassock has been left in a crumpled heap on the floor.~
 ~
 9 0 0 0 0 al 0 0 0 0 0 0 0
 3 0 0 0
-5 10 0 21
+5 10000 0 21
 A
 4 1
 A
