@@ -370,6 +370,7 @@ int load_char(const char *name, struct char_data *ch)
     GET_NUM_QUESTS(ch) = PFDEF_COMPQUESTS;
     GET_LAST_MOTD(ch) = PFDEF_LASTMOTD;
     GET_LAST_NEWS(ch) = PFDEF_LASTNEWS;
+    SET_BOUNTY(ch, PFDEF_BOUNTY);
     *GET_PROMPT(ch) = '\0';
 
     for (i = 0; i < AF_ARRAY_MAX; i++)
@@ -423,6 +424,13 @@ int load_char(const char *name, struct char_data *ch)
 
           GET_BANK_MONEY(ch) = copper;
           bank_money_seen = TRUE;
+        }
+        else if (!strcmp(tag, "Bounty")) {
+          long long copper = atoll(line);
+          if (copper < 0)
+            copper = 0;
+
+          SET_BOUNTY(ch, copper);
         }
 	else if (!strcmp(tag, "Brth"))	ch->player.time.birth	= atol(line);
 	break;
@@ -774,6 +782,7 @@ void save_char(struct char_data * ch)
   fprintf(fl, "BankMoney: %lld\n", GET_BANK_MONEY(ch));
   if (GET_DIAMONDS(ch))
     fprintf(fl, "Diamonds: %d\n", GET_DIAMONDS(ch));
+  fprintf(fl, "Bounty: %lld\n", GET_BOUNTY(ch));
 
   if (GET_GOLD(ch)         != PFDEF_GOLD)       fprintf(fl, "Gold: %d\n", GET_GOLD(ch));
   if (GET_BANK_GOLD(ch)    != PFDEF_BANK)       fprintf(fl, "Bank: %d\n", GET_BANK_GOLD(ch));

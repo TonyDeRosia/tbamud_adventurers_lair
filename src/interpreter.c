@@ -42,6 +42,8 @@
 ACMD(do_stataudit);
 
 ACMD(do_offhand);
+ACMD(do_bounty);
+ACMD(do_finger);
 /* local (file scope) functions */
 static int perform_dupe_check(struct descriptor_data *d);
 static struct alias_data *find_alias(struct alias_data *alias_list, char *str);
@@ -154,6 +156,7 @@ cpp_extern const struct command_info cmd_info[] = {
   { "force"    , "force"   , POS_SLEEPING, do_force    , LVL_GOD, 0 },
   { "fill"     , "fil"     , POS_STANDING, do_pour     , 0, SCMD_FILL },
   { "file"     , "file"    , POS_SLEEPING, do_file     , LVL_GOD, 0 },
+  { "finger"   , "f"       , POS_DEAD    , do_finger   , 0, 0 },
   { "flee"     , "fl"      , POS_FIGHTING, do_flee     , 1, 0 },
   { "follow"   , "fol"     , POS_RESTING , do_follow   , 0, 0 },
   { "freeze"   , "freeze"  , POS_DEAD    , do_wizutil  , LVL_GRGOD, SCMD_FREEZE },
@@ -376,6 +379,7 @@ cpp_extern const struct command_info cmd_info[] = {
   { "zcheck"   , "zcheck"  , POS_DEAD    , do_zcheck   , LVL_BUILDER, 0 },
   { "zpurge"   , "zpurge"  , POS_DEAD    , do_zpurge   , LVL_BUILDER, 0 },
   { "balance", "bal", POS_DEAD, do_balance, 0, 0 },
+  { "bounty"   , "bounty"  , POS_DEAD    , do_bounty   , 0, 0 },
   { "worth",   "wor", POS_DEAD, do_worth,   0, 0 },
 
   { "\n", "zzzzzzz", 0, 0, 0, 0 }   

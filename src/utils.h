@@ -541,6 +541,9 @@ do                                                              \
 #define GET_BANK_MONEY(ch) ((ch)->points.bank_money)
 /** Diamonds on ch */
 #define GET_DIAMONDS(ch)   ((ch)->points.diamonds)
+/** Bounty on character (copper units) */
+#define GET_BOUNTY(ch)     ((ch)->player_specials->saved.bounty_copper)
+#define SET_BOUNTY(ch, v)  do { (ch)->player_specials->saved.bounty_copper = (v); } while (0)
 
 /* Legacy gold views (gold-equivalent). Not lvalues. */
 #define GET_GOLD(ch)       ((int)(GET_MONEY(ch) / COPPER_PER_GOLD))
