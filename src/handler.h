@@ -22,8 +22,9 @@ void	affect_join(struct char_data *ch, struct affected_type *af,
 bool add_dur, bool avg_dur, bool add_mod, bool avg_mod);
 
 /* utility */
-const char *money_desc(int amount);
-struct obj_data *create_money(int amount_copper);
+struct obj_data *create_money(long long amount_copper);
+void refresh_money_object(struct obj_data *obj);
+void merge_money_in_room(room_rnum room, struct obj_data *money);
 int	isname(const char *str, const char *namelist);
 int	is_name(const char *str, const char *namelist);
 char	*fname(const char *namelist);
