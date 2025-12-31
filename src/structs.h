@@ -1002,6 +1002,7 @@ struct player_special_data_saved
   time_t   lastmotd;            /**< Last time player read motd */
   time_t   lastnews;            /**< Last time player read news */
   long account_id; /* account linkage id */
+  long long bounty_copper; /**< Outstanding bounty on the character, stored in copper */
 
 };
 

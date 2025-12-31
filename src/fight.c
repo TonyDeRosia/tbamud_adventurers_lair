@@ -432,6 +432,15 @@ struct char_data *i;
 
 void die(struct char_data * ch, struct char_data * killer)
 {
+  if (killer && killer != ch && !IS_NPC(ch) && !IS_NPC(killer) && GET_LEVEL(killer) < LVL_IMMORT && GET_BOUNTY(ch) > 0) {
+    long long reward = GET_BOUNTY(ch);
+    SET_BOUNTY(ch, 0);
+    increase_money_copper(killer, reward);
+    save_char(ch);
+    save_char(killer);
+    send_to_char(killer, "You claim %lld copper for the bounty on %s.\r\n", reward, GET_NAME(ch));
+  }
+
   gain_exp(ch, -(GET_EXP(ch) / 2));
   if (!IS_NPC(ch)) {
     REMOVE_BIT_AR(PLR_FLAGS(ch), PLR_KILLER);

@@ -65,6 +65,8 @@ static void look_at_char(struct char_data *i, struct char_data *ch);
 static void look_at_target(struct char_data *ch, char *arg);
 static void look_in_direction(struct char_data *ch, int dir);
 static void look_in_obj(struct char_data *ch, char *arg);
+static bool load_player_target(struct char_data *ch, const char *name, struct char_data **out, bool *from_file);
+static bool parse_bounty_amount(const char *arg, long long *amount_out);
 /* do_look, do_inventory utility functions */
 static void list_obj_to_char(struct obj_data *list, struct char_data *ch, int mode, int show);
 /* do_look, do_equipment, do_examine, do_inventory */
@@ -892,6 +894,94 @@ static size_t copy_trunc_visible(char *dst, size_t dstsz, const char *src, size_
   return vis;
 }
 
+static bool load_player_target(struct char_data *ch, const char *name, struct char_data **out, bool *from_file)
+{
+  struct char_data *vict = get_player_vis(ch, name, NULL, FIND_CHAR_WORLD);
+
+  if (vict) {
+    if (from_file)
+      *from_file = FALSE;
+    *out = vict;
+    return TRUE;
+  }
+
+  CREATE(vict, struct char_data, 1);
+  clear_char(vict);
+  new_mobile_data(vict);
+  CREATE(vict->player_specials, struct player_special_data, 1);
+
+  if (load_char(name, vict) > -1) {
+    if (from_file)
+      *from_file = TRUE;
+    *out = vict;
+    return TRUE;
+  }
+
+  free_char(vict);
+  return FALSE;
+}
+
+static bool parse_bounty_amount(const char *arg, long long *amount_out)
+{
+  char token[MAX_INPUT_LENGTH];
+  const char *p = arg;
+  long long total = 0;
+  bool saw_token = FALSE;
+
+  while (isspace((unsigned char)*p))
+    p++;
+
+  while (*p) {
+    size_t tlen = 0;
+    while (*p && !isspace((unsigned char)*p) && tlen + 1 < sizeof(token))
+      token[tlen++] = *(p++);
+    token[tlen] = '\0';
+
+    while (isspace((unsigned char)*p))
+      p++;
+
+    if (tlen == 0)
+      continue;
+
+    saw_token = TRUE;
+
+    char suffix = token[tlen - 1];
+    long long multiplier = 1;
+    if (isalpha((unsigned char)suffix)) {
+      token[tlen - 1] = '\0';
+      switch (tolower((unsigned char)suffix)) {
+        case 'g': multiplier = COPPER_PER_GOLD; break;
+        case 's': multiplier = COPPER_PER_SILVER; break;
+        case 'c': multiplier = 1; break;
+        default: return FALSE;
+      }
+    }
+
+    if (token[0] == '\0')
+      return FALSE;
+
+    char *end = NULL;
+    long long value = strtoll(token, &end, 10);
+    if (end == NULL || *end != '\0' || value < 0)
+      return FALSE;
+
+    if (multiplier != 0 && value > LLONG_MAX / multiplier)
+      return FALSE;
+
+    long long add = value * multiplier;
+    if (add > LLONG_MAX - total)
+      return FALSE;
+
+    total += add;
+  }
+
+  if (!saw_token || total <= 0)
+    return FALSE;
+
+  *amount_out = total;
+  return TRUE;
+}
+
 static int append_box_line(char *buf, int len, size_t bufsz,
                            const char *border_color, const char *reset_color,
                            const char *content, size_t inner_width)
@@ -909,6 +999,77 @@ static int append_box_line(char *buf, int len, size_t bufsz,
       border_color, reset_color,
       trimmed, (int)pad, "",
       border_color, reset_color);
+  }
+
+  return len;
+}
+
+static int append_wrapped_box_text(char *buf, int len, size_t bufsz,
+                                   const char *border_color, const char *reset_color,
+                                   const char *text, size_t inner_width)
+{
+  const char *p = text ? text : "";
+  char linebuf[2048];
+
+  if (!*p)
+    return append_box_line(buf, len, bufsz, border_color, reset_color, "", inner_width);
+
+  while (*p) {
+    size_t vis = 0, idx = 0, last_space_idx = 0;
+    bool saw_space = FALSE;
+
+    /* Skip leading newlines */
+    if (*p == '\n' || *p == '\r') {
+      len = append_box_line(buf, len, bufsz, border_color, reset_color, "", inner_width);
+      while (*p == '\n' || *p == '\r')
+        p++;
+      continue;
+    }
+
+    while (p[idx] && p[idx] != '\n') {
+      if (p[idx] == '\t' && p[idx + 1]) {
+        idx += 2;
+        continue;
+      }
+
+      if ((unsigned char)p[idx] == 27 && p[idx + 1] == '[') {
+        idx += 2;
+        while (p[idx] && p[idx] != 'm')
+          idx++;
+        if (p[idx] == 'm')
+          idx++;
+        continue;
+      }
+
+      if (isspace((unsigned char)p[idx])) {
+        saw_space = TRUE;
+        last_space_idx = idx + 1;
+      }
+
+      vis++;
+      idx++;
+
+      if (vis >= inner_width)
+        break;
+    }
+
+    size_t break_idx = idx;
+    if (p[idx] == '\n')
+      break_idx = idx;
+    else if (vis >= inner_width && saw_space && last_space_idx > 0)
+      break_idx = last_space_idx;
+
+    while (break_idx > 0 && isspace((unsigned char)p[break_idx - 1]) && p[break_idx - 1] != '\t')
+      break_idx--;
+
+    snprintf(linebuf, sizeof(linebuf), "%.*s", (int)break_idx, p);
+    len = append_box_line(buf, len, bufsz, border_color, reset_color, linebuf, inner_width);
+
+    p += break_idx;
+    while (*p == ' ')
+      p++;
+    if (*p == '\n')
+      p++;
   }
 
   return len;
@@ -1311,6 +1472,166 @@ len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
   
   /* Send to character */
   send_to_char(ch, "%s", buf);
+}
+
+ACMD(do_finger)
+{
+  char arg[MAX_INPUT_LENGTH];
+  struct char_data *vict = NULL;
+  bool from_file = FALSE;
+  char buf[MAX_STRING_LENGTH];
+  char line[2048];
+  int len = 0;
+  const size_t W = 77;
+  const char *B = CCBLU(ch, C_NRM);
+  const char *R = CCNRM(ch, C_NRM);
+  const char *Y = CCYEL(ch, C_NRM);
+  const char *C = CCCYN(ch, C_NRM);
+  const char *BY = CBYEL(ch, C_NRM);
+
+  if (IS_NPC(ch))
+    return;
+
+  one_argument(argument, arg);
+
+  if (!*arg)
+    vict = ch;
+  else if (!load_player_target(ch, arg, &vict, &from_file)) {
+    send_to_char(ch, "There is no such player.\r\n");
+    return;
+  }
+
+  if (IS_NPC(vict)) {
+    send_to_char(ch, "You can only finger player characters.\r\n");
+    if (from_file)
+      free_char(vict);
+    return;
+  }
+
+  const char *race = (GET_RACE(vict) >= 0 && GET_RACE(vict) < NUM_RACES) ? pc_race_types[GET_RACE(vict)] : "Unknown";
+  const char *clan = "None";
+  long long bounty = GET_BOUNTY(vict);
+  const char *bounty_color = bounty > 0 ? BY : R;
+
+  /* Top border */
+  len += snprintf(buf + len, sizeof(buf) - len,
+    "\r\n%s╔═══════════════════════════════════════════════════════════════════════════════╗%s\r\n", B, R);
+
+  snprintf(line, sizeof(line), "%sCHARACTER FINGER%s", Y, R);
+  len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
+
+  len += snprintf(buf + len, sizeof(buf) - len,
+    "%s╠═══════════════════════════════════════════════════════════════════════════════╣%s\r\n", B, R);
+
+  snprintf(line, sizeof(line), "%sName:%s %-20s  %sRace:%s %-20s", C, R, GET_NAME(vict), C, R, race);
+  len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
+
+  snprintf(line, sizeof(line), "%sClass:%s %-19s  %sLevel:%s %-5d", C, R, archetype_name(GET_CLASS(vict)), C, R, GET_LEVEL(vict));
+  len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
+
+  snprintf(line, sizeof(line), "%sClan:%s %-20s  %sBounty:%s %s%lld%s", C, R, clan, C, R, bounty_color, bounty, R);
+  len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
+
+  len += snprintf(buf + len, sizeof(buf) - len,
+    "%s╠═══════════════════════════════════════════════════════════════════════════════╣%s\r\n", B, R);
+
+  const char *desc = (vict->player.description && *vict->player.description) ? vict->player.description : "None.";
+  snprintf(line, sizeof(line), "%sDescription:%s %s", C, R, desc);
+  len = append_wrapped_box_text(buf, len, sizeof(buf), B, R, line, W);
+
+  len += snprintf(buf + len, sizeof(buf) - len,
+    "%s╠═══════════════════════════════════════════════════════════════════════════════╣%s\r\n", B, R);
+
+  snprintf(line, sizeof(line), "%sWeight:%s %d   %sHeight:%s %d", C, R, GET_WEIGHT(vict), C, R, GET_HEIGHT(vict));
+  len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
+
+  len += snprintf(buf + len, sizeof(buf) - len,
+    "%s╚═══════════════════════════════════════════════════════════════════════════════╝%s\r\n", B, R);
+
+  send_to_char(ch, "%s", buf);
+
+  if (from_file)
+    free_char(vict);
+}
+
+ACMD(do_bounty)
+{
+  char target[MAX_INPUT_LENGTH];
+  char amount_buf[MAX_INPUT_LENGTH];
+  long long amount = 0;
+  struct char_data *vict = NULL;
+  bool from_file = FALSE;
+
+  if (IS_NPC(ch))
+    return;
+
+  argument = one_argument(argument, target);
+  skip_spaces(&argument);
+
+  if (!*target || !*argument) {
+    send_to_char(ch, "Usage: bounty <player> <amount>\r\n");
+    return;
+  }
+
+  strlcpy(amount_buf, argument, sizeof(amount_buf));
+
+  if (!parse_bounty_amount(amount_buf, &amount) || amount <= 0) {
+    send_to_char(ch, "Invalid bounty amount. Use numbers or amounts like 10g 5s 2c.\r\n");
+    return;
+  }
+
+  if (!load_player_target(ch, target, &vict, &from_file)) {
+    send_to_char(ch, "There is no such player.\r\n");
+    return;
+  }
+
+  if (vict == ch) {
+    send_to_char(ch, "You cannot place a bounty on yourself.\r\n");
+    if (from_file)
+      free_char(vict);
+    return;
+  }
+
+  if (IS_NPC(vict)) {
+    send_to_char(ch, "You can only place bounties on players.\r\n");
+    if (from_file)
+      free_char(vict);
+    return;
+  }
+
+  if (GET_LEVEL(vict) >= LVL_IMMORT) {
+    send_to_char(ch, "You cannot place a bounty on an immortal.\r\n");
+    if (from_file)
+      free_char(vict);
+    return;
+  }
+
+  if (GET_MONEY(ch) < amount) {
+    send_to_char(ch, "You cannot afford that bounty.\r\n");
+    if (from_file)
+      free_char(vict);
+    return;
+  }
+
+  if (amount > LLONG_MAX - GET_BOUNTY(vict)) {
+    send_to_char(ch, "That bounty would overflow the coffers.\r\n");
+    if (from_file)
+      free_char(vict);
+    return;
+  }
+
+  increase_money_copper(ch, -amount);
+  SET_BOUNTY(vict, GET_BOUNTY(vict) + amount);
+
+  save_char(ch);
+  save_char(vict);
+
+  send_to_char(ch, "You place a bounty of %lld copper on %s.\r\n", amount, GET_NAME(vict));
+  if (!from_file && vict->desc)
+    send_to_char(vict, "%s has placed a bounty of %lld copper on you!\r\n", GET_NAME(ch), amount);
+
+  if (from_file)
+    free_char(vict);
 }
 
 /* Currency-only display used by worth and balance. */
