@@ -1273,96 +1273,139 @@ int get_obj_pos_in_equip_vis(struct char_data *ch, char *arg, int *number, struc
   return (-1);
 }
 
-const char *money_desc(int amount)
+const char *money_desc(int amount_copper)
 {
-  int cnt;
-  struct {
-    int limit;
-    const char *description;
-  } money_table[] = {
-    {          1, "a gold coin"				},
-    {         10, "a tiny pile of gold coins"		},
-    {         20, "a handful of gold coins"		},
-    {         75, "a little pile of gold coins"		},
-    {        200, "a small pile of gold coins"		},
-    {       1000, "a pile of gold coins"		},
-    {       5000, "a big pile of gold coins"		},
-    {      10000, "a large heap of gold coins"		},
-    {      20000, "a huge mound of gold coins"		},
-    {      75000, "an enormous mound of gold coins"	},
-    {     150000, "a small mountain of gold coins"	},
-    {     250000, "a mountain of gold coins"		},
-    {     500000, "a huge mountain of gold coins"	},
-    {    1000000, "an enormous mountain of gold coins"	},
-    {          0, NULL					},
-  };
+  static char buf[128];
+  long long unit = 1;
+  const char *metal = "copper";
 
-  if (amount <= 0) {
-    log("SYSERR: Try to create negative or 0 money (%d).", amount);
+  if (amount_copper <= 0) {
+    log("SYSERR: Try to create negative or 0 money (%d).", amount_copper);
     return (NULL);
   }
 
-  for (cnt = 0; money_table[cnt].limit; cnt++)
-    if (amount <= money_table[cnt].limit)
-      return (money_table[cnt].description);
+  /* Auto by value for generic uses */
+  if ((long long)amount_copper >= (long long)COPPER_PER_GOLD) {
+    unit = COPPER_PER_GOLD;
+    metal = "gold";
+  } else if ((long long)amount_copper >= (long long)COPPER_PER_SILVER) {
+    unit = COPPER_PER_SILVER;
+    metal = "silver";
+  } else {
+    unit = 1;
+    metal = "copper";
+  }
 
-  return ("an absolutely colossal mountain of gold coins");
+  {
+    long long count = (long long)amount_copper / unit;
+    long long rem   = (long long)amount_copper % unit;
+
+    if (count == 1 && rem == 0)
+      snprintf(buf, sizeof(buf), "a %s coin", metal);
+    else
+      snprintf(buf, sizeof(buf), "a pile of %s coins", metal);
+  }
+
+  return buf;
 }
 
-struct obj_data *create_money(int amount_copper)
+
+struct obj_data *create_money(int amount_copper, int denom_hint)
 {
   struct obj_data *obj;
   struct extra_descr_data *new_descr;
-  char buf[200];
+  char buf[256];
   int y;
+
+  long long unit = 1;
+  const char *metal = "copper";
 
   if (amount_copper <= 0) {
     log("SYSERR: Try to create negative or 0 money. (%d)", amount_copper);
     return (NULL);
   }
-  obj = create_obj();
-  CREATE(new_descr, struct extra_descr_data, 1);
 
-  if (amount_copper == 1) {
-    obj->name = strdup("coin gold");
-    obj->short_description = strdup("a gold coin");
-    obj->description = strdup("One miserable gold coin is lying here.");
-    new_descr->keyword = strdup("coin gold");
-    new_descr->description = strdup("It's just one miserable little gold coin.");
+  /* If caller knows intent (drop), trust denom_hint. Otherwise auto by value. */
+  if (denom_hint == 3) {
+    unit = COPPER_PER_GOLD;
+    metal = "gold";
+  } else if (denom_hint == 2) {
+    unit = COPPER_PER_SILVER;
+    metal = "silver";
+  } else if (denom_hint == 1) {
+    unit = 1;
+    metal = "copper";
   } else {
-    obj->name = strdup("coins gold");
-    obj->short_description = strdup(money_desc(amount_copper));
-    snprintf(buf, sizeof(buf), "%s is lying here.", money_desc(amount_copper));
-    obj->description = strdup(CAP(buf));
-
-    new_descr->keyword = strdup("coins gold");
-    if (amount_copper < 10)
-      snprintf(buf, sizeof(buf), "There are %d coins.", amount_copper);
-    else if (amount_copper < 100)
-      snprintf(buf, sizeof(buf), "There are about %d coins.", 10 * (amount_copper / 10));
-    else if (amount_copper < 1000)
-      snprintf(buf, sizeof(buf), "It looks to be about %d coins.", 100 * (amount_copper / 100));
-    else if (amount_copper < 100000)
-      snprintf(buf, sizeof(buf), "You guess there are, maybe, %d coins.",
-	      1000 * ((amount_copper / 1000) + rand_number(0, (amount_copper / 1000))));
-    else
-      strcpy(buf, "There are a LOT of coins.");	/* strcpy: OK (is < 200) */
-    new_descr->description = strdup(buf);
+    if ((long long)amount_copper >= (long long)COPPER_PER_GOLD) {
+      unit = COPPER_PER_GOLD;
+      metal = "gold";
+    } else if ((long long)amount_copper >= (long long)COPPER_PER_SILVER) {
+      unit = COPPER_PER_SILVER;
+      metal = "silver";
+    } else {
+      unit = 1;
+      metal = "copper";
+    }
   }
 
-  new_descr->next = NULL;
-  obj->ex_description = new_descr;
+  {
+    long long count = (long long)amount_copper / unit;
+    long long rem   = (long long)amount_copper % unit;
+    int singular = (count == 1 && rem == 0);
 
-  GET_OBJ_TYPE(obj) = ITEM_MONEY;
-  for(y = 0; y < TW_ARRAY_MAX; y++)
-    obj->obj_flags.wear_flags[y] = 0;
-  SET_BIT_AR(GET_OBJ_WEAR(obj), ITEM_WEAR_TAKE);
-  GET_OBJ_VAL(obj, 0) = amount_copper;
-  GET_OBJ_COST(obj) = MAX(1, amount_copper);
-  obj->item_number = NOTHING;
+    obj = create_obj();
+    CREATE(new_descr, struct extra_descr_data, 1);
 
-  return (obj);
+    /* Keywords: only correct metal */
+    {
+      char k[128];
+      snprintf(k, sizeof(k), "coin coins money pile %s", metal);
+      obj->name = strdup(k);
+      new_descr->keyword = strdup(k);
+    }
+
+    if (singular)
+      snprintf(buf, sizeof(buf), "a %s coin", metal);
+    else
+      snprintf(buf, sizeof(buf), "a pile of %s coins", metal);
+    obj->short_description = strdup(buf);
+
+    if (singular)
+      snprintf(buf, sizeof(buf), "A %s coin is lying here.", metal);
+    else
+      snprintf(buf, sizeof(buf), "A pile of %s coins is lying here.", metal);
+    obj->description = strdup(buf);
+
+    if (singular) {
+      snprintf(buf, sizeof(buf), "It's a single %s coin.", metal);
+    } else {
+      if (count < 10)
+        snprintf(buf, sizeof(buf), "There are %lld %s coins.", count, metal);
+      else if (count < 100)
+        snprintf(buf, sizeof(buf), "There are about %lld %s coins.", 10LL * (count / 10LL), metal);
+      else if (count < 1000)
+        snprintf(buf, sizeof(buf), "It looks to be about %lld %s coins.", 100LL * (count / 100LL), metal);
+      else
+        snprintf(buf, sizeof(buf), "There are a lot of %s coins.", metal);
+    }
+    new_descr->description = strdup(buf);
+
+    new_descr->next = NULL;
+    obj->ex_description = new_descr;
+
+    GET_OBJ_TYPE(obj) = ITEM_MONEY;
+    for (y = 0; y < TW_ARRAY_MAX; y++)
+      obj->obj_flags.wear_flags[y] = 0;
+    SET_BIT_AR(GET_OBJ_WEAR(obj), ITEM_WEAR_TAKE);
+
+    GET_OBJ_VAL(obj, 0) = amount_copper;
+    GET_OBJ_COST(obj) = MAX(1, amount_copper);
+    obj->item_number = NOTHING;
+
+    return obj;
+  }
 }
+
 
 /* Generic Find, designed to find any object orcharacter.
  *  *arg     is the pointer containing the string to be searched for.

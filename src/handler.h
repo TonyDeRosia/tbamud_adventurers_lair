@@ -23,7 +23,7 @@ bool add_dur, bool avg_dur, bool add_mod, bool avg_mod);
 
 /* utility */
 const char *money_desc(int amount);
-struct obj_data *create_money(int amount_copper);
+struct obj_data *create_money(int amount_copper, int denom_hint);
 int	isname(const char *str, const char *namelist);
 int	is_name(const char *str, const char *namelist);
 char	*fname(const char *namelist);
