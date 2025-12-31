@@ -992,6 +992,7 @@ struct player_special_data_saved
   ubyte screen_width;     /**< How wide the display page is */
   char prompt[MAX_PROMPT_LENGTH + 1]; /**< Custom prompt string */
   int spells_to_learn;    /**< Remaining number of practice sessions */
+  int trains;             /**< Remaining number of training sessions */
   int olc_zone;           /**< Current olc permissions */
   int questpoints;        /**< Number of quest points earned */
   qst_vnum *completed_quests;   /**< Quests completed              */

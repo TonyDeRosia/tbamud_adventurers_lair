@@ -599,6 +599,7 @@ do                                                              \
 #define GET_LOADROOM(ch)	CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.load_room))
 /** Number of skill practice sessions remaining for ch. */
 #define GET_PRACTICES(ch)	CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.spells_to_learn))
+#define GET_TRAINS(ch)          CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.trains))
 /** Current invisibility level of ch. */
 #define GET_INVIS_LEV(ch)	CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.invis_level))
 /** Current wimpy level of ch. */

@@ -1521,6 +1521,8 @@ void advance_level(struct char_data *ch)
   else
     GET_PRACTICES(ch) += MIN(2, MAX(1, wis_app[GET_WIS(ch)].bonus));
 
+  GET_TRAINS(ch) += 1;
+
   if (GET_LEVEL(ch) >= LVL_IMMORT) {
     for (i = 0; i < 3; i++)
       GET_COND(ch, i) = (char) -1;

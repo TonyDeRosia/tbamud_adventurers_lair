@@ -248,6 +248,7 @@ cpp_extern const struct command_info cmd_info[] = {
   { "peace"    , "pe"      , POS_DEAD    , do_peace    , LVL_BUILDER, 0 },
   { "pick"     , "pi"      , POS_STANDING, do_gen_door , 1, SCMD_PICK },
   { "practice" , "pr"      , POS_RESTING , do_practice , 1, 0 },
+  { "train"    , "tr"      , POS_RESTING , do_train    , 1, 0 },
   { "skills"    , "sk"      , POS_RESTING , do_skills   , 1, 0 },
   { "spellbook" , "spell"   , POS_RESTING , do_spellbook , 1, 0 },
   { "spells"    , "sp"      , POS_RESTING , do_spells   , 1, 0 },
