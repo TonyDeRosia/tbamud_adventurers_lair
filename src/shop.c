@@ -528,10 +528,39 @@ static struct obj_data *get_purchase_obj(struct char_data *ch, char *arg, struct
    discount beyond the basic price.  That assumes they put a lot of points
    into charisma, because on the flip side they'd get 11% inflation by
    having a 3. */
+static float cha_buy_discount_factor(const struct char_data *buyer)
+{
+  int cha;
+
+  if (!buyer || IS_NPC(buyer) || GET_LEVEL(buyer) >= LVL_IMMORT)
+    return 1.0f;
+
+  cha = GET_CHA(buyer);
+
+  if (cha <= 13)
+    return 1.0f;
+
+  if (cha > 25)
+    cha = 25;
+
+  /* CHA 13 -> 1.00, CHA 25 -> 0.85 */
+  {
+    float t = (float)(cha - 13) / (float)(25 - 13);
+    return 1.0f - (0.15f * t);
+  }
+}
+
 static int buy_price(struct obj_data *obj, int shop_nr, struct char_data *keeper, struct char_data *buyer)
 {
-  return (int)shop_calculate_buy_price(GET_OBJ_COST(obj), SHOP_BUYPROFIT(shop_nr),
-                                       GET_CHA(keeper), buyer);
+  float base = (float)GET_OBJ_COST(obj) * (float)SHOP_BUYPROFIT(shop_nr);
+  float final = base * cha_buy_discount_factor(buyer);
+
+  (void)keeper;
+
+  if (final < 1.0f)
+    final = 1.0f;
+
+  return (int)(final + 0.5f);
 }
 
 /* When the shopkeeper is buying, we reverse the discount. Also make sure
@@ -1796,31 +1825,20 @@ ACMD(do_shopdisc)
   send_to_char(ch, "Item: %s\r\n", obj->short_description ? obj->short_description : obj->name);
 
   {
-    long price = shop_calculate_buy_price(GET_OBJ_COST(obj), SHOP_BUYPROFIT(shop_nr),
-                                          GET_CHA(keeper), ch);
-    float factor = shop_charisma_discount(ch);
+    int saved_cha = ch->aff_abils.cha;
 
-    shop_format_price(price_buf, sizeof(price_buf), shop_units_to_copper(price));
-    send_to_char(ch, "CHA %2d factor %.2f price %s\r\n", GET_CHA(ch), factor, price_buf);
-  }
+    for (i = 0; i < (int)(sizeof(samples) / sizeof(samples[0])); i++) {
+      long price_copper;
+      int price;
 
-  for (i = 0; i < (int)(sizeof(samples) / sizeof(samples[0])); i++) {
-    struct char_data dummy;
-    long price;
-    float factor;
+      ch->aff_abils.cha = samples[i];
+      price = buy_price(obj, shop_nr, keeper, ch);
+      price_copper = shop_units_to_copper((long long)price);
 
-    if (samples[i] == GET_CHA(ch))
-      continue;
+      shop_format_price(price_buf, sizeof(price_buf), price_copper);
+      send_to_char(ch, "CHA %2d price %s\r\n", samples[i], price_buf);
+    }
 
-    memset(&dummy, 0, sizeof(dummy));
-    dummy.player.level = 1;
-    dummy.real_abils.cha = samples[i];
-
-    price = shop_calculate_buy_price(GET_OBJ_COST(obj), SHOP_BUYPROFIT(shop_nr),
-                                     GET_CHA(keeper), &dummy);
-    factor = shop_charisma_discount(&dummy);
-
-    shop_format_price(price_buf, sizeof(price_buf), shop_units_to_copper(price));
-    send_to_char(ch, "CHA %2d factor %.2f price %s\r\n", samples[i], factor, price_buf);
+    ch->aff_abils.cha = saved_cha;
   }
 }
