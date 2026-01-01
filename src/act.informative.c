@@ -2449,7 +2449,7 @@ ACMD(do_who)
             clancol[0] = '\0';
 
             if (GET_CLAN_ID(tch) > 0)
-              snprintf(clancol, sizeof(clancol), "[%s]", clan_display_name_by_id(GET_CLAN_ID(tch)));
+              snprintf(clancol, sizeof(clancol), "[%s\tn]", clan_display_name_by_id(GET_CLAN_ID(tch)));
       char clan_col[64];
       who_center_clan_tag(clan_col, sizeof(clan_col), clancol, 17);
 
