@@ -517,33 +517,34 @@ ACMD(do_clanedit)
 
   skip_spaces(&argument);
 
-  if (*argument) {
-    if (GET_LEVEL(ch) < LVL_IMPL) {
-      send_to_char(ch, "You do not have permission to do that.\r\n");
-      return;
-    }
+  if (!*argument) {
+    send_to_char(ch, "Usage: clanedit <clan name>\r\n");
+    return;
+  }
 
-    if (is_number(argument)) {
-      id = atoi(argument);
-    } else {
-      int k;
-      for (k = 1; k < 10000; k++) {
-        const char *nm = clan_name_by_id(k);
-        if (!nm) continue;
-        if (!str_cmp(nm, argument)) { id = k; break; }
+  if (is_number(argument)) {
+    id = atoi(argument);
+  } else {
+    int k;
+    for (k = 1; k < 10000; k++) {
+      const char *nm = clan_name_by_id(k);
+      if (!nm)
+        continue;
+      if (!str_cmp(nm, argument)) {
+        id = k;
+        break;
       }
     }
+  }
 
-    if (id <= 0 || !clan_name_by_id(id)) {
-      send_to_char(ch, "Clan not found.\r\n");
-      return;
-    }
-  } else {
-    id = GET_CLAN_ID(ch);
-    if (id <= 0) {
-      send_to_char(ch, "You are not in a clan.\r\n");
-      return;
-    }
+  if (id <= 0 || !clan_name_by_id(id)) {
+    send_to_char(ch, "Clan not found.\r\n");
+    return;
+  }
+
+  if (GET_LEVEL(ch) < LVL_IMPL && GET_CLAN_ID(ch) != id) {
+    send_to_char(ch, "You do not have permission to edit that clan.\r\n");
+    return;
   }
 
   ch->desc->clanedit_id = id;
