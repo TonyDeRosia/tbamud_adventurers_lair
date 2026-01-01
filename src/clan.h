@@ -2,11 +2,12 @@
 #define CLAN_H
 
 #define CLAN_NONE 0
+#define CLAN_NAME_LEN 64
 
 struct clan_data {
   int id;
   long leader_idnum;
-  char name[64];
+  char name[CLAN_NAME_LEN];
   struct clan_data *next;
 };
 
@@ -18,5 +19,6 @@ const char *clan_name_by_id(int clan_id);
 int clan_next_id(void);
 
 int clan_create_and_save(int new_id, long leader_idnum, const char *name);
+int clan_set_name_and_save(int clan_id, const char *name);
 
 #endif

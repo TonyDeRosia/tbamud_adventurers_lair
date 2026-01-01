@@ -263,7 +263,29 @@ void clanedit_parse(struct descriptor_data *d, char *arg)
 
   switch (d->clanedit_mode) {
     case CLANEDIT_SET_NAME:
-      write_to_output(d, "\r\nName edit is not persisted yet. Use file edits for now.\r\n");
+      if (!*arg) {
+        write_to_output(d, "Clan name cannot be empty. Enter new clan name: ");
+        return;
+      }
+
+      if (!is_valid_clan_name(arg)) {
+        write_to_output(d, "Clan names may only use letters, numbers, and color codes. Try again: ");
+        return;
+      }
+
+      if (strlen(arg) >= CLAN_NAME_LEN) {
+        write_to_output(d, "Clan names must be under %d characters. Try again: ", CLAN_NAME_LEN);
+        return;
+      }
+
+      if (!clan_set_name_and_save(d->clanedit_id, arg)) {
+        write_to_output(d, "Unable to save the new clan name.\r\n");
+        d->clanedit_mode = CLANEDIT_MAIN;
+        clanedit_menu(d);
+        return;
+      }
+
+      write_to_output(d, "Clan name updated to %s.\r\n", clan_name_by_id(d->clanedit_id));
       d->clanedit_mode = CLANEDIT_MAIN;
       clanedit_menu(d);
       return;
