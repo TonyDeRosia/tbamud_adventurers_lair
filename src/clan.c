@@ -31,7 +31,7 @@ static struct clan_data *clan_by_id(int clan_id)
   return NULL;
 }
 
-static int clan_save_all(void)
+int clan_save_all(void)
 {
   FILE *fl;
   struct clan_data *c;

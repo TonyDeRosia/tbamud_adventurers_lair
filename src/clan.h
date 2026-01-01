@@ -24,5 +24,6 @@ int clan_next_id(void);
 int clan_create_and_save(int new_id, long leader_idnum, const char *name);
 int clan_set_name_and_save(int clan_id, const char *name);
 int clan_set_display_name_and_save(int clan_id, const char *display_name);
+int clan_save_all(void);
 
 #endif
