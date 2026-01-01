@@ -295,9 +295,10 @@ void clanedit_parse(struct descriptor_data *d, char *arg);
 #define AFF_SNEAK          19   /**< Char can move quietly */
 #define AFF_HIDE           20   /**< Char is hidden */
 #define AFF_PVP_LOCK       21   /**< Clan PvP lockout */
-#define AFF_CHARM          22   /**< Char is charmed */
+#define AFF_CLAN_COOLDOWN  22   /**< Prevents rapidly switching clans */
+#define AFF_CHARM          23   /**< Char is charmed */
 /** Total number of affect flags */
-#define NUM_AFF_FLAGS   23
+#define NUM_AFF_FLAGS   24
 
 /* Modes of connectedness: used by descriptor_data.state 		*/
 #define CON_CLANEDIT      42 /**< Clan editor */
