@@ -2466,7 +2466,21 @@ ACMD(do_who)
             memcpy(clan_name_buf, clan_name, name_len);
             clan_name_buf[name_len] = '\0';
 
-            snprintf(clancol, sizeof(clancol), "[%s]\tn", clan_name_buf);
+            {
+              const char *cn = clan_name_buf;
+              size_t cn_len = strlen(cn);
+
+              /* If the clan name already ends with a reset, move it outside the bracket. */
+              if (cn_len >= 2 && cn[cn_len - 2] == '	' && cn[cn_len - 1] == 'n')
+                cn_len -= 2;
+
+              /* Leave room for: '[' + ']' + '	' 'n' + NUL => 1 + 1 + 2 + 1 = 5 bytes */
+              size_t max_inside = sizeof(clancol) - 5;
+              if (cn_len > max_inside)
+                cn_len = max_inside;
+
+              snprintf(clancol, sizeof(clancol), "[%.*s]	n", (int)cn_len, cn);
+            }
           }
 
           {
