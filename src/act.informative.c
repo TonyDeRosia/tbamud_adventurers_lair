@@ -36,6 +36,41 @@
 
 
 /* Encumbrance label for score display */
+/* Ensure exactly one blank line after room descriptions before exits/contents. */
+static void ensure_one_blank_line_after_desc(struct char_data *ch, const char *desc)
+{
+  size_t n;
+  int trailing_nl = 0;
+
+  if (!ch)
+    return;
+
+  if (!desc || !*desc) {
+    send_to_char(ch, "\r\n");
+    return;
+  }
+
+  n = strlen(desc);
+
+  /* Count trailing '\n' ignoring '\r'. */
+  while (n > 0) {
+    char c = desc[n - 1];
+    if (c == '\r') { n--; continue; }
+    if (c == '\n') { trailing_nl++; n--; continue; }
+    break;
+  }
+
+  /* If desc doesn't end in newline, add one. */
+  if (trailing_nl == 0)
+    send_to_char(ch, "\r\n");
+
+  /* If desc ends with 1 newline, add one more to make a blank line. */
+  if (trailing_nl == 1)
+    send_to_char(ch, "\r\n");
+
+  /* If desc already has 2+ newlines, do nothing (prevents double blank gaps). */
+}
+
 static const char *encumbrance_text(struct char_data *ch)
 {
   int cap = CAN_CARRY_W(ch);
@@ -557,6 +592,8 @@ void look_at_room(struct char_data *ch, int ignore_brief)
       str_and_map(world[target_room].description, ch, target_room);
     else
        send_to_char(ch, "%s", world[IN_ROOM(ch)].description);
+
+  ensure_one_blank_line_after_desc(ch, world[IN_ROOM(ch)].description);
   }
 
 
