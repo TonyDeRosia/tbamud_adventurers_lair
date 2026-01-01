@@ -6,6 +6,7 @@ extern struct descriptor_data *descriptor_list;
 #include "structs.h"
 #include "utils.h"
 #include "comm.h"
+#include "screen.h"
 #include "interpreter.h"
 #include "handler.h"
 #include "db.h"
@@ -230,7 +231,8 @@ static void clan_show_roster(struct char_data *ch)
     B, R,
     B, R, Y, R, B,
     B, R,
-    B, C, R, C, R, C, R, C, R, B, R);
+    B, C, R, C, R, C, R, C, R, B,
+    B, R);
 
   if (count == 0) {
     send_to_char(ch,
