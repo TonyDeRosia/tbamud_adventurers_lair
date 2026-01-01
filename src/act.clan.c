@@ -10,6 +10,7 @@ extern struct descriptor_data *descriptor_list;
 #include "handler.h"
 #include "db.h"
 #include "clan.h"
+#include "modify.h"
 
 /* rank ideas for now */
 #define CLAN_RANK_MEMBER 0
@@ -56,25 +57,47 @@ static int is_valid_plain_clan_name(const char *s)
 
 static int is_valid_display_clan_name(const char *s)
 {
-  /* Allow: letters/numbers, and tbaMUD color codes like \tR \tn, no spaces. */
+  /* Allow: letters/numbers, and tbaMUD color codes like @R @n (stored as a tab
+   * followed by a color code), no spaces. */
   if (!s || !*s)
     return 0;
 
   for (size_t i = 0; s[i]; i++) {
-    if (s[i] == '\\') {
-      /* Accept \tX */
-      if (s[i + 1] == 't' && s[i + 2]) {
-        i += 2; /* skip over \ t X */
-        continue;
-      }
-      return 0;
+    if (s[i] == '\t') {
+      if (!s[i + 1])
+        return 0; /* A lone tab can't start a color code. */
+      i++; /* Skip the color code character. */
+      continue;
     }
+
+    if (s[i] == '@')
+      continue; /* Escaped @@ that survived parsing. */
+
     if (isspace((unsigned char)s[i]))
       return 0;
     if (!isalnum((unsigned char)s[i]))
       return 0;
   }
   return 1;
+}
+
+static void normalize_display_name(char *dest, size_t destlen, const char *src)
+{
+  /* Translate both legacy \tX sequences and builder-friendly @X into the
+   * protocol tab codes used by the output layer. */
+  size_t di = 0;
+
+  for (size_t si = 0; src[si] && di + 1 < destlen; si++) {
+    if (src[si] == '\\' && src[si + 1] == 't') {
+      dest[di++] = '@';
+      si++; /* Skip the 't'. */
+    } else {
+      dest[di++] = src[si];
+    }
+  }
+
+  dest[di] = '\0';
+  parse_at(dest);
 }
 
 
@@ -319,17 +342,21 @@ void clanedit_parse(struct descriptor_data *d, char *arg)
         return;
       }
 
-      if (!is_valid_display_clan_name(arg)) {
+      char parsed_name[CLAN_DISPLAY_LEN];
+
+      normalize_display_name(parsed_name, sizeof(parsed_name), arg);
+
+      if (!is_valid_display_clan_name(parsed_name)) {
         write_to_output(d, "Display names may only use letters, numbers, and color codes. Try again: ");
         return;
       }
 
-      if (strlen(arg) >= CLAN_DISPLAY_LEN) {
+      if (strlen(parsed_name) >= CLAN_DISPLAY_LEN) {
         write_to_output(d, "Display names must be under %d characters. Try again: ", CLAN_DISPLAY_LEN);
         return;
       }
 
-      if (!clan_set_display_name_and_save(d->clanedit_id, arg)) {
+      if (!clan_set_display_name_and_save(d->clanedit_id, parsed_name)) {
         write_to_output(d, "Unable to save the new display name.\r\n");
         d->clanedit_mode = CLANEDIT_MAIN;
         clanedit_menu(d);
