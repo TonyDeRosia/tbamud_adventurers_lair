@@ -26,6 +26,7 @@
 #include "shop.h"
 #include "quest.h"
 #include "criticalhits.h"
+#include "clan.h"
 
 
 /* locally defined global variables, used externally */
@@ -53,6 +54,110 @@ struct attack_hit_type attack_hit_text[] =
 
 /* local (file scope only) variables */
 static struct char_data *next_combat_list = NULL;
+
+static int clan_pvp_enabled(const struct char_data *ch, int clan_type)
+{
+  switch (clan_type) {
+    case CLAN_PVP_ALWAYS:
+      return TRUE;
+    case CLAN_PVP_TOGGLE:
+      return PRF_FLAGGED(ch, PRF_CLAN_PVP);
+    default:
+      return FALSE;
+  }
+}
+
+int clan_pvp_lock_remaining(struct char_data *ch)
+{
+  struct affected_type *af;
+  int ticks = 0;
+
+  if (!ch)
+    return 0;
+
+  for (af = ch->affected; af; af = af->next) {
+    if (IS_SET_AR(af->bitvector, AFF_PVP_LOCK))
+      ticks = MAX(ticks, af->duration);
+  }
+
+  if (ticks <= 0)
+    return 0;
+
+  return ticks * SECS_PER_MUD_HOUR;
+}
+
+int can_pvp(struct char_data *ch, struct char_data *victim, int silent)
+{
+  int ch_clan_type, vict_clan_type;
+
+  if (!ch || !victim)
+    return FALSE;
+
+  if (ch == victim)
+    return TRUE;
+
+  /* NPC combat is not restricted by clan PvP rules. */
+  if (IS_NPC(ch) || IS_NPC(victim))
+    return TRUE;
+
+  if (!CONFIG_PK_ALLOWED) {
+    if (!silent)
+      send_to_char(ch, "Player killing is disabled.\r\n");
+    return FALSE;
+  }
+
+  if (GET_CLAN_ID(ch) > 0 && GET_CLAN_ID(ch) == GET_CLAN_ID(victim)) {
+    if (!silent)
+      send_to_char(ch, "You cannot attack a member of your own clan.\r\n");
+    return FALSE;
+  }
+
+  ch_clan_type = clan_pvp_type_by_id(GET_CLAN_ID(ch));
+  vict_clan_type = clan_pvp_type_by_id(GET_CLAN_ID(victim));
+
+  if (ch_clan_type == CLAN_PVP_NO_PVP) {
+    if (!silent)
+      send_to_char(ch, "Your clan forbids PvP.\r\n");
+    return FALSE;
+  }
+
+  if (vict_clan_type == CLAN_PVP_NO_PVP) {
+    if (!silent)
+      send_to_char(ch, "That player is protected by a no-PvP clan.\r\n");
+    return FALSE;
+  }
+
+  if (!clan_pvp_enabled(ch, ch_clan_type)) {
+    if (!silent)
+      send_to_char(ch, "You must enable PvP before attacking.\r\n");
+    return FALSE;
+  }
+
+  if (!clan_pvp_enabled(victim, vict_clan_type)) {
+    if (!silent)
+      send_to_char(ch, "That player does not have PvP enabled.\r\n");
+    return FALSE;
+  }
+
+  return TRUE;
+}
+
+static void apply_clan_pvp_lock(struct char_data *ch)
+{
+  struct affected_type af;
+
+  if (!ch || IS_NPC(ch))
+    return;
+
+  if (AFF_FLAGGED(ch, AFF_PVP_LOCK))
+    return;
+
+  new_affect(&af);
+  af.duration = MAX(1, (30 * 60) / SECS_PER_MUD_HOUR);
+  SET_BIT_AR(af.bitvector, AFF_PVP_LOCK);
+  affect_join(ch, &af, FALSE, FALSE, FALSE, FALSE);
+  send_to_char(ch, "Your PvP flag is now locked on for 30 minutes.\r\n");
+}
 
 /* local file scope utility functions */
 static void perform_group_gain(struct char_data *ch, int base, struct char_data *victim);
@@ -862,6 +967,9 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
     return (0);
   }
 
+  if (!can_pvp(ch, victim, FALSE))
+    return 0;
+
   /* You can't damage an immortal! */
   if (!IS_NPC(victim) && ((GET_LEVEL(victim) >= LVL_IMMORT) && PRF_FLAGGED(victim, PRF_NOHASSLE)))
     dam = 0;
@@ -872,6 +980,12 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
   }
 
   if (victim != ch) {
+    if (!IS_NPC(ch) && !IS_NPC(victim)) {
+      int ch_clan_type = clan_pvp_type_by_id(GET_CLAN_ID(ch));
+      if (ch_clan_type == CLAN_PVP_TOGGLE && PRF_FLAGGED(ch, PRF_CLAN_PVP))
+        apply_clan_pvp_lock(ch);
+    }
+
     /* Start the attacker fighting the victim */
     if (GET_POS(ch) > POS_STUNNED && (FIGHTING(ch) == NULL))
       set_fighting(ch, victim);
