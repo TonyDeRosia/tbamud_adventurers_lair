@@ -109,7 +109,7 @@ static void clan_help(struct char_data *ch)
     "  clan                 shows your clan status\r\n"
     "  clan list            shows clan file location\r\n"
     "  clan <message>       sends clan chat\r\n"
-    "  pvp                  toggle your clan PvP status if allowed\r\n"
+    "  togglepvp            toggle your clan PvP status if allowed\r\n"
     "Shortcuts:\r\n"
     "  ccreate <Name>       create clan (admins level 104 only)\r\n"
     "  cinvite <player>     not active yet\r\n"
@@ -620,10 +620,10 @@ ACMD(do_clan_pvp_toggle)
         }
 
         REMOVE_BIT_AR(PRF_FLAGS(ch), PRF_CLAN_PVP);
-        send_to_char(ch, "You disable PvP for your clan membership.\r\n");
+        send_to_char(ch, "PvP deactivated.\r\n");
       } else {
         SET_BIT_AR(PRF_FLAGS(ch), PRF_CLAN_PVP);
-        send_to_char(ch, "You enable PvP for your clan membership.\r\n");
+        send_to_char(ch, "PvP activated.\r\n");
         send_to_char(ch, "If you attack another player while enabled, you will be locked on for 30 minutes.\r\n");
       }
       save_char(ch);
