@@ -33,6 +33,7 @@
 #include "fight.h"
 #include "modify.h"
 #include "shop.h"
+#include "clan.h"
 #include "quest.h"
 #include "ibt.h"
 #include "mud_event.h"
@@ -724,6 +725,7 @@ void boot_db(void)
   mag_assign_spells();
 
   boot_world();
+  clan_boot();
 
   log("Loading help entries.");
   index_boot(DB_BOOT_HLP);

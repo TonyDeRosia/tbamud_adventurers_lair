@@ -1,0 +1,5 @@
+# clans.dat
+# Format per line:
+# <clan_id> <leader_idnum> <name>
+# Example:
+# 1 12345 KnightsOfMidgaard

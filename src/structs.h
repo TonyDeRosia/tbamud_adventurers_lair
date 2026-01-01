@@ -1009,6 +1009,8 @@ struct player_special_data_saved
   long account_id; /* account linkage id */
   long long bounty_copper; /**< Outstanding bounty on the character, stored in copper */
 
+  int clan_id;
+  int clan_rank;
 };
 
 /** Specials needed only by PCs, not NPCs.  Space for this structure is
@@ -1467,3 +1469,10 @@ struct config_data
 #endif
 
 #endif /* _STRUCTS_H_ */
+
+
+/* Clan helpers */
+#define GET_CLAN_ID(ch)      ((ch)->player_specials->saved.clan_id)
+#define GET_CLAN_RANK(ch)    ((ch)->player_specials->saved.clan_rank)
+#define SET_CLAN_ID(ch, v)   (GET_CLAN_ID(ch) = (v))
+#define SET_CLAN_RANK(ch, v) (GET_CLAN_RANK(ch) = (v))

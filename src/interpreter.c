@@ -47,6 +47,16 @@ ACMD(do_unpull);
 ACMD(do_offhand);
 ACMD(do_bounty);
 ACMD(do_finger);
+
+ACMD(do_clan);
+ACMD(do_ccreate);
+ACMD(do_cinvite);
+ACMD(do_cjoin);
+ACMD(do_cquit);
+ACMD(do_cpromote);
+ACMD(do_cdemote);
+ACMD(do_roster);
+
 /* local (file scope) functions */
 static int perform_dupe_check(struct descriptor_data *d);
 static struct alias_data *find_alias(struct alias_data *alias_list, char *str);
@@ -362,6 +372,8 @@ cpp_extern const struct command_info cmd_info[] = {
   { "wear"     , "wea"     , POS_RESTING , do_wear     , 0, 0 },
   { "weather"  , "weather" , POS_RESTING , do_weather  , 0, 0 },
   { "who"      , "wh"      , POS_DEAD    , do_who      , 0, 0 },
+  { "roster", "roster", POS_DEAD, do_roster, 0, 0 },
+
   { "whois"    , "whoi"    , POS_DEAD    , do_whois    , 0, 0 },
   { "whoami"   , "whoami"  , POS_DEAD    , do_gen_ps   , 0, SCMD_WHOAMI },
   { "where"    , "where"   , POS_RESTING , do_where    , 1, 0 },
@@ -387,6 +399,13 @@ cpp_extern const struct command_info cmd_info[] = {
   { "zpurge"   , "zpurge"  , POS_DEAD    , do_zpurge   , LVL_BUILDER, 0 },
   { "balance", "bal", POS_DEAD, do_balance, 0, 0 },
   { "bounty"   , "bounty"  , POS_DEAD    , do_bounty   , 0, 0 },
+  { "clan", "clan", POS_DEAD, do_clan, 0, 0 },
+  { "ccreate", "ccreate", POS_DEAD, do_ccreate, 0, 0 },
+  { "cinvite", "cinvite", POS_DEAD, do_cinvite, 0, 0 },
+  { "cjoin", "cjoin", POS_DEAD, do_cjoin, 0, 0 },
+  { "cquit", "cquit", POS_DEAD, do_cquit, 0, 0 },
+  { "cpromote", "cpromote", POS_DEAD, do_cpromote, 0, 0 },
+  { "cdemote", "cdemote", POS_DEAD, do_cdemote, 0, 0 },
   { "worth",   "wor", POS_DEAD, do_worth,   0, 0 },
 
   { "\n", "zzzzzzz", 0, 0, 0, 0 }   
