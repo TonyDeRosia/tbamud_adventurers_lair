@@ -2474,12 +2474,12 @@ ACMD(do_who)
               if (cn_len >= 2 && cn[cn_len - 2] == '	' && cn[cn_len - 1] == 'n')
                 cn_len -= 2;
 
-              /* Leave room for: '[' + ']' + '	' 'n' + NUL => 1 + 1 + 2 + 1 = 5 bytes */
+              /* Leave room for: '[' + '	' 'n' + ']' + NUL => 1 + 2 + 1 + 1 = 5 bytes */
               size_t max_inside = sizeof(clancol) - 5;
               if (cn_len > max_inside)
                 cn_len = max_inside;
 
-              snprintf(clancol, sizeof(clancol), "[%.*s]	n", (int)cn_len, cn);
+              snprintf(clancol, sizeof(clancol), "[%.*s	n]", (int)cn_len, cn);
             }
           }
 
