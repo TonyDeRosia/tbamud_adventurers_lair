@@ -33,9 +33,9 @@ static void send_to_clan(int clan_id, const char *msg, struct char_data *from)
       continue;
 
     if (from)
-      send_to_char(d->character, "\r\n[Clan] %s: %s\r\n", GET_NAME(from), msg);
+      send_to_char(d->character, "\r\n\tG[Clan]\tn %s: %s\r\n", GET_NAME(from), msg);
     else
-      send_to_char(d->character, "\r\n[Clan] %s\r\n", msg);
+      send_to_char(d->character, "\r\n\tG[Clan]\tn %s\r\n", msg);
   }
 }
 
@@ -661,6 +661,10 @@ ACMD(do_clan)
     return;
   }
 
+  /* Preserve the original text for chat so spacing is not lost during parsing. */
+  char original_message[MAX_INPUT_LENGTH * 2];
+  strlcpy(original_message, argument, sizeof(original_message));
+
   /* Parse first word. We allow both: "clan join X" and wrapper calls like cjoin -> "join X". */
   argument = any_one_arg(argument, arg1);
 
@@ -723,15 +727,8 @@ ACMD(do_clan)
     return;
   }
 
-  /* Rebuild the message with arg1 included. */
-  {
-    char msg[MAX_INPUT_LENGTH * 2];
-    if (*argument)
-      snprintf(msg, sizeof(msg), "%s %s", arg1, argument);
-    else
-      snprintf(msg, sizeof(msg), "%s", arg1);
-    send_to_clan(GET_CLAN_ID(ch), msg, ch);
-  }
+  /* Use the original message so user-entered spacing is preserved. */
+  send_to_clan(GET_CLAN_ID(ch), original_message, ch);
 }
 
 
