@@ -164,6 +164,63 @@ static const char *roster_class_name(int id)
   return "Unknown";
 }
 
+/* Pad a field to a fixed visible width while preserving color codes. */
+static void roster_pad_field(char *out, size_t outsz, const char *src, int width)
+{
+  int vis = 0;
+  size_t pos = 0;
+  int color_active = FALSE;
+
+  if (!out || outsz == 0)
+    return;
+
+  out[0] = '\0';
+
+  if (width < 0)
+    width = 0;
+
+  if (!src)
+    src = "";
+
+  for (const char *s = src; *s && pos + 1 < outsz; ) {
+    if (*s == '@' && *(s + 1)) {
+      color_active = (*(s + 1) != 'n');
+      if (pos + 2 < outsz) {
+        out[pos++] = *s++;
+        out[pos++] = *s++;
+      }
+      continue;
+    }
+
+    if (*s == '\t' && *(s + 1)) {
+      color_active = (*(s + 1) != 'n');
+      if (pos + 2 < outsz) {
+        out[pos++] = *s++;
+        out[pos++] = *s++;
+      }
+      continue;
+    }
+
+    if (vis >= width) {
+      s++;
+      continue;
+    }
+
+    out[pos++] = *s++;
+    vis++;
+  }
+
+  if (color_active && pos + 2 < outsz) {
+    out[pos++] = '\t';
+    out[pos++] = 'n';
+  }
+
+  for (; vis < width && pos + 1 < outsz; vis++)
+    out[pos++] = ' ';
+
+  out[pos] = '\0';
+}
+
 
 static void clan_show_roster(struct char_data *ch)
 {
@@ -240,14 +297,22 @@ static void clan_show_roster(struct char_data *ch)
       B, R, B
     );
   } else {
+    char namebuf[128];
+    char racebuf[64];
+    char classbuf[64];
+
     for (i = 0; i < count; i++) {
       const char *rname = roster_race_name(GET_RACE(list[i]));
       const char *cname = roster_class_name(GET_CLASS(list[i]));
-      send_to_char(ch, "%s║%s %-24.24s %-15.15s %-15.15s %5d      %s║\r\n",
+      roster_pad_field(namebuf, sizeof(namebuf), GET_NAME(list[i]), 24);
+      roster_pad_field(racebuf, sizeof(racebuf), (rname ? rname : "Unknown"), 15);
+      roster_pad_field(classbuf, sizeof(classbuf), (cname ? cname : "Unknown"), 15);
+
+      send_to_char(ch, "%s║%s %s %s %s %5d       %s║\r\n",
         B, R,
-        GET_NAME(list[i]),
-        (rname ? rname : "Unknown"),
-        (cname ? cname : "Unknown"),
+        namebuf,
+        racebuf,
+        classbuf,
         GET_LEVEL(list[i]),
         B
       );
