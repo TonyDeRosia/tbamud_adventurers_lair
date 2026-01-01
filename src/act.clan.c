@@ -1,6 +1,8 @@
 #include "conf.h"
 #include "sysdep.h"
 
+extern struct descriptor_data *descriptor_list;
+
 #include "structs.h"
 #include "utils.h"
 #include "comm.h"
@@ -208,6 +210,219 @@ static void clan_show_roster(struct char_data *ch)
 
 
 
+
+/* Clan list (clist / clanlist). Shows existing clans and online member counts. */
+struct clanlist_row {
+  int id;
+  const char *name;
+  int online;
+};
+
+static int clanlist_cmp(const void *a, const void *b)
+{
+  const struct clanlist_row *ra = (const struct clanlist_row *)a;
+  const struct clanlist_row *rb = (const struct clanlist_row *)b;
+
+  if (!ra->name && !rb->name) return 0;
+  if (!ra->name) return 1;
+  if (!rb->name) return -1;
+
+  return strcasecmp(ra->name, rb->name);
+}
+
+/* Clan editor (basic) */
+#define CLANEDIT_MAIN 0
+#define CLANEDIT_SET_NAME 1
+#define CLANEDIT_SET_TAG 2
+
+static void clanedit_menu(struct descriptor_data *d)
+{
+  int id = d->clanedit_id;
+  const char *nm = clan_name_by_id(id);
+  if (!nm) nm = "(unknown)";
+
+  write_to_output(d,
+    "\r\n"
+    "Clan Editor\r\n"
+    "Clan: [%d] %s\r\n"
+    "\r\n"
+    "1) Name\r\n"
+    "2) Tag\r\n"
+    "Q) Quit\r\n"
+    "\r\n"
+    "Enter choice: ",
+    id, nm);
+}
+
+void clanedit_parse(struct descriptor_data *d, char *arg)
+{
+  if (!d || !d->character) return;
+
+  skip_spaces(&arg);
+  if (!arg) arg = "";
+
+  switch (d->clanedit_mode) {
+    case CLANEDIT_SET_NAME:
+      write_to_output(d, "\r\nName edit is not persisted yet. Use file edits for now.\r\n");
+      d->clanedit_mode = CLANEDIT_MAIN;
+      clanedit_menu(d);
+      return;
+
+    case CLANEDIT_SET_TAG:
+      write_to_output(d, "\r\nTag edit is not persisted yet. Use file edits for now.\r\n");
+      d->clanedit_mode = CLANEDIT_MAIN;
+      clanedit_menu(d);
+      return;
+
+    default:
+      break;
+  }
+
+  if (!*arg) {
+    clanedit_menu(d);
+    return;
+  }
+
+  switch (LOWER(*arg)) {
+    case '1':
+      d->clanedit_mode = CLANEDIT_SET_NAME;
+      write_to_output(d, "Enter new clan name: ");
+      return;
+    case '2':
+      d->clanedit_mode = CLANEDIT_SET_TAG;
+      write_to_output(d, "Enter new clan tag (shown in who): ");
+      return;
+    case 'q':
+      d->clanedit_id = 0;
+      d->clanedit_mode = CLANEDIT_MAIN;
+      STATE(d) = CON_PLAYING;
+      write_to_output(d, "Exited clan editor.\r\n");
+      return;
+    default:
+      write_to_output(d, "Invalid choice.\r\n");
+      clanedit_menu(d);
+      return;
+  }
+}
+
+ACMD(do_clist)
+{
+  struct clanlist_row rows[256];
+  int n = 0, i;
+
+  if (IS_NPC(ch))
+    return;
+
+  /* Build list from clan ids. */
+#ifdef MAX_CLANS
+  int max_id = MAX_CLANS;
+#else
+  /* Fallback if MAX_CLANS is not visible for some reason. */
+  int max_id = 256;
+#endif
+
+  if (max_id > (int)(sizeof(rows) / sizeof(rows[0])))
+    max_id = (int)(sizeof(rows) / sizeof(rows[0]));
+
+  for (i = 1; i < max_id; i++) {
+    const char *nm = clan_name_by_id(i);
+    if (!nm || !*nm)
+      continue;
+
+    rows[n].id = i;
+    rows[n].name = nm;
+    rows[n].online = 0;
+    n++;
+  }
+
+  if (n <= 0) {
+    send_to_char(ch, "No clans found.\r\n");
+    return;
+  }
+
+  /* Count online members for each clan. */
+  for (i = 0; i < n; i++) {
+    struct descriptor_data *d;
+    for (d = descriptor_list; d; d = d->next) {
+      struct char_data *tch;
+      if (!d->character)
+        continue;
+      tch = d->character;
+      if (!IS_PLAYING(d))
+        continue;
+      if (IS_NPC(tch))
+        continue;
+      if (GET_CLAN_ID(tch) == rows[i].id)
+        rows[i].online++;
+    }
+  }
+
+  qsort(rows, n, sizeof(rows[0]), clanlist_cmp);
+
+  send_to_char(ch, "Clans\r\n");
+  send_to_char(ch, "-----\r\n");
+  for (i = 0; i < n; i++) {
+    /* Keep it compact, like who/finger style. */
+    send_to_char(ch, "%-20s Online: %d\r\n", rows[i].name, rows[i].online);
+  }
+  send_to_char(ch, "\r\n%d clan%s listed.\r\n", n, (n == 1 ? "" : "s"));
+}
+
+
+
+/* Clan editor entry point. Full editor will be implemented after state plumbing is stable. */
+ACMD(do_clanedit)
+{
+  int id = 0;
+
+  if (IS_NPC(ch))
+    return;
+
+  if (!ch->desc) {
+    send_to_char(ch, "Clanedit requires a live descriptor.\r\n");
+    return;
+  }
+
+  skip_spaces(&argument);
+
+  if (*argument) {
+    if (GET_LEVEL(ch) < LVL_IMPL) {
+      send_to_char(ch, "You do not have permission to do that.\r\n");
+      return;
+    }
+
+    if (is_number(argument)) {
+      id = atoi(argument);
+    } else {
+      int k;
+      for (k = 1; k < 10000; k++) {
+        const char *nm = clan_name_by_id(k);
+        if (!nm) continue;
+        if (!str_cmp(nm, argument)) { id = k; break; }
+      }
+    }
+
+    if (id <= 0 || !clan_name_by_id(id)) {
+      send_to_char(ch, "Clan not found.\r\n");
+      return;
+    }
+  } else {
+    id = GET_CLAN_ID(ch);
+    if (id <= 0) {
+      send_to_char(ch, "You are not in a clan.\r\n");
+      return;
+    }
+  }
+
+  ch->desc->clanedit_id = id;
+  ch->desc->clanedit_mode = CLANEDIT_MAIN;
+  STATE(ch->desc) = CON_CLANEDIT;
+
+  clanedit_menu(ch->desc);
+}
+
+
+
 ACMD(do_roster)
 {
   if (IS_NPC(ch))
@@ -223,23 +438,104 @@ ACMD(do_roster)
 
 ACMD(do_clan)
 {
+  char arg1[MAX_INPUT_LENGTH];
+  char arg2[MAX_INPUT_LENGTH];
+  int clan_id = 0;
+
   if (IS_NPC(ch))
     return;
 
+  skip_spaces(&argument);
+  if (!*argument) {
+    send_to_char(ch, "Usage:\r\n  clan <message>\r\n  cjoin <clan name or id>\r\n  cquit\r\n");
+    return;
+  }
+
+  /* Parse first word. We allow both: "clan join X" and wrapper calls like cjoin -> "join X". */
+  argument = any_one_arg(argument, arg1);
+
+  /* Helper: resolve clan id by numeric id or exact name match using clan_name_by_id(). */
+  if (!str_cmp(arg1, "join")) {
+    if (GET_CLAN_ID(ch) > 0) {
+      send_to_char(ch, "You are already in a clan.\r\n");
+      return;
+    }
+
+    skip_spaces(&argument);
+    if (!*argument) {
+      send_to_char(ch, "Usage: cjoin <clan name or id>\r\n");
+      return;
+    }
+
+    argument = any_one_arg(argument, arg2);
+
+    if (is_number(arg2)) {
+      clan_id = atoi(arg2);
+    } else {
+      int i;
+      /* Best effort scan. Increase upper bound if you expect more than 1000 clans. */
+      for (i = 1; i <= 1000; i++) {
+        const char *nm = clan_name_by_id(i);
+        if (nm && *nm && !str_cmp(nm, arg2)) {
+          clan_id = i;
+          break;
+        }
+      }
+    }
+
+    if (clan_id <= 0 || !clan_name_by_id(clan_id)) {
+      send_to_char(ch, "No such clan.\r\n");
+      return;
+    }
+
+    SET_CLAN_ID(ch, clan_id);
+    SET_CLAN_RANK(ch, CLAN_RANK_MEMBER);
+
+    send_to_char(ch, "You have joined %s.\r\n", clan_name_by_id(clan_id));
+
+    /* Save if available in your codebase; harmless if you remove it later. */
+    save_char(ch);
+    return;
+  }
+
+  if (!str_cmp(arg1, "quit")) {
+    if (GET_CLAN_ID(ch) <= 0) {
+      send_to_char(ch, "You are not in a clan.\r\n");
+      return;
+    }
+    send_to_char(ch, "You have left %s.\r\n", clan_name_by_id(GET_CLAN_ID(ch)));
+    SET_CLAN_ID(ch, 0);
+    SET_CLAN_RANK(ch, 0);
+    save_char(ch);
+    return;
+  }
+
+  if (!str_cmp(arg1, "invite") || !str_cmp(arg1, "promote") || !str_cmp(arg1, "demote")) {
+    if (GET_CLAN_ID(ch) <= 0) {
+      send_to_char(ch, "You are not in a clan.\r\n");
+      return;
+    }
+    send_to_char(ch, "That clan function is not implemented yet.\r\n");
+    return;
+  }
+
+  /* Otherwise treat as clan chat. The wrapper also lands here for "join" only if something went wrong. */
   if (GET_CLAN_ID(ch) <= 0) {
     send_to_char(ch, "You are not in a clan.\r\n");
     return;
   }
 
-  skip_spaces(&argument);
-
-  if (!*argument) {
-    send_to_char(ch, "Usage: clan <message>\r\n");
-    return;
+  /* Rebuild the message with arg1 included. */
+  {
+    char msg[MAX_INPUT_LENGTH * 2];
+    if (*argument)
+      snprintf(msg, sizeof(msg), "%s %s", arg1, argument);
+    else
+      snprintf(msg, sizeof(msg), "%s", arg1);
+    send_to_clan(GET_CLAN_ID(ch), msg, ch);
   }
-
-  send_to_clan(GET_CLAN_ID(ch), argument, ch);
 }
+
 
 
 /* Shortcut wrappers */
