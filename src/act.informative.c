@@ -2454,7 +2454,7 @@ ACMD(do_who)
       who_center_clan_tag(clan_col, sizeof(clan_col), clancol, 17);
 
 
-            send_to_char(ch, "%s[%2d %3s] %-17.17s %s%s%s%s",
+            send_to_char(ch, "%s[%2d %3s] %s %s%s%s",
                 (GET_LEVEL(tch) >= LVL_IMMORT ? CCYEL(ch, C_SPR) : ""),
                 GET_LEVEL(tch), get_archetype_abbrev(tch),
                 clan_col,
