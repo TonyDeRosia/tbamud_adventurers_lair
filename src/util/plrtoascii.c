@@ -138,7 +138,7 @@ struct char_file_u_plrtoascii {
    ubyte weight;
    ubyte height;
 
-   char	pwd[MAX_PWD_LENGTH+1];    /* character's password */
+   char	pwd[MAX_PWD_HASH_LENGTH+1];    /* character's password */
 
    struct char_special_data_saved_plrtoascii char_specials_saved;
    struct player_special_data_saved_plrtoascii player_specials_saved;

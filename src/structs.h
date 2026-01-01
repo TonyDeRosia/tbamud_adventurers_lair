@@ -628,6 +628,8 @@ void clanedit_parse(struct descriptor_data *d, char *arg);
 #define MAX_MESSAGES          60     /**< Max Different attack message types */
 #define MAX_NAME_LENGTH       20     /**< Max PC/NPC name length */
 #define MAX_PWD_LENGTH        32     /**< Max PC password length */
+#define MIN_PWD_LENGTH         8     /**< Minimum PC password length */
+#define MAX_PWD_HASH_LENGTH  256     /**< Max stored password hash length */
 #define MAX_TITLE_LENGTH      80     /**< Max PC title length */
 #define HOST_LENGTH           40     /**< Max hostname resolution length */
 #define PLR_DESC_LENGTH       4096   /**< Max length for PC description */
@@ -897,7 +899,7 @@ struct pclean_criteria_data
 /** General info used by PC's and NPC's. */
 struct char_player_data
 {
-  char passwd[MAX_PWD_LENGTH+1]; /**< PC's password */
+  char passwd[MAX_PWD_HASH_LENGTH+1]; /**< PC's password hash */
   char *name;                    /**< PC / NPC name */
   char *short_descr;             /**< NPC 'actions' */
   char *long_descr;              /**< PC / NPC look description */
