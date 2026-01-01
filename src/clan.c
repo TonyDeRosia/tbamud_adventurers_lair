@@ -41,13 +41,13 @@ static int clan_save_all(void)
     return 0;
 
   for (c = clan_list; c; c = c->next)
-    fprintf(fl, "%d %ld %s\n", c->id, c->leader_idnum, c->name);
+    fprintf(fl, "%d %ld %s %s\n", c->id, c->leader_idnum, c->name, c->display_name);
 
   fclose(fl);
   return 1;
 }
 
-static void clan_add(int id, long leader_idnum, const char *name)
+static void clan_add(int id, long leader_idnum, const char *name, const char *display_name)
 {
   struct clan_data *c = calloc(1, sizeof(*c));
   if (!c)
@@ -56,6 +56,10 @@ static void clan_add(int id, long leader_idnum, const char *name)
   c->id = id;
   c->leader_idnum = leader_idnum;
   strlcpy(c->name, name ? name : "Unnamed", sizeof(c->name));
+  if (display_name && *display_name)
+    strlcpy(c->display_name, display_name, sizeof(c->display_name));
+  else
+    strlcpy(c->display_name, c->name, sizeof(c->display_name));
   c->next = clan_list;
   clan_list = c;
 }
@@ -67,6 +71,7 @@ void clan_boot(void)
   int id = 0;
   long leader = 0;
   char name[128];
+  char display_name[128];
 
   clan_free_all();
 
@@ -81,9 +86,10 @@ void clan_boot(void)
       continue;
 
     name[0] = '\0';
-    if (sscanf(line, "%d %ld %127s", &id, &leader, name) == 3) {
+    display_name[0] = '\0';
+    if (sscanf(line, "%d %ld %127s %127s", &id, &leader, name, display_name) >= 3) {
       if (id > 0 && *name)
-        clan_add(id, leader, name);
+        clan_add(id, leader, name, *display_name ? display_name : NULL);
     }
   }
 
@@ -109,6 +115,16 @@ const char *clan_name_by_id(int clan_id)
   return c->name;
 }
 
+const char *clan_display_name_by_id(int clan_id)
+{
+  struct clan_data *c = clan_by_id(clan_id);
+  if (!c)
+    return "None";
+  if (c->display_name && *c->display_name)
+    return c->display_name;
+  return c->name;
+}
+
 int clan_next_id(void)
 {
   int max_id = 0;
@@ -130,10 +146,10 @@ int clan_create_and_save(int new_id, long leader_idnum, const char *name)
   if (!fl)
     return 0;
 
-  fprintf(fl, "%d %ld %s\n", new_id, leader_idnum, name);
+  fprintf(fl, "%d %ld %s %s\n", new_id, leader_idnum, name, name);
   fclose(fl);
 
-  clan_add(new_id, leader_idnum, name);
+  clan_add(new_id, leader_idnum, name, name);
   return 1;
 }
 
@@ -146,5 +162,17 @@ int clan_set_name_and_save(int clan_id, const char *name)
     return 0;
 
   strlcpy(c->name, name, sizeof(c->name));
+  return clan_save_all();
+}
+
+int clan_set_display_name_and_save(int clan_id, const char *display_name)
+{
+  struct clan_data *c;
+
+  c = clan_by_id(clan_id);
+  if (!c || !display_name || !*display_name)
+    return 0;
+
+  strlcpy(c->display_name, display_name, sizeof(c->display_name));
   return clan_save_all();
 }

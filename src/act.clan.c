@@ -37,7 +37,24 @@ static void send_to_clan(int clan_id, const char *msg, struct char_data *from)
   }
 }
 
-static int is_valid_clan_name(const char *s)
+static int is_valid_plain_clan_name(const char *s)
+{
+  /* For matching/commands: only letters and numbers, no color codes or spaces. */
+  if (!s || !*s)
+    return 0;
+
+  for (size_t i = 0; s[i]; i++) {
+    if (s[i] == '\\')
+      return 0;
+    if (isspace((unsigned char)s[i]))
+      return 0;
+    if (!isalnum((unsigned char)s[i]))
+      return 0;
+  }
+  return 1;
+}
+
+static int is_valid_display_clan_name(const char *s)
 {
   /* Allow: letters/numbers, and tbaMUD color codes like \tR \tn, no spaces. */
   if (!s || !*s)
@@ -215,6 +232,7 @@ static void clan_show_roster(struct char_data *ch)
 struct clanlist_row {
   int id;
   const char *name;
+  const char *display_name;
   int online;
 };
 
@@ -233,25 +251,30 @@ static int clanlist_cmp(const void *a, const void *b)
 /* Clan editor (basic) */
 #define CLANEDIT_MAIN 0
 #define CLANEDIT_SET_NAME 1
-#define CLANEDIT_SET_TAG 2
+#define CLANEDIT_SET_DISPLAY_NAME 2
+#define CLANEDIT_SET_TAG 3
 
 static void clanedit_menu(struct descriptor_data *d)
 {
   int id = d->clanedit_id;
   const char *nm = clan_name_by_id(id);
+  const char *disp = clan_display_name_by_id(id);
   if (!nm) nm = "(unknown)";
+  if (!disp) disp = "(unknown)";
 
   write_to_output(d,
     "\r\n"
     "Clan Editor\r\n"
     "Clan: [%d] %s\r\n"
+    "Plain: %s\r\n"
     "\r\n"
-    "1) Name\r\n"
-    "2) Tag\r\n"
+    "1) Name (plain, used for commands)\r\n"
+    "2) Display name (colors shown to players)\r\n"
+    "3) Tag\r\n"
     "Q) Quit\r\n"
     "\r\n"
     "Enter choice: ",
-    id, nm);
+    id, disp, nm);
 }
 
 void clanedit_parse(struct descriptor_data *d, char *arg)
@@ -268,8 +291,8 @@ void clanedit_parse(struct descriptor_data *d, char *arg)
         return;
       }
 
-      if (!is_valid_clan_name(arg)) {
-        write_to_output(d, "Clan names may only use letters, numbers, and color codes. Try again: ");
+      if (!is_valid_plain_clan_name(arg)) {
+        write_to_output(d, "Clan names may only use letters or numbers (no color codes). Try again: ");
         return;
       }
 
@@ -286,6 +309,34 @@ void clanedit_parse(struct descriptor_data *d, char *arg)
       }
 
       write_to_output(d, "Clan name updated to %s.\r\n", clan_name_by_id(d->clanedit_id));
+      d->clanedit_mode = CLANEDIT_MAIN;
+      clanedit_menu(d);
+      return;
+
+    case CLANEDIT_SET_DISPLAY_NAME:
+      if (!*arg) {
+        write_to_output(d, "Display name cannot be empty. Enter new display name: ");
+        return;
+      }
+
+      if (!is_valid_display_clan_name(arg)) {
+        write_to_output(d, "Display names may only use letters, numbers, and color codes. Try again: ");
+        return;
+      }
+
+      if (strlen(arg) >= CLAN_DISPLAY_LEN) {
+        write_to_output(d, "Display names must be under %d characters. Try again: ", CLAN_DISPLAY_LEN);
+        return;
+      }
+
+      if (!clan_set_display_name_and_save(d->clanedit_id, arg)) {
+        write_to_output(d, "Unable to save the new display name.\r\n");
+        d->clanedit_mode = CLANEDIT_MAIN;
+        clanedit_menu(d);
+        return;
+      }
+
+      write_to_output(d, "Clan display name updated to %s.\r\n", clan_display_name_by_id(d->clanedit_id));
       d->clanedit_mode = CLANEDIT_MAIN;
       clanedit_menu(d);
       return;
@@ -311,6 +362,10 @@ void clanedit_parse(struct descriptor_data *d, char *arg)
       write_to_output(d, "Enter new clan name: ");
       return;
     case '2':
+      d->clanedit_mode = CLANEDIT_SET_DISPLAY_NAME;
+      write_to_output(d, "Enter new clan display name (colors allowed): ");
+      return;
+    case '3':
       d->clanedit_mode = CLANEDIT_SET_TAG;
       write_to_output(d, "Enter new clan tag (shown in who): ");
       return;
@@ -353,6 +408,7 @@ ACMD(do_clist)
 
     rows[n].id = i;
     rows[n].name = nm;
+    rows[n].display_name = clan_display_name_by_id(i);
     rows[n].online = 0;
     n++;
   }
@@ -385,7 +441,7 @@ ACMD(do_clist)
   send_to_char(ch, "-----\r\n");
   for (i = 0; i < n; i++) {
     /* Keep it compact, like who/finger style. */
-    send_to_char(ch, "%-20s Online: %d\r\n", rows[i].name, rows[i].online);
+    send_to_char(ch, "%-20s Online: %d\r\n", rows[i].display_name ? rows[i].display_name : rows[i].name, rows[i].online);
   }
   send_to_char(ch, "\r\n%d clan%s listed.\r\n", n, (n == 1 ? "" : "s"));
 }
@@ -513,7 +569,7 @@ ACMD(do_clan)
     SET_CLAN_ID(ch, clan_id);
     SET_CLAN_RANK(ch, CLAN_RANK_MEMBER);
 
-    send_to_char(ch, "You have joined %s.\r\n", clan_name_by_id(clan_id));
+    send_to_char(ch, "You have joined %s.\r\n", clan_display_name_by_id(clan_id));
 
     /* Save if available in your codebase; harmless if you remove it later. */
     save_char(ch);
@@ -525,7 +581,7 @@ ACMD(do_clan)
       send_to_char(ch, "You are not in a clan.\r\n");
       return;
     }
-    send_to_char(ch, "You have left %s.\r\n", clan_name_by_id(GET_CLAN_ID(ch)));
+    send_to_char(ch, "You have left %s.\r\n", clan_display_name_by_id(GET_CLAN_ID(ch)));
     SET_CLAN_ID(ch, 0);
     SET_CLAN_RANK(ch, 0);
     save_char(ch);
@@ -593,13 +649,13 @@ ACMD(do_ccreate)
   if (!*name) {
     clan_help(ch);
     send_to_char(ch, "Usage: ccreate <clanname>\r\n");
-    send_to_char(ch, "Tip: you can include color codes like \\tRName\\tn (no spaces).\r\n");
+    send_to_char(ch, "Tip: keep the base name plain; set colors later in clanedit.\r\n");
     return;
   }
 
-  if (!is_valid_clan_name(name)) {
-    send_to_char(ch, "Invalid clan name. Use letters and numbers only.\r\n");
-    send_to_char(ch, "You may also include color codes like \\tRName\\tn (no spaces).\r\n");
+  if (!is_valid_plain_clan_name(name)) {
+    send_to_char(ch, "Invalid clan name. Use letters and numbers only (no color codes).\r\n");
+    send_to_char(ch, "Tip: set the colored display with 'clanedit' after creation.\r\n");
     return;
   }
 
