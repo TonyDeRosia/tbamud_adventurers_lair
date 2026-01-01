@@ -109,6 +109,20 @@ int clan_exists(int clan_id)
   return clan_by_id(clan_id) != NULL;
 }
 
+int clan_id_by_name(const char *name)
+{
+  struct clan_data *c;
+
+  if (!name || !*name)
+    return 0;
+
+  for (c = clan_list; c; c = c->next)
+    if (!str_cmp(c->name, name))
+      return c->id;
+
+  return 0;
+}
+
 const char *clan_name_by_id(int clan_id)
 {
   struct clan_data *c = clan_by_id(clan_id);
