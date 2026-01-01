@@ -6,6 +6,7 @@
 #include "comm.h"
 #include "db.h"
 #include "clan.h"
+#include "modify.h"
 static struct clan_data *clan_list = NULL;
 
 static void clan_free_all(void)
@@ -35,13 +36,24 @@ int clan_save_all(void)
 {
   FILE *fl;
   struct clan_data *c;
+  char name_save[CLAN_NAME_LEN];
+  char display_save[CLAN_DISPLAY_LEN];
 
   fl = fopen("misc/clans.dat", "w");
   if (!fl)
     return 0;
 
-  for (c = clan_list; c; c = c->next)
-    fprintf(fl, "%d\t%ld\t%s\t%s\n", c->id, c->leader_idnum, c->name, c->display_name);
+  for (c = clan_list; c; c = c->next) {
+    strlcpy(name_save, c->name, sizeof(name_save));
+    strlcpy(display_save, c->display_name, sizeof(display_save));
+
+    /* Store clan strings using @ codes to avoid raw tabs interfering with
+     * the tab-delimited save format. */
+    parse_tab(name_save);
+    parse_tab(display_save);
+
+    fprintf(fl, "%d\t%ld\t%s\t%s\n", c->id, c->leader_idnum, name_save, display_save);
+  }
 
   fclose(fl);
   return 1;
@@ -89,6 +101,9 @@ void clan_boot(void)
     display_name[0] = '\0';
     if (sscanf(line, "%d\t%ld\t%127[^\t]\t%127[^\r\n]", &id, &leader, name, display_name) >= 3 ||
         sscanf(line, "%d %ld %127s %127s", &id, &leader, name, display_name) >= 3) {
+      parse_at(name);
+      parse_at(display_name);
+
       if (id > 0 && *name)
         clan_add(id, leader, name, *display_name ? display_name : NULL);
     }
