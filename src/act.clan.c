@@ -525,16 +525,7 @@ ACMD(do_clanedit)
   if (is_number(argument)) {
     id = atoi(argument);
   } else {
-    int k;
-    for (k = 1; k < 10000; k++) {
-      const char *nm = clan_name_by_id(k);
-      if (!nm)
-        continue;
-      if (!str_cmp(nm, argument)) {
-        id = k;
-        break;
-      }
-    }
+    id = clan_id_by_name(argument);
   }
 
   if (id <= 0 || !clan_name_by_id(id)) {
@@ -602,19 +593,7 @@ ACMD(do_clan)
 
     argument = any_one_arg(argument, arg2);
 
-    if (is_number(arg2)) {
-      clan_id = atoi(arg2);
-    } else {
-      int i;
-      /* Best effort scan. Increase upper bound if you expect more than 1000 clans. */
-      for (i = 1; i <= 1000; i++) {
-        const char *nm = clan_name_by_id(i);
-        if (nm && *nm && !str_cmp(nm, arg2)) {
-          clan_id = i;
-          break;
-        }
-      }
-    }
+    clan_id = is_number(arg2) ? atoi(arg2) : clan_id_by_name(arg2);
 
     if (clan_id <= 0 || !clan_name_by_id(clan_id)) {
       send_to_char(ch, "No such clan.\r\n");
