@@ -2,6 +2,7 @@
 #include "sysdep.h"
 
 #include "accounts.h"
+#include "password.h"
 #include "utils.h"
 #include "db.h"
 
@@ -66,12 +67,6 @@ static int index_add(long id, const char *acct_name)
   fprintf(fp, "%ld %s\n", id, acct_name);
   fclose(fp);
   return 1;
-}
-
-static void acct_hash_password(char *out, size_t outlen, const char *passwd)
-{
-  const char *salt = "AC";
-  snprintf(out, outlen, "%s", CRYPT(passwd, salt));
 }
 
 int account_load_any(long acct_id, struct account_data *acct)
@@ -161,7 +156,8 @@ int account_authenticate(const char *acct_name, const char *passwd, long *out_id
 {
   long id = 0;
   struct account_data acct;
-  char hash[128];
+  char hash[MAX_PWD_HASH_LENGTH + 1];
+  int upgraded = 0;
 
   if (out_id) *out_id = 0;
   if (!acct_name || !*acct_name) return 0;
@@ -176,9 +172,14 @@ int account_authenticate(const char *acct_name, const char *passwd, long *out_id
   if (!acct.passwd_hash[0])
     return 0;
 
-  acct_hash_password(hash, sizeof(hash), passwd);
-  if (strcmp(hash, acct.passwd_hash) != 0)
+  if (!password_verify(passwd, acct.passwd_hash, hash, sizeof(hash), &upgraded))
     return 0;
+
+  if (upgraded) {
+    strlcpy(acct.passwd_hash, hash, sizeof(acct.passwd_hash));
+    account_save_any(&acct);
+    mudlog(NRM, LVL_IMMORT, TRUE, "Account %s password upgraded to SHA512 hash.", acct.acct_name);
+  }
 
   if (out_id) *out_id = id;
   return 1;
@@ -188,7 +189,7 @@ int account_create(const char *acct_name, const char *passwd, long *out_id)
 {
   long id = 0;
   struct account_data acct;
-  char hash[128];
+  char hash[MAX_PWD_HASH_LENGTH + 1];
 
   if (out_id) *out_id = 0;
   if (!acct_name || !*acct_name) return 0;
@@ -197,12 +198,16 @@ int account_create(const char *acct_name, const char *passwd, long *out_id)
   if (index_find(acct_name, &id))
     return 0;
 
+  if (strlen(passwd) < MIN_PWD_LENGTH || strlen(passwd) > MAX_PWD_LENGTH)
+    return 0;
+
   id = index_next_id();
 
   memset(&acct, 0, sizeof(acct));
   acct.account_id = id;
   strlcpy(acct.acct_name, acct_name, sizeof(acct.acct_name));
-  acct_hash_password(hash, sizeof(hash), passwd);
+  if (!password_hash(passwd, hash, sizeof(hash)))
+    return 0;
   strlcpy(acct.passwd_hash, hash, sizeof(acct.passwd_hash));
 
   account_save_any(&acct);
