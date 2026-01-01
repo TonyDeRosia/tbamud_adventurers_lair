@@ -104,6 +104,42 @@ void clan_shutdown(void)
   clan_free_all();
 }
 
+static void strip_clan_colors(char *dest, size_t destlen, const char *src)
+{
+  size_t di = 0;
+
+  if (!dest || destlen == 0)
+    return;
+
+  if (!src) {
+    *dest = '\0';
+    return;
+  }
+
+  for (size_t si = 0; src[si] && di + 1 < destlen; si++) {
+    /* Treat both the @X and \tX patterns as color codes and skip them. */
+    if (src[si] == '@') {
+      if (src[si + 1] == '@') {
+        dest[di++] = '@';
+        si++;
+      } else if (src[si + 1]) {
+        si++;
+      }
+      continue;
+    }
+
+    if (src[si] == '\t') {
+      if (src[si + 1])
+        si++;
+      continue;
+    }
+
+    dest[di++] = src[si];
+  }
+
+  dest[di] = '\0';
+}
+
 int clan_exists(int clan_id)
 {
   return clan_by_id(clan_id) != NULL;
@@ -112,13 +148,23 @@ int clan_exists(int clan_id)
 int clan_id_by_name(const char *name)
 {
   struct clan_data *c;
+  char search_plain[CLAN_DISPLAY_LEN];
 
   if (!name || !*name)
     return 0;
 
-  for (c = clan_list; c; c = c->next)
-    if (!str_cmp(c->name, name))
+  strip_clan_colors(search_plain, sizeof(search_plain), name);
+
+  for (c = clan_list; c; c = c->next) {
+    if (!str_cmp(c->name, name) || !str_cmp(c->name, search_plain))
       return c->id;
+
+    char display_plain[CLAN_DISPLAY_LEN];
+    strip_clan_colors(display_plain, sizeof(display_plain), c->display_name);
+
+    if (!str_cmp(display_plain, search_plain))
+      return c->id;
+  }
 
   return 0;
 }
