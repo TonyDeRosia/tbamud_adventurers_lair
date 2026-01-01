@@ -49,6 +49,7 @@ ACMD(do_bounty);
 ACMD(do_finger);
 
 ACMD(do_clan);
+ACMD(do_clan_pvp_toggle);
 ACMD(do_ccreate);
 ACMD(do_cinvite);
 ACMD(do_cjoin);
@@ -404,6 +405,7 @@ cpp_extern const struct command_info cmd_info[] = {
   { "zpurge"   , "zpurge"  , POS_DEAD    , do_zpurge   , LVL_BUILDER, 0 },
   { "balance", "bal", POS_DEAD, do_balance, 0, 0 },
   { "bounty"   , "bounty"  , POS_DEAD    , do_bounty   , 0, 0 },
+  { "pvp", "pvp", POS_DEAD, do_clan_pvp_toggle, 0, 0 },
   { "clan", "clan", POS_DEAD, do_clan, 0, 0 },
   { "ccreate", "ccreate", POS_DEAD, do_ccreate, 0, 0 },
   { "cinvite", "cinvite", POS_DEAD, do_cinvite, 0, 0 },

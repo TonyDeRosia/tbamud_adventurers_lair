@@ -11,6 +11,7 @@ extern struct descriptor_data *descriptor_list;
 #include "db.h"
 #include "clan.h"
 #include "modify.h"
+#include "fight.h"
 
 /* rank ideas for now */
 #define CLAN_RANK_MEMBER 0
@@ -108,6 +109,7 @@ static void clan_help(struct char_data *ch)
     "  clan                 shows your clan status\r\n"
     "  clan list            shows clan file location\r\n"
     "  clan <message>       sends clan chat\r\n"
+    "  pvp                  toggle your clan PvP status if allowed\r\n"
     "Shortcuts:\r\n"
     "  ccreate <Name>       create clan (admins level 104 only)\r\n"
     "  cinvite <player>     not active yet\r\n"
@@ -276,7 +278,23 @@ static int clanlist_cmp(const void *a, const void *b)
 #define CLANEDIT_SET_NAME 1
 #define CLANEDIT_SET_DISPLAY_NAME 2
 #define CLANEDIT_SET_TAG 3
-#define CLANEDIT_CONFIRM_QUIT 4
+#define CLANEDIT_SET_PVP_TYPE 4
+#define CLANEDIT_CONFIRM_QUIT 5
+
+static void clanedit_pvp_menu(struct descriptor_data *d)
+{
+  write_to_output(d,
+    "\r\n"
+    "Clan PvP/PK Type\r\n"
+    "Editing: %s\r\n"
+    "\r\n"
+    "0) No PvP / No PK\r\n"
+    "1) Always PvP / PK always on\r\n"
+    "2) Toggle PvP / PK\r\n"
+    "\r\n"
+    "Enter choice: ",
+    clan_display_name_by_id(d->clanedit_id));
+}
 
 static void clanedit_menu(struct descriptor_data *d)
 {
@@ -285,6 +303,7 @@ static void clanedit_menu(struct descriptor_data *d)
   const char *disp = clan_display_name_by_id(id);
   if (!nm) nm = "(unknown)";
   if (!disp) disp = "(unknown)";
+  const char *pvp_name = clan_pvp_type_name(clan_pvp_type_by_id(id));
 
   write_to_output(d,
     "\r\n"
@@ -295,10 +314,11 @@ static void clanedit_menu(struct descriptor_data *d)
     "1) Name (plain, used for commands)\r\n"
     "2) Display name (colors shown to players)\r\n"
     "3) Tag\r\n"
+    "4) PvP/PK Type: %s\r\n"
     "Q) Quit\r\n"
     "\r\n"
     "Enter choice: ",
-    id, disp, nm);
+    id, disp, nm, pvp_name);
 }
 
 void clanedit_parse(struct descriptor_data *d, char *arg)
@@ -374,6 +394,25 @@ void clanedit_parse(struct descriptor_data *d, char *arg)
       d->clanedit_mode = CLANEDIT_MAIN;
       clanedit_menu(d);
       return;
+    case CLANEDIT_SET_PVP_TYPE:
+      switch (*arg) {
+        case '0':
+        case '1':
+        case '2': {
+          int pvp_type = *arg - '0';
+          if (!clan_set_pvp_type_and_save(d->clanedit_id, pvp_type)) {
+            write_to_output(d, "Unable to save the new PvP type.\r\n");
+          } else {
+            write_to_output(d, "Clan PvP/PK type updated to %s.\r\n", clan_pvp_type_name(pvp_type));
+          }
+          d->clanedit_mode = CLANEDIT_MAIN;
+          clanedit_menu(d);
+          return;
+        }
+        default:
+          write_to_output(d, "Invalid choice. Enter 0, 1, or 2: ");
+          return;
+      }
 
     case CLANEDIT_CONFIRM_QUIT:
       if (!*arg) {
@@ -424,6 +463,10 @@ void clanedit_parse(struct descriptor_data *d, char *arg)
     case '3':
       d->clanedit_mode = CLANEDIT_SET_TAG;
       write_to_output(d, "Enter new clan tag (shown in who): ");
+      return;
+    case '4':
+      d->clanedit_mode = CLANEDIT_SET_PVP_TYPE;
+      clanedit_pvp_menu(d);
       return;
     case 'q':
       d->clanedit_mode = CLANEDIT_CONFIRM_QUIT;
@@ -543,6 +586,49 @@ ACMD(do_clanedit)
   STATE(ch->desc) = CON_CLANEDIT;
 
   clanedit_menu(ch->desc);
+}
+
+ACMD(do_clan_pvp_toggle)
+{
+  int clan_type;
+
+  if (IS_NPC(ch))
+    return;
+
+  if (GET_CLAN_ID(ch) <= 0) {
+    send_to_char(ch, "You are not in a clan.\r\n");
+    return;
+  }
+
+  clan_type = clan_pvp_type_by_id(GET_CLAN_ID(ch));
+
+  switch (clan_type) {
+    case CLAN_PVP_ALWAYS:
+      send_to_char(ch, "Your clan is always PvP enabled.\r\n");
+      return;
+    case CLAN_PVP_NO_PVP:
+      send_to_char(ch, "Your clan forbids PvP.\r\n");
+      return;
+    case CLAN_PVP_TOGGLE:
+      if (PRF_FLAGGED(ch, PRF_CLAN_PVP)) {
+        int remain = clan_pvp_lock_remaining(ch);
+        if (remain > 0) {
+          int mins = remain / 60;
+          int secs = remain % 60;
+          send_to_char(ch, "Your PvP flag is locked on for %d:%02d more (mm:ss).\r\n", mins, secs);
+          return;
+        }
+
+        REMOVE_BIT_AR(PRF_FLAGS(ch), PRF_CLAN_PVP);
+        send_to_char(ch, "You disable PvP for your clan membership.\r\n");
+      } else {
+        SET_BIT_AR(PRF_FLAGS(ch), PRF_CLAN_PVP);
+        send_to_char(ch, "You enable PvP for your clan membership.\r\n");
+        send_to_char(ch, "If you attack another player while enabled, you will be locked on for 30 minutes.\r\n");
+      }
+      save_char(ch);
+      return;
+  }
 }
 
 
