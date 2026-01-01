@@ -590,10 +590,10 @@ ACMD(do_bandage)
 
   WAIT_STATE(ch, PULSE_VIOLENCE * 2);
 
-  if (!can_pvp(ch, vict, TRUE))
+  if (!can_pvp(ch, vict, TRUE)) {
     return;
+  }
 
-    if (!can_pvp(ch, vict, TRUE))
       return;
 
     percent = rand_number(1, 101);        /* 101% is a complete failure */
