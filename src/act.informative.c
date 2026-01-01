@@ -2444,24 +2444,33 @@ ACMD(do_who)
           GET_LEVEL(tch), get_archetype_abbrev(tch), GET_NAME(tch),
           CCNRM(ch, C_SPR), ((!(++num_can_see % 4)) ? "\r\n" : ""));
       } else {
-        num_can_see++;          {
-            char clancol[18];
-            clancol[0] = '\0';
+        num_can_see++;
+        {
+          char clancol[256];
+          clancol[0] = '\0';
 
-            if (GET_CLAN_ID(tch) > 0)
-              snprintf(clancol, sizeof(clancol), "[%s\tn]", clan_display_name_by_id(GET_CLAN_ID(tch)));
-      char clan_col[64];
-      who_center_clan_tag(clan_col, sizeof(clan_col), clancol, 17);
+          if (GET_CLAN_ID(tch) > 0) {
+            const char *clan_name = clan_display_name_by_id(GET_CLAN_ID(tch));
+            size_t clan_name_len = strlen(clan_name);
 
+            if (clan_name_len >= 2 && clan_name[clan_name_len - 2] == '\t' &&
+                clan_name[clan_name_len - 1] == 'n')
+              clan_name_len -= 2;
 
-            send_to_char(ch, "%s[%2d %3s] %s %s%s%s",
-                (GET_LEVEL(tch) >= LVL_IMMORT ? CCYEL(ch, C_SPR) : ""),
-                GET_LEVEL(tch), get_archetype_abbrev(tch),
-                clan_col,
-                GET_NAME(tch),
-                (*GET_TITLE(tch) ? " " : ""), GET_TITLE(tch),
-                CCNRM(ch, C_SPR));
+            snprintf(clancol, sizeof(clancol), "[%.*s]\\tn", (int)clan_name_len, clan_name);
           }
+
+          char clan_col[64];
+          who_center_clan_tag(clan_col, sizeof(clan_col), clancol, 17);
+
+          send_to_char(ch, "%s[%2d %3s] %s %s%s%s%s",
+              (GET_LEVEL(tch) >= LVL_IMMORT ? CCYEL(ch, C_SPR) : ""),
+              GET_LEVEL(tch), get_archetype_abbrev(tch),
+              clan_col,
+              GET_NAME(tch),
+              (*GET_TITLE(tch) ? " " : ""), GET_TITLE(tch),
+              CCNRM(ch, C_SPR));
+        }
 
 
         if (GET_INVIS_LEV(tch))
