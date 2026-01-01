@@ -33,9 +33,9 @@ static void send_to_clan(int clan_id, const char *msg, struct char_data *from)
       continue;
 
     if (from)
-      send_to_char(d->character, "\r\n@G[Clan]@n %s: %s\r\n", GET_NAME(from), msg);
+      send_to_char(d->character, "\r\n\tG[Clan]\n %s: %s\r\n", GET_NAME(from), msg);
     else
-      send_to_char(d->character, "\r\n@G[Clan]@n %s\r\n", msg);
+      send_to_char(d->character, "\r\n\tG[Clan]\n %s\r\n", msg);
   }
 }
 
