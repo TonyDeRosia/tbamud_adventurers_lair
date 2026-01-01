@@ -74,6 +74,36 @@ static void who_center_clan_tag(char *out, size_t outsz, const char *tag, int wi
   out[pos] = '\0';
 }
 
+/* Visible length helper that skips both @X and \tX color codes. */
+static size_t color_visible_len(const char *src)
+{
+  size_t n = 0;
+
+  if (!src)
+    return 0;
+
+  for (const char *s = src; *s; s++) {
+    if (*s == '@') {
+      if (*(s + 1) == '@') {
+        n++;
+        s++;
+      } else if (*(s + 1)) {
+        s++;
+      }
+      continue;
+    }
+
+    if (*s == '\t' && *(s + 1)) {
+      s++;
+      continue;
+    }
+
+    n++;
+  }
+
+  return n;
+}
+
 
 #include <stdlib.h>  /* abs */
 #include "structs.h"
@@ -1621,8 +1651,15 @@ ACMD(do_finger)
   long long bounty = GET_BOUNTY(vict);
   const char *bounty_color = bounty > 0 ? BY : R;
   char bounty_buf[64];
+  size_t clan_padding = 0;
 
   format_copper_as_currency(bounty_buf, sizeof(bounty_buf), bounty);
+
+  {
+    const size_t column_width = 20;
+    size_t vis = color_visible_len(clan);
+    clan_padding = (vis < column_width) ? column_width - vis : 0;
+  }
 
   /* Top border */
   len += snprintf(buf + len, sizeof(buf) - len,
@@ -1640,7 +1677,7 @@ ACMD(do_finger)
   snprintf(line, sizeof(line), "%sClass:%s %-19s  %sLevel:%s %-5d", C, R, archetype_name(GET_CLASS(vict)), C, R, GET_LEVEL(vict));
   len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
 
-  snprintf(line, sizeof(line), "%sClan:%s %-20s  %sBounty:%s %s%s%s", C, R, clan, C, R, bounty_color, bounty_buf, R);
+  snprintf(line, sizeof(line), "%sClan:%s %s%*s  %sBounty:%s %s%s%s", C, R, clan, (int)clan_padding, "", C, R, bounty_color, bounty_buf, R);
   len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
 
   len += snprintf(buf + len, sizeof(buf) - len,
