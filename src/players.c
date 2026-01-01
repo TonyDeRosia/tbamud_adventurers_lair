@@ -442,6 +442,8 @@ int load_char(const char *name, struct char_data *ch)
 	     if (!strcmp(tag, "Cha "))	ch->real_abils.cha	= atoi(line);
 	else if (!strcmp(tag, "Clas"))	GET_CLASS(ch)		= atoi(line);
 	else if (!strcmp(tag, "Con "))	ch->real_abils.con	= atoi(line);
+	else if (!strcmp(tag, "Clan"))	GET_CLAN_ID(ch)		= atoi(line);
+	else if (!strcmp(tag, "Clrk"))	GET_CLAN_RANK(ch)	= atoi(line);
 	break;
 
       case 'D':
