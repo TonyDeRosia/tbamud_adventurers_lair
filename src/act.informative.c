@@ -2453,11 +2453,15 @@ ACMD(do_who)
             const char *clan_name = clan_display_name_by_id(GET_CLAN_ID(tch));
             char clan_name_buf[256];
             size_t name_len = strlen(clan_name);
+            size_t max_clan_len = sizeof(clancol) - 5; /* '[', ']', '\t', 'n', '\0' */
+
+            if (max_clan_len >= sizeof(clan_name_buf))
+              max_clan_len = sizeof(clan_name_buf) - 1;
 
             if (name_len >= 2 && clan_name[name_len - 2] == '\t' && clan_name[name_len - 1] == 'n')
               name_len -= 2;
-            if (name_len >= sizeof(clan_name_buf))
-              name_len = sizeof(clan_name_buf) - 1;
+            if (name_len > max_clan_len)
+              name_len = max_clan_len;
 
             memcpy(clan_name_buf, clan_name, name_len);
             clan_name_buf[name_len] = '\0';
