@@ -10,7 +10,6 @@
 
 #include "conf.h"
 #include "sysdep.h"
-
 /* Begin conf.h dependent includes */
 
 #if CIRCLE_GNU_LIBC_MEMORY_TRACK
@@ -86,6 +85,7 @@
 #include "mud_event.h"
 #include "prompt.h"
 
+struct descriptor_data;
 #ifndef INVALID_SOCKET
 #define INVALID_SOCKET (-1)
 #endif

@@ -15,6 +15,10 @@
 #include "protocol.h" /* Kavir Plugin*/
 #include "lists.h"
 
+/* clan editor */
+struct descriptor_data;
+void clanedit_parse(struct descriptor_data *d, char *arg);
+
 /** If you want equipment to be automatically equipped to the same place
  * it was when players rented, set the define below to 1 because
  * TRUE/FALSE aren't defined yet. */
@@ -296,6 +300,7 @@
 #define NUM_AFF_FLAGS   23
 
 /* Modes of connectedness: used by descriptor_data.state 		*/
+#define CON_CLANEDIT      42 /**< Clan editor */
 #define CON_PLAYING       0 /**< Playing - Nominal state 		*/
 #define CON_CLOSE         1 /**< User disconnect, remove character.	*/
 #define CON_GET_NAME      2 /**< Login with name */
@@ -1122,6 +1127,11 @@ struct txt_q
  * is the soul. */
 struct descriptor_data
 {
+
+  /* Clan editor state */
+  int clanedit_id;      /* clan being edited, 0 means none */
+  int clanedit_mode;    /* submode/menu state */
+
 
   long acct_id;
   int acct_claim; /* 1 if selecting an existing legacy character to bind */

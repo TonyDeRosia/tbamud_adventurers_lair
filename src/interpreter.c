@@ -56,6 +56,8 @@ ACMD(do_cquit);
 ACMD(do_cpromote);
 ACMD(do_cdemote);
 ACMD(do_roster);
+ACMD(do_clanedit);
+ACMD(do_clist);
 
 /* local (file scope) functions */
 static int perform_dupe_check(struct descriptor_data *d);
@@ -373,6 +375,10 @@ cpp_extern const struct command_info cmd_info[] = {
   { "weather"  , "weather" , POS_RESTING , do_weather  , 0, 0 },
   { "who"      , "wh"      , POS_DEAD    , do_who      , 0, 0 },
   { "roster", "roster", POS_DEAD, do_roster, 0, 0 },
+  { "clist", "clist", POS_DEAD, do_clist, 0, 0 },
+  { "clanlist", "clanlist", POS_DEAD, do_clist, 0, 0 },
+  { "clanedit", "clanedit", POS_DEAD, do_clanedit, 0, 0 },
+  { "clanquit", "clanquit", POS_DEAD, do_cquit, 0, 0 },
   { "whois"    , "whoi"    , POS_DEAD    , do_whois    , 0, 0 },
   { "whoami"   , "whoami"  , POS_DEAD    , do_gen_ps   , 0, SCMD_WHOAMI },
   { "where"    , "where"   , POS_RESTING , do_where    , 1, 0 },
@@ -1957,7 +1963,11 @@ if (PLR_FLAGGED(d->character, PLR_DELETED)) {
       case 'f':
         GET_SEX(d->character) = SEX_FEMALE;
         break;
-      default:
+        case CON_CLANEDIT:
+    clanedit_parse(d, arg);
+    break;
+
+default:
         write_to_output(d, "That is not a sex... What IS your sex? (M/F) ");
         return;
     }
