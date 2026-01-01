@@ -41,6 +41,41 @@ static void send_to_clan(int clan_id, const char *msg, struct char_data *from)
   }
 }
 
+static int clan_cooldown_remaining(struct char_data *ch)
+{
+  struct affected_type *af;
+  int ticks = 0;
+
+  if (!ch || IS_NPC(ch) || GET_LEVEL(ch) >= LVL_IMMORT)
+    return 0;
+
+  for (af = ch->affected; af; af = af->next) {
+    if (IS_SET_AR(af->bitvector, AFF_CLAN_COOLDOWN))
+      ticks = MAX(ticks, af->duration);
+  }
+
+  if (ticks <= 0)
+    return 0;
+
+  return ticks * SECS_PER_MUD_HOUR;
+}
+
+static void apply_clan_cooldown(struct char_data *ch)
+{
+  struct affected_type af;
+
+  if (!ch || IS_NPC(ch) || GET_LEVEL(ch) >= LVL_IMMORT)
+    return;
+
+  if (AFF_FLAGGED(ch, AFF_CLAN_COOLDOWN))
+    return;
+
+  new_affect(&af);
+  af.duration = MAX(1, (10 * 60) / SECS_PER_MUD_HOUR);
+  SET_BIT_AR(af.bitvector, AFF_CLAN_COOLDOWN);
+  affect_join(ch, &af, FALSE, FALSE, FALSE, FALSE);
+}
+
 static int is_valid_plain_clan_name(const char *s)
 {
   /* For matching/commands: only letters and numbers, no color codes or spaces. */
@@ -754,6 +789,14 @@ ACMD(do_clan)
       return;
     }
 
+    int cooldown = clan_cooldown_remaining(ch);
+    if (cooldown > 0) {
+      int mins = cooldown / 60;
+      int secs = cooldown % 60;
+      send_to_char(ch, "You must wait %d:%02d (mm:ss) before joining another clan.\r\n", mins, secs);
+      return;
+    }
+
     skip_spaces(&argument);
     if (!*argument) {
       send_to_char(ch, "Usage: cjoin <clan name or id>\r\n");
@@ -787,6 +830,9 @@ ACMD(do_clan)
     send_to_char(ch, "You have left %s.\r\n", clan_display_name_by_id(GET_CLAN_ID(ch)));
     SET_CLAN_ID(ch, 0);
     SET_CLAN_RANK(ch, 0);
+    apply_clan_cooldown(ch);
+    if (GET_LEVEL(ch) < LVL_IMMORT)
+      send_to_char(ch, "You will need to wait 10 minutes before joining another clan.\r\n");
     save_char(ch);
     return;
   }
