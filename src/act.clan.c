@@ -276,6 +276,7 @@ static int clanlist_cmp(const void *a, const void *b)
 #define CLANEDIT_SET_NAME 1
 #define CLANEDIT_SET_DISPLAY_NAME 2
 #define CLANEDIT_SET_TAG 3
+#define CLANEDIT_CONFIRM_QUIT 4
 
 static void clanedit_menu(struct descriptor_data *d)
 {
@@ -374,6 +375,34 @@ void clanedit_parse(struct descriptor_data *d, char *arg)
       clanedit_menu(d);
       return;
 
+    case CLANEDIT_CONFIRM_QUIT:
+      if (!*arg) {
+        write_to_output(d, "Save changes before exiting? (Y/N): ");
+        return;
+      }
+
+      switch (LOWER(*arg)) {
+        case 'y':
+          if (clan_save_all())
+            write_to_output(d, "Clans saved. Exiting clan editor.\r\n");
+          else
+            write_to_output(d, "Could not save clans, exiting anyway.\r\n");
+          break;
+
+        case 'n':
+          write_to_output(d, "Exiting clan editor without saving.\r\n");
+          break;
+
+        default:
+          write_to_output(d, "Please enter Y or N: ");
+          return;
+      }
+
+      d->clanedit_id = 0;
+      d->clanedit_mode = CLANEDIT_MAIN;
+      STATE(d) = CON_PLAYING;
+      return;
+
     default:
       break;
   }
@@ -397,10 +426,8 @@ void clanedit_parse(struct descriptor_data *d, char *arg)
       write_to_output(d, "Enter new clan tag (shown in who): ");
       return;
     case 'q':
-      d->clanedit_id = 0;
-      d->clanedit_mode = CLANEDIT_MAIN;
-      STATE(d) = CON_PLAYING;
-      write_to_output(d, "Exited clan editor.\r\n");
+      d->clanedit_mode = CLANEDIT_CONFIRM_QUIT;
+      write_to_output(d, "Save changes before exiting? (Y/N): ");
       return;
     default:
       write_to_output(d, "Invalid choice.\r\n");
