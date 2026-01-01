@@ -41,9 +41,9 @@ void clan_boot(void)
 
   clan_free_all();
 
-  fl = fopen("lib/misc/clans.dat", "r");
+  fl = fopen("misc/clans.dat", "r");
   if (!fl) {
-    mudlog(NRM, LVL_GOD, TRUE, "SYSERR: clan_boot: could not open lib/misc/clans.dat");
+    mudlog(NRM, LVL_GOD, TRUE, "SYSERR: clan_boot: could not open misc/clans.dat");
     return;
   }
 
@@ -106,7 +106,7 @@ int clan_create_and_save(int new_id, long leader_idnum, const char *name)
   if (new_id <= 0 || !name || !*name)
     return 0;
 
-  fl = fopen("lib/misc/clans.dat", "a");
+  fl = fopen("misc/clans.dat", "a");
   if (!fl)
     return 0;
 
