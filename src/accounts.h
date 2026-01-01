@@ -13,7 +13,7 @@ struct account_char_entry {
 struct account_data {
   long account_id;
   char acct_name[64];
-  char passwd_hash[128];
+  char passwd_hash[MAX_PWD_HASH_LENGTH + 1];
   int num_chars;
   struct account_char_entry chars[MAX_CHARS_PER_ACCOUNT];
 };
