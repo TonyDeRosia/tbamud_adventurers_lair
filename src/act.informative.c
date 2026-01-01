@@ -2462,7 +2462,7 @@ ACMD(do_who)
             const char *clan_name = clan_display_name_by_id(GET_CLAN_ID(tch));
             char clan_name_buf[256];
             size_t name_len = strlen(clan_name);
-            size_t max_clan_len = sizeof(clancol) - 5; /* '[', ']', '\t', 'n', '\0' */
+            size_t max_clan_len = sizeof(clancol) - 7; /* '\t','n','[', name, '\t','n',']','\0' */
 
             if (max_clan_len >= sizeof(clan_name_buf))
               max_clan_len = sizeof(clan_name_buf) - 1;
@@ -2483,12 +2483,12 @@ ACMD(do_who)
               if (cn_len >= 2 && cn[cn_len - 2] == '	' && cn[cn_len - 1] == 'n')
                 cn_len -= 2;
 
-              /* Leave room for: '[' + '	' 'n' + ']' + NUL => 1 + 2 + 1 + 1 = 5 bytes */
-              size_t max_inside = sizeof(clancol) - 5;
+              /* Leave room for: '	','n','[', name, '	','n',']','\0' */
+              size_t max_inside = sizeof(clancol) - 7;
               if (cn_len > max_inside)
                 cn_len = max_inside;
 
-              snprintf(clancol, sizeof(clancol), "[%.*s	n]", (int)cn_len, cn);
+              snprintf(clancol, sizeof(clancol), "\tn[%.*s\tn]", (int)cn_len, cn);
             }
           }
 
