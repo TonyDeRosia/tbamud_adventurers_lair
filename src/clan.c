@@ -19,6 +19,18 @@ static void clan_free_all(void)
   clan_list = NULL;
 }
 
+static int normalize_pvp_type(int raw)
+{
+  switch (raw) {
+    case CLAN_PVP_NO_PVP:
+    case CLAN_PVP_ALWAYS:
+    case CLAN_PVP_TOGGLE:
+      return raw;
+    default:
+      return CLAN_PVP_NO_PVP;
+  }
+}
+
 static struct clan_data *clan_by_id(int clan_id)
 {
   struct clan_data *c;
@@ -52,14 +64,14 @@ int clan_save_all(void)
     parse_tab(name_save);
     parse_tab(display_save);
 
-    fprintf(fl, "%d\t%ld\t%s\t%s\n", c->id, c->leader_idnum, name_save, display_save);
+    fprintf(fl, "%d\t%ld\t%s\t%s\t%d\n", c->id, c->leader_idnum, name_save, display_save, c->pvp_type);
   }
 
   fclose(fl);
   return 1;
 }
 
-static void clan_add(int id, long leader_idnum, const char *name, const char *display_name)
+static void clan_add(int id, long leader_idnum, const char *name, const char *display_name, int pvp_type)
 {
   struct clan_data *c = calloc(1, sizeof(*c));
   if (!c)
@@ -72,6 +84,7 @@ static void clan_add(int id, long leader_idnum, const char *name, const char *di
     strlcpy(c->display_name, display_name, sizeof(c->display_name));
   else
     strlcpy(c->display_name, c->name, sizeof(c->display_name));
+  c->pvp_type = normalize_pvp_type(pvp_type);
   c->next = clan_list;
   clan_list = c;
 }
@@ -82,6 +95,7 @@ void clan_boot(void)
   char line[256];
   int id = 0;
   long leader = 0;
+  int pvp_type = CLAN_PVP_NO_PVP;
   char name[128];
   char display_name[128];
 
@@ -99,13 +113,24 @@ void clan_boot(void)
 
     name[0] = '\0';
     display_name[0] = '\0';
-    if (sscanf(line, "%d\t%ld\t%127[^\t]\t%127[^\r\n]", &id, &leader, name, display_name) >= 3 ||
-        sscanf(line, "%d %ld %127s %127s", &id, &leader, name, display_name) >= 3) {
+    pvp_type = CLAN_PVP_NO_PVP;
+    int fields = sscanf(line, "%d\t%ld\t%127[^\t]\t%127[^\t\r\n]\t%d", &id, &leader, name, display_name, &pvp_type);
+    if (fields < 3)
+      fields = sscanf(line, "%d %ld %127s %127s %d", &id, &leader, name, display_name, &pvp_type);
+    if (fields < 3) {
+      /* Legacy format without the PvP field. */
+      pvp_type = CLAN_PVP_NO_PVP;
+      fields = sscanf(line, "%d\t%ld\t%127[^\t]\t%127[^\t\r\n]", &id, &leader, name, display_name);
+      if (fields < 3)
+        fields = sscanf(line, "%d %ld %127s %127s", &id, &leader, name, display_name);
+    }
+
+    if (fields >= 3) {
       parse_at(name);
       parse_at(display_name);
 
       if (id > 0 && *name)
-        clan_add(id, leader, name, *display_name ? display_name : NULL);
+        clan_add(id, leader, name, *display_name ? display_name : NULL, pvp_type);
     }
   }
 
@@ -217,7 +242,7 @@ int clan_create_and_save(int new_id, long leader_idnum, const char *name)
   if (new_id <= 0 || !name || !*name)
     return 0;
 
-  clan_add(new_id, leader_idnum, name, name);
+  clan_add(new_id, leader_idnum, name, name, CLAN_PVP_NO_PVP);
   return clan_save_all();
 }
 
@@ -243,4 +268,39 @@ int clan_set_display_name_and_save(int clan_id, const char *display_name)
 
   strlcpy(c->display_name, display_name, sizeof(c->display_name));
   return clan_save_all();
+}
+
+int clan_set_pvp_type_and_save(int clan_id, int pvp_type)
+{
+  struct clan_data *c;
+
+  c = clan_by_id(clan_id);
+  if (!c)
+    return 0;
+
+  c->pvp_type = normalize_pvp_type(pvp_type);
+  return clan_save_all();
+}
+
+const char *clan_pvp_type_name(int pvp_type)
+{
+  switch (normalize_pvp_type(pvp_type)) {
+    case CLAN_PVP_NO_PVP: return "No PvP";
+    case CLAN_PVP_ALWAYS: return "Always PvP";
+    case CLAN_PVP_TOGGLE: return "Toggle PvP";
+  }
+  return "Unknown";
+}
+
+int clan_pvp_type_by_id(int clan_id)
+{
+  struct clan_data *c;
+
+  if (clan_id <= 0)
+    return CLAN_PVP_ALWAYS;
+
+  c = clan_by_id(clan_id);
+  if (!c)
+    return CLAN_PVP_NO_PVP;
+  return normalize_pvp_type(c->pvp_type);
 }
