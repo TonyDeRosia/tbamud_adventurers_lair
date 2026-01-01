@@ -18,6 +18,9 @@ extern struct descriptor_data *descriptor_list;
 #define CLAN_RANK_MEMBER 0
 #define CLAN_RANK_LEADER 2
 
+/* Use a dedicated spell slot so the cooldown can be saved/restored. */
+#define SPELL_CLAN_COOLDOWN  1001
+
 static void send_to_clan(int clan_id, const char *msg, struct char_data *from)
 {
   struct descriptor_data *d;
@@ -71,6 +74,7 @@ static void apply_clan_cooldown(struct char_data *ch)
     return;
 
   new_affect(&af);
+  af.spell = SPELL_CLAN_COOLDOWN;
   af.duration = MAX(1, (10 * 60) / SECS_PER_MUD_HOUR);
   SET_BIT_AR(af.bitvector, AFF_CLAN_COOLDOWN);
   affect_join(ch, &af, FALSE, FALSE, FALSE, FALSE);
