@@ -48,9 +48,14 @@ static void who_center_clan_tag(char *out, size_t outsz, const char *tag, int wi
   /* Copy tag including color codes, but stop once visible width reached. */
   {
     int v = 0;
+    int color_active = 0;
     const char *s = tag;
     while (*s && pos + 1 < outsz) {
       if (*s == '\t' && *(s + 1)) {
+        if (*(s + 1) == 'n')
+          color_active = 0;
+        else
+          color_active = 1;
         if (pos + 2 < outsz) { out[pos++] = *s++; out[pos++] = *s++; }
         else break;
         continue;
@@ -58,6 +63,10 @@ static void who_center_clan_tag(char *out, size_t outsz, const char *tag, int wi
       if (v >= vis) break;
       out[pos++] = *s++;
       v++;
+    }
+    if (color_active && pos + 2 < outsz) {
+      out[pos++] = '\t';
+      out[pos++] = 'n';
     }
   }
 
