@@ -32,10 +32,11 @@ static void send_to_clan(int clan_id, const char *msg, struct char_data *from)
     if (GET_CLAN_ID(d->character) != clan_id)
       continue;
 
-    if (from)
-      send_to_char(d->character, "\r\n\tG[Clan]\n %s: %s\r\n", GET_NAME(from), msg);
-    else
-      send_to_char(d->character, "\r\n\tG[Clan]\n %s\r\n", msg);
+  if (from)
+    send_to_char(d->character, "\r\n\tG[Clan] %s: %s\r\n", GET_NAME(from), msg);
+  else
+    send_to_char(d->character, "\r\n\tG[Clan] %s\r\n", msg);
+
   }
 }
 
