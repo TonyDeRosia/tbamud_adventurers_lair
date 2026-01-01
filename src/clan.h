@@ -19,6 +19,7 @@ void clan_shutdown(void);
 int clan_exists(int clan_id);
 const char *clan_name_by_id(int clan_id);
 const char *clan_display_name_by_id(int clan_id);
+int clan_id_by_name(const char *name);
 int clan_next_id(void);
 
 int clan_create_and_save(int new_id, long leader_idnum, const char *name);
