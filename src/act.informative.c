@@ -2452,7 +2452,6 @@ ACMD(do_who)
           if (GET_CLAN_ID(tch) > 0) {
             const char *clan_name = clan_display_name_by_id(GET_CLAN_ID(tch));
             char clan_name_buf[256];
-            char color_prefix[32];
             size_t name_len = strlen(clan_name);
             size_t max_clan_len = sizeof(clancol) - 5; /* '[', ']', '\t', 'n', '\0' */
 
@@ -2469,35 +2468,19 @@ ACMD(do_who)
 
             {
               const char *cn = clan_name_buf;
-              size_t prefix_len = 0;
               size_t cn_len = strlen(cn);
 
-              /* Move any leading color codes to a prefix so they color the brackets too. */
-              color_prefix[0] = '\0';
-              while (cn_len >= 2 && cn[0] == '\t' && cn[1] && prefix_len + 2 < sizeof(color_prefix)) {
-                color_prefix[prefix_len++] = *cn++;
-                color_prefix[prefix_len++] = *cn++;
-                cn_len -= 2;
-              }
-              color_prefix[prefix_len] = '\0';
-
               /* If the clan name already ends with a reset, move it outside the bracket. */
-              if (cn_len >= 2 && cn[cn_len - 2] == '\t' && cn[cn_len - 1] == 'n')
+              if (cn_len >= 2 && cn[cn_len - 2] == '	' && cn[cn_len - 1] == 'n')
                 cn_len -= 2;
 
-              /* Leave room for: prefix + '[' + ']' + '\t' 'n' + NUL => prefix + 4 bytes */
-              size_t max_inside = sizeof(clancol) - 4;
-              if (prefix_len < max_inside)
-                max_inside -= prefix_len;
-              else
-                max_inside = 0;
-
+              /* Leave room for: '[' + '	' 'n' + ']' + NUL => 1 + 2 + 1 + 1 = 5 bytes */
+              size_t max_inside = sizeof(clancol) - 5;
               if (cn_len > max_inside)
                 cn_len = max_inside;
 
-              snprintf(clancol, sizeof(clancol), "%s[%.*s]\tn", color_prefix, (int)cn_len, cn);
+              snprintf(clancol, sizeof(clancol), "[%.*s	n]", (int)cn_len, cn);
             }
-
           }
 
           {
