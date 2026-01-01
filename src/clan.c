@@ -18,6 +18,35 @@ static void clan_free_all(void)
   clan_list = NULL;
 }
 
+static struct clan_data *clan_by_id(int clan_id)
+{
+  struct clan_data *c;
+  if (clan_id <= 0)
+    return NULL;
+
+  for (c = clan_list; c; c = c->next)
+    if (c->id == clan_id)
+      return c;
+
+  return NULL;
+}
+
+static int clan_save_all(void)
+{
+  FILE *fl;
+  struct clan_data *c;
+
+  fl = fopen("misc/clans.dat", "w");
+  if (!fl)
+    return 0;
+
+  for (c = clan_list; c; c = c->next)
+    fprintf(fl, "%d %ld %s\n", c->id, c->leader_idnum, c->name);
+
+  fclose(fl);
+  return 1;
+}
+
 static void clan_add(int id, long leader_idnum, const char *name)
 {
   struct clan_data *c = calloc(1, sizeof(*c));
@@ -69,24 +98,15 @@ void clan_shutdown(void)
 
 int clan_exists(int clan_id)
 {
-  struct clan_data *c;
-  if (clan_id <= 0)
-    return 0;
-  for (c = clan_list; c; c = c->next)
-    if (c->id == clan_id)
-      return 1;
-  return 0;
+  return clan_by_id(clan_id) != NULL;
 }
 
 const char *clan_name_by_id(int clan_id)
 {
-  struct clan_data *c;
-  if (clan_id <= 0)
+  struct clan_data *c = clan_by_id(clan_id);
+  if (!c)
     return "None";
-  for (c = clan_list; c; c = c->next)
-    if (c->id == clan_id)
-      return c->name;
-  return "None";
+  return c->name;
 }
 
 int clan_next_id(void)
@@ -115,4 +135,16 @@ int clan_create_and_save(int new_id, long leader_idnum, const char *name)
 
   clan_add(new_id, leader_idnum, name);
   return 1;
+}
+
+int clan_set_name_and_save(int clan_id, const char *name)
+{
+  struct clan_data *c;
+
+  c = clan_by_id(clan_id);
+  if (!c || !name || !*name)
+    return 0;
+
+  strlcpy(c->name, name, sizeof(c->name));
+  return clan_save_all();
 }
