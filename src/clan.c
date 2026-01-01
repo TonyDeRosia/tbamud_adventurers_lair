@@ -41,7 +41,7 @@ int clan_save_all(void)
     return 0;
 
   for (c = clan_list; c; c = c->next)
-    fprintf(fl, "%d %ld %s %s\n", c->id, c->leader_idnum, c->name, c->display_name);
+    fprintf(fl, "%d\t%ld\t%s\t%s\n", c->id, c->leader_idnum, c->name, c->display_name);
 
   fclose(fl);
   return 1;
@@ -87,7 +87,8 @@ void clan_boot(void)
 
     name[0] = '\0';
     display_name[0] = '\0';
-    if (sscanf(line, "%d %ld %127s %127s", &id, &leader, name, display_name) >= 3) {
+    if (sscanf(line, "%d\t%ld\t%127[^\t]\t%127[^\r\n]", &id, &leader, name, display_name) >= 3 ||
+        sscanf(line, "%d %ld %127s %127s", &id, &leader, name, display_name) >= 3) {
       if (id > 0 && *name)
         clan_add(id, leader, name, *display_name ? display_name : NULL);
     }
@@ -99,6 +100,7 @@ void clan_boot(void)
 
 void clan_shutdown(void)
 {
+  clan_save_all();
   clan_free_all();
 }
 
@@ -137,20 +139,11 @@ int clan_next_id(void)
 
 int clan_create_and_save(int new_id, long leader_idnum, const char *name)
 {
-  FILE *fl;
-
   if (new_id <= 0 || !name || !*name)
     return 0;
 
-  fl = fopen("misc/clans.dat", "a");
-  if (!fl)
-    return 0;
-
-  fprintf(fl, "%d %ld %s %s\n", new_id, leader_idnum, name, name);
-  fclose(fl);
-
   clan_add(new_id, leader_idnum, name, name);
-  return 1;
+  return clan_save_all();
 }
 
 int clan_set_name_and_save(int clan_id, const char *name)
