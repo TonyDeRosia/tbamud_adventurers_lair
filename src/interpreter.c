@@ -1963,11 +1963,7 @@ if (PLR_FLAGGED(d->character, PLR_DELETED)) {
       case 'f':
         GET_SEX(d->character) = SEX_FEMALE;
         break;
-        case CON_CLANEDIT:
-    clanedit_parse(d, arg);
-    break;
-
-default:
+      default:
         write_to_output(d, "That is not a sex... What IS your sex? (M/F) ");
         return;
     }
@@ -1975,6 +1971,10 @@ default:
     STATE(d) = CON_QRACE;
     write_to_output(d, "%s", race_menu);
     return;
+
+  case CON_CLANEDIT:
+    clanedit_parse(d, arg);
+    break;
 
   case CON_QRACE: {
     int race = parse_race(arg);
