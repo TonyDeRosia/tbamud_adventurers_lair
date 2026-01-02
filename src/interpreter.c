@@ -1677,6 +1677,33 @@ void nanny(struct descriptor_data *d, char *arg)
         return;
       }
 
+      if (!str_cmp(arg, "pass") || !str_cmp(arg, "password")) {
+        d->acct_change_pass[0] = '\0';
+        echo_off(d);
+        write_to_output(d, "\r\nEnter your current account password: ");
+        STATE(d) = CON_ACCT_PWD_OLD;
+        return;
+      }
+
+      if (!str_cmp(arg, "char") || !str_cmp(arg, "character")) {
+        struct account_data acct;
+
+        memset(&acct, 0, sizeof(acct));
+        if (!account_load_any(d->acct_id, &acct) || acct.num_chars <= 0) {
+          write_to_output(d, "\r\nNo characters available to update.\r\n");
+          acct_show_character_menu(d);
+          return;
+        }
+
+        d->acct_change_pass[0] = '\0';
+        d->acct_change_char[0] = '\0';
+        d->acct_change_char_id = 0;
+        d->acct_prompted_menu = 1;
+        write_to_output(d, "\r\nEnter the character name or number to change: ");
+        STATE(d) = CON_ACCT_CHARPASS_SELECT;
+        return;
+      }
+
       if (isdigit((unsigned char)*arg)) {
         choice = atoi(arg);
         if (choice < 1 || choice > acct.num_chars) {
@@ -1711,7 +1738,190 @@ void nanny(struct descriptor_data *d, char *arg)
       return;
     }
 
-case CON_GET_NAME:             /* wait for input of name */
+    case CON_ACCT_PWD_OLD: {
+      struct account_data acct;
+
+      if (!*arg) {
+        write_to_output(d, "\r\nEnter your current account password: ");
+        echo_off(d);
+        return;
+      }
+
+      memset(&acct, 0, sizeof(acct));
+      if (!account_load_any(d->acct_id, &acct) || !account_check_password(&acct, arg)) {
+        echo_on(d);
+        write_to_output(d, "\r\nIncorrect password.\r\n");
+        STATE(d) = CON_ACCT_MENU;
+        acct_show_character_menu(d);
+        return;
+      }
+
+      d->acct_change_pass[0] = '\0';
+      write_to_output(d, "\r\nEnter a new account password: ");
+      STATE(d) = CON_ACCT_PWD_NEW1;
+      return;
+    }
+
+    case CON_ACCT_PWD_NEW1:
+      if (!*arg) {
+        write_to_output(d, "\r\nEnter a new account password: ");
+        echo_off(d);
+        return;
+      }
+
+      strlcpy(d->acct_change_pass, arg, sizeof(d->acct_change_pass));
+      write_to_output(d, "\r\nConfirm new account password: ");
+      STATE(d) = CON_ACCT_PWD_NEW2;
+      return;
+
+    case CON_ACCT_PWD_NEW2: {
+      struct account_data acct;
+
+      echo_on(d);
+
+      if (strcmp(d->acct_change_pass, arg) != 0) {
+        d->acct_change_pass[0] = '\0';
+        write_to_output(d, "\r\nPasswords do not match.\r\n");
+        STATE(d) = CON_ACCT_MENU;
+        acct_show_character_menu(d);
+        return;
+      }
+
+      if (!account_load_any(d->acct_id, &acct)) {
+        write_to_output(d, "\r\nUnable to load account for update.\r\n");
+        STATE(d) = CON_ACCT_MENU;
+        acct_show_character_menu(d);
+        return;
+      }
+
+      account_set_password(&acct, d->acct_change_pass);
+      account_save_any(&acct);
+      d->acct_change_pass[0] = '\0';
+      write_to_output(d, "\r\nAccount password updated.\r\n");
+      STATE(d) = CON_ACCT_MENU;
+      acct_show_character_menu(d);
+      return;
+    }
+
+    case CON_ACCT_CHARPASS_SELECT: {
+      struct account_data acct;
+      const char *choice_name = NULL;
+      long choice_id = 0;
+      int idx = 0;
+
+      if (!*arg) {
+        write_to_output(d, "\r\nEnter the character name or number to change: ");
+        return;
+      }
+
+      if (!str_cmp(arg, "0") || !str_cmp(arg, "back")) {
+        STATE(d) = CON_ACCT_MENU;
+        acct_show_character_menu(d);
+        return;
+      }
+
+      memset(&acct, 0, sizeof(acct));
+      if (!account_load_any(d->acct_id, &acct)) {
+        write_to_output(d, "\r\nUnable to load account data.\r\n");
+        STATE(d) = CON_ACCT_MENU;
+        acct_show_character_menu(d);
+        return;
+      }
+
+      if (isdigit((unsigned char)*arg)) {
+        idx = atoi(arg);
+        if (idx > 0 && idx <= acct.num_chars) {
+          choice_name = acct.chars[idx - 1].name;
+          choice_id = acct.chars[idx - 1].char_id;
+        }
+      } else {
+        for (idx = 0; idx < acct.num_chars && idx < MAX_CHARS_PER_ACCOUNT; idx++) {
+          if (!acct.chars[idx].name[0])
+            continue;
+          if (!str_cmp(arg, acct.chars[idx].name)) {
+            choice_name = acct.chars[idx].name;
+            choice_id = acct.chars[idx].char_id;
+            break;
+          }
+        }
+      }
+
+      if (!choice_name) {
+        write_to_output(d, "\r\nThat character is not on this account.\r\n");
+        acct_show_character_menu(d);
+        return;
+      }
+
+      d->acct_change_char_id = choice_id;
+      strlcpy(d->acct_change_char, choice_name, sizeof(d->acct_change_char));
+      d->acct_change_pass[0] = '\0';
+      echo_off(d);
+      write_to_output(d, "\r\nNew password for %s: ", d->acct_change_char);
+      STATE(d) = CON_ACCT_CHARPASS_NEW1;
+      return;
+    }
+
+    case CON_ACCT_CHARPASS_NEW1:
+      if (!*arg) {
+        write_to_output(d, "\r\nNew password for %s: ", d->acct_change_char[0] ? d->acct_change_char : "that character");
+        echo_off(d);
+        return;
+      }
+
+      strlcpy(d->acct_change_pass, arg, sizeof(d->acct_change_pass));
+      write_to_output(d, "\r\nConfirm new password for %s: ", d->acct_change_char[0] ? d->acct_change_char : "that character");
+      STATE(d) = CON_ACCT_CHARPASS_NEW2;
+      return;
+
+    case CON_ACCT_CHARPASS_NEW2: {
+      struct char_data *tmp_ch = NULL;
+      int player_i = -1;
+
+      echo_on(d);
+
+      if (strcmp(d->acct_change_pass, arg) != 0) {
+        d->acct_change_pass[0] = '\0';
+        write_to_output(d, "\r\nPasswords do not match.\r\n");
+        STATE(d) = CON_ACCT_MENU;
+        acct_show_character_menu(d);
+        return;
+      }
+
+      CREATE(tmp_ch, struct char_data, 1);
+      clear_char(tmp_ch);
+      CREATE(tmp_ch->player_specials, struct player_special_data, 1);
+      new_mobile_data(tmp_ch);
+
+      player_i = load_char(d->acct_change_char, tmp_ch);
+      if (player_i < 0 || GET_ACCOUNT_ID(tmp_ch) != d->acct_id ||
+          (d->acct_change_char_id > 0 && GET_IDNUM(tmp_ch) != d->acct_change_char_id)) {
+        write_to_output(d, "\r\nUnable to load that character.\r\n");
+        free_char(tmp_ch);
+        d->acct_change_pass[0] = '\0';
+        d->acct_change_char[0] = '\0';
+        d->acct_change_char_id = 0;
+        STATE(d) = CON_ACCT_MENU;
+        acct_show_character_menu(d);
+        return;
+      }
+
+      GET_PFILEPOS(tmp_ch) = player_i;
+      strncpy(GET_PASSWD(tmp_ch), CRYPT(d->acct_change_pass, GET_PC_NAME(tmp_ch)), MAX_PWD_LENGTH);
+      *(GET_PASSWD(tmp_ch) + MAX_PWD_LENGTH) = '\0';
+      save_char(tmp_ch);
+      free_char(tmp_ch);
+
+      d->acct_change_pass[0] = '\0';
+      d->acct_change_char[0] = '\0';
+      d->acct_change_char_id = 0;
+
+      write_to_output(d, "\r\nPassword updated.\r\n");
+      STATE(d) = CON_ACCT_MENU;
+      acct_show_character_menu(d);
+      return;
+    }
+
+  case CON_GET_NAME:             /* wait for input of name */
   /* Account-first enforcement */
   if (!(d->acct_id > 0)) {
     STATE(d) = CON_ACCT_NAME;
