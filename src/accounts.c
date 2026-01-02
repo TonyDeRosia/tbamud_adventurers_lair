@@ -6,12 +6,33 @@
 #include "utils.h"
 #include "db.h"
 
+#include <ctype.h>
+
 #include "comm.h"
 #define ACCT_INDEX_FILE (LIB_ACCTFILES "index.txt")
 
 static void get_account_filename(char *out, size_t len, long account_id)
 {
   snprintf(out, len, "%s%ld.%s", LIB_ACCTFILES, account_id, SUF_ACCT);
+}
+
+static void trim_whitespace(char *str)
+{
+  char *start = str;
+  char *end;
+
+  if (!str)
+    return;
+
+  while (*start && isspace((unsigned char)*start))
+    start++;
+
+  end = start + strlen(start);
+  while (end > start && isspace((unsigned char)*(end - 1)))
+    end--;
+
+  memmove(str, start, (size_t)(end - start));
+  str[end - start] = '\0';
 }
 
 static int index_find(const char *acct_name, long *out_id)
@@ -92,13 +113,11 @@ int account_load_any(long acct_id, struct account_data *acct)
     while (fgets(line, sizeof(line), fp)) {
       if (!strncmp(line, "Name:", 5)) {
         char *p = line + 5;
-        while (*p == ' ') p++;
-        p[strcspn(p, "\r\n")] = '\0';
+        trim_whitespace(p);
         strlcpy(acct->acct_name, p, sizeof(acct->acct_name));
       } else if (!strncmp(line, "Pass:", 5)) {
         char *p = line + 5;
-        while (*p == ' ') p++;
-        p[strcspn(p, "\r\n")] = '\0';
+        trim_whitespace(p);
         strlcpy(acct->passwd_hash, p, sizeof(acct->passwd_hash));
       } else if (!strncmp(line, "Chars:", 6)) {
         acct->num_chars = atoi(line + 6);
