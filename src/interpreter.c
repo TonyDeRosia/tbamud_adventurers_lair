@@ -2112,6 +2112,38 @@ if (PLR_FLAGGED(d->character, PLR_DELETED)) {
 	return;
       }
 
+      
+      /*
+       * Legacy DES crypt() hashes only use the first 8 chars. If this character
+       * still has a legacy hash, upgrade it immediately on successful login so
+       * the full password length is enforced going forward.
+       */
+      if (GET_PASSWD(d->character)[0] != '$') {
+        char salt[64];
+        gen_crypt_salt_sha512(salt, sizeof(salt));
+        /* pwsha512_sethash */
+        {
+          char salt[64];
+          gen_crypt_salt_sha512(salt, sizeof(salt));
+          strncpy(GET_PASSWD(d->character), CRYPT(arg, salt), MAX_PWD_LENGTH);
+          *(GET_PASSWD(d->character) + MAX_PWD_LENGTH) = '\0';
+        }
+
+        *(GET_PASSWD(d->character) + MAX_PWD_LENGTH) = '\0';
+        save_char(d->character);
+        mudlog(NRM, LVL_GOD, TRUE, "Upgraded legacy password hash for %s", GET_NAME(d->character));
+      }
+
+      
+      /* pwsha512_upgrade_on_login */
+      if (GET_PASSWD(d->character)[0] != '$') {
+        char salt[64];
+        gen_crypt_salt_sha512(salt, sizeof(salt));
+        strncpy(GET_PASSWD(d->character), CRYPT(arg, salt), MAX_PWD_LENGTH);
+        *(GET_PASSWD(d->character) + MAX_PWD_LENGTH) = '\0';
+        save_char(d->character);
+      }
+
       /* Password was correct. */
       load_result = GET_BAD_PWS(d->character);
       GET_BAD_PWS(d->character) = 0;
@@ -2164,7 +2196,7 @@ if (PLR_FLAGGED(d->character, PLR_DELETED)) {
 
   case CON_NEWPASSWD:
   case CON_CHPWD_GETNEW:
-    if (!*arg || strlen(arg) > MAX_PWD_LENGTH || strlen(arg) < 3 ||
+    if (!*arg || strlen(arg) > MAX_PWD_LENGTH || strlen(arg) < 14 /* pwsha512_min14 */||
 	!str_cmp(arg, GET_PC_NAME(d->character))) {
       write_to_output(d, "\r\nIllegal password.\r\nPassword: ");
       return;
