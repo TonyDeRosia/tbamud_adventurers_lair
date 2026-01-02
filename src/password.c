@@ -1,6 +1,7 @@
 #include "conf.h"
 #include "sysdep.h"
 
+#include <openssl/evp.h>
 #include <openssl/sha.h>
 #include <time.h>
 
@@ -56,16 +57,27 @@ static int hash_sha256_fallback(const char *password, const char *salt, char *ou
 {
   unsigned char digest[SHA256_DIGEST_LENGTH];
   char hex[(SHA256_DIGEST_LENGTH * 2) + 1];
-  SHA256_CTX ctx;
+  EVP_MD_CTX *ctx = NULL;
+  unsigned int digest_len = 0;
   size_t i;
 
   if (!password || !salt || !out || outlen == 0)
     return 0;
 
-  SHA256_Init(&ctx);
-  SHA256_Update(&ctx, salt, strlen(salt));
-  SHA256_Update(&ctx, password, strlen(password));
-  SHA256_Final(digest, &ctx);
+  ctx = EVP_MD_CTX_new();
+  if (!ctx)
+    return 0;
+
+  if (EVP_DigestInit_ex(ctx, EVP_sha256(), NULL) != 1 ||
+      EVP_DigestUpdate(ctx, salt, strlen(salt)) != 1 ||
+      EVP_DigestUpdate(ctx, password, strlen(password)) != 1 ||
+      EVP_DigestFinal_ex(ctx, digest, &digest_len) != 1 ||
+      digest_len != SHA256_DIGEST_LENGTH) {
+    EVP_MD_CTX_free(ctx);
+    return 0;
+  }
+
+  EVP_MD_CTX_free(ctx);
 
   for (i = 0; i < SHA256_DIGEST_LENGTH; i++)
     snprintf(hex + (i * 2), 3, "%02x", digest[i]);
@@ -114,6 +126,9 @@ int password_is_legacy(const char *stored_hash)
   return 1;
 }
 
+#if defined(__GNUC__)
+__attribute__((unused))
+#endif
 static int verify_sha256_hash(const char *password, const char *stored_hash)
 {
   const char *salt_start = stored_hash + strlen(SHA256_PREFIX);
