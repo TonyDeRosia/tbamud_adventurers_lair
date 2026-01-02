@@ -25,3 +25,6 @@ lib/etc/plrmail
 lib/etc/time
 src/depend
 src/util/depend
+
+# runtime playerfiles
+lib/plrfiles/
