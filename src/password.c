@@ -92,7 +92,7 @@ int password_hash(const char *password, char *out, size_t outlen)
     snprintf(salt_string, sizeof(salt_string), "%s%s$", SHA512_PREFIX, salt);
     result = CRYPT(password, salt_string);
     if (result && !strncmp(result, SHA512_PREFIX, 3)) {
-      strlcpy(out, result, outlen);
+      snprintf(out, outlen, "%s", result);
       return 1;
     }
   }
