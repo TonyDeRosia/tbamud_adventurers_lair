@@ -68,10 +68,25 @@ static int index_add(long id, const char *acct_name)
   return 1;
 }
 
-static void acct_hash_password(char *out, size_t outlen, const char *passwd)
+static int acct_hash_password(char *out, size_t outlen, const char *passwd)
 {
   const char *salt = "AC";
-  snprintf(out, outlen, "%s", CRYPT(passwd, salt));
+  const char *crypted;
+
+  if (!out || outlen == 0)
+    return 0;
+
+  out[0] = '\0';
+
+  if (!passwd || !*passwd)
+    return 0;
+
+  crypted = CRYPT(passwd, salt);
+  if (!crypted || !*crypted)
+    return 0;
+
+  strlcpy(out, crypted, outlen);
+  return out[0] != '\0';
 }
 
 int account_load_any(long acct_id, struct account_data *acct)
@@ -176,7 +191,9 @@ int account_authenticate(const char *acct_name, const char *passwd, long *out_id
   if (!acct.passwd_hash[0])
     return 0;
 
-  acct_hash_password(hash, sizeof(hash), passwd);
+  if (!acct_hash_password(hash, sizeof(hash), passwd))
+    return 0;
+
   if (strcmp(hash, acct.passwd_hash) != 0)
     return 0;
 
@@ -202,7 +219,9 @@ int account_create(const char *acct_name, const char *passwd, long *out_id)
   memset(&acct, 0, sizeof(acct));
   acct.account_id = id;
   strlcpy(acct.acct_name, acct_name, sizeof(acct.acct_name));
-  acct_hash_password(hash, sizeof(hash), passwd);
+  if (!acct_hash_password(hash, sizeof(hash), passwd))
+    return 0;
+
   strlcpy(acct.passwd_hash, hash, sizeof(acct.passwd_hash));
 
   account_save_any(&acct);
