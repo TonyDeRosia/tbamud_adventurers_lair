@@ -294,7 +294,6 @@ void acct_show_character_menu(struct descriptor_data *d)
   write_to_output(d, "\r\nOptions:\r\n");
   write_to_output(d, "  NEW   Create a new character\r\n");
   write_to_output(d, "  PASS  Change your account password\r\n");
-  write_to_output(d, "  CHAR  Change a character password\r\n");
   write_to_output(d, "  0     Disconnect\r\n");
   write_to_output(d, "\r\nSelect: ");
 }

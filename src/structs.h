@@ -316,9 +316,6 @@ void clanedit_parse(struct descriptor_data *d, char *arg);
 #define CON_ACCT_PWD_OLD 47 /**< Account password: verify current */
 #define CON_ACCT_PWD_NEW1 48 /**< Account password: new entry */
 #define CON_ACCT_PWD_NEW2 49 /**< Account password: confirm */
-#define CON_ACCT_CHARPASS_SELECT 50 /**< Choose character for password update */
-#define CON_ACCT_CHARPASS_NEW1 51 /**< Character password: new entry */
-#define CON_ACCT_CHARPASS_NEW2 52 /**< Character password: confirm */
 
 /* Character creation: allocate base stats */
 #define CON_QSTATS        41
