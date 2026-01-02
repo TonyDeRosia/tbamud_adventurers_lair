@@ -196,7 +196,7 @@ The robes of a mage lies here.~
 ~
 9 0 0 0 0 ak 0 0 0 0 0 0 0
 3 0 0 0
-5 250000 0 0 0
+5 20 0 0 0
 E
 robe robes~
    These robes are comfortable and clean.
@@ -299,7 +299,7 @@ A simple wooden spear lies here.~
 ~
 5 0 0 0 0 an 0 0 0 0 0 0 0
 0 5 3 14
-4 200000 0 10 0
+4 35 0 10 0
 #55532
 club~
 a stone club~
@@ -307,7 +307,7 @@ A stone club is here.~
 ~
 5 0 0 0 0 an 0 0 0 0 0 0 0
 0 5 3 7
-10 50000 0 10 0
+10 25 0 10 0
 #55533
 gavel~
 a gavel~
@@ -432,7 +432,7 @@ A sword lies on the ground.~
 ~
 5 0 0 0 0 an 0 0 0 0 0 0 0
 0 13 3 3
-10 300000 0 15 0
+10 1000 0 15 0
 A
 18 2
 #55542
@@ -442,7 +442,7 @@ A paladin's suit of armor lies here.~
 ~
 9 0 0 0 0 ad 0 0 0 0 0 0 0
 3 0 0 0
-15 500000 0 15 0
+15 25 0 15 0
 A
 1 1
 A
@@ -746,14 +746,14 @@ A pure gold sceptre is topped with a perfect crystal orb of power.~
 10 0 0 0
 10 1000000 0 30 0
 E
-sceptre~
-   The second of the crown jewels, this sceptre is amazingly light, and
-amazingly powerful.  It is pure gold, but topped with an orb of power.
-~
-E
 orb~
    The orb of power is transparent to the point of sightlessness.  It holds
 within a vast store of power.
+~
+E
+sceptre~
+   The second of the crown jewels, this sceptre is amazingly light, and
+amazingly powerful.  It is pure gold, but topped with an orb of power.
 ~
 A
 5 2
@@ -792,5 +792,5 @@ A boat lies here.~
 ~
 22 0 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-20 500000 0 0 0
+20 1050 0 0 0
 $~
