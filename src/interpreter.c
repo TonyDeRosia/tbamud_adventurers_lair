@@ -65,6 +65,7 @@ static struct alias_data *find_alias(struct alias_data *alias_list, char *str);
 static void perform_complex_alias(struct txt_q *input_q, char *orig, struct alias_data *a);
 static int _parse_name(char *arg, char *name);
 static bool perform_new_char_dupe_check(struct descriptor_data *d);
+static void complete_char_login(struct descriptor_data *d);
 /* sort_commands utility */
 static int sort_commands_helper(const void *a, const void *b);
 
@@ -1276,6 +1277,60 @@ static bool perform_new_char_dupe_check(struct descriptor_data *d)
   return (found);
 }
 
+static void complete_char_login(struct descriptor_data *d)
+{
+  int load_result = GET_BAD_PWS(d->character);
+
+  GET_BAD_PWS(d->character) = 0;
+  d->bad_pws = 0;
+  d->idle_tics = 0;
+
+  if (isbanned(d->host) == BAN_SELECT &&
+      !PLR_FLAGGED(d->character, PLR_SITEOK)) {
+    write_to_output(d, "Sorry, this char has not been cleared for login from your site!\r\n");
+    STATE(d) = CON_CLOSE;
+    mudlog(NRM, LVL_GOD, TRUE, "Connection attempt for %s denied from %s", GET_NAME(d->character), d->host);
+    return;
+  }
+  if (GET_LEVEL(d->character) < circle_restrict) {
+    write_to_output(d, "The game is temporarily restricted.. try again later.\r\n");
+    STATE(d) = CON_CLOSE;
+    mudlog(NRM, LVL_GOD, TRUE, "Request for login denied for %s [%s] (wizlock)", GET_NAME(d->character), d->host);
+    return;
+  }
+
+  /* check and make sure no other copies of this player are logged in */
+  if (perform_dupe_check(d))
+    return;
+
+  if (GET_LEVEL(d->character) >= LVL_IMMORT)
+    write_to_output(d, "%s", imotd);
+  else
+    write_to_output(d, "%s", motd);
+
+  if (GET_INVIS_LEV(d->character))
+    mudlog(BRF, MAX(LVL_IMMORT, GET_INVIS_LEV(d->character)), TRUE, "%s has connected. (invis %d)", GET_NAME(d->character),
+GET_INVIS_LEV(d->character));
+  else
+    mudlog(BRF, LVL_IMMORT, TRUE, "%s has connected.", GET_NAME(d->character));
+
+  /* Add to the list of 'recent' players (since last reboot) */
+  if (AddRecentPlayer(GET_NAME(d->character), d->host, FALSE, FALSE) == FALSE)
+  {
+    mudlog(BRF, MAX(LVL_IMMORT, GET_INVIS_LEV(d->character)), TRUE, "Failure to AddRecentPlayer (returned FALSE).");
+  }
+
+  if (load_result) {
+    write_to_output(d, "\r\n\r\n\007\007\007"
+            "%s%d LOGIN FAILURE%s SINCE LAST SUCCESSFUL LOGIN.%s\r\n",
+            CCRED(d->character, C_SPR), load_result,
+            (load_result > 1) ? "S" : "", CCNRM(d->character, C_SPR));
+    GET_BAD_PWS(d->character) = 0;
+  }
+  write_to_output(d, "\r\n*** PRESS RETURN: ");
+  STATE(d) = CON_RMOTD;
+}
+
 /* load the player, put them in the right room - used by copyover_recover too */
 int enter_player_game (struct descriptor_data *d)
 {
@@ -1786,10 +1841,8 @@ if (PLR_FLAGGED(d->character, PLR_DELETED)) {
           REMOVE_BIT_AR(PLR_FLAGS(d->character), PLR_MAILING);
           REMOVE_BIT_AR(PLR_FLAGS(d->character), PLR_CRYO);
           d->character->player.time.logon = time(0);
-          write_to_output(d, "Password: ");
-          echo_off(d);
-          d->idle_tics = 0;
-          STATE(d) = CON_PASSWORD;
+          complete_char_login(d);
+          return;
         }
       } else {
         /* player unknown -- make new character */
@@ -1823,9 +1876,9 @@ if (PLR_FLAGGED(d->character, PLR_DELETED)) {
 	return;
       }
       perform_new_char_dupe_check(d);
-      write_to_output(d, "New character.\r\nGive me a password for %s: ", GET_PC_NAME(d->character));
-      echo_off(d);
-      STATE(d) = CON_NEWPASSWD;
+      write_to_output(d, "New character.\r\nWhat is your sex (\t(M\t)/\t(F\t))? ");
+      GET_PASSWD(d->character)[0] = '\0';
+      STATE(d) = CON_QSEX;
     } else if (*arg == 'n' || *arg == 'N') {
       write_to_output(d, "Okay, what IS it, then? ");
       free(d->character->player.name);
@@ -1866,53 +1919,7 @@ if (PLR_FLAGGED(d->character, PLR_DELETED)) {
 	return;
       }
 
-      /* Password was correct. */
-      load_result = GET_BAD_PWS(d->character);
-      GET_BAD_PWS(d->character) = 0;
-      d->bad_pws = 0;
-
-      if (isbanned(d->host) == BAN_SELECT &&
-	  !PLR_FLAGGED(d->character, PLR_SITEOK)) {
-	write_to_output(d, "Sorry, this char has not been cleared for login from your site!\r\n");
-	STATE(d) = CON_CLOSE;
-	mudlog(NRM, LVL_GOD, TRUE, "Connection attempt for %s denied from %s", GET_NAME(d->character), d->host);
-	return;
-      }
-      if (GET_LEVEL(d->character) < circle_restrict) {
-	write_to_output(d, "The game is temporarily restricted.. try again later.\r\n");
-	STATE(d) = CON_CLOSE;
-	mudlog(NRM, LVL_GOD, TRUE, "Request for login denied for %s [%s] (wizlock)", GET_NAME(d->character), d->host);
-	return;
-      }
-      /* check and make sure no other copies of this player are logged in */
-      if (perform_dupe_check(d))
-	return;
-
-      if (GET_LEVEL(d->character) >= LVL_IMMORT)
-	write_to_output(d, "%s", imotd);
-      else
-	write_to_output(d, "%s", motd);
-
-      if (GET_INVIS_LEV(d->character))
-        mudlog(BRF, MAX(LVL_IMMORT, GET_INVIS_LEV(d->character)), TRUE, "%s has connected. (invis %d)", GET_NAME(d->character), GET_INVIS_LEV(d->character));
-      else
-        mudlog(BRF, LVL_IMMORT, TRUE, "%s has connected.", GET_NAME(d->character));
-
-      /* Add to the list of 'recent' players (since last reboot) */
-      if (AddRecentPlayer(GET_NAME(d->character), d->host, FALSE, FALSE) == FALSE)
-      {
-        mudlog(BRF, MAX(LVL_IMMORT, GET_INVIS_LEV(d->character)), TRUE, "Failure to AddRecentPlayer (returned FALSE).");
-      }
-
-      if (load_result) {
-        write_to_output(d, "\r\n\r\n\007\007\007"
-		"%s%d LOGIN FAILURE%s SINCE LAST SUCCESSFUL LOGIN.%s\r\n",
-		CCRED(d->character, C_SPR), load_result,
-		(load_result > 1) ? "S" : "", CCNRM(d->character, C_SPR));
-	GET_BAD_PWS(d->character) = 0;
-      }
-      write_to_output(d, "\r\n*** PRESS RETURN: ");
-      STATE(d) = CON_RMOTD;
+      complete_char_login(d);
     }
     break;
 
