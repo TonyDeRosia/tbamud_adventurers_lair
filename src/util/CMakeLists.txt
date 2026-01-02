@@ -16,6 +16,7 @@ include_directories(${CMAKE_SOURCE_DIR}/src)
 add_definitions(-DCIRCLE_UTIL)
 
 find_library(CRYPT_LIBRARY crypt)
+find_library(CRYPTO_LIBRARY crypto)
 find_library(NETLIB_LIBRARY nsl socket)  # for sign.c, hvis nødvendig
 
 foreach(tool ${TOOLS})
@@ -30,9 +31,15 @@ foreach(tool ${TOOLS})
         RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin
     )
 
-    # Link to libcrypt for asciipasswd
-    if(${tool} STREQUAL "asciipasswd" AND CRYPT_LIBRARY)
-        target_link_libraries(${tool} ${CRYPT_LIBRARY})
+    # Link to libcrypt/libcrypto for asciipasswd and include password helpers
+    if(${tool} STREQUAL "asciipasswd")
+        target_sources(${tool} PRIVATE ../password.c)
+        if(CRYPT_LIBRARY)
+            target_link_libraries(${tool} ${CRYPT_LIBRARY})
+        endif()
+        if(CRYPTO_LIBRARY)
+            target_link_libraries(${tool} ${CRYPTO_LIBRARY})
+        endif()
     endif()
 
     # Link to netlib for sign

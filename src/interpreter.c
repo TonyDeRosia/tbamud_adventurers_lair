@@ -15,6 +15,7 @@
 #include "comm.h"
 #include "interpreter.h"
 #include "accounts.h"
+#include "password.h"
 #include "race.h"
 #include "db.h"
 #include "spells.h"
@@ -1612,7 +1613,10 @@ void nanny(struct descriptor_data *d, char *arg)
       return;
 
     case CON_ACCT_CREATE_PASS1:
-      if (!*arg) { write_to_output(d, "\r\nNew account password: "); return; }
+      if (!*arg || strlen(arg) < MIN_PWD_LENGTH || strlen(arg) > MAX_PWD_LENGTH) {
+        write_to_output(d, "\r\nNew account password: ");
+        return;
+      }
       strlcpy(d->acct_tmp_pass, arg, sizeof(d->acct_tmp_pass));
       write_to_output(d, "\r\nConfirm password: ");
       STATE(d) = CON_ACCT_CREATE_PASS2;
@@ -1854,18 +1858,27 @@ if (PLR_FLAGGED(d->character, PLR_DELETED)) {
     if (!*arg)
       STATE(d) = CON_CLOSE;
     else {
-      if (strncmp(CRYPT(arg, GET_PASSWD(d->character)), GET_PASSWD(d->character), MAX_PWD_LENGTH)) {
-	mudlog(BRF, LVL_GOD, TRUE, "Bad PW: %s [%s]", GET_NAME(d->character), d->host);
-	GET_BAD_PWS(d->character)++;
-	save_char(d->character);
-	if (++(d->bad_pws) >= CONFIG_MAX_BAD_PWS) {	/* 3 strikes and you're out. */
-	  write_to_output(d, "Wrong password... disconnecting.\r\n");
-	  STATE(d) = CON_CLOSE;
-	} else {
-	  write_to_output(d, "Wrong password.\r\nPassword: ");
-	  echo_off(d);
-	}
-	return;
+      char new_hash[MAX_PWD_HASH_LENGTH + 1];
+      int upgraded = 0;
+
+      if (!password_verify(arg, GET_PASSWD(d->character), new_hash, sizeof(new_hash), &upgraded)) {
+        mudlog(BRF, LVL_GOD, TRUE, "Bad PW: %s [%s]", GET_NAME(d->character), d->host);
+        GET_BAD_PWS(d->character)++;
+        save_char(d->character);
+        if (++(d->bad_pws) >= CONFIG_MAX_BAD_PWS) {     /* 3 strikes and you're out. */
+          write_to_output(d, "Wrong password... disconnecting.\r\n");
+          STATE(d) = CON_CLOSE;
+        } else {
+          write_to_output(d, "Wrong password.\r\nPassword: ");
+          echo_off(d);
+        }
+        return;
+      }
+
+      if (upgraded) {
+        strlcpy(GET_PASSWD(d->character), new_hash, sizeof(d->character->player.passwd));
+        save_char(d->character);
+        mudlog(NRM, LVL_IMMORT, TRUE, "Upgraded password hash for %s.", GET_NAME(d->character));
       }
 
       /* Password was correct. */
@@ -1920,13 +1933,15 @@ if (PLR_FLAGGED(d->character, PLR_DELETED)) {
 
   case CON_NEWPASSWD:
   case CON_CHPWD_GETNEW:
-    if (!*arg || strlen(arg) > MAX_PWD_LENGTH || strlen(arg) < 3 ||
-	!str_cmp(arg, GET_PC_NAME(d->character))) {
+    if (!*arg || strlen(arg) > MAX_PWD_LENGTH || strlen(arg) < MIN_PWD_LENGTH ||
+        !str_cmp(arg, GET_PC_NAME(d->character))) {
       write_to_output(d, "\r\nIllegal password.\r\nPassword: ");
       return;
     }
-    strncpy(GET_PASSWD(d->character), CRYPT(arg, GET_PC_NAME(d->character)), MAX_PWD_LENGTH);	/* strncpy: OK (G_P:MAX_PWD_LENGTH+1) */
-    *(GET_PASSWD(d->character) + MAX_PWD_LENGTH) = '\0';
+    if (!password_hash(arg, GET_PASSWD(d->character), sizeof(d->character->player.passwd))) {
+      write_to_output(d, "\r\nPassword hashing failed.\r\nPassword: ");
+      return;
+    }
 
     write_to_output(d, "\r\nPlease retype password: ");
     if (STATE(d) == CON_NEWPASSWD)
@@ -1934,16 +1949,14 @@ if (PLR_FLAGGED(d->character, PLR_DELETED)) {
     else
       STATE(d) = CON_CHPWD_VRFY;
     break;
-
   case CON_CNFPASSWD:
   case CON_CHPWD_VRFY:
-    if (strncmp(CRYPT(arg, GET_PASSWD(d->character)), GET_PASSWD(d->character),
-		MAX_PWD_LENGTH)) {
-      write_to_output(d, "\r\nPasswords don't match... start over.\r\nPassword: ");
+      if (!password_verify(arg, GET_PASSWD(d->character), NULL, 0, NULL)) {
+        write_to_output(d, "\r\nPasswords don't match... start over.\r\nPassword: ");
       if (STATE(d) == CON_CNFPASSWD)
-	STATE(d) = CON_NEWPASSWD;
+        STATE(d) = CON_NEWPASSWD;
       else
-	STATE(d) = CON_CHPWD_GETNEW;
+        STATE(d) = CON_CHPWD_GETNEW;
       return;
     }
     echo_on(d);
@@ -2208,28 +2221,42 @@ save_char(d->character);
   }
 
   case CON_CHPWD_GETOLD:
-    if (strncmp(CRYPT(arg, GET_PASSWD(d->character)), GET_PASSWD(d->character), MAX_PWD_LENGTH)) {
-      echo_on(d);
-      write_to_output(d, "\r\nIncorrect password.\r\n%s", CONFIG_MENU);
-      STATE(d) = CON_MENU;
-    } else {
-      write_to_output(d, "\r\nEnter a new password: ");
-      STATE(d) = CON_CHPWD_GETNEW;
+    {
+      char new_hash[MAX_PWD_HASH_LENGTH + 1];
+      int upgraded = 0;
+
+      if (!password_verify(arg, GET_PASSWD(d->character), new_hash, sizeof(d->character->player.passwd), &upgraded)) {
+        echo_on(d);
+        write_to_output(d, "\r\nIncorrect password.\r\n%s", CONFIG_MENU);
+        STATE(d) = CON_MENU;
+      } else {
+        if (upgraded) {
+          strlcpy(GET_PASSWD(d->character), new_hash, sizeof(d->character->player.passwd));
+          save_char(d->character);
+          mudlog(NRM, LVL_IMMORT, TRUE, "Upgraded password hash for %s.", GET_NAME(d->character));
+        }
+        write_to_output(d, "\r\nEnter a new password: ");
+        STATE(d) = CON_CHPWD_GETNEW;
+      }
     }
     return;
 
+
+
   case CON_DELCNF1:
     echo_on(d);
-    if (strncmp(CRYPT(arg, GET_PASSWD(d->character)), GET_PASSWD(d->character), MAX_PWD_LENGTH)) {
+    if (!password_verify(arg, GET_PASSWD(d->character), NULL, 0, NULL)) {
       write_to_output(d, "\r\nIncorrect password.\r\n%s", CONFIG_MENU);
       STATE(d) = CON_MENU;
     } else {
-      write_to_output(d, "\r\nYOU ARE ABOUT TO DELETE THIS CHARACTER PERMANENTLY.\r\n"
-		"ARE YOU ABSOLUTELY SURE?\r\n\r\n"
-		"Please type \"yes\" to confirm: ");
+        write_to_output(d, "\r\nYOU ARE ABOUT TO DELETE THIS CHARACTER PERMANENTLY.\r\n"
+                  "ARE YOU ABSOLUTELY SURE?\r\n\r\n"
+                  "Please type \"yes\" to confirm: ");
       STATE(d) = CON_DELCNF2;
     }
     break;
+
+
 
   case CON_DELCNF2:
     if (!strcmp(arg, "yes") || !strcmp(arg, "YES")) {

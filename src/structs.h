@@ -295,9 +295,10 @@ void clanedit_parse(struct descriptor_data *d, char *arg);
 #define AFF_SNEAK          19   /**< Char can move quietly */
 #define AFF_HIDE           20   /**< Char is hidden */
 #define AFF_PVP_LOCK       21   /**< Clan PvP lockout */
-#define AFF_CHARM          22   /**< Char is charmed */
+#define AFF_CLAN_COOLDOWN  22   /**< Prevents rapidly switching clans */
+#define AFF_CHARM          23   /**< Char is charmed */
 /** Total number of affect flags */
-#define NUM_AFF_FLAGS   23
+#define NUM_AFF_FLAGS   24
 
 /* Modes of connectedness: used by descriptor_data.state 		*/
 #define CON_CLANEDIT      42 /**< Clan editor */
@@ -626,7 +627,9 @@ void clanedit_parse(struct descriptor_data *d, char *arg);
 #define MAX_RAW_INPUT_LENGTH  (12 * 1024) /**< Max size of *raw* input */
 #define MAX_MESSAGES          60     /**< Max Different attack message types */
 #define MAX_NAME_LENGTH       20     /**< Max PC/NPC name length */
-#define MAX_PWD_LENGTH        30     /**< Max PC password length */
+#define MAX_PWD_LENGTH        32     /**< Max PC password length */
+#define MIN_PWD_LENGTH         8     /**< Minimum PC password length */
+#define MAX_PWD_HASH_LENGTH  256     /**< Max stored password hash length */
 #define MAX_TITLE_LENGTH      80     /**< Max PC title length */
 #define HOST_LENGTH           40     /**< Max hostname resolution length */
 #define PLR_DESC_LENGTH       4096   /**< Max length for PC description */
@@ -896,7 +899,7 @@ struct pclean_criteria_data
 /** General info used by PC's and NPC's. */
 struct char_player_data
 {
-  char passwd[MAX_PWD_LENGTH+1]; /**< PC's password */
+  char passwd[MAX_PWD_HASH_LENGTH+1]; /**< PC's password hash */
   char *name;                    /**< PC / NPC name */
   char *short_descr;             /**< NPC 'actions' */
   char *long_descr;              /**< PC / NPC look description */
