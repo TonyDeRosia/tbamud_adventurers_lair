@@ -597,7 +597,7 @@ static void shopping_buy(char *arg, struct char_data *ch, struct char_data *keep
   char tempstr[MAX_INPUT_LENGTH - 10], tempbuf[MAX_INPUT_LENGTH];
   struct obj_data *obj, *last_obj = NULL;
   int goldamt = 0, buynum, bought = 0;
-  bool insufficient_funds = FALSE;
+  bool insufficient_funds_flag = FALSE;
 
   if (!is_ok(keeper, ch, shop_nr))
     return;
@@ -695,7 +695,7 @@ static void shopping_buy(char *arg, struct char_data *ch, struct char_data *keep
 
     cost_copper = shop_units_to_copper((long long)buy_price(obj, shop_nr, keeper, ch));
     if (GET_MONEY(ch) < cost_copper) {
-      insufficient_funds = TRUE;
+      insufficient_funds_flag = TRUE;
       break;
     }
 
@@ -732,7 +732,7 @@ static void shopping_buy(char *arg, struct char_data *ch, struct char_data *keep
 
     if (!obj || !same_obj(last_obj, obj))
       snprintf(buf, sizeof(buf), "%s I only have %d to sell you.", GET_NAME(ch), bought);
-    else if (!OBJ_FLAGGED(obj, ITEM_QUEST) && insufficient_funds)
+    else if (!OBJ_FLAGGED(obj, ITEM_QUEST) && insufficient_funds_flag)
       snprintf(buf, sizeof(buf), "%s You can only afford %d.", GET_NAME(ch), bought);
     else if (OBJ_FLAGGED(obj, ITEM_QUEST) &&
       GET_QUESTPOINTS(ch) < GET_OBJ_COST(obj))
