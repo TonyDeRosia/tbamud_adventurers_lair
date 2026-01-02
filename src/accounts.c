@@ -169,6 +169,10 @@ int account_authenticate(const char *acct_name, const char *passwd, long *out_id
   if (!account_load_any(id, &acct))
     return 0;
 
+  /* Guard against stale/incorrect index entries. */
+  if (!acct.acct_name[0] || strcasecmp(acct.acct_name, acct_name) != 0)
+    return 0;
+
   if (!acct.passwd_hash[0])
     return 0;
 
