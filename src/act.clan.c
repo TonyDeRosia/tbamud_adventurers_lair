@@ -578,7 +578,12 @@ ACMD(do_clist)
     max_id = (int)(sizeof(rows) / sizeof(rows[0]));
 
   for (i = 1; i < max_id; i++) {
-    const char *nm = clan_name_by_id(i);
+    const char *nm;
+
+    if (!clan_exists(i))
+      continue;
+
+    nm = clan_name_by_id(i);
     if (!nm || !*nm)
       continue;
 
