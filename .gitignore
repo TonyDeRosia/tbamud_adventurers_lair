@@ -20,7 +20,6 @@ mudrun.log
 syslog.*
 syslog.CRASH
 log/
-lib/plrfiles/
 lib/plrobjs/
 lib/etc/plrmail
 lib/etc/time

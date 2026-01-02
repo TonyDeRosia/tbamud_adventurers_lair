@@ -313,6 +313,12 @@ void clanedit_parse(struct descriptor_data *d, char *arg);
 #define CON_ACCT_CREATE_PASS2 38
 #define CON_ACCT_CHARSEL   39 /**< Account character select */
 #define CON_ACCT_MENU 40 /**< Account character select/create menu */
+#define CON_ACCT_PWD_OLD 47 /**< Account password: verify current */
+#define CON_ACCT_PWD_NEW1 48 /**< Account password: new entry */
+#define CON_ACCT_PWD_NEW2 49 /**< Account password: confirm */
+#define CON_ACCT_CHARPASS_SELECT 50 /**< Choose character for password update */
+#define CON_ACCT_CHARPASS_NEW1 51 /**< Character password: new entry */
+#define CON_ACCT_CHARPASS_NEW2 52 /**< Character password: confirm */
 
 /* Character creation: allocate base stats */
 #define CON_QSTATS        41
@@ -1138,6 +1144,9 @@ struct descriptor_data
   char acct_name[64];
   int acct_authed;
   char acct_tmp_pass[128];
+  char acct_change_pass[128];
+  char acct_change_char[64];
+  long acct_change_char_id;
 
   socket_t descriptor;      /**< file descriptor for socket */
   char host[HOST_LENGTH+1]; /**< hostname */

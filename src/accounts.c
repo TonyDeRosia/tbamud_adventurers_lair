@@ -74,6 +74,30 @@ static void acct_hash_password(char *out, size_t outlen, const char *passwd)
   snprintf(out, outlen, "%s", CRYPT(passwd, salt));
 }
 
+int account_check_password(const struct account_data *acct, const char *passwd)
+{
+  char hash[128];
+
+  if (!acct || !passwd || !acct->passwd_hash[0])
+    return 0;
+
+  acct_hash_password(hash, sizeof(hash), passwd);
+  return strcmp(hash, acct->passwd_hash) == 0;
+}
+
+void account_set_password(struct account_data *acct, const char *passwd)
+{
+  if (!acct)
+    return;
+
+  acct->passwd_hash[0] = '\0';
+
+  if (!passwd || !*passwd)
+    return;
+
+  acct_hash_password(acct->passwd_hash, sizeof(acct->passwd_hash), passwd);
+}
+
 int account_load_any(long acct_id, struct account_data *acct)
 {
   char fname[256], line[256];
@@ -161,7 +185,6 @@ int account_authenticate(const char *acct_name, const char *passwd, long *out_id
 {
   long id = 0;
   struct account_data acct;
-  char hash[128];
 
   if (out_id) *out_id = 0;
   if (!acct_name || !*acct_name) return 0;
@@ -173,11 +196,7 @@ int account_authenticate(const char *acct_name, const char *passwd, long *out_id
   if (!account_load_any(id, &acct))
     return 0;
 
-  if (!acct.passwd_hash[0])
-    return 0;
-
-  acct_hash_password(hash, sizeof(hash), passwd);
-  if (strcmp(hash, acct.passwd_hash) != 0)
+  if (!account_check_password(&acct, passwd))
     return 0;
 
   if (out_id) *out_id = id;
@@ -188,7 +207,6 @@ int account_create(const char *acct_name, const char *passwd, long *out_id)
 {
   long id = 0;
   struct account_data acct;
-  char hash[128];
 
   if (out_id) *out_id = 0;
   if (!acct_name || !*acct_name) return 0;
@@ -202,8 +220,7 @@ int account_create(const char *acct_name, const char *passwd, long *out_id)
   memset(&acct, 0, sizeof(acct));
   acct.account_id = id;
   strlcpy(acct.acct_name, acct_name, sizeof(acct.acct_name));
-  acct_hash_password(hash, sizeof(hash), passwd);
-  strlcpy(acct.passwd_hash, hash, sizeof(acct.passwd_hash));
+  account_set_password(&acct, passwd);
 
   account_save_any(&acct);
   index_add(id, acct_name);
@@ -276,6 +293,8 @@ void acct_show_character_menu(struct descriptor_data *d)
 
   write_to_output(d, "\r\nOptions:\r\n");
   write_to_output(d, "  NEW   Create a new character\r\n");
+  write_to_output(d, "  PASS  Change your account password\r\n");
+  write_to_output(d, "  CHAR  Change a character password\r\n");
   write_to_output(d, "  0     Disconnect\r\n");
   write_to_output(d, "\r\nSelect: ");
 }
