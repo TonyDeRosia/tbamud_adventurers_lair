@@ -1,6 +1,7 @@
 #include "conf.h"
 #include "sysdep.h"
 
+#include <openssl/evp.h>
 #include <openssl/sha.h>
 #include <time.h>
 
@@ -51,21 +52,31 @@ static void build_salt(char *out, size_t len)
 
   out[len - 1] = '\0';
 }
-
 static int hash_sha256_fallback(const char *password, const char *salt, char *out, size_t outlen)
 {
   unsigned char digest[SHA256_DIGEST_LENGTH];
   char hex[(SHA256_DIGEST_LENGTH * 2) + 1];
-  SHA256_CTX ctx;
+  EVP_MD_CTX *ctx = NULL;
+  unsigned int digest_len = 0;
   size_t i;
 
   if (!password || !salt || !out || outlen == 0)
     return 0;
 
-  SHA256_Init(&ctx);
-  SHA256_Update(&ctx, salt, strlen(salt));
-  SHA256_Update(&ctx, password, strlen(password));
-  SHA256_Final(digest, &ctx);
+  ctx = EVP_MD_CTX_new();
+  if (!ctx)
+    return 0;
+
+  if (EVP_DigestInit_ex(ctx, EVP_sha256(), NULL) != 1 ||
+      EVP_DigestUpdate(ctx, salt, strlen(salt)) != 1 ||
+      EVP_DigestUpdate(ctx, password, strlen(password)) != 1 ||
+      EVP_DigestFinal_ex(ctx, digest, &digest_len) != 1 ||
+      digest_len != SHA256_DIGEST_LENGTH) {
+    EVP_MD_CTX_free(ctx);
+    return 0;
+  }
+
+  EVP_MD_CTX_free(ctx);
 
   for (i = 0; i < SHA256_DIGEST_LENGTH; i++)
     snprintf(hex + (i * 2), 3, "%02x", digest[i]);
@@ -75,7 +86,6 @@ static int hash_sha256_fallback(const char *password, const char *salt, char *ou
 
   return 1;
 }
-
 int password_hash(const char *password, char *out, size_t outlen)
 {
   char salt[SALT_LEN + 1];
@@ -92,7 +102,7 @@ int password_hash(const char *password, char *out, size_t outlen)
     snprintf(salt_string, sizeof(salt_string), "%s%s$", SHA512_PREFIX, salt);
     result = CRYPT(password, salt_string);
     if (result && !strncmp(result, SHA512_PREFIX, 3)) {
-      strlcpy(out, result, outlen);
+      snprintf(out, outlen, "%s", result);
       return 1;
     }
   }
@@ -105,16 +115,10 @@ int password_is_legacy(const char *stored_hash)
   if (!stored_hash || !*stored_hash)
     return 1;
 
-  if (!strncmp(stored_hash, SHA512_PREFIX, 3))
-    return 0;
-
-  if (!strncmp(stored_hash, SHA256_PREFIX, strlen(SHA256_PREFIX)))
-    return 0;
-
-  return 1;
+  /* New scheme starts with "sha256$". Anything else is legacy crypt(). */
+  return strncmp(stored_hash, SHA256_PREFIX, strlen(SHA256_PREFIX)) != 0;
 }
-
-static int verify_sha256_hash(const char *password, const char *stored_hash)
+static int __attribute__((unused)) verify_sha256_hash(const char *password, const char *stored_hash)
 {
   const char *salt_start = stored_hash + strlen(SHA256_PREFIX);
   const char *second_dollar;
@@ -139,33 +143,55 @@ static int verify_sha256_hash(const char *password, const char *stored_hash)
   return strcmp(candidate, stored_hash) == 0;
 }
 
-int password_verify(const char *password, const char *stored_hash, char *upgrade_out, size_t upgrade_len, int *upgraded)
+int password_verify(const char *password, const char *stored_hash,
+                    char *upgrade_out, size_t upgrade_len, int *upgraded)
 {
-  const char *result;
-
   if (upgraded)
     *upgraded = 0;
 
   if (!password || !stored_hash || !*stored_hash)
     return 0;
 
-  if (!strncmp(stored_hash, SHA512_PREFIX, 3)) {
-    result = CRYPT(password, stored_hash);
-    return result && strcmp(result, stored_hash) == 0;
+  /* New format: sha256$<salt>$<hex> */
+  if (!strncmp(stored_hash, SHA256_PREFIX, strlen(SHA256_PREFIX))) {
+    const char *salt_start = stored_hash + strlen(SHA256_PREFIX);
+    const char *salt_end = strchr(salt_start, '$');
+    char salt[64];
+    char computed[256];
+
+    if (!salt_end)
+      return 0;
+
+    size_t slen = (size_t)(salt_end - salt_start);
+    if (slen == 0 || slen >= sizeof(salt))
+      return 0;
+
+    memcpy(salt, salt_start, slen);
+    salt[slen] = '\0';
+
+    if (!hash_sha256_fallback(password, salt, computed, sizeof(computed)))
+      return 0;
+
+    return strcmp(computed, stored_hash) == 0;
   }
 
-  if (!strncmp(stored_hash, SHA256_PREFIX, strlen(SHA256_PREFIX)))
-    return verify_sha256_hash(password, stored_hash);
+  /* Legacy format: crypt(3). Classic DES crypt uses only first 8 chars. */
+  const char *c = crypt(password, stored_hash);
+  if (!c)
+    return 0;
 
-  /* Legacy DES-style hash */
-  result = CRYPT(password, stored_hash);
-  if (result && strcmp(result, stored_hash) == 0) {
-    if (upgrade_out && upgrade_len && password_hash(password, upgrade_out, upgrade_len)) {
-      if (upgraded)
-        *upgraded = 1;
-    }
-    return 1;
+  if (strcmp(c, stored_hash) != 0)
+    return 0;
+
+  /* Successful legacy login: upgrade to sha256$ if caller supplied buffer. */
+  if (upgrade_out && upgrade_len) {
+    if (!password_hash(password, upgrade_out, upgrade_len))
+      return 0;
+    if (upgraded)
+      *upgraded = 1;
   }
 
-  return 0;
+  return 1;
 }
+
+

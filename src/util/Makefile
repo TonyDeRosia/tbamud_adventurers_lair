@@ -44,8 +44,8 @@ split: $(BINDIR)/split
 
 wld2html: $(BINDIR)/wld2html
 
-$(BINDIR)/asciipasswd: asciipasswd.c ../password.c
-	$(CC) $(CFLAGS) -o $(BINDIR)/asciipasswd asciipasswd.c ../password.c -lcrypt -lcrypto
+$(BINDIR)/asciipasswd: asciipasswd.c ../password.c ../bsd-snprintf.c strlcpy.c
+	$(CC) $(CFLAGS) -o $(BINDIR)/asciipasswd asciipasswd.c ../password.c strlcpy.c ../bsd-snprintf.c -lcrypt -lcrypto
 
 $(BINDIR)/autowiz: autowiz.c
 	$(CC) $(CFLAGS) -o $(BINDIR)/autowiz autowiz.c
