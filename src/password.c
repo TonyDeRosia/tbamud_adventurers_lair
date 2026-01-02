@@ -12,32 +12,6 @@
 #define SALT_CHARS "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789./"
 #define SALT_LEN 16
 
-#ifndef HAVE_STRLCPY
-/* Local fallback for systems without strlcpy (mirrors implementation in utils.c). */
-static size_t strlcpy(char *dest, const char *source, size_t totalsize)
-{
-  char *d = dest;
-  const char *s = source;
-  size_t n = totalsize;
-
-  if (n != 0 && --n != 0) {
-    do {
-      if ((*d++ = *s++) == '\0')
-        break;
-    } while (--n != 0);
-  }
-
-  if (n == 0) {
-    if (totalsize != 0)
-      *d = '\0';
-    while (*s++)
-      ;
-  }
-
-  return (size_t)(s - source - 1);
-}
-#endif
-
 static unsigned int password_rand(void)
 {
   static int seeded = 0;
