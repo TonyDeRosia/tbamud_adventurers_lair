@@ -1,5 +1,5 @@
 Name: admin
-Pass: adil3e07733pw
+Pass: adtx.D.1KTDuo
 Titl: the Implementor
 Sex : 1
 Clas: 3
@@ -8,29 +8,27 @@ Levl: 104
 Id  : 1
 Acct: 1
 Brth: 1767327191
-Plyd: 0
-Last: 1767327191
-Host: offline_setup
+Plyd: 32
+Last: 1767328321
+Host: c-68-37-164-232.hsd1.mi.comcast.net
 Hite: 180
 Wate: 180
-Alin: 0
 Act : 0 0 0 0
 Aff : 0 0 0 0
-Pref: 0 0 0 0
+Pref: no 0 0 0
+Room: 1204
 Hit : 500/500
 Mana: 100/100
 Move: 82/82
-Str : 25/100
-Int : 25
-Wis : 25
-Dex : 25
-Con : 25
-Cha : 25
+Str : 20/100
+Int : 20
+Wis : 20
+Dex : 20
+Con : 20
+Cha : 20
 Ac  : 100
-Room: 3001
 Money: 0
 BankMoney: 0
 Bounty: 0
-Exp : 7000000
-Hrol: 0
-Drol: 0
+Clan: 1
+Exp : 40000000
