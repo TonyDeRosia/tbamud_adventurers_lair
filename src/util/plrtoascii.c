@@ -16,7 +16,7 @@
 // first some stock circle 3.0 defines. Change where appropriate.
 #define MAX_NAME_LENGTH		20  /* Used in char_file_u *DO*NOT*CHANGE* */
 
-#define MAX_PWD_LENGTH		30  /* Used in char_file_u *DO*NOT*CHANGE* */
+#define MAX_PWD_LENGTH		32  /* Used in char_file_u *DO*NOT*CHANGE* */
 #define MAX_TITLE_LENGTH	80  /* Used in char_file_u *DO*NOT*CHANGE* */
 #define HOST_LENGTH		40  /* Used in char_file_u *DO*NOT*CHANGE* */
 #define MAX_TONGUE		3   /* Used in char_file_u *DO*NOT*CHANGE* */
@@ -138,7 +138,7 @@ struct char_file_u_plrtoascii {
    ubyte weight;
    ubyte height;
 
-   char	pwd[MAX_PWD_LENGTH+1];    /* character's password */
+   char	pwd[MAX_PWD_HASH_LENGTH+1];    /* character's password */
 
    struct char_special_data_saved_plrtoascii char_specials_saved;
    struct player_special_data_saved_plrtoascii player_specials_saved;

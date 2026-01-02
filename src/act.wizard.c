@@ -12,6 +12,7 @@
 #include "sysdep.h"
 #include "structs.h"
 #include "utils.h"
+#include "password.h"
 #include "comm.h"
 #include "interpreter.h"
 #include "handler.h"
@@ -3175,8 +3176,14 @@ static int perform_set(struct char_data *ch, struct char_data *vict, int mode, c
         send_to_char(ch, "You cannot change that.\r\n");
         return (0);
       }
-      strncpy(GET_PASSWD(vict), CRYPT(val_arg, GET_NAME(vict)), MAX_PWD_LENGTH);	/* strncpy: OK (G_P:MAX_PWD_LENGTH) */
-      *(GET_PASSWD(vict) + MAX_PWD_LENGTH) = '\0';
+      if (!*val_arg || strlen(val_arg) < MIN_PWD_LENGTH || strlen(val_arg) > MAX_PWD_LENGTH) {
+        send_to_char(ch, "Password must be between %d and %d characters.\r\n", MIN_PWD_LENGTH, MAX_PWD_LENGTH);
+        return (0);
+      }
+      if (!password_hash(val_arg, GET_PASSWD(vict), sizeof(vict->player.passwd))) {
+        send_to_char(ch, "Password hashing failed.\r\n");
+        return (0);
+      }
       send_to_char(ch, "Password changed to '%s'.\r\n", val_arg);
       break;
     case 39: /* poofin */

@@ -284,6 +284,7 @@ const char *affected_bits[] =
   "SNEAK",
   "HIDE",
   "PVP_LOCK",
+  "CLAN_COOLDOWN",
   "CHARM",
   "\n"
 };

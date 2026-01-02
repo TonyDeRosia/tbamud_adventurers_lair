@@ -13,7 +13,7 @@ struct account_char_entry {
 struct account_data {
   long account_id;
   char acct_name[64];
-  char passwd_hash[128];
+  char passwd_hash[MAX_PWD_HASH_LENGTH + 1];
   int num_chars;
   struct account_char_entry chars[MAX_CHARS_PER_ACCOUNT];
 };
@@ -22,6 +22,7 @@ int account_authenticate(const char *acct_name, const char *passwd, long *out_id
 int account_create(const char *acct_name, const char *passwd, long *out_id);
 int account_load_any(long acct_id, struct account_data *acct);
 void account_save_any(const struct account_data *acct);
+void account_boot(void);
 
 void account_init_for_char(struct char_data *ch);
 void account_attach_char(struct char_data *ch);

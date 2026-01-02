@@ -2,15 +2,100 @@
 #include "sysdep.h"
 
 #include "accounts.h"
+#include "password.h"
 #include "utils.h"
 #include "db.h"
+
+#include <ctype.h>
 
 #include "comm.h"
 #define ACCT_INDEX_FILE (LIB_ACCTFILES "index.txt")
 
+static int ensure_account_directories(void)
+{
+  char path[PATH_MAX];
+  size_t len;
+
+  if (!*LIB_ACCTFILES)
+    return 0;
+
+  len = strlen(LIB_ACCTFILES);
+  if (len + 1 > sizeof(path)) {
+    log("SYSERR: Account path too long: %s", LIB_ACCTFILES);
+    return 0;
+  }
+
+  strlcpy(path, LIB_ACCTFILES, sizeof(path));
+
+  /* Remove trailing slash for mkdir logic. */
+  if (len > 0 && path[len - 1] == '/')
+    path[len - 1] = '\0';
+
+  for (char *p = path + 1; *p; p++) {
+    if (*p == '/') {
+      *p = '\0';
+      if (mkdir(path, 0755) == -1 && errno != EEXIST) {
+        log("SYSERR: Unable to create account directory '%s': %s", path, strerror(errno));
+        *p = '/';
+        return 0;
+      }
+      *p = '/';
+    }
+  }
+
+  if (mkdir(path, 0755) == -1 && errno != EEXIST) {
+    log("SYSERR: Unable to create account directory '%s': %s", path, strerror(errno));
+    return 0;
+  }
+
+  return 1;
+}
+
+static int ensure_account_index_file(void)
+{
+  FILE *fp;
+
+  if (!ensure_account_directories())
+    return 0;
+
+  fp = fopen(ACCT_INDEX_FILE, "a");
+  if (!fp) {
+    log("SYSERR: Unable to open or create account index '%s': %s", ACCT_INDEX_FILE, strerror(errno));
+    return 0;
+  }
+
+  fclose(fp);
+  return 1;
+}
+
+void account_boot(void)
+{
+  if (!ensure_account_index_file())
+    log("SYSERR: Account storage initialization failed; account login may be unavailable.");
+}
+
 static void get_account_filename(char *out, size_t len, long account_id)
 {
   snprintf(out, len, "%s%ld.%s", LIB_ACCTFILES, account_id, SUF_ACCT);
+}
+
+static void trim_whitespace(char *str)
+{
+  char *start = str;
+  char *end;
+
+  if (!str)
+    return;
+
+  while (*start && isspace((unsigned char)*start))
+    start++;
+
+  end = start + strlen(start);
+  while (end > start && isspace((unsigned char)*(end - 1)))
+    end--;
+
+  memmove(str, start, (size_t)(end - start));
+  str[end - start] = '\0';
 }
 
 static int index_find(const char *acct_name, long *out_id)
@@ -22,8 +107,14 @@ static int index_find(const char *acct_name, long *out_id)
   if (!out_id) return 0;
   *out_id = 0;
 
+  if (!ensure_account_index_file())
+    return 0;
+
   fp = fopen(ACCT_INDEX_FILE, "r");
-  if (!fp) return 0;
+  if (!fp) {
+    log("SYSERR: Unable to read account index '%s': %s", ACCT_INDEX_FILE, strerror(errno));
+    return 0;
+  }
 
   while (fscanf(fp, "%ld %127s", &id, name) == 2) {
     if (!strcasecmp(name, acct_name)) {
@@ -43,8 +134,14 @@ static long index_next_id(void)
   long id = 0, max_id = 0;
   char name[128];
 
+  if (!ensure_account_index_file())
+    return 1;
+
   fp = fopen(ACCT_INDEX_FILE, "r");
-  if (!fp) return 1;
+  if (!fp) {
+    log("SYSERR: Unable to read account index '%s': %s", ACCT_INDEX_FILE, strerror(errno));
+    return 1;
+  }
 
   while (fscanf(fp, "%ld %127s", &id, name) == 2)
     if (id > max_id) max_id = id;
@@ -59,19 +156,18 @@ static int index_add(long id, const char *acct_name)
 
   if (!acct_name || !*acct_name) return 0;
 
-  mkdir(LIB_ACCTFILES, 0755);
+  if (!ensure_account_index_file())
+    return 0;
+
   fp = fopen(ACCT_INDEX_FILE, "a");
-  if (!fp) return 0;
+  if (!fp) {
+    log("SYSERR: Unable to write account index '%s': %s", ACCT_INDEX_FILE, strerror(errno));
+    return 0;
+  }
 
   fprintf(fp, "%ld %s\n", id, acct_name);
   fclose(fp);
   return 1;
-}
-
-static void acct_hash_password(char *out, size_t outlen, const char *passwd)
-{
-  const char *salt = "AC";
-  snprintf(out, outlen, "%s", CRYPT(passwd, salt));
 }
 
 int account_load_any(long acct_id, struct account_data *acct)
@@ -84,9 +180,15 @@ int account_load_any(long acct_id, struct account_data *acct)
   memset(acct, 0, sizeof(*acct));
   acct->account_id = acct_id;
 
+  if (!ensure_account_directories())
+    return 0;
+
   get_account_filename(fname, sizeof(fname), acct_id);
   fp = fopen(fname, "r");
-  if (!fp) return 0;
+  if (!fp) {
+    log("SYSERR: Unable to load account file '%s': %s", fname, strerror(errno));
+    return 0;
+  }
 
   if (!fgets(line, sizeof(line), fp)) {
     fclose(fp);
@@ -97,13 +199,11 @@ int account_load_any(long acct_id, struct account_data *acct)
     while (fgets(line, sizeof(line), fp)) {
       if (!strncmp(line, "Name:", 5)) {
         char *p = line + 5;
-        while (*p == ' ') p++;
-        p[strcspn(p, "\r\n")] = '\0';
+        trim_whitespace(p);
         strlcpy(acct->acct_name, p, sizeof(acct->acct_name));
       } else if (!strncmp(line, "Pass:", 5)) {
         char *p = line + 5;
-        while (*p == ' ') p++;
-        p[strcspn(p, "\r\n")] = '\0';
+        trim_whitespace(p);
         strlcpy(acct->passwd_hash, p, sizeof(acct->passwd_hash));
       } else if (!strncmp(line, "Chars:", 6)) {
         acct->num_chars = atoi(line + 6);
@@ -140,11 +240,15 @@ void account_save_any(const struct account_data *acct)
 
   if (!acct) return;
 
-  mkdir(LIB_ACCTFILES, 0755);
+  if (!ensure_account_directories())
+    return;
 
   get_account_filename(fname, sizeof(fname), acct->account_id);
   fp = fopen(fname, "w");
-  if (!fp) return;
+  if (!fp) {
+    log("SYSERR: Unable to save account file '%s': %s", fname, strerror(errno));
+    return;
+  }
 
   fprintf(fp, "V2\n");
   fprintf(fp, "Name: %s\n", acct->acct_name[0] ? acct->acct_name : "");
@@ -161,7 +265,8 @@ int account_authenticate(const char *acct_name, const char *passwd, long *out_id
 {
   long id = 0;
   struct account_data acct;
-  char hash[128];
+  char hash[MAX_PWD_HASH_LENGTH + 1];
+  int upgraded = 0;
 
   if (out_id) *out_id = 0;
   if (!acct_name || !*acct_name) return 0;
@@ -176,9 +281,14 @@ int account_authenticate(const char *acct_name, const char *passwd, long *out_id
   if (!acct.passwd_hash[0])
     return 0;
 
-  acct_hash_password(hash, sizeof(hash), passwd);
-  if (strcmp(hash, acct.passwd_hash) != 0)
+  if (!password_verify(passwd, acct.passwd_hash, hash, sizeof(hash), &upgraded))
     return 0;
+
+  if (upgraded) {
+    strlcpy(acct.passwd_hash, hash, sizeof(acct.passwd_hash));
+    account_save_any(&acct);
+    mudlog(NRM, LVL_IMMORT, TRUE, "Account %s password upgraded to SHA512 hash.", acct.acct_name);
+  }
 
   if (out_id) *out_id = id;
   return 1;
@@ -188,7 +298,7 @@ int account_create(const char *acct_name, const char *passwd, long *out_id)
 {
   long id = 0;
   struct account_data acct;
-  char hash[128];
+  char hash[MAX_PWD_HASH_LENGTH + 1];
 
   if (out_id) *out_id = 0;
   if (!acct_name || !*acct_name) return 0;
@@ -197,12 +307,16 @@ int account_create(const char *acct_name, const char *passwd, long *out_id)
   if (index_find(acct_name, &id))
     return 0;
 
+  if (strlen(passwd) < MIN_PWD_LENGTH || strlen(passwd) > MAX_PWD_LENGTH)
+    return 0;
+
   id = index_next_id();
 
   memset(&acct, 0, sizeof(acct));
   acct.account_id = id;
   strlcpy(acct.acct_name, acct_name, sizeof(acct.acct_name));
-  acct_hash_password(hash, sizeof(hash), passwd);
+  if (!password_hash(passwd, hash, sizeof(hash)))
+    return 0;
   strlcpy(acct.passwd_hash, hash, sizeof(acct.passwd_hash));
 
   account_save_any(&acct);
