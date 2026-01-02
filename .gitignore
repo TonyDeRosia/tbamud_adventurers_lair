@@ -26,12 +26,3 @@ lib/etc/plrmail
 lib/etc/time
 src/depend
 src/util/depend
-
-# Seed data that should be tracked even under lib/plrfiles
-!lib/plrfiles/
-!lib/plrfiles/accounts/
-!lib/plrfiles/accounts/index.txt
-!lib/plrfiles/accounts/1.acct
-!lib/plrfiles/index
-!lib/plrfiles/A-E/
-!lib/plrfiles/A-E/admin.plr

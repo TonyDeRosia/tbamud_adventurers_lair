@@ -22,8 +22,6 @@ int account_authenticate(const char *acct_name, const char *passwd, long *out_id
 int account_create(const char *acct_name, const char *passwd, long *out_id);
 int account_load_any(long acct_id, struct account_data *acct);
 void account_save_any(const struct account_data *acct);
-int account_set_password(long acct_id, const char *passwd);
-int account_reset_char_password(const char *char_name, const char *passwd);
 
 void account_init_for_char(struct char_data *ch);
 void account_attach_char(struct char_data *ch);

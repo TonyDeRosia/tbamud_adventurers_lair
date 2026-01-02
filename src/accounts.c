@@ -201,55 +201,6 @@ int account_authenticate(const char *acct_name, const char *passwd, long *out_id
   return 1;
 }
 
-int account_set_password(long acct_id, const char *passwd)
-{
-  struct account_data acct;
-  char hash[128];
-
-  if (acct_id <= 0 || !passwd || !*passwd)
-    return 0;
-
-  if (!account_load_any(acct_id, &acct))
-    return 0;
-
-  if (!acct_hash_password(hash, sizeof(hash), passwd))
-    return 0;
-
-  strlcpy(acct.passwd_hash, hash, sizeof(acct.passwd_hash));
-  account_save_any(&acct);
-  return 1;
-}
-
-int account_reset_char_password(const char *char_name, const char *passwd)
-{
-  struct char_data *tmp_ch = NULL;
-  int pfilepos;
-
-  if (!char_name || !*char_name)
-    return 0;
-  if (!passwd || strlen(passwd) < 3 || strlen(passwd) > MAX_PWD_LENGTH)
-    return 0;
-
-  CREATE(tmp_ch, struct char_data, 1);
-  clear_char(tmp_ch);
-  CREATE(tmp_ch->player_specials, struct player_special_data, 1);
-  new_mobile_data(tmp_ch);
-
-  pfilepos = load_char(char_name, tmp_ch);
-  if (pfilepos < 0) {
-    free_char(tmp_ch);
-    return 0;
-  }
-
-  GET_PFILEPOS(tmp_ch) = pfilepos;
-  strncpy(GET_PASSWD(tmp_ch), CRYPT(passwd, GET_PC_NAME(tmp_ch)), MAX_PWD_LENGTH);
-  *(GET_PASSWD(tmp_ch) + MAX_PWD_LENGTH) = '\0';
-
-  save_char(tmp_ch);
-  free_char(tmp_ch);
-  return 1;
-}
-
 int account_create(const char *acct_name, const char *passwd, long *out_id)
 {
   long id = 0;
@@ -344,8 +295,6 @@ void acct_show_character_menu(struct descriptor_data *d)
 
   write_to_output(d, "\r\nOptions:\r\n");
   write_to_output(d, "  NEW   Create a new character\r\n");
-  write_to_output(d, "  PASS  Change this account password\r\n");
-  write_to_output(d, "  CHARPASS <name/#>  Change a character password\r\n");
   write_to_output(d, "  0     Disconnect\r\n");
   write_to_output(d, "\r\nSelect: ");
 }
