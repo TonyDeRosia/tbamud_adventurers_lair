@@ -687,10 +687,18 @@ static void shopping_buy(char *arg, struct char_data *ch, struct char_data *keep
         break;
     }
   } else {
-  while (obj && (GET_MONEY(ch) >= shop_units_to_copper((long long)buy_price(obj, shop_nr, keeper, ch)))
-         && IS_CARRYING_N(ch) < CAN_CARRY_N(ch) && bought < buynum
+  bool insufficient_funds = FALSE;
+
+  while (obj && IS_CARRYING_N(ch) < CAN_CARRY_N(ch) && bought < buynum
          && IS_CARRYING_W(ch) + GET_OBJ_WEIGHT(obj) <= CAN_CARRY_W(ch)) {
     int charged;
+    long long cost_copper;
+
+    cost_copper = shop_units_to_copper((long long)buy_price(obj, shop_nr, keeper, ch));
+    if (GET_MONEY(ch) < cost_copper) {
+      insufficient_funds = TRUE;
+      break;
+    }
 
     bought++;
     /* Test if producing shop ! */
@@ -712,7 +720,7 @@ static void shopping_buy(char *arg, struct char_data *ch, struct char_data *keep
     charged = buy_price(obj, shop_nr, keeper, ch);
 #endif
     goldamt += charged;
-    shop_charge(ch, shop_units_to_copper((long long)charged));
+    shop_charge(ch, cost_copper);
 
     last_obj = obj;
     obj = get_purchase_obj(ch, arg, keeper, shop_nr, FALSE);
@@ -725,8 +733,7 @@ static void shopping_buy(char *arg, struct char_data *ch, struct char_data *keep
 
     if (!obj || !same_obj(last_obj, obj))
       snprintf(buf, sizeof(buf), "%s I only have %d to sell you.", GET_NAME(ch), bought);
-    else if (!OBJ_FLAGGED(obj, ITEM_QUEST) &&
-      GET_MONEY(ch) < shop_units_to_copper((long long)buy_price(obj, shop_nr, keeper, ch)))
+    else if (!OBJ_FLAGGED(obj, ITEM_QUEST) && insufficient_funds)
       snprintf(buf, sizeof(buf), "%s You can only afford %d.", GET_NAME(ch), bought);
     else if (OBJ_FLAGGED(obj, ITEM_QUEST) &&
       GET_QUESTPOINTS(ch) < GET_OBJ_COST(obj))
