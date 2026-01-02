@@ -38,6 +38,7 @@
 #include "ibt.h"
 #include "mud_event.h"
 #include "msgedit.h"
+#include "accounts.h"
 #include "screen.h"
 #include <sys/stat.h>
 
@@ -704,6 +705,9 @@ void boot_db(void)
 
   log("Initializing Events");
   init_events();
+
+  log("Ensuring account storage.");
+  account_boot();
 
   log("Reading news, credits, help, ihelp, bground, info & motds.");
   file_to_string_alloc(NEWS_FILE, &news);
