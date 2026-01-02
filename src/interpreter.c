@@ -1640,13 +1640,13 @@ void nanny(struct descriptor_data *d, char *arg)
     case CON_ACCT_CREATE_NAME:
       if (!*arg) { STATE(d) = CON_ACCT_NAME; return; }
       strlcpy(d->acct_name, arg, sizeof(d->acct_name));
-      write_to_output(d, "\r\nNew account password: ");
+        write_to_output(d, "\r\nNew account password (max 8 characters): ");
       echo_off(d);
       STATE(d) = CON_ACCT_CREATE_PASS1;
       return;
 
     case CON_ACCT_CREATE_PASS1:
-      if (!*arg) { write_to_output(d, "\r\nNew account password: "); return; }
+      if (!*arg) { write_to_output(d, "\r\nNew account password (max 8 characters): "); return; }
       strlcpy(d->acct_tmp_pass, arg, sizeof(d->acct_tmp_pass));
       write_to_output(d, "\r\nConfirm password: ");
       STATE(d) = CON_ACCT_CREATE_PASS2;
@@ -2069,7 +2069,7 @@ if (PLR_FLAGGED(d->character, PLR_DELETED)) {
 	return;
       }
       perform_new_char_dupe_check(d);
-      write_to_output(d, "New character.\r\nGive me a password for %s: ", GET_PC_NAME(d->character));
+      write_to_output(d, "New character.\r\nGive me a password for %s (max 8 characters): ", GET_PC_NAME(d->character));
       echo_off(d);
       STATE(d) = CON_NEWPASSWD;
     } else if (*arg == 'n' || *arg == 'N') {
