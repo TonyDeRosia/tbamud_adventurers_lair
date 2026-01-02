@@ -44,6 +44,7 @@ ACMD(do_saudit);
 ACMD(do_shopdisc);
 ACMD(do_pull);
 ACMD(do_unpull);
+ACMD(do_acctlink);
 
 ACMD(do_offhand);
 ACMD(do_bounty);
@@ -321,6 +322,7 @@ cpp_extern const struct command_info cmd_info[] = {
   { "sedit"    , "sedit"   , POS_DEAD    , do_oasis_sedit, LVL_BUILDER, 0 },
   { "send"     , "send"    , POS_SLEEPING, do_send     , LVL_GOD, 0 },
   { "set"      , "set"     , POS_DEAD    , do_set      , LVL_IMMORT, 0 },
+  { "acctlink" , "acctlink", POS_DEAD    , do_acctlink , LVL_IMMORT, 0 },
   { "shout"    , "sho"     , POS_RESTING , do_gen_comm , 0, SCMD_SHOUT },
   { "show"     , "show"    , POS_DEAD    , do_show     , LVL_IMMORT, 0 },
   { "shopdisc" , "shopdisc", POS_STANDING, do_shopdisc , LVL_GOD, 0 },

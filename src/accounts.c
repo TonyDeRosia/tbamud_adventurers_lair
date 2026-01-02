@@ -128,6 +128,11 @@ static int index_find(const char *acct_name, long *out_id)
   return 0;
 }
 
+int account_find_id(const char *acct_name, long *out_id)
+{
+  return index_find(acct_name, out_id);
+}
+
 static long index_next_id(void)
 {
   FILE *fp;
@@ -259,6 +264,31 @@ void account_save_any(const struct account_data *acct)
     fprintf(fp, "%ld %s\n", acct->chars[i].char_id, acct->chars[i].name);
 
   fclose(fp);
+}
+
+int account_add_character(struct account_data *acct, long char_id, const char *char_name)
+{
+  int i;
+
+  if (!acct || !char_name || !*char_name)
+    return 0;
+
+  for (i = 0; i < acct->num_chars && i < MAX_CHARS_PER_ACCOUNT; i++) {
+    if (acct->chars[i].char_id == char_id || !str_cmp(acct->chars[i].name, char_name)) {
+      acct->chars[i].char_id = char_id;
+      strlcpy(acct->chars[i].name, char_name, sizeof(acct->chars[i].name));
+      return 1;
+    }
+  }
+
+  if (acct->num_chars >= MAX_CHARS_PER_ACCOUNT)
+    return 0;
+
+  acct->chars[acct->num_chars].char_id = char_id;
+  strlcpy(acct->chars[acct->num_chars].name, char_name,
+          sizeof(acct->chars[acct->num_chars].name));
+  acct->num_chars++;
+  return 1;
 }
 
 int account_authenticate(const char *acct_name, const char *passwd, long *out_id)

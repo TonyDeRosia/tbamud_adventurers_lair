@@ -13,6 +13,7 @@
 #include "structs.h"
 #include "utils.h"
 #include "password.h"
+#include "accounts.h"
 #include "comm.h"
 #include "interpreter.h"
 #include "handler.h"
@@ -2283,6 +2284,95 @@ ACMD(do_wiznet)
 
   if (PRF_FLAGGED(ch, PRF_NOREPEAT))
     send_to_char(ch, "%s", CONFIG_OK);
+}
+
+ACMD(do_acctlink)
+{
+  char acct_name[MAX_INPUT_LENGTH], char_name[MAX_INPUT_LENGTH], force_arg[MAX_INPUT_LENGTH];
+  char linked_name[MAX_INPUT_LENGTH];
+  struct char_data *vict = NULL;
+  struct account_data acct, old_acct;
+  long acct_id = 0, old_acct_id = 0;
+  int force = FALSE;
+
+  argument = one_argument(argument, acct_name);
+  argument = one_argument(argument, char_name);
+  one_argument(argument, force_arg);
+
+  if (!*acct_name || !*char_name) {
+    send_to_char(ch, "Usage: acctlink <account_name> <character_name> [-f]\r\n");
+    return;
+  }
+
+  if (*force_arg && (!str_cmp(force_arg, "-f") || !str_cmp(force_arg, "force")))
+    force = TRUE;
+
+  if (!account_find_id(acct_name, &acct_id) || acct_id <= 0) {
+    send_to_char(ch, "Account '%s' was not found.\r\n", acct_name);
+    return;
+  }
+
+  if (!account_load_any(acct_id, &acct)) {
+    send_to_char(ch, "Account data for '%s' could not be loaded.\r\n", acct_name);
+    return;
+  }
+
+  if (get_ptable_by_name(char_name) < 0) {
+    send_to_char(ch, "No player named '%s' exists.\r\n", char_name);
+    return;
+  }
+
+  CREATE(vict, struct char_data, 1);
+  clear_char(vict);
+  CREATE(vict->player_specials, struct player_special_data, 1);
+  new_mobile_data(vict);
+
+  if (load_char(char_name, vict) < 0) {
+    send_to_char(ch, "Failed to load '%s' from disk.\r\n", char_name);
+    free_char(vict);
+    free(vict);
+    return;
+  }
+
+  old_acct_id = GET_ACCOUNT_ID(vict);
+
+  if (old_acct_id > 0 && old_acct_id != acct_id && !force) {
+    send_to_char(ch, "Character '%s' already belongs to account #%ld. Use -f to override.\r\n",
+                 GET_NAME(vict), old_acct_id);
+    free_char(vict);
+    free(vict);
+    return;
+  }
+
+  strlcpy(linked_name, GET_NAME(vict), sizeof(linked_name));
+  GET_ACCOUNT_ID(vict) = acct_id;
+  save_char(vict);
+
+  if (!account_add_character(&acct, GET_IDNUM(vict), linked_name)) {
+    send_to_char(ch, "Unable to add %s to the account roster (limit reached?).\r\n", linked_name);
+    free_char(vict);
+    free(vict);
+    return;
+  }
+
+  account_save_any(&acct);
+
+  if (force && old_acct_id > 0 && old_acct_id != acct_id) {
+    if (account_load_any(old_acct_id, &old_acct)) {
+      account_remove_character(&old_acct, linked_name);
+      account_save_any(&old_acct);
+    } else {
+      mudlog(NRM, LVL_IMMORT, TRUE, "(GC) acctlink: unable to load old account #%ld for %s.", old_acct_id, linked_name);
+    }
+  }
+
+  mudlog(CMP, MAX(LVL_IMMORT, GET_INVIS_LEV(ch)), TRUE,
+         "(GC) %s linked %s to account %s (id %ld)%s.",
+         GET_NAME(ch), linked_name, acct.acct_name, acct_id, force ? " [forced]" : "");
+  send_to_char(ch, "%s linked to account %s (id %ld).\r\n", linked_name, acct.acct_name, acct_id);
+
+  free_char(vict);
+  free(vict);
 }
 
 ACMD(do_zreset)
