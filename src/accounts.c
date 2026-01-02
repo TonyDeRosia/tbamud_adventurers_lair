@@ -11,6 +11,69 @@
 #include "comm.h"
 #define ACCT_INDEX_FILE (LIB_ACCTFILES "index.txt")
 
+static int ensure_account_directories(void)
+{
+  char path[PATH_MAX];
+  size_t len;
+
+  if (!*LIB_ACCTFILES)
+    return 0;
+
+  len = strlen(LIB_ACCTFILES);
+  if (len + 1 > sizeof(path)) {
+    log("SYSERR: Account path too long: %s", LIB_ACCTFILES);
+    return 0;
+  }
+
+  strlcpy(path, LIB_ACCTFILES, sizeof(path));
+
+  /* Remove trailing slash for mkdir logic. */
+  if (len > 0 && path[len - 1] == '/')
+    path[len - 1] = '\0';
+
+  for (char *p = path + 1; *p; p++) {
+    if (*p == '/') {
+      *p = '\0';
+      if (mkdir(path, 0755) == -1 && errno != EEXIST) {
+        log("SYSERR: Unable to create account directory '%s': %s", path, strerror(errno));
+        *p = '/';
+        return 0;
+      }
+      *p = '/';
+    }
+  }
+
+  if (mkdir(path, 0755) == -1 && errno != EEXIST) {
+    log("SYSERR: Unable to create account directory '%s': %s", path, strerror(errno));
+    return 0;
+  }
+
+  return 1;
+}
+
+static int ensure_account_index_file(void)
+{
+  FILE *fp;
+
+  if (!ensure_account_directories())
+    return 0;
+
+  fp = fopen(ACCT_INDEX_FILE, "a");
+  if (!fp) {
+    log("SYSERR: Unable to open or create account index '%s': %s", ACCT_INDEX_FILE, strerror(errno));
+    return 0;
+  }
+
+  fclose(fp);
+  return 1;
+}
+
+void account_boot(void)
+{
+  if (!ensure_account_index_file())
+    log("SYSERR: Account storage initialization failed; account login may be unavailable.");
+}
+
 static void get_account_filename(char *out, size_t len, long account_id)
 {
   snprintf(out, len, "%s%ld.%s", LIB_ACCTFILES, account_id, SUF_ACCT);
@@ -44,8 +107,14 @@ static int index_find(const char *acct_name, long *out_id)
   if (!out_id) return 0;
   *out_id = 0;
 
+  if (!ensure_account_index_file())
+    return 0;
+
   fp = fopen(ACCT_INDEX_FILE, "r");
-  if (!fp) return 0;
+  if (!fp) {
+    log("SYSERR: Unable to read account index '%s': %s", ACCT_INDEX_FILE, strerror(errno));
+    return 0;
+  }
 
   while (fscanf(fp, "%ld %127s", &id, name) == 2) {
     if (!strcasecmp(name, acct_name)) {
@@ -65,8 +134,14 @@ static long index_next_id(void)
   long id = 0, max_id = 0;
   char name[128];
 
+  if (!ensure_account_index_file())
+    return 1;
+
   fp = fopen(ACCT_INDEX_FILE, "r");
-  if (!fp) return 1;
+  if (!fp) {
+    log("SYSERR: Unable to read account index '%s': %s", ACCT_INDEX_FILE, strerror(errno));
+    return 1;
+  }
 
   while (fscanf(fp, "%ld %127s", &id, name) == 2)
     if (id > max_id) max_id = id;
@@ -81,9 +156,14 @@ static int index_add(long id, const char *acct_name)
 
   if (!acct_name || !*acct_name) return 0;
 
-  mkdir(LIB_ACCTFILES, 0755);
+  if (!ensure_account_index_file())
+    return 0;
+
   fp = fopen(ACCT_INDEX_FILE, "a");
-  if (!fp) return 0;
+  if (!fp) {
+    log("SYSERR: Unable to write account index '%s': %s", ACCT_INDEX_FILE, strerror(errno));
+    return 0;
+  }
 
   fprintf(fp, "%ld %s\n", id, acct_name);
   fclose(fp);
@@ -100,9 +180,15 @@ int account_load_any(long acct_id, struct account_data *acct)
   memset(acct, 0, sizeof(*acct));
   acct->account_id = acct_id;
 
+  if (!ensure_account_directories())
+    return 0;
+
   get_account_filename(fname, sizeof(fname), acct_id);
   fp = fopen(fname, "r");
-  if (!fp) return 0;
+  if (!fp) {
+    log("SYSERR: Unable to load account file '%s': %s", fname, strerror(errno));
+    return 0;
+  }
 
   if (!fgets(line, sizeof(line), fp)) {
     fclose(fp);
@@ -154,11 +240,15 @@ void account_save_any(const struct account_data *acct)
 
   if (!acct) return;
 
-  mkdir(LIB_ACCTFILES, 0755);
+  if (!ensure_account_directories())
+    return;
 
   get_account_filename(fname, sizeof(fname), acct->account_id);
   fp = fopen(fname, "w");
-  if (!fp) return;
+  if (!fp) {
+    log("SYSERR: Unable to save account file '%s': %s", fname, strerror(errno));
+    return;
+  }
 
   fprintf(fp, "V2\n");
   fprintf(fp, "Name: %s\n", acct->acct_name[0] ? acct->acct_name : "");
