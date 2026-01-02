@@ -693,7 +693,22 @@ static void shopping_buy(char *arg, struct char_data *ch, struct char_data *keep
     int charged;
     long long cost_copper;
 
-    cost_copper = shop_units_to_copper((long long)buy_price(obj, shop_nr, keeper, ch));
+#ifdef SHOP_PRICE_DEBUG
+    {
+      struct buy_price_info price_info;
+      charged = buy_price_internal(obj, shop_nr, keeper, ch, &price_info);
+      shop_debug_price(ch, obj, shop_nr, &price_info);
+    }
+#else
+    charged = buy_price(obj, shop_nr, keeper, ch);
+#endif
+
+#if SHOP_PRICE_IN_COPPER
+    cost_copper = (long long)charged;
+#else
+    cost_copper = shop_units_to_copper((long long)charged);
+#endif
+
     if (GET_MONEY(ch) < cost_copper) {
       insufficient_funds_flag = TRUE;
       break;
@@ -709,17 +724,17 @@ static void shopping_buy(char *arg, struct char_data *ch, struct char_data *keep
     }
     obj_to_char(obj, ch);
 
-#ifdef SHOP_PRICE_DEBUG
-    {
-      struct buy_price_info price_info;
-      charged = buy_price_internal(obj, shop_nr, keeper, ch, &price_info);
-      shop_debug_price(ch, obj, shop_nr, &price_info);
-    }
-#else
-    charged = buy_price(obj, shop_nr, keeper, ch);
-#endif
     goldamt += charged;
-    shop_charge(ch, cost_copper);
+    {
+      long long money_before = GET_MONEY(ch);
+
+      shop_charge(ch, cost_copper);
+
+      if (GET_LEVEL(ch) >= LVL_IMMORT)
+        send_to_char(ch,
+                     "[SHOP_MONEY_DEBUG] before=%lld charged=%d cost_copper=%lld after=%lld\r\n",
+                     money_before, charged, cost_copper, GET_MONEY(ch));
+    }
 
     last_obj = obj;
     obj = get_purchase_obj(ch, arg, keeper, shop_nr, FALSE);
