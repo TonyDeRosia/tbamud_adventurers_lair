@@ -1710,6 +1710,55 @@ void nanny(struct descriptor_data *d, char *arg)
         }
       }
 
+      /* Legacy migration: allow claiming unbound characters not yet listed
+       * on this account. This keeps existing characters usable after the
+       * account system was introduced. */
+      {
+        struct char_data *tmp_ch = NULL;
+        struct account_data tmp_acct;
+        char tmp_name[MAX_INPUT_LENGTH];
+        int acct_exists = 0;
+
+        /* Reuse the same validation rules as character login. */
+        if (_parse_name(arg, tmp_name) || strlen(tmp_name) < 2 ||
+            strlen(tmp_name) > MAX_NAME_LENGTH || !valid_name(tmp_name) ||
+            fill_word(tmp_name) || reserved_word(tmp_name)) {
+          /* Fall through to the standard error message. */
+        } else {
+          CREATE(tmp_ch, struct char_data, 1);
+          clear_char(tmp_ch);
+          CREATE(tmp_ch->player_specials, struct player_special_data, 1);
+          new_mobile_data(tmp_ch);
+
+          if (load_char(tmp_name, tmp_ch) > -1) {
+            if (GET_ACCOUNT_ID(tmp_ch) > 0) {
+              memset(&tmp_acct, 0, sizeof(tmp_acct));
+              acct_exists = account_load_any(GET_ACCOUNT_ID(tmp_ch), &tmp_acct);
+            }
+
+            if (acct_exists && GET_ACCOUNT_ID(tmp_ch) != d->acct_id) {
+              /* Character belongs to another account. */
+              free_char(tmp_ch);
+            } else {
+              /* Attach the legacy character to this account and continue. */
+              GET_ACCOUNT_ID(tmp_ch) = d->acct_id;
+              account_attach_char(tmp_ch);
+              save_char(tmp_ch);
+
+              strlcpy(tmp_name, GET_NAME(tmp_ch), sizeof(tmp_name));
+              free_char(tmp_ch);
+
+              d->acct_prompted_menu = 0;
+              STATE(d) = CON_GET_NAME;
+              nanny(d, tmp_name);
+              return;
+            }
+          } else if (tmp_ch) {
+            free_char(tmp_ch);
+          }
+        }
+      }
+
       write_to_output(d, "\r\nThat character is not on this account.\r\n");
       acct_show_character_menu(d);
       return;
