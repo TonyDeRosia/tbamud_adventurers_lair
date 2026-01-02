@@ -597,6 +597,7 @@ static void shopping_buy(char *arg, struct char_data *ch, struct char_data *keep
   char tempstr[MAX_INPUT_LENGTH - 10], tempbuf[MAX_INPUT_LENGTH];
   struct obj_data *obj, *last_obj = NULL;
   int goldamt = 0, buynum, bought = 0;
+  bool insufficient_funds = FALSE;
 
   if (!is_ok(keeper, ch, shop_nr))
     return;
@@ -687,8 +688,6 @@ static void shopping_buy(char *arg, struct char_data *ch, struct char_data *keep
         break;
     }
   } else {
-  bool insufficient_funds = FALSE;
-
   while (obj && IS_CARRYING_N(ch) < CAN_CARRY_N(ch) && bought < buynum
          && IS_CARRYING_W(ch) + GET_OBJ_WEIGHT(obj) <= CAN_CARRY_W(ch)) {
     int charged;
