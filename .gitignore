@@ -28,3 +28,8 @@ src/util/depend
 
 # runtime playerfiles
 lib/plrfiles/
+
+# runtime player + account data (DO NOT COMMIT)
+lib/plrfiles/
+lib/plrfiles/**
+
