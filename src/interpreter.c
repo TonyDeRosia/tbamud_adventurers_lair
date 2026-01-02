@@ -39,6 +39,10 @@
 #include "prefedit.h"
 #include "ibt.h"
 #include "mud_event.h"
+
+#define NEWPASS_MIN_LEN 3
+#define NEWPASS_MAX_LEN 8
+
 ACMD(do_saudit);
 ACMD(do_shopdisc);
 ACMD(do_pull);
@@ -1640,13 +1644,20 @@ void nanny(struct descriptor_data *d, char *arg)
     case CON_ACCT_CREATE_NAME:
       if (!*arg) { STATE(d) = CON_ACCT_NAME; return; }
       strlcpy(d->acct_name, arg, sizeof(d->acct_name));
-        write_to_output(d, "\r\nNew account password (max 8 characters): ");
+        write_to_output(d, "\r\nNew account password (%d-%d characters): ", NEWPASS_MIN_LEN, NEWPASS_MAX_LEN);
       echo_off(d);
       STATE(d) = CON_ACCT_CREATE_PASS1;
       return;
 
     case CON_ACCT_CREATE_PASS1:
-      if (!*arg) { write_to_output(d, "\r\nNew account password (max 8 characters): "); return; }
+      if (!*arg) {
+        write_to_output(d, "\r\nNew account password (%d-%d characters): ", NEWPASS_MIN_LEN, NEWPASS_MAX_LEN);
+        return;
+      }
+      if (strlen(arg) < NEWPASS_MIN_LEN || strlen(arg) > NEWPASS_MAX_LEN) {
+        write_to_output(d, "\r\nPassword must be between %d and %d characters.\r\nNew account password: ", NEWPASS_MIN_LEN, NEWPASS_MAX_LEN);
+        return;
+      }
       strlcpy(d->acct_tmp_pass, arg, sizeof(d->acct_tmp_pass));
       write_to_output(d, "\r\nConfirm password: ");
       STATE(d) = CON_ACCT_CREATE_PASS2;
@@ -1791,14 +1802,19 @@ void nanny(struct descriptor_data *d, char *arg)
       }
 
       d->acct_change_pass[0] = '\0';
-      write_to_output(d, "\r\nEnter a new account password: ");
+      write_to_output(d, "\r\nEnter a new account password (%d-%d characters): ", NEWPASS_MIN_LEN, NEWPASS_MAX_LEN);
       STATE(d) = CON_ACCT_PWD_NEW1;
       return;
     }
 
     case CON_ACCT_PWD_NEW1:
       if (!*arg) {
-        write_to_output(d, "\r\nEnter a new account password: ");
+        write_to_output(d, "\r\nEnter a new account password (%d-%d characters): ", NEWPASS_MIN_LEN, NEWPASS_MAX_LEN);
+        echo_off(d);
+        return;
+      }
+      if (strlen(arg) < NEWPASS_MIN_LEN || strlen(arg) > NEWPASS_MAX_LEN) {
+        write_to_output(d, "\r\nPassword must be between %d and %d characters.\r\nEnter a new account password: ", NEWPASS_MIN_LEN, NEWPASS_MAX_LEN);
         echo_off(d);
         return;
       }
@@ -2069,7 +2085,7 @@ if (PLR_FLAGGED(d->character, PLR_DELETED)) {
 	return;
       }
       perform_new_char_dupe_check(d);
-      write_to_output(d, "New character.\r\nGive me a password for %s (max 8 characters): ", GET_PC_NAME(d->character));
+      write_to_output(d, "New character.\r\nGive me a password for %s (%d-%d characters): ", GET_PC_NAME(d->character), NEWPASS_MIN_LEN, NEWPASS_MAX_LEN);
       echo_off(d);
       STATE(d) = CON_NEWPASSWD;
     } else if (*arg == 'n' || *arg == 'N') {
@@ -2196,9 +2212,9 @@ if (PLR_FLAGGED(d->character, PLR_DELETED)) {
 
   case CON_NEWPASSWD:
   case CON_CHPWD_GETNEW:
-    if (!*arg || strlen(arg) > MAX_PWD_LENGTH || strlen(arg) < 14 /* pwsha512_min14 */||
-	!str_cmp(arg, GET_PC_NAME(d->character))) {
-      write_to_output(d, "\r\nIllegal password.\r\nPassword: ");
+    if (!*arg || strlen(arg) > NEWPASS_MAX_LEN || strlen(arg) < NEWPASS_MIN_LEN ||
+        !str_cmp(arg, GET_PC_NAME(d->character))) {
+      write_to_output(d, "\r\nIllegal password. Please use %d-%d characters.\r\nPassword: ", NEWPASS_MIN_LEN, NEWPASS_MAX_LEN);
       return;
     }
     strncpy(GET_PASSWD(d->character), CRYPT(arg, GET_PC_NAME(d->character)), MAX_PWD_LENGTH);	/* strncpy: OK (G_P:MAX_PWD_LENGTH+1) */
