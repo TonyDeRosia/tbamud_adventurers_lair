@@ -176,7 +176,7 @@ int password_verify(const char *password, const char *stored_hash,
   }
 
   /* Legacy format: crypt(3). Classic DES crypt uses only first 8 chars. */
-  const char *c = crypt(password, stored_hash);
+  const char *c = CRYPT(password, stored_hash);
   if (!c)
     return 0;
 
