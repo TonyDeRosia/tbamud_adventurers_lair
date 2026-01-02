@@ -12,6 +12,8 @@
 
 #include "conf.h"
 #include "sysdep.h"
+#include <unistd.h>
+#include <fcntl.h>
 #include "structs.h"
 #include "utils.h"
 #include "db.h"
@@ -1588,4 +1590,39 @@ void remove_from_string(char *string, const char *to_remove)
         }
     }
     
+}
+
+/*
+ * Generate a SHA-512 crypt() salt of the form: $6$<16chars>$
+ * This removes the legacy DES 8-character password limit.
+ */
+void gen_crypt_salt_sha512(char *out, size_t outlen)
+{
+  static const char salt_tbl[] = "./0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+  unsigned char bytes[16];
+  char salt[17];
+  int fd = -1;
+  ssize_t n = 0;
+  int urandom_ok = 0;
+
+  if (!out || outlen == 0)
+    return;
+
+  memset(bytes, 0, sizeof(bytes));
+
+  fd = open("/dev/urandom", O_RDONLY);
+  if (fd >= 0) {
+    n = read(fd, bytes, sizeof(bytes));
+    close(fd);
+    if (n == (ssize_t)sizeof(bytes))
+      urandom_ok = 1;
+  }
+
+  for (int i = 0; i < 16; i++) {
+    unsigned int v = urandom_ok ? (unsigned int)bytes[i] : (unsigned int)rand();
+    salt[i] = salt_tbl[v % (sizeof(salt_tbl) - 1)];
+  }
+  salt[16] = '\0';
+
+  snprintf(out, outlen, "$6$%s$", salt);
 }
