@@ -1328,6 +1328,23 @@ int enter_player_game (struct descriptor_data *d)
   /* Check for a login trigger in the players' start room */
   login_wtrigger(&world[IN_ROOM(d->character)], d->character);
 
+  /* Ensure color preferences are set when the client supports ANSI */
+  if (d->pProtocol) {
+    bool supports_ansi = d->pProtocol->pVariables[eMSDP_ANSI_COLORS]->ValueInt ||
+                         d->pProtocol->pVariables[eMSDP_XTERM_256_COLORS]->ValueInt;
+
+    if (supports_ansi && !PRF_FLAGGED(d->character, PRF_COLOR_1) &&
+        !PRF_FLAGGED(d->character, PRF_COLOR_2)) {
+      SET_BIT_AR(PRF_FLAGS(d->character), PRF_COLOR_1);
+      SET_BIT_AR(PRF_FLAGS(d->character), PRF_COLOR_2);
+      mudlog(CMP, LVL_IMMORT, TRUE,
+             "Color debug: defaulting PRF color on for %s (ANSI=%d, 256=%d)",
+             GET_NAME(d->character),
+             d->pProtocol->pVariables[eMSDP_ANSI_COLORS]->ValueInt,
+             d->pProtocol->pVariables[eMSDP_XTERM_256_COLORS]->ValueInt);
+    }
+  }
+
   return load_result;
 }
 
@@ -1337,12 +1354,29 @@ EVENTFUNC(get_protocols)
   struct mud_event_data *pMudEvent;
   char buf[MAX_STRING_LENGTH];
   size_t len;
+  int prf_color_1 = 0, prf_color_2 = 0;
 
   if (event_obj == NULL)
     return 0;
   
   pMudEvent = (struct mud_event_data *) event_obj;
-  d = (struct descriptor_data *) pMudEvent->pStruct;  
+  d = (struct descriptor_data *) pMudEvent->pStruct;
+
+  if (d->character) {
+    prf_color_1 = PRF_FLAGGED(d->character, PRF_COLOR_1);
+    prf_color_2 = PRF_FLAGGED(d->character, PRF_COLOR_2);
+  }
+
+  mudlog(CMP, LVL_IMMORT, TRUE,
+         "Color debug: ANSI=%d 256=%d MXP=%d MSDP=%d ATCP=%d PRF1=%d PRF2=%d state=%d",
+         d->pProtocol->pVariables[eMSDP_ANSI_COLORS]->ValueInt,
+         d->pProtocol->pVariables[eMSDP_XTERM_256_COLORS]->ValueInt,
+         d->pProtocol->bMXP,
+         d->pProtocol->bMSDP,
+         d->pProtocol->bATCP,
+         prf_color_1,
+         prf_color_2,
+         STATE(d));
   
   /* Clear extra white space from the "protocol scroll" */
   write_to_output(d, "[H[J");
