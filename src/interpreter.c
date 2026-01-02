@@ -66,6 +66,7 @@ static struct alias_data *find_alias(struct alias_data *alias_list, char *str);
 static void perform_complex_alias(struct txt_q *input_q, char *orig, struct alias_data *a);
 static int _parse_name(char *arg, char *name);
 static bool perform_new_char_dupe_check(struct descriptor_data *d);
+static void finalize_character_login(struct descriptor_data *d, int load_result);
 /* sort_commands utility */
 static int sort_commands_helper(const void *a, const void *b);
 
@@ -1278,6 +1279,55 @@ static bool perform_new_char_dupe_check(struct descriptor_data *d)
   return (found);
 }
 
+static void finalize_character_login(struct descriptor_data *d, int load_result)
+{
+  if (isbanned(d->host) == BAN_SELECT &&
+      !PLR_FLAGGED(d->character, PLR_SITEOK)) {
+    write_to_output(d, "Sorry, this char has not been cleared for login from your site!\r\n");
+    STATE(d) = CON_CLOSE;
+    mudlog(NRM, LVL_GOD, TRUE, "Connection attempt for %s denied from %s", GET_NAME(d->character), d->host);
+    return;
+  }
+
+  if (GET_LEVEL(d->character) < circle_restrict) {
+    write_to_output(d, "The game is temporarily restricted.. try again later.\r\n");
+    STATE(d) = CON_CLOSE;
+    mudlog(NRM, LVL_GOD, TRUE, "Request for login denied for %s [%s] (wizlock)", GET_NAME(d->character), d->host);
+    return;
+  }
+
+  /* check and make sure no other copies of this player are logged in */
+  if (perform_dupe_check(d))
+    return;
+
+  if (GET_LEVEL(d->character) >= LVL_IMMORT)
+    write_to_output(d, "%s", imotd);
+  else
+    write_to_output(d, "%s", motd);
+
+  if (GET_INVIS_LEV(d->character))
+    mudlog(BRF, MAX(LVL_IMMORT, GET_INVIS_LEV(d->character)), TRUE, "%s has connected. (invis %d)", GET_NAME(d->character), GET_INVIS_LEV(d->character));
+  else
+    mudlog(BRF, LVL_IMMORT, TRUE, "%s has connected.", GET_NAME(d->character));
+
+  /* Add to the list of 'recent' players (since last reboot) */
+  if (AddRecentPlayer(GET_NAME(d->character), d->host, FALSE, FALSE) == FALSE)
+  {
+    mudlog(BRF, MAX(LVL_IMMORT, GET_INVIS_LEV(d->character)), TRUE, "Failure to AddRecentPlayer (returned FALSE).");
+  }
+
+  if (load_result) {
+    write_to_output(d, "\r\n\r\n\007\007\007"
+            "%s%d LOGIN FAILURE%s SINCE LAST SUCCESSFUL LOGIN.%s\r\n",
+            CCRED(d->character, C_SPR), load_result,
+            (load_result > 1) ? "S" : "", CCNRM(d->character, C_SPR));
+    GET_BAD_PWS(d->character) = 0;
+  }
+
+  write_to_output(d, "\r\n*** PRESS RETURN: ");
+  STATE(d) = CON_RMOTD;
+}
+
 /* load the player, put them in the right room - used by copyover_recover too */
 int enter_player_game (struct descriptor_data *d)
 {
@@ -1719,25 +1769,6 @@ void nanny(struct descriptor_data *d, char *arg)
         return;
       }
 
-      if (!str_cmp(arg, "char") || !str_cmp(arg, "character")) {
-        struct account_data acct;
-
-        memset(&acct, 0, sizeof(acct));
-        if (!account_load_any(d->acct_id, &acct) || acct.num_chars <= 0) {
-          write_to_output(d, "\r\nNo characters available to update.\r\n");
-          acct_show_character_menu(d);
-          return;
-        }
-
-        d->acct_change_pass[0] = '\0';
-        d->acct_change_char[0] = '\0';
-        d->acct_change_char_id = 0;
-        d->acct_prompted_menu = 1;
-        write_to_output(d, "\r\nEnter the character name or number to change: ");
-        STATE(d) = CON_ACCT_CHARPASS_SELECT;
-        return;
-      }
-
       if (isdigit((unsigned char)*arg)) {
         choice = atoi(arg);
         if (choice < 1 || choice > acct.num_chars) {
@@ -1837,124 +1868,6 @@ void nanny(struct descriptor_data *d, char *arg)
       return;
     }
 
-    case CON_ACCT_CHARPASS_SELECT: {
-      struct account_data acct;
-      const char *choice_name = NULL;
-      long choice_id = 0;
-      int idx = 0;
-
-      if (!*arg) {
-        write_to_output(d, "\r\nEnter the character name or number to change: ");
-        return;
-      }
-
-      if (!str_cmp(arg, "0") || !str_cmp(arg, "back")) {
-        STATE(d) = CON_ACCT_MENU;
-        acct_show_character_menu(d);
-        return;
-      }
-
-      memset(&acct, 0, sizeof(acct));
-      if (!account_load_any(d->acct_id, &acct)) {
-        write_to_output(d, "\r\nUnable to load account data.\r\n");
-        STATE(d) = CON_ACCT_MENU;
-        acct_show_character_menu(d);
-        return;
-      }
-
-      if (isdigit((unsigned char)*arg)) {
-        idx = atoi(arg);
-        if (idx > 0 && idx <= acct.num_chars) {
-          choice_name = acct.chars[idx - 1].name;
-          choice_id = acct.chars[idx - 1].char_id;
-        }
-      } else {
-        for (idx = 0; idx < acct.num_chars && idx < MAX_CHARS_PER_ACCOUNT; idx++) {
-          if (!acct.chars[idx].name[0])
-            continue;
-          if (!str_cmp(arg, acct.chars[idx].name)) {
-            choice_name = acct.chars[idx].name;
-            choice_id = acct.chars[idx].char_id;
-            break;
-          }
-        }
-      }
-
-      if (!choice_name) {
-        write_to_output(d, "\r\nThat character is not on this account.\r\n");
-        acct_show_character_menu(d);
-        return;
-      }
-
-      d->acct_change_char_id = choice_id;
-      strlcpy(d->acct_change_char, choice_name, sizeof(d->acct_change_char));
-      d->acct_change_pass[0] = '\0';
-      echo_off(d);
-      write_to_output(d, "\r\nNew password for %s: ", d->acct_change_char);
-      STATE(d) = CON_ACCT_CHARPASS_NEW1;
-      return;
-    }
-
-    case CON_ACCT_CHARPASS_NEW1:
-      if (!*arg) {
-        write_to_output(d, "\r\nNew password for %s: ", d->acct_change_char[0] ? d->acct_change_char : "that character");
-        echo_off(d);
-        return;
-      }
-
-      strlcpy(d->acct_change_pass, arg, sizeof(d->acct_change_pass));
-      write_to_output(d, "\r\nConfirm new password for %s: ", d->acct_change_char[0] ? d->acct_change_char : "that character");
-      STATE(d) = CON_ACCT_CHARPASS_NEW2;
-      return;
-
-    case CON_ACCT_CHARPASS_NEW2: {
-      struct char_data *tmp_ch = NULL;
-      int player_i = -1;
-
-      echo_on(d);
-
-      if (strcmp(d->acct_change_pass, arg) != 0) {
-        d->acct_change_pass[0] = '\0';
-        write_to_output(d, "\r\nPasswords do not match.\r\n");
-        STATE(d) = CON_ACCT_MENU;
-        acct_show_character_menu(d);
-        return;
-      }
-
-      CREATE(tmp_ch, struct char_data, 1);
-      clear_char(tmp_ch);
-      CREATE(tmp_ch->player_specials, struct player_special_data, 1);
-      new_mobile_data(tmp_ch);
-
-      player_i = load_char(d->acct_change_char, tmp_ch);
-      if (player_i < 0 || GET_ACCOUNT_ID(tmp_ch) != d->acct_id ||
-          (d->acct_change_char_id > 0 && GET_IDNUM(tmp_ch) != d->acct_change_char_id)) {
-        write_to_output(d, "\r\nUnable to load that character.\r\n");
-        free_char(tmp_ch);
-        d->acct_change_pass[0] = '\0';
-        d->acct_change_char[0] = '\0';
-        d->acct_change_char_id = 0;
-        STATE(d) = CON_ACCT_MENU;
-        acct_show_character_menu(d);
-        return;
-      }
-
-      GET_PFILEPOS(tmp_ch) = player_i;
-      strncpy(GET_PASSWD(tmp_ch), CRYPT(d->acct_change_pass, GET_PC_NAME(tmp_ch)), MAX_PWD_LENGTH);
-      *(GET_PASSWD(tmp_ch) + MAX_PWD_LENGTH) = '\0';
-      save_char(tmp_ch);
-      free_char(tmp_ch);
-
-      d->acct_change_pass[0] = '\0';
-      d->acct_change_char[0] = '\0';
-      d->acct_change_char_id = 0;
-
-      write_to_output(d, "\r\nPassword updated.\r\n");
-      STATE(d) = CON_ACCT_MENU;
-      acct_show_character_menu(d);
-      return;
-    }
-
   case CON_GET_NAME:             /* wait for input of name */
   /* Account-first enforcement */
   if (!(d->acct_id > 0)) {
@@ -2031,6 +1944,14 @@ if (PLR_FLAGGED(d->character, PLR_DELETED)) {
           REMOVE_BIT_AR(PLR_FLAGS(d->character), PLR_WRITING);
           REMOVE_BIT_AR(PLR_FLAGS(d->character), PLR_MAILING);
           REMOVE_BIT_AR(PLR_FLAGS(d->character), PLR_CRYO);
+          if (d->acct_authed && d->acct_id > 0 && GET_ACCOUNT_ID(d->character) == d->acct_id) {
+            load_result = GET_BAD_PWS(d->character);
+            GET_BAD_PWS(d->character) = 0;
+            d->bad_pws = 0;
+            d->character->player.time.logon = time(0);
+            finalize_character_login(d, load_result);
+            return;
+          }
           d->character->player.time.logon = time(0);
           write_to_output(d, "Password: ");
           echo_off(d);
@@ -2063,15 +1984,23 @@ if (PLR_FLAGGED(d->character, PLR_DELETED)) {
 	return;
       }
       if (circle_restrict) {
-	write_to_output(d, "Sorry, new players can't be created at the moment.\r\n");
-	mudlog(NRM, LVL_GOD, TRUE, "Request for new char %s denied from [%s] (wizlock)", GET_PC_NAME(d->character), d->host);
-	STATE(d) = CON_CLOSE;
-	return;
+        write_to_output(d, "Sorry, new players can't be created at the moment.\r\n");
+        mudlog(NRM, LVL_GOD, TRUE, "Request for new char %s denied from [%s] (wizlock)", GET_PC_NAME(d->character), d->host);
+        STATE(d) = CON_CLOSE;
+        return;
       }
       perform_new_char_dupe_check(d);
-      write_to_output(d, "New character.\r\nGive me a password for %s: ", GET_PC_NAME(d->character));
-      echo_off(d);
-      STATE(d) = CON_NEWPASSWD;
+      if (d->acct_authed && d->acct_id > 0) {
+        write_to_output(d, "New character.\r\nAccount login will secure %s; no separate character password needed.\r\n",
+                        GET_PC_NAME(d->character));
+        GET_PASSWD(d->character)[0] = '\0';
+        write_to_output(d, "What is your sex (\t(M\t)/\t(F\t))? ");
+        STATE(d) = CON_QSEX;
+      } else {
+        write_to_output(d, "New character.\r\nGive me a password for %s: ", GET_PC_NAME(d->character));
+        echo_off(d);
+        STATE(d) = CON_NEWPASSWD;
+      }
     } else if (*arg == 'n' || *arg == 'N') {
       write_to_output(d, "Okay, what IS it, then? ");
       free(d->character->player.name);
@@ -2112,7 +2041,7 @@ if (PLR_FLAGGED(d->character, PLR_DELETED)) {
 	return;
       }
 
-      
+
       /*
        * Legacy DES crypt() hashes only use the first 8 chars. If this character
        * still has a legacy hash, upgrade it immediately on successful login so
@@ -2133,48 +2062,7 @@ if (PLR_FLAGGED(d->character, PLR_DELETED)) {
       GET_BAD_PWS(d->character) = 0;
       d->bad_pws = 0;
 
-      if (isbanned(d->host) == BAN_SELECT &&
-	  !PLR_FLAGGED(d->character, PLR_SITEOK)) {
-	write_to_output(d, "Sorry, this char has not been cleared for login from your site!\r\n");
-	STATE(d) = CON_CLOSE;
-	mudlog(NRM, LVL_GOD, TRUE, "Connection attempt for %s denied from %s", GET_NAME(d->character), d->host);
-	return;
-      }
-      if (GET_LEVEL(d->character) < circle_restrict) {
-	write_to_output(d, "The game is temporarily restricted.. try again later.\r\n");
-	STATE(d) = CON_CLOSE;
-	mudlog(NRM, LVL_GOD, TRUE, "Request for login denied for %s [%s] (wizlock)", GET_NAME(d->character), d->host);
-	return;
-      }
-      /* check and make sure no other copies of this player are logged in */
-      if (perform_dupe_check(d))
-	return;
-
-      if (GET_LEVEL(d->character) >= LVL_IMMORT)
-	write_to_output(d, "%s", imotd);
-      else
-	write_to_output(d, "%s", motd);
-
-      if (GET_INVIS_LEV(d->character))
-        mudlog(BRF, MAX(LVL_IMMORT, GET_INVIS_LEV(d->character)), TRUE, "%s has connected. (invis %d)", GET_NAME(d->character), GET_INVIS_LEV(d->character));
-      else
-        mudlog(BRF, LVL_IMMORT, TRUE, "%s has connected.", GET_NAME(d->character));
-
-      /* Add to the list of 'recent' players (since last reboot) */
-      if (AddRecentPlayer(GET_NAME(d->character), d->host, FALSE, FALSE) == FALSE)
-      {
-        mudlog(BRF, MAX(LVL_IMMORT, GET_INVIS_LEV(d->character)), TRUE, "Failure to AddRecentPlayer (returned FALSE).");
-      }
-
-      if (load_result) {
-        write_to_output(d, "\r\n\r\n\007\007\007"
-		"%s%d LOGIN FAILURE%s SINCE LAST SUCCESSFUL LOGIN.%s\r\n",
-		CCRED(d->character, C_SPR), load_result,
-		(load_result > 1) ? "S" : "", CCNRM(d->character, C_SPR));
-	GET_BAD_PWS(d->character) = 0;
-      }
-      write_to_output(d, "\r\n*** PRESS RETURN: ");
-      STATE(d) = CON_RMOTD;
+      finalize_character_login(d, load_result);
     }
     break;
 
