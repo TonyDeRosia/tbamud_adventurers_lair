@@ -27,7 +27,8 @@
 static int graf(int grafage, int p0, int p1, int p2, int p3, int p4, int p5, int p6);
 static void check_idling(struct char_data *ch);
 static struct affected_type *find_affect(struct char_data *ch, int spellnum);
-static int furniture_regen_multiplier(struct char_data *ch);
+static int best_regen_multiplier(struct char_data *ch);
+static int object_regen_multiplier(struct obj_data *obj);
 
 
 /* When age < 15 return the value p0
@@ -64,23 +65,42 @@ static struct affected_type *find_affect(struct char_data *ch, int spellnum)
   return NULL;
 }
 
-static int furniture_regen_multiplier(struct char_data *ch)
+static int object_regen_multiplier(struct obj_data *obj)
 {
   int mult;
-  struct obj_data *furniture;
+
+  if (!obj)
+    return 1;
+
+  switch (GET_OBJ_TYPE(obj)) {
+  case ITEM_FURNITURE:
+  case ITEM_WEAPON:
+    mult = GET_OBJ_VAL(obj, 0);
+    break;
+  default:
+    return 1;
+  }
+
+  if (mult < 2)
+    return 1;
+
+  return mult;
+}
+
+static int best_regen_multiplier(struct char_data *ch)
+{
+  int mult = 1, check;
 
   if (GET_POS(ch) != POS_SITTING && GET_POS(ch) != POS_RESTING && GET_POS(ch) != POS_SLEEPING)
     return 1;
 
-  furniture = SITTING(ch);
+  check = object_regen_multiplier(SITTING(ch));
+  if (check > mult)
+    mult = check;
 
-  if (!furniture || GET_OBJ_TYPE(furniture) != ITEM_FURNITURE)
-    return 1;
-
-  mult = GET_OBJ_VAL(furniture, 0);
-
-  if (mult < 2)
-    return 1;
+  check = object_regen_multiplier(GET_EQ(ch, WEAR_WIELD));
+  if (check > mult)
+    mult = check;
 
   return mult;
 }
@@ -129,7 +149,7 @@ int mana_gain(struct char_data *ch)
   if (AFF_FLAGGED(ch, AFF_POISON))
     gain /= 4;
 
-  gain *= furniture_regen_multiplier(ch);
+  gain *= best_regen_multiplier(ch);
 
   return (gain);
 }
@@ -172,7 +192,7 @@ int hit_gain(struct char_data *ch)
   if (AFF_FLAGGED(ch, AFF_POISON))
     gain /= 4;
 
-  gain *= furniture_regen_multiplier(ch);
+  gain *= best_regen_multiplier(ch);
 
   return (gain);
 }
@@ -210,7 +230,7 @@ int move_gain(struct char_data *ch)
   if (AFF_FLAGGED(ch, AFF_POISON))
     gain /= 4;
 
-  gain *= furniture_regen_multiplier(ch);
+  gain *= best_regen_multiplier(ch);
 
   return (gain);
 }
