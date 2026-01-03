@@ -35,9 +35,9 @@
 
 const struct pc_class_definition pc_classes[] = {
   [CLASS_MAGIC_USER] = {
-    .name = "Magic User",
-    .abbrev = "Mu",
-    .archetype_abbrev = "Spl",
+    .name = "Mage",
+    .abbrev = "Mg",
+    .archetype_abbrev = "Arc",
     .select_key = 'm',
     .selectable = true,
     .prac_learned_level = 95,
