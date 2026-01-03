@@ -287,6 +287,15 @@ static long long parse_numeric_value(const char *line)
   return atoll(value);
 }
 
+/* Convert legacy copper-based currency values into canonical gold units. */
+static long long normalize_currency_units(long long stored)
+{
+  if (stored > MAX_MONEY && stored % LEGACY_COPPER_PER_GOLD == 0)
+    return stored / LEGACY_COPPER_PER_GOLD;
+
+  return stored;
+}
+
 int load_char(const char *name, struct char_data *ch)
 {
   int id, i;
@@ -297,7 +306,8 @@ int load_char(const char *name, struct char_data *ch)
   trig_data *t = NULL;
   trig_rnum t_rnum = NOTHING;
   bool money_seen = FALSE, bank_money_seen = FALSE;
-  long long __loaded_money_copper = -1;
+  long long __loaded_money_gold = -1;
+  long long __loaded_bank_money = -1;
   long long __loaded_gold_units = -1;
 
   if ((id = get_ptable_by_name(name)) < 0)
@@ -421,11 +431,11 @@ int load_char(const char *name, struct char_data *ch)
 	     if (!strcmp(tag, "Badp"))	GET_BAD_PWS(ch)		= atoi(line);
         else if (!strcmp(tag, "Bank") && !bank_money_seen) SET_BANK_GOLD(ch, atoi(line));
         else if (!strcmp(tag, "BankMoney")) {
-          long long copper = atoll(line);
-          if (copper < 0)
-            copper = 0;
+          long long stored = atoll(line);
+          if (stored < 0)
+            stored = 0;
 
-          GET_BANK_MONEY(ch) = copper;
+          __loaded_bank_money = stored;
           bank_money_seen = TRUE;
         }
         else if (!strcmp(tag, "Bounty")) {
@@ -434,10 +444,7 @@ int load_char(const char *name, struct char_data *ch)
             stored = 0;
 
           /* Legacy player files stored bounty in copper; convert if needed. */
-          if (stored > MAX_MONEY && stored % LEGACY_COPPER_PER_GOLD == 0)
-            stored /= LEGACY_COPPER_PER_GOLD;
-
-          SET_BOUNTY(ch, stored);
+          SET_BOUNTY(ch, normalize_currency_units(stored));
         }
 	else if (!strcmp(tag, "Brth"))	ch->player.time.birth	= atol(line);
 	break;
@@ -507,11 +514,11 @@ int load_char(const char *name, struct char_data *ch)
         else if (!strcmp(tag, "SCmt"))    GET_SPELL_CRIT_MULT(ch) = atoi(line);
         else if (!strcmp(tag, "HCmt"))    GET_HEAL_CRIT_MULT(ch)  = atoi(line);
         else if (!strcmp(tag, "Mone") || !strcmp(tag, "Money")) {
-          long long copper = (long long)strtoll(line, NULL, 10);
-          if (copper < 0)
-            copper = 0;
+          long long stored = (long long)strtoll(line, NULL, 10);
+          if (stored < 0)
+            stored = 0;
 
-          __loaded_money_copper = copper;
+          __loaded_money_gold = stored;
           money_seen = 1;
         }
         break;
@@ -596,13 +603,16 @@ int load_char(const char *name, struct char_data *ch)
     }
   }
 
-    if (money_seen && __loaded_money_copper >= 0) {
-      GET_MONEY(ch) = __loaded_money_copper;
-      SET_GOLD(ch, (int)(GET_MONEY(ch) / (long long)COPPER_PER_GOLD));
+    if (money_seen && __loaded_money_gold >= 0) {
+      GET_MONEY(ch) = normalize_currency_units(__loaded_money_gold);
+      SET_GOLD(ch, (int)GET_MONEY(ch));
     } else if (!money_seen && __loaded_gold_units >= 0) {
       SET_GOLD(ch, (int)__loaded_gold_units);
-      GET_MONEY(ch) = (long long)__loaded_gold_units * (long long)COPPER_PER_GOLD;
+      GET_MONEY(ch) = (long long)__loaded_gold_units;
     }
+
+    if (bank_money_seen && __loaded_bank_money >= 0)
+      GET_BANK_MONEY(ch) = normalize_currency_units(__loaded_bank_money);
 
   if (upgrade_legacy_immortal_levels(ch))
       mudlog(CMP, LVL_IMMORT, TRUE, "%s converted to updated immortal tier (level %d).", GET_NAME(ch), GET_LEVEL(ch));
@@ -789,9 +799,9 @@ void save_char(struct char_data * ch)
 
   if (GET_AC(ch)   != PFDEF_AC)         fprintf(fl, "Ac  : %d\n", GET_AC(ch));
 
-  /* Copper-level currency is canonical; always write it once. */
-  fprintf(fl, "Money: %lld\n", GET_MONEY(ch));
-  fprintf(fl, "BankMoney: %lld\n", GET_BANK_MONEY(ch));
+  /* Gold-level currency is canonical; always write it once. */
+  fprintf(fl, "Gold: %lld\n", ((long long)GET_GOLD(ch)));
+  fprintf(fl, "Bank: %lld\n", ((long long)GET_BANK_GOLD(ch)));
   if (GET_DIAMONDS(ch))
     fprintf(fl, "Diamonds: %d\n", GET_DIAMONDS(ch));
   if (GET_GLORY(ch))
@@ -799,9 +809,6 @@ void save_char(struct char_data * ch)
   fprintf(fl, "Bounty: %lld\n", GET_BOUNTY(ch));
   if (GET_CLAN_ID(ch)) fprintf(fl, "Clan: %d\n", GET_CLAN_ID(ch));
   if (GET_CLAN_RANK(ch)) fprintf(fl, "Clrk: %d\n", GET_CLAN_RANK(ch));
-
-  if (((long long)GET_GOLD(ch))         != PFDEF_GOLD)       fprintf(fl, "Gold: %lld\n", ((long long)GET_GOLD(ch)));
-  if (((long long)GET_BANK_GOLD(ch))    != PFDEF_BANK)       fprintf(fl, "Bank: %lld\n", ((long long)GET_BANK_GOLD(ch)));
   if (GET_EXP(ch)	   != PFDEF_EXP)	fprintf(fl, "Exp : %d\n", GET_EXP(ch));
   if (GET_HITROLL(ch)	   != PFDEF_HITROLL)	fprintf(fl, "Hrol: %d\n", GET_HITROLL(ch));
   if (GET_DAMROLL(ch)	   != PFDEF_DAMROLL)	fprintf(fl, "Drol: %d\n", GET_DAMROLL(ch));
