@@ -537,15 +537,15 @@ do                                                              \
 #define GET_MANA(ch)	  ((ch)->points.mana)
 /** Maximum mana points (magic) of ch. */
 #define GET_MAX_MANA(ch)  ((ch)->points.max_mana)
-/** Money stored as copper on ch (authoritative currency unit). */
-#define GET_COPPER(ch)     ((ch)->points.money)
-#define GET_MONEY(ch)      GET_COPPER(ch)
-/** Copper in bank */
+/** Money stored as gold on ch (authoritative currency unit). */
+#define GET_COPPER(ch)       ((ch)->points.money)
+#define GET_MONEY(ch)        GET_COPPER(ch)
+/** Gold in bank */
 #define GET_BANK_COPPER(ch)  ((ch)->points.bank_money)
-#define GET_BANK_MONEY(ch) GET_BANK_COPPER(ch)
-/** Gold views are derived from copper totals. */
-#define GET_GOLD(ch)       (GET_COPPER(ch) / COPPER_PER_GOLD)
-#define GET_BANK_GOLD(ch)  (GET_BANK_COPPER(ch) / COPPER_PER_GOLD)
+#define GET_BANK_MONEY(ch)   GET_BANK_COPPER(ch)
+/** Gold views are authoritative lvalues. */
+#define GET_GOLD(ch)         ((ch)->points.money)
+#define GET_BANK_GOLD(ch)    ((ch)->points.bank_money)
 /** Diamonds on ch */
 #define GET_DIAMONDS(ch)   ((ch)->points.diamonds)
 /** Glory currency */
@@ -558,8 +558,8 @@ do                                                              \
 #define SET_BOUNTY(ch, v)  do { (ch)->player_specials->saved.bounty_gold = (v); } while (0)
 
 /* Lvalue helpers for old code paths that used assignments */
-#define SET_GOLD(ch,g)       do { GET_COPPER(ch) = ((long long)(g) * COPPER_PER_GOLD); } while (0)
-#define SET_BANK_GOLD(ch,g)  do { GET_BANK_COPPER(ch) = ((long long)(g) * COPPER_PER_GOLD); } while (0)
+#define SET_GOLD(ch,g)       do { GET_GOLD(ch) = ((long long)(g)); } while (0)
+#define SET_BANK_GOLD(ch,g)  do { GET_BANK_GOLD(ch) = ((long long)(g)); } while (0)
 /** Current to-hit roll modifier for ch. */
 #define GET_HITROLL(ch)	  ((ch)->points.hitroll)
 /** Current damage roll modifier for ch. */
