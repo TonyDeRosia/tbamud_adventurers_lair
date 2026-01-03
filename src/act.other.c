@@ -1341,6 +1341,34 @@ ACMD(do_gen_tog)
   return;
 }
 
+/* Toggle auto zone reset notifications with optional on/off arguments. */
+ACMD(do_azr)
+{
+  char arg[MAX_INPUT_LENGTH];
+
+  if (IS_NPC(ch))
+    return;
+
+  one_argument(argument, arg);
+
+  if (!*arg) {
+    int enabled = PRF_TOG_CHK(ch, PRF_ZONERESETS);
+    send_to_char(ch, "Auto zone reset notifications %s.\r\n",
+                 enabled ? "enabled" : "disabled");
+    return;
+  }
+
+  if (is_abbrev(arg, "on")) {
+    SET_BIT_AR(PRF_FLAGS(ch), PRF_ZONERESETS);
+    send_to_char(ch, "Auto zone reset notifications enabled.\r\n");
+  } else if (is_abbrev(arg, "off")) {
+    REMOVE_BIT_AR(PRF_FLAGS(ch), PRF_ZONERESETS);
+    send_to_char(ch, "Auto zone reset notifications disabled.\r\n");
+  } else {
+    send_to_char(ch, "Usage: azr [on|off]\r\n");
+  }
+}
+
 static void show_happyhour(struct char_data *ch)
 {
   char happyexp[80], happygold[80], happyqp[80];
