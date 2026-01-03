@@ -437,7 +437,7 @@ static void oedit_disp_val1_menu(struct descriptor_data *d)
     write_to_output(d, "Number of gold coins : ");
     break;
   case ITEM_FURNITURE:
-    write_to_output(d, "Number of people it can hold : ");
+    write_to_output(d, "Regen multiplier (0/1 normal, 3 for triple) : ");
     break;
   case ITEM_NOTE:  // These object types have no 'values' so go back to menu
   case ITEM_OTHER:
@@ -472,6 +472,9 @@ static void oedit_disp_val2_menu(struct descriptor_data *d)
     break;
   case ITEM_WEAPON:
     write_to_output(d, "Number of damage dice : ");
+    break;
+  case ITEM_FURNITURE:
+    write_to_output(d, "Number of people it can hold (0 for unlimited) : ");
     break;
   case ITEM_FOOD:
     /* Values 2 and 3 are unused, jump to 4...Odd. */
@@ -949,13 +952,9 @@ void oedit_parse(struct descriptor_data *d, char *arg)
     number = atoi(arg);
     switch (GET_OBJ_TYPE(OLC_OBJ(d))) {
     case ITEM_FURNITURE:
-      if (number < 0 || number > MAX_PEOPLE)
-        oedit_disp_val1_menu(d);
-      else {
-        GET_OBJ_VAL(OLC_OBJ(d), 0) = number;
-        oedit_disp_val2_menu(d);
-      }
-      break;
+      GET_OBJ_VAL(OLC_OBJ(d), 0) = LIMIT(number, 0, 3);
+      oedit_disp_val2_menu(d);
+      return;
     case ITEM_WEAPON:
       GET_OBJ_VAL(OLC_OBJ(d), 0) = MIN(MAX(atoi(arg), -50), 50);
       break;
@@ -994,6 +993,11 @@ void oedit_parse(struct descriptor_data *d, char *arg)
       break;
     case ITEM_WEAPON:
       GET_OBJ_VAL(OLC_OBJ(d), 1) = LIMIT(number, 1, MAX_WEAPON_NDICE);
+      oedit_disp_val3_menu(d);
+      break;
+
+    case ITEM_FURNITURE:
+      GET_OBJ_VAL(OLC_OBJ(d), 1) = LIMIT(number, 0, MAX_PEOPLE);
       oedit_disp_val3_menu(d);
       break;
 
