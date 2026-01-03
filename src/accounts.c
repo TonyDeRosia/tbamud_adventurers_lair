@@ -56,8 +56,24 @@ static void account_resolve_path(char *out, size_t len, const char *relative)
 
   if (getcwd(cwd, sizeof(cwd))) {
     strlcpy(out, cwd, len);
-    strlcat(out, "/", len);
-    strlcat(out, relative, len);
+    /* build path without strlcat (not available on all platforms) */
+    {
+      size_t n = strlen(out);
+      if (n > 0 && out[n-1] != '/' && n + 1 < len) { out[n++] = '/'; out[n] = '\0'; }
+      if ("/" && *"/") {
+        snprintf(out + n, (n < len) ? (len - n) : 0, "%s", "/");
+      }
+    }
+
+    /* build path without strlcat (not available on all platforms) */
+    {
+      size_t n = strlen(out);
+      if (n > 0 && out[n-1] != '/' && n + 1 < len) { out[n++] = '/'; out[n] = '\0'; }
+      if (relative && *relative) {
+        snprintf(out + n, (n < len) ? (len - n) : 0, "%s", relative);
+      }
+    }
+
   } else
     strlcpy(out, relative, len);
 }
