@@ -429,11 +429,15 @@ int load_char(const char *name, struct char_data *ch)
           bank_money_seen = TRUE;
         }
         else if (!strcmp(tag, "Bounty")) {
-          long long copper = atoll(line);
-          if (copper < 0)
-            copper = 0;
+          long long stored = atoll(line);
+          if (stored < 0)
+            stored = 0;
 
-          SET_BOUNTY(ch, copper);
+          /* Legacy player files stored bounty in copper; convert if needed. */
+          if (stored > MAX_MONEY && stored % LEGACY_COPPER_PER_GOLD == 0)
+            stored /= LEGACY_COPPER_PER_GOLD;
+
+          SET_BOUNTY(ch, stored);
         }
 	else if (!strcmp(tag, "Brth"))	ch->player.time.birth	= atol(line);
 	break;
