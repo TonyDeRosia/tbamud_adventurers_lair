@@ -662,7 +662,24 @@ SPECIAL(cityguard)
   return (FALSE);
 }
 
-#define PET_PRICE(pet) (GET_LEVEL(pet) * 300)
+static int pet_shop_price(struct char_data *pet)
+{
+  int price = GET_LEVEL(pet) * 300;
+
+  if (GET_PET_PRICE(pet) > 0)
+    return GET_PET_PRICE(pet);
+
+  if (GET_MOB_RNUM(pet) != NOBODY) {
+    struct char_data *proto = &mob_proto[GET_MOB_RNUM(pet)];
+
+    if (GET_PET_PRICE(proto) > 0)
+      price = GET_PET_PRICE(proto);
+  }
+
+  return price;
+}
+
+#define PET_PRICE(pet) (pet_shop_price(pet))
 SPECIAL(pet_shops)
 {
   char buf[MAX_STRING_LENGTH], pet_name[256];

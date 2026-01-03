@@ -353,6 +353,8 @@ int write_mobile_espec(mob_vnum mvnum, struct char_data *mob, FILE *fd)
     fprintf(fd, "SavingBreath: %d\n", GET_SAVE(mob, SAVING_BREATH));
   if (GET_SAVE(mob, SAVING_SPELL) != 0)
     fprintf(fd, "SavingSpell: %d\n", GET_SAVE(mob, SAVING_SPELL));
+  if (GET_PET_PRICE(mob) > 0)
+    fprintf(fd, "PetPrice: %d\n", GET_PET_PRICE(mob));
   fputs("E\n", fd);
   return TRUE;
 }
