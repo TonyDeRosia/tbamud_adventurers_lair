@@ -83,7 +83,7 @@ const struct pc_class_definition pc_classes[] = {
     .abbrev = "Pa",
     .archetype_abbrev = "Mar",
     .select_key = 'p',
-    .selectable = false,
+    .selectable = true,
     .prac_learned_level = 80,
     .prac_max_per_prac = 12,
     .prac_min_per_prac = 0,
@@ -94,7 +94,7 @@ const struct pc_class_definition pc_classes[] = {
     .abbrev = "Br",
     .archetype_abbrev = "Rog",
     .select_key = 'b',
-    .selectable = false,
+    .selectable = true,
     .prac_learned_level = 85,
     .prac_max_per_prac = 12,
     .prac_min_per_prac = 0,
@@ -104,8 +104,8 @@ const struct pc_class_definition pc_classes[] = {
     .name = "Warlock",
     .abbrev = "Wl",
     .archetype_abbrev = "Spl",
-    .select_key = 'l',
-    .selectable = false,
+    .select_key = 'k',
+    .selectable = true,
     .prac_learned_level = 95,
     .prac_max_per_prac = 100,
     .prac_min_per_prac = 25,
@@ -116,7 +116,7 @@ const struct pc_class_definition pc_classes[] = {
     .abbrev = "Dr",
     .archetype_abbrev = "Div",
     .select_key = 'd',
-    .selectable = false,
+    .selectable = true,
     .prac_learned_level = 95,
     .prac_max_per_prac = 100,
     .prac_min_per_prac = 25,
@@ -127,7 +127,7 @@ const struct pc_class_definition pc_classes[] = {
     .abbrev = "My",
     .archetype_abbrev = "Spl",
     .select_key = 'y',
-    .selectable = false,
+    .selectable = true,
     .prac_learned_level = 95,
     .prac_max_per_prac = 100,
     .prac_min_per_prac = 25,
@@ -188,10 +188,12 @@ const char *get_archetype_abbrev(struct char_data *ch)
 /* The menu for choosing a class in interpreter.c: */
 const char *class_menu(void)
 {
-  static char menu[128];
+  static char menu[256];
   size_t len = 0;
   int i;
-  const int menu_order[] = { CLASS_CLERIC, CLASS_THIEF, CLASS_WARRIOR, CLASS_MAGIC_USER };
+  const int menu_order[] = { CLASS_MAGIC_USER, CLASS_CLERIC, CLASS_THIEF, CLASS_WARRIOR,
+                             CLASS_PALADIN, CLASS_BARD, CLASS_WARLOCK, CLASS_DRUID,
+                             CLASS_MYSTIC };
 
   if (menu[0] != '\0')
     return menu;
@@ -203,6 +205,9 @@ const char *class_menu(void)
     const struct pc_class_definition *pc_class = &pc_classes[cls];
     char rest_name[MAX_INPUT_LENGTH];
     const char *name_ptr = pc_class->name;
+
+    if (!pc_class->selectable)
+      continue;
 
     snprintf(rest_name, sizeof(rest_name), "%s", name_ptr + 1);
     for (char *p = rest_name; *p; ++p) {
