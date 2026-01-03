@@ -166,6 +166,43 @@ static const char *roster_class_name(int id)
   return "Unknown";
 }
 
+static void roster_format_color_field(char *out, size_t outsz, const char *src, size_t width)
+{
+  size_t pos = 0, vis = 0;
+  const char *p;
+
+  if (!out || outsz == 0)
+    return;
+
+  out[0] = '\0';
+
+  if (!src)
+    src = "Unknown";
+
+  for (p = src; *p && pos + 1 < outsz; ) {
+    if (*p == '\t' && *(p + 1)) {
+      if (pos + 2 >= outsz)
+        break;
+      out[pos++] = *p++;
+      out[pos++] = *p++;
+      continue;
+    }
+
+    if (vis >= width)
+      break;
+
+    out[pos++] = *p++;
+    vis++;
+  }
+
+  while (vis < width && pos + 1 < outsz) {
+    out[pos++] = ' ';
+    vis++;
+  }
+
+  out[pos] = '\0';
+}
+
 
 static void clan_show_roster(struct char_data *ch)
 {
@@ -177,9 +214,12 @@ static void clan_show_roster(struct char_data *ch)
   const char *Y = CCYEL(ch, C_NRM);
   const char *C = CCCYN(ch, C_NRM);
   const char *clan_name = clan_display_name_by_id(GET_CLAN_ID(ch));
+  char clan_name_buf[128];
 
   if (!clan_name)
     clan_name = "(unknown clan)";
+
+  roster_format_color_field(clan_name_buf, sizeof(clan_name_buf), clan_name, 70);
 
   clan_id = GET_CLAN_ID(ch);
   if (clan_id <= 0) {
@@ -230,35 +270,41 @@ static void clan_show_roster(struct char_data *ch)
   send_to_char(ch,
     "\r\n"
     "%s╔══════════════════════════════════════════════════════════════════════╗%s\r\n"
-    "%s║%s %-70.70s %s║\r\n"
-    "%s║%s %s                              Clan Roster                               %s║\r\n"
+    "%s║%s %s %s║%s\r\n"
+    "%s║%s %s                              Clan Roster                               %s║%s\r\n"
     "%s╠══════════════════════════════════════════════════════════════════════╣%s\r\n"
-    "%s║%s %sName                     Race            Class            Level     %s ║\r\n"
+    "%s║%s %sName                     Race            Class            Level     %s ║%s\r\n"
     "%s╠══════════════════════════════════════════════════════════════════════╣%s\r\n"
     , B, R,
-      B, R, clan_name, B,
-      B, R, Y, R,
+      B, R, clan_name_buf, B, R,
+      B, R, Y, R, B, R,
       B, R,
-      B, R, C, R,
+      B, R, C, R, B, R,
       B, R
   );
 
   if (count == 0) {
     send_to_char(ch,
-      "%s║%s No clan members are currently online.                                %s║\r\n"
-      , B, R, B
+      "%s║%s No clan members are currently online.                                %s║%s\r\n"
+      , B, R, B, R
     );
   } else {
     for (i = 0; i < count; i++) {
       const char *rname = roster_race_name(GET_RACE(list[i]));
       const char *cname = roster_class_name(GET_CLASS(list[i]));
-      send_to_char(ch, "%s║%s %-24.24s %-15.15s %-15.15s %5d      %s║\r\n",
+      char name_buf[64], race_buf[32], class_buf[32];
+
+      roster_format_color_field(name_buf, sizeof(name_buf), GET_NAME(list[i]), 24);
+      roster_format_color_field(race_buf, sizeof(race_buf), (rname ? rname : "Unknown"), 15);
+      roster_format_color_field(class_buf, sizeof(class_buf), (cname ? cname : "Unknown"), 15);
+
+      send_to_char(ch, "%s║%s %s %s %s %5d      %s║%s\r\n",
         B, R,
-        GET_NAME(list[i]),
-        (rname ? rname : "Unknown"),
-        (cname ? cname : "Unknown"),
+        name_buf,
+        race_buf,
+        class_buf,
         GET_LEVEL(list[i]),
-        B
+        B, R
       );
     }
   }
