@@ -643,18 +643,19 @@ void clanedit_parse(struct descriptor_data *d, char *arg);
 #define MAX_HELP_ENTRY        MAX_STRING_LENGTH /**< Max size of help entry */
 #define MAX_COMPLETED_QUESTS  1024   /**< Maximum number of completed quests allowed */
 
-#define COPPER_PER_SILVER   1000LL
-#define SILVER_PER_GOLD     100LL
-
-/* Money caps (canonical storage is copper units). Target max display: 999999g 99s 999c */
-#define MAX_MONEY (999999LL * (long long)COPPER_PER_GOLD + (long long)(SILVER_PER_GOLD - 1) * (long long)COPPER_PER_SILVER + (long long)(COPPER_PER_SILVER - 1))
-#define MAX_BANK  MAX_MONEY
-
 #define GOLD_PER_DIAMOND    1000LL
-#define COPPER_PER_GOLD     (COPPER_PER_SILVER * SILVER_PER_GOLD)
+
+#define COPPER_PER_SILVER   1LL
+#define SILVER_PER_GOLD     1LL
+#define COPPER_PER_GOLD     1LL
 #define COPPER_PER_DIAMOND  (COPPER_PER_GOLD * GOLD_PER_DIAMOND)
 
-/* Stored in copper units for copper silver gold */
+/* Legacy conversion constants for pre-refactor player files. */
+#define LEGACY_COPPER_PER_GOLD   100000LL
+
+/* Money caps (canonical storage is gold units). Target max display: 999999 gold */
+#define MAX_MONEY (999999LL)
+#define MAX_BANK  MAX_MONEY
 
 /** Define the largest set of commands for a trigger.
  * 16k should be plenty and then some. */
@@ -945,8 +946,9 @@ struct char_point_data
    * Dungeons and Dragons method of dealing with character defense, or
    * Armor class. */
   sh_int armor;
-  long long money;      /**< Currency carried, stored in copper units */
-  long long bank_money; /**< Currency in bank, stored in copper units */
+  long long money;      /**< Currency carried, stored in gold units */
+  long long bank_money; /**< Currency in bank, stored in gold units */
+  int glory;            /**< Glory currency */
   int diamonds;         /**< Premium currency, stored as diamonds */
   int exp;         /**< The experience points, or value, of the character. */
 
@@ -1017,6 +1019,8 @@ struct player_special_data_saved
   time_t   lastnews;            /**< Last time player read news */
   long account_id; /* account linkage id */
   long long bounty_copper; /**< Outstanding bounty on the character, stored in copper */
+  char last_pvp_glory_victim[MAX_NAME_LENGTH + 1]; /**< anti-farm tracking */
+  time_t last_pvp_glory_time; /**< anti-farm timestamp */
 
   int clan_id;
   int clan_rank;
