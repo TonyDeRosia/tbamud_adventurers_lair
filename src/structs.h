@@ -666,7 +666,7 @@ typedef unsigned char ubyte;        /**< 1 byte; vals = 0 to 255 */
 typedef signed short int sh_int;    /**< 2 bytes; vals = -32,768 to 32,767 */
 typedef unsigned short int ush_int; /**< 2 bytes; vals = 0 to 65,535 */
 #if !defined(__cplusplus)	/* Anyone know a portable method? */
-typedef char bool; /**< Technically 1 signed byte; vals should only = TRUE or FALSE. */
+typedef _Bool bool; /**< Boolean type; vals should only = TRUE or FALSE. */
 #endif
 
 #if !defined(CIRCLE_WINDOWS) || defined(LCC_WIN32)	/* Hm, sysdep.h? */
@@ -980,6 +980,8 @@ struct char_special_data
   struct char_data *hunting;   /**< Target of NPC hunt; else NULL */
   struct obj_data *furniture;  /**< Object being sat on/in; else NULL */
   struct char_data *next_in_furniture; /**< Next person sitting, else NULL */
+  struct char_data *mount;     /**< Pet currently being ridden, else NULL */
+  struct char_data *rider;     /**< Rider currently mounted, else NULL */
 
   byte position; /**< Standing, fighting, sleeping, etc. */
 

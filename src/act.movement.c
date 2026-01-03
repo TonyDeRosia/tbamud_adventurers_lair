@@ -142,6 +142,8 @@ int do_simple_move(struct char_data *ch, int dir, int need_specials_check)
   int need_movement = 0;
   /* Contains the "leave" message to display to the was_in room. */
   char leave_message[SMALL_BUFSIZE];
+  /* Pet mount carrying the character, if any. */
+  struct char_data *mount = GET_MOUNT(ch);
   /*---------------------------------------------------------------------*/
   /* End Local variable definitions */
 
@@ -171,6 +173,11 @@ int do_simple_move(struct char_data *ch, int dir, int need_specials_check)
     send_to_char(ch, "The thought of leaving your master makes you weep.\r\n");
     act("$n bursts into tears.", FALSE, ch, 0, 0, TO_ROOM);
     return (0);
+  }
+
+  if (mount && (IN_ROOM(mount) != was_in || mount->master != ch)) {
+    dismount_char(ch);
+    mount = NULL;
   }
 
   /* Water, No Swimming Rooms: Does the deep water prevent movement? */
@@ -253,7 +260,12 @@ int do_simple_move(struct char_data *ch, int dir, int need_specials_check)
 		   movement_loss[SECT(going_to)]) / 2;
 
   /* Move Point Requirement Check */
-  if (GET_MOVE(ch) < need_movement && !IS_NPC(ch))
+  if (mount) {
+    if (GET_MOVE(mount) < need_movement) {
+      send_to_char(ch, "%s is too exhausted to move.\r\n", GET_NAME(mount));
+      return (0);
+    }
+  } else if (GET_MOVE(ch) < need_movement && !IS_NPC(ch))
   {
     if (need_specials_check && ch->master)
       send_to_char(ch, "You are too exhausted to follow.\r\n");
@@ -270,7 +282,9 @@ int do_simple_move(struct char_data *ch, int dir, int need_specials_check)
   /* Begin: the leave operation. */
   /*---------------------------------------------------------------------*/
   /* If applicable, subtract movement cost. */
-  if (GET_LEVEL(ch) < LVL_IMMORT && !IS_NPC(ch))
+  if (mount)
+    GET_MOVE(mount) -= need_movement;
+  else if (GET_LEVEL(ch) < LVL_IMMORT && !IS_NPC(ch))
     GET_MOVE(ch) -= need_movement;
 
   /* Generate the leave message and display to others in the was_in room. */
@@ -378,6 +392,75 @@ ACMD(do_move)
 {
   /* These subcmd defines are mapped precisely to the direction defines. */
   perform_move(ch, subcmd, 0);
+}
+
+ACMD(do_mount)
+{
+  char arg[MAX_INPUT_LENGTH];
+  struct char_data *mount;
+
+  one_argument(argument, arg);
+
+  if (IS_NPC(ch)) {
+    send_to_char(ch, "Only players can mount pets.\r\n");
+    return;
+  }
+
+  if (!*arg) {
+    send_to_char(ch, "Mount whom?\r\n");
+    return;
+  }
+
+  if (GET_MOUNT(ch)) {
+    send_to_char(ch, "You are already mounted on %s.\r\n", GET_NAME(GET_MOUNT(ch)));
+    return;
+  }
+
+  if (!(mount = get_char_room_vis(ch, arg, NULL))) {
+    send_to_char(ch, "You don't see that pet here.\r\n");
+    return;
+  }
+
+  if (mount == ch) {
+    send_to_char(ch, "You can't mount yourself.\r\n");
+    return;
+  }
+
+  if (!IS_NPC(mount) || mount->master != ch) {
+    send_to_char(ch, "You can only mount a pet that follows you.\r\n");
+    return;
+  }
+
+  if (GET_RIDER(mount)) {
+    send_to_char(ch, "%s is already being ridden.\r\n", GET_NAME(mount));
+    return;
+  }
+
+  if (GET_POS(mount) < POS_STANDING) {
+    send_to_char(ch, "%s needs to be standing first.\r\n", GET_NAME(mount));
+    return;
+  }
+
+  GET_MOUNT(ch) = mount;
+  GET_RIDER(mount) = ch;
+
+  act("You climb onto $N.", FALSE, ch, 0, mount, TO_CHAR);
+  act("$n climbs onto $N.", FALSE, ch, 0, mount, TO_ROOM);
+}
+
+ACMD(do_dismount)
+{
+  struct char_data *mount = GET_MOUNT(ch);
+
+  if (!mount) {
+    send_to_char(ch, "You are not mounted.\r\n");
+    return;
+  }
+
+  act("You dismount from $N.", FALSE, ch, 0, mount, TO_CHAR);
+  act("$n dismounts from $N.", FALSE, ch, 0, mount, TO_ROOM);
+
+  dismount_char(ch);
 }
 
 static int find_door(struct char_data *ch, const char *type, char *dir, const char *cmdname)
