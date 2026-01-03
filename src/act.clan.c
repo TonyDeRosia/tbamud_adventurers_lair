@@ -272,9 +272,9 @@ static void clan_show_roster(struct char_data *ch)
     "\r\n"
     "%s╔══════════════════════════════════════════════════════════════════════╗%s\r\n"
     "%s║%s %s %s║%s\r\n"
-    "%s║%s                              %sClan Roster%s                             ║%s%s\r\n"
+    "%s║%s                              %sClan Roster%s                             %s║%s\r\n"
     "%s╠══════════════════════════════════════════════════════════════════════╣%s\r\n"
-    "%s║%s %sName                     Race            Class            Level      %s║%s%s\r\n"
+    "%s║%s %sName                     Race            Class            Level      %s%s║%s\r\n"
     "%s╠══════════════════════════════════════════════════════════════════════╣%s\r\n"
     , B, R,
       B, R, clan_name_buf, B, R, B,
