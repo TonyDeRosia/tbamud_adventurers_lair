@@ -66,6 +66,14 @@ type: teleport grave
 
 Uncapitalized zones are linked through a capitalized zone.
 ~
+#3007
+pool of radiance~
+Pool of Radiance~
+A giant pool of healing power shines with a brilliant golden radiance before you.~
+~
+6 ceq 0 0 0 0 0 0 0 0 0 0 0
+0 3 0 0
+999999 0 0 0 0
 #3009
 waybread bread~
 a waybread~
