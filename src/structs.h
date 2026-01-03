@@ -299,10 +299,9 @@ void clanedit_parse(struct descriptor_data *d, char *arg);
 /** Total number of affect flags */
 #define NUM_AFF_FLAGS   23
 
-/* Modes of connectedness: used by descriptor_data.state 		*/
-#define CON_CLANEDIT      42 /**< Clan editor */
-#define CON_PLAYING       0 /**< Playing - Nominal state 		*/
-#define CON_CLOSE         1 /**< User disconnect, remove character.	*/
+/* Modes of connectedness: used by descriptor_data.state                */
+#define CON_PLAYING       0 /**< Playing - Nominal state                */
+#define CON_CLOSE         1 /**< User disconnect, remove character.     */
 #define CON_GET_NAME      2 /**< Login with name */
 
 /* Account login flow states */
@@ -316,6 +315,9 @@ void clanedit_parse(struct descriptor_data *d, char *arg);
 
 /* Character creation: allocate base stats */
 #define CON_QSTATS        41
+#define CON_CLANEDIT      42 /**< Clan editor */
+#define CON_ACCT_FORCEPASS1 43 /**< Forced account password change: new pass */
+#define CON_ACCT_FORCEPASS2 44 /**< Forced account password change: verify */
 
 #define CON_NAME_CNFRM    3 /**< New character, confirm name */
 #define CON_PASSWORD      4 /**< Login with password */
