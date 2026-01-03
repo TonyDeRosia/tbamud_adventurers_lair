@@ -575,6 +575,63 @@ void stop_follower(struct char_data *ch)
   REMOVE_BIT_AR(AFF_FLAGS(ch), AFF_CHARM);
 }
 
+/* Break charm on a follower with custom messaging without extracting them. */
+void break_charm_follower(struct char_data *ch, struct char_data *vict)
+{
+  struct follow_type *curr, *prev = NULL;
+
+  if (!ch || !vict || vict->master != ch)
+    return;
+
+  if (!AFF_FLAGGED(vict, AFF_CHARM))
+    return;
+
+  if (affected_by_spell(vict, SPELL_CHARM))
+    affect_from_char(vict, SPELL_CHARM);
+
+  REMOVE_BIT_AR(AFF_FLAGS(vict), AFF_CHARM);
+
+  send_to_char(ch, "%s is no longer charmed.\r\n", GET_NAME(vict));
+  send_to_char(vict, "You feel your mind clear.\r\n");
+  act("$n looks less obedient.", TRUE, vict, 0, 0, TO_ROOM);
+
+  for (curr = ch->followers; curr; prev = curr, curr = curr->next) {
+    if (curr->follower != vict)
+      continue;
+
+    if (prev)
+      prev->next = curr->next;
+    else
+      ch->followers = curr->next;
+
+    free(curr);
+    break;
+  }
+
+  vict->master = NULL;
+}
+
+/* Check whether a follower is a purchased pet belonging to a master. */
+bool is_purchased_pet(struct char_data *ch, struct char_data *pet)
+{
+  if (!ch || !pet)
+    return FALSE;
+
+  if (pet->master != ch || !IS_NPC(pet))
+    return FALSE;
+
+  if (!AFF_FLAGGED(pet, AFF_CHARM))
+    return FALSE;
+
+  if (GET_PET_PRICE(pet) > 0)
+    return TRUE;
+
+  if (GET_MOB_RNUM(pet) != NOBODY && GET_PET_PRICE(&mob_proto[GET_MOB_RNUM(pet)]) > 0)
+    return TRUE;
+
+  return FALSE;
+}
+
 /** Finds the number of follows that are following, and charmed by, the
  * character (PC or NPC).
  * @param ch The character to check for charmed followers.

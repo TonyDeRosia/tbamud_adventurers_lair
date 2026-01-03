@@ -800,8 +800,6 @@ ACMD(do_pet_release)
 {
   char arg[MAX_INPUT_LENGTH];
   struct char_data *pet;
-  bool has_pet_price = FALSE;
-  bool is_charmed = FALSE;
 
   one_argument(argument, arg);
 
@@ -815,30 +813,22 @@ ACMD(do_pet_release)
     return;
   }
 
-  if (!IS_NPC(pet)) {
-    send_to_char(ch, "You cannot dismiss a player.\r\n");
-    return;
-  }
-
   if (pet->master != ch) {
     send_to_char(ch, "That pet is not following you.\r\n");
     return;
   }
 
-  is_charmed = (AFF_FLAGGED(pet, AFF_CHARM) != 0);
-
-  if (!is_charmed) {
-    send_to_char(ch, "You can only dismiss a purchased pet.\r\n");
+  if (!IS_NPC(pet)) {
+    if (AFF_FLAGGED(pet, AFF_CHARM))
+      break_charm_follower(ch, pet);
+    else
+      send_to_char(ch, "You can only dismiss a charmed follower.\r\n");
     return;
   }
 
-  if (GET_PET_PRICE(pet) > 0)
-    has_pet_price = TRUE;
-  else if (GET_MOB_RNUM(pet) != NOBODY && GET_PET_PRICE(&mob_proto[GET_MOB_RNUM(pet)]) > 0)
-    has_pet_price = TRUE;
-
-  if (!has_pet_price) {
-    /* Fall back to charm validation when no pet shop pricing is recorded. */
+  if (!is_purchased_pet(ch, pet)) {
+    send_to_char(ch, "You can only dismiss a purchased pet.\r\n");
+    return;
   }
 
   act("$N stops following you.", FALSE, ch, 0, pet, TO_CHAR);

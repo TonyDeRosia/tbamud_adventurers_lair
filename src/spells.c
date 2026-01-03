@@ -25,6 +25,39 @@
 
 
 
+/* Handle followers when an owner teleports or recalls. */
+void handle_followers_after_owner_teleport_or_recall(struct char_data *ch)
+{
+  struct follow_type *f, *next;
+
+  if (!ch)
+    return;
+
+  for (f = ch->followers; f; f = next) {
+    struct char_data *follower = f->follower;
+
+    next = f->next;
+
+    if (!follower || follower->master != ch)
+      continue;
+
+    if (is_purchased_pet(ch, follower)) {
+      room_rnum to_room = IN_ROOM(ch);
+
+      if (IN_ROOM(follower) == to_room)
+        continue;
+
+      act("$n disappears.", TRUE, follower, 0, 0, TO_ROOM);
+      char_from_room(follower);
+      char_to_room(follower, to_room);
+      act("$n arrives at $N's side.", TRUE, follower, 0, ch, TO_ROOM);
+      look_at_room(follower, 0);
+    } else if (!IS_NPC(follower) && AFF_FLAGGED(follower, AFF_CHARM)) {
+      break_charm_follower(ch, follower);
+    }
+  }
+}
+
 /* Special spells appear below. */
 ASPELL(spell_create_water)
 {
@@ -72,6 +105,7 @@ ASPELL(spell_recall)
   entry_memory_mtrigger(victim);
   greet_mtrigger(victim, -1);
   greet_memory_mtrigger(victim);
+  handle_followers_after_owner_teleport_or_recall(victim);
 }
 
 ASPELL(spell_teleport)
@@ -101,6 +135,7 @@ ASPELL(spell_teleport)
   entry_memory_mtrigger(victim);
   greet_mtrigger(victim, -1);
   greet_memory_mtrigger(victim);
+  handle_followers_after_owner_teleport_or_recall(victim);
 }
 
 #define SUMMON_FAIL "You failed.\r\n"
