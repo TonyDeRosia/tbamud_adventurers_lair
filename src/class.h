@@ -36,6 +36,7 @@ struct pc_class_definition {
 /* Functions available through class.c */
 int backstab_mult(int level);
 void do_start(struct char_data *ch);
+void ensure_class_abilities(struct char_data *ch);
 bitvector_t find_class_bitvector(const char *arg);
 int invalid_class(struct char_data *ch, struct obj_data *obj);
 int is_valid_class(int class_num);

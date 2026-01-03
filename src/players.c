@@ -619,6 +619,9 @@ int load_char(const char *name, struct char_data *ch)
   /* Ensure persisted base stats stay within the creation caps on load. */
   clamp_base_stats(ch);
 
+  /* Keep any existing characters in sync with their class spell/skill lists. */
+  ensure_class_abilities(ch);
+
   affect_total(ch);
 
   /* initialization for imms */
