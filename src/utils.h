@@ -116,6 +116,8 @@ int	num_followers_charmed(struct char_data *ch);
 void	die_follower(struct char_data *ch);
 void	add_follower(struct char_data *ch, struct char_data *leader);
 void	stop_follower(struct char_data *ch);
+void	break_charm_follower(struct char_data *ch, struct char_data *vict);
+bool	is_purchased_pet(struct char_data *ch, struct char_data *pet);
 bool	circle_follow(struct char_data *ch, struct char_data *victim);
 
 /* in act.informative.c */
