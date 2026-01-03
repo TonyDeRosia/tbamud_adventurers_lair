@@ -28,6 +28,9 @@
 #include "mail.h"  /* for has_mail() */
 #include "shop.h"
 #include "quest.h"
+
+#define GLORY_PRACTICE_COST 250
+#define GLORY_TRAIN_COST 600
 #include "modify.h"
 #include "pfdefaults.h"
 
@@ -471,6 +474,23 @@ ACMD(do_practice)
   list_known_abilities(ch);
 }
 
+ACMD(do_buypractice)
+{
+  if (IS_NPC(ch))
+    return;
+
+  if (GET_GLORY(ch) < GLORY_PRACTICE_COST) {
+    send_to_char(ch, "A practice session costs %d Glory. You currently have %d Glory.\r\n",
+                 GLORY_PRACTICE_COST, GET_GLORY(ch));
+    return;
+  }
+
+  GET_GLORY(ch) -= GLORY_PRACTICE_COST;
+  GET_PRACTICES(ch) += 1;
+  send_to_char(ch, "You spend %d Glory to buy a practice session. Practices: %d. Glory left: %d.\r\n",
+               GLORY_PRACTICE_COST, GET_PRACTICES(ch), GET_GLORY(ch));
+}
+
 ACMD(do_train)
 {
   char arg[MAX_INPUT_LENGTH];
@@ -569,6 +589,23 @@ ACMD(do_train)
 
   send_to_char(ch, "You have %d training sessions available.\r\n", GET_TRAINS(ch));
   send_to_char(ch, "Train hit, mana, move (cost 1) or str dex con int wis cha (cost 10, cap 20).\r\n");
+}
+
+ACMD(do_buytrain)
+{
+  if (IS_NPC(ch))
+    return;
+
+  if (GET_GLORY(ch) < GLORY_TRAIN_COST) {
+    send_to_char(ch, "A training session costs %d Glory. You currently have %d Glory.\r\n",
+                 GLORY_TRAIN_COST, GET_GLORY(ch));
+    return;
+  }
+
+  GET_GLORY(ch) -= GLORY_TRAIN_COST;
+  GET_TRAINS(ch) += 1;
+  send_to_char(ch, "You spend %d Glory to buy a training session. Training sessions: %d. Glory left: %d.\r\n",
+               GLORY_TRAIN_COST, GET_TRAINS(ch), GET_GLORY(ch));
 }
 
 ACMD(do_visible)

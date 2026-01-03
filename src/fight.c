@@ -27,6 +27,8 @@
 #include "quest.h"
 #include "criticalhits.h"
 
+#define PVP_GLORY_COOLDOWN 600 /* seconds */
+
 
 /* locally defined global variables, used externally */
 /* head of l-list of fighting chars */
@@ -382,6 +384,68 @@ static void change_alignment(struct char_data *ch, struct char_data *victim)
   GET_ALIGNMENT(ch) += (-GET_ALIGNMENT(victim) - GET_ALIGNMENT(ch)) / 16;
 }
 
+static int calc_pve_glory(struct char_data *ch, struct char_data *victim)
+{
+  int diff = abs(GET_LEVEL(victim) - GET_LEVEL(ch));
+  int base = rand_number(15, 25);
+
+  if (diff <= 3)
+    return base;
+
+  return MAX(0, (base * MAX(0, (8 - diff))) / 5);
+}
+
+static int calc_pvp_glory(struct char_data *ch, struct char_data *victim)
+{
+  int diff = abs(GET_LEVEL(victim) - GET_LEVEL(ch));
+  int base = rand_number(800, 1200);
+
+  if (diff <= 3)
+    return base;
+
+  return MAX(0, (base * MAX(0, (10 - diff))) / 7);
+}
+
+static bool recently_killed_for_glory(struct char_data *killer, struct char_data *victim)
+{
+  time_t now = time(NULL);
+
+  if (!GET_LAST_PVP_GLORY_TIME(killer))
+    return FALSE;
+
+  if (str_cmp(GET_LAST_PVP_GLORY_VICTIM(killer), GET_NAME(victim)))
+    return FALSE;
+
+  return (now - GET_LAST_PVP_GLORY_TIME(killer)) < PVP_GLORY_COOLDOWN;
+}
+
+static void grant_glory_for_kill(struct char_data *killer, struct char_data *victim)
+{
+  int glory = 0;
+
+  if (!killer || IS_NPC(killer) || !victim)
+    return;
+
+  if (IS_NPC(victim)) {
+    glory = calc_pve_glory(killer, victim);
+  } else {
+    if (recently_killed_for_glory(killer, victim))
+      return;
+
+    glory = calc_pvp_glory(killer, victim);
+    if (glory > 0) {
+      strlcpy(GET_LAST_PVP_GLORY_VICTIM(killer), GET_NAME(victim), sizeof(GET_LAST_PVP_GLORY_VICTIM(killer)));
+      GET_LAST_PVP_GLORY_TIME(killer) = time(NULL);
+    }
+  }
+
+  if (glory <= 0)
+    return;
+
+  GET_GLORY(killer) += glory;
+  send_to_char(killer, "You gain %d Glory.\r\n", glory);
+}
+
 void death_cry(struct char_data *ch)
 {
   int door;
@@ -501,7 +565,7 @@ static void perform_group_gain(struct char_data *ch, int base,
     share = MIN(CONFIG_MAX_EXP_GAIN, MAX(1, hap_share));
   }
   if (share > 1)
-    send_to_char(ch, "You receive your share of experience -- %d points.\r\n", share);
+    send_to_char(ch, "You receive your share of experience -- %s%d%s points.\r\n", CCYEL(ch, C_NRM), share, CCNRM(ch, C_NRM));
   else
     send_to_char(ch, "You receive your share of experience -- one measly little point!\r\n");
 
@@ -555,7 +619,7 @@ static void solo_gain(struct char_data *ch, struct char_data *victim)
   }
 
   if (exp > 1)
-    send_to_char(ch, "You receive %d experience points.\r\n", exp);
+    send_to_char(ch, "You receive %s%d%s experience points.\r\n", CCYEL(ch, C_NRM), exp, CCNRM(ch, C_NRM));
   else
     send_to_char(ch, "You receive one lousy experience point.\r\n");
 
@@ -1008,11 +1072,13 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
     }
 
     if (!IS_NPC(victim)) {
-      mudlog(BRF, MAX(LVL_IMMORT, MAX(GET_INVIS_LEV(ch), GET_INVIS_LEV(victim))), 
+      mudlog(BRF, MAX(LVL_IMMORT, MAX(GET_INVIS_LEV(ch), GET_INVIS_LEV(victim))),
         TRUE, "%s killed by %s at %s", GET_NAME(victim), GET_NAME(ch), world[IN_ROOM(victim)].name);
       if (MOB_FLAGGED(ch, MOB_MEMORY))
-	forget(ch, victim);
+        forget(ch, victim);
     }
+    if (ch != victim)
+      grant_glory_for_kill(ch, victim);
     /* Cant determine GET_GOLD on corpse, so do now and store */
     if (IS_NPC(victim)) {
       if ((IS_HAPPYHOUR) && (IS_HAPPYGOLD))
