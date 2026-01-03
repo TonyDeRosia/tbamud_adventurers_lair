@@ -1501,6 +1501,65 @@ static void stat_alloc_try_add(struct descriptor_data *d, int idx)
   affect_total(ch);
 }
 
+static int complete_character_login(struct descriptor_data *d)
+{
+  int load_result;
+
+  if (!d || !d->character)
+    return 0;
+
+  /* Password was correct, or account session is trusted. */
+  load_result = GET_BAD_PWS(d->character);
+  GET_BAD_PWS(d->character) = 0;
+  d->bad_pws = 0;
+
+  if (isbanned(d->host) == BAN_SELECT &&
+      !PLR_FLAGGED(d->character, PLR_SITEOK)) {
+    write_to_output(d, "Sorry, this char has not been cleared for login from your site!\r\n");
+    STATE(d) = CON_CLOSE;
+    mudlog(NRM, LVL_GOD, TRUE, "Connection attempt for %s denied from %s", GET_NAME(d->character), d->host);
+    return 0;
+  }
+
+  if (GET_LEVEL(d->character) < circle_restrict) {
+    write_to_output(d, "The game is temporarily restricted.. try again later.\r\n");
+    STATE(d) = CON_CLOSE;
+    mudlog(NRM, LVL_GOD, TRUE, "Request for login denied for %s [%s] (wizlock)", GET_NAME(d->character), d->host);
+    return 0;
+  }
+
+  /* check and make sure no other copies of this player are logged in */
+  if (perform_dupe_check(d))
+    return 0;
+
+  if (GET_LEVEL(d->character) >= LVL_IMMORT)
+    write_to_output(d, "%s", imotd);
+  else
+    write_to_output(d, "%s", motd);
+
+  if (GET_INVIS_LEV(d->character))
+    mudlog(BRF, MAX(LVL_IMMORT, GET_INVIS_LEV(d->character)), TRUE, "%s has connected. (invis %d)", GET_NAME(d->character), GET_INVIS_LEV(d->character));
+  else
+    mudlog(BRF, LVL_IMMORT, TRUE, "%s has connected.", GET_NAME(d->character));
+
+  /* Add to the list of 'recent' players (since last reboot) */
+  if (AddRecentPlayer(GET_NAME(d->character), d->host, FALSE, FALSE) == FALSE) {
+    mudlog(BRF, MAX(LVL_IMMORT, GET_INVIS_LEV(d->character)), TRUE, "Failure to AddRecentPlayer (returned FALSE).");
+  }
+
+  if (load_result) {
+    write_to_output(d, "\r\n\r\n\007\007\007"
+            "%s%d LOGIN FAILURE%s SINCE LAST SUCCESSFUL LOGIN.%s\r\n",
+            CCRED(d->character, C_SPR), load_result,
+            (load_result > 1) ? "S" : "", CCNRM(d->character, C_SPR));
+    GET_BAD_PWS(d->character) = 0;
+  }
+
+  write_to_output(d, "\r\n*** PRESS RETURN: ");
+  STATE(d) = CON_RMOTD;
+  return 1;
+}
+
 void nanny(struct descriptor_data *d, char *arg)
 {
   int load_result;	/* Overloaded variable */
@@ -1689,12 +1748,14 @@ void nanny(struct descriptor_data *d, char *arg)
       memset(&acct, 0, sizeof(acct));
       if (d->acct_id > 0 && account_load_any(d->acct_id, &acct)) {
         if (!account_set_password(d->acct_id, arg, 0)) {
+          echo_on(d);
           write_to_output(d, "\r\nCould not update password.\r\nAccount name (or NEW): ");
           STATE(d) = CON_ACCT_NAME;
           return;
         }
         acct.force_pw_change = 0;
         d->acct_tmp_pass[0] = '\0';
+        echo_on(d);
         write_to_output(d, "\r\nPassword updated.\r\n");
         STATE(d) = CON_ACCT_MENU;
         d->acct_prompted_menu = 0;
@@ -1703,6 +1764,53 @@ void nanny(struct descriptor_data *d, char *arg)
       }
 
       write_to_output(d, "\r\nCould not load account.\r\nAccount name (or NEW): ");
+      echo_on(d);
+      STATE(d) = CON_ACCT_NAME;
+      return;
+    }
+
+    case CON_ACCT_CHANGEPASS1:
+      if (!*arg) { write_to_output(d, "\r\nNew account password: "); return; }
+
+      if (strlen(arg) > MAX_PWD_LENGTH || strlen(arg) < 3) {
+        write_to_output(d, "\r\nIllegal password.\r\nNew account password: ");
+        return;
+      }
+
+      strlcpy(d->acct_tmp_pass, arg, sizeof(d->acct_tmp_pass));
+      write_to_output(d, "\r\nConfirm password: ");
+      STATE(d) = CON_ACCT_CHANGEPASS2;
+      return;
+
+    case CON_ACCT_CHANGEPASS2: {
+      struct account_data acct;
+
+      if (strcmp(d->acct_tmp_pass, arg) != 0) {
+        d->acct_tmp_pass[0] = '\0';
+        write_to_output(d, "\r\nPasswords do not match.\r\nNew account password: ");
+        STATE(d) = CON_ACCT_CHANGEPASS1;
+        return;
+      }
+
+      memset(&acct, 0, sizeof(acct));
+      if (d->acct_id > 0 && account_load_any(d->acct_id, &acct)) {
+        if (!account_set_password(d->acct_id, arg, 0)) {
+          echo_on(d);
+          write_to_output(d, "\r\nCould not update password.\r\nAccount name (or NEW): ");
+          STATE(d) = CON_ACCT_NAME;
+          return;
+        }
+        d->acct_tmp_pass[0] = '\0';
+        echo_on(d);
+        write_to_output(d, "\r\nPassword updated.\r\n");
+        STATE(d) = CON_ACCT_MENU;
+        d->acct_prompted_menu = 0;
+        acct_show_character_menu(d);
+        return;
+      }
+
+      write_to_output(d, "\r\nCould not load account.\r\nAccount name (or NEW): ");
+      echo_on(d);
       STATE(d) = CON_ACCT_NAME;
       return;
     }
@@ -1738,6 +1846,15 @@ void nanny(struct descriptor_data *d, char *arg)
         d->acct_prompted_menu = 0;
         write_to_output(d, "\r\nBy what name do you wish to be known?\r\n");
         STATE(d) = CON_GET_NAME;
+        return;
+      }
+
+      if (!str_cmp(arg, "pass") || !str_cmp(arg, "password")) {
+        d->acct_prompted_menu = 0;
+        d->acct_tmp_pass[0] = '\0';
+        write_to_output(d, "\r\nNew account password: ");
+        echo_off(d);
+        STATE(d) = CON_ACCT_CHANGEPASS1;
         return;
       }
 
@@ -1852,9 +1969,15 @@ if (PLR_FLAGGED(d->character, PLR_DELETED)) {
           REMOVE_BIT_AR(PLR_FLAGS(d->character), PLR_MAILING);
           REMOVE_BIT_AR(PLR_FLAGS(d->character), PLR_CRYO);
           d->character->player.time.logon = time(0);
+          d->idle_tics = 0;
+          if (d->acct_authed && d->acct_id > 0 && GET_ACCOUNT_ID(d->character) == d->acct_id) {
+            if (!complete_character_login(d))
+              return;
+            break;
+          }
+
           write_to_output(d, "Password: ");
           echo_off(d);
-          d->idle_tics = 0;
           STATE(d) = CON_PASSWORD;
         }
       } else {
@@ -1932,53 +2055,8 @@ if (PLR_FLAGGED(d->character, PLR_DELETED)) {
 	return;
       }
 
-      /* Password was correct. */
-      load_result = GET_BAD_PWS(d->character);
-      GET_BAD_PWS(d->character) = 0;
-      d->bad_pws = 0;
-
-      if (isbanned(d->host) == BAN_SELECT &&
-	  !PLR_FLAGGED(d->character, PLR_SITEOK)) {
-	write_to_output(d, "Sorry, this char has not been cleared for login from your site!\r\n");
-	STATE(d) = CON_CLOSE;
-	mudlog(NRM, LVL_GOD, TRUE, "Connection attempt for %s denied from %s", GET_NAME(d->character), d->host);
-	return;
-      }
-      if (GET_LEVEL(d->character) < circle_restrict) {
-	write_to_output(d, "The game is temporarily restricted.. try again later.\r\n");
-	STATE(d) = CON_CLOSE;
-	mudlog(NRM, LVL_GOD, TRUE, "Request for login denied for %s [%s] (wizlock)", GET_NAME(d->character), d->host);
-	return;
-      }
-      /* check and make sure no other copies of this player are logged in */
-      if (perform_dupe_check(d))
-	return;
-
-      if (GET_LEVEL(d->character) >= LVL_IMMORT)
-	write_to_output(d, "%s", imotd);
-      else
-	write_to_output(d, "%s", motd);
-
-      if (GET_INVIS_LEV(d->character))
-        mudlog(BRF, MAX(LVL_IMMORT, GET_INVIS_LEV(d->character)), TRUE, "%s has connected. (invis %d)", GET_NAME(d->character), GET_INVIS_LEV(d->character));
-      else
-        mudlog(BRF, LVL_IMMORT, TRUE, "%s has connected.", GET_NAME(d->character));
-
-      /* Add to the list of 'recent' players (since last reboot) */
-      if (AddRecentPlayer(GET_NAME(d->character), d->host, FALSE, FALSE) == FALSE)
-      {
-        mudlog(BRF, MAX(LVL_IMMORT, GET_INVIS_LEV(d->character)), TRUE, "Failure to AddRecentPlayer (returned FALSE).");
-      }
-
-      if (load_result) {
-        write_to_output(d, "\r\n\r\n\007\007\007"
-		"%s%d LOGIN FAILURE%s SINCE LAST SUCCESSFUL LOGIN.%s\r\n",
-		CCRED(d->character, C_SPR), load_result,
-		(load_result > 1) ? "S" : "", CCNRM(d->character, C_SPR));
-	GET_BAD_PWS(d->character) = 0;
-      }
-      write_to_output(d, "\r\n*** PRESS RETURN: ");
-      STATE(d) = CON_RMOTD;
+      if (!complete_character_login(d))
+        return;
     }
     break;
 
