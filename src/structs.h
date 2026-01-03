@@ -946,8 +946,8 @@ struct char_point_data
    * Dungeons and Dragons method of dealing with character defense, or
    * Armor class. */
   sh_int armor;
-  long long money;      /**< Currency carried, stored in gold units */
-  long long bank_money; /**< Currency in bank, stored in gold units */
+  long long money;      /**< Currency carried, stored in copper units */
+  long long bank_money; /**< Currency in bank, stored in copper units */
   int glory;            /**< Glory currency */
   int diamonds;         /**< Premium currency, stored as diamonds */
   int exp;         /**< The experience points, or value, of the character. */
