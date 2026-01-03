@@ -27,6 +27,7 @@
 static int graf(int grafage, int p0, int p1, int p2, int p3, int p4, int p5, int p6);
 static void check_idling(struct char_data *ch);
 static struct affected_type *find_affect(struct char_data *ch, int spellnum);
+static int furniture_regen_multiplier(struct char_data *ch);
 
 
 /* When age < 15 return the value p0
@@ -61,6 +62,27 @@ static struct affected_type *find_affect(struct char_data *ch, int spellnum)
       return af;
 
   return NULL;
+}
+
+static int furniture_regen_multiplier(struct char_data *ch)
+{
+  int mult;
+  struct obj_data *furniture;
+
+  if (GET_POS(ch) != POS_SITTING && GET_POS(ch) != POS_RESTING && GET_POS(ch) != POS_SLEEPING)
+    return 1;
+
+  furniture = SITTING(ch);
+
+  if (!furniture || GET_OBJ_TYPE(furniture) != ITEM_FURNITURE)
+    return 1;
+
+  mult = GET_OBJ_VAL(furniture, 0);
+
+  if (mult < 2)
+    return 1;
+
+  return mult;
 }
 
 /* The hit_limit, mana_limit, and move_limit functions are gone.  They added an
@@ -107,6 +129,8 @@ int mana_gain(struct char_data *ch)
   if (AFF_FLAGGED(ch, AFF_POISON))
     gain /= 4;
 
+  gain *= furniture_regen_multiplier(ch);
+
   return (gain);
 }
 
@@ -148,6 +172,8 @@ int hit_gain(struct char_data *ch)
   if (AFF_FLAGGED(ch, AFF_POISON))
     gain /= 4;
 
+  gain *= furniture_regen_multiplier(ch);
+
   return (gain);
 }
 
@@ -183,6 +209,8 @@ int move_gain(struct char_data *ch)
 
   if (AFF_FLAGGED(ch, AFF_POISON))
     gain /= 4;
+
+  gain *= furniture_regen_multiplier(ch);
 
   return (gain);
 }

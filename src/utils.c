@@ -1027,7 +1027,6 @@ void char_from_furniture(struct char_data *ch)
     log("SYSERR: Char from furniture, but no furniture!");
     SITTING(ch) = NULL;
     NEXT_SITTING(ch) = NULL;
-    GET_OBJ_VAL(furniture, 1) = 0;
     return;
   }
 
@@ -1044,17 +1043,10 @@ void char_from_furniture(struct char_data *ch)
       }
     }
   }
-  GET_OBJ_VAL(furniture, 1) -= 1;
   SITTING(ch) = NULL;
   NEXT_SITTING(ch) = NULL;
 
-
-  if (GET_OBJ_VAL(furniture, 1) < 1){
-    OBJ_SAT_IN_BY(furniture) = NULL;
-    GET_OBJ_VAL(furniture, 1) = 0;
-  }
-
- return;
+  return;
 }
 
 

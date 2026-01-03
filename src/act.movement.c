@@ -33,6 +33,7 @@ static int find_door(struct char_data *ch, const char *type, char *dir, const ch
 static int has_key(struct char_data *ch, obj_vnum key);
 static void do_doorcmd(struct char_data *ch, struct obj_data *obj, int door, int scmd);
 static int ok_pick(struct char_data *ch, obj_vnum keynum, int pickproof, int scmd);
+static int furniture_occupants(struct obj_data *obj);
 
 
 /* simple function to determine if char can walk on water */
@@ -58,6 +59,20 @@ static int has_boat(struct char_data *ch)
       return (1);
 
   return (0);
+}
+
+static int furniture_occupants(struct obj_data *obj)
+{
+  struct char_data *tempch;
+  int count = 0;
+
+  if (!obj)
+    return 0;
+
+  for (tempch = OBJ_SAT_IN_BY(obj); tempch; tempch = NEXT_SITTING(tempch))
+    count++;
+
+  return count;
 }
 
 /* Simple function to determine if char can fly. */
@@ -852,7 +867,7 @@ ACMD(do_sit)
   char arg[MAX_STRING_LENGTH];
   struct obj_data *furniture;
   struct char_data *tempch;
-  int found;
+  int found, capacity, occupants;
 
   one_argument(argument, arg);
 
@@ -860,6 +875,14 @@ ACMD(do_sit)
     found = 0;
   else
     found = 1;
+
+  if (found) {
+    capacity = GET_OBJ_VAL(furniture, 1);
+    occupants = furniture_occupants(furniture);
+  } else {
+    capacity = 0;
+    occupants = 0;
+  }
 
   switch (GET_POS(ch)) {
   case POS_STANDING:
@@ -871,12 +894,7 @@ ACMD(do_sit)
       if (GET_OBJ_TYPE(furniture) != ITEM_FURNITURE) {
         send_to_char(ch, "You can't sit on that!\r\n");
         return;
-      } else if (GET_OBJ_VAL(furniture, 1) > GET_OBJ_VAL(furniture, 0)) {
-        /* Val 1 is current number sitting, 0 is max in sitting. */
-        act("$p looks like it's all full.", TRUE, ch, furniture, 0, TO_CHAR);
-        log("SYSERR: Furniture %d holding too many people.", GET_OBJ_VNUM(furniture));
-        return;
-      } else if (GET_OBJ_VAL(furniture, 1) == GET_OBJ_VAL(furniture, 0)) {
+      } else if (capacity > 0 && occupants >= capacity) {
         act("There is no where left to sit upon $p.", TRUE, ch, furniture, 0, TO_CHAR);
         return;
       } else {
@@ -891,7 +909,6 @@ ACMD(do_sit)
         act("$n sits down upon $p.", TRUE, ch, furniture, 0, TO_ROOM);
         SITTING(ch) = furniture;
         NEXT_SITTING(ch) = NULL;
-        GET_OBJ_VAL(furniture, 1) += 1;
         GET_POS(ch) = POS_SITTING;
       }
     }
