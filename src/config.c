@@ -265,10 +265,11 @@ const char *MENU =
 "Welcome to tbaMUD!\r\n"
 "\t(0\t)) Exit from tbaMUD.\r\n"
 "\t(1\t)) Enter the game.\r\n"
-"\t(2\t)) Enter description.\r\n"
-"\t(3\t)) Read the background story.\r\n"
-"\t(4\t)) Change password.\r\n"
-"\t(5\t)) Delete this character.\r\n"
+"\t(2\t)) Switch characters.\r\n"
+"\t(3\t)) Enter description.\r\n"
+"\t(4\t)) Read the background story.\r\n"
+"\t(5\t)) Change password.\r\n"
+"\t(6\t)) Delete this character.\r\n"
 "\r\n"
 "   Make your choice: ";
 

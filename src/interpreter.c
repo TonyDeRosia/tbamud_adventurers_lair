@@ -2317,11 +2317,21 @@ save_char(d->character);
       break;
 
     case '2':
+      write_to_output(d, "\r\nReturning to your account to select a character.\r\n");
+      save_char(d->character);
+      free_char(d->character);
+      d->character = NULL;
+      d->acct_prompted_menu = 0;
+      STATE(d) = CON_ACCT_MENU;
+      acct_show_character_menu(d);
+      break;
+
+    case '3':
       if (d->character->player.description) {
-	write_to_output(d, "Current description:\r\n%s", d->character->player.description);
-	/* Don't free this now... so that the old description gets loaded as the
-	 * current buffer in the editor.  Do setup the ABORT buffer here, however. */
-	d->backstr = strdup(d->character->player.description);
+        write_to_output(d, "Current description:\r\n%s", d->character->player.description);
+        /* Don't free this now... so that the old description gets loaded as the
+         * current buffer in the editor.  Do setup the ABORT buffer here, however. */
+        d->backstr = strdup(d->character->player.description);
       }
       write_to_output(d, "Enter the new text you'd like others to see when they look at you.\r\n");
       send_editor_help(d);
@@ -2330,18 +2340,18 @@ save_char(d->character);
       STATE(d) = CON_PLR_DESC;
       break;
 
-    case '3':
+    case '4':
       page_string(d, background, 0);
       STATE(d) = CON_RMOTD;
       break;
 
-    case '4':
+    case '5':
       write_to_output(d, "\r\nEnter your old password: ");
       echo_off(d);
       STATE(d) = CON_CHPWD_GETOLD;
       break;
 
-    case '5':
+    case '6':
       write_to_output(d, "\r\nEnter your password for verification: ");
       echo_off(d);
       STATE(d) = CON_DELCNF1;
