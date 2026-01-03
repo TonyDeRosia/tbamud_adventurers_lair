@@ -328,7 +328,9 @@ void gain_exp(struct char_data *ch, int gain)
         send_to_char(ch, "%sYou rise %d levels to level %d!%s\r\n", CCYEL(ch, C_NRM), num_levels, GET_LEVEL(ch), CCNRM(ch, C_NRM));
       if (glory_awarded > 0) {
         GET_GLORY(ch) += glory_awarded;
-        send_to_char(ch, "You gain %d Glory for advancing.\r\n", glory_awarded);
+        send_to_char(ch, "You gain %s%d%s %sGlory%s for advancing.\r\n",
+                     CBYEL(ch, C_NRM), glory_awarded, CCNRM(ch, C_NRM),
+                     CBCYN(ch, C_NRM), CCNRM(ch, C_NRM));
       }
       set_title(ch, NULL);
       if (GET_LEVEL(ch) >= LVL_IMMORT && !PLR_FLAGGED(ch, PLR_NOWIZLIST))
@@ -380,7 +382,9 @@ void gain_exp_regardless(struct char_data *ch, int gain, int max_level)
         send_to_char(ch, "%sYou rise %d levels to level %d!%s\r\n", CCYEL(ch, C_NRM), num_levels, GET_LEVEL(ch), CCNRM(ch, C_NRM));
       if (glory_awarded > 0) {
         GET_GLORY(ch) += glory_awarded;
-        send_to_char(ch, "You gain %d Glory for advancing.\r\n", glory_awarded);
+        send_to_char(ch, "You gain %s%d%s %sGlory%s for advancing.\r\n",
+                     CBYEL(ch, C_NRM), glory_awarded, CCNRM(ch, C_NRM),
+                     CBCYN(ch, C_NRM), CCNRM(ch, C_NRM));
       }
       set_title(ch, NULL);
     }

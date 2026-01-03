@@ -443,7 +443,9 @@ static void grant_glory_for_kill(struct char_data *killer, struct char_data *vic
     return;
 
   GET_GLORY(killer) += glory;
-  send_to_char(killer, "You gain %d Glory.\r\n", glory);
+  send_to_char(killer, "You gain %s%d%s %sGlory%s.\r\n",
+               CBYEL(killer, C_NRM), glory, CCNRM(killer, C_NRM),
+               CBCYN(killer, C_NRM), CCNRM(killer, C_NRM));
 }
 
 void death_cry(struct char_data *ch)
