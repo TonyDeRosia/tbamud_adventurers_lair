@@ -318,6 +318,8 @@ void clanedit_parse(struct descriptor_data *d, char *arg);
 #define CON_CLANEDIT      42 /**< Clan editor */
 #define CON_ACCT_FORCEPASS1 43 /**< Forced account password change: new pass */
 #define CON_ACCT_FORCEPASS2 44 /**< Forced account password change: verify */
+#define CON_ACCT_CHANGEPASS1 45 /**< Voluntary account password change: new pass */
+#define CON_ACCT_CHANGEPASS2 46 /**< Voluntary account password change: verify */
 
 #define CON_NAME_CNFRM    3 /**< New character, confirm name */
 #define CON_PASSWORD      4 /**< Login with password */
