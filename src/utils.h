@@ -147,6 +147,7 @@ long long increase_bank_copper(struct char_data *ch, long long amt);
 int increase_diamonds(struct char_data *ch, int amt);
 int decrease_diamonds(struct char_data *ch, int amt);
 void format_copper_as_currency(char *out, size_t outsz, long long total_copper);
+void format_gold_as_currency(char *out, size_t outsz, long long total_gold);
 /* in class.c */
 void    advance_level(struct char_data *ch);
 
@@ -536,29 +537,26 @@ do                                                              \
 #define GET_MANA(ch)	  ((ch)->points.mana)
 /** Maximum mana points (magic) of ch. */
 #define GET_MAX_MANA(ch)  ((ch)->points.max_mana)
-/** Money on ch (copper units) */
-#define GET_MONEY(ch)      ((ch)->points.money)
-/** Money in bank (copper units) */
-#define GET_BANK_MONEY(ch) ((ch)->points.bank_money)
+/** Gold on ch (primary currency) */
+#define GET_GOLD(ch)       ((ch)->points.money)
+#define GET_MONEY(ch)      GET_GOLD(ch)
+/** Gold in bank */
+#define GET_BANK_GOLD(ch)  ((ch)->points.bank_money)
+#define GET_BANK_MONEY(ch) GET_BANK_GOLD(ch)
 /** Diamonds on ch */
 #define GET_DIAMONDS(ch)   ((ch)->points.diamonds)
+/** Glory currency */
+#define GET_GLORY(ch)      ((ch)->points.glory)
+/** Anti-farm tracking */
+#define GET_LAST_PVP_GLORY_VICTIM(ch) ((ch)->player_specials->saved.last_pvp_glory_victim)
+#define GET_LAST_PVP_GLORY_TIME(ch)   ((ch)->player_specials->saved.last_pvp_glory_time)
 /** Bounty on character (copper units) */
 #define GET_BOUNTY(ch)     ((ch)->player_specials->saved.bounty_copper)
 #define SET_BOUNTY(ch, v)  do { (ch)->player_specials->saved.bounty_copper = (v); } while (0)
 
-/* Legacy gold views (gold-equivalent). Not lvalues. */
-#define GET_GOLD(ch)       ((int)(GET_MONEY(ch) / COPPER_PER_GOLD))
-#define GET_BANK_GOLD(ch)  ((int)(GET_BANK_MONEY(ch) / COPPER_PER_GOLD))
-
 /* Lvalue helpers for old code paths that used assignments */
-#define SET_GOLD(ch,g)       do { \
-  long long _rem = GET_MONEY(ch) % COPPER_PER_GOLD; \
-  GET_MONEY(ch) = (long long)(g) * COPPER_PER_GOLD + _rem; \
-} while (0)
-#define SET_BANK_GOLD(ch,g)  do { \
-  long long _rem = GET_BANK_MONEY(ch) % COPPER_PER_GOLD; \
-  GET_BANK_MONEY(ch) = (long long)(g) * COPPER_PER_GOLD + _rem; \
-} while (0)
+#define SET_GOLD(ch,g)       do { GET_GOLD(ch) = (g); } while (0)
+#define SET_BANK_GOLD(ch,g)  do { GET_BANK_GOLD(ch) = (g); } while (0)
 /** Current to-hit roll modifier for ch. */
 #define GET_HITROLL(ch)	  ((ch)->points.hitroll)
 /** Current damage roll modifier for ch. */
