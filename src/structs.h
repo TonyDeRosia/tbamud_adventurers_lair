@@ -149,6 +149,7 @@ void clanedit_parse(struct descriptor_data *d, char *arg);
 #define GROUP_NPC     (1 << 2)  /**< Group created by NPC and thus not listed */
 
 /* PC classes */
+#define MAX_CLASSES      50
 #define CLASS_UNDEFINED	  (-1) /**< PC Class undefined */
 #define CLASS_MAGIC_USER  0    /**< PC Class Magic User */
 #define CLASS_CLERIC      1    /**< PC Class Cleric */

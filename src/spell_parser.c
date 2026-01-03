@@ -14,6 +14,7 @@
 #include "utils.h"
 #include "interpreter.h"
 #include "spells.h"
+#include "class.h"
 #include "handler.h"
 #include "comm.h"
 #include "db.h"
@@ -791,6 +792,7 @@ ACMD(do_cast) {
 
 void spell_level(int spell, int chclass, int level) {
   int bad = 0;
+  int class_count = num_pc_classes();
 
   if (spell < 0 || spell > TOP_SPELL_DEFINE) {
     log("SYSERR: attempting assign to illegal spellnum %d/%d", spell,
@@ -798,9 +800,9 @@ void spell_level(int spell, int chclass, int level) {
     return;
   }
 
-  if (chclass < 0 || chclass >= NUM_CLASSES) {
+  if (chclass < 0 || chclass >= class_count) {
     log("SYSERR: assigning '%s' to illegal class %d/%d.", skill_name(spell),
-        chclass, NUM_CLASSES - 1);
+        chclass, class_count - 1);
     bad = 1;
   }
 
@@ -820,7 +822,7 @@ static void spello(int spl, const char *name, int max_mana, int min_mana,
     const char *wearoff) {
   int i;
 
-  for (i = 0; i < NUM_CLASSES; i++)
+  for (i = 0; i < MAX_CLASSES; i++)
     spell_info[spl].min_level[i] = LVL_IMMORT;
   spell_info[spl].mana_max = max_mana;
   spell_info[spl].mana_min = min_mana;
@@ -836,7 +838,7 @@ static void spello(int spl, const char *name, int max_mana, int min_mana,
 void unused_spell(int spl) {
   int i;
 
-  for (i = 0; i < NUM_CLASSES; i++)
+  for (i = 0; i < MAX_CLASSES; i++)
     spell_info[spl].min_level[i] = LVL_IMPL + 1;
   spell_info[spl].mana_max = 0;
   spell_info[spl].mana_min = 0;
