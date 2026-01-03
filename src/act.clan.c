@@ -37,7 +37,7 @@ static void send_to_clan(int clan_id, const char *msg, struct char_data *from)
       const char *R = CCNRM(d->character, C_NRM);
 
       if (from)
-        send_to_char(d->character, "\r\n%s[Clan]%s %s%s%s: %s\r\n", G, R, G, GET_NAME(from), R, msg);
+        send_to_char(d->character, "\r\n%s[Clan]%s %s%s%s: %s%s%s\r\n", G, R, G, GET_NAME(from), R, G, msg, R);
       else
         send_to_char(d->character, "\r\n%s[Clan]%s %s%s%s\r\n", G, R, G, msg, R);
     }
@@ -176,6 +176,10 @@ static void clan_show_roster(struct char_data *ch)
   const char *R = CCNRM(ch, C_NRM);
   const char *Y = CCYEL(ch, C_NRM);
   const char *C = CCCYN(ch, C_NRM);
+  const char *clan_name = clan_display_name_by_id(GET_CLAN_ID(ch));
+
+  if (!clan_name)
+    clan_name = "(unknown clan)";
 
   clan_id = GET_CLAN_ID(ch);
   if (clan_id <= 0) {
@@ -226,12 +230,14 @@ static void clan_show_roster(struct char_data *ch)
   send_to_char(ch,
     "\r\n"
     "%s╔══════════════════════════════════════════════════════════════════════╗%s\r\n"
-    "%s║%s                              %sClan Roster%s                             %s║\r\n"
+    "%s║%s %-70.70s %s║\r\n"
+    "%s║%s %s                              Clan Roster                               %s║\r\n"
     "%s╠══════════════════════════════════════════════════════════════════════╣%s\r\n"
     "%s║%s %sName                     Race            Class            Level     %s ║\r\n"
     "%s╠══════════════════════════════════════════════════════════════════════╣%s\r\n"
     , B, R,
-      B, R, Y, R, B,
+      B, R, clan_name, B,
+      B, R, Y, R,
       B, R,
       B, R, C, R,
       B, R
