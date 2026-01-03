@@ -249,6 +249,8 @@ ACMD(do_skills);
 ACMD(do_spellbook);
 ACMD(do_spells);
 ACMD(do_practice);
+ACMD(do_buypractice);
+ACMD(do_buytrain);
 ACMD(do_train);
 ACMD(do_pet_release);
 ACMD(do_report);

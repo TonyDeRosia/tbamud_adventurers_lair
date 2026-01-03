@@ -18,9 +18,9 @@
 #include "handler.h"
 #include "interpreter.h"
 #include "dg_scripts.h"
+#include "screen.h"
 #include "class.h"
 #include "fight.h"
-#include "screen.h"
 #include "mud_event.h"
 
 /* local file scope function prototypes */
@@ -238,6 +238,7 @@ void gain_exp(struct char_data *ch, int gain)
   int num_levels = 0;
   int max_mortal_level = LVL_IMMORT - 1;
   bool hit_mortal_cap = FALSE;
+  int glory_awarded = 0;
 
   if (!IS_NPC(ch) && ((GET_LEVEL(ch) < 1 || GET_LEVEL(ch) >= LVL_IMMORT)))
     return;
@@ -257,6 +258,7 @@ void gain_exp(struct char_data *ch, int gain)
       GET_LEVEL(ch) += 1;
       num_levels++;
       advance_level(ch);
+      glory_awarded += rand_number(50, 75);
       is_altered = TRUE;
     }
 
@@ -273,9 +275,13 @@ void gain_exp(struct char_data *ch, int gain)
       mudlog(BRF, MAX(LVL_IMMORT, GET_INVIS_LEV(ch)), TRUE, "%s advanced %d level%s to level %d.\r\n",
                 GET_NAME(ch), num_levels, num_levels == 1 ? "" : "s", GET_LEVEL(ch));
       if (num_levels == 1)
-        send_to_char(ch, "You rise a level!\r\n");
+        send_to_char(ch, "%sYou rise to level %d!%s\r\n", CCYEL(ch, C_NRM), GET_LEVEL(ch), CCNRM(ch, C_NRM));
       else
-        send_to_char(ch, "You rise %d levels!\r\n", num_levels);
+        send_to_char(ch, "%sYou rise %d levels to level %d!%s\r\n", CCYEL(ch, C_NRM), num_levels, GET_LEVEL(ch), CCNRM(ch, C_NRM));
+      if (glory_awarded > 0) {
+        GET_GLORY(ch) += glory_awarded;
+        send_to_char(ch, "You gain %d Glory for advancing.\r\n", glory_awarded);
+      }
       set_title(ch, NULL);
       if (GET_LEVEL(ch) >= LVL_IMMORT && !PLR_FLAGGED(ch, PLR_NOWIZLIST))
         run_autowiz();
@@ -298,6 +304,7 @@ void gain_exp_regardless(struct char_data *ch, int gain, int max_level)
   int is_altered = FALSE;
   int num_levels = 0;
   int level_cap = MIN(max_level, LVL_IMPL);
+  int glory_awarded = 0;
 
   if ((IS_HAPPYHOUR) && (IS_HAPPYEXP))
     gain += (int)((float)gain * ((float)HAPPY_EXP / (float)(100)));
@@ -312,6 +319,7 @@ void gain_exp_regardless(struct char_data *ch, int gain, int max_level)
       GET_LEVEL(ch) += 1;
       num_levels++;
       advance_level(ch);
+      glory_awarded += rand_number(50, 75);
       is_altered = TRUE;
     }
 
@@ -319,9 +327,13 @@ void gain_exp_regardless(struct char_data *ch, int gain, int max_level)
       mudlog(BRF, MAX(LVL_IMMORT, GET_INVIS_LEV(ch)), TRUE, "%s advanced %d level%s to level %d.",
 		GET_NAME(ch), num_levels, num_levels == 1 ? "" : "s", GET_LEVEL(ch));
       if (num_levels == 1)
-        send_to_char(ch, "You rise a level!\r\n");
+        send_to_char(ch, "%sYou rise to level %d!%s\r\n", CCYEL(ch, C_NRM), GET_LEVEL(ch), CCNRM(ch, C_NRM));
       else
-	send_to_char(ch, "You rise %d levels!\r\n", num_levels);
+        send_to_char(ch, "%sYou rise %d levels to level %d!%s\r\n", CCYEL(ch, C_NRM), num_levels, GET_LEVEL(ch), CCNRM(ch, C_NRM));
+      if (glory_awarded > 0) {
+        GET_GLORY(ch) += glory_awarded;
+        send_to_char(ch, "You gain %d Glory for advancing.\r\n", glory_awarded);
+      }
       set_title(ch, NULL);
     }
   }

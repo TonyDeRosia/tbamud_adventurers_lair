@@ -22,6 +22,7 @@
 #include "oasis.h"
 #include "act.h"
 #include "quest.h"
+#include "screen.h"
 /* Helpers for handedness and offhand logic */
 static int is_two_hander(const struct obj_data *obj)
 {
@@ -1831,7 +1832,8 @@ ACMD(do_sac)
       send_to_char(ch, "You sacrifice %s to the Gods.\r\nThe gods give you %d experience points.\r\n", GET_OBJ_SHORT(j), 1+2*GET_OBJ_LEVEL(j));
       gain_exp(ch, (1 + 2 * GET_OBJ_LEVEL(j))); break;
     case 3:
-      send_to_char(ch, "You sacrifice %s to the Gods.\r\nYou receive %d experience points.\r\n", GET_OBJ_SHORT(j), 1+GET_OBJ_LEVEL(j));
+      send_to_char(ch, "You sacrifice %s to the Gods.\r\nYou receive %s%d%s experience points.\r\n", GET_OBJ_SHORT(j),
+                   CCYEL(ch, C_NRM), 1 + GET_OBJ_LEVEL(j), CCNRM(ch, C_NRM));
       gain_exp(ch, (1 + GET_OBJ_LEVEL(j))); break;
     case 4:
       send_to_char(ch, "Your sacrifice to the Gods is rewarded with %d gold coins.\r\n", 1+GET_OBJ_LEVEL(j));
