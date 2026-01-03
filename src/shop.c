@@ -597,6 +597,7 @@ static void shopping_buy(char *arg, struct char_data *ch, struct char_data *keep
   char tempstr[MAX_INPUT_LENGTH - 10], tempbuf[MAX_INPUT_LENGTH];
   struct obj_data *obj, *last_obj = NULL;
   int goldamt = 0, buynum, bought = 0;
+  long long cost_copper = 0;
 
   if (!is_ok(keeper, ch, shop_nr))
     return;
@@ -622,6 +623,8 @@ static void shopping_buy(char *arg, struct char_data *ch, struct char_data *keep
   if (!(obj = get_purchase_obj(ch, arg, keeper, shop_nr, TRUE)))
     return;
 
+  cost_copper = shop_units_to_copper((long long)buy_price(obj, shop_nr, keeper, ch));
+
   if (OBJ_FLAGGED(obj, ITEM_QUEST)) {
     if (GET_OBJ_COST(obj) > GET_QUESTPOINTS(ch)) {
       char actbuf[MAX_INPUT_LENGTH];
@@ -632,7 +635,7 @@ static void shopping_buy(char *arg, struct char_data *ch, struct char_data *keep
       return;
     }
   } else { /*has the player got enough money? */
-  if (shop_units_to_copper((long long)buy_price(obj, shop_nr, keeper, ch)) > GET_MONEY(ch)) {
+  if (cost_copper > GET_MONEY(ch)) {
     char actbuf[MAX_INPUT_LENGTH];
 
     snprintf(actbuf, sizeof(actbuf), shop_index[shop_nr].missing_cash2, GET_NAME(ch));
@@ -687,10 +690,11 @@ static void shopping_buy(char *arg, struct char_data *ch, struct char_data *keep
         break;
     }
   } else {
-  while (obj && (GET_MONEY(ch) >= shop_units_to_copper((long long)buy_price(obj, shop_nr, keeper, ch)))
+  while (obj && (GET_MONEY(ch) >= cost_copper)
          && IS_CARRYING_N(ch) < CAN_CARRY_N(ch) && bought < buynum
          && IS_CARRYING_W(ch) + GET_OBJ_WEIGHT(obj) <= CAN_CARRY_W(ch)) {
     int charged;
+    long long charged_copper;
 
     bought++;
     /* Test if producing shop ! */
@@ -711,11 +715,26 @@ static void shopping_buy(char *arg, struct char_data *ch, struct char_data *keep
 #else
     charged = buy_price(obj, shop_nr, keeper, ch);
 #endif
+    charged_copper = shop_units_to_copper((long long)charged);
+
+#ifdef SHOP_PRICE_DEBUG
+    mudlog(CMP, LVL_IMMORT, TRUE,
+           "[SHOP_PRICE_DEBUG] charging %s for '%s': price_units=%d cost_copper=%lld money_before=%lld",
+           GET_NAME(ch), obj ? obj->short_description : "<unknown>", charged, charged_copper, GET_MONEY(ch));
+#endif
+
     goldamt += charged;
-    shop_charge(ch, shop_units_to_copper((long long)charged));
+    shop_charge(ch, charged_copper);
+
+#ifdef SHOP_PRICE_DEBUG
+    mudlog(CMP, LVL_IMMORT, TRUE,
+           "[SHOP_PRICE_DEBUG] post-charge money=%lld (deducted %lld copper)",
+           GET_MONEY(ch), charged_copper);
+#endif
 
     last_obj = obj;
     obj = get_purchase_obj(ch, arg, keeper, shop_nr, FALSE);
+    cost_copper = obj ? shop_units_to_copper((long long)buy_price(obj, shop_nr, keeper, ch)) : 0;
     if (!same_obj(obj, last_obj))
       break;
   }
@@ -726,7 +745,7 @@ static void shopping_buy(char *arg, struct char_data *ch, struct char_data *keep
     if (!obj || !same_obj(last_obj, obj))
       snprintf(buf, sizeof(buf), "%s I only have %d to sell you.", GET_NAME(ch), bought);
     else if (!OBJ_FLAGGED(obj, ITEM_QUEST) &&
-      GET_MONEY(ch) < shop_units_to_copper((long long)buy_price(obj, shop_nr, keeper, ch)))
+      GET_MONEY(ch) < cost_copper)
       snprintf(buf, sizeof(buf), "%s You can only afford %d.", GET_NAME(ch), bought);
     else if (OBJ_FLAGGED(obj, ITEM_QUEST) &&
       GET_QUESTPOINTS(ch) < GET_OBJ_COST(obj))
