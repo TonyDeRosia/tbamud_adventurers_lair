@@ -376,6 +376,10 @@ int call_magic(struct char_data *caster, struct char_data *cvict,
       MANUAL_SPELL(spell_teleport)
       ;
       break;
+    case SPELL_CORRUPTION:
+      MANUAL_SPELL(spell_corruption)
+      ;
+      break;
     }
 
   return (1);
@@ -925,6 +929,10 @@ void mag_assign_spells(void) {
 
   spello(SPELL_CONTROL_WEATHER, "control weather", 75, 25, 5, POS_STANDING,
   TAR_IGNORE, FALSE, MAG_MANUAL, NULL);
+
+  spello(SPELL_CORRUPTION, "corruption", 35, 20, 3, POS_FIGHTING,
+  TAR_CHAR_ROOM | TAR_FIGHT_VICT, TRUE, MAG_MANUAL,
+      "The lingering corruption fades away.");
 
   spello(SPELL_CREATE_FOOD, "create food", 30, 5, 4, POS_STANDING,
   TAR_IGNORE, FALSE, MAG_CREATIONS, NULL);

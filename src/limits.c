@@ -26,6 +26,7 @@
 /* local file scope function prototypes */
 static int graf(int grafage, int p0, int p1, int p2, int p3, int p4, int p5, int p6);
 static void check_idling(struct char_data *ch);
+static struct affected_type *find_affect(struct char_data *ch, int spellnum);
 
 
 /* When age < 15 return the value p0
@@ -49,6 +50,17 @@ static int graf(int grafage, int p0, int p1, int p2, int p3, int p4, int p5, int
     return (p4 + (((grafage - 60) * (p5 - p4)) / 20));	/* 60..79 */
   else
     return (p6);					/* >= 80 */
+}
+
+static struct affected_type *find_affect(struct char_data *ch, int spellnum)
+{
+  struct affected_type *af;
+
+  for (af = ch->affected; af; af = af->next)
+    if (af->spell == spellnum)
+      return af;
+
+  return NULL;
 }
 
 /* The hit_limit, mana_limit, and move_limit functions are gone.  They added an
@@ -405,14 +417,22 @@ void point_update(void)
     gain_condition(i, THIRST, -1);
 
     if (GET_POS(i) >= POS_STUNNED) {
+      struct affected_type *corruption = NULL;
+
       GET_HIT(i) = MIN(GET_HIT(i) + hit_gain(i), GET_MAX_HIT(i));
       GET_MANA(i) = MIN(GET_MANA(i) + mana_gain(i), GET_MAX_MANA(i));
       GET_MOVE(i) = MIN(GET_MOVE(i) + move_gain(i), GET_MAX_MOVE(i));
       if (AFF_FLAGGED(i, AFF_POISON))
-	if (damage(i, i, 2, SPELL_POISON) == -1)
-	  continue;	/* Oops, they died. -gg 6/24/98 */
+        if (damage(i, i, 2, SPELL_POISON) == -1)
+          continue;     /* Oops, they died. -gg 6/24/98 */
+      corruption = find_affect(i, SPELL_CORRUPTION);
+      if (corruption) {
+        send_to_char(i, "Corrupting energy gnaws at you.\\r\\n");
+        if (damage(i, i, corruption->modifier, SPELL_CORRUPTION) == -1)
+          continue;
+      }
       if (GET_POS(i) <= POS_STUNNED)
-	update_pos(i);
+        update_pos(i);
     } else if (GET_POS(i) == POS_INCAP) {
       if (damage(i, i, 1, TYPE_SUFFERING) == -1)
 	continue;

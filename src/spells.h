@@ -93,8 +93,9 @@
 #define SPELL_IDENTIFY               52 /* Reserved Skill[] DO NOT CHANGE */
 #define SPELL_FLY                    53 /* Reserved Skill[] DO NOT CHANGE */
 #define SPELL_DARKNESS               54
+#define SPELL_CORRUPTION             55
 /** Total Number of defined spells */
-#define NUM_SPELLS                   54
+#define NUM_SPELLS                   55
 
 /* Insert new spells here, up to MAX_SPELLS */
 #define MAX_SPELLS		    130
@@ -229,6 +230,7 @@ ASPELL(spell_information);
 ASPELL(spell_identify);
 ASPELL(spell_enchant_weapon);
 ASPELL(spell_detect_poison);
+ASPELL(spell_corruption);
 
 /* basic magic calling functions */
 

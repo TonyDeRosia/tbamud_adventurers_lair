@@ -1866,6 +1866,7 @@ void init_spell_levels(void)
   spell_level(SPELL_HARM, CLASS_MAGIC_USER, LVL_IMMORT);
 
   /* WARLOCKS */
+  spell_level(SPELL_CORRUPTION, CLASS_WARLOCK, 1);
   spell_level(SPELL_CHILL_TOUCH, CLASS_WARLOCK, 1);
   spell_level(SPELL_DETECT_MAGIC, CLASS_WARLOCK, 3);
   spell_level(SPELL_CURSE, CLASS_WARLOCK, 8);
