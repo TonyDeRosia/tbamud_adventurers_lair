@@ -219,7 +219,8 @@ static void clan_show_roster(struct char_data *ch)
   if (!clan_name)
     clan_name = "(unknown clan)";
 
-  roster_format_color_field(clan_name_buf, sizeof(clan_name_buf), clan_name, 70);
+  /* Leave one space of padding on either side of the clan name to fit the 70-char interior. */
+  roster_format_color_field(clan_name_buf, sizeof(clan_name_buf), clan_name, 68);
 
   clan_id = GET_CLAN_ID(ch);
   if (clan_id <= 0) {
@@ -270,10 +271,10 @@ static void clan_show_roster(struct char_data *ch)
   send_to_char(ch,
     "\r\n"
     "%s╔══════════════════════════════════════════════════════════════════════╗%s\r\n"
-    "%s║%s %s %s║%s\r\n"
-    "%s║%s %s                              Clan Roster                               %s║%s%s\r\n"
+    "%s║%s %s %s ║%s\r\n"
+    "%s║%s                              %sClan Roster%s                             ║%s%s\r\n"
     "%s╠══════════════════════════════════════════════════════════════════════╣%s\r\n"
-    "%s║%s %sName                     Race            Class            Level     %s ║%s%s\r\n"
+    "%s║%s %sName                     Race            Class            Level      %s║%s%s\r\n"
     "%s╠══════════════════════════════════════════════════════════════════════╣%s\r\n"
     , B, R,
       B, R, clan_name_buf, B, R,
@@ -298,7 +299,7 @@ static void clan_show_roster(struct char_data *ch)
       roster_format_color_field(race_buf, sizeof(race_buf), (rname ? rname : "Unknown"), 15);
       roster_format_color_field(class_buf, sizeof(class_buf), (cname ? cname : "Unknown"), 15);
 
-      send_to_char(ch, "%s║%s %s %s %s %5d      %s║%s\r\n",
+      send_to_char(ch, "%s║%s %s %s %s %5d       %s║%s\r\n",
         B, R,
         name_buf,
         race_buf,
