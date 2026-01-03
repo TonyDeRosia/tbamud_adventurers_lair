@@ -174,6 +174,22 @@ int is_valid_class(int class_num)
   return class_num >= 0 && class_num < NUM_PC_CLASSES;
 }
 
+const char *class_name(int class_id)
+{
+  if (!is_valid_class(class_id))
+    return "Unknown";
+
+  return pc_classes[class_id].name;
+}
+
+const char *class_abbrev(int class_id)
+{
+  if (!is_valid_class(class_id))
+    return "Unknown";
+
+  return pc_classes[class_id].abbrev;
+}
+
 const char *get_archetype_abbrev(struct char_data *ch)
 {
   if (IS_NPC(ch))

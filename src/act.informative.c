@@ -1662,7 +1662,7 @@ ACMD(do_finger)
   snprintf(line, sizeof(line), "%sName:%s %-20s  %sRace:%s %-20s", C, R, GET_NAME(vict), C, R, race);
   len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
 
-  snprintf(line, sizeof(line), "%sClass:%s %-19s  %sLevel:%s %-5d", C, R, archetype_name(GET_CLASS(vict)), C, R, GET_LEVEL(vict));
+  snprintf(line, sizeof(line), "%sClass:%s %-19s  %sLevel:%s %-5d", C, R, class_name(GET_CLASS(vict)), C, R, GET_LEVEL(vict));
   len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
 
   snprintf(line, sizeof(line), "%sClan:%s %s  %sBounty:%s %s%s%s", C, R, clan_buf, C, R, bounty_color, bounty_buf, R);
@@ -3698,7 +3698,7 @@ ACMD(do_whois)
   send_to_char(ch, "Name: %s %s\r\nSex: %s\r\n", GET_NAME(victim),
                    (victim->player.title ? victim->player.title : ""), buf);
 
-  strlcpy(buf, archetype_name(victim->player.chclass), sizeof(buf));
+  strlcpy(buf, class_name(victim->player.chclass), sizeof(buf));
   send_to_char(ch, "Class: %s\r\n", buf);
 
 
