@@ -486,7 +486,7 @@ void point_update(void)
 }
 
 
-long long increase_money_copper(struct char_data *ch, long long amt)
+long long increase_money_gold(struct char_data *ch, long long amt)
 {
   long long curr = GET_MONEY(ch);
   long long updated = curr + amt;
@@ -509,7 +509,7 @@ long long increase_money_copper(struct char_data *ch, long long amt)
   return GET_MONEY(ch);
 }
 
-long long increase_bank_copper(struct char_data *ch, long long amt)
+long long increase_bank_gold(struct char_data *ch, long long amt)
 {
   long long curr;
   long long updated;
@@ -553,10 +553,10 @@ int decrease_diamonds(struct char_data *ch, int deduction)
   return increase_diamonds(ch, -deduction);
 }
 
-/* Legacy API: arguments are in gold units, converted to copper units internally. */
+/* Legacy API: arguments are in gold units (authoritative currency unit). */
 int increase_gold(struct char_data *ch, int amt_gold)
 {
-  return (int)(increase_money_copper(ch, (long long)amt_gold * COPPER_PER_GOLD) / COPPER_PER_GOLD);
+  return (int)increase_money_gold(ch, (long long)amt_gold);
 }
 
 int decrease_gold(struct char_data *ch, int deduction_gold)
@@ -566,7 +566,7 @@ int decrease_gold(struct char_data *ch, int deduction_gold)
 
 int increase_bank(struct char_data *ch, int amt_gold)
 {
-  return (int)(increase_bank_copper(ch, (long long)amt_gold * COPPER_PER_GOLD) / COPPER_PER_GOLD);
+  return (int)increase_bank_gold(ch, (long long)amt_gold);
 }
 
 int decrease_bank(struct char_data *ch, int deduction_gold)

@@ -2905,7 +2905,6 @@ static struct set_struct {
    { "wis", 		LVL_BUILDER, 	BOTH, 	NUMBER }, /* 55 */
    { "questpoints",     LVL_GOD,        PC,     NUMBER },
    { "questhistory",    LVL_GOD,        PC,   NUMBER },
-  { "copper",          LVL_BUILDER,    BOTH,   NUMBER },
   { "diamond",         LVL_BUILDER,    BOTH,   NUMBER },
   { "diamonds",        LVL_BUILDER,    BOTH,   NUMBER },
    { "\n", 0, BOTH, MISC }
@@ -3038,10 +3037,8 @@ static int perform_set(struct char_data *ch, struct char_data *vict, int mode, c
       break;
     case 16: /* gold */
         {
-          long long cur = (long long)GET_MONEY(vict);
-          long long rem = cur % COPPER_PER_GOLD;
           long long ng = (long long)RANGE(0, 999999);
-          long long after = (ng * COPPER_PER_GOLD) + rem;
+          long long after = ng;
           if (after < 0) after = 0;
           if (after > MAX_MONEY) after = MAX_MONEY;
           GET_MONEY(vict) = after;

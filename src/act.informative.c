@@ -1058,9 +1058,7 @@ static bool parse_bounty_amount(const char *arg, long long *amount_out)
     if (isalpha((unsigned char)suffix)) {
       token[tlen - 1] = '\0';
       switch (tolower((unsigned char)suffix)) {
-        case 'g': multiplier = COPPER_PER_GOLD; break;
-        case 's': multiplier = COPPER_PER_SILVER; break;
-        case 'c': multiplier = 1; break;
+        case 'g': multiplier = 1; break;
         default: return FALSE; /* Unknown suffix */
       }
     }
@@ -1613,7 +1611,7 @@ ACMD(do_finger)
   const char *bounty_color = bounty > 0 ? BY : R;
   char bounty_buf[64];
 
-  format_copper_as_currency(bounty_buf, sizeof(bounty_buf), bounty);
+  format_gold_as_currency(bounty_buf, sizeof(bounty_buf), bounty);
 
   /* Top border */
   len += snprintf(buf + len, sizeof(buf) - len,
@@ -1679,7 +1677,7 @@ ACMD(do_bounty)
   strlcpy(amount_buf, argument, sizeof(amount_buf));
 
   if (!parse_bounty_amount(amount_buf, &amount) || amount <= 0) {
-    send_to_char(ch, "Invalid bounty amount. Use numbers or amounts like 10g 5s 2c.\r\n");
+    send_to_char(ch, "Invalid bounty amount. Use numbers or amounts like 10g.\r\n");
     return;
   }
 
@@ -1716,13 +1714,13 @@ ACMD(do_bounty)
     return;
   }
 
-  increase_money_copper(ch, -amount);
+  increase_money_gold(ch, -amount);
   SET_BOUNTY(vict, GET_BOUNTY(vict) + amount);
 
   save_char(ch);
   save_char(vict);
 
-  format_copper_as_currency(bounty_buf, sizeof(bounty_buf), amount);
+  format_gold_as_currency(bounty_buf, sizeof(bounty_buf), amount);
 
   send_to_char(ch, "You place a bounty of %s on %s.\r\n", bounty_buf, GET_NAME(vict));
   if (!from_file && vict->desc)

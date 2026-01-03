@@ -142,11 +142,10 @@ int decrease_gold(struct char_data *ch, int amt);
 int increase_bank(struct char_data *ch, int amt);
 int decrease_bank(struct char_data *ch, int amt);
 
-long long increase_money_copper(struct char_data *ch, long long amt);
-long long increase_bank_copper(struct char_data *ch, long long amt);
+long long increase_money_gold(struct char_data *ch, long long amt);
+long long increase_bank_gold(struct char_data *ch, long long amt);
 int increase_diamonds(struct char_data *ch, int amt);
 int decrease_diamonds(struct char_data *ch, int amt);
-void format_copper_as_currency(char *out, size_t outsz, long long total_copper);
 void format_gold_as_currency(char *out, size_t outsz, long long total_gold);
 /* in class.c */
 void    advance_level(struct char_data *ch);
@@ -537,14 +536,11 @@ do                                                              \
 #define GET_MANA(ch)	  ((ch)->points.mana)
 /** Maximum mana points (magic) of ch. */
 #define GET_MAX_MANA(ch)  ((ch)->points.max_mana)
-/** Money stored as gold on ch (authoritative currency unit). */
-#define GET_COPPER(ch)       ((ch)->points.money)
-#define GET_MONEY(ch)        GET_COPPER(ch)
-/** Gold in bank */
-#define GET_BANK_COPPER(ch)  ((ch)->points.bank_money)
-#define GET_BANK_MONEY(ch)   GET_BANK_COPPER(ch)
+/** Gold stored on ch (authoritative currency unit). */
+#define GET_MONEY(ch)        GET_GOLD(ch)
 /** Gold views are authoritative lvalues. */
 #define GET_GOLD(ch)         ((ch)->points.money)
+#define GET_BANK_MONEY(ch)   GET_BANK_GOLD(ch)
 #define GET_BANK_GOLD(ch)    ((ch)->points.bank_money)
 /** Diamonds on ch */
 #define GET_DIAMONDS(ch)   ((ch)->points.diamonds)

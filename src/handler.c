@@ -1273,17 +1273,17 @@ int get_obj_pos_in_equip_vis(struct char_data *ch, char *arg, int *number, struc
   return (-1);
 }
 
-const char *money_desc(int amount_copper)
+const char *money_desc(int amount_gold)
 {
   static char buf[128];
 
-  if (amount_copper <= 0) {
-    log("SYSERR: Try to create negative or 0 money (%d).", amount_copper);
+  if (amount_gold <= 0) {
+    log("SYSERR: Try to create negative or 0 money (%d).", amount_gold);
     return (NULL);
   }
 
   {
-    long long count = (long long)amount_copper;
+    long long count = (long long)amount_gold;
 
     if (count == 1)
       snprintf(buf, sizeof(buf), "a gold coin");
@@ -1295,7 +1295,7 @@ const char *money_desc(int amount_copper)
 }
 
 
-struct obj_data *create_money(int amount_copper, int denom_hint)
+struct obj_data *create_money(int amount_gold, int denom_hint)
 {
   struct obj_data *obj;
   struct extra_descr_data *new_descr;
@@ -1307,17 +1307,16 @@ struct obj_data *create_money(int amount_copper, int denom_hint)
 
   (void)denom_hint;
 
-  if (amount_copper <= 0) {
-    log("SYSERR: Try to create negative or 0 money. (%d)", amount_copper);
+  if (amount_gold <= 0) {
+    log("SYSERR: Try to create negative or 0 money. (%d)", amount_gold);
     return (NULL);
   }
 
-  unit = COPPER_PER_GOLD;
   metal = "gold";
 
   {
-    long long count = (long long)amount_copper / unit;
-    long long rem   = (long long)amount_copper % unit;
+    long long count = (long long)amount_gold / unit;
+    long long rem   = (long long)amount_gold % unit;
     int singular = (count == 1 && rem == 0);
 
     obj = create_obj();
@@ -1365,8 +1364,8 @@ struct obj_data *create_money(int amount_copper, int denom_hint)
       obj->obj_flags.wear_flags[y] = 0;
     SET_BIT_AR(GET_OBJ_WEAR(obj), ITEM_WEAR_TAKE);
 
-    GET_OBJ_VAL(obj, 0) = amount_copper;
-    GET_OBJ_COST(obj) = MAX(1, amount_copper);
+    GET_OBJ_VAL(obj, 0) = amount_gold;
+    GET_OBJ_COST(obj) = MAX(1, amount_gold);
     obj->item_number = NOTHING;
 
     return obj;
