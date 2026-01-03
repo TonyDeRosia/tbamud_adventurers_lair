@@ -729,6 +729,7 @@ something to happen.
 40 1600
 8 8 2
 BareHandAttack: 4
+PetPrice: 20
 E
 #31557
 hawk pets~
@@ -743,6 +744,7 @@ with it, it may decide to peck your eyes out!
 100 10000
 8 8 0
 BareHandAttack: 4
+PetPrice: 35
 E
 #31558
 teleport operator man~
