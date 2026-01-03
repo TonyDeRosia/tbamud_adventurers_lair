@@ -34,6 +34,9 @@ static int has_key(struct char_data *ch, obj_vnum key);
 static void do_doorcmd(struct char_data *ch, struct obj_data *obj, int door, int scmd);
 static int ok_pick(struct char_data *ch, obj_vnum keynum, int pickproof, int scmd);
 static int furniture_occupants(struct obj_data *obj);
+static int furniture_is_available(struct char_data *ch, struct obj_data *obj);
+static struct obj_data *find_furniture(struct char_data *ch, char *arg, const char *verb, int *state);
+static void place_char_on_furniture(struct char_data *ch, struct obj_data *furniture);
 
 
 /* simple function to determine if char can walk on water */
@@ -73,6 +76,111 @@ static int furniture_occupants(struct obj_data *obj)
     count++;
 
   return count;
+}
+
+static int furniture_is_available(struct char_data *ch, struct obj_data *obj)
+{
+  int capacity, occupants;
+
+  if (!obj || GET_OBJ_TYPE(obj) != ITEM_FURNITURE || !CAN_SEE_OBJ(ch, obj))
+    return FALSE;
+
+  capacity = GET_OBJ_VAL(obj, 1);
+  occupants = furniture_occupants(obj);
+
+  if (SITTING(ch) == obj)
+    occupants--;
+
+  if (capacity > 0 && occupants >= capacity)
+    return FALSE;
+
+  return TRUE;
+}
+
+static struct obj_data *find_furniture(struct char_data *ch, char *arg, const char *verb, int *state)
+{
+  struct obj_data *obj, *furniture = NULL;
+  int count = 0;
+
+  *state = 0;
+
+  if (arg && *arg) {
+    obj = get_obj_in_list_vis(ch, arg, NULL, world[ch->in_room].contents);
+
+    if (!obj) {
+      send_to_char(ch, "You don't see that here.\r\n");
+      *state = -2;
+      return NULL;
+    }
+
+    if (GET_OBJ_TYPE(obj) != ITEM_FURNITURE) {
+      send_to_char(ch, "You can't %s that.\r\n", verb);
+      *state = -2;
+      return NULL;
+    }
+
+    if (!furniture_is_available(ch, obj)) {
+      act("There is nowhere left to use $p right now.", TRUE, ch, obj, 0, TO_CHAR);
+      *state = -2;
+      return NULL;
+    }
+
+    *state = 1;
+    return obj;
+  }
+
+  if (SITTING(ch) && GET_OBJ_TYPE(SITTING(ch)) == ITEM_FURNITURE &&
+      CAN_SEE_OBJ(ch, SITTING(ch)) && furniture_is_available(ch, SITTING(ch))) {
+    *state = 1;
+    return SITTING(ch);
+  }
+
+  for (obj = world[ch->in_room].contents; obj; obj = obj->next_content) {
+    if (!furniture_is_available(ch, obj))
+      continue;
+
+    furniture = obj;
+    count++;
+
+    if (count > 1)
+      break;
+  }
+
+  if (count == 1) {
+    *state = 1;
+    return furniture;
+  }
+
+  if (count > 1) {
+    send_to_char(ch, "You'll need to specify which piece of furniture you want to %s.\r\n", verb);
+    *state = -1;
+  }
+
+  return NULL;
+}
+
+static void place_char_on_furniture(struct char_data *ch, struct obj_data *furniture)
+{
+  struct char_data *tempch;
+
+  if (!furniture || GET_OBJ_TYPE(furniture) != ITEM_FURNITURE)
+    return;
+
+  if (SITTING(ch) == furniture)
+    return;
+
+  char_from_furniture(ch);
+
+  if (OBJ_SAT_IN_BY(furniture) == NULL) {
+    OBJ_SAT_IN_BY(furniture) = ch;
+  } else {
+    for (tempch = OBJ_SAT_IN_BY(furniture); NEXT_SITTING(tempch); tempch = NEXT_SITTING(tempch))
+      ;
+    NEXT_SITTING(tempch) = ch;
+  }
+
+  SITTING(ch) = furniture;
+  NEXT_SITTING(ch) = NULL;
 }
 
 /* Simple function to determine if char can fly. */
@@ -866,57 +974,40 @@ ACMD(do_sit)
 {
   char arg[MAX_STRING_LENGTH];
   struct obj_data *furniture;
-  struct char_data *tempch;
-  int found, capacity, occupants;
+  int state;
 
   one_argument(argument, arg);
 
-  if (!(furniture = get_obj_in_list_vis(ch, arg, NULL, world[ch->in_room].contents)))
-    found = 0;
-  else
-    found = 1;
+  furniture = find_furniture(ch, arg, "sit on", &state);
 
-  if (found) {
-    capacity = GET_OBJ_VAL(furniture, 1);
-    occupants = furniture_occupants(furniture);
-  } else {
-    capacity = 0;
-    occupants = 0;
-  }
+  if (state < 0)
+    return;
 
   switch (GET_POS(ch)) {
   case POS_STANDING:
-    if (found == 0) {
+    if (state == 1 && furniture) {
+      place_char_on_furniture(ch, furniture);
+      act("You sit down upon $p.", TRUE, ch, furniture, 0, TO_CHAR);
+      act("$n sits down upon $p.", TRUE, ch, furniture, 0, TO_ROOM);
+      GET_POS(ch) = POS_SITTING;
+    } else {
       send_to_char(ch, "You sit down.\r\n");
       act("$n sits down.", FALSE, ch, 0, 0, TO_ROOM);
       GET_POS(ch) = POS_SITTING;
-    } else {
-      if (GET_OBJ_TYPE(furniture) != ITEM_FURNITURE) {
-        send_to_char(ch, "You can't sit on that!\r\n");
-        return;
-      } else if (capacity > 0 && occupants >= capacity) {
-        act("There is no where left to sit upon $p.", TRUE, ch, furniture, 0, TO_CHAR);
-        return;
-      } else {
-        if (OBJ_SAT_IN_BY(furniture) == NULL)
-          OBJ_SAT_IN_BY(furniture) = ch;
-        for (tempch = OBJ_SAT_IN_BY(furniture); tempch != ch ; tempch = NEXT_SITTING(tempch)) {
-          if (NEXT_SITTING(tempch))
-            continue;
-          NEXT_SITTING(tempch) = ch;
-        }
-        act("You sit down upon $p.", TRUE, ch, furniture, 0, TO_CHAR);
-        act("$n sits down upon $p.", TRUE, ch, furniture, 0, TO_ROOM);
-        SITTING(ch) = furniture;
-        NEXT_SITTING(ch) = NULL;
-        GET_POS(ch) = POS_SITTING;
-      }
     }
     break;
   case POS_SITTING:
-    send_to_char(ch, "You're sitting already.\r\n");
+    if (state == 1 && furniture && SITTING(ch) != furniture) {
+      place_char_on_furniture(ch, furniture);
+      act("You move over and sit upon $p.", TRUE, ch, furniture, 0, TO_CHAR);
+      act("$n moves over and sits upon $p.", TRUE, ch, furniture, 0, TO_ROOM);
+    } else
+      send_to_char(ch, "You're sitting already.\r\n");
     break;
   case POS_RESTING:
+    if (state == 1 && furniture && SITTING(ch) != furniture)
+      place_char_on_furniture(ch, furniture);
+
     send_to_char(ch, "You stop resting, and sit up.\r\n");
     act("$n stops resting.", TRUE, ch, 0, 0, TO_ROOM);
     GET_POS(ch) = POS_SITTING;
@@ -937,19 +1028,46 @@ ACMD(do_sit)
 
 ACMD(do_rest)
 {
+  char arg[MAX_INPUT_LENGTH];
+  struct obj_data *furniture;
+  int state;
+
+  one_argument(argument, arg);
+  furniture = find_furniture(ch, arg, "rest on", &state);
+
+  if (state < 0)
+    return;
+
   switch (GET_POS(ch)) {
   case POS_STANDING:
-    send_to_char(ch, "You sit down and rest your tired bones.\r\n");
-    act("$n sits down and rests.", TRUE, ch, 0, 0, TO_ROOM);
+    if (state == 1 && furniture) {
+      place_char_on_furniture(ch, furniture);
+      act("You rest upon $p.", TRUE, ch, furniture, 0, TO_CHAR);
+      act("$n rests upon $p.", TRUE, ch, furniture, 0, TO_ROOM);
+    } else {
+      send_to_char(ch, "You sit down and rest your tired bones.\r\n");
+      act("$n sits down and rests.", TRUE, ch, 0, 0, TO_ROOM);
+    }
     GET_POS(ch) = POS_RESTING;
     break;
   case POS_SITTING:
-    send_to_char(ch, "You rest your tired bones.\r\n");
-    act("$n rests.", TRUE, ch, 0, 0, TO_ROOM);
+    if (state == 1 && furniture) {
+      place_char_on_furniture(ch, furniture);
+      act("You rest upon $p.", TRUE, ch, furniture, 0, TO_CHAR);
+      act("$n rests upon $p.", TRUE, ch, furniture, 0, TO_ROOM);
+    } else {
+      send_to_char(ch, "You rest your tired bones.\r\n");
+      act("$n rests.", TRUE, ch, 0, 0, TO_ROOM);
+    }
     GET_POS(ch) = POS_RESTING;
     break;
   case POS_RESTING:
-    send_to_char(ch, "You are already resting.\r\n");
+    if (state == 1 && furniture && SITTING(ch) != furniture) {
+      place_char_on_furniture(ch, furniture);
+      act("You settle onto $p.", TRUE, ch, furniture, 0, TO_CHAR);
+      act("$n settles onto $p.", TRUE, ch, furniture, 0, TO_ROOM);
+    } else
+      send_to_char(ch, "You are already resting.\r\n");
     break;
   case POS_SLEEPING:
     send_to_char(ch, "You have to wake up first.\r\n");
@@ -967,12 +1085,28 @@ ACMD(do_rest)
 
 ACMD(do_sleep)
 {
+  char arg[MAX_INPUT_LENGTH];
+  struct obj_data *furniture;
+  int state;
+
+  one_argument(argument, arg);
+  furniture = find_furniture(ch, arg, "sleep on", &state);
+
+  if (state < 0)
+    return;
+
   switch (GET_POS(ch)) {
   case POS_STANDING:
   case POS_SITTING:
   case POS_RESTING:
-    send_to_char(ch, "You go to sleep.\r\n");
-    act("$n lies down and falls asleep.", TRUE, ch, 0, 0, TO_ROOM);
+    if (state == 1 && furniture) {
+      place_char_on_furniture(ch, furniture);
+      act("You lie down upon $p and fall asleep.", TRUE, ch, furniture, 0, TO_CHAR);
+      act("$n lies down upon $p and falls asleep.", TRUE, ch, furniture, 0, TO_ROOM);
+    } else {
+      send_to_char(ch, "You go to sleep.\r\n");
+      act("$n lies down and falls asleep.", TRUE, ch, 0, 0, TO_ROOM);
+    }
     GET_POS(ch) = POS_SLEEPING;
     break;
   case POS_SLEEPING:

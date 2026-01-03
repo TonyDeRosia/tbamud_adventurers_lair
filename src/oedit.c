@@ -622,11 +622,17 @@ static void oedit_disp_menu(struct descriptor_data *d)
 {
   char buf1[MAX_STRING_LENGTH];
   char buf2[MAX_STRING_LENGTH];
+  char regen_buf[MAX_INPUT_LENGTH];
   struct obj_data *obj;
 
   obj = OLC_OBJ(d);
   get_char_colors(d->character);
   clear_screen(d);
+
+  if (GET_OBJ_TYPE(obj) == ITEM_FURNITURE || GET_OBJ_TYPE(obj) == ITEM_WEAPON)
+    snprintf(regen_buf, sizeof(regen_buf), "%d", GET_OBJ_VAL(obj, 0));
+  else
+    snprintf(regen_buf, sizeof(regen_buf), "N/A");
 
   /* Build buffers for first part of menu. */
   sprinttype(GET_OBJ_TYPE(obj), item_types, buf1, sizeof(buf1));
@@ -656,13 +662,14 @@ static void oedit_disp_menu(struct descriptor_data *d)
 
   write_to_output(d,
 	  "%s7%s) Wear flags  : %s%s\r\n"
-	  "%s8%s) Weight      : %s%d\r\n"
-	  "%s9%s) Cost        : %s%d\r\n"
-	  "%sA%s) Cost/Day    : %s%d\r\n"
-	  "%sB%s) Timer       : %s%d\r\n"
-	  "%sC%s) Values      : %s%d %d %d %d\r\n"
-	  "%sD%s) Applies menu\r\n"
-	  "%sE%s) Extra descriptions menu: %s%s%s\r\n"
+          "%s8%s) Weight      : %s%d\r\n"
+          "%s9%s) Cost        : %s%d\r\n"
+          "%sA%s) Cost/Day    : %s%d\r\n"
+          "%sB%s) Timer       : %s%d\r\n"
+          "%sR%s) Regen Mult  : %s%s\r\n"
+          "%sC%s) Values      : %s%d %d %d %d\r\n"
+          "%sD%s) Applies menu\r\n"
+          "%sE%s) Extra descriptions menu: %s%s%s\r\n"
           "%sM%s) Min Level   : %s%d\r\n"
           "%sP%s) Perm Affects: %s%s\r\n"
 	  "%sS%s) Script      : %s%s\r\n"
@@ -672,13 +679,14 @@ static void oedit_disp_menu(struct descriptor_data *d)
 	  "Enter choice : ",
 
 	  grn, nrm, cyn, buf1,
-	  grn, nrm, cyn, GET_OBJ_WEIGHT(obj),
-	  grn, nrm, cyn, GET_OBJ_COST(obj),
-	  grn, nrm, cyn, GET_OBJ_RENT(obj),
-	  grn, nrm, cyn, GET_OBJ_TIMER(obj),
-	  grn, nrm, cyn, GET_OBJ_VAL(obj, 0),
-	  GET_OBJ_VAL(obj, 1),
-	  GET_OBJ_VAL(obj, 2),
+          grn, nrm, cyn, GET_OBJ_WEIGHT(obj),
+          grn, nrm, cyn, GET_OBJ_COST(obj),
+          grn, nrm, cyn, GET_OBJ_RENT(obj),
+          grn, nrm, cyn, GET_OBJ_TIMER(obj),
+          grn, nrm, cyn, regen_buf,
+          grn, nrm, cyn, GET_OBJ_VAL(obj, 0),
+          GET_OBJ_VAL(obj, 1),
+          GET_OBJ_VAL(obj, 2),
 	  GET_OBJ_VAL(obj, 3),
 	  grn, nrm, grn, nrm, cyn, obj->ex_description ? "Set." : "Not Set.", grn,
           grn, nrm, cyn, GET_OBJ_LEVEL(obj),
@@ -793,6 +801,16 @@ void oedit_parse(struct descriptor_data *d, char *arg)
     case 'B':
       write_to_output(d, "Enter timer : ");
       OLC_MODE(d) = OEDIT_TIMER;
+      break;
+    case 'r':
+    case 'R':
+      if (GET_OBJ_TYPE(OLC_OBJ(d)) != ITEM_FURNITURE && GET_OBJ_TYPE(OLC_OBJ(d)) != ITEM_WEAPON) {
+        write_to_output(d, "This object type does not support a regen multiplier.\r\n");
+        oedit_disp_menu(d);
+      } else {
+        write_to_output(d, "Enter regen multiplier (0/1 for normal) : ");
+        OLC_MODE(d) = OEDIT_REGEN_MULT;
+      }
       break;
     case 'c':
     case 'C':
@@ -932,6 +950,10 @@ void oedit_parse(struct descriptor_data *d, char *arg)
     GET_OBJ_TIMER(OLC_OBJ(d)) = LIMIT(atoi(arg), 0, MAX_OBJ_TIMER);
     break;
 
+  case OEDIT_REGEN_MULT:
+    GET_OBJ_VAL(OLC_OBJ(d), 0) = MAX(0, atoi(arg));
+    break;
+
   case OEDIT_LEVEL:
     GET_OBJ_LEVEL(OLC_OBJ(d)) = LIMIT(atoi(arg), 0, LVL_IMPL);
     break;
@@ -952,11 +974,11 @@ void oedit_parse(struct descriptor_data *d, char *arg)
     number = atoi(arg);
     switch (GET_OBJ_TYPE(OLC_OBJ(d))) {
     case ITEM_FURNITURE:
-      GET_OBJ_VAL(OLC_OBJ(d), 0) = LIMIT(number, 0, 3);
+      GET_OBJ_VAL(OLC_OBJ(d), 0) = MAX(number, 0);
       oedit_disp_val2_menu(d);
       return;
     case ITEM_WEAPON:
-      GET_OBJ_VAL(OLC_OBJ(d), 0) = MIN(MAX(atoi(arg), -50), 50);
+      GET_OBJ_VAL(OLC_OBJ(d), 0) = MAX(atoi(arg), 0);
       break;
     case ITEM_CONTAINER:
       GET_OBJ_VAL(OLC_OBJ(d), 0) = LIMIT(atoi(arg), -1, MAX_CONTAINER_SIZE);
