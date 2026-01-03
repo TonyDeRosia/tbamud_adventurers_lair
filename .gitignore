@@ -20,8 +20,14 @@ mudrun.log
 syslog.*
 syslog.CRASH
 log/
+plrfiles/
+plrobjs/
+plrtext/
+plrvars/
 lib/plrfiles/
 lib/plrobjs/
+lib/plrtext/
+lib/plrvars/
 lib/etc/plrmail
 lib/etc/time
 src/depend
