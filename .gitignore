@@ -20,9 +20,16 @@ mudrun.log
 syslog.*
 syslog.CRASH
 log/
-lib/plrfiles/
 lib/plrobjs/
 lib/etc/plrmail
 lib/etc/time
 src/depend
 src/util/depend
+
+# runtime playerfiles
+lib/plrfiles/
+
+# runtime player + account data (DO NOT COMMIT)
+lib/plrfiles/
+lib/plrfiles/**
+

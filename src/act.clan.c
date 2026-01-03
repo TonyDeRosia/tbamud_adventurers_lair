@@ -6,11 +6,13 @@ extern struct descriptor_data *descriptor_list;
 #include "structs.h"
 #include "utils.h"
 #include "comm.h"
+#include "screen.h"
 #include "interpreter.h"
 #include "handler.h"
 #include "db.h"
 #include "clan.h"
 #include "modify.h"
+#include "fight.h"
 
 /* rank ideas for now */
 #define CLAN_RANK_MEMBER 0
@@ -31,10 +33,11 @@ static void send_to_clan(int clan_id, const char *msg, struct char_data *from)
     if (GET_CLAN_ID(d->character) != clan_id)
       continue;
 
-    if (from)
-      send_to_char(d->character, "\r\n[Clan] %s: %s\r\n", GET_NAME(from), msg);
-    else
-      send_to_char(d->character, "\r\n[Clan] %s\r\n", msg);
+  if (from)
+    send_to_char(d->character, "\r\n\tG[Clan] %s: %s\r\n", GET_NAME(from), msg);
+  else
+    send_to_char(d->character, "\r\n\tG[Clan] %s\r\n", msg);
+
   }
 }
 
@@ -108,6 +111,7 @@ static void clan_help(struct char_data *ch)
     "  clan                 shows your clan status\r\n"
     "  clan list            shows clan file location\r\n"
     "  clan <message>       sends clan chat\r\n"
+    "  togglepvp            toggle your clan PvP status if allowed\r\n"
     "Shortcuts:\r\n"
     "  ccreate <Name>       create clan (admins level 104 only)\r\n"
     "  cinvite <player>     not active yet\r\n"
@@ -160,12 +164,73 @@ static const char *roster_class_name(int id)
   return "Unknown";
 }
 
+/* Pad a field to a fixed visible width while preserving color codes. */
+static void roster_pad_field(char *out, size_t outsz, const char *src, int width)
+{
+  int vis = 0;
+  size_t pos = 0;
+  int color_active = FALSE;
+
+  if (!out || outsz == 0)
+    return;
+
+  out[0] = '\0';
+
+  if (width < 0)
+    width = 0;
+
+  if (!src)
+    src = "";
+
+  for (const char *s = src; *s && pos + 1 < outsz; ) {
+    if (*s == '@' && *(s + 1)) {
+      color_active = (*(s + 1) != 'n');
+      if (pos + 2 < outsz) {
+        out[pos++] = *s++;
+        out[pos++] = *s++;
+      }
+      continue;
+    }
+
+    if (*s == '\t' && *(s + 1)) {
+      color_active = (*(s + 1) != 'n');
+      if (pos + 2 < outsz) {
+        out[pos++] = *s++;
+        out[pos++] = *s++;
+      }
+      continue;
+    }
+
+    if (vis >= width) {
+      s++;
+      continue;
+    }
+
+    out[pos++] = *s++;
+    vis++;
+  }
+
+  if (color_active && pos + 2 < outsz) {
+    out[pos++] = '\t';
+    out[pos++] = 'n';
+  }
+
+  for (; vis < width && pos + 1 < outsz; vis++)
+    out[pos++] = ' ';
+
+  out[pos] = '\0';
+}
+
 
 static void clan_show_roster(struct char_data *ch)
 {
   struct descriptor_data *d;
   struct char_data *tch;
   int clan_id, count = 0;
+  const char *B = CCBLU(ch, C_NRM);
+  const char *R = CCNRM(ch, C_NRM);
+  const char *Y = CCYEL(ch, C_NRM);
+  const char *C = CCCYN(ch, C_NRM);
 
   clan_id = GET_CLAN_ID(ch);
   if (clan_id <= 0) {
@@ -215,33 +280,49 @@ static void clan_show_roster(struct char_data *ch)
 
   send_to_char(ch,
     "\r\n"
-    "╔══════════════════════════════════════════════════════════════════════╗\r\n"
-    "║                              Clan Roster                             ║\r\n"
-    "╠══════════════════════════════════════════════════════════════════════╣\r\n"
-    "║ Name                     Race            Class            Level      ║\r\n"
-    "╠══════════════════════════════════════════════════════════════════════╣\r\n"
-  );
+    "%s╔══════════════════════════════════════════════════════════════════════╗%s\r\n"
+    "%s║%s                              %sClan Roster%s                             %s║\r\n"
+    "%s╠══════════════════════════════════════════════════════════════════════╣%s\r\n"
+    "%s║ %sName%s                     %sRace%s            %sClass%s            %sLevel%s      %s║\r\n"
+    "%s╠══════════════════════════════════════════════════════════════════════╣%s\r\n",
+    B, R,
+    B, R, Y, R, B,
+    B, R,
+    B, C, R, C, R, C, R, C, R, B,
+    B, R);
 
   if (count == 0) {
     send_to_char(ch,
-      "║ No clan members are currently online.                                ║\r\n"
+      "%s║%s No clan members are currently online.                                %s║\r\n",
+      B, R, B
     );
   } else {
+    char namebuf[128];
+    char racebuf[64];
+    char classbuf[64];
+
     for (i = 0; i < count; i++) {
       const char *rname = roster_race_name(GET_RACE(list[i]));
       const char *cname = roster_class_name(GET_CLASS(list[i]));
-      send_to_char(ch, "║ %-24.24s %-15.15s %-15.15s %5d      ║\r\n",
-        GET_NAME(list[i]),
-        (rname ? rname : "Unknown"),
-        (cname ? cname : "Unknown"),
-        GET_LEVEL(list[i])
+      roster_pad_field(namebuf, sizeof(namebuf), GET_NAME(list[i]), 24);
+      roster_pad_field(racebuf, sizeof(racebuf), (rname ? rname : "Unknown"), 15);
+      roster_pad_field(classbuf, sizeof(classbuf), (cname ? cname : "Unknown"), 15);
+
+      send_to_char(ch, "%s║%s %s %s %s %5d       %s║\r\n",
+        B, R,
+        namebuf,
+        racebuf,
+        classbuf,
+        GET_LEVEL(list[i]),
+        B
       );
     }
   }
 
   send_to_char(ch,
-    "╚══════════════════════════════════════════════════════════════════════╝\r\n"
-    "\r\n"
+    "%s╚══════════════════════════════════════════════════════════════════════╝%s\r\n"
+    "\r\n",
+    B, R
   );
 
   if (list)
@@ -276,7 +357,23 @@ static int clanlist_cmp(const void *a, const void *b)
 #define CLANEDIT_SET_NAME 1
 #define CLANEDIT_SET_DISPLAY_NAME 2
 #define CLANEDIT_SET_TAG 3
-#define CLANEDIT_CONFIRM_QUIT 4
+#define CLANEDIT_SET_PVP_TYPE 4
+#define CLANEDIT_CONFIRM_QUIT 5
+
+static void clanedit_pvp_menu(struct descriptor_data *d)
+{
+  write_to_output(d,
+    "\r\n"
+    "Clan PvP/PK Type\r\n"
+    "Editing: %s\r\n"
+    "\r\n"
+    "0) No PvP / No PK\r\n"
+    "1) Always PvP / PK always on\r\n"
+    "2) Toggle PvP / PK\r\n"
+    "\r\n"
+    "Enter choice: ",
+    clan_display_name_by_id(d->clanedit_id));
+}
 
 static void clanedit_menu(struct descriptor_data *d)
 {
@@ -285,6 +382,7 @@ static void clanedit_menu(struct descriptor_data *d)
   const char *disp = clan_display_name_by_id(id);
   if (!nm) nm = "(unknown)";
   if (!disp) disp = "(unknown)";
+  const char *pvp_name = clan_pvp_type_name(clan_pvp_type_by_id(id));
 
   write_to_output(d,
     "\r\n"
@@ -295,10 +393,11 @@ static void clanedit_menu(struct descriptor_data *d)
     "1) Name (plain, used for commands)\r\n"
     "2) Display name (colors shown to players)\r\n"
     "3) Tag\r\n"
+    "4) PvP/PK Type: %s\r\n"
     "Q) Quit\r\n"
     "\r\n"
     "Enter choice: ",
-    id, disp, nm);
+    id, disp, nm, pvp_name);
 }
 
 void clanedit_parse(struct descriptor_data *d, char *arg)
@@ -374,6 +473,25 @@ void clanedit_parse(struct descriptor_data *d, char *arg)
       d->clanedit_mode = CLANEDIT_MAIN;
       clanedit_menu(d);
       return;
+    case CLANEDIT_SET_PVP_TYPE:
+      switch (*arg) {
+        case '0':
+        case '1':
+        case '2': {
+          int pvp_type = *arg - '0';
+          if (!clan_set_pvp_type_and_save(d->clanedit_id, pvp_type)) {
+            write_to_output(d, "Unable to save the new PvP type.\r\n");
+          } else {
+            write_to_output(d, "Clan PvP/PK type updated to %s.\r\n", clan_pvp_type_name(pvp_type));
+          }
+          d->clanedit_mode = CLANEDIT_MAIN;
+          clanedit_menu(d);
+          return;
+        }
+        default:
+          write_to_output(d, "Invalid choice. Enter 0, 1, or 2: ");
+          return;
+      }
 
     case CLANEDIT_CONFIRM_QUIT:
       if (!*arg) {
@@ -425,6 +543,10 @@ void clanedit_parse(struct descriptor_data *d, char *arg)
       d->clanedit_mode = CLANEDIT_SET_TAG;
       write_to_output(d, "Enter new clan tag (shown in who): ");
       return;
+    case '4':
+      d->clanedit_mode = CLANEDIT_SET_PVP_TYPE;
+      clanedit_pvp_menu(d);
+      return;
     case 'q':
       d->clanedit_mode = CLANEDIT_CONFIRM_QUIT;
       write_to_output(d, "Save changes before exiting? (Y/N): ");
@@ -456,7 +578,12 @@ ACMD(do_clist)
     max_id = (int)(sizeof(rows) / sizeof(rows[0]));
 
   for (i = 1; i < max_id; i++) {
-    const char *nm = clan_name_by_id(i);
+    const char *nm;
+
+    if (!clan_exists(i))
+      continue;
+
+    nm = clan_name_by_id(i);
     if (!nm || !*nm)
       continue;
 
@@ -545,6 +672,49 @@ ACMD(do_clanedit)
   clanedit_menu(ch->desc);
 }
 
+ACMD(do_clan_pvp_toggle)
+{
+  int clan_type;
+
+  if (IS_NPC(ch))
+    return;
+
+  if (GET_CLAN_ID(ch) <= 0) {
+    send_to_char(ch, "You are not in a clan.\r\n");
+    return;
+  }
+
+  clan_type = clan_pvp_type_by_id(GET_CLAN_ID(ch));
+
+  switch (clan_type) {
+    case CLAN_PVP_ALWAYS:
+      send_to_char(ch, "Your clan is always PvP enabled.\r\n");
+      return;
+    case CLAN_PVP_NO_PVP:
+      send_to_char(ch, "Your clan forbids PvP.\r\n");
+      return;
+    case CLAN_PVP_TOGGLE:
+      if (PRF_FLAGGED(ch, PRF_CLAN_PVP)) {
+        int remain = clan_pvp_lock_remaining(ch);
+        if (remain > 0) {
+          int mins = remain / 60;
+          int secs = remain % 60;
+          send_to_char(ch, "Your PvP flag is locked on for %d:%02d more (mm:ss).\r\n", mins, secs);
+          return;
+        }
+
+        REMOVE_BIT_AR(PRF_FLAGS(ch), PRF_CLAN_PVP);
+        send_to_char(ch, "PvP deactivated.\r\n");
+      } else {
+        SET_BIT_AR(PRF_FLAGS(ch), PRF_CLAN_PVP);
+        send_to_char(ch, "PvP activated.\r\n");
+        send_to_char(ch, "If you attack another player while enabled, you will be locked on for 30 minutes.\r\n");
+      }
+      save_char(ch);
+      return;
+  }
+}
+
 
 
 ACMD(do_roster)
@@ -574,6 +744,10 @@ ACMD(do_clan)
     send_to_char(ch, "Usage:\r\n  clan <message>\r\n  cjoin <clan name or id>\r\n  cquit\r\n");
     return;
   }
+
+  /* Preserve the original text for chat so spacing is not lost during parsing. */
+  char original_message[MAX_INPUT_LENGTH * 2];
+  strlcpy(original_message, argument, sizeof(original_message));
 
   /* Parse first word. We allow both: "clan join X" and wrapper calls like cjoin -> "join X". */
   argument = any_one_arg(argument, arg1);
@@ -637,15 +811,8 @@ ACMD(do_clan)
     return;
   }
 
-  /* Rebuild the message with arg1 included. */
-  {
-    char msg[MAX_INPUT_LENGTH * 2];
-    if (*argument)
-      snprintf(msg, sizeof(msg), "%s %s", arg1, argument);
-    else
-      snprintf(msg, sizeof(msg), "%s", arg1);
-    send_to_clan(GET_CLAN_ID(ch), msg, ch);
-  }
+  /* Use the original message so user-entered spacing is preserved. */
+  send_to_clan(GET_CLAN_ID(ch), original_message, ch);
 }
 
 

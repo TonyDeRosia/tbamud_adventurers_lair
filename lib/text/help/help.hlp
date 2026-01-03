@@ -13774,5 +13774,36 @@ own zone if their name is in the zone's builders list.
 zlock - Locks one or all zones. Type zlock for usage.
 zunlock - Locks one or all zones. Type zunlock for usage.
 
+#0
+CLANEDIT CLAN-EDIT
+
+Usage: clanedit <clan name or id>
+
+Opens the clan editor for the specified clan. Options include:
+ 1) Base clan name used in commands
+ 2) Colored display name shown to players
+ 3) Clan tag (not yet persisted)
+ 4) Clan PvP/PK type (No PvP, Always PvP, or Toggle PvP)
+
+Changes take effect immediately when saved in the editor menu.
+
+See also: CLAN, PVP
+
+#0
+PVP PK CLANPVP
+
+Usage: pvp
+
+Toggle your clan PvP status when your clan type allows it. Clans may be:
+  NO PvP     - PvP is always disabled.
+  ALWAYS PvP - PvP is always on.
+  TOGGLE PvP - Members may toggle. Attacking a player while enabled locks
+               PvP on for 30 minutes.
+
+If your PvP flag is locked after attacking, you must wait for the lock to
+expire before turning it off.
+
+See also: CLANEDIT
+
 #31
 $~

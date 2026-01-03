@@ -54,8 +54,8 @@ ACMD(do_assist)
     else if (!CAN_SEE(ch, opponent))
       act("You can't see who is fighting $M!", FALSE, ch, 0, helpee, TO_CHAR);
          /* prevent accidental pkill */
-    else if (!CONFIG_PK_ALLOWED && !IS_NPC(opponent))
-      send_to_char(ch, "You cannot kill other players.\r\n");
+    else if (!can_pvp(ch, opponent, TRUE))
+      return;
     else {
       send_to_char(ch, "You join the fight!\r\n");
       act("$N assists you!", 0, helpee, 0, ch, TO_CHAR);
@@ -70,7 +70,7 @@ ACMD(do_hit)
   char arg[MAX_INPUT_LENGTH];
   struct char_data *vict;
 
- one_argument(argument, arg);
+  one_argument(argument, arg);
 
   if (!*arg)
     send_to_char(ch, "Hit who?\r\n");
@@ -82,10 +82,10 @@ ACMD(do_hit)
   } else if (AFF_FLAGGED(ch, AFF_CHARM) && (ch->master == vict))
     act("$N is just such a good friend, you simply can't hit $M.", FALSE, ch, 0, vict, TO_CHAR);
   else {
-    if (!CONFIG_PK_ALLOWED && !IS_NPC(vict) && !IS_NPC(ch)) 
-      check_killer(ch, vict);
+    if (!can_pvp(ch, vict, TRUE))
+      return;
 
-    if ((GET_POS(ch) == POS_STANDING) && (vict != FIGHTING(ch))) { 
+    if ((GET_POS(ch) == POS_STANDING) && (vict != FIGHTING(ch))) {
       if (GET_DEX(ch) > GET_DEX(vict) || (GET_DEX(ch) == GET_DEX(vict) && rand_number(1, 2) == 1))  /* if faster */
         hit(ch, vict, TYPE_UNDEFINED);  /* first */
       else hit(vict, ch, TYPE_UNDEFINED);  /* or the victim is first */
@@ -590,7 +590,13 @@ ACMD(do_bandage)
 
   WAIT_STATE(ch, PULSE_VIOLENCE * 2);
 
-  percent = rand_number(1, 101);        /* 101% is a complete failure */
+  if (!can_pvp(ch, vict, TRUE)) {
+    return;
+  }
+
+      return;
+
+    percent = rand_number(1, 101);        /* 101% is a complete failure */
   prob = GET_SKILL(ch, SKILL_BANDAGE);
 
   if (percent <= prob) {

@@ -49,6 +49,7 @@ ACMD(do_bounty);
 ACMD(do_finger);
 
 ACMD(do_clan);
+ACMD(do_clan_pvp_toggle);
 ACMD(do_ccreate);
 ACMD(do_cinvite);
 ACMD(do_cjoin);
@@ -65,6 +66,7 @@ static struct alias_data *find_alias(struct alias_data *alias_list, char *str);
 static void perform_complex_alias(struct txt_q *input_q, char *orig, struct alias_data *a);
 static int _parse_name(char *arg, char *name);
 static bool perform_new_char_dupe_check(struct descriptor_data *d);
+static void finalize_character_login(struct descriptor_data *d, int load_result);
 /* sort_commands utility */
 static int sort_commands_helper(const void *a, const void *b);
 
@@ -374,11 +376,12 @@ cpp_extern const struct command_info cmd_info[] = {
   { "wear"     , "wea"     , POS_RESTING , do_wear     , 0, 0 },
   { "weather"  , "weather" , POS_RESTING , do_weather  , 0, 0 },
   { "who"      , "wh"      , POS_DEAD    , do_who      , 0, 0 },
-  { "roster", "roster", POS_DEAD, do_roster, 0, 0 },
-  { "clist", "clist", POS_DEAD, do_clist, 0, 0 },
-  { "clanlist", "clanlist", POS_DEAD, do_clist, 0, 0 },
+  { "clan", "clan", POS_DEAD, do_clan, 0, 0 },
   { "clanedit", "clanedit", POS_DEAD, do_clanedit, 0, 0 },
+  { "clanlist", "clanlist", POS_DEAD, do_clist, 0, 0 },
+  { "clist", "clist", POS_DEAD, do_clist, 0, 0 },
   { "clanquit", "clanquit", POS_DEAD, do_cquit, 0, 0 },
+  { "roster", "roster", POS_DEAD, do_roster, 0, 0 },
   { "whois"    , "whoi"    , POS_DEAD    , do_whois    , 0, 0 },
   { "whoami"   , "whoami"  , POS_DEAD    , do_gen_ps   , 0, SCMD_WHOAMI },
   { "where"    , "where"   , POS_RESTING , do_where    , 1, 0 },
@@ -404,7 +407,7 @@ cpp_extern const struct command_info cmd_info[] = {
   { "zpurge"   , "zpurge"  , POS_DEAD    , do_zpurge   , LVL_BUILDER, 0 },
   { "balance", "bal", POS_DEAD, do_balance, 0, 0 },
   { "bounty"   , "bounty"  , POS_DEAD    , do_bounty   , 0, 0 },
-  { "clan", "clan", POS_DEAD, do_clan, 0, 0 },
+  { "togglepvp", "togglepvp", POS_DEAD, do_clan_pvp_toggle, 0, 0 },
   { "ccreate", "ccreate", POS_DEAD, do_ccreate, 0, 0 },
   { "cinvite", "cinvite", POS_DEAD, do_cinvite, 0, 0 },
   { "cjoin", "cjoin", POS_DEAD, do_cjoin, 0, 0 },
@@ -1276,6 +1279,55 @@ static bool perform_new_char_dupe_check(struct descriptor_data *d)
   return (found);
 }
 
+static void finalize_character_login(struct descriptor_data *d, int load_result)
+{
+  if (isbanned(d->host) == BAN_SELECT &&
+      !PLR_FLAGGED(d->character, PLR_SITEOK)) {
+    write_to_output(d, "Sorry, this char has not been cleared for login from your site!\r\n");
+    STATE(d) = CON_CLOSE;
+    mudlog(NRM, LVL_GOD, TRUE, "Connection attempt for %s denied from %s", GET_NAME(d->character), d->host);
+    return;
+  }
+
+  if (GET_LEVEL(d->character) < circle_restrict) {
+    write_to_output(d, "The game is temporarily restricted.. try again later.\r\n");
+    STATE(d) = CON_CLOSE;
+    mudlog(NRM, LVL_GOD, TRUE, "Request for login denied for %s [%s] (wizlock)", GET_NAME(d->character), d->host);
+    return;
+  }
+
+  /* check and make sure no other copies of this player are logged in */
+  if (perform_dupe_check(d))
+    return;
+
+  if (GET_LEVEL(d->character) >= LVL_IMMORT)
+    write_to_output(d, "%s", imotd);
+  else
+    write_to_output(d, "%s", motd);
+
+  if (GET_INVIS_LEV(d->character))
+    mudlog(BRF, MAX(LVL_IMMORT, GET_INVIS_LEV(d->character)), TRUE, "%s has connected. (invis %d)", GET_NAME(d->character), GET_INVIS_LEV(d->character));
+  else
+    mudlog(BRF, LVL_IMMORT, TRUE, "%s has connected.", GET_NAME(d->character));
+
+  /* Add to the list of 'recent' players (since last reboot) */
+  if (AddRecentPlayer(GET_NAME(d->character), d->host, FALSE, FALSE) == FALSE)
+  {
+    mudlog(BRF, MAX(LVL_IMMORT, GET_INVIS_LEV(d->character)), TRUE, "Failure to AddRecentPlayer (returned FALSE).");
+  }
+
+  if (load_result) {
+    write_to_output(d, "\r\n\r\n\007\007\007"
+            "%s%d LOGIN FAILURE%s SINCE LAST SUCCESSFUL LOGIN.%s\r\n",
+            CCRED(d->character, C_SPR), load_result,
+            (load_result > 1) ? "S" : "", CCNRM(d->character, C_SPR));
+    GET_BAD_PWS(d->character) = 0;
+  }
+
+  write_to_output(d, "\r\n*** PRESS RETURN: ");
+  STATE(d) = CON_RMOTD;
+}
+
 /* load the player, put them in the right room - used by copyover_recover too */
 int enter_player_game (struct descriptor_data *d)
 {
@@ -1326,6 +1378,23 @@ int enter_player_game (struct descriptor_data *d)
   /* Check for a login trigger in the players' start room */
   login_wtrigger(&world[IN_ROOM(d->character)], d->character);
 
+  /* Ensure color preferences are set when the client supports ANSI */
+  if (d->pProtocol) {
+    bool supports_ansi = d->pProtocol->pVariables[eMSDP_ANSI_COLORS]->ValueInt ||
+                         d->pProtocol->pVariables[eMSDP_XTERM_256_COLORS]->ValueInt;
+
+    if (supports_ansi && !PRF_FLAGGED(d->character, PRF_COLOR_1) &&
+        !PRF_FLAGGED(d->character, PRF_COLOR_2)) {
+      SET_BIT_AR(PRF_FLAGS(d->character), PRF_COLOR_1);
+      SET_BIT_AR(PRF_FLAGS(d->character), PRF_COLOR_2);
+      mudlog(CMP, LVL_IMMORT, TRUE,
+             "Color debug: defaulting PRF color on for %s (ANSI=%d, 256=%d)",
+             GET_NAME(d->character),
+             d->pProtocol->pVariables[eMSDP_ANSI_COLORS]->ValueInt,
+             d->pProtocol->pVariables[eMSDP_XTERM_256_COLORS]->ValueInt);
+    }
+  }
+
   return load_result;
 }
 
@@ -1335,12 +1404,29 @@ EVENTFUNC(get_protocols)
   struct mud_event_data *pMudEvent;
   char buf[MAX_STRING_LENGTH];
   size_t len;
+  int prf_color_1 = 0, prf_color_2 = 0;
 
   if (event_obj == NULL)
     return 0;
   
   pMudEvent = (struct mud_event_data *) event_obj;
-  d = (struct descriptor_data *) pMudEvent->pStruct;  
+  d = (struct descriptor_data *) pMudEvent->pStruct;
+
+  if (d->character) {
+    prf_color_1 = PRF_FLAGGED(d->character, PRF_COLOR_1);
+    prf_color_2 = PRF_FLAGGED(d->character, PRF_COLOR_2);
+  }
+
+  mudlog(CMP, LVL_IMMORT, TRUE,
+         "Color debug: ANSI=%d 256=%d MXP=%d MSDP=%d ATCP=%d PRF1=%d PRF2=%d state=%d",
+         d->pProtocol->pVariables[eMSDP_ANSI_COLORS]->ValueInt,
+         d->pProtocol->pVariables[eMSDP_XTERM_256_COLORS]->ValueInt,
+         d->pProtocol->bMXP,
+         d->pProtocol->bMSDP,
+         d->pProtocol->bATCP,
+         prf_color_1,
+         prf_color_2,
+         STATE(d));
   
   /* Clear extra white space from the "protocol scroll" */
   write_to_output(d, "[H[J");
@@ -1675,6 +1761,14 @@ void nanny(struct descriptor_data *d, char *arg)
         return;
       }
 
+      if (!str_cmp(arg, "pass") || !str_cmp(arg, "password")) {
+        d->acct_change_pass[0] = '\0';
+        echo_off(d);
+        write_to_output(d, "\r\nEnter your current account password: ");
+        STATE(d) = CON_ACCT_PWD_OLD;
+        return;
+      }
+
       if (isdigit((unsigned char)*arg)) {
         choice = atoi(arg);
         if (choice < 1 || choice > acct.num_chars) {
@@ -1709,7 +1803,72 @@ void nanny(struct descriptor_data *d, char *arg)
       return;
     }
 
-case CON_GET_NAME:             /* wait for input of name */
+    case CON_ACCT_PWD_OLD: {
+      struct account_data acct;
+
+      if (!*arg) {
+        write_to_output(d, "\r\nEnter your current account password: ");
+        echo_off(d);
+        return;
+      }
+
+      memset(&acct, 0, sizeof(acct));
+      if (!account_load_any(d->acct_id, &acct) || !account_check_password(&acct, arg)) {
+        echo_on(d);
+        write_to_output(d, "\r\nIncorrect password.\r\n");
+        STATE(d) = CON_ACCT_MENU;
+        acct_show_character_menu(d);
+        return;
+      }
+
+      d->acct_change_pass[0] = '\0';
+      write_to_output(d, "\r\nEnter a new account password: ");
+      STATE(d) = CON_ACCT_PWD_NEW1;
+      return;
+    }
+
+    case CON_ACCT_PWD_NEW1:
+      if (!*arg) {
+        write_to_output(d, "\r\nEnter a new account password: ");
+        echo_off(d);
+        return;
+      }
+
+      strlcpy(d->acct_change_pass, arg, sizeof(d->acct_change_pass));
+      write_to_output(d, "\r\nConfirm new account password: ");
+      STATE(d) = CON_ACCT_PWD_NEW2;
+      return;
+
+    case CON_ACCT_PWD_NEW2: {
+      struct account_data acct;
+
+      echo_on(d);
+
+      if (strcmp(d->acct_change_pass, arg) != 0) {
+        d->acct_change_pass[0] = '\0';
+        write_to_output(d, "\r\nPasswords do not match.\r\n");
+        STATE(d) = CON_ACCT_MENU;
+        acct_show_character_menu(d);
+        return;
+      }
+
+      if (!account_load_any(d->acct_id, &acct)) {
+        write_to_output(d, "\r\nUnable to load account for update.\r\n");
+        STATE(d) = CON_ACCT_MENU;
+        acct_show_character_menu(d);
+        return;
+      }
+
+      account_set_password(&acct, d->acct_change_pass);
+      account_save_any(&acct);
+      d->acct_change_pass[0] = '\0';
+      write_to_output(d, "\r\nAccount password updated.\r\n");
+      STATE(d) = CON_ACCT_MENU;
+      acct_show_character_menu(d);
+      return;
+    }
+
+  case CON_GET_NAME:             /* wait for input of name */
   /* Account-first enforcement */
   if (!(d->acct_id > 0)) {
     STATE(d) = CON_ACCT_NAME;
@@ -1785,6 +1944,14 @@ if (PLR_FLAGGED(d->character, PLR_DELETED)) {
           REMOVE_BIT_AR(PLR_FLAGS(d->character), PLR_WRITING);
           REMOVE_BIT_AR(PLR_FLAGS(d->character), PLR_MAILING);
           REMOVE_BIT_AR(PLR_FLAGS(d->character), PLR_CRYO);
+          if (d->acct_authed && d->acct_id > 0 && GET_ACCOUNT_ID(d->character) == d->acct_id) {
+            load_result = GET_BAD_PWS(d->character);
+            GET_BAD_PWS(d->character) = 0;
+            d->bad_pws = 0;
+            d->character->player.time.logon = time(0);
+            finalize_character_login(d, load_result);
+            return;
+          }
           d->character->player.time.logon = time(0);
           write_to_output(d, "Password: ");
           echo_off(d);
@@ -1817,15 +1984,23 @@ if (PLR_FLAGGED(d->character, PLR_DELETED)) {
 	return;
       }
       if (circle_restrict) {
-	write_to_output(d, "Sorry, new players can't be created at the moment.\r\n");
-	mudlog(NRM, LVL_GOD, TRUE, "Request for new char %s denied from [%s] (wizlock)", GET_PC_NAME(d->character), d->host);
-	STATE(d) = CON_CLOSE;
-	return;
+        write_to_output(d, "Sorry, new players can't be created at the moment.\r\n");
+        mudlog(NRM, LVL_GOD, TRUE, "Request for new char %s denied from [%s] (wizlock)", GET_PC_NAME(d->character), d->host);
+        STATE(d) = CON_CLOSE;
+        return;
       }
       perform_new_char_dupe_check(d);
-      write_to_output(d, "New character.\r\nGive me a password for %s: ", GET_PC_NAME(d->character));
-      echo_off(d);
-      STATE(d) = CON_NEWPASSWD;
+      if (d->acct_authed && d->acct_id > 0) {
+        write_to_output(d, "New character.\r\nAccount login will secure %s; no separate character password needed.\r\n",
+                        GET_PC_NAME(d->character));
+        GET_PASSWD(d->character)[0] = '\0';
+        write_to_output(d, "What is your sex (\t(M\t)/\t(F\t))? ");
+        STATE(d) = CON_QSEX;
+      } else {
+        write_to_output(d, "New character.\r\nGive me a password for %s: ", GET_PC_NAME(d->character));
+        echo_off(d);
+        STATE(d) = CON_NEWPASSWD;
+      }
     } else if (*arg == 'n' || *arg == 'N') {
       write_to_output(d, "Okay, what IS it, then? ");
       free(d->character->player.name);
@@ -1866,65 +2041,45 @@ if (PLR_FLAGGED(d->character, PLR_DELETED)) {
 	return;
       }
 
+
+      /*
+       * Legacy DES crypt() hashes only use the first 8 chars. If this character
+       * still has a legacy hash, upgrade it immediately on successful login so
+       * the full password length is enforced going forward.
+       */
+      if (GET_PASSWD(d->character)[0] != '$') {
+        char salt[64];
+        gen_crypt_salt_sha512(salt, sizeof(salt));
+
+        strncpy(GET_PASSWD(d->character), CRYPT(arg, salt), MAX_PWD_LENGTH);
+        *(GET_PASSWD(d->character) + MAX_PWD_LENGTH) = '\0';
+        save_char(d->character);
+        mudlog(NRM, LVL_GOD, TRUE, "Upgraded legacy password hash for %s", GET_NAME(d->character));
+      }
+
       /* Password was correct. */
       load_result = GET_BAD_PWS(d->character);
       GET_BAD_PWS(d->character) = 0;
       d->bad_pws = 0;
 
-      if (isbanned(d->host) == BAN_SELECT &&
-	  !PLR_FLAGGED(d->character, PLR_SITEOK)) {
-	write_to_output(d, "Sorry, this char has not been cleared for login from your site!\r\n");
-	STATE(d) = CON_CLOSE;
-	mudlog(NRM, LVL_GOD, TRUE, "Connection attempt for %s denied from %s", GET_NAME(d->character), d->host);
-	return;
-      }
-      if (GET_LEVEL(d->character) < circle_restrict) {
-	write_to_output(d, "The game is temporarily restricted.. try again later.\r\n");
-	STATE(d) = CON_CLOSE;
-	mudlog(NRM, LVL_GOD, TRUE, "Request for login denied for %s [%s] (wizlock)", GET_NAME(d->character), d->host);
-	return;
-      }
-      /* check and make sure no other copies of this player are logged in */
-      if (perform_dupe_check(d))
-	return;
-
-      if (GET_LEVEL(d->character) >= LVL_IMMORT)
-	write_to_output(d, "%s", imotd);
-      else
-	write_to_output(d, "%s", motd);
-
-      if (GET_INVIS_LEV(d->character))
-        mudlog(BRF, MAX(LVL_IMMORT, GET_INVIS_LEV(d->character)), TRUE, "%s has connected. (invis %d)", GET_NAME(d->character), GET_INVIS_LEV(d->character));
-      else
-        mudlog(BRF, LVL_IMMORT, TRUE, "%s has connected.", GET_NAME(d->character));
-
-      /* Add to the list of 'recent' players (since last reboot) */
-      if (AddRecentPlayer(GET_NAME(d->character), d->host, FALSE, FALSE) == FALSE)
-      {
-        mudlog(BRF, MAX(LVL_IMMORT, GET_INVIS_LEV(d->character)), TRUE, "Failure to AddRecentPlayer (returned FALSE).");
-      }
-
-      if (load_result) {
-        write_to_output(d, "\r\n\r\n\007\007\007"
-		"%s%d LOGIN FAILURE%s SINCE LAST SUCCESSFUL LOGIN.%s\r\n",
-		CCRED(d->character, C_SPR), load_result,
-		(load_result > 1) ? "S" : "", CCNRM(d->character, C_SPR));
-	GET_BAD_PWS(d->character) = 0;
-      }
-      write_to_output(d, "\r\n*** PRESS RETURN: ");
-      STATE(d) = CON_RMOTD;
+      finalize_character_login(d, load_result);
     }
     break;
 
   case CON_NEWPASSWD:
   case CON_CHPWD_GETNEW:
-    if (!*arg || strlen(arg) > MAX_PWD_LENGTH || strlen(arg) < 3 ||
+    if (!*arg || strlen(arg) > MAX_PWD_LENGTH ||
 	!str_cmp(arg, GET_PC_NAME(d->character))) {
       write_to_output(d, "\r\nIllegal password.\r\nPassword: ");
       return;
     }
-    strncpy(GET_PASSWD(d->character), CRYPT(arg, GET_PC_NAME(d->character)), MAX_PWD_LENGTH);	/* strncpy: OK (G_P:MAX_PWD_LENGTH+1) */
-    *(GET_PASSWD(d->character) + MAX_PWD_LENGTH) = '\0';
+    {
+      char salt[64];
+      gen_crypt_salt_sha512(salt, sizeof(salt));
+
+      strncpy(GET_PASSWD(d->character), CRYPT(arg, salt), MAX_PWD_LENGTH);	/* strncpy: OK (G_P:MAX_PWD_LENGTH+1) */
+      *(GET_PASSWD(d->character) + MAX_PWD_LENGTH) = '\0';
+    }
 
     write_to_output(d, "\r\nPlease retype password: ");
     if (STATE(d) == CON_NEWPASSWD)

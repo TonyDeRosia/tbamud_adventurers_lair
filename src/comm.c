@@ -2041,7 +2041,10 @@ static void check_idle_passwords(void)
 
   for (d = descriptor_list; d; d = next_d) {
     next_d = d->next;
-    if (STATE(d) != CON_PASSWORD && STATE(d) != CON_GET_NAME && STATE(d) != CON_ACCT_NAME)
+    if (STATE(d) != CON_PASSWORD && STATE(d) != CON_GET_NAME && STATE(d) != CON_ACCT_NAME &&
+        STATE(d) != CON_ACCT_PASS && STATE(d) != CON_ACCT_CREATE_PASS1 &&
+        STATE(d) != CON_ACCT_CREATE_PASS2 && STATE(d) != CON_ACCT_PWD_OLD &&
+        STATE(d) != CON_ACCT_PWD_NEW1 && STATE(d) != CON_ACCT_PWD_NEW2)
       continue;
     if (!d->idle_tics) {
       d->idle_tics++;

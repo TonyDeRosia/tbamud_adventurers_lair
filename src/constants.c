@@ -222,7 +222,7 @@ const char *preference_bits[] = {
   "COMPACT",
   "NO_SHOUT",
   "NO_TELL",
-  "UNUSED",
+  "CLANPVP",
   "UNUSED",
   "UNUSED",
   "AUTOEX",
@@ -253,6 +253,7 @@ const char *preference_bits[] = {
   "AUTOKEY",
   "AUTODOOR",
   "ZONERESETS",
+  "VERBOSE",
   "\n"
 };
 
@@ -282,7 +283,7 @@ const char *affected_bits[] =
   "SCUBA",
   "SNEAK",
   "HIDE",
-  "UNUSED",
+  "PVP_LOCK",
   "CHARM",
   "\n"
 };

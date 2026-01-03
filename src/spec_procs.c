@@ -745,40 +745,57 @@ SPECIAL(pet_shops)
 /* Special procedures for objects. */
 SPECIAL(bank)
 {
-  int amount;
+  long long amount;
 
   if (CMD_IS("balance")) {
-    if (GET_BANK_GOLD(ch) > 0)
-      send_to_char(ch, "Your current balance is %d coins.\r\n", GET_BANK_GOLD(ch));
-    else
-      send_to_char(ch, "You currently have no money deposited.\r\n");
+    char bank_buf[64], carry_buf[64];
+
+    format_copper_as_currency(bank_buf, sizeof(bank_buf), GET_BANK_MONEY(ch));
+    format_copper_as_currency(carry_buf, sizeof(carry_buf), GET_MONEY(ch));
+    send_to_char(ch, "Bank balance: %s. You are carrying: %s.\r\n", bank_buf, carry_buf);
     return (TRUE);
   } else if (CMD_IS("deposit")) {
-    if ((amount = atoi(argument)) <= 0) {
+    amount = atoll(argument);
+
+    if (amount <= 0) {
       send_to_char(ch, "How much do you want to deposit?\r\n");
       return (TRUE);
     }
-    if (GET_GOLD(ch) < amount) {
-      send_to_char(ch, "You don't have that many coins!\r\n");
+    if (GET_MONEY(ch) < amount) {
+      send_to_char(ch, "You don't have that much currency!\r\n");
       return (TRUE);
     }
-    decrease_gold(ch, amount);
-	increase_bank(ch, amount);
-    send_to_char(ch, "You deposit %d coins.\r\n", amount);
+
+    increase_money_copper(ch, -amount);
+    increase_bank_copper(ch, amount);
+
+    {
+      char amt_buf[64];
+      format_copper_as_currency(amt_buf, sizeof(amt_buf), amount);
+      send_to_char(ch, "You deposit %s.\r\n", amt_buf);
+    }
     act("$n makes a bank transaction.", TRUE, ch, 0, FALSE, TO_ROOM);
     return (TRUE);
   } else if (CMD_IS("withdraw")) {
-    if ((amount = atoi(argument)) <= 0) {
+    amount = atoll(argument);
+
+    if (amount <= 0) {
       send_to_char(ch, "How much do you want to withdraw?\r\n");
       return (TRUE);
     }
-    if (GET_BANK_GOLD(ch) < amount) {
-      send_to_char(ch, "You don't have that many coins deposited!\r\n");
+    if (GET_BANK_MONEY(ch) < amount) {
+      send_to_char(ch, "You don't have that much currency deposited!\r\n");
       return (TRUE);
     }
-    increase_gold(ch, amount);
-	decrease_bank(ch, amount);
-    send_to_char(ch, "You withdraw %d coins.\r\n", amount);
+
+    increase_money_copper(ch, amount);
+    increase_bank_copper(ch, -amount);
+
+    {
+      char amt_buf[64];
+      format_copper_as_currency(amt_buf, sizeof(amt_buf), amount);
+      send_to_char(ch, "You withdraw %s.\r\n", amt_buf);
+    }
     act("$n makes a bank transaction.", TRUE, ch, 0, FALSE, TO_ROOM);
     return (TRUE);
   } else

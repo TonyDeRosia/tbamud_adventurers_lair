@@ -236,7 +236,7 @@ void clanedit_parse(struct descriptor_data *d, char *arg);
 #define PRF_COMPACT       1   /**< No extra CRLF pair before prompts */
 #define PRF_NOSHOUT       2   /**< Can't hear shouts */
 #define PRF_NOTELL        3   /**< Can't receive tells */
-#define PRF_UNUSED4       4   /**< Reserved */
+#define PRF_CLAN_PVP      4   /**< Clan PvP opt-in */
 #define PRF_UNUSED5       5   /**< Reserved */
 #define PRF_UNUSED6       6   /**< Reserved */
 #define PRF_AUTOEXIT      7   /**< Display exits in a room */
@@ -294,7 +294,7 @@ void clanedit_parse(struct descriptor_data *d, char *arg);
 #define AFF_SCUBA          18   /**< Room for future expansion */
 #define AFF_SNEAK          19   /**< Char can move quietly */
 #define AFF_HIDE           20   /**< Char is hidden */
-#define AFF_FREE           21   /**< Room for future expansion */
+#define AFF_PVP_LOCK       21   /**< Clan PvP lockout */
 #define AFF_CHARM          22   /**< Char is charmed */
 /** Total number of affect flags */
 #define NUM_AFF_FLAGS   23
@@ -313,6 +313,9 @@ void clanedit_parse(struct descriptor_data *d, char *arg);
 #define CON_ACCT_CREATE_PASS2 38
 #define CON_ACCT_CHARSEL   39 /**< Account character select */
 #define CON_ACCT_MENU 40 /**< Account character select/create menu */
+#define CON_ACCT_PWD_OLD 47 /**< Account password: verify current */
+#define CON_ACCT_PWD_NEW1 48 /**< Account password: new entry */
+#define CON_ACCT_PWD_NEW2 49 /**< Account password: confirm */
 
 /* Character creation: allocate base stats */
 #define CON_QSTATS        41
@@ -626,7 +629,7 @@ void clanedit_parse(struct descriptor_data *d, char *arg);
 #define MAX_RAW_INPUT_LENGTH  (12 * 1024) /**< Max size of *raw* input */
 #define MAX_MESSAGES          60     /**< Max Different attack message types */
 #define MAX_NAME_LENGTH       20     /**< Max PC/NPC name length */
-#define MAX_PWD_LENGTH        30     /**< Max PC password length */
+#define MAX_PWD_LENGTH        128     /**< Max PC password length */
 #define MAX_TITLE_LENGTH      80     /**< Max PC title length */
 #define HOST_LENGTH           40     /**< Max hostname resolution length */
 #define PLR_DESC_LENGTH       4096   /**< Max length for PC description */
@@ -1138,6 +1141,9 @@ struct descriptor_data
   char acct_name[64];
   int acct_authed;
   char acct_tmp_pass[128];
+  char acct_change_pass[128];
+  char acct_change_char[64];
+  long acct_change_char_id;
 
   socket_t descriptor;      /**< file descriptor for socket */
   char host[HOST_LENGTH+1]; /**< hostname */
