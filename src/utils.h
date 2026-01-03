@@ -544,7 +544,7 @@ do                                                              \
 #define GET_BANK_COPPER(ch)  ((ch)->points.bank_money)
 #define GET_BANK_MONEY(ch) GET_BANK_COPPER(ch)
 /** Gold views are derived from copper totals. */
-#define GET_GOLD(ch)       (GET_COPPER(ch) / COPPER_PER_GOLD)
+#define GET_GOLD(ch)    (GET_COPPER(ch))
 #define GET_BANK_GOLD(ch)  (GET_BANK_COPPER(ch) / COPPER_PER_GOLD)
 /** Diamonds on ch */
 #define GET_DIAMONDS(ch)   ((ch)->points.diamonds)

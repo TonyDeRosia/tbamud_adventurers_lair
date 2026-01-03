@@ -29,6 +29,9 @@
 
 
 /* default currency unit sizes */
+#ifndef SHOP_PRICE_IN_COPPER
+#define SHOP_PRICE_IN_COPPER 1 /* shop prices are stored as copper totals */
+#endif
 #ifndef COPPER_PER_GOLD
 #define COPPER_PER_GOLD 100000
 #endif
