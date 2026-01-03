@@ -1879,8 +1879,19 @@ void init_spell_levels(void)
   spell_level(SKILL_PICK_LOCK, CLASS_THIEF, 2);
   spell_level(SKILL_BACKSTAB, CLASS_THIEF, 3);
   spell_level(SKILL_STEAL, CLASS_THIEF, 4);
-  spell_level(SKILL_HIDE, CLASS_THIEF, 5);
-  spell_level(SKILL_TRACK, CLASS_THIEF, 6);
+  spell_level(SKILL_HIDE, CLASS_THIEF, 6);
+  spell_level(SKILL_TRACK, CLASS_THIEF, 10);
+  spell_level(SKILL_BANDAGE, CLASS_THIEF, 15);
+  spell_level(SKILL_DUAL_WIELD, CLASS_THIEF, 20);
+  spell_level(SPELL_DETECT_MAGIC, CLASS_THIEF, 10);
+  spell_level(SPELL_DETECT_INVIS, CLASS_THIEF, 15);
+  spell_level(SPELL_DETECT_POISON, CLASS_THIEF, 20);
+  spell_level(SPELL_DETECT_ALIGN, CLASS_THIEF, 25);
+  spell_level(SPELL_INFRAVISION, CLASS_THIEF, 30);
+  spell_level(SPELL_ARMOR, CLASS_THIEF, 35);
+  spell_level(SPELL_LOCATE_OBJECT, CLASS_THIEF, 45);
+  spell_level(SPELL_IDENTIFY, CLASS_THIEF, 60);
+  spell_level(SPELL_ENERGY_DRAIN, CLASS_THIEF, 70);
 
   /* WARRIORS */
   spell_level(SKILL_RESCUE, CLASS_WARRIOR, 3);
