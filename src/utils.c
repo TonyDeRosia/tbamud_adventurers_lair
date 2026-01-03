@@ -571,8 +571,34 @@ void stop_follower(struct char_data *ch)
     free(j);
   }
 
+  if (GET_MOUNT(ch))
+    dismount_char(ch);
+
+  if (GET_RIDER(ch)) {
+    send_to_char(GET_RIDER(ch), "You tumble off of %s.\r\n", GET_NAME(ch));
+    dismount_mount(ch);
+  }
+
   ch->master = NULL;
   REMOVE_BIT_AR(AFF_FLAGS(ch), AFF_CHARM);
+}
+
+void dismount_char(struct char_data *rider)
+{
+  if (!rider || !GET_MOUNT(rider))
+    return;
+
+  GET_RIDER(GET_MOUNT(rider)) = NULL;
+  GET_MOUNT(rider) = NULL;
+}
+
+void dismount_mount(struct char_data *mount)
+{
+  if (!mount || !GET_RIDER(mount))
+    return;
+
+  GET_MOUNT(GET_RIDER(mount)) = NULL;
+  GET_RIDER(mount) = NULL;
 }
 
 /* Break charm on a follower with custom messaging without extracting them. */
@@ -657,6 +683,12 @@ int num_followers_charmed(struct char_data *ch)
 void die_follower(struct char_data *ch)
 {
   struct follow_type *j, *k;
+
+  if (GET_MOUNT(ch))
+    dismount_char(ch);
+
+  if (GET_RIDER(ch))
+    dismount_mount(ch);
 
   if (ch->master)
     stop_follower(ch);

@@ -117,6 +117,8 @@ void	die_follower(struct char_data *ch);
 void	add_follower(struct char_data *ch, struct char_data *leader);
 void	stop_follower(struct char_data *ch);
 void	break_charm_follower(struct char_data *ch, struct char_data *vict);
+void	dismount_char(struct char_data *rider);
+void	dismount_mount(struct char_data *mount);
 bool	is_purchased_pet(struct char_data *ch, struct char_data *pet);
 bool	circle_follow(struct char_data *ch, struct char_data *victim);
 
@@ -157,6 +159,10 @@ void char_from_furniture(struct char_data *ch);
 #define SITTING(ch)             ((ch)->char_specials.furniture)
 /** Who is sitting next to ch, if anyone. */
 #define NEXT_SITTING(ch)        ((ch)->char_specials.next_in_furniture)
+/** What pet ch is currently mounted on. */
+#define GET_MOUNT(ch)           ((ch)->char_specials.mount)
+/** Which rider is on ch, if any. */
+#define GET_RIDER(ch)           ((ch)->char_specials.rider)
 /** Who is sitting on this obj */
 #define OBJ_SAT_IN_BY(obj)      ((obj)->sitting_here)
 

@@ -158,6 +158,7 @@ cpp_extern const struct command_info cmd_info[] = {
   { "detach"   , "detach"  , POS_DEAD    , do_detach   , LVL_BUILDER, 0 },
   { "diagnose" , "diag"    , POS_RESTING , do_diagnose , 0, 0 },
   { "dig"      , "dig"     , POS_DEAD    , do_dig      , LVL_BUILDER, 0 },
+  { "dismount" , "dism"    , POS_STANDING, do_dismount , 0, 0 },
 // //   { "display"  , "disp"    , POS_DEAD    , do_display  , 0, 0 },
   { "donate"   , "don"     , POS_RESTING , do_drop     , 0, SCMD_DONATE },
   { "drink"    , "dri"     , POS_RESTING , do_drink    , 0, SCMD_DRINK },
@@ -235,6 +236,7 @@ cpp_extern const struct command_info cmd_info[] = {
   { "load"     , "load"     , POS_DEAD    , do_load     , LVL_BUILDER, 0 },
 
   { "motd"     , "motd"    , POS_DEAD    , do_gen_ps   , 0, SCMD_MOTD },
+  { "mount"    , "mou"     , POS_STANDING, do_mount    , 0, 0 },
   { "mail"     , "mail"    , POS_STANDING, do_not_here , 1, 0 },
   { "map"      , "map"     , POS_STANDING, do_map      , 1, 0 },
   { "medit"    , "med"     , POS_DEAD    , do_oasis_medit, LVL_BUILDER, 0 },
