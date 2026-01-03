@@ -74,6 +74,43 @@ static void who_center_clan_tag(char *out, size_t outsz, const char *tag, int wi
   out[pos] = '\0';
 }
 
+static void format_color_field(char *out, size_t outsz, const char *src, size_t width)
+{
+  size_t pos = 0, vis = 0;
+  const char *p;
+
+  if (!out || outsz == 0)
+    return;
+
+  out[0] = '\0';
+
+  if (!src)
+    src = "None";
+
+  for (p = src; *p && pos + 1 < outsz; ) {
+    if (*p == '\t' && *(p + 1)) {
+      if (pos + 2 >= outsz)
+        break;
+      out[pos++] = *p++;
+      out[pos++] = *p++;
+      continue;
+    }
+
+    if (vis >= width)
+      break;
+
+    out[pos++] = *p++;
+    vis++;
+  }
+
+  while (vis < width && pos + 1 < outsz) {
+    out[pos++] = ' ';
+    vis++;
+  }
+
+  out[pos] = '\0';
+}
+
 
 #include <stdlib.h>  /* abs */
 #include "structs.h"
@@ -1610,8 +1647,10 @@ ACMD(do_finger)
   long long bounty = GET_BOUNTY(vict);
   const char *bounty_color = bounty > 0 ? BY : R;
   char bounty_buf[64];
+  char clan_buf[128];
 
   format_gold_as_currency(bounty_buf, sizeof(bounty_buf), bounty);
+  format_color_field(clan_buf, sizeof(clan_buf), clan, 20);
 
   /* Top border */
   len += snprintf(buf + len, sizeof(buf) - len,
@@ -1629,7 +1668,7 @@ ACMD(do_finger)
   snprintf(line, sizeof(line), "%sClass:%s %-19s  %sLevel:%s %-5d", C, R, archetype_name(GET_CLASS(vict)), C, R, GET_LEVEL(vict));
   len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
 
-  snprintf(line, sizeof(line), "%sClan:%s %-20s  %sBounty:%s %s%s%s", C, R, clan, C, R, bounty_color, bounty_buf, R);
+  snprintf(line, sizeof(line), "%sClan:%s %s  %sBounty:%s %s%s%s", C, R, clan_buf, C, R, bounty_color, bounty_buf, R);
   len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
 
   len += snprintf(buf + len, sizeof(buf) - len,

@@ -31,10 +31,15 @@ static void send_to_clan(int clan_id, const char *msg, struct char_data *from)
     if (GET_CLAN_ID(d->character) != clan_id)
       continue;
 
-    if (from)
-      send_to_char(d->character, "\r\n[Clan] %s: %s\r\n", GET_NAME(from), msg);
-    else
-      send_to_char(d->character, "\r\n[Clan] %s\r\n", msg);
+    {
+      const char *G = CBGRN(d->character, C_NRM);
+      const char *R = CCNRM(d->character, C_NRM);
+
+      if (from)
+        send_to_char(d->character, "\r\n%s[Clan]%s %s%s%s: %s\r\n", G, R, G, GET_NAME(from), R, msg);
+      else
+        send_to_char(d->character, "\r\n%s[Clan]%s %s%s%s\r\n", G, R, G, msg, R);
+    }
   }
 }
 
@@ -166,6 +171,10 @@ static void clan_show_roster(struct char_data *ch)
   struct descriptor_data *d;
   struct char_data *tch;
   int clan_id, count = 0;
+  const char *B = CCBLU(ch, C_NRM);
+  const char *R = CCNRM(ch, C_NRM);
+  const char *Y = CCYEL(ch, C_NRM);
+  const char *C = CCCYN(ch, C_NRM);
 
   clan_id = GET_CLAN_ID(ch);
   if (clan_id <= 0) {
@@ -215,33 +224,38 @@ static void clan_show_roster(struct char_data *ch)
 
   send_to_char(ch,
     "\r\n"
-    "╔══════════════════════════════════════════════════════════════════════╗\r\n"
-    "║                              Clan Roster                             ║\r\n"
-    "╠══════════════════════════════════════════════════════════════════════╣\r\n"
-    "║ Name                     Race            Class            Level      ║\r\n"
-    "╠══════════════════════════════════════════════════════════════════════╣\r\n"
+    "%s╔══════════════════════════════════════════════════════════════════════╗%s\r\n"
+    "%s║%s                              %sClan Roster%s                             %s║\r\n"
+    "%s╠══════════════════════════════════════════════════════════════════════╣%s\r\n"
+    "%s║%s %sName                     Race            Class            Level     %s ║\r\n"
+    "%s╠══════════════════════════════════════════════════════════════════════╣%s\r\n"
+    , B, R, B, R, Y, R, B, R, B, R, C, R, B, R
   );
 
   if (count == 0) {
     send_to_char(ch,
-      "║ No clan members are currently online.                                ║\r\n"
+      "%s║%s No clan members are currently online.                                %s║\r\n"
+      , B, R, B
     );
   } else {
     for (i = 0; i < count; i++) {
       const char *rname = roster_race_name(GET_RACE(list[i]));
       const char *cname = roster_class_name(GET_CLASS(list[i]));
-      send_to_char(ch, "║ %-24.24s %-15.15s %-15.15s %5d      ║\r\n",
+      send_to_char(ch, "%s║%s %-24.24s %-15.15s %-15.15s %5d      %s║\r\n",
+        B, R,
         GET_NAME(list[i]),
         (rname ? rname : "Unknown"),
         (cname ? cname : "Unknown"),
-        GET_LEVEL(list[i])
+        GET_LEVEL(list[i]),
+        B
       );
     }
   }
 
   send_to_char(ch,
-    "╚══════════════════════════════════════════════════════════════════════╝\r\n"
+    "%s╚══════════════════════════════════════════════════════════════════════╝%s\r\n"
     "\r\n"
+    , B, R
   );
 
   if (list)
