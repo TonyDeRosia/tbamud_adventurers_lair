@@ -806,10 +806,13 @@ void spell_level(int spell, int chclass, int level) {
     return;
   }
 
-  if (chclass < 0 || chclass >= class_count) {
+  if (chclass < 0 || chclass >= MAX_CLASSES) {
     log("SYSERR: assigning '%s' to illegal class %d/%d.", skill_name(spell),
-        chclass, class_count - 1);
+        chclass, MAX_CLASSES - 1);
     bad = 1;
+  } else if (chclass >= class_count) {
+    log("SYSERR: assigning '%s' to class %d, which is outside num_pc_classes (%d).",
+        skill_name(spell), chclass, class_count);
   }
 
   if (level < 1 || level > LVL_IMPL) {
@@ -828,7 +831,7 @@ static void spello(int spl, const char *name, int max_mana, int min_mana,
     const char *wearoff) {
   int i;
 
-  for (i = 0; i < MAX_CLASSES; i++)
+  for (i = 0; i < NUM_CLASSES; i++)
     spell_info[spl].min_level[i] = LVL_IMMORT;
   spell_info[spl].mana_max = max_mana;
   spell_info[spl].mana_min = min_mana;
@@ -844,7 +847,7 @@ static void spello(int spl, const char *name, int max_mana, int min_mana,
 void unused_spell(int spl) {
   int i;
 
-  for (i = 0; i < MAX_CLASSES; i++)
+  for (i = 0; i < NUM_CLASSES; i++)
     spell_info[spl].min_level[i] = LVL_IMPL + 1;
   spell_info[spl].mana_max = 0;
   spell_info[spl].mana_min = 0;
