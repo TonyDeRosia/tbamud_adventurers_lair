@@ -1222,15 +1222,12 @@ static int append_wrapped_box_text(char *buf, int len, size_t bufsz,
  * MAIN SCORE FUNCTION - Replace your entire ACMD(do_score) with this
  * ========================================================================= */
 
-static const char *archetype_name(int class_num)
+static const char *score_class_name(int class_num)
 {
-  switch (class_num) {
-    case CLASS_CLERIC:     return "Divine";
-    case CLASS_THIEF:      return "Rogue";
-    case CLASS_WARRIOR:    return "Martial";
-    case CLASS_MAGIC_USER: return "Spellcaster";
-    default:               return "Unknown";
-  }
+  if (class_num >= 0 && class_num < NUM_CLASSES)
+    return pc_class_types[class_num];
+
+  return "Unknown";
 }
 
 
@@ -1273,7 +1270,7 @@ ACMD(do_score)
     /* Race and Class */
   snprintf(line, sizeof(line), "%sRace:%s %-20s  %sClass:%s %-20s",
     C, R, pc_race_types[GET_RACE(ch)],
-    C, R, archetype_name(GET_CLASS(ch)));
+    C, R, score_class_name(GET_CLASS(ch)));
   len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
 
   /* Level and Age */
