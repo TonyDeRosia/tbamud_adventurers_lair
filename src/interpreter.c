@@ -256,6 +256,7 @@ cpp_extern const struct command_info cmd_info[] = {
   { "nowiz"    , "nowiz"   , POS_DEAD    , do_gen_tog  , LVL_IMMORT, SCMD_NOWIZ },
 
   { "open"     , "o"       , POS_SITTING , do_gen_door , 0, SCMD_OPEN },
+  { "opet"     , "opet"    , POS_RESTING , do_opet     , 1, 0 },
   { "order"    , "ord"     , POS_RESTING , do_order    , 1, 0 },
   { "offer"    , "off"     , POS_STANDING, do_not_here , 1, 0 },
   { "olc"      , "olc"     , POS_DEAD    , do_show_save_list, LVL_BUILDER, 0 },
@@ -299,6 +300,9 @@ cpp_extern const struct command_info cmd_info[] = {
   { "receive"  , "rece"    , POS_STANDING, do_not_here , 1, 0 },
   { "recent"   , "recent"  , POS_DEAD    , do_recent   , LVL_IMMORT, 0 },
   { "remove"   , "rem"     , POS_RESTING , do_remove   , 0, 0 },
+  { "release"  , "nofollow", POS_RESTING , do_pet_release, 0, 0 },
+  { "dismiss"  , "nofollow", POS_RESTING , do_pet_release, 0, 0 },
+  { "nofollow" , "nofollow", POS_RESTING , do_pet_release, 0, 0 },
   { "rent"     , "rent"    , POS_STANDING, do_not_here , 1, 0 },
   { "report"   , "repo"    , POS_RESTING , do_report   , 0, 0 },
   { "reroll"   , "rero"    , POS_DEAD    , do_wizutil  , LVL_GRGOD, SCMD_REROLL },

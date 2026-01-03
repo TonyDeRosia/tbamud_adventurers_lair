@@ -761,6 +761,159 @@ ACMD(do_group)
 
 }
 
+static struct char_data *find_charmed_follower(struct char_data *ch, const char *name)
+{
+  struct follow_type *follower;
+  struct char_data *first_charmed = NULL, *named_match = NULL, *pet_named = NULL;
+
+  for (follower = ch->followers; follower; follower = follower->next) {
+    struct char_data *current = follower->follower;
+
+    if (!current || current->master != ch)
+      continue;
+    if (!AFF_FLAGGED(current, AFF_CHARM))
+      continue;
+
+    if (!first_charmed)
+      first_charmed = current;
+
+    if (!pet_named && isname("pet", current->player.name))
+      pet_named = current;
+
+    if (name && *name && isname(name, current->player.name)) {
+      named_match = current;
+      break;
+    }
+  }
+
+  if (named_match)
+    return named_match;
+  if (name && *name)
+    return NULL;
+  if (pet_named)
+    return pet_named;
+
+  return first_charmed;
+}
+
+ACMD(do_pet_release)
+{
+  char arg[MAX_INPUT_LENGTH];
+  struct char_data *pet;
+  bool has_pet_price = FALSE;
+  bool is_charmed = FALSE;
+
+  one_argument(argument, arg);
+
+  if (!*arg) {
+    send_to_char(ch, "Dismiss whom?\r\n");
+    return;
+  }
+
+  if (!(pet = get_char_room_vis(ch, arg, NULL))) {
+    send_to_char(ch, "%s", CONFIG_NOPERSON);
+    return;
+  }
+
+  if (!IS_NPC(pet)) {
+    send_to_char(ch, "You cannot dismiss a player.\r\n");
+    return;
+  }
+
+  if (pet->master != ch) {
+    send_to_char(ch, "That pet is not following you.\r\n");
+    return;
+  }
+
+  is_charmed = AFF_FLAGGED(pet, AFF_CHARM);
+
+  if (!is_charmed) {
+    send_to_char(ch, "You can only dismiss a purchased pet.\r\n");
+    return;
+  }
+
+  if (GET_PET_PRICE(pet) > 0)
+    has_pet_price = TRUE;
+  else if (GET_MOB_RNUM(pet) != NOBODY && GET_PET_PRICE(&mob_proto[GET_MOB_RNUM(pet)]) > 0)
+    has_pet_price = TRUE;
+
+  if (!has_pet_price) {
+    /* Fall back to charm validation when no pet shop pricing is recorded. */
+  }
+
+  act("$N stops following you.", FALSE, ch, 0, pet, TO_CHAR);
+  act("$N stops following $n.", FALSE, ch, 0, pet, TO_ROOM);
+
+  if (pet->master) {
+    struct follow_type *f, *prev = NULL;
+
+    for (f = ch->followers; f; prev = f, f = f->next) {
+      if (f->follower != pet)
+        continue;
+
+      if (prev)
+        prev->next = f->next;
+      else
+        ch->followers = f->next;
+
+      free(f);
+      break;
+    }
+
+    pet->master = NULL;
+    REMOVE_BIT_AR(AFF_FLAGS(pet), AFF_CHARM);
+  }
+
+  extract_char(pet);
+}
+
+ACMD(do_opet)
+{
+  char first_arg[MAX_INPUT_LENGTH], command_part[MAX_INPUT_LENGTH];
+  char subcmd[MAX_INPUT_LENGTH], target[MAX_INPUT_LENGTH];
+  char order_arguments[MAX_INPUT_LENGTH * 2];
+  struct char_data *follower;
+  const char *usage = "Usage: opet stay | opet attack <target>\r\n";
+
+  half_chop(argument, first_arg, command_part);
+
+  follower = find_charmed_follower(ch, first_arg);
+
+  if (!follower) {
+    follower = find_charmed_follower(ch, NULL);
+    if (*first_arg)
+      strlcpy(command_part, argument, sizeof(command_part));
+  }
+
+  if (!follower || follower->master != ch) {
+    send_to_char(ch, "You have no charmed follower to command.\r\n");
+    return;
+  }
+
+  if (!*command_part) {
+    send_to_char(ch, "%s", usage);
+    return;
+  }
+
+  half_chop(command_part, subcmd, target);
+
+  if (is_abbrev(subcmd, "stay")) {
+    snprintf(order_arguments, sizeof(order_arguments), "%s stay", GET_NAME(follower));
+  } else if (is_abbrev(subcmd, "attack")) {
+    if (!*target) {
+      send_to_char(ch, "Usage: opet attack <target>\r\n");
+      return;
+    }
+
+    snprintf(order_arguments, sizeof(order_arguments), "%s attack %s", GET_NAME(follower), target);
+  } else {
+    send_to_char(ch, "%s", usage);
+    return;
+  }
+
+  do_order(ch, order_arguments, 0, 0);
+}
+
 ACMD(do_report)
 {
   struct group_data *group;
