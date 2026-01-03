@@ -10,6 +10,7 @@ extern struct descriptor_data *descriptor_list;
 #include "handler.h"
 #include "db.h"
 #include "clan.h"
+#include "screen.h"
 #include "modify.h"
 
 /* rank ideas for now */
@@ -229,7 +230,11 @@ static void clan_show_roster(struct char_data *ch)
     "%s╠══════════════════════════════════════════════════════════════════════╣%s\r\n"
     "%s║%s %sName                     Race            Class            Level     %s ║\r\n"
     "%s╠══════════════════════════════════════════════════════════════════════╣%s\r\n"
-    , B, R, B, R, Y, R, B, R, B, R, C, R, B, R
+    , B, R,
+      B, R, Y, R, B,
+      B, R,
+      B, R, C, R,
+      B, R
   );
 
   if (count == 0) {
