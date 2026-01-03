@@ -25,6 +25,7 @@ void account_save_any(const struct account_data *acct);
 
 void account_init_for_char(struct char_data *ch);
 void account_attach_char(struct char_data *ch);
+void account_storage_report(void);
 
 void acct_show_character_menu(struct descriptor_data *d);
 void account_remove_character(struct account_data *acct, const char *name);
