@@ -47,6 +47,8 @@ byte saving_throws(int class_num, int type, int level);
 int thaco(int class_num, int level);
 const char *title_female(int chclass, int level);
 const char *title_male(int chclass, int level);
+const char *class_name(int class_id);
+const char *class_abbrev(int class_id);
 const char *get_archetype_abbrev(struct char_data *ch);
 const char *get_class_display_abbrev(struct char_data *ch);
 const char *class_menu(void);
