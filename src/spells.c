@@ -58,6 +58,28 @@ void handle_followers_after_owner_teleport_or_recall(struct char_data *ch)
   }
 }
 
+static int corruption_duration(int level)
+{
+  if (level >= 100)
+    return 8;
+  if (level >= 80)
+    return 8;
+  if (level >= 60)
+    return 7;
+  if (level >= 40)
+    return 6;
+  if (level >= 20)
+    return 5;
+  return 4;
+}
+
+static int corruption_damage_per_tick(int level)
+{
+  int damage = 1 + (level / 10);
+
+  return MIN(damage, 12);
+}
+
 /* Special spells appear below. */
 ASPELL(spell_create_water)
 {
@@ -326,6 +348,26 @@ ASPELL(spell_charm)
     if (IS_NPC(victim))
       REMOVE_BIT_AR(MOB_FLAGS(victim), MOB_SPEC);
   }
+}
+
+ASPELL(spell_corruption)
+{
+  struct affected_type af;
+  int caster_level = GET_LEVEL(ch);
+
+  if (victim == NULL || ch == NULL)
+    return;
+
+  new_affect(&af);
+  af.spell = SPELL_CORRUPTION;
+  af.duration = corruption_duration(caster_level);
+  af.modifier = corruption_damage_per_tick(caster_level);
+  af.location = APPLY_NONE;
+
+  affect_join(victim, &af, FALSE, FALSE, FALSE, FALSE);
+
+  act("You envelop $N in a wave of corrupting energy.", FALSE, ch, 0, victim, TO_CHAR);
+  act("$n envelopes $N in a wave of corrupting energy.", TRUE, ch, 0, victim, TO_ROOM);
 }
 
 ASPELL(spell_identify)
