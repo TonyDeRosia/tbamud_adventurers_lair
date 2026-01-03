@@ -915,7 +915,11 @@ ACMD(do_opet)
     if (follower->master == ch) {
       act("You order $N to stay here.", FALSE, ch, 0, follower, TO_CHAR);
       act("$n orders $N to stay here.", FALSE, ch, 0, follower, TO_ROOM);
-      detach_charmed_follower(follower);
+      if (GET_POS(follower) > POS_SITTING) {
+        act("$n sits down obediently.", TRUE, follower, 0, 0, TO_ROOM);
+        act("$n sits down obediently.", TRUE, follower, 0, 0, TO_CHAR);
+      }
+      GET_POS(follower) = POS_SITTING;
     } else {
       send_to_char(ch, "%s isn't following you.\r\n", GET_NAME(follower));
     }
@@ -925,7 +929,12 @@ ACMD(do_opet)
       detach_charmed_follower(follower);
 
     if (follower->master == ch) {
-      send_to_char(ch, "%s is already following you.\r\n", GET_NAME(follower));
+      if (GET_POS(follower) < POS_STANDING) {
+        act("You motion for $N to stand up and follow you.", FALSE, ch, 0, follower, TO_CHAR);
+        act("$n motions for $N to stand up and follow $m.", FALSE, ch, 0, follower, TO_ROOM);
+        GET_POS(follower) = POS_STANDING;
+      } else
+        send_to_char(ch, "%s is already following you.\r\n", GET_NAME(follower));
       return;
     }
 
