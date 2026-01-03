@@ -200,25 +200,19 @@ const char *class_menu(void)
 
   len += snprintf(menu + len, sizeof(menu) - len, "\r\nSelect a class:\r\n");
 
-  for (i = 0; i < ARRAY_SIZE(menu_order) && len < sizeof(menu); i++) {
-    int cls = menu_order[i];
-    const struct pc_class_definition *pc_class = &pc_classes[cls];
-    char rest_name[MAX_INPUT_LENGTH];
-    const char *name_ptr = pc_class->name;
+  for (i = 0; i + 2 < ARRAY_SIZE(menu_order) && len < sizeof(menu); i += 3) {
+    const struct pc_class_definition *first = &pc_classes[menu_order[i]];
+    const struct pc_class_definition *second = &pc_classes[menu_order[i + 1]];
+    const struct pc_class_definition *third = &pc_classes[menu_order[i + 2]];
 
-    if (!pc_class->selectable)
+    if (!first->selectable || !second->selectable || !third->selectable)
       continue;
 
-    snprintf(rest_name, sizeof(rest_name), "%s", name_ptr + 1);
-    for (char *p = rest_name; *p; ++p) {
-      if (*p == ' ')
-        *p = '-';
-      else
-        *p = LOWER(*p);
-    }
-
-    len += snprintf(menu + len, sizeof(menu) - len, "  [\t(%c\t)]%s\r\n",
-                    UPPER(pc_class->select_key), rest_name);
+    len += snprintf(menu + len, sizeof(menu) - len,
+                    "  [%c] %-8s  [%c] %-8s   [%c] %-8s\r\n",
+                    UPPER(first->select_key), first->name,
+                    UPPER(second->select_key), second->name,
+                    UPPER(third->select_key), third->name);
   }
 
   return menu;
