@@ -462,6 +462,7 @@ int load_char(const char *name, struct char_data *ch)
 	else if (!strcmp(tag, "Dex "))	ch->real_abils.dex	= atoi(line);
 	else if (!strcmp(tag, "Drnk"))	GET_COND(ch, DRUNK)	= atoi(line);
 	else if (!strcmp(tag, "Drol"))	GET_DAMROLL(ch)		= atoi(line);
+	else if (!strcmp(tag, "Diamonds")) GET_DIAMONDS(ch) = atoi(line);
 	break;
 
       case 'E':
@@ -475,7 +476,6 @@ int load_char(const char *name, struct char_data *ch)
       case 'G':
         if (!strcmp(tag, "Gold"))
           __loaded_gold_units = parse_numeric_value(line);
-        else if (!strcmp(tag, "Diamonds")) GET_DIAMONDS(ch) = atoi(line);
         else if (!strcmp(tag, "Glory")) GET_GLORY(ch) = atoi(line);
         break;
 
