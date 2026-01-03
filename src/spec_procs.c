@@ -733,7 +733,7 @@ SPECIAL(bank)
 
   if (CMD_IS("balance")) {
     if (GET_BANK_GOLD(ch) > 0)
-      send_to_char(ch, "Your current balance is %d coins.\r\n", GET_BANK_GOLD(ch));
+      send_to_char(ch, "Your current balance is %lld coins.\r\n", ((long long)GET_BANK_GOLD(ch)));
     else
       send_to_char(ch, "You currently have no money deposited.\r\n");
     return (TRUE);

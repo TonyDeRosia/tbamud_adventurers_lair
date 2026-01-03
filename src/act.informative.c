@@ -928,7 +928,7 @@ ACMD(do_gold)
   else if (GET_GOLD(ch) == 1)
     send_to_char(ch, "You have one miserable little gold coin.\r\n");
   else
-    send_to_char(ch, "You have %d gold coins.\r\n", GET_GOLD(ch));
+    send_to_char(ch, "You have %lld gold coins.\r\n", ((long long)GET_GOLD(ch)));
 }
 
 /* Put these helpers above ACMD(do_score) in the same .c file */

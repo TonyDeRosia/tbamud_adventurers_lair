@@ -800,8 +800,8 @@ void save_char(struct char_data * ch)
   if (GET_CLAN_ID(ch)) fprintf(fl, "Clan: %d\n", GET_CLAN_ID(ch));
   if (GET_CLAN_RANK(ch)) fprintf(fl, "Clrk: %d\n", GET_CLAN_RANK(ch));
 
-  if (GET_GOLD(ch)         != PFDEF_GOLD)       fprintf(fl, "Gold: %d\n", GET_GOLD(ch));
-  if (GET_BANK_GOLD(ch)    != PFDEF_BANK)       fprintf(fl, "Bank: %d\n", GET_BANK_GOLD(ch));
+  if (((long long)GET_GOLD(ch))         != PFDEF_GOLD)       fprintf(fl, "Gold: %lld\n", ((long long)GET_GOLD(ch)));
+  if (((long long)GET_BANK_GOLD(ch))    != PFDEF_BANK)       fprintf(fl, "Bank: %lld\n", ((long long)GET_BANK_GOLD(ch)));
   if (GET_EXP(ch)	   != PFDEF_EXP)	fprintf(fl, "Exp : %d\n", GET_EXP(ch));
   if (GET_HITROLL(ch)	   != PFDEF_HITROLL)	fprintf(fl, "Hrol: %d\n", GET_HITROLL(ch));
   if (GET_DAMROLL(ch)	   != PFDEF_DAMROLL)	fprintf(fl, "Drol: %d\n", GET_DAMROLL(ch));

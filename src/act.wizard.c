@@ -840,7 +840,7 @@ static void do_stat_character(struct char_data *ch, struct char_data *k)
 	  CCGRN(ch, C_NRM), GET_MANA(k), GET_MAX_MANA(k), mana_gain(k), CCNRM(ch, C_NRM),
 	  CCGRN(ch, C_NRM), GET_MOVE(k), GET_MAX_MOVE(k), move_gain(k), CCNRM(ch, C_NRM));
 
-  send_to_char(ch, "Gold: [%9d], Bank: [%9d] (Total: %d), ",
+  send_to_char(ch, "Gold: [%9lld], Bank: [%9lld] (Total: %lld), ",
 	  GET_GOLD(k), GET_BANK_GOLD(k), GET_GOLD(k) + GET_BANK_GOLD(k));
 
   if (!IS_NPC(k))
@@ -2630,7 +2630,7 @@ ACMD(do_show)
     send_to_char(ch, "Player: %-12s (%s) [%2d %s]\r\n", GET_NAME(vict),
       genders[(int) GET_SEX(vict)], GET_LEVEL(vict), class_abbrevs[(int)
       GET_CLASS(vict)]);
-    send_to_char(ch, "Gold: %-8d  Bal: %-8d Exp: %-8d  Align: %-5d  Lessons: %-3d\r\n",
+    send_to_char(ch, "Gold: %-8lld  Bal: %-8lld Exp: %-8d  Align: %-5d  Lessons: %-3d\r\n",
       GET_GOLD(vict), GET_BANK_GOLD(vict), GET_EXP(vict),
       GET_ALIGNMENT(vict), GET_PRACTICES(vict));
     send_to_char(ch, "Started: %-25.25s  Last: %-25.25s\r\n", buf1, buf2);
@@ -3796,7 +3796,7 @@ ACMD (do_zcheck)
 
         if ((GET_GOLD(mob) > MAX_MOB_GOLD_ALLOWED) && (found=1))
           len += snprintf(buf + len, sizeof(buf) - len,
-                          "- Set to %d Gold (limit : %d).\r\n",
+                          "- Set to %lld Gold (limit : %d).\r\n",
                                   GET_GOLD(mob),
                                   MAX_MOB_GOLD_ALLOWED);
 
