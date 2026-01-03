@@ -220,6 +220,12 @@ int main(void)
     set(CMAKE_REQUIRED_LIBRARIES ${_saved_lib_list})
 endif()
 
+# ========== math library ==========
+find_library(MATH_LIBRARY m)
+if (MATH_LIBRARY)
+    list(APPEND EXTRA_LIBS ${MATH_LIBRARY})
+endif()
+
 
 # ========== network libs ==========
 check_function_exists(gethostbyaddr HAVE_GETHOSTBYADDR)
