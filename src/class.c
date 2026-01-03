@@ -1658,6 +1658,30 @@ void roll_real_abils(struct char_data *ch)
   ch->aff_abils = ch->real_abils;
 }
 
+/* Ensure a character knows every class ability that should be available at
+ * their current level. This keeps existing characters up to date when new
+ * spells or skills are added for their class. */
+void ensure_class_abilities(struct char_data *ch)
+{
+  if (IS_NPC(ch) || !is_valid_class(GET_CLASS(ch)))
+    return;
+
+  int learned_level = get_class_prac_learned_level((int)GET_CLASS(ch));
+
+  for (int ability = 1; ability <= MAX_SKILLS; ability++) {
+    if (!spell_info[ability].name)
+      continue;
+
+    int required_level = spell_info[ability].min_level[(int)GET_CLASS(ch)];
+
+    if (required_level <= 0 || required_level > GET_LEVEL(ch))
+      continue;
+
+    if (GET_SKILL(ch, ability) < learned_level)
+      SET_SKILL(ch, ability, learned_level);
+  }
+}
+
 /* Some initializations for characters, including initial skills */
 void do_start(struct char_data *ch)
 {
@@ -1691,16 +1715,7 @@ void do_start(struct char_data *ch)
     break;
   }
 
-  /* Ensure all classes start knowing their level 1 abilities. */
-  int learned_level = get_class_prac_learned_level((int)GET_CLASS(ch));
-
-  for (int ability = 1; ability <= MAX_SKILLS; ability++) {
-    if (!spell_info[ability].name)
-      continue;
-
-    if (spell_info[ability].min_level[(int)GET_CLASS(ch)] == 1)
-      SET_SKILL(ch, ability, MAX(GET_SKILL(ch, ability), learned_level));
-  }
+  ensure_class_abilities(ch);
 
   advance_level(ch);
 
