@@ -97,12 +97,6 @@ void format_gold_as_currency(char *out, size_t outsz, long long total_gold)
   snprintf(out, outsz, "%lld gold", total_gold);
 }
 
-/* Legacy wrapper retained for compatibility. */
-void format_copper_as_currency(char *out, size_t outsz, long long total_copper)
-{
-  format_gold_as_currency(out, outsz, total_copper);
-}
-
 /** Used to capitalize a string. Will not change any mud specific color codes.
  * @param txt The string to capitalize. */
 char *CAP(char *txt)

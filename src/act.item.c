@@ -203,7 +203,7 @@ static void get_check_money(struct char_data *ch, struct obj_data *obj)
     return;
 
   extract_obj(obj);
-  increase_money_copper(ch, (long long)value);
+  increase_money_gold(ch, (long long)value);
   if (value == 1)
     send_to_char(ch, "The pile of coins was worth %d gold coin.\r\n", value);
   else
@@ -416,7 +416,7 @@ static void perform_drop_gold(struct char_data *ch, int amount, byte mode, room_
   else {
     if (mode != SCMD_JUNK) {
       WAIT_STATE(ch, PULSE_VIOLENCE); /* to prevent coin-bombing */
-      obj = create_money((int)((long long)amount * (long long)COPPER_PER_GOLD), 3);
+      obj = create_money(amount, 3);
       if (mode == SCMD_DONATE) {
 	      send_to_char(ch, "You throw some gold into the air where it disappears in a puff of smoke!\r\n");
 	      act("$n throws some gold into the air where it disappears in a puff of smoke!",
@@ -514,7 +514,7 @@ static int perform_drop(struct char_data *ch, struct obj_data *obj,
 
 static void perform_drop_currency(struct char_data *ch, int amount, int denom, int subcmd)
 {
-  long long amount_copper = 0;
+  long long amount_gold = 0;
   const char *metal = "gold";
 
   (void)denom;
@@ -524,21 +524,21 @@ static void perform_drop_currency(struct char_data *ch, int amount, int denom, i
     return;
   }
 
-  amount_copper = (long long)amount * (long long)COPPER_PER_GOLD;
+  amount_gold = (long long)amount;
 
-  if (amount_copper <= 0) {
+  if (amount_gold <= 0) {
     send_to_char(ch, "Drop how much?\r\n");
     return;
   }
 
-  if (GET_MONEY(ch) < amount_copper) {
+  if (GET_MONEY(ch) < amount_gold) {
     send_to_char(ch, "You don't have that much currency.\r\n");
     return;
   }
 
   /* JUNK: delete money instead of creating a pile */
   if (subcmd == SCMD_JUNK) {
-    GET_MONEY(ch) -= amount_copper;
+    GET_MONEY(ch) -= amount_gold;
     send_to_char(ch, "You junk %d %s coin%s.\r\n", amount, metal, (amount == 1 ? "" : "s"));
     act("$n junks some coins.", FALSE, ch, 0, 0, TO_ROOM);
     return;
@@ -546,12 +546,12 @@ static void perform_drop_currency(struct char_data *ch, int amount, int denom, i
 
   /* DONATE: behave like normal drop into room (your donate rooms logic is separate) */
   {
-    struct obj_data *obj = create_money((int)amount_copper, denom);
+    struct obj_data *obj = create_money((int)amount_gold, denom);
     if (!obj) {
       send_to_char(ch, "Something went wrong.\r\n");
       return;
     }
-    GET_MONEY(ch) -= amount_copper;
+    GET_MONEY(ch) -= amount_gold;
 
     send_to_char(ch, "You drop %d %s coin%s.\r\n", amount, metal, (amount == 1 ? "" : "s"));
     act("$n drops some coins.", FALSE, ch, 0, 0, TO_ROOM);
@@ -694,7 +694,7 @@ else if (multi <= 0)
   if (amount && (subcmd == SCMD_JUNK)) {
     send_to_char(ch, "You have been rewarded by the gods!\r\n");
     act("$n has been rewarded by the gods!", TRUE, ch, 0, 0, TO_ROOM);
-    increase_money_copper(ch, (long long)amount);
+    increase_money_gold(ch, (long long)amount);
   }
 }
 
@@ -732,8 +732,6 @@ static void perform_give(struct char_data *ch, struct char_data *vict,
 static int parse_money_denom(const char *w)
 {
   if (!w || !*w) return 0;
-  if (!str_cmp(w, "copper") || !str_cmp(w, "c")) return 3;
-  if (!str_cmp(w, "silver") || !str_cmp(w, "s")) return 3;
   if (!str_cmp(w, "gold") || !str_cmp(w, "g")) return 3;
   if (!str_cmp(w, "diamond") || !str_cmp(w, "d")) return 4;
   if (!str_cmp(w, "coin") || !str_cmp(w, "coins")) return 3;
@@ -756,9 +754,7 @@ static int parse_compact_money_token(const char *tok, int *out_amount, int *out_
     return 0;
 
   last = tok[len - 1];
-  if (last != 'c' && last != 'C' &&
-      last != 's' && last != 'S' &&
-      last != 'g' && last != 'G' &&
+  if (last != 'g' && last != 'G' &&
       last != 'd' && last != 'D')
     return 0;
 
@@ -772,16 +768,6 @@ static int parse_compact_money_token(const char *tok, int *out_amount, int *out_
 
   return 1;
 }
-static long long money_to_copper_ll(int amount, int denom)
-{
-  long long a = (long long)amount;
-
-  if (denom == 4)
-    return 0;
-
-  return a * (long long)COPPER_PER_GOLD;
-}
-
 static const char *denom_name(int denom, int amount)
 {
   if (denom == 4) return amount == 1 ? "diamond" : "diamonds";
@@ -816,13 +802,13 @@ static void perform_give_currency(struct char_data *ch, struct char_data *vict, 
     return;
   }
 
-  long long copper = money_to_copper_ll(amount, denom);
-  if (copper <= 0) {
+  long long gold = amount;
+  if (gold <= 0) {
     send_to_char(ch, "Give how much of what?\r\n");
     return;
   }
 
-  if ((GET_MONEY(ch) < copper) && (IS_NPC(ch) || (GET_LEVEL(ch) < LVL_GOD))) {
+  if ((GET_MONEY(ch) < gold) && (IS_NPC(ch) || (GET_LEVEL(ch) < LVL_GOD))) {
     send_to_char(ch, "You don't have that much currency!\r\n");
     return;
   }
@@ -834,9 +820,9 @@ static void perform_give_currency(struct char_data *ch, struct char_data *vict, 
   act(buf, TRUE, ch, 0, vict, TO_NOTVICT);
 
   if (IS_NPC(ch) || (GET_LEVEL(ch) < LVL_GOD))
-    increase_money_copper(ch, -copper);
+    increase_money_gold(ch, -gold);
 
-  increase_money_copper(vict, copper);
+  increase_money_gold(vict, gold);
 }
 
 /* utility function for give */

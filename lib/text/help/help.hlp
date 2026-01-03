@@ -968,9 +968,9 @@ Examples:
 
 Deposits 400 gold on your account.
 
-  > withdraw 1000 copper
+  > withdraw 1000 gold
 
-Withdraws 1000 copper pieces from your account.
+Withdraws 1000 gold pieces from your account.
   
   > balance
 

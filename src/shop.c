@@ -42,57 +42,6 @@ static void shop_format_price(char *out, size_t outsz, long long total_gold)
   format_gold_as_currency(out, outsz, total_gold);
 }
 
-static void shop_charge(struct char_data *ch, long long cost_copper)
-{
-  long long before;
-
-  if (!ch)
-    return;
-
-  if (cost_copper < 0)
-    cost_copper = 0;
-
-  before = GET_MONEY(ch);
-
-  /*
-   * Defensive clamp: if an upstream caller hands us an amount larger than the
-   * available balance (e.g., due to mismatched currency units), avoid wiping
-   * the entire purse.  The purchase logic should prevent this, but the clamp
-   * keeps the deduction bounded.
-   */
-  if (cost_copper > before)
-    cost_copper = before;
-
-  /*
-   * Use the shared currency helper to avoid overflow/underflow edge cases and
-   * keep deductions consistent with other money adjustments (e.g. object
-   * save/load and coin handling commands).
-   */
-#ifdef SHOP_MONEY_DEBUG
-  log("[SHOP_MONEY_DEBUG] Charging %s %lldc (before=%lld, after=%lld)",
-      GET_NAME(ch) ? GET_NAME(ch) : "<unknown>", cost_copper, before,
-      before - cost_copper);
-#endif
-  increase_money_copper(ch, -cost_copper);
-}
-
-/* Add copper to a character (keeper/player). */
-static void shop_pay(struct char_data *ch, long long amount_copper)
-{
-  if (!ch || amount_copper <= 0)
-    return;
-
-  increase_money_copper(ch, amount_copper);
-}
-
-static void shop_pay_copper(struct char_data *ch, long long amt_copper)
-{
-  if (!ch || amt_copper < 0)
-    return;
-
-  increase_money_copper(ch, amt_copper);
-}
-
 /* Global variables definitions used externally */
 /* Constant list for printing out who we sell to */
 const char *trade_letters[] = {

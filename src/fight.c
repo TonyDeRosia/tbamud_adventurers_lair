@@ -294,7 +294,7 @@ void stop_fighting(struct char_data *ch)
 static void make_corpse(struct char_data *ch)
 {
   int inv_dropped = 0;
-  long long dropped_copper = 0;
+  long long dropped_gold = 0;
   char buf2[MAX_NAME_LENGTH + 64];
   struct obj_data *corpse, *o;
   struct obj_data *money;
@@ -349,17 +349,17 @@ static void make_corpse(struct char_data *ch)
 /* transfer gold */
   if (!IS_NPC(ch)) {
     long long have = (long long)GET_MONEY(ch);
-    dropped_copper = have / 10;
-    if (dropped_copper > 0) {
-      money = create_money((int)dropped_copper, 0);
+    dropped_gold = have / 10;
+    if (dropped_gold > 0) {
+      money = create_money((int)dropped_gold, 0);
       obj_to_obj(money, corpse);
-      GET_MONEY(ch) = (long long)GET_MONEY(ch) - dropped_copper;
+      GET_MONEY(ch) = (long long)GET_MONEY(ch) - dropped_gold;
     }
 
     /* Death drop summary for items and money. */
-    if (inv_dropped > 0 || dropped_copper > 0) {
+    if (inv_dropped > 0 || dropped_gold > 0) {
       send_to_char(ch, "Death penalty: You drop %lld gold and %d inventory item(s) on your corpse.\r\n",
-                   dropped_copper, inv_dropped);
+                   dropped_gold, inv_dropped);
     } else {
       send_to_char(ch, "Death penalty: You drop nothing.\r\n");
     }
@@ -461,9 +461,9 @@ void die(struct char_data * ch, struct char_data * killer)
     long long reward = GET_BOUNTY(ch);
     char reward_buf[64];
 
-    format_copper_as_currency(reward_buf, sizeof(reward_buf), reward);
+    format_gold_as_currency(reward_buf, sizeof(reward_buf), reward);
     SET_BOUNTY(ch, 0);
-    increase_money_copper(killer, reward);
+    increase_money_gold(killer, reward);
     save_char(ch);
     save_char(killer);
     send_to_char(killer, "You claim %s for the bounty on %s.\r\n", reward_buf, GET_NAME(ch));

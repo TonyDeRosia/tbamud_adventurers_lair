@@ -2,7 +2,8 @@
 """One-time converter for object costs from gold units to copper.
 
 The game now treats `Cost:` values in object files as copper, so existing
-world files that store gold values must be multiplied by `COPPER_PER_GOLD`.
+world files that store gold values must be multiplied by the configured
+copper-per-gold rate.
 
 Safeguards:
 - Costs greater than or equal to the skip threshold (default: 100000) are
@@ -26,27 +27,21 @@ COST_PATTERN = re.compile(
 
 
 def detect_copper_per_gold(structs_path: pathlib.Path, fallback: int = 1000) -> int:
-    """Infer COPPER_PER_GOLD from src/structs.h, falling back on a default."""
+    """Infer a legacy copper-per-gold rate from src/structs.h, falling back on a default."""
     copper_per_silver = None
     silver_per_gold = None
-    direct_value = None
 
     if not structs_path.exists():
         return fallback
 
-    define_re = re.compile(r"#define\s+(COPPER_PER_SILVER|SILVER_PER_GOLD|COPPER_PER_GOLD)\s+(.+)")
+    define_re = re.compile(r"#define\s+(COPPER_PER_SILVER|SILVER_PER_GOLD)\s+(.+)")
     for line in structs_path.read_text(encoding="utf-8").splitlines():
         match = define_re.match(line.strip())
         if not match:
             continue
         name, value = match.groups()
         value = value.replace("LL", "")
-        if name == "COPPER_PER_GOLD":
-            try:
-                direct_value = int(eval(value))  # noqa: S307 (trusted local file)
-            except Exception:
-                direct_value = None
-        elif name == "COPPER_PER_SILVER":
+        if name == "COPPER_PER_SILVER":
             try:
                 copper_per_silver = int(float(value))
             except ValueError:
@@ -57,8 +52,6 @@ def detect_copper_per_gold(structs_path: pathlib.Path, fallback: int = 1000) -> 
             except ValueError:
                 silver_per_gold = None
 
-    if direct_value:
-        return direct_value
     if copper_per_silver and silver_per_gold:
         return copper_per_silver * silver_per_gold
     return fallback
@@ -173,7 +166,7 @@ def main() -> int:
     parser.add_argument("--object-dir", default="lib/world/obj", type=pathlib.Path, help="Directory containing .obj files")
     parser.add_argument("--skip-threshold", type=int, default=100000, help="Costs >= threshold are treated as already converted")
     parser.add_argument("--backup-suffix", default=".gold_cost.bak", help="Suffix for backup copies")
-    parser.add_argument("--copper-per-gold", type=int, default=None, help="Override COPPER_PER_GOLD value")
+    parser.add_argument("--copper-per-gold", type=int, default=None, help="Override copper-per-gold value")
     parser.add_argument("--dry-run", action="store_true", help="Show what would change without writing files")
     parser.add_argument(
         "--ignore-backups",
@@ -183,7 +176,7 @@ def main() -> int:
     args = parser.parse_args()
 
     copper_per_gold = args.copper_per_gold or detect_copper_per_gold(pathlib.Path("src/structs.h"))
-    print(f"Using COPPER_PER_GOLD={copper_per_gold}")
+    print(f"Using copper_per_gold={copper_per_gold}")
 
     if not args.object_dir.exists():
         print(f"Object directory {args.object_dir} not found", file=sys.stderr)
