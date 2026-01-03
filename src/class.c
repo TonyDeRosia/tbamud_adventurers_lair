@@ -1691,6 +1691,17 @@ void do_start(struct char_data *ch)
     break;
   }
 
+  /* Ensure all classes start knowing their level 1 abilities. */
+  int learned_level = get_class_prac_learned_level((int)GET_CLASS(ch));
+
+  for (int ability = 1; ability <= MAX_SKILLS; ability++) {
+    if (!spell_info[ability].name)
+      continue;
+
+    if (spell_info[ability].min_level[(int)GET_CLASS(ch)] == 1)
+      SET_SKILL(ch, ability, MAX(GET_SKILL(ch, ability), learned_level));
+  }
+
   advance_level(ch);
 
   GET_HIT(ch) = GET_MAX_HIT(ch);
