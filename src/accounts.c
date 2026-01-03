@@ -13,6 +13,7 @@
 static int ensure_account_dirs(void);
 static void account_debug_log(const char *format, ...);
 static void account_resolve_path(char *out, size_t len, const char *relative);
+static int account_verify_password(const char *password, const char *stored_hash, const char *acct_name);
 static void report_storage_diagnostics(void);
 
 static int account_debugging_enabled(void)
@@ -50,32 +51,25 @@ static void account_resolve_path(char *out, size_t len, const char *relative)
   }
 
   if (relative[0] == '/') {
-    strlcpy(out, relative, len);
+    snprintf(out, len, "%s", relative);
     return;
   }
 
   if (getcwd(cwd, sizeof(cwd))) {
-    strlcpy(out, cwd, len);
-    /* build path without strlcat (not available on all platforms) */
-    {
-      size_t n = strlen(out);
-      if (n > 0 && out[n-1] != '/' && n + 1 < len) { out[n++] = '/'; out[n] = '\0'; }
-      if ("/" && *"/") {
-        snprintf(out + n, (n < len) ? (len - n) : 0, "%s", "/");
+    size_t n = strlcpy(out, cwd, len);
+
+    if (n > 0 && n < len && out[n - 1] != '/') {
+      if (n + 1 < len) {
+        out[n++] = '/';
+        out[n] = '\0';
       }
     }
 
-    /* build path without strlcat (not available on all platforms) */
-    {
-      size_t n = strlen(out);
-      if (n > 0 && out[n-1] != '/' && n + 1 < len) { out[n++] = '/'; out[n] = '\0'; }
-      if (relative && *relative) {
-        snprintf(out + n, (n < len) ? (len - n) : 0, "%s", relative);
-      }
-    }
-
-  } else
-    strlcpy(out, relative, len);
+    if (len > n)
+      strlcpy(out + n, relative, len - n);
+  } else {
+    snprintf(out, len, "%s", relative);
+  }
 }
 
 static int ensure_dir_exists(const char *path)
@@ -188,6 +182,32 @@ static void acct_hash_password(char *out, size_t outlen, const char *passwd)
   snprintf(out, outlen, "%s", CRYPT(passwd, salt));
 }
 
+static int account_verify_password(const char *password, const char *stored_hash, const char *acct_name)
+{
+  const char *crypted;
+
+  if (!password || !stored_hash || !*stored_hash)
+    return 0;
+
+  /* Legacy DES hashes are 13 chars and do not start with '$'. */
+  if (stored_hash[0] != '$' && strlen(stored_hash) == 13)
+    crypted = CRYPT(password, stored_hash);
+  else
+    crypted = CRYPT(password, stored_hash);
+
+  if (!crypted) {
+    account_debug_log("Account auth failed for %s: crypt() returned NULL", acct_name ? acct_name : "<unknown>");
+    return 0;
+  }
+
+  if (strcmp(crypted, stored_hash) != 0) {
+    account_debug_log("Account auth failed for %s: hash mismatch", acct_name ? acct_name : "<unknown>");
+    return 0;
+  }
+
+  return 1;
+}
+
 int account_load_any(long acct_id, struct account_data *acct)
 {
   char fname[256], line[256];
@@ -288,7 +308,6 @@ int account_authenticate(const char *acct_name, const char *passwd, long *out_id
 {
   long id = 0;
   struct account_data acct;
-  char hash[128];
   char clean_pass[MAX_PWD_LENGTH + 1];
 
   if (out_id) *out_id = 0;
@@ -312,8 +331,7 @@ int account_authenticate(const char *acct_name, const char *passwd, long *out_id
   if (!acct.passwd_hash[0])
     return 0;
 
-  acct_hash_password(hash, sizeof(hash), clean_pass);
-  if (strcmp(hash, acct.passwd_hash) != 0)
+  if (!account_verify_password(clean_pass, acct.passwd_hash, acct.acct_name))
     return 0;
 
   if (out_id) *out_id = id;
