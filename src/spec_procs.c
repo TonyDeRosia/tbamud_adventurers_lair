@@ -30,25 +30,9 @@
 
 
 
-static void format_price_gsc(char *out, size_t outsz, long long total_copper)
+static void format_price_gsc(char *out, size_t outsz, long long total_gold)
 {
-  long long g = 0, s = 0, c = 0;
-
-  if (total_copper < 0)
-    total_copper = 0;
-
-  g = total_copper / (long long)COPPER_PER_GOLD;
-  total_copper %= (long long)COPPER_PER_GOLD;
-
-  s = total_copper / (long long)COPPER_PER_SILVER;
-  c = total_copper % (long long)COPPER_PER_SILVER;
-
-  if (g > 0)
-    snprintf(out, outsz, "%lldg %llds %lldc", g, s, c);
-  else if (s > 0)
-    snprintf(out, outsz, "%llds %lldc", s, c);
-  else
-    snprintf(out, outsz, "%lldc", c);
+  format_gold_as_currency(out, outsz, total_gold);
 }
 /* locally defined functions of local (file) scope */
 static int compare_spells(const void *x, const void *y);

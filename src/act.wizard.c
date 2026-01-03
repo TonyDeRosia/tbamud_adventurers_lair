@@ -3440,16 +3440,15 @@ ACMD(do_set)
     goto do_set_save_and_cleanup;
   }
 
-  /* Direct currency set: canonical total is GET_MONEY (copper units). */
-  if (!strcmp(field, "copper") || !strcmp(field, "silver") || !strcmp(field, "gold") || !strcmp(field, "money")) {
-      /* Direct currency set: canonical total is GET_MONEY (copper units). */
+  /* Direct currency set: canonical total is gold units. */
+  if (!strcmp(field, "gold") || !strcmp(field, "money")) {
       long long amount = 0;
       char *endp = NULL;
       char *valp = buf;
 
       skip_spaces(&valp);
       if (!*valp) {
-        send_to_char(ch, "Usage: set <victim> <copper|silver|gold|money> <number>\r\n");
+        send_to_char(ch, "Usage: set <victim> <gold|money> <number>\r\n");
         retval = 0;
         goto do_set_save_and_cleanup;
       }
@@ -3462,65 +3461,38 @@ ACMD(do_set)
       }
 
       if (amount < 0) amount = 0;
+      if (amount > MAX_MONEY) amount = MAX_MONEY;
 
-      /* Break current total into denoms using current conversion macros. */
-      {
-        long long total = (long long)GET_MONEY(vict);
-        if (total < 0) total = 0;
+      GET_MONEY(vict) = amount;
 
-        long long gold = total / COPPER_PER_GOLD;
-        long long silver = (total % COPPER_PER_GOLD) / COPPER_PER_SILVER;
-        long long copper = total % COPPER_PER_SILVER;
-
-        long long new_total = total;
-
-        if (!strcmp(field, "money")) {
-          /* money is total copper units */
-          new_total = amount;
-        } else if (!strcmp(field, "copper")) {
-          /* copper is the remainder below 1 silver */
-          if (amount >= COPPER_PER_SILVER) amount = COPPER_PER_SILVER - 1;
-          new_total =
-              gold * COPPER_PER_GOLD +
-              silver * COPPER_PER_SILVER +
-              amount;
-        } else if (!strcmp(field, "silver")) {
-          /* silver is the remainder below 1 gold */
-          if (amount >= SILVER_PER_GOLD) amount = SILVER_PER_GOLD - 1;
-          new_total =
-              gold * COPPER_PER_GOLD +
-              amount * COPPER_PER_SILVER +
-              copper;
-        } else { /* gold */
-          new_total =
-              amount * COPPER_PER_GOLD +
-              silver * COPPER_PER_SILVER +
-              copper;
-        }
-
-        /* Clamp to the configured maximum. */
-        if (new_total < 0) new_total = 0;
-        if (new_total > MAX_MONEY) new_total = MAX_MONEY;
-
-        GET_MONEY(vict) = new_total;
-
-        /* Debug style output that matches what you’ve been seeing. */
-        {
-          long long after = (long long)GET_MONEY(vict);
-          long long ng = after / COPPER_PER_GOLD;
-          long long ns = (after % COPPER_PER_GOLD) / COPPER_PER_SILVER;
-          long long nc = after % COPPER_PER_SILVER;
-
-          send_to_char(ch, "%s set %s's %s to %lld.\r\n",
-            GET_NAME(ch), GET_NAME(vict), field, amount);
-          send_to_char(ch, "Money: %lld (copper units). Normalized: %lld gold %lld silver %lld copper.\r\n",
-            after, ng, ns, nc);
-        }
-      }
+      send_to_char(ch, "%s set %s's gold to %lld.\r\n",
+        GET_NAME(ch), GET_NAME(vict), amount);
 
       retval = 1;
       goto do_set_save_and_cleanup;
     }
+
+  if (!strcmp(field, "glory")) {
+    char *endp = NULL;
+    long long req = strtoll(buf, &endp, 10);
+
+    if (endp == buf) {
+      send_to_char(ch, "Value must be a number.\r\n");
+      retval = 0;
+      goto do_set_save_and_cleanup;
+    }
+
+    if (req < 0) req = 0;
+    if (req > 2147483647LL) req = 2147483647LL;
+
+    GET_GLORY(vict) = (int)req;
+
+    send_to_char(ch, "%s set %s's glory to %lld.\r\n",
+      GET_NAME(ch), GET_NAME(vict), req);
+
+    retval = 1;
+    goto do_set_save_and_cleanup;
+  }
 
   /* Diamonds are a separate currency field (additive, clamped). */
   if (!strcmp(field, "diamond") || !strcmp(field, "diamonds")) {

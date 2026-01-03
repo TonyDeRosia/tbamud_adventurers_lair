@@ -1395,26 +1395,17 @@ len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
     "%s╠═══════════════════════════════════════════════════════════════════════════════╣%s\r\n", B, R);
 
 
-/* Currencies */
-snprintf(line, sizeof(line), "%sCurrencies%s", Y, R);
-len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
-
-{
-  long long rem = GET_MONEY(ch);
-  long long gold = rem / COPPER_PER_GOLD;
-  rem %= COPPER_PER_GOLD;
-  long long silver = rem / COPPER_PER_SILVER;
-  rem %= COPPER_PER_SILVER;
-  long long copper = rem;
+  /* Currencies */
+  snprintf(line, sizeof(line), "%sCurrencies%s", Y, R);
+  len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
 
   snprintf(line, sizeof(line),
-    "%sCopper:%s %3lld   %sSilver:%s %2lld   %sGold:%s %6lld   %sDiamond:%s %d",
-    C, R, copper,
-    C, R, silver,
-    C, R, gold,
-    C, R, GET_DIAMONDS(ch));
+    "%sGold:%s %8lld   %sDiamonds:%s %6d   %sGlory:%s %6d   %sBank:%s %8lld",
+    C, R, (long long)GET_GOLD(ch),
+    C, R, GET_DIAMONDS(ch),
+    C, R, GET_GLORY(ch),
+    C, R, (long long)GET_BANK_GOLD(ch));
   len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
-}
 
 /* Next Level (if mortal) */
   if (GET_LEVEL(ch) < LVL_IMMORT) {
@@ -1744,17 +1735,12 @@ ACMD(do_bounty)
 /* Currency-only display used by worth and balance. */
 static void show_currency_only(struct char_data *ch)
 {
-  long long money = (long long)GET_MONEY(ch);
-  long long gold = money / COPPER_PER_GOLD;
-  long long silver = (money % COPPER_PER_GOLD) / COPPER_PER_SILVER;
-  long long copper = money % COPPER_PER_SILVER;
-  long long diamonds = 0;
+  long long gold = (long long)GET_GOLD(ch);
+  long long bank = (long long)GET_BANK_GOLD(ch);
+  long long diamonds = (long long)GET_DIAMONDS(ch);
+  long long glory = (long long)GET_GLORY(ch);
 
-#ifdef GET_DIAMONDS
-  diamonds = (long long)GET_DIAMONDS(ch);
-#endif
-
-  if (gold <= 0 && silver <= 0 && copper <= 0 && diamonds <= 0) {
+  if (gold <= 0 && bank <= 0 && diamonds <= 0 && glory <= 0) {
     send_to_char(ch, "You have no currency.\r\n");
     return;
   }
@@ -1766,14 +1752,14 @@ static void show_currency_only(struct char_data *ch)
     size_t len = 0;
     out[0] = '\0';
 
-    if (copper > 0)
-      len += (size_t)snprintf(out + len, sizeof(out) - len, "Copper: %lld  ", copper);
-    if (silver > 0)
-      len += (size_t)snprintf(out + len, sizeof(out) - len, "Silver: %lld  ", silver);
     if (gold > 0)
       len += (size_t)snprintf(out + len, sizeof(out) - len, "Gold: %lld  ", gold);
+    if (bank > 0)
+      len += (size_t)snprintf(out + len, sizeof(out) - len, "Banked Gold: %lld  ", bank);
     if (diamonds > 0)
-      len += (size_t)snprintf(out + len, sizeof(out) - len, "Diamond: %lld  ", diamonds);
+      len += (size_t)snprintf(out + len, sizeof(out) - len, "Diamonds: %lld  ", diamonds);
+    if (glory > 0)
+      len += (size_t)snprintf(out + len, sizeof(out) - len, "Glory: %lld  ", glory);
 
     while (len > 0 && out[len - 1] == ' ')
       out[--len] = '\0';
