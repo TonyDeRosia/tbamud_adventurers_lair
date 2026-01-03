@@ -358,7 +358,7 @@ static void make_corpse(struct char_data *ch)
 
     /* Death drop summary for items and money. */
     if (inv_dropped > 0 || dropped_copper > 0) {
-      send_to_char(ch, "Death penalty: You drop %lld copper and %d inventory item(s) on your corpse.\r\n",
+      send_to_char(ch, "Death penalty: You drop %lld gold and %d inventory item(s) on your corpse.\r\n",
                    dropped_copper, inv_dropped);
     } else {
       send_to_char(ch, "Death penalty: You drop nothing.\r\n");

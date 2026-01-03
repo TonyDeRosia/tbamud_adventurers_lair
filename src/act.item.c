@@ -205,9 +205,9 @@ static void get_check_money(struct char_data *ch, struct obj_data *obj)
   extract_obj(obj);
   increase_money_copper(ch, (long long)value);
   if (value == 1)
-    send_to_char(ch, "The pile of coins was worth %d copper coins.\r\n", value);
+    send_to_char(ch, "The pile of coins was worth %d gold coin.\r\n", value);
   else
-    send_to_char(ch, "The pile of coins was worth %d copper coins.\r\n", value);
+    send_to_char(ch, "The pile of coins was worth %d gold coins.\r\n", value);
 }
 
 static void perform_get_from_container(struct char_data *ch, struct obj_data *obj,
@@ -515,23 +515,16 @@ static int perform_drop(struct char_data *ch, struct obj_data *obj,
 static void perform_drop_currency(struct char_data *ch, int amount, int denom, int subcmd)
 {
   long long amount_copper = 0;
-  const char *metal = "copper";
+  const char *metal = "gold";
+
+  (void)denom;
 
   if (amount <= 0) {
     send_to_char(ch, "Drop how much?\r\n");
     return;
   }
 
-  if (denom == 2) {
-    metal = "silver";
-    amount_copper = (long long)amount * (long long)COPPER_PER_SILVER;
-  } else if (denom == 3) {
-    metal = "gold";
-    amount_copper = (long long)amount * (long long)COPPER_PER_GOLD;
-  } else {
-    metal = "copper";
-    amount_copper = (long long)amount;
-  }
+  amount_copper = (long long)amount * (long long)COPPER_PER_GOLD;
 
   if (amount_copper <= 0) {
     send_to_char(ch, "Drop how much?\r\n");
@@ -735,12 +728,12 @@ static void perform_give(struct char_data *ch, struct char_data *vict,
 }
 
 
-/* Currency helpers for give: copper/silver/gold auto-convert, diamonds separate */
+/* Currency helpers for give: gold primary with diamonds as premium currency */
 static int parse_money_denom(const char *w)
 {
   if (!w || !*w) return 0;
-  if (!str_cmp(w, "copper") || !str_cmp(w, "c")) return 1;
-  if (!str_cmp(w, "silver") || !str_cmp(w, "s")) return 2;
+  if (!str_cmp(w, "copper") || !str_cmp(w, "c")) return 3;
+  if (!str_cmp(w, "silver") || !str_cmp(w, "s")) return 3;
   if (!str_cmp(w, "gold") || !str_cmp(w, "g")) return 3;
   if (!str_cmp(w, "diamond") || !str_cmp(w, "d")) return 4;
   if (!str_cmp(w, "coin") || !str_cmp(w, "coins")) return 3;
@@ -765,7 +758,8 @@ static int parse_compact_money_token(const char *tok, int *out_amount, int *out_
   last = tok[len - 1];
   if (last != 'c' && last != 'C' &&
       last != 's' && last != 'S' &&
-      last != 'g' && last != 'G')
+      last != 'g' && last != 'G' &&
+      last != 'd' && last != 'D')
     return 0;
 
   for (int i = 0; i < len - 1; i++)
@@ -773,8 +767,7 @@ static int parse_compact_money_token(const char *tok, int *out_amount, int *out_
       return 0;
 
   *out_amount = atoi(tok);
-  if (last == 'c' || last == 'C') *out_denom = 1;
-  else if (last == 's' || last == 'S') *out_denom = 2;
+  if (last == 'd' || last == 'D') *out_denom = 4;
   else *out_denom = 3;
 
   return 1;
@@ -782,19 +775,17 @@ static int parse_compact_money_token(const char *tok, int *out_amount, int *out_
 static long long money_to_copper_ll(int amount, int denom)
 {
   long long a = (long long)amount;
-  if (denom == 1) return a;
-  if (denom == 2) return a * COPPER_PER_SILVER;
-  if (denom == 3) return a * COPPER_PER_GOLD;
-  return 0;
+
+  if (denom == 4)
+    return 0;
+
+  return a * (long long)COPPER_PER_GOLD;
 }
 
 static const char *denom_name(int denom, int amount)
 {
-  if (denom == 1) return amount == 1 ? "copper coin" : "copper coins";
-  if (denom == 2) return amount == 1 ? "silver coin" : "silver coins";
-  if (denom == 3) return amount == 1 ? "gold coin" : "gold coins";
   if (denom == 4) return amount == 1 ? "diamond" : "diamonds";
-  return amount == 1 ? "coin" : "coins";
+  return amount == 1 ? "gold coin" : "gold coins";
 }
 
 static void perform_give_currency(struct char_data *ch, struct char_data *vict, int amount, int denom)
@@ -1201,7 +1192,7 @@ ACMD(do_pour)
 
   two_arguments(argument, arg1, arg2);
 
-  /* Currency drop: drop <amount> <copper|silver|gold> */
+  /* Currency drop: drop <amount> <gold> */
   if (*arg1 && is_number(arg1) && *arg2) {
     int denom = parse_money_denom(arg2);
     if (denom) {

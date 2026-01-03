@@ -1276,34 +1276,19 @@ int get_obj_pos_in_equip_vis(struct char_data *ch, char *arg, int *number, struc
 const char *money_desc(int amount_copper)
 {
   static char buf[128];
-  long long unit = 1;
-  const char *metal = "copper";
 
   if (amount_copper <= 0) {
     log("SYSERR: Try to create negative or 0 money (%d).", amount_copper);
     return (NULL);
   }
 
-  /* Auto by value for generic uses */
-  if ((long long)amount_copper >= (long long)COPPER_PER_GOLD) {
-    unit = COPPER_PER_GOLD;
-    metal = "gold";
-  } else if ((long long)amount_copper >= (long long)COPPER_PER_SILVER) {
-    unit = COPPER_PER_SILVER;
-    metal = "silver";
-  } else {
-    unit = 1;
-    metal = "copper";
-  }
-
   {
-    long long count = (long long)amount_copper / unit;
-    long long rem   = (long long)amount_copper % unit;
+    long long count = (long long)amount_copper;
 
-    if (count == 1 && rem == 0)
-      snprintf(buf, sizeof(buf), "a %s coin", metal);
+    if (count == 1)
+      snprintf(buf, sizeof(buf), "a gold coin");
     else
-      snprintf(buf, sizeof(buf), "a pile of %s coins", metal);
+      snprintf(buf, sizeof(buf), "a pile of gold coins");
   }
 
   return buf;
@@ -1318,35 +1303,17 @@ struct obj_data *create_money(int amount_copper, int denom_hint)
   int y;
 
   long long unit = 1;
-  const char *metal = "copper";
+  const char *metal = "gold";
+
+  (void)denom_hint;
 
   if (amount_copper <= 0) {
     log("SYSERR: Try to create negative or 0 money. (%d)", amount_copper);
     return (NULL);
   }
 
-  /* If caller knows intent (drop), trust denom_hint. Otherwise auto by value. */
-  if (denom_hint == 3) {
-    unit = COPPER_PER_GOLD;
-    metal = "gold";
-  } else if (denom_hint == 2) {
-    unit = COPPER_PER_SILVER;
-    metal = "silver";
-  } else if (denom_hint == 1) {
-    unit = 1;
-    metal = "copper";
-  } else {
-    if ((long long)amount_copper >= (long long)COPPER_PER_GOLD) {
-      unit = COPPER_PER_GOLD;
-      metal = "gold";
-    } else if ((long long)amount_copper >= (long long)COPPER_PER_SILVER) {
-      unit = COPPER_PER_SILVER;
-      metal = "silver";
-    } else {
-      unit = 1;
-      metal = "copper";
-    }
-  }
+  unit = COPPER_PER_GOLD;
+  metal = "gold";
 
   {
     long long count = (long long)amount_copper / unit;

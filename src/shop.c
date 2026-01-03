@@ -48,23 +48,18 @@ static long long shop_units_to_copper(long long units)
 
 static void shop_format_price(char *out, size_t outsz, long long total_copper)
 {
-  long long g = 0, s = 0, c = 0;
+  long long total_gold = total_copper;
 
   if (total_copper < 0)
     total_copper = 0;
 
-  g = total_copper / (long long)COPPER_PER_GOLD;
-  total_copper %= (long long)COPPER_PER_GOLD;
+  total_gold = total_copper;
 
-  s = total_copper / (long long)COPPER_PER_SILVER;
-  c = total_copper % (long long)COPPER_PER_SILVER;
+#if SHOP_PRICE_IN_COPPER
+  total_gold = total_copper / (long long)COPPER_PER_GOLD;
+#endif
 
-  if (g > 0)
-    snprintf(out, outsz, "%lldg %llds %lldc", g, s, c);
-  else if (s > 0)
-    snprintf(out, outsz, "%llds %lldc", s, c);
-  else
-    snprintf(out, outsz, "%lldc", c);
+  format_gold_as_currency(out, outsz, total_gold);
 }
 
 static void shop_charge(struct char_data *ch, long long cost_copper)
