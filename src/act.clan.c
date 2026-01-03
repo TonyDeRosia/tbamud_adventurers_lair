@@ -278,7 +278,7 @@ static void clan_show_roster(struct char_data *ch)
     "%s╠══════════════════════════════════════════════════════════════════════╣%s\r\n"
     , B, R,
       B, R, clan_name_buf, B, R, B,
-      B, R, Y, R, B, R,
+      R, Y, R, B, R,
       B, R,
       B, R, C, R, B, R,
       B, R
