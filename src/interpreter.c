@@ -1534,10 +1534,12 @@ void nanny(struct descriptor_data *d, char *arg)
   /* Not in OLC. */
   switch (STATE(d)) {
   case CON_GET_PROTOCOL:
-    write_to_output(d, "Collecting Protocol Information... Please Wait.\r\n"); 
+    write_to_output(d, "Collecting Protocol Information... Please Wait.\r\n");
     return;
 
     case CON_ACCT_NAME:
+      account_storage_report();
+
       if (!*arg) {
         write_to_output(d, "Account name (or NEW): ");
         return;
