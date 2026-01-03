@@ -73,15 +73,10 @@ static const char *prac_types[] = {
 #define ABILITIES_PER_LINE 2
 #define LEVEL_LABEL_PADDING 14
 
-#define LEARNED_LEVEL   0       /* % known which is considered "learned" */
-#define MAX_PER_PRAC    1       /* max percent gain in skill per practice */
-#define MIN_PER_PRAC    2       /* min percent gain in skill per practice */
-#define PRAC_TYPE       3       /* should it say 'spell' or 'skill'?     */
-
-#define LEARNED(ch) (prac_params[LEARNED_LEVEL][(int)GET_CLASS(ch)])
-#define MINGAIN(ch) (prac_params[MIN_PER_PRAC][(int)GET_CLASS(ch)])
-#define MAXGAIN(ch) (prac_params[MAX_PER_PRAC][(int)GET_CLASS(ch)])
-#define SPLSKL(ch) (prac_types[prac_params[PRAC_TYPE][(int)GET_CLASS(ch)]])
+#define LEARNED(ch) (get_class_prac_learned_level((int)GET_CLASS(ch)))
+#define MINGAIN(ch) (get_class_prac_min_per_prac((int)GET_CLASS(ch)))
+#define MAXGAIN(ch) (get_class_prac_max_per_prac((int)GET_CLASS(ch)))
+#define SPLSKL(ch) (prac_types[get_class_prac_type((int)GET_CLASS(ch))])
 
 static bool ability_is_spell(int ability)
 {

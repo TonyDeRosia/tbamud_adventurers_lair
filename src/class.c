@@ -26,59 +26,134 @@
 #include "act.h"
 #include "class.h"
 
-/* Names first */
+#define SPELL   0
+#define SKILL   1
+
+const struct pc_class_definition pc_classes[NUM_CLASSES] = {
+  [CLASS_MAGIC_USER] = {
+    .name = "Magic User",
+    .abbrev = "Mu",
+    .archetype_abbrev = "Spl",
+    .select_key = 'm',
+    .prac_learned_level = 95,
+    .prac_max_per_prac = 100,
+    .prac_min_per_prac = 25,
+    .prac_type = SPELL
+  },
+  [CLASS_CLERIC] = {
+    .name = "Cleric",
+    .abbrev = "Cl",
+    .archetype_abbrev = "Div",
+    .select_key = 'c',
+    .prac_learned_level = 95,
+    .prac_max_per_prac = 100,
+    .prac_min_per_prac = 25,
+    .prac_type = SPELL
+  },
+  [CLASS_THIEF] = {
+    .name = "Thief",
+    .abbrev = "Th",
+    .archetype_abbrev = "Rog",
+    .select_key = 't',
+    .prac_learned_level = 85,
+    .prac_max_per_prac = 12,
+    .prac_min_per_prac = 0,
+    .prac_type = SKILL
+  },
+  [CLASS_WARRIOR] = {
+    .name = "Warrior",
+    .abbrev = "Wa",
+    .archetype_abbrev = "Mar",
+    .select_key = 'w',
+    .prac_learned_level = 80,
+    .prac_max_per_prac = 12,
+    .prac_min_per_prac = 0,
+    .prac_type = SKILL
+  }
+};
+
+_Static_assert(ARRAY_SIZE(pc_classes) == NUM_CLASSES, "pc_classes size mismatch");
+
 const char *class_abbrevs[] = {
-  "Mu",
-  "Cl",
-  "Th",
-  "Wa",
+  [CLASS_MAGIC_USER] = pc_classes[CLASS_MAGIC_USER].abbrev,
+  [CLASS_CLERIC] = pc_classes[CLASS_CLERIC].abbrev,
+  [CLASS_THIEF] = pc_classes[CLASS_THIEF].abbrev,
+  [CLASS_WARRIOR] = pc_classes[CLASS_WARRIOR].abbrev,
   "\n"
 };
+
+const char *pc_class_types[] = {
+  [CLASS_MAGIC_USER] = pc_classes[CLASS_MAGIC_USER].name,
+  [CLASS_CLERIC] = pc_classes[CLASS_CLERIC].name,
+  [CLASS_THIEF] = pc_classes[CLASS_THIEF].name,
+  [CLASS_WARRIOR] = pc_classes[CLASS_WARRIOR].name,
+  "\n"
+};
+
+int is_valid_class(int class_num)
+{
+  return class_num >= 0 && class_num < NUM_CLASSES;
+}
 
 const char *get_archetype_abbrev(struct char_data *ch)
 {
   if (IS_NPC(ch))
     return "--";
 
-  switch (GET_CLASS(ch)) {
-    case CLASS_WARRIOR:     return "Mar";
-    case CLASS_THIEF:       return "Rog";
-    case CLASS_CLERIC:      return "Div";
-    case CLASS_MAGIC_USER:  return "Spl";
-    default:                return "UNK";
-  }
+  if (!is_valid_class(GET_CLASS(ch)))
+    return "UNK";
+
+  return pc_classes[GET_CLASS(ch)].archetype_abbrev;
 }
 
-const char *pc_class_types[] = {
-  "Magic User",
-  "Cleric",
-  "Thief",
-  "Warrior",
-  "\n"
-};
-
 /* The menu for choosing a class in interpreter.c: */
-const char *class_menu =
-"\r\n"
-"Select a class:\r\n"
-"  [\t(C\t)]leric\r\n"
-"  [\t(T\t)]hief\r\n"
-"  [\t(W\t)]arrior\r\n"
-"  [\t(M\t)]agic-user\r\n";
+const char *class_menu(void)
+{
+  static char menu[128];
+  size_t len = 0;
+  int i;
+  const int menu_order[] = { CLASS_CLERIC, CLASS_THIEF, CLASS_WARRIOR, CLASS_MAGIC_USER };
+
+  if (menu[0] != '\0')
+    return menu;
+
+  len += snprintf(menu + len, sizeof(menu) - len, "\r\nSelect a class:\r\n");
+
+  for (i = 0; i < NUM_CLASSES && len < sizeof(menu); i++) {
+    int cls = menu_order[i];
+    const struct pc_class_definition *pc_class = &pc_classes[cls];
+    char rest_name[MAX_INPUT_LENGTH];
+    const char *name_ptr = pc_class->name;
+
+    snprintf(rest_name, sizeof(rest_name), "%s", name_ptr + 1);
+    for (char *p = rest_name; *p; ++p) {
+      if (*p == ' ')
+        *p = '-';
+      else
+        *p = LOWER(*p);
+    }
+
+    len += snprintf(menu + len, sizeof(menu) - len, "  [\t(%c\t)]%s\r\n",
+                    UPPER(pc_class->select_key), rest_name);
+  }
+
+  return menu;
+}
 
 /* The code to interpret a class letter -- used in interpreter.c when a new
  * character is selecting a class and by 'set class' in act.wizard.c. */
 int parse_class(char arg)
 {
+  size_t i;
+
   arg = LOWER(arg);
 
-  switch (arg) {
-  case 'm': return CLASS_MAGIC_USER;
-  case 'c': return CLASS_CLERIC;
-  case 'w': return CLASS_WARRIOR;
-  case 't': return CLASS_THIEF;
-  default:  return CLASS_UNDEFINED;
+  for (i = 0; i < ARRAY_SIZE(pc_classes); i++) {
+    if (pc_classes[i].select_key == arg)
+      return i;
   }
+
+  return CLASS_UNDEFINED;
 }
 
 /* bitvectors (i.e., powers of two) for each class, mainly for use in do_who
@@ -89,8 +164,12 @@ bitvector_t find_class_bitvector(const char *arg)
 {
   size_t rpos, ret = 0;
 
-  for (rpos = 0; rpos < strlen(arg); rpos++)
-    ret |= (1 << parse_class(arg[rpos]));
+  for (rpos = 0; rpos < strlen(arg); rpos++) {
+    int class_num = parse_class(arg[rpos]);
+
+    if (is_valid_class(class_num))
+      ret |= (1 << class_num);
+  }
 
   return (ret);
 }
@@ -113,21 +192,42 @@ bitvector_t find_class_bitvector(const char *arg)
  * trying to practice (i.e. "You know of the following spells" vs. "You know of
  * the following skills" */
 
-#define SPELL	0
-#define SKILL	1
-
 /* #define LEARNED_LEVEL	0  % known which is considered "learned" */
 /* #define MAX_PER_PRAC		1  max percent gain in skill per practice */
 /* #define MIN_PER_PRAC		2  min percent gain in skill per practice */
 /* #define PRAC_TYPE		3  should it say 'spell' or 'skill'?	*/
 
-int prac_params[4][NUM_CLASSES] = {
-  /* MAG	CLE	THE	WAR */
-  { 95,		95,	85,	80	},	/* learned level */
-  { 100,	100,	12,	12	},	/* max per practice */
-  { 25,		25,	0,	0	},	/* min per practice */
-  { SPELL,	SPELL,	SKILL,	SKILL	},	/* prac name */
-};
+int get_class_prac_learned_level(int class_num)
+{
+  if (!is_valid_class(class_num))
+    return 0;
+
+  return pc_classes[class_num].prac_learned_level;
+}
+
+int get_class_prac_max_per_prac(int class_num)
+{
+  if (!is_valid_class(class_num))
+    return 0;
+
+  return pc_classes[class_num].prac_max_per_prac;
+}
+
+int get_class_prac_min_per_prac(int class_num)
+{
+  if (!is_valid_class(class_num))
+    return 0;
+
+  return pc_classes[class_num].prac_min_per_prac;
+}
+
+int get_class_prac_type(int class_num)
+{
+  if (!is_valid_class(class_num))
+    return SPELL;
+
+  return pc_classes[class_num].prac_type;
+}
 
 /* The appropriate rooms for each guildmaster/guildguard; controls which types
  * of people the various guildguards let through.  i.e., the first line shows
