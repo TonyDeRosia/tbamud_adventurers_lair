@@ -409,6 +409,7 @@ cpp_extern const struct command_info cmd_info[] = {
   { "wizlock"  , "wizlock" , POS_DEAD    , do_wizlock  , LVL_IMPL, 0 },
   { "write"    , "write"   , POS_STANDING, do_write    , 1, 0 },
 
+  { "azr"      , "azr"     , POS_DEAD    , do_azr      , LVL_IMPL, 0 },
   { "zoneresets", "zoner" ,  POS_DEAD    , do_gen_tog , LVL_IMPL, SCMD_ZONERESETS },
   { "zreset"   , "zreset"  , POS_DEAD    , do_zreset   , LVL_BUILDER, 0 },
   { "zedit"    , "zedit"   , POS_DEAD    , do_oasis_zedit, LVL_BUILDER, 0 },
