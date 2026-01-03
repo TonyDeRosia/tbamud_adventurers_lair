@@ -733,7 +733,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig,
               int addition = atoi(subfield);
               increase_gold(c, addition);
             }
-            snprintf(str, slen, "%lld", ((long long)GET_GOLD(c)));
+            snprintf(str, slen, "%d", GET_GOLD(c));
           }
           break;
         case 'h':
