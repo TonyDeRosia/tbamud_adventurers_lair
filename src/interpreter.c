@@ -2158,6 +2158,9 @@ case CON_QCLASS:
   else if (c == 's') c = 'm';  /* Spellcaster -> Magic-user */
 
   load_result = parse_class(c);
+
+  if (load_result != CLASS_UNDEFINED && !pc_classes[load_result].selectable)
+    load_result = CLASS_UNDEFINED;
 }
 if (load_result == CLASS_UNDEFINED) {
   write_to_output(d, "\r\nThat's not a class.\r\nClass: ");
