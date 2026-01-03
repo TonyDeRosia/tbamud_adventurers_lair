@@ -1895,10 +1895,14 @@ void init_spell_levels(void)
 
   /* WARRIORS */
   spell_level(SKILL_RESCUE, CLASS_WARRIOR, 3);
-  spell_level(SKILL_BANDAGE, CLASS_WARRIOR, 7);
-  spell_level(SKILL_TRACK, CLASS_WARRIOR, 9);
+  spell_level(SPELL_STRENGTH, CLASS_WARRIOR, 10);
   spell_level(SKILL_BASH, CLASS_WARRIOR, 12);
-  spell_level(SKILL_WHIRLWIND, CLASS_WARRIOR, 16);
+  spell_level(SKILL_DUAL_WIELD, CLASS_WARRIOR, 15);
+  spell_level(SKILL_BANDAGE, CLASS_WARRIOR, 20);
+  spell_level(SKILL_WHIRLWIND, CLASS_WARRIOR, 25);
+  spell_level(SPELL_ARMOR, CLASS_WARRIOR, 30);
+  spell_level(SKILL_TRACK, CLASS_WARRIOR, 40);
+  spell_level(SPELL_EARTHQUAKE, CLASS_WARRIOR, 60);
 }
 
 #define MORTAL_MAX_LEVEL   (LVL_IMMORT - 1)
