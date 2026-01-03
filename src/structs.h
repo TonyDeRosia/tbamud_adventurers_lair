@@ -643,15 +643,15 @@ void clanedit_parse(struct descriptor_data *d, char *arg);
 #define MAX_HELP_ENTRY        MAX_STRING_LENGTH /**< Max size of help entry */
 #define MAX_COMPLETED_QUESTS  1024   /**< Maximum number of completed quests allowed */
 
+/* Currency configuration. Primary currency is gold with premium diamonds. */
 #define GOLD_PER_DIAMOND    1000LL
 
+/* Legacy conversion constants for pre-refactor player files (copper-based). */
+#define LEGACY_COPPER_PER_GOLD   100000LL
 #define COPPER_PER_SILVER   1LL
 #define SILVER_PER_GOLD     1LL
 #define COPPER_PER_GOLD     1LL
 #define COPPER_PER_DIAMOND  (COPPER_PER_GOLD * GOLD_PER_DIAMOND)
-
-/* Legacy conversion constants for pre-refactor player files. */
-#define LEGACY_COPPER_PER_GOLD   100000LL
 
 /* Money caps (canonical storage is gold units). Target max display: 999999 gold */
 #define MAX_MONEY (999999LL)
@@ -1018,7 +1018,7 @@ struct player_special_data_saved
   time_t   lastmotd;            /**< Last time player read motd */
   time_t   lastnews;            /**< Last time player read news */
   long account_id; /* account linkage id */
-  long long bounty_copper; /**< Outstanding bounty on the character, stored in copper */
+  long long bounty_gold; /**< Outstanding bounty on the character, stored in gold units */
   char last_pvp_glory_victim[MAX_NAME_LENGTH + 1]; /**< anti-farm tracking */
   time_t last_pvp_glory_time; /**< anti-farm timestamp */
 

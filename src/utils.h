@@ -550,9 +550,9 @@ do                                                              \
 /** Anti-farm tracking */
 #define GET_LAST_PVP_GLORY_VICTIM(ch) ((ch)->player_specials->saved.last_pvp_glory_victim)
 #define GET_LAST_PVP_GLORY_TIME(ch)   ((ch)->player_specials->saved.last_pvp_glory_time)
-/** Bounty on character (copper units) */
-#define GET_BOUNTY(ch)     ((ch)->player_specials->saved.bounty_copper)
-#define SET_BOUNTY(ch, v)  do { (ch)->player_specials->saved.bounty_copper = (v); } while (0)
+/** Bounty on character (gold units) */
+#define GET_BOUNTY(ch)     ((ch)->player_specials->saved.bounty_gold)
+#define SET_BOUNTY(ch, v)  do { (ch)->player_specials->saved.bounty_gold = (v); } while (0)
 
 /* Lvalue helpers for old code paths that used assignments */
 #define SET_GOLD(ch,g)       do { GET_GOLD(ch) = (g); } while (0)
