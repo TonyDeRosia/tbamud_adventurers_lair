@@ -871,9 +871,10 @@ ACMD(do_opet)
 {
   char first_arg[MAX_INPUT_LENGTH], command_part[MAX_INPUT_LENGTH];
   char cmd_sub[MAX_INPUT_LENGTH], target[MAX_INPUT_LENGTH];
-  char follower_command[MAX_INPUT_LENGTH * 2];
+  char order_argument[MAX_INPUT_LENGTH * 2];
   struct char_data *follower;
-  const char *usage = "Usage: opet stay | opet attack <target>\r\n";
+  const char *usage =
+    "Usage: opet [follower] stay | opet [follower] follow | opet [follower] attack <target> | opet [follower] assist <target>\r\n";
 
   half_chop(argument, first_arg, command_part);
 
@@ -898,31 +899,29 @@ ACMD(do_opet)
   half_chop(command_part, cmd_sub, target);
 
   if (is_abbrev(cmd_sub, "stay")) {
-    /* Use the sit command so the pet will remain in place instead of trying
-     * to follow the player on movement. */
-    snprintf(follower_command, sizeof(follower_command), "sit");
+    snprintf(order_argument, sizeof(order_argument), "%s stay", GET_NAME(follower));
+  } else if (is_abbrev(cmd_sub, "follow")) {
+    snprintf(order_argument, sizeof(order_argument), "%s follow", GET_NAME(follower));
   } else if (is_abbrev(cmd_sub, "attack")) {
     if (!*target) {
-      send_to_char(ch, "Usage: opet attack <target>\r\n");
+      send_to_char(ch, "Usage: opet [follower] attack <target>\r\n");
       return;
     }
 
-    /* Translate attack into the standard kill command so charmies
-     * immediately engage the requested target. */
-    snprintf(follower_command, sizeof(follower_command), "kill %s", target);
+    snprintf(order_argument, sizeof(order_argument), "%s attack %s", GET_NAME(follower), target);
+  } else if (is_abbrev(cmd_sub, "assist")) {
+    if (!*target) {
+      send_to_char(ch, "Usage: opet [follower] assist <target>\r\n");
+      return;
+    }
+
+    snprintf(order_argument, sizeof(order_argument), "%s assist %s", GET_NAME(follower), target);
   } else {
     send_to_char(ch, "%s", usage);
     return;
   }
 
-  /* Directly command the follower instead of going through do_order().
-   * The do_order() handler attempts to find the target by parsing the
-   * provided name, which can misidentify the commander as the victim when
-   * the pet name is ambiguous. By executing the interpreted command on the
-   * already-selected follower, we avoid targeting the wrong character while
-   * preserving the expected acknowledgement. */
-  send_to_char(ch, "%s", CONFIG_OK);
-  command_interpreter(follower, follower_command);
+  do_order(ch, order_argument, 0, 0);
 }
 
 ACMD(do_report)
