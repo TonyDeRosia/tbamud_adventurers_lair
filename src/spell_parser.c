@@ -582,6 +582,8 @@ int cast_spell(struct char_data *ch, struct char_data *tch,
     send_to_char(ch, "You can't cast this spell if you're not in a group!\r\n");
     return (0);
   }
+  if (is_spirit_spell(spellnum) && !can_bind_spirit(ch, spellnum))
+    return (0);
   send_to_char(ch, "%s", CONFIG_OK);
   /* cast feedback message */
   if (!IS_NPC(ch)) {
@@ -1058,6 +1060,21 @@ void mag_assign_spells(void) {
 
   spello(SPELL_TELEPORT, "teleport", 75, 50, 3, POS_STANDING,
   TAR_CHAR_ROOM, FALSE, MAG_MANUAL, NULL);
+
+  spello(SPELL_BEAR_SPIRIT, "bear spirit", 40, 20, 2, POS_STANDING,
+  TAR_SELF_ONLY, FALSE, MAG_AFFECTS, "The strength of the bear spirit leaves you.");
+
+  spello(SPELL_WOLF_SPIRIT, "wolf spirit", 40, 20, 2, POS_STANDING,
+  TAR_SELF_ONLY, FALSE, MAG_AFFECTS, "The keen focus of the wolf spirit fades.");
+
+  spello(SPELL_TIGER_SPIRIT, "tiger spirit", 45, 25, 2, POS_STANDING,
+  TAR_SELF_ONLY, FALSE, MAG_AFFECTS, "The ferocity of the tiger spirit ebbs.");
+
+  spello(SPELL_EAGLE_SPIRIT, "eagle spirit", 50, 25, 2, POS_STANDING,
+  TAR_SELF_ONLY, FALSE, MAG_AFFECTS, "The watchful eagle spirit drifts away.");
+
+  spello(SPELL_DRAGON_SPIRIT, "dragon spirit", 60, 40, 2, POS_STANDING,
+  TAR_SELF_ONLY, FALSE, MAG_AFFECTS, "The presence of the dragon spirit withdraws.");
 
   spello(SPELL_WATERWALK, "waterwalk", 40, 20, 2, POS_STANDING,
   TAR_CHAR_ROOM, FALSE, MAG_AFFECTS, "Your feet seem less buoyant.");

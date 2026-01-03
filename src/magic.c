@@ -28,6 +28,10 @@
 /* local file scope function prototypes */
 static int mag_materials(struct char_data *ch, IDXTYPE item0, IDXTYPE item1, IDXTYPE item2, int extract, int verbose);
 static void perform_mag_groups(int level, struct char_data *ch, struct char_data *tch, int spellnum, int savetype);
+bool is_spirit_spell(int spellnum);
+int mystic_spirit_cap(struct char_data *ch);
+static int active_spirit_count(struct char_data *ch);
+bool can_bind_spirit(struct char_data *ch, int spellnum);
 
 
 /* Negative apply_saving_throw[] values make saving throws better! So do
@@ -311,7 +315,7 @@ int mag_damage(int level, struct char_data *ch, struct char_data *victim,
 #define MAX_SPELL_AFFECTS 5	/* change if more needed */
 
 void mag_affects(int level, struct char_data *ch, struct char_data *victim,
-		      int spellnum, int savetype)
+                      int spellnum, int savetype)
 {
   struct affected_type af[MAX_SPELL_AFFECTS];
   bool accum_affect = FALSE, accum_duration = FALSE;
@@ -320,6 +324,9 @@ void mag_affects(int level, struct char_data *ch, struct char_data *victim,
 
 
   if (victim == NULL || ch == NULL)
+    return;
+
+  if (is_spirit_spell(spellnum) && !can_bind_spirit(ch, spellnum))
     return;
 
   for (i = 0; i < MAX_SPELL_AFFECTS; i++) {
@@ -525,6 +532,101 @@ void mag_affects(int level, struct char_data *ch, struct char_data *victim,
     accum_duration = TRUE;
     to_vict = "You feel webbing between your toes.";
     break;
+
+  case SPELL_BEAR_SPIRIT:
+    af[0].location = APPLY_AC;
+    af[0].modifier = -15;
+    af[0].duration = 12 + level;
+
+    af[1].location = APPLY_HIT;
+    af[1].modifier = 10;
+    af[1].duration = 12 + level;
+
+    af[2].location = APPLY_SAVING_BREATH;
+    af[2].modifier = -1;
+    af[2].duration = 12 + level;
+
+    accum_duration = TRUE;
+    accum_affect = TRUE;
+    to_vict = "A steadfast bear spirit girds your body.";
+    break;
+
+  case SPELL_WOLF_SPIRIT:
+    af[0].location = APPLY_HITROLL;
+    af[0].modifier = 2;
+    af[0].duration = 12 + level;
+
+    af[1].location = APPLY_DEX;
+    af[1].modifier = 1;
+    af[1].duration = 12 + level;
+
+    af[2].location = APPLY_MELEE_CRIT;
+    af[2].modifier = 1;
+    af[2].duration = 12 + level;
+
+    accum_duration = TRUE;
+    accum_affect = TRUE;
+    to_vict = "A wolf spirit sharpens your predatory instincts.";
+    break;
+
+  case SPELL_TIGER_SPIRIT:
+    af[0].location = APPLY_DAMROLL;
+    af[0].modifier = 2;
+    af[0].duration = 12 + level;
+
+    af[1].location = APPLY_HITROLL;
+    af[1].modifier = 1;
+    af[1].duration = 12 + level;
+
+    af[2].location = APPLY_MELEE_CRIT_MULT;
+    af[2].modifier = 1;
+    af[2].duration = 12 + level;
+
+    accum_duration = TRUE;
+    accum_affect = TRUE;
+    to_vict = "A stalking tiger spirit urges you to strike from the shadows.";
+    break;
+
+  case SPELL_EAGLE_SPIRIT:
+    af[0].duration = 12 + level;
+    SET_BIT_AR(af[0].bitvector, AFF_DETECT_INVIS);
+
+    af[1].duration = 12 + level;
+    SET_BIT_AR(af[1].bitvector, AFF_SENSE_LIFE);
+
+    af[2].location = APPLY_AC;
+    af[2].modifier = -10;
+    af[2].duration = 12 + level;
+
+    accum_duration = TRUE;
+    accum_affect = TRUE;
+    to_vict = "An eagle spirit guides your sight from above.";
+    break;
+
+  case SPELL_DRAGON_SPIRIT:
+    af[0].location = APPLY_STR;
+    af[0].modifier = 1;
+    af[0].duration = 12 + level;
+
+    af[1].location = APPLY_CON;
+    af[1].modifier = 1;
+    af[1].duration = 12 + level;
+
+    af[2].location = APPLY_MOVE;
+    af[2].modifier = 15;
+    af[2].duration = 12 + level;
+
+    af[3].location = APPLY_SAVING_BREATH;
+    af[3].modifier = -2;
+    af[3].duration = 12 + level;
+
+    af[4].duration = 12 + level;
+    SET_BIT_AR(af[4].bitvector, AFF_FLYING);
+
+    accum_duration = TRUE;
+    accum_affect = TRUE;
+    to_vict = "A venerable dragon spirit coils protectively around you.";
+    break;
   }
 
   /* If this is a mob that has this affect set in its mob file, do not perform
@@ -558,6 +660,89 @@ void mag_affects(int level, struct char_data *ch, struct char_data *victim,
     act(to_vict, FALSE, victim, 0, ch, TO_CHAR);
   if (to_room != NULL)
     act(to_room, TRUE, victim, 0, ch, TO_ROOM);
+}
+
+bool is_spirit_spell(int spellnum)
+{
+  switch (spellnum) {
+  case SPELL_BEAR_SPIRIT:
+  case SPELL_WOLF_SPIRIT:
+  case SPELL_TIGER_SPIRIT:
+  case SPELL_EAGLE_SPIRIT:
+  case SPELL_DRAGON_SPIRIT:
+    return TRUE;
+  default:
+    return FALSE;
+  }
+}
+
+int mystic_spirit_cap(struct char_data *ch)
+{
+  int level;
+
+  if (ch == NULL || IS_NPC(ch) || GET_CLASS(ch) != CLASS_MYSTIC)
+    return 0;
+
+  level = GET_LEVEL(ch);
+
+  if (level >= 80)
+    return 5;
+  if (level >= 60)
+    return 4;
+  if (level >= 40)
+    return 3;
+  if (level >= 20)
+    return 2;
+  return 1;
+}
+
+static int active_spirit_count(struct char_data *ch)
+{
+  int spirits = 0;
+
+  if (ch == NULL)
+    return 0;
+
+  spirits += affected_by_spell(ch, SPELL_BEAR_SPIRIT) ? 1 : 0;
+  spirits += affected_by_spell(ch, SPELL_WOLF_SPIRIT) ? 1 : 0;
+  spirits += affected_by_spell(ch, SPELL_TIGER_SPIRIT) ? 1 : 0;
+  spirits += affected_by_spell(ch, SPELL_EAGLE_SPIRIT) ? 1 : 0;
+  spirits += affected_by_spell(ch, SPELL_DRAGON_SPIRIT) ? 1 : 0;
+
+  return spirits;
+}
+
+bool can_bind_spirit(struct char_data *ch, int spellnum)
+{
+  int cap, active;
+
+  if (!is_spirit_spell(spellnum))
+    return TRUE;
+
+  if (ch == NULL)
+    return FALSE;
+
+  if (GET_CLASS(ch) != CLASS_MYSTIC && GET_LEVEL(ch) < LVL_IMMORT) {
+    send_to_char(ch, "Only mystics may bind this spirit.\r\n");
+    return FALSE;
+  }
+
+  cap = mystic_spirit_cap(ch);
+
+  if (cap == 0)
+    return TRUE;
+
+  if (affected_by_spell(ch, spellnum))
+    return TRUE;
+
+  active = active_spirit_count(ch);
+
+  if (active >= cap) {
+    send_to_char(ch, "You cannot bind another spirit; you have reached your limit of %d.\r\n", cap);
+    return FALSE;
+  }
+
+  return TRUE;
 }
 
 /* This function is used to provide services to mag_groups.  This function is
