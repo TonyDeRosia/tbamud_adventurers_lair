@@ -449,14 +449,18 @@ ACMD(do_clist)
   int max_id = MAX_CLANS;
 #else
   /* Fallback if MAX_CLANS is not visible for some reason. */
-  int max_id = 256;
+  int max_id = clan_next_id();
 #endif
 
   if (max_id > (int)(sizeof(rows) / sizeof(rows[0])))
     max_id = (int)(sizeof(rows) / sizeof(rows[0]));
 
   for (i = 1; i < max_id; i++) {
-    const char *nm = clan_name_by_id(i);
+    const char *nm = NULL;
+    if (!clan_exists(i))
+      continue;
+
+    nm = clan_name_by_id(i);
     if (!nm || !*nm)
       continue;
 
