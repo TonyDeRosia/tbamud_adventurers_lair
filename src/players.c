@@ -287,19 +287,11 @@ static long long parse_numeric_value(const char *line)
   return atoll(value);
 }
 
-/* Normalize any saved currency into the canonical copper unit. */
+/* Normalize any saved currency into the canonical gold unit. */
 static long long normalize_currency_units(long long stored)
 {
   if (stored < 0)
     return 0;
-
-  /* Legacy gold-based saves were written in whole gold; scale to copper. */
-  if (stored <= MAX_MONEY)
-    return stored * COPPER_PER_GOLD;
-
-  /* If we detect legacy copper-per-gold ratios, rescale to current settings. */
-  if (LEGACY_COPPER_PER_GOLD != COPPER_PER_GOLD && stored % LEGACY_COPPER_PER_GOLD == 0)
-    return (stored / LEGACY_COPPER_PER_GOLD) * COPPER_PER_GOLD;
 
   return stored;
 }
@@ -614,7 +606,7 @@ int load_char(const char *name, struct char_data *ch)
     if (money_seen && __loaded_money_gold >= 0) {
       GET_MONEY(ch) = normalize_currency_units(__loaded_money_gold);
     } else if (!money_seen && __loaded_gold_units >= 0) {
-      GET_MONEY(ch) = (long long)__loaded_gold_units * COPPER_PER_GOLD;
+      GET_MONEY(ch) = (long long)__loaded_gold_units;
     }
 
     if (bank_money_seen && __loaded_bank_money >= 0)
@@ -805,7 +797,7 @@ void save_char(struct char_data * ch)
 
   if (GET_AC(ch)   != PFDEF_AC)         fprintf(fl, "Ac  : %d\n", GET_AC(ch));
 
-  /* Copper is canonical; persist it directly. */
+  /* Gold is canonical; persist it directly. */
   fprintf(fl, "Gold: %lld\n", ((long long)GET_MONEY(ch)));
   fprintf(fl, "Bank: %lld\n", ((long long)GET_BANK_MONEY(ch)));
   if (GET_DIAMONDS(ch))

@@ -28,36 +28,16 @@
 #include "shop_prices.h"
 
 
-/* default currency unit sizes */
-#ifndef COPPER_PER_GOLD
-#define COPPER_PER_GOLD 100000
-#endif
-#ifndef COPPER_PER_SILVER
-#define COPPER_PER_SILVER 1000
-#endif
-
-/* shop currency helpers (display and payment in copper total) */
-static long long shop_units_to_copper(long long units)
+/* shop currency helpers (display and payment in gold total) */
+static long long shop_units_to_gold(long long units)
 {
-#if SHOP_PRICE_IN_COPPER
-  return units; /* units already copper */
-#else
-  return units * (long long)COPPER_PER_GOLD; /* units are gold */
-#endif
+  return units;
 }
 
-static void shop_format_price(char *out, size_t outsz, long long total_copper)
+static void shop_format_price(char *out, size_t outsz, long long total_gold)
 {
-  long long total_gold = total_copper;
-
-  if (total_copper < 0)
-    total_copper = 0;
-
-  total_gold = total_copper;
-
-#if SHOP_PRICE_IN_COPPER
-  total_gold = total_copper / (long long)COPPER_PER_GOLD;
-#endif
+  if (total_gold < 0)
+    total_gold = 0;
 
   format_gold_as_currency(out, outsz, total_gold);
 }
@@ -1013,14 +993,14 @@ static void shopping_value(char *arg, struct char_data *ch, struct char_data *ke
   if (!(obj = get_selling_obj(ch, name, keeper, shop_nr, TRUE)))
     return;
 
-  { long long _sp = shop_units_to_copper((long long)sell_price(obj, shop_nr, keeper, ch)); char _pb[64]; shop_format_price(_pb, sizeof(_pb), _sp); snprintf(buf, sizeof(buf), "%s I\'ll give you %s for that!", GET_NAME(ch), _pb); }
+  { long long _sp = shop_units_to_gold((long long)sell_price(obj, shop_nr, keeper, ch)); char _pb[64]; shop_format_price(_pb, sizeof(_pb), _sp); snprintf(buf, sizeof(buf), "%s I\'ll give you %s for that!", GET_NAME(ch), _pb); }
   do_tell(keeper, buf, cmd_tell, 0);
 }
 
 static char *list_object(struct obj_data *obj, int cnt, int aindex, int shop_nr, struct char_data *keeper, struct char_data *ch)
 {
   char pricebuf[64];
-  long long price_copper = 0;
+  long long price_gold = 0;
 #ifdef SHOP_PRICE_DEBUG
   struct buy_price_info info;
   int price = buy_price_internal(obj, shop_nr, keeper, ch, &info);
@@ -1028,8 +1008,8 @@ static char *list_object(struct obj_data *obj, int cnt, int aindex, int shop_nr,
 #else
   int price = buy_price(obj, shop_nr, keeper, ch);
 #endif
-  price_copper = shop_units_to_copper((long long)price);
-  shop_format_price(pricebuf, sizeof(pricebuf), price_copper);
+  price_gold = shop_units_to_gold((long long)price);
+  shop_format_price(pricebuf, sizeof(pricebuf), price_gold);
   static char result[256];
   char  itemname[128],
         quantity[16];   /* "Unlimited" or "%d" */
@@ -1916,14 +1896,14 @@ ACMD(do_shopdisc)
     int saved_cha = ch->aff_abils.cha;
 
     for (i = 0; i < (int)(sizeof(samples) / sizeof(samples[0])); i++) {
-      long price_copper;
+      long price_gold;
       int price;
 
       ch->aff_abils.cha = samples[i];
       price = buy_price(obj, shop_nr, keeper, ch);
-      price_copper = shop_units_to_copper((long long)price);
+      price_gold = shop_units_to_gold((long long)price);
 
-      shop_format_price(price_buf, sizeof(price_buf), price_copper);
+      shop_format_price(price_buf, sizeof(price_buf), price_gold);
       send_to_char(ch, "CHA %2d price %s\r\n", samples[i], price_buf);
     }
 
