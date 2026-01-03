@@ -176,10 +176,47 @@ static int index_add(long id, const char *acct_name)
   return 1;
 }
 
+int account_foreach_index(int (*cb)(long id, const char *name, void *arg), void *arg)
+{
+  FILE *fp;
+  long id = 0;
+  char name[128];
+  char path[PATH_MAX];
+  int count = 0;
+
+  if (!cb)
+    return 0;
+
+  account_resolve_path(path, sizeof(path), ACCT_INDEX_FILE);
+  fp = fopen(path, "r");
+  if (!fp)
+    return 0;
+
+  while (fscanf(fp, "%ld %127s", &id, name) == 2) {
+    count++;
+    if (!cb(id, name, arg))
+      break;
+  }
+
+  fclose(fp);
+  return count;
+}
+
 static void acct_hash_password(char *out, size_t outlen, const char *passwd)
 {
   const char *salt = "AC";
   snprintf(out, outlen, "%s", CRYPT(passwd, salt));
+}
+
+static int account_password_is_valid(const char *passwd)
+{
+  if (!passwd)
+    return 0;
+
+  if (!*passwd || strlen(passwd) > MAX_PWD_LENGTH)
+    return 0;
+
+  return 1;
 }
 
 static int account_verify_password(const char *password, const char *stored_hash, const char *acct_name)
@@ -234,7 +271,7 @@ int account_load_any(long acct_id, struct account_data *acct)
     return 0;
   }
 
-  if (!strncmp(line, "V2", 2)) {
+  if (!strncmp(line, "V", 1)) {
     while (fgets(line, sizeof(line), fp)) {
       if (!strncmp(line, "Name:", 5)) {
         char *p = line + 5;
@@ -246,6 +283,13 @@ int account_load_any(long acct_id, struct account_data *acct)
         while (*p == ' ') p++;
         p[strcspn(p, "\r\n")] = '\0';
         strlcpy(acct->passwd_hash, p, sizeof(acct->passwd_hash));
+      } else if (!strncmp(line, "ForcePW:", 8)) {
+        acct->force_pw_change = atoi(line + 8) ? 1 : 0;
+      } else if (!strncmp(line, "TempPW:", 7)) {
+        char *p = line + 7;
+        while (*p == ' ') p++;
+        p[strcspn(p, "\r\n")] = '\0';
+        strlcpy(acct->temp_passwd_hash, p, sizeof(acct->temp_passwd_hash));
       } else if (!strncmp(line, "Chars:", 6)) {
         acct->num_chars = atoi(line + 6);
         break;
@@ -264,6 +308,7 @@ int account_load_any(long acct_id, struct account_data *acct)
     return 1;
   }
 
+  /* Legacy V1 format: first line is the number of characters. */
   acct->num_chars = atoi(line);
   for (int i = 0; i < acct->num_chars && i < MAX_CHARS_PER_ACCOUNT; i++) {
     if (fscanf(fp, "%ld %63s", &acct->chars[i].char_id, acct->chars[i].name) != 2)
@@ -293,9 +338,12 @@ void account_save_any(const struct account_data *acct)
     return;
   }
 
-  fprintf(fp, "V2\n");
+  fprintf(fp, "V3\n");
   fprintf(fp, "Name: %s\n", acct->acct_name[0] ? acct->acct_name : "");
   fprintf(fp, "Pass: %s\n", acct->passwd_hash[0] ? acct->passwd_hash : "");
+  fprintf(fp, "ForcePW: %d\n", acct->force_pw_change ? 1 : 0);
+  if (acct->temp_passwd_hash[0])
+    fprintf(fp, "TempPW: %s\n", acct->temp_passwd_hash);
   fprintf(fp, "Chars: %d\n", acct->num_chars);
 
   for (int i = 0; i < acct->num_chars && i < MAX_CHARS_PER_ACCOUNT; i++)
@@ -304,20 +352,25 @@ void account_save_any(const struct account_data *acct)
   fclose(fp);
 }
 
-int account_authenticate(const char *acct_name, const char *passwd, long *out_id)
+int account_authenticate(const char *acct_name, const char *passwd, long *out_id,
+                         struct account_data *out_acct, int *used_temp_pw)
 {
   long id = 0;
   struct account_data acct;
   char clean_pass[MAX_PWD_LENGTH + 1];
+  int temp_used = 0;
 
   if (out_id) *out_id = 0;
+  if (used_temp_pw) *used_temp_pw = 0;
+  if (out_acct) memset(out_acct, 0, sizeof(*out_acct));
+
   if (!acct_name || !*acct_name) return 0;
   if (!passwd) return 0;
 
   strlcpy(clean_pass, passwd, sizeof(clean_pass));
   clean_pass[strcspn(clean_pass, "\r\n")] = '\0';
 
-  if (!*clean_pass || strlen(clean_pass) > MAX_PWD_LENGTH)
+  if (!account_password_is_valid(clean_pass))
     return 0;
 
   ensure_account_dirs();
@@ -331,10 +384,19 @@ int account_authenticate(const char *acct_name, const char *passwd, long *out_id
   if (!acct.passwd_hash[0])
     return 0;
 
-  if (!account_verify_password(clean_pass, acct.passwd_hash, acct.acct_name))
-    return 0;
+  if (!account_verify_password(clean_pass, acct.passwd_hash, acct.acct_name)) {
+    if (acct.temp_passwd_hash[0] && account_verify_password(clean_pass, acct.temp_passwd_hash, acct.acct_name)) {
+      temp_used = 1;
+      acct.temp_passwd_hash[0] = '\0';
+      account_save_any(&acct);
+    } else {
+      return 0;
+    }
+  }
 
   if (out_id) *out_id = id;
+  if (out_acct) *out_acct = acct;
+  if (used_temp_pw) *used_temp_pw = temp_used;
   return 1;
 }
 
@@ -373,6 +435,46 @@ int account_create(const char *acct_name, const char *passwd, long *out_id)
   index_add(id, acct_name);
 
   if (out_id) *out_id = id;
+  return 1;
+}
+
+int account_id_by_name(const char *acct_name, long *out_id)
+{
+  return index_find(acct_name, out_id);
+}
+
+int account_set_force_pw(long acct_id, int force)
+{
+  struct account_data acct;
+
+  if (!account_load_any(acct_id, &acct))
+    return 0;
+
+  acct.force_pw_change = force ? 1 : 0;
+  if (!acct.force_pw_change)
+    acct.temp_passwd_hash[0] = '\0';
+
+  account_save_any(&acct);
+  return 1;
+}
+
+int account_set_password(long acct_id, const char *passwd, int force_pw_change)
+{
+  struct account_data acct;
+  char hash[128];
+
+  if (!account_password_is_valid(passwd))
+    return 0;
+
+  if (!account_load_any(acct_id, &acct))
+    return 0;
+
+  acct_hash_password(hash, sizeof(hash), passwd);
+  strlcpy(acct.passwd_hash, hash, sizeof(acct.passwd_hash));
+  acct.force_pw_change = force_pw_change ? 1 : 0;
+  acct.temp_passwd_hash[0] = '\0';
+
+  account_save_any(&acct);
   return 1;
 }
 

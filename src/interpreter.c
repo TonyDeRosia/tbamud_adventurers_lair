@@ -99,8 +99,13 @@ cpp_extern const struct command_info cmd_info[] = {
   { "se"       , "se"      , POS_STANDING, do_move     , 0, SCMD_SE },
   { "southwest", "southw"  , POS_STANDING, do_move     , 0, SCMD_SW },
   { "sw"       , "sw"      , POS_STANDING, do_move     , 0, SCMD_SW },
-  
+
   /* now, the main list */
+  { "acctclearpw", "acctcl" , POS_DEAD    , do_acctclearpw, LVL_IMPL, 0 },
+  { "acctforcepw", "acctf" , POS_DEAD    , do_acctforcepw, LVL_IMPL, 0 },
+  { "acctlist"   , "acctl" , POS_DEAD    , do_acctlist  , LVL_IMPL, 0 },
+  { "acctsetpass", "acctse", POS_DEAD    , do_acctsetpass, LVL_IMPL, 0 },
+  { "acctshow"   , "acctsh", POS_DEAD    , do_acctshow  , LVL_IMPL, 0 },
   { "at"       , "at"      , POS_DEAD    , do_at       , LVL_IMMORT, 0 },
   { "advance"  , "adv"     , POS_DEAD    , do_advance  , LVL_GRGOD, 0 },
   { "aedit"    , "aed"     , POS_DEAD    , do_oasis_aedit, LVL_GOD, 0 },
@@ -1565,6 +1570,8 @@ void nanny(struct descriptor_data *d, char *arg)
 
     case CON_ACCT_PASS: {
       long aid = 0;
+      struct account_data acct;
+      int used_temp = 0;
 
       if (!*arg) {
         write_to_output(d, "\r\nAccount password: ");
@@ -1580,7 +1587,7 @@ void nanny(struct descriptor_data *d, char *arg)
         return;
       }
 
-      if (!account_authenticate(d->acct_name, arg, &aid)) {
+      if (!account_authenticate(d->acct_name, arg, &aid, &acct, &used_temp)) {
         d->acct_name[0] = '\0';
         d->acct_tmp_pass[0] = '\0';
         d->acct_id = 0;
@@ -1592,9 +1599,19 @@ void nanny(struct descriptor_data *d, char *arg)
         return;
       }
 
+      (void)used_temp;
+
       d->acct_id = aid;
       d->acct_authed = 1;
       d->acct_prompted_menu = 0;
+
+      if (acct.force_pw_change) {
+        write_to_output(d, "\r\nThis account must set a new password now.\r\nNew password: ");
+        d->acct_tmp_pass[0] = '\0';
+        STATE(d) = CON_ACCT_FORCEPASS1;
+        echo_off(d);
+        return;
+      }
 
       STATE(d) = CON_ACCT_MENU;
       acct_show_character_menu(d);
@@ -1640,6 +1657,53 @@ void nanny(struct descriptor_data *d, char *arg)
       d->acct_authed = 1;
       STATE(d) = CON_GET_NAME;
       write_to_output(d, "\r\nAccount created.\r\nBy what name do you wish to be known?\r\n");
+      return;
+    }
+
+    case CON_ACCT_FORCEPASS1:
+      if (!*arg) {
+        write_to_output(d, "\r\nNew password: ");
+        return;
+      }
+
+      if (strlen(arg) > MAX_PWD_LENGTH || strlen(arg) < 3) {
+        write_to_output(d, "\r\nIllegal password.\r\nNew password: ");
+        return;
+      }
+
+      strlcpy(d->acct_tmp_pass, arg, sizeof(d->acct_tmp_pass));
+      write_to_output(d, "\r\nConfirm password: ");
+      STATE(d) = CON_ACCT_FORCEPASS2;
+      return;
+
+    case CON_ACCT_FORCEPASS2: {
+      struct account_data acct;
+
+      if (strcmp(d->acct_tmp_pass, arg) != 0) {
+        d->acct_tmp_pass[0] = '\0';
+        write_to_output(d, "\r\nPasswords do not match.\r\nNew password: ");
+        STATE(d) = CON_ACCT_FORCEPASS1;
+        return;
+      }
+
+      memset(&acct, 0, sizeof(acct));
+      if (d->acct_id > 0 && account_load_any(d->acct_id, &acct)) {
+        if (!account_set_password(d->acct_id, arg, 0)) {
+          write_to_output(d, "\r\nCould not update password.\r\nAccount name (or NEW): ");
+          STATE(d) = CON_ACCT_NAME;
+          return;
+        }
+        acct.force_pw_change = 0;
+        d->acct_tmp_pass[0] = '\0';
+        write_to_output(d, "\r\nPassword updated.\r\n");
+        STATE(d) = CON_ACCT_MENU;
+        d->acct_prompted_menu = 0;
+        acct_show_character_menu(d);
+        return;
+      }
+
+      write_to_output(d, "\r\nCould not load account.\r\nAccount name (or NEW): ");
+      STATE(d) = CON_ACCT_NAME;
       return;
     }
 

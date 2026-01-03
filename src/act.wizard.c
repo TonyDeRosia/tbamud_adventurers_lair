@@ -35,6 +35,7 @@
 #include "quest.h"
 #include "ban.h"
 #include "screen.h"
+#include "accounts.h"
 
 /* local utility functions with file scope */
 static int perform_set(struct char_data *ch, struct char_data *vict, int mode, char *val_arg);
@@ -55,6 +56,14 @@ static void clear_recent(struct recent_player *this);
 static struct recent_player *create_recent(void);
 const char *get_spec_func_name(SPECIAL(*func));
 bool zedit_get_levels(struct descriptor_data *d, char *buf);
+
+struct acct_list_ctx {
+  struct char_data *ch;
+  char filter[MAX_INPUT_LENGTH];
+  int shown;
+};
+
+static int acctlist_show_entry(long id, const char *name, void *arg);
 
 /* Local Globals */
 static struct recent_player *recent_list = NULL;  /** Global list of recent players */
@@ -4761,6 +4770,187 @@ ACMD(do_plist)
   snprintf(buf + len, sizeof(buf) - len, "%s-------------------------------------%s\r\n"
            "%d players listed.\r\n", CCCYN(ch, C_NRM), CCNRM(ch, C_NRM), count);
   page_string(ch->desc, buf, TRUE);
+}
+
+static int acctlist_show_entry(long id, const char *name, void *arg)
+{
+  struct acct_list_ctx *ctx = (struct acct_list_ctx *)arg;
+  struct account_data acct;
+
+  if (!ctx || !ctx->ch)
+    return 0;
+
+  if (ctx->filter[0] && strncasecmp(name, ctx->filter, strlen(ctx->filter)))
+    return 1;
+
+  if (!account_load_any(id, &acct))
+    return 1;
+
+  send_to_char(ctx->ch, "%s (id %ld) chars %d ForcePW %d\r\n",
+               acct.acct_name, acct.account_id, acct.num_chars,
+               acct.force_pw_change ? 1 : 0);
+  ctx->shown++;
+  return 1;
+}
+
+ACMD(do_acctlist)
+{
+  struct acct_list_ctx ctx;
+  char arg[MAX_INPUT_LENGTH];
+
+  if (IS_NPC(ch) || GET_LEVEL(ch) < LVL_IMPL) {
+    send_to_char(ch, "You aren't powerful enough to do that.\r\n");
+    return;
+  }
+
+  one_argument(argument, arg);
+
+  memset(&ctx, 0, sizeof(ctx));
+  ctx.ch = ch;
+  strlcpy(ctx.filter, arg, sizeof(ctx.filter));
+
+  account_foreach_index(acctlist_show_entry, &ctx);
+
+  if (!ctx.shown)
+    send_to_char(ch, "No accounts found.\r\n");
+}
+
+ACMD(do_acctshow)
+{
+  long acct_id = 0;
+  char arg[MAX_INPUT_LENGTH];
+  struct account_data acct;
+  int i;
+
+  if (IS_NPC(ch) || GET_LEVEL(ch) < LVL_IMPL) {
+    send_to_char(ch, "You aren't powerful enough to do that.\r\n");
+    return;
+  }
+
+  one_argument(argument, arg);
+  if (!*arg) {
+    send_to_char(ch, "Usage: acctshow <account name>\r\n");
+    return;
+  }
+
+  if (!account_id_by_name(arg, &acct_id) || !account_load_any(acct_id, &acct)) {
+    send_to_char(ch, "No such account.\r\n");
+    return;
+  }
+
+  send_to_char(ch, "Account: %s (id %ld) ForcePW %d\r\n", acct.acct_name,
+               acct.account_id, acct.force_pw_change ? 1 : 0);
+  if (acct.num_chars <= 0) {
+    send_to_char(ch, "  Characters: none\r\n");
+  } else {
+    send_to_char(ch, "  Characters (%d):\r\n", acct.num_chars);
+    for (i = 0; i < acct.num_chars && i < MAX_CHARS_PER_ACCOUNT; i++) {
+      if (!acct.chars[i].name[0])
+        continue;
+      send_to_char(ch, "    %ld %s\r\n", acct.chars[i].char_id, acct.chars[i].name);
+    }
+  }
+}
+
+ACMD(do_acctforcepw)
+{
+  long acct_id = 0;
+  char arg[MAX_INPUT_LENGTH];
+  struct account_data acct;
+
+  if (IS_NPC(ch) || GET_LEVEL(ch) < LVL_IMPL) {
+    send_to_char(ch, "You aren't powerful enough to do that.\r\n");
+    return;
+  }
+
+  one_argument(argument, arg);
+  if (!*arg) {
+    send_to_char(ch, "Usage: acctforcepw <account>\r\n");
+    return;
+  }
+
+  if (!account_id_by_name(arg, &acct_id) || !account_load_any(acct_id, &acct)) {
+    send_to_char(ch, "No such account.\r\n");
+    return;
+  }
+
+  if (!account_set_force_pw(acct_id, 1)) {
+    send_to_char(ch, "Could not update account.\r\n");
+    return;
+  }
+
+  mudlog(BRF, LVL_IMPL, TRUE, "%s flagged account %s (id %ld) for password change.",
+         GET_NAME(ch), acct.acct_name, acct.account_id);
+  send_to_char(ch, "Account %s now must change password.\r\n", acct.acct_name);
+}
+
+ACMD(do_acctclearpw)
+{
+  long acct_id = 0;
+  char arg[MAX_INPUT_LENGTH];
+  struct account_data acct;
+
+  if (IS_NPC(ch) || GET_LEVEL(ch) < LVL_IMPL) {
+    send_to_char(ch, "You aren't powerful enough to do that.\r\n");
+    return;
+  }
+
+  one_argument(argument, arg);
+  if (!*arg) {
+    send_to_char(ch, "Usage: acctclearpw <account>\r\n");
+    return;
+  }
+
+  if (!account_id_by_name(arg, &acct_id) || !account_load_any(acct_id, &acct)) {
+    send_to_char(ch, "No such account.\r\n");
+    return;
+  }
+
+  if (!account_set_force_pw(acct_id, 0)) {
+    send_to_char(ch, "Could not update account.\r\n");
+    return;
+  }
+
+  mudlog(BRF, LVL_IMPL, TRUE, "%s cleared password change flag on account %s (id %ld).",
+         GET_NAME(ch), acct.acct_name, acct.account_id);
+  send_to_char(ch, "Account %s no longer requires a password change.\r\n", acct.acct_name);
+}
+
+ACMD(do_acctsetpass)
+{
+  long acct_id = 0;
+  char target[MAX_INPUT_LENGTH], newpass[MAX_INPUT_LENGTH];
+  struct account_data acct;
+
+  if (IS_NPC(ch) || GET_LEVEL(ch) < LVL_IMPL) {
+    send_to_char(ch, "You aren't powerful enough to do that.\r\n");
+    return;
+  }
+
+  two_arguments(argument, target, newpass);
+  if (!*target || !*newpass) {
+    send_to_char(ch, "Usage: acctsetpass <account> <newpass>\r\n");
+    return;
+  }
+
+  if (strlen(newpass) > MAX_PWD_LENGTH || strlen(newpass) < 3) {
+    send_to_char(ch, "Password length must be between 3 and %d characters.\r\n", MAX_PWD_LENGTH);
+    return;
+  }
+
+  if (!account_id_by_name(target, &acct_id) || !account_load_any(acct_id, &acct)) {
+    send_to_char(ch, "No such account.\r\n");
+    return;
+  }
+
+  if (!account_set_password(acct_id, newpass, 1)) {
+    send_to_char(ch, "Could not update account password.\r\n");
+    return;
+  }
+
+  mudlog(BRF, LVL_IMPL, TRUE, "%s set a temporary password on account %s (id %ld).",
+         GET_NAME(ch), acct.acct_name, acct.account_id);
+  send_to_char(ch, "Password updated and ForcePW set for account %s.\r\n", acct.acct_name);
 }
 
 ACMD(do_wizupdate)
