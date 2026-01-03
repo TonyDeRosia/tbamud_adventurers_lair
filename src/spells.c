@@ -368,6 +368,9 @@ ASPELL(spell_corruption)
 
   act("You envelop $N in a wave of corrupting energy.", FALSE, ch, 0, victim, TO_CHAR);
   act("$n envelopes $N in a wave of corrupting energy.", TRUE, ch, 0, victim, TO_ROOM);
+
+  if (ch != victim)
+    damage(ch, victim, 0, SPELL_CORRUPTION);
 }
 
 ASPELL(spell_identify)
