@@ -26,10 +26,14 @@
 #include "act.h"
 #include "class.h"
 
+#ifndef ARRAY_SIZE
+#define ARRAY_SIZE(array) (sizeof(array) / sizeof((array)[0]))
+#endif
+
 #define SPELL   0
 #define SKILL   1
 
-const struct pc_class_definition pc_classes[NUM_CLASSES] = {
+const struct pc_class_definition pc_classes[] = {
   [CLASS_MAGIC_USER] = {
     .name = "Magic User",
     .abbrev = "Mu",
@@ -72,7 +76,8 @@ const struct pc_class_definition pc_classes[NUM_CLASSES] = {
   }
 };
 
-_Static_assert(ARRAY_SIZE(pc_classes) == NUM_CLASSES, "pc_classes size mismatch");
+#define NUM_PC_CLASSES ((int)ARRAY_SIZE(pc_classes))
+_Static_assert(NUM_PC_CLASSES <= MAX_CLASSES, "pc_classes exceeds MAX_CLASSES");
 
 const char *class_abbrevs[] = {
   [CLASS_MAGIC_USER] = pc_classes[CLASS_MAGIC_USER].abbrev,
@@ -90,9 +95,14 @@ const char *pc_class_types[] = {
   "\n"
 };
 
+int num_pc_classes(void)
+{
+  return NUM_PC_CLASSES;
+}
+
 int is_valid_class(int class_num)
 {
-  return class_num >= 0 && class_num < NUM_CLASSES;
+  return class_num >= 0 && class_num < NUM_PC_CLASSES;
 }
 
 const char *get_archetype_abbrev(struct char_data *ch)
@@ -119,7 +129,7 @@ const char *class_menu(void)
 
   len += snprintf(menu + len, sizeof(menu) - len, "\r\nSelect a class:\r\n");
 
-  for (i = 0; i < NUM_CLASSES && len < sizeof(menu); i++) {
+  for (i = 0; i < NUM_PC_CLASSES && len < sizeof(menu); i++) {
     int cls = menu_order[i];
     const struct pc_class_definition *pc_class = &pc_classes[cls];
     char rest_name[MAX_INPUT_LENGTH];

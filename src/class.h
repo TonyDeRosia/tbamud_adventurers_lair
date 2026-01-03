@@ -36,6 +36,7 @@ void do_start(struct char_data *ch);
 bitvector_t find_class_bitvector(const char *arg);
 int invalid_class(struct char_data *ch, struct obj_data *obj);
 int is_valid_class(int class_num);
+int num_pc_classes(void);
 int level_exp(int chclass, int level);
 int parse_class(char arg);
 void roll_real_abils(struct char_data *ch);
@@ -52,7 +53,7 @@ int get_class_prac_min_per_prac(int class_num);
 int get_class_prac_type(int class_num);
 
 /* Global variables */
-extern const struct pc_class_definition pc_classes[NUM_CLASSES];
+extern const struct pc_class_definition pc_classes[];
 extern const char *class_abbrevs[];
 extern const char *pc_class_types[];
 extern struct guild_info_type guild_info[];

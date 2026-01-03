@@ -188,7 +188,7 @@ struct spell_info_type {
    int mana_max;	/* Max amount of mana used by a spell (lowest lev) */
    int mana_change;	/* Change in mana used by spell from lev to lev */
 
-   int min_level[NUM_CLASSES];
+   int min_level[MAX_CLASSES];
    int routines;
    byte violent;
    int targets;         /* See below for use with TAR_XXX  */

@@ -1554,7 +1554,7 @@ void new_affect(struct affected_type *af)
 int get_class_by_name(char *classname)
 {
     int i;
-    for (i=0; i<NUM_CLASSES; i++)
+    for (i = 0; i < num_pc_classes(); i++)
       if (is_abbrev(classname, pc_class_types[i])) return(i);
 
     return (-1);
