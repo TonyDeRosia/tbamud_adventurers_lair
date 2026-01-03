@@ -150,13 +150,18 @@ void clanedit_parse(struct descriptor_data *d, char *arg);
 
 /* PC classes */
 #define MAX_CLASSES      50
-#define CLASS_UNDEFINED	  (-1) /**< PC Class undefined */
+#define CLASS_UNDEFINED   (-1) /**< PC Class undefined */
 #define CLASS_MAGIC_USER  0    /**< PC Class Magic User */
 #define CLASS_CLERIC      1    /**< PC Class Cleric */
 #define CLASS_THIEF       2    /**< PC Class Thief */
 #define CLASS_WARRIOR     3    /**< PC Class Warrior */
+#define CLASS_PALADIN     4    /**< PC Class Paladin */
+#define CLASS_BARD        5    /**< PC Class Bard */
+#define CLASS_WARLOCK     6    /**< PC Class Warlock */
+#define CLASS_DRUID       7    /**< PC Class Druid */
+#define CLASS_MYSTIC      8    /**< PC Class Mystic */
 /** Total number of available PC Classes */
-#define NUM_CLASSES	  4
+#define NUM_CLASSES       9
 
 /* NPC classes (currently unused - feel free to implement!) */
 #define CLASS_OTHER       0    /**< NPC Class Other (or undefined) */

@@ -13,6 +13,8 @@
 #ifndef _CLASS_H_
 #define _CLASS_H_
 
+#include <stdbool.h>
+
 #include "structs.h"   /* byte, bitvector_t, NUM_CLASSES, struct types */
 
 /* Forward declarations (structs.h already has these, but keeping them is fine) */
@@ -24,6 +26,7 @@ struct pc_class_definition {
   const char *abbrev;
   const char *archetype_abbrev;
   char select_key;
+  bool selectable;
   int prac_learned_level;
   int prac_max_per_prac;
   int prac_min_per_prac;

@@ -39,6 +39,7 @@ const struct pc_class_definition pc_classes[] = {
     .abbrev = "Mu",
     .archetype_abbrev = "Spl",
     .select_key = 'm',
+    .selectable = true,
     .prac_learned_level = 95,
     .prac_max_per_prac = 100,
     .prac_min_per_prac = 25,
@@ -49,6 +50,7 @@ const struct pc_class_definition pc_classes[] = {
     .abbrev = "Cl",
     .archetype_abbrev = "Div",
     .select_key = 'c',
+    .selectable = true,
     .prac_learned_level = 95,
     .prac_max_per_prac = 100,
     .prac_min_per_prac = 25,
@@ -59,6 +61,7 @@ const struct pc_class_definition pc_classes[] = {
     .abbrev = "Th",
     .archetype_abbrev = "Rog",
     .select_key = 't',
+    .selectable = true,
     .prac_learned_level = 85,
     .prac_max_per_prac = 12,
     .prac_min_per_prac = 0,
@@ -69,10 +72,66 @@ const struct pc_class_definition pc_classes[] = {
     .abbrev = "Wa",
     .archetype_abbrev = "Mar",
     .select_key = 'w',
+    .selectable = true,
     .prac_learned_level = 80,
     .prac_max_per_prac = 12,
     .prac_min_per_prac = 0,
     .prac_type = SKILL
+  },
+  [CLASS_PALADIN] = {
+    .name = "Paladin",
+    .abbrev = "Pa",
+    .archetype_abbrev = "Mar",
+    .select_key = 'p',
+    .selectable = false,
+    .prac_learned_level = 80,
+    .prac_max_per_prac = 12,
+    .prac_min_per_prac = 0,
+    .prac_type = SKILL
+  },
+  [CLASS_BARD] = {
+    .name = "Bard",
+    .abbrev = "Br",
+    .archetype_abbrev = "Rog",
+    .select_key = 'b',
+    .selectable = false,
+    .prac_learned_level = 85,
+    .prac_max_per_prac = 12,
+    .prac_min_per_prac = 0,
+    .prac_type = SKILL
+  },
+  [CLASS_WARLOCK] = {
+    .name = "Warlock",
+    .abbrev = "Wl",
+    .archetype_abbrev = "Spl",
+    .select_key = 'l',
+    .selectable = false,
+    .prac_learned_level = 95,
+    .prac_max_per_prac = 100,
+    .prac_min_per_prac = 25,
+    .prac_type = SPELL
+  },
+  [CLASS_DRUID] = {
+    .name = "Druid",
+    .abbrev = "Dr",
+    .archetype_abbrev = "Div",
+    .select_key = 'd',
+    .selectable = false,
+    .prac_learned_level = 95,
+    .prac_max_per_prac = 100,
+    .prac_min_per_prac = 25,
+    .prac_type = SPELL
+  },
+  [CLASS_MYSTIC] = {
+    .name = "Mystic",
+    .abbrev = "My",
+    .archetype_abbrev = "Spl",
+    .select_key = 'y',
+    .selectable = false,
+    .prac_learned_level = 95,
+    .prac_max_per_prac = 100,
+    .prac_min_per_prac = 25,
+    .prac_type = SPELL
   }
 };
 
@@ -84,6 +143,11 @@ const char *class_abbrevs[] = {
   [CLASS_CLERIC] = pc_classes[CLASS_CLERIC].abbrev,
   [CLASS_THIEF] = pc_classes[CLASS_THIEF].abbrev,
   [CLASS_WARRIOR] = pc_classes[CLASS_WARRIOR].abbrev,
+  [CLASS_PALADIN] = pc_classes[CLASS_PALADIN].abbrev,
+  [CLASS_BARD] = pc_classes[CLASS_BARD].abbrev,
+  [CLASS_WARLOCK] = pc_classes[CLASS_WARLOCK].abbrev,
+  [CLASS_DRUID] = pc_classes[CLASS_DRUID].abbrev,
+  [CLASS_MYSTIC] = pc_classes[CLASS_MYSTIC].abbrev,
   "\n"
 };
 
@@ -92,6 +156,11 @@ const char *pc_class_types[] = {
   [CLASS_CLERIC] = pc_classes[CLASS_CLERIC].name,
   [CLASS_THIEF] = pc_classes[CLASS_THIEF].name,
   [CLASS_WARRIOR] = pc_classes[CLASS_WARRIOR].name,
+  [CLASS_PALADIN] = pc_classes[CLASS_PALADIN].name,
+  [CLASS_BARD] = pc_classes[CLASS_BARD].name,
+  [CLASS_WARLOCK] = pc_classes[CLASS_WARLOCK].name,
+  [CLASS_DRUID] = pc_classes[CLASS_DRUID].name,
+  [CLASS_MYSTIC] = pc_classes[CLASS_MYSTIC].name,
   "\n"
 };
 
@@ -129,7 +198,7 @@ const char *class_menu(void)
 
   len += snprintf(menu + len, sizeof(menu) - len, "\r\nSelect a class:\r\n");
 
-  for (i = 0; i < NUM_PC_CLASSES && len < sizeof(menu); i++) {
+  for (i = 0; i < ARRAY_SIZE(menu_order) && len < sizeof(menu); i++) {
     int cls = menu_order[i];
     const struct pc_class_definition *pc_class = &pc_classes[cls];
     char rest_name[MAX_INPUT_LENGTH];
@@ -164,6 +233,24 @@ int parse_class(char arg)
   }
 
   return CLASS_UNDEFINED;
+}
+
+static int get_class_archetype(int class_num)
+{
+  switch (class_num) {
+  case CLASS_PALADIN:
+    return CLASS_WARRIOR;
+  case CLASS_BARD:
+    return CLASS_THIEF;
+  case CLASS_WARLOCK:
+    return CLASS_MAGIC_USER;
+  case CLASS_DRUID:
+    return CLASS_CLERIC;
+  case CLASS_MYSTIC:
+    return CLASS_MAGIC_USER;
+  default:
+    return class_num;
+  }
 }
 
 /* bitvectors (i.e., powers of two) for each class, mainly for use in do_who
@@ -266,6 +353,11 @@ struct guild_info_type guild_info[] = {
  * not forget to change extern declaration in magic.c if you add to this. */
 byte saving_throws(int class_num, int type, int level)
 {
+  class_num = get_class_archetype(class_num);
+
+  if (!is_valid_class(class_num))
+    return 100;
+
   switch (class_num) {
   case CLASS_MAGIC_USER:
     switch (type) {
@@ -1296,6 +1388,11 @@ byte saving_throws(int class_num, int type, int level)
 /* THAC0 for classes and levels.  (To Hit Armor Class 0) */
 int thaco(int class_num, int level)
 {
+  class_num = get_class_archetype(class_num);
+
+  if (!is_valid_class(class_num))
+    return 100;
+
   switch (class_num) {
   case CLASS_MAGIC_USER:
     switch (level) {
