@@ -1920,6 +1920,35 @@ void init_spell_levels(void)
   spell_level(SPELL_WORD_OF_RECALL, CLASS_PALADIN, 75);
   spell_level(SPELL_GROUP_ARMOR, CLASS_PALADIN, 85);
   spell_level(SPELL_GROUP_RECALL, CLASS_PALADIN, 95);
+
+  /* BARD */
+  spell_level(SPELL_CURE_LIGHT, CLASS_BARD, 1);
+  spell_level(SPELL_BLESS, CLASS_BARD, 3);
+  spell_level(SPELL_DETECT_MAGIC, CLASS_BARD, 5);
+  spell_level(SPELL_CREATE_WATER, CLASS_BARD, 8);
+  spell_level(SPELL_CREATE_FOOD, CLASS_BARD, 10);
+  spell_level(SKILL_SNEAK, CLASS_BARD, 10);
+  spell_level(SPELL_DETECT_INVIS, CLASS_BARD, 12);
+  spell_level(SPELL_ARMOR, CLASS_BARD, 15);
+  spell_level(SPELL_CURE_BLIND, CLASS_BARD, 18);
+  spell_level(SPELL_INVISIBLE, CLASS_BARD, 20);
+  spell_level(SKILL_HIDE, CLASS_BARD, 20);
+  spell_level(SPELL_CURE_CRITIC, CLASS_BARD, 25);
+  spell_level(SPELL_INFRAVISION, CLASS_BARD, 30);
+  spell_level(SKILL_TRACK, CLASS_BARD, 30);
+  spell_level(SPELL_FLY, CLASS_BARD, 35);
+  spell_level(SPELL_HEAL, CLASS_BARD, 40);
+  spell_level(SKILL_BANDAGE, CLASS_BARD, 40);
+  spell_level(SPELL_REMOVE_POISON, CLASS_BARD, 45);
+  spell_level(SPELL_REMOVE_CURSE, CLASS_BARD, 50);
+  spell_level(SPELL_PROT_FROM_EVIL, CLASS_BARD, 55);
+  spell_level(SPELL_SANCTUARY, CLASS_BARD, 60);
+  spell_level(SPELL_IDENTIFY, CLASS_BARD, 65);
+  spell_level(SPELL_GROUP_ARMOR, CLASS_BARD, 70);
+  spell_level(SPELL_GROUP_HEAL, CLASS_BARD, 80);
+  spell_level(SPELL_GROUP_RECALL, CLASS_BARD, 85);
+  spell_level(SPELL_WORD_OF_RECALL, CLASS_BARD, 90);
+  spell_level(SPELL_SENSE_LIFE, CLASS_BARD, 95);
 }
 
 #define MORTAL_MAX_LEVEL   (LVL_IMMORT - 1)
