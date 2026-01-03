@@ -825,7 +825,7 @@ ACMD(do_pet_release)
     return;
   }
 
-  is_charmed = AFF_FLAGGED(pet, AFF_CHARM);
+  is_charmed = (AFF_FLAGGED(pet, AFF_CHARM) != 0);
 
   if (!is_charmed) {
     send_to_char(ch, "You can only dismiss a purchased pet.\r\n");
@@ -870,7 +870,7 @@ ACMD(do_pet_release)
 ACMD(do_opet)
 {
   char first_arg[MAX_INPUT_LENGTH], command_part[MAX_INPUT_LENGTH];
-  char subcmd[MAX_INPUT_LENGTH], target[MAX_INPUT_LENGTH];
+  char cmd_sub[MAX_INPUT_LENGTH], target[MAX_INPUT_LENGTH];
   char order_arguments[MAX_INPUT_LENGTH * 2];
   struct char_data *follower;
   const char *usage = "Usage: opet stay | opet attack <target>\r\n";
@@ -895,11 +895,11 @@ ACMD(do_opet)
     return;
   }
 
-  half_chop(command_part, subcmd, target);
+  half_chop(command_part, cmd_sub, target);
 
-  if (is_abbrev(subcmd, "stay")) {
+  if (is_abbrev(cmd_sub, "stay")) {
     snprintf(order_arguments, sizeof(order_arguments), "%s stay", GET_NAME(follower));
-  } else if (is_abbrev(subcmd, "attack")) {
+  } else if (is_abbrev(cmd_sub, "attack")) {
     if (!*target) {
       send_to_char(ch, "Usage: opet attack <target>\r\n");
       return;
