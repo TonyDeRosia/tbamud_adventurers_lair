@@ -2139,27 +2139,19 @@ if (PLR_FLAGGED(d->character, PLR_DELETED)) {
     GET_RACE(d->character) = race;
 
     STATE(d) = CON_QCLASS;
-    write_to_output(d, "\r\nSelect a class:\r\n"
-                      "  [D]ivine\r\n"
-                      "  [R]ogue\r\n"
-                      "  [M]artial\r\n"
-                      "  [S]pellcaster\r\n"
-                      "\r\nClass: ");
+    write_to_output(d, "%sClass: ", class_menu());
     return;
   }
 
 
 case CON_QCLASS:
 {
-  char c = LOWER(*arg);
+  if (!*arg) {
+    write_to_output(d, "\r\nThat's not a class.\r\nClass: ");
+    return;
+  }
 
-  /* Map new archetype letters to existing classes */
-  if (c == 'd') c = 'c';       /* Divine -> Cleric */
-  else if (c == 'r') c = 't';  /* Rogue -> Thief */
-  else if (c == 'm') c = 'w';  /* Martial -> Warrior */
-  else if (c == 's') c = 'm';  /* Spellcaster -> Magic-user */
-
-  load_result = parse_class(c);
+  load_result = parse_class(*arg);
 
   if (load_result != CLASS_UNDEFINED && !pc_classes[load_result].selectable)
     load_result = CLASS_UNDEFINED;
