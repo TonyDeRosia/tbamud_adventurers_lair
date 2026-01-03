@@ -94,8 +94,13 @@
 #define SPELL_FLY                    53 /* Reserved Skill[] DO NOT CHANGE */
 #define SPELL_DARKNESS               54
 #define SPELL_CORRUPTION             55
+#define SPELL_BEAR_SPIRIT            56
+#define SPELL_WOLF_SPIRIT            57
+#define SPELL_TIGER_SPIRIT           58
+#define SPELL_EAGLE_SPIRIT           59
+#define SPELL_DRAGON_SPIRIT          60
 /** Total Number of defined spells */
-#define NUM_SPELLS                   55
+#define NUM_SPELLS                   60
 
 /* Insert new spells here, up to MAX_SPELLS */
 #define MAX_SPELLS		    130
@@ -241,6 +246,9 @@ int mag_damage(int level, struct char_data *ch, struct char_data *victim,
 
 void mag_affects(int level, struct char_data *ch, struct char_data *victim,
   int spellnum, int savetype);
+bool is_spirit_spell(int spellnum);
+bool can_bind_spirit(struct char_data *ch, int spellnum);
+int mystic_spirit_cap(struct char_data *ch);
 
 void mag_groups(int level, struct char_data *ch, int spellnum, int savetype);
 
