@@ -479,6 +479,11 @@ ACMD(do_buypractice)
   if (IS_NPC(ch))
     return;
 
+  if (!can_use_practice_trainer(ch)) {
+    send_to_char(ch, "You must be at your class trainer to buy practice sessions.\r\n");
+    return;
+  }
+
   if (GET_GLORY(ch) < GLORY_PRACTICE_COST) {
     send_to_char(ch, "A practice session costs %d Glory. You currently have %d Glory.\r\n",
                  GLORY_PRACTICE_COST, GET_GLORY(ch));
@@ -595,6 +600,11 @@ ACMD(do_buytrain)
 {
   if (IS_NPC(ch))
     return;
+
+  if (!can_use_practice_trainer(ch)) {
+    send_to_char(ch, "You must be at your class trainer to buy training sessions.\r\n");
+    return;
+  }
 
   if (GET_GLORY(ch) < GLORY_TRAIN_COST) {
     send_to_char(ch, "A training session costs %d Glory. You currently have %d Glory.\r\n",
