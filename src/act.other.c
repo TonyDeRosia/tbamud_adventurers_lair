@@ -871,7 +871,7 @@ ACMD(do_opet)
 {
   char first_arg[MAX_INPUT_LENGTH], command_part[MAX_INPUT_LENGTH];
   char cmd_sub[MAX_INPUT_LENGTH], target[MAX_INPUT_LENGTH];
-  char order_arguments[MAX_INPUT_LENGTH * 2];
+  char follower_command[MAX_INPUT_LENGTH * 2];
   struct char_data *follower;
   const char *usage = "Usage: opet stay | opet attack <target>\r\n";
 
@@ -900,7 +900,7 @@ ACMD(do_opet)
   if (is_abbrev(cmd_sub, "stay")) {
     /* Use the sit command so the pet will remain in place instead of trying
      * to follow the player on movement. */
-    snprintf(order_arguments, sizeof(order_arguments), "%s sit", GET_NAME(follower));
+    snprintf(follower_command, sizeof(follower_command), "sit");
   } else if (is_abbrev(cmd_sub, "attack")) {
     if (!*target) {
       send_to_char(ch, "Usage: opet attack <target>\r\n");
@@ -909,13 +909,20 @@ ACMD(do_opet)
 
     /* Translate attack into the standard kill command so charmies
      * immediately engage the requested target. */
-    snprintf(order_arguments, sizeof(order_arguments), "%s kill %s", GET_NAME(follower), target);
+    snprintf(follower_command, sizeof(follower_command), "kill %s", target);
   } else {
     send_to_char(ch, "%s", usage);
     return;
   }
 
-  do_order(ch, order_arguments, 0, 0);
+  /* Directly command the follower instead of going through do_order().
+   * The do_order() handler attempts to find the target by parsing the
+   * provided name, which can misidentify the commander as the victim when
+   * the pet name is ambiguous. By executing the interpreted command on the
+   * already-selected follower, we avoid targeting the wrong character while
+   * preserving the expected acknowledgement. */
+  send_to_char(ch, "%s", CONFIG_OK);
+  command_interpreter(follower, follower_command);
 }
 
 ACMD(do_report)
