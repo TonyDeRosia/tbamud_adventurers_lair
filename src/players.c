@@ -469,6 +469,7 @@ int load_char(const char *name, struct char_data *ch)
         if (!strcmp(tag, "Gold"))
           __loaded_gold_units = parse_numeric_value(line);
         else if (!strcmp(tag, "Diamonds")) GET_DIAMONDS(ch) = atoi(line);
+        else if (!strcmp(tag, "Glory")) GET_GLORY(ch) = atoi(line);
         break;
 
       case 'H':
@@ -793,6 +794,8 @@ void save_char(struct char_data * ch)
   fprintf(fl, "BankMoney: %lld\n", GET_BANK_MONEY(ch));
   if (GET_DIAMONDS(ch))
     fprintf(fl, "Diamonds: %d\n", GET_DIAMONDS(ch));
+  if (GET_GLORY(ch))
+    fprintf(fl, "Glory: %d\n", GET_GLORY(ch));
   fprintf(fl, "Bounty: %lld\n", GET_BOUNTY(ch));
   if (GET_CLAN_ID(ch)) fprintf(fl, "Clan: %d\n", GET_CLAN_ID(ch));
   if (GET_CLAN_RANK(ch)) fprintf(fl, "Clrk: %d\n", GET_CLAN_RANK(ch));
