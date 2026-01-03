@@ -2473,7 +2473,7 @@ ACMD(do_who)
       if (short_list) {
         send_to_char(ch, "%s[%2d %3s] %-12.12s%s%s",
           (GET_LEVEL(tch) >= LVL_IMMORT ? CCYEL(ch, C_SPR) : ""),
-          GET_LEVEL(tch), get_archetype_abbrev(tch), GET_NAME(tch),
+          GET_LEVEL(tch), get_class_display_abbrev(tch), GET_NAME(tch),
           CCNRM(ch, C_SPR), ((!(++num_can_see % 4)) ? "\r\n" : ""));
       } else {
         num_can_see++;
@@ -2521,7 +2521,7 @@ ACMD(do_who)
 
             send_to_char(ch, "%s[%2d %3s] %s %s%s%s%s",
                 (GET_LEVEL(tch) >= LVL_IMMORT ? CCYEL(ch, C_SPR) : ""),
-                GET_LEVEL(tch), get_archetype_abbrev(tch),
+                GET_LEVEL(tch), get_class_display_abbrev(tch),
                 clan_col,
                 GET_NAME(tch),
                 (*GET_TITLE(tch) ? " " : ""), GET_TITLE(tch),

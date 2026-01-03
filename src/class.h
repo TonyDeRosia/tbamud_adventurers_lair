@@ -48,6 +48,7 @@ int thaco(int class_num, int level);
 const char *title_female(int chclass, int level);
 const char *title_male(int chclass, int level);
 const char *get_archetype_abbrev(struct char_data *ch);
+const char *get_class_display_abbrev(struct char_data *ch);
 const char *class_menu(void);
 
 int get_class_prac_learned_level(int class_num);

@@ -185,6 +185,17 @@ const char *get_archetype_abbrev(struct char_data *ch)
   return pc_classes[GET_CLASS(ch)].archetype_abbrev;
 }
 
+const char *get_class_display_abbrev(struct char_data *ch)
+{
+  if (IS_NPC(ch))
+    return "Unknown";
+
+  if (!is_valid_class(GET_CLASS(ch)))
+    return "Unknown";
+
+  return pc_classes[GET_CLASS(ch)].abbrev;
+}
+
 /* The menu for choosing a class in interpreter.c: */
 const char *class_menu(void)
 {
