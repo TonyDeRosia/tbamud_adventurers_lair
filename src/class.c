@@ -1894,6 +1894,26 @@ void init_spell_levels(void)
   spell_level(SPELL_SUMMON, CLASS_CLERIC, 95);
   spell_level(SPELL_FLY, CLASS_CLERIC, 99);
 
+  /* DRUID */
+  spell_level(SPELL_CREATE_WATER, CLASS_DRUID, 1);
+  spell_level(SPELL_CREATE_FOOD, CLASS_DRUID, 3);
+  spell_level(SPELL_DETECT_POISON, CLASS_DRUID, 5);
+  spell_level(SPELL_SENSE_LIFE, CLASS_DRUID, 8);
+  spell_level(SKILL_TRACK, CLASS_DRUID, 10);
+  spell_level(SPELL_CURE_LIGHT, CLASS_DRUID, 12);
+  spell_level(SKILL_BANDAGE, CLASS_DRUID, 15);
+  spell_level(SPELL_REMOVE_POISON, CLASS_DRUID, 18);
+  spell_level(SPELL_CALL_LIGHTNING, CLASS_DRUID, 25);
+  spell_level(SPELL_FLY, CLASS_DRUID, 30);
+  spell_level(SPELL_INFRAVISION, CLASS_DRUID, 35);
+  spell_level(SPELL_CONTROL_WEATHER, CLASS_DRUID, 40);
+  spell_level(SPELL_HEAL, CLASS_DRUID, 45);
+  spell_level(SPELL_WATERWALK, CLASS_DRUID, 50);
+  spell_level(SPELL_GROUP_HEAL, CLASS_DRUID, 60);
+  spell_level(SPELL_GROUP_ARMOR, CLASS_DRUID, 70);
+  spell_level(SPELL_SUMMON, CLASS_DRUID, 80);
+  spell_level(SPELL_EARTHQUAKE, CLASS_DRUID, 90);
+
   /* THIEVES */
   spell_level(SKILL_SNEAK, CLASS_THIEF, 1);
   spell_level(SKILL_PICK_LOCK, CLASS_THIEF, 2);
