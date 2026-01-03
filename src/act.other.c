@@ -898,14 +898,18 @@ ACMD(do_opet)
   half_chop(command_part, cmd_sub, target);
 
   if (is_abbrev(cmd_sub, "stay")) {
-    snprintf(order_arguments, sizeof(order_arguments), "%s stay", GET_NAME(follower));
+    /* Use the sit command so the pet will remain in place instead of trying
+     * to follow the player on movement. */
+    snprintf(order_arguments, sizeof(order_arguments), "%s sit", GET_NAME(follower));
   } else if (is_abbrev(cmd_sub, "attack")) {
     if (!*target) {
       send_to_char(ch, "Usage: opet attack <target>\r\n");
       return;
     }
 
-    snprintf(order_arguments, sizeof(order_arguments), "%s attack %s", GET_NAME(follower), target);
+    /* Translate attack into the standard kill command so charmies
+     * immediately engage the requested target. */
+    snprintf(order_arguments, sizeof(order_arguments), "%s kill %s", GET_NAME(follower), target);
   } else {
     send_to_char(ch, "%s", usage);
     return;
