@@ -1083,6 +1083,8 @@ struct char_data
   struct player_special_data *player_specials; /**< PC specials		  */
   struct mob_special_data mob_specials; /**< NPC specials		  */
 
+  int pet_price; /**< Custom price for pet shop purchases (0 = default) */
+
   struct affected_type *affected;        /**< affected by what spells    */
   struct obj_data *equipment[NUM_WEARS]; /**< Equipment array            */
 

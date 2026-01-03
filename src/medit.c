@@ -229,6 +229,7 @@ static void init_mobile(struct char_data *mob)
   GET_NDD(mob) = GET_SDD(mob) = 1;
   GET_WEIGHT(mob) = 200;
   GET_HEIGHT(mob) = 198;
+  GET_PET_PRICE(mob) = 0;
 
   mob->real_abils.str = mob->real_abils.intel = mob->real_abils.wis = 11;
   mob->real_abils.dex = mob->real_abils.con = mob->real_abils.cha = 11;
@@ -408,10 +409,16 @@ static void medit_disp_menu(struct descriptor_data *d)
 {
   struct char_data *mob;
   char flags[MAX_STRING_LENGTH], flag2[MAX_STRING_LENGTH];
+  char price_buf[MAX_INPUT_LENGTH];
 
   mob = OLC_MOB(d);
   get_char_colors(d->character);
   clear_screen(d);
+
+  if (GET_PET_PRICE(mob) > 0)
+    snprintf(price_buf, sizeof(price_buf), "%d", GET_PET_PRICE(mob));
+  else
+    strlcpy(price_buf, "(default)", sizeof(price_buf));
 
   write_to_output(d,
   "-- Mob Number:  [%s%d%s]\r\n"
@@ -431,27 +438,29 @@ static void medit_disp_menu(struct descriptor_data *d)
   sprintbitarray(MOB_FLAGS(mob), action_bits, AF_ARRAY_MAX, flags);
   sprintbitarray(AFF_FLAGS(mob), affected_bits, AF_ARRAY_MAX, flag2);
   write_to_output(d,
-	  "%s6%s) Position  : %s%s\r\n"
-	  "%s7%s) Default   : %s%s\r\n"
-	  "%s8%s) Attack    : %s%s\r\n"
+          "%s6%s) Position  : %s%s\r\n"
+          "%s7%s) Default   : %s%s\r\n"
+          "%s8%s) Attack    : %s%s\r\n"
       "%s9%s) Stats Menu...\r\n"
-	  "%sA%s) NPC Flags : %s%s\r\n"
-	  "%sB%s) AFF Flags : %s%s\r\n"
+          "%sA%s) NPC Flags : %s%s\r\n"
+          "%sB%s) AFF Flags : %s%s\r\n"
+          "%sP%s) Pet Price : %s%s\r\n"
           "%sS%s) Script    : %s%s\r\n"
           "%sW%s) Copy mob\r\n"
-	  "%sX%s) Delete mob\r\n"
+          "%sX%s) Delete mob\r\n"
 	  "%sQ%s) Quit\r\n"
 	  "Enter choice : ",
 
-	  grn, nrm, yel, position_types[(int)GET_POS(mob)],
-	  grn, nrm, yel, position_types[(int)GET_DEFAULT_POS(mob)],
-	  grn, nrm, yel, attack_hit_text[(int)GET_ATTACK(mob)].singular,
-	  grn, nrm,
-	  grn, nrm, cyn, flags,
-	  grn, nrm, cyn, flag2,
+          grn, nrm, yel, position_types[(int)GET_POS(mob)],
+          grn, nrm, yel, position_types[(int)GET_DEFAULT_POS(mob)],
+          grn, nrm, yel, attack_hit_text[(int)GET_ATTACK(mob)].singular,
+          grn, nrm,
+          grn, nrm, cyn, flags,
+          grn, nrm, cyn, flag2,
+          grn, nrm, yel, price_buf,
           grn, nrm, cyn, OLC_SCRIPT(d) ?"Set.":"Not Set.",
           grn, nrm,
-	  grn, nrm,
+          grn, nrm,
 	  grn, nrm
 	  );
 
@@ -634,6 +643,11 @@ void medit_parse(struct descriptor_data *d, char *arg)
     case 'B':
       OLC_MODE(d) = MEDIT_AFF_FLAGS;
       medit_disp_aff_flags(d);
+      return;
+    case 'p':
+    case 'P':
+      OLC_MODE(d) = MEDIT_PET_PRICE;
+      write_to_output(d, "Enter pet price in gold (0 = default): ");
       return;
     case 'w':
     case 'W':
@@ -972,6 +986,15 @@ void medit_parse(struct descriptor_data *d, char *arg)
     SET_GOLD(OLC_MOB(d), LIMIT(i, 0, MAX_MOB_GOLD));OLC_VAL(d) = TRUE;
     medit_disp_stats_menu(d);
     return;
+
+  case MEDIT_PET_PRICE:
+    if (i < 0) {
+      write_to_output(d, "Pet price must be 0 or greater. Enter pet price in gold (0 = default): ");
+      return;
+    }
+    GET_PET_PRICE(OLC_MOB(d)) = i;
+    OLC_VAL(d) = TRUE;
+    break;
 
   case MEDIT_STR:
     GET_STR(OLC_MOB(d)) = LIMIT(i, 11, 25);

@@ -504,6 +504,8 @@ do                                                              \
 #define GET_WEIGHT(ch)	((ch)->player.weight)
 /** Sex of ch. */
 #define GET_SEX(ch)	((ch)->player.sex)
+/** Pet shop price override. */
+#define GET_PET_PRICE(ch) ((ch)->pet_price)
 
 /** Current strength of ch. */
 #define GET_STR(ch)     ((ch)->aff_abils.str)

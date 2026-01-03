@@ -1692,6 +1692,11 @@ static void interpret_espec(const char *keyword, const char *value, int i, int n
     mob_proto[i].real_abils.cha = num_arg;
   }
 
+  CASE("PetPrice") {
+    RANGE(0, INT_MAX);
+    GET_PET_PRICE(&mob_proto[i]) = num_arg;
+  }
+
   CASE("SavingPara") {
     RANGE(0, 100);
     mob_proto[i].char_specials.saved.apply_saving_throw[SAVING_PARA] = num_arg;
