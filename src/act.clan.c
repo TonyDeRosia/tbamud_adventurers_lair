@@ -268,21 +268,13 @@ static void clan_show_roster(struct char_data *ch)
   if (count > 1)
     qsort(list, (size_t)count, sizeof(*list), roster_cmp);
 
-  send_to_char(ch,
-    "\r\n"
-    "%s╔══════════════════════════════════════════════════════════════════════╗%s\r\n"
-    "%s║%s %s %s ║%s\r\n"
-    "%s║%s                              %sClan Roster%s                             ║%s%s\r\n"
-    "%s╠══════════════════════════════════════════════════════════════════════╣%s\r\n"
-    "%s║%s %sName                     Race            Class            Level      %s║%s%s\r\n"
-    "%s╠══════════════════════════════════════════════════════════════════════╣%s\r\n"
-    , B, R,
-      B, R, clan_name_buf, B, R,
-      B, R, Y, R, B, R,
-      B, R,
-      B, R, C, R, B, R,
-      B, R
-  );
+  send_to_char(ch, "\r\n");
+  send_to_char(ch, "%s╔══════════════════════════════════════════════════════════════════════╗%s\r\n", B, R);
+  send_to_char(ch, "%s║%s %s %s ║%s\r\n", B, R, clan_name_buf, B, R);
+  send_to_char(ch, "%s║%s                              %sClan Roster%s                             ║%s%s\r\n", B, R, Y, R, B, R);
+  send_to_char(ch, "%s╠══════════════════════════════════════════════════════════════════════╣%s\r\n", B, R);
+  send_to_char(ch, "%s║%s %sName                     Race            Class            Level      %s║%s%s\r\n", B, R, C, R, B, R);
+  send_to_char(ch, "%s╠══════════════════════════════════════════════════════════════════════╣%s\r\n", B, R);
 
   if (count == 0) {
     send_to_char(ch,
