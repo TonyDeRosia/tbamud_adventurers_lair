@@ -717,7 +717,7 @@ void Crash_rentsave(struct char_data *ch, int cost)
 
 static int objsave_write_rentcode(FILE *fl, int rentcode, int cost_per_day, struct char_data *ch)
 {
-  if (fprintf(fl, "%d %ld %d %d %d %d\r\n",
+  if (fprintf(fl, "%d %ld %d %lld %lld %d\r\n",
           rentcode,
           (long) time(0),
           cost_per_day,
@@ -935,7 +935,7 @@ static int gen_receptionist(struct char_data *ch, struct char_data *recep, int c
     if (mode == RENT_FACTOR) {
       act("$n stores your belongings and helps you into your private chamber.", FALSE, recep, 0, ch, TO_VICT);
       Crash_rentsave(ch, cost);
-      mudlog(NRM, MAX(LVL_IMMORT, GET_INVIS_LEV(ch)), TRUE, "%s has rented (%d/day, %d tot.)",
+      mudlog(NRM, MAX(LVL_IMMORT, GET_INVIS_LEV(ch)), TRUE, "%s has rented (%d/day, %lld tot.)",
 		GET_NAME(ch), cost, GET_GOLD(ch) + GET_BANK_GOLD(ch));
     } else {			/* cryo */
       act("$n stores your belongings and helps you into your private chamber.\r\n"
