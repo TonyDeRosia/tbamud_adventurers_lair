@@ -796,6 +796,29 @@ static struct char_data *find_charmed_follower(struct char_data *ch, const char 
   return first_charmed;
 }
 
+static void detach_charmed_follower(struct char_data *pet)
+{
+  struct follow_type *f, *prev = NULL;
+
+  if (!pet || !pet->master)
+    return;
+
+  for (f = pet->master->followers; f; prev = f, f = f->next) {
+    if (f->follower != pet)
+      continue;
+
+    if (prev)
+      prev->next = f->next;
+    else
+      pet->master->followers = f->next;
+
+    free(f);
+    break;
+  }
+
+  pet->master = NULL;
+}
+
 ACMD(do_pet_release)
 {
   char arg[MAX_INPUT_LENGTH];
@@ -889,23 +912,40 @@ ACMD(do_opet)
   half_chop(command_part, cmd_sub, target);
 
   if (is_abbrev(cmd_sub, "stay")) {
-    snprintf(order_argument, sizeof(order_argument), "%s stay", GET_NAME(follower));
+    if (follower->master == ch) {
+      act("You order $N to stay here.", FALSE, ch, 0, follower, TO_CHAR);
+      act("$n orders $N to stay here.", FALSE, ch, 0, follower, TO_ROOM);
+      detach_charmed_follower(follower);
+    } else {
+      send_to_char(ch, "%s isn't following you.\r\n", GET_NAME(follower));
+    }
+    return;
   } else if (is_abbrev(cmd_sub, "follow")) {
-    snprintf(order_argument, sizeof(order_argument), "%s follow", GET_NAME(follower));
+    if (follower->master && follower->master != ch)
+      detach_charmed_follower(follower);
+
+    if (follower->master == ch) {
+      send_to_char(ch, "%s is already following you.\r\n", GET_NAME(follower));
+      return;
+    }
+
+    add_follower(follower, ch);
+    SET_BIT_AR(AFF_FLAGS(follower), AFF_CHARM);
+    return;
   } else if (is_abbrev(cmd_sub, "attack")) {
     if (!*target) {
       send_to_char(ch, "Usage: opet [follower] attack <target>\r\n");
       return;
     }
 
-    snprintf(order_argument, sizeof(order_argument), "%s attack %s", GET_NAME(follower), target);
+    snprintf(order_argument, sizeof(order_argument), "hit %s", target);
   } else if (is_abbrev(cmd_sub, "assist")) {
     if (!*target) {
       send_to_char(ch, "Usage: opet [follower] assist <target>\r\n");
       return;
     }
 
-    snprintf(order_argument, sizeof(order_argument), "%s assist %s", GET_NAME(follower), target);
+    snprintf(order_argument, sizeof(order_argument), "assist %s", target);
   } else {
     send_to_char(ch, "%s", usage);
     return;
