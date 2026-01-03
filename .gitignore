@@ -32,3 +32,11 @@ lib/etc/plrmail
 lib/etc/time
 src/depend
 src/util/depend
+
+# local build and git artifacts
+FETCH_HEAD
+*.o
+src/depend
+
+# local backup folders created by scripts
+backups_*/
