@@ -2691,7 +2691,7 @@ static void msdp_update( void )
       MSDPSetString( d, eMSDP_CLASS, buf );
 
       MSDPSetNumber( d, eMSDP_MANA, GET_MANA(ch) );
-      MSDPSetNumber( d, eMSDP_MANA_MAX, GET_MAX_MANA(ch) );
+      MSDPSetNumber( d, eMSDP_MANA_MAX, effective_max_mana(ch) );
       MSDPSetNumber( d, eMSDP_WIMPY, GET_WIMP_LEV(ch) );
       MSDPSetNumber( d, eMSDP_MONEY, GET_GOLD(ch) );
       MSDPSetNumber( d, eMSDP_MOVEMENT, GET_MOVE(ch) );

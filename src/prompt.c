@@ -182,7 +182,7 @@ static void append_prompt_mana(char *prompt, size_t *pos, struct descriptor_data
 
 static void append_prompt_max_mana(char *prompt, size_t *pos, struct descriptor_data *d)
 {
-  append_prompt_number(prompt, pos, GET_MAX_MANA(d->character));
+  append_prompt_number(prompt, pos, effective_max_mana(d->character));
 }
 
 static void append_prompt_move(char *prompt, size_t *pos, struct descriptor_data *d)

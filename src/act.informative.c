@@ -1292,7 +1292,7 @@ ACMD(do_score)
 snprintf(line, sizeof(line),
   "%sHP:%s %d/%d  %sMana:%s %d/%d  %sMove:%s %d/%d     %sExp:%s %d",
   C, R, GET_HIT(ch), GET_MAX_HIT(ch),
-  C, R, GET_MANA(ch), GET_MAX_MANA(ch),
+  C, R, GET_MANA(ch), effective_max_mana(ch),
   C, R, GET_MOVE(ch), GET_MAX_MOVE(ch),
   C, R, GET_EXP(ch));
 len = append_box_line(buf, len, sizeof(buf), B, R, line, W);

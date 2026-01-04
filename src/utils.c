@@ -1657,3 +1657,38 @@ void remove_from_string(char *string, const char *to_remove)
     }
     
 }
+
+
+/* Mana scaling using combined INT + WIS. Base mana comes from class/level. */
+int mana_bonus_percent(const struct char_data *ch)
+{
+  int stat_sum = GET_INT(ch) + GET_WIS(ch);
+
+  if (MANA_BONUS_STAT_CAP > 0)
+    stat_sum = MIN(stat_sum, MANA_BONUS_STAT_CAP);
+
+  int over = MAX(0, stat_sum - MANA_BONUS_BASELINE);
+  double bonus_pct = (over * MANA_BONUS_MULTIPLIER) /
+                     (1.0 + (over / MANA_BONUS_HALF_SCALE));
+
+  if (MANA_BONUS_PERCENT_CAP > 0.0)
+    bonus_pct = MIN(bonus_pct, MANA_BONUS_PERCENT_CAP);
+
+  return (int) (bonus_pct + 0.5);
+}
+
+int effective_max_mana(const struct char_data *ch)
+{
+  double bonus_pct = mana_bonus_percent(ch);
+  double scaled = (double)GET_MAX_MANA(ch) * (1.0 + (bonus_pct / 100.0));
+
+  return (int) (scaled + 0.5);
+}
+
+void clamp_mana_to_effective_max(struct char_data *ch)
+{
+  int max_mana = effective_max_mana(ch);
+
+  if (GET_MANA(ch) > max_mana)
+    GET_MANA(ch) = max_mana;
+}

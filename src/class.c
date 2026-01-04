@@ -1720,7 +1720,7 @@ void do_start(struct char_data *ch)
   advance_level(ch);
 
   GET_HIT(ch) = GET_MAX_HIT(ch);
-  GET_MANA(ch) = GET_MAX_MANA(ch);
+  GET_MANA(ch) = effective_max_mana(ch);
   GET_MOVE(ch) = GET_MAX_MOVE(ch);
 
   GET_COND(ch, THIRST) = 24;

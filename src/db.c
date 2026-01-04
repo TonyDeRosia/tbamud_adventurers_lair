@@ -3545,7 +3545,7 @@ void init_char(struct char_data *ch)
     GET_MAX_MANA(ch) = 100;
     GET_MAX_MOVE(ch) = 82;
     GET_HIT(ch) = GET_MAX_HIT(ch);
-    GET_MANA(ch) = GET_MAX_MANA(ch);
+    GET_MANA(ch) = effective_max_mana(ch);
     GET_MOVE(ch) = GET_MAX_MOVE(ch);
   }
 
