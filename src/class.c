@@ -1874,6 +1874,7 @@ void init_spell_levels(void)
   spell_level(SPELL_SENSE_LIFE, CLASS_MAGIC_USER, 76);
   spell_level(SPELL_GROUP_RECALL, CLASS_MAGIC_USER, 78);
   spell_level(SPELL_WORD_OF_RECALL, CLASS_MAGIC_USER, 80);
+  spell_level(SPELL_ARCANE_WARD, CLASS_MAGIC_USER, 50);
   spell_level(SPELL_WATERWALK, CLASS_MAGIC_USER, 83);
   spell_level(SPELL_DISPEL_GOOD, CLASS_MAGIC_USER, 86);
   spell_level(SPELL_DISPEL_EVIL, CLASS_MAGIC_USER, 90);
@@ -1886,7 +1887,6 @@ void init_spell_levels(void)
   spell_level(SPELL_GROUP_HEAL, CLASS_MAGIC_USER, LVL_IMMORT);
   spell_level(SPELL_REMOVE_POISON, CLASS_MAGIC_USER, LVL_IMMORT);
   spell_level(SPELL_REMOVE_CURSE, CLASS_MAGIC_USER, LVL_IMMORT);
-  spell_level(SPELL_SANCTUARY, CLASS_MAGIC_USER, LVL_IMMORT);
   spell_level(SPELL_ANIMATE_DEAD, CLASS_MAGIC_USER, LVL_IMMORT);
   spell_level(SPELL_ENERGY_DRAIN, CLASS_MAGIC_USER, LVL_IMMORT);
   spell_level(SPELL_HARM, CLASS_MAGIC_USER, LVL_IMMORT);
@@ -1906,6 +1906,7 @@ void init_spell_levels(void)
   spell_level(SPELL_DISPEL_GOOD, CLASS_WARLOCK, 40);
   spell_level(SPELL_HARM, CLASS_WARLOCK, 45);
   spell_level(SPELL_SUMMON, CLASS_WARLOCK, 50);
+  spell_level(SPELL_DARK_AEGIS, CLASS_WARLOCK, 50);
   spell_level(SPELL_CONTROL_WEATHER, CLASS_WARLOCK, 60);
   spell_level(SPELL_TELEPORT, CLASS_WARLOCK, 70);
   spell_level(SPELL_ANIMATE_DEAD, CLASS_WARLOCK, 80);
@@ -1926,7 +1927,7 @@ void init_spell_levels(void)
   spell_level(SPELL_CURE_CRITIC, CLASS_CLERIC, 18);
   spell_level(SPELL_PROT_FROM_EVIL, CLASS_CLERIC, 20);
   spell_level(SPELL_REMOVE_CURSE, CLASS_CLERIC, 22);
-  spell_level(SPELL_SANCTUARY, CLASS_CLERIC, 24);
+  spell_level(SPELL_SANCTUARY, CLASS_CLERIC, 50);
   spell_level(SPELL_HEAL, CLASS_CLERIC, 26);
   spell_level(SPELL_WORD_OF_RECALL, CLASS_CLERIC, 28);
   spell_level(SPELL_FLY, CLASS_CLERIC, 30);
@@ -1961,6 +1962,7 @@ void init_spell_levels(void)
   spell_level(SPELL_INFRAVISION, CLASS_DRUID, 35);
   spell_level(SPELL_CONTROL_WEATHER, CLASS_DRUID, 40);
   spell_level(SPELL_HEAL, CLASS_DRUID, 45);
+  spell_level(SPELL_NIRVANA, CLASS_DRUID, 50);
   spell_level(SPELL_WATERWALK, CLASS_DRUID, 50);
   spell_level(SPELL_GROUP_HEAL, CLASS_DRUID, 60);
   spell_level(SPELL_GROUP_ARMOR, CLASS_DRUID, 70);
@@ -1983,6 +1985,7 @@ void init_spell_levels(void)
   spell_level(SPELL_INFRAVISION, CLASS_THIEF, 30);
   spell_level(SPELL_ARMOR, CLASS_THIEF, 35);
   spell_level(SPELL_LOCATE_OBJECT, CLASS_THIEF, 45);
+  spell_level(SPELL_EVASION, CLASS_THIEF, 50);
   spell_level(SPELL_IDENTIFY, CLASS_THIEF, 60);
   spell_level(SPELL_ENERGY_DRAIN, CLASS_THIEF, 70);
 
@@ -1994,6 +1997,7 @@ void init_spell_levels(void)
   spell_level(SKILL_BANDAGE, CLASS_WARRIOR, 20);
   spell_level(SKILL_WHIRLWIND, CLASS_WARRIOR, 25);
   spell_level(SPELL_ARMOR, CLASS_WARRIOR, 30);
+  spell_level(SPELL_IRONSKIN, CLASS_WARRIOR, 50);
   spell_level(SKILL_TRACK, CLASS_WARRIOR, 40);
   spell_level(SPELL_EARTHQUAKE, CLASS_WARRIOR, 60);
 
@@ -2008,7 +2012,7 @@ void init_spell_levels(void)
   spell_level(SPELL_REMOVE_POISON, CLASS_PALADIN, 30);
   spell_level(SPELL_STRENGTH, CLASS_PALADIN, 35);
   spell_level(SPELL_ARMOR, CLASS_PALADIN, 45);
-  spell_level(SPELL_SANCTUARY, CLASS_PALADIN, 55);
+  spell_level(SPELL_DIVINE_BULWARK, CLASS_PALADIN, 50);
   spell_level(SPELL_HEAL, CLASS_PALADIN, 65);
   spell_level(SPELL_WORD_OF_RECALL, CLASS_PALADIN, 75);
   spell_level(SPELL_GROUP_ARMOR, CLASS_PALADIN, 85);
@@ -2035,7 +2039,7 @@ void init_spell_levels(void)
   spell_level(SPELL_REMOVE_POISON, CLASS_BARD, 45);
   spell_level(SPELL_REMOVE_CURSE, CLASS_BARD, 50);
   spell_level(SPELL_PROT_FROM_EVIL, CLASS_BARD, 55);
-  spell_level(SPELL_SANCTUARY, CLASS_BARD, 60);
+  spell_level(SPELL_SONG_OF_RESILIENCE, CLASS_BARD, 50);
   spell_level(SPELL_IDENTIFY, CLASS_BARD, 65);
   spell_level(SPELL_GROUP_ARMOR, CLASS_BARD, 70);
   spell_level(SPELL_GROUP_HEAL, CLASS_BARD, 80);
@@ -2044,7 +2048,7 @@ void init_spell_levels(void)
   spell_level(SPELL_SENSE_LIFE, CLASS_BARD, 95);
 
   /* MYSTIC */
-  spell_level(SPELL_BEAR_SPIRIT, CLASS_MYSTIC, 1);
+  spell_level(SPELL_BEAR_SPIRIT, CLASS_MYSTIC, 50);
   spell_level(SPELL_DETECT_MAGIC, CLASS_MYSTIC, 1);
   spell_level(SPELL_SENSE_LIFE, CLASS_MYSTIC, 5);
   spell_level(SPELL_DETECT_INVIS, CLASS_MYSTIC, 10);

@@ -571,7 +571,10 @@ int cast_spell(struct char_data *ch, struct char_data *tch,
     return (0);
   }
   if ((tch != ch) && IS_SET(SINFO.targets, TAR_SELF_ONLY)) {
-    send_to_char(ch, "You can only cast this spell upon yourself!\r\n");
+    if (is_sanctuary_spell(spellnum))
+      send_to_char(ch, "You can only invoke this protection on yourself.\r\n");
+    else
+      send_to_char(ch, "You can only cast this spell upon yourself!\r\n");
     return (0);
   }
   if ((tch == ch) && IS_SET(SINFO.targets, TAR_NOT_SELF)) {
@@ -1043,7 +1046,35 @@ void mag_assign_spells(void) {
       MAG_UNAFFECTS | MAG_ALTER_OBJS, NULL);
 
   spello(SPELL_SANCTUARY, "sanctuary", 110, 85, 5, POS_STANDING,
-  TAR_CHAR_ROOM, FALSE, MAG_AFFECTS, "The white aura around your body fades.");
+  TAR_CHAR_ROOM, FALSE, MAG_AFFECTS, "The divine glow around you fades away.");
+
+  spello(SPELL_ARCANE_WARD, "arcane ward", 110, 85, 5, POS_STANDING,
+  TAR_CHAR_ROOM | TAR_SELF_ONLY, FALSE, MAG_AFFECTS,
+  "The arcane runes around you flicker and fade.");
+
+  spello(SPELL_EVASION, "evasion", 110, 85, 5, POS_STANDING,
+  TAR_CHAR_ROOM | TAR_SELF_ONLY, FALSE, MAG_AFFECTS,
+  "Your heightened awareness fades.");
+
+  spello(SPELL_IRONSKIN, "ironskin", 110, 85, 5, POS_STANDING,
+  TAR_CHAR_ROOM | TAR_SELF_ONLY, FALSE, MAG_AFFECTS,
+  "Your skin softens back to normal.");
+
+  spello(SPELL_DIVINE_BULWARK, "divine bulwark", 110, 85, 5, POS_STANDING,
+  TAR_CHAR_ROOM | TAR_SELF_ONLY, FALSE, MAG_AFFECTS,
+  "The holy bulwark around you dissipates.");
+
+  spello(SPELL_SONG_OF_RESILIENCE, "song of resilience", 110, 85, 5, POS_STANDING,
+  TAR_CHAR_ROOM, FALSE, MAG_AFFECTS,
+  "The resonant melody around you fades.");
+
+  spello(SPELL_DARK_AEGIS, "dark aegis", 110, 85, 5, POS_STANDING,
+  TAR_CHAR_ROOM | TAR_SELF_ONLY, FALSE, MAG_AFFECTS,
+  "The shadows around you unravel and disperse.");
+
+  spello(SPELL_NIRVANA, "nirvana", 110, 85, 5, POS_STANDING,
+  TAR_CHAR_ROOM | TAR_SELF_ONLY, FALSE, MAG_AFFECTS,
+  "Your eyes dim as the primal serenity fades.");
 
   spello(SPELL_SENSE_LIFE, "sense life", 20, 10, 2, POS_STANDING,
   TAR_CHAR_ROOM | TAR_SELF_ONLY, FALSE, MAG_AFFECTS,
@@ -1065,7 +1096,7 @@ void mag_assign_spells(void) {
   TAR_CHAR_ROOM, FALSE, MAG_MANUAL, NULL);
 
   spello(SPELL_BEAR_SPIRIT, "bear spirit", 40, 20, 2, POS_STANDING,
-  TAR_SELF_ONLY, FALSE, MAG_AFFECTS, "The strength of the bear spirit leaves you.");
+  TAR_SELF_ONLY, FALSE, MAG_AFFECTS, "The spirit of the bear withdraws from you.");
 
   spello(SPELL_WOLF_SPIRIT, "wolf spirit", 40, 20, 2, POS_STANDING,
   TAR_SELF_ONLY, FALSE, MAG_AFFECTS, "The keen focus of the wolf spirit fades.");
