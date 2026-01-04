@@ -74,6 +74,14 @@ A giant pool of healing power shines with a brilliant golden radiance before you
 6 ceq 0 0 0 0 0 0 0 0 0 0 0
 3 3 0 0
 999999 0 0 0 0
+#3008
+bedroll bed sleeping~
+a @Pbedroll@n~
+@WAn exquisite @Pbedroll@n with restorative powers is here.@n~
+~
+6 0 0 0 0 a 0 0 0 i 0 0 0
+2 1 0 0
+2 100000 0 0 0
 #3009
 waybread bread~
 a waybread~
@@ -163,12 +171,12 @@ A small sword lies here.~
 0 1 6 11
 3 60000 10 0 0
 E
-sword small~
-   The small sword seems to have an inscription of some sort.
-~
-E
 inscription~
    It says: 'May this sword be a good companion.  '
+~
+E
+sword small~
+   The small sword seems to have an inscription of some sort.
 ~
 #3022
 sword long~
@@ -645,12 +653,12 @@ A large, sociable bulletin board is mounted on a wall here.~
 0 0 0 0
 0 0 0 0 0
 E
-board~
-   If you can read this, the board is not working.
-~
-E
 social bulletin~
    Use 'look board' to read the board.
+~
+E
+board~
+   If you can read this, the board is not working.
 ~
 #3097
 boards frozen bulletin gen_boards~
@@ -661,12 +669,12 @@ A large bulletin board is here, carved from a block of ice.~
 0 0 0 0
 0 0 0 0 0
 E
-board~
-   If you can read this, the board is not working.
-~
-E
 freeze bulletin~
    Use 'look board' to read the board.
+~
+E
+board~
+   If you can read this, the board is not working.
 ~
 #3098
 boards holy bulletin gen_boards~
@@ -677,12 +685,12 @@ A large bulletin board is mounted on a wall here.  It glows with a faint aura.~
 0 0 0 0
 0 0 0 0 0
 E
-board~
-   If you can read this, the board is not working.
-~
-E
 holy bulletin~
    Use 'look board' to read the board.
+~
+E
+board~
+   If you can read this, the board is not working.
 ~
 #3099
 boards bulletin gen_boards~
@@ -693,11 +701,11 @@ A large bulletin board is mounted on a wall here.~
 0 0 0 0
 0 0 0 0 0
 E
-board~
-   If you can read this, the board is not working.
-~
-E
 bulletin~
    Use 'look board' to read the board.
+~
+E
+board~
+   If you can read this, the board is not working.
 ~
 $~
