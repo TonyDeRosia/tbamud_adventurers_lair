@@ -302,6 +302,8 @@ void affect_total(struct char_data *ch)
       GET_STR(ch) = 18;
     }
   }
+
+  clamp_mana_to_effective_max(ch);
 }
 
 /* Insert an affect_type in a char_data structure. Automatically sets

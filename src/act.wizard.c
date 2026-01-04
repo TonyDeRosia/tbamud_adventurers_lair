@@ -836,9 +836,9 @@ static void do_stat_character(struct char_data *ch, struct char_data *k)
 	  CCCYN(ch, C_NRM), GET_CHA(k), CCNRM(ch, C_NRM));
 
   send_to_char(ch, "Hit p.:[%s%d/%d+%d%s]  Mana p.:[%s%d/%d+%d%s]  Move p.:[%s%d/%d+%d%s]\r\n",
-	  CCGRN(ch, C_NRM), GET_HIT(k), GET_MAX_HIT(k), hit_gain(k), CCNRM(ch, C_NRM),
-	  CCGRN(ch, C_NRM), GET_MANA(k), GET_MAX_MANA(k), mana_gain(k), CCNRM(ch, C_NRM),
-	  CCGRN(ch, C_NRM), GET_MOVE(k), GET_MAX_MOVE(k), move_gain(k), CCNRM(ch, C_NRM));
+          CCGRN(ch, C_NRM), GET_HIT(k), GET_MAX_HIT(k), hit_gain(k), CCNRM(ch, C_NRM),
+          CCGRN(ch, C_NRM), GET_MANA(k), effective_max_mana(k), mana_gain(k), CCNRM(ch, C_NRM),
+          CCGRN(ch, C_NRM), GET_MOVE(k), GET_MAX_MOVE(k), move_gain(k), CCNRM(ch, C_NRM));
 
   send_to_char(ch, "Gold: [%9lld], Bank: [%9lld] (Total: %lld), ",
 	  GET_GOLD(k), GET_BANK_GOLD(k), GET_GOLD(k) + GET_BANK_GOLD(k));
@@ -1602,7 +1602,7 @@ ACMD(do_restore)
      continue;
 
       GET_HIT(vict)  = GET_MAX_HIT(vict);
-      GET_MANA(vict) = GET_MAX_MANA(vict);
+      GET_MANA(vict) = effective_max_mana(vict);
       GET_MOVE(vict) = GET_MAX_MOVE(vict);
 
       update_pos(vict);
@@ -1618,7 +1618,7 @@ ACMD(do_restore)
     mudlog(NRM, MAX(LVL_GOD, GET_INVIS_LEV(ch)), TRUE, "(GC) %s restored %s",GET_NAME(ch), GET_NAME(vict));
 
     GET_HIT(vict) = GET_MAX_HIT(vict);
-    GET_MANA(vict) = GET_MAX_MANA(vict);
+    GET_MANA(vict) = effective_max_mana(vict);
     GET_MOVE(vict) = GET_MAX_MOVE(vict);
 
     if (!IS_NPC(vict) && GET_LEVEL(ch) >= LVL_GRGOD) {

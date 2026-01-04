@@ -661,11 +661,11 @@ static void print_group(struct char_data *ch)
   while ((k = (struct char_data *) simple_list(ch->group->members)) != NULL)
     send_to_char(ch, "%-*s: %s[%4d/%-4d]H [%4d/%-4d]M [%4d/%-4d]V%s\r\n",
 	    count_color_chars(GET_NAME(k))+22, GET_NAME(k), 
-	    GROUP_LEADER(GROUP(ch)) == k ? CBGRN(ch, C_NRM) : CCGRN(ch, C_NRM),
-	    GET_HIT(k), GET_MAX_HIT(k),
-	    GET_MANA(k), GET_MAX_MANA(k),
-	    GET_MOVE(k), GET_MAX_MOVE(k),
-	    CCNRM(ch, C_NRM));
+            GROUP_LEADER(GROUP(ch)) == k ? CBGRN(ch, C_NRM) : CCGRN(ch, C_NRM),
+            GET_HIT(k), GET_MAX_HIT(k),
+            GET_MANA(k), effective_max_mana(k),
+            GET_MOVE(k), GET_MAX_MOVE(k),
+            CCNRM(ch, C_NRM));
 }
 
 static void display_group_list(struct char_data * ch)
@@ -1020,10 +1020,10 @@ ACMD(do_report)
   }
 
   send_to_group(NULL, group, "%s reports: %d/%dH, %d/%dM, %d/%dV\r\n",
-	  GET_NAME(ch),
-	  GET_HIT(ch), GET_MAX_HIT(ch),
-	  GET_MANA(ch), GET_MAX_MANA(ch),
-	  GET_MOVE(ch), GET_MAX_MOVE(ch));
+          GET_NAME(ch),
+          GET_HIT(ch), GET_MAX_HIT(ch),
+          GET_MANA(ch), effective_max_mana(ch),
+          GET_MOVE(ch), GET_MAX_MOVE(ch));
 }
 
 ACMD(do_split)
