@@ -36,6 +36,311 @@ static void spello(int spl, const char *name, int max_mana, int min_mana,
     const char *wearoff);
 static int mag_manacost(struct char_data *ch, int spellnum);
 
+struct cast_message {
+  const char *to_caster;
+  const char *to_room;
+  const char *to_target;
+};
+
+static const struct cast_message cast_messages[] = {
+  [SPELL_ARMOR] = {
+    "Your skin takes on a faint, hardened sheen.",
+    "A dull protective sheen settles over $n.",
+    NULL
+  },
+  [SPELL_TELEPORT] = {
+    "Reality folds and you vanish in a blink.",
+    "Space ripples and $n disappears.",
+    NULL
+  },
+  [SPELL_BLESS] = {
+    "You speak a quiet blessing and strength answers.",
+    "A warm glow briefly rests on $n.",
+    NULL
+  },
+  [SPELL_BLINDNESS] = {
+    "You gesture sharply and sight is stolen away.",
+    "$n makes a cutting motion toward $N\u2019s eyes.",
+    "Darkness swallows your vision."
+  },
+  [SPELL_BURNING_HANDS] = {
+    "Flames spill from your palms in a hungry rush.",
+    "Fire bursts from $n\u2019s hands toward $N.",
+    "Fire scorches across your skin."
+  },
+  [SPELL_CALL_LIGHTNING] = {
+    "You call upward and the sky answers with wrath.",
+    "A crack of lightning answers $n\u2019s call.",
+    "Lightning rips through you."
+  },
+  [SPELL_CHARM] = {
+    "Your voice turns velvet and command slips in.",
+    "$n speaks softly to $N with unsettling certainty.",
+    "A strange warmth makes $n feel trustworthy."
+  },
+  [SPELL_CHILL_TOUCH] = {
+    "Cold clings to your fingers as you reach out.",
+    "Frosty darkness trails $n\u2019s hand toward $N.",
+    "A dead cold grips your body."
+  },
+  [SPELL_CLONE] = {
+    "You trace a mirror sigil and life imitates life.",
+    "A wavering duplicate forms near $n.",
+    NULL
+  },
+  [SPELL_COLOR_SPRAY] = {
+    "You fling a burst of prismatic light.",
+    "A fan of colors explodes from $n toward $N.",
+    "Light fractures your senses."
+  },
+  [SPELL_CONTROL_WEATHER] = {
+    "You whisper to the air and the world listens.",
+    "The air shifts as if obeying $n\u2019s will.",
+    NULL
+  },
+  [SPELL_CREATE_FOOD] = {
+    "Simple words become a simple meal.",
+    "Food appears as $n finishes a short chant.",
+    NULL
+  },
+  [SPELL_CREATE_WATER] = {
+    "You call forth water, clean and cold.",
+    "Fresh water gathers at $n\u2019s gesture.",
+    NULL
+  },
+  [SPELL_CURE_BLIND] = {
+    "You brush away the dark and sight returns.",
+    "$n\u2019s hand passes over $N\u2019s eyes with a soft glow.",
+    "Warmth clears your eyes."
+  },
+  [SPELL_CURE_CRITIC] = {
+    "You bind deep wounds with steady purpose.",
+    "A strong healing glow wraps around $N.",
+    "Pain pulls back as your body knits."
+  },
+  [SPELL_CURE_LIGHT] = {
+    "You close minor wounds with a calm touch.",
+    "A soft glow settles over $N.",
+    "Your cuts seal and the sting fades."
+  },
+  [SPELL_CURSE] = {
+    "You lay a bitter word that clings like ash.",
+    "A shadowed hush follows $n\u2019s curse upon $N.",
+    "Misfortune settles on you like a weight."
+  },
+  [SPELL_DETECT_ALIGN] = {
+    "You focus, reading the shape of a soul.",
+    "$n\u2019s eyes narrow as if seeing too much.",
+    NULL
+  },
+  [SPELL_DETECT_INVIS] = {
+    "Your sight sharpens beyond the veil.",
+    "$n blinks slowly, gaze turning keen.",
+    NULL
+  },
+  [SPELL_DETECT_MAGIC] = {
+    "The world\u2019s hidden threads begin to glow.",
+    "$n studies the air as if reading it.",
+    NULL
+  },
+  [SPELL_DETECT_POISON] = {
+    "Your senses turn to bitterness and danger.",
+    "$n inhales carefully, eyes intent.",
+    NULL
+  },
+  [SPELL_DISPEL_EVIL] = {
+    "You drive out darkness with a fierce prayer.",
+    "Light flares from $n toward $N.",
+    "A searing purity burns at you."
+  },
+  [SPELL_EARTHQUAKE] = {
+    "You slam your will into the ground.",
+    "The earth heaves violently around $n.",
+    NULL
+  },
+  [SPELL_ENCHANT_WEAPON] = {
+    "You bind a sharp promise into the steel.",
+    "$n\u2019s weapon glints with a brief, hungry light.",
+    NULL
+  },
+  [SPELL_ENERGY_DRAIN] = {
+    "You reach into life and pull.",
+    "A dark pull radiates from $n toward $N.",
+    "Strength bleeds from you in a cold rush."
+  },
+  [SPELL_FIREBALL] = {
+    "You hurl a roaring sphere of flame.",
+    "A fireball streaks from $n toward $N.",
+    "Exploding heat slams into you."
+  },
+  [SPELL_HARM] = {
+    "You speak ruin and it answers.",
+    "A brutal, blackened pulse strikes $N.",
+    "Agony tears through you."
+  },
+  [SPELL_HEAL] = {
+    "You call wholeness back into flesh.",
+    "Radiant light floods $N for a heartbeat.",
+    "Relief washes through you as wounds vanish."
+  },
+  [SPELL_INVISIBLE] = {
+    "You blur, then vanish from easy sight.",
+    "$n shimmers and fades from view.",
+    NULL
+  },
+  [SPELL_LIGHTNING_BOLT] = {
+    "You snap your hand and lightning obeys.",
+    "A bolt of lightning lashes out from $n.",
+    "Lightning punches through you."
+  },
+  [SPELL_LOCATE_OBJECT] = {
+    "Your mind reaches, seeking a familiar weight.",
+    "$n grows still, listening with $s eyes.",
+    NULL
+  },
+  [SPELL_MAGIC_MISSILE] = {
+    "You flick your fingers and force darts fly.",
+    "Arcane missiles snap from $n toward $N.",
+    "Invisible force strikes you hard."
+  },
+  [SPELL_POISON] = {
+    "Your words sour the air with venom.",
+    "$n\u2019s curse turns the color of sickness on $N.",
+    "Your blood turns cold and foul."
+  },
+  [SPELL_PROT_FROM_EVIL] = {
+    "A firm barrier settles around you.",
+    "A pale ward circles $n for a moment.",
+    NULL
+  },
+  [SPELL_REMOVE_CURSE] = {
+    "You tear away the clinging malice.",
+    "A dark haze lifts from $N.",
+    "The weight of the curse falls away."
+  },
+  [SPELL_SANCTUARY] = {
+    "A gentle aura settles around you like mercy.",
+    "A soft protective glow surrounds $n.",
+    NULL
+  },
+  [SPELL_SHOCKING_GRASP] = {
+    "Electricity crawls over your hand as you strike.",
+    "$n grabs at $N with crackling power.",
+    "Your muscles lock as shock tears through you."
+  },
+  [SPELL_SLEEP] = {
+    "You murmur a lull and will becomes fog.",
+    "$n gestures and drowsiness rolls over $N.",
+    "Your eyelids grow heavy and the world slips away."
+  },
+  [SPELL_STRENGTH] = {
+    "Power pours into your limbs like heat.",
+    "$n\u2019s posture steadies with sudden might.",
+    NULL
+  },
+  [SPELL_SUMMON] = {
+    "You pull on a name and space gives way.",
+    "The air twists as $n calls someone through.",
+    NULL
+  },
+  [SPELL_VENTRILOQUATE] = {
+    "You throw your voice like a hidden knife.",
+    "A voice speaks from the wrong place.",
+    NULL
+  },
+  [SPELL_WORD_OF_RECALL] = {
+    "You speak the word that leads you home.",
+    "$n fades away on a whispered word.",
+    NULL
+  },
+  [SPELL_REMOVE_POISON] = {
+    "You draw the toxin out and cast it aside.",
+    "A sickly tinge drains from $N.",
+    "The poison\u2019s grip loosens and fades."
+  },
+  [SPELL_SENSE_LIFE] = {
+    "You feel the pulse of living things nearby.",
+    "$n breathes in slowly, sensing the unseen.",
+    NULL
+  },
+  [SPELL_ANIMATE_DEAD] = {
+    "You call to the stillness and it answers.",
+    "A grave chill rises as $n stirs the dead.",
+    NULL
+  },
+  [SPELL_DISPEL_GOOD] = {
+    "You tear at holy light with spiteful force.",
+    "Darkness flares from $n toward $N.",
+    "Something cold snuffs at your virtue."
+  },
+  [SPELL_GROUP_ARMOR] = {
+    "Your ward spreads outward to your allies.",
+    "A protective sheen settles over $n\u2019s group.",
+    NULL
+  },
+  [SPELL_GROUP_HEAL] = {
+    "You release a wave of restoring light.",
+    "Warm radiance washes over $n\u2019s group.",
+    NULL
+  },
+  [SPELL_GROUP_RECALL] = {
+    "You call your allies back by shared bond.",
+    "The air pulls tight as $n\u2019s group vanishes.",
+    NULL
+  },
+  [SPELL_INFRAVISION] = {
+    "Heat and shadow sharpen into clear sight.",
+    "$n\u2019s eyes take on a faint, eerie glow.",
+    NULL
+  },
+  [SPELL_WATERWALK] = {
+    "Your feet grow light as if the world forgives weight.",
+    "$n\u2019s steps seem strangely certain.",
+    NULL
+  },
+  [SPELL_IDENTIFY] = {
+    "You trace the thing\u2019s story with your mind.",
+    "$n studies $p with intense focus.",
+    NULL
+  },
+  [SPELL_FLY] = {
+    "Air gathers beneath you and lifts.",
+    "$n rises as if carried by unseen hands.",
+    NULL
+  },
+  [SPELL_DARKNESS] = {
+    "You snuff the light with a cold gesture.",
+    "Shadows thicken around $n, swallowing the room.",
+    NULL
+  }
+};
+
+static bool send_cast_message(struct char_data *ch, struct char_data *tch, struct obj_data *tobj, int spellnum)
+{
+  const struct cast_message *msg;
+
+  if (spellnum < 0 || spellnum >= (int) (sizeof(cast_messages) / sizeof(cast_messages[0])))
+    return FALSE;
+
+  msg = &cast_messages[spellnum];
+
+  if (!msg->to_caster && !msg->to_room && !msg->to_target)
+    return FALSE;
+
+  if (msg->to_caster)
+    act(msg->to_caster, FALSE, ch, tobj, tch, TO_CHAR);
+
+  if (msg->to_room) {
+    int audience = (tch && msg->to_target) ? TO_NOTVICT : TO_ROOM;
+    act(msg->to_room, TRUE, ch, tobj, tch, audience);
+  }
+
+  if (tch && msg->to_target)
+    act(msg->to_target, FALSE, ch, tobj, tch, TO_VICT);
+
+  return TRUE;
+}
+
 /* Local (File Scope) Variables */
 struct syllable {
   const char *org;
@@ -588,14 +893,17 @@ int cast_spell(struct char_data *ch, struct char_data *tch,
   if (is_spirit_spell(spellnum) && !can_bind_spirit(ch, spellnum))
     return (0);
   send_to_char(ch, "%s", CONFIG_OK);
-  /* cast feedback message */
-  if (!IS_NPC(ch)) {
-    if (tch) {
-      send_to_char(ch, "You cast %s on %s.\r\n", skill_name(spellnum), (tch == ch) ? "yourself" : GET_NAME(tch));
-    } else if (tobj) {
-      send_to_char(ch, "You cast %s on %s.\r\n", skill_name(spellnum), GET_OBJ_SHORT(tobj));
-    } else {
-      send_to_char(ch, "You cast %s.\r\n", skill_name(spellnum));
+
+  if (!send_cast_message(ch, tch, tobj, spellnum)) {
+    /* fallback feedback */
+    if (!IS_NPC(ch)) {
+      if (tch) {
+        send_to_char(ch, "You cast %s on %s.\r\n", skill_name(spellnum), (tch == ch) ? "yourself" : GET_NAME(tch));
+      } else if (tobj) {
+        send_to_char(ch, "You cast %s on %s.\r\n", skill_name(spellnum), GET_OBJ_SHORT(tobj));
+      } else {
+        send_to_char(ch, "You cast %s.\r\n", skill_name(spellnum));
+      }
     }
   }
 
