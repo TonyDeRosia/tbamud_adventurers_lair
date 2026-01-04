@@ -948,22 +948,10 @@ ACMD(do_stand)
     act("$n clambers to $s feet.", TRUE, ch, 0, 0, TO_ROOM);
     /* Were they sitting in something? */
     char_from_furniture(ch);
-    if (GET_LEVEL(ch) >= LVL_IMMORT) {
-      send_to_char(ch, "[DBG] after char_from_furniture: SITTING=%s AFF_SANCT=%s\r\n",
-        SITTING(ch) ? "SET" : "NULL",
-        AFF_FLAGGED(ch, AFF_SANCTUARY) ? "YES" : "NO");
-    }
-
     /* Will be sitting after a successful bash and may still be fighting. */
     GET_POS(ch) = FIGHTING(ch) ? POS_FIGHTING : POS_STANDING;
     /* Recompute after furniture state change so derived effects drop immediately. */
     affect_total(ch);
-    if (GET_LEVEL(ch) >= LVL_IMMORT) {
-      send_to_char(ch, "[DBG] after affect_total:       SITTING=%s AFF_SANCT=%s\r\n",
-        SITTING(ch) ? "SET" : "NULL",
-        AFF_FLAGGED(ch, AFF_SANCTUARY) ? "YES" : "NO");
-    }
-
     break;
 
   case POS_RESTING:
@@ -971,21 +959,9 @@ ACMD(do_stand)
     act("$n stops resting, and clambers on $s feet.", TRUE, ch, 0, 0, TO_ROOM);
     /* Were they resting on furniture? */
     char_from_furniture(ch);
-    if (GET_LEVEL(ch) >= LVL_IMMORT) {
-      send_to_char(ch, "[DBG] after char_from_furniture: SITTING=%s AFF_SANCT=%s\r\n",
-        SITTING(ch) ? "SET" : "NULL",
-        AFF_FLAGGED(ch, AFF_SANCTUARY) ? "YES" : "NO");
-    }
-
     GET_POS(ch) = POS_STANDING;
     /* Recompute after furniture state change so derived effects drop immediately. */
     affect_total(ch);
-    if (GET_LEVEL(ch) >= LVL_IMMORT) {
-      send_to_char(ch, "[DBG] after affect_total:       SITTING=%s AFF_SANCT=%s\r\n",
-        SITTING(ch) ? "SET" : "NULL",
-        AFF_FLAGGED(ch, AFF_SANCTUARY) ? "YES" : "NO");
-    }
-
     break;
 
   case POS_SLEEPING:
