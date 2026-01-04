@@ -1544,8 +1544,7 @@ len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
     snprintf(line, sizeof(line), "%sYou sense invisible things.%s", C, R);
     len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
   }
-  if (AFF_FLAGGED(ch, AFF_SANCTUARY)) {
-    snprintf(line, sizeof(line), "%sYou are protected by Sanctuary.%s", W_CLR, R);
+  if (AFF_FLAGGED(ch, AFF_SANCTUARY)) {snprintf(line, sizeof(line), "%sYou are protected by Sanctuary.%s", W_CLR, R);
     len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
   }
   if (AFF_FLAGGED(ch, AFF_POISON)) {

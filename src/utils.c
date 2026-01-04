@@ -1008,46 +1008,44 @@ int levenshtein_distance(const char *s1, const char *s2)
  * @post ch is unattached from the furniture object.
  * @param ch The character to remove from the furniture object.
  */
+
 void char_from_furniture(struct char_data *ch)
 {
-  struct obj_data *furniture;
-  struct char_data *tempch;
+  struct obj_data *obj;
+  struct char_data *iter, *prev;
 
-  if (!SITTING(ch))
+  if (!ch)
     return;
 
-  if (!(furniture = SITTING(ch))){
-    log("SYSERR: No furniture for char in char_from_furniture.");
+  obj = SITTING(ch);
+  if (!obj) {
     SITTING(ch) = NULL;
     NEXT_SITTING(ch) = NULL;
     return;
   }
 
-  if (!(tempch = OBJ_SAT_IN_BY(furniture))){
-    log("SYSERR: Char from furniture, but no furniture!");
-    SITTING(ch) = NULL;
-    NEXT_SITTING(ch) = NULL;
-    return;
+  /* Remove ch from OBJ_SAT_IN_BY(obj) linked list. */
+  prev = NULL;
+  for (iter = OBJ_SAT_IN_BY(obj); iter; iter = NEXT_SITTING(iter)) {
+    if (iter == ch) {
+      if (prev)
+        NEXT_SITTING(prev) = NEXT_SITTING(ch);
+      else
+        OBJ_SAT_IN_BY(obj) = NEXT_SITTING(ch);
+      break;
+    }
+    prev = iter;
   }
 
-  if (tempch == ch){
-    if (!NEXT_SITTING(ch)) {
-      OBJ_SAT_IN_BY(furniture) = NULL;
-    } else {
-      OBJ_SAT_IN_BY(furniture) = NEXT_SITTING(ch);
-    }
-  } else {
-    for (tempch = OBJ_SAT_IN_BY(furniture); tempch; tempch = NEXT_SITTING(tempch)) {
-      if (NEXT_SITTING(tempch) == ch) {
-        NEXT_SITTING(tempch) = NEXT_SITTING(ch);
-      }
-    }
-  }
+  /* Clear character pointers. */
   SITTING(ch) = NULL;
   NEXT_SITTING(ch) = NULL;
 
-  return;
+  /* Defensive: if the old furniture pointer is also stored here, clear it. */
+  if (ch->char_specials.furniture)
+    ch->char_specials.furniture = NULL;
 }
+
 
 
 /* column_list

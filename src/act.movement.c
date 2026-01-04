@@ -180,7 +180,9 @@ static void place_char_on_furniture(struct char_data *ch, struct obj_data *furni
   }
 
   SITTING(ch) = furniture;
-  NEXT_SITTING(ch) = NULL;
+  
+  affect_total(ch); /* furniture affects */
+NEXT_SITTING(ch) = NULL;
 }
 
 /* Simple function to determine if char can fly. */
@@ -940,36 +942,68 @@ ACMD(do_stand)
   case POS_STANDING:
     send_to_char(ch, "You are already standing.\r\n");
     break;
+
   case POS_SITTING:
     send_to_char(ch, "You stand up.\r\n");
     act("$n clambers to $s feet.", TRUE, ch, 0, 0, TO_ROOM);
     /* Were they sitting in something? */
     char_from_furniture(ch);
+    if (GET_LEVEL(ch) >= LVL_IMMORT) {
+      send_to_char(ch, "[DBG] after char_from_furniture: SITTING=%s AFF_SANCT=%s\r\n",
+        SITTING(ch) ? "SET" : "NULL",
+        AFF_FLAGGED(ch, AFF_SANCTUARY) ? "YES" : "NO");
+    }
+
     /* Will be sitting after a successful bash and may still be fighting. */
     GET_POS(ch) = FIGHTING(ch) ? POS_FIGHTING : POS_STANDING;
+    /* Recompute after furniture state change so derived effects drop immediately. */
+    affect_total(ch);
+    if (GET_LEVEL(ch) >= LVL_IMMORT) {
+      send_to_char(ch, "[DBG] after affect_total:       SITTING=%s AFF_SANCT=%s\r\n",
+        SITTING(ch) ? "SET" : "NULL",
+        AFF_FLAGGED(ch, AFF_SANCTUARY) ? "YES" : "NO");
+    }
+
     break;
+
   case POS_RESTING:
     send_to_char(ch, "You stop resting, and stand up.\r\n");
     act("$n stops resting, and clambers on $s feet.", TRUE, ch, 0, 0, TO_ROOM);
-    GET_POS(ch) = POS_STANDING;
-    /* Were they sitting in something. */
+    /* Were they resting on furniture? */
     char_from_furniture(ch);
+    if (GET_LEVEL(ch) >= LVL_IMMORT) {
+      send_to_char(ch, "[DBG] after char_from_furniture: SITTING=%s AFF_SANCT=%s\r\n",
+        SITTING(ch) ? "SET" : "NULL",
+        AFF_FLAGGED(ch, AFF_SANCTUARY) ? "YES" : "NO");
+    }
+
+    GET_POS(ch) = POS_STANDING;
+    /* Recompute after furniture state change so derived effects drop immediately. */
+    affect_total(ch);
+    if (GET_LEVEL(ch) >= LVL_IMMORT) {
+      send_to_char(ch, "[DBG] after affect_total:       SITTING=%s AFF_SANCT=%s\r\n",
+        SITTING(ch) ? "SET" : "NULL",
+        AFF_FLAGGED(ch, AFF_SANCTUARY) ? "YES" : "NO");
+    }
+
     break;
+
   case POS_SLEEPING:
     send_to_char(ch, "You have to wake up first!\r\n");
     break;
+
   case POS_FIGHTING:
     send_to_char(ch, "Do you not consider fighting as standing?\r\n");
     break;
+
   default:
     send_to_char(ch, "You stop floating around, and put your feet on the ground.\r\n");
     act("$n stops floating around, and puts $s feet on the ground.",
-	TRUE, ch, 0, 0, TO_ROOM);
+        TRUE, ch, 0, 0, TO_ROOM);
     GET_POS(ch) = POS_STANDING;
     break;
   }
 }
-
 ACMD(do_sit)
 {
   char arg[MAX_STRING_LENGTH];
@@ -1161,7 +1195,11 @@ ACMD(do_wake)
     act("$n awakens.", TRUE, ch, 0, 0, TO_ROOM);
     GET_POS(ch) = POS_SITTING;
   }
+  /* RECOMPUTE_AFFECTS_AFTER_DO_WAKE */
+  affect_total(ch);
+
 }
+
 
 ACMD(do_follow)
 {

@@ -1380,6 +1380,8 @@ ACMD(do_vstat)
 
   ACMD(do_tstat);
 
+ACMD(do_affremove);
+
   two_arguments(argument, buf, buf2);
 
   if (!*buf || !*buf2 || !isdigit(*buf2)) {
@@ -5517,3 +5519,151 @@ ACMD(do_unpull)
   send_to_char(ch, "You unpull %s.\r\n", GET_NAME(vict));
   extract_char(vict);
 }
+
+/* AFFREMOVE COMMAND BEGIN */
+ACMD(do_affremove)
+{
+  char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
+  struct char_data *vict = NULL;
+  struct affected_type *af, *next_af;
+  int affnum = -1, removed = 0;
+
+  one_argument(argument, arg1);
+  argument = one_argument(argument, arg1);
+  argument = one_argument(argument, arg2);
+
+  if (!*arg1) {
+    send_to_char(ch, "Usage:\r\n"
+                     "  affremove all\r\n"
+                     "  affremove all <target>\r\n"
+                     "  affremove <affect> <target>\r\n");
+    return;
+  }
+
+  /* helper: remove all affects and all AFF flags from one character */
+  #define CLEAR_ALL_AFFECTS(v) do {                                     \
+    struct affected_type *a_, *n_;                                      \
+    for (a_ = (v)->affected; a_; a_ = n_) {                             \
+      n_ = a_->next;                                                    \
+      affect_remove((v), a_);                                           \
+    }                                                                   \
+    AFF_FLAGS((v))[0] = 0;                                              \
+    AFF_FLAGS((v))[1] = 0;                                              \
+    AFF_FLAGS((v))[2] = 0;                                              \
+    AFF_FLAGS((v))[3] = 0;                                              \
+    affect_total((v));                                                  \
+  } while (0)
+
+  if (!str_cmp(arg1, "all")) {
+
+    /* affremove all <target> */
+    if (*arg2) {
+      if (!(vict = get_char_vis(ch, arg2, NULL, FIND_CHAR_WORLD))) {
+        send_to_char(ch, "That player is not here.\r\n");
+        return;
+      }
+      if (GET_LEVEL(vict) >= GET_LEVEL(ch) && vict != ch) {
+        send_to_char(ch, "You cannot affect someone of equal or higher level.\r\n");
+        return;
+      }
+
+      CLEAR_ALL_AFFECTS(vict);
+
+      send_to_char(ch, "All affects removed from %s.\r\n", GET_NAME(vict));
+      send_to_char(vict, "An immortal strips all magical effects from you.\r\n");
+      act("$n gestures, cleansing $N of all lingering magic.",
+          FALSE, ch, NULL, vict, TO_NOTVICT);
+      return;
+    }
+
+    /* affremove all   (global, all connected PCs) */
+    {
+      struct descriptor_data *d;
+      int count = 0;
+
+      for (d = descriptor_list; d; d = d->next) {
+        if (!d->character)
+          continue;
+        if (STATE(d) != CON_PLAYING)
+          continue;
+        if (IS_NPC(d->character))
+          continue;
+
+        /* do not allow lower imm to strip higher imm */
+        if (GET_LEVEL(d->character) >= GET_LEVEL(ch) && d->character != ch)
+          continue;
+
+        CLEAR_ALL_AFFECTS(d->character);
+        count++;
+      }
+
+      send_to_char(ch, "All affects removed from %d connected player(s).\r\n", count);
+      return;
+    }
+  }
+
+  /* affremove <affect> <target> */
+  if (!*arg2) {
+    send_to_char(ch, "Usage: affremove <affect> <target>\r\n");
+    return;
+  }
+
+  if (!(vict = get_char_vis(ch, arg2, NULL, FIND_CHAR_WORLD))) {
+    send_to_char(ch, "That player is not here.\r\n");
+    return;
+  }
+
+  if (GET_LEVEL(vict) >= GET_LEVEL(ch) && vict != ch) {
+    send_to_char(ch, "You cannot affect someone of equal or higher level.\r\n");
+    return;
+  }
+
+    /* Resolve affect by number or name.
+   * This codebase does not provide find_spell_num(), so we use find_skill_num()
+   * which covers skills and (in most tba forks) spells by name too.
+   */
+  if (is_number(arg1)) {
+    affnum = atoi(arg1);
+  } else {
+    affnum = find_skill_num(arg1);
+  }
+
+  /* Remove all affect nodes matching this type */
+  if (affnum >= 0) {
+    for (af = vict->affected; af; af = next_af) {
+      next_af = af->next;
+      if (af->spell == affnum) {
+        affect_remove(vict, af);
+        removed++;
+      }
+    }
+  }
+
+  /* Special-case: stuck sanctuary bit can exist with no affect node */
+  if (!str_cmp(arg1, "sanctuary")) {
+    REMOVE_BIT_AR(AFF_FLAGS(vict), AFF_SANCTUARY);
+    affect_total(vict);
+  }
+
+#ifdef SPELL_SANCTUARY
+  if (affnum == SPELL_SANCTUARY) {
+    REMOVE_BIT_AR(AFF_FLAGS(vict), AFF_SANCTUARY);
+    affect_total(vict);
+  }
+#endif
+
+  if (affnum < 0 && str_cmp(arg1, "sanctuary")) {
+    send_to_char(ch, "Unknown affect: %s\r\n", arg1);
+    return;
+  }
+
+  /* Always recompute after selective removal */
+  affect_total(vict);
+
+  send_to_char(ch, "Removed %d instance(s) of '%s' from %s.\r\n",
+               removed, arg1, GET_NAME(vict));
+  send_to_char(vict, "An immortal strips '%s' from you.\r\n", arg1);
+
+  #undef CLEAR_ALL_AFFECTS
+}
+/* AFFREMOVE COMMAND END */

@@ -59,6 +59,8 @@ ACMD(do_roster);
 ACMD(do_clanedit);
 ACMD(do_clist);
 
+ACMD(do_affremove);
+
 /* local (file scope) functions */
 static int perform_dupe_check(struct descriptor_data *d);
 static struct alias_data *find_alias(struct alias_data *alias_list, char *str);
@@ -428,9 +430,11 @@ cpp_extern const struct command_info cmd_info[] = {
   { "cdemote", "cdemote", POS_DEAD, do_cdemote, 0, 0 },
   { "worth",   "wor", POS_DEAD, do_worth,   0, 0 },
 
-  { "\n", "zzzzzzz", 0, 0, 0, 0 }   
-  
-};    /* this must be last */
+  { "affremove", "affremove", POS_DEAD, do_affremove, LVL_IMMORT, 0 },
+  { "\n", "zzzzzzz", 0, 0, 0, 0 }   ,
+
+}
+;    /* this must be last */
 
 
   /* Thanks to Melzaren for this change to allow DG Scripts to be attachable

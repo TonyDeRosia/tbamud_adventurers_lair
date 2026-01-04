@@ -253,17 +253,47 @@ void affect_total(struct char_data *ch)
   struct affected_type *af;
   int i, j;
 
+  /* Rebuild affected flags from the saved baseline every time. */
+  for (i = 0; i < AF_ARRAY_MAX; i++)
+    AFF_FLAGS(ch)[i] = ch->char_specials.saved.affected_by[i];
+
+  /* SCRUB_CORRUPT_SAVED_SANCT
+   * If Sanctuary got accidentally written into the saved baseline flags,
+   * it will persist forever. This heals corrupted characters by removing
+   * baseline Sanctuary when they are not actually under a real Sanctuary spell
+   * and not using furniture.
+   */
+  if (!SITTING(ch)
+      && IS_SET_AR(ch->char_specials.saved.affected_by, AFF_SANCTUARY)
+      && !affected_by_spell(ch, SPELL_SANCTUARY)) {
+    REMOVE_BIT_AR(ch->char_specials.saved.affected_by, AFF_SANCTUARY);
+    REMOVE_BIT_AR(AFF_FLAGS(ch), AFF_SANCTUARY);
+    mudlog(CMP, LVL_IMMORT, TRUE,
+      "[SANCT-SCRUB] Removed baseline Sanctuary corruption for %s", GET_NAME(ch));
+  }
+
+  /* DBG: detect baseline corruption of sanctuary while not using furniture */
+  if (!SITTING(ch) && IS_SET_AR(ch->char_specials.saved.affected_by, AFF_SANCTUARY)) {
+    mudlog(CMP, LVL_IMMORT, TRUE,
+      "[DBG] %s has AFF_SANCTUARY in saved baseline while SITTING=NULL", GET_NAME(ch));
+  }
+
+  /* Remove equipment modifiers and bits. */
   for (i = 0; i < NUM_WEARS; i++) {
     if (GET_EQ(ch, i))
       for (j = 0; j < MAX_OBJ_AFFECT; j++)
-	affect_modify_ar(ch, GET_EQ(ch, i)->affected[j].location,
-		      GET_EQ(ch, i)->affected[j].modifier,
-		      GET_OBJ_AFFECT(GET_EQ(ch, i)), FALSE);
+        affect_modify_ar(ch,
+          GET_EQ(ch, i)->affected[j].location,
+          GET_EQ(ch, i)->affected[j].modifier,
+          GET_OBJ_AFFECT(GET_EQ(ch, i)),
+          FALSE);
   }
 
+  /* Remove spell/skill affects. */
   for (af = ch->affected; af; af = af->next)
     affect_modify_ar(ch, af->location, af->modifier, af->bitvector, FALSE);
 
+  /* Reset abilities from real values, then apply racial bonuses. */
   ch->aff_abils = ch->real_abils;
 
   if (!IS_NPC(ch)) {
@@ -275,16 +305,35 @@ void affect_total(struct char_data *ch)
     ch->aff_abils.cha   += race_abil_bonus(GET_RACE(ch), 5);
   }
 
+  /* Reapply equipment modifiers and bits. */
   for (i = 0; i < NUM_WEARS; i++) {
     if (GET_EQ(ch, i))
       for (j = 0; j < MAX_OBJ_AFFECT; j++)
-        affect_modify_ar(ch, GET_EQ(ch, i)->affected[j].location,
-		      GET_EQ(ch, i)->affected[j].modifier,
-		      GET_OBJ_AFFECT(GET_EQ(ch, i)), TRUE);
+        affect_modify_ar(ch,
+          GET_EQ(ch, i)->affected[j].location,
+          GET_EQ(ch, i)->affected[j].modifier,
+          GET_OBJ_AFFECT(GET_EQ(ch, i)),
+          TRUE);
   }
 
+  /* Reapply spell/skill affects. */
   for (af = ch->affected; af; af = af->next)
     affect_modify_ar(ch, af->location, af->modifier, af->bitvector, TRUE);
+
+  /* Apply affects from furniture being used (sit/rest/sleep on ITEM_FURNITURE).
+     These must be derived only, based on SITTING(ch). */
+  if (SITTING(ch) && GET_OBJ_TYPE(SITTING(ch)) == ITEM_FURNITURE) {
+    struct obj_data *furn = SITTING(ch);
+
+    /* Apply the furniture's affect bitvector (SANCT, INVIS, etc). */
+    affect_modify_ar(ch, APPLY_NONE, 0, GET_OBJ_AFFECT(furn), TRUE);
+
+    /* Apply any numeric modifiers stored on the furniture safely. */
+    for (j = 0; j < MAX_OBJ_AFFECT; j++) {
+      if (furn->affected[j].location != APPLY_NONE)
+        aff_apply_modify(ch, furn->affected[j].location, furn->affected[j].modifier, "furniture");
+    }
+  }
 
   /* Clamp fully modified stats. */
   ch->aff_abils.str   = MAX(0, MIN(ch->aff_abils.str,   EFFECTIVE_STAT_CAP));
