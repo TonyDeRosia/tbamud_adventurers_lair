@@ -1096,19 +1096,19 @@ void mag_assign_spells(void) {
   TAR_CHAR_ROOM, FALSE, MAG_MANUAL, NULL);
 
   spello(SPELL_BEAR_SPIRIT, "bear spirit", 40, 20, 2, POS_STANDING,
-  TAR_SELF_ONLY, FALSE, MAG_AFFECTS, "The spirit of the bear withdraws from you.");
+  TAR_CHAR_ROOM, FALSE, MAG_AFFECTS, "The spirit of the bear withdraws from you.");
 
   spello(SPELL_WOLF_SPIRIT, "wolf spirit", 40, 20, 2, POS_STANDING,
-  TAR_SELF_ONLY, FALSE, MAG_AFFECTS, "The keen focus of the wolf spirit fades.");
+  TAR_CHAR_ROOM, FALSE, MAG_AFFECTS, "The keen focus of the wolf spirit fades.");
 
   spello(SPELL_TIGER_SPIRIT, "tiger spirit", 45, 25, 2, POS_STANDING,
-  TAR_SELF_ONLY, FALSE, MAG_AFFECTS, "The ferocity of the tiger spirit ebbs.");
+  TAR_CHAR_ROOM, FALSE, MAG_AFFECTS, "The ferocity of the tiger spirit ebbs.");
 
   spello(SPELL_EAGLE_SPIRIT, "eagle spirit", 50, 25, 2, POS_STANDING,
-  TAR_SELF_ONLY, FALSE, MAG_AFFECTS, "The watchful eagle spirit drifts away.");
+  TAR_CHAR_ROOM, FALSE, MAG_AFFECTS, "The watchful eagle spirit drifts away.");
 
   spello(SPELL_DRAGON_SPIRIT, "dragon spirit", 60, 40, 2, POS_STANDING,
-  TAR_SELF_ONLY, FALSE, MAG_AFFECTS, "The presence of the dragon spirit withdraws.");
+  TAR_CHAR_ROOM, FALSE, MAG_AFFECTS, "The presence of the dragon spirit withdraws.");
 
   spello(SPELL_WATERWALK, "waterwalk", 40, 20, 2, POS_STANDING,
   TAR_CHAR_ROOM, FALSE, MAG_AFFECTS, "Your feet seem less buoyant.");
