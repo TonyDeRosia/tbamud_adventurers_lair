@@ -32,6 +32,87 @@ bool is_spirit_spell(int spellnum);
 int mystic_spirit_cap(struct char_data *ch);
 static int active_spirit_count(struct char_data *ch);
 bool can_bind_spirit(struct char_data *ch, int spellnum);
+bool is_sanctuary_spell(int spellnum);
+static void strip_sanctuary_effects(struct char_data *victim);
+static void sanctuary_messages(int spellnum, const char **to_vict, const char **to_room);
+
+bool is_sanctuary_spell(int spellnum)
+{
+  switch (spellnum) {
+  case SPELL_SANCTUARY:
+  case SPELL_ARCANE_WARD:
+  case SPELL_EVASION:
+  case SPELL_IRONSKIN:
+  case SPELL_DIVINE_BULWARK:
+  case SPELL_SONG_OF_RESILIENCE:
+  case SPELL_DARK_AEGIS:
+  case SPELL_NIRVANA:
+  case SPELL_BEAR_SPIRIT:
+    return TRUE;
+  default:
+    return FALSE;
+  }
+}
+
+static void strip_sanctuary_effects(struct char_data *victim)
+{
+  struct affected_type *af, *next;
+
+  for (af = victim->affected; af; af = next) {
+    next = af->next;
+
+    if (IS_SET_AR(af->bitvector, AFF_SANCTUARY) &&
+        af->spell > 0 && af->spell <= MAX_SPELLS &&
+        is_sanctuary_spell(af->spell))
+      affect_remove(victim, af);
+  }
+}
+
+static void sanctuary_messages(int spellnum, const char **to_vict, const char **to_room)
+{
+  switch (spellnum) {
+  case SPELL_ARCANE_WARD:
+    *to_vict = "Arcane runes flare to life, warding you from harm.";
+    *to_room = "$n is surrounded by shimmering arcane runes that bend incoming force.";
+    break;
+  case SPELL_SANCTUARY:
+    *to_vict = "A divine presence shields you.";
+    *to_room = "A soft divine glow surrounds $n, warding them from harm.";
+    break;
+  case SPELL_EVASION:
+    *to_vict = "Your senses sharpen as you prepare to evade incoming attacks.";
+    *to_room = "$n moves with heightened awareness, slipping instinctively away from danger.";
+    break;
+  case SPELL_IRONSKIN:
+    *to_vict = "Your skin hardens, turning aside incoming blows.";
+    *to_room = "$n's skin hardens like forged steel.";
+    break;
+  case SPELL_DIVINE_BULWARK:
+    *to_vict = "Holy power forms a bulwark around you.";
+    *to_room = "A radiant bulwark of holy power surrounds $n.";
+    break;
+  case SPELL_SONG_OF_RESILIENCE:
+    *to_vict = "A resonant melody weaves resilience into your body.";
+    *to_room = "A steady, resonant melody surrounds $n, dampening the force of attacks.";
+    break;
+  case SPELL_DARK_AEGIS:
+    *to_vict = "Dark energies form a protective aegis around you.";
+    *to_room = "Shadows coil tightly around $n, absorbing incoming harm.";
+    break;
+  case SPELL_NIRVANA:
+    *to_vict = "Your eyes glow green as you enter a state of primal nirvana.";
+    *to_room = "$n grows unnaturally still as $s eyes begin to glow green with primal serenity.";
+    break;
+  case SPELL_BEAR_SPIRIT:
+    *to_vict = "The spirit of the bear fortifies your body.";
+    *to_room = "$n's form thickens with primal strength as the spirit of the bear envelops $m.";
+    break;
+  default:
+    *to_vict = "A white aura momentarily surrounds you.";
+    *to_room = "$n is surrounded by a white aura.";
+    break;
+  }
+}
 
 
 /* Negative apply_saving_throw[] values make saving throws better! So do
@@ -73,11 +154,16 @@ void affect_update(void)
       else if (af->duration == -1)	/* No action */
 	;
       else {
-	if ((af->spell > 0) && (af->spell <= MAX_SPELLS))
-	  if (!af->next || (af->next->spell != af->spell) ||
-	      (af->next->duration > 0))
-	    if (spell_info[af->spell].wear_off_msg)
-	      send_to_char(i, "%s\r\n", spell_info[af->spell].wear_off_msg);
+        if ((af->spell > 0) && (af->spell <= MAX_SPELLS))
+          if (!af->next || (af->next->spell != af->spell) ||
+              (af->next->duration > 0))
+            if (spell_info[af->spell].wear_off_msg) {
+              if (is_sanctuary_spell(af->spell)) {
+                act(spell_info[af->spell].wear_off_msg, TRUE, i, 0, 0, TO_ROOM);
+                act(spell_info[af->spell].wear_off_msg, FALSE, i, 0, 0, TO_CHAR);
+              } else
+                send_to_char(i, "%s\r\n", spell_info[af->spell].wear_off_msg);
+            }
 	affect_remove(i, af);
       }
     }
@@ -329,6 +415,9 @@ void mag_affects(int level, struct char_data *ch, struct char_data *victim,
   if (is_spirit_spell(spellnum) && !can_bind_spirit(ch, spellnum))
     return;
 
+  if (is_sanctuary_spell(spellnum))
+    strip_sanctuary_effects(victim);
+
   for (i = 0; i < MAX_SPELL_AFFECTS; i++) {
     new_affect(&(af[i]));
     af[i].spell = spellnum;
@@ -481,12 +570,17 @@ void mag_affects(int level, struct char_data *ch, struct char_data *victim,
     break;
 
   case SPELL_SANCTUARY:
+  case SPELL_ARCANE_WARD:
+  case SPELL_EVASION:
+  case SPELL_IRONSKIN:
+  case SPELL_DIVINE_BULWARK:
+  case SPELL_SONG_OF_RESILIENCE:
+  case SPELL_DARK_AEGIS:
+  case SPELL_NIRVANA:
+    sanctuary_messages(spellnum, &to_vict, &to_room);
     af[0].duration = 4;
     SET_BIT_AR(af[0].bitvector, AFF_SANCTUARY);
-
     accum_duration = TRUE;
-    to_vict = "A white aura momentarily surrounds you.";
-    to_room = "$n is surrounded by a white aura.";
     break;
 
   case SPELL_SLEEP:
@@ -534,21 +628,24 @@ void mag_affects(int level, struct char_data *ch, struct char_data *victim,
     break;
 
   case SPELL_BEAR_SPIRIT:
-    af[0].location = APPLY_AC;
-    af[0].modifier = -15;
-    af[0].duration = 12 + level;
+    sanctuary_messages(spellnum, &to_vict, &to_room);
+    af[0].duration = 4;
+    SET_BIT_AR(af[0].bitvector, AFF_SANCTUARY);
 
-    af[1].location = APPLY_HIT;
-    af[1].modifier = 10;
+    af[1].location = APPLY_AC;
+    af[1].modifier = -15;
     af[1].duration = 12 + level;
 
-    af[2].location = APPLY_SAVING_BREATH;
-    af[2].modifier = -1;
+    af[2].location = APPLY_HIT;
+    af[2].modifier = 10;
     af[2].duration = 12 + level;
+
+    af[3].location = APPLY_SAVING_BREATH;
+    af[3].modifier = -1;
+    af[3].duration = 12 + level;
 
     accum_duration = TRUE;
     accum_affect = TRUE;
-    to_vict = "A steadfast bear spirit girds your body.";
     break;
 
   case SPELL_WOLF_SPIRIT:

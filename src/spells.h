@@ -99,8 +99,15 @@
 #define SPELL_TIGER_SPIRIT           58
 #define SPELL_EAGLE_SPIRIT           59
 #define SPELL_DRAGON_SPIRIT          60
+#define SPELL_ARCANE_WARD            61
+#define SPELL_EVASION                62
+#define SPELL_IRONSKIN               63
+#define SPELL_DIVINE_BULWARK         64
+#define SPELL_SONG_OF_RESILIENCE     65
+#define SPELL_DARK_AEGIS             66
+#define SPELL_NIRVANA                67
 /** Total Number of defined spells */
-#define NUM_SPELLS                   60
+#define NUM_SPELLS                   67
 
 /* Insert new spells here, up to MAX_SPELLS */
 #define MAX_SPELLS		    130
@@ -289,6 +296,7 @@ const char *skill_name(int num);
 /* From magic.c */
 int mag_savingthrow(struct char_data *ch, int type, int modifier);
 void affect_update(void);
+bool is_sanctuary_spell(int spellnum);
 
 /* from spell_parser.c */
 ACMD(do_cast);
