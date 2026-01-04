@@ -485,7 +485,7 @@ void point_update(void)
 
       GET_HIT(i) = MIN(GET_HIT(i) + hit_gain(i), GET_MAX_HIT(i));
       GET_MANA(i) = MIN(GET_MANA(i) + mana_gain(i), effective_max_mana(i));
-      GET_MOVE(i) = MIN(GET_MOVE(i) + move_gain(i), GET_MAX_MOVE(i));
+      GET_MOVE(i) = MIN(GET_MOVE(i) + move_gain(i), effective_max_move(i));
       if (AFF_FLAGGED(i, AFF_POISON))
         if (damage(i, i, 2, SPELL_POISON) == -1)
           continue;     /* Oops, they died. -gg 6/24/98 */

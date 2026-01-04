@@ -192,7 +192,7 @@ static void append_prompt_move(char *prompt, size_t *pos, struct descriptor_data
 
 static void append_prompt_max_move(char *prompt, size_t *pos, struct descriptor_data *d)
 {
-  append_prompt_number(prompt, pos, GET_MAX_MOVE(d->character));
+  append_prompt_number(prompt, pos, effective_max_move(d->character));
 }
 
 static void append_prompt_exp(char *prompt, size_t *pos, struct descriptor_data *d)

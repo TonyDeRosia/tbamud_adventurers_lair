@@ -135,6 +135,9 @@ int	mana_gain(struct char_data *ch);
 int	mana_bonus_percent(const struct char_data *ch);
 int	effective_max_mana(const struct char_data *ch);
 void	clamp_mana_to_effective_max(struct char_data *ch);
+int	move_bonus_percent(const struct char_data *ch);
+int	effective_max_move(const struct char_data *ch);
+void	clamp_move_to_effective_max(struct char_data *ch);
 int	hit_gain(struct char_data *ch);
 int	move_gain(struct char_data *ch);
 void	set_title(struct char_data *ch, char *title);
@@ -556,6 +559,12 @@ do                                                              \
 #define MANA_BONUS_HALF_SCALE    20.0 /* Higher = slower ramp after baseline. */
 #define MANA_BONUS_STAT_CAP      0    /* Optional clamp on INT+WIS; 0 = uncapped. */
 #define MANA_BONUS_PERCENT_CAP   0.0  /* Optional clamp on percent bonus; 0 = uncapped. */
+/* Move bonus tuning constants. */
+#define MOVE_BONUS_BASELINE      30   /* Stat sum where bonus begins. */
+#define MOVE_BONUS_MULTIPLIER    2.25 /* Scales early growth. */
+#define MOVE_BONUS_HALF_SCALE    20.0 /* Higher = slower ramp after baseline. */
+#define MOVE_BONUS_STAT_CAP      0    /* Optional clamp on DEX+CHA; 0 = uncapped. */
+#define MOVE_BONUS_PERCENT_CAP   0.0  /* Optional clamp on percent bonus; 0 = uncapped. */
 /** Gold stored on ch (authoritative currency unit). */
 #define GET_MONEY(ch)        GET_GOLD(ch)
 /** Gold views are authoritative lvalues. */

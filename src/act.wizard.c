@@ -838,7 +838,7 @@ static void do_stat_character(struct char_data *ch, struct char_data *k)
   send_to_char(ch, "Hit p.:[%s%d/%d+%d%s]  Mana p.:[%s%d/%d+%d%s]  Move p.:[%s%d/%d+%d%s]\r\n",
           CCGRN(ch, C_NRM), GET_HIT(k), GET_MAX_HIT(k), hit_gain(k), CCNRM(ch, C_NRM),
           CCGRN(ch, C_NRM), GET_MANA(k), effective_max_mana(k), mana_gain(k), CCNRM(ch, C_NRM),
-          CCGRN(ch, C_NRM), GET_MOVE(k), GET_MAX_MOVE(k), move_gain(k), CCNRM(ch, C_NRM));
+          CCGRN(ch, C_NRM), GET_MOVE(k), effective_max_move(k), move_gain(k), CCNRM(ch, C_NRM));
 
   send_to_char(ch, "Gold: [%9lld], Bank: [%9lld] (Total: %lld), ",
 	  GET_GOLD(k), GET_BANK_GOLD(k), GET_GOLD(k) + GET_BANK_GOLD(k));
@@ -1603,7 +1603,7 @@ ACMD(do_restore)
 
       GET_HIT(vict)  = GET_MAX_HIT(vict);
       GET_MANA(vict) = effective_max_mana(vict);
-      GET_MOVE(vict) = GET_MAX_MOVE(vict);
+      GET_MOVE(vict) = effective_max_move(vict);
 
       update_pos(vict);
       send_to_char(ch, "%s has been fully healed.\r\n", GET_NAME(vict));
@@ -1619,7 +1619,7 @@ ACMD(do_restore)
 
     GET_HIT(vict) = GET_MAX_HIT(vict);
     GET_MANA(vict) = effective_max_mana(vict);
-    GET_MOVE(vict) = GET_MAX_MOVE(vict);
+    GET_MOVE(vict) = effective_max_move(vict);
 
     if (!IS_NPC(vict) && GET_LEVEL(ch) >= LVL_GRGOD) {
       if (GET_LEVEL(vict) >= LVL_IMMORT)

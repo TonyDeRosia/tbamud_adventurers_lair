@@ -2695,7 +2695,7 @@ static void msdp_update( void )
       MSDPSetNumber( d, eMSDP_WIMPY, GET_WIMP_LEV(ch) );
       MSDPSetNumber( d, eMSDP_MONEY, GET_GOLD(ch) );
       MSDPSetNumber( d, eMSDP_MOVEMENT, GET_MOVE(ch) );
-      MSDPSetNumber( d, eMSDP_MOVEMENT_MAX, GET_MAX_MOVE(ch) );
+      MSDPSetNumber( d, eMSDP_MOVEMENT_MAX, effective_max_move(ch) );
       MSDPSetNumber( d, eMSDP_AC, compute_armor_class(ch) );
 
       /* This would be better moved elsewhere */
