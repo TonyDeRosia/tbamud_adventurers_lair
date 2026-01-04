@@ -1692,3 +1692,37 @@ void clamp_mana_to_effective_max(struct char_data *ch)
   if (GET_MANA(ch) > max_mana)
     GET_MANA(ch) = max_mana;
 }
+
+/* Move scaling using combined DEX + CHA. Base move comes from class/level. */
+int move_bonus_percent(const struct char_data *ch)
+{
+  int stat_sum = GET_DEX(ch) + GET_CHA(ch);
+
+  if (MOVE_BONUS_STAT_CAP > 0)
+    stat_sum = MIN(stat_sum, MOVE_BONUS_STAT_CAP);
+
+  int over = MAX(0, stat_sum - MOVE_BONUS_BASELINE);
+  double bonus_pct = (over * MOVE_BONUS_MULTIPLIER) /
+                     (1.0 + (over / MOVE_BONUS_HALF_SCALE));
+
+  if (MOVE_BONUS_PERCENT_CAP > 0.0)
+    bonus_pct = MIN(bonus_pct, MOVE_BONUS_PERCENT_CAP);
+
+  return (int) (bonus_pct + 0.5);
+}
+
+int effective_max_move(const struct char_data *ch)
+{
+  double bonus_pct = move_bonus_percent(ch);
+  double scaled = (double)GET_MAX_MOVE(ch) * (1.0 + (bonus_pct / 100.0));
+
+  return (int) (scaled + 0.5);
+}
+
+void clamp_move_to_effective_max(struct char_data *ch)
+{
+  int max_move = effective_max_move(ch);
+
+  if (GET_MOVE(ch) > max_move)
+    GET_MOVE(ch) = max_move;
+}
