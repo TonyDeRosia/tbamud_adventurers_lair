@@ -1051,7 +1051,8 @@ struct mob_special_data
   byte attack_type;   /**< The primary attack type (bite, sting, hit, etc.) */
   byte default_pos;   /**< Default position (standing, sleeping, etc.) */
   byte damnodice;     /**< The number of dice to roll for damage */
-  byte damsizedice;   /**< The size of each die rolled for damage. */
+  byte damsizedice;   /**< The size of each die rolled for damage. */  long long gold_min; /* min roll on death */
+  long long gold_max; /* max roll on death */
 };
 
 /** An affect structure. */

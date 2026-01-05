@@ -493,7 +493,7 @@ static void medit_disp_stats_menu(struct descriptor_data *d)
 
   "(%sA%s) Armor Class: %s[%s%4d%s]%s        (%sD%s) Hitroll:   %s[%s%5d%s]%s\r\n"
   "(%sB%s) Exp Points:  %s[%s%10d%s]%s  (%sE%s) Alignment: %s[%s%5d%s]%s\r\n"
-  "(%sC%s) Gold:        %s[%s%10lld%s]%s\r\n\r\n",
+  "(%sC%s) Gold Min/Max: %s[%s%5lld%s/%s%5lld%s]%s\r\n\r\n",
       cyn, yel, OLC_NUM(d), cyn, nrm,
       cyn, nrm, cyn, yel, GET_LEVEL(mob), cyn, nrm,
       cyn, nrm, cyn, nrm,
@@ -508,7 +508,7 @@ static void medit_disp_stats_menu(struct descriptor_data *d)
       cyn, nrm, cyn, yel, GET_AC(mob), cyn, nrm,   cyn, nrm, cyn, yel, GET_HITROLL(mob), cyn, nrm,
       cyn, nrm, cyn, yel, GET_EXP(mob), cyn, nrm,  cyn, nrm, cyn, yel, GET_ALIGNMENT(mob), cyn, nrm,
       cyn, nrm, cyn, yel, GET_GOLD(mob), cyn, nrm
-      );
+      , (long long)OLC_MOB(d)->mob_specials.gold_max, nrm, nrm);
 
   if (CONFIG_MEDIT_ADVANCED) {
     /* Bottom section - non-standard stats, togglable in cedit */
@@ -982,12 +982,40 @@ void medit_parse(struct descriptor_data *d, char *arg)
     medit_disp_stats_menu(d);
     return;
 
-  case MEDIT_GOLD:
-    SET_GOLD(OLC_MOB(d), LIMIT(i, 0, MAX_MOB_GOLD));OLC_VAL(d) = TRUE;
-    medit_disp_stats_menu(d);
-    return;
+  case MEDIT_GOLD: {
+      int a = 0, b = 0;
+      int n = sscanf(arg, "%d %d", &a, &b);
+      long long gmin = 0, gmax = 0;
 
-  case MEDIT_PET_PRICE:
+      if (n <= 0) {
+        write_to_output(d, "Enter gold min and max (example: 10 50) or a single value: ");
+        return;
+      }
+
+      if (n == 1) {
+        gmin = a;
+        gmax = a;
+      } else {
+        gmin = a;
+        gmax = b;
+      }
+
+      if (gmin < 0) gmin = 0;
+      if (gmax < gmin) gmax = gmin;
+
+      if (gmin > MAX_MOB_GOLD) gmin = MAX_MOB_GOLD;
+      if (gmax > MAX_MOB_GOLD) gmax = MAX_MOB_GOLD;
+
+      OLC_MOB(d)->mob_specials.gold_min = gmin;
+      OLC_MOB(d)->mob_specials.gold_max = gmax;
+
+      /* Keep legacy field sane too (used by older code/exports). */
+      SET_GOLD(OLC_MOB(d), (int)gmax);
+
+      OLC_VAL(d) = TRUE;
+      medit_disp_stats_menu(d);
+      return;
+    }case MEDIT_PET_PRICE:
     if (i < 0) {
       write_to_output(d, "Pet price must be 0 or greater. Enter pet price in gold (0 = default): ");
       return;

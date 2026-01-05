@@ -365,9 +365,17 @@ static void make_corpse(struct char_data *ch)
     } else {
       send_to_char(ch, "Death penalty: You drop nothing.\r\n");
     }
-  } else {
-    /* NPC money handled elsewhere */
-
+    } else {
+    /* NPC gold drop: roll between gold_min and gold_max and place on corpse. */
+    long long gmin = ch->mob_specials.gold_min;
+    long long gmax = ch->mob_specials.gold_max;
+    if (gmin < 0) gmin = 0;
+    if (gmax < gmin) gmax = gmin;
+    dropped_gold = (gmax > 0) ? rand_number((int)gmin, (int)gmax) : 0;
+    if (dropped_gold > 0) {
+      money = create_money((int)dropped_gold, 0);
+      obj_to_obj(money, corpse);
+    }
   }
 ch->carrying = NULL;
   IS_CARRYING_N(ch) = 0;
