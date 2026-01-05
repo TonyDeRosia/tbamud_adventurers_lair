@@ -849,15 +849,18 @@ int skill_message(int dam, struct char_data *ch, struct char_data *vict,
         if (GET_POS(vict) == POS_DEAD) {
           if (msg->die_msg.attacker_msg) {
             send_to_char(ch, CCYEL(ch, C_CMP));
-            act(msg->die_msg.attacker_msg, FALSE, ch, weap, vict, TO_CHAR);
+            apply_severity_verb(wmsg_att, sizeof(wmsg_att), msg->die_msg.attacker_msg, damage_severity_tier(dam, vict));
+            act(wmsg_att, FALSE, ch, weap, vict, TO_CHAR);
             send_to_char(ch, CCNRM(ch, C_CMP));
           }
 
           send_to_char(vict, CCRED(vict, C_CMP));
-          act(msg->die_msg.victim_msg, FALSE, ch, weap, vict, TO_VICT | TO_SLEEP);
+          apply_severity_verb(wmsg_vic, sizeof(wmsg_vic), msg->die_msg.victim_msg, damage_severity_tier(dam, vict));
+          act(wmsg_vic, FALSE, ch, weap, vict, TO_VICT | TO_SLEEP);
           send_to_char(vict, CCNRM(vict, C_CMP));
 
-          act(msg->die_msg.room_msg, FALSE, ch, weap, vict, TO_NOTVICT);
+          apply_severity_verb(wmsg_room, sizeof(wmsg_room), msg->die_msg.room_msg, damage_severity_tier(dam, vict));
+          act(wmsg_room, FALSE, ch, weap, vict, TO_NOTVICT);
         } else {
           if (msg->hit_msg.attacker_msg) {
             send_to_char(ch, CCYEL(ch, C_CMP));

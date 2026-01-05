@@ -13,66 +13,7 @@
 
 
 /* Who clan column helpers (center clan tag in fixed width). */
-static int who_visible_len(const char *s)
-{
-  int n = 0;
-  if (!s) return 0;
 
-  /* Skip \tX color codes for visible width. */
-  for (; *s; s++) {
-    if (*s == '\t' && *(s + 1)) { s++; continue; }
-    n++;
-  }
-  return n;
-}
-
-static void who_center_clan_tag(char *out, size_t outsz, const char *tag, int width)
-{
-  int vis, left, right, i;
-  size_t pos = 0;
-
-  if (!out || outsz == 0) return;
-  out[0] = '\0';
-
-  if (width < 0) width = 0;
-  if (!tag) tag = "";
-
-  vis = who_visible_len(tag);
-  if (vis > width) vis = width;
-
-  left = (width - vis) / 2;
-  right = width - vis - left;
-
-  for (i = 0; i < left && pos + 1 < outsz; i++) out[pos++] = ' ';
-
-  /* Copy tag including color codes, but stop once visible width reached. */
-  {
-    int v = 0;
-    int color_active = 0;
-    const char *s = tag;
-    while (*s && pos + 1 < outsz) {
-      if (*s == '\t' && *(s + 1)) {
-        if (*(s + 1) == 'n')
-          color_active = 0;
-        else
-          color_active = 1;
-        if (pos + 2 < outsz) { out[pos++] = *s++; out[pos++] = *s++; }
-        else break;
-        continue;
-      }
-      if (v >= vis) break;
-      out[pos++] = *s++;
-      v++;
-    }
-    if (color_active && pos + 2 < outsz) {
-      out[pos++] = '\t';
-      out[pos++] = 'n';
-    }
-  }
-
-  for (i = 0; i < right && pos + 1 < outsz; i++) out[pos++] = ' ';
-  out[pos] = '\0';
-}
 
 static void format_color_field(char *out, size_t outsz, const char *src, size_t width)
 {
@@ -2508,18 +2449,18 @@ ACMD(do_who)
             }
           }
 
-          {
-            char clan_col[64];
-            who_center_clan_tag(clan_col, sizeof(clan_col), clancol, 17);
+            {
+              /* Print WHO line once. Avoid fixed-width clan padding to prevent wrap artifacts. */
+              const char *tag = (*clancol) ? clancol : "";
 
-            send_to_char(ch, "%s[%2d %3s] %s %s%s%s%s",
-                (GET_LEVEL(tch) >= LVL_IMMORT ? CCYEL(ch, C_SPR) : ""),
-                GET_LEVEL(tch), get_class_display_abbrev(tch),
-                clan_col,
-                GET_NAME(tch),
-                (*GET_TITLE(tch) ? " " : ""), GET_TITLE(tch),
-                CCNRM(ch, C_SPR));
-          }
+              send_to_char(ch, "%s[%2d %3s]%s%s %s%s%s%s",
+                  (GET_LEVEL(tch) >= LVL_IMMORT ? CCYEL(ch, C_SPR) : ""),
+                  GET_LEVEL(tch), get_class_display_abbrev(tch),
+                  (*tag ? " " : ""), tag,
+                  GET_NAME(tch),
+                  (*GET_TITLE(tch) ? " " : ""), GET_TITLE(tch),
+                  CCNRM(ch, C_SPR));
+            }
         }
 
 
