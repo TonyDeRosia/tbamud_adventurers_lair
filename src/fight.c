@@ -558,6 +558,42 @@ void die(struct char_data * ch, struct char_data * killer)
     REMOVE_BIT_AR(PLR_FLAGS(ch), PLR_KILLER);
     REMOVE_BIT_AR(PLR_FLAGS(ch), PLR_THIEF);
   }
+
+  /*
+   * NPC gold payout to the killer (single, authoritative location).
+   * Uses gold_min/gold_max if set, otherwise falls back to GET_GOLD(ch).
+   * Clears NPC gold so it does not also appear on the corpse.
+   */
+  if (killer && ch && IS_NPC(ch) && !IS_NPC(killer)) {
+    long long gold_gain = 0;
+    long long gmin = (long long)ch->mob_specials.gold_min;
+    long long gmax = (long long)ch->mob_specials.gold_max;
+
+    if (gmin < 0) gmin = 0;
+    if (gmax < 0) gmax = 0;
+    if (gmax < gmin) gmax = gmin;
+
+    if (gmin > 0 || gmax > 0) {
+      int imin = (gmin > 2147483647LL) ? 2147483647 : (int)gmin;
+      int imax = (gmax > 2147483647LL) ? 2147483647 : (int)gmax;
+      gold_gain = (imin == imax) ? (long long)imin : (long long)rand_number(imin, imax);
+    } else if (GET_GOLD(ch) > 0) {
+      gold_gain = (long long)GET_GOLD(ch);
+    }
+
+    if (gold_gain > 0) {
+      char buf[64];
+      format_gold_as_currency(buf, sizeof(buf), gold_gain);
+      increase_money_gold(killer, gold_gain);
+      send_to_char(killer, "You receive %s from the kill.\r\n", buf);
+    }
+
+    /* prevent corpse gold duplication */
+    ch->mob_specials.gold_min = 0;
+    ch->mob_specials.gold_max = 0;
+    SET_GOLD(ch, 0);
+  }
+
   raw_kill(ch, killer);
 }
 
@@ -634,7 +670,8 @@ static void solo_gain(struct char_data *ch, struct char_data *victim)
     send_to_char(ch, "You receive one lousy experience point.\r\n");
 
   gain_exp(ch, exp);
-  change_alignment(ch, victim);
+
+    change_alignment(ch, victim);
 }
 
 static char *replace_string(const char *str, const char *weapon_singular, const char *weapon_plural)

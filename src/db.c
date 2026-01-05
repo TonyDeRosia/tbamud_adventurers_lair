@@ -1605,6 +1605,20 @@ static void parse_simple_mob(FILE *mob_f, int i, int nr)
   }
 
   SET_GOLD(mob_proto + i, t[0]);
+  /* Default gold_min/gold_max to the base gold if not specified via E-spec. */
+  if ((long long)mob_proto[i].mob_specials.gold_min == 0 && (long long)mob_proto[i].mob_specials.gold_max == 0) {
+    long long g = (long long)GET_GOLD(mob_proto + i);
+    if (g < 0) g = 0;
+    mob_proto[i].mob_specials.gold_min = g;
+    mob_proto[i].mob_specials.gold_max = g;
+  }
+
+  /* Clamp bad values */
+  if ((long long)mob_proto[i].mob_specials.gold_min < 0)
+    mob_proto[i].mob_specials.gold_min = 0;
+  if ((long long)mob_proto[i].mob_specials.gold_max < (long long)mob_proto[i].mob_specials.gold_min)
+    mob_proto[i].mob_specials.gold_max = mob_proto[i].mob_specials.gold_min;
+
   GET_EXP(mob_proto + i) = t[1];
 
   if (!get_line(mob_f, line)) {
@@ -1766,6 +1780,28 @@ static void parse_enhanced_mob(FILE *mob_f, int i, int nr)
       exit(1);
     } else
       parse_espec(line, i, nr);
+
+  /*
+   * GoldMin/GoldMax legacy fix:
+   * If mob files contain GoldMin: 0 and GoldMax: 0, they override base gold to 0 drops.
+   * If base gold is non-zero, treat 0/0 as "unspecified" and default min/max to base gold.
+   * Builders can still force no-gold by setting base gold to 0.
+   */
+  if ((long long)mob_proto[i].mob_specials.gold_min == 0 &&
+      (long long)mob_proto[i].mob_specials.gold_max == 0) {
+    long long g = (long long)GET_GOLD(mob_proto + i);
+    if (g > 0) {
+      mob_proto[i].mob_specials.gold_min = g;
+      mob_proto[i].mob_specials.gold_max = g;
+    }
+  }
+
+  /* Clamp bad values */
+  if ((long long)mob_proto[i].mob_specials.gold_min < 0)
+    mob_proto[i].mob_specials.gold_min = 0;
+  if ((long long)mob_proto[i].mob_specials.gold_max < (long long)mob_proto[i].mob_specials.gold_min)
+    mob_proto[i].mob_specials.gold_max = mob_proto[i].mob_specials.gold_min;
+
   }
 
   log("SYSERR: Unexpected end of file reached after mob #%d", nr);
