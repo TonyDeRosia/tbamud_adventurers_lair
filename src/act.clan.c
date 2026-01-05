@@ -348,30 +348,50 @@ static int clanlist_cmp(const void *a, const void *b)
 #define CLANEDIT_SET_NAME 1
 #define CLANEDIT_SET_DISPLAY_NAME 2
 #define CLANEDIT_SET_TAG 3
-#define CLANEDIT_CONFIRM_QUIT 4
+#define CLANEDIT_SET_PVP_TYPE 4
+#define CLANEDIT_CONFIRM_QUIT 5
+
+static void clanedit_pvp_menu(struct descriptor_data *d)
+{
+  write_to_output(d,
+    "\r\n"
+    "Clan PvP / PK Type\r\n"
+    "0) No PvP / No PK\r\n"
+    "1) Always PvP / PK always on\r\n"
+    "2) Toggle PvP / PK (players opt in)\r\n"
+    "\r\n"
+    "Enter choice (0-2): ");
+}
 
 static void clanedit_menu(struct descriptor_data *d)
 {
   int id = d->clanedit_id;
-  const char *nm = clan_name_by_id(id);
-  const char *disp = clan_display_name_by_id(id);
-  if (!nm) nm = "(unknown)";
-  if (!disp) disp = "(unknown)";
+  const char *plain = clan_name_by_id(id);
+  const char *disp  = clan_display_name_by_id(id);
+
+  if (!plain) plain = "Undefined";
+  if (!disp)  disp  = plain;
 
   write_to_output(d,
     "\r\n"
     "Clan Editor\r\n"
     "Clan: [%d] %s\r\n"
     "Plain: %s\r\n"
+    "PvP/PK Type: %s\r\n"
     "\r\n"
-    "1) Name (plain, used for commands)\r\n"
-    "2) Display name (colors shown to players)\r\n"
+    "1) Name\r\n"
+    "2) Display Name\r\n"
     "3) Tag\r\n"
+    "4) PvP / PK Type\r\n"
     "Q) Quit\r\n"
     "\r\n"
     "Enter choice: ",
-    id, disp, nm);
+    id, disp, plain,
+    clan_pvp_type_name(clan_pvp_type_by_id(id))
+  );
 }
+
+
 
 void clanedit_parse(struct descriptor_data *d, char *arg)
 {
@@ -447,7 +467,29 @@ void clanedit_parse(struct descriptor_data *d, char *arg)
       clanedit_menu(d);
       return;
 
-    case CLANEDIT_CONFIRM_QUIT:
+    
+
+    case CLANEDIT_SET_PVP_TYPE:
+      if (!*arg) {
+        clanedit_pvp_menu(d);
+        return;
+      }
+      if (*arg < '0' || *arg > '2') {
+        write_to_output(d, "Please enter 0, 1, or 2: ");
+        return;
+      }
+      if (!clan_set_pvp_type_and_save(d->clanedit_id, (*arg - '0'))) {
+        write_to_output(d, "Unable to save the new PvP/PK type.\r\n");
+        d->clanedit_mode = CLANEDIT_MAIN;
+        clanedit_menu(d);
+        return;
+      }
+      write_to_output(d, "Clan PvP/PK type updated to %s.\r\n",
+        clan_pvp_type_name(clan_pvp_type_by_id(d->clanedit_id)));
+      d->clanedit_mode = CLANEDIT_MAIN;
+      clanedit_menu(d);
+      return;
+case CLANEDIT_CONFIRM_QUIT:
       if (!*arg) {
         write_to_output(d, "Save changes before exiting? (Y/N): ");
         return;
@@ -497,7 +539,11 @@ void clanedit_parse(struct descriptor_data *d, char *arg)
       d->clanedit_mode = CLANEDIT_SET_TAG;
       write_to_output(d, "Enter new clan tag (shown in who): ");
       return;
-    case 'q':
+    case '4':
+      d->clanedit_mode = CLANEDIT_SET_PVP_TYPE;
+      clanedit_pvp_menu(d);
+      return;
+case 'q':
       d->clanedit_mode = CLANEDIT_CONFIRM_QUIT;
       write_to_output(d, "Save changes before exiting? (Y/N): ");
       return;
