@@ -1697,6 +1697,14 @@ static void interpret_espec(const char *keyword, const char *value, int i, int n
     GET_PET_PRICE(&mob_proto[i]) = num_arg;
   }
 
+
+  CASE("GoldMin") {
+    mob_proto[i].mob_specials.gold_min = atoll(value);
+  }
+
+  CASE("GoldMax") {
+    mob_proto[i].mob_specials.gold_max = atoll(value);
+  }
   CASE("SavingPara") {
     RANGE(0, 100);
     mob_proto[i].char_specials.saved.apply_saving_throw[SAVING_PARA] = num_arg;

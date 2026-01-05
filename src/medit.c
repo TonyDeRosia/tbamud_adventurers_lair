@@ -6,6 +6,7 @@
 **************************************************************************/
 
 #include "conf.h"
+#include <stdio.h>
 #include "sysdep.h"
 #include "structs.h"
 #include "utils.h"
@@ -983,45 +984,30 @@ void medit_parse(struct descriptor_data *d, char *arg)
     return;
 
   case MEDIT_GOLD: {
-      int a = 0, b = 0;
-      int n = sscanf(arg, "%d %d", &a, &b);
       long long gmin = 0, gmax = 0;
 
-      if (n <= 0) {
+      /* Accept: "min max" OR a single value (sets both). */
+      if (sscanf(arg, "%lld %lld", &gmin, &gmax) == 2) {
+        /* ok */
+      } else if (sscanf(arg, "%lld", &gmin) == 1) {
+        gmax = gmin;
+      } else {
         write_to_output(d, "Enter gold min and max (example: 10 50) or a single value: ");
         return;
       }
 
-      if (n == 1) {
-        gmin = a;
-        gmax = a;
-      } else {
-        gmin = a;
-        gmax = b;
-      }
-
       if (gmin < 0) gmin = 0;
-      if (gmax < gmin) gmax = gmin;
-
-      if (gmin > MAX_MOB_GOLD) gmin = MAX_MOB_GOLD;
-      if (gmax > MAX_MOB_GOLD) gmax = MAX_MOB_GOLD;
+      if (gmax < 0) gmax = 0;
+      if (gmax < gmin) {
+        write_to_output(d, "Max must be >= min. Enter gold min and max (example: 10 50) or a single value: ");
+        return;
+      }
 
       OLC_MOB(d)->mob_specials.gold_min = gmin;
       OLC_MOB(d)->mob_specials.gold_max = gmax;
 
-      /* Keep legacy field sane too (used by older code/exports). */
-      SET_GOLD(OLC_MOB(d), (int)gmax);
-
-      OLC_VAL(d) = TRUE;
-      medit_disp_stats_menu(d);
-      return;
-    }case MEDIT_PET_PRICE:
-    if (i < 0) {
-      write_to_output(d, "Pet price must be 0 or greater. Enter pet price in gold (0 = default): ");
-      return;
+      medit_disp_menu(d);
     }
-    GET_PET_PRICE(OLC_MOB(d)) = i;
-    OLC_VAL(d) = TRUE;
     break;
 
   case MEDIT_STR:
