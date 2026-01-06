@@ -2,6 +2,7 @@
 DikuMUD~
 Northern Midgaard~
 3000 3099 15 2 d 0 0 0 1 33
+M 0 3019 1 3059 	(an instructor.)
 O 0 3007 1 3001 	(Pool of Radiance)
 R 0 3001 3034 -1 	(an automatic teller machine)
 O 0 3034 99 3001 	(an automatic teller machine)
@@ -79,7 +80,7 @@ G 1 3050 500 -1 	(a scroll of identify)
 G 1 3051 500 -1 	(a yellow potion of see invisible)
 G 1 3052 500 -1 	(a scroll of recall)
 G 1 3053 500 -1 	(a gray wand of invisibility)
-G 1 3054 500 -1 	(a gnarled staff)
+G 1 3054 500 -1 	(a gnarled staff of magic missiles.)
 M 0 3001 1 3009 	(the baker)
 G 1 3009 100 -1 	(a waybread)
 G 1 3010 100 -1 	(a bread)

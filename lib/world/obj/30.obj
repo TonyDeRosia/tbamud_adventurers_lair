@@ -89,7 +89,7 @@ Some waybread has been put here.~
 ~
 19 0 0 0 0 a 0 0 0 0 0 0 0
 24 0 0 0
-1 50000 50 0 0
+1 3 50 0 0
 E
 waybread bread~
    The waybread is the traditional feed of elves when travelling, they call it
@@ -102,7 +102,7 @@ A loaf of bread has been left here.~
 ~
 19 0 0 0 0 a 0 0 0 0 0 0 0
 12 0 0 0
-1 10000 10 0 0
+1 2 10 0 0
 #3011
 danish pastry~
 a danish pastry~
@@ -110,7 +110,7 @@ A nice looking delicious danish pastry has been placed here.~
 ~
 19 0 0 0 0 a 0 0 0 0 0 0 0
 5 0 0 0
-1 5000 5 0 0
+1 1 5 0 0
 #3012
 taco mexican~
 a Mexican taco~
@@ -161,7 +161,7 @@ A dagger with a long thin blade is here.~
 ~
 5 n 0 0 0 an 0 0 0 0 0 0 0
 0 1 4 11
-1 10000 10 0 0
+1 2 10 0 0
 #3021
 sword small~
 a small sword~
@@ -169,7 +169,7 @@ A small sword lies here.~
 ~
 5 e 0 0 0 an 0 0 0 0 0 0 0
 0 1 6 11
-3 60000 10 0 0
+3 4 10 0 0
 E
 inscription~
    It says: 'May this sword be a good companion.  '
@@ -185,7 +185,7 @@ A long sword has been left here.~
 ~
 5 n 0 0 0 an 0 0 0 0 0 0 0
 0 1 8 3
-8 600000 10 0 0
+8 7 10 0 0
 #3023
 club wooden~
 a wooden club~
@@ -193,7 +193,7 @@ A simple looking wooden club is here.~
 ~
 5 0 0 0 0 an 0 0 0 0 0 0 0
 0 1 3 7
-3 12000 10 0 0
+3 1 10 0 0
 #3024
 warhammer hammer~
 a warhammer~
@@ -201,7 +201,7 @@ A medium sized warhammer is here.~
 ~
 5 0 0 0 0 an 0 0 0 0 0 0 0
 0 1 5 7
-6 50000 10 0 0
+6 10 10 0 0
 #3025
 flail large~
 a flail~
@@ -209,7 +209,7 @@ A large flail is here.~
 ~
 5 0 0 0 0 an 0 0 0 0 0 0 0
 0 2 4 7
-6 625000 10 0 0
+6 12 10 0 0
 #3030
 torch~
 a torch~
@@ -217,7 +217,7 @@ A large torch.~
 ~
 1 0 0 0 0 ao 0 0 0 0 0 0 0
 0 0 24 0
-1 10000 10 0 0
+1 1 10 0 0
 #3031
 lantern brass~
 a lantern~
@@ -225,7 +225,7 @@ A brass lantern is here.~
 ~
 1 0 0 0 0 ao 0 0 0 0 0 0 0
 0 0 96 0
-1 50000 10 0 0
+1 5 10 0 0
 #3032
 bag~
 a bag~
@@ -233,7 +233,7 @@ A small bag is here.~
 ~
 15 0 0 0 0 ao 0 0 0 0 0 0 0
 50 0 0 0
-2 20000 10 0 0
+2 1 10 0 0
 #3033
 box~
 a box~
@@ -241,7 +241,7 @@ A small box is here.~
 ~
 15 0 0 0 0 ao 0 0 0 0 0 0 0
 10 0 0 0
-5 50000 10 0 0
+5 3 10 0 0
 #3034
 atm teller banks machine~
 an automatic teller machine~
@@ -280,7 +280,7 @@ A handy dandy cashcard is sitting on the ground here.~
 ~
 12 cdeg 0 0 0 ao 0 0 0 0 0 0 0
 0 0 0 0
-1 1000000 10 0 0
+1 9999 10 0 0
 E
 cashcard card atm~
    There is some writing on the back of the card which reads:
@@ -388,7 +388,7 @@ A scroll has carelessly been left here.~
 ~
 2 g 0 0 0 ao 0 0 0 0 0 0 0
 1 52 -1 -1
-1 5000000 10 0 0
+1 15 10 0 0
 E
 scroll identify~
    The scroll has a magic formula drawn upon it:
@@ -408,7 +408,7 @@ A small yellow potion has carelessly been left here.~
 ~
 10 g 0 0 0 ao 0 0 0 0 0 0 0
 12 19 -1 -1
-1 400000 10 0 0
+1 10 10 0 0
 E
 potion yellow~
    The potion has a small label 'Detect The Invisible'.
@@ -420,7 +420,7 @@ A scroll has carelessly been left here.~
 ~
 2 g 0 0 0 ao 0 0 0 0 0 0 0
 12 42 -1 -1
-4 200000 10 0 0
+4 1 10 0 0
 E
 scroll recall~
    The scroll has written a formulae of 'Word of Recall' upon it.
@@ -432,7 +432,7 @@ A gray wand has carelessly been left here.~
 ~
 3 g 0 0 0 ao 0 0 0 0 0 0 0
 12 2 2 29
-2 400000 10 0 0
+2 20 10 0 0
 E
 wand gray~
    The wand is an old dark gray stick.  You notice a small symbol etched
@@ -443,12 +443,12 @@ at the base of the wand.  It looks like this:
 ~
 #3054
 staff gnarled~
-a gnarled staff~
+a gnarled staff of magic missiles.~
 A gnarled staff has carelessly been left here.~
 ~
 4 g 0 0 0 ao 0 0 0 0 0 0 0
-12 1 1 38
-17 700000 50 0 0
+5 10 10 32
+17 50 50 0 0
 E
 staff gnarled~
    The staff is made of old oak, and is around five feet long. It fits

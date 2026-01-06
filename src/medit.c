@@ -9,6 +9,9 @@
 #include <stdio.h>
 #include "sysdep.h"
 #include "structs.h"
+
+/* Needed for MOB_GUILD_MASTER auto-sync in medit_save_internally() */
+SPECIAL(guild);
 #include "utils.h"
 #include "interpreter.h"
 #include "comm.h"
@@ -27,6 +30,34 @@
 #include "screen.h"
 #include "fight.h"
 #include "modify.h"      /* for smash_tilde */
+
+/* Builder-friendly NPC flags list:
+ * action_bits[] ends with reserved "DEAD" which should not be exposed in OLC menus.
+ * This wrapper omits that final entry while keeping numbering stable for builders.
+ */
+static const char *action_bits_olc[] = {
+  "SPEC",
+  "SENTINEL",
+  "SCAVENGER",
+  "ISNPC",
+  "AWARE",
+  "AGGR",
+  "STAY-ZONE",
+  "WIMPY",
+  "AGGR_EVIL",
+  "AGGR_GOOD",
+  "AGGR_NEUTRAL",
+  "MEMORY",
+  "HELPER",
+  "NO_CHARM",
+  "NO_SUMMN",
+  "NO_SLEEP",
+  "NO_BASH",
+  "NO_BLIND",
+  "NO_KILL",
+  "GUILD_MASTER",
+  "\n"
+};
 
 /* local functions */
 static void medit_setup_new(struct descriptor_data *d);
@@ -261,6 +292,14 @@ void medit_save_internally(struct descriptor_data *d)
     return;
   }
 
+
+  /* Auto-sync GUILD_MASTER flag with the guild spec-proc. */
+  if (IS_SET_AR(MOB_FLAGS(OLC_MOB(d)), MOB_GUILD_MASTER)) {
+    mob_index[new_rnum].func = guild;
+  } else if (mob_index[new_rnum].func == guild) {
+    mob_index[new_rnum].func = NULL;
+  }
+
   /* Update triggers and free old proto list */
   if (mob_proto[new_rnum].proto_script &&
       mob_proto[new_rnum].proto_script != OLC_SCRIPT(d))
@@ -387,7 +426,7 @@ static void medit_disp_mob_flags(struct descriptor_data *d)
                 !(++columns % 2) ? "\r\n" : "");
   }
 
-  sprintbitarray(MOB_FLAGS(OLC_MOB(d)), action_bits, AF_ARRAY_MAX, flags);
+  sprintbitarray(MOB_FLAGS(OLC_MOB(d)), action_bits_olc, AF_ARRAY_MAX, flags);
   write_to_output(d, "\r\nCurrent flags : %s%s%s\r\nEnter mob flags (0 to quit) : ", cyn, flags, nrm);
 }
 
@@ -436,7 +475,7 @@ static void medit_disp_menu(struct descriptor_data *d)
 	  grn, nrm, yel, GET_DDESC(mob)
 	  );
 
-  sprintbitarray(MOB_FLAGS(mob), action_bits, AF_ARRAY_MAX, flags);
+  sprintbitarray(MOB_FLAGS(mob), action_bits_olc, AF_ARRAY_MAX, flags);
   sprintbitarray(AFF_FLAGS(mob), affected_bits, AF_ARRAY_MAX, flag2);
   write_to_output(d,
           "%s6%s) Position  : %s%s\r\n"

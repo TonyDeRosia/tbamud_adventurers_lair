@@ -11,8 +11,8 @@ bracelets.
 33 9 -9 6d6+330 5d5+5
 330 108900
 8 8 1
-GoldMin: 0
-GoldMax: 0
+GoldMin: 330
+GoldMax: 330
 E
 #3001
 baker~
@@ -26,8 +26,8 @@ body.
 33 9 -9 6d6+330 5d5+5
 330 108900
 8 8 1
-GoldMin: 0
-GoldMax: 0
+GoldMin: 330
+GoldMax: 330
 E
 #3002
 grocer~
@@ -41,8 +41,8 @@ A grocer stands at the counter, with a slightly impatient look on his face.
 33 9 -9 6d6+330 5d5+5
 330 108900
 8 8 1
-GoldMin: 0
-GoldMax: 0
+GoldMin: 330
+GoldMax: 330
 E
 #3003
 weaponsmith~
@@ -56,8 +56,8 @@ to sell you his latest implements of carnage and destruction.
 33 9 -9 6d6+330 5d5+5
 330 108900
 8 8 1
-GoldMin: 0
-GoldMax: 0
+GoldMin: 330
+GoldMax: 330
 E
 #3004
 armorer~
@@ -71,8 +71,8 @@ life than you have ever seen.
 33 9 -9 6d6+330 5d5+5
 330 108900
 8 8 1
-GoldMin: 0
-GoldMax: 0
+GoldMin: 330
+GoldMax: 330
 E
 #3005
 receptionists~
@@ -86,8 +86,8 @@ enough to put up with any crap from mud players with attitudes.
 33 9 -9 6d6+330 5d5+5
 330 108900
 8 8 2
-GoldMin: 0
-GoldMax: 0
+GoldMin: 330
+GoldMax: 330
 E
 #3006
 captain stolar~
@@ -100,8 +100,8 @@ A retired captain stands here, selling boats.
 33 9 -9 6d6+330 5d5+5
 330 108900
 8 8 1
-GoldMin: 0
-GoldMax: 0
+GoldMin: 330
+GoldMax: 330
 E
 #3007
 sailor~
@@ -114,8 +114,8 @@ A sailor stands here, waiting to help you.
 33 9 -9 6d6+330 5d5+5
 330 108900
 8 8 1
-GoldMin: 0
-GoldMax: 0
+GoldMin: 330
+GoldMax: 330
 E
 #3008
 uncle juan~
@@ -128,8 +128,8 @@ Uncle Juan is here ready to take your order.
 33 9 -9 6d6+330 5d5+5
 330 108900
 8 8 1
-GoldMin: 0
-GoldMax: 0
+GoldMin: 330
+GoldMax: 330
 E
 #3009
 wally watermaster~
@@ -144,8 +144,8 @@ fine collection of contemporary waters.
 33 9 -9 6d6+330 5d5+5
 330 108900
 8 8 1
-GoldMin: 0
-GoldMax: 0
+GoldMin: 330
+GoldMax: 330
 E
 #3010
 postmasters~
@@ -161,8 +161,8 @@ it would help to make a better impression.
 33 9 -9 6d6+330 5d5+5
 330 108900
 8 8 1
-GoldMin: 0
-GoldMax: 0
+GoldMin: 330
+GoldMax: 330
 E
 #3011
 travelling saleswoman woman~
@@ -177,8 +177,8 @@ on a rare occasion does she sell anything useful.
 30 10 -8 6d6+300 5d5+5
 300 90000
 8 8 2
-GoldMin: 0
-GoldMax: 0
+GoldMin: 300
+GoldMax: 300
 E
 #3012
 kind soul~
@@ -193,8 +193,8 @@ hard times and need a little boost.
 30 10 -8 6d6+300 5d5+5
 300 90000
 8 8 2
-GoldMin: 0
-GoldMax: 0
+GoldMin: 300
+GoldMax: 300
 E
 T 3016
 #3013
@@ -215,8 +215,20 @@ SavingRod: 2
 SavingPetri: 2
 SavingBreath: 2
 SavingSpell: 2
-GoldMin: 0
-GoldMax: 0
+GoldMin: 100
+GoldMax: 100
+E
+#3019
+Guildmaster~
+an instructor.~
+a universal instructor is here.
+~
+It looks unfinished.
+~
+845851 0 0 0 2360 0 0 0 0 E
+0 20 10 1d1+0 1d1+0
+0 0
+8 8 1
 E
 #3020
 master mage guildmasters~
@@ -231,8 +243,8 @@ you notice that she is surrounded by a blue shimmering aura.
 34 9 -10 6d6+340 5d5+5
 340 115600
 8 8 2
-GoldMin: 0
-GoldMax: 0
+GoldMin: 340
+GoldMax: 340
 E
 #3021
 guildmasters master priest~
@@ -246,8 +258,8 @@ a peaceful, loving look.  You notice that he is surrounded by a white aura.
 34 9 -10 6d6+340 5d5+5
 340 115600
 8 8 1
-GoldMin: 0
-GoldMax: 0
+GoldMin: 340
+GoldMax: 340
 E
 #3022
 guildmasters master beggar thief~
@@ -262,8 +274,8 @@ appearance of a beggar.
 34 9 -10 6d6+340 5d5+5
 340 115600
 8 8 2
-GoldMin: 0
-GoldMax: 0
+GoldMin: 340
+GoldMax: 340
 E
 #3023
 guildmasters master~
@@ -278,8 +290,8 @@ calm look on his face.
 34 9 -10 6d6+340 5d5+5
 340 115600
 8 8 1
-GoldMin: 0
-GoldMax: 0
+GoldMin: 340
+GoldMax: 340
 E
 #3024
 sorcerer guildguard~
@@ -294,8 +306,8 @@ well as defensive spells make him a deadly opponent.
 33 9 -9 6d6+330 5d5+5
 330 108900
 8 8 1
-GoldMin: 0
-GoldMax: 0
+GoldMin: 330
+GoldMax: 330
 E
 T 3000
 #3025
@@ -312,8 +324,8 @@ opponent.
 33 9 -9 6d6+330 5d5+5
 330 108900
 8 8 1
-GoldMin: 0
-GoldMax: 0
+GoldMin: 330
+GoldMax: 330
 E
 T 3001
 #3026
@@ -330,8 +342,8 @@ to use them combined with his extraordinary stealth makes him a deadly opponent.
 33 9 -9 6d6+330 5d5+5
 330 108900
 8 8 1
-GoldMin: 0
-GoldMax: 0
+GoldMin: 330
+GoldMax: 330
 E
 T 3002
 #3027
@@ -347,8 +359,8 @@ skill combined with his experience in warfare makes him a deadly opponent.
 33 9 -9 6d6+330 5d5+5
 330 108900
 8 8 1
-GoldMin: 0
-GoldMax: 0
+GoldMin: 330
+GoldMax: 330
 E
 T 3003
 #3040
@@ -362,8 +374,8 @@ A bartender watches you calmly, while he skillfully mixes a drink.
 24 12 -4 4d4+240 4d4+4
 240 57600
 8 8 1
-GoldMin: 0
-GoldMax: 0
+GoldMin: 240
+GoldMax: 240
 E
 #3041
 waiter~
@@ -376,8 +388,8 @@ A waiter is going around from one place to another.
 23 13 -3 4d4+230 3d3+3
 230 52900
 8 8 1
-GoldMin: 0
-GoldMax: 0
+GoldMin: 230
+GoldMax: 230
 E
 #3042
 waiter~
@@ -391,8 +403,8 @@ recognize his face.
 23 13 -3 4d4+230 3d3+3
 230 52900
 8 8 1
-GoldMin: 0
-GoldMax: 0
+GoldMin: 230
+GoldMax: 230
 E
 #3043
 waiter~
@@ -406,8 +418,8 @@ begin to worship your God.  Naaah.
 23 13 -3 4d4+230 3d3+3
 230 52900
 8 8 1
-GoldMin: 0
-GoldMax: 0
+GoldMin: 230
+GoldMax: 230
 E
 #3044
 waiter~
@@ -420,8 +432,8 @@ A waiter who knows where all his customers keep their money is standing here.
 23 13 -3 4d4+230 3d3+3
 230 52900
 8 8 1
-GoldMin: 0
-GoldMax: 0
+GoldMin: 230
+GoldMax: 230
 E
 #3045
 waiter~
@@ -435,8 +447,8 @@ firebreathers.
 23 13 -3 4d4+230 3d3+3
 230 52900
 8 8 1
-GoldMin: 0
-GoldMax: 0
+GoldMin: 230
+GoldMax: 230
 E
 #3046
 filthy~
@@ -450,8 +462,8 @@ not mess with him or else he'll get upset.
 33 9 -9 6d6+330 5d5+5
 330 108900
 8 8 1
-GoldMin: 0
-GoldMax: 0
+GoldMin: 330
+GoldMax: 330
 E
 #3059
 keeper peacekeeper~
@@ -465,8 +477,8 @@ A Peacekeeper is standing here, ready to jump in at the first sign of trouble.
 170 28900
 8 8 1
 BareHandAttack: 10
-GoldMin: 0
-GoldMax: 0
+GoldMin: 170
+GoldMax: 170
 E
 T 3009
 #3060
@@ -480,8 +492,8 @@ A cityguard stands here.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 1
-GoldMin: 0
-GoldMax: 0
+GoldMin: 100
+GoldMax: 100
 E
 T 3009
 #3061
@@ -495,8 +507,8 @@ A janitor is walking around, cleaning up.
 1 20 9 0d0+10 1d2+0
 10 100
 8 8 1
-GoldMin: 0
-GoldMax: 0
+GoldMin: 10
+GoldMax: 10
 E
 T 3011
 #3062
@@ -527,8 +539,8 @@ A mercenary is waiting for a job here.
 5 19 7 1d1+50 1d2+0
 50 2500
 8 8 1
-GoldMin: 0
-GoldMax: 0
+GoldMin: 50
+GoldMax: 50
 E
 #3064
 drunk~
@@ -541,8 +553,8 @@ A singing, happy Drunk.
 2 20 8 0d0+20 1d2+0
 20 400
 8 8 1
-GoldMin: 0
-GoldMax: 0
+GoldMin: 20
+GoldMax: 20
 E
 #3065
 beggar~
@@ -555,8 +567,8 @@ A beggar is here, asking for a few coins.
 1 20 9 0d0+10 1d2+0
 10 100
 8 8 2
-GoldMin: 0
-GoldMax: 0
+GoldMin: 10
+GoldMax: 10
 E
 #3066
 odif yltsaeb~
@@ -570,8 +582,8 @@ An odif yltsaeb is here, walking backwards.
 10 100
 8 8 1
 BareHandAttack: 4
-GoldMin: 0
-GoldMax: 0
+GoldMin: 10
+GoldMax: 10
 E
 T 3010
 #3067
@@ -585,8 +597,8 @@ A cityguard is here, guarding the gate.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 1
-GoldMin: 0
-GoldMax: 0
+GoldMin: 100
+GoldMax: 100
 E
 T 3009
 #3068
@@ -601,8 +613,8 @@ An oozing green gelatinous blob is here, sucking in bits of debris.
 200 40000
 8 8 0
 BareHandAttack: 6
-GoldMin: 0
-GoldMax: 0
+GoldMin: 200
+GoldMax: 200
 E
 T 3011
 #3089
@@ -616,8 +628,8 @@ There is a Pet Shop Boy standing here cuddling something furry in his hands.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 1
-GoldMin: 0
-GoldMax: 0
+GoldMin: 100
+GoldMax: 100
 E
 #3090
 kitten pets~
@@ -631,8 +643,8 @@ A small loyal kitten is here.
 10 100
 8 8 0
 BareHandAttack: 8
-GoldMin: 0
-GoldMax: 0
+GoldMin: 10
+GoldMax: 10
 E
 #3091
 puppy pets~
@@ -646,8 +658,8 @@ A small loyal puppy is here.
 10 100
 8 8 0
 BareHandAttack: 8
-GoldMin: 0
-GoldMax: 0
+GoldMin: 10
+GoldMax: 10
 E
 #3092
 beagle pets~
@@ -661,8 +673,8 @@ A small, quick, loyal beagle is here.
 20 400
 8 8 0
 BareHandAttack: 4
-GoldMin: 0
-GoldMax: 0
+GoldMin: 20
+GoldMax: 20
 E
 #3093
 rottweiler pets~
@@ -676,8 +688,8 @@ A large, loyal rottweiler is here.
 30 900
 8 8 0
 BareHandAttack: 4
-GoldMin: 0
-GoldMax: 0
+GoldMin: 30
+GoldMax: 30
 E
 #3094
 wolf pets~
@@ -691,8 +703,8 @@ A large, trained wolf is here.
 40 1600
 8 8 0
 BareHandAttack: 4
-GoldMin: 0
-GoldMax: 0
+GoldMin: 1
+GoldMax: 10
 E
 #3095
 cryogenicist cryo~
@@ -706,7 +718,7 @@ enough to put up with any crap from mud players with attitudes.
 33 9 -9 6d6+330 5d5+5
 330 108900
 8 8 2
-GoldMin: 0
-GoldMax: 0
+GoldMin: 330
+GoldMax: 330
 E
 $
