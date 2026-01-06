@@ -2434,7 +2434,7 @@ ACMD(do_who)
 
             {
               const char *cn = clan_name_buf;
-              size_t cn_len = strlen(cn);
+              size_t cn_len = strcspn(cn, "\r\n");
 
               /* If the clan name already ends with a reset, move it outside the bracket. */
               if (cn_len >= 2 && cn[cn_len - 2] == '	' && cn[cn_len - 1] == 'n')
@@ -2450,13 +2450,20 @@ ACMD(do_who)
           }
 
             {
-              /* Print WHO line once. Avoid fixed-width clan padding to prevent wrap artifacts. */
+              /* Print WHO line once. Clan chunk is atomic to avoid bracket splitting on wrap. */
               const char *tag = (*clancol) ? clancol : "";
-
-              send_to_char(ch, "%s[%2d %3s]%s%s %s%s%s%s",
+              char clan_chunk[160];
+              
+              /* Keep tba color codes intact. cn_len strips newlines before clancol is built. */
+              if (*tag)
+                snprintf(clan_chunk, sizeof(clan_chunk), "   %s   ", tag);
+              else
+                clan_chunk[0] = '\0';
+              
+              send_to_char(ch, "%s[%2d %3s]%s%s%s%s%s",
                   (GET_LEVEL(tch) >= LVL_IMMORT ? CCYEL(ch, C_SPR) : ""),
                   GET_LEVEL(tch), get_class_display_abbrev(tch),
-                  (*tag ? " " : ""), tag,
+                  (*clan_chunk ? clan_chunk : " "),
                   GET_NAME(tch),
                   (*GET_TITLE(tch) ? " " : ""), GET_TITLE(tch),
                   CCNRM(ch, C_SPR));
