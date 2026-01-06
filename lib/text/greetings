@@ -6,7 +6,6 @@
 	D   Based on CircleMUD by Jeremy Elson and DikuMUD by Hans-Henrik Staerfeldt,
 	D          Katja Nyboe, Tom Madsen, Michael Seifert, and Sebastian Hammer
 	n
-
 	Y   
 	  _____ _   _ _____      _    ______     _______ _   _ _____ _   _ ____  _____ ____  ____    
 	 |_   _| | | | ____|    / \  |  _ \ \   / / ____| \ | |_   _| | | |  _ \| ____|  _ \/ ___| 
@@ -19,8 +18,7 @@
 								 | |     / _ \  | || |_) |
 								 | |___ / ___ \ | ||  _ < 
 								 |_____/_/   \_\___|_| \_\
-
-	c                          By Anthony DeRosia
+	c                                By Anthony DeRosia
 	n
 
 	n
