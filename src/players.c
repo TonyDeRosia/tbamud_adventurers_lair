@@ -884,7 +884,9 @@ void save_char(struct char_data * ch)
   /* end char_to_store code */
 
   /* Rebuild derived stats even if no affects/eq were present so aff_abils
-   * retains racial bonuses and other modifiers after saving. */
+   * retains racial bonuses and other modifiers after saving. This only
+   * recalculates derived maxima; current hit/mana/move values remain
+   * unchanged. */
   affect_total(ch);
 
   if ((id = get_ptable_by_name(GET_NAME(ch))) < 0)
