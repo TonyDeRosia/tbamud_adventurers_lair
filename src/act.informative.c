@@ -522,10 +522,13 @@ static void list_char_to_char(struct char_data *list, struct char_data *ch)
 static void do_auto_exits(struct char_data *ch)
 {
   int door, slen = 0;
+  static const int exit_order[] = { 0, 3, 2, 1, 4, 5 }; /* N W S E U D */
+  int ord;
 
   send_to_char(ch, "%s[ Exits: ", CCCYN(ch, C_NRM));
 
-  for (door = 0; door < DIR_COUNT; door++) {
+  for (ord = 0; ord < (int)(sizeof(exit_order) / sizeof(exit_order[0])) && ord < DIR_COUNT; ord++) {
+    door = exit_order[ord];
     if (!EXIT(ch, door) || EXIT(ch, door)->to_room == NOWHERE)
       continue;
     if (EXIT_FLAGGED(EXIT(ch, door), EX_CLOSED) && !CONFIG_DISP_CLOSED_DOORS)
@@ -547,6 +550,8 @@ static void do_auto_exits(struct char_data *ch)
 ACMD(do_exits)
 {
   int door, len = 0;
+  static const int exit_order[] = { 0, 3, 2, 1, 4, 5 }; /* N W S E U D */
+  int ord;
 
   if (AFF_FLAGGED(ch, AFF_BLIND) && GET_LEVEL(ch) < LVL_IMMORT)
   {
@@ -556,8 +561,8 @@ ACMD(do_exits)
 
   send_to_char(ch, "Obvious exits:\r\n");
 
-  for (door = 0; door < DIR_COUNT; door++)
-  {
+  for (ord = 0; ord < (int)(sizeof(exit_order) / sizeof(exit_order[0])) && ord < DIR_COUNT; ord++) {
+    door = exit_order[ord];
     if (!EXIT(ch, door) || EXIT(ch, door)->to_room == NOWHERE)
       continue;
     if (EXIT_FLAGGED(EXIT(ch, door), EX_CLOSED) && !CONFIG_DISP_CLOSED_DOORS)
