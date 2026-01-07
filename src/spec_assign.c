@@ -107,6 +107,26 @@ void assign_mobiles(void)
   ASSIGNMOB(31639, guild);
   ASSIGNMOB(31641, guild);
 
+  /* Auto-assign guild spec from MOB_GUILD_MASTER flag.
+   * This lets builders add more trainers by flagging mobs, without editing lists here.
+   */
+  {
+    mob_rnum i;
+    const char *nm;
+
+    for (i = 0; i <= top_of_mobt; i++) {
+      if (MOB_FLAGGED(&mob_proto[i], MOB_GUILD_MASTER)) {
+        if (mob_index[i].func == NULL || mob_index[i].func == guild) {
+          mob_index[i].func = guild;
+        } else {
+          nm = get_spec_func_name(mob_index[i].func);
+          log("SYSERR: mob %d flagged GUILD_MASTER but already has spec %s",
+              mob_index[i].vnum, nm ? nm : "Unknown");
+        }
+      }
+    }
+  }
+
   ASSIGNMOB(3105, mayor);
 
   ASSIGNMOB(110, postmaster);
