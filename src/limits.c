@@ -492,7 +492,7 @@ void point_update(void)
       corruption = find_affect(i, SPELL_CORRUPTION);
       if (corruption) {
         send_to_char(i, "Corrupting energy gnaws at you.\\r\\n");
-        if (damage(i, i, corruption->modifier, SPELL_CORRUPTION) == -1)
+        if (damage(i, i, (corruption->modifier < 1 ? 1 : corruption->modifier), SPELL_CORRUPTION) == -1)
           continue;
       }
       if (GET_POS(i) <= POS_STUNNED)

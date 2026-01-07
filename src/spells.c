@@ -370,7 +370,9 @@ ASPELL(spell_corruption)
   act("$n envelopes $N in a wave of corrupting energy.", TRUE, ch, 0, victim, TO_ROOM);
 
   if (ch != victim)
-    damage(ch, victim, 0, SPELL_CORRUPTION);
+  /* 0 damage prints like a miss. Make the initial hit at least 1. */
+  damage(ch, victim, (af.modifier < 1 ? 1 : af.modifier), SPELL_CORRUPTION);
+
 }
 
 ASPELL(spell_identify)

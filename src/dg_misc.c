@@ -295,7 +295,33 @@ void script_damage(struct char_data *vict, int dam)
   }
 
   GET_HIT(vict) -= dam;
-  GET_HIT(vict) = MIN(GET_HIT(vict), GET_MAX_HIT(vict));
+GET_HIT(vict) = MIN(GET_HIT(vict), GET_MAX_HIT(vict));
+  /* DG script damage verb output (no attacker available) */
+  if (dam > 0 && IN_ROOM(vict) != NOWHERE) {
+    int msgnum, pct;
+    static const char *const v3[] = {
+      "misses", "grazes", "glances", "hits", "strikes", "slams", "crushes", "devastates", "maims", "annihilates"
+    };
+    pct = (dam * 100) / MAX(1, GET_MAX_HIT(vict));
+
+    if (pct <= 4)        msgnum = 1;
+    else if (pct <= 9)   msgnum = 2;
+    else if (pct <= 19)  msgnum = 3;
+    else if (pct <= 29)  msgnum = 4;
+    else if (pct <= 44)  msgnum = 5;
+    else if (pct <= 59)  msgnum = 6;
+    else if (pct <= 74)  msgnum = 7;
+    else if (pct <= 89)  msgnum = 8;
+    else                 msgnum = 9;
+
+    send_to_char(vict, "An unseen force %s you.\r\n", v3[msgnum]);
+    {
+      char roommsg[128];
+      snprintf(roommsg, sizeof(roommsg), "$n is %s by an unseen force.", v3[msgnum]);
+      act(roommsg, TRUE, vict, 0, 0, TO_ROOM);
+    }
+  }
+
 
   update_pos(vict);
   send_char_pos(vict, dam);

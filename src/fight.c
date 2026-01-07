@@ -1072,26 +1072,40 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
    * death blow, send a skill_message if one exists; if not, default to a
    * dam_message. Otherwise, always send a dam_message. */
   if (!IS_WEAPON(attacktype)) {
-    /* Fallback: non-weapon damage verb output (spells, skills, DoTs) */
-    if (!skill_message(dam, ch, victim, attacktype)) {
-      static const char *const fb_verbs[] = {
-        "miss", "graze", "glance", "hit", "strike", "slam", "crush", "devastate", "maim", "annihilate"
+    /* Always add a short severity verb line for spells, skills, DoTs. */
+    int shown = skill_message(dam, ch, victim, attacktype);
+    if (dam > 0 && IN_ROOM(victim) != NOWHERE) {
+      static const char *const v3[] = {
+        "misses", "grazes", "glances", "hits", "strikes", "slams", "crushes", "devastates", "maims", "annihilates"
+      };
+      static const char *const v3_past[] = {
+        "missed", "grazed", "glanced", "hit", "struck", "slammed", "crushed", "devastated", "maimed", "annihilated"
       };
       int tier = damage_severity_tier(dam, victim);
-      const char *verb;
-      char to_char[128], to_vict[128], to_room[128];
-  
       if (tier < 0) tier = 0;
       if (tier > 9) tier = 9;
-      verb = fb_verbs[tier];
-  
       if (ch) {
-        snprintf(to_char, sizeof(to_char), "Your magic %s $N.", verb);
-        snprintf(to_vict, sizeof(to_vict), "$n's magic %s you.", verb);
-        snprintf(to_room, sizeof(to_room), "$n's magic %s $N.", verb);
+        char to_char[128], to_vict[128], to_room[128];
+        snprintf(to_char, sizeof(to_char), "Your magic %s $N.", v3[tier]);
+        snprintf(to_vict, sizeof(to_vict), "$n's magic %s you.", v3[tier]);
+        snprintf(to_room, sizeof(to_room), "$n's magic %s $N.", v3[tier]);
         act(to_room, FALSE, ch, NULL, victim, TO_NOTVICT);
         act(to_char, FALSE, ch, NULL, victim, TO_CHAR);
         act(to_vict, FALSE, ch, NULL, victim, TO_VICT | TO_SLEEP);
+      } else {
+        send_to_char(victim, "Lingering magic %s you.\r\n", v3[tier]);
+        {
+          char roommsg[128];
+          snprintf(roommsg, sizeof(roommsg), "$n is %s by lingering magic.", v3_past[tier]);
+          act(roommsg, TRUE, victim, 0, 0, TO_ROOM);
+        }
+      }
+    } else if (!shown) {
+      /* If a spell has no messages and did 0 damage, still show something. */
+      if (ch) {
+        act("Your magic misses $N.", FALSE, ch, NULL, victim, TO_CHAR);
+        act("$n's magic misses you.", FALSE, ch, NULL, victim, TO_VICT | TO_SLEEP);
+        act("$n's magic misses $N.", FALSE, ch, NULL, victim, TO_NOTVICT);
       } else {
         send_to_char(victim, "You suffer.\r\n");
         act("$n suffers.", TRUE, victim, 0, 0, TO_ROOM);
