@@ -171,6 +171,7 @@ ACMD(do_backstab)
     damage(ch, vict, 0, SKILL_BACKSTAB);
   else
     hit(ch, vict, SKILL_BACKSTAB);
+  improve_ability_from_use(ch, SKILL_BACKSTAB, !(AWAKE(vict) && (percent > prob)));
 
   WAIT_STATE(ch, 2 * PULSE_VIOLENCE);
 }
@@ -331,6 +332,7 @@ ACMD(do_bash)
         GET_POS(vict) = POS_SITTING;
     }
   }
+  improve_ability_from_use(ch, SKILL_BASH, (percent <= prob));
   WAIT_STATE(ch, PULSE_VIOLENCE * 2);
 }
 
@@ -555,6 +557,7 @@ ACMD(do_kick)
     damage(ch, vict, 0, SKILL_KICK);
   } else
     damage(ch, vict, GET_LEVEL(ch) / 2, SKILL_KICK);
+  improve_ability_from_use(ch, SKILL_KICK, (percent <= prob));
 
   WAIT_STATE(ch, PULSE_VIOLENCE * 3);
 }

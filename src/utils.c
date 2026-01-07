@@ -66,6 +66,41 @@ int dice(int num, int size)
 /** Return the smaller number. Original note: Be wary of sign issues with this.
  * @param a The first number.
  * @param b The second number. */
+
+void improve_ability_from_use(struct char_data *ch, int ability, int success)
+{
+  int cur, chance, stat;
+
+  if (!ch || IS_NPC(ch))
+    return;
+
+  if (ability < 1 || ability > MAX_SKILLS)
+    return;
+
+  cur = GET_SKILL(ch, ability);
+
+  /* Practice is capped at 75. Use based improvement is only for 75+..99. */
+  if (cur < 75 || cur >= 100)
+    return;
+
+  /* Spells: int+wis. Skills: dex+int (simple, stable default). */
+  if (ability <= MAX_SPELLS)
+    stat = (GET_INT(ch) + GET_WIS(ch)) / 2;
+  else
+    stat = (GET_DEX(ch) + GET_INT(ch)) / 2;
+
+  /* Slow curve as you approach 100. */
+  chance = 1 + (stat / 12) + ((100 - cur) / 20);
+  if (!success)
+    chance /= 2;
+
+  if (chance < 1) chance = 1;
+  if (chance > 15) chance = 15;
+
+  if (rand_number(1, 100) <= chance)
+    SET_SKILL(ch, ability, cur + 1);
+}
+
 int MIN(int a, int b)
 {
   return (a < b ? a : b);

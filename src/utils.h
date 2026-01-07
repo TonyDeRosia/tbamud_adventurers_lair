@@ -1136,4 +1136,5 @@ do                                                              \
 /** What is the minimum level character to put on the wizlist? */
 #define CONFIG_MIN_WIZLIST_LEV  config_info.autowiz.min_wizlist_lev
 
+void improve_ability_from_use(struct char_data *ch, int ability, int success);
 #endif /* _UTILS_H_ */

@@ -28,6 +28,8 @@
 #include "fight.h"
 #include "modify.h"
 
+#define PRACTICE_CAP 75
+
 
 
 static void format_price_gsc(char *out, size_t outsz, long long total_gold)
@@ -72,8 +74,8 @@ static const char *prac_types[] = {
 #define ABILITY_COL_WIDTH 27
 #define ABILITIES_PER_LINE 2
 #define LEVEL_LABEL_PADDING 14
+#define LEARNED(ch) (MIN(PRACTICE_CAP, get_class_prac_learned_level((int)GET_CLASS(ch))))
 
-#define LEARNED(ch) (get_class_prac_learned_level((int)GET_CLASS(ch)))
 #define MINGAIN(ch) (get_class_prac_min_per_prac((int)GET_CLASS(ch)))
 #define MAXGAIN(ch) (get_class_prac_max_per_prac((int)GET_CLASS(ch)))
 #define SPLSKL(ch) (prac_types[get_class_prac_type((int)GET_CLASS(ch))])
@@ -226,7 +228,11 @@ SPECIAL(guild)
 
   SET_SKILL(ch, skill_num, MIN(LEARNED(ch), percent));
 
-  if (GET_SKILL(ch, skill_num) >= LEARNED(ch))
+  
+  /* practice cap */
+  if (GET_SKILL(ch, skill_num) > PRACTICE_CAP)
+    SET_SKILL(ch, skill_num, PRACTICE_CAP);
+if (GET_SKILL(ch, skill_num) >= LEARNED(ch))
     send_to_char(ch, "You are now learned in that area.\r\n");
 
   return (TRUE);

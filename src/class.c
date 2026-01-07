@@ -1734,6 +1734,23 @@ void do_start(struct char_data *ch)
 
 /* This function controls the change to maxmove, maxmana, and maxhp for each
  * class every time they gain a level. */
+
+static void grant_new_abilities_one_percent(struct char_data *ch)
+{
+  int i, cls, lvl;
+
+  if (!ch || IS_NPC(ch))
+    return;
+
+  cls = GET_CLASS(ch);
+  lvl = GET_LEVEL(ch);
+
+  for (i = 1; i <= MAX_SKILLS; i++) {
+    if (spell_info[i].min_level[cls] == lvl && GET_SKILL(ch, i) == 0)
+      SET_SKILL(ch, i, 1);
+  }
+}
+
 void advance_level(struct char_data *ch)
 {
   int add_hp, add_mana = 0, add_move = 0, i;
@@ -1782,6 +1799,8 @@ void advance_level(struct char_data *ch)
 
   GET_TRAINS(ch) += 1;
 
+
+  grant_new_abilities_one_percent(ch);
   if (GET_LEVEL(ch) >= LVL_IMMORT) {
     for (i = 0; i < 3; i++)
       GET_COND(ch, i) = (char) -1;

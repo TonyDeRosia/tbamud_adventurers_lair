@@ -1098,8 +1098,10 @@ ACMD(do_cast) {
       GET_MANA(ch) = MAX(0, MIN(effective_max_mana(ch), GET_MANA(ch) - (mana / 2)));
     if (SINFO.violent && tch && IS_NPC(tch))
     hit(tch, ch, TYPE_UNDEFINED);
+    improve_ability_from_use(ch, spellnum, 0);
   } else { /* cast spell returns 1 on success; subtract mana & set waitstate */
     if (cast_spell(ch, tch, tobj, spellnum)) {
+      improve_ability_from_use(ch, spellnum, 1);
       WAIT_STATE(ch, PULSE_VIOLENCE);
       if (mana > 0)
         GET_MANA(ch) = MAX(0, MIN(effective_max_mana(ch), GET_MANA(ch) - mana));
