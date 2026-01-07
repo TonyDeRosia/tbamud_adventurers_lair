@@ -687,7 +687,7 @@ void medit_parse(struct descriptor_data *d, char *arg)
     case 'p':
     case 'P':
       OLC_MODE(d) = MEDIT_PET_PRICE;
-      write_to_output(d, "Enter pet price in gold (0 = default): ");
+      write_to_output(d, "Enter pet price in gold (0 = automatic): ");
       return;
     case 'w':
     case 'W':
@@ -1048,6 +1048,25 @@ break;
       medit_disp_stats_menu(d);
     }
       return;
+
+  case MEDIT_PET_PRICE: {
+    long long price = 0;
+
+    if (sscanf(arg, "%lld", &price) != 1) {
+      write_to_output(d, "Enter pet price in gold (0 = automatic): ");
+      return;
+    }
+
+    if (price < 0)
+      price = 0;
+    if (price > 2000000000LL)
+      price = 2000000000LL;
+
+    GET_PET_PRICE(OLC_MOB(d)) = (int)price;
+    OLC_VAL(d) = TRUE;
+    medit_disp_menu(d);
+    return;
+  }
 
   case MEDIT_STR:
     GET_STR(OLC_MOB(d)) = LIMIT(i, 11, 25);

@@ -643,6 +643,7 @@ A small loyal kitten is here.
 10 100
 8 8 0
 BareHandAttack: 8
+PetPrice: 10
 GoldMin: 10
 GoldMax: 10
 E
@@ -658,6 +659,7 @@ A small loyal puppy is here.
 10 100
 8 8 0
 BareHandAttack: 8
+PetPrice: 10
 GoldMin: 10
 GoldMax: 10
 E
@@ -673,6 +675,7 @@ A small, quick, loyal beagle is here.
 20 400
 8 8 0
 BareHandAttack: 4
+PetPrice: 50
 GoldMin: 20
 GoldMax: 20
 E
@@ -688,6 +691,7 @@ A large, loyal rottweiler is here.
 30 900
 8 8 0
 BareHandAttack: 4
+PetPrice: 80
 GoldMin: 30
 GoldMax: 30
 E
@@ -703,6 +707,7 @@ A large, trained wolf is here.
 40 1600
 8 8 0
 BareHandAttack: 4
+PetPrice: 110
 GoldMin: 1
 GoldMax: 10
 E
