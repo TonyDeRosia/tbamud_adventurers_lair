@@ -525,7 +525,7 @@ ACMD(do_train)
     }
 
     GET_TRAINS(ch)--;
-    GET_MAX_HIT(ch) += 5;
+    GET_MAX_HIT(ch) += 10;
     send_to_char(ch, "You spend one training session and feel hardier.\r\n");
     return;
   }
@@ -537,7 +537,7 @@ ACMD(do_train)
     }
 
     GET_TRAINS(ch)--;
-    GET_MAX_MANA(ch) += 5;
+    GET_MAX_MANA(ch) += 10;
     send_to_char(ch, "You spend one training session and feel hardier.\r\n");
     return;
   }
