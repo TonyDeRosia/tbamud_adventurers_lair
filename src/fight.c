@@ -542,18 +542,42 @@ void die(struct char_data * ch, struct char_data * killer)
     save_char(killer);
     send_to_char(killer, "You claim %s for the bounty on %s.\r\n", reward_buf, GET_NAME(ch));
   }
-  /* Death penalty: lose half current XP (prints exact amount lost). */
+    /* Death penalty: lose 1-10% of TNL on a level-based curve. */
   if (!IS_NPC(ch) && GET_LEVEL(ch) < LVL_IMMORT) {
-    long long before = (long long)GET_EXP(ch);
-    long long lost = before / 2;
-    if (lost < 0) lost = 0;
-    send_to_char(ch, "Death penalty: You lose %lld experience.\r\n", lost);
-    /* gain_exp uses int in stock code; clamp to int range to be safe. */
-    if (lost > 2147483647LL) lost = 2147483647LL;
-    gain_exp(ch, (int)(-lost));
+    long long tnl, loss;
+    int pct, max_mortal_level;
+    long long num, den, den2;
+
+    /* TNL = exp needed for next level, clamped */
+    tnl = (long long)level_exp(GET_CLASS(ch), GET_LEVEL(ch) + 1) - (long long)GET_EXP(ch);
+    if (tnl < 0)
+      tnl = 0;
+
+    max_mortal_level = LVL_IMMORT - 1;
+
+    /* Quadratic curve: level 1 => 1%, top mortal => 10% */
+    if (GET_LEVEL(ch) <= 1 || max_mortal_level <= 1) {
+      pct = 1;
+    } else {
+      num = (long long)(GET_LEVEL(ch) - 1);
+      den = (long long)(max_mortal_level - 1);
+      den2 = den * den;
+      pct = 1 + (int)((9LL * num * num + den2 / 2) / den2);
+      pct = MIN(10, MAX(1, pct));
+    }
+
+    /* ceil(tnl * pct / 100) */
+    loss = (tnl * pct + 99) / 100;
+
+    send_to_char(ch, "Death penalty: You lose %lld experience.\r\n", loss);
+
+    /* gain_exp uses int; clamp to int range */
+    if (loss > 2147483647LL) loss = 2147483647LL;
+    gain_exp(ch, (int)(-loss));
   } else {
     gain_exp(ch, -(GET_EXP(ch) / 2));
   }
+
   if (!IS_NPC(ch)) {
     REMOVE_BIT_AR(PLR_FLAGS(ch), PLR_KILLER);
     REMOVE_BIT_AR(PLR_FLAGS(ch), PLR_THIEF);
