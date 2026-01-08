@@ -87,7 +87,7 @@ static int is_skill_id(int i)
 #endif
 #endif
 }
-static void show_ability_table_aligned(struct char_data *ch, int show_spells)
+static void show_ability_table_aligned(struct char_data *ch, int show_spells, int show_all)
 {
   int i;
   int cls = GET_CLASS(ch);
@@ -118,17 +118,15 @@ static void show_ability_table_aligned(struct char_data *ch, int show_spells)
     if (lvl <= 0) continue;
 
     pct = GET_SKILL(ch, i);
-    if (pct <= 0) continue;
-
+    if (!show_all && pct <= 0) continue;
+    if (pct <= 0) pct = -1;
     nm = spell_info[i].name;
     if (!nm || !*nm) continue;
 
     /* filter placeholders */
     if (!strcmp(nm, "!UNUSED!")) continue;
 
-    if (pct < 0) pct = 0;
-    if (pct > 100) pct = 100;
-
+    if (pct >= 0 && pct > 100) pct = 100;
     rows[n].id = i;
     rows[n].lvl = lvl;
     rows[n].name = nm;
@@ -158,9 +156,13 @@ static void show_ability_table_aligned(struct char_data *ch, int show_spells)
       send_to_char(ch, "%s", cont);
     }
 
-    snprintf(cell, sizeof(cell), "%-24s [%3d%%]",
-         rows[i].name,
-         rows[i].pct);
+    if (rows[i].pct < 0)
+
+      snprintf(cell, sizeof(cell), "%-24s [ -- ]", rows[i].name);
+
+    else
+
+      snprintf(cell, sizeof(cell), "%-24s [%3d%%]", rows[i].name, rows[i].pct);
     send_to_char(ch, "%-*s", ABIL_COL_WIDTH, cell);
 
     col++;
@@ -412,10 +414,18 @@ ACMD(do_steal)
 }
 ACMD(do_skills)
 {
-  send_to_char(ch, "You have %d practice sessions remaining.\r\n", GET_PRACTICES(ch));
-  show_ability_table_aligned(ch, 0);
-}
+  char arg[MAX_INPUT_LENGTH];
+  int show_all = 0;
 
+  one_argument(argument, arg);
+  if (*arg && !str_cmp(arg, "all"))
+    show_all = 1;
+
+  send_to_char(ch, "You have %d practice sessions remaining.\r\n", GET_PRACTICES(ch));
+  if (show_all)
+    send_to_char(ch, "Showing all skills your class can learn at any level.\r\n");
+  show_ability_table_aligned(ch, 0, show_all);
+}
 ACMD(do_spellbook)
 {
   if (IS_NPC(ch))
@@ -1483,6 +1493,15 @@ ACMD(do_happyhour)
 }
 ACMD(do_spells)
 {
+  char arg[MAX_INPUT_LENGTH];
+  int show_all = 0;
+
+  one_argument(argument, arg);
+  if (*arg && !str_cmp(arg, "all"))
+    show_all = 1;
+
   send_to_char(ch, "You have %d practice sessions remaining.\r\n", GET_PRACTICES(ch));
-  show_ability_table_aligned(ch, 1);
+  if (show_all)
+    send_to_char(ch, "Showing all spells your class can learn at any level.\r\n");
+  show_ability_table_aligned(ch, 1, show_all);
 }
