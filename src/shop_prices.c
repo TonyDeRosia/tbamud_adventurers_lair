@@ -31,9 +31,18 @@ float shop_charisma_discount(const struct char_data *buyer, int keeper_cha)
   }
 }
 
+long shop_scale_base_cost(long base_cost)
+{
+  if (base_cost >= SHOP_PRICE_SCALE_MIN) {
+    long div = SHOP_PRICE_SCALE_DIV;
+    return (base_cost + (div / 2)) / div;
+  }
+  return base_cost;
+}
+
 long shop_calculate_buy_price(long base_cost, float buyprofit, int keeper_cha, const struct char_data *buyer)
 {
-  float price = base_cost * buyprofit;
+  float price = shop_scale_base_cost(base_cost) * buyprofit;
   long final_price = (long)(price * shop_charisma_discount(buyer, keeper_cha) + 0.5f);
 
   (void)keeper_cha;

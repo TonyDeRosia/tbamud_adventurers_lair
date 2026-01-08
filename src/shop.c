@@ -528,10 +528,13 @@ static int sell_price(struct obj_data *obj, int shop_nr, struct char_data *keepe
   float sell_cost_modifier = SHOP_SELLPROFIT(shop_nr) * (1 - (GET_CHA(keeper) - GET_CHA(seller)) / 70.0);
   float buy_cost_modifier = SHOP_BUYPROFIT(shop_nr) * (1 + (GET_CHA(keeper) - GET_CHA(seller)) / 70.0);
 
-  if (sell_cost_modifier > buy_cost_modifier)
+    if (sell_cost_modifier > buy_cost_modifier)
     sell_cost_modifier = buy_cost_modifier;
 
-  return (int) (GET_OBJ_COST(obj) * sell_cost_modifier);
+  {
+    long base_cost = shop_scale_base_cost(GET_OBJ_COST(obj));
+    return (int) (base_cost * sell_cost_modifier);
+  }
 }
 
 static void shopping_buy(char *arg, struct char_data *ch, struct char_data *keeper, int shop_nr)
