@@ -117,6 +117,7 @@ static void show_ability_table_aligned(struct char_data *ch, int show_spells, in
     lvl = spell_info[i].min_level[cls];
     if (lvl <= 0) continue;
 
+    if (show_all && lvl >= LVL_IMMORT) continue;
     pct = GET_SKILL(ch, i);
     if (!show_all && pct <= 0) continue;
     if (pct <= 0) pct = -1;
