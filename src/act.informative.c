@@ -594,6 +594,68 @@ ACMD(do_exits)
       send_to_char(ch, " None.\r\n");
 }
 
+static void build_room_compass_map(struct char_data *ch, struct room_data *room,
+                                   char *out, size_t outsz)
+{
+  bool north = FALSE;
+  bool east = FALSE;
+  bool south = FALSE;
+  bool west = FALSE;
+  const char *box = CCFWHT(ch, C_NRM);
+  const char *dir_active = CCFCYN(ch, C_NRM);
+  const char *dir_inactive = CCWHT(ch, C_NRM);
+  const char *x_color = CCFYEL(ch, C_NRM);
+  const char *reset = CCNRM(ch, C_NRM);
+  const char *north_color;
+  const char *south_color;
+  const char *west_color;
+  const char *east_color;
+  const char *west_label;
+  const char *east_label;
+  const char *south_label;
+
+  if (!out || outsz == 0)
+    return;
+
+  if (room) {
+    if (room->dir_option[DIR_NORTH] &&
+        room->dir_option[DIR_NORTH]->to_room != NOWHERE)
+      north = TRUE;
+    if (room->dir_option[DIR_EAST] &&
+        room->dir_option[DIR_EAST]->to_room != NOWHERE)
+      east = TRUE;
+    if (room->dir_option[DIR_SOUTH] &&
+        room->dir_option[DIR_SOUTH]->to_room != NOWHERE)
+      south = TRUE;
+    if (room->dir_option[DIR_WEST] &&
+        room->dir_option[DIR_WEST]->to_room != NOWHERE)
+      west = TRUE;
+    /* TODO: consider door states (closed/locked) when determining active exits. */
+  }
+
+  north_color = north ? dir_active : dir_inactive;
+  west_color = west ? dir_active : dir_inactive;
+  east_color = east ? dir_active : dir_inactive;
+  south_color = south ? dir_active : dir_inactive;
+
+  west_label = west ? "=W=" : " W ";
+  east_label = east ? "=E=" : " E ";
+  south_label = south ? "S" : "s";
+
+  snprintf(out, outsz,
+           "          %s___N___%s\r\n"
+           "          %s|          |%s\r\n"
+           "%s%s%s %s|     %sX%s    %s| %s%s%s\r\n"
+           "          %s|_______|%s\r\n"
+           "               %s%s%s\r\n",
+           north_color, reset,
+           box, reset,
+           west_color, west_label, reset, box, x_color, reset, box, reset,
+           east_color, east_label, reset,
+           box, reset,
+           south_color, south_label, reset);
+}
+
 void look_at_room(struct char_data *ch, int ignore_brief)
 {
   trig_data * t;
@@ -612,6 +674,13 @@ void look_at_room(struct char_data *ch, int ignore_brief)
   else if (AFF_FLAGGED(ch, AFF_BLIND) && GET_LEVEL(ch) < LVL_IMMORT) {
     send_to_char(ch, "You see nothing but infinite darkness...\r\n");
     return;
+  }
+
+  {
+    char mapbuf[MAX_STRING_LENGTH];
+
+    build_room_compass_map(ch, rm, mapbuf, sizeof(mapbuf));
+    send_to_char(ch, "%s", mapbuf);
   }
 
   send_to_char(ch, "%s", CCYEL(ch, C_NRM));
@@ -3995,4 +4064,3 @@ ACMD(do_saudit)
 
   send_to_char(ch, "╚══════════════════════════════════════════════════════════════════════════════╝\r\n");
 }
-
