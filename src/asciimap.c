@@ -91,18 +91,18 @@ static struct map_info_type door_info[] =
 
 static struct map_info_type compact_door_info[] =
 {
-  { DOOR_NONE, " " },
-  { DOOR_DOWN_AND_SE, "\tR\\\tn" },
-  { DOOR_UP_AND_NE,   "\tR/\tn" },
-  { VDOOR_DIAGNW,   "\tm+\tn" },
-  { VDOOR_DIAGNE,   "\tm+\tn"},
-  { VDOOR_EW,  " \tm+\tn " },
-  { VDOOR_NS,  " \tm+\tn "},
-  { DOOR_DIAGNW,"\\" },
-  { DOOR_DIAGNE,"/" },
-  { DOOR_DOWN, "\tr-\tn" },
-  { DOOR_UP,   "\tr+\tn" },
-  { DOOR_EW,   "-" },
+  { DOOR_NONE, "   " },
+  { DOOR_DOWN_AND_SE, " \\ " },
+  { DOOR_UP_AND_NE,   " / " },
+  { VDOOR_DIAGNW,   " 	m+	n " },
+  { VDOOR_DIAGNE,   " 	m+	n "},
+  { VDOOR_EW,  " 	m+	n " },
+  { VDOOR_NS,  " 	m+	n "},
+  { DOOR_DIAGNW," \\ " },
+  { DOOR_DIAGNE," / " },
+  { DOOR_DOWN, " - " },
+  { DOOR_UP,   " + " },
+  { DOOR_EW,   " - " },
   { DOOR_NS,   " | " }
 };
 

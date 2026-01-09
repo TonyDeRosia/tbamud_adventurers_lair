@@ -596,13 +596,16 @@ ACMD(do_exits)
 
 static bool compass_exit_visible(struct char_data *ch, int dir)
 {
-  struct room_direction_data *exit = EXIT(ch, dir);
+  struct room_direction_data *ex = EXIT(ch, dir);
 
-  if (!exit || exit->to_room == NOWHERE)
+  if (!ex || ex->to_room == NOWHERE)
     return FALSE;
-  if (EXIT_FLAGGED(exit, EX_CLOSED) && !CONFIG_DISP_CLOSED_DOORS)
+
+  /* Mirror exit display rules. */
+  if (EXIT_FLAGGED(ex, EX_CLOSED) && !CONFIG_DISP_CLOSED_DOORS)
     return FALSE;
-  if (EXIT_FLAGGED(exit, EX_HIDDEN) && !PRF_FLAGGED(ch, PRF_HOLYLIGHT))
+
+  if (EXIT_FLAGGED(ex, EX_HIDDEN) && !PRF_FLAGGED(ch, PRF_HOLYLIGHT))
     return FALSE;
 
   return TRUE;
@@ -629,39 +632,45 @@ static void build_room_compass_map(struct char_data *ch, struct room_data *room,
   const char *east_label;
   const char *south_label;
 
+  (void)room;
+
   if (!out || outsz == 0)
     return;
 
-  if (room) {
-    north = compass_exit_visible(ch, NORTH);
-    east = compass_exit_visible(ch, EAST);
-    south = compass_exit_visible(ch, SOUTH);
-    west = compass_exit_visible(ch, WEST);
-  }
+  north = compass_exit_visible(ch, NORTH);
+  east  = compass_exit_visible(ch, EAST);
+  south = compass_exit_visible(ch, SOUTH);
+  west  = compass_exit_visible(ch, WEST);
 
   north_color = north ? dir_active : dir_inactive;
-  west_color = west ? dir_active : dir_inactive;
-  east_color = east ? dir_active : dir_inactive;
+  west_color  = west  ? dir_active : dir_inactive;
+  east_color  = east  ? dir_active : dir_inactive;
   south_color = south ? dir_active : dir_inactive;
 
+  /* Keep labels single width so alignment never drifts. */
   north_label = north ? "N" : " ";
-  west_label = west ? "W" : " ";
-  east_label = east ? "E" : " ";
+  west_label  = west  ? "W" : " ";
+  east_label  = east  ? "E" : " ";
   south_label = south ? "S" : " ";
 
+  /* 21 %s placeholders, 21 args: no format warnings. Adds one blank line after map. */
   snprintf(out, outsz,
            "            %s%s%s\r\n"
            "          %s+---+%s\r\n"
-           "      %s%s%s %s| %sX%s |%s %s%s%s\r\n"
+           "        %s%s%s %s| %sX%s |%s %s%s%s\r\n"
            "          %s+---+%s\r\n"
-           "            %s%s%s\r\n",
+           "            %s%s%s\r\n"
+           "\r\n",
            north_color, north_label, reset,
            box, reset,
-           west_color, west_label, reset, box, x_color, reset, box, reset,
+           west_color, west_label, reset,
+           box, x_color, reset, box,
            east_color, east_label, reset,
            box, reset,
            south_color, south_label, reset);
 }
+
+
 
 void look_at_room(struct char_data *ch, int ignore_brief)
 {
