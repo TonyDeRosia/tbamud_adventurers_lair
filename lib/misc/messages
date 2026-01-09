@@ -782,6 +782,54 @@ $N looks really sick and shivers uncomfortably.
 You have become poisoned somehow.
 $N has somehow become poisoned.
 
+* plague bolt 68
+M
+68
+Your \tGplague bolt\tn rots $N from the inside out!\tn
+You feel \tGplague\tn bloom in your veins as you die!\tn
+$N collapses as $n's \tGplague bolt\tn finishes the job!\tn
+Your \tGplague bolt\tn hisses past $N and splatters harmlessly.\tn
+A \tGplague bolt\tn hisses past you and splatters harmlessly.\tn
+$n's \tGplague bolt\tn splatters wide of $N.\tn
+Your \tGplague bolt\tn slams into $N and spreads \tGsickness\tn!\tn
+A \tGplague bolt\tn slams into you and spreads \tGsickness\tn!\tn
+$n's \tGplague bolt\tn slams into $N, spreading \tGsickness\tn!\tn
+$N shrugs off your \tGplague\tn with a hard stare.\tn
+You shake off $n's \tGplague\tn with pure will.\tn
+$N shakes off $n's \tGplague\tn with pure will.\tn
+
+* enfeeblement 69
+M
+69
+Your \tDhex\tn snaps $N's body like dry twigs!\tn
+A \tDhex\tn crushes your strength and ends you.\tn
+$n's \tDhex\tn leaves $N limp and lifeless!\tn
+Your \tDhex\tn slips as $N resists your will.\tn
+You feel a \tDhex\tn grasp at you, then it slips away.\tn
+$n's \tDhex\tn fails to take hold of $N.\tn
+Your \tDhex\tn clamps down and \tDweakens\tn $N!\tn
+A \tDhex\tn clamps down and \tDweakens\tn you!\tn
+$n's \tDhex\tn clamps down, \tDweakening\tn $N!\tn
+$N refuses your \tDhex\tn outright.\tn
+You refuse $n's \tDhex\tn outright.\tn
+$N refuses $n's \tDhex\tn outright.\tn
+
+* devour soul 70
+M
+70
+You \tDevour\tn $N's soul and leave only emptiness!\tn
+Your soul is \tDevoured\tn and everything goes dark!\tn
+$n \tDevours\tn $N's soul, leaving only a hollow corpse!\tn
+Your \tDevour Soul\tn snaps shut on air as $N dodges.\tn
+You feel cold jaws close on nothing as you slip aside.\tn
+$n's \tDevour Soul\tn snaps shut on air as $N dodges.\tn
+You \tDevour\tn $N's soul and drink the \tDterror\tn within!\tn
+Cold jaws bite into your soul as $n \tDevours\tn you!\tn
+$n \tDevours\tn $N's soul, feeding on \tDterror\tn!\tn
+$N wards off your \tDsoul hunger\tn.\tn
+You ward off $n's \tDsoul hunger\tn.\tn
+$N wards off $n's \tDsoul hunger\tn.\tn
+
 * !UNUSED! 202
 M
 202
@@ -861,4 +909,3 @@ $N is hit by $n's lightning breath.
 $N is immortal and immune to lightning breath.
 $n tries to breath lightning upon you.
 $n tries to breath lightning upon $N.
-

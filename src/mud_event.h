@@ -27,6 +27,7 @@ typedef enum {
     ePROTOCOLS, /* The Protocol Detection Event */
     eWHIRLWIND, /* The Whirlwind Attack */
     eSPL_DARKNESS, /* Darkness Spell */
+    eSPL_ENFEEBLEMENT, /* Enfeeblement Spell */
 } event_id;
 
 struct mud_event_list {

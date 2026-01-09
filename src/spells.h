@@ -106,8 +106,11 @@
 #define SPELL_SONG_OF_RESILIENCE     65
 #define SPELL_DARK_AEGIS             66
 #define SPELL_NIRVANA                67
+#define SPELL_PLAGUE_BOLT            68
+#define SPELL_ENFEEBLEMENT           69
+#define SPELL_DEVOUR_SOUL            70
 /** Total Number of defined spells */
-#define NUM_SPELLS                   67
+#define NUM_SPELLS                   70
 
 /* Insert new spells here, up to MAX_SPELLS */
 #define MAX_SPELLS		    130
@@ -244,6 +247,9 @@ ASPELL(spell_identify);
 ASPELL(spell_enchant_weapon);
 ASPELL(spell_detect_poison);
 ASPELL(spell_corruption);
+ASPELL(spell_plague_bolt);
+ASPELL(spell_enfeeblement);
+ASPELL(spell_devour_soul);
 
 /* basic magic calling functions */
 
