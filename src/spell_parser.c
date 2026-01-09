@@ -1505,7 +1505,7 @@ void mag_assign_spells(void) {
   TAR_CHAR_ROOM | TAR_NOT_SELF, TRUE, MAG_MANUAL,
       "You feel more self-confident.");
 
-  spello(SPELL_CHILL_TOUCH, "chill touch", 30, 10, 3, POS_FIGHTING,
+  spello(SPELL_CHILL_TOUCH, "chill touch", 12, 6, 1, POS_FIGHTING,
   TAR_CHAR_ROOM | TAR_FIGHT_VICT, TRUE, MAG_DAMAGE | MAG_AFFECTS,
       "You feel your strength return.");
 
@@ -1518,7 +1518,7 @@ void mag_assign_spells(void) {
   spello(SPELL_CONTROL_WEATHER, "control weather", 75, 25, 5, POS_STANDING,
   TAR_IGNORE, FALSE, MAG_MANUAL, NULL);
 
-  spello(SPELL_CORRUPTION, "corruption", 35, 20, 3, POS_FIGHTING,
+  spello(SPELL_CORRUPTION, "corruption", 14, 7, 1, POS_FIGHTING,
   TAR_CHAR_ROOM | TAR_FIGHT_VICT, TRUE, MAG_MANUAL,
       "The lingering corruption fades away.");
 
@@ -1537,7 +1537,7 @@ void mag_assign_spells(void) {
   spello(SPELL_CURE_LIGHT, "cure light", 30, 10, 2, POS_FIGHTING,
   TAR_CHAR_ROOM, FALSE, MAG_POINTS, NULL);
 
-  spello(SPELL_CURSE, "curse", 80, 50, 2, POS_STANDING,
+  spello(SPELL_CURSE, "curse", 12, 6, 1, POS_STANDING,
   TAR_CHAR_ROOM | TAR_OBJ_INV, TRUE, MAG_AFFECTS | MAG_ALTER_OBJS,
       "You feel more optimistic.");
 
@@ -1551,7 +1551,7 @@ void mag_assign_spells(void) {
   TAR_CHAR_ROOM | TAR_SELF_ONLY, FALSE, MAG_AFFECTS,
       "Your eyes stop tingling.");
 
-  spello(SPELL_DETECT_MAGIC, "detect magic", 20, 10, 2, POS_STANDING,
+  spello(SPELL_DETECT_MAGIC, "detect magic", 10, 5, 1, POS_STANDING,
   TAR_CHAR_ROOM | TAR_SELF_ONLY, FALSE, MAG_AFFECTS,
       "The detect magic wears off.");
 
@@ -1656,7 +1656,7 @@ void mag_assign_spells(void) {
   TAR_CHAR_ROOM | TAR_SELF_ONLY, FALSE, MAG_AFFECTS,
   "Your eyes dim as the primal serenity fades.");
 
-  spello(SPELL_PLAGUE_BOLT, "plague bolt", 35, 15, 2, POS_FIGHTING,
+  spello(SPELL_PLAGUE_BOLT, "plague bolt", 14, 7, 1, POS_FIGHTING,
   TAR_CHAR_ROOM | TAR_FIGHT_VICT, TRUE, MAG_MANUAL,
   "The \tGplague\tn in your veins subsides.\tn");
 
