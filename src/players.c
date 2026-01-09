@@ -838,14 +838,16 @@ void save_char(struct char_data * ch)
 }
 
   /* Save skills */
-  if (GET_LEVEL(ch) < LVL_IMMORT) {
-    fprintf(fl, "Skil:\n");
-    for (i = 1; i <= MAX_SKILLS; i++) {
-     if (GET_SKILL(ch, i))
-	fprintf(fl, "%d %d\n", i, GET_SKILL(ch, i));
-    }
-    fprintf(fl, "0 0\n");
+  if (GET_LEVEL(ch) >= LVL_IMMORT) {
+    for (i = 1; i <= MAX_SKILLS; i++)
+      GET_SKILL(ch, i) = 100;
   }
+  fprintf(fl, "Skil:\n");
+  for (i = 1; i <= MAX_SKILLS; i++) {
+    if (GET_SKILL(ch, i))
+      fprintf(fl, "%d %d\n", i, GET_SKILL(ch, i));
+  }
+  fprintf(fl, "0 0\n");
 
   /* Save affects */
   if (tmp_aff[0].spell > 0) {
@@ -1047,9 +1049,23 @@ static void load_skills(FILE *fl, struct char_data *ch)
   do {
     get_line(fl, line);
     sscanf(line, "%d %d", &num, &num2);
-      if (num != 0)
-	GET_SKILL(ch, num) = num2;
+    if (num != 0) {
+      if (num < 1 || num > MAX_SKILLS) {
+        log("SYSERR: Invalid skill id %d in pfile (%s)", num, GET_NAME(ch));
+        continue;
+      }
+      if (num2 < 0)
+        num2 = 0;
+      else if (num2 > 100)
+        num2 = 100;
+      GET_SKILL(ch, num) = num2;
+    }
   } while (num != 0);
+
+  if (GET_LEVEL(ch) >= LVL_IMMORT) {
+    for (num = 1; num <= MAX_SKILLS; num++)
+      GET_SKILL(ch, num) = 100;
+  }
 }
 
 void load_quests(FILE *fl, struct char_data *ch)
