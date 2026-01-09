@@ -237,6 +237,45 @@ ACMD(do_save)
   GET_LOADROOM(ch) = GET_ROOM_VNUM(IN_ROOM(ch));
 }
 
+ACMD(do_recall)
+{
+  if (IS_NPC(ch) || !GET_SKILL(ch, SKILL_RECALL)) {
+    send_to_char(ch, "You have no idea how.\r\n");
+    return;
+  }
+
+  if (GET_POS(ch) <= POS_STUNNED || GET_POS(ch) == POS_SLEEPING) {
+    send_to_char(ch, "You are in no condition to recall.\r\n");
+    return;
+  }
+
+  if (GET_MOVE(ch) <= 0) {
+    send_to_char(ch, "You are too exhausted to recall.\r\n");
+    return;
+  }
+
+  if (ZONE_FLAGGED(GET_ROOM_ZONE(IN_ROOM(ch)), ZONE_NOASTRAL)) {
+    send_to_char(ch, "A bright flash prevents your recall from working!");
+    return;
+  }
+
+  send_to_char(ch, "You focus and force yourself back to safety, collapsing from exhaustion.\r\n");
+  act("$n vanishes in a blur of motion.", TRUE, ch, 0, 0, TO_ROOM);
+
+  GET_MOVE(ch) = 0;
+  WAIT_STATE(ch, PULSE_VIOLENCE * 2);
+
+  char_from_room(ch);
+  char_to_room(ch, r_mortal_start_room);
+  act("$n appears in the middle of the room.", TRUE, ch, 0, 0, TO_ROOM);
+  look_at_room(ch, 0);
+  entry_memory_mtrigger(ch);
+  greet_mtrigger(ch, -1);
+  greet_memory_mtrigger(ch);
+  handle_followers_after_owner_teleport_or_recall(ch);
+  improve_ability_from_use(ch, SKILL_RECALL, TRUE);
+}
+
 /* Generic function for commands which are normally overridden by special
  * procedures - i.e., shop commands, mail commands, etc. */
 ACMD(do_not_here)

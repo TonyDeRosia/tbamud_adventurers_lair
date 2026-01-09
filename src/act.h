@@ -254,6 +254,7 @@ ACMD(do_buypractice);
 ACMD(do_buytrain);
 ACMD(do_train);
 ACMD(do_pet_release);
+ACMD(do_recall);
 ACMD(do_report);
 ACMD(do_save);
 ACMD(do_sneak);

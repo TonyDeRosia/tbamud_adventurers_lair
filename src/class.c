@@ -1859,6 +1859,8 @@ void init_spell_levels(void)
 
   for (i = 0; i < num_pc_classes(); i++)
     spell_level(SKILL_KICK, i, 5);
+  for (i = 0; i < num_pc_classes(); i++)
+    spell_level(SKILL_RECALL, i, 1);
 
   /* MAGES */
   spell_level(SPELL_MAGIC_MISSILE, CLASS_MAGIC_USER, 1);

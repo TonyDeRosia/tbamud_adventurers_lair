@@ -1453,5 +1453,5 @@ void mag_assign_spells(void) {
   skillo_cost(SKILL_BANDAGE, "bandage", 8);
 
   skillo_cost(SKILL_DUAL_WIELD, "dual wield", 0);
+  skillo_cost(SKILL_RECALL, "recall", 0);
 }
-
