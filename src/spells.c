@@ -487,6 +487,62 @@ ASPELL(spell_enfeeblement)
   NEW_EVENT(eSPL_ENFEEBLEMENT, victim, NULL, dur_sec * PASSES_PER_SEC);
 }
 
+ASPELL(spell_memento_mori)
+{
+  struct affected_type af;
+  int power;
+  int hr_pen;
+  int sv_pen;
+  int dur_ticks;
+  int saved;
+
+  if (victim == NULL || ch == NULL)
+    return;
+
+  act("You trace a \tDgrave sigil\tn over $N and whisper, '\tDMemento Mori\tn'.\tn",
+      FALSE, ch, 0, victim, TO_CHAR);
+  act("$n traces a \tDgrave sigil\tn over you and whispers, '\tDMemento Mori\tn'.\tn",
+      FALSE, ch, 0, victim, TO_VICT);
+  act("$n traces a \tDgrave sigil\tn over $N and whispers, '\tDMemento Mori\tn'.\tn",
+      TRUE, ch, 0, victim, TO_ROOM);
+
+  power = warlock_power(ch);
+  hr_pen = clampi(1 + MAX(0, power - 20) / 12, 1, 4);
+  sv_pen = clampi(1 + MAX(0, power - 20) / 10, 1, 6);
+  dur_ticks = clampi(2 + MAX(0, power - 20) / 16, 2, 5);
+
+  saved = mag_savingthrow(victim, SAVING_SPELL, 0);
+  if (saved) {
+    hr_pen = MAX(1, hr_pen / 2);
+    sv_pen = MAX(1, sv_pen / 2);
+    dur_ticks = MAX(1, dur_ticks / 2);
+    act("$N resists most of your \tDomen\tn, but the mark still bites.\tn",
+        FALSE, ch, 0, victim, TO_CHAR);
+    act("You resist most of the \tDomen\tn, but the mark still bites.\tn",
+        FALSE, ch, 0, victim, TO_VICT);
+    act("$N resists most of the \tDomen\tn, but the mark still bites.\tn",
+        TRUE, ch, 0, victim, TO_ROOM);
+  }
+
+  new_affect(&af);
+  af.spell = SPELL_MEMENTO_MORI;
+  af.duration = dur_ticks;
+  af.modifier = -hr_pen;
+  af.location = APPLY_HITROLL;
+#ifdef AFF_CURSE
+  SET_BIT_AR(af.bitvector, AFF_CURSE);
+#endif
+  affect_join(victim, &af, FALSE, FALSE, FALSE, FALSE);
+
+  af.modifier = sv_pen;
+  af.location = APPLY_SAVING_SPELL;
+  affect_join(victim, &af, FALSE, FALSE, FALSE, FALSE);
+
+  act("A \tDcold omen\tn settles on $N.\tn", FALSE, ch, 0, victim, TO_CHAR);
+  act("A \tDcold omen\tn settles on you.\tn", FALSE, ch, 0, victim, TO_VICT);
+  act("A \tDcold omen\tn settles on $N.\tn", TRUE, ch, 0, victim, TO_ROOM);
+}
+
 ASPELL(spell_devour_soul)
 {
   struct affected_type af;

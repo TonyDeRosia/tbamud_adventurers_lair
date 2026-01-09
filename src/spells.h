@@ -109,8 +109,9 @@
 #define SPELL_PLAGUE_BOLT            68
 #define SPELL_ENFEEBLEMENT           69
 #define SPELL_DEVOUR_SOUL            70
+#define SPELL_MEMENTO_MORI           71
 /** Total Number of defined spells */
-#define NUM_SPELLS                   70
+#define NUM_SPELLS                   71
 
 /* Insert new spells here, up to MAX_SPELLS */
 #define MAX_SPELLS		    130
@@ -250,6 +251,7 @@ ASPELL(spell_corruption);
 ASPELL(spell_plague_bolt);
 ASPELL(spell_enfeeblement);
 ASPELL(spell_devour_soul);
+ASPELL(spell_memento_mori);
 
 /* basic magic calling functions */
 

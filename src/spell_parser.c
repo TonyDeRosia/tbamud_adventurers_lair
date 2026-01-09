@@ -877,6 +877,10 @@ int call_magic(struct char_data *caster, struct char_data *cvict,
       MANUAL_SPELL(spell_devour_soul)
       ;
       break;
+    case SPELL_MEMENTO_MORI:
+      MANUAL_SPELL(spell_memento_mori)
+      ;
+      break;
     }
 
   return (1);
@@ -1659,6 +1663,10 @@ void mag_assign_spells(void) {
   spello(SPELL_ENFEEBLEMENT, "enfeeblement", 45, 20, 2, POS_FIGHTING,
   TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_NOT_SELF, TRUE, MAG_MANUAL,
   "Your strength and agility return.\tn");
+
+  spello(SPELL_MEMENTO_MORI, "memento mori", 10, 5, 2, POS_STANDING,
+  TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_NOT_SELF, TRUE, MAG_MANUAL,
+  "The \tDdeath omen\tn lifts.\tn");
 
   spello(SPELL_DEVOUR_SOUL, "devour soul", 120, 90, 3, POS_FIGHTING,
   TAR_CHAR_ROOM | TAR_FIGHT_VICT, TRUE, MAG_MANUAL,
