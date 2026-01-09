@@ -612,148 +612,151 @@ static bool compass_exit_visible(struct char_data *ch, int dir)
   return TRUE;
 }
 
-static const char *get_adj_room_name(struct char_data *ch, int dir)
-{
-  struct room_direction_data *ex = EXIT(ch, dir);
-
-  if (!compass_exit_visible(ch, dir))
-    return NULL;
-
-  if (!ex || ex->to_room == NOWHERE)
-    return NULL;
-
-  return world[ex->to_room].name;
-}
-
-static void center_cell(char *dst, size_t dstsz, const char *txt, int width)
-{
-  size_t len;
-  int left_pad;
-  int i;
-
-  if (!dst || dstsz == 0 || width <= 0)
-    return;
-
-  if (!txt)
-    txt = "";
-
-  len = strlen(txt);
-  if ((int)len > width)
-    len = (size_t)width;
-
-  left_pad = (width - (int)len) / 2;
-  for (i = 0; i < width && (size_t)i + 1 < dstsz; i++)
-    dst[i] = ' ';
-
-  for (i = 0; i < (int)len && (size_t)(left_pad + i) + 1 < dstsz; i++)
-    dst[left_pad + i] = txt[i];
-
-  if ((size_t)width < dstsz)
-    dst[width] = '\0';
-  else
-    dst[dstsz - 1] = '\0';
-
-}
-
-static void append_to_buffer(char *out, size_t outsz, size_t *pos, const char *fmt, ...)
-{
-  va_list args;
-  int written;
-  size_t remaining;
-
-  if (!out || outsz == 0 || !pos || *pos >= outsz)
-    return;
-
-  remaining = outsz - *pos;
-  va_start(args, fmt);
-  written = vsnprintf(out + *pos, remaining, fmt, args);
-  va_end(args);
-
-  if (written < 0)
-    return;
-
-  if ((size_t)written >= remaining)
-    *pos = outsz - 1;
-  else
-    *pos += (size_t)written;
-}
-
 static void build_room_compass_map(struct char_data *ch, struct room_data *room,
                                    char *out, size_t outsz)
 {
-  bool north = FALSE;
-  bool east = FALSE;
-  bool south = FALSE;
-  bool west = FALSE;
+  bool has_n = FALSE;
+  bool has_e = FALSE;
+  bool has_s = FALSE;
+  bool has_w = FALSE;
+  room_rnum to_n = NOWHERE;
+  room_rnum to_e = NOWHERE;
+  room_rnum to_s = NOWHERE;
+  room_rnum to_w = NOWHERE;
   const char *box = CCFWHT(ch, C_NRM);
   const char *dir_active = CCFCYN(ch, C_NRM);
-  const char *dir_inactive = CCWHT(ch, C_NRM);
   const char *x_color = CCFYEL(ch, C_NRM);
   const char *reset = CCNRM(ch, C_NRM);
-  const char *north_color;
-  const char *south_color;
-  const char *west_color;
-  const char *east_color;
-  const char *north_label;
-  const char *west_label;
-  const char *east_label;
-  const char *south_label;
-  size_t used = 0;
-  char cell_blank[19];
-  char cell_north[19];
-  char cell_south[19];
-  char cell_west[19];
-  char cell_east[19];
-  char cell_center[19];
+  const char *blank = "     ";
+  const char *gap = " ";
+  char north_top[32];
+  char north_mid[64];
+  char north_bot[32];
+  char south_top[32];
+  char south_mid[64];
+  char south_bot[32];
+  char west_top[32];
+  char west_mid[64];
+  char west_bot[32];
+  char east_top[32];
+  char east_mid[64];
+  char east_bot[32];
+  char center_top[32];
+  char center_mid[64];
+  char center_bot[32];
+  char connector_n[32];
+  char connector_s[32];
+  char connector_w[16];
+  char connector_e[16];
 
   (void)room;
 
   if (!out || outsz == 0)
     return;
 
-  north = compass_exit_visible(ch, NORTH);
-  east  = compass_exit_visible(ch, EAST);
-  south = compass_exit_visible(ch, SOUTH);
-  west  = compass_exit_visible(ch, WEST);
+  has_n = compass_exit_visible(ch, NORTH);
+  has_e = compass_exit_visible(ch, EAST);
+  has_s = compass_exit_visible(ch, SOUTH);
+  has_w = compass_exit_visible(ch, WEST);
 
-  north_color = north ? dir_active : dir_inactive;
-  west_color  = west  ? dir_active : dir_inactive;
-  east_color  = east  ? dir_active : dir_inactive;
-  south_color = south ? dir_active : dir_inactive;
+  to_n = (has_n && EXIT(ch, NORTH)) ? EXIT(ch, NORTH)->to_room : NOWHERE;
+  to_e = (has_e && EXIT(ch, EAST)) ? EXIT(ch, EAST)->to_room : NOWHERE;
+  to_s = (has_s && EXIT(ch, SOUTH)) ? EXIT(ch, SOUTH)->to_room : NOWHERE;
+  to_w = (has_w && EXIT(ch, WEST)) ? EXIT(ch, WEST)->to_room : NOWHERE;
 
-  /* Keep labels single width so alignment never drifts. */
-  north_label = north ? "N" : " ";
-  west_label  = west  ? "W" : " ";
-  east_label  = east  ? "E" : " ";
-  south_label = south ? "S" : " ";
+  if (has_n) {
+    snprintf(north_top, sizeof(north_top), "%s+---+%s", box, reset);
+    snprintf(north_mid, sizeof(north_mid), "%s|%s %sN%s %s|%s", box, reset, dir_active, reset, box, reset);
+    snprintf(north_bot, sizeof(north_bot), "%s+---+%s", box, reset);
+  } else {
+    snprintf(north_top, sizeof(north_top), "%s", blank);
+    snprintf(north_mid, sizeof(north_mid), "%s", blank);
+    snprintf(north_bot, sizeof(north_bot), "%s", blank);
+  }
 
-  /* 21 %s placeholders, 21 args: no format warnings. Adds one blank line after map. */
+  if (has_s) {
+    snprintf(south_top, sizeof(south_top), "%s+---+%s", box, reset);
+    snprintf(south_mid, sizeof(south_mid), "%s|%s %sS%s %s|%s", box, reset, dir_active, reset, box, reset);
+    snprintf(south_bot, sizeof(south_bot), "%s+---+%s", box, reset);
+  } else {
+    snprintf(south_top, sizeof(south_top), "%s", blank);
+    snprintf(south_mid, sizeof(south_mid), "%s", blank);
+    snprintf(south_bot, sizeof(south_bot), "%s", blank);
+  }
+
+  if (has_w) {
+    snprintf(west_top, sizeof(west_top), "%s+---+%s", box, reset);
+    snprintf(west_mid, sizeof(west_mid), "%s|%s %sW%s %s|%s", box, reset, dir_active, reset, box, reset);
+    snprintf(west_bot, sizeof(west_bot), "%s+---+%s", box, reset);
+  } else {
+    snprintf(west_top, sizeof(west_top), "%s", blank);
+    snprintf(west_mid, sizeof(west_mid), "%s", blank);
+    snprintf(west_bot, sizeof(west_bot), "%s", blank);
+  }
+
+  if (has_e) {
+    snprintf(east_top, sizeof(east_top), "%s+---+%s", box, reset);
+    snprintf(east_mid, sizeof(east_mid), "%s|%s %sE%s %s|%s", box, reset, dir_active, reset, box, reset);
+    snprintf(east_bot, sizeof(east_bot), "%s+---+%s", box, reset);
+  } else {
+    snprintf(east_top, sizeof(east_top), "%s", blank);
+    snprintf(east_mid, sizeof(east_mid), "%s", blank);
+    snprintf(east_bot, sizeof(east_bot), "%s", blank);
+  }
+
+  snprintf(center_top, sizeof(center_top), "%s+---+%s", box, reset);
+  snprintf(center_mid, sizeof(center_mid), "%s|%s %sX%s %s|%s", box, reset, x_color, reset, box, reset);
+  snprintf(center_bot, sizeof(center_bot), "%s+---+%s", box, reset);
+
+  if (has_n)
+    snprintf(connector_n, sizeof(connector_n), "%s  |  %s", box, reset);
+  else
+    snprintf(connector_n, sizeof(connector_n), "%s", blank);
+
+  if (has_s)
+    snprintf(connector_s, sizeof(connector_s), "%s  |  %s", box, reset);
+  else
+    snprintf(connector_s, sizeof(connector_s), "%s", blank);
+
+  if (has_w)
+    snprintf(connector_w, sizeof(connector_w), "%s-%s", box, reset);
+  else
+    snprintf(connector_w, sizeof(connector_w), " ");
+
+  if (has_e)
+    snprintf(connector_e, sizeof(connector_e), "%s-%s", box, reset);
+  else
+    snprintf(connector_e, sizeof(connector_e), " ");
+
   snprintf(out, outsz,
-           "            %s%s%s\r\n"
-           "          %s+---+%s\r\n"
-           "        %s%s%s %s| %sX%s |%s %s%s%s\r\n"
-           "          %s+---+%s\r\n"
-           "            %s%s%s\r\n"
+           "%s %s %s\r\n"
+           "%s %s %s\r\n"
+           "%s %s %s\r\n"
+           "%s %s %s\r\n"
+           "%s%s%s%s%s\r\n"
+           "%s%s%s%s%s\r\n"
+           "%s%s%s%s%s\r\n"
+           "%s %s %s\r\n"
+           "%s %s %s\r\n"
+           "%s %s %s\r\n"
+           "%s %s %s\r\n"
            "\r\n",
-           north_color, north_label, reset,
-           box, reset,
-           west_color, west_label, reset,
-           box, x_color, reset, box,
-           east_color, east_label, reset,
-           box, reset,
-           south_color, south_label, reset);
+           blank, north_top, blank,
+           blank, north_mid, blank,
+           blank, north_bot, blank,
+           blank, connector_n, blank,
+           west_top, gap, center_top, gap, east_top,
+           west_mid, connector_w, center_mid, connector_e, east_mid,
+           west_bot, gap, center_bot, gap, east_bot,
+           blank, connector_s, blank,
+           blank, south_top, blank,
+           blank, south_mid, blank,
+           blank, south_bot, blank);
 
-  used = strnlen(out, outsz);
-  center_cell(cell_blank, sizeof(cell_blank), NULL, 18);
-  center_cell(cell_north, sizeof(cell_north), get_adj_room_name(ch, NORTH), 18);
-  center_cell(cell_south, sizeof(cell_south), get_adj_room_name(ch, SOUTH), 18);
-  center_cell(cell_west, sizeof(cell_west), get_adj_room_name(ch, WEST), 18);
-  center_cell(cell_east, sizeof(cell_east), get_adj_room_name(ch, EAST), 18);
-  center_cell(cell_center, sizeof(cell_center), room ? room->name : "", 18);
-
-  append_to_buffer(out, outsz, &used, "%s %s %s\r\n", cell_blank, cell_north, cell_blank);
-  append_to_buffer(out, outsz, &used, "%s %s %s\r\n", cell_west, cell_center, cell_east);
-  append_to_buffer(out, outsz, &used, "%s %s %s\r\n", cell_blank, cell_south, cell_blank);
+  (void)to_n;
+  (void)to_e;
+  (void)to_s;
+  (void)to_w;
 }
 
 
