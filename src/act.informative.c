@@ -594,6 +594,20 @@ ACMD(do_exits)
     send_to_char(ch, " None.\r\n");
 }
 
+static bool compass_exit_visible(struct char_data *ch, int dir)
+{
+  struct room_direction_data *exit = EXIT(ch, dir);
+
+  if (!exit || exit->to_room == NOWHERE)
+    return FALSE;
+  if (EXIT_FLAGGED(exit, EX_CLOSED) && !CONFIG_DISP_CLOSED_DOORS)
+    return FALSE;
+  if (EXIT_FLAGGED(exit, EX_HIDDEN) && !PRF_FLAGGED(ch, PRF_HOLYLIGHT))
+    return FALSE;
+
+  return TRUE;
+}
+
 static void build_room_compass_map(struct char_data *ch, struct room_data *room,
                                    char *out, size_t outsz)
 {
@@ -618,19 +632,10 @@ static void build_room_compass_map(struct char_data *ch, struct room_data *room,
     return;
 
   if (room) {
-    if (room->dir_option[NORTH] &&
-        room->dir_option[NORTH]->to_room != NOWHERE)
-      north = TRUE;
-    if (room->dir_option[EAST] &&
-        room->dir_option[EAST]->to_room != NOWHERE)
-      east = TRUE;
-    if (room->dir_option[SOUTH] &&
-        room->dir_option[SOUTH]->to_room != NOWHERE)
-      south = TRUE;
-    if (room->dir_option[WEST] &&
-        room->dir_option[WEST]->to_room != NOWHERE)
-      west = TRUE;
-    /* TODO: consider door states (closed/locked) when determining active exits. */
+    north = compass_exit_visible(ch, NORTH);
+    east = compass_exit_visible(ch, EAST);
+    south = compass_exit_visible(ch, SOUTH);
+    west = compass_exit_visible(ch, WEST);
   }
 
   north_color = north ? dir_active : dir_inactive;
