@@ -618,17 +618,17 @@ static void build_room_compass_map(struct char_data *ch, struct room_data *room,
     return;
 
   if (room) {
-    if (room->dir_option[DIR_NORTH] &&
-        room->dir_option[DIR_NORTH]->to_room != NOWHERE)
+    if (room->dir_option[NORTH] &&
+        room->dir_option[NORTH]->to_room != NOWHERE)
       north = TRUE;
-    if (room->dir_option[DIR_EAST] &&
-        room->dir_option[DIR_EAST]->to_room != NOWHERE)
+    if (room->dir_option[EAST] &&
+        room->dir_option[EAST]->to_room != NOWHERE)
       east = TRUE;
-    if (room->dir_option[DIR_SOUTH] &&
-        room->dir_option[DIR_SOUTH]->to_room != NOWHERE)
+    if (room->dir_option[SOUTH] &&
+        room->dir_option[SOUTH]->to_room != NOWHERE)
       south = TRUE;
-    if (room->dir_option[DIR_WEST] &&
-        room->dir_option[DIR_WEST]->to_room != NOWHERE)
+    if (room->dir_option[WEST] &&
+        room->dir_option[WEST]->to_room != NOWHERE)
       west = TRUE;
     /* TODO: consider door states (closed/locked) when determining active exits. */
   }
