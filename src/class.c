@@ -1738,6 +1738,7 @@ void do_start(struct char_data *ch)
 static void grant_new_abilities_one_percent(struct char_data *ch)
 {
   int i, cls, lvl;
+  const int start_prof = 1;
 
   if (!ch || IS_NPC(ch))
     return;
@@ -1746,8 +1747,8 @@ static void grant_new_abilities_one_percent(struct char_data *ch)
   lvl = GET_LEVEL(ch);
 
   for (i = 1; i <= MAX_SKILLS; i++) {
-    if (spell_info[i].min_level[cls] == lvl && GET_SKILL(ch, i) == 0)
-      SET_SKILL(ch, i, 1);
+    if (spell_info[i].min_level[cls] == lvl && GET_SKILL(ch, i) <= 0)
+      SET_SKILL(ch, i, start_prof);
   }
 }
 
