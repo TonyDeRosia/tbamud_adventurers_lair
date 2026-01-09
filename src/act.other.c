@@ -151,7 +151,11 @@ static void show_ability_table_aligned(struct char_data *ch, int show_spells, in
         send_to_char(ch, "\r\n");
         col = 0;
       }
-      send_to_char(ch, "Level %3d: ", rows[i].lvl);
+      send_to_char(ch, "%sLevel %3d%s:%s ",
+                   CCCYN(ch, C_NRM),
+                   rows[i].lvl,
+                   CCWHT(ch, C_NRM),
+                   CCNRM(ch, C_NRM));
       last_lvl = rows[i].lvl;
     } else if (col == 0) {
       send_to_char(ch, "%s", cont);
@@ -159,12 +163,19 @@ static void show_ability_table_aligned(struct char_data *ch, int show_spells, in
 
     if (rows[i].pct < 0)
 
-      snprintf(cell, sizeof(cell), "%-24s [ -- ]", rows[i].name);
+      snprintf(cell, sizeof(cell), "%s%-24s%s [ -- ]",
+               CCCYN(ch, C_NRM),
+               rows[i].name,
+               CCNRM(ch, C_NRM));
 
     else
 
-      snprintf(cell, sizeof(cell), "%-24s [%3d%%]", rows[i].name, rows[i].pct);
-    send_to_char(ch, "%-*s", ABIL_COL_WIDTH, cell);
+      snprintf(cell, sizeof(cell), "%s%-24s%s [%3d%%]",
+               CCCYN(ch, C_NRM),
+               rows[i].name,
+               CCNRM(ch, C_NRM),
+               rows[i].pct);
+    send_to_char(ch, "%-*s", ABIL_COL_WIDTH + count_color_chars(cell), cell);
 
     col++;
     if (col >= 2) {
