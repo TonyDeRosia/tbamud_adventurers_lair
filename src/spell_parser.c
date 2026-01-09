@@ -35,6 +35,7 @@ static void spello(int spl, const char *name, int max_mana, int min_mana,
     int mana_change, int minpos, int targets, int violent, int routines,
     const char *wearoff);
 static int mag_manacost(struct char_data *ch, int spellnum);
+static bool is_buff_spell(int spellnum);
 
 struct cast_message {
   const char *to_caster;
@@ -453,6 +454,62 @@ static bool is_available_spell(int spellnum) {
       && str_cmp(spell_info[spellnum].name, unused_spellname) != 0);
 }
 
+static bool is_available_ability(int ability) {
+  return (ability > 0 && ability <= TOP_SPELL_DEFINE && spell_info[ability].name
+      && str_cmp(spell_info[ability].name, unused_spellname) != 0);
+}
+
+static bool is_buff_spell(int spellnum)
+{
+  if (!is_available_spell(spellnum))
+    return FALSE;
+  if (SINFO.violent)
+    return FALSE;
+  if (!IS_SET(SINFO.routines, MAG_AFFECTS))
+    return FALSE;
+  if (!IS_SET(SINFO.targets, TAR_CHAR_ROOM | TAR_CHAR_WORLD | TAR_SELF_ONLY))
+    return FALSE;
+  if (IS_SET(SINFO.targets, TAR_IGNORE))
+    return FALSE;
+
+  return TRUE;
+}
+
+static void normalize_ability_input(const char *input, char *output,
+    size_t output_len) {
+  const char *start = input;
+  char quote;
+  size_t len;
+
+  if (!input || output_len == 0) {
+    if (output_len > 0)
+      *output = '\0';
+    return;
+  }
+
+  while (*start && isspace((unsigned char)*start))
+    start++;
+
+  quote = *start;
+  if (quote == '\'' || quote == '"') {
+    const char *end = strchr(start + 1, quote);
+    start++;
+    len = end ? (size_t)(end - start) : strlen(start);
+    if (len >= output_len)
+      len = output_len - 1;
+    memcpy(output, start, len);
+    output[len] = '\0';
+  } else {
+    strlcpy(output, start, output_len);
+  }
+
+  len = strlen(output);
+  while (len > 0 && isspace((unsigned char)output[len - 1])) {
+    output[len - 1] = '\0';
+    len--;
+  }
+}
+
 static void append_match(char *buffer, size_t buf_size, const char *name,
     int *count) {
   size_t offset = strlen(buffer);
@@ -467,27 +524,96 @@ static void append_match(char *buffer, size_t buf_size, const char *name,
   (*count)++;
 }
 
-static int find_spell_by_prefix(const char *name, char *ambig_buf,
-    size_t ambig_len) {
-  int prefix_spell = -1, prefix_count = 0, spellnum;
+static bool ability_matches_input(const char *input, const char *ability_name,
+    bool allow_partial_name, bool allow_extra_input, int *name_tokens) {
+  char input_buf[MAX_INPUT_LENGTH];
+  char name_buf[MAX_INPUT_LENGTH];
+  char input_token[MAX_INPUT_LENGTH];
+  char name_token[MAX_INPUT_LENGTH];
+  char *input_ptr = input_buf;
+  char *name_ptr = name_buf;
+  int tokens = 0;
+
+  if (name_tokens)
+    *name_tokens = 0;
+
+  if (!input || !*input || !ability_name || !*ability_name)
+    return FALSE;
+
+  strlcpy(input_buf, input, sizeof(input_buf));
+  strlcpy(name_buf, ability_name, sizeof(name_buf));
+
+  input_ptr = any_one_arg(input_ptr, input_token);
+  name_ptr = any_one_arg(name_ptr, name_token);
+
+  while (*input_token && *name_token) {
+    if (!is_abbrev(input_token, name_token))
+      return FALSE;
+    tokens++;
+    input_ptr = any_one_arg(input_ptr, input_token);
+    name_ptr = any_one_arg(name_ptr, name_token);
+  }
+
+  if (!*input_token && *name_token) {
+    if (!allow_partial_name)
+      return FALSE;
+    while (*name_token) {
+      tokens++;
+      name_ptr = any_one_arg(name_ptr, name_token);
+    }
+  } else if (*input_token && !*name_token) {
+    if (!allow_extra_input)
+      return FALSE;
+  }
+
+  if (name_tokens)
+    *name_tokens = tokens;
+
+  return TRUE;
+}
+
+static int find_spell_by_tokens(const char *name, char *ambig_buf,
+    size_t ambig_len, int *matched_tokens, bool allow_partial_name,
+    bool allow_extra_input) {
+  int best_spell = -1;
+  int best_tokens = 0;
+  int match_count = 0;
+  int spellnum;
+
+  if (matched_tokens)
+    *matched_tokens = 0;
 
   *ambig_buf = '\0';
 
   for (spellnum = 1; spellnum <= MAX_SPELLS; spellnum++) {
+    int token_count = 0;
+
     if (!is_available_spell(spellnum))
       continue;
-    if (!strcasecmp(name, spell_info[spellnum].name))
-      return spellnum;
-    if (is_abbrev(name, spell_info[spellnum].name)) {
-      prefix_spell = spellnum;
+
+    if (!ability_matches_input(name, spell_info[spellnum].name,
+        allow_partial_name, allow_extra_input, &token_count))
+      continue;
+
+    if (token_count > best_tokens) {
+      best_tokens = token_count;
+      best_spell = spellnum;
+      match_count = 0;
+      *ambig_buf = '\0';
       append_match(ambig_buf, ambig_len, spell_info[spellnum].name,
-          &prefix_count);
+          &match_count);
+    } else if (token_count == best_tokens) {
+      append_match(ambig_buf, ambig_len, spell_info[spellnum].name,
+          &match_count);
     }
   }
 
-  if (prefix_count == 1)
-    return prefix_spell;
-  else if (prefix_count > 1)
+  if (matched_tokens)
+    *matched_tokens = best_tokens;
+
+  if (match_count == 1)
+    return best_spell;
+  if (match_count > 1)
     return -2;
 
   return -1;
@@ -533,31 +659,85 @@ static struct char_data *find_char_prefix(struct char_data *ch,
   return NULL;
 }
 
-int find_skill_num(char *name) {
-  int skindex, ok;
-  char *temp, *temp2;
-  char first[256], first2[256], tempbuf[256];
+static int find_ability_by_tokens(const char *name, char *ambig_buf,
+    size_t ambig_len, int *matched_tokens, bool allow_partial_name,
+    bool allow_extra_input) {
+  int best_ability = -1;
+  int best_tokens = 0;
+  int match_count = 0;
+  int ability;
 
-  for (skindex = 1; skindex <= TOP_SPELL_DEFINE; skindex++) {
-    if (is_abbrev(name, spell_info[skindex].name))
-      return (skindex);
+  if (matched_tokens)
+    *matched_tokens = 0;
 
-    ok = TRUE;
-    strlcpy(tempbuf, spell_info[skindex].name, sizeof(tempbuf)); /* strlcpy: OK */
-    temp = any_one_arg(tempbuf, first);
-    temp2 = any_one_arg(name, first2);
-    while (*first && *first2 && ok) {
-      if (!is_abbrev(first2, first))
-        ok = FALSE;
-      temp = any_one_arg(temp, first);
-      temp2 = any_one_arg(temp2, first2);
+  *ambig_buf = '\0';
+
+  for (ability = 1; ability <= TOP_SPELL_DEFINE; ability++) {
+    int token_count = 0;
+
+    if (!is_available_ability(ability))
+      continue;
+
+    if (!ability_matches_input(name, spell_info[ability].name,
+        allow_partial_name, allow_extra_input, &token_count))
+      continue;
+
+    if (token_count > best_tokens) {
+      best_tokens = token_count;
+      best_ability = ability;
+      match_count = 0;
+      *ambig_buf = '\0';
+      append_match(ambig_buf, ambig_len, spell_info[ability].name,
+          &match_count);
+    } else if (token_count == best_tokens) {
+      append_match(ambig_buf, ambig_len, spell_info[ability].name,
+          &match_count);
     }
+  }
 
-    if (ok && !*first2)
-      return (skindex);
+  if (matched_tokens)
+    *matched_tokens = best_tokens;
+
+  if (match_count == 1)
+    return best_ability;
+  if (match_count > 1)
+    return -2;
+
+  return -1;
+}
+
+int find_skill_num(char *name) {
+  char cleaned[MAX_INPUT_LENGTH];
+  int skill_num;
+
+  normalize_ability_input(name, cleaned, sizeof(cleaned));
+  if (!*cleaned)
+    return (-1);
+
+  for (skill_num = 1; skill_num <= TOP_SPELL_DEFINE; skill_num++) {
+    if (!is_available_ability(skill_num))
+      continue;
+    if (ability_matches_input(cleaned, spell_info[skill_num].name,
+        TRUE, FALSE, NULL))
+      return skill_num;
   }
 
   return (-1);
+}
+
+int find_skill_num_with_ambig(const char *name, char *ambig_buf,
+    size_t ambig_len) {
+  char cleaned[MAX_INPUT_LENGTH];
+
+  normalize_ability_input(name, cleaned, sizeof(cleaned));
+  if (!*cleaned) {
+    if (ambig_buf)
+      *ambig_buf = '\0';
+    return (-1);
+  }
+
+  return find_ability_by_tokens(cleaned, ambig_buf, ambig_len, NULL,
+      TRUE, FALSE);
 }
 
 /* This function is the very heart of the entire magic system.  All invocations
@@ -912,6 +1092,77 @@ int cast_spell(struct char_data *ch, struct char_data *tch,
   return (call_magic(ch, tch, tobj, spellnum, GET_LEVEL(ch), CAST_SPELL));
 }
 
+ACMD(do_spellup)
+{
+  struct char_data *tch = NULL;
+  char arg[MAX_INPUT_LENGTH];
+  int spellnum;
+  int mana;
+  bool any_eligible = FALSE;
+  bool any_attempted = FALSE;
+
+  if (IS_NPC(ch))
+    return;
+
+  one_argument(argument, arg);
+
+  if (*arg) {
+    int number = get_number(&arg);
+    if ((tch = get_char_vis(ch, arg, &number, FIND_CHAR_ROOM)) == NULL) {
+      send_to_char(ch, "You don't see that person here.\r\n");
+      return;
+    }
+  } else {
+    tch = ch;
+  }
+
+  for (spellnum = 1; spellnum <= MAX_SPELLS; spellnum++) {
+    if (!is_buff_spell(spellnum))
+      continue;
+    if (GET_LEVEL(ch) < SINFO.min_level[(int) GET_CLASS(ch)])
+      continue;
+    if (GET_SKILL(ch, spellnum) == 0)
+      continue;
+    if (tch != ch && IS_SET(SINFO.targets, TAR_SELF_ONLY))
+      continue;
+    if (tch == ch && IS_SET(SINFO.targets, TAR_NOT_SELF))
+      continue;
+
+    any_eligible = TRUE;
+    mana = mag_manacost(ch, spellnum);
+    if ((mana > 0) && (GET_MANA(ch) < mana) && (GET_LEVEL(ch) < LVL_IMMORT))
+      continue;
+
+    any_attempted = TRUE;
+    if (rand_number(0, 101) > GET_SKILL(ch, spellnum)) {
+      WAIT_STATE(ch, PULSE_VIOLENCE);
+      if (!tch || !skill_message(0, ch, tch, spellnum))
+        send_to_char(ch, "You lost your concentration!\r\n");
+      if (mana > 0)
+        GET_MANA(ch) = MAX(0, MIN(effective_max_mana(ch), GET_MANA(ch) - (mana / 2)));
+      if (SINFO.violent && tch && IS_NPC(tch))
+        hit(tch, ch, TYPE_UNDEFINED);
+      improve_ability_from_use(ch, spellnum, 0);
+    } else {
+      if (cast_spell(ch, tch, NULL, spellnum)) {
+        improve_ability_from_use(ch, spellnum, 1);
+        WAIT_STATE(ch, PULSE_VIOLENCE);
+        if (mana > 0)
+          GET_MANA(ch) = MAX(0, MIN(effective_max_mana(ch), GET_MANA(ch) - mana));
+      }
+    }
+  }
+
+  if (!any_eligible) {
+    if (tch == ch)
+      send_to_char(ch, "You don't know any buff spells to cast.\r\n");
+    else
+      send_to_char(ch, "You don't know any buff spells to cast on them.\r\n");
+  } else if (!any_attempted) {
+    send_to_char(ch, "You don't have the energy to cast any buffs right now.\r\n");
+  }
+}
+
 /* do_cast is the entry point for PC-casted spells.  It parses the arguments,
  * determines the spell number and finds a target, throws the die to see if
  * the spell can be cast, checks for sufficient mana and subtracts it, and
@@ -919,17 +1170,17 @@ int cast_spell(struct char_data *ch, struct char_data *tch,
 ACMD(do_cast) {
   struct char_data *tch = NULL;
   struct obj_data *tobj = NULL;
-  char *spell_argument, *target_argument;
+  const char *target_argument;
   char spell_input[MAX_INPUT_LENGTH], target_input[MAX_INPUT_LENGTH];
   char target_name[MAX_INPUT_LENGTH];
   char ambiguity[MAX_STRING_LENGTH];
   int number, mana, spellnum, i, target = 0;
+  int matched_tokens = 0;
 
   if (IS_NPC(ch))
     return;
 
   /* get: blank, spell name, target name */
-  spell_argument = NULL;
   target_argument = NULL;
   skip_spaces(&argument);
 
@@ -938,38 +1189,36 @@ ACMD(do_cast) {
     return;
   }
 
-  /*
-   * Support quoted multi word spell names:
-   *   cast 'remove poison' self
-   *   cast 'color spray' <target>
-   */
-  if (*argument == '\'') {
-    spell_argument = strtok(argument + 1, "'");
-    target_argument = strtok(NULL, "");
-  } else if (strchr(argument, '\'')) {
-    /* Quote appears later, keep compatibility */
-    (void)strtok(argument, "'");
-    spell_argument = strtok(NULL, "'");
-    target_argument = strtok(NULL, "");
+  if (*argument == '\'' || *argument == '"') {
+    char quote = *argument++;
+    const char *closing = strchr(argument, quote);
+    size_t len = closing ? (size_t)(closing - argument) : strlen(argument);
+
+    if (len >= sizeof(spell_input))
+      len = sizeof(spell_input) - 1;
+    memcpy(spell_input, argument, len);
+    spell_input[len] = '\0';
+
+    target_argument = closing ? closing + 1 : NULL;
+    if (target_argument) {
+      char *target_ptr = (char *)target_argument;
+      skip_spaces(&target_ptr);
+      target_argument = target_ptr;
+    }
+
+    spellnum = find_spell_by_tokens(spell_input, ambiguity, sizeof(ambiguity),
+        &matched_tokens, FALSE, FALSE);
   } else {
-    target_argument = any_one_arg(argument, spell_input);
-    spell_argument = spell_input;
+    spellnum = find_spell_by_tokens(argument, ambiguity, sizeof(ambiguity),
+        &matched_tokens, TRUE, TRUE);
+    if (spellnum > 0) {
+      char *target_ptr = argument;
+      for (i = 0; i < matched_tokens && *target_ptr; i++)
+        target_ptr = any_one_arg(target_ptr, spell_input);
+      skip_spaces(&target_ptr);
+      target_argument = target_ptr;
+    }
   }
-
-  if (spell_argument == NULL) {
-    send_to_char(ch, "Cast what where?\r\n");
-    return;
-  }
-
-  skip_spaces(&spell_argument);
-  if (target_argument)
-    skip_spaces(&target_argument);
-
-  strlcpy(spell_input, spell_argument, sizeof(spell_input));
-  strlcpy(target_input, target_argument ? target_argument : "",
-      sizeof(target_input));
-
-  spellnum = find_spell_by_prefix(spell_input, ambiguity, sizeof(ambiguity));
 
   if (spellnum == -2) {
     send_to_char(ch, "Ambiguous spell name. Did you mean: %s?\r\n",
@@ -977,7 +1226,7 @@ ACMD(do_cast) {
     return;
   }
 
-  if ((spellnum < 1) || (spellnum > MAX_SPELLS) || !*spell_input) {
+  if ((spellnum < 1) || (spellnum > MAX_SPELLS)) {
     send_to_char(ch, "Cast what?!?\r\n");
     return;
   }
@@ -991,6 +1240,7 @@ ACMD(do_cast) {
   }
   /* Find the target */
   if (target_argument != NULL) {
+    strlcpy(target_input, target_argument, sizeof(target_input));
     strlcpy(target_name, target_input, sizeof(target_name));
     one_argument(target_name, target_name);
     target_argument = target_name;

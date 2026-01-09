@@ -600,7 +600,7 @@ static int find_door(struct char_data *ch, const char *type, char *dir, const ch
       }
     }
     if (EXIT(ch, door)) {	/* Braces added according to indent. -gg */
-      if (EXIT(ch, door)->keyword) {
+      if (EXIT(ch, door)->keyword && *type) {
         if (is_name(type, EXIT(ch, door)->keyword))
           return (door);
         else {
@@ -608,7 +608,7 @@ static int find_door(struct char_data *ch, const char *type, char *dir, const ch
           return (-1);
         }
       } else
-	return (door);
+        return (door);
     } else {
       send_to_char(ch, "I really don't see how you can %s anything there.\r\n", cmdname);
       return (-1);
@@ -845,6 +845,15 @@ ACMD(do_gen_door)
     return;
   }
   two_arguments(argument, type, dir);
+  if (!*dir) {
+    int door_dir = search_block(type, dirs, FALSE);
+    if (door_dir == -1)
+      door_dir = search_block(type, autoexits, FALSE);
+    if (door_dir != -1) {
+      strlcpy(dir, type, sizeof(dir));
+      type[0] = '\0';
+    }
+  }
   if (!generic_find(type, FIND_OBJ_INV | FIND_OBJ_ROOM, ch, &victim, &obj))
     door = find_door(ch, type, dir, cmd_door[subcmd]);
 
