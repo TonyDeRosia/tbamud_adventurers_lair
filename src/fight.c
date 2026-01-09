@@ -1074,7 +1074,7 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
   if (!IS_WEAPON(attacktype)) {
     /* Always add a short severity verb line for spells, skills, DoTs. */
     int shown = skill_message(dam, ch, victim, attacktype);
-    if (dam > 0 && IN_ROOM(victim) != NOWHERE) {
+    if (!shown && dam > 0 && IN_ROOM(victim) != NOWHERE) {
       static const char *const v3[] = {
         "misses", "grazes", "glances", "hits", "strikes", "slams", "crushes", "devastates", "maims", "annihilates"
       };

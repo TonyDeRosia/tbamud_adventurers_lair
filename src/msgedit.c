@@ -132,17 +132,41 @@ void load_messages(void)
       fight_messages[i].msg = messages;
 
       messages->die_msg.attacker_msg = fread_action(fl, i);
+      if (messages->die_msg.attacker_msg)
+        parse_at(messages->die_msg.attacker_msg);
       messages->die_msg.victim_msg = fread_action(fl, i);
+      if (messages->die_msg.victim_msg)
+        parse_at(messages->die_msg.victim_msg);
       messages->die_msg.room_msg = fread_action(fl, i);
+      if (messages->die_msg.room_msg)
+        parse_at(messages->die_msg.room_msg);
       messages->miss_msg.attacker_msg = fread_action(fl, i);
+      if (messages->miss_msg.attacker_msg)
+        parse_at(messages->miss_msg.attacker_msg);
       messages->miss_msg.victim_msg = fread_action(fl, i);
+      if (messages->miss_msg.victim_msg)
+        parse_at(messages->miss_msg.victim_msg);
       messages->miss_msg.room_msg = fread_action(fl, i);
+      if (messages->miss_msg.room_msg)
+        parse_at(messages->miss_msg.room_msg);
       messages->hit_msg.attacker_msg = fread_action(fl, i);
+      if (messages->hit_msg.attacker_msg)
+        parse_at(messages->hit_msg.attacker_msg);
       messages->hit_msg.victim_msg = fread_action(fl, i);
+      if (messages->hit_msg.victim_msg)
+        parse_at(messages->hit_msg.victim_msg);
       messages->hit_msg.room_msg = fread_action(fl, i);
+      if (messages->hit_msg.room_msg)
+        parse_at(messages->hit_msg.room_msg);
       messages->god_msg.attacker_msg = fread_action(fl, i);
+      if (messages->god_msg.attacker_msg)
+        parse_at(messages->god_msg.attacker_msg);
       messages->god_msg.victim_msg = fread_action(fl, i);
+      if (messages->god_msg.victim_msg)
+        parse_at(messages->god_msg.victim_msg);
       messages->god_msg.room_msg = fread_action(fl, i);
+      if (messages->god_msg.room_msg)
+        parse_at(messages->god_msg.room_msg);
     }
   }
   fclose(fl);
@@ -171,6 +195,19 @@ static void show_messages(struct char_data *ch)
 
 #define PRINT_MSG(msg) (msg == NULL ? "#" : msg)
 
+static void write_message_line(FILE *fp, const char *message)
+{
+  char tmp[MAX_STRING_LENGTH];
+
+  if (message) {
+    strlcpy(tmp, message, sizeof(tmp));
+    parse_tab(tmp);
+    fprintf(fp, "%s\n", tmp);
+  } else {
+    fprintf(fp, "#\n");
+  }
+}
+
 void save_messages_to_disk(void)
 {
   FILE *fp;
@@ -194,33 +231,21 @@ void save_messages_to_disk(void)
              
     for (msg = fight_messages[i].msg; msg; msg = msg->next){
       fprintf(fp, "M\n"
-                  "%d\n"
-                  "%s\n"
-                  "%s\n" 
-                  "%s\n" 
-                  "%s\n" 
-                  "%s\n" 
-                  "%s\n" 
-                  "%s\n" 
-                  "%s\n" 
-                  "%s\n" 
-                  "%s\n" 
-                  "%s\n" 
-                  "%s\n"
-                  "\n",
-                  fight_messages[i].a_type,
-                  PRINT_MSG(msg->die_msg.attacker_msg),
-                  PRINT_MSG(msg->die_msg.victim_msg),
-                  PRINT_MSG(msg->die_msg.room_msg),
-                  PRINT_MSG(msg->miss_msg.attacker_msg),
-                  PRINT_MSG(msg->miss_msg.victim_msg),
-                  PRINT_MSG(msg->miss_msg.room_msg),
-                  PRINT_MSG(msg->hit_msg.attacker_msg),
-                  PRINT_MSG(msg->hit_msg.victim_msg),
-                  PRINT_MSG(msg->hit_msg.room_msg),
-                  PRINT_MSG(msg->god_msg.attacker_msg),
-                  PRINT_MSG(msg->god_msg.victim_msg),
-                  PRINT_MSG(msg->god_msg.room_msg));
+                  "%d\n",
+                  fight_messages[i].a_type);
+      write_message_line(fp, msg->die_msg.attacker_msg);
+      write_message_line(fp, msg->die_msg.victim_msg);
+      write_message_line(fp, msg->die_msg.room_msg);
+      write_message_line(fp, msg->miss_msg.attacker_msg);
+      write_message_line(fp, msg->miss_msg.victim_msg);
+      write_message_line(fp, msg->miss_msg.room_msg);
+      write_message_line(fp, msg->hit_msg.attacker_msg);
+      write_message_line(fp, msg->hit_msg.victim_msg);
+      write_message_line(fp, msg->hit_msg.room_msg);
+      write_message_line(fp, msg->god_msg.attacker_msg);
+      write_message_line(fp, msg->god_msg.victim_msg);
+      write_message_line(fp, msg->god_msg.room_msg);
+      fprintf(fp, "\n");
     }
   }  
   
