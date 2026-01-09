@@ -525,17 +525,21 @@ static void append_match(char *buffer, size_t buf_size, const char *name,
 }
 
 static bool ability_matches_input(const char *input, const char *ability_name,
-    bool allow_partial_name, bool allow_extra_input, int *name_tokens) {
+    bool allow_partial_name, bool allow_extra_input, int *name_tokens,
+    int *input_tokens) {
   char input_buf[MAX_INPUT_LENGTH];
   char name_buf[MAX_INPUT_LENGTH];
   char input_token[MAX_INPUT_LENGTH];
   char name_token[MAX_INPUT_LENGTH];
   char *input_ptr = input_buf;
   char *name_ptr = name_buf;
-  int tokens = 0;
+  int matched_name_tokens = 0;
+  int matched_input_tokens = 0;
 
   if (name_tokens)
     *name_tokens = 0;
+  if (input_tokens)
+    *input_tokens = 0;
 
   if (!input || !*input || !ability_name || !*ability_name)
     return FALSE;
@@ -549,7 +553,8 @@ static bool ability_matches_input(const char *input, const char *ability_name,
   while (*input_token && *name_token) {
     if (!is_abbrev(input_token, name_token))
       return FALSE;
-    tokens++;
+    matched_name_tokens++;
+    matched_input_tokens++;
     input_ptr = any_one_arg(input_ptr, input_token);
     name_ptr = any_one_arg(name_ptr, name_token);
   }
@@ -558,7 +563,7 @@ static bool ability_matches_input(const char *input, const char *ability_name,
     if (!allow_partial_name)
       return FALSE;
     while (*name_token) {
-      tokens++;
+      matched_name_tokens++;
       name_ptr = any_one_arg(name_ptr, name_token);
     }
   } else if (*input_token && !*name_token) {
@@ -567,7 +572,9 @@ static bool ability_matches_input(const char *input, const char *ability_name,
   }
 
   if (name_tokens)
-    *name_tokens = tokens;
+    *name_tokens = matched_name_tokens;
+  if (input_tokens)
+    *input_tokens = matched_input_tokens;
 
   return TRUE;
 }
@@ -577,6 +584,7 @@ static int find_spell_by_tokens(const char *name, char *ambig_buf,
     bool allow_extra_input) {
   int best_spell = -1;
   int best_tokens = 0;
+  int best_input_tokens = 0;
   int match_count = 0;
   int spellnum;
 
@@ -587,16 +595,19 @@ static int find_spell_by_tokens(const char *name, char *ambig_buf,
 
   for (spellnum = 1; spellnum <= MAX_SPELLS; spellnum++) {
     int token_count = 0;
+    int input_token_count = 0;
 
     if (!is_available_spell(spellnum))
       continue;
 
     if (!ability_matches_input(name, spell_info[spellnum].name,
-        allow_partial_name, allow_extra_input, &token_count))
+        allow_partial_name, allow_extra_input, &token_count,
+        &input_token_count))
       continue;
 
     if (token_count > best_tokens) {
       best_tokens = token_count;
+      best_input_tokens = input_token_count;
       best_spell = spellnum;
       match_count = 0;
       *ambig_buf = '\0';
@@ -609,7 +620,7 @@ static int find_spell_by_tokens(const char *name, char *ambig_buf,
   }
 
   if (matched_tokens)
-    *matched_tokens = best_tokens;
+    *matched_tokens = best_input_tokens;
 
   if (match_count == 1)
     return best_spell;
@@ -664,6 +675,7 @@ static int find_ability_by_tokens(const char *name, char *ambig_buf,
     bool allow_extra_input) {
   int best_ability = -1;
   int best_tokens = 0;
+  int best_input_tokens = 0;
   int match_count = 0;
   int ability;
 
@@ -674,16 +686,19 @@ static int find_ability_by_tokens(const char *name, char *ambig_buf,
 
   for (ability = 1; ability <= TOP_SPELL_DEFINE; ability++) {
     int token_count = 0;
+    int input_token_count = 0;
 
     if (!is_available_ability(ability))
       continue;
 
     if (!ability_matches_input(name, spell_info[ability].name,
-        allow_partial_name, allow_extra_input, &token_count))
+        allow_partial_name, allow_extra_input, &token_count,
+        &input_token_count))
       continue;
 
     if (token_count > best_tokens) {
       best_tokens = token_count;
+      best_input_tokens = input_token_count;
       best_ability = ability;
       match_count = 0;
       *ambig_buf = '\0';
@@ -696,7 +711,7 @@ static int find_ability_by_tokens(const char *name, char *ambig_buf,
   }
 
   if (matched_tokens)
-    *matched_tokens = best_tokens;
+    *matched_tokens = best_input_tokens;
 
   if (match_count == 1)
     return best_ability;
@@ -718,7 +733,7 @@ int find_skill_num(char *name) {
     if (!is_available_ability(skill_num))
       continue;
     if (ability_matches_input(cleaned, spell_info[skill_num].name,
-        TRUE, FALSE, NULL))
+        TRUE, FALSE, NULL, NULL))
       return skill_num;
   }
 
