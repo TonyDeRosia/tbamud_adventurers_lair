@@ -1666,7 +1666,7 @@ void ensure_class_abilities(struct char_data *ch)
   if (IS_NPC(ch) || !is_valid_class(GET_CLASS(ch)))
     return;
 
-  int learned_level = get_class_prac_learned_level((int)GET_CLASS(ch));
+  const int start_prof = 1;
 
   for (int ability = 1; ability <= MAX_SKILLS; ability++) {
     if (!spell_info[ability].name)
@@ -1677,8 +1677,8 @@ void ensure_class_abilities(struct char_data *ch)
     if (required_level <= 0 || required_level > GET_LEVEL(ch))
       continue;
 
-    if (GET_SKILL(ch, ability) < learned_level)
-      SET_SKILL(ch, ability, learned_level);
+    if (GET_SKILL(ch, ability) <= 0)
+      SET_SKILL(ch, ability, start_prof);
   }
 }
 
@@ -2422,4 +2422,3 @@ const char *title_female(int chclass, int level)
   /* Default title for classes which do not have titles defined */
   return "the Classless";
 }
-
