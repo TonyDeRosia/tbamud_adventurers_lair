@@ -1150,6 +1150,10 @@ ACMD(do_wake)
   int self = 0;
 
   one_argument(argument, arg);
+  if (!*arg && (GET_POS(ch) == POS_RESTING || GET_POS(ch) == POS_SITTING)) {
+    do_stand(ch, "", 0, 0);
+    return;
+  }
   if (*arg) {
     if (GET_POS(ch) == POS_SLEEPING)
       send_to_char(ch, "Maybe you should wake yourself up first.\r\n");
@@ -1167,6 +1171,8 @@ ACMD(do_wake)
       act("You wake $M up.", FALSE, ch, 0, vict, TO_CHAR);
       act("You are awakened by $n.", FALSE, ch, 0, vict, TO_VICT | TO_SLEEP);
       GET_POS(vict) = POS_STANDING;
+      char_from_furniture(vict);
+      affect_total(vict);
     }
     if (!self)
       return;
@@ -1179,6 +1185,7 @@ ACMD(do_wake)
     send_to_char(ch, "You wake and stand up.\r\n");
     act("$n awakens.", TRUE, ch, 0, 0, TO_ROOM);
     GET_POS(ch) = POS_STANDING;
+    char_from_furniture(ch);
   }
   /* RECOMPUTE_AFFECTS_AFTER_DO_WAKE */
   affect_total(ch);
