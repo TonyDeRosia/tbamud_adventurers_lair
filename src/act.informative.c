@@ -645,7 +645,7 @@ static void build_room_compass_map(struct char_data *ch, struct room_data *room,
   snprintf(out, outsz,
            "          %s___N___%s\r\n"
            "          %s|          |%s\r\n"
-           "%s%s%s %s|     %sX%s    %s| %s%s%s\r\n"
+           "          %s%s%s %s|     %sX%s    %s| %s%s%s\r\n"
            "          %s|_______|%s\r\n"
            "               %s%s%s\r\n",
            north_color, reset,
