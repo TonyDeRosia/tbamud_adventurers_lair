@@ -624,6 +624,7 @@ static void build_room_compass_map(struct char_data *ch, struct room_data *room,
   const char *south_color;
   const char *west_color;
   const char *east_color;
+  const char *north_label;
   const char *west_label;
   const char *east_label;
   const char *south_label;
@@ -643,17 +644,18 @@ static void build_room_compass_map(struct char_data *ch, struct room_data *room,
   east_color = east ? dir_active : dir_inactive;
   south_color = south ? dir_active : dir_inactive;
 
-  west_label = west ? "=W=" : " W ";
-  east_label = east ? "=E=" : " E ";
-  south_label = south ? "S" : "s";
+  north_label = north ? "N" : " ";
+  west_label = west ? "W" : " ";
+  east_label = east ? "E" : " ";
+  south_label = south ? "S" : " ";
 
   snprintf(out, outsz,
-           "          %s___N___%s\r\n"
-           "         %s|     |%s\r\n"
-           "         %s%s%s   %s|%s  %sX%s  |%s   %s%s%s\r\n"
-           "         %s|     |%s\r\n"
-           "          %s___%s___%s\r\n",
-           north_color, reset,
+           "            %s%s%s\r\n"
+           "          %s+---+%s\r\n"
+           "      %s%s%s %s| %sX%s |%s %s%s%s\r\n"
+           "          %s+---+%s\r\n"
+           "            %s%s%s\r\n",
+           north_color, north_label, reset,
            box, reset,
            west_color, west_label, reset, box, x_color, reset, box, reset,
            east_color, east_label, reset,
