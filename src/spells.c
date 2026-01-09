@@ -414,6 +414,9 @@ ASPELL(spell_plague_bolt)
     crit_show_banner(ch, victim, mult);
   }
 
+  if (dam < 1)
+    dam = 1;
+
   if (damage(ch, victim, dam, SPELL_PLAGUE_BOLT) == -1)
     return;
 
