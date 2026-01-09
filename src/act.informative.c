@@ -590,8 +590,8 @@ ACMD(do_exits)
         !CAN_SEE_IN_DARK(ch) ? "Too dark to tell." : world[EXIT(ch, door)->to_room].name);
     }
   }
-    if (!len)
-      send_to_char(ch, " None.\r\n");
+  if (!len)
+    send_to_char(ch, " None.\r\n");
 }
 
 static void build_room_compass_map(struct char_data *ch, struct room_data *room,
@@ -654,6 +654,7 @@ snprintf(out, outsz,
          east_color, east_label, reset,
          box, reset,
          south_color, south_label, reset);
+}
 
 void look_at_room(struct char_data *ch, int ignore_brief)
 {
