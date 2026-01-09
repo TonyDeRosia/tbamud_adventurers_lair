@@ -164,13 +164,10 @@ static void show_ability_table_aligned(struct char_data *ch, int show_spells, in
     }
 
     if (rows[i].pct < 0)
-
-      snprintf(cell, sizeof(cell), "%-24s [ -- ]",
+      snprintf(cell, sizeof(cell), "%s [ -- ]",
                rows[i].name);
-
     else
-
-      snprintf(cell, sizeof(cell), "%-24s [%3d%%]",
+      snprintf(cell, sizeof(cell), "%s [%d%%]",
                rows[i].name,
                rows[i].pct);
     send_to_char(ch, "%-*s", ABIL_COL_WIDTH + count_color_chars(cell), cell);
