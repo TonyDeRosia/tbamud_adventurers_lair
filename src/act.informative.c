@@ -642,19 +642,18 @@ static void build_room_compass_map(struct char_data *ch, struct room_data *room,
   east_label = east ? "=E=" : " E ";
   south_label = south ? "S" : "s";
 
-  snprintf(out, outsz,
-           "          %s___N___%s\r\n"
-           "          %s|          |%s\r\n"
-           "          %s%s%s %s|     %sX%s    %s| %s%s%s\r\n"
-           "          %s|_______|%s\r\n"
-           "               %s%s%s\r\n",
-           north_color, reset,
-           box, reset,
-           west_color, west_label, reset, box, x_color, reset, box, reset,
-           east_color, east_label, reset,
-           box, reset,
-           south_color, south_label, reset);
-}
+snprintf(out, outsz,
+         "          %s___N___%s\r\n"
+         "         %s|     |%s\r\n"
+         "         %s%s%s   %s|%s  %sX%s  |%s   %s%s%s\r\n"
+         "         %s|     |%s\r\n"
+         "          %s___%s___%s\r\n",
+         north_color, reset,
+         box, reset,
+         west_color, west_label, reset, box, x_color, reset, box, reset,
+         east_color, east_label, reset,
+         box, reset,
+         south_color, south_label, reset);
 
 void look_at_room(struct char_data *ch, int ignore_brief)
 {
