@@ -396,6 +396,8 @@ ASPELL(spell_plague_bolt)
   int mult = 200;
   int pen;
   int dur_ticks;
+  int stat_bonus;
+  int lvl_bonus;
 
   if (victim == NULL || ch == NULL)
     return;
@@ -405,7 +407,9 @@ ASPELL(spell_plague_bolt)
   act("$n flings a \tGplague bolt\tn at $N!\tn", TRUE, ch, 0, victim, TO_ROOM);
 
   power = warlock_power(ch);
-  dam = dice(3, 6) + (level / 2) + (power / 5);
+  stat_bonus = MIN(6, power / 10);
+  lvl_bonus = level / 6;
+  dam = dice(3, 6) + 3 + stat_bonus + lvl_bonus;
   if (mag_savingthrow(victim, SAVING_SPELL, 0))
     dam = (dam * 75) / 100;
 
