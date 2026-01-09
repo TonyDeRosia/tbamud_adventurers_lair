@@ -248,6 +248,8 @@ ASPELL(spell_corruption);
 /* basic magic calling functions */
 
 int find_skill_num(char *name);
+int find_skill_num_with_ambig(const char *name, char *ambig_buf,
+    size_t ambig_len);
 
 int mag_damage(int level, struct char_data *ch, struct char_data *victim,
   int spellnum, int savetype);
@@ -303,6 +305,7 @@ bool is_sanctuary_spell(int spellnum);
 
 /* from spell_parser.c */
 ACMD(do_cast);
+ACMD(do_spellup);
 void unused_spell(int spl);
 void mag_assign_spells(void);
 

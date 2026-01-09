@@ -209,7 +209,16 @@ SPECIAL(guild)
     return (TRUE);
   }
 
-  skill_num = find_skill_num(argument);
+  {
+    char ambiguity[MAX_STRING_LENGTH];
+
+    skill_num = find_skill_num_with_ambig(argument, ambiguity, sizeof(ambiguity));
+    if (skill_num == -2) {
+      send_to_char(ch, "Ambiguous %s name. Did you mean: %s?\r\n",
+          SPLSKL(ch), ambiguity);
+      return (TRUE);
+    }
+  }
 
   if (skill_num < 1 ||
       GET_LEVEL(ch) < spell_info[skill_num].min_level[(int) GET_CLASS(ch)]) {
@@ -786,4 +795,3 @@ SPECIAL(bank)
   } else
     return (FALSE);
 }
-
