@@ -126,6 +126,7 @@
 #define SKILL_BANDAGE               141 /* Reserved Skill[] DO NOT CHANGE */
 
 #define SKILL_DUAL_WIELD            142 /* Reserved Skill[] DO NOT CHANGE */
+#define SKILL_RECALL                143 /* Reserved Skill[] DO NOT CHANGE */
 /* New skills may be added here up to MAX_SKILLS (200) */
 
 /* NON-PLAYER AND OBJECT SPELLS AND SKILLS: The practice levels for the spells
@@ -267,6 +268,8 @@ void mag_rooms(int level, struct char_data *ch, int spellnum);
 
 void mag_summons(int level, struct char_data *ch, struct obj_data *obj,
  int spellnum, int savetype);
+
+void handle_followers_after_owner_teleport_or_recall(struct char_data *ch);
 
 void mag_points(int level, struct char_data *ch, struct char_data *victim,
  int spellnum, int savetype);

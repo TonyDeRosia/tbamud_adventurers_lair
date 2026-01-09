@@ -303,6 +303,7 @@ cpp_extern const struct command_info cmd_info[] = {
   { "read"     , "rea"     , POS_RESTING , do_look     , 0, SCMD_READ },
   { "reload"   , "reload"  , POS_DEAD    , do_reboot   , LVL_IMPL, 0 },
   { "recite"   , "reci"    , POS_RESTING , do_use      , 0, SCMD_RECITE },
+  { "recall"   , "reca"    , POS_FIGHTING, do_recall   , 1, 0 },
   { "receive"  , "rece"    , POS_STANDING, do_not_here , 1, 0 },
   { "recent"   , "recent"  , POS_DEAD    , do_recent   , LVL_IMMORT, 0 },
   { "remove"   , "rem"     , POS_RESTING , do_remove   , 0, 0 },
