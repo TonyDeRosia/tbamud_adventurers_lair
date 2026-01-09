@@ -1919,6 +1919,7 @@ void init_spell_levels(void)
   spell_level(SPELL_DETECT_MAGIC, CLASS_WARLOCK, 3);
   spell_level(SPELL_PLAGUE_BOLT, CLASS_WARLOCK, 8);
   spell_level(SPELL_CURSE, CLASS_WARLOCK, 8);
+  spell_level(SPELL_MEMENTO_MORI, CLASS_WARLOCK, 10);
   spell_level(SPELL_BLINDNESS, CLASS_WARLOCK, 12);
   spell_level(SPELL_ENFEEBLEMENT, CLASS_WARLOCK, 15);
   spell_level(SPELL_POISON, CLASS_WARLOCK, 16);
