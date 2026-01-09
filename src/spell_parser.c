@@ -1204,17 +1204,20 @@ ACMD(do_cast) {
   struct obj_data *tobj = NULL;
   char *target_argument;
   char *targp = NULL;
+  char spell_argument[MAX_INPUT_LENGTH];
   char spell_input[MAX_INPUT_LENGTH], target_input[MAX_INPUT_LENGTH];
   char target_name[MAX_INPUT_LENGTH];
   char ambiguity[MAX_STRING_LENGTH];
   int number, mana, spellnum, i, target = 0;
   int matched_tokens = 0;
+  bool allow_partial_name = FALSE;
 
   if (IS_NPC(ch))
     return;
 
   /* get: blank, spell name, target name */
   target_argument = NULL;
+  *spell_argument = '\0';
   skip_spaces(&argument);
 
   if (*argument == '\0') {
@@ -1227,10 +1230,10 @@ ACMD(do_cast) {
     const char *closing = strchr(argument, quote);
     size_t len = closing ? (size_t)(closing - argument) : strlen(argument);
 
-    if (len >= sizeof(spell_input))
-      len = sizeof(spell_input) - 1;
-    memcpy(spell_input, argument, len);
-    spell_input[len] = '\0';
+    if (len >= sizeof(spell_argument))
+      len = sizeof(spell_argument) - 1;
+    memcpy(spell_argument, argument, len);
+    spell_argument[len] = '\0';
 
     target_argument = closing ? (char *)closing + 1 : NULL;
     if (target_argument) {
@@ -1238,20 +1241,65 @@ ACMD(do_cast) {
       skip_spaces(&target_ptr);
       target_argument = target_ptr;
     }
-
-    spellnum = find_spell_by_tokens(spell_input, ambiguity, sizeof(ambiguity),
-        &matched_tokens, FALSE, FALSE);
   } else {
-    spellnum = find_spell_by_tokens(argument, ambiguity, sizeof(ambiguity),
-        &matched_tokens, TRUE, TRUE);
-    if (spellnum > 0) {
-      char *target_ptr = argument;
-      for (i = 0; i < matched_tokens && *target_ptr; i++)
-        target_ptr = any_one_arg(target_ptr, spell_input);
+    char work[MAX_INPUT_LENGTH];
+    char words[16][MAX_INPUT_LENGTH];
+    char best_candidate[MAX_INPUT_LENGTH] = "";
+    char target_argument_buf[MAX_INPUT_LENGTH] = "";
+    int word_count = 0;
+    int best_spellnum = -1;
+    int best_k = 0;
+    char *work_ptr = work;
+
+    allow_partial_name = TRUE;
+    strlcpy(work, argument, sizeof(work));
+
+    while (*work_ptr && word_count < (int)(sizeof(words) / sizeof(words[0]))) {
+      work_ptr = any_one_arg(work_ptr, words[word_count]);
+      if (!*words[word_count])
+        break;
+      word_count++;
+    }
+
+    for (i = 1; i <= word_count; i++) {
+      char candidate[MAX_INPUT_LENGTH] = "";
+      char candidate_ambiguity[MAX_STRING_LENGTH];
+      int j;
+
+      for (j = 0; j < i; j++) {
+        if (*candidate)
+          strlcat(candidate, " ", sizeof(candidate));
+        strlcat(candidate, words[j], sizeof(candidate));
+      }
+
+      spellnum = find_spell_by_tokens(candidate, candidate_ambiguity,
+          sizeof(candidate_ambiguity), NULL, TRUE, FALSE);
+      if (spellnum >= 1) {
+        best_spellnum = spellnum;
+        best_k = i;
+        strlcpy(best_candidate, candidate, sizeof(best_candidate));
+      }
+    }
+
+    if (best_spellnum >= 1) {
+      strlcpy(spell_argument, best_candidate, sizeof(spell_argument));
+      for (i = best_k; i < word_count; i++) {
+        if (*target_argument_buf)
+          strlcat(target_argument_buf, " ", sizeof(target_argument_buf));
+        strlcat(target_argument_buf, words[i], sizeof(target_argument_buf));
+      }
+      target_argument = target_argument_buf;
+    } else {
+      char *target_ptr = any_one_arg(argument, spell_argument);
       skip_spaces(&target_ptr);
-      target_argument = target_ptr;
+      strlcpy(target_argument_buf, target_ptr, sizeof(target_argument_buf));
+      target_argument = target_argument_buf;
     }
   }
+
+  strlcpy(spell_input, spell_argument, sizeof(spell_input));
+  spellnum = find_spell_by_tokens(spell_input, ambiguity, sizeof(ambiguity),
+      &matched_tokens, allow_partial_name, FALSE);
 
   if (spellnum == -2) {
     send_to_char(ch, "Ambiguous spell name. Did you mean: %s?\r\n",
