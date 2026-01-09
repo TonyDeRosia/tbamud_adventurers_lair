@@ -13,7 +13,9 @@
 #include "dg_event.h"
 #include "constants.h"
 #include "comm.h"  /* For access to the game pulse */
+#include "handler.h"
 #include "mud_event.h"
+#include "spells.h"
 
 /* Global List */
 struct list_data * world_events = NULL;
@@ -24,7 +26,8 @@ struct mud_event_list mud_event_index[] = {
   { "Null"         , NULL           , -1          },  /* eNULL */
   { "Protocol"     , get_protocols  , EVENT_DESC  },  /* ePROTOCOLS */
   { "Whirlwind"    , event_whirlwind, EVENT_CHAR  },  /* eWHIRLWIND */
-  { "Spell:Darkness",event_countdown, EVENT_ROOM  }   /* eSPL_DARKNESS */
+  { "Spell:Darkness",event_countdown, EVENT_ROOM  },  /* eSPL_DARKNESS */
+  { "Spell:Enfeeblement", event_countdown, EVENT_CHAR }   /* eSPL_ENFEEBLEMENT */
 };
 
 /* init_events() is the ideal function for starting global events. This
@@ -56,11 +59,13 @@ EVENTFUNC(event_countdown)
   struct mud_event_data * pMudEvent;
   struct room_data * room = NULL;
   room_rnum rnum = NOWHERE;
+  struct char_data * tch = NULL;
 
   pMudEvent = (struct mud_event_data * ) event_obj;
 
   switch (mud_event_index[pMudEvent->iId].iEvent_Type) {
     case EVENT_CHAR:
+      tch = (struct char_data *) pMudEvent->pStruct;
       break;
     case EVENT_ROOM:
       room = (struct room_data * ) pMudEvent->pStruct;
@@ -74,6 +79,12 @@ EVENTFUNC(event_countdown)
     case eSPL_DARKNESS:
       REMOVE_BIT_AR(ROOM_FLAGS(rnum), ROOM_DARK);
       send_to_room(rnum, "The dark shroud disappates.\r\n");
+      break;
+    case eSPL_ENFEEBLEMENT:
+      if (tch && affected_by_spell(tch, SPELL_ENFEEBLEMENT)) {
+        affect_from_char(tch, SPELL_ENFEEBLEMENT);
+        send_to_char(tch, "Your strength and agility return.\tn\r\n");
+      }
       break;
     case ePROTOCOLS:
       break;

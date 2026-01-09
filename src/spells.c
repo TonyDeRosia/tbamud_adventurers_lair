@@ -21,9 +21,22 @@
 #include "dg_scripts.h"
 #include "act.h"
 #include "fight.h"
+#include "criticalhits.h"
+#include "mud_event.h"
 
+static int clampi(int v, int lo, int hi)
+{
+  if (v < lo)
+    return lo;
+  if (v > hi)
+    return hi;
+  return v;
+}
 
-
+static int warlock_power(struct char_data *ch)
+{
+  return GET_INT(ch) + GET_WIS(ch);
+}
 
 /* Handle followers when an owner teleports or recalls. */
 void handle_followers_after_owner_teleport_or_recall(struct char_data *ch)
@@ -373,6 +386,165 @@ ASPELL(spell_corruption)
   /* 0 damage prints like a miss. Make the initial hit at least 1. */
   damage(ch, victim, (af.modifier < 1 ? 1 : af.modifier), SPELL_CORRUPTION);
 
+}
+
+ASPELL(spell_plague_bolt)
+{
+  struct affected_type af;
+  int power;
+  int dam;
+  int mult = 200;
+  int pen;
+  int dur_ticks;
+
+  if (victim == NULL || ch == NULL)
+    return;
+
+  act("You fling a \tGplague bolt\tn at $N!\tn", FALSE, ch, 0, victim, TO_CHAR);
+  act("$n flings a \tGplague bolt\tn at you!\tn", FALSE, ch, 0, victim, TO_VICT);
+  act("$n flings a \tGplague bolt\tn at $N!\tn", TRUE, ch, 0, victim, TO_ROOM);
+
+  power = warlock_power(ch);
+  dam = dice(3, 6) + (level / 2) + (power / 5);
+  if (mag_savingthrow(victim, SAVING_SPELL, 0))
+    dam = (dam * 75) / 100;
+
+  if (crit_check_spell(ch, &mult)) {
+    dam = (dam * mult) / 100;
+    crit_show_banner(ch, victim, mult);
+  }
+
+  if (damage(ch, victim, dam, SPELL_PLAGUE_BOLT) == -1)
+    return;
+
+  pen = clampi(1 + MAX(0, power - 20) / 10, 1, 4);
+  dur_ticks = clampi(2 + MAX(0, power - 20) / 12, 2, 6);
+
+  new_affect(&af);
+  af.spell = SPELL_PLAGUE_BOLT;
+  af.duration = dur_ticks;
+  af.modifier = -pen;
+  af.location = APPLY_STR;
+  SET_BIT_AR(af.bitvector, AFF_POISON);
+  affect_join(victim, &af, FALSE, FALSE, FALSE, FALSE);
+
+  act("\tGSickness\tn spreads through $N's body!\tn", FALSE, ch, 0, victim, TO_CHAR);
+  act("\tGSickness\tn spreads through your body!\tn", FALSE, ch, 0, victim, TO_VICT);
+  act("\tGSickness\tn spreads through $N's body!\tn", TRUE, ch, 0, victim, TO_ROOM);
+}
+
+ASPELL(spell_enfeeblement)
+{
+  struct affected_type af;
+  struct mud_event_data *event;
+  int power;
+  int stat_pen;
+  int dur_sec;
+
+  if (victim == NULL || ch == NULL)
+    return;
+
+  act("You whisper a \tDcruel hex\tn and sap $N's strength.\tn", FALSE, ch, 0, victim, TO_CHAR);
+  act("$n whispers a \tDcruel hex\tn and your limbs go weak.\tn", FALSE, ch, 0, victim, TO_VICT);
+  act("$n whispers a \tDcruel hex\tn and $N's limbs go weak.\tn", TRUE, ch, 0, victim, TO_ROOM);
+
+  if (mag_savingthrow(victim, SAVING_SPELL, 0)) {
+    act("$N shakes off your \tDhex\tn.\tn", FALSE, ch, 0, victim, TO_CHAR);
+    act("You shake off $n's \tDhex\tn.\tn", FALSE, ch, 0, victim, TO_VICT);
+    act("$N shakes off $n's \tDhex\tn.\tn", TRUE, ch, 0, victim, TO_ROOM);
+    return;
+  }
+
+  power = warlock_power(ch);
+  stat_pen = clampi(1 + MAX(0, power - 20) / 8, 1, 6);
+  dur_sec = 30 + MIN(60, MAX(0, power - 20) * 2);
+  dur_sec = clampi(dur_sec, 30, 90);
+
+  if (affected_by_spell(victim, SPELL_ENFEEBLEMENT))
+    affect_from_char(victim, SPELL_ENFEEBLEMENT);
+
+  new_affect(&af);
+  af.spell = SPELL_ENFEEBLEMENT;
+  af.duration = -1;
+  af.modifier = -stat_pen;
+  af.location = APPLY_STR;
+  affect_join(victim, &af, FALSE, FALSE, FALSE, FALSE);
+
+  af.location = APPLY_DEX;
+  affect_join(victim, &af, FALSE, FALSE, FALSE, FALSE);
+
+  event = char_has_mud_event(victim, eSPL_ENFEEBLEMENT);
+  if (event && event->pEvent)
+    event_cancel(event->pEvent);
+
+  NEW_EVENT(eSPL_ENFEEBLEMENT, victim, NULL, dur_sec * PASSES_PER_SEC);
+}
+
+ASPELL(spell_devour_soul)
+{
+  struct affected_type af;
+  int power;
+  int dam;
+  int mult = 200;
+  int pct;
+  int mana_d;
+  int move_d;
+  int hr_pen;
+  int sv_pen;
+  int dur_ticks;
+
+  if (victim == NULL || ch == NULL)
+    return;
+
+  act("You reach out with \tDcold jaws\tn to \tDevour\tn $N's soul!\tn", FALSE, ch, 0, victim, TO_CHAR);
+  act("$n reaches out with \tDcold jaws\tn to \tDevour\tn your soul!\tn", FALSE, ch, 0, victim, TO_VICT);
+  act("$n reaches out with \tDcold jaws\tn to \tDevour\tn $N's soul!\tn", TRUE, ch, 0, victim, TO_ROOM);
+
+  power = warlock_power(ch);
+  dam = dice(8, 15) + (level * 3) + (power * 3 / 2);
+  pct = clampi(1 + MAX(0, power - 20) / 2, 1, 15);
+
+  if (mag_savingthrow(victim, SAVING_SPELL, 0)) {
+    dam = (dam * 75) / 100;
+    pct = MAX(1, pct / 2);
+  }
+
+  if (crit_check_spell(ch, &mult)) {
+    dam = (dam * mult) / 100;
+    crit_show_banner(ch, victim, mult);
+  }
+
+  if (damage(ch, victim, dam, SPELL_DEVOUR_SOUL) == -1)
+    return;
+
+  mana_d = MAX(1, (GET_MAX_MANA(victim) * pct) / 100);
+  move_d = MAX(1, (GET_MAX_MOVE(victim) * pct) / 100);
+  mana_d = MIN(mana_d, GET_MANA(victim));
+  move_d = MIN(move_d, GET_MOVE(victim));
+
+  GET_MANA(victim) = MAX(0, GET_MANA(victim) - mana_d);
+  GET_MOVE(victim) = MAX(0, GET_MOVE(victim) - move_d);
+  GET_MANA(ch) = MIN(GET_MAX_MANA(ch), GET_MANA(ch) + mana_d);
+  GET_MOVE(ch) = MIN(GET_MAX_MOVE(ch), GET_MOVE(ch) + move_d);
+
+  act("You drink in $N's essence, restoring your power.\tn", FALSE, ch, 0, victim, TO_CHAR);
+  act("You feel your power ripped away as $n feeds on you!\tn", FALSE, ch, 0, victim, TO_VICT);
+  act("$n feeds on $N's essence!\tn", TRUE, ch, 0, victim, TO_ROOM);
+
+  hr_pen = clampi(1 + MAX(0, power - 20) / 8, 1, 6);
+  sv_pen = clampi(1 + MAX(0, power - 20) / 6, 1, 8);
+  dur_ticks = clampi(2 + MAX(0, power - 20) / 12, 2, 6);
+
+  new_affect(&af);
+  af.spell = SPELL_DEVOUR_SOUL;
+  af.duration = dur_ticks;
+  af.modifier = -hr_pen;
+  af.location = APPLY_HITROLL;
+  affect_join(victim, &af, FALSE, FALSE, FALSE, FALSE);
+
+  af.modifier = sv_pen;
+  af.location = APPLY_SAVING_SPELL;
+  affect_join(victim, &af, FALSE, FALSE, FALSE, FALSE);
 }
 
 ASPELL(spell_identify)

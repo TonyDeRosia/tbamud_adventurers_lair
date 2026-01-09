@@ -865,6 +865,18 @@ int call_magic(struct char_data *caster, struct char_data *cvict,
       MANUAL_SPELL(spell_corruption)
       ;
       break;
+    case SPELL_PLAGUE_BOLT:
+      MANUAL_SPELL(spell_plague_bolt)
+      ;
+      break;
+    case SPELL_ENFEEBLEMENT:
+      MANUAL_SPELL(spell_enfeeblement)
+      ;
+      break;
+    case SPELL_DEVOUR_SOUL:
+      MANUAL_SPELL(spell_devour_soul)
+      ;
+      break;
     }
 
   return (1);
@@ -1639,6 +1651,18 @@ void mag_assign_spells(void) {
   spello(SPELL_NIRVANA, "nirvana", 110, 85, 5, POS_STANDING,
   TAR_CHAR_ROOM | TAR_SELF_ONLY, FALSE, MAG_AFFECTS,
   "Your eyes dim as the primal serenity fades.");
+
+  spello(SPELL_PLAGUE_BOLT, "plague bolt", 35, 15, 2, POS_FIGHTING,
+  TAR_CHAR_ROOM | TAR_FIGHT_VICT, TRUE, MAG_MANUAL,
+  "The \tGplague\tn in your veins subsides.\tn");
+
+  spello(SPELL_ENFEEBLEMENT, "enfeeblement", 45, 20, 2, POS_FIGHTING,
+  TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_NOT_SELF, TRUE, MAG_MANUAL,
+  "Your strength and agility return.\tn");
+
+  spello(SPELL_DEVOUR_SOUL, "devour soul", 120, 90, 3, POS_FIGHTING,
+  TAR_CHAR_ROOM | TAR_FIGHT_VICT, TRUE, MAG_MANUAL,
+  "The hollow ache in your soul fades.\tn");
 
   spello(SPELL_SENSE_LIFE, "sense life", 20, 10, 2, POS_STANDING,
   TAR_CHAR_ROOM | TAR_SELF_ONLY, FALSE, MAG_AFFECTS,

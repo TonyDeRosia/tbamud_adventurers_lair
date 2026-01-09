@@ -1916,8 +1916,10 @@ void init_spell_levels(void)
   spell_level(SPELL_CORRUPTION, CLASS_WARLOCK, 1);
   spell_level(SPELL_CHILL_TOUCH, CLASS_WARLOCK, 1);
   spell_level(SPELL_DETECT_MAGIC, CLASS_WARLOCK, 3);
+  spell_level(SPELL_PLAGUE_BOLT, CLASS_WARLOCK, 8);
   spell_level(SPELL_CURSE, CLASS_WARLOCK, 8);
   spell_level(SPELL_BLINDNESS, CLASS_WARLOCK, 12);
+  spell_level(SPELL_ENFEEBLEMENT, CLASS_WARLOCK, 15);
   spell_level(SPELL_POISON, CLASS_WARLOCK, 16);
   spell_level(SKILL_BANDAGE, CLASS_WARLOCK, 20);
   spell_level(SPELL_SLEEP, CLASS_WARLOCK, 20);
@@ -1933,6 +1935,7 @@ void init_spell_levels(void)
   spell_level(SPELL_ANIMATE_DEAD, CLASS_WARLOCK, 80);
   spell_level(SPELL_EARTHQUAKE, CLASS_WARLOCK, 90);
   spell_level(SPELL_CLONE, CLASS_WARLOCK, 95);
+  spell_level(SPELL_DEVOUR_SOUL, CLASS_WARLOCK, 100);
 
   /* CLERICS */
   spell_level(SPELL_CURE_LIGHT, CLASS_CLERIC, 1);
