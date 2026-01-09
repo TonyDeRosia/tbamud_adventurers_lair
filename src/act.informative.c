@@ -804,6 +804,25 @@ static void append_map_line(char *out, size_t outsz, const char *line, size_t in
     out[outsz - 1] = '\0';
 }
 
+
+/* Safe append that does not rely on strlcat(). */
+static void out_append(char *dst, size_t dstsz, const char *src)
+{
+  size_t len;
+
+  if (!dst || dstsz == 0)
+    return;
+
+  if (!src)
+    src = "";
+
+  len = strlen(dst);
+  if (len >= dstsz)
+    return;
+
+  snprintf(dst + len, dstsz - len, "%s", src);
+}
+
 static void build_room_compass_map(struct char_data *ch, struct room_data *room,
                                    char *out, size_t outsz)
 {
@@ -847,7 +866,7 @@ static void build_room_compass_map(struct char_data *ch, struct room_data *room,
   char connector_s[32];
   char connector_w[16];
   char connector_e[16];
-  char lines[11][96];
+  char lines[11][512];
 
   (void)room;
 
@@ -970,7 +989,7 @@ static void build_room_compass_map(struct char_data *ch, struct room_data *room,
   for (line = 0; line < 11; line++)
     append_map_line(out, outsz, lines[line], indent);
 
-  strlcat(out, "\r\n", outsz);
+  out_append(out, outsz, "\r\n");
 }
 
 
