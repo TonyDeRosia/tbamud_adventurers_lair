@@ -36,8 +36,9 @@
 
 /* ABILITY LIST FORMATTER v4 */
 #ifndef ABIL_COL_WIDTH
-#define ABIL_COL_WIDTH 38
+#define ABIL_COL_WIDTH 27
 #endif
+#define LEVEL_LABEL_PADDING 14
 
 struct abil_row {
   int id;
@@ -94,8 +95,7 @@ static void show_ability_table_aligned(struct char_data *ch, int show_spells, in
   int col = 0;
   int last_lvl = -1;
 
-  /* "Level 101: " is 11 chars. Keep continuation indent identical. */
-  const char *cont = "           ";
+  /* "Level 99: " is 10 chars; padding below matches practice output. */
 
   struct abil_row rows[TOP_SPELL_DEFINE + 1];
   int n = 0;
@@ -151,29 +151,27 @@ static void show_ability_table_aligned(struct char_data *ch, int show_spells, in
         send_to_char(ch, "\r\n");
         col = 0;
       }
-      send_to_char(ch, "%sLevel %3d%s:%s ",
+      send_to_char(ch, "%sLevel %-2d%s:%s ",
                    CCCYN(ch, C_NRM),
                    rows[i].lvl,
                    CCWHT(ch, C_NRM),
                    CCNRM(ch, C_NRM));
       last_lvl = rows[i].lvl;
     } else if (col == 0) {
-      send_to_char(ch, "%s", cont);
+      send_to_char(ch, "\r\n%*s", LEVEL_LABEL_PADDING, "");
+    } else {
+      send_to_char(ch, "  ");
     }
 
     if (rows[i].pct < 0)
 
-      snprintf(cell, sizeof(cell), "%s%-24s%s [ -- ]",
-               CCCYN(ch, C_NRM),
-               rows[i].name,
-               CCNRM(ch, C_NRM));
+      snprintf(cell, sizeof(cell), "%-24s [ -- ]",
+               rows[i].name);
 
     else
 
-      snprintf(cell, sizeof(cell), "%s%-24s%s [%3d%%]",
-               CCCYN(ch, C_NRM),
+      snprintf(cell, sizeof(cell), "%-24s [%3d%%]",
                rows[i].name,
-               CCNRM(ch, C_NRM),
                rows[i].pct);
     send_to_char(ch, "%-*s", ABIL_COL_WIDTH + count_color_chars(cell), cell);
 
