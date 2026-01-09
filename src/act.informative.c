@@ -975,8 +975,7 @@ static void build_room_compass_map(struct char_data *ch, struct room_data *room,
       map_width = line_width;
   }
 
-  if (!IS_NPC(ch) && PRF_FLAGGED(ch, PRF_MAPCENTER))
-    center_map = TRUE;
+  center_map = TRUE;
 
   if (center_map) {
     size_t screen_width = map_screen_width(ch);
