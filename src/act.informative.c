@@ -75,6 +75,9 @@ static void format_color_field(char *out, size_t outsz, const char *src, size_t 
 #include "modify.h"
 #include "asciimap.h"
 #include "quest.h"
+#include "boards.h"
+#include "shop.h"
+#include "spec_procs.h"
 #include "criticalhits.h"
 
 
@@ -612,6 +615,195 @@ static bool compass_exit_visible(struct char_data *ch, int dir)
   return TRUE;
 }
 
+/* Map centering preference uses an unused PRF flag slot. */
+#define PRF_MAPCENTER PRF_UNUSED4
+
+static size_t visible_strlen_ansi(const char *s)
+{
+  size_t len = 0;
+
+  if (!s)
+    return 0;
+
+  while (*s) {
+    if (*s == '\r' || *s == '\n') {
+      s++;
+      continue;
+    }
+
+    if (*s == '\t' && *(s + 1)) {
+      s += 2;
+      continue;
+    }
+
+    if (*s == '@' && *(s + 1)) {
+      s += 2;
+      continue;
+    }
+
+    if (*s == '\033') {
+      s++;
+      if (*s == '[') {
+        s++;
+        while (*s && *s != 'm')
+          s++;
+        if (*s == 'm')
+          s++;
+      } else if (*s) {
+        s++;
+      }
+      continue;
+    }
+
+    len++;
+    s++;
+  }
+
+  return len;
+}
+
+static size_t map_screen_width(const struct char_data *ch)
+{
+  if (ch && ch->desc && ch->desc->pProtocol && ch->desc->pProtocol->bMSDP &&
+      ch->desc->pProtocol->ScreenWidth > 0)
+    return (size_t)ch->desc->pProtocol->ScreenWidth;
+
+  if (ch && !IS_NPC(ch) && GET_SCREEN_WIDTH(ch) > 0)
+    return (size_t)GET_SCREEN_WIDTH(ch);
+
+  return 80;
+}
+
+static bool room_has_shopkeeper(room_rnum rnum)
+{
+  struct char_data *mob;
+
+  if (!VALID_ROOM_RNUM(rnum))
+    return FALSE;
+
+  for (mob = world[rnum].people; mob; mob = mob->next_in_room) {
+    if (!IS_MOB(mob))
+      continue;
+
+    if (GET_MOB_SPEC(mob) == shop_keeper)
+      return TRUE;
+
+    if (shop_index) {
+      int shop;
+
+      for (shop = 0; shop <= top_shop; shop++) {
+        if (SHOP_KEEPER(shop) == GET_MOB_RNUM(mob))
+          return TRUE;
+      }
+    }
+  }
+
+  return FALSE;
+}
+
+static bool room_has_guildmaster(room_rnum rnum)
+{
+  struct char_data *mob;
+
+  if (!VALID_ROOM_RNUM(rnum))
+    return FALSE;
+
+  for (mob = world[rnum].people; mob; mob = mob->next_in_room) {
+    if (!IS_MOB(mob))
+      continue;
+
+    if (GET_MOB_SPEC(mob) == guild || MOB_FLAGGED(mob, MOB_GUILD_MASTER))
+      return TRUE;
+  }
+
+  return FALSE;
+}
+
+static bool room_has_board(room_rnum rnum)
+{
+  struct obj_data *obj;
+
+  if (!VALID_ROOM_RNUM(rnum))
+    return FALSE;
+
+  for (obj = world[rnum].contents; obj; obj = obj->next_content) {
+    if (GET_OBJ_SPEC(obj) == gen_board)
+      return TRUE;
+
+    if (obj->item_number != NOTHING) {
+      int board;
+
+      for (board = 0; board < NUM_OF_BOARDS; board++) {
+        if (BOARD_RNUM(board) == obj->item_number)
+          return TRUE;
+      }
+    }
+  }
+
+  return FALSE;
+}
+
+static bool room_has_quest_or_spec(room_rnum rnum)
+{
+  struct char_data *mob;
+
+  if (!VALID_ROOM_RNUM(rnum))
+    return FALSE;
+
+  if (GET_ROOM_SPEC(rnum) != NULL)
+    return TRUE;
+
+  for (mob = world[rnum].people; mob; mob = mob->next_in_room) {
+    if (!IS_MOB(mob))
+      continue;
+
+    if (GET_MOB_SPEC(mob) == questmaster)
+      return TRUE;
+  }
+
+  return FALSE;
+}
+
+static char room_poi_marker(room_rnum rnum)
+{
+  if (!VALID_ROOM_RNUM(rnum))
+    return ' ';
+
+  if (room_has_shopkeeper(rnum))
+    return '$';
+
+  if (room_has_guildmaster(rnum))
+    return 'G';
+
+  if (room_has_board(rnum))
+    return 'B';
+
+  if (ROOM_FLAGGED(rnum, ROOM_DEATH))
+    return '!';
+
+  if (room_has_quest_or_spec(rnum))
+    return '?';
+
+  return ' ';
+}
+
+static void append_map_line(char *out, size_t outsz, const char *line, size_t indent)
+{
+  size_t len;
+  int nlen;
+
+  if (!out || outsz == 0 || !line)
+    return;
+
+  len = strlen(out);
+  if (len >= outsz)
+    return;
+
+  nlen = snprintf(out + len, outsz - len, "%*s%s\r\n", (int)indent, "", line);
+  if (nlen < 0)
+    out[outsz - 1] = '\0';
+}
+
 static void build_room_compass_map(struct char_data *ch, struct room_data *room,
                                    char *out, size_t outsz)
 {
@@ -624,11 +816,18 @@ static void build_room_compass_map(struct char_data *ch, struct room_data *room,
   room_rnum to_s = NOWHERE;
   room_rnum to_w = NOWHERE;
   const char *box = CCFWHT(ch, C_NRM);
-  const char *dir_active = CCFCYN(ch, C_NRM);
   const char *x_color = CCFYEL(ch, C_NRM);
   const char *reset = CCNRM(ch, C_NRM);
   const char *blank = "     ";
   const char *gap = " ";
+  bool center_map = FALSE;
+  size_t map_width = 0;
+  size_t indent = 0;
+  int line = 0;
+  char north_marker = ' ';
+  char east_marker = ' ';
+  char south_marker = ' ';
+  char west_marker = ' ';
   char north_top[32];
   char north_mid[64];
   char north_bot[32];
@@ -648,6 +847,7 @@ static void build_room_compass_map(struct char_data *ch, struct room_data *room,
   char connector_s[32];
   char connector_w[16];
   char connector_e[16];
+  char lines[11][96];
 
   (void)room;
 
@@ -664,9 +864,18 @@ static void build_room_compass_map(struct char_data *ch, struct room_data *room,
   to_s = (has_s && EXIT(ch, SOUTH)) ? EXIT(ch, SOUTH)->to_room : NOWHERE;
   to_w = (has_w && EXIT(ch, WEST)) ? EXIT(ch, WEST)->to_room : NOWHERE;
 
+  if (has_n && to_n != NOWHERE)
+    north_marker = room_poi_marker(to_n);
+  if (has_e && to_e != NOWHERE)
+    east_marker = room_poi_marker(to_e);
+  if (has_s && to_s != NOWHERE)
+    south_marker = room_poi_marker(to_s);
+  if (has_w && to_w != NOWHERE)
+    west_marker = room_poi_marker(to_w);
+
   if (has_n) {
     snprintf(north_top, sizeof(north_top), "%s+---+%s", box, reset);
-    snprintf(north_mid, sizeof(north_mid), "%s|%s %sN%s %s|%s", box, reset, dir_active, reset, box, reset);
+    snprintf(north_mid, sizeof(north_mid), "%s|%s %c %s|%s", box, reset, north_marker, box, reset);
     snprintf(north_bot, sizeof(north_bot), "%s+---+%s", box, reset);
   } else {
     snprintf(north_top, sizeof(north_top), "%s", blank);
@@ -676,7 +885,7 @@ static void build_room_compass_map(struct char_data *ch, struct room_data *room,
 
   if (has_s) {
     snprintf(south_top, sizeof(south_top), "%s+---+%s", box, reset);
-    snprintf(south_mid, sizeof(south_mid), "%s|%s %sS%s %s|%s", box, reset, dir_active, reset, box, reset);
+    snprintf(south_mid, sizeof(south_mid), "%s|%s %c %s|%s", box, reset, south_marker, box, reset);
     snprintf(south_bot, sizeof(south_bot), "%s+---+%s", box, reset);
   } else {
     snprintf(south_top, sizeof(south_top), "%s", blank);
@@ -686,7 +895,7 @@ static void build_room_compass_map(struct char_data *ch, struct room_data *room,
 
   if (has_w) {
     snprintf(west_top, sizeof(west_top), "%s+---+%s", box, reset);
-    snprintf(west_mid, sizeof(west_mid), "%s|%s %sW%s %s|%s", box, reset, dir_active, reset, box, reset);
+    snprintf(west_mid, sizeof(west_mid), "%s|%s %c %s|%s", box, reset, west_marker, box, reset);
     snprintf(west_bot, sizeof(west_bot), "%s+---+%s", box, reset);
   } else {
     snprintf(west_top, sizeof(west_top), "%s", blank);
@@ -696,7 +905,7 @@ static void build_room_compass_map(struct char_data *ch, struct room_data *room,
 
   if (has_e) {
     snprintf(east_top, sizeof(east_top), "%s+---+%s", box, reset);
-    snprintf(east_mid, sizeof(east_mid), "%s|%s %sE%s %s|%s", box, reset, dir_active, reset, box, reset);
+    snprintf(east_mid, sizeof(east_mid), "%s|%s %c %s|%s", box, reset, east_marker, box, reset);
     snprintf(east_bot, sizeof(east_bot), "%s+---+%s", box, reset);
   } else {
     snprintf(east_top, sizeof(east_top), "%s", blank);
@@ -728,35 +937,40 @@ static void build_room_compass_map(struct char_data *ch, struct room_data *room,
   else
     snprintf(connector_e, sizeof(connector_e), " ");
 
-  snprintf(out, outsz,
-           "%s %s %s\r\n"
-           "%s %s %s\r\n"
-           "%s %s %s\r\n"
-           "%s %s %s\r\n"
-           "%s%s%s%s%s\r\n"
-           "%s%s%s%s%s\r\n"
-           "%s%s%s%s%s\r\n"
-           "%s %s %s\r\n"
-           "%s %s %s\r\n"
-           "%s %s %s\r\n"
-           "%s %s %s\r\n"
-           "\r\n",
-           blank, north_top, blank,
-           blank, north_mid, blank,
-           blank, north_bot, blank,
-           blank, connector_n, blank,
-           west_top, gap, center_top, gap, east_top,
-           west_mid, connector_w, center_mid, connector_e, east_mid,
-           west_bot, gap, center_bot, gap, east_bot,
-           blank, connector_s, blank,
-           blank, south_top, blank,
-           blank, south_mid, blank,
-           blank, south_bot, blank);
+  snprintf(lines[line++], sizeof(lines[0]), "%s %s %s", blank, north_top, blank);
+  snprintf(lines[line++], sizeof(lines[0]), "%s %s %s", blank, north_mid, blank);
+  snprintf(lines[line++], sizeof(lines[0]), "%s %s %s", blank, north_bot, blank);
+  snprintf(lines[line++], sizeof(lines[0]), "%s %s %s", blank, connector_n, blank);
+  snprintf(lines[line++], sizeof(lines[0]), "%s%s%s%s%s", west_top, gap, center_top, gap, east_top);
+  snprintf(lines[line++], sizeof(lines[0]), "%s%s%s%s%s", west_mid, connector_w, center_mid, connector_e, east_mid);
+  snprintf(lines[line++], sizeof(lines[0]), "%s%s%s%s%s", west_bot, gap, center_bot, gap, east_bot);
+  snprintf(lines[line++], sizeof(lines[0]), "%s %s %s", blank, connector_s, blank);
+  snprintf(lines[line++], sizeof(lines[0]), "%s %s %s", blank, south_top, blank);
+  snprintf(lines[line++], sizeof(lines[0]), "%s %s %s", blank, south_mid, blank);
+  snprintf(lines[line++], sizeof(lines[0]), "%s %s %s", blank, south_bot, blank);
 
-  (void)to_n;
-  (void)to_e;
-  (void)to_s;
-  (void)to_w;
+  for (line = 0; line < 11; line++) {
+    size_t line_width = visible_strlen_ansi(lines[line]);
+
+    if (line_width > map_width)
+      map_width = line_width;
+  }
+
+  if (!IS_NPC(ch) && PRF_FLAGGED(ch, PRF_MAPCENTER))
+    center_map = TRUE;
+
+  if (center_map) {
+    size_t screen_width = map_screen_width(ch);
+
+    if (screen_width > map_width)
+      indent = (screen_width - map_width) / 2;
+  }
+
+  out[0] = '\0';
+  for (line = 0; line < 11; line++)
+    append_map_line(out, outsz, lines[line], indent);
+
+  strlcat(out, "\r\n", outsz);
 }
 
 
@@ -3355,6 +3569,9 @@ ACMD(do_toggle)
     {"automap", PRF_AUTOMAP, 1,
     "You will no longer see the mini-map.\r\n",
     "You will now see a mini-map at the side of room descriptions.\r\n"},
+    {"mapcenter", PRF_MAPCENTER, 1,
+    "Mini-map centering disabled.\r\n",
+    "Mini-map centering enabled.\r\n"},
     {"autokey", PRF_AUTOKEY, 0,
     "You will now have to unlock doors manually before opening.\r\n",
     "You will now automatically unlock doors when opening them (if you have the key).\r\n"},
@@ -3450,12 +3667,14 @@ ACMD(do_toggle)
     "     AutoAssist: %-3s    "
     "        AutoMap: %-3s\r\n"
 
+    "     MapCenter: %-3s    "
     "     Pagelength: %-3d    "
-    "    Screenwidth: %-3d    "
-    "            AFK: %-3s\r\n"
+    "    Screenwidth: %-3d\r\n"
 
+    "            AFK: %-3s    "
     "        Autokey: %-3s    "
-    "       Autodoor: %-3s    "
+    "       Autodoor: %-3s\r\n"
+
     "          Color: %s     \r\n ",
 
     ONOFF(PRF_FLAGGED(ch, PRF_BRIEF)),
@@ -3482,10 +3701,10 @@ ACMD(do_toggle)
     ONOFF(PRF_FLAGGED(ch, PRF_AUTOASSIST)),
     ONOFF(PRF_FLAGGED(ch, PRF_AUTOMAP)),
 
+    ONOFF(PRF_FLAGGED(ch, PRF_MAPCENTER)),
     GET_PAGE_LENGTH(ch),
     GET_SCREEN_WIDTH(ch),
     ONOFF(PRF_FLAGGED(ch, PRF_AFK)),
-
     ONOFF(PRF_FLAGGED(ch, PRF_AUTOKEY)),
     ONOFF(PRF_FLAGGED(ch, PRF_AUTODOOR)),
     types[COLOR_LEV(ch)]);
