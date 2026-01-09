@@ -1107,7 +1107,8 @@ ACMD(do_spellup)
   one_argument(argument, arg);
 
   if (*arg) {
-    int number = get_number(&arg);
+    char *argp = arg;
+    int number = get_number(&argp);
     if ((tch = get_char_vis(ch, arg, &number, FIND_CHAR_ROOM)) == NULL) {
       send_to_char(ch, "You don't see that person here.\r\n");
       return;
@@ -1170,7 +1171,8 @@ ACMD(do_spellup)
 ACMD(do_cast) {
   struct char_data *tch = NULL;
   struct obj_data *tobj = NULL;
-  const char *target_argument;
+  char *target_argument;
+  char *targp = NULL;
   char spell_input[MAX_INPUT_LENGTH], target_input[MAX_INPUT_LENGTH];
   char target_name[MAX_INPUT_LENGTH];
   char ambiguity[MAX_STRING_LENGTH];
@@ -1199,7 +1201,7 @@ ACMD(do_cast) {
     memcpy(spell_input, argument, len);
     spell_input[len] = '\0';
 
-    target_argument = closing ? closing + 1 : NULL;
+    target_argument = closing ? (char *)closing + 1 : NULL;
     if (target_argument) {
       char *target_ptr = (char *)target_argument;
       skip_spaces(&target_ptr);
@@ -1244,7 +1246,9 @@ ACMD(do_cast) {
     strlcpy(target_name, target_input, sizeof(target_name));
     one_argument(target_name, target_name);
     target_argument = target_name;
-    skip_spaces(&target_argument);
+    targp = target_argument;
+    skip_spaces(&targp);
+    target_argument = targp;
 
     /* Copy target to global cast_arg2, for use in spells like locate object */
     strcpy(cast_arg2, target_argument);
@@ -1252,7 +1256,7 @@ ACMD(do_cast) {
   if (IS_SET(SINFO.targets, TAR_IGNORE)) {
     target = TRUE;
   } else if (target_argument != NULL && *target_argument) {
-    number = get_number(&target_argument);
+    number = get_number(&targp);
     if (!target && (IS_SET(SINFO.targets, TAR_CHAR_ROOM))) {
       if ((tch = get_char_vis(ch, target_argument, &number, FIND_CHAR_ROOM)) != NULL)
         target = TRUE;

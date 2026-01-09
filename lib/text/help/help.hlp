@@ -4423,6 +4423,163 @@ Level 90
 - Player XP per kill: ~15,300
 - Mob EXP to set: ~46,000
 #31
+KEYWORDS
+
+This help file is unfinished.
+Welcome to Adventurers Lair.
+This help file covers the basics to get you started.
+PROMPT
+Your prompt shows HP, Mana, Move, and XP.
+Customize it with:
+prompt
+prompt <text>
+Example:
+prompt [H:%h M:%m V:%v]
+MOVEMENT
+Move with:
+n s e w u d
+Look around:
+look
+look <object>
+exits
+Open doors or gates:
+open <door>
+open <direction>
+MAP
+A small map appears near room text.
+View a larger map:
+map
+map 4
+map 5
+ITEMS
+Check inventory:
+inventory
+equipment
+Pick up and store items:
+get <item>
+put <item> <container>
+drop <item>
+COMBAT
+Attack:
+kill <target>
+Escape:
+flee
+Pets assist automatically.
+SPELLS AND ITEMS
+Cast spells:
+cast <spell> <target>
+Magic items:
+recite <scroll>
+quaff <potion>
+use <wand> <target>
+use <staff>
+SKILLS AND TRAINING
+View abilities:
+skills
+spells
+Practice and train at guildmasters:
+practice
+train
+EATING AND REST
+Eat and drink:
+eat <food>
+drink <container>
+Recover:
+rest
+sleep
+wake
+stand
+HELP AND CHAT
+Help:
+help <topic>
+Talk:
+say <message>
+tell <player> <message>
+newbie <message>
+Save often:
+save
+Recall if lost:
+recall
+#0
+KEYWORDS
+
+This help file is unfinished.
+NEWPLAYER
+Welcome to Adventurers Lair.
+This help file covers the basics to get you started.
+PROMPT
+Your prompt shows HP, Mana, Move, and XP.
+Customize it with:
+prompt
+prompt <text>
+Example:
+prompt [H:%h M:%m V:%v]
+MOVEMENT
+Move with:
+n s e w u d
+Look around:
+look
+look <object>
+exits
+Open doors or gates:
+open <door>
+open <direction>
+MAP
+A small map appears near room text.
+View a larger map:
+map
+map 4
+map 5
+ITEMS
+Check inventory:
+inventory
+equipment
+Pick up and store items:
+get <item>
+put <item> <container>
+drop <item>
+COMBAT
+Attack:
+kill <target>
+Escape:
+flee
+Pets assist automatically.
+SPELLS AND ITEMS
+Cast spells:
+cast <spell> <target>
+Magic items:
+recite <scroll>
+quaff <potion>
+use <wand> <target>
+use <staff>
+SKILLS AND TRAINING
+View abilities:
+skills
+spells
+Practice and train at guildmasters:
+practice
+train
+EATING AND REST
+Eat and drink:
+eat <food>
+drink <container>
+Recover:
+rest
+sleep
+wake
+stand
+HELP AND CHAT
+Help:
+help <topic>
+Talk:
+say <message>
+tell <player> <message>
+newbie <message>
+Save often:
+save
+Recall if lost:
+recall
+#0
 KICK
 
 Some fighting classes only.
@@ -5828,6 +5985,9 @@ Use NO<channel> if you wish to stop using and seeing that channel. A
 
 See also: TOGGLE, FLAGS, TELL, WHO
 #0
+Nothing.
+NEWPLAYER
+#1
 NOTITLE
 
 Usage: notitle <victim>
@@ -13775,7 +13935,85 @@ zlock - Locks one or all zones. Type zlock for usage.
 zunlock - Locks one or all zones. Type zunlock for usage.
 
 #31
-Nothing.
+KEYWORDS
+
+This help file is unfinished.
 NEWPLAYER
-#1
+
+NEWPLAYER
+Welcome to Adventurers Lair.
+This help file covers the basics to get you started.
+PROMPT
+Your prompt shows HP, Mana, Move, and XP.
+Customize it with:
+prompt
+prompt <text>
+Example:
+prompt [H:%h M:%m V:%v]
+MOVEMENT
+Move with:
+n s e w u d
+Look around:
+look
+look <object>
+exits
+Open doors or gates:
+open <door>
+open <direction>
+MAP
+A small map appears near room text.
+View a larger map:
+map
+map 4
+map 5
+ITEMS
+Check inventory:
+inventory
+equipment
+Pick up and store items:
+get <item>
+put <item> <container>
+drop <item>
+COMBAT
+Attack:
+kill <target>
+Escape:
+flee
+Pets assist automatically.
+SPELLS AND ITEMS
+Cast spells:
+cast <spell> <target>
+Magic items:
+recite <scroll>
+quaff <potion>
+use <wand> <target>
+use <staff>
+SKILLS AND TRAINING
+View abilities:
+skills
+spells
+Practice and train at guildmasters:
+practice
+train
+EATING AND REST
+Eat and drink:
+eat <food>
+drink <container>
+Recover:
+rest
+sleep
+wake
+stand
+HELP AND CHAT
+Help:
+help <topic>
+Talk:
+say <message>
+tell <player> <message>
+newbie <message>
+Save often:
+save
+Recall if lost:
+recall
+#0
 $~
