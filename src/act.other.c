@@ -710,6 +710,7 @@ ACMD(do_title)
   else {
     set_title(ch, argument);
     send_to_char(ch, "Okay, you're now %s%s%s.\r\n", GET_NAME(ch), *GET_TITLE(ch) ? " " : "", GET_TITLE(ch));
+    save_char(ch);
   }
 }
 
