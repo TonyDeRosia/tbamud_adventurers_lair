@@ -630,6 +630,11 @@ static int find_spell_by_tokens(const char *name, char *ambig_buf,
   return -1;
 }
 
+static int find_spell_by_prefix(const char *name, char *ambig_buf,
+    size_t ambig_len) {
+  return find_spell_by_tokens(name, ambig_buf, ambig_len, NULL, TRUE, FALSE);
+}
+
 static struct char_data *find_char_prefix(struct char_data *ch,
     const char *name, int number, bool include_fighting, char *ambig_buf,
     size_t ambig_len) {
@@ -1205,6 +1210,7 @@ ACMD(do_cast) {
   char *target_argument;
   char *targp = NULL;
   char spell_input[MAX_INPUT_LENGTH], target_input[MAX_INPUT_LENGTH];
+  char work[MAX_INPUT_LENGTH];
   char target_name[MAX_INPUT_LENGTH];
   char ambiguity[MAX_STRING_LENGTH];
   int number, mana, spellnum, i, target = 0;
@@ -1242,14 +1248,60 @@ ACMD(do_cast) {
     spellnum = find_spell_by_tokens(spell_input, ambiguity, sizeof(ambiguity),
         &matched_tokens, FALSE, FALSE);
   } else {
-    spellnum = find_spell_by_tokens(argument, ambiguity, sizeof(ambiguity),
-        &matched_tokens, TRUE, TRUE);
-    if (spellnum > 0) {
-      char *target_ptr = argument;
-      for (i = 0; i < matched_tokens && *target_ptr; i++)
-        target_ptr = any_one_arg(target_ptr, spell_input);
-      skip_spaces(&target_ptr);
-      target_argument = target_ptr;
+    int best_cut = -1;
+    int best_spellnum = -1;
+    char ambiguity_local[MAX_STRING_LENGTH];
+
+    strlcpy(work, argument, sizeof(work));
+
+    char *p;
+
+    for (p = work; *p; p++) {
+      if (*p == ' ') {
+        char saved = *p;
+        *p = '\0';
+
+        if (*work) {
+          int sn = find_spell_by_prefix(work, ambiguity_local,
+              sizeof(ambiguity_local));
+          if (sn > 0) {
+            best_spellnum = sn;
+            best_cut = (int)(p - work);
+          }
+        }
+
+        *p = saved;
+      }
+    }
+
+    if (*work) {
+      int snfull = find_spell_by_prefix(work, ambiguity_local,
+          sizeof(ambiguity_local));
+      if (snfull > 0) {
+        best_spellnum = snfull;
+        best_cut = -1;
+      }
+    }
+
+    if (best_spellnum > 0) {
+      if (best_cut >= 0) {
+        work[best_cut] = '\0';
+        target_argument = work + best_cut + 1;
+        skip_spaces(&target_argument);
+      } else {
+        target_argument = NULL;
+      }
+      spellnum = best_spellnum;
+    } else {
+      spellnum = find_spell_by_tokens(argument, ambiguity, sizeof(ambiguity),
+          &matched_tokens, TRUE, TRUE);
+      if (spellnum > 0) {
+        char *target_ptr = argument;
+        for (i = 0; i < matched_tokens && *target_ptr; i++)
+          target_ptr = any_one_arg(target_ptr, spell_input);
+        skip_spaces(&target_ptr);
+        target_argument = target_ptr;
+      }
     }
   }
 
