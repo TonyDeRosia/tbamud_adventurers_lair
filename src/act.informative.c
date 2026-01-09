@@ -10,6 +10,7 @@
 
 #include "conf.h"
 #include "sysdep.h"
+#include <stdarg.h>
 
 
 /* Who clan column helpers (center clan tag in fixed width). */
@@ -611,6 +612,72 @@ static bool compass_exit_visible(struct char_data *ch, int dir)
   return TRUE;
 }
 
+static const char *get_adj_room_name(struct char_data *ch, int dir)
+{
+  struct room_direction_data *ex = EXIT(ch, dir);
+
+  if (!compass_exit_visible(ch, dir))
+    return NULL;
+
+  if (!ex || ex->to_room == NOWHERE)
+    return NULL;
+
+  return world[ex->to_room].name;
+}
+
+static void center_cell(char *dst, size_t dstsz, const char *txt, int width)
+{
+  size_t len;
+  int left_pad;
+  int i;
+
+  if (!dst || dstsz == 0 || width <= 0)
+    return;
+
+  if (!txt)
+    txt = "";
+
+  len = strlen(txt);
+  if ((int)len > width)
+    len = (size_t)width;
+
+  left_pad = (width - (int)len) / 2;
+  for (i = 0; i < width && (size_t)i + 1 < dstsz; i++)
+    dst[i] = ' ';
+
+  for (i = 0; i < (int)len && (size_t)(left_pad + i) + 1 < dstsz; i++)
+    dst[left_pad + i] = txt[i];
+
+  if ((size_t)width < dstsz)
+    dst[width] = '\0';
+  else
+    dst[dstsz - 1] = '\0';
+
+}
+
+static void append_to_buffer(char *out, size_t outsz, size_t *pos, const char *fmt, ...)
+{
+  va_list args;
+  int written;
+  size_t remaining;
+
+  if (!out || outsz == 0 || !pos || *pos >= outsz)
+    return;
+
+  remaining = outsz - *pos;
+  va_start(args, fmt);
+  written = vsnprintf(out + *pos, remaining, fmt, args);
+  va_end(args);
+
+  if (written < 0)
+    return;
+
+  if ((size_t)written >= remaining)
+    *pos = outsz - 1;
+  else
+    *pos += (size_t)written;
+}
+
 static void build_room_compass_map(struct char_data *ch, struct room_data *room,
                                    char *out, size_t outsz)
 {
@@ -631,6 +698,13 @@ static void build_room_compass_map(struct char_data *ch, struct room_data *room,
   const char *west_label;
   const char *east_label;
   const char *south_label;
+  size_t used = 0;
+  char cell_blank[19];
+  char cell_north[19];
+  char cell_south[19];
+  char cell_west[19];
+  char cell_east[19];
+  char cell_center[19];
 
   (void)room;
 
@@ -668,6 +742,18 @@ static void build_room_compass_map(struct char_data *ch, struct room_data *room,
            east_color, east_label, reset,
            box, reset,
            south_color, south_label, reset);
+
+  used = strnlen(out, outsz);
+  center_cell(cell_blank, sizeof(cell_blank), NULL, 18);
+  center_cell(cell_north, sizeof(cell_north), get_adj_room_name(ch, NORTH), 18);
+  center_cell(cell_south, sizeof(cell_south), get_adj_room_name(ch, SOUTH), 18);
+  center_cell(cell_west, sizeof(cell_west), get_adj_room_name(ch, WEST), 18);
+  center_cell(cell_east, sizeof(cell_east), get_adj_room_name(ch, EAST), 18);
+  center_cell(cell_center, sizeof(cell_center), room ? room->name : "", 18);
+
+  append_to_buffer(out, outsz, &used, "%s %s %s\r\n", cell_blank, cell_north, cell_blank);
+  append_to_buffer(out, outsz, &used, "%s %s %s\r\n", cell_west, cell_center, cell_east);
+  append_to_buffer(out, outsz, &used, "%s %s %s\r\n", cell_blank, cell_south, cell_blank);
 }
 
 
