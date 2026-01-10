@@ -2192,10 +2192,6 @@ static int is_aff_debuff(const struct affected_type *af)
 {
   if (!af) return 0;
 
-  /* Negative modifiers are usually debuffs */
-  if (af->modifier < 0)
-    return 1;
-
   /* Common debuff flags */
 #ifdef AFF_POISON
   if (IS_SET_AR(af->bitvector, AFF_POISON)) return 1;
@@ -2209,6 +2205,25 @@ static int is_aff_debuff(const struct affected_type *af)
 #ifdef AFF_CHARM
   if (IS_SET_AR(af->bitvector, AFF_CHARM)) return 1;
 #endif
+
+  if (is_spirit_spell(af->spell))
+    return 0;
+
+  if (af->location == APPLY_NONE)
+    return 0;
+
+  switch (af->location) {
+    case APPLY_AC:
+    case APPLY_SAVING_BREATH:
+    case APPLY_SAVING_SPELL:
+    case APPLY_SAVING_PARA:
+    case APPLY_SAVING_ROD:
+    case APPLY_SAVING_PETRI:
+      return (af->modifier > 0);
+  }
+
+  if (af->modifier < 0)
+    return 1;
 
   return 0;
 }
