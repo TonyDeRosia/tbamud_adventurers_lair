@@ -65,6 +65,7 @@ static void group_gain(struct char_data *ch, struct char_data *victim);
 static void solo_gain(struct char_data *ch, struct char_data *victim);
 /** @todo refactor this function name */
 static char *replace_string(const char *str, const char *weapon_singular, const char *weapon_plural);
+static void do_spirit_procs(struct char_data *ch, struct char_data *vict);
 
 
 /* Per-hit crit multiplier for message shaping (0 means no crit for this hit). */
@@ -198,6 +199,76 @@ static int compute_thaco(struct char_data *ch, struct char_data *vict);
 
 
 #define IS_WEAPON(type) (((type) >= TYPE_HIT) && ((type) < TYPE_SUFFERING))
+
+static int spirit_proc_damage(const struct char_data *ch)
+{
+  int bonus = 0;
+  int dam = 0;
+
+  if (!ch)
+    return 0;
+
+  bonus = MIN(GET_LEVEL(ch) / 30, 2);
+  dam = dice(1, 3) + bonus;
+
+  return MIN(dam, 5);
+}
+
+static void spirit_proc_attack(struct char_data *ch, struct char_data *vict, int attacktype,
+                               int proc_chance, int hit_chance)
+{
+  int dam;
+
+  if (!ch || !vict)
+    return;
+
+  if (rand_number(1, 100) > proc_chance)
+    return;
+
+  if (!CAN_SEE(ch, vict))
+    return;
+
+  if (rand_number(1, 100) > hit_chance) {
+    damage(ch, vict, 0, attacktype);
+    return;
+  }
+
+  dam = spirit_proc_damage(ch);
+  damage(ch, vict, dam, attacktype);
+}
+
+static void do_spirit_procs(struct char_data *ch, struct char_data *vict)
+{
+  const int proc_chance = 10;
+  const int hit_chance = 70;
+
+  if (!ch || !vict)
+    return;
+
+  if (!FIGHTING(ch))
+    return;
+
+  if (DEAD(vict) || IN_ROOM(ch) != IN_ROOM(vict))
+    return;
+
+  if (!affected_by_spell(ch, SPELL_BEAR_SPIRIT) &&
+      !affected_by_spell(ch, SPELL_WOLF_SPIRIT) &&
+      !affected_by_spell(ch, SPELL_TIGER_SPIRIT) &&
+      !affected_by_spell(ch, SPELL_EAGLE_SPIRIT) &&
+      !affected_by_spell(ch, SPELL_DRAGON_SPIRIT))
+    return;
+
+  if (affected_by_spell(ch, SPELL_BEAR_SPIRIT))
+    spirit_proc_attack(ch, vict, SPELL_BEAR_SPIRIT, proc_chance, hit_chance);
+  if (affected_by_spell(ch, SPELL_WOLF_SPIRIT))
+    spirit_proc_attack(ch, vict, SPELL_WOLF_SPIRIT, proc_chance, hit_chance);
+  if (affected_by_spell(ch, SPELL_TIGER_SPIRIT))
+    spirit_proc_attack(ch, vict, SPELL_TIGER_SPIRIT, proc_chance, hit_chance);
+  if (affected_by_spell(ch, SPELL_EAGLE_SPIRIT))
+    spirit_proc_attack(ch, vict, SPELL_EAGLE_SPIRIT, proc_chance, hit_chance);
+  if (affected_by_spell(ch, SPELL_DRAGON_SPIRIT))
+    spirit_proc_attack(ch, vict, SPELL_DRAGON_SPIRIT, proc_chance, hit_chance);
+}
 /* The Fight related routines */
 void appear(struct char_data *ch)
 {
@@ -1379,11 +1450,11 @@ void perform_violence(void)
       continue;
     }
 
- if (GROUP(ch) && GROUP(ch)->members && GROUP(ch)->members->iSize) {
+    if (GROUP(ch) && GROUP(ch)->members && GROUP(ch)->members->iSize) {
       struct iterator_data Iterator;
 
       tch = (struct char_data *) merge_iterator(&Iterator, GROUP(ch)->members);
-    for (; tch ; tch = next_in_list(&Iterator)) {
+      for (; tch ; tch = next_in_list(&Iterator)) {
         if (tch == ch)
           continue;
         if (!IS_NPC(tch) && !PRF_FLAGGED(tch, PRF_AUTOASSIST))
@@ -1403,7 +1474,11 @@ void perform_violence(void)
 
     hit(ch, FIGHTING(ch), TYPE_UNDEFINED);
     
-        do_offhand_attack(ch, FIGHTING(ch));if (MOB_FLAGGED(ch, MOB_SPEC) && GET_MOB_SPEC(ch) && !MOB_FLAGGED(ch, MOB_NOTDEADYET)) {
+    do_offhand_attack(ch, FIGHTING(ch));
+    if (FIGHTING(ch))
+      do_spirit_procs(ch, FIGHTING(ch));
+
+    if (MOB_FLAGGED(ch, MOB_SPEC) && GET_MOB_SPEC(ch) && !MOB_FLAGGED(ch, MOB_NOTDEADYET)) {
       char actbuf[MAX_INPUT_LENGTH] = "";
       (GET_MOB_SPEC(ch)) (ch, ch, 0, actbuf);
     }

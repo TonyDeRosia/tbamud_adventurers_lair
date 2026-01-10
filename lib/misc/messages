@@ -909,3 +909,83 @@ $N is hit by $n's lightning breath.
 $N is immortal and immune to lightning breath.
 $n tries to breath lightning upon you.
 $n tries to breath lightning upon $N.
+
+* bear spirit 56
+M
+56
+\tGYour bear spirit mauls $N to death!\tn
+\tRThe bear spirit tears you apart!\tn
+\tG$n's bear spirit mauls $N to death!\tn
+\tGYour bear spirit swipes at $N but misses.\tn
+\tG$n's bear spirit swipes at you but misses.\tn
+\tG$n's bear spirit swipes at $N but misses.\tn
+\tGYour bear spirit rakes $N with heavy claws.\tn
+\tG$n's bear spirit rakes you with heavy claws.\tn
+\tG$n's bear spirit rakes $N with heavy claws.\tn
+\tW$N shrugs off your bear spirit's wrath.\tn
+\tWYou shrug off $n's bear spirit.\tn
+\tW$N shrugs off $n's bear spirit.\tn
+
+* wolf spirit 57
+M
+57
+\tWYour wolf spirit rends $N and leaves no mercy.\tn
+\tRThe wolf spirit's fangs end your hunt!\tn
+\tW$n's wolf spirit rends $N without mercy.\tn
+\tWYour wolf spirit snaps at $N but finds only air.\tn
+\tW$n's wolf spirit snaps at you but misses.\tn
+\tW$n's wolf spirit snaps at $N but misses.\tn
+\tWYour wolf spirit bites deep into $N.\tn
+\tW$n's wolf spirit bites deep into you.\tn
+\tW$n's wolf spirit bites deep into $N.\tn
+\tW$N refuses the wolf spirit's bite.\tn
+\tWYou refuse $n's wolf spirit.\tn
+\tW$N refuses $n's wolf spirit.\tn
+
+* tiger spirit 58
+M
+58
+\tYYour tiger spirit pounces and ends $N's fight.\tn
+\tRThe tiger spirit's pounce ends you!\tn
+\tY$n's tiger spirit pounces and ends $N's fight.\tn
+\tYYour tiger spirit stalks $N but slips away.\tn
+\tY$n's tiger spirit stalks you but slips away.\tn
+\tY$n's tiger spirit stalks $N but slips away.\tn
+\tYYour tiger spirit rips across $N's guard.\tn
+\tY$n's tiger spirit rips across your guard.\tn
+\tY$n's tiger spirit rips across $N's guard.\tn
+\tW$N is too swift for your tiger spirit.\tn
+\tWYou are too swift for $n's tiger spirit.\tn
+\tW$N is too swift for $n's tiger spirit.\tn
+
+* eagle spirit 59
+M
+59
+\tCYour eagle spirit dives and fells $N!\tn
+\tRThe eagle spirit's talons end you!\tn
+\tC$n's eagle spirit dives and fells $N!\tn
+\tCYour eagle spirit wheels past $N without a strike.\tn
+\tC$n's eagle spirit wheels past you without a strike.\tn
+\tC$n's eagle spirit wheels past $N without a strike.\tn
+\tCYour eagle spirit's talons rake $N from above.\tn
+\tC$n's eagle spirit's talons rake you from above.\tn
+\tC$n's eagle spirit's talons rake $N from above.\tn
+\tW$N's guard turns aside the eagle spirit.\tn
+\tWYour guard turns aside $n's eagle spirit.\tn
+\tW$N's guard turns aside $n's eagle spirit.\tn
+
+* dragon spirit 60
+M
+60
+\tRYour dragon spirit scorches $N into silence.\tn
+\tRDragonfire consumes you!\tn
+\tR$n's dragon spirit scorches $N into silence.\tn
+\tRYour dragon spirit exhales, but $N escapes the embers.\tn
+\tR$n's dragon spirit exhales, but you escape the embers.\tn
+\tR$n's dragon spirit exhales, but $N escapes the embers.\tn
+\tRYour dragon spirit lashes $N with burning force.\tn
+\tR$n's dragon spirit lashes you with burning force.\tn
+\tR$n's dragon spirit lashes $N with burning force.\tn
+\tW$N stands firm against your dragon spirit.\tn
+\tWYou stand firm against $n's dragon spirit.\tn
+\tW$N stands firm against $n's dragon spirit.\tn

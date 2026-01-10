@@ -695,6 +695,9 @@ void mag_affects(int level, struct char_data *ch, struct char_data *victim,
     af[2].modifier = -10;
     af[2].duration = 12 + level;
 
+    af[3].duration = 12 + level;
+    SET_BIT_AR(af[3].bitvector, AFF_FLYING);
+
     accum_duration = TRUE;
     accum_affect = TRUE;
     to_vict = "An eagle spirit guides your sight from above.";
@@ -716,9 +719,6 @@ void mag_affects(int level, struct char_data *ch, struct char_data *victim,
     af[3].location = APPLY_SAVING_BREATH;
     af[3].modifier = -2;
     af[3].duration = 12 + level;
-
-    af[4].duration = 12 + level;
-    SET_BIT_AR(af[4].bitvector, AFF_FLYING);
 
     accum_duration = TRUE;
     accum_affect = TRUE;
