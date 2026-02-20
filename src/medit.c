@@ -56,6 +56,7 @@ static const char *action_bits_olc[] = {
   "NO_BLIND",
   "NO_KILL",
   "GUILD_MASTER",
+  "RESERVED",
   "AI_ACTOR",
   "\n"
 };
@@ -385,6 +386,7 @@ static bool medit_illegal_mob_flag(int fl)
   const int illegal_flags[] = {
     MOB_ISNPC,
     MOB_NOTDEADYET,
+    20,
   };
 
   const int num_illegal_flags = sizeof(illegal_flags)/sizeof(int);
