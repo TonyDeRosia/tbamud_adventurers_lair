@@ -53,8 +53,10 @@ void mobile_activity(void)
       }
     }
 
-    if (MOB_FLAGGED(ch, MOB_AI_ACTOR))
-      ai_actor_tick(ch, time(0));
+    if (MOB_FLAGGED(ch, MOB_AI_ACTOR)) {
+      if (ai_actor_tick(ch, time(0)))
+        continue;
+    }
 
     /* If the mob has no specproc, do the default actions */
     if (FIGHTING(ch) || !AWAKE(ch))
