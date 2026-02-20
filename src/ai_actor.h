@@ -1,0 +1,118 @@
+#ifndef _AI_ACTOR_H_
+#define _AI_ACTOR_H_
+
+#define AI_MEM_MAX 12
+
+/* Optional compile-time debug logging. */
+#ifndef AI_ACTOR_DEBUG
+#define AI_ACTOR_DEBUG 0
+#endif
+
+enum ai_actor_role {
+  ROLE_UNKNOWN = 0,
+  ROLE_GUARD,
+  ROLE_MERCHANT,
+  ROLE_BANDIT,
+  ROLE_BEAST,
+  ROLE_UNDEAD,
+  ROLE_SPIRIT,
+  ROLE_CULTIST,
+  ROLE_CIVILIAN,
+  ROLE_BOSS
+};
+
+enum ai_actor_movement {
+  MOVE_SENTINEL = 0,
+  MOVE_PATROL,
+  MOVE_WANDER_RADIUS,
+  MOVE_ROAM_INTEREST
+};
+
+enum ai_actor_aggression {
+  AGG_PEACEFUL = 0,
+  AGG_RETALIATE,
+  AGG_TERRITORIAL,
+  AGG_OPPORTUNISTIC,
+  AGG_CRIME_HUNTER,
+  AGG_AMBUSH
+};
+
+enum ai_actor_social {
+  SOC_SILENT = 0,
+  SOC_WARNING,
+  SOC_TALKATIVE,
+  SOC_EXTORT
+};
+
+enum ai_actor_morale {
+  MORALE_BRAVE = 0,
+  MORALE_NORMAL,
+  MORALE_COWARD
+};
+
+#define MEM_WANTED      (1 << 0)
+#define MEM_ATTACKED_ME (1 << 1)
+#define MEM_HELPED_ME   (1 << 2)
+#define MEM_STOLE       (1 << 3)
+#define MEM_FLED_FROM   (1 << 4)
+
+enum {
+  AI_OPP_NONE = 0,
+  AI_OPP_PREF_WOUNDED = (1 << 0),
+  AI_OPP_PREF_ALONE = (1 << 1)
+};
+
+struct ai_actor_profile {
+  int role;
+  int movement;
+  int aggression;
+  int social;
+  int morale;
+  int home_room_vnum;
+  int roam_radius;
+  int flee_hp_percent;
+  int surrender_hp_percent;
+  int talk_cooldown_secs;
+  int room_talk_cooldown_secs;
+  int hunt_enabled;
+  int arrest_enabled;
+  int trade_enabled;
+  int whisper_enabled;
+  int assist_enabled;
+  int call_help_enabled;
+  int target_alignment_pref;
+  int opportunistic_pref;
+  int initialized;
+};
+
+struct ai_actor_memory_entry {
+  long idnum;
+  int hostility;
+  int trust;
+  int fear;
+  time_t last_update;
+  int last_room_vnum;
+  int flags;
+};
+
+struct ai_actor_state {
+  time_t next_tick;
+  time_t last_spoke;
+  time_t last_room_spoke;
+  int last_room_vnum_spoke;
+  struct ai_actor_memory_entry mem[AI_MEM_MAX];
+  int mem_count;
+  long current_target_idnum;
+  time_t target_last_seen;
+  int cached_zone;
+};
+
+void ai_actor_init(struct char_data *mob);
+void ai_actor_free(struct char_data *mob);
+int ai_actor_tick(struct char_data *mob, time_t now);
+void ai_actor_record_damage(struct char_data *mob, struct char_data *actor, int dam);
+void ai_actor_record_help(struct char_data *mob, struct char_data *actor, int amount);
+void ai_actor_record_crime(struct char_data *mob, struct char_data *criminal, int flags);
+void ai_actor_record_room_crime(struct char_data *witness, struct char_data *criminal, int flags);
+
+#endif

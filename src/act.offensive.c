@@ -20,6 +20,7 @@
 #include "act.h"
 #include "fight.h"
 #include "mud_event.h"
+#include "ai_actor.h"
 
 ACMD(do_assist)
 {
@@ -60,6 +61,8 @@ ACMD(do_assist)
       send_to_char(ch, "You join the fight!\r\n");
       act("$N assists you!", 0, helpee, 0, ch, TO_CHAR);
       act("$n assists $N.", FALSE, ch, 0, helpee, TO_NOTVICT);
+      if (IS_NPC(helpee) && !IS_NPC(ch))
+        ai_actor_record_help(helpee, ch, 5);
       hit(ch, opponent, TYPE_UNDEFINED);
     }
   }

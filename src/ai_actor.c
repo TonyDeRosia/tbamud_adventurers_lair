@@ -1,0 +1,760 @@
+#include "conf.h"
+#include "sysdep.h"
+
+#include <ctype.h>
+
+#include "structs.h"
+#include "utils.h"
+#include "db.h"
+#include "comm.h"
+#include "handler.h"
+#include "graph.h"
+#include "fight.h"
+#include "shop.h"
+#include "spells.h"
+#include "ai_actor.h"
+
+#define AI_HOSTILE_ATTACK_THRESHOLD 12
+#define AI_ROOM_IDLE_SKIP_SECS 12
+#define AI_BFS_MAX_DEPTH 6
+
+static int ai_debug = AI_ACTOR_DEBUG;
+
+static void ai_debug_log(const char *fmt, ...)
+{
+  va_list args;
+  char buf[MAX_STRING_LENGTH];
+
+  if (!ai_debug)
+    return;
+
+  va_start(args, fmt);
+  vsnprintf(buf, sizeof(buf), fmt, args);
+  va_end(args);
+  log("AI_ACTOR: %s", buf);
+}
+
+static void ai_extract_text(char *out, size_t outsz, struct char_data *mob)
+{
+  const char *parts[4];
+  char tmp[MAX_STRING_LENGTH];
+  size_t i, j = 0;
+  int p;
+
+  if (!out || outsz == 0) return;
+  out[0] = '\0';
+  if (!mob) return;
+
+  parts[0] = mob->player.name ? mob->player.name : "";
+  parts[1] = mob->player.short_descr ? mob->player.short_descr : "";
+  parts[2] = mob->player.long_descr ? mob->player.long_descr : "";
+  parts[3] = mob->player.description ? mob->player.description : "";
+
+  snprintf(tmp, sizeof(tmp), "%s %s %s %s", parts[0], parts[1], parts[2], parts[3]);
+
+  for (i = 0; tmp[i] != '\0' && j + 1 < outsz; i++) {
+    unsigned char c = (unsigned char)tmp[i];
+    if (isalnum(c))
+      out[j++] = (char)tolower(c);
+    else if (j > 0 && out[j - 1] != ' ')
+      out[j++] = ' ';
+  }
+  if (j > 0 && out[j - 1] == ' ')
+    j--;
+  out[j] = '\0';
+
+  for (p = (int)j - 1; p >= 0; p--) {
+    if (out[p] == ' ')
+      out[p] = '\0';
+    else
+      break;
+  }
+}
+
+static int ai_text_has(const char *hay, const char *needle)
+{
+  char token[128];
+  size_t nlen;
+  const char *pos;
+
+  if (!hay || !needle || !*hay || !*needle)
+    return FALSE;
+
+  nlen = strlen(needle);
+  if (nlen + 3 > sizeof(token))
+    return FALSE;
+
+  snprintf(token, sizeof(token), " %s ", needle);
+  pos = hay;
+  if (!strncmp(hay, needle, nlen) && (hay[nlen] == '\0' || hay[nlen] == ' '))
+    return TRUE;
+
+  while ((pos = strstr(pos, token + 1)) != NULL) {
+    if ((pos == hay || *(pos - 1) == ' ') &&
+        (pos[nlen] == '\0' || pos[nlen] == ' '))
+      return TRUE;
+    pos++;
+  }
+
+  return FALSE;
+}
+
+static int ai_role_weight_from_keywords(const char *text, const char *const *words)
+{
+  int score = 0, i;
+  for (i = 0; words[i]; i++) {
+    if (ai_text_has(text, words[i]))
+      score += 3;
+  }
+  return score;
+}
+
+static struct ai_actor_memory_entry *ai_mem_get_or_create(struct char_data *mob, long idnum)
+{
+  struct ai_actor_state *st;
+  int i, evict = 0;
+  int evict_score = 999999;
+
+  if (!mob || !mob->ai_state || idnum <= 0)
+    return NULL;
+
+  st = mob->ai_state;
+
+  for (i = 0; i < st->mem_count; i++) {
+    if (st->mem[i].idnum == idnum)
+      return &st->mem[i];
+  }
+
+  if (st->mem_count < AI_MEM_MAX) {
+    memset(&st->mem[st->mem_count], 0, sizeof(st->mem[st->mem_count]));
+    st->mem[st->mem_count].idnum = idnum;
+    st->mem[st->mem_count].last_update = time(0);
+    return &st->mem[st->mem_count++];
+  }
+
+  for (i = 0; i < AI_MEM_MAX; i++) {
+    int score = abs(st->mem[i].hostility) + abs(st->mem[i].trust) + abs(st->mem[i].fear) + ((st->mem[i].flags != 0) ? 5 : 0);
+    if (score < evict_score) {
+      evict = i;
+      evict_score = score;
+    }
+  }
+
+  memset(&st->mem[evict], 0, sizeof(st->mem[evict]));
+  st->mem[evict].idnum = idnum;
+  st->mem[evict].last_update = time(0);
+  return &st->mem[evict];
+}
+
+static void ai_mem_decay(struct char_data *mob, time_t now)
+{
+  struct ai_actor_state *st;
+  int i;
+
+  if (!mob || !mob->ai_state)
+    return;
+
+  st = mob->ai_state;
+
+  for (i = 0; i < st->mem_count; i++) {
+    struct ai_actor_memory_entry *e = &st->mem[i];
+    int steps;
+
+    if (e->idnum <= 0)
+      continue;
+
+    steps = (int)((now - e->last_update) / 120);
+    if (steps <= 0)
+      continue;
+    if (steps > 5)
+      steps = 5;
+
+    while (steps-- > 0) {
+      if (e->hostility > 0) e->hostility--;
+      else if (e->hostility < 0) e->hostility++;
+      if (e->trust > 0) e->trust--;
+      else if (e->trust < 0) e->trust++;
+      if (e->fear > 0) e->fear--;
+      else if (e->fear < 0) e->fear++;
+    }
+
+    if (e->hostility == 0 && e->trust == 0 && e->fear == 0 && (now - e->last_update) > 600) {
+      memset(e, 0, sizeof(*e));
+      continue;
+    }
+    e->last_update = now;
+  }
+}
+
+static int ai_mob_has_shop_data(struct char_data *mob)
+{
+  if (!mob || GET_MOB_RNUM(mob) == NOBODY)
+    return FALSE;
+  return (mob_index[GET_MOB_RNUM(mob)].func == shop_keeper);
+}
+
+static int ai_can_speak_now(struct char_data *mob, time_t now)
+{
+  struct ai_actor_profile *pf;
+  struct ai_actor_state *st;
+  int room_num_vnum;
+
+  if (!mob || !mob->ai_prof || !mob->ai_state)
+    return FALSE;
+  pf = mob->ai_prof;
+  st = mob->ai_state;
+
+  room_num_vnum = (IN_ROOM(mob) != NOWHERE) ? GET_ROOM_VNUM(IN_ROOM(mob)) : -1;
+
+  if ((now - st->last_spoke) < pf->talk_cooldown_secs)
+    return FALSE;
+  if (st->last_room_vnum_spoke == room_num_vnum && (now - st->last_room_spoke) < pf->room_talk_cooldown_secs)
+    return FALSE;
+  return TRUE;
+}
+
+static void ai_say(struct char_data *mob, const char *msg, time_t now)
+{
+  if (!mob || !msg || !*msg)
+    return;
+  act(msg, FALSE, mob, NULL, NULL, TO_ROOM);
+  if (mob->ai_state) {
+    mob->ai_state->last_spoke = now;
+    mob->ai_state->last_room_spoke = now;
+    mob->ai_state->last_room_vnum_spoke = (IN_ROOM(mob) != NOWHERE) ? GET_ROOM_VNUM(IN_ROOM(mob)) : -1;
+  }
+}
+
+static int ai_within_radius_home(struct char_data *mob, room_rnum room, int max_depth)
+{
+  room_rnum q_room[256];
+  int q_depth[256];
+  int head = 0, tail = 0, visited = 0;
+  int mark = ROOM_BFS_MARK;
+  room_rnum home;
+  int i;
+
+  if (!mob || !mob->ai_prof || room == NOWHERE)
+    return TRUE;
+  home = real_room(mob->ai_prof->home_room_vnum);
+  if (home == NOWHERE)
+    return TRUE;
+  if (home == room)
+    return TRUE;
+
+  q_room[tail] = home;
+  q_depth[tail++] = 0;
+  SET_BIT_AR(ROOM_FLAGS(home), mark);
+
+  while (head < tail && tail < 255) {
+    room_rnum cur = q_room[head];
+    int depth = q_depth[head++];
+    int dir;
+
+    if (depth >= max_depth)
+      continue;
+
+    for (dir = 0; dir < DIR_COUNT; dir++) {
+      room_rnum to;
+      if (!world[cur].dir_option[dir])
+        continue;
+      to = world[cur].dir_option[dir]->to_room;
+      if (to == NOWHERE)
+        continue;
+      if (ROOM_FLAGGED(to, ROOM_NOMOB) || ROOM_FLAGGED(to, ROOM_DEATH))
+        continue;
+      if (IS_SET_AR(ROOM_FLAGS(to), mark))
+        continue;
+      SET_BIT_AR(ROOM_FLAGS(to), mark);
+      visited++;
+      if (to == room) {
+        for (i = 0; i <= top_of_world; i++)
+          REMOVE_BIT_AR(ROOM_FLAGS(i), mark);
+        return TRUE;
+      }
+      q_room[tail] = to;
+      q_depth[tail++] = depth + 1;
+      if (visited >= 200)
+        break;
+    }
+  }
+
+  for (i = 0; i <= top_of_world; i++)
+    REMOVE_BIT_AR(ROOM_FLAGS(i), mark);
+
+  return FALSE;
+}
+
+static int ai_move_random_biased(struct char_data *mob)
+{
+  int tries;
+  int door;
+
+  if (!mob || IN_ROOM(mob) == NOWHERE)
+    return FALSE;
+
+  for (tries = 0; tries < 4; tries++) {
+    door = rand_number(0, DIR_COUNT - 1);
+    if (!CAN_GO(mob, door))
+      continue;
+    if (ROOM_FLAGGED(EXIT(mob, door)->to_room, ROOM_NOMOB) || ROOM_FLAGGED(EXIT(mob, door)->to_room, ROOM_DEATH))
+      continue;
+    if (MOB_FLAGGED(mob, MOB_STAY_ZONE) && world[EXIT(mob, door)->to_room].zone != world[IN_ROOM(mob)].zone)
+      continue;
+    if (mob->ai_prof && mob->ai_prof->roam_radius > 0 &&
+        !ai_within_radius_home(mob, EXIT(mob, door)->to_room, mob->ai_prof->roam_radius))
+      continue;
+
+    perform_move(mob, door, 1);
+    return TRUE;
+  }
+
+  return FALSE;
+}
+
+static void ai_parse_hints(struct ai_actor_profile *pf, const char *desc)
+{
+  const char *p;
+  char line[256];
+
+  if (!pf || !desc)
+    return;
+
+  p = strstr(desc, "AI:");
+  if (!p)
+    return;
+
+  snprintf(line, sizeof(line), "%s", p + 3);
+  if (strstr(line, "role=guard")) pf->role = ROLE_GUARD;
+  else if (strstr(line, "role=merchant")) pf->role = ROLE_MERCHANT;
+  else if (strstr(line, "role=bandit")) pf->role = ROLE_BANDIT;
+  else if (strstr(line, "role=beast")) pf->role = ROLE_BEAST;
+  else if (strstr(line, "role=spirit")) pf->role = ROLE_SPIRIT;
+
+  if (strstr(line, "morale=brave")) pf->morale = MORALE_BRAVE;
+  else if (strstr(line, "morale=coward")) pf->morale = MORALE_COWARD;
+
+  if (strstr(line, "move=patrol")) pf->movement = MOVE_PATROL;
+  else if (strstr(line, "move=sentinel")) pf->movement = MOVE_SENTINEL;
+
+  p = strstr(line, "radius=");
+  if (p)
+    pf->roam_radius = MAX(1, MIN(8, atoi(p + 7)));
+}
+
+void ai_actor_init(struct char_data *mob)
+{
+  static const char *const guard_kw[] = { "guard", "captain", "watch", "patrol", "sentry", "warden", "sheriff", "constable", "knight", "paladin", NULL };
+  static const char *const merchant_kw[] = { "merchant", "shop", "shopkeeper", "vendor", "trader", "peddler", "innkeeper", "bartender", NULL };
+  static const char *const bandit_kw[] = { "bandit", "thief", "brigand", "outlaw", "cutpurse", "pirate", "raider", "mugger", NULL };
+  static const char *const beast_kw[] = { "wolf", "bear", "boar", "spider", "rat", "beast", "serpent", "drake", "lion", "tiger", NULL };
+  static const char *const undead_kw[] = { "skeleton", "zombie", "wight", "lich", "undead", "ghoul", "revenant", "corpse", NULL };
+  static const char *const spirit_kw[] = { "spirit", "ghost", "wraith", "apparition", "ethereal", "phantom", NULL };
+  static const char *const cult_kw[] = { "cult", "acolyte", "zealot", "fanatic", "heretic", "summoner", "devotee", NULL };
+  static const char *const boss_kw[] = { "king", "queen", "lord", "commander", "champion", "ancient", "elder", "arch", "high", "dread", NULL };
+  int score[ROLE_BOSS + 1];
+  char text[MAX_STRING_LENGTH];
+  int best_role = ROLE_CIVILIAN;
+  int best_score = -9999;
+  int i;
+
+  if (!mob || !IS_NPC(mob) || !MOB_FLAGGED(mob, MOB_AI_ACTOR))
+    return;
+
+  if (!mob->ai_prof)
+    CREATE(mob->ai_prof, struct ai_actor_profile, 1);
+  if (!mob->ai_state)
+    CREATE(mob->ai_state, struct ai_actor_state, 1);
+
+  if (!mob->ai_prof || !mob->ai_state)
+    return;
+
+  memset(mob->ai_prof, 0, sizeof(*mob->ai_prof));
+  memset(mob->ai_state, 0, sizeof(*mob->ai_state));
+
+  mob->ai_prof->role = ROLE_CIVILIAN;
+  mob->ai_prof->movement = MOVE_WANDER_RADIUS;
+  mob->ai_prof->aggression = AGG_RETALIATE;
+  mob->ai_prof->social = SOC_WARNING;
+  mob->ai_prof->morale = MORALE_NORMAL;
+  mob->ai_prof->home_room_vnum = (IN_ROOM(mob) == NOWHERE) ? NOWHERE : GET_ROOM_VNUM(IN_ROOM(mob));
+  mob->ai_prof->roam_radius = 3;
+  mob->ai_prof->talk_cooldown_secs = 20;
+  mob->ai_prof->room_talk_cooldown_secs = 40;
+  mob->ai_prof->flee_hp_percent = 20;
+  mob->ai_prof->surrender_hp_percent = 15;
+  mob->ai_state->cached_zone = (IN_ROOM(mob) == NOWHERE) ? NOWHERE : world[IN_ROOM(mob)].zone;
+  mob->ai_state->next_tick = time(0) + rand_number(1, 3);
+
+  ai_extract_text(text, sizeof(text), mob);
+  memset(score, 0, sizeof(score));
+
+  score[ROLE_GUARD] += ai_role_weight_from_keywords(text, guard_kw);
+  score[ROLE_MERCHANT] += ai_role_weight_from_keywords(text, merchant_kw);
+  score[ROLE_BANDIT] += ai_role_weight_from_keywords(text, bandit_kw);
+  score[ROLE_BEAST] += ai_role_weight_from_keywords(text, beast_kw);
+  score[ROLE_UNDEAD] += ai_role_weight_from_keywords(text, undead_kw);
+  score[ROLE_SPIRIT] += ai_role_weight_from_keywords(text, spirit_kw);
+  score[ROLE_CULTIST] += ai_role_weight_from_keywords(text, cult_kw);
+  score[ROLE_BOSS] += ai_role_weight_from_keywords(text, boss_kw);
+
+  if (MOB_FLAGGED(mob, MOB_AGGRESSIVE)) {
+    score[ROLE_BANDIT] += 2;
+    score[ROLE_BEAST] += 2;
+  }
+  if (MOB_FLAGGED(mob, MOB_SENTINEL))
+    score[ROLE_GUARD] += 2;
+  if (MOB_FLAGGED(mob, MOB_HELPER))
+    score[ROLE_GUARD] += 2;
+  if (MOB_FLAGGED(mob, MOB_SCAVENGER)) {
+    score[ROLE_BANDIT] += 1;
+    score[ROLE_BEAST] += 1;
+  }
+  if (ai_mob_has_shop_data(mob))
+    score[ROLE_MERCHANT] += 8;
+
+  for (i = ROLE_UNKNOWN; i <= ROLE_BOSS; i++) {
+    if (score[i] > best_score) {
+      best_score = score[i];
+      best_role = i;
+    }
+  }
+
+  if (best_score <= 0)
+    best_role = ROLE_CIVILIAN;
+
+  mob->ai_prof->role = best_role;
+
+  switch (mob->ai_prof->role) {
+    case ROLE_GUARD:
+      mob->ai_prof->movement = MOB_FLAGGED(mob, MOB_SENTINEL) ? MOVE_SENTINEL : MOVE_PATROL;
+      mob->ai_prof->aggression = AGG_CRIME_HUNTER;
+      mob->ai_prof->arrest_enabled = TRUE;
+      mob->ai_prof->assist_enabled = TRUE;
+      mob->ai_prof->call_help_enabled = TRUE;
+      mob->ai_prof->roam_radius = 3;
+      mob->ai_prof->flee_hp_percent = 10;
+      break;
+    case ROLE_MERCHANT:
+      mob->ai_prof->movement = MOB_FLAGGED(mob, MOB_SENTINEL) ? MOVE_SENTINEL : MOVE_ROAM_INTEREST;
+      mob->ai_prof->aggression = AGG_PEACEFUL;
+      mob->ai_prof->trade_enabled = TRUE;
+      mob->ai_prof->call_help_enabled = TRUE;
+      mob->ai_prof->social = SOC_TALKATIVE;
+      mob->ai_prof->roam_radius = 2;
+      break;
+    case ROLE_BANDIT:
+      mob->ai_prof->movement = MOVE_WANDER_RADIUS;
+      mob->ai_prof->aggression = ai_text_has(text, "ambush") ? AGG_AMBUSH : AGG_OPPORTUNISTIC;
+      mob->ai_prof->social = SOC_EXTORT;
+      mob->ai_prof->hunt_enabled = TRUE;
+      mob->ai_prof->roam_radius = 5;
+      mob->ai_prof->flee_hp_percent = 25;
+      mob->ai_prof->opportunistic_pref = AI_OPP_PREF_ALONE | AI_OPP_PREF_WOUNDED;
+      break;
+    case ROLE_BEAST:
+      mob->ai_prof->movement = MOVE_WANDER_RADIUS;
+      mob->ai_prof->aggression = AGG_TERRITORIAL;
+      mob->ai_prof->social = SOC_SILENT;
+      mob->ai_prof->roam_radius = 4;
+      mob->ai_prof->flee_hp_percent = 15;
+      break;
+    case ROLE_UNDEAD:
+      mob->ai_prof->movement = MOVE_WANDER_RADIUS;
+      mob->ai_prof->aggression = AGG_TERRITORIAL;
+      mob->ai_prof->morale = MORALE_BRAVE;
+      mob->ai_prof->flee_hp_percent = 0;
+      mob->ai_prof->social = SOC_SILENT;
+      break;
+    case ROLE_SPIRIT:
+      mob->ai_prof->movement = MOVE_ROAM_INTEREST;
+      mob->ai_prof->aggression = AGG_RETALIATE;
+      mob->ai_prof->whisper_enabled = TRUE;
+      mob->ai_prof->hunt_enabled = FALSE;
+      mob->ai_prof->roam_radius = 3;
+      break;
+    case ROLE_CULTIST:
+      mob->ai_prof->movement = MOVE_PATROL;
+      mob->ai_prof->aggression = AGG_OPPORTUNISTIC;
+      mob->ai_prof->call_help_enabled = TRUE;
+      mob->ai_prof->hunt_enabled = TRUE;
+      break;
+    case ROLE_BOSS:
+      mob->ai_prof->movement = MOB_FLAGGED(mob, MOB_SENTINEL) ? MOVE_SENTINEL : MOVE_PATROL;
+      mob->ai_prof->aggression = AGG_RETALIATE;
+      mob->ai_prof->morale = MORALE_BRAVE;
+      mob->ai_prof->flee_hp_percent = 0;
+      mob->ai_prof->social = SOC_WARNING;
+      break;
+    default:
+      break;
+  }
+
+  if (mob->ai_prof->morale == MORALE_COWARD)
+    mob->ai_prof->flee_hp_percent = MAX(mob->ai_prof->flee_hp_percent, 35);
+  else if (mob->ai_prof->morale == MORALE_BRAVE)
+    mob->ai_prof->flee_hp_percent = 0;
+
+  if (mob->ai_prof->role == ROLE_BANDIT)
+    mob->ai_prof->flee_hp_percent = MAX(mob->ai_prof->flee_hp_percent, 25);
+
+  mob->ai_prof->surrender_hp_percent = MAX(0, mob->ai_prof->flee_hp_percent - 5);
+  if (mob->ai_prof->surrender_hp_percent > mob->ai_prof->flee_hp_percent)
+    mob->ai_prof->surrender_hp_percent = mob->ai_prof->flee_hp_percent;
+
+  ai_parse_hints(mob->ai_prof, mob->player.description ? mob->player.description : "");
+
+  mob->ai_prof->initialized = TRUE;
+  ai_debug_log("init %s role=%d move=%d aggr=%d morale=%d", GET_NAME(mob), mob->ai_prof->role,
+               mob->ai_prof->movement, mob->ai_prof->aggression, mob->ai_prof->morale);
+}
+
+void ai_actor_free(struct char_data *mob)
+{
+  if (!mob)
+    return;
+  if (mob->ai_prof) {
+    free(mob->ai_prof);
+    mob->ai_prof = NULL;
+  }
+  if (mob->ai_state) {
+    free(mob->ai_state);
+    mob->ai_state = NULL;
+  }
+}
+
+static int ai_find_hostile_target_in_room(struct char_data *mob)
+{
+  struct char_data *vict;
+
+  if (!mob || IN_ROOM(mob) == NOWHERE || !mob->ai_state)
+    return 0;
+
+  for (vict = world[IN_ROOM(mob)].people; vict; vict = vict->next_in_room) {
+    int i;
+    if (IS_NPC(vict) || PRF_FLAGGED(vict, PRF_NOHASSLE) || !CAN_SEE(mob, vict))
+      continue;
+    for (i = 0; i < mob->ai_state->mem_count; i++) {
+      struct ai_actor_memory_entry *e = &mob->ai_state->mem[i];
+      if (e->idnum == GET_IDNUM(vict) && (e->flags & MEM_WANTED || e->hostility >= AI_HOSTILE_ATTACK_THRESHOLD)) {
+        return GET_IDNUM(vict);
+      }
+    }
+  }
+  return 0;
+}
+
+static struct char_data *ai_find_player_by_idnum_room(struct char_data *mob, long idnum)
+{
+  struct char_data *vict;
+  if (!mob || idnum <= 0 || IN_ROOM(mob) == NOWHERE)
+    return NULL;
+  for (vict = world[IN_ROOM(mob)].people; vict; vict = vict->next_in_room) {
+    if (!IS_NPC(vict) && GET_IDNUM(vict) == idnum)
+      return vict;
+  }
+  return NULL;
+}
+
+static int ai_try_flee_or_surrender(struct char_data *mob, time_t now)
+{
+  int hp_pct;
+
+  if (!mob || !mob->ai_prof || !FIGHTING(mob))
+    return FALSE;
+
+  if (GET_MAX_HIT(mob) <= 0)
+    return FALSE;
+
+  hp_pct = (GET_HIT(mob) * 100) / GET_MAX_HIT(mob);
+  if (hp_pct <= mob->ai_prof->flee_hp_percent && mob->ai_prof->flee_hp_percent > 0) {
+    int moved = ai_move_random_biased(mob);
+    if (moved && FIGHTING(mob))
+      stop_fighting(mob);
+    if (moved) {
+      ai_debug_log("%s flees at %d%% hp", GET_NAME(mob), hp_pct);
+      return TRUE;
+    }
+  }
+
+  if (hp_pct <= mob->ai_prof->surrender_hp_percent && mob->ai_prof->surrender_hp_percent > 0) {
+    if (ai_can_speak_now(mob, now))
+      ai_say(mob, "$n lowers $s weapon and backs away in surrender.", now);
+    if (FIGHTING(mob))
+      stop_fighting(mob);
+    return TRUE;
+  }
+
+  return FALSE;
+}
+
+int ai_actor_tick(struct char_data *mob, time_t now)
+{
+  struct ai_actor_profile *pf;
+  struct ai_actor_state *st;
+  long target_id;
+  struct char_data *target;
+
+  if (!mob || !IS_NPC(mob) || !MOB_FLAGGED(mob, MOB_AI_ACTOR) || AFF_FLAGGED(mob, AFF_CHARM))
+    return FALSE;
+
+  if (!mob->ai_prof || !mob->ai_state || !mob->ai_prof->initialized)
+    ai_actor_init(mob);
+  if (!mob->ai_prof || !mob->ai_state)
+    return FALSE;
+
+  pf = mob->ai_prof;
+  st = mob->ai_state;
+
+  if (st->next_tick > now)
+    return FALSE;
+  st->next_tick = now + rand_number(2, 4);
+
+  ai_mem_decay(mob, now);
+
+  if (FIGHTING(mob)) {
+    if (ai_try_flee_or_surrender(mob, now))
+      return TRUE;
+    if (pf->call_help_enabled && ai_can_speak_now(mob, now) && !rand_number(0, 4))
+      ai_say(mob, "$n shouts, 'To me! Help!'", now);
+    return FALSE;
+  }
+
+  if (IN_ROOM(mob) == NOWHERE)
+    return FALSE;
+
+  if (!world[IN_ROOM(mob)].people && (now - st->last_spoke) < AI_ROOM_IDLE_SKIP_SECS)
+    return FALSE;
+
+  target_id = ai_find_hostile_target_in_room(mob);
+  target = ai_find_player_by_idnum_room(mob, target_id);
+
+  if (target && pf->role == ROLE_GUARD && pf->arrest_enabled) {
+    if (ai_can_speak_now(mob, now))
+      ai_say(mob, "$n says, 'Halt! In the name of the law!'", now);
+    hit(mob, target, TYPE_UNDEFINED);
+    return TRUE;
+  }
+
+  if (target && pf->role == ROLE_MERCHANT) {
+    if (ai_can_speak_now(mob, now))
+      ai_say(mob, "$n says, 'I will not deal with criminals. Guards!'", now);
+    return TRUE;
+  }
+
+  if (target && pf->role == ROLE_BANDIT) {
+    if (ai_can_speak_now(mob, now) && !rand_number(0, 2))
+      ai_say(mob, "$n says, 'Your coin or your blood!'", now);
+    hit(mob, target, TYPE_UNDEFINED);
+    return TRUE;
+  }
+
+  if (pf->whisper_enabled && ai_can_speak_now(mob, now) &&
+      (SECT(IN_ROOM(mob)) == SECT_FOREST || SECT(IN_ROOM(mob)) == SECT_MOUNTAIN) &&
+      !rand_number(0, 5)) {
+    ai_say(mob, "$n whispers, 'The veil is thin tonight.'", now);
+    return TRUE;
+  }
+
+  if (pf->movement != MOVE_SENTINEL && GET_POS(mob) == POS_STANDING) {
+    if (MOB_FLAGGED(mob, MOB_SENTINEL))
+      return FALSE;
+    if (MOB_FLAGGED(mob, MOB_SPEC) && pf->role != ROLE_GUARD)
+      return FALSE;
+    if (ai_move_random_biased(mob))
+      return TRUE;
+  }
+
+  return FALSE;
+}
+
+void ai_actor_record_damage(struct char_data *mob, struct char_data *actor, int dam)
+{
+  struct ai_actor_memory_entry *e;
+
+  if (!mob || !actor || !IS_NPC(mob) || IS_NPC(actor) || !MOB_FLAGGED(mob, MOB_AI_ACTOR))
+    return;
+  if (!mob->ai_prof || !mob->ai_state)
+    ai_actor_init(mob);
+
+  e = ai_mem_get_or_create(mob, GET_IDNUM(actor));
+  if (!e)
+    return;
+
+  e->hostility += MAX(1, dam / 10);
+  e->flags |= MEM_ATTACKED_ME;
+  e->last_update = time(0);
+  e->last_room_vnum = (IN_ROOM(mob) == NOWHERE) ? NOWHERE : GET_ROOM_VNUM(IN_ROOM(mob));
+}
+
+void ai_actor_record_help(struct char_data *mob, struct char_data *actor, int amount)
+{
+  struct ai_actor_memory_entry *e;
+
+  if (!mob || !actor || !IS_NPC(mob) || IS_NPC(actor) || !MOB_FLAGGED(mob, MOB_AI_ACTOR))
+    return;
+  if (!mob->ai_prof || !mob->ai_state)
+    ai_actor_init(mob);
+
+  e = ai_mem_get_or_create(mob, GET_IDNUM(actor));
+  if (!e)
+    return;
+
+  e->trust += MAX(1, amount / 5);
+  e->flags |= MEM_HELPED_ME;
+  e->last_update = time(0);
+  e->last_room_vnum = (IN_ROOM(mob) == NOWHERE) ? NOWHERE : GET_ROOM_VNUM(IN_ROOM(mob));
+}
+
+void ai_actor_record_crime(struct char_data *mob, struct char_data *criminal, int flags)
+{
+  struct ai_actor_memory_entry *e;
+
+  if (!mob || !criminal || !IS_NPC(mob) || IS_NPC(criminal) || !MOB_FLAGGED(mob, MOB_AI_ACTOR))
+    return;
+  if (!mob->ai_prof || !mob->ai_state)
+    ai_actor_init(mob);
+
+  e = ai_mem_get_or_create(mob, GET_IDNUM(criminal));
+  if (!e)
+    return;
+
+  e->hostility += 4;
+  e->flags |= (MEM_WANTED | flags);
+  e->last_update = time(0);
+  e->last_room_vnum = (IN_ROOM(mob) == NOWHERE) ? NOWHERE : GET_ROOM_VNUM(IN_ROOM(mob));
+}
+
+void ai_actor_record_room_crime(struct char_data *witness, struct char_data *criminal, int flags)
+{
+  struct char_data *mob;
+  room_rnum room = NOWHERE;
+
+  if (!criminal || IS_NPC(criminal) || IN_ROOM(criminal) == NOWHERE)
+    return;
+
+  room = IN_ROOM(criminal);
+  if (witness && IN_ROOM(witness) != NOWHERE)
+    room = IN_ROOM(witness);
+
+  for (mob = world[room].people; mob; mob = mob->next_in_room) {
+    if (!IS_NPC(mob) || !MOB_FLAGGED(mob, MOB_AI_ACTOR))
+      continue;
+    if (!mob->ai_prof || !mob->ai_prof->initialized)
+      ai_actor_init(mob);
+    if (!mob->ai_prof || mob->ai_prof->role != ROLE_GUARD)
+      continue;
+    if (!CAN_SEE(mob, criminal))
+      continue;
+    ai_actor_record_crime(mob, criminal, flags);
+  }
+}
+
+/*
+ * AI Actor testing checklist:
+ * 1) Spawn an AI guard and confirm patrol and arrest response.
+ * 2) Spawn an AI merchant and confirm trade refusal after theft or attack.
+ * 3) Spawn an AI bandit and confirm ambush behavior.
+ * 4) Confirm non-AI mobs remain unchanged.
+ * 5) Confirm no speech spam and no noticeable performance spikes.
+ */

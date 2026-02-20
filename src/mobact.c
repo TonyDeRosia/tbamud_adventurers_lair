@@ -21,6 +21,7 @@
 #include "act.h"
 #include "graph.h"
 #include "fight.h"
+#include "ai_actor.h"
 
 
 /* local file scope only function prototypes */
@@ -51,6 +52,9 @@ void mobile_activity(void)
 	  continue;		/* go to next char */
       }
     }
+
+    if (MOB_FLAGGED(ch, MOB_AI_ACTOR))
+      ai_actor_tick(ch, time(0));
 
     /* If the mob has no specproc, do the default actions */
     if (FIGHTING(ch) || !AWAKE(ch))

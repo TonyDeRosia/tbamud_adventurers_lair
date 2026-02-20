@@ -56,6 +56,7 @@ static const char *action_bits_olc[] = {
   "NO_BLIND",
   "NO_KILL",
   "GUILD_MASTER",
+  "AI_ACTOR",
   "\n"
 };
 
