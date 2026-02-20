@@ -23,6 +23,7 @@
 #include "act.h"
 #include "class.h"
 #include "fight.h"
+#include "ai_actor.h"
 #include "shop.h"
 #include "quest.h"
 #include "criticalhits.h"
@@ -1080,6 +1081,9 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
   	return (0);
   }
 
+  if (!IS_NPC(ch) && ch != victim)
+    ai_actor_record_room_crime(NULL, ch, MEM_WANTED);
+
   if (victim != ch) {
     /* Start the attacker fighting the victim */
     if (GET_POS(ch) > POS_STUNNED && (FIGHTING(ch) == NULL))
@@ -1090,6 +1094,8 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
       set_fighting(victim, ch);
       if (MOB_FLAGGED(victim, MOB_MEMORY) && !IS_NPC(ch))
 	remember(victim, ch);
+      if (!IS_NPC(ch))
+        ai_actor_record_damage(victim, ch, dam);
     }
   }
 

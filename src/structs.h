@@ -235,8 +235,9 @@ void clanedit_parse(struct descriptor_data *d, char *arg);
 #define MOB_NOKILL         18   /**< Mob can't be attacked */
 #define MOB_GUILD_MASTER   19   /**< Mob is a guildmaster */
 #define MOB_NOTDEADYET     20   /**< (R) Mob being extracted */
+#define MOB_AI_ACTOR       21   /**< Mob uses inferred AI actor behavior */
 
-#define NUM_MOB_FLAGS      20
+#define NUM_MOB_FLAGS      22
 
 /* Preference flags: used by char_data.player_specials.pref */
 #define PRF_BRIEF         0   /**< Room descs won't normally be shown */
@@ -1056,6 +1057,9 @@ struct mob_special_data
   long long gold_max; /* max roll on death */
 };
 
+struct ai_actor_profile;
+struct ai_actor_state;
+
 /** An affect structure. */
 struct affected_type
 {
@@ -1092,6 +1096,8 @@ struct char_data
   struct char_special_data char_specials; /**< PC/NPC specials	  */
   struct player_special_data *player_specials; /**< PC specials		  */
   struct mob_special_data mob_specials; /**< NPC specials		  */
+  struct ai_actor_profile *ai_prof;     /**< AI actor derived profile */
+  struct ai_actor_state *ai_state;      /**< AI actor runtime state */
 
   int pet_price; /**< Custom price for pet shop purchases (0 = default) */
 

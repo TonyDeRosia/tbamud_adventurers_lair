@@ -22,6 +22,7 @@
 #include "constants.h"
 #include "dg_scripts.h"
 #include "act.h"
+#include "ai_actor.h"
 #include "spec_procs.h"
 #include "class.h"
 #include "fight.h"
@@ -454,6 +455,9 @@ ACMD(do_steal)
       }
     }
   }
+
+  if (!IS_NPC(ch) && vict && vict != ch)
+    ai_actor_record_room_crime(NULL, ch, MEM_STOLE);
 
   if (ohoh && IS_NPC(vict) && AWAKE(vict))
     hit(vict, ch, TYPE_UNDEFINED);

@@ -22,6 +22,7 @@
 #include "constants.h"
 #include "oasis.h"
 #include "dg_scripts.h"
+#include "ai_actor.h"
 #include "dg_event.h"
 #include "act.h"
 #include "ban.h"
@@ -2535,6 +2536,9 @@ struct char_data *read_mobile(mob_vnum nr, int type) /* and mob_rnum */
   copy_proto_script(&mob_proto[i], mob, MOB_TRIGGER);
   assign_triggers(mob, MOB_TRIGGER);
 
+  if (MOB_FLAGGED(mob, MOB_AI_ACTOR))
+    ai_actor_init(mob);
+
   return (mob);
 }
 
@@ -3354,6 +3358,8 @@ void free_char(struct char_data *ch)
     if (ch->proto_script && ch->proto_script != mob_proto[i].proto_script)
       free_proto_script(ch, MOB_TRIGGER);
   }
+  ai_actor_free(ch);
+
   while (ch->affected)
     affect_remove(ch, ch->affected);
 
