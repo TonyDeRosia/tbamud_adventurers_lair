@@ -81,7 +81,6 @@ A feral wolf used as a smartspawn AI actor test prototype.
 1 20 9 0d0+10 1d2+0
 10 100
 8 8 0
-BareHandAttack: 5
 E
 #19507
 test skeleton ai actor~
@@ -94,7 +93,6 @@ An undead skeleton used as a smartspawn AI actor test prototype.
 1 20 9 0d0+10 1d2+0
 10 100
 8 8 0
-BareHandAttack: 7
 E
 #19508
 test spirit ai actor~
