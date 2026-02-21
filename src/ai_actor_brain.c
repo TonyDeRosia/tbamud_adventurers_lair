@@ -66,7 +66,7 @@ static struct ai_actor_brain_mem *mem_get(struct ai_actor_brain *b, long idnum, 
   return &b->mem[ev];
 }
 
-static void brain_say(struct char_data *mob, struct char_data *target, const char *msg, int combat_event) {
+static void brain_say(struct char_data *mob, struct char_data *target, const char *msg, int combat_event, int delayed_entry_reaction) {
   static room_vnum room_last = NOWHERE;
   static time_t room_last_t = 0;
   static int room_count = 0;
@@ -88,7 +88,12 @@ static void brain_say(struct char_data *mob, struct char_data *target, const cha
     snprintf(buf, sizeof(buf), "$n says to %s, '%s'", GET_NAME(target), msg);
   else
     snprintf(buf, sizeof(buf), "$n says, '%s'", msg);
-  act(buf, FALSE, mob, NULL, NULL, TO_ROOM);
+
+  if (delayed_entry_reaction)
+    ai_actor_schedule_reaction_speech(mob, target, buf);
+  else
+    act(buf, FALSE, mob, NULL, NULL, TO_ROOM);
+
   b->next_global_speak = time(0) + rand_number(8, 18);
   room_count++;
 }
@@ -190,9 +195,9 @@ void ai_actor_brain_on_enter(struct char_data *mob, struct char_data *actor) {
   remember_actor(mob, actor, "entered room", 0, 0, 0, 0);
   b->state = (b->goal_mask & AIG_TRADE) ? AI_BRAIN_TRADE : AI_BRAIN_OBSERVE;
   if (b->archetype == ARCH_GUARD || b->archetype == ARCH_CONSTABLE)
-    brain_say(mob, actor, "Keep the peace here.", FALSE);
+    brain_say(mob, actor, "Keep the peace here.", FALSE, TRUE);
   else if (b->archetype == ARCH_MERCHANT || b->archetype == ARCH_INNKEEPER)
-    brain_say(mob, actor, "Welcome. Looking for wares or rest?", FALSE);
+    brain_say(mob, actor, "Welcome. Looking for wares or rest?", FALSE, TRUE);
 }
 
 void ai_actor_brain_on_leave(struct char_data *mob, struct char_data *actor) {
@@ -221,14 +226,14 @@ void ai_actor_brain_on_say(struct char_data *mob, struct char_data *actor, const
 
   if ((strstr(msg, "help") || strstr(msg, "guard")) && (b->archetype == ARCH_GUARD || b->archetype == ARCH_CONSTABLE)) {
     b->state = AI_BRAIN_REPORT;
-    brain_say(mob, actor, "Report the crime clearly.", FALSE);
+    brain_say(mob, actor, "Report the crime clearly.", FALSE, FALSE);
   } else if (b->archetype == ARCH_SPIRIT) {
     char reply[96];
     snprintf(reply, sizeof(reply), "...%s...", key[0] ? key : "echo");
-    brain_say(mob, actor, reply, FALSE);
+    brain_say(mob, actor, reply, FALSE, FALSE);
   } else if (b->archetype == ARCH_CULTIST && (strstr(msg, "faith") || strstr(msg, "power"))) {
     b->state = AI_BRAIN_ENGAGE;
-    brain_say(mob, actor, "Join us and be remade.", FALSE);
+    brain_say(mob, actor, "Join us and be remade.", FALSE, FALSE);
   }
 }
 
@@ -245,7 +250,7 @@ void ai_actor_brain_on_combat_start(struct char_data *mob, struct char_data *att
   if (!IS_NPC(attacker)) remember_actor(mob, attacker, "started combat", -2, 3, 6, MEM_ASSAULT);
   if (b->archetype == ARCH_GUARD || b->archetype == ARCH_CONSTABLE) {
     b->state = AI_BRAIN_WARN;
-    brain_say(mob, attacker, "Stand down now!", TRUE);
+    brain_say(mob, attacker, "Stand down now!", TRUE, FALSE);
     if (!FIGHTING(mob) && IN_ROOM(mob) == IN_ROOM(attacker)) hit(mob, attacker, 0);
   } else if (b->archetype == ARCH_MERCHANT || b->archetype == ARCH_INNKEEPER) {
     b->state = AI_BRAIN_FLEE;
@@ -271,13 +276,13 @@ void ai_actor_brain_on_drop(struct char_data *mob, struct char_data *actor, stru
   if (!mob || !actor || IS_NPC(actor) || !mob->ai_state || !mob->ai_state->brain) return;
   remember_actor(mob, actor, "dropped item", 0, 0, 0, 0);
   if ((mob->ai_state->brain->archetype == ARCH_MERCHANT || mob->ai_state->brain->archetype == ARCH_INNKEEPER) && obj)
-    brain_say(mob, actor, "Careful where you leave your goods.", FALSE);
+    brain_say(mob, actor, "Careful where you leave your goods.", FALSE, FALSE);
 }
 
 void ai_actor_brain_on_give(struct char_data *mob, struct char_data *actor, struct obj_data *obj, struct char_data *to) {
   if (!mob || !actor || IS_NPC(actor) || !to || to != mob) return;
   remember_actor(mob, actor, obj ? "gifted item" : "gave something", 4, 0, 0, 0);
-  brain_say(mob, actor, "A fair exchange.", FALSE);
+  brain_say(mob, actor, "A fair exchange.", FALSE, FALSE);
 }
 
 int ai_actor_brain_think(struct char_data *mob, time_t now) {
@@ -292,7 +297,7 @@ int ai_actor_brain_think(struct char_data *mob, time_t now) {
 
   if (FIGHTING(mob)) {
     b->state = AI_BRAIN_ENGAGE;
-    if (b->archetype == ARCH_COMMANDER) brain_say(mob, NULL, "Hold the line!", TRUE);
+    if (b->archetype == ARCH_COMMANDER) brain_say(mob, NULL, "Hold the line!", TRUE, FALSE);
     return FALSE;
   }
 
@@ -303,12 +308,12 @@ int ai_actor_brain_think(struct char_data *mob, time_t now) {
     if (!m) continue;
     if ((b->archetype == ARCH_GUARD || b->archetype == ARCH_CONSTABLE) && (m->crime_flags & (MEM_WANTED | MEM_MURDER | MEM_ASSAULT))) {
       b->state = AI_BRAIN_WARN;
-      brain_say(mob, plr, "You are remembered. Behave yourself.", FALSE);
+      brain_say(mob, plr, "You are remembered. Behave yourself.", FALSE, FALSE);
       break;
     }
     if (b->archetype == ARCH_BANDIT && m->relationship != AI_REL_ENEMY && GET_LEVEL(plr) < GET_LEVEL(mob)) {
       b->state = AI_BRAIN_PURSUE;
-      brain_say(mob, plr, "Keep walking, unless your purse is heavy.", FALSE);
+      brain_say(mob, plr, "Keep walking, unless your purse is heavy.", FALSE, FALSE);
       if (!rand_number(0, 2)) hit(mob, plr, 0);
       break;
     }

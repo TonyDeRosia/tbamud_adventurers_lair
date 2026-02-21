@@ -21,6 +21,8 @@
 
 static int ai_debug = AI_ACTOR_DEBUG;
 
+static struct char_data *ai_find_player_by_idnum_room(struct char_data *mob, long idnum);
+
 static void ai_debug_log(const char *fmt, ...)
 {
   va_list args;
@@ -224,6 +226,62 @@ static void ai_say(struct char_data *mob, const char *msg, time_t now)
     mob->ai_state->last_room_spoke = now;
     mob->ai_state->last_room_vnum_spoke = (IN_ROOM(mob) != NOWHERE) ? GET_ROOM_VNUM(IN_ROOM(mob)) : -1;
   }
+}
+
+void ai_actor_schedule_reaction_speech(struct char_data *mob, struct char_data *target, const char *msg)
+{
+  struct ai_actor_state *st;
+
+  if (!mob || !msg || !*msg || !mob->ai_state)
+    return;
+
+  st = mob->ai_state;
+  snprintf(st->pending_speech, sizeof(st->pending_speech), "%s", msg);
+  st->pending_speech_target_idnum =
+      (target && !IS_NPC(target)) ? GET_IDNUM(target) : 0;
+  st->pending_speech_fire_pulse = pulse + 1;
+}
+
+static int ai_try_emit_pending_reaction_speech(struct char_data *mob, time_t now)
+{
+  struct ai_actor_state *st;
+  struct char_data *target = NULL;
+
+  if (!mob || !mob->ai_state)
+    return FALSE;
+
+  st = mob->ai_state;
+
+  if (!st->pending_speech[0] || st->pending_speech_fire_pulse == 0)
+    return FALSE;
+
+  if (pulse < st->pending_speech_fire_pulse)
+    return FALSE;
+
+  if (IN_ROOM(mob) == NOWHERE) {
+    st->pending_speech[0] = '\0';
+    st->pending_speech_target_idnum = 0;
+    st->pending_speech_fire_pulse = 0;
+    return FALSE;
+  }
+
+  if (st->pending_speech_target_idnum > 0) {
+    target = ai_find_player_by_idnum_room(mob, st->pending_speech_target_idnum);
+    if (!target) {
+      st->pending_speech[0] = '\0';
+      st->pending_speech_target_idnum = 0;
+      st->pending_speech_fire_pulse = 0;
+      return FALSE;
+    }
+  }
+
+  if (ai_can_speak_now(mob, now))
+    ai_say(mob, st->pending_speech, now);
+
+  st->pending_speech[0] = '\0';
+  st->pending_speech_target_idnum = 0;
+  st->pending_speech_fire_pulse = 0;
+  return TRUE;
 }
 
 static int ai_within_radius_home(struct char_data *mob, room_rnum room, int max_depth)
@@ -627,6 +685,9 @@ int ai_actor_tick(struct char_data *mob, time_t now)
 
   if (IN_ROOM(mob) == NOWHERE)
     return FALSE;
+
+  if (ai_try_emit_pending_reaction_speech(mob, now))
+    return TRUE;
 
   if (!world[IN_ROOM(mob)].people && (now - st->last_spoke) < AI_ROOM_IDLE_SKIP_SECS)
     return FALSE;

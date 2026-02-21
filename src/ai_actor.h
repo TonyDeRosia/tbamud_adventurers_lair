@@ -105,6 +105,9 @@ struct ai_actor_state {
   time_t last_spoke;
   time_t last_room_spoke;
   int last_room_vnum_spoke;
+  unsigned long pending_speech_fire_pulse;
+  long pending_speech_target_idnum;
+  char pending_speech[256];
   struct ai_actor_memory_entry mem[AI_MEM_MAX];
   int mem_count;
   long current_target_idnum;
@@ -128,5 +131,6 @@ void ai_actor_event_combat_start(struct char_data *attacker, struct char_data *v
 void ai_actor_event_corpse(struct char_data *dead, room_rnum room);
 void ai_actor_event_drop(struct char_data *actor, struct obj_data *obj);
 void ai_actor_event_give(struct char_data *actor, struct char_data *to, struct obj_data *obj);
+void ai_actor_schedule_reaction_speech(struct char_data *mob, struct char_data *target, const char *msg);
 
 #endif
