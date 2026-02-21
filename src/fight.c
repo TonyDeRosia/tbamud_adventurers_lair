@@ -220,7 +220,13 @@ static void spirit_proc_attack(struct char_data *ch, struct char_data *vict, int
 {
   int dam;
 
-  if (!ch || !vict)
+  if (!ch || IN_ROOM(ch) == NOWHERE)
+    return;
+
+  if (!vict || IN_ROOM(vict) == NOWHERE)
+    return;
+
+  if (DEAD(vict) || IN_ROOM(ch) != IN_ROOM(vict))
     return;
 
   if (rand_number(1, 100) > proc_chance)
@@ -243,7 +249,10 @@ static void do_spirit_procs(struct char_data *ch, struct char_data *vict)
   const int proc_chance = 10;
   const int hit_chance = 70;
 
-  if (!ch || !vict)
+  if (!ch || IN_ROOM(ch) == NOWHERE)
+    return;
+
+  if (!vict || IN_ROOM(vict) == NOWHERE)
     return;
 
   if (!FIGHTING(ch))
@@ -261,12 +270,20 @@ static void do_spirit_procs(struct char_data *ch, struct char_data *vict)
 
   if (affected_by_spell(ch, SPELL_BEAR_SPIRIT))
     spirit_proc_attack(ch, vict, SPELL_BEAR_SPIRIT, proc_chance, hit_chance);
+  if (!vict || IN_ROOM(vict) == NOWHERE || DEAD(vict) || IN_ROOM(ch) != IN_ROOM(vict))
+    return;
   if (affected_by_spell(ch, SPELL_WOLF_SPIRIT))
     spirit_proc_attack(ch, vict, SPELL_WOLF_SPIRIT, proc_chance, hit_chance);
+  if (!vict || IN_ROOM(vict) == NOWHERE || DEAD(vict) || IN_ROOM(ch) != IN_ROOM(vict))
+    return;
   if (affected_by_spell(ch, SPELL_TIGER_SPIRIT))
     spirit_proc_attack(ch, vict, SPELL_TIGER_SPIRIT, proc_chance, hit_chance);
+  if (!vict || IN_ROOM(vict) == NOWHERE || DEAD(vict) || IN_ROOM(ch) != IN_ROOM(vict))
+    return;
   if (affected_by_spell(ch, SPELL_EAGLE_SPIRIT))
     spirit_proc_attack(ch, vict, SPELL_EAGLE_SPIRIT, proc_chance, hit_chance);
+  if (!vict || IN_ROOM(vict) == NOWHERE || DEAD(vict) || IN_ROOM(ch) != IN_ROOM(vict))
+    return;
   if (affected_by_spell(ch, SPELL_DRAGON_SPIRIT))
     spirit_proc_attack(ch, vict, SPELL_DRAGON_SPIRIT, proc_chance, hit_chance);
 }
