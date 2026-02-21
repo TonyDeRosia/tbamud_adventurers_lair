@@ -952,8 +952,20 @@ static void do_stat_character(struct char_data *ch, struct char_data *k)
 
   if (IS_MOB(k) && MOB_FLAGGED(k, MOB_AI_ACTOR) && k->ai_prof) {
     long last_said = 0;
+    long last_action = 0;
+    int disp_count = 0;
+    int i_mem;
+    int talk_cd_left = 0;
     if (k->ai_state && k->ai_state->last_spoke > 0)
       last_said = (long)(time(0) - k->ai_state->last_spoke);
+    if (k->ai_state && k->ai_state->last_action_time > 0)
+      last_action = (long)(time(0) - k->ai_state->last_action_time);
+    if (k->ai_state) {
+      talk_cd_left = k->ai_state->talk_cooldown_pulses / PASSES_PER_SEC;
+      for (i_mem = 0; i_mem < k->ai_state->mem_count; i_mem++)
+        if (k->ai_state->mem[i_mem].idnum > 0)
+          disp_count++;
+    }
     send_to_char(ch, "AI_ACTOR: role=%s temperament=%s roam=%d greet=%s talk_cd=%ds override_tag=%s\r\n",
                  ai_actor_role_name(k->ai_prof->role),
                  ai_actor_temperament_name(k->ai_prof->aggression),
@@ -961,10 +973,16 @@ static void do_stat_character(struct char_data *ch, struct char_data *k)
                  ai_actor_theme_name(k->ai_prof->social),
                  k->ai_prof->talk_cooldown_secs,
                  ai_actor_has_override_tag(k) ? "yes" : "no");
-    send_to_char(ch, "AI_ACTOR: mode=%d morale=%d last_said=%ld\r\n",
+    send_to_char(ch, "AI_ACTOR: mode=%d morale=%d last_said=%ld last_action=%ld talk_cd_left=%ds dispositions=%d\r\n",
                  k->ai_prof->mode,
                  k->ai_prof->morale,
-                 (last_said < 0 ? 0L : last_said));
+                 (last_said < 0 ? 0L : last_said),
+                 (last_action < 0 ? 0L : last_action),
+                 talk_cd_left,
+                 disp_count);
+    send_to_char(ch, "AI_ACTOR: keywords='%s'%s\r\n",
+                 k->ai_prof->matched_keywords[0] ? k->ai_prof->matched_keywords : "-",
+                 (k->ai_prof->profile_flags & AI_PROFILE_INCONSISTENT) ? " PROFILE_INCONSISTENT" : "");
     send_to_char(ch, "AI control mode: %s, AI signature hash: %08X\r\n",
                  ai_actor_control_mode_name(),
                  (unsigned int)k->ai_prof->signature);

@@ -22,10 +22,16 @@
 #define AI_SIGNATURE_CHECK_SECS 10
 #define AI_TARGET_REACTION_COOLDOWN_SECS 18
 #define AI_EVENT_IGNORE_MSG_SECS 4
+#define AI_INTENT_THRESHOLD 25
+#define AI_INTENT_COOLDOWN_MIN 6
+#define AI_INTENT_COOLDOWN_MAX 12
+#define AI_TALK_COOLDOWN_MIN 12
+#define AI_TALK_COOLDOWN_MAX 20
 
 static int ai_debug = AI_ACTOR_DEBUG;
 
 static struct char_data *ai_find_player_by_idnum_room(struct char_data *mob, long idnum);
+static const char *ai_pick_phrase(const char *const *pool);
 
 static void ai_debug_log(const char *fmt, ...)
 {
@@ -135,6 +141,9 @@ static struct ai_actor_memory_entry *ai_mem_get_or_create(struct char_data *mob,
   if (st->mem_count < AI_MEM_MAX) {
     memset(&st->mem[st->mem_count], 0, sizeof(st->mem[st->mem_count]));
     st->mem[st->mem_count].idnum = idnum;
+    st->mem[st->mem_count].attitude = 0;
+    st->mem[st->mem_count].last_seen_time = time(0);
+    st->mem[st->mem_count].last_interaction_time = time(0);
     st->mem[st->mem_count].last_update = time(0);
     return &st->mem[st->mem_count++];
   }
@@ -149,8 +158,63 @@ static struct ai_actor_memory_entry *ai_mem_get_or_create(struct char_data *mob,
 
   memset(&st->mem[evict], 0, sizeof(st->mem[evict]));
   st->mem[evict].idnum = idnum;
+  st->mem[evict].attitude = 0;
+  st->mem[evict].last_seen_time = time(0);
+  st->mem[evict].last_interaction_time = time(0);
   st->mem[evict].last_update = time(0);
   return &st->mem[evict];
+}
+
+static int ai_room_crowd_count(room_rnum room)
+{
+  struct char_data *ch;
+  int n = 0;
+  if (room == NOWHERE) return 0;
+  for (ch = world[room].people; ch; ch = ch->next_in_room)
+    n++;
+  return n;
+}
+
+static void ai_state_push_event(struct char_data *mob, enum ai_event_type type, struct char_data *actor, const char *text)
+{
+  struct ai_actor_state *st;
+  struct ai_actor_recent_event *ev;
+  int idx;
+
+  if (!mob || !mob->ai_state) return;
+  st = mob->ai_state;
+  idx = (st->event_ring_start + st->event_ring_count) % AI_EVENT_RING_MAX;
+  if (st->event_ring_count == AI_EVENT_RING_MAX) {
+    st->event_ring_start = (st->event_ring_start + 1) % AI_EVENT_RING_MAX;
+    idx = (st->event_ring_start + st->event_ring_count - 1) % AI_EVENT_RING_MAX;
+  } else st->event_ring_count++;
+
+  ev = &st->recent_events[idx];
+  memset(ev, 0, sizeof(*ev));
+  ev->type = type;
+  ev->actor_idnum = (actor && !IS_NPC(actor)) ? GET_IDNUM(actor) : 0;
+  ev->room_vnum = (IN_ROOM(mob) == NOWHERE) ? NOWHERE : GET_ROOM_VNUM(IN_ROOM(mob));
+  ev->when = time(0);
+  if (text && *text)
+    strlcpy(ev->text, text, sizeof(ev->text));
+
+  st->pending_target_idnum = ev->actor_idnum;
+  st->pending_event_type = type;
+  st->pending_event_time = ev->when;
+  if (ev->text[0]) strlcpy(st->pending_event_text, ev->text, sizeof(st->pending_event_text));
+  else st->pending_event_text[0] = '\0';
+
+  if (type == AI_EVENT_PLAYER_EMOTE)
+    st->social_spam_count = MIN(8, st->social_spam_count + 1);
+}
+
+static int ai_state_cooldown_left_pulses(time_t last, int cd_secs)
+{
+  int left;
+  if (last <= 0 || cd_secs <= 0) return 0;
+  left = cd_secs - (int)(time(0) - last);
+  if (left <= 0) return 0;
+  return left * PASSES_PER_SEC;
 }
 
 static void ai_mem_decay(struct char_data *mob, time_t now)
@@ -183,6 +247,8 @@ static void ai_mem_decay(struct char_data *mob, time_t now)
       else if (e->trust < 0) e->trust++;
       if (e->fear > 0) e->fear--;
       else if (e->fear < 0) e->fear++;
+      if (e->attitude > 0) e->attitude--;
+      else if (e->attitude < 0) e->attitude++;
     }
 
     if (e->hostility == 0 && e->trust == 0 && e->fear == 0 && (now - e->last_update) > 600) {
@@ -237,6 +303,10 @@ static void ai_say(struct char_data *mob, const char *msg, time_t now)
 
   if (mob->ai_state) {
     mob->ai_state->last_spoke = now;
+    mob->ai_state->last_talk_time = now;
+    mob->ai_state->last_action_time = now;
+    mob->ai_state->talk_cooldown_pulses = ai_state_cooldown_left_pulses(now, rand_number(AI_TALK_COOLDOWN_MIN, AI_TALK_COOLDOWN_MAX));
+    mob->ai_state->intent_cooldown_pulses = ai_state_cooldown_left_pulses(now, rand_number(AI_INTENT_COOLDOWN_MIN, AI_INTENT_COOLDOWN_MAX));
     mob->ai_state->last_room_spoke = now;
     mob->ai_state->last_room_vnum_spoke = (IN_ROOM(mob) != NOWHERE) ? GET_ROOM_VNUM(IN_ROOM(mob)) : -1;
   }
@@ -565,6 +635,7 @@ static void ai_actor_apply_role_setup(struct char_data *mob, const char *text)
       mob->ai_prof->call_help_enabled = TRUE;
       mob->ai_prof->social = SOC_TALKATIVE;
       mob->ai_prof->roam_radius = 2;
+      mob->ai_prof->style = (ai_text_has(text, "inn") || ai_text_has(text, "ale") || ai_text_has(text, "tavern")) ? 1 : 0;
       break;
     case ROLE_BANDIT:
       mob->ai_prof->movement = MOVE_WANDER_RADIUS;
@@ -637,7 +708,7 @@ void ai_actor_refresh_profile(struct char_data *mob, int force)
   static const char *const boss_kw[] = { "king", "queen", "lord", "commander", "champion", "ancient", "elder", "arch", "high", "dread", "marshal", NULL };
   int score[ROLE_BOSS + 1];
   char text[MAX_STRING_LENGTH];
-  int best_role = ROLE_CIVILIAN;
+  int best_role = ROLE_UNKNOWN;
   int best_score = -9999;
   int i;
   int zone_lvl = 0;
@@ -674,7 +745,7 @@ void ai_actor_refresh_profile(struct char_data *mob, int force)
     }
   }
 
-  mob->ai_prof->role = ROLE_CIVILIAN;
+  mob->ai_prof->role = ROLE_UNKNOWN;
   mob->ai_prof->mode = 1;
   mob->ai_prof->movement = MOVE_WANDER_RADIUS;
   mob->ai_prof->aggression = AGG_RETALIATE;
@@ -733,9 +804,24 @@ void ai_actor_refresh_profile(struct char_data *mob, int force)
   }
 
   if (best_score <= 0)
-    best_role = ROLE_CIVILIAN;
+    best_role = ROLE_UNKNOWN;
 
   mob->ai_prof->role = best_role;
+  if (best_role == ROLE_UNKNOWN) {
+    mob->ai_prof->movement = MOB_FLAGGED(mob, MOB_SENTINEL) ? MOVE_SENTINEL : MOVE_PATROL;
+    mob->ai_prof->aggression = MOB_FLAGGED(mob, MOB_AGGRESSIVE) ? AGG_OPPORTUNISTIC : AGG_RETALIATE;
+    mob->ai_prof->social = SOC_SILENT;
+    mob->ai_prof->morale = MORALE_NORMAL;
+    mob->ai_prof->style = 0;
+    if (MOB_FLAGGED(mob, MOB_STAY_ZONE) || MOB_FLAGGED(mob, MOB_SENTINEL))
+      mob->ai_prof->aggression = AGG_TERRITORIAL;
+    if (ai_text_has(text, "fang") || ai_text_has(text, "claw") || ai_text_has(text, "beast")) {
+      mob->ai_prof->style = 1;
+      if (mob->ai_prof->aggression == AGG_RETALIATE) mob->ai_prof->aggression = AGG_TERRITORIAL;
+    }
+    if (ai_text_has(text, "ethereal") || ai_text_has(text, "undead") || ai_text_has(text, "wraith"))
+      mob->ai_prof->style = 2;
+  }
   ai_actor_apply_role_setup(mob, text);
 
   ai_apply_overrides_from_description(raw_desc, mob->ai_prof);
@@ -757,6 +843,14 @@ void ai_actor_refresh_profile(struct char_data *mob, int force)
   mob->ai_prof->surrender_hp_percent = MAX(0, mob->ai_prof->flee_hp_percent - 5);
   if (mob->ai_prof->surrender_hp_percent > mob->ai_prof->flee_hp_percent)
     mob->ai_prof->surrender_hp_percent = mob->ai_prof->flee_hp_percent;
+
+  snprintf(mob->ai_prof->matched_keywords, sizeof(mob->ai_prof->matched_keywords),
+           "g%d m%d b%d be%d u%d s%d c%d boss%d",
+           score[ROLE_GUARD], score[ROLE_MERCHANT], score[ROLE_BANDIT], score[ROLE_BEAST],
+           score[ROLE_UNDEAD], score[ROLE_SPIRIT], score[ROLE_CULTIST], score[ROLE_BOSS]);
+  mob->ai_prof->profile_flags = 0;
+  if ((ai_text_has(text, "fire") || ai_text_has(text, "flame")) && (ai_text_has(text, "ice") || ai_text_has(text, "frost")))
+    mob->ai_prof->profile_flags |= AI_PROFILE_INCONSISTENT;
 
   mob->ai_prof->signature = ai_actor_compute_signature(mob);
   mob->ai_prof->initialized = TRUE;
@@ -893,16 +987,108 @@ static int ai_try_flee_or_surrender(struct char_data *mob, time_t now)
   return FALSE;
 }
 
+/*
+ * Intent scoring rules summary:
+ * - Evaluate lightweight context once per tick window.
+ * - Score intents using role/temperament bases + recent event boosts + disposition.
+ * - Apply hard gates: peaceful rooms, cooldowns, visibility, and special/script ownership.
+ * - Execute only the top intent above threshold, then apply intent/talk cooldowns.
+ */
+static const char *const role_guard_greet[] = {"Keep the peace.", "Eyes open, no trouble.", NULL};
+static const char *const role_merchant_greet[] = {"Fresh wares, fair rates.", "Browse first, buy smart.", NULL};
+static const char *const role_innkeeper_greet[] = {"Warm beds and warm stew.", "Rest your boots by the fire.", NULL};
+static const char *const role_bandit_greet[] = {"Keep your coin close.", "Road tax might find you.", NULL};
+static const char *const role_unknown_idle[] = {"$n watches quietly.", "$n studies the room in silence.", NULL};
+
+static int ai_actor_choose_intent(struct char_data *mob, struct char_data **out_target, const char **out_line, int *do_emote, int *do_warn)
+{
+  struct ai_actor_state *st = mob->ai_state;
+  struct ai_actor_profile *pf = mob->ai_prof;
+  struct ai_actor_memory_entry *e = NULL;
+  struct char_data *target = NULL;
+  int crowd = ai_room_crowd_count(IN_ROOM(mob));
+  int score_greet = 0, score_social = 0, score_say = 0, score_warn = 0, score_idle = 0, score_flee = 0;
+
+  *out_target = NULL; *out_line = NULL; *do_emote = FALSE; *do_warn = FALSE;
+  if (!st || !pf || IN_ROOM(mob) == NOWHERE) return 0;
+  if (st->intent_cooldown_pulses > 0) return 0;
+  if (st->pending_event_time <= 0 || (time(0) - st->pending_event_time) > 20)
+    st->pending_event_type = AI_EVENT_PLAYER_LEAVE;
+
+  if (st->pending_target_idnum > 0)
+    target = ai_find_player_by_idnum_room(mob, st->pending_target_idnum);
+  if (target)
+    e = ai_mem_get_or_create(mob, GET_IDNUM(target));
+
+  score_idle = (pf->role == ROLE_UNKNOWN) ? 26 : 6;
+  score_greet = (st->pending_event_type == AI_EVENT_PLAYER_ENTER) ? 26 : 0;
+  score_social = (st->pending_event_type == AI_EVENT_PLAYER_EMOTE) ? 24 : 0;
+  score_say = (st->pending_event_type == AI_EVENT_PLAYER_SAY) ? 22 : 0;
+  score_warn = (st->social_spam_count >= 3) ? 26 : 0;
+  score_flee = (pf->morale == MORALE_COWARD || pf->role == ROLE_MERCHANT || pf->role == ROLE_UNKNOWN) ? 8 : 0;
+
+  if (e) {
+    score_social += e->attitude / 8;
+    score_say += e->attitude / 10;
+    if (e->disposition_flags & AI_DISP_ANNOYED_ME) score_warn += 8;
+    if (e->disposition_flags & AI_DISP_ATTACKED_ME) score_warn += 12;
+  }
+  if (crowd >= 6) score_warn += 4;
+  if (ROOM_FLAGGED(IN_ROOM(mob), ROOM_PEACEFUL) || ROOM_FLAGGED(IN_ROOM(mob), ROOM_NOMOB)) score_flee = 0;
+  if (GET_MAX_HIT(mob) > 0 && (GET_HIT(mob) * 100 / GET_MAX_HIT(mob)) < 30) score_flee += 16;
+
+  if (score_flee >= AI_INTENT_THRESHOLD && !MOB_FLAGGED(mob, MOB_SENTINEL) && GET_POS(mob) == POS_STANDING) {
+    *out_line = NULL;
+    return 6;
+  }
+  if (score_warn >= AI_INTENT_THRESHOLD && ai_can_speak_now(mob, time(0))) {
+    *out_line = "Enough. Keep order in here.";
+    *out_target = target;
+    *do_warn = TRUE;
+    return 4;
+  }
+  if (score_social >= AI_INTENT_THRESHOLD && ai_can_speak_now(mob, time(0))) {
+    *out_line = (e && e->attitude < -10) ? "Mind yourself." : "Noted.";
+    *out_target = target;
+    return 2;
+  }
+  if (score_say >= AI_INTENT_THRESHOLD && ai_can_speak_now(mob, time(0))) {
+    *out_target = target;
+    if (pf->role == ROLE_GUARD) *out_line = "State your business and keep calm.";
+    else if (pf->role == ROLE_MERCHANT) *out_line = ai_pick_phrase(role_merchant_greet);
+    else if (pf->role == ROLE_BANDIT) *out_line = ai_pick_phrase(role_bandit_greet);
+    else *out_line = "...";
+    return 3;
+  }
+  if (score_greet >= AI_INTENT_THRESHOLD && ai_can_speak_now(mob, time(0))) {
+    *out_target = target;
+    if (pf->role == ROLE_GUARD) *out_line = ai_pick_phrase(role_guard_greet);
+    else if (pf->role == ROLE_MERCHANT && pf->style == 1) *out_line = ai_pick_phrase(role_innkeeper_greet);
+    else if (pf->role == ROLE_MERCHANT) *out_line = ai_pick_phrase(role_merchant_greet);
+    else if (pf->role == ROLE_BANDIT) *out_line = ai_pick_phrase(role_bandit_greet);
+    else *out_line = "Well met.";
+    return 1;
+  }
+  if (score_idle >= AI_INTENT_THRESHOLD && !rand_number(0, 14)) {
+    *out_line = ai_pick_phrase(role_unknown_idle);
+    *do_emote = TRUE;
+    return 5;
+  }
+  return 0;
+}
+
 int ai_actor_tick(struct char_data *mob, time_t now)
 {
   struct ai_actor_profile *pf;
   struct ai_actor_state *st;
-  long target_id;
-  struct char_data *target;
+  struct char_data *target = NULL;
+  const char *line = NULL;
+  int do_emote = FALSE, do_warn = FALSE;
+  int intent;
+  int has_external_logic;
 
   if (!mob || !IS_NPC(mob) || !MOB_FLAGGED(mob, MOB_AI_ACTOR) || AFF_FLAGGED(mob, AFF_CHARM))
     return FALSE;
-
   if (!CONFIG_AI_ACTOR_ENABLED)
     return FALSE;
 
@@ -913,6 +1099,7 @@ int ai_actor_tick(struct char_data *mob, time_t now)
 
   pf = mob->ai_prof;
   st = mob->ai_state;
+  has_external_logic = (MOB_FLAGGED(mob, MOB_SPEC) || mob->proto_script || mob->script);
 
   if (st->next_signature_check <= now) {
     uint32_t sig = ai_actor_compute_signature(mob);
@@ -927,68 +1114,56 @@ int ai_actor_tick(struct char_data *mob, time_t now)
     return FALSE;
   st->next_tick = now + rand_number(2, 4);
 
+  if (st->talk_cooldown_pulses > 0) st->talk_cooldown_pulses = MAX(0, st->talk_cooldown_pulses - (int)(2 * PASSES_PER_SEC));
+  if (st->intent_cooldown_pulses > 0) st->intent_cooldown_pulses = MAX(0, st->intent_cooldown_pulses - (int)(2 * PASSES_PER_SEC));
+  if (st->social_spam_count > 0 && !rand_number(0, 2)) st->social_spam_count--;
+
   ai_mem_decay(mob, now);
-  if (ai_actor_brain_think(mob, now))
-    return TRUE;
 
   if (FIGHTING(mob)) {
     if (ai_try_flee_or_surrender(mob, now))
       return TRUE;
-    if (pf->call_help_enabled && ai_can_speak_now(mob, now) && !rand_number(0, 4))
-      ai_say(mob, "$n shouts, 'To me! Help!'", now);
     return FALSE;
   }
-
   if (IN_ROOM(mob) == NOWHERE)
     return FALSE;
 
-  if (ai_try_emit_pending_reaction_speech(mob, now))
-    return TRUE;
-
-  if (!world[IN_ROOM(mob)].people && (now - st->last_spoke) < AI_ROOM_IDLE_SKIP_SECS)
+  intent = ai_actor_choose_intent(mob, &target, &line, &do_emote, &do_warn);
+  if (intent <= 0)
     return FALSE;
 
-  target_id = ai_find_hostile_target_in_room(mob);
-  target = ai_find_player_by_idnum_room(mob, target_id);
-
-  if (target && pf->role == ROLE_GUARD && pf->arrest_enabled) {
-    if (ai_can_speak_now(mob, now))
-      ai_say(mob, "$n says, 'Halt! In the name of the law!'", now);
-    hit(mob, target, TYPE_UNDEFINED);
-    return TRUE;
-  }
-
-  if (target && pf->role == ROLE_MERCHANT) {
-    if (ai_can_speak_now(mob, now))
-      ai_say(mob, "$n says, 'I will not deal with criminals. Guards!'", now);
-    return TRUE;
-  }
-
-  if (target && pf->role == ROLE_BANDIT) {
-    if (ai_can_speak_now(mob, now) && !rand_number(0, 2))
-      ai_say(mob, "$n says, 'Your coin or your blood!'", now);
-    hit(mob, target, TYPE_UNDEFINED);
-    return TRUE;
-  }
-
-  if (pf->whisper_enabled && ai_can_speak_now(mob, now) &&
-      (SECT(IN_ROOM(mob)) == SECT_FOREST || SECT(IN_ROOM(mob)) == SECT_MOUNTAIN) &&
-      !rand_number(0, 5)) {
-    ai_say(mob, "$n whispers, 'The veil is thin tonight.'", now);
-    return TRUE;
-  }
-
-  if (pf->movement != MOVE_SENTINEL && GET_POS(mob) == POS_STANDING) {
-    if (MOB_FLAGGED(mob, MOB_SENTINEL))
-      return FALSE;
-    if (MOB_FLAGGED(mob, MOB_SPEC) && pf->role != ROLE_GUARD)
-      return FALSE;
-    if (ai_move_random_biased(mob))
+  if (intent == 6) {
+    if (!has_external_logic && ai_move_random_biased(mob)) {
+      st->last_action_time = now;
+      st->intent_cooldown_pulses = rand_number(AI_INTENT_COOLDOWN_MIN, AI_INTENT_COOLDOWN_MAX) * PASSES_PER_SEC;
       return TRUE;
+    }
+    return FALSE;
   }
 
-  return FALSE;
+  if (line && *line) {
+    if (do_emote)
+      do_echo(mob, (char *)(line[0] == '$' ? line + 3 : line), 0, SCMD_EMOTE);
+    else if (ai_can_speak_now(mob, now) && st->talk_cooldown_pulses <= 0)
+      ai_say(mob, line, now);
+    else
+      return FALSE;
+
+    st->last_action_time = now;
+    if (do_emote) st->last_emote_time = now;
+    if (!do_emote) st->last_talk_time = now;
+    st->intent_cooldown_pulses = rand_number(AI_INTENT_COOLDOWN_MIN, AI_INTENT_COOLDOWN_MAX) * PASSES_PER_SEC;
+    if (!do_emote)
+      st->talk_cooldown_pulses = rand_number(AI_TALK_COOLDOWN_MIN, AI_TALK_COOLDOWN_MAX) * PASSES_PER_SEC;
+    st->pending_target_idnum = 0;
+    st->pending_event_text[0] = '\0';
+    st->pending_event_type = AI_EVENT_PLAYER_LEAVE;
+    return TRUE;
+  }
+
+  return do_warn;
 }
+
 
 void ai_actor_record_damage(struct char_data *mob, struct char_data *actor, int dam)
 {
@@ -1005,7 +1180,11 @@ void ai_actor_record_damage(struct char_data *mob, struct char_data *actor, int 
 
   e->hostility += MAX(1, dam / 10);
   e->flags |= MEM_ATTACKED_ME;
+  e->disposition_flags |= AI_DISP_ATTACKED_ME;
+  e->attitude = MAX(-100, e->attitude - MAX(4, dam / 8));
   e->last_update = time(0);
+  e->last_seen_time = e->last_update;
+  e->last_interaction_time = e->last_update;
   e->last_room_vnum = (IN_ROOM(mob) == NOWHERE) ? NOWHERE : GET_ROOM_VNUM(IN_ROOM(mob));
   ai_actor_brain_on_attacked(mob, actor, dam);
 }
@@ -1025,6 +1204,8 @@ void ai_actor_record_help(struct char_data *mob, struct char_data *actor, int am
 
   e->trust += MAX(1, amount / 5);
   e->flags |= MEM_HELPED_ME;
+  e->disposition_flags |= AI_DISP_HELPED_ME;
+  e->attitude = MIN(100, e->attitude + MAX(3, amount / 4));
   e->last_update = time(0);
   e->last_room_vnum = (IN_ROOM(mob) == NOWHERE) ? NOWHERE : GET_ROOM_VNUM(IN_ROOM(mob));
 }
@@ -1123,244 +1304,40 @@ static void ai_actor_mark_target_reaction(struct char_data *mob, struct char_dat
 
 void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, struct char_data *actor, const char *text)
 {
-  time_t now;
-  int is_imm;
-  const char *line = NULL;
-  int peaceful;
-  static const char *const guard_enter[] = {
-    "Greetings. Keep your hands where I can see them.",
-    "Move along and keep the peace.",
-    "Watch business is serious business today.",
-    NULL
-  };
-  static const char *const merchant_enter[] = {
-    "Welcome in. Fresh wares and fair prices.",
-    "Browse as long as you like; ask if you need a price.",
-    "Step right up, best bargains this side of the gate.",
-    "Fine steel, dry cloth, and honest scales today.",
-    "Coin well spent keeps a roof over us all.",
-    "If you need kit for the road, I have it.",
-    "No haggling games; the mark is fair already.",
-    "Mind the jars by the door; they're fragile stock.",
-    NULL
-  };
-  static const char *const innkeeper_enter[] = {
-    "Welcome traveler, rooms are clean and ale is warm.",
-    "Need rest? I've got beds upstairs and stew on the fire.",
-    "Take a seat; the common room is open all night.",
-    "Boots off the table, then pick your supper.",
-    "A dry blanket and a hot cup wait by the hearth.",
-    "The fire is banked and the casks are full.",
-    "You look road-worn; rest first, stories after.",
-    "Rooms are ready if your purse and manners are steady.",
-    NULL
-  };
-  static const char *const merchant_smalltalk[] = {
-    "Market's lively today; that's good for every hand.",
-    "Caravans came in at dawn with salt and lamp oil.",
-    "Storms ruined some grain, but cloth is plenty.",
-    "A sharp eye saves coin better than a sharp blade.",
-    "I trust scales and ledgers more than promises.",
-    "Good boots matter more than fancy cloaks out there.",
-    "Travel light, pay fair, and roads treat you kinder.",
-    "If you need trade goods, ask plain and I'll answer plain.",
-    NULL
-  };
-  static const char *const innkeeper_smalltalk[] = {
-    "The stew is thick tonight, and that's no small blessing.",
-    "Rain's coming; travelers always crowd in before dusk.",
-    "A full hall means fewer knives drawn in alleys.",
-    "Rest turns quarrels soft. Keep to the hearth and breathe.",
-    "I keep spare blankets for the road-bitten.",
-    "Minstrels pass through on Moonsday if you're lucky.",
-    "Pay for the room before sleep and we'll get along.",
-    "Warm bread at sundown, if the oven behaves.",
-    NULL
-  };
-  static const char *const merchant_social_positive[] = {
-    "Ha! A cheerful market makes easy trade.",
-    "Good spirits sell more than sharp signs.",
-    "A wave and a smile cost nothing and earn much.",
-    "Careful with the dancing boots near my wares.",
-    "Well met. Keep that cheer bright.",
-    "A light laugh lifts a heavy purse.",
-    "Share the joy, not the elbows.",
-    "That's the mood that keeps coin moving.",
-    NULL
-  };
-  static const char *const innkeeper_social_positive[] = {
-    "Easy now, dance if you must but spare the benches.",
-    "A good laugh belongs in a common room.",
-    "Hugs are fine; broken mugs are not.",
-    "Wave to the hearth and it'll wave back in warmth.",
-    "Keep that cheer and the night will pass gentle.",
-    "That's the sort of joy that earns a second cup.",
-    "Good company keeps wolves outside the door.",
-    "A lively hall is better than a silent one.",
-    NULL
-  };
-  static const char *const merchant_social_rude[] = {
-    "Spit elsewhere. I keep a clean shop.",
-    "Take that filth outside my doorway.",
-    "Mind yourself, or the watch will mind you.",
-    "Rudeness drives off honest buyers.",
-    "Show respect and you'll get the same.",
-    "No one trades with a gutter mouth for long.",
-    "Keep your temper leashed in here.",
-    "You're close to being shown the street.",
-    NULL
-  };
-  static const char *const innkeeper_social_rude[] = {
-    "Spit on my floor and you'll sleep outside.",
-    "Mind your manners, this is a house of rest.",
-    "I scrub that floor myself; don't test me.",
-    "Take your quarrel to the yard, not my hall.",
-    "Keep the peace or keep walking.",
-    "No bed for folk who foul the room.",
-    "Do that again and the door finds you.",
-    "Respect the hearth, or lose it.",
-    NULL
-  };
-  static const char *const bandit_enter[] = {
-    "Keep your purse close, friend.",
-    "New face. New opportunity.",
-    "You look lost. Coin helps people find their way.",
-    NULL
-  };
-  static const char *const beast_enter[] = {
-    "$n bares $s teeth and watches carefully.",
-    "$n sniffs the air and paces in a wary circle.",
-    "$n gives a low warning growl.",
-    NULL
-  };
-  static const char *const undead_enter[] = {
-    "The grave remembers every footstep.",
-    "Warm blood walks where it should not.",
-    "Your breath sounds very loud in here.",
-    NULL
-  };
-  static const char *const spirit_enter[] = {
-    "The air stirs... another soul arrives.",
-    "I have watched this hall longer than kings have ruled.",
-    "Do not fear the chill. Fear what follows it.",
-    NULL
-  };
-  static const char *const commander_enter[] = {
-    "Form up and keep discipline.",
-    "Report your business quickly.",
-    "Eyes forward. No disorder in my sight.",
-    NULL
-  };
-  static const char *const social_positive[] = {
-    "Good spirit. Keep that energy up.",
-    "Ha! A little joy suits this place.",
-    "Well done. Morale matters.",
-    NULL
-  };
-  static const char *const social_rude[] = {
-    "Mind your manners.",
-    "That filth stays off my floor.",
-    "Try that again and you'll regret it.",
-    NULL
-  };
-  static const char *const combat_guard[] = {
-    "Break it up! By order of the watch!",
-    "Stand down or be put down.",
-    NULL
-  };
-  static const char *const combat_merchant[] = {
-    "Not in my shop! Take it outside!",
-    "Guards! They're ruining the merchandise!",
-    NULL
-  };
-  static const char *const combat_bandit[] = {
-    "Heh. Weak blood spills first.",
-    "Now this is entertainment.",
-    NULL
-  };
+  struct ai_actor_memory_entry *e;
+  time_t now = time(0);
 
-  if (!mob || !actor || !mob->ai_prof || !mob->ai_state)
-    return;
-  if (IS_NPC(actor) || actor == mob || IN_ROOM(mob) == NOWHERE || IN_ROOM(mob) != IN_ROOM(actor))
-    return;
-  if (FIGHTING(mob) && type != AI_EVENT_COMBAT_START)
+  if (!mob || !actor || !mob->ai_prof || !mob->ai_state || IS_NPC(actor))
     return;
 
-  now = time(0);
-  if (!ai_can_speak_now(mob, now))
-    return;
-  if (!ai_actor_target_cooldown_ok(mob, actor, now))
-    return;
-
-  is_imm = GET_LEVEL(actor) >= LVL_IMMORT;
-  peaceful = ai_actor_peaceful_room(IN_ROOM(mob));
-
-  if (type == AI_EVENT_PLAYER_ENTER) {
-    switch (mob->ai_prof->role) {
-      case ROLE_GUARD: line = ai_pick_phrase(guard_enter); break;
-      case ROLE_MERCHANT:
-        if (text && (strstr(text, "inn") || strstr(text, "ale") || strstr(text, "room")))
-          line = ai_pick_phrase(innkeeper_enter);
-        else
-          line = ai_pick_phrase(merchant_enter);
-        break;
-      case ROLE_BANDIT: line = ai_pick_phrase(bandit_enter); break;
-      case ROLE_BEAST: line = ai_pick_phrase(beast_enter); break;
-      case ROLE_UNDEAD: line = ai_pick_phrase(undead_enter); break;
-      case ROLE_SPIRIT: line = ai_pick_phrase(spirit_enter); break;
-      case ROLE_BOSS: line = ai_pick_phrase(commander_enter); break;
-      default: line = "Welcome, traveler."; break;
-    }
-    if (is_imm && mob->ai_prof->role == ROLE_GUARD)
-      line = "Evening, my lord. The watch stands ready.";
-  } else if (type == AI_EVENT_PLAYER_LEAVE) {
-    if (mob->ai_prof->role == ROLE_BANDIT)
-      line = "Leaving so soon?";
-    else if (mob->ai_prof->role == ROLE_MERCHANT)
-      line = "Come back when you need wares.";
-  } else if (type == AI_EVENT_PLAYER_SAY && text && *text) {
-    if (strstr(text, "hello") || strstr(text, "greet") || strstr(text, "hi"))
-      line = (mob->ai_prof->role == ROLE_GUARD) ? "Keep moving and keep it civil." : "Greetings.";
-    else if (mob->ai_prof->role == ROLE_MERCHANT && (strstr(text, "price") || strstr(text, "trade") || strstr(text, "buy") || strstr(text, "sell") || strstr(text, "wares")))
-      line = "Everything has a price, and mine are honest.";
-    else if (mob->ai_prof->role == ROLE_MERCHANT && (strstr(text, "ale") || strstr(text, "room") || strstr(text, "rest") || strstr(text, "rooms")))
-      line = "Rooms upstairs, ale by the cask, and a hot meal at dusk.";
-    else if (mob->ai_prof->role == ROLE_MERCHANT)
-      line = (text && (strstr(text, "inn") || strstr(text, "ale") || strstr(text, "room"))) ?
-        ai_pick_phrase(innkeeper_smalltalk) : ai_pick_phrase(merchant_smalltalk);
-    else if (mob->ai_prof->role == ROLE_GUARD && (strstr(text, "steal") || strstr(text, "kill") || strstr(text, "fight") || strstr(text, "blood")))
-      line = "Choose your words carefully. The law is listening.";
-    else if (mob->ai_prof->role == ROLE_BANDIT && (strstr(text, "coin") || strstr(text, "gold") || strstr(text, "rich")))
-      line = "Gold talks louder than courage.";
-  } else if (type == AI_EVENT_PLAYER_EMOTE && text && *text) {
-    if (mob->ai_prof->role == ROLE_MERCHANT) {
-      int innkeeper_style = (strstr(text, "inn") || strstr(text, "ale") || strstr(text, "room"));
-      if (strstr(text, "spit") || strstr(text, "insult"))
-        line = innkeeper_style ? ai_pick_phrase(innkeeper_social_rude) : ai_pick_phrase(merchant_social_rude);
-      else if (strstr(text, "dance") || strstr(text, "hug") || strstr(text, "wave") || strstr(text, "laugh") || strstr(text, "highfive"))
-        line = innkeeper_style ? ai_pick_phrase(innkeeper_social_positive) : ai_pick_phrase(merchant_social_positive);
-    } else if (strstr(text, "spit") || strstr(text, "insult"))
-      line = ai_pick_phrase(social_rude);
-    else if (strstr(text, "dance") || strstr(text, "hug") || strstr(text, "wave") || strstr(text, "laugh") || strstr(text, "highfive"))
-      line = ai_pick_phrase(social_positive);
-  } else if (type == AI_EVENT_COMBAT_START && !peaceful) {
-    switch (mob->ai_prof->role) {
-      case ROLE_GUARD: line = ai_pick_phrase(combat_guard); break;
-      case ROLE_MERCHANT: line = ai_pick_phrase(combat_merchant); break;
-      case ROLE_BANDIT: line = ai_pick_phrase(combat_bandit); break;
-      case ROLE_BEAST: line = "$n snarls and circles for an opening."; break;
-      default: line = "Keep your blades away from me."; break;
+  e = ai_mem_get_or_create(mob, GET_IDNUM(actor));
+  if (e) {
+    e->last_seen_time = now;
+    e->last_interaction_time = now;
+    e->last_room_vnum = (IN_ROOM(mob) == NOWHERE) ? NOWHERE : GET_ROOM_VNUM(IN_ROOM(mob));
+    if (actor->player.name)
+      strlcpy(e->key_name, actor->player.name, sizeof(e->key_name));
+    if (type == AI_EVENT_PLAYER_SAY) {
+      e->trust = MIN(40, e->trust + 1);
+      e->attitude = MAX(-100, MIN(100, e->attitude + 1));
+    } else if (type == AI_EVENT_PLAYER_EMOTE) {
+      if (text && (strstr(text, "spit") || strstr(text, "insult"))) {
+        e->disposition_flags |= AI_DISP_ANNOYED_ME;
+        e->hostility = MIN(40, e->hostility + 2);
+        e->attitude = MAX(-100, e->attitude - 6);
+      } else {
+        e->attitude = MAX(-100, MIN(100, e->attitude + 2));
+      }
     }
   }
 
-  if (!line)
-    return;
+  if (type == AI_EVENT_COMBAT_START && e) {
+    e->disposition_flags |= AI_DISP_ATTACKED_ME;
+    e->hostility = MIN(60, e->hostility + 4);
+    e->attitude = MAX(-100, e->attitude - 12);
+  }
 
-  if (mob->ai_state->last_spoke && (now - mob->ai_state->last_spoke) < AI_EVENT_IGNORE_MSG_SECS)
-    return;
-
-  ai_actor_schedule_reaction_speech(mob, actor, line);
-  ai_actor_mark_target_reaction(mob, actor, now);
+  ai_state_push_event(mob, type, actor, text ? text : "");
 }
 
 
@@ -1373,7 +1350,6 @@ void ai_actor_event_enter(struct char_data *actor, room_rnum room)
     if (IS_NPC(mob) && MOB_FLAGGED(mob, MOB_AI_ACTOR) && mob != actor) {
       if (!mob->ai_state || !mob->ai_state->brain) ai_actor_init(mob);
       ai_actor_on_room_event(mob, AI_EVENT_PLAYER_ENTER, actor, actor->player.short_descr ? actor->player.short_descr : actor->player.name);
-      if (ai_actor_brain_enabled()) ai_actor_brain_on_enter(mob, actor);
     }
 }
 
@@ -1385,7 +1361,6 @@ void ai_actor_event_leave(struct char_data *actor, room_rnum room)
     if (IS_NPC(mob) && MOB_FLAGGED(mob, MOB_AI_ACTOR) && mob != actor) {
       if (!mob->ai_state || !mob->ai_state->brain) ai_actor_init(mob);
       ai_actor_on_room_event(mob, AI_EVENT_PLAYER_LEAVE, actor, NULL);
-      if (ai_actor_brain_enabled()) ai_actor_brain_on_leave(mob, actor);
     }
 }
 
@@ -1397,7 +1372,6 @@ void ai_actor_event_say(struct char_data *actor, const char *msg)
     if (IS_NPC(mob) && MOB_FLAGGED(mob, MOB_AI_ACTOR) && mob != actor) {
       if (!mob->ai_state || !mob->ai_state->brain) ai_actor_init(mob);
       ai_actor_on_room_event(mob, AI_EVENT_PLAYER_SAY, actor, msg ? msg : "");
-      if (ai_actor_brain_enabled()) ai_actor_brain_on_say(mob, actor, msg ? msg : "");
     }
 }
 
@@ -1409,7 +1383,6 @@ void ai_actor_event_emote(struct char_data *actor, const char *msg)
     if (IS_NPC(mob) && MOB_FLAGGED(mob, MOB_AI_ACTOR) && mob != actor) {
       if (!mob->ai_state || !mob->ai_state->brain) ai_actor_init(mob);
       ai_actor_on_room_event(mob, AI_EVENT_PLAYER_EMOTE, actor, msg ? msg : "");
-      if (ai_actor_brain_enabled()) ai_actor_brain_on_emote(mob, actor, msg ? msg : "");
     }
 }
 
@@ -1423,7 +1396,6 @@ void ai_actor_event_combat_start(struct char_data *attacker, struct char_data *v
     if (IS_NPC(mob) && MOB_FLAGGED(mob, MOB_AI_ACTOR) && mob != attacker && mob != victim) {
       if (!mob->ai_state || !mob->ai_state->brain) ai_actor_init(mob);
       ai_actor_on_room_event(mob, AI_EVENT_COMBAT_START, attacker, "combat");
-      if (ai_actor_brain_enabled()) ai_actor_brain_on_combat_start(mob, attacker, victim);
     }
 }
 
