@@ -477,6 +477,7 @@ void boot_world(void)
 
   log("Loading mobs and generating index.");
   index_boot(DB_BOOT_MOB);
+  log("AI test mob 19500 real_mobile=%d", real_mobile(19500));
 
   log("Loading objs and generating index.");
   index_boot(DB_BOOT_OBJ);
