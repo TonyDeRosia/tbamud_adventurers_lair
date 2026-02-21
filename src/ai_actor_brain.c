@@ -24,6 +24,14 @@
 
 static int g_aictl_enabled = TRUE;
 
+static void ai_safe_append(char *dst, size_t dstsz, const char *src) {
+  size_t len;
+  if (!dst || dstsz == 0 || !src) return;
+  len = strlen(dst);
+  if (len >= dstsz - 1) return;
+  snprintf(dst + len, dstsz - len, "%s", src);
+}
+
 enum ai_actor_archetype {
   ARCH_GUARD = 0, ARCH_CONSTABLE, ARCH_MERCHANT, ARCH_INNKEEPER, ARCH_BANDIT,
   ARCH_CULTIST, ARCH_WOLF, ARCH_SKELETON, ARCH_SPIRIT, ARCH_COMMANDER, ARCH_GENERIC
@@ -348,17 +356,17 @@ void ai_actor_brain_show_state(struct char_data *viewer, struct char_data *mob) 
   if (mob->ai_state) {
     char topics[160];
     topics[0] = '\0';
-    if (mob->ai_state->local_topic_mask & AI_TOPIC_MIDGAARD) strlcat(topics, "MIDGAARD ", sizeof(topics));
-    if (mob->ai_state->local_topic_mask & AI_TOPIC_TEMPLE) strlcat(topics, "TEMPLE ", sizeof(topics));
-    if (mob->ai_state->local_topic_mask & AI_TOPIC_MARKET) strlcat(topics, "MARKET ", sizeof(topics));
-    if (mob->ai_state->local_topic_mask & AI_TOPIC_INN) strlcat(topics, "INN ", sizeof(topics));
-    if (mob->ai_state->local_topic_mask & AI_TOPIC_BANK) strlcat(topics, "BANK ", sizeof(topics));
-    if (mob->ai_state->local_topic_mask & AI_TOPIC_ALLEY) strlcat(topics, "ALLEY ", sizeof(topics));
-    if (mob->ai_state->local_topic_mask & AI_TOPIC_WILDERNESS) strlcat(topics, "WILDERNESS ", sizeof(topics));
-    if (mob->ai_state->local_topic_mask & AI_TOPIC_DUNGEON) strlcat(topics, "DUNGEON ", sizeof(topics));
-    if (mob->ai_state->local_topic_mask & AI_TOPIC_SEWER) strlcat(topics, "SEWER ", sizeof(topics));
-    if (mob->ai_state->local_topic_mask & AI_TOPIC_CASTLE) strlcat(topics, "CASTLE ", sizeof(topics));
-    if (!topics[0]) strlcpy(topics, "NONE", sizeof(topics));
+    if (mob->ai_state->local_topic_mask & AI_TOPIC_MIDGAARD) ai_safe_append(topics, sizeof(topics), "MIDGAARD ");
+    if (mob->ai_state->local_topic_mask & AI_TOPIC_TEMPLE) ai_safe_append(topics, sizeof(topics), "TEMPLE ");
+    if (mob->ai_state->local_topic_mask & AI_TOPIC_MARKET) ai_safe_append(topics, sizeof(topics), "MARKET ");
+    if (mob->ai_state->local_topic_mask & AI_TOPIC_INN) ai_safe_append(topics, sizeof(topics), "INN ");
+    if (mob->ai_state->local_topic_mask & AI_TOPIC_BANK) ai_safe_append(topics, sizeof(topics), "BANK ");
+    if (mob->ai_state->local_topic_mask & AI_TOPIC_ALLEY) ai_safe_append(topics, sizeof(topics), "ALLEY ");
+    if (mob->ai_state->local_topic_mask & AI_TOPIC_WILDERNESS) ai_safe_append(topics, sizeof(topics), "WILDERNESS ");
+    if (mob->ai_state->local_topic_mask & AI_TOPIC_DUNGEON) ai_safe_append(topics, sizeof(topics), "DUNGEON ");
+    if (mob->ai_state->local_topic_mask & AI_TOPIC_SEWER) ai_safe_append(topics, sizeof(topics), "SEWER ");
+    if (mob->ai_state->local_topic_mask & AI_TOPIC_CASTLE) ai_safe_append(topics, sizeof(topics), "CASTLE ");
+    if (!topics[0]) snprintf(topics, sizeof(topics), "%s", "NONE");
     send_to_char(viewer, "  last_pool=%s last_reason=%s topics=0x%x [%s]\r\n",
                  mob->ai_state->last_pool_name[0] ? mob->ai_state->last_pool_name : "POOL_NONE",
                  mob->ai_state->last_speak_reason[0] ? mob->ai_state->last_speak_reason : "NONE",
