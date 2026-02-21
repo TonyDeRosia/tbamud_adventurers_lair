@@ -1137,12 +1137,88 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
     "Welcome in. Fresh wares and fair prices.",
     "Browse as long as you like; ask if you need a price.",
     "Step right up, best bargains this side of the gate.",
+    "Fine steel, dry cloth, and honest scales today.",
+    "Coin well spent keeps a roof over us all.",
+    "If you need kit for the road, I have it.",
+    "No haggling games; the mark is fair already.",
+    "Mind the jars by the door; they're fragile stock.",
     NULL
   };
   static const char *const innkeeper_enter[] = {
     "Welcome traveler, rooms are clean and ale is warm.",
     "Need rest? I've got beds upstairs and stew on the fire.",
     "Take a seat; the common room is open all night.",
+    "Boots off the table, then pick your supper.",
+    "A dry blanket and a hot cup wait by the hearth.",
+    "The fire is banked and the casks are full.",
+    "You look road-worn; rest first, stories after.",
+    "Rooms are ready if your purse and manners are steady.",
+    NULL
+  };
+  static const char *const merchant_smalltalk[] = {
+    "Market's lively today; that's good for every hand.",
+    "Caravans came in at dawn with salt and lamp oil.",
+    "Storms ruined some grain, but cloth is plenty.",
+    "A sharp eye saves coin better than a sharp blade.",
+    "I trust scales and ledgers more than promises.",
+    "Good boots matter more than fancy cloaks out there.",
+    "Travel light, pay fair, and roads treat you kinder.",
+    "If you need trade goods, ask plain and I'll answer plain.",
+    NULL
+  };
+  static const char *const innkeeper_smalltalk[] = {
+    "The stew is thick tonight, and that's no small blessing.",
+    "Rain's coming; travelers always crowd in before dusk.",
+    "A full hall means fewer knives drawn in alleys.",
+    "Rest turns quarrels soft. Keep to the hearth and breathe.",
+    "I keep spare blankets for the road-bitten.",
+    "Minstrels pass through on Moonsday if you're lucky.",
+    "Pay for the room before sleep and we'll get along.",
+    "Warm bread at sundown, if the oven behaves.",
+    NULL
+  };
+  static const char *const merchant_social_positive[] = {
+    "Ha! A cheerful market makes easy trade.",
+    "Good spirits sell more than sharp signs.",
+    "A wave and a smile cost nothing and earn much.",
+    "Careful with the dancing boots near my wares.",
+    "Well met. Keep that cheer bright.",
+    "A light laugh lifts a heavy purse.",
+    "Share the joy, not the elbows.",
+    "That's the mood that keeps coin moving.",
+    NULL
+  };
+  static const char *const innkeeper_social_positive[] = {
+    "Easy now, dance if you must but spare the benches.",
+    "A good laugh belongs in a common room.",
+    "Hugs are fine; broken mugs are not.",
+    "Wave to the hearth and it'll wave back in warmth.",
+    "Keep that cheer and the night will pass gentle.",
+    "That's the sort of joy that earns a second cup.",
+    "Good company keeps wolves outside the door.",
+    "A lively hall is better than a silent one.",
+    NULL
+  };
+  static const char *const merchant_social_rude[] = {
+    "Spit elsewhere. I keep a clean shop.",
+    "Take that filth outside my doorway.",
+    "Mind yourself, or the watch will mind you.",
+    "Rudeness drives off honest buyers.",
+    "Show respect and you'll get the same.",
+    "No one trades with a gutter mouth for long.",
+    "Keep your temper leashed in here.",
+    "You're close to being shown the street.",
+    NULL
+  };
+  static const char *const innkeeper_social_rude[] = {
+    "Spit on my floor and you'll sleep outside.",
+    "Mind your manners, this is a house of rest.",
+    "I scrub that floor myself; don't test me.",
+    "Take your quarrel to the yard, not my hall.",
+    "Keep the peace or keep walking.",
+    "No bed for folk who foul the room.",
+    "Do that again and the door finds you.",
+    "Respect the hearth, or lose it.",
     NULL
   };
   static const char *const bandit_enter[] = {
@@ -1249,14 +1325,23 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
       line = "Everything has a price, and mine are honest.";
     else if (mob->ai_prof->role == ROLE_MERCHANT && (strstr(text, "ale") || strstr(text, "room") || strstr(text, "rest") || strstr(text, "rooms")))
       line = "Rooms upstairs, ale by the cask, and a hot meal at dusk.";
+    else if (mob->ai_prof->role == ROLE_MERCHANT)
+      line = (text && (strstr(text, "inn") || strstr(text, "ale") || strstr(text, "room"))) ?
+        ai_pick_phrase(innkeeper_smalltalk) : ai_pick_phrase(merchant_smalltalk);
     else if (mob->ai_prof->role == ROLE_GUARD && (strstr(text, "steal") || strstr(text, "kill") || strstr(text, "fight") || strstr(text, "blood")))
       line = "Choose your words carefully. The law is listening.";
     else if (mob->ai_prof->role == ROLE_BANDIT && (strstr(text, "coin") || strstr(text, "gold") || strstr(text, "rich")))
       line = "Gold talks louder than courage.";
   } else if (type == AI_EVENT_PLAYER_EMOTE && text && *text) {
-    if (strstr(text, "spit") || strstr(text, "insult"))
+    if (mob->ai_prof->role == ROLE_MERCHANT) {
+      int innkeeper_style = (strstr(text, "inn") || strstr(text, "ale") || strstr(text, "room"));
+      if (strstr(text, "spit") || strstr(text, "insult"))
+        line = innkeeper_style ? ai_pick_phrase(innkeeper_social_rude) : ai_pick_phrase(merchant_social_rude);
+      else if (strstr(text, "dance") || strstr(text, "hug") || strstr(text, "wave") || strstr(text, "laugh") || strstr(text, "highfive"))
+        line = innkeeper_style ? ai_pick_phrase(innkeeper_social_positive) : ai_pick_phrase(merchant_social_positive);
+    } else if (strstr(text, "spit") || strstr(text, "insult"))
       line = ai_pick_phrase(social_rude);
-    else if (strstr(text, "dance") || strstr(text, "hug") || strstr(text, "highfive"))
+    else if (strstr(text, "dance") || strstr(text, "hug") || strstr(text, "wave") || strstr(text, "laugh") || strstr(text, "highfive"))
       line = ai_pick_phrase(social_positive);
   } else if (type == AI_EVENT_COMBAT_START && !peaceful) {
     switch (mob->ai_prof->role) {
