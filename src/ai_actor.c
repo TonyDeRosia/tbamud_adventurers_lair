@@ -58,6 +58,21 @@ enum ai_conversation_topic {
 
 struct ai_conv_actor_state {
   struct char_data *mob;
+  int voice_profile_ready;
+  struct ai_voice_profile {
+    int vocab_tier;
+    int rhythm;
+    int hedge_style;
+    int topic_lean;
+    int tic_index;
+    int opener_index;
+    int closer_index;
+    int intensity;
+    int mbti_ei;
+    int mbti_sn;
+    int mbti_tf;
+    int mbti_jp;
+  } voice_profile;
   int current_topic;
   long partner_id;
   long last_speaker_id;
@@ -89,6 +104,20 @@ static struct ai_conv_room_state ai_conv_room_states[AI_CONV_ROOM_STATE_MAX];
 static int ai_debug = AI_ACTOR_DEBUG;
 
 struct ai_synonym_group;
+struct ai_word_tier_entry {
+  const char *concept;
+  const char *tier0;
+  const char *tier1;
+  const char *tier2;
+  const char *tier3;
+};
+
+struct ai_phrase_entry {
+  const char *tag;
+  int tier;
+  int rhythm;
+  const char *text;
+};
 
 static struct char_data *ai_find_player_by_idnum_room(struct char_data *mob, long idnum);
 static const char *ai_pick_phrase(const char *const *pool);
@@ -121,6 +150,14 @@ static int ai_is_weather_smalltalk(const char *text);
 static const char *ai_synonym_pick(const struct ai_synonym_group *groups, const char *token, unsigned long seed, int slot);
 static void ai_template_expand(const char *tpl, const struct ai_synonym_group *groups, unsigned long seed, char *out, size_t outsz);
 static const char *ai_template_reply_for_intent(struct char_data *mob, int intent, const char *text, int avoid_template_id, int *out_template_id);
+static void ai_voice_profile_derive(struct char_data *mob, struct ai_voice_profile *out);
+static const struct ai_voice_profile *ai_voice_profile_get(struct char_data *mob);
+static const char *ai_word(const char *concept, int tier);
+static const char *ai_word_sn(const char *concept, int vocab_tier, int sn);
+static const char *ai_phrase(const char *tag, int tier, int rhythm, unsigned long seed, int slot);
+static const char *ai_mbti_string(const struct ai_voice_profile *vp);
+static void ai_mbti_compound_modifier(const struct ai_voice_profile *vp, int speech_act, int *out_add_followup_question, int *out_add_topic_lean, int *out_suppress_opener, int *out_use_emotional_color, unsigned long seed);
+static void ai_voice_assemble(struct char_data *mob, const struct ai_voice_profile *vp, int speech_act, const char *core_content, unsigned long seed, char *out, size_t outsz);
 
 enum ai_player_speech_class {
   AI_SPEECH_UNKNOWN = 0,
@@ -1341,13 +1378,13 @@ static int ai_try_flee_or_surrender(struct char_data *mob, time_t now)
  * - Apply hard gates: peaceful rooms, cooldowns, visibility, and special/script ownership.
  * - Execute only the top intent above threshold, then apply intent/talk cooldowns.
  */
-static const char *const role_guard_greet[] = {"Good day. Keep things lawful.", "Welcome. Keep the peace.", "Morning. Move smart and stay calm.", "Eyes open. No trouble today.", "You are safe if you act right.", "Keep your blade sheathed in town.", "Report crimes and keep walking.", "Stay civil and we get along.", "The square is watched. Behave.", "Mind the law and you'll do fine.", "Need directions? Ask plainly.", "Order first, comfort second.", NULL};
+static const char *const role_guard_greet[] = {"{GREET}. Keep things lawful on this {PLACE}.", "{GREET}. Keep the {QUIET}.", "Morning. Move smart and stay {QUIET}.", "Eyes open. No trouble today.", "You are safe if you act right.", "Keep your blade sheathed in town.", "Report crimes and keep walking.", "Stay civil and we get along.", "The square is watched. Behave.", "Mind the law and you'll do fine.", "Need directions? Ask plainly.", "Order first, comfort second.", NULL};
 static const char *const role_guard_service[] = {"Need a direction? I can point you to the inn, bank, or market.", "For rooms and rest, head to the inn. For trade, market stalls.", "The law office keeps records; the bank is east from here.", "Travelers rest at the inn. Keep your coin close on the road.", "Need help finding a healer? I can point the way.", "If you're lost, follow the main road to the square fountain.", "Merchants trade nearby; keep business clean and legal.", "Ask clearly and I'll give directions, not discounts.", NULL};
-static const char *const role_merchant_greet[] = {"Welcome, traveler. Browse my wares.", "Fresh stock and fair measures today.", "Take your time; prices are honest.", "Looking to buy or sell?", "Careful hands, quality goods.", "Coin talks, and I listen.", "Best rates in this quarter.", "See anything you fancy?", "Trade straight, leave happy.", "Step closer and have a look.", "Fine goods, no tricks.", "I can help you outfit your journey.", NULL};
+static const char *const role_merchant_greet[] = {"{GREET}, traveler. Browse my wares.", "Fresh stock and fair measures this {TIME}.", "Take your {TIME}; prices stay {GOOD}.", "Looking to buy or sell?", "Careful hands, quality goods.", "Coin talks, and I listen.", "Best rates in this quarter.", "See anything you fancy?", "Trade straight, leave happy.", "Step closer and have a look.", "Fine goods, no tricks.", "I can help you outfit your journey.", NULL};
 static const char *const role_merchant_service[] = {"I buy and sell. Show me what you carry.", "Need wares? I've got supplies and tools.", "Trade window's open; let's do business.", "If you need kit for the road, I can sort you out.", "Sell loot, buy provisions, move fast.", "My stock rotates often; check the shelves.", "I can price your goods fairly.", "If you seek rest, the inn is across the square.", NULL};
-static const char *const role_innkeeper_greet[] = {"Welcome in. Warm beds and hot stew.", "Evening, friend. Rest and room available.", "Boots off, worries down, hearth's warm.", "Need a quiet room tonight?", "The fire's hot and the ale's fresh.", "Travel's hard; rest here.", "I've got blankets, broth, and a bed.", "Come in out of the weather.", "A calm table and a softer mattress await.", "Sit, breathe, and settle in.", "You're welcome so long as you keep it civil.", "Long road behind you? I've got rest for that.", NULL};
+static const char *const role_innkeeper_greet[] = {"{GREET} in. Warm beds and hot stew.", "Evening, friend. Rest and room at this {PLACE}.", "Boots off, worries down, hearth stays {GOOD}.", "Need a quiet room tonight?", "The fire's hot and the ale's fresh.", "Travel's hard; rest here.", "I've got blankets, broth, and a bed.", "Come in out of the weather.", "A calm table and a softer mattress await.", "Sit, breathe, and settle in.", "You're welcome so long as you keep it civil.", "Long road behind you? I've got rest for that.", NULL};
 static const char *const role_innkeeper_service[] = {"I can offer a room, a meal, and a place to rest.", "Need an inn room? I can set you up.", "Rest your wounds by the hearth and take a bed upstairs.", "Food's hot, beds are clean, and noise stays low.", "You can rent a room or just sit and recover.", "If you need healing rest, this is your best stop.", "Stay the night and start fresh at dawn.", "No shop haggling here; comfort's what I sell.", NULL};
-static const char *const role_bandit_greet[] = {"You're new. Keep your coin visible.", "Road's rough. Pay attention.", "Nice purse. Shame if it wandered.", "Walk light and don't stare.", "You look like trouble worth weighing.", "Eyes down, pockets up.", "I've seen richer folk go missing.", "Careful where you step, friend.", "This lane charges tolls in silver.", "Keep moving and maybe we smile.", "You breathe easy for someone in my street.", "Hope you can afford local manners.", NULL};
+static const char *const role_bandit_greet[] = {"You're new. Keep coin visible on this {ROAD}.", "The {ROAD}'s {BAD}. Pay attention.", "Nice purse. Shame if {TROUBLE} found it.", "Walk light and don't stare.", "You look like trouble worth weighing.", "Eyes down, pockets up.", "I've seen richer folk go missing.", "Careful where you step, friend.", "This lane charges tolls in silver.", "Keep moving and maybe we smile.", "You breathe easy for someone in my street.", "Hope you can afford local manners.", NULL};
 static const char *const role_bandit_service[] = {"I don't sell wares; I tax passage.", "Service? Pay coin and I might answer.", "Inn and bank are for soft hands, not mine.", "You want directions, buy them.", "Trade's for merchants. I deal in leverage.", "Need rest? Don't sleep where I can see you.", "You're asking a lot for free.", "I can help you keep your purse by not taking it.", NULL};
 static const char *const role_beast_greet[] = {"$n snorts and watches you warily.", "$n paces in a tense circle.", "$n rumbles a low warning growl.", "$n flicks ears and studies your movement.", "$n stamps once and bares its teeth.", "$n huffs and keeps distance.", "$n lets out a rough bark.", "$n watches your hands, unblinking.", "$n prowls a step closer, then stops.", "$n growls but does not lunge.", "$n shakes its mane and sniffs the air.", "$n tracks you with predator focus.", NULL};
 static const char *const role_beast_service[] = {"$n growls, offering no help.", "$n bares fangs; there is no service here.", "$n huffs and ignores your request.", "$n paws the ground in refusal.", "$n answers with a warning snarl.", "$n circles, uninterested in trade.", "$n stares as if you are prey.", "$n snaps the air and turns away.", NULL};
@@ -1548,6 +1585,256 @@ static unsigned long ai_conv_seed(struct char_data *mob, int intent, unsigned in
   h = ai_hash_mix(h, (unsigned long)intent);
   h = ai_hash_mix(h, (unsigned long)counter);
   return h;
+}
+
+
+static const struct ai_word_tier_entry ai_word_tiers[] = {
+  {"AFFIRM", "yeah", "yes", "indeed", "verily"},
+  {"DENY", "nope", "no", "I cannot", "I shall not"},
+  {"UNCERTAIN", "dunno", "not sure", "I am unsure", "I cannot say with certainty"},
+  {"WARN", "watch out", "be careful", "exercise care", "heed well"},
+  {"GREET", "hey", "hello", "greetings", "well met, traveler"},
+  {"FAREWELL", "bye", "take care", "safe travels", "may your road be clear"},
+  {"THANKS", "ta", "thanks", "I thank you", "my gratitude"},
+  {"TROUBLE", "mess", "trouble", "difficulty", "upheaval"},
+  {"QUIET", "still", "quiet", "calm", "serene"},
+  {"DANGEROUS", "bad", "risky", "dangerous", "perilous"},
+  {"PLACE", "spot", "place", "location", "locale"},
+  {"PEOPLE", "folks", "people", "individuals", "souls"},
+  {"TIME", "a while", "some time", "a period", "an age"},
+  {"ROAD", "road", "path", "route", "thoroughfare"},
+  {"WORK", "job", "work", "duty", "charge"},
+  {"UNKNOWN", "weird", "odd", "unusual", "peculiar"},
+  {"GOOD", "fine", "good", "excellent", "admirable"},
+  {"BAD", "rough", "bad", "poor", "lamentable"},
+  {"WANT", "want", "would like", "prefer", "desire"},
+  {"THINK", "reckon", "think", "believe", "surmise"},
+  {NULL, NULL, NULL, NULL, NULL}
+};
+
+static const struct ai_phrase_entry ai_phrases[] = {
+  {"OPENER",0,0,"Right."},{"OPENER",0,0,"Well."},{"OPENER",0,0,"Look."},{"OPENER",0,0,"So."},
+  {"OPENER",1,1,"Truth is,"},{"OPENER",1,1,"Now then,"},{"OPENER",1,1,"As it stands,"},{"OPENER",1,1,"By my count,"},
+  {"OPENER",2,2,"I should say,"},{"OPENER",2,2,"For what it is worth,"},{"OPENER",2,2,"As matters presently stand,"},{"OPENER",2,2,"To be precise,"},
+  {"OPENER",3,3,"In the turning of things,"},{"OPENER",3,3,"Among all matters,"},{"OPENER",3,3,"By the lights above,"},{"OPENER",3,3,"In the broader pattern,"},
+  {"CLOSER",0,-1,"that's it."},{"CLOSER",0,-1,"simple as."},{"CLOSER",0,-1,"end of."},{"CLOSER",0,-1,"no more."},
+  {"CLOSER",1,-1,"that's how it stands."},{"CLOSER",1,-1,"make of it what you will."},{"CLOSER",1,-1,"that's the shape of it."},{"CLOSER",1,-1,"that's all."},
+  {"CLOSER",2,-1,"I trust that answers your question."},{"CLOSER",2,-1,"that should be sufficient."},{"CLOSER",2,-1,"those are the facts."},{"CLOSER",2,-1,"thus it is resolved."},
+  {"CLOSER",3,-1,"so the currents run."},{"CLOSER",3,-1,"as it has ever been."},{"CLOSER",3,-1,"so the pattern suggests."},{"CLOSER",3,-1,"such is the turning."},
+  {"HEDGE_UNCERTAIN",0,-1,"I think,"},{"HEDGE_UNCERTAIN",1,-1,"maybe,"},{"HEDGE_UNCERTAIN",2,-1,"could be,"},{"HEDGE_UNCERTAIN",3,-1,"as best I can tell,"},
+  {"HEDGE_EVASIVE",0,-1,"hard to say,"},{"HEDGE_EVASIVE",1,-1,"who can tell,"},{"HEDGE_EVASIVE",2,-1,"some would argue,"},{"HEDGE_EVASIVE",3,-1,"the matter is obscured,"},
+  {"HEDGE_CONFIDENT",0,-1,"no doubt,"},{"HEDGE_CONFIDENT",1,-1,"without question,"},{"HEDGE_CONFIDENT",2,-1,"mark my words,"},{"HEDGE_CONFIDENT",3,-1,"I am certain,"},
+  {"TOPIC_DUTY",0,-1,"the watch holds"},{"TOPIC_DUTY",1,-1,"order must be kept"},{"TOPIC_DUTY",2,-1,"this post is not idle"},{"TOPIC_DUTY",3,-1,"duty does not rest"},
+  {"TOPIC_TRADE",0,-1,"coin moves slowly"},{"TOPIC_TRADE",1,-1,"the market breathes"},{"TOPIC_TRADE",2,-1,"stock runs thin"},{"TOPIC_TRADE",3,-1,"prices shift by the hour"},
+  {"TOPIC_COMFORT",0,-1,"the hearth stays warm"},{"TOPIC_COMFORT",1,-1,"a meal helps most things"},{"TOPIC_COMFORT",2,-1,"rest when you can"},{"TOPIC_COMFORT",3,-1,"comfort is not weakness"},
+  {"TOPIC_DANGER",0,-1,"the roads are not safe"},{"TOPIC_DANGER",1,-1,"trouble gathers"},{"TOPIC_DANGER",2,-1,"something moves in the east"},{"TOPIC_DANGER",3,-1,"stay armed if you travel"},
+  {"TOPIC_MYSTERY",0,-1,"not everything has a name"},{"TOPIC_MYSTERY",1,-1,"some doors stay shut"},{"TOPIC_MYSTERY",2,-1,"the pattern is not clear"},{"TOPIC_MYSTERY",3,-1,"ask no more of that"},
+  {"FEEL_POSITIVE",0,-1,"I am glad to hear it."},{"FEEL_POSITIVE",1,-1,"That is welcome news."},{"FEEL_POSITIVE",2,-1,"It eases my mind."},{"FEEL_POSITIVE",3,-1,"Good to know."},
+  {"FEEL_NEGATIVE",0,-1,"That does not sit well."},{"FEEL_NEGATIVE",1,-1,"I worry at that."},{"FEEL_NEGATIVE",2,-1,"It grieves me to say."},{"FEEL_NEGATIVE",3,-1,"That is troubling."},
+  {NULL,0,0,NULL}
+};
+
+static const char *const ai_followup_greet[] = {"And yourself? Road treating you well?","You look like you have traveled far. All well?","How long have you been in these parts?","First time through here, or do you know the area?",NULL};
+static const char *const ai_followup_status[] = {"Did you come from the east road or the west?","Have you seen anything unusual on your way in?","Any trouble where you came from?",NULL};
+static const char *const ai_followup_story[] = {"You have the look of someone with a tale of their own.","Have you heard something similar on your travels?",NULL};
+static const char *const ai_followup_general[] = {"What brings you to ask?","Curious question. What is your interest?","I wonder what led you to that.",NULL};
+
+static const char *ai_followup_pick(int speech_act, unsigned long seed)
+{
+  const char *const *pool = ai_followup_general;
+  int n = 0;
+  if (speech_act == AI_INTENT_GREET || speech_act == AI_INTENT_SMALLTALK) pool = ai_followup_greet;
+  else if (speech_act == AI_INTENT_CONFUSION) pool = ai_followup_story;
+  else if (speech_act == AI_INTENT_DIRECTIONS) pool = ai_followup_status;
+  while (pool[n]) n++;
+  if (n <= 0) return "";
+  return pool[(seed + (unsigned long)speech_act) % (unsigned long)n];
+}
+
+static const char *ai_word(const char *concept, int tier)
+{
+  int i;
+  int t = (tier < 0 || tier > 3) ? 1 : tier;
+  for (i = 0; ai_word_tiers[i].concept; i++) {
+    if (!strcmp(ai_word_tiers[i].concept, concept)) {
+      if (t == 0) return ai_word_tiers[i].tier0;
+      if (t == 1) return ai_word_tiers[i].tier1;
+      if (t == 2) return ai_word_tiers[i].tier2;
+      return ai_word_tiers[i].tier3;
+    }
+  }
+  return concept ? concept : "";
+}
+
+static const char *ai_word_sn(const char *concept, int vocab_tier, int sn)
+{
+  int t = vocab_tier;
+  if (sn == 0 && t > 1) t = 1;
+  if (sn == 1 && t < 2) t = 2;
+  return ai_word(concept, t);
+}
+
+static const char *ai_phrase(const char *tag, int tier, int rhythm, unsigned long seed, int slot)
+{
+  int idxs[64];
+  int any[64];
+  int i, n = 0, m = 0;
+  for (i = 0; ai_phrases[i].tag; i++) {
+    if (strcmp(ai_phrases[i].tag, tag) || ai_phrases[i].tier != tier)
+      continue;
+    if (ai_phrases[i].rhythm == rhythm)
+      idxs[n++] = i;
+    if (ai_phrases[i].rhythm == -1)
+      any[m++] = i;
+  }
+  if (n > 0)
+    return ai_phrases[idxs[(seed + (unsigned long)(slot * 13)) % (unsigned long)n]].text;
+  if (m > 0)
+    return ai_phrases[any[(seed + (unsigned long)(slot * 17)) % (unsigned long)m]].text;
+  return "";
+}
+
+static const char *ai_mbti_string(const struct ai_voice_profile *vp)
+{
+  static char mbti[5];
+  if (!vp) return "ISTJ";
+  mbti[0] = vp->mbti_ei ? 'E' : 'I';
+  mbti[1] = vp->mbti_sn ? 'N' : 'S';
+  mbti[2] = vp->mbti_tf ? 'F' : 'T';
+  mbti[3] = vp->mbti_jp ? 'P' : 'J';
+  mbti[4] = '\0';
+  return mbti;
+}
+
+static void ai_voice_profile_derive(struct char_data *mob, struct ai_voice_profile *out)
+{
+  unsigned long seed;
+  unsigned long long seed64;
+  int role;
+  int zone = (mob && IN_ROOM(mob) != NOWHERE) ? world[IN_ROOM(mob)].zone : 0;
+  if (!mob || !out || !mob->ai_prof) return;
+  role = mob->ai_prof->role;
+  seed = ai_hash_mix(ai_hash_mix((unsigned long)GET_MOB_VNUM(mob), (unsigned long)role), (unsigned long)zone);
+  out->vocab_tier = seed % 4;
+  out->rhythm = (seed >> 4) % 4;
+  out->hedge_style = (seed >> 8) % 4;
+  out->topic_lean = (seed >> 12) % 5;
+  out->tic_index = (seed >> 16) % 8;
+  out->opener_index = (seed >> 20) % 6;
+  out->closer_index = (seed >> 24) % 6;
+  out->intensity = (seed >> 28) % 3;
+  seed64 = ((unsigned long long)seed << 32) | ai_hash_mix(seed, (unsigned long)GET_MOB_VNUM(mob));
+  out->mbti_ei = (int)((seed64 >> 32) % 2ULL);
+  out->mbti_sn = (int)((seed64 >> 34) % 2ULL);
+  out->mbti_tf = (int)((seed64 >> 36) % 2ULL);
+  out->mbti_jp = (int)((seed64 >> 38) % 2ULL);
+  if (role == ROLE_BEAST) { out->vocab_tier = 0; out->rhythm = (out->rhythm % 2) ? 2 : 0; out->intensity = out->intensity ? 1 : 0; out->mbti_ei=0; out->mbti_sn=0; out->mbti_tf=0; out->mbti_jp=0; }
+  if (role == ROLE_UNDEAD) { out->vocab_tier = 1 + (out->vocab_tier % 2); out->rhythm = (out->rhythm % 2) ? 2 : 0; out->hedge_style = (out->hedge_style % 2) ? 3 : 0; out->mbti_ei=0; out->mbti_jp=0; }
+  if (role == ROLE_SPIRIT) { out->vocab_tier = 2 + (out->vocab_tier % 2); out->rhythm = (out->rhythm % 2) ? 3 : 1; out->mbti_sn=1; out->mbti_ei=0; }
+  if (role == ROLE_GUARD) { if (out->vocab_tier > 2) out->vocab_tier = 2; out->hedge_style = (out->hedge_style % 2) ? 3 : 0; out->mbti_jp=0; if (out->mbti_ei && ((seed64>>40)%3ULL==0ULL)) out->mbti_ei=0; if (out->mbti_tf && ((seed64>>42)%4ULL!=0ULL)) out->mbti_tf=0; }
+  if (role == ROLE_CULTIST) { out->hedge_style = 2; out->topic_lean = 4; out->mbti_sn=1; if ((seed64>>41)%3ULL!=0ULL) out->mbti_ei=0; if ((seed64>>42)%4ULL!=0ULL) out->mbti_tf=0; }
+  if (role == ROLE_BOSS) { out->hedge_style = (out->hedge_style % 2) ? 3 : 0; if (out->vocab_tier == 0) out->vocab_tier = 1; out->mbti_jp=0; if (out->mbti_ei && ((seed64>>40)%3ULL==0ULL)) out->mbti_ei=0; if (out->mbti_tf && ((seed64>>42)%4ULL!=0ULL)) out->mbti_tf=0; }
+  if (role == ROLE_MERCHANT) { out->mbti_ei = ((seed64>>43)%3ULL==0ULL)?0:1; out->mbti_sn = ((seed64>>44)%3ULL==0ULL)?1:0; out->mbti_jp = ((seed64>>45)%3ULL==0ULL)?1:0; }
+  if (role == ROLE_BANDIT) { if ((seed64>>46)%4ULL!=0ULL) out->mbti_tf=0; if ((seed64>>47)%3ULL!=0ULL) out->mbti_jp=1; }
+}
+
+static const struct ai_voice_profile *ai_voice_profile_get(struct char_data *mob)
+{
+  struct ai_conv_actor_state *st = ai_conv_actor_state_get(mob, 1);
+  if (!st) return NULL;
+  if (!st->voice_profile_ready) {
+    ai_voice_profile_derive(mob, &st->voice_profile);
+    st->voice_profile_ready = TRUE;
+  }
+  return &st->voice_profile;
+}
+
+static void ai_mbti_compound_modifier(const struct ai_voice_profile *vp, int speech_act, int *out_add_followup_question, int *out_add_topic_lean, int *out_suppress_opener, int *out_use_emotional_color, unsigned long seed)
+{
+  const char *m = ai_mbti_string(vp);
+  (void)seed;
+  *out_add_followup_question = vp && vp->mbti_ei;
+  *out_add_topic_lean = vp && vp->mbti_ei;
+  *out_suppress_opener = vp && !vp->mbti_ei;
+  *out_use_emotional_color = vp && vp->mbti_tf;
+  if (!strcmp(m, "ENFP")) { *out_add_followup_question = (speech_act==AI_INTENT_GREET||speech_act==AI_INTENT_SMALLTALK); *out_add_topic_lean=1; *out_suppress_opener=0; *out_use_emotional_color=1; }
+  else if (!strcmp(m, "ISTJ")) { *out_add_followup_question=0; *out_add_topic_lean=0; *out_suppress_opener=1; *out_use_emotional_color=0; }
+  else if (!strcmp(m, "INTJ")) { *out_add_followup_question=0; *out_add_topic_lean=(speech_act==AI_INTENT_SMALLTALK||speech_act==AI_INTENT_CONFUSION); *out_suppress_opener=1; *out_use_emotional_color=0; }
+  else if (!strcmp(m, "ESFP")) { *out_add_followup_question=((seed>>2)%10)<7; *out_add_topic_lean=1; *out_use_emotional_color=1; }
+  else if (!strcmp(m, "ENTP")) { *out_add_followup_question=1; *out_add_topic_lean=1; *out_use_emotional_color=0; }
+  else if (!strcmp(m, "ISFP")) { *out_suppress_opener=1; *out_use_emotional_color=(speech_act==AI_INTENT_PRAISE||speech_act==AI_INTENT_INSULT); }
+}
+
+static void ai_voice_apply_tokens(const struct ai_voice_profile *vp, const char *in, char *out, size_t outsz)
+{
+  size_t oi = 0;
+  size_t i = 0;
+  while (in && in[i] && oi + 1 < outsz) {
+    if (in[i] == '{') {
+      char tok[32];
+      size_t ti = 0;
+      i++;
+      while (in[i] && in[i] != '}' && ti + 1 < sizeof(tok)) tok[ti++] = in[i++];
+      tok[ti] = '\0';
+      if (in[i] == '}') {
+        const char *w = ai_word_sn(tok, vp ? vp->vocab_tier : 1, vp ? vp->mbti_sn : 0);
+        size_t k = 0;
+        while (w && w[k] && oi + 1 < outsz) out[oi++] = w[k++];
+        i++;
+        continue;
+      }
+    }
+    out[oi++] = in[i++];
+  }
+  out[oi] = '\0';
+}
+
+static void ai_voice_assemble(struct char_data *mob, const struct ai_voice_profile *vp, int speech_act, const char *core_content, unsigned long seed, char *out, size_t outsz)
+{
+  char core[256], work[512], topic_tag[24], buf[128];
+  int rhythm, add_q, add_topic, suppress_opener, use_emotional;
+  const char *opener = "", *closer = "", *hedge = "", *topic = "", *tic = "";
+  if (!out || outsz == 0) return;
+  ai_voice_apply_tokens(vp, core_content ? core_content : "", core, sizeof(core));
+  ai_mbti_compound_modifier(vp, speech_act, &add_q, &add_topic, &suppress_opener, &use_emotional, seed);
+  rhythm = vp ? vp->rhythm : 1;
+  if (vp && vp->mbti_ei && rhythm == 0) rhythm = 1;
+  if (vp && !vp->mbti_ei && rhythm == 3) rhythm = 2;
+  if (vp && vp->hedge_style == 1) hedge = ai_phrase("HEDGE_UNCERTAIN", vp->vocab_tier, rhythm, seed, 2);
+  else if (vp && vp->hedge_style == 2) hedge = ai_phrase("HEDGE_EVASIVE", vp->vocab_tier, rhythm, seed, 3);
+  else if (vp && vp->hedge_style == 3) hedge = ai_phrase("HEDGE_CONFIDENT", vp->vocab_tier, rhythm, seed, 4);
+  opener = suppress_opener ? "" : ai_phrase("OPENER", vp ? vp->vocab_tier : 1, rhythm, seed, vp ? vp->opener_index : 0);
+  closer = ai_phrase("CLOSER", vp ? vp->vocab_tier : 1, rhythm, seed, vp ? vp->closer_index : 1);
+  if (vp && vp->mbti_jp == 0) {
+    if (vp->tic_index == 5) tic = "";
+    closer = "That is how it is.";
+  }
+  if (vp && vp->mbti_jp == 1 && strcmp(closer, "")) closer = "though it could be otherwise.";
+  snprintf(topic_tag, sizeof(topic_tag), "TOPIC_%s", (vp && vp->topic_lean==0)?"DUTY":(vp&&vp->topic_lean==1)?"TRADE":(vp&&vp->topic_lean==2)?"COMFORT":(vp&&vp->topic_lean==3)?"DANGER":"MYSTERY");
+  topic = ai_phrase(topic_tag, vp ? vp->vocab_tier : 1, rhythm, seed, 5);
+  if (vp && vp->tic_index > 0 && (((seed >> (6 * 7)) % 10) < 3)) {
+    static const char *const tics[] = {"", "...if you follow.", "Mind you,", "mark that.", "aye", "...or so they say.", "Listen.", "friend"};
+    tic = tics[vp->tic_index % 8];
+  }
+  work[0] = '\0';
+  if (rhythm == 0) snprintf(work, sizeof(work), "%s%s%s.", (tic && vp && vp->tic_index==6)?"Listen. ":"", core, (tic && vp && vp->tic_index==1)?" ...if you follow":"");
+  else if (rhythm == 1) snprintf(work, sizeof(work), "%s%s%s%s%s%s %s", opener, *opener?" ":"", hedge, *hedge?" ":"", core, ".", closer);
+  else if (rhythm == 2) snprintf(work, sizeof(work), "%s%s%s", (vp&&vp->tic_index==2)?"Mind you, ":"", core, (tic&&vp->tic_index==5)?" ...or so they say.":"");
+  else snprintf(work, sizeof(work), "%s %s %s. %s. %s", opener, hedge, core, topic, closer);
+  if (use_emotional) {
+    const char *feel = (speech_act==AI_INTENT_PRAISE||speech_act==AI_INTENT_GREET||speech_act==AI_INTENT_SMALLTALK) ? ai_phrase("FEEL_POSITIVE", vp->vocab_tier, rhythm, seed, 7) : ai_phrase("FEEL_NEGATIVE", vp->vocab_tier, rhythm, seed, 8);
+    snprintf(buf, sizeof(buf), " %s", feel);
+    snprintf(work + strlen(work), sizeof(work) - strlen(work), "%s", buf);
+  }
+  if (add_topic && vp && vp->mbti_ei && (((seed >> (9 * 7)) % 10) < 5)) {
+    snprintf(work + strlen(work), sizeof(work) - strlen(work), " %s.", topic);
+  }
+  if (add_q && vp && vp->mbti_ei) {
+    snprintf(work + strlen(work), sizeof(work) - strlen(work), " %s", ai_followup_pick(speech_act, seed));
+  }
+  snprintf(out, outsz, "%s", work);
+  if (ai_debug)
+    ai_debug_log("VOICE vnum=%d role=%s tier=%d rhythm=%d tic=%d mbti=%s out=%s", GET_MOB_VNUM(mob), ai_role_name_local(mob->ai_prof->role), vp->vocab_tier, vp->rhythm, vp->tic_index, ai_mbti_string(vp), out);
 }
 
 static const char *const syn_greeting[] = {"Greetings", "Hello", "Well met", "Good day", NULL};
@@ -2096,28 +2383,32 @@ static const char *ai_direction_line(struct char_data *mob, int target_topic)
 static const char *ai_line_for_intent(struct char_data *mob, struct ai_actor_memory_entry *e, int intent, int attitude, const char *text, int avoid_template_id, int *out_template_id, const char **out_pool, const char **out_reason)
 {
   static char line[224];
+  static char voiced[224];
   int innkeeper;
   int role;
   int style;
   int topic = TARGET_NONE;
+  int skip_voice = FALSE;
   const char *dir_line = NULL;
-  const char *redir;
+  const char *core = NULL;
+  const struct ai_voice_profile *vp = NULL;
+  unsigned long seed;
 
   static const char *const gib_guard[] = {"Slow down and say that clearly.", "I did not catch that. Ask again plain.", NULL};
   static const char *const gib_merch[] = {"I cannot parse that. Ask for wares plainly.", "Try that again with clear words.", NULL};
   static const char *const gib_inn[] = {"Easy now. Ask for room or meal plain.", "I missed that. Say it slow.", NULL};
   static const char *const gib_civ[] = {"I do not understand. Maybe ask a guard.", "Could you say that another way?", NULL};
 
-  static const char *const weather_guard[] = {"Skies look steady, but keep a cloak handy.", "Weather turns fast near the roads; stay prepared.", NULL};
-  static const char *const weather_inn[] = {"If rain comes, the hearth stays warm here.", "Bad weather fills my rooms early.", NULL};
-  static const char *const weather_merch[] = {"Weather shifts prices almost as much as caravans.", "Dry roads mean better stock by dusk.", NULL};
-  static const char *const smalltalk_guard[] = {"Stay sharp and stay kind.", "Quiet streets are good streets.", NULL};
-  static const char *const smalltalk_inn[] = {"A calm table helps everyone breathe easier.", "Long roads make short conversations welcome.", NULL};
-  static const char *const smalltalk_merch[] = {"Steady crowds make for steady trade.", "Good mood, good market.", NULL};
-  static const char *const personal_guard[] = {"Keep your mind on the road and your heart steady.", "That's personal. Keep your choices respectful and lawful.", NULL};
+  static const char *const weather_guard[] = {"The {QUIET} never holds. {WARN}, {PEOPLE}.", "The {ROAD} turns by the hour; {WARN}.", NULL};
+  static const char *const weather_inn[] = {"If rain comes, the hearth stays warm at this {PLACE}.", "Bad weather fills my rooms before {TIME}.", NULL};
+  static const char *const weather_merch[] = {"The weather shifts prices as much as caravans.", "Dry {ROAD} means better stock by dusk.", NULL};
+  static const char *const smalltalk_guard[] = {"Stay {GOOD} and keep {QUIET} on the {ROAD}.", "{QUIET} streets are {GOOD} streets.", NULL};
+  static const char *const smalltalk_inn[] = {"A {QUIET} table helps {PEOPLE} breathe easier.", "Long {ROAD}s make short talks welcome.", NULL};
+  static const char *const smalltalk_merch[] = {"Steady crowds make steady {WORK}.", "{GOOD} mood, {GOOD} market.", NULL};
+  static const char *const personal_guard[] = {"Keep your mind on the {ROAD} and your heart steady.", "That's personal. Keep choices respectful and lawful.", NULL};
   static const char *const personal_inn[] = {"Hearts are complicated; I serve comfort, not gossip.", "Feelings are yours to weigh, but kindness helps.", NULL};
   static const char *const personal_merch[] = {"I trade in goods, not hearts, friend.", "That's personal coin to spend carefully.", NULL};
-  static const char *const personal_bandit[] = {"Romance gets people careless.", "Ask someone softer for heart-talk.", NULL};
+  static const char *const personal_bandit[] = {"Romance gets {PEOPLE} careless.", "Ask someone softer for heart-talk.", NULL};
 
   if (!mob || !mob->ai_prof)
     return NULL;
@@ -2127,21 +2418,24 @@ static const char *ai_line_for_intent(struct char_data *mob, struct ai_actor_mem
   role = mob->ai_prof->role;
   style = mob->ai_prof->style;
   innkeeper = (role == ROLE_MERCHANT && style == 1);
+  seed = ai_hash_mix(ai_conv_seed(mob, intent, 0), ai_hash_text_stable(text ? text : ""));
 
   if (ai_text_has_sub_ci(text, "love") || ai_text_has_sub_ci(text, "crush") || ai_text_has_sub_ci(text, "romance") || ai_text_has_sub_ci(text, "date") || ai_text_has_sub_ci(text, "pretty") ||
       ai_text_has_sub_ci(text, "weird") || ai_text_has_sub_ci(text, "feel") || ai_text_has_sub_ci(text, "feeling") || ai_text_has_sub_ci(text, "what do you think") || ai_text_has_sub_ci(text, "do you think i") || ai_text_has_sub_ci(text, "am i")) {
     if (out_pool) *out_pool = "POOL_PERSONAL_SMALLTALK";
-    if (role == ROLE_GUARD) return ai_pick_phrase(personal_guard);
-    if (role == ROLE_MERCHANT && innkeeper) return ai_pick_phrase(personal_inn);
-    if (role == ROLE_MERCHANT) return ai_pick_phrase(personal_merch);
-    if (role == ROLE_BANDIT) return ai_pick_phrase(personal_bandit);
-    if (role == ROLE_BOSS) return "Keep your focus where it matters.";
-    return "That's personal. Best asked of a close friend.";
+    if (role == ROLE_GUARD) core = ai_pick_phrase(personal_guard);
+    else if (role == ROLE_MERCHANT && innkeeper) core = ai_pick_phrase(personal_inn);
+    else if (role == ROLE_MERCHANT) core = ai_pick_phrase(personal_merch);
+    else if (role == ROLE_BANDIT) core = ai_pick_phrase(personal_bandit);
+    else if (role == ROLE_BOSS) core = "Keep your focus where it matters.";
+    else core = "That's personal. Best asked of a close friend.";
+    goto finalize;
   }
 
   if (!ai_role_can_answer_intent(role, style, intent)) {
-    redir = ai_role_redirect_line(role, style);
-    return redir;
+    core = ai_role_redirect_line(role, style);
+    skip_voice = TRUE;
+    goto finalize;
   }
 
   if (intent == AI_INTENT_DIRECTIONS || intent == AI_INTENT_BUY_WEAPON || intent == AI_INTENT_BUY_ARMOR || intent == AI_INTENT_BUY_FOOD ||
@@ -2163,86 +2457,111 @@ static const char *ai_line_for_intent(struct char_data *mob, struct ai_actor_mem
     const char *tpl_line = ai_template_reply_for_intent(mob, intent, text, avoid_template_id, out_template_id);
     if (tpl_line && *tpl_line) {
       if (out_pool) *out_pool = "POOL_TEMPLATE_WEATHER";
-      return tpl_line;
+      core = tpl_line;
+      skip_voice = TRUE;
+      goto finalize;
     }
     if (out_pool) *out_pool = "POOL_WEATHER";
-    if (role == ROLE_GUARD)
-      return ai_pick_phrase(weather_guard);
-    if (role == ROLE_MERCHANT && innkeeper)
-      return ai_pick_phrase(weather_inn);
-    if (role == ROLE_MERCHANT)
-      return ai_pick_phrase(weather_merch);
-    return "Weather's been shifting all day.";
+    if (role == ROLE_GUARD) core = ai_pick_phrase(weather_guard);
+    else if (role == ROLE_MERCHANT && innkeeper) core = ai_pick_phrase(weather_inn);
+    else if (role == ROLE_MERCHANT) core = ai_pick_phrase(weather_merch);
+    else core = "The {QUIET} never holds. {WARN}, {PEOPLE}.";
+    goto finalize;
   }
 
   if (intent == AI_INTENT_SMALLTALK) {
     const char *tpl_line = ai_template_reply_for_intent(mob, intent, text, avoid_template_id, out_template_id);
     if (tpl_line && *tpl_line) {
       if (out_pool) *out_pool = "POOL_TEMPLATE_SMALLTALK";
-      return tpl_line;
+      core = tpl_line;
+      skip_voice = TRUE;
+      goto finalize;
     }
     if (out_pool) *out_pool = "POOL_SMALLTALK";
-    if (role == ROLE_GUARD) return ai_pick_phrase(smalltalk_guard);
-    if (role == ROLE_MERCHANT && innkeeper) return ai_pick_phrase(smalltalk_inn);
-    if (role == ROLE_MERCHANT) return ai_pick_phrase(smalltalk_merch);
-    if (role == ROLE_BANDIT) return ai_pick_weighted_phrase(role_bandit_greet, role_rare_bandit);
-    if (role == ROLE_BOSS) return "Stay sharp. This post does not sleep.";
-    if (role == ROLE_CIVILIAN || role == ROLE_UNKNOWN) return "Hello.";
+    if (role == ROLE_GUARD) core = ai_pick_phrase(smalltalk_guard);
+    else if (role == ROLE_MERCHANT && innkeeper) core = ai_pick_phrase(smalltalk_inn);
+    else if (role == ROLE_MERCHANT) core = ai_pick_phrase(smalltalk_merch);
+    else if (role == ROLE_BANDIT) core = ai_pick_weighted_phrase(role_bandit_greet, role_rare_bandit);
+    else if (role == ROLE_BOSS) core = "Stay sharp. This {WORK} does not sleep.";
+    else if (role == ROLE_CIVILIAN || role == ROLE_UNKNOWN) core = "{GREET}.";
+    goto finalize;
   }
 
   if (role == ROLE_GUARD) {
-    if (intent == AI_INTENT_GREET) return ai_pick_weighted_phrase(role_guard_greet, role_rare_guard);
-    if (intent == AI_INTENT_GIBBERISH) return ai_pick_phrase(gib_guard);
-    if (intent == AI_INTENT_DIRECTIONS || intent == AI_INTENT_HEAL || intent == AI_INTENT_BANK || intent == AI_INTENT_INN || intent == AI_INTENT_QUEST)
-      return dir_line ? dir_line : ai_pick_phrase(role_guard_service);
+    if (intent == AI_INTENT_GREET) core = ai_pick_weighted_phrase(role_guard_greet, role_rare_guard);
+    else if (intent == AI_INTENT_GIBBERISH) core = ai_pick_phrase(gib_guard);
+    else if (intent == AI_INTENT_DIRECTIONS || intent == AI_INTENT_HEAL || intent == AI_INTENT_BANK || intent == AI_INTENT_INN || intent == AI_INTENT_QUEST) {
+      core = dir_line ? dir_line : ai_pick_phrase(role_guard_service);
+      skip_voice = (dir_line != NULL);
+    }
   } else if (role == ROLE_MERCHANT) {
     if (innkeeper) {
-      if (intent == AI_INTENT_GREET || intent == AI_INTENT_SMALLTALK) return ai_pick_weighted_phrase(role_innkeeper_greet, role_rare_innkeeper);
-      if (intent == AI_INTENT_GIBBERISH) return ai_pick_phrase(gib_inn);
-      if (intent == AI_INTENT_INN || intent == AI_INTENT_BUY_FOOD || intent == AI_INTENT_DIRECTIONS || intent == AI_INTENT_RUMOR)
-        return dir_line ? dir_line : ai_pick_phrase(role_innkeeper_service);
+      if (intent == AI_INTENT_GREET || intent == AI_INTENT_SMALLTALK) core = ai_pick_weighted_phrase(role_innkeeper_greet, role_rare_innkeeper);
+      else if (intent == AI_INTENT_GIBBERISH) core = ai_pick_phrase(gib_inn);
+      else if (intent == AI_INTENT_INN || intent == AI_INTENT_BUY_FOOD || intent == AI_INTENT_DIRECTIONS || intent == AI_INTENT_RUMOR) {
+        core = dir_line ? dir_line : ai_pick_phrase(role_innkeeper_service);
+        skip_voice = (dir_line != NULL);
+      }
     } else {
-      if (intent == AI_INTENT_GREET || intent == AI_INTENT_SMALLTALK) return ai_pick_weighted_phrase(role_merchant_greet, role_rare_merchant);
-      if (intent == AI_INTENT_GIBBERISH) return ai_pick_phrase(gib_merch);
-      if (intent == AI_INTENT_BUY_WEAPON || intent == AI_INTENT_BUY_ARMOR || intent == AI_INTENT_BUY_FOOD || intent == AI_INTENT_DIRECTIONS)
-        return dir_line ? dir_line : ai_pick_phrase(role_merchant_service);
+      if (intent == AI_INTENT_GREET || intent == AI_INTENT_SMALLTALK) core = ai_pick_weighted_phrase(role_merchant_greet, role_rare_merchant);
+      else if (intent == AI_INTENT_GIBBERISH) core = ai_pick_phrase(gib_merch);
+      else if (intent == AI_INTENT_BUY_WEAPON || intent == AI_INTENT_BUY_ARMOR || intent == AI_INTENT_BUY_FOOD || intent == AI_INTENT_DIRECTIONS) {
+        core = dir_line ? dir_line : ai_pick_phrase(role_merchant_service);
+        skip_voice = (dir_line != NULL);
+      }
     }
   } else if (role == ROLE_BOSS) {
-    if (intent == AI_INTENT_GREET || intent == AI_INTENT_SMALLTALK) return "Stay sharp. This post does not sleep.";
-    if (intent == AI_INTENT_GIBBERISH) return "Collect yourself and speak plainly.";
-    if (intent == AI_INTENT_DIRECTIONS || intent == AI_INTENT_QUEST) return dir_line ? dir_line : "Find a guard post and ask plainly.";
+    if (intent == AI_INTENT_GREET || intent == AI_INTENT_SMALLTALK) core = "Stay sharp. This {WORK} does not sleep.";
+    else if (intent == AI_INTENT_GIBBERISH) core = "Collect yourself and speak plainly.";
+    else if (intent == AI_INTENT_DIRECTIONS || intent == AI_INTENT_QUEST) {
+      core = dir_line ? dir_line : "Find a guard post and ask plainly.";
+      skip_voice = (dir_line != NULL);
+    }
   } else if (role == ROLE_CIVILIAN || role == ROLE_UNKNOWN) {
-    if (intent == AI_INTENT_GREET || intent == AI_INTENT_SMALLTALK) return "Hello.";
-    if (intent == AI_INTENT_GIBBERISH) return ai_pick_phrase(gib_civ);
-    if (intent == AI_INTENT_DIRECTIONS || intent == AI_INTENT_RUMOR) return dir_line ? dir_line : "I'm not sure. Maybe ask a guard.";
+    if (intent == AI_INTENT_GREET || intent == AI_INTENT_SMALLTALK) core = "{GREET}.";
+    else if (intent == AI_INTENT_GIBBERISH) core = ai_pick_phrase(gib_civ);
+    else if (intent == AI_INTENT_DIRECTIONS || intent == AI_INTENT_RUMOR) {
+      core = dir_line ? dir_line : "I'm not sure. Maybe ask a guard.";
+      skip_voice = (dir_line != NULL);
+    }
   } else if (role == ROLE_BANDIT) {
-    if (intent == AI_INTENT_GREET || intent == AI_INTENT_SMALLTALK) return ai_pick_weighted_phrase(role_bandit_greet, role_rare_bandit);
+    if (intent == AI_INTENT_GREET || intent == AI_INTENT_SMALLTALK) core = ai_pick_weighted_phrase(role_bandit_greet, role_rare_bandit);
   } else if (role == ROLE_BEAST || role == ROLE_UNDEAD || role == ROLE_SPIRIT || role == ROLE_CULTIST) {
-    if (intent == AI_INTENT_GIBBERISH)
-      return NULL;
+    if (intent == AI_INTENT_GIBBERISH) core = NULL;
   }
 
-  if (intent == AI_INTENT_INSULT || intent == AI_INTENT_EMOTE_SPIT || intent == AI_INTENT_THREAT)
-    return (attitude < -20) ? "Last warning. Respect the law or leave." : "Mind your tongue and keep the peace.";
-  if (intent >= AI_INTENT_EMOTE_DANCE) {
-    if (role == ROLE_GUARD) return ai_pick_phrase(role_guard_emote);
-    if (role == ROLE_MERCHANT && innkeeper) return ai_pick_phrase(role_innkeeper_emote);
-    if (role == ROLE_MERCHANT) return ai_pick_phrase(role_merchant_emote);
-    if (role == ROLE_BANDIT) return ai_pick_phrase(role_bandit_emote);
-    if (role == ROLE_BEAST) return ai_pick_phrase(role_beast_emote);
-    if (role == ROLE_UNDEAD) return ai_pick_phrase(role_undead_emote);
-    if (role == ROLE_SPIRIT) return ai_pick_phrase(role_spirit_emote);
-    if (role == ROLE_CULTIST) return (intent == AI_INTENT_EMOTE_SPIT) ? "Blasphemy has a price." : "Ritual, not revelry.";
+  if (!core && intent == AI_INTENT_PRAISE)
+    core = "{THANKS}. Keep to the {GOOD} {WORK}.";
+  if (!core && (intent == AI_INTENT_INSULT || intent == AI_INTENT_EMOTE_SPIT || intent == AI_INTENT_THREAT))
+    core = (attitude < -20) ? "Last warning. Respect the law or leave." : "Mind your tongue and keep the {QUIET}.";
+  if (!core && intent >= AI_INTENT_EMOTE_DANCE) {
+    if (role == ROLE_GUARD) core = ai_pick_phrase(role_guard_emote);
+    else if (role == ROLE_MERCHANT && innkeeper) core = ai_pick_phrase(role_innkeeper_emote);
+    else if (role == ROLE_MERCHANT) core = ai_pick_phrase(role_merchant_emote);
+    else if (role == ROLE_BANDIT) core = ai_pick_phrase(role_bandit_emote);
+    else if (role == ROLE_BEAST) core = ai_pick_phrase(role_beast_emote);
+    else if (role == ROLE_UNDEAD) core = ai_pick_phrase(role_undead_emote);
+    else if (role == ROLE_SPIRIT) core = ai_pick_phrase(role_spirit_emote);
+    else if (role == ROLE_CULTIST) core = (intent == AI_INTENT_EMOTE_SPIT) ? "Blasphemy has a price." : "Ritual, not revelry.";
   }
 
-  if (intent == AI_INTENT_ASK_SERVICE)
-    return ai_role_redirect_line(role, style);
+  if (!core && intent == AI_INTENT_ASK_SERVICE) {
+    core = ai_role_redirect_line(role, style);
+    skip_voice = TRUE;
+  }
 
-  if (intent == AI_INTENT_CONFUSION)
-    return "I am not sure I follow. Ask me in another way.";
+  if (!core && intent == AI_INTENT_CONFUSION)
+    core = "I am not sure I follow. Ask me in another way.";
+  if (!core)
+    core = "I am not sure I follow. Ask me in another way.";
 
-  (void)line;
-  return "I am not sure I follow. Ask me in another way.";
+finalize:
+  if (skip_voice || !core)
+    return core;
+  vp = ai_voice_profile_get(mob);
+  ai_voice_assemble(mob, vp, intent, core, seed, voiced, sizeof(voiced));
+  snprintf(line, sizeof(line), "%s", voiced);
+  return line;
 }
 
 static int ai_actor_choose_intent(struct char_data *mob, struct char_data **out_target, const char **out_line, int *do_emote, int *do_warn)
