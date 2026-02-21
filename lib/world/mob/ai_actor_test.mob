@@ -1,121 +1,121 @@
 #19500
-guard ai actor test~
-an AI actor test guard~
-An AI actor test guard stands here, scanning the area.
+test guard ai actor~
+a test guard~
+A test guard stands here, watching for trouble.
 ~
-A hardened city guard used for smartspawn AI actor testing.
+A disciplined city guard used as a smartspawn AI actor test prototype.
 ~
-10 0 0 0 0 0 0 0 0 E
+10 2097152 0 0 0 0 0 0 0 E
 1 20 9 0d0+10 1d2+0
 10 100
 8 8 1
 E
 #19501
-patrol constable ai actor test~
-an AI actor test patrol constable~
-An AI actor test patrol constable walks a measured route.
+test constable ai actor~
+a test constable~
+A test constable patrols this area with a steady pace.
 ~
-A patrol constable prototype used for smartspawn AI actor testing.
+A dutiful constable used as a smartspawn AI actor test prototype.
 ~
-10 0 0 0 0 0 0 0 0 E
+10 2097152 0 0 0 0 0 0 0 E
 1 20 9 0d0+10 1d2+0
 10 100
 8 8 1
 E
 #19502
-merchant ai actor test~
-an AI actor test merchant~
-An AI actor test merchant watches you over a ledger.
+test merchant ai actor~
+a test merchant~
+A test merchant eyes you from behind a travel-worn cart.
 ~
-A traveling merchant prototype used for smartspawn AI actor testing.
+A practical merchant used as a smartspawn AI actor test prototype.
 ~
-10 0 0 0 0 0 0 0 0 E
+10 2097152 0 0 0 0 0 0 0 E
 1 20 9 0d0+10 1d2+0
 10 100
 8 8 1
 E
 #19503
-innkeeper ai actor test~
-an AI actor test innkeeper~
-An AI actor test innkeeper wipes down the counter.
+test innkeeper ai actor~
+a test innkeeper~
+A test innkeeper wipes a mug and watches the room.
 ~
-An innkeeper prototype used for smartspawn AI actor testing.
+A patient innkeeper used as a smartspawn AI actor test prototype.
 ~
-10 0 0 0 0 0 0 0 0 E
+10 2097152 0 0 0 0 0 0 0 E
 1 20 9 0d0+10 1d2+0
 10 100
 8 8 1
 E
 #19504
-bandit ai actor test~
-an AI actor test bandit~
-An AI actor test bandit lurks nearby with bad intent.
+test bandit ai actor~
+a test bandit~
+A test bandit lurks nearby, hand close to a hidden blade.
 ~
-A bandit prototype used for smartspawn AI actor testing.
+A rough bandit used as a smartspawn AI actor test prototype.
 ~
-10 0 0 0 0 0 0 0 0 E
+10 2097152 0 0 0 0 0 0 0 E
 1 20 9 0d0+10 1d2+0
 10 100
 8 8 0
 E
 #19505
-cultist ai actor test~
-an AI actor test cultist~
-An AI actor test cultist murmurs an unsettling prayer.
+test cultist ai actor~
+a test cultist~
+A test cultist whispers dark vows under their breath.
 ~
-A cultist prototype used for smartspawn AI actor testing.
+A fanatical cultist used as a smartspawn AI actor test prototype.
 ~
-10 0 0 0 0 0 0 0 0 E
+10 2097152 0 0 0 0 0 0 0 E
 1 20 9 0d0+10 1d2+0
 10 100
 8 8 0
 E
 #19506
-wolf beast ai actor test~
-an AI actor test wolf beast~
-An AI actor test wolf beast prowls in a tight circle.
+test wolf ai actor~
+a test wolf~
+A test wolf prowls here with ears pinned and teeth bared.
 ~
-A wolf beast prototype used for smartspawn AI actor testing.
+A feral wolf used as a smartspawn AI actor test prototype.
 ~
-10 0 0 0 0 0 0 0 0 E
+10 2097152 0 0 0 0 0 0 0 E
 1 20 9 0d0+10 1d2+0
 10 100
 8 8 0
 BareHandAttack: 5
 E
 #19507
-skeleton undead ai actor test~
-an AI actor test skeleton undead~
-An AI actor test skeleton undead rattles as it moves.
+test skeleton ai actor~
+a test skeleton~
+A test skeleton clatters as it shifts restlessly.
 ~
-A skeleton undead prototype used for smartspawn AI actor testing.
+An undead skeleton used as a smartspawn AI actor test prototype.
 ~
-10 0 0 0 0 0 0 0 0 E
+10 2097152 0 0 0 0 0 0 0 E
 1 20 9 0d0+10 1d2+0
 10 100
 8 8 0
 BareHandAttack: 7
 E
 #19508
-spirit ai actor test~
-an AI actor test spirit~
-An AI actor test spirit drifts here in silence.
+test spirit ai actor~
+a test spirit~
+A test spirit hovers here, wavering like pale smoke.
 ~
-A spirit prototype used for smartspawn AI actor testing.
+An eerie spirit used as a smartspawn AI actor test prototype.
 ~
-10 0 0 0 0 0 0 0 0 E
+10 2097152 0 0 0 0 0 0 0 E
 1 20 9 0d0+10 1d2+0
 10 100
 8 8 0
 E
 #19509
-commander boss ai actor test~
-an AI actor test commander boss~
-An AI actor test commander boss surveys the field.
+test commander ai actor~
+a test commander~
+A test commander stands tall, surveying the battlefield.
 ~
-A commander boss prototype used for smartspawn AI actor testing.
+A veteran commander used as a smartspawn AI actor test prototype.
 ~
-10 0 0 0 0 0 0 0 0 E
+10 2097152 0 0 0 0 0 0 0 E
 1 20 9 0d0+10 1d2+0
 10 100
 8 8 1
