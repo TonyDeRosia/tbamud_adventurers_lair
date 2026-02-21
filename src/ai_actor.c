@@ -2,6 +2,7 @@
 #include "sysdep.h"
 
 #include <ctype.h>
+#include <math.h>
 
 #include "structs.h"
 #include "utils.h"
@@ -40,6 +41,13 @@
 #define AI_NPC_CONVO_START_WITH_PLAYERS_SECS 180
 #define AI_PLAYER_ARB_CACHE_MAX 128
 #define AI_PLAYER_ARB_TTL_SECS 6
+#define AI_ATTENTION_THRESHOLD 0.25f
+#define AI_GOAL_STACK_MAX 4
+#define AI_THREAT_TABLE_MAX 16
+#define AI_ZONE_HEATMAP_MAX 256
+#define AI_ZONE_ALERT_MAX 64
+#define AI_MOOD_SPRING_K 0.15f
+#define AI_MOOD_DAMPING 0.75f
 
 enum ai_conversation_topic {
   AI_CONV_TOPIC_UNKNOWN = 0,
@@ -54,6 +62,64 @@ enum ai_conversation_topic {
   AI_CONV_TOPIC_CRIME,
   AI_CONV_TOPIC_PATROL,
   AI_CONV_TOPIC_RUMOR
+};
+
+enum ai_action_type {
+  AI_ACTION_SPEAK = 0,
+  AI_ACTION_SPEAK_WARN,
+  AI_ACTION_SPEAK_DEFLECT,
+  AI_ACTION_IGNORE,
+  AI_ACTION_CALL_HELP,
+  AI_ACTION_FLEE,
+  AI_ACTION_OBSERVE,
+  AI_ACTION_EMOTE_REACT,
+  AI_ACTION_COUNT
+};
+
+enum ai_goal_type {
+  AI_GOAL_NONE = 0,
+  AI_GOAL_MAINTAIN_POST,
+  AI_GOAL_PURSUE_OFFENDER,
+  AI_GOAL_ESCORT,
+  AI_GOAL_SELL,
+  AI_GOAL_GREET_TRAVELERS,
+  AI_GOAL_MONITOR_SUSPECT,
+  AI_GOAL_SEEK_SAFETY,
+  AI_GOAL_AMBUSH,
+  AI_GOAL_REGROUP,
+  AI_GOAL_RECRUIT,
+  AI_GOAL_IDLE_WANDER
+};
+
+struct ai_goal_entry {
+  enum ai_goal_type type;
+  float priority;
+  time_t committed_until;
+  time_t expires_at;
+  long target_idnum;
+};
+
+struct ai_threat_entry {
+  long player_idnum;
+  float threat;
+  time_t last_damage_time;
+  time_t last_heal_time;
+  time_t updated_at;
+};
+
+struct ai_zone_heat {
+  int zone_rnum;
+  float danger;
+  float profit;
+  time_t updated_at;
+};
+
+struct ai_zone_alert {
+  int zone_rnum;
+  float alert_level;
+  long target_idnum;
+  time_t raised_at;
+  time_t expires_at;
 };
 
 struct ai_conv_actor_state {
@@ -80,6 +146,13 @@ struct ai_conv_actor_state {
   time_t topic_expires_at;
   int depth_counter;
   time_t updated_at;
+  struct ai_goal_entry goals[AI_GOAL_STACK_MAX];
+  int goal_count;
+  float mood_current;
+  float mood_target;
+  float mood_velocity;
+  time_t mood_last_tick;
+  struct ai_threat_entry threats[AI_THREAT_TABLE_MAX];
 };
 
 struct ai_conv_room_state {
@@ -158,6 +231,25 @@ static const char *ai_phrase(const char *tag, int tier, int rhythm, unsigned lon
 static const char *ai_mbti_string(const struct ai_voice_profile *vp);
 static void ai_mbti_compound_modifier(const struct ai_voice_profile *vp, int speech_act, int *out_add_followup_question, int *out_add_topic_lean, int *out_suppress_opener, int *out_use_emotional_color, unsigned long seed);
 static void ai_voice_assemble(struct char_data *mob, const struct ai_voice_profile *vp, int speech_act, const char *core_content, unsigned long seed, char *out, size_t outsz);
+static float ai_event_salience(enum ai_event_type type, int role, const char *text);
+static float ai_event_recency(struct char_data *mob, enum ai_event_type type, struct char_data *actor, time_t now);
+static float ai_attention_score(struct char_data *mob, enum ai_event_type type, struct char_data *actor, const char *text, time_t now);
+static float ai_belief_confidence_now(struct ai_actor_memory_entry *e, time_t now);
+static float ai_belief_value_decay(float base, time_t updated_at, time_t now, float half_life);
+static struct ai_goal_entry *ai_goal_active(struct char_data *mob, time_t now);
+static int ai_goal_interferes(enum ai_goal_type a, enum ai_goal_type b);
+static void ai_goal_push(struct char_data *mob, enum ai_goal_type type, float priority, int commit_secs, int expire_secs, long target_idnum);
+static float ai_mood_drift(struct char_data *mob, time_t now);
+static void ai_mood_spring_update(struct char_data *mob, float dt);
+static float ai_heatmap_danger(int zone_rnum, time_t now);
+static float ai_heatmap_profit(int zone_rnum);
+static void ai_heatmap_update_danger(int zone_rnum, float incident_weight);
+static void ai_heatmap_decay_tick(time_t now);
+static void ai_alert_raise(int zone_rnum, float level, long target_idnum, int duration_secs);
+static float ai_alert_level(int zone_rnum, time_t now);
+static void ai_alert_decay_tick(time_t now);
+static float ai_suspicion_score(struct char_data *mob, struct char_data *actor, struct ai_actor_memory_entry *e, time_t now, int speech_act);
+static float ai_utility_score(struct char_data *mob, enum ai_action_type action, struct char_data *actor, int speech_act, int intent, time_t now, float attention_score, int is_emote_event, float suspicion);
 
 enum ai_player_speech_class {
   AI_SPEECH_UNKNOWN = 0,
@@ -189,6 +281,9 @@ struct ai_player_arb_entry {
 };
 
 static struct ai_player_arb_entry ai_player_arb_cache[AI_PLAYER_ARB_CACHE_MAX];
+static struct ai_zone_heat ai_zone_heatmap[AI_ZONE_HEATMAP_MAX];
+static struct ai_zone_alert ai_zone_alerts[AI_ZONE_ALERT_MAX];
+static time_t ai_last_minute_decay_tick = 0;
 
 #define AI_CONV_REPLY_STATE_MAX 512
 #define AI_TEMPLATE_BUFFER_MAX 256
@@ -220,6 +315,125 @@ struct ai_reply_template {
 
 static struct ai_conv_reply_state ai_conv_reply_states[AI_CONV_REPLY_STATE_MAX];
 
+
+
+static float ai_clampf(float v, float lo, float hi)
+{
+  if (v < lo) return lo;
+  if (v > hi) return hi;
+  return v;
+}
+
+static int ai_role_is_suspicious_watcher(int role)
+{
+  return (role == ROLE_GUARD || role == ROLE_BOSS || role == ROLE_CULTIST || role == ROLE_MERCHANT);
+}
+
+static float ai_belief_value_decay(float base, time_t updated_at, time_t now, float half_life)
+{
+  float age;
+
+  if (updated_at <= 0 || now <= updated_at)
+    return ai_clampf(base, 0.0f, 1.0f);
+
+  age = (float)(now - updated_at);
+  return ai_clampf(base * expf(-0.693f * age / half_life), 0.0f, 1.0f);
+}
+
+static float ai_belief_confidence_now(struct ai_actor_memory_entry *e, time_t now)
+{
+  if (!e)
+    return 0.0f;
+  return ai_belief_value_decay(e->belief_confidence, e->belief_updated_at, now, 180.0f);
+}
+
+static float ai_event_salience(enum ai_event_type type, int role, const char *text)
+{
+  switch (type) {
+    case AI_EVENT_PLAYER_SAY:
+      switch (role) {
+        case ROLE_GUARD: return 0.9f;
+        case ROLE_MERCHANT: return 0.7f;
+        case ROLE_BANDIT: return 0.8f;
+        case ROLE_BEAST: return 0.3f;
+        case ROLE_UNDEAD: return 0.4f;
+        case ROLE_SPIRIT: return 0.6f;
+        case ROLE_CIVILIAN: return 0.7f;
+        default: return 0.6f;
+      }
+    case AI_EVENT_PLAYER_EMOTE:
+      return 0.5f + ((text && (ai_text_has_sub_ci(text, "threat") || ai_text_has_sub_ci(text, "attack") || ai_text_has_sub_ci(text, "kill"))) ? 0.2f : 0.0f);
+    case AI_EVENT_PLAYER_ENTER:
+      if (role == ROLE_GUARD) return 0.8f;
+      if (role == ROLE_BANDIT) return 0.9f;
+      if (role == ROLE_MERCHANT) return 0.7f;
+      if (role == ROLE_BEAST) return 0.85f;
+      return 0.5f;
+    case AI_EVENT_COMBAT_START:
+      return 1.0f;
+    default:
+      return 0.4f;
+  }
+}
+
+static float ai_event_recency(struct char_data *mob, enum ai_event_type type, struct char_data *actor, time_t now)
+{
+  int i;
+  int recent_count = 0;
+  long actor_id = (actor && !IS_NPC(actor)) ? GET_IDNUM(actor) : 0;
+
+  if (!mob || !mob->ai_state)
+    return 0.0f;
+
+  for (i = 0; i < mob->ai_state->event_ring_count; i++) {
+    int idx = (mob->ai_state->event_ring_start + i) % AI_EVENT_RING_MAX;
+    struct ai_actor_recent_event *ev = &mob->ai_state->recent_events[idx];
+    if (ev->type != type || ev->actor_idnum != actor_id)
+      continue;
+    if ((now - ev->when) <= 30)
+      recent_count++;
+  }
+
+  return ai_clampf((float)recent_count * 0.25f, 0.0f, 1.0f);
+}
+
+static float ai_attention_score(struct char_data *mob, enum ai_event_type type, struct char_data *actor, const char *text, time_t now)
+{
+  float salience;
+  float novelty;
+
+  if (!mob || !mob->ai_prof)
+    return 0.0f;
+
+  salience = ai_event_salience(type, mob->ai_prof->role, text);
+  novelty = 1.0f - ai_event_recency(mob, type, actor, now);
+  return ai_clampf(salience * novelty * 1.0f, 0.0f, 1.0f);
+}
+
+static const char *ai_action_name(enum ai_action_type action)
+{
+  static const char *names[] = {"SPEAK","SPEAK_WARN","SPEAK_DEFLECT","IGNORE","CALL_HELP","FLEE","OBSERVE","EMOTE_REACT"};
+  if (action < 0 || action >= AI_ACTION_COUNT) return "UNKNOWN";
+  return names[action];
+}
+
+static const char *ai_goal_name(enum ai_goal_type goal)
+{
+  switch (goal) {
+    case AI_GOAL_MAINTAIN_POST: return "MAINTAIN_POST";
+    case AI_GOAL_PURSUE_OFFENDER: return "PURSUE_OFFENDER";
+    case AI_GOAL_ESCORT: return "ESCORT";
+    case AI_GOAL_SELL: return "SELL";
+    case AI_GOAL_GREET_TRAVELERS: return "GREET_TRAVELERS";
+    case AI_GOAL_MONITOR_SUSPECT: return "MONITOR_SUSPECT";
+    case AI_GOAL_SEEK_SAFETY: return "SEEK_SAFETY";
+    case AI_GOAL_AMBUSH: return "AMBUSH";
+    case AI_GOAL_REGROUP: return "REGROUP";
+    case AI_GOAL_RECRUIT: return "RECRUIT";
+    case AI_GOAL_IDLE_WANDER: return "IDLE_WANDER";
+    default: return "NONE";
+  }
+}
 
 static const char *ai_role_name_local(int role)
 {
@@ -360,6 +574,10 @@ static struct ai_actor_memory_entry *ai_mem_get_or_create(struct char_data *mob,
     st->mem[st->mem_count].last_seen_time = time(0);
     st->mem[st->mem_count].last_interaction_time = time(0);
     st->mem[st->mem_count].last_update = time(0);
+    st->mem[st->mem_count].belief_confidence = 0.5f;
+    st->mem[st->mem_count].belief_last_room = NOWHERE;
+    st->mem[st->mem_count].belief_last_direction = -1;
+    st->mem[st->mem_count].belief_updated_at = time(0);
     return &st->mem[st->mem_count++];
   }
 
@@ -377,6 +595,10 @@ static struct ai_actor_memory_entry *ai_mem_get_or_create(struct char_data *mob,
   st->mem[evict].last_seen_time = time(0);
   st->mem[evict].last_interaction_time = time(0);
   st->mem[evict].last_update = time(0);
+  st->mem[evict].belief_confidence = 0.5f;
+  st->mem[evict].belief_last_room = NOWHERE;
+  st->mem[evict].belief_last_direction = -1;
+  st->mem[evict].belief_updated_at = time(0);
   return &st->mem[evict];
 }
 
@@ -1280,10 +1502,30 @@ void ai_actor_refresh_live_mobs_by_vnum(mob_vnum vnum)
 
 void ai_actor_init(struct char_data *mob)
 {
+  struct ai_conv_actor_state *conv_st;
   if (!mob || !IS_NPC(mob) || !MOB_FLAGGED(mob, MOB_AI_ACTOR))
     return;
 
   ai_actor_refresh_profile(mob, TRUE);
+  conv_st = ai_conv_actor_state_get(mob, 1);
+  if (conv_st) {
+    conv_st->mood_current = 0.0f;
+    conv_st->mood_target = 0.0f;
+    conv_st->mood_velocity = 0.0f;
+    conv_st->mood_last_tick = time(0);
+    conv_st->goal_count = 0;
+    switch (mob->ai_prof->role) {
+      case ROLE_GUARD: ai_goal_push(mob, AI_GOAL_MAINTAIN_POST, 0.8f, 60, 0, 0); break;
+      case ROLE_MERCHANT:
+        if (mob->ai_prof->style == 1) ai_goal_push(mob, AI_GOAL_GREET_TRAVELERS, 0.75f, 10, 0, 0);
+        else ai_goal_push(mob, AI_GOAL_SELL, 0.7f, 30, 0, 0);
+        break;
+      case ROLE_BANDIT: ai_goal_push(mob, AI_GOAL_AMBUSH, 0.7f, 90, 0, 0); break;
+      case ROLE_CIVILIAN: ai_goal_push(mob, AI_GOAL_IDLE_WANDER, 0.5f, 15, 0, 0); break;
+      case ROLE_CULTIST: ai_goal_push(mob, AI_GOAL_MONITOR_SUSPECT, 0.6f, 20, 0, 0); break;
+      default: break;
+    }
+  }
   ai_debug_log("init %s role=%d move=%d aggr=%d morale=%d", GET_NAME(mob), mob->ai_prof->role,
                mob->ai_prof->movement, mob->ai_prof->aggression, mob->ai_prof->morale);
 }
@@ -2684,6 +2926,13 @@ int ai_actor_tick(struct char_data *mob, time_t now)
   if (st->social_spam_count > 0 && !rand_number(0, 2)) st->social_spam_count--;
 
   ai_mem_decay(mob, now);
+  ai_mood_spring_update(mob, 1.0f);
+
+  if (ai_last_minute_decay_tick == 0 || (now - ai_last_minute_decay_tick) >= 60) {
+    ai_heatmap_decay_tick(now);
+    ai_alert_decay_tick(now);
+    ai_last_minute_decay_tick = now;
+  }
 
   if (ai_try_emit_pending_reaction_speech(mob, now))
     return TRUE;
@@ -2763,6 +3012,8 @@ void ai_actor_record_damage(struct char_data *mob, struct char_data *actor, int 
   e->last_seen_time = e->last_update;
   e->last_interaction_time = e->last_update;
   e->last_room_vnum = (IN_ROOM(mob) == NOWHERE) ? NOWHERE : GET_ROOM_VNUM(IN_ROOM(mob));
+  e->belief_hostility = ai_clampf(e->belief_hostility + 0.25f, 0.0f, 1.0f);
+  e->belief_updated_at = e->last_update;
   ai_actor_brain_on_attacked(mob, actor, dam);
 }
 
@@ -2785,6 +3036,9 @@ void ai_actor_record_help(struct char_data *mob, struct char_data *actor, int am
   e->attitude = MIN(100, e->attitude + MAX(3, amount / 4));
   e->last_update = time(0);
   e->last_room_vnum = (IN_ROOM(mob) == NOWHERE) ? NOWHERE : GET_ROOM_VNUM(IN_ROOM(mob));
+  e->belief_familiarity = ai_clampf(e->belief_familiarity + 0.08f, 0.0f, 1.0f);
+  e->belief_hostility = ai_clampf(e->belief_hostility - 0.03f, 0.0f, 1.0f);
+  e->belief_updated_at = e->last_update;
 }
 
 void ai_actor_record_crime(struct char_data *mob, struct char_data *criminal, int flags)
@@ -3544,10 +3798,281 @@ static void ai_actor_mark_target_reaction(struct char_data *mob, struct char_dat
 }
 #endif
 
+
+static int ai_goal_interferes(enum ai_goal_type a, enum ai_goal_type b)
+{
+  if (a == AI_GOAL_IDLE_WANDER && b != AI_GOAL_NONE) return TRUE;
+  if (b == AI_GOAL_IDLE_WANDER && a != AI_GOAL_NONE) return TRUE;
+  if ((a == AI_GOAL_MAINTAIN_POST && (b == AI_GOAL_PURSUE_OFFENDER || b == AI_GOAL_ESCORT)) ||
+      (b == AI_GOAL_MAINTAIN_POST && (a == AI_GOAL_PURSUE_OFFENDER || a == AI_GOAL_ESCORT))) return TRUE;
+  if ((a == AI_GOAL_SELL && b == AI_GOAL_SEEK_SAFETY) || (b == AI_GOAL_SELL && a == AI_GOAL_SEEK_SAFETY)) return TRUE;
+  if ((a == AI_GOAL_AMBUSH && b == AI_GOAL_REGROUP) || (b == AI_GOAL_AMBUSH && a == AI_GOAL_REGROUP)) return TRUE;
+  return FALSE;
+}
+
+static struct ai_goal_entry *ai_goal_active(struct char_data *mob, time_t now)
+{
+  struct ai_conv_actor_state *st = ai_conv_actor_state_get(mob, 1);
+  int i, best = -1;
+
+  if (!st)
+    return NULL;
+
+  for (i = 0; i < st->goal_count; i++) {
+    if (st->goals[i].expires_at > 0 && now > st->goals[i].expires_at)
+      continue;
+    if (best < 0 || st->goals[i].priority > st->goals[best].priority)
+      best = i;
+  }
+  if (best < 0)
+    return NULL;
+  return &st->goals[best];
+}
+
+static void ai_goal_push(struct char_data *mob, enum ai_goal_type type, float priority, int commit_secs, int expire_secs, long target_idnum)
+{
+  struct ai_conv_actor_state *st = ai_conv_actor_state_get(mob, 1);
+  struct ai_goal_entry *active;
+  int idx;
+
+  if (!st || type == AI_GOAL_NONE)
+    return;
+
+  active = ai_goal_active(mob, time(0));
+  if (active && active->committed_until > time(0) && ai_goal_interferes(active->type, type)) {
+    if (priority <= active->priority * 1.5f)
+      return;
+  }
+
+  if (st->goal_count < AI_GOAL_STACK_MAX) idx = st->goal_count++;
+  else idx = AI_GOAL_STACK_MAX - 1;
+
+  st->goals[idx].type = type;
+  st->goals[idx].priority = priority;
+  st->goals[idx].committed_until = time(0) + MAX(0, commit_secs);
+  st->goals[idx].expires_at = (expire_secs > 0) ? (time(0) + expire_secs) : 0;
+  st->goals[idx].target_idnum = target_idnum;
+}
+
+static void ai_mood_spring_update(struct char_data *mob, float dt)
+{
+  struct ai_conv_actor_state *st = ai_conv_actor_state_get(mob, 1);
+  float force;
+
+  if (!st)
+    return;
+
+  force = AI_MOOD_SPRING_K * (st->mood_target - st->mood_current) * MAX(0.1f, dt);
+  st->mood_velocity += force;
+  st->mood_velocity *= AI_MOOD_DAMPING;
+  st->mood_current += st->mood_velocity;
+  st->mood_current = ai_clampf(st->mood_current, -1.0f, 1.0f);
+  st->mood_target += (0.0f - st->mood_target) * 0.01f;
+  st->mood_target = ai_clampf(st->mood_target, -1.0f, 1.0f);
+}
+
+static float ai_mood_drift(struct char_data *mob, time_t now)
+{
+  float twopi = 6.2831853f;
+  int vnum = GET_MOB_VNUM(mob);
+  int period_a = 7200 + (vnum % 1800);
+  int period_b = 21600 + (vnum % 3600);
+  int period_c = 86400;
+  int phase_a = (vnum * 17) % period_a;
+  int phase_b = (vnum * 31) % period_b;
+  int phase_c = (vnum * 7) % period_c;
+
+  return 0.15f * sinf(twopi * ((float)(now + phase_a) / (float)period_a)) +
+         0.10f * sinf(twopi * ((float)(now + phase_b) / (float)period_b)) +
+         0.08f * sinf(twopi * ((float)(now + phase_c) / (float)period_c));
+}
+
+static int ai_heatmap_slot(int zone_rnum)
+{
+  int i, free_idx = -1;
+  for (i = 0; i < AI_ZONE_HEATMAP_MAX; i++) {
+    if (ai_zone_heatmap[i].zone_rnum == zone_rnum) return i;
+    if (free_idx < 0 && ai_zone_heatmap[i].zone_rnum == 0 && ai_zone_heatmap[i].updated_at == 0) free_idx = i;
+  }
+  return (free_idx >= 0) ? free_idx : (zone_rnum % AI_ZONE_HEATMAP_MAX);
+}
+
+static void ai_heatmap_update_danger(int zone_rnum, float incident_weight)
+{
+  int idx;
+  if (zone_rnum < 0) return;
+  idx = ai_heatmap_slot(zone_rnum);
+  ai_zone_heatmap[idx].zone_rnum = zone_rnum;
+  ai_zone_heatmap[idx].danger = MAX(ai_zone_heatmap[idx].danger * 0.98f, ai_zone_heatmap[idx].danger + incident_weight);
+  ai_zone_heatmap[idx].danger = ai_clampf(ai_zone_heatmap[idx].danger, 0.0f, 1.0f);
+  ai_zone_heatmap[idx].updated_at = time(0);
+}
+
+static void ai_heatmap_decay_tick(time_t now)
+{
+  int i;
+  for (i = 0; i < AI_ZONE_HEATMAP_MAX; i++) {
+    if (ai_zone_heatmap[i].zone_rnum < 0) continue;
+    ai_zone_heatmap[i].danger = ai_clampf(ai_zone_heatmap[i].danger * 0.98f, 0.0f, 1.0f);
+    ai_zone_heatmap[i].updated_at = now;
+  }
+}
+
+static float ai_heatmap_danger(int zone_rnum, time_t now)
+{
+  int idx = ai_heatmap_slot(zone_rnum);
+  (void)now;
+  if (idx < 0) return 0.0f;
+  return ai_clampf(ai_zone_heatmap[idx].danger, 0.0f, 1.0f);
+}
+
+static float ai_heatmap_profit(int zone_rnum)
+{
+  int idx = ai_heatmap_slot(zone_rnum);
+  if (idx < 0) return 0.3f;
+  return ai_clampf(ai_zone_heatmap[idx].profit > 0.0f ? ai_zone_heatmap[idx].profit : 0.3f, 0.0f, 1.0f);
+}
+
+static int ai_alert_slot(int zone_rnum)
+{
+  int i;
+  for (i = 0; i < AI_ZONE_ALERT_MAX; i++)
+    if (ai_zone_alerts[i].zone_rnum == zone_rnum)
+      return i;
+  return zone_rnum % AI_ZONE_ALERT_MAX;
+}
+
+static void ai_alert_raise(int zone_rnum, float level, long target_idnum, int duration_secs)
+{
+  int idx;
+  time_t now = time(0);
+  if (zone_rnum < 0) return;
+  idx = ai_alert_slot(zone_rnum);
+  ai_zone_alerts[idx].zone_rnum = zone_rnum;
+  ai_zone_alerts[idx].alert_level = MAX(ai_zone_alerts[idx].alert_level, ai_clampf(level, 0.0f, 1.0f));
+  ai_zone_alerts[idx].target_idnum = target_idnum;
+  ai_zone_alerts[idx].raised_at = now;
+  ai_zone_alerts[idx].expires_at = now + MAX(1, duration_secs);
+}
+
+static float ai_alert_level(int zone_rnum, time_t now)
+{
+  int idx = ai_alert_slot(zone_rnum);
+  if (idx < 0 || ai_zone_alerts[idx].zone_rnum != zone_rnum) return 0.0f;
+  if (ai_zone_alerts[idx].expires_at > 0 && now > ai_zone_alerts[idx].expires_at) return 0.0f;
+  return ai_clampf(ai_zone_alerts[idx].alert_level, 0.0f, 1.0f);
+}
+
+static void ai_alert_decay_tick(time_t now)
+{
+  int i;
+  for (i = 0; i < AI_ZONE_ALERT_MAX; i++) {
+    if (ai_zone_alerts[i].zone_rnum < 0)
+      continue;
+    if (ai_zone_alerts[i].expires_at > 0 && now > ai_zone_alerts[i].expires_at) {
+      memset(&ai_zone_alerts[i], 0, sizeof(ai_zone_alerts[i]));
+      continue;
+    }
+    ai_zone_alerts[i].alert_level = ai_clampf(ai_zone_alerts[i].alert_level * 0.95f, 0.0f, 1.0f);
+  }
+}
+
+static float ai_suspicion_score(struct char_data *mob, struct char_data *actor, struct ai_actor_memory_entry *e, time_t now, int speech_act)
+{
+  float odds = 1.0f;
+  int zone;
+
+  if (!mob || !actor || !e || !mob->ai_prof || !ai_role_is_suspicious_watcher(mob->ai_prof->role))
+    return 0.0f;
+
+  zone = (IN_ROOM(mob) != NOWHERE) ? world[IN_ROOM(mob)].zone : -1;
+  if (GET_EQ(actor, WEAR_WIELD)) odds *= 3.5f;
+  if (speech_act == AI_INTENT_THREAT) odds *= 4.0f;
+  if (speech_act == AI_INTENT_INSULT) odds *= 2.5f;
+  if (ai_belief_value_decay(e->belief_hostility, e->belief_updated_at, now, 180.0f) > 0.5f) odds *= 3.0f;
+  if (ai_alert_level(zone, now) > 0.5f) odds *= 2.0f;
+  if (time_info.hours >= 20 || time_info.hours <= 6) odds *= 1.5f;
+  if (e->disposition_flags & AI_DISP_DISRESPECT) odds *= 2.0f;
+  if (e->disposition_flags & AI_DISP_FRIENDLY) odds *= 0.6f;
+  if (ai_belief_value_decay(e->belief_familiarity, e->belief_updated_at, now, 180.0f) > 0.6f) odds *= 0.5f;
+  if (GET_INVIS_LEV(actor) > 0) odds *= 2.5f;
+
+  return ai_clampf(odds / (1.0f + odds), 0.0f, 1.0f);
+}
+
+static float ai_utility_score(struct char_data *mob, enum ai_action_type action, struct char_data *actor, int speech_act, int intent, time_t now, float attention_score, int is_emote_event, float suspicion)
+{
+  float need_weight = 0.2f, need_value = 0.5f, context_fit = 0.5f, risk_cost = 0.0f, habit_bonus = 0.0f;
+  struct ai_actor_memory_entry *e = NULL;
+  struct ai_goal_entry *goal = ai_goal_active(mob, now);
+  struct ai_voice_profile *vp;
+  float health_pct = (GET_MAX_HIT(mob) > 0) ? (float)GET_HIT(mob)/(float)GET_MAX_HIT(mob) : 1.0f;
+
+  if (actor && !IS_NPC(actor) && mob && mob->ai_state)
+    e = ai_mem_get_or_create(mob, GET_IDNUM(actor));
+  vp = (struct ai_voice_profile *)ai_voice_profile_get(mob);
+
+  switch (action) {
+    case AI_ACTION_SPEAK: need_weight = (mob->ai_prof->role==ROLE_GUARD?0.7f:mob->ai_prof->role==ROLE_MERCHANT?0.8f:mob->ai_prof->role==ROLE_CIVILIAN?0.8f:0.6f); break;
+    case AI_ACTION_SPEAK_WARN: need_weight = (mob->ai_prof->role==ROLE_GUARD?0.9f:mob->ai_prof->role==ROLE_BANDIT?0.7f:0.3f); break;
+    case AI_ACTION_IGNORE: need_weight = (mob->ai_prof->role==ROLE_BEAST?0.8f:mob->ai_prof->role==ROLE_UNDEAD?0.7f:mob->ai_prof->role==ROLE_SPIRIT?0.6f:0.2f); break;
+    case AI_ACTION_CALL_HELP: need_weight = (mob->ai_prof->role==ROLE_GUARD?0.8f:mob->ai_prof->role==ROLE_CIVILIAN?0.6f:0.3f); break;
+    case AI_ACTION_FLEE: need_weight = (mob->ai_prof->role==ROLE_BEAST?0.4f:mob->ai_prof->role==ROLE_CIVILIAN?0.7f:mob->ai_prof->role==ROLE_BANDIT?0.5f:0.1f); break;
+    case AI_ACTION_OBSERVE: need_weight = (mob->ai_prof->role==ROLE_BANDIT||mob->ai_prof->role==ROLE_CULTIST||mob->ai_prof->role==ROLE_SPIRIT)?0.7f:0.3f; break;
+    case AI_ACTION_EMOTE_REACT: need_weight = (mob->ai_prof->role==ROLE_BEAST?0.9f:mob->ai_prof->role==ROLE_SPIRIT?0.5f:0.2f); break;
+    default: break;
+  }
+
+  switch (action) {
+    case AI_ACTION_SPEAK: need_value = ai_clampf(1.0f - ((e && now > e->last_reply_time) ? (float)MIN(5, (int)(now - e->last_reply_time)/5) / 5.0f : 0.0f), 0.0f, 1.0f); break;
+    case AI_ACTION_SPEAK_WARN: need_value = e ? ai_belief_value_decay(e->belief_hostility, e->belief_updated_at, now, 180.0f) : suspicion; break;
+    case AI_ACTION_IGNORE: need_value = 1.0f - attention_score; break;
+    case AI_ACTION_CALL_HELP: need_value = ai_clampf((1.0f - health_pct) * 2.0f, 0.0f, 1.0f); break;
+    case AI_ACTION_FLEE: need_value = 1.0f - health_pct; break;
+    case AI_ACTION_OBSERVE: need_value = e ? ai_belief_confidence_now(e, now) : suspicion; break;
+    case AI_ACTION_EMOTE_REACT: need_value = is_emote_event ? 1.0f : 0.1f; break;
+    default: break;
+  }
+
+  context_fit = 0.5f;
+  if (speech_act == AI_INTENT_GREET && action == AI_ACTION_SPEAK) context_fit = 0.9f;
+  if (speech_act == AI_INTENT_CONFUSION && action == AI_ACTION_SPEAK) context_fit = 0.8f;
+  if (speech_act == AI_INTENT_INSULT && action == AI_ACTION_SPEAK) context_fit = 0.4f;
+  if (speech_act == AI_INTENT_INSULT && action == AI_ACTION_SPEAK_WARN) context_fit = 0.9f;
+  if (speech_act == AI_INTENT_INSULT && action == AI_ACTION_IGNORE) context_fit = 0.3f;
+  if (speech_act == AI_INTENT_PRAISE && action == AI_ACTION_IGNORE) context_fit = 0.1f;
+
+  if (action == AI_ACTION_SPEAK_WARN) risk_cost = 0.1f;
+  else if (action == AI_ACTION_CALL_HELP) risk_cost = 0.2f;
+  else if (action == AI_ACTION_FLEE) risk_cost = 0.3f + (mob->ai_prof->role==ROLE_GUARD?0.4f:0.0f);
+  else if (action == AI_ACTION_IGNORE) risk_cost = 0.05f;
+
+  if (vp) {
+    if (vp->mbti_ei > 0 && (action == AI_ACTION_SPEAK || action == AI_ACTION_SPEAK_WARN)) habit_bonus += 0.15f;
+    if (vp->mbti_ei <= 0 && (action == AI_ACTION_OBSERVE || action == AI_ACTION_IGNORE)) habit_bonus += 0.15f;
+    if (vp->intensity >= 2 && (action == AI_ACTION_SPEAK_WARN || action == AI_ACTION_EMOTE_REACT)) habit_bonus += 0.1f;
+  }
+
+  if (goal) {
+    if (goal->type == AI_GOAL_MAINTAIN_POST) {
+      if (action == AI_ACTION_FLEE) risk_cost += 0.5f;
+      if (action == AI_ACTION_SPEAK_WARN) need_weight += 0.2f;
+    } else if (goal->type == AI_GOAL_SELL) {
+      if (action == AI_ACTION_SPEAK && (intent == AI_INTENT_ASK_SERVICE || intent == AI_INTENT_BUY_ARMOR || intent == AI_INTENT_BUY_WEAPON || intent == AI_INTENT_BUY_FOOD)) context_fit += 0.3f;
+    } else if (goal->type == AI_GOAL_MONITOR_SUSPECT) {
+      if (action == AI_ACTION_OBSERVE) need_weight += 0.4f;
+      if (action == AI_ACTION_SPEAK) need_weight -= 0.2f;
+    }
+  }
+
+  return need_weight * need_value * context_fit - risk_cost + habit_bonus;
+}
+
 void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, struct char_data *actor, const char *text)
 {
   struct ai_actor_memory_entry *e;
   struct ai_conv_room_state *room_st;
+  struct ai_conv_actor_state *conv_st;
   time_t now = time(0);
   int intent;
   int confidence = 0;
@@ -3556,13 +4081,35 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
   int avoid_template_id = -1;
   int selected_template_id = -1;
   char normalized[256];
+  float attention_score;
+  float suspicion = 0.0f;
+  float best_score = -999.0f;
+  enum ai_action_type best_action = AI_ACTION_IGNORE;
+  float mood = 0.0f;
+  float alert_level = 0.0f;
+  float zone_danger = 0.0f;
+  float zone_profit = 0.0f;
+  struct ai_goal_entry *goal;
+  int zone = (IN_ROOM(mob) != NOWHERE) ? world[IN_ROOM(mob)].zone : -1;
+  int i;
 
   if (!mob || !actor || !mob->ai_prof || !mob->ai_state || IS_NPC(actor))
     return;
 
   ai_state_refresh_local_topics(mob);
   ai_normalize_text(text ? text : "", normalized, sizeof(normalized));
+  attention_score = ai_attention_score(mob, type, actor, normalized, now);
+  ai_state_push_event(mob, type, actor, normalized);
+
+  if (attention_score < AI_ATTENTION_THRESHOLD) {
+    ai_debug_log("ai_skip_attention vnum=%d event=%s score=%.2f", GET_MOB_VNUM(mob), ai_event_reason_name(type), attention_score);
+    return;
+  }
+
   e = ai_mem_get_or_create(mob, GET_IDNUM(actor));
+  if (!e)
+    return;
+
   if (type == AI_EVENT_PLAYER_SAY) {
     if (ai_is_gibberish(normalized)) {
       intent = AI_INTENT_GIBBERISH;
@@ -3577,65 +4124,91 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
     intent = ai_detect_intent(type, normalized);
     confidence = 10;
   }
+
+  e->last_seen_time = now;
+  e->last_interaction_time = now;
+  e->last_room_vnum = (IN_ROOM(mob) == NOWHERE) ? NOWHERE : GET_ROOM_VNUM(IN_ROOM(mob));
+  e->last_intent = intent;
+  e->belief_confidence = 1.0f;
+  e->belief_last_room = e->last_room_vnum;
+  e->belief_updated_at = now;
+  if (actor->player.name)
+    strlcpy(e->key_name, actor->player.name, sizeof(e->key_name));
+
+  if (type == AI_EVENT_PLAYER_LEAVE) {
+    e->belief_confidence = 0.85f;
+    e->belief_last_direction = -1;
+  }
+
+  if (type == AI_EVENT_PLAYER_SAY)
+    e->belief_familiarity = ai_clampf(e->belief_familiarity + 0.05f, 0.0f, 1.0f);
+
+  if (intent == AI_INTENT_THREAT) e->belief_hostility += 0.25f;
+  if (intent == AI_INTENT_INSULT) e->belief_hostility += 0.10f;
+  if (intent == AI_INTENT_PRAISE) e->belief_hostility -= 0.05f;
+  if (type == AI_EVENT_COMBAT_START) e->belief_hostility = 1.0f;
+  if (intent == AI_INTENT_GREET || intent == AI_INTENT_SMALLTALK) e->belief_hostility -= 0.03f;
+  e->belief_hostility = ai_clampf(e->belief_hostility, 0.0f, 1.0f);
+
   room_st = ai_conv_room_state_get(IN_ROOM(mob), 1);
   if (room_st && type == AI_EVENT_PLAYER_SAY)
     room_st->last_player_speech_time = now;
 
-  if (type == AI_EVENT_PLAYER_SAY) {
-    struct ai_conv_actor_state *conv_st = ai_conv_actor_state_get(mob, 1);
-    if (conv_st) {
-      conv_st->current_topic = ai_conv_topic_from_intent(intent);
-      conv_st->last_speaker_id = GET_IDNUM(actor);
-      conv_st->last_line_time = now;
-      conv_st->updated_at = now;
+  conv_st = ai_conv_actor_state_get(mob, 1);
+  if (conv_st && type == AI_EVENT_PLAYER_SAY) {
+    conv_st->current_topic = ai_conv_topic_from_intent(intent);
+    conv_st->last_speaker_id = GET_IDNUM(actor);
+    conv_st->last_line_time = now;
+    conv_st->updated_at = now;
+  }
+
+  suspicion = ai_suspicion_score(mob, actor, e, now, intent);
+  if (suspicion > 0.7f)
+    e->belief_hostility = MAX(e->belief_hostility, suspicion - 0.1f);
+
+  if (suspicion > 0.85f) ai_goal_push(mob, AI_GOAL_PURSUE_OFFENDER, 0.9f, 45, 120, GET_IDNUM(actor));
+  else if (suspicion > 0.7f) ai_goal_push(mob, AI_GOAL_MONITOR_SUSPECT, 0.7f, 20, 90, GET_IDNUM(actor));
+
+  if (type == AI_EVENT_COMBAT_START) {
+    ai_heatmap_update_danger(zone, 0.15f);
+    ai_alert_raise(zone, 0.5f, GET_IDNUM(actor), 180);
+  }
+
+  alert_level = ai_alert_level(zone, now);
+  zone_danger = ai_heatmap_danger(zone, now);
+  zone_profit = ai_heatmap_profit(zone);
+  goal = ai_goal_active(mob, now);
+  mood = ai_clampf((conv_st ? conv_st->mood_current : 0.0f) + ai_mood_drift(mob, now), -1.0f, 1.0f);
+
+  for (i = 0; i < AI_ACTION_COUNT; i++) {
+    float score = ai_utility_score(mob, (enum ai_action_type)i, actor, intent, intent, now, attention_score, (type == AI_EVENT_PLAYER_EMOTE), suspicion);
+    if (mood < -0.5f && (i == AI_ACTION_SPEAK_DEFLECT || i == AI_ACTION_IGNORE)) score += 0.2f;
+    if (alert_level > 0.6f && i == AI_ACTION_OBSERVE && mob->ai_prof->role == ROLE_BANDIT) score += 0.25f;
+    if (mob->ai_prof->role == ROLE_BANDIT && i == AI_ACTION_OBSERVE) score += (zone_profit - zone_danger) * 0.2f;
+    if (mob->ai_prof->role == ROLE_CIVILIAN && i == AI_ACTION_IGNORE) score += zone_danger * 0.2f;
+    if (alert_level > 0.6f && i == AI_ACTION_SPEAK_WARN && mob->ai_prof->role == ROLE_GUARD) score += 0.25f;
+    if (score > best_score) {
+      best_score = score;
+      best_action = (enum ai_action_type)i;
     }
   }
 
-  if (e) {
-    e->last_seen_time = now;
-    e->last_interaction_time = now;
-    e->last_room_vnum = (IN_ROOM(mob) == NOWHERE) ? NOWHERE : GET_ROOM_VNUM(IN_ROOM(mob));
-    e->last_intent = intent;
-    if (actor->player.name)
-      strlcpy(e->key_name, actor->player.name, sizeof(e->key_name));
-
-    /* Intent scoring table:
-     * GREET +2
-     * PRAISE +5
-     * INSULT -12 (DISRESPECT)
-     * EMOTE_SPIT -20 (DISRESPECT)
-     * THREAT -25 (THREATENED)
-     */
-    if (intent == AI_INTENT_GREET)
-      e->attitude += 2;
-    else if (intent == AI_INTENT_PRAISE) {
-      e->attitude += 5;
-      e->disposition_flags |= AI_DISP_FRIENDLY;
-    } else if (intent == AI_INTENT_INSULT) {
-      e->attitude -= 12;
-      e->disposition_flags |= (AI_DISP_DISRESPECT | AI_DISP_ANNOYED_ME);
-    } else if (intent == AI_INTENT_EMOTE_SPIT) {
-      e->attitude -= 20;
-      e->disposition_flags |= (AI_DISP_DISRESPECT | AI_DISP_ANNOYED_ME);
-    } else if (intent == AI_INTENT_THREAT) {
-      e->attitude -= 25;
-      e->disposition_flags |= (AI_DISP_THREATENED | AI_DISP_ATTACKED_ME);
-    }
-
-    e->attitude = MAX(-100, MIN(100, e->attitude));
-    e->last_update = now;
+  if (best_action == AI_ACTION_OBSERVE) {
+    ai_goal_push(mob, AI_GOAL_MONITOR_SUSPECT, 0.65f, 20, 120, GET_IDNUM(actor));
+  } else if (best_action == AI_ACTION_CALL_HELP) {
+    ai_goal_push(mob, AI_GOAL_REGROUP, 0.8f, 15, 90, GET_IDNUM(actor));
+    ai_alert_raise(zone, 0.7f, GET_IDNUM(actor), 300);
+  } else if (best_action == AI_ACTION_FLEE) {
+    ai_goal_push(mob, AI_GOAL_SEEK_SAFETY, 0.85f, 15, 90, GET_IDNUM(actor));
   }
 
-  if (type == AI_EVENT_COMBAT_START && e) {
-    e->disposition_flags |= AI_DISP_ATTACKED_ME;
-    e->hostility = MIN(60, e->hostility + 4);
-    e->attitude = MAX(-100, e->attitude - 12);
-  }
-
-  ai_state_push_event(mob, type, actor, normalized);
-
-  if (!e || !intent)
+  if (!(best_action == AI_ACTION_SPEAK || best_action == AI_ACTION_SPEAK_WARN || best_action == AI_ACTION_SPEAK_DEFLECT || best_action == AI_ACTION_EMOTE_REACT)) {
+    ai_debug_log("AI_LAYER mob=%d role=%s mbti=%s attn=%.2f action=%s score=%.2f mood=%.2f susp=%.2f alert=%.2f goal=%s act=%d slot=-1",
+                 GET_MOB_VNUM(mob), ai_role_name_local(mob->ai_prof->role), ai_mbti_string(ai_voice_profile_get(mob)), attention_score,
+                 ai_action_name(best_action), best_score, mood, suspicion, alert_level, goal ? ai_goal_name(goal->type) : "NONE", intent);
     return;
+  }
+
   if (!ai_actor_room_response_slot(mob, actor, type, intent, confidence, normalized))
     return;
 
@@ -3656,7 +4229,15 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
     const char *reason = ai_event_reason_name(type);
     char targeted[256];
 
-    line = ai_line_for_intent(mob, e, intent, e->attitude, normalized, avoid_template_id, &selected_template_id, &pool, &reason);
+    if (best_action == AI_ACTION_SPEAK_WARN)
+      line = "Watch yourself. State your business.";
+    else if (best_action == AI_ACTION_SPEAK_DEFLECT || (alert_level > 0.6f && mob->ai_prof->role == ROLE_MERCHANT))
+      line = "I'd rather not linger today, friend.";
+    else if (alert_level > 0.6f && mob->ai_prof->role == ROLE_GUARD)
+      line = "State your business. Now.";
+    else
+      line = ai_line_for_intent(mob, e, intent, e->attitude, normalized, avoid_template_id, &selected_template_id, &pool, &reason);
+
     if (!line || !*line)
       return;
 
@@ -3675,6 +4256,10 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
       }
     }
   }
+
+  ai_debug_log("AI_LAYER mob=%d role=%s mbti=%s attn=%.2f action=%s score=%.2f mood=%.2f susp=%.2f alert=%.2f goal=%s act=%d slot=ok",
+               GET_MOB_VNUM(mob), ai_role_name_local(mob->ai_prof->role), ai_mbti_string(ai_voice_profile_get(mob)), attention_score,
+               ai_action_name(best_action), best_score, mood, suspicion, alert_level, goal ? ai_goal_name(goal->type) : "NONE", intent);
 }
 
 
