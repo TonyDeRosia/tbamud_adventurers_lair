@@ -36,6 +36,7 @@ static int ai_debug = AI_ACTOR_DEBUG;
 
 static struct char_data *ai_find_player_by_idnum_room(struct char_data *mob, long idnum);
 static const char *ai_pick_phrase(const char *const *pool);
+static const char *ai_pool_pick(const char *const *pool);
 static int ai_role_can_give_directions(int role);
 static int ai_role_can_answer_intent(int role, int style, int intent);
 static int ai_text_has_sub_ci(const char *hay, const char *needle);
@@ -1113,12 +1114,72 @@ static const char *const role_rare_beast[] = {"$n lets out a strangely melodic g
 static const char *const role_rare_undead[] = {"$n whispers your name as if from a crypt.", NULL};
 static const char *const role_rare_spirit[] = {"$n murmurs of doors hidden between moonbeams.", NULL};
 
+static int ai_pool_roll_percent(void)
+{
+  return rand_number(1, 100);
+}
+
+static const char *ai_snapshot_touch_role_pool(struct char_data *mob, int role, const char **out_pool)
+{
+  const char *picked = NULL;
+
+  if (out_pool)
+    *out_pool = "POOL_NONE";
+  if (!mob || !mob->ai_state)
+    return NULL;
+  if (((pulse + GET_MOB_VNUM(mob)) % 23) != 0)
+    return NULL;
+
+  switch (role) {
+    case ROLE_BANDIT:
+      picked = ai_pool_pick(role_bandit_service);
+      if (out_pool) *out_pool = "POOL_BANDIT_SERVICE";
+      break;
+    case ROLE_BEAST:
+      if (ai_pool_roll_percent() <= 5) {
+        picked = ai_pool_pick(role_rare_beast);
+        if (out_pool) *out_pool = "POOL_RARE_BEAST";
+      } else {
+        picked = ai_pool_pick(role_beast_greet);
+        if (out_pool) *out_pool = "POOL_BEAST_GREET";
+      }
+      (void)ai_pool_pick(role_beast_service);
+      break;
+    case ROLE_UNDEAD:
+      if (ai_pool_roll_percent() <= 5) {
+        picked = ai_pool_pick(role_rare_undead);
+        if (out_pool) *out_pool = "POOL_RARE_UNDEAD";
+      } else {
+        picked = ai_pool_pick(role_undead_greet);
+        if (out_pool) *out_pool = "POOL_UNDEAD_GREET";
+      }
+      (void)ai_pool_pick(role_undead_service);
+      break;
+    case ROLE_SPIRIT:
+      if (ai_pool_roll_percent() <= 5) {
+        picked = ai_pool_pick(role_rare_spirit);
+        if (out_pool) *out_pool = "POOL_RARE_SPIRIT";
+      } else {
+        picked = ai_pool_pick(role_spirit_greet);
+        if (out_pool) *out_pool = "POOL_SPIRIT_GREET";
+      }
+      (void)ai_pool_pick(role_spirit_service);
+      break;
+    default:
+      break;
+  }
+
+  return picked;
+}
+
 
 static void ai_refresh_score_snapshot_text(struct char_data *mob)
 {
   int i, r1 = ROLE_CIVILIAN, r2 = ROLE_CIVILIAN, r3 = ROLE_CIVILIAN;
   int rs1 = -999, rs2 = -999, rs3 = -999;
   char buf[AI_INTENT_KEYWORDS_MAX];
+  const char *touch_pool = NULL;
+  const char *touch_pick = NULL;
 
   if (!mob || !mob->ai_prof || !mob->ai_state)
     return;
@@ -1136,6 +1197,13 @@ static void ai_refresh_score_snapshot_text(struct char_data *mob)
            ai_role_name_local(r3), rs3,
            mob->ai_state->last_pool_name[0] ? mob->ai_state->last_pool_name : "POOL_NONE",
            mob->ai_state->last_speak_reason[0] ? mob->ai_state->last_speak_reason : "NONE");
+
+  touch_pick = ai_snapshot_touch_role_pool(mob, r1, &touch_pool);
+  if (touch_pick && touch_pool && *touch_pool) {
+    snprintf(mob->ai_state->last_pool_name, sizeof(mob->ai_state->last_pool_name), "%s", touch_pool);
+    snprintf(mob->ai_state->last_speak_reason, sizeof(mob->ai_state->last_speak_reason), "SNAPSHOT_TOUCH");
+  }
+
   strlcpy(mob->ai_prof->matched_keywords, buf, sizeof(mob->ai_prof->matched_keywords));
 }
 
@@ -2044,10 +2112,24 @@ static int ai_actor_room_response_slot(struct char_data *mob, struct char_data *
 
 static const char *ai_pick_phrase(const char *const *pool)
 {
+  return ai_pool_pick(pool);
+}
+
+static const char *ai_pool_pick(const char *const *pool)
+{
   int n = 0;
+  int i;
+
+  if (!pool)
+    return NULL;
+
   while (pool[n]) n++;
-  if (!n) return NULL;
-  return pool[rand_number(0, n - 1)];
+
+  if (!n)
+    return NULL;
+
+  i = rand_number(0, n - 1);
+  return pool[i];
 }
 
 
