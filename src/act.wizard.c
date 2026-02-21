@@ -4948,8 +4948,12 @@ ACMD(do_smartspawn)
   char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH];
   int count = 1, minlevel = 1, maxlevel = 10;
   int i;
+  struct char_data *cmd_ch = ch;
 
-  if (!ch || GET_LEVEL(ch) < LVL_IMMORT) {
+  if (ch && ch->desc && ch->desc->original)
+    cmd_ch = ch->desc->original;
+
+  if (!cmd_ch || GET_LEVEL(cmd_ch) < LVL_IMMORT) {
     send_to_char(ch, "Huh?\r\n");
     return;
   }
