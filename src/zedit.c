@@ -38,11 +38,14 @@ static void zedit_disp_arg3(struct descriptor_data *d);
 ACMD(do_oasis_zedit)
 {
   int number = NOWHERE, save = 0, real_num;
+  zone_rnum zone_num = NOWHERE;
+  zone_vnum zone_vnum = NOWHERE;
   struct descriptor_data *d;
   char *stop;
   char sbot[MAX_STRING_LENGTH];
   char buf1[MAX_STRING_LENGTH];
   char buf2[MAX_STRING_LENGTH];
+  char buf3[MAX_STRING_LENGTH];
   room_vnum bottom, top;
 
   /* No building as a mob or while being forced. */
@@ -51,6 +54,7 @@ ACMD(do_oasis_zedit)
 
   /* Parse any arguments. */
   stop = one_argument(two_arguments(argument, buf1, buf2), sbot);
+  one_argument(stop, buf3);
 
   /* If no argument was given, use the zone the builder is standing in. */
   if (!*buf1)
@@ -74,10 +78,33 @@ ACMD(do_oasis_zedit)
         send_to_char(ch, "Save which zone?\r\n");
         return;
       }
+    } else if (!str_cmp("room", buf1)) {
+      if (!*buf2 || !is_number(buf2)) {
+        send_to_char(ch, "Usage:\r\n"
+                         "  zedit\r\n"
+                         "  zedit <zone vnum>\r\n"
+                         "  zedit room <room vnum>\r\n"
+                         "  zedit new <zone vnum> <bottom room> <top room>\r\n");
+        return;
+      }
+
+      number = atoidx(buf2);
+
+      if (number < 0 || real_room(number) == NOWHERE) {
+        send_to_char(ch, "Usage:\r\n"
+                         "  zedit\r\n"
+                         "  zedit <zone vnum>\r\n"
+                         "  zedit room <room vnum>\r\n"
+                         "  zedit new <zone vnum> <bottom room> <top room>\r\n");
+        return;
+      }
     } else if (GET_LEVEL(ch) >= LVL_IMPL) {
       if (str_cmp("new", buf1) || !stop || !*stop)
-        send_to_char(ch, "Format: zedit new <zone number> <bottom-room> "
-           "<upper-room>\r\n");
+        send_to_char(ch, "Usage:\r\n"
+                         "  zedit\r\n"
+                         "  zedit <zone vnum>\r\n"
+                         "  zedit room <room vnum>\r\n"
+                         "  zedit new <zone vnum> <bottom room> <top room>\r\n");
       else {
         if (atoi(stop) < 0 || atoi(sbot) < 0) {
           send_to_char(ch, "Zones cannot contain negative vnums.\r\n");
@@ -102,9 +129,17 @@ ACMD(do_oasis_zedit)
     }
   }
 
-  /* If a numeric argument was given, retrieve it. */
-  if (number == NOWHERE)
-    number = atoidx(buf1);
+  /* If a numeric argument was given, treat it as a zone vnum. */
+  if (number == NOWHERE) {
+    zone_vnum = atoidx(buf1);
+    zone_num = real_zone(zone_vnum);
+    if (zone_num == NOWHERE) {
+      send_to_char(ch, "Sorry, there is no zone for that number!\r\n");
+      return;
+    }
+
+    number = zone_table[zone_num].bot;
+  }
 
   /* Check that nobody is currently editing this zone. */
   for (d = descriptor_list; d; d = d->next) {
@@ -130,7 +165,14 @@ ACMD(do_oasis_zedit)
   CREATE(d->olc, struct oasis_olc_data, 1);
 
   /* Find the zone. */
-  OLC_ZNUM(d) = save ? real_zone(number) : real_zone_by_thing(number);
+  if (save)
+    OLC_ZNUM(d) = real_zone(number);
+  else if (!str_cmp("room", buf1))
+    OLC_ZNUM(d) = real_zone_by_thing(number);
+  else if (*buf1)
+    OLC_ZNUM(d) = real_zone(zone_vnum);
+  else
+    OLC_ZNUM(d) = real_zone_by_thing(number);
   if (OLC_ZNUM(d) == NOWHERE) {
     send_to_char(ch, "Sorry, there is no zone for that number!\r\n");
 
