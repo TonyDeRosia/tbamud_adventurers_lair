@@ -820,6 +820,17 @@ static const char *ai_actor_control_mode_name(void)
   return CONFIG_AI_ACTOR_ENABLED ? "ai_actor" : "legacy";
 }
 
+static int ai_actor_has_override_tag(const struct char_data *mob)
+{
+  const char *desc;
+
+  if (!mob)
+    return FALSE;
+
+  desc = mob->player.description;
+  return (desc && strstr(desc, "[AI_"));
+}
+
 static void do_stat_character(struct char_data *ch, struct char_data *k)
 {
   char buf[MAX_STRING_LENGTH];
@@ -943,11 +954,15 @@ static void do_stat_character(struct char_data *ch, struct char_data *k)
     long last_said = 0;
     if (k->ai_state && k->ai_state->last_spoke > 0)
       last_said = (long)(time(0) - k->ai_state->last_spoke);
-    send_to_char(ch, "AI_ACTOR: role=%s temperament=%s mode=%d roam=%d morale=%d last_said=%ld\r\n",
+    send_to_char(ch, "AI_ACTOR: role=%s temperament=%s roam=%d greet=%s talk_cd=%ds override_tag=%s\r\n",
                  ai_actor_role_name(k->ai_prof->role),
                  ai_actor_temperament_name(k->ai_prof->aggression),
-                 k->ai_prof->mode,
                  k->ai_prof->roam_radius,
+                 ai_actor_theme_name(k->ai_prof->social),
+                 k->ai_prof->talk_cooldown_secs,
+                 ai_actor_has_override_tag(k) ? "yes" : "no");
+    send_to_char(ch, "AI_ACTOR: mode=%d morale=%d last_said=%ld\r\n",
+                 k->ai_prof->mode,
                  k->ai_prof->morale,
                  (last_said < 0 ? 0L : last_said));
     send_to_char(ch, "AI control mode: %s, AI signature hash: %08X\r\n",
