@@ -123,6 +123,7 @@ struct ai_context_vector {
 struct ai_session_read_entry {
   long player_idnum;
   time_t last_exchange_time;
+  time_t last_reply_time;
   time_t cooldown_until;
   int exchange_count;
   int speech_count;
@@ -572,6 +573,20 @@ static const char *ai_goal_name(enum ai_goal_type goal)
   }
 }
 
+
+static const char *ai_reply_goal_name(enum ai_reply_goal goal)
+{
+  switch (goal) {
+    case GOAL_INFORM: return "INFORM";
+    case GOAL_DEFLECT: return "DEFLECT";
+    case GOAL_WARN: return "WARN";
+    case GOAL_CONNECT: return "CONNECT";
+    case GOAL_DISMISS: return "DISMISS";
+    case GOAL_CLARIFY: return "CLARIFY";
+    case GOAL_SERVE: return "SERVE";
+    default: return "UNKNOWN";
+  }
+}
 static const char *ai_role_name_local(int role)
 {
   switch (role) {
@@ -629,7 +644,11 @@ static void ai_extract_text(char *out, size_t outsz, struct char_data *mob)
   parts[2] = mob->player.long_descr ? mob->player.long_descr : "";
   parts[3] = mob->player.description ? mob->player.description : "";
 
-  snprintf(tmp, sizeof(tmp), "%s %s %s %s", parts[0], parts[1], parts[2], parts[3]);
+  snprintf(tmp, sizeof(tmp), "%.*s %.*s %.*s %.*s",
+           (int)sizeof(tmp) / 4 - 2, parts[0],
+           (int)sizeof(tmp) / 4 - 2, parts[1],
+           (int)sizeof(tmp) / 4 - 2, parts[2],
+           (int)sizeof(tmp) / 4 - 2, parts[3]);
 
   for (i = 0; tmp[i] != '\0' && j + 1 < outsz; i++) {
     unsigned char c = (unsigned char)tmp[i];
@@ -1336,10 +1355,10 @@ static void ai_say(struct char_data *mob, const char *msg, time_t now)
     return;
 
   if (!strncmp(msg, "$n ", 3)) {
-    snprintf(saybuf, sizeof(saybuf), "%s", msg + 3);
+    snprintf(saybuf, sizeof(saybuf), "%.*s", (int)sizeof(saybuf) - 1, msg + 3);
     do_echo(mob, saybuf, 0, SCMD_EMOTE);
   } else {
-    snprintf(saybuf, sizeof(saybuf), "%s", msg);
+    snprintf(saybuf, sizeof(saybuf), "%.*s", (int)sizeof(saybuf) - 1, msg);
     do_say(mob, saybuf, 0, 0);
   }
 
@@ -1370,7 +1389,7 @@ void ai_actor_schedule_reaction_speech(struct char_data *mob, struct char_data *
     return;
 
   st = mob->ai_state;
-  snprintf(st->pending_speech, sizeof(st->pending_speech), "%s", msg);
+  snprintf(st->pending_speech, sizeof(st->pending_speech), "%.*s", (int)sizeof(st->pending_speech) - 1, msg);
   st->pending_speech_target_idnum =
       (target && !IS_NPC(target)) ? GET_IDNUM(target) : 0;
   st->pending_speech_fire_pulse = pulse + 1;
@@ -2688,7 +2707,7 @@ static const char *ai_select_content_for_intention(struct char_data *mob, const 
     return "What do you mean?";
 
   if (in->goal == GOAL_CLARIFY) {
-    snprintf(best, sizeof(best), "%s", ai_pick_phrase(clarify_pool));
+    snprintf(best, sizeof(best), "%.*s", (int)sizeof(best) - 1, ai_pick_phrase(clarify_pool));
     return best;
   }
 
@@ -2786,7 +2805,7 @@ static const char *ai_select_content_for_intention(struct char_data *mob, const 
       }
     }
     if (bi >= 0 && bs > -900) {
-      snprintf(best, sizeof(best), "%s", cands[bi]);
+      snprintf(best, sizeof(best), "%.*s", (int)sizeof(best) - 1, cands[bi]);
       return best;
     }
   }
@@ -2794,7 +2813,7 @@ static const char *ai_select_content_for_intention(struct char_data *mob, const 
   {
     const char *fallback = ai_role_redirect_line(role, style);
     if (!fallback) fallback = "I'd rather not discuss that.";
-    snprintf(best, sizeof(best), "%s", fallback);
+    snprintf(best, sizeof(best), "%.*s", (int)sizeof(best) - 1, fallback);
   }
   return best;
 }
@@ -2802,6 +2821,8 @@ static const char *ai_select_content_for_intention(struct char_data *mob, const 
 static void ai_voice_assemble(struct char_data *mob, const struct ai_voice_profile *vp, const struct ai_reply_intention *in, int speech_act, const char *core_content, unsigned long seed, char *out, size_t outsz)
 {
   char core[256], work[512], topic_tag[24], buf[128];
+  int role = (mob && mob->ai_prof) ? mob->ai_prof->role : ROLE_UNKNOWN;
+  int style = (mob && mob->ai_prof) ? mob->ai_prof->style : 0;
   int rhythm;
   int use_emotional = 0;
   int recent_violence = 0;
@@ -2836,12 +2857,12 @@ static void ai_voice_assemble(struct char_data *mob, const struct ai_voice_profi
     rhythm = 1;
 
   closer = ai_phrase("CLOSER", vp ? vp->vocab_tier : 1, rhythm, seed, vp ? vp->closer_index : 1);
-  if (!ai_line_is_role_legal(closer, mob->ai_prof->role, mob->ai_prof->style))
+  if (!ai_line_is_role_legal(closer, role, style))
     closer = "";
 
   snprintf(topic_tag, sizeof(topic_tag), "TOPIC_%s", (vp && vp->topic_lean==0)?"DUTY":(vp&&vp->topic_lean==1)?"TRADE":(vp&&vp->topic_lean==2)?"COMFORT":(vp&&vp->topic_lean==3)?"DANGER":"MYSTERY");
   topic = ai_phrase(topic_tag, vp ? vp->vocab_tier : 1, rhythm, seed, 5);
-  if (!ai_line_is_role_legal(topic, mob->ai_prof->role, mob->ai_prof->style))
+  if (!ai_line_is_role_legal(topic, role, style))
     topic = "";
 
   if (st && st->mob && IN_ROOM(st->mob) != NOWHERE) {
@@ -2850,7 +2871,7 @@ static void ai_voice_assemble(struct char_data *mob, const struct ai_voice_profi
       recent_violence = 1;
   }
 
-  if (in && in->goal == GOAL_SERVE && mob && mob->ai_prof && mob->ai_prof->role == ROLE_MERCHANT && mob->ai_prof->style == 1)
+  if (in && in->goal == GOAL_SERVE && role == ROLE_MERCHANT && style == 1)
     use_emotional = 1;
 
   snprintf(work, sizeof(work), "%s", core);
@@ -2886,7 +2907,7 @@ static void ai_voice_assemble(struct char_data *mob, const struct ai_voice_profi
 
   snprintf(out, outsz, "%.*s", (int)outsz - 1, work);
   if (ai_debug)
-    ai_debug_log("VOICE vnum=%d role=%s tier=%d rhythm=%d tic=%d mbti=%s out=%s", GET_MOB_VNUM(mob), ai_role_name_local(mob->ai_prof->role), vp->vocab_tier, vp->rhythm, vp->tic_index, ai_mbti_string(vp), out);
+    ai_debug_log("VOICE vnum=%d role=%s tier=%d rhythm=%d tic=%d mbti=%s out=%s", GET_MOB_VNUM(mob), ai_role_name_local(role), vp->vocab_tier, vp->rhythm, vp->tic_index, ai_mbti_string(vp), out);
 }
 
 
@@ -3651,7 +3672,7 @@ finalize:
     return core;
   vp = ai_voice_profile_get(mob);
   ai_voice_assemble(mob, vp, NULL, intent, core, seed, voiced, sizeof(voiced));
-  snprintf(line, sizeof(line), "%s", voiced);
+  snprintf(line, sizeof(line), "%.*s", (int)sizeof(line) - 1, voiced);
   return line;
 }
 
@@ -3739,7 +3760,7 @@ int ai_actor_tick(struct char_data *mob, time_t now)
   struct char_data *target = NULL;
   const char *line = NULL;
   int do_emote = FALSE, do_warn = FALSE;
-  int intent;
+  int intent = AI_INTENT_NONE;
   int has_external_logic;
 
   if (!mob || !IS_NPC(mob) || !MOB_FLAGGED(mob, MOB_AI_ACTOR) || AFF_FLAGGED(mob, AFF_CHARM))
@@ -4303,6 +4324,10 @@ static int ai_player_speech_classify(const char *text, int *out_confidence, int 
   if (ai_text_has_sub_ci(text, "where") || ai_text_has_sub_ci(text, "which way") || ai_text_has_sub_ci(text, "how do i get") ||
       ai_text_has_sub_ci(text, "directions") || ai_text_has_sub_ci(text, "find") || ai_text_has_sub_ci(text, "locate") || ai_text_has_sub_ci(text, "path"))
     scores[AI_SPEECH_DIRECTIONS] += 10;
+  if (ai_text_has_sub_ci(text, "where should i go") || ai_text_has_sub_ci(text, "where do i go") || ai_text_has_sub_ci(text, "where to go"))
+    scores[AI_SPEECH_DIRECTIONS] += 14;
+  if (ai_text_has_sub_ci(text, "where is the bank") || ai_text_has_sub_ci(text, "where's the bank") || ai_text_has_sub_ci(text, "where is bank"))
+    scores[AI_SPEECH_BANK] += 16;
 
   if (ai_text_has_sub_ci(text, "buy") || ai_text_has_sub_ci(text, "sell") || ai_text_has_sub_ci(text, "wares") || ai_text_has_sub_ci(text, "shop") ||
       ai_text_has_sub_ci(text, "price") || ai_text_has_sub_ci(text, "trade") || ai_text_has_sub_ci(text, "discount"))
@@ -4576,8 +4601,13 @@ static int ai_actor_room_response_slot(struct char_data *mob, struct char_data *
 
     if (!IS_NPC(it) || !MOB_FLAGGED(it, MOB_AI_ACTOR) || !it->ai_prof || !it->ai_state)
       continue;
-    if ((now - it->ai_state->last_talk_time) < AI_PER_PLAYER_REPLY_COOLDOWN_SECS)
-      continue;
+
+    {
+      struct ai_actor_memory_entry *it_e = ai_mem_get_or_create(it, GET_IDNUM(actor));
+      time_t it_last_reply = it_e ? it_e->last_reply_time : 0;
+      if ((now - it_last_reply) < AI_PER_PLAYER_REPLY_COOLDOWN_SECS)
+        continue;
+    }
 
     pri = ai_event_fit_bonus(it, type, intent);
     role_score = ai_role_priority_score(it);
@@ -4944,7 +4974,7 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
   struct ai_conv_room_state *room_st;
   struct ai_conv_actor_state *conv_st;
   time_t now = time(0);
-  int intent;
+  int intent = AI_INTENT_NONE;
   int confidence = 0;
   int speech_class = AI_SPEECH_UNKNOWN;
   const char *line = NULL;
@@ -4965,9 +4995,23 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
   float cooldown_remaining = 0.0f;
   int zone = (IN_ROOM(mob) != NOWHERE) ? world[IN_ROOM(mob)].zone : -1;
   int i;
+  int role = (mob && mob->ai_prof) ? mob->ai_prof->role : ROLE_UNKNOWN;
+  int style = (mob && mob->ai_prof) ? mob->ai_prof->style : 0;
+  enum ai_reply_goal chosen_goal = GOAL_INFORM;
+  int chosen_goal_known = FALSE;
+
+#define AI_EVT_RETURN(_reason) do { \
+  if (ai_debug) \
+    ai_debug_log("AI_EVT_RETURN vnum=%d role=%s style=%d event=%s intent=%d chosen_goal=%s RETURN_REASON=%s", \
+                 mob ? GET_MOB_VNUM(mob) : -1, ai_role_name_local(role), style, ai_event_reason_name(type), intent, \
+                 chosen_goal_known ? ai_reply_goal_name(chosen_goal) : "UNKNOWN", (_reason)); \
+  return; \
+} while (0)
 
   if (!mob || !actor || !mob->ai_prof || !mob->ai_state || IS_NPC(actor))
-    return;
+    AI_EVT_RETURN("MISSING_STATE_OR_PROFILE_OR_BAD_ACTOR");
+  if (IN_ROOM(mob) == NOWHERE)
+    AI_EVT_RETURN("NOWHERE_ROOM");
 
   ai_state_refresh_local_topics(mob);
   ai_normalize_text(text ? text : "", normalized, sizeof(normalized));
@@ -4976,14 +5020,14 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
 
   if (attention_score < AI_ATTENTION_THRESHOLD) {
     ai_debug_log("ai_skip_attention vnum=%d event=%s score=%.2f", GET_MOB_VNUM(mob), ai_event_reason_name(type), attention_score);
-    return;
+    AI_EVT_RETURN("LOW_ATTENTION");
   }
 
   ai_context_vector_build(mob, actor, now, &ctx);
 
   e = ai_mem_get_or_create(mob, GET_IDNUM(actor));
   if (!e)
-    return;
+    AI_EVT_RETURN("NO_MEMORY_ENTRY");
 
   if (type == AI_EVENT_PLAYER_SAY) {
     if (ai_is_gibberish(normalized)) {
@@ -5104,11 +5148,11 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
                  GET_MOB_VNUM(mob), ai_role_name_local(mob->ai_prof->role), ai_goal_name(goal ? goal->type : AI_GOAL_NONE), ai_mbti_string(ai_voice_profile_get(mob)),
                  ai_time_bucket_name(ctx.time_bucket), ai_arch_name(sr ? sr->archetype : AI_ARCH_UNKNOWN), ai_arc_name(sr ? sr->arc : AI_ARC_STRANGER),
                  sr ? sr->exchange_count : 0, attention_score, suspicion, ai_action_name(best_action), cooldown_remaining);
-    return;
+    AI_EVT_RETURN("NON_SPEAK_ACTION_SELECTED");
   }
 
   if (!ai_actor_room_response_slot(mob, actor, type, intent, confidence, normalized))
-    return;
+    AI_EVT_RETURN("ARB_SLOT_DENIED");
 
   if (type == AI_EVENT_PLAYER_SAY && IN_ROOM(mob) != NOWHERE) {
     struct ai_player_arb_entry *arb = ai_player_arb_lookup(IN_ROOM(mob), GET_IDNUM(actor), type, ai_text_hash_simple(normalized), now);
@@ -5119,8 +5163,11 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
         avoid_template_id = arb->responder2_template_id;
     }
   }
-  if ((now - e->last_reply_time) < AI_PER_PLAYER_REPLY_COOLDOWN_SECS)
-    return;
+  {
+    time_t last_reply = sr ? sr->last_reply_time : e->last_reply_time;
+    if ((now - last_reply) < AI_PER_PLAYER_REPLY_COOLDOWN_SECS)
+      AI_EVT_RETURN("PER_PLAYER_REPLY_COOLDOWN");
+  }
 
   {
     const char *pool = "POOL_NONE";
@@ -5153,10 +5200,13 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
       static char voiced[300];
 
       intention = ai_form_intention(mob, intent, speech_class, suspicion_bucket, sr ? sr->arc : AI_ARC_STRANGER, &ctx, sr, e, now);
+      chosen_goal = intention.goal;
+      chosen_goal_known = TRUE;
       if (best_action == AI_ACTION_SPEAK_WARN)
         intention.goal = GOAL_WARN;
       else if (best_action == AI_ACTION_SPEAK_DEFLECT)
         intention.goal = GOAL_DEFLECT;
+      chosen_goal = intention.goal;
 
       core = ai_select_content_for_intention(mob, &intention, normalized, NULL);
       line = core;
@@ -5188,15 +5238,29 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
         line = voiced;
       }
 
+      if (line && *line && !ai_line_is_role_legal(line, role, style)) {
+        static char legal_core[300];
+        snprintf(legal_core, sizeof(legal_core), "%.*s", (int)sizeof(legal_core) - 1, core ? core : "");
+        line = legal_core;
+        if (!line[0] || !ai_line_is_role_legal(line, role, style)) {
+          const char *redirect = ai_role_redirect_line(role, style);
+          if (!redirect || !*redirect || !ai_line_is_role_legal(redirect, role, style))
+            redirect = "Let's keep to what I can answer.";
+          line = redirect;
+        }
+      }
+
     }
 
     if (!line || !*line)
-      return;
+      AI_EVT_RETURN("EMPTY_LINE_AFTER_ASSEMBLY");
 
     ai_set_last_speech_meta(mob, pool, reason);
     snprintf(targeted, sizeof(targeted), "$n says to %s, '%s'", GET_NAME(actor), line);
     ai_actor_schedule_reaction_speech(mob, actor, targeted);
     e->last_reply_time = now;
+    if (sr)
+      sr->last_reply_time = now;
     if (sr)
       sr->cooldown_until = now + ((best_action == AI_ACTION_EMOTE_REACT) ? 3 : 2);
 
@@ -5216,6 +5280,8 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
                GET_MOB_VNUM(mob), ai_role_name_local(mob->ai_prof->role), ai_goal_name(goal ? goal->type : AI_GOAL_NONE), ai_mbti_string(ai_voice_profile_get(mob)),
                ai_time_bucket_name(ctx.time_bucket), ai_arch_name(sr ? sr->archetype : AI_ARCH_UNKNOWN), ai_arc_name(sr ? sr->arc : AI_ARC_STRANGER),
                sr ? sr->exchange_count : 0, attention_score, suspicion, ai_action_name(best_action), cooldown_remaining);
+
+#undef AI_EVT_RETURN
 }
 
 
