@@ -2538,7 +2538,7 @@ struct char_data *read_mobile(mob_vnum nr, int type) /* and mob_rnum */
   assign_triggers(mob, MOB_TRIGGER);
 
   if (MOB_FLAGGED(mob, MOB_AI_ACTOR))
-    ai_actor_init(mob);
+    ai_actor_refresh_profile(mob, TRUE);
 
   return (mob);
 }
