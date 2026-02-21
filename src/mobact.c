@@ -54,6 +54,10 @@ void mobile_activity(void)
     }
 
     if (MOB_FLAGGED(ch, MOB_AI_ACTOR)) {
+      if (FIGHTING(ch))
+        continue;
+      if (IN_ROOM(ch) == NOWHERE || IN_ROOM(ch) < 0 || IN_ROOM(ch) > top_of_world)
+        continue;
       if (ai_actor_tick(ch, time(0)))
         continue;
     }
@@ -273,4 +277,3 @@ static bool aggressive_mob_on_a_leash(struct char_data *slave, struct char_data 
   /* So sorry, now you're a player killer... Tsk tsk. */
   return (FALSE);
 }
-
