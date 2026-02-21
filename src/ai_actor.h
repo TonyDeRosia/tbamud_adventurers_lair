@@ -30,7 +30,30 @@ enum ai_actor_intent {
   AI_INTENT_EMOTE_DANCE,
   AI_INTENT_EMOTE_SPIT,
   AI_INTENT_EMOTE_HUG,
-  AI_INTENT_EMOTE_WAVE
+  AI_INTENT_EMOTE_WAVE,
+  AI_INTENT_BUY_WEAPON,
+  AI_INTENT_BUY_ARMOR,
+  AI_INTENT_BUY_FOOD,
+  AI_INTENT_HEAL,
+  AI_INTENT_BANK,
+  AI_INTENT_INN,
+  AI_INTENT_TRAIN,
+  AI_INTENT_RUMOR,
+  AI_INTENT_QUEST,
+  AI_INTENT_SMALLTALK,
+  AI_INTENT_GIBBERISH
+};
+
+enum ai_topic_target {
+  TARGET_NONE = 0,
+  TARGET_INN,
+  TARGET_BANK,
+  TARGET_TEMPLE,
+  TARGET_MARKET,
+  TARGET_ARMORY,
+  TARGET_BAKERY,
+  TARGET_TRAINER,
+  TARGET_HEAL
 };
 
 enum ai_actor_topic_flags {
@@ -175,6 +198,9 @@ struct ai_actor_memory_entry {
   time_t last_reaction;
   int last_intent;
   time_t last_reply_time;
+  int last_topic;
+  time_t last_topic_time;
+  char last_topic_key[32];
 };
 
 struct ai_actor_state {
