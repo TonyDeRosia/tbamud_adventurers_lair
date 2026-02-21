@@ -5019,9 +5019,9 @@ ACMD(do_smartspawn)
       return;
     }
 
-    SET_BIT_AR(MOB_FLAGS(mob), MOB_AI_ACTOR);
     GET_LEVEL(mob) = level;
     char_to_room(mob, IN_ROOM(ch));
+    SET_BIT_AR(MOB_FLAGS(mob), MOB_AI_ACTOR);
     send_to_char(ch, "smartspawn: spawned vnum %d rnum %d at level %d.\r\n", vnum, rnum, level);
   }
 
