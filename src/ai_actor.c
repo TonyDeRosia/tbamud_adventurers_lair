@@ -513,6 +513,7 @@ static void ai_working_mem_mark_answered(struct ai_working_mem_entry *mem, int c
 static const struct ai_working_mem_entry *ai_relevance_link(const struct ai_working_mem_entry *mem, int count, int head, long player_idnum, const char *current_text, int current_intent, int current_topic, int current_domain, time_t now, int *out_best_score);
 static void ai_resolve_world_facts(struct char_data *mob, struct char_data *actor, int topic_target, int domain, const struct ai_context_vector *ctx, struct ai_world_facts *out);
 static void ai_slot_replace(const char *in, const struct ai_world_facts *f, char *out, size_t outsz);
+static void ai_sanitize_unresolved_tokens(const char *in, char *out, size_t outsz);
 static const char *ai_epistemic_line(int confidence, int role, int topic_target);
 unsigned int ai_hash_fnv1a_32(const char *text);
 
@@ -3178,7 +3179,8 @@ static const char *ai_select_content_for_intention(struct char_data *mob, const 
         snprintf(best, sizeof(best), "%s %s %s %s.", lead ? lead : "Try", rctx->facts.service_name[0] ? rctx->facts.service_name : "that place", join ? join : "nearby", rctx->facts.route_snippet[0] ? rctx->facts.route_snippet : "ask around");
         cands[n++] = best;
       }
-    } else if (effective_goal == GOAL_INFORM && rctx && (rctx->domain == DOMAIN_SOCIAL || in->topic == AI_INTENT_SMALLTALK)) {
+    } else if (effective_goal == GOAL_INFORM && rctx && (rctx->domain == DOMAIN_SOCIAL || in->topic == AI_INTENT_SMALLTALK) &&
+               !(rctx->domain == DOMAIN_SHOPPING || rctx->domain == DOMAIN_SERVICES || rctx->domain == DOMAIN_DIRECTIONS)) {
       const char *const *pool = (role == ROLE_GUARD || role == ROLE_BOSS) ? checkin_guard : ((role == ROLE_MERCHANT && style == 1) ? checkin_inn : checkin_merch);
       for (i = 0; pool[i] && n < 48; i++) cands[n++] = pool[i];
     } else if (effective_goal == GOAL_INFORM && in->topic == AI_INTENT_RUMOR) {
@@ -3979,7 +3981,7 @@ static void ai_detect_requested_targets(const char *text, int *targets, int *cou
     return;
 #define AI_REQ_PUSH(t) do { int _x=(t),_i,_f=0; for(_i=0;_i<n;_i++) if(targets[_i]==_x) _f=1; if(!_f && n<AI_REQ_MAX) targets[n++]=_x; } while(0)
   if (ai_text_has_sub_ci(text, "weapon") || ai_text_has_sub_ci(text, "sword") || ai_text_has_sub_ci(text, "axe") || ai_text_has_sub_ci(text, "mace") || ai_text_has_sub_ci(text, "dagger") || ai_text_has_sub_ci(text, "bow") || ai_text_has_sub_ci(text, "staff") || ai_text_has_sub_ci(text, "spear") || ai_text_has_sub_ci(text, "armor") || ai_text_has_sub_ci(text, "shield")) AI_REQ_PUSH(TARGET_ARMORY);
-  if (ai_text_has_sub_ci(text, "food") || ai_text_has_sub_ci(text, "ration") || ai_text_has_sub_ci(text, "bread") || ai_text_has_sub_ci(text, "stew")) AI_REQ_PUSH(TARGET_BAKERY);
+  if (ai_text_has_sub_ci(text, "hungry") || ai_text_has_sub_ci(text, "food") || ai_text_has_sub_ci(text, "eat") || ai_text_has_sub_ci(text, "meal") || ai_text_has_sub_ci(text, "ration") || ai_text_has_sub_ci(text, "bread") || ai_text_has_sub_ci(text, "stew")) AI_REQ_PUSH(TARGET_BAKERY);
   if (ai_text_has_sub_ci(text, "heal") || ai_text_has_sub_ci(text, "healer") || ai_text_has_sub_ci(text, "temple")) AI_REQ_PUSH(TARGET_HEAL);
   if (ai_text_has_sub_ci(text, "inn") || ai_text_has_sub_ci(text, "lodging")) AI_REQ_PUSH(TARGET_INN);
   if (ai_text_has_sub_ci(text, "bank") || ai_text_has_sub_ci(text, "deposit")) AI_REQ_PUSH(TARGET_BANK);
@@ -4273,6 +4275,9 @@ static int ai_classify_domain(const char *normalized, int intent, int speech_act
 
   if (intent == AI_INTENT_BUY_WEAPON || intent == AI_INTENT_BUY_ARMOR || intent == AI_INTENT_BUY_FOOD)
     scores[DOMAIN_SHOPPING] += 6;
+  if (normalized && (ai_text_has_sub_ci(normalized, "hungry") || ai_text_has_sub_ci(normalized, "food") || ai_text_has_sub_ci(normalized, "eat") ||
+      ai_text_has_sub_ci(normalized, "meal") || ai_text_has_sub_ci(normalized, "ration") || ai_text_has_sub_ci(normalized, "bread") || ai_text_has_sub_ci(normalized, "stew")))
+    scores[DOMAIN_SERVICES] += 14;
   if (intent == AI_INTENT_BANK || intent == AI_INTENT_INN || intent == AI_INTENT_HEAL || intent == AI_INTENT_TRAIN || intent == AI_INTENT_ASK_SERVICE)
     scores[DOMAIN_SERVICES] += 6;
   if (intent == AI_INTENT_DIRECTIONS)
@@ -4417,6 +4422,51 @@ static void ai_slot_replace(const char *in, const struct ai_world_facts *f, char
   out[oi] = 0;
 }
 
+static void ai_sanitize_unresolved_tokens(const char *in, char *out, size_t outsz)
+{
+  size_t i = 0, oi = 0;
+  int removed = 0;
+
+  if (!out || outsz == 0)
+    return;
+  out[0] = '\0';
+  if (!in)
+    return;
+
+  while (in[i] && oi + 1 < outsz) {
+    if (in[i] == '{') {
+      size_t j = i + 1;
+      int valid = 1;
+      while (in[j] && in[j] != '}') {
+        unsigned char c = (unsigned char)in[j];
+        if (!(isupper(c) || c == '_' || isdigit(c))) {
+          valid = 0;
+          break;
+        }
+        j++;
+      }
+      if (valid && in[j] == '}' && j > i + 1) {
+        size_t tlen = j - i - 1;
+        const char *tok = in + i + 1;
+        int keep = ((tlen == 7 && !strncmp(tok, "SERVICE", 7)) ||
+                    (tlen == 5 && !strncmp(tok, "ROUTE", 5)) ||
+                    (tlen == 4 && !strncmp(tok, "ITEM", 4)) ||
+                    (tlen == 4 && !strncmp(tok, "ZONE", 4)));
+        if (!keep) {
+          removed = 1;
+          i = j + 1;
+          continue;
+        }
+      }
+    }
+    out[oi++] = in[i++];
+  }
+  out[oi] = '\0';
+
+  if (removed && ai_debug)
+    ai_debug_log("AI_SANITIZE_TOKENS original='%s' sanitized='%s'", in, out);
+}
+
 static const char *ai_epistemic_line(int confidence, int role, int topic_target)
 {
   (void)topic_target;
@@ -4425,8 +4475,7 @@ static const char *ai_epistemic_line(int confidence, int role, int topic_target)
   if (confidence == 2) {
     if (role == ROLE_GUARD) return "There is one nearby but I cannot give you a clean route from here. Ask at the north post.";
     if (role == ROLE_MERCHANT) return "I know there is one nearby but I cannot point you there directly.";
-    if (role == ROLE_MERCHANT) return "Should be near the market square though I cannot say exactly.";
-    return "Should be around here somewhere. I cannot say exactly where.";
+    return "Should be near the market square though I cannot say exactly.";
   }
   if (confidence == 1)
     return "Somewhere in this district but I do not know the exact location.";
@@ -4536,7 +4585,13 @@ static const char *ai_service_direction_line(struct char_data *mob, struct char_
     return NULL;
 
   ai_build_route_text(first_dir, route, sizeof(route));
-  snprintf(route_trim, sizeof(route_trim), "%.*s", AI_ROUTE_MAX_STEPS * 14, route);
+  {
+    int maxp = (int)sizeof(route_trim) - 1;
+    if (!route[0])
+      route[0] = '\0';
+    snprintf(route_trim, sizeof(route_trim), "%.*s", maxp, route);
+    route_trim[sizeof(route_trim) - 1] = '\0';
+  }
   dest_name = world[rr].name;
 
   if (item_v >= 0) {
@@ -5472,6 +5527,12 @@ static int ai_player_speech_classify(const char *text, int *out_confidence, int 
   if (ai_text_has_sub_ci(text, "chat") || ai_text_has_sub_ci(text, "talk") || ai_text_has_sub_ci(text, "bored") || ai_text_has_sub_ci(text, "day going"))
     scores[AI_SPEECH_SMALLTALK] += 4;
 
+  if (ai_text_has_sub_ci(text, "hungry") || ai_text_has_sub_ci(text, "starving") || ai_text_has_sub_ci(text, "need food") ||
+      ai_text_has_sub_ci(text, "need something to eat") || ai_text_has_sub_ci(text, "something to eat")) {
+    scores[AI_SPEECH_SHOP] += 12;
+    scores[AI_SPEECH_SMALLTALK] -= 6;
+  }
+
   if (ai_text_has_sub_ci(text, "where") || ai_text_has_sub_ci(text, "which way") || ai_text_has_sub_ci(text, "how do i get") ||
       ai_text_has_sub_ci(text, "directions") || ai_text_has_sub_ci(text, "find") || ai_text_has_sub_ci(text, "locate") || ai_text_has_sub_ci(text, "path"))
     scores[AI_SPEECH_DIRECTIONS] += 10;
@@ -6211,6 +6272,8 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
   rctx.topic_target = ai_detect_topic_target_from_text(normalized);
   ai_detect_requested_targets(normalized, rctx.requested_targets, &rctx.requested_count);
   rctx.primary_topic_target = (rctx.requested_count > 0) ? rctx.requested_targets[0] : rctx.topic_target;
+  if (type == AI_EVENT_PLAYER_SAY && (ai_text_has_sub_ci(normalized, "hungry") || ai_text_has_sub_ci(normalized, "starving") || ai_text_has_sub_ci(normalized, "food") || ai_text_has_sub_ci(normalized, "eat") || ai_text_has_sub_ci(normalized, "meal")))
+    rctx.primary_topic_target = TARGET_BAKERY;
   rctx.confidence = 0;
   if (ai_debug) {
     int qi;
@@ -6431,6 +6494,8 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
       static char voiced[300];
 
       intention = ai_form_intention(mob, intent, speech_class, suspicion_bucket, sr ? sr->arc : AI_ARC_STRANGER, &ctx, sr, e, now);
+      if (type == AI_EVENT_PLAYER_SAY && (ai_text_has_sub_ci(normalized, "hungry") || ai_text_has_sub_ci(normalized, "starving") || ai_text_has_sub_ci(normalized, "need food") || ai_text_has_sub_ci(normalized, "something to eat") || ai_text_has_sub_ci(normalized, "food")))
+        intention.goal = GOAL_SERVE;
       chosen_goal = intention.goal;
       chosen_goal_known = TRUE;
       if (best_action == AI_ACTION_SPEAK_WARN)
@@ -6452,7 +6517,7 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
 
       if (type == AI_EVENT_PLAYER_SAY && rctx.requested_count > 1 &&
           (rctx.domain == DOMAIN_SHOPPING || rctx.domain == DOMAIN_SERVICES || rctx.domain == DOMAIN_DIRECTIONS)) {
-        static char multi_core[256];
+        char multi_core[256];
         int qi;
         int pos = 0;
         multi_core[0] = '\0';
@@ -6484,8 +6549,10 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
         }
         multi_core[sizeof(multi_core) - 1] = '\0';
         if (multi_core[0]) {
-          line = multi_core;
-          rctx.chosen_core = multi_core;
+          char multi_sanitized[256];
+          ai_sanitize_unresolved_tokens(multi_core, multi_sanitized, sizeof(multi_sanitized));
+          line = multi_sanitized;
+          rctx.chosen_core = multi_sanitized;
           intention.be_brief = 1;
         }
       }
@@ -6552,7 +6619,11 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
       AI_EVT_RETURN("EMPTY_LINE_AFTER_ASSEMBLY");
 
     ai_set_last_speech_meta(mob, pool, reason);
-    snprintf(targeted, sizeof(targeted), "$n says to %s, '%s'", GET_NAME(actor), line);
+    {
+      char finalbuf[300];
+      ai_sanitize_unresolved_tokens(line, finalbuf, sizeof(finalbuf));
+      snprintf(targeted, sizeof(targeted), "$n says to %s, '%s'", GET_NAME(actor), finalbuf);
+    }
     ai_actor_schedule_reaction_speech(mob, actor, targeted);
     e->last_reply_time = now;
     if (sr)
