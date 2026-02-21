@@ -78,6 +78,28 @@ enum ai_speech_domain {
   DOMAIN_PERSONAL,
 };
 
+enum ai_imtb_personality {
+  IMTB_STOIC = 0,
+  IMTB_FRIENDLY,
+  IMTB_GRUFF,
+  IMTB_WITTY,
+  IMTB_SUSPICIOUS,
+  IMTB_BOOKISH,
+  IMTB_ZEALOUS,
+  IMTB_EERIE,
+  IMTB_MAX
+};
+
+struct ai_imtb_profile {
+  const char *tag;
+  int warmth;
+  int verbosity;
+  int curiosity;
+  int certainty;
+  int humor;
+  int formality;
+};
+
 struct ai_working_mem_entry {
   long player_idnum;
   char text[64];
@@ -113,6 +135,8 @@ struct ai_reply_context {
   char callback_prefix[80];
   struct ai_world_facts facts;
   int confidence;
+  int personality;
+  const struct ai_imtb_profile *profile;
   const char *chosen_core;
   int from_template;
   int event_id;
@@ -350,6 +374,11 @@ struct ai_conv_actor_state {
   unsigned int recent_core_hashes[AI_RECENT_CORE_HASH_MAX];
   int recent_core_head;
   int recent_core_count;
+  int personality;
+  int personality_ready;
+  unsigned int recent_lead_hashes[6];
+  int recent_lead_head;
+  int recent_lead_count;
   int tone_clipped;
   int tone_no_extras;
   int tone_day_trade;
@@ -426,6 +455,50 @@ struct ai_phrase_entry {
   const char *text;
 };
 
+static const struct ai_imtb_profile ai_imtb_profiles[IMTB_MAX] = {
+  {"stoic", -1, 0, 0, 1, 0, 2},
+  {"friendly", 2, 1, 2, 0, 0, 0},
+  {"gruff", -2, 0, 0, -1, 0, 0},
+  {"witty", 1, 1, 1, 0, 2, 1},
+  {"suspicious", -1, 0, 0, -1, 0, 1},
+  {"bookish", 0, 2, 1, 1, 0, 2},
+  {"zealous", 0, 1, 1, 1, 0, 2},
+  {"eerie", -1, 1, 0, -1, 0, 1}
+};
+
+static const char *const ai_imtb_leadin[IMTB_MAX][4] = {
+  {"Listen.", "Noted.", "Very well.", NULL},
+  {"Hey there.", "Glad you asked.", "Happy to help.", NULL},
+  {"Yeah.", "Make it quick.", "Fine.", NULL},
+  {"Well now.", "If you insist.", "Let us make this interesting.", NULL},
+  {"Careful.", "Watch who you ask.", "Keep your voice down.", NULL},
+  {"If memory serves,", "By common practice,", "According to what I know,", NULL},
+  {"By oath,", "By the light,", "By shadow,", NULL},
+  {"Hush.", "The air remembers.", "Listen to the quiet,", NULL}
+};
+
+static const char *const ai_imtb_uncertainty[IMTB_MAX][4] = {
+  {"Unclear.", "Not certain.", "Hard to say.", NULL},
+  {"I think", "Might be", "As best I can tell", NULL},
+  {"Dunno.", "Not my lane.", "Could be.", NULL},
+  {"Maybe.", "Could be.", "Depends who you ask.", NULL},
+  {"Not sure.", "Could be a trap.", "I cannot confirm.", NULL},
+  {"Possibly.", "I cannot confirm.", "Records are thin.", NULL},
+  {"Perhaps.", "By oath, uncertain.", "I cannot swear it.", NULL},
+  {"Mist hides it.", "Hard to see.", "The signs are unclear.", NULL}
+};
+
+static const char *const ai_imtb_followup[IMTB_MAX][4] = {
+  {"Do you need anything else?", "Is that enough?", NULL, NULL},
+  {"Want help with anything else?", "Need another pointer?", NULL, NULL},
+  {"Anything else?", "You done?", NULL, NULL},
+  {"Want the longer version?", "Shall I add details?", NULL, NULL},
+  {"Who sent you?", "Need anything else, carefully?", NULL, NULL},
+  {"Would you like a more precise route?", "Shall I cross-check another lead?", NULL, NULL},
+  {"Do you seek more guidance?", "Shall I name another place?", NULL, NULL},
+  {"Do you still seek an answer?", "Shall we follow another thread?", NULL, NULL}
+};
+
 static struct char_data *ai_find_player_by_idnum_room(struct char_data *mob, long idnum);
 static const char *ai_pick_phrase(const char *const *pool);
 static const char *ai_pool_pick(const char *const *pool);
@@ -454,7 +527,14 @@ static int ai_actor_room_response_slot(struct char_data *mob, struct char_data *
 static int ai_actor_ensure_ready(struct char_data *mob);
 static unsigned long ai_hash_mix(unsigned long h, unsigned long v);
 static unsigned long ai_hash_text_stable(const char *text);
+static int ai_imtb_pick_personality(struct char_data *mob, int role, int style);
+static const struct ai_imtb_profile *ai_imtb_profile_get(int personality);
+static const char *ai_imtb_pick_leadin(struct ai_conv_actor_state *st, const struct ai_reply_context *rctx, int role, int style, unsigned long seed, int *out_suppressed);
+static const char *ai_imtb_pick_uncertainty(const struct ai_reply_context *rctx, int role, int style, unsigned long seed, int *out_used);
+static const char *ai_imtb_pick_followup(const struct ai_reply_context *rctx, int role, int style, unsigned long seed);
 static unsigned long ai_conv_seed(struct char_data *mob, int intent, unsigned int counter);
+static int ai_hash_ring_has(const unsigned int *ring, int count, int head, int max, unsigned int v);
+static void ai_hash_ring_push(unsigned int *ring, int *head, int *count, int max, unsigned int v);
 static int ai_template_pick_index(const int *ids, int count, unsigned long seed, int avoid_id, int avoid_prev, int avoid_recent1, int avoid_recent2);
 static struct ai_conv_reply_state *ai_conv_reply_state_get(struct char_data *mob, int create);
 static int ai_is_weather_smalltalk(const char *text);
@@ -2639,6 +2719,164 @@ static unsigned long ai_hash_text_stable(const char *text)
   return h;
 }
 
+
+static const struct ai_imtb_profile *ai_imtb_profile_get(int personality)
+{
+  if (personality < 0 || personality >= IMTB_MAX)
+    personality = IMTB_STOIC;
+  return &ai_imtb_profiles[personality];
+}
+
+static int ai_imtb_pick_personality(struct char_data *mob, int role, int style)
+{
+  struct ai_conv_actor_state *st;
+  char seedbuf[256];
+  unsigned long h;
+  int p;
+
+  if (!mob)
+    return IMTB_STOIC;
+
+  st = ai_conv_actor_state_get(mob, 1);
+  if (st && st->personality_ready)
+    return st->personality;
+
+  snprintf(seedbuf, sizeof(seedbuf), "%d|%s|%s|%d|%d|%d",
+           GET_MOB_VNUM(mob),
+           GET_NAME(mob) ? GET_NAME(mob) : "",
+           (mob->player.long_descr && *mob->player.long_descr) ? mob->player.long_descr : "",
+           role,
+           GET_ALIGNMENT(mob),
+           style);
+  h = ai_hash_text_stable(seedbuf);
+  p = (int)(h % (unsigned long)IMTB_MAX);
+
+  if ((role == ROLE_SPIRIT || role == ROLE_UNDEAD) && p != IMTB_EERIE) {
+    if ((h % 100UL) < 70UL)
+      p = IMTB_EERIE;
+  }
+  if (role == ROLE_CULTIST) {
+    p = ((h % 2UL) == 0UL) ? IMTB_ZEALOUS : IMTB_SUSPICIOUS;
+  }
+  if (role == ROLE_MERCHANT) {
+    if (p == IMTB_EERIE)
+      p = ((h % 2UL) == 0UL) ? IMTB_FRIENDLY : IMTB_BOOKISH;
+  }
+
+  if (st) {
+    st->personality = p;
+    st->personality_ready = 1;
+  }
+
+  if (ai_debug)
+    ai_debug_log("AI_IMTB_ASSIGN vnum=%d role=%s personality=%s", GET_MOB_VNUM(mob), ai_role_name_local(role), ai_imtb_profiles[p].tag);
+
+  return p;
+}
+
+static const char *ai_imtb_pick_fragment(const char *const *pool, unsigned long seed)
+{
+  int n = 0;
+  if (!pool)
+    return "";
+  while (pool[n])
+    n++;
+  if (n <= 0)
+    return "";
+  return pool[seed % (unsigned long)n];
+}
+
+static const char *ai_imtb_pick_leadin(struct ai_conv_actor_state *st, const struct ai_reply_context *rctx, int role, int style, unsigned long seed, int *out_suppressed)
+{
+  const char *frag;
+  unsigned int h;
+  int personality;
+  unsigned long mix;
+
+  if (out_suppressed)
+    *out_suppressed = 0;
+  if (!rctx)
+    return "";
+
+  personality = (rctx->personality >= 0 && rctx->personality < IMTB_MAX) ? rctx->personality : IMTB_STOIC;
+  mix = ai_hash_mix(seed, (unsigned long)(personality * 41 + 7));
+  frag = ai_imtb_pick_fragment(ai_imtb_leadin[personality], mix);
+  if (!frag || !*frag)
+    return "";
+
+  h = (unsigned int)ai_hash_text_stable(frag);
+  if (st && ai_hash_ring_has(st->recent_lead_hashes, st->recent_lead_count, st->recent_lead_head, 6, h)) {
+    frag = ai_imtb_pick_fragment(ai_imtb_leadin[personality], ai_hash_mix(mix, 19));
+    if (!frag || !*frag)
+      return "";
+    h = (unsigned int)ai_hash_text_stable(frag);
+    if (ai_hash_ring_has(st->recent_lead_hashes, st->recent_lead_count, st->recent_lead_head, 6, h))
+      return "";
+  }
+
+  if (!ai_line_is_role_legal(frag, role, style)) {
+    frag = ai_imtb_pick_fragment(ai_imtb_leadin[personality], ai_hash_mix(mix, 53));
+    if (!frag || !*frag || !ai_line_is_role_legal(frag, role, style)) {
+      if (out_suppressed)
+        *out_suppressed = 1;
+      return "";
+    }
+  }
+
+  if (st)
+    ai_hash_ring_push(st->recent_lead_hashes, &st->recent_lead_head, &st->recent_lead_count, 6, h);
+
+  return frag;
+}
+
+static const char *ai_imtb_pick_uncertainty(const struct ai_reply_context *rctx, int role, int style, unsigned long seed, int *out_used)
+{
+  const char *frag;
+  int personality;
+
+  if (out_used)
+    *out_used = 0;
+  if (!rctx || rctx->confidence > 2)
+    return "";
+
+  personality = (rctx->personality >= 0 && rctx->personality < IMTB_MAX) ? rctx->personality : IMTB_STOIC;
+  frag = ai_imtb_pick_fragment(ai_imtb_uncertainty[personality], ai_hash_mix(seed, 73));
+  if (!frag || !*frag)
+    return "";
+  if (!ai_line_is_role_legal(frag, role, style))
+    return "";
+  if (out_used)
+    *out_used = 1;
+  return frag;
+}
+
+static const char *ai_imtb_pick_followup(const struct ai_reply_context *rctx, int role, int style, unsigned long seed)
+{
+  int personality;
+  const struct ai_imtb_profile *profile;
+  const char *frag;
+  int allow = 0;
+
+  if (!rctx)
+    return "";
+  personality = (rctx->personality >= 0 && rctx->personality < IMTB_MAX) ? rctx->personality : IMTB_STOIC;
+  profile = ai_imtb_profile_get(personality);
+
+  if ((rctx->domain == DOMAIN_SOCIAL || (rctx->domain == DOMAIN_NONE && rctx->speech_act == AI_INTENT_SMALLTALK)) && profile->curiosity > 0)
+    allow = 1;
+  if (rctx->confidence <= 1 && rctx->requested_count <= 1)
+    allow = 1;
+  if (!allow)
+    return "";
+
+  frag = ai_imtb_pick_fragment(ai_imtb_followup[personality], ai_hash_mix(seed, 97));
+  if (!frag || !*frag)
+    return "";
+  if (!ai_line_is_role_legal(frag, role, style))
+    return "";
+  return frag;
+}
+
 static int ai_hash_ring_has(const unsigned int *ring, int count, int head, int max, unsigned int v)
 {
   int i;
@@ -3304,6 +3542,15 @@ static void ai_voice_assemble(struct char_data *mob, const struct ai_voice_profi
   int recent_violence = 0;
   int add_q = 0, add_topic = 0, suppress_opener = 0;
   int allow_followup = 0;
+  int personality = (rctx ? rctx->personality : IMTB_STOIC);
+  const struct ai_imtb_profile *iprofile = ai_imtb_profile_get(personality);
+  const char *plead = "";
+  const char *punc = "";
+  const char *pfollow = "";
+  int psuppressed = 0;
+  int punc_used = 0;
+  int multi_topic = (rctx && rctx->requested_count > 1);
+  int service_domain = (rctx && (rctx->domain == DOMAIN_SHOPPING || rctx->domain == DOMAIN_SERVICES || rctx->domain == DOMAIN_DIRECTIONS));
   int engaged_arc = (in && (in->stance == STANCE_OPEN || in->stance == STANCE_WARM));
   struct ai_conv_actor_state *st = ai_conv_actor_state_get(mob, 0);
   const char *closer = "";
@@ -3327,6 +3574,13 @@ static void ai_voice_assemble(struct char_data *mob, const struct ai_voice_profi
       core[0] = "\0"[0];
   }
 
+  plead = ai_imtb_pick_leadin(st, rctx, role, style, ai_hash_mix(seed, 111), &psuppressed);
+  if (psuppressed && ai_debug)
+    ai_debug_log("AI_IMTB_SUPPRESS vnum=%d role=%s fragment=leadin", GET_MOB_VNUM(mob), ai_role_name_local(role));
+
+  if (service_domain)
+    allow_followup = 0;
+
   if (in && in->goal == GOAL_CLARIFY) {
     snprintf(out, outsz, "%.*s", (int)outsz - 1, core);
     len = strlen(out);
@@ -3340,6 +3594,8 @@ static void ai_voice_assemble(struct char_data *mob, const struct ai_voice_profi
   rhythm = vp ? vp->rhythm : 1;
   if (st && st->tone_clipped)
     rhythm = 0;
+  if (iprofile && iprofile->verbosity <= 0 && rhythm > 1)
+    rhythm = 1;
   if (in && in->be_brief && rhythm > 1)
     rhythm = 1;
 
@@ -3365,7 +3621,21 @@ static void ai_voice_assemble(struct char_data *mob, const struct ai_voice_profi
   if (in && in->goal == GOAL_SERVE && role == ROLE_MERCHANT && style == 1)
     use_emotional = 1;
 
-  snprintf(work, sizeof(work), "%s", core);
+  if (plead && *plead)
+    snprintf(work, sizeof(work), "%s %s", plead, core);
+  else
+    snprintf(work, sizeof(work), "%s", core);
+
+  if ((service_domain || !multi_topic) && rctx && rctx->confidence <= 2) {
+    punc = ai_imtb_pick_uncertainty(rctx, role, style, ai_hash_mix(seed, 137), &punc_used);
+    if (punc_used && punc && *punc) {
+      char oldwork[512];
+      snprintf(oldwork, sizeof(oldwork), "%s", work);
+      snprintf(work, sizeof(work), "%s %s", punc, oldwork);
+      if (ai_debug && service_domain)
+        ai_debug_log("AI_IMTB_UNCERTAIN vnum=%d role=%s domain=%d", GET_MOB_VNUM(mob), ai_role_name_local(role), rctx->domain);
+    }
+  }
 
   if (rhythm >= 1 && closer && *closer)
     snprintf(work + strlen(work), sizeof(work) - strlen(work), " %s", closer);
@@ -3379,6 +3649,10 @@ static void ai_voice_assemble(struct char_data *mob, const struct ai_voice_profi
 
   if (allow_followup)
     snprintf(work + strlen(work), sizeof(work) - strlen(work), " %s", ai_followup_pick(rctx ? rctx->speech_act : AI_INTENT_NONE, seed));
+
+  pfollow = ai_imtb_pick_followup(rctx, role, style, ai_hash_mix(seed, 149));
+  if (pfollow && *pfollow && !service_domain && !multi_topic)
+    snprintf(work + strlen(work), sizeof(work) - strlen(work), " %s", pfollow);
 
   if (use_emotional) {
     const char *feel = ((rctx ? rctx->speech_act : AI_INTENT_NONE)==AI_INTENT_PRAISE||(rctx ? rctx->speech_act : AI_INTENT_NONE)==AI_INTENT_GREET||(rctx ? rctx->speech_act : AI_INTENT_NONE)==AI_INTENT_SMALLTALK) ? ai_phrase("FEEL_POSITIVE", vocab_tier, rhythm, seed, 7) : ai_phrase("FEEL_NEGATIVE", vocab_tier, rhythm, seed, 8);
@@ -5023,7 +5297,7 @@ finalize:
   if (skip_voice || !core)
     return core;
   vp = ai_voice_profile_get(mob);
-  { struct ai_reply_context lrctx; memset(&lrctx, 0, sizeof(lrctx)); lrctx.speech_act = intent; lrctx.chosen_core = core; ai_voice_assemble(mob, vp, NULL, &lrctx, seed, voiced, sizeof(voiced)); }
+  { struct ai_reply_context lrctx; int p; memset(&lrctx, 0, sizeof(lrctx)); lrctx.speech_act = intent; p = ai_imtb_pick_personality(mob, role, style); lrctx.personality = p; lrctx.profile = ai_imtb_profile_get(p); lrctx.chosen_core = core; ai_voice_assemble(mob, vp, NULL, &lrctx, seed, voiced, sizeof(voiced)); }
   snprintf(line, sizeof(line), "%.*s", (int)sizeof(line) - 1, voiced);
   return line;
 }
@@ -6393,6 +6667,11 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
     AI_EVT_RETURN("NOWHERE_ROOM");
 
   ai_state_refresh_local_topics(mob);
+  {
+    int p = ai_imtb_pick_personality(mob, role, style);
+    rctx.personality = p;
+    rctx.profile = ai_imtb_profile_get(p);
+  }
   ai_normalize_text(text ? text : "", normalized, sizeof(normalized));
   attention_score = ai_attention_score(mob, type, actor, normalized, now);
   ai_state_push_event(mob, type, actor, normalized);
