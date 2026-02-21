@@ -65,6 +65,8 @@
 #define AI_ZONE_SHOPS_MAX 64
 #define AI_ZONE_KEYWORDS_MAX 1024
 #define AI_ZONE_CACHE_MAX 64
+#define AI_IMTB_LEAD_PLAYER_MAX 12
+#define AI_IMTB_LEAD_PLAYER_SUPPRESS_SECS 10
 
 enum ai_speech_domain {
   DOMAIN_NONE = 0,
@@ -123,6 +125,7 @@ struct ai_world_facts {
 
 struct ai_reply_context {
   const char *current_text;
+  long player_idnum;
   int intent;
   int speech_act;
   int domain;
@@ -383,6 +386,8 @@ struct ai_conv_actor_state {
   int tone_no_extras;
   int tone_day_trade;
   int tone_night_watch;
+  long lead_player_ids[AI_IMTB_LEAD_PLAYER_MAX];
+  time_t lead_player_times[AI_IMTB_LEAD_PLAYER_MAX];
 };
 
 struct ai_conv_room_state {
@@ -550,6 +555,9 @@ static unsigned long ai_hash_text_stable(const char *text);
 static int ai_imtb_pick_personality(struct char_data *mob, int role, int style);
 static const struct ai_imtb_profile *ai_imtb_profile_get(int personality);
 static const char *ai_imtb_pick_leadin(struct ai_conv_actor_state *st, const struct ai_reply_context *rctx, int role, int style, unsigned long seed, int *out_suppressed);
+static int ai_imtb_recent_leadin_for_player(struct ai_conv_actor_state *st, long player_idnum, time_t now);
+static void ai_imtb_mark_leadin_for_player(struct ai_conv_actor_state *st, long player_idnum, time_t now);
+static const char *ai_imtb_pick_micro_wrap(const struct ai_reply_context *rctx, int role, int style, unsigned long seed, int suffix_mode);
 static const char *ai_imtb_pick_uncertainty(const struct ai_reply_context *rctx, int role, int style, unsigned long seed, int *out_used);
 static const char *ai_imtb_pick_followup(const struct ai_reply_context *rctx, int role, int style, unsigned long seed);
 static unsigned long ai_conv_seed(struct char_data *mob, int intent, unsigned int counter);
@@ -2814,7 +2822,8 @@ static const char *ai_imtb_pick_leadin(struct ai_conv_actor_state *st, const str
   int personality;
   unsigned long mix;
   int multi_topic;
-  int spoke_recently;
+  int same_player_recent;
+  time_t now = time(0);
 
   if (out_suppressed)
     *out_suppressed = 0;
@@ -2822,9 +2831,9 @@ static const char *ai_imtb_pick_leadin(struct ai_conv_actor_state *st, const str
     return "";
 
   multi_topic = (rctx->requested_count > 1);
-  spoke_recently = (st && st->last_line_time > 0 && (time(0) - st->last_line_time) <= 2);
+  same_player_recent = ai_imtb_recent_leadin_for_player(st, rctx->player_idnum, now);
 
-  if (multi_topic || spoke_recently) {
+  if (multi_topic || same_player_recent) {
     if (out_suppressed)
       *out_suppressed = 1;
     return "";
@@ -2874,7 +2883,74 @@ static const char *ai_imtb_pick_leadin(struct ai_conv_actor_state *st, const str
 
   if (st)
     ai_hash_ring_push(st->recent_lead_hashes, &st->recent_lead_head, &st->recent_lead_count, 6, h);
+  ai_imtb_mark_leadin_for_player(st, rctx->player_idnum, now);
 
+  return frag;
+}
+
+static int ai_imtb_recent_leadin_for_player(struct ai_conv_actor_state *st, long player_idnum, time_t now)
+{
+  int i;
+  if (!st || player_idnum <= 0)
+    return FALSE;
+  for (i = 0; i < AI_IMTB_LEAD_PLAYER_MAX; i++) {
+    if (st->lead_player_ids[i] == player_idnum && st->lead_player_times[i] > 0 &&
+        (now - st->lead_player_times[i]) <= AI_IMTB_LEAD_PLAYER_SUPPRESS_SECS)
+      return TRUE;
+  }
+  return FALSE;
+}
+
+static void ai_imtb_mark_leadin_for_player(struct ai_conv_actor_state *st, long player_idnum, time_t now)
+{
+  int i, slot = 0;
+  if (!st || player_idnum <= 0)
+    return;
+  for (i = 0; i < AI_IMTB_LEAD_PLAYER_MAX; i++) {
+    if (st->lead_player_ids[i] == player_idnum || st->lead_player_ids[i] == 0) {
+      slot = i;
+      break;
+    }
+    if (st->lead_player_times[i] < st->lead_player_times[slot])
+      slot = i;
+  }
+  st->lead_player_ids[slot] = player_idnum;
+  st->lead_player_times[slot] = now;
+}
+
+static const char *ai_imtb_pick_micro_wrap(const struct ai_reply_context *rctx, int role, int style, unsigned long seed, int suffix_mode)
+{
+  int personality;
+  static const char *const micro_prefix[IMTB_MAX][5] = {
+    {"Steady now,", "Right then,", "As you asked,", "Briefly,", NULL},
+    {"Gladly,", "Happy to help,", "Sure thing,", "With a smile,", NULL},
+    {"Fine.", "Hnh.", "Aye,", "Keep up,", NULL},
+    {"Oh, certainly,", "Now that's rich,", "Well then,", "Let's make it fun,", NULL},
+    {"Careful now,", "Quietly,", "Keep this close,", "Eyes open,", NULL},
+    {"By the record,", "In plain terms,", "As noted,", "Strictly speaking,", NULL},
+    {"By the sign,", "As the rite wills,", "Marked and clear,", "By oath,", NULL},
+    {"From the hush,", "Through the echo,", "In the dim,", "From old silence,", NULL}
+  };
+  static const char *const micro_suffix[IMTB_MAX][5] = {
+    {"keep it orderly.", "that is plain.", "that should do.", "stay steady.", NULL},
+    {"if that helps.", "hope that lands.", "good luck out there.", "happy trails.", NULL},
+    {"don't dawdle.", "move sharp.", "that's enough.", "keep pace.", NULL},
+    {"try not to trip.", "call it a bonus.", "that's the trick.", "enjoy the spin.", NULL},
+    {"keep your head low.", "watch your back.", "say less of it.", "stay unseen.", NULL},
+    {"per available record.", "by best estimate.", "as evidence suggests.", "with fair certainty.", NULL},
+    {"the omen agrees.", "the rite allows it.", "the sign stands.", "so the pattern says.", NULL},
+    {"echoes remember.", "the dark keeps count.", "the hush permits it.", "so it fades.", NULL}
+  };
+  const char *frag;
+
+  if (!rctx)
+    return "";
+  personality = (rctx->personality >= 0 && rctx->personality < IMTB_MAX) ? rctx->personality : IMTB_STOIC;
+  frag = ai_imtb_pick_fragment(suffix_mode ? micro_suffix[personality] : micro_prefix[personality], ai_hash_mix(seed, suffix_mode ? 211 : 173));
+  if (!frag || !*frag)
+    return "";
+  if (!ai_line_is_role_legal(frag, role, style))
+    return "";
   return frag;
 }
 
@@ -3376,22 +3452,24 @@ static const char *ai_select_content_for_intention(struct char_data *mob, const 
     "What part do you want answered?",
     NULL
   };
-  static const char *const deflect_guard[] = {"State your business and keep it short.", "I have watch duty to finish.", "Ask one clear question and stand easy.", "I can spare a moment, not a lecture.", "If you need help, ask plainly and briefly.", "I keep this post, so keep to the point.", "I've orders to hold this watch.", "Speak direct; my patrol is due.", "I answer clear needs, not wandering chatter.", "Keep your request concise.", "Use plain words and we can proceed.", "I can help, but not for long.", NULL};
-  static const char *const deflect_inn[] = {"If you need rest, ask for a room.", "I can pour ale, not debate rumors.", "Ask for stew, room, or bed and we'll be square.", "This hearth serves comfort, not long disputes.", "Keep it simple: meal, bed, or directions.", "I can warm you up, not chase side talk.", "If you're staying, ask what you need.", "I keep rooms and rest, not gossip chains.", "Tell me if you need a bed or a bowl.", "Let's keep this to house business.", "I can help you settle in, not speculate.", "Best keep it to inn matters.", NULL};
-  static const char *const deflect_merch[] = {"Ask about wares, prices, or stock.", "Trade only for now.", "If it isn't about a bargain, keep moving.", "Name the item and we can deal.", "I can quote prices, not idle theories.", "Let's keep this on wares.", "If you want stock details, ask directly.", "I handle coin, not side stories.", "Pick a good and we'll talk numbers.", "Bargain talk only today.", "I can help with price and quality.", "State the purchase and we'll proceed.", NULL};
-  static const char *const deflect_bandit[] = {"Keep walking, mark.", "Not your concern.", "Pay up or move on.", "Easy coin doesn't answer questions.", "Wrong road for chatter.", "Purse first, talk later.", "You're asking too much for free.", "Keep your head down and pass through.", "No free guidance in my stretch.", "Step light and keep walking.", "Ask less, pay more.", "Pick a direction and go.", NULL};
-  static const char *const deflect_cult[] = {"The veil does not answer every voice.", "Not all patterns are for open telling.", "That omen is not for this moment.", "The currents stay unread for strangers.", "Some signs are kept within ritual.", "Beyond words for now.", "The pattern remains closed.", "Not every question crosses the veil.", "This thread is not yours to pull.", "The rite keeps that answer veiled.", "I will not open that omen.", "Ask another current.", NULL};
+  static const char *const deflect_guard[] = {"State your business and keep it short.", "I have watch duty to finish.", "Ask one clear question and stand easy.", "I can spare a moment, not a lecture.", "If you need help, ask plainly and briefly.", "I keep this post, so keep to the point.", "I've orders to hold this watch.", "Speak direct; my patrol is due.", "I answer clear needs, not wandering chatter.", "Keep your request concise.", "Use plain words and we can proceed.", "I can help, but not for long.", "Save the wandering tale for later.", "Duty first, stories second.", "If it isn't actionable, make it brief.", "Hold formation in your words.", "Short question, sharp answer.", "My patrol clock is running.", "Give me the practical version.", "I can guide, not gossip.", NULL};
+  static const char *const deflect_inn[] = {"If you need rest, ask for a room.", "I can pour ale, not debate rumors.", "Ask for stew, room, or bed and we'll be square.", "This hearth serves comfort, not long disputes.", "Keep it simple: meal, bed, or directions.", "I can warm you up, not chase side talk.", "If you're staying, ask what you need.", "I keep rooms and rest, not gossip chains.", "Tell me if you need a bed or a bowl.", "Let's keep this to house business.", "I can help you settle in, not speculate.", "Best keep it to inn matters.", "Hearth talk is fine; riddles are not.", "Order first, stories after supper.", "Name what you need and I'll fetch it.", "Keep it to board and lodging.", "Ask direct and I'll answer quick.", "My tables are full; be concise.", "I mind the house, not endless debate.", "Food, room, route—pick one.", NULL};
+  static const char *const deflect_merch[] = {"Ask about wares, prices, or stock.", "Trade only for now.", "If it isn't about a bargain, keep moving.", "Name the item and we can deal.", "I can quote prices, not idle theories.", "Let's keep this on wares.", "If you want stock details, ask directly.", "I handle coin, not side stories.", "Pick a good and we'll talk numbers.", "Bargain talk only today.", "I can help with price and quality.", "State the purchase and we'll proceed.", "I sell goods, not digressions.", "Put coin on the question.", "If it's not inventory, it's not now.", "Choose item, quality, or budget.", "Make it a trade question.", "The ledger likes clear requests.", "Quote first, chatter later.", "Bring me specifics and we'll deal.", NULL};
+  static const char *const deflect_bandit[] = {"Keep walking, mark.", "Not your concern.", "Pay up or move on.", "Easy coin doesn't answer questions.", "Wrong road for chatter.", "Purse first, talk later.", "You're asking too much for free.", "Keep your head down and pass through.", "No free guidance in my stretch.", "Step light and keep walking.", "Ask less, pay more.", "Pick a direction and go.", "No coin, no extra words.", "You're burning daylight and patience.", "This isn't a charity crossroads.", "Short ask, then vanish.", "Your curiosity costs extra.", "Road toll includes silence.", "Ask once, then move.", "Don't linger in my shadow.", NULL};
+  static const char *const deflect_cult[] = {"The veil does not answer every voice.", "Not all patterns are for open telling.", "That omen is not for this moment.", "The currents stay unread for strangers.", "Some signs are kept within ritual.", "Beyond words for now.", "The pattern remains closed.", "Not every question crosses the veil.", "This thread is not yours to pull.", "The rite keeps that answer veiled.", "I will not open that omen.", "Ask another current.", "The litany bars that path.", "That symbol is sealed tonight.", "The rite permits no further telling.", "Your question falls outside the circle.", "Another moon, perhaps another answer.", "The current rejects that thread.", "Silence guards that sign.", "Seek a different omen.", NULL};
+  static const char *const deflect_spirit[] = {"Echoes thin; ask less.", "The mist keeps that answer.", "Not every memory wakes for you.", "The wind takes idle questions.", "That path is closed to breath and bone.", "I answer only what still matters.", "This whisper is not for the living crowd.", "Leave that thread in the dark.", "Speak one need, not ten.", "Hollow halls dislike rambling.", "Ask clear, or drift on.", "The hush keeps its own counsel.", NULL};
   static const char *const warn_guard[] = {"Stand easy and keep lawful.", "Mind your tone and hold position.", "Keep order or move along.", "Last courtesy: stay civil.", "This post stays calm by rule.", "Choose respect and keep to the law.", "Drop the heat and speak plainly.", "Watch your words and keep the peace.", "Take one step back and steady yourself.", "Do not test the watch.", "Hold your temper and comply.", "Keep hands clear and trouble ends here.", NULL};
   static const char *const warn_inn[] = {"Keep it civil under this roof.", "No brawls near my hearth.", "Lower your voice or leave the room.", "You can rest here, not rage here.", "Respect the house and calm down.", "No threats over my ale and stew.", "Settle down or take the road.", "This bed and board stays peaceful.", "Quiet it, or I close your tab.", "You're welcome warm, not wild.", "Keep your temper from my common room.", "Ease up before I turn you out.", NULL};
   static const char *const warn_merch[] = {"Keep this market lawful.", "No threats near my wares.", "Mind your hands around my stock.", "Talk straight or walk.", "Keep your edge down and your coin honest.", "No trouble at my stall.", "Bargain fair, or leave.", "Watch it, or this deal is done.", "Keep calm and we'll keep trading.", "You want prices, not problems.", "Don't test me in the market.", "One more push and you're gone.", NULL};
   static const char *const warn_bandit[] = {"Careful, mark.", "Push again and you pay up.", "Keep your voice low and your purse ready.", "Test me and lose easy coin.", "One wrong move and this road gets expensive.", "Don't make me collect early.", "You walk because I allow it.", "Stay polite and keep moving.", "I warned you once.", "Easy now, unless you want trouble.", "Pay attention and stay in line.", "Keep walking while you still can.", NULL};
   static const char *const warn_cult[] = {"Do not mock the ritual.", "Keep your voice soft before the omen.", "The pattern bites back when provoked.", "Step lightly near the veil.", "Show restraint and the current stays calm.", "Disrespect the rite and face consequence.", "Let this warning settle.", "Do not force what lies beyond.", "Keep still; the sign is watching.", "Temper yourself before the pattern turns.", "The veil closes on reckless tongues.", "Take heed and lower your intent.", NULL};
   static const char *const dismiss_pool[] = {"Keep it brief.", "Not today.", "Move along.", NULL};
-  static const char *const connect_guard[] = {"Well met. Keep to the law.", "Good day. Stay alert at this post.", "You're clear to pass; keep it lawful.", "Welcome through. Keep the peace.", "Morning. Report trouble, avoid it otherwise.", "Steady step and you'll do fine here.", "Road looks calm; keep it that way.", "You're safe while you stay civil.", "All quiet so far; let's keep watch tight.", "Need help, ask plain and respectful.", "Duty's steady and the gate is open.", "Walk with purpose and keep clear of trouble.", NULL};
-  static const char *const connect_inn[] = {"Welcome in. Warm yourself by the hearth.", "Good evening. Rest here and breathe easy.", "Come in from the road; stew is hot.", "Beds are ready if you need real sleep.", "Set your pack down and take a seat.", "Ale's fresh and the room is calm.", "Long road? I've got bed and broth.", "Take the edge off by the fire.", "You're welcome while you keep it civil.", "A warm table waits if you're staying.", "House is open, hearth is bright.", "Stay the night and start fresh at dawn.", NULL};
-  static const char *const connect_merch[] = {"Greetings. Looking for wares?", "Hello there; stock is fresh today.", "Fair prices and honest measures right here.", "See something useful? Ask and I'll quote.", "Trade's steady; let's make a clean bargain.", "Need provisions? I've got quality stock.", "Take your time and compare the wares.", "Coin and clarity make good business.", "If you need kit, I can sort it.", "Market's open; what's your price range?", "Ask for an item and I'll run numbers.", "Good day. Let's trade straight.", NULL};
-  static const char *const connect_bandit[] = {"Yeah? Keep it short.", "You talk fast for this road.", "Step careful and maybe we get along.", "You look like a mark worth sparing today.", "No sudden moves and we're fine.", "Walk light and keep your purse close.", "You made it this far; don't waste it.", "Talk plain and keep moving.", "Coin buys manners around here.", "You seem sharp enough to listen.", "I'm in a decent mood; don't test it.", "Say your bit and keep walking.", NULL};
-  static const char *const connect_cult[] = {"The veil stirs; speak your thread.", "I hear a pattern in your voice.", "The current is calm enough to listen.", "An omen opens; ask with care.", "Beyond the noise, I can hear you.", "The rite is quiet; proceed.", "A sign crosses the air. Continue.", "You stand at the edge of meaning; speak.", "The pattern leans closer.", "I attend, if your words are steady.", "The veil allows a moment.", "Your voice enters the current.", NULL};
+  static const char *const connect_guard[] = {"Well met. Keep to the law.", "Good day. Stay alert at this post.", "You're clear to pass; keep it lawful.", "Welcome through. Keep the peace.", "Morning. Report trouble, avoid it otherwise.", "Steady step and you'll do fine here.", "Road looks calm; keep it that way.", "You're safe while you stay civil.", "All quiet so far; let's keep watch tight.", "Need help, ask plain and respectful.", "Duty's steady and the gate is open.", "Walk with purpose and keep clear of trouble.", "Watchline's steady—you're fine here.", "Need routing or rules, I can help.", "Good posture, good day.", "Stay sharp and the city stays easy.", "Gate's open; mind your manners.", "If trouble starts, call me first.", "You look ready—keep it lawful.", "Clear road ahead, keep it clean.", NULL};
+  static const char *const connect_inn[] = {"Welcome in. Warm yourself by the hearth.", "Good evening. Rest here and breathe easy.", "Come in from the road; stew is hot.", "Beds are ready if you need real sleep.", "Set your pack down and take a seat.", "Ale's fresh and the room is calm.", "Long road? I've got bed and broth.", "Take the edge off by the fire.", "You're welcome while you keep it civil.", "A warm table waits if you're staying.", "House is open, hearth is bright.", "Stay the night and start fresh at dawn.", "Mind your boots and make yourself at home.", "Hot kettle, clean beds, easy night.", "You made good time—sit and breathe.", "I've room enough for weary folk.", "Soup's on and the fire's kind.", "Road dust off, comfort on.", "Settle in; we keep a gentle house.", "If you're hungry, you're in luck.", NULL};
+  static const char *const connect_merch[] = {"Greetings. Looking for wares?", "Hello there; stock is fresh today.", "Fair prices and honest measures right here.", "See something useful? Ask and I'll quote.", "Trade's steady; let's make a clean bargain.", "Need provisions? I've got quality stock.", "Take your time and compare the wares.", "Coin and clarity make good business.", "If you need kit, I can sort it.", "Market's open; what's your price range?", "Ask for an item and I'll run numbers.", "Good day. Let's trade straight.", "You've got the look of a smart buyer.", "Tell me your budget and we'll tune it.", "Good eye—there's quality on this stall.", "Need value or durability?", "Let's make this a clean deal.", "I can fit kit to your route.", "Welcome—I've got fresh stock in.", "Name the need; I'll name the price.", NULL};
+  static const char *const connect_bandit[] = {"Yeah? Keep it short.", "You talk fast for this road.", "Step careful and maybe we get along.", "You look like a mark worth sparing today.", "No sudden moves and we're fine.", "Walk light and keep your purse close.", "You made it this far; don't waste it.", "Talk plain and keep moving.", "Coin buys manners around here.", "You seem sharp enough to listen.", "I'm in a decent mood; don't test it.", "Say your bit and keep walking.", "Hnh. You're either brave or lost.", "Keep calm and we stay friendly.", "Don't flinch and I won't bite.", "You're on my road; act wise.", "Talk straight and maybe you keep your coin.", "I've heard worse voices than yours.", "Show respect and we're square.", "Quick words, quick peace.", NULL};
+  static const char *const connect_cult[] = {"The veil stirs; speak your thread.", "I hear a pattern in your voice.", "The current is calm enough to listen.", "An omen opens; ask with care.", "Beyond the noise, I can hear you.", "The rite is quiet; proceed.", "A sign crosses the air. Continue.", "You stand at the edge of meaning; speak.", "The pattern leans closer.", "I attend, if your words are steady.", "The veil allows a moment.", "Your voice enters the current.", "Tonight's signs are favorable to speech.", "The circle widens; step in.", "Your words align with the current.", "A thin door opens—use it well.", "I hear intent beneath your tone.", "The litany permits this exchange.", "Speak, and let the symbol settle.", "A measured voice is welcome here.", NULL};
+  static const char *const connect_spirit[] = {"A quiet footstep reaches me.", "You walk where echoes gather.", "I hear you through the stone.", "The old air carries your words.", "Speak softly; the hall is listening.", "You are not lost yet, traveler.", "The mist parts for a moment.", "Your voice stirs the dust of memory.", "Ask, and I'll answer what lingers.", "The silence makes room for you.", "Another soul at the threshold.", "Stay calm; the echoes are kind tonight.", NULL};
   static const char *const serve_shop[] = {"I can show wares, prices, and stock.", "Tell me the item and I'll quote it.", "Need provisions? I can set a fair bargain.", "I keep practical stock for the road.", "Ask by item type and I'll narrow options.", "If you sell, I can price your goods.", "Let's compare quality and numbers.", "State your budget and I can guide you.", "I can handle both buying and selling.", "Point to the wares and we'll bargain.", "Trade with me and keep it straightforward.", "Name your need and we'll do business.", NULL};
   static const char *const serve_inn[] = {"I can offer room, bed, stew, and ale.", "Need rest? I have clean rooms tonight.", "Sit by the hearth and warm yourself first.", "A hot meal and a bed are ready.", "If you're hurt, rest here and recover.", "You can take a room and sleep safely.", "I serve comfort: bed, broth, and calm.", "Tell me if you need food or a room.", "Stay here, eat well, and start fresh.", "I can set you up with a quiet bed.", "Warm ale and soft blankets are available.", "Rest here as long as you keep house peace.", NULL};
   static const char *const serve_bank[] = {"The bank is east from here.", "Head to the vault counter in town.", "Bankers keep ledgers near the central square.", "Follow the main street to the bank doors.", "The vault hall is by the market road.", "Ask a clerk at the bank counter.", "Take the city route toward the vault district.", "You want the bank office near town center.", "Go to the vault house and ask inside.", "The banking hall is a short walk east.", "Find the ledger desk at the bank.", "Bank services are handled at the vault post.", NULL};
@@ -3422,9 +3500,17 @@ static const char *ai_select_content_for_intention(struct char_data *mob, const 
 
     if ((effective_goal == GOAL_INFORM || effective_goal == GOAL_SERVE) && role_fit < AI_MIN_ROLE_FITNESS)
       effective_goal = GOAL_DEFLECT;
+    if (rctx && rctx->current_text &&
+        (ai_text_has_sub_ci(rctx->current_text, "hungry") || ai_text_has_sub_ci(rctx->current_text, "starving") || ai_text_has_sub_ci(rctx->current_text, "food") ||
+         ai_text_has_sub_ci(rctx->current_text, "eat") || ai_text_has_sub_ci(rctx->current_text, "meal") || ai_text_has_sub_ci(rctx->current_text, "ration") ||
+         ai_text_has_sub_ci(rctx->current_text, "bread") || ai_text_has_sub_ci(rctx->current_text, "stew") || ai_text_has_sub_ci(rctx->current_text, "weapon") ||
+         ai_text_has_sub_ci(rctx->current_text, "weapons") || ai_text_has_sub_ci(rctx->current_text, "armor") || ai_text_has_sub_ci(rctx->current_text, "armory") ||
+         ai_text_has_sub_ci(rctx->current_text, "supplies") || ai_text_has_sub_ci(rctx->current_text, "shop") || ai_text_has_sub_ci(rctx->current_text, "buy") ||
+         ai_text_has_sub_ci(rctx->current_text, "sell") || ai_text_has_sub_ci(rctx->current_text, "merchant") || ai_text_has_sub_ci(rctx->current_text, "store") ||
+         ai_text_has_sub_ci(rctx->current_text, "smith") || ai_text_has_sub_ci(rctx->current_text, "blacksmith")))
+      effective_goal = GOAL_SERVE;
     if (rctx && (rctx->domain == DOMAIN_SHOPPING || rctx->domain == DOMAIN_SERVICES || rctx->domain == DOMAIN_DIRECTIONS)) {
-      if (effective_goal == GOAL_INFORM)
-        effective_goal = GOAL_SERVE;
+      effective_goal = GOAL_SERVE;
     }
 
     if (effective_goal == GOAL_CLARIFY) {
@@ -3433,7 +3519,8 @@ static const char *ai_select_content_for_intention(struct char_data *mob, const 
       const char *const *pool = (role == ROLE_GUARD || role == ROLE_BOSS) ? deflect_guard :
                                 ((role == ROLE_MERCHANT && style == 1) ? deflect_inn :
                                 (role == ROLE_MERCHANT ? deflect_merch :
-                                (role == ROLE_BANDIT ? deflect_bandit : deflect_cult)));
+                                (role == ROLE_BANDIT ? deflect_bandit :
+                                (role == ROLE_SPIRIT ? deflect_spirit : deflect_cult))));
       for (i = 0; pool[i] && n < 48; i++) cands[n++] = pool[i];
     } else if (effective_goal == GOAL_WARN) {
       const char *const *pool = (role == ROLE_GUARD || role == ROLE_BOSS) ? warn_guard :
@@ -3447,7 +3534,8 @@ static const char *ai_select_content_for_intention(struct char_data *mob, const 
       const char *const *pool = (role == ROLE_GUARD || role == ROLE_BOSS) ? connect_guard :
                                 ((role == ROLE_MERCHANT && style == 1) ? connect_inn :
                                 (role == ROLE_MERCHANT ? connect_merch :
-                                (role == ROLE_BANDIT ? connect_bandit : connect_cult)));
+                                (role == ROLE_BANDIT ? connect_bandit :
+                                (role == ROLE_SPIRIT ? connect_spirit : connect_cult))));
       for (i = 0; pool[i] && n < 48; i++) cands[n++] = pool[i];
     } else if (effective_goal == GOAL_SERVE) {
       const char *const *pool = (in->topic == AI_INTENT_INN) ? serve_inn :
@@ -3596,6 +3684,7 @@ static void ai_voice_assemble(struct char_data *mob, const struct ai_voice_profi
   const char *plead = "";
   const char *punc = "";
   const char *pfollow = "";
+  const char *pmicro = "";
   int psuppressed = 0;
   int punc_used = 0;
   int multi_topic = (rctx && rctx->requested_count > 1);
@@ -3611,7 +3700,6 @@ static void ai_voice_assemble(struct char_data *mob, const struct ai_voice_profi
   int vp_tic_index = vp ? vp->tic_index : 0;
   int vp_topic_lean = vp ? vp->topic_lean : 0;
 
-  (void)seed;
   if (!out || outsz == 0)
     return;
 
@@ -3674,6 +3762,20 @@ static void ai_voice_assemble(struct char_data *mob, const struct ai_voice_profi
     snprintf(work, sizeof(work), "%s %s", plead, core);
   else
     snprintf(work, sizeof(work), "%s", core);
+
+  if (!multi_topic && !(in && in->be_brief) && ((ai_hash_mix(seed, 223) % 100UL) < 35UL)) {
+    int suffix_mode = ((ai_hash_mix(seed, 227) % 2UL) == 0UL);
+    pmicro = ai_imtb_pick_micro_wrap(rctx, role, style, ai_hash_mix(seed, 229), suffix_mode);
+    if (pmicro && *pmicro) {
+      if (suffix_mode)
+        snprintf(work + strlen(work), sizeof(work) - strlen(work), " %s", pmicro);
+      else {
+        char oldwork[512];
+        snprintf(oldwork, sizeof(oldwork), "%s", work);
+        snprintf(work, sizeof(work), "%s %s", pmicro, oldwork);
+      }
+    }
+  }
 
   if (service_domain && !multi_topic && rctx && rctx->confidence <= 2) {
     punc = ai_imtb_pick_uncertainty(rctx, role, style, ai_hash_mix(seed, 137), &punc_used);
@@ -4291,20 +4393,40 @@ static void ai_zone_build_cache(struct ai_zone_knowledge *zk)
 static void ai_detect_requested_targets(const char *text, int *targets, int *count)
 {
   int n = 0;
+  int food_trigger = FALSE;
+  int gear_trigger = FALSE;
   if (!targets || !count)
     return;
   *count = 0;
   if (!text)
     return;
 #define AI_REQ_PUSH(t) do { int _x=(t),_i,_f=0; for(_i=0;_i<n;_i++) if(targets[_i]==_x) _f=1; if(!_f && n<AI_REQ_MAX) targets[n++]=_x; } while(0)
-  if (ai_text_has_sub_ci(text, "weapon") || ai_text_has_sub_ci(text, "sword") || ai_text_has_sub_ci(text, "axe") || ai_text_has_sub_ci(text, "mace") || ai_text_has_sub_ci(text, "dagger") || ai_text_has_sub_ci(text, "bow") || ai_text_has_sub_ci(text, "staff") || ai_text_has_sub_ci(text, "spear")) AI_REQ_PUSH(TARGET_ARMORY);
-  if (ai_text_has_sub_ci(text, "armor") || ai_text_has_sub_ci(text, "shield") || ai_text_has_sub_ci(text, "helm") || ai_text_has_sub_ci(text, "breastplate")) AI_REQ_PUSH(TARGET_ARMORY);
-  if (ai_text_has_sub_ci(text, "hungry") || ai_text_has_sub_ci(text, "starving") || ai_text_has_sub_ci(text, "food") || ai_text_has_sub_ci(text, "eat") || ai_text_has_sub_ci(text, "meal") || ai_text_has_sub_ci(text, "ration") || ai_text_has_sub_ci(text, "bread") || ai_text_has_sub_ci(text, "stew")) AI_REQ_PUSH(TARGET_BAKERY);
+  if (ai_text_has_sub_ci(text, "hungry") || ai_text_has_sub_ci(text, "starving") || ai_text_has_sub_ci(text, "food") || ai_text_has_sub_ci(text, "eat") || ai_text_has_sub_ci(text, "meal") || ai_text_has_sub_ci(text, "ration") || ai_text_has_sub_ci(text, "bread") || ai_text_has_sub_ci(text, "stew"))
+    food_trigger = TRUE;
+  if (ai_text_has_sub_ci(text, "weapon") || ai_text_has_sub_ci(text, "weapons") || ai_text_has_sub_ci(text, "armor") || ai_text_has_sub_ci(text, "armory") || ai_text_has_sub_ci(text, "supplies") || ai_text_has_sub_ci(text, "shop") || ai_text_has_sub_ci(text, "buy") || ai_text_has_sub_ci(text, "sell") || ai_text_has_sub_ci(text, "merchant") || ai_text_has_sub_ci(text, "store") || ai_text_has_sub_ci(text, "smith") || ai_text_has_sub_ci(text, "blacksmith") || ai_text_has_sub_ci(text, "sword") || ai_text_has_sub_ci(text, "axe") || ai_text_has_sub_ci(text, "mace") || ai_text_has_sub_ci(text, "dagger") || ai_text_has_sub_ci(text, "bow") || ai_text_has_sub_ci(text, "staff") || ai_text_has_sub_ci(text, "spear") || ai_text_has_sub_ci(text, "shield") || ai_text_has_sub_ci(text, "helm") || ai_text_has_sub_ci(text, "breastplate"))
+    gear_trigger = TRUE;
+
+  if (food_trigger) {
+    if (strcmp(ai_topic_key_name(TARGET_BAKERY), "NONE"))
+      AI_REQ_PUSH(TARGET_BAKERY);
+    else
+      AI_REQ_PUSH(TARGET_INN);
+  }
+  if (gear_trigger) {
+    if (strcmp(ai_topic_key_name(TARGET_ARMORY), "NONE"))
+      AI_REQ_PUSH(TARGET_ARMORY);
+    else if (strcmp(ai_topic_key_name(TARGET_MARKET), "NONE"))
+      AI_REQ_PUSH(TARGET_MARKET);
+  }
   if (ai_text_has_sub_ci(text, "heal") || ai_text_has_sub_ci(text, "healer") || ai_text_has_sub_ci(text, "temple") || ai_text_has_sub_ci(text, "potion") || ai_text_has_sub_ci(text, "bandage") || ai_text_has_sub_ci(text, "wounded")) AI_REQ_PUSH(TARGET_HEAL);
   if (ai_text_has_sub_ci(text, "inn") || ai_text_has_sub_ci(text, "lodging") || ai_text_has_sub_ci(text, "sleep") || ai_text_has_sub_ci(text, "bed") || ai_text_has_sub_ci(text, "bedroll") || ai_text_has_sub_ci(text, "tent") || ai_text_has_sub_ci(text, "camping")) AI_REQ_PUSH(TARGET_INN);
   if (ai_text_has_sub_ci(text, "bank") || ai_text_has_sub_ci(text, "deposit") || ai_text_has_sub_ci(text, "withdraw") || ai_text_has_sub_ci(text, "atm") || ai_text_has_sub_ci(text, "teller")) AI_REQ_PUSH(TARGET_BANK);
   if (ai_text_has_sub_ci(text, "train") || ai_text_has_sub_ci(text, "trainer") || ai_text_has_sub_ci(text, "practice") || ai_text_has_sub_ci(text, "guild") || ai_text_has_sub_ci(text, "instructor") || ai_text_has_sub_ci(text, "master")) AI_REQ_PUSH(TARGET_TRAINER);
   if (ai_text_has_sub_ci(text, "market") || ai_text_has_sub_ci(text, "supplies") || ai_text_has_sub_ci(text, "supply") || ai_text_has_sub_ci(text, "gear") || ai_text_has_sub_ci(text, "equipment") || ai_text_has_sub_ci(text, "pack") || ai_text_has_sub_ci(text, "rope") || ai_text_has_sub_ci(text, "torch") || ai_text_has_sub_ci(text, "oil") || ai_text_has_sub_ci(text, "kit")) AI_REQ_PUSH(TARGET_MARKET);
+  if (food_trigger && n == 0)
+    AI_REQ_PUSH(TARGET_INN);
+  if (gear_trigger && n == 0)
+    AI_REQ_PUSH(TARGET_MARKET);
 #undef AI_REQ_PUSH
   *count = n;
 }
@@ -4723,9 +4845,17 @@ static int ai_classify_domain(const char *normalized, int intent, int speech_act
   if (intent == AI_INTENT_BUY_WEAPON || intent == AI_INTENT_BUY_ARMOR || intent == AI_INTENT_BUY_FOOD)
     scores[DOMAIN_SHOPPING] += 6;
   if (normalized && (ai_text_has_sub_ci(normalized, "hungry") || ai_text_has_sub_ci(normalized, "food") || ai_text_has_sub_ci(normalized, "eat") ||
-      ai_text_has_sub_ci(normalized, "meal") || ai_text_has_sub_ci(normalized, "ration") || ai_text_has_sub_ci(normalized, "bread") || ai_text_has_sub_ci(normalized, "stew"))) {
+      ai_text_has_sub_ci(normalized, "meal") || ai_text_has_sub_ci(normalized, "ration") || ai_text_has_sub_ci(normalized, "bread") || ai_text_has_sub_ci(normalized, "stew") || ai_text_has_sub_ci(normalized, "starving"))) {
     scores[DOMAIN_SERVICES] += 24;
     scores[DOMAIN_SHOPPING] += 10;
+    scores[DOMAIN_SOCIAL] = MAX(0, scores[DOMAIN_SOCIAL] - 3);
+  }
+  if (normalized && (ai_text_has_sub_ci(normalized, "weapon") || ai_text_has_sub_ci(normalized, "weapons") || ai_text_has_sub_ci(normalized, "armor") || ai_text_has_sub_ci(normalized, "armory") ||
+      ai_text_has_sub_ci(normalized, "supplies") || ai_text_has_sub_ci(normalized, "shop") || ai_text_has_sub_ci(normalized, "buy") || ai_text_has_sub_ci(normalized, "sell") ||
+      ai_text_has_sub_ci(normalized, "merchant") || ai_text_has_sub_ci(normalized, "store") || ai_text_has_sub_ci(normalized, "smith") || ai_text_has_sub_ci(normalized, "blacksmith"))) {
+    scores[DOMAIN_SHOPPING] += 28;
+    scores[DOMAIN_SERVICES] += 8;
+    scores[DOMAIN_SOCIAL] = MAX(0, scores[DOMAIN_SOCIAL] - 3);
   }
   if (intent == AI_INTENT_BANK || intent == AI_INTENT_INN || intent == AI_INTENT_HEAL || intent == AI_INTENT_TRAIN || intent == AI_INTENT_ASK_SERVICE)
     scores[DOMAIN_SERVICES] += 6;
@@ -5994,6 +6124,19 @@ static int ai_player_speech_classify(const char *text, int *out_confidence, int 
 
   is_hunger_request = (ai_text_has_sub_ci(text, "hungry") || ai_text_has_sub_ci(text, "starving") || ai_text_has_sub_ci(text, "need food") ||
                        ai_text_has_sub_ci(text, "need something to eat") || ai_text_has_sub_ci(text, "something to eat"));
+  if (ai_text_has_sub_ci(text, "hungry") || ai_text_has_sub_ci(text, "starving") || ai_text_has_sub_ci(text, "food") || ai_text_has_sub_ci(text, "eat") ||
+      ai_text_has_sub_ci(text, "meal") || ai_text_has_sub_ci(text, "ration") || ai_text_has_sub_ci(text, "bread") || ai_text_has_sub_ci(text, "stew")) {
+    scores[AI_SPEECH_SHOP] += 18;
+    scores[AI_SPEECH_INN] += 12;
+    scores[AI_SPEECH_SMALLTALK] = MAX(0, scores[AI_SPEECH_SMALLTALK] - 8);
+  }
+  if (ai_text_has_sub_ci(text, "weapon") || ai_text_has_sub_ci(text, "weapons") || ai_text_has_sub_ci(text, "armor") || ai_text_has_sub_ci(text, "armory") ||
+      ai_text_has_sub_ci(text, "supplies") || ai_text_has_sub_ci(text, "shop") || ai_text_has_sub_ci(text, "buy") || ai_text_has_sub_ci(text, "sell") ||
+      ai_text_has_sub_ci(text, "merchant") || ai_text_has_sub_ci(text, "store") || ai_text_has_sub_ci(text, "smith") || ai_text_has_sub_ci(text, "blacksmith")) {
+    scores[AI_SPEECH_SHOP] += 22;
+    scores[AI_SPEECH_DIRECTIONS] += 4;
+    scores[AI_SPEECH_SMALLTALK] = MAX(0, scores[AI_SPEECH_SMALLTALK] - 8);
+  }
 
   if (!is_hunger_request && (ai_text_has_sub_ci(text, "how are you") || ai_text_has_sub_ci(text, "what s up") || ai_text_has_sub_ci(text, "whats up") || ai_text_has_sub_ci(text, "what's up") ||
       ai_text_has_sub_ci(text, "how goes") || ai_text_has_sub_ci(text, "how is it going") || ai_text_has_sub_ci(text, "hows it going") || ai_text_has_sub_ci(text, "how's it going") ||
@@ -6752,6 +6895,7 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
   }
 
   rctx.current_text = normalized;
+  rctx.player_idnum = GET_IDNUM(actor);
   rctx.intent = intent;
   rctx.speech_act = intent;
   rctx.domain = ai_classify_domain(normalized, intent, intent);
