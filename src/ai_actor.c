@@ -20,6 +20,7 @@
 #define AI_ROOM_IDLE_SKIP_SECS 12
 #define AI_BFS_MAX_DEPTH 6
 #define AI_SIGNATURE_CHECK_SECS 10
+#define AI_TARGET_REACTION_COOLDOWN_SECS 18
 #define AI_EVENT_IGNORE_MSG_SECS 4
 #define AI_INTENT_THRESHOLD 25
 #define AI_INTENT_COOLDOWN_MIN 6
@@ -31,27 +32,6 @@ static int ai_debug = AI_ACTOR_DEBUG;
 
 static struct char_data *ai_find_player_by_idnum_room(struct char_data *mob, long idnum);
 static const char *ai_pick_phrase(const char *const *pool);
-
-static size_t ai_appendf(char *buf, size_t bufsz, size_t off, const char *fmt, ...)
-{
-  int wrote;
-  va_list args;
-
-  if (!buf || bufsz == 0)
-    return 0;
-  if (off >= bufsz)
-    return bufsz - 1;
-
-  va_start(args, fmt);
-  wrote = vsnprintf(buf + off, bufsz - off, fmt, args);
-  va_end(args);
-
-  if (wrote < 0)
-    return off;
-  if ((size_t)wrote >= (bufsz - off))
-    return bufsz - 1;
-  return off + (size_t)wrote;
-}
 
 static void ai_debug_log(const char *fmt, ...)
 {
@@ -345,6 +325,50 @@ void ai_actor_schedule_reaction_speech(struct char_data *mob, struct char_data *
       (target && !IS_NPC(target)) ? GET_IDNUM(target) : 0;
   st->pending_speech_fire_pulse = pulse + 1;
 }
+
+#if 0
+static int ai_try_emit_pending_reaction_speech(struct char_data *mob, time_t now)
+{
+  struct ai_actor_state *st;
+  struct char_data *target = NULL;
+
+  if (!mob || !mob->ai_state)
+    return FALSE;
+
+  st = mob->ai_state;
+
+  if (!st->pending_speech[0] || st->pending_speech_fire_pulse == 0)
+    return FALSE;
+
+  if (pulse < st->pending_speech_fire_pulse)
+    return FALSE;
+
+  if (IN_ROOM(mob) == NOWHERE) {
+    st->pending_speech[0] = '\0';
+    st->pending_speech_target_idnum = 0;
+    st->pending_speech_fire_pulse = 0;
+    return FALSE;
+  }
+
+  if (st->pending_speech_target_idnum > 0) {
+    target = ai_find_player_by_idnum_room(mob, st->pending_speech_target_idnum);
+    if (!target) {
+      st->pending_speech[0] = '\0';
+      st->pending_speech_target_idnum = 0;
+      st->pending_speech_fire_pulse = 0;
+      return FALSE;
+    }
+  }
+
+  if (ai_can_speak_now(mob, now))
+    ai_say(mob, st->pending_speech, now);
+
+  st->pending_speech[0] = '\0';
+  st->pending_speech_target_idnum = 0;
+  st->pending_speech_fire_pulse = 0;
+  return TRUE;
+}
+#endif
 
 static int ai_within_radius_home(struct char_data *mob, room_rnum room, int max_depth)
 {
@@ -823,23 +847,14 @@ void ai_actor_refresh_profile(struct char_data *mob, int force)
     mob->ai_prof->surrender_hp_percent = mob->ai_prof->flee_hp_percent;
 
   {
-    size_t off = 0;
-    off = ai_appendf(mob->ai_prof->matched_keywords, sizeof(mob->ai_prof->matched_keywords), off,
-                     "g%d", score[ROLE_GUARD]);
-    off = ai_appendf(mob->ai_prof->matched_keywords, sizeof(mob->ai_prof->matched_keywords), off,
-                     " m%d", score[ROLE_MERCHANT]);
-    off = ai_appendf(mob->ai_prof->matched_keywords, sizeof(mob->ai_prof->matched_keywords), off,
-                     " b%d", score[ROLE_BANDIT]);
-    off = ai_appendf(mob->ai_prof->matched_keywords, sizeof(mob->ai_prof->matched_keywords), off,
-                     " be%d", score[ROLE_BEAST]);
-    off = ai_appendf(mob->ai_prof->matched_keywords, sizeof(mob->ai_prof->matched_keywords), off,
-                     " u%d", score[ROLE_UNDEAD]);
-    off = ai_appendf(mob->ai_prof->matched_keywords, sizeof(mob->ai_prof->matched_keywords), off,
-                     " s%d", score[ROLE_SPIRIT]);
-    off = ai_appendf(mob->ai_prof->matched_keywords, sizeof(mob->ai_prof->matched_keywords), off,
-                     " c%d", score[ROLE_CULTIST]);
-    ai_appendf(mob->ai_prof->matched_keywords, sizeof(mob->ai_prof->matched_keywords), off,
-               " boss%d", score[ROLE_BOSS]);
+    char matched_keywords[128];
+
+    snprintf(matched_keywords, sizeof(matched_keywords),
+             "g%d m%d b%d be%d u%d s%d c%d boss%d",
+             score[ROLE_GUARD], score[ROLE_MERCHANT], score[ROLE_BANDIT], score[ROLE_BEAST],
+             score[ROLE_UNDEAD], score[ROLE_SPIRIT], score[ROLE_CULTIST], score[ROLE_BOSS]);
+    matched_keywords[sizeof(matched_keywords) - 1] = '\0';
+    strlcpy(mob->ai_prof->matched_keywords, matched_keywords, sizeof(mob->ai_prof->matched_keywords));
   }
   mob->ai_prof->profile_flags = 0;
   if ((ai_text_has(text, "fire") || ai_text_has(text, "flame")) && (ai_text_has(text, "ice") || ai_text_has(text, "frost")))
@@ -914,6 +929,30 @@ void ai_actor_free(struct char_data *mob)
     mob->ai_state = NULL;
   }
 }
+
+
+#if 0
+static int ai_find_hostile_target_in_room(struct char_data *mob)
+{
+  struct char_data *vict;
+
+  if (!mob || IN_ROOM(mob) == NOWHERE || !mob->ai_state)
+    return 0;
+
+  for (vict = world[IN_ROOM(mob)].people; vict; vict = vict->next_in_room) {
+    int i;
+    if (IS_NPC(vict) || PRF_FLAGGED(vict, PRF_NOHASSLE) || !CAN_SEE(mob, vict))
+      continue;
+    for (i = 0; i < mob->ai_state->mem_count; i++) {
+      struct ai_actor_memory_entry *e = &mob->ai_state->mem[i];
+      if (e->idnum == GET_IDNUM(vict) && (e->flags & MEM_WANTED || e->hostility >= AI_HOSTILE_ATTACK_THRESHOLD)) {
+        return GET_IDNUM(vict);
+      }
+    }
+  }
+  return 0;
+}
+#endif
 
 static struct char_data *ai_find_player_by_idnum_room(struct char_data *mob, long idnum)
 {
@@ -1233,6 +1272,49 @@ static const char *ai_pick_phrase(const char *const *pool)
   if (!n) return NULL;
   return pool[rand_number(0, n - 1)];
 }
+
+
+#if 0
+static int ai_actor_peaceful_room(room_rnum room)
+{
+  if (room == NOWHERE)
+    return FALSE;
+  return ROOM_FLAGGED(room, ROOM_PEACEFUL) || ROOM_FLAGGED(room, ROOM_NOMOB) || ROOM_FLAGGED(room, ROOM_NOMAGIC);
+}
+
+static int ai_actor_target_cooldown_ok(struct char_data *mob, struct char_data *actor, time_t now)
+{
+  int i;
+  struct ai_actor_memory_entry *e;
+
+  if (!mob || !mob->ai_state || !actor || IS_NPC(actor))
+    return TRUE;
+
+  for (i = 0; i < mob->ai_state->mem_count; i++) {
+    if (mob->ai_state->mem[i].idnum == GET_IDNUM(actor)) {
+      e = &mob->ai_state->mem[i];
+      return (now - e->last_reaction) >= AI_TARGET_REACTION_COOLDOWN_SECS;
+    }
+  }
+
+  e = ai_mem_get_or_create(mob, GET_IDNUM(actor));
+  if (!e)
+    return TRUE;
+  return (now - e->last_reaction) >= AI_TARGET_REACTION_COOLDOWN_SECS;
+}
+
+static void ai_actor_mark_target_reaction(struct char_data *mob, struct char_data *actor, time_t now)
+{
+  struct ai_actor_memory_entry *e;
+
+  if (!mob || !mob->ai_state || !actor || IS_NPC(actor))
+    return;
+  e = ai_mem_get_or_create(mob, GET_IDNUM(actor));
+  if (!e)
+    return;
+  e->last_reaction = now;
+}
+#endif
 
 void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, struct char_data *actor, const char *text)
 {
