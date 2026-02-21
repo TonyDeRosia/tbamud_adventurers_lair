@@ -1,6 +1,8 @@
 #ifndef _AI_ACTOR_H_
 #define _AI_ACTOR_H_
 
+#include <stdint.h>
+
 #define AI_MEM_MAX 12
 
 /* Optional compile-time debug logging. */
@@ -87,6 +89,7 @@ struct ai_actor_profile {
   int call_help_enabled;
   int target_alignment_pref;
   int opportunistic_pref;
+  uint32_t signature;
   int initialized;
 };
 
@@ -112,9 +115,15 @@ struct ai_actor_state {
   int mem_count;
   long current_target_idnum;
   time_t target_last_seen;
+  time_t next_signature_check;
   int cached_zone;
   struct ai_actor_brain *brain;
 };
+
+uint32_t ai_actor_compute_signature(struct char_data *mob);
+void ai_actor_build_profile(struct char_data *mob, int full_reset);
+void ai_actor_rebuild_profile(struct char_data *mob);
+void ai_actor_refresh_live_mobs_by_vnum(mob_vnum vnum);
 
 void ai_actor_init(struct char_data *mob);
 void ai_actor_free(struct char_data *mob);
