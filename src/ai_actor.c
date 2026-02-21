@@ -88,6 +88,8 @@ static struct ai_conv_room_state ai_conv_room_states[AI_CONV_ROOM_STATE_MAX];
 
 static int ai_debug = AI_ACTOR_DEBUG;
 
+struct ai_synonym_group;
+
 static struct char_data *ai_find_player_by_idnum_room(struct char_data *mob, long idnum);
 static const char *ai_pick_phrase(const char *const *pool);
 static const char *ai_pool_pick(const char *const *pool);
@@ -110,6 +112,15 @@ static int ai_conv_try_start(struct char_data *mob, time_t now);
 static int ai_player_speech_classify(const char *text, int *out_confidence, int *out_is_weather);
 static int ai_intent_from_player_class(int speech_class);
 static int ai_actor_room_response_slot(struct char_data *mob, struct char_data *actor, enum ai_event_type type, int intent, int confidence, const char *normalized);
+static unsigned long ai_hash_mix(unsigned long h, unsigned long v);
+static unsigned long ai_hash_text_stable(const char *text);
+static unsigned long ai_conv_seed(struct char_data *mob, int intent, unsigned int counter);
+static int ai_template_pick_index(const int *ids, int count, unsigned long seed, int avoid_id, int avoid_prev, int avoid_recent1, int avoid_recent2);
+static struct ai_conv_reply_state *ai_conv_reply_state_get(struct char_data *mob, int create);
+static int ai_is_weather_smalltalk(const char *text);
+static const char *ai_synonym_pick(const struct ai_synonym_group *groups, const char *token, unsigned long seed, int slot);
+static void ai_template_expand(const char *tpl, const struct ai_synonym_group *groups, unsigned long seed, char *out, size_t outsz);
+static const char *ai_template_reply_for_intent(struct char_data *mob, int intent, const char *text, int avoid_template_id, int *out_template_id);
 
 enum ai_player_speech_class {
   AI_SPEECH_UNKNOWN = 0,
@@ -136,9 +147,41 @@ struct ai_player_arb_entry {
   time_t created_at;
   struct char_data *responder1;
   struct char_data *responder2;
+  int responder1_template_id;
+  int responder2_template_id;
 };
 
 static struct ai_player_arb_entry ai_player_arb_cache[AI_PLAYER_ARB_CACHE_MAX];
+
+#define AI_CONV_REPLY_STATE_MAX 512
+#define AI_TEMPLATE_BUFFER_MAX 256
+
+struct ai_conv_reply_state {
+  struct char_data *mob;
+  unsigned int counter;
+  int last_intent;
+  int last_template_ids[3];
+  time_t updated_at;
+};
+
+enum ai_template_intent {
+  AI_TEMPLATE_INTENT_SMALLTALK = 1,
+  AI_TEMPLATE_INTENT_WEATHER = 2
+};
+
+struct ai_synonym_group {
+  const char *token;
+  const char *const *words;
+};
+
+struct ai_reply_template {
+  int id;
+  int role;
+  int intent;
+  const char *text;
+};
+
+static struct ai_conv_reply_state ai_conv_reply_states[AI_CONV_REPLY_STATE_MAX];
 
 
 static const char *ai_role_name_local(int role)
@@ -1432,6 +1475,313 @@ static void ai_set_last_speech_meta(struct char_data *mob, const char *pool, con
   ai_refresh_score_snapshot_text(mob);
 }
 
+static unsigned long ai_hash_mix(unsigned long h, unsigned long v)
+{
+  h ^= v + 0x9e3779b9UL + (h << 6) + (h >> 2);
+  return h;
+}
+
+static unsigned long ai_hash_text_stable(const char *text)
+{
+  const unsigned char *p = (const unsigned char *)text;
+  unsigned long h = 2166136261UL;
+
+  if (!text)
+    return h;
+
+  while (*p) {
+    h ^= (unsigned long)(*p++);
+    h *= 16777619UL;
+  }
+
+  return h;
+}
+
+static struct ai_conv_reply_state *ai_conv_reply_state_get(struct char_data *mob, int create)
+{
+  int i;
+  int oldest = 0;
+
+  if (!mob)
+    return NULL;
+
+  for (i = 0; i < AI_CONV_REPLY_STATE_MAX; i++) {
+    if (ai_conv_reply_states[i].mob == mob)
+      return &ai_conv_reply_states[i];
+    if (!ai_conv_reply_states[i].mob && oldest == 0)
+      oldest = i;
+    else if (ai_conv_reply_states[oldest].updated_at > ai_conv_reply_states[i].updated_at)
+      oldest = i;
+  }
+
+  if (!create)
+    return NULL;
+
+  memset(&ai_conv_reply_states[oldest], 0, sizeof(ai_conv_reply_states[oldest]));
+  ai_conv_reply_states[oldest].mob = mob;
+  ai_conv_reply_states[oldest].last_intent = AI_INTENT_NONE;
+  ai_conv_reply_states[oldest].last_template_ids[0] = -1;
+  ai_conv_reply_states[oldest].last_template_ids[1] = -1;
+  ai_conv_reply_states[oldest].last_template_ids[2] = -1;
+  ai_conv_reply_states[oldest].updated_at = time(0);
+  return &ai_conv_reply_states[oldest];
+}
+
+static int ai_is_weather_smalltalk(const char *text)
+{
+  if (!text)
+    return FALSE;
+  return ai_text_has_sub_ci(text, "weather") || ai_text_has_sub_ci(text, "rain") || ai_text_has_sub_ci(text, "sun") ||
+         ai_text_has_sub_ci(text, "storm") || ai_text_has_sub_ci(text, "wind") || ai_text_has_sub_ci(text, "snow") ||
+         ai_text_has_sub_ci(text, "fog") || ai_text_has_sub_ci(text, "nice day") || ai_text_has_sub_ci(text, "cloud");
+}
+
+static unsigned long ai_conv_seed(struct char_data *mob, int intent, unsigned int counter)
+{
+  unsigned long h = 1469598103UL;
+  int role = (mob && mob->ai_prof) ? mob->ai_prof->role : ROLE_UNKNOWN;
+  int zone = (mob && IN_ROOM(mob) != NOWHERE) ? world[IN_ROOM(mob)].zone : -1;
+
+  h = ai_hash_mix(h, (unsigned long)((mob && IS_NPC(mob)) ? GET_MOB_VNUM(mob) : 0));
+  h = ai_hash_mix(h, (unsigned long)role);
+  h = ai_hash_mix(h, (unsigned long)zone);
+  h = ai_hash_mix(h, (unsigned long)intent);
+  h = ai_hash_mix(h, (unsigned long)counter);
+  return h;
+}
+
+static const char *const syn_greeting[] = {"Greetings", "Hello", "Well met", "Good day", NULL};
+static const char *const syn_notice[] = {"friend", "traveler", "neighbor", "folk", NULL};
+static const char *const syn_tone_guard[] = {"Keep the peace", "Stay alert", "Walk steady", NULL};
+static const char *const syn_tone_inn[] = {"Rest easy", "Warm yourself", "Take a calm breath", NULL};
+static const char *const syn_tone_merch[] = {"Trade fair", "Keep your coin close", "Mind the market", NULL};
+static const char *const syn_tone_bandit[] = {"Watch your purse", "Keep your wits", "Step careful", NULL};
+static const char *const syn_weather[] = {"weather", "skies", "wind", "clouds", NULL};
+static const char *const syn_weather_state[] = {"shifts quickly", "turns by the hour", "never stays still", NULL};
+static const char *const syn_weather_action[] = {"Carry a cloak", "Plan your road", "Keep dry if you can", NULL};
+
+static const struct ai_synonym_group ai_synonyms_common[] = {
+  {"GREETING", syn_greeting},
+  {"NOTICE", syn_notice},
+  {"WEATHER", syn_weather},
+  {"WSTATE", syn_weather_state},
+  {"WACTION", syn_weather_action},
+  {NULL, NULL}
+};
+
+static const struct ai_synonym_group ai_synonyms_guard[] = {
+  {"TONE", syn_tone_guard},
+  {NULL, NULL}
+};
+
+static const struct ai_synonym_group ai_synonyms_inn[] = {
+  {"TONE", syn_tone_inn},
+  {NULL, NULL}
+};
+
+static const struct ai_synonym_group ai_synonyms_merchant[] = {
+  {"TONE", syn_tone_merch},
+  {NULL, NULL}
+};
+
+static const struct ai_synonym_group ai_synonyms_bandit[] = {
+  {"TONE", syn_tone_bandit},
+  {NULL, NULL}
+};
+
+static const struct ai_reply_template ai_reply_templates[] = {
+  {1001, ROLE_GUARD, AI_TEMPLATE_INTENT_SMALLTALK, "{GREETING}, {NOTICE}. {TONE}."},
+  {1002, ROLE_GUARD, AI_TEMPLATE_INTENT_SMALLTALK, "{GREETING}. {TONE}, and mind the crossings."},
+  {1003, ROLE_GUARD, AI_TEMPLATE_INTENT_WEATHER, "The {WEATHER} {WSTATE}; {WACTION}."},
+  {1004, ROLE_GUARD, AI_TEMPLATE_INTENT_WEATHER, "Around here the {WEATHER} {WSTATE}. {TONE}."},
+  {1101, ROLE_MERCHANT, AI_TEMPLATE_INTENT_SMALLTALK, "{GREETING}, {NOTICE}. {TONE}."},
+  {1102, ROLE_MERCHANT, AI_TEMPLATE_INTENT_SMALLTALK, "{GREETING}. {TONE}, and may business be steady."},
+  {1103, ROLE_MERCHANT, AI_TEMPLATE_INTENT_WEATHER, "When the {WEATHER} {WSTATE}, carts slow down. {WACTION}."},
+  {1104, ROLE_MERCHANT, AI_TEMPLATE_INTENT_WEATHER, "The {WEATHER} {WSTATE}; {TONE}."},
+  {1201, ROLE_BANDIT, AI_TEMPLATE_INTENT_SMALLTALK, "{GREETING}. {TONE}."},
+  {1202, ROLE_BANDIT, AI_TEMPLATE_INTENT_SMALLTALK, "{NOTICE}, {TONE} out here."},
+  {1203, ROLE_BANDIT, AI_TEMPLATE_INTENT_WEATHER, "The {WEATHER} {WSTATE}. {TONE}."},
+  {1204, ROLE_BANDIT, AI_TEMPLATE_INTENT_WEATHER, "Bad {WEATHER}? Good cover. {WACTION}."},
+  {1301, ROLE_BOSS, AI_TEMPLATE_INTENT_SMALLTALK, "{GREETING}. Keep formation and keep focus."},
+  {1302, ROLE_BOSS, AI_TEMPLATE_INTENT_WEATHER, "If the {WEATHER} {WSTATE}, adjust your route accordingly."},
+  {1401, ROLE_CIVILIAN, AI_TEMPLATE_INTENT_SMALLTALK, "{GREETING}. Hope your road stays kind."},
+  {1402, ROLE_CIVILIAN, AI_TEMPLATE_INTENT_WEATHER, "Seems the {WEATHER} {WSTATE} today."},
+  {-1, 0, 0, NULL}
+};
+
+static const char *ai_synonym_pick(const struct ai_synonym_group *groups, const char *token, unsigned long seed, int slot)
+{
+  int i;
+
+  if (!token)
+    return "";
+
+  if (groups) {
+    for (i = 0; groups[i].token; i++) {
+      if (!strcmp(groups[i].token, token)) {
+        int n = 0;
+        while (groups[i].words && groups[i].words[n]) n++;
+        if (n <= 0)
+          break;
+        return groups[i].words[(seed + (unsigned long)(slot * 13)) % (unsigned long)n];
+      }
+    }
+  }
+
+  for (i = 0; ai_synonyms_common[i].token; i++) {
+    if (!strcmp(ai_synonyms_common[i].token, token)) {
+      int n = 0;
+      while (ai_synonyms_common[i].words && ai_synonyms_common[i].words[n]) n++;
+      if (n <= 0)
+        break;
+      return ai_synonyms_common[i].words[(seed + (unsigned long)(slot * 17)) % (unsigned long)n];
+    }
+  }
+
+  return "";
+}
+
+static void ai_template_expand(const char *tpl, const struct ai_synonym_group *groups, unsigned long seed, char *out, size_t outsz)
+{
+  size_t oi = 0;
+  size_t i = 0;
+  int slot = 0;
+
+  if (!out || outsz == 0)
+    return;
+  out[0] = '\0';
+  if (!tpl)
+    return;
+
+  while (tpl[i] != '\0' && oi + 1 < outsz) {
+    if (tpl[i] == '{') {
+      char token[32];
+      size_t ti = 0;
+      const char *word;
+      i++;
+      while (tpl[i] && tpl[i] != '}' && ti + 1 < sizeof(token))
+        token[ti++] = tpl[i++];
+      token[ti] = '\0';
+      if (tpl[i] == '}')
+        i++;
+      word = ai_synonym_pick(groups, token, seed, slot++);
+      if (word) {
+        size_t wi;
+        for (wi = 0; word[wi] != '\0' && oi + 1 < outsz; wi++)
+          out[oi++] = word[wi];
+      }
+      continue;
+    }
+    out[oi++] = tpl[i++];
+  }
+  out[oi] = '\0';
+}
+
+static int ai_template_pick_index(const int *ids, int count, unsigned long seed, int avoid_id, int avoid_prev, int avoid_recent1, int avoid_recent2)
+{
+  int start;
+  int pass;
+  int i;
+
+  if (!ids || count <= 0)
+    return -1;
+
+  start = (int)(seed % (unsigned long)count);
+  for (pass = 0; pass < 2; pass++) {
+    for (i = 0; i < count; i++) {
+      int idx = (start + i) % count;
+      int id = ids[idx];
+      if (pass == 0) {
+        if (id == avoid_prev || id == avoid_id || id == avoid_recent1 || id == avoid_recent2)
+          continue;
+      } else {
+        if (id == avoid_prev)
+          continue;
+      }
+      return idx;
+    }
+  }
+
+  return start;
+}
+
+static const char *ai_template_reply_for_intent(struct char_data *mob, int intent, const char *text, int avoid_template_id, int *out_template_id)
+{
+  static char out[AI_TEMPLATE_BUFFER_MAX];
+  struct ai_conv_reply_state *st;
+  int role;
+  int mapped_intent = 0;
+  int candidate_idx[16];
+  int candidate_count = 0;
+  int chosen_slot;
+  int i;
+  unsigned long seed;
+  const struct ai_reply_template *t;
+  const struct ai_synonym_group *role_groups = NULL;
+
+  if (!mob || !mob->ai_prof)
+    return NULL;
+
+  if (intent == AI_INTENT_SMALLTALK)
+    mapped_intent = ai_is_weather_smalltalk(text) ? AI_TEMPLATE_INTENT_WEATHER : AI_TEMPLATE_INTENT_SMALLTALK;
+  else
+    return NULL;
+
+  role = mob->ai_prof->role;
+  if (role == ROLE_MERCHANT && mob->ai_prof->style == 1)
+    role_groups = ai_synonyms_inn;
+  else if (role == ROLE_GUARD)
+    role_groups = ai_synonyms_guard;
+  else if (role == ROLE_MERCHANT)
+    role_groups = ai_synonyms_merchant;
+  else if (role == ROLE_BANDIT)
+    role_groups = ai_synonyms_bandit;
+
+  for (i = 0; ai_reply_templates[i].id >= 0; i++) {
+    if (ai_reply_templates[i].intent != mapped_intent)
+      continue;
+    if (ai_reply_templates[i].role != role && ai_reply_templates[i].role != ROLE_CIVILIAN)
+      continue;
+    if (candidate_count < (int)(sizeof(candidate_idx) / sizeof(candidate_idx[0])))
+      candidate_idx[candidate_count++] = i;
+  }
+
+  if (candidate_count <= 0)
+    return NULL;
+
+  st = ai_conv_reply_state_get(mob, 1);
+  if (!st)
+    return NULL;
+
+  st->counter++;
+  seed = ai_conv_seed(mob, mapped_intent, st->counter);
+  seed = ai_hash_mix(seed, ai_hash_text_stable(text));
+
+  {
+    int ids[16];
+    for (i = 0; i < candidate_count; i++)
+      ids[i] = ai_reply_templates[candidate_idx[i]].id;
+    chosen_slot = ai_template_pick_index(ids, candidate_count, seed, avoid_template_id,
+                                         st->last_template_ids[0], st->last_template_ids[1], st->last_template_ids[2]);
+    if (chosen_slot < 0)
+      return NULL;
+  }
+
+  t = &ai_reply_templates[candidate_idx[chosen_slot]];
+  ai_template_expand(t->text, role_groups, seed, out, sizeof(out));
+  if (!out[0])
+    return NULL;
+
+  st->last_template_ids[2] = st->last_template_ids[1];
+  st->last_template_ids[1] = st->last_template_ids[0];
+  st->last_template_ids[0] = t->id;
+  st->last_intent = mapped_intent;
+  st->updated_at = time(0);
+  if (out_template_id)
+    *out_template_id = t->id;
+  return out;
+}
+
 static const char *ai_pick_weighted_phrase(const char *const *normal_pool, const char *const *rare_pool)
 {
   if (rare_pool && rand_number(1, 100) <= 5)
@@ -1743,7 +2093,7 @@ static const char *ai_direction_line(struct char_data *mob, int target_topic)
   return "Keep to the main road and ask a guard post.";
 }
 
-static const char *ai_line_for_intent(struct char_data *mob, struct ai_actor_memory_entry *e, int intent, int attitude, const char *text, const char **out_pool, const char **out_reason)
+static const char *ai_line_for_intent(struct char_data *mob, struct ai_actor_memory_entry *e, int intent, int attitude, const char *text, int avoid_template_id, int *out_template_id, const char **out_pool, const char **out_reason)
 {
   static char line[224];
   int innkeeper;
@@ -1809,7 +2159,12 @@ static const char *ai_line_for_intent(struct char_data *mob, struct ai_actor_mem
     snprintf(e->last_topic_key, sizeof(e->last_topic_key), "%s", ai_topic_key_name(topic));
   }
 
-  if (intent == AI_INTENT_SMALLTALK && (ai_text_has_sub_ci(text, "weather") || ai_text_has_sub_ci(text, "rain") || ai_text_has_sub_ci(text, "sun") || ai_text_has_sub_ci(text, "storm") || ai_text_has_sub_ci(text, "wind") || ai_text_has_sub_ci(text, "snow") || ai_text_has_sub_ci(text, "fog") || ai_text_has_sub_ci(text, "nice day"))) {
+  if (intent == AI_INTENT_SMALLTALK && ai_is_weather_smalltalk(text)) {
+    const char *tpl_line = ai_template_reply_for_intent(mob, intent, text, avoid_template_id, out_template_id);
+    if (tpl_line && *tpl_line) {
+      if (out_pool) *out_pool = "POOL_TEMPLATE_WEATHER";
+      return tpl_line;
+    }
     if (out_pool) *out_pool = "POOL_WEATHER";
     if (role == ROLE_GUARD)
       return ai_pick_phrase(weather_guard);
@@ -1821,6 +2176,11 @@ static const char *ai_line_for_intent(struct char_data *mob, struct ai_actor_mem
   }
 
   if (intent == AI_INTENT_SMALLTALK) {
+    const char *tpl_line = ai_template_reply_for_intent(mob, intent, text, avoid_template_id, out_template_id);
+    if (tpl_line && *tpl_line) {
+      if (out_pool) *out_pool = "POOL_TEMPLATE_SMALLTALK";
+      return tpl_line;
+    }
     if (out_pool) *out_pool = "POOL_SMALLTALK";
     if (role == ROLE_GUARD) return ai_pick_phrase(smalltalk_guard);
     if (role == ROLE_MERCHANT && innkeeper) return ai_pick_phrase(smalltalk_inn);
@@ -2874,6 +3234,8 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
   int confidence = 0;
   int speech_class = AI_SPEECH_UNKNOWN;
   const char *line = NULL;
+  int avoid_template_id = -1;
+  int selected_template_id = -1;
   char normalized[256];
 
   if (!mob || !actor || !mob->ai_prof || !mob->ai_state || IS_NPC(actor))
@@ -2957,6 +3319,16 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
     return;
   if (!ai_actor_room_response_slot(mob, actor, type, intent, confidence, normalized))
     return;
+
+  if (type == AI_EVENT_PLAYER_SAY && IN_ROOM(mob) != NOWHERE) {
+    struct ai_player_arb_entry *arb = ai_player_arb_lookup(IN_ROOM(mob), GET_IDNUM(actor), type, ai_text_hash_simple(normalized), now);
+    if (arb) {
+      if (mob == arb->responder2)
+        avoid_template_id = arb->responder1_template_id;
+      else if (mob == arb->responder1)
+        avoid_template_id = arb->responder2_template_id;
+    }
+  }
   if ((now - e->last_reply_time) < AI_PER_PLAYER_REPLY_COOLDOWN_SECS)
     return;
 
@@ -2965,7 +3337,7 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
     const char *reason = ai_event_reason_name(type);
     char targeted[256];
 
-    line = ai_line_for_intent(mob, e, intent, e->attitude, normalized, &pool, &reason);
+    line = ai_line_for_intent(mob, e, intent, e->attitude, normalized, avoid_template_id, &selected_template_id, &pool, &reason);
     if (!line || !*line)
       return;
 
@@ -2973,6 +3345,16 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
     snprintf(targeted, sizeof(targeted), "$n says to %s, '%s'", GET_NAME(actor), line);
     ai_actor_schedule_reaction_speech(mob, actor, targeted);
     e->last_reply_time = now;
+
+    if (type == AI_EVENT_PLAYER_SAY && selected_template_id >= 0 && IN_ROOM(mob) != NOWHERE) {
+      struct ai_player_arb_entry *arb = ai_player_arb_lookup(IN_ROOM(mob), GET_IDNUM(actor), type, ai_text_hash_simple(normalized), now);
+      if (arb) {
+        if (mob == arb->responder1)
+          arb->responder1_template_id = selected_template_id;
+        else if (mob == arb->responder2)
+          arb->responder2_template_id = selected_template_id;
+      }
+    }
   }
 }
 
