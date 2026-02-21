@@ -48,6 +48,76 @@
 #define AI_ZONE_ALERT_MAX 64
 #define AI_MOOD_SPRING_K 0.15f
 #define AI_MOOD_DAMPING 0.75f
+#define AI_SESSION_READ_MAX 16
+
+enum ai_time_bucket {
+  AI_TIME_DAY = 0,
+  AI_TIME_DUSK,
+  AI_TIME_NIGHT,
+  AI_TIME_DAWN
+};
+
+enum ai_player_archetype {
+  AI_ARCH_UNKNOWN = 0,
+  AI_ARCH_TROUBLEMAKER,
+  AI_ARCH_ERRATIC,
+  AI_ARCH_TRANSACTOR,
+  AI_ARCH_EXPLORER,
+  AI_ARCH_SOCIALIZER,
+  AI_ARCH_SILENT
+};
+
+enum ai_conv_arc_state {
+  AI_ARC_STRANGER = 0,
+  AI_ARC_ACKNOWLEDGED,
+  AI_ARC_ENGAGED,
+  AI_ARC_RAPPORT,
+  AI_ARC_COLD
+};
+
+struct ai_context_vector {
+  int safe_room;
+  int lawful_or_city;
+  int dark;
+  int indoors;
+  int visible_pc_count;
+  int visible_mob_count;
+  int guard_present;
+  int authority_present;
+  int open_exit_count;
+  int recent_violence;
+  enum ai_time_bucket time_bucket;
+  float zone_danger;
+  float zone_alert;
+  float alignment_delta;
+};
+
+struct ai_session_read_entry {
+  long player_idnum;
+  time_t last_exchange_time;
+  time_t cooldown_until;
+  int exchange_count;
+  int speech_count;
+  int emote_count;
+  int greet_count;
+  int question_count;
+  int hostile_count;
+  int social_count;
+  int transact_count;
+  int story_count;
+  int topic_jump_count;
+  int last_speech_act;
+  int non_hostile_streak;
+  float aggression;
+  float curiosity;
+  float social;
+  float erratic;
+  float first_impression;
+  int first_impression_set;
+  enum ai_player_archetype archetype;
+  enum ai_conv_arc_state arc;
+  int rapport_rumor_used;
+};
 
 enum ai_conversation_topic {
   AI_CONV_TOPIC_UNKNOWN = 0,
@@ -153,6 +223,11 @@ struct ai_conv_actor_state {
   float mood_velocity;
   time_t mood_last_tick;
   struct ai_threat_entry threats[AI_THREAT_TABLE_MAX];
+  struct ai_session_read_entry session_reads[AI_SESSION_READ_MAX];
+  int tone_clipped;
+  int tone_no_extras;
+  int tone_day_trade;
+  int tone_night_watch;
 };
 
 struct ai_conv_room_state {
@@ -167,6 +242,7 @@ struct ai_conv_room_state {
   time_t topic_expires_at;
   time_t last_start_time;
   time_t last_player_speech_time;
+  time_t last_violence_time;
 };
 
 #define AI_CONV_ACTOR_STATE_MAX 512
@@ -249,6 +325,25 @@ static void ai_heatmap_decay_tick(time_t now);
 static void ai_alert_raise(int zone_rnum, float level, long target_idnum, int duration_secs);
 static float ai_alert_level(int zone_rnum, time_t now);
 static void ai_alert_decay_tick(time_t now);
+static enum ai_time_bucket ai_time_bucket_now(void);
+static const char *ai_time_bucket_name(enum ai_time_bucket b);
+static const char *ai_arch_name(enum ai_player_archetype a);
+static const char *ai_arc_name(enum ai_conv_arc_state a);
+static int ai_is_hostile_intent(int intent);
+static int ai_is_social_intent(int intent);
+static int ai_is_transact_intent(int intent);
+static int ai_is_story_intent(int intent);
+static int ai_is_question_intent(int intent);
+static void ai_context_vector_build(struct char_data *mob, struct char_data *actor, time_t now, struct ai_context_vector *out);
+static struct ai_session_read_entry *ai_session_read_get(struct ai_conv_actor_state *st, long player_id, int create, time_t now);
+static void ai_session_read_update(struct ai_session_read_entry *sr, enum ai_event_type type, int intent, const char *normalized, time_t now);
+static void ai_session_read_apply_impression(struct ai_session_read_entry *sr, struct ai_actor_memory_entry *e, struct ai_conv_actor_state *conv_st);
+static void ai_session_read_update_arc(struct ai_session_read_entry *sr, struct char_data *mob, const struct ai_context_vector *ctx);
+static float ai_session_cooldown_penalty(struct ai_session_read_entry *sr, enum ai_action_type action, time_t now);
+static float ai_session_arc_action_bias(const struct ai_session_read_entry *sr, enum ai_action_type action);
+static float ai_session_arch_action_bias(const struct ai_session_read_entry *sr, enum ai_action_type action);
+static float ai_context_action_bias(struct char_data *mob, const struct ai_context_vector *ctx, enum ai_action_type action, int intent);
+static float ai_context_suspicion_bias(struct char_data *mob, const struct ai_context_vector *ctx);
 static float ai_suspicion_score(struct char_data *mob, struct char_data *actor, struct ai_actor_memory_entry *e, time_t now, int speech_act);
 static float ai_utility_score(struct char_data *mob, enum ai_action_type action, struct char_data *actor, int speech_act, int intent, time_t now, float attention_score, int is_emote_event, float suspicion);
 
@@ -737,6 +832,356 @@ static void ai_conv_room_end(struct ai_conv_room_state *room_st, time_t now)
   room_st->line_count = 0;
   room_st->last_speaker_id = 0;
   room_st->topic_expires_at = 0;
+}
+
+static enum ai_time_bucket ai_time_bucket_now(void)
+{
+  if (time_info.hours >= 6 && time_info.hours <= 8)
+    return AI_TIME_DAWN;
+  if (time_info.hours >= 9 && time_info.hours <= 17)
+    return AI_TIME_DAY;
+  if (time_info.hours >= 18 && time_info.hours <= 20)
+    return AI_TIME_DUSK;
+  return AI_TIME_NIGHT;
+}
+
+static const char *ai_time_bucket_name(enum ai_time_bucket b)
+{
+  switch (b) {
+    case AI_TIME_DAY: return "day";
+    case AI_TIME_DUSK: return "dusk";
+    case AI_TIME_NIGHT: return "night";
+    case AI_TIME_DAWN: return "dawn";
+    default: return "day";
+  }
+}
+
+static const char *ai_arch_name(enum ai_player_archetype a)
+{
+  switch (a) {
+    case AI_ARCH_TROUBLEMAKER: return "trouble";
+    case AI_ARCH_ERRATIC: return "erratic";
+    case AI_ARCH_TRANSACTOR: return "transact";
+    case AI_ARCH_EXPLORER: return "explore";
+    case AI_ARCH_SOCIALIZER: return "social";
+    case AI_ARCH_SILENT: return "silent";
+    default: return "unknown";
+  }
+}
+
+static const char *ai_arc_name(enum ai_conv_arc_state a)
+{
+  switch (a) {
+    case AI_ARC_STRANGER: return "stranger";
+    case AI_ARC_ACKNOWLEDGED: return "ack";
+    case AI_ARC_ENGAGED: return "engaged";
+    case AI_ARC_RAPPORT: return "rapport";
+    case AI_ARC_COLD: return "cold";
+    default: return "stranger";
+  }
+}
+
+static int ai_is_hostile_intent(int intent)
+{
+  return intent == AI_INTENT_THREAT || intent == AI_INTENT_INSULT || intent == AI_INTENT_EMOTE_SPIT;
+}
+
+static int ai_is_social_intent(int intent)
+{
+  return intent == AI_INTENT_GREET || intent == AI_INTENT_SMALLTALK || intent == AI_INTENT_PRAISE || intent >= AI_INTENT_EMOTE_DANCE;
+}
+
+static int ai_is_transact_intent(int intent)
+{
+  return intent == AI_INTENT_ASK_SERVICE || intent == AI_INTENT_BUY_ARMOR || intent == AI_INTENT_BUY_WEAPON || intent == AI_INTENT_BUY_FOOD || intent == AI_INTENT_BANK || intent == AI_INTENT_INN;
+}
+
+static int ai_is_story_intent(int intent)
+{
+  return intent == AI_INTENT_RUMOR || intent == AI_INTENT_QUEST || intent == AI_INTENT_CONFUSION;
+}
+
+static int ai_is_question_intent(int intent)
+{
+  return intent == AI_INTENT_DIRECTIONS || intent == AI_INTENT_BANK || intent == AI_INTENT_INN || intent == AI_INTENT_HEAL || intent == AI_INTENT_QUEST || intent == AI_INTENT_ASK_SERVICE || intent == AI_INTENT_RUMOR || intent == AI_INTENT_CONFUSION;
+}
+
+static void ai_context_vector_build(struct char_data *mob, struct char_data *actor, time_t now, struct ai_context_vector *out)
+{
+  struct char_data *it;
+  int d;
+  int zone;
+
+  if (!mob || IN_ROOM(mob) == NOWHERE || !out)
+    return;
+
+  memset(out, 0, sizeof(*out));
+  zone = world[IN_ROOM(mob)].zone;
+  out->safe_room = ROOM_FLAGGED(IN_ROOM(mob), ROOM_PEACEFUL) || ROOM_FLAGGED(IN_ROOM(mob), ROOM_NOMOB);
+  out->lawful_or_city = (SECT(IN_ROOM(mob)) == SECT_CITY) || ROOM_FLAGGED(IN_ROOM(mob), ROOM_PEACEFUL);
+  out->dark = ROOM_FLAGGED(IN_ROOM(mob), ROOM_DARK);
+  out->indoors = ROOM_FLAGGED(IN_ROOM(mob), ROOM_INDOORS);
+  out->time_bucket = ai_time_bucket_now();
+  out->zone_danger = ai_heatmap_danger(zone, now);
+  out->zone_alert = ai_alert_level(zone, now);
+
+  for (d = 0; d < NUM_OF_DIRS; d++)
+    if (CAN_GO(mob, d))
+      out->open_exit_count++;
+
+  for (it = world[IN_ROOM(mob)].people; it; it = it->next_in_room) {
+    if (!CAN_SEE(mob, it))
+      continue;
+    if (IS_NPC(it)) {
+      out->visible_mob_count++;
+      if (it->ai_prof && it->ai_prof->role == ROLE_GUARD)
+        out->guard_present = TRUE;
+      if (it->ai_prof && (it->ai_prof->role == ROLE_GUARD || it->ai_prof->role == ROLE_BOSS))
+        out->authority_present = TRUE;
+    } else
+      out->visible_pc_count++;
+  }
+
+  if (actor)
+    out->alignment_delta = ai_clampf((float)abs(GET_ALIGNMENT(mob) - GET_ALIGNMENT(actor)) / 1000.0f, 0.0f, 1.0f);
+}
+
+static struct ai_session_read_entry *ai_session_read_get(struct ai_conv_actor_state *st, long player_id, int create, time_t now)
+{
+  int i, oldest = 0;
+  if (!st || player_id <= 0)
+    return NULL;
+  for (i = 0; i < AI_SESSION_READ_MAX; i++)
+    if (st->session_reads[i].player_idnum == player_id)
+      return &st->session_reads[i];
+  if (!create)
+    return NULL;
+  for (i = 0; i < AI_SESSION_READ_MAX; i++) {
+    if (st->session_reads[i].player_idnum == 0) {
+      memset(&st->session_reads[i], 0, sizeof(st->session_reads[i]));
+      st->session_reads[i].player_idnum = player_id;
+      st->session_reads[i].arc = AI_ARC_STRANGER;
+      st->session_reads[i].archetype = AI_ARCH_UNKNOWN;
+      st->session_reads[i].last_exchange_time = now;
+      st->session_reads[i].last_speech_act = AI_INTENT_NONE;
+      return &st->session_reads[i];
+    }
+    if (st->session_reads[i].last_exchange_time < st->session_reads[oldest].last_exchange_time)
+      oldest = i;
+  }
+  memset(&st->session_reads[oldest], 0, sizeof(st->session_reads[oldest]));
+  st->session_reads[oldest].player_idnum = player_id;
+  st->session_reads[oldest].arc = AI_ARC_STRANGER;
+  st->session_reads[oldest].archetype = AI_ARCH_UNKNOWN;
+  st->session_reads[oldest].last_exchange_time = now;
+  st->session_reads[oldest].last_speech_act = AI_INTENT_NONE;
+  return &st->session_reads[oldest];
+}
+
+static void ai_session_read_update(struct ai_session_read_entry *sr, enum ai_event_type type, int intent, const char *normalized, time_t now)
+{
+  float denom;
+  if (!sr)
+    return;
+  sr->exchange_count++;
+  sr->last_exchange_time = now;
+  if (type == AI_EVENT_PLAYER_SAY)
+    sr->speech_count++;
+  if (type == AI_EVENT_PLAYER_EMOTE)
+    sr->emote_count++;
+  if (intent == AI_INTENT_GREET || intent == AI_INTENT_PRAISE)
+    sr->greet_count++;
+  if (ai_is_question_intent(intent) || (normalized && strchr(normalized, '?')))
+    sr->question_count++;
+  if (ai_is_hostile_intent(intent))
+    sr->hostile_count++;
+  if (ai_is_social_intent(intent))
+    sr->social_count++;
+  if (ai_is_transact_intent(intent))
+    sr->transact_count++;
+  if (ai_is_story_intent(intent))
+    sr->story_count++;
+  if (sr->last_speech_act != AI_INTENT_NONE && sr->last_speech_act != intent)
+    sr->topic_jump_count++;
+  sr->last_speech_act = intent;
+
+  if (!sr->first_impression_set) {
+    float imp = 0.0f;
+    if (intent == AI_INTENT_GREET || intent == AI_INTENT_PRAISE || (type == AI_EVENT_PLAYER_EMOTE && !ai_is_hostile_intent(intent))) imp = 0.45f;
+    else if (ai_is_question_intent(intent)) imp = 0.05f;
+    else if (ai_is_hostile_intent(intent)) imp = -0.55f;
+    sr->first_impression = ai_clampf(imp, -1.0f, 1.0f);
+    sr->first_impression_set = TRUE;
+  }
+
+  denom = (float)MAX(1, sr->exchange_count);
+  sr->aggression = ai_clampf((float)sr->hostile_count / denom, 0.0f, 1.0f);
+  sr->curiosity = ai_clampf((float)(sr->question_count + sr->story_count) / (denom * 1.2f), 0.0f, 1.0f);
+  sr->social = ai_clampf((float)(sr->social_count + sr->greet_count) / (denom * 1.3f), 0.0f, 1.0f);
+  sr->erratic = ai_clampf((float)sr->topic_jump_count / (denom * 0.9f), 0.0f, 1.0f);
+
+  if (sr->exchange_count >= 3 && ((sr->exchange_count == 3) || (sr->exchange_count % 5 == 0))) {
+    if (sr->speech_count == 0 && sr->emote_count > 0)
+      sr->archetype = AI_ARCH_SILENT;
+    else if (sr->aggression > 0.45f)
+      sr->archetype = AI_ARCH_TROUBLEMAKER;
+    else if (sr->transact_count >= sr->social_count && sr->transact_count >= sr->story_count)
+      sr->archetype = AI_ARCH_TRANSACTOR;
+    else if (sr->curiosity > 0.55f && sr->story_count >= sr->question_count / 2)
+      sr->archetype = AI_ARCH_EXPLORER;
+    else if (sr->social > 0.5f)
+      sr->archetype = AI_ARCH_SOCIALIZER;
+    else if (sr->erratic > 0.55f)
+      sr->archetype = AI_ARCH_ERRATIC;
+    else
+      sr->archetype = AI_ARCH_UNKNOWN;
+  }
+
+  if (ai_is_hostile_intent(intent))
+    sr->non_hostile_streak = 0;
+  else
+    sr->non_hostile_streak++;
+}
+
+static void ai_session_read_apply_impression(struct ai_session_read_entry *sr, struct ai_actor_memory_entry *e, struct ai_conv_actor_state *conv_st)
+{
+  float decay;
+  if (!sr || !e || !sr->first_impression_set)
+    return;
+  decay = ai_clampf(1.0f - ((float)MIN(sr->exchange_count, 10) / 10.0f), 0.0f, 1.0f);
+  if (sr->first_impression > 0.0f) {
+    e->belief_familiarity = ai_clampf(e->belief_familiarity + (0.08f * sr->first_impression * decay), 0.0f, 1.0f);
+    if (conv_st)
+      conv_st->mood_target = ai_clampf(conv_st->mood_target + (0.06f * sr->first_impression * decay), -1.0f, 1.0f);
+  } else if (sr->first_impression < 0.0f) {
+    e->belief_hostility = ai_clampf(e->belief_hostility + (0.10f * -sr->first_impression * decay), 0.0f, 1.0f);
+  }
+}
+
+static void ai_session_read_update_arc(struct ai_session_read_entry *sr, struct char_data *mob, const struct ai_context_vector *ctx)
+{
+  int rapport_req = 4;
+  if (!sr || !mob || !mob->ai_prof)
+    return;
+  if (mob->ai_prof->role == ROLE_GUARD)
+    rapport_req = 6;
+
+  if (ai_is_hostile_intent(sr->last_speech_act) || sr->aggression > 0.7f)
+    sr->arc = AI_ARC_COLD;
+  else if (sr->arc == AI_ARC_STRANGER && sr->exchange_count > 0)
+    sr->arc = AI_ARC_ACKNOWLEDGED;
+  else if (sr->arc == AI_ARC_ACKNOWLEDGED && sr->exchange_count >= 2 && sr->aggression < 0.35f && (sr->question_count > 0 || sr->social_count > 0))
+    sr->arc = AI_ARC_ENGAGED;
+  else if (sr->arc == AI_ARC_ENGAGED && sr->exchange_count >= rapport_req && sr->aggression < 0.25f && (sr->story_count > 0 || sr->social_count > 2) && sr->archetype != AI_ARCH_TRANSACTOR)
+    sr->arc = AI_ARC_RAPPORT;
+  else if (sr->arc == AI_ARC_COLD && sr->non_hostile_streak >= 3)
+    sr->arc = AI_ARC_ACKNOWLEDGED;
+
+  if (mob->ai_prof->role == ROLE_BANDIT) {
+    if (sr->arc > AI_ARC_ENGAGED)
+      sr->arc = AI_ARC_ENGAGED;
+    if (sr->archetype == AI_ARCH_TROUBLEMAKER || sr->archetype == AI_ARCH_TRANSACTOR)
+      sr->arc = MIN(sr->arc, AI_ARC_ACKNOWLEDGED);
+  }
+  if (mob->ai_prof->role == ROLE_CULTIST && !(sr->archetype == AI_ARCH_EXPLORER && sr->curiosity > 0.55f) && sr->arc == AI_ARC_RAPPORT)
+    sr->arc = AI_ARC_ENGAGED;
+  if (mob->ai_prof->role == ROLE_MERCHANT && ctx && ctx->zone_alert > 0.65f && sr->arc == AI_ARC_RAPPORT)
+    sr->arc = AI_ARC_ENGAGED;
+}
+
+static float ai_session_cooldown_penalty(struct ai_session_read_entry *sr, enum ai_action_type action, time_t now)
+{
+  if (!sr || now >= sr->cooldown_until)
+    return 0.0f;
+  if (action == AI_ACTION_SPEAK || action == AI_ACTION_SPEAK_WARN)
+    return -1.5f;
+  return 0.0f;
+}
+
+static float ai_session_arc_action_bias(const struct ai_session_read_entry *sr, enum ai_action_type action)
+{
+  if (!sr)
+    return 0.0f;
+  switch (sr->arc) {
+    case AI_ARC_STRANGER:
+      if (action == AI_ACTION_SPEAK) return -0.15f;
+      break;
+    case AI_ARC_ACKNOWLEDGED:
+      if (action == AI_ACTION_SPEAK) return 0.05f;
+      break;
+    case AI_ARC_ENGAGED:
+      if (action == AI_ACTION_SPEAK) return 0.15f;
+      break;
+    case AI_ARC_RAPPORT:
+      if (action == AI_ACTION_SPEAK) return 0.2f;
+      break;
+    case AI_ARC_COLD:
+      if (action == AI_ACTION_SPEAK_WARN || action == AI_ACTION_SPEAK_DEFLECT) return 0.25f;
+      if (action == AI_ACTION_SPEAK) return -0.25f;
+      break;
+    default: break;
+  }
+  return 0.0f;
+}
+
+static float ai_session_arch_action_bias(const struct ai_session_read_entry *sr, enum ai_action_type action)
+{
+  if (!sr)
+    return 0.0f;
+  if (sr->archetype == AI_ARCH_TROUBLEMAKER) {
+    if (action == AI_ACTION_OBSERVE || action == AI_ACTION_SPEAK_WARN) return 0.3f;
+    if (action == AI_ACTION_SPEAK) return -0.2f;
+  } else if (sr->archetype == AI_ARCH_TRANSACTOR) {
+    if (action == AI_ACTION_SPEAK) return 0.12f;
+    if (action == AI_ACTION_EMOTE_REACT) return -0.15f;
+  } else if (sr->archetype == AI_ARCH_EXPLORER) {
+    if (action == AI_ACTION_SPEAK) return 0.15f;
+  } else if (sr->archetype == AI_ARCH_SOCIALIZER) {
+    if (action == AI_ACTION_SPEAK) return 0.18f;
+  } else if (sr->archetype == AI_ARCH_ERRATIC) {
+    if (action == AI_ACTION_SPEAK_DEFLECT) return 0.22f;
+  } else if (sr->archetype == AI_ARCH_SILENT) {
+    if (action == AI_ACTION_EMOTE_REACT) return 0.2f;
+  }
+  return 0.0f;
+}
+
+static float ai_context_action_bias(struct char_data *mob, const struct ai_context_vector *ctx, enum ai_action_type action, int intent)
+{
+  float bias = 0.0f;
+  if (!mob || !ctx || !mob->ai_prof)
+    return 0.0f;
+  if (ctx->safe_room && (action == AI_ACTION_SPEAK_WARN || action == AI_ACTION_CALL_HELP || action == AI_ACTION_FLEE))
+    bias -= 0.15f;
+  if (ctx->recent_violence && (action == AI_ACTION_SPEAK_WARN || action == AI_ACTION_FLEE))
+    bias += 0.22f;
+  if (ctx->visible_pc_count >= 4 && mob->ai_prof->role == ROLE_MERCHANT && action == AI_ACTION_SPEAK)
+    bias += 0.12f;
+  if (ctx->open_exit_count <= 1 && ctx->zone_danger > 0.5f && mob->ai_prof->role == ROLE_CIVILIAN) {
+    if (action == AI_ACTION_FLEE || action == AI_ACTION_SPEAK_DEFLECT)
+      bias += 0.18f;
+  }
+  if (ctx->time_bucket == AI_TIME_NIGHT) {
+    if (mob->ai_prof->role == ROLE_GUARD && action == AI_ACTION_OBSERVE) bias += 0.18f;
+    if (mob->ai_prof->role == ROLE_BANDIT && (action == AI_ACTION_OBSERVE || action == AI_ACTION_SPEAK_WARN)) bias += 0.15f;
+  }
+  if (ctx->time_bucket == AI_TIME_DAY && mob->ai_prof->role == ROLE_MERCHANT && action == AI_ACTION_SPEAK && ai_is_transact_intent(intent))
+    bias += 0.12f;
+  return bias;
+}
+
+static float ai_context_suspicion_bias(struct char_data *mob, const struct ai_context_vector *ctx)
+{
+  float b = 0.0f;
+  if (!mob || !ctx || !mob->ai_prof)
+    return 0.0f;
+  if (mob->ai_prof->role != ROLE_GUARD && mob->ai_prof->role != ROLE_CULTIST)
+    return 0.0f;
+  if (ctx->time_bucket == AI_TIME_NIGHT) b += 0.08f;
+  if (!ctx->lawful_or_city) b += 0.06f;
+  if (ctx->recent_violence) b += 0.09f;
+  b += ctx->alignment_delta * 0.10f;
+  return b;
 }
 
 static void ai_state_push_event(struct char_data *mob, enum ai_event_type type, struct char_data *actor, const char *text)
@@ -2062,10 +2507,13 @@ static void ai_voice_assemble(struct char_data *mob, const struct ai_voice_profi
 {
   char core[256], work[512], topic_tag[24], buf[128];
   int rhythm, add_q, add_topic, suppress_opener, use_emotional;
+  struct ai_conv_actor_state *st = ai_conv_actor_state_get(mob, 0);
   const char *opener = "", *closer = "", *hedge = "", *topic = "", *tic = "";
   if (!out || outsz == 0) return;
   ai_voice_apply_tokens(vp, core_content ? core_content : "", core, sizeof(core));
   ai_mbti_compound_modifier(vp, speech_act, &add_q, &add_topic, &suppress_opener, &use_emotional, seed);
+  if (st && st->tone_no_extras) { add_q = 0; add_topic = 0; }
+  if (st && st->tone_clipped) suppress_opener = 1;
   rhythm = vp ? vp->rhythm : 1;
   if (vp && vp->mbti_ei && rhythm == 0) rhythm = 1;
   if (vp && !vp->mbti_ei && rhythm == 3) rhythm = 2;
@@ -2095,10 +2543,10 @@ static void ai_voice_assemble(struct char_data *mob, const struct ai_voice_profi
     snprintf(buf, sizeof(buf), " %s", feel);
     snprintf(work + strlen(work), sizeof(work) - strlen(work), "%s", buf);
   }
-  if (add_topic && vp && vp->mbti_ei && (((seed >> (9 * 7)) % 10) < 5)) {
+  if (add_topic && vp && vp->mbti_ei && (((seed >> (9 * 7)) % 10) < 5) && !(st && st->tone_no_extras)) {
     snprintf(work + strlen(work), sizeof(work) - strlen(work), " %s.", topic);
   }
-  if (add_q && vp && vp->mbti_ei) {
+  if (add_q && vp && vp->mbti_ei && !(st && st->tone_no_extras)) {
     snprintf(work + strlen(work), sizeof(work) - strlen(work), " %s", ai_followup_pick(speech_act, seed));
   }
   snprintf(out, outsz, "%s", work);
@@ -4171,6 +4619,9 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
   float zone_danger = 0.0f;
   float zone_profit = 0.0f;
   struct ai_goal_entry *goal;
+  struct ai_context_vector ctx;
+  struct ai_session_read_entry *sr = NULL;
+  float cooldown_remaining = 0.0f;
   int zone = (IN_ROOM(mob) != NOWHERE) ? world[IN_ROOM(mob)].zone : -1;
   int i;
 
@@ -4186,6 +4637,8 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
     ai_debug_log("ai_skip_attention vnum=%d event=%s score=%.2f", GET_MOB_VNUM(mob), ai_event_reason_name(type), attention_score);
     return;
   }
+
+  ai_context_vector_build(mob, actor, now, &ctx);
 
   e = ai_mem_get_or_create(mob, GET_IDNUM(actor));
   if (!e)
@@ -4232,8 +4685,13 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
   e->belief_hostility = ai_clampf(e->belief_hostility, 0.0f, 1.0f);
 
   room_st = ai_conv_room_state_get(IN_ROOM(mob), 1);
-  if (room_st && type == AI_EVENT_PLAYER_SAY)
-    room_st->last_player_speech_time = now;
+  if (room_st) {
+    if (type == AI_EVENT_PLAYER_SAY)
+      room_st->last_player_speech_time = now;
+    if (type == AI_EVENT_COMBAT_START)
+      room_st->last_violence_time = now;
+    ctx.recent_violence = (room_st->last_violence_time > 0 && (now - room_st->last_violence_time) <= 60);
+  }
 
   conv_st = ai_conv_actor_state_get(mob, 1);
   if (conv_st && type == AI_EVENT_PLAYER_SAY) {
@@ -4243,7 +4701,19 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
     conv_st->updated_at = now;
   }
 
+  if (conv_st) {
+    sr = ai_session_read_get(conv_st, GET_IDNUM(actor), 1, now);
+    if (sr) {
+      ai_session_read_update(sr, type, intent, normalized, now);
+      ai_session_read_apply_impression(sr, e, conv_st);
+      ai_session_read_update_arc(sr, mob, &ctx);
+      if (sr->first_impression < -0.4f)
+        ai_goal_push(mob, AI_GOAL_MONITOR_SUSPECT, 0.62f, 10, 60, GET_IDNUM(actor));
+    }
+  }
+
   suspicion = ai_suspicion_score(mob, actor, e, now, intent);
+  suspicion = ai_clampf(suspicion + ai_context_suspicion_bias(mob, &ctx) + (sr && sr->archetype == AI_ARCH_TROUBLEMAKER ? 0.08f : 0.0f), 0.0f, 1.0f);
   if (suspicion > 0.7f)
     e->belief_hostility = MAX(e->belief_hostility, suspicion - 0.1f);
 
@@ -4255,14 +4725,18 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
     ai_alert_raise(zone, 0.5f, GET_IDNUM(actor), 180);
   }
 
-  alert_level = ai_alert_level(zone, now);
-  zone_danger = ai_heatmap_danger(zone, now);
+  alert_level = ctx.zone_alert;
+  zone_danger = ctx.zone_danger;
   zone_profit = ai_heatmap_profit(zone);
   goal = ai_goal_active(mob, now);
   mood = ai_clampf((conv_st ? conv_st->mood_current : 0.0f) + ai_mood_drift(mob, now), -1.0f, 1.0f);
 
   for (i = 0; i < AI_ACTION_COUNT; i++) {
     float score = ai_utility_score(mob, (enum ai_action_type)i, actor, intent, intent, now, attention_score, (type == AI_EVENT_PLAYER_EMOTE), suspicion);
+    score += ai_context_action_bias(mob, &ctx, (enum ai_action_type)i, intent);
+    score += ai_session_arch_action_bias(sr, (enum ai_action_type)i);
+    score += ai_session_arc_action_bias(sr, (enum ai_action_type)i);
+    score += ai_session_cooldown_penalty(sr, (enum ai_action_type)i, now);
     if (mood < -0.5f && (i == AI_ACTION_SPEAK_DEFLECT || i == AI_ACTION_IGNORE)) score += 0.2f;
     if (alert_level > 0.6f && i == AI_ACTION_OBSERVE && mob->ai_prof->role == ROLE_BANDIT) score += 0.25f;
     if (mob->ai_prof->role == ROLE_BANDIT && i == AI_ACTION_OBSERVE) score += (zone_profit - zone_danger) * 0.2f;
@@ -4284,9 +4758,11 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
   }
 
   if (!(best_action == AI_ACTION_SPEAK || best_action == AI_ACTION_SPEAK_WARN || best_action == AI_ACTION_SPEAK_DEFLECT || best_action == AI_ACTION_EMOTE_REACT)) {
-    ai_debug_log("AI_LAYER mob=%d role=%s mbti=%s attn=%.2f action=%s score=%.2f mood=%.2f susp=%.2f alert=%.2f goal=%s act=%d slot=-1",
-                 GET_MOB_VNUM(mob), ai_role_name_local(mob->ai_prof->role), ai_mbti_string(ai_voice_profile_get(mob)), attention_score,
-                 ai_action_name(best_action), best_score, mood, suspicion, alert_level, goal ? ai_goal_name(goal->type) : "NONE", intent);
+    cooldown_remaining = (sr && sr->cooldown_until > now) ? (float)(sr->cooldown_until - now) : 0.0f;
+    ai_debug_log("AI_EVT vnum=%d role=%s mbti=%s tb=%s arch=%s arc=%s ex=%d attn=%.2f susp=%.2f action=%s cd=%.0f",
+                 GET_MOB_VNUM(mob), ai_role_name_local(mob->ai_prof->role), ai_mbti_string(ai_voice_profile_get(mob)),
+                 ai_time_bucket_name(ctx.time_bucket), ai_arch_name(sr ? sr->archetype : AI_ARCH_UNKNOWN), ai_arc_name(sr ? sr->arc : AI_ARC_STRANGER),
+                 sr ? sr->exchange_count : 0, attention_score, suspicion, ai_action_name(best_action), cooldown_remaining);
     return;
   }
 
@@ -4310,6 +4786,22 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
     const char *reason = ai_event_reason_name(type);
     char targeted[256];
 
+    if (conv_st) {
+      conv_st->tone_clipped = 0;
+      conv_st->tone_no_extras = 0;
+      conv_st->tone_day_trade = 0;
+      conv_st->tone_night_watch = 0;
+      if (ctx.recent_violence || (sr && sr->arc == AI_ARC_COLD)) {
+        conv_st->tone_clipped = 1;
+        conv_st->tone_no_extras = 1;
+      }
+      if (ctx.time_bucket == AI_TIME_NIGHT && mob->ai_prof->role == ROLE_GUARD) conv_st->tone_night_watch = 1;
+      if (ctx.time_bucket == AI_TIME_NIGHT && mob->ai_prof->role == ROLE_MERCHANT) conv_st->tone_night_watch = 1;
+      if (ctx.time_bucket == AI_TIME_DAY && mob->ai_prof->role == ROLE_MERCHANT) conv_st->tone_day_trade = 1;
+      if (sr && sr->arc == AI_ARC_STRANGER) conv_st->tone_no_extras = 1;
+      if (sr && sr->arc == AI_ARC_RAPPORT && !sr->rapport_rumor_used) conv_st->tone_no_extras = 0;
+    }
+
     if (best_action == AI_ACTION_SPEAK_WARN)
       line = "Watch yourself. State your business.";
     else if (best_action == AI_ACTION_SPEAK_DEFLECT || (alert_level > 0.6f && mob->ai_prof->role == ROLE_MERCHANT))
@@ -4319,6 +4811,21 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
     else
       line = ai_line_for_intent(mob, e, intent, e->attitude, normalized, best_action, avoid_template_id, &selected_template_id, &pool, &reason);
 
+    if (sr && sr->archetype == AI_ARCH_TRANSACTOR && (intent == AI_INTENT_GREET || intent == AI_INTENT_SMALLTALK))
+      line = "State your need and I will answer.";
+    if (sr && sr->arc == AI_ARC_COLD && best_action == AI_ACTION_SPEAK)
+      line = "Keep it brief.";
+    if (ctx.time_bucket == AI_TIME_NIGHT && mob->ai_prof->role == ROLE_GUARD && best_action == AI_ACTION_SPEAK)
+      line = "Night watch is tight. Keep moving and keep lawful.";
+    if (ctx.time_bucket == AI_TIME_NIGHT && mob->ai_prof->role == ROLE_MERCHANT && best_action == AI_ACTION_SPEAK)
+      line = "Late hour trade is short and careful.";
+    if (ctx.time_bucket == AI_TIME_DAY && mob->ai_prof->role == ROLE_MERCHANT && ai_is_transact_intent(intent) && best_action == AI_ACTION_SPEAK)
+      line = "Day market is open. What are you buying?";
+    if (sr && sr->arc == AI_ARC_RAPPORT && !sr->rapport_rumor_used && sr->archetype != AI_ARCH_TRANSACTOR && best_action == AI_ACTION_SPEAK) {
+      line = "Between us, I heard a traveler mention odd lights near the old road.";
+      sr->rapport_rumor_used = 1;
+    }
+
     if (!line || !*line)
       return;
 
@@ -4326,6 +4833,8 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
     snprintf(targeted, sizeof(targeted), "$n says to %s, '%s'", GET_NAME(actor), line);
     ai_actor_schedule_reaction_speech(mob, actor, targeted);
     e->last_reply_time = now;
+    if (sr)
+      sr->cooldown_until = now + ((best_action == AI_ACTION_EMOTE_REACT) ? 3 : 2);
 
     if (type == AI_EVENT_PLAYER_SAY && selected_template_id >= 0 && IN_ROOM(mob) != NOWHERE) {
       struct ai_player_arb_entry *arb = ai_player_arb_lookup(IN_ROOM(mob), GET_IDNUM(actor), type, ai_text_hash_simple(normalized), now);
@@ -4338,9 +4847,11 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
     }
   }
 
-  ai_debug_log("AI_LAYER mob=%d role=%s mbti=%s attn=%.2f action=%s score=%.2f mood=%.2f susp=%.2f alert=%.2f goal=%s act=%d slot=ok",
-               GET_MOB_VNUM(mob), ai_role_name_local(mob->ai_prof->role), ai_mbti_string(ai_voice_profile_get(mob)), attention_score,
-               ai_action_name(best_action), best_score, mood, suspicion, alert_level, goal ? ai_goal_name(goal->type) : "NONE", intent);
+  cooldown_remaining = (sr && sr->cooldown_until > now) ? (float)(sr->cooldown_until - now) : 0.0f;
+  ai_debug_log("AI_EVT vnum=%d role=%s mbti=%s tb=%s arch=%s arc=%s ex=%d attn=%.2f susp=%.2f action=%s cd=%.0f",
+               GET_MOB_VNUM(mob), ai_role_name_local(mob->ai_prof->role), ai_mbti_string(ai_voice_profile_get(mob)),
+               ai_time_bucket_name(ctx.time_bucket), ai_arch_name(sr ? sr->archetype : AI_ARCH_UNKNOWN), ai_arc_name(sr ? sr->arc : AI_ARC_STRANGER),
+               sr ? sr->exchange_count : 0, attention_score, suspicion, ai_action_name(best_action), cooldown_remaining);
 }
 
 
