@@ -133,6 +133,7 @@ static void cedit_setup(struct descriptor_data *d)
   OLC_CONFIG(d)->operation.protocol_negotiation = CONFIG_PROTOCOL_NEGOTIATION;
   OLC_CONFIG(d)->operation.special_in_comm    = CONFIG_SPECIAL_IN_COMM;
   OLC_CONFIG(d)->operation.debug_mode    = CONFIG_DEBUG_MODE;
+  OLC_CONFIG(d)->operation.ai_actor_enabled = CONFIG_AI_ACTOR_ENABLED;
   
   /* Autowiz */
   OLC_CONFIG(d)->autowiz.use_autowiz          = CONFIG_USE_AUTOWIZ;
@@ -237,6 +238,7 @@ static void cedit_save_internally(struct descriptor_data *d)
   CONFIG_PROTOCOL_NEGOTIATION = OLC_CONFIG(d)->operation.protocol_negotiation;
   CONFIG_SPECIAL_IN_COMM      = OLC_CONFIG(d)->operation.special_in_comm;
   CONFIG_DEBUG_MODE           = OLC_CONFIG(d)->operation.debug_mode;
+  CONFIG_AI_ACTOR_ENABLED     = OLC_CONFIG(d)->operation.ai_actor_enabled;
     
   /* Autowiz */
   CONFIG_USE_AUTOWIZ          = OLC_CONFIG(d)->autowiz.use_autowiz;
@@ -568,6 +570,10 @@ int save_config( IDXTYPE nowhere )
   fprintf(fl, "* If 0 then off, otherwise 1: Brief, 2: Normal, 3: Complete.\n"
               "debug_mode = %d\n\n",
               CONFIG_DEBUG_MODE);
+
+  fprintf(fl, "* Enable AI_ACTOR runtime control loop.\n"
+              "ai_actor_enabled = %d\n\n",
+              CONFIG_AI_ACTOR_ENABLED);
 
   fclose(fl);
 

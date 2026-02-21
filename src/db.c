@@ -3947,6 +3947,7 @@ static void load_default_config( void )
   CONFIG_MINIMAP_SIZE           = default_minimap_size;
   CONFIG_SCRIPT_PLAYERS         = script_players;
   CONFIG_DEBUG_MODE             = debug_mode;
+  CONFIG_AI_ACTOR_ENABLED       = ai_actor_enabled;
 
   /* Rent / crashsave options. */
   CONFIG_FREE_RENT              = free_rent;
@@ -4021,7 +4022,9 @@ void load_config( void )
 
     switch (LOWER(*tag)) {
       case 'a':
-        if (!str_cmp(tag, "auto_save"))
+        if (!str_cmp(tag, "ai_actor_enabled"))
+          CONFIG_AI_ACTOR_ENABLED = num;
+        else if (!str_cmp(tag, "auto_save"))
           CONFIG_AUTO_SAVE = num;
         else if (!str_cmp(tag, "autosave_time"))
           CONFIG_AUTOSAVE_TIME = num;

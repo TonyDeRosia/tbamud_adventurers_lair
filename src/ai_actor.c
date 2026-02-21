@@ -755,6 +755,9 @@ int ai_actor_tick(struct char_data *mob, time_t now)
   if (!mob || !IS_NPC(mob) || !MOB_FLAGGED(mob, MOB_AI_ACTOR) || AFF_FLAGGED(mob, AFF_CHARM))
     return FALSE;
 
+  if (!CONFIG_AI_ACTOR_ENABLED)
+    return FALSE;
+
   if (!mob->ai_prof || !mob->ai_state || !mob->ai_prof->initialized)
     ai_actor_init(mob);
   if (!mob->ai_prof || !mob->ai_state)
