@@ -342,6 +342,13 @@ void ai_actor_brain_show_state(struct char_data *viewer, struct char_data *mob) 
   send_to_char(viewer, "  traits Bv%d Gr%d Cu%d Em%d Ag%d Di%d Su%d\r\n", b->traits.bravery, b->traits.greed, b->traits.curiosity,
                b->traits.empathy, b->traits.aggression, b->traits.discipline, b->traits.superstition);
   send_to_char(viewer, "  ctx speaker='%s' loud='%s' fight='%s'\r\n", b->last_speaker, b->last_loud_event, b->last_fight_outcome);
+  if (mob->ai_prof)
+    send_to_char(viewer, "  role=%d mode=%d temperament=%d scores=%s\r\n", mob->ai_prof->role, mob->ai_prof->mode, mob->ai_prof->aggression,
+                 mob->ai_prof->matched_keywords[0] ? mob->ai_prof->matched_keywords : "-");
+  if (mob->ai_state)
+    send_to_char(viewer, "  last_pool=%s last_reason=%s\r\n",
+                 mob->ai_state->last_pool_name[0] ? mob->ai_state->last_pool_name : "POOL_NONE",
+                 mob->ai_state->last_speak_reason[0] ? mob->ai_state->last_speak_reason : "NONE");
   send_to_char(viewer, "  memory entries=%d\r\n", b->mem_count);
   for (i = 0; i < b->mem_count; i++) {
     struct ai_actor_brain_mem *m = &b->mem[i];

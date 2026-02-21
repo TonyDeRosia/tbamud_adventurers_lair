@@ -5,7 +5,7 @@
 
 #define AI_MEM_MAX 12
 #define AI_EVENT_RING_MAX 12
-#define AI_INTENT_KEYWORDS_MAX 64
+#define AI_INTENT_KEYWORDS_MAX 192
 
 #define AI_PROFILE_INCONSISTENT (1 << 0)
 
@@ -35,6 +35,10 @@ enum ai_actor_intent {
 /* Optional compile-time debug logging. */
 #ifndef AI_ACTOR_DEBUG
 #define AI_ACTOR_DEBUG 0
+#endif
+
+#ifndef AI_ACTOR_DEBUG_SPEECH
+#define AI_ACTOR_DEBUG_SPEECH 0
 #endif
 
 struct ai_actor_brain;
@@ -186,6 +190,9 @@ struct ai_actor_state {
   char pending_event_text[64];
   time_t pending_event_time;
   int cached_zone;
+  int role_scores[ROLE_BOSS + 1];
+  char last_pool_name[48];
+  char last_speak_reason[32];
   struct ai_actor_recent_event recent_events[AI_EVENT_RING_MAX];
   struct ai_actor_brain *brain;
 };
