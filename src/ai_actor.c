@@ -22,6 +22,7 @@
 #define AI_SIGNATURE_CHECK_SECS 10
 #define AI_TARGET_REACTION_COOLDOWN_SECS 18
 #define AI_EVENT_IGNORE_MSG_SECS 4
+#define AI_PER_PLAYER_REPLY_COOLDOWN_SECS 6
 #define AI_INTENT_THRESHOLD 25
 #define AI_INTENT_COOLDOWN_MIN 6
 #define AI_INTENT_COOLDOWN_MAX 12
@@ -326,7 +327,6 @@ void ai_actor_schedule_reaction_speech(struct char_data *mob, struct char_data *
   st->pending_speech_fire_pulse = pulse + 1;
 }
 
-#if 0
 static int ai_try_emit_pending_reaction_speech(struct char_data *mob, time_t now)
 {
   struct ai_actor_state *st;
@@ -368,7 +368,6 @@ static int ai_try_emit_pending_reaction_speech(struct char_data *mob, time_t now
   st->pending_speech_fire_pulse = 0;
   return TRUE;
 }
-#endif
 
 static int ai_within_radius_home(struct char_data *mob, room_rnum room, int max_depth)
 {
@@ -1005,11 +1004,104 @@ static int ai_try_flee_or_surrender(struct char_data *mob, time_t now)
  * - Apply hard gates: peaceful rooms, cooldowns, visibility, and special/script ownership.
  * - Execute only the top intent above threshold, then apply intent/talk cooldowns.
  */
-static const char *const role_guard_greet[] = {"Keep the peace.", "Eyes open, no trouble.", NULL};
-static const char *const role_merchant_greet[] = {"Fresh wares, fair rates.", "Browse first, buy smart.", NULL};
-static const char *const role_innkeeper_greet[] = {"Warm beds and warm stew.", "Rest your boots by the fire.", NULL};
-static const char *const role_bandit_greet[] = {"Keep your coin close.", "Road tax might find you.", NULL};
+static const char *const role_guard_greet[] = {"Good day. Keep things lawful.", "Welcome. Keep the peace.", "Morning. Move smart and stay calm.", "Eyes open. No trouble today.", "You are safe if you act right.", "Keep your blade sheathed in town.", "Report crimes and keep walking.", "Stay civil and we get along.", "The square is watched. Behave.", "Mind the law and you'll do fine.", "Need directions? Ask plainly.", "Order first, comfort second.", NULL};
+static const char *const role_guard_service[] = {"Need a direction? I can point you to the inn, bank, or market.", "For rooms and rest, head to the inn. For trade, market stalls.", "The law office keeps records; the bank is east from here.", "Travelers rest at the inn. Keep your coin close on the road.", "Need help finding a healer? I can point the way.", "If you're lost, follow the main road to the square fountain.", "Merchants trade nearby; keep business clean and legal.", "Ask clearly and I'll give directions, not discounts.", NULL};
+static const char *const role_merchant_greet[] = {"Welcome, traveler. Browse my wares.", "Fresh stock and fair measures today.", "Take your time; prices are honest.", "Looking to buy or sell?", "Careful hands, quality goods.", "Coin talks, and I listen.", "Best rates in this quarter.", "See anything you fancy?", "Trade straight, leave happy.", "Step closer and have a look.", "Fine goods, no tricks.", "I can help you outfit your journey.", NULL};
+static const char *const role_merchant_service[] = {"I buy and sell. Show me what you carry.", "Need wares? I've got supplies and tools.", "Trade window's open; let's do business.", "If you need kit for the road, I can sort you out.", "Sell loot, buy provisions, move fast.", "My stock rotates often; check the shelves.", "I can price your goods fairly.", "If you seek rest, the inn is across the square.", NULL};
+static const char *const role_innkeeper_greet[] = {"Welcome in. Warm beds and hot stew.", "Evening, friend. Rest and room available.", "Boots off, worries down, hearth's warm.", "Need a quiet room tonight?", "The fire's hot and the ale's fresh.", "Travel's hard; rest here.", "I've got blankets, broth, and a bed.", "Come in out of the weather.", "A calm table and a softer mattress await.", "Sit, breathe, and settle in.", "You're welcome so long as you keep it civil.", "Long road behind you? I've got rest for that.", NULL};
+static const char *const role_innkeeper_service[] = {"I can offer a room, a meal, and a place to rest.", "Need an inn room? I can set you up.", "Rest your wounds by the hearth and take a bed upstairs.", "Food's hot, beds are clean, and noise stays low.", "You can rent a room or just sit and recover.", "If you need healing rest, this is your best stop.", "Stay the night and start fresh at dawn.", "No shop haggling here; comfort's what I sell.", NULL};
+static const char *const role_bandit_greet[] = {"You're new. Keep your coin visible.", "Road's rough. Pay attention.", "Nice purse. Shame if it wandered.", "Walk light and don't stare.", "You look like trouble worth weighing.", "Eyes down, pockets up.", "I've seen richer folk go missing.", "Careful where you step, friend.", "This lane charges tolls in silver.", "Keep moving and maybe we smile.", "You breathe easy for someone in my street.", "Hope you can afford local manners.", NULL};
+static const char *const role_bandit_service[] = {"I don't sell wares; I tax passage.", "Service? Pay coin and I might answer.", "Inn and bank are for soft hands, not mine.", "You want directions, buy them.", "Trade's for merchants. I deal in leverage.", "Need rest? Don't sleep where I can see you.", "You're asking a lot for free.", "I can help you keep your purse by not taking it.", NULL};
+static const char *const role_beast_greet[] = {"$n snorts and watches you warily.", "$n paces in a tense circle.", "$n rumbles a low warning growl.", "$n flicks ears and studies your movement.", "$n stamps once and bares its teeth.", "$n huffs and keeps distance.", "$n lets out a rough bark.", "$n watches your hands, unblinking.", "$n prowls a step closer, then stops.", "$n growls but does not lunge.", "$n shakes its mane and sniffs the air.", "$n tracks you with predator focus.", NULL};
+static const char *const role_beast_service[] = {"$n growls, offering no help.", "$n bares fangs; there is no service here.", "$n huffs and ignores your request.", "$n paws the ground in refusal.", "$n answers with a warning snarl.", "$n circles, uninterested in trade.", "$n stares as if you are prey.", "$n snaps the air and turns away.", NULL};
+static const char *const role_undead_greet[] = {"$n hisses, voice dry as dust.", "$n's hollow eyes fix on you.", "$n rasps a death-cold greeting.", "$n drifts forward with a graveyard hush.", "$n clicks bone against bone.", "$n whispers from behind dead lips.", "$n exhales a chill moan.", "$n studies you like a future corpse.", "$n sways, then stills.", "$n's jaw cracks in a rotten grin.", "$n croaks in sepulchral tones.", "$n stares without blinking.", NULL};
+static const char *const role_undead_service[] = {"$n hisses: no comfort for the living.", "$n rasps: only graves offer rest here.", "$n gives no aid, only cold silence.", "$n mutters of rot instead of trade.", "$n will not guide the breathing.", "$n offers hunger, not healing.", "$n's answer is a funeral whisper.", "$n turns away with a hiss.", NULL};
+static const char *const role_spirit_greet[] = {"$n whispers through the air around you.", "$n shimmers and nods faintly.", "$n's voice drifts like wind in glass.", "$n circles you in a pale glow.", "$n murmurs from nowhere and everywhere.", "$n bows with spectral grace.", "$n flickers, then steadies.", "$n hums a thin haunting note.", "$n greets you in a breath-cold whisper.", "$n glides nearby without footsteps.", "$n watches with distant calm.", "$n ripples like moonlight on water.", NULL};
+static const char *const role_spirit_service[] = {"$n whispers: I keep no wares, only echoes.", "$n murmurs: rest is for flesh, not fog.", "$n cannot trade coin, only omens.", "$n offers guidance in riddles, not rooms.", "$n says the bank means nothing to the dead.", "$n drifts, refusing worldly service.", "$n whispers directions like a dream.", "$n sighs: seek living hands for living needs.", NULL};
 static const char *const role_unknown_idle[] = {"$n watches quietly.", "$n studies the room in silence.", NULL};
+
+static const char *const role_guard_emote[] = {"Keep it orderly.", "Public antics are fine; keep it decent.", "Seen worse. Carry on.", "No laws broken yet.", "You have spirit. Keep control.", "Stay respectful and we're good.", "Enjoy yourself, just keep peace.", "That's enough show for now.", "Move along and stay civil.", "The square isn't a stage, but fine.", "Keep hands to yourself.", "Don't test my patience.", NULL};
+static const char *const role_merchant_emote[] = {"Good energy brings good trade.", "A lively crowd helps business.", "Try not to knock the wares.", "If you dance, dance clear of my stall.", "Friendly folk spend well.", "Keep it cheerful, keep it moving.", "No stains on the goods, please.", "You bring attention; I like that.", "A wave and a smile sell more than shouting.", "Spirited crowd today.", "Mind the shelves while you celebrate.", "Thanks for brightening the square.", NULL};
+static const char *const role_innkeeper_emote[] = {"Easy now, keep the common room calm.", "Dance if you like, just no broken chairs.", "Warm mood, warm hearth.", "Friendly gestures are welcome here.", "Mind the mugs while you celebrate.", "You're welcome to be merry, not messy.", "A wave to the room goes a long way.", "Hugs are fine, fights are not.", "Keep voices kind and I'll keep serving.", "Joy's good for the house.", "Don't spit in my inn.", "Respect the place and stay as long as you like.", NULL};
+static const char *const role_bandit_emote[] = {"Cute. Keep your purse while you perform.", "Dance all you want; I count your coin.", "Wave less, watch more.", "Hugging in this district gets expensive.", "Spit again and pay in blood.", "You entertain. I evaluate.", "Big moves make easy targets.", "I prefer fear to applause.", "You got nerve; maybe too much.", "Keep the show short.", "You trying to impress me?", "One wrong step and I collect.", NULL};
+static const char *const role_beast_emote[] = {"$n growls at the motion.", "$n huffs and backs a half-step.", "$n snaps at the air.", "$n's hackles rise.", "$n paws hard at the ground.", "$n watches your gestures with suspicion.", "$n circles and snorts.", "$n emits a warning rumble.", "$n bares teeth briefly.", "$n shakes off with a low growl.", "$n tracks you, tense and alert.", "$n stalks in a tight arc.", NULL};
+static const char *const role_undead_emote[] = {"$n hisses at your display.", "$n rattles in contempt.", "$n whispers a curse.", "$n's stare chills the air.", "$n croaks a hollow warning.", "$n's jaw clacks in disapproval.", "$n drifts closer, hostile.", "$n emits a grave-cold moan.", "$n watches with corpse-still malice.", "$n rasps at your insolence.", "$n's fingers twitch like dead roots.", "$n leans in with a hiss.", NULL};
+static const char *const role_spirit_emote[] = {"$n whispers around your motion.", "$n flickers in pale interest.", "$n swirls as if in a slow dance.", "$n hums a spectral reply.", "$n drifts back from your gesture.", "$n's glow dims in disapproval.", "$n curls into mist and returns.", "$n answers with a haunted murmur.", "$n shivers through the air.", "$n ripples with soft emotion.", "$n whispers from behind you.", "$n lingers, uncertain.", NULL};
+
+static const char *const role_rare_guard[] = {"I know every alley here. Ask and I'll map your path.", NULL};
+static const char *const role_rare_merchant[] = {"For you? A rumor free with every fair trade.", NULL};
+static const char *const role_rare_innkeeper[] = {"Old travelers say this hearth blesses honest sleepers.", NULL};
+static const char *const role_rare_bandit[] = {"Pay once and I might remember your face kindly.", NULL};
+static const char *const role_rare_beast[] = {"$n lets out a strangely melodic growl.", NULL};
+static const char *const role_rare_undead[] = {"$n whispers your name as if from a crypt.", NULL};
+static const char *const role_rare_spirit[] = {"$n murmurs of doors hidden between moonbeams.", NULL};
+
+static const char *ai_pick_weighted_phrase(const char *const *normal_pool, const char *const *rare_pool)
+{
+  if (rare_pool && rand_number(1, 100) <= 5)
+    return ai_pick_phrase(rare_pool);
+  return ai_pick_phrase(normal_pool);
+}
+
+static const char *ai_line_for_intent(struct char_data *mob, int intent, int attitude)
+{
+  int innkeeper;
+
+  if (!mob || !mob->ai_prof)
+    return NULL;
+
+  innkeeper = (mob->ai_prof->role == ROLE_MERCHANT && mob->ai_prof->style == 1);
+
+  if (mob->ai_prof->role == ROLE_GUARD) {
+    if (intent == AI_INTENT_GREET) return ai_pick_weighted_phrase(role_guard_greet, role_rare_guard);
+    if (intent == AI_INTENT_ASK_SERVICE || intent == AI_INTENT_CONFUSION) return ai_pick_phrase(role_guard_service);
+    if (intent == AI_INTENT_INSULT || intent == AI_INTENT_EMOTE_SPIT || intent == AI_INTENT_THREAT)
+      return (attitude < -20) ? "Last warning. Respect the law or leave." : "Mind your tongue and keep the peace.";
+    if (intent >= AI_INTENT_EMOTE_DANCE) return ai_pick_phrase(role_guard_emote);
+  }
+
+  if (mob->ai_prof->role == ROLE_MERCHANT) {
+    if (innkeeper) {
+      if (intent == AI_INTENT_GREET) return ai_pick_weighted_phrase(role_innkeeper_greet, role_rare_innkeeper);
+      if (intent == AI_INTENT_ASK_SERVICE || intent == AI_INTENT_CONFUSION) return ai_pick_phrase(role_innkeeper_service);
+      if (intent == AI_INTENT_INSULT || intent == AI_INTENT_EMOTE_SPIT || intent == AI_INTENT_THREAT)
+        return (attitude < -25) ? "That's enough. Calm down or leave my inn." : "Please show respect in my house.";
+      if (intent >= AI_INTENT_EMOTE_DANCE) return ai_pick_phrase(role_innkeeper_emote);
+    } else {
+      if (intent == AI_INTENT_GREET) return ai_pick_weighted_phrase(role_merchant_greet, role_rare_merchant);
+      if (intent == AI_INTENT_ASK_SERVICE || intent == AI_INTENT_CONFUSION) return ai_pick_phrase(role_merchant_service);
+      if (intent == AI_INTENT_INSULT || intent == AI_INTENT_EMOTE_SPIT || intent == AI_INTENT_THREAT)
+        return (attitude < -25) ? "No trade for rude customers. Move along." : "Respect the stall or no business.";
+      if (intent >= AI_INTENT_EMOTE_DANCE) return ai_pick_phrase(role_merchant_emote);
+    }
+  }
+
+  if (mob->ai_prof->role == ROLE_BANDIT) {
+    if (intent == AI_INTENT_GREET) return ai_pick_weighted_phrase(role_bandit_greet, role_rare_bandit);
+    if (intent == AI_INTENT_ASK_SERVICE || intent == AI_INTENT_CONFUSION) return ai_pick_phrase(role_bandit_service);
+    if (intent == AI_INTENT_INSULT || intent == AI_INTENT_EMOTE_SPIT || intent == AI_INTENT_THREAT)
+      return (attitude < -15) ? "Do that again and I collect your coin with interest." : "Careful. I don't forgive disrespect.";
+    if (intent >= AI_INTENT_EMOTE_DANCE) return ai_pick_phrase(role_bandit_emote);
+  }
+
+  if (mob->ai_prof->role == ROLE_BEAST) {
+    if (intent == AI_INTENT_GREET) return ai_pick_weighted_phrase(role_beast_greet, role_rare_beast);
+    if (intent == AI_INTENT_ASK_SERVICE || intent == AI_INTENT_CONFUSION) return ai_pick_phrase(role_beast_service);
+    if (intent >= AI_INTENT_EMOTE_DANCE || intent == AI_INTENT_THREAT || intent == AI_INTENT_INSULT) return ai_pick_phrase(role_beast_emote);
+  }
+  if (mob->ai_prof->role == ROLE_UNDEAD) {
+    if (intent == AI_INTENT_GREET) return ai_pick_weighted_phrase(role_undead_greet, role_rare_undead);
+    if (intent == AI_INTENT_ASK_SERVICE || intent == AI_INTENT_CONFUSION) return ai_pick_phrase(role_undead_service);
+    if (intent >= AI_INTENT_EMOTE_DANCE || intent == AI_INTENT_THREAT || intent == AI_INTENT_INSULT) return ai_pick_phrase(role_undead_emote);
+  }
+  if (mob->ai_prof->role == ROLE_SPIRIT) {
+    if (intent == AI_INTENT_GREET) return ai_pick_weighted_phrase(role_spirit_greet, role_rare_spirit);
+    if (intent == AI_INTENT_ASK_SERVICE || intent == AI_INTENT_CONFUSION) return ai_pick_phrase(role_spirit_service);
+    if (intent >= AI_INTENT_EMOTE_DANCE || intent == AI_INTENT_THREAT || intent == AI_INTENT_INSULT) return ai_pick_phrase(role_spirit_emote);
+  }
+
+  return NULL;
+}
 
 static int ai_actor_choose_intent(struct char_data *mob, struct char_data **out_target, const char **out_line, int *do_emote, int *do_warn)
 {
@@ -1130,6 +1222,9 @@ int ai_actor_tick(struct char_data *mob, time_t now)
   if (st->social_spam_count > 0 && !rand_number(0, 2)) st->social_spam_count--;
 
   ai_mem_decay(mob, now);
+
+  if (ai_try_emit_pending_reaction_speech(mob, now))
+    return TRUE;
 
   if (FIGHTING(mob)) {
     if (ai_try_flee_or_surrender(mob, now))
@@ -1265,6 +1360,112 @@ void ai_actor_record_room_crime(struct char_data *witness, struct char_data *cri
   }
 }
 
+
+static int ai_text_has_sub_ci(const char *hay, const char *needle)
+{
+  size_t nlen;
+  const char *p;
+
+  if (!hay || !needle || !*hay || !*needle)
+    return FALSE;
+
+  nlen = strlen(needle);
+  for (p = hay; *p; p++) {
+    if (!strncasecmp(p, needle, nlen))
+      return TRUE;
+  }
+  return FALSE;
+}
+
+static int ai_detect_intent(enum ai_event_type type, const char *text)
+{
+  if (type == AI_EVENT_PLAYER_EMOTE) {
+    if (ai_text_has_sub_ci(text, "dance")) return AI_INTENT_EMOTE_DANCE;
+    if (ai_text_has_sub_ci(text, "spit")) return AI_INTENT_EMOTE_SPIT;
+    if (ai_text_has_sub_ci(text, "hug")) return AI_INTENT_EMOTE_HUG;
+    if (ai_text_has_sub_ci(text, "wave")) return AI_INTENT_EMOTE_WAVE;
+    return AI_INTENT_NONE;
+  }
+
+  if (type != AI_EVENT_PLAYER_SAY)
+    return AI_INTENT_NONE;
+
+  if (ai_text_has_sub_ci(text, "hello") || ai_text_has_sub_ci(text, "hi") || ai_text_has_sub_ci(text, "hey") ||
+      ai_text_has_sub_ci(text, "greetings") || ai_text_has_sub_ci(text, "yo"))
+    return AI_INTENT_GREET;
+  if (ai_text_has_sub_ci(text, "buy") || ai_text_has_sub_ci(text, "sell") || ai_text_has_sub_ci(text, "wares") ||
+      ai_text_has_sub_ci(text, "shop") || ai_text_has_sub_ci(text, "room") || ai_text_has_sub_ci(text, "inn") ||
+      ai_text_has_sub_ci(text, "rest") || ai_text_has_sub_ci(text, "heal") || ai_text_has_sub_ci(text, "bank"))
+    return AI_INTENT_ASK_SERVICE;
+  if (ai_text_has_sub_ci(text, "die") || ai_text_has_sub_ci(text, "kill") || ai_text_has_sub_ci(text, "attack") ||
+      ai_text_has_sub_ci(text, "fight") || ai_text_has_sub_ci(text, "threat") || ai_text_has_sub_ci(text, "mug") ||
+      ai_text_has_sub_ci(text, "rob"))
+    return AI_INTENT_THREAT;
+  if (ai_text_has_sub_ci(text, "idiot") || ai_text_has_sub_ci(text, "stupid") || ai_text_has_sub_ci(text, "trash") ||
+      ai_text_has_sub_ci(text, "ugly") || ai_text_has_sub_ci(text, "hate") || ai_text_has_sub_ci(text, "shut up"))
+    return AI_INTENT_INSULT;
+  if (ai_text_has_sub_ci(text, "thanks") || ai_text_has_sub_ci(text, "good") || ai_text_has_sub_ci(text, "nice") ||
+      ai_text_has_sub_ci(text, "great") || ai_text_has_sub_ci(text, "appreciate"))
+    return AI_INTENT_PRAISE;
+  if (ai_text_has_sub_ci(text, "what") || ai_text_has_sub_ci(text, "where") || ai_text_has_sub_ci(text, "help") ||
+      ai_text_has_sub_ci(text, "lost"))
+    return AI_INTENT_CONFUSION;
+
+  return AI_INTENT_NONE;
+}
+
+static int ai_role_priority_score(struct char_data *mob)
+{
+  if (!mob || !mob->ai_prof) return 0;
+  if (mob->ai_prof->role == ROLE_GUARD) return 300;
+  if (mob->ai_prof->role == ROLE_MERCHANT && mob->ai_prof->style == 1) return 280;
+  if (mob->ai_prof->role == ROLE_MERCHANT) return 260;
+  if (mob->ai_prof->role == ROLE_BANDIT) return 180;
+  if (mob->ai_prof->role == ROLE_BEAST) return 120;
+  if (mob->ai_prof->role == ROLE_UNDEAD) return 110;
+  if (mob->ai_prof->role == ROLE_SPIRIT) return 100;
+  return 10;
+}
+
+static int ai_actor_room_response_slot(struct char_data *mob, struct char_data *actor)
+{
+  struct char_data *it, *top = NULL, *second = NULL;
+  int best = -9999;
+  int second_key = 99999999;
+  int tie;
+
+  if (!mob || !actor || IN_ROOM(mob) == NOWHERE || IN_ROOM(actor) != IN_ROOM(mob))
+    return FALSE;
+
+  for (it = world[IN_ROOM(mob)].people; it; it = it->next_in_room) {
+    int pri;
+    if (!IS_NPC(it) || !MOB_FLAGGED(it, MOB_AI_ACTOR) || !it->ai_prof)
+      continue;
+
+    pri = ai_role_priority_score(it);
+    if (pri > best) {
+      best = pri;
+      top = it;
+    }
+  }
+
+  tie = (int)(GET_IDNUM(actor) % 17);
+  for (it = world[IN_ROOM(mob)].people; it; it = it->next_in_room) {
+    int key;
+    if (!IS_NPC(it) || !MOB_FLAGGED(it, MOB_AI_ACTOR) || !it->ai_prof || it == top)
+      continue;
+    key = abs(GET_MOB_VNUM(it) - tie) + (ai_role_priority_score(top) - ai_role_priority_score(it));
+    if (key < second_key) {
+      second_key = key;
+      second = it;
+    }
+  }
+
+  return (mob == top || mob == second);
+}
+
+
+
 static const char *ai_pick_phrase(const char *const *pool)
 {
   int n = 0;
@@ -1320,29 +1521,48 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
 {
   struct ai_actor_memory_entry *e;
   time_t now = time(0);
+  int intent;
+  const char *line = NULL;
 
   if (!mob || !actor || !mob->ai_prof || !mob->ai_state || IS_NPC(actor))
     return;
 
   e = ai_mem_get_or_create(mob, GET_IDNUM(actor));
+  intent = ai_detect_intent(type, text ? text : "");
+
   if (e) {
     e->last_seen_time = now;
     e->last_interaction_time = now;
     e->last_room_vnum = (IN_ROOM(mob) == NOWHERE) ? NOWHERE : GET_ROOM_VNUM(IN_ROOM(mob));
+    e->last_intent = intent;
     if (actor->player.name)
       strlcpy(e->key_name, actor->player.name, sizeof(e->key_name));
-    if (type == AI_EVENT_PLAYER_SAY) {
-      e->trust = MIN(40, e->trust + 1);
-      e->attitude = MAX(-100, MIN(100, e->attitude + 1));
-    } else if (type == AI_EVENT_PLAYER_EMOTE) {
-      if (text && (strstr(text, "spit") || strstr(text, "insult"))) {
-        e->disposition_flags |= AI_DISP_ANNOYED_ME;
-        e->hostility = MIN(40, e->hostility + 2);
-        e->attitude = MAX(-100, e->attitude - 6);
-      } else {
-        e->attitude = MAX(-100, MIN(100, e->attitude + 2));
-      }
+
+    /* Intent scoring table:
+     * GREET +2
+     * PRAISE +5
+     * INSULT -12 (DISRESPECT)
+     * EMOTE_SPIT -20 (DISRESPECT)
+     * THREAT -25 (THREATENED)
+     */
+    if (intent == AI_INTENT_GREET)
+      e->attitude += 2;
+    else if (intent == AI_INTENT_PRAISE) {
+      e->attitude += 5;
+      e->disposition_flags |= AI_DISP_FRIENDLY;
+    } else if (intent == AI_INTENT_INSULT) {
+      e->attitude -= 12;
+      e->disposition_flags |= (AI_DISP_DISRESPECT | AI_DISP_ANNOYED_ME);
+    } else if (intent == AI_INTENT_EMOTE_SPIT) {
+      e->attitude -= 20;
+      e->disposition_flags |= (AI_DISP_DISRESPECT | AI_DISP_ANNOYED_ME);
+    } else if (intent == AI_INTENT_THREAT) {
+      e->attitude -= 25;
+      e->disposition_flags |= (AI_DISP_THREATENED | AI_DISP_ATTACKED_ME);
     }
+
+    e->attitude = MAX(-100, MIN(100, e->attitude));
+    e->last_update = now;
   }
 
   if (type == AI_EVENT_COMBAT_START && e) {
@@ -1352,6 +1572,20 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
   }
 
   ai_state_push_event(mob, type, actor, text ? text : "");
+
+  if (!e || !intent)
+    return;
+  if (!ai_actor_room_response_slot(mob, actor))
+    return;
+  if ((now - e->last_reply_time) < AI_PER_PLAYER_REPLY_COOLDOWN_SECS)
+    return;
+
+  line = ai_line_for_intent(mob, intent, e->attitude);
+  if (!line || !*line)
+    return;
+
+  ai_actor_schedule_reaction_speech(mob, actor, line);
+  e->last_reply_time = now;
 }
 
 

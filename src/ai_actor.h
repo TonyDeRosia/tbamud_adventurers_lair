@@ -12,7 +12,24 @@
 enum ai_disposition_flags {
   AI_DISP_ATTACKED_ME = (1 << 0),
   AI_DISP_HELPED_ME = (1 << 1),
-  AI_DISP_ANNOYED_ME = (1 << 2)
+  AI_DISP_ANNOYED_ME = (1 << 2),
+  AI_DISP_DISRESPECT = (1 << 3),
+  AI_DISP_THREATENED = (1 << 4),
+  AI_DISP_FRIENDLY = (1 << 5)
+};
+
+enum ai_actor_intent {
+  AI_INTENT_NONE = 0,
+  AI_INTENT_GREET,
+  AI_INTENT_ASK_SERVICE,
+  AI_INTENT_THREAT,
+  AI_INTENT_INSULT,
+  AI_INTENT_PRAISE,
+  AI_INTENT_CONFUSION,
+  AI_INTENT_EMOTE_DANCE,
+  AI_INTENT_EMOTE_SPIT,
+  AI_INTENT_EMOTE_HUG,
+  AI_INTENT_EMOTE_WAVE
 };
 
 /* Optional compile-time debug logging. */
@@ -138,6 +155,8 @@ struct ai_actor_memory_entry {
   int last_room_vnum;
   int flags;
   time_t last_reaction;
+  int last_intent;
+  time_t last_reply_time;
 };
 
 struct ai_actor_state {
