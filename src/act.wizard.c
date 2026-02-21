@@ -4966,6 +4966,19 @@ ACMD(do_smartspawn)
   *arg1 = *arg2 = *arg3 = '\0';
   one_argument(two_arguments(argument, arg1, arg2), arg3);
 
+  if (!*arg1) {
+    send_to_char(ch,
+      "Usage: smartspawn <count 1-10> [min level] [max level]\r\n"
+      "Example: smartspawn 3 90 110\r\n"
+      "Tip: start with 'smartspawn 1' to spawn a single test AI mob.\r\n");
+    return;
+  }
+
+  if (*arg1 && !is_number(arg1)) {
+    send_to_char(ch, "Usage: smartspawn <count 1-10> [min level] [max level]\r\n");
+    return;
+  }
+
   if (*arg1 && is_number(arg1))
     count = atoi(arg1);
   count = MAX(1, MIN(10, count));
