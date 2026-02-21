@@ -345,10 +345,25 @@ void ai_actor_brain_show_state(struct char_data *viewer, struct char_data *mob) 
   if (mob->ai_prof)
     send_to_char(viewer, "  role=%d mode=%d temperament=%d scores=%s\r\n", mob->ai_prof->role, mob->ai_prof->mode, mob->ai_prof->aggression,
                  mob->ai_prof->matched_keywords[0] ? mob->ai_prof->matched_keywords : "-");
-  if (mob->ai_state)
-    send_to_char(viewer, "  last_pool=%s last_reason=%s\r\n",
+  if (mob->ai_state) {
+    char topics[160];
+    topics[0] = '\0';
+    if (mob->ai_state->local_topic_mask & AI_TOPIC_MIDGAARD) strlcat(topics, "MIDGAARD ", sizeof(topics));
+    if (mob->ai_state->local_topic_mask & AI_TOPIC_TEMPLE) strlcat(topics, "TEMPLE ", sizeof(topics));
+    if (mob->ai_state->local_topic_mask & AI_TOPIC_MARKET) strlcat(topics, "MARKET ", sizeof(topics));
+    if (mob->ai_state->local_topic_mask & AI_TOPIC_INN) strlcat(topics, "INN ", sizeof(topics));
+    if (mob->ai_state->local_topic_mask & AI_TOPIC_BANK) strlcat(topics, "BANK ", sizeof(topics));
+    if (mob->ai_state->local_topic_mask & AI_TOPIC_ALLEY) strlcat(topics, "ALLEY ", sizeof(topics));
+    if (mob->ai_state->local_topic_mask & AI_TOPIC_WILDERNESS) strlcat(topics, "WILDERNESS ", sizeof(topics));
+    if (mob->ai_state->local_topic_mask & AI_TOPIC_DUNGEON) strlcat(topics, "DUNGEON ", sizeof(topics));
+    if (mob->ai_state->local_topic_mask & AI_TOPIC_SEWER) strlcat(topics, "SEWER ", sizeof(topics));
+    if (mob->ai_state->local_topic_mask & AI_TOPIC_CASTLE) strlcat(topics, "CASTLE ", sizeof(topics));
+    if (!topics[0]) strlcpy(topics, "NONE", sizeof(topics));
+    send_to_char(viewer, "  last_pool=%s last_reason=%s topics=0x%x [%s]\r\n",
                  mob->ai_state->last_pool_name[0] ? mob->ai_state->last_pool_name : "POOL_NONE",
-                 mob->ai_state->last_speak_reason[0] ? mob->ai_state->last_speak_reason : "NONE");
+                 mob->ai_state->last_speak_reason[0] ? mob->ai_state->last_speak_reason : "NONE",
+                 mob->ai_state->local_topic_mask, topics);
+  }
   send_to_char(viewer, "  memory entries=%d\r\n", b->mem_count);
   for (i = 0; i < b->mem_count; i++) {
     struct ai_actor_brain_mem *m = &b->mem[i];

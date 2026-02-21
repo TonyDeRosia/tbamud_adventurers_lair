@@ -34,6 +34,8 @@ static int ai_debug = AI_ACTOR_DEBUG;
 
 static struct char_data *ai_find_player_by_idnum_room(struct char_data *mob, long idnum);
 static const char *ai_pick_phrase(const char *const *pool);
+static int ai_role_can_give_directions(int role);
+static void ai_state_refresh_local_topics(struct char_data *mob);
 
 
 static const char *ai_role_name_local(int role)
@@ -796,6 +798,7 @@ void ai_actor_refresh_profile(struct char_data *mob, int force)
   mob->ai_prof->flee_hp_percent = 20;
   mob->ai_prof->surrender_hp_percent = 15;
   mob->ai_state->cached_zone = (IN_ROOM(mob) == NOWHERE) ? NOWHERE : world[IN_ROOM(mob)].zone;
+  ai_state_refresh_local_topics(mob);
   mob->ai_state->next_tick = time(0) + rand_number(1, 3);
   mob->ai_state->next_signature_check = 0;
 
@@ -1148,6 +1151,94 @@ static const char *ai_pick_weighted_phrase(const char *const *normal_pool, const
   return ai_pick_phrase(normal_pool);
 }
 
+static const char *ai_direction_line(struct char_data *mob)
+{
+  static const char *const guard_city[] = {
+    "The market square is central; look for the crowds and stalls.",
+    "For supplies, head toward the market lanes. The temple is near the main road.",
+    "If you need coin services, the bank is close to the market quarter.",
+    "The inn sits off the market road. Temple bells can guide you from there.",
+    NULL
+  };
+  static const char *const guard_wilds[] = {
+    "No market out here. Keep to marked paths and watch for tracks.",
+    "You're in rough ground; follow the safest trail back toward guarded roads.",
+    "There is no bank in these wilds. Regroup near patrol routes first.",
+    "Use landmarks and keep your bearings; this area shifts from trail to trail.",
+    NULL
+  };
+  static const char *const merchant_city[] = {
+    "Market's this way; inn and bank are both nearby once you hit the main square.",
+    "Temple is off the main market road, and the bank is past the busiest stalls.",
+    "Need rest? Find the inn near the market heart. Bank is a short walk beyond.",
+    NULL
+  };
+  static const char *const merchant_wilds[] = {
+    "Out here you'll find trails, not shops. Head for safer roads first.",
+    "No proper market in this stretch; follow the path back toward town lights.",
+    "This is frontier ground. Best direction is back toward the nearest gate.",
+    NULL
+  };
+  static const char *const innkeeper_city[] = {
+    "The inn is near the market road; temple and bank are easy from there.",
+    "If you're lost, return to the inn district first, then ask for the market square.",
+    "From the inn quarter, the temple bells point one way and the market noise the other.",
+    NULL
+  };
+  static const char *const innkeeper_wilds[] = {
+    "No inns out here, friend. Follow the road back toward town before dark.",
+    "These wild paths won't lead you to a bank or market. Head back to the city roads.",
+    NULL
+  };
+  static const char *const commander_city[] = {
+    "Report to the main road and you'll reach market, temple, and bank in short order.",
+    "Hold to the patrol routes; they'll carry you to the market quarter.",
+    "The inn and temple are both within the secured district near the square.",
+    NULL
+  };
+  static const char *const commander_wilds[] = {
+    "No civic quarter here. Fall back to secured roads and reorient there.",
+    "Stay on defensible ground and move toward patrol lines for safe directions.",
+    NULL
+  };
+  static const char *const civilian_city[] = {
+    "I usually find the market first, then the inn or temple from there.",
+    "Try the main streets; they lead toward the market and bank district.",
+    NULL
+  };
+  static const char *const civilian_wilds[] = {
+    "I don't know much out here-best head back toward town roads.",
+    "No market or bank nearby, I think. I'd return to the nearest gate.",
+    NULL
+  };
+  uint32_t topics;
+  int civic;
+  int wild;
+
+  if (!mob || !mob->ai_prof || !mob->ai_state)
+    return NULL;
+  if (!ai_role_can_give_directions(mob->ai_prof->role))
+    return NULL;
+
+  topics = mob->ai_state->local_topic_mask;
+  civic = (topics & (AI_TOPIC_MIDGAARD | AI_TOPIC_MARKET | AI_TOPIC_TEMPLE | AI_TOPIC_BANK | AI_TOPIC_INN | AI_TOPIC_CASTLE)) != 0;
+  wild = (topics & (AI_TOPIC_WILDERNESS | AI_TOPIC_DUNGEON | AI_TOPIC_SEWER | AI_TOPIC_ALLEY)) != 0;
+
+  if (!civic && !wild)
+    civic = 1;
+
+  if (mob->ai_prof->role == ROLE_GUARD)
+    return ai_pick_phrase(wild && !civic ? guard_wilds : guard_city);
+  if (mob->ai_prof->role == ROLE_MERCHANT)
+    return ai_pick_phrase((mob->ai_prof->style == 1) ? (wild && !civic ? innkeeper_wilds : innkeeper_city) : (wild && !civic ? merchant_wilds : merchant_city));
+  if (mob->ai_prof->role == ROLE_BOSS)
+    return ai_pick_phrase(wild && !civic ? commander_wilds : commander_city);
+  if (mob->ai_prof->role == ROLE_CIVILIAN)
+    return ai_pick_phrase(wild && !civic ? civilian_wilds : civilian_city);
+
+  return NULL;
+}
+
 static const char *ai_line_for_intent(struct char_data *mob, int intent, int attitude, const char **out_pool, const char **out_reason)
 {
   int innkeeper;
@@ -1161,17 +1252,20 @@ static const char *ai_line_for_intent(struct char_data *mob, int intent, int att
 
   if (mob->ai_prof->role == ROLE_GUARD) {
     if (intent == AI_INTENT_GREET) { if (out_pool) *out_pool = "POOL_GUARD_GREET"; if (out_reason) *out_reason = "PLAYER_SAY"; return ai_pick_weighted_phrase(role_guard_greet, role_rare_guard); }
+    if (intent == AI_INTENT_DIRECTIONS) { if (out_pool) *out_pool = "POOL_GUARD_DIRECTIONS"; if (out_reason) *out_reason = "PLAYER_SAY"; return ai_direction_line(mob); }
     if (intent == AI_INTENT_ASK_SERVICE || intent == AI_INTENT_CONFUSION) { if (out_pool) *out_pool = "POOL_GUARD_PLAYER_SAY_RESPONSE"; if (out_reason) *out_reason = "PLAYER_SAY"; return ai_pick_phrase(role_guard_service); }
     if (intent == AI_INTENT_INSULT || intent == AI_INTENT_EMOTE_SPIT || intent == AI_INTENT_THREAT) { if (out_pool) *out_pool = "POOL_GUARD_CRIME_REACT"; return (attitude < -20) ? "Last warning. Respect the law or leave." : "Mind your tongue and keep the peace."; }
     if (intent >= AI_INTENT_EMOTE_DANCE) { if (out_pool) *out_pool = "POOL_GUARD_PLAYER_EMOTE_RESPONSE"; if (out_reason) *out_reason = "PLAYER_EMOTE"; return ai_pick_phrase(role_guard_emote); }
   } else if (mob->ai_prof->role == ROLE_MERCHANT) {
     if (innkeeper) {
       if (intent == AI_INTENT_GREET) { if (out_pool) *out_pool = "POOL_INNKEEPER_GREET"; if (out_reason) *out_reason = "PLAYER_SAY"; return ai_pick_weighted_phrase(role_innkeeper_greet, role_rare_innkeeper); }
+      if (intent == AI_INTENT_DIRECTIONS) { if (out_pool) *out_pool = "POOL_INNKEEPER_DIRECTIONS"; if (out_reason) *out_reason = "PLAYER_SAY"; return ai_direction_line(mob); }
       if (intent == AI_INTENT_ASK_SERVICE || intent == AI_INTENT_CONFUSION) { if (out_pool) *out_pool = "POOL_INNKEEPER_PLAYER_SAY_RESPONSE"; if (out_reason) *out_reason = "PLAYER_SAY"; return ai_pick_phrase(role_innkeeper_service); }
       if (intent == AI_INTENT_INSULT || intent == AI_INTENT_EMOTE_SPIT || intent == AI_INTENT_THREAT) { if (out_pool) *out_pool = "POOL_INNKEEPER_CRIME_REACT"; return (attitude < -25) ? "That's enough. Calm down or leave my inn." : "Please show respect in my house."; }
       if (intent >= AI_INTENT_EMOTE_DANCE) { if (out_pool) *out_pool = "POOL_INNKEEPER_PLAYER_EMOTE_RESPONSE"; if (out_reason) *out_reason = "PLAYER_EMOTE"; return ai_pick_phrase(role_innkeeper_emote); }
     } else {
       if (intent == AI_INTENT_GREET) { if (out_pool) *out_pool = "POOL_MERCHANT_GREET"; if (out_reason) *out_reason = "PLAYER_SAY"; return ai_pick_weighted_phrase(role_merchant_greet, role_rare_merchant); }
+      if (intent == AI_INTENT_DIRECTIONS) { if (out_pool) *out_pool = "POOL_MERCHANT_DIRECTIONS"; if (out_reason) *out_reason = "PLAYER_SAY"; return ai_direction_line(mob); }
       if (intent == AI_INTENT_ASK_SERVICE || intent == AI_INTENT_CONFUSION) { if (out_pool) *out_pool = "POOL_MERCHANT_PLAYER_SAY_RESPONSE"; if (out_reason) *out_reason = "PLAYER_SAY"; return ai_pick_phrase(role_merchant_service); }
       if (intent == AI_INTENT_INSULT || intent == AI_INTENT_EMOTE_SPIT || intent == AI_INTENT_THREAT) { if (out_pool) *out_pool = "POOL_MERCHANT_CRIME_REACT"; return (attitude < -25) ? "No trade for rude customers. Move along." : "Respect the stall or no business."; }
       if (intent >= AI_INTENT_EMOTE_DANCE) { if (out_pool) *out_pool = "POOL_MERCHANT_PLAYER_EMOTE_RESPONSE"; if (out_reason) *out_reason = "PLAYER_EMOTE"; return ai_pick_phrase(role_merchant_emote); }
@@ -1183,26 +1277,32 @@ static const char *ai_line_for_intent(struct char_data *mob, int intent, int att
     if (intent >= AI_INTENT_EMOTE_DANCE) { if (out_pool) *out_pool = "POOL_BANDIT_PLAYER_EMOTE_RESPONSE"; if (out_reason) *out_reason = "PLAYER_EMOTE"; return ai_pick_phrase(role_bandit_emote); }
   } else if (mob->ai_prof->role == ROLE_BEAST) {
     if (intent == AI_INTENT_GREET) { if (out_pool) *out_pool = "POOL_BEAST_GREET"; if (out_reason) *out_reason = "PLAYER_SAY"; return ai_pick_weighted_phrase(role_beast_greet, role_rare_beast); }
+    if (intent == AI_INTENT_DIRECTIONS) return NULL;
     if (intent == AI_INTENT_ASK_SERVICE || intent == AI_INTENT_CONFUSION) { if (out_pool) *out_pool = "POOL_BEAST_PLAYER_SAY_RESPONSE"; if (out_reason) *out_reason = "PLAYER_SAY"; return ai_pick_phrase(role_beast_service); }
     if (intent >= AI_INTENT_EMOTE_DANCE || intent == AI_INTENT_THREAT || intent == AI_INTENT_INSULT || intent == AI_INTENT_EMOTE_SPIT) { if (out_pool) *out_pool = "POOL_BEAST_PLAYER_EMOTE_RESPONSE"; if (out_reason) *out_reason = "PLAYER_EMOTE"; return ai_pick_phrase(role_beast_emote); }
     return NULL;
   } else if (mob->ai_prof->role == ROLE_UNDEAD) {
     if (intent == AI_INTENT_GREET) { if (out_pool) *out_pool = "POOL_UNDEAD_GREET"; if (out_reason) *out_reason = "PLAYER_SAY"; return ai_pick_weighted_phrase(role_undead_greet, role_rare_undead); }
+    if (intent == AI_INTENT_DIRECTIONS) return NULL;
     if (intent == AI_INTENT_ASK_SERVICE || intent == AI_INTENT_CONFUSION) { if (out_pool) *out_pool = "POOL_UNDEAD_PLAYER_SAY_RESPONSE"; if (out_reason) *out_reason = "PLAYER_SAY"; return ai_pick_phrase(role_undead_service); }
     if (intent >= AI_INTENT_EMOTE_DANCE || intent == AI_INTENT_THREAT || intent == AI_INTENT_INSULT || intent == AI_INTENT_EMOTE_SPIT) { if (out_pool) *out_pool = "POOL_UNDEAD_PLAYER_EMOTE_RESPONSE"; if (out_reason) *out_reason = "PLAYER_EMOTE"; return ai_pick_phrase(role_undead_emote); }
   } else if (mob->ai_prof->role == ROLE_SPIRIT) {
     if (intent == AI_INTENT_GREET) { if (out_pool) *out_pool = "POOL_SPIRIT_GREET"; if (out_reason) *out_reason = "PLAYER_SAY"; return ai_pick_weighted_phrase(role_spirit_greet, role_rare_spirit); }
+    if (intent == AI_INTENT_DIRECTIONS) return NULL;
     if (intent == AI_INTENT_ASK_SERVICE || intent == AI_INTENT_CONFUSION) { if (out_pool) *out_pool = "POOL_SPIRIT_PLAYER_SAY_RESPONSE"; if (out_reason) *out_reason = "PLAYER_SAY"; return ai_pick_phrase(role_spirit_service); }
     if (intent == AI_INTENT_EMOTE_SPIT) { if (out_pool) *out_pool = "POOL_SPIRIT_PLAYER_EMOTE_RESPONSE"; if (out_reason) *out_reason = "PLAYER_EMOTE"; return "$n recoils like torn mist."; }
     if (intent >= AI_INTENT_EMOTE_DANCE) { if (out_pool) *out_pool = "POOL_SPIRIT_PLAYER_EMOTE_RESPONSE"; if (out_reason) *out_reason = "PLAYER_EMOTE"; return ai_pick_phrase(role_spirit_emote); }
   } else if (mob->ai_prof->role == ROLE_CULTIST) {
     if (intent == AI_INTENT_GREET) { if (out_pool) *out_pool = "POOL_CULTIST_GREET"; if (out_reason) *out_reason = "PLAYER_SAY"; return "The circle watches. Speak your intent."; }
+    if (intent == AI_INTENT_DIRECTIONS) return NULL;
     if (intent >= AI_INTENT_EMOTE_DANCE || intent == AI_INTENT_EMOTE_SPIT) { if (out_pool) *out_pool = "POOL_CULTIST_PLAYER_EMOTE_RESPONSE"; if (out_reason) *out_reason = "PLAYER_EMOTE"; return (intent == AI_INTENT_EMOTE_SPIT) ? "Blasphemy has a price." : "Ritual, not revelry."; }
   } else if (mob->ai_prof->role == ROLE_BOSS) {
     if (intent == AI_INTENT_GREET) { if (out_pool) *out_pool = "POOL_COMMANDER_GREET"; if (out_reason) *out_reason = "PLAYER_SAY"; return "Stay sharp. This post does not sleep."; }
+    if (intent == AI_INTENT_DIRECTIONS) { if (out_pool) *out_pool = "POOL_COMMANDER_DIRECTIONS"; if (out_reason) *out_reason = "PLAYER_SAY"; return ai_direction_line(mob); }
     if (intent >= AI_INTENT_EMOTE_DANCE) { if (out_pool) *out_pool = "POOL_COMMANDER_PLAYER_EMOTE_RESPONSE"; if (out_reason) *out_reason = "PLAYER_EMOTE"; return "Stand to. Keep discipline."; }
   } else {
     if (intent == AI_INTENT_GREET) { if (out_pool) *out_pool = "POOL_GENERIC_GREET"; if (out_reason) *out_reason = "PLAYER_SAY"; return "Hello."; }
+    if (intent == AI_INTENT_DIRECTIONS) { if (out_pool) *out_pool = "POOL_GENERIC_DIRECTIONS"; if (out_reason) *out_reason = "PLAYER_SAY"; return ai_direction_line(mob); }
     return NULL;
   }
 
@@ -1321,6 +1421,7 @@ int ai_actor_tick(struct char_data *mob, time_t now)
 
   if (st->next_tick > now)
     return FALSE;
+  ai_state_refresh_local_topics(mob);
   st->next_tick = now + rand_number(2, 4);
 
   if (st->talk_cooldown_pulses > 0) st->talk_cooldown_pulses = MAX(0, st->talk_cooldown_pulses - (int)(2 * PASSES_PER_SEC));
@@ -1486,6 +1587,66 @@ static int ai_text_has_sub_ci(const char *hay, const char *needle)
   return FALSE;
 }
 
+static int ai_role_can_give_directions(int role)
+{
+  switch (role) {
+    case ROLE_GUARD:
+    case ROLE_MERCHANT:
+    case ROLE_BOSS:
+    case ROLE_CIVILIAN:
+      return TRUE;
+    case ROLE_BEAST:
+    case ROLE_UNDEAD:
+    case ROLE_SPIRIT:
+    case ROLE_CULTIST:
+      return FALSE;
+    default:
+      return FALSE;
+  }
+}
+
+static void ai_state_refresh_local_topics(struct char_data *mob)
+{
+  struct ai_actor_state *st;
+  char room_name[MAX_INPUT_LENGTH * 2];
+  char zone_name[MAX_INPUT_LENGTH * 2];
+  char combo[(MAX_INPUT_LENGTH * 4) + 8];
+  int zone;
+
+  if (!mob || !mob->ai_state) return;
+  st = mob->ai_state;
+  st->local_topic_mask = 0;
+
+  if (IN_ROOM(mob) == NOWHERE)
+    return;
+
+  zone = world[IN_ROOM(mob)].zone;
+  room_name[0] = '\0';
+  zone_name[0] = '\0';
+  combo[0] = '\0';
+
+  if (world[IN_ROOM(mob)].name)
+    snprintf(room_name, sizeof(room_name), "%s", world[IN_ROOM(mob)].name);
+  if (zone >= 0 && zone <= top_of_zone_table && zone_table[zone].name)
+    snprintf(zone_name, sizeof(zone_name), "%s", zone_table[zone].name);
+
+  snprintf(combo, sizeof(combo), "%s %s", room_name, zone_name);
+
+  if (ai_text_has_sub_ci(combo, "midgaard")) st->local_topic_mask |= AI_TOPIC_MIDGAARD;
+  if (ai_text_has_sub_ci(combo, "temple")) st->local_topic_mask |= AI_TOPIC_TEMPLE;
+  if (ai_text_has_sub_ci(combo, "market") || ai_text_has_sub_ci(combo, "bazaar") || ai_text_has_sub_ci(combo, "square")) st->local_topic_mask |= AI_TOPIC_MARKET;
+  if (ai_text_has_sub_ci(combo, "inn") || ai_text_has_sub_ci(combo, "tavern")) st->local_topic_mask |= AI_TOPIC_INN;
+  if (ai_text_has_sub_ci(combo, "bank") || ai_text_has_sub_ci(combo, "vault") || ai_text_has_sub_ci(combo, "exchange")) st->local_topic_mask |= AI_TOPIC_BANK;
+  if (ai_text_has_sub_ci(combo, "alley") || ai_text_has_sub_ci(combo, "backstreet")) st->local_topic_mask |= AI_TOPIC_ALLEY;
+  if (ai_text_has_sub_ci(combo, "wild") || ai_text_has_sub_ci(combo, "forest") || ai_text_has_sub_ci(combo, "field") || ai_text_has_sub_ci(combo, "plains")) st->local_topic_mask |= AI_TOPIC_WILDERNESS;
+  if (ai_text_has_sub_ci(combo, "dungeon") || ai_text_has_sub_ci(combo, "crypt") || ai_text_has_sub_ci(combo, "cavern")) st->local_topic_mask |= AI_TOPIC_DUNGEON;
+  if (ai_text_has_sub_ci(combo, "sewer") || ai_text_has_sub_ci(combo, "drain")) st->local_topic_mask |= AI_TOPIC_SEWER;
+  if (ai_text_has_sub_ci(combo, "castle") || ai_text_has_sub_ci(combo, "keep") || ai_text_has_sub_ci(combo, "fort")) st->local_topic_mask |= AI_TOPIC_CASTLE;
+
+  if (st->local_topic_mask == 0)
+    st->local_topic_mask = AI_TOPIC_MIDGAARD;
+}
+
 static int ai_detect_intent(enum ai_event_type type, const char *text)
 {
   if (type == AI_EVENT_PLAYER_EMOTE) {
@@ -1502,6 +1663,9 @@ static int ai_detect_intent(enum ai_event_type type, const char *text)
   if (ai_text_has_sub_ci(text, "hello") || ai_text_has_sub_ci(text, "hi") || ai_text_has_sub_ci(text, "hey") ||
       ai_text_has_sub_ci(text, "greetings") || ai_text_has_sub_ci(text, "yo"))
     return AI_INTENT_GREET;
+  if (ai_text_has_sub_ci(text, "where") || ai_text_has_sub_ci(text, "how do i get") || ai_text_has_sub_ci(text, "how to get") ||
+      ai_text_has_sub_ci(text, "directions") || ai_text_has_sub_ci(text, "find") || ai_text_has_sub_ci(text, "locate"))
+    return AI_INTENT_DIRECTIONS;
   if (ai_text_has_sub_ci(text, "buy") || ai_text_has_sub_ci(text, "sell") || ai_text_has_sub_ci(text, "wares") ||
       ai_text_has_sub_ci(text, "shop") || ai_text_has_sub_ci(text, "room") || ai_text_has_sub_ci(text, "inn") ||
       ai_text_has_sub_ci(text, "rest") || ai_text_has_sub_ci(text, "heal") || ai_text_has_sub_ci(text, "bank"))
@@ -1529,6 +1693,8 @@ static int ai_role_priority_score(struct char_data *mob)
   if (mob->ai_prof->role == ROLE_GUARD) return 300;
   if (mob->ai_prof->role == ROLE_MERCHANT && mob->ai_prof->style == 1) return 280;
   if (mob->ai_prof->role == ROLE_MERCHANT) return 260;
+  if (mob->ai_prof->role == ROLE_BOSS) return 245;
+  if (mob->ai_prof->role == ROLE_CIVILIAN) return 220;
   if (mob->ai_prof->role == ROLE_BANDIT) return 180;
   if (mob->ai_prof->role == ROLE_BEAST) return 120;
   if (mob->ai_prof->role == ROLE_UNDEAD) return 110;
@@ -1557,6 +1723,15 @@ static int ai_event_fit_bonus(struct char_data *mob, enum ai_event_type type, in
     if (mob->ai_prof->role == ROLE_MERCHANT && mob->ai_prof->style == 1) return 35;
     if (mob->ai_prof->role == ROLE_CULTIST) return 30;
     if (mob->ai_prof->role == ROLE_SPIRIT) return 22;
+  }
+  if (type == AI_EVENT_PLAYER_SAY && intent == AI_INTENT_DIRECTIONS) {
+    if (!ai_role_can_give_directions(mob->ai_prof->role))
+      return -500;
+    if (mob->ai_prof->role == ROLE_GUARD) return 260;
+    if (mob->ai_prof->role == ROLE_MERCHANT && mob->ai_prof->style == 1) return 245;
+    if (mob->ai_prof->role == ROLE_BOSS) return 240;
+    if (mob->ai_prof->role == ROLE_MERCHANT) return 230;
+    if (mob->ai_prof->role == ROLE_CIVILIAN) return 210;
   }
   return ai_role_priority_score(mob);
 }
@@ -1647,6 +1822,7 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
   if (!mob || !actor || !mob->ai_prof || !mob->ai_state || IS_NPC(actor))
     return;
 
+  ai_state_refresh_local_topics(mob);
   e = ai_mem_get_or_create(mob, GET_IDNUM(actor));
   intent = ai_detect_intent(type, text ? text : "");
 

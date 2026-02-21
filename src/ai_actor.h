@@ -22,6 +22,7 @@ enum ai_actor_intent {
   AI_INTENT_NONE = 0,
   AI_INTENT_GREET,
   AI_INTENT_ASK_SERVICE,
+  AI_INTENT_DIRECTIONS,
   AI_INTENT_THREAT,
   AI_INTENT_INSULT,
   AI_INTENT_PRAISE,
@@ -30,6 +31,19 @@ enum ai_actor_intent {
   AI_INTENT_EMOTE_SPIT,
   AI_INTENT_EMOTE_HUG,
   AI_INTENT_EMOTE_WAVE
+};
+
+enum ai_actor_topic_flags {
+  AI_TOPIC_MIDGAARD = (1 << 0),
+  AI_TOPIC_TEMPLE = (1 << 1),
+  AI_TOPIC_MARKET = (1 << 2),
+  AI_TOPIC_INN = (1 << 3),
+  AI_TOPIC_BANK = (1 << 4),
+  AI_TOPIC_ALLEY = (1 << 5),
+  AI_TOPIC_WILDERNESS = (1 << 6),
+  AI_TOPIC_DUNGEON = (1 << 7),
+  AI_TOPIC_SEWER = (1 << 8),
+  AI_TOPIC_CASTLE = (1 << 9)
 };
 
 /* Optional compile-time debug logging. */
@@ -190,6 +204,7 @@ struct ai_actor_state {
   char pending_event_text[64];
   time_t pending_event_time;
   int cached_zone;
+  uint32_t local_topic_mask;
   int role_scores[ROLE_BOSS + 1];
   char last_pool_name[48];
   char last_speak_reason[32];
