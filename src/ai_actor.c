@@ -213,6 +213,7 @@ static int ai_conv_try_progress(struct char_data *mob, time_t now);
 static int ai_conv_try_start(struct char_data *mob, time_t now);
 static int ai_player_speech_classify(const char *text, int *out_confidence, int *out_is_weather);
 static int ai_intent_from_player_class(int speech_class);
+static int ai_detect_emote_kind(const char *text);
 static int ai_actor_room_response_slot(struct char_data *mob, struct char_data *actor, enum ai_event_type type, int intent, int confidence, const char *normalized);
 static unsigned long ai_hash_mix(unsigned long h, unsigned long v);
 static unsigned long ai_hash_text_stable(const char *text);
@@ -266,6 +267,14 @@ enum ai_player_speech_class {
   AI_SPEECH_COMPLIMENT,
   AI_SPEECH_ROMANCE,
   AI_SPEECH_FEELING
+};
+
+enum ai_emote_kind {
+  AI_EMOTE_OTHER = 0,
+  AI_EMOTE_DANCE,
+  AI_EMOTE_HIGHFIVE,
+  AI_EMOTE_HUG,
+  AI_EMOTE_GLARE
 };
 
 struct ai_player_arb_entry {
@@ -1644,6 +1653,24 @@ static const char *const role_beast_emote[] = {"$n growls at the motion.", "$n h
 static const char *const role_undead_emote[] = {"$n hisses at your display.", "$n rattles in contempt.", "$n whispers a curse.", "$n's stare chills the air.", "$n croaks a hollow warning.", "$n's jaw clacks in disapproval.", "$n drifts closer, hostile.", "$n emits a grave-cold moan.", "$n watches with corpse-still malice.", "$n rasps at your insolence.", "$n's fingers twitch like dead roots.", "$n leans in with a hiss.", NULL};
 static const char *const role_spirit_emote[] = {"$n whispers around your motion.", "$n flickers in pale interest.", "$n swirls as if in a slow dance.", "$n hums a spectral reply.", "$n drifts back from your gesture.", "$n's glow dims in disapproval.", "$n curls into mist and returns.", "$n answers with a haunted murmur.", "$n shivers through the air.", "$n ripples with soft emotion.", "$n whispers from behind you.", "$n lingers, uncertain.", NULL};
 
+static const char *const emote_dance_guard[] = {"Keep that energy outside the post.", NULL};
+static const char *const emote_dance_innkeeper[] = {"Ha. Good to see some life in here.", NULL};
+static const char *const emote_dance_merchant[] = {"Good spirits. Good for business.", NULL};
+static const char *const emote_dance_bandit[] = {"Draw less attention to yourself.", NULL};
+static const char *const emote_dance_commander[] = {"Enough. Keep order in here.", NULL};
+static const char *const emote_dance_cultist[] = {"Joy is a distraction from purpose.", NULL};
+static const char *const emote_dance_spirit_emote[] = {"$n gives a soft, ethereal laugh.", NULL};
+
+static const char *const emote_affection_innkeeper[] = {"Friendly sort, aren't you.", NULL};
+static const char *const emote_affection_guard[] = {"Mind your distance on post.", NULL};
+static const char *const emote_affection_bandit[] = {"Watch the hands.", NULL};
+static const char *const emote_affection_civilian[] = {"Oh. Well, hello to you too.", NULL};
+
+static const char *const emote_glare_guard[] = {"Something the matter, citizen?", NULL};
+static const char *const emote_glare_bandit[] = {"Keep walking.", NULL};
+static const char *const emote_glare_spirit[] = {"Your gaze cannot touch what I am.", NULL};
+static const char *const emote_glare_commander[] = {"State your grievance or move on.", NULL};
+
 static const char *const role_rare_guard[] = {"I know every alley here. Ask and I'll map your path.", NULL};
 static const char *const role_rare_merchant[] = {"For you? A rumor free with every fair trade.", NULL};
 static const char *const role_rare_innkeeper[] = {"Old travelers say this hearth blesses honest sleepers.", NULL};
@@ -2622,7 +2649,7 @@ static const char *ai_direction_line(struct char_data *mob, int target_topic)
   return "Keep to the main road and ask a guard post.";
 }
 
-static const char *ai_line_for_intent(struct char_data *mob, struct ai_actor_memory_entry *e, int intent, int attitude, const char *text, int avoid_template_id, int *out_template_id, const char **out_pool, const char **out_reason)
+static const char *ai_line_for_intent(struct char_data *mob, struct ai_actor_memory_entry *e, int intent, int attitude, const char *text, enum ai_action_type action, int avoid_template_id, int *out_template_id, const char **out_pool, const char **out_reason)
 {
   static char line[224];
   static char voiced[224];
@@ -2635,6 +2662,8 @@ static const char *ai_line_for_intent(struct char_data *mob, struct ai_actor_mem
   const char *core = NULL;
   const struct ai_voice_profile *vp = NULL;
   unsigned long seed;
+  int emote_kind = AI_EMOTE_OTHER;
+  int suppress_default_emote = FALSE;
 
   static const char *const gib_guard[] = {"Slow down and say that clearly.", "I did not catch that. Ask again plain.", NULL};
   static const char *const gib_merch[] = {"I cannot parse that. Ask for wares plainly.", "Try that again with clear words.", NULL};
@@ -2661,6 +2690,7 @@ static const char *ai_line_for_intent(struct char_data *mob, struct ai_actor_mem
   style = mob->ai_prof->style;
   innkeeper = (role == ROLE_MERCHANT && style == 1);
   seed = ai_hash_mix(ai_conv_seed(mob, intent, 0), ai_hash_text_stable(text ? text : ""));
+  emote_kind = ai_detect_emote_kind(text);
 
   if (ai_text_has_sub_ci(text, "love") || ai_text_has_sub_ci(text, "crush") || ai_text_has_sub_ci(text, "romance") || ai_text_has_sub_ci(text, "date") || ai_text_has_sub_ci(text, "pretty") ||
       ai_text_has_sub_ci(text, "weird") || ai_text_has_sub_ci(text, "feel") || ai_text_has_sub_ci(text, "feeling") || ai_text_has_sub_ci(text, "what do you think") || ai_text_has_sub_ci(text, "do you think i") || ai_text_has_sub_ci(text, "am i")) {
@@ -2776,7 +2806,37 @@ static const char *ai_line_for_intent(struct char_data *mob, struct ai_actor_mem
     core = "{THANKS}. Keep to the {GOOD} {WORK}.";
   if (!core && (intent == AI_INTENT_INSULT || intent == AI_INTENT_EMOTE_SPIT || intent == AI_INTENT_THREAT))
     core = (attitude < -20) ? "Last warning. Respect the law or leave." : "Mind your tongue and keep the {QUIET}.";
-  if (!core && intent >= AI_INTENT_EMOTE_DANCE) {
+  if (!core && intent >= AI_INTENT_EMOTE_DANCE && (action == AI_ACTION_SPEAK || action == AI_ACTION_SPEAK_WARN)) {
+    if (emote_kind == AI_EMOTE_DANCE) {
+      if (role == ROLE_GUARD) core = ai_pick_phrase(emote_dance_guard);
+      else if (role == ROLE_MERCHANT && innkeeper) core = ai_pick_phrase(emote_dance_innkeeper);
+      else if (role == ROLE_MERCHANT) core = ai_pick_phrase(emote_dance_merchant);
+      else if (role == ROLE_BANDIT) core = ai_pick_phrase(emote_dance_bandit);
+      else if (role == ROLE_BOSS) core = ai_pick_phrase(emote_dance_commander);
+      else if (role == ROLE_CULTIST) core = ai_pick_phrase(emote_dance_cultist);
+      else if (role == ROLE_SPIRIT) {
+        core = ai_pick_phrase(emote_dance_spirit_emote);
+        skip_voice = TRUE;
+      }
+      else if (role == ROLE_BEAST || role == ROLE_UNDEAD)
+        suppress_default_emote = TRUE;
+      if (core && out_pool) *out_pool = "POOL_EMOTE_ROLE_DANCE";
+    } else if (emote_kind == AI_EMOTE_HIGHFIVE || emote_kind == AI_EMOTE_HUG) {
+      if (role == ROLE_MERCHANT && innkeeper) core = ai_pick_phrase(emote_affection_innkeeper);
+      else if (role == ROLE_GUARD) core = ai_pick_phrase(emote_affection_guard);
+      else if (role == ROLE_BANDIT) core = ai_pick_phrase(emote_affection_bandit);
+      else if (role == ROLE_CIVILIAN) core = ai_pick_phrase(emote_affection_civilian);
+      if (core && out_pool) *out_pool = "POOL_EMOTE_ROLE_AFFECTION";
+    } else if (emote_kind == AI_EMOTE_GLARE) {
+      if (role == ROLE_GUARD) core = ai_pick_phrase(emote_glare_guard);
+      else if (role == ROLE_BANDIT) core = ai_pick_phrase(emote_glare_bandit);
+      else if (role == ROLE_SPIRIT) core = ai_pick_phrase(emote_glare_spirit);
+      else if (role == ROLE_BOSS) core = ai_pick_phrase(emote_glare_commander);
+      if (core && out_pool) *out_pool = "POOL_EMOTE_ROLE_GLARE";
+    }
+  }
+
+  if (!core && !suppress_default_emote && intent >= AI_INTENT_EMOTE_DANCE) {
     if (role == ROLE_GUARD) core = ai_pick_phrase(role_guard_emote);
     else if (role == ROLE_MERCHANT && innkeeper) core = ai_pick_phrase(role_innkeeper_emote);
     else if (role == ROLE_MERCHANT) core = ai_pick_phrase(role_merchant_emote);
@@ -3522,15 +3582,36 @@ static int ai_intent_from_player_class(int speech_class)
   }
 }
 
+static int ai_detect_emote_kind(const char *text)
+{
+  if (!text || !*text)
+    return AI_EMOTE_OTHER;
+
+  if (ai_text_has_sub_ci(text, "dance"))
+    return AI_EMOTE_DANCE;
+  if (ai_text_has_sub_ci(text, "high five") || ai_text_has_sub_ci(text, "highfive") || ai_text_has_sub_ci(text, "high-five"))
+    return AI_EMOTE_HIGHFIVE;
+  if (ai_text_has_sub_ci(text, "hug"))
+    return AI_EMOTE_HUG;
+  if (ai_text_has_sub_ci(text, "glare") || ai_text_has_sub_ci(text, "glares") || ai_text_has_sub_ci(text, "glared"))
+    return AI_EMOTE_GLARE;
+
+  return AI_EMOTE_OTHER;
+}
+
 static int ai_detect_intent(enum ai_event_type type, const char *text)
 {
+  int emote_kind;
   int speech_class;
 
   if (type == AI_EVENT_PLAYER_EMOTE) {
-    if (ai_text_has_sub_ci(text, "dance")) return AI_INTENT_EMOTE_DANCE;
+    emote_kind = ai_detect_emote_kind(text);
+    if (emote_kind == AI_EMOTE_DANCE) return AI_INTENT_EMOTE_DANCE;
+    if (emote_kind == AI_EMOTE_HIGHFIVE || emote_kind == AI_EMOTE_HUG) return AI_INTENT_EMOTE_HUG;
+    if (emote_kind == AI_EMOTE_GLARE) return AI_INTENT_INSULT;
+
     if (ai_text_has_sub_ci(text, "spit")) return AI_INTENT_EMOTE_SPIT;
     if (ai_text_has_sub_ci(text, "sing")) return AI_INTENT_EMOTE_WAVE;
-    if (ai_text_has_sub_ci(text, "hug")) return AI_INTENT_EMOTE_HUG;
     if (ai_text_has_sub_ci(text, "wave")) return AI_INTENT_EMOTE_WAVE;
     return AI_INTENT_NONE;
   }
@@ -4236,7 +4317,7 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
     else if (alert_level > 0.6f && mob->ai_prof->role == ROLE_GUARD)
       line = "State your business. Now.";
     else
-      line = ai_line_for_intent(mob, e, intent, e->attitude, normalized, avoid_template_id, &selected_template_id, &pool, &reason);
+      line = ai_line_for_intent(mob, e, intent, e->attitude, normalized, best_action, avoid_template_id, &selected_template_id, &pool, &reason);
 
     if (!line || !*line)
       return;
