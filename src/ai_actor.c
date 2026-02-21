@@ -31,6 +31,58 @@
 #define AI_ROLE_AMBIGUOUS_MARGIN 3
 #define AI_TOPIC_MEMORY_WINDOW_SECS 30
 #define AI_BFS_QUEUE_MAX 256
+#define AI_ROOM_PLAYER_SPEECH_GRACE_SECS 8
+#define AI_NPC_CONVO_MAX_LINES 6
+#define AI_NPC_CONVO_LINE_GAP_SECS 10
+#define AI_NPC_CONVO_TOPIC_MIN_SECS 20
+#define AI_NPC_CONVO_TOPIC_MAX_SECS 30
+#define AI_NPC_CONVO_START_EMPTY_SECS 60
+#define AI_NPC_CONVO_START_WITH_PLAYERS_SECS 180
+
+enum ai_conversation_topic {
+  AI_CONV_TOPIC_UNKNOWN = 0,
+  AI_CONV_TOPIC_WEATHER,
+  AI_CONV_TOPIC_SMALLTALK,
+  AI_CONV_TOPIC_DIRECTIONS,
+  AI_CONV_TOPIC_SHOP,
+  AI_CONV_TOPIC_INN,
+  AI_CONV_TOPIC_BANK,
+  AI_CONV_TOPIC_HELP,
+  AI_CONV_TOPIC_THREAT,
+  AI_CONV_TOPIC_CRIME,
+  AI_CONV_TOPIC_PATROL,
+  AI_CONV_TOPIC_RUMOR
+};
+
+struct ai_conv_actor_state {
+  struct char_data *mob;
+  int current_topic;
+  long partner_id;
+  long last_speaker_id;
+  time_t last_line_time;
+  time_t topic_expires_at;
+  int depth_counter;
+  time_t updated_at;
+};
+
+struct ai_conv_room_state {
+  room_rnum room;
+  struct char_data *speaker_a;
+  struct char_data *speaker_b;
+  int topic;
+  int active;
+  int line_count;
+  long last_speaker_id;
+  time_t last_line_time;
+  time_t topic_expires_at;
+  time_t last_start_time;
+  time_t last_player_speech_time;
+};
+
+#define AI_CONV_ACTOR_STATE_MAX 512
+#define AI_CONV_ROOM_STATE_MAX 256
+static struct ai_conv_actor_state ai_conv_actor_states[AI_CONV_ACTOR_STATE_MAX];
+static struct ai_conv_room_state ai_conv_room_states[AI_CONV_ROOM_STATE_MAX];
 
 static int ai_debug = AI_ACTOR_DEBUG;
 
@@ -40,7 +92,19 @@ static const char *ai_pool_pick(const char *const *pool);
 static int ai_role_can_give_directions(int role);
 static int ai_role_can_answer_intent(int role, int style, int intent);
 static int ai_text_has_sub_ci(const char *hay, const char *needle);
+static int ai_role_priority_score(struct char_data *mob);
 static void ai_state_refresh_local_topics(struct char_data *mob);
+static struct ai_conv_actor_state *ai_conv_actor_state_get(struct char_data *mob, int create);
+static struct ai_conv_room_state *ai_conv_room_state_get(room_rnum room, int create);
+static void ai_conv_actor_reset(struct char_data *mob, time_t now);
+static void ai_conv_room_end(struct ai_conv_room_state *room_st, time_t now);
+static int ai_conv_topic_from_intent(int intent);
+static int ai_conv_topic_for_pair(struct char_data *a, struct char_data *b);
+static int ai_conv_room_has_player(room_rnum room);
+static const char *ai_conv_line_for_topic(struct char_data *speaker, int topic);
+static int ai_conv_emit_line(struct ai_conv_room_state *room_st, struct char_data *speaker, struct char_data *partner, time_t now);
+static int ai_conv_try_progress(struct char_data *mob, time_t now);
+static int ai_conv_try_start(struct char_data *mob, time_t now);
 
 
 static const char *ai_role_name_local(int role)
@@ -210,6 +274,124 @@ static int ai_room_crowd_count(room_rnum room)
   for (ch = world[room].people; ch; ch = ch->next_in_room)
     n++;
   return n;
+}
+
+static int ai_conv_room_has_player(room_rnum room)
+{
+  struct char_data *ch;
+
+  if (room == NOWHERE)
+    return FALSE;
+
+  for (ch = world[room].people; ch; ch = ch->next_in_room) {
+    if (!IS_NPC(ch))
+      return TRUE;
+  }
+  return FALSE;
+}
+
+static struct ai_conv_actor_state *ai_conv_actor_state_get(struct char_data *mob, int create)
+{
+  int i;
+  int oldest = 0;
+
+  if (!mob)
+    return NULL;
+
+  for (i = 0; i < AI_CONV_ACTOR_STATE_MAX; i++) {
+    if (ai_conv_actor_states[i].mob == mob)
+      return &ai_conv_actor_states[i];
+  }
+
+  if (!create)
+    return NULL;
+
+  for (i = 0; i < AI_CONV_ACTOR_STATE_MAX; i++) {
+    if (!ai_conv_actor_states[i].mob) {
+      memset(&ai_conv_actor_states[i], 0, sizeof(ai_conv_actor_states[i]));
+      ai_conv_actor_states[i].mob = mob;
+      return &ai_conv_actor_states[i];
+    }
+    if (ai_conv_actor_states[i].updated_at < ai_conv_actor_states[oldest].updated_at)
+      oldest = i;
+  }
+
+  memset(&ai_conv_actor_states[oldest], 0, sizeof(ai_conv_actor_states[oldest]));
+  ai_conv_actor_states[oldest].mob = mob;
+  return &ai_conv_actor_states[oldest];
+}
+
+static struct ai_conv_room_state *ai_conv_room_state_get(room_rnum room, int create)
+{
+  static int initialized = FALSE;
+  int i;
+  int oldest = 0;
+
+  if (!initialized) {
+    for (i = 0; i < AI_CONV_ROOM_STATE_MAX; i++)
+      ai_conv_room_states[i].room = NOWHERE;
+    initialized = TRUE;
+  }
+
+  if (room == NOWHERE)
+    return NULL;
+
+  for (i = 0; i < AI_CONV_ROOM_STATE_MAX; i++) {
+    if (ai_conv_room_states[i].room == room)
+      return &ai_conv_room_states[i];
+  }
+
+  if (!create)
+    return NULL;
+
+  for (i = 0; i < AI_CONV_ROOM_STATE_MAX; i++) {
+    if (ai_conv_room_states[i].room == NOWHERE) {
+      memset(&ai_conv_room_states[i], 0, sizeof(ai_conv_room_states[i]));
+      ai_conv_room_states[i].room = room;
+      return &ai_conv_room_states[i];
+    }
+    if (ai_conv_room_states[i].last_line_time < ai_conv_room_states[oldest].last_line_time)
+      oldest = i;
+  }
+
+  memset(&ai_conv_room_states[oldest], 0, sizeof(ai_conv_room_states[oldest]));
+  ai_conv_room_states[oldest].room = room;
+  return &ai_conv_room_states[oldest];
+}
+
+static void ai_conv_actor_reset(struct char_data *mob, time_t now)
+{
+  struct ai_conv_actor_state *st = ai_conv_actor_state_get(mob, 0);
+
+  if (!st)
+    return;
+
+  st->current_topic = AI_CONV_TOPIC_UNKNOWN;
+  st->partner_id = 0;
+  st->last_speaker_id = 0;
+  st->last_line_time = 0;
+  st->topic_expires_at = 0;
+  st->depth_counter = 0;
+  st->updated_at = now;
+}
+
+static void ai_conv_room_end(struct ai_conv_room_state *room_st, time_t now)
+{
+  if (!room_st)
+    return;
+
+  if (room_st->speaker_a)
+    ai_conv_actor_reset(room_st->speaker_a, now);
+  if (room_st->speaker_b)
+    ai_conv_actor_reset(room_st->speaker_b, now);
+
+  room_st->speaker_a = NULL;
+  room_st->speaker_b = NULL;
+  room_st->topic = AI_CONV_TOPIC_UNKNOWN;
+  room_st->active = FALSE;
+  room_st->line_count = 0;
+  room_st->last_speaker_id = 0;
+  room_st->topic_expires_at = 0;
 }
 
 static void ai_state_push_event(struct char_data *mob, enum ai_event_type type, struct char_data *actor, const char *text)
@@ -1542,6 +1724,10 @@ static const char *ai_line_for_intent(struct char_data *mob, struct ai_actor_mem
   static const char *const gib_inn[] = {"Easy now. Ask for room or meal plain.", "I missed that. Say it slow.", NULL};
   static const char *const gib_civ[] = {"I do not understand. Maybe ask a guard.", "Could you say that another way?", NULL};
 
+  static const char *const weather_guard[] = {"Skies look steady, but keep a cloak handy.", "Weather turns fast near the roads; stay prepared.", NULL};
+  static const char *const weather_inn[] = {"If rain comes, the hearth stays warm here.", "Bad weather fills my rooms early.", NULL};
+  static const char *const weather_merch[] = {"Weather shifts prices almost as much as caravans.", "Dry roads mean better stock by dusk.", NULL};
+
   if (!mob || !mob->ai_prof)
     return NULL;
   if (out_pool) *out_pool = "POOL_NONE";
@@ -1569,6 +1755,16 @@ static const char *ai_line_for_intent(struct char_data *mob, struct ai_actor_mem
     e->last_topic = topic;
     e->last_topic_time = time(0);
     snprintf(e->last_topic_key, sizeof(e->last_topic_key), "%s", ai_topic_key_name(topic));
+  }
+
+  if (intent == AI_INTENT_SMALLTALK && (ai_text_has_sub_ci(text, "weather") || ai_text_has_sub_ci(text, "rain") || ai_text_has_sub_ci(text, "sun") || ai_text_has_sub_ci(text, "storm") || ai_text_has_sub_ci(text, "nice day"))) {
+    if (role == ROLE_GUARD)
+      return ai_pick_phrase(weather_guard);
+    if (role == ROLE_MERCHANT && innkeeper)
+      return ai_pick_phrase(weather_inn);
+    if (role == ROLE_MERCHANT)
+      return ai_pick_phrase(weather_merch);
+    return "Weather's been shifting all day.";
   }
 
   if (role == ROLE_GUARD) {
@@ -1747,6 +1943,9 @@ int ai_actor_tick(struct char_data *mob, time_t now)
   if (ai_try_emit_pending_reaction_speech(mob, now))
     return TRUE;
 
+  if (ai_conv_try_progress(mob, now))
+    return TRUE;
+
   if (FIGHTING(mob)) {
     if (ai_try_flee_or_surrender(mob, now))
       return TRUE;
@@ -1754,6 +1953,9 @@ int ai_actor_tick(struct char_data *mob, time_t now)
   }
   if (IN_ROOM(mob) == NOWHERE)
     return FALSE;
+
+  if (ai_conv_try_start(mob, now))
+    return TRUE;
 
   intent = ai_actor_choose_intent(mob, &target, &line, &do_emote, &do_warn);
   if (intent <= 0)
@@ -1943,6 +2145,285 @@ static void ai_state_refresh_local_topics(struct char_data *mob)
     st->local_topic_mask = AI_TOPIC_MIDGAARD;
 }
 
+static int ai_conv_topic_from_intent(int intent)
+{
+  if (intent == AI_INTENT_DIRECTIONS)
+    return AI_CONV_TOPIC_DIRECTIONS;
+  if (intent == AI_INTENT_BANK)
+    return AI_CONV_TOPIC_BANK;
+  if (intent == AI_INTENT_INN)
+    return AI_CONV_TOPIC_INN;
+  if (intent == AI_INTENT_QUEST || intent == AI_INTENT_ASK_SERVICE)
+    return AI_CONV_TOPIC_HELP;
+  if (intent == AI_INTENT_THREAT || intent == AI_INTENT_INSULT || intent == AI_INTENT_EMOTE_SPIT)
+    return AI_CONV_TOPIC_THREAT;
+  if (intent == AI_INTENT_RUMOR)
+    return AI_CONV_TOPIC_RUMOR;
+  if (intent == AI_INTENT_SMALLTALK || intent == AI_INTENT_GREET)
+    return AI_CONV_TOPIC_SMALLTALK;
+  return AI_CONV_TOPIC_UNKNOWN;
+}
+
+static int ai_conv_topic_for_pair(struct char_data *a, struct char_data *b)
+{
+  int ra, rb, sa, sb;
+
+  if (!a || !b || !a->ai_prof || !b->ai_prof)
+    return AI_CONV_TOPIC_UNKNOWN;
+
+  ra = a->ai_prof->role;
+  rb = b->ai_prof->role;
+  sa = ai_role_priority_score(a);
+  sb = ai_role_priority_score(b);
+
+  if ((ra == ROLE_GUARD && rb == ROLE_GUARD))
+    return (sa + sb > 90) ? AI_CONV_TOPIC_PATROL : AI_CONV_TOPIC_CRIME;
+  if ((ra == ROLE_GUARD && rb == ROLE_BANDIT) || (ra == ROLE_BANDIT && rb == ROLE_GUARD))
+    return (sa > sb) ? AI_CONV_TOPIC_CRIME : AI_CONV_TOPIC_THREAT;
+  if ((ra == ROLE_MERCHANT && a->ai_prof->style != 1 && rb == ROLE_CIVILIAN) ||
+      (rb == ROLE_MERCHANT && b->ai_prof->style != 1 && ra == ROLE_CIVILIAN))
+    return AI_CONV_TOPIC_SHOP;
+  if ((ra == ROLE_MERCHANT && a->ai_prof->style == 1 && rb == ROLE_CIVILIAN) ||
+      (rb == ROLE_MERCHANT && b->ai_prof->style == 1 && ra == ROLE_CIVILIAN))
+    return AI_CONV_TOPIC_INN;
+  if ((ra == ROLE_MERCHANT && ai_mob_has_shop_data(a) && rb == ROLE_CIVILIAN) ||
+      (rb == ROLE_MERCHANT && ai_mob_has_shop_data(b) && ra == ROLE_CIVILIAN))
+    return AI_CONV_TOPIC_BANK;
+  if (ra == ROLE_UNDEAD || rb == ROLE_UNDEAD || ra == ROLE_SPIRIT || rb == ROLE_SPIRIT)
+    return (rand_number(0, 1) == 0) ? AI_CONV_TOPIC_RUMOR : AI_CONV_TOPIC_SMALLTALK;
+  if (ra == ROLE_BEAST || rb == ROLE_BEAST)
+    return AI_CONV_TOPIC_UNKNOWN;
+  if (ra == ROLE_GUARD || rb == ROLE_GUARD)
+    return AI_CONV_TOPIC_PATROL;
+  if (ra == ROLE_MERCHANT || rb == ROLE_MERCHANT)
+    return AI_CONV_TOPIC_SHOP;
+  return AI_CONV_TOPIC_SMALLTALK;
+}
+
+static const char *ai_conv_line_for_topic(struct char_data *speaker, int topic)
+{
+  static const char *const weather_lines[] = {"Looks like weather's turning again.", "Air feels different today.", NULL};
+  static const char *const smalltalk_lines[] = {"Quiet stretch, for now.", "Seen many travelers today?", NULL};
+  static const char *const directions_lines[] = {"Main road still fastest through town.", "Square is easiest landmark to follow.", NULL};
+  static const char *const shop_lines[] = {"Coin's moving slowly today.", "Stock's better when caravans arrive on time.", NULL};
+  static const char *const inn_lines[] = {"Beds fill fast on wet nights.", "Stew's gone before moonrise most nights.", NULL};
+  static const char *const bank_lines[] = {"Vault runners were busy this morning.", "People trust locked iron more than luck.", NULL};
+  static const char *const help_lines[] = {"Most folk just need clear directions.", "Half the work is calming people down.", NULL};
+  static const char *const threat_lines[] = {"Tension's high. Keep your eyes open.", "Trouble starts when tempers do.", NULL};
+  static const char *const crime_lines[] = {"Petty theft's up near the alleys.", "Keep reports clear and names exact.", NULL};
+  static const char *const patrol_lines[] = {"Routes look calm this watch.", "Keep patrol turns tight and visible.", NULL};
+  static const char *const rumor_lines[] = {"Heard whispers from the old road again.", "Rumors travel faster than caravans.", NULL};
+
+  if (speaker && speaker->ai_prof && speaker->ai_prof->role == ROLE_BEAST)
+    return ai_pick_phrase(role_beast_emote);
+
+  switch (topic) {
+    case AI_CONV_TOPIC_WEATHER: return ai_pick_phrase(weather_lines);
+    case AI_CONV_TOPIC_SMALLTALK: return ai_pick_phrase(smalltalk_lines);
+    case AI_CONV_TOPIC_DIRECTIONS: return ai_pick_phrase(directions_lines);
+    case AI_CONV_TOPIC_SHOP: return ai_pick_phrase(shop_lines);
+    case AI_CONV_TOPIC_INN: return ai_pick_phrase(inn_lines);
+    case AI_CONV_TOPIC_BANK: return ai_pick_phrase(bank_lines);
+    case AI_CONV_TOPIC_HELP: return ai_pick_phrase(help_lines);
+    case AI_CONV_TOPIC_THREAT: return ai_pick_phrase(threat_lines);
+    case AI_CONV_TOPIC_CRIME: return ai_pick_phrase(crime_lines);
+    case AI_CONV_TOPIC_PATROL: return ai_pick_phrase(patrol_lines);
+    case AI_CONV_TOPIC_RUMOR: return ai_pick_phrase(rumor_lines);
+    default: return ai_pick_phrase(smalltalk_lines);
+  }
+}
+
+static int ai_conv_emit_line(struct ai_conv_room_state *room_st, struct char_data *speaker, struct char_data *partner, time_t now)
+{
+  struct ai_conv_actor_state *sst, *pst;
+  const char *line;
+
+  if (!room_st || !speaker || !partner)
+    return FALSE;
+
+  line = ai_conv_line_for_topic(speaker, room_st->topic);
+  if (!line || !*line)
+    return FALSE;
+  if (!ai_can_speak_now(speaker, now))
+    return FALSE;
+
+  ai_set_last_speech_meta(speaker, "POOL_NPC_CONVERSATION", "AMBIENT");
+  ai_say(speaker, line, now);
+
+  room_st->line_count++;
+  room_st->last_speaker_id = GET_MOB_VNUM(speaker);
+  room_st->last_line_time = now;
+
+  sst = ai_conv_actor_state_get(speaker, 1);
+  pst = ai_conv_actor_state_get(partner, 1);
+  if (sst) {
+    sst->current_topic = room_st->topic;
+    sst->partner_id = GET_MOB_VNUM(partner);
+    sst->last_speaker_id = room_st->last_speaker_id;
+    sst->last_line_time = now;
+    sst->topic_expires_at = room_st->topic_expires_at;
+    sst->depth_counter = room_st->line_count;
+    sst->updated_at = now;
+  }
+  if (pst) {
+    pst->current_topic = room_st->topic;
+    pst->partner_id = GET_MOB_VNUM(speaker);
+    pst->last_speaker_id = room_st->last_speaker_id;
+    pst->last_line_time = now;
+    pst->topic_expires_at = room_st->topic_expires_at;
+    pst->depth_counter = room_st->line_count;
+    pst->updated_at = now;
+  }
+
+  return TRUE;
+}
+
+static int ai_conv_try_progress(struct char_data *mob, time_t now)
+{
+  struct ai_conv_room_state *room_st;
+  struct char_data *speaker, *partner;
+
+  if (!mob || IN_ROOM(mob) == NOWHERE)
+    return FALSE;
+
+  room_st = ai_conv_room_state_get(IN_ROOM(mob), 0);
+  if (!room_st || !room_st->active)
+    return FALSE;
+
+  if (!room_st->speaker_a || !room_st->speaker_b || room_st->speaker_a == room_st->speaker_b) {
+    ai_conv_room_end(room_st, now);
+    return FALSE;
+  }
+
+  if (room_st->line_count >= AI_NPC_CONVO_MAX_LINES || now >= room_st->topic_expires_at) {
+    ai_conv_room_end(room_st, now);
+    return FALSE;
+  }
+
+  if ((now - room_st->last_line_time) < AI_NPC_CONVO_LINE_GAP_SECS)
+    return FALSE;
+  if ((now - room_st->last_player_speech_time) < AI_ROOM_PLAYER_SPEECH_GRACE_SECS)
+    return FALSE;
+
+  speaker = (room_st->last_speaker_id == GET_MOB_VNUM(room_st->speaker_a)) ? room_st->speaker_b : room_st->speaker_a;
+  partner = (speaker == room_st->speaker_a) ? room_st->speaker_b : room_st->speaker_a;
+
+  if (IN_ROOM(speaker) != IN_ROOM(partner) || FIGHTING(speaker) || FIGHTING(partner) || GET_POS(speaker) <= POS_SLEEPING || GET_POS(partner) <= POS_SLEEPING) {
+    ai_conv_room_end(room_st, now);
+    return FALSE;
+  }
+
+  if (!ai_conv_emit_line(room_st, speaker, partner, now))
+    return FALSE;
+
+  if (room_st->line_count >= AI_NPC_CONVO_MAX_LINES || now >= room_st->topic_expires_at)
+    ai_conv_room_end(room_st, now);
+
+  return TRUE;
+}
+
+static int ai_conv_try_start(struct char_data *mob, time_t now)
+{
+  struct ai_conv_room_state *room_st;
+  struct ai_conv_actor_state *self_state;
+  struct char_data *it, *best = NULL;
+  int best_score = -9999;
+  int min_start_gap;
+
+  if (!mob || !mob->ai_prof || IN_ROOM(mob) == NOWHERE)
+    return FALSE;
+  if (ROOM_FLAGGED(IN_ROOM(mob), ROOM_NOMOB) || ROOM_FLAGGED(IN_ROOM(mob), ROOM_PEACEFUL))
+    return FALSE;
+  if (FIGHTING(mob) || GET_POS(mob) <= POS_SLEEPING || !ai_can_speak_now(mob, now))
+    return FALSE;
+
+  room_st = ai_conv_room_state_get(IN_ROOM(mob), 1);
+  self_state = ai_conv_actor_state_get(mob, 1);
+  if (!room_st || !self_state)
+    return FALSE;
+
+  if (room_st->active)
+    return FALSE;
+
+  min_start_gap = ai_conv_room_has_player(IN_ROOM(mob)) ? AI_NPC_CONVO_START_WITH_PLAYERS_SECS : AI_NPC_CONVO_START_EMPTY_SECS;
+  if ((now - room_st->last_start_time) < min_start_gap)
+    return FALSE;
+  if ((now - room_st->last_player_speech_time) < AI_ROOM_PLAYER_SPEECH_GRACE_SECS)
+    return FALSE;
+
+  if (self_state->partner_id != 0 && now < self_state->topic_expires_at)
+    return FALSE;
+
+  for (it = world[IN_ROOM(mob)].people; it; it = it->next_in_room) {
+    struct ai_conv_actor_state *other_state;
+    int topic;
+    int score;
+
+    if (it == mob || !IS_NPC(it) || !MOB_FLAGGED(it, MOB_AI_ACTOR) || !it->ai_prof || !it->ai_state)
+      continue;
+    if (FIGHTING(it) || GET_POS(it) <= POS_SLEEPING || !ai_can_speak_now(it, now))
+      continue;
+
+    other_state = ai_conv_actor_state_get(it, 1);
+    if (!other_state)
+      continue;
+    if (other_state->partner_id != 0 && now < other_state->topic_expires_at)
+      continue;
+
+    topic = ai_conv_topic_for_pair(mob, it);
+    if (topic == AI_CONV_TOPIC_UNKNOWN)
+      continue;
+
+    score = ai_role_priority_score(mob) + ai_role_priority_score(it);
+    if (topic == AI_CONV_TOPIC_PATROL || topic == AI_CONV_TOPIC_CRIME)
+      score += 8;
+    if (topic == AI_CONV_TOPIC_THREAT)
+      score += 5;
+
+    if (score > best_score) {
+      best_score = score;
+      best = it;
+    }
+  }
+
+  if (!best)
+    return FALSE;
+
+  room_st->speaker_a = mob;
+  room_st->speaker_b = best;
+  room_st->topic = ai_conv_topic_for_pair(mob, best);
+  room_st->active = TRUE;
+  room_st->line_count = 0;
+  room_st->last_line_time = now - AI_NPC_CONVO_LINE_GAP_SECS;
+  room_st->topic_expires_at = now + rand_number(AI_NPC_CONVO_TOPIC_MIN_SECS, AI_NPC_CONVO_TOPIC_MAX_SECS);
+  room_st->last_start_time = now;
+
+  return ai_conv_emit_line(room_st, mob, best, now);
+}
+
+static void ai_normalize_text(const char *src, char *dst, size_t dstsz)
+{
+  size_t i, j = 0;
+
+  if (!dst || dstsz == 0)
+    return;
+  dst[0] = '\0';
+  if (!src)
+    return;
+
+  for (i = 0; src[i] && j + 1 < dstsz; i++) {
+    unsigned char c = (unsigned char)src[i];
+
+    if (isalnum(c))
+      dst[j++] = (char)tolower(c);
+    else if (j > 0 && dst[j - 1] != ' ')
+      dst[j++] = ' ';
+  }
+  if (j > 0 && dst[j - 1] == ' ')
+    j--;
+  dst[j] = '\0';
+}
+
 static int ai_detect_intent(enum ai_event_type type, const char *text)
 {
   if (type == AI_EVENT_PLAYER_EMOTE) {
@@ -1959,6 +2440,8 @@ static int ai_detect_intent(enum ai_event_type type, const char *text)
   if (ai_is_gibberish(text))
     return AI_INTENT_GIBBERISH;
 
+  if (ai_text_has_sub_ci(text, "weather") || ai_text_has_sub_ci(text, "rain") || ai_text_has_sub_ci(text, "sun") || ai_text_has_sub_ci(text, "storm") || ai_text_has_sub_ci(text, "nice day"))
+    return AI_INTENT_SMALLTALK;
   if (ai_text_has_sub_ci(text, "how are you") || ai_text_has_sub_ci(text, "what's up"))
     return AI_INTENT_SMALLTALK;
   if (ai_text_has_sub_ci(text, "hello") || ai_text_has_sub_ci(text, "hi") || ai_text_has_sub_ci(text, "hey") ||
@@ -2087,27 +2570,36 @@ static int ai_event_fit_bonus(struct char_data *mob, enum ai_event_type type, in
 
 static int ai_actor_room_response_slot(struct char_data *mob, struct char_data *actor, enum ai_event_type type, int intent)
 {
-  struct char_data *it, *top = NULL;
-  int best = -9999;
+  struct char_data *it;
+  struct char_data *top1 = NULL, *top2 = NULL;
+  int best1 = -9999, best2 = -9999;
 
   if (!mob || !actor || IN_ROOM(mob) == NOWHERE || IN_ROOM(actor) != IN_ROOM(mob))
     return FALSE;
 
   for (it = world[IN_ROOM(mob)].people; it; it = it->next_in_room) {
     int pri;
+
     if (!IS_NPC(it) || !MOB_FLAGGED(it, MOB_AI_ACTOR) || !it->ai_prof || !it->ai_state)
       continue;
     if ((time(0) - it->ai_state->last_talk_time) < AI_PER_PLAYER_REPLY_COOLDOWN_SECS)
       continue;
+
     pri = ai_event_fit_bonus(it, type, intent);
-    if (pri > best || (pri == best && GET_MOB_VNUM(it) < GET_MOB_VNUM(top))) {
-      best = pri;
-      top = it;
+    if (pri > best1 || (pri == best1 && (!top1 || GET_MOB_VNUM(it) < GET_MOB_VNUM(top1)))) {
+      best2 = best1;
+      top2 = top1;
+      best1 = pri;
+      top1 = it;
+    } else if (pri > best2 || (pri == best2 && (!top2 || GET_MOB_VNUM(it) < GET_MOB_VNUM(top2)))) {
+      best2 = pri;
+      top2 = it;
     }
   }
 
-  return (mob == top);
+  return (mob == top1 || mob == top2);
 }
+
 
 
 static const char *ai_pick_phrase(const char *const *pool)
@@ -2178,16 +2670,32 @@ static void ai_actor_mark_target_reaction(struct char_data *mob, struct char_dat
 void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, struct char_data *actor, const char *text)
 {
   struct ai_actor_memory_entry *e;
+  struct ai_conv_room_state *room_st;
   time_t now = time(0);
   int intent;
   const char *line = NULL;
+  char normalized[256];
 
   if (!mob || !actor || !mob->ai_prof || !mob->ai_state || IS_NPC(actor))
     return;
 
   ai_state_refresh_local_topics(mob);
+  ai_normalize_text(text ? text : "", normalized, sizeof(normalized));
   e = ai_mem_get_or_create(mob, GET_IDNUM(actor));
-  intent = ai_detect_intent(type, text ? text : "");
+  intent = ai_detect_intent(type, normalized);
+  room_st = ai_conv_room_state_get(IN_ROOM(mob), 1);
+  if (room_st && type == AI_EVENT_PLAYER_SAY)
+    room_st->last_player_speech_time = now;
+
+  if (type == AI_EVENT_PLAYER_SAY) {
+    struct ai_conv_actor_state *conv_st = ai_conv_actor_state_get(mob, 1);
+    if (conv_st) {
+      conv_st->current_topic = ai_conv_topic_from_intent(intent);
+      conv_st->last_speaker_id = GET_IDNUM(actor);
+      conv_st->last_line_time = now;
+      conv_st->updated_at = now;
+    }
+  }
 
   if (e) {
     e->last_seen_time = now;
@@ -2230,7 +2738,7 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
     e->attitude = MAX(-100, e->attitude - 12);
   }
 
-  ai_state_push_event(mob, type, actor, text ? text : "");
+  ai_state_push_event(mob, type, actor, normalized);
 
   if (!e || !intent)
     return;
@@ -2244,7 +2752,7 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
     const char *reason = ai_event_reason_name(type);
     char targeted[256];
 
-    line = ai_line_for_intent(mob, e, intent, e->attitude, text ? text : "", &pool, &reason);
+    line = ai_line_for_intent(mob, e, intent, e->attitude, normalized, &pool, &reason);
     if (!line || !*line)
       return;
 
