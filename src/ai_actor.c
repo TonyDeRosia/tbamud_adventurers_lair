@@ -1183,13 +1183,16 @@ static const char *ai_line_for_intent(struct char_data *mob, int intent, int att
     if (intent >= AI_INTENT_EMOTE_DANCE) { if (out_pool) *out_pool = "POOL_BANDIT_PLAYER_EMOTE_RESPONSE"; if (out_reason) *out_reason = "PLAYER_EMOTE"; return ai_pick_phrase(role_bandit_emote); }
   } else if (mob->ai_prof->role == ROLE_BEAST) {
     if (intent == AI_INTENT_GREET) { if (out_pool) *out_pool = "POOL_BEAST_GREET"; if (out_reason) *out_reason = "PLAYER_SAY"; return ai_pick_weighted_phrase(role_beast_greet, role_rare_beast); }
+    if (intent == AI_INTENT_ASK_SERVICE || intent == AI_INTENT_CONFUSION) { if (out_pool) *out_pool = "POOL_BEAST_PLAYER_SAY_RESPONSE"; if (out_reason) *out_reason = "PLAYER_SAY"; return ai_pick_phrase(role_beast_service); }
     if (intent >= AI_INTENT_EMOTE_DANCE || intent == AI_INTENT_THREAT || intent == AI_INTENT_INSULT || intent == AI_INTENT_EMOTE_SPIT) { if (out_pool) *out_pool = "POOL_BEAST_PLAYER_EMOTE_RESPONSE"; if (out_reason) *out_reason = "PLAYER_EMOTE"; return ai_pick_phrase(role_beast_emote); }
     return NULL;
   } else if (mob->ai_prof->role == ROLE_UNDEAD) {
     if (intent == AI_INTENT_GREET) { if (out_pool) *out_pool = "POOL_UNDEAD_GREET"; if (out_reason) *out_reason = "PLAYER_SAY"; return ai_pick_weighted_phrase(role_undead_greet, role_rare_undead); }
+    if (intent == AI_INTENT_ASK_SERVICE || intent == AI_INTENT_CONFUSION) { if (out_pool) *out_pool = "POOL_UNDEAD_PLAYER_SAY_RESPONSE"; if (out_reason) *out_reason = "PLAYER_SAY"; return ai_pick_phrase(role_undead_service); }
     if (intent >= AI_INTENT_EMOTE_DANCE || intent == AI_INTENT_THREAT || intent == AI_INTENT_INSULT || intent == AI_INTENT_EMOTE_SPIT) { if (out_pool) *out_pool = "POOL_UNDEAD_PLAYER_EMOTE_RESPONSE"; if (out_reason) *out_reason = "PLAYER_EMOTE"; return ai_pick_phrase(role_undead_emote); }
   } else if (mob->ai_prof->role == ROLE_SPIRIT) {
     if (intent == AI_INTENT_GREET) { if (out_pool) *out_pool = "POOL_SPIRIT_GREET"; if (out_reason) *out_reason = "PLAYER_SAY"; return ai_pick_weighted_phrase(role_spirit_greet, role_rare_spirit); }
+    if (intent == AI_INTENT_ASK_SERVICE || intent == AI_INTENT_CONFUSION) { if (out_pool) *out_pool = "POOL_SPIRIT_PLAYER_SAY_RESPONSE"; if (out_reason) *out_reason = "PLAYER_SAY"; return ai_pick_phrase(role_spirit_service); }
     if (intent == AI_INTENT_EMOTE_SPIT) { if (out_pool) *out_pool = "POOL_SPIRIT_PLAYER_EMOTE_RESPONSE"; if (out_reason) *out_reason = "PLAYER_EMOTE"; return "$n recoils like torn mist."; }
     if (intent >= AI_INTENT_EMOTE_DANCE) { if (out_pool) *out_pool = "POOL_SPIRIT_PLAYER_EMOTE_RESPONSE"; if (out_reason) *out_reason = "PLAYER_EMOTE"; return ai_pick_phrase(role_spirit_emote); }
   } else if (mob->ai_prof->role == ROLE_CULTIST) {
