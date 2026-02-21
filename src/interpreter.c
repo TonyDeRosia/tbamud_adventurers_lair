@@ -572,6 +572,9 @@ void command_interpreter(struct char_data *ch, char *argument)
   } else
     line = any_one_arg(argument, arg);
 
+  if (!strcmp(arg, "smartspawn"))
+    log("DEBUG: smartspawn parsed, searching cmd_info");
+
   /* Since all command triggers check for valid_dg_target before acting, the levelcheck
    * here has been removed. Otherwise, find the command. */
   {
@@ -655,8 +658,11 @@ void command_interpreter(struct char_data *ch, char *argument)
     case POS_FIGHTING:
       send_to_char(ch, "No way!  You're fighting for your life!\r\n");
       break;
-  } else if (no_specials || !special(ch, cmd, line))
+  } else if (no_specials || !special(ch, cmd, line)) {
+    if (!strcmp(complete_cmd_info[cmd].command, "smartspawn"))
+      log("DEBUG: smartspawn matched in table");
     ((*complete_cmd_info[cmd].command_pointer) (ch, line, cmd, complete_cmd_info[cmd].subcmd));
+  }
 }
 
 /* Routines to handle aliasing. */
