@@ -49,6 +49,7 @@
 #define AI_MOOD_SPRING_K 0.15f
 #define AI_MOOD_DAMPING 0.75f
 #define AI_SESSION_READ_MAX 16
+#define AI_MIN_ROLE_FITNESS 10
 
 enum ai_time_bucket {
   AI_TIME_DAY = 0,
@@ -73,6 +74,33 @@ enum ai_conv_arc_state {
   AI_ARC_ENGAGED,
   AI_ARC_RAPPORT,
   AI_ARC_COLD
+};
+
+enum ai_reply_goal {
+  GOAL_INFORM = 0,
+  GOAL_DEFLECT,
+  GOAL_WARN,
+  GOAL_CONNECT,
+  GOAL_DISMISS,
+  GOAL_CLARIFY,
+  GOAL_SERVE
+};
+
+enum ai_reply_stance {
+  STANCE_OPEN = 0,
+  STANCE_NEUTRAL,
+  STANCE_GUARDED,
+  STANCE_HOSTILE,
+  STANCE_WARM,
+  STANCE_AMUSED
+};
+
+struct ai_reply_intention {
+  int topic;
+  enum ai_reply_goal goal;
+  enum ai_reply_stance stance;
+  int be_specific;
+  int be_brief;
 };
 
 struct ai_context_vector {
@@ -273,6 +301,7 @@ static const char *ai_pick_phrase(const char *const *pool);
 static const char *ai_pool_pick(const char *const *pool);
 static int ai_role_can_give_directions(int role);
 static int ai_role_can_answer_intent(int role, int style, int intent);
+static const char *ai_role_redirect_line(int role, int style);
 static int ai_text_has_sub_ci(const char *hay, const char *needle);
 static int ai_role_priority_score(struct char_data *mob);
 static void ai_state_refresh_local_topics(struct char_data *mob);
@@ -290,6 +319,7 @@ static int ai_conv_try_start(struct char_data *mob, time_t now);
 static int ai_player_speech_classify(const char *text, int *out_confidence, int *out_is_weather);
 static int ai_intent_from_player_class(int speech_class);
 static int ai_detect_emote_kind(const char *text);
+static int ai_detect_topic_target_from_text(const char *text);
 static int ai_actor_room_response_slot(struct char_data *mob, struct char_data *actor, enum ai_event_type type, int intent, int confidence, const char *normalized);
 static unsigned long ai_hash_mix(unsigned long h, unsigned long v);
 static unsigned long ai_hash_text_stable(const char *text);
@@ -307,7 +337,10 @@ static const char *ai_word_sn(const char *concept, int vocab_tier, int sn);
 static const char *ai_phrase(const char *tag, int tier, int rhythm, unsigned long seed, int slot);
 static const char *ai_mbti_string(const struct ai_voice_profile *vp);
 static void ai_mbti_compound_modifier(const struct ai_voice_profile *vp, int speech_act, int *out_add_followup_question, int *out_add_topic_lean, int *out_suppress_opener, int *out_use_emotional_color, unsigned long seed);
-static void ai_voice_assemble(struct char_data *mob, const struct ai_voice_profile *vp, int speech_act, const char *core_content, unsigned long seed, char *out, size_t outsz);
+static int ai_line_is_role_legal(const char *line, int role, int style);
+static struct ai_reply_intention ai_form_intention(struct char_data *mob, int speech_act, int speech_class, int suspicion_bucket, int arc_state, const struct ai_context_vector *ctx, const struct ai_session_read_entry *sr, struct ai_actor_memory_entry *e, time_t now);
+static const char *ai_select_content_for_intention(struct char_data *mob, const struct ai_reply_intention *in, const char *player_text, int *out_from_template);
+static void ai_voice_assemble(struct char_data *mob, const struct ai_voice_profile *vp, const struct ai_reply_intention *in, int speech_act, const char *core_content, unsigned long seed, char *out, size_t outsz);
 static float ai_event_salience(enum ai_event_type type, int role, const char *text);
 static float ai_event_recency(struct char_data *mob, enum ai_event_type type, struct char_data *actor, time_t now);
 static float ai_attention_score(struct char_data *mob, enum ai_event_type type, struct char_data *actor, const char *text, time_t now);
@@ -2503,17 +2536,253 @@ static void ai_voice_apply_tokens(const struct ai_voice_profile *vp, const char 
   out[oi] = '\0';
 }
 
-static void ai_voice_assemble(struct char_data *mob, const struct ai_voice_profile *vp, int speech_act, const char *core_content, unsigned long seed, char *out, size_t outsz)
+
+static int ai_line_is_role_legal(const char *line, int role, int style)
+{
+  int innkeeper = (role == ROLE_MERCHANT && style == 1);
+  if (!line || !*line)
+    return FALSE;
+
+  if ((ai_text_has_sub_ci(line, "patrol") || ai_text_has_sub_ci(line, "post") || ai_text_has_sub_ci(line, "watch") || ai_text_has_sub_ci(line, "garrison") || ai_text_has_sub_ci(line, "duty") || ai_text_has_sub_ci(line, "formation") || ai_text_has_sub_ci(line, "orders"))
+      && !(role == ROLE_GUARD || role == ROLE_BOSS))
+    return FALSE;
+
+  if ((ai_text_has_sub_ci(line, "hearth") || ai_text_has_sub_ci(line, "stew") || ai_text_has_sub_ci(line, "ale") || ai_text_has_sub_ci(line, "room") || ai_text_has_sub_ci(line, "bed") || ai_text_has_sub_ci(line, "warm yourself") || ai_text_has_sub_ci(line, "meal helps") || ai_text_has_sub_ci(line, "rest here"))
+      && !innkeeper)
+    return FALSE;
+
+  if ((ai_text_has_sub_ci(line, "stock") || ai_text_has_sub_ci(line, "prices") || ai_text_has_sub_ci(line, "bargain") || ai_text_has_sub_ci(line, "wares"))
+      && role != ROLE_MERCHANT)
+    return FALSE;
+
+  if (ai_text_has_sub_ci(line, "coin purse") && !(role == ROLE_MERCHANT || role == ROLE_BANDIT))
+    return FALSE;
+
+  if ((ai_text_has_sub_ci(line, "purse") || ai_text_has_sub_ci(line, "pay up") || ai_text_has_sub_ci(line, "mark") || ai_text_has_sub_ci(line, "easy coin") || ai_text_has_sub_ci(line, "keep walking"))
+      && role != ROLE_BANDIT)
+    return FALSE;
+
+  if ((ai_text_has_sub_ci(line, "ritual") || ai_text_has_sub_ci(line, "omen") || ai_text_has_sub_ci(line, "pattern") || ai_text_has_sub_ci(line, "veil") || ai_text_has_sub_ci(line, "currents") || ai_text_has_sub_ci(line, "beyond"))
+      && !(role == ROLE_CULTIST || role == ROLE_SPIRIT))
+    return FALSE;
+
+  return TRUE;
+}
+
+static struct ai_reply_intention ai_form_intention(struct char_data *mob, int speech_act, int speech_class, int suspicion_bucket, int arc_state, const struct ai_context_vector *ctx, const struct ai_session_read_entry *sr, struct ai_actor_memory_entry *e, time_t now)
+{
+  struct ai_reply_intention in;
+  int role = (mob && mob->ai_prof) ? mob->ai_prof->role : ROLE_UNKNOWN;
+  int style = (mob && mob->ai_prof) ? mob->ai_prof->style : 0;
+  int role_fit = ai_role_can_answer_intent(role, style, speech_act) ? 20 : 0;
+
+  (void)now;
+  in.topic = speech_act;
+  in.goal = GOAL_DEFLECT;
+  in.stance = STANCE_NEUTRAL;
+  in.be_specific = 0;
+  in.be_brief = 0;
+
+  if (suspicion_bucket >= 2)
+    in.topic = AI_INTENT_QUEST;
+
+  if (speech_act == AI_INTENT_CONFUSION || speech_act == AI_INTENT_GIBBERISH || speech_class == AI_SPEECH_UNKNOWN)
+    in.goal = GOAL_CLARIFY;
+  else if (speech_act == AI_INTENT_ASK_SERVICE || speech_act == AI_INTENT_BANK || speech_act == AI_INTENT_INN || speech_act == AI_INTENT_DIRECTIONS)
+    in.goal = (role_fit >= AI_MIN_ROLE_FITNESS) ? GOAL_SERVE : GOAL_DEFLECT;
+  else if (speech_act == AI_INTENT_GREET || speech_act == AI_INTENT_SMALLTALK)
+    in.goal = GOAL_CONNECT;
+  else if (speech_act == AI_INTENT_INSULT || speech_act == AI_INTENT_THREAT)
+    in.goal = (role == ROLE_GUARD || role == ROLE_BOSS) ? GOAL_WARN : GOAL_DISMISS;
+  else
+    in.goal = (role_fit >= AI_MIN_ROLE_FITNESS) ? GOAL_INFORM : GOAL_DEFLECT;
+
+  if (suspicion_bucket >= 2)
+    in.goal = GOAL_WARN;
+  if (arc_state == AI_ARC_COLD && in.goal != GOAL_CLARIFY)
+    in.goal = (role == ROLE_GUARD || role == ROLE_BOSS) ? GOAL_DEFLECT : GOAL_DISMISS;
+
+  switch (arc_state) {
+    case AI_ARC_ENGAGED: in.stance = STANCE_OPEN; break;
+    case AI_ARC_RAPPORT: in.stance = STANCE_WARM; break;
+    case AI_ARC_COLD: in.stance = STANCE_GUARDED; break;
+    default: in.stance = STANCE_NEUTRAL; break;
+  }
+  if (e && e->belief_hostility > 0.75f)
+    in.stance = STANCE_HOSTILE;
+  if (role == ROLE_GUARD && in.stance == STANCE_WARM)
+    in.stance = STANCE_OPEN;
+  if (role == ROLE_CULTIST)
+    in.stance = STANCE_GUARDED;
+  if (role == ROLE_SPIRIT && in.stance == STANCE_HOSTILE)
+    in.stance = STANCE_GUARDED;
+  if (role == ROLE_SPIRIT && in.stance == STANCE_WARM)
+    in.stance = STANCE_OPEN;
+  if (role == ROLE_BANDIT && arc_state == AI_ARC_STRANGER && in.stance == STANCE_OPEN)
+    in.stance = STANCE_NEUTRAL;
+  if (sr && sr->archetype == AI_ARCH_TROUBLEMAKER && (role == ROLE_GUARD || role == ROLE_MERCHANT) && in.stance < STANCE_GUARDED)
+    in.stance = STANCE_GUARDED;
+
+  in.be_specific = (arc_state >= AI_ARC_ENGAGED) || (e && e->belief_confidence > 0.5f);
+  in.be_brief = (in.stance == STANCE_GUARDED || in.stance == STANCE_HOSTILE || arc_state == AI_ARC_STRANGER || arc_state == AI_ARC_COLD || (ctx && ctx->recent_violence));
+
+  return in;
+}
+
+static const char *ai_select_content_for_intention(struct char_data *mob, const struct ai_reply_intention *in, const char *player_text, int *out_from_template)
+{
+  static char best[256];
+  const char *cands[8];
+  int score[8];
+  int n = 0;
+  int i;
+  int role = (mob && mob->ai_prof) ? mob->ai_prof->role : ROLE_UNKNOWN;
+  int style = (mob && mob->ai_prof) ? mob->ai_prof->style : 0;
+  int role_fit = ai_role_can_answer_intent(role, style, in ? in->topic : AI_INTENT_NONE) ? 20 : 0;
+  static const char *const clarify_pool[] = {"What do you mean?", "Could you say that another way?", "Can you be more clear?", NULL};
+  static const char *const deflect_guard[] = {"State your need and keep it brief.", "I have duty to keep.", NULL};
+  static const char *const deflect_inn[] = {"If you need rest, ask for a room.", "I can offer a meal, not gossip.", NULL};
+  static const char *const deflect_merch[] = {"Ask about wares or prices.", "Trade talk only for now.", NULL};
+  static const char *const deflect_bandit[] = {"Keep walking.", "Not your concern, mark.", NULL};
+  static const char *const deflect_cult[] = {"The pattern is not for you.", "That lies beyond your sight.", NULL};
+  static const char *const warn_strong[] = {"Watch yourself and state your business.", "Careful now, or move along.", NULL};
+  static const char *const warn_mild[] = {"Easy now. Keep it civil.", "Let's keep this calm.", NULL};
+  static const char *const dismiss_pool[] = {"Keep it brief.", "Not today.", "Move along.", NULL};
+  static const char *const connect_guard[] = {"Well met. Keep to the law.", "Greetings. Stay alert.", NULL};
+  static const char *const connect_inn[] = {"Welcome. Warm yourself by the hearth.", "Good day. Rest here if you need.", NULL};
+  static const char *const connect_merch[] = {"Hello. Looking for wares?", "Greetings. Prices are fair today.", NULL};
+  static const char *const connect_bandit[] = {"Yeah?", "You talking to me?", NULL};
+  static const char *const connect_cult[] = {"The veil stirs. Speak.", "I hear the currents. Go on.", NULL};
+  static const char *const serve_shop[] = {"I can show you wares and prices.", "Tell me what stock you seek.", NULL};
+  static const char *const serve_inn[] = {"We have warm beds and stew.", "You can rest here and get ale.", NULL};
+  static const char *const serve_bank[] = {"The bank is east from here.", "Ask at the vault counter in town.", NULL};
+  static const char *const serve_dir[] = {"Head north, then east at the square.", "Follow the main road and ask at the post.", NULL};
+
+  if (out_from_template)
+    *out_from_template = 0;
+  best[0] = '\0';
+  if (!in)
+    return "What do you mean?";
+
+  if (in->goal == GOAL_CLARIFY) {
+    snprintf(best, sizeof(best), "%s", ai_pick_phrase(clarify_pool));
+    return best;
+  }
+
+  if ((in->goal == GOAL_INFORM || in->goal == GOAL_SERVE) && role_fit < AI_MIN_ROLE_FITNESS)
+    { const char *fallback = ai_role_redirect_line(role, style); return fallback ? fallback : "I'd rather not discuss that."; }
+
+  if (in->goal == GOAL_DEFLECT) {
+    const char *pick = (role == ROLE_GUARD || role == ROLE_BOSS) ? ai_pick_phrase(deflect_guard) :
+                       ((role == ROLE_MERCHANT && style == 1) ? ai_pick_phrase(deflect_inn) :
+                       (role == ROLE_MERCHANT ? ai_pick_phrase(deflect_merch) :
+                       (role == ROLE_BANDIT ? ai_pick_phrase(deflect_bandit) : ai_pick_phrase(deflect_cult))));
+    cands[n++] = pick;
+  } else if (in->goal == GOAL_WARN) {
+    cands[n++] = ai_pick_phrase((role == ROLE_GUARD || role == ROLE_BOSS) ? warn_strong : warn_mild);
+  } else if (in->goal == GOAL_DISMISS) {
+    cands[n++] = ai_pick_phrase(dismiss_pool);
+  } else if (in->goal == GOAL_CONNECT) {
+    cands[n++] = (role == ROLE_GUARD || role == ROLE_BOSS) ? ai_pick_phrase(connect_guard) :
+                 ((role == ROLE_MERCHANT && style == 1) ? ai_pick_phrase(connect_inn) :
+                 (role == ROLE_MERCHANT ? ai_pick_phrase(connect_merch) :
+                 (role == ROLE_BANDIT ? ai_pick_phrase(connect_bandit) : ai_pick_phrase(connect_cult))));
+  } else if (in->goal == GOAL_SERVE) {
+    if (in->topic == AI_INTENT_INN)
+      cands[n++] = ai_pick_phrase(serve_inn);
+    else if (in->topic == AI_INTENT_BANK)
+      cands[n++] = ai_pick_phrase(serve_bank);
+    else if (in->topic == AI_INTENT_DIRECTIONS)
+      cands[n++] = ai_pick_phrase(serve_dir);
+    else
+      cands[n++] = ai_pick_phrase(serve_shop);
+  } else {
+    if (in->topic == AI_INTENT_SMALLTALK)
+      cands[n++] = "Things are steady enough.";
+    else if (in->topic == AI_INTENT_QUEST)
+      cands[n++] = "Ask clearly and I'll answer what I can.";
+    else
+      cands[n++] = ai_role_redirect_line(role, style);
+  }
+
+  if (in->goal == GOAL_INFORM || in->goal == GOAL_SERVE) {
+    const char *tpl = ai_template_reply_for_intent(mob, in->topic, player_text ? player_text : "", -1, NULL);
+    if (tpl && n < 8)
+      cands[n++] = tpl;
+  }
+
+  for (i = 0; i < n; i++) {
+    const char *cand = cands[i];
+    score[i] = 0;
+    if (!cand || !*cand || !ai_line_is_role_legal(cand, role, style)) {
+      score[i] = -999;
+      continue;
+    }
+    if (in->be_brief)
+      score[i] += (strlen(cand) <= 72) ? 5 : -3;
+    if (in->stance == STANCE_WARM && (ai_text_has_sub_ci(cand, "welcome") || ai_text_has_sub_ci(cand, "warm") || ai_text_has_sub_ci(cand, "rest")))
+      score[i] += 4;
+    if ((in->stance == STANCE_HOSTILE || in->stance == STANCE_GUARDED) && (ai_text_has_sub_ci(cand, "watch") || ai_text_has_sub_ci(cand, "brief") || ai_text_has_sub_ci(cand, "move along")))
+      score[i] += 4;
+    if (player_text && *player_text && ai_text_has_sub_ci(player_text, "food") && ai_text_has_sub_ci(cand, "stew"))
+      score[i] += 3;
+  }
+
+  {
+    int bi = -1;
+    int bs = -1000;
+    for (i = 0; i < n; i++) {
+      if (score[i] > bs) {
+        bs = score[i];
+        bi = i;
+      }
+    }
+    if (bi >= 0 && bs > -900) {
+      snprintf(best, sizeof(best), "%s", cands[bi]);
+      return best;
+    }
+  }
+
+  {
+    const char *fallback = ai_role_redirect_line(role, style);
+    if (!fallback) fallback = "I'd rather not discuss that.";
+    snprintf(best, sizeof(best), "%s", fallback);
+  }
+  return best;
+}
+
+static void ai_voice_assemble(struct char_data *mob, const struct ai_voice_profile *vp, const struct ai_reply_intention *in, int speech_act, const char *core_content, unsigned long seed, char *out, size_t outsz)
 {
   char core[256], work[512], topic_tag[24], buf[128];
   int rhythm, add_q, add_topic, suppress_opener, use_emotional;
   struct ai_conv_actor_state *st = ai_conv_actor_state_get(mob, 0);
-  const char *opener = "", *closer = "", *hedge = "", *topic = "", *tic = "";
-  if (!out || outsz == 0) return;
+  const char *opener = "", *closer = "", *hedge = "", *topic = "";
+  size_t len;
+
+  if (!out || outsz == 0)
+    return;
   ai_voice_apply_tokens(vp, core_content ? core_content : "", core, sizeof(core));
+
+  if (in && in->goal == GOAL_CLARIFY) {
+    snprintf(out, outsz, "%s", core);
+    len = strlen(out);
+    if (len == 0 || out[len - 1] != '?')
+      snprintf(out, outsz, "What do you mean?");
+    return;
+  }
+
   ai_mbti_compound_modifier(vp, speech_act, &add_q, &add_topic, &suppress_opener, &use_emotional, seed);
-  if (st && st->tone_no_extras) { add_q = 0; add_topic = 0; }
-  if (st && st->tone_clipped) suppress_opener = 1;
+  if (st && st->tone_no_extras) {
+    add_q = 0;
+    add_topic = 0;
+  }
+  if (st && st->tone_clipped)
+    suppress_opener = 1;
+  if (in && in->be_brief) {
+    add_q = 0;
+    add_topic = 0;
+  }
+
   rhythm = vp ? vp->rhythm : 1;
   if (vp && vp->mbti_ei && rhythm == 0) rhythm = 1;
   if (vp && !vp->mbti_ei && rhythm == 3) rhythm = 2;
@@ -2522,33 +2791,77 @@ static void ai_voice_assemble(struct char_data *mob, const struct ai_voice_profi
   else if (vp && vp->hedge_style == 3) hedge = ai_phrase("HEDGE_CONFIDENT", vp->vocab_tier, rhythm, seed, 4);
   opener = suppress_opener ? "" : ai_phrase("OPENER", vp ? vp->vocab_tier : 1, rhythm, seed, vp ? vp->opener_index : 0);
   closer = ai_phrase("CLOSER", vp ? vp->vocab_tier : 1, rhythm, seed, vp ? vp->closer_index : 1);
-  if (vp && vp->mbti_jp == 0) {
-    if (vp->tic_index == 5) tic = "";
-    closer = "That is how it is.";
+
+  if (in && (in->goal == GOAL_DEFLECT || in->goal == GOAL_DISMISS || in->goal == GOAL_SERVE)) {
+    opener = "";
+    hedge = "";
+    add_topic = 0;
+    add_q = 0;
+    use_emotional = (in->goal == GOAL_SERVE && mob && mob->ai_prof && mob->ai_prof->role == ROLE_MERCHANT && mob->ai_prof->style == 1);
   }
-  if (vp && vp->mbti_jp == 1 && strcmp(closer, "")) closer = "though it could be otherwise.";
+  if (in && in->goal == GOAL_WARN) {
+    opener = "";
+    hedge = "";
+    add_q = 0;
+    add_topic = 0;
+    use_emotional = 0;
+    if (!(vp && vp->rhythm >= 2 && in->stance != STANCE_HOSTILE))
+      rhythm = 0;
+  }
+
   snprintf(topic_tag, sizeof(topic_tag), "TOPIC_%s", (vp && vp->topic_lean==0)?"DUTY":(vp&&vp->topic_lean==1)?"TRADE":(vp&&vp->topic_lean==2)?"COMFORT":(vp&&vp->topic_lean==3)?"DANGER":"MYSTERY");
   topic = ai_phrase(topic_tag, vp ? vp->vocab_tier : 1, rhythm, seed, 5);
-  if (vp && vp->tic_index > 0 && (((seed >> (6 * 7)) % 10) < 3)) {
-    static const char *const tics[] = {"", "...if you follow.", "Mind you,", "mark that.", "aye", "...or so they say.", "Listen.", "friend"};
-    tic = tics[vp->tic_index % 8];
+  if (!ai_line_is_role_legal(topic, mob->ai_prof->role, mob->ai_prof->style))
+    topic = "";
+  if (!ai_line_is_role_legal(closer, mob->ai_prof->role, mob->ai_prof->style))
+    closer = "";
+
+  if (rhythm == 0 || (st && st->tone_clipped))
+    snprintf(work, sizeof(work), "%s", core);
+  else if (rhythm == 1)
+    snprintf(work, sizeof(work), "%s%s%s%s%s.", opener, *opener?" ":"", hedge, *hedge?" ":"", core);
+  else if (rhythm == 2)
+    snprintf(work, sizeof(work), "%s", core);
+  else
+    snprintf(work, sizeof(work), "%s %s %s.", opener, hedge, core);
+
+  if (in && in->goal == GOAL_CONNECT) {
+    if (closer && *closer)
+      snprintf(work + strlen(work), sizeof(work) - strlen(work), " %s", closer);
+  } else if (in && in->goal == GOAL_INFORM) {
+    if (!in->be_brief && add_topic && topic && *topic)
+      snprintf(work + strlen(work), sizeof(work) - strlen(work), " %s.", topic);
+    if (closer && *closer)
+      snprintf(work + strlen(work), sizeof(work) - strlen(work), " %s", closer);
+  } else if (in && (in->goal == GOAL_DEFLECT || in->goal == GOAL_DISMISS || in->goal == GOAL_WARN || in->goal == GOAL_SERVE)) {
+    if (closer && *closer)
+      snprintf(work + strlen(work), sizeof(work) - strlen(work), " %s", closer);
+  } else {
+    if (add_topic && topic && *topic)
+      snprintf(work + strlen(work), sizeof(work) - strlen(work), " %s.", topic);
+    if (closer && *closer)
+      snprintf(work + strlen(work), sizeof(work) - strlen(work), " %s", closer);
   }
-  work[0] = '\0';
-  if (rhythm == 0) snprintf(work, sizeof(work), "%s%s%s.", (tic && vp && vp->tic_index==6)?"Listen. ":"", core, (tic && vp && vp->tic_index==1)?" ...if you follow":"");
-  else if (rhythm == 1) snprintf(work, sizeof(work), "%s%s%s%s%s%s %s", opener, *opener?" ":"", hedge, *hedge?" ":"", core, ".", closer);
-  else if (rhythm == 2) snprintf(work, sizeof(work), "%s%s%s", (vp&&vp->tic_index==2)?"Mind you, ":"", core, (tic&&vp->tic_index==5)?" ...or so they say.":"");
-  else snprintf(work, sizeof(work), "%s %s %s. %s. %s", opener, hedge, core, topic, closer);
+
   if (use_emotional) {
     const char *feel = (speech_act==AI_INTENT_PRAISE||speech_act==AI_INTENT_GREET||speech_act==AI_INTENT_SMALLTALK) ? ai_phrase("FEEL_POSITIVE", vp->vocab_tier, rhythm, seed, 7) : ai_phrase("FEEL_NEGATIVE", vp->vocab_tier, rhythm, seed, 8);
     snprintf(buf, sizeof(buf), " %s", feel);
     snprintf(work + strlen(work), sizeof(work) - strlen(work), "%s", buf);
   }
-  if (add_topic && vp && vp->mbti_ei && (((seed >> (9 * 7)) % 10) < 5) && !(st && st->tone_no_extras)) {
-    snprintf(work + strlen(work), sizeof(work) - strlen(work), " %s.", topic);
-  }
-  if (add_q && vp && vp->mbti_ei && !(st && st->tone_no_extras)) {
+
+  if (in && in->goal == GOAL_CONNECT && vp && vp->mbti_ei && in->stance != STANCE_HOSTILE && !(st && st->tone_no_extras))
     snprintf(work + strlen(work), sizeof(work) - strlen(work), " %s", ai_followup_pick(speech_act, seed));
+
+  len = strlen(work);
+  if (len > 180) {
+    size_t cut = 180;
+    while (cut > 0 && work[cut] != '.' && work[cut] != '?' && work[cut] != '!')
+      cut--;
+    if (cut == 0)
+      cut = 180;
+    work[cut] = '\0';
   }
+
   snprintf(out, outsz, "%s", work);
   if (ai_debug)
     ai_debug_log("VOICE vnum=%d role=%s tier=%d rhythm=%d tic=%d mbti=%s out=%s", GET_MOB_VNUM(mob), ai_role_name_local(mob->ai_prof->role), vp->vocab_tier, vp->rhythm, vp->tic_index, ai_mbti_string(vp), out);
@@ -3300,8 +3613,11 @@ static const char *ai_line_for_intent(struct char_data *mob, struct ai_actor_mem
     skip_voice = TRUE;
   }
 
+  if (core && !ai_line_is_role_legal(core, role, style))
+    core = NULL;
+
   if (!core && intent == AI_INTENT_CONFUSION)
-    core = "I am not sure I follow. Ask me in another way.";
+    core = "What do you mean?";
   if (!core)
     core = "I am not sure I follow. Ask me in another way.";
 
@@ -3309,7 +3625,7 @@ finalize:
   if (skip_voice || !core)
     return core;
   vp = ai_voice_profile_get(mob);
-  ai_voice_assemble(mob, vp, intent, core, seed, voiced, sizeof(voiced));
+  ai_voice_assemble(mob, vp, NULL, intent, core, seed, voiced, sizeof(voiced));
   snprintf(line, sizeof(line), "%s", voiced);
   return line;
 }
@@ -4802,28 +5118,49 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
       if (sr && sr->arc == AI_ARC_RAPPORT && !sr->rapport_rumor_used) conv_st->tone_no_extras = 0;
     }
 
-    if (best_action == AI_ACTION_SPEAK_WARN)
-      line = "Watch yourself. State your business.";
-    else if (best_action == AI_ACTION_SPEAK_DEFLECT || (alert_level > 0.6f && mob->ai_prof->role == ROLE_MERCHANT))
-      line = "I'd rather not linger today, friend.";
-    else if (alert_level > 0.6f && mob->ai_prof->role == ROLE_GUARD)
-      line = "State your business. Now.";
-    else
-      line = ai_line_for_intent(mob, e, intent, e->attitude, normalized, best_action, avoid_template_id, &selected_template_id, &pool, &reason);
+    {
+      struct ai_reply_intention intention;
+      int suspicion_bucket = (suspicion > 0.6f) ? 2 : ((suspicion > 0.35f) ? 1 : 0);
+      const char *core = NULL;
+      const struct ai_voice_profile *vp;
+      unsigned long seed;
+      int skip_voice = FALSE;
+      static char voiced[224];
 
-    if (sr && sr->archetype == AI_ARCH_TRANSACTOR && (intent == AI_INTENT_GREET || intent == AI_INTENT_SMALLTALK))
-      line = "State your need and I will answer.";
-    if (sr && sr->arc == AI_ARC_COLD && best_action == AI_ACTION_SPEAK)
-      line = "Keep it brief.";
-    if (ctx.time_bucket == AI_TIME_NIGHT && mob->ai_prof->role == ROLE_GUARD && best_action == AI_ACTION_SPEAK)
-      line = "Night watch is tight. Keep moving and keep lawful.";
-    if (ctx.time_bucket == AI_TIME_NIGHT && mob->ai_prof->role == ROLE_MERCHANT && best_action == AI_ACTION_SPEAK)
-      line = "Late hour trade is short and careful.";
-    if (ctx.time_bucket == AI_TIME_DAY && mob->ai_prof->role == ROLE_MERCHANT && ai_is_transact_intent(intent) && best_action == AI_ACTION_SPEAK)
-      line = "Day market is open. What are you buying?";
-    if (sr && sr->arc == AI_ARC_RAPPORT && !sr->rapport_rumor_used && sr->archetype != AI_ARCH_TRANSACTOR && best_action == AI_ACTION_SPEAK) {
-      line = "Between us, I heard a traveler mention odd lights near the old road.";
-      sr->rapport_rumor_used = 1;
+      intention = ai_form_intention(mob, intent, speech_class, suspicion_bucket, sr ? sr->arc : AI_ARC_STRANGER, &ctx, sr, e, now);
+      if (best_action == AI_ACTION_SPEAK_WARN)
+        intention.goal = GOAL_WARN;
+      else if (best_action == AI_ACTION_SPEAK_DEFLECT)
+        intention.goal = GOAL_DEFLECT;
+
+      core = ai_select_content_for_intention(mob, &intention, normalized, NULL);
+      line = core;
+
+      if (intention.goal == GOAL_SERVE && (intention.topic == AI_INTENT_DIRECTIONS || intention.topic == AI_INTENT_BANK || intention.topic == AI_INTENT_INN)) {
+        const char *dir = ai_direction_line(mob, ai_detect_topic_target_from_text(normalized));
+        if (dir && *dir) {
+          line = dir;
+          skip_voice = TRUE;
+        }
+      }
+
+      if (sr && sr->arc == AI_ARC_RAPPORT && !sr->rapport_rumor_used && sr->archetype != AI_ARCH_TRANSACTOR && best_action == AI_ACTION_SPEAK && intention.goal == GOAL_INFORM) {
+        static const char *const rapport_rumor_pool[] = {
+          "Between us, I heard a traveler mention odd lights near the old road.",
+          "Quiet word: someone reported strange lights by the old road.",
+          NULL
+        };
+        line = ai_pick_phrase(rapport_rumor_pool);
+        sr->rapport_rumor_used = 1;
+      }
+
+      if (!skip_voice && line && *line) {
+        vp = ai_voice_profile_get(mob);
+        seed = ai_conv_seed(mob, intent, (unsigned int)now);
+        ai_voice_assemble(mob, vp, &intention, intent, line, seed, voiced, sizeof(voiced));
+        line = voiced;
+      }
+
     }
 
     if (!line || !*line)
