@@ -9,6 +9,7 @@
 #include "db.h"
 #include "comm.h"
 #include "handler.h"
+#include "class.h"
 #include "graph.h"
 #include "fight.h"
 #include "shop.h"
@@ -50,6 +51,10 @@
 #define AI_MOOD_DAMPING 0.75f
 #define AI_SESSION_READ_MAX 16
 #define AI_MIN_ROLE_FITNESS 10
+#define AI_SERVICE_CACHE_MAX_ZONES 256
+#define AI_SERVICE_CANDIDATES_MAX 192
+#define AI_SERVICE_CACHE_TTL_SECS 120
+#define AI_ROUTE_MAX_STEPS 6
 
 enum ai_time_bucket {
   AI_TIME_DAY = 0,
@@ -281,6 +286,28 @@ static struct ai_conv_room_state ai_conv_room_states[AI_CONV_ROOM_STATE_MAX];
 
 static int ai_debug = AI_ACTOR_DEBUG;
 
+struct ai_service_candidate {
+  int service_type;
+  room_vnum room_vnum;
+  int shop_nr;
+  obj_vnum sample_item_vnum;
+  int has_weapon;
+  int has_armor;
+  int has_food;
+};
+
+struct ai_service_zone_cache {
+  int in_use;
+  int zone_rnum;
+  time_t last_built;
+  unsigned long build_version;
+  struct ai_service_candidate candidates[AI_SERVICE_CANDIDATES_MAX];
+  int candidate_count;
+};
+
+static struct ai_service_zone_cache ai_service_zone_cache[AI_SERVICE_CACHE_MAX_ZONES];
+static unsigned long ai_service_cache_build_version = 0;
+
 struct ai_synonym_group;
 struct ai_word_tier_entry {
   const char *concept;
@@ -333,6 +360,7 @@ static const char *ai_synonym_pick(const struct ai_synonym_group *groups, const 
 static void ai_template_expand(const char *tpl, const struct ai_synonym_group *groups, unsigned long seed, char *out, size_t outsz);
 static const char *ai_template_reply_for_intent(struct char_data *mob, int intent, const char *text, int avoid_template_id, int *out_template_id);
 static void ai_voice_profile_derive(struct char_data *mob, struct ai_voice_profile *out);
+static void ai_traits_to_mbti(const struct ai_actor_traits *t, struct ai_voice_profile *vp, int role);
 static const struct ai_voice_profile *ai_voice_profile_get(struct char_data *mob);
 static const char *ai_word(const char *concept, int tier);
 static const char *ai_word_sn(const char *concept, int vocab_tier, int sn);
@@ -382,6 +410,13 @@ static float ai_context_action_bias(struct char_data *mob, const struct ai_conte
 static float ai_context_suspicion_bias(struct char_data *mob, const struct ai_context_vector *ctx);
 static float ai_suspicion_score(struct char_data *mob, struct char_data *actor, struct ai_actor_memory_entry *e, time_t now, int speech_act);
 static float ai_utility_score(struct char_data *mob, enum ai_action_type action, struct char_data *actor, int speech_act, int intent, time_t now, float attention_score, int is_emote_event, float suspicion);
+static int ai_find_closest_service(struct char_data *mob, struct char_data *player, int service_type, int *out_room_vnum, int *out_item_vnum);
+static struct ai_service_zone_cache *ai_service_cache_get_zone(struct char_data *mob, int force_rebuild);
+static void ai_service_cache_add_candidate(struct ai_service_zone_cache *zc, int service_type, room_vnum room, int shop_nr, obj_vnum item_vnum, int has_weapon, int has_armor, int has_food);
+static void ai_service_cache_build_for_zone(int zone_rnum, struct ai_service_zone_cache *zc);
+static int ai_zone_candidate_matches(const struct ai_service_candidate *c, int service_type);
+static int ai_find_route_to_room(room_rnum start, room_rnum target, int max_depth, int *out_first_dir, int *out_distance);
+
 
 enum ai_player_speech_class {
   AI_SPEECH_UNKNOWN = 0,
@@ -2509,36 +2544,79 @@ static const char *ai_mbti_string(const struct ai_voice_profile *vp)
   return mbti;
 }
 
+static void ai_traits_to_mbti(const struct ai_actor_traits *t, struct ai_voice_profile *vp, int role)
+{
+  int score;
+  int greed, curiosity, empathy, aggression, discipline, superstition;
+  if (!t || !vp)
+    return;
+
+  greed = t->greed / 10;
+  curiosity = t->curiosity / 10;
+  empathy = t->empathy / 10;
+  aggression = t->aggression / 10;
+  discipline = t->discipline / 10;
+  superstition = t->superstition / 10;
+
+  score = empathy + curiosity - discipline;
+  vp->mbti_ei = (score > 0) ? 1 : 0;
+  score = curiosity + superstition - discipline;
+  vp->mbti_sn = (score > 0) ? 1 : 0;
+  score = empathy - aggression - discipline;
+  vp->mbti_tf = (score > 0) ? 1 : 0;
+  score = curiosity + greed - discipline;
+  vp->mbti_jp = (score > 0) ? 1 : 0;
+
+  if (role == ROLE_BEAST) {
+    vp->mbti_ei = 0; vp->mbti_sn = 0; vp->mbti_tf = 0; vp->mbti_jp = 0;
+  } else if (role == ROLE_SPIRIT) {
+    vp->mbti_sn = 1;
+    vp->mbti_jp = (discipline >= 9) ? 0 : 1;
+  } else if (role == ROLE_CULTIST) {
+    vp->mbti_sn = 1;
+    vp->mbti_ei = (empathy + curiosity >= 18) ? 1 : 0;
+  } else if (role == ROLE_GUARD) {
+    vp->mbti_jp = 0;
+  } else if (role == ROLE_BOSS) {
+    vp->mbti_jp = 0;
+    vp->mbti_tf = (empathy >= 8 && aggression <= 3) ? 1 : 0;
+  }
+}
+
 static void ai_voice_profile_derive(struct char_data *mob, struct ai_voice_profile *out)
 {
   unsigned long seed;
-  unsigned long long seed64;
   int role;
   int zone = (mob && IN_ROOM(mob) != NOWHERE) ? world[IN_ROOM(mob)].zone : 0;
-  if (!mob || !out || !mob->ai_prof) return;
+  const struct ai_actor_traits def = {50,50,50,50,50,50,50};
+  const struct ai_actor_traits *t = &def;
+
+  if (!mob || !out || !mob->ai_prof)
+    return;
+
   role = mob->ai_prof->role;
+  if (mob->ai_state && mob->ai_state->brain)
+    t = &mob->ai_state->brain->traits;
+
   seed = ai_hash_mix(ai_hash_mix((unsigned long)GET_MOB_VNUM(mob), (unsigned long)role), (unsigned long)zone);
-  out->vocab_tier = seed % 4;
-  out->rhythm = (seed >> 4) % 4;
-  out->hedge_style = (seed >> 8) % 4;
+  out->vocab_tier = MAX(0, MIN(3, ((t->discipline / 10) + (t->empathy / 10)) / 4));
+  out->rhythm = ((t->discipline / 10) > 5) ? 0 : (((t->curiosity / 10) > 5) ? 3 : 1);
+  out->hedge_style = ((t->superstition / 10) > 5) ? 2 : (((t->discipline / 10) > 7) ? 3 : 1);
   out->topic_lean = (seed >> 12) % 5;
   out->tic_index = (seed >> 16) % 8;
   out->opener_index = (seed >> 20) % 6;
   out->closer_index = (seed >> 24) % 6;
-  out->intensity = (seed >> 28) % 3;
-  seed64 = ((unsigned long long)seed << 32) | ai_hash_mix(seed, (unsigned long)GET_MOB_VNUM(mob));
-  out->mbti_ei = (int)((seed64 >> 32) % 2ULL);
-  out->mbti_sn = (int)((seed64 >> 34) % 2ULL);
-  out->mbti_tf = (int)((seed64 >> 36) % 2ULL);
-  out->mbti_jp = (int)((seed64 >> 38) % 2ULL);
-  if (role == ROLE_BEAST) { out->vocab_tier = 0; out->rhythm = (out->rhythm % 2) ? 2 : 0; out->intensity = out->intensity ? 1 : 0; out->mbti_ei=0; out->mbti_sn=0; out->mbti_tf=0; out->mbti_jp=0; }
+  out->intensity = MAX(0, MIN(2, (t->aggression / 10) / 4));
+  ai_traits_to_mbti(t, out, role);
+
+  if (role == ROLE_BEAST) { out->vocab_tier = 0; out->rhythm = (out->rhythm % 2) ? 2 : 0; out->intensity = out->intensity ? 1 : 0; }
   if (role == ROLE_UNDEAD) { out->vocab_tier = 1 + (out->vocab_tier % 2); out->rhythm = (out->rhythm % 2) ? 2 : 0; out->hedge_style = (out->hedge_style % 2) ? 3 : 0; out->mbti_ei=0; out->mbti_jp=0; }
-  if (role == ROLE_SPIRIT) { out->vocab_tier = 2 + (out->vocab_tier % 2); out->rhythm = (out->rhythm % 2) ? 3 : 1; out->mbti_sn=1; out->mbti_ei=0; }
-  if (role == ROLE_GUARD) { if (out->vocab_tier > 2) out->vocab_tier = 2; out->hedge_style = (out->hedge_style % 2) ? 3 : 0; out->mbti_jp=0; if (out->mbti_ei && ((seed64>>40)%3ULL==0ULL)) out->mbti_ei=0; if (out->mbti_tf && ((seed64>>42)%4ULL!=0ULL)) out->mbti_tf=0; }
-  if (role == ROLE_CULTIST) { out->hedge_style = 2; out->topic_lean = 4; out->mbti_sn=1; if ((seed64>>41)%3ULL!=0ULL) out->mbti_ei=0; if ((seed64>>42)%4ULL!=0ULL) out->mbti_tf=0; }
-  if (role == ROLE_BOSS) { out->hedge_style = (out->hedge_style % 2) ? 3 : 0; if (out->vocab_tier == 0) out->vocab_tier = 1; out->mbti_jp=0; if (out->mbti_ei && ((seed64>>40)%3ULL==0ULL)) out->mbti_ei=0; if (out->mbti_tf && ((seed64>>42)%4ULL!=0ULL)) out->mbti_tf=0; }
-  if (role == ROLE_MERCHANT) { out->mbti_ei = ((seed64>>43)%3ULL==0ULL)?0:1; out->mbti_sn = ((seed64>>44)%3ULL==0ULL)?1:0; out->mbti_jp = ((seed64>>45)%3ULL==0ULL)?1:0; }
-  if (role == ROLE_BANDIT) { if ((seed64>>46)%4ULL!=0ULL) out->mbti_tf=0; if ((seed64>>47)%3ULL!=0ULL) out->mbti_jp=1; }
+  if (role == ROLE_SPIRIT) { out->vocab_tier = 2 + (out->vocab_tier % 2); out->rhythm = (out->rhythm % 2) ? 3 : 1; }
+  if (role == ROLE_GUARD) { if (out->vocab_tier > 2) out->vocab_tier = 2; out->hedge_style = (out->hedge_style % 2) ? 3 : 0; }
+  if (role == ROLE_CULTIST) { out->hedge_style = 2; out->topic_lean = 4; }
+  if (role == ROLE_BOSS) { out->hedge_style = (out->hedge_style % 2) ? 3 : 0; if (out->vocab_tier == 0) out->vocab_tier = 1; }
+  if (role == ROLE_MERCHANT) { out->mbti_ei = 1; }
+  if (role == ROLE_BANDIT) { out->mbti_tf=0; out->mbti_jp=1; }
 }
 
 static const struct ai_voice_profile *ai_voice_profile_get(struct char_data *mob)
@@ -3250,7 +3328,7 @@ static int ai_room_name_matches(room_rnum r, const char *const *needles)
 }
 
 static int ai_bfs_find_target_room(room_rnum start, int max_depth, const char *const *needles,
-                                   room_rnum *out_room, int *out_first_dir)
+                                   room_rnum *out_room, int *out_first_dir, int *out_depth)
 {
   room_rnum q_room[AI_BFS_QUEUE_MAX];
   int q_depth[AI_BFS_QUEUE_MAX];
@@ -3280,6 +3358,8 @@ static int ai_bfs_find_target_room(room_rnum start, int max_depth, const char *c
         *out_room = cur;
       if (out_first_dir)
         *out_first_dir = first;
+      if (out_depth)
+        *out_depth = depth;
       return TRUE;
     }
     if (depth >= max_depth)
@@ -3402,6 +3482,264 @@ static const char *ai_topic_key_name(int target)
   }
 }
 
+static void ai_service_cache_add_candidate(struct ai_service_zone_cache *zc, int service_type, room_vnum room, int shop_nr, obj_vnum item_vnum, int has_weapon, int has_armor, int has_food)
+{
+  int i;
+  struct ai_service_candidate *c;
+
+  if (!zc || room <= 0)
+    return;
+
+  for (i = 0; i < zc->candidate_count; i++) {
+    c = &zc->candidates[i];
+    if (c->service_type == service_type && c->room_vnum == room) {
+      if (c->shop_nr < 0 && shop_nr >= 0)
+        c->shop_nr = shop_nr;
+      if (c->sample_item_vnum < 0 && item_vnum >= 0)
+        c->sample_item_vnum = item_vnum;
+      c->has_weapon = c->has_weapon || has_weapon;
+      c->has_armor = c->has_armor || has_armor;
+      c->has_food = c->has_food || has_food;
+      return;
+    }
+  }
+
+  if (zc->candidate_count >= AI_SERVICE_CANDIDATES_MAX)
+    return;
+
+  c = &zc->candidates[zc->candidate_count++];
+  c->service_type = service_type;
+  c->room_vnum = room;
+  c->shop_nr = shop_nr;
+  c->sample_item_vnum = item_vnum;
+  c->has_weapon = has_weapon;
+  c->has_armor = has_armor;
+  c->has_food = has_food;
+}
+
+static void ai_service_cache_build_for_zone(int zone_rnum, struct ai_service_zone_cache *zc)
+{
+  int i, j;
+  int counts[TARGET_HEAL + 1];
+  memset(counts, 0, sizeof(counts));
+
+  if (!zc || zone_rnum < 0 || zone_rnum > top_of_zone_table)
+    return;
+
+  zc->candidate_count = 0;
+  zc->zone_rnum = zone_rnum;
+  zc->last_built = time(0);
+  zc->build_version = ++ai_service_cache_build_version;
+
+  for (i = 0; i <= top_shop; i++) {
+    int has_weapon = FALSE, has_armor = FALSE, has_food = FALSE;
+    obj_vnum weapon_item = -1, armor_item = -1, food_item = -1;
+
+    for (j = 0; SHOP_PRODUCT(i, j) != NOTHING; j++) {
+      obj_rnum ornum = real_object(SHOP_PRODUCT(i, j));
+      if (ornum == NOTHING)
+        continue;
+      if (GET_OBJ_TYPE(&obj_proto[ornum]) == ITEM_WEAPON) {
+        has_weapon = TRUE;
+        if (weapon_item < 0)
+          weapon_item = SHOP_PRODUCT(i, j);
+      } else if (GET_OBJ_TYPE(&obj_proto[ornum]) == ITEM_ARMOR) {
+        has_armor = TRUE;
+        if (armor_item < 0)
+          armor_item = SHOP_PRODUCT(i, j);
+      } else if (GET_OBJ_TYPE(&obj_proto[ornum]) == ITEM_FOOD || GET_OBJ_TYPE(&obj_proto[ornum]) == ITEM_DRINKCON) {
+        has_food = TRUE;
+        if (food_item < 0)
+          food_item = SHOP_PRODUCT(i, j);
+      }
+    }
+
+    for (j = 0; SHOP_ROOM(i, j) != NOWHERE; j++) {
+      room_rnum rr = real_room(SHOP_ROOM(i, j));
+      if (rr == NOWHERE || world[rr].zone != zone_rnum)
+        continue;
+      if (has_weapon || has_armor || has_food)
+        ai_service_cache_add_candidate(zc, TARGET_MARKET, SHOP_ROOM(i, j), i, (weapon_item >= 0 ? weapon_item : (armor_item >= 0 ? armor_item : food_item)), has_weapon, has_armor, has_food);
+      if (has_weapon || has_armor)
+        ai_service_cache_add_candidate(zc, TARGET_ARMORY, SHOP_ROOM(i, j), i, (weapon_item >= 0 ? weapon_item : armor_item), has_weapon, has_armor, has_food);
+      if (has_food)
+        ai_service_cache_add_candidate(zc, TARGET_BAKERY, SHOP_ROOM(i, j), i, food_item, has_weapon, has_armor, has_food);
+    }
+  }
+
+  for (i = 0; i <= top_of_world; i++) {
+    if (world[i].zone != zone_rnum)
+      continue;
+
+    if (ai_text_has_sub_ci(world[i].name, "bank") || ai_text_has_sub_ci(world[i].name, "vault") || ai_text_has_sub_ci(world[i].name, "atm"))
+      ai_service_cache_add_candidate(zc, TARGET_BANK, world[i].number, -1, -1, FALSE, FALSE, FALSE);
+    if (ai_text_has_sub_ci(world[i].name, "inn") || ai_text_has_sub_ci(world[i].name, "tavern") || ai_text_has_sub_ci(world[i].name, "reception"))
+      ai_service_cache_add_candidate(zc, TARGET_INN, world[i].number, -1, -1, FALSE, FALSE, FALSE);
+    if (ai_text_has_sub_ci(world[i].name, "healer") || ai_text_has_sub_ci(world[i].name, "temple") || ai_text_has_sub_ci(world[i].name, "shrine")) {
+      ai_service_cache_add_candidate(zc, TARGET_HEAL, world[i].number, -1, -1, FALSE, FALSE, FALSE);
+      ai_service_cache_add_candidate(zc, TARGET_TEMPLE, world[i].number, -1, -1, FALSE, FALSE, FALSE);
+    }
+    if (ai_text_has_sub_ci(world[i].name, "guild") || ai_text_has_sub_ci(world[i].name, "training") || ai_text_has_sub_ci(world[i].name, "practice"))
+      ai_service_cache_add_candidate(zc, TARGET_TRAINER, world[i].number, -1, -1, FALSE, FALSE, FALSE);
+  }
+
+  if (ai_debug)
+    ai_debug_log("AI_SERVICE_CACHE_BUILD zone=%d version=%lu candidates=%d", zone_rnum, zc->build_version, zc->candidate_count);
+  for (i = 0; i < zc->candidate_count; i++) {
+    if (zc->candidates[i].service_type >= TARGET_NONE && zc->candidates[i].service_type <= TARGET_HEAL)
+      counts[zc->candidates[i].service_type]++;
+  }
+  if (ai_debug) {
+    ai_debug_log("AI_SERVICE_COUNTS zone=%d armory=%d bank=%d inn=%d heal=%d trainer=%d bakery=%d market=%d temple=%d",
+      zone_rnum, counts[TARGET_ARMORY], counts[TARGET_BANK], counts[TARGET_INN], counts[TARGET_HEAL], counts[TARGET_TRAINER], counts[TARGET_BAKERY], counts[TARGET_MARKET], counts[TARGET_TEMPLE]);
+  }
+}
+
+static struct ai_service_zone_cache *ai_service_cache_get_zone(struct char_data *mob, int force_rebuild)
+{
+  int zone_rnum;
+  int i;
+  struct ai_service_zone_cache *slot = NULL;
+  time_t now = time(0);
+
+  if (!mob || IN_ROOM(mob) == NOWHERE)
+    return NULL;
+
+  zone_rnum = world[IN_ROOM(mob)].zone;
+  for (i = 0; i < AI_SERVICE_CACHE_MAX_ZONES; i++) {
+    if (ai_service_zone_cache[i].in_use && ai_service_zone_cache[i].zone_rnum == zone_rnum) {
+      slot = &ai_service_zone_cache[i];
+      break;
+    }
+    if (!slot && !ai_service_zone_cache[i].in_use)
+      slot = &ai_service_zone_cache[i];
+  }
+
+  if (!slot)
+    slot = &ai_service_zone_cache[zone_rnum % AI_SERVICE_CACHE_MAX_ZONES];
+
+  if (!slot->in_use || force_rebuild || (now - slot->last_built) > AI_SERVICE_CACHE_TTL_SECS) {
+    if (ai_debug)
+      ai_debug_log("AI_SERVICE_CACHE_REBUILD zone=%d reason=%s", zone_rnum,
+        (!slot->in_use ? "miss" : (force_rebuild ? "forced" : "ttl")));
+    memset(slot, 0, sizeof(*slot));
+    slot->in_use = TRUE;
+    ai_service_cache_build_for_zone(zone_rnum, slot);
+  }
+
+  return slot;
+}
+
+static int ai_zone_candidate_matches(const struct ai_service_candidate *c, int service_type)
+{
+  if (!c)
+    return FALSE;
+  if (c->service_type == service_type)
+    return TRUE;
+  if (service_type == TARGET_ARMORY && c->service_type == TARGET_MARKET)
+    return c->has_weapon || c->has_armor;
+  if (service_type == TARGET_BAKERY && c->service_type == TARGET_MARKET)
+    return c->has_food;
+  return FALSE;
+}
+
+static int ai_find_route_to_room(room_rnum start, room_rnum target, int max_depth, int *out_first_dir, int *out_distance)
+{
+  const char *needles[2];
+  room_rnum found = NOWHERE;
+  int first_dir = -1;
+  int depth = 0;
+
+  if (start == NOWHERE || target == NOWHERE || !VALID_ROOM_RNUM(target))
+    return FALSE;
+
+  needles[0] = world[target].name;
+  needles[1] = NULL;
+  if (!ai_bfs_find_target_room(start, max_depth, needles, &found, &first_dir, &depth))
+    return FALSE;
+  if (found != target)
+    return FALSE;
+
+  if (out_first_dir)
+    *out_first_dir = first_dir;
+  if (out_distance)
+    *out_distance = depth;
+  return TRUE;
+}
+
+static int ai_find_closest_service(struct char_data *mob, struct char_data *player, int service_type, int *out_room_vnum, int *out_item_vnum)
+{
+  struct ai_service_zone_cache *zc;
+  int i;
+  int best_dist = 9999;
+  room_vnum best_room = NOWHERE;
+  obj_vnum best_item = -1;
+
+  if (!mob || IN_ROOM(mob) == NOWHERE)
+    return FALSE;
+
+  zc = ai_service_cache_get_zone(mob, FALSE);
+  if (!zc)
+    return FALSE;
+
+  for (i = 0; i < zc->candidate_count; i++) {
+    const struct ai_service_candidate *c = &zc->candidates[i];
+    room_rnum rr;
+    int dist = 0;
+    int first_dir = -1;
+    obj_vnum item_choice = c->sample_item_vnum;
+
+    if (!ai_zone_candidate_matches(c, service_type))
+      continue;
+
+    rr = real_room(c->room_vnum);
+    if (rr == NOWHERE)
+      continue;
+
+    if (!ai_find_route_to_room(IN_ROOM(mob), rr, AI_BFS_MAX_DEPTH, &first_dir, &dist))
+      continue;
+
+    if (c->shop_nr >= 0 && player) {
+      int j;
+      item_choice = -1;
+      for (j = 0; SHOP_PRODUCT(c->shop_nr, j) != NOTHING; j++) {
+        obj_rnum ornum = real_object(SHOP_PRODUCT(c->shop_nr, j));
+        struct obj_data *o;
+        if (ornum == NOTHING)
+          continue;
+        o = &obj_proto[ornum];
+        if (service_type == TARGET_ARMORY && GET_OBJ_TYPE(o) != ITEM_WEAPON && GET_OBJ_TYPE(o) != ITEM_ARMOR)
+          continue;
+        if (service_type == TARGET_BAKERY && GET_OBJ_TYPE(o) != ITEM_FOOD && GET_OBJ_TYPE(o) != ITEM_DRINKCON)
+          continue;
+        if (invalid_align(player, o) || invalid_class(player, o))
+          continue;
+        item_choice = SHOP_PRODUCT(c->shop_nr, j);
+        break;
+      }
+    }
+
+    if (dist < best_dist) {
+      best_dist = dist;
+      best_room = c->room_vnum;
+      best_item = item_choice;
+    }
+  }
+
+  if (best_room == NOWHERE)
+    return FALSE;
+
+  if (out_room_vnum)
+    *out_room_vnum = best_room;
+  if (out_item_vnum)
+    *out_item_vnum = best_item;
+
+  if (ai_debug)
+    ai_debug_log("AI_SERVICE_SELECT zone=%d service=%s room=%d dist=%d item=%d", world[IN_ROOM(mob)].zone, ai_topic_key_name(service_type), best_room, best_dist, best_item);
+
+  return TRUE;
+}
+
 static const char *ai_role_redirect_line(int role, int style)
 {
   if (role == ROLE_GUARD)
@@ -3452,6 +3790,73 @@ static int ai_role_can_give_directions(int role)
   return (role == ROLE_GUARD || role == ROLE_MERCHANT || role == ROLE_BOSS || role == ROLE_CIVILIAN || role == ROLE_UNKNOWN);
 }
 
+static int ai_service_type_from_intent_topic(int intent, int topic)
+{
+  if (intent == AI_INTENT_BUY_WEAPON || intent == AI_INTENT_BUY_ARMOR)
+    return TARGET_ARMORY;
+  if (intent == AI_INTENT_BUY_FOOD)
+    return TARGET_BAKERY;
+  if (intent == AI_INTENT_BANK)
+    return TARGET_BANK;
+  if (intent == AI_INTENT_INN)
+    return TARGET_INN;
+  if (intent == AI_INTENT_HEAL)
+    return TARGET_HEAL;
+  if (intent == AI_INTENT_TRAIN)
+    return TARGET_TRAINER;
+  if (topic != TARGET_NONE)
+    return topic;
+  return TARGET_MARKET;
+}
+
+static const char *ai_service_direction_line(struct char_data *mob, struct char_data *player, int intent, int topic)
+{
+  static char line[220];
+  int room_v = NOWHERE;
+  int item_v = -1;
+  room_rnum rr;
+  int first_dir = -1;
+  int dist = 0;
+  char route[128];
+  char route_trim[96];
+  const char *item_name = NULL;
+  const char *dest_name = NULL;
+  int service_type = ai_service_type_from_intent_topic(intent, topic);
+
+  if (!mob || IN_ROOM(mob) == NOWHERE)
+    return NULL;
+
+  if (!ai_find_closest_service(mob, player, service_type, &room_v, &item_v))
+    return NULL;
+
+  rr = real_room(room_v);
+  if (rr == NOWHERE)
+    return NULL;
+
+  if (!ai_find_route_to_room(IN_ROOM(mob), rr, AI_BFS_MAX_DEPTH, &first_dir, &dist))
+    return NULL;
+
+  ai_build_route_text(first_dir, route, sizeof(route));
+  snprintf(route_trim, sizeof(route_trim), "%.*s", AI_ROUTE_MAX_STEPS * 14, route);
+  dest_name = world[rr].name;
+
+  if (item_v >= 0) {
+    obj_rnum ornum = real_object(item_v);
+    if (ornum != NOTHING)
+      item_name = obj_proto[ornum].short_description;
+  }
+
+  if (item_name && *item_name)
+    snprintf(line, sizeof(line), "%s: %s They usually stock %s.", dest_name, route_trim, item_name);
+  else
+    snprintf(line, sizeof(line), "%s: %s", dest_name, route_trim);
+
+  if (ai_debug)
+    ai_debug_log("AI_SERVICE_ROUTE intent=%d topic=%s room=%d route=%s", intent, ai_topic_key_name(service_type), room_v, route_trim);
+
+  return line;
+}
+
 static const char *ai_direction_line(struct char_data *mob, int target_topic)
 {
   static char line[160];
@@ -3474,7 +3879,7 @@ static const char *ai_direction_line(struct char_data *mob, int target_topic)
     target_topic = TARGET_MARKET;
 
   needles = ai_needles_for_target(target_topic);
-  if (needles && IN_ROOM(mob) != NOWHERE && ai_bfs_find_target_room(IN_ROOM(mob), AI_BFS_MAX_DEPTH, needles, &found, &first_dir)) {
+  if (needles && IN_ROOM(mob) != NOWHERE && ai_bfs_find_target_room(IN_ROOM(mob), AI_BFS_MAX_DEPTH, needles, &found, &first_dir, NULL)) {
     ai_build_route_text(first_dir, route, sizeof(route));
     if (role == ROLE_GUARD)
       snprintf(line, sizeof(line), "%s Keep your eyes open.", route);
@@ -3562,7 +3967,8 @@ static const char *ai_line_for_intent(struct char_data *mob, struct ai_actor_mem
     topic = ai_detect_topic_target_from_text(text);
     if (topic == TARGET_NONE && e && (time(0) - e->last_topic_time) <= AI_TOPIC_MEMORY_WINDOW_SECS)
       topic = e->last_topic;
-    if (topic != TARGET_NONE)
+    dir_line = ai_service_direction_line(mob, NULL, intent, topic);
+    if (!dir_line && topic != TARGET_NONE)
       dir_line = ai_direction_line(mob, topic);
   }
 
@@ -5275,7 +5681,8 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
       }
 
       if (intention.goal == GOAL_SERVE && (intention.topic == AI_INTENT_DIRECTIONS || intention.topic == AI_INTENT_BANK || intention.topic == AI_INTENT_INN)) {
-        const char *dir = ai_direction_line(mob, ai_detect_topic_target_from_text(normalized));
+        const char *dir = ai_service_direction_line(mob, actor, intent, ai_detect_topic_target_from_text(normalized));
+        if (!dir) dir = ai_direction_line(mob, ai_detect_topic_target_from_text(normalized));
         if (dir && *dir) {
           line = dir;
           skip_voice = TRUE;
