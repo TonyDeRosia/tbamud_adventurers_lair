@@ -61,6 +61,8 @@ ACMD(do_clist);
 
 ACMD(do_affremove);
 ACMD(do_smartspawn);
+ACMD(do_aistate);
+ACMD(do_aictl);
 
 /* local (file scope) functions */
 static int perform_dupe_check(struct descriptor_data *d);
@@ -350,6 +352,8 @@ cpp_extern const struct command_info cmd_info[] = {
   { "sneak"    , "sneak"   , POS_STANDING, do_sneak    , 1, 0 },
   { "snoop"    , "snoop"   , POS_DEAD    , do_snoop    , LVL_GOD, 0 },
   { "smartsp"   , "smartsp"  , POS_DEAD    , do_smartspawn, LVL_IMMORT, 0 },
+  { "aictl"    , "aictl"    , POS_DEAD    , do_aictl    , LVL_IMMORT, 0 },
+  { "aistate"  , "aistate"  , POS_DEAD    , do_aistate  , LVL_IMMORT, 0 },
   { "smartspawn", "smartspawn", POS_DEAD    , do_smartspawn, LVL_IMMORT, 0 },
   { "socials"  , "socials" , POS_DEAD    , do_commands , 0, SCMD_SOCIALS },
   { "split"    , "split"   , POS_SITTING , do_split    , 1, 0 },

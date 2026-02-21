@@ -8,6 +8,8 @@
 #define AI_ACTOR_DEBUG 0
 #endif
 
+struct ai_actor_brain;
+
 enum ai_actor_role {
   ROLE_UNKNOWN = 0,
   ROLE_GUARD,
@@ -55,6 +57,9 @@ enum ai_actor_morale {
 #define MEM_HELPED_ME   (1 << 2)
 #define MEM_STOLE       (1 << 3)
 #define MEM_FLED_FROM   (1 << 4)
+#define MEM_ASSAULT     (1 << 5)
+#define MEM_MURDER      (1 << 6)
+#define MEM_TRESPASS    (1 << 7)
 
 enum {
   AI_OPP_NONE = 0,
@@ -105,6 +110,7 @@ struct ai_actor_state {
   long current_target_idnum;
   time_t target_last_seen;
   int cached_zone;
+  struct ai_actor_brain *brain;
 };
 
 void ai_actor_init(struct char_data *mob);
@@ -114,5 +120,13 @@ void ai_actor_record_damage(struct char_data *mob, struct char_data *actor, int 
 void ai_actor_record_help(struct char_data *mob, struct char_data *actor, int amount);
 void ai_actor_record_crime(struct char_data *mob, struct char_data *criminal, int flags);
 void ai_actor_record_room_crime(struct char_data *witness, struct char_data *criminal, int flags);
+void ai_actor_event_enter(struct char_data *actor, room_rnum room);
+void ai_actor_event_leave(struct char_data *actor, room_rnum room);
+void ai_actor_event_say(struct char_data *actor, const char *msg);
+void ai_actor_event_emote(struct char_data *actor, const char *msg);
+void ai_actor_event_combat_start(struct char_data *attacker, struct char_data *victim);
+void ai_actor_event_corpse(struct char_data *dead, room_rnum room);
+void ai_actor_event_drop(struct char_data *actor, struct obj_data *obj);
+void ai_actor_event_give(struct char_data *actor, struct char_data *to, struct obj_data *obj);
 
 #endif

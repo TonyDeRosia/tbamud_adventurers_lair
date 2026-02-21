@@ -36,6 +36,8 @@
 #include "ban.h"
 #include "screen.h"
 #include "accounts.h"
+#include "ai_actor.h"
+#include "ai_actor_brain.h"
 
 /* local utility functions with file scope */
 static int perform_set(struct char_data *ch, struct char_data *vict, int mode, char *val_arg);
@@ -143,6 +145,8 @@ ACMD(do_echo)
       mudlog(CMP, MAX(LVL_BUILDER, GET_INVIS_LEV(ch)), TRUE, "(GC) %s echoed: %s", GET_NAME(ch), buf);
       }
     act(buf, FALSE, ch, 0, 0, TO_ROOM);
+    if (subcmd == SCMD_EMOTE)
+      ai_actor_event_emote(ch, argument);
 
     if (!IS_NPC(ch) && PRF_FLAGGED(ch, PRF_NOREPEAT))
       send_to_char(ch, "%s", CONFIG_OK);
@@ -5771,3 +5775,46 @@ ACMD(do_affremove)
   #undef CLEAR_ALL_AFFECTS
 }
 /* AFFREMOVE COMMAND END */
+
+
+ACMD(do_aictl)
+{
+  char arg[MAX_INPUT_LENGTH];
+  one_argument(argument, arg);
+
+  if (!*arg) {
+    send_to_char(ch, "AI actor reactions are currently %s.\r\n", ai_actor_brain_enabled() ? "ON" : "OFF");
+    return;
+  }
+
+  if (!str_cmp(arg, "on")) {
+    ai_actor_brain_set_enabled(TRUE);
+    send_to_char(ch, "AI actor reactions enabled.\r\n");
+  } else if (!str_cmp(arg, "off")) {
+    ai_actor_brain_set_enabled(FALSE);
+    send_to_char(ch, "AI actor reactions disabled.\r\n");
+  } else
+    send_to_char(ch, "Usage: aictl <on|off>\r\n");
+}
+
+ACMD(do_aistate)
+{
+  char arg[MAX_INPUT_LENGTH];
+  struct char_data *mob;
+
+  one_argument(argument, arg);
+  if (!*arg) {
+    send_to_char(ch, "Usage: aistate <mob>\r\n");
+    return;
+  }
+
+  if (!(mob = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM))) {
+    send_to_char(ch, "%s", CONFIG_NOPERSON);
+    return;
+  }
+  if (!IS_NPC(mob) || !MOB_FLAGGED(mob, MOB_AI_ACTOR)) {
+    send_to_char(ch, "That target is not an AI actor mob.\r\n");
+    return;
+  }
+  ai_actor_brain_show_state(ch, mob);
+}

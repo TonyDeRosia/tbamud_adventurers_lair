@@ -363,6 +363,8 @@ void set_fighting(struct char_data *ch, struct char_data *vict)
   FIGHTING(ch) = vict;
   GET_POS(ch) = POS_FIGHTING;
 
+  ai_actor_event_combat_start(ch, vict);
+
   if (!CONFIG_PK_ALLOWED)
     check_killer(ch, vict);
 }
@@ -591,6 +593,7 @@ struct char_data *i;
   update_pos(ch);
 
   make_corpse(ch);
+  ai_actor_event_corpse(ch, IN_ROOM(ch));
 
   /* NPCs: original behavior. PCs: do NOT extract (extraction puts them into the menu).
      Instead, respawn them at the mortal start room and keep the descriptor playing. */
