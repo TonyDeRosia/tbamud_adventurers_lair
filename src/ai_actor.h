@@ -4,6 +4,16 @@
 #include <stdint.h>
 
 #define AI_MEM_MAX 12
+#define AI_EVENT_RING_MAX 12
+#define AI_INTENT_KEYWORDS_MAX 64
+
+#define AI_PROFILE_INCONSISTENT (1 << 0)
+
+enum ai_disposition_flags {
+  AI_DISP_ATTACKED_ME = (1 << 0),
+  AI_DISP_HELPED_ME = (1 << 1),
+  AI_DISP_ANNOYED_ME = (1 << 2)
+};
 
 /* Optional compile-time debug logging. */
 #ifndef AI_ACTOR_DEBUG
@@ -100,11 +110,27 @@ struct ai_actor_profile {
   int target_alignment_pref;
   int opportunistic_pref;
   uint32_t signature;
+  uint32_t profile_flags;
+  char matched_keywords[AI_INTENT_KEYWORDS_MAX];
+  int style;
   int initialized;
+};
+
+struct ai_actor_recent_event {
+  int type;
+  long actor_idnum;
+  int room_vnum;
+  time_t when;
+  char text[48];
 };
 
 struct ai_actor_memory_entry {
   long idnum;
+  char key_name[24];
+  int attitude;
+  time_t last_seen_time;
+  time_t last_interaction_time;
+  int disposition_flags;
   int hostility;
   int trust;
   int fear;
@@ -127,7 +153,21 @@ struct ai_actor_state {
   long current_target_idnum;
   time_t target_last_seen;
   time_t next_signature_check;
+  time_t last_action_time;
+  time_t last_talk_time;
+  time_t last_emote_time;
+  int last_room_vnum;
+  int talk_cooldown_pulses;
+  int intent_cooldown_pulses;
+  int event_ring_start;
+  int event_ring_count;
+  int social_spam_count;
+  long pending_target_idnum;
+  enum ai_event_type pending_event_type;
+  char pending_event_text[64];
+  time_t pending_event_time;
   int cached_zone;
+  struct ai_actor_recent_event recent_events[AI_EVENT_RING_MAX];
   struct ai_actor_brain *brain;
 };
 
