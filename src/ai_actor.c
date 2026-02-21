@@ -6478,6 +6478,9 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
     const char *pool = "POOL_NONE";
     const char *reason = ai_event_reason_name(type);
     char targeted[640];
+    char voiced[300];
+
+    voiced[0] = '\0';
 
     if (conv_st) {
       conv_st->tone_clipped = 0;
@@ -6502,8 +6505,6 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
       const struct ai_voice_profile *vp;
       unsigned long seed;
       int skip_voice = FALSE;
-      char voiced[300];
-      voiced[0] = '\0';
 
       intention = ai_form_intention(mob, intent, speech_class, suspicion_bucket, sr ? sr->arc : AI_ARC_STRANGER, &ctx, sr, e, now);
       if (is_hunger_request)
@@ -6568,10 +6569,10 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
         }
         multi_core[sizeof(multi_core) - 1] = '\0';
         if (multi_core[0]) {
-          char multi_sanitized[256];
-          ai_sanitize_unresolved_tokens(multi_core, multi_sanitized, sizeof(multi_sanitized));
-          line = multi_sanitized;
-          rctx.chosen_core = multi_sanitized;
+          ai_sanitize_unresolved_tokens(multi_core, voiced, sizeof(voiced));
+          line = voiced;
+          rctx.chosen_core = voiced;
+          skip_voice = TRUE;
           intention.be_brief = 1;
         }
       }
@@ -6621,10 +6622,8 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
       }
 
       if (line && *line && !ai_line_is_role_legal(line, role, style)) {
-        char legal_core[300];
-        legal_core[0] = '\0';
-        snprintf(legal_core, sizeof(legal_core), "%.*s", (int)sizeof(legal_core) - 1, core ? core : "");
-        line = legal_core;
+        snprintf(voiced, sizeof(voiced), "%.*s", (int)sizeof(voiced) - 1, core ? core : "");
+        line = voiced;
         if (!line[0] || !ai_line_is_role_legal(line, role, style)) {
           const char *redirect = ai_role_redirect_line(role, style, TARGET_NONE);
           if (!redirect || !*redirect || !ai_line_is_role_legal(redirect, role, style))
