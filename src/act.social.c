@@ -19,6 +19,7 @@
 #include "screen.h"
 #include "spells.h"
 #include "act.h"
+#include "ai_actor.h"
 
 /* local defined functions for local use */
 /* do_action and do_gmote utility function */
@@ -43,6 +44,7 @@ ACMD(do_action)
   if (!argument || !*argument) {
     send_to_char(ch, "%s\r\n", action->char_no_arg);
     act(action->others_no_arg, action->hide, ch, 0, 0, TO_ROOM);
+    ai_actor_event_emote(ch, argument);
     return;
   }
 
@@ -69,6 +71,7 @@ ACMD(do_action)
       if (targ) {
         act(action->char_obj_found, action->hide, ch, targ, 0, TO_CHAR);
         act(action->others_obj_found, action->hide, ch, targ, 0, TO_ROOM);
+        ai_actor_event_emote(ch, argument);
         return;
       }
     }
@@ -85,6 +88,7 @@ ACMD(do_action)
     else
       send_to_char(ch, "Erm, no.\r\n");
     act(action->others_auto, action->hide, ch, 0, 0, TO_ROOM);
+    ai_actor_event_emote(ch, argument);
     return;
   }
 
@@ -95,10 +99,12 @@ ACMD(do_action)
       act(action->char_body_found, 0, ch, (struct obj_data *)part, vict, TO_CHAR | TO_SLEEP);
       act(action->others_body_found, action->hide, ch, (struct obj_data *)part, vict, TO_NOTVICT);
       act(action->vict_body_found, action->hide, ch, (struct obj_data *)part, vict, TO_VICT);
+      ai_actor_event_emote(ch, argument);
     } else {
       act(action->char_found, 0, ch, 0, vict, TO_CHAR | TO_SLEEP);
       act(action->others_found, action->hide, ch, 0, vict, TO_NOTVICT);
       act(action->vict_found, action->hide, ch, 0, vict, TO_VICT);
+      ai_actor_event_emote(ch, argument);
     }
   }
 }

@@ -12,6 +12,15 @@
 
 struct ai_actor_brain;
 
+enum ai_event_type {
+  AI_EVENT_PLAYER_SAY = 0,
+  AI_EVENT_PLAYER_EMOTE,
+  AI_EVENT_PLAYER_ENTER,
+  AI_EVENT_PLAYER_LEAVE,
+  AI_EVENT_COMBAT_START,
+  AI_EVENT_COMBAT_END
+};
+
 enum ai_actor_role {
   ROLE_UNKNOWN = 0,
   ROLE_GUARD,
@@ -71,6 +80,7 @@ enum {
 
 struct ai_actor_profile {
   int role;
+  int mode;
   int movement;
   int aggression;
   int social;
@@ -101,6 +111,7 @@ struct ai_actor_memory_entry {
   time_t last_update;
   int last_room_vnum;
   int flags;
+  time_t last_reaction;
 };
 
 struct ai_actor_state {
@@ -123,6 +134,7 @@ struct ai_actor_state {
 uint32_t ai_actor_compute_signature(struct char_data *mob);
 void ai_actor_build_profile(struct char_data *mob, int full_reset);
 void ai_actor_rebuild_profile(struct char_data *mob);
+void ai_actor_refresh_profile(struct char_data *mob, int force);
 void ai_actor_refresh_live_mobs_by_vnum(mob_vnum vnum);
 
 void ai_actor_init(struct char_data *mob);
@@ -137,6 +149,7 @@ void ai_actor_event_leave(struct char_data *actor, room_rnum room);
 void ai_actor_event_say(struct char_data *actor, const char *msg);
 void ai_actor_event_emote(struct char_data *actor, const char *msg);
 void ai_actor_event_combat_start(struct char_data *attacker, struct char_data *victim);
+void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, struct char_data *actor, const char *text);
 void ai_actor_event_corpse(struct char_data *dead, room_rnum room);
 void ai_actor_event_drop(struct char_data *actor, struct obj_data *obj);
 void ai_actor_event_give(struct char_data *actor, struct char_data *to, struct obj_data *obj);

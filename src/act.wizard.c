@@ -940,10 +940,16 @@ static void do_stat_character(struct char_data *ch, struct char_data *k)
 	    k->mob_specials.damnodice, k->mob_specials.damsizedice);
 
   if (IS_MOB(k) && MOB_FLAGGED(k, MOB_AI_ACTOR) && k->ai_prof) {
-    send_to_char(ch, "AI role: %s, AI temperament: %s, AI theme: %s\r\n",
+    long last_said = 0;
+    if (k->ai_state && k->ai_state->last_spoke > 0)
+      last_said = (long)(time(0) - k->ai_state->last_spoke);
+    send_to_char(ch, "AI_ACTOR: role=%s temperament=%s mode=%d roam=%d morale=%d last_said=%ld\r\n",
                  ai_actor_role_name(k->ai_prof->role),
                  ai_actor_temperament_name(k->ai_prof->aggression),
-                 ai_actor_theme_name(k->ai_prof->social));
+                 k->ai_prof->mode,
+                 k->ai_prof->roam_radius,
+                 k->ai_prof->morale,
+                 (last_said < 0 ? 0L : last_said));
     send_to_char(ch, "AI control mode: %s, AI signature hash: %08X\r\n",
                  ai_actor_control_mode_name(),
                  (unsigned int)k->ai_prof->signature);
