@@ -4927,25 +4927,10 @@ ACMD(do_acctsetpass)
 
 ACMD(do_smartspawn)
 {
-  static const struct {
-    mob_vnum vnum;
-    const char *name;
-    const char *short_descr;
-    const char *long_descr;
-    const char *description;
-  } test_defs[] = {
-    { 9800, "test guard city watch sentinel", "a city watch test guard", "A city watch test guard patrols here, watching for trouble.", "This test guard wears a plain tabard and keeps a sharp eye on the street. The badge reads 'City Watch'." },
-    { 9801, "test patrol guard constable", "a patrolling test constable", "A test constable patrols the area with practiced steps.", "A disciplined test constable of the city watch. The posture and pacing screams patrol duty." },
-    { 9802, "test shopkeeper merchant vendor trader", "a test shopkeeper", "A test shopkeeper stands ready to trade.", "A well stocked test merchant with a ledger and a friendly smile. A sign reads 'Trader'." },
-    { 9803, "test innkeeper bartender vendor", "a test innkeeper", "A test innkeeper wipes down the bar and greets travelers.", "This test bartender keeps the peace and calls for help if trouble starts." },
-    { 9804, "test bandit brigand outlaw mugger", "a roadside test bandit", "A test bandit lurks here, eyeing your coin pouch.", "Scarred and hungry, this test brigand looks for easy victims." },
-    { 9805, "test cultist acolyte zealot summoner", "a hooded test cultist", "A hooded test cultist mutters prayers under their breath.", "A fanatical test devotee with twitchy hands and a ritual dagger." },
-    { 9806, "test wolf beast predator", "a hungry test wolf", "A hungry test wolf prowls here.", "A lean test predator that guards its territory." },
-    { 9807, "test skeleton undead revenant", "a rattling test skeleton", "A test skeleton clacks forward with empty malice.", "Its bones move with unnatural purpose. Nothing human remains." },
-    { 9808, "test spirit ghost wraith whisper", "a drifting test spirit", "A pale test spirit drifts silently through the air.", "An ethereal test presence that whispers in the corners of your mind." },
-    { 9809, "test commander lord champion boss", "a dread test commander", "A dread test commander stands here, daring anyone to challenge them.", "Armored, confident, and cruel. The air feels heavier near them." }
-  };
-  char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH];
+  /* Reserved smartspawn AI actor test mob prototype block: 19500-19509. */
+  static const mob_vnum smartspawn_base_vnum = 19500;
+  static const int smartspawn_max_count = 10;
+  char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH], arg4[MAX_INPUT_LENGTH];
   int count = 1, minlevel = 1, maxlevel = 10;
   int i;
   struct char_data *cmd_ch = ch;
@@ -4963,79 +4948,81 @@ ACMD(do_smartspawn)
     return;
   }
 
-  *arg1 = *arg2 = *arg3 = '\0';
-  one_argument(two_arguments(argument, arg1, arg2), arg3);
+  *arg1 = *arg2 = *arg3 = *arg4 = '\0';
+  argument = one_argument(argument, arg1);
+  argument = one_argument(argument, arg2);
+  argument = one_argument(argument, arg3);
+  one_argument(argument, arg4);
 
   if (!*arg1) {
     send_to_char(ch,
       "Usage: smartspawn <count 1-10> [min level] [max level]\r\n"
+      "   or: smartspawn <count 1-10> [min-max]\r\n"
       "Example: smartspawn 3 90 110\r\n"
-      "Tip: start with 'smartspawn 1' to spawn a single test AI mob.\r\n");
+      "Example: smartspawn 3 90-110\r\n");
     return;
   }
 
-  if (*arg1 && !is_number(arg1)) {
+  if (!is_number(arg1)) {
     send_to_char(ch, "Usage: smartspawn <count 1-10> [min level] [max level]\r\n");
     return;
   }
 
-  if (*arg1 && is_number(arg1))
-    count = atoi(arg1);
-  count = MAX(1, MIN(10, count));
+  count = atoi(arg1);
+  count = MAX(1, MIN(smartspawn_max_count, count));
 
-  if (*arg2 && *arg3 && is_number(arg2) && is_number(arg3)) {
+  if (*arg2 && *arg3 && !*arg4 && is_number(arg2) && is_number(arg3)) {
     minlevel = atoi(arg2);
     maxlevel = atoi(arg3);
-    if (minlevel > maxlevel) {
-      int tmp = minlevel;
-      minlevel = maxlevel;
-      maxlevel = tmp;
+  } else if (*arg2 && !*arg3 && !*arg4) {
+    int parsed_min = 0, parsed_max = 0;
+
+    if (sscanf(arg2, "%d-%d", &parsed_min, &parsed_max) == 2) {
+      minlevel = parsed_min;
+      maxlevel = parsed_max;
+    } else if (is_number(arg2)) {
+      minlevel = atoi(arg2);
+      maxlevel = minlevel;
+    } else {
+      send_to_char(ch, "Usage: smartspawn <count 1-10> [min level] [max level]\r\n");
+      return;
     }
-    minlevel = MAX(1, minlevel);
-    maxlevel = MAX(1, maxlevel);
+  } else if (*arg2 || *arg3 || *arg4) {
+    send_to_char(ch, "Usage: smartspawn <count 1-10> [min level] [max level]\r\n");
+    return;
+  }
+
+  minlevel = MAX(1, minlevel);
+  maxlevel = MAX(1, maxlevel);
+  if (minlevel > maxlevel) {
+    int tmp = minlevel;
+    minlevel = maxlevel;
+    maxlevel = tmp;
   }
 
   for (i = 0; i < count; i++) {
-    int pick = rand_number(0, 9);
-    mob_vnum vnum = test_defs[pick].vnum;
+    mob_vnum vnum = smartspawn_base_vnum + i;
+    mob_rnum rnum = real_mobile(vnum);
     int level = rand_number(minlevel, maxlevel);
-    struct char_data *mob = read_mobile(vnum, VIRTUAL);
+    struct char_data *mob;
 
+    if (rnum == NOBODY || rnum < 0) {
+      send_to_char(ch,
+        "smartspawn: missing test mob vnum %d. Did you add lib/world/mob/ai_actor_test.mob and index entries?\r\n",
+        vnum);
+      return;
+    }
+
+    mob = read_mobile(rnum, REAL);
     if (!mob) {
-      mob = create_char();
-      if (!mob)
-        continue;
-
-      mob->player.name = strdup(test_defs[pick].name);
-      mob->player.short_descr = strdup(test_defs[pick].short_descr);
-      mob->player.long_descr = strdup(test_defs[pick].long_descr);
-      mob->player.description = strdup(test_defs[pick].description);
-      GET_SEX(mob) = SEX_NEUTRAL;
-      GET_CLASS(mob) = CLASS_OTHER;
-      GET_RACE(mob) = RACE_UNDEFINED;
-      GET_LEVEL(mob) = level;
-      GET_ALIGNMENT(mob) = 0;
-      GET_POS(mob) = POS_STANDING;
-      GET_DEFAULT_POS(mob) = POS_STANDING;
-      mob->points.max_hit = MAX(20, level * 20);
-      mob->points.hit = mob->points.max_hit;
-      mob->points.max_mana = 100;
-      mob->points.mana = mob->points.max_mana;
-      mob->points.max_move = 100;
-      mob->points.move = mob->points.max_move;
-      mob->points.armor = 100;
-      GET_HITROLL(mob) = MAX(1, level / 2);
-      GET_DAMROLL(mob) = MAX(1, level / 2);
-      mob->mob_specials.damnodice = MAX(1, level / 3);
-      mob->mob_specials.damsizedice = 4;
-      GET_MOB_RNUM(mob) = NOBODY;
-      SET_BIT_AR(MOB_FLAGS(mob), MOB_ISNPC);
-    } else {
-      GET_LEVEL(mob) = level;
+      send_to_char(ch, "smartspawn: failed to load test mob vnum %d.\r\n", vnum);
+      return;
     }
 
     SET_BIT_AR(MOB_FLAGS(mob), MOB_AI_ACTOR);
+    GET_LEVEL(mob) = level;
     char_to_room(mob, IN_ROOM(ch));
+    send_to_char(ch, "smartspawn: spawned vnum %d rnum %d at level %d.\r\n", vnum, rnum, level);
   }
 
   send_to_char(ch, "Spawned %d AI actor test mobs (levels %d-%d).\r\n", count, minlevel, maxlevel);
