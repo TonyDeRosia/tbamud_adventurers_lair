@@ -466,15 +466,35 @@ static const struct ai_imtb_profile ai_imtb_profiles[IMTB_MAX] = {
   {"eerie", -1, 1, 0, -1, 0, 1}
 };
 
-static const char *const ai_imtb_leadin[IMTB_MAX][4] = {
-  {"Listen.", "Noted.", "Very well.", NULL},
-  {"Hey there.", "Glad you asked.", "Happy to help.", NULL},
-  {"Yeah.", "Make it quick.", "Fine.", NULL},
-  {"Well now.", "If you insist.", "Let us make this interesting.", NULL},
-  {"Careful.", "Watch who you ask.", "Keep your voice down.", NULL},
-  {"If memory serves,", "By common practice,", "According to what I know,", NULL},
-  {"By oath,", "By the light,", "By shadow,", NULL},
-  {"Hush.", "The air remembers.", "Listen to the quiet,", NULL}
+static const char *const ai_imtb_leadin[IMTB_MAX][8] = {
+  {"Listen.", "Noted.", "Very well.", "Let's keep this plain.", "Straight answer:", NULL},
+  {"Hey there.", "Glad you asked.", "Happy to help.", "Good to see you.", "All right, friend.", NULL},
+  {"Yeah.", "Make it quick.", "Fine.", "Spit it out.", "Keep it short.", NULL},
+  {"Well now.", "If you insist.", "Let us make this interesting.", "Right then.", "Here's the lively version.", NULL},
+  {"Careful.", "Watch who you ask.", "Keep your voice down.", "Quiet now.", "Stay sharp.", NULL},
+  {"If memory serves,", "By common practice,", "According to what I know,", "From what the records show,", "Let me order this clearly:", NULL},
+  {"By oath,", "By the light,", "By shadow,", "The omen is this:", "By ritual measure,", NULL},
+  {"Hush.", "The air remembers.", "Listen to the quiet,", "The veil stirs.", "Hear the old hush,", NULL}
+};
+
+
+static const char *const ai_role_leadin_guard[] = {
+  "On watch:", "By my duty,", NULL
+};
+static const char *const ai_role_leadin_merchant[] = {
+  "On wares and prices:", "For fair stock,", NULL
+};
+static const char *const ai_role_leadin_innkeeper[] = {
+  "By the hearth,", "For room and stew,", NULL
+};
+static const char *const ai_role_leadin_cultist[] = {
+  "By ritual sign,", "Read the omen:", NULL
+};
+static const char *const ai_role_leadin_spirit[] = {
+  "From beyond the veil,", "Through the old currents,", NULL
+};
+static const char *const ai_role_leadin_bandit[] = {
+  "Keep walking,", "About that purse,", NULL
 };
 
 static const char *const ai_imtb_uncertainty[IMTB_MAX][4] = {
@@ -552,7 +572,8 @@ static void ai_mbti_compound_modifier(const struct ai_voice_profile *vp, int spe
 static int ai_line_is_role_legal(const char *line, int role, int style);
 static struct ai_reply_intention ai_form_intention(struct char_data *mob, int speech_act, int speech_class, int suspicion_bucket, int arc_state, const struct ai_context_vector *ctx, const struct ai_session_read_entry *sr, struct ai_actor_memory_entry *e, time_t now);
 static const char *ai_select_content_for_intention(struct char_data *mob, const struct ai_reply_intention *in, const struct ai_reply_context *rctx, struct ai_session_read_entry *sr, int *out_from_template);
-static void ai_voice_assemble(struct char_data *mob, const struct ai_voice_profile *vp, const struct ai_reply_intention *in, const struct ai_reply_context *rctx, unsigned long seed, char *out, size_t outsz);
+static void
+ai_voice_assemble(struct char_data *mob, const struct ai_voice_profile *vp, const struct ai_reply_intention *in, const struct ai_reply_context *rctx, unsigned long seed, char *out, size_t outsz);
 static float ai_event_salience(enum ai_event_type type, int role, const char *text);
 static float ai_event_recency(struct char_data *mob, enum ai_event_type type, struct char_data *actor, time_t now);
 static float ai_attention_score(struct char_data *mob, enum ai_event_type type, struct char_data *actor, const char *text, time_t now);
@@ -2792,15 +2813,43 @@ static const char *ai_imtb_pick_leadin(struct ai_conv_actor_state *st, const str
   unsigned int h;
   int personality;
   unsigned long mix;
+  int multi_topic;
+  int spoke_recently;
 
   if (out_suppressed)
     *out_suppressed = 0;
   if (!rctx)
     return "";
 
+  multi_topic = (rctx->requested_count > 1);
+  spoke_recently = (st && st->last_line_time > 0 && (time(0) - st->last_line_time) <= 2);
+
+  if (multi_topic || spoke_recently) {
+    if (out_suppressed)
+      *out_suppressed = 1;
+    return "";
+  }
+
   personality = (rctx->personality >= 0 && rctx->personality < IMTB_MAX) ? rctx->personality : IMTB_STOIC;
   mix = ai_hash_mix(seed, (unsigned long)(personality * 41 + 7));
-  frag = ai_imtb_pick_fragment(ai_imtb_leadin[personality], mix);
+
+  if (role == ROLE_GUARD)
+    frag = ai_imtb_pick_fragment(ai_role_leadin_guard, ai_hash_mix(mix, 3));
+  else if (role == ROLE_MERCHANT && style == 1)
+    frag = ai_imtb_pick_fragment(ai_role_leadin_innkeeper, ai_hash_mix(mix, 5));
+  else if (role == ROLE_MERCHANT)
+    frag = ai_imtb_pick_fragment(ai_role_leadin_merchant, ai_hash_mix(mix, 7));
+  else if (role == ROLE_CULTIST)
+    frag = ai_imtb_pick_fragment(ai_role_leadin_cultist, ai_hash_mix(mix, 11));
+  else if (role == ROLE_SPIRIT)
+    frag = ai_imtb_pick_fragment(ai_role_leadin_spirit, ai_hash_mix(mix, 13));
+  else if (role == ROLE_BANDIT)
+    frag = ai_imtb_pick_fragment(ai_role_leadin_bandit, ai_hash_mix(mix, 17));
+  else
+    frag = "";
+
+  if (!frag || !*frag)
+    frag = ai_imtb_pick_fragment(ai_imtb_leadin[personality], mix);
   if (!frag || !*frag)
     return "";
 
@@ -3626,7 +3675,7 @@ static void ai_voice_assemble(struct char_data *mob, const struct ai_voice_profi
   else
     snprintf(work, sizeof(work), "%s", core);
 
-  if ((service_domain || !multi_topic) && rctx && rctx->confidence <= 2) {
+  if (service_domain && !multi_topic && rctx && rctx->confidence <= 2) {
     punc = ai_imtb_pick_uncertainty(rctx, role, style, ai_hash_mix(seed, 137), &punc_used);
     if (punc_used && punc && *punc) {
       char oldwork[512];
