@@ -572,8 +572,6 @@ void command_interpreter(struct char_data *ch, char *argument)
   } else
     line = any_one_arg(argument, arg);
 
-  if (!strcmp(arg, "smartspawn"))
-    log("DEBUG: smartspawn parsed, searching cmd_info");
 
   /* Since all command triggers check for valid_dg_target before acting, the levelcheck
    * here has been removed. Otherwise, find the command. */
@@ -594,7 +592,10 @@ void command_interpreter(struct char_data *ch, char *argument)
   for (length = strlen(arg), cmd = 0; *complete_cmd_info[cmd].command != '\n'; cmd++)
     if(complete_cmd_info[cmd].command_pointer != do_action &&
        !strncmp(complete_cmd_info[cmd].command, arg, length))
-      if (GET_LEVEL(ch) >= complete_cmd_info[cmd].minimum_level)
+      if (GET_LEVEL(ch) >= complete_cmd_info[cmd].minimum_level ||
+          (complete_cmd_info[cmd].command_pointer == do_smartspawn &&
+           IS_NPC(ch) && ch->desc && ch->desc->original &&
+           GET_LEVEL(ch->desc->original) >= complete_cmd_info[cmd].minimum_level))
         break;
 
   /* it's not a 'real' command, so it's a social */
@@ -632,7 +633,8 @@ void command_interpreter(struct char_data *ch, char *argument)
     send_to_char(ch, "You try, but the mind-numbing cold prevents you...\r\n");
   else if (complete_cmd_info[cmd].command_pointer == NULL)
     send_to_char(ch, "Sorry, that command hasn't been implemented yet.\r\n");
-  else if (IS_NPC(ch) && complete_cmd_info[cmd].minimum_level >= LVL_IMMORT)
+  else if (IS_NPC(ch) && complete_cmd_info[cmd].minimum_level >= LVL_IMMORT &&
+           complete_cmd_info[cmd].command_pointer != do_smartspawn)
     send_to_char(ch, "You can't use immortal commands while switched.\r\n");
   else if (GET_POS(ch) < complete_cmd_info[cmd].minimum_position)
     switch (GET_POS(ch)) {
@@ -659,8 +661,6 @@ void command_interpreter(struct char_data *ch, char *argument)
       send_to_char(ch, "No way!  You're fighting for your life!\r\n");
       break;
   } else if (no_specials || !special(ch, cmd, line)) {
-    if (!strcmp(complete_cmd_info[cmd].command, "smartspawn"))
-      log("DEBUG: smartspawn matched in table");
     ((*complete_cmd_info[cmd].command_pointer) (ch, line, cmd, complete_cmd_info[cmd].subcmd));
   }
 }
