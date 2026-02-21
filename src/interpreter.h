@@ -128,6 +128,8 @@ extern const struct command_info cmd_info[];
 ACMD(do_worth);
 ACMD(do_balance);
 ACMD(do_smartspawn);
+ACMD(do_aistate);
+ACMD(do_aictl);
 
 
 #endif /* _INTERPRETER_H_ */

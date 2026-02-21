@@ -13,6 +13,7 @@
 #include "shop.h"
 #include "spells.h"
 #include "ai_actor.h"
+#include "ai_actor_brain.h"
 
 #define AI_HOSTILE_ATTACK_THRESHOLD 12
 #define AI_ROOM_IDLE_SKIP_SECS 12
@@ -385,6 +386,7 @@ void ai_actor_init(struct char_data *mob)
   mob->ai_prof->surrender_hp_percent = 15;
   mob->ai_state->cached_zone = (IN_ROOM(mob) == NOWHERE) ? NOWHERE : world[IN_ROOM(mob)].zone;
   mob->ai_state->next_tick = time(0) + rand_number(1, 3);
+  ai_actor_brain_init(mob);
 
   ai_extract_text(text, sizeof(text), mob);
   memset(score, 0, sizeof(score));
@@ -518,6 +520,7 @@ void ai_actor_free(struct char_data *mob)
     mob->ai_prof = NULL;
   }
   if (mob->ai_state) {
+    ai_actor_brain_free(mob);
     free(mob->ai_state);
     mob->ai_state = NULL;
   }
@@ -611,6 +614,8 @@ int ai_actor_tick(struct char_data *mob, time_t now)
   st->next_tick = now + rand_number(2, 4);
 
   ai_mem_decay(mob, now);
+  if (ai_actor_brain_think(mob, now))
+    return TRUE;
 
   if (FIGHTING(mob)) {
     if (ai_try_flee_or_surrender(mob, now))
@@ -685,6 +690,7 @@ void ai_actor_record_damage(struct char_data *mob, struct char_data *actor, int 
   e->flags |= MEM_ATTACKED_ME;
   e->last_update = time(0);
   e->last_room_vnum = (IN_ROOM(mob) == NOWHERE) ? NOWHERE : GET_ROOM_VNUM(IN_ROOM(mob));
+  ai_actor_brain_on_attacked(mob, actor, dam);
 }
 
 void ai_actor_record_help(struct char_data *mob, struct char_data *actor, int amount)
@@ -748,6 +754,93 @@ void ai_actor_record_room_crime(struct char_data *witness, struct char_data *cri
       continue;
     ai_actor_record_crime(mob, criminal, flags);
   }
+}
+
+
+void ai_actor_event_enter(struct char_data *actor, room_rnum room)
+{
+  struct char_data *mob;
+  if (!actor || IS_NPC(actor) || room == NOWHERE || !ai_actor_brain_enabled()) return;
+  for (mob = world[room].people; mob; mob = mob->next_in_room)
+    if (IS_NPC(mob) && MOB_FLAGGED(mob, MOB_AI_ACTOR) && mob != actor) {
+      if (!mob->ai_state || !mob->ai_state->brain) ai_actor_init(mob);
+      ai_actor_brain_on_enter(mob, actor);
+    }
+}
+
+void ai_actor_event_leave(struct char_data *actor, room_rnum room)
+{
+  struct char_data *mob;
+  if (!actor || IS_NPC(actor) || room == NOWHERE || !ai_actor_brain_enabled()) return;
+  for (mob = world[room].people; mob; mob = mob->next_in_room)
+    if (IS_NPC(mob) && MOB_FLAGGED(mob, MOB_AI_ACTOR) && mob != actor) {
+      if (!mob->ai_state || !mob->ai_state->brain) ai_actor_init(mob);
+      ai_actor_brain_on_leave(mob, actor);
+    }
+}
+
+void ai_actor_event_say(struct char_data *actor, const char *msg)
+{
+  struct char_data *mob;
+  if (!actor || IS_NPC(actor) || IN_ROOM(actor) == NOWHERE || !ai_actor_brain_enabled()) return;
+  for (mob = world[IN_ROOM(actor)].people; mob; mob = mob->next_in_room)
+    if (IS_NPC(mob) && MOB_FLAGGED(mob, MOB_AI_ACTOR) && mob != actor) {
+      if (!mob->ai_state || !mob->ai_state->brain) ai_actor_init(mob);
+      ai_actor_brain_on_say(mob, actor, msg ? msg : "");
+    }
+}
+
+void ai_actor_event_emote(struct char_data *actor, const char *msg)
+{
+  struct char_data *mob;
+  if (!actor || IS_NPC(actor) || IN_ROOM(actor) == NOWHERE || !ai_actor_brain_enabled()) return;
+  for (mob = world[IN_ROOM(actor)].people; mob; mob = mob->next_in_room)
+    if (IS_NPC(mob) && MOB_FLAGGED(mob, MOB_AI_ACTOR) && mob != actor) {
+      if (!mob->ai_state || !mob->ai_state->brain) ai_actor_init(mob);
+      ai_actor_brain_on_emote(mob, actor, msg ? msg : "");
+    }
+}
+
+void ai_actor_event_combat_start(struct char_data *attacker, struct char_data *victim)
+{
+  struct char_data *mob;
+  room_rnum room;
+  if (!attacker || !victim || IN_ROOM(attacker) == NOWHERE || !ai_actor_brain_enabled()) return;
+  room = IN_ROOM(attacker);
+  for (mob = world[room].people; mob; mob = mob->next_in_room)
+    if (IS_NPC(mob) && MOB_FLAGGED(mob, MOB_AI_ACTOR) && mob != attacker && mob != victim) {
+      if (!mob->ai_state || !mob->ai_state->brain) ai_actor_init(mob);
+      ai_actor_brain_on_combat_start(mob, attacker, victim);
+    }
+}
+
+void ai_actor_event_corpse(struct char_data *dead, room_rnum room)
+{
+  struct char_data *mob;
+  if (room == NOWHERE || !ai_actor_brain_enabled()) return;
+  for (mob = world[room].people; mob; mob = mob->next_in_room)
+    if (IS_NPC(mob) && MOB_FLAGGED(mob, MOB_AI_ACTOR)) {
+      if (!mob->ai_state || !mob->ai_state->brain) ai_actor_init(mob);
+      ai_actor_brain_on_corpse(mob, dead);
+    }
+}
+
+void ai_actor_event_drop(struct char_data *actor, struct obj_data *obj)
+{
+  struct char_data *mob;
+  if (!actor || IS_NPC(actor) || IN_ROOM(actor) == NOWHERE || !ai_actor_brain_enabled()) return;
+  for (mob = world[IN_ROOM(actor)].people; mob; mob = mob->next_in_room)
+    if (IS_NPC(mob) && MOB_FLAGGED(mob, MOB_AI_ACTOR) && mob != actor) {
+      if (!mob->ai_state || !mob->ai_state->brain) ai_actor_init(mob);
+      ai_actor_brain_on_drop(mob, actor, obj);
+    }
+}
+
+void ai_actor_event_give(struct char_data *actor, struct char_data *to, struct obj_data *obj)
+{
+  if (!to || !IS_NPC(to) || !MOB_FLAGGED(to, MOB_AI_ACTOR) || !ai_actor_brain_enabled()) return;
+  if (!to->ai_state || !to->ai_state->brain) ai_actor_init(to);
+  ai_actor_brain_on_give(to, actor, obj, to);
 }
 
 /*

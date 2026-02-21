@@ -19,6 +19,7 @@
 #include "spells.h"
 #include "constants.h"
 #include "dg_scripts.h"
+#include "ai_actor.h"
 #include "oasis.h"
 #include "act.h"
 #include "quest.h"
@@ -494,6 +495,7 @@ static int perform_drop(struct char_data *ch, struct obj_data *obj,
   switch (mode) {
   case SCMD_DROP:
     obj_to_room(obj, IN_ROOM(ch));
+    ai_actor_event_drop(ch, obj);
     return (0);
   case SCMD_DONATE:
     obj_to_room(obj, RDR);
@@ -726,6 +728,7 @@ static void perform_give(struct char_data *ch, struct char_data *vict,
   act("$n gives $p to $N.", TRUE, ch, obj, vict, TO_NOTVICT);
 
   autoquest_trigger_check( ch, vict, obj, AQ_OBJ_RETURN);
+  ai_actor_event_give(ch, vict, obj);
 }
 
 

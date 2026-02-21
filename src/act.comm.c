@@ -21,6 +21,7 @@
 #include "dg_scripts.h"
 #include "act.h"
 #include "modify.h"
+#include "ai_actor.h"
 
 static bool legal_communication(char * arg);
 
@@ -67,6 +68,8 @@ ACMD(do_say)
   }
 
   /* Trigger check. */
+  ai_actor_event_say(ch, argument);
+
   speech_mtrigger(ch, argument);
   speech_wtrigger(ch, argument);
 }
