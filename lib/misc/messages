@@ -913,79 +913,79 @@ $n tries to breath lightning upon $N.
 * bear spirit 56
 M
 56
-\tGYour bear spirit mauls $N to death!
-\tRThe bear spirit tears you apart!
-\tG$n's bear spirit mauls $N to death!
-\tGYour bear spirit swipes at $N but misses.
-\tG$n's bear spirit swipes at you but misses.
-\tG$n's bear spirit swipes at $N but misses.
-\tGYour bear spirit rakes $N with heavy claws.
-\tG$n's bear spirit rakes you with heavy claws.
-\tG$n's bear spirit rakes $N with heavy claws.
-\tW$N shrugs off your bear spirit's wrath.
-\tWYou shrug off $n's bear spirit.
-\tW$N shrugs off $n's bear spirit.
+	GYour bear spirit mauls $N to death!
+	RThe bear spirit tears you apart!
+	G$n's bear spirit mauls $N to death!
+	GYour bear spirit swipes at $N but misses.
+	G$n's bear spirit swipes at you but misses.
+	G$n's bear spirit swipes at $N but misses.
+	GYour bear spirit rakes $N with heavy claws.
+	G$n's bear spirit rakes you with heavy claws.
+	G$n's bear spirit rakes $N with heavy claws.
+	W$N shrugs off your bear spirit's wrath.
+	WYou shrug off $n's bear spirit.
+	W$N shrugs off $n's bear spirit.
 
 * wolf spirit 57
 M
 57
-\tWYour wolf spirit rends $N and leaves no mercy.
-\tRThe wolf spirit's fangs end your hunt!
-\tW$n's wolf spirit rends $N without mercy.
-\tWYour wolf spirit snaps at $N but finds only air.
-\tW$n's wolf spirit snaps at you but misses.
-\tW$n's wolf spirit snaps at $N but misses.
-\tWYour wolf spirit bites deep into $N.
-\tW$n's wolf spirit bites deep into you.
-\tW$n's wolf spirit bites deep into $N.
-\tW$N refuses the wolf spirit's bite.
-\tWYou refuse $n's wolf spirit.
-\tW$N refuses $n's wolf spirit.
+	WYour wolf spirit rends $N and leaves no mercy.
+	RThe wolf spirit's fangs end your hunt!
+	W$n's wolf spirit rends $N without mercy.
+	WYour wolf spirit snaps at $N but finds only air.
+	W$n's wolf spirit snaps at you but misses.
+	W$n's wolf spirit snaps at $N but misses.
+	WYour wolf spirit bites deep into $N.
+	W$n's wolf spirit bites deep into you.
+	W$n's wolf spirit bites deep into $N.
+	W$N refuses the wolf spirit's bite.
+	WYou refuse $n's wolf spirit.
+	W$N refuses $n's wolf spirit.
 
 * tiger spirit 58
 M
 58
-\tYYour tiger spirit pounces and ends $N's fight.
-\tRThe tiger spirit's pounce ends you!
-\tY$n's tiger spirit pounces and ends $N's fight.
-\tYYour tiger spirit stalks $N but slips away.
-\tY$n's tiger spirit stalks you but slips away.
-\tY$n's tiger spirit stalks $N but slips away.
-\tYYour tiger spirit rips across $N's guard.
-\tY$n's tiger spirit rips across your guard.
-\tY$n's tiger spirit rips across $N's guard.
-\tW$N is too swift for your tiger spirit.
-\tWYou are too swift for $n's tiger spirit.
-\tW$N is too swift for $n's tiger spirit.
+	YYour tiger spirit pounces and ends $N's fight.
+	RThe tiger spirit's pounce ends you!
+	Y$n's tiger spirit pounces and ends $N's fight.
+	YYour tiger spirit stalks $N but slips away.
+	Y$n's tiger spirit stalks you but slips away.
+	Y$n's tiger spirit stalks $N but slips away.
+	YYour tiger spirit rips across $N's guard.
+	Y$n's tiger spirit rips across your guard.
+	Y$n's tiger spirit rips across $N's guard.
+	W$N is too swift for your tiger spirit.
+	WYou are too swift for $n's tiger spirit.
+	W$N is too swift for $n's tiger spirit.
 
 * eagle spirit 59
 M
 59
-\tCYour eagle spirit dives and fells $N!
-\tRThe eagle spirit's talons end you!
-\tC$n's eagle spirit dives and fells $N!
-\tCYour eagle spirit wheels past $N without a strike.
-\tC$n's eagle spirit wheels past you without a strike.
-\tC$n's eagle spirit wheels past $N without a strike.
-\tCYour eagle spirit's talons rake $N from above.
-\tC$n's eagle spirit's talons rake you from above.
-\tC$n's eagle spirit's talons rake $N from above.
-\tW$N's guard turns aside the eagle spirit.
-\tWYour guard turns aside $n's eagle spirit.
-\tW$N's guard turns aside $n's eagle spirit.
+	CYour eagle spirit dives and fells $N!
+	RThe eagle spirit's talons end you!
+	C$n's eagle spirit dives and fells $N!
+	CYour eagle spirit wheels past $N without a strike.
+	C$n's eagle spirit wheels past you without a strike.
+	C$n's eagle spirit wheels past $N without a strike.
+	CYour eagle spirit's talons rake $N from above.
+	C$n's eagle spirit's talons rake you from above.
+	C$n's eagle spirit's talons rake $N from above.
+	W$N's guard turns aside the eagle spirit.
+	WYour guard turns aside $n's eagle spirit.
+	W$N's guard turns aside $n's eagle spirit.
 
 * dragon spirit 60
 M
 60
-\tRYour dragon spirit scorches $N into silence.
-\tRDragonfire consumes you!
-\tR$n's dragon spirit scorches $N into silence.
-\tRYour dragon spirit exhales, but $N escapes the embers.
-\tR$n's dragon spirit exhales, but you escape the embers.
-\tR$n's dragon spirit exhales, but $N escapes the embers.
-\tRYour dragon spirit lashes $N with burning force.
-\tR$n's dragon spirit lashes you with burning force.
-\tR$n's dragon spirit lashes $N with burning force.
-\tW$N stands firm against your dragon spirit.
-\tWYou stand firm against $n's dragon spirit.
-\tW$N stands firm against $n's dragon spirit.
+	RYour dragon spirit scorches $N into silence.
+	RDragonfire consumes you!
+	R$n's dragon spirit scorches $N into silence.
+	RYour dragon spirit exhales, but $N escapes the embers.
+	R$n's dragon spirit exhales, but you escape the embers.
+	R$n's dragon spirit exhales, but $N escapes the embers.
+	RYour dragon spirit lashes $N with burning force.
+	R$n's dragon spirit lashes you with burning force.
+	R$n's dragon spirit lashes $N with burning force.
+	W$N stands firm against your dragon spirit.
+	WYou stand firm against $n's dragon spirit.
+	W$N stands firm against $n's dragon spirit.
