@@ -28,11 +28,40 @@
 #define AI_INTENT_COOLDOWN_MAX 12
 #define AI_TALK_COOLDOWN_MIN 12
 #define AI_TALK_COOLDOWN_MAX 20
+#define AI_ROLE_AMBIGUOUS_MARGIN 3
 
 static int ai_debug = AI_ACTOR_DEBUG;
 
 static struct char_data *ai_find_player_by_idnum_room(struct char_data *mob, long idnum);
 static const char *ai_pick_phrase(const char *const *pool);
+
+
+static const char *ai_role_name_local(int role)
+{
+  switch (role) {
+    case ROLE_GUARD: return "GUARD";
+    case ROLE_MERCHANT: return "MERCHANT";
+    case ROLE_BANDIT: return "BANDIT";
+    case ROLE_BEAST: return "BEAST";
+    case ROLE_UNDEAD: return "UNDEAD";
+    case ROLE_SPIRIT: return "SPIRIT";
+    case ROLE_CULTIST: return "CULTIST";
+    case ROLE_BOSS: return "COMMANDER";
+    case ROLE_CIVILIAN: return "GENERIC";
+    default: return "GENERIC";
+  }
+}
+
+static const char *ai_event_reason_name(enum ai_event_type type)
+{
+  switch (type) {
+    case AI_EVENT_PLAYER_SAY: return "PLAYER_SAY";
+    case AI_EVENT_PLAYER_EMOTE: return "PLAYER_EMOTE";
+    case AI_EVENT_PLAYER_ENTER: return "ARRIVAL";
+    case AI_EVENT_COMBAT_START: return "COMBAT_TAUNT";
+    default: return "AMBIENT";
+  }
+}
 
 static void ai_debug_log(const char *fmt, ...)
 {
@@ -301,6 +330,14 @@ static void ai_say(struct char_data *mob, const char *msg, time_t now)
     snprintf(saybuf, sizeof(saybuf), "%s", msg);
     do_say(mob, saybuf, 0, 0);
   }
+
+#if AI_ACTOR_DEBUG_SPEECH
+  log("AI_ACTOR_SPEECH: vnum=%d name=%s role=%s pool=%s reason=%s target=%ld",
+      GET_MOB_VNUM(mob), GET_NAME(mob), ai_role_name_local(mob->ai_prof ? mob->ai_prof->role : ROLE_UNKNOWN),
+      (mob->ai_state && mob->ai_state->last_pool_name[0]) ? mob->ai_state->last_pool_name : "POOL_NONE",
+      (mob->ai_state && mob->ai_state->last_speak_reason[0]) ? mob->ai_state->last_speak_reason : "AMBIENT",
+      (mob->ai_state ? mob->ai_state->pending_speech_target_idnum : 0));
+#endif
 
   if (mob->ai_state) {
     mob->ai_state->last_spoke = now;
@@ -774,46 +811,67 @@ void ai_actor_refresh_profile(struct char_data *mob, int force)
   score[ROLE_CULTIST] += ai_role_weight_from_keywords(text, cult_kw);
   score[ROLE_BOSS] += ai_role_weight_from_keywords(text, boss_kw);
 
+  /*
+   * Role scoring rules (small + reversible):
+   * 1) Primary truth = mob text (name/short/long/description) via keyword weights.
+   * 2) Secondary truth = mob design flags/spec/shop signals.
+   * 3) Tertiary room/zone context can only nudge weak/ambiguous scores.
+   * 4) Confidence gate: if (top - second) < AI_ROLE_AMBIGUOUS_MARGIN, use generic role.
+   */
   if (MOB_FLAGGED(mob, MOB_AGGRESSIVE)) {
-    score[ROLE_BANDIT] += 2;
-    score[ROLE_BEAST] += 2;
+    if (score[ROLE_BEAST] >= score[ROLE_BANDIT])
+      score[ROLE_BEAST] += 4;
+    else
+      score[ROLE_BANDIT] += 4;
   }
   if (MOB_FLAGGED(mob, MOB_SENTINEL))
-    score[ROLE_GUARD] += 3;
+    score[ROLE_GUARD] += 5;
   if (MOB_FLAGGED(mob, MOB_HELPER))
     score[ROLE_GUARD] += 2;
   if (MOB_FLAGGED(mob, MOB_SCAVENGER)) {
     score[ROLE_BANDIT] += 1;
-    score[ROLE_BEAST] += 1;
+    score[ROLE_BEAST] += 2;
   }
   if (ai_mob_has_shop_data(mob))
-    score[ROLE_MERCHANT] += 8;
+    score[ROLE_MERCHANT] += 10;
+  if (mob_index[GET_MOB_RNUM(mob)].func == shop_keeper)
+    score[ROLE_MERCHANT] += 6;
 
   if (IN_ROOM(mob) != NOWHERE) {
     zone_lvl = (zone_table[world[IN_ROOM(mob)].zone].min_level + zone_table[world[IN_ROOM(mob)].zone].max_level) / 2;
-    if (zone_lvl >= 80)
+    if (zone_lvl >= 80 && best_score <= 6)
       score[ROLE_UNDEAD] += 1;
-    if (zone_lvl >= 110)
-      score[ROLE_BOSS] += 2;
+    if (zone_lvl >= 110 && best_score <= 6)
+      score[ROLE_BOSS] += 1;
   }
 
-  for (i = ROLE_UNKNOWN; i <= ROLE_BOSS; i++) {
-    if (score[i] > best_score) {
-      best_score = score[i];
-      best_role = i;
+  {
+    int second_score = -9999;
+    for (i = ROLE_UNKNOWN; i <= ROLE_BOSS; i++) {
+      if (score[i] > best_score) {
+        second_score = best_score;
+        best_score = score[i];
+        best_role = i;
+      } else if (score[i] > second_score) {
+        second_score = score[i];
+      }
+      if (mob->ai_state)
+        mob->ai_state->role_scores[i] = score[i];
     }
-  }
 
-  if (best_score <= 0)
-    best_role = ROLE_UNKNOWN;
+    if (best_score <= 0 || (best_score - second_score) < AI_ROLE_AMBIGUOUS_MARGIN)
+      best_role = ROLE_CIVILIAN;
+  }
 
   mob->ai_prof->role = best_role;
-  if (best_role == ROLE_UNKNOWN) {
+  if (best_role == ROLE_UNKNOWN || best_role == ROLE_CIVILIAN) {
     mob->ai_prof->movement = MOB_FLAGGED(mob, MOB_SENTINEL) ? MOVE_SENTINEL : MOVE_PATROL;
     mob->ai_prof->aggression = MOB_FLAGGED(mob, MOB_AGGRESSIVE) ? AGG_OPPORTUNISTIC : AGG_RETALIATE;
     mob->ai_prof->social = SOC_SILENT;
     mob->ai_prof->morale = MORALE_NORMAL;
     mob->ai_prof->style = 0;
+    mob->ai_prof->talk_cooldown_secs = 30;
+    mob->ai_prof->room_talk_cooldown_secs = 45;
     if (MOB_FLAGGED(mob, MOB_STAY_ZONE) || MOB_FLAGGED(mob, MOB_SENTINEL))
       mob->ai_prof->aggression = AGG_TERRITORIAL;
     if (ai_text_has(text, "fang") || ai_text_has(text, "claw") || ai_text_has(text, "beast")) {
@@ -846,12 +904,24 @@ void ai_actor_refresh_profile(struct char_data *mob, int force)
     mob->ai_prof->surrender_hp_percent = mob->ai_prof->flee_hp_percent;
 
   {
-    char matched_keywords[128];
+    char matched_keywords[AI_INTENT_KEYWORDS_MAX];
+    int r1 = ROLE_CIVILIAN, r2 = ROLE_CIVILIAN, r3 = ROLE_CIVILIAN;
+    int rs1 = -999, rs2 = -999, rs3 = -999;
+
+    for (i = ROLE_UNKNOWN; i <= ROLE_BOSS; i++) {
+      int v = score[i];
+      if (v > rs1) { rs3 = rs2; r3 = r2; rs2 = rs1; r2 = r1; rs1 = v; r1 = i; }
+      else if (v > rs2) { rs3 = rs2; r3 = r2; rs2 = v; r2 = i; }
+      else if (v > rs3) { rs3 = v; r3 = i; }
+    }
 
     snprintf(matched_keywords, sizeof(matched_keywords),
-             "g%d m%d b%d be%d u%d s%d c%d boss%d",
-             score[ROLE_GUARD], score[ROLE_MERCHANT], score[ROLE_BANDIT], score[ROLE_BEAST],
-             score[ROLE_UNDEAD], score[ROLE_SPIRIT], score[ROLE_CULTIST], score[ROLE_BOSS]);
+             "top3=%s=%d %s=%d %s=%d pool=%s reason=%s",
+             ai_role_name_local(r1), rs1,
+             ai_role_name_local(r2), rs2,
+             ai_role_name_local(r3), rs3,
+             (mob->ai_state && mob->ai_state->last_pool_name[0]) ? mob->ai_state->last_pool_name : "POOL_NONE",
+             (mob->ai_state && mob->ai_state->last_speak_reason[0]) ? mob->ai_state->last_speak_reason : "NONE");
     matched_keywords[sizeof(matched_keywords) - 1] = '\0';
     strlcpy(mob->ai_prof->matched_keywords, matched_keywords, sizeof(mob->ai_prof->matched_keywords));
   }
@@ -1036,6 +1106,41 @@ static const char *const role_rare_beast[] = {"$n lets out a strangely melodic g
 static const char *const role_rare_undead[] = {"$n whispers your name as if from a crypt.", NULL};
 static const char *const role_rare_spirit[] = {"$n murmurs of doors hidden between moonbeams.", NULL};
 
+
+static void ai_refresh_score_snapshot_text(struct char_data *mob)
+{
+  int i, r1 = ROLE_CIVILIAN, r2 = ROLE_CIVILIAN, r3 = ROLE_CIVILIAN;
+  int rs1 = -999, rs2 = -999, rs3 = -999;
+  char buf[AI_INTENT_KEYWORDS_MAX];
+
+  if (!mob || !mob->ai_prof || !mob->ai_state)
+    return;
+
+  for (i = ROLE_UNKNOWN; i <= ROLE_BOSS; i++) {
+    int v = mob->ai_state->role_scores[i];
+    if (v > rs1) { rs3 = rs2; r3 = r2; rs2 = rs1; r2 = r1; rs1 = v; r1 = i; }
+    else if (v > rs2) { rs3 = rs2; r3 = r2; rs2 = v; r2 = i; }
+    else if (v > rs3) { rs3 = v; r3 = i; }
+  }
+
+  snprintf(buf, sizeof(buf), "top3=%s=%d %s=%d %s=%d pool=%s reason=%s",
+           ai_role_name_local(r1), rs1,
+           ai_role_name_local(r2), rs2,
+           ai_role_name_local(r3), rs3,
+           mob->ai_state->last_pool_name[0] ? mob->ai_state->last_pool_name : "POOL_NONE",
+           mob->ai_state->last_speak_reason[0] ? mob->ai_state->last_speak_reason : "NONE");
+  strlcpy(mob->ai_prof->matched_keywords, buf, sizeof(mob->ai_prof->matched_keywords));
+}
+
+static void ai_set_last_speech_meta(struct char_data *mob, const char *pool, const char *reason)
+{
+  if (!mob || !mob->ai_state)
+    return;
+  strlcpy(mob->ai_state->last_pool_name, pool ? pool : "POOL_NONE", sizeof(mob->ai_state->last_pool_name));
+  strlcpy(mob->ai_state->last_speak_reason, reason ? reason : "AMBIENT", sizeof(mob->ai_state->last_speak_reason));
+  ai_refresh_score_snapshot_text(mob);
+}
+
 static const char *ai_pick_weighted_phrase(const char *const *normal_pool, const char *const *rare_pool)
 {
   if (rare_pool && rand_number(1, 100) <= 5)
@@ -1043,61 +1148,59 @@ static const char *ai_pick_weighted_phrase(const char *const *normal_pool, const
   return ai_pick_phrase(normal_pool);
 }
 
-static const char *ai_line_for_intent(struct char_data *mob, int intent, int attitude)
+static const char *ai_line_for_intent(struct char_data *mob, int intent, int attitude, const char **out_pool, const char **out_reason)
 {
   int innkeeper;
 
   if (!mob || !mob->ai_prof)
     return NULL;
+  if (out_pool) *out_pool = "POOL_NONE";
+  if (out_reason) *out_reason = "AMBIENT";
 
   innkeeper = (mob->ai_prof->role == ROLE_MERCHANT && mob->ai_prof->style == 1);
 
   if (mob->ai_prof->role == ROLE_GUARD) {
-    if (intent == AI_INTENT_GREET) return ai_pick_weighted_phrase(role_guard_greet, role_rare_guard);
-    if (intent == AI_INTENT_ASK_SERVICE || intent == AI_INTENT_CONFUSION) return ai_pick_phrase(role_guard_service);
-    if (intent == AI_INTENT_INSULT || intent == AI_INTENT_EMOTE_SPIT || intent == AI_INTENT_THREAT)
-      return (attitude < -20) ? "Last warning. Respect the law or leave." : "Mind your tongue and keep the peace.";
-    if (intent >= AI_INTENT_EMOTE_DANCE) return ai_pick_phrase(role_guard_emote);
-  }
-
-  if (mob->ai_prof->role == ROLE_MERCHANT) {
+    if (intent == AI_INTENT_GREET) { if (out_pool) *out_pool = "POOL_GUARD_GREET"; if (out_reason) *out_reason = "PLAYER_SAY"; return ai_pick_weighted_phrase(role_guard_greet, role_rare_guard); }
+    if (intent == AI_INTENT_ASK_SERVICE || intent == AI_INTENT_CONFUSION) { if (out_pool) *out_pool = "POOL_GUARD_PLAYER_SAY_RESPONSE"; if (out_reason) *out_reason = "PLAYER_SAY"; return ai_pick_phrase(role_guard_service); }
+    if (intent == AI_INTENT_INSULT || intent == AI_INTENT_EMOTE_SPIT || intent == AI_INTENT_THREAT) { if (out_pool) *out_pool = "POOL_GUARD_CRIME_REACT"; return (attitude < -20) ? "Last warning. Respect the law or leave." : "Mind your tongue and keep the peace."; }
+    if (intent >= AI_INTENT_EMOTE_DANCE) { if (out_pool) *out_pool = "POOL_GUARD_PLAYER_EMOTE_RESPONSE"; if (out_reason) *out_reason = "PLAYER_EMOTE"; return ai_pick_phrase(role_guard_emote); }
+  } else if (mob->ai_prof->role == ROLE_MERCHANT) {
     if (innkeeper) {
-      if (intent == AI_INTENT_GREET) return ai_pick_weighted_phrase(role_innkeeper_greet, role_rare_innkeeper);
-      if (intent == AI_INTENT_ASK_SERVICE || intent == AI_INTENT_CONFUSION) return ai_pick_phrase(role_innkeeper_service);
-      if (intent == AI_INTENT_INSULT || intent == AI_INTENT_EMOTE_SPIT || intent == AI_INTENT_THREAT)
-        return (attitude < -25) ? "That's enough. Calm down or leave my inn." : "Please show respect in my house.";
-      if (intent >= AI_INTENT_EMOTE_DANCE) return ai_pick_phrase(role_innkeeper_emote);
+      if (intent == AI_INTENT_GREET) { if (out_pool) *out_pool = "POOL_INNKEEPER_GREET"; if (out_reason) *out_reason = "PLAYER_SAY"; return ai_pick_weighted_phrase(role_innkeeper_greet, role_rare_innkeeper); }
+      if (intent == AI_INTENT_ASK_SERVICE || intent == AI_INTENT_CONFUSION) { if (out_pool) *out_pool = "POOL_INNKEEPER_PLAYER_SAY_RESPONSE"; if (out_reason) *out_reason = "PLAYER_SAY"; return ai_pick_phrase(role_innkeeper_service); }
+      if (intent == AI_INTENT_INSULT || intent == AI_INTENT_EMOTE_SPIT || intent == AI_INTENT_THREAT) { if (out_pool) *out_pool = "POOL_INNKEEPER_CRIME_REACT"; return (attitude < -25) ? "That's enough. Calm down or leave my inn." : "Please show respect in my house."; }
+      if (intent >= AI_INTENT_EMOTE_DANCE) { if (out_pool) *out_pool = "POOL_INNKEEPER_PLAYER_EMOTE_RESPONSE"; if (out_reason) *out_reason = "PLAYER_EMOTE"; return ai_pick_phrase(role_innkeeper_emote); }
     } else {
-      if (intent == AI_INTENT_GREET) return ai_pick_weighted_phrase(role_merchant_greet, role_rare_merchant);
-      if (intent == AI_INTENT_ASK_SERVICE || intent == AI_INTENT_CONFUSION) return ai_pick_phrase(role_merchant_service);
-      if (intent == AI_INTENT_INSULT || intent == AI_INTENT_EMOTE_SPIT || intent == AI_INTENT_THREAT)
-        return (attitude < -25) ? "No trade for rude customers. Move along." : "Respect the stall or no business.";
-      if (intent >= AI_INTENT_EMOTE_DANCE) return ai_pick_phrase(role_merchant_emote);
+      if (intent == AI_INTENT_GREET) { if (out_pool) *out_pool = "POOL_MERCHANT_GREET"; if (out_reason) *out_reason = "PLAYER_SAY"; return ai_pick_weighted_phrase(role_merchant_greet, role_rare_merchant); }
+      if (intent == AI_INTENT_ASK_SERVICE || intent == AI_INTENT_CONFUSION) { if (out_pool) *out_pool = "POOL_MERCHANT_PLAYER_SAY_RESPONSE"; if (out_reason) *out_reason = "PLAYER_SAY"; return ai_pick_phrase(role_merchant_service); }
+      if (intent == AI_INTENT_INSULT || intent == AI_INTENT_EMOTE_SPIT || intent == AI_INTENT_THREAT) { if (out_pool) *out_pool = "POOL_MERCHANT_CRIME_REACT"; return (attitude < -25) ? "No trade for rude customers. Move along." : "Respect the stall or no business."; }
+      if (intent >= AI_INTENT_EMOTE_DANCE) { if (out_pool) *out_pool = "POOL_MERCHANT_PLAYER_EMOTE_RESPONSE"; if (out_reason) *out_reason = "PLAYER_EMOTE"; return ai_pick_phrase(role_merchant_emote); }
     }
-  }
-
-  if (mob->ai_prof->role == ROLE_BANDIT) {
-    if (intent == AI_INTENT_GREET) return ai_pick_weighted_phrase(role_bandit_greet, role_rare_bandit);
-    if (intent == AI_INTENT_ASK_SERVICE || intent == AI_INTENT_CONFUSION) return ai_pick_phrase(role_bandit_service);
-    if (intent == AI_INTENT_INSULT || intent == AI_INTENT_EMOTE_SPIT || intent == AI_INTENT_THREAT)
-      return (attitude < -15) ? "Do that again and I collect your coin with interest." : "Careful. I don't forgive disrespect.";
-    if (intent >= AI_INTENT_EMOTE_DANCE) return ai_pick_phrase(role_bandit_emote);
-  }
-
-  if (mob->ai_prof->role == ROLE_BEAST) {
-    if (intent == AI_INTENT_GREET) return ai_pick_weighted_phrase(role_beast_greet, role_rare_beast);
-    if (intent == AI_INTENT_ASK_SERVICE || intent == AI_INTENT_CONFUSION) return ai_pick_phrase(role_beast_service);
-    if (intent >= AI_INTENT_EMOTE_DANCE || intent == AI_INTENT_THREAT || intent == AI_INTENT_INSULT) return ai_pick_phrase(role_beast_emote);
-  }
-  if (mob->ai_prof->role == ROLE_UNDEAD) {
-    if (intent == AI_INTENT_GREET) return ai_pick_weighted_phrase(role_undead_greet, role_rare_undead);
-    if (intent == AI_INTENT_ASK_SERVICE || intent == AI_INTENT_CONFUSION) return ai_pick_phrase(role_undead_service);
-    if (intent >= AI_INTENT_EMOTE_DANCE || intent == AI_INTENT_THREAT || intent == AI_INTENT_INSULT) return ai_pick_phrase(role_undead_emote);
-  }
-  if (mob->ai_prof->role == ROLE_SPIRIT) {
-    if (intent == AI_INTENT_GREET) return ai_pick_weighted_phrase(role_spirit_greet, role_rare_spirit);
-    if (intent == AI_INTENT_ASK_SERVICE || intent == AI_INTENT_CONFUSION) return ai_pick_phrase(role_spirit_service);
-    if (intent >= AI_INTENT_EMOTE_DANCE || intent == AI_INTENT_THREAT || intent == AI_INTENT_INSULT) return ai_pick_phrase(role_spirit_emote);
+  } else if (mob->ai_prof->role == ROLE_BANDIT) {
+    if (intent == AI_INTENT_GREET) { if (out_pool) *out_pool = "POOL_BANDIT_GREET"; if (out_reason) *out_reason = "PLAYER_SAY"; return ai_pick_weighted_phrase(role_bandit_greet, role_rare_bandit); }
+    if (intent == AI_INTENT_ASK_SERVICE || intent == AI_INTENT_CONFUSION) { if (out_pool) *out_pool = "POOL_BANDIT_PLAYER_SAY_RESPONSE"; if (out_reason) *out_reason = "PLAYER_SAY"; return ai_pick_phrase(role_bandit_service); }
+    if (intent == AI_INTENT_INSULT || intent == AI_INTENT_EMOTE_SPIT || intent == AI_INTENT_THREAT) { if (out_pool) *out_pool = "POOL_BANDIT_CRIME_REACT"; return (attitude < -15) ? "Do that again and I collect your coin with interest." : "Careful. I don't forgive disrespect."; }
+    if (intent >= AI_INTENT_EMOTE_DANCE) { if (out_pool) *out_pool = "POOL_BANDIT_PLAYER_EMOTE_RESPONSE"; if (out_reason) *out_reason = "PLAYER_EMOTE"; return ai_pick_phrase(role_bandit_emote); }
+  } else if (mob->ai_prof->role == ROLE_BEAST) {
+    if (intent == AI_INTENT_GREET) { if (out_pool) *out_pool = "POOL_BEAST_GREET"; if (out_reason) *out_reason = "PLAYER_SAY"; return ai_pick_weighted_phrase(role_beast_greet, role_rare_beast); }
+    if (intent >= AI_INTENT_EMOTE_DANCE || intent == AI_INTENT_THREAT || intent == AI_INTENT_INSULT || intent == AI_INTENT_EMOTE_SPIT) { if (out_pool) *out_pool = "POOL_BEAST_PLAYER_EMOTE_RESPONSE"; if (out_reason) *out_reason = "PLAYER_EMOTE"; return ai_pick_phrase(role_beast_emote); }
+    return NULL;
+  } else if (mob->ai_prof->role == ROLE_UNDEAD) {
+    if (intent == AI_INTENT_GREET) { if (out_pool) *out_pool = "POOL_UNDEAD_GREET"; if (out_reason) *out_reason = "PLAYER_SAY"; return ai_pick_weighted_phrase(role_undead_greet, role_rare_undead); }
+    if (intent >= AI_INTENT_EMOTE_DANCE || intent == AI_INTENT_THREAT || intent == AI_INTENT_INSULT || intent == AI_INTENT_EMOTE_SPIT) { if (out_pool) *out_pool = "POOL_UNDEAD_PLAYER_EMOTE_RESPONSE"; if (out_reason) *out_reason = "PLAYER_EMOTE"; return ai_pick_phrase(role_undead_emote); }
+  } else if (mob->ai_prof->role == ROLE_SPIRIT) {
+    if (intent == AI_INTENT_GREET) { if (out_pool) *out_pool = "POOL_SPIRIT_GREET"; if (out_reason) *out_reason = "PLAYER_SAY"; return ai_pick_weighted_phrase(role_spirit_greet, role_rare_spirit); }
+    if (intent == AI_INTENT_EMOTE_SPIT) { if (out_pool) *out_pool = "POOL_SPIRIT_PLAYER_EMOTE_RESPONSE"; if (out_reason) *out_reason = "PLAYER_EMOTE"; return "$n recoils like torn mist."; }
+    if (intent >= AI_INTENT_EMOTE_DANCE) { if (out_pool) *out_pool = "POOL_SPIRIT_PLAYER_EMOTE_RESPONSE"; if (out_reason) *out_reason = "PLAYER_EMOTE"; return ai_pick_phrase(role_spirit_emote); }
+  } else if (mob->ai_prof->role == ROLE_CULTIST) {
+    if (intent == AI_INTENT_GREET) { if (out_pool) *out_pool = "POOL_CULTIST_GREET"; if (out_reason) *out_reason = "PLAYER_SAY"; return "The circle watches. Speak your intent."; }
+    if (intent >= AI_INTENT_EMOTE_DANCE || intent == AI_INTENT_EMOTE_SPIT) { if (out_pool) *out_pool = "POOL_CULTIST_PLAYER_EMOTE_RESPONSE"; if (out_reason) *out_reason = "PLAYER_EMOTE"; return (intent == AI_INTENT_EMOTE_SPIT) ? "Blasphemy has a price." : "Ritual, not revelry."; }
+  } else if (mob->ai_prof->role == ROLE_BOSS) {
+    if (intent == AI_INTENT_GREET) { if (out_pool) *out_pool = "POOL_COMMANDER_GREET"; if (out_reason) *out_reason = "PLAYER_SAY"; return "Stay sharp. This post does not sleep."; }
+    if (intent >= AI_INTENT_EMOTE_DANCE) { if (out_pool) *out_pool = "POOL_COMMANDER_PLAYER_EMOTE_RESPONSE"; if (out_reason) *out_reason = "PLAYER_EMOTE"; return "Stand to. Keep discipline."; }
+  } else {
+    if (intent == AI_INTENT_GREET) { if (out_pool) *out_pool = "POOL_GENERIC_GREET"; if (out_reason) *out_reason = "PLAYER_SAY"; return "Hello."; }
+    return NULL;
   }
 
   return NULL;
@@ -1123,12 +1226,12 @@ static int ai_actor_choose_intent(struct char_data *mob, struct char_data **out_
   if (target)
     e = ai_mem_get_or_create(mob, GET_IDNUM(target));
 
-  score_idle = (pf->role == ROLE_UNKNOWN) ? 26 : 6;
+  score_idle = (pf->role == ROLE_UNKNOWN || pf->role == ROLE_CIVILIAN) ? 20 : 6;
   score_greet = (st->pending_event_type == AI_EVENT_PLAYER_ENTER) ? 26 : 0;
   score_social = (st->pending_event_type == AI_EVENT_PLAYER_EMOTE) ? 24 : 0;
   score_say = (st->pending_event_type == AI_EVENT_PLAYER_SAY) ? 22 : 0;
   score_warn = (st->social_spam_count >= 3) ? 26 : 0;
-  score_flee = (pf->morale == MORALE_COWARD || pf->role == ROLE_MERCHANT || pf->role == ROLE_UNKNOWN) ? 8 : 0;
+  score_flee = (pf->morale == MORALE_COWARD || pf->role == ROLE_MERCHANT || pf->role == ROLE_UNKNOWN || pf->role == ROLE_CIVILIAN) ? 8 : 0;
 
   if (e) {
     score_social += e->attitude / 8;
@@ -1160,7 +1263,7 @@ static int ai_actor_choose_intent(struct char_data *mob, struct char_data **out_
     if (pf->role == ROLE_GUARD) *out_line = "State your business and keep calm.";
     else if (pf->role == ROLE_MERCHANT) *out_line = ai_pick_phrase(role_merchant_greet);
     else if (pf->role == ROLE_BANDIT) *out_line = ai_pick_phrase(role_bandit_greet);
-    else *out_line = "...";
+    else *out_line = (pf->role == ROLE_CIVILIAN || pf->role == ROLE_UNKNOWN) ? NULL : "...";
     return 3;
   }
   if (score_greet >= AI_INTENT_THRESHOLD && ai_can_speak_now(mob, time(0))) {
@@ -1169,7 +1272,7 @@ static int ai_actor_choose_intent(struct char_data *mob, struct char_data **out_
     else if (pf->role == ROLE_MERCHANT && pf->style == 1) *out_line = ai_pick_phrase(role_innkeeper_greet);
     else if (pf->role == ROLE_MERCHANT) *out_line = ai_pick_phrase(role_merchant_greet);
     else if (pf->role == ROLE_BANDIT) *out_line = ai_pick_phrase(role_bandit_greet);
-    else *out_line = "Well met.";
+    else *out_line = (pf->role == ROLE_CIVILIAN || pf->role == ROLE_UNKNOWN) ? NULL : "Well met.";
     return 1;
   }
   if (score_idle >= AI_INTENT_THRESHOLD && !rand_number(0, 14)) {
@@ -1248,6 +1351,9 @@ int ai_actor_tick(struct char_data *mob, time_t now)
   }
 
   if (line && *line) {
+    const char *reason = (st->pending_event_type == AI_EVENT_PLAYER_ENTER) ? "ARRIVAL" : "AMBIENT";
+    const char *pool = (pf->role == ROLE_CIVILIAN || pf->role == ROLE_UNKNOWN) ? "POOL_GENERIC_AMBIENT" : "POOL_ROLE_AMBIENT";
+    ai_set_last_speech_meta(mob, pool, reason);
     if (do_emote)
       do_echo(mob, (char *)(line[0] == '$' ? line + 3 : line), 0, SCMD_EMOTE);
     else if (ai_can_speak_now(mob, now) && st->talk_cooldown_pulses <= 0)
@@ -1427,43 +1533,54 @@ static int ai_role_priority_score(struct char_data *mob)
   return 10;
 }
 
-static int ai_actor_room_response_slot(struct char_data *mob, struct char_data *actor)
+static int ai_event_fit_bonus(struct char_data *mob, enum ai_event_type type, int intent)
 {
-  struct char_data *it, *top = NULL, *second = NULL;
+  if (!mob || !mob->ai_prof)
+    return 0;
+  if (type == AI_EVENT_PLAYER_SAY && intent == AI_INTENT_GREET) {
+    if (mob->ai_prof->role == ROLE_MERCHANT && mob->ai_prof->style == 1) return 50;
+    if (mob->ai_prof->role == ROLE_MERCHANT) return 35;
+    if (mob->ai_prof->role == ROLE_GUARD) return 25;
+    if (mob->ai_prof->role == ROLE_BANDIT) return 20;
+  }
+  if (type == AI_EVENT_PLAYER_EMOTE && intent == AI_INTENT_EMOTE_DANCE) {
+    if (mob->ai_prof->role == ROLE_GUARD) return 40;
+    if (mob->ai_prof->role == ROLE_MERCHANT && mob->ai_prof->style == 1) return 36;
+    if (mob->ai_prof->role == ROLE_BANDIT) return 26;
+    if (mob->ai_prof->role == ROLE_BOSS) return 30;
+  }
+  if (type == AI_EVENT_PLAYER_EMOTE && intent == AI_INTENT_EMOTE_SPIT) {
+    if (mob->ai_prof->role == ROLE_GUARD) return 45;
+    if (mob->ai_prof->role == ROLE_MERCHANT && mob->ai_prof->style == 1) return 35;
+    if (mob->ai_prof->role == ROLE_CULTIST) return 30;
+    if (mob->ai_prof->role == ROLE_SPIRIT) return 22;
+  }
+  return ai_role_priority_score(mob);
+}
+
+static int ai_actor_room_response_slot(struct char_data *mob, struct char_data *actor, enum ai_event_type type, int intent)
+{
+  struct char_data *it, *top = NULL;
   int best = -9999;
-  int second_key = 99999999;
-  int tie;
 
   if (!mob || !actor || IN_ROOM(mob) == NOWHERE || IN_ROOM(actor) != IN_ROOM(mob))
     return FALSE;
 
   for (it = world[IN_ROOM(mob)].people; it; it = it->next_in_room) {
     int pri;
-    if (!IS_NPC(it) || !MOB_FLAGGED(it, MOB_AI_ACTOR) || !it->ai_prof)
+    if (!IS_NPC(it) || !MOB_FLAGGED(it, MOB_AI_ACTOR) || !it->ai_prof || !it->ai_state)
       continue;
-
-    pri = ai_role_priority_score(it);
-    if (pri > best) {
+    if ((time(0) - it->ai_state->last_talk_time) < AI_PER_PLAYER_REPLY_COOLDOWN_SECS)
+      continue;
+    pri = ai_event_fit_bonus(it, type, intent);
+    if (pri > best || (pri == best && GET_MOB_VNUM(it) < GET_MOB_VNUM(top))) {
       best = pri;
       top = it;
     }
   }
 
-  tie = (int)(GET_IDNUM(actor) % 17);
-  for (it = world[IN_ROOM(mob)].people; it; it = it->next_in_room) {
-    int key;
-    if (!IS_NPC(it) || !MOB_FLAGGED(it, MOB_AI_ACTOR) || !it->ai_prof || it == top)
-      continue;
-    key = abs(GET_MOB_VNUM(it) - tie) + (ai_role_priority_score(top) - ai_role_priority_score(it));
-    if (key < second_key) {
-      second_key = key;
-      second = it;
-    }
-  }
-
-  return (mob == top || mob == second);
+  return (mob == top);
 }
-
 
 
 static const char *ai_pick_phrase(const char *const *pool)
@@ -1575,17 +1692,25 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
 
   if (!e || !intent)
     return;
-  if (!ai_actor_room_response_slot(mob, actor))
+  if (!ai_actor_room_response_slot(mob, actor, type, intent))
     return;
   if ((now - e->last_reply_time) < AI_PER_PLAYER_REPLY_COOLDOWN_SECS)
     return;
 
-  line = ai_line_for_intent(mob, intent, e->attitude);
-  if (!line || !*line)
-    return;
+  {
+    const char *pool = "POOL_NONE";
+    const char *reason = ai_event_reason_name(type);
+    char targeted[256];
 
-  ai_actor_schedule_reaction_speech(mob, actor, line);
-  e->last_reply_time = now;
+    line = ai_line_for_intent(mob, intent, e->attitude, &pool, &reason);
+    if (!line || !*line)
+      return;
+
+    ai_set_last_speech_meta(mob, pool, reason);
+    snprintf(targeted, sizeof(targeted), "$n says to %s, '%s'", GET_NAME(actor), line);
+    ai_actor_schedule_reaction_speech(mob, actor, targeted);
+    e->last_reply_time = now;
+  }
 }
 
 
