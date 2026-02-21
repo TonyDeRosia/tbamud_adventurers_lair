@@ -30,6 +30,7 @@ SPECIAL(guild);
 #include "screen.h"
 #include "fight.h"
 #include "modify.h"      /* for smash_tilde */
+#include "ai_actor.h"
 
 /* Builder-friendly NPC flags list:
  * action_bits[] ends with reserved "DEAD" which should not be exposed in OLC menus.
@@ -323,6 +324,8 @@ void medit_save_internally(struct descriptor_data *d)
     assign_triggers(mob, MOB_TRIGGER);
   }
   /* end trigger update */
+
+  ai_actor_refresh_live_mobs_by_vnum(OLC_NUM(d));
 
   if (!i)	/* Only renumber on new mobiles. */
     return;

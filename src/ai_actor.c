@@ -18,6 +18,7 @@
 #define AI_HOSTILE_ATTACK_THRESHOLD 12
 #define AI_ROOM_IDLE_SKIP_SECS 12
 #define AI_BFS_MAX_DEPTH 6
+#define AI_SIGNATURE_CHECK_SECS 10
 
 static int ai_debug = AI_ACTOR_DEBUG;
 
@@ -401,89 +402,44 @@ static void ai_parse_hints(struct ai_actor_profile *pf, const char *desc)
     pf->roam_radius = MAX(1, MIN(8, atoi(p + 7)));
 }
 
-void ai_actor_init(struct char_data *mob)
+static uint32_t ai_fnv1a32_update(uint32_t hash, const char *s)
 {
-  static const char *const guard_kw[] = { "guard", "captain", "watch", "patrol", "sentry", "warden", "sheriff", "constable", "knight", "paladin", NULL };
-  static const char *const merchant_kw[] = { "merchant", "shop", "shopkeeper", "vendor", "trader", "peddler", "innkeeper", "bartender", NULL };
-  static const char *const bandit_kw[] = { "bandit", "thief", "brigand", "outlaw", "cutpurse", "pirate", "raider", "mugger", NULL };
-  static const char *const beast_kw[] = { "wolf", "bear", "boar", "spider", "rat", "beast", "serpent", "drake", "lion", "tiger", NULL };
-  static const char *const undead_kw[] = { "skeleton", "zombie", "wight", "lich", "undead", "ghoul", "revenant", "corpse", NULL };
-  static const char *const spirit_kw[] = { "spirit", "ghost", "wraith", "apparition", "ethereal", "phantom", NULL };
-  static const char *const cult_kw[] = { "cult", "acolyte", "zealot", "fanatic", "heretic", "summoner", "devotee", NULL };
-  static const char *const boss_kw[] = { "king", "queen", "lord", "commander", "champion", "ancient", "elder", "arch", "high", "dread", NULL };
-  int score[ROLE_BOSS + 1];
-  char text[MAX_STRING_LENGTH];
-  int best_role = ROLE_CIVILIAN;
-  int best_score = -9999;
-  int i;
+  const unsigned char *p = (const unsigned char *)(s ? s : "");
 
-  if (!mob || !IS_NPC(mob) || !MOB_FLAGGED(mob, MOB_AI_ACTOR))
+  while (*p) {
+    hash ^= (uint32_t)(*p++);
+    hash *= 16777619u;
+  }
+
+  return hash;
+}
+
+uint32_t ai_actor_compute_signature(struct char_data *mob)
+{
+  uint32_t hash = 2166136261u;
+  char vbuf[32];
+
+  if (!mob)
+    return 0;
+
+  snprintf(vbuf, sizeof(vbuf), "%d", GET_MOB_VNUM(mob));
+  hash = ai_fnv1a32_update(hash, vbuf);
+  hash = ai_fnv1a32_update(hash, "|");
+  hash = ai_fnv1a32_update(hash, mob->player.name ? mob->player.name : "");
+  hash = ai_fnv1a32_update(hash, "|");
+  hash = ai_fnv1a32_update(hash, mob->player.short_descr ? mob->player.short_descr : "");
+  hash = ai_fnv1a32_update(hash, "|");
+  hash = ai_fnv1a32_update(hash, mob->player.long_descr ? mob->player.long_descr : "");
+  hash = ai_fnv1a32_update(hash, "|");
+  hash = ai_fnv1a32_update(hash, mob->player.description ? mob->player.description : "");
+
+  return hash;
+}
+
+static void ai_actor_apply_role_setup(struct char_data *mob, const char *text)
+{
+  if (!mob || !mob->ai_prof)
     return;
-
-  if (!mob->ai_prof)
-    CREATE(mob->ai_prof, struct ai_actor_profile, 1);
-  if (!mob->ai_state)
-    CREATE(mob->ai_state, struct ai_actor_state, 1);
-
-  if (!mob->ai_prof || !mob->ai_state)
-    return;
-
-  memset(mob->ai_prof, 0, sizeof(*mob->ai_prof));
-  memset(mob->ai_state, 0, sizeof(*mob->ai_state));
-
-  mob->ai_prof->role = ROLE_CIVILIAN;
-  mob->ai_prof->movement = MOVE_WANDER_RADIUS;
-  mob->ai_prof->aggression = AGG_RETALIATE;
-  mob->ai_prof->social = SOC_WARNING;
-  mob->ai_prof->morale = MORALE_NORMAL;
-  mob->ai_prof->home_room_vnum = (IN_ROOM(mob) == NOWHERE) ? NOWHERE : GET_ROOM_VNUM(IN_ROOM(mob));
-  mob->ai_prof->roam_radius = 3;
-  mob->ai_prof->talk_cooldown_secs = 20;
-  mob->ai_prof->room_talk_cooldown_secs = 40;
-  mob->ai_prof->flee_hp_percent = 20;
-  mob->ai_prof->surrender_hp_percent = 15;
-  mob->ai_state->cached_zone = (IN_ROOM(mob) == NOWHERE) ? NOWHERE : world[IN_ROOM(mob)].zone;
-  mob->ai_state->next_tick = time(0) + rand_number(1, 3);
-  ai_actor_brain_init(mob);
-
-  ai_extract_text(text, sizeof(text), mob);
-  memset(score, 0, sizeof(score));
-
-  score[ROLE_GUARD] += ai_role_weight_from_keywords(text, guard_kw);
-  score[ROLE_MERCHANT] += ai_role_weight_from_keywords(text, merchant_kw);
-  score[ROLE_BANDIT] += ai_role_weight_from_keywords(text, bandit_kw);
-  score[ROLE_BEAST] += ai_role_weight_from_keywords(text, beast_kw);
-  score[ROLE_UNDEAD] += ai_role_weight_from_keywords(text, undead_kw);
-  score[ROLE_SPIRIT] += ai_role_weight_from_keywords(text, spirit_kw);
-  score[ROLE_CULTIST] += ai_role_weight_from_keywords(text, cult_kw);
-  score[ROLE_BOSS] += ai_role_weight_from_keywords(text, boss_kw);
-
-  if (MOB_FLAGGED(mob, MOB_AGGRESSIVE)) {
-    score[ROLE_BANDIT] += 2;
-    score[ROLE_BEAST] += 2;
-  }
-  if (MOB_FLAGGED(mob, MOB_SENTINEL))
-    score[ROLE_GUARD] += 2;
-  if (MOB_FLAGGED(mob, MOB_HELPER))
-    score[ROLE_GUARD] += 2;
-  if (MOB_FLAGGED(mob, MOB_SCAVENGER)) {
-    score[ROLE_BANDIT] += 1;
-    score[ROLE_BEAST] += 1;
-  }
-  if (ai_mob_has_shop_data(mob))
-    score[ROLE_MERCHANT] += 8;
-
-  for (i = ROLE_UNKNOWN; i <= ROLE_BOSS; i++) {
-    if (score[i] > best_score) {
-      best_score = score[i];
-      best_role = i;
-    }
-  }
-
-  if (best_score <= 0)
-    best_role = ROLE_CIVILIAN;
-
-  mob->ai_prof->role = best_role;
 
   switch (mob->ai_prof->role) {
     case ROLE_GUARD:
@@ -549,6 +505,95 @@ void ai_actor_init(struct char_data *mob)
     default:
       break;
   }
+}
+
+void ai_actor_build_profile(struct char_data *mob, int full_reset)
+{
+  static const char *const guard_kw[] = { "guard", "captain", "watch", "patrol", "sentry", "warden", "sheriff", "constable", "knight", "paladin", NULL };
+  static const char *const merchant_kw[] = { "merchant", "shop", "shopkeeper", "vendor", "trader", "peddler", "innkeeper", "bartender", NULL };
+  static const char *const bandit_kw[] = { "bandit", "thief", "brigand", "outlaw", "cutpurse", "pirate", "raider", "mugger", NULL };
+  static const char *const beast_kw[] = { "wolf", "bear", "boar", "spider", "rat", "beast", "serpent", "drake", "lion", "tiger", NULL };
+  static const char *const undead_kw[] = { "skeleton", "zombie", "wight", "lich", "undead", "ghoul", "revenant", "corpse", NULL };
+  static const char *const spirit_kw[] = { "spirit", "ghost", "wraith", "apparition", "ethereal", "phantom", NULL };
+  static const char *const cult_kw[] = { "cult", "acolyte", "zealot", "fanatic", "heretic", "summoner", "devotee", NULL };
+  static const char *const boss_kw[] = { "king", "queen", "lord", "commander", "champion", "ancient", "elder", "arch", "high", "dread", NULL };
+  int score[ROLE_BOSS + 1];
+  char text[MAX_STRING_LENGTH];
+  int best_role = ROLE_CIVILIAN;
+  int best_score = -9999;
+  int i;
+
+  if (!mob || !IS_NPC(mob) || !MOB_FLAGGED(mob, MOB_AI_ACTOR) || !mob->ai_prof || !mob->ai_state)
+    return;
+
+  if (full_reset) {
+    memset(mob->ai_prof, 0, sizeof(*mob->ai_prof));
+    ai_actor_brain_free(mob);
+    memset(mob->ai_state, 0, sizeof(*mob->ai_state));
+    ai_actor_brain_init(mob);
+  }
+
+  mob->ai_prof->role = ROLE_CIVILIAN;
+  mob->ai_prof->movement = MOVE_WANDER_RADIUS;
+  mob->ai_prof->aggression = AGG_RETALIATE;
+  mob->ai_prof->social = SOC_WARNING;
+  mob->ai_prof->morale = MORALE_NORMAL;
+  mob->ai_prof->home_room_vnum = (IN_ROOM(mob) == NOWHERE) ? NOWHERE : GET_ROOM_VNUM(IN_ROOM(mob));
+  mob->ai_prof->roam_radius = 3;
+  mob->ai_prof->talk_cooldown_secs = 20;
+  mob->ai_prof->room_talk_cooldown_secs = 40;
+  mob->ai_prof->flee_hp_percent = 20;
+  mob->ai_prof->surrender_hp_percent = 15;
+  mob->ai_state->cached_zone = (IN_ROOM(mob) == NOWHERE) ? NOWHERE : world[IN_ROOM(mob)].zone;
+  mob->ai_state->next_tick = time(0) + rand_number(1, 3);
+  mob->ai_state->next_signature_check = 0;
+
+  ai_extract_text(text, sizeof(text), mob);
+  memset(score, 0, sizeof(score));
+
+  /* Step 1: explicit hints first. */
+  ai_parse_hints(mob->ai_prof, mob->player.description ? mob->player.description : "");
+
+  /* Step 2: infer text defaults for unset values. */
+  score[ROLE_GUARD] += ai_role_weight_from_keywords(text, guard_kw);
+  score[ROLE_MERCHANT] += ai_role_weight_from_keywords(text, merchant_kw);
+  score[ROLE_BANDIT] += ai_role_weight_from_keywords(text, bandit_kw);
+  score[ROLE_BEAST] += ai_role_weight_from_keywords(text, beast_kw);
+  score[ROLE_UNDEAD] += ai_role_weight_from_keywords(text, undead_kw);
+  score[ROLE_SPIRIT] += ai_role_weight_from_keywords(text, spirit_kw);
+  score[ROLE_CULTIST] += ai_role_weight_from_keywords(text, cult_kw);
+  score[ROLE_BOSS] += ai_role_weight_from_keywords(text, boss_kw);
+
+  if (MOB_FLAGGED(mob, MOB_AGGRESSIVE)) {
+    score[ROLE_BANDIT] += 2;
+    score[ROLE_BEAST] += 2;
+  }
+  if (MOB_FLAGGED(mob, MOB_SENTINEL))
+    score[ROLE_GUARD] += 2;
+  if (MOB_FLAGGED(mob, MOB_HELPER))
+    score[ROLE_GUARD] += 2;
+  if (MOB_FLAGGED(mob, MOB_SCAVENGER)) {
+    score[ROLE_BANDIT] += 1;
+    score[ROLE_BEAST] += 1;
+  }
+  if (ai_mob_has_shop_data(mob))
+    score[ROLE_MERCHANT] += 8;
+
+  for (i = ROLE_UNKNOWN; i <= ROLE_BOSS; i++) {
+    if (score[i] > best_score) {
+      best_score = score[i];
+      best_role = i;
+    }
+  }
+
+  if (best_score <= 0)
+    best_role = ROLE_CIVILIAN;
+
+  if (mob->ai_prof->role == ROLE_CIVILIAN)
+    mob->ai_prof->role = best_role;
+
+  /* Step 3: role-specific setup from resolved role. */
+  ai_actor_apply_role_setup(mob, text);
 
   if (mob->ai_prof->morale == MORALE_COWARD)
     mob->ai_prof->flee_hp_percent = MAX(mob->ai_prof->flee_hp_percent, 35);
@@ -562,9 +607,60 @@ void ai_actor_init(struct char_data *mob)
   if (mob->ai_prof->surrender_hp_percent > mob->ai_prof->flee_hp_percent)
     mob->ai_prof->surrender_hp_percent = mob->ai_prof->flee_hp_percent;
 
-  ai_parse_hints(mob->ai_prof, mob->player.description ? mob->player.description : "");
-
+  mob->ai_prof->signature = ai_actor_compute_signature(mob);
   mob->ai_prof->initialized = TRUE;
+}
+
+void ai_actor_rebuild_profile(struct char_data *mob)
+{
+  int before_role;
+  uint32_t before_sig;
+
+  if (!mob || !IS_NPC(mob) || !MOB_FLAGGED(mob, MOB_AI_ACTOR))
+    return;
+
+  if (!mob->ai_prof)
+    CREATE(mob->ai_prof, struct ai_actor_profile, 1);
+  if (!mob->ai_state)
+    CREATE(mob->ai_state, struct ai_actor_state, 1);
+  if (!mob->ai_prof || !mob->ai_state)
+    return;
+
+  before_role = mob->ai_prof->role;
+  before_sig = mob->ai_prof->signature;
+  ai_actor_build_profile(mob, TRUE);
+  ai_debug_log("profile refresh vnum=%d sig=%u->%u role=%d->%d", GET_MOB_VNUM(mob),
+               (unsigned int)before_sig, (unsigned int)mob->ai_prof->signature,
+               before_role, mob->ai_prof->role);
+}
+
+void ai_actor_refresh_live_mobs_by_vnum(mob_vnum vnum)
+{
+  struct char_data *mob;
+
+  for (mob = character_list; mob; mob = mob->next) {
+    if (!IS_NPC(mob) || !MOB_FLAGGED(mob, MOB_AI_ACTOR))
+      continue;
+    if (GET_MOB_VNUM(mob) != vnum)
+      continue;
+    ai_actor_rebuild_profile(mob);
+  }
+}
+
+void ai_actor_init(struct char_data *mob)
+{
+  if (!mob || !IS_NPC(mob) || !MOB_FLAGGED(mob, MOB_AI_ACTOR))
+    return;
+
+  if (!mob->ai_prof)
+    CREATE(mob->ai_prof, struct ai_actor_profile, 1);
+  if (!mob->ai_state)
+    CREATE(mob->ai_state, struct ai_actor_state, 1);
+
+  if (!mob->ai_prof || !mob->ai_state)
+    return;
+
+  ai_actor_build_profile(mob, TRUE);
   ai_debug_log("init %s role=%d move=%d aggr=%d morale=%d", GET_NAME(mob), mob->ai_prof->role,
                mob->ai_prof->movement, mob->ai_prof->aggression, mob->ai_prof->morale);
 }
@@ -666,6 +762,15 @@ int ai_actor_tick(struct char_data *mob, time_t now)
 
   pf = mob->ai_prof;
   st = mob->ai_state;
+
+  if (st->next_signature_check <= now) {
+    uint32_t sig = ai_actor_compute_signature(mob);
+    if (sig != pf->signature)
+      ai_actor_rebuild_profile(mob);
+    st->next_signature_check = now + AI_SIGNATURE_CHECK_SECS + rand_number(0, 3);
+    pf = mob->ai_prof;
+    st = mob->ai_state;
+  }
 
   if (st->next_tick > now)
     return FALSE;
