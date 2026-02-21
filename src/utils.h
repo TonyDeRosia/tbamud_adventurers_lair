@@ -1129,6 +1129,7 @@ do                                                              \
 #define CONFIG_SPECIAL_IN_COMM config_info.operation.special_in_comm
 /** Activate debug mode? */
 #define CONFIG_DEBUG_MODE config_info.operation.debug_mode
+#define CONFIG_AI_ACTOR_ENABLED config_info.operation.ai_actor_enabled
 
 /* Autowiz */
 /** Use autowiz or not? */

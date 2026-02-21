@@ -775,6 +775,51 @@ static void do_stat_object(struct char_data *ch, struct obj_data *j)
   do_sstat_object(ch, j);
 }
 
+static const char *ai_actor_role_name(int role)
+{
+  switch (role) {
+    case ROLE_GUARD: return "guard";
+    case ROLE_MERCHANT: return "merchant";
+    case ROLE_BANDIT: return "bandit";
+    case ROLE_BEAST: return "beast";
+    case ROLE_UNDEAD: return "undead";
+    case ROLE_SPIRIT: return "spirit";
+    case ROLE_CULTIST: return "cultist";
+    case ROLE_CIVILIAN: return "civilian";
+    case ROLE_BOSS: return "boss";
+    default: return "unknown";
+  }
+}
+
+static const char *ai_actor_temperament_name(int aggression)
+{
+  switch (aggression) {
+    case AGG_PEACEFUL: return "peaceful";
+    case AGG_RETALIATE: return "retaliate";
+    case AGG_TERRITORIAL: return "territorial";
+    case AGG_OPPORTUNISTIC: return "opportunistic";
+    case AGG_CRIME_HUNTER: return "crime_hunter";
+    case AGG_AMBUSH: return "ambush";
+    default: return "unknown";
+  }
+}
+
+static const char *ai_actor_theme_name(int social)
+{
+  switch (social) {
+    case SOC_SILENT: return "silent";
+    case SOC_WARNING: return "warning";
+    case SOC_TALKATIVE: return "talkative";
+    case SOC_EXTORT: return "extort";
+    default: return "unknown";
+  }
+}
+
+static const char *ai_actor_control_mode_name(void)
+{
+  return CONFIG_AI_ACTOR_ENABLED ? "ai_actor" : "legacy";
+}
+
 static void do_stat_character(struct char_data *ch, struct char_data *k)
 {
   char buf[MAX_STRING_LENGTH];
@@ -893,6 +938,16 @@ static void do_stat_character(struct char_data *ch, struct char_data *k)
     send_to_char(ch, "Mob Spec-Proc: %s, NPC Bare Hand Dam: %dd%d\r\n",
         (mob_index[GET_MOB_RNUM(k)].func ? get_spec_func_name(mob_index[GET_MOB_RNUM(k)].func) : "None"),
 	    k->mob_specials.damnodice, k->mob_specials.damsizedice);
+
+  if (IS_MOB(k) && MOB_FLAGGED(k, MOB_AI_ACTOR) && k->ai_prof) {
+    send_to_char(ch, "AI role: %s, AI temperament: %s, AI theme: %s\r\n",
+                 ai_actor_role_name(k->ai_prof->role),
+                 ai_actor_temperament_name(k->ai_prof->aggression),
+                 ai_actor_theme_name(k->ai_prof->social));
+    send_to_char(ch, "AI control mode: %s, AI signature hash: %08X\r\n",
+                 ai_actor_control_mode_name(),
+                 (unsigned int)k->ai_prof->signature);
+  }
 
   for (i = 0, j = k->carrying; j; j = j->next_content, i++);
   send_to_char(ch, "Carried: weight: %d, items: %d; Items in: inventory: %d, ", IS_CARRYING_W(k), IS_CARRYING_N(k), i);

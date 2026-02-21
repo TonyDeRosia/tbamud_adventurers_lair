@@ -317,3 +317,6 @@ int special_in_comm = YES;
 
 /* Current Debug Mode */
 int debug_mode = OFF;
+
+/* Global runtime toggle for AI_ACTOR tick behavior. */
+int ai_actor_enabled = YES;

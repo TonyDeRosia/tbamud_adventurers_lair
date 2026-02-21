@@ -53,13 +53,9 @@ void mobile_activity(void)
       }
     }
 
-    if (MOB_FLAGGED(ch, MOB_AI_ACTOR)) {
-      if (FIGHTING(ch))
-        continue;
-      if (IN_ROOM(ch) == NOWHERE || IN_ROOM(ch) < 0 || IN_ROOM(ch) > top_of_world)
-        continue;
-      if (ai_actor_tick(ch, time(0)))
-        continue;
+    if (MOB_FLAGGED(ch, MOB_AI_ACTOR) && CONFIG_AI_ACTOR_ENABLED) {
+      ai_actor_tick(ch, time(0));
+      continue;
     }
 
     /* If the mob has no specproc, do the default actions */
