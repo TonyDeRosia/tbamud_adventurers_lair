@@ -515,7 +515,6 @@ static void ai_resolve_world_facts(struct char_data *mob, struct char_data *acto
 static void ai_slot_replace(const char *in, const struct ai_world_facts *f, char *out, size_t outsz);
 static void ai_sanitize_unresolved_tokens(const char *in, char *out, size_t outsz);
 static const char *ai_epistemic_line(int confidence, int role, int topic_target);
-unsigned int ai_hash_fnv1a_32(const char *text);
 
 
 enum ai_player_speech_class {
@@ -2629,22 +2628,6 @@ static unsigned long ai_hash_text_stable(const char *text)
   return h;
 }
 
-unsigned int ai_hash_fnv1a_32(const char *text)
-{
-  const unsigned char *p = (const unsigned char *)text;
-  unsigned int h = 2166136261u;
-
-  if (!text)
-    return h;
-
-  while (*p) {
-    h ^= (unsigned int)(*p++);
-    h *= 16777619u;
-  }
-
-  return h;
-}
-
 static int ai_hash_ring_has(const unsigned int *ring, int count, int head, int max, unsigned int v)
 {
   int i;
@@ -4276,8 +4259,10 @@ static int ai_classify_domain(const char *normalized, int intent, int speech_act
   if (intent == AI_INTENT_BUY_WEAPON || intent == AI_INTENT_BUY_ARMOR || intent == AI_INTENT_BUY_FOOD)
     scores[DOMAIN_SHOPPING] += 6;
   if (normalized && (ai_text_has_sub_ci(normalized, "hungry") || ai_text_has_sub_ci(normalized, "food") || ai_text_has_sub_ci(normalized, "eat") ||
-      ai_text_has_sub_ci(normalized, "meal") || ai_text_has_sub_ci(normalized, "ration") || ai_text_has_sub_ci(normalized, "bread") || ai_text_has_sub_ci(normalized, "stew")))
-    scores[DOMAIN_SERVICES] += 14;
+      ai_text_has_sub_ci(normalized, "meal") || ai_text_has_sub_ci(normalized, "ration") || ai_text_has_sub_ci(normalized, "bread") || ai_text_has_sub_ci(normalized, "stew"))) {
+    scores[DOMAIN_SERVICES] += 24;
+    scores[DOMAIN_SHOPPING] += 10;
+  }
   if (intent == AI_INTENT_BANK || intent == AI_INTENT_INN || intent == AI_INTENT_HEAL || intent == AI_INTENT_TRAIN || intent == AI_INTENT_ASK_SERVICE)
     scores[DOMAIN_SERVICES] += 6;
   if (intent == AI_INTENT_DIRECTIONS)
@@ -4306,7 +4291,8 @@ static void ai_resolve_world_facts(struct char_data *mob, struct char_data *acto
   room_rnum rr;
   int first_dir = -1;
   int dist = 0;
-  char route[128];
+  char route_buf[128];
+  const char *route = "";
   struct ai_zone_knowledge *zk = NULL;
 
   if (!out)
@@ -4372,9 +4358,10 @@ static void ai_resolve_world_facts(struct char_data *mob, struct char_data *acto
   }
   if (rr != NOWHERE && ai_find_route_to_room(IN_ROOM(mob), rr, AI_BFS_MAX_DEPTH, &first_dir, &dist)) {
     int maxp = (int)sizeof(out->route_snippet) - 1;
-    ai_build_route_text(first_dir, route, sizeof(route));
-    if (!route[0])
-      route[0] = '\0';
+    ai_build_route_text(first_dir, route_buf, sizeof(route_buf));
+    route = route_buf;
+    if (!route)
+      route = "";
     snprintf(out->route_snippet, sizeof(out->route_snippet), "%.*s", maxp, route);
     out->route_snippet[sizeof(out->route_snippet) - 1] = '\0';
     out->confidence = 3;
@@ -5500,6 +5487,7 @@ static int ai_player_speech_classify(const char *text, int *out_confidence, int 
   int scores[AI_SPEECH_FEELING + 1];
   int best = AI_SPEECH_UNKNOWN;
   int i;
+  int is_hunger_request;
 
   memset(scores, 0, sizeof(scores));
   if (out_confidence) *out_confidence = 0;
@@ -5518,19 +5506,21 @@ static int ai_player_speech_classify(const char *text, int *out_confidence, int 
     if (out_is_weather) *out_is_weather = TRUE;
   }
 
-  if (ai_text_has_sub_ci(text, "how are you") || ai_text_has_sub_ci(text, "what s up") || ai_text_has_sub_ci(text, "whats up") || ai_text_has_sub_ci(text, "what's up") ||
+  is_hunger_request = (ai_text_has_sub_ci(text, "hungry") || ai_text_has_sub_ci(text, "starving") || ai_text_has_sub_ci(text, "need food") ||
+                       ai_text_has_sub_ci(text, "need something to eat") || ai_text_has_sub_ci(text, "something to eat"));
+
+  if (!is_hunger_request && (ai_text_has_sub_ci(text, "how are you") || ai_text_has_sub_ci(text, "what s up") || ai_text_has_sub_ci(text, "whats up") || ai_text_has_sub_ci(text, "what's up") ||
       ai_text_has_sub_ci(text, "how goes") || ai_text_has_sub_ci(text, "how is it going") || ai_text_has_sub_ci(text, "hows it going") || ai_text_has_sub_ci(text, "how's it going") ||
       ai_text_has_sub_ci(text, "hows your day") || ai_text_has_sub_ci(text, "how's your day") || ai_text_has_sub_ci(text, "anything new") || ai_text_has_sub_ci(text, "what's new") || ai_text_has_sub_ci(text, "whats new") ||
       ai_text_has_sub_ci(text, "you alright") || ai_text_has_sub_ci(text, "all good") || ai_text_has_sub_ci(text, "how are things") || ai_text_has_sub_ci(text, "how goes it") || ai_text_has_sub_ci(text, "hows things") ||
-      ai_text_has_sub_ci(text, "what are you up to") || ai_text_has_sub_ci(text, "what are you doing") || ai_text_has_sub_ci(text, "tell me about"))
+      ai_text_has_sub_ci(text, "what are you up to") || ai_text_has_sub_ci(text, "what are you doing") || ai_text_has_sub_ci(text, "tell me about")))
     scores[AI_SPEECH_SMALLTALK] += 12;
-  if (ai_text_has_sub_ci(text, "chat") || ai_text_has_sub_ci(text, "talk") || ai_text_has_sub_ci(text, "bored") || ai_text_has_sub_ci(text, "day going"))
+  if (!is_hunger_request && (ai_text_has_sub_ci(text, "chat") || ai_text_has_sub_ci(text, "talk") || ai_text_has_sub_ci(text, "bored") || ai_text_has_sub_ci(text, "day going")))
     scores[AI_SPEECH_SMALLTALK] += 4;
 
-  if (ai_text_has_sub_ci(text, "hungry") || ai_text_has_sub_ci(text, "starving") || ai_text_has_sub_ci(text, "need food") ||
-      ai_text_has_sub_ci(text, "need something to eat") || ai_text_has_sub_ci(text, "something to eat")) {
-    scores[AI_SPEECH_SHOP] += 12;
-    scores[AI_SPEECH_SMALLTALK] -= 6;
+  if (is_hunger_request) {
+    scores[AI_SPEECH_SHOP] += 18;
+    scores[AI_SPEECH_INN] += 8;
   }
 
   if (ai_text_has_sub_ci(text, "where") || ai_text_has_sub_ci(text, "which way") || ai_text_has_sub_ci(text, "how do i get") ||
@@ -6210,6 +6200,11 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
   int i;
   int role = (mob && mob->ai_prof) ? mob->ai_prof->role : ROLE_UNKNOWN;
   int style = (mob && mob->ai_prof) ? mob->ai_prof->style : 0;
+  int is_hunger_request = FALSE;
+  int bakery_room = NOWHERE;
+  int bakery_item = -1;
+  int inn_room = NOWHERE;
+  int inn_item = -1;
   enum ai_reply_goal chosen_goal = GOAL_INFORM;
   int chosen_goal_known = FALSE;
   struct ai_reply_context rctx;
@@ -6272,8 +6267,24 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
   rctx.topic_target = ai_detect_topic_target_from_text(normalized);
   ai_detect_requested_targets(normalized, rctx.requested_targets, &rctx.requested_count);
   rctx.primary_topic_target = (rctx.requested_count > 0) ? rctx.requested_targets[0] : rctx.topic_target;
-  if (type == AI_EVENT_PLAYER_SAY && (ai_text_has_sub_ci(normalized, "hungry") || ai_text_has_sub_ci(normalized, "starving") || ai_text_has_sub_ci(normalized, "food") || ai_text_has_sub_ci(normalized, "eat") || ai_text_has_sub_ci(normalized, "meal")))
-    rctx.primary_topic_target = TARGET_BAKERY;
+  is_hunger_request = (type == AI_EVENT_PLAYER_SAY &&
+                      (ai_text_has_sub_ci(normalized, "hungry") || ai_text_has_sub_ci(normalized, "starving") || ai_text_has_sub_ci(normalized, "need food") ||
+                       ai_text_has_sub_ci(normalized, "something to eat") || ai_text_has_sub_ci(normalized, "food") || ai_text_has_sub_ci(normalized, "eat") ||
+                       ai_text_has_sub_ci(normalized, "meal") || ai_text_has_sub_ci(normalized, "ration") || ai_text_has_sub_ci(normalized, "bread") ||
+                       ai_text_has_sub_ci(normalized, "stew")));
+  if (is_hunger_request) {
+    rctx.domain = DOMAIN_SERVICES;
+    if (mob && ai_find_closest_service(mob, actor, TARGET_BAKERY, &bakery_room, &bakery_item))
+      rctx.primary_topic_target = TARGET_BAKERY;
+    else if (mob && ai_find_closest_service(mob, actor, TARGET_INN, &inn_room, &inn_item))
+      rctx.primary_topic_target = TARGET_INN;
+    else
+      rctx.primary_topic_target = TARGET_INN;
+    if (rctx.requested_count <= 0) {
+      rctx.requested_targets[0] = rctx.primary_topic_target;
+      rctx.requested_count = 1;
+    }
+  }
   rctx.confidence = 0;
   if (ai_debug) {
     int qi;
@@ -6491,10 +6502,11 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
       const struct ai_voice_profile *vp;
       unsigned long seed;
       int skip_voice = FALSE;
-      static char voiced[300];
+      char voiced[300];
+      voiced[0] = '\0';
 
       intention = ai_form_intention(mob, intent, speech_class, suspicion_bucket, sr ? sr->arc : AI_ARC_STRANGER, &ctx, sr, e, now);
-      if (type == AI_EVENT_PLAYER_SAY && (ai_text_has_sub_ci(normalized, "hungry") || ai_text_has_sub_ci(normalized, "starving") || ai_text_has_sub_ci(normalized, "need food") || ai_text_has_sub_ci(normalized, "something to eat") || ai_text_has_sub_ci(normalized, "food")))
+      if (is_hunger_request)
         intention.goal = GOAL_SERVE;
       chosen_goal = intention.goal;
       chosen_goal_known = TRUE;
@@ -6504,7 +6516,7 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
         intention.goal = GOAL_DEFLECT;
       chosen_goal = intention.goal;
 
-      if (rctx.confidence == 0 && intention.goal == GOAL_SERVE)
+      if (rctx.confidence == 0 && intention.goal == GOAL_SERVE && !is_hunger_request)
         intention.goal = GOAL_DEFLECT;
 
       core = ai_select_content_for_intention(mob, &intention, &rctx, sr, &rctx.from_template);
@@ -6535,12 +6547,19 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
               if (w2 > 0) pos2 += MIN(w2, (int)(sizeof(seg) - pos2 - 1));
             }
             if (pos2 < rem) {
-              int w3 = snprintf(seg + pos2, sizeof(seg) - pos2, " %.*s.", (int)(sizeof(seg) - pos2 - 3), mf.route_snippet[0] ? mf.route_snippet : "ask around");
+              int segp = (int)sizeof(seg) - pos2 - 3;
+              if (segp < 0)
+                segp = 0;
+              int w3 = snprintf(seg + pos2, sizeof(seg) - pos2, " %.*s.", segp, mf.route_snippet[0] ? mf.route_snippet : "ask around");
               if (w3 > 0) pos2 += MIN(w3, (int)(sizeof(seg) - pos2 - 1));
             }
             seg[sizeof(seg) - 1] = '\0';
-          } else
-            snprintf(seg, sizeof(seg), "%s: %.*s", label, (int)sizeof(seg) - ((int)strlen(label) + 3), ai_epistemic_line(mf.confidence, role, rctx.requested_targets[qi]));
+          } else {
+            int epip = (int)sizeof(seg) - ((int)strlen(label) + 3);
+            if (epip < 0)
+              epip = 0;
+            snprintf(seg, sizeof(seg), "%s: %.*s", label, epip, ai_epistemic_line(mf.confidence, role, rctx.requested_targets[qi]));
+          }
           if (pos < (int)sizeof(multi_core) - 1) {
             int w = snprintf(multi_core + pos, sizeof(multi_core) - pos, "%s%s", (pos ? " " : ""), seg);
             if (w > 0)
@@ -6602,7 +6621,8 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
       }
 
       if (line && *line && !ai_line_is_role_legal(line, role, style)) {
-        static char legal_core[300];
+        char legal_core[300];
+        legal_core[0] = '\0';
         snprintf(legal_core, sizeof(legal_core), "%.*s", (int)sizeof(legal_core) - 1, core ? core : "");
         line = legal_core;
         if (!line[0] || !ai_line_is_role_legal(line, role, style)) {
