@@ -38,6 +38,8 @@
 #define AI_NPC_CONVO_TOPIC_MAX_SECS 30
 #define AI_NPC_CONVO_START_EMPTY_SECS 60
 #define AI_NPC_CONVO_START_WITH_PLAYERS_SECS 180
+#define AI_PLAYER_ARB_CACHE_MAX 128
+#define AI_PLAYER_ARB_TTL_SECS 6
 
 enum ai_conversation_topic {
   AI_CONV_TOPIC_UNKNOWN = 0,
@@ -105,6 +107,38 @@ static const char *ai_conv_line_for_topic(struct char_data *speaker, int topic);
 static int ai_conv_emit_line(struct ai_conv_room_state *room_st, struct char_data *speaker, struct char_data *partner, time_t now);
 static int ai_conv_try_progress(struct char_data *mob, time_t now);
 static int ai_conv_try_start(struct char_data *mob, time_t now);
+static int ai_player_speech_classify(const char *text, int *out_confidence, int *out_is_weather);
+static int ai_intent_from_player_class(int speech_class);
+static int ai_actor_room_response_slot(struct char_data *mob, struct char_data *actor, enum ai_event_type type, int intent, int confidence, const char *normalized);
+
+enum ai_player_speech_class {
+  AI_SPEECH_UNKNOWN = 0,
+  AI_SPEECH_GREET,
+  AI_SPEECH_WEATHER,
+  AI_SPEECH_SMALLTALK,
+  AI_SPEECH_DIRECTIONS,
+  AI_SPEECH_SHOP,
+  AI_SPEECH_INN,
+  AI_SPEECH_BANK,
+  AI_SPEECH_HELP,
+  AI_SPEECH_THREAT,
+  AI_SPEECH_OPINION,
+  AI_SPEECH_COMPLIMENT,
+  AI_SPEECH_ROMANCE,
+  AI_SPEECH_FEELING
+};
+
+struct ai_player_arb_entry {
+  room_rnum room;
+  long actor_id;
+  enum ai_event_type type;
+  unsigned long text_hash;
+  time_t created_at;
+  struct char_data *responder1;
+  struct char_data *responder2;
+};
+
+static struct ai_player_arb_entry ai_player_arb_cache[AI_PLAYER_ARB_CACHE_MAX];
 
 
 static const char *ai_role_name_local(int role)
@@ -1727,6 +1761,13 @@ static const char *ai_line_for_intent(struct char_data *mob, struct ai_actor_mem
   static const char *const weather_guard[] = {"Skies look steady, but keep a cloak handy.", "Weather turns fast near the roads; stay prepared.", NULL};
   static const char *const weather_inn[] = {"If rain comes, the hearth stays warm here.", "Bad weather fills my rooms early.", NULL};
   static const char *const weather_merch[] = {"Weather shifts prices almost as much as caravans.", "Dry roads mean better stock by dusk.", NULL};
+  static const char *const smalltalk_guard[] = {"Stay sharp and stay kind.", "Quiet streets are good streets.", NULL};
+  static const char *const smalltalk_inn[] = {"A calm table helps everyone breathe easier.", "Long roads make short conversations welcome.", NULL};
+  static const char *const smalltalk_merch[] = {"Steady crowds make for steady trade.", "Good mood, good market.", NULL};
+  static const char *const personal_guard[] = {"Keep your mind on the road and your heart steady.", "That's personal. Keep your choices respectful and lawful.", NULL};
+  static const char *const personal_inn[] = {"Hearts are complicated; I serve comfort, not gossip.", "Feelings are yours to weigh, but kindness helps.", NULL};
+  static const char *const personal_merch[] = {"I trade in goods, not hearts, friend.", "That's personal coin to spend carefully.", NULL};
+  static const char *const personal_bandit[] = {"Romance gets people careless.", "Ask someone softer for heart-talk.", NULL};
 
   if (!mob || !mob->ai_prof)
     return NULL;
@@ -1736,6 +1777,17 @@ static const char *ai_line_for_intent(struct char_data *mob, struct ai_actor_mem
   role = mob->ai_prof->role;
   style = mob->ai_prof->style;
   innkeeper = (role == ROLE_MERCHANT && style == 1);
+
+  if (ai_text_has_sub_ci(text, "love") || ai_text_has_sub_ci(text, "crush") || ai_text_has_sub_ci(text, "romance") || ai_text_has_sub_ci(text, "date") || ai_text_has_sub_ci(text, "pretty") ||
+      ai_text_has_sub_ci(text, "weird") || ai_text_has_sub_ci(text, "feel") || ai_text_has_sub_ci(text, "feeling") || ai_text_has_sub_ci(text, "what do you think") || ai_text_has_sub_ci(text, "do you think i") || ai_text_has_sub_ci(text, "am i")) {
+    if (out_pool) *out_pool = "POOL_PERSONAL_SMALLTALK";
+    if (role == ROLE_GUARD) return ai_pick_phrase(personal_guard);
+    if (role == ROLE_MERCHANT && innkeeper) return ai_pick_phrase(personal_inn);
+    if (role == ROLE_MERCHANT) return ai_pick_phrase(personal_merch);
+    if (role == ROLE_BANDIT) return ai_pick_phrase(personal_bandit);
+    if (role == ROLE_BOSS) return "Keep your focus where it matters.";
+    return "That's personal. Best asked of a close friend.";
+  }
 
   if (!ai_role_can_answer_intent(role, style, intent)) {
     redir = ai_role_redirect_line(role, style);
@@ -1757,7 +1809,8 @@ static const char *ai_line_for_intent(struct char_data *mob, struct ai_actor_mem
     snprintf(e->last_topic_key, sizeof(e->last_topic_key), "%s", ai_topic_key_name(topic));
   }
 
-  if (intent == AI_INTENT_SMALLTALK && (ai_text_has_sub_ci(text, "weather") || ai_text_has_sub_ci(text, "rain") || ai_text_has_sub_ci(text, "sun") || ai_text_has_sub_ci(text, "storm") || ai_text_has_sub_ci(text, "nice day"))) {
+  if (intent == AI_INTENT_SMALLTALK && (ai_text_has_sub_ci(text, "weather") || ai_text_has_sub_ci(text, "rain") || ai_text_has_sub_ci(text, "sun") || ai_text_has_sub_ci(text, "storm") || ai_text_has_sub_ci(text, "wind") || ai_text_has_sub_ci(text, "snow") || ai_text_has_sub_ci(text, "fog") || ai_text_has_sub_ci(text, "nice day"))) {
+    if (out_pool) *out_pool = "POOL_WEATHER";
     if (role == ROLE_GUARD)
       return ai_pick_phrase(weather_guard);
     if (role == ROLE_MERCHANT && innkeeper)
@@ -1767,8 +1820,18 @@ static const char *ai_line_for_intent(struct char_data *mob, struct ai_actor_mem
     return "Weather's been shifting all day.";
   }
 
+  if (intent == AI_INTENT_SMALLTALK) {
+    if (out_pool) *out_pool = "POOL_SMALLTALK";
+    if (role == ROLE_GUARD) return ai_pick_phrase(smalltalk_guard);
+    if (role == ROLE_MERCHANT && innkeeper) return ai_pick_phrase(smalltalk_inn);
+    if (role == ROLE_MERCHANT) return ai_pick_phrase(smalltalk_merch);
+    if (role == ROLE_BANDIT) return ai_pick_weighted_phrase(role_bandit_greet, role_rare_bandit);
+    if (role == ROLE_BOSS) return "Stay sharp. This post does not sleep.";
+    if (role == ROLE_CIVILIAN || role == ROLE_UNKNOWN) return "Hello.";
+  }
+
   if (role == ROLE_GUARD) {
-    if (intent == AI_INTENT_GREET || intent == AI_INTENT_SMALLTALK) return ai_pick_weighted_phrase(role_guard_greet, role_rare_guard);
+    if (intent == AI_INTENT_GREET) return ai_pick_weighted_phrase(role_guard_greet, role_rare_guard);
     if (intent == AI_INTENT_GIBBERISH) return ai_pick_phrase(gib_guard);
     if (intent == AI_INTENT_DIRECTIONS || intent == AI_INTENT_HEAL || intent == AI_INTENT_BANK || intent == AI_INTENT_INN || intent == AI_INTENT_QUEST)
       return dir_line ? dir_line : ai_pick_phrase(role_guard_service);
@@ -1812,11 +1875,14 @@ static const char *ai_line_for_intent(struct char_data *mob, struct ai_actor_mem
     if (role == ROLE_CULTIST) return (intent == AI_INTENT_EMOTE_SPIT) ? "Blasphemy has a price." : "Ritual, not revelry.";
   }
 
-  if (intent == AI_INTENT_ASK_SERVICE || intent == AI_INTENT_CONFUSION)
+  if (intent == AI_INTENT_ASK_SERVICE)
     return ai_role_redirect_line(role, style);
 
+  if (intent == AI_INTENT_CONFUSION)
+    return "I am not sure I follow. Ask me in another way.";
+
   (void)line;
-  return NULL;
+  return "I am not sure I follow. Ask me in another way.";
 }
 
 static int ai_actor_choose_intent(struct char_data *mob, struct char_data **out_target, const char **out_line, int *do_emote, int *do_warn)
@@ -2424,11 +2490,113 @@ static void ai_normalize_text(const char *src, char *dst, size_t dstsz)
   dst[j] = '\0';
 }
 
+static int ai_player_speech_classify(const char *text, int *out_confidence, int *out_is_weather)
+{
+  int scores[AI_SPEECH_FEELING + 1];
+  int best = AI_SPEECH_UNKNOWN;
+  int i;
+
+  memset(scores, 0, sizeof(scores));
+  if (out_confidence) *out_confidence = 0;
+  if (out_is_weather) *out_is_weather = FALSE;
+  if (!text || !*text)
+    return AI_SPEECH_UNKNOWN;
+
+  if (ai_text_has_sub_ci(text, "hello") || ai_text_has_sub_ci(text, "hi") || ai_text_has_sub_ci(text, "hey") ||
+      ai_text_has_sub_ci(text, "greetings") || ai_text_has_sub_ci(text, "yo") || ai_text_has_sub_ci(text, "good morning"))
+    scores[AI_SPEECH_GREET] += 8;
+
+  if (ai_text_has_sub_ci(text, "weather") || ai_text_has_sub_ci(text, "rain") || ai_text_has_sub_ci(text, "sun") || ai_text_has_sub_ci(text, "storm") ||
+      ai_text_has_sub_ci(text, "wind") || ai_text_has_sub_ci(text, "snow") || ai_text_has_sub_ci(text, "fog") || ai_text_has_sub_ci(text, "nice day")) {
+    scores[AI_SPEECH_WEATHER] += 12;
+    if (out_is_weather) *out_is_weather = TRUE;
+  }
+
+  if (ai_text_has_sub_ci(text, "how are you") || ai_text_has_sub_ci(text, "what s up") || ai_text_has_sub_ci(text, "how goes") ||
+      ai_text_has_sub_ci(text, "how is it going") || ai_text_has_sub_ci(text, "what are you doing") || ai_text_has_sub_ci(text, "tell me about"))
+    scores[AI_SPEECH_SMALLTALK] += 9;
+  if (ai_text_has_sub_ci(text, "chat") || ai_text_has_sub_ci(text, "talk") || ai_text_has_sub_ci(text, "bored") || ai_text_has_sub_ci(text, "day going"))
+    scores[AI_SPEECH_SMALLTALK] += 4;
+
+  if (ai_text_has_sub_ci(text, "where") || ai_text_has_sub_ci(text, "which way") || ai_text_has_sub_ci(text, "how do i get") ||
+      ai_text_has_sub_ci(text, "directions") || ai_text_has_sub_ci(text, "find") || ai_text_has_sub_ci(text, "locate") || ai_text_has_sub_ci(text, "path"))
+    scores[AI_SPEECH_DIRECTIONS] += 10;
+
+  if (ai_text_has_sub_ci(text, "buy") || ai_text_has_sub_ci(text, "sell") || ai_text_has_sub_ci(text, "wares") || ai_text_has_sub_ci(text, "shop") ||
+      ai_text_has_sub_ci(text, "price") || ai_text_has_sub_ci(text, "trade") || ai_text_has_sub_ci(text, "discount"))
+    scores[AI_SPEECH_SHOP] += 10;
+  if (ai_text_has_sub_ci(text, "inn") || ai_text_has_sub_ci(text, "room") || ai_text_has_sub_ci(text, "rest") || ai_text_has_sub_ci(text, "sleep") || ai_text_has_sub_ci(text, "rent"))
+    scores[AI_SPEECH_INN] += 11;
+  if (ai_text_has_sub_ci(text, "bank") || ai_text_has_sub_ci(text, "deposit") || ai_text_has_sub_ci(text, "withdraw") || ai_text_has_sub_ci(text, "vault"))
+    scores[AI_SPEECH_BANK] += 11;
+  if (ai_text_has_sub_ci(text, "help") || ai_text_has_sub_ci(text, "quest") || ai_text_has_sub_ci(text, "job") || ai_text_has_sub_ci(text, "task") ||
+      ai_text_has_sub_ci(text, "mission") || ai_text_has_sub_ci(text, "advice"))
+    scores[AI_SPEECH_HELP] += 10;
+
+  if (ai_text_has_sub_ci(text, "die") || ai_text_has_sub_ci(text, "kill") || ai_text_has_sub_ci(text, "attack") || ai_text_has_sub_ci(text, "fight") ||
+      ai_text_has_sub_ci(text, "rob") || ai_text_has_sub_ci(text, "mug") || ai_text_has_sub_ci(text, "threat"))
+    scores[AI_SPEECH_THREAT] += 14;
+
+  if (ai_text_has_sub_ci(text, "what do you think") || ai_text_has_sub_ci(text, "opinion") || ai_text_has_sub_ci(text, "am i") ||
+      ai_text_has_sub_ci(text, "do you think i") || ai_text_has_sub_ci(text, "weird") || ai_text_has_sub_ci(text, "pretty"))
+    scores[AI_SPEECH_OPINION] += 11;
+  if (ai_text_has_sub_ci(text, "you are nice") || ai_text_has_sub_ci(text, "you re nice") || ai_text_has_sub_ci(text, "good work") ||
+      ai_text_has_sub_ci(text, "thanks") || ai_text_has_sub_ci(text, "appreciate"))
+    scores[AI_SPEECH_COMPLIMENT] += 10;
+  if (ai_text_has_sub_ci(text, "love") || ai_text_has_sub_ci(text, "crush") || ai_text_has_sub_ci(text, "date") || ai_text_has_sub_ci(text, "romance") ||
+      ai_text_has_sub_ci(text, "kiss") || ai_text_has_sub_ci(text, "marry") || ai_text_has_sub_ci(text, "heart"))
+    scores[AI_SPEECH_ROMANCE] += 13;
+  if (ai_text_has_sub_ci(text, "feel") || ai_text_has_sub_ci(text, "feeling") || ai_text_has_sub_ci(text, "happy") || ai_text_has_sub_ci(text, "sad") ||
+      ai_text_has_sub_ci(text, "afraid") || ai_text_has_sub_ci(text, "angry") || ai_text_has_sub_ci(text, "lonely"))
+    scores[AI_SPEECH_FEELING] += 10;
+
+  for (i = 1; i <= AI_SPEECH_FEELING; i++) {
+    if (scores[i] > scores[best])
+      best = i;
+  }
+
+  if (best == AI_SPEECH_UNKNOWN && (ai_text_has_sub_ci(text, "what") || ai_text_has_sub_ci(text, "hmm") || ai_text_has_sub_ci(text, "uh")))
+    scores[AI_SPEECH_SMALLTALK] += 2;
+
+  for (i = 1; i <= AI_SPEECH_FEELING; i++) {
+    if (scores[i] > scores[best])
+      best = i;
+  }
+
+  if (out_confidence)
+    *out_confidence = scores[best];
+
+  return best;
+}
+
+static int ai_intent_from_player_class(int speech_class)
+{
+  switch (speech_class) {
+    case AI_SPEECH_GREET: return AI_INTENT_GREET;
+    case AI_SPEECH_WEATHER: return AI_INTENT_SMALLTALK;
+    case AI_SPEECH_SMALLTALK: return AI_INTENT_SMALLTALK;
+    case AI_SPEECH_DIRECTIONS: return AI_INTENT_DIRECTIONS;
+    case AI_SPEECH_SHOP: return AI_INTENT_ASK_SERVICE;
+    case AI_SPEECH_INN: return AI_INTENT_INN;
+    case AI_SPEECH_BANK: return AI_INTENT_BANK;
+    case AI_SPEECH_HELP: return AI_INTENT_QUEST;
+    case AI_SPEECH_THREAT: return AI_INTENT_THREAT;
+    case AI_SPEECH_COMPLIMENT: return AI_INTENT_PRAISE;
+    case AI_SPEECH_OPINION: return AI_INTENT_CONFUSION;
+    case AI_SPEECH_ROMANCE: return AI_INTENT_CONFUSION;
+    case AI_SPEECH_FEELING: return AI_INTENT_CONFUSION;
+    default: return AI_INTENT_CONFUSION;
+  }
+}
+
 static int ai_detect_intent(enum ai_event_type type, const char *text)
 {
+  int speech_class;
+
   if (type == AI_EVENT_PLAYER_EMOTE) {
     if (ai_text_has_sub_ci(text, "dance")) return AI_INTENT_EMOTE_DANCE;
     if (ai_text_has_sub_ci(text, "spit")) return AI_INTENT_EMOTE_SPIT;
+    if (ai_text_has_sub_ci(text, "sing")) return AI_INTENT_EMOTE_WAVE;
     if (ai_text_has_sub_ci(text, "hug")) return AI_INTENT_EMOTE_HUG;
     if (ai_text_has_sub_ci(text, "wave")) return AI_INTENT_EMOTE_WAVE;
     return AI_INTENT_NONE;
@@ -2440,58 +2608,8 @@ static int ai_detect_intent(enum ai_event_type type, const char *text)
   if (ai_is_gibberish(text))
     return AI_INTENT_GIBBERISH;
 
-  if (ai_text_has_sub_ci(text, "weather") || ai_text_has_sub_ci(text, "rain") || ai_text_has_sub_ci(text, "sun") || ai_text_has_sub_ci(text, "storm") || ai_text_has_sub_ci(text, "nice day"))
-    return AI_INTENT_SMALLTALK;
-  if (ai_text_has_sub_ci(text, "how are you") || ai_text_has_sub_ci(text, "what's up"))
-    return AI_INTENT_SMALLTALK;
-  if (ai_text_has_sub_ci(text, "hello") || ai_text_has_sub_ci(text, "hi") || ai_text_has_sub_ci(text, "hey") ||
-      ai_text_has_sub_ci(text, "greetings") || ai_text_has_sub_ci(text, "yo"))
-    return AI_INTENT_GREET;
-  if (ai_text_has_sub_ci(text, "weapon") || ai_text_has_sub_ci(text, "sword") || ai_text_has_sub_ci(text, "dagger") ||
-      ai_text_has_sub_ci(text, "axe") || ai_text_has_sub_ci(text, "bow") || ai_text_has_sub_ci(text, "mace") ||
-      ai_text_has_sub_ci(text, "staff") || ai_text_has_sub_ci(text, "armory"))
-    return AI_INTENT_BUY_WEAPON;
-  if (ai_text_has_sub_ci(text, "armor") || ai_text_has_sub_ci(text, "shield") || ai_text_has_sub_ci(text, "helm") ||
-      ai_text_has_sub_ci(text, "mail") || ai_text_has_sub_ci(text, "plate"))
-    return AI_INTENT_BUY_ARMOR;
-  if (ai_text_has_sub_ci(text, "food") || ai_text_has_sub_ci(text, "eat") || ai_text_has_sub_ci(text, "hungry") ||
-      ai_text_has_sub_ci(text, "drink") || ai_text_has_sub_ci(text, "tavern") || ai_text_has_sub_ci(text, "bakery"))
-    return AI_INTENT_BUY_FOOD;
-  if (ai_text_has_sub_ci(text, "heal") || ai_text_has_sub_ci(text, "healer") || ai_text_has_sub_ci(text, "cleric") ||
-      ai_text_has_sub_ci(text, "temple") || ai_text_has_sub_ci(text, "shrine") || ai_text_has_sub_ci(text, "cure"))
-    return AI_INTENT_HEAL;
-  if (ai_text_has_sub_ci(text, "bank") || ai_text_has_sub_ci(text, "deposit") || ai_text_has_sub_ci(text, "withdraw") ||
-      ai_text_has_sub_ci(text, "vault") || ai_text_has_sub_ci(text, "exchange"))
-    return AI_INTENT_BANK;
-  if (ai_text_has_sub_ci(text, "inn") || ai_text_has_sub_ci(text, "room") || ai_text_has_sub_ci(text, "rest") ||
-      ai_text_has_sub_ci(text, "sleep") || ai_text_has_sub_ci(text, "rent"))
-    return AI_INTENT_INN;
-  if (ai_text_has_sub_ci(text, "train") || ai_text_has_sub_ci(text, "practice") || ai_text_has_sub_ci(text, "guild") || ai_text_has_sub_ci(text, "trainer"))
-    return AI_INTENT_TRAIN;
-  if (ai_text_has_sub_ci(text, "rumor") || ai_text_has_sub_ci(text, "gossip") || ai_text_has_sub_ci(text, "news") || ai_text_has_sub_ci(text, "heard"))
-    return AI_INTENT_RUMOR;
-  if (ai_text_has_sub_ci(text, "quest") || ai_text_has_sub_ci(text, "job") || ai_text_has_sub_ci(text, "task") ||
-      ai_text_has_sub_ci(text, "mission") || ai_text_has_sub_ci(text, "help me"))
-    return AI_INTENT_QUEST;
-  if (ai_text_has_sub_ci(text, "where") || ai_text_has_sub_ci(text, "how") || ai_text_has_sub_ci(text, "which way") ||
-      ai_text_has_sub_ci(text, "how do i get") || ai_text_has_sub_ci(text, "how to get") || ai_text_has_sub_ci(text, "get there") ||
-      ai_text_has_sub_ci(text, "directions") || ai_text_has_sub_ci(text, "find") || ai_text_has_sub_ci(text, "locate"))
-    return AI_INTENT_DIRECTIONS;
-  if (ai_text_has_sub_ci(text, "buy") || ai_text_has_sub_ci(text, "sell") || ai_text_has_sub_ci(text, "wares") || ai_text_has_sub_ci(text, "shop"))
-    return AI_INTENT_ASK_SERVICE;
-  if (ai_text_has_sub_ci(text, "die") || ai_text_has_sub_ci(text, "kill") || ai_text_has_sub_ci(text, "attack") ||
-      ai_text_has_sub_ci(text, "fight") || ai_text_has_sub_ci(text, "threat") || ai_text_has_sub_ci(text, "mug") || ai_text_has_sub_ci(text, "rob"))
-    return AI_INTENT_THREAT;
-  if (ai_text_has_sub_ci(text, "idiot") || ai_text_has_sub_ci(text, "stupid") || ai_text_has_sub_ci(text, "trash") ||
-      ai_text_has_sub_ci(text, "ugly") || ai_text_has_sub_ci(text, "hate") || ai_text_has_sub_ci(text, "shut up"))
-    return AI_INTENT_INSULT;
-  if (ai_text_has_sub_ci(text, "thanks") || ai_text_has_sub_ci(text, "good") || ai_text_has_sub_ci(text, "nice") ||
-      ai_text_has_sub_ci(text, "great") || ai_text_has_sub_ci(text, "appreciate"))
-    return AI_INTENT_PRAISE;
-  if (ai_text_has_sub_ci(text, "what") || ai_text_has_sub_ci(text, "help") || ai_text_has_sub_ci(text, "lost"))
-    return AI_INTENT_CONFUSION;
-
-  return AI_INTENT_NONE;
+  speech_class = ai_player_speech_classify(text, NULL, NULL);
+  return ai_intent_from_player_class(speech_class);
 }
 
 static int ai_role_priority_score(struct char_data *mob)
@@ -2568,24 +2686,102 @@ static int ai_event_fit_bonus(struct char_data *mob, enum ai_event_type type, in
   return ai_role_priority_score(mob);
 }
 
-static int ai_actor_room_response_slot(struct char_data *mob, struct char_data *actor, enum ai_event_type type, int intent)
+static unsigned long ai_text_hash_simple(const char *text)
+{
+  unsigned long h = 2166136261u;
+  size_t i;
+
+  if (!text)
+    return 0;
+
+  for (i = 0; text[i]; i++) {
+    h ^= (unsigned long)(unsigned char)text[i];
+    h *= 16777619u;
+  }
+  return h;
+}
+
+static struct ai_player_arb_entry *ai_player_arb_lookup(room_rnum room, long actor_id, enum ai_event_type type, unsigned long text_hash, time_t now)
+{
+  int i;
+
+  for (i = 0; i < AI_PLAYER_ARB_CACHE_MAX; i++) {
+    struct ai_player_arb_entry *e = &ai_player_arb_cache[i];
+    if (e->created_at > 0 && (now - e->created_at) > AI_PLAYER_ARB_TTL_SECS)
+      memset(e, 0, sizeof(*e));
+    if (e->created_at <= 0)
+      continue;
+    if (e->room == room && e->actor_id == actor_id && e->type == type && e->text_hash == text_hash)
+      return e;
+  }
+
+  return NULL;
+}
+
+static struct ai_player_arb_entry *ai_player_arb_get_or_create(room_rnum room, long actor_id, enum ai_event_type type, unsigned long text_hash, time_t now)
+{
+  struct ai_player_arb_entry *found;
+  int i;
+  int oldest = 0;
+
+  found = ai_player_arb_lookup(room, actor_id, type, text_hash, now);
+  if (found)
+    return found;
+
+  for (i = 0; i < AI_PLAYER_ARB_CACHE_MAX; i++) {
+    if (ai_player_arb_cache[i].created_at <= 0) {
+      oldest = i;
+      break;
+    }
+    if (ai_player_arb_cache[i].created_at < ai_player_arb_cache[oldest].created_at)
+      oldest = i;
+  }
+
+  memset(&ai_player_arb_cache[oldest], 0, sizeof(ai_player_arb_cache[oldest]));
+  ai_player_arb_cache[oldest].room = room;
+  ai_player_arb_cache[oldest].actor_id = actor_id;
+  ai_player_arb_cache[oldest].type = type;
+  ai_player_arb_cache[oldest].text_hash = text_hash;
+  ai_player_arb_cache[oldest].created_at = now;
+  return &ai_player_arb_cache[oldest];
+}
+
+static int ai_actor_room_response_slot(struct char_data *mob, struct char_data *actor, enum ai_event_type type, int intent, int confidence, const char *normalized)
 {
   struct char_data *it;
   struct char_data *top1 = NULL, *top2 = NULL;
-  int best1 = -9999, best2 = -9999;
+  struct ai_player_arb_entry *arb;
+  int best1 = -999999, best2 = -999999;
+  time_t now = time(0);
+  unsigned long text_hash;
 
   if (!mob || !actor || IN_ROOM(mob) == NOWHERE || IN_ROOM(actor) != IN_ROOM(mob))
     return FALSE;
 
+  text_hash = ai_text_hash_simple(normalized);
+  arb = ai_player_arb_get_or_create(IN_ROOM(mob), GET_IDNUM(actor), type, text_hash, now);
+  if (!arb)
+    return FALSE;
+
+  if (arb->responder1 || arb->responder2)
+    return (mob == arb->responder1 || mob == arb->responder2);
+
   for (it = world[IN_ROOM(mob)].people; it; it = it->next_in_room) {
     int pri;
+    int role_score;
+    int dist = (IN_ROOM(it) == IN_ROOM(actor)) ? 0 : 1;
 
     if (!IS_NPC(it) || !MOB_FLAGGED(it, MOB_AI_ACTOR) || !it->ai_prof || !it->ai_state)
       continue;
-    if ((time(0) - it->ai_state->last_talk_time) < AI_PER_PLAYER_REPLY_COOLDOWN_SECS)
+    if ((now - it->ai_state->last_talk_time) < AI_PER_PLAYER_REPLY_COOLDOWN_SECS)
       continue;
 
     pri = ai_event_fit_bonus(it, type, intent);
+    role_score = ai_role_priority_score(it);
+    pri += confidence * 100;
+    pri += role_score;
+    pri -= (dist * 2);
+
     if (pri > best1 || (pri == best1 && (!top1 || GET_MOB_VNUM(it) < GET_MOB_VNUM(top1)))) {
       best2 = best1;
       top2 = top1;
@@ -2597,7 +2793,9 @@ static int ai_actor_room_response_slot(struct char_data *mob, struct char_data *
     }
   }
 
-  return (mob == top1 || mob == top2);
+  arb->responder1 = top1;
+  arb->responder2 = top2;
+  return (mob == arb->responder1 || mob == arb->responder2);
 }
 
 
@@ -2673,6 +2871,8 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
   struct ai_conv_room_state *room_st;
   time_t now = time(0);
   int intent;
+  int confidence = 0;
+  int speech_class = AI_SPEECH_UNKNOWN;
   const char *line = NULL;
   char normalized[256];
 
@@ -2682,7 +2882,20 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
   ai_state_refresh_local_topics(mob);
   ai_normalize_text(text ? text : "", normalized, sizeof(normalized));
   e = ai_mem_get_or_create(mob, GET_IDNUM(actor));
-  intent = ai_detect_intent(type, normalized);
+  if (type == AI_EVENT_PLAYER_SAY) {
+    if (ai_is_gibberish(normalized)) {
+      intent = AI_INTENT_GIBBERISH;
+      confidence = 8;
+    } else {
+      speech_class = ai_player_speech_classify(normalized, &confidence, NULL);
+      intent = ai_intent_from_player_class(speech_class);
+      if (speech_class == AI_SPEECH_WEATHER)
+        confidence += 4;
+    }
+  } else {
+    intent = ai_detect_intent(type, normalized);
+    confidence = 10;
+  }
   room_st = ai_conv_room_state_get(IN_ROOM(mob), 1);
   if (room_st && type == AI_EVENT_PLAYER_SAY)
     room_st->last_player_speech_time = now;
@@ -2742,7 +2955,7 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
 
   if (!e || !intent)
     return;
-  if (!ai_actor_room_response_slot(mob, actor, type, intent))
+  if (!ai_actor_room_response_slot(mob, actor, type, intent, confidence, normalized))
     return;
   if ((now - e->last_reply_time) < AI_PER_PLAYER_REPLY_COOLDOWN_SECS)
     return;
