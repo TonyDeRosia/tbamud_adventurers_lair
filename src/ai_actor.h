@@ -201,6 +201,12 @@ struct ai_actor_memory_entry {
   int last_topic;
   time_t last_topic_time;
   char last_topic_key[32];
+  float belief_confidence;
+  int belief_last_room;
+  int belief_last_direction;
+  time_t belief_updated_at;
+  float belief_hostility;
+  float belief_familiarity;
 };
 
 struct ai_actor_state {
