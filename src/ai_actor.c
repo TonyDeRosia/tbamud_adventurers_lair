@@ -1118,6 +1118,7 @@ static void ai_resolve_world_facts(struct char_data *mob, struct char_data *acto
 static void ai_slot_replace(const char *in, const struct ai_world_facts *f, char *out, size_t outsz);
 static void ai_sanitize_unresolved_tokens(const char *in, char *out, size_t outsz);
 static const char *ai_epistemic_line(int confidence, int role, int topic_target);
+static int ai_player_say_requires_service_reply(const char *text);
 static const char *ai_service_menu_clarify_line(struct char_data *mob, int role, int style, int evil, int archetype, int personality);
 static const char *ai_service_honest_fallback_line(int role, int topic_target, int archetype);
 static const char *ai_role_neutral_fallback_line(int role, int style, int archetype);
@@ -6162,6 +6163,7 @@ static void ai_detect_requested_targets(const char *text, int *targets, int *cou
 
   if (ai_text_has_sub_ci(text, "heal") || ai_text_has_sub_ci(text, "healer") || ai_text_has_sub_ci(text, "temple") || ai_text_has_sub_ci(text, "potion") || ai_text_has_sub_ci(text, "bandage") || ai_text_has_sub_ci(text, "wounded")) AI_REQ_PUSH(TARGET_HEAL);
   if (ai_text_has_sub_ci(text, "bank") || ai_text_has_sub_ci(text, "deposit") || ai_text_has_sub_ci(text, "withdraw") || ai_text_has_sub_ci(text, "atm") || ai_text_has_sub_ci(text, "teller")) AI_REQ_PUSH(TARGET_BANK);
+  if (ai_text_has_sub_ci(text, "board") || ai_text_has_sub_ci(text, "bounty") || ai_text_has_sub_ci(text, "contract")) AI_REQ_PUSH(TARGET_MARKET);
 
   if (n == 0 && (food_trigger || water_trigger || rest_trigger))
     AI_REQ_PUSH(TARGET_INN);
@@ -6194,15 +6196,18 @@ static void ai_detect_guidance_query(const char *text, struct ai_guidance_query 
   has_what = ai_text_has_sub_ci(text, "what");
 
   out->is_question = (strchr(text, '?') != NULL || has_where || has_how || has_who || has_what);
-  out->asks_navigation = (ai_text_has_sub_ci(text, "exit") || ai_text_has_sub_ci(text, "way out") || ai_text_has_sub_ci(text, "leave") || ai_text_has_sub_ci(text, "gate"));
-  out->asks_in_room_referral = (ai_text_has_sub_ci(text, "who sells") || ai_text_has_sub_ci(text, "who trains") || ai_text_has_sub_ci(text, "who can") || ai_text_has_sub_ci(text, "talk to") || ai_text_has_sub_ci(text, "ask "));
+  out->asks_navigation = (ai_text_has_sub_ci(text, "exit") || ai_text_has_sub_ci(text, "way out") || ai_text_has_sub_ci(text, "leave") || ai_text_has_sub_ci(text, "gate") ||
+                          ai_text_has_sub_ci(text, "directions") || ai_text_has_sub_ci(text, "find") || ai_text_has_sub_ci(text, "go to"));
+  out->asks_in_room_referral = (ai_text_has_sub_ci(text, "who sells") || ai_text_has_sub_ci(text, "who trains") || ai_text_has_sub_ci(text, "who can") ||
+                                ai_text_has_sub_ci(text, "talk to") || ai_text_has_sub_ci(text, "ask ") || ai_text_has_sub_ci(text, "merchant") ||
+                                ai_text_has_sub_ci(text, "shopkeeper") || ai_text_has_sub_ci(text, "trainer"));
   out->asks_quest = (ai_text_has_sub_ci(text, "quest") || ai_text_has_sub_ci(text, "job") || ai_text_has_sub_ci(text, "work") || ai_text_has_sub_ci(text, "bounty") ||
-                     ai_text_has_sub_ci(text, "contract") || ai_text_has_sub_ci(text, "rumor"));
+                     ai_text_has_sub_ci(text, "contract") || ai_text_has_sub_ci(text, "rumor") || ai_text_has_sub_ci(text, "board"));
 
   if (ai_text_has_sub_ci(text, "bank")) { out->target = TARGET_BANK; out->target_keyword = "bank"; out->confidence += 40; }
   else if (ai_text_has_sub_ci(text, "inn") || ai_text_has_sub_ci(text, "tavern")) { out->target = TARGET_INN; out->target_keyword = "inn"; out->confidence += 40; }
-  else if (ai_text_has_sub_ci(text, "shop") || ai_text_has_sub_ci(text, "merchant") || ai_text_has_sub_ci(text, "market")) { out->target = TARGET_MARKET; out->target_keyword = "market"; out->confidence += 35; }
-  else if (ai_text_has_sub_ci(text, "trainer") || ai_text_has_sub_ci(text, "train") || ai_text_has_sub_ci(text, "guild")) { out->target = TARGET_TRAINER; out->target_keyword = "trainer"; out->confidence += 40; }
+  else if (ai_text_has_sub_ci(text, "shop") || ai_text_has_sub_ci(text, "merchant") || ai_text_has_sub_ci(text, "market") || ai_text_has_sub_ci(text, "sells")) { out->target = TARGET_MARKET; out->target_keyword = "market"; out->confidence += 35; }
+  else if (ai_text_has_sub_ci(text, "trainer") || ai_text_has_sub_ci(text, "train") || ai_text_has_sub_ci(text, "guild") || ai_text_has_sub_ci(text, "who trains")) { out->target = TARGET_TRAINER; out->target_keyword = "trainer"; out->confidence += 40; }
   else if (ai_text_has_sub_ci(text, "heal") || ai_text_has_sub_ci(text, "healer") || ai_text_has_sub_ci(text, "temple")) { out->target = TARGET_HEAL; out->target_keyword = "healer"; out->confidence += 40; }
   else if (ai_text_has_sub_ci(text, "armory") || ai_text_has_sub_ci(text, "weapon")) { out->target = TARGET_ARMORY; out->target_keyword = "armory"; out->confidence += 35; }
   else if (ai_text_has_sub_ci(text, "board") || ai_text_has_sub_ci(text, "post office")) { out->target = TARGET_MARKET; out->target_keyword = "board"; out->confidence += 28; }
@@ -6223,7 +6228,8 @@ static void ai_detect_guidance_query(const char *text, struct ai_guidance_query 
   if (out->is_question)
     out->confidence += 10;
 
-  if ((ai_text_has_sub_ci(text, "where is it") || ai_text_has_sub_ci(text, "where do i go") || ai_text_has_sub_ci(text, "where should i go")) && out->target == TARGET_NONE)
+  if ((ai_text_has_sub_ci(text, "where is it") || ai_text_has_sub_ci(text, "where do i go") || ai_text_has_sub_ci(text, "where should i go") ||
+       (out->is_question && ai_player_say_requires_service_reply(text))) && out->target == TARGET_NONE)
     out->wants_clarify = 1;
 
   if (out->is_question && out->target != TARGET_NONE && out->confidence >= 45)
@@ -6253,6 +6259,15 @@ static int ai_build_guidance_answer(struct char_data *mob, struct char_data *pla
     return TRUE;
   }
 
+  if (role == ROLE_BEAST) {
+    snprintf(out, outsz, "*the beast huffs and refuses to answer about town services*");
+    return TRUE;
+  }
+  if (role == ROLE_UNDEAD || role == ROLE_SPIRIT) {
+    snprintf(out, outsz, "I do not keep mortal services. Seek the living in this place.");
+    return TRUE;
+  }
+
   if (q->asks_quest)
     brain_domain = 5;
   else if (current_domain == DOMAIN_DIRECTIONS)
@@ -6260,9 +6275,13 @@ static int ai_build_guidance_answer(struct char_data *mob, struct char_data *pla
 
   if (q->asks_in_room_referral || q->asks_quest || current_domain == DOMAIN_SERVICES || current_domain == DOMAIN_DIRECTIONS) {
     if (ai_brain_pick_referral_in_room(mob, player, brain_domain, &target) && target) {
+      if (ai_debug)
+        ai_debug_log("AI_GUIDANCE_PATH vnum=%d in_room_referral=1 bfs=0 dir=none depth=0", GET_MOB_VNUM(mob));
       snprintf(out, outsz, "Ask %s in this room.", PERS(target, mob));
       return TRUE;
     }
+    if (ai_debug)
+      ai_debug_log("AI_GUIDANCE_PATH vnum=%d in_room_referral=0 bfs=0 dir=none depth=0", GET_MOB_VNUM(mob));
   }
 
   service_type = (q->target != TARGET_NONE) ? q->target : fallback_topic;
@@ -6288,11 +6307,15 @@ static int ai_build_guidance_answer(struct char_data *mob, struct char_data *pla
         default: dname = NULL; break;
       }
       if (dname) {
+        if (ai_debug)
+          ai_debug_log("AI_GUIDANCE_PATH vnum=%d in_room_referral=0 bfs=1 dir=%s depth=%d", GET_MOB_VNUM(mob), dname, MAX(1, dist));
         snprintf(out, outsz, "Go %s. It is %d steps from here.", dname, MAX(1, dist));
         return TRUE;
       }
     }
   }
+  if (ai_debug)
+    ai_debug_log("AI_GUIDANCE_PATH vnum=%d in_room_referral=0 bfs=0 dir=none depth=0", GET_MOB_VNUM(mob));
 
   if (role == ROLE_GUARD || role == ROLE_MERCHANT || role == ROLE_BOSS || role == ROLE_CIVILIAN || role == ROLE_UNKNOWN) {
     snprintf(out, outsz, "I cannot find that nearby. Try the town board or ask a guard.");
@@ -6300,6 +6323,19 @@ static int ai_build_guidance_answer(struct char_data *mob, struct char_data *pla
   }
 
   return FALSE;
+}
+
+static int ai_player_say_requires_service_reply(const char *text)
+{
+  if (!text || !*text)
+    return FALSE;
+  return (strchr(text, '?') != NULL ||
+          ai_text_has_sub_ci(text, "where") || ai_text_has_sub_ci(text, "how") || ai_text_has_sub_ci(text, "who") || ai_text_has_sub_ci(text, "what") ||
+          ai_text_has_sub_ci(text, "help") || ai_text_has_sub_ci(text, "find") || ai_text_has_sub_ci(text, "directions") ||
+          ai_text_has_sub_ci(text, "bank") || ai_text_has_sub_ci(text, "inn") || ai_text_has_sub_ci(text, "shop") || ai_text_has_sub_ci(text, "merchant") ||
+          ai_text_has_sub_ci(text, "train") || ai_text_has_sub_ci(text, "trainer") || ai_text_has_sub_ci(text, "board") || ai_text_has_sub_ci(text, "bounty") ||
+          ai_text_has_sub_ci(text, "contract") || ai_text_has_sub_ci(text, "guild") || ai_text_has_sub_ci(text, "gate") || ai_text_has_sub_ci(text, "exit") ||
+          ai_text_has_sub_ci(text, "go to") || ai_text_has_sub_ci(text, "who sells") || ai_text_has_sub_ci(text, "who trains"));
 }
 
 static int ai_is_question_shape(const char *text)
@@ -9445,11 +9481,11 @@ static struct ai_multi_intent ai_detect_multi_intent(const char *text, int speec
     out.secondary_intent = INTENT_SERVICE_INN;
   else if (ai_text_has_sub_ci(text, "rest") || ai_text_has_sub_ci(text, "sleep") || ai_text_has_sub_ci(text, "bed"))
     out.secondary_intent = INTENT_SERVICE_REST;
-  else if (ai_text_has_sub_ci(text, "weapon") || ai_text_has_sub_ci(text, "armory") || ai_text_has_sub_ci(text, "blacksmith"))
+  else if (ai_text_has_sub_ci(text, "weapon") || ai_text_has_sub_ci(text, "armory") || ai_text_has_sub_ci(text, "blacksmith") || ai_text_has_sub_ci(text, "who sells"))
     out.secondary_intent = INTENT_SERVICE_WEAPONS;
-  else if (ai_text_has_sub_ci(text, "supplies") || ai_text_has_sub_ci(text, "gear") || ai_text_has_sub_ci(text, "shop"))
+  else if (ai_text_has_sub_ci(text, "supplies") || ai_text_has_sub_ci(text, "gear") || ai_text_has_sub_ci(text, "shop") || ai_text_has_sub_ci(text, "merchant"))
     out.secondary_intent = INTENT_SERVICE_SUPPLIES;
-  else if (ai_text_has_sub_ci(text, "guard") || ai_text_has_sub_ci(text, "constable") || ai_text_has_sub_ci(text, "watch"))
+  else if (ai_text_has_sub_ci(text, "guard") || ai_text_has_sub_ci(text, "constable") || ai_text_has_sub_ci(text, "watch") || ai_text_has_sub_ci(text, "gate") || ai_text_has_sub_ci(text, "exit"))
     out.secondary_intent = INTENT_SERVICE_GUARDS;
   else if (ai_is_money_job_phrase(text))
     out.secondary_intent = INTENT_MONEY_JOB;
@@ -10162,6 +10198,7 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
   int guidance_forced = 0;
   int guidance_clarify_used = 0;
   int guidance_computed = 0;
+  int service_question_request = 0;
 
 #define AI_EVT_RETURN(_reason) do { \
   ai_dbg_evt(mob, (_reason), type, actor, text); \
@@ -10187,6 +10224,8 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
 
   ai_brain_ensure(mob);
   if (type == AI_EVENT_PLAYER_SAY && !ai_brain_can_speak(mob)) {
+    if (ai_debug)
+      ai_debug_log("AI_SKIP reason=BRAIN_NONVERBAL_GATE event=%s intent=%d target=%s", ai_event_reason_name(type), intent, ai_topic_key_name(guidance_query.target));
     enum ai_answer_domain nd = ai_plan_classify_domain(normalized);
     ai_react_nonverbal(mob, actor, (nd == AI_DOM_GREETING) ? AI_RX_TRIG_OPTIONAL_OTHER : AI_RX_TRIG_NON_SPEAK_ACTION_SELECTED);
 #if AI_ACTOR_DEBUG
@@ -10271,6 +10310,7 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
   }
   if (type == AI_EVENT_PLAYER_SAY) {
     ai_detect_guidance_query(normalized, &guidance_query);
+    service_question_request = ai_player_say_requires_service_reply(normalized);
     if (ai_debug && guidance_query.confidence > 0) {
       ai_debug_log("AI_GUIDANCE_INTENT vnum=%d conf=%d force=%d clarify=%d q=%d target=%s keyword=%s nav=%d inroom=%d quest=%d",
         GET_MOB_VNUM(mob), guidance_query.confidence, guidance_query.force_guidance, guidance_query.wants_clarify,
@@ -10286,13 +10326,15 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
     quality_score = ai_speech_quality_score(normalized, &quality_has_intent);
     if (quality_score < 26 && !quality_has_intent) {
       if (!(ai_is_attention_phrase(normalized) || ai_is_questionish_greeting(normalized) || ai_is_chat_request_phrase(normalized) ||
-            ai_is_help_request_phrase(normalized) || ai_is_thoughts_phrase(normalized) || ai_is_empathy_phrase(normalized))) {
+            ai_is_help_request_phrase(normalized) || ai_is_thoughts_phrase(normalized) || ai_is_empathy_phrase(normalized) || service_question_request)) {
         const char *clar = ai_service_menu_clarify_line(mob, role, style, rctx.evil_signaled, rctx.archetype, rctx.personality);
         char tiny[300];
         if (!clar || !*clar)
           clar = "What do you need: food, water, rest, or gear?";
         snprintf(tiny, sizeof(tiny), "$n says to %s, '%s'", GET_NAME(actor), clar);
         ai_actor_schedule_delayed_player_reply(mob, actor, tiny, rctx.personality, rctx.evil_signaled, rctx.archetype, now);
+        if (ai_debug)
+          ai_debug_log("AI_SKIP reason=LOW_QUALITY_CLARIFY event=%s intent=%d target=%s", ai_event_reason_name(type), intent, ai_topic_key_name(guidance_query.target));
         AI_EVT_RETURN("LOW_QUALITY_CLARIFY");
       }
     }
@@ -10316,6 +10358,8 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
                                  intent, rctx.domain, attention_score, suspicion, rx_result.threat, rx_result.urgency);
       if (ai_debug)
         ai_debug_log("AI_ARB decision=denied room=%d actor=%ld intent=%d mob=%d", IN_ROOM(mob), GET_IDNUM(actor), rx_result.intent, GET_MOB_VNUM(mob));
+      if (ai_debug)
+        ai_debug_log("AI_SKIP reason=ARB_SLOT_DENIED_EARLY event=%s intent=%d target=%s", ai_event_reason_name(type), rx_result.intent, ai_topic_key_name(guidance_query.target));
       AI_EVT_RETURN("ARB_SLOT_DENIED_EARLY");
     }
 
@@ -10323,7 +10367,7 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
   ai_state_push_event(mob, type, actor, normalized);
 
   if (type == AI_EVENT_PLAYER_SAY && attention_score < AI_ATTENTION_THRESHOLD) {
-    if (addressed_to_mob || service_style_request) {
+    if (addressed_to_mob || service_style_request || service_question_request) {
       ai_debug_log("ai_attention_clamp_addressed vnum=%d event=%s old=%.2f new=%.2f addressed=%d service=%d",
                    GET_MOB_VNUM(mob), ai_event_reason_name(type), attention_score, (float)AI_ATTENTION_THRESHOLD,
                    addressed_to_mob, service_style_request);
@@ -10334,8 +10378,14 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
   if (attention_score < AI_ATTENTION_THRESHOLD) {
     if (type == AI_EVENT_PLAYER_SAY && explicit_sexual_request)
       ai_debug_log("ai_attention_bypass_sexual_refusal vnum=%d event=%s score=%.2f", GET_MOB_VNUM(mob), ai_event_reason_name(type), attention_score);
-    else {
+    else if (type == AI_EVENT_PLAYER_SAY && service_question_request) {
+      if (ai_debug)
+        ai_debug_log("AI_SKIP_BYPASS reason=LOW_ATTENTION event=%s intent=%d target=%s", ai_event_reason_name(type), intent, ai_topic_key_name(guidance_query.target));
+      attention_score = AI_ATTENTION_THRESHOLD;
+    } else {
       ai_debug_log("ai_skip_attention vnum=%d event=%s score=%.2f", GET_MOB_VNUM(mob), ai_event_reason_name(type), attention_score);
+      if (ai_debug)
+        ai_debug_log("AI_SKIP reason=LOW_ATTENTION event=%s intent=%d target=%s", ai_event_reason_name(type), intent, ai_topic_key_name(guidance_query.target));
       AI_EVT_RETURN("LOW_ATTENTION");
     }
   }
@@ -10731,8 +10781,16 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
   {
     time_t last_reply = sr ? sr->last_reply_time : e->last_reply_time;
     if (type == AI_EVENT_PLAYER_SAY && conv_st && conv_st->last_player_idnum == GET_IDNUM(actor) &&
-        (now - conv_st->last_player_say_reply_at) < 1)
-      AI_EVT_RETURN("PER_PLAYER_SAY_REPLY_COOLDOWN");
+        (now - conv_st->last_player_say_reply_at) < 1) {
+      if (service_question_request) {
+        if (ai_debug)
+          ai_debug_log("AI_SKIP_BYPASS reason=PER_PLAYER_SAY_REPLY_COOLDOWN event=%s intent=%d target=%s", ai_event_reason_name(type), intent, ai_topic_key_name(guidance_query.target));
+      } else {
+        if (ai_debug)
+          ai_debug_log("AI_SKIP reason=PER_PLAYER_SAY_REPLY_COOLDOWN event=%s intent=%d target=%s", ai_event_reason_name(type), intent, ai_topic_key_name(guidance_query.target));
+        AI_EVT_RETURN("PER_PLAYER_SAY_REPLY_COOLDOWN");
+      }
+    }
     if (type != AI_EVENT_PLAYER_SAY && (now - last_reply) < AI_PER_PLAYER_REPLY_COOLDOWN_SECS)
       AI_EVT_RETURN("PER_PLAYER_REPLY_COOLDOWN");
   }
@@ -10882,7 +10940,7 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
           skip_voice = TRUE;
           intention.be_brief = 1;
           intention.goal = GOAL_SERVE;
-          guidance_computed = guidance_query.wants_clarify ? 0 : 1;
+          guidance_computed = (guidance_query.wants_clarify || ai_text_has_sub_ci(line, "cannot find")) ? 0 : 1;
           guidance_clarify_used = guidance_query.wants_clarify ? 1 : 0;
         }
       }
@@ -11087,6 +11145,8 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
 
       if (type == AI_EVENT_PLAYER_SAY && (rctx.domain == DOMAIN_SERVICES || rctx.domain == DOMAIN_SHOPPING || rctx.domain == DOMAIN_DIRECTIONS) && rctx.facts.confidence <= 1) {
         const char *svc_fb = ai_role_service_fallback_line(role, style, explicit_intent);
+        if (svc_fb && ai_line_has_hard_location_claim(svc_fb))
+          svc_fb = NULL;
         line = svc_fb ? svc_fb : ai_service_honest_fallback_line(role, rctx.primary_topic_target, rctx.archetype);
         skip_voice = TRUE;
       }
