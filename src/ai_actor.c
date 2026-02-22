@@ -712,6 +712,36 @@ static const char *const ai_imtb_leadin[IMTB_MAX][8] = {
   {"Hush.", "The air remembers.", "Listen to the quiet,", "The veil stirs.", "Hear the old hush,", NULL}
 };
 
+static const char *const ai_imtb_leadin_ext[IMTB_MAX][13] = {
+  {"Listen.", "Noted.", "Very well.", "Let's keep this plain.", "Straight answer:", "Steady.", "In brief.", "No flourish.", "Hear this.", "Plainly.", "To the point.", "One line:", NULL},
+  {"Hey there.", "Glad you asked.", "Happy to help.", "Good to see you.", "All right, friend.", "With a grin,", "Sure thing,", "You got it,", "Right with you,", "Easy now,", "Happy road to you,", "Let's sort it,", NULL},
+  {"Yeah.", "Make it quick.", "Fine.", "Spit it out.", "Keep it short.", "Hnh.", "Move it.", "Quick words.", "I'm listening.", "Say it clean.", "No rambling.", "Right, then.", NULL},
+  {"Well now.", "If you insist.", "Let us make this interesting.", "Right then.", "Here's the lively version.", "Oh, delight.", "A bright thought,", "Now that's a tune,", "Try this spin,", "For color,", "A quick flourish,", "As you please,", NULL},
+  {"Careful.", "Watch who you ask.", "Keep your voice down.", "Quiet now.", "Stay sharp.", "Eyes open.", "Hold your tongue.", "Low and slow.", "No names.", "Speak plain.", "Check your shadows.", "Not too loud.", NULL},
+  {"If memory serves,", "By common practice,", "According to what I know,", "From what the records show,", "Let me order this clearly:", "Catalog first,", "By ledger,", "By precedent,", "By exact note,", "In proper terms,", "As indexed,", "Methodically,", NULL},
+  {"By oath,", "By the light,", "By shadow,", "The omen is this:", "By ritual measure,", "By sacred mark,", "By vow,", "By rite,", "In witness,", "By consecrated word,", "By altar sign,", "As the rite commands,", NULL},
+  {"Hush.", "The air remembers.", "Listen to the quiet,", "The veil stirs.", "Hear the old hush,", "From the dim,", "Echoes gather,", "Night leans close,", "The cold speaks,", "Grave wind whispers,", "Faint bells answer,", "The mist listens,", NULL}
+};
+
+static const char *const ai_imtb_suffix_ext[IMTB_MAX][13] = {
+  {"stay steady", "in proper order", "that's sufficient", "mark it well", "that stands", "keep formation", "no further comment", "as expected", "done and settled", "hold to it", "clean and plain", "that is final", NULL},
+  {"if that helps", "good luck out there", "you're doing fine", "glad to help", "safe travels friend", "keep smiling", "you've got this", "happy hunting", "take care now", "may it go well", "all the best", "go with cheer", NULL},
+  {"don't dawdle", "move sharp", "that's enough", "keep your head", "no nonsense", "step lively", "make it fast", "keep it tight", "eyes forward", "waste no breath", "done talking", "keep moving", NULL},
+  {"call it style", "that's the trick", "try not to trip", "with a flourish", "and scene", "if you fancy", "for dramatic effect", "there's your punchline", "keep the rhythm", "make it sing", "that's the sparkle", "curtain falls", NULL},
+  {"watch your back", "keep it quiet", "no witnesses", "trust slowly", "check every corner", "speak to no one", "count your exits", "hide your trail", "not another word", "keep your hood low", "take the long way", "shadows only", NULL},
+  {"per available record", "by best estimate", "as noted", "per prior account", "within margin", "by formal measure", "in strict terms", "pending better data", "as tables suggest", "as archived", "under review", "for the record", NULL},
+  {"the omen agrees", "so it is sworn", "by rite and witness", "as the sign shows", "keep faith", "under sacred watch", "by holy measure", "as vowed", "let the rite stand", "in solemn order", "the mark is set", "amen to that", NULL},
+  {"the hush keeps count", "echoes remember", "in the cold dark", "the mist approves", "grave silence answers", "the veil watches", "old dust stirs", "night takes note", "under dim stars", "bones remember", "the dark listens", "so it fades", NULL}
+};
+
+enum ai_distinct_role_group {
+  DRG_GUARD = 0, DRG_BANDIT, DRG_CULTIST, DRG_MERCHANT, DRG_INNKEEPER, DRG_SPIRIT, DRG_UNDEAD, DRG_BEAST, DRG_GENERIC
+};
+
+enum ai_distinct_intent_class {
+  DINT_GREETING = 0, DINT_HELP_FOLLOWUP, DINT_SERVICE_MENU, DINT_TRAINING, DINT_FOOD_WATER, DINT_MONEY_REFUSAL, DINT_CONFUSION, DINT_REFUSAL
+};
+
 
 static const char *const ai_role_leadin_guard[] = {
   "On watch:", "By my duty,", NULL
@@ -7034,62 +7064,216 @@ static uint64_t ai_detect_creature_subtags(struct char_data *mob)
   return tags;
 }
 
+
+static const char *ai_alignment_bucket_name(int align)
+{
+  if (align >= 350)
+    return "good";
+  if (align <= -350)
+    return "evil";
+  return "neutral";
+}
+
+static enum ai_distinct_role_group ai_distinct_role_group_pick(struct char_data *mob, int role, int archetype, uint64_t subtags)
+{
+  if (archetype == AI_CREATURE_BEAST || (subtags & AI_SUB_BEASTIAL)) return DRG_BEAST;
+  if (archetype == AI_CREATURE_SPIRIT) return DRG_SPIRIT;
+  if (archetype == AI_CREATURE_UNDEAD) return DRG_UNDEAD;
+  (void)mob;
+  if (role == ROLE_GUARD || role == ROLE_BOSS || (subtags & AI_SUB_SOLDIERLY)) return DRG_GUARD;
+  if (role == ROLE_BANDIT || (subtags & AI_SUB_BANDITRY)) return DRG_BANDIT;
+  if (role == ROLE_CULTIST || (subtags & (AI_SUB_CULT | AI_SUB_FANATIC))) return DRG_CULTIST;
+  if (role == ROLE_MERCHANT || (subtags & AI_SUB_MERCANTILE)) return DRG_MERCHANT;
+  if (subtags & AI_SUB_INNKEEPING) return DRG_INNKEEPER;
+  return DRG_GENERIC;
+}
+
+static const char *ai_distinct_pool_pick(struct char_data *mob, enum ai_distinct_role_group grp, enum ai_distinct_intent_class icls, unsigned long salt, int *out_idx)
+{
+  static const char *const pools[DRG_GENERIC + 1][DINT_REFUSAL + 1][13] = {
+    [DRG_GUARD] = {
+      [DINT_GREETING] = {"Hail. Keep to the law.","On watch. State your business.","You have the watch's ear. Briefly.","Citizen, speak your need.","Hold there. What is it?","I am on duty. Be clear.","Road is watched. Your request?","Report in plain words.","Discipline first. Ask.","Guard post is active. Speak.","Keep order and ask cleanly.","By watch oath, be brief.",NULL},
+      [DINT_HELP_FOLLOWUP] = {"Need directions or trouble handled?","Do you seek a route or the watch?","Ask for roads, trainers, or safety.","Tell me: guidance, law, or supplies?","Need the barracks, guild, or market?","Point me: directions or protection?","Say whether this is training or danger.","Need lawful work or a path?","Do you need patrol aid or a landmark?","Road advice or watch business?","Pick one: route, trainer, or watch help.","Is this a peace matter or travel matter?",NULL},
+      [DINT_SERVICE_MENU] = {"Name one service: training, food, water, or lodging.","One request at a time: route, guard, or trainer.","Be specific: meal, room, drill, or directions.","Choose your need clearly: watch, inn, or supplies.","Single request, citizen: food, rest, or guidance.","Pick a category: law, route, or provisions.","State one need: trainer, tavern, or market.","Narrow it down: security, road, or rations.","What exactly: room, water, or training?","Select one service and I can point you.","Clear request please: guard, inn, or guild.","One clear need and I'll answer.",NULL},
+      [DINT_TRAINING] = {"Drills happen at the guild hall.","Find a guildmaster for proper training.","Training belongs to the yard, not this post.","Take your stance to the drillmaster.","Practice with the guild, not the gate.","The trainer keeps strict hours in the hall.","For skill work, report to the guild.","Steelwork training is done by masters.","You want progress, seek the training yard.","Discipline starts with the guildmaster.","March to the guild if you want instruction.","I enforce order; the guild teaches forms.",NULL},
+      [DINT_FOOD_WATER] = {"Rations are at the inn.","Water and stew are sold by the hearth.","Try the tavern for food and drink.","The cookhouse can feed you.","Find an inn bench for bread and water.","For meals, head to the common room.","Supplies and drink are market side.","The watch does not serve stew.","You'll eat better at the innkeeper's table.","Water skins and meals come from vendors.","Hunger is solved at the tavern fire.","Get fed at the next inn.",NULL},
+      [DINT_MONEY_REFUSAL] = {"No handouts from the watch.","Earn coin lawfully.","The guard issues no free gold.","I don't pay beggars.","Coin comes from work, not pleading.","Take lawful contracts for money.","No purse opens for that request.","The watch keeps order, not charity.","No free coin. Try the market.","Work earns silver; demands earn nothing.","I will not hand out gold.","Seek wages, not alms.",NULL},
+      [DINT_CONFUSION] = {"Your meaning is muddy.","Say that again, clearly.","I need a clearer request.","That was not specific enough.","Use plain words.","I cannot act on that.","Clarify your need.","Give me one clear ask.","I did not catch your point.","Try again, cleaner.","That request is too vague.","Speak directly.",NULL},
+      [DINT_REFUSAL] = {"No. Not my post.","Denied. Ask elsewhere.","I won't do that.","Negative. Move along.","That request is refused.","Not happening under my watch.","No permission for that.","I cannot grant that.","Refused. Keep moving.","No. Find another route.","I decline that ask.","Request denied.",NULL}
+    },
+    [DRG_BANDIT] = {
+      [DINT_GREETING] = {"Yeah? Speak quick.","You got a point, say it.","Don't stare. Talk.","Coin first, words second.","Keep your hands where I can see.","You hail me? Make it worth it.","Road's rough. Talk fast.","Got business or trouble?","If you're talking, be useful.","I hear you. Briefly.","No dawdling. Ask.","You called? Spit it out.",NULL},
+      [DINT_HELP_FOLLOWUP] = {"Need a fence, a route, or a warning?","You after coin tricks or safe alleys?","Ask for shortcuts, not sermons.","Need food, a bolt-hole, or a buyer?","Road tip or street tip?","Say if this is trade or trouble.","Need a place to duck or a place to eat?","Ask for work, wares, or exits.","You want hustle advice or directions?","Need to move unseen or move fed?","Pick: money angle, alley route, or meal.","Is this a survival ask or a shopping ask?",NULL},
+      [DINT_SERVICE_MENU] = {"Pick one hustle: food, room, gear, or coin lead.","One ask: hideout, market, or way out.","Choose cleanly: meal, supplies, or street route.","Name your angle: trade, shelter, or rumor.","Single request, cutter: gold, grub, or guidance.","Say one thing: buyer, bed, or bread.","Narrow it: alley, tavern, or trainer.","Pick a lane: food, work, or road.","What is it exactly: coin, water, or shelter?","Choose one and I might help.","One clear hustle and we're done.","Keep it simple: gear, grub, or getaway.",NULL},
+      [DINT_TRAINING] = {"I don't run drills.","Training? Find a guild soft-hand.","Learn by bleeding, not by me.","No academy here, just scars.","I teach nothing for free.","Take your training talk to a master.","Street lessons cost more than you pay.","Try the yard if you want forms.","I sharpen knives, not students.","Go find a proper trainer.","No practice hall in my shadow.","Train elsewhere.",NULL},
+      [DINT_FOOD_WATER] = {"Try the tavern before you faint.","Grub's at the inn, not my pocket.","Water skin sellers haunt the market.","Find a cookfire and pay up.","You'll get stew near the square.","Hunger? Buy bread like everyone.","Innkeeper has water if you have coin.","Food's two alleys over at the stalls.","Get fed at the hearthhouse.","Drink's at the taproom.","I don't carry spare rations.","Find a vendor for food and water.",NULL},
+      [DINT_MONEY_REFUSAL] = {"Not giving you my coin.","Ask for gold again and limp away.","No freebies.","Earn it or steal it elsewhere.","My purse stays shut.","You want money? Take a job.","No charity in these streets.","I owe you nothing.","Hands off my gold.","Coin is for crew, not beggars.","Not a copper from me.","Try someone softer.",NULL},
+      [DINT_CONFUSION] = {"That made no sense.","Use words that bite.","Say it straight.","You're mumbling air.","Try again without fog.","I can't work with that.","Clear ask or no deal.","Speak plain, stranger.","What are you actually after?","Too vague. Again.","No clue what you want.","Cut the haze and ask.",NULL},
+      [DINT_REFUSAL] = {"No deal.","Not happening.","I pass.","Find another mark.","Nope. Move.","I won't touch that.","Request denied, friend.","Not my game.","Dead end.","That's a hard no.","No, and we're done.","Take it elsewhere.",NULL}
+    },
+    [DRG_CULTIST] = {
+      [DINT_GREETING] = {"The rite sees you.","You stand before the sign.","Speak beneath the candle smoke.","The circle listens. Ask.","By shadowed vow, state your need.","The altar hears your greeting.","The hymn pauses for your words.","Speak, and mind the omen.","You are noticed by the faithful.","Under veiled stars, ask.","The mark is upon this talk.","Name your petition.",NULL},
+      [DINT_HELP_FOLLOWUP] = {"Do you seek guidance, shelter, or provision?","Need a path, a meal, or a lesson?","Ask for rite, road, or resource.","Say if you need food, training, or direction.","Is your need body, coin, or spirit?","Do you ask for inn, market, or counsel?","Choose: practical aid or sacred advice.","Need water, work, or a way onward?","Tell me if this is hunger or discipline.","Do you seek coin wisdom or travel wisdom?","Name one need and I will answer.","What burden shall I narrow first?",NULL},
+      [DINT_SERVICE_MENU] = {"Declare one need: bread, bed, blade, or bearing.","One petition only: food, water, lodging, or training.","Name your thread: coin, route, or provisions.","Single vow, single answer: choose your service.","Speak one category: meal, room, or instruction.","Choose clearly: guidance, goods, or rest.","One request through the veil, no more.","State one mortal need.","Pick one lane: trainer, tavern, or trader.","Give one clear petition and I respond.","One service at a time.","Name one practical rite.",NULL},
+      [DINT_TRAINING] = {"The training masters keep the discipline halls.","Seek a guildmaster for true drills.","I tend doctrine, not combat forms.","Your body is trained in the yard.","Skillcraft is taught by appointed masters.","Find the guild to hone your edge.","Practice belongs to ordered halls.","I can bless; I do not coach.","For training, follow the banners to the guild.","The rite does not replace a drillmaster.","Go where steel is instructed.","Seek structured instruction elsewhere.",NULL},
+      [DINT_FOOD_WATER] = {"The hearth will feed the hungry.","Find stew and clean water at the inn.","Bread waits where the tavern lamps burn.","The market has rations for coin.","Drink from the innkeeper's cask.","For hunger, seek the cookfire.","Meals are served in the common hall.","Water and food are a short walk away.","Ask the inn for bed and broth.","You will find provisions near the square.","The faithful do not stock rations here.","Take your hunger to the hearth.",NULL},
+      [DINT_MONEY_REFUSAL] = {"I grant no loose coin.","Gold is not given for idle asking.","No alms from this hand.","Earn coin by service, not demand.","Your purse must be filled by labor.","I refuse that request for money.","No free silver leaves this altar.","I offer counsel, not gold.","Seek work if you need coin.","I will not hand you money.","Coin follows effort.","That purse stays closed.",NULL},
+      [DINT_CONFUSION] = {"Your words are smoke.","I cannot read that omen.","Speak with sharper intent.","That petition is unclear.","Name one thing plainly.","Your meaning is veiled too deeply.","Try again in plain tongue.","I need clearer terms.","The sign is muddled. Clarify.","No clear request reached me.","Reduce your ask to one point.","Say it without fog.",NULL},
+      [DINT_REFUSAL] = {"No. The rite forbids it.","Denied by vow.","I refuse that petition.","That path is closed.","Not by my hand.","No permission is granted.","I will not aid that.","Your request is denied.","No. Ask another.","The circle declines.","That answer is no.","Refused.",NULL}
+    },
+    [DRG_MERCHANT] = {
+      [DINT_GREETING] = {"Welcome. Buying or selling?","Good day. Looking for wares?","Shop's open. What do you need?","Coin ready? I can help.","Greetings. Trade, room, or directions?","Step up, customer. What's your ask?","Need supplies today?","Looking for a fair bargain?","Wares are fresh. Speak your need.","Welcome to my counter.","Trade talk starts with clear requests.","Hello there, coinfriend.",NULL},
+      [DINT_HELP_FOLLOWUP] = {"Do you want to buy, sell, or rent a room?","Need supplies, food, or directions to a trainer?","Is this about goods, lodging, or coin work?","Ask me trade, meals, or routes.","Need market help or inn help?","Do you seek gear, water, or guidance?","Tell me if this is buying, selling, or resting.","Do you need prices, paths, or provisions?","Which first: wares, room, or road?","Need a vendor, a tavern, or a guild?","Pick one need and we can deal.","Are you here for trade or survival basics?",NULL},
+      [DINT_SERVICE_MENU] = {"Choose one service: wares, food, water, room, or route.","One request at a time: buy, sell, inn, or training direction.","Be specific: trade, lodging, or supplies.","Pick a category: market goods, meals, or guidance.","Name one need: coin, provisions, or rest.","Single request please: room, ration, or shop.","What exactly: buy, sell, eat, or train?","Narrow it down and I'll price it.","One clear ask gets the fastest answer.","Select one service lane: wares, water, or wayfinding.","Give me one category to work with.","One item of business, please.",NULL},
+      [DINT_TRAINING] = {"Training is guild business, not shop business.","I sell gear; guildmasters sell skill.","For drills, visit the training hall.","Take your training request to a master.","No practice sessions at this counter.","Guild hall handles TRAIN and PRAC.","You want lessons, find a trainer.","I'm a trader, not an instructor.","Training contracts are elsewhere.","Go to the guild if you seek discipline.","I can outfit you, not train you.","Find the drill yard for that.",NULL},
+      [DINT_FOOD_WATER] = {"Food and water are available at the inn.","Buy rations at market stalls nearby.","The tavern serves stew and drink.","Need water? The inn has clean casks.","For a meal, head to the hearthroom.","You can get bread and water in the square.","Try the cook stalls for quick food.","Innkeeper can set you up with a meal.","Rations cost less at the morning market.","Meals are sold by the tavern fire.","Food and drink are easy to find nearby.","I can point you to provisions.",NULL},
+      [DINT_MONEY_REFUSAL] = {"I don't hand out coin.","No free gold from this stall.","Earn your money by trade.","Charity is not in today's ledger.","I won't give you my purse.","Coin comes with work or wares.","No handout. Bring value.","Not a copper for begging.","I refuse money requests.","Sell loot if you need cash.","No free silver here.","This counter pays no alms.",NULL},
+      [DINT_CONFUSION] = {"I need a clearer order.","What exactly are you asking to buy?","That's too vague for a quote.","Specify the service.","I can't price that request yet.","Say one thing at a time.","Clarify your business.","Give me a cleaner ask.","Your order is unclear.","Name the item or service.","I didn't catch your intent.","Try again with specifics.",NULL},
+      [DINT_REFUSAL] = {"No deal.","I decline that trade.","Not for sale.","That transaction is refused.","I won't do that.","No agreement from me.","Request denied at this counter.","Not in my inventory.","I pass on that.","No, take other business.","That offer is rejected.","Refused.",NULL}
+    },
+    [DRG_INNKEEPER] = {
+      [DINT_GREETING] = {"Welcome in. Room or meal?","Hail, traveler. Need a bed?","Come to the hearth. What can I serve?","Good evening. Hungry or tired?","Take a seat. Room, water, or stew?","Welcome. Looking for rest?","Step inside. Need food or lodging?","The fire's warm. What's your need?","Hearth's open, friend.","Need a mug and a bed?","Inn's awake. Speak your request.","Welcome to my hall.",NULL},
+      [DINT_HELP_FOLLOWUP] = {"Do you need a room, a meal, or directions?","Looking for bed, bread, or guidance?","Ask for lodging, water, or local tips.","Need rest first or food first?","Do you want inn service or market directions?","Tell me if this is room, stew, or route.","Need a table, a cot, or a pointer?","Are you after comfort or supplies?","Shall I set a meal or point the way?","Need a safe bed or a quick drink?","Pick one need and I'll sort it.","Is this about resting, eating, or finding someone?",NULL},
+      [DINT_SERVICE_MENU] = {"Choose one: room, meal, water, or directions.","One request at a time: bed, bread, or route.","Name your need: lodging, food, or guidance.","Pick a service: inn stay, drink, or city pointer.","Single ask please: room, stew, or trainer direction.","Tell me one thing to arrange.","What exactly: bed, bowl, or bearings?","Choose one and I'll get moving.","One clear need works best.","Pick your comfort: cot, cask, or counsel.","Name one service from this hearth.","One at a time, traveler.",NULL},
+      [DINT_TRAINING] = {"Training happens at the guild, not the inn.","I pour drinks, I don't run drills.","Find a guildmaster for practice.","The yard teaches; I host sleepers.","For skill training, seek the hall.","No TRAIN sessions from this bar.","I can point you to the trainers.","Take your weapon forms to the guild.","Try the drillmaster for that.","Instruction is outside my hearth duties.","Guild doors are where you train.","I serve beds, not battle lessons.",NULL},
+      [DINT_FOOD_WATER] = {"Aye, we serve stew and water.","Sit down and I'll bring a meal.","We've got bread, broth, and clean drink.","Food and water are ready here.","You can eat by the fire.","Water cask is fresh tonight.","I can set a hot bowl for you.","Hungry? The kitchen is open.","Need a drink? Pull up a stool.","Meals are served till lamps-out.","You'll not go hungry in this hall.","Yes, we can feed you.",NULL},
+      [DINT_MONEY_REFUSAL] = {"I can't give away coin.","No free gold, sorry.","Paying guests keep this inn standing.","I serve food, not handouts.","No purse gifts from my counter.","You'll need work for coin.","I won't hand over silver.","Money isn't given, it's earned.","No charity purse tonight.","I cannot spare coin.","Try the job board for wages.","No, I don't give money.",NULL},
+      [DINT_CONFUSION] = {"I didn't catch that, traveler.","Could you ask that plain?","One thing at a time, please.","Was that room, meal, or directions?","Your request was fuzzy.","Say it again clearly.","I need a clearer order.","Tell me exactly what you need.","Too vague for me to serve.","Narrow it down for me.","I can help once I understand.","Try that again, simple and clear.",NULL},
+      [DINT_REFUSAL] = {"No, I can't do that.","I'm afraid that's not possible.","That request is denied.","I won't provide that.","No, traveler.","Not from this inn.","I must refuse.","Can't help with that one.","No service for that ask.","I decline that request.","That answer is no.","Refused.",NULL}
+    },
+    [DRG_SPIRIT] = {
+      [DINT_GREETING] = {"The veil parts for your voice.","A breath from the living reaches me.","You speak, and echoes answer.","The mist hears you.","From old silence, I attend.","Your greeting stirs pale currents.","A mortal word in hollow air.","The dim path acknowledges you.","Speak before the hush closes.","I listen through the cold.","Your voice finds the threshold.","Ask, while the veil is thin.",NULL},
+      [DINT_HELP_FOLLOWUP] = {"Do you seek a path, a hearth, or a warning?","Need bread for flesh, or direction for feet?","Name if you seek trainer, table, or trail.","Is your need for body, coin, or road?","Say whether you hunger or wander.","Do you ask for shelter or steelcraft?","Choose one thread: rest, ration, or route.","Need mortal service or ghostly counsel?","Do you seek market signs or safe ground?","Tell me if this is hunger, training, or coin.","One request, and the mist may guide.","What burden shall I name first?",NULL},
+      [DINT_SERVICE_MENU] = {"Speak one need through the fog: food, room, route, or training.","One thread only: water, shelter, goods, or guidance.","Name one mortal want.","Choose one service and the echo will point.","Single request: bread, bed, blade, or bearing.","Pick one from the dim ledger of needs.","Say one clear thing: meal, market, or map.","One ask at a time, living one.","Define your need and I answer.","What single service do you seek?","Narrow your wish to one thread.","One clear petition, no more.",NULL},
+      [DINT_TRAINING] = {"I teach no living drills.","Seek the guild where steel still rings.","Training belongs to warm hands.","Find a master of flesh and form.","The dead remember, but do not coach.","Go to the yard for discipline.","My counsel is not practice.","For TRAIN, seek the living masters.","I cannot guide your stance.","Skillcraft waits in mortal halls.","No drill circles in this hush.","Ask a guildmaster, not a ghost.",NULL},
+      [DINT_FOOD_WATER] = {"The living inn keeps bread and water.","Follow lamplight to the hearth for food.","A tavern cask will answer your thirst.","The market sells rations to warm blood.","Seek stew where fire still burns.","Water waits in mortal hands nearby.","Find a table in the common hall.","Go where kitchens breathe.","Your hunger is solved among the living.","Take your thirst to the inn.","I cannot feed you, but I can point.","Bread lies beyond this chill.",NULL},
+      [DINT_MONEY_REFUSAL] = {"Ghosts carry no purse for beggars.","No coin passes from this shade.","I grant omens, not gold.","The dead pay no alms.","I will not give money.","Silver is for the breathing to earn.","No treasure leaves this hush.","Seek wages among the living.","My hands hold only cold air.","No coin for that request.","I refuse your ask for gold.","Find work, not specters.",NULL},
+      [DINT_CONFUSION] = {"Your words scatter like mist.","The meaning fades before it forms.","Speak again, less clouded.","I hear sound, not intent.","Clarify before the echo dies.","One clear thread, please.","That ask is swallowed by fog.","Name your need in plain tone.","I cannot read that murmur.","Too vague for even ghosts.","Say it once, clearly.","The veil needs clearer words.",NULL},
+      [DINT_REFUSAL] = {"No. The veil withholds.","Denied by old silence.","I refuse that thread.","That path is shut.","No answer will open there.","I will not aid that wish.","The hush says no.","Not granted.","No, living one.","That request dies here.","Refused in the cold.","No.",NULL}
+    },
+    [DRG_UNDEAD] = {
+      [DINT_GREETING] = {"Bones turn toward your voice.","Cold attention falls on you.","Speak, warmblood.","The grave listens briefly.","Your greeting rattles old dust.","I hear you from hollow lungs.","State it before patience rots.","The dead acknowledge you.","Words, quickly.","You wake old ears.","The crypt grants a moment.","Ask and be done.",NULL},
+      [DINT_HELP_FOLLOWUP] = {"Need directions, rations, or training hall?","Say if you seek food, coin, or route.","Do you ask for shelter or steelcraft?","Choose one need: bed, bread, or bearing.","State if this is hunger or discipline.","Need the inn, market, or guild?","Tell me your one mortal requirement.","Is this about water, work, or wayfinding?","Pick trainer, tavern, or trader.","Name one service and stop circling.","Need road guidance or purse advice?","Choose your need before the dust settles.",NULL},
+      [DINT_SERVICE_MENU] = {"One need only: food, water, lodging, or route.","Name one service from your living list.","Choose clearly: trainer, inn, market, or guard.","Single request, warmblood.","Pick bread, bed, blade, or bearings.","State one category and I respond.","Narrow your ask to one bone.","One service at a time.","What exactly do you seek?","Give one clear need.","Your request must be singular.","Choose and be concise.",NULL},
+      [DINT_TRAINING] = {"I am not your drillmaster.","Training belongs to the guild.","Take your practice to living masters.","No TRAIN from dead hands.","Seek steel lessons elsewhere.","The yard teaches better than bones.","Find a guildmaster for forms.","I remember battles, not lessons.","Practice in the hall, not here.","No instruction from this corpse.","Go where trainers still breathe.","I refuse training requests.",NULL},
+      [DINT_FOOD_WATER] = {"The inn feeds the living.","Find water at the tavern cask.","Market stalls sell bread and skins.","Go to the hearth for stew.","Your hunger is not solved by me.","Take thirst to the innkeeper.","Food waits where fires burn.","Seek the common room for meals.","Rations are sold nearby.","I do not eat, but you can.","Get fed at the nearest inn.","Water and bread are for the living hall.",NULL},
+      [DINT_MONEY_REFUSAL] = {"No coin from dead fingers.","I give no gold.","Beg elsewhere.","Money is not granted here.","I keep no charity purse.","No silver for you.","Earn your own coin.","I refuse your money demand.","Not a copper.","No alms from the grave.","Your request for gold is denied.","No.",NULL},
+      [DINT_CONFUSION] = {"Your words decay before meaning.","Unclear.","Speak plainly, warmblood.","That request is rotten with vagueness.","I need one clear ask.","No sense in that mutter.","Try again, cleaner.","I cannot parse your noise.","Clarify before I lose interest.","Your meaning is brittle.","One sentence, clear.","That was fog.",NULL},
+      [DINT_REFUSAL] = {"Denied.","No.","I refuse.","That is rejected.","Not granted.","Request refused.","I will not comply.","No aid from me.","That path is closed.","Declined.","No further.","Never.",NULL}
+    },
+    [DRG_BEAST] = {
+      [DINT_GREETING] = {"*the beast sniffs and huffs*","*a low growl answers*","*ears twitch; it watches you*","*it paws the ground once*","*a short bark, then a stare*","*it circles, alert*","*tail flick, wary eyes*","*it snorts and waits*","*a rumble in its chest*","*it tilts its head*","*a sharp sniff of your scent*","*it gives a brief howl*",NULL},
+      [DINT_HELP_FOLLOWUP] = {"*it growls, then glances toward townfolk*","*a bark: food, water, or move along*","*it sniffs your pack and the street*","*the beast nudges toward the inn door*","*it paws twice, then points its muzzle down the road*","*a low whine asks what you want*","*it stares at your hands, then the market*","*the animal huffs at the water trough*","*it nudges toward nearby humans for help*","*a growl, then a look toward the guard post*","*it waits for one clear signal*","*it snorts and looks to the tavern light*",NULL},
+      [DINT_SERVICE_MENU] = {"*it growls: one need, one scent*","*a huff: choose food, water, or shelter*","*the beast paws once, waiting for one ask*","*it snorts for a single clear request*","*a rumble says pick one thing*","*it gives one bark for one need*","*it waits, ears forward, for one cue*","*the animal demands one simple signal*","*it grunts: one request only*","*a short growl asks for one trail*","*it watches for one clear motion*","*one snort: choose and move*",NULL},
+      [DINT_TRAINING] = {"*it growls; no drills here*","*the beast cannot teach forms*","*a huff: find a human trainer*","*it shakes its head at training talk*","*no practice lessons from fangs*","*it paces, uninterested in drills*","*the animal only knows instinct*","*it barks toward the barracks*","*training words get a confused snort*","*it cannot coach your stance*","*a low rumble: seek a guildmaster*","*the beast turns away from that ask*",NULL},
+      [DINT_FOOD_WATER] = {"*it sniffs the air toward cooking smoke*","*a bark points toward water*","*it noses toward the inn and whines*","*the beast paws by a nearby trough*","*it stares at your ration bag*","*a short howl toward tavern lamps*","*it nudges you toward the market stalls*","*the animal sniffs for bread scent nearby*","*it huffs and points toward the hearth*","*it snorts at the smell of stew*","*a paw-scratch near the water barrel*","*it urges you toward food smells*",NULL},
+      [DINT_MONEY_REFUSAL] = {"*the beast bares teeth at the word coin*","*a growl: no gold here*","*it snorts; money means nothing to it*","*the animal paws dirt, refusing*","*a sharp bark rejects the ask*","*it stares blankly at coin talk*","*the beast turns away from money words*","*no purse, only claws*","*it growls and guards its space*","*a rumble says no handouts*","*it huffs, unimpressed by begging*","*the beast ignores coin demands*",NULL},
+      [DINT_CONFUSION] = {"*it cocks its head, confused*","*a puzzled whine*","*the beast sniffs, unsure*","*it gives a questioning growl*","*ears flatten; it doesn't understand*","*it snorts and waits for clearer cues*","*the animal blinks, confused*","*a low uncertain rumble*","*it paws once, asking again*","*the beast needs a simpler signal*","*it circles, not understanding*","*a short bark for clarity*",NULL},
+      [DINT_REFUSAL] = {"*a firm growl of refusal*","*it snaps the air: no*","*the beast turns away*","*it plants its paws and refuses*","*a warning bark denies you*","*it bares teeth and declines*","*the animal won't do that*","*it steps back, refusing*","*a low snarl says no*","*it ignores the request*","*the beast declines with a huff*","*no response but a hard stare*",NULL}
+    },
+    [DRG_GENERIC] = {
+      [DINT_GREETING] = {"Hello. What do you need?","Hail. Speak your ask.","Greetings. Be clear.","Well met. How can I help?","Good day. Your request?","I'm listening. Briefly.","What brings you here?","Ask and I will answer if I can.","State your business.","Need something specific?","Speak plainly and we'll do fine.","Hail, traveler.",NULL},
+      [DINT_HELP_FOLLOWUP] = {"Do you need directions, food, or training?","Tell me if this is coin, rest, or route.","Need an inn, a market, or a guild?","Ask for one thing and I'll point you.","Is this about supplies or shelter?","Need food, water, or a trainer?","Say what kind of help you need.","Do you seek work, wares, or wayfinding?","Pick one need to start.","Need a bed, a meal, or guidance?","Is this a service question or a rumor question?","What should I narrow down first?",NULL},
+      [DINT_SERVICE_MENU] = {"Choose one service: food, water, rest, gear, or training.","One request at a time please.","Name one category and I can help.","Pick one need clearly.","Say whether you need room, meal, or route.","Single request works best.","One clear ask: trainer, inn, or market.","Tell me exactly one service.","Narrow your request for me.","Choose one practical need.","One thing first, then another.","Give one clear category.",NULL},
+      [DINT_TRAINING] = {"Training is handled by guildmasters.","Find the training hall for drills.","You'll need a proper trainer.","No practice lessons from me.","Seek the guild for TRAIN and PRAC.","The guild handles instruction.","I can't train you here.","Try the drill yard.","Take that ask to a trainer.","For skill work, head to the guild.","Instruction is elsewhere.","Ask a guildmaster.",NULL},
+      [DINT_FOOD_WATER] = {"Try the inn for food and water.","You can get a meal at the tavern.","Market stalls sell rations nearby.","The innkeeper can help with drink.","Find the hearth for stew.","Food and water are nearby.","Head to the common room for a meal.","Bread and water can be bought in town.","Try the cook stalls.","You'll find provisions near the square.","Eat and drink at the inn.","Supplies are available nearby.",NULL},
+      [DINT_MONEY_REFUSAL] = {"I can't give you money.","No free coin from me.","You'll need to earn gold.","I don't hand out silver.","No handouts.","Coin comes from work.","I won't give money.","Try finding paid work.","No purse for begging.","Earn it through labor.","That request is denied.","No gold for free.",NULL},
+      [DINT_CONFUSION] = {"I don't follow.","Could you be clearer?","Say that again plainly.","I need a clearer request.","Too vague for me.","One thing at a time.","Clarify your ask.","I didn't catch your meaning.","Try again, simple words.","What exactly do you need?","That wasn't clear.","Please narrow the request.",NULL},
+      [DINT_REFUSAL] = {"No.","I can't do that.","That request is refused.","Not possible.","I won't help with that.","Denied.","Not from me.","I decline.","That answer is no.","Request rejected.","No aid there.","Refused.",NULL}
+    }
+  };
+  const char *const *pool = pools[grp][icls];
+  int i, count = 0;
+  unsigned long seed;
+
+  for (i = 0; i < 12 && pool[i]; i++)
+    count++;
+  if (count <= 0)
+    return "";
+
+  seed = ai_hash_mix((unsigned long)(mob ? GET_MOB_VNUM(mob) : 0), salt);
+  if (mob && mob->ai_prof) {
+    seed = ai_hash_mix(seed, (unsigned long)mob->ai_prof->role);
+    seed = ai_hash_mix(seed, (unsigned long)mob->ai_prof->style);
+  }
+  if (out_idx)
+    *out_idx = (int)(seed % (unsigned long)count);
+  return ai_pick_line_from_pool(mob, pool, count, salt);
+}
+
+static const char *ai_imtb_pick_suffix_for_player(struct ai_conv_actor_state *st, const struct ai_reply_context *rctx, long player_idnum, unsigned long seed, int *out_used)
+{
+  const char *frag;
+  int personality;
+  if (out_used) *out_used = 0;
+  if (!st || !rctx || player_idnum <= 0)
+    return "";
+  if (st->micro_player_id == player_idnum && (time(0) - st->last_micro_ts) < 30)
+    return "";
+  personality = (rctx->personality >= 0 && rctx->personality < IMTB_MAX) ? rctx->personality : IMTB_STOIC;
+  frag = ai_imtb_pick_fragment(ai_imtb_suffix_ext[personality], ai_hash_mix(seed, 911));
+  if (!frag || !*frag)
+    return "";
+  st->micro_player_id = player_idnum;
+  st->last_micro_ts = time(0);
+  if (out_used) *out_used = 1;
+  return frag;
+}
+
+static const char *ai_distinct_reply_line(struct char_data *mob, struct ai_conv_actor_state *st, const struct ai_reply_context *rctx, enum ai_distinct_intent_class icls, long player_idnum, char *out, size_t outsz, const char **out_pool_label)
+{
+  enum ai_distinct_role_group grp;
+  const char *core;
+  const char *lead = "";
+  const char *suf = "";
+  int core_idx = -1;
+  int lead_idx = -1;
+  int suf_used = 0;
+  int personality;
+  int mode;
+  unsigned long salt_base;
+  if (!mob || !rctx || !out || outsz == 0)
+    return "";
+  grp = ai_distinct_role_group_pick(mob, mob->ai_prof ? mob->ai_prof->role : ROLE_UNKNOWN, rctx->archetype, rctx->subtags);
+  salt_base = ai_hash_mix((unsigned long)icls, (unsigned long)(grp * 137 + rctx->personality * 19));
+  core = ai_distinct_pool_pick(mob, grp, icls, ai_hash_mix(salt_base, 401), &core_idx);
+  personality = (rctx->personality >= 0 && rctx->personality < IMTB_MAX) ? rctx->personality : IMTB_STOIC;
+  lead = ai_imtb_pick_fragment(ai_imtb_leadin_ext[personality], ai_hash_mix(salt_base, 503));
+  {
+    int n=0; while (ai_imtb_leadin_ext[personality][n]) n++; if (n>0) lead_idx=(int)(ai_hash_mix(salt_base,503)% (unsigned long)n);
+  }
+  suf = ai_imtb_pick_suffix_for_player(st, rctx, player_idnum, ai_hash_mix(salt_base, 607), &suf_used);
+  mode = (int)(ai_hash_mix(salt_base, 701) % 10UL);
+  if (mode < 5 && lead && *lead)
+    snprintf(out, outsz, "%s %s", lead, core);
+  else if (mode < 9 && suf && *suf)
+    snprintf(out, outsz, "%s, %s", core, suf);
+  else if (lead && *lead && suf && *suf)
+    snprintf(out, outsz, "%s %s, %s", lead, core, suf);
+  else
+    snprintf(out, outsz, "%s", core);
+  if (out_pool_label)
+    *out_pool_label = (icls == DINT_HELP_FOLLOWUP) ? "HELP_FOLLOWUP" :
+                      (icls == DINT_SERVICE_MENU) ? "SERVICE_CLARIFY_MENU" :
+                      (icls == DINT_GREETING) ? "GREETING" :
+                      (icls == DINT_TRAINING) ? "TRAINING_RESPONSE" :
+                      (icls == DINT_FOOD_WATER) ? "FOOD_WATER_RESPONSE" :
+                      (icls == DINT_MONEY_REFUSAL) ? "MONEY_REQUEST_REFUSAL" :
+                      (icls == DINT_CONFUSION) ? "CONFUSION_GENERIC" : "REFUSAL_GENERIC";
+  if (ai_debug)
+    ai_debug_log("AI_DISTINCT_PICK vnum=%d pool=%s grp=%d align=%s imtb=%d core_idx=%d lead_idx=%d suffix=%d", GET_MOB_VNUM(mob), (out_pool_label && *out_pool_label) ? *out_pool_label : "CORE", grp, ai_alignment_bucket_name(GET_ALIGNMENT(mob)), personality, core_idx, lead_idx, suf_used);
+  return out;
+}
+
 static const char *ai_service_menu_clarify_line(struct char_data *mob, int role, int style, int evil, int archetype, int personality)
 {
-  static const char *const evil_pool[] = {
-    "Pick one: food, water, inn, weapons, supplies, guards, or training?",
-    "One at a time: food, water, inn, weapons, supplies, guards, or practice?",
-    "Choose clearly: food, water, inn, weapons, supplies, guards, or train?",
-    NULL
-  };
-  static const char *const guard_pool[] = {
-    "State it clean: food, water, inn, weapons, supplies, guards, or training?",
-    "Be specific: food, water, inn, weapons, supplies, guards, or practice?",
-    "Name your need: food, water, inn, weapons, supplies, guards, or train?",
-    NULL
-  };
-  static const char *const merchant_pool[] = {
-    "What are you after: food, water, inn, weapons, supplies, guards, or training?",
-    "Do you need food, water, an inn, weapons, supplies, guards, or practice?",
-    "Point me to it: food, water, inn, weapons, supplies, guards, or train?",
-    NULL
-  };
-  static const char *const beast_pool[] = {
-    "*a low growl asks for one scent: food, water, inn, weapons, supplies, or guards?*",
-    "*the beast huffs: food, water, inn, weapons, supplies, or guards?*",
-    "*it tilts its head: food, water, inn, weapons, supplies, or training?*",
-    NULL
-  };
-  static const char *const spirit_pool[] = {
-    "Name one thread: food, water, inn, weapons, supplies, guards, or training?",
-    "Speak one need: food, water, inn, weapons, supplies, guards, or practice?",
-    "One request only: food, water, inn, weapons, supplies, guards, or train?",
-    NULL
-  };
-  static const char *const personality_pool[][3] = {
-    {"Do you mean food, water, inn, weapons, supplies, guards, or training?", "Pick one need: food, water, inn, weapons, supplies, guards, or practice?", "Be direct: food, water, inn, weapons, supplies, guards, or train?"},
-    {"Happy to help—food, water, inn, weapons, supplies, guards, or training?", "Sure thing. Food, water, inn, weapons, supplies, guards, or practice?", "Let's sort it out: food, water, inn, weapons, supplies, guards, or train?"},
-    {"Keep it short: food, water, inn, weapons, supplies, guards, or training?", "One need only: food, water, inn, weapons, supplies, guards, or practice?", "Quickly—food, water, inn, weapons, supplies, guards, or train?"},
-    {"Riddle me this: food, water, inn, weapons, supplies, guards, or training?", "Which tune today—food, water, inn, weapons, supplies, guards, or practice?", "Your verse says what: food, water, inn, weapons, supplies, guards, or train?"},
-    {"Say one exact thing: food, water, inn, weapons, supplies, guards, or training?", "Specifics only: food, water, inn, weapons, supplies, guards, or practice?", "No blur: food, water, inn, weapons, supplies, guards, or train?"},
-    {"Classify your ask: food, water, inn, weapons, supplies, guards, or training?", "Identify category: food, water, inn, weapons, supplies, guards, or practice?", "Select one service: food, water, inn, weapons, supplies, guards, or train?"},
-    {"Choose your rite: food, water, inn, weapons, supplies, guards, or training?", "Declare one need: food, water, inn, weapons, supplies, guards, or practice?", "Speak one omen: food, water, inn, weapons, supplies, guards, or train?"}
-  };
-  unsigned long salt = ai_hash_mix((unsigned long)style, (unsigned long)(role * 37 + archetype * 11 + personality));
-
-  if (evil)
-    return ai_pick_line_from_pool(mob, evil_pool, 3, ai_hash_mix(salt, 7));
-  if (archetype == AI_CREATURE_BEAST)
-    return ai_pick_line_from_pool(mob, beast_pool, 3, ai_hash_mix(salt, 13));
-  if (archetype == AI_CREATURE_SPIRIT || archetype == AI_CREATURE_UNDEAD)
-    return ai_pick_line_from_pool(mob, spirit_pool, 3, ai_hash_mix(salt, 17));
-  if (role == ROLE_GUARD)
-    return ai_pick_line_from_pool(mob, guard_pool, 3, ai_hash_mix(salt, 23));
-  if (role == ROLE_MERCHANT || (role == ROLE_MERCHANT && style == 1))
-    return ai_pick_line_from_pool(mob, merchant_pool, 3, ai_hash_mix(salt, 29));
-  if (personality >= IMTB_STOIC && personality < IMTB_MAX)
-    return ai_pick_line_from_pool(mob, personality_pool[personality], 3, ai_hash_mix(salt, 31));
-  return "Do you mean food, water, inn, weapons, supplies, guards, or training?";
+  enum ai_distinct_role_group grp;
+  int idx = -1;
+  uint64_t subtags = ai_detect_creature_subtags(mob);
+  (void)evil;
+  (void)style;
+  grp = ai_distinct_role_group_pick(mob, role, archetype, subtags);
+  return ai_distinct_pool_pick(mob, grp, DINT_SERVICE_MENU, ai_hash_mix((unsigned long)personality, 1901UL), &idx);
 }
 
 static void ai_state_refresh_local_topics(struct char_data *mob)
@@ -7549,40 +7733,36 @@ static int ai_count_multi_service_hits(const char *text, int *has_food, int *has
 
 static const char *ai_social_prompt_line(struct char_data *mob, int role, int style, enum ai_explicit_intent ex, int mood, int archetype, int personality)
 {
-  unsigned long salt = ai_hash_mix((unsigned long)(role * 17 + style), (unsigned long)(personality * 13 + archetype));
-  if (ex == INTENT_GREETING || ex == INTENT_ATTENTION) {
-    if (role == ROLE_GUARD) return ai_pick_line_from_pool(mob, (const char *const[]){"Hail. I'm on watch--what do you need?", "State your business. Keep it clear.", "Watch is active. What's your need?", NULL}, 3, ai_hash_mix(salt, 3));
-    if (role == ROLE_MERCHANT) return ai_pick_line_from_pool(mob, (const char *const[]){"Hello there. Need goods, rest, or directions?", "Welcome. Shopping, lodging, or a route?", "Greetings. Looking for wares, a room, or guidance?", NULL}, 3, ai_hash_mix(salt, 5));
-    if (mob && MOB_FLAGGED(mob, MOB_GUILD_MASTER)) return ai_pick_line_from_pool(mob, (const char *const[]){"Greetings. If you train, be precise.", "Hail. Name the skill you seek.", "Welcome. Speak clearly if you want instruction.", NULL}, 3, ai_hash_mix(salt, 7));
-    if (role == ROLE_BANDIT) return ai_pick_line_from_pool(mob, (const char *const[]){"Yeah, I'm here. Talk fast.", "You got words? Make them quick.", "I'm listening. Don't waste it.", NULL}, 3, ai_hash_mix(salt, 11));
-    return ai_pick_line_from_pool(mob, (const char *const[]){"Hello. What can I do for you?", "Greetings. What do you need?", "Hail. Ask and I'll answer if I can.", NULL}, 3, ai_hash_mix(salt, 13));
-  }
-  if (ex == INTENT_CHAT_REQUEST) {
-    if (role == ROLE_GUARD) return "All right, let's talk. Need directions, safety advice, or work leads?";
-    if (role == ROLE_MERCHANT) return "Happy to talk. Looking for supplies, a room, or a fair trade?";
-    if (mob && MOB_FLAGGED(mob, MOB_GUILD_MASTER)) return "We can talk. Want training tips, practice basics, or survival advice?";
-    return "Sure, let's talk. What do you want to start with?";
-  }
-  if (ex == INTENT_HELP_REQUEST)
-    return ai_pick_line_from_pool(mob, (const char *const[]){"I can help. What do you need most: food, rest, training, supplies, or directions?", "Say your need: food, water, inn, training, supplies, or directions?", "Let's narrow it: food, rest, training, supplies, guards, or route?", NULL}, 3, ai_hash_mix(salt, 17));
-  if (ex == INTENT_THOUGHTS) {
-    if (role == ROLE_GUARD) return "Right now I'm watching the road and keeping the peace.";
-    if (role == ROLE_MERCHANT) return "Right now I'm tracking stock, coin, and who needs what.";
-    if (mob && MOB_FLAGGED(mob, MOB_GUILD_MASTER)) return "Right now I'm focused on discipline and steady improvement.";
-    return "Right now I'm focused on my duty here.";
-  }
-  if (ex == INTENT_EMPATHY) {
-    if (mood >= AI_SOCIAL_ANNOYED) return "I hear you. Say what you need and I'll answer plainly.";
-    if (role == ROLE_BANDIT) return "I care enough to listen. Say what you need.";
-    return "Yes, I care. Tell me what you need right now.";
-  }
-  if (ex == INTENT_MONEY_JOB) {
-    if (role == ROLE_GUARD) return "For coin, look for lawful work: errands, bounties, or market labor.";
-    if (role == ROLE_MERCHANT) return "Earn coin by selling loot, trading cleanly, or helping at market stalls.";
-    if (mob && MOB_FLAGGED(mob, MOB_GUILD_MASTER)) return "Train to stay alive, then take steady work in town for coin.";
-    return ai_pick_line_from_pool(mob, (const char *const[]){"Look for honest work in town and keep your coin secure.", "Coin comes from steady labor, clean trade, and survival.", "Take work, keep your head, and protect your purse.", NULL}, 3, ai_hash_mix(salt, 19));
-  }
-  return NULL;
+  static char out[512];
+  struct ai_reply_context rctx;
+  struct ai_conv_actor_state *st = ai_conv_actor_state_get(mob, 1);
+  const char *pool_label = NULL;
+  enum ai_distinct_intent_class icls = DINT_CONFUSION;
+  (void)style;
+  (void)mood;
+  memset(&rctx, 0, sizeof(rctx));
+  rctx.personality = personality;
+  rctx.archetype = archetype;
+  rctx.subtags = st ? st->creature_subtags : ai_detect_creature_subtags(mob);
+  rctx.evil_signaled = ai_is_evil_signaled(mob);
+
+  if (ex == INTENT_GREETING || ex == INTENT_ATTENTION)
+    icls = DINT_GREETING;
+  else if (ex == INTENT_HELP_REQUEST)
+    icls = DINT_HELP_FOLLOWUP;
+  else if (ex == INTENT_MONEY_JOB)
+    icls = DINT_MONEY_REFUSAL;
+  else if (ex == INTENT_CHAT_REQUEST)
+    icls = DINT_HELP_FOLLOWUP;
+  else
+    icls = DINT_CONFUSION;
+
+  ai_distinct_reply_line(mob, st, &rctx, icls, st ? st->last_player_idnum : 0, out, sizeof(out), &pool_label);
+  if (mob && mob->ai_state)
+    ai_set_last_speech_meta(mob, pool_label ? pool_label : "SOCIAL_PROMPT", "SOCIAL_PROMPT");
+  if (ai_debug)
+    ai_debug_log("AI_DISTINCT_ROUTE vnum=%d ex=%d role=%s arch=%d align=%s imtb=%d pool=%s", GET_MOB_VNUM(mob), ex, ai_role_name_local(role), archetype, ai_alignment_bucket_name(GET_ALIGNMENT(mob)), personality, pool_label ? pool_label : "NONE");
+  return out;
 }
 
 static int ai_player_speech_classify(const char *text, int *out_confidence, int *out_is_weather)
@@ -9371,25 +9551,37 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
       }
 
       if (!line && type == AI_EVENT_PLAYER_SAY && ai_intent_is_service(explicit_intent)) {
+        const char *pl = NULL;
+        enum ai_distinct_intent_class dcls = DINT_SERVICE_MENU;
+        if (explicit_intent == INTENT_SERVICE_TRAINING)
+          dcls = DINT_TRAINING;
+        else if (explicit_intent == INTENT_SERVICE_FOOD || explicit_intent == INTENT_SERVICE_WATER)
+          dcls = DINT_FOOD_WATER;
         if (!has_capability) {
-          line = ai_role_redirect_line(role, style, rctx.primary_topic_target);
-          if (!line || !*line)
-            line = ai_role_service_fallback_line(role, style, explicit_intent);
-          if (!line || !*line)
-            line = ai_service_honest_fallback_line(role, rctx.primary_topic_target, rctx.archetype);
+          if (rctx.archetype == AI_CREATURE_BEAST)
+            dcls = DINT_REFUSAL;
+          ai_distinct_reply_line(mob, conv_st, &rctx, dcls == DINT_SERVICE_MENU ? DINT_REFUSAL : dcls, GET_IDNUM(actor), voiced, sizeof(voiced), &pl);
+          line = voiced;
         } else if (explicit_intent == INTENT_SERVICE_TRAINING) {
-          line = "Yes. Use TRAIN to spend training sessions. Use PRAC to spend practice sessions.";
+          ai_distinct_reply_line(mob, conv_st, &rctx, DINT_TRAINING, GET_IDNUM(actor), voiced, sizeof(voiced), &pl);
+          line = voiced;
+        } else if (explicit_intent == INTENT_SERVICE_FOOD || explicit_intent == INTENT_SERVICE_WATER) {
+          ai_distinct_reply_line(mob, conv_st, &rctx, DINT_FOOD_WATER, GET_IDNUM(actor), voiced, sizeof(voiced), &pl);
+          line = voiced;
         } else if (rctx.facts.confidence >= 3 && rctx.facts.service_name[0]) {
           snprintf(service_line, sizeof(service_line), "%s. %s", rctx.facts.service_name, rctx.facts.route_snippet[0] ? rctx.facts.route_snippet : "Go there directly.");
           line = service_line;
         } else {
-          line = ai_epistemic_line(rctx.facts.confidence, role, rctx.primary_topic_target);
+          ai_distinct_reply_line(mob, conv_st, &rctx, DINT_SERVICE_MENU, GET_IDNUM(actor), voiced, sizeof(voiced), &pl);
+          line = voiced;
         }
         if (line && *line) {
           rctx.chosen_core = line;
           skip_voice = TRUE;
           intention.be_brief = 1;
           intention.goal = GOAL_SERVE;
+          if (pl)
+            ai_set_last_speech_meta(mob, pl, "SERVICE_INTENT");
         }
       }
 
@@ -9492,8 +9684,22 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
             epi = "No pet ledgers here; ask a stablemaster or market vendors.";
           else
             epi = "Try market gossip or the stablemaster for pets.";
-        } else if (type == AI_EVENT_PLAYER_SAY && (rctx.domain == DOMAIN_SERVICES || rctx.domain == DOMAIN_SHOPPING))
-          epi = ai_service_menu_clarify_line(mob, role, style, rctx.evil_signaled, rctx.archetype, rctx.personality);
+        } else if (type == AI_EVENT_PLAYER_SAY && (rctx.domain == DOMAIN_SERVICES || rctx.domain == DOMAIN_SHOPPING)) {
+          enum ai_distinct_intent_class dcls = DINT_SERVICE_MENU;
+          const char *pl = NULL;
+          if (explicit_intent == INTENT_HELP_REQUEST)
+            dcls = DINT_HELP_FOLLOWUP;
+          else if (explicit_intent == INTENT_SERVICE_TRAINING || multi_intent.secondary_intent == INTENT_SERVICE_TRAINING)
+            dcls = DINT_TRAINING;
+          else if (explicit_intent == INTENT_SERVICE_FOOD || explicit_intent == INTENT_SERVICE_WATER || multi_intent.secondary_intent == INTENT_SERVICE_FOOD || multi_intent.secondary_intent == INTENT_SERVICE_WATER)
+            dcls = DINT_FOOD_WATER;
+          else if (explicit_intent == INTENT_MONEY_JOB || multi_intent.secondary_intent == INTENT_MONEY_JOB)
+            dcls = DINT_MONEY_REFUSAL;
+          ai_distinct_reply_line(mob, conv_st, &rctx, dcls, GET_IDNUM(actor), voiced, sizeof(voiced), &pl);
+          epi = voiced;
+          if (pl)
+            ai_set_last_speech_meta(mob, pl, "SERVICE_CLARIFY");
+        }
         if (epi && *epi) {
           line = epi;
           rctx.chosen_core = epi;
