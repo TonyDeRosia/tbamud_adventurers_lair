@@ -12,6 +12,28 @@
 #include "ai_actor.h"
 #include "ai_actor_brain.h"
 
+
+#define AI_ARCH_MAX 4
+
+typedef struct ai_brain_profile {
+  uint32_t seed;
+  uint8_t is_humanoid;
+  uint8_t can_speak;
+  uint8_t temperament;
+  uint8_t cognition;
+  uint8_t tolerance;
+  float imtb_i;
+  float imtb_m;
+  float imtb_t;
+  float imtb_b;
+  uint8_t archetype_count;
+  uint8_t archetypes[AI_ARCH_MAX];
+  int role;
+  int role_fitness;
+  uint32_t caps;
+  time_t built_at;
+} ai_brain_profile;
+
 #define AIG_PROTECT    (1 << 0)
 #define AIG_TRADE      (1 << 1)
 #define AIG_SERVE      (1 << 2)
@@ -380,4 +402,202 @@ void ai_actor_brain_show_state(struct char_data *viewer, struct char_data *mob) 
                  m->idnum, m->relationship, m->trust, m->fear, m->hostility, m->crime_flags,
                  m->last_action[0] ? m->last_action : "-");
   }
+}
+
+
+#define AI_BRAIN_PROFILE_MAX 1024
+#define AI_BRAIN_CAP_DIRECTIONS   (1u << 0)
+#define AI_BRAIN_CAP_LAW          (1u << 1)
+#define AI_BRAIN_CAP_TRADE        (1u << 2)
+#define AI_BRAIN_CAP_TRAINING     (1u << 3)
+#define AI_BRAIN_CAP_LODGING      (1u << 4)
+#define AI_BRAIN_CAP_FOOD         (1u << 5)
+#define AI_BRAIN_CAP_RUMOR        (1u << 6)
+#define AI_BRAIN_CAP_RELIGION     (1u << 7)
+#define AI_BRAIN_CAP_QUEST        (1u << 8)
+
+struct ai_brain_slot {
+  struct char_data *mob;
+  ai_brain_profile profile;
+};
+
+static struct ai_brain_slot ai_brain_slots[AI_BRAIN_PROFILE_MAX];
+
+static struct ai_brain_slot *ai_brain_slot_get(struct char_data *mob, int create) {
+  int i, oldest = 0;
+  for (i = 0; i < AI_BRAIN_PROFILE_MAX; i++) {
+    if (ai_brain_slots[i].mob == mob) return &ai_brain_slots[i];
+    if (!ai_brain_slots[i].mob && create) {
+      ai_brain_slots[i].mob = mob;
+      memset(&ai_brain_slots[i].profile, 0, sizeof(ai_brain_slots[i].profile));
+      return &ai_brain_slots[i];
+    }
+    if (ai_brain_slots[i].profile.built_at < ai_brain_slots[oldest].profile.built_at) oldest = i;
+  }
+  if (!create) return NULL;
+  ai_brain_slots[oldest].mob = mob;
+  memset(&ai_brain_slots[oldest].profile, 0, sizeof(ai_brain_slots[oldest].profile));
+  return &ai_brain_slots[oldest];
+}
+
+static int ai_brain_has_kw(const char *txt, const char *const *pool) {
+  int i;
+  if (!txt || !*txt || !pool) return FALSE;
+  for (i = 0; pool[i]; i++) if (strstr(txt, pool[i])) return TRUE;
+  return FALSE;
+}
+
+static void ai_brain_collect_text(struct char_data *mob, char *buf, size_t bufsz) {
+  int i;
+  size_t len;
+  if (!mob || !buf || bufsz == 0) return;
+  buf[0] = '\0';
+  if (GET_NAME(mob)) snprintf(buf, bufsz, "%s", GET_NAME(mob));
+  len = strlen(buf);
+  if (mob->player.short_descr && len + 2 < bufsz) snprintf(buf + len, bufsz - len, " %s", mob->player.short_descr);
+  len = strlen(buf);
+  if (mob->player.long_descr && len + 2 < bufsz) snprintf(buf + len, bufsz - len, " %s", mob->player.long_descr);
+  for (i = 0; i < NUM_WEARS; i++) {
+    struct obj_data *eq = GET_EQ(mob, i);
+    if (!eq) continue;
+    len = strlen(buf);
+    if (eq->short_description && len + 2 < bufsz) snprintf(buf + len, bufsz - len, " %s", eq->short_description);
+    len = strlen(buf);
+    if (eq->name && len + 2 < bufsz) snprintf(buf + len, bufsz - len, " %s", eq->name);
+  }
+}
+
+static void ai_brain_build_profile(struct char_data *mob, ai_brain_profile *p) {
+  static const char *const humanoid_kw[] = {"guard","merchant","teacher","trainer","wizard","priest","banker","advisor","innkeeper","guildmaster","captain","wise",NULL};
+  static const char *const speaker_kw[] = {"says","speaks","teacher","merchant","guard","priest","wizard","innkeeper","banker","advisor","guide",NULL};
+  static const char *const beast_kw[] = {"wolf","bear","boar","spider","hound","beast","serpent","bat","rat","animal",NULL};
+  static const char *const guard_kw[] = {"guard","watch","constable","warden","captain","sheriff",NULL};
+  static const char *const merchant_kw[] = {"merchant","trader","shop","vendor","banker",NULL};
+  static const char *const inn_kw[] = {"innkeeper","tavern","inn","bartender","hostler",NULL};
+  static const char *const trainer_kw[] = {"trainer","teacher","instructor","guildmaster",NULL};
+  static const char *const priest_kw[] = {"priest","cleric","temple","holy","chapel",NULL};
+  static const char *const wise_speaker_kw[] = {"wise wolf","speaks","guide",NULL};
+  static const char *const honor_kw[] = {"honor","lawful","disciplined","order",NULL};
+  static const char *const smart_kw[] = {"scholar","wise","wizard","strategic",NULL};
+  static const char *const warm_kw[] = {"kind","warm","gentle","friendly",NULL};
+  static const char *const formal_kw[] = {"regal","honor","disciplined","formal",NULL};
+  static const char *const short_fuse_kw[] = {"angry","snarling","hostile",NULL};
+  static const char *const demon_kw[] = {"demon","devil","fiend",NULL};
+  static const char *const royal_kw[] = {"royal","lord","lady","regal","commander",NULL};
+  static const char *const undead_kw2[] = {"undead","skeleton","lich","ghost",NULL};
+  char text[2048];
+  unsigned long h;
+  int fit = 0;
+  if (!mob || !p) return;
+  memset(p, 0, sizeof(*p));
+  ai_brain_collect_text(mob, text, sizeof(text));
+  { const unsigned char *hp=(const unsigned char *)text; h=5381UL; while (*hp) { h=((h<<5)+h) ^ (unsigned long)(*hp++); } }
+  p->seed = (uint32_t)(GET_MOB_VNUM(mob) * 2654435761u) ^ (uint32_t)h;
+  p->is_humanoid = ai_brain_has_kw(text, humanoid_kw) || !ai_brain_has_kw(text, beast_kw);
+  p->can_speak = p->is_humanoid && ai_brain_has_kw(text, speaker_kw);
+  if (!p->can_speak && ai_brain_has_kw(text, wise_speaker_kw)) p->can_speak = 1;
+
+  p->imtb_i = p->is_humanoid ? 0.65f : 0.35f;
+  p->imtb_m = ai_brain_has_kw(text, honor_kw) ? 0.75f : 0.45f;
+  p->imtb_t = ai_brain_has_kw(text, smart_kw) ? 0.72f : 0.40f;
+  p->imtb_b = ai_brain_has_kw(text, warm_kw) ? 0.70f : 0.45f;
+
+  p->temperament = ai_brain_has_kw(text, formal_kw) ? 0 : 1;
+  p->cognition = (p->imtb_t > 0.65f) ? 2 : 1;
+  p->tolerance = ai_brain_has_kw(text, short_fuse_kw) ? 2 : 1;
+
+  if (ai_brain_has_kw(text, demon_kw) && p->archetype_count < AI_ARCH_MAX) p->archetypes[p->archetype_count++] = 1;
+  if (ai_brain_has_kw(text, royal_kw) && p->archetype_count < AI_ARCH_MAX) p->archetypes[p->archetype_count++] = 2;
+  if (ai_brain_has_kw(text, beast_kw) && p->archetype_count < AI_ARCH_MAX) p->archetypes[p->archetype_count++] = 3;
+  if (ai_brain_has_kw(text, undead_kw2) && p->archetype_count < AI_ARCH_MAX) p->archetypes[p->archetype_count++] = 4;
+
+  p->role = ROLE_CIVILIAN;
+  if (ai_brain_has_kw(text, guard_kw)) { p->role = ROLE_GUARD; fit += 55; p->caps |= AI_BRAIN_CAP_DIRECTIONS | AI_BRAIN_CAP_LAW; }
+  if (ai_brain_has_kw(text, merchant_kw)) { p->role = ROLE_MERCHANT; fit += 50; p->caps |= AI_BRAIN_CAP_TRADE | AI_BRAIN_CAP_DIRECTIONS; }
+  if (ai_brain_has_kw(text, inn_kw)) { p->role = ROLE_CIVILIAN; fit += 40; p->caps |= AI_BRAIN_CAP_LODGING | AI_BRAIN_CAP_FOOD | AI_BRAIN_CAP_RUMOR | AI_BRAIN_CAP_DIRECTIONS; }
+  if (ai_brain_has_kw(text, trainer_kw)) { fit += 45; p->caps |= AI_BRAIN_CAP_TRAINING; }
+  if (ai_brain_has_kw(text, priest_kw)) { fit += 35; p->caps |= AI_BRAIN_CAP_RELIGION | AI_BRAIN_CAP_QUEST; }
+  if (ai_brain_has_kw(text, beast_kw) && !p->can_speak) {
+    p->role = ROLE_BEAST;
+    p->caps = 0;
+    fit = 5;
+  }
+  if (MOB_FLAGGED(mob, MOB_GUILD_MASTER)) { fit += 30; p->caps |= AI_BRAIN_CAP_TRAINING; }
+
+  p->role_fitness = fit;
+  p->built_at = time(0);
+
+#if AI_ACTOR_DEBUG
+  log("AI_BRAIN_PROFILE mob=%s vnum=%d seed=%u speak=%d role=%d fit=%d caps=0x%x", GET_NAME(mob), GET_MOB_VNUM(mob), p->seed, p->can_speak, p->role, p->role_fitness, (unsigned int)p->caps);
+#endif
+}
+
+const ai_brain_profile *ai_brain_get(struct char_data *mob) {
+  struct ai_brain_slot *sl;
+  if (!mob) return NULL;
+  sl = ai_brain_slot_get(mob, 0);
+  return sl ? &sl->profile : NULL;
+}
+
+void ai_brain_ensure(struct char_data *mob) {
+  struct ai_brain_slot *sl;
+  if (!mob || !IS_NPC(mob) || !MOB_FLAGGED(mob, MOB_AI_ACTOR)) return;
+  sl = ai_brain_slot_get(mob, 1);
+  if (!sl) return;
+  if (sl->profile.built_at == 0) ai_brain_build_profile(mob, &sl->profile);
+}
+
+void ai_brain_on_spawn(struct char_data *mob) { ai_brain_ensure(mob); }
+
+void ai_brain_infer_role_and_caps(struct char_data *mob, int *out_role, int *out_fit, uint32_t *out_caps) {
+  const ai_brain_profile *p;
+  ai_brain_ensure(mob);
+  p = ai_brain_get(mob);
+  if (out_role) *out_role = p ? p->role : ROLE_UNKNOWN;
+  if (out_fit) *out_fit = p ? p->role_fitness : 0;
+  if (out_caps) *out_caps = p ? p->caps : 0;
+}
+
+int ai_brain_can_speak(const struct char_data *mob) {
+  struct ai_brain_slot *sl;
+  if (!mob) return FALSE;
+  sl = ai_brain_slot_get((struct char_data *)mob, 1);
+  if (!sl || sl->profile.built_at == 0) ai_brain_build_profile((struct char_data *)mob, &sl->profile);
+  return sl ? (sl->profile.can_speak ? TRUE : FALSE) : FALSE;
+}
+
+int ai_brain_voice_style(const struct char_data *mob) {
+  struct ai_brain_slot *sl;
+  if (!mob) return 0;
+  sl = ai_brain_slot_get((struct char_data *)mob, 1);
+  if (!sl || sl->profile.built_at == 0) ai_brain_build_profile((struct char_data *)mob, &sl->profile);
+  return sl ? sl->profile.temperament : 0;
+}
+
+int ai_brain_knows_domain(const struct char_data *mob, int domain) {
+  const ai_brain_profile *p = ai_brain_get((struct char_data *)mob);
+  if (!p) return FALSE;
+  switch (domain) {
+    case 1: return (p->caps & (AI_BRAIN_CAP_TRADE | AI_BRAIN_CAP_LODGING | AI_BRAIN_CAP_FOOD | AI_BRAIN_CAP_TRAINING)) ? TRUE : FALSE;
+    case 3: return (p->caps & AI_BRAIN_CAP_DIRECTIONS) ? TRUE : FALSE;
+    case 4: return (p->caps & AI_BRAIN_CAP_RUMOR) ? TRUE : FALSE;
+    case 5: return (p->caps & AI_BRAIN_CAP_QUEST) ? TRUE : FALSE;
+    case 6: return (p->caps & AI_BRAIN_CAP_LAW) ? TRUE : FALSE;
+    default: return p->can_speak ? TRUE : FALSE;
+  }
+}
+
+int ai_brain_pick_referral_in_room(struct char_data *mob, struct char_data *player, int domain, struct char_data **out_target) {
+  struct char_data *ch;
+  if (out_target) *out_target = NULL;
+  if (!mob || IN_ROOM(mob) == NOWHERE) return FALSE;
+  for (ch = world[IN_ROOM(mob)].people; ch; ch = ch->next_in_room) {
+    if (!IS_NPC(ch) || ch == mob || (player && ch == player) || !MOB_FLAGGED(ch, MOB_AI_ACTOR)) continue;
+    ai_brain_ensure(ch);
+    if (ai_brain_knows_domain(ch, domain)) {
+      if (out_target) *out_target = ch;
+      return TRUE;
+    }
+  }
+  return FALSE;
 }

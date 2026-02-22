@@ -475,3 +475,37 @@ int ai_reaction_try(struct char_data *mob, const struct ai_reaction_ctx *ctx) {
   (void)oldest;
   return 1;
 }
+
+void ai_react_emote(struct char_data *mob, struct char_data *player, int mood, int reason)
+{
+  struct ai_reaction_ctx ctx;
+  memset(&ctx, 0, sizeof(ctx));
+  if (!mob || IN_ROOM(mob) == NOWHERE) return;
+  ctx.event_type = AI_EVENT_PLAYER_SAY;
+  ctx.trigger_reason = reason;
+  ctx.mob_vnum = GET_MOB_VNUM(mob);
+  ctx.mob_role = mob->ai_prof ? mob->ai_prof->role : ROLE_UNKNOWN;
+  ctx.actor_idnum = player ? GET_IDNUM(player) : 0;
+  ctx.room_rnum = IN_ROOM(mob);
+  ctx.intent_id = (mood < 0) ? AI_INTENT_INSULT : AI_INTENT_SMALLTALK;
+  ctx.can_act = TRUE;
+  ctx.is_fighting = FIGHTING(mob) ? TRUE : FALSE;
+  ai_reaction_try(mob, &ctx);
+}
+
+void ai_react_nonverbal(struct char_data *mob, struct char_data *player, int reason)
+{
+  struct ai_reaction_ctx ctx;
+  memset(&ctx, 0, sizeof(ctx));
+  if (!mob || IN_ROOM(mob) == NOWHERE) return;
+  ctx.event_type = AI_EVENT_PLAYER_SAY;
+  ctx.trigger_reason = reason;
+  ctx.mob_vnum = GET_MOB_VNUM(mob);
+  ctx.mob_role = ROLE_BEAST;
+  ctx.actor_idnum = player ? GET_IDNUM(player) : 0;
+  ctx.room_rnum = IN_ROOM(mob);
+  ctx.intent_id = AI_INTENT_SMALLTALK;
+  ctx.can_act = TRUE;
+  ctx.is_fighting = FIGHTING(mob) ? TRUE : FALSE;
+  ai_reaction_try(mob, &ctx);
+}

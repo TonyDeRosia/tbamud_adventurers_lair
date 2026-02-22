@@ -21,6 +21,12 @@
 #include "ai_actor_brain.h"
 #include "ai_reactions.h"
 
+/* stable APIs from ai_actor_brain.c / ai_reactions.c */
+void ai_brain_ensure(struct char_data *mob);
+void ai_brain_infer_role_and_caps(struct char_data *mob, int *out_role, int *out_fit, uint32_t *out_caps);
+int ai_brain_can_speak(const struct char_data *mob);
+void ai_react_nonverbal(struct char_data *mob, struct char_data *player, int reason);
+
 #define AI_HOSTILE_ATTACK_THRESHOLD 12
 #define AI_ROOM_IDLE_SKIP_SECS 12
 #define AI_BFS_MAX_DEPTH 6
@@ -4514,7 +4520,7 @@ static const char *ai_select_content_for_intention(struct char_data *mob, const 
     "What part do you want answered?",
     NULL
   };
-  static const char *const deflect_guard[] = {"State your business and keep it short.", "I have watch duty to finish.", "Ask one clear question and stand easy.", "I can spare a moment, not a lecture.", "If you need help, ask plainly and briefly.", "I keep this post, so keep to the point.", "I've orders to hold this watch.", "Speak direct; my patrol is due.", "I answer clear needs, not wandering chatter.", "Keep your request concise.", "Use plain words and we can proceed.", "I can help, but not for long.", "Save the wandering tale for later.", "Duty first, stories second.", "If it isn't actionable, make it brief.", "Hold formation in your words.", "Short question, sharp answer.", "My patrol clock is running.", "Give me the practical version.", "I can guide, not gossip.", NULL};
+  static const char *const deflect_guard[] = {"State your business and keep it short.", "I have watch duty to finish.", "Ask one clear question and stand easy.", "I can spare a moment, not a lecture.", "If you need help, ask plainly and briefly.", "I keep this post, so keep to the point.", "I've orders to hold this watch.", "Speak direct; my patrol is due.", "I answer clear needs, not wandering chatter.", "Tell me what you need, and I will help if I can.", "Use plain words and we can proceed.", "I can help, but not for long.", "Save the wandering tale for later.", "Duty first, stories second.", "If it isn't actionable, make it brief.", "Hold formation in your words.", "Short question, sharp answer.", "My patrol clock is running.", "Give me the practical version.", "I can guide, not gossip.", NULL};
   static const char *const deflect_inn[] = {"If you need rest, ask for a room.", "I can pour ale, not debate rumors.", "Ask for stew, room, or bed and we'll be square.", "This hearth serves comfort, not long disputes.", "Keep it simple: meal, bed, or directions.", "I can warm you up, not chase side talk.", "If you're staying, ask what you need.", "I keep rooms and rest, not gossip chains.", "Tell me if you need a bed or a bowl.", "Let's keep this to house business.", "I can help you settle in, not speculate.", "Best keep it to inn matters.", "Hearth talk is fine; riddles are not.", "Order first, stories after supper.", "Name what you need and I'll fetch it.", "Keep it to board and lodging.", "Ask direct and I'll answer quick.", "My tables are full; be concise.", "I mind the house, not endless debate.", "Food, room, route—pick one.", NULL};
   static const char *const deflect_merch[] = {"Ask about wares, prices, or stock.", "Trade only for now.", "If it isn't about a bargain, keep moving.", "Name the item and we can deal.", "I can quote prices, not idle theories.", "Let's keep this on wares.", "If you want stock details, ask directly.", "I handle coin, not side stories.", "Pick a good and we'll talk numbers.", "Bargain talk only today.", "I can help with price and quality.", "State the purchase and we'll proceed.", "I sell goods, not digressions.", "Put coin on the question.", "If it's not inventory, it's not now.", "Choose item, quality, or budget.", "Make it a trade question.", "The ledger likes clear requests.", "Quote first, chatter later.", "Bring me specifics and we'll deal.", NULL};
   static const char *const deflect_bandit[] = {"Keep walking, mark.", "Not your concern.", "Pay up or move on.", "Easy coin doesn't answer questions.", "Wrong road for chatter.", "Purse first, talk later.", "You're asking too much for free.", "Keep your head down and pass through.", "No free guidance in my stretch.", "Step light and keep walking.", "Ask less, pay more.", "Pick a direction and go.", "No coin, no extra words.", "You're burning daylight and patience.", "This isn't a charity crossroads.", "Short ask, then vanish.", "Your curiosity costs extra.", "Road toll includes silence.", "Ask once, then move.", "Don't linger in my shadow.", NULL};
@@ -8854,7 +8860,7 @@ static const char *ai_social_escalation_line(struct char_data *mob, int role, en
     return "No threats. Ask straight or leave.";
   }
   if (ex == INTENT_CONFUSION)
-    return "Keep it simple and ask one thing at a time.";
+    return "Keep it clear and I will give you a useful answer.";
   return NULL;
 }
 
@@ -9464,6 +9470,12 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
   if (IN_ROOM(mob) == NOWHERE)
     AI_EVT_RETURN("NOWHERE_ROOM");
 
+  ai_brain_ensure(mob);
+  if (type == AI_EVENT_PLAYER_SAY && !ai_brain_can_speak(mob)) {
+    ai_react_nonverbal(mob, actor, AI_RX_TRIG_NON_SPEAK_ACTION_SELECTED);
+    AI_EVT_RETURN("BRAIN_NONVERBAL_GATE");
+  }
+
   ai_state_refresh_local_topics(mob);
   {
     int p = ai_imtb_pick_personality(mob, role, style);
@@ -9499,6 +9511,22 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
   role_caps = ai_role_capabilities(role, style);
   if (MOB_FLAGGED(mob, MOB_GUILD_MASTER))
     role_caps |= (CAP_TRAIN | CAP_PRACTICE);
+  {
+    int b_role = ROLE_UNKNOWN;
+    int b_fit = 0;
+    uint32_t b_caps = 0;
+    ai_brain_infer_role_and_caps(mob, &b_role, &b_fit, &b_caps);
+    if (b_fit >= AI_MIN_ROLE_FITNESS && b_role != ROLE_UNKNOWN)
+      role = b_role;
+    if (b_caps & (1u << 0)) role_caps |= CAP_DIRECT_CITY;
+    if (b_caps & (1u << 1)) role_caps |= CAP_ENFORCE_LAW;
+    if (b_caps & (1u << 2)) role_caps |= (CAP_SELL | CAP_BUY);
+    if (b_caps & (1u << 3)) role_caps |= (CAP_TRAIN | CAP_PRACTICE);
+    if (b_caps & (1u << 4)) role_caps |= CAP_LODGE;
+    if (b_caps & (1u << 5)) role_caps |= CAP_SERVE_FOOD;
+    if (b_caps & (1u << 6)) role_caps |= CAP_PROVIDE_RUMOR;
+    if (b_caps & (1u << 7)) role_caps |= CAP_RELIGIOUS_GUIDANCE;
+  }
 
   if (type == AI_EVENT_PLAYER_SAY && !text)
     AI_EVT_RETURN("NULL_PLAYER_SAY");
