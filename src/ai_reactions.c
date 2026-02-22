@@ -509,3 +509,59 @@ void ai_react_nonverbal(struct char_data *mob, struct char_data *player, int rea
   ctx.is_fighting = FIGHTING(mob) ? TRUE : FALSE;
   ai_reaction_try(mob, &ctx);
 }
+
+
+static void ai_react_pick_and_fire(struct char_data *mob, const char *const *pool, unsigned long seed) {
+  const char *line = ai_rx_pick_seeded(pool, seed);
+  char buf[256];
+  if (!mob || !line || !*line) return;
+  if (!strncmp(line, "$n ", 3)) {
+    snprintf(buf, sizeof(buf), "%.*s", (int)sizeof(buf)-1, line + 3);
+    do_echo(mob, buf, 0, SCMD_EMOTE);
+  } else {
+    snprintf(buf, sizeof(buf), "%.*s", (int)sizeof(buf)-1, line);
+    do_say(mob, buf, 0, 0);
+  }
+}
+
+void ai_react_fear(struct char_data *mob, struct char_data *player, ai_fear_state_t fear)
+{
+  static const char *const hum_wary[] = {"$n watches you carefully.", "$n steps back half a pace.", NULL};
+  static const char *const hum_afraid[] = {"$n lowers $s voice.", "$n avoids your eyes.", "$n swallows and nods quickly.", NULL};
+  static const char *const hum_terrified[] = {"$n freezes in place.", "$n trembles and backs away.", "$n cannot meet your gaze.", NULL};
+  static const char *const beast_wary[] = {"$n prowls in a tight circle.", "$n gives a low warning growl.", NULL};
+  static const char *const beast_afraid[] = {"$n whines and retreats.", "$n flattens low to the ground.", NULL};
+  const ai_brain_profile *p = ai_brain_get(mob);
+  int beast = (p && !ai_brain_can_speak(mob));
+  unsigned long seed;
+  if (!mob || IN_ROOM(mob) == NOWHERE || fear <= AI_FEAR_NONE) return;
+  seed = (unsigned long)(GET_MOB_VNUM(mob) * 33u + (player ? GET_IDNUM(player) : 0) + fear * 17u);
+  if (beast)
+    ai_react_pick_and_fire(mob, (fear >= AI_FEAR_AFRAID) ? beast_afraid : beast_wary, seed);
+  else if (fear >= AI_FEAR_TERRIFIED)
+    ai_react_pick_and_fire(mob, hum_terrified, seed);
+  else if (fear >= AI_FEAR_AFRAID)
+    ai_react_pick_and_fire(mob, hum_afraid, seed);
+  else
+    ai_react_pick_and_fire(mob, hum_wary, seed);
+}
+
+void ai_react_reverence(struct char_data *mob, struct char_data *player, ai_reverence_state_t rev)
+{
+  static const char *const hum_respect[] = {"$n nods respectfully.", "$n stands a little straighter.", NULL};
+  static const char *const hum_reverent[] = {"$n offers a polite bow.", "$n speaks with careful respect.", NULL};
+  static const char *const hum_guard[] = {"$n salutes crisply.", "$n keeps a professional nod.", NULL};
+  static const char *const beast_respect[] = {"$n lowers its head in calm regard.", "$n settles and watches you quietly.", NULL};
+  const ai_brain_profile *p = ai_brain_get(mob);
+  unsigned long seed;
+  if (!mob || IN_ROOM(mob) == NOWHERE || rev <= AI_REV_NONE) return;
+  seed = (unsigned long)(GET_MOB_VNUM(mob) * 29u + (player ? GET_IDNUM(player) : 0) + rev * 11u);
+  if (p && !ai_brain_can_speak(mob))
+    ai_react_pick_and_fire(mob, beast_respect, seed);
+  else if (mob->ai_prof && mob->ai_prof->role == ROLE_GUARD)
+    ai_react_pick_and_fire(mob, hum_guard, seed);
+  else if (rev >= AI_REV_REVERENT)
+    ai_react_pick_and_fire(mob, hum_reverent, seed);
+  else
+    ai_react_pick_and_fire(mob, hum_respect, seed);
+}

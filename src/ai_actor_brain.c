@@ -494,7 +494,11 @@ static void ai_brain_build_profile(struct char_data *mob, ai_brain_profile *p) {
   { const unsigned char *hp=(const unsigned char *)text; h=5381UL; while (*hp) { h=((h<<5)+h) ^ (unsigned long)(*hp++); } }
   p->seed = (uint32_t)(GET_MOB_VNUM(mob) * 2654435761u) ^ (uint32_t)h;
   p->is_humanoid = ai_brain_has_kw(text, humanoid_kw) || !ai_brain_has_kw(text, beast_kw);
-  p->can_speak = p->is_humanoid && ai_brain_has_kw(text, speaker_kw);
+  p->can_speak = (p->is_humanoid && ai_brain_has_kw(text, speaker_kw)) ? 1 : 0;
+  if (!p->can_speak && p->is_humanoid &&
+      (ai_brain_has_kw(text, guard_kw) || ai_brain_has_kw(text, merchant_kw) || ai_brain_has_kw(text, inn_kw) ||
+       ai_brain_has_kw(text, trainer_kw) || ai_brain_has_kw(text, priest_kw)))
+    p->can_speak = 1;
   if (!p->can_speak && ai_brain_has_kw(text, wise_speaker_kw)) p->can_speak = 1;
 
   p->imtb_i = p->is_humanoid ? 0.65f : 0.35f;
@@ -514,6 +518,7 @@ static void ai_brain_build_profile(struct char_data *mob, ai_brain_profile *p) {
   p->role = ROLE_CIVILIAN;
   if (ai_brain_has_kw(text, guard_kw)) { p->role = ROLE_GUARD; fit += 55; p->caps |= AI_BRAIN_CAP_DIRECTIONS | AI_BRAIN_CAP_LAW; }
   if (ai_brain_has_kw(text, merchant_kw)) { p->role = ROLE_MERCHANT; fit += 50; p->caps |= AI_BRAIN_CAP_TRADE | AI_BRAIN_CAP_DIRECTIONS; }
+  if (strstr(text, "bank") || strstr(text, "banker")) { p->role = ROLE_MERCHANT; fit += 45; p->caps |= AI_BRAIN_CAP_TRADE; }
   if (ai_brain_has_kw(text, inn_kw)) { p->role = ROLE_CIVILIAN; fit += 40; p->caps |= AI_BRAIN_CAP_LODGING | AI_BRAIN_CAP_FOOD | AI_BRAIN_CAP_RUMOR | AI_BRAIN_CAP_DIRECTIONS; }
   if (ai_brain_has_kw(text, trainer_kw)) { fit += 45; p->caps |= AI_BRAIN_CAP_TRAINING; }
   if (ai_brain_has_kw(text, priest_kw)) { fit += 35; p->caps |= AI_BRAIN_CAP_RELIGION | AI_BRAIN_CAP_QUEST; }
@@ -523,6 +528,8 @@ static void ai_brain_build_profile(struct char_data *mob, ai_brain_profile *p) {
     fit = 5;
   }
   if (MOB_FLAGGED(mob, MOB_GUILD_MASTER)) { fit += 30; p->caps |= AI_BRAIN_CAP_TRAINING; }
+  if (p->role == ROLE_CIVILIAN && p->is_humanoid && p->can_speak && fit < 12)
+    fit = 12;
 
   p->role_fitness = fit;
   p->built_at = time(0);
@@ -600,4 +607,100 @@ int ai_brain_pick_referral_in_room(struct char_data *mob, struct char_data *play
     }
   }
   return FALSE;
+}
+
+
+static int ai_brain_is_disciplined(const ai_brain_profile *p) {
+  int i;
+  if (!p) return 0;
+  if (p->temperament == 0) return 1;
+  for (i = 0; i < p->archetype_count; i++)
+    if (p->archetypes[i] == 2) return 1;
+  return 0;
+}
+
+static int ai_brain_prefers_evil_respect(const ai_brain_profile *p) {
+  int i;
+  if (!p) return 0;
+  for (i = 0; i < p->archetype_count; i++)
+    if (p->archetypes[i] == 1 || p->archetypes[i] == 4) return 1;
+  return 0;
+}
+
+int ai_brain_intimidation_score(struct char_data *mob, struct char_data *player) {
+  int score = 0, gap = 0, evil = 0, bounty = 0;
+  const ai_brain_profile *p;
+  if (!mob || !player) return 0;
+  ai_brain_ensure(mob);
+  p = ai_brain_get(mob);
+  evil = MAX(0, -GET_ALIGNMENT(player));
+  bounty = (int)MIN(1000000, GET_BOUNTY(player));
+  gap = GET_LEVEL(player) - GET_LEVEL(mob);
+  score += evil / 20;
+  score += MIN(30, bounty / 20000);
+  if (gap >= 10) score += 20 + MIN(20, gap - 10);
+  if (p && ai_brain_is_disciplined(p)) score = (score * 75) / 100;
+  if (p && ai_brain_prefers_evil_respect(p)) score = (score * 85) / 100;
+  if (score < 0) score = 0;
+  if (score > 100) score = 100;
+#if AI_ACTOR_DEBUG
+  log("AI_BRAIN_STANCE_INTIM mob=%d ply=%ld evil=%d bounty=%d gap=%d score=%d", GET_MOB_VNUM(mob), GET_IDNUM(player), evil, bounty, gap, score);
+#endif
+  return score;
+}
+
+ai_fear_state_t ai_brain_fear_state(struct char_data *mob, struct char_data *player) {
+  int s = ai_brain_intimidation_score(mob, player);
+  if (s >= 80) return AI_FEAR_TERRIFIED;
+  if (s >= 60) return AI_FEAR_AFRAID;
+  if (s >= 40) return AI_FEAR_INTIMIDATED;
+  if (s >= 20) return AI_FEAR_WARY;
+  return AI_FEAR_NONE;
+}
+
+int ai_brain_respect_score(struct char_data *mob, struct char_data *player) {
+  int score = 0, align = 0, gap = 0;
+  const ai_brain_profile *p;
+  if (!mob || !player) return 0;
+  ai_brain_ensure(mob);
+  p = ai_brain_get(mob);
+  align = GET_ALIGNMENT(player);
+  gap = GET_LEVEL(player) - GET_LEVEL(mob);
+  if (align > 0) score += align / 25;
+  if (gap >= 8 && align > 200) score += 15 + MIN(20, gap - 8);
+  if (p && ai_brain_prefers_evil_respect(p)) {
+    if (align > 0) score = (score * 60) / 100;
+    else score += MIN(30, (-align) / 35);
+  }
+  if (p && ai_brain_is_disciplined(p)) score = (score * 80) / 100;
+  if (score < 0) score = 0;
+  if (score > 100) score = 100;
+#if AI_ACTOR_DEBUG
+  log("AI_BRAIN_STANCE_RESPECT mob=%d ply=%ld align=%d gap=%d score=%d", GET_MOB_VNUM(mob), GET_IDNUM(player), align, gap, score);
+#endif
+  return score;
+}
+
+ai_reverence_state_t ai_brain_reverence_state(struct char_data *mob, struct char_data *player) {
+  int s = ai_brain_respect_score(mob, player);
+  if (s >= 80) return AI_REV_AWED;
+  if (s >= 60) return AI_REV_REVERENT;
+  if (s >= 40) return AI_REV_ADMIRING;
+  if (s >= 20) return AI_REV_RESPECTFUL;
+  return AI_REV_NONE;
+}
+
+void ai_brain_apply_stance_bias(const ai_brain_profile *p, ai_fear_state_t fear, ai_reverence_state_t rev, int *io_mood, int *io_voice_style, uint32_t *io_caps) {
+  (void)p;
+  if (io_mood) {
+    if (fear >= AI_FEAR_AFRAID) *io_mood = -2;
+    else if (fear >= AI_FEAR_WARY) *io_mood = -1;
+    else if (rev >= AI_REV_ADMIRING) *io_mood = 1;
+  }
+  if (io_voice_style) {
+    if (fear >= AI_FEAR_AFRAID) *io_voice_style = 0;
+    else if (rev >= AI_REV_REVERENT) *io_voice_style = 1;
+  }
+  if (io_caps && fear >= AI_FEAR_AFRAID)
+    *io_caps &= ~(AI_BRAIN_CAP_QUEST | AI_BRAIN_CAP_RUMOR);
 }
