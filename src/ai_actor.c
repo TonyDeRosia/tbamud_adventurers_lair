@@ -79,6 +79,7 @@
 #define AI_RECENT_FRAGMENT_HASH_MAX 8
 #define AI_SOCIAL_CTX_MAX 512
 #define AI_ROOM_AMBIENT_CACHE_MAX 256
+#define AI_KNOWLEDGE_RADIUS 20
 
 
 
@@ -226,6 +227,13 @@ struct ai_room_ambient_cache {
 
 static struct ai_social_context ai_social_ctx[AI_SOCIAL_CTX_MAX];
 static struct ai_room_ambient_cache ai_room_ambient_cache[AI_ROOM_AMBIENT_CACHE_MAX];
+
+static const char *ai_deferral_lines[] = {
+  "I do not know that district.",
+  "You should ask someone in that area.",
+  "That lies beyond where I patrol.",
+  "I cannot speak for places outside my watch."
+};
 
 
 enum ai_speech_domain {
@@ -956,6 +964,7 @@ static unsigned long ai_hash_mix(unsigned long h, unsigned long v);
 static unsigned long ai_hash_text_stable(const char *text);
 static int ai_imtb_pick_personality(struct char_data *mob, int role, int style);
 static const char *ai_service_direction_line(struct char_data *mob, struct char_data *player, int intent, int topic);
+static const char *ai_knowledge_deferral_line(struct char_data *mob, int service_type, room_rnum target_room, int bfs_steps, int allow_train_override, int allow_bank_override, int allow_shop_override);
 static const struct ai_imtb_profile *ai_imtb_profile_get(int personality);
 static enum ai_creature_archetype ai_detect_creature_archetype(struct char_data *mob);
 static uint64_t ai_detect_creature_subtags(struct char_data *mob);
@@ -6372,7 +6381,7 @@ static int ai_build_guidance_answer(struct char_data *mob, struct char_data *pla
   int service_type = TARGET_NONE;
   int room_v = NOWHERE;
   int item_v = -1;
-  room_rnum rr;
+  room_rnum rr = NOWHERE;
   int first_dir = -1;
   int dist = 0;
   struct char_data *target = NULL;
@@ -6422,6 +6431,19 @@ static int ai_build_guidance_answer(struct char_data *mob, struct char_data *pla
   if (ai_find_closest_service(mob, player, service_type, &room_v, &item_v)) {
     rr = real_room(room_v);
     if (rr != NOWHERE && ai_find_route_to_room(IN_ROOM(mob), rr, AI_BFS_MAX_DEPTH, &first_dir, &dist)) {
+      const char *deferral = ai_knowledge_deferral_line(
+        mob,
+        service_type,
+        rr,
+        dist,
+        (service_type == TARGET_TRAINER) ? ai_liveplay_mob_can_train(mob) : FALSE,
+        (service_type == TARGET_BANK && ai_liveplay_mob_can_shop(mob)),
+        ((service_type == TARGET_MARKET || service_type == TARGET_ARMORY || service_type == TARGET_BAKERY) && ai_liveplay_mob_can_shop(mob) && rr == IN_ROOM(mob))
+      );
+      if (deferral) {
+        snprintf(out, outsz, "%s", deferral);
+        return TRUE;
+      }
       switch (first_dir) {
         case NORTH: dname = "north"; break;
         case EAST: dname = "east"; break;
@@ -6447,6 +6469,22 @@ static int ai_build_guidance_answer(struct char_data *mob, struct char_data *pla
   }
   if (ai_debug)
     ai_debug_log("AI_GUIDANCE_PATH vnum=%d in_room_referral=0 bfs=0 dir=none depth=0", GET_MOB_VNUM(mob));
+
+  if (rr != NOWHERE) {
+    const char *deferral = ai_knowledge_deferral_line(
+      mob,
+      service_type,
+      rr,
+      -1,
+      (service_type == TARGET_TRAINER) ? ai_liveplay_mob_can_train(mob) : FALSE,
+      (service_type == TARGET_BANK && ai_liveplay_mob_can_shop(mob)),
+      ((service_type == TARGET_MARKET || service_type == TARGET_ARMORY || service_type == TARGET_BAKERY) && ai_liveplay_mob_can_shop(mob) && rr == IN_ROOM(mob))
+    );
+    if (deferral) {
+      snprintf(out, outsz, "%s", deferral);
+      return TRUE;
+    }
+  }
 
   if (role == ROLE_GUARD || role == ROLE_MERCHANT || role == ROLE_BOSS || role == ROLE_CIVILIAN || role == ROLE_UNKNOWN) {
     snprintf(out, outsz, "I cannot find that nearby. Try the town board or ask a guard.");
@@ -7340,6 +7378,41 @@ static int ai_service_type_from_intent_topic(int intent, int topic)
   return TARGET_MARKET;
 }
 
+static const char *ai_knowledge_deferral_line(struct char_data *mob, int service_type, room_rnum target_room, int bfs_steps, int allow_train_override, int allow_bank_override, int allow_shop_override)
+{
+  int allow = FALSE;
+  int mob_zone = -1;
+  int target_zone = -1;
+
+  if (!mob || IN_ROOM(mob) == NOWHERE)
+    return NULL;
+
+  if (IN_ROOM(mob) >= 0 && IN_ROOM(mob) <= top_of_world)
+    mob_zone = world[IN_ROOM(mob)].zone;
+
+  if (target_room != NOWHERE && target_room >= 0 && target_room <= top_of_world)
+    target_zone = world[target_room].zone;
+
+  if (allow_train_override || allow_bank_override || allow_shop_override)
+    allow = TRUE;
+  else if (target_room != NOWHERE && target_room >= 0 && target_room <= top_of_world) {
+    if (target_zone == mob_zone)
+      allow = TRUE;
+    else if (bfs_steps >= 0 && bfs_steps <= AI_KNOWLEDGE_RADIUS)
+      allow = TRUE;
+  }
+
+#if AI_ACTOR_DEBUG
+  ai_debug_log("[AI_KNOWLEDGE] mob_zone=%d target_zone=%d bfs_steps=%d result=%s",
+    mob_zone, target_zone, bfs_steps, allow ? "ALLOW" : "BLOCK");
+#endif
+
+  if (allow)
+    return NULL;
+
+  return ai_pick_line_from_pool(mob, ai_deferral_lines, 4, ai_hash_mix((unsigned long)(service_type + 1), 9011UL));
+}
+
 static const char *ai_service_direction_line(struct char_data *mob, struct char_data *player, int intent, int topic)
 {
   static char line[220];
@@ -7365,7 +7438,29 @@ static const char *ai_service_direction_line(struct char_data *mob, struct char_
     return NULL;
 
   if (!ai_find_route_to_room(IN_ROOM(mob), rr, AI_BFS_MAX_DEPTH, &first_dir, &dist))
-    return NULL;
+    return ai_knowledge_deferral_line(
+      mob,
+      service_type,
+      rr,
+      -1,
+      (service_type == TARGET_TRAINER) ? ai_liveplay_mob_can_train(mob) : FALSE,
+      (service_type == TARGET_BANK && ai_liveplay_mob_can_shop(mob)),
+      ((service_type == TARGET_MARKET || service_type == TARGET_ARMORY || service_type == TARGET_BAKERY) && ai_liveplay_mob_can_shop(mob) && rr == IN_ROOM(mob))
+    );
+
+  {
+    const char *deferral = ai_knowledge_deferral_line(
+      mob,
+      service_type,
+      rr,
+      dist,
+      (service_type == TARGET_TRAINER) ? ai_liveplay_mob_can_train(mob) : FALSE,
+      (service_type == TARGET_BANK && ai_liveplay_mob_can_shop(mob)),
+      ((service_type == TARGET_MARKET || service_type == TARGET_ARMORY || service_type == TARGET_BAKERY) && ai_liveplay_mob_can_shop(mob) && rr == IN_ROOM(mob))
+    );
+    if (deferral)
+      return deferral;
+  }
 
   ai_build_route_text(first_dir, route, sizeof(route));
   {
