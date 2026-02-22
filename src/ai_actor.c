@@ -109,6 +109,55 @@ enum ai_explicit_intent {
   INTENT_ILLEGAL_SLAVERY_REQUEST
 };
 
+enum ai_capability_bits {
+  CAP_TRAIN = (1u << 0),
+  CAP_PRACTICE = (1u << 1),
+  CAP_SELL = (1u << 2),
+  CAP_BUY = (1u << 3),
+  CAP_DIRECT_CITY = (1u << 4),
+  CAP_ENFORCE_LAW = (1u << 5),
+  CAP_LODGE = (1u << 6),
+  CAP_SERVE_FOOD = (1u << 7),
+  CAP_PROVIDE_RUMOR = (1u << 8),
+  CAP_SHADE_INFO = (1u << 9),
+  CAP_RELIGIOUS_GUIDANCE = (1u << 10)
+};
+
+enum ai_temperament {
+  AI_TEMP_STOIC = 0,
+  AI_TEMP_WARM,
+  AI_TEMP_COLD,
+  AI_TEMP_ARROGANT,
+  AI_TEMP_PIOUS,
+  AI_TEMP_SHADY
+};
+
+enum ai_cognition_style {
+  AI_COG_SIMPLE = 0,
+  AI_COG_PRACTICAL,
+  AI_COG_EDUCATED,
+  AI_COG_STRATEGIC,
+  AI_COG_CRYPTIC
+};
+
+enum ai_social_tolerance {
+  AI_TOL_PATIENT = 0,
+  AI_TOL_NORMAL,
+  AI_TOL_SHORT_FUSE
+};
+
+typedef struct {
+  uint8_t temperament;
+  uint8_t cognition_style;
+  uint8_t social_tolerance;
+} ai_personality;
+
+struct ai_multi_intent {
+  enum ai_explicit_intent primary_intent;
+  enum ai_explicit_intent secondary_intent;
+  int illegal_intent_flag;
+};
+
 struct ai_social_context {
   struct char_data *mob;
   int last_intent;
@@ -118,6 +167,9 @@ struct ai_social_context {
   long last_player_idnum;
   uint32_t last_player_text_hash;
   int last_mood;
+  uint8_t insult_count_recent;
+  uint8_t last_meta_flag;
+  uint8_t last_refusal_type;
   time_t updated_at;
 };
 
@@ -855,7 +907,12 @@ static int ai_explicit_to_core_intent(enum ai_explicit_intent ex);
 static int ai_explicit_to_target(enum ai_explicit_intent ex);
 static int ai_explicit_to_domain(enum ai_explicit_intent ex, int current_domain);
 static const char *ai_role_service_fallback_line(int role, int style, enum ai_explicit_intent ex);
-static const char *ai_meta_response_line(int role, int style, enum ai_explicit_intent ex, int mood);
+static uint32_t ai_role_capabilities(int role, int style);
+static uint32_t ai_intent_required_capability(enum ai_explicit_intent ex);
+static int ai_intent_is_service(enum ai_explicit_intent ex);
+static ai_personality ai_personality_from_role(struct char_data *mob, int role, int archetype);
+static struct ai_multi_intent ai_detect_multi_intent(const char *text, int speech_class, int domain, int self_identity_query);
+static const char *ai_meta_response_line(struct char_data *mob, int role, int style, enum ai_explicit_intent ex, int mood);
 static const char *ai_social_escalation_line(int role, enum ai_explicit_intent ex, int mood);
 static struct ai_room_ambient_cache *ai_room_ambient_cache_get(room_rnum room, int create);
 static int ai_room_ambient_seen_recent(room_rnum room, unsigned long hash, time_t now);
@@ -7704,6 +7761,130 @@ static int ai_explicit_to_domain(enum ai_explicit_intent ex, int current_domain)
   }
 }
 
+static uint32_t ai_role_capabilities(int role, int style)
+{
+  uint32_t caps = 0;
+
+  switch (role) {
+    case ROLE_MERCHANT:
+      caps = CAP_SELL | CAP_BUY | CAP_PROVIDE_RUMOR;
+      if (style == 1)
+        caps |= CAP_LODGE | CAP_SERVE_FOOD;
+      break;
+    case ROLE_GUARD:
+    case ROLE_BOSS:
+      caps = CAP_DIRECT_CITY | CAP_ENFORCE_LAW;
+      break;
+    case ROLE_BANDIT:
+      caps = CAP_SHADE_INFO;
+      break;
+    case ROLE_CULTIST:
+      caps = CAP_RELIGIOUS_GUIDANCE;
+      break;
+    default:
+      break;
+  }
+
+  return caps;
+}
+
+static uint32_t ai_intent_required_capability(enum ai_explicit_intent ex)
+{
+  switch (ex) {
+    case INTENT_SERVICE_TRAINING: return CAP_TRAIN | CAP_PRACTICE;
+    case INTENT_SERVICE_FOOD:
+    case INTENT_SERVICE_WATER: return CAP_SERVE_FOOD;
+    case INTENT_SERVICE_REST:
+    case INTENT_SERVICE_INN: return CAP_LODGE;
+    case INTENT_SERVICE_WEAPONS:
+    case INTENT_SERVICE_SUPPLIES:
+    case INTENT_SERVICE_PETS: return CAP_SELL | CAP_BUY;
+    case INTENT_SERVICE_GUARDS:
+    case INTENT_DIRECTIONS_GENERIC: return CAP_DIRECT_CITY;
+    default: return 0;
+  }
+}
+
+static int ai_intent_is_service(enum ai_explicit_intent ex)
+{
+  return (ex == INTENT_SERVICE_FOOD || ex == INTENT_SERVICE_WATER || ex == INTENT_SERVICE_REST ||
+          ex == INTENT_SERVICE_INN || ex == INTENT_SERVICE_WEAPONS || ex == INTENT_SERVICE_SUPPLIES ||
+          ex == INTENT_SERVICE_PETS || ex == INTENT_SERVICE_GUARDS || ex == INTENT_SERVICE_TRAINING ||
+          ex == INTENT_DIRECTIONS_GENERIC);
+}
+
+static ai_personality ai_personality_from_role(struct char_data *mob, int role, int archetype)
+{
+  ai_personality p;
+  int alignment = mob ? GET_ALIGNMENT(mob) : 0;
+
+  p.temperament = AI_TEMP_STOIC;
+  p.cognition_style = AI_COG_PRACTICAL;
+  p.social_tolerance = AI_TOL_NORMAL;
+
+  if (mob && MOB_FLAGGED(mob, MOB_GUILD_MASTER)) {
+    p.temperament = (alignment >= 350) ? AI_TEMP_WARM : AI_TEMP_STOIC;
+    p.cognition_style = AI_COG_EDUCATED;
+    p.social_tolerance = (alignment >= 0) ? AI_TOL_PATIENT : AI_TOL_NORMAL;
+  } else if (role == ROLE_GUARD || role == ROLE_BOSS) {
+    p.temperament = AI_TEMP_STOIC;
+    p.cognition_style = AI_COG_STRATEGIC;
+    p.social_tolerance = AI_TOL_NORMAL;
+  } else if (role == ROLE_MERCHANT) {
+    p.temperament = (alignment < -250) ? AI_TEMP_ARROGANT : AI_TEMP_WARM;
+    p.cognition_style = AI_COG_PRACTICAL;
+    p.social_tolerance = AI_TOL_NORMAL;
+  } else if (role == ROLE_BANDIT) {
+    p.temperament = AI_TEMP_SHADY;
+    p.cognition_style = AI_COG_PRACTICAL;
+    p.social_tolerance = AI_TOL_SHORT_FUSE;
+  } else if (role == ROLE_CULTIST) {
+    p.temperament = AI_TEMP_PIOUS;
+    p.cognition_style = AI_COG_CRYPTIC;
+    p.social_tolerance = AI_TOL_SHORT_FUSE;
+  }
+
+  if (archetype == AI_CREATURE_UNDEAD || role == ROLE_UNDEAD || role == ROLE_SPIRIT) {
+    p.temperament = AI_TEMP_COLD;
+    p.cognition_style = AI_COG_CRYPTIC;
+    p.social_tolerance = AI_TOL_SHORT_FUSE;
+  }
+
+  if (alignment <= -500) {
+    if (p.temperament == AI_TEMP_WARM)
+      p.temperament = AI_TEMP_COLD;
+    if (p.social_tolerance == AI_TOL_PATIENT)
+      p.social_tolerance = AI_TOL_NORMAL;
+  }
+
+  return p;
+}
+
+static struct ai_multi_intent ai_detect_multi_intent(const char *text, int speech_class, int domain, int self_identity_query)
+{
+  struct ai_multi_intent out;
+  out.primary_intent = ai_detect_explicit_intent(text, speech_class, domain, self_identity_query);
+  out.secondary_intent = INTENT_CONFUSION;
+  out.illegal_intent_flag = (out.primary_intent == INTENT_ILLEGAL_SLAVERY_REQUEST);
+
+  if (ai_text_has_sub_ci(text, "slave") || ai_text_has_sub_ci(text, "slavery"))
+    out.illegal_intent_flag = 1;
+  if (out.illegal_intent_flag)
+    out.primary_intent = INTENT_ILLEGAL_SLAVERY_REQUEST;
+
+  if (ai_text_has_sub_ci(text, "pet") || ai_text_has_sub_ci(text, "stablemaster"))
+    out.secondary_intent = INTENT_SERVICE_PETS;
+  else if (ai_is_training_query_text(text) || ai_is_practice_query_text(text))
+    out.secondary_intent = INTENT_SERVICE_TRAINING;
+  else if (ai_text_has_sub_ci(text, "food") || ai_text_has_sub_ci(text, "eat") || ai_text_has_sub_ci(text, "meal"))
+    out.secondary_intent = INTENT_SERVICE_FOOD;
+
+  if (!out.illegal_intent_flag)
+    out.secondary_intent = INTENT_CONFUSION;
+
+  return out;
+}
+
 static const char *ai_role_service_fallback_line(int role, int style, enum ai_explicit_intent ex)
 {
   (void)style;
@@ -7720,17 +7901,21 @@ static const char *ai_role_service_fallback_line(int role, int style, enum ai_ex
   return "I teach skills. Ask a merchant in the market for goods.";
 }
 
-static const char *ai_meta_response_line(int role, int style, enum ai_explicit_intent ex, int mood)
+static const char *ai_meta_response_line(struct char_data *mob, int role, int style, enum ai_explicit_intent ex, int mood)
 {
   (void)style;
   (void)ex;
   if (role == ROLE_GUARD)
-    return "I keep watch and answer what I can.";
+    return "I think about keeping the peace and watching the roads.";
   if (role == ROLE_MERCHANT)
-    return "I can speak, quote, and point you where to go.";
+    return "I think about prices, stock, and who needs what.";
+  if (mob && MOB_FLAGGED(mob, MOB_GUILD_MASTER))
+    return "I think about discipline and improvement.";
+  if (role == ROLE_UNDEAD)
+    return "I think of nothing living.";
   if (role == ROLE_BANDIT)
     return (mood >= AI_SOCIAL_ANNOYED) ? "I think about exits and purses. Move along." : "I keep my own counsel.";
-  return "I answer in my role, same as anyone in town.";
+  return "I think about my duties here.";
 }
 
 static const char *ai_social_escalation_line(int role, enum ai_explicit_intent ex, int mood)
@@ -8283,6 +8468,9 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
   int inn_room = NOWHERE;
   int inn_item = -1;
   enum ai_explicit_intent explicit_intent = INTENT_CONFUSION;
+  struct ai_multi_intent multi_intent;
+  ai_personality stable_personality;
+  uint32_t role_caps = 0;
   struct ai_social_context *sctx = NULL;
   enum ai_reply_goal chosen_goal = GOAL_INFORM;
   int chosen_goal_known = FALSE;
@@ -8340,6 +8528,11 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
       rctx.evil_signaled = 1;
     }
   }
+  stable_personality = ai_personality_from_role(mob, role, rctx.archetype);
+  role_caps = ai_role_capabilities(role, style);
+  if (MOB_FLAGGED(mob, MOB_GUILD_MASTER))
+    role_caps |= (CAP_TRAIN | CAP_PRACTICE);
+
   if (type == AI_EVENT_PLAYER_SAY && !text)
     AI_EVT_RETURN("NULL_PLAYER_SAY");
   ai_normalize_text(text ? text : "", normalized, sizeof(normalized));
@@ -8362,6 +8555,11 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
     }
     self_identity_query = ai_is_self_identity_query(normalized, &self_identity_human_query);
   }
+
+  if (type == AI_EVENT_PLAYER_SAY)
+    if (!ai_actor_room_response_slot(mob, actor, type, AI_INTENT_NONE, 0, normalized))
+      AI_EVT_RETURN("ARB_SLOT_DENIED_EARLY");
+
   attention_score = ai_attention_score(mob, type, actor, normalized, now);
   ai_state_push_event(mob, type, actor, normalized);
 
@@ -8399,10 +8597,6 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
     confidence = 10;
   }
 
-  if (type == AI_EVENT_PLAYER_SAY)
-    if (!ai_actor_room_response_slot(mob, actor, type, intent, confidence, normalized))
-      AI_EVT_RETURN("ARB_SLOT_DENIED_EARLY");
-
   rctx.current_text = normalized;
   rctx.player_idnum = GET_IDNUM(actor);
   rctx.intent = intent;
@@ -8417,7 +8611,8 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
                        ai_text_has_sub_ci(normalized, "meal") || ai_text_has_sub_ci(normalized, "ration") || ai_text_has_sub_ci(normalized, "bread") ||
                        ai_text_has_sub_ci(normalized, "stew")));
   if (type == AI_EVENT_PLAYER_SAY) {
-    explicit_intent = ai_detect_explicit_intent(normalized, speech_class, rctx.domain, self_identity_query);
+    multi_intent = ai_detect_multi_intent(normalized, speech_class, rctx.domain, self_identity_query);
+    explicit_intent = multi_intent.primary_intent;
     intent = ai_explicit_to_core_intent(explicit_intent);
     rctx.intent = intent;
     rctx.speech_act = intent;
@@ -8722,16 +8917,29 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
       unsigned long seed;
       int skip_voice = FALSE;
       int asks_train = ai_is_training_query_text(normalized) || ai_is_practice_query_text(normalized);
+      uint32_t required_cap = ai_intent_required_capability(explicit_intent);
+      int has_capability = (!required_cap || ((role_caps & required_cap) != 0));
 
       if (type == AI_EVENT_PLAYER_SAY && explicit_intent == INTENT_ILLEGAL_SLAVERY_REQUEST) {
-        if (role == ROLE_GUARD)
-          line = "No. We do not traffic in people here. Drop it.";
-        else if (role == ROLE_BANDIT)
-          line = "Not happening. Ask that again and we're done.";
-        else if (role == ROLE_MERCHANT)
-          line = "No. I sell lawful goods only.";
-        else
-          line = "No. I will not help with that.";
+        const char *illegal = (role == ROLE_GUARD) ? "No. We do not traffic in people here. Drop it." :
+                              (role == ROLE_BANDIT) ? "Not happening. Ask that again and we're done." :
+                              (role == ROLE_MERCHANT) ? "No. I sell lawful goods only." :
+                              "No. I will not help with that.";
+        if (multi_intent.secondary_intent != INTENT_CONFUSION) {
+          const char *follow = NULL;
+          if (multi_intent.secondary_intent == INTENT_SERVICE_PETS)
+            follow = (role == ROLE_MERCHANT) ? "I deal in goods, not beasts. Try the market square — stablehands often pass through." :
+                    "Try the market square — stablehands often pass through.";
+          else if (multi_intent.secondary_intent == INTENT_SERVICE_TRAINING)
+            follow = has_capability ? "Yes. Use TRAIN for sessions. Use PRACTICE for skills." : "I am not a trainer. Ask a guildmaster to TRAIN and PRACTICE.";
+          if (follow && *follow)
+            snprintf(voiced, sizeof(voiced), "%s %s", illegal, follow);
+          else
+            snprintf(voiced, sizeof(voiced), "%s", illegal);
+          line = voiced;
+        } else {
+          line = illegal;
+        }
         rctx.chosen_core = line;
         skip_voice = TRUE;
         intention.be_brief = 1;
@@ -8741,13 +8949,15 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
             if (sctx->last_player_idnum == GET_IDNUM(actor) && sctx->last_intent == AI_INTENT_INSULT)
               sctx->last_mood = MIN(AI_SOCIAL_HOSTILE, sctx->last_mood + 1);
             else
-              sctx->last_mood = MAX(AI_SOCIAL_ANNOYED, sctx->last_mood);
+              sctx->last_mood = (stable_personality.social_tolerance == AI_TOL_PATIENT) ? MAX(AI_SOCIAL_NEUTRAL, sctx->last_mood) : MAX(AI_SOCIAL_ANNOYED, sctx->last_mood);
           } else if (explicit_intent == INTENT_THREAT) {
             sctx->last_mood = AI_SOCIAL_HOSTILE;
           }
+          if (explicit_intent == INTENT_INSULT || explicit_intent == INTENT_THREAT)
+            sctx->insult_count_recent = MIN(255, sctx->insult_count_recent + 1);
         }
         if (explicit_intent == INTENT_META_AI)
-          line = ai_meta_response_line(role, style, explicit_intent, sctx ? sctx->last_mood : AI_SOCIAL_NEUTRAL);
+          line = ai_meta_response_line(mob, role, style, explicit_intent, sctx ? sctx->last_mood : AI_SOCIAL_NEUTRAL);
         else
           line = ai_social_escalation_line(role, explicit_intent, sctx ? sctx->last_mood : AI_SOCIAL_NEUTRAL);
         rctx.chosen_core = line;
@@ -8788,6 +8998,29 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
         skip_voice = TRUE;
         intention.be_brief = 1;
         intention.goal = GOAL_SERVE;
+      }
+
+      if (!line && type == AI_EVENT_PLAYER_SAY && ai_intent_is_service(explicit_intent)) {
+        if (!has_capability) {
+          line = ai_role_redirect_line(role, style, rctx.primary_topic_target);
+          if (!line || !*line)
+            line = ai_role_service_fallback_line(role, style, explicit_intent);
+          if (!line || !*line)
+            line = ai_service_honest_fallback_line(role, rctx.primary_topic_target, rctx.archetype);
+        } else if (explicit_intent == INTENT_SERVICE_TRAINING) {
+          line = "Yes. Use TRAIN for sessions. Use PRACTICE for skills.";
+        } else if (rctx.facts.confidence >= 3 && rctx.facts.service_name[0]) {
+          snprintf(service_line, sizeof(service_line), "%s. %s", rctx.facts.service_name, rctx.facts.route_snippet[0] ? rctx.facts.route_snippet : "Go there directly.");
+          line = service_line;
+        } else {
+          line = ai_epistemic_line(rctx.facts.confidence, role, rctx.primary_topic_target);
+        }
+        if (line && *line) {
+          rctx.chosen_core = line;
+          skip_voice = TRUE;
+          intention.be_brief = 1;
+          intention.goal = GOAL_SERVE;
+        }
       }
 
       if (!line || !*line) {
@@ -9026,6 +9259,12 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
         sctx->last_mood = MIN(AI_SOCIAL_HOSTILE, MAX(AI_SOCIAL_ANNOYED, sctx->last_mood + 1));
       else if (explicit_intent == INTENT_GREETING || explicit_intent == INTENT_SMALLTALK)
         sctx->last_mood = MAX(AI_SOCIAL_NEUTRAL, sctx->last_mood - 1);
+      if (explicit_intent == INTENT_INSULT || explicit_intent == INTENT_THREAT)
+        sctx->insult_count_recent = MIN(255, sctx->insult_count_recent + 1);
+      else if (explicit_intent == INTENT_GREETING || explicit_intent == INTENT_SMALLTALK)
+        sctx->insult_count_recent = (sctx->insult_count_recent > 0) ? (uint8_t)(sctx->insult_count_recent - 1) : 0;
+      sctx->last_meta_flag = (explicit_intent == INTENT_META_AI) ? 1 : 0;
+      sctx->last_refusal_type = (explicit_intent == INTENT_ILLEGAL_SLAVERY_REQUEST) ? 1 : ((explicit_intent == INTENT_INSULT || explicit_intent == INTENT_THREAT) ? 2 : 0);
       sctx->updated_at = now;
     }
 
