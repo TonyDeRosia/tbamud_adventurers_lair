@@ -42,7 +42,7 @@ struct ai_reaction_result {
 struct ai_rx_cd_mob { int mob_id; time_t next_allowed; };
 struct ai_rx_cd_room { room_rnum room; int event_type; time_t next_allowed; };
 struct ai_rx_cd_room_player { room_rnum room; long player_idnum; int event_type; time_t next_allowed; };
-struct ai_rx_cd_room_player_hash { room_rnum room; long player_idnum; unsigned long text_hash; int event_type; time_t next_allowed; };
+struct ai_rx_cd_room_player_hash { room_rnum room; long player_idnum; int mob_id; unsigned long text_hash; int event_type; time_t next_allowed; };
 struct ai_rx_room_event { room_rnum room; int event_type; int count; time_t updated_at; };
 struct ai_rx_harass { room_rnum room; long actor_idnum; int boundary_hits; time_t expires_at; };
 struct ai_rx_room_voice { room_rnum room; time_t last_spoken; time_t next_ambience; };
@@ -138,6 +138,41 @@ static const char *const rx_plan_merchant_demand[] = {"Coin first.", "No coin, n
 static const char *const rx_plan_innkeeper_demand[] = {"Pay first, then service.", "We do not do charity at knifepoint.", NULL};
 static const char *const rx_plan_bandit_demand[] = {"Try it and bleed for it.", "You demand too much.", NULL};
 static const char *const rx_plan_instructor_demand[] = {"Discipline before demands.", "Ask properly or leave.", NULL};
+static const char *const fallback_guard[] = {
+  "State your need clearly.","Speak plainly.","One request at a time.","Keep it lawful and concise.",
+  "Report the matter in plain words.","Stay calm and be specific.","I need a clear request.","Keep to one topic.",
+  "Say exactly what service you need.","Brief and lawful, citizen.","No riddles. State your business.","Make your request direct.",NULL
+};
+static const char *const fallback_constable[] = {
+  "File your request properly.","Specify the service required.","Submit one clear request.","State the matter for the record.",
+  "Clarify your petition in formal terms.","One issue per request.","I require a precise statement.","Identify the exact service sought.",
+  "Present your request in order.","Keep the report concise.","Define your need without ambiguity.","Proceed with a proper request.",NULL
+};
+static const char *const fallback_merchant[] = {
+  "What category are you after?","Weapons, armor, or something finer?","Name the goods and I'll quote coin.","Are you buying, selling, or browsing?",
+  "Pick a wares category and we can trade.","Tell me the item class you want.","Coin talks-what exactly do you need?","Give me one product line at a time.",
+  "Trade starts with specifics.","State the merchandise clearly.","Need supplies, steel, or sundries?","Choose the goods and we'll deal.",NULL
+};
+static const char *const fallback_innkeeper[] = {
+  "Room, meal, or ale?","Say if you need a bed or a bowl.","Pick one: lodging, food, or drink.","Travel's easier with a clear order.",
+  "Bed, bread, or brew?","Name your comfort and I'll serve it.","One tab at a time-room or refreshment.","You after rest, rations, or a mug?",
+  "Tell me if it's cot, stew, or cask.","Make it simple: room, meal, or ale.","What can I pour or prepare for you?","Choose your inn service plainly.",NULL
+};
+static const char *const fallback_bandit[] = {
+  "Talk straight or keep walking.","One ask, quick.","Don't waste my time with foggy words.","Pick a lane and spit it out.",
+  "You want coin, cover, or directions?","Say it clean before my patience snaps.","One hustle at a time.","Make your angle obvious.",
+  "Clear asks get answers. Maybe.","Keep it short and useful.","Stop circling-state your play.","One request, then move.",NULL
+};
+static const char *const fallback_instructor[] = {
+  "Discipline your question.","State one training objective.","Specify the lesson you seek.","One drill request at a time.",
+  "Name the skill to improve.","Clarity is the first exercise.","Choose one technique to discuss.","Ask with precision and focus.",
+  "Define your need like a student.","Pick a single training goal.","Refine your request and continue.","Instruction begins with a clear ask.",NULL
+};
+static const char *const fallback_neutral[] = {
+  "I need a clearer request.","Ask one thing at a time.","Say that more plainly.","Clarify what you need.",
+  "Give me one specific question.","Keep your request concise.","I can help when it's clearer.","Try a direct question.",
+  "Name the service or topic.","Let's keep this simple.","State your request directly.","What exactly are you asking?",NULL
+};
 
 int ai_rx_infer_targeted_to_mob(struct char_data *mob, const char *norm_text) {
   if (!mob || !norm_text) return FALSE;
@@ -160,10 +195,16 @@ static enum ai_rx_intent ai_rx_classify_intent(enum ai_event_type type, const ch
   if (type == AI_EVENT_COMBAT_START) return RX_INTENT_COMBAT_START;
   if (!norm_text || !*norm_text) return RX_INTENT_NONE;
   if (ai_rx_is_explicit_sexual_request(norm_text)) return RX_INTENT_FLIRT_LEWD;
+  if (ai_text_has_sub_ci_local(norm_text, "buy") || ai_text_has_sub_ci_local(norm_text, "shop") || ai_text_has_sub_ci_local(norm_text, "purchase") || ai_text_has_sub_ci_local(norm_text, "market") || ai_text_has_sub_ci_local(norm_text, "stuff")) return RX_INTENT_REQUEST_TRADE;
+  if (ai_text_has_sub_ci_local(norm_text, "help") || ai_text_has_sub_ci_local(norm_text, "assist") || ai_text_has_sub_ci_local(norm_text, "guide") || ai_text_has_sub_ci_local(norm_text, "where")) return RX_INTENT_REQUEST_HELP;
+  if (ai_text_has_sub_ci_local(norm_text, "give me") || ai_text_has_sub_ci_local(norm_text, "gold") || ai_text_has_sub_ci_local(norm_text, "money") || ai_text_has_sub_ci_local(norm_text, "coins")) return RX_INTENT_REQUEST_TRADE;
+  if (ai_text_has_sub_ci_local(norm_text, "hello") || ai_text_has_sub_ci_local(norm_text, "hi") || ai_text_has_sub_ci_local(norm_text, "greetings")) return RX_INTENT_GREETING;
+  if (ai_text_has_sub_ci_local(norm_text, "kiss") || ai_text_has_sub_ci_local(norm_text, "love") || ai_text_has_sub_ci_local(norm_text, "flirt")) return RX_INTENT_FRIENDLY_SOCIAL;
+  if (ai_text_has_sub_ci_local(norm_text, "thanks")) return RX_INTENT_PRAISE;
+  if (ai_text_has_sub_ci_local(norm_text, "idiot") || ai_text_has_sub_ci_local(norm_text, "stupid") || ai_text_has_sub_ci_local(norm_text, "moron") || ai_text_has_sub_ci_local(norm_text, "fool")) return RX_INTENT_INSULT;
   if (ai_text_has_sub_ci_local(norm_text, "steal") || ai_text_has_sub_ci_local(norm_text, "rob") || ai_text_has_sub_ci_local(norm_text, "mug")) return RX_INTENT_LOOT_THEFT;
   if (ai_text_has_sub_ci_local(norm_text, "threat") || ai_text_has_sub_ci_local(norm_text, "kill") || ai_text_has_sub_ci_local(norm_text, "hurt")) return RX_INTENT_THREATEN;
   if (ai_text_has_sub_ci_local(norm_text, "help")) return RX_INTENT_REQUEST_HELP;
-  if (ai_text_has_sub_ci_local(norm_text, "hello") || ai_text_has_sub_ci_local(norm_text, "hi ")) return RX_INTENT_GREETING;
   if (strchr(norm_text, '?')) return RX_INTENT_QUESTION;
   return RX_INTENT_SMALLTALK;
 }
@@ -245,7 +286,7 @@ static int ai_rx_can_fire(struct char_data *mob, const struct ai_reaction_ctx *c
     }
     *why = "room_cooldown"; return FALSE;
   }
-  for (i = 0; i < AI_RX_ROOM_PLAYER_HASH_CD_MAX; i++) if (ai_rx_room_player_hash_cd[i].room == ctx->room_rnum && ai_rx_room_player_hash_cd[i].player_idnum == ctx->actor_idnum && ai_rx_room_player_hash_cd[i].event_type == ctx->event_type && ai_rx_room_player_hash_cd[i].text_hash == ctx->normalized_hash && ai_rx_room_player_hash_cd[i].next_allowed > now) { *why = "room_player_hash_cooldown"; return FALSE; }
+  for (i = 0; i < AI_RX_ROOM_PLAYER_HASH_CD_MAX; i++) if (ai_rx_room_player_hash_cd[i].room == ctx->room_rnum && ai_rx_room_player_hash_cd[i].player_idnum == ctx->actor_idnum && ai_rx_room_player_hash_cd[i].mob_id == mob_id && ai_rx_room_player_hash_cd[i].event_type == ctx->event_type && ai_rx_room_player_hash_cd[i].text_hash == ctx->normalized_hash && ai_rx_room_player_hash_cd[i].next_allowed > now) { *why = "same_mob_hash_cooldown"; return FALSE; }
   ev = ai_rx_room_event_get(ctx->room_rnum, ctx->event_type, 1);
   if (ev && ev->updated_at && (now - ev->updated_at) > 5) ev->count = 0;
   *why = "ok";
@@ -292,8 +333,15 @@ static const char *ai_rx_pick_plan_line(enum ai_actor_persona persona, int inten
       default: pool = rx_plan_neutral_greet; *out_pool = "neutral_greet"; break;
     }
   } else {
-    *out_pool = "fallback_one_liner";
-    pool = rx_one_liner;
+    switch (persona) {
+      case AI_PERSONA_BANDIT: pool = fallback_bandit; *out_pool = "fallback_bandit"; break;
+      case AI_PERSONA_GUARD: pool = fallback_guard; *out_pool = "fallback_guard"; break;
+      case AI_PERSONA_CONSTABLE: pool = fallback_constable; *out_pool = "fallback_constable"; break;
+      case AI_PERSONA_MERCHANT: pool = fallback_merchant; *out_pool = "fallback_merchant"; break;
+      case AI_PERSONA_INNKEEPER: pool = fallback_innkeeper; *out_pool = "fallback_innkeeper"; break;
+      case AI_PERSONA_INSTRUCTOR: pool = fallback_instructor; *out_pool = "fallback_instructor"; break;
+      default: pool = fallback_neutral; *out_pool = "fallback_neutral"; break;
+    }
   }
 
   return ai_rx_pick_seeded(pool, seed);
@@ -419,7 +467,7 @@ int ai_reaction_try(struct char_data *mob, const struct ai_reaction_ctx *ctx) {
   for (i = 0; i < AI_RX_MOB_CD_MAX; i++) { if (ai_rx_mob_cd[i].mob_id == mob_id || ai_rx_mob_cd[i].next_allowed == 0) { ai_rx_mob_cd[i].mob_id = mob_id; ai_rx_mob_cd[i].next_allowed = now + rand_number(8, 20); break; } }
   for (i = 0; i < AI_RX_ROOM_CD_MAX; i++) { if ((ai_rx_room_cd[i].room == ctx->room_rnum && ai_rx_room_cd[i].event_type == ctx->event_type) || ai_rx_room_cd[i].next_allowed == 0) { int cd = rand_number(2, 4); if (ctx->trigger_reason == AI_RX_TRIG_NON_SPEAK_ACTION_SELECTED) cd = rand_number(1, 2); else if (ctx->trigger_reason == AI_RX_TRIG_ARB_SLOT_DENIED_EARLY) cd = rand_number(2, 3); else if (ctx->event_type == AI_EVENT_PLAYER_SAY) cd = rand_number(3, 5); ai_rx_room_cd[i].room = ctx->room_rnum; ai_rx_room_cd[i].event_type = ctx->event_type; ai_rx_room_cd[i].next_allowed = now + cd; break; } }
   for (i = 0; i < AI_RX_ROOM_PLAYER_CD_MAX; i++) { if ((ai_rx_room_player_cd[i].room == ctx->room_rnum && ai_rx_room_player_cd[i].player_idnum == ctx->actor_idnum && ai_rx_room_player_cd[i].event_type == ctx->event_type) || ai_rx_room_player_cd[i].next_allowed == 0) { ai_rx_room_player_cd[i].room = ctx->room_rnum; ai_rx_room_player_cd[i].player_idnum = ctx->actor_idnum; ai_rx_room_player_cd[i].event_type = ctx->event_type; ai_rx_room_player_cd[i].next_allowed = now + 6; break; } }
-  for (i = 0; i < AI_RX_ROOM_PLAYER_HASH_CD_MAX; i++) { if ((ai_rx_room_player_hash_cd[i].room == ctx->room_rnum && ai_rx_room_player_hash_cd[i].player_idnum == ctx->actor_idnum && ai_rx_room_player_hash_cd[i].event_type == ctx->event_type && ai_rx_room_player_hash_cd[i].text_hash == ctx->normalized_hash) || ai_rx_room_player_hash_cd[i].next_allowed == 0) { ai_rx_room_player_hash_cd[i].room = ctx->room_rnum; ai_rx_room_player_hash_cd[i].player_idnum = ctx->actor_idnum; ai_rx_room_player_hash_cd[i].event_type = ctx->event_type; ai_rx_room_player_hash_cd[i].text_hash = ctx->normalized_hash; ai_rx_room_player_hash_cd[i].next_allowed = now + 20; break; } }
+  for (i = 0; i < AI_RX_ROOM_PLAYER_HASH_CD_MAX; i++) { if ((ai_rx_room_player_hash_cd[i].room == ctx->room_rnum && ai_rx_room_player_hash_cd[i].player_idnum == ctx->actor_idnum && ai_rx_room_player_hash_cd[i].mob_id == mob_id && ai_rx_room_player_hash_cd[i].event_type == ctx->event_type && ai_rx_room_player_hash_cd[i].text_hash == ctx->normalized_hash) || ai_rx_room_player_hash_cd[i].next_allowed == 0) { ai_rx_room_player_hash_cd[i].room = ctx->room_rnum; ai_rx_room_player_hash_cd[i].player_idnum = ctx->actor_idnum; ai_rx_room_player_hash_cd[i].mob_id = mob_id; ai_rx_room_player_hash_cd[i].event_type = ctx->event_type; ai_rx_room_player_hash_cd[i].text_hash = ctx->normalized_hash; ai_rx_room_player_hash_cd[i].next_allowed = now + 3; break; } }
 
   ev = ai_rx_room_event_get(ctx->room_rnum, ctx->event_type, 1);
   if (ev) { ev->room = ctx->room_rnum; ev->event_type = ctx->event_type; ev->count++; ev->updated_at = now; }

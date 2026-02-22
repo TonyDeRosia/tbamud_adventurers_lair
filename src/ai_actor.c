@@ -1192,8 +1192,10 @@ struct ai_player_arb_entry {
   time_t created_at;
   struct char_data *responder1;
   struct char_data *responder2;
+  struct char_data *responder3;
   int responder1_template_id;
   int responder2_template_id;
+  int responder3_template_id;
 };
 
 static struct ai_player_arb_entry ai_player_arb_cache[AI_PLAYER_ARB_CACHE_MAX];
@@ -7424,7 +7426,7 @@ static const char *ai_distinct_pool_pick(struct char_data *mob, enum ai_distinct
     [DRG_GUARD] = {
       [DINT_GREETING] = {"Hail. Keep to the law.","On watch. State your business.","You have the watch's ear. Briefly.","Citizen, speak your need.","Hold there. What is it?","I am on duty. Be clear.","Road is watched. Your request?","Report in plain words.","Discipline first. Ask.","Guard post is active. Speak.","Keep order and ask cleanly.","By watch oath, be brief.",NULL},
       [DINT_HELP_FOLLOWUP] = {"Need directions or trouble handled?","Do you seek a route or the watch?","Ask for roads, trainers, or safety.","Tell me: guidance, law, or supplies?","Need the barracks, guild, or market?","Point me: directions or protection?","Say whether this is training or danger.","Need lawful work or a path?","Do you need patrol aid or a landmark?","Road advice or watch business?","Pick one: route, trainer, or watch help.","Is this a peace matter or travel matter?",NULL},
-      [DINT_SERVICE_MENU] = {"Name one service: training, food, water, or lodging.","One request at a time: route, guard, or trainer.","Be specific: meal, room, drill, or directions.","Choose your need clearly: watch, inn, or supplies.","Single request, citizen: food, rest, or guidance.","Pick a category: law, route, or provisions.","State one need: trainer, tavern, or market.","Narrow it down: security, road, or rations.","What exactly: room, water, or training?","Select one service and I can point you.","Clear request please: guard, inn, or guild.","One clear need and I'll answer.",NULL},
+      [DINT_SERVICE_MENU] = {"State your need clearly.","Speak plainly.","One request at a time.","Name one lawful service.","Keep it precise and brief.","State one need and I'll direct you.","One clear request, citizen.","Specify the exact service.","No riddles-just the request.","One request. No rambling.","Tell me one need at a time.","Be direct and lawful.",NULL},
       [DINT_TRAINING] = {"Drills happen at the guild hall.","Find a guildmaster for proper training.","Training belongs to the yard, not this post.","Take your stance to the drillmaster.","Practice with the guild, not the gate.","The trainer keeps strict hours in the hall.","For skill work, report to the guild.","Steelwork training is done by masters.","You want progress, seek the training yard.","Discipline starts with the guildmaster.","March to the guild if you want instruction.","I enforce order; the guild teaches forms.",NULL},
       [DINT_FOOD_WATER] = {"Rations are at the inn.","Water and stew are sold by the hearth.","Try the tavern for food and drink.","The cookhouse can feed you.","Find an inn bench for bread and water.","For meals, head to the common room.","Supplies and drink are market side.","The watch does not serve stew.","You'll eat better at the innkeeper's table.","Water skins and meals come from vendors.","Hunger is solved at the tavern fire.","Get fed at the next inn.",NULL},
       [DINT_MONEY_REFUSAL] = {"No handouts from the watch.","Earn coin lawfully.","The guard issues no free gold.","I don't pay beggars.","Coin comes from work, not pleading.","Take lawful contracts for money.","No purse opens for that request.","The watch keeps order, not charity.","No free coin. Try the market.","Work earns silver; demands earn nothing.","I will not hand out gold.","Seek wages, not alms.",NULL},
@@ -7454,7 +7456,7 @@ static const char *ai_distinct_pool_pick(struct char_data *mob, enum ai_distinct
     [DRG_MERCHANT] = {
       [DINT_GREETING] = {"Welcome. Buying or selling?","Good day. Looking for wares?","Shop's open. What do you need?","Coin ready? I can help.","Greetings. Trade, room, or directions?","Step up, customer. What's your ask?","Need supplies today?","Looking for a fair bargain?","Wares are fresh. Speak your need.","Welcome to my counter.","Trade talk starts with clear requests.","Hello there, coinfriend.",NULL},
       [DINT_HELP_FOLLOWUP] = {"Do you want to buy, sell, or rent a room?","Need supplies, food, or directions to a trainer?","Is this about goods, lodging, or coin work?","Ask me trade, meals, or routes.","Need market help or inn help?","Do you seek gear, water, or guidance?","Tell me if this is buying, selling, or resting.","Do you need prices, paths, or provisions?","Which first: wares, room, or road?","Need a vendor, a tavern, or a guild?","Pick one need and we can deal.","Are you here for trade or survival basics?",NULL},
-      [DINT_SERVICE_MENU] = {"Choose one service: wares, food, water, room, or route.","One request at a time: buy, sell, inn, or training direction.","Be specific: trade, lodging, or supplies.","Pick a category: market goods, meals, or guidance.","Name one need: coin, provisions, or rest.","Single request please: room, ration, or shop.","What exactly: buy, sell, eat, or train?","Narrow it down and I'll price it.","One clear ask gets the fastest answer.","Select one service lane: wares, water, or wayfinding.","Give me one category to work with.","One item of business, please.",NULL},
+      [DINT_SERVICE_MENU] = {"What category are you after?","Weapons, armor, or something finer?","Name the goods and I'll quote you.","Are you buying or selling today?","Pick one merchandise category.","One product line at a time.","Trade starts with specifics.","Tell me the exact wares you need.","Coin and clarity, friend.","State the item class clearly.","Choose the goods and we can deal.","One item of business at a time.",NULL},
       [DINT_TRAINING] = {"Training is guild business, not shop business.","I sell gear; guildmasters sell skill.","For drills, visit the training hall.","Take your training request to a master.","No practice sessions at this counter.","Guild hall handles TRAIN and PRAC.","You want lessons, find a trainer.","I'm a trader, not an instructor.","Training contracts are elsewhere.","Go to the guild if you seek discipline.","I can outfit you, not train you.","Find the drill yard for that.",NULL},
       [DINT_FOOD_WATER] = {"Food and water are available at the inn.","Buy rations at market stalls nearby.","The tavern serves stew and drink.","Need water? The inn has clean casks.","For a meal, head to the hearthroom.","You can get bread and water in the square.","Try the cook stalls for quick food.","Innkeeper can set you up with a meal.","Rations cost less at the morning market.","Meals are sold by the tavern fire.","Food and drink are easy to find nearby.","I can point you to provisions.",NULL},
       [DINT_MONEY_REFUSAL] = {"I don't hand out coin.","No free gold from this stall.","Earn your money by trade.","Charity is not in today's ledger.","I won't give you my purse.","Coin comes with work or wares.","No handout. Bring value.","Not a copper for begging.","I refuse money requests.","Sell loot if you need cash.","No free silver here.","This counter pays no alms.",NULL},
@@ -7464,7 +7466,7 @@ static const char *ai_distinct_pool_pick(struct char_data *mob, enum ai_distinct
     [DRG_INNKEEPER] = {
       [DINT_GREETING] = {"Welcome in. Room or meal?","Hail, traveler. Need a bed?","Come to the hearth. What can I serve?","Good evening. Hungry or tired?","Take a seat. Room, water, or stew?","Welcome. Looking for rest?","Step inside. Need food or lodging?","The fire's warm. What's your need?","Hearth's open, friend.","Need a mug and a bed?","Inn's awake. Speak your request.","Welcome to my hall.",NULL},
       [DINT_HELP_FOLLOWUP] = {"Do you need a room, a meal, or directions?","Looking for bed, bread, or guidance?","Ask for lodging, water, or local tips.","Need rest first or food first?","Do you want inn service or market directions?","Tell me if this is room, stew, or route.","Need a table, a cot, or a pointer?","Are you after comfort or supplies?","Shall I set a meal or point the way?","Need a safe bed or a quick drink?","Pick one need and I'll sort it.","Is this about resting, eating, or finding someone?",NULL},
-      [DINT_SERVICE_MENU] = {"Choose one: room, meal, water, or directions.","One request at a time: bed, bread, or route.","Name your need: lodging, food, or guidance.","Pick a service: inn stay, drink, or city pointer.","Single ask please: room, stew, or trainer direction.","Tell me one thing to arrange.","What exactly: bed, bowl, or bearings?","Choose one and I'll get moving.","One clear need works best.","Pick your comfort: cot, cask, or counsel.","Name one service from this hearth.","One at a time, traveler.",NULL},
+      [DINT_SERVICE_MENU] = {"Room, meal, or ale?","Tell me if it's bed, bread, or brew.","Pick one inn service at a time.","Need lodging, a hot meal, or a drink?","Say one thing to arrange first.","One order at a time, traveler.","What can I pour or prepare?","Choose cot, stew, or cask.","Keep the order simple and clear.","Name one request from this hearth.","Bed or bowl-which is it?","One clear inn request, please.",NULL},
       [DINT_TRAINING] = {"Training happens at the guild, not the inn.","I pour drinks, I don't run drills.","Find a guildmaster for practice.","The yard teaches; I host sleepers.","For skill training, seek the hall.","No TRAIN sessions from this bar.","I can point you to the trainers.","Take your weapon forms to the guild.","Try the drillmaster for that.","Instruction is outside my hearth duties.","Guild doors are where you train.","I serve beds, not battle lessons.",NULL},
       [DINT_FOOD_WATER] = {"Aye, we serve stew and water.","Sit down and I'll bring a meal.","We've got bread, broth, and clean drink.","Food and water are ready here.","You can eat by the fire.","Water cask is fresh tonight.","I can set a hot bowl for you.","Hungry? The kitchen is open.","Need a drink? Pull up a stool.","Meals are served till lamps-out.","You'll not go hungry in this hall.","Yes, we can feed you.",NULL},
       [DINT_MONEY_REFUSAL] = {"I can't give away coin.","No free gold, sorry.","Paying guests keep this inn standing.","I serve food, not handouts.","No purse gifts from my counter.","You'll need work for coin.","I won't hand over silver.","Money isn't given, it's earned.","No charity purse tonight.","I cannot spare coin.","Try the job board for wages.","No, I don't give money.",NULL},
@@ -7660,11 +7662,33 @@ static const char *ai_creature_reaction_line(enum ai_creature_category cat, enum
 
 static const char *ai_service_menu_clarify_line(struct char_data *mob, int role, int style, int evil, int archetype, int personality)
 {
+  static const char *const guard_clarify[] = {
+    "State your need clearly.","Speak plainly.","One request at a time.",NULL
+  };
+  static const char *const constable_clarify[] = {
+    "File your request properly.","Specify the service required.",NULL
+  };
+  static const char *const merchant_clarify[] = {
+    "What category are you after?","Weapons, armor, or something finer?",NULL
+  };
+  static const char *const innkeeper_clarify[] = {
+    "Room, meal, or ale?",NULL
+  };
+  enum ai_actor_persona persona;
   enum ai_distinct_role_group grp;
   int idx = -1;
   uint64_t subtags = ai_detect_creature_subtags(mob);
   (void)evil;
   (void)style;
+  persona = get_actor_persona(mob);
+  if (persona == AI_PERSONA_GUARD)
+    return ai_pick_line_from_pool(mob, guard_clarify, 3, ai_hash_mix((unsigned long)personality, 1911UL));
+  if (persona == AI_PERSONA_CONSTABLE)
+    return ai_pick_line_from_pool(mob, constable_clarify, 2, ai_hash_mix((unsigned long)personality, 1921UL));
+  if (persona == AI_PERSONA_MERCHANT)
+    return ai_pick_line_from_pool(mob, merchant_clarify, 2, ai_hash_mix((unsigned long)personality, 1931UL));
+  if (persona == AI_PERSONA_INNKEEPER)
+    return ai_pick_line_from_pool(mob, innkeeper_clarify, 1, ai_hash_mix((unsigned long)personality, 1941UL));
   grp = ai_distinct_role_group_pick(mob, role, archetype, subtags);
   return ai_distinct_pool_pick(mob, grp, DINT_SERVICE_MENU, ai_hash_mix((unsigned long)personality, 1901UL), &idx);
 }
@@ -8511,6 +8535,8 @@ static enum ai_explicit_intent ai_detect_explicit_intent(const char *text, int s
     return INTENT_IDENTITY;
   if (ai_is_training_query_text(text) || ai_is_practice_query_text(text))
     return INTENT_SERVICE_TRAINING;
+  if (ai_text_has_sub_ci(text, "give me") || ai_text_has_sub_ci(text, "gold") || ai_text_has_sub_ci(text, "money") || ai_text_has_sub_ci(text, "coins"))
+    return INTENT_MONEY_JOB;
   if (ai_is_money_job_phrase(text))
     return INTENT_MONEY_JOB;
   if (ai_text_has_sub_ci(text, "pet") || ai_text_has_sub_ci(text, "stablemaster"))
@@ -8529,6 +8555,16 @@ static enum ai_explicit_intent ai_detect_explicit_intent(const char *text, int s
     return INTENT_SERVICE_SUPPLIES;
   if (ai_text_has_sub_ci(text, "guard") || ai_text_has_sub_ci(text, "constable"))
     return INTENT_SERVICE_GUARDS;
+  if (ai_text_has_sub_ci(text, "buy") || ai_text_has_sub_ci(text, "shop") || ai_text_has_sub_ci(text, "purchase") || ai_text_has_sub_ci(text, "market") || ai_text_has_sub_ci(text, "stuff"))
+    return INTENT_SERVICE_SUPPLIES;
+  if (ai_text_has_sub_ci(text, "help") || ai_text_has_sub_ci(text, "assist") || ai_text_has_sub_ci(text, "guide") || ai_text_has_sub_ci(text, "where"))
+    return INTENT_HELP_REQUEST;
+  if (ai_text_has_sub_ci(text, "hello") || ai_text_has_sub_ci(text, "hi") || ai_text_has_sub_ci(text, "greetings"))
+    return INTENT_GREETING;
+  if (ai_text_has_sub_ci(text, "kiss") || ai_text_has_sub_ci(text, "love") || ai_text_has_sub_ci(text, "flirt"))
+    return INTENT_SMALLTALK;
+  if (ai_text_has_sub_ci(text, "thanks"))
+    return INTENT_EMPATHY;
   if (ai_text_has_sub_ci(text, "where") || speech_class == AI_SPEECH_DIRECTIONS)
     return INTENT_DIRECTIONS_GENERIC;
   if (speech_class == AI_SPEECH_GREET || ai_is_questionish_greeting(text))
@@ -8537,6 +8573,8 @@ static enum ai_explicit_intent ai_detect_explicit_intent(const char *text, int s
     return INTENT_HELP_REQUEST;
   if (speech_class == AI_SPEECH_SMALLTALK || domain == DOMAIN_SOCIAL)
     return INTENT_SMALLTALK;
+  if (strchr(text, '?'))
+    return INTENT_DIRECTIONS_GENERIC;
   return INTENT_CONFUSION;
 }
 
@@ -8930,9 +8968,9 @@ static struct ai_player_arb_entry *ai_player_arb_get_or_create(room_rnum room, l
 static int ai_actor_room_response_slot(struct char_data *mob, struct char_data *actor, enum ai_event_type type, int intent, int confidence, const char *normalized)
 {
   struct char_data *it;
-  struct char_data *top1 = NULL, *top2 = NULL;
+  struct char_data *top1 = NULL, *top2 = NULL, *top3 = NULL;
   struct ai_player_arb_entry *arb;
-  int best1 = -999999, best2 = -999999;
+  int best1 = -999999, best2 = -999999, best3 = -999999;
   int targeted_to_mob = ai_rx_infer_targeted_to_mob(mob, normalized);
   time_t now = time(0);
   unsigned long text_hash;
@@ -8945,8 +8983,8 @@ static int ai_actor_room_response_slot(struct char_data *mob, struct char_data *
   if (!arb)
     return FALSE;
 
-  if (arb->responder1 || arb->responder2)
-    return (mob == arb->responder1 || mob == arb->responder2);
+  if (arb->responder1 || arb->responder2 || arb->responder3)
+    return (mob == arb->responder1 || mob == arb->responder2 || mob == arb->responder3);
 
   for (it = world[IN_ROOM(mob)].people; it; it = it->next_in_room) {
     int pri;
@@ -8974,13 +9012,20 @@ static int ai_actor_room_response_slot(struct char_data *mob, struct char_data *
     pri -= (dist * 2);
 
     if (pri > best1 || (pri == best1 && (!top1 || GET_MOB_VNUM(it) < GET_MOB_VNUM(top1)))) {
+      best3 = best2;
+      top3 = top2;
       best2 = best1;
       top2 = top1;
       best1 = pri;
       top1 = it;
     } else if (pri > best2 || (pri == best2 && (!top2 || GET_MOB_VNUM(it) < GET_MOB_VNUM(top2)))) {
+      best3 = best2;
+      top3 = top2;
       best2 = pri;
       top2 = it;
+    } else if (pri > best3 || (pri == best3 && (!top3 || GET_MOB_VNUM(it) < GET_MOB_VNUM(top3)))) {
+      best3 = pri;
+      top3 = it;
     }
   }
 
@@ -8989,7 +9034,10 @@ static int ai_actor_room_response_slot(struct char_data *mob, struct char_data *
 
   arb->responder1 = top1;
   arb->responder2 = targeted_to_mob ? NULL : top2;
-  return (mob == arb->responder1 || mob == arb->responder2);
+  arb->responder3 = targeted_to_mob ? NULL : top3;
+  if (ai_debug)
+    ai_debug_log("AI_ARB decision=slot_assign room=%d actor=%ld intent=%d responders=%d/%d/%d", IN_ROOM(mob), GET_IDNUM(actor), intent, top1 ? GET_MOB_VNUM(top1) : -1, top2 ? GET_MOB_VNUM(top2) : -1, top3 ? GET_MOB_VNUM(top3) : -1);
+  return (mob == arb->responder1 || mob == arb->responder2 || mob == arb->responder3);
 }
 
 
@@ -9502,10 +9550,12 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
   }
 
   if (type == AI_EVENT_PLAYER_SAY)
-    if (!ai_actor_room_response_slot(mob, actor, type, AI_INTENT_NONE, 0, normalized)) {
+    if (!ai_actor_room_response_slot(mob, actor, type, rx_result.intent, 0, normalized)) {
       ai_actor_try_reaction_glue(mob, actor, text, normalized, normalized_hash, type, AI_RX_TRIG_ARB_SLOT_DENIED_EARLY,
                                  AI_ACTION_IGNORE, role, style, rctx.personality, rctx.archetype,
                                  intent, rctx.domain, attention_score, suspicion, rx_result.threat, rx_result.urgency);
+      if (ai_debug)
+        ai_debug_log("AI_ARB decision=denied room=%d actor=%ld intent=%d mob=%d", IN_ROOM(mob), GET_IDNUM(actor), rx_result.intent, GET_MOB_VNUM(mob));
       AI_EVT_RETURN("ARB_SLOT_DENIED_EARLY");
     }
 
@@ -9890,6 +9940,8 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
     struct ai_player_arb_entry *arb = ai_player_arb_lookup(IN_ROOM(mob), GET_IDNUM(actor), type, normalized_hash, now);
     if (arb) {
       if (mob == arb->responder2)
+        avoid_template_id = arb->responder1_template_id;
+      else if (mob == arb->responder3)
         avoid_template_id = arb->responder1_template_id;
       else if (mob == arb->responder1)
         avoid_template_id = arb->responder2_template_id;
@@ -10402,6 +10454,8 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
           arb->responder1_template_id = selected_template_id;
         else if (mob == arb->responder2)
           arb->responder2_template_id = selected_template_id;
+        else if (mob == arb->responder3)
+          arb->responder3_template_id = selected_template_id;
       }
     }
   }
