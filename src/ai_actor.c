@@ -435,6 +435,9 @@ struct ai_conv_actor_state {
   unsigned int recent_lead_hashes[6];
   int recent_lead_head;
   int recent_lead_count;
+  unsigned int recent_phrase_hashes[6];
+  int recent_phrase_head;
+  int recent_phrase_count;
   int tone_clipped;
   int tone_no_extras;
   int tone_day_trade;
@@ -745,6 +748,8 @@ static const char *ai_service_honest_fallback_line(int role, int topic_target, i
 static void ai_buf_prefix(char *buf, size_t bufsz, const char *prefix);
 static int ai_text_is_effectively_empty(const char *s);
 static const char *ai_role_neutral_fallback_line(int role, int style, int archetype);
+static int ai_is_self_identity_query(const char *text, int *out_is_human_question);
+static void ai_build_self_identity_line(struct char_data *mob, int role, int archetype, char *out, size_t outsz, int human_question);
 
 
 enum ai_player_speech_class {
@@ -973,6 +978,11 @@ static int ai_try_emit_pending_player_reply(struct char_data *mob, time_t now)
   st = ai_pending_reply_state_get(mob, 0);
   if (!st || !st->pending_line[0])
     return FALSE;
+
+  if (st->pending_type != AI_EVENT_PLAYER_SAY) {
+    ai_pending_reply_clear(mob);
+    return FALSE;
+  }
 
   if (now < st->pending_due || pulse < st->pending_fire_pulse)
     return FALSE;
@@ -3728,9 +3738,15 @@ static int ai_line_is_role_legal(const char *line, int role, int style)
     return FALSE;
 
   if (instructor_role &&
-      (ai_text_has_sub_ci(line, "stock") || ai_text_has_sub_ci(line, "buy") || ai_text_has_sub_ci(line, "sell") ||
-       ai_text_has_sub_ci(line, "wares") || ai_text_has_sub_ci(line, "coin") || ai_text_has_sub_ci(line, "price") ||
-       ai_text_has_sub_ci(line, "fresh stock") || ai_text_has_sub_ci(line, "trade") || ai_text_has_sub_ci(line, "bargain")))
+      (ai_text_has_sub_ci(line, "stock") || ai_text_has_sub_ci(line, "fresh stock") || ai_text_has_sub_ci(line, "wares") ||
+       ai_text_has_sub_ci(line, "bargain") || ai_text_has_sub_ci(line, "trade") || ai_text_has_sub_ci(line, "trader") ||
+       ai_text_has_sub_ci(line, "merchant") || ai_text_has_sub_ci(line, "buy") || ai_text_has_sub_ci(line, "sell") ||
+       ai_text_has_sub_ci(line, "price") || ai_text_has_sub_ci(line, "coinwise") || ai_text_has_sub_ci(line, "profit") ||
+       ai_text_has_sub_ci(line, "sale") || ai_text_has_sub_ci(line, "shop") || ai_text_has_sub_ci(line, "market") ||
+       ai_text_has_sub_ci(line, "quality stock") || ai_text_has_sub_ci(line, "clean bargain") || ai_text_has_sub_ci(line, "coin") ||
+       ai_text_has_sub_ci(line, "watch") || ai_text_has_sub_ci(line, "patrol") || ai_text_has_sub_ci(line, "garrison") ||
+       ai_text_has_sub_ci(line, "duty") || ai_text_has_sub_ci(line, "post") || ai_text_has_sub_ci(line, "orders") ||
+       ai_text_has_sub_ci(line, "formation")))
     return FALSE;
 
   if (ai_text_has_sub_ci(line, "coin purse") && !(role == ROLE_MERCHANT || role == ROLE_BANDIT))
@@ -4181,6 +4197,16 @@ static void ai_voice_assemble(struct char_data *mob, const struct ai_voice_profi
   closer = ai_phrase("CLOSER", vocab_tier, rhythm, seed, vp_closer_index);
   if (!ai_line_is_role_legal(closer, role, style))
     closer = ai_phrase("CLOSER", vocab_tier, rhythm, ai_hash_mix(seed, 13), vp_closer_index + 1);
+  if (closer && *closer && st) {
+    int ctry;
+    unsigned int ch = (unsigned int)ai_hash_text_stable(closer);
+    for (ctry = 0; ctry < 6 && ai_hash_ring_has(st->recent_phrase_hashes, st->recent_phrase_count, st->recent_phrase_head, 6, ch); ctry++) {
+      closer = ai_phrase("CLOSER", vocab_tier, rhythm, ai_hash_mix(seed, (unsigned long)(131 + ctry * 17)), vp_closer_index + ctry + 1);
+      if (!closer || !*closer || !ai_line_is_role_legal(closer, role, style))
+        break;
+      ch = (unsigned int)ai_hash_text_stable(closer);
+    }
+  }
   if (!ai_line_is_role_legal(closer, role, style))
     closer = "";
 
@@ -4208,12 +4234,24 @@ static void ai_voice_assemble(struct char_data *mob, const struct ai_voice_profi
   if (!multi_topic && !(in && in->be_brief) && ((ai_hash_mix(seed, 223) % 100UL) < 35UL)) {
     int suffix_mode = ((ai_hash_mix(seed, 227) % 2UL) == 0UL);
     pmicro = ai_imtb_pick_micro_wrap(rctx, role, style, ai_hash_mix(seed, 229), suffix_mode);
+    if (pmicro && *pmicro && st) {
+      int mtry;
+      unsigned int mh = (unsigned int)ai_hash_text_stable(pmicro);
+      for (mtry = 0; mtry < 6 && ai_hash_ring_has(st->recent_phrase_hashes, st->recent_phrase_count, st->recent_phrase_head, 6, mh); mtry++) {
+        pmicro = ai_imtb_pick_micro_wrap(rctx, role, style, ai_hash_mix(seed, (unsigned long)(229 + mtry * 31)), suffix_mode);
+        if (!pmicro || !*pmicro)
+          break;
+        mh = (unsigned int)ai_hash_text_stable(pmicro);
+      }
+    }
     if (pmicro && *pmicro) {
       if (suffix_mode)
         snprintf(work + strlen(work), sizeof(work) - strlen(work), " %s", pmicro);
       else {
         ai_buf_prefix(work, sizeof(work), pmicro);
       }
+      if (st)
+        ai_hash_ring_push(st->recent_phrase_hashes, &st->recent_phrase_head, &st->recent_phrase_count, 6, (unsigned int)ai_hash_text_stable(pmicro));
     }
   }
 
@@ -4226,8 +4264,11 @@ static void ai_voice_assemble(struct char_data *mob, const struct ai_voice_profi
     }
   }
 
-  if (rhythm >= 1 && closer && *closer)
+  if (rhythm >= 1 && closer && *closer) {
     snprintf(work + strlen(work), sizeof(work) - strlen(work), " %s", closer);
+    if (st)
+      ai_hash_ring_push(st->recent_phrase_hashes, &st->recent_phrase_head, &st->recent_phrase_count, 6, (unsigned int)ai_hash_text_stable(closer));
+  }
 
   if (rhythm >= 3 && topic && *topic)
     snprintf(work + strlen(work), sizeof(work) - strlen(work), " %s.", topic);
@@ -4560,19 +4601,65 @@ static int ai_is_gibberish(const char *text)
 static int ai_text_is_effectively_empty(const char *s)
 {
   const unsigned char *p;
-  int has_word = FALSE;
+  int alnum_count = 0;
 
   if (!s)
     return TRUE;
 
   for (p = (const unsigned char *)s; *p; p++) {
-    if (isalnum(*p)) {
-      has_word = TRUE;
-      break;
-    }
+    if (isalnum(*p))
+      alnum_count++;
   }
 
-  return has_word ? FALSE : TRUE;
+  return (alnum_count <= 1) ? TRUE : FALSE;
+}
+
+static int ai_is_self_identity_query(const char *text, int *out_is_human_question)
+{
+  int is_human = FALSE;
+
+  if (out_is_human_question)
+    *out_is_human_question = FALSE;
+  if (!text || !*text)
+    return FALSE;
+
+  if (ai_text_has_sub_ci(text, "are you human") || ai_text_has_sub_ci(text, "are you a human")) {
+    is_human = TRUE;
+  } else if (!(ai_text_has_sub_ci(text, "who are you") || ai_text_has_sub_ci(text, "what are you") ||
+               ai_text_has_sub_ci(text, "tell me about yourself"))) {
+    return FALSE;
+  }
+
+  if (out_is_human_question)
+    *out_is_human_question = is_human;
+  return TRUE;
+}
+
+static void ai_build_self_identity_line(struct char_data *mob, int role, int archetype, char *out, size_t outsz, int human_question)
+{
+  const char *desc;
+  const char *role_name;
+  const char *mortal;
+
+  if (!out || outsz == 0)
+    return;
+
+  desc = (mob && mob->player.short_descr && *mob->player.short_descr) ? mob->player.short_descr : "this one";
+  role_name = ai_role_name_local(role);
+
+  if (human_question) {
+    if (archetype == AI_CREATURE_HUMANOID)
+      mortal = "Yes. I am humanoid.";
+    else if (archetype == AI_CREATURE_UNDEAD || archetype == AI_CREATURE_FIEND || archetype == AI_CREATURE_CONSTRUCT ||
+             archetype == AI_CREATURE_ABERRATION || archetype == AI_CREATURE_ELEMENTAL || archetype == AI_CREATURE_OOZE)
+      mortal = "No. I am not human.";
+    else
+      mortal = "Not sure what you'd call me.";
+    snprintf(out, outsz, "%s I serve here as %s.", mortal, role_name ? role_name : "a local");
+    return;
+  }
+
+  snprintf(out, outsz, "I am %s, a %s. My alignment runs at %d.", desc, role_name ? role_name : "local", mob ? GET_ALIGNMENT(mob) : 0);
 }
 
 static const char *ai_role_neutral_fallback_line(int role, int style, int archetype)
@@ -7558,6 +7645,8 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
   int intent = AI_INTENT_NONE;
   int confidence = 0;
   int speech_class = AI_SPEECH_UNKNOWN;
+  int self_identity_query = FALSE;
+  int self_identity_human_query = FALSE;
   const char *line = NULL;
   int avoid_template_id = -1;
   int selected_template_id = -1;
@@ -7638,9 +7727,26 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
       rctx.evil_signaled = 1;
     }
   }
+  if (type == AI_EVENT_PLAYER_SAY && !text)
+    AI_EVT_RETURN("NULL_PLAYER_SAY");
   ai_normalize_text(text ? text : "", normalized, sizeof(normalized));
-  if (type == AI_EVENT_PLAYER_SAY && ai_text_is_effectively_empty(normalized))
-    AI_EVT_RETURN("EMPTY_PLAYER_SAY");
+  if (type == AI_EVENT_PLAYER_SAY) {
+    char trimmed[256];
+    size_t tlen;
+    const char *start = normalized;
+    while (*start && isspace((unsigned char)*start))
+      start++;
+    snprintf(trimmed, sizeof(trimmed), "%.*s", (int)sizeof(trimmed) - 1, start);
+    tlen = strlen(trimmed);
+    while (tlen > 0 && isspace((unsigned char)trimmed[tlen - 1]))
+      trimmed[--tlen] = '\0';
+    snprintf(normalized, sizeof(normalized), "%.*s", (int)sizeof(normalized) - 1, trimmed);
+    if (!normalized[0])
+      AI_EVT_RETURN("EMPTY_PLAYER_SAY");
+    if (ai_text_is_effectively_empty(normalized))
+      AI_EVT_RETURN("NOISE_PLAYER_SAY");
+    self_identity_query = ai_is_self_identity_query(normalized, &self_identity_human_query);
+  }
   attention_score = ai_attention_score(mob, type, actor, normalized, now);
   ai_state_push_event(mob, type, actor, normalized);
 
@@ -7669,6 +7775,10 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
       if (speech_class == AI_SPEECH_WEATHER)
         confidence += 4;
     }
+    if (self_identity_query) {
+      intent = AI_INTENT_SMALLTALK;
+      confidence = MAX(confidence, 36);
+    }
   } else {
     intent = ai_detect_intent(type, normalized);
     confidence = 10;
@@ -7694,7 +7804,12 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
     int asks_supplies = ai_is_supply_query_text(normalized);
     int asks_food = ai_is_food_drink_query_text(normalized);
 
-    if (asks_train) {
+    if (self_identity_query) {
+      rctx.domain = DOMAIN_SOCIAL;
+      intent = AI_INTENT_SMALLTALK;
+      rctx.intent = intent;
+      rctx.speech_act = intent;
+    } else if (asks_train) {
       rctx.domain = DOMAIN_SERVICES;
       intent = AI_INTENT_TRAIN;
       rctx.intent = intent;
@@ -7994,7 +8109,15 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
       if (rctx.confidence == 0 && intention.goal == GOAL_SERVE && !is_hunger_request)
         intention.goal = GOAL_DEFLECT;
 
-      if (type == AI_EVENT_PLAYER_SAY && asks_train && IN_ROOM(mob) == IN_ROOM(actor) && MOB_FLAGGED(mob, MOB_GUILD_MASTER)) {
+      if (type == AI_EVENT_PLAYER_SAY && self_identity_query) {
+        ai_build_self_identity_line(mob, role, rctx.archetype, voiced, sizeof(voiced), self_identity_human_query);
+        line = voiced;
+        core = line;
+        rctx.chosen_core = core;
+        skip_voice = TRUE;
+        intention.be_brief = 1;
+        intention.goal = GOAL_INFORM;
+      } else if (type == AI_EVENT_PLAYER_SAY && asks_train && IN_ROOM(mob) == IN_ROOM(actor) && MOB_FLAGGED(mob, MOB_GUILD_MASTER)) {
         line = "Yes. Use TRAIN to spend training sessions. Use PRAC to spend practice sessions.";
         core = line;
         rctx.chosen_core = core;
