@@ -67,6 +67,7 @@
 #define AI_ZONE_CACHE_MAX 64
 #define AI_IMTB_LEAD_PLAYER_MAX 12
 #define AI_IMTB_LEAD_PLAYER_SUPPRESS_SECS 10
+#define AI_PENDING_REPLY_STATE_MAX 1024
 
 enum ai_speech_domain {
   DOMAIN_NONE = 0,
@@ -540,6 +541,13 @@ static int ai_role_can_answer_intent(int role, int style, int intent);
 static const char *ai_role_redirect_line(int role, int style, int topic_target);
 static int ai_text_has_sub_ci(const char *hay, const char *needle);
 static int ai_role_priority_score(struct char_data *mob);
+static struct ai_pending_reply_state *ai_pending_reply_state_get(struct char_data *mob, int create);
+static void ai_pending_reply_clear(struct char_data *mob);
+static int ai_actor_reply_delay_ms(struct char_data *mob, int personality, int evil_signaled);
+static void ai_actor_schedule_delayed_player_reply(struct char_data *mob, struct char_data *target, const char *msg, int personality, int evil_signaled, time_t now);
+static int ai_try_emit_pending_player_reply(struct char_data *mob, time_t now);
+static int ai_can_speak_now(struct char_data *mob, time_t now);
+static void ai_say(struct char_data *mob, const char *msg, time_t now);
 static void ai_state_refresh_local_topics(struct char_data *mob);
 static struct ai_conv_actor_state *ai_conv_actor_state_get(struct char_data *mob, int create);
 static struct ai_conv_room_state *ai_conv_room_state_get(room_rnum room, int create);
@@ -644,6 +652,7 @@ static void ai_slot_replace(const char *in, const struct ai_world_facts *f, char
 static void ai_sanitize_unresolved_tokens(const char *in, char *out, size_t outsz);
 static const char *ai_epistemic_line(int confidence, int role, int topic_target);
 static const char *ai_service_menu_clarify_line(int role, int style, int evil);
+static const char *ai_service_honest_fallback_line(int role, int topic_target);
 
 
 enum ai_player_speech_class {
@@ -718,6 +727,166 @@ struct ai_reply_template {
 };
 
 static struct ai_conv_reply_state ai_conv_reply_states[AI_CONV_REPLY_STATE_MAX];
+
+struct ai_pending_reply_state {
+  struct char_data *mob;
+  char pending_line[512];
+  long pending_player_idnum;
+  room_rnum pending_room;
+  time_t pending_created;
+  time_t pending_due;
+  int pending_type;
+  unsigned long pending_fire_pulse;
+};
+
+static struct ai_pending_reply_state ai_pending_reply_states[AI_PENDING_REPLY_STATE_MAX];
+
+
+
+static struct ai_pending_reply_state *ai_pending_reply_state_get(struct char_data *mob, int create)
+{
+  int i;
+  int oldest = 0;
+
+  if (!mob)
+    return NULL;
+
+  for (i = 0; i < AI_PENDING_REPLY_STATE_MAX; i++) {
+    if (ai_pending_reply_states[i].mob == mob)
+      return &ai_pending_reply_states[i];
+  }
+
+  if (!create)
+    return NULL;
+
+  for (i = 0; i < AI_PENDING_REPLY_STATE_MAX; i++) {
+    if (!ai_pending_reply_states[i].mob) {
+      memset(&ai_pending_reply_states[i], 0, sizeof(ai_pending_reply_states[i]));
+      ai_pending_reply_states[i].mob = mob;
+      ai_pending_reply_states[i].pending_room = NOWHERE;
+      return &ai_pending_reply_states[i];
+    }
+    if (ai_pending_reply_states[i].pending_created < ai_pending_reply_states[oldest].pending_created)
+      oldest = i;
+  }
+
+  memset(&ai_pending_reply_states[oldest], 0, sizeof(ai_pending_reply_states[oldest]));
+  ai_pending_reply_states[oldest].mob = mob;
+  ai_pending_reply_states[oldest].pending_room = NOWHERE;
+  return &ai_pending_reply_states[oldest];
+}
+
+static void ai_pending_reply_clear(struct char_data *mob)
+{
+  struct ai_pending_reply_state *st = ai_pending_reply_state_get(mob, 0);
+  if (!st)
+    return;
+  st->pending_line[0] = '\0';
+  st->pending_player_idnum = 0;
+  st->pending_room = NOWHERE;
+  st->pending_created = 0;
+  st->pending_due = 0;
+  st->pending_type = 0;
+  st->pending_fire_pulse = 0;
+}
+
+static int ai_actor_reply_delay_ms(struct char_data *mob, int personality, int evil_signaled)
+{
+  int base = 700;
+  int jitter = rand_number(0, 250);
+
+  if (personality == IMTB_FRIENDLY || personality == IMTB_WITTY)
+    base = 420;
+  else if (personality == IMTB_STOIC)
+    base = 560;
+  else if (personality == IMTB_BOOKISH)
+    base = 760;
+  else if (personality == IMTB_GRUFF)
+    base = 680;
+  else if (personality == IMTB_SUSPICIOUS)
+    base = 880;
+  else if (personality == IMTB_ZEALOUS)
+    base = 980;
+  else if (personality == IMTB_EERIE)
+    base = 1100;
+
+  if (mob && mob->ai_prof) {
+    if (mob->ai_prof->role == ROLE_GUARD)
+      base -= 80;
+    else if (mob->ai_prof->role == ROLE_BANDIT || mob->ai_prof->role == ROLE_CULTIST)
+      base += 110;
+  }
+
+  if (evil_signaled)
+    base += rand_number(60, 400);
+
+  base += jitter;
+  if (base < 180)
+    base = 180;
+  if (base > 3000)
+    base = 3000;
+  return base;
+}
+
+static void ai_actor_schedule_delayed_player_reply(struct char_data *mob, struct char_data *target, const char *msg, int personality, int evil_signaled, time_t now)
+{
+  struct ai_pending_reply_state *st;
+  int delay_ms;
+
+  if (!mob || !msg || !*msg || IN_ROOM(mob) == NOWHERE)
+    return;
+
+  st = ai_pending_reply_state_get(mob, 1);
+  if (!st)
+    return;
+
+  delay_ms = ai_actor_reply_delay_ms(mob, personality, evil_signaled);
+
+  snprintf(st->pending_line, sizeof(st->pending_line), "%.*s", (int)sizeof(st->pending_line) - 1, msg);
+  st->pending_player_idnum = (target && !IS_NPC(target)) ? GET_IDNUM(target) : 0;
+  st->pending_room = IN_ROOM(mob);
+  st->pending_created = now;
+  st->pending_due = now + ((delay_ms + 999) / 1000);
+  st->pending_type = AI_EVENT_PLAYER_SAY;
+  st->pending_fire_pulse = pulse + ((unsigned long)(((delay_ms * PASSES_PER_SEC) + 999) / 1000));
+  if (st->pending_fire_pulse <= pulse)
+    st->pending_fire_pulse = pulse + 1;
+}
+
+static int ai_try_emit_pending_player_reply(struct char_data *mob, time_t now)
+{
+  struct ai_pending_reply_state *st;
+  struct char_data *target = NULL;
+
+  if (!mob)
+    return FALSE;
+
+  st = ai_pending_reply_state_get(mob, 0);
+  if (!st || !st->pending_line[0])
+    return FALSE;
+
+  if (now < st->pending_due || pulse < st->pending_fire_pulse)
+    return FALSE;
+
+  if (IN_ROOM(mob) == NOWHERE || st->pending_room == NOWHERE || IN_ROOM(mob) != st->pending_room) {
+    ai_pending_reply_clear(mob);
+    return FALSE;
+  }
+
+  if (st->pending_player_idnum > 0) {
+    target = ai_find_player_by_idnum_room(mob, st->pending_player_idnum);
+    if (!target) {
+      ai_pending_reply_clear(mob);
+      return FALSE;
+    }
+  }
+
+  if (ai_can_speak_now(mob, now))
+    ai_say(mob, st->pending_line, now);
+
+  ai_pending_reply_clear(mob);
+  return TRUE;
+}
 
 
 
@@ -2300,6 +2469,20 @@ void ai_actor_refresh_profile(struct char_data *mob, int force)
   score[ROLE_CULTIST] += ai_role_weight_from_keywords(text, cult_kw);
   score[ROLE_BOSS] += ai_role_weight_from_keywords(text, boss_kw);
 
+  if (ai_text_has_sub_ci(text, "bandit"))
+    score[ROLE_BANDIT] += 60;
+
+  if (ai_text_has_sub_ci(text, "constable")) {
+    score[ROLE_GUARD] += 40;
+    score[ROLE_BANDIT] -= 20;
+  }
+
+  if (ai_text_has_sub_ci(text, "instructor") || ai_text_has_sub_ci(text, "guildmaster") || ai_text_has_sub_ci(text, "guild master")) {
+    score[ROLE_MERCHANT] += 16;
+    if (!(ai_text_has_sub_ci(text, "guard") || ai_text_has_sub_ci(text, "watch") || ai_text_has_sub_ci(text, "patrol") || ai_text_has_sub_ci(text, "constable")))
+      score[ROLE_GUARD] -= 24;
+  }
+
   /*
    * Role scoring rules (small + reversible):
    * 1) Primary truth = mob text (name/short/long/description) via keyword weights.
@@ -2980,8 +3163,15 @@ static const char *ai_imtb_pick_micro_wrap(const struct ai_reply_context *rctx, 
     frag = ai_imtb_pick_fragment(suffix_mode ? micro_suffix[personality] : micro_prefix[personality], ai_hash_mix(seed, suffix_mode ? 211 : 173));
   if (!frag || !*frag)
     return "";
-  if (!ai_line_is_role_legal(frag, role, style))
+  if (!ai_line_is_role_legal(frag, role, style)) {
+    int tries;
+    for (tries = 0; tries < 4; tries++) {
+      frag = ai_imtb_pick_fragment(suffix_mode ? micro_suffix[personality] : micro_prefix[personality], ai_hash_mix(seed, (unsigned long)(311 + tries * 17)));
+      if (frag && *frag && ai_line_is_role_legal(frag, role, style))
+        return frag;
+    }
     return "";
+  }
   return frag;
 }
 
@@ -2999,8 +3189,16 @@ static const char *ai_imtb_pick_uncertainty(const struct ai_reply_context *rctx,
   frag = ai_imtb_pick_fragment(ai_imtb_uncertainty[personality], ai_hash_mix(seed, 73));
   if (!frag || !*frag)
     return "";
-  if (!ai_line_is_role_legal(frag, role, style))
-    return "";
+  if (!ai_line_is_role_legal(frag, role, style)) {
+    int tries;
+    for (tries = 0; tries < 6; tries++) {
+      frag = ai_imtb_pick_fragment(ai_imtb_uncertainty[personality], ai_hash_mix(seed, (unsigned long)(401 + tries * 19)));
+      if (frag && *frag && ai_line_is_role_legal(frag, role, style))
+        break;
+    }
+    if (!frag || !*frag || !ai_line_is_role_legal(frag, role, style))
+      return "";
+  }
   if (out_used)
     *out_used = 1;
   return frag;
@@ -3028,8 +3226,15 @@ static const char *ai_imtb_pick_followup(const struct ai_reply_context *rctx, in
   frag = ai_imtb_pick_fragment(ai_imtb_followup[personality], ai_hash_mix(seed, 97));
   if (!frag || !*frag)
     return "";
-  if (!ai_line_is_role_legal(frag, role, style))
+  if (!ai_line_is_role_legal(frag, role, style)) {
+    int tries;
+    for (tries = 0; tries < 6; tries++) {
+      frag = ai_imtb_pick_fragment(ai_imtb_followup[personality], ai_hash_mix(seed, (unsigned long)(503 + tries * 23)));
+      if (frag && *frag && ai_line_is_role_legal(frag, role, style))
+        return frag;
+    }
     return "";
+  }
   return frag;
 }
 
@@ -3366,7 +3571,7 @@ static int ai_line_is_role_legal(const char *line, int role, int style)
     return FALSE;
 
   if ((ai_text_has_sub_ci(line, "patrol") || ai_text_has_sub_ci(line, "post") || ai_text_has_sub_ci(line, "watch") || ai_text_has_sub_ci(line, "garrison") || ai_text_has_sub_ci(line, "duty") || ai_text_has_sub_ci(line, "formation") || ai_text_has_sub_ci(line, "orders"))
-      && !(role == ROLE_GUARD || role == ROLE_BOSS))
+      && role != ROLE_GUARD)
     return FALSE;
 
   if ((ai_text_has_sub_ci(line, "hearth") || ai_text_has_sub_ci(line, "stew") || ai_text_has_sub_ci(line, "ale") || ai_text_has_sub_ci(line, "room") || ai_text_has_sub_ci(line, "bed") || ai_text_has_sub_ci(line, "warm yourself") || ai_text_has_sub_ci(line, "meal helps") || ai_text_has_sub_ci(line, "rest here"))
@@ -4433,7 +4638,10 @@ static void ai_detect_requested_targets(const char *text, int *targets, int *cou
 {
   int n = 0;
   int food_trigger = FALSE;
+  int water_trigger = FALSE;
+  int rest_trigger = FALSE;
   int gear_trigger = FALSE;
+  int guard_trigger = FALSE;
   int train_trigger = FALSE;
   int practice_trigger = FALSE;
 
@@ -4447,28 +4655,41 @@ static void ai_detect_requested_targets(const char *text, int *targets, int *cou
 
   train_trigger = ai_is_training_query_text(text);
   practice_trigger = ai_is_practice_query_text(text);
-  food_trigger = ai_is_food_drink_query_text(text);
-  gear_trigger = ai_is_supply_query_text(text);
+  food_trigger = (ai_text_has_sub_ci(text, "hungry") || ai_text_has_sub_ci(text, "starving") || ai_text_has_sub_ci(text, "food") || ai_text_has_sub_ci(text, "eat") || ai_text_has_sub_ci(text, "meal") || ai_text_has_sub_ci(text, "ration") || ai_text_has_sub_ci(text, "bread") || ai_text_has_sub_ci(text, "stew") || ai_text_has_sub_ci(text, "drink") || ai_text_has_sub_ci(text, "ale") || ai_text_has_sub_ci(text, "beer") || ai_text_has_sub_ci(text, "inn"));
+  water_trigger = (ai_text_has_sub_ci(text, "water") || ai_text_has_sub_ci(text, "drink") || ai_text_has_sub_ci(text, "thirsty"));
+  rest_trigger = (ai_text_has_sub_ci(text, "rest") || ai_text_has_sub_ci(text, "sleep") || ai_text_has_sub_ci(text, "inn") || ai_text_has_sub_ci(text, "room") || ai_text_has_sub_ci(text, "bed"));
+  gear_trigger = (ai_text_has_sub_ci(text, "supplies") || ai_text_has_sub_ci(text, "shop") || ai_text_has_sub_ci(text, "store") || ai_text_has_sub_ci(text, "merchant") || ai_text_has_sub_ci(text, "buy") || ai_text_has_sub_ci(text, "sell") || ai_text_has_sub_ci(text, "goods") || ai_text_has_sub_ci(text, "market") || ai_text_has_sub_ci(text, "armory") || ai_text_has_sub_ci(text, "armor") || ai_text_has_sub_ci(text, "weapon") || ai_text_has_sub_ci(text, "weapons") || ai_is_supply_query_text(text));
+  guard_trigger = (ai_text_has_sub_ci(text, "guard") || ai_text_has_sub_ci(text, "constable") || ai_text_has_sub_ci(text, "law") || ai_text_has_sub_ci(text, "help") || ai_text_has_sub_ci(text, "crime"));
 
   if (train_trigger || practice_trigger)
     AI_REQ_PUSH(TARGET_TRAINER);
 
-  if (gear_trigger) {
-    AI_REQ_PUSH(TARGET_MARKET);
-    AI_REQ_PUSH(TARGET_ARMORY);
+  if (food_trigger) {
+    AI_REQ_PUSH(TARGET_BAKERY);
+    AI_REQ_PUSH(TARGET_INN);
   }
 
-  if (food_trigger)
+  if (water_trigger || rest_trigger)
     AI_REQ_PUSH(TARGET_INN);
+
+  if (gear_trigger) {
+    AI_REQ_PUSH(TARGET_ARMORY);
+    AI_REQ_PUSH(TARGET_MARKET);
+  }
+
+  if (guard_trigger) {
+    AI_REQ_PUSH(TARGET_MARKET);
+    AI_REQ_PUSH(TARGET_INN);
+  }
 
   if (ai_text_has_sub_ci(text, "heal") || ai_text_has_sub_ci(text, "healer") || ai_text_has_sub_ci(text, "temple") || ai_text_has_sub_ci(text, "potion") || ai_text_has_sub_ci(text, "bandage") || ai_text_has_sub_ci(text, "wounded")) AI_REQ_PUSH(TARGET_HEAL);
-  if (ai_text_has_sub_ci(text, "inn") || ai_text_has_sub_ci(text, "lodging") || ai_text_has_sub_ci(text, "sleep") || ai_text_has_sub_ci(text, "bed") || ai_text_has_sub_ci(text, "bedroll") || ai_text_has_sub_ci(text, "tent") || ai_text_has_sub_ci(text, "camping")) AI_REQ_PUSH(TARGET_INN);
   if (ai_text_has_sub_ci(text, "bank") || ai_text_has_sub_ci(text, "deposit") || ai_text_has_sub_ci(text, "withdraw") || ai_text_has_sub_ci(text, "atm") || ai_text_has_sub_ci(text, "teller")) AI_REQ_PUSH(TARGET_BANK);
-  if (ai_text_has_sub_ci(text, "market") || ai_text_has_sub_ci(text, "supplies") || ai_text_has_sub_ci(text, "supply") || ai_text_has_sub_ci(text, "gear") || ai_text_has_sub_ci(text, "equipment") || ai_text_has_sub_ci(text, "pack") || ai_text_has_sub_ci(text, "rope") || ai_text_has_sub_ci(text, "torch") || ai_text_has_sub_ci(text, "oil") || ai_text_has_sub_ci(text, "kit")) AI_REQ_PUSH(TARGET_MARKET);
 
-  if (food_trigger && n == 0)
+  if (n == 0 && (food_trigger || water_trigger || rest_trigger))
     AI_REQ_PUSH(TARGET_INN);
-  if (gear_trigger && n == 0)
+  if (n == 0 && gear_trigger)
+    AI_REQ_PUSH(TARGET_MARKET);
+  if (n == 0 && guard_trigger)
     AI_REQ_PUSH(TARGET_MARKET);
 
 #undef AI_REQ_PUSH
@@ -4917,6 +5138,35 @@ static int ai_classify_domain(const char *normalized, int intent, int speech_act
     scores[DOMAIN_SOCIAL] = MAX(0, scores[DOMAIN_SOCIAL] - 6);
   }
 
+  if (ai_is_food_drink_query_text(normalized) ||
+      ai_text_has_sub_ci(normalized, "thirsty") ||
+      ai_text_has_sub_ci(normalized, "water") ||
+      ai_text_has_sub_ci(normalized, "rest") ||
+      ai_text_has_sub_ci(normalized, "sleep") ||
+      ai_text_has_sub_ci(normalized, "bed") ||
+      ai_text_has_sub_ci(normalized, "inn") ||
+      ai_text_has_sub_ci(normalized, "room")) {
+    scores[DOMAIN_SERVICES] += 46;
+    scores[DOMAIN_SOCIAL] = MAX(0, scores[DOMAIN_SOCIAL] - 10);
+  }
+
+  if (ai_is_supply_query_text(normalized) ||
+      ai_text_has_sub_ci(normalized, "goods") ||
+      ai_text_has_sub_ci(normalized, "market") ||
+      ai_text_has_sub_ci(normalized, "armory")) {
+    scores[DOMAIN_SHOPPING] += 48;
+    scores[DOMAIN_SERVICES] += 10;
+    scores[DOMAIN_SOCIAL] = MAX(0, scores[DOMAIN_SOCIAL] - 10);
+  }
+
+  if (ai_text_has_sub_ci(normalized, "guard") || ai_text_has_sub_ci(normalized, "constable") ||
+      ai_text_has_sub_ci(normalized, "law") || ai_text_has_sub_ci(normalized, "crime") ||
+      ai_text_has_sub_ci(normalized, "help")) {
+    scores[DOMAIN_SERVICES] += 42;
+    scores[DOMAIN_DIRECTIONS] += 12;
+    scores[DOMAIN_SOCIAL] = MAX(0, scores[DOMAIN_SOCIAL] - 10);
+  }
+
   if (intent == AI_INTENT_BANK || intent == AI_INTENT_INN || intent == AI_INTENT_HEAL || intent == AI_INTENT_TRAIN || intent == AI_INTENT_ASK_SERVICE)
     scores[DOMAIN_SERVICES] += 6;
   if (intent == AI_INTENT_DIRECTIONS)
@@ -5148,6 +5398,17 @@ static const char *ai_epistemic_line(int confidence, int role, int topic_target)
   if (role == ROLE_CULTIST) return "That knowledge is not mine to give.";
   if (role == ROLE_SPIRIT) return "Ask the living. They keep such records.";
   return "I cannot help with that.";
+}
+
+static const char *ai_service_honest_fallback_line(int role, int topic_target)
+{
+  if (topic_target == TARGET_BAKERY || topic_target == TARGET_INN)
+    return "I cannot point you from here. Try the inn in town.";
+  if (topic_target == TARGET_ARMORY || topic_target == TARGET_MARKET)
+    return "I do not know the nearest place. Ask at the market.";
+  if (role == ROLE_GUARD)
+    return "I cannot confirm from here. Ask at the nearest post.";
+  return "I do not know the nearest place. Ask at the market.";
 }
 
 static const char *ai_role_redirect_line(int role, int style, int topic_target)
@@ -5668,6 +5929,9 @@ int ai_actor_tick(struct char_data *mob, time_t now)
     ai_alert_decay_tick(now);
     ai_last_minute_decay_tick = now;
   }
+
+  if (ai_try_emit_pending_player_reply(mob, now))
+    return TRUE;
 
   if (ai_try_emit_pending_reaction_speech(mob, now))
     return TRUE;
@@ -7509,6 +7773,11 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
         sr->rapport_rumor_used = 1;
       }
 
+      if (type == AI_EVENT_PLAYER_SAY && (rctx.domain == DOMAIN_SERVICES || rctx.domain == DOMAIN_SHOPPING || rctx.domain == DOMAIN_DIRECTIONS) && rctx.facts.confidence <= 1) {
+        line = ai_service_honest_fallback_line(role, rctx.primary_topic_target);
+        skip_voice = TRUE;
+      }
+
       if (!skip_voice && line && *line) {
         vp = ai_voice_profile_get(mob);
         seed = ai_conv_seed(mob, intent, (unsigned int)now);
@@ -7568,7 +7837,7 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
       snprintf(targeted, sizeof(targeted), "$n says to %s, '%s'", GET_NAME(actor), finalbuf);
     }
     if (type == AI_EVENT_PLAYER_SAY)
-      ai_say(mob, targeted, now);
+      ai_actor_schedule_delayed_player_reply(mob, actor, targeted, rctx.personality, rctx.evil_signaled, now);
     else
       ai_actor_schedule_reaction_speech(mob, actor, targeted);
     e->last_reply_time = now;
