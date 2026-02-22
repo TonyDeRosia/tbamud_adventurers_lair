@@ -232,6 +232,23 @@ enum ai_creature_archetype {
   AI_CREATURE_SPIRIT
 };
 
+enum ai_comm_mode {
+  AI_COMM_SAY = 0,
+  AI_COMM_EMOTE,
+  AI_COMM_SOUND,
+  AI_COMM_TELEPATHY,
+  AI_COMM_SILENT
+};
+
+enum ai_creature_category {
+  AI_CAT_HUMANOID_GENERIC = 0,
+  AI_CAT_BEAST_ANIMAL,
+  AI_CAT_UNDEAD_MINDLESS,
+  AI_CAT_UNDEAD_INTELLIGENT,
+  AI_CAT_SPIRIT,
+  AI_CAT_CONSTRUCT
+};
+
 #define AI_SUB_DEMON      (1ULL << 0)
 #define AI_SUB_DEVIL      (1ULL << 1)
 #define AI_SUB_YUGOLOTH   (1ULL << 2)
@@ -739,7 +756,8 @@ enum ai_distinct_role_group {
 };
 
 enum ai_distinct_intent_class {
-  DINT_GREETING = 0, DINT_HELP_FOLLOWUP, DINT_SERVICE_MENU, DINT_TRAINING, DINT_FOOD_WATER, DINT_MONEY_REFUSAL, DINT_CONFUSION, DINT_REFUSAL
+  DINT_GREETING = 0, DINT_HELP_FOLLOWUP, DINT_SERVICE_MENU, DINT_TRAINING, DINT_FOOD_WATER, DINT_MONEY_REFUSAL, DINT_CONFUSION, DINT_REFUSAL,
+  DINT_GREETING_REACTION, DINT_THREAT_REACTION, DINT_HELP_REACTION
 };
 
 
@@ -974,6 +992,11 @@ static int ai_is_money_job_phrase(const char *text);
 static int ai_has_trailing_question(const char *text);
 static int ai_is_questionish_greeting(const char *text);
 static const char *ai_social_prompt_line(struct char_data *mob, int role, int style, enum ai_explicit_intent ex, int mood, int archetype, int personality);
+static void ai_copy_trunc(char *dst, size_t dstsz, const char *src);
+static void ai_append_space_and_trunc(char *dst, size_t dstsz, const char *src);
+static enum ai_creature_category ai_pick_creature_category(struct char_data *mob, const struct ai_reply_context *rctx);
+static enum ai_comm_mode ai_pick_comm_mode(struct char_data *mob, const struct ai_reply_context *rctx, int primary_intent, int secondary_intent, int domain, enum ai_explicit_intent explicit_intent, const char **out_sound_style);
+static const char *ai_creature_reaction_line(enum ai_creature_category cat, enum ai_explicit_intent ex, enum ai_distinct_intent_class icls, unsigned long seed);
 static int ai_count_multi_service_hits(const char *text, int *has_food, int *has_money);
 static int ai_text_is_effectively_empty(const char *s)
 {
@@ -5576,6 +5599,88 @@ static int ai_line_has_min_service_usefulness(const char *line)
   return FALSE;
 }
 
+
+static void ai_copy_trunc(char *dst, size_t dstsz, const char *src)
+{
+  if (!dst || dstsz == 0)
+    return;
+  snprintf(dst, dstsz, "%.*s", (int)dstsz - 1, src ? src : "");
+}
+
+static void ai_append_space_and_trunc(char *dst, size_t dstsz, const char *src)
+{
+  size_t len;
+  if (!dst || dstsz == 0 || !src || !*src)
+    return;
+  len = strlen(dst);
+  if (len >= dstsz - 1)
+    return;
+  if (len > 0 && dst[len - 1] != ' ')
+    snprintf(dst + len, dstsz - len, " %.*s", (int)(dstsz - len - 2), src);
+  else
+    snprintf(dst + len, dstsz - len, "%.*s", (int)(dstsz - len - 1), src);
+}
+
+static enum ai_creature_category ai_pick_creature_category(struct char_data *mob, const struct ai_reply_context *rctx)
+{
+  int role = (mob && mob->ai_prof) ? mob->ai_prof->role : ROLE_UNKNOWN;
+  int archetype = rctx ? rctx->archetype : ai_detect_creature_archetype(mob);
+  uint64_t subtags = rctx ? rctx->subtags : ai_detect_creature_subtags(mob);
+
+  if (archetype == AI_CREATURE_CONSTRUCT || (subtags & (AI_SUB_MECHANICAL | AI_SUB_GOLEM)))
+    return AI_CAT_CONSTRUCT;
+  if (archetype == AI_CREATURE_SPIRIT || role == ROLE_SPIRIT || (subtags & (AI_SUB_GHOST | AI_SUB_WRAITH)))
+    return AI_CAT_SPIRIT;
+  if (archetype == AI_CREATURE_UNDEAD || role == ROLE_UNDEAD || (subtags & (AI_SUB_ZOMBIE | AI_SUB_SKELETON | AI_SUB_LICH | AI_SUB_VAMPIRE))) {
+    if ((subtags & (AI_SUB_LICH | AI_SUB_VAMPIRE)) || role == ROLE_CULTIST)
+      return AI_CAT_UNDEAD_INTELLIGENT;
+    return AI_CAT_UNDEAD_MINDLESS;
+  }
+  if (archetype == AI_CREATURE_BEAST || role == ROLE_BEAST || (subtags & (AI_SUB_BEASTIAL | AI_SUB_PREDATORY | AI_SUB_DOMESTIC | AI_SUB_AVIAN | AI_SUB_REPTILIAN | AI_SUB_INSECTOID | AI_SUB_ARACHNID | AI_SUB_AQUATIC)))
+    return AI_CAT_BEAST_ANIMAL;
+  return AI_CAT_HUMANOID_GENERIC;
+}
+
+static enum ai_comm_mode ai_pick_comm_mode(struct char_data *mob, const struct ai_reply_context *rctx, int primary_intent, int secondary_intent, int domain, enum ai_explicit_intent explicit_intent, const char **out_sound_style)
+{
+  enum ai_creature_category cat = ai_pick_creature_category(mob, rctx);
+  int role = (mob && mob->ai_prof) ? mob->ai_prof->role : ROLE_UNKNOWN;
+  (void)primary_intent;
+  (void)secondary_intent;
+  if (out_sound_style)
+    *out_sound_style = NULL;
+
+  if (cat == AI_CAT_BEAST_ANIMAL) {
+    if (out_sound_style) *out_sound_style = "growls";
+    if (explicit_intent == INTENT_GREETING || explicit_intent == INTENT_HELP_REQUEST || explicit_intent == INTENT_META_AI)
+      return AI_COMM_EMOTE;
+    return AI_COMM_SOUND;
+  }
+  if (cat == AI_CAT_UNDEAD_MINDLESS) {
+    if (out_sound_style) *out_sound_style = "rattles";
+    if (explicit_intent == INTENT_META_AI)
+      return AI_COMM_EMOTE;
+    return AI_COMM_SOUND;
+  }
+  if (cat == AI_CAT_UNDEAD_INTELLIGENT) {
+    if (out_sound_style) *out_sound_style = "rasps";
+    if (domain == DOMAIN_SERVICES && role != ROLE_MERCHANT)
+      return AI_COMM_EMOTE;
+    return AI_COMM_SAY;
+  }
+  if (cat == AI_CAT_SPIRIT) {
+    if (out_sound_style) *out_sound_style = "whispers";
+    return AI_COMM_TELEPATHY;
+  }
+  if (cat == AI_CAT_CONSTRUCT) {
+    if (out_sound_style) *out_sound_style = "clicks";
+    if (explicit_intent == INTENT_GREETING)
+      return AI_COMM_SOUND;
+    return AI_COMM_SAY;
+  }
+  return AI_COMM_SAY;
+}
+
 static void ai_append_clause(char *buf, size_t bufsz, const char *clause)
 {
   size_t len;
@@ -7265,6 +7370,69 @@ static const char *ai_distinct_reply_line(struct char_data *mob, struct ai_conv_
   return out;
 }
 
+
+static const char *ai_creature_reaction_line(enum ai_creature_category cat, enum ai_explicit_intent ex, enum ai_distinct_intent_class icls, unsigned long seed)
+{
+  static const char *const beast_confusion[] = {"The creature tilts its head.","It sniffs the air and circles once.","It paws at the ground, uncertain.","The beast huffs and watches you.","Ears twitch; it does not understand.","It blinks and backs half a step.","The animal snorts and looks away.","A low whine answers your words.","It paces in a tight half-circle.","It noses at your hand, wary.","Its tail stiffens, then stills.","The beast freezes and listens.",NULL};
+  static const char *const beast_refusal[] = {"The creature bares its teeth.","It growls and turns its flank.","A warning snarl cuts you off.","It snaps at the air near you.","The beast backs off with a hiss.","It stomps and refuses to engage.","A hard stare says enough.","It curls its lip and withdraws.","The animal bristles and declines.","It rumbles low in refusal.","Its hackles rise; no cooperation.","It ignores the request entirely.",NULL};
+  static const char *const beast_greet[] = {"The creature sniffs and circles.","It gives a short, curious huff.","The beast lowers its head briefly.","Ears perk; it watches you.","It wags once, then steadies.","The animal blinks and relaxes.","A soft chuff answers you.","It pads closer, then pauses.","The beast tilts its head at you.","A low rumble, not hostile.","It studies your scent in silence.","The creature settles on its haunches.",NULL};
+  static const char *const beast_threat[] = {"The creature lunges half a step.","It growls, deep and sharp.","Teeth flash in a warning snap.","The beast slams a paw down.","It snarls and squares up.","A harsh bark answers your push.","The animal stalks sideways, tense.","Its tail lashes in agitation.","It crouches, ready to spring.","The creature hisses and advances.","A crackling snarl fills the air.","It stares you down, unblinking.",NULL};
+  static const char *const beast_help[] = {"The creature noses toward a nearby path.","It turns and looks toward the trail.","A short bark points your attention east.","It pads to the doorway, then waits.","The beast sniffs a track and glances back.","It scratches near the route marker.","A low whine urges you onward.","It circles the exit and pauses there.","The animal nudges you toward safer ground.","It watches the road and huffs once.","The creature tracks a scent and looks back.","It paces toward the open route.",NULL};
+  static const char *const undead_m_confusion[] = {"Its jaw clacks without words.","A hollow rattle answers you.","It stares through you, empty-eyed.","The corpse twitches and stills.","Bone fingers scrape stone, uncertain.","It emits a dry, broken rasp.","The undead tilts its skull slowly.","A dead gaze fixes on nothing.","It sways, uncomprehending.","Loose bones chatter once.","It drags a foot and pauses.","The thing gives no clear answer.",NULL};
+  static const char *const undead_m_refusal[] = {"Its jaw snaps shut with finality.","A grave-cold hiss rejects you.","It rattles in hard refusal.","The corpse turns away, rigid.","Bone knuckles tighten and release.","It emits a wet, hostile rasp.","The undead points and dismisses you.","A dead stare denies your request.","It jerks back with a clatter.","Its spine stiffens in refusal.","The thing stands motionless, refusing.","It answers with silence and menace.",NULL};
+  static const char *const undead_m_greet[] = {"A slow nod creaks from dead joints.","Its skull inclines a fraction.","Bone fingers tap a rhythm once.","A low rattle marks your presence.","It acknowledges you with a stare.","The corpse shifts to face you.","A faint rasp greets the living.","It stills and watches you approach.","A cold tilt of the head answers.","The undead raises one bony hand.","Its sockets fix on you, attentive.","A dry clack serves as greeting.",NULL};
+  static const char *const undead_m_threat[] = {"Its ribcage rattles like a warning drum.","The corpse lurches closer, hostile.","Bone claws scrape with intent.","It hisses from a ruined throat.","A sudden clatter signals danger.","The undead juts its skull toward you.","It stiffens and prepares to strike.","Grave-stink and menace roll off it.","Its jaw works in a silent threat.","The thing advances one cold step.","A harsh rattle answers your demand.","It locks onto you with predatory stillness.",NULL};
+  static const char *const undead_m_help[] = {"It points with bone toward the passage.","A rattle draws your attention west.","The corpse gestures toward the stairs.","It drags a finger toward the crypt door.","A hollow rasp nudges you onward.","It turns and indicates the corridor.","The undead marks a route in dust.","It lifts an arm toward safer ground.","A skull tilt suggests the side path.","It scratches an arrow in grime.","The thing beckons once, stiffly.","A dead hand traces the right turn.",NULL};
+  static const char *const undead_i_confusion[] = {"Speak plain; the grave has little patience.","Your meaning rots before it reaches me.","Clarify. I keep no mortal shorthand.","State intent. I answer only purpose.","Your words are fog. Shape them.","Specify your need, living one.","That is imprecise. Try again.","Name the request without ornament.","I require cleaner terms than that.","Be exact. I will not guess.","Your phrasing is weak. Refine it.","I hear you, but not your point.",NULL};
+  static const char *const undead_i_refusal[] = {"Denied. Seek warmer company.","I decline. Leave the grave to its order.","No. I will not grant that.","Refused. Ask another soul.","I am not compelled to help you.","That request dies here.","No further words on it.","I reject this outright.","The dead owe you nothing.","You have my refusal and no more.","I will not bend to that.","Refusal stands. Move on.",NULL};
+  static const char *const undead_i_greet[] = {"You stand before the patient dead.","Living one, mind your step.","I acknowledge your arrival.","Speak, and spend the moment well.","You have my attention, briefly.","The grave listens.","State your purpose among bones.","Proceed; I am listening.","You are noted, traveler.","The dead are not asleep today.","Welcome, if that word still fits.","You may speak now.",NULL};
+  static const char *const undead_i_threat[] = {"Press further and join my silence.","Coin means little to a gravekeeper.","Threats are wasted on the dead.","You mistake patience for weakness.","One more shove and I answer in kind.","I endured death; I can endure you.","Withdraw your demand.","Do not test old malice.","Your pressure earns only ruin.","Choose caution, living one.","No tribute. No compliance.","You provoke a very old hunger.",NULL};
+  static const char *const undead_i_help[] = {"I can point; I do not coddle.","I will guide once. Listen closely.","There is a path; keep your pulse steady.","Take the side corridor and do not linger.","Follow the torchmarks and keep moving.","The route is simple if you stay calm.","Go east, then down. Do not stray.","You may have direction, not comfort.","Watch the floor sigils and continue.","Take the stairs and avoid the altar hall.","I will indicate the way, nothing more.","Proceed quietly and you'll pass.",NULL};
+  static const char *const spirit_confusion[] = {"A whisper brushes your thoughts: unclear.","The air chills; your meaning scatters.","A mind-echo asks for clearer intent.","Mist gathers, uncertain of your request.","A hush answers, puzzled.","The spirit's thought-voice falters.","A distant tone says: not yet understood.","Your words ripple and fade in the veil.","A pale murmur asks you to focus.","The echo circles back without meaning.","A cool pressure seeks clarification.","The spirit waits for a truer question.",NULL};
+  static const char *const spirit_refusal[] = {"A cold thought: no.","The spirit withdraws from your request.","A whisper refuses to bind itself.","The veil closes to that demand.","A distant voice declines.","The ghostly presence recedes in refusal.","No answer comes but chill denial.","A mind-echo rejects your plea.","The spirit thins away from you.","A hollow hush says enough.","The ether denies your ask.","A pale refusal settles in your chest.",NULL};
+  static const char *const spirit_greet[] = {"A gentle whisper greets your mind.","The air cools in greeting.","A pale shimmer acknowledges you.","A quiet echo says welcome.","A thought touches yours, cordial and thin.","The spirit drifts closer, attentive.","A soft chime marks your arrival.","A veil-borne voice notes your presence.","The apparition inclines in silence.","A flicker of light greets you.","A calm pressure brushes your thoughts.","The spirit's gaze settles kindly on you.",NULL};
+  static const char *const spirit_threat[] = {"A sharp whisper cuts your thoughts.","The room drops cold with warning.","A hostile echo presses back.","The spirit's glow hardens.","A mind-voice hisses: enough.","A sudden chill answers your demand.","The apparition swells with ire.","A spectral tone rebukes you.","The veil trembles in warning.","A psychic pulse pushes you away.","The ghost fixes you with burning absence.","A whisper turns into a blade-edge threat.",NULL};
+  static const char *const spirit_help[] = {"A quiet thought points toward the old road.","The spirit traces a route in pale light.","A whisper suggests the safer stair.","A ghostly hand gestures toward the archway.","A cool nudge guides you north.","The apparition marks a path in frost.","A mind-echo offers subtle direction.","The spirit tilts toward the corridor you need.","A soft chime draws your eye to the exit.","A pale finger indicates the trail.","The veil parts slightly in one direction.","A telepathic hint steers you onward.",NULL};
+  static const char *const construct_confusion[] = {"Input ambiguous. Rephrase request.","Unable to parse. Specify objective.","Statement incomplete. Clarify parameters.","Directive unclear. Provide exact target.","Request noise exceeds signal. Retry.","Interpretation failed. Use concise terms.","Query malformed. State intent plainly.","Insufficient context. Supply details.","Processing halted: unclear command.","Data mismatch. Reformulate.","I do not map that request yet.","Please issue a valid instruction.",NULL};
+  static const char *const construct_refusal[] = {"Request denied by protocol.","Authorization insufficient. Refused.","Operation disallowed. End request.","Directive rejected.","Cannot comply with that command.","Protocol conflict detected. Denied.","I will not execute this task.","Access outside role envelope. Refused.","Task blocked. Seek proper unit.","Request rejected. No override.","Service unavailable under current policy.","Negative. Choose another action.",NULL};
+  static const char *const construct_greet[] = {"Acknowledged. Presence detected.","Greeting received. Standing by.","Unit online. You are recognized.","Contact established. State request.","Salutation logged. Awaiting input.","Observer detected. Ready.","Handshake complete. Continue.","Signal accepted. Proceed.","Welcome. Operational status: stable.","Interface open. Speak.","Arrival registered. Listening.","You are identified. Begin.",NULL};
+  static const char *const construct_threat[] = {"Threat posture detected. Countermeasures primed.","Extortion request rejected.","Hostility logged. Step back.","Aggression level elevated. Cease.","Warning: pressure tactics ineffective.","Demand denied. Maintain distance.","Risk profile rising. Withdraw.","Coercion attempt recorded and refused.","I do not yield to intimidation.","Escalation unacceptable. Halt.","Further pressure triggers defensive response.","Threat acknowledged. Compliance remains zero.",NULL};
+  static const char *const construct_help[] = {"Routing assistance available. Provide destination.","I can map one route now.","Specify endpoint for guidance.","Navigation support active. Name target.","Objective support offered within scope.","I can direct you to nearby services.","Query destination; I will route.","Pathfinding ready. State location.","I can provide concise guidance.","Assistance accepted. Detail your need.","Support channel open. Continue.","I can help within protocol limits.",NULL};
+  static const char *const humanoid_confusion[] = {"I need a clearer question.","Could you say that more plainly?", "I'm not sure what you're asking.","Pick one thing and ask it.","Slow down—what do you need?","That came out tangled; try again.","I heard you, not the point.","Be specific and I can help.","I'm missing the request.","Say the need in simple words.","I can answer once it's clear.","Let's try that one more time.",NULL};
+  static const char *const humanoid_refusal[] = {"No. I won't do that.","That's not happening.","I refuse that request.","Ask for something lawful.","Not my role, not my answer.","You'll need someone else.","I won't help with that.","No deal.","That crosses a line.","I'm not providing that.","Refused. Move along.","Try another request.",NULL};
+  static const char *const humanoid_greet[] = {"Well met.","Good to see you.","Hello there.","Welcome.","You look ready for the road.","Morning.","Evening traveler.","Glad to see a friendly face.","Need anything?", "How goes it?", "Good day to you.","State your need.",NULL};
+  static const char *const humanoid_threat[] = {"Back off.","Don't push me.","Keep your coin demand to yourself.","Try that again and regret it.","No tribute from me.","You're testing the wrong person.","That's your warning.","I won't be shaken down.","Careful how you ask.","I said no.","Enough threats.","Walk away.",NULL};
+  static const char *const humanoid_help[] = {"I can help if you narrow the ask.","Tell me what part you need.","I'll point you in the right direction.","Let's sort your problem clearly.","I can offer a quick answer.","Ask directly and I'll respond.","I can guide you from here.","Give me one request at a time.","I'll help where I can.","Start with your main need.","Let's handle this step by step.","I can assist within my role.",NULL};
+
+  const char *const *pool = NULL;
+  int n = 0;
+  if (ex == INTENT_GREETING || icls == DINT_GREETING_REACTION)
+    icls = DINT_GREETING_REACTION;
+  else if (ex == INTENT_THREAT || ex == INTENT_INSULT)
+    icls = DINT_THREAT_REACTION;
+  else if (ex == INTENT_HELP_REQUEST)
+    icls = DINT_HELP_REACTION;
+
+  switch (cat) {
+    case AI_CAT_BEAST_ANIMAL:
+      pool = (icls == DINT_REFUSAL) ? beast_refusal : (icls == DINT_GREETING_REACTION) ? beast_greet : (icls == DINT_THREAT_REACTION) ? beast_threat : (icls == DINT_HELP_REACTION) ? beast_help : beast_confusion; break;
+    case AI_CAT_UNDEAD_MINDLESS:
+      pool = (icls == DINT_REFUSAL) ? undead_m_refusal : (icls == DINT_GREETING_REACTION) ? undead_m_greet : (icls == DINT_THREAT_REACTION) ? undead_m_threat : (icls == DINT_HELP_REACTION) ? undead_m_help : undead_m_confusion; break;
+    case AI_CAT_UNDEAD_INTELLIGENT:
+      pool = (icls == DINT_REFUSAL) ? undead_i_refusal : (icls == DINT_GREETING_REACTION) ? undead_i_greet : (icls == DINT_THREAT_REACTION) ? undead_i_threat : (icls == DINT_HELP_REACTION) ? undead_i_help : undead_i_confusion; break;
+    case AI_CAT_SPIRIT:
+      pool = (icls == DINT_REFUSAL) ? spirit_refusal : (icls == DINT_GREETING_REACTION) ? spirit_greet : (icls == DINT_THREAT_REACTION) ? spirit_threat : (icls == DINT_HELP_REACTION) ? spirit_help : spirit_confusion; break;
+    case AI_CAT_CONSTRUCT:
+      pool = (icls == DINT_REFUSAL) ? construct_refusal : (icls == DINT_GREETING_REACTION) ? construct_greet : (icls == DINT_THREAT_REACTION) ? construct_threat : (icls == DINT_HELP_REACTION) ? construct_help : construct_confusion; break;
+    default:
+      pool = (icls == DINT_REFUSAL) ? humanoid_refusal : (icls == DINT_GREETING_REACTION) ? humanoid_greet : (icls == DINT_THREAT_REACTION) ? humanoid_threat : (icls == DINT_HELP_REACTION) ? humanoid_help : humanoid_confusion; break;
+  }
+  while (pool && pool[n]) n++;
+  if (!pool || n <= 0)
+    return NULL;
+  return pool[(int)(seed % (unsigned long)n)];
+}
+
 static const char *ai_service_menu_clarify_line(struct char_data *mob, int role, int style, int evil, int archetype, int personality)
 {
   enum ai_distinct_role_group grp;
@@ -8094,7 +8262,10 @@ static enum ai_explicit_intent ai_detect_explicit_intent(const char *text, int s
   if (ai_text_has_sub_ci(text, "buy a slave") || ai_text_has_sub_ci(text, "purchase a slave") || ai_text_has_sub_ci(text, "slave market"))
     return INTENT_ILLEGAL_SLAVERY_REQUEST;
   if (ai_text_has_sub_ci(text, "are you capable of conversation") ||
-      ai_text_has_sub_ci(text, "are you ai") || ai_text_has_sub_ci(text, "are you real"))
+      ai_text_has_sub_ci(text, "are you ai") || ai_text_has_sub_ci(text, "are you real") ||
+      ai_text_has_sub_ci(text, "why are you talking") || ai_text_has_sub_ci(text, "how can you speak") ||
+      ai_text_has_sub_ci(text, "skeleton talking") || ai_text_has_sub_ci(text, "animal talking") ||
+      ai_text_has_sub_ci(text, "why can you understand me"))
     return INTENT_META_AI;
   if (ai_is_thoughts_phrase(text))
     return INTENT_THOUGHTS;
@@ -8982,6 +9153,9 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
   enum ai_reply_goal chosen_goal = GOAL_INFORM;
   int chosen_goal_known = FALSE;
   struct ai_reply_context rctx;
+  enum ai_comm_mode comm_mode = AI_COMM_SAY;
+  enum ai_creature_category creature_cat = AI_CAT_HUMANOID_GENERIC;
+  const char *comm_sound_style = NULL;
 
 #define AI_EVT_RETURN(_reason) do { \
   ai_dbg_evt(mob, (_reason), type, actor, text); \
@@ -9469,10 +9643,11 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
                     "Try the market square — stablehands often pass through.";
           else if (multi_intent.secondary_intent == INTENT_SERVICE_TRAINING)
             follow = has_capability ? "Yes. Use TRAIN to spend training sessions. Use PRAC to spend practice sessions." : "I'm not a trainer. Look for a guildmaster to TRAIN and PRAC.";
-          if (follow && *follow)
-            snprintf(voiced, sizeof(voiced), "%s %s", illegal, follow);
-          else
-            snprintf(voiced, sizeof(voiced), "%s", illegal);
+          if (follow && *follow) {
+            ai_copy_trunc(voiced, sizeof(voiced), illegal);
+            ai_append_space_and_trunc(voiced, sizeof(voiced), follow);
+          } else
+            ai_copy_trunc(voiced, sizeof(voiced), illegal);
           line = voiced;
         } else {
           line = illegal;
@@ -9611,7 +9786,8 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
       }
 
       if (type == AI_EVENT_PLAYER_SAY && multi_service_hits >= 2 && multi_has_food && multi_has_money && line && *line) {
-        snprintf(service_line, sizeof(service_line), "%s %s", line, "If coin is tight, ask for lawful work at the market.");
+        ai_copy_trunc(service_line, sizeof(service_line), line);
+        ai_append_space_and_trunc(service_line, sizeof(service_line), "If coin is tight, ask for lawful work at the market.");
         line = service_line;
       }
 
@@ -9710,7 +9886,8 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
       if (type == AI_EVENT_PLAYER_SAY && line && *line && rctx.requested_count <= 1 && !(asks_train && MOB_FLAGGED(mob, MOB_GUILD_MASTER))) {
         unsigned long dseed = ai_conv_seed(mob, intent, (unsigned int)now);
         if (!repeated_topic && ai_pick_stance_prefix(role, style, dseed, &stance_prefix) && stance_prefix && *stance_prefix && ai_line_is_role_legal(stance_prefix, role, style)) {
-          snprintf(decorated, sizeof(decorated), "%s %s", stance_prefix, line);
+          ai_copy_trunc(decorated, sizeof(decorated), stance_prefix);
+          ai_append_space_and_trunc(decorated, sizeof(decorated), line);
           line = decorated;
           if (ai_debug)
             ai_debug_log("AI_STANCE_PICK vnum=%d prefix='%s'", GET_MOB_VNUM(mob), stance_prefix);
@@ -9718,8 +9895,9 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
         if (question_shape) {
           mirror_clause = ai_pick_question_mirror_clause(rctx.primary_topic_target, role, style, dseed);
           if (mirror_clause && *mirror_clause) {
-            snprintf(service_line, sizeof(service_line), "%s %s", mirror_clause, line);
-            if (strlen(service_line) < sizeof(service_line) - 1) {
+            ai_copy_trunc(service_line, sizeof(service_line), mirror_clause);
+            ai_append_space_and_trunc(service_line, sizeof(service_line), line);
+            if (service_line[0]) {
               line = service_line;
               if (ai_debug)
                 ai_debug_log("AI_MIRROR_PICK vnum=%d mirror='%s'", GET_MOB_VNUM(mob), mirror_clause);
@@ -9775,7 +9953,7 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
       if (line && *line && type == AI_EVENT_PLAYER_SAY && (rctx.domain == DOMAIN_SERVICES || rctx.domain == DOMAIN_DIRECTIONS) && rctx.facts.confidence >= 3) {
         because_clause = ai_role_because_clause(role, style);
         if (because_clause && *because_clause) {
-          snprintf(service_line, sizeof(service_line), "%s", line);
+          ai_copy_trunc(service_line, sizeof(service_line), line);
           ai_append_clause(service_line, sizeof(service_line), because_clause);
           if (strlen(service_line) < sizeof(service_line) - 1)
             line = service_line;
@@ -9787,23 +9965,56 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
     if (!line || !*line)
       AI_EVT_RETURN("EMPTY_LINE_AFTER_ASSEMBLY");
 
+    creature_cat = ai_pick_creature_category(mob, &rctx);
+    comm_mode = ai_pick_comm_mode(mob, &rctx, intent, ai_explicit_to_core_intent(multi_intent.secondary_intent), rctx.domain, explicit_intent, &comm_sound_style);
+    if ((rctx.domain == DOMAIN_SERVICES || rctx.domain == DOMAIN_SHOPPING || rctx.domain == DOMAIN_DIRECTIONS) &&
+        (comm_mode != AI_COMM_SAY || !(ai_intent_required_capability(explicit_intent) == 0 || ((role_caps & ai_intent_required_capability(explicit_intent)) != 0)))) {
+      const char *creature_line = ai_creature_reaction_line(creature_cat, explicit_intent,
+                                ((ai_intent_required_capability(explicit_intent) == 0 || ((role_caps & ai_intent_required_capability(explicit_intent)) != 0)) ? DINT_CONFUSION : DINT_REFUSAL),
+                                ai_conv_seed(mob, intent, (unsigned int)now));
+      if (creature_line && *creature_line)
+        line = creature_line;
+    }
+
+    if (explicit_intent == INTENT_META_AI) {
+      const char *meta_line = ai_creature_reaction_line(creature_cat, explicit_intent, DINT_CONFUSION, ai_conv_seed(mob, intent, (unsigned int)(now + 17)));
+      if (creature_cat == AI_CAT_HUMANOID_GENERIC)
+        meta_line = ai_meta_response_line(mob, role, style, explicit_intent, sctx ? sctx->last_mood : AI_SOCIAL_NEUTRAL);
+      if (meta_line && *meta_line)
+        line = meta_line;
+    }
+
     ai_set_last_speech_meta(mob, pool, reason);
     {
       char finalbuf[300];
       char original[300];
       const char *replacement = NULL;
       ai_sanitize_unresolved_tokens(line, finalbuf, sizeof(finalbuf));
-      snprintf(original, sizeof(original), "%s", finalbuf);
+      ai_copy_trunc(original, sizeof(original), finalbuf);
       if (type == AI_EVENT_PLAYER_SAY && !ai_line_is_role_legal(finalbuf, role, style)) {
         replacement = ai_role_redirect_line(role, style, rctx.primary_topic_target);
         if (!replacement || !*replacement)
           replacement = "Let's keep to what I can answer.";
-        snprintf(finalbuf, sizeof(finalbuf), "%.*s", (int)sizeof(finalbuf) - 1, replacement);
+        ai_copy_trunc(finalbuf, sizeof(finalbuf), replacement);
         if (ai_debug) {
           ai_debug_log("ROLE_ILLEGAL_OUTPUT: role=%s pool=%s original='%s' replacement='%s'", ai_role_name_local(role), pool ? pool : "POOL_NONE", original, finalbuf);
         }
       }
-      snprintf(targeted, sizeof(targeted), "$n says to %s, '%s'", GET_NAME(actor), finalbuf);
+      if (comm_mode == AI_COMM_SAY) {
+        snprintf(targeted, sizeof(targeted), "$n says to %s, '%s'", GET_NAME(actor), finalbuf);
+      } else if (comm_mode == AI_COMM_TELEPATHY) {
+        snprintf(targeted, sizeof(targeted), "$n's voice brushes %s's mind: \"%.*s\"", GET_NAME(actor), (int)sizeof(finalbuf)-1, finalbuf);
+      } else if (comm_mode == AI_COMM_SOUND) {
+        const char *sound = comm_sound_style ? comm_sound_style : "makes a harsh sound toward";
+        snprintf(targeted, sizeof(targeted), "$n %s %s.", sound, GET_NAME(actor));
+      } else if (comm_mode == AI_COMM_EMOTE) {
+        snprintf(targeted, sizeof(targeted), "$n %.*s", (int)sizeof(targeted)-5, finalbuf);
+      } else {
+        snprintf(targeted, sizeof(targeted), "$n ignores %s.", GET_NAME(actor));
+      }
+      if (ai_debug) {
+        ai_debug_log("AI_COMM_PICK vnum=%d cat=%d subtags=%llu comm=%d intent=%d/%d pool=%s", GET_MOB_VNUM(mob), creature_cat, (unsigned long long)rctx.subtags, comm_mode, intent, ai_explicit_to_core_intent(multi_intent.secondary_intent), pool ? pool : "POOL_NONE");
+      }
     }
     if (type == AI_EVENT_PLAYER_SAY)
       ai_actor_schedule_delayed_player_reply(mob, actor, targeted, rctx.personality, rctx.evil_signaled, rctx.archetype, now);
