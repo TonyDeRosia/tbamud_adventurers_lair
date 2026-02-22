@@ -89,9 +89,14 @@ enum ai_social_mood {
 
 enum ai_explicit_intent {
   INTENT_GREETING = 0,
+  INTENT_ATTENTION,
   INTENT_IDENTITY,
   INTENT_SMALLTALK,
+  INTENT_CHAT_REQUEST,
   INTENT_HELP_REQUEST,
+  INTENT_THOUGHTS,
+  INTENT_EMPATHY,
+  INTENT_MONEY_JOB,
   INTENT_SERVICE_FOOD,
   INTENT_SERVICE_WATER,
   INTENT_SERVICE_REST,
@@ -928,11 +933,20 @@ static const char *ai_service_menu_clarify_line(int role, int style, int evil);
 static const char *ai_service_honest_fallback_line(int role, int topic_target, int archetype);
 static const char *ai_role_neutral_fallback_line(int role, int style, int archetype);
 static void ai_buf_prefix(char *buf, size_t bufsz, const char *prefix);
+static int ai_is_attention_phrase(const char *text);
+static int ai_is_chat_request_phrase(const char *text);
+static int ai_is_help_request_phrase(const char *text);
+static int ai_is_thoughts_phrase(const char *text);
+static int ai_is_empathy_phrase(const char *text);
+static int ai_is_money_job_phrase(const char *text);
+static int ai_has_trailing_question(const char *text);
+static int ai_is_questionish_greeting(const char *text);
+static const char *ai_social_prompt_line(struct char_data *mob, int role, int style, enum ai_explicit_intent ex, int mood);
+static int ai_count_multi_service_hits(const char *text, int *has_food, int *has_money);
 static int ai_text_is_effectively_empty(const char *s)
 {
   const unsigned char *p;
   int alnum_count = 0;
-  int len = 0;
 
   if (!s)
     return TRUE;
@@ -945,14 +959,10 @@ static int ai_text_is_effectively_empty(const char *s)
   for (p = (const unsigned char *)s; *p; p++) {
     if (isalnum(*p))
       alnum_count++;
-    len++;
   }
 
   if (alnum_count == 0)
     return TRUE;
-  if (alnum_count < 2 && len <= 3)
-    return TRUE;
-
   return FALSE;
 }
 
@@ -7333,6 +7343,143 @@ static void ai_normalize_text(const char *src, char *dst, size_t dstsz)
     dst[end] = '\0';
 }
 
+static int ai_has_trailing_question(const char *text)
+{
+  size_t n;
+  if (!text || !*text)
+    return FALSE;
+  n = strlen(text);
+  while (n > 0 && isspace((unsigned char)text[n - 1]))
+    n--;
+  return (n > 0 && text[n - 1] == '?');
+}
+
+static int ai_is_attention_phrase(const char *text)
+{
+  if (!text || !*text)
+    return FALSE;
+  return ai_text_has_sub_ci(text, "anyone") || ai_text_has_sub_ci(text, "anybody") ||
+         ai_text_has_sub_ci(text, "someone") || ai_text_has_sub_ci(text, "somebody") ||
+         ai_text_has_sub_ci(text, "hello?") || ai_text_has_sub_ci(text, "anyone here") ||
+         ai_text_has_sub_ci(text, "anybody here");
+}
+
+static int ai_is_chat_request_phrase(const char *text)
+{
+  if (!text || !*text)
+    return FALSE;
+  return ai_text_has_sub_ci(text, "lets chat") || ai_text_has_sub_ci(text, "let's chat") ||
+         ai_text_has_sub_ci(text, "talk to me") || ai_text_has_sub_ci(text, "chat with me") ||
+         ai_text_has_sub_ci(text, "say something") || ai_text_has_sub_ci(text, "tell me something") ||
+         ai_text_has_sub_ci(text, "please talk") || ai_text_has_sub_ci(text, "talk please");
+}
+
+static int ai_is_help_request_phrase(const char *text)
+{
+  if (!text || !*text)
+    return FALSE;
+  return ai_text_has_sub_ci(text, "can you help me") || ai_text_has_sub_ci(text, "help me") ||
+         ai_text_has_sub_ci(text, "i need help") || ai_text_has_sub_ci(text, "need help") ||
+         ai_text_has_sub_ci(text, "please help");
+}
+
+static int ai_is_thoughts_phrase(const char *text)
+{
+  if (!text || !*text)
+    return FALSE;
+  return ai_text_has_sub_ci(text, "what's on your mind") || ai_text_has_sub_ci(text, "whats on your mind") ||
+         ai_text_has_sub_ci(text, "what are you thinking") || ai_text_has_sub_ci(text, "on your mind");
+}
+
+static int ai_is_empathy_phrase(const char *text)
+{
+  if (!text || !*text)
+    return FALSE;
+  return ai_text_has_sub_ci(text, "do you have empathy") || ai_text_has_sub_ci(text, "do you care") ||
+         ai_text_has_sub_ci(text, "anyone care") || ai_text_has_sub_ci(text, "why are you ignoring me");
+}
+
+static int ai_is_money_job_phrase(const char *text)
+{
+  if (!text || !*text)
+    return FALSE;
+  return ai_text_has_sub_ci(text, "money") || ai_text_has_sub_ci(text, "coin") || ai_text_has_sub_ci(text, "cash") ||
+         ai_text_has_sub_ci(text, "job") || ai_text_has_sub_ci(text, "work") || ai_text_has_sub_ci(text, "earn");
+}
+
+static int ai_is_questionish_greeting(const char *text)
+{
+  if (!text || !*text)
+    return FALSE;
+  if (!ai_has_trailing_question(text))
+    return FALSE;
+  if (ai_is_attention_phrase(text))
+    return TRUE;
+  return ai_text_has_sub_ci(text, "hello") || ai_text_has_sub_ci(text, "hi") || ai_text_has_sub_ci(text, "hey") ||
+         ai_text_has_sub_ci(text, "greetings") || ai_text_has_sub_ci(text, "hail") || ai_text_has_sub_ci(text, "yo");
+}
+
+static int ai_count_multi_service_hits(const char *text, int *has_food, int *has_money)
+{
+  int hits = 0;
+  if (has_food) *has_food = 0;
+  if (has_money) *has_money = 0;
+  if (!text || !*text)
+    return 0;
+
+  if (ai_text_has_sub_ci(text, "food") || ai_text_has_sub_ci(text, "drink") || ai_text_has_sub_ci(text, "water")) {
+    hits++;
+    if (has_food) *has_food = 1;
+  }
+  if (ai_text_has_sub_ci(text, "rest") || ai_text_has_sub_ci(text, "inn"))
+    hits++;
+  if (ai_is_money_job_phrase(text)) {
+    hits++;
+    if (has_money) *has_money = 1;
+  }
+  if (ai_text_has_sub_ci(text, "supplies") || ai_text_has_sub_ci(text, "weapon") || ai_text_has_sub_ci(text, "pet"))
+    hits++;
+  return hits;
+}
+
+static const char *ai_social_prompt_line(struct char_data *mob, int role, int style, enum ai_explicit_intent ex, int mood)
+{
+  (void)style;
+  if (ex == INTENT_GREETING || ex == INTENT_ATTENTION) {
+    if (role == ROLE_GUARD) return "Hail. I'm on watch--what do you need?";
+    if (role == ROLE_MERCHANT) return "Hello there. Need goods, rest, or directions?";
+    if (mob && MOB_FLAGGED(mob, MOB_GUILD_MASTER)) return "Greetings. If you train, be precise.";
+    if (role == ROLE_BANDIT) return "Yeah, I'm here. Talk fast.";
+    return "Hello. What can I do for you?";
+  }
+  if (ex == INTENT_CHAT_REQUEST) {
+    if (role == ROLE_GUARD) return "All right, let's talk. Need directions, safety advice, or work leads?";
+    if (role == ROLE_MERCHANT) return "Happy to talk. Looking for supplies, a room, or a fair trade?";
+    if (mob && MOB_FLAGGED(mob, MOB_GUILD_MASTER)) return "We can talk. Want training tips, practice basics, or survival advice?";
+    return "Sure, let's talk. What do you want to start with?";
+  }
+  if (ex == INTENT_HELP_REQUEST)
+    return "I can help. What do you need most: food, rest, training, supplies, or directions?";
+  if (ex == INTENT_THOUGHTS) {
+    if (role == ROLE_GUARD) return "Right now I'm watching the road and keeping the peace.";
+    if (role == ROLE_MERCHANT) return "Right now I'm tracking stock, coin, and who needs what.";
+    if (mob && MOB_FLAGGED(mob, MOB_GUILD_MASTER)) return "Right now I'm focused on discipline and steady improvement.";
+    return "Right now I'm focused on my duty here.";
+  }
+  if (ex == INTENT_EMPATHY) {
+    if (mood >= AI_SOCIAL_ANNOYED) return "I hear you. Say what you need and I'll answer plainly.";
+    if (role == ROLE_BANDIT) return "I care enough to listen. Say what you need.";
+    return "Yes, I care. Tell me what you need right now.";
+  }
+  if (ex == INTENT_MONEY_JOB) {
+    if (role == ROLE_GUARD) return "For coin, look for lawful work: errands, bounties, or market labor.";
+    if (role == ROLE_MERCHANT) return "Earn coin by selling loot, trading cleanly, or helping at market stalls.";
+    if (mob && MOB_FLAGGED(mob, MOB_GUILD_MASTER)) return "Train to stay alive, then take steady work in town for coin.";
+    return "Look for honest work in town and keep your coin secure.";
+  }
+  return NULL;
+}
+
 static int ai_player_speech_classify(const char *text, int *out_confidence, int *out_is_weather)
 {
   int scores[AI_SPEECH_FEELING + 1];
@@ -7347,9 +7494,18 @@ static int ai_player_speech_classify(const char *text, int *out_confidence, int 
     return AI_SPEECH_UNKNOWN;
 
   if (ai_text_has_sub_ci(text, "hello") || ai_text_has_sub_ci(text, "hi") || ai_text_has_sub_ci(text, "hey") ||
-      ai_text_has_sub_ci(text, "greetings") || ai_text_has_sub_ci(text, "yo") || ai_text_has_sub_ci(text, "sup") ||
+      ai_text_has_sub_ci(text, "greetings") || ai_text_has_sub_ci(text, "hail") || ai_text_has_sub_ci(text, "yo") || ai_text_has_sub_ci(text, "sup") ||
       ai_text_has_sub_ci(text, "good morning") || ai_text_has_sub_ci(text, "good afternoon") || ai_text_has_sub_ci(text, "good evening"))
     scores[AI_SPEECH_GREET] += 10;
+
+  if (ai_is_attention_phrase(text) || ai_is_questionish_greeting(text)) {
+    scores[AI_SPEECH_GREET] += 24;
+    scores[AI_SPEECH_SMALLTALK] += 8;
+  }
+  if (ai_is_chat_request_phrase(text) || ai_is_help_request_phrase(text) || ai_is_thoughts_phrase(text) || ai_is_empathy_phrase(text)) {
+    scores[AI_SPEECH_SMALLTALK] += 20;
+    scores[AI_SPEECH_HELP] += 12;
+  }
 
   if (ai_is_training_query_text(text) || ai_is_practice_query_text(text)) {
     scores[AI_SPEECH_SHOP] += 34;
@@ -7652,9 +7808,19 @@ static enum ai_explicit_intent ai_detect_explicit_intent(const char *text, int s
     return INTENT_CONFUSION;
   if (ai_text_has_sub_ci(text, "buy a slave") || ai_text_has_sub_ci(text, "purchase a slave") || ai_text_has_sub_ci(text, "slave market"))
     return INTENT_ILLEGAL_SLAVERY_REQUEST;
-  if (ai_text_has_sub_ci(text, "are you capable of conversation") || ai_text_has_sub_ci(text, "what are you thinking") ||
+  if (ai_text_has_sub_ci(text, "are you capable of conversation") ||
       ai_text_has_sub_ci(text, "are you ai") || ai_text_has_sub_ci(text, "are you real"))
     return INTENT_META_AI;
+  if (ai_is_thoughts_phrase(text))
+    return INTENT_THOUGHTS;
+  if (ai_is_empathy_phrase(text))
+    return INTENT_EMPATHY;
+  if (ai_is_chat_request_phrase(text))
+    return INTENT_CHAT_REQUEST;
+  if (ai_is_help_request_phrase(text))
+    return INTENT_HELP_REQUEST;
+  if (ai_is_attention_phrase(text))
+    return INTENT_ATTENTION;
   if (ai_text_has_sub_ci(text, "idiot") || ai_text_has_sub_ci(text, "stupid") || ai_text_has_sub_ci(text, "moron") ||
       ai_text_has_sub_ci(text, "dumb") || ai_text_has_sub_ci(text, "fool"))
     return INTENT_INSULT;
@@ -7664,6 +7830,8 @@ static enum ai_explicit_intent ai_detect_explicit_intent(const char *text, int s
     return INTENT_IDENTITY;
   if (ai_is_training_query_text(text) || ai_is_practice_query_text(text))
     return INTENT_SERVICE_TRAINING;
+  if (ai_is_money_job_phrase(text))
+    return INTENT_MONEY_JOB;
   if (ai_text_has_sub_ci(text, "pet") || ai_text_has_sub_ci(text, "stablemaster"))
     return INTENT_SERVICE_PETS;
   if (ai_text_has_sub_ci(text, "food") || ai_text_has_sub_ci(text, "eat") || ai_text_has_sub_ci(text, "meal"))
@@ -7682,7 +7850,7 @@ static enum ai_explicit_intent ai_detect_explicit_intent(const char *text, int s
     return INTENT_SERVICE_GUARDS;
   if (ai_text_has_sub_ci(text, "where") || speech_class == AI_SPEECH_DIRECTIONS)
     return INTENT_DIRECTIONS_GENERIC;
-  if (speech_class == AI_SPEECH_GREET)
+  if (speech_class == AI_SPEECH_GREET || ai_is_questionish_greeting(text))
     return INTENT_GREETING;
   if (speech_class == AI_SPEECH_HELP)
     return INTENT_HELP_REQUEST;
@@ -7695,9 +7863,14 @@ static int ai_explicit_to_core_intent(enum ai_explicit_intent ex)
 {
   switch (ex) {
     case INTENT_GREETING: return AI_INTENT_GREET;
+    case INTENT_ATTENTION: return AI_INTENT_GREET;
     case INTENT_IDENTITY: return AI_INTENT_SMALLTALK;
     case INTENT_SMALLTALK: return AI_INTENT_SMALLTALK;
+    case INTENT_CHAT_REQUEST: return AI_INTENT_SMALLTALK;
     case INTENT_HELP_REQUEST: return AI_INTENT_QUEST;
+    case INTENT_THOUGHTS: return AI_INTENT_SMALLTALK;
+    case INTENT_EMPATHY: return AI_INTENT_SMALLTALK;
+    case INTENT_MONEY_JOB: return AI_INTENT_QUEST;
     case INTENT_SERVICE_FOOD: return AI_INTENT_BUY_FOOD;
     case INTENT_SERVICE_WATER: return AI_INTENT_BUY_FOOD;
     case INTENT_SERVICE_REST: return AI_INTENT_INN;
@@ -7752,8 +7925,14 @@ static int ai_explicit_to_domain(enum ai_explicit_intent ex, int current_domain)
     case INTENT_THREAT:
     case INTENT_META_AI:
     case INTENT_GREETING:
+    case INTENT_ATTENTION:
     case INTENT_IDENTITY:
     case INTENT_SMALLTALK:
+    case INTENT_CHAT_REQUEST:
+    case INTENT_HELP_REQUEST:
+    case INTENT_THOUGHTS:
+    case INTENT_EMPATHY:
+    case INTENT_MONEY_JOB:
     case INTENT_CONFUSION:
       return DOMAIN_SOCIAL;
     default:
@@ -7878,9 +8057,8 @@ static struct ai_multi_intent ai_detect_multi_intent(const char *text, int speec
     out.secondary_intent = INTENT_SERVICE_TRAINING;
   else if (ai_text_has_sub_ci(text, "food") || ai_text_has_sub_ci(text, "eat") || ai_text_has_sub_ci(text, "meal"))
     out.secondary_intent = INTENT_SERVICE_FOOD;
-
-  if (!out.illegal_intent_flag)
-    out.secondary_intent = INTENT_CONFUSION;
+  else if (ai_is_money_job_phrase(text))
+    out.secondary_intent = INTENT_MONEY_JOB;
 
   return out;
 }
@@ -8467,6 +8645,9 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
   int bakery_item = -1;
   int inn_room = NOWHERE;
   int inn_item = -1;
+  int multi_service_hits = 0;
+  int multi_has_food = 0;
+  int multi_has_money = 0;
   enum ai_explicit_intent explicit_intent = INTENT_CONFUSION;
   struct ai_multi_intent multi_intent;
   ai_personality stable_personality;
@@ -8545,15 +8726,19 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
       AI_EVT_RETURN("NOISE_PLAYER_SAY");
     quality_score = ai_speech_quality_score(normalized, &quality_has_intent);
     if (quality_score < 26 && !quality_has_intent) {
-      const char *clar = ai_service_menu_clarify_line(role, style, rctx.evil_signaled);
-      char tiny[300];
-      if (!clar || !*clar)
-        clar = "What do you need: food, water, rest, or gear?";
-      snprintf(tiny, sizeof(tiny), "$n says to %s, '%s'", GET_NAME(actor), clar);
-      ai_actor_schedule_delayed_player_reply(mob, actor, tiny, rctx.personality, rctx.evil_signaled, rctx.archetype, now);
-      AI_EVT_RETURN("LOW_QUALITY_CLARIFY");
+      if (!(ai_is_attention_phrase(normalized) || ai_is_questionish_greeting(normalized) || ai_is_chat_request_phrase(normalized) ||
+            ai_is_help_request_phrase(normalized) || ai_is_thoughts_phrase(normalized) || ai_is_empathy_phrase(normalized))) {
+        const char *clar = ai_service_menu_clarify_line(role, style, rctx.evil_signaled);
+        char tiny[300];
+        if (!clar || !*clar)
+          clar = "What do you need: food, water, rest, or gear?";
+        snprintf(tiny, sizeof(tiny), "$n says to %s, '%s'", GET_NAME(actor), clar);
+        ai_actor_schedule_delayed_player_reply(mob, actor, tiny, rctx.personality, rctx.evil_signaled, rctx.archetype, now);
+        AI_EVT_RETURN("LOW_QUALITY_CLARIFY");
+      }
     }
     self_identity_query = ai_is_self_identity_query(normalized, &self_identity_human_query);
+    multi_service_hits = ai_count_multi_service_hits(normalized, &multi_has_food, &multi_has_money);
   }
 
   if (type == AI_EVENT_PLAYER_SAY)
@@ -8581,12 +8766,35 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
     } else {
       speech_class = ai_player_speech_classify(normalized, &confidence, NULL);
       intent = ai_intent_from_player_class(speech_class);
+      if (ai_is_attention_phrase(normalized) || ai_is_questionish_greeting(normalized) || speech_class == AI_SPEECH_GREET) {
+        intent = AI_INTENT_GREET;
+        confidence = MAX(confidence, 40);
+      }
       if (ai_is_training_query_text(normalized) || ai_is_practice_query_text(normalized)) {
         intent = AI_INTENT_TRAIN;
-        confidence = MAX(confidence, 32);
+        confidence = MAX(confidence, 45);
       }
       if (speech_class == AI_SPEECH_WEATHER)
         confidence += 4;
+      if (intent == AI_INTENT_CONFUSION && strlen(normalized) <= 12) {
+        const unsigned char *pp;
+        int has_alpha = 0;
+        for (pp = (const unsigned char *)normalized; *pp; pp++) {
+          if (isalpha(*pp)) {
+            has_alpha = 1;
+            break;
+          }
+        }
+        if (has_alpha) {
+          if (ai_is_attention_phrase(normalized) || ai_is_questionish_greeting(normalized)) {
+            intent = AI_INTENT_GREET;
+            confidence = MAX(confidence, 34);
+          } else {
+            intent = AI_INTENT_SMALLTALK;
+            confidence = MAX(confidence, 30);
+          }
+        }
+      }
     }
     if (self_identity_query) {
       intent = AI_INTENT_SMALLTALK;
@@ -8613,6 +8821,8 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
   if (type == AI_EVENT_PLAYER_SAY) {
     multi_intent = ai_detect_multi_intent(normalized, speech_class, rctx.domain, self_identity_query);
     explicit_intent = multi_intent.primary_intent;
+    if (explicit_intent == INTENT_ATTENTION || explicit_intent == INTENT_GREETING)
+      confidence = MAX(confidence, 40);
     intent = ai_explicit_to_core_intent(explicit_intent);
     rctx.intent = intent;
     rctx.speech_act = intent;
@@ -8931,7 +9141,7 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
             follow = (role == ROLE_MERCHANT) ? "I deal in goods, not beasts. Try the market square — stablehands often pass through." :
                     "Try the market square — stablehands often pass through.";
           else if (multi_intent.secondary_intent == INTENT_SERVICE_TRAINING)
-            follow = has_capability ? "Yes. Use TRAIN for sessions. Use PRACTICE for skills." : "I am not a trainer. Ask a guildmaster to TRAIN and PRACTICE.";
+            follow = has_capability ? "Yes. Use TRAIN to spend training sessions. Use PRAC to spend practice sessions." : "I'm not a trainer. Look for a guildmaster to TRAIN and PRAC.";
           if (follow && *follow)
             snprintf(voiced, sizeof(voiced), "%s %s", illegal, follow);
           else
@@ -8963,6 +9173,19 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
         rctx.chosen_core = line;
         skip_voice = TRUE;
         intention.be_brief = 1;
+      } else if (type == AI_EVENT_PLAYER_SAY && (explicit_intent == INTENT_GREETING || explicit_intent == INTENT_ATTENTION || explicit_intent == INTENT_CHAT_REQUEST ||
+                 explicit_intent == INTENT_HELP_REQUEST || explicit_intent == INTENT_THOUGHTS || explicit_intent == INTENT_EMPATHY || explicit_intent == INTENT_MONEY_JOB)) {
+        line = ai_social_prompt_line(mob, role, style, explicit_intent, sctx ? sctx->last_mood : AI_SOCIAL_NEUTRAL);
+        rctx.chosen_core = line;
+        skip_voice = TRUE;
+        intention.be_brief = 1;
+        if (explicit_intent == INTENT_GREETING || explicit_intent == INTENT_ATTENTION) {
+          intent = AI_INTENT_GREET;
+          rctx.intent = intent;
+          rctx.speech_act = intent;
+          if (sctx)
+            sctx->last_mood = AI_SOCIAL_FRIENDLY;
+        }
       }
 
       intention = ai_form_intention(mob, intent, speech_class, suspicion_bucket, sr ? sr->arc : AI_ARC_STRANGER, &ctx, sr, e, now);
@@ -9008,7 +9231,7 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
           if (!line || !*line)
             line = ai_service_honest_fallback_line(role, rctx.primary_topic_target, rctx.archetype);
         } else if (explicit_intent == INTENT_SERVICE_TRAINING) {
-          line = "Yes. Use TRAIN for sessions. Use PRACTICE for skills.";
+          line = "Yes. Use TRAIN to spend training sessions. Use PRAC to spend practice sessions.";
         } else if (rctx.facts.confidence >= 3 && rctx.facts.service_name[0]) {
           snprintf(service_line, sizeof(service_line), "%s. %s", rctx.facts.service_name, rctx.facts.route_snippet[0] ? rctx.facts.route_snippet : "Go there directly.");
           line = service_line;
@@ -9033,7 +9256,7 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
           if (rctx.facts.confidence == 3)
             line = ai_role_redirect_line(role, style, TARGET_TRAINER);
           else
-            line = "I am not a trainer. Ask a guildmaster to TRAIN and PRAC.";
+            line = "I'm not a trainer. Look for a guildmaster to TRAIN and PRAC.";
         } else if (type == AI_EVENT_PLAYER_SAY && (rctx.domain == DOMAIN_SERVICES || rctx.domain == DOMAIN_DIRECTIONS))
           line = ai_role_redirect_line(role, style, rctx.primary_topic_target);
         else if (rctx.domain == DOMAIN_SOCIAL)
@@ -9046,6 +9269,11 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
         const char *repick = ai_role_redirect_line(role, style, rctx.primary_topic_target);
         if (repick && *repick)
           line = repick;
+      }
+
+      if (type == AI_EVENT_PLAYER_SAY && multi_service_hits >= 2 && multi_has_food && multi_has_money && line && *line) {
+        snprintf(service_line, sizeof(service_line), "%s %s", line, "If coin is tight, ask for lawful work at the market.");
+        line = service_line;
       }
 
       if (type == AI_EVENT_PLAYER_SAY && rctx.requested_count > 1 &&
@@ -9253,15 +9481,22 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
       sctx->last_player_idnum = GET_IDNUM(actor);
       sctx->last_player_text_hash = (uint32_t)ai_text_hash_simple(normalized);
       sctx->last_answer_kind = (explicit_intent == INTENT_ILLEGAL_SLAVERY_REQUEST) ? AI_ANSWER_REFUSAL :
+                               ((explicit_intent == INTENT_GREETING || explicit_intent == INTENT_ATTENTION || explicit_intent == INTENT_CHAT_REQUEST ||
+                                 explicit_intent == INTENT_HELP_REQUEST || explicit_intent == INTENT_THOUGHTS || explicit_intent == INTENT_EMPATHY) ? AI_ANSWER_SMALLTALK :
                                ((rctx.facts.confidence >= 3) ? AI_ANSWER_FACT :
-                               ((rctx.domain == DOMAIN_SERVICES || rctx.domain == DOMAIN_DIRECTIONS) ? AI_ANSWER_REFERRAL : AI_ANSWER_SMALLTALK));
+                               ((rctx.domain == DOMAIN_SERVICES || rctx.domain == DOMAIN_DIRECTIONS) ? AI_ANSWER_REFERRAL : AI_ANSWER_SMALLTALK)));
       if (explicit_intent == INTENT_INSULT || explicit_intent == INTENT_THREAT)
         sctx->last_mood = MIN(AI_SOCIAL_HOSTILE, MAX(AI_SOCIAL_ANNOYED, sctx->last_mood + 1));
-      else if (explicit_intent == INTENT_GREETING || explicit_intent == INTENT_SMALLTALK)
+      else if (explicit_intent == INTENT_GREETING || explicit_intent == INTENT_ATTENTION)
+        sctx->last_mood = AI_SOCIAL_FRIENDLY;
+      else if (explicit_intent == INTENT_SMALLTALK || explicit_intent == INTENT_CHAT_REQUEST || explicit_intent == INTENT_HELP_REQUEST ||
+               explicit_intent == INTENT_THOUGHTS || explicit_intent == INTENT_EMPATHY)
         sctx->last_mood = MAX(AI_SOCIAL_NEUTRAL, sctx->last_mood - 1);
       if (explicit_intent == INTENT_INSULT || explicit_intent == INTENT_THREAT)
         sctx->insult_count_recent = MIN(255, sctx->insult_count_recent + 1);
-      else if (explicit_intent == INTENT_GREETING || explicit_intent == INTENT_SMALLTALK)
+      else if (explicit_intent == INTENT_GREETING || explicit_intent == INTENT_ATTENTION || explicit_intent == INTENT_SMALLTALK ||
+               explicit_intent == INTENT_CHAT_REQUEST || explicit_intent == INTENT_HELP_REQUEST || explicit_intent == INTENT_THOUGHTS ||
+               explicit_intent == INTENT_EMPATHY)
         sctx->insult_count_recent = (sctx->insult_count_recent > 0) ? (uint8_t)(sctx->insult_count_recent - 1) : 0;
       sctx->last_meta_flag = (explicit_intent == INTENT_META_AI) ? 1 : 0;
       sctx->last_refusal_type = (explicit_intent == INTENT_ILLEGAL_SLAVERY_REQUEST) ? 1 : ((explicit_intent == INTENT_INSULT || explicit_intent == INTENT_THREAT) ? 2 : 0);
