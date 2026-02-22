@@ -53,5 +53,8 @@ struct ai_rx_result {
 
 int ai_rx_process_event(const struct ai_rx_event *ev, struct ai_rx_result *out);
 void ai_rx_clean_sentence(char *s);
+int ai_rx_infer_targeted_to_mob(struct char_data *mob, const char *norm_text);
+int ai_rx_is_service_style_request(const char *norm_text);
+int ai_rx_is_explicit_sexual_request(const char *norm_text);
 
 #endif

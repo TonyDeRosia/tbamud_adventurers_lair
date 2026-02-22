@@ -75,12 +75,6 @@
 #define AI_SOCIAL_CTX_MAX 512
 #define AI_ROOM_AMBIENT_CACHE_MAX 256
 
-enum ai_ext_archetype {
-  AI_ARCHX_PALADIN_HOLY = 0, AI_ARCHX_HEALER_SUPPORT, AI_ARCHX_GUARD_LAW,
-  AI_ARCHX_CIVILIAN, AI_ARCHX_MERCHANT, AI_ARCHX_INSTRUCTOR, AI_ARCHX_BANDIT_CRIMINAL,
-  AI_ARCHX_CULTIST_FANATIC, AI_ARCHX_BEAST_ANIMAL, AI_ARCHX_UNDEAD_MINDLESS,
-  AI_ARCHX_SPIRIT_ETHEREAL, AI_ARCHX_COMMANDER
-};
 
 
 enum ai_answer_kind {
@@ -940,7 +934,6 @@ static enum ai_time_bucket ai_time_bucket_now(void);
 static const char *ai_time_bucket_name(enum ai_time_bucket b);
 static const char *ai_arch_name(enum ai_player_archetype a);
 static const char *ai_arc_name(enum ai_conv_arc_state a);
-static const char *ai_actor_display_name(struct char_data *mob, char *out, size_t outsz);
 
 /* REACTION-SPLIT MOVE BANNER:
  * Moved to ai_reactions.c:
@@ -1024,53 +1017,6 @@ static enum ai_creature_category ai_pick_creature_category(struct char_data *mob
 static enum ai_comm_mode ai_pick_comm_mode(struct char_data *mob, const struct ai_reply_context *rctx, int primary_intent, int secondary_intent, int domain, enum ai_explicit_intent explicit_intent, const char **out_sound_style);
 static const char *ai_creature_reaction_line(enum ai_creature_category cat, enum ai_explicit_intent ex, enum ai_distinct_intent_class icls, unsigned long seed);
 static int ai_count_multi_service_hits(const char *text, int *has_food, int *has_money);
-static void ai_strip_color_codes(const char *in, char *out, size_t outsz)
-{
-  size_t i = 0, j = 0;
-  if (!out || outsz == 0) return;
-  out[0] = '\0';
-  if (!in) return;
-  while (in[i] && j + 1 < outsz) {
-    if (in[i] == '&' && isalpha((unsigned char)in[i + 1])) { i += 2; continue; }
-    out[j++] = in[i++];
-  }
-  out[j] = '\0';
-}
-
-static const char *ai_actor_display_name(struct char_data *mob, char *out, size_t outsz)
-{
-  char tmp[256];
-  char *p;
-  size_t len;
-  if (!out || outsz == 0) return "someone";
-  out[0] = '\0';
-  if (!mob) { strlcpy(out, "someone", outsz); return out; }
-  if (GET_NAME(mob) && isupper((unsigned char)GET_NAME(mob)[0]))
-    ai_strip_color_codes(GET_NAME(mob), tmp, sizeof(tmp));
-  else
-    ai_strip_color_codes(mob->player.short_descr ? mob->player.short_descr : GET_NAME(mob), tmp, sizeof(tmp));
-  p = tmp;
-  while (*p && isspace((unsigned char)*p)) p++;
-  if (!strncasecmp(p, "a ", 2)) p += 2;
-  else if (!strncasecmp(p, "an ", 3)) p += 3;
-  else if (!strncasecmp(p, "the ", 4)) p += 4;
-  strlcpy(out, p, outsz);
-  len = strlen(out);
-  while (len > 0 && (isspace((unsigned char)out[len-1]) || out[len-1]=='.' || out[len-1]=='!' || out[len-1]=='?' || out[len-1]==',')) out[--len]='\0';
-  for (len = 0; out[len]; len++) if (isspace((unsigned char)out[len])) { out[len] = ' '; while (out[len+1] && isspace((unsigned char)out[len+1])) memmove(out+len+1, out+len+2, strlen(out+len+2)+1); }
-  if (!out[0]) strlcpy(out, "someone", outsz);
-  return out;
-}
-
-static int ai_rx_infer_targeted_to_mob(struct char_data *mob, const char *norm_text)
-{
-  char dn[128];
-  if (!mob || !norm_text) return FALSE;
-  ai_actor_display_name(mob, dn, sizeof(dn));
-  if (ai_text_has_sub_ci(norm_text, "you") || ai_text_has_sub_ci(norm_text, "@")) return TRUE;
-  return ai_text_has_sub_ci(norm_text, dn);
-}
-
 static int ai_text_is_effectively_empty(const char *s)
 {
   const unsigned char *p;
@@ -9219,6 +9165,9 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
   int multi_service_hits = 0;
   int multi_has_food = 0;
   int multi_has_money = 0;
+  int addressed_to_mob = 0;
+  int service_style_request = 0;
+  int explicit_sexual_request = 0;
   enum ai_explicit_intent explicit_intent = INTENT_CONFUSION;
   struct ai_multi_intent multi_intent;
   multi_intent.primary_intent = INTENT_CONFUSION;
@@ -9331,6 +9280,15 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
     }
     self_identity_query = ai_is_self_identity_query(normalized, &self_identity_human_query);
     multi_service_hits = ai_count_multi_service_hits(normalized, &multi_has_food, &multi_has_money);
+    addressed_to_mob = ai_rx_infer_targeted_to_mob(mob, normalized) ||
+                       ai_text_has_sub_ci(normalized, "help") ||
+                       ai_text_has_sub_ci(normalized, "please") ||
+                       ai_is_help_request_phrase(normalized) ||
+                       ai_is_chat_request_phrase(normalized) ||
+                       ai_is_attention_phrase(normalized) ||
+                       strlen(normalized) <= 22;
+    service_style_request = ai_rx_is_service_style_request(normalized);
+    explicit_sexual_request = ai_rx_is_explicit_sexual_request(normalized);
   }
 
   if (type == AI_EVENT_PLAYER_SAY)
@@ -9340,9 +9298,22 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
   attention_score = ai_attention_score(mob, type, actor, normalized, now);
   ai_state_push_event(mob, type, actor, normalized);
 
+  if (type == AI_EVENT_PLAYER_SAY && attention_score < AI_ATTENTION_THRESHOLD) {
+    if (addressed_to_mob || service_style_request) {
+      ai_debug_log("ai_attention_clamp_addressed vnum=%d event=%s old=%.2f new=%.2f addressed=%d service=%d",
+                   GET_MOB_VNUM(mob), ai_event_reason_name(type), attention_score, (float)AI_ATTENTION_THRESHOLD,
+                   addressed_to_mob, service_style_request);
+      attention_score = AI_ATTENTION_THRESHOLD;
+    }
+  }
+
   if (attention_score < AI_ATTENTION_THRESHOLD) {
-    ai_debug_log("ai_skip_attention vnum=%d event=%s score=%.2f", GET_MOB_VNUM(mob), ai_event_reason_name(type), attention_score);
-    AI_EVT_RETURN("LOW_ATTENTION");
+    if (type == AI_EVENT_PLAYER_SAY && explicit_sexual_request)
+      ai_debug_log("ai_attention_bypass_sexual_refusal vnum=%d event=%s score=%.2f", GET_MOB_VNUM(mob), ai_event_reason_name(type), attention_score);
+    else {
+      ai_debug_log("ai_skip_attention vnum=%d event=%s score=%.2f", GET_MOB_VNUM(mob), ai_event_reason_name(type), attention_score);
+      AI_EVT_RETURN("LOW_ATTENTION");
+    }
   }
 
   ai_context_vector_build(mob, actor, now, &ctx);
@@ -9414,6 +9385,8 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
     if (normalized[0])
       multi_intent = ai_detect_multi_intent(normalized, speech_class, rctx.domain, self_identity_query);
     explicit_intent = multi_intent.primary_intent;
+    if (explicit_sexual_request && explicit_intent != INTENT_ILLEGAL_SLAVERY_REQUEST)
+      explicit_intent = INTENT_THREAT;
     if (explicit_intent == INTENT_ATTENTION || explicit_intent == INTENT_GREETING)
       confidence = MAX(confidence, 40);
     intent = ai_explicit_to_core_intent(explicit_intent);
@@ -10231,11 +10204,16 @@ void ai_actor_event_leave(struct char_data *actor, room_rnum room)
 void ai_actor_event_say(struct char_data *actor, const char *msg)
 {
   struct char_data *mob;
-  ai_dbg_evt(NULL, "SAY_DISPATCH", AI_EVENT_PLAYER_SAY, actor, msg ? msg : "");
-  if (!actor || IS_NPC(actor) || IN_ROOM(actor) == NOWHERE) {
-    ai_dbg_evt(NULL, "RETURN_BAD_ACTOR_OR_ROOM", AI_EVENT_PLAYER_SAY, actor, msg ? msg : "");
+
+  /* Runtime checklist:
+   * 1) Player speaker in valid room dispatches to local AI mobs.
+   * 2) NPC/NOWHERE speakers are ignored here (no SAY_DISPATCH/RETURN_BAD_ACTOR_OR_ROOM spam).
+   * 3) Direct and service requests should reach intent handling instead of LOW_ATTENTION drops.
+   */
+  if (!actor || IS_NPC(actor) || IN_ROOM(actor) == NOWHERE)
     return;
-  }
+
+  ai_dbg_evt(NULL, "SAY_DISPATCH", AI_EVENT_PLAYER_SAY, actor, msg ? msg : "");
   for (mob = world[IN_ROOM(actor)].people; mob; mob = mob->next_in_room)
     if (IS_NPC(mob) && MOB_FLAGGED(mob, MOB_AI_ACTOR) && mob != actor) {
       if (!ai_actor_ensure_ready(mob)) {
