@@ -503,6 +503,9 @@ struct ai_session_read_entry {
   unsigned int recent_reply_hashes[AI_RECENT_REPLY_HASH_MAX];
   int recent_reply_head;
   int recent_reply_count;
+  long last_speaker_player_id;
+  time_t last_spoke_time;
+  int thread_turns;
 };
 
 enum ai_conversation_topic {
@@ -967,6 +970,74 @@ static float ai_session_cooldown_penalty(struct ai_session_read_entry *sr, enum 
 static float ai_session_arc_action_bias(const struct ai_session_read_entry *sr, enum ai_action_type action);
 static float ai_session_arch_action_bias(const struct ai_session_read_entry *sr, enum ai_action_type action);
 static float ai_context_action_bias(struct char_data *mob, const struct ai_context_vector *ctx, enum ai_action_type action, int intent);
+static float ai_actor_speech_bias(struct char_data *mob, struct char_data *actor, const char *msg)
+{
+  float bias = 0.35f;
+  int role;
+  int personality = IMTB_STOIC;
+  int addressed = 0;
+  int speech_intent = AI_INTENT_NONE;
+  int room_hot = 0;
+  struct ai_conv_actor_state *conv_st;
+
+  if (!mob || !actor || !msg || !*msg || !mob->ai_prof)
+    return 0.0f;
+
+  role = mob->ai_prof->role;
+  conv_st = ai_conv_actor_state_get(mob, 0);
+  if (conv_st)
+    personality = conv_st->personality;
+
+  addressed = ai_rx_infer_targeted_to_mob(mob, msg);
+  if (strchr(msg, '?') != NULL)
+    speech_intent = AI_INTENT_DIRECTIONS;
+  else if (ai_text_has_sub_ci(msg, "hello") || ai_text_has_sub_ci(msg, "hi") || ai_text_has_sub_ci(msg, "greetings"))
+    speech_intent = AI_INTENT_GREET;
+  else if (ai_text_has_sub_ci(msg, "help") || ai_text_has_sub_ci(msg, "can you"))
+    speech_intent = AI_INTENT_ASK_SERVICE;
+  else if (ai_text_has_sub_ci(msg, "thanks") || ai_text_has_sub_ci(msg, "good"))
+    speech_intent = AI_INTENT_PRAISE;
+  else if (ai_text_has_sub_ci(msg, "threat") || ai_text_has_sub_ci(msg, "kill") || ai_text_has_sub_ci(msg, "idiot"))
+    speech_intent = AI_INTENT_THREAT;
+
+  if (IS_GOOD(mob) || IS_NEUTRAL(mob))
+    bias += 0.20f;
+  if (IS_EVIL(mob))
+    bias -= 0.22f;
+
+  if (role == ROLE_MERCHANT || role == ROLE_GUARD || role == ROLE_CIVILIAN || role == ROLE_BOSS)
+    bias += 0.15f;
+  if (role == ROLE_BANDIT || role == ROLE_CULTIST)
+    bias -= 0.18f;
+
+  if (personality == IMTB_FRIENDLY || personality == IMTB_WITTY)
+    bias += 0.18f;
+  if (personality == IMTB_STOIC || personality == IMTB_SUSPICIOUS)
+    bias -= 0.16f;
+
+  if (addressed)
+    bias += 0.22f;
+
+  if (speech_intent == AI_INTENT_GREET || speech_intent == AI_INTENT_SMALLTALK ||
+      speech_intent == AI_INTENT_ASK_SERVICE || speech_intent == AI_INTENT_DIRECTIONS ||
+      speech_intent == AI_INTENT_CONFUSION || speech_intent == AI_INTENT_PRAISE)
+    bias += 0.18f;
+  if (speech_intent == AI_INTENT_INSULT || speech_intent == AI_INTENT_THREAT)
+    bias -= 0.24f;
+
+  if ((FIGHTING(mob) || FIGHTING(actor)) ||
+      (IN_ROOM(mob) != NOWHERE && world[IN_ROOM(mob)].zone >= 0 &&
+       ai_alert_level(world[IN_ROOM(mob)].zone, time(0)) > 0.55f))
+    room_hot = 1;
+  if (room_hot)
+    bias -= 0.22f;
+
+  if (bias < 0.0f) bias = 0.0f;
+  if (bias > 1.0f) bias = 1.0f;
+  log("AI_ACTOR: AI_SPEECH_BIAS vnum=%d bias=%.2f align=%d personality=%d intent=%d", GET_MOB_VNUM(mob), bias, GET_ALIGNMENT(mob), personality, speech_intent);
+  return bias;
+}
+
 static float ai_context_suspicion_bias(struct char_data *mob, const struct ai_context_vector *ctx);
 static float ai_suspicion_score(struct char_data *mob, struct char_data *actor, struct ai_actor_memory_entry *e, time_t now, int speech_act);
 static float ai_utility_score(struct char_data *mob, enum ai_action_type action, struct char_data *actor, int speech_act, int intent, time_t now, float attention_score, int is_emote_event, float suspicion);
@@ -6550,6 +6621,8 @@ const char *ai_line_for_intent(struct char_data *mob, struct ai_actor_memory_ent
   static const char *const smalltalk_guard[] = {"Stay {GOOD} and keep {QUIET} on the {ROAD}.", "{QUIET} streets are {GOOD} streets.", NULL};
   static const char *const smalltalk_inn[] = {"A {QUIET} table helps {PEOPLE} breathe easier.", "Long {ROAD}s make short talks welcome.", NULL};
   static const char *const smalltalk_merch[] = {"Steady crowds make steady {WORK}.", "{GOOD} mood, {GOOD} market.", NULL};
+  static const char *const smalltalk_short[] = {"Evening.", "Quiet enough for now.", "Still here, still listening.", "Aye, room's awake.", "We're about.", NULL};
+  static const char *const helpful_short[] = {"Ask plain and I'll help.", "Tell me your need.", "I can point you right.", "Keep it short and clear.", "What do you need?", NULL};
   static const char *const personal_guard[] = {"Keep your mind on the {ROAD} and your heart steady.", "That's personal. Keep choices respectful and lawful.", NULL};
   static const char *const personal_inn[] = {"Hearts are complicated; I serve comfort, not gossip.", "Feelings are yours to weigh, but kindness helps.", NULL};
   static const char *const personal_merch[] = {"I trade in goods, not hearts, friend.", "That's personal coin to spend carefully.", NULL};
@@ -6565,6 +6638,15 @@ const char *ai_line_for_intent(struct char_data *mob, struct ai_actor_memory_ent
   innkeeper = (role == ROLE_MERCHANT && style == 1);
   seed = ai_hash_mix(ai_conv_seed(mob, intent, 0), ai_hash_text_stable(text ? text : ""));
   emote_kind = ai_detect_emote_kind(text);
+
+  if (ai_text_has_sub_ci(text, "hello everyone") || ai_text_has_sub_ci(text, "whats going on") || ai_text_has_sub_ci(text, "what's going on") ||
+      ai_text_has_sub_ci(text, "anyone here") || ai_text_has_sub_ci(text, "anyone got a response") || ai_text_has_sub_ci(text, "verbal response")) {
+    if (role == ROLE_GUARD && IS_GOOD(mob)) { if (out_pool) *out_pool = "POOL_HELPFUL_SHORT"; core = "State your business and I'll guide you."; }
+    else if (IS_EVIL(mob)) { if (out_pool) *out_pool = "POOL_SMALLTALK_SHORT"; core = "Say it plain."; }
+    else if (ai_imtb_pick_personality(mob, role, style) == IMTB_FRIENDLY || ai_imtb_pick_personality(mob, role, style) == IMTB_WITTY) { if (out_pool) *out_pool = "POOL_SMALLTALK_SHORT"; core = ai_pick_phrase(smalltalk_short); }
+    else { if (out_pool) *out_pool = "POOL_HELPFUL_SHORT"; core = ai_pick_phrase(helpful_short); }
+    goto finalize;
+  }
 
   if (ai_text_has_sub_ci(text, "love") || ai_text_has_sub_ci(text, "crush") || ai_text_has_sub_ci(text, "romance") || ai_text_has_sub_ci(text, "date") || ai_text_has_sub_ci(text, "pretty") ||
       ai_text_has_sub_ci(text, "weird") || ai_text_has_sub_ci(text, "feel") || ai_text_has_sub_ci(text, "feeling") || ai_text_has_sub_ci(text, "what do you think") || ai_text_has_sub_ci(text, "do you think i") || ai_text_has_sub_ci(text, "am i")) {
@@ -9232,6 +9314,11 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
   struct ai_rx_result rx_result;
   char rx_override[240];
   int rx_force_emote = 0;
+  float speech_bias = 0.0f;
+  float speak_score_raw = -999.0f;
+  float observe_score_raw = -999.0f;
+  const char *speak_decision_reason = "scored";
+  int force_speak_intent = 0;
 
 #define AI_EVT_RETURN(_reason) do { \
   ai_dbg_evt(mob, (_reason), type, actor, text); \
@@ -9557,6 +9644,9 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
   if (conv_st) {
     sr = ai_session_read_get(conv_st, GET_IDNUM(actor), 1, now);
     if (sr) {
+      if ((sr->last_speaker_player_id != 0 && sr->last_speaker_player_id != GET_IDNUM(actor)) ||
+          (sr->last_spoke_time > 0 && (now - sr->last_spoke_time) > 20))
+        sr->thread_turns = 0;
       ai_session_read_update(sr, type, intent, normalized, now);
       ai_session_read_apply_impression(sr, e, conv_st);
       ai_session_read_update_arc(sr, mob, &ctx);
@@ -9637,6 +9727,16 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
   if (suspicion > 0.85f) ai_goal_push(mob, AI_GOAL_PURSUE_OFFENDER, 0.9f, 45, 120, GET_IDNUM(actor));
   else if (suspicion > 0.7f) ai_goal_push(mob, AI_GOAL_MONITOR_SUSPECT, 0.7f, 20, 90, GET_IDNUM(actor));
 
+  if (type == AI_EVENT_PLAYER_SAY) {
+    speech_bias = ai_actor_speech_bias(mob, actor, normalized);
+    if ((IS_GOOD(mob) || IS_NEUTRAL(mob)) && (intent == AI_INTENT_GREET || ai_is_question_intent(intent)))
+      force_speak_intent = 1;
+    if (addressed_to_mob)
+      force_speak_intent = 1;
+    if (sr && sr->thread_turns > 0 && sr->last_speaker_player_id == GET_IDNUM(actor) && (now - sr->last_spoke_time) <= 20)
+      force_speak_intent = 1;
+  }
+
   if (type == AI_EVENT_COMBAT_START) {
     ai_heatmap_update_danger(zone, 0.15f);
     ai_alert_raise(zone, 0.5f, GET_IDNUM(actor), 180);
@@ -9659,10 +9759,31 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
     if (mob->ai_prof->role == ROLE_BANDIT && i == AI_ACTION_OBSERVE) score += (zone_profit - zone_danger) * 0.2f;
     if (mob->ai_prof->role == ROLE_CIVILIAN && i == AI_ACTION_IGNORE) score += zone_danger * 0.2f;
     if (alert_level > 0.6f && i == AI_ACTION_SPEAK_WARN && mob->ai_prof->role == ROLE_GUARD) score += 0.25f;
+    if (type == AI_EVENT_PLAYER_SAY && i == AI_ACTION_SPEAK)
+      score += (speech_bias * 0.70f);
+    if (type == AI_EVENT_PLAYER_SAY && i == AI_ACTION_OBSERVE)
+      score -= (speech_bias * 0.35f);
+    if (i == AI_ACTION_SPEAK)
+      speak_score_raw = score;
+    if (i == AI_ACTION_OBSERVE)
+      observe_score_raw = score;
     if (score > best_score) {
       best_score = score;
       best_action = (enum ai_action_type)i;
     }
+  }
+  if (type == AI_EVENT_PLAYER_SAY && force_speak_intent && (sr == NULL || now >= sr->cooldown_until)) {
+    if (best_action == AI_ACTION_OBSERVE || best_action == AI_ACTION_IGNORE || best_action == AI_ACTION_EMOTE_REACT) {
+      best_action = AI_ACTION_SPEAK;
+      best_score = MAX(best_score, speak_score_raw);
+      speak_decision_reason = addressed_to_mob ? "addressed_force_speak" : "intent_force_speak";
+    }
+  }
+
+  if (type == AI_EVENT_PLAYER_SAY) {
+    float base_prob = ai_clampf((speak_score_raw - observe_score_raw + 1.0f) * 0.5f, 0.0f, 1.0f);
+    float final_prob = ai_clampf(base_prob + (speech_bias * 0.5f), 0.0f, 1.0f);
+    log("AI_ACTOR: AI_SPEAK_DECISION vnum=%d base=%.2f bias=%.2f final=%.2f chosen=%s reason=%s", GET_MOB_VNUM(mob), base_prob, speech_bias, final_prob, ((best_action == AI_ACTION_SPEAK || best_action == AI_ACTION_SPEAK_WARN || best_action == AI_ACTION_SPEAK_DEFLECT) ? "SPEAK" : "OBSERVE"), speak_decision_reason);
   }
 
   if (best_action == AI_ACTION_OBSERVE) {
@@ -9683,6 +9804,7 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
     ai_actor_try_reaction_glue(mob, actor, text, normalized, normalized_hash, type, AI_RX_TRIG_NON_SPEAK_ACTION_SELECTED,
                                best_action, role, style, rctx.personality, rctx.archetype,
                                intent, rctx.domain, attention_score, suspicion, rx_result.threat, rx_result.urgency);
+    if (type == AI_EVENT_PLAYER_SAY && sr && sr->thread_turns > 0) sr->thread_turns--;
     AI_EVT_RETURN("NON_SPEAK_ACTION_SELECTED");
   }
 
@@ -10164,6 +10286,9 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
       sr->last_domain = rctx.domain;
       sr->last_turn_time = now;
       sr->last_player_utter_hash = (unsigned int)ai_text_hash_simple(normalized);
+      sr->last_speaker_player_id = GET_IDNUM(actor);
+      sr->last_spoke_time = now;
+      sr->thread_turns = MIN(3, sr->thread_turns + 1);
     }
 
     if (type == AI_EVENT_PLAYER_SAY && sctx) {

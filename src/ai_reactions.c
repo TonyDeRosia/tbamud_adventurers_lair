@@ -19,7 +19,7 @@
 #define AI_RX_ROOM_EVENT_MAX 512
 #define AI_RX_HARASS_MAX 1024
 
-enum ai_rx_kind { AI_RX_KIND_EMOTE = 0, AI_RX_KIND_TINY_UTTERANCE, AI_RX_KIND_SHORT_LINE };
+enum ai_rx_kind { AI_RX_KIND_EMOTE = 0, AI_RX_KIND_TINY_UTTERANCE, AI_RX_KIND_SHORT_LINE, AI_RX_KIND_ONE_LINER };
 enum ai_rx_category {
   AI_RX_PROCESSING_BEAT = 0, AI_RX_EVALUATION_BEAT, AI_RX_MORAL_JUDGMENT, AI_RX_SOCIAL_TENSION,
   AI_RX_DEFENSIVE_POSTURE, AI_RX_CURIOUS_INTEREST, AI_RX_DISMISSAL, AI_RX_AMUSED, AI_RX_DISGUST,
@@ -42,6 +42,7 @@ struct ai_rx_cd_room_player { room_rnum room; long player_idnum; int event_type;
 struct ai_rx_cd_room_player_hash { room_rnum room; long player_idnum; unsigned long text_hash; int event_type; time_t next_allowed; };
 struct ai_rx_room_event { room_rnum room; int event_type; int count; time_t updated_at; };
 struct ai_rx_harass { room_rnum room; long actor_idnum; int boundary_hits; time_t expires_at; };
+struct ai_rx_room_voice { room_rnum room; time_t last_spoken; time_t next_ambience; };
 
 static struct ai_rx_cd_mob ai_rx_mob_cd[AI_RX_MOB_CD_MAX];
 static struct ai_rx_cd_room ai_rx_room_cd[AI_RX_ROOM_CD_MAX];
@@ -49,6 +50,7 @@ static struct ai_rx_cd_room_player ai_rx_room_player_cd[AI_RX_ROOM_PLAYER_CD_MAX
 static struct ai_rx_cd_room_player_hash ai_rx_room_player_hash_cd[AI_RX_ROOM_PLAYER_HASH_CD_MAX];
 static struct ai_rx_room_event ai_rx_room_event[AI_RX_ROOM_EVENT_MAX];
 static struct ai_rx_harass ai_rx_harass[AI_RX_HARASS_MAX];
+static struct ai_rx_room_voice ai_rx_room_voice[AI_RX_ROOM_CD_MAX];
 
 static int ai_text_has_sub_ci_local(const char *hay, const char *needle) {
   size_t nl, i, j; if (!hay || !needle || !*needle) return FALSE; nl = strlen(needle);
@@ -116,6 +118,10 @@ static const char *const rx_service_refusal[] = {
 static const char *const rx_silent_stare[] = { "$n just stares.", "$n says nothing.", "$n remains unreadable.", NULL };
 static const char *const rx_tiny[] = { "Hm.", "Tch.", "Hmph.", "No.", NULL };
 
+static const char *const rx_one_liner[] = {
+  "Evening.", "I can help if you ask clean.", "What do you need.", "That depends.", "Say it plain.", NULL
+};
+
 int ai_rx_infer_targeted_to_mob(struct char_data *mob, const char *norm_text) {
   if (!mob || !norm_text) return FALSE;
   if (ai_text_has_sub_ci_local(norm_text, "you") || ai_text_has_sub_ci_local(norm_text, "@")) return TRUE;
@@ -174,6 +180,21 @@ void ai_reactions_room_event_reset(room_rnum room, int event_type) {
   e->room = room; e->event_type = event_type; e->count = 0; e->updated_at = time(0);
 }
 
+static struct ai_rx_room_voice *ai_rx_room_voice_get(room_rnum room, int create) {
+  int i, oldest = 0;
+  for (i = 0; i < AI_RX_ROOM_CD_MAX; i++) {
+    if (ai_rx_room_voice[i].room == room)
+      return &ai_rx_room_voice[i];
+    if (ai_rx_room_voice[i].room == NOWHERE && !create)
+      continue;
+    if (ai_rx_room_voice[i].last_spoken < ai_rx_room_voice[oldest].last_spoken)
+      oldest = i;
+  }
+  if (!create) return NULL;
+  ai_rx_room_voice[oldest].room = room;
+  return &ai_rx_room_voice[oldest];
+}
+
 static int ai_rx_harass_level(room_rnum room, long actor, int bump) {
   int i, oldest = 0; time_t now = time(0);
   for (i = 0; i < AI_RX_HARASS_MAX; i++) {
@@ -197,7 +218,16 @@ static int ai_rx_can_fire(struct char_data *mob, const struct ai_reaction_ctx *c
   if (!ctx->can_act || ctx->is_sleeping || ctx->is_stunned || ctx->is_charmed || ctx->is_fighting) { *why = "cannot_act"; return FALSE; }
   if (mob_id <= 0) mob_id = GET_MOB_VNUM(mob);
   for (i = 0; i < AI_RX_MOB_CD_MAX; i++) if (ai_rx_mob_cd[i].mob_id == mob_id && ai_rx_mob_cd[i].next_allowed > now) { *why = "mob_cooldown"; return FALSE; }
-  for (i = 0; i < AI_RX_ROOM_CD_MAX; i++) if (ai_rx_room_cd[i].room == ctx->room_rnum && ai_rx_room_cd[i].event_type == ctx->event_type && ai_rx_room_cd[i].next_allowed > now) { *why = "room_cooldown"; return FALSE; }
+  for (i = 0; i < AI_RX_ROOM_CD_MAX; i++) if (ai_rx_room_cd[i].room == ctx->room_rnum && ai_rx_room_cd[i].event_type == ctx->event_type && ai_rx_room_cd[i].next_allowed > now) {
+    struct ai_rx_room_voice *rv = ai_rx_room_voice_get(ctx->room_rnum, 1);
+    if (rv && (now - rv->last_spoken) > 8 && now >= rv->next_ambience) {
+      rv->next_ambience = now + 8;
+      *why = "allow_ambience";
+      log("AI_RX_RULE_ALLOW_AMBIENCE reason=no_speech_recent");
+      return TRUE;
+    }
+    *why = "room_cooldown"; return FALSE;
+  }
   for (i = 0; i < AI_RX_ROOM_PLAYER_HASH_CD_MAX; i++) if (ai_rx_room_player_hash_cd[i].room == ctx->room_rnum && ai_rx_room_player_hash_cd[i].player_idnum == ctx->actor_idnum && ai_rx_room_player_hash_cd[i].event_type == ctx->event_type && ai_rx_room_player_hash_cd[i].text_hash == ctx->normalized_hash && ai_rx_room_player_hash_cd[i].next_allowed > now) { *why = "room_player_hash_cooldown"; return FALSE; }
   ev = ai_rx_room_event_get(ctx->room_rnum, ctx->event_type, 1);
   if (ev && ev->updated_at && (now - ev->updated_at) > 5) ev->count = 0;
@@ -233,6 +263,16 @@ static void ai_reaction_pick(struct char_data *mob, const struct ai_reaction_ctx
   out->will_fire = TRUE;
   out->category = cat;
   out->output_kind = (cat == AI_RX_SERVICE_REFUSAL_REINFORCER) ? AI_RX_KIND_TINY_UTTERANCE : AI_RX_KIND_EMOTE;
+  if (ctx->trigger_reason == AI_RX_TRIG_ARB_SLOT_DENIED_EARLY && (ctx->mob_alignment >= -350) && (ctx->mob_role == ROLE_GUARD || ctx->mob_role == ROLE_MERCHANT || ctx->mob_role == ROLE_CIVILIAN))
+    out->output_kind = AI_RX_KIND_ONE_LINER;
+  if (ctx->intent_id == AI_INTENT_INSULT || ctx->intent_id == AI_INTENT_THREAT) {
+    if (ctx->mob_alignment >= -350 && (ctx->mob_role == ROLE_GUARD || ctx->mob_role == ROLE_MERCHANT))
+      cat = AI_RX_DE_ESCALATION;
+    else if (ctx->mob_role == ROLE_MERCHANT)
+      cat = AI_RX_SERVICE_REFUSAL_REINFORCER;
+  }
+  if (ctx->trigger_reason == AI_RX_TRIG_NON_SPEAK_ACTION_SELECTED)
+    out->output_kind = AI_RX_KIND_TINY_UTTERANCE;
   seed = 1469598103UL;
   seed = ai_rx_hash_mix(seed, (unsigned long)ctx->room_rnum);
   seed = ai_rx_hash_mix(seed, (unsigned long)ctx->mob_vnum);
@@ -248,10 +288,14 @@ static void ai_reaction_pick(struct char_data *mob, const struct ai_reaction_ctx
     case AI_RX_EVALUATION_BEAT: out->selected_text = ai_rx_pick_seeded((ctx->mob_role == ROLE_MERCHANT) ? rx_eval_merchant : rx_eval_guard, seed); out->debug_reason = "evaluation"; break;
     case AI_RX_WARNING: out->selected_text = ai_rx_pick_seeded(rx_intrusion, seed); out->debug_reason = "warning"; break;
     case AI_RX_CONFUSION: out->selected_text = ai_rx_pick_seeded(rx_confusion, seed); out->debug_reason = "confusion"; break;
-    case AI_RX_SILENT_STARE: out->selected_text = ai_rx_pick_seeded(rx_silent_stare, seed); out->debug_reason = "degraded_cap"; break;
+    case AI_RX_SILENT_STARE: out->selected_text = ai_rx_pick_seeded(rx_tiny, seed); out->debug_reason = "degraded_cap"; break;
     case AI_RX_MORAL_JUDGMENT: out->selected_text = ai_rx_pick_seeded(IS_GOOD(mob) ? rx_moral_good : rx_moral_evil, seed); out->debug_reason = "moral"; break;
+    case AI_RX_DE_ESCALATION: out->selected_text = ai_rx_pick_seeded(rx_de_escalation, seed); out->debug_reason = "de_escalation"; break;
+    case AI_RX_SERVICE_REFUSAL_REINFORCER: out->selected_text = ai_rx_pick_seeded(rx_service_refusal, seed); out->debug_reason = "service_refusal"; break;
     default: out->selected_text = ai_rx_pick_seeded(rx_processing_generic, seed); out->debug_reason = "processing"; break;
   }
+  if (out->output_kind == AI_RX_KIND_ONE_LINER)
+    out->selected_text = ai_rx_pick_seeded(rx_one_liner, seed);
   if (!out->selected_text) { out->will_fire = FALSE; out->debug_reason = "empty_pool"; }
 }
 
@@ -262,8 +306,10 @@ static void ai_reaction_fire(struct char_data *mob, const struct ai_reaction_res
     snprintf(buf, sizeof(buf), "%.*s", (int)sizeof(buf)-1, (!strncmp(r->selected_text, "$n ", 3) ? r->selected_text + 3 : r->selected_text));
     do_echo(mob, buf, 0, SCMD_EMOTE);
   } else {
+    struct ai_rx_room_voice *rv = ai_rx_room_voice_get(IN_ROOM(mob), 1);
     snprintf(buf, sizeof(buf), "%.*s", (int)sizeof(buf)-1, r->selected_text);
     do_say(mob, buf, 0, 0);
+    if (rv) rv->last_spoken = time(0);
   }
 }
 
@@ -285,13 +331,13 @@ int ai_reaction_try(struct char_data *mob, const struct ai_reaction_ctx *ctx) {
     return 0;
   }
 
-  log("AI_RX_PICK category=%d kind=%d text=\"%s\"", r.category, r.output_kind, r.selected_text);
+  log("AI_RX_PICK kind=%s category=%d text=\"%s\"", (r.output_kind == AI_RX_KIND_ONE_LINER ? "ONE_LINER" : (r.output_kind == AI_RX_KIND_EMOTE ? "EMOTE" : (r.output_kind == AI_RX_KIND_TINY_UTTERANCE ? "TINY" : "SHORT"))), r.category, r.selected_text);
   ai_reaction_fire(mob, &r);
   log("AI_RX_FIRE vnum=%d role=%d trigger=%d", GET_MOB_VNUM(mob), ctx ? ctx->mob_role : -1, ctx ? ctx->trigger_reason : -1);
 
   if (mob_id <= 0) mob_id = GET_MOB_VNUM(mob);
   for (i = 0; i < AI_RX_MOB_CD_MAX; i++) { if (ai_rx_mob_cd[i].mob_id == mob_id || ai_rx_mob_cd[i].next_allowed == 0) { ai_rx_mob_cd[i].mob_id = mob_id; ai_rx_mob_cd[i].next_allowed = now + rand_number(8, 20); break; } }
-  for (i = 0; i < AI_RX_ROOM_CD_MAX; i++) { if ((ai_rx_room_cd[i].room == ctx->room_rnum && ai_rx_room_cd[i].event_type == ctx->event_type) || ai_rx_room_cd[i].next_allowed == 0) { ai_rx_room_cd[i].room = ctx->room_rnum; ai_rx_room_cd[i].event_type = ctx->event_type; ai_rx_room_cd[i].next_allowed = now + rand_number(2, 4); break; } }
+  for (i = 0; i < AI_RX_ROOM_CD_MAX; i++) { if ((ai_rx_room_cd[i].room == ctx->room_rnum && ai_rx_room_cd[i].event_type == ctx->event_type) || ai_rx_room_cd[i].next_allowed == 0) { int cd = rand_number(2, 4); if (ctx->trigger_reason == AI_RX_TRIG_NON_SPEAK_ACTION_SELECTED) cd = rand_number(1, 2); else if (ctx->trigger_reason == AI_RX_TRIG_ARB_SLOT_DENIED_EARLY) cd = rand_number(2, 3); else if (ctx->event_type == AI_EVENT_PLAYER_SAY) cd = rand_number(3, 5); ai_rx_room_cd[i].room = ctx->room_rnum; ai_rx_room_cd[i].event_type = ctx->event_type; ai_rx_room_cd[i].next_allowed = now + cd; break; } }
   for (i = 0; i < AI_RX_ROOM_PLAYER_CD_MAX; i++) { if ((ai_rx_room_player_cd[i].room == ctx->room_rnum && ai_rx_room_player_cd[i].player_idnum == ctx->actor_idnum && ai_rx_room_player_cd[i].event_type == ctx->event_type) || ai_rx_room_player_cd[i].next_allowed == 0) { ai_rx_room_player_cd[i].room = ctx->room_rnum; ai_rx_room_player_cd[i].player_idnum = ctx->actor_idnum; ai_rx_room_player_cd[i].event_type = ctx->event_type; ai_rx_room_player_cd[i].next_allowed = now + 6; break; } }
   for (i = 0; i < AI_RX_ROOM_PLAYER_HASH_CD_MAX; i++) { if ((ai_rx_room_player_hash_cd[i].room == ctx->room_rnum && ai_rx_room_player_hash_cd[i].player_idnum == ctx->actor_idnum && ai_rx_room_player_hash_cd[i].event_type == ctx->event_type && ai_rx_room_player_hash_cd[i].text_hash == ctx->normalized_hash) || ai_rx_room_player_hash_cd[i].next_allowed == 0) { ai_rx_room_player_hash_cd[i].room = ctx->room_rnum; ai_rx_room_player_hash_cd[i].player_idnum = ctx->actor_idnum; ai_rx_room_player_hash_cd[i].event_type = ctx->event_type; ai_rx_room_player_hash_cd[i].text_hash = ctx->normalized_hash; ai_rx_room_player_hash_cd[i].next_allowed = now + 20; break; } }
 
