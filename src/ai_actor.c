@@ -93,6 +93,47 @@ enum ai_imtb_personality {
   IMTB_MAX
 };
 
+enum ai_creature_archetype {
+  AI_CREATURE_ABERRATION = 0,
+  AI_CREATURE_BEAST,
+  AI_CREATURE_CELESTIAL,
+  AI_CREATURE_CONSTRUCT,
+  AI_CREATURE_DRAGON,
+  AI_CREATURE_ELEMENTAL,
+  AI_CREATURE_FEY,
+  AI_CREATURE_FIEND,
+  AI_CREATURE_GIANT,
+  AI_CREATURE_HUMANOID,
+  AI_CREATURE_MONSTROSITY,
+  AI_CREATURE_OOZE,
+  AI_CREATURE_PLANT,
+  AI_CREATURE_UNDEAD,
+  AI_CREATURE_UNKNOWN
+};
+
+enum ai_archetype_subtag_bits {
+  AI_SUB_DEMON = (1U << 0), AI_SUB_DEVIL = (1U << 1), AI_SUB_YUGOLOTH = (1U << 2), AI_SUB_ANGEL = (1U << 3),
+  AI_SUB_GHOST = (1U << 4), AI_SUB_VAMPIRE = (1U << 5), AI_SUB_LICH = (1U << 6), AI_SUB_ZOMBIE = (1U << 7),
+  AI_SUB_SKELETON = (1U << 8), AI_SUB_SLIME = (1U << 9), AI_SUB_GOLEM = (1U << 10), AI_SUB_WITCH = (1U << 11),
+  AI_SUB_FANATIC = (1U << 12), AI_SUB_BEASTIAL = (1U << 13), AI_SUB_INSECTOID = (1U << 14), AI_SUB_DRACONIC = (1U << 15),
+  AI_SUB_AQUATIC = (1U << 16), AI_SUB_ARACHNID = (1U << 17), AI_SUB_BANDITRY = (1U << 18), AI_SUB_SOLDIERLY = (1U << 19),
+  AI_SUB_MERCANTILE = (1U << 20), AI_SUB_INNKEEPING = (1U << 21)
+};
+
+enum ai_cadence_category { AI_CADENCE_FAST = 0, AI_CADENCE_NORMAL, AI_CADENCE_SLOW };
+
+struct ai_archetype_profile {
+  const char *name;
+  int cadence;
+  int delay_min_ms;
+  int delay_max_ms;
+  int evil_bias;
+  const char *const *micro_prefix;
+  const char *const *micro_suffix;
+  const char *const *uncertainty_pool;
+  const char *const *social_connect_pool;
+};
+
 struct ai_imtb_profile {
   const char *tag;
   int warmth;
@@ -141,6 +182,9 @@ struct ai_reply_context {
   int confidence;
   int personality;
   const struct ai_imtb_profile *profile;
+  int archetype;
+  unsigned int subtags;
+  const struct ai_archetype_profile *aprof;
   int evil_signaled;
   const char *chosen_core;
   int from_template;
@@ -381,6 +425,13 @@ struct ai_conv_actor_state {
   int recent_core_count;
   int personality;
   int personality_ready;
+  int creature_archetype;
+  unsigned int creature_subtags;
+  int creature_archetype_ready;
+  long micro_player_id;
+  time_t last_micro_ts;
+  long leadin_player_id;
+  time_t last_leadin_ts;
   unsigned int recent_lead_hashes[6];
   int recent_lead_head;
   int recent_lead_count;
@@ -533,6 +584,40 @@ static const char *const ai_imtb_followup[IMTB_MAX][4] = {
   {"Do you still seek an answer?", "Shall we follow another thread?", NULL, NULL}
 };
 
+static const char *const ai_arch_micro_prefix_default[] = {"Listen,", "Briefly,", "As you ask,", "In short,", NULL};
+static const char *const ai_arch_micro_suffix_default[] = {"that is all.", "keep moving.", "remember that.", "so it stands.", NULL};
+static const char *const ai_arch_uncertain_default[] = {"I cannot place it exactly.", "I only know part of it.", "That is as far as I know.", NULL};
+static const char *const ai_arch_connect_default[] = {"Ask clearly and I will try.", "Speak your need.", "I can answer what I know.", NULL};
+static const char *const ai_arch_micro_prefix_fiend[] = {"Speak,", "Quickly,", "Go on,", "Out with it,", NULL};
+static const char *const ai_arch_micro_suffix_fiend[] = {"if you dare.", "do not bore me.", "waste no blood on it.", NULL};
+static const char *const ai_arch_uncertain_fiend[] = {"I do not have that pleasure.", "No certainty there.", "Not even I know that from here.", NULL};
+static const char *const ai_arch_connect_fiend[] = {"Talk fast; I might indulge you.", "Fine. State it.", "You have a moment.", NULL};
+static const char *const ai_arch_micro_prefix_undead[] = {"From the dust,", "Slowly,", "Hear this,", "In old silence,", NULL};
+static const char *const ai_arch_micro_suffix_undead[] = {"seek the living for more.", "that memory is thin.", "the grave keeps no maps.", NULL};
+static const char *const ai_arch_uncertain_undead[] = {"That memory has rotted away.", "I do not keep such records.", "Only fragments remain.", NULL};
+static const char *const ai_arch_connect_undead[] = {"Speak before the echo fades.", "Ask, and be brief.", "I answer what still lingers.", NULL};
+static const char *const ai_arch_micro_prefix_construct[] = {"Processing,", "Statement,", "Result,", "Confirmed,", NULL};
+static const char *const ai_arch_micro_suffix_construct[] = {"query complete.", "insufficient data.", "directive stands.", NULL};
+static const char *const ai_arch_uncertain_construct[] = {"Insufficient local data.", "No route certainty available.", "Cannot verify target from current node.", NULL};
+static const char *const ai_arch_connect_construct[] = {"State request parameters.", "Query accepted.", "Specify objective.", NULL};
+static const struct ai_archetype_profile ai_archetype_profiles[] = {
+  {"aberration", AI_CADENCE_NORMAL, 520, 1250, 2, ai_arch_micro_prefix_default, ai_arch_micro_suffix_default, ai_arch_uncertain_default, ai_arch_connect_default},
+  {"beast", AI_CADENCE_FAST, 260, 760, 1, ai_arch_micro_prefix_default, ai_arch_micro_suffix_default, ai_arch_uncertain_default, ai_arch_connect_default},
+  {"celestial", AI_CADENCE_NORMAL, 400, 1050, 0, ai_arch_micro_prefix_default, ai_arch_micro_suffix_default, ai_arch_uncertain_default, ai_arch_connect_default},
+  {"construct", AI_CADENCE_SLOW, 760, 1650, 0, ai_arch_micro_prefix_construct, ai_arch_micro_suffix_construct, ai_arch_uncertain_construct, ai_arch_connect_construct},
+  {"dragon", AI_CADENCE_NORMAL, 500, 1200, 2, ai_arch_micro_prefix_default, ai_arch_micro_suffix_default, ai_arch_uncertain_default, ai_arch_connect_default},
+  {"elemental", AI_CADENCE_NORMAL, 450, 1150, 1, ai_arch_micro_prefix_default, ai_arch_micro_suffix_default, ai_arch_uncertain_default, ai_arch_connect_default},
+  {"fey", AI_CADENCE_NORMAL, 360, 980, 0, ai_arch_micro_prefix_default, ai_arch_micro_suffix_default, ai_arch_uncertain_default, ai_arch_connect_default},
+  {"fiend", AI_CADENCE_FAST, 280, 880, 4, ai_arch_micro_prefix_fiend, ai_arch_micro_suffix_fiend, ai_arch_uncertain_fiend, ai_arch_connect_fiend},
+  {"giant", AI_CADENCE_SLOW, 850, 1900, 1, ai_arch_micro_prefix_default, ai_arch_micro_suffix_default, ai_arch_uncertain_default, ai_arch_connect_default},
+  {"humanoid", AI_CADENCE_NORMAL, 320, 1000, 0, ai_arch_micro_prefix_default, ai_arch_micro_suffix_default, ai_arch_uncertain_default, ai_arch_connect_default},
+  {"monstrosity", AI_CADENCE_NORMAL, 480, 1200, 1, ai_arch_micro_prefix_default, ai_arch_micro_suffix_default, ai_arch_uncertain_default, ai_arch_connect_default},
+  {"ooze", AI_CADENCE_SLOW, 920, 2100, 0, ai_arch_micro_prefix_default, ai_arch_micro_suffix_default, ai_arch_uncertain_default, ai_arch_connect_default},
+  {"plant", AI_CADENCE_SLOW, 860, 1950, 0, ai_arch_micro_prefix_default, ai_arch_micro_suffix_default, ai_arch_uncertain_default, ai_arch_connect_default},
+  {"undead", AI_CADENCE_SLOW, 820, 1850, 3, ai_arch_micro_prefix_undead, ai_arch_micro_suffix_undead, ai_arch_uncertain_undead, ai_arch_connect_undead},
+  {"unknown", AI_CADENCE_NORMAL, 420, 1100, 0, ai_arch_micro_prefix_default, ai_arch_micro_suffix_default, ai_arch_uncertain_default, ai_arch_connect_default}
+};
+
 static struct char_data *ai_find_player_by_idnum_room(struct char_data *mob, long idnum);
 static const char *ai_pick_phrase(const char *const *pool);
 static const char *ai_pool_pick(const char *const *pool);
@@ -543,8 +628,8 @@ static int ai_text_has_sub_ci(const char *hay, const char *needle);
 static int ai_role_priority_score(struct char_data *mob);
 static struct ai_pending_reply_state *ai_pending_reply_state_get(struct char_data *mob, int create);
 static void ai_pending_reply_clear(struct char_data *mob);
-static int ai_actor_reply_delay_ms(struct char_data *mob, int personality, int evil_signaled);
-static void ai_actor_schedule_delayed_player_reply(struct char_data *mob, struct char_data *target, const char *msg, int personality, int evil_signaled, time_t now);
+static int ai_actor_reply_delay_ms(struct char_data *mob, int personality, int evil_signaled, int archetype);
+static void ai_actor_schedule_delayed_player_reply(struct char_data *mob, struct char_data *target, const char *msg, int personality, int evil_signaled, int archetype, time_t now);
 static int ai_try_emit_pending_player_reply(struct char_data *mob, time_t now);
 static int ai_can_speak_now(struct char_data *mob, time_t now);
 static void ai_say(struct char_data *mob, const char *msg, time_t now);
@@ -570,6 +655,10 @@ static unsigned long ai_hash_mix(unsigned long h, unsigned long v);
 static unsigned long ai_hash_text_stable(const char *text);
 static int ai_imtb_pick_personality(struct char_data *mob, int role, int style);
 static const struct ai_imtb_profile *ai_imtb_profile_get(int personality);
+static enum ai_creature_archetype ai_detect_creature_archetype(struct char_data *mob);
+static unsigned int ai_detect_creature_subtags(struct char_data *mob);
+static const struct ai_archetype_profile *ai_archetype_profile_get(int archetype);
+static int ai_line_is_legal_with_archetype(const char *line, int role, int style, int archetype, unsigned int subtags);
 static const char *ai_imtb_pick_leadin(struct ai_conv_actor_state *st, const struct ai_reply_context *rctx, int role, int style, unsigned long seed, int *out_suppressed);
 static int ai_imtb_recent_leadin_for_player(struct ai_conv_actor_state *st, long player_idnum, time_t now);
 static void ai_imtb_mark_leadin_for_player(struct ai_conv_actor_state *st, long player_idnum, time_t now);
@@ -652,10 +741,10 @@ static void ai_slot_replace(const char *in, const struct ai_world_facts *f, char
 static void ai_sanitize_unresolved_tokens(const char *in, char *out, size_t outsz);
 static const char *ai_epistemic_line(int confidence, int role, int topic_target);
 static const char *ai_service_menu_clarify_line(int role, int style, int evil);
-static const char *ai_service_honest_fallback_line(int role, int topic_target);
+static const char *ai_service_honest_fallback_line(int role, int topic_target, int archetype);
 static void ai_buf_prefix(char *buf, size_t bufsz, const char *prefix);
 static int ai_text_is_effectively_empty(const char *s);
-static const char *ai_role_neutral_fallback_line(int role, int style);
+static const char *ai_role_neutral_fallback_line(int role, int style, int archetype);
 
 
 enum ai_player_speech_class {
@@ -793,37 +882,54 @@ static void ai_pending_reply_clear(struct char_data *mob)
   st->pending_fire_pulse = 0;
 }
 
-static int ai_actor_reply_delay_ms(struct char_data *mob, int personality, int evil_signaled)
+static int ai_actor_reply_delay_ms(struct char_data *mob, int personality, int evil_signaled, int archetype)
 {
   int base = 700;
-  int jitter = rand_number(0, 250);
+  int min_ms = 220;
+  int max_ms = 1200;
+  int jitter;
+  const struct ai_archetype_profile *ap = ai_archetype_profile_get(archetype);
+
+  if (ap) {
+    min_ms = ap->delay_min_ms;
+    max_ms = ap->delay_max_ms;
+    if (min_ms < 180) min_ms = 180;
+    if (max_ms > 3000) max_ms = 3000;
+    if (min_ms > max_ms) min_ms = max_ms;
+    base = (min_ms + max_ms) / 2;
+  }
 
   if (personality == IMTB_FRIENDLY || personality == IMTB_WITTY)
-    base = 420;
+    base -= 120;
   else if (personality == IMTB_STOIC)
-    base = 560;
+    base -= 40;
   else if (personality == IMTB_BOOKISH)
-    base = 760;
+    base += 60;
   else if (personality == IMTB_GRUFF)
-    base = 680;
+    base += 20;
   else if (personality == IMTB_SUSPICIOUS)
-    base = 880;
+    base += 90;
   else if (personality == IMTB_ZEALOUS)
-    base = 980;
+    base += 130;
   else if (personality == IMTB_EERIE)
-    base = 1100;
+    base += 180;
 
   if (mob && mob->ai_prof) {
-    if (mob->ai_prof->role == ROLE_GUARD)
-      base -= 80;
-    else if (mob->ai_prof->role == ROLE_BANDIT || mob->ai_prof->role == ROLE_CULTIST)
-      base += 110;
+    if (mob->ai_prof->role == ROLE_GUARD || mob->ai_prof->role == ROLE_BANDIT)
+      base -= 60;
+    else if (mob->ai_prof->role == ROLE_CULTIST)
+      base += 80;
   }
 
   if (evil_signaled)
-    base += rand_number(60, 400);
+    base += 70;
 
+  jitter = rand_number(30, 240);
   base += jitter;
+  if (base < min_ms)
+    base = min_ms;
+  if (base > max_ms)
+    base = max_ms;
   if (base < 180)
     base = 180;
   if (base > 3000)
@@ -831,7 +937,7 @@ static int ai_actor_reply_delay_ms(struct char_data *mob, int personality, int e
   return base;
 }
 
-static void ai_actor_schedule_delayed_player_reply(struct char_data *mob, struct char_data *target, const char *msg, int personality, int evil_signaled, time_t now)
+static void ai_actor_schedule_delayed_player_reply(struct char_data *mob, struct char_data *target, const char *msg, int personality, int evil_signaled, int archetype, time_t now)
 {
   struct ai_pending_reply_state *st;
   int delay_ms;
@@ -843,7 +949,7 @@ static void ai_actor_schedule_delayed_player_reply(struct char_data *mob, struct
   if (!st)
     return;
 
-  delay_ms = ai_actor_reply_delay_ms(mob, personality, evil_signaled);
+  delay_ms = ai_actor_reply_delay_ms(mob, personality, evil_signaled, archetype);
 
   snprintf(st->pending_line, sizeof(st->pending_line), "%.*s", (int)sizeof(st->pending_line) - 1, msg);
   st->pending_player_idnum = (target && !IS_NPC(target)) ? GET_IDNUM(target) : 0;
@@ -3080,9 +3186,14 @@ static const char *ai_imtb_pick_leadin(struct ai_conv_actor_state *st, const str
       return "";
   }
 
-  if (!ai_line_is_role_legal(frag, role, style)) {
-    frag = ai_imtb_pick_fragment(ai_imtb_leadin[personality], ai_hash_mix(mix, 53));
-    if (!frag || !*frag || !ai_line_is_role_legal(frag, role, style)) {
+  if (!ai_line_is_legal_with_archetype(frag, role, style, rctx->archetype, rctx->subtags)) {
+    int tries;
+    for (tries = 0; tries < 6; tries++) {
+      frag = ai_imtb_pick_fragment(ai_imtb_leadin[personality], ai_hash_mix(mix, (unsigned long)(53 + tries * 29)));
+      if (frag && *frag && ai_line_is_legal_with_archetype(frag, role, style, rctx->archetype, rctx->subtags))
+        break;
+    }
+    if (!frag || !*frag || !ai_line_is_legal_with_archetype(frag, role, style, rctx->archetype, rctx->subtags)) {
       if (out_suppressed)
         *out_suppressed = 1;
       return "";
@@ -3162,15 +3273,17 @@ static const char *ai_imtb_pick_micro_wrap(const struct ai_reply_context *rctx, 
   evil = rctx->evil_signaled;
   if (evil)
     frag = ai_imtb_pick_fragment(suffix_mode ? evil_suffix : evil_prefix, ai_hash_mix(seed, suffix_mode ? 251 : 233));
+  else if (rctx->aprof)
+    frag = ai_imtb_pick_fragment(suffix_mode ? rctx->aprof->micro_suffix : rctx->aprof->micro_prefix, ai_hash_mix(seed, suffix_mode ? 211 : 173));
   else
     frag = ai_imtb_pick_fragment(suffix_mode ? micro_suffix[personality] : micro_prefix[personality], ai_hash_mix(seed, suffix_mode ? 211 : 173));
   if (!frag || !*frag)
     return "";
-  if (!ai_line_is_role_legal(frag, role, style)) {
+  if (!ai_line_is_legal_with_archetype(frag, role, style, rctx->archetype, rctx->subtags)) {
     int tries;
     for (tries = 0; tries < 4; tries++) {
-      frag = ai_imtb_pick_fragment(suffix_mode ? micro_suffix[personality] : micro_prefix[personality], ai_hash_mix(seed, (unsigned long)(311 + tries * 17)));
-      if (frag && *frag && ai_line_is_role_legal(frag, role, style))
+      frag = ai_imtb_pick_fragment((rctx->aprof ? (suffix_mode ? rctx->aprof->micro_suffix : rctx->aprof->micro_prefix) : (suffix_mode ? micro_suffix[personality] : micro_prefix[personality])), ai_hash_mix(seed, (unsigned long)(311 + tries * 17)));
+      if (frag && *frag && ai_line_is_legal_with_archetype(frag, role, style, rctx->archetype, rctx->subtags))
         return frag;
     }
     return "";
@@ -3189,17 +3302,17 @@ static const char *ai_imtb_pick_uncertainty(const struct ai_reply_context *rctx,
     return "";
 
   personality = (rctx->personality >= 0 && rctx->personality < IMTB_MAX) ? rctx->personality : IMTB_STOIC;
-  frag = ai_imtb_pick_fragment(ai_imtb_uncertainty[personality], ai_hash_mix(seed, 73));
+  frag = ai_imtb_pick_fragment((rctx->aprof && rctx->aprof->uncertainty_pool) ? rctx->aprof->uncertainty_pool : ai_imtb_uncertainty[personality], ai_hash_mix(seed, 73));
   if (!frag || !*frag)
     return "";
-  if (!ai_line_is_role_legal(frag, role, style)) {
+  if (!ai_line_is_legal_with_archetype(frag, role, style, rctx->archetype, rctx->subtags)) {
     int tries;
     for (tries = 0; tries < 6; tries++) {
-      frag = ai_imtb_pick_fragment(ai_imtb_uncertainty[personality], ai_hash_mix(seed, (unsigned long)(401 + tries * 19)));
-      if (frag && *frag && ai_line_is_role_legal(frag, role, style))
+      frag = ai_imtb_pick_fragment((rctx->aprof && rctx->aprof->uncertainty_pool) ? rctx->aprof->uncertainty_pool : ai_imtb_uncertainty[personality], ai_hash_mix(seed, (unsigned long)(401 + tries * 19)));
+      if (frag && *frag && ai_line_is_legal_with_archetype(frag, role, style, rctx->archetype, rctx->subtags))
         break;
     }
-    if (!frag || !*frag || !ai_line_is_role_legal(frag, role, style))
+    if (!frag || !*frag || !ai_line_is_legal_with_archetype(frag, role, style, rctx->archetype, rctx->subtags))
       return "";
   }
   if (out_used)
@@ -3229,11 +3342,11 @@ static const char *ai_imtb_pick_followup(const struct ai_reply_context *rctx, in
   frag = ai_imtb_pick_fragment(ai_imtb_followup[personality], ai_hash_mix(seed, 97));
   if (!frag || !*frag)
     return "";
-  if (!ai_line_is_role_legal(frag, role, style)) {
+  if (!ai_line_is_legal_with_archetype(frag, role, style, rctx->archetype, rctx->subtags)) {
     int tries;
     for (tries = 0; tries < 6; tries++) {
       frag = ai_imtb_pick_fragment(ai_imtb_followup[personality], ai_hash_mix(seed, (unsigned long)(503 + tries * 23)));
-      if (frag && *frag && ai_line_is_role_legal(frag, role, style))
+      if (frag && *frag && ai_line_is_legal_with_archetype(frag, role, style, rctx->archetype, rctx->subtags))
         return frag;
     }
     return "";
@@ -3634,6 +3747,37 @@ static int ai_line_is_role_legal(const char *line, int role, int style)
   return TRUE;
 }
 
+static int ai_line_is_legal_with_archetype(const char *line, int role, int style, int archetype, unsigned int subtags)
+{
+  if (!ai_line_is_role_legal(line, role, style))
+    return FALSE;
+  if (!line || !*line)
+    return FALSE;
+
+  if ((ai_text_has_sub_ci(line, "stock") || ai_text_has_sub_ci(line, "wares") || ai_text_has_sub_ci(line, "bargain") ||
+       ai_text_has_sub_ci(line, "price") || ai_text_has_sub_ci(line, "buy") || ai_text_has_sub_ci(line, "sell") ||
+       ai_text_has_sub_ci(line, "trade") || ai_text_has_sub_ci(line, "coin") || ai_text_has_sub_ci(line, "fresh stock")) &&
+      !(role == ROLE_MERCHANT || (subtags & AI_SUB_MERCANTILE) || (subtags & AI_SUB_INNKEEPING)))
+    return FALSE;
+
+  if ((ai_text_has_sub_ci(line, "watch") || ai_text_has_sub_ci(line, "patrol") || ai_text_has_sub_ci(line, "garrison") ||
+       ai_text_has_sub_ci(line, "duty") || ai_text_has_sub_ci(line, "post") || ai_text_has_sub_ci(line, "orders") ||
+       ai_text_has_sub_ci(line, "formation")) &&
+      !(role == ROLE_GUARD || (subtags & AI_SUB_SOLDIERLY)))
+    return FALSE;
+
+  if ((archetype == AI_CREATURE_FIEND || archetype == AI_CREATURE_UNDEAD || (subtags & (AI_SUB_DEMON|AI_SUB_DEVIL|AI_SUB_YUGOLOTH|AI_SUB_GHOST|AI_SUB_LICH|AI_SUB_VAMPIRE|AI_SUB_ZOMBIE|AI_SUB_SKELETON))) &&
+      (ai_text_has_sub_ci(line, "holy") || ai_text_has_sub_ci(line, "divine") || ai_text_has_sub_ci(line, "radiant") || ai_text_has_sub_ci(line, "sermon")))
+    return FALSE;
+
+  if (archetype != AI_CREATURE_ABERRATION &&
+      (ai_text_has_sub_ci(line, "eldritch") || ai_text_has_sub_ci(line, "mind flayer") || ai_text_has_sub_ci(line, "beholder") || ai_text_has_sub_ci(line, "tentacle")) &&
+      role != ROLE_SPIRIT && role != ROLE_CULTIST)
+    return FALSE;
+
+  return TRUE;
+}
+
 static struct ai_reply_intention ai_form_intention(struct char_data *mob, int speech_act, int speech_class, int suspicion_bucket, int arc_state, const struct ai_context_vector *ctx, const struct ai_session_read_entry *sr, struct ai_actor_memory_entry *e, time_t now)
 {
   struct ai_reply_intention in;
@@ -3940,7 +4084,7 @@ static const char *ai_select_content_for_intention(struct char_data *mob, const 
           }
         }
         if (!cands[bi] || !*cands[bi] || !ai_line_is_role_legal(cands[bi], role, style)) {
-          const char *neutral = ai_role_neutral_fallback_line(role, style);
+          const char *neutral = ai_role_neutral_fallback_line(role, style, (rctx ? rctx->archetype : AI_CREATURE_UNKNOWN));
           snprintf(best, sizeof(best), "%.*s", (int)sizeof(best) - 1,
                    (neutral && *neutral) ? neutral : "I can offer guidance if you ask plainly.");
           return best;
@@ -4431,10 +4575,14 @@ static int ai_text_is_effectively_empty(const char *s)
   return has_word ? FALSE : TRUE;
 }
 
-static const char *ai_role_neutral_fallback_line(int role, int style)
+static const char *ai_role_neutral_fallback_line(int role, int style, int archetype)
 {
   int instructor_role = FALSE;
   (void)style;
+  if (archetype == AI_CREATURE_UNDEAD)
+    return "The living will know better than I.";
+  if (archetype == AI_CREATURE_FIEND)
+    return "Ask the market, if you dare.";
 #ifdef ROLE_INSTRUCTOR
   if (role == ROLE_INSTRUCTOR)
     instructor_role = TRUE;
@@ -5486,15 +5634,19 @@ static const char *ai_epistemic_line(int confidence, int role, int topic_target)
   return "I cannot help with that.";
 }
 
-static const char *ai_service_honest_fallback_line(int role, int topic_target)
+static const char *ai_service_honest_fallback_line(int role, int topic_target, int archetype)
 {
+  if (archetype == AI_CREATURE_UNDEAD)
+    return "I do not keep such comforts. Seek the living halls.";
+  if (archetype == AI_CREATURE_FIEND)
+    return "Food? Hah. Try the inn, if you dare.";
   if (topic_target == TARGET_BAKERY || topic_target == TARGET_INN)
-    return "I cannot point you from here. Try the inn in town.";
+    return (role == ROLE_GUARD) ? "Ask at the square. I cannot place it from here." : "If you head toward the inn, someone there can point you right.";
   if (topic_target == TARGET_ARMORY || topic_target == TARGET_MARKET)
     return "I do not know the nearest place. Ask at the market.";
   if (role == ROLE_GUARD)
-    return "I cannot confirm from here. Ask at the nearest post.";
-  return "I do not know the nearest place. Ask at the market.";
+    return "Ask at the square. I cannot place it from here.";
+  return "I cannot place it from here. Ask in town.";
 }
 
 static const char *ai_role_redirect_line(int role, int style, int topic_target)
@@ -6246,6 +6398,99 @@ static int ai_is_evil_signaled(const struct char_data *mob)
   }
 
   return FALSE;
+}
+
+static const struct ai_archetype_profile *ai_archetype_profile_get(int archetype)
+{
+  int idx = archetype;
+  if (idx < AI_CREATURE_ABERRATION || idx > AI_CREATURE_UNKNOWN)
+    idx = AI_CREATURE_UNKNOWN;
+  return &ai_archetype_profiles[idx];
+}
+
+static enum ai_creature_archetype ai_detect_creature_archetype(struct char_data *mob)
+{
+  char text[MAX_STRING_LENGTH];
+  int role = (mob && mob->ai_prof) ? mob->ai_prof->role : ROLE_UNKNOWN;
+
+  if (!mob)
+    return AI_CREATURE_UNKNOWN;
+
+  if (role == ROLE_UNDEAD)
+    return AI_CREATURE_UNDEAD;
+  if (role == ROLE_BEAST)
+    return AI_CREATURE_BEAST;
+  if (role == ROLE_SPIRIT)
+    return AI_CREATURE_UNDEAD;
+
+  ai_extract_text(text, sizeof(text), mob);
+  if (ai_text_has_sub_ci(text, "construct") || ai_text_has_sub_ci(text, "golem") || ai_text_has_sub_ci(text, "automaton") || ai_text_has_sub_ci(text, "animated armor") || ai_text_has_sub_ci(text, "clockwork"))
+    return AI_CREATURE_CONSTRUCT;
+  if (ai_text_has_sub_ci(text, "undead") || ai_text_has_sub_ci(text, "zombie") || ai_text_has_sub_ci(text, "skeleton") || ai_text_has_sub_ci(text, "ghoul") || ai_text_has_sub_ci(text, "wight") || ai_text_has_sub_ci(text, "wraith") || ai_text_has_sub_ci(text, "specter") || ai_text_has_sub_ci(text, "ghost") || ai_text_has_sub_ci(text, "lich") || ai_text_has_sub_ci(text, "vampire") || ai_text_has_sub_ci(text, "necro"))
+    return AI_CREATURE_UNDEAD;
+  if (ai_text_has_sub_ci(text, "demon") || ai_text_has_sub_ci(text, "devil") || ai_text_has_sub_ci(text, "yugoloth") || ai_text_has_sub_ci(text, "infernal") || ai_text_has_sub_ci(text, "abyssal") || ai_text_has_sub_ci(text, "hell") || ai_text_has_sub_ci(text, "diabolic") || ai_text_has_sub_ci(text, "fiend"))
+    return AI_CREATURE_FIEND;
+  if (ai_text_has_sub_ci(text, "ooze") || ai_text_has_sub_ci(text, "slime") || ai_text_has_sub_ci(text, "jelly") || ai_text_has_sub_ci(text, "gelatinous") || ai_text_has_sub_ci(text, "muck") || ai_text_has_sub_ci(text, "blob"))
+    return AI_CREATURE_OOZE;
+  if (ai_text_has_sub_ci(text, "angel") || ai_text_has_sub_ci(text, "celestial") || ai_text_has_sub_ci(text, "seraph") || ai_text_has_sub_ci(text, "divine") || ai_text_has_sub_ci(text, "holy") || ai_text_has_sub_ci(text, "radiant"))
+    return AI_CREATURE_CELESTIAL;
+  if (ai_text_has_sub_ci(text, "fey") || ai_text_has_sub_ci(text, "fae") || ai_text_has_sub_ci(text, "pixie") || ai_text_has_sub_ci(text, "sprite") || ai_text_has_sub_ci(text, "dryad") || ai_text_has_sub_ci(text, "satyr") || ai_text_has_sub_ci(text, "hag"))
+    return AI_CREATURE_FEY;
+  if (ai_text_has_sub_ci(text, "aberration") || ai_text_has_sub_ci(text, "eldritch") || ai_text_has_sub_ci(text, "mind flayer") || ai_text_has_sub_ci(text, "beholder") || ai_text_has_sub_ci(text, "tentacle") || ai_text_has_sub_ci(text, "alien"))
+    return AI_CREATURE_ABERRATION;
+  if (ai_text_has_sub_ci(text, "elemental") || ai_text_has_sub_ci(text, "magma") || ai_text_has_sub_ci(text, "storm") || ai_text_has_sub_ci(text, "frost"))
+    return AI_CREATURE_ELEMENTAL;
+  if (ai_text_has_sub_ci(text, "dragon") || ai_text_has_sub_ci(text, "drake") || ai_text_has_sub_ci(text, "wyrm") || ai_text_has_sub_ci(text, "wyvern"))
+    return AI_CREATURE_DRAGON;
+  if (ai_text_has_sub_ci(text, "plant") || ai_text_has_sub_ci(text, "treant") || ai_text_has_sub_ci(text, "vine") || ai_text_has_sub_ci(text, "shambling") || ai_text_has_sub_ci(text, "fungus") || ai_text_has_sub_ci(text, "spore"))
+    return AI_CREATURE_PLANT;
+  if (ai_text_has_sub_ci(text, "chimera") || ai_text_has_sub_ci(text, "owlbear") || ai_text_has_sub_ci(text, "mimic") || ai_text_has_sub_ci(text, "basilisk") || ai_text_has_sub_ci(text, "hydra") || ai_text_has_sub_ci(text, "manticore"))
+    return AI_CREATURE_MONSTROSITY;
+  if (ai_text_has_sub_ci(text, "giant") || ai_text_has_sub_ci(text, "ogre") || ai_text_has_sub_ci(text, "troll") || ai_text_has_sub_ci(text, "titan"))
+    return AI_CREATURE_GIANT;
+  if (ai_text_has_sub_ci(text, "wolf") || ai_text_has_sub_ci(text, "bear") || ai_text_has_sub_ci(text, "boar") || ai_text_has_sub_ci(text, "cat") || ai_text_has_sub_ci(text, "dog") || ai_text_has_sub_ci(text, "spider") || ai_text_has_sub_ci(text, "serpent") || ai_text_has_sub_ci(text, "bat") || ai_text_has_sub_ci(text, "hawk") || ai_text_has_sub_ci(text, "stag"))
+    return AI_CREATURE_BEAST;
+  if (ai_text_has_sub_ci(text, "human") || ai_text_has_sub_ci(text, "elf") || ai_text_has_sub_ci(text, "dwarf") || ai_text_has_sub_ci(text, "orc") || ai_text_has_sub_ci(text, "goblin") || ai_text_has_sub_ci(text, "guard") || ai_text_has_sub_ci(text, "bandit") || ai_text_has_sub_ci(text, "merchant") || ai_text_has_sub_ci(text, "priest") || ai_text_has_sub_ci(text, "innkeeper"))
+    return AI_CREATURE_HUMANOID;
+
+  if (role == ROLE_GUARD || role == ROLE_MERCHANT || role == ROLE_BANDIT || role == ROLE_BOSS || role == ROLE_CIVILIAN || role == ROLE_CULTIST)
+    return AI_CREATURE_HUMANOID;
+
+  return AI_CREATURE_UNKNOWN;
+}
+
+static unsigned int ai_detect_creature_subtags(struct char_data *mob)
+{
+  char text[MAX_STRING_LENGTH];
+  unsigned int tags = 0U;
+  if (!mob)
+    return 0U;
+  ai_extract_text(text, sizeof(text), mob);
+
+  if (ai_text_has_sub_ci(text, "demon")) tags |= AI_SUB_DEMON;
+  if (ai_text_has_sub_ci(text, "devil")) tags |= AI_SUB_DEVIL;
+  if (ai_text_has_sub_ci(text, "yugoloth")) tags |= AI_SUB_YUGOLOTH;
+  if (ai_text_has_sub_ci(text, "angel") || ai_text_has_sub_ci(text, "seraph")) tags |= AI_SUB_ANGEL;
+  if (ai_text_has_sub_ci(text, "ghost") || ai_text_has_sub_ci(text, "wraith") || ai_text_has_sub_ci(text, "specter")) tags |= AI_SUB_GHOST;
+  if (ai_text_has_sub_ci(text, "vampire")) tags |= AI_SUB_VAMPIRE;
+  if (ai_text_has_sub_ci(text, "lich")) tags |= AI_SUB_LICH;
+  if (ai_text_has_sub_ci(text, "zombie")) tags |= AI_SUB_ZOMBIE;
+  if (ai_text_has_sub_ci(text, "skeleton")) tags |= AI_SUB_SKELETON;
+  if (ai_text_has_sub_ci(text, "slime") || ai_text_has_sub_ci(text, "ooze") || ai_text_has_sub_ci(text, "jelly")) tags |= AI_SUB_SLIME;
+  if (ai_text_has_sub_ci(text, "golem") || ai_text_has_sub_ci(text, "automaton") || ai_text_has_sub_ci(text, "clockwork")) tags |= AI_SUB_GOLEM;
+  if (ai_text_has_sub_ci(text, "witch")) tags |= AI_SUB_WITCH;
+  if (ai_text_has_sub_ci(text, "fanatic") || ai_text_has_sub_ci(text, "cult")) tags |= AI_SUB_FANATIC;
+  if (ai_text_has_sub_ci(text, "wolf") || ai_text_has_sub_ci(text, "boar") || ai_text_has_sub_ci(text, "hound")) tags |= AI_SUB_BEASTIAL;
+  if (ai_text_has_sub_ci(text, "insect") || ai_text_has_sub_ci(text, "beetle") || ai_text_has_sub_ci(text, "mantis")) tags |= AI_SUB_INSECTOID;
+  if (ai_text_has_sub_ci(text, "dragon") || ai_text_has_sub_ci(text, "drake") || ai_text_has_sub_ci(text, "wyrm")) tags |= AI_SUB_DRACONIC;
+  if (ai_text_has_sub_ci(text, "fish") || ai_text_has_sub_ci(text, "shark") || ai_text_has_sub_ci(text, "eel") || ai_text_has_sub_ci(text, "aquatic")) tags |= AI_SUB_AQUATIC;
+  if (ai_text_has_sub_ci(text, "spider") || ai_text_has_sub_ci(text, "arachnid")) tags |= AI_SUB_ARACHNID;
+  if (ai_text_has_sub_ci(text, "bandit") || ai_text_has_sub_ci(text, "brigand") || ai_text_has_sub_ci(text, "highwayman")) tags |= AI_SUB_BANDITRY;
+  if (ai_text_has_sub_ci(text, "guard") || ai_text_has_sub_ci(text, "soldier") || ai_text_has_sub_ci(text, "watch")) tags |= AI_SUB_SOLDIERLY;
+  if (ai_text_has_sub_ci(text, "merchant") || ai_text_has_sub_ci(text, "trader") || ai_text_has_sub_ci(text, "vendor")) tags |= AI_SUB_MERCANTILE;
+  if (ai_text_has_sub_ci(text, "innkeeper") || ai_text_has_sub_ci(text, "bartender") || ai_text_has_sub_ci(text, "tavern")) tags |= AI_SUB_INNKEEPING;
+
+  return tags;
 }
 
 static const char *ai_service_menu_clarify_line(int role, int style, int evil)
@@ -7365,9 +7610,33 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
   ai_state_refresh_local_topics(mob);
   {
     int p = ai_imtb_pick_personality(mob, role, style);
+    conv_st = ai_conv_actor_state_get(mob, 1);
     rctx.personality = p;
     rctx.profile = ai_imtb_profile_get(p);
+    if (conv_st && !conv_st->creature_archetype_ready) {
+      conv_st->creature_archetype = (int)ai_detect_creature_archetype(mob);
+      conv_st->creature_subtags = ai_detect_creature_subtags(mob);
+      conv_st->creature_archetype_ready = 1;
+    }
+    rctx.archetype = (conv_st && conv_st->creature_archetype_ready) ? conv_st->creature_archetype : (int)ai_detect_creature_archetype(mob);
+    rctx.subtags = (conv_st && conv_st->creature_archetype_ready) ? conv_st->creature_subtags : ai_detect_creature_subtags(mob);
+    rctx.aprof = ai_archetype_profile_get(rctx.archetype);
     rctx.evil_signaled = ai_is_evil_signaled(mob);
+    if (rctx.aprof && rctx.aprof->evil_bias > 0 &&
+        (rctx.evil_signaled || ai_text_has_sub_ci((mob->player.long_descr ? mob->player.long_descr : ""), "wicked") ||
+         ai_text_has_sub_ci((mob->player.long_descr ? mob->player.long_descr : ""), "horror") ||
+         ai_text_has_sub_ci((mob->player.long_descr ? mob->player.long_descr : ""), "cursed") ||
+         ai_text_has_sub_ci((mob->player.long_descr ? mob->player.long_descr : ""), "vile") ||
+         ai_text_has_sub_ci((mob->player.long_descr ? mob->player.long_descr : ""), "damned") ||
+         ai_text_has_sub_ci((mob->player.long_descr ? mob->player.long_descr : ""), "blood") ||
+         ai_text_has_sub_ci((mob->player.long_descr ? mob->player.long_descr : ""), "butcher") ||
+         ai_text_has_sub_ci((mob->player.long_descr ? mob->player.long_descr : ""), "torment") ||
+         ai_text_has_sub_ci((mob->player.long_descr ? mob->player.long_descr : ""), "reaper") ||
+         ai_text_has_sub_ci((mob->player.long_descr ? mob->player.long_descr : ""), "cult") ||
+         ai_text_has_sub_ci((mob->player.long_descr ? mob->player.long_descr : ""), "blaspheme") ||
+         ai_text_has_sub_ci((mob->player.long_descr ? mob->player.long_descr : ""), "profane"))) {
+      rctx.evil_signaled = 1;
+    }
   }
   ai_normalize_text(text ? text : "", normalized, sizeof(normalized));
   if (type == AI_EVENT_PLAYER_SAY && ai_text_is_effectively_empty(normalized))
@@ -7862,7 +8131,7 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
       }
 
       if (type == AI_EVENT_PLAYER_SAY && (rctx.domain == DOMAIN_SERVICES || rctx.domain == DOMAIN_SHOPPING || rctx.domain == DOMAIN_DIRECTIONS) && rctx.facts.confidence <= 1) {
-        line = ai_service_honest_fallback_line(role, rctx.primary_topic_target);
+        line = ai_service_honest_fallback_line(role, rctx.primary_topic_target, rctx.archetype);
         skip_voice = TRUE;
       }
 
@@ -7925,7 +8194,7 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
       snprintf(targeted, sizeof(targeted), "$n says to %s, '%s'", GET_NAME(actor), finalbuf);
     }
     if (type == AI_EVENT_PLAYER_SAY)
-      ai_actor_schedule_delayed_player_reply(mob, actor, targeted, rctx.personality, rctx.evil_signaled, now);
+      ai_actor_schedule_delayed_player_reply(mob, actor, targeted, rctx.personality, rctx.evil_signaled, rctx.archetype, now);
     else
       ai_actor_schedule_reaction_speech(mob, actor, targeted);
     e->last_reply_time = now;
