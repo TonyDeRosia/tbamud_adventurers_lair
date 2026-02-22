@@ -24,7 +24,7 @@
 #define AI_SIGNATURE_CHECK_SECS 10
 #define AI_TARGET_REACTION_COOLDOWN_SECS 18
 #define AI_EVENT_IGNORE_MSG_SECS 4
-#define AI_PER_PLAYER_REPLY_COOLDOWN_SECS 6
+#define AI_PER_PLAYER_REPLY_COOLDOWN_SECS 1
 #define AI_INTENT_THRESHOLD 25
 #define AI_INTENT_COOLDOWN_MIN 6
 #define AI_INTENT_COOLDOWN_MAX 12
@@ -42,7 +42,7 @@
 #define AI_NPC_CONVO_START_EMPTY_SECS 60
 #define AI_NPC_CONVO_START_WITH_PLAYERS_SECS 180
 #define AI_PLAYER_ARB_CACHE_MAX 128
-#define AI_PLAYER_ARB_TTL_SECS 6
+#define AI_PLAYER_ARB_TTL_SECS 1
 #define AI_ATTENTION_THRESHOLD 0.25f
 #define AI_GOAL_STACK_MAX 4
 #define AI_THREAT_TABLE_MAX 16
@@ -140,6 +140,7 @@ struct ai_reply_context {
   int confidence;
   int personality;
   const struct ai_imtb_profile *profile;
+  int evil_signaled;
   const char *chosen_core;
   int from_template;
   int event_id;
@@ -388,6 +389,8 @@ struct ai_conv_actor_state {
   int tone_night_watch;
   long lead_player_ids[AI_IMTB_LEAD_PLAYER_MAX];
   time_t lead_player_times[AI_IMTB_LEAD_PLAYER_MAX];
+  long last_player_idnum;
+  time_t last_player_say_reply_at;
 };
 
 struct ai_conv_room_state {
@@ -439,6 +442,11 @@ static void ai_zone_build_cache(struct ai_zone_knowledge *zk);
 static void ai_detect_requested_targets(const char *text, int *targets, int *count);
 static int ai_is_question_shape(const char *text);
 static int ai_pick_stance_prefix(int role, int style, unsigned long seed, const char **out_prefix);
+static int ai_is_evil_signaled(const struct char_data *mob);
+static int ai_is_training_query_text(const char *text);
+static int ai_is_practice_query_text(const char *text);
+static int ai_is_supply_query_text(const char *text);
+static int ai_is_food_drink_query_text(const char *text);
 static const char *ai_pick_question_mirror_clause(int topic_target, int role, int style, unsigned long seed);
 static const char *ai_role_because_clause(int role, int style);
 static int ai_line_has_min_service_usefulness(const char *line);
@@ -635,6 +643,7 @@ static void ai_resolve_world_facts(struct char_data *mob, struct char_data *acto
 static void ai_slot_replace(const char *in, const struct ai_world_facts *f, char *out, size_t outsz);
 static void ai_sanitize_unresolved_tokens(const char *in, char *out, size_t outsz);
 static const char *ai_epistemic_line(int confidence, int role, int topic_target);
+static const char *ai_service_menu_clarify_line(int role, int style, int evil);
 
 
 enum ai_player_speech_class {
@@ -2770,16 +2779,29 @@ static int ai_imtb_pick_personality(struct char_data *mob, int role, int style)
   if (st && st->personality_ready)
     return st->personality;
 
-  snprintf(seedbuf, sizeof(seedbuf), "%d|%s|%s|%d|%d|%d",
+  snprintf(seedbuf, sizeof(seedbuf), "%d|%s|%s|%s|%d|%d|%d|%d|%d",
            GET_MOB_VNUM(mob),
            GET_NAME(mob) ? GET_NAME(mob) : "",
+           (mob->player.short_descr && *mob->player.short_descr) ? mob->player.short_descr : "",
            (mob->player.long_descr && *mob->player.long_descr) ? mob->player.long_descr : "",
            role,
            GET_ALIGNMENT(mob),
-           style);
+           style,
+           (IN_ROOM(mob) != NOWHERE) ? world[IN_ROOM(mob)].zone : -1,
+           (mob->ai_prof ? mob->ai_prof->social : 0));
   h = ai_hash_text_stable(seedbuf);
   p = (int)(h % (unsigned long)IMTB_MAX);
 
+
+  if (ai_is_evil_signaled(mob)) {
+    switch ((int)(h % 5UL)) {
+      case 0: p = IMTB_GRUFF; break;
+      case 1: p = IMTB_SUSPICIOUS; break;
+      case 2: p = IMTB_EERIE; break;
+      case 3: p = IMTB_ZEALOUS; break;
+      default: p = IMTB_STOIC; break;
+    }
+  }
   if ((role == ROLE_SPIRIT || role == ROLE_UNDEAD) && p != IMTB_EERIE) {
     if ((h % 100UL) < 70UL)
       p = IMTB_EERIE;
@@ -2942,11 +2964,20 @@ static const char *ai_imtb_pick_micro_wrap(const struct ai_reply_context *rctx, 
     {"echoes remember.", "the dark keeps count.", "the hush permits it.", "so it fades.", NULL}
   };
   const char *frag;
+  int evil;
+  static const char *const evil_prefix[] = {"Heh.", "Careful.", "Tsk.", "Speak fast.", NULL};
+  static const char *const evil_suffix[] = {"You tempt fate.", "Try not to bleed for it.", "Don't waste my patience.", "Keep your pulse steady.", NULL};
 
   if (!rctx)
     return "";
+  if (rctx->requested_count > 1)
+    return "";
   personality = (rctx->personality >= 0 && rctx->personality < IMTB_MAX) ? rctx->personality : IMTB_STOIC;
-  frag = ai_imtb_pick_fragment(suffix_mode ? micro_suffix[personality] : micro_prefix[personality], ai_hash_mix(seed, suffix_mode ? 211 : 173));
+  evil = rctx->evil_signaled;
+  if (evil)
+    frag = ai_imtb_pick_fragment(suffix_mode ? evil_suffix : evil_prefix, ai_hash_mix(seed, suffix_mode ? 251 : 233));
+  else
+    frag = ai_imtb_pick_fragment(suffix_mode ? micro_suffix[personality] : micro_prefix[personality], ai_hash_mix(seed, suffix_mode ? 211 : 173));
   if (!frag || !*frag)
     return "";
   if (!ai_line_is_role_legal(frag, role, style))
@@ -3379,7 +3410,7 @@ static struct ai_reply_intention ai_form_intention(struct char_data *mob, int sp
 
   if (speech_act == AI_INTENT_CONFUSION || speech_act == AI_INTENT_GIBBERISH || speech_class == AI_SPEECH_UNKNOWN)
     in.goal = GOAL_CLARIFY;
-  else if (speech_act == AI_INTENT_ASK_SERVICE || speech_act == AI_INTENT_BANK || speech_act == AI_INTENT_INN || speech_act == AI_INTENT_DIRECTIONS)
+  else if (speech_act == AI_INTENT_ASK_SERVICE || speech_act == AI_INTENT_BANK || speech_act == AI_INTENT_INN || speech_act == AI_INTENT_DIRECTIONS || speech_act == AI_INTENT_TRAIN)
     in.goal = (role_fit >= AI_MIN_ROLE_FITNESS) ? GOAL_SERVE : GOAL_DEFLECT;
   else if (speech_act == AI_INTENT_GREET || speech_act == AI_INTENT_SMALLTALK)
     in.goal = GOAL_CONNECT;
@@ -3514,13 +3545,19 @@ static const char *ai_select_content_for_intention(struct char_data *mob, const 
     }
 
     if (effective_goal == GOAL_CLARIFY) {
-      for (i = 0; clarify_pool[i] && n < 48; i++) cands[n++] = clarify_pool[i];
+      if (rctx && (rctx->domain == DOMAIN_SERVICES || rctx->domain == DOMAIN_SHOPPING || rctx->domain == DOMAIN_DIRECTIONS)) {
+        cands[n++] = ai_service_menu_clarify_line(role, style, rctx->evil_signaled);
+      } else {
+        for (i = 0; clarify_pool[i] && n < 48; i++) cands[n++] = clarify_pool[i];
+      }
     } else if (effective_goal == GOAL_DEFLECT) {
-      const char *const *pool = (role == ROLE_GUARD || role == ROLE_BOSS) ? deflect_guard :
+      static const char *const deflect_evil[] = {"Speak clearly, or don't speak.", "I answer useful questions only.", "Choose your words with care.", "Keep it short if you value your time.", NULL};
+      const char *const *pool = (rctx && rctx->evil_signaled) ? deflect_evil :
+                                ((role == ROLE_GUARD || role == ROLE_BOSS) ? deflect_guard :
                                 ((role == ROLE_MERCHANT && style == 1) ? deflect_inn :
                                 (role == ROLE_MERCHANT ? deflect_merch :
                                 (role == ROLE_BANDIT ? deflect_bandit :
-                                (role == ROLE_SPIRIT ? deflect_spirit : deflect_cult))));
+                                (role == ROLE_SPIRIT ? deflect_spirit : deflect_cult)))));
       for (i = 0; pool[i] && n < 48; i++) cands[n++] = pool[i];
     } else if (effective_goal == GOAL_WARN) {
       const char *const *pool = (role == ROLE_GUARD || role == ROLE_BOSS) ? warn_guard :
@@ -3531,11 +3568,13 @@ static const char *ai_select_content_for_intention(struct char_data *mob, const 
     } else if (effective_goal == GOAL_DISMISS) {
       for (i = 0; dismiss_pool[i] && n < 48; i++) cands[n++] = dismiss_pool[i];
     } else if (effective_goal == GOAL_CONNECT) {
-      const char *const *pool = (role == ROLE_GUARD || role == ROLE_BOSS) ? connect_guard :
+      static const char *const connect_evil[] = {"You have my attention. Briefly.", "Talk fast; I still might help.", "Ask, and do not waste the moment.", "Fine. Make your point.", NULL};
+      const char *const *pool = (rctx && rctx->evil_signaled) ? connect_evil :
+                                ((role == ROLE_GUARD || role == ROLE_BOSS) ? connect_guard :
                                 ((role == ROLE_MERCHANT && style == 1) ? connect_inn :
                                 (role == ROLE_MERCHANT ? connect_merch :
                                 (role == ROLE_BANDIT ? connect_bandit :
-                                (role == ROLE_SPIRIT ? connect_spirit : connect_cult))));
+                                (role == ROLE_SPIRIT ? connect_spirit : connect_cult)))));
       for (i = 0; pool[i] && n < 48; i++) cands[n++] = pool[i];
     } else if (effective_goal == GOAL_SERVE) {
       const char *const *pool = (in->topic == AI_INTENT_INN) ? serve_inn :
@@ -4242,9 +4281,9 @@ static int ai_detect_topic_target_from_text(const char *text)
     return TARGET_HEAL;
   if (ai_text_has_sub_ci(text, "market") || ai_text_has_sub_ci(text, "square") || ai_text_has_sub_ci(text, "bazaar"))
     return TARGET_MARKET;
-  if (ai_text_has_sub_ci(text, "food") || ai_text_has_sub_ci(text, "bakery") || ai_text_has_sub_ci(text, "tavern") || ai_text_has_sub_ci(text, "drink") || ai_text_has_sub_ci(text, "hungry") || ai_text_has_sub_ci(text, "eat"))
-    return TARGET_BAKERY;
-  if (ai_text_has_sub_ci(text, "train") || ai_text_has_sub_ci(text, "guild") || ai_text_has_sub_ci(text, "trainer") || ai_text_has_sub_ci(text, "practice") || ai_text_has_sub_ci(text, "training"))
+  if (ai_text_has_sub_ci(text, "food") || ai_text_has_sub_ci(text, "bakery") || ai_text_has_sub_ci(text, "tavern") || ai_text_has_sub_ci(text, "drink") || ai_text_has_sub_ci(text, "hungry") || ai_text_has_sub_ci(text, "eat") || ai_text_has_sub_ci(text, "bread"))
+    return TARGET_INN;
+  if (ai_is_training_query_text(text) || ai_is_practice_query_text(text) || ai_text_has_sub_ci(text, "guild"))
     return TARGET_TRAINER;
   return TARGET_NONE;
 }
@@ -4395,38 +4434,43 @@ static void ai_detect_requested_targets(const char *text, int *targets, int *cou
   int n = 0;
   int food_trigger = FALSE;
   int gear_trigger = FALSE;
+  int train_trigger = FALSE;
+  int practice_trigger = FALSE;
+
   if (!targets || !count)
     return;
   *count = 0;
   if (!text)
     return;
-#define AI_REQ_PUSH(t) do { int _x=(t),_i,_f=0; for(_i=0;_i<n;_i++) if(targets[_i]==_x) _f=1; if(!_f && n<AI_REQ_MAX) targets[n++]=_x; } while(0)
-  if (ai_text_has_sub_ci(text, "hungry") || ai_text_has_sub_ci(text, "starving") || ai_text_has_sub_ci(text, "food") || ai_text_has_sub_ci(text, "eat") || ai_text_has_sub_ci(text, "meal") || ai_text_has_sub_ci(text, "ration") || ai_text_has_sub_ci(text, "bread") || ai_text_has_sub_ci(text, "stew"))
-    food_trigger = TRUE;
-  if (ai_text_has_sub_ci(text, "weapon") || ai_text_has_sub_ci(text, "weapons") || ai_text_has_sub_ci(text, "armor") || ai_text_has_sub_ci(text, "armory") || ai_text_has_sub_ci(text, "supplies") || ai_text_has_sub_ci(text, "shop") || ai_text_has_sub_ci(text, "buy") || ai_text_has_sub_ci(text, "sell") || ai_text_has_sub_ci(text, "merchant") || ai_text_has_sub_ci(text, "store") || ai_text_has_sub_ci(text, "smith") || ai_text_has_sub_ci(text, "blacksmith") || ai_text_has_sub_ci(text, "sword") || ai_text_has_sub_ci(text, "axe") || ai_text_has_sub_ci(text, "mace") || ai_text_has_sub_ci(text, "dagger") || ai_text_has_sub_ci(text, "bow") || ai_text_has_sub_ci(text, "staff") || ai_text_has_sub_ci(text, "spear") || ai_text_has_sub_ci(text, "shield") || ai_text_has_sub_ci(text, "helm") || ai_text_has_sub_ci(text, "breastplate"))
-    gear_trigger = TRUE;
 
-  if (food_trigger) {
-    if (strcmp(ai_topic_key_name(TARGET_BAKERY), "NONE"))
-      AI_REQ_PUSH(TARGET_BAKERY);
-    else
-      AI_REQ_PUSH(TARGET_INN);
-  }
+#define AI_REQ_PUSH(t) do { int _x=(t),_i,_f=0; for(_i=0;_i<n;_i++) if(targets[_i]==_x) _f=1; if(!_f && n<AI_REQ_MAX) targets[n++]=_x; } while(0)
+
+  train_trigger = ai_is_training_query_text(text);
+  practice_trigger = ai_is_practice_query_text(text);
+  food_trigger = ai_is_food_drink_query_text(text);
+  gear_trigger = ai_is_supply_query_text(text);
+
+  if (train_trigger || practice_trigger)
+    AI_REQ_PUSH(TARGET_TRAINER);
+
   if (gear_trigger) {
-    if (strcmp(ai_topic_key_name(TARGET_ARMORY), "NONE"))
-      AI_REQ_PUSH(TARGET_ARMORY);
-    else if (strcmp(ai_topic_key_name(TARGET_MARKET), "NONE"))
-      AI_REQ_PUSH(TARGET_MARKET);
+    AI_REQ_PUSH(TARGET_MARKET);
+    AI_REQ_PUSH(TARGET_ARMORY);
   }
+
+  if (food_trigger)
+    AI_REQ_PUSH(TARGET_INN);
+
   if (ai_text_has_sub_ci(text, "heal") || ai_text_has_sub_ci(text, "healer") || ai_text_has_sub_ci(text, "temple") || ai_text_has_sub_ci(text, "potion") || ai_text_has_sub_ci(text, "bandage") || ai_text_has_sub_ci(text, "wounded")) AI_REQ_PUSH(TARGET_HEAL);
   if (ai_text_has_sub_ci(text, "inn") || ai_text_has_sub_ci(text, "lodging") || ai_text_has_sub_ci(text, "sleep") || ai_text_has_sub_ci(text, "bed") || ai_text_has_sub_ci(text, "bedroll") || ai_text_has_sub_ci(text, "tent") || ai_text_has_sub_ci(text, "camping")) AI_REQ_PUSH(TARGET_INN);
   if (ai_text_has_sub_ci(text, "bank") || ai_text_has_sub_ci(text, "deposit") || ai_text_has_sub_ci(text, "withdraw") || ai_text_has_sub_ci(text, "atm") || ai_text_has_sub_ci(text, "teller")) AI_REQ_PUSH(TARGET_BANK);
-  if (ai_text_has_sub_ci(text, "train") || ai_text_has_sub_ci(text, "trainer") || ai_text_has_sub_ci(text, "practice") || ai_text_has_sub_ci(text, "guild") || ai_text_has_sub_ci(text, "instructor") || ai_text_has_sub_ci(text, "master")) AI_REQ_PUSH(TARGET_TRAINER);
   if (ai_text_has_sub_ci(text, "market") || ai_text_has_sub_ci(text, "supplies") || ai_text_has_sub_ci(text, "supply") || ai_text_has_sub_ci(text, "gear") || ai_text_has_sub_ci(text, "equipment") || ai_text_has_sub_ci(text, "pack") || ai_text_has_sub_ci(text, "rope") || ai_text_has_sub_ci(text, "torch") || ai_text_has_sub_ci(text, "oil") || ai_text_has_sub_ci(text, "kit")) AI_REQ_PUSH(TARGET_MARKET);
+
   if (food_trigger && n == 0)
     AI_REQ_PUSH(TARGET_INN);
   if (gear_trigger && n == 0)
     AI_REQ_PUSH(TARGET_MARKET);
+
 #undef AI_REQ_PUSH
   *count = n;
 }
@@ -4823,8 +4867,8 @@ static int ai_classify_domain(const char *normalized, int intent, int speech_act
   int scores[DOMAIN_PERSONAL + 1];
   int i, best = DOMAIN_NONE, bestv = 0;
 
-  static const char *const shopping[] = {"buy","sword","weapon","armor","dagger","shield","axe","mace","bow","equipment","gear","purchase","shop","sell",NULL};
-  static const char *const services[] = {"bank","inn","heal","healer","train","temple","rest","room","deposit","withdraw",NULL};
+  static const char *const shopping[] = {"buy","sword","weapon","weapons","armor","armory","dagger","shield","axe","mace","bow","equipment","gear","kit","purchase","shop","store","merchant","smith","blacksmith","sell","supplies",NULL};
+  static const char *const services[] = {"bank","inn","heal","healer","train","training","trainer","practice","prac","instructor","guildmaster","temple","rest","room","deposit","withdraw","food","drink","bread",NULL};
   static const char *const directions[] = {"where","how do i get","which way","find","locate","nearest","closest",NULL};
   static const char *const rumor[] = {"heard","rumor","story","news","word","whisper","legend","tale",NULL};
   static const char *const quest[] = {"quest","mission","work","job","task","bounty","help","need someone",NULL};
@@ -4857,6 +4901,22 @@ static int ai_classify_domain(const char *normalized, int intent, int speech_act
     scores[DOMAIN_SERVICES] += 8;
     scores[DOMAIN_SOCIAL] = MAX(0, scores[DOMAIN_SOCIAL] - 3);
   }
+  if (ai_is_training_query_text(normalized) || ai_is_practice_query_text(normalized)) {
+    scores[DOMAIN_SERVICES] += 40;
+    scores[DOMAIN_SHOPPING] += 12;
+    scores[DOMAIN_SOCIAL] = MAX(0, scores[DOMAIN_SOCIAL] - 6);
+  }
+  if (ai_is_supply_query_text(normalized)) {
+    scores[DOMAIN_SHOPPING] += 34;
+    scores[DOMAIN_SERVICES] += 16;
+    scores[DOMAIN_SOCIAL] = MAX(0, scores[DOMAIN_SOCIAL] - 6);
+  }
+  if (ai_is_food_drink_query_text(normalized)) {
+    scores[DOMAIN_SERVICES] += 30;
+    scores[DOMAIN_SHOPPING] += 10;
+    scores[DOMAIN_SOCIAL] = MAX(0, scores[DOMAIN_SOCIAL] - 6);
+  }
+
   if (intent == AI_INTENT_BANK || intent == AI_INTENT_INN || intent == AI_INTENT_HEAL || intent == AI_INTENT_TRAIN || intent == AI_INTENT_ASK_SERVICE)
     scores[DOMAIN_SERVICES] += 6;
   if (intent == AI_INTENT_DIRECTIONS)
@@ -5777,6 +5837,78 @@ static int ai_text_has_sub_ci(const char *hay, const char *needle)
   return FALSE;
 }
 
+static int ai_is_training_query_text(const char *text)
+{
+  if (!text || !*text)
+    return FALSE;
+  return (ai_text_has_sub_ci(text, "train") || ai_text_has_sub_ci(text, "training") || ai_text_has_sub_ci(text, "trainer") ||
+          ai_text_has_sub_ci(text, "instructor") || ai_text_has_sub_ci(text, "guildmaster") || ai_text_has_sub_ci(text, "guild master") ||
+          ai_text_has_sub_ci(text, "can i train") || ai_text_has_sub_ci(text, "train here") || ai_text_has_sub_ci(text, "where do i train"));
+}
+
+static int ai_is_practice_query_text(const char *text)
+{
+  if (!text || !*text)
+    return FALSE;
+  return (ai_text_has_sub_ci(text, "practice") || ai_text_has_sub_ci(text, "prac") || ai_text_has_sub_ci(text, "practice here") ||
+          ai_text_has_sub_ci(text, "where do i practice") || ai_text_has_sub_ci(text, "can i practice") || ai_text_has_sub_ci(text, "train and practice"));
+}
+
+static int ai_is_supply_query_text(const char *text)
+{
+  if (!text || !*text)
+    return FALSE;
+  return (ai_text_has_sub_ci(text, "supplies") || ai_text_has_sub_ci(text, "supply") || ai_text_has_sub_ci(text, "gear") ||
+          ai_text_has_sub_ci(text, "equipment") || ai_text_has_sub_ci(text, "kit") || ai_text_has_sub_ci(text, "weapons") ||
+          ai_text_has_sub_ci(text, "weapon") || ai_text_has_sub_ci(text, "armor") || ai_text_has_sub_ci(text, "armory") ||
+          ai_text_has_sub_ci(text, "shield") || ai_text_has_sub_ci(text, "buy") || ai_text_has_sub_ci(text, "sell") ||
+          ai_text_has_sub_ci(text, "shop") || ai_text_has_sub_ci(text, "store") || ai_text_has_sub_ci(text, "merchant") ||
+          ai_text_has_sub_ci(text, "smith") || ai_text_has_sub_ci(text, "blacksmith"));
+}
+
+static int ai_is_food_drink_query_text(const char *text)
+{
+  if (!text || !*text)
+    return FALSE;
+  return (ai_text_has_sub_ci(text, "hungry") || ai_text_has_sub_ci(text, "starving") || ai_text_has_sub_ci(text, "food") ||
+          ai_text_has_sub_ci(text, "eat") || ai_text_has_sub_ci(text, "meal") || ai_text_has_sub_ci(text, "ration") ||
+          ai_text_has_sub_ci(text, "bread") || ai_text_has_sub_ci(text, "stew") || ai_text_has_sub_ci(text, "drink") ||
+          ai_text_has_sub_ci(text, "drinks") || ai_text_has_sub_ci(text, "ale") || ai_text_has_sub_ci(text, "beer") ||
+          ai_text_has_sub_ci(text, "wine") || ai_text_has_sub_ci(text, "water"));
+}
+
+static int ai_is_evil_signaled(const struct char_data *mob)
+{
+  static const char *const evil_kw[] = {"evil", "wicked", "vile", "cruel", "demon", "demonic", "horror", "fiend", "infernal", "damned", "blight", "cursed", "corrupt", "cult", "necro", "undead", "blood", "butcher", "torment", "nightmare", NULL};
+  int i;
+
+  if (!mob)
+    return FALSE;
+  if (GET_ALIGNMENT((struct char_data *)mob) < -350)
+    return TRUE;
+
+  for (i = 0; evil_kw[i]; i++) {
+    if ((mob->player.name && ai_text_has_sub_ci(mob->player.name, evil_kw[i])) ||
+        (mob->player.short_descr && ai_text_has_sub_ci(mob->player.short_descr, evil_kw[i])) ||
+        (mob->player.long_descr && ai_text_has_sub_ci(mob->player.long_descr, evil_kw[i])) ||
+        (mob->player.description && ai_text_has_sub_ci(mob->player.description, evil_kw[i])))
+      return TRUE;
+  }
+
+  return FALSE;
+}
+
+static const char *ai_service_menu_clarify_line(int role, int style, int evil)
+{
+  if (evil)
+    return "Pick one: food, weapons, armor, or general supplies.";
+  if (role == ROLE_MERCHANT && style == 1)
+    return "Do you mean food, weapons, armor, or general supplies?";
+  if (role == ROLE_BANDIT)
+    return "Say it plain: food, weapons, armor, or general supplies.";
+  return "Do you mean food, weapons, armor, or general supplies?";
+}
+
 static void ai_state_refresh_local_topics(struct char_data *mob)
 {
   struct ai_actor_state *st;
@@ -6116,6 +6248,24 @@ static int ai_player_speech_classify(const char *text, int *out_confidence, int 
       ai_text_has_sub_ci(text, "good morning") || ai_text_has_sub_ci(text, "good afternoon") || ai_text_has_sub_ci(text, "good evening"))
     scores[AI_SPEECH_GREET] += 10;
 
+  if (ai_is_training_query_text(text) || ai_is_practice_query_text(text)) {
+    scores[AI_SPEECH_SHOP] += 34;
+    scores[AI_SPEECH_DIRECTIONS] += 12;
+    scores[AI_SPEECH_SMALLTALK] = MAX(0, scores[AI_SPEECH_SMALLTALK] - 10);
+  }
+
+  if (ai_is_supply_query_text(text)) {
+    scores[AI_SPEECH_SHOP] += 28;
+    scores[AI_SPEECH_DIRECTIONS] += 8;
+    scores[AI_SPEECH_SMALLTALK] = MAX(0, scores[AI_SPEECH_SMALLTALK] - 10);
+  }
+
+  if (ai_is_food_drink_query_text(text)) {
+    scores[AI_SPEECH_SHOP] += 20;
+    scores[AI_SPEECH_INN] += 16;
+    scores[AI_SPEECH_SMALLTALK] = MAX(0, scores[AI_SPEECH_SMALLTALK] - 10);
+  }
+
   if (ai_text_has_sub_ci(text, "weather") || ai_text_has_sub_ci(text, "rain") || ai_text_has_sub_ci(text, "sun") || ai_text_has_sub_ci(text, "storm") ||
       ai_text_has_sub_ci(text, "wind") || ai_text_has_sub_ci(text, "snow") || ai_text_has_sub_ci(text, "fog") || ai_text_has_sub_ci(text, "nice day")) {
     scores[AI_SPEECH_WEATHER] += 12;
@@ -6436,8 +6586,12 @@ static int ai_actor_room_response_slot(struct char_data *mob, struct char_data *
 
     {
       struct ai_actor_memory_entry *it_e = ai_mem_get_or_create(it, GET_IDNUM(actor));
+      struct ai_conv_actor_state *it_conv = ai_conv_actor_state_get(it, 0);
       time_t it_last_reply = it_e ? it_e->last_reply_time : 0;
-      if ((now - it_last_reply) < AI_PER_PLAYER_REPLY_COOLDOWN_SECS)
+      if (type == AI_EVENT_PLAYER_SAY && it_conv && it_conv->last_player_idnum == GET_IDNUM(actor) &&
+          (now - it_conv->last_player_say_reply_at) < AI_PER_PLAYER_REPLY_COOLDOWN_SECS)
+        continue;
+      if (type != AI_EVENT_PLAYER_SAY && (now - it_last_reply) < AI_PER_PLAYER_REPLY_COOLDOWN_SECS)
         continue;
     }
 
@@ -6863,6 +7017,7 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
     int p = ai_imtb_pick_personality(mob, role, style);
     rctx.personality = p;
     rctx.profile = ai_imtb_profile_get(p);
+    rctx.evil_signaled = ai_is_evil_signaled(mob);
   }
   ai_normalize_text(text ? text : "", normalized, sizeof(normalized));
   attention_score = ai_attention_score(mob, type, actor, normalized, now);
@@ -6886,6 +7041,10 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
     } else {
       speech_class = ai_player_speech_classify(normalized, &confidence, NULL);
       intent = ai_intent_from_player_class(speech_class);
+      if (ai_is_training_query_text(normalized) || ai_is_practice_query_text(normalized)) {
+        intent = AI_INTENT_TRAIN;
+        confidence = MAX(confidence, 32);
+      }
       if (speech_class == AI_SPEECH_WEATHER)
         confidence += 4;
     }
@@ -6910,13 +7069,26 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
   if (type == AI_EVENT_PLAYER_SAY) {
     int asks_where = (!strncasecmp(normalized, "where", 5) || ai_text_has_sub_ci(normalized, "where"));
     int asks_service = (rctx.requested_count > 0);
+    int asks_train = (ai_is_training_query_text(normalized) || ai_is_practice_query_text(normalized));
+    int asks_supplies = ai_is_supply_query_text(normalized);
+    int asks_food = ai_is_food_drink_query_text(normalized);
 
-    if (asks_where) {
+    if (asks_train) {
+      rctx.domain = DOMAIN_SERVICES;
+      intent = AI_INTENT_TRAIN;
+      rctx.intent = intent;
+      rctx.speech_act = intent;
+      if (rctx.requested_count <= 0) {
+        rctx.requested_targets[0] = TARGET_TRAINER;
+        rctx.requested_count = 1;
+      }
+      rctx.primary_topic_target = TARGET_TRAINER;
+    } else if (asks_where && (asks_service || asks_supplies || asks_food)) {
       rctx.domain = DOMAIN_DIRECTIONS;
       intent = AI_INTENT_ASK_SERVICE;
       rctx.intent = intent;
       rctx.speech_act = intent;
-    } else if (asks_service || is_hunger_request) {
+    } else if (asks_service || asks_supplies || asks_food || is_hunger_request) {
       rctx.domain = DOMAIN_SERVICES;
       intent = AI_INTENT_ASK_SERVICE;
       rctx.intent = intent;
@@ -7134,7 +7306,10 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
   }
   {
     time_t last_reply = sr ? sr->last_reply_time : e->last_reply_time;
-    if ((now - last_reply) < AI_PER_PLAYER_REPLY_COOLDOWN_SECS)
+    if (type == AI_EVENT_PLAYER_SAY && conv_st && conv_st->last_player_idnum == GET_IDNUM(actor) &&
+        (now - conv_st->last_player_say_reply_at) < AI_PER_PLAYER_REPLY_COOLDOWN_SECS)
+      AI_EVT_RETURN("PER_PLAYER_SAY_REPLY_COOLDOWN");
+    if (type != AI_EVENT_PLAYER_SAY && (now - last_reply) < AI_PER_PLAYER_REPLY_COOLDOWN_SECS)
       AI_EVT_RETURN("PER_PLAYER_REPLY_COOLDOWN");
   }
 
@@ -7178,6 +7353,7 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
       const struct ai_voice_profile *vp;
       unsigned long seed;
       int skip_voice = FALSE;
+      int asks_train = ai_is_training_query_text(normalized) || ai_is_practice_query_text(normalized);
 
       intention = ai_form_intention(mob, intent, speech_class, suspicion_bucket, sr ? sr->arc : AI_ARC_STRANGER, &ctx, sr, e, now);
       if (is_hunger_request || (type == AI_EVENT_PLAYER_SAY && (rctx.domain == DOMAIN_SERVICES || rctx.domain == DOMAIN_DIRECTIONS)))
@@ -7197,11 +7373,27 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
       if (rctx.confidence == 0 && intention.goal == GOAL_SERVE && !is_hunger_request)
         intention.goal = GOAL_DEFLECT;
 
-      core = ai_select_content_for_intention(mob, &intention, &rctx, sr, &rctx.from_template);
-      rctx.chosen_core = core;
-      line = core;
+      if (type == AI_EVENT_PLAYER_SAY && asks_train && IN_ROOM(mob) == IN_ROOM(actor) && MOB_FLAGGED(mob, MOB_GUILD_MASTER)) {
+        line = "Yes. Use TRAIN to spend training sessions. Use PRAC to spend practice sessions.";
+        core = line;
+        rctx.chosen_core = core;
+        skip_voice = TRUE;
+        intention.be_brief = 1;
+        intention.goal = GOAL_SERVE;
+      }
+
       if (!line || !*line) {
-        if (type == AI_EVENT_PLAYER_SAY && (rctx.domain == DOMAIN_SERVICES || rctx.domain == DOMAIN_DIRECTIONS))
+        core = ai_select_content_for_intention(mob, &intention, &rctx, sr, &rctx.from_template);
+        rctx.chosen_core = core;
+        line = core;
+      }
+      if (!line || !*line) {
+        if (type == AI_EVENT_PLAYER_SAY && asks_train && !MOB_FLAGGED(mob, MOB_GUILD_MASTER)) {
+          if (rctx.facts.confidence == 3)
+            line = ai_role_redirect_line(role, style, TARGET_TRAINER);
+          else
+            line = "I am not a trainer. Ask a guildmaster to TRAIN and PRAC.";
+        } else if (type == AI_EVENT_PLAYER_SAY && (rctx.domain == DOMAIN_SERVICES || rctx.domain == DOMAIN_DIRECTIONS))
           line = ai_role_redirect_line(role, style, rctx.primary_topic_target);
         else if (rctx.domain == DOMAIN_SOCIAL)
           line = ai_select_content_for_intention(mob, &(struct ai_reply_intention){AI_INTENT_SMALLTALK, GOAL_CONNECT, STANCE_NEUTRAL, 0, 1}, &rctx, sr, &rctx.from_template);
@@ -7277,6 +7469,8 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
 
       if (intention.goal == GOAL_SERVE && rctx.confidence <= 2) {
         const char *epi = ai_epistemic_line(rctx.confidence, role, rctx.topic_target);
+        if (type == AI_EVENT_PLAYER_SAY && (rctx.domain == DOMAIN_SERVICES || rctx.domain == DOMAIN_SHOPPING))
+          epi = ai_service_menu_clarify_line(role, style, rctx.evil_signaled);
         if (epi && *epi) {
           line = epi;
           rctx.chosen_core = epi;
@@ -7284,7 +7478,7 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
         }
       }
 
-      if (type == AI_EVENT_PLAYER_SAY && line && *line && rctx.requested_count <= 1) {
+      if (type == AI_EVENT_PLAYER_SAY && line && *line && rctx.requested_count <= 1 && !(asks_train && MOB_FLAGGED(mob, MOB_GUILD_MASTER))) {
         unsigned long dseed = ai_conv_seed(mob, intent, (unsigned int)now);
         if (!repeated_topic && ai_pick_stance_prefix(role, style, dseed, &stance_prefix) && stance_prefix && *stance_prefix && ai_line_is_role_legal(stance_prefix, role, style)) {
           snprintf(decorated, sizeof(decorated), "%s %s", stance_prefix, line);
@@ -7358,13 +7552,32 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
     ai_set_last_speech_meta(mob, pool, reason);
     {
       char finalbuf[300];
+      char original[300];
+      const char *replacement = NULL;
       ai_sanitize_unresolved_tokens(line, finalbuf, sizeof(finalbuf));
+      snprintf(original, sizeof(original), "%s", finalbuf);
+      if (type == AI_EVENT_PLAYER_SAY && !ai_line_is_role_legal(finalbuf, role, style)) {
+        replacement = ai_role_redirect_line(role, style, rctx.primary_topic_target);
+        if (!replacement || !*replacement)
+          replacement = "Let's keep to what I can answer.";
+        snprintf(finalbuf, sizeof(finalbuf), "%.*s", (int)sizeof(finalbuf) - 1, replacement);
+        if (ai_debug) {
+          ai_debug_log("ROLE_ILLEGAL_OUTPUT: role=%s pool=%s original='%s' replacement='%s'", ai_role_name_local(role), pool ? pool : "POOL_NONE", original, finalbuf);
+        }
+      }
       snprintf(targeted, sizeof(targeted), "$n says to %s, '%s'", GET_NAME(actor), finalbuf);
     }
-    ai_actor_schedule_reaction_speech(mob, actor, targeted);
+    if (type == AI_EVENT_PLAYER_SAY)
+      ai_say(mob, targeted, now);
+    else
+      ai_actor_schedule_reaction_speech(mob, actor, targeted);
     e->last_reply_time = now;
     if (sr)
       sr->last_reply_time = now;
+    if (type == AI_EVENT_PLAYER_SAY && conv_st) {
+      conv_st->last_player_idnum = GET_IDNUM(actor);
+      conv_st->last_player_say_reply_at = now;
+    }
     if (sr)
       sr->cooldown_until = now + ((best_action == AI_ACTION_EMOTE_REACT) ? 3 : 2);
     if (sr && rctx.event_id >= 0)
