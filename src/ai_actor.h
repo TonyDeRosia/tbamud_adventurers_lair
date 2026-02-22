@@ -102,6 +102,18 @@ enum ai_actor_role {
   ROLE_BOSS
 };
 
+enum ai_actor_persona {
+  AI_PERSONA_NEUTRAL = 0,
+  AI_PERSONA_GUARD,
+  AI_PERSONA_CONSTABLE,
+  AI_PERSONA_MERCHANT,
+  AI_PERSONA_INNKEEPER,
+  AI_PERSONA_BANDIT,
+  AI_PERSONA_INSTRUCTOR,
+  AI_PERSONA_CULTIST,
+  AI_PERSONA_BEAST
+};
+
 enum ai_actor_movement {
   MOVE_SENTINEL = 0,
   MOVE_PATROL,
@@ -258,6 +270,7 @@ void ai_actor_record_help(struct char_data *mob, struct char_data *actor, int am
 void ai_actor_record_crime(struct char_data *mob, struct char_data *criminal, int flags);
 void ai_actor_record_room_crime(struct char_data *witness, struct char_data *criminal, int flags);
 void ai_actor_event_enter(struct char_data *actor, room_rnum room);
+enum ai_actor_persona get_actor_persona(struct char_data *ch);
 void ai_actor_event_leave(struct char_data *actor, room_rnum room);
 void ai_actor_event_say(struct char_data *actor, const char *msg);
 void ai_actor_event_emote(struct char_data *actor, const char *msg);

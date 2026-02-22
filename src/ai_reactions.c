@@ -18,6 +18,9 @@
 #define AI_RX_ROOM_PLAYER_HASH_CD_MAX 2048
 #define AI_RX_ROOM_EVENT_MAX 512
 #define AI_RX_HARASS_MAX 1024
+#ifndef AI_RX_DEBUG_PLAN
+#define AI_RX_DEBUG_PLAN 1
+#endif
 
 enum ai_rx_kind { AI_RX_KIND_EMOTE = 0, AI_RX_KIND_TINY_UTTERANCE, AI_RX_KIND_SHORT_LINE, AI_RX_KIND_ONE_LINER };
 enum ai_rx_category {
@@ -121,6 +124,20 @@ static const char *const rx_tiny[] = { "Hm.", "Tch.", "Hmph.", "No.", NULL };
 static const char *const rx_one_liner[] = {
   "Evening.", "I can help if you ask clean.", "What do you need.", "That depends.", "Say it plain.", NULL
 };
+
+static const char *const rx_plan_neutral_greet[] = {"Hello.", "Yes?", "What do you need?", NULL};
+static const char *const rx_plan_guard_greet[] = {"State your business.", "Keep it brief.", "Move along if you have no business.", NULL};
+static const char *const rx_plan_constable_greet[] = {"Constable on duty. Speak plain.", "Order first. What is your business?", NULL};
+static const char *const rx_plan_merchant_greet[] = {"Welcome. Need wares?", "Trade fair and speak plain.", NULL};
+static const char *const rx_plan_innkeeper_greet[] = {"Well met. Need food or a bed?", "Welcome in. What can I get you?", NULL};
+static const char *const rx_plan_bandit_greet[] = {"Move it.", "Talk fast.", "You lost, traveler?", NULL};
+static const char *const rx_plan_instructor_greet[] = {"Ready to train? Ask clearly.", "Discipline first. What lesson do you seek?", NULL};
+
+static const char *const rx_plan_guard_demand[] = {"No.", "That is not happening.", "Stand down.", NULL};
+static const char *const rx_plan_merchant_demand[] = {"Coin first.", "No coin, no deal.", NULL};
+static const char *const rx_plan_innkeeper_demand[] = {"Pay first, then service.", "We do not do charity at knifepoint.", NULL};
+static const char *const rx_plan_bandit_demand[] = {"Try it and bleed for it.", "You demand too much.", NULL};
+static const char *const rx_plan_instructor_demand[] = {"Discipline before demands.", "Ask properly or leave.", NULL};
 
 int ai_rx_infer_targeted_to_mob(struct char_data *mob, const char *norm_text) {
   if (!mob || !norm_text) return FALSE;
@@ -235,6 +252,53 @@ static int ai_rx_can_fire(struct char_data *mob, const struct ai_reaction_ctx *c
   return TRUE;
 }
 
+
+static const char *ai_rx_persona_name(enum ai_actor_persona p) {
+  switch (p) {
+    case AI_PERSONA_GUARD: return "guard";
+    case AI_PERSONA_CONSTABLE: return "constable";
+    case AI_PERSONA_MERCHANT: return "merchant";
+    case AI_PERSONA_INNKEEPER: return "innkeeper";
+    case AI_PERSONA_BANDIT: return "bandit";
+    case AI_PERSONA_INSTRUCTOR: return "instructor";
+    default: return "neutral";
+  }
+}
+
+static const char *ai_rx_pick_plan_line(enum ai_actor_persona persona, int intent_id, unsigned long seed, const char **out_pool)
+{
+  const char *const *pool = rx_plan_neutral_greet;
+  int demand = (intent_id == AI_INTENT_THREAT || intent_id == AI_INTENT_INSULT);
+  int greet = (intent_id == AI_INTENT_GREET || intent_id == AI_INTENT_SMALLTALK);
+
+  if (demand) {
+    switch (persona) {
+      case AI_PERSONA_GUARD:
+      case AI_PERSONA_CONSTABLE: pool = rx_plan_guard_demand; *out_pool = "guard_demand"; break;
+      case AI_PERSONA_MERCHANT: pool = rx_plan_merchant_demand; *out_pool = "merchant_demand"; break;
+      case AI_PERSONA_INNKEEPER: pool = rx_plan_innkeeper_demand; *out_pool = "innkeeper_demand"; break;
+      case AI_PERSONA_BANDIT: pool = rx_plan_bandit_demand; *out_pool = "bandit_demand"; break;
+      case AI_PERSONA_INSTRUCTOR: pool = rx_plan_instructor_demand; *out_pool = "instructor_demand"; break;
+      default: pool = rx_plan_guard_demand; *out_pool = "neutral_demand"; break;
+    }
+  } else if (greet) {
+    switch (persona) {
+      case AI_PERSONA_GUARD: pool = rx_plan_guard_greet; *out_pool = "guard_greet"; break;
+      case AI_PERSONA_CONSTABLE: pool = rx_plan_constable_greet; *out_pool = "constable_greet"; break;
+      case AI_PERSONA_MERCHANT: pool = rx_plan_merchant_greet; *out_pool = "merchant_greet"; break;
+      case AI_PERSONA_INNKEEPER: pool = rx_plan_innkeeper_greet; *out_pool = "innkeeper_greet"; break;
+      case AI_PERSONA_BANDIT: pool = rx_plan_bandit_greet; *out_pool = "bandit_greet"; break;
+      case AI_PERSONA_INSTRUCTOR: pool = rx_plan_instructor_greet; *out_pool = "instructor_greet"; break;
+      default: pool = rx_plan_neutral_greet; *out_pool = "neutral_greet"; break;
+    }
+  } else {
+    *out_pool = "fallback_one_liner";
+    pool = rx_one_liner;
+  }
+
+  return ai_rx_pick_seeded(pool, seed);
+}
+
 static int ai_reaction_category_from_intent(int intent_id, const struct ai_reaction_ctx *ctx) {
   if (ai_rx_is_explicit_sexual_request(ctx ? ctx->normalized_text : NULL)) return AI_RX_BOUNDARY_RESPONSE;
   if (intent_id == AI_INTENT_THREAT || intent_id == AI_INTENT_INSULT) return AI_RX_WARNING;
@@ -280,6 +344,22 @@ static void ai_reaction_pick(struct char_data *mob, const struct ai_reaction_ctx
   seed = ai_rx_hash_mix(seed, (unsigned long)ctx->normalized_hash);
   seed = ai_rx_hash_mix(seed, (unsigned long)cat);
 
+  if (out->output_kind == AI_RX_KIND_ONE_LINER || ctx->event_type == AI_EVENT_PLAYER_SAY) {
+    enum ai_actor_persona persona = get_actor_persona(mob);
+    const char *pool_name = "";
+    out->output_kind = AI_RX_KIND_ONE_LINER;
+    out->selected_text = ai_rx_pick_plan_line(persona, ctx->intent_id, seed, &pool_name);
+    out->debug_reason = pool_name;
+#if AI_RX_DEBUG_PLAN
+    log("AI_RX_PLAN intent=%d persona=%s pool=%s", ctx->intent_id, ai_rx_persona_name(persona), pool_name ? pool_name : "none");
+#endif
+    if (!out->selected_text) {
+      out->will_fire = FALSE;
+      out->debug_reason = "empty_plan";
+    }
+    return;
+  }
+
   switch (cat) {
     case AI_RX_BOUNDARY_RESPONSE: out->selected_text = ai_rx_pick_seeded(rx_boundary, seed); out->debug_reason = "boundary"; break;
     case AI_RX_ESCALATION: out->selected_text = ai_rx_pick_seeded(rx_escalation, seed); out->debug_reason = "escalation"; break;
@@ -321,7 +401,7 @@ int ai_reaction_try(struct char_data *mob, const struct ai_reaction_ctx *ctx) {
   struct ai_rx_room_event *ev;
 
   if (!ai_rx_can_fire(mob, ctx, &why)) {
-    log("AI_RX_SUPPRESS reason=%s", why ? why : "unknown");
+    log("AI_RX_SUPPRESS reason=%s one_line_rule=%d", why ? why : "unknown", (why && !strcmp(why, "room_player_hash_cooldown")) ? 1 : 0);
     return 0;
   }
 

@@ -1590,6 +1590,55 @@ static const char *ai_event_reason_name(enum ai_event_type type)
   }
 }
 
+const char *ai_actor_persona_name(enum ai_actor_persona persona)
+{
+  switch (persona) {
+    case AI_PERSONA_GUARD: return "guard";
+    case AI_PERSONA_CONSTABLE: return "constable";
+    case AI_PERSONA_MERCHANT: return "merchant";
+    case AI_PERSONA_INNKEEPER: return "innkeeper";
+    case AI_PERSONA_BANDIT: return "bandit";
+    case AI_PERSONA_INSTRUCTOR: return "instructor";
+    case AI_PERSONA_CULTIST: return "cultist";
+    case AI_PERSONA_BEAST: return "beast";
+    default: return "neutral";
+  }
+}
+
+enum ai_actor_persona get_actor_persona(struct char_data *ch)
+{
+  const char *n;
+  int role;
+  int style;
+
+  if (!ch || !IS_NPC(ch) || !ch->ai_prof)
+    return AI_PERSONA_NEUTRAL;
+
+  role = ch->ai_prof->role;
+  style = ch->ai_prof->style;
+  n = GET_NAME(ch);
+
+  if (MOB_FLAGGED(ch, MOB_GUILD_MASTER))
+    return AI_PERSONA_INSTRUCTOR;
+
+  if (role == ROLE_BANDIT)
+    return AI_PERSONA_BANDIT;
+  if (role == ROLE_CULTIST)
+    return AI_PERSONA_CULTIST;
+  if (role == ROLE_BEAST)
+    return AI_PERSONA_BEAST;
+  if (role == ROLE_MERCHANT)
+    return (style == 1) ? AI_PERSONA_INNKEEPER : AI_PERSONA_MERCHANT;
+  if (role == ROLE_GUARD || role == ROLE_BOSS) {
+    if (n && (strstr(n, "Constable") || strstr(n, "constable") || strstr(n, "Sheriff") || strstr(n, "sheriff")))
+      return AI_PERSONA_CONSTABLE;
+    return AI_PERSONA_GUARD;
+  }
+
+  return AI_PERSONA_NEUTRAL;
+}
+
+
 static void ai_debug_log(const char *fmt, ...)
 {
   va_list args;
@@ -4892,6 +4941,32 @@ static void ai_voice_assemble(struct char_data *mob, const struct ai_voice_profi
     const char *feel = ((rctx ? rctx->speech_act : AI_INTENT_NONE)==AI_INTENT_PRAISE||(rctx ? rctx->speech_act : AI_INTENT_NONE)==AI_INTENT_GREET||(rctx ? rctx->speech_act : AI_INTENT_NONE)==AI_INTENT_SMALLTALK) ? ai_phrase("FEEL_POSITIVE", vocab_tier, rhythm, seed, 7) : ai_phrase("FEEL_NEGATIVE", vocab_tier, rhythm, seed, 8);
     snprintf(buf, sizeof(buf), " %s", feel);
     snprintf(work + strlen(work), sizeof(work) - strlen(work), "%s", buf);
+  }
+
+  /* Coherence cap: keep at most opener+body OR body+closer. */
+  if (rctx && rctx->speech_act != AI_INTENT_NONE) {
+    char planned[512];
+    const char *body = core;
+    const char *open = (plead && *plead) ? plead : "";
+    const char *close = (closer && *closer) ? closer : "";
+    int use_open = (*open && rctx->speech_act != AI_INTENT_GREET);
+    int use_close = (!use_open && *close);
+
+    if (get_actor_persona(mob) == AI_PERSONA_BANDIT) {
+      if (ai_text_has_sub_ci(body, "well met") || ai_text_has_sub_ci(body, "good day"))
+        body = "Mind your step.";
+      if (use_open && (ai_text_has_sub_ci(open, "well met") || ai_text_has_sub_ci(open, "good day")))
+        use_open = 0;
+    }
+
+    if (use_open)
+      snprintf(planned, sizeof(planned), "%s %s", open, body);
+    else if (use_close)
+      snprintf(planned, sizeof(planned), "%s %s", body, close);
+    else
+      snprintf(planned, sizeof(planned), "%s", body);
+
+    snprintf(work, sizeof(work), "%.*s", (int)sizeof(work) - 1, planned);
   }
 
   len = strlen(work);
@@ -10263,7 +10338,7 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
         snprintf(targeted, sizeof(targeted), "$n ignores %s.", GET_NAME(actor));
       }
       if (ai_debug) {
-        ai_debug_log("AI_COMM_PICK vnum=%d cat=%d subtags=%llu comm=%d intent=%d/%d pool=%s", GET_MOB_VNUM(mob), creature_cat, (unsigned long long)rctx.subtags, comm_mode, intent, ai_explicit_to_core_intent(multi_intent.secondary_intent), pool ? pool : "POOL_NONE");
+        ai_debug_log("AI_COMM_PICK vnum=%d cat=%d subtags=%llu comm=%d intent=%d/%d persona=%s pool=%s", GET_MOB_VNUM(mob), creature_cat, (unsigned long long)rctx.subtags, comm_mode, intent, ai_explicit_to_core_intent(multi_intent.secondary_intent), ai_actor_persona_name(get_actor_persona(mob)), pool ? pool : "POOL_NONE");
       }
     }
     if (type == AI_EVENT_PLAYER_SAY)
