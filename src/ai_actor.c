@@ -95,7 +95,8 @@ enum ai_imtb_personality {
 };
 
 enum ai_creature_archetype {
-  AI_CREATURE_ABERRATION = 0,
+  AI_CREATURE_UNKNOWN = 0,
+  AI_CREATURE_ABERRATION,
   AI_CREATURE_BEAST,
   AI_CREATURE_CELESTIAL,
   AI_CREATURE_CONSTRUCT,
@@ -109,17 +110,62 @@ enum ai_creature_archetype {
   AI_CREATURE_OOZE,
   AI_CREATURE_PLANT,
   AI_CREATURE_UNDEAD,
-  AI_CREATURE_UNKNOWN
+  AI_CREATURE_SPIRIT
 };
 
-enum ai_archetype_subtag_bits {
-  AI_SUB_DEMON = (1U << 0), AI_SUB_DEVIL = (1U << 1), AI_SUB_YUGOLOTH = (1U << 2), AI_SUB_ANGEL = (1U << 3),
-  AI_SUB_GHOST = (1U << 4), AI_SUB_VAMPIRE = (1U << 5), AI_SUB_LICH = (1U << 6), AI_SUB_ZOMBIE = (1U << 7),
-  AI_SUB_SKELETON = (1U << 8), AI_SUB_SLIME = (1U << 9), AI_SUB_GOLEM = (1U << 10), AI_SUB_WITCH = (1U << 11),
-  AI_SUB_FANATIC = (1U << 12), AI_SUB_BEASTIAL = (1U << 13), AI_SUB_INSECTOID = (1U << 14), AI_SUB_DRACONIC = (1U << 15),
-  AI_SUB_AQUATIC = (1U << 16), AI_SUB_ARACHNID = (1U << 17), AI_SUB_BANDITRY = (1U << 18), AI_SUB_SOLDIERLY = (1U << 19),
-  AI_SUB_MERCANTILE = (1U << 20), AI_SUB_INNKEEPING = (1U << 21)
-};
+#define AI_SUB_DEMON      (1ULL << 0)
+#define AI_SUB_DEVIL      (1ULL << 1)
+#define AI_SUB_YUGOLOTH   (1ULL << 2)
+#define AI_SUB_ANGEL      (1ULL << 3)
+#define AI_SUB_SERAPHIC   (1ULL << 4)
+#define AI_SUB_VAMPIRE    (1ULL << 5)
+#define AI_SUB_LYCAN      (1ULL << 6)
+#define AI_SUB_LICH       (1ULL << 7)
+#define AI_SUB_ZOMBIE     (1ULL << 8)
+#define AI_SUB_SKELETON   (1ULL << 9)
+#define AI_SUB_GHOST      (1ULL << 10)
+#define AI_SUB_WRAITH     (1ULL << 11)
+#define AI_SUB_WITCH      (1ULL << 12)
+#define AI_SUB_WIZARDLY   (1ULL << 13)
+#define AI_SUB_FANATIC    (1ULL << 14)
+#define AI_SUB_CULT       (1ULL << 15)
+#define AI_SUB_SWARM      (1ULL << 16)
+#define AI_SUB_AQUATIC    (1ULL << 17)
+#define AI_SUB_FIRE       (1ULL << 18)
+#define AI_SUB_ICE        (1ULL << 19)
+#define AI_SUB_STORM      (1ULL << 20)
+#define AI_SUB_EARTH      (1ULL << 21)
+#define AI_SUB_POISON     (1ULL << 22)
+#define AI_SUB_ACID       (1ULL << 23)
+#define AI_SUB_SHADOW     (1ULL << 24)
+#define AI_SUB_HOLY       (1ULL << 25)
+#define AI_SUB_ARCANE     (1ULL << 26)
+#define AI_SUB_PSIONIC    (1ULL << 27)
+#define AI_SUB_MECHANICAL (1ULL << 28)
+#define AI_SUB_CLOCKWORK  (1ULL << 29)
+#define AI_SUB_ANCIENT    (1ULL << 30)
+#define AI_SUB_NOBLE      (1ULL << 31)
+#define AI_SUB_SAVAGE     (1ULL << 32)
+#define AI_SUB_MERCANTILE (1ULL << 33)
+#define AI_SUB_MILITARY   (1ULL << 34)
+#define AI_SUB_SCHOLARLY  (1ULL << 35)
+#define AI_SUB_PRIESTLY   (1ULL << 36)
+#define AI_SUB_BEASTIAL   (1ULL << 37)
+#define AI_SUB_PREDATORY  (1ULL << 38)
+#define AI_SUB_DOMESTIC   (1ULL << 39)
+#define AI_SUB_SLIME      (1ULL << 40)
+#define AI_SUB_PLANTLIKE  (1ULL << 41)
+#define AI_SUB_INSECTOID  (1ULL << 42)
+#define AI_SUB_REPTILIAN  (1ULL << 43)
+#define AI_SUB_AVIAN      (1ULL << 44)
+#define AI_SUB_BANDITRY   (1ULL << 45)
+#define AI_SUB_SOLDIERLY  (1ULL << 46)
+#define AI_SUB_INNKEEPING (1ULL << 47)
+
+#define AI_SUB_GOLEM      AI_SUB_MECHANICAL
+#define AI_SUB_DRACONIC   AI_SUB_REPTILIAN
+#define AI_SUB_ARACHNID   AI_SUB_INSECTOID
+
 
 enum ai_cadence_category { AI_CADENCE_FAST = 0, AI_CADENCE_NORMAL, AI_CADENCE_SLOW };
 
@@ -184,7 +230,7 @@ struct ai_reply_context {
   int personality;
   const struct ai_imtb_profile *profile;
   int archetype;
-  unsigned int subtags;
+  uint64_t subtags;
   const struct ai_archetype_profile *aprof;
   int evil_signaled;
   const char *chosen_core;
@@ -428,7 +474,7 @@ struct ai_conv_actor_state {
   int personality;
   int personality_ready;
   int creature_archetype;
-  unsigned int creature_subtags;
+  uint64_t creature_subtags;
   int creature_archetype_ready;
   long micro_player_id;
   time_t last_micro_ts;
@@ -606,6 +652,7 @@ static const char *const ai_arch_micro_suffix_construct[] = {"query complete.", 
 static const char *const ai_arch_uncertain_construct[] = {"Insufficient local data.", "No route certainty available.", "Cannot verify target from current node.", NULL};
 static const char *const ai_arch_connect_construct[] = {"State request parameters.", "Query accepted.", "Specify objective.", NULL};
 static const struct ai_archetype_profile ai_archetype_profiles[] = {
+  {"unknown", AI_CADENCE_NORMAL, 420, 1100, 0, ai_arch_micro_prefix_default, ai_arch_micro_suffix_default, ai_arch_uncertain_default, ai_arch_connect_default},
   {"aberration", AI_CADENCE_NORMAL, 520, 1250, 2, ai_arch_micro_prefix_default, ai_arch_micro_suffix_default, ai_arch_uncertain_default, ai_arch_connect_default},
   {"beast", AI_CADENCE_FAST, 260, 760, 1, ai_arch_micro_prefix_default, ai_arch_micro_suffix_default, ai_arch_uncertain_default, ai_arch_connect_default},
   {"celestial", AI_CADENCE_NORMAL, 400, 1050, 0, ai_arch_micro_prefix_default, ai_arch_micro_suffix_default, ai_arch_uncertain_default, ai_arch_connect_default},
@@ -620,7 +667,7 @@ static const struct ai_archetype_profile ai_archetype_profiles[] = {
   {"ooze", AI_CADENCE_SLOW, 920, 2100, 0, ai_arch_micro_prefix_default, ai_arch_micro_suffix_default, ai_arch_uncertain_default, ai_arch_connect_default},
   {"plant", AI_CADENCE_SLOW, 860, 1950, 0, ai_arch_micro_prefix_default, ai_arch_micro_suffix_default, ai_arch_uncertain_default, ai_arch_connect_default},
   {"undead", AI_CADENCE_SLOW, 820, 1850, 3, ai_arch_micro_prefix_undead, ai_arch_micro_suffix_undead, ai_arch_uncertain_undead, ai_arch_connect_undead},
-  {"unknown", AI_CADENCE_NORMAL, 420, 1100, 0, ai_arch_micro_prefix_default, ai_arch_micro_suffix_default, ai_arch_uncertain_default, ai_arch_connect_default}
+  {"spirit", AI_CADENCE_SLOW, 700, 1700, 1, ai_arch_micro_prefix_undead, ai_arch_micro_suffix_default, ai_arch_uncertain_default, ai_arch_connect_default}
 };
 
 static struct char_data *ai_find_player_by_idnum_room(struct char_data *mob, long idnum);
@@ -636,6 +683,7 @@ static void ai_pending_reply_clear(struct char_data *mob);
 static int ai_actor_reply_delay_ms(struct char_data *mob, int personality, int evil_signaled, int archetype);
 static void ai_actor_schedule_delayed_player_reply(struct char_data *mob, struct char_data *target, const char *msg, int personality, int evil_signaled, int archetype, time_t now);
 static int ai_try_emit_pending_player_reply(struct char_data *mob, time_t now);
+static void ai_pending_reply_clear_if_player_missing(struct char_data *mob, long player_idnum);
 static int ai_can_speak_now(struct char_data *mob, time_t now);
 static void ai_say(struct char_data *mob, const char *msg, time_t now);
 static void ai_state_refresh_local_topics(struct char_data *mob);
@@ -661,9 +709,9 @@ static unsigned long ai_hash_text_stable(const char *text);
 static int ai_imtb_pick_personality(struct char_data *mob, int role, int style);
 static const struct ai_imtb_profile *ai_imtb_profile_get(int personality);
 static enum ai_creature_archetype ai_detect_creature_archetype(struct char_data *mob);
-static unsigned int ai_detect_creature_subtags(struct char_data *mob);
+static uint64_t ai_detect_creature_subtags(struct char_data *mob);
 static const struct ai_archetype_profile *ai_archetype_profile_get(int archetype);
-static int ai_line_is_legal_with_archetype(const char *line, int role, int style, int archetype, unsigned int subtags);
+static int ai_line_is_legal_with_archetype(const char *line, int role, int style, int archetype, uint64_t subtags);
 static const char *ai_imtb_pick_leadin(struct ai_conv_actor_state *st, const struct ai_reply_context *rctx, int role, int style, unsigned long seed, int *out_suppressed);
 static int ai_imtb_recent_leadin_for_player(struct ai_conv_actor_state *st, long player_idnum, time_t now);
 static void ai_imtb_mark_leadin_for_player(struct ai_conv_actor_state *st, long player_idnum, time_t now);
@@ -747,9 +795,75 @@ static void ai_sanitize_unresolved_tokens(const char *in, char *out, size_t outs
 static const char *ai_epistemic_line(int confidence, int role, int topic_target);
 static const char *ai_service_menu_clarify_line(int role, int style, int evil);
 static const char *ai_service_honest_fallback_line(int role, int topic_target, int archetype);
-static void ai_buf_prefix(char *buf, size_t bufsz, const char *prefix);
-static int ai_text_is_effectively_empty(const char *s);
 static const char *ai_role_neutral_fallback_line(int role, int style, int archetype);
+static void ai_buf_prefix(char *buf, size_t bufsz, const char *prefix);
+static int ai_text_is_effectively_empty(const char *s)
+{
+  const unsigned char *p;
+  int alnum_count = 0;
+  int len = 0;
+
+  if (!s)
+    return TRUE;
+
+  while (*s && isspace((unsigned char)*s))
+    s++;
+  if (!*s)
+    return TRUE;
+
+  for (p = (const unsigned char *)s; *p; p++) {
+    if (isalnum(*p))
+      alnum_count++;
+    len++;
+  }
+
+  if (alnum_count == 0)
+    return TRUE;
+  if (alnum_count < 2 && len <= 3)
+    return TRUE;
+
+  return FALSE;
+}
+
+static int ai_speech_quality_score(const char *s, int *out_has_intent)
+{
+  int alnum = 0, words = 0, in_word = 0, score = 0;
+  int has_service = 0, has_identity = 0, has_qword = 0;
+  const unsigned char *p;
+  static const char *const qwords[] = {"where", "what", "who", "how", "why", NULL};
+  int i;
+
+  if (out_has_intent)
+    *out_has_intent = 0;
+  if (!s || !*s)
+    return 0;
+
+  for (p = (const unsigned char *)s; *p; p++) {
+    if (isalnum(*p)) {
+      alnum++;
+      if (!in_word) { words++; in_word = 1; }
+    } else if (isspace(*p)) {
+      in_word = 0;
+    }
+  }
+
+  has_service = (ai_is_food_drink_query_text(s) || ai_is_supply_query_text(s) || ai_is_training_query_text(s) || ai_is_practice_query_text(s));
+  has_identity = (ai_text_has_sub_ci(s, "who are you") || ai_text_has_sub_ci(s, "what are you") || ai_text_has_sub_ci(s, "your name") || ai_text_has_sub_ci(s, "about yourself") || ai_text_has_sub_ci(s, "what do you do"));
+  for (i = 0; qwords[i]; i++) if (ai_text_has_sub_ci(s, qwords[i])) { has_qword = 1; break; }
+
+  score += MIN(40, alnum * 4);
+  score += MIN(25, words * 6);
+  if (has_service) score += 20;
+  if (has_identity) score += 18;
+  if (has_qword) score += 15;
+  if (score > 100) score = 100;
+
+  if (out_has_intent && (has_service || has_identity || has_qword || words >= 3))
+    *out_has_intent = 1;
+
+  return score;
+}
+
 static int ai_is_self_identity_query(const char *text, int *out_is_human_question);
 static void ai_build_self_identity_line(struct char_data *mob, int role, int archetype, char *out, size_t outsz, int human_question);
 
@@ -900,7 +1014,7 @@ static int ai_actor_reply_delay_ms(struct char_data *mob, int personality, int e
   if (ap) {
     min_ms = ap->delay_min_ms;
     max_ms = ap->delay_max_ms;
-    if (min_ms < 180) min_ms = 180;
+    if (min_ms < 220) min_ms = 220;
     if (max_ms > 3000) max_ms = 3000;
     if (min_ms > max_ms) min_ms = max_ms;
     base = (min_ms + max_ms) / 2;
@@ -931,14 +1045,17 @@ static int ai_actor_reply_delay_ms(struct char_data *mob, int personality, int e
   if (evil_signaled)
     base += 70;
 
-  jitter = rand_number(30, 240);
-  base += jitter;
+  {
+    unsigned long h = ai_hash_mix((unsigned long)(mob ? GET_MOB_VNUM(mob) : 0), (unsigned long)pulse);
+    jitter = 30 + (int)(h % 220UL);
+    base += jitter;
+  }
   if (base < min_ms)
     base = min_ms;
   if (base > max_ms)
     base = max_ms;
-  if (base < 180)
-    base = 180;
+  if (base < 220)
+    base = 220;
   if (base > 3000)
     base = 3000;
   return base;
@@ -967,6 +1084,18 @@ static void ai_actor_schedule_delayed_player_reply(struct char_data *mob, struct
   st->pending_fire_pulse = pulse + ((unsigned long)(((delay_ms * PASSES_PER_SEC) + 999) / 1000));
   if (st->pending_fire_pulse <= pulse)
     st->pending_fire_pulse = pulse + 1;
+}
+
+static void ai_pending_reply_clear_if_player_missing(struct char_data *mob, long player_idnum)
+{
+  struct ai_pending_reply_state *st;
+  if (!mob || player_idnum <= 0)
+    return;
+  st = ai_pending_reply_state_get(mob, 0);
+  if (!st || !st->pending_line[0])
+    return;
+  if (st->pending_type != AI_EVENT_PLAYER_SAY || st->pending_player_idnum == player_idnum)
+    ai_pending_reply_clear(mob);
 }
 
 static int ai_try_emit_pending_player_reply(struct char_data *mob, time_t now)
@@ -2600,7 +2729,14 @@ void ai_actor_refresh_profile(struct char_data *mob, int force)
   }
 
   if (ai_text_has_sub_ci(text, "instructor") || ai_text_has_sub_ci(text, "guildmaster") || ai_text_has_sub_ci(text, "guild master")) {
-    score[ROLE_MERCHANT] += 16;
+    /* REGRESSION GUARD: instructor/guildmaster cues must never boost merchant scoring. */
+#ifdef ROLE_INSTRUCTOR
+    score[ROLE_INSTRUCTOR] += 22;
+#endif
+#ifdef ROLE_GUILDMASTER
+    score[ROLE_GUILDMASTER] += 22;
+#endif
+    score[ROLE_MERCHANT] -= 10;
     if (!(ai_text_has_sub_ci(text, "guard") || ai_text_has_sub_ci(text, "watch") || ai_text_has_sub_ci(text, "patrol") || ai_text_has_sub_ci(text, "constable")))
       score[ROLE_GUARD] -= 24;
   }
@@ -2806,6 +2942,7 @@ void ai_actor_free(struct char_data *mob)
     free(mob->ai_prof);
     mob->ai_prof = NULL;
   }
+  ai_pending_reply_clear(mob);
   if (mob->ai_state) {
     ai_actor_brain_free(mob);
     free(mob->ai_state);
@@ -3809,7 +3946,7 @@ static int ai_line_is_role_legal(const char *line, int role, int style)
   return TRUE;
 }
 
-static int ai_line_is_legal_with_archetype(const char *line, int role, int style, int archetype, unsigned int subtags)
+static int ai_line_is_legal_with_archetype(const char *line, int role, int style, int archetype, uint64_t subtags)
 {
   if (!ai_line_is_role_legal(line, role, style))
     return FALSE;
@@ -4669,27 +4806,6 @@ static int ai_is_gibberish(const char *text)
     return TRUE;
 
   return FALSE;
-}
-
-static int ai_text_is_effectively_empty(const char *s)
-{
-  const unsigned char *p;
-  int alnum_count = 0;
-
-  if (!s)
-    return TRUE;
-
-  while (*s && isspace((unsigned char)*s))
-    s++;
-  if (!*s)
-    return TRUE;
-
-  for (p = (const unsigned char *)s; *p; p++) {
-    if (isalnum(*p))
-      alnum_count++;
-  }
-
-  return (alnum_count <= 1) ? TRUE : FALSE;
 }
 
 static int ai_is_self_identity_query(const char *text, int *out_is_human_question)
@@ -6564,7 +6680,7 @@ static int ai_is_food_drink_query_text(const char *text)
 
 static int ai_is_evil_signaled(const struct char_data *mob)
 {
-  static const char *const evil_kw[] = {"evil", "wicked", "vile", "cruel", "demon", "demonic", "horror", "fiend", "infernal", "damned", "blight", "cursed", "corrupt", "cult", "necro", "undead", "blood", "butcher", "torment", "nightmare", NULL};
+  static const char *const evil_kw[] = {"evil", "wicked", "vile", "cruel", "demon", "demonic", "horror", "fiend", "infernal", "damned", "blight", "cursed", "corrupt", "cult", "necro", "undead", "blood", "butcher", "torment", "nightmare", "abyssal", "necrotic", NULL};
   int i;
 
   if (!mob)
@@ -6586,7 +6702,7 @@ static int ai_is_evil_signaled(const struct char_data *mob)
 static const struct ai_archetype_profile *ai_archetype_profile_get(int archetype)
 {
   int idx = archetype;
-  if (idx < AI_CREATURE_ABERRATION || idx > AI_CREATURE_UNKNOWN)
+  if (idx < AI_CREATURE_UNKNOWN || idx > AI_CREATURE_SPIRIT)
     idx = AI_CREATURE_UNKNOWN;
   return &ai_archetype_profiles[idx];
 }
@@ -6604,7 +6720,7 @@ static enum ai_creature_archetype ai_detect_creature_archetype(struct char_data 
   if (role == ROLE_BEAST)
     return AI_CREATURE_BEAST;
   if (role == ROLE_SPIRIT)
-    return AI_CREATURE_UNDEAD;
+    return AI_CREATURE_SPIRIT;
 
   ai_extract_text(text, sizeof(text), mob);
   if (ai_text_has_sub_ci(text, "construct") || ai_text_has_sub_ci(text, "golem") || ai_text_has_sub_ci(text, "automaton") || ai_text_has_sub_ci(text, "animated armor") || ai_text_has_sub_ci(text, "clockwork"))
@@ -6642,15 +6758,42 @@ static enum ai_creature_archetype ai_detect_creature_archetype(struct char_data 
   return AI_CREATURE_UNKNOWN;
 }
 
-static unsigned int ai_detect_creature_subtags(struct char_data *mob)
+static uint64_t ai_detect_creature_subtags(struct char_data *mob)
 {
   char text[MAX_STRING_LENGTH];
-  unsigned int tags = 0U;
+  uint64_t tags = 0ULL;
   if (!mob)
     return 0U;
   ai_extract_text(text, sizeof(text), mob);
 
   if (ai_text_has_sub_ci(text, "demon")) tags |= AI_SUB_DEMON;
+  if (ai_text_has_sub_ci(text, "seraph")) tags |= AI_SUB_SERAPHIC;
+  if (ai_text_has_sub_ci(text, "were") || ai_text_has_sub_ci(text, "lycan")) tags |= AI_SUB_LYCAN;
+  if (ai_text_has_sub_ci(text, "wraith")) tags |= AI_SUB_WRAITH;
+  if (ai_text_has_sub_ci(text, "wizard") || ai_text_has_sub_ci(text, "mage")) tags |= AI_SUB_WIZARDLY;
+  if (ai_text_has_sub_ci(text, "swarm")) tags |= AI_SUB_SWARM;
+  if (ai_text_has_sub_ci(text, "fire") || ai_text_has_sub_ci(text, "flame")) tags |= AI_SUB_FIRE;
+  if (ai_text_has_sub_ci(text, "ice") || ai_text_has_sub_ci(text, "frost")) tags |= AI_SUB_ICE;
+  if (ai_text_has_sub_ci(text, "storm") || ai_text_has_sub_ci(text, "lightning")) tags |= AI_SUB_STORM;
+  if (ai_text_has_sub_ci(text, "earth") || ai_text_has_sub_ci(text, "stone")) tags |= AI_SUB_EARTH;
+  if (ai_text_has_sub_ci(text, "poison") || ai_text_has_sub_ci(text, "venom")) tags |= AI_SUB_POISON;
+  if (ai_text_has_sub_ci(text, "acid")) tags |= AI_SUB_ACID;
+  if (ai_text_has_sub_ci(text, "shadow")) tags |= AI_SUB_SHADOW;
+  if (ai_text_has_sub_ci(text, "holy") || ai_text_has_sub_ci(text, "radiant")) tags |= AI_SUB_HOLY;
+  if (ai_text_has_sub_ci(text, "arcane") || ai_text_has_sub_ci(text, "eldritch")) tags |= AI_SUB_ARCANE;
+  if (ai_text_has_sub_ci(text, "psion") || ai_text_has_sub_ci(text, "mind")) tags |= AI_SUB_PSIONIC;
+  if (ai_text_has_sub_ci(text, "mechanical")) tags |= AI_SUB_MECHANICAL;
+  if (ai_text_has_sub_ci(text, "ancient")) tags |= AI_SUB_ANCIENT;
+  if (ai_text_has_sub_ci(text, "noble")) tags |= AI_SUB_NOBLE;
+  if (ai_text_has_sub_ci(text, "savage")) tags |= AI_SUB_SAVAGE;
+  if (ai_text_has_sub_ci(text, "military") || ai_text_has_sub_ci(text, "soldier")) tags |= AI_SUB_MILITARY;
+  if (ai_text_has_sub_ci(text, "scholar") || ai_text_has_sub_ci(text, "scribe")) tags |= AI_SUB_SCHOLARLY;
+  if (ai_text_has_sub_ci(text, "priest") || ai_text_has_sub_ci(text, "temple")) tags |= AI_SUB_PRIESTLY;
+  if (ai_text_has_sub_ci(text, "predator")) tags |= AI_SUB_PREDATORY;
+  if (ai_text_has_sub_ci(text, "domestic") || ai_text_has_sub_ci(text, "tame")) tags |= AI_SUB_DOMESTIC;
+  if (ai_text_has_sub_ci(text, "plant") || ai_text_has_sub_ci(text, "vine")) tags |= AI_SUB_PLANTLIKE;
+  if (ai_text_has_sub_ci(text, "reptile") || ai_text_has_sub_ci(text, "lizard")) tags |= AI_SUB_REPTILIAN;
+  if (ai_text_has_sub_ci(text, "bird") || ai_text_has_sub_ci(text, "avian")) tags |= AI_SUB_AVIAN;
   if (ai_text_has_sub_ci(text, "devil")) tags |= AI_SUB_DEVIL;
   if (ai_text_has_sub_ci(text, "yugoloth")) tags |= AI_SUB_YUGOLOTH;
   if (ai_text_has_sub_ci(text, "angel") || ai_text_has_sub_ci(text, "seraph")) tags |= AI_SUB_ANGEL;
@@ -6987,7 +7130,8 @@ static int ai_conv_try_start(struct char_data *mob, time_t now)
 
 static void ai_normalize_text(const char *src, char *dst, size_t dstsz)
 {
-  size_t i, j = 0;
+  size_t si = 0, di = 0, start = 0, end = 0;
+  int saw_space = 0;
 
   if (!dst || dstsz == 0)
     return;
@@ -6995,17 +7139,45 @@ static void ai_normalize_text(const char *src, char *dst, size_t dstsz)
   if (!src)
     return;
 
-  for (i = 0; src[i] && j + 1 < dstsz; i++) {
-    unsigned char c = (unsigned char)src[i];
+  while (src[si] && isspace((unsigned char)src[si]))
+    si++;
+  if (src[si] == '\'' || src[si] == '"' || src[si] == '`')
+    si++;
 
-    if (isalnum(c))
-      dst[j++] = (char)tolower(c);
-    else if (j > 0 && dst[j - 1] != ' ')
-      dst[j++] = ' ';
+  while (src[si] && di + 1 < dstsz) {
+    unsigned char c = (unsigned char)src[si++];
+    if (isspace(c)) {
+      saw_space = 1;
+      continue;
+    }
+    if (saw_space && di > 0 && dst[di - 1] != ' ' && di + 1 < dstsz)
+      dst[di++] = ' ';
+    saw_space = 0;
+    dst[di++] = (char)tolower(c);
   }
-  if (j > 0 && dst[j - 1] == ' ')
-    j--;
-  dst[j] = '\0';
+  dst[di] = '\0';
+
+  while (di > 0 && isspace((unsigned char)dst[di - 1]))
+    dst[--di] = '\0';
+
+  start = 0;
+  while (dst[start] && isspace((unsigned char)dst[start]))
+    start++;
+  if (start > 0) {
+    memmove(dst, dst + start, strlen(dst + start) + 1);
+    di = strlen(dst);
+  }
+
+  end = di;
+  while (end > 0) {
+    unsigned char c = (unsigned char)dst[end - 1];
+    if (c == '.' || c == '?' || c == '!' || c == ',' || c == ';' || c == ':')
+      end--;
+    else
+      break;
+  }
+  if (end < di)
+    dst[end] = '\0';
 }
 
 static int ai_player_speech_classify(const char *text, int *out_confidence, int *out_is_weather)
@@ -7827,20 +7999,22 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
     AI_EVT_RETURN("NULL_PLAYER_SAY");
   ai_normalize_text(text ? text : "", normalized, sizeof(normalized));
   if (type == AI_EVENT_PLAYER_SAY) {
-    char trimmed[256];
-    size_t tlen;
-    const char *start = normalized;
-    while (*start && isspace((unsigned char)*start))
-      start++;
-    snprintf(trimmed, sizeof(trimmed), "%.*s", (int)sizeof(trimmed) - 1, start);
-    tlen = strlen(trimmed);
-    while (tlen > 0 && isspace((unsigned char)trimmed[tlen - 1]))
-      trimmed[--tlen] = '\0';
-    snprintf(normalized, sizeof(normalized), "%.*s", (int)sizeof(normalized) - 1, trimmed);
+    int quality_has_intent = 0;
+    int quality_score = 0;
     if (!normalized[0])
       AI_EVT_RETURN("EMPTY_PLAYER_SAY");
     if (ai_text_is_effectively_empty(normalized))
       AI_EVT_RETURN("NOISE_PLAYER_SAY");
+    quality_score = ai_speech_quality_score(normalized, &quality_has_intent);
+    if (quality_score < 26 && !quality_has_intent) {
+      const char *clar = ai_service_menu_clarify_line(role, style, rctx.evil_signaled);
+      char tiny[300];
+      if (!clar || !*clar)
+        clar = "What do you need: food, water, rest, or gear?";
+      snprintf(tiny, sizeof(tiny), "$n says to %s, '%s'", GET_NAME(actor), clar);
+      ai_actor_schedule_delayed_player_reply(mob, actor, tiny, rctx.personality, rctx.evil_signaled, rctx.archetype, now);
+      AI_EVT_RETURN("LOW_QUALITY_CLARIFY");
+    }
     self_identity_query = ai_is_self_identity_query(normalized, &self_identity_human_query);
   }
   attention_score = ai_attention_score(mob, type, actor, normalized, now);
@@ -8492,6 +8666,7 @@ void ai_actor_event_leave(struct char_data *actor, room_rnum room)
         ai_dbg_evt(mob, "RETURN_NOT_READY", AI_EVENT_PLAYER_LEAVE, actor, "");
         continue;
       }
+      ai_pending_reply_clear_if_player_missing(mob, GET_IDNUM(actor));
       ai_dbg_evt(mob, "DISPATCH", AI_EVENT_PLAYER_LEAVE, actor, "");
       ai_actor_on_room_event(mob, AI_EVENT_PLAYER_LEAVE, actor, NULL);
     }
