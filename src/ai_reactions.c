@@ -71,7 +71,7 @@ static const char *const rx_processing_generic[] = {
   "$n pauses, weighing your words.", "$n tilts $s head, considering.", "$n breathes out, thinking.",
   "$n studies you in silence.", "$n glances aside, then back.", "$n keeps still for a beat.",
   "$n folds $s hands and listens.", "$n nods once, slowly.", "$n narrows $s gaze in thought.",
-  "$n taps two fingers, mulling it over.", NULL
+  "$n taps two fingers, mulling it over.", "$n lets out a slow breath through the nose.", "$n's eyes move as if reading something only $e can see.", "$n closes $s eyes for a moment and opens them again.", "$n holds the silence before answering.", "$n turns the question over, visible in $s expression.", NULL
 };
 static const char *const rx_eval_guard[] = {
   "$n scans the room and rechecks you.", "$n squares $s shoulders and evaluates the risk.",
@@ -100,17 +100,17 @@ static const char *const rx_moral_evil[] = {
 static const char *const rx_boundary[] = {
   "$n gives you a flat look.", "$n steps back, unimpressed.", "$n raises a hand in refusal.",
   "$n's expression hardens: no.", "$n turns the conversation away.", "$n does not indulge that.",
-  "$n's answer is firm and final.", "$n keeps a respectful distance.", NULL
+  "$n's answer is firm and final.", "$n keeps a respectful distance.", "$n draws a quiet line.", "$n declines with neither cruelty nor apology.", "$n holds the boundary with calm certainty.", "$n makes it clear without making it a scene.", NULL
 };
 static const char *const rx_confusion[] = {
   "$n blinks, uncertain.", "$n tilts $s head, puzzled.", "$n mouths a quiet, 'what?'", "$n squints at the nonsense.",
-  "$n waits for a clearer question.", NULL
+  "$n waits for a clearer question.", "$n looks like $e's replaying what you said.", "$n exhales through $s nose, trying.", "$n's eyebrow lifts and stays there.", "$n opens $s mouth, closes it, tries again.", NULL
 };
 static const char *const rx_escalation[] = {
-  "$n's posture hardens.", "$n points to the door, stern.", "$n's patience runs out.", "$n stands taller, warning clear.", NULL
+  "$n's posture hardens.", "$n points to the door, stern.", "$n's patience runs out.", "$n stands taller, warning clear.", "$n's tolerance reaches its floor.", "$n closes the gap between polite and done.", "$n's next move is not a warning.", "$n steps forward once, deliberately.", "$n signals: this ends now.", NULL
 };
 static const char *const rx_de_escalation[] = {
-  "$n eases $s stance a little.", "$n lowers $s voice and steadies the room.", "$n gestures for calm.", "$n nods, tension fading.", NULL
+  "$n eases $s stance a little.", "$n lowers $s voice and steadies the room.", "$n gestures for calm.", "$n nods, tension fading.", "$n opens $s hands and drops $s shoulders.", "$n exhales and lets the edge go.", "$n pulls the temperature in the room down by a degree.", "$n offers a small, steadying nod.", "$n makes room for the situation to breathe.", NULL
 };
 static const char *const rx_intrusion[] = {
   "$n shields $s belongings with a sharp look.", "$n guards the counter with both hands.", "$n gives a hard no to that idea.", NULL
@@ -118,7 +118,7 @@ static const char *const rx_intrusion[] = {
 static const char *const rx_service_refusal[] = {
   "No.", "Not happening.", "Ask something lawful.", "Try a different request.", NULL
 };
-static const char *const rx_silent_stare[] = { "$n just stares.", "$n says nothing.", "$n remains unreadable.", NULL };
+static const char *const rx_silent_stare[] = { "$n just stares.", "$n says nothing.", "$n remains unreadable.", "$n's silence is complete.", "$n lets the quiet do the work.", "$n holds the stare without blinking.", "$n watches without engaging.", NULL };
 static const char *const rx_tiny[] = { "Hm.", "Tch.", "Hmph.", "No.", NULL };
 
 static const char *const rx_one_liner[] = {
