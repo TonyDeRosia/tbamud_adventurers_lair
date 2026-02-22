@@ -970,7 +970,6 @@ enum ai_emote_kind {
 struct ai_player_arb_entry {
   room_rnum room;
   long actor_id;
-  long mob_id;
   enum ai_event_type type;
   unsigned long text_hash;
   time_t created_at;
@@ -3932,7 +3931,7 @@ static int ai_line_is_role_legal(const char *line, int role, int style)
     "watch", "patrol", "garrison", "duty", "post", "orders", "formation", "report in", "standing watch", NULL
   };
   static const char *const merchant_only_tokens[] = {
-    "stock", "fresh stock", "wares", "bargain", "trade", "trader", "profit", "sale", "price", "coinwise", "buy", "sell", NULL
+    "stock", "fresh stock", "wares", "bargain", "trade", "trader", "profit", "sale", "price", "prices", "coinwise", "coin", "buy", "sell", "quote", "quoted", "purchase", NULL
   };
   static const char *const innkeeper_only_tokens[] = {
     "room for the night", "beds", "ale on tap", "mug", "stables", "bar tab", "lodging", NULL
@@ -7801,7 +7800,7 @@ static void ai_room_ambient_record(room_rnum room, unsigned long hash, time_t no
   rc->updated_at = now;
 }
 
-static struct ai_player_arb_entry *ai_player_arb_lookup(room_rnum room, long actor_id, long mob_id, enum ai_event_type type, unsigned long text_hash, time_t now)
+static struct ai_player_arb_entry *ai_player_arb_lookup(room_rnum room, long actor_id, enum ai_event_type type, unsigned long text_hash, time_t now)
 {
   int i;
 
@@ -7811,20 +7810,20 @@ static struct ai_player_arb_entry *ai_player_arb_lookup(room_rnum room, long act
       memset(e, 0, sizeof(*e));
     if (e->created_at <= 0)
       continue;
-    if (e->room == room && e->actor_id == actor_id && e->mob_id == mob_id && e->type == type && e->text_hash == text_hash)
+    if (e->room == room && e->actor_id == actor_id && e->type == type && e->text_hash == text_hash)
       return e;
   }
 
   return NULL;
 }
 
-static struct ai_player_arb_entry *ai_player_arb_get_or_create(room_rnum room, long actor_id, long mob_id, enum ai_event_type type, unsigned long text_hash, time_t now)
+static struct ai_player_arb_entry *ai_player_arb_get_or_create(room_rnum room, long actor_id, enum ai_event_type type, unsigned long text_hash, time_t now)
 {
   struct ai_player_arb_entry *found;
   int i;
   int oldest = 0;
 
-  found = ai_player_arb_lookup(room, actor_id, mob_id, type, text_hash, now);
+  found = ai_player_arb_lookup(room, actor_id, type, text_hash, now);
   if (found)
     return found;
 
@@ -7840,7 +7839,6 @@ static struct ai_player_arb_entry *ai_player_arb_get_or_create(room_rnum room, l
   memset(&ai_player_arb_cache[oldest], 0, sizeof(ai_player_arb_cache[oldest]));
   ai_player_arb_cache[oldest].room = room;
   ai_player_arb_cache[oldest].actor_id = actor_id;
-  ai_player_arb_cache[oldest].mob_id = mob_id;
   ai_player_arb_cache[oldest].type = type;
   ai_player_arb_cache[oldest].text_hash = text_hash;
   ai_player_arb_cache[oldest].created_at = now;
@@ -7860,7 +7858,7 @@ static int ai_actor_room_response_slot(struct char_data *mob, struct char_data *
     return FALSE;
 
   text_hash = ai_text_hash_simple(normalized);
-  arb = ai_player_arb_get_or_create(IN_ROOM(mob), GET_IDNUM(actor), GET_IDNUM(mob), type, text_hash, now);
+  arb = ai_player_arb_get_or_create(IN_ROOM(mob), GET_IDNUM(actor), type, text_hash, now);
   if (!arb)
     return FALSE;
 
@@ -7880,7 +7878,7 @@ static int ai_actor_room_response_slot(struct char_data *mob, struct char_data *
       struct ai_conv_actor_state *it_conv = ai_conv_actor_state_get(it, 0);
       time_t it_last_reply = it_e ? it_e->last_reply_time : 0;
       if (type == AI_EVENT_PLAYER_SAY && it_conv && it_conv->last_player_idnum == GET_IDNUM(actor) &&
-          (now - it_conv->last_player_say_reply_at) < AI_PER_PLAYER_REPLY_COOLDOWN_SECS)
+          (now - it_conv->last_player_say_reply_at) < 1)
         continue;
       if (type != AI_EVENT_PLAYER_SAY && (now - it_last_reply) < AI_PER_PLAYER_REPLY_COOLDOWN_SECS)
         continue;
@@ -7902,6 +7900,9 @@ static int ai_actor_room_response_slot(struct char_data *mob, struct char_data *
       top2 = it;
     }
   }
+
+  if (!top1 && IS_NPC(mob) && MOB_FLAGGED(mob, MOB_AI_ACTOR) && mob->ai_prof && mob->ai_state && IN_ROOM(mob) == IN_ROOM(actor))
+    top1 = mob;
 
   arb->responder1 = top1;
   arb->responder2 = top2;
@@ -8663,7 +8664,7 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
     AI_EVT_RETURN("ARB_SLOT_DENIED");
 
   if (type == AI_EVENT_PLAYER_SAY && IN_ROOM(mob) != NOWHERE) {
-    struct ai_player_arb_entry *arb = ai_player_arb_lookup(IN_ROOM(mob), GET_IDNUM(actor), GET_IDNUM(mob), type, ai_text_hash_simple(normalized), now);
+    struct ai_player_arb_entry *arb = ai_player_arb_lookup(IN_ROOM(mob), GET_IDNUM(actor), type, ai_text_hash_simple(normalized), now);
     if (arb) {
       if (mob == arb->responder2)
         avoid_template_id = arb->responder1_template_id;
@@ -8674,7 +8675,7 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
   {
     time_t last_reply = sr ? sr->last_reply_time : e->last_reply_time;
     if (type == AI_EVENT_PLAYER_SAY && conv_st && conv_st->last_player_idnum == GET_IDNUM(actor) &&
-        (now - conv_st->last_player_say_reply_at) < AI_PER_PLAYER_REPLY_COOLDOWN_SECS)
+        (now - conv_st->last_player_say_reply_at) < 1)
       AI_EVT_RETURN("PER_PLAYER_SAY_REPLY_COOLDOWN");
     if (type != AI_EVENT_PLAYER_SAY && (now - last_reply) < AI_PER_PLAYER_REPLY_COOLDOWN_SECS)
       AI_EVT_RETURN("PER_PLAYER_REPLY_COOLDOWN");
@@ -9029,7 +9030,7 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
     }
 
     if (type == AI_EVENT_PLAYER_SAY && selected_template_id >= 0 && IN_ROOM(mob) != NOWHERE) {
-      struct ai_player_arb_entry *arb = ai_player_arb_lookup(IN_ROOM(mob), GET_IDNUM(actor), GET_IDNUM(mob), type, ai_text_hash_simple(normalized), now);
+      struct ai_player_arb_entry *arb = ai_player_arb_lookup(IN_ROOM(mob), GET_IDNUM(actor), type, ai_text_hash_simple(normalized), now);
       if (arb) {
         if (mob == arb->responder1)
           arb->responder1_template_id = selected_template_id;
