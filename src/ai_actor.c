@@ -917,10 +917,12 @@ static uint32_t ai_intent_required_capability(enum ai_explicit_intent ex);
 static int ai_intent_is_service(enum ai_explicit_intent ex);
 static ai_personality ai_personality_from_role(struct char_data *mob, int role, int archetype);
 static struct ai_multi_intent ai_detect_multi_intent(const char *text, int speech_class, int domain, int self_identity_query);
+static const char *ai_pick_line_from_pool(struct char_data *mob, const char *const *pool, int pool_len, unsigned long salt);
 static const char *ai_meta_response_line(struct char_data *mob, int role, int style, enum ai_explicit_intent ex, int mood);
-static const char *ai_social_escalation_line(int role, enum ai_explicit_intent ex, int mood);
+static const char *ai_social_escalation_line(struct char_data *mob, int role, enum ai_explicit_intent ex, int mood);
 static struct ai_room_ambient_cache *ai_room_ambient_cache_get(room_rnum room, int create);
 static int ai_room_ambient_seen_recent(room_rnum room, unsigned long hash, time_t now);
+static int ai_room_ambient_seen_recent_within(room_rnum room, unsigned long hash, time_t now, int window_secs);
 static void ai_room_ambient_record(room_rnum room, unsigned long hash, time_t now);
 static void ai_working_mem_push(struct ai_working_mem_entry *mem, int *head, int *count, int *next_id, long player_idnum, const char *text, int intent, int topic_target, int speech_act, int domain, time_t now, int *out_event_id);
 static void ai_working_mem_mark_answered(struct ai_working_mem_entry *mem, int count, int head, int event_id);
@@ -929,7 +931,7 @@ static void ai_resolve_world_facts(struct char_data *mob, struct char_data *acto
 static void ai_slot_replace(const char *in, const struct ai_world_facts *f, char *out, size_t outsz);
 static void ai_sanitize_unresolved_tokens(const char *in, char *out, size_t outsz);
 static const char *ai_epistemic_line(int confidence, int role, int topic_target);
-static const char *ai_service_menu_clarify_line(int role, int style, int evil);
+static const char *ai_service_menu_clarify_line(struct char_data *mob, int role, int style, int evil, int archetype, int personality);
 static const char *ai_service_honest_fallback_line(int role, int topic_target, int archetype);
 static const char *ai_role_neutral_fallback_line(int role, int style, int archetype);
 static void ai_buf_prefix(char *buf, size_t bufsz, const char *prefix);
@@ -941,7 +943,7 @@ static int ai_is_empathy_phrase(const char *text);
 static int ai_is_money_job_phrase(const char *text);
 static int ai_has_trailing_question(const char *text);
 static int ai_is_questionish_greeting(const char *text);
-static const char *ai_social_prompt_line(struct char_data *mob, int role, int style, enum ai_explicit_intent ex, int mood);
+static const char *ai_social_prompt_line(struct char_data *mob, int role, int style, enum ai_explicit_intent ex, int mood, int archetype, int personality);
 static int ai_count_multi_service_hits(const char *text, int *has_food, int *has_money);
 static int ai_text_is_effectively_empty(const char *s)
 {
@@ -3339,6 +3341,58 @@ static unsigned long ai_hash_text_stable(const char *text)
   return h;
 }
 
+static const char *ai_pick_line_from_pool(struct char_data *mob, const char *const *pool, int pool_len, unsigned long salt)
+{
+  unsigned long seed;
+  int count = 0;
+  int pick;
+  int alt = -1;
+  int i;
+  time_t now = time(0);
+
+  if (!pool)
+    return NULL;
+  if (pool_len <= 0) {
+    while (pool[count])
+      count++;
+  } else
+    count = pool_len;
+  if (count <= 0)
+    return NULL;
+
+  seed = ai_hash_mix((unsigned long)(mob ? GET_MOB_VNUM(mob) : 0), salt);
+  if (mob) {
+    seed = ai_hash_mix(seed, (unsigned long)GET_IDNUM(mob));
+    if (mob->ai_prof) {
+      seed = ai_hash_mix(seed, (unsigned long)mob->ai_prof->role);
+      seed = ai_hash_mix(seed, (unsigned long)mob->ai_prof->style);
+    }
+  }
+
+  pick = (int)(seed % (unsigned long)count);
+  if (mob && IN_ROOM(mob) != NOWHERE) {
+    unsigned long h = ai_hash_text_stable(pool[pick]);
+    if (ai_debug)
+      ai_debug_log("AI_POOL_PICK vnum=%d room=%d role=%d style=%d align=%d personality=%d archetype=%d salt=%lu idx=%d", GET_MOB_VNUM(mob), IN_ROOM(mob), (mob->ai_prof ? mob->ai_prof->role : -1), (mob->ai_prof ? mob->ai_prof->style : -1), GET_ALIGNMENT(mob), (ai_conv_actor_state_get(mob,0) ? ai_conv_actor_state_get(mob,0)->personality : -1), (ai_conv_actor_state_get(mob,0) ? ai_conv_actor_state_get(mob,0)->creature_archetype : -1), salt, pick);
+    if (ai_room_ambient_seen_recent_within(IN_ROOM(mob), h, now, 30)) {
+      for (i = 1; i < count; i++) {
+        int idx2 = (pick + i) % count;
+        if (!pool[idx2] || !*pool[idx2])
+          continue;
+        if (!ai_room_ambient_seen_recent_within(IN_ROOM(mob), ai_hash_text_stable(pool[idx2]), now, 30)) {
+          alt = idx2;
+          break;
+        }
+      }
+      if (alt >= 0)
+        pick = alt;
+    }
+    ai_room_ambient_record(IN_ROOM(mob), ai_hash_text_stable(pool[pick]), now);
+  }
+  return pool[pick];
+}
+
+
 
 static const struct ai_imtb_profile *ai_imtb_profile_get(int personality)
 {
@@ -4280,7 +4334,7 @@ static const char *ai_select_content_for_intention(struct char_data *mob, const 
 
     if (effective_goal == GOAL_CLARIFY) {
       if (rctx && (rctx->domain == DOMAIN_SERVICES || rctx->domain == DOMAIN_SHOPPING || rctx->domain == DOMAIN_DIRECTIONS)) {
-        cands[n++] = ai_service_menu_clarify_line(role, style, rctx->evil_signaled);
+        cands[n++] = ai_service_menu_clarify_line(mob, role, style, rctx->evil_signaled, rctx->archetype, rctx->personality);
       } else {
         for (i = 0; clarify_pool[i] && n < 48; i++) cands[n++] = clarify_pool[i];
       }
@@ -4984,6 +5038,9 @@ static void ai_build_self_identity_line(struct char_data *mob, int role, int arc
   const char *align;
   const char *name;
   int has_proper_name = FALSE;
+  int personality = ai_imtb_pick_personality(mob, role, (mob && mob->ai_prof) ? mob->ai_prof->style : 0);
+  unsigned long salt = ai_hash_mix((unsigned long)role, (unsigned long)(archetype * 17 + personality));
+  const char *variant = NULL;
 
   if (!out || outsz == 0)
     return;
@@ -4996,14 +5053,15 @@ static void ai_build_self_identity_line(struct char_data *mob, int role, int arc
 
   if (human_question) {
     if (archetype == AI_CREATURE_HUMANOID)
-      snprintf(out, outsz, "Yes. I'm humanoid.");
+      variant = ai_pick_line_from_pool(mob, (const char *const[]){"Yes. I'm humanoid.", "Aye. Humanoid, plainly.", "Yes—humanoid by form.", NULL}, 3, ai_hash_mix(salt, 3));
     else if (archetype == AI_CREATURE_UNDEAD || archetype == AI_CREATURE_FIEND || archetype == AI_CREATURE_CONSTRUCT ||
              archetype == AI_CREATURE_OOZE || archetype == AI_CREATURE_BEAST || archetype == AI_CREATURE_ABERRATION ||
              archetype == AI_CREATURE_DRAGON || archetype == AI_CREATURE_ELEMENTAL || archetype == AI_CREATURE_GIANT ||
              archetype == AI_CREATURE_MONSTROSITY || archetype == AI_CREATURE_PLANT)
-      snprintf(out, outsz, "No. I'm not human.");
+      variant = ai_pick_line_from_pool(mob, (const char *const[]){"No. I'm not human.", "No. Not human at all.", "No. I am something other than human.", NULL}, 3, ai_hash_mix(salt, 5));
     else
-      snprintf(out, outsz, "I'm not certain what I am.");
+      variant = ai_pick_line_from_pool(mob, (const char *const[]){"I'm not certain what I am.", "Hard to name exactly what I am.", "I don't carry a clean answer to that.", NULL}, 3, ai_hash_mix(salt, 7));
+    snprintf(out, outsz, "%s", variant ? variant : "I'm not certain what I am.");
     return;
   }
 
@@ -6976,15 +7034,62 @@ static uint64_t ai_detect_creature_subtags(struct char_data *mob)
   return tags;
 }
 
-static const char *ai_service_menu_clarify_line(int role, int style, int evil)
+static const char *ai_service_menu_clarify_line(struct char_data *mob, int role, int style, int evil, int archetype, int personality)
 {
+  static const char *const evil_pool[] = {
+    "Pick one: food, water, inn, weapons, supplies, guards, or training?",
+    "One at a time: food, water, inn, weapons, supplies, guards, or practice?",
+    "Choose clearly: food, water, inn, weapons, supplies, guards, or train?",
+    NULL
+  };
+  static const char *const guard_pool[] = {
+    "State it clean: food, water, inn, weapons, supplies, guards, or training?",
+    "Be specific: food, water, inn, weapons, supplies, guards, or practice?",
+    "Name your need: food, water, inn, weapons, supplies, guards, or train?",
+    NULL
+  };
+  static const char *const merchant_pool[] = {
+    "What are you after: food, water, inn, weapons, supplies, guards, or training?",
+    "Do you need food, water, an inn, weapons, supplies, guards, or practice?",
+    "Point me to it: food, water, inn, weapons, supplies, guards, or train?",
+    NULL
+  };
+  static const char *const beast_pool[] = {
+    "*a low growl asks for one scent: food, water, inn, weapons, supplies, or guards?*",
+    "*the beast huffs: food, water, inn, weapons, supplies, or guards?*",
+    "*it tilts its head: food, water, inn, weapons, supplies, or training?*",
+    NULL
+  };
+  static const char *const spirit_pool[] = {
+    "Name one thread: food, water, inn, weapons, supplies, guards, or training?",
+    "Speak one need: food, water, inn, weapons, supplies, guards, or practice?",
+    "One request only: food, water, inn, weapons, supplies, guards, or train?",
+    NULL
+  };
+  static const char *const personality_pool[][3] = {
+    {"Do you mean food, water, inn, weapons, supplies, guards, or training?", "Pick one need: food, water, inn, weapons, supplies, guards, or practice?", "Be direct: food, water, inn, weapons, supplies, guards, or train?"},
+    {"Happy to help—food, water, inn, weapons, supplies, guards, or training?", "Sure thing. Food, water, inn, weapons, supplies, guards, or practice?", "Let's sort it out: food, water, inn, weapons, supplies, guards, or train?"},
+    {"Keep it short: food, water, inn, weapons, supplies, guards, or training?", "One need only: food, water, inn, weapons, supplies, guards, or practice?", "Quickly—food, water, inn, weapons, supplies, guards, or train?"},
+    {"Riddle me this: food, water, inn, weapons, supplies, guards, or training?", "Which tune today—food, water, inn, weapons, supplies, guards, or practice?", "Your verse says what: food, water, inn, weapons, supplies, guards, or train?"},
+    {"Say one exact thing: food, water, inn, weapons, supplies, guards, or training?", "Specifics only: food, water, inn, weapons, supplies, guards, or practice?", "No blur: food, water, inn, weapons, supplies, guards, or train?"},
+    {"Classify your ask: food, water, inn, weapons, supplies, guards, or training?", "Identify category: food, water, inn, weapons, supplies, guards, or practice?", "Select one service: food, water, inn, weapons, supplies, guards, or train?"},
+    {"Choose your rite: food, water, inn, weapons, supplies, guards, or training?", "Declare one need: food, water, inn, weapons, supplies, guards, or practice?", "Speak one omen: food, water, inn, weapons, supplies, guards, or train?"}
+  };
+  unsigned long salt = ai_hash_mix((unsigned long)style, (unsigned long)(role * 37 + archetype * 11 + personality));
+
   if (evil)
-    return "Pick one: food, weapons, armor, or general supplies.";
-  if (role == ROLE_MERCHANT && style == 1)
-    return "Do you mean food, weapons, armor, or general supplies?";
-  if (role == ROLE_BANDIT)
-    return "Say it plain: food, weapons, armor, or general supplies.";
-  return "Do you mean food, weapons, armor, or general supplies?";
+    return ai_pick_line_from_pool(mob, evil_pool, 3, ai_hash_mix(salt, 7));
+  if (archetype == AI_CREATURE_BEAST)
+    return ai_pick_line_from_pool(mob, beast_pool, 3, ai_hash_mix(salt, 13));
+  if (archetype == AI_CREATURE_SPIRIT || archetype == AI_CREATURE_UNDEAD)
+    return ai_pick_line_from_pool(mob, spirit_pool, 3, ai_hash_mix(salt, 17));
+  if (role == ROLE_GUARD)
+    return ai_pick_line_from_pool(mob, guard_pool, 3, ai_hash_mix(salt, 23));
+  if (role == ROLE_MERCHANT || (role == ROLE_MERCHANT && style == 1))
+    return ai_pick_line_from_pool(mob, merchant_pool, 3, ai_hash_mix(salt, 29));
+  if (personality >= IMTB_STOIC && personality < IMTB_MAX)
+    return ai_pick_line_from_pool(mob, personality_pool[personality], 3, ai_hash_mix(salt, 31));
+  return "Do you mean food, water, inn, weapons, supplies, guards, or training?";
 }
 
 static void ai_state_refresh_local_topics(struct char_data *mob)
@@ -7442,15 +7547,15 @@ static int ai_count_multi_service_hits(const char *text, int *has_food, int *has
   return hits;
 }
 
-static const char *ai_social_prompt_line(struct char_data *mob, int role, int style, enum ai_explicit_intent ex, int mood)
+static const char *ai_social_prompt_line(struct char_data *mob, int role, int style, enum ai_explicit_intent ex, int mood, int archetype, int personality)
 {
-  (void)style;
+  unsigned long salt = ai_hash_mix((unsigned long)(role * 17 + style), (unsigned long)(personality * 13 + archetype));
   if (ex == INTENT_GREETING || ex == INTENT_ATTENTION) {
-    if (role == ROLE_GUARD) return "Hail. I'm on watch--what do you need?";
-    if (role == ROLE_MERCHANT) return "Hello there. Need goods, rest, or directions?";
-    if (mob && MOB_FLAGGED(mob, MOB_GUILD_MASTER)) return "Greetings. If you train, be precise.";
-    if (role == ROLE_BANDIT) return "Yeah, I'm here. Talk fast.";
-    return "Hello. What can I do for you?";
+    if (role == ROLE_GUARD) return ai_pick_line_from_pool(mob, (const char *const[]){"Hail. I'm on watch--what do you need?", "State your business. Keep it clear.", "Watch is active. What's your need?", NULL}, 3, ai_hash_mix(salt, 3));
+    if (role == ROLE_MERCHANT) return ai_pick_line_from_pool(mob, (const char *const[]){"Hello there. Need goods, rest, or directions?", "Welcome. Shopping, lodging, or a route?", "Greetings. Looking for wares, a room, or guidance?", NULL}, 3, ai_hash_mix(salt, 5));
+    if (mob && MOB_FLAGGED(mob, MOB_GUILD_MASTER)) return ai_pick_line_from_pool(mob, (const char *const[]){"Greetings. If you train, be precise.", "Hail. Name the skill you seek.", "Welcome. Speak clearly if you want instruction.", NULL}, 3, ai_hash_mix(salt, 7));
+    if (role == ROLE_BANDIT) return ai_pick_line_from_pool(mob, (const char *const[]){"Yeah, I'm here. Talk fast.", "You got words? Make them quick.", "I'm listening. Don't waste it.", NULL}, 3, ai_hash_mix(salt, 11));
+    return ai_pick_line_from_pool(mob, (const char *const[]){"Hello. What can I do for you?", "Greetings. What do you need?", "Hail. Ask and I'll answer if I can.", NULL}, 3, ai_hash_mix(salt, 13));
   }
   if (ex == INTENT_CHAT_REQUEST) {
     if (role == ROLE_GUARD) return "All right, let's talk. Need directions, safety advice, or work leads?";
@@ -7459,7 +7564,7 @@ static const char *ai_social_prompt_line(struct char_data *mob, int role, int st
     return "Sure, let's talk. What do you want to start with?";
   }
   if (ex == INTENT_HELP_REQUEST)
-    return "I can help. What do you need most: food, rest, training, supplies, or directions?";
+    return ai_pick_line_from_pool(mob, (const char *const[]){"I can help. What do you need most: food, rest, training, supplies, or directions?", "Say your need: food, water, inn, training, supplies, or directions?", "Let's narrow it: food, rest, training, supplies, guards, or route?", NULL}, 3, ai_hash_mix(salt, 17));
   if (ex == INTENT_THOUGHTS) {
     if (role == ROLE_GUARD) return "Right now I'm watching the road and keeping the peace.";
     if (role == ROLE_MERCHANT) return "Right now I'm tracking stock, coin, and who needs what.";
@@ -7475,7 +7580,7 @@ static const char *ai_social_prompt_line(struct char_data *mob, int role, int st
     if (role == ROLE_GUARD) return "For coin, look for lawful work: errands, bounties, or market labor.";
     if (role == ROLE_MERCHANT) return "Earn coin by selling loot, trading cleanly, or helping at market stalls.";
     if (mob && MOB_FLAGGED(mob, MOB_GUILD_MASTER)) return "Train to stay alive, then take steady work in town for coin.";
-    return "Look for honest work in town and keep your coin secure.";
+    return ai_pick_line_from_pool(mob, (const char *const[]){"Look for honest work in town and keep your coin secure.", "Coin comes from steady labor, clean trade, and survival.", "Take work, keep your head, and protect your purse.", NULL}, 3, ai_hash_mix(salt, 19));
   }
   return NULL;
 }
@@ -8057,6 +8162,18 @@ static struct ai_multi_intent ai_detect_multi_intent(const char *text, int speec
     out.secondary_intent = INTENT_SERVICE_TRAINING;
   else if (ai_text_has_sub_ci(text, "food") || ai_text_has_sub_ci(text, "eat") || ai_text_has_sub_ci(text, "meal"))
     out.secondary_intent = INTENT_SERVICE_FOOD;
+  else if (ai_text_has_sub_ci(text, "water") || ai_text_has_sub_ci(text, "drink") || ai_text_has_sub_ci(text, "thirst"))
+    out.secondary_intent = INTENT_SERVICE_WATER;
+  else if (ai_text_has_sub_ci(text, "inn") || ai_text_has_sub_ci(text, "tavern") || ai_text_has_sub_ci(text, "room"))
+    out.secondary_intent = INTENT_SERVICE_INN;
+  else if (ai_text_has_sub_ci(text, "rest") || ai_text_has_sub_ci(text, "sleep") || ai_text_has_sub_ci(text, "bed"))
+    out.secondary_intent = INTENT_SERVICE_REST;
+  else if (ai_text_has_sub_ci(text, "weapon") || ai_text_has_sub_ci(text, "armory") || ai_text_has_sub_ci(text, "blacksmith"))
+    out.secondary_intent = INTENT_SERVICE_WEAPONS;
+  else if (ai_text_has_sub_ci(text, "supplies") || ai_text_has_sub_ci(text, "gear") || ai_text_has_sub_ci(text, "shop"))
+    out.secondary_intent = INTENT_SERVICE_SUPPLIES;
+  else if (ai_text_has_sub_ci(text, "guard") || ai_text_has_sub_ci(text, "constable") || ai_text_has_sub_ci(text, "watch"))
+    out.secondary_intent = INTENT_SERVICE_GUARDS;
   else if (ai_is_money_job_phrase(text))
     out.secondary_intent = INTENT_MONEY_JOB;
 
@@ -8068,6 +8185,10 @@ static const char *ai_role_service_fallback_line(int role, int style, enum ai_ex
   (void)style;
   if (ex == INTENT_ILLEGAL_SLAVERY_REQUEST)
     return NULL;
+  if (role == ROLE_BEAST)
+    return "*the beast gives no trade answer, only a wary stare*";
+  if (role == ROLE_SPIRIT || role == ROLE_UNDEAD)
+    return "I do not keep mortal services. Seek the living in the square.";
   if (role == ROLE_GUARD)
     return "Try the market to the south, and keep to the roads.";
   if (role == ROLE_MERCHANT)
@@ -8081,30 +8202,37 @@ static const char *ai_role_service_fallback_line(int role, int style, enum ai_ex
 
 static const char *ai_meta_response_line(struct char_data *mob, int role, int style, enum ai_explicit_intent ex, int mood)
 {
-  (void)style;
+  static const char *const neutral_pool[] = {
+    "I think about my duties here.",
+    "I keep my mind on the work in front of me.",
+    "I focus on what this place needs.",
+    NULL
+  };
+  int personality = ai_imtb_pick_personality(mob, role, style);
   (void)ex;
   if (role == ROLE_GUARD)
-    return "I think about keeping the peace and watching the roads.";
+    return ai_pick_line_from_pool(mob, (const char *const[]){"I think about keeping the peace and watching the roads.", "I track trouble before it reaches the gate.", "I keep law, roads, and watch rotations in mind.", NULL}, 3, 101);
   if (role == ROLE_MERCHANT)
-    return "I think about prices, stock, and who needs what.";
+    return ai_pick_line_from_pool(mob, (const char *const[]){"I think about prices, stock, and who needs what.", "I count coin, inventory, and timing.", "I plan supply, demand, and fair margin.", NULL}, 3, 103 + personality);
   if (mob && MOB_FLAGGED(mob, MOB_GUILD_MASTER))
-    return "I think about discipline and improvement.";
+    return ai_pick_line_from_pool(mob, (const char *const[]){"I think about discipline and improvement.", "I think about drills and steady growth.", "I think about technique and survival.", NULL}, 3, 107);
   if (role == ROLE_UNDEAD)
-    return "I think of nothing living.";
+    return ai_pick_line_from_pool(mob, (const char *const[]){"I think of nothing living.", "I remember cold vows and older dust.", "I keep to old silence and older hunger.", NULL}, 3, 109);
   if (role == ROLE_BANDIT)
-    return (mood >= AI_SOCIAL_ANNOYED) ? "I think about exits and purses. Move along." : "I keep my own counsel.";
-  return "I think about my duties here.";
+    return (mood >= AI_SOCIAL_ANNOYED) ? "I think about exits and purses. Move along." : ai_pick_line_from_pool(mob, (const char *const[]){"I keep my own counsel.", "I mind roads, coin, and sharp chances.", "I watch hands more than words.", NULL}, 3, 113);
+  return ai_pick_line_from_pool(mob, neutral_pool, 3, 127 + personality);
 }
 
-static const char *ai_social_escalation_line(int role, enum ai_explicit_intent ex, int mood)
+static const char *ai_social_escalation_line(struct char_data *mob, int role, enum ai_explicit_intent ex, int mood)
 {
+  unsigned long salt = ai_hash_mix((unsigned long)role, (unsigned long)(mood + 23));
   if (ex == INTENT_INSULT) {
-    if (mood <= AI_SOCIAL_NEUTRAL) return "Watch your tongue.";
-    if (mood == AI_SOCIAL_ANNOYED) return "Enough. I will not help you while you spit insults.";
-    if (role == ROLE_GUARD) return "Last warning. Keep civil or move on.";
-    if (role == ROLE_BANDIT) return "One more insult and you'll regret it.";
-    if (role == ROLE_MERCHANT) return "Conversation's over. Take your coin elsewhere.";
-    return "We're done here.";
+    if (mood <= AI_SOCIAL_NEUTRAL) return ai_pick_line_from_pool(mob, (const char *const[]){"Watch your tongue.", "Mind your words.", "Keep it civil.", NULL}, 3, ai_hash_mix(salt, 3));
+    if (mood == AI_SOCIAL_ANNOYED) return ai_pick_line_from_pool(mob, (const char *const[]){"Enough. I will not help you while you spit insults.", "That's enough. Ask plainly or leave.", "Stop with the insults if you want answers.", NULL}, 3, ai_hash_mix(salt, 5));
+    if (role == ROLE_GUARD) return ai_pick_line_from_pool(mob, (const char *const[]){"Last warning. Keep civil or move on.", "Final warning. Respect the peace.", "Stand down and speak properly.", NULL}, 3, ai_hash_mix(salt, 7));
+    if (role == ROLE_BANDIT) return ai_pick_line_from_pool(mob, (const char *const[]){"One more insult and you'll regret it.", "Push it again and bleed.", "Try me once more and see.", NULL}, 3, ai_hash_mix(salt, 11));
+    if (role == ROLE_MERCHANT) return ai_pick_line_from_pool(mob, (const char *const[]){"Conversation's over. Take your coin elsewhere.", "We're done. Spend your coin somewhere else.", "No trade for a foul mouth.", NULL}, 3, ai_hash_mix(salt, 13));
+    return ai_pick_line_from_pool(mob, (const char *const[]){"We're done here.", "This talk is over.", "Enough. Leave it.", NULL}, 3, ai_hash_mix(salt, 17));
   }
   if (ex == INTENT_THREAT) {
     if (role == ROLE_GUARD) return "Threats noted. Stand down now.";
@@ -8147,6 +8275,21 @@ static int ai_room_ambient_seen_recent(room_rnum room, unsigned long hash, time_
     return FALSE;
   for (i = 0; i < 8; i++) {
     if (rc->hashes[i] == hash && (now - rc->times[i]) <= 120)
+      return TRUE;
+  }
+  return FALSE;
+}
+
+static int ai_room_ambient_seen_recent_within(room_rnum room, unsigned long hash, time_t now, int window_secs)
+{
+  struct ai_room_ambient_cache *rc = ai_room_ambient_cache_get(room, 0);
+  int i;
+  if (!rc || !hash)
+    return FALSE;
+  if (window_secs <= 0)
+    window_secs = 30;
+  for (i = 0; i < 8; i++) {
+    if (rc->hashes[i] == hash && (now - rc->times[i]) <= window_secs)
       return TRUE;
   }
   return FALSE;
@@ -8650,6 +8793,9 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
   int multi_has_money = 0;
   enum ai_explicit_intent explicit_intent = INTENT_CONFUSION;
   struct ai_multi_intent multi_intent;
+  multi_intent.primary_intent = INTENT_CONFUSION;
+  multi_intent.secondary_intent = INTENT_CONFUSION;
+  multi_intent.illegal_intent_flag = 0;
   ai_personality stable_personality;
   uint32_t role_caps = 0;
   struct ai_social_context *sctx = NULL;
@@ -8728,7 +8874,7 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
     if (quality_score < 26 && !quality_has_intent) {
       if (!(ai_is_attention_phrase(normalized) || ai_is_questionish_greeting(normalized) || ai_is_chat_request_phrase(normalized) ||
             ai_is_help_request_phrase(normalized) || ai_is_thoughts_phrase(normalized) || ai_is_empathy_phrase(normalized))) {
-        const char *clar = ai_service_menu_clarify_line(role, style, rctx.evil_signaled);
+        const char *clar = ai_service_menu_clarify_line(mob, role, style, rctx.evil_signaled, rctx.archetype, rctx.personality);
         char tiny[300];
         if (!clar || !*clar)
           clar = "What do you need: food, water, rest, or gear?";
@@ -8819,7 +8965,8 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
                        ai_text_has_sub_ci(normalized, "meal") || ai_text_has_sub_ci(normalized, "ration") || ai_text_has_sub_ci(normalized, "bread") ||
                        ai_text_has_sub_ci(normalized, "stew")));
   if (type == AI_EVENT_PLAYER_SAY) {
-    multi_intent = ai_detect_multi_intent(normalized, speech_class, rctx.domain, self_identity_query);
+    if (normalized[0])
+      multi_intent = ai_detect_multi_intent(normalized, speech_class, rctx.domain, self_identity_query);
     explicit_intent = multi_intent.primary_intent;
     if (explicit_intent == INTENT_ATTENTION || explicit_intent == INTENT_GREETING)
       confidence = MAX(confidence, 40);
@@ -8891,7 +9038,7 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
       if (u < sizeof(reqbuf) - 1)
         snprintf(reqbuf + u, sizeof(reqbuf) - u, "%s%s", (qi ? "," : ""), ai_topic_key_name(rctx.requested_targets[qi]));
     }
-    ai_debug_log("AI_DOMAIN_SELECT vnum=%d domain=%d target=%s requested=[%s]", GET_MOB_VNUM(mob), rctx.domain, ai_topic_key_name(rctx.primary_topic_target), reqbuf);
+    ai_debug_log("AI_DOMAIN_SELECT vnum=%d domain=%d target=%s requested=[%s] role=%s style=%d arch=%d align=%d imtb=%d ex=%d sec=%d", GET_MOB_VNUM(mob), rctx.domain, ai_topic_key_name(rctx.primary_topic_target), reqbuf, ai_role_name_local(role), style, rctx.archetype, GET_ALIGNMENT(mob), rctx.personality, explicit_intent, multi_intent.secondary_intent);
   }
 
   e->last_seen_time = now;
@@ -9169,13 +9316,13 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
         if (explicit_intent == INTENT_META_AI)
           line = ai_meta_response_line(mob, role, style, explicit_intent, sctx ? sctx->last_mood : AI_SOCIAL_NEUTRAL);
         else
-          line = ai_social_escalation_line(role, explicit_intent, sctx ? sctx->last_mood : AI_SOCIAL_NEUTRAL);
+          line = ai_social_escalation_line(mob, role, explicit_intent, sctx ? sctx->last_mood : AI_SOCIAL_NEUTRAL);
         rctx.chosen_core = line;
         skip_voice = TRUE;
         intention.be_brief = 1;
       } else if (type == AI_EVENT_PLAYER_SAY && (explicit_intent == INTENT_GREETING || explicit_intent == INTENT_ATTENTION || explicit_intent == INTENT_CHAT_REQUEST ||
                  explicit_intent == INTENT_HELP_REQUEST || explicit_intent == INTENT_THOUGHTS || explicit_intent == INTENT_EMPATHY || explicit_intent == INTENT_MONEY_JOB)) {
-        line = ai_social_prompt_line(mob, role, style, explicit_intent, sctx ? sctx->last_mood : AI_SOCIAL_NEUTRAL);
+        line = ai_social_prompt_line(mob, role, style, explicit_intent, sctx ? sctx->last_mood : AI_SOCIAL_NEUTRAL, rctx.archetype, rctx.personality);
         rctx.chosen_core = line;
         skip_voice = TRUE;
         intention.be_brief = 1;
@@ -9346,7 +9493,7 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
           else
             epi = "Try market gossip or the stablemaster for pets.";
         } else if (type == AI_EVENT_PLAYER_SAY && (rctx.domain == DOMAIN_SERVICES || rctx.domain == DOMAIN_SHOPPING))
-          epi = ai_service_menu_clarify_line(role, style, rctx.evil_signaled);
+          epi = ai_service_menu_clarify_line(mob, role, style, rctx.evil_signaled, rctx.archetype, rctx.personality);
         if (epi && *epi) {
           line = epi;
           rctx.chosen_core = epi;
