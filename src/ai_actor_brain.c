@@ -704,3 +704,12 @@ void ai_brain_apply_stance_bias(const ai_brain_profile *p, ai_fear_state_t fear,
   if (io_caps && fear >= AI_FEAR_AFRAID)
     *io_caps &= ~(AI_BRAIN_CAP_QUEST | AI_BRAIN_CAP_RUMOR);
 }
+
+
+void ai_brain_apply_fear_bias(const ai_brain_profile *p, ai_fear_state_t fear, int *io_mood, int *io_voice_style, uint32_t *io_caps) {
+  ai_brain_apply_stance_bias(p, fear, AI_REV_NONE, io_mood, io_voice_style, io_caps);
+}
+
+void ai_brain_apply_reverence_bias(const ai_brain_profile *p, ai_reverence_state_t rev, int *io_mood, int *io_voice_style, uint32_t *io_caps) {
+  ai_brain_apply_stance_bias(p, AI_FEAR_NONE, rev, io_mood, io_voice_style, io_caps);
+}

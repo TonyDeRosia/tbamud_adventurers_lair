@@ -77,6 +77,8 @@ ai_fear_state_t ai_brain_fear_state(struct char_data *mob, struct char_data *pla
 int ai_brain_respect_score(struct char_data *mob, struct char_data *player);
 ai_reverence_state_t ai_brain_reverence_state(struct char_data *mob, struct char_data *player);
 void ai_brain_apply_stance_bias(const ai_brain_profile *p, ai_fear_state_t fear, ai_reverence_state_t rev, int *io_mood, int *io_voice_style, uint32_t *io_caps);
+void ai_brain_apply_fear_bias(const ai_brain_profile *p, ai_fear_state_t fear, int *io_mood, int *io_voice_style, uint32_t *io_caps);
+void ai_brain_apply_reverence_bias(const ai_brain_profile *p, ai_reverence_state_t rev, int *io_mood, int *io_voice_style, uint32_t *io_caps);
 
 void ai_actor_brain_init(struct char_data *mob);
 void ai_actor_brain_free(struct char_data *mob);
