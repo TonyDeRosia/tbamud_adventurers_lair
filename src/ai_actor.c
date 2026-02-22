@@ -74,6 +74,9 @@
 #define AI_RECENT_FRAGMENT_HASH_MAX 8
 #define AI_SOCIAL_CTX_MAX 512
 #define AI_ROOM_AMBIENT_CACHE_MAX 256
+#define AI_MICRO_MOB_CD_MAX 1024
+#define AI_MICRO_ROOM_CD_MAX 512
+#define AI_MICRO_PLAYER_HASH_CD_MAX 2048
 
 
 
@@ -193,6 +196,29 @@ struct ai_room_ambient_cache {
 
 static struct ai_social_context ai_social_ctx[AI_SOCIAL_CTX_MAX];
 static struct ai_room_ambient_cache ai_room_ambient_cache[AI_ROOM_AMBIENT_CACHE_MAX];
+
+struct ai_micro_mob_cd_entry {
+  int mob_id;
+  time_t next_allowed;
+};
+
+struct ai_micro_room_cd_entry {
+  room_rnum room;
+  time_t next_allowed;
+};
+
+struct ai_micro_player_hash_cd_entry {
+  room_rnum room;
+  long player_idnum;
+  unsigned long text_hash;
+  time_t next_allowed;
+};
+
+static struct ai_micro_mob_cd_entry ai_micro_mob_cd[AI_MICRO_MOB_CD_MAX];
+static struct ai_micro_room_cd_entry ai_micro_room_cd[AI_MICRO_ROOM_CD_MAX];
+static struct ai_micro_player_hash_cd_entry ai_micro_player_hash_cd[AI_MICRO_PLAYER_HASH_CD_MAX];
+static room_rnum ai_micro_dispatch_room = NOWHERE;
+static int ai_micro_dispatch_room_count = 0;
 
 enum ai_speech_domain {
   DOMAIN_NONE = 0,
@@ -873,6 +899,11 @@ static int ai_conv_try_start(struct char_data *mob, time_t now);
 static int ai_player_speech_classify(const char *text, int *out_confidence, int *out_is_weather);
 static int ai_intent_from_player_class(int speech_class);
 static int ai_detect_emote_kind(const char *text);
+static void ai_micro_dispatch_begin(room_rnum room);
+static int ai_micro_mob_can_act(struct char_data *mob);
+static const char *ai_micro_role_pool_name(struct char_data *mob, int *out_is_innkeeper);
+static const char *ai_micro_pick_line(struct char_data *mob, const char **out_pool_name, int *out_is_tiny_utterance);
+static void ai_actor_try_micro_reaction(struct char_data *mob, struct char_data *actor, enum ai_event_type type, int best_action, const char *normalized, unsigned long normalized_hash, const char *reason, time_t now);
 static int ai_detect_topic_target_from_text(const char *text);
 static int ai_actor_room_response_slot(struct char_data *mob, struct char_data *actor, enum ai_event_type type, int intent, int confidence, const char *normalized);
 static int ai_actor_ensure_ready(struct char_data *mob);
@@ -2473,6 +2504,225 @@ static void ai_say(struct char_data *mob, const char *msg, time_t now)
     mob->ai_state->last_room_spoke = now;
     mob->ai_state->last_room_vnum_spoke = (IN_ROOM(mob) != NOWHERE) ? GET_ROOM_VNUM(IN_ROOM(mob)) : -1;
   }
+}
+
+static void ai_micro_dispatch_begin(room_rnum room)
+{
+  if (ai_micro_dispatch_room != room) {
+    ai_micro_dispatch_room = room;
+    ai_micro_dispatch_room_count = 0;
+  }
+}
+
+static int ai_micro_mob_can_act(struct char_data *mob)
+{
+  if (!mob)
+    return FALSE;
+  if (FIGHTING(mob))
+    return FALSE;
+  if (GET_POS(mob) <= POS_SLEEPING)
+    return FALSE;
+  if (GET_POS(mob) <= POS_STUNNED)
+    return FALSE;
+  if (AFF_FLAGGED(mob, AFF_CHARM))
+    return FALSE;
+  return TRUE;
+}
+
+static const char *ai_micro_role_pool_name(struct char_data *mob, int *out_is_innkeeper)
+{
+  int role = (mob && mob->ai_prof) ? mob->ai_prof->role : ROLE_UNKNOWN;
+  if (out_is_innkeeper)
+    *out_is_innkeeper = ai_mob_has_shop_data(mob);
+  switch (role) {
+    case ROLE_GUARD: return "GUARD";
+    case ROLE_MERCHANT: return (out_is_innkeeper && *out_is_innkeeper) ? "INNKEEPER" : "MERCHANT";
+    case ROLE_BANDIT: return "BANDIT";
+    case ROLE_CULTIST: return "CULTIST";
+    case ROLE_BEAST: return "WOLF";
+    case ROLE_UNDEAD: return "SKELETON";
+    case ROLE_BOSS: return "COMMANDER";
+    case ROLE_SPIRIT: return "SPIRIT";
+    default: return "GENERIC";
+  }
+}
+
+static const char *ai_micro_pick_line(struct char_data *mob, const char **out_pool_name, int *out_is_tiny_utterance)
+{
+  static const char *const micro_guard[] = {"$n shifts stance and keeps watch.", "$n narrows eyes and scans the room.", "$n taps a gauntlet once, then stills.", NULL};
+  static const char *const micro_merchant[] = {"$n adjusts a stack of wares and listens.", "$n weighs you with a trader's eye.", "$n checks the counter, then glances back.", NULL};
+  static const char *const micro_innkeeper[] = {"$n wipes the bar and keeps an ear out.", "$n glances between the hearth and the room.", "$n straightens a mug and watches quietly.", NULL};
+  static const char *const micro_bandit[] = {"$n hooks thumbs in a belt and watches.", "$n gives a hard look, then says nothing.", "$n shifts weight like a coiled spring.", NULL};
+  static const char *const micro_cultist[] = {"$n traces a small sigil in the air.", "$n lowers gaze in brief, private ritual.", "$n murmurs a prayer too soft to catch.", NULL};
+  static const char *const micro_wolf[] = {"$n's ears twitch toward the speaker.", "$n huffs once and keeps watching.", "$n's hackles lift, then settle.", NULL};
+  static const char *const micro_skeleton[] = {"$n's jaw clicks once in dry thought.", "$n goes still, then tilts its skull.", "$n's bones rasp softly as it shifts.", NULL};
+  static const char *const micro_commander[] = {"$n folds arms and studies the room.", "$n gives a clipped nod to no one.", "$n checks the exits with a soldier's calm.", NULL};
+  static const char *const micro_spirit[] = {"$n flickers faintly, as if considering.", "$n drifts a handspan, then hangs still.", "$n's glow pulses once, then fades.", NULL};
+  static const char *const micro_generic[] = {"$n pauses, considering your words.", "$n glances over and keeps quiet.", "$n gives a brief, unreadable look.", NULL};
+  static const char *const tiny_utter[] = {"Hmm.", "Hmph.", "Tch.", "Heh.", NULL};
+  const char *const *pool = micro_generic;
+  const char *line;
+  int innkeeper = 0;
+
+  if (out_is_tiny_utterance)
+    *out_is_tiny_utterance = FALSE;
+
+  if (rand_number(1, 100) <= 15) {
+    if (out_pool_name)
+      *out_pool_name = "TINY_UTTERANCE";
+    if (out_is_tiny_utterance)
+      *out_is_tiny_utterance = TRUE;
+    return ai_pick_phrase(tiny_utter);
+  }
+
+  switch ((mob && mob->ai_prof) ? mob->ai_prof->role : ROLE_UNKNOWN) {
+    case ROLE_GUARD: pool = micro_guard; break;
+    case ROLE_MERCHANT:
+      innkeeper = ai_mob_has_shop_data(mob);
+      pool = innkeeper ? micro_innkeeper : micro_merchant;
+      break;
+    case ROLE_BANDIT: pool = micro_bandit; break;
+    case ROLE_CULTIST: pool = micro_cultist; break;
+    case ROLE_BEAST: pool = micro_wolf; break;
+    case ROLE_UNDEAD: pool = micro_skeleton; break;
+    case ROLE_BOSS: pool = micro_commander; break;
+    case ROLE_SPIRIT: pool = micro_spirit; break;
+    default: pool = micro_generic; break;
+  }
+
+  if (out_pool_name)
+    *out_pool_name = ai_micro_role_pool_name(mob, &innkeeper);
+
+  line = ai_pick_phrase(pool);
+  if (!line || !*line)
+    line = ai_pick_phrase(micro_generic);
+  return line;
+}
+
+static void ai_actor_try_micro_reaction(struct char_data *mob, struct char_data *actor, enum ai_event_type type, int best_action, const char *normalized, unsigned long normalized_hash, const char *reason, time_t now)
+{
+  static int mob_cd_cursor = 0;
+  static int room_cd_cursor = 0;
+  static int player_hash_cursor = 0;
+  int i;
+  room_rnum room;
+  int mob_id;
+  long player_id;
+  struct ai_micro_mob_cd_entry *mob_entry = NULL;
+  struct ai_micro_room_cd_entry *room_entry = NULL;
+  struct ai_micro_player_hash_cd_entry *ph_entry = NULL;
+  const char *line;
+  const char *pool_name = "GENERIC";
+  const char *role_name = "GENERIC";
+  int is_tiny = FALSE;
+  int innkeeper = 0;
+
+  if (!mob || !actor || type != AI_EVENT_PLAYER_SAY)
+    return;
+  room = IN_ROOM(mob);
+  if (room == NOWHERE || room != IN_ROOM(actor)) {
+    ai_debug_log("AI_MICRO_SUPPRESS reason=ROOM_MISMATCH");
+    return;
+  }
+  if (!ai_micro_mob_can_act(mob)) {
+    ai_debug_log("AI_MICRO_SUPPRESS reason=MOB_UNABLE");
+    return;
+  }
+  if (!(reason && (!strcmp(reason, "ARB_SLOT_DENIED_EARLY") || !strcmp(reason, "NON_SPEAK_ACTION_SELECTED")))) {
+    ai_debug_log("AI_MICRO_SUPPRESS reason=NOT_ELIGIBLE_PATH");
+    return;
+  }
+  if (ai_micro_dispatch_room != room) {
+    ai_debug_log("AI_MICRO_SUPPRESS reason=DISPATCH_SCOPE_MISS");
+    return;
+  }
+  if (ai_micro_dispatch_room_count >= 2) {
+    ai_debug_log("AI_MICRO_SUPPRESS reason=ROOM_EVENT_CAP");
+    return;
+  }
+
+  mob_id = GET_IDNUM(mob);
+  if (mob_id <= 0)
+    mob_id = GET_MOB_VNUM(mob);
+  player_id = GET_IDNUM(actor);
+
+  for (i = 0; i < AI_MICRO_MOB_CD_MAX; i++) {
+    if (ai_micro_mob_cd[i].mob_id == mob_id) {
+      mob_entry = &ai_micro_mob_cd[i];
+      break;
+    }
+  }
+  if (!mob_entry) {
+    mob_entry = &ai_micro_mob_cd[mob_cd_cursor++ % AI_MICRO_MOB_CD_MAX];
+    memset(mob_entry, 0, sizeof(*mob_entry));
+    mob_entry->mob_id = mob_id;
+  }
+  if (mob_entry->next_allowed > now) {
+    ai_debug_log("AI_MICRO_SUPPRESS reason=MOB_COOLDOWN");
+    return;
+  }
+
+  for (i = 0; i < AI_MICRO_ROOM_CD_MAX; i++) {
+    if (ai_micro_room_cd[i].room == room) {
+      room_entry = &ai_micro_room_cd[i];
+      break;
+    }
+  }
+  if (!room_entry) {
+    room_entry = &ai_micro_room_cd[room_cd_cursor++ % AI_MICRO_ROOM_CD_MAX];
+    memset(room_entry, 0, sizeof(*room_entry));
+    room_entry->room = room;
+  }
+  if (room_entry->next_allowed > now) {
+    ai_debug_log("AI_MICRO_SUPPRESS reason=ROOM_COOLDOWN");
+    return;
+  }
+
+  for (i = 0; i < AI_MICRO_PLAYER_HASH_CD_MAX; i++) {
+    if (ai_micro_player_hash_cd[i].room == room &&
+        ai_micro_player_hash_cd[i].player_idnum == player_id &&
+        ai_micro_player_hash_cd[i].text_hash == normalized_hash) {
+      ph_entry = &ai_micro_player_hash_cd[i];
+      break;
+    }
+  }
+  if (!ph_entry) {
+    ph_entry = &ai_micro_player_hash_cd[player_hash_cursor++ % AI_MICRO_PLAYER_HASH_CD_MAX];
+    memset(ph_entry, 0, sizeof(*ph_entry));
+    ph_entry->room = room;
+    ph_entry->player_idnum = player_id;
+    ph_entry->text_hash = normalized_hash;
+  }
+  if (ph_entry->next_allowed > now) {
+    ai_debug_log("AI_MICRO_SUPPRESS reason=ROOM_PLAYER_TEXT_COOLDOWN");
+    return;
+  }
+
+  line = ai_micro_pick_line(mob, &pool_name, &is_tiny);
+  if (!line || !*line) {
+    ai_debug_log("AI_MICRO_SUPPRESS reason=EMPTY_PICK");
+    return;
+  }
+
+  if (!normalized_hash && normalized && *normalized)
+    normalized_hash = ai_text_hash_simple(normalized);
+  role_name = ai_micro_role_pool_name(mob, &innkeeper);
+  ai_debug_log("AI_MICRO_PICK text=\"%s\"", line);
+  ai_debug_log("AI_MICRO_FIRE mob_vnum=%d role=%s kind=%s pool=%s trigger=%s action=%s", GET_MOB_VNUM(mob), role_name,
+               is_tiny ? "TINY_UTTERANCE" : "EMOTE", pool_name ? pool_name : "GENERIC", reason,
+               ai_action_name((enum ai_action_type)best_action));
+  ai_say(mob, line, now);
+
+  /* Cooldown keys:
+   * - mob_id: throttles any single NPC to one micro reaction every 8-20s.
+   * - room_rnum: throttles overall room chatter to one micro reaction every 2-4s.
+   * - (room_rnum, player_idnum, normalized_text_hash): blocks repeated identical text spam for 20s.
+   * These run only on non-SPEAK paths, so main SPEAK selection and phrase/template pools stay unchanged.
+   */
+  mob_entry->next_allowed = now + rand_number(8, 20);
+  room_entry->next_allowed = now + rand_number(2, 4);
+  ph_entry->next_allowed = now + 20;
+  ai_micro_dispatch_room_count++;
 }
 
 void ai_actor_schedule_reaction_speech(struct char_data *mob, struct char_data *target, const char *msg)
@@ -9141,6 +9391,7 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
   int avoid_template_id = -1;
   int selected_template_id = -1;
   char normalized[256];
+  unsigned long normalized_hash = 0;
   float attention_score;
   float suspicion = 0.0f;
   float best_score = -999.0f;
@@ -9246,6 +9497,7 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
   if (type == AI_EVENT_PLAYER_SAY && !text)
     AI_EVT_RETURN("NULL_PLAYER_SAY");
   ai_normalize_text(text ? text : "", normalized, sizeof(normalized));
+  normalized_hash = ai_text_hash_simple(normalized);
   memset(&rx_result, 0, sizeof(rx_result));
   {
     struct ai_rx_event rx_ev;
@@ -9292,8 +9544,10 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
   }
 
   if (type == AI_EVENT_PLAYER_SAY)
-    if (!ai_actor_room_response_slot(mob, actor, type, AI_INTENT_NONE, 0, normalized))
+    if (!ai_actor_room_response_slot(mob, actor, type, AI_INTENT_NONE, 0, normalized)) {
+      ai_actor_try_micro_reaction(mob, actor, type, AI_ACTION_IGNORE, normalized, normalized_hash, "ARB_SLOT_DENIED_EARLY", now);
       AI_EVT_RETURN("ARB_SLOT_DENIED_EARLY");
+    }
 
   attention_score = ai_attention_score(mob, type, actor, normalized, now);
   ai_state_push_event(mob, type, actor, normalized);
@@ -9628,6 +9882,7 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
                  GET_MOB_VNUM(mob), ai_role_name_local(mob->ai_prof->role), ai_goal_name(goal ? goal->type : AI_GOAL_NONE), ai_mbti_string(ai_voice_profile_get(mob)),
                  ai_time_bucket_name(ctx.time_bucket), ai_arch_name(sr ? sr->archetype : AI_ARCH_UNKNOWN), ai_arc_name(sr ? sr->arc : AI_ARC_STRANGER),
                  sr ? sr->exchange_count : 0, attention_score, suspicion, ai_action_name(best_action), cooldown_remaining);
+    ai_actor_try_micro_reaction(mob, actor, type, best_action, normalized, normalized_hash, "NON_SPEAK_ACTION_SELECTED", now);
     AI_EVT_RETURN("NON_SPEAK_ACTION_SELECTED");
   }
 
@@ -9635,7 +9890,7 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
     AI_EVT_RETURN("ARB_SLOT_DENIED");
 
   if (type == AI_EVENT_PLAYER_SAY && IN_ROOM(mob) != NOWHERE) {
-    struct ai_player_arb_entry *arb = ai_player_arb_lookup(IN_ROOM(mob), GET_IDNUM(actor), type, ai_text_hash_simple(normalized), now);
+    struct ai_player_arb_entry *arb = ai_player_arb_lookup(IN_ROOM(mob), GET_IDNUM(actor), type, normalized_hash, now);
     if (arb) {
       if (mob == arb->responder2)
         avoid_template_id = arb->responder1_template_id;
@@ -10214,6 +10469,7 @@ void ai_actor_event_say(struct char_data *actor, const char *msg)
     return;
 
   ai_dbg_evt(NULL, "SAY_DISPATCH", AI_EVENT_PLAYER_SAY, actor, msg ? msg : "");
+  ai_micro_dispatch_begin(IN_ROOM(actor));
   for (mob = world[IN_ROOM(actor)].people; mob; mob = mob->next_in_room)
     if (IS_NPC(mob) && MOB_FLAGGED(mob, MOB_AI_ACTOR) && mob != actor) {
       if (!ai_actor_ensure_ready(mob)) {
