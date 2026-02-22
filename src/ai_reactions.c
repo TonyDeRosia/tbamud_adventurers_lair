@@ -565,3 +565,50 @@ void ai_react_reverence(struct char_data *mob, struct char_data *player, ai_reve
   else
     ai_react_pick_and_fire(mob, hum_respect, seed);
 }
+
+void ai_react_romance(struct char_data *mob, struct char_data *player, int kind, int intensity)
+{
+  static const char *const rom_smile[] = {"$n smiles at you.", "$n offers a small smile.", NULL};
+  static const char *const rom_blush[] = {"$n blushes and looks away.", "$n blushes lightly.", NULL};
+  static const char *const rom_wink[] = {"$n winks.", NULL};
+  static const char *const rom_avert[] = {"$n avoids your gaze.", NULL};
+  static const char *const rom_sigh[] = {"$n lets out a soft sigh.", NULL};
+  static const char *const rom_closer[] = {"$n takes a subtle step closer.", NULL};
+  static const char *const rom_back[] = {"$n takes a half step back.", NULL};
+  static const char *const rom_boundary[] = {"$n sets their jaw and holds up a hand.", NULL};
+  const char *const *pool = NULL;
+  unsigned long seed;
+  (void)intensity;
+  if (!mob || IN_ROOM(mob) == NOWHERE) return;
+  seed = (unsigned long)(GET_MOB_VNUM(mob) * 71u + (player ? GET_IDNUM(player) : 0) + (unsigned long)kind * 13u);
+  switch (kind) {
+    case AI_REACT_ROM_SMILE: pool = rom_smile; break;
+    case AI_REACT_ROM_BLUSH: pool = rom_blush; break;
+    case AI_REACT_ROM_WINK: pool = rom_wink; break;
+    case AI_REACT_ROM_AVERT_EYES: pool = rom_avert; break;
+    case AI_REACT_ROM_SIGH_SOFT: pool = rom_sigh; break;
+    case AI_REACT_ROM_STEP_CLOSER: pool = rom_closer; break;
+    case AI_REACT_ROM_STEP_BACK: pool = rom_back; break;
+    default: pool = rom_boundary; break;
+  }
+  ai_react_pick_and_fire(mob, pool, seed);
+}
+
+void ai_react_relationship(struct char_data *mob, struct char_data *player, int rel_bucket)
+{
+  static const char *const rel_hate[] = {"$n glares coldly.", "$n turns away with a dismissive gesture.", "$n takes a half step back.", NULL};
+  static const char *const rel_dislike[] = {"$n gives a flat stare.", "$n lets out a short sigh.", NULL};
+  static const char *const rel_admire[] = {"$n smiles and nods.", "$n softens $s posture.", NULL};
+  static const char *const rel_adore[] = {"$n offers a gentle smile.", "$n lingers on your gaze for a moment.", "$n blushes faintly.", NULL};
+  const char *const *pool;
+  unsigned long seed;
+  if (!mob || IN_ROOM(mob) == NOWHERE) return;
+  seed = (unsigned long)(GET_MOB_VNUM(mob) * 59u + (player ? GET_IDNUM(player) : 0) + (unsigned long)rel_bucket * 7u);
+  if (rel_bucket <= REL_HOSTILE) pool = rel_hate;
+  else if (rel_bucket == REL_DISLIKE) pool = rel_dislike;
+  else if (rel_bucket >= REL_ADMIRE && rel_bucket <= REL_ADORE) pool = rel_admire;
+  else if (rel_bucket >= REL_IN_LOVE) pool = rel_adore;
+  else return;
+  if (rand_number(1, 100) > 18) return;
+  ai_react_pick_and_fire(mob, pool, seed);
+}

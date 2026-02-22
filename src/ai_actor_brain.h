@@ -13,6 +13,55 @@ struct obj_data;
 typedef enum { AI_FEAR_NONE, AI_FEAR_WARY, AI_FEAR_INTIMIDATED, AI_FEAR_AFRAID, AI_FEAR_TERRIFIED } ai_fear_state_t;
 typedef enum { AI_REV_NONE, AI_REV_RESPECTFUL, AI_REV_ADMIRING, AI_REV_REVERENT, AI_REV_AWED } ai_reverence_state_t;
 
+typedef enum {
+  AI_ROM_STYLE_NONE = 0,
+  AI_ROM_STYLE_SHY,
+  AI_ROM_STYLE_WARM,
+  AI_ROM_STYLE_FLIRTY,
+  AI_ROM_STYLE_FORMAL,
+  AI_ROM_STYLE_ROGUISH,
+  AI_ROM_STYLE_PLAYFUL
+} ai_romance_style_t;
+
+typedef enum {
+  AI_CONSENT_NONE = 0,
+  AI_CONSENT_ASKED,
+  AI_CONSENT_GRANTED,
+  AI_CONSENT_DENIED
+} ai_consent_state_t;
+
+typedef enum {
+  AI_ATTRACT_NONE = 0,
+  AI_ATTRACT_BAD_BOY,
+  AI_ATTRACT_GOOD_HEART,
+  AI_ATTRACT_POWER,
+  AI_ATTRACT_INTELLECT,
+  AI_ATTRACT_HUMOR,
+  AI_ATTRACT_SHY_SWEET,
+  AI_ATTRACT_MYSTERIOUS
+} ai_attraction_model_t;
+
+#define AI_PARCH_GOOD      (1u << 0)
+#define AI_PARCH_EVIL      (1u << 1)
+#define AI_PARCH_NEUTRAL   (1u << 2)
+#define AI_PARCH_BRAVE     (1u << 3)
+#define AI_PARCH_SHY       (1u << 4)
+#define AI_PARCH_ROGUEISH  (1u << 5)
+#define AI_PARCH_NOBLE     (1u << 6)
+#define AI_PARCH_MYSTIC    (1u << 7)
+
+enum ai_relationship_bucket {
+  REL_HATEFUL = 0,
+  REL_DISGUSTED,
+  REL_HOSTILE,
+  REL_DISLIKE,
+  REL_NEUTRAL,
+  REL_ADMIRE_LIGHT,
+  REL_ADMIRE,
+  REL_ADORE,
+  REL_IN_LOVE
+};
+
 enum ai_actor_brain_state {
   AI_BRAIN_IDLE = 0,
   AI_BRAIN_OBSERVE,
@@ -79,6 +128,18 @@ ai_reverence_state_t ai_brain_reverence_state(struct char_data *mob, struct char
 void ai_brain_apply_stance_bias(const ai_brain_profile *p, ai_fear_state_t fear, ai_reverence_state_t rev, int *io_mood, int *io_voice_style, uint32_t *io_caps);
 void ai_brain_apply_fear_bias(const ai_brain_profile *p, ai_fear_state_t fear, int *io_mood, int *io_voice_style, uint32_t *io_caps);
 void ai_brain_apply_reverence_bias(const ai_brain_profile *p, ai_reverence_state_t rev, int *io_mood, int *io_voice_style, uint32_t *io_caps);
+int ai_brain_player_archetype_mask(struct char_data *player, struct char_data *mob);
+int ai_brain_romance_enabled(const struct char_data *mob);
+int ai_brain_interest_score(struct char_data *mob, struct char_data *player);
+int ai_brain_interest_bucket(struct char_data *mob, struct char_data *player);
+ai_romance_style_t ai_brain_romance_style(const struct char_data *mob);
+ai_attraction_model_t ai_brain_attraction_model(const struct char_data *mob);
+ai_consent_state_t ai_brain_consent_state(const struct char_data *mob, const struct char_data *player);
+void ai_brain_set_consent(struct char_data *mob, struct char_data *player, ai_consent_state_t st);
+int ai_brain_romance_allowed_now(struct char_data *mob, struct char_data *player);
+int ai_brain_relationship_score(struct char_data *mob, struct char_data *player);
+int ai_brain_relationship_bucket(struct char_data *mob, struct char_data *player);
+const char *ai_brain_relationship_bucket_name(int bucket);
 
 void ai_actor_brain_init(struct char_data *mob);
 void ai_actor_brain_free(struct char_data *mob);

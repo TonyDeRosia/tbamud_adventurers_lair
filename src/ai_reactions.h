@@ -100,4 +100,18 @@ void ai_react_nonverbal(struct char_data *mob, struct char_data *player, int rea
 void ai_react_fear(struct char_data *mob, struct char_data *player, ai_fear_state_t fear);
 void ai_react_reverence(struct char_data *mob, struct char_data *player, ai_reverence_state_t rev);
 
+enum ai_react_romance_kind {
+  AI_REACT_ROM_SMILE = 0,
+  AI_REACT_ROM_BLUSH,
+  AI_REACT_ROM_WINK,
+  AI_REACT_ROM_AVERT_EYES,
+  AI_REACT_ROM_SIGH_SOFT,
+  AI_REACT_ROM_STEP_CLOSER,
+  AI_REACT_ROM_STEP_BACK,
+  AI_REACT_ROM_FIRM_BOUNDARY
+};
+
+void ai_react_romance(struct char_data *mob, struct char_data *player, int kind, int intensity);
+void ai_react_relationship(struct char_data *mob, struct char_data *player, int rel_bucket);
+
 #endif
