@@ -47,6 +47,90 @@ static int ai_text_has_sub_ci_local(const char *hay, const char *needle)
   return FALSE;
 }
 
+static const char *ai_rx_actor_display_name(struct char_data *mob, char *out, size_t outsz)
+{
+  char tmp[256];
+  char *p;
+  size_t len;
+
+  if (!out || outsz == 0)
+    return "someone";
+  out[0] = '\0';
+  if (!mob) {
+    strlcpy(out, "someone", outsz);
+    return out;
+  }
+
+  if (GET_NAME(mob) && isupper((unsigned char)GET_NAME(mob)[0]))
+    strlcpy(tmp, GET_NAME(mob), sizeof(tmp));
+  else
+    strlcpy(tmp, mob->player.short_descr ? mob->player.short_descr : GET_NAME(mob), sizeof(tmp));
+
+  p = tmp;
+  while (*p && isspace((unsigned char)*p))
+    p++;
+  if (!strncasecmp(p, "a ", 2))
+    p += 2;
+  else if (!strncasecmp(p, "an ", 3))
+    p += 3;
+  else if (!strncasecmp(p, "the ", 4))
+    p += 4;
+
+  strlcpy(out, p, outsz);
+  len = strlen(out);
+  while (len > 0 && (isspace((unsigned char)out[len - 1]) || out[len - 1] == '.' || out[len - 1] == '!' || out[len - 1] == '?' || out[len - 1] == ','))
+    out[--len] = '\0';
+
+  if (!out[0])
+    strlcpy(out, "someone", outsz);
+  return out;
+}
+
+int ai_rx_infer_targeted_to_mob(struct char_data *mob, const char *norm_text)
+{
+  char dn[128];
+
+  if (!mob || !norm_text)
+    return FALSE;
+
+  ai_rx_actor_display_name(mob, dn, sizeof(dn));
+  if (ai_text_has_sub_ci_local(norm_text, "you") || ai_text_has_sub_ci_local(norm_text, "@"))
+    return TRUE;
+  return ai_text_has_sub_ci_local(norm_text, dn);
+}
+
+int ai_rx_is_service_style_request(const char *norm_text)
+{
+  if (!norm_text || !*norm_text)
+    return FALSE;
+
+  return (ai_text_has_sub_ci_local(norm_text, "food") ||
+          ai_text_has_sub_ci_local(norm_text, "water") ||
+          ai_text_has_sub_ci_local(norm_text, "rest") ||
+          ai_text_has_sub_ci_local(norm_text, "inn") ||
+          ai_text_has_sub_ci_local(norm_text, "training") ||
+          ai_text_has_sub_ci_local(norm_text, "train") ||
+          ai_text_has_sub_ci_local(norm_text, "practice") ||
+          ai_text_has_sub_ci_local(norm_text, "directions") ||
+          ai_text_has_sub_ci_local(norm_text, "where") ||
+          ai_text_has_sub_ci_local(norm_text, "money") ||
+          ai_text_has_sub_ci_local(norm_text, "job"));
+}
+
+int ai_rx_is_explicit_sexual_request(const char *norm_text)
+{
+  if (!norm_text || !*norm_text)
+    return FALSE;
+
+  return (ai_text_has_sub_ci_local(norm_text, "sex") ||
+          ai_text_has_sub_ci_local(norm_text, "fuck") ||
+          ai_text_has_sub_ci_local(norm_text, "nude") ||
+          ai_text_has_sub_ci_local(norm_text, "horny") ||
+          ai_text_has_sub_ci_local(norm_text, "bed me") ||
+          ai_text_has_sub_ci_local(norm_text, "sleep with me") ||
+          ai_text_has_sub_ci_local(norm_text, "kiss me"));
+}
+
 void ai_rx_clean_sentence(char *s)
 {
   size_t i, len;
