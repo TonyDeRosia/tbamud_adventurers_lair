@@ -878,6 +878,9 @@ static const struct ai_archetype_profile ai_archetype_profiles[] = {
 static struct char_data *ai_find_player_by_idnum_room(struct char_data *mob, long idnum);
 static const char *ai_pick_phrase(const char *const *pool);
 static const char *ai_pool_pick(const char *const *pool);
+static int ai_line_has_hard_location_claim(const char *line);
+static int ai_intent_is_service_domain(int intent);
+static const char *ai_pick_nonfactual_line(const char *const *pool);
 static int ai_role_can_give_directions(int role);
 static int ai_role_can_answer_intent(int role, int style, int intent);
 static const char *ai_role_redirect_line(int role, int style, int topic_target);
@@ -3785,6 +3788,86 @@ static int ai_try_flee_or_surrender(struct char_data *mob, time_t now)
  * - Apply hard gates: peaceful rooms, cooldowns, visibility, and special/script ownership.
  * - Execute only the top intent above threshold, then apply intent/talk cooldowns.
  */
+/*
+ * Extended dialogue pools sourced from dialogue options input.
+ * Keep these additive-only and safe to extend without altering core routing.
+ */
+static const char *const ext_guard_greet[] = {
+  "Good day. Keep the peace on this street.", "Morning. Stay lawful and you'll have no trouble.",
+  "Well met. Keep your hands visible and your temper low.", "Evening watch is active. Keep it clean.",
+  "Report crimes. Keep order. Move along.", "Stay on the lit roads and you'll be fine.",
+  "I've got eyes on this block. Behave.", "Weapons sheathed in town. That's the rule.",
+  "Patrol's active tonight. No incidents, please.", "You're safe here as long as you act right.",
+  "Need directions? Ask and I'll point you right.", NULL
+};
+static const char *const ext_guard_service[] = {
+  "Need work? Check the watch station, bounty board, or guild hall.",
+  "For safe directions, follow the lantern roads and ask at the gate post.",
+  "Suspicious activity? Tell me directly. Don't confront it yourself.",
+  "If someone's following you, step to a lit doorway and call out.",
+  "Need a direction? I can point you to the inn, bank, or market.",
+  "For rooms and rest, head to the inn. For trade, market stalls.",
+  "Ask clearly and I'll give directions, not discounts.",
+  "Merchants trade nearby; keep business clean and legal.", NULL
+};
+static const char *const ext_merchant_greet[] = {
+  "Welcome. Buying, selling, or browsing today?", "Fresh stock on the shelves. Take your time.",
+  "Coin talks and I'm listening. What do you need?", "Best rates in this quarter. Have a look.",
+  "Trade straight and we'll both leave happy.", "New stock just in. First pick goes fast.",
+  "Buying or selling? Either way, I'm open.", "Fair prices posted. No tricks.",
+  "Road supplies, gear, or specialty items—ask plainly.", "Everything on the shelf is priced and ready.", NULL
+};
+static const char *const ext_merchant_service[] = {
+  "Sell loot, take contracts, and trade smart for steady coin.",
+  "Tell me the item class and I'll check stock and price.",
+  "I handle wares here; trainers and guards handle the rest.",
+  "I buy and sell. Show me what you carry.", "Need kit for the road? I can sort you out.",
+  "Trade window's open. Let's do business.", "Looking for something specific? Give me a name.",
+  "Weapons, armor, potions, rations—ask and I'll quote.", NULL
+};
+static const char *const ext_innkeeper_greet[] = {
+  "Welcome in. Warm fire, clean beds, hot stew.", "Long road behind you? Sit and breathe.",
+  "Room, meal, or ale? I'll get you sorted.", "Boots off, worries down. Hearth stays warm.",
+  "Come in out of the weather. I've got what you need.", "Need a quiet room tonight? I've got one.",
+  "The fire's hot and the ale's cold. Sit.", "Travel's hard. Rest here.",
+  "I've got blankets, broth, and a bed. Say the word.", "A calm table and a softer mattress await.", NULL
+};
+static const char *const ext_innkeeper_service[] = {
+  "If you need rumors, ask in the common room after dusk.",
+  "For quests, check the town board or ask the guard captain.",
+  "I can give you rest, food, and a quiet room upstairs.",
+  "Room, meal, or just a chair by the fire?", "Meals included with the room. Ale costs extra.",
+  "Hot bath? Add two coin and I'll have water heated.",
+  "Private room or common? Either's available tonight.",
+  "Need directions in the morning? I know every road out of town.", NULL
+};
+static const char *const ext_bandit_greet[] = {
+  "You're in claimed streets now. Keep it respectful.", "Coin talks. Long stories don't.",
+  "Pass through quiet and we won't have problems.", "Eyes down, pockets up. Street rules.",
+  "You look like trouble worth weighing.", "New face. Keep your hand off that hilt.",
+  "This lane has a toll. Don't make it complicated.", "Walk light and don't stare at anyone.",
+  "Coin or conversation. Pick one and make it fast.", "I've seen richer folk disappear. Think on that.", NULL
+};
+static const char *const ext_bandit_service[] = {
+  "I sell information, not comfort. Price first.", "You want directions? Pay for local knowledge.",
+  "Information costs. Safe passage costs more.", "I know these roads. That knowledge isn't free.",
+  "Trade's for merchants. I deal in leverage.", "Maps I've got. Trust, you have to earn.",
+  "Safe route through this district: negotiate the rate.", "I don't sell wares. I tax passage.", NULL
+};
+static const char *const ext_civilian_greet[] = {
+  "Hello there. Hope your road was kind.", "Well met. Town's calmer than usual today.",
+  "Good to see a traveler keeping things civil.", "Greetings. Quiet day so far.",
+  "Hello. Safe travels getting here?", "Well met, stranger. Need anything?", NULL
+};
+static const char *const ext_civilian_service[] = {
+  "Try the guild hall, town board, or watch post for official help.",
+  "For trade, head to the market stalls and ask plainly.",
+  "If you're lost, the guard by the square can point you right.",
+  "I'm not certain, but the guard station would know.",
+  "Try asking at the inn; they hear everything.",
+  "The town board has postings for work and directions.",
+  "I don't know much, but the innkeeper would.", "Ask at the watch post; they're usually helpful.", NULL
+};
 static const char *const role_guard_greet[] = {"{GREET}. Keep things lawful on this {PLACE}.", "{GREET}. Keep the {QUIET}.", "Morning. Move smart and stay {QUIET}.", "Eyes open. No trouble today.", "You are safe if you act right.", "Keep your blade sheathed in town.", "Report crimes and keep walking.", "Stay civil and we get along.", "The square is watched. Behave.", "Mind the law and you'll do fine.", "Need directions? Ask plainly.", "Order first, comfort second.", NULL};
 static const char *const role_guard_service[] = {"Need a direction? I can point you to the inn, bank, or market.", "For rooms and rest, head to the inn. For trade, market stalls.", "The law office keeps records; the bank is east from here.", "Travelers rest at the inn. Keep your coin close on the road.", "Need help finding a healer? I can point the way.", "If you're lost, follow the main road to the square fountain.", "Merchants trade nearby; keep business clean and legal.", "Ask clearly and I'll give directions, not discounts.", NULL};
 static const char *const role_merchant_greet[] = {"{GREET}, traveler. Browse my wares.", "Fresh stock and fair measures this {TIME}.", "Take your {TIME}; prices stay {GOOD}.", "Looking to buy or sell?", "Careful hands, quality goods.", "Coin talks, and I listen.", "Best rates in this quarter.", "See anything you fancy?", "Trade straight, leave happy.", "Step closer and have a look.", "Fine goods, no tricks.", "I can help you outfit your journey.", NULL};
@@ -7169,25 +7252,67 @@ const char *ai_line_for_intent(struct char_data *mob, struct ai_actor_memory_ent
   }
 
   if (role == ROLE_GUARD) {
-    if (intent == AI_INTENT_GREET) core = ai_pick_weighted_phrase(role_guard_greet, role_rare_guard);
+    if (intent == AI_INTENT_GREET) core = (ai_pool_roll_percent() <= 45) ? ai_pick_phrase(ext_guard_greet) : ai_pick_weighted_phrase(role_guard_greet, role_rare_guard);
     else if (intent == AI_INTENT_GIBBERISH) core = ai_pick_phrase(gib_guard);
     else if (intent == AI_INTENT_DIRECTIONS || intent == AI_INTENT_HEAL || intent == AI_INTENT_BANK || intent == AI_INTENT_INN || intent == AI_INTENT_QUEST) {
-      core = dir_line ? dir_line : ai_pick_phrase(role_guard_service);
+      if (dir_line) {
+        core = dir_line;
+        if (ai_pool_roll_percent() <= 35) {
+          const char *sfx = ai_pick_nonfactual_line(ext_guard_service);
+          if (sfx && *sfx) {
+            static char svc_mix[300];
+            snprintf(svc_mix, sizeof(svc_mix), "%s %s", dir_line, sfx);
+            core = svc_mix;
+          }
+        }
+      } else {
+        core = ai_pick_nonfactual_line(ext_guard_service);
+        if (!core)
+          core = ai_pick_phrase(role_guard_service);
+      }
       skip_voice = (dir_line != NULL);
     }
   } else if (role == ROLE_MERCHANT) {
     if (innkeeper) {
-      if (intent == AI_INTENT_GREET || intent == AI_INTENT_SMALLTALK) core = ai_pick_weighted_phrase(role_innkeeper_greet, role_rare_innkeeper);
+      if (intent == AI_INTENT_GREET || intent == AI_INTENT_SMALLTALK) core = (ai_pool_roll_percent() <= 45) ? ai_pick_phrase(ext_innkeeper_greet) : ai_pick_weighted_phrase(role_innkeeper_greet, role_rare_innkeeper);
       else if (intent == AI_INTENT_GIBBERISH) core = ai_pick_phrase(gib_inn);
       else if (intent == AI_INTENT_INN || intent == AI_INTENT_BUY_FOOD || intent == AI_INTENT_DIRECTIONS || intent == AI_INTENT_RUMOR) {
-        core = dir_line ? dir_line : ai_pick_phrase(role_innkeeper_service);
+        if (dir_line) {
+          core = dir_line;
+          if (ai_pool_roll_percent() <= 35) {
+            const char *sfx = ai_pick_nonfactual_line(ext_innkeeper_service);
+            if (sfx && *sfx) {
+              static char svc_mix[300];
+              snprintf(svc_mix, sizeof(svc_mix), "%s %s", dir_line, sfx);
+              core = svc_mix;
+            }
+          }
+        } else {
+          core = ai_pick_nonfactual_line(ext_innkeeper_service);
+          if (!core)
+            core = ai_pick_phrase(role_innkeeper_service);
+        }
         skip_voice = (dir_line != NULL);
       }
     } else {
-      if (intent == AI_INTENT_GREET || intent == AI_INTENT_SMALLTALK) core = ai_pick_weighted_phrase(role_merchant_greet, role_rare_merchant);
+      if (intent == AI_INTENT_GREET || intent == AI_INTENT_SMALLTALK) core = (ai_pool_roll_percent() <= 45) ? ai_pick_phrase(ext_merchant_greet) : ai_pick_weighted_phrase(role_merchant_greet, role_rare_merchant);
       else if (intent == AI_INTENT_GIBBERISH) core = ai_pick_phrase(gib_merch);
       else if (intent == AI_INTENT_BUY_WEAPON || intent == AI_INTENT_BUY_ARMOR || intent == AI_INTENT_BUY_FOOD || intent == AI_INTENT_DIRECTIONS) {
-        core = dir_line ? dir_line : ai_pick_phrase(role_merchant_service);
+        if (dir_line) {
+          core = dir_line;
+          if (ai_pool_roll_percent() <= 35) {
+            const char *sfx = ai_pick_nonfactual_line(ext_merchant_service);
+            if (sfx && *sfx) {
+              static char svc_mix[300];
+              snprintf(svc_mix, sizeof(svc_mix), "%s %s", dir_line, sfx);
+              core = svc_mix;
+            }
+          }
+        } else {
+          core = ai_pick_nonfactual_line(ext_merchant_service);
+          if (!core)
+            core = ai_pick_phrase(role_merchant_service);
+        }
         skip_voice = (dir_line != NULL);
       }
     }
@@ -7199,14 +7324,28 @@ const char *ai_line_for_intent(struct char_data *mob, struct ai_actor_memory_ent
       skip_voice = (dir_line != NULL);
     }
   } else if (role == ROLE_CIVILIAN || role == ROLE_UNKNOWN) {
-    if (intent == AI_INTENT_GREET || intent == AI_INTENT_SMALLTALK) core = "{GREET}.";
+    if (intent == AI_INTENT_GREET || intent == AI_INTENT_SMALLTALK) core = (ai_pool_roll_percent() <= 40) ? ai_pick_phrase(ext_civilian_greet) : "{GREET}.";
     else if (intent == AI_INTENT_GIBBERISH) core = ai_pick_phrase(gib_civ);
     else if (intent == AI_INTENT_DIRECTIONS || intent == AI_INTENT_RUMOR) {
-      core = dir_line ? dir_line : "I'm not sure. Maybe ask a guard.";
+      if (dir_line) {
+        core = dir_line;
+        if (ai_pool_roll_percent() <= 35) {
+          const char *sfx = ai_pick_nonfactual_line(ext_civilian_service);
+          if (sfx && *sfx) {
+            static char svc_mix[300];
+            snprintf(svc_mix, sizeof(svc_mix), "%s %s", dir_line, sfx);
+            core = svc_mix;
+          }
+        }
+      } else {
+        core = ai_pick_nonfactual_line(ext_civilian_service);
+        if (!core)
+          core = "I'm not sure. Maybe ask a guard.";
+      }
       skip_voice = (dir_line != NULL);
     }
   } else if (role == ROLE_BANDIT) {
-    if (intent == AI_INTENT_GREET || intent == AI_INTENT_SMALLTALK) core = ai_pick_weighted_phrase(role_bandit_greet, role_rare_bandit);
+    if (intent == AI_INTENT_GREET || intent == AI_INTENT_SMALLTALK) core = (ai_pool_roll_percent() <= 45) ? ai_pick_phrase(ext_bandit_greet) : ai_pick_weighted_phrase(role_bandit_greet, role_rare_bandit);
   } else if (role == ROLE_BEAST || role == ROLE_UNDEAD || role == ROLE_SPIRIT || role == ROLE_CULTIST) {
     if (intent == AI_INTENT_GIBBERISH) core = NULL;
   }
@@ -7256,10 +7395,17 @@ const char *ai_line_for_intent(struct char_data *mob, struct ai_actor_memory_ent
     else if (role == ROLE_CULTIST) core = (intent == AI_INTENT_EMOTE_SPIT) ? "Blasphemy has a price." : "Ritual, not revelry.";
   }
 
+  if (!core && role == ROLE_BANDIT && ai_intent_is_service_domain(intent)) {
+    core = ai_pick_nonfactual_line(ext_bandit_service);
+  }
+
   if (!core && intent == AI_INTENT_ASK_SERVICE) {
     core = ai_role_redirect_line(role, style, TARGET_NONE);
     skip_voice = TRUE;
   }
+
+  if (core && ai_intent_is_service_domain(intent) && !dir_line && ai_line_has_hard_location_claim(core))
+    core = NULL;
 
   if (core && !ai_line_is_role_legal(core, role, style))
     core = NULL;
@@ -9438,6 +9584,53 @@ static const char *ai_pool_pick(const char *const *pool)
   i = rand_number(0, n - 1);
   return pool[i];
 }
+
+static int ai_line_has_hard_location_claim(const char *line)
+{
+  static const char *const risky[] = {
+    " north", " south", " east", " west", " northeast", " northwest", " southeast", " southwest",
+    " two streets", " three streets", " block", " blocks", " quarter", "quarters", "district", " two rooms",
+    " one room", "stone building", "fountain", "gate post", "temple is", "bank is", "inn is", NULL
+  };
+  int i;
+  if (!line || !*line)
+    return FALSE;
+  for (i = 0; risky[i]; i++)
+    if (ai_text_has_sub_ci(line, risky[i]))
+      return TRUE;
+  return FALSE;
+}
+
+static int ai_intent_is_service_domain(int intent)
+{
+  return intent == AI_INTENT_DIRECTIONS || intent == AI_INTENT_BUY_WEAPON || intent == AI_INTENT_BUY_ARMOR ||
+         intent == AI_INTENT_BUY_FOOD || intent == AI_INTENT_INN || intent == AI_INTENT_BANK ||
+         intent == AI_INTENT_HEAL || intent == AI_INTENT_TRAIN || intent == AI_INTENT_QUEST ||
+         intent == AI_INTENT_RUMOR || intent == AI_INTENT_ASK_SERVICE;
+}
+
+static const char *ai_pick_nonfactual_line(const char *const *pool)
+{
+  int n = 0;
+  int start;
+  int i;
+  if (!pool)
+    return NULL;
+  while (pool[n])
+    n++;
+  if (n <= 0)
+    return NULL;
+  start = rand_number(0, n - 1);
+  for (i = 0; i < n; i++) {
+    const char *cand = pool[(start + i) % n];
+    if (!cand || !*cand)
+      continue;
+    if (!ai_line_has_hard_location_claim(cand))
+      return cand;
+  }
+  return NULL;
+}
+
 
 
 #if 0
