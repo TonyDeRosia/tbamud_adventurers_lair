@@ -21,11 +21,6 @@
 #include "ai_actor_brain.h"
 #include "ai_reactions.h"
 
-/* stable APIs from ai_actor_brain.c / ai_reactions.c */
-void ai_brain_ensure(struct char_data *mob);
-void ai_brain_infer_role_and_caps(struct char_data *mob, int *out_role, int *out_fit, uint32_t *out_caps);
-int ai_brain_can_speak(const struct char_data *mob);
-void ai_react_nonverbal(struct char_data *mob, struct char_data *player, int reason);
 
 #define AI_HOSTILE_ATTACK_THRESHOLD 12
 #define AI_ROOM_IDLE_SKIP_SECS 12
@@ -1079,6 +1074,7 @@ static const struct ai_working_mem_entry *ai_relevance_link(const struct ai_work
 static void ai_resolve_world_facts(struct char_data *mob, struct char_data *actor, int topic_target, int domain, const struct ai_context_vector *ctx, struct ai_world_facts *out);
 static void ai_slot_replace(const char *in, const struct ai_world_facts *f, char *out, size_t outsz);
 static void ai_sanitize_unresolved_tokens(const char *in, char *out, size_t outsz);
+static void ai_trim_to_single_sentence(char *s);
 static const char *ai_epistemic_line(int confidence, int role, int topic_target);
 static const char *ai_service_menu_clarify_line(struct char_data *mob, int role, int style, int evil, int archetype, int personality);
 static const char *ai_service_honest_fallback_line(int role, int topic_target, int archetype);
@@ -6407,6 +6403,18 @@ static void ai_slot_replace(const char *in, const struct ai_world_facts *f, char
   out[oi] = 0;
 }
 
+static void ai_trim_to_single_sentence(char *s)
+{
+  size_t i;
+  if (!s || !*s) return;
+  for (i = 0; s[i]; i++) {
+    if (s[i] == '.' || s[i] == "!"[0] || s[i] == "?"[0]) {
+      s[i + 1] = '\0';
+      break;
+    }
+  }
+}
+
 static void ai_sanitize_unresolved_tokens(const char *in, char *out, size_t outsz)
 {
   size_t i = 0, oi = 0;
@@ -9444,6 +9452,10 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
   char rx_override[240];
   int rx_force_emote = 0;
   float speech_bias = 0.0f;
+  ai_fear_state_t fear_state = AI_FEAR_NONE;
+  ai_reverence_state_t rev_state = AI_REV_NONE;
+  int stance_mood = 0;
+  int stance_voice = 0;
   float speak_score_raw = -999.0f;
   float observe_score_raw = -999.0f;
   const char *speak_decision_reason = "scored";
@@ -9527,6 +9539,9 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
     if (b_caps & (1u << 6)) role_caps |= CAP_PROVIDE_RUMOR;
     if (b_caps & (1u << 7)) role_caps |= CAP_RELIGIOUS_GUIDANCE;
   }
+  fear_state = ai_brain_fear_state(mob, actor);
+  rev_state = ai_brain_reverence_state(mob, actor);
+  ai_brain_apply_stance_bias(ai_brain_get(mob), fear_state, rev_state, &stance_mood, &stance_voice, NULL);
 
   if (type == AI_EVENT_PLAYER_SAY && !text)
     AI_EVT_RETURN("NULL_PLAYER_SAY");
@@ -10394,6 +10409,14 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
       const char *replacement = NULL;
       ai_sanitize_unresolved_tokens(line, finalbuf, sizeof(finalbuf));
       ai_rx_clean_sentence(finalbuf);
+      ai_trim_to_single_sentence(finalbuf);
+      if (fear_state >= AI_FEAR_AFRAID && strstr(finalbuf, "?") && role != ROLE_GUARD)
+        snprintf(finalbuf, sizeof(finalbuf), "%s", "I cannot help with that right now.");
+      if (rev_state >= AI_REV_RESPECTFUL && fear_state == AI_FEAR_NONE && stance_mood > 0 && role != ROLE_BANDIT) {
+        char tmp[300];
+        snprintf(tmp, sizeof(tmp), "With respect, %s", finalbuf);
+        ai_copy_trunc(finalbuf, sizeof(finalbuf), tmp);
+      }
       ai_copy_trunc(original, sizeof(original), finalbuf);
       if (type == AI_EVENT_PLAYER_SAY && !ai_line_is_role_legal(finalbuf, role, style)) {
         replacement = ai_role_redirect_line(role, style, rctx.primary_topic_target);
@@ -10421,8 +10444,13 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
         ai_debug_log("AI_COMM_PICK vnum=%d cat=%d subtags=%llu comm=%d intent=%d/%d persona=%s pool=%s", GET_MOB_VNUM(mob), creature_cat, (unsigned long long)rctx.subtags, comm_mode, intent, ai_explicit_to_core_intent(multi_intent.secondary_intent), ai_actor_persona_name(get_actor_persona(mob)), pool ? pool : "POOL_NONE");
       }
     }
-    if (type == AI_EVENT_PLAYER_SAY)
+    if (type == AI_EVENT_PLAYER_SAY) {
+      if (fear_state >= AI_FEAR_WARY)
+        ai_react_fear(mob, actor, fear_state);
+      else if (rev_state >= AI_REV_RESPECTFUL)
+        ai_react_reverence(mob, actor, rev_state);
       ai_actor_schedule_delayed_player_reply(mob, actor, targeted, rctx.personality, rctx.evil_signaled, rctx.archetype, now);
+    }
     else
       ai_actor_schedule_reaction_speech(mob, actor, targeted);
     e->last_reply_time = now;

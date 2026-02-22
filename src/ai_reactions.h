@@ -2,6 +2,7 @@
 #define _AI_REACTIONS_H_
 
 #include "ai_actor.h"
+#include "ai_actor_brain.h"
 
 struct room_data;
 struct char_data;
@@ -94,5 +95,9 @@ int ai_rx_is_explicit_sexual_request(const char *norm_text);
 
 void ai_reactions_room_event_reset(room_rnum room, int event_type);
 int ai_reaction_try(struct char_data *mob, const struct ai_reaction_ctx *ctx);
+void ai_react_emote(struct char_data *mob, struct char_data *player, int mood, int reason);
+void ai_react_nonverbal(struct char_data *mob, struct char_data *player, int reason);
+void ai_react_fear(struct char_data *mob, struct char_data *player, ai_fear_state_t fear);
+void ai_react_reverence(struct char_data *mob, struct char_data *player, ai_reverence_state_t rev);
 
 #endif
