@@ -416,7 +416,7 @@ static void ai_reaction_pick(struct char_data *mob, const struct ai_reaction_ctx
     case AI_RX_EVALUATION_BEAT: out->selected_text = ai_rx_pick_seeded((ctx->mob_role == ROLE_MERCHANT) ? rx_eval_merchant : rx_eval_guard, seed); out->debug_reason = "evaluation"; break;
     case AI_RX_WARNING: out->selected_text = ai_rx_pick_seeded(rx_intrusion, seed); out->debug_reason = "warning"; break;
     case AI_RX_CONFUSION: out->selected_text = ai_rx_pick_seeded(rx_confusion, seed); out->debug_reason = "confusion"; break;
-    case AI_RX_SILENT_STARE: out->selected_text = ai_rx_pick_seeded(rx_tiny, seed); out->debug_reason = "degraded_cap"; break;
+    case AI_RX_SILENT_STARE: out->selected_text = ai_rx_pick_seeded((seed & 1UL) ? rx_silent_stare : rx_tiny, seed); out->debug_reason = "silent_stare"; break;
     case AI_RX_MORAL_JUDGMENT: out->selected_text = ai_rx_pick_seeded(IS_GOOD(mob) ? rx_moral_good : rx_moral_evil, seed); out->debug_reason = "moral"; break;
     case AI_RX_DE_ESCALATION: out->selected_text = ai_rx_pick_seeded(rx_de_escalation, seed); out->debug_reason = "de_escalation"; break;
     case AI_RX_SERVICE_REFUSAL_REINFORCER: out->selected_text = ai_rx_pick_seeded(rx_service_refusal, seed); out->debug_reason = "service_refusal"; break;
