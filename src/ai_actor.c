@@ -21,6 +21,9 @@
 #ifndef AI_ACTOR_LIVEPLAY_DEBUG
 #define AI_ACTOR_LIVEPLAY_DEBUG 0
 #endif
+#ifndef AI_ACTOR_DEBUG_POOLS
+#define AI_ACTOR_DEBUG_POOLS 0
+#endif
 #include "ai_actor.h"
 #include "ai_actor_brain.h"
 #include "ai_reactions.h"
@@ -95,6 +98,35 @@ enum ai_plan_kind { AI_PLAN_ANSWER, AI_PLAN_REFERRAL, AI_PLAN_REFUSE, AI_PLAN_SM
 enum ai_answer_domain { AI_DOM_NONE, AI_DOM_GREETING, AI_DOM_DIRECTIONS, AI_DOM_MONEY, AI_DOM_QUESTS, AI_DOM_TRAINING, AI_DOM_TRADE, AI_DOM_RUMOR, AI_DOM_INSULT, AI_DOM_THREAT,
   AI_DOM_FLIRT, AI_DOM_ROMANCE, AI_DOM_REJECT, AI_DOM_COMPLIMENT, AI_DOM_DATE, AI_DOM_CONSENT_YES, AI_DOM_CONSENT_NO };
 enum ai_clarify_type { AI_CLARIFY_NONE, AI_CLARIFY_WHERE, AI_CLARIFY_WHICH_QUEST, AI_CLARIFY_WHICH_SHOP, AI_CLARIFY_WHICH_TRAINING };
+
+enum ai_actor_archetype {
+  ACT_ARCH_GUARD = 0,
+  ACT_ARCH_MERCHANT,
+  ACT_ARCH_INNKEEPER,
+  ACT_ARCH_TRAINER,
+  ACT_ARCH_BANDIT,
+  ACT_ARCH_CIVILIAN,
+  ACT_ARCH_BEAST,
+  ACT_ARCH_UNDEAD,
+  ACT_ARCH_SPIRIT,
+  ACT_ARCH_CULTIST,
+  ACT_ARCH_COMMANDER,
+  ACT_ARCH_OTHER
+};
+
+enum ai_pool_category {
+  POOLCAT_GREET = 0,
+  POOLCAT_SERVICE_GENERAL,
+  POOLCAT_SERVICE_TRAIN,
+  POOLCAT_SERVICE_SHOP,
+  POOLCAT_REFUSAL,
+  POOLCAT_CONFUSION,
+  POOLCAT_THREAT,
+  POOLCAT_INSULT,
+  POOLCAT_SMALLTALK,
+  POOLCAT_EMOTE_REACTION,
+  POOLCAT_AMBIENT
+};
 
 typedef struct {
   enum ai_plan_kind kind;
@@ -957,6 +989,11 @@ static enum ai_liveplay_intent ai_liveplay_classify_intent(const char *normalize
 static const char *ai_liveplay_intent_name(enum ai_liveplay_intent intent);
 static int ai_liveplay_mob_can_train(struct char_data *mob);
 static int ai_liveplay_mob_can_shop(struct char_data *mob);
+static enum ai_actor_archetype ai_actor_detect_archetype(struct char_data *mob);
+static const char *ai_actor_archetype_name(enum ai_actor_archetype arch);
+static const char *ai_pool_category_name(enum ai_pool_category cat);
+static int ai_actor_pool_allowed(struct char_data *mob, enum ai_actor_archetype arch, enum ai_pool_category cat);
+static int ai_actor_service_archetype_allowed(enum ai_actor_archetype arch, enum ai_liveplay_intent intent);
 static int ai_liveplay_role_eligible(struct char_data *mob, enum ai_liveplay_intent intent);
 static const char *ai_liveplay_referral_line(struct char_data *mob, struct char_data *player, enum ai_liveplay_intent intent);
 static int ai_actor_ensure_ready(struct char_data *mob);
@@ -3057,6 +3094,155 @@ static const char *ai_liveplay_intent_name(enum ai_liveplay_intent intent)
   }
 }
 
+static const char *ai_actor_archetype_name(enum ai_actor_archetype arch)
+{
+  switch (arch) {
+    case ACT_ARCH_GUARD: return "GUARD";
+    case ACT_ARCH_MERCHANT: return "MERCHANT";
+    case ACT_ARCH_INNKEEPER: return "INNKEEPER";
+    case ACT_ARCH_TRAINER: return "TRAINER";
+    case ACT_ARCH_BANDIT: return "BANDIT";
+    case ACT_ARCH_CIVILIAN: return "CIVILIAN";
+    case ACT_ARCH_BEAST: return "BEAST";
+    case ACT_ARCH_UNDEAD: return "UNDEAD";
+    case ACT_ARCH_SPIRIT: return "SPIRIT";
+    case ACT_ARCH_CULTIST: return "CULTIST";
+    case ACT_ARCH_COMMANDER: return "COMMANDER";
+    default: return "OTHER";
+  }
+}
+
+static const char *ai_pool_category_name(enum ai_pool_category cat)
+{
+  switch (cat) {
+    case POOLCAT_GREET: return "GREET";
+    case POOLCAT_SERVICE_GENERAL: return "SERVICE_GENERAL";
+    case POOLCAT_SERVICE_TRAIN: return "SERVICE_TRAIN";
+    case POOLCAT_SERVICE_SHOP: return "SERVICE_SHOP";
+    case POOLCAT_REFUSAL: return "REFUSAL";
+    case POOLCAT_CONFUSION: return "CONFUSION";
+    case POOLCAT_THREAT: return "THREAT";
+    case POOLCAT_INSULT: return "INSULT";
+    case POOLCAT_SMALLTALK: return "SMALLTALK";
+    case POOLCAT_EMOTE_REACTION: return "EMOTE_REACTION";
+    case POOLCAT_AMBIENT: return "AMBIENT";
+    default: return "UNKNOWN";
+  }
+}
+
+static enum ai_actor_archetype ai_actor_detect_archetype(struct char_data *mob)
+{
+  int role;
+  int style;
+  enum ai_creature_archetype creature;
+
+  if (!mob)
+    return ACT_ARCH_OTHER;
+
+  role = (mob->ai_prof) ? mob->ai_prof->role : ROLE_UNKNOWN;
+  style = (mob->ai_prof) ? mob->ai_prof->style : 0;
+  creature = ai_detect_creature_archetype(mob);
+
+  if (ai_liveplay_mob_can_train(mob))
+    return ACT_ARCH_TRAINER;
+  if (ai_liveplay_mob_can_shop(mob))
+    return (style == 1) ? ACT_ARCH_INNKEEPER : ACT_ARCH_MERCHANT;
+  if (role == ROLE_MERCHANT && style == 1)
+    return ACT_ARCH_INNKEEPER;
+  if (role == ROLE_MERCHANT)
+    return ACT_ARCH_MERCHANT;
+  if (role == ROLE_GUARD)
+    return ACT_ARCH_GUARD;
+  if (role == ROLE_BANDIT)
+    return ACT_ARCH_BANDIT;
+  if (role == ROLE_CULTIST)
+    return ACT_ARCH_CULTIST;
+  if (role == ROLE_BOSS)
+    return ACT_ARCH_COMMANDER;
+  if (role == ROLE_BEAST || creature == AI_CREATURE_BEAST)
+    return ACT_ARCH_BEAST;
+  if (role == ROLE_UNDEAD || creature == AI_CREATURE_UNDEAD)
+    return ACT_ARCH_UNDEAD;
+  if (role == ROLE_SPIRIT || creature == AI_CREATURE_SPIRIT)
+    return ACT_ARCH_SPIRIT;
+  if (role == ROLE_CIVILIAN)
+    return ACT_ARCH_CIVILIAN;
+  return ACT_ARCH_OTHER;
+}
+
+static int ai_actor_pool_allowed(struct char_data *mob, enum ai_actor_archetype arch, enum ai_pool_category cat)
+{
+  int allowed = TRUE;
+
+  (void)mob;
+  switch (arch) {
+    case ACT_ARCH_BEAST:
+      allowed = (cat == POOLCAT_REFUSAL || cat == POOLCAT_EMOTE_REACTION || cat == POOLCAT_AMBIENT);
+      break;
+    case ACT_ARCH_UNDEAD:
+      allowed = (cat == POOLCAT_GREET || cat == POOLCAT_REFUSAL || cat == POOLCAT_CONFUSION || cat == POOLCAT_THREAT ||
+                 cat == POOLCAT_INSULT || cat == POOLCAT_EMOTE_REACTION || cat == POOLCAT_AMBIENT || cat == POOLCAT_SMALLTALK);
+      break;
+    case ACT_ARCH_SPIRIT:
+      allowed = (cat == POOLCAT_GREET || cat == POOLCAT_REFUSAL || cat == POOLCAT_CONFUSION || cat == POOLCAT_THREAT ||
+                 cat == POOLCAT_INSULT || cat == POOLCAT_EMOTE_REACTION || cat == POOLCAT_AMBIENT || cat == POOLCAT_SMALLTALK);
+      break;
+    case ACT_ARCH_GUARD:
+    case ACT_ARCH_COMMANDER:
+      allowed = (cat != POOLCAT_SERVICE_SHOP);
+      break;
+    case ACT_ARCH_MERCHANT:
+      allowed = (cat != POOLCAT_SERVICE_TRAIN);
+      break;
+    case ACT_ARCH_INNKEEPER:
+      allowed = (cat != POOLCAT_SERVICE_SHOP && cat != POOLCAT_SERVICE_TRAIN);
+      break;
+    case ACT_ARCH_TRAINER:
+      allowed = (cat != POOLCAT_SERVICE_SHOP);
+      break;
+    case ACT_ARCH_BANDIT:
+    case ACT_ARCH_CULTIST:
+      allowed = (cat == POOLCAT_GREET || cat == POOLCAT_SERVICE_GENERAL || cat == POOLCAT_REFUSAL || cat == POOLCAT_CONFUSION ||
+                 cat == POOLCAT_THREAT || cat == POOLCAT_INSULT || cat == POOLCAT_SMALLTALK || cat == POOLCAT_EMOTE_REACTION || cat == POOLCAT_AMBIENT);
+      break;
+    case ACT_ARCH_CIVILIAN:
+      allowed = (cat != POOLCAT_SERVICE_TRAIN && cat != POOLCAT_SERVICE_SHOP);
+      break;
+    case ACT_ARCH_OTHER:
+    default:
+      allowed = (cat != POOLCAT_SERVICE_TRAIN && cat != POOLCAT_SERVICE_SHOP);
+      break;
+  }
+
+#if AI_ACTOR_DEBUG_POOLS
+  if (!allowed && mob)
+    ai_debug_log("AI_POOL_REJECT mob=%s vnum=%d arch=%s poolcat=%s",
+                 GET_NAME(mob) ? GET_NAME(mob) : "(unknown)",
+                 GET_MOB_VNUM(mob),
+                 ai_actor_archetype_name(arch),
+                 ai_pool_category_name(cat));
+#endif
+
+  return allowed;
+}
+
+static int ai_actor_service_archetype_allowed(enum ai_actor_archetype arch, enum ai_liveplay_intent intent)
+{
+  switch (intent) {
+    case AI_LIVE_INTENT_TRAIN_REQUEST:
+      return (arch == ACT_ARCH_TRAINER || arch == ACT_ARCH_GUARD || arch == ACT_ARCH_INNKEEPER || arch == ACT_ARCH_CIVILIAN || arch == ACT_ARCH_COMMANDER);
+    case AI_LIVE_INTENT_SHOP_REQUEST:
+      return (arch == ACT_ARCH_MERCHANT || arch == ACT_ARCH_INNKEEPER || arch == ACT_ARCH_GUARD || arch == ACT_ARCH_CIVILIAN || arch == ACT_ARCH_COMMANDER);
+    case AI_LIVE_INTENT_BANK_REQUEST:
+    case AI_LIVE_INTENT_DIRECTIONS_REQUEST:
+    case AI_LIVE_INTENT_INN_REQUEST:
+    case AI_LIVE_INTENT_QUEST_REQUEST:
+      return (arch == ACT_ARCH_GUARD || arch == ACT_ARCH_MERCHANT || arch == ACT_ARCH_INNKEEPER || arch == ACT_ARCH_TRAINER || arch == ACT_ARCH_CIVILIAN || arch == ACT_ARCH_COMMANDER);
+    default:
+      return TRUE;
+  }
+}
+
 static int ai_liveplay_mob_can_train(struct char_data *mob)
 {
   if (!mob || !IS_NPC(mob) || GET_MOB_RNUM(mob) == NOBODY)
@@ -3075,6 +3261,9 @@ static int ai_liveplay_role_eligible(struct char_data *mob, enum ai_liveplay_int
 {
   int role = (mob && mob->ai_prof) ? mob->ai_prof->role : ROLE_UNKNOWN;
   int style = (mob && mob->ai_prof) ? mob->ai_prof->style : 0;
+  enum ai_actor_archetype arch = ai_actor_detect_archetype(mob);
+  if (!ai_actor_service_archetype_allowed(arch, intent))
+    return FALSE;
   switch (intent) {
     case AI_LIVE_INTENT_TRAIN_REQUEST: return ai_liveplay_mob_can_train(mob);
     case AI_LIVE_INTENT_SHOP_REQUEST: return ai_liveplay_mob_can_shop(mob);
@@ -7548,6 +7737,7 @@ const char *ai_line_for_intent(struct char_data *mob, struct ai_actor_memory_ent
   unsigned long seed;
   int emote_kind = AI_EMOTE_OTHER;
   int suppress_default_emote = FALSE;
+  enum ai_actor_archetype actor_arch;
 
   static const char *const gib_guard[] = {"Slow down and say that clearly.", "I did not catch that. Ask again plain.", NULL};
   static const char *const gib_merch[] = {"I cannot parse that. Ask for wares plainly.", "Try that again with clear words.", NULL};
@@ -7576,6 +7766,7 @@ const char *ai_line_for_intent(struct char_data *mob, struct ai_actor_memory_ent
   style = mob->ai_prof->style;
   innkeeper = (role == ROLE_MERCHANT && style == 1);
   seed = ai_hash_mix(ai_conv_seed(mob, intent, 0), ai_hash_text_stable(text ? text : ""));
+  actor_arch = ai_actor_detect_archetype(mob);
   emote_kind = ai_detect_emote_kind(text);
 
   if (ai_text_has_sub_ci(text, "hello everyone") || ai_text_has_sub_ci(text, "whats going on") || ai_text_has_sub_ci(text, "what's going on") ||
@@ -7589,14 +7780,16 @@ const char *ai_line_for_intent(struct char_data *mob, struct ai_actor_memory_ent
 
   if (ai_text_has_sub_ci(text, "love") || ai_text_has_sub_ci(text, "crush") || ai_text_has_sub_ci(text, "romance") || ai_text_has_sub_ci(text, "date") || ai_text_has_sub_ci(text, "pretty") ||
       ai_text_has_sub_ci(text, "weird") || ai_text_has_sub_ci(text, "feel") || ai_text_has_sub_ci(text, "feeling") || ai_text_has_sub_ci(text, "what do you think") || ai_text_has_sub_ci(text, "do you think i") || ai_text_has_sub_ci(text, "am i")) {
-    if (out_pool) *out_pool = "POOL_PERSONAL_SMALLTALK";
-    if (role == ROLE_GUARD) core = ai_pick_phrase(personal_guard);
-    else if (role == ROLE_MERCHANT && innkeeper) core = ai_pick_phrase(personal_inn);
-    else if (role == ROLE_MERCHANT) core = ai_pick_phrase(personal_merch);
-    else if (role == ROLE_BANDIT) core = ai_pick_phrase(personal_bandit);
-    else if (role == ROLE_BOSS) core = "Keep your focus where it matters.";
-    else core = "That's personal. Best asked of a close friend.";
-    goto finalize;
+    if (ai_actor_pool_allowed(mob, actor_arch, POOLCAT_SMALLTALK)) {
+      if (out_pool) *out_pool = "POOL_PERSONAL_SMALLTALK";
+      if (role == ROLE_GUARD) core = ai_pick_phrase(personal_guard);
+      else if (role == ROLE_MERCHANT && innkeeper) core = ai_pick_phrase(personal_inn);
+      else if (role == ROLE_MERCHANT) core = ai_pick_phrase(personal_merch);
+      else if (role == ROLE_BANDIT) core = ai_pick_phrase(personal_bandit);
+      else if (role == ROLE_BOSS) core = "Keep your focus where it matters.";
+      else core = "That's personal. Best asked of a close friend.";
+      goto finalize;
+    }
   }
 
   if (!ai_role_can_answer_intent(role, style, intent)) {
@@ -7788,7 +7981,7 @@ const char *ai_line_for_intent(struct char_data *mob, struct ai_actor_memory_ent
     }
   }
 
-  if (!core && !suppress_default_emote && intent >= AI_INTENT_EMOTE_DANCE) {
+  if (!core && !suppress_default_emote && intent >= AI_INTENT_EMOTE_DANCE && ai_actor_pool_allowed(mob, actor_arch, POOLCAT_EMOTE_REACTION)) {
     if (role == ROLE_GUARD) core = ai_pick_phrase(role_guard_emote);
     else if (role == ROLE_MERCHANT && innkeeper) core = ai_pick_phrase(role_innkeeper_emote);
     else if (role == ROLE_MERCHANT) core = ai_pick_phrase(role_merchant_emote);
@@ -7799,7 +7992,7 @@ const char *ai_line_for_intent(struct char_data *mob, struct ai_actor_memory_ent
     else if (role == ROLE_CULTIST) core = (intent == AI_INTENT_EMOTE_SPIT) ? "Blasphemy has a price." : "Ritual, not revelry.";
   }
 
-  if (!core && role == ROLE_BANDIT && ai_intent_is_service_domain(intent)) {
+  if (!core && role == ROLE_BANDIT && ai_intent_is_service_domain(intent) && ai_actor_pool_allowed(mob, actor_arch, POOLCAT_SERVICE_GENERAL)) {
     core = ai_pick_nonfactual_line(ext_bandit_service);
   }
 
@@ -11063,6 +11256,7 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
       uint32_t required_cap = ai_intent_required_capability(explicit_intent);
       int has_capability = (!required_cap || ((role_caps & required_cap) != 0));
       enum ai_liveplay_intent live_intent = ai_liveplay_classify_intent(normalized);
+      enum ai_actor_archetype actor_arch = ai_actor_detect_archetype(mob);
 
       if (type == AI_EVENT_PLAYER_SAY && explicit_intent == INTENT_ILLEGAL_SLAVERY_REQUEST) {
         const char *illegal = (role == ROLE_GUARD) ? "No. We do not traffic in people here. Drop it." :
@@ -11184,18 +11378,23 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
       if (!line && type == AI_EVENT_PLAYER_SAY && ai_intent_is_service(explicit_intent)) {
         const char *pl = NULL;
         enum ai_distinct_intent_class dcls = DINT_SERVICE_MENU;
+        int factual_allowed = ai_actor_service_archetype_allowed(actor_arch, live_intent);
         if (explicit_intent == INTENT_SERVICE_TRAINING)
           dcls = DINT_TRAINING;
         else if (explicit_intent == INTENT_SERVICE_FOOD || explicit_intent == INTENT_SERVICE_WATER)
           dcls = DINT_FOOD_WATER;
-        if (!has_capability) {
+        if (!has_capability || !factual_allowed) {
+          if (!ai_actor_pool_allowed(mob, actor_arch, POOLCAT_SERVICE_GENERAL))
+            dcls = DINT_REFUSAL;
           if (rctx.archetype == AI_CREATURE_BEAST)
             dcls = DINT_REFUSAL;
           ai_distinct_reply_line(mob, conv_st, &rctx, dcls == DINT_SERVICE_MENU ? DINT_REFUSAL : dcls, GET_IDNUM(actor), voiced, sizeof(voiced), &pl);
           line = voiced;
         } else if (explicit_intent == INTENT_SERVICE_TRAINING) {
-          ai_distinct_reply_line(mob, conv_st, &rctx, DINT_TRAINING, GET_IDNUM(actor), voiced, sizeof(voiced), &pl);
-          line = voiced;
+          if (ai_actor_pool_allowed(mob, actor_arch, POOLCAT_SERVICE_TRAIN)) {
+            ai_distinct_reply_line(mob, conv_st, &rctx, DINT_TRAINING, GET_IDNUM(actor), voiced, sizeof(voiced), &pl);
+            line = voiced;
+          }
         } else if (explicit_intent == INTENT_SERVICE_FOOD || explicit_intent == INTENT_SERVICE_WATER) {
           ai_distinct_reply_line(mob, conv_st, &rctx, DINT_FOOD_WATER, GET_IDNUM(actor), voiced, sizeof(voiced), &pl);
           line = voiced;
