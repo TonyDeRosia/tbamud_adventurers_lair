@@ -68,6 +68,7 @@
 #define AI_IMTB_LEAD_PLAYER_MAX 12
 #define AI_IMTB_LEAD_PLAYER_SUPPRESS_SECS 10
 #define AI_PENDING_REPLY_STATE_MAX 1024
+#define AI_RECENT_FRAGMENT_HASH_MAX 8
 
 enum ai_speech_domain {
   DOMAIN_NONE = 0,
@@ -239,7 +240,8 @@ enum ai_reply_goal {
   GOAL_CONNECT,
   GOAL_DISMISS,
   GOAL_CLARIFY,
-  GOAL_SERVE
+  GOAL_SERVE,
+  GOAL_IDENTITY
 };
 
 enum ai_reply_stance {
@@ -435,7 +437,7 @@ struct ai_conv_actor_state {
   unsigned int recent_lead_hashes[6];
   int recent_lead_head;
   int recent_lead_count;
-  unsigned int recent_phrase_hashes[6];
+  unsigned int recent_phrase_hashes[AI_RECENT_FRAGMENT_HASH_MAX];
   int recent_phrase_head;
   int recent_phrase_count;
   int tone_clipped;
@@ -1138,6 +1140,7 @@ static const char *ai_reply_goal_name(enum ai_reply_goal goal)
     case GOAL_DISMISS: return "DISMISS";
     case GOAL_CLARIFY: return "CLARIFY";
     case GOAL_SERVE: return "SERVE";
+    case GOAL_IDENTITY: return "IDENTITY";
     default: return "UNKNOWN";
   }
 }
@@ -3714,6 +3717,25 @@ static int ai_line_is_role_legal(const char *line, int role, int style)
 {
   int innkeeper = (role == ROLE_MERCHANT && style == 1);
   int instructor_role = FALSE;
+  static const char *const guard_only_tokens[] = {
+    "watch", "patrol", "garrison", "duty", "post", "orders", "formation", "report in", "standing watch", NULL
+  };
+  static const char *const merchant_only_tokens[] = {
+    "stock", "fresh stock", "wares", "bargain", "trade", "trader", "profit", "sale", "price", "coinwise", "buy", "sell", NULL
+  };
+  static const char *const innkeeper_only_tokens[] = {
+    "room for the night", "beds", "ale on tap", "mug", "stables", "bar tab", "lodging", NULL
+  };
+  static const char *const cultist_only_tokens[] = {
+    "the rite", "vows", "the faith", "altar calls", "dark lord", "sacrament", NULL
+  };
+  static const char *const bandit_only_tokens[] = {
+    "your coin or", "hands where i can see", "easy pickings", "toll", "stash", "knife", NULL
+  };
+  static const char *const instructor_only_tokens[] = {
+    "train", "practice", "sessions", "discipline", "lesson", "drill", NULL
+  };
+  const char *const *tok;
 #ifdef ROLE_INSTRUCTOR
   if (role == ROLE_INSTRUCTOR)
     instructor_role = TRUE;
@@ -3725,29 +3747,53 @@ static int ai_line_is_role_legal(const char *line, int role, int style)
   if (!line || !*line)
     return FALSE;
 
-  if ((ai_text_has_sub_ci(line, "patrol") || ai_text_has_sub_ci(line, "post") || ai_text_has_sub_ci(line, "watch") || ai_text_has_sub_ci(line, "garrison") || ai_text_has_sub_ci(line, "duty") || ai_text_has_sub_ci(line, "formation") || ai_text_has_sub_ci(line, "orders"))
-      && role != ROLE_GUARD)
-    return FALSE;
+  for (tok = guard_only_tokens; *tok; tok++) {
+    if (ai_text_has_sub_ci(line, *tok) && role != ROLE_GUARD)
+      return FALSE;
+  }
+  for (tok = merchant_only_tokens; *tok; tok++) {
+    if (ai_text_has_sub_ci(line, *tok) && role != ROLE_MERCHANT)
+      return FALSE;
+  }
+  for (tok = innkeeper_only_tokens; *tok; tok++) {
+    if (ai_text_has_sub_ci(line, *tok) && !innkeeper)
+      return FALSE;
+  }
+  for (tok = cultist_only_tokens; *tok; tok++) {
+    if (ai_text_has_sub_ci(line, *tok) && role != ROLE_CULTIST)
+      return FALSE;
+  }
+  for (tok = bandit_only_tokens; *tok; tok++) {
+    if (ai_text_has_sub_ci(line, *tok) && role != ROLE_BANDIT)
+      return FALSE;
+  }
+  for (tok = instructor_only_tokens; *tok; tok++) {
+    if (ai_text_has_sub_ci(line, *tok) && !instructor_role)
+      return FALSE;
+  }
 
-  if ((ai_text_has_sub_ci(line, "hearth") || ai_text_has_sub_ci(line, "stew") || ai_text_has_sub_ci(line, "ale") || ai_text_has_sub_ci(line, "room") || ai_text_has_sub_ci(line, "bed") || ai_text_has_sub_ci(line, "warm yourself") || ai_text_has_sub_ci(line, "meal helps") || ai_text_has_sub_ci(line, "rest here"))
-      && !innkeeper)
-    return FALSE;
-
-  if ((ai_text_has_sub_ci(line, "stock") || ai_text_has_sub_ci(line, "prices") || ai_text_has_sub_ci(line, "bargain") || ai_text_has_sub_ci(line, "wares"))
-      && role != ROLE_MERCHANT)
-    return FALSE;
-
-  if (instructor_role &&
-      (ai_text_has_sub_ci(line, "stock") || ai_text_has_sub_ci(line, "fresh stock") || ai_text_has_sub_ci(line, "wares") ||
-       ai_text_has_sub_ci(line, "bargain") || ai_text_has_sub_ci(line, "trade") || ai_text_has_sub_ci(line, "trader") ||
-       ai_text_has_sub_ci(line, "merchant") || ai_text_has_sub_ci(line, "buy") || ai_text_has_sub_ci(line, "sell") ||
-       ai_text_has_sub_ci(line, "price") || ai_text_has_sub_ci(line, "coinwise") || ai_text_has_sub_ci(line, "profit") ||
-       ai_text_has_sub_ci(line, "sale") || ai_text_has_sub_ci(line, "shop") || ai_text_has_sub_ci(line, "market") ||
-       ai_text_has_sub_ci(line, "quality stock") || ai_text_has_sub_ci(line, "clean bargain") || ai_text_has_sub_ci(line, "coin") ||
-       ai_text_has_sub_ci(line, "watch") || ai_text_has_sub_ci(line, "patrol") || ai_text_has_sub_ci(line, "garrison") ||
-       ai_text_has_sub_ci(line, "duty") || ai_text_has_sub_ci(line, "post") || ai_text_has_sub_ci(line, "orders") ||
-       ai_text_has_sub_ci(line, "formation")))
-    return FALSE;
+  if (instructor_role) {
+    for (tok = merchant_only_tokens; *tok; tok++) {
+      if (ai_text_has_sub_ci(line, *tok))
+        return FALSE;
+    }
+  }
+  if (role == ROLE_BANDIT) {
+    for (tok = guard_only_tokens; *tok; tok++) {
+      if (ai_text_has_sub_ci(line, *tok))
+        return FALSE;
+    }
+  }
+  if (role == ROLE_GUARD) {
+    for (tok = merchant_only_tokens; *tok; tok++) {
+      if (ai_text_has_sub_ci(line, *tok))
+        return FALSE;
+    }
+    for (tok = innkeeper_only_tokens; *tok; tok++) {
+      if (ai_text_has_sub_ci(line, *tok))
+        return FALSE;
+    }
+  }
 
   if (ai_text_has_sub_ci(line, "coin purse") && !(role == ROLE_MERCHANT || role == ROLE_BANDIT))
     return FALSE;
@@ -4200,7 +4246,7 @@ static void ai_voice_assemble(struct char_data *mob, const struct ai_voice_profi
   if (closer && *closer && st) {
     int ctry;
     unsigned int ch = (unsigned int)ai_hash_text_stable(closer);
-    for (ctry = 0; ctry < 6 && ai_hash_ring_has(st->recent_phrase_hashes, st->recent_phrase_count, st->recent_phrase_head, 6, ch); ctry++) {
+    for (ctry = 0; ctry < 6 && ai_hash_ring_has(st->recent_phrase_hashes, st->recent_phrase_count, st->recent_phrase_head, AI_RECENT_FRAGMENT_HASH_MAX, ch); ctry++) {
       closer = ai_phrase("CLOSER", vocab_tier, rhythm, ai_hash_mix(seed, (unsigned long)(131 + ctry * 17)), vp_closer_index + ctry + 1);
       if (!closer || !*closer || !ai_line_is_role_legal(closer, role, style))
         break;
@@ -4226,10 +4272,24 @@ static void ai_voice_assemble(struct char_data *mob, const struct ai_voice_profi
   if (in && in->goal == GOAL_SERVE && role == ROLE_MERCHANT && style == 1)
     use_emotional = 1;
 
+  if (plead && *plead && st) {
+    int ptry;
+    unsigned int ph = (unsigned int)ai_hash_text_stable(plead);
+    for (ptry = 0; ptry < 6 && ai_hash_ring_has(st->recent_phrase_hashes, st->recent_phrase_count, st->recent_phrase_head, AI_RECENT_FRAGMENT_HASH_MAX, ph); ptry++) {
+      plead = ai_imtb_pick_leadin(st, rctx, role, style, ai_hash_mix(seed, (unsigned long)(111 + ptry * 19)), &psuppressed);
+      if (!plead || !*plead)
+        break;
+      ph = (unsigned int)ai_hash_text_stable(plead);
+    }
+  }
+
   if (plead && *plead)
     snprintf(work, sizeof(work), "%s %s", plead, core);
   else
     snprintf(work, sizeof(work), "%s", core);
+
+  if (plead && *plead && st)
+    ai_hash_ring_push(st->recent_phrase_hashes, &st->recent_phrase_head, &st->recent_phrase_count, AI_RECENT_FRAGMENT_HASH_MAX, (unsigned int)ai_hash_text_stable(plead));
 
   if (!multi_topic && !(in && in->be_brief) && ((ai_hash_mix(seed, 223) % 100UL) < 35UL)) {
     int suffix_mode = ((ai_hash_mix(seed, 227) % 2UL) == 0UL);
@@ -4237,7 +4297,7 @@ static void ai_voice_assemble(struct char_data *mob, const struct ai_voice_profi
     if (pmicro && *pmicro && st) {
       int mtry;
       unsigned int mh = (unsigned int)ai_hash_text_stable(pmicro);
-      for (mtry = 0; mtry < 6 && ai_hash_ring_has(st->recent_phrase_hashes, st->recent_phrase_count, st->recent_phrase_head, 6, mh); mtry++) {
+      for (mtry = 0; mtry < 6 && ai_hash_ring_has(st->recent_phrase_hashes, st->recent_phrase_count, st->recent_phrase_head, AI_RECENT_FRAGMENT_HASH_MAX, mh); mtry++) {
         pmicro = ai_imtb_pick_micro_wrap(rctx, role, style, ai_hash_mix(seed, (unsigned long)(229 + mtry * 31)), suffix_mode);
         if (!pmicro || !*pmicro)
           break;
@@ -4251,7 +4311,7 @@ static void ai_voice_assemble(struct char_data *mob, const struct ai_voice_profi
         ai_buf_prefix(work, sizeof(work), pmicro);
       }
       if (st)
-        ai_hash_ring_push(st->recent_phrase_hashes, &st->recent_phrase_head, &st->recent_phrase_count, 6, (unsigned int)ai_hash_text_stable(pmicro));
+        ai_hash_ring_push(st->recent_phrase_hashes, &st->recent_phrase_head, &st->recent_phrase_count, AI_RECENT_FRAGMENT_HASH_MAX, (unsigned int)ai_hash_text_stable(pmicro));
     }
   }
 
@@ -4267,7 +4327,7 @@ static void ai_voice_assemble(struct char_data *mob, const struct ai_voice_profi
   if (rhythm >= 1 && closer && *closer) {
     snprintf(work + strlen(work), sizeof(work) - strlen(work), " %s", closer);
     if (st)
-      ai_hash_ring_push(st->recent_phrase_hashes, &st->recent_phrase_head, &st->recent_phrase_count, 6, (unsigned int)ai_hash_text_stable(closer));
+      ai_hash_ring_push(st->recent_phrase_hashes, &st->recent_phrase_head, &st->recent_phrase_count, AI_RECENT_FRAGMENT_HASH_MAX, (unsigned int)ai_hash_text_stable(closer));
   }
 
   if (rhythm >= 3 && topic && *topic)
@@ -4281,8 +4341,21 @@ static void ai_voice_assemble(struct char_data *mob, const struct ai_voice_profi
     snprintf(work + strlen(work), sizeof(work) - strlen(work), " %s", ai_followup_pick(rctx ? rctx->speech_act : AI_INTENT_NONE, seed));
 
   pfollow = ai_imtb_pick_followup(rctx, role, style, ai_hash_mix(seed, 149));
-  if (pfollow && *pfollow && !service_domain && !multi_topic)
+  if (pfollow && *pfollow && !service_domain && !multi_topic && st) {
+    int ftry;
+    unsigned int fh = (unsigned int)ai_hash_text_stable(pfollow);
+    for (ftry = 0; ftry < 6 && ai_hash_ring_has(st->recent_phrase_hashes, st->recent_phrase_count, st->recent_phrase_head, AI_RECENT_FRAGMENT_HASH_MAX, fh); ftry++) {
+      pfollow = ai_imtb_pick_followup(rctx, role, style, ai_hash_mix(seed, (unsigned long)(149 + ftry * 23)));
+      if (!pfollow || !*pfollow)
+        break;
+      fh = (unsigned int)ai_hash_text_stable(pfollow);
+    }
+  }
+  if (pfollow && *pfollow && !service_domain && !multi_topic) {
     snprintf(work + strlen(work), sizeof(work) - strlen(work), " %s", pfollow);
+    if (st)
+      ai_hash_ring_push(st->recent_phrase_hashes, &st->recent_phrase_head, &st->recent_phrase_count, AI_RECENT_FRAGMENT_HASH_MAX, (unsigned int)ai_hash_text_stable(pfollow));
+  }
 
   if (use_emotional) {
     const char *feel = ((rctx ? rctx->speech_act : AI_INTENT_NONE)==AI_INTENT_PRAISE||(rctx ? rctx->speech_act : AI_INTENT_NONE)==AI_INTENT_GREET||(rctx ? rctx->speech_act : AI_INTENT_NONE)==AI_INTENT_SMALLTALK) ? ai_phrase("FEEL_POSITIVE", vocab_tier, rhythm, seed, 7) : ai_phrase("FEEL_NEGATIVE", vocab_tier, rhythm, seed, 8);
@@ -4606,6 +4679,11 @@ static int ai_text_is_effectively_empty(const char *s)
   if (!s)
     return TRUE;
 
+  while (*s && isspace((unsigned char)*s))
+    s++;
+  if (!*s)
+    return TRUE;
+
   for (p = (const unsigned char *)s; *p; p++) {
     if (isalnum(*p))
       alnum_count++;
@@ -4626,7 +4704,7 @@ static int ai_is_self_identity_query(const char *text, int *out_is_human_questio
   if (ai_text_has_sub_ci(text, "are you human") || ai_text_has_sub_ci(text, "are you a human")) {
     is_human = TRUE;
   } else if (!(ai_text_has_sub_ci(text, "who are you") || ai_text_has_sub_ci(text, "what are you") ||
-               ai_text_has_sub_ci(text, "tell me about yourself"))) {
+               ai_text_has_sub_ci(text, "tell me about yourself") || ai_text_has_sub_ci(text, "what is your name"))) {
     return FALSE;
   }
 
@@ -4639,27 +4717,43 @@ static void ai_build_self_identity_line(struct char_data *mob, int role, int arc
 {
   const char *desc;
   const char *role_name;
-  const char *mortal;
+  const char *align;
+  const char *name;
+  int has_proper_name = FALSE;
 
   if (!out || outsz == 0)
     return;
 
   desc = (mob && mob->player.short_descr && *mob->player.short_descr) ? mob->player.short_descr : "this one";
   role_name = ai_role_name_local(role);
+  name = (mob && mob->player.name) ? mob->player.name : "";
+  if (name && *name && isalpha((unsigned char)name[0]))
+    has_proper_name = TRUE;
 
   if (human_question) {
     if (archetype == AI_CREATURE_HUMANOID)
-      mortal = "Yes. I am humanoid.";
+      snprintf(out, outsz, "Yes. I'm humanoid.");
     else if (archetype == AI_CREATURE_UNDEAD || archetype == AI_CREATURE_FIEND || archetype == AI_CREATURE_CONSTRUCT ||
-             archetype == AI_CREATURE_ABERRATION || archetype == AI_CREATURE_ELEMENTAL || archetype == AI_CREATURE_OOZE)
-      mortal = "No. I am not human.";
+             archetype == AI_CREATURE_OOZE || archetype == AI_CREATURE_BEAST || archetype == AI_CREATURE_ABERRATION ||
+             archetype == AI_CREATURE_DRAGON || archetype == AI_CREATURE_ELEMENTAL || archetype == AI_CREATURE_GIANT ||
+             archetype == AI_CREATURE_MONSTROSITY || archetype == AI_CREATURE_PLANT)
+      snprintf(out, outsz, "No. I'm not human.");
     else
-      mortal = "Not sure what you'd call me.";
-    snprintf(out, outsz, "%s I serve here as %s.", mortal, role_name ? role_name : "a local");
+      snprintf(out, outsz, "I'm not certain what I am.");
     return;
   }
 
-  snprintf(out, outsz, "I am %s, a %s. My alignment runs at %d.", desc, role_name ? role_name : "local", mob ? GET_ALIGNMENT(mob) : 0);
+  if (mob && GET_ALIGNMENT(mob) >= 350)
+    align = "good";
+  else if (mob && GET_ALIGNMENT(mob) <= -350)
+    align = "evil";
+  else
+    align = "neutral";
+
+  if (has_proper_name)
+    snprintf(out, outsz, "I'm %s. %s, %s. Alignment: %s.", name, desc, role_name ? role_name : "local", align);
+  else
+    snprintf(out, outsz, "I don't carry a proper name. I'm %s, %s. Alignment: %s.", desc, role_name ? role_name : "local", align);
 }
 
 static const char *ai_role_neutral_fallback_line(int role, int style, int archetype)
@@ -6289,6 +6383,8 @@ int ai_actor_tick(struct char_data *mob, time_t now)
   }
 
   if (line && *line) {
+    if (st->pending_event_type != AI_EVENT_PLAYER_SAY)
+      return FALSE;
     const char *reason = (st->pending_event_type == AI_EVENT_PLAYER_ENTER) ? "ARRIVAL" : "AMBIENT";
     const char *pool = (pf->role == ROLE_CIVILIAN || pf->role == ROLE_UNKNOWN) ? "POOL_GENERIC_AMBIENT" : "POOL_ROLE_AMBIENT";
     ai_set_last_speech_meta(mob, pool, reason);
@@ -8116,7 +8212,7 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
         rctx.chosen_core = core;
         skip_voice = TRUE;
         intention.be_brief = 1;
-        intention.goal = GOAL_INFORM;
+        intention.goal = GOAL_IDENTITY;
       } else if (type == AI_EVENT_PLAYER_SAY && asks_train && IN_ROOM(mob) == IN_ROOM(actor) && MOB_FLAGGED(mob, MOB_GUILD_MASTER)) {
         line = "Yes. Use TRAIN to spend training sessions. Use PRAC to spend practice sessions.";
         core = line;
@@ -8273,13 +8369,16 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
       }
 
       if (line && *line && !ai_line_is_role_legal(line, role, style)) {
-        snprintf(voiced, sizeof(voiced), "%.*s", (int)sizeof(voiced) - 1, core ? core : "");
-        line = voiced;
-        if (!line[0] || !ai_line_is_role_legal(line, role, style)) {
-          const char *redirect = ai_role_redirect_line(role, style, TARGET_NONE);
-          if (!redirect || !*redirect || !ai_line_is_role_legal(redirect, role, style))
-            redirect = "Let's keep to what I can answer.";
-          line = redirect;
+        int legal_try;
+        for (legal_try = 0; legal_try < 8 && (!line || !*line || !ai_line_is_role_legal(line, role, style)); legal_try++) {
+          core = ai_select_content_for_intention(mob, &intention, &rctx, sr, &rctx.from_template);
+          line = core;
+        }
+        if (!line || !*line || !ai_line_is_role_legal(line, role, style)) {
+          const char *fallback = ai_role_neutral_fallback_line(role, style, rctx.archetype);
+          if (!fallback || !*fallback || !ai_line_is_role_legal(fallback, role, style))
+            fallback = "Let's keep to what I can answer.";
+          line = fallback;
         }
       }
 
