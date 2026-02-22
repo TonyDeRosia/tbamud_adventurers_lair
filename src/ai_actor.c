@@ -13,10 +13,14 @@
 #include "graph.h"
 #include "fight.h"
 #include "shop.h"
+#include "spec_procs.h"
 #include "spells.h"
 #include "act.h"
 #undef AI_ACTOR_DEBUG
-#define AI_ACTOR_DEBUG 1
+#define AI_ACTOR_DEBUG 0
+#ifndef AI_ACTOR_LIVEPLAY_DEBUG
+#define AI_ACTOR_LIVEPLAY_DEBUG 0
+#endif
 #include "ai_actor.h"
 #include "ai_actor_brain.h"
 #include "ai_reactions.h"
@@ -734,6 +738,20 @@ static int ai_pick_stance_prefix(int role, int style, unsigned long seed, const 
 static int ai_is_evil_signaled(const struct char_data *mob);
 static int ai_is_training_query_text(const char *text);
 static int ai_is_practice_query_text(const char *text);
+
+enum ai_liveplay_intent {
+  AI_LIVE_INTENT_UNKNOWN = 0,
+  AI_LIVE_INTENT_TRAIN_REQUEST,
+  AI_LIVE_INTENT_SHOP_REQUEST,
+  AI_LIVE_INTENT_DIRECTIONS_REQUEST,
+  AI_LIVE_INTENT_BANK_REQUEST,
+  AI_LIVE_INTENT_INN_REQUEST,
+  AI_LIVE_INTENT_QUEST_REQUEST,
+  AI_LIVE_INTENT_SOCIAL_FLIRT,
+  AI_LIVE_INTENT_FREE_STUFF,
+  AI_LIVE_INTENT_INSULT_THREAT,
+  AI_LIVE_INTENT_GREET_SMALLTALK
+};
 static int ai_is_supply_query_text(const char *text);
 static int ai_is_food_drink_query_text(const char *text);
 static const char *ai_pick_question_mirror_clause(int topic_target, int role, int style, unsigned long seed);
@@ -927,10 +945,17 @@ static void ai_actor_try_reaction_glue(struct char_data *mob, struct char_data *
                                        int role, int style, int personality, int archetype, int intent_id, int domain_id,
                                        float attention, float suspicion, int threat, int urgency);
 static int ai_actor_room_response_slot(struct char_data *mob, struct char_data *actor, enum ai_event_type type, int intent, int confidence, const char *normalized);
+static enum ai_liveplay_intent ai_liveplay_classify_intent(const char *normalized);
+static const char *ai_liveplay_intent_name(enum ai_liveplay_intent intent);
+static int ai_liveplay_mob_can_train(struct char_data *mob);
+static int ai_liveplay_mob_can_shop(struct char_data *mob);
+static int ai_liveplay_role_eligible(struct char_data *mob, enum ai_liveplay_intent intent);
+static const char *ai_liveplay_referral_line(struct char_data *mob, struct char_data *player, enum ai_liveplay_intent intent);
 static int ai_actor_ensure_ready(struct char_data *mob);
 static unsigned long ai_hash_mix(unsigned long h, unsigned long v);
 static unsigned long ai_hash_text_stable(const char *text);
 static int ai_imtb_pick_personality(struct char_data *mob, int role, int style);
+static const char *ai_service_direction_line(struct char_data *mob, struct char_data *player, int intent, int topic);
 static const struct ai_imtb_profile *ai_imtb_profile_get(int personality);
 static enum ai_creature_archetype ai_detect_creature_archetype(struct char_data *mob);
 static uint64_t ai_detect_creature_subtags(struct char_data *mob);
@@ -2977,6 +3002,112 @@ static int ai_mob_has_shop_data(struct char_data *mob)
   if (!mob || GET_MOB_RNUM(mob) == NOBODY)
     return FALSE;
   return (mob_index[GET_MOB_RNUM(mob)].func == shop_keeper);
+}
+
+static enum ai_liveplay_intent ai_liveplay_classify_intent(const char *normalized)
+{
+  if (!normalized || !*normalized)
+    return AI_LIVE_INTENT_UNKNOWN;
+  if (ai_text_has_sub_ci(normalized, "train") || ai_text_has_sub_ci(normalized, "practice") || ai_text_has_sub_ci(normalized, "learn") || ai_text_has_sub_ci(normalized, "teach") || ai_text_has_sub_ci(normalized, "skills") || ai_text_has_sub_ci(normalized, "abilities"))
+    return AI_LIVE_INTENT_TRAIN_REQUEST;
+  if (ai_text_has_sub_ci(normalized, "buy") || ai_text_has_sub_ci(normalized, "sell") || ai_text_has_sub_ci(normalized, "shop") || ai_text_has_sub_ci(normalized, "price") || ai_text_has_sub_ci(normalized, "purchase"))
+    return AI_LIVE_INTENT_SHOP_REQUEST;
+  if (ai_text_has_sub_ci(normalized, "where is") || ai_text_has_sub_ci(normalized, "how do i get to") || ai_text_has_sub_ci(normalized, "directions") || ai_text_has_sub_ci(normalized, "find"))
+    return AI_LIVE_INTENT_DIRECTIONS_REQUEST;
+  if (ai_text_has_sub_ci(normalized, "bank") || ai_text_has_sub_ci(normalized, "deposit") || ai_text_has_sub_ci(normalized, "withdraw") || ai_text_has_sub_ci(normalized, "atm") || ai_text_has_sub_ci(normalized, "vault"))
+    return AI_LIVE_INTENT_BANK_REQUEST;
+  if (ai_text_has_sub_ci(normalized, "inn") || ai_text_has_sub_ci(normalized, "tavern") || ai_text_has_sub_ci(normalized, "room") || ai_text_has_sub_ci(normalized, "sleep") || ai_text_has_sub_ci(normalized, "rest"))
+    return AI_LIVE_INTENT_INN_REQUEST;
+  if (ai_text_has_sub_ci(normalized, "quest") || ai_text_has_sub_ci(normalized, "job") || ai_text_has_sub_ci(normalized, "work") || ai_text_has_sub_ci(normalized, "bounty") || ai_text_has_sub_ci(normalized, "board"))
+    return AI_LIVE_INTENT_QUEST_REQUEST;
+  if (ai_text_has_sub_ci(normalized, "pretty") || ai_text_has_sub_ci(normalized, "crush") || ai_text_has_sub_ci(normalized, "love") || ai_text_has_sub_ci(normalized, "kiss"))
+    return AI_LIVE_INTENT_SOCIAL_FLIRT;
+  if (ai_text_has_sub_ci(normalized, "free") || ai_text_has_sub_ci(normalized, "give me") || ai_text_has_sub_ci(normalized, "gift") || ai_text_has_sub_ci(normalized, "handout"))
+    return AI_LIVE_INTENT_FREE_STUFF;
+  if (ai_text_has_sub_ci(normalized, "idiot") || ai_text_has_sub_ci(normalized, "moron") || ai_text_has_sub_ci(normalized, "stupid") || ai_text_has_sub_ci(normalized, "threat") || ai_text_has_sub_ci(normalized, "kill"))
+    return AI_LIVE_INTENT_INSULT_THREAT;
+  if (ai_text_has_sub_ci(normalized, "hello") || ai_text_has_sub_ci(normalized, "greetings") || ai_text_has_sub_ci(normalized, "hi") || ai_text_has_sub_ci(normalized, "morning") || ai_text_has_sub_ci(normalized, "evening"))
+    return AI_LIVE_INTENT_GREET_SMALLTALK;
+  return AI_LIVE_INTENT_UNKNOWN;
+}
+
+static const char *ai_liveplay_intent_name(enum ai_liveplay_intent intent)
+{
+  switch (intent) {
+    case AI_LIVE_INTENT_TRAIN_REQUEST: return "TRAIN_REQUEST";
+    case AI_LIVE_INTENT_SHOP_REQUEST: return "SHOP_REQUEST";
+    case AI_LIVE_INTENT_DIRECTIONS_REQUEST: return "DIRECTIONS_REQUEST";
+    case AI_LIVE_INTENT_BANK_REQUEST: return "BANK_REQUEST";
+    case AI_LIVE_INTENT_INN_REQUEST: return "INN_REQUEST";
+    case AI_LIVE_INTENT_QUEST_REQUEST: return "QUEST_REQUEST";
+    case AI_LIVE_INTENT_SOCIAL_FLIRT: return "SOCIAL_FLIRT";
+    case AI_LIVE_INTENT_FREE_STUFF: return "FREE_STUFF";
+    case AI_LIVE_INTENT_INSULT_THREAT: return "INSULT_THREAT";
+    case AI_LIVE_INTENT_GREET_SMALLTALK: return "GREET_SMALLTALK";
+    default: return "UNKNOWN";
+  }
+}
+
+static int ai_liveplay_mob_can_train(struct char_data *mob)
+{
+  if (!mob || !IS_NPC(mob) || GET_MOB_RNUM(mob) == NOBODY)
+    return FALSE;
+  return (MOB_FLAGGED(mob, MOB_GUILD_MASTER) || (mob_index[GET_MOB_RNUM(mob)].func == guild));
+}
+
+static int ai_liveplay_mob_can_shop(struct char_data *mob)
+{
+  if (!mob || !IS_NPC(mob) || GET_MOB_RNUM(mob) == NOBODY)
+    return FALSE;
+  return (mob_index[GET_MOB_RNUM(mob)].func == shop_keeper);
+}
+
+static int ai_liveplay_role_eligible(struct char_data *mob, enum ai_liveplay_intent intent)
+{
+  int role = (mob && mob->ai_prof) ? mob->ai_prof->role : ROLE_UNKNOWN;
+  int style = (mob && mob->ai_prof) ? mob->ai_prof->style : 0;
+  switch (intent) {
+    case AI_LIVE_INTENT_TRAIN_REQUEST: return ai_liveplay_mob_can_train(mob);
+    case AI_LIVE_INTENT_SHOP_REQUEST: return ai_liveplay_mob_can_shop(mob);
+    case AI_LIVE_INTENT_BANK_REQUEST: return (ai_liveplay_mob_can_shop(mob) || role == ROLE_GUARD || role == ROLE_MERCHANT);
+    case AI_LIVE_INTENT_INN_REQUEST: return (role == ROLE_MERCHANT && style == 1);
+    case AI_LIVE_INTENT_DIRECTIONS_REQUEST: return ai_role_can_give_directions(role);
+    case AI_LIVE_INTENT_QUEST_REQUEST: return (role == ROLE_GUARD || role == ROLE_MERCHANT || role == ROLE_CIVILIAN || role == ROLE_BANDIT);
+    default: return TRUE;
+  }
+}
+
+static const char *ai_liveplay_referral_line(struct char_data *mob, struct char_data *player, enum ai_liveplay_intent intent)
+{
+  static char out[220];
+  struct char_data *it;
+  int topic = TARGET_NONE;
+  const char *route;
+
+  if (!mob || IN_ROOM(mob) == NOWHERE)
+    return "I cannot find that nearby. Try the town board or ask at the square.";
+
+  if (intent == AI_LIVE_INTENT_TRAIN_REQUEST) {
+    for (it = world[IN_ROOM(mob)].people; it; it = it->next_in_room) {
+      if (!IS_NPC(it) || it == mob)
+        continue;
+      if (ai_liveplay_mob_can_train(it)) {
+        snprintf(out, sizeof(out), "Ask %s in this room.", GET_NAME(it));
+        return out;
+      }
+    }
+    topic = TARGET_TRAINER;
+  } else if (intent == AI_LIVE_INTENT_BANK_REQUEST)
+    topic = TARGET_BANK;
+  else if (intent == AI_LIVE_INTENT_INN_REQUEST)
+    topic = TARGET_INN;
+  else if (intent == AI_LIVE_INTENT_SHOP_REQUEST || intent == AI_LIVE_INTENT_DIRECTIONS_REQUEST)
+    topic = TARGET_MARKET;
+
+  route = ai_service_direction_line(mob, player, AI_INTENT_ASK_SERVICE, topic);
+  if (route && *route)
+    return route;
+  return "I cannot find that nearby. Try the town board or ask at the square.";
 }
 
 static int ai_can_speak_now(struct char_data *mob, time_t now)
@@ -7257,8 +7388,8 @@ static const char *ai_service_direction_line(struct char_data *mob, struct char_
   else
     snprintf(line, sizeof(line), "%s: %s", dest_name, route_trim);
 
-  if (ai_debug)
-    ai_debug_log("AI_SERVICE_ROUTE intent=%d topic=%s room=%d route=%s", intent, ai_topic_key_name(service_type), room_v, route_trim);
+  if (ai_debug || AI_ACTOR_LIVEPLAY_DEBUG)
+    ai_debug_log("AI_LIVEPLAY service_source mob=%d source=computed intent=%d topic=%s room=%d route=%s", mob ? GET_MOB_VNUM(mob) : -1, intent, ai_topic_key_name(service_type), room_v, route_trim);
 
   return line;
 }
@@ -9667,10 +9798,10 @@ static struct ai_player_arb_entry *ai_player_arb_get_or_create(room_rnum room, l
 static int ai_actor_room_response_slot(struct char_data *mob, struct char_data *actor, enum ai_event_type type, int intent, int confidence, const char *normalized)
 {
   struct char_data *it;
-  struct char_data *top1 = NULL, *top2 = NULL, *top3 = NULL;
+  struct char_data *top1 = NULL;
   struct ai_player_arb_entry *arb;
-  int best1 = -999999, best2 = -999999, best3 = -999999;
-  int targeted_to_mob = ai_rx_infer_targeted_to_mob(mob, normalized);
+  int best1 = -999999;
+  enum ai_liveplay_intent live_intent = ai_liveplay_classify_intent(normalized);
   time_t now = time(0);
   unsigned long text_hash;
 
@@ -9683,12 +9814,11 @@ static int ai_actor_room_response_slot(struct char_data *mob, struct char_data *
     return FALSE;
 
   if (arb->responder1 || arb->responder2 || arb->responder3)
-    return (mob == arb->responder1 || mob == arb->responder2 || mob == arb->responder3);
+    return (mob == arb->responder1);
 
   for (it = world[IN_ROOM(mob)].people; it; it = it->next_in_room) {
     int pri;
     int role_score;
-    int dist = (IN_ROOM(it) == IN_ROOM(actor)) ? 0 : 1;
 
     if (!IS_NPC(it) || !MOB_FLAGGED(it, MOB_AI_ACTOR) || !it->ai_prof || !it->ai_state)
       continue;
@@ -9708,23 +9838,19 @@ static int ai_actor_room_response_slot(struct char_data *mob, struct char_data *
     role_score = ai_role_priority_score(it);
     pri += confidence * 100;
     pri += role_score;
-    pri -= (dist * 2);
+
+    if (type == AI_EVENT_PLAYER_SAY) {
+      if (live_intent == AI_LIVE_INTENT_TRAIN_REQUEST && ai_liveplay_mob_can_train(it))
+        pri += 9000;
+      else if (live_intent == AI_LIVE_INTENT_TRAIN_REQUEST)
+        pri -= 800;
+      if (live_intent == AI_LIVE_INTENT_SHOP_REQUEST && ai_liveplay_mob_can_shop(it))
+        pri += 3500;
+    }
 
     if (pri > best1 || (pri == best1 && (!top1 || GET_MOB_VNUM(it) < GET_MOB_VNUM(top1)))) {
-      best3 = best2;
-      top3 = top2;
-      best2 = best1;
-      top2 = top1;
       best1 = pri;
       top1 = it;
-    } else if (pri > best2 || (pri == best2 && (!top2 || GET_MOB_VNUM(it) < GET_MOB_VNUM(top2)))) {
-      best3 = best2;
-      top3 = top2;
-      best2 = pri;
-      top2 = it;
-    } else if (pri > best3 || (pri == best3 && (!top3 || GET_MOB_VNUM(it) < GET_MOB_VNUM(top3)))) {
-      best3 = pri;
-      top3 = it;
     }
   }
 
@@ -9732,11 +9858,11 @@ static int ai_actor_room_response_slot(struct char_data *mob, struct char_data *
     top1 = mob;
 
   arb->responder1 = top1;
-  arb->responder2 = targeted_to_mob ? NULL : top2;
-  arb->responder3 = targeted_to_mob ? NULL : top3;
-  if (ai_debug)
-    ai_debug_log("AI_ARB decision=slot_assign room=%d actor=%ld intent=%d responders=%d/%d/%d", IN_ROOM(mob), GET_IDNUM(actor), intent, top1 ? GET_MOB_VNUM(top1) : -1, top2 ? GET_MOB_VNUM(top2) : -1, top3 ? GET_MOB_VNUM(top3) : -1);
-  return (mob == arb->responder1 || mob == arb->responder2 || mob == arb->responder3);
+  arb->responder2 = NULL;
+  arb->responder3 = NULL;
+  if (ai_debug || AI_ACTOR_LIVEPLAY_DEBUG)
+    ai_debug_log("AI_ARB decision=slot_assign room=%d actor=%ld intent=%d live=%s primary=%d", IN_ROOM(mob), GET_IDNUM(actor), intent, ai_liveplay_intent_name(live_intent), top1 ? GET_MOB_VNUM(top1) : -1);
+  return (mob == arb->responder1);
 }
 
 
@@ -10508,6 +10634,9 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
       rctx.speech_act = intent;
     }
 
+    if (AI_ACTOR_LIVEPLAY_DEBUG)
+      ai_debug_log("AI_LIVEPLAY intent mob=%d core=%d explicit=%d live=%s", GET_MOB_VNUM(mob), intent, explicit_intent, ai_liveplay_intent_name(ai_liveplay_classify_intent(normalized)));
+
     if (guidance_query.confidence >= 45 && guidance_query.is_question && explicit_intent != INTENT_ILLEGAL_SLAVERY_REQUEST) {
       guidance_forced = 1;
       if (guidance_query.wants_clarify) {
@@ -10838,6 +10967,7 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
       int asks_train = ai_is_training_query_text(normalized) || ai_is_practice_query_text(normalized);
       uint32_t required_cap = ai_intent_required_capability(explicit_intent);
       int has_capability = (!required_cap || ((role_caps & required_cap) != 0));
+      enum ai_liveplay_intent live_intent = ai_liveplay_classify_intent(normalized);
 
       if (type == AI_EVENT_PLAYER_SAY && explicit_intent == INTENT_ILLEGAL_SLAVERY_REQUEST) {
         const char *illegal = (role == ROLE_GUARD) ? "No. We do not traffic in people here. Drop it." :
@@ -10896,6 +11026,17 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
           if (sctx)
             sctx->last_mood = AI_SOCIAL_FRIENDLY;
         }
+      }
+
+      if (type == AI_EVENT_PLAYER_SAY &&
+          (live_intent == AI_LIVE_INTENT_TRAIN_REQUEST || live_intent == AI_LIVE_INTENT_SHOP_REQUEST || live_intent == AI_LIVE_INTENT_DIRECTIONS_REQUEST ||
+           live_intent == AI_LIVE_INTENT_BANK_REQUEST || live_intent == AI_LIVE_INTENT_INN_REQUEST || live_intent == AI_LIVE_INTENT_QUEST_REQUEST) &&
+          !ai_liveplay_role_eligible(mob, live_intent)) {
+        line = ai_liveplay_referral_line(mob, actor, live_intent);
+        rctx.chosen_core = line;
+        skip_voice = TRUE;
+        if (AI_ACTOR_LIVEPLAY_DEBUG)
+          ai_debug_log("AI_LIVEPLAY role_gate mob=%d intent=%s eligible=0", GET_MOB_VNUM(mob), ai_liveplay_intent_name(live_intent));
       }
 
       intention = ai_form_intention(mob, intent, speech_class, suspicion_bucket, sr ? sr->arc : AI_ARC_STRANGER, &ctx, sr, e, now);
@@ -11148,6 +11289,8 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
         if (svc_fb && ai_line_has_hard_location_claim(svc_fb))
           svc_fb = NULL;
         line = svc_fb ? svc_fb : ai_service_honest_fallback_line(role, rctx.primary_topic_target, rctx.archetype);
+        if (AI_ACTOR_LIVEPLAY_DEBUG)
+          ai_debug_log("AI_LIVEPLAY service_source mob=%d source=fallback", GET_MOB_VNUM(mob));
         skip_voice = TRUE;
       }
 
@@ -11402,6 +11545,8 @@ void ai_actor_event_leave(struct char_data *actor, room_rnum room)
 void ai_actor_event_say(struct char_data *actor, const char *msg)
 {
   struct char_data *mob;
+  struct char_data *seed_mob = NULL;
+  char normalized[MAX_INPUT_LENGTH];
 
   /* Runtime checklist:
    * 1) Player speaker in valid room dispatches to local AI mobs.
@@ -11411,8 +11556,19 @@ void ai_actor_event_say(struct char_data *actor, const char *msg)
   if (!actor || IS_NPC(actor) || IN_ROOM(actor) == NOWHERE)
     return;
 
+  ai_normalize_text(msg ? msg : "", normalized, sizeof(normalized));
   ai_dbg_evt(NULL, "SAY_DISPATCH", AI_EVENT_PLAYER_SAY, actor, msg ? msg : "");
   ai_reactions_room_event_reset(IN_ROOM(actor), AI_EVENT_PLAYER_SAY);
+
+  for (mob = world[IN_ROOM(actor)].people; mob; mob = mob->next_in_room) {
+    if (IS_NPC(mob) && MOB_FLAGGED(mob, MOB_AI_ACTOR) && mob != actor && ai_actor_ensure_ready(mob)) {
+      seed_mob = mob;
+      break;
+    }
+  }
+  if (seed_mob)
+    (void)ai_actor_room_response_slot(seed_mob, actor, AI_EVENT_PLAYER_SAY, AI_INTENT_NONE, 0, normalized);
+
   for (mob = world[IN_ROOM(actor)].people; mob; mob = mob->next_in_room)
     if (IS_NPC(mob) && MOB_FLAGGED(mob, MOB_AI_ACTOR) && mob != actor) {
       if (!ai_actor_ensure_ready(mob)) {
