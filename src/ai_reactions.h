@@ -31,6 +31,41 @@ enum ai_rx_intent {
   RX_INTENT_PLAYER_DOWN
 };
 
+enum ai_reaction_trigger_reason {
+  AI_RX_TRIG_NONE = 0,
+  AI_RX_TRIG_ARB_SLOT_DENIED_EARLY,
+  AI_RX_TRIG_NON_SPEAK_ACTION_SELECTED,
+  AI_RX_TRIG_OPTIONAL_OTHER
+};
+
+struct ai_reaction_ctx {
+  int event_type;
+  int trigger_reason;
+  int mob_vnum;
+  int mob_role;
+  int mob_style;
+  int mob_personality;
+  int mob_alignment;
+  int mob_archetype;
+  int action_selected;
+  long actor_idnum;
+  room_rnum room_rnum;
+  unsigned long normalized_hash;
+  int intent_id;
+  int domain_id;
+  float suspicion;
+  int threat;
+  int urgency;
+  float attention;
+  int is_fighting;
+  int is_sleeping;
+  int is_charmed;
+  int is_stunned;
+  int can_act;
+  const char *raw_text;
+  const char *normalized_text;
+};
+
 struct ai_rx_event {
   struct char_data *mob;
   struct char_data *speaker;
@@ -56,5 +91,8 @@ void ai_rx_clean_sentence(char *s);
 int ai_rx_infer_targeted_to_mob(struct char_data *mob, const char *norm_text);
 int ai_rx_is_service_style_request(const char *norm_text);
 int ai_rx_is_explicit_sexual_request(const char *norm_text);
+
+void ai_reactions_room_event_reset(room_rnum room, int event_type);
+int ai_reaction_try(struct char_data *mob, const struct ai_reaction_ctx *ctx);
 
 #endif
