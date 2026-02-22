@@ -87,7 +87,8 @@ enum ai_answer_kind {
 };
 
 enum ai_plan_kind { AI_PLAN_ANSWER, AI_PLAN_REFERRAL, AI_PLAN_REFUSE, AI_PLAN_SMALLTALK };
-enum ai_answer_domain { AI_DOM_NONE, AI_DOM_GREETING, AI_DOM_DIRECTIONS, AI_DOM_MONEY, AI_DOM_QUESTS, AI_DOM_TRAINING, AI_DOM_TRADE, AI_DOM_RUMOR, AI_DOM_INSULT, AI_DOM_THREAT };
+enum ai_answer_domain { AI_DOM_NONE, AI_DOM_GREETING, AI_DOM_DIRECTIONS, AI_DOM_MONEY, AI_DOM_QUESTS, AI_DOM_TRAINING, AI_DOM_TRADE, AI_DOM_RUMOR, AI_DOM_INSULT, AI_DOM_THREAT,
+  AI_DOM_FLIRT, AI_DOM_ROMANCE, AI_DOM_REJECT, AI_DOM_COMPLIMENT, AI_DOM_DATE, AI_DOM_CONSENT_YES, AI_DOM_CONSENT_NO };
 enum ai_clarify_type { AI_CLARIFY_NONE, AI_CLARIFY_WHERE, AI_CLARIFY_WHICH_QUEST, AI_CLARIFY_WHICH_SHOP, AI_CLARIFY_WHICH_TRAINING };
 
 typedef struct {
@@ -195,7 +196,20 @@ struct ai_social_context {
   uint8_t insult_count_recent;
   uint8_t last_meta_flag;
   uint8_t last_refusal_type;
+  int last_romance_domain;
+  int last_romance_bucket;
+  int last_consent_state;
+  uint32_t last_romance_text_hash;
   time_t updated_at;
+};
+
+struct ai_romance_overlay {
+  int active;
+  int rel_bucket;
+  ai_romance_style_t style;
+  ai_consent_state_t consent;
+  int wants_clarify;
+  char tag[32];
 };
 
 struct ai_room_ambient_cache {
@@ -1116,9 +1130,26 @@ static int ai_plan_domain_to_brain_domain(enum ai_answer_domain domain);
 static uint32_t ai_plan_required_caps(enum ai_answer_domain domain);
 static void ai_plan_finalize_sentence(char *dst, size_t dstsz, const char *src);
 static void ai_plan_build(struct char_data *mob, struct char_data *player, const char *normalized, int role, int style, uint32_t caps, ai_fear_state_t fear_state, ai_reverence_state_t rev_state, int voice_style, ai_response_plan_t *out);
+static int ai_romance_keyword_hit(const char *text, const char *const *pool);
+static void ai_build_romance_overlay(struct char_data *mob, struct char_data *player, int domain, const char *player_text, struct ai_romance_overlay *out);
+static const char *ai_romance_style_tag(ai_romance_style_t style);
+static const char *ai_romance_line_style(ai_romance_style_t style, int idx);
+static const char *ai_romance_boundary_line(int repeat);
 static enum ai_answer_domain ai_plan_classify_domain(const char *normalized)
 {
+  static const char *const comp_kw[] = {"you look nice","handsome","beautiful","cute","pretty","hot","adorable",NULL};
+  static const char *const flirt_kw[] = {"flirt","hey beautiful","come here","what are you doing later","wink",NULL};
+  static const char *const romance_kw[] = {"kiss","hold hands","hug","date","take you out",NULL};
+  static const char *const consent_yes_kw[] = {"yes","sure","ok","i want that","i am interested","ready",NULL};
+  static const char *const consent_no_kw[] = {"no","stop","leave me alone","not interested","back off",NULL};
+  static const char *const reject_kw[] = {"you are gross","go away","not my type",NULL};
   if (!normalized || !*normalized) return AI_DOM_NONE;
+  if (ai_romance_keyword_hit(normalized, consent_no_kw)) return AI_DOM_CONSENT_NO;
+  if (ai_romance_keyword_hit(normalized, consent_yes_kw)) return AI_DOM_CONSENT_YES;
+  if (ai_romance_keyword_hit(normalized, reject_kw)) return AI_DOM_REJECT;
+  if (ai_romance_keyword_hit(normalized, romance_kw)) return ai_text_has_sub_ci(normalized, "date") ? AI_DOM_DATE : AI_DOM_ROMANCE;
+  if (ai_romance_keyword_hit(normalized, flirt_kw)) return AI_DOM_FLIRT;
+  if (ai_romance_keyword_hit(normalized, comp_kw)) return AI_DOM_COMPLIMENT;
   if (ai_text_has_sub_ci(normalized, "hello") || ai_text_has_sub_ci(normalized, " hi") || ai_text_has_sub_ci(normalized, "hey") || ai_text_has_sub_ci(normalized, "greetings") || ai_text_has_sub_ci(normalized, "hail") || ai_text_has_sub_ci(normalized, "yo")) return AI_DOM_GREETING;
   if (ai_text_has_sub_ci(normalized, "kill") || ai_text_has_sub_ci(normalized, "hurt") || ai_text_has_sub_ci(normalized, "smash") || ai_text_has_sub_ci(normalized, "attack you") || ai_text_has_sub_ci(normalized, "burn") || ai_text_has_sub_ci(normalized, "murder")) return AI_DOM_THREAT;
   if (ai_text_has_sub_ci(normalized, "robot") || ai_text_has_sub_ci(normalized, "stupid") || ai_text_has_sub_ci(normalized, "idiot") || ai_text_has_sub_ci(normalized, "trash") || ai_text_has_sub_ci(normalized, "dumb") || ai_text_has_sub_ci(normalized, "crazy") || ai_text_has_sub_ci(normalized, "bad dialogue")) return AI_DOM_INSULT;
@@ -1193,16 +1224,88 @@ static void ai_plan_finalize_sentence(char *dst, size_t dstsz, const char *src)
   }
 }
 
+static int ai_romance_keyword_hit(const char *text, const char *const *pool)
+{
+  int i;
+  if (!text || !pool) return 0;
+  for (i = 0; pool[i]; i++)
+    if (ai_text_has_sub_ci(text, pool[i])) return 1;
+  return 0;
+}
+
+static const char *ai_romance_style_tag(ai_romance_style_t style)
+{
+  switch (style) {
+    case AI_ROM_STYLE_SHY: return "shy";
+    case AI_ROM_STYLE_WARM: return "warm";
+    case AI_ROM_STYLE_FLIRTY: return "flirty";
+    case AI_ROM_STYLE_FORMAL: return "formal";
+    case AI_ROM_STYLE_ROGUISH: return "roguish";
+    case AI_ROM_STYLE_PLAYFUL: return "playful";
+    default: return "none";
+  }
+}
+
+static const char *ai_romance_line_style(ai_romance_style_t style, int idx)
+{
+  static const char *const shy[] = {"Uh, thanks. That is kind of you.", "I do not flirt much, but I appreciate it.", NULL};
+  static const char *const warm[] = {"Thank you. You are sweet.", "That made my day.", NULL};
+  static const char *const flirty[] = {"Careful, you will make me blush.", "Bold words. I might like that.", NULL};
+  static const char *const formal[] = {"You are gracious. Thank you.", "I am flattered. What can I do for you?", NULL};
+  static const char *const roguish[] = {"Heh. You have nerve. I respect that.", "Try not to get yourself into trouble around me.", NULL};
+  static const char *const playful[] = {"Stop, you will give me a big head.", "Okay, that was a good one.", NULL};
+  const char *const *pool = warm;
+  if (style == AI_ROM_STYLE_SHY) pool = shy;
+  else if (style == AI_ROM_STYLE_FLIRTY) pool = flirty;
+  else if (style == AI_ROM_STYLE_FORMAL) pool = formal;
+  else if (style == AI_ROM_STYLE_ROGUISH) pool = roguish;
+  else if (style == AI_ROM_STYLE_PLAYFUL) pool = playful;
+  return pool[idx % 2];
+}
+
+static const char *ai_romance_boundary_line(int repeat)
+{
+  static const char *const bnd[] = {"No. Do not talk to me that way.", "Not interested. Keep it respectful.", "Back off.", NULL};
+  if (repeat) return "I said no.";
+  return bnd[rand_number(0, 2)];
+}
+
+static void ai_build_romance_overlay(struct char_data *mob, struct char_data *player, int domain, const char *player_text, struct ai_romance_overlay *out)
+{
+  int rel_bucket;
+  ai_consent_state_t st;
+  if (!out) return;
+  memset(out, 0, sizeof(*out));
+  if (!mob || !player) return;
+  st = ai_brain_consent_state(mob, player);
+  rel_bucket = ai_brain_relationship_bucket(mob, player);
+  out->style = ai_brain_romance_style(mob);
+  out->consent = st;
+  out->rel_bucket = rel_bucket;
+  snprintf(out->tag, sizeof(out->tag), "%s", ai_romance_style_tag(out->style));
+  if (!ai_brain_romance_allowed_now(mob, player) || rel_bucket < REL_ADMIRE_LIGHT || st == AI_CONSENT_DENIED) {
+    out->active = 0;
+    return;
+  }
+  if (domain == AI_DOM_ROMANCE || domain == AI_DOM_DATE || domain == AI_DOM_FLIRT || domain == AI_DOM_COMPLIMENT)
+    out->active = 1;
+  if (domain == AI_DOM_DATE && !ai_text_has_sub_ci(player_text, "date")) out->wants_clarify = 1;
+}
+
 static void ai_plan_build(struct char_data *mob, struct char_data *player, const char *normalized, int role, int style, uint32_t caps, ai_fear_state_t fear_state, ai_reverence_state_t rev_state, int voice_style, ai_response_plan_t *out)
 {
   uint32_t need_caps;
   int brain_domain;
+  int rel_bucket;
   struct char_data *target = NULL;
   const char *tname;
+  struct ai_romance_overlay ro;
   if (!out) return;
   memset(out, 0, sizeof(*out));
   out->kind = AI_PLAN_ANSWER;
   out->domain = ai_plan_classify_domain(normalized);
+  rel_bucket = ai_brain_relationship_bucket(mob, player);
+  ai_build_romance_overlay(mob, player, out->domain, normalized, &ro);
   out->clarify_type = AI_CLARIFY_NONE;
   (void)voice_style;
 
@@ -1230,6 +1333,42 @@ static void ai_plan_build(struct char_data *mob, struct char_data *player, const
     out->kind = AI_PLAN_REFERRAL;
   }
 
+  if (out->domain == AI_DOM_REJECT || out->domain == AI_DOM_CONSENT_NO) {
+    ai_brain_set_consent(mob, player, AI_CONSENT_DENIED);
+    out->kind = AI_PLAN_REFUSE;
+    ai_plan_finalize_sentence(out->answer1, sizeof(out->answer1), "Understood");
+    ai_plan_finalize_sentence(out->answer2, sizeof(out->answer2), ai_romance_boundary_line(0));
+    return;
+  }
+
+  if (out->domain == AI_DOM_CONSENT_YES && ai_brain_consent_state(mob, player) == AI_CONSENT_ASKED) {
+    ai_brain_set_consent(mob, player, AI_CONSENT_GRANTED);
+    if (rel_bucket >= REL_ADORE) {
+      ai_plan_finalize_sentence(out->answer1, sizeof(out->answer1), "Alright. Meet me by the inn when you are ready");
+      ai_plan_finalize_sentence(out->answer2, sizeof(out->answer2), "Say 'ready' when you want to go");
+    } else {
+      ai_plan_finalize_sentence(out->answer1, sizeof(out->answer1), "Alright. Somewhere quiet in town works");
+      out->answer2[0] = '\0';
+    }
+    return;
+  }
+
+  if ((out->domain == AI_DOM_ROMANCE || out->domain == AI_DOM_DATE) && ai_brain_consent_state(mob, player) == AI_CONSENT_NONE) {
+    ai_brain_set_consent(mob, player, AI_CONSENT_ASKED);
+    ai_plan_finalize_sentence(out->answer1, sizeof(out->answer1), (out->domain == AI_DOM_DATE) ? "Do you want a date, yes or no?" : "Are you asking to hold hands, yes or no?");
+    out->answer2[0] = '\0';
+    return;
+  }
+
+  if (out->domain == AI_DOM_COMPLIMENT || out->domain == AI_DOM_FLIRT) {
+    if (!ro.active || fear_state >= AI_FEAR_AFRAID || rel_bucket < REL_ADMIRE_LIGHT)
+      ai_plan_finalize_sentence(out->answer1, sizeof(out->answer1), "Thank you");
+    else
+      ai_plan_finalize_sentence(out->answer1, sizeof(out->answer1), ai_romance_line_style(ro.style, rand_number(0, 1)));
+    out->answer2[0] = '\0';
+    return;
+  }
+
   if (out->kind == AI_PLAN_REFERRAL) {
     brain_domain = ai_plan_domain_to_brain_domain(out->domain);
     if (ai_brain_pick_referral_in_room(mob, player, brain_domain, &target) && target) {
@@ -1254,6 +1393,12 @@ static void ai_plan_build(struct char_data *mob, struct char_data *player, const
     case AI_DOM_GREETING:
       if (rev_state >= AI_REV_REVERENT) {
         ai_plan_finalize_sentence(out->answer1, sizeof(out->answer1), "My respect");
+        out->answer2[0] = '\0';
+      } else if (rel_bucket <= REL_DISLIKE) {
+        ai_plan_finalize_sentence(out->answer1, sizeof(out->answer1), "State your business");
+        out->answer2[0] = '\0';
+      } else if (rel_bucket >= REL_ADMIRE) {
+        ai_plan_finalize_sentence(out->answer1, sizeof(out->answer1), "Good to see you");
         out->answer2[0] = '\0';
       } else if (style == 1 || role == ROLE_GUARD) {
         ai_plan_finalize_sentence(out->answer1, sizeof(out->answer1), "Good day");
@@ -10678,10 +10823,18 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
       }
     }
     if (type == AI_EVENT_PLAYER_SAY) {
+      int rel_bucket_now = ai_brain_relationship_bucket(mob, actor);
       if (fear_state >= AI_FEAR_INTIMIDATED && rand_number(1, 100) <= 30)
         ai_react_fear(mob, actor, fear_state);
       else if (rev_state >= AI_REV_ADMIRING && rand_number(1, 100) <= 20)
         ai_react_reverence(mob, actor, rev_state);
+      ai_react_relationship(mob, actor, rel_bucket_now);
+      if (response_plan.domain == AI_DOM_COMPLIMENT && rel_bucket_now >= REL_ADMIRE_LIGHT)
+        ai_react_romance(mob, actor, (rand_number(1, 100) <= 50) ? AI_REACT_ROM_SMILE : AI_REACT_ROM_BLUSH, 1);
+      else if (response_plan.domain == AI_DOM_FLIRT && rel_bucket_now >= REL_ADMIRE && rand_number(1, 100) <= 25)
+        ai_react_romance(mob, actor, AI_REACT_ROM_WINK, 1);
+      else if (response_plan.domain == AI_DOM_REJECT || response_plan.domain == AI_DOM_CONSENT_NO)
+        ai_react_romance(mob, actor, AI_REACT_ROM_FIRM_BOUNDARY, 2);
       ai_actor_schedule_delayed_player_reply(mob, actor, targeted, rctx.personality, rctx.evil_signaled, rctx.archetype, now);
     }
     else

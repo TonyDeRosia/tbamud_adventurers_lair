@@ -31,6 +31,15 @@ typedef struct ai_brain_profile {
   int role;
   int role_fitness;
   uint32_t caps;
+  uint8_t romance_enabled;
+  uint8_t romance_style;
+  uint8_t attraction_model;
+  uint8_t attracted_to_mask;
+  uint8_t romance_boundaries;
+  int16_t baseline_interest;
+  uint32_t last_romance_ts;
+  uint32_t last_consent_ts;
+  uint8_t consent_state;
   time_t built_at;
 } ai_brain_profile;
 
@@ -485,6 +494,7 @@ static void ai_brain_build_profile(struct char_data *mob, ai_brain_profile *p) {
   static const char *const demon_kw[] = {"demon","devil","fiend",NULL};
   static const char *const royal_kw[] = {"royal","lord","lady","regal","commander",NULL};
   static const char *const undead_kw2[] = {"undead","skeleton","lich","ghost",NULL};
+  static const char *const romance_kw[] = {"charming","courtesan","bard","poet","romantic",NULL};
   char text[2048];
   unsigned long h;
   int fit = 0;
@@ -532,11 +542,189 @@ static void ai_brain_build_profile(struct char_data *mob, ai_brain_profile *p) {
     fit = 12;
 
   p->role_fitness = fit;
+  p->romance_style = (uint8_t)((p->seed % 6u) + 1u);
+  p->attraction_model = (uint8_t)((p->seed % 7u) + 1u);
+  p->attracted_to_mask = (uint8_t)(AI_PARCH_GOOD | AI_PARCH_NEUTRAL | AI_PARCH_EVIL | AI_PARCH_BRAVE | AI_PARCH_SHY | AI_PARCH_ROGUEISH | AI_PARCH_NOBLE | AI_PARCH_MYSTIC);
+  p->romance_boundaries = 1u;
+  p->baseline_interest = (int16_t)((int)(p->seed % 61u) - 30);
+  p->consent_state = AI_CONSENT_NONE;
+  p->last_consent_ts = 0;
+  p->last_romance_ts = 0;
+  p->romance_enabled = (p->can_speak && p->is_humanoid) ? 1 : 0;
+  if (p->role == ROLE_BEAST) p->romance_enabled = 0;
+  if ((MOB_FLAGGED(mob, MOB_AGGRESSIVE) || MOB_FLAGGED(mob, MOB_AGGR_EVIL) || MOB_FLAGGED(mob, MOB_AGGR_GOOD) || MOB_FLAGGED(mob, MOB_AGGR_NEUTRAL)) && !ai_brain_has_kw(text, romance_kw))
+    p->romance_enabled = 0;
+  if (p->role_fitness <= 8 && !ai_brain_has_kw(text, romance_kw)) p->romance_enabled = 0;
   p->built_at = time(0);
 
 #if AI_ACTOR_DEBUG
   log("AI_BRAIN_PROFILE mob=%s vnum=%d seed=%u speak=%d role=%d fit=%d caps=0x%x", GET_NAME(mob), GET_MOB_VNUM(mob), p->seed, p->can_speak, p->role, p->role_fitness, (unsigned int)p->caps);
 #endif
+}
+
+int ai_brain_player_archetype_mask(struct char_data *player, struct char_data *mob) {
+  int mask = 0, align, cha, lvl_gap;
+  if (!player) return AI_PARCH_NEUTRAL;
+  align = GET_ALIGNMENT(player);
+  cha = GET_CHA(player);
+  lvl_gap = mob ? (GET_LEVEL(player) - GET_LEVEL(mob)) : 0;
+  if (align > 350) mask |= AI_PARCH_GOOD;
+  else if (align < -350) mask |= AI_PARCH_EVIL;
+  else mask |= AI_PARCH_NEUTRAL;
+  if (cha >= 15) mask |= AI_PARCH_BRAVE;
+  else if (cha <= 8) mask |= AI_PARCH_SHY;
+  if (GET_CLASS(player) == CLASS_THIEF || GET_CLASS(player) == CLASS_BARD) mask |= AI_PARCH_ROGUEISH;
+  if (GET_CLASS(player) == CLASS_CLERIC || GET_CLASS(player) == CLASS_PALADIN) mask |= AI_PARCH_NOBLE;
+  if (GET_CLASS(player) == CLASS_MAGIC_USER || GET_CLASS(player) == CLASS_WARLOCK || GET_CLASS(player) == CLASS_DRUID || GET_CLASS(player) == CLASS_MYSTIC)
+    mask |= AI_PARCH_MYSTIC;
+  if (lvl_gap >= 8) mask |= AI_PARCH_BRAVE;
+  if (GET_BOUNTY(player) > 0 && align < -250) mask |= AI_PARCH_ROGUEISH;
+  return mask ? mask : AI_PARCH_NEUTRAL;
+}
+
+int ai_brain_romance_enabled(const struct char_data *mob) {
+  const ai_brain_profile *p = ai_brain_get((struct char_data *)mob);
+  return (p && p->romance_enabled) ? TRUE : FALSE;
+}
+
+ai_romance_style_t ai_brain_romance_style(const struct char_data *mob) {
+  const ai_brain_profile *p = ai_brain_get((struct char_data *)mob);
+  return p ? (ai_romance_style_t)p->romance_style : AI_ROM_STYLE_NONE;
+}
+
+ai_attraction_model_t ai_brain_attraction_model(const struct char_data *mob) {
+  const ai_brain_profile *p = ai_brain_get((struct char_data *)mob);
+  return p ? (ai_attraction_model_t)p->attraction_model : AI_ATTRACT_NONE;
+}
+
+ai_consent_state_t ai_brain_consent_state(const struct char_data *mob, const struct char_data *player) {
+  const ai_brain_profile *p;
+  (void)player;
+  p = ai_brain_get((struct char_data *)mob);
+  if (!p) return AI_CONSENT_NONE;
+  return (ai_consent_state_t)p->consent_state;
+}
+
+void ai_brain_set_consent(struct char_data *mob, struct char_data *player, ai_consent_state_t st) {
+  struct ai_brain_slot *sl;
+  (void)player;
+  if (!mob) return;
+  sl = ai_brain_slot_get(mob, 1);
+  if (!sl) return;
+  sl->profile.consent_state = (uint8_t)st;
+  sl->profile.last_consent_ts = (uint32_t)time(0);
+#if AI_ACTOR_DEBUG
+  log("AI_ROMANCE_CONSENT mob=%d player=%ld state=%d", GET_MOB_VNUM(mob), player ? GET_IDNUM(player) : 0L, (int)st);
+#endif
+}
+
+static int ai_brain_compatibility_score(struct char_data *mob, struct char_data *player, const ai_brain_profile *p) {
+  int mask, score = 0;
+  if (!mob || !player || !p) return 0;
+  mask = ai_brain_player_archetype_mask(player, mob);
+  switch ((ai_attraction_model_t)p->attraction_model) {
+    case AI_ATTRACT_BAD_BOY: if (mask & (AI_PARCH_EVIL | AI_PARCH_ROGUEISH)) score += 18; if (mask & AI_PARCH_NOBLE) score -= 8; break;
+    case AI_ATTRACT_GOOD_HEART: if (mask & (AI_PARCH_GOOD | AI_PARCH_NOBLE)) score += 18; if (mask & AI_PARCH_EVIL) score -= 15; break;
+    case AI_ATTRACT_POWER: if ((GET_LEVEL(player) - GET_LEVEL(mob)) >= 8) score += 20; break;
+    case AI_ATTRACT_INTELLECT: if (mask & AI_PARCH_MYSTIC) score += 16; if (GET_INT(player) >= 15) score += 8; break;
+    case AI_ATTRACT_HUMOR: if (GET_BOUNTY(player) == 0) score += 10; break;
+    case AI_ATTRACT_SHY_SWEET: if (mask & AI_PARCH_SHY) score += 18; if (GET_CHA(player) >= 17) score -= 8; break;
+    case AI_ATTRACT_MYSTERIOUS: if (mask & AI_PARCH_NEUTRAL) score += 12; if (mask & AI_PARCH_ROGUEISH) score += 8; break;
+    default: break;
+  }
+  if (score < -30) score = -30;
+  if (score > 30) score = 30;
+  return score;
+}
+
+int ai_brain_interest_score(struct char_data *mob, struct char_data *player) {
+  const ai_brain_profile *p;
+  int score, cha_mod;
+  if (!mob || !player) return -100;
+  ai_brain_ensure(mob);
+  p = ai_brain_get(mob);
+  if (!p || !p->romance_enabled) return -100;
+  score = p->baseline_interest + ai_brain_compatibility_score(mob, player, p);
+  cha_mod = (GET_CHA(player) - 10) * 4;
+  if (cha_mod < -20) cha_mod = -20;
+  if (cha_mod > 20) cha_mod = 20;
+  score += cha_mod;
+  if (score < -100) score = -100;
+  if (score > 100) score = 100;
+  return score;
+}
+
+int ai_brain_interest_bucket(struct char_data *mob, struct char_data *player) {
+  int s = ai_brain_interest_score(mob, player);
+  if (s < -20) return 0;
+  if (s < 20) return 1;
+  if (s < 45) return 2;
+  if (s < 70) return 3;
+  return 4;
+}
+
+int ai_brain_romance_allowed_now(struct char_data *mob, struct char_data *player) {
+  const ai_brain_profile *p;
+  time_t now = time(0);
+  if (!mob || !player) return FALSE;
+  ai_brain_ensure(mob);
+  p = ai_brain_get(mob);
+  if (!p || !p->romance_enabled) return FALSE;
+  if (ai_brain_fear_state(mob, player) >= AI_FEAR_AFRAID) return FALSE;
+  if ((int)p->last_romance_ts > 0 && (now - (time_t)p->last_romance_ts) < 3) return FALSE;
+  return TRUE;
+}
+
+int ai_brain_relationship_score(struct char_data *mob, struct char_data *player) {
+  const ai_brain_profile *p;
+  int base_social, attraction_component, respect_component, fear_component, boundary_penalty = 0, short_mood = 0, rel;
+  if (!mob || !player) return 0;
+  ai_brain_ensure(mob);
+  p = ai_brain_get(mob);
+  if (!p) return 0;
+  base_social = p->baseline_interest + (int)p->tolerance * 4;
+  attraction_component = ai_brain_compatibility_score(mob, player, p) + ((GET_CHA(player) - 10) * 2);
+  if (attraction_component < -30) attraction_component = -30;
+  if (attraction_component > 30) attraction_component = 30;
+  respect_component = (ai_brain_respect_score(mob, player) * 25) / 100;
+  fear_component = (ai_brain_intimidation_score(mob, player) * 60) / 100;
+  if (p->consent_state == AI_CONSENT_DENIED) boundary_penalty += 20;
+  rel = base_social + attraction_component + respect_component - fear_component - boundary_penalty + short_mood;
+  if (ai_brain_fear_state(mob, player) >= AI_FEAR_AFRAID && rel > 19) rel = 19;
+  if (rel < -100) rel = -100;
+  if (rel > 100) rel = 100;
+#if AI_ACTOR_DEBUG
+  log("AI_REL mob=%d player=%ld rel=%d enabled=%d model=%d style=%d", GET_MOB_VNUM(mob), GET_IDNUM(player), rel, p->romance_enabled, p->attraction_model, p->romance_style);
+#endif
+  return rel;
+}
+
+int ai_brain_relationship_bucket(struct char_data *mob, struct char_data *player) {
+  int rel = ai_brain_relationship_score(mob, player);
+  if (rel <= -80) return REL_HATEFUL;
+  if (rel <= -60) return REL_DISGUSTED;
+  if (rel <= -40) return REL_HOSTILE;
+  if (rel <= -20) return REL_DISLIKE;
+  if (rel <= 19) return REL_NEUTRAL;
+  if (rel <= 39) return REL_ADMIRE_LIGHT;
+  if (rel <= 59) return REL_ADMIRE;
+  if (rel <= 79) return REL_ADORE;
+  return REL_IN_LOVE;
+}
+
+const char *ai_brain_relationship_bucket_name(int bucket) {
+  switch (bucket) {
+    case REL_HATEFUL: return "REL_HATEFUL";
+    case REL_DISGUSTED: return "REL_DISGUSTED";
+    case REL_HOSTILE: return "REL_HOSTILE";
+    case REL_DISLIKE: return "REL_DISLIKE";
+    case REL_NEUTRAL: return "REL_NEUTRAL";
+    case REL_ADMIRE_LIGHT: return "REL_ADMIRE_LIGHT";
+    case REL_ADMIRE: return "REL_ADMIRE";
+    case REL_ADORE: return "REL_ADORE";
+    case REL_IN_LOVE: return "REL_IN_LOVE";
+    default: return "REL_UNKNOWN";
+  }
 }
 
 const ai_brain_profile *ai_brain_get(struct char_data *mob) {
