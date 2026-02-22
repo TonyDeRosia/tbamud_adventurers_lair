@@ -86,6 +86,20 @@ enum ai_answer_kind {
   AI_ANSWER_SMALLTALK
 };
 
+enum ai_plan_kind { AI_PLAN_ANSWER, AI_PLAN_REFERRAL, AI_PLAN_REFUSE, AI_PLAN_SMALLTALK };
+enum ai_answer_domain { AI_DOM_NONE, AI_DOM_GREETING, AI_DOM_DIRECTIONS, AI_DOM_MONEY, AI_DOM_QUESTS, AI_DOM_TRAINING, AI_DOM_TRADE, AI_DOM_RUMOR, AI_DOM_INSULT, AI_DOM_THREAT };
+enum ai_clarify_type { AI_CLARIFY_NONE, AI_CLARIFY_WHERE, AI_CLARIFY_WHICH_QUEST, AI_CLARIFY_WHICH_SHOP, AI_CLARIFY_WHICH_TRAINING };
+
+typedef struct {
+  enum ai_plan_kind kind;
+  enum ai_answer_domain domain;
+  int needs_clarify;
+  int clarify_type;
+  char answer1[256];
+  char answer2[256];
+  struct char_data *ref_target;
+} ai_response_plan_t;
+
 enum ai_social_mood {
   AI_SOCIAL_NEUTRAL = 0,
   AI_SOCIAL_FRIENDLY,
@@ -1074,7 +1088,6 @@ static const struct ai_working_mem_entry *ai_relevance_link(const struct ai_work
 static void ai_resolve_world_facts(struct char_data *mob, struct char_data *actor, int topic_target, int domain, const struct ai_context_vector *ctx, struct ai_world_facts *out);
 static void ai_slot_replace(const char *in, const struct ai_world_facts *f, char *out, size_t outsz);
 static void ai_sanitize_unresolved_tokens(const char *in, char *out, size_t outsz);
-static void ai_trim_to_single_sentence(char *s);
 static const char *ai_epistemic_line(int confidence, int role, int topic_target);
 static const char *ai_service_menu_clarify_line(struct char_data *mob, int role, int style, int evil, int archetype, int personality);
 static const char *ai_service_honest_fallback_line(int role, int topic_target, int archetype);
@@ -1095,6 +1108,221 @@ static enum ai_creature_category ai_pick_creature_category(struct char_data *mob
 static enum ai_comm_mode ai_pick_comm_mode(struct char_data *mob, const struct ai_reply_context *rctx, int primary_intent, int secondary_intent, int domain, enum ai_explicit_intent explicit_intent, const char **out_sound_style);
 static const char *ai_creature_reaction_line(enum ai_creature_category cat, enum ai_explicit_intent ex, enum ai_distinct_intent_class icls, unsigned long seed);
 static int ai_count_multi_service_hits(const char *text, int *has_food, int *has_money);
+static enum ai_answer_domain ai_plan_classify_domain(const char *normalized);
+static int ai_plan_missing_where_target(const char *normalized);
+static int ai_plan_missing_trade_target(const char *normalized);
+static int ai_plan_missing_training_target(const char *normalized);
+static int ai_plan_domain_to_brain_domain(enum ai_answer_domain domain);
+static uint32_t ai_plan_required_caps(enum ai_answer_domain domain);
+static void ai_plan_finalize_sentence(char *dst, size_t dstsz, const char *src);
+static void ai_plan_build(struct char_data *mob, struct char_data *player, const char *normalized, int role, int style, uint32_t caps, ai_fear_state_t fear_state, ai_reverence_state_t rev_state, int voice_style, ai_response_plan_t *out);
+static enum ai_answer_domain ai_plan_classify_domain(const char *normalized)
+{
+  if (!normalized || !*normalized) return AI_DOM_NONE;
+  if (ai_text_has_sub_ci(normalized, "hello") || ai_text_has_sub_ci(normalized, " hi") || ai_text_has_sub_ci(normalized, "hey") || ai_text_has_sub_ci(normalized, "greetings") || ai_text_has_sub_ci(normalized, "hail") || ai_text_has_sub_ci(normalized, "yo")) return AI_DOM_GREETING;
+  if (ai_text_has_sub_ci(normalized, "kill") || ai_text_has_sub_ci(normalized, "hurt") || ai_text_has_sub_ci(normalized, "smash") || ai_text_has_sub_ci(normalized, "attack you") || ai_text_has_sub_ci(normalized, "burn") || ai_text_has_sub_ci(normalized, "murder")) return AI_DOM_THREAT;
+  if (ai_text_has_sub_ci(normalized, "robot") || ai_text_has_sub_ci(normalized, "stupid") || ai_text_has_sub_ci(normalized, "idiot") || ai_text_has_sub_ci(normalized, "trash") || ai_text_has_sub_ci(normalized, "dumb") || ai_text_has_sub_ci(normalized, "crazy") || ai_text_has_sub_ci(normalized, "bad dialogue")) return AI_DOM_INSULT;
+  if (ai_text_has_sub_ci(normalized, "where is") || ai_text_has_sub_ci(normalized, "how do i get to") || ai_text_has_sub_ci(normalized, "directions") || ai_text_has_sub_ci(normalized, "way to") || ai_text_has_sub_ci(normalized, "locate") || ai_text_has_sub_ci(normalized, "find")) return AI_DOM_DIRECTIONS;
+  if (ai_text_has_sub_ci(normalized, "money") || ai_text_has_sub_ci(normalized, "gold") || ai_text_has_sub_ci(normalized, "coins") || ai_text_has_sub_ci(normalized, "cash") || ai_text_has_sub_ci(normalized, "pay") || ai_text_has_sub_ci(normalized, "broke") || ai_text_has_sub_ci(normalized, "earn") || ai_text_has_sub_ci(normalized, "job") || ai_text_has_sub_ci(normalized, "work") || ai_text_has_sub_ci(normalized, "bounty")) return AI_DOM_MONEY;
+  if (ai_text_has_sub_ci(normalized, "quest") || ai_text_has_sub_ci(normalized, "task") || ai_text_has_sub_ci(normalized, "mission") || ai_text_has_sub_ci(normalized, "contract") || ai_text_has_sub_ci(normalized, "bounty board")) return AI_DOM_QUESTS;
+  if (ai_text_has_sub_ci(normalized, "train") || ai_text_has_sub_ci(normalized, "practice") || ai_text_has_sub_ci(normalized, "learn") || ai_text_has_sub_ci(normalized, "skills") || ai_text_has_sub_ci(normalized, "spells") || ai_text_has_sub_ci(normalized, "trainer") || ai_text_has_sub_ci(normalized, "guildmaster")) return AI_DOM_TRAINING;
+  if (ai_text_has_sub_ci(normalized, "buy") || ai_text_has_sub_ci(normalized, "sell") || ai_text_has_sub_ci(normalized, "shop") || ai_text_has_sub_ci(normalized, "store") || ai_text_has_sub_ci(normalized, "merchant") || ai_text_has_sub_ci(normalized, "vendor") || ai_text_has_sub_ci(normalized, "price")) return AI_DOM_TRADE;
+  return AI_DOM_NONE;
+}
+
+static int ai_plan_missing_where_target(const char *normalized)
+{
+  if (!normalized) return 0;
+  if (ai_text_has_sub_ci(normalized, "where is") && (strcmp(normalized, "where is") == 0 || strcmp(normalized, "where is?") == 0)) return 1;
+  if (ai_text_has_sub_ci(normalized, "where is the") && (strcmp(normalized, "where is the") == 0 || strcmp(normalized, "where is the?") == 0)) return 1;
+  if (ai_text_has_sub_ci(normalized, "how do i get to") && (strcmp(normalized, "how do i get to") == 0 || strcmp(normalized, "how do i get to?") == 0)) return 1;
+  return 0;
+}
+
+static int ai_plan_missing_trade_target(const char *normalized)
+{
+  if (!normalized) return 0;
+  if (ai_text_has_sub_ci(normalized, "where can i buy") && !ai_text_has_sub_ci(normalized, "buy ") ) return 1;
+  if (strcmp(normalized, "where can i buy") == 0 || strcmp(normalized, "where can i buy?") == 0) return 1;
+  return 0;
+}
+
+static int ai_plan_missing_training_target(const char *normalized)
+{
+  if (!normalized) return 0;
+  if (strcmp(normalized, "i need training") == 0 || strcmp(normalized, "i need training.") == 0 || strcmp(normalized, "i need training?") == 0) return 1;
+  return 0;
+}
+
+static int ai_plan_domain_to_brain_domain(enum ai_answer_domain domain)
+{
+  switch (domain) {
+    case AI_DOM_DIRECTIONS: return 3;
+    case AI_DOM_QUESTS: return 5;
+    case AI_DOM_TRADE:
+    case AI_DOM_TRAINING:
+    case AI_DOM_MONEY: return 1;
+    default: return 0;
+  }
+}
+
+static uint32_t ai_plan_required_caps(enum ai_answer_domain domain)
+{
+  switch (domain) {
+    case AI_DOM_DIRECTIONS: return CAP_DIRECT_CITY;
+    case AI_DOM_MONEY: return (CAP_BUY | CAP_SELL | CAP_ENFORCE_LAW);
+    case AI_DOM_QUESTS: return (CAP_PROVIDE_RUMOR | CAP_ENFORCE_LAW);
+    case AI_DOM_TRAINING: return (CAP_TRAIN | CAP_PRACTICE);
+    case AI_DOM_TRADE: return (CAP_BUY | CAP_SELL);
+    default: return 0;
+  }
+}
+
+static void ai_plan_finalize_sentence(char *dst, size_t dstsz, const char *src)
+{
+  size_t n;
+  if (!dst || dstsz == 0) return;
+  dst[0] = '\0';
+  if (!src || !*src) return;
+  snprintf(dst, dstsz, "%.*s", (int)dstsz - 1, src);
+  n = strlen(dst);
+  while (n > 0 && isspace((unsigned char)dst[n - 1])) dst[--n] = '\0';
+  if (n == 0) return;
+  if (dst[n - 1] != '.' && dst[n - 1] != '?') {
+    if (n + 1 < dstsz) { dst[n] = '.'; dst[n + 1] = '\0'; }
+  }
+}
+
+static void ai_plan_build(struct char_data *mob, struct char_data *player, const char *normalized, int role, int style, uint32_t caps, ai_fear_state_t fear_state, ai_reverence_state_t rev_state, int voice_style, ai_response_plan_t *out)
+{
+  uint32_t need_caps;
+  int brain_domain;
+  struct char_data *target = NULL;
+  const char *tname;
+  if (!out) return;
+  memset(out, 0, sizeof(*out));
+  out->kind = AI_PLAN_ANSWER;
+  out->domain = ai_plan_classify_domain(normalized);
+  out->clarify_type = AI_CLARIFY_NONE;
+  (void)voice_style;
+
+  if (out->domain == AI_DOM_DIRECTIONS && ai_plan_missing_where_target(normalized)) {
+    out->needs_clarify = 1;
+    out->clarify_type = AI_CLARIFY_WHERE;
+  } else if (out->domain == AI_DOM_TRADE && ai_plan_missing_trade_target(normalized)) {
+    out->needs_clarify = 1;
+    out->clarify_type = AI_CLARIFY_WHICH_SHOP;
+  } else if (out->domain == AI_DOM_TRAINING && ai_plan_missing_training_target(normalized)) {
+    out->needs_clarify = 1;
+    out->clarify_type = AI_CLARIFY_WHICH_TRAINING;
+  }
+
+  need_caps = ai_plan_required_caps(out->domain);
+  if (need_caps && (caps & need_caps) == 0)
+    out->kind = AI_PLAN_REFERRAL;
+
+  if (fear_state >= AI_FEAR_TERRIFIED) {
+    out->kind = AI_PLAN_REFUSE;
+    ai_plan_finalize_sentence(out->answer1, sizeof(out->answer1), "Please... ask someone else");
+    out->answer2[0] = '\0';
+    return;
+  } else if (fear_state >= AI_FEAR_AFRAID && out->kind == AI_PLAN_ANSWER) {
+    out->kind = AI_PLAN_REFERRAL;
+  }
+
+  if (out->kind == AI_PLAN_REFERRAL) {
+    brain_domain = ai_plan_domain_to_brain_domain(out->domain);
+    if (ai_brain_pick_referral_in_room(mob, player, brain_domain, &target) && target) {
+      tname = PERS(target, mob);
+      snprintf(out->answer1, sizeof(out->answer1), "I cannot help with that. Ask %s.", tname ? tname : "them");
+      out->ref_target = target;
+    } else {
+      switch (out->domain) {
+        case AI_DOM_DIRECTIONS: ai_plan_finalize_sentence(out->answer1, sizeof(out->answer1), "Ask a guard by the main road"); break;
+        case AI_DOM_TRADE: ai_plan_finalize_sentence(out->answer1, sizeof(out->answer1), "Ask a merchant or shopkeeper"); break;
+        case AI_DOM_TRAINING: ai_plan_finalize_sentence(out->answer1, sizeof(out->answer1), "Ask a trainer or guildmaster"); break;
+        case AI_DOM_QUESTS: ai_plan_finalize_sentence(out->answer1, sizeof(out->answer1), "Check the town board or ask a guard"); break;
+        case AI_DOM_MONEY: ai_plan_finalize_sentence(out->answer1, sizeof(out->answer1), "Work bounties, sell loot, or ask a merchant about trade"); break;
+        default: ai_plan_finalize_sentence(out->answer1, sizeof(out->answer1), "I cannot help with that right now"); break;
+      }
+    }
+    out->answer2[0] = '\0';
+    return;
+  }
+
+  switch (out->domain) {
+    case AI_DOM_GREETING:
+      if (rev_state >= AI_REV_REVERENT) {
+        ai_plan_finalize_sentence(out->answer1, sizeof(out->answer1), "My respect");
+        out->answer2[0] = '\0';
+      } else if (style == 1 || role == ROLE_GUARD) {
+        ai_plan_finalize_sentence(out->answer1, sizeof(out->answer1), "Good day");
+        out->answer2[0] = '\0';
+      } else {
+        ai_plan_finalize_sentence(out->answer1, sizeof(out->answer1), "Hello");
+        out->answer2[0] = '\0';
+      }
+      break;
+    case AI_DOM_MONEY:
+      if (role == ROLE_MERCHANT)
+        ai_plan_finalize_sentence(out->answer1, sizeof(out->answer1), "Sell loot, craft goods, or trade at shops to build coin");
+      else if (role == ROLE_GUARD)
+        ai_plan_finalize_sentence(out->answer1, sizeof(out->answer1), "Bounties and lawful work pay best if you keep your record clean");
+      else
+        ai_plan_finalize_sentence(out->answer1, sizeof(out->answer1), "Bounties, quests, and selling loot are steady money");
+      break;
+    case AI_DOM_QUESTS:
+      if (ai_brain_pick_referral_in_room(mob, player, 5, &target) && target) {
+        tname = PERS(target, mob);
+        snprintf(out->answer1, sizeof(out->answer1), "I cannot help with that. Ask %s.", tname ? tname : "them");
+        out->kind = AI_PLAN_REFERRAL;
+      } else {
+        ai_plan_finalize_sentence(out->answer1, sizeof(out->answer1), "Look for notice boards, guild halls, and officials for local work");
+      }
+      break;
+    case AI_DOM_DIRECTIONS:
+      if (out->clarify_type == AI_CLARIFY_WHERE) {
+        ai_plan_finalize_sentence(out->answer1, sizeof(out->answer1), "Where are you trying to go?");
+      } else {
+        ai_plan_finalize_sentence(out->answer1, sizeof(out->answer1), "Follow the main road and ask at the gates if you get turned around");
+      }
+      break;
+    case AI_DOM_TRAINING:
+      if ((caps & (CAP_TRAIN | CAP_PRACTICE)) || MOB_FLAGGED(mob, MOB_GUILD_MASTER)) {
+        ai_plan_finalize_sentence(out->answer1, sizeof(out->answer1), "I can train you");
+        out->clarify_type = AI_CLARIFY_WHICH_TRAINING; out->needs_clarify = 1; ai_plan_finalize_sentence(out->answer2, sizeof(out->answer2), "What skill or spell?");
+      } else {
+        ai_plan_finalize_sentence(out->answer1, sizeof(out->answer1), "Trainers and guildmasters handle that");
+        out->clarify_type = AI_CLARIFY_WHICH_TRAINING; out->needs_clarify = 1; ai_plan_finalize_sentence(out->answer2, sizeof(out->answer2), "What skill or spell do you want?");
+      }
+      break;
+    case AI_DOM_TRADE:
+      if (role == ROLE_MERCHANT)
+        ai_plan_finalize_sentence(out->answer1, sizeof(out->answer1), "I buy and sell. Tell me what you are looking for");
+      else
+        ai_plan_finalize_sentence(out->answer1, sizeof(out->answer1), "Ask a merchant or shopkeeper");
+      break;
+    case AI_DOM_INSULT:
+      ai_plan_finalize_sentence(out->answer1, sizeof(out->answer1), "I am here to help when you are ready");
+      break;
+    case AI_DOM_THREAT:
+      out->kind = AI_PLAN_REFUSE;
+      ai_plan_finalize_sentence(out->answer1, sizeof(out->answer1), "I will not engage with threats");
+      break;
+    default:
+      out->kind = AI_PLAN_SMALLTALK;
+      ai_plan_finalize_sentence(out->answer1, sizeof(out->answer1), "I did not catch that. Say it again");
+      break;
+  }
+
+  if (out->clarify_type == AI_CLARIFY_WHICH_SHOP)
+    ai_plan_finalize_sentence(out->answer2, sizeof(out->answer2), "Which shop or item do you mean?");
+  else if (out->clarify_type == AI_CLARIFY_WHICH_TRAINING)
+    ai_plan_finalize_sentence(out->answer2, sizeof(out->answer2), "Which skill or spell do you want?");
+  else if (out->clarify_type == AI_CLARIFY_WHERE && out->answer1[0] && out->answer1[strlen(out->answer1)-1] != '?')
+    ai_plan_finalize_sentence(out->answer2, sizeof(out->answer2), "Where are you trying to go?");
+}
+
 static int ai_text_is_effectively_empty(const char *s)
 {
   const unsigned char *p;
@@ -6403,18 +6631,6 @@ static void ai_slot_replace(const char *in, const struct ai_world_facts *f, char
   out[oi] = 0;
 }
 
-static void ai_trim_to_single_sentence(char *s)
-{
-  size_t i;
-  if (!s || !*s) return;
-  for (i = 0; s[i]; i++) {
-    if (s[i] == '.' || s[i] == "!"[0] || s[i] == "?"[0]) {
-      s[i + 1] = '\0';
-      break;
-    }
-  }
-}
-
 static void ai_sanitize_unresolved_tokens(const char *in, char *out, size_t outsz)
 {
   size_t i = 0, oi = 0;
@@ -9456,6 +9672,8 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
   ai_reverence_state_t rev_state = AI_REV_NONE;
   int stance_mood = 0;
   int stance_voice = 0;
+  ai_response_plan_t response_plan;
+  int brain_fit = 0;
   float speak_score_raw = -999.0f;
   float observe_score_raw = -999.0f;
   const char *speak_decision_reason = "scored";
@@ -9484,7 +9702,11 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
 
   ai_brain_ensure(mob);
   if (type == AI_EVENT_PLAYER_SAY && !ai_brain_can_speak(mob)) {
-    ai_react_nonverbal(mob, actor, AI_RX_TRIG_NON_SPEAK_ACTION_SELECTED);
+    enum ai_answer_domain nd = ai_plan_classify_domain(normalized);
+    ai_react_nonverbal(mob, actor, (nd == AI_DOM_GREETING) ? AI_RX_TRIG_OPTIONAL_OTHER : AI_RX_TRIG_NON_SPEAK_ACTION_SELECTED);
+#if AI_ACTOR_DEBUG
+    ai_debug_log("AI_PLAN_GATE_NONVERBAL mob=%d domain=%d", GET_MOB_VNUM(mob), (int)nd);
+#endif
     AI_EVT_RETURN("BRAIN_NONVERBAL_GATE");
   }
 
@@ -9528,6 +9750,7 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
     int b_fit = 0;
     uint32_t b_caps = 0;
     ai_brain_infer_role_and_caps(mob, &b_role, &b_fit, &b_caps);
+    brain_fit = b_fit;
     if (b_fit >= AI_MIN_ROLE_FITNESS && b_role != ROLE_UNKNOWN)
       role = b_role;
     if (b_caps & (1u << 0)) role_caps |= CAP_DIRECT_CITY;
@@ -9541,7 +9764,9 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
   }
   fear_state = ai_brain_fear_state(mob, actor);
   rev_state = ai_brain_reverence_state(mob, actor);
-  ai_brain_apply_stance_bias(ai_brain_get(mob), fear_state, rev_state, &stance_mood, &stance_voice, NULL);
+  stance_voice = ai_brain_voice_style(mob);
+  ai_brain_apply_fear_bias(ai_brain_get(mob), fear_state, &stance_mood, &stance_voice, &role_caps);
+  ai_brain_apply_reverence_bias(ai_brain_get(mob), rev_state, &stance_mood, &stance_voice, &role_caps);
 
   if (type == AI_EVENT_PLAYER_SAY && !text)
     AI_EVT_RETURN("NULL_PLAYER_SAY");
@@ -10409,13 +10634,21 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
       const char *replacement = NULL;
       ai_sanitize_unresolved_tokens(line, finalbuf, sizeof(finalbuf));
       ai_rx_clean_sentence(finalbuf);
-      ai_trim_to_single_sentence(finalbuf);
-      if (fear_state >= AI_FEAR_AFRAID && strstr(finalbuf, "?") && role != ROLE_GUARD)
-        snprintf(finalbuf, sizeof(finalbuf), "%s", "I cannot help with that right now.");
-      if (rev_state >= AI_REV_RESPECTFUL && fear_state == AI_FEAR_NONE && stance_mood > 0 && role != ROLE_BANDIT) {
-        char tmp[300];
-        snprintf(tmp, sizeof(tmp), "With respect, %s", finalbuf);
-        ai_copy_trunc(finalbuf, sizeof(finalbuf), tmp);
+      if (type == AI_EVENT_PLAYER_SAY) {
+        char built[300];
+        ai_plan_build(mob, actor, normalized, role, style, role_caps, fear_state, rev_state, stance_voice, &response_plan);
+#if AI_ACTOR_DEBUG
+        ai_debug_log("AI_PLAN domain=%d kind=%d clarify=%d role=%d fit=%d caps=0x%x fear=%d rev=%d voice=%d", (int)response_plan.domain, (int)response_plan.kind, response_plan.clarify_type, role, brain_fit, (unsigned int)role_caps, (int)fear_state, (int)rev_state, stance_voice);
+#endif
+        built[0] = '\0';
+        if (response_plan.answer1[0])
+          snprintf(built, sizeof(built), "%s", response_plan.answer1);
+        if (response_plan.answer2[0]) {
+          size_t bl = strlen(built);
+          snprintf(built + bl, sizeof(built) - bl, " %s", response_plan.answer2);
+        }
+        if (built[0])
+          ai_copy_trunc(finalbuf, sizeof(finalbuf), built);
       }
       ai_copy_trunc(original, sizeof(original), finalbuf);
       if (type == AI_EVENT_PLAYER_SAY && !ai_line_is_role_legal(finalbuf, role, style)) {
@@ -10445,9 +10678,9 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
       }
     }
     if (type == AI_EVENT_PLAYER_SAY) {
-      if (fear_state >= AI_FEAR_WARY)
+      if (fear_state >= AI_FEAR_INTIMIDATED && rand_number(1, 100) <= 30)
         ai_react_fear(mob, actor, fear_state);
-      else if (rev_state >= AI_REV_RESPECTFUL)
+      else if (rev_state >= AI_REV_ADMIRING && rand_number(1, 100) <= 20)
         ai_react_reverence(mob, actor, rev_state);
       ai_actor_schedule_delayed_player_reply(mob, actor, targeted, rctx.personality, rctx.evil_signaled, rctx.archetype, now);
     }
