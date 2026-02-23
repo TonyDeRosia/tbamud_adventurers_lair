@@ -11785,7 +11785,30 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
         snprintf(targeted, sizeof(targeted), "$n ignores %s.", GET_NAME(actor));
       }
       if (ai_debug) {
-        ai_debug_log("AI_COMM_PICK vnum=%d cat=%d subtags=%llu comm=%d intent=%d/%d persona=%s pool=%s", GET_MOB_VNUM(mob), creature_cat, (unsigned long long)rctx.subtags, comm_mode, intent, ai_explicit_to_core_intent(multi_intent.secondary_intent), ai_actor_persona_name(get_actor_persona(mob)), pool ? pool : "POOL_NONE");
+        enum ai_pool_category poolcat = POOLCAT_AMBIENT;
+        if (pool) {
+          if (strstr(pool, "GREET")) poolcat = POOLCAT_GREET;
+          else if (strstr(pool, "TRAIN")) poolcat = POOLCAT_SERVICE_TRAIN;
+          else if (strstr(pool, "SHOP")) poolcat = POOLCAT_SERVICE_SHOP;
+          else if (strstr(pool, "SERVICE")) poolcat = POOLCAT_SERVICE_GENERAL;
+          else if (strstr(pool, "REFUS")) poolcat = POOLCAT_REFUSAL;
+          else if (strstr(pool, "CONFUS")) poolcat = POOLCAT_CONFUSION;
+          else if (strstr(pool, "THREAT")) poolcat = POOLCAT_THREAT;
+          else if (strstr(pool, "INSULT")) poolcat = POOLCAT_INSULT;
+          else if (strstr(pool, "SMALL")) poolcat = POOLCAT_SMALLTALK;
+          else if (strstr(pool, "EMOTE")) poolcat = POOLCAT_EMOTE_REACTION;
+        }
+        ai_debug_log("AI_COMM_PICK vnum=%d arch=%s cat=%d poolcat=%s subtags=%llu comm=%d intent=%d/%d persona=%s pool=%s",
+                     GET_MOB_VNUM(mob),
+                     ai_actor_archetype_name(ai_actor_detect_archetype(mob)),
+                     creature_cat,
+                     ai_pool_category_name(poolcat),
+                     (unsigned long long)rctx.subtags,
+                     comm_mode,
+                     intent,
+                     ai_explicit_to_core_intent(multi_intent.secondary_intent),
+                     ai_actor_persona_name(get_actor_persona(mob)),
+                     pool ? pool : "POOL_NONE");
       }
     }
     if (type == AI_EVENT_PLAYER_SAY) {
