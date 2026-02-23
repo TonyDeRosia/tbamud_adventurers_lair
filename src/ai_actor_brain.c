@@ -12,8 +12,156 @@
 #include "ai_actor.h"
 #include "ai_actor_brain.h"
 
+#include <dirent.h>
+#include <errno.h>
+#include <sys/stat.h>
+
 
 #define AI_ARCH_MAX 4
+#define AI_BRAIN_STATE_DIR "lib/ai_state"
+#define AI_BRAIN_LOG_DIR "lib/ai_logs"
+
+#ifndef AI_BRAIN_LOG_DEBUG
+#define AI_BRAIN_LOG_DEBUG 0
+#endif
+
+static void update_rel(struct ai_actor_brain_mem *m);
+
+void ai_brain_state_load_or_init(struct char_data *mob);
+void ai_brain_state_save(struct char_data *mob);
+void ai_brain_log_event(struct char_data *mob, struct char_data *actor, const char *event_name, const char *severity, const char *topic);
+
+
+struct ai_brain_log_budget_entry {
+  const struct char_data *mob;
+  time_t hour_start;
+  int count;
+};
+
+struct ai_brain_spoke_rl_entry {
+  const struct char_data *mob;
+  long player_idnum;
+  time_t last_ts;
+};
+
+#define AI_BRAIN_LOG_BUDGET_MAX 256
+#define AI_BRAIN_SPOKE_RL_MAX 512
+
+static struct ai_brain_log_budget_entry ai_brain_log_budget[AI_BRAIN_LOG_BUDGET_MAX];
+static struct ai_brain_spoke_rl_entry ai_brain_spoke_rl[AI_BRAIN_SPOKE_RL_MAX];
+
+static int ai_brain_log_budget_allow(const struct char_data *mob, time_t now) {
+  int i, oldest = 0;
+  time_t oldest_t = ai_brain_log_budget[0].hour_start;
+  if (!mob) return 0;
+  for (i = 0; i < AI_BRAIN_LOG_BUDGET_MAX; i++) {
+    if (ai_brain_log_budget[i].mob == mob) {
+      if ((now - ai_brain_log_budget[i].hour_start) >= 3600) {
+        ai_brain_log_budget[i].hour_start = now;
+        ai_brain_log_budget[i].count = 0;
+      }
+      if (ai_brain_log_budget[i].count >= 200) return 0;
+      ai_brain_log_budget[i].count++;
+      return 1;
+    }
+    if (ai_brain_log_budget[i].hour_start < oldest_t) {
+      oldest_t = ai_brain_log_budget[i].hour_start;
+      oldest = i;
+    }
+  }
+  ai_brain_log_budget[oldest].mob = mob;
+  ai_brain_log_budget[oldest].hour_start = now;
+  ai_brain_log_budget[oldest].count = 1;
+  return 1;
+}
+
+static int ai_brain_spoke_rate_limited(const struct char_data *mob, long player_idnum, time_t now) {
+  int i, oldest = 0;
+  time_t oldest_t = ai_brain_spoke_rl[0].last_ts;
+  if (!mob || player_idnum <= 0) return 0;
+  for (i = 0; i < AI_BRAIN_SPOKE_RL_MAX; i++) {
+    if (ai_brain_spoke_rl[i].mob == mob && ai_brain_spoke_rl[i].player_idnum == player_idnum) {
+      if ((now - ai_brain_spoke_rl[i].last_ts) < 60) return 1;
+      ai_brain_spoke_rl[i].last_ts = now;
+      return 0;
+    }
+    if (ai_brain_spoke_rl[i].last_ts < oldest_t) {
+      oldest_t = ai_brain_spoke_rl[i].last_ts;
+      oldest = i;
+    }
+  }
+  ai_brain_spoke_rl[oldest].mob = mob;
+  ai_brain_spoke_rl[oldest].player_idnum = player_idnum;
+  ai_brain_spoke_rl[oldest].last_ts = now;
+  return 0;
+}
+
+static const char *ai_brain_uid(const struct ai_actor_brain *b) {
+  return (b && !strncmp(b->last_fight_outcome, "uid=", 4)) ? (b->last_fight_outcome + 4) : NULL;
+}
+
+static void ai_brain_set_uid(struct ai_actor_brain *b, const char *uid) {
+  if (!b || !uid || !*uid) return;
+  snprintf(b->last_fight_outcome, sizeof(b->last_fight_outcome), "uid=%s", uid);
+}
+
+static void ai_brain_ensure_dir(const char *path) {
+  struct stat st;
+  if (!path || !*path) return;
+  if (stat(path, &st) == 0 && S_ISDIR(st.st_mode)) return;
+  if (mkdir(path, 0755) != 0 && errno != EEXIST)
+    log("AI_BRAIN: mkdir failed path=%s err=%d", path, errno);
+}
+
+static const char *ai_brain_mood_name(const struct ai_actor_brain *b) {
+  if (!b) return "calm";
+  if (b->state == AI_BRAIN_ENGAGE || b->state == AI_BRAIN_PURSUE) return "hostile";
+  if (b->state == AI_BRAIN_WARN || b->state == AI_BRAIN_FLEE) return "irritated";
+  if (b->state == AI_BRAIN_OBSERVE || b->state == AI_BRAIN_REPORT) return "wary";
+  return "calm";
+}
+
+static void ai_brain_apply_mood(struct ai_actor_brain *b, const char *mood) {
+  if (!b || !mood) return;
+  if (!strcmp(mood, "hostile")) b->state = AI_BRAIN_ENGAGE;
+  else if (!strcmp(mood, "irritated")) b->state = AI_BRAIN_WARN;
+  else if (!strcmp(mood, "wary")) b->state = AI_BRAIN_OBSERVE;
+  else b->state = AI_BRAIN_IDLE;
+}
+
+static void ai_brain_state_path(const char *uid, char *out, size_t outsz) {
+  if (!out || outsz == 0) return;
+  snprintf(out, outsz, "%s/%s.state", AI_BRAIN_STATE_DIR, uid ? uid : "unknown");
+}
+
+static void ai_brain_log_path(const char *uid, char *out, size_t outsz) {
+  if (!out || outsz == 0) return;
+  snprintf(out, outsz, "%s/%s.log", AI_BRAIN_LOG_DIR, uid ? uid : "unknown");
+}
+
+static int ai_brain_find_uid_for_vnum(mob_vnum vnum, char *out_uid, size_t out_uid_sz) {
+  DIR *dir;
+  struct dirent *ent;
+  char prefix[32];
+  if (!out_uid || out_uid_sz == 0) return 0;
+  out_uid[0] = '\0';
+  snprintf(prefix, sizeof(prefix), "%d_", (int)vnum);
+  dir = opendir(AI_BRAIN_STATE_DIR);
+  if (!dir) return 0;
+  while ((ent = readdir(dir)) != NULL) {
+    size_t nlen = strlen(ent->d_name);
+    if (!strncmp(ent->d_name, prefix, strlen(prefix)) && nlen > 6 && !strcmp(ent->d_name + nlen - 6, ".state")) {
+      size_t copy_len = nlen - 6;
+      if (copy_len >= out_uid_sz) copy_len = out_uid_sz - 1;
+      memcpy(out_uid, ent->d_name, copy_len);
+      out_uid[copy_len] = '\0';
+      closedir(dir);
+      return 1;
+    }
+  }
+  closedir(dir);
+  return 0;
+}
 
 typedef struct ai_brain_profile {
   uint32_t seed;
@@ -167,6 +315,133 @@ void ai_actor_brain_init(struct char_data *mob) {
   if (!mob->ai_state->brain) CREATE(mob->ai_state->brain, struct ai_actor_brain, 1);
   if (!mob->ai_state->brain) return;
   apply_profile(mob->ai_state->brain, GET_MOB_VNUM(mob));
+  ai_brain_state_load_or_init(mob);
+}
+
+void ai_brain_state_load_or_init(struct char_data *mob) {
+  char state_path[256], line[256], uid[64], mood[32];
+  time_t now = time(0);
+  FILE *fp;
+  struct ai_actor_brain *b;
+
+  if (!mob || !mob->ai_state || !mob->ai_state->brain || !IS_NPC(mob)) return;
+  b = mob->ai_state->brain;
+  if (ai_brain_uid(b)) return;
+
+  ai_brain_ensure_dir(AI_BRAIN_STATE_DIR);
+
+  if (ai_brain_find_uid_for_vnum(GET_MOB_VNUM(mob), uid, sizeof(uid)))
+    ai_brain_state_path(uid, state_path, sizeof(state_path));
+  else {
+    snprintf(uid, sizeof(uid), "%d_%ld_%x", (int)GET_MOB_VNUM(mob), (long)now, (unsigned int)rand_number(0, 0x7fff));
+    ai_brain_state_path(uid, state_path, sizeof(state_path));
+  }
+
+  fp = fopen(state_path, "r");
+  if (fp) {
+    uid[0] = '\0';
+    while (fgets(line, sizeof(line), fp)) {
+      long pid = 0, seen = 0;
+      int trust = 0, host = 0;
+      if (sscanf(line, "uid=%63s", uid) == 1) continue;
+      if (sscanf(line, "mood=%31s", mood) == 1) { ai_brain_apply_mood(b, mood); continue; }
+      if (sscanf(line, "last_seen=%ld", &seen) == 1) { b->last_think = (time_t)seen; continue; }
+      if (sscanf(line, "rel.%ld.trust=%d", &pid, &trust) == 2) {
+        struct ai_actor_brain_mem *m = mem_get(b, pid, now);
+        if (m) { m->trust = MAX(-100, MIN(100, trust)); m->last_update = now; }
+        continue;
+      }
+      if (sscanf(line, "rel.%ld.hostility=%d", &pid, &host) == 2) {
+        struct ai_actor_brain_mem *m = mem_get(b, pid, now);
+        if (m) { m->hostility = MAX(0, MIN(100, host)); m->last_update = now; }
+        continue;
+      }
+      if (sscanf(line, "rel.%ld.last=%ld", &pid, &seen) == 2) {
+        struct ai_actor_brain_mem *m = mem_get(b, pid, now);
+        if (m) { m->last_seen = (time_t)seen; m->last_update = now; update_rel(m); }
+      }
+    }
+    fclose(fp);
+    if (uid[0]) {
+      ai_brain_set_uid(b, uid);
+      return;
+    }
+  }
+
+  ai_brain_set_uid(b, uid);
+  ai_brain_state_save(mob);
+}
+
+void ai_brain_state_save(struct char_data *mob) {
+  FILE *fp;
+  int i, count = 0;
+  time_t now = time(0);
+  struct ai_actor_brain *b;
+  const char *uid;
+  char path[256];
+
+  if (!mob || !mob->ai_state || !mob->ai_state->brain) return;
+  b = mob->ai_state->brain;
+  uid = ai_brain_uid(b);
+  if (!uid || !*uid) return;
+  ai_brain_ensure_dir(AI_BRAIN_STATE_DIR);
+  ai_brain_state_path(uid, path, sizeof(path));
+
+  fp = fopen(path, "w");
+  if (!fp) return;
+  fprintf(fp, "uid=%s\n", uid);
+  fprintf(fp, "mood=%s\n", ai_brain_mood_name(b));
+  fprintf(fp, "last_seen=%ld\n", (long)now);
+  for (i = 0; i < b->mem_count && count < 32; i++) {
+    struct ai_actor_brain_mem *m = &b->mem[i];
+    if (m->idnum <= 0) continue;
+    fprintf(fp, "rel.%ld.trust=%d\n", m->idnum, MAX(-100, MIN(100, m->trust)));
+    fprintf(fp, "rel.%ld.hostility=%d\n", m->idnum, MAX(0, MIN(100, m->hostility)));
+    fprintf(fp, "rel.%ld.last=%ld\n", m->idnum, (long)m->last_seen);
+    count++;
+  }
+  fclose(fp);
+}
+
+void ai_brain_log_event(struct char_data *mob, struct char_data *actor, const char *event_name, const char *severity, const char *topic) {
+  FILE *fp;
+  char path[256];
+  time_t now = time(0);
+  long player_id = (actor && !IS_NPC(actor)) ? GET_IDNUM(actor) : 0;
+  const char *uid;
+  struct ai_actor_brain *b;
+
+  if (!mob || !mob->ai_state || !mob->ai_state->brain || !event_name || !*event_name) return;
+  b = mob->ai_state->brain;
+  ai_brain_state_load_or_init(mob);
+  uid = ai_brain_uid(b);
+  if (!uid || !*uid) return;
+
+  if (!strcmp(event_name, "SPOKE_TO") && actor && !IS_NPC(actor) && ai_brain_spoke_rate_limited(mob, GET_IDNUM(actor), now)) {
+#if AI_BRAIN_LOG_DEBUG
+    log("AI_BRAIN_LOG uid=%s vnum=%d player=%ld event=%s severity=%s topic=%s logged=0 rate_limited=1", uid, GET_MOB_VNUM(mob), player_id, event_name, severity ? severity : "-", topic ? topic : "-");
+#endif
+    return;
+  }
+
+  if (!ai_brain_log_budget_allow(mob, now)) {
+#if AI_BRAIN_LOG_DEBUG
+    log("AI_BRAIN_LOG uid=%s vnum=%d player=%ld event=%s severity=%s topic=%s logged=0 rate_limited=1", uid, GET_MOB_VNUM(mob), player_id, event_name, severity ? severity : "-", topic ? topic : "-");
+#endif
+    return;
+  }
+
+  ai_brain_ensure_dir(AI_BRAIN_LOG_DIR);
+  ai_brain_log_path(uid, path, sizeof(path));
+
+  fp = fopen(path, "a");
+  if (!fp) return;
+  fprintf(fp, "%ld %ld %s %s %s\n", (long)now, player_id, event_name, severity ? severity : "minor", (topic && *topic) ? topic : "-");
+  fclose(fp);
+  ai_brain_state_save(mob);
+#if AI_BRAIN_LOG_DEBUG
+  log("AI_BRAIN_LOG uid=%s vnum=%d player=%ld event=%s severity=%s topic=%s logged=1 rate_limited=0", uid, GET_MOB_VNUM(mob), player_id, event_name, severity ? severity : "-", topic ? topic : "-");
+#endif
 }
 
 void ai_actor_brain_free(struct char_data *mob) {

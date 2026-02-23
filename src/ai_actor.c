@@ -32,6 +32,11 @@
 #include "ai_reactions.h"
 
 
+void ai_brain_state_load_or_init(struct char_data *mob);
+void ai_brain_state_save(struct char_data *mob);
+void ai_brain_log_event(struct char_data *mob, struct char_data *actor, const char *event_name, const char *severity, const char *topic);
+
+
 #define AI_HOSTILE_ATTACK_THRESHOLD 12
 #define AI_ROOM_IDLE_SKIP_SECS 12
 #define AI_BFS_MAX_DEPTH 6
@@ -313,6 +318,27 @@ enum ai_creature_archetype {
   AI_CREATURE_UNDEAD,
   AI_CREATURE_SPIRIT
 };
+
+static const char *ai_log_topic_for_intent(enum ai_explicit_intent intent) {
+  switch (intent) {
+    case INTENT_HELP_REQUEST: return "help";
+    case INTENT_SERVICE_INN:
+    case INTENT_SERVICE_REST:
+    case INTENT_SERVICE_FOOD:
+    case INTENT_SERVICE_WATER:
+    case INTENT_SERVICE_WEAPONS:
+    case INTENT_SERVICE_SUPPLIES:
+    case INTENT_SERVICE_PETS:
+    case INTENT_SERVICE_GUARDS:
+    case INTENT_SERVICE_TRAINING:
+      return "service";
+    case INTENT_DIRECTIONS_GENERIC: return "directions";
+    case INTENT_MONEY_JOB: return "money";
+    case INTENT_THREAT: return "threat";
+    case INTENT_INSULT: return "insult";
+    default: return "-";
+  }
+}
 
 enum ai_comm_mode {
   AI_COMM_SAY = 0,
@@ -8261,6 +8287,7 @@ void ai_actor_record_damage(struct char_data *mob, struct char_data *actor, int 
   e->belief_hostility = ai_clampf(e->belief_hostility + 0.25f, 0.0f, 1.0f);
   e->belief_updated_at = e->last_update;
   ai_actor_brain_on_attacked(mob, actor, dam);
+  ai_brain_log_event(mob, actor, "ATTACKED_ME", "severe", "-");
 }
 
 void ai_actor_record_help(struct char_data *mob, struct char_data *actor, int amount)
@@ -8285,6 +8312,7 @@ void ai_actor_record_help(struct char_data *mob, struct char_data *actor, int am
   e->belief_familiarity = ai_clampf(e->belief_familiarity + 0.08f, 0.0f, 1.0f);
   e->belief_hostility = ai_clampf(e->belief_hostility - 0.03f, 0.0f, 1.0f);
   e->belief_updated_at = e->last_update;
+  ai_brain_log_event(mob, actor, "HELPED", "significant", "-");
 }
 
 void ai_actor_record_crime(struct char_data *mob, struct char_data *criminal, int flags)
@@ -10656,6 +10684,7 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
     AI_EVT_RETURN("NOWHERE_ROOM");
 
   ai_brain_ensure(mob);
+  ai_brain_state_load_or_init(mob);
   if (type == AI_EVENT_PLAYER_SAY && !ai_brain_can_speak(mob)) {
     if (ai_debug)
       ai_debug_log("AI_SKIP reason=BRAIN_NONVERBAL_GATE event=%s intent=%d target=%s", ai_event_reason_name(type), intent, ai_topic_key_name(guidance_query.target));
@@ -10894,6 +10923,11 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
     explicit_intent = multi_intent.primary_intent;
     if (explicit_sexual_request && explicit_intent != INTENT_ILLEGAL_SLAVERY_REQUEST)
       explicit_intent = INTENT_THREAT;
+    ai_brain_log_event(mob, actor, "SPOKE_TO", "minor", ai_log_topic_for_intent(explicit_intent));
+    if (explicit_intent == INTENT_INSULT)
+      ai_brain_log_event(mob, actor, "INSULTED", "significant", "insult");
+    else if (explicit_intent == INTENT_THREAT)
+      ai_brain_log_event(mob, actor, "THREATENED", "significant", "threat");
     if (explicit_intent == INTENT_ATTENTION || explicit_intent == INTENT_GREETING)
       confidence = MAX(confidence, 40);
     intent = ai_explicit_to_core_intent(explicit_intent);
@@ -11965,6 +11999,7 @@ void ai_actor_event_give(struct char_data *actor, struct char_data *to, struct o
   if (!to || !IS_NPC(to) || !MOB_FLAGGED(to, MOB_AI_ACTOR) || !ai_actor_brain_enabled()) return;
   if (!to->ai_state || !to->ai_state->brain) ai_actor_init(to);
   ai_actor_brain_on_give(to, actor, obj, to);
+  ai_brain_log_event(to, actor, "GIFTED", "minor", "-");
 }
 
 /*
