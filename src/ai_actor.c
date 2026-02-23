@@ -268,6 +268,18 @@ struct ai_room_ambient_cache {
 static struct ai_social_context ai_social_ctx[AI_SOCIAL_CTX_MAX];
 static struct ai_room_ambient_cache ai_room_ambient_cache[AI_ROOM_AMBIENT_CACHE_MAX];
 
+struct ai_repeat_reply_guard {
+  long mob_id;
+  long player_id;
+  room_rnum room;
+  unsigned long norm_hash;
+  time_t ts;
+};
+
+#define AI_REPEAT_REPLY_GUARD_MAX 128
+static struct ai_repeat_reply_guard ai_repeat_reply_guard[AI_REPEAT_REPLY_GUARD_MAX];
+static int ai_repeat_reply_guard_head = 0;
+
 static const char *ai_deferral_lines[] = {
   "I do not know that district.",
   "You should ask someone in that area.",
@@ -1022,6 +1034,7 @@ static enum ai_actor_archetype ai_actor_detect_archetype(struct char_data *mob);
 static const char *ai_actor_archetype_name(enum ai_actor_archetype arch);
 static const char *ai_pool_category_name(enum ai_pool_category cat);
 static int ai_actor_pool_allowed(struct char_data *mob, enum ai_actor_archetype arch, enum ai_pool_category cat);
+static int ai_arch_allows_pool(enum ai_actor_archetype arch, enum ai_pool_category cat, enum ai_speech_domain domain, enum ai_distinct_intent_class dint);
 static int ai_actor_service_archetype_allowed(enum ai_actor_archetype arch, enum ai_liveplay_intent intent);
 static int ai_liveplay_role_eligible(struct char_data *mob, enum ai_liveplay_intent intent);
 static const char *ai_liveplay_referral_line(struct char_data *mob, struct char_data *player, enum ai_liveplay_intent intent);
@@ -1043,6 +1056,7 @@ static const char *ai_imtb_pick_micro_wrap(const struct ai_reply_context *rctx, 
 static const char *ai_imtb_pick_uncertainty(const struct ai_reply_context *rctx, int role, int style, unsigned long seed, int *out_used);
 static const char *ai_imtb_pick_followup(const struct ai_reply_context *rctx, int role, int style, unsigned long seed);
 static unsigned long ai_conv_seed(struct char_data *mob, int intent, unsigned int counter);
+static int ai_repeat_reply_guard_should_suppress(struct char_data *mob, struct char_data *actor, room_rnum room, unsigned long norm_hash, time_t now);
 static int ai_hash_ring_has(const unsigned int *ring, int count, int head, int max, unsigned int v);
 static void ai_hash_ring_push(unsigned int *ring, int *head, int *count, int max, unsigned int v);
 static int ai_template_pick_index(const int *ids, int count, unsigned long seed, int avoid_id, int avoid_prev, int avoid_recent1, int avoid_recent2);
@@ -3239,6 +3253,9 @@ static int ai_actor_pool_allowed(struct char_data *mob, enum ai_actor_archetype 
       break;
   }
 
+  if (allowed)
+    allowed = ai_arch_allows_pool(arch, cat, DOMAIN_NONE, DINT_CONFUSION);
+
 #if AI_ACTOR_DEBUG_POOLS
   if (!allowed && mob)
     ai_debug_log("AI_POOL_REJECT mob=%s vnum=%d arch=%s poolcat=%s",
@@ -3249,6 +3266,67 @@ static int ai_actor_pool_allowed(struct char_data *mob, enum ai_actor_archetype 
 #endif
 
   return allowed;
+}
+
+static int ai_arch_allows_pool(enum ai_actor_archetype arch, enum ai_pool_category cat, enum ai_speech_domain domain, enum ai_distinct_intent_class dint)
+{
+  int is_training = (domain == DOMAIN_SERVICES && dint == DINT_TRAINING);
+
+  switch (arch) {
+    case ACT_ARCH_BEAST:
+      if (cat == POOLCAT_GREET)
+        return FALSE;
+      return (cat == POOLCAT_REFUSAL || cat == POOLCAT_CONFUSION || cat == POOLCAT_EMOTE_REACTION || cat == POOLCAT_AMBIENT);
+    case ACT_ARCH_UNDEAD:
+    case ACT_ARCH_SPIRIT:
+      if (is_training && (cat == POOLCAT_GREET || cat == POOLCAT_SMALLTALK))
+        return FALSE;
+      return (cat == POOLCAT_GREET || cat == POOLCAT_REFUSAL || cat == POOLCAT_CONFUSION || cat == POOLCAT_THREAT ||
+              cat == POOLCAT_INSULT || cat == POOLCAT_EMOTE_REACTION || cat == POOLCAT_AMBIENT || cat == POOLCAT_SMALLTALK);
+    case ACT_ARCH_CULTIST:
+      return (cat == POOLCAT_GREET || cat == POOLCAT_REFUSAL || cat == POOLCAT_CONFUSION || cat == POOLCAT_THREAT ||
+              cat == POOLCAT_INSULT || cat == POOLCAT_SMALLTALK || cat == POOLCAT_EMOTE_REACTION || cat == POOLCAT_AMBIENT);
+    case ACT_ARCH_GUARD:
+    case ACT_ARCH_MERCHANT:
+    case ACT_ARCH_INNKEEPER:
+    case ACT_ARCH_TRAINER:
+    case ACT_ARCH_BANDIT:
+    case ACT_ARCH_CIVILIAN:
+    case ACT_ARCH_COMMANDER:
+    case ACT_ARCH_OTHER:
+    default:
+      return TRUE;
+  }
+}
+
+static int ai_repeat_reply_guard_should_suppress(struct char_data *mob, struct char_data *actor, room_rnum room, unsigned long norm_hash, time_t now)
+{
+  int i;
+  long mob_id;
+  long player_id;
+
+  if (!mob || !actor || room == NOWHERE || !IS_NPC(mob) || IS_NPC(actor) || norm_hash == 0)
+    return FALSE;
+
+  mob_id = GET_IDNUM(mob);
+  player_id = GET_IDNUM(actor);
+
+  for (i = 0; i < AI_REPEAT_REPLY_GUARD_MAX; i++) {
+    if (ai_repeat_reply_guard[i].mob_id == mob_id &&
+        ai_repeat_reply_guard[i].player_id == player_id &&
+        ai_repeat_reply_guard[i].room == room &&
+        ai_repeat_reply_guard[i].norm_hash == norm_hash &&
+        (now - ai_repeat_reply_guard[i].ts) <= 2)
+      return TRUE;
+  }
+
+  ai_repeat_reply_guard[ai_repeat_reply_guard_head].mob_id = mob_id;
+  ai_repeat_reply_guard[ai_repeat_reply_guard_head].player_id = player_id;
+  ai_repeat_reply_guard[ai_repeat_reply_guard_head].room = room;
+  ai_repeat_reply_guard[ai_repeat_reply_guard_head].norm_hash = norm_hash;
+  ai_repeat_reply_guard[ai_repeat_reply_guard_head].ts = now;
+  ai_repeat_reply_guard_head = (ai_repeat_reply_guard_head + 1) % AI_REPEAT_REPLY_GUARD_MAX;
+  return FALSE;
 }
 
 static int ai_actor_service_archetype_allowed(enum ai_actor_archetype arch, enum ai_liveplay_intent intent)
@@ -8716,6 +8794,8 @@ static const char *ai_imtb_pick_suffix_for_player(struct ai_conv_actor_state *st
 static const char *ai_distinct_reply_line(struct char_data *mob, struct ai_conv_actor_state *st, const struct ai_reply_context *rctx, enum ai_distinct_intent_class icls, long player_idnum, char *out, size_t outsz, const char **out_pool_label)
 {
   enum ai_distinct_role_group grp;
+  enum ai_actor_archetype arch;
+  enum ai_pool_category poolcat;
   const char *core;
   const char *lead = "";
   const char *suf = "";
@@ -8727,9 +8807,33 @@ static const char *ai_distinct_reply_line(struct char_data *mob, struct ai_conv_
   unsigned long salt_base;
   if (!mob || !rctx || !out || outsz == 0)
     return "";
-  grp = ai_distinct_group_for_actor_arch(ai_actor_detect_archetype(mob));
+  arch = ai_actor_detect_archetype(mob);
+  grp = ai_distinct_group_for_actor_arch(arch);
   if (grp == DRG_GENERIC)
     grp = ai_distinct_role_group_pick(mob, mob->ai_prof ? mob->ai_prof->role : ROLE_UNKNOWN, rctx->archetype, rctx->subtags);
+  poolcat = (icls == DINT_TRAINING) ? POOLCAT_SERVICE_TRAIN :
+            (icls == DINT_FOOD_WATER || icls == DINT_HELP_FOLLOWUP || icls == DINT_SERVICE_MENU) ? POOLCAT_SERVICE_GENERAL :
+            (icls == DINT_GREETING) ? POOLCAT_GREET :
+            (icls == DINT_MONEY_REFUSAL || icls == DINT_REFUSAL) ? POOLCAT_REFUSAL :
+            (icls == DINT_CONFUSION) ? POOLCAT_CONFUSION : POOLCAT_SMALLTALK;
+  if (!ai_arch_allows_pool(arch, poolcat, rctx->domain, icls)) {
+#ifdef AI_BRAIN_LOG_DEBUG
+    if (ai_debug)
+      ai_debug_log("AI_POOL_GATE vnum=%d arch=%s intent/domain=%d/%d cat=%s blocked selected=suppressed",
+                   GET_MOB_VNUM(mob), ai_actor_archetype_name(arch), icls, rctx->domain, ai_pool_category_name(poolcat));
+#endif
+    if (icls == DINT_TRAINING || icls == DINT_REFUSAL || icls == DINT_MONEY_REFUSAL)
+      icls = DINT_REFUSAL;
+    else
+      icls = DINT_CONFUSION;
+    poolcat = (icls == DINT_REFUSAL) ? POOLCAT_REFUSAL : POOLCAT_CONFUSION;
+  }
+#ifdef AI_BRAIN_LOG_DEBUG
+  else if (ai_debug) {
+    ai_debug_log("AI_POOL_GATE vnum=%d arch=%s intent/domain=%d/%d cat=%s allowed selected=attempt",
+                 GET_MOB_VNUM(mob), ai_actor_archetype_name(arch), icls, rctx->domain, ai_pool_category_name(poolcat));
+  }
+#endif
   salt_base = ai_hash_mix((unsigned long)icls, (unsigned long)(grp * 137 + rctx->personality * 19));
   core = ai_distinct_pool_pick(mob, grp, icls, ai_hash_mix(salt_base, 401), &core_idx);
   personality = (rctx->personality >= 0 && rctx->personality < IMTB_MAX) ? rctx->personality : IMTB_STOIC;
@@ -8757,6 +8861,11 @@ static const char *ai_distinct_reply_line(struct char_data *mob, struct ai_conv_
                       (icls == DINT_CONFUSION) ? "CONFUSION_GENERIC" : "REFUSAL_GENERIC";
   if (ai_debug)
     ai_debug_log("AI_DISTINCT_PICK vnum=%d pool=%s grp=%d align=%s imtb=%d core_idx=%d lead_idx=%d suffix=%d", GET_MOB_VNUM(mob), (out_pool_label && *out_pool_label) ? *out_pool_label : "CORE", grp, ai_alignment_bucket_name(GET_ALIGNMENT(mob)), personality, core_idx, lead_idx, suf_used);
+#ifdef AI_BRAIN_LOG_DEBUG
+  if (ai_debug)
+    ai_debug_log("AI_POOL_GATE vnum=%d arch=%s intent/domain=%d/%d cat=%s allowed selected=core",
+                 GET_MOB_VNUM(mob), ai_actor_archetype_name(arch), icls, rctx->domain, ai_pool_category_name(poolcat));
+#endif
   return out;
 }
 
@@ -11271,6 +11380,14 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
     }
     if (type != AI_EVENT_PLAYER_SAY && (now - last_reply) < AI_PER_PLAYER_REPLY_COOLDOWN_SECS)
       AI_EVT_RETURN("PER_PLAYER_REPLY_COOLDOWN");
+    if (type == AI_EVENT_PLAYER_SAY && ai_repeat_reply_guard_should_suppress(mob, actor, IN_ROOM(mob), normalized_hash, now)) {
+#ifdef AI_BRAIN_LOG_DEBUG
+      ai_debug_log("AI_POOL_GATE vnum=%d arch=%s intent/domain=%d/%d cat=%s blocked selected=suppressed_repeat",
+                   GET_MOB_VNUM(mob), ai_actor_archetype_name(ai_actor_detect_archetype(mob)), intent, rctx.domain,
+                   ai_pool_category_name(POOLCAT_AMBIENT));
+#endif
+      AI_EVT_RETURN("REPEAT_TEXT_SUPPRESSED");
+    }
   }
 
   {
@@ -11321,6 +11438,28 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
         has_capability = is_trainer_exact;
       enum ai_liveplay_intent live_intent = ai_liveplay_classify_intent(normalized);
       enum ai_actor_archetype actor_arch = ai_actor_detect_archetype(mob);
+
+      if (type == AI_EVENT_PLAYER_SAY && asks_train && IN_ROOM(mob) == IN_ROOM(actor)) {
+        if (is_trainer_exact) {
+          line = "Yes. Use TRAIN to spend training sessions. Use PRAC to spend practice sessions.";
+          rctx.chosen_core = line;
+          skip_voice = TRUE;
+          intention.be_brief = 1;
+          intention.goal = GOAL_SERVE;
+          pool = "POOL_TRAINING_GUIDANCE";
+        } else {
+          const char *pl = NULL;
+          enum ai_distinct_intent_class tdcls = ai_arch_allows_pool(actor_arch, POOLCAT_SERVICE_TRAIN, rctx.domain, DINT_TRAINING) ? DINT_TRAINING : DINT_REFUSAL;
+          ai_distinct_reply_line(mob, conv_st, &rctx, tdcls, GET_IDNUM(actor), voiced, sizeof(voiced), &pl);
+          line = voiced;
+          rctx.chosen_core = line;
+          skip_voice = TRUE;
+          intention.be_brief = 1;
+          intention.goal = GOAL_SERVE;
+          if (pl)
+            ai_set_last_speech_meta(mob, pl, "TRAINING_DEFERRAL");
+        }
+      }
 
       if (type == AI_EVENT_PLAYER_SAY && explicit_intent == INTENT_ILLEGAL_SLAVERY_REQUEST) {
         const char *illegal = (role == ROLE_GUARD) ? "No. We do not traffic in people here. Drop it." :
@@ -11486,10 +11625,10 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
       }
       if (!line || !*line) {
         if (type == AI_EVENT_PLAYER_SAY && asks_train && !is_trainer_exact) {
-          if (rctx.facts.confidence == 3)
-            line = ai_role_redirect_line(role, style, TARGET_TRAINER);
-          else
-            line = "I'm not a trainer. Look for a guildmaster to TRAIN and PRAC.";
+          const char *pl = NULL;
+          enum ai_distinct_intent_class tdcls = ai_arch_allows_pool(actor_arch, POOLCAT_SERVICE_TRAIN, rctx.domain, DINT_TRAINING) ? DINT_TRAINING : DINT_REFUSAL;
+          ai_distinct_reply_line(mob, conv_st, &rctx, tdcls, GET_IDNUM(actor), voiced, sizeof(voiced), &pl);
+          line = voiced;
         } else if (type == AI_EVENT_PLAYER_SAY && (rctx.domain == DOMAIN_SERVICES || rctx.domain == DOMAIN_DIRECTIONS))
           line = ai_role_redirect_line(role, style, rctx.primary_topic_target);
         else if (rctx.domain == DOMAIN_SOCIAL)
