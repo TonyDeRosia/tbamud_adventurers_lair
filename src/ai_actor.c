@@ -17,8 +17,9 @@
 #include "spec_procs.h"
 #include "spells.h"
 #include "act.h"
-#undef AI_ACTOR_DEBUG
-#define AI_ACTOR_DEBUG 1
+#ifndef AI_ACTOR_DEBUG
+#define AI_ACTOR_DEBUG 0
+#endif
 #ifndef AI_ACTOR_LIVEPLAY_DEBUG
 #define AI_ACTOR_LIVEPLAY_DEBUG 0
 #endif
@@ -7120,7 +7121,7 @@ static void ai_service_cache_add_candidate(struct ai_service_zone_cache *zc, int
     if (c->service_type == service_type && c->room_vnum == room) {
       if (c->shop_nr < 0 && shop_nr >= 0)
         c->shop_nr = shop_nr;
-      if (c->sample_item_vnum < 0 && item_vnum >= 0)
+      if (c->sample_item_vnum == NOTHING && item_vnum != NOTHING)
         c->sample_item_vnum = item_vnum;
       c->has_weapon = c->has_weapon || has_weapon;
       c->has_armor = c->has_armor || has_armor;
@@ -7158,7 +7159,7 @@ static void ai_service_cache_build_for_zone(int zone_rnum, struct ai_service_zon
 
   for (i = 0; i <= top_shop; i++) {
     int has_weapon = FALSE, has_armor = FALSE, has_food = FALSE;
-    obj_vnum weapon_item = -1, armor_item = -1, food_item = -1;
+    obj_vnum weapon_item = NOTHING, armor_item = NOTHING, food_item = NOTHING;
 
     for (j = 0; SHOP_PRODUCT(i, j) != NOTHING; j++) {
       obj_rnum ornum = real_object(SHOP_PRODUCT(i, j));
@@ -7166,15 +7167,15 @@ static void ai_service_cache_build_for_zone(int zone_rnum, struct ai_service_zon
         continue;
       if (GET_OBJ_TYPE(&obj_proto[ornum]) == ITEM_WEAPON) {
         has_weapon = TRUE;
-        if (weapon_item < 0)
+        if (weapon_item == NOTHING)
           weapon_item = SHOP_PRODUCT(i, j);
       } else if (GET_OBJ_TYPE(&obj_proto[ornum]) == ITEM_ARMOR) {
         has_armor = TRUE;
-        if (armor_item < 0)
+        if (armor_item == NOTHING)
           armor_item = SHOP_PRODUCT(i, j);
       } else if (GET_OBJ_TYPE(&obj_proto[ornum]) == ITEM_FOOD || GET_OBJ_TYPE(&obj_proto[ornum]) == ITEM_DRINKCON) {
         has_food = TRUE;
-        if (food_item < 0)
+        if (food_item == NOTHING)
           food_item = SHOP_PRODUCT(i, j);
       }
     }
@@ -7184,9 +7185,9 @@ static void ai_service_cache_build_for_zone(int zone_rnum, struct ai_service_zon
       if (rr == NOWHERE || world[rr].zone != zone_rnum)
         continue;
       if (has_weapon || has_armor || has_food)
-        ai_service_cache_add_candidate(zc, TARGET_MARKET, SHOP_ROOM(i, j), i, (weapon_item >= 0 ? weapon_item : (armor_item >= 0 ? armor_item : food_item)), has_weapon, has_armor, has_food);
+        ai_service_cache_add_candidate(zc, TARGET_MARKET, SHOP_ROOM(i, j), i, (weapon_item != NOTHING ? weapon_item : (armor_item != NOTHING ? armor_item : food_item)), has_weapon, has_armor, has_food);
       if (has_weapon || has_armor)
-        ai_service_cache_add_candidate(zc, TARGET_ARMORY, SHOP_ROOM(i, j), i, (weapon_item >= 0 ? weapon_item : armor_item), has_weapon, has_armor, has_food);
+        ai_service_cache_add_candidate(zc, TARGET_ARMORY, SHOP_ROOM(i, j), i, (weapon_item != NOTHING ? weapon_item : armor_item), has_weapon, has_armor, has_food);
       if (has_food)
         ai_service_cache_add_candidate(zc, TARGET_BAKERY, SHOP_ROOM(i, j), i, food_item, has_weapon, has_armor, has_food);
     }
@@ -7298,7 +7299,7 @@ static int ai_find_closest_service(struct char_data *mob, struct char_data *play
   int i;
   int best_dist = 9999;
   room_vnum best_room = NOWHERE;
-  obj_vnum best_item = -1;
+  obj_vnum best_item = NOTHING;
 
   if (!mob || IN_ROOM(mob) == NOWHERE)
     return FALSE;
@@ -7326,7 +7327,7 @@ static int ai_find_closest_service(struct char_data *mob, struct char_data *play
 
     if (c->shop_nr >= 0 && player) {
       int j;
-      item_choice = -1;
+      item_choice = NOTHING;
       for (j = 0; SHOP_PRODUCT(c->shop_nr, j) != NOTHING; j++) {
         obj_rnum ornum = real_object(SHOP_PRODUCT(c->shop_nr, j));
         struct obj_data *o;
@@ -7525,7 +7526,7 @@ static void ai_resolve_world_facts(struct char_data *mob, struct char_data *acto
   if (rr != NOWHERE)
     snprintf(out->service_name, sizeof(out->service_name), "%.*s", (int)sizeof(out->service_name) - 1, world[rr].name ? world[rr].name : "an armory near the market");
 
-  if (item_v >= 0) {
+  if (item_v != NOTHING) {
     obj_rnum ornum = real_object(item_v);
     if (ornum != NOTHING)
       snprintf(out->example_item, sizeof(out->example_item), "%.*s", (int)sizeof(out->example_item) - 1, obj_proto[ornum].short_description ? obj_proto[ornum].short_description : "goods");
