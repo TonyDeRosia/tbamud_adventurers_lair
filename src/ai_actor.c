@@ -24,6 +24,9 @@
 #ifndef AI_ACTOR_DEBUG_POOLS
 #define AI_ACTOR_DEBUG_POOLS 0
 #endif
+#ifndef AI_ACTOR_DEBUG_DIALOGUE
+#define AI_ACTOR_DEBUG_DIALOGUE 0
+#endif
 #include "ai_actor.h"
 #include "ai_actor_brain.h"
 #include "ai_reactions.h"
@@ -3143,28 +3146,24 @@ static enum ai_actor_archetype ai_actor_detect_archetype(struct char_data *mob)
   style = (mob->ai_prof) ? mob->ai_prof->style : 0;
   creature = ai_detect_creature_archetype(mob);
 
-  if (ai_liveplay_mob_can_train(mob))
-    return ACT_ARCH_TRAINER;
-  if (ai_liveplay_mob_can_shop(mob))
-    return (style == 1) ? ACT_ARCH_INNKEEPER : ACT_ARCH_MERCHANT;
-  if (role == ROLE_MERCHANT && style == 1)
-    return ACT_ARCH_INNKEEPER;
-  if (role == ROLE_MERCHANT)
-    return ACT_ARCH_MERCHANT;
-  if (role == ROLE_GUARD)
-    return ACT_ARCH_GUARD;
-  if (role == ROLE_BANDIT)
-    return ACT_ARCH_BANDIT;
-  if (role == ROLE_CULTIST)
-    return ACT_ARCH_CULTIST;
-  if (role == ROLE_BOSS)
-    return ACT_ARCH_COMMANDER;
   if (role == ROLE_BEAST || creature == AI_CREATURE_BEAST)
     return ACT_ARCH_BEAST;
   if (role == ROLE_UNDEAD || creature == AI_CREATURE_UNDEAD)
     return ACT_ARCH_UNDEAD;
   if (role == ROLE_SPIRIT || creature == AI_CREATURE_SPIRIT)
     return ACT_ARCH_SPIRIT;
+  if (ai_liveplay_mob_can_train(mob))
+    return ACT_ARCH_TRAINER;
+  if (role == ROLE_GUARD)
+    return ACT_ARCH_GUARD;
+  if (role == ROLE_BOSS)
+    return ACT_ARCH_COMMANDER;
+  if (role == ROLE_BANDIT)
+    return ACT_ARCH_BANDIT;
+  if (role == ROLE_CULTIST)
+    return ACT_ARCH_CULTIST;
+  if (ai_liveplay_mob_can_shop(mob) || role == ROLE_MERCHANT)
+    return (style == 1) ? ACT_ARCH_INNKEEPER : ACT_ARCH_MERCHANT;
   if (role == ROLE_CIVILIAN)
     return ACT_ARCH_CIVILIAN;
   return ACT_ARCH_OTHER;
@@ -3240,6 +3239,22 @@ static int ai_actor_service_archetype_allowed(enum ai_actor_archetype arch, enum
       return (arch == ACT_ARCH_GUARD || arch == ACT_ARCH_MERCHANT || arch == ACT_ARCH_INNKEEPER || arch == ACT_ARCH_TRAINER || arch == ACT_ARCH_CIVILIAN || arch == ACT_ARCH_COMMANDER);
     default:
       return TRUE;
+  }
+}
+
+static enum ai_distinct_role_group ai_distinct_group_for_actor_arch(enum ai_actor_archetype arch)
+{
+  switch (arch) {
+    case ACT_ARCH_GUARD:
+    case ACT_ARCH_COMMANDER: return DRG_GUARD;
+    case ACT_ARCH_MERCHANT: return DRG_MERCHANT;
+    case ACT_ARCH_INNKEEPER: return DRG_INNKEEPER;
+    case ACT_ARCH_BANDIT: return DRG_BANDIT;
+    case ACT_ARCH_BEAST: return DRG_BEAST;
+    case ACT_ARCH_UNDEAD: return DRG_UNDEAD;
+    case ACT_ARCH_SPIRIT: return DRG_SPIRIT;
+    case ACT_ARCH_CULTIST: return DRG_CULTIST;
+    default: return DRG_GENERIC;
   }
 }
 
@@ -8684,7 +8699,9 @@ static const char *ai_distinct_reply_line(struct char_data *mob, struct ai_conv_
   unsigned long salt_base;
   if (!mob || !rctx || !out || outsz == 0)
     return "";
-  grp = ai_distinct_role_group_pick(mob, mob->ai_prof ? mob->ai_prof->role : ROLE_UNKNOWN, rctx->archetype, rctx->subtags);
+  grp = ai_distinct_group_for_actor_arch(ai_actor_detect_archetype(mob));
+  if (grp == DRG_GENERIC)
+    grp = ai_distinct_role_group_pick(mob, mob->ai_prof ? mob->ai_prof->role : ROLE_UNKNOWN, rctx->archetype, rctx->subtags);
   salt_base = ai_hash_mix((unsigned long)icls, (unsigned long)(grp * 137 + rctx->personality * 19));
   core = ai_distinct_pool_pick(mob, grp, icls, ai_hash_mix(salt_base, 401), &core_idx);
   personality = (rctx->personality >= 0 && rctx->personality < IMTB_MAX) ? rctx->personality : IMTB_STOIC;
@@ -8795,9 +8812,9 @@ static const char *ai_service_menu_clarify_line(struct char_data *mob, int role,
   enum ai_actor_persona persona;
   enum ai_distinct_role_group grp;
   int idx = -1;
-  uint64_t subtags = ai_detect_creature_subtags(mob);
   (void)evil;
   (void)style;
+  (void)archetype;
   persona = get_actor_persona(mob);
   if (persona == AI_PERSONA_GUARD)
     return ai_pick_line_from_pool(mob, guard_clarify, 3, ai_hash_mix((unsigned long)personality, 1911UL));
@@ -8807,7 +8824,9 @@ static const char *ai_service_menu_clarify_line(struct char_data *mob, int role,
     return ai_pick_line_from_pool(mob, merchant_clarify, 2, ai_hash_mix((unsigned long)personality, 1931UL));
   if (persona == AI_PERSONA_INNKEEPER)
     return ai_pick_line_from_pool(mob, innkeeper_clarify, 1, ai_hash_mix((unsigned long)personality, 1941UL));
-  grp = ai_distinct_role_group_pick(mob, role, archetype, subtags);
+  grp = ai_distinct_group_for_actor_arch(ai_actor_detect_archetype(mob));
+  if (grp == DRG_GENERIC)
+    grp = ai_distinct_role_group_pick(mob, role, archetype, ai_detect_creature_subtags(mob));
   return ai_distinct_pool_pick(mob, grp, DINT_SERVICE_MENU, ai_hash_mix((unsigned long)personality, 1901UL), &idx);
 }
 
@@ -9922,14 +9941,14 @@ static const char *ai_role_service_fallback_line(int role, int style, enum ai_ex
   if (role == ROLE_SPIRIT || role == ROLE_UNDEAD)
     return "I do not keep mortal services. Seek the living in the square.";
   if (role == ROLE_GUARD)
-    return "Try the market to the south, and keep to the roads.";
+    return "I keep order; ask a guildmaster, merchant, or innkeeper for that.";
   if (role == ROLE_MERCHANT)
     return "Market stalls carry that; ask what you need.";
   if (role == ROLE_BANDIT)
     return "Heard traders in the market move that sort of thing, if you're lucky.";
   if (role == ROLE_CULTIST)
     return "I teach no trade. Ask living merchants in the square.";
-  return "I teach skills. Ask a merchant in the market for goods.";
+  return "I cannot provide that. Ask a guildmaster, merchant, or innkeeper.";
 }
 
 static const char *ai_meta_response_line(struct char_data *mob, int role, int style, enum ai_explicit_intent ex, int mood)
@@ -10681,7 +10700,7 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
   }
   stable_personality = ai_personality_from_role(mob, role, rctx.archetype);
   role_caps = ai_role_capabilities(role, style);
-  if (MOB_FLAGGED(mob, MOB_GUILD_MASTER))
+  if (ai_liveplay_mob_can_train(mob))
     role_caps |= (CAP_TRAIN | CAP_PRACTICE);
   {
     int b_role = ROLE_UNKNOWN;
@@ -11253,8 +11272,11 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
       unsigned long seed;
       int skip_voice = FALSE;
       int asks_train = ai_is_training_query_text(normalized) || ai_is_practice_query_text(normalized);
+      int is_trainer_exact = ai_liveplay_mob_can_train(mob);
       uint32_t required_cap = ai_intent_required_capability(explicit_intent);
       int has_capability = (!required_cap || ((role_caps & required_cap) != 0));
+      if (explicit_intent == INTENT_SERVICE_TRAINING || asks_train)
+        has_capability = is_trainer_exact;
       enum ai_liveplay_intent live_intent = ai_liveplay_classify_intent(normalized);
       enum ai_actor_archetype actor_arch = ai_actor_detect_archetype(mob);
 
@@ -11354,7 +11376,7 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
         skip_voice = TRUE;
         intention.be_brief = 1;
         intention.goal = GOAL_IDENTITY;
-      } else if (type == AI_EVENT_PLAYER_SAY && asks_train && IN_ROOM(mob) == IN_ROOM(actor) && MOB_FLAGGED(mob, MOB_GUILD_MASTER)) {
+      } else if (type == AI_EVENT_PLAYER_SAY && asks_train && IN_ROOM(mob) == IN_ROOM(actor) && is_trainer_exact) {
         line = "Yes. Use TRAIN to spend training sessions. Use PRAC to spend practice sessions.";
         core = line;
         rctx.chosen_core = core;
@@ -11421,7 +11443,7 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
         line = core;
       }
       if (!line || !*line) {
-        if (type == AI_EVENT_PLAYER_SAY && asks_train && !MOB_FLAGGED(mob, MOB_GUILD_MASTER)) {
+        if (type == AI_EVENT_PLAYER_SAY && asks_train && !is_trainer_exact) {
           if (rctx.facts.confidence == 3)
             line = ai_role_redirect_line(role, style, TARGET_TRAINER);
           else
@@ -11438,6 +11460,15 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
         const char *repick = ai_role_redirect_line(role, style, rctx.primary_topic_target);
         if (repick && *repick)
           line = repick;
+      }
+
+      if (type == AI_EVENT_PLAYER_SAY && ai_intent_is_service(explicit_intent) && line && *line &&
+          rctx.facts.confidence < 3 && ai_line_has_hard_location_claim(line)) {
+        const char *safe = ai_role_service_fallback_line(role, style, explicit_intent);
+        if (safe && *safe && !ai_line_has_hard_location_claim(safe))
+          line = safe;
+        else
+          line = "I cannot confirm an exact location from here.";
       }
 
       if (type == AI_EVENT_PLAYER_SAY && multi_service_hits >= 2 && multi_has_food && multi_has_money && line && *line) {
@@ -11545,7 +11576,7 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
         }
       }
 
-      if (type == AI_EVENT_PLAYER_SAY && line && *line && rctx.requested_count <= 1 && !(asks_train && MOB_FLAGGED(mob, MOB_GUILD_MASTER))) {
+      if (type == AI_EVENT_PLAYER_SAY && line && *line && rctx.requested_count <= 1 && !(asks_train && is_trainer_exact)) {
         unsigned long dseed = ai_conv_seed(mob, intent, (unsigned int)now);
         if (!repeated_topic && ai_pick_stance_prefix(role, style, dseed, &stance_prefix) && stance_prefix && *stance_prefix && ai_line_is_role_legal(stance_prefix, role, style)) {
           ai_copy_trunc(decorated, sizeof(decorated), stance_prefix);
@@ -11657,6 +11688,15 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
     }
 
     ai_set_last_speech_meta(mob, pool, reason);
+#if AI_ACTOR_DEBUG_DIALOGUE
+    ai_debug_log("AI_DIALOGUE mob=%s vnum=%d arch=%s intent=%s trainer=%d pool=%s",
+                 GET_NAME(mob) ? GET_NAME(mob) : "(unknown)",
+                 GET_MOB_VNUM(mob),
+                 ai_actor_archetype_name(actor_arch),
+                 ai_liveplay_intent_name(live_intent),
+                 is_trainer_exact ? 1 : 0,
+                 pool ? pool : "POOL_NONE");
+#endif
     {
       char finalbuf[300];
       char original[300];
