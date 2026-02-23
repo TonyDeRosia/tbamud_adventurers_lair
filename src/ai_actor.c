@@ -2,6 +2,7 @@
 #include "sysdep.h"
 
 #include <ctype.h>
+#include <string.h>
 #include <math.h>
 
 #include "structs.h"
@@ -17,15 +18,15 @@
 #include "spells.h"
 #include "act.h"
 #undef AI_ACTOR_DEBUG
-#define AI_ACTOR_DEBUG 0
+#define AI_ACTOR_DEBUG 1
 #ifndef AI_ACTOR_LIVEPLAY_DEBUG
 #define AI_ACTOR_LIVEPLAY_DEBUG 0
 #endif
 #ifndef AI_ACTOR_DEBUG_POOLS
-#define AI_ACTOR_DEBUG_POOLS 0
+#define AI_ACTOR_DEBUG_POOLS 1
 #endif
 #ifndef AI_ACTOR_DEBUG_DIALOGUE
-#define AI_ACTOR_DEBUG_DIALOGUE 0
+#define AI_ACTOR_DEBUG_DIALOGUE 1
 #endif
 #include "ai_actor.h"
 #include "ai_actor_brain.h"
@@ -3136,6 +3137,7 @@ static const char *ai_liveplay_intent_name(enum ai_liveplay_intent intent)
     default: return "UNKNOWN";
   }
 }
+#if defined(AI_BRAIN_LOG_DEBUG) || defined(AI_ACTOR_DEBUG_DIALOGUE) || defined(AI_ACTOR_DEBUG_POOLS)
 
 static const char *ai_actor_archetype_name(enum ai_actor_archetype arch)
 {
@@ -3154,6 +3156,9 @@ static const char *ai_actor_archetype_name(enum ai_actor_archetype arch)
     default: return "OTHER";
   }
 }
+#endif
+#if defined(AI_BRAIN_LOG_DEBUG) || defined(AI_ACTOR_DEBUG_DIALOGUE) || defined(AI_ACTOR_DEBUG_POOLS)
+
 
 static const char *ai_pool_category_name(enum ai_pool_category cat)
 {
@@ -3172,6 +3177,8 @@ static const char *ai_pool_category_name(enum ai_pool_category cat)
     default: return "UNKNOWN";
   }
 }
+#endif
+
 
 static enum ai_actor_archetype ai_actor_detect_archetype(struct char_data *mob)
 {
@@ -4679,6 +4686,11 @@ static int ai_imtb_pick_personality(struct char_data *mob, int role, int style)
   }
 
   if (ai_debug)
+  /* Trainer role upgrade: trainer mobs must have trainer role so SERVICE_TRAIN output is legal. */
+  if (ai_liveplay_mob_can_train(mob)) {
+    role = ACT_ARCH_TRAINER;
+  }
+
     ai_debug_log("AI_IMTB_ASSIGN vnum=%d role=%s personality=%s", GET_MOB_VNUM(mob), ai_role_name_local(role), ai_imtb_profiles[p].tag);
 
   return p;
@@ -8889,6 +8901,12 @@ static const char *ai_distinct_reply_line(struct char_data *mob, struct ai_conv_
             (icls == DINT_GREETING) ? POOLCAT_GREET :
             (icls == DINT_MONEY_REFUSAL || icls == DINT_REFUSAL) ? POOLCAT_REFUSAL :
             (icls == DINT_CONFUSION) ? POOLCAT_CONFUSION : POOLCAT_SMALLTALK;
+  /* Hard gate: non-trainers must not answer training requests from generic pools. */
+  if (icls == DINT_TRAINING && !ai_liveplay_mob_can_train(mob)) {
+    icls = DINT_REFUSAL;
+    poolcat = POOLCAT_REFUSAL;
+  }
+
   {
     enum ai_pool_category requested = poolcat;
     int allowed = ai_poolcat_allowed(mob, arch, poolcat, rctx->domain, icls);
@@ -12000,13 +12018,18 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
 
     ai_set_last_speech_meta(mob, pool, reason);
 #if AI_ACTOR_DEBUG_DIALOGUE
-    ai_debug_log("AI_DIALOGUE mob=%s vnum=%d arch=%s intent=%s trainer=%d pool=%s",
-                 GET_NAME(mob) ? GET_NAME(mob) : "(unknown)",
-                 GET_MOB_VNUM(mob),
-                 ai_actor_archetype_name(actor_arch),
-                 ai_liveplay_intent_name(live_intent),
-                 is_trainer_exact ? 1 : 0,
-                 pool ? pool : "POOL_NONE");
+    {
+      enum ai_actor_archetype _dbg_arch = ai_actor_detect_archetype(mob);
+      enum ai_liveplay_intent _dbg_intent = ai_liveplay_classify_intent(normalized);
+      int _dbg_trainer = ai_liveplay_mob_can_train(mob);
+      ai_debug_log("AI_DIALOGUE mob=%s vnum=%d arch=%s intent=%s trainer=%d pool=%s",
+                   (mob && GET_NAME(mob)) ? GET_NAME(mob) : "(unknown)",
+                   mob ? GET_MOB_VNUM(mob) : -1,
+                   ai_actor_archetype_name(_dbg_arch),
+                   ai_liveplay_intent_name(_dbg_intent),
+                   _dbg_trainer ? 1 : 0,
+                   pool ? pool : "POOL_NONE");
+    }
 #endif
     {
       char finalbuf[300];
@@ -12036,7 +12059,11 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
         if (!replacement || !*replacement)
           replacement = "Let's keep to what I can answer.";
         ai_copy_trunc(finalbuf, sizeof(finalbuf), replacement);
-        if (ai_debug) {
+    /* Training guidance legality override: trainers keep training guidance line even if role gate trips. */
+if (ai_liveplay_mob_can_train(mob) && pool && !strcmp(pool, "POOL_TRAINING_GUIDANCE")) {
+  replacement = original;
+}
+    if (ai_debug) {
           ai_debug_log("ROLE_ILLEGAL_OUTPUT: role=%s pool=%s original='%s' replacement='%s'", ai_role_name_local(role), pool ? pool : "POOL_NONE", original, finalbuf);
         }
       }
