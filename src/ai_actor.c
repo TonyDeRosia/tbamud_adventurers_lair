@@ -1040,6 +1040,7 @@ static int ai_actor_service_archetype_allowed(enum ai_actor_archetype arch, enum
 static int ai_liveplay_role_eligible(struct char_data *mob, enum ai_liveplay_intent intent);
 static const char *ai_liveplay_referral_line(struct char_data *mob, struct char_data *player, enum ai_liveplay_intent intent);
 static int ai_actor_ensure_ready(struct char_data *mob);
+static int ai_actor_mob_say_eligible(struct char_data *mob);
 static unsigned long ai_hash_mix(unsigned long h, unsigned long v);
 static unsigned long ai_hash_text_stable(const char *text);
 static int ai_imtb_pick_personality(struct char_data *mob, int role, int style);
@@ -2182,7 +2183,7 @@ static void ai_dbg_evt(struct char_data *mob, const char *tag, enum ai_event_typ
 
 static int ai_actor_ensure_ready(struct char_data *mob)
 {
-  if (!mob || !IS_NPC(mob) || !MOB_FLAGGED(mob, MOB_AI_ACTOR) || IN_ROOM(mob) == NOWHERE)
+  if (!mob || !IS_NPC(mob) || !ai_actor_mob_say_eligible(mob) || IN_ROOM(mob) == NOWHERE)
     return 0;
 
   if (!mob->ai_state || !mob->ai_state->brain)
@@ -2195,6 +2196,15 @@ static int ai_actor_ensure_ready(struct char_data *mob)
   }
 
   return 1;
+}
+
+static int ai_actor_mob_say_eligible(struct char_data *mob)
+{
+  if (!mob || !IS_NPC(mob))
+    return 0;
+  if (MOB_FLAGGED(mob, MOB_AI_ACTOR))
+    return 1;
+  return ai_liveplay_mob_can_train(mob);
 }
 
 static void ai_extract_text(char *out, size_t outsz, struct char_data *mob)
@@ -4199,7 +4209,7 @@ void ai_actor_refresh_live_mobs_by_vnum(mob_vnum vnum)
 void ai_actor_init(struct char_data *mob)
 {
   struct ai_conv_actor_state *conv_st;
-  if (!mob || !IS_NPC(mob) || !MOB_FLAGGED(mob, MOB_AI_ACTOR))
+  if (!mob || !IS_NPC(mob) || !ai_actor_mob_say_eligible(mob))
     return;
 
   ai_actor_refresh_profile(mob, TRUE);
@@ -10885,6 +10895,13 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
 } while (0)
 
   ai_dbg_evt(mob, "ENTER", type, actor, text);
+  if (type == AI_EVENT_PLAYER_SAY)
+    log("AI_ACTOR: SAY_HOOK mob_vnum=%d mob=%s actor=%s room=%d msg=%s",
+        mob ? GET_MOB_VNUM(mob) : -1,
+        (mob && GET_NAME(mob)) ? GET_NAME(mob) : "(null)",
+        (actor && GET_NAME(actor)) ? GET_NAME(actor) : "(null)",
+        (mob && IN_ROOM(mob) != NOWHERE) ? GET_ROOM_VNUM(IN_ROOM(mob)) : NOWHERE,
+        text ? text : "");
   memset(&rctx, 0, sizeof(rctx));
   memset(&guidance_query, 0, sizeof(guidance_query));
   rctx.event_id = -1;
@@ -12256,7 +12273,7 @@ void ai_actor_event_say(struct char_data *actor, const char *msg)
   ai_reactions_room_event_reset(IN_ROOM(actor), AI_EVENT_PLAYER_SAY);
 
   for (mob = world[IN_ROOM(actor)].people; mob; mob = mob->next_in_room) {
-    if (IS_NPC(mob) && MOB_FLAGGED(mob, MOB_AI_ACTOR) && mob != actor && ai_actor_ensure_ready(mob)) {
+    if (IS_NPC(mob) && ai_actor_mob_say_eligible(mob) && mob != actor && ai_actor_ensure_ready(mob)) {
       seed_mob = mob;
       break;
     }
@@ -12265,7 +12282,7 @@ void ai_actor_event_say(struct char_data *actor, const char *msg)
     (void)ai_actor_room_response_slot(seed_mob, actor, AI_EVENT_PLAYER_SAY, AI_INTENT_NONE, 0, normalized);
 
   for (mob = world[IN_ROOM(actor)].people; mob; mob = mob->next_in_room)
-    if (IS_NPC(mob) && MOB_FLAGGED(mob, MOB_AI_ACTOR) && mob != actor) {
+    if (IS_NPC(mob) && ai_actor_mob_say_eligible(mob) && mob != actor) {
       if (!ai_actor_ensure_ready(mob)) {
         ai_dbg_evt(mob, "RETURN_NOT_READY", AI_EVENT_PLAYER_SAY, actor, msg ? msg : "");
         continue;
