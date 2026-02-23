@@ -21,6 +21,14 @@
 #define AI_BRAIN_STATE_DIR "lib/ai_state"
 #define AI_BRAIN_LOG_DIR "lib/ai_logs"
 
+#ifdef AI_DEV_MODE
+#define AI_BRAIN_SPOKE_COOLDOWN_SECONDS 5
+#define AI_BRAIN_HOURLY_LOG_CAP 2000
+#else
+#define AI_BRAIN_SPOKE_COOLDOWN_SECONDS 60
+#define AI_BRAIN_HOURLY_LOG_CAP 200
+#endif
+
 #ifndef AI_BRAIN_LOG_DEBUG
 #define AI_BRAIN_LOG_DEBUG 0
 #endif
@@ -50,6 +58,62 @@ struct ai_brain_spoke_rl_entry {
 static struct ai_brain_log_budget_entry ai_brain_log_budget[AI_BRAIN_LOG_BUDGET_MAX];
 static struct ai_brain_spoke_rl_entry ai_brain_spoke_rl[AI_BRAIN_SPOKE_RL_MAX];
 
+static const char *ai_brain_archetype_label(const struct ai_actor_brain *b) {
+  int arch = b ? b->archetype : 10;
+  switch (arch) {
+    case 0: return "guard";
+    case 1: return "constable";
+    case 2: return "merchant";
+    case 3: return "innkeeper";
+    case 4: return "bandit";
+    case 5: return "trainer";
+    case 6: return "beast";
+    case 7: return "undead";
+    case 8: return "spirit";
+    case 9: return "commander";
+    default: return "humanoid";
+  }
+}
+
+static void ai_brain_archetype_baseline(const struct ai_actor_brain *b, const char **out_mood, int *out_trust, int *out_hostility) {
+  const char *mood = "calm";
+  int trust = 0;
+  int hostility = 0;
+  int arch = b ? b->archetype : 10;
+
+  switch (arch) {
+    case 4:
+      mood = "wary";
+      trust = -10;
+      hostility = 10;
+      break;
+    case 7:
+      mood = "hostile";
+      trust = -30;
+      hostility = 40;
+      break;
+    case 8:
+      mood = "wary";
+      trust = -5;
+      hostility = 5;
+      break;
+    case 6:
+      mood = "wary";
+      trust = -5;
+      hostility = 10;
+      break;
+    default:
+      mood = "calm";
+      trust = 0;
+      hostility = 0;
+      break;
+  }
+
+  if (out_mood) *out_mood = mood;
+  if (out_trust) *out_trust = trust;
+  if (out_hostility) *out_hostility = hostility;
+}
+
 static int ai_brain_log_budget_allow(const struct char_data *mob, time_t now) {
   int i, oldest = 0;
   time_t oldest_t = ai_brain_log_budget[0].hour_start;
@@ -60,7 +124,7 @@ static int ai_brain_log_budget_allow(const struct char_data *mob, time_t now) {
         ai_brain_log_budget[i].hour_start = now;
         ai_brain_log_budget[i].count = 0;
       }
-      if (ai_brain_log_budget[i].count >= 200) return 0;
+      if (ai_brain_log_budget[i].count >= AI_BRAIN_HOURLY_LOG_CAP) return 0;
       ai_brain_log_budget[i].count++;
       return 1;
     }
@@ -81,7 +145,7 @@ static int ai_brain_spoke_rate_limited(const struct char_data *mob, long player_
   if (!mob || player_idnum <= 0) return 0;
   for (i = 0; i < AI_BRAIN_SPOKE_RL_MAX; i++) {
     if (ai_brain_spoke_rl[i].mob == mob && ai_brain_spoke_rl[i].player_idnum == player_idnum) {
-      if ((now - ai_brain_spoke_rl[i].last_ts) < 60) return 1;
+      if ((now - ai_brain_spoke_rl[i].last_ts) < AI_BRAIN_SPOKE_COOLDOWN_SECONDS) return 1;
       ai_brain_spoke_rl[i].last_ts = now;
       return 0;
     }
@@ -139,25 +203,42 @@ static void ai_brain_log_path(const char *uid, char *out, size_t outsz) {
   snprintf(out, outsz, "%s/%s.log", AI_BRAIN_LOG_DIR, uid ? uid : "unknown");
 }
 
+static int ai_brain_state_vnum_match(const char *path, mob_vnum vnum) {
+  FILE *fp;
+  char line[128];
+  int fvnum;
+  fp = fopen(path, "r");
+  if (!fp) return 0;
+  while (fgets(line, sizeof(line), fp)) {
+    if (sscanf(line, "vnum=%d", &fvnum) == 1) {
+      fclose(fp);
+      return (fvnum == (int)vnum);
+    }
+  }
+  fclose(fp);
+  return 0;
+}
+
 static int ai_brain_find_uid_for_vnum(mob_vnum vnum, char *out_uid, size_t out_uid_sz) {
   DIR *dir;
   struct dirent *ent;
-  char prefix[32];
+  char path[256];
   if (!out_uid || out_uid_sz == 0) return 0;
   out_uid[0] = '\0';
-  snprintf(prefix, sizeof(prefix), "%d_", (int)vnum);
   dir = opendir(AI_BRAIN_STATE_DIR);
   if (!dir) return 0;
   while ((ent = readdir(dir)) != NULL) {
     size_t nlen = strlen(ent->d_name);
-    if (!strncmp(ent->d_name, prefix, strlen(prefix)) && nlen > 6 && !strcmp(ent->d_name + nlen - 6, ".state")) {
-      size_t copy_len = nlen - 6;
-      if (copy_len >= out_uid_sz) copy_len = out_uid_sz - 1;
-      memcpy(out_uid, ent->d_name, copy_len);
-      out_uid[copy_len] = '\0';
-      closedir(dir);
-      return 1;
-    }
+    size_t copy_len;
+    if (nlen <= 6 || strcmp(ent->d_name + nlen - 6, ".state")) continue;
+    snprintf(path, sizeof(path), "%s/%s", AI_BRAIN_STATE_DIR, ent->d_name);
+    if (!ai_brain_state_vnum_match(path, vnum)) continue;
+    copy_len = nlen - 6;
+    if (copy_len >= out_uid_sz) copy_len = out_uid_sz - 1;
+    memcpy(out_uid, ent->d_name, copy_len);
+    out_uid[copy_len] = '\0';
+    closedir(dir);
+    return 1;
   }
   closedir(dir);
   return 0;
@@ -233,13 +314,18 @@ static int arch_from_vnum(mob_vnum vnum) {
 
 static struct ai_actor_brain_mem *mem_get(struct ai_actor_brain *b, long idnum, time_t now) {
   int i, ev = 0, score = 999999;
+  int base_trust = 0, base_hostility = 0;
   if (!b || idnum <= 0) return NULL;
+  ai_brain_archetype_baseline(b, NULL, &base_trust, &base_hostility);
   for (i = 0; i < b->mem_count; i++) if (b->mem[i].idnum == idnum) return &b->mem[i];
   if (b->mem_count < AI_BRAIN_MEM_MAX) {
     memset(&b->mem[b->mem_count], 0, sizeof(b->mem[b->mem_count]));
     b->mem[b->mem_count].idnum = idnum;
+    b->mem[b->mem_count].trust = base_trust;
+    b->mem[b->mem_count].hostility = MAX(0, MIN(100, base_hostility));
     b->mem[b->mem_count].relationship = AI_REL_NEUTRAL;
     b->mem[b->mem_count].last_update = now;
+    update_rel(&b->mem[b->mem_count]);
     return &b->mem[b->mem_count++];
   }
   for (i = 0; i < AI_BRAIN_MEM_MAX; i++) {
@@ -248,8 +334,11 @@ static struct ai_actor_brain_mem *mem_get(struct ai_actor_brain *b, long idnum, 
   }
   memset(&b->mem[ev], 0, sizeof(b->mem[ev]));
   b->mem[ev].idnum = idnum;
+  b->mem[ev].trust = base_trust;
+  b->mem[ev].hostility = MAX(0, MIN(100, base_hostility));
   b->mem[ev].relationship = AI_REL_NEUTRAL;
   b->mem[ev].last_update = now;
+  update_rel(&b->mem[ev]);
   return &b->mem[ev];
 }
 
@@ -369,12 +458,18 @@ void ai_brain_state_load_or_init(struct char_data *mob) {
   }
 
   ai_brain_set_uid(b, uid);
+  {
+    const char *baseline_mood = NULL;
+    ai_brain_archetype_baseline(b, &baseline_mood, NULL, NULL);
+    ai_brain_apply_mood(b, baseline_mood ? baseline_mood : "calm");
+  }
   ai_brain_state_save(mob);
 }
 
 void ai_brain_state_save(struct char_data *mob) {
   FILE *fp;
   int i, count = 0;
+  int selected[32];
   time_t now = time(0);
   struct ai_actor_brain *b;
   const char *uid;
@@ -390,15 +485,34 @@ void ai_brain_state_save(struct char_data *mob) {
   fp = fopen(path, "w");
   if (!fp) return;
   fprintf(fp, "uid=%s\n", uid);
+  fprintf(fp, "vnum=%d\n", (int)GET_MOB_VNUM(mob));
+  fprintf(fp, "archetype=%s\n", ai_brain_archetype_label(b));
   fprintf(fp, "mood=%s\n", ai_brain_mood_name(b));
   fprintf(fp, "last_seen=%ld\n", (long)now);
-  for (i = 0; i < b->mem_count && count < 32; i++) {
+  for (i = 0; i < 32; i++) selected[i] = -1;
+  for (i = 0; i < b->mem_count; i++) {
+    int j;
     struct ai_actor_brain_mem *m = &b->mem[i];
+    if (m->idnum <= 0) continue;
+    for (j = 0; j < 32; j++) {
+      if (selected[j] < 0 || b->mem[selected[j]].last_seen > m->last_seen) {
+        int k;
+        for (k = 31; k > j; k--) selected[k] = selected[k - 1];
+        selected[j] = i;
+        break;
+      }
+    }
+  }
+  for (i = 31; i >= 0; i--) {
+    struct ai_actor_brain_mem *m;
+    if (selected[i] < 0) continue;
+    m = &b->mem[selected[i]];
     if (m->idnum <= 0) continue;
     fprintf(fp, "rel.%ld.trust=%d\n", m->idnum, MAX(-100, MIN(100, m->trust)));
     fprintf(fp, "rel.%ld.hostility=%d\n", m->idnum, MAX(0, MIN(100, m->hostility)));
     fprintf(fp, "rel.%ld.last=%ld\n", m->idnum, (long)m->last_seen);
     count++;
+    if (count >= 32) break;
   }
   fclose(fp);
 }
@@ -410,6 +524,8 @@ void ai_brain_log_event(struct char_data *mob, struct char_data *actor, const ch
   long player_id = (actor && !IS_NPC(actor)) ? GET_IDNUM(actor) : 0;
   const char *uid;
   struct ai_actor_brain *b;
+  int logged = 0;
+  int rate_limited = 0;
 
   if (!mob || !mob->ai_state || !mob->ai_state->brain || !event_name || !*event_name) return;
   b = mob->ai_state->brain;
@@ -418,29 +534,30 @@ void ai_brain_log_event(struct char_data *mob, struct char_data *actor, const ch
   if (!uid || !*uid) return;
 
   if (!strcmp(event_name, "SPOKE_TO") && actor && !IS_NPC(actor) && ai_brain_spoke_rate_limited(mob, GET_IDNUM(actor), now)) {
-#if AI_BRAIN_LOG_DEBUG
-    log("AI_BRAIN_LOG uid=%s vnum=%d player=%ld event=%s severity=%s topic=%s logged=0 rate_limited=1", uid, GET_MOB_VNUM(mob), player_id, event_name, severity ? severity : "-", topic ? topic : "-");
-#endif
-    return;
+    rate_limited = 1;
+    goto brain_log_debug;
   }
 
   if (!ai_brain_log_budget_allow(mob, now)) {
-#if AI_BRAIN_LOG_DEBUG
-    log("AI_BRAIN_LOG uid=%s vnum=%d player=%ld event=%s severity=%s topic=%s logged=0 rate_limited=1", uid, GET_MOB_VNUM(mob), player_id, event_name, severity ? severity : "-", topic ? topic : "-");
-#endif
-    return;
+    rate_limited = 1;
+    goto brain_log_debug;
   }
 
   ai_brain_ensure_dir(AI_BRAIN_LOG_DIR);
   ai_brain_log_path(uid, path, sizeof(path));
 
   fp = fopen(path, "a");
-  if (!fp) return;
+  if (!fp) goto brain_log_debug;
   fprintf(fp, "%ld %ld %s %s %s\n", (long)now, player_id, event_name, severity ? severity : "minor", (topic && *topic) ? topic : "-");
   fclose(fp);
   ai_brain_state_save(mob);
+  logged = 1;
+
+brain_log_debug:
 #if AI_BRAIN_LOG_DEBUG
-  log("AI_BRAIN_LOG uid=%s vnum=%d player=%ld event=%s severity=%s topic=%s logged=1 rate_limited=0", uid, GET_MOB_VNUM(mob), player_id, event_name, severity ? severity : "-", topic ? topic : "-");
+  log("AI_BRAIN_LOG uid=%s vnum=%d archetype=%s player=%ld event=%s severity=%s topic=%s logged=%d rate_limited=%d spoke_cooldown=%d hourly_cap=%d",
+      uid, GET_MOB_VNUM(mob), ai_brain_archetype_label(b), player_id, event_name, severity ? severity : "-", topic ? topic : "-",
+      logged, rate_limited, AI_BRAIN_SPOKE_COOLDOWN_SECONDS, AI_BRAIN_HOURLY_LOG_CAP);
 #endif
 }
 
