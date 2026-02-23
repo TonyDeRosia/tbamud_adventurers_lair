@@ -3299,6 +3299,65 @@ static int ai_arch_allows_pool(enum ai_actor_archetype arch, enum ai_pool_catego
   }
 }
 
+static enum ai_pool_category ai_poolcat_from_label(const char *pool)
+{
+  if (!pool || !*pool)
+    return POOLCAT_AMBIENT;
+  if (strstr(pool, "GREET")) return POOLCAT_GREET;
+  if (strstr(pool, "TRAIN")) return POOLCAT_SERVICE_TRAIN;
+  if (strstr(pool, "SHOP")) return POOLCAT_SERVICE_SHOP;
+  if (strstr(pool, "SERVICE")) return POOLCAT_SERVICE_GENERAL;
+  if (strstr(pool, "REFUS")) return POOLCAT_REFUSAL;
+  if (strstr(pool, "CONFUS")) return POOLCAT_CONFUSION;
+  if (strstr(pool, "THREAT")) return POOLCAT_THREAT;
+  if (strstr(pool, "INSULT")) return POOLCAT_INSULT;
+  if (strstr(pool, "SMALL")) return POOLCAT_SMALLTALK;
+  if (strstr(pool, "EMOTE")) return POOLCAT_EMOTE_REACTION;
+  return POOLCAT_AMBIENT;
+}
+
+static int ai_poolcat_allowed(struct char_data *mob, enum ai_actor_archetype arch, enum ai_pool_category cat,
+                              enum ai_speech_domain domain, enum ai_distinct_intent_class dint)
+{
+  return (ai_arch_allows_pool(arch, cat, domain, dint) || ai_actor_pool_allowed(mob, arch, cat));
+}
+
+static enum ai_pool_category ai_poolcat_fallback_pick(struct char_data *mob, enum ai_actor_archetype arch,
+                                                      enum ai_speech_domain domain, enum ai_distinct_intent_class dint,
+                                                      int service_request, int force_refusal_confusion_only)
+{
+  if (force_refusal_confusion_only) {
+    if (ai_poolcat_allowed(mob, arch, POOLCAT_REFUSAL, domain, DINT_REFUSAL)) return POOLCAT_REFUSAL;
+    if (ai_poolcat_allowed(mob, arch, POOLCAT_CONFUSION, domain, DINT_CONFUSION)) return POOLCAT_CONFUSION;
+    return -1;
+  }
+  if (service_request) {
+    if (ai_poolcat_allowed(mob, arch, POOLCAT_REFUSAL, domain, DINT_REFUSAL)) return POOLCAT_REFUSAL;
+    if (ai_poolcat_allowed(mob, arch, POOLCAT_CONFUSION, domain, DINT_CONFUSION)) return POOLCAT_CONFUSION;
+  }
+  if (ai_poolcat_allowed(mob, arch, POOLCAT_SMALLTALK, domain, DINT_CONFUSION)) return POOLCAT_SMALLTALK;
+  if (ai_poolcat_allowed(mob, arch, POOLCAT_EMOTE_REACTION, domain, DINT_CONFUSION)) return POOLCAT_EMOTE_REACTION;
+  if (ai_poolcat_allowed(mob, arch, POOLCAT_AMBIENT, domain, DINT_CONFUSION)) return POOLCAT_AMBIENT;
+  return -1;
+}
+
+static void ai_log_emit_attempt(struct char_data *mob, enum ai_actor_archetype arch, enum ai_distinct_intent_class icls,
+                                enum ai_speech_domain domain, enum ai_pool_category requested,
+                                int allowed, enum ai_pool_category final_cat, int emitted)
+{
+#ifdef AI_BRAIN_LOG_DEBUG
+  if (ai_debug) {
+    ai_debug_log("AI_EMIT_ATTEMPT vnum=%d arch=%s icls=%d domain=%d req=%s allowed=%s final=%s emitted=%s",
+                 GET_MOB_VNUM(mob), ai_actor_archetype_name(arch), icls, domain,
+                 ai_pool_category_name(requested), allowed ? "yes" : "no",
+                 (final_cat >= 0) ? ai_pool_category_name(final_cat) : "NONE",
+                 emitted ? "yes" : "no");
+  }
+#else
+  (void)mob; (void)arch; (void)icls; (void)domain; (void)requested; (void)allowed; (void)final_cat; (void)emitted;
+#endif
+}
+
 static int ai_repeat_reply_guard_should_suppress(struct char_data *mob, struct char_data *actor, room_rnum room, unsigned long norm_hash, time_t now)
 {
   int i;
@@ -8306,6 +8365,8 @@ int ai_actor_tick(struct char_data *mob, time_t now)
   if (line && *line) {
     if (st->pending_event_type != AI_EVENT_PLAYER_SAY)
       return FALSE;
+    if (st->last_spoke == now)
+      return FALSE;
     const char *reason = (st->pending_event_type == AI_EVENT_PLAYER_ENTER) ? "ARRIVAL" : "AMBIENT";
     const char *pool = (pf->role == ROLE_CIVILIAN || pf->role == ROLE_UNKNOWN) ? "POOL_GENERIC_AMBIENT" : "POOL_ROLE_AMBIENT";
     ai_set_last_speech_meta(mob, pool, reason);
@@ -8318,10 +8379,22 @@ int ai_actor_tick(struct char_data *mob, time_t now)
     }
     if (do_emote)
       do_echo(mob, (char *)(line[0] == '$' ? line + 3 : line), 0, SCMD_EMOTE);
-    else if (ai_can_speak_now(mob, now) && st->talk_cooldown_pulses <= 0)
-      ai_say(mob, line, now);
-    else
-      return FALSE;
+    else {
+      enum ai_actor_archetype arch = ai_actor_detect_archetype(mob);
+      enum ai_pool_category requested = POOLCAT_AMBIENT;
+      enum ai_pool_category final_cat = requested;
+      int allowed = ai_poolcat_allowed(mob, arch, requested, DOMAIN_NONE, DINT_CONFUSION);
+      if (!allowed)
+        final_cat = ai_poolcat_fallback_pick(mob, arch, DOMAIN_NONE, DINT_CONFUSION, 0, 0);
+      ai_log_emit_attempt(mob, arch, DINT_CONFUSION, DOMAIN_NONE, requested, allowed, final_cat,
+                          (final_cat >= 0 && ai_can_speak_now(mob, now) && st->talk_cooldown_pulses <= 0));
+      if (final_cat < 0)
+        return FALSE;
+      if (ai_can_speak_now(mob, now) && st->talk_cooldown_pulses <= 0)
+        ai_say(mob, line, now);
+      else
+        return FALSE;
+    }
 
     st->last_action_time = now;
     if (do_emote) st->last_emote_time = now;
@@ -8816,24 +8889,26 @@ static const char *ai_distinct_reply_line(struct char_data *mob, struct ai_conv_
             (icls == DINT_GREETING) ? POOLCAT_GREET :
             (icls == DINT_MONEY_REFUSAL || icls == DINT_REFUSAL) ? POOLCAT_REFUSAL :
             (icls == DINT_CONFUSION) ? POOLCAT_CONFUSION : POOLCAT_SMALLTALK;
-  if (!ai_arch_allows_pool(arch, poolcat, rctx->domain, icls)) {
-#ifdef AI_BRAIN_LOG_DEBUG
-    if (ai_debug)
-      ai_debug_log("AI_POOL_GATE vnum=%d arch=%s intent/domain=%d/%d cat=%s blocked selected=suppressed",
-                   GET_MOB_VNUM(mob), ai_actor_archetype_name(arch), icls, rctx->domain, ai_pool_category_name(poolcat));
-#endif
-    if (icls == DINT_TRAINING || icls == DINT_REFUSAL || icls == DINT_MONEY_REFUSAL)
-      icls = DINT_REFUSAL;
-    else
-      icls = DINT_CONFUSION;
-    poolcat = (icls == DINT_REFUSAL) ? POOLCAT_REFUSAL : POOLCAT_CONFUSION;
+  {
+    enum ai_pool_category requested = poolcat;
+    int allowed = ai_poolcat_allowed(mob, arch, poolcat, rctx->domain, icls);
+    if (!allowed) {
+      int service_request = (rctx->domain == DOMAIN_SERVICES || rctx->domain == DOMAIN_SHOPPING || rctx->domain == DOMAIN_DIRECTIONS);
+      int force_refusal_confusion_only = ((icls == DINT_TRAINING) &&
+        (arch == ACT_ARCH_BEAST || arch == ACT_ARCH_UNDEAD || arch == ACT_ARCH_SPIRIT));
+      enum ai_pool_category fallback = ai_poolcat_fallback_pick(mob, arch, rctx->domain, icls, service_request, force_refusal_confusion_only);
+      if (fallback == POOLCAT_REFUSAL)
+        icls = DINT_REFUSAL;
+      else if (fallback == POOLCAT_CONFUSION)
+        icls = DINT_CONFUSION;
+      poolcat = fallback;
+      ai_log_emit_attempt(mob, arch, icls, rctx->domain, requested, 0, poolcat, (poolcat >= 0));
+      if (poolcat < 0)
+        return "";
+    } else {
+      ai_log_emit_attempt(mob, arch, icls, rctx->domain, requested, 1, poolcat, 1);
+    }
   }
-#ifdef AI_BRAIN_LOG_DEBUG
-  else if (ai_debug) {
-    ai_debug_log("AI_POOL_GATE vnum=%d arch=%s intent/domain=%d/%d cat=%s allowed selected=attempt",
-                 GET_MOB_VNUM(mob), ai_actor_archetype_name(arch), icls, rctx->domain, ai_pool_category_name(poolcat));
-  }
-#endif
   salt_base = ai_hash_mix((unsigned long)icls, (unsigned long)(grp * 137 + rctx->personality * 19));
   core = ai_distinct_pool_pick(mob, grp, icls, ai_hash_mix(salt_base, 401), &core_idx);
   personality = (rctx->personality >= 0 && rctx->personality < IMTB_MAX) ? rctx->personality : IMTB_STOIC;
@@ -9115,6 +9190,18 @@ static int ai_conv_emit_line(struct ai_conv_room_state *room_st, struct char_dat
     return FALSE;
   if (!ai_can_speak_now(speaker, now))
     return FALSE;
+
+  {
+    enum ai_actor_archetype arch = ai_actor_detect_archetype(speaker);
+    enum ai_pool_category requested = POOLCAT_AMBIENT;
+    enum ai_pool_category final_cat = requested;
+    int allowed = ai_poolcat_allowed(speaker, arch, requested, DOMAIN_NONE, DINT_CONFUSION);
+    if (!allowed)
+      final_cat = ai_poolcat_fallback_pick(speaker, arch, DOMAIN_NONE, DINT_CONFUSION, 0, 0);
+    ai_log_emit_attempt(speaker, arch, DINT_CONFUSION, DOMAIN_NONE, requested, allowed, final_cat, (final_cat >= 0));
+    if (final_cat < 0)
+      return FALSE;
+  }
 
   ai_set_last_speech_meta(speaker, "POOL_NPC_CONVERSATION", "AMBIENT");
   ai_say(speaker, line, now);
@@ -11432,6 +11519,7 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
       int skip_voice = FALSE;
       int asks_train = ai_is_training_query_text(normalized) || ai_is_practice_query_text(normalized);
       int is_trainer_exact = ai_liveplay_mob_can_train(mob);
+      int forced_training_guidance = FALSE;
       uint32_t required_cap = ai_intent_required_capability(explicit_intent);
       int has_capability = (!required_cap || ((role_caps & required_cap) != 0));
       if (explicit_intent == INTENT_SERVICE_TRAINING || asks_train)
@@ -11447,6 +11535,7 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
           intention.be_brief = 1;
           intention.goal = GOAL_SERVE;
           pool = "POOL_TRAINING_GUIDANCE";
+          forced_training_guidance = TRUE;
         } else {
           const char *pl = NULL;
           enum ai_distinct_intent_class tdcls = ai_arch_allows_pool(actor_arch, POOLCAT_SERVICE_TRAIN, rctx.domain, DINT_TRAINING) ? DINT_TRAINING : DINT_REFUSAL;
@@ -11564,6 +11653,7 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
         skip_voice = TRUE;
         intention.be_brief = 1;
         intention.goal = GOAL_SERVE;
+        forced_training_guidance = TRUE;
       }
 
       if (!line && type == AI_EVENT_PLAYER_SAY && (guidance_forced || (guidance_query.is_question && guidance_query.target != TARGET_NONE))) {
@@ -11780,7 +11870,7 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
         }
       }
 
-      if (sr && sr->arc == AI_ARC_RAPPORT && !sr->rapport_rumor_used && sr->archetype != AI_ARCH_TRANSACTOR && best_action == AI_ACTION_SPEAK && intention.goal == GOAL_INFORM) {
+      if (!forced_training_guidance && sr && sr->arc == AI_ARC_RAPPORT && !sr->rapport_rumor_used && sr->archetype != AI_ARCH_TRANSACTOR && best_action == AI_ACTION_SPEAK && intention.goal == GOAL_INFORM) {
         static const char *const rapport_rumor_pool[] = {
           "Between us, I heard a traveler mention odd lights near the old road.",
           "Quiet word: someone reported strange lights by the old road.",
@@ -11790,7 +11880,7 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
         sr->rapport_rumor_used = 1;
       }
 
-      if (type == AI_EVENT_PLAYER_SAY && (rctx.domain == DOMAIN_SERVICES || rctx.domain == DOMAIN_SHOPPING || rctx.domain == DOMAIN_DIRECTIONS) && rctx.facts.confidence <= 1) {
+      if (!forced_training_guidance && type == AI_EVENT_PLAYER_SAY && (rctx.domain == DOMAIN_SERVICES || rctx.domain == DOMAIN_SHOPPING || rctx.domain == DOMAIN_DIRECTIONS) && rctx.facts.confidence <= 1) {
         const char *svc_fb = ai_role_service_fallback_line(role, style, explicit_intent);
         if (svc_fb && ai_line_has_hard_location_claim(svc_fb))
           svc_fb = NULL;
@@ -11866,6 +11956,46 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
         meta_line = ai_meta_response_line(mob, role, style, explicit_intent, sctx ? sctx->last_mood : AI_SOCIAL_NEUTRAL);
       if (meta_line && *meta_line)
         line = meta_line;
+    }
+
+    {
+      enum ai_pool_category requested_poolcat = ai_poolcat_from_label(pool);
+      enum ai_pool_category final_poolcat = requested_poolcat;
+      enum ai_distinct_intent_class emit_icls = DINT_CONFUSION;
+      int asks_train_local = ai_is_training_query_text(normalized) || ai_is_practice_query_text(normalized);
+      int is_trainer_exact_local = ai_liveplay_mob_can_train(mob);
+      enum ai_actor_archetype actor_arch_local = ai_actor_detect_archetype(mob);
+      int is_service_request = (type == AI_EVENT_PLAYER_SAY && (rctx.domain == DOMAIN_SERVICES || rctx.domain == DOMAIN_SHOPPING || rctx.domain == DOMAIN_DIRECTIONS || explicit_intent == INTENT_SERVICE_TRAINING));
+      int force_refusal_confusion_only = (type == AI_EVENT_PLAYER_SAY && asks_train_local && !is_trainer_exact_local &&
+        (actor_arch_local == ACT_ARCH_BEAST || actor_arch_local == ACT_ARCH_UNDEAD || actor_arch_local == ACT_ARCH_SPIRIT));
+      int allowed_requested;
+      if (explicit_intent == INTENT_SERVICE_TRAINING || asks_train_local)
+        emit_icls = DINT_TRAINING;
+      else if (explicit_intent == INTENT_GREETING || explicit_intent == INTENT_ATTENTION)
+        emit_icls = DINT_GREETING;
+      else if (explicit_intent == INTENT_MONEY_JOB)
+        emit_icls = DINT_MONEY_REFUSAL;
+      else if (explicit_intent == INTENT_HELP_REQUEST)
+        emit_icls = DINT_HELP_FOLLOWUP;
+      allowed_requested = ai_poolcat_allowed(mob, actor_arch_local, requested_poolcat, rctx.domain, emit_icls);
+      if (!allowed_requested) {
+        final_poolcat = ai_poolcat_fallback_pick(mob, actor_arch_local, rctx.domain, emit_icls, is_service_request, force_refusal_confusion_only);
+        if (final_poolcat == POOLCAT_REFUSAL)
+          ai_distinct_reply_line(mob, conv_st, &rctx, DINT_REFUSAL, GET_IDNUM(actor), voiced, sizeof(voiced), NULL);
+        else if (final_poolcat == POOLCAT_CONFUSION)
+          ai_distinct_reply_line(mob, conv_st, &rctx, DINT_CONFUSION, GET_IDNUM(actor), voiced, sizeof(voiced), NULL);
+        else if (final_poolcat == POOLCAT_SMALLTALK)
+          ai_distinct_reply_line(mob, conv_st, &rctx, DINT_GREETING, GET_IDNUM(actor), voiced, sizeof(voiced), NULL);
+        else if (final_poolcat == POOLCAT_EMOTE_REACTION)
+          ai_copy_trunc(voiced, sizeof(voiced), ai_creature_reaction_line(ai_pick_creature_category(mob, &rctx), explicit_intent, DINT_CONFUSION, ai_conv_seed(mob, intent, (unsigned int)now)));
+        else if (final_poolcat == POOLCAT_AMBIENT)
+          ai_copy_trunc(voiced, sizeof(voiced), ai_role_neutral_fallback_line(role, style, rctx.archetype));
+        if (final_poolcat >= 0 && voiced[0])
+          line = voiced;
+        else
+          line = NULL;
+      }
+      ai_log_emit_attempt(mob, actor_arch_local, emit_icls, rctx.domain, requested_poolcat, allowed_requested, final_poolcat, (line && *line) ? 1 : 0);
     }
 
     ai_set_last_speech_meta(mob, pool, reason);
