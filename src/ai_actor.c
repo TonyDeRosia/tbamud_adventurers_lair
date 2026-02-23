@@ -10918,8 +10918,10 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
                        ai_text_has_sub_ci(normalized, "meal") || ai_text_has_sub_ci(normalized, "ration") || ai_text_has_sub_ci(normalized, "bread") ||
                        ai_text_has_sub_ci(normalized, "stew")));
   if (type == AI_EVENT_PLAYER_SAY) {
+    enum ai_liveplay_intent spoke_live_intent = AI_LIVE_INTENT_UNKNOWN;
     if (normalized[0])
       multi_intent = ai_detect_multi_intent(normalized, speech_class, rctx.domain, self_identity_query);
+    spoke_live_intent = ai_liveplay_classify_intent(normalized);
     explicit_intent = multi_intent.primary_intent;
     if (explicit_sexual_request && explicit_intent != INTENT_ILLEGAL_SLAVERY_REQUEST)
       explicit_intent = INTENT_THREAT;
@@ -10928,6 +10930,12 @@ void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, stru
       ai_brain_log_event(mob, actor, "INSULTED", "significant", "insult");
     else if (explicit_intent == INTENT_THREAT)
       ai_brain_log_event(mob, actor, "THREATENED", "significant", "threat");
+    else if (spoke_live_intent == AI_LIVE_INTENT_SOCIAL_FLIRT) {
+      if (sctx && sctx->last_player_idnum == GET_IDNUM(actor) && sctx->updated_at > 0 && (time(0) - sctx->updated_at) <= 120)
+        ai_brain_log_event(mob, actor, "FLIRTED_REPEATED", "significant", "romance");
+      else
+        ai_brain_log_event(mob, actor, "FLIRTED", "minor", "romance");
+    }
     if (explicit_intent == INTENT_ATTENTION || explicit_intent == INTENT_GREETING)
       confidence = MAX(confidence, 40);
     intent = ai_explicit_to_core_intent(explicit_intent);
