@@ -387,7 +387,7 @@ ACMD(do_runto)
   skip_spaces(&argument);
   one_argument(argument, arg);
   if (!*arg) {
-    send_to_char(ch, "Run to whom?\r\n");
+    send_to_char(ch, "Run to whom or what?\r\n");
     return;
   }
 
