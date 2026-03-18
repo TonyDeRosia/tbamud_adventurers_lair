@@ -53,6 +53,8 @@ static void format_color_field(char *out, size_t outsz, const char *src, size_t 
   out[pos] = '\0';
 }
 
+static const char *score_cond_label(int cond);
+
 
 #include <stdlib.h>  /* abs */
 #include "structs.h"
@@ -1674,14 +1676,6 @@ len = append_box_line(buf, len, sizeof(buf), B, R, "", W);
 {
   int cap = CAN_CARRY_W(ch);
   int cur = IS_CARRYING_W(ch);
-  const char *enc = "None";
-  if (cap > 0) {
-    int pct = (cur * 100) / cap;
-    if (pct < 25) enc = "Light";
-    else if (pct < 50) enc = "Moderate";
-    else if (pct < 75) enc = "Heavy";
-    else enc = "Overloaded";
-  }
   snprintf(line, sizeof(line), "%sCarry Capacity:%s %d / %d  (%s)", C, R, cur, cap, encumbrance_text(ch));
   len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
 }
@@ -1838,41 +1832,80 @@ len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
     playing_time.hours, (playing_time.hours == 1 ? "" : "s"));
   len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
   /* Position/Status */
+  {
+    const char *status_text;
+
   switch (GET_POS(ch)) {
     case POS_DEAD:
-      snprintf(line, sizeof(line), "%sStatus:%s %sYou are DEAD!%s", C, R, RED, R);
+      status_text = "You are DEAD!";
       break;
     case POS_MORTALLYW:
-      snprintf(line, sizeof(line), "%sStatus:%s %sMortally wounded!%s", C, R, RED, R);
+      status_text = "Mortally wounded!";
       break;
     case POS_INCAP:
-      snprintf(line, sizeof(line), "%sStatus:%s %sIncapacitated%s", C, R, RED, R);
+      status_text = "Incapacitated";
       break;
     case POS_STUNNED:
-      snprintf(line, sizeof(line), "%sStatus:%s %sStunned%s", C, R, Y, R);
+      status_text = "Stunned";
       break;
     case POS_SLEEPING:
-      snprintf(line, sizeof(line), "%sStatus:%s Sleeping", C, R);
+      status_text = "Sleeping";
       break;
     case POS_RESTING:
-      snprintf(line, sizeof(line), "%sStatus:%s Resting", C, R);
+      status_text = "Resting";
       break;
     case POS_SITTING:
-      if (!SITTING(ch))
-        snprintf(line, sizeof(line), "%sStatus:%s Sitting", C, R);
-      else
-        snprintf(line, sizeof(line), "%sStatus:%s Sitting on %s", C, R, SITTING(ch)->short_description);
+      status_text = !SITTING(ch) ? "Sitting" : SITTING(ch)->short_description;
       break;
     case POS_FIGHTING:
-      snprintf(line, sizeof(line), "%sStatus:%s %sFighting %s%s",
-        C, R, RED, (FIGHTING(ch) ? PERS(FIGHTING(ch), ch) : "thin air"), R);
+      status_text = (FIGHTING(ch) ? PERS(FIGHTING(ch), ch) : "thin air");
       break;
     case POS_STANDING:
-      snprintf(line, sizeof(line), "%sStatus:%s Standing", C, R);
+      status_text = "Standing";
       break;
     default:
-      snprintf(line, sizeof(line), "%sStatus:%s Floating", C, R);
+      status_text = "Floating";
       break;
+  }
+
+    if (GET_LEVEL(ch) < LVL_IMMORT) {
+      if (GET_POS(ch) == POS_FIGHTING)
+        snprintf(line, sizeof(line), "%sStatus:%s %sFighting %s%s   %sHunger:%s %s   %sThirst:%s %s",
+          C, R, RED, status_text, R,
+          C, R, score_cond_label(GET_COND(ch, HUNGER)),
+          C, R, score_cond_label(GET_COND(ch, THIRST)));
+      else if (GET_POS(ch) == POS_DEAD || GET_POS(ch) == POS_MORTALLYW || GET_POS(ch) == POS_INCAP)
+        snprintf(line, sizeof(line), "%sStatus:%s %s%s%s   %sHunger:%s %s   %sThirst:%s %s",
+          C, R, RED, status_text, R,
+          C, R, score_cond_label(GET_COND(ch, HUNGER)),
+          C, R, score_cond_label(GET_COND(ch, THIRST)));
+      else if (GET_POS(ch) == POS_STUNNED)
+        snprintf(line, sizeof(line), "%sStatus:%s %s%s%s   %sHunger:%s %s   %sThirst:%s %s",
+          C, R, Y, status_text, R,
+          C, R, score_cond_label(GET_COND(ch, HUNGER)),
+          C, R, score_cond_label(GET_COND(ch, THIRST)));
+      else if (GET_POS(ch) == POS_SITTING && SITTING(ch))
+        snprintf(line, sizeof(line), "%sStatus:%s Sitting on %s   %sHunger:%s %s   %sThirst:%s %s",
+          C, R, status_text,
+          C, R, score_cond_label(GET_COND(ch, HUNGER)),
+          C, R, score_cond_label(GET_COND(ch, THIRST)));
+      else
+        snprintf(line, sizeof(line), "%sStatus:%s %s   %sHunger:%s %s   %sThirst:%s %s",
+          C, R, status_text,
+          C, R, score_cond_label(GET_COND(ch, HUNGER)),
+          C, R, score_cond_label(GET_COND(ch, THIRST)));
+    } else {
+      if (GET_POS(ch) == POS_FIGHTING)
+        snprintf(line, sizeof(line), "%sStatus:%s %sFighting %s%s", C, R, RED, status_text, R);
+      else if (GET_POS(ch) == POS_DEAD || GET_POS(ch) == POS_MORTALLYW || GET_POS(ch) == POS_INCAP)
+        snprintf(line, sizeof(line), "%sStatus:%s %s%s%s", C, R, RED, status_text, R);
+      else if (GET_POS(ch) == POS_STUNNED)
+        snprintf(line, sizeof(line), "%sStatus:%s %s%s%s", C, R, Y, status_text, R);
+      else if (GET_POS(ch) == POS_SITTING && SITTING(ch))
+        snprintf(line, sizeof(line), "%sStatus:%s Sitting on %s", C, R, status_text);
+      else
+        snprintf(line, sizeof(line), "%sStatus:%s %s", C, R, status_text);
+    }
   }
   len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
 
@@ -4532,16 +4565,187 @@ static int ci_contains(const char *haystack, const char *needle)
   return FALSE;
 }
 
+static const char *score_cond_label(int cond)
+{
+  if (cond <= 0)
+    return "Starving";
+  if (cond <= 4)
+    return "Hungry";
+  if (cond <= 9)
+    return "Peckish";
+  if (cond <= 14)
+    return "Average";
+  if (cond <= 19)
+    return "Satisfied";
+  return "Full";
+}
+
+static int speedwalk_reverse_token_to_dir(const char *token, int len)
+{
+  char dirbuf[8];
+
+  if (len <= 0 || len >= (int)sizeof(dirbuf))
+    return -1;
+
+  snprintf(dirbuf, sizeof(dirbuf), "%.*s", len, token);
+  if (!str_cmp(dirbuf, "n"))
+    return NORTH;
+  if (!str_cmp(dirbuf, "e"))
+    return EAST;
+  if (!str_cmp(dirbuf, "s"))
+    return SOUTH;
+  if (!str_cmp(dirbuf, "w"))
+    return WEST;
+  if (!str_cmp(dirbuf, "u"))
+    return UP;
+  if (!str_cmp(dirbuf, "d"))
+    return DOWN;
+  if (!str_cmp(dirbuf, "nw"))
+    return NORTHWEST;
+  if (!str_cmp(dirbuf, "ne"))
+    return NORTHEAST;
+  if (!str_cmp(dirbuf, "se"))
+    return SOUTHEAST;
+  if (!str_cmp(dirbuf, "sw"))
+    return SOUTHWEST;
+
+  return -1;
+}
+
+static int speedwalk_append_dir_token(char *out, size_t outsz, int dir, int count)
+{
+  char token[16];
+  size_t used;
+
+  if (dir < 0 || dir >= NUM_OF_DIRS || count <= 0)
+    return FALSE;
+
+  if (count > 1)
+    snprintf(token, sizeof(token), "%d%s", count, autoexits[dir]);
+  else
+    snprintf(token, sizeof(token), "%s", autoexits[dir]);
+
+  used = strlen(out);
+  if (used + strlen(token) + 1 >= outsz)
+    return FALSE;
+
+  strlcat(out, token, outsz);
+  return TRUE;
+}
+
+static int speedwalk_reverse_route(const char *route, char *out, size_t outsz)
+{
+  int dirs_seen[256];
+  int dir_count = 0;
+  int i = 0;
+  int count = 0;
+
+  if (!route || !out || outsz == 0)
+    return FALSE;
+
+  out[0] = '\0';
+
+  while (route[i] != '\0') {
+    int start;
+    int dir;
+    int k;
+
+    if (isspace((unsigned char)route[i])) {
+      i++;
+      continue;
+    }
+
+    count = 0;
+    while (isdigit((unsigned char)route[i])) {
+      count = (count * 10) + (route[i] - '0');
+      i++;
+    }
+    if (count <= 0)
+      count = 1;
+
+    start = i;
+    while (isalpha((unsigned char)route[i]))
+      i++;
+
+    dir = speedwalk_reverse_token_to_dir(route + start, i - start);
+    if (dir < 0)
+      return FALSE;
+
+    for (k = 0; k < count; k++) {
+      if (dir_count >= (int)(sizeof(dirs_seen) / sizeof(dirs_seen[0])))
+        return FALSE;
+      dirs_seen[dir_count++] = dir;
+    }
+  }
+
+  if (dir_count == 0)
+    return FALSE;
+
+  i = dir_count - 1;
+  while (i >= 0) {
+    int rev = rev_dir[dirs_seen[i]];
+    int step;
+    count = 1;
+    i--;
+    while (i >= 0 && rev_dir[dirs_seen[i]] == rev) {
+      count++;
+      i--;
+    }
+    step = speedwalk_append_dir_token(out, outsz, rev, count);
+    if (!step)
+      return FALSE;
+  }
+
+  return TRUE;
+}
+
+ACMD(do_identify)
+{
+  struct char_data *tch = NULL;
+  struct obj_data *tobj = NULL;
+  char arg[MAX_INPUT_LENGTH];
+  char *name = arg;
+  int number;
+
+  one_argument(argument, arg);
+  if (!*arg) {
+    send_to_char(ch, "Identify what?\r\n");
+    return;
+  }
+
+  number = get_number(&name);
+  if (!*name)
+    return;
+
+  if ((tobj = get_obj_in_list_vis(ch, name, &number, ch->carrying)) == NULL) {
+    if ((tobj = get_obj_in_equip_vis(ch, name, &number, ch->equipment)) == NULL)
+      tobj = get_obj_in_list_vis(ch, name, &number, world[IN_ROOM(ch)].contents);
+  }
+
+  if (tobj)
+    cast_spell(ch, NULL, tobj, SPELL_IDENTIFY);
+  else if ((tch = get_char_vis(ch, name, &number, FIND_CHAR_ROOM)) != NULL)
+    cast_spell(ch, tch, NULL, SPELL_IDENTIFY);
+  else
+    send_to_char(ch, "You don't see that here.\r\n");
+}
+
 ACMD(do_speedwalk)
 {
   char arg[MAX_INPUT_LENGTH];
   FILE *fl;
   char line[256];
+  char current_route[200];
   const char *recall_name = "mortal recall";
   int shown = 0;
+  zone_rnum current_zone = NOWHERE;
 
   skip_spaces(&argument);
   strlcpy(arg, argument, sizeof(arg));
+  current_route[0] = '\0';
+
+  if (IN_ROOM(ch) != NOWHERE)
+    current_zone = world[IN_ROOM(ch)].zone;
 
   fl = fopen("misc/speedwalk.lst", "r");
   if (!fl) {
@@ -4575,7 +4779,45 @@ ACMD(do_speedwalk)
     if (*arg && !ci_contains(zone_table[z].name, arg))
       continue;
 
-    send_to_char(ch, "%-30.30s  %s\r\n", zone_table[z].name, route);
+    if (current_zone != NOWHERE && z == current_zone)
+      strlcpy(current_route, route, sizeof(current_route));
+  }
+
+  rewind(fl);
+
+  while (fgets(line, sizeof(line), fl)) {
+    int zvnum;
+    char route[200];
+    char display_route[400];
+    zone_rnum z;
+
+    if (line[0] == '\0' || line[0] == '\n' || line[0] == '#')
+      continue;
+
+    route[0] = '\0';
+    if (sscanf(line, "%d %199[^\r\n]", &zvnum, route) != 2)
+      continue;
+
+    z = real_zone(zvnum);
+    if (z == NOWHERE)
+      continue;
+
+    if (*arg && !ci_contains(zone_table[z].name, arg))
+      continue;
+
+    strlcpy(display_route, route, sizeof(display_route));
+    if (*current_route) {
+      char rev[400];
+
+      if (z == current_zone) {
+        strlcpy(display_route, "you are here", sizeof(display_route));
+      } else if (speedwalk_reverse_route(current_route, rev, sizeof(rev))) {
+        strlcpy(display_route, rev, sizeof(display_route));
+        strlcat(display_route, route, sizeof(display_route));
+      }
+    }
+
+    send_to_char(ch, "%-30.30s  %s\r\n", zone_table[z].name, display_route);
     shown++;
   }
 

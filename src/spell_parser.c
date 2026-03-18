@@ -843,7 +843,7 @@ int call_magic(struct char_data *caster, struct char_data *cvict,
   if (!cast_mtrigger(caster, cvict, spellnum))
     return 0;
 
-  if (ROOM_FLAGGED(IN_ROOM(caster), ROOM_NOMAGIC)) {
+  if (ROOM_FLAGGED(IN_ROOM(caster), ROOM_NOMAGIC) && spellnum != SPELL_IDENTIFY) {
     send_to_char(caster, "Your magic fizzles out and dies.\r\n");
     act("$n's magic fizzles out and dies.", FALSE, caster, 0, 0, TO_ROOM);
     return (0);
@@ -1864,11 +1864,11 @@ void mag_assign_spells(void) {
   TAR_CHAR_ROOM, FALSE, MAG_MANUAL, NULL);
 
   spello(SPELL_IDENTIFY, "identify", 50, 25, 5, POS_STANDING,
-  TAR_CHAR_ROOM | TAR_OBJ_INV | TAR_OBJ_ROOM, FALSE, MAG_MANUAL, NULL);
+  TAR_CHAR_ROOM | TAR_OBJ_INV | TAR_OBJ_ROOM | TAR_OBJ_EQUIP, FALSE, MAG_MANUAL, NULL);
 
   /* NON-castable spells should appear below here. */
   spello(SPELL_IDENTIFY, "identify", 0, 0, 0, 0,
-  TAR_CHAR_ROOM | TAR_OBJ_INV | TAR_OBJ_ROOM, FALSE, MAG_MANUAL, NULL);
+  TAR_CHAR_ROOM | TAR_OBJ_INV | TAR_OBJ_ROOM | TAR_OBJ_EQUIP, FALSE, MAG_MANUAL, NULL);
 
   /* you might want to name this one something more fitting to your theme -Welcor*/
   spello(SPELL_DG_AFFECT, "Script-inflicted", 0, 0, 0, POS_SITTING,
