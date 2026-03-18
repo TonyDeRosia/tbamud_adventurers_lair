@@ -1165,6 +1165,49 @@ static bool is_available_ability(int ability) {
       && str_cmp(spell_info[ability].name, unused_spellname) != 0);
 }
 
+static bool is_spellup_buff_active(struct char_data *victim, int spellnum)
+{
+  if (!victim)
+    return FALSE;
+
+  if (affected_by_spell(victim, spellnum))
+    return TRUE;
+
+  switch (spellnum) {
+    case SPELL_SANCTUARY:
+    case SPELL_ARCANE_WARD:
+    case SPELL_EVASION:
+    case SPELL_IRONSKIN:
+    case SPELL_DIVINE_BULWARK:
+    case SPELL_SONG_OF_RESILIENCE:
+    case SPELL_DARK_AEGIS:
+    case SPELL_NIRVANA:
+    case SPELL_BEAR_SPIRIT:
+      return AFF_FLAGGED(victim, AFF_SANCTUARY);
+
+    case SPELL_FLY:
+      return AFF_FLAGGED(victim, AFF_FLYING);
+
+    case SPELL_DETECT_INVIS:
+      return AFF_FLAGGED(victim, AFF_DETECT_INVIS) || AFF_FLAGGED(victim, AFF_TRUESIGHT);
+
+    case SPELL_SENSE_LIFE:
+      return AFF_FLAGGED(victim, AFF_SENSE_LIFE) || AFF_FLAGGED(victim, AFF_TRUESIGHT);
+
+    case SPELL_TRUE_SEEING:
+    case SPELL_DETECT_KILL_INTENT:
+      return AFF_FLAGGED(victim, AFF_TRUESIGHT);
+
+    case SPELL_INVISIBLE:
+    case SPELL_PERFECT_UNKNOWABLE:
+    case SPELL_TOTAL_OCCULTATION:
+      return AFF_FLAGGED(victim, AFF_INVISIBLE);
+
+    default:
+      return FALSE;
+  }
+}
+
 static bool is_spellup_beneficial_spell(int spellnum)
 {
   if (!is_available_spell(spellnum))
@@ -1197,13 +1240,39 @@ static bool is_spellup_beneficial_spell(int spellnum)
     case SPELL_EAGLE_SPIRIT:
     case SPELL_DRAGON_SPIRIT:
     case SPELL_WATERWALK:
+    case SPELL_TRUE_SEEING:
+    case SPELL_STONE_SKIN:
+    case SPELL_BARKSKIN:
+    case SPELL_GIANT_STRENGTH:
+    case SPELL_CLARITY:
+    case SPELL_ANTIMAGIC_SHELL:
+    case SPELL_ENCHANTERS_FOCUS:
+    case SPELL_PHASE_SHIFT:
+    case SPELL_MIRROR_VEIL:
+    case SPELL_ELEMENTAL_WARD_FIRE:
+    case SPELL_ELEMENTAL_WARD_COLD:
+    case SPELL_ELEMENTAL_WARD_LIGHTNING:
+    case SPELL_ELEMENTAL_WARD_ACID:
+    case SPELL_SHADOW_ARMOR:
+    case SPELL_TOTAL_OCCULTATION:
+    case SPELL_HUNTERS_INSTINCT:
+    case SPELL_ASSASSINS_INTENT:
+    case SPELL_SOVEREIGNS_STEP:
+    case SPELL_DETECT_KILL_INTENT:
+    case SPELL_PANTHEON:
+    case SPELL_PERFECT_UNKNOWABLE:
+    case SPELL_CRYSTAL_BODY:
+    case SPELL_BODY_OF_EFFULGENT_BERYL:
+    case SPELL_UNDYING_WILL:
+    case SPELL_DOMINION_OF_SHADOWS:
+    case SPELL_SHADOW_REGENESIS:
       break;
     default:
       return FALSE;
   }
 
-  /* Defensive invariants: even whitelisted spells must be non-violent affects. */
-  if (SINFO.violent || !IS_SET(SINFO.routines, MAG_AFFECTS))
+  /* Defensive invariants: even whitelisted spells must be non-violent affects/manual buffs. */
+  if (SINFO.violent || !IS_SET(SINFO.routines, MAG_AFFECTS | MAG_MANUAL))
     return FALSE;
   if (!IS_SET(SINFO.targets, TAR_CHAR_ROOM | TAR_CHAR_WORLD | TAR_SELF_ONLY))
     return FALSE;
@@ -2267,7 +2336,7 @@ ACMD(do_spellup)
       skipped_combat++;
       continue;
     }
-    if (affected_by_spell(tch, spellnum)) {
+    if (is_spellup_buff_active(tch, spellnum)) {
       skipped_active++;
       continue;
     }
