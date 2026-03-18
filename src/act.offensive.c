@@ -91,6 +91,32 @@ static int appraise_success_score(struct char_data *ch, struct char_data *vict)
   return score;
 }
 
+static int appraise_is_hasted(struct char_data *vict)
+{
+  if (!vict)
+    return FALSE;
+
+  /*
+   * There is no AFF_HASTE in this codebase; adrenaline surge is the
+   * implemented haste-style effect path.
+   */
+  return affected_by_spell(vict, SPELL_ADRENALINE_SURGE);
+}
+
+static int appraise_is_undead(struct char_data *vict)
+{
+  if (!vict)
+    return FALSE;
+
+  /*
+   * Match existing undead handling paths:
+   * - vampires are treated as undead by spell logic
+   * - NPC CLASS_UNDEAD is treated as undead by visibility/combat logic
+   */
+  return GET_RACE(vict) == RACE_VAMPIRE ||
+         (IS_NPC(vict) && GET_CLASS(vict) == CLASS_UNDEAD);
+}
+
 ACMD(do_assist)
 {
   char arg[MAX_INPUT_LENGTH];
@@ -746,12 +772,13 @@ ACMD(do_appraise_enemy)
   if (AFF_FLAGGED(vict, AFF_BURNING)) send_to_char(ch, "Flag: burning.\r\n");
   if (AFF_FLAGGED(vict, AFF_ROOTED) || AFF_FLAGGED(vict, AFF_WEBBED)) send_to_char(ch, "Flag: rooted.\r\n");
   if (AFF_FLAGGED(vict, AFF_STUNNED)) send_to_char(ch, "Flag: stunned.\r\n");
+  if (appraise_is_hasted(vict)) send_to_char(ch, "Flag: hasted.\r\n");
   if (AFF_FLAGGED(vict, AFF_ADRENALINE)) send_to_char(ch, "Flag: adrenaline surge.\r\n");
   if (AFF_FLAGGED(vict, AFF_FROZEN) || AFF_FLAGGED(vict, AFF_TIME_SNARE)) send_to_char(ch, "Flag: slowed.\r\n");
   if (AFF_FLAGGED(vict, AFF_WARDED) || AFF_FLAGGED(vict, AFF_SANCTUARY)) send_to_char(ch, "Flag: protected by magic.\r\n");
   if (AFF_FLAGGED(vict, AFF_SHIELDED)) send_to_char(ch, "Flag: shielded.\r\n");
   if (AFF_FLAGGED(vict, AFF_HIDE) || AFF_FLAGGED(vict, AFF_INVISIBLE)) send_to_char(ch, "Flag: hidden by shadow.\r\n");
-  if (GET_RACE(vict) == RACE_VAMPIRE) send_to_char(ch, "Flag: undead.\r\n");
+  if (appraise_is_undead(vict)) send_to_char(ch, "Flag: undead.\r\n");
   if (IS_NPC(vict) && vict->master) send_to_char(ch, "Flag: summoned.\r\n");
 
   if (quality >= 2) {
