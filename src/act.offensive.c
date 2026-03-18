@@ -254,6 +254,10 @@ ACMD(do_flee)
     send_to_char(ch, "You are rooted and cannot flee!\r\n");
     return;
   }
+  if (room_has_effect(&world[IN_ROOM(ch)], ROOM_EFFECT_GRAVITY_WELL)) {
+    send_to_char(ch, "The gravity well pins you in place; you cannot flee!\r\n");
+    return;
+  }
 
   if (AFF_FLAGGED(ch, AFF_WEBBED)) {
     for (af = ch->affected; af; af = af->next) {

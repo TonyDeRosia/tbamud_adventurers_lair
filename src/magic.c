@@ -43,6 +43,8 @@ static int spell_dur_medium(int level) { return 4 + (level / 8); }
 static int spell_dur_long(int level) { return 6 + (level / 6); }
 static int spell_dmg_low(int level) { return (level * 2) + dice(2, MAX(1, level / 4)); }
 static int spell_dmg_medium(int level) { return (level * 3) + dice(3, MAX(1, level / 3)); }
+static int spell_dmg_high(int level) { return (level * 4) + dice(4, MAX(1, level / 2)); }
+static int spell_dmg_extreme(int level) { return (level * 5) + dice(5, MAX(1, level / 2)); }
 
 void set_spell_damage_type(enum damage_type type)
 {
@@ -144,6 +146,10 @@ int mag_savingthrow(struct char_data *ch, int type, int modifier)
   save = saving_throws(class_sav, type, GET_LEVEL(ch));
   save += GET_SAVE(ch, type);
   save += modifier;
+  if (IN_ROOM(ch) != NOWHERE &&
+      room_has_effect(&world[IN_ROOM(ch)], ROOM_EFFECT_CONSECRATE) &&
+      IS_GOOD(ch))
+    save -= 5;
 
   /* Throwing a 0 is always a failure. */
   if (MAX(1, save) < rand_number(0, 99))
@@ -1340,6 +1346,7 @@ void mag_areas(int level, struct char_data *ch, int spellnum, int savetype)
 {
   struct char_data *tch, *next_tch;
   const char *to_char = NULL, *to_room = NULL;
+  struct char_data *primary = NULL;
 
   if (ch == NULL)
     return;
@@ -1348,8 +1355,48 @@ void mag_areas(int level, struct char_data *ch, int spellnum, int savetype)
    * the damaging part of the spell.   */
   switch (spellnum) {
   case SPELL_EARTHQUAKE:
-    to_char = "You gesture and the earth begins to shake all around you!";
-    to_room ="$n gracefully gestures and the earth begins to shake violently!";
+    to_char = "You call a violent earthquake that shakes the ground!";
+    to_room ="$n calls a violent earthquake that shakes the ground!";
+    break;
+  case SPELL_MIASMA:
+    to_char = "You exhale a billowing cloud of toxic miasma!";
+    to_room = "$n exhales a billowing cloud of toxic miasma!";
+    break;
+  case SPELL_TOXIC_CLOUD:
+    to_char = "You summon a billowing cloud of toxic gas!";
+    to_room = "$n summons a billowing cloud of toxic gas!";
+    break;
+  case SPELL_SHOCKWAVE:
+    to_char = "A shockwave of force erupts from you!";
+    to_room = "A shockwave of force erupts from $n!";
+    break;
+  case SPELL_NOVA:
+    to_char = "You explode with a blinding nova of pure magical energy!";
+    to_room = "$n explodes with a blinding nova of pure magical energy!";
+    break;
+  case SPELL_ICE_STORM:
+    to_char = "You call a violent storm of razor ice into the room!";
+    to_room = "$n calls a violent storm of razor ice into the room!";
+    break;
+  case SPELL_BLIZZARD:
+    to_char = "You unleash a full blizzard upon your enemies!";
+    to_room = "$n unleashes a full blizzard upon $s enemies!";
+    break;
+  case SPELL_FROST_NOVA:
+    to_char = "Frost explodes outward from you in a shattering nova!";
+    to_room = "Frost explodes outward from $n in a shattering nova!";
+    break;
+  case SPELL_FIREBALL_GREATER:
+    to_char = "A massive fireball erupts from your hands, filling the room with fire!";
+    to_room = "A massive fireball erupts from $n's hands, filling the room with fire!";
+    break;
+  case SPELL_SONIC_BURST:
+    to_char = "A sonic burst explodes outward from you!";
+    to_room = "A sonic burst explodes outward from $n!";
+    break;
+  case SPELL_WORD_OF_PAIN:
+    to_char = "You speak the Word of Pain into existence!";
+    to_room = "$n speaks the Word of Pain into existence!";
     break;
   }
 
@@ -1380,8 +1427,168 @@ void mag_areas(int level, struct char_data *ch, int spellnum, int savetype)
       continue;
 	if ((spellnum == SPELL_EARTHQUAKE) && AFF_FLAGGED(tch, AFF_FLYING))
 	  continue;
-    /* Doesn't matter if they die here so we don't check. -gg 6/24/98 */
-    mag_damage(level, ch, tch, spellnum, 1);
+    if (spellnum == SPELL_GRAVITY_WELL) {
+      int dam = spell_dmg_medium(level);
+      if (mag_savingthrow(tch, SAVING_SPELL, 0))
+        dam /= 2;
+      set_next_damage_type(DAM_FORCE);
+      if (damage(ch, tch, dam, spellnum) == -1)
+        continue;
+      continue;
+    }
+
+    if (spellnum == SPELL_MIASMA) {
+      struct affected_type af;
+      int dur = mag_savingthrow(tch, SAVING_SPELL, 0) ? spell_dur_short(level) : spell_dur_medium(level);
+      new_affect(&af);
+      af.spell = SPELL_MIASMA;
+      af.duration = dur;
+      af.location = APPLY_HITROLL;
+      af.modifier = -5;
+      affect_join(tch, &af, FALSE, FALSE, FALSE, FALSE);
+      continue;
+    }
+
+    if (spellnum == SPELL_TOXIC_CLOUD) {
+      struct affected_type af;
+      int dur = mag_savingthrow(tch, SAVING_SPELL, 0) ? spell_dur_short(level) : spell_dur_medium(level);
+      new_affect(&af);
+      af.spell = SPELL_TOXIC_CLOUD;
+      af.duration = dur;
+      af.location = APPLY_HITROLL;
+      af.modifier = 0;
+      affect_join(tch, &af, FALSE, FALSE, FALSE, FALSE);
+      continue;
+    }
+
+    if (spellnum == SPELL_FIREBALL_GREATER && !primary)
+      primary = FIGHTING(ch) ? FIGHTING(ch) : tch;
+
+    {
+      int saved = mag_savingthrow(tch, SAVING_SPELL, 0);
+      int dam = 0;
+      enum damage_type dtype = DAM_FORCE;
+      struct affected_type af;
+
+      switch (spellnum) {
+        case SPELL_EARTHQUAKE:
+          dam = spell_dmg_medium(level);
+          dtype = DAM_EARTH;
+          break;
+        case SPELL_SHOCKWAVE:
+          dam = spell_dmg_medium(level);
+          dtype = DAM_FORCE;
+          break;
+        case SPELL_NOVA:
+          dam = spell_dmg_high(level);
+          dtype = DAM_ARCANE;
+          break;
+        case SPELL_ICE_STORM:
+          dam = spell_dmg_medium(level);
+          dtype = DAM_COLD;
+          break;
+        case SPELL_BLIZZARD:
+          dam = spell_dmg_high(level);
+          dtype = DAM_COLD;
+          break;
+        case SPELL_FROST_NOVA:
+          dam = spell_dmg_medium(level);
+          dtype = DAM_COLD;
+          break;
+        case SPELL_FIREBALL_GREATER:
+          dam = (tch == primary) ? spell_dmg_high(level) : spell_dmg_medium(level);
+          dtype = DAM_FIRE;
+          break;
+        case SPELL_SONIC_BURST:
+          dam = spell_dmg_medium(level);
+          dtype = DAM_SONIC;
+          break;
+        case SPELL_WORD_OF_PAIN:
+          dam = (GET_RACE(tch) == RACE_VAMPIRE) ? spell_dmg_extreme(level) : spell_dmg_high(level);
+          dtype = DAM_SONIC;
+          break;
+      }
+
+      if (saved)
+        dam /= 2;
+      set_next_damage_type(dtype);
+      if (damage(ch, tch, dam, spellnum) == -1)
+        continue;
+
+      if (spellnum == SPELL_SHOCKWAVE && !saved) {
+        new_affect(&af);
+        af.spell = spellnum;
+        af.duration = 1;
+        af.location = APPLY_NONE;
+        SET_BIT_AR(af.bitvector, AFF_STUNNED);
+        affect_join(tch, &af, FALSE, FALSE, FALSE, FALSE);
+        if (FIGHTING(tch))
+          stop_fighting(tch);
+      } else if (spellnum == SPELL_EARTHQUAKE && !saved) {
+        new_affect(&af);
+        af.spell = spellnum;
+        af.duration = 1;
+        af.location = APPLY_NONE;
+        SET_BIT_AR(af.bitvector, AFF_STUNNED);
+        affect_join(tch, &af, FALSE, FALSE, FALSE, FALSE);
+      } else if (spellnum == SPELL_ICE_STORM && !saved) {
+        new_affect(&af);
+        af.spell = spellnum;
+        af.duration = spell_dur_short(level);
+        af.location = APPLY_DEX;
+        af.modifier = -1;
+        affect_join(tch, &af, FALSE, FALSE, FALSE, FALSE);
+      } else if (spellnum == SPELL_BLIZZARD) {
+        if (!saved) {
+          new_affect(&af);
+          af.spell = spellnum;
+          af.duration = spell_dur_medium(level);
+          af.location = APPLY_NONE;
+          SET_BIT_AR(af.bitvector, AFF_TIME_SNARE);
+          affect_join(tch, &af, FALSE, FALSE, FALSE, FALSE);
+          new_affect(&af);
+          af.spell = spellnum;
+          af.duration = spell_dur_medium(level);
+          af.location = APPLY_DEX;
+          af.modifier = -3;
+          affect_join(tch, &af, FALSE, FALSE, FALSE, FALSE);
+        } else {
+          new_affect(&af);
+          af.spell = spellnum;
+          af.duration = spell_dur_short(level);
+          af.location = APPLY_DEX;
+          af.modifier = -1;
+          affect_join(tch, &af, FALSE, FALSE, FALSE, FALSE);
+        }
+      } else if (spellnum == SPELL_FROST_NOVA && !saved) {
+        new_affect(&af);
+        af.spell = spellnum;
+        af.duration = spell_dur_short(level);
+        af.location = APPLY_NONE;
+        SET_BIT_AR(af.bitvector, AFF_ROOTED);
+        affect_join(tch, &af, FALSE, FALSE, FALSE, FALSE);
+      } else if (spellnum == SPELL_SONIC_BURST && !saved) {
+        new_affect(&af);
+        af.spell = spellnum;
+        af.duration = 1;
+        af.location = APPLY_NONE;
+        SET_BIT_AR(af.bitvector, AFF_STUNNED);
+        affect_join(tch, &af, FALSE, FALSE, FALSE, FALSE);
+      } else if (spellnum == SPELL_WORD_OF_PAIN && !saved) {
+        new_affect(&af);
+        af.spell = spellnum;
+        af.duration = 2;
+        af.location = APPLY_NONE;
+        SET_BIT_AR(af.bitvector, AFF_STUNNED);
+        affect_join(tch, &af, FALSE, FALSE, FALSE, FALSE);
+        new_affect(&af);
+        af.spell = spellnum;
+        af.duration = spell_dur_short(level);
+        af.location = APPLY_NONE;
+        SET_BIT_AR(af.bitvector, AFF_SILENCED);
+        affect_join(tch, &af, FALSE, FALSE, FALSE, FALSE);
+      }
+    }
   }
 }
 
@@ -1788,6 +1995,46 @@ void mag_rooms(int level, struct char_data *ch, int spellnum)
       room_add_effect(&world[rnum], ROOM_EFFECT_SILENCE_FIELD, duration, 0);
       msg = "A field of magical silence falls over the entire area!";
       room = "$n silences the entire area with a wave of a hand!";
+      break;
+    case SPELL_WALL_OF_FIRE:
+      if (room_has_effect(&world[rnum], ROOM_EFFECT_WALL_OF_FIRE))
+        failure = TRUE;
+      duration = spell_dur_medium(level);
+      room_add_effect(&world[rnum], ROOM_EFFECT_WALL_OF_FIRE, duration, 0);
+      msg = "You conjure a wall of magical fire!";
+      room = "$n conjures a wall of magical fire!";
+      break;
+    case SPELL_STATIC_FIELD:
+      if (room_has_effect(&world[rnum], ROOM_EFFECT_STATIC_FIELD))
+        failure = TRUE;
+      duration = spell_dur_medium(level);
+      room_add_effect(&world[rnum], ROOM_EFFECT_STATIC_FIELD, duration, 0);
+      msg = "You charge the air with crackling static electricity!";
+      room = "$n charges the air with crackling static electricity!";
+      break;
+    case SPELL_CONSECRATE:
+      if (room_has_effect(&world[rnum], ROOM_EFFECT_CONSECRATE))
+        failure = TRUE;
+      duration = spell_dur_long(level);
+      room_add_effect(&world[rnum], ROOM_EFFECT_CONSECRATE, duration, 0);
+      msg = "You consecrate this ground in the name of your deity!";
+      room = "$n consecrates this ground in the name of $s deity!";
+      break;
+    case SPELL_GRAVITY_WELL:
+      if (room_has_effect(&world[rnum], ROOM_EFFECT_GRAVITY_WELL))
+        failure = TRUE;
+      duration = spell_dur_short(level);
+      room_add_effect(&world[rnum], ROOM_EFFECT_GRAVITY_WELL, duration, 0);
+      msg = "You create a crushing gravity well that pins your enemies!";
+      room = "$n creates a crushing gravity well that pins enemies in place!";
+      break;
+    case SPELL_ACID_RAIN:
+      if (room_has_effect(&world[rnum], ROOM_EFFECT_ACID_RAIN))
+        failure = TRUE;
+      duration = spell_dur_medium(level);
+      room_add_effect(&world[rnum], ROOM_EFFECT_ACID_RAIN, duration, 0);
+      msg = "You call a rain of burning acid from above!";
+      room = "$n calls a rain of burning acid from above!";
       break;
   
   }

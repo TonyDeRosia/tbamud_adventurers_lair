@@ -558,6 +558,10 @@ int do_simple_move(struct char_data *ch, int dir, int need_specials_check)
     send_to_char(ch, "Your feet are rooted in place!\r\n");
     return (0);
   }
+  if (room_has_effect(&world[was_in], ROOM_EFFECT_GRAVITY_WELL)) {
+    send_to_char(ch, "Crushing gravity pins you in place!\r\n");
+    return (0);
+  }
 
   if (mount && (IN_ROOM(mount) != was_in || mount->master != ch)) {
     dismount_char(ch);

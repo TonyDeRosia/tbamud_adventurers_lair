@@ -150,8 +150,23 @@
 #define SPELL_MASS_FEAR              109
 #define SPELL_NULL_FIELD             110
 #define SPELL_SILENCE_FIELD          111
+#define SPELL_MIASMA                 112
+#define SPELL_TOXIC_CLOUD            113
+#define SPELL_WALL_OF_FIRE           114
+#define SPELL_STATIC_FIELD           115
+#define SPELL_CONSECRATE             116
+#define SPELL_GRAVITY_WELL           117
+#define SPELL_SHOCKWAVE              118
+#define SPELL_NOVA                   119
+#define SPELL_ICE_STORM              120
+#define SPELL_BLIZZARD               121
+#define SPELL_FROST_NOVA             122
+#define SPELL_FIREBALL_GREATER       123
+#define SPELL_ACID_RAIN              124
+#define SPELL_SONIC_BURST            125
+#define SPELL_WORD_OF_PAIN           126
 /** Total Number of defined spells */
-#define NUM_SPELLS                   111
+#define NUM_SPELLS                   126
 
 /* Insert new spells here, up to MAX_SPELLS */
 #define MAX_SPELLS		    130
@@ -308,7 +323,8 @@ enum room_effect_type {
   ROOM_EFFECT_STATIC_FIELD,
   ROOM_EFFECT_TOXIC_CLOUD,
   ROOM_EFFECT_MIASMA,
-  ROOM_EFFECT_GRAVITY_WELL
+  ROOM_EFFECT_GRAVITY_WELL,
+  ROOM_EFFECT_ACID_RAIN
 };
 
 ASPELL(spell_create_water);

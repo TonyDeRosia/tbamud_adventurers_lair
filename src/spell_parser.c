@@ -15,6 +15,7 @@
 #include "interpreter.h"
 #include "spells.h"
 #include "class.h"
+#include "race.h"
 #include "handler.h"
 #include "comm.h"
 #include "db.h"
@@ -104,7 +105,90 @@ void room_tick_effects(struct room_data *room)
     return;
 
   for (eff = room->effects; eff; eff = next) {
+    struct char_data *tch, *next_tch;
     next = eff->next;
+
+    for (tch = room->people; tch; tch = next_tch) {
+      struct affected_type af;
+      int saved = FALSE;
+      next_tch = tch->next_in_room;
+
+      if (!tch || (!IS_NPC(tch) && GET_LEVEL(tch) >= LVL_IMMORT))
+        continue;
+
+      switch (eff->effect_type) {
+        case ROOM_EFFECT_WALL_OF_FIRE:
+          set_next_damage_type(DAM_FIRE);
+          if (damage(tch, tch, 8, TYPE_SUFFERING) == -1)
+            continue;
+          if (!AFF_FLAGGED(tch, AFF_BURNING)) {
+            saved = mag_savingthrow(tch, SAVING_SPELL, 0);
+            if (!saved) {
+              new_affect(&af);
+              af.spell = SPELL_WALL_OF_FIRE;
+              af.duration = 2;
+              af.location = APPLY_NONE;
+              SET_BIT_AR(af.bitvector, AFF_BURNING);
+              affect_join(tch, &af, FALSE, FALSE, FALSE, FALSE);
+            }
+          }
+          break;
+        case ROOM_EFFECT_STATIC_FIELD:
+          set_next_damage_type(DAM_LIGHTNING);
+          if (damage(tch, tch, AFF_FLAGGED(tch, AFF_STATIC) ? 8 : 6, TYPE_SUFFERING) == -1)
+            continue;
+          if (!AFF_FLAGGED(tch, AFF_STATIC)) {
+            saved = mag_savingthrow(tch, SAVING_SPELL, 0);
+            if (!saved) {
+              new_affect(&af);
+              af.spell = SPELL_STATIC_FIELD;
+              af.duration = 2;
+              af.location = APPLY_NONE;
+              SET_BIT_AR(af.bitvector, AFF_STATIC);
+              affect_join(tch, &af, FALSE, FALSE, FALSE, FALSE);
+            }
+          }
+          break;
+        case ROOM_EFFECT_CONSECRATE:
+          if (IS_EVIL(tch) && !affected_by_spell(tch, SPELL_CONSECRATE)) {
+            new_affect(&af);
+            af.spell = SPELL_CONSECRATE;
+            af.duration = 1;
+            af.location = APPLY_HITROLL;
+            af.modifier = -2;
+            affect_join(tch, &af, FALSE, FALSE, FALSE, FALSE);
+          }
+          if (GET_RACE(tch) == RACE_VAMPIRE) {
+            set_next_damage_type(DAM_HOLY);
+            if (damage(tch, tch, 5, TYPE_SUFFERING) == -1)
+              continue;
+          }
+          break;
+        case ROOM_EFFECT_GRAVITY_WELL:
+          set_next_damage_type(DAM_FORCE);
+          if (damage(tch, tch, 6, TYPE_SUFFERING) == -1)
+            continue;
+          break;
+        case ROOM_EFFECT_ACID_RAIN:
+          set_next_damage_type(DAM_ACID);
+          if (damage(tch, tch, 7, TYPE_SUFFERING) == -1)
+            continue;
+          if (!AFF_FLAGGED(tch, AFF_CORRODED)) {
+            saved = mag_savingthrow(tch, SAVING_SPELL, 0);
+            if (!saved) {
+              new_affect(&af);
+              af.spell = SPELL_ACID_RAIN;
+              af.duration = MAX(1, eff->duration);
+              af.location = APPLY_AC;
+              af.modifier = 20;
+              SET_BIT_AR(af.bitvector, AFF_CORRODED);
+              affect_join(tch, &af, FALSE, FALSE, FALSE, FALSE);
+            }
+          }
+          break;
+      }
+    }
+
     if (eff->duration > 0)
       eff->duration--;
     if (eff->duration <= 0) {
@@ -114,6 +198,21 @@ void room_tick_effects(struct room_data *room)
           break;
         case ROOM_EFFECT_SILENCE_FIELD:
           send_to_room(real_room(room->number), "The field of silence dissipates.\r\n");
+          break;
+        case ROOM_EFFECT_WALL_OF_FIRE:
+          send_to_room(real_room(room->number), "The wall of fire gutters out.\r\n");
+          break;
+        case ROOM_EFFECT_STATIC_FIELD:
+          send_to_room(real_room(room->number), "The static field finally disperses.\r\n");
+          break;
+        case ROOM_EFFECT_CONSECRATE:
+          send_to_room(real_room(room->number), "The consecrated ground returns to normal.\r\n");
+          break;
+        case ROOM_EFFECT_GRAVITY_WELL:
+          send_to_room(real_room(room->number), "The crushing gravity well releases its grip.\r\n");
+          break;
+        case ROOM_EFFECT_ACID_RAIN:
+          send_to_room(real_room(room->number), "The acid rain ceases.\r\n");
           break;
       }
       if (prev)
@@ -609,6 +708,86 @@ static const struct cast_message cast_messages[] = {
   [SPELL_SILENCE_FIELD] = {
     "A field of magical silence falls over the entire area!",
     "$n silences the entire area with a wave of a hand!",
+    NULL
+  },
+  [SPELL_MIASMA] = {
+    "You exhale a billowing cloud of toxic miasma!",
+    "$n exhales a billowing cloud of toxic miasma!",
+    NULL
+  },
+  [SPELL_TOXIC_CLOUD] = {
+    "You summon a billowing cloud of toxic gas!",
+    "$n summons a billowing cloud of toxic gas!",
+    NULL
+  },
+  [SPELL_WALL_OF_FIRE] = {
+    "You conjure a wall of magical fire!",
+    "$n conjures a wall of magical fire!",
+    NULL
+  },
+  [SPELL_STATIC_FIELD] = {
+    "You charge the air with crackling static electricity!",
+    "$n charges the air with crackling static electricity!",
+    NULL
+  },
+  [SPELL_CONSECRATE] = {
+    "You consecrate this ground in the name of your deity!",
+    "$n consecrates this ground in the name of $s deity!",
+    NULL
+  },
+  [SPELL_GRAVITY_WELL] = {
+    "You create a crushing gravity well that pins your enemies!",
+    "$n creates a crushing gravity well that pins enemies in place!",
+    NULL
+  },
+  [SPELL_SHOCKWAVE] = {
+    "A shockwave of force erupts from you!",
+    "A shockwave of force erupts from $n!",
+    NULL
+  },
+  [SPELL_NOVA] = {
+    "You explode with a blinding nova of pure magical energy!",
+    "$n explodes with a blinding nova of pure magical energy!",
+    NULL
+  },
+  [SPELL_EARTHQUAKE] = {
+    "You call a violent earthquake that shakes the ground!",
+    "$n calls a violent earthquake that shakes the ground!",
+    NULL
+  },
+  [SPELL_ICE_STORM] = {
+    "You call a violent storm of razor ice into the room!",
+    "$n calls a violent storm of razor ice into the room!",
+    NULL
+  },
+  [SPELL_BLIZZARD] = {
+    "You unleash a full blizzard upon your enemies!",
+    "$n unleashes a full blizzard upon $s enemies!",
+    NULL
+  },
+  [SPELL_FROST_NOVA] = {
+    "Frost explodes outward from you in a shattering nova!",
+    "Frost explodes outward from $n in a shattering nova!",
+    NULL
+  },
+  [SPELL_FIREBALL_GREATER] = {
+    "A massive fireball erupts from your hands, filling the room with fire!",
+    "A massive fireball erupts from $n's hands, filling the room with fire!",
+    NULL
+  },
+  [SPELL_ACID_RAIN] = {
+    "You call a rain of burning acid from above!",
+    "$n calls a rain of burning acid from above!",
+    NULL
+  },
+  [SPELL_SONIC_BURST] = {
+    "A sonic burst explodes outward from you!",
+    "A sonic burst explodes outward from $n!",
+    NULL
+  },
+  [SPELL_WORD_OF_PAIN] = {
+    "You speak the Word of Pain into existence!",
+    "$n speaks the Word of Pain into existence!",
     NULL
   }
 };
@@ -2392,6 +2571,51 @@ void mag_assign_spells(void) {
 
   spello(SPELL_SILENCE_FIELD, "silence field", 40, 40, 0, POS_STANDING,
   TAR_IGNORE, FALSE, MAG_ROOMS, NULL);
+
+  spello(SPELL_MIASMA, "miasma", 28, 28, 0, POS_FIGHTING,
+  TAR_IGNORE, TRUE, MAG_AREAS, "The choking miasma finally clears.");
+
+  spello(SPELL_TOXIC_CLOUD, "toxic cloud", 32, 32, 0, POS_FIGHTING,
+  TAR_IGNORE, TRUE, MAG_AREAS, "You finally cough out the lingering poison gas.");
+
+  spello(SPELL_WALL_OF_FIRE, "wall of fire", 40, 40, 0, POS_STANDING,
+  TAR_IGNORE, TRUE, MAG_ROOMS, NULL);
+
+  spello(SPELL_STATIC_FIELD, "static field", 35, 35, 0, POS_STANDING,
+  TAR_IGNORE, TRUE, MAG_ROOMS, NULL);
+
+  spello(SPELL_CONSECRATE, "consecrate", 40, 40, 0, POS_STANDING,
+  TAR_IGNORE, FALSE, MAG_ROOMS, NULL);
+
+  spello(SPELL_GRAVITY_WELL, "gravity well", 55, 55, 0, POS_FIGHTING,
+  TAR_IGNORE, TRUE, MAG_AREAS | MAG_ROOMS, NULL);
+
+  spello(SPELL_SHOCKWAVE, "shockwave", 35, 35, 0, POS_FIGHTING,
+  TAR_IGNORE, TRUE, MAG_AREAS, NULL);
+
+  spello(SPELL_NOVA, "nova", 40, 40, 0, POS_FIGHTING,
+  TAR_IGNORE, TRUE, MAG_AREAS, NULL);
+
+  spello(SPELL_ICE_STORM, "ice storm", 35, 35, 0, POS_FIGHTING,
+  TAR_IGNORE, TRUE, MAG_AREAS, NULL);
+
+  spello(SPELL_BLIZZARD, "blizzard", 55, 55, 0, POS_FIGHTING,
+  TAR_IGNORE, TRUE, MAG_AREAS, NULL);
+
+  spello(SPELL_FROST_NOVA, "frost nova", 40, 40, 0, POS_FIGHTING,
+  TAR_IGNORE, TRUE, MAG_AREAS, NULL);
+
+  spello(SPELL_FIREBALL_GREATER, "greater fireball", 45, 45, 0, POS_FIGHTING,
+  TAR_IGNORE, TRUE, MAG_AREAS, NULL);
+
+  spello(SPELL_ACID_RAIN, "acid rain", 38, 38, 0, POS_STANDING,
+  TAR_IGNORE, TRUE, MAG_ROOMS, NULL);
+
+  spello(SPELL_SONIC_BURST, "sonic burst", 28, 28, 0, POS_FIGHTING,
+  TAR_IGNORE, TRUE, MAG_AREAS, NULL);
+
+  spello(SPELL_WORD_OF_PAIN, "word of pain", 65, 65, 0, POS_FIGHTING,
+  TAR_IGNORE, TRUE, MAG_AREAS, NULL);
 
   spello(SPELL_SENSE_LIFE, "sense life", 20, 10, 2, POS_STANDING,
   TAR_CHAR_ROOM | TAR_SELF_ONLY, FALSE, MAG_AFFECTS,
