@@ -4572,7 +4572,7 @@ ACMD(do_speedwalk)
 
   fl = fopen("misc/speedwalk.lst", "r");
   if (!fl) {
-    send_to_char(ch, "No speedwalk data is available right now.\r\n");
+    send_to_char(ch, "No speedwalk routes are available.\r\n");
     return;
   }
 
@@ -4608,8 +4608,12 @@ ACMD(do_speedwalk)
 
   fclose(fl);
 
-  if (!shown)
-    send_to_char(ch, "No matching speedwalk routes found.\r\n");
+  if (!shown) {
+    if (*arg)
+      send_to_char(ch, "No areas matched that filter.\r\n");
+    else
+      send_to_char(ch, "No speedwalk routes are available.\r\n");
+  }
 }
 
 ACMD(do_saudit)
