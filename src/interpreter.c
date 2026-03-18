@@ -284,6 +284,7 @@ cpp_extern const struct command_info cmd_info[] = {
   { "practice" , "pr"      , POS_RESTING , do_practice , 1, 0 },
   { "train"    , "tr"      , POS_RESTING , do_train    , 1, 0 },
   { "skills"    , "sk"      , POS_RESTING , do_skills   , 1, 0 },
+  { "allspells" , "allspells", POS_RESTING, do_spells   , 1, 1 },
   { "spellbook" , "spell"   , POS_RESTING , do_spellbook , 1, 0 },
   { "spells"    , "sp"      , POS_RESTING , do_spells   , 1, 0 },
   { "page"     , "pag"     , POS_DEAD    , do_page     , 1, 0 },
@@ -327,6 +328,7 @@ cpp_extern const struct command_info cmd_info[] = {
   { "rlist"    , "rlist"   , POS_DEAD    , do_oasis_list, LVL_BUILDER, SCMD_OASIS_RLIST },
   { "rcopy"    , "rcopy"   , POS_DEAD    , do_oasis_copy, LVL_GOD, CON_REDIT },
   { "showvnums", "showvnums", POS_DEAD   , do_gen_tog  , LVL_IMMORT, SCMD_SHOWVNUMS },
+  { "shortflags", "shortflags", POS_DEAD , do_gen_tog  , 0, SCMD_SHORTFLAGS },
   { "vnumsshow", "vnumsshow", POS_DEAD   , do_gen_tog  , LVL_IMMORT, SCMD_SHOWVNUMS },
 
   { "sacrifice", "sac"     , POS_RESTING , do_sac      , 0, 0 },

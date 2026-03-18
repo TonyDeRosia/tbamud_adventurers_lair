@@ -276,8 +276,9 @@ void clanedit_parse(struct descriptor_data *d, char *arg);
 #define PRF_AUTODOOR     33   /**< Use the next available door */
 #define PRF_ZONERESETS   34   /**< Show when zones reset */
 #define PRF_VERBOSE      35   /**< Listings like where are more verbose */
+#define PRF_SHORTFLAGS   36   /**< Show short-form aura/object flags */
 /** Total number of available PRF flags */
-#define NUM_PRF_FLAGS    36
+#define NUM_PRF_FLAGS    37
 
 /* Affect bits: used in char_data.char_specials.saved.affected_by */
 /* WARNING: In the world files, NEVER set the bits marked "R" ("Reserved") */

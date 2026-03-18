@@ -1878,9 +1878,28 @@ static struct auction_state_data live_auction = { NULL, NULL, NULL, 0, 0, 0 };
 
 static const char *auction_item_display_name(struct obj_data *obj)
 {
+  static char namebuf[MAX_STRING_LENGTH];
+
   if (!obj || !GET_OBJ_SHORT(obj))
     return "something";
-  return GET_OBJ_SHORT(obj);
+
+  namebuf[0] = '\0';
+  if (OBJ_FLAGGED(obj, ITEM_BLESS))
+    strlcat(namebuf, "(Blue Aura) ", sizeof(namebuf));
+  if (OBJ_FLAGGED(obj, ITEM_GLOW))
+    strlcat(namebuf, "(Glow) ", sizeof(namebuf));
+  if (OBJ_FLAGGED(obj, ITEM_HUM))
+    strlcat(namebuf, "(Hum) ", sizeof(namebuf));
+  if (OBJ_FLAGGED(obj, ITEM_INVISIBLE))
+    strlcat(namebuf, "(Invis) ", sizeof(namebuf));
+  if (OBJ_FLAGGED(obj, ITEM_NODROP))
+    strlcat(namebuf, "(K) ", sizeof(namebuf));
+  if (OBJ_FLAGGED(obj, ITEM_MAGIC))
+    strlcat(namebuf, "(Magic) ", sizeof(namebuf));
+  if (OBJ_FLAGGED(obj, ITEM_ANTI_GOOD))
+    strlcat(namebuf, "(Red Aura) ", sizeof(namebuf));
+  strlcat(namebuf, GET_OBJ_SHORT(obj), sizeof(namebuf));
+  return namebuf;
 }
 
 static int auction_item_num(struct obj_data *obj)

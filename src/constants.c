@@ -256,6 +256,7 @@ const char *preference_bits[] = {
   "AUTOKEY",
   "AUTODOOR",
   "ZONERESETS",
+  "SHORTFLAGS",
   "\n"
 };
 
@@ -980,4 +981,3 @@ const char *ibt_bits[] = {
 	extra_bits_count = sizeof(extra_bits) / sizeof(extra_bits[0]) - 1,
 	/** Number of defined wear bit descriptions. */
 	wear_bits_count = sizeof(wear_bits) / sizeof(wear_bits[0]) - 1;
-
