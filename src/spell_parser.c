@@ -186,6 +186,50 @@ void room_tick_effects(struct room_data *room)
             }
           }
           break;
+        case ROOM_EFFECT_SHADOW_DOMAIN:
+          if (!(IS_NPC(tch) && AFF_FLAGGED(tch, AFF_CHARM) && GET_SUMMON_TIMER(tch) > 0 &&
+                (affected_by_spell(tch, SPELL_CALL_SHADOW_LEGION) ||
+                 affected_by_spell(tch, SPELL_SHADOW_EXTRACTION) ||
+                 affected_by_spell(tch, SPELL_ARISE_GREATER)))) {
+            new_affect(&af);
+            af.spell = SPELL_SHADOW_DOMAIN;
+            af.duration = 1;
+            af.location = APPLY_HITROLL;
+            af.modifier = -3;
+            affect_join(tch, &af, FALSE, FALSE, FALSE, FALSE);
+          } else {
+            new_affect(&af);
+            af.spell = SPELL_SHADOW_DOMAIN;
+            af.duration = 1;
+            af.location = APPLY_DAMROLL;
+            af.modifier = 2;
+            affect_join(tch, &af, FALSE, FALSE, FALSE, FALSE);
+            GET_HIT(tch) = MIN(GET_MAX_HIT(tch), GET_HIT(tch) + MAX(1, GET_MAX_HIT(tch) / 10));
+          }
+          break;
+        case ROOM_EFFECT_SHADOW_STORM:
+          if (!(IS_NPC(tch) && AFF_FLAGGED(tch, AFF_CHARM) && GET_SUMMON_TIMER(tch) > 0 &&
+                (affected_by_spell(tch, SPELL_CALL_SHADOW_LEGION) ||
+                 affected_by_spell(tch, SPELL_SHADOW_EXTRACTION) ||
+                 affected_by_spell(tch, SPELL_ARISE_GREATER)))) {
+            set_next_damage_type(DAM_SHADOW);
+            if (damage(tch, tch, 5, TYPE_SUFFERING) == -1)
+              continue;
+            new_affect(&af);
+            af.spell = SPELL_SHADOW_STORM;
+            af.duration = 1;
+            af.location = APPLY_HITROLL;
+            af.modifier = -2;
+            affect_join(tch, &af, FALSE, FALSE, FALSE, FALSE);
+          } else {
+            new_affect(&af);
+            af.spell = SPELL_SHADOW_STORM;
+            af.duration = 1;
+            af.location = APPLY_HITROLL;
+            af.modifier = 2;
+            affect_join(tch, &af, FALSE, FALSE, FALSE, FALSE);
+          }
+          break;
       }
     }
 
@@ -216,6 +260,12 @@ void room_tick_effects(struct room_data *room)
           break;
         case ROOM_EFFECT_DIMENSIONAL_LOCK:
           send_to_room(real_room(room->number), "The dimensional lock dissolves.\r\n");
+          break;
+        case ROOM_EFFECT_SHADOW_DOMAIN:
+          send_to_room(real_room(room->number), "The shadow domain recedes.\r\n");
+          break;
+        case ROOM_EFFECT_SHADOW_STORM:
+          send_to_room(real_room(room->number), "The storm of living shadow breaks apart.\r\n");
           break;
       }
       if (prev)
@@ -1886,6 +1936,40 @@ int call_magic(struct char_data *caster, struct char_data *cvict,
     case SPELL_TRIPLE_MAXIMIZE_MAGIC: MANUAL_SPELL(spell_triple_maximize_magic); break;
     case SPELL_PANTHEON: MANUAL_SPELL(spell_pantheon); break;
     case SPELL_DIMENSIONAL_LOCK: MANUAL_SPELL(spell_dimensional_lock); break;
+    case SPELL_SHADOW_BIND: MANUAL_SPELL(spell_shadow_bind); break;
+    case SPELL_SHADOW_EXCHANGE: MANUAL_SPELL(spell_shadow_exchange); break;
+    case SPELL_DAGGER_RAIN: MANUAL_SPELL(spell_dagger_rain); break;
+    case SPELL_MONARCHS_PRESSURE: MANUAL_SPELL(spell_monarchs_pressure); break;
+    case SPELL_SHADOW_DOMAIN: MANUAL_SPELL(spell_shadow_domain); break;
+    case SPELL_FORCE_GRASP: MANUAL_SPELL(spell_force_grasp); break;
+    case SPELL_SHADOW_STEP: MANUAL_SPELL(spell_shadow_step); break;
+    case SPELL_BLACK_HEART: MANUAL_SPELL(spell_black_heart); break;
+    case SPELL_CALL_SHADOW_LEGION: MANUAL_SPELL(spell_call_shadow_legion); break;
+    case SPELL_NIGHT_HUNT: MANUAL_SPELL(spell_night_hunt); break;
+    case SPELL_DARK_REBUKE: MANUAL_SPELL(spell_dark_rebuke); break;
+    case SPELL_EXECUTION_MARK: MANUAL_SPELL(spell_execution_mark); break;
+    case SPELL_SHADOW_EXTRACTION: MANUAL_SPELL(spell_shadow_extraction); break;
+    case SPELL_ARISE_GREATER: MANUAL_SPELL(spell_arise_greater); break;
+    case SPELL_MONARCHS_AUTHORITY: MANUAL_SPELL(spell_monarchs_authority); break;
+    case SPELL_RULERS_HAND: MANUAL_SPELL(spell_rulers_hand); break;
+    case SPELL_SHADOW_LANCE: MANUAL_SPELL(spell_shadow_lance); break;
+    case SPELL_SHADOW_BURST: MANUAL_SPELL(spell_shadow_burst); break;
+    case SPELL_SHADOW_STORM: MANUAL_SPELL(spell_shadow_storm); break;
+    case SPELL_FATAL_STRIKE: MANUAL_SPELL(spell_fatal_strike); break;
+    case SPELL_DOMINION_OF_SHADOWS: MANUAL_SPELL(spell_dominion_of_shadows); break;
+    case SPELL_SHADOW_RECALL: MANUAL_SPELL(spell_shadow_recall); break;
+    case SPELL_SHADOW_REGENESIS: MANUAL_SPELL(spell_shadow_regenesis); break;
+    case SPELL_ASSASSINS_INTENT: MANUAL_SPELL(spell_assassins_intent); break;
+    case SPELL_BLOOD_DAGGER_TEMPEST: MANUAL_SPELL(spell_blood_dagger_tempest); break;
+    case SPELL_CHAIN_OF_SUBJUGATION: MANUAL_SPELL(spell_chain_of_subjugation); break;
+    case SPELL_SOVEREIGNS_STEP: MANUAL_SPELL(spell_sovereigns_step); break;
+    case SPELL_KINGS_COMMAND: MANUAL_SPELL(spell_kings_command); break;
+    case SPELL_DETECT_KILL_INTENT: MANUAL_SPELL(spell_detect_kill_intent); break;
+    case SPELL_MUTILATE: MANUAL_SPELL(spell_mutilate); break;
+    case SPELL_SHADOW_ARMOR: MANUAL_SPELL(spell_shadow_armor); break;
+    case SPELL_TOTAL_OCCULTATION: MANUAL_SPELL(spell_total_occultation); break;
+    case SPELL_DOMAIN_BREAK: MANUAL_SPELL(spell_domain_break); break;
+    case SPELL_HUNTERS_INSTINCT: MANUAL_SPELL(spell_hunters_instinct); break;
     }
 
   return (1);
@@ -3119,6 +3203,40 @@ void mag_assign_spells(void) {
   spello(SPELL_TRIPLE_MAXIMIZE_MAGIC, "triple maximize magic", 55, 55, 0, POS_STANDING, TAR_SELF_ONLY, FALSE, MAG_MANUAL, "The triple maximize weave fades unused.");
   spello(SPELL_PANTHEON, "pantheon", 48, 48, 0, POS_STANDING, TAR_SELF_ONLY, FALSE, MAG_MANUAL, "The mantle of Pantheon fades.");
   spello(SPELL_DIMENSIONAL_LOCK, "dimensional lock", 36, 36, 0, POS_STANDING, TAR_IGNORE, FALSE, MAG_MANUAL, NULL);
+  spello(SPELL_SHADOW_BIND, "shadow bind", 20, 20, 0, POS_FIGHTING, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_NOT_SELF, TRUE, MAG_MANUAL, "The shadows release your limbs.");
+  spello(SPELL_SHADOW_EXCHANGE, "shadow exchange", 28, 28, 0, POS_FIGHTING, TAR_CHAR_ROOM, FALSE, MAG_MANUAL, NULL);
+  spello(SPELL_DAGGER_RAIN, "dagger rain", 30, 30, 0, POS_FIGHTING, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_NOT_SELF, TRUE, MAG_MANUAL, NULL);
+  spello(SPELL_MONARCHS_PRESSURE, "monarchs pressure", 34, 34, 0, POS_FIGHTING, TAR_IGNORE, TRUE, MAG_MANUAL, NULL);
+  spello(SPELL_SHADOW_DOMAIN, "shadow domain", 42, 42, 0, POS_STANDING, TAR_IGNORE, FALSE, MAG_MANUAL, "The shadow domain recedes.");
+  spello(SPELL_FORCE_GRASP, "force grasp", 24, 24, 0, POS_FIGHTING, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_NOT_SELF, TRUE, MAG_MANUAL, NULL);
+  spello(SPELL_SHADOW_STEP, "shadow step", 18, 18, 0, POS_STANDING, TAR_SELF_ONLY, FALSE, MAG_MANUAL, "Your shadow step advantage fades.");
+  spello(SPELL_BLACK_HEART, "black heart", 0, 0, 0, POS_FIGHTING, TAR_SELF_ONLY, FALSE, MAG_MANUAL, "The Black Heart's surge fades.");
+  spello(SPELL_CALL_SHADOW_LEGION, "call shadow legion", 65, 65, 0, POS_STANDING, TAR_IGNORE, FALSE, MAG_MANUAL, NULL);
+  spello(SPELL_NIGHT_HUNT, "night hunt", 26, 26, 0, POS_FIGHTING, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_NOT_SELF, TRUE, MAG_MANUAL, "The hunter's brand fades from your shadow.");
+  spello(SPELL_DARK_REBUKE, "dark rebuke", 22, 22, 0, POS_FIGHTING, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_NOT_SELF, TRUE, MAG_MANUAL, NULL);
+  spello(SPELL_EXECUTION_MARK, "execution mark", 30, 30, 0, POS_FIGHTING, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_NOT_SELF, TRUE, MAG_MANUAL, "The execution mark fades.");
+  spello(SPELL_SHADOW_EXTRACTION, "shadow extraction", 50, 50, 0, POS_STANDING, TAR_OBJ_ROOM, FALSE, MAG_MANUAL, NULL);
+  spello(SPELL_ARISE_GREATER, "arise greater", 70, 70, 0, POS_STANDING, TAR_OBJ_ROOM, FALSE, MAG_MANUAL, NULL);
+  spello(SPELL_MONARCHS_AUTHORITY, "monarchs authority", 48, 48, 0, POS_FIGHTING, TAR_IGNORE, TRUE, MAG_MANUAL, NULL);
+  spello(SPELL_RULERS_HAND, "rulers hand", 32, 32, 0, POS_FIGHTING, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_NOT_SELF, TRUE, MAG_MANUAL, NULL);
+  spello(SPELL_SHADOW_LANCE, "shadow lance", 26, 26, 0, POS_FIGHTING, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_NOT_SELF, TRUE, MAG_MANUAL, NULL);
+  spello(SPELL_SHADOW_BURST, "shadow burst", 28, 28, 0, POS_FIGHTING, TAR_IGNORE, TRUE, MAG_MANUAL, NULL);
+  spello(SPELL_SHADOW_STORM, "shadow storm", 46, 46, 0, POS_STANDING, TAR_IGNORE, TRUE, MAG_MANUAL, "The storm of living shadow breaks apart.");
+  spello(SPELL_FATAL_STRIKE, "fatal strike", 30, 30, 0, POS_FIGHTING, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_NOT_SELF, TRUE, MAG_MANUAL, NULL);
+  spello(SPELL_DOMINION_OF_SHADOWS, "dominion of shadows", 52, 52, 0, POS_STANDING, TAR_SELF_ONLY, FALSE, MAG_MANUAL, "Your dominion over the shadows loosens.");
+  spello(SPELL_SHADOW_RECALL, "shadow recall", 20, 20, 0, POS_STANDING, TAR_SELF_ONLY, FALSE, MAG_MANUAL, NULL);
+  spello(SPELL_SHADOW_REGENESIS, "shadow regenesis", 34, 34, 0, POS_FIGHTING, TAR_SELF_ONLY, FALSE, MAG_MANUAL, "Your shadow regeneration ends.");
+  spello(SPELL_ASSASSINS_INTENT, "assassins intent", 24, 24, 0, POS_STANDING, TAR_SELF_ONLY, FALSE, MAG_MANUAL, "Your assassin's intent fades.");
+  spello(SPELL_BLOOD_DAGGER_TEMPEST, "blood dagger tempest", 44, 44, 0, POS_FIGHTING, TAR_IGNORE, TRUE, MAG_MANUAL, NULL);
+  spello(SPELL_CHAIN_OF_SUBJUGATION, "chain of subjugation", 36, 36, 0, POS_FIGHTING, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_NOT_SELF, TRUE, MAG_MANUAL, "The chains of subjugation crumble away.");
+  spello(SPELL_SOVEREIGNS_STEP, "sovereigns step", 22, 22, 0, POS_STANDING, TAR_SELF_ONLY, FALSE, MAG_MANUAL, "Your sovereign step fades.");
+  spello(SPELL_KINGS_COMMAND, "kings command", 28, 28, 0, POS_STANDING, TAR_SELF_ONLY, FALSE, MAG_MANUAL, "The king's command fades from your summons.");
+  spello(SPELL_DETECT_KILL_INTENT, "detect kill intent", 18, 18, 0, POS_STANDING, TAR_SELF_ONLY, FALSE, MAG_MANUAL, "Your heightened sense of killing intent fades.");
+  spello(SPELL_MUTILATE, "mutilate", 24, 24, 0, POS_FIGHTING, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_NOT_SELF, TRUE, MAG_MANUAL, "Your maimed weakness slowly fades.");
+  spello(SPELL_SHADOW_ARMOR, "shadow armor", 26, 26, 0, POS_STANDING, TAR_CHAR_ROOM, FALSE, MAG_MANUAL, "Your shadow armor melts away.");
+  spello(SPELL_TOTAL_OCCULTATION, "total occultation", 40, 40, 0, POS_STANDING, TAR_SELF_ONLY, FALSE, MAG_MANUAL, "The total occultation ends.");
+  spello(SPELL_DOMAIN_BREAK, "domain break", 38, 38, 0, POS_FIGHTING, TAR_IGNORE, FALSE, MAG_MANUAL, NULL);
+  spello(SPELL_HUNTERS_INSTINCT, "hunters instinct", 20, 20, 0, POS_STANDING, TAR_SELF_ONLY, FALSE, MAG_MANUAL, "Your hunter's instinct recedes.");
 
   /* NON-castable spells should appear below here. */
   spello(SPELL_IDENTIFY, "identify", 0, 0, 0, 0,
@@ -3150,4 +3268,14 @@ void mag_assign_spells(void) {
   skillo_cost(SKILL_UNDEAD_COMMAND, "undead command", 0);
   skillo_cost(SKILL_TACTICAL_SPELL_MEMORY, "tactical spell memory", 0);
   skillo_cost(SKILL_DREAD_DOMINION, "dread dominion", 0);
+  skillo_cost(SKILL_SHADOW_COMMANDER, "shadow commander", 0);
+  skillo_cost(SKILL_PREDATORS_ADVANCE, "predators advance", 0);
+  skillo_cost(SKILL_MONARCH_REFLEXES, "monarch reflexes", 0);
+  skillo_cost(SKILL_RELENTLESS_HUNT, "relentless hunt", 0);
+  skillo_cost(SKILL_SHADOW_RESERVOIR, "shadow reservoir", 0);
+  skillo_cost(SKILL_SHADOW_SURGE, "shadow surge", 0);
+  skillo_cost(SKILL_CHAIN_ASSASSAULT, "chain assault", 0);
+  skillo_cost(SKILL_SOVEREIGN_PRESSURE, "sovereign pressure", 0);
+  skillo_cost(SKILL_KILL_WINDOW, "kill window", 0);
+  skillo_cost(SKILL_LEGION_MASTERY, "legion mastery", 0);
 }
