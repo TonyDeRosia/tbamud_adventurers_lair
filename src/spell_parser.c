@@ -582,6 +582,21 @@ static bool ability_matches_input(const char *input, const char *ability_name,
 static int find_spell_by_tokens(const char *name, char *ambig_buf,
     size_t ambig_len, int *matched_tokens, bool allow_partial_name,
     bool allow_extra_input) {
+  /* Adventurers Lair compatibility aliases:
+   * Keep these lightweight so legacy/variant ability names can reuse stable
+   * implementations without duplicating spell logic. */
+  static const struct {
+    const char *alias;
+    int spellnum;
+  } spell_aliases[] = {
+    { "colour spray", SPELL_COLOR_SPRAY },
+    { "detect invis", SPELL_DETECT_INVIS },
+    { "invis", SPELL_INVISIBLE },
+    { "night vision", SPELL_INFRAVISION },
+    { "shield", SPELL_ARMOR },
+    { "underwater breathing", SPELL_WATERWALK },
+    { NULL, 0 }
+  };
   int best_spell = -1;
   int best_tokens = 0;
   int best_input_tokens = 0;
@@ -592,6 +607,15 @@ static int find_spell_by_tokens(const char *name, char *ambig_buf,
     *matched_tokens = 0;
 
   *ambig_buf = '\0';
+
+  for (spellnum = 0; spell_aliases[spellnum].alias; spellnum++) {
+    if (ability_matches_input(name, spell_aliases[spellnum].alias,
+        allow_partial_name, allow_extra_input, NULL, NULL)) {
+      if (matched_tokens)
+        *matched_tokens = 1;
+      return spell_aliases[spellnum].spellnum;
+    }
+  }
 
   for (spellnum = 1; spellnum <= MAX_SPELLS; spellnum++) {
     int token_count = 0;
@@ -678,6 +702,19 @@ static struct char_data *find_char_prefix(struct char_data *ch,
 static int find_ability_by_tokens(const char *name, char *ambig_buf,
     size_t ambig_len, int *matched_tokens, bool allow_partial_name,
     bool allow_extra_input) {
+  static const struct {
+    const char *alias;
+    int ability;
+  } ability_aliases[] = {
+    { "colour spray", SPELL_COLOR_SPRAY },
+    { "detect invis", SPELL_DETECT_INVIS },
+    { "hunt", SKILL_TRACK },
+    { "invis", SPELL_INVISIBLE },
+    { "night vision", SPELL_INFRAVISION },
+    { "shield", SPELL_ARMOR },
+    { "underwater breathing", SPELL_WATERWALK },
+    { NULL, 0 }
+  };
   int best_ability = -1;
   int best_tokens = 0;
   int best_input_tokens = 0;
@@ -688,6 +725,15 @@ static int find_ability_by_tokens(const char *name, char *ambig_buf,
     *matched_tokens = 0;
 
   *ambig_buf = '\0';
+
+  for (ability = 0; ability_aliases[ability].alias; ability++) {
+    if (ability_matches_input(name, ability_aliases[ability].alias,
+        allow_partial_name, allow_extra_input, NULL, NULL)) {
+      if (matched_tokens)
+        *matched_tokens = 1;
+      return ability_aliases[ability].ability;
+    }
+  }
 
   for (ability = 1; ability <= TOP_SPELL_DEFINE; ability++) {
     int token_count = 0;
@@ -729,10 +775,28 @@ static int find_ability_by_tokens(const char *name, char *ambig_buf,
 int find_skill_num(char *name) {
   char cleaned[MAX_INPUT_LENGTH];
   int skill_num;
+  static const struct {
+    const char *alias;
+    int ability;
+  } direct_aliases[] = {
+    { "colour spray", SPELL_COLOR_SPRAY },
+    { "detect invis", SPELL_DETECT_INVIS },
+    { "hunt", SKILL_TRACK },
+    { "invis", SPELL_INVISIBLE },
+    { "night vision", SPELL_INFRAVISION },
+    { "shield", SPELL_ARMOR },
+    { "underwater breathing", SPELL_WATERWALK },
+    { NULL, 0 }
+  };
 
   normalize_ability_input(name, cleaned, sizeof(cleaned));
   if (!*cleaned)
     return (-1);
+
+  for (skill_num = 0; direct_aliases[skill_num].alias; skill_num++)
+    if (ability_matches_input(cleaned, direct_aliases[skill_num].alias,
+        TRUE, FALSE, NULL, NULL))
+      return direct_aliases[skill_num].ability;
 
   for (skill_num = 1; skill_num <= TOP_SPELL_DEFINE; skill_num++) {
     if (!is_available_ability(skill_num))
