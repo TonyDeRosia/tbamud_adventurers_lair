@@ -1307,6 +1307,18 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
   if (dam > 0 && AFF_FLAGGED(victim, AFF_MARKED))
     dam = (dam * 6) / 5;
 
+  if (dam > 0 && ch && ch != victim && affected_by_spell(ch, SPELL_TIME_STOP)) {
+    struct char_data *tch;
+    affect_from_char(ch, SPELL_TIME_STOP);
+    for (tch = world[IN_ROOM(ch)].people; tch; tch = tch->next_in_room) {
+      if (tch == ch)
+        continue;
+      GET_WAIT_STATE(tch) = 0;
+    }
+    send_to_char(ch, "Your assault shatters the frozen moment.\r\n");
+    act("Time lurches back into motion around $n.", TRUE, ch, 0, 0, TO_ROOM);
+  }
+
   if (dam > 0 && AFF_FLAGGED(victim, AFF_STONESKIN) && IS_WEAPON(attacktype)) {
     dam = MAX(1, dam - 5);
   }

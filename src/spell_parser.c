@@ -854,6 +854,101 @@ static const struct cast_message cast_messages[] = {
     "You shift yourself back in time one round, undoing the damage!",
     "$n flickers as time rewinds around $m!",
     NULL
+  },
+  [SPELL_BALEFIRE] = {
+    "You unleash a lance of pure balefire that tears through $N's very existence!",
+    "$n unleashes a lance of pure balefire at $N!",
+    NULL
+  },
+  [SPELL_METEOR] = {
+    "You call down a meteor from the heavens onto $N!",
+    "$n calls down a meteor from the heavens onto $N!",
+    NULL
+  },
+  [SPELL_METEOR_SWARM] = {
+    "You call down a swarm of meteors from the heavens!",
+    "$n calls down a swarm of meteors from the heavens!",
+    NULL
+  },
+  [SPELL_HELLFIRE] = {
+    "Hellfire erupts from below, incinerating $N!",
+    "Hellfire erupts from below, incinerating $N!",
+    NULL
+  },
+  [SPELL_WRATHFIRE] = {
+    "Wrathfire explodes from your hands, fueled by divine fury!",
+    "$n hurls wrathfire fueled by divine fury!",
+    NULL
+  },
+  [SPELL_CELESTIAL_SMITE] = {
+    "Celestial fire descends to smite $N in your deity's name!",
+    "Celestial fire descends to smite $N!",
+    NULL
+  },
+  [SPELL_HAMMER_OF_GOD] = {
+    "The Hammer of God descends on $N!",
+    "The Hammer of God descends on $N!",
+    NULL
+  },
+  [SPELL_DEATH_KNELL] = {
+    "You sound the death knell for $N's existence!",
+    "$n sounds the death knell for $N's existence!",
+    NULL
+  },
+  [SPELL_UNHOLY_WORD] = {
+    "You unleash the Unholy Word, speaking blasphemy into reality!",
+    "$n unleashes the Unholy Word!",
+    NULL
+  },
+  [SPELL_HOLY_WORD] = {
+    "You speak the Holy Word and divine light fills the room!",
+    "$n speaks the Holy Word and divine light fills the room!",
+    NULL
+  },
+  [SPELL_FINGER_OF_DEATH] = {
+    "You point your finger at $N, channeling the finger of death!",
+    "$n points a finger at $N, channeling death!",
+    NULL
+  },
+  [SPELL_WAIL_OF_THE_BANSHEE] = {
+    "You unleash the wail of a banshee!",
+    "$n unleashes the wail of a banshee!",
+    NULL
+  },
+  [SPELL_DISINTEGRATE] = {
+    "A green ray of disintegrating energy erupts from your hand at $N!",
+    "A green ray of disintegrating energy erupts from $n's hand at $N!",
+    NULL
+  },
+  [SPELL_POWER_WORD_KILL] = {
+    "You speak the Power Word: Kill at $N!",
+    "$n speaks the Power Word: Kill at $N!",
+    NULL
+  },
+  [SPELL_POWER_WORD_STUN] = {
+    "You speak the Power Word: Stun at $N!",
+    "$n speaks the Power Word: Stun at $N!",
+    NULL
+  },
+  [SPELL_POWER_WORD_BLIND] = {
+    "You speak the Power Word: Blind at $N!",
+    "$n speaks the Power Word: Blind at $N!",
+    NULL
+  },
+  [SPELL_POWER_WORD_SILENCE] = {
+    "You speak the Power Word: Silence at $N!",
+    "$n speaks the Power Word: Silence at $N!",
+    NULL
+  },
+  [SPELL_PSYCHIC_CRUSH] = {
+    "You crush $N's mind with overwhelming psychic force!",
+    "$n crushes $N's mind with overwhelming psychic force!",
+    NULL
+  },
+  [SPELL_TIME_STOP] = {
+    "Time itself grinds to a halt around you!",
+    "$n speaks a single word and time freezes!",
+    NULL
   }
 };
 
@@ -1649,6 +1744,82 @@ int call_magic(struct char_data *caster, struct char_data *cvict,
       break;
     case SPELL_CHRONO_SHIFT:
       MANUAL_SPELL(spell_chrono_shift)
+      ;
+      break;
+    case SPELL_BALEFIRE:
+      MANUAL_SPELL(spell_balefire)
+      ;
+      break;
+    case SPELL_METEOR:
+      MANUAL_SPELL(spell_meteor)
+      ;
+      break;
+    case SPELL_METEOR_SWARM:
+      MANUAL_SPELL(spell_meteor_swarm)
+      ;
+      break;
+    case SPELL_HELLFIRE:
+      MANUAL_SPELL(spell_hellfire)
+      ;
+      break;
+    case SPELL_WRATHFIRE:
+      MANUAL_SPELL(spell_wrathfire)
+      ;
+      break;
+    case SPELL_CELESTIAL_SMITE:
+      MANUAL_SPELL(spell_celestial_smite)
+      ;
+      break;
+    case SPELL_HAMMER_OF_GOD:
+      MANUAL_SPELL(spell_hammer_of_god)
+      ;
+      break;
+    case SPELL_DEATH_KNELL:
+      MANUAL_SPELL(spell_death_knell)
+      ;
+      break;
+    case SPELL_UNHOLY_WORD:
+      MANUAL_SPELL(spell_unholy_word)
+      ;
+      break;
+    case SPELL_HOLY_WORD:
+      MANUAL_SPELL(spell_holy_word)
+      ;
+      break;
+    case SPELL_FINGER_OF_DEATH:
+      MANUAL_SPELL(spell_finger_of_death)
+      ;
+      break;
+    case SPELL_WAIL_OF_THE_BANSHEE:
+      MANUAL_SPELL(spell_wail_of_the_banshee)
+      ;
+      break;
+    case SPELL_DISINTEGRATE:
+      MANUAL_SPELL(spell_disintegrate)
+      ;
+      break;
+    case SPELL_POWER_WORD_KILL:
+      MANUAL_SPELL(spell_power_word_kill)
+      ;
+      break;
+    case SPELL_POWER_WORD_STUN:
+      MANUAL_SPELL(spell_power_word_stun)
+      ;
+      break;
+    case SPELL_POWER_WORD_BLIND:
+      MANUAL_SPELL(spell_power_word_blind)
+      ;
+      break;
+    case SPELL_POWER_WORD_SILENCE:
+      MANUAL_SPELL(spell_power_word_silence)
+      ;
+      break;
+    case SPELL_PSYCHIC_CRUSH:
+      MANUAL_SPELL(spell_psychic_crush)
+      ;
+      break;
+    case SPELL_TIME_STOP:
+      MANUAL_SPELL(spell_time_stop)
       ;
       break;
     }
@@ -2809,6 +2980,44 @@ void mag_assign_spells(void) {
   TAR_CHAR_ROOM | TAR_FIGHT_SELF | TAR_FIGHT_VICT, TRUE, MAG_MANUAL, NULL);
   spello(SPELL_CHRONO_SHIFT, "chrono shift", 50, 50, 0, POS_FIGHTING,
   TAR_SELF_ONLY, FALSE, MAG_MANUAL, NULL);
+  spello(SPELL_BALEFIRE, "balefire", 100, 60, 0, POS_FIGHTING,
+  TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_NOT_SELF, TRUE, MAG_MANUAL, NULL);
+  spello(SPELL_METEOR, "meteor", 90, 50, 0, POS_FIGHTING,
+  TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_NOT_SELF, TRUE, MAG_MANUAL, NULL);
+  spello(SPELL_METEOR_SWARM, "meteor swarm", 120, 90, 0, POS_FIGHTING,
+  TAR_IGNORE, TRUE, MAG_MANUAL, NULL);
+  spello(SPELL_HELLFIRE, "hellfire", 75, 40, 0, POS_FIGHTING,
+  TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_NOT_SELF, TRUE, MAG_MANUAL, NULL);
+  spello(SPELL_WRATHFIRE, "wrathfire", 65, 35, 0, POS_FIGHTING,
+  TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_NOT_SELF, TRUE, MAG_MANUAL, NULL);
+  spello(SPELL_CELESTIAL_SMITE, "celestial smite", 80, 45, 0, POS_FIGHTING,
+  TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_NOT_SELF, TRUE, MAG_MANUAL, NULL);
+  spello(SPELL_HAMMER_OF_GOD, "hammer of god", 90, 55, 0, POS_FIGHTING,
+  TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_NOT_SELF, TRUE, MAG_MANUAL, NULL);
+  spello(SPELL_DEATH_KNELL, "death knell", 70, 35, 0, POS_FIGHTING,
+  TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_NOT_SELF, TRUE, MAG_MANUAL, NULL);
+  spello(SPELL_UNHOLY_WORD, "unholy word", 100, 60, 0, POS_FIGHTING,
+  TAR_IGNORE, TRUE, MAG_MANUAL, NULL);
+  spello(SPELL_HOLY_WORD, "holy word", 100, 60, 0, POS_FIGHTING,
+  TAR_IGNORE, TRUE, MAG_MANUAL, NULL);
+  spello(SPELL_FINGER_OF_DEATH, "finger of death", 130, 75, 0, POS_FIGHTING,
+  TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_NOT_SELF, TRUE, MAG_MANUAL, NULL);
+  spello(SPELL_WAIL_OF_THE_BANSHEE, "wail of the banshee", 150, 100, 0, POS_FIGHTING,
+  TAR_IGNORE, TRUE, MAG_MANUAL, NULL);
+  spello(SPELL_DISINTEGRATE, "disintegrate", 140, 80, 0, POS_FIGHTING,
+  TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_NOT_SELF, TRUE, MAG_MANUAL, NULL);
+  spello(SPELL_POWER_WORD_KILL, "power word kill", 180, 100, 0, POS_FIGHTING,
+  TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_NOT_SELF, TRUE, MAG_MANUAL, NULL);
+  spello(SPELL_POWER_WORD_STUN, "power word stun", 80, 40, 0, POS_FIGHTING,
+  TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_NOT_SELF, TRUE, MAG_MANUAL, NULL);
+  spello(SPELL_POWER_WORD_BLIND, "power word blind", 60, 30, 0, POS_FIGHTING,
+  TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_NOT_SELF, TRUE, MAG_MANUAL, NULL);
+  spello(SPELL_POWER_WORD_SILENCE, "power word silence", 60, 30, 0, POS_FIGHTING,
+  TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_NOT_SELF, TRUE, MAG_MANUAL, NULL);
+  spello(SPELL_PSYCHIC_CRUSH, "psychic crush", 90, 50, 0, POS_FIGHTING,
+  TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_NOT_SELF, TRUE, MAG_MANUAL, NULL);
+  spello(SPELL_TIME_STOP, "time stop", 180, 100, 0, POS_STANDING,
+  TAR_IGNORE, FALSE, MAG_MANUAL, NULL);
 
   /* NON-castable spells should appear below here. */
   spello(SPELL_IDENTIFY, "identify", 0, 0, 0, 0,
