@@ -30,6 +30,10 @@
 
 #define PVP_GLORY_COOLDOWN 600 /* seconds */
 
+#define RARE_KILL_MAX_COUNT 10
+#define RARE_KILL_BASE_BONUS 5
+#define RARE_KILL_STEP_BONUS 2
+
 
 /* locally defined global variables, used externally */
 /* head of l-list of fighting chars */
@@ -59,6 +63,9 @@ static struct char_data *next_combat_list = NULL;
 
 /* local file scope utility functions */
 static void perform_group_gain(struct char_data *ch, int base, struct char_data *victim);
+static int count_live_mobs_by_vnum(mob_vnum vnum);
+static int rare_kill_bonus_for_count(int live_count);
+static int rare_kill_bonus_for_victim(struct char_data *victim);
 static void dam_message(int dam, struct char_data *ch, struct char_data *victim, int w_type);
 static void make_corpse(struct char_data *ch);
 static void change_alignment(struct char_data *ch, struct char_data *victim);
@@ -716,7 +723,7 @@ void die(struct char_data * ch, struct char_data * killer)
 static void perform_group_gain(struct char_data *ch, int base,
 			     struct char_data *victim)
 {
-  int share, hap_share;
+  int share, hap_share, rare_bonus;
 
   share = MIN(CONFIG_MAX_EXP_GAIN, MAX(1, base));
 
@@ -730,6 +737,12 @@ static void perform_group_gain(struct char_data *ch, int base,
     send_to_char(ch, "You receive your share of experience -- %s%d%s points.\r\n", CCYEL(ch, C_NRM), share, CCNRM(ch, C_NRM));
   else
     send_to_char(ch, "You receive your share of experience -- one measly little point!\r\n");
+
+  rare_bonus = rare_kill_bonus_for_victim(victim);
+  if (rare_bonus > 0) {
+    share += rare_bonus;
+    send_to_char(ch, "You receive %d 'rare kill' experience bonus.\r\n", rare_bonus);
+  }
 
   gain_exp(ch, share);
   change_alignment(ch, victim);
@@ -763,7 +776,7 @@ static void group_gain(struct char_data *ch, struct char_data *victim)
 
 static void solo_gain(struct char_data *ch, struct char_data *victim)
 {
-  int exp, happy_exp;
+  int exp, happy_exp, rare_bonus;
 
   exp = MIN(CONFIG_MAX_EXP_GAIN, GET_EXP(victim) / 3);
 
@@ -785,9 +798,50 @@ static void solo_gain(struct char_data *ch, struct char_data *victim)
   else
     send_to_char(ch, "You receive one lousy experience point.\r\n");
 
+  rare_bonus = rare_kill_bonus_for_victim(victim);
+  if (rare_bonus > 0) {
+    exp += rare_bonus;
+    send_to_char(ch, "You receive %d 'rare kill' experience bonus.\r\n", rare_bonus);
+  }
+
   gain_exp(ch, exp);
 
     change_alignment(ch, victim);
+}
+
+static int count_live_mobs_by_vnum(mob_vnum vnum)
+{
+  int count = 0;
+  struct char_data *mob;
+
+  if (vnum == NOBODY)
+    return 0;
+
+  for (mob = character_list; mob; mob = mob->next) {
+    if (!IS_NPC(mob) || MOB_FLAGGED(mob, MOB_NOTDEADYET))
+      continue;
+
+    if (GET_MOB_VNUM(mob) == vnum)
+      count++;
+  }
+
+  return count;
+}
+
+static int rare_kill_bonus_for_count(int live_count)
+{
+  if (live_count <= 0 || live_count > RARE_KILL_MAX_COUNT)
+    return 0;
+
+  return RARE_KILL_BASE_BONUS + ((RARE_KILL_MAX_COUNT - live_count) * RARE_KILL_STEP_BONUS);
+}
+
+static int rare_kill_bonus_for_victim(struct char_data *victim)
+{
+  if (!victim || !IS_NPC(victim))
+    return 0;
+
+  return rare_kill_bonus_for_count(count_live_mobs_by_vnum(GET_MOB_VNUM(victim)));
 }
 
 static char *replace_string(const char *str, const char *weapon_singular, const char *weapon_plural)
