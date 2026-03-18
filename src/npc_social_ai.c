@@ -8,6 +8,9 @@
 #include "handler.h"
 #include "interpreter.h"
 #include "shop.h"
+#include "spec_procs.h"
+#include "quest.h"
+#include "mail.h"
 #include "npc_social_ai.h"
 
 ACMD(do_say);
@@ -37,62 +40,68 @@ static struct ai_actor_memory_entry *npc_mem_get(struct char_data *ch, long idnu
 
 int npc_ai_is_humanoid_social_candidate(struct char_data *ch)
 {
-  const char *name;
-  const char *sdesc;
-  int spec_is_service = FALSE;
-
-  if (!ch || !IS_NPC(ch) || IN_ROOM(ch) == NOWHERE)
-    return FALSE;
-  if (!MOB_FLAGGED(ch, MOB_AI_ACTOR))
-    return FALSE;
-  if (MOB_FLAGGED(ch, MOB_AGGRESSIVE | MOB_AGGR_EVIL | MOB_AGGR_GOOD | MOB_AGGR_NEUTRAL))
-    return FALSE;
-
-  if (GET_MOB_RNUM(ch) != NOBODY && mob_index[GET_MOB_RNUM(ch)].func == shop_keeper)
-    spec_is_service = TRUE;
-
-  name = ch->player.name ? ch->player.name : "";
-  sdesc = ch->player.short_descr ? ch->player.short_descr : "";
-
-  if (has_kw(name, "wolf") || has_kw(name, "bear") || has_kw(name, "dragon") || has_kw(name, "slime") ||
-      has_kw(name, "elemental") || has_kw(name, "golem") || has_kw(name, "beast") || has_kw(name, "spider") ||
-      has_kw(sdesc, "wolf") || has_kw(sdesc, "bear") || has_kw(sdesc, "dragon") || has_kw(sdesc, "slime") ||
-      has_kw(sdesc, "elemental") || has_kw(sdesc, "golem") || has_kw(sdesc, "beast") || has_kw(sdesc, "spider"))
-    return FALSE;
-
-  if (spec_is_service)
-    return TRUE;
-
-  if (has_kw(name, "guard") || has_kw(name, "merchant") || has_kw(name, "shop") || has_kw(name, "innkeeper") ||
-      has_kw(name, "trainer") || has_kw(name, "healer") || has_kw(name, "priest") || has_kw(name, "clerk") ||
-      has_kw(name, "official") || has_kw(name, "civilian") || has_kw(name, "bandit") || has_kw(name, "townsfolk") ||
-      has_kw(sdesc, "guard") || has_kw(sdesc, "merchant") || has_kw(sdesc, "innkeeper") || has_kw(sdesc, "trainer") ||
-      has_kw(sdesc, "healer") || has_kw(sdesc, "priest") || has_kw(sdesc, "clerk") || has_kw(sdesc, "official") ||
-      has_kw(sdesc, "civilian") || has_kw(sdesc, "bandit"))
-    return TRUE;
-
-  return FALSE;
+  /* Builder-controlled entry gate: AI_ACTOR means this NPC opts into social AI. */
+  return (ch && IS_NPC(ch) && IN_ROOM(ch) != NOWHERE && MOB_FLAGGED(ch, MOB_AI_ACTOR));
 }
 
 void npc_ai_build_profile(struct char_data *ch, struct npc_social_profile *out)
 {
   const char *name = (ch && ch->player.name) ? ch->player.name : "";
   const char *sdesc = (ch && ch->player.short_descr) ? ch->player.short_descr : "";
+  int has_shop_spec = FALSE;
+  int has_quest_spec = FALSE;
+  int has_mayor_spec = FALSE;
+  int has_guard_spec = FALSE;
+  int has_guild_spec = FALSE;
+  int has_service_spec = FALSE;
 
   if (!out) return;
   out->role = NPC_ROLE_GENERIC_TOWNSFOLK;
   out->temperament = NPC_TEMP_STEADY;
   out->social_style = NPC_SOCIAL_NEUTRAL;
 
-  if (has_kw(name, "guard") || has_kw(sdesc, "guard")) out->role = NPC_ROLE_GUARD;
-  else if ((GET_MOB_RNUM(ch) != NOBODY && mob_index[GET_MOB_RNUM(ch)].func == shop_keeper) || has_kw(name, "merchant") || has_kw(sdesc, "merchant")) out->role = NPC_ROLE_MERCHANT;
-  else if (has_kw(name, "trainer") || has_kw(sdesc, "trainer")) out->role = NPC_ROLE_TRAINER;
-  else if (has_kw(name, "healer") || has_kw(name, "medic") || has_kw(sdesc, "healer")) out->role = NPC_ROLE_HEALER;
-  else if (has_kw(name, "quest") || has_kw(sdesc, "quest")) out->role = NPC_ROLE_QUESTGIVER;
-  else if (has_kw(name, "innkeeper") || has_kw(sdesc, "innkeeper")) out->role = NPC_ROLE_INNKEEPER;
-  else if (has_kw(name, "priest") || has_kw(sdesc, "priest")) out->role = NPC_ROLE_PRIEST;
-  else if (has_kw(name, "bandit") || has_kw(sdesc, "bandit")) out->role = NPC_ROLE_BANDIT;
-  else if (has_kw(name, "civilian") || has_kw(sdesc, "civilian")) out->role = NPC_ROLE_CIVILIAN;
+  if (ch && GET_MOB_RNUM(ch) != NOBODY) {
+    int (*spec)(struct char_data *, void *, int, char *) = mob_index[GET_MOB_RNUM(ch)].func;
+    has_shop_spec = (spec == shop_keeper || spec == receptionist || spec == postmaster || spec == bank);
+    has_quest_spec = (spec == questmaster);
+    has_mayor_spec = (spec == mayor);
+    has_guard_spec = (spec == guild_guard);
+    has_guild_spec = (spec == guild || MOB_FLAGGED(ch, MOB_GUILD_MASTER));
+    has_service_spec = has_shop_spec || has_quest_spec || has_mayor_spec || has_guild_spec;
+  }
+
+  /* 1) Explicit service/gameplay roles first. */
+  if (has_shop_spec || has_kw(name, "merchant") || has_kw(name, "shopkeeper") || has_kw(name, "shop") ||
+      has_kw(sdesc, "merchant") || has_kw(sdesc, "shopkeeper") || has_kw(sdesc, "shop")) {
+    out->role = NPC_ROLE_MERCHANT;
+  } else if (has_guild_spec || has_kw(name, "trainer") || has_kw(name, "instructor") || has_kw(name, "guildmaster") ||
+             has_kw(sdesc, "trainer") || has_kw(sdesc, "instructor") || has_kw(sdesc, "guildmaster")) {
+    out->role = NPC_ROLE_TRAINER;
+  } else if (has_kw(name, "healer") || has_kw(name, "medic") || has_kw(name, "cleric") || has_kw(name, "priest") ||
+             has_kw(sdesc, "healer") || has_kw(sdesc, "medic") || has_kw(sdesc, "cleric")) {
+    out->role = NPC_ROLE_HEALER;
+  } else if (has_quest_spec || has_kw(name, "quest") || has_kw(name, "hermit") || has_kw(sdesc, "quest") || has_kw(sdesc, "hermit")) {
+    out->role = NPC_ROLE_QUESTGIVER;
+  } else if (has_kw(name, "innkeeper") || has_kw(name, "inn") || has_kw(sdesc, "innkeeper") || has_kw(sdesc, "inn")) {
+    out->role = NPC_ROLE_INNKEEPER;
+  } else if (has_mayor_spec || has_kw(name, "mayor") || has_kw(name, "official") || has_kw(name, "advisor") ||
+             has_kw(name, "council") || has_kw(sdesc, "mayor") || has_kw(sdesc, "official") || has_kw(sdesc, "advisor")) {
+    out->role = NPC_ROLE_OFFICIAL;
+  /* 2) Guard / civic enforcement role. */
+  } else if (has_guard_spec || has_kw(name, "guard") || has_kw(name, "watch") || has_kw(name, "sentinel") ||
+             has_kw(sdesc, "guard") || has_kw(sdesc, "watch") || has_kw(sdesc, "sentinel")) {
+    out->role = NPC_ROLE_GUARD;
+  /* 3) Bandit / hostile social role if explicitly suited. */
+  } else if (has_kw(name, "bandit") || has_kw(name, "brigand") || has_kw(name, "outlaw") || has_kw(sdesc, "bandit")) {
+    out->role = NPC_ROLE_BANDIT;
+  /* 4) Safe fallback: service or townsfolk. */
+  } else if (has_service_spec || has_kw(name, "service") || has_kw(sdesc, "service")) {
+    out->role = NPC_ROLE_GENERIC_SERVICE;
+  } else if (has_kw(name, "civilian") || has_kw(name, "townsfolk") || has_kw(sdesc, "civilian") || has_kw(sdesc, "townsfolk")) {
+    out->role = NPC_ROLE_CIVILIAN;
+  } else {
+    out->role = NPC_ROLE_GENERIC_TOWNSFOLK;
+  }
 
   if (MOB_FLAGGED(ch, MOB_WIMPY)) out->temperament = NPC_TEMP_TIMID;
   if (MOB_FLAGGED(ch, MOB_AGGRESSIVE)) out->temperament = NPC_TEMP_AGGRESSIVE;
