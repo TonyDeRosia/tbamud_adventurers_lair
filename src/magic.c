@@ -405,8 +405,9 @@ void mag_affects(int level, struct char_data *ch, struct char_data *victim,
 {
   struct affected_type af[MAX_SPELL_AFFECTS];
   bool accum_affect = FALSE, accum_duration = FALSE;
+  bool refresh_on_recast = FALSE;
   const char *to_vict = NULL, *to_room = NULL;
-  int i, j;
+  int i, j, buff_duration;
 
 
   if (victim == NULL || ch == NULL)
@@ -439,21 +440,27 @@ void mag_affects(int level, struct char_data *ch, struct char_data *victim,
   case SPELL_ARMOR:
     af[0].location = APPLY_AC;
     af[0].modifier = -20;
-    af[0].duration = 24;
-    accum_duration = TRUE;
+    af[0].duration = 12 + (level / 6);
+    if (af[0].duration > 18)
+      af[0].duration = 18;
+    refresh_on_recast = TRUE;
     to_vict = "You feel someone protecting you.";
     break;
 
   case SPELL_BLESS:
+    buff_duration = 12 + (level / 6);
+    if (buff_duration > 18)
+      buff_duration = 18;
+
     af[0].location = APPLY_HITROLL;
     af[0].modifier = 2;
-    af[0].duration = 6;
+    af[0].duration = buff_duration;
 
     af[1].location = APPLY_SAVING_SPELL;
     af[1].modifier = -1;
-    af[1].duration = 6;
+    af[1].duration = buff_duration;
 
-    accum_duration = TRUE;
+    refresh_on_recast = TRUE;
     to_vict = "You feel righteous.";
     break;
 
@@ -500,37 +507,47 @@ void mag_affects(int level, struct char_data *ch, struct char_data *victim,
     break;
 
   case SPELL_DETECT_ALIGN:
-    af[0].duration = 12 + level;
+    af[0].duration = 12 + (level / 6);
+    if (af[0].duration > 18)
+      af[0].duration = 18;
     SET_BIT_AR(af[0].bitvector, AFF_DETECT_ALIGN);
-    accum_duration = TRUE;
+    refresh_on_recast = TRUE;
     to_vict = "Your eyes tingle.";
     break;
 
   case SPELL_DETECT_INVIS:
-    af[0].duration = 12 + level;
+    af[0].duration = 12 + (level / 6);
+    if (af[0].duration > 18)
+      af[0].duration = 18;
     SET_BIT_AR(af[0].bitvector, AFF_DETECT_INVIS);
-    accum_duration = TRUE;
+    refresh_on_recast = TRUE;
     to_vict = "Your eyes tingle.";
     break;
 
   case SPELL_DETECT_MAGIC:
-    af[0].duration = 12 + level;
+    af[0].duration = 12 + (level / 6);
+    if (af[0].duration > 18)
+      af[0].duration = 18;
     SET_BIT_AR(af[0].bitvector, AFF_DETECT_MAGIC);
-    accum_duration = TRUE;
+    refresh_on_recast = TRUE;
     to_vict = "Your eyes tingle.";
     break;
 
   case SPELL_FLY:
-    af[0].duration = 24;
+    af[0].duration = 15 + (level / 5);
+    if (af[0].duration > 24)
+      af[0].duration = 24;
     SET_BIT_AR(af[0].bitvector, AFF_FLYING);
-    accum_duration = TRUE;
+    refresh_on_recast = TRUE;
     to_vict = "You float above the ground.";
     break;
 
   case SPELL_INFRAVISION:
-    af[0].duration = 12 + level;
+    af[0].duration = 12 + (level / 6);
+    if (af[0].duration > 18)
+      af[0].duration = 18;
     SET_BIT_AR(af[0].bitvector, AFF_INFRAVISION);
-    accum_duration = TRUE;
+    refresh_on_recast = TRUE;
     to_vict = "Your eyes glow red.";
     to_room = "$n's eyes glow red.";
     break;
@@ -539,11 +556,13 @@ void mag_affects(int level, struct char_data *ch, struct char_data *victim,
     if (!victim)
       victim = ch;
 
-    af[0].duration = 12 + (GET_LEVEL(ch) / 4);
+    af[0].duration = 12 + (GET_LEVEL(ch) / 6);
+    if (af[0].duration > 20)
+      af[0].duration = 20;
     af[0].modifier = -40;
     af[0].location = APPLY_AC;
     SET_BIT_AR(af[0].bitvector, AFF_INVISIBLE);
-    accum_duration = TRUE;
+    refresh_on_recast = TRUE;
     to_vict = "You vanish.";
     to_room = "$n slowly fades out of existence.";
     break;
@@ -563,9 +582,11 @@ void mag_affects(int level, struct char_data *ch, struct char_data *victim,
     break;
 
   case SPELL_PROT_FROM_EVIL:
-    af[0].duration = 24;
+    af[0].duration = 15 + (level / 5);
+    if (af[0].duration > 24)
+      af[0].duration = 24;
     SET_BIT_AR(af[0].bitvector, AFF_PROTECT_EVIL);
-    accum_duration = TRUE;
+    refresh_on_recast = TRUE;
     to_vict = "You feel invulnerable!";
     break;
 
@@ -578,9 +599,11 @@ void mag_affects(int level, struct char_data *ch, struct char_data *victim,
   case SPELL_DARK_AEGIS:
   case SPELL_NIRVANA:
     sanctuary_messages(spellnum, &to_vict, &to_room);
-    af[0].duration = 4;
+    af[0].duration = 18 + (level / 4);
+    if (af[0].duration > 30)
+      af[0].duration = 30;
     SET_BIT_AR(af[0].bitvector, AFF_SANCTUARY);
-    accum_duration = TRUE;
+    refresh_on_recast = TRUE;
     break;
 
   case SPELL_SLEEP:
@@ -615,113 +638,131 @@ void mag_affects(int level, struct char_data *ch, struct char_data *victim,
 
   case SPELL_SENSE_LIFE:
     to_vict = "Your feel your awareness improve.";
-    af[0].duration = GET_LEVEL(ch);
+    af[0].duration = 12 + (level / 6);
+    if (af[0].duration > 18)
+      af[0].duration = 18;
     SET_BIT_AR(af[0].bitvector, AFF_SENSE_LIFE);
-    accum_duration = TRUE;
+    refresh_on_recast = TRUE;
     break;
 
   case SPELL_WATERWALK:
-    af[0].duration = 24;
+    af[0].duration = 15 + (level / 5);
+    if (af[0].duration > 24)
+      af[0].duration = 24;
     SET_BIT_AR(af[0].bitvector, AFF_WATERWALK);
-    accum_duration = TRUE;
+    refresh_on_recast = TRUE;
     to_vict = "You feel webbing between your toes.";
     break;
 
   case SPELL_BEAR_SPIRIT:
     sanctuary_messages(spellnum, &to_vict, &to_room);
-    af[0].duration = 4;
+    buff_duration = 18 + (level / 4);
+    if (buff_duration > 30)
+      buff_duration = 30;
+    af[0].duration = buff_duration;
     SET_BIT_AR(af[0].bitvector, AFF_SANCTUARY);
 
     af[1].location = APPLY_AC;
     af[1].modifier = -15;
-    af[1].duration = 12 + level;
+    af[1].duration = buff_duration;
 
     af[2].location = APPLY_HIT;
     af[2].modifier = 10;
-    af[2].duration = 12 + level;
+    af[2].duration = buff_duration;
 
     af[3].location = APPLY_SAVING_BREATH;
     af[3].modifier = -1;
-    af[3].duration = 12 + level;
+    af[3].duration = buff_duration;
 
-    accum_duration = TRUE;
-    accum_affect = TRUE;
+    refresh_on_recast = TRUE;
     break;
 
   case SPELL_WOLF_SPIRIT:
+    buff_duration = 18 + (level / 4);
+    if (buff_duration > 30)
+      buff_duration = 30;
+
     af[0].location = APPLY_HITROLL;
     af[0].modifier = 2;
-    af[0].duration = 12 + level;
+    af[0].duration = buff_duration;
 
     af[1].location = APPLY_DEX;
     af[1].modifier = 1;
-    af[1].duration = 12 + level;
+    af[1].duration = buff_duration;
 
     af[2].location = APPLY_MELEE_CRIT;
     af[2].modifier = 1;
-    af[2].duration = 12 + level;
+    af[2].duration = buff_duration;
 
-    accum_duration = TRUE;
-    accum_affect = TRUE;
+    refresh_on_recast = TRUE;
     to_vict = "A wolf spirit sharpens your predatory instincts.";
     break;
 
   case SPELL_TIGER_SPIRIT:
+    buff_duration = 18 + (level / 4);
+    if (buff_duration > 30)
+      buff_duration = 30;
+
     af[0].location = APPLY_DAMROLL;
     af[0].modifier = 2;
-    af[0].duration = 12 + level;
+    af[0].duration = buff_duration;
 
     af[1].location = APPLY_HITROLL;
     af[1].modifier = 1;
-    af[1].duration = 12 + level;
+    af[1].duration = buff_duration;
 
     af[2].location = APPLY_MELEE_CRIT_MULT;
     af[2].modifier = 1;
-    af[2].duration = 12 + level;
+    af[2].duration = buff_duration;
 
-    accum_duration = TRUE;
-    accum_affect = TRUE;
+    refresh_on_recast = TRUE;
     to_vict = "A stalking tiger spirit urges you to strike from the shadows.";
     break;
 
   case SPELL_EAGLE_SPIRIT:
-    af[0].duration = 12 + level;
+    buff_duration = 18 + (level / 4);
+    if (buff_duration > 30)
+      buff_duration = 30;
+
+    af[0].duration = buff_duration;
     SET_BIT_AR(af[0].bitvector, AFF_DETECT_INVIS);
 
-    af[1].duration = 12 + level;
+    af[1].duration = buff_duration;
     SET_BIT_AR(af[1].bitvector, AFF_SENSE_LIFE);
 
     af[2].location = APPLY_AC;
     af[2].modifier = -10;
-    af[2].duration = 12 + level;
+    af[2].duration = buff_duration;
 
-    af[3].duration = 12 + level;
+    af[3].duration = buff_duration;
     SET_BIT_AR(af[3].bitvector, AFF_FLYING);
 
-    accum_duration = TRUE;
-    accum_affect = TRUE;
+    refresh_on_recast = TRUE;
     to_vict = "An eagle spirit guides your sight from above.";
     break;
 
   case SPELL_DRAGON_SPIRIT:
+    buff_duration = 18 + (level / 4);
+    if (buff_duration > 30)
+      buff_duration = 30;
+
     af[0].location = APPLY_STR;
     af[0].modifier = 1;
-    af[0].duration = 12 + level;
+    af[0].duration = buff_duration;
 
     af[1].location = APPLY_CON;
     af[1].modifier = 1;
-    af[1].duration = 12 + level;
+    af[1].duration = buff_duration;
 
     af[2].location = APPLY_MOVE;
     af[2].modifier = 15;
-    af[2].duration = 12 + level;
+    af[2].duration = buff_duration;
 
     af[3].location = APPLY_SAVING_BREATH;
     af[3].modifier = -2;
-    af[3].duration = 12 + level;
+    af[3].duration = buff_duration;
 
-    accum_duration = TRUE;
-    accum_affect = TRUE;
+    refresh_on_recast = TRUE;
     to_vict = "A venerable dragon spirit coils protectively around you.";
     break;
   }
@@ -739,6 +780,9 @@ void mag_affects(int level, struct char_data *ch, struct char_data *victim,
       }
     }
   }
+
+  if (refresh_on_recast && affected_by_spell(victim, spellnum))
+    affect_from_char(victim, spellnum);
 
   /* If the victim is already affected by this spell, and the spell does not
    * have an accumulative effect, then fail the spell. */
