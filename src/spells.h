@@ -198,27 +198,56 @@
 #define SPELL_POWER_WORD_SILENCE     157
 #define SPELL_PSYCHIC_CRUSH          158
 #define SPELL_TIME_STOP              159
+#define SPELL_BLACK_LANCE            160
+#define SPELL_REALITY_SLASH          161
+#define SPELL_GRASP_HEART            162
+#define SPELL_NEGATIVE_BURST         163
+#define SPELL_TRUE_DEATH             164
+#define SPELL_PERFECT_UNKNOWABLE     165
+#define SPELL_CRYSTAL_BODY           166
+#define SPELL_GREATER_MAGIC_SEAL     167
+#define SPELL_DESPAIR_AURA           168
+#define SPELL_OBLIVION_SPEAR         169
+#define SPELL_BONE_PRISON            170
+#define SPELL_UNDYING_WILL           171
+#define SPELL_DRAGON_LIGHTNING       172
+#define SPELL_CHAIN_DRAGON_LIGHTNING 173
+#define SPELL_HELL_FLAME             174
+#define SPELL_GRAVITY_MAELSTROM      175
+#define SPELL_CALL_GREATER_THUNDER   176
+#define SPELL_ASTRAL_SMITE           177
+#define SPELL_GREATER_REJECTION      178
+#define SPELL_FALLEN_DOWN            179
+#define SPELL_IA_SHUB_NIGGURATH      180
+#define SPELL_GOAL_OF_ALL_LIFE_IS_DEATH 181
+#define SPELL_CRY_OF_THE_BANSHEE     182
+#define SPELL_NAPALM                 183
 /** Total Number of defined spells */
-#define NUM_SPELLS                   159
+#define NUM_SPELLS                   183
 
 /* Insert new spells here, up to MAX_SPELLS */
-#define MAX_SPELLS		    170
+#define MAX_SPELLS		    190
 
 /* PLAYER SKILLS - Numbered from MAX_SPELLS+1 to MAX_SKILLS */
-#define SKILL_BACKSTAB              171 /* Reserved Skill[] DO NOT CHANGE */
-#define SKILL_BASH                  172 /* Reserved Skill[] DO NOT CHANGE */
-#define SKILL_HIDE                  173 /* Reserved Skill[] DO NOT CHANGE */
-#define SKILL_KICK                  174 /* Reserved Skill[] DO NOT CHANGE */
-#define SKILL_PICK_LOCK             175 /* Reserved Skill[] DO NOT CHANGE */
-#define SKILL_WHIRLWIND             176 
-#define SKILL_RESCUE                177 /* Reserved Skill[] DO NOT CHANGE */
-#define SKILL_SNEAK                 178 /* Reserved Skill[] DO NOT CHANGE */
-#define SKILL_STEAL                 179 /* Reserved Skill[] DO NOT CHANGE */
-#define SKILL_TRACK                 180 /* Reserved Skill[] DO NOT CHANGE */
-#define SKILL_BANDAGE               181 /* Reserved Skill[] DO NOT CHANGE */
+#define SKILL_BACKSTAB              191 /* Reserved Skill[] DO NOT CHANGE */
+#define SKILL_BASH                  192 /* Reserved Skill[] DO NOT CHANGE */
+#define SKILL_HIDE                  193 /* Reserved Skill[] DO NOT CHANGE */
+#define SKILL_KICK                  194 /* Reserved Skill[] DO NOT CHANGE */
+#define SKILL_PICK_LOCK             195 /* Reserved Skill[] DO NOT CHANGE */
+#define SKILL_WHIRLWIND             196 
+#define SKILL_RESCUE                197 /* Reserved Skill[] DO NOT CHANGE */
+#define SKILL_SNEAK                 198 /* Reserved Skill[] DO NOT CHANGE */
+#define SKILL_STEAL                 199 /* Reserved Skill[] DO NOT CHANGE */
+#define SKILL_TRACK                 200 /* Reserved Skill[] DO NOT CHANGE */
+#define SKILL_BANDAGE               201 /* Reserved Skill[] DO NOT CHANGE */
 
-#define SKILL_DUAL_WIELD            182 /* Reserved Skill[] DO NOT CHANGE */
-#define SKILL_RECALL                183 /* Reserved Skill[] DO NOT CHANGE */
+#define SKILL_DUAL_WIELD            202 /* Reserved Skill[] DO NOT CHANGE */
+#define SKILL_RECALL                203 /* Reserved Skill[] DO NOT CHANGE */
+#define SKILL_OVERLORD_PRESENCE     204
+#define SKILL_SUPREME_CASTER_DISCIPLINE 205
+#define SKILL_UNDEAD_COMMAND        206
+#define SKILL_TACTICAL_SPELL_MEMORY 207
+#define SKILL_DREAD_DOMINION        208
 /* New skills may be added here up to MAX_SKILLS (200) */
 
 /* NON-PLAYER AND OBJECT SPELLS AND SKILLS: The practice levels for the spells
@@ -431,6 +460,30 @@ ASPELL(spell_power_word_blind);
 ASPELL(spell_power_word_silence);
 ASPELL(spell_psychic_crush);
 ASPELL(spell_time_stop);
+ASPELL(spell_black_lance);
+ASPELL(spell_reality_slash);
+ASPELL(spell_grasp_heart);
+ASPELL(spell_negative_burst);
+ASPELL(spell_true_death);
+ASPELL(spell_perfect_unknowable);
+ASPELL(spell_crystal_body);
+ASPELL(spell_greater_magic_seal);
+ASPELL(spell_despair_aura);
+ASPELL(spell_oblivion_spear);
+ASPELL(spell_bone_prison);
+ASPELL(spell_undying_will);
+ASPELL(spell_dragon_lightning);
+ASPELL(spell_chain_dragon_lightning);
+ASPELL(spell_hell_flame);
+ASPELL(spell_gravity_maelstrom);
+ASPELL(spell_call_greater_thunder);
+ASPELL(spell_astral_smite);
+ASPELL(spell_greater_rejection);
+ASPELL(spell_fallen_down);
+ASPELL(spell_ia_shub_niggurath);
+ASPELL(spell_goal_of_all_life_is_death);
+ASPELL(spell_cry_of_the_banshee);
+ASPELL(spell_napalm);
 void show_identify_item(struct char_data *ch, struct obj_data *obj, enum identify_detail_level detail);
 
 /* basic magic calling functions */

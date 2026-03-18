@@ -1002,9 +1002,19 @@ static int mag_manacost(struct char_data *ch, int spellnum) {
   int mana = MAX(SINFO.mana_max - (SINFO.mana_change *
       (GET_LEVEL(ch) - SINFO.min_level[(int) GET_CLASS(ch)])),
   SINFO.mana_min);
+  int reduction_pct = 0;
 
   if (ch && AFF_FLAGGED(ch, AFF_EMPOWERED))
     mana = MAX(1, (mana * 9) / 10);
+
+  if (ch && GET_SKILL(ch, SKILL_SUPREME_CASTER_DISCIPLINE) > 0)
+    reduction_pct += 5;
+  if (ch && affected_by_spell(ch, SPELL_ENCHANTERS_FOCUS))
+    reduction_pct += 10;
+  if (reduction_pct > 20)
+    reduction_pct = 20;
+  if (reduction_pct > 0)
+    mana = MAX(1, (mana * (100 - reduction_pct)) / 100);
 
   return mana;
 }
@@ -1822,6 +1832,30 @@ int call_magic(struct char_data *caster, struct char_data *cvict,
       MANUAL_SPELL(spell_time_stop)
       ;
       break;
+    case SPELL_BLACK_LANCE: MANUAL_SPELL(spell_black_lance); break;
+    case SPELL_REALITY_SLASH: MANUAL_SPELL(spell_reality_slash); break;
+    case SPELL_GRASP_HEART: MANUAL_SPELL(spell_grasp_heart); break;
+    case SPELL_NEGATIVE_BURST: MANUAL_SPELL(spell_negative_burst); break;
+    case SPELL_TRUE_DEATH: MANUAL_SPELL(spell_true_death); break;
+    case SPELL_PERFECT_UNKNOWABLE: MANUAL_SPELL(spell_perfect_unknowable); break;
+    case SPELL_CRYSTAL_BODY: MANUAL_SPELL(spell_crystal_body); break;
+    case SPELL_GREATER_MAGIC_SEAL: MANUAL_SPELL(spell_greater_magic_seal); break;
+    case SPELL_DESPAIR_AURA: MANUAL_SPELL(spell_despair_aura); break;
+    case SPELL_OBLIVION_SPEAR: MANUAL_SPELL(spell_oblivion_spear); break;
+    case SPELL_BONE_PRISON: MANUAL_SPELL(spell_bone_prison); break;
+    case SPELL_UNDYING_WILL: MANUAL_SPELL(spell_undying_will); break;
+    case SPELL_DRAGON_LIGHTNING: MANUAL_SPELL(spell_dragon_lightning); break;
+    case SPELL_CHAIN_DRAGON_LIGHTNING: MANUAL_SPELL(spell_chain_dragon_lightning); break;
+    case SPELL_HELL_FLAME: MANUAL_SPELL(spell_hell_flame); break;
+    case SPELL_GRAVITY_MAELSTROM: MANUAL_SPELL(spell_gravity_maelstrom); break;
+    case SPELL_CALL_GREATER_THUNDER: MANUAL_SPELL(spell_call_greater_thunder); break;
+    case SPELL_ASTRAL_SMITE: MANUAL_SPELL(spell_astral_smite); break;
+    case SPELL_GREATER_REJECTION: MANUAL_SPELL(spell_greater_rejection); break;
+    case SPELL_FALLEN_DOWN: MANUAL_SPELL(spell_fallen_down); break;
+    case SPELL_IA_SHUB_NIGGURATH: MANUAL_SPELL(spell_ia_shub_niggurath); break;
+    case SPELL_GOAL_OF_ALL_LIFE_IS_DEATH: MANUAL_SPELL(spell_goal_of_all_life_is_death); break;
+    case SPELL_CRY_OF_THE_BANSHEE: MANUAL_SPELL(spell_cry_of_the_banshee); break;
+    case SPELL_NAPALM: MANUAL_SPELL(spell_napalm); break;
     }
 
   return (1);
@@ -3018,6 +3052,30 @@ void mag_assign_spells(void) {
   TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_NOT_SELF, TRUE, MAG_MANUAL, NULL);
   spello(SPELL_TIME_STOP, "time stop", 180, 100, 0, POS_STANDING,
   TAR_IGNORE, FALSE, MAG_MANUAL, NULL);
+  spello(SPELL_BLACK_LANCE, "black lance", 24, 24, 0, POS_FIGHTING, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_NOT_SELF, TRUE, MAG_MANUAL, NULL);
+  spello(SPELL_REALITY_SLASH, "reality slash", 40, 40, 0, POS_FIGHTING, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_NOT_SELF, TRUE, MAG_MANUAL, NULL);
+  spello(SPELL_GRASP_HEART, "grasp heart", 38, 38, 0, POS_FIGHTING, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_NOT_SELF, TRUE, MAG_MANUAL, NULL);
+  spello(SPELL_NEGATIVE_BURST, "negative burst", 35, 35, 0, POS_FIGHTING, TAR_IGNORE, TRUE, MAG_MANUAL, NULL);
+  spello(SPELL_TRUE_DEATH, "true death", 55, 55, 0, POS_FIGHTING, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_NOT_SELF, TRUE, MAG_MANUAL, NULL);
+  spello(SPELL_PERFECT_UNKNOWABLE, "perfect unknowable", 30, 30, 0, POS_STANDING, TAR_SELF_ONLY, FALSE, MAG_MANUAL, "The veil of perfect unknowability slips away.");
+  spello(SPELL_CRYSTAL_BODY, "crystal body", 28, 28, 0, POS_STANDING, TAR_SELF_ONLY, FALSE, MAG_MANUAL, "Your crystal body fractures and fades.");
+  spello(SPELL_GREATER_MAGIC_SEAL, "greater magic seal", 34, 34, 0, POS_FIGHTING, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_NOT_SELF, TRUE, MAG_MANUAL, NULL);
+  spello(SPELL_DESPAIR_AURA, "despair aura", 32, 32, 0, POS_STANDING, TAR_SELF_ONLY, FALSE, MAG_MANUAL, "Your aura of despair fades.");
+  spello(SPELL_OBLIVION_SPEAR, "oblivion spear", 45, 45, 0, POS_FIGHTING, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_NOT_SELF, TRUE, MAG_MANUAL, NULL);
+  spello(SPELL_BONE_PRISON, "bone prison", 26, 26, 0, POS_FIGHTING, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_NOT_SELF, TRUE, MAG_MANUAL, "The bone prison collapses around you.");
+  spello(SPELL_UNDYING_WILL, "undying will", 35, 35, 0, POS_STANDING, TAR_SELF_ONLY, FALSE, MAG_MANUAL, "Your undying will finally relaxes.");
+  spello(SPELL_DRAGON_LIGHTNING, "dragon lightning", 28, 28, 0, POS_FIGHTING, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_NOT_SELF, TRUE, MAG_MANUAL, NULL);
+  spello(SPELL_CHAIN_DRAGON_LIGHTNING, "chain dragon lightning", 42, 42, 0, POS_FIGHTING, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_NOT_SELF, TRUE, MAG_MANUAL, NULL);
+  spello(SPELL_HELL_FLAME, "hell flame", 36, 36, 0, POS_FIGHTING, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_NOT_SELF, TRUE, MAG_MANUAL, "The clinging black hell flame finally burns out.");
+  spello(SPELL_GRAVITY_MAELSTROM, "gravity maelstrom", 38, 38, 0, POS_FIGHTING, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_NOT_SELF, TRUE, MAG_MANUAL, NULL);
+  spello(SPELL_CALL_GREATER_THUNDER, "call greater thunder", 50, 50, 0, POS_FIGHTING, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_NOT_SELF, TRUE, MAG_MANUAL, NULL);
+  spello(SPELL_ASTRAL_SMITE, "astral smite", 40, 40, 0, POS_FIGHTING, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_NOT_SELF, TRUE, MAG_MANUAL, NULL);
+  spello(SPELL_GREATER_REJECTION, "greater rejection", 30, 30, 0, POS_FIGHTING, TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_NOT_SELF, TRUE, MAG_MANUAL, NULL);
+  spello(SPELL_NAPALM, "napalm", 38, 38, 0, POS_FIGHTING, TAR_IGNORE, TRUE, MAG_MANUAL, NULL);
+  spello(SPELL_FALLEN_DOWN, "fallen down", 80, 80, 0, POS_FIGHTING, TAR_IGNORE, TRUE, MAG_MANUAL, NULL);
+  spello(SPELL_IA_SHUB_NIGGURATH, "ia shub niggurath", 90, 90, 0, POS_FIGHTING, TAR_IGNORE, TRUE, MAG_MANUAL, NULL);
+  spello(SPELL_GOAL_OF_ALL_LIFE_IS_DEATH, "goal of all life is death", 60, 60, 0, POS_STANDING, TAR_SELF_ONLY, FALSE, MAG_MANUAL, "The certainty of death fades, but its truth remains.");
+  spello(SPELL_CRY_OF_THE_BANSHEE, "cry of the banshee", 55, 55, 0, POS_FIGHTING, TAR_IGNORE, TRUE, MAG_MANUAL, NULL);
 
   /* NON-castable spells should appear below here. */
   spello(SPELL_IDENTIFY, "identify", 0, 0, 0, 0,
@@ -3044,4 +3102,9 @@ void mag_assign_spells(void) {
 
   skillo_cost(SKILL_DUAL_WIELD, "dual wield", 0);
   skillo_cost(SKILL_RECALL, "recall", 0);
+  skillo_cost(SKILL_OVERLORD_PRESENCE, "overlord presence", 0);
+  skillo_cost(SKILL_SUPREME_CASTER_DISCIPLINE, "supreme caster discipline", 0);
+  skillo_cost(SKILL_UNDEAD_COMMAND, "undead command", 0);
+  skillo_cost(SKILL_TACTICAL_SPELL_MEMORY, "tactical spell memory", 0);
+  skillo_cost(SKILL_DREAD_DOMINION, "dread dominion", 0);
 }
