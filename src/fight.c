@@ -76,10 +76,6 @@ static char *replace_string(const char *str, const char *weapon_singular, const 
 static void do_spirit_procs(struct char_data *ch, struct char_data *vict);
 
 
-/* Per-hit crit multiplier for message shaping (0 means no crit for this hit). */
-static int current_crit_mult_for_msgs = 0;
-
-
 static int damage_severity_tier(int dam, struct char_data *victim)
 {
   int pct;
@@ -123,9 +119,9 @@ static const char *severity_verb_base(int tier)
     case 4: return "strike";
     case 5: return "slam";
     case 6: return "crush";
-    case 7: return "devastate";
-    case 8: return "maim";
-    case 9: return "annihilate";
+    case 7: return "blast";
+    case 8: return "shred";
+    case 9: return "pulverize";
     default: return "hit";
   }
 }
@@ -139,10 +135,61 @@ static const char *severity_verb_third(int tier)
     case 4: return "strikes";
     case 5: return "slams";
     case 6: return "crushes";
-    case 7: return "devastates";
-    case 8: return "maims";
-    case 9: return "annihilates";
+    case 7: return "blasts";
+    case 8: return "shreds";
+    case 9: return "pulverizes";
     default: return "hits";
+  }
+}
+
+static const char *severity_impact_wrap_open(int tier)
+{
+  switch (tier) {
+    case 7: return "- ";
+    case 8: return "** ";
+    case 9: return "***** ";
+    default: return "";
+  }
+}
+
+static const char *severity_impact_wrap_close(int tier)
+{
+  switch (tier) {
+    case 7: return " -";
+    case 8: return " **";
+    case 9: return " *****";
+    default: return "";
+  }
+}
+
+static int victim_condition_band(const struct char_data *victim)
+{
+  int pct;
+
+  if (!victim || GET_MAX_HIT(victim) <= 0)
+    return 7;
+
+  pct = (GET_HIT(victim) * 100) / GET_MAX_HIT(victim);
+
+  if (pct >= 100) return 0;
+  if (pct >= 90)  return 1;
+  if (pct >= 75)  return 2;
+  if (pct >= 50)  return 3;
+  if (pct >= 30)  return 4;
+  if (pct >= 15)  return 5;
+  return 6;
+}
+
+static const char *victim_condition_text(int band)
+{
+  switch (band) {
+    case 0: return "is in excellent condition.";
+    case 1: return "has a few scratches.";
+    case 2: return "has some small wounds and bruises.";
+    case 3: return "has quite a few wounds.";
+    case 4: return "has some big nasty wounds and scratches.";
+    case 5: return "is gravely injured.";
+    default: return "needs a hospital.";
   }
 }
 
@@ -151,14 +198,8 @@ static void apply_severity_verb(char *out, size_t outsz, const char *in, int tie
   const char *col = severity_color(tier);
   const char *vb  = severity_verb_base(tier);
   const char *vt  = severity_verb_third(tier);
-
-
-  /* Max crit tier: swap the action verb to an inline censor token. */
-  if (current_crit_mult_for_msgs >= 400) {
-    col = "	W";
-    vb  = "###CENSORED###";
-    vt  = "###CENSORED###";
-  }
+  const char *pre = severity_impact_wrap_open(tier);
+  const char *post = severity_impact_wrap_close(tier);
   char *pos;
 
   if (!in || !*in) {
@@ -172,14 +213,14 @@ static void apply_severity_verb(char *out, size_t outsz, const char *in, int tie
   if ((pos = strstr(out, " hit "))) {
     char tmp[MAX_STRING_LENGTH];
     *pos = '\0';
-    snprintf(tmp, sizeof(tmp), "%s %s%s\tn %s%s", out, col, vb, pos + 5, "");
+    snprintf(tmp, sizeof(tmp), "%s %s%s%s%s\tn %s", out, col, pre, vb, post, pos + 5);
     snprintf(out, outsz, "%s", tmp);
     return;
   }
   if ((pos = strstr(out, " hit!"))) {
     char tmp[MAX_STRING_LENGTH];
     *pos = '\0';
-    snprintf(tmp, sizeof(tmp), "%s %s%s\tn!%s", out, col, vb, pos + 5);
+    snprintf(tmp, sizeof(tmp), "%s %s%s%s%s\tn!%s", out, col, pre, vb, post, pos + 5);
     snprintf(out, outsz, "%s", tmp);
     return;
   }
@@ -188,14 +229,14 @@ static void apply_severity_verb(char *out, size_t outsz, const char *in, int tie
   if ((pos = strstr(out, " hits "))) {
     char tmp[MAX_STRING_LENGTH];
     *pos = '\0';
-    snprintf(tmp, sizeof(tmp), "%s %s%s\tn %s%s", out, col, vt, pos + 6, "");
+    snprintf(tmp, sizeof(tmp), "%s %s%s%s%s\tn %s", out, col, pre, vt, post, pos + 6);
     snprintf(out, outsz, "%s", tmp);
     return;
   }
   if ((pos = strstr(out, " hits!"))) {
     char tmp[MAX_STRING_LENGTH];
     *pos = '\0';
-    snprintf(tmp, sizeof(tmp), "%s %s%s\tn!%s", out, col, vt, pos + 6);
+    snprintf(tmp, sizeof(tmp), "%s %s%s%s%s\tn!%s", out, col, pre, vt, post, pos + 6);
     snprintf(out, outsz, "%s", tmp);
     return;
   }
@@ -937,21 +978,21 @@ static void dam_message(int dam, struct char_data *ch, struct char_data *victim,
     },
 
     {
-      "$n 	Rdevastates	n $N with $s #w!",
-      "You 	Rdevastate	n $N with your #w!",
-      "$n 	Rdevastates	n you with $s #w!"
+      "$n \tR- blasts -\tn $N with $s #w!",
+      "You \tR- blast -\tn $N with your #w!",
+      "$n \tR- blasts -\tn you with $s #w!"
     },
 
     {
-      "$n 	Mmaims	n $N with $s #w!",
-      "You 	Mmaim	n $N with your #w!",
-      "$n 	Mmaims	n you with $s #w!"
+      "$n \tM** shreds **\tn $N with $s #w!",
+      "You \tM** shred **\tn $N with your #w!",
+      "$n \tM** shreds **\tn you with $s #w!"
     },
 
     {
-      "$n 	Rannihilates	n $N with $s #w!!",
-      "You 	Rannihilate	n $N with your #w!!",
-      "$n 	Rannihilates	n you with $s #w!!"
+      "$n \tR***** pulverizes *****\tn $N with $s #w!!",
+      "You \tR***** pulverize *****\tn $N with your #w!!",
+      "$n \tR***** pulverizes *****\tn you with $s #w!!"
     }
   };
 
@@ -1124,6 +1165,8 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
     dam = (dam * OFFHAND_DAMAGE_PCT) / 100;
   }
 
+  int old_hit = 0;
+  int old_band = 0;
   long local_gold = 0, happy_gold = 0;
   char local_buf[256];
   struct char_data *tmp_char;
@@ -1198,9 +1241,7 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
     int mult = 200;
     if (crit_check_melee(ch, &mult)) {
       dam = (dam * mult) / 100;
-      current_crit_mult_for_msgs = mult;
       crit_show_banner(ch, victim, mult);
-      current_crit_mult_for_msgs = mult;
     }
   }
 
@@ -1213,6 +1254,8 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
 
   /* Set the maximum damage per round and subtract the hit points */
   dam = MAX(MIN(dam, 1000), 0);
+  old_hit = GET_HIT(victim);
+  old_band = victim_condition_band(victim);
   GET_HIT(victim) -= dam;
 
   /* Gain exp for the hit */
@@ -1234,27 +1277,30 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
     int shown = skill_message(dam, ch, victim, attacktype);
     if (!shown && dam > 0 && IN_ROOM(victim) != NOWHERE) {
       static const char *const v3[] = {
-        "misses", "grazes", "glances", "hits", "strikes", "slams", "crushes", "devastates", "maims", "annihilates"
+        "misses", "grazes", "glances", "hits", "strikes", "slams", "crushes", "blasts", "shreds", "pulverizes"
       };
       static const char *const v3_past[] = {
-        "missed", "grazed", "glanced", "hit", "struck", "slammed", "crushed", "devastated", "maimed", "annihilated"
+        "missed", "grazed", "glanced", "hit", "struck", "slammed", "crushed", "blasted", "shredded", "pulverized"
       };
       int tier = damage_severity_tier(dam, victim);
+      const char *col = severity_color(tier);
+      const char *pre = severity_impact_wrap_open(tier);
+      const char *post = severity_impact_wrap_close(tier);
       if (tier < 0) tier = 0;
       if (tier > 9) tier = 9;
       if (ch) {
-        char to_char[128], to_vict[128], to_room[128];
-        snprintf(to_char, sizeof(to_char), "Your magic %s $N.", v3[tier]);
-        snprintf(to_vict, sizeof(to_vict), "$n's magic %s you.", v3[tier]);
-        snprintf(to_room, sizeof(to_room), "$n's magic %s $N.", v3[tier]);
+        char to_char[160], to_vict[160], to_room[160];
+        snprintf(to_char, sizeof(to_char), "Your magic %s%s%s%s\tn $N.", col, pre, v3[tier], post);
+        snprintf(to_vict, sizeof(to_vict), "$n's magic %s%s%s%s\tn you.", col, pre, v3[tier], post);
+        snprintf(to_room, sizeof(to_room), "$n's magic %s%s%s%s\tn $N.", col, pre, v3[tier], post);
         act(to_room, FALSE, ch, NULL, victim, TO_NOTVICT);
         act(to_char, FALSE, ch, NULL, victim, TO_CHAR);
         act(to_vict, FALSE, ch, NULL, victim, TO_VICT | TO_SLEEP);
       } else {
-        send_to_char(victim, "Lingering magic %s you.\r\n", v3[tier]);
+        send_to_char(victim, "Lingering magic %s%s%s%s\tn you.\r\n", col, pre, v3[tier], post);
         {
-          char roommsg[128];
-          snprintf(roommsg, sizeof(roommsg), "$n is %s by lingering magic.", v3_past[tier]);
+          char roommsg[160];
+          snprintf(roommsg, sizeof(roommsg), "$n is %s%s%s%s\tn by lingering magic.", col, pre, v3_past[tier], post);
           act(roommsg, TRUE, victim, 0, 0, TO_ROOM);
         }
       }
@@ -1277,7 +1323,18 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
       dam_message(dam, ch, victim, attacktype);
     }
   }
-  current_crit_mult_for_msgs = 0;
+  if (ch && victim && ch != victim && GET_POS(victim) > POS_DEAD && dam > 0) {
+    int new_band = victim_condition_band(victim);
+    int tier = damage_severity_tier(dam, victim);
+
+    if ((new_band > old_band && tier >= 4) || tier >= 7) {
+      send_to_char(ch, "\tC%s %s\tn\r\n", GET_NAME(victim), victim_condition_text(new_band));
+      if (GET_LEVEL(ch) >= LVL_IMMORT)
+        send_to_char(ch, "\tD(cond: %d%% -> %d%%)\tn\r\n",
+                     (old_hit * 100) / MAX(1, GET_MAX_HIT(victim)),
+                     (GET_HIT(victim) * 100) / MAX(1, GET_MAX_HIT(victim)));
+    }
+  }
 
 
   /* Use send_to_char -- act() doesn't send message if you are DEAD. */
