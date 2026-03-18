@@ -1109,6 +1109,51 @@ ACMD(do_pet_release)
   extract_char(pet);
 }
 
+ACMD(do_heel)
+{
+  char arg[MAX_INPUT_LENGTH];
+  struct char_data *pet = NULL, *it;
+
+  one_argument(argument, arg);
+
+  for (it = character_list; it; it = it->next) {
+    if (!IS_NPC(it))
+      continue;
+    if (it->master != ch)
+      continue;
+    if (!AFF_FLAGGED(it, AFF_CHARM))
+      continue;
+    if (!is_purchased_pet(ch, it))
+      continue;
+    if (*arg && !isname(arg, it->player.name))
+      continue;
+    pet = it;
+    break;
+  }
+
+  if (!pet) {
+    send_to_char(ch, "You have no purchased pet by that name to heel.\r\n");
+    return;
+  }
+
+  if (IN_ROOM(pet) == IN_ROOM(ch)) {
+    act("$N is already here at your side.", FALSE, ch, 0, pet, TO_CHAR);
+    return;
+  }
+
+  if (FIGHTING(pet))
+    stop_fighting(pet);
+
+  if (IN_ROOM(pet) != NOWHERE)
+    char_from_room(pet);
+  char_to_room(pet, IN_ROOM(ch));
+  GET_POS(pet) = POS_STANDING;
+
+  act("You whistle sharply and $N heels to your side.", FALSE, ch, 0, pet, TO_CHAR);
+  act("$N hustles back to $n and takes position at $s side.", FALSE, ch, 0, pet, TO_ROOM);
+  act("$n hustles in and heels beside $N.", FALSE, pet, 0, ch, TO_ROOM);
+}
+
 ACMD(do_opet)
 {
   char first_arg[MAX_INPUT_LENGTH], command_part[MAX_INPUT_LENGTH];

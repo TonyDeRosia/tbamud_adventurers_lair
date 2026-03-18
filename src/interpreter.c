@@ -141,6 +141,7 @@ cpp_extern const struct command_info cmd_info[] = {
   { "brief"    , "br"      , POS_DEAD    , do_gen_tog  , 0, SCMD_BRIEF },
   { "bid"      , "bid"     , POS_SLEEPING, do_bid      , 0, 0 },
   { "buildwalk", "buildwalk", POS_STANDING, do_gen_tog , LVL_BUILDER, SCMD_BUILDWALK },
+  { "adopt"    , "ad"      , POS_STANDING, do_not_here , 0, 0 },
   { "buy"      , "bu"      , POS_STANDING, do_not_here , 0, 0 },
   { "bug"      , "bug"     , POS_DEAD    , do_ibt      , 0, SCMD_BUG },
 
@@ -268,6 +269,7 @@ cpp_extern const struct command_info cmd_info[] = {
 
   { "open"     , "o"       , POS_SITTING , do_gen_door , 0, SCMD_OPEN },
   { "opet"     , "opet"    , POS_RESTING , do_opet     , 1, 0 },
+  { "heel"     , "heel"    , POS_RESTING , do_heel     , 0, 0 },
   { "order"    , "ord"     , POS_RESTING , do_order    , 1, 0 },
   { "offer"    , "off"     , POS_STANDING, do_not_here , 1, 0 },
   { "olc"      , "olc"     , POS_DEAD    , do_show_save_list, LVL_BUILDER, 0 },

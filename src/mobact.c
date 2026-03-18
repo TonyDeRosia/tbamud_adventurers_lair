@@ -54,8 +54,8 @@ void mobile_activity(void)
     }
 
     if (MOB_FLAGGED(ch, MOB_AI_ACTOR) && CONFIG_AI_ACTOR_ENABLED) {
-      ai_actor_tick(ch, time(0));
-      continue;
+      if (ai_actor_tick(ch, time(0)))
+        continue;
     }
 
     /* If the mob has no specproc, do the default actions */

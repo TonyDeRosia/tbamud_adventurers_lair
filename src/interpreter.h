@@ -130,6 +130,7 @@ ACMD(do_balance);
 ACMD(do_smartspawn);
 ACMD(do_aistate);
 ACMD(do_aictl);
+ACMD(do_heel);
 
 
 #endif /* _INTERPRETER_H_ */
