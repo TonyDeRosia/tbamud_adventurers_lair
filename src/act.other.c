@@ -89,7 +89,51 @@ static int is_skill_id(int i)
 #endif
 #endif
 }
-static void show_ability_table_aligned(struct char_data *ch, int show_spells, int show_all)
+static int is_active_on_char(struct char_data *ch, int spellnum)
+{
+  struct affected_type *af;
+  for (af = ch->affected; af; af = af->next) {
+    if (af->spell == spellnum)
+      return 1;
+  }
+  return 0;
+}
+
+static int ability_matches_filter(struct char_data *ch, int ability, const char *filter, int show_spells)
+{
+  const struct spell_info_type *si = &spell_info[ability];
+  const char *nm = si->name ? si->name : "";
+
+  if (!filter || !*filter)
+    return 1;
+
+  if (!str_cmp(filter, "affected"))
+    return show_spells && is_active_on_char(ch, ability);
+  if (!str_cmp(filter, "unaffected"))
+    return show_spells && !is_active_on_char(ch, ability);
+  if (!str_cmp(filter, "combat"))
+    return si->violent || IS_SET(si->routines, MAG_DAMAGE);
+  if (!str_cmp(filter, "healing") || !str_cmp(filter, "curative"))
+    return IS_SET(si->routines, MAG_POINTS) || strstr(nm, "cure");
+  if (!str_cmp(filter, "movement"))
+    return strstr(nm, "fly") || strstr(nm, "recall") || strstr(nm, "portal");
+  if (!str_cmp(filter, "area"))
+    return IS_SET(si->routines, MAG_AREAS | MAG_MASSES);
+  if (!str_cmp(filter, "spellup"))
+    return !si->violent && IS_SET(si->routines, MAG_AFFECTS) && IS_SET(si->targets, TAR_SELF_ONLY);
+  if (!str_cmp(filter, "learned"))
+    return GET_SKILL(ch, ability) > 0;
+  if (!str_cmp(filter, "object"))
+    return IS_SET(si->targets, TAR_OBJ_ROOM | TAR_OBJ_INV | TAR_OBJ_WORLD | TAR_OBJ_EQUIP) || IS_SET(si->routines, MAG_ALTER_OBJS);
+  if (!str_cmp(filter, "attack") || !str_cmp(filter, "bad"))
+    return si->violent;
+  if (!str_cmp(filter, "fire") || !str_cmp(filter, "cold") || !str_cmp(filter, "acid") || !str_cmp(filter, "electric"))
+    return strstr(nm, filter) != NULL;
+
+  return strstr(nm, filter) != NULL;
+}
+
+static void show_ability_table_aligned(struct char_data *ch, int show_spells, int show_all, const char *filter)
 {
   int i;
   int cls = GET_CLASS(ch);
@@ -124,6 +168,7 @@ static void show_ability_table_aligned(struct char_data *ch, int show_spells, in
     if (pct <= 0) pct = -1;
     nm = spell_info[i].name;
     if (!nm || !*nm) continue;
+    if (!ability_matches_filter(ch, i, filter, show_spells)) continue;
 
     /* filter placeholders */
     if (!strcmp(nm, "!UNUSED!")) continue;
@@ -464,17 +509,20 @@ ACMD(do_steal)
 }
 ACMD(do_skills)
 {
-  char arg[MAX_INPUT_LENGTH];
+  char arg[MAX_INPUT_LENGTH], filter[MAX_INPUT_LENGTH];
   int show_all = 0;
+  *filter = '\0';
 
-  one_argument(argument, arg);
+  half_chop(argument, arg, filter);
   if (*arg && !str_cmp(arg, "all"))
     show_all = 1;
+  else if (*arg && !*filter)
+    strlcpy(filter, arg, sizeof(filter));
 
   send_to_char(ch, "You have %d practice sessions remaining.\r\n", GET_PRACTICES(ch));
   if (show_all)
     send_to_char(ch, "Showing all skills your class can learn at any level.\r\n");
-  show_ability_table_aligned(ch, 0, show_all);
+  show_ability_table_aligned(ch, 0, show_all, filter);
 }
 ACMD(do_spellbook)
 {
@@ -1389,6 +1437,10 @@ ACMD(do_gen_tog)
   case SCMD_ZONERESETS:
     result = PRF_TOG_CHK(ch, PRF_ZONERESETS);
     break;
+  case SCMD_SHORTFLAGS:
+    result = PRF_TOG_CHK(ch, PRF_SHORTFLAGS);
+    send_to_char(ch, "Shortflags %s.\r\n", result ? "enabled" : "disabled");
+    return;
   default:
     log("SYSERR: Unknown subcmd %d in do_gen_toggle.", subcmd);
     return;
@@ -1544,15 +1596,30 @@ ACMD(do_happyhour)
 }
 ACMD(do_spells)
 {
-  char arg[MAX_INPUT_LENGTH];
+  char arg[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], filter[MAX_INPUT_LENGTH];
   int show_all = 0;
+  int show_spells = 1;
+  *filter = '\0';
 
-  one_argument(argument, arg);
-  if (*arg && !str_cmp(arg, "all"))
+  half_chop(argument, arg, arg2);
+  if (subcmd == 1) {
     show_all = 1;
+    show_spells = 1;
+    if (*arg && !str_cmp(arg, "all"))
+      strlcpy(filter, "", sizeof(filter));
+    else if (*arg && is_number(arg))
+      strlcpy(filter, "", sizeof(filter));
+    else
+      strlcpy(filter, arg, sizeof(filter));
+  } else if (*arg && !str_cmp(arg, "all"))
+    show_all = 1;
+  else if (*arg)
+    strlcpy(filter, arg, sizeof(filter));
+  if (*arg2)
+    strlcpy(filter, arg2, sizeof(filter));
 
   send_to_char(ch, "You have %d practice sessions remaining.\r\n", GET_PRACTICES(ch));
-  if (show_all)
+  if (show_all || subcmd == 1)
     send_to_char(ch, "Showing all spells your class can learn at any level.\r\n");
-  show_ability_table_aligned(ch, 1, show_all);
+  show_ability_table_aligned(ch, show_spells, show_all, filter);
 }

@@ -262,20 +262,26 @@ static void show_obj_to_char(struct obj_data *obj, struct char_data *ch, int mod
 
 static void show_obj_modifiers(struct obj_data *obj, struct char_data *ch)
 {
+  int shortflags = (!IS_NPC(ch) && PRF_FLAGGED(ch, PRF_SHORTFLAGS));
+
   if (OBJ_FLAGGED(obj, ITEM_INVISIBLE))
-    send_to_char(ch, " (invisible)");
+    send_to_char(ch, shortflags ? " (I)" : " (Invis)");
 
   if (OBJ_FLAGGED(obj, ITEM_BLESS) && AFF_FLAGGED(ch, AFF_DETECT_ALIGN))
-    send_to_char(ch, " ..It glows blue!");
+    send_to_char(ch, shortflags ? " (B)" : " (Blue Aura)");
 
   if (OBJ_FLAGGED(obj, ITEM_MAGIC) && AFF_FLAGGED(ch, AFF_DETECT_MAGIC))
-    send_to_char(ch, " ..It glows yellow!");
+    send_to_char(ch, shortflags ? " (M)" : " (Magic)");
 
   if (OBJ_FLAGGED(obj, ITEM_GLOW))
-    send_to_char(ch, " ..It has a soft glowing aura!");
+    send_to_char(ch, shortflags ? " (G)" : " (Glow)");
 
   if (OBJ_FLAGGED(obj, ITEM_HUM))
-    send_to_char(ch, " ..It emits a faint humming sound!");
+    send_to_char(ch, shortflags ? " (H)" : " (Hum)");
+  if (OBJ_FLAGGED(obj, ITEM_NODROP))
+    send_to_char(ch, shortflags ? " (K)" : " (Cursed)");
+  if (OBJ_FLAGGED(obj, ITEM_ANTI_GOOD))
+    send_to_char(ch, shortflags ? " (R)" : " (Red Aura)");
 }
 
 static void list_obj_to_char(struct obj_data *list, struct char_data *ch, int mode, int show)
@@ -433,11 +439,34 @@ static void list_one_char(struct char_data *i, struct char_data *ch)
     if (AFF_FLAGGED(i, AFF_INVISIBLE))
       send_to_char(ch, "*");
 
-    if (AFF_FLAGGED(ch, AFF_DETECT_ALIGN)) {
-      if (IS_EVIL(i))
-        send_to_char(ch, "(Red Aura) ");
-      else if (IS_GOOD(i))
-        send_to_char(ch, "(Blue Aura) ");
+    {
+      int shortflags = (!IS_NPC(ch) && PRF_FLAGGED(ch, PRF_SHORTFLAGS));
+      if (!IS_NPC(i))
+        send_to_char(ch, shortflags ? "(P) " : "(Player) ");
+      if (AFF_FLAGGED(i, AFF_CHARM))
+        send_to_char(ch, shortflags ? "(C) " : "(Charmed) ");
+      if (AFF_FLAGGED(i, AFF_POISON))
+        send_to_char(ch, shortflags ? "(D) " : "(Diseased) ");
+      if (AFF_FLAGGED(i, AFF_FLYING))
+        send_to_char(ch, shortflags ? "(F) " : "(Flying) ");
+      if (AFF_FLAGGED(i, AFF_HIDE))
+        send_to_char(ch, shortflags ? "(H) " : "(Hidden) ");
+      if (AFF_FLAGGED(i, AFF_INVISIBLE))
+        send_to_char(ch, shortflags ? "(I) " : "(Invis) ");
+      if (AFF_FLAGGED(i, AFF_SNEAK) && AFF_FLAGGED(ch, AFF_SENSE_LIFE))
+        send_to_char(ch, shortflags ? "(S) " : "(Stealth) ");
+      if (AFF_FLAGGED(i, AFF_SANCTUARY))
+        send_to_char(ch, shortflags ? "(W) " : "(White Aura) ");
+      if (!IS_NPC(i) && PLR_FLAGGED(i, PLR_KILLER))
+        send_to_char(ch, "(OPK) ");
+      if (IS_NPC(i) && MOB_FLAGGED(i, MOB_AGGRESSIVE) && AFF_FLAGGED(ch, AFF_SENSE_LIFE))
+        send_to_char(ch, "(Angry) ");
+      if (AFF_FLAGGED(ch, AFF_DETECT_ALIGN)) {
+        if (IS_EVIL(i))
+          send_to_char(ch, shortflags ? "(R) " : "(Red Aura) ");
+        else if (IS_GOOD(i))
+          send_to_char(ch, shortflags ? "(G) " : "(Golden Aura) ");
+      }
     }
     send_to_char(ch, "%s", i->player.long_descr);
 
@@ -454,10 +483,13 @@ static void list_one_char(struct char_data *i, struct char_data *ch)
   else
     send_to_char(ch, "%s%s%s", i->player.name, *GET_TITLE(i) ? " " : "", GET_TITLE(i));
 
-  if (AFF_FLAGGED(i, AFF_INVISIBLE))
-    send_to_char(ch, " (invisible)");
-  if (AFF_FLAGGED(i, AFF_HIDE))
-    send_to_char(ch, " (hidden)");
+  {
+    int shortflags = (!IS_NPC(ch) && PRF_FLAGGED(ch, PRF_SHORTFLAGS));
+    if (AFF_FLAGGED(i, AFF_INVISIBLE))
+      send_to_char(ch, shortflags ? " (I)" : " (invisible)");
+    if (AFF_FLAGGED(i, AFF_HIDE))
+      send_to_char(ch, shortflags ? " (H)" : " (hidden)");
+  }
   if (!IS_NPC(i) && !i->desc)
     send_to_char(ch, " (linkless)");
   if (!IS_NPC(i) && PLR_FLAGGED(i, PLR_WRITING))
@@ -491,11 +523,32 @@ static void list_one_char(struct char_data *i, struct char_data *ch)
       send_to_char(ch, " is here struggling with thin air.");
   }
 
-  if (AFF_FLAGGED(ch, AFF_DETECT_ALIGN)) {
-    if (IS_EVIL(i))
-      send_to_char(ch, " (Red Aura)");
-    else if (IS_GOOD(i))
-      send_to_char(ch, " (Blue Aura)");
+  {
+    int shortflags = (!IS_NPC(ch) && PRF_FLAGGED(ch, PRF_SHORTFLAGS));
+    if (!IS_NPC(i))
+      send_to_char(ch, shortflags ? " (P)" : " (Player)");
+    if (AFF_FLAGGED(i, AFF_CHARM))
+      send_to_char(ch, shortflags ? " (C)" : " (Charmed)");
+    if (AFF_FLAGGED(i, AFF_POISON))
+      send_to_char(ch, shortflags ? " (D)" : " (Diseased)");
+    if (AFF_FLAGGED(i, AFF_FLYING))
+      send_to_char(ch, shortflags ? " (F)" : " (Flying)");
+    if (AFF_FLAGGED(i, AFF_SNEAK) && AFF_FLAGGED(ch, AFF_SENSE_LIFE))
+      send_to_char(ch, shortflags ? " (S)" : " (Stealth)");
+    if (AFF_FLAGGED(i, AFF_SANCTUARY))
+      send_to_char(ch, shortflags ? " (W)" : " (White Aura)");
+    if (!IS_NPC(i) && PLR_FLAGGED(i, PLR_KILLER))
+      send_to_char(ch, " (OPK)");
+    if (IS_NPC(i) && MOB_FLAGGED(i, MOB_AGGRESSIVE) && AFF_FLAGGED(ch, AFF_SENSE_LIFE))
+      send_to_char(ch, " (Angry)");
+    if (GET_MAX_HIT(i) > 0 && (100 * GET_HIT(i) / GET_MAX_HIT(i)) < 60)
+      send_to_char(ch, " (Wounded)");
+    if (AFF_FLAGGED(ch, AFF_DETECT_ALIGN)) {
+      if (IS_EVIL(i))
+        send_to_char(ch, shortflags ? " (R)" : " (Red Aura)");
+      else if (IS_GOOD(i))
+        send_to_char(ch, shortflags ? " (G)" : " (Golden Aura)");
+    }
   }
   if (is_player_quest_target(ch, i))
     send_to_char(ch, " %s[QUEST]%s", CCRED(ch, C_NRM), CCNRM(ch, C_NRM));
@@ -3624,6 +3677,9 @@ ACMD(do_toggle)
     {"verbose", PRF_VERBOSE, LVL_IMMORT,
       "You will no longer see verbose output in listings.\n",
       "You will now see verbose listings.\n"},
+    {"shortflags", PRF_SHORTFLAGS, 0,
+      "Short aura/object flags disabled.\r\n",
+      "Short aura/object flags enabled.\r\n"},
     {"\n", 0, -1, "\n", "\n"} /* must be last */
   };
 
@@ -4250,24 +4306,40 @@ ACMD(do_areas)
 static void build_scan_target_tags(struct char_data *viewer, struct char_data *target,
                                    char *out, size_t outsz)
 {
+  int shortflags = (!IS_NPC(viewer) && PRF_FLAGGED(viewer, PRF_SHORTFLAGS));
+
   out[0] = '\0';
 
   if (!IS_NPC(target) && PRF_FLAGGED(target, PRF_AFK))
     strlcat(out, "[AFK] ", outsz);
   if (!IS_NPC(target))
-    strlcat(out, "(Player) ", outsz);
+    strlcat(out, shortflags ? "(P) " : "(Player) ", outsz);
   if (AFF_FLAGGED(target, AFF_INVISIBLE))
-    strlcat(out, "(Invis) ", outsz);
+    strlcat(out, shortflags ? "(I) " : "(Invis) ", outsz);
   if (AFF_FLAGGED(target, AFF_HIDE))
-    strlcat(out, "(Hidden) ", outsz);
+    strlcat(out, shortflags ? "(H) " : "(Hidden) ", outsz);
   if (AFF_FLAGGED(target, AFF_FLYING))
-    strlcat(out, "(Flying) ", outsz);
+    strlcat(out, shortflags ? "(F) " : "(Flying) ", outsz);
   if (AFF_FLAGGED(target, AFF_SANCTUARY))
-    strlcat(out, "(White Aura) ", outsz);
+    strlcat(out, shortflags ? "(W) " : "(White Aura) ", outsz);
   if (AFF_FLAGGED(target, AFF_CHARM))
-    strlcat(out, "(Charmed) ", outsz);
+    strlcat(out, shortflags ? "(C) " : "(Charmed) ", outsz);
+  if (AFF_FLAGGED(target, AFF_POISON))
+    strlcat(out, shortflags ? "(D) " : "(Diseased) ", outsz);
+  if (AFF_FLAGGED(target, AFF_SNEAK) && AFF_FLAGGED(viewer, AFF_SENSE_LIFE))
+    strlcat(out, shortflags ? "(S) " : "(Stealth) ", outsz);
+  if (IS_NPC(target) && MOB_FLAGGED(target, MOB_AGGRESSIVE) && AFF_FLAGGED(viewer, AFF_SENSE_LIFE))
+    strlcat(out, "(Angry) ", outsz);
+  if (GET_MAX_HIT(target) > 0 && (100 * GET_HIT(target) / GET_MAX_HIT(target)) < 60)
+    strlcat(out, "(Wounded) ", outsz);
   if (!IS_NPC(target) && PLR_FLAGGED(target, PLR_KILLER))
     strlcat(out, "(OPK) ", outsz);
+  if (AFF_FLAGGED(viewer, AFF_DETECT_ALIGN)) {
+    if (IS_EVIL(target))
+      strlcat(out, shortflags ? "(R) " : "(Red Aura) ", outsz);
+    else if (IS_GOOD(target))
+      strlcat(out, shortflags ? "(G) " : "(Golden Aura) ", outsz);
+  }
 
   (void) viewer;
 }

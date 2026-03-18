@@ -14039,5 +14039,31 @@ Save often:
 save
 Recall if lost:
 recall
+SHORTFLAGS
+Usage: shortflags
+Toggles compact aura/flag output.
+Off: (White Aura) (Flying) (Charmed)
+On : (W) (F) (C)
+AFFECTED / UNAFFECTED
+Use with spells:
+spells affected
+spells unaffected
+These filters show active and inactive spell effects on you.
+ALLSPELLS
+Usage:
+allspells
+allspells <filter>
+allspells all
+Shows class spell access, and accepts the same filters as spells.
+AURAS
+Character tags are shown when states are truly active and visible:
+Player, OPK, Invis, Hidden, Flying, Charmed, Diseased, Stealth,
+White Aura, Red Aura, Golden Aura, Angry, Wounded.
+OBJECT FLAGS
+Object aura tags can appear in room, inventory, equipment, and auction:
+Blue Aura, Glow, Hum, Invis, K, Magic, Cursed, Red Aura.
+WEAPON FLAGS
+Weapon-specific flags currently displayed through object auras include:
+Magic, Cursed (K), and Red Aura when present.
 #0
 $~

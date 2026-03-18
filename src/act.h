@@ -240,6 +240,7 @@ ACMD(do_gen_tog);
 #define SCMD_PAGELENGTH  31
 #define SCMD_SCREENWIDTH 32
 #define SCMD_COLOR       33
+#define SCMD_SHORTFLAGS  34
 
 /* do_quit */
 ACMD(do_quit);
