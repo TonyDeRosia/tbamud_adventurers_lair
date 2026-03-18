@@ -14163,3 +14163,6185 @@ Object auras:
 ----------------------------------------------------------------------------
 #0
 $~
+
+
+! --- Auto-generated spell/skill help entries (2026-03-18) ---
+
+ARMOR
+----------------------------------------
+Name
+----------------------------------------
+Armor
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Grants a beneficial spell effect that improves your combat readiness.
+
+----------------------------------------
+Effect
+----------------------------------------
+Applies one or more buffs such as defense, accuracy, resistance, or utility depending on the ability.
+
+----------------------------------------
+Usage
+----------------------------------------
+Primarily self-targeted (or cast on an ally when allowed).
+
+----------------------------------------
+Notes
+----------------------------------------
+Use before engagement for best value.
+#0
+
+CLONE
+----------------------------------------
+Name
+----------------------------------------
+Clone
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Channels arcane power to produce a direct combat or utility outcome.
+
+----------------------------------------
+Effect
+----------------------------------------
+Commonly deals magical damage and/or applies a short-lived status effect.
+
+----------------------------------------
+Usage
+----------------------------------------
+Usually cast on self, a target, or enemies in your room depending on spell rules.
+
+----------------------------------------
+Notes
+----------------------------------------
+Observe target saves and resistances for best results.
+#0
+
+CORRUPTION
+----------------------------------------
+Name
+----------------------------------------
+Corruption
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Channels arcane power to produce a direct combat or utility outcome.
+
+----------------------------------------
+Effect
+----------------------------------------
+Commonly deals magical damage and/or applies a short-lived status effect.
+
+----------------------------------------
+Usage
+----------------------------------------
+Usually cast on self, a target, or enemies in your room depending on spell rules.
+
+----------------------------------------
+Notes
+----------------------------------------
+Observe target saves and resistances for best results.
+#0
+
+GROUP-HEAL
+----------------------------------------
+Name
+----------------------------------------
+Group Heal
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Restoration-focused magic for recovery and survival.
+
+----------------------------------------
+Effect
+----------------------------------------
+Heals damage and/or removes harmful conditions; recall variants provide repositioning.
+
+----------------------------------------
+Usage
+----------------------------------------
+Self, ally, or group use depending on the specific ability.
+
+----------------------------------------
+Notes
+----------------------------------------
+Critical for sustain during prolonged fights.
+#0
+
+ARCANE-WARD
+----------------------------------------
+Name
+----------------------------------------
+Arcane Ward
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Grants a beneficial spell effect that improves your combat readiness.
+
+----------------------------------------
+Effect
+----------------------------------------
+Applies one or more buffs such as defense, accuracy, resistance, or utility depending on the ability.
+
+----------------------------------------
+Usage
+----------------------------------------
+Primarily self-targeted (or cast on an ally when allowed).
+
+----------------------------------------
+Notes
+----------------------------------------
+Use before engagement for best value.
+#0
+
+EVASION
+----------------------------------------
+Name
+----------------------------------------
+Evasion
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Channels arcane power to produce a direct combat or utility outcome.
+
+----------------------------------------
+Effect
+----------------------------------------
+Commonly deals magical damage and/or applies a short-lived status effect.
+
+----------------------------------------
+Usage
+----------------------------------------
+Usually cast on self, a target, or enemies in your room depending on spell rules.
+
+----------------------------------------
+Notes
+----------------------------------------
+Observe target saves and resistances for best results.
+#0
+
+IRONSKIN
+----------------------------------------
+Name
+----------------------------------------
+Ironskin
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Grants a beneficial spell effect that improves your combat readiness.
+
+----------------------------------------
+Effect
+----------------------------------------
+Applies one or more buffs such as defense, accuracy, resistance, or utility depending on the ability.
+
+----------------------------------------
+Usage
+----------------------------------------
+Primarily self-targeted (or cast on an ally when allowed).
+
+----------------------------------------
+Notes
+----------------------------------------
+Use before engagement for best value.
+#0
+
+DIVINE-BULWARK
+----------------------------------------
+Name
+----------------------------------------
+Divine Bulwark
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Grants a beneficial spell effect that improves your combat readiness.
+
+----------------------------------------
+Effect
+----------------------------------------
+Applies one or more buffs such as defense, accuracy, resistance, or utility depending on the ability.
+
+----------------------------------------
+Usage
+----------------------------------------
+Primarily self-targeted (or cast on an ally when allowed).
+
+----------------------------------------
+Notes
+----------------------------------------
+Use before engagement for best value.
+#0
+
+SONG-OF-RESILIENCE
+----------------------------------------
+Name
+----------------------------------------
+Song of Resilience
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Channels arcane power to produce a direct combat or utility outcome.
+
+----------------------------------------
+Effect
+----------------------------------------
+Commonly deals magical damage and/or applies a short-lived status effect.
+
+----------------------------------------
+Usage
+----------------------------------------
+Usually cast on self, a target, or enemies in your room depending on spell rules.
+
+----------------------------------------
+Notes
+----------------------------------------
+Observe target saves and resistances for best results.
+#0
+
+DARK-AEGIS
+----------------------------------------
+Name
+----------------------------------------
+Dark Aegis
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Grants a beneficial spell effect that improves your combat readiness.
+
+----------------------------------------
+Effect
+----------------------------------------
+Applies one or more buffs such as defense, accuracy, resistance, or utility depending on the ability.
+
+----------------------------------------
+Usage
+----------------------------------------
+Primarily self-targeted (or cast on an ally when allowed).
+
+----------------------------------------
+Notes
+----------------------------------------
+Use before engagement for best value.
+#0
+
+NIRVANA
+----------------------------------------
+Name
+----------------------------------------
+Nirvana
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Grants a beneficial spell effect that improves your combat readiness.
+
+----------------------------------------
+Effect
+----------------------------------------
+Applies one or more buffs such as defense, accuracy, resistance, or utility depending on the ability.
+
+----------------------------------------
+Usage
+----------------------------------------
+Primarily self-targeted (or cast on an ally when allowed).
+
+----------------------------------------
+Notes
+----------------------------------------
+Use before engagement for best value.
+#0
+
+PLAGUE-BOLT
+----------------------------------------
+Name
+----------------------------------------
+Plague Bolt
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Channels arcane power to produce a direct combat or utility outcome.
+
+----------------------------------------
+Effect
+----------------------------------------
+Commonly deals magical damage and/or applies a short-lived status effect.
+
+----------------------------------------
+Usage
+----------------------------------------
+Usually cast on self, a target, or enemies in your room depending on spell rules.
+
+----------------------------------------
+Notes
+----------------------------------------
+Observe target saves and resistances for best results.
+#0
+
+ENFEEBLEMENT
+----------------------------------------
+Name
+----------------------------------------
+Enfeeblement
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Channels arcane power to produce a direct combat or utility outcome.
+
+----------------------------------------
+Effect
+----------------------------------------
+Commonly deals magical damage and/or applies a short-lived status effect.
+
+----------------------------------------
+Usage
+----------------------------------------
+Usually cast on self, a target, or enemies in your room depending on spell rules.
+
+----------------------------------------
+Notes
+----------------------------------------
+Observe target saves and resistances for best results.
+#0
+
+MEMENTO-MORI
+----------------------------------------
+Name
+----------------------------------------
+Memento Mori
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Brands the target with an omen of mortality.
+
+----------------------------------------
+Effect
+----------------------------------------
+Applies a death-themed debuff that weakens long-term survival.
+
+----------------------------------------
+Usage
+----------------------------------------
+Single-target offensive cast.
+
+----------------------------------------
+Notes
+----------------------------------------
+Excellent setup before execute-style follow-up spells.
+#0
+
+DEVOUR-SOUL
+----------------------------------------
+Name
+----------------------------------------
+Devour Soul
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Channels arcane power to produce a direct combat or utility outcome.
+
+----------------------------------------
+Effect
+----------------------------------------
+Commonly deals magical damage and/or applies a short-lived status effect.
+
+----------------------------------------
+Usage
+----------------------------------------
+Usually cast on self, a target, or enemies in your room depending on spell rules.
+
+----------------------------------------
+Notes
+----------------------------------------
+Observe target saves and resistances for best results.
+#0
+
+FIREBOLT
+----------------------------------------
+Name
+----------------------------------------
+Firebolt
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Channels arcane power to produce a direct combat or utility outcome.
+
+----------------------------------------
+Effect
+----------------------------------------
+Commonly deals magical damage and/or applies a short-lived status effect.
+
+----------------------------------------
+Usage
+----------------------------------------
+Usually cast on self, a target, or enemies in your room depending on spell rules.
+
+----------------------------------------
+Notes
+----------------------------------------
+Observe target saves and resistances for best results.
+#0
+
+FLAME-ARROW
+----------------------------------------
+Name
+----------------------------------------
+Flame Arrow
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Channels arcane power to produce a direct combat or utility outcome.
+
+----------------------------------------
+Effect
+----------------------------------------
+Commonly deals magical damage and/or applies a short-lived status effect.
+
+----------------------------------------
+Usage
+----------------------------------------
+Usually cast on self, a target, or enemies in your room depending on spell rules.
+
+----------------------------------------
+Notes
+----------------------------------------
+Observe target saves and resistances for best results.
+#0
+
+FROSTBITE
+----------------------------------------
+Name
+----------------------------------------
+Frostbite
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Channels arcane power to produce a direct combat or utility outcome.
+
+----------------------------------------
+Effect
+----------------------------------------
+Commonly deals magical damage and/or applies a short-lived status effect.
+
+----------------------------------------
+Usage
+----------------------------------------
+Usually cast on self, a target, or enemies in your room depending on spell rules.
+
+----------------------------------------
+Notes
+----------------------------------------
+Observe target saves and resistances for best results.
+#0
+
+VOLTAIC-BOLT
+----------------------------------------
+Name
+----------------------------------------
+Voltaic Bolt
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Channels arcane power to produce a direct combat or utility outcome.
+
+----------------------------------------
+Effect
+----------------------------------------
+Commonly deals magical damage and/or applies a short-lived status effect.
+
+----------------------------------------
+Usage
+----------------------------------------
+Usually cast on self, a target, or enemies in your room depending on spell rules.
+
+----------------------------------------
+Notes
+----------------------------------------
+Observe target saves and resistances for best results.
+#0
+
+ACID-BLAST
+----------------------------------------
+Name
+----------------------------------------
+Acid Blast
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Projects large-scale battlefield magic to pressure multiple enemies.
+
+----------------------------------------
+Effect
+----------------------------------------
+Deals area damage and/or establishes room-wide effects that influence positioning.
+
+----------------------------------------
+Usage
+----------------------------------------
+Room/area cast affecting enemies in the current location.
+
+----------------------------------------
+Notes
+----------------------------------------
+Powerful when enemies are grouped.
+#0
+
+SHADOW-BOLT
+----------------------------------------
+Name
+----------------------------------------
+Shadow Bolt
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Channels arcane power to produce a direct combat or utility outcome.
+
+----------------------------------------
+Effect
+----------------------------------------
+Commonly deals magical damage and/or applies a short-lived status effect.
+
+----------------------------------------
+Usage
+----------------------------------------
+Usually cast on self, a target, or enemies in your room depending on spell rules.
+
+----------------------------------------
+Notes
+----------------------------------------
+Observe target saves and resistances for best results.
+#0
+
+VAMPIRIC-TOUCH
+----------------------------------------
+Name
+----------------------------------------
+Vampiric Touch
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Channels arcane power to produce a direct combat or utility outcome.
+
+----------------------------------------
+Effect
+----------------------------------------
+Commonly deals magical damage and/or applies a short-lived status effect.
+
+----------------------------------------
+Usage
+----------------------------------------
+Usually cast on self, a target, or enemies in your room depending on spell rules.
+
+----------------------------------------
+Notes
+----------------------------------------
+Observe target saves and resistances for best results.
+#0
+
+WEB
+----------------------------------------
+Name
+----------------------------------------
+Web
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Channels arcane power to produce a direct combat or utility outcome.
+
+----------------------------------------
+Effect
+----------------------------------------
+Commonly deals magical damage and/or applies a short-lived status effect.
+
+----------------------------------------
+Usage
+----------------------------------------
+Usually cast on self, a target, or enemies in your room depending on spell rules.
+
+----------------------------------------
+Notes
+----------------------------------------
+Observe target saves and resistances for best results.
+#0
+
+SILENCE
+----------------------------------------
+Name
+----------------------------------------
+Silence
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Imposes control pressure on the target to limit options.
+
+----------------------------------------
+Effect
+----------------------------------------
+Applies debuffs such as rooting, silence, fear, weakened offense, or brief disable effects.
+
+----------------------------------------
+Usage
+----------------------------------------
+Single-target offensive use in combat.
+
+----------------------------------------
+Notes
+----------------------------------------
+Combine with burst abilities while the target is constrained.
+#0
+
+FEAR
+----------------------------------------
+Name
+----------------------------------------
+Fear
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Imposes control pressure on the target to limit options.
+
+----------------------------------------
+Effect
+----------------------------------------
+Applies debuffs such as rooting, silence, fear, weakened offense, or brief disable effects.
+
+----------------------------------------
+Usage
+----------------------------------------
+Single-target offensive use in combat.
+
+----------------------------------------
+Notes
+----------------------------------------
+Combine with burst abilities while the target is constrained.
+#0
+
+TRUE-SEEING
+----------------------------------------
+Name
+----------------------------------------
+True Seeing
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Grants a beneficial spell effect that improves your combat readiness.
+
+----------------------------------------
+Effect
+----------------------------------------
+Applies one or more buffs such as defense, accuracy, resistance, or utility depending on the ability.
+
+----------------------------------------
+Usage
+----------------------------------------
+Primarily self-targeted (or cast on an ally when allowed).
+
+----------------------------------------
+Notes
+----------------------------------------
+Use before engagement for best value.
+#0
+
+STONE-SKIN
+----------------------------------------
+Name
+----------------------------------------
+Stone Skin
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Grants a beneficial spell effect that improves your combat readiness.
+
+----------------------------------------
+Effect
+----------------------------------------
+Applies one or more buffs such as defense, accuracy, resistance, or utility depending on the ability.
+
+----------------------------------------
+Usage
+----------------------------------------
+Primarily self-targeted (or cast on an ally when allowed).
+
+----------------------------------------
+Notes
+----------------------------------------
+Use before engagement for best value.
+#0
+
+BARKSKIN
+----------------------------------------
+Name
+----------------------------------------
+Barkskin
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Grants a beneficial spell effect that improves your combat readiness.
+
+----------------------------------------
+Effect
+----------------------------------------
+Applies one or more buffs such as defense, accuracy, resistance, or utility depending on the ability.
+
+----------------------------------------
+Usage
+----------------------------------------
+Primarily self-targeted (or cast on an ally when allowed).
+
+----------------------------------------
+Notes
+----------------------------------------
+Use before engagement for best value.
+#0
+
+GIANT-STRENGTH
+----------------------------------------
+Name
+----------------------------------------
+Giant Strength
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Channels arcane power to produce a direct combat or utility outcome.
+
+----------------------------------------
+Effect
+----------------------------------------
+Commonly deals magical damage and/or applies a short-lived status effect.
+
+----------------------------------------
+Usage
+----------------------------------------
+Usually cast on self, a target, or enemies in your room depending on spell rules.
+
+----------------------------------------
+Notes
+----------------------------------------
+Observe target saves and resistances for best results.
+#0
+
+ADRENALINE-SURGE
+----------------------------------------
+Name
+----------------------------------------
+Adrenaline Surge
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Channels arcane power to produce a direct combat or utility outcome.
+
+----------------------------------------
+Effect
+----------------------------------------
+Commonly deals magical damage and/or applies a short-lived status effect.
+
+----------------------------------------
+Usage
+----------------------------------------
+Usually cast on self, a target, or enemies in your room depending on spell rules.
+
+----------------------------------------
+Notes
+----------------------------------------
+Observe target saves and resistances for best results.
+#0
+
+CLARITY
+----------------------------------------
+Name
+----------------------------------------
+Clarity
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Grants a beneficial spell effect that improves your combat readiness.
+
+----------------------------------------
+Effect
+----------------------------------------
+Applies one or more buffs such as defense, accuracy, resistance, or utility depending on the ability.
+
+----------------------------------------
+Usage
+----------------------------------------
+Primarily self-targeted (or cast on an ally when allowed).
+
+----------------------------------------
+Notes
+----------------------------------------
+Use before engagement for best value.
+#0
+
+MARK-OF-DEATH
+----------------------------------------
+Name
+----------------------------------------
+Mark of Death
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Imposes control pressure on the target to limit options.
+
+----------------------------------------
+Effect
+----------------------------------------
+Applies debuffs such as rooting, silence, fear, weakened offense, or brief disable effects.
+
+----------------------------------------
+Usage
+----------------------------------------
+Single-target offensive use in combat.
+
+----------------------------------------
+Notes
+----------------------------------------
+Combine with burst abilities while the target is constrained.
+#0
+
+BLOODLUST
+----------------------------------------
+Name
+----------------------------------------
+Bloodlust
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Channels arcane power to produce a direct combat or utility outcome.
+
+----------------------------------------
+Effect
+----------------------------------------
+Commonly deals magical damage and/or applies a short-lived status effect.
+
+----------------------------------------
+Usage
+----------------------------------------
+Usually cast on self, a target, or enemies in your room depending on spell rules.
+
+----------------------------------------
+Notes
+----------------------------------------
+Observe target saves and resistances for best results.
+#0
+
+GREATER-HEAL
+----------------------------------------
+Name
+----------------------------------------
+Greater Heal
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Restoration-focused magic for recovery and survival.
+
+----------------------------------------
+Effect
+----------------------------------------
+Heals damage and/or removes harmful conditions; recall variants provide repositioning.
+
+----------------------------------------
+Usage
+----------------------------------------
+Self, ally, or group use depending on the specific ability.
+
+----------------------------------------
+Notes
+----------------------------------------
+Critical for sustain during prolonged fights.
+#0
+
+CLEANSE
+----------------------------------------
+Name
+----------------------------------------
+Cleanse
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Restoration-focused magic for recovery and survival.
+
+----------------------------------------
+Effect
+----------------------------------------
+Heals damage and/or removes harmful conditions; recall variants provide repositioning.
+
+----------------------------------------
+Usage
+----------------------------------------
+Self, ally, or group use depending on the specific ability.
+
+----------------------------------------
+Notes
+----------------------------------------
+Critical for sustain during prolonged fights.
+#0
+
+DISRUPT
+----------------------------------------
+Name
+----------------------------------------
+Disrupt
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Channels arcane power to produce a direct combat or utility outcome.
+
+----------------------------------------
+Effect
+----------------------------------------
+Commonly deals magical damage and/or applies a short-lived status effect.
+
+----------------------------------------
+Usage
+----------------------------------------
+Usually cast on self, a target, or enemies in your room depending on spell rules.
+
+----------------------------------------
+Notes
+----------------------------------------
+Observe target saves and resistances for best results.
+#0
+
+ANTIMAGIC-SHELL
+----------------------------------------
+Name
+----------------------------------------
+Antimagic Shell
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Channels arcane power to produce a direct combat or utility outcome.
+
+----------------------------------------
+Effect
+----------------------------------------
+Commonly deals magical damage and/or applies a short-lived status effect.
+
+----------------------------------------
+Usage
+----------------------------------------
+Usually cast on self, a target, or enemies in your room depending on spell rules.
+
+----------------------------------------
+Notes
+----------------------------------------
+Observe target saves and resistances for best results.
+#0
+
+ENCHANTERS-FOCUS
+----------------------------------------
+Name
+----------------------------------------
+Enchanters Focus
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Grants a beneficial spell effect that improves your combat readiness.
+
+----------------------------------------
+Effect
+----------------------------------------
+Applies one or more buffs such as defense, accuracy, resistance, or utility depending on the ability.
+
+----------------------------------------
+Usage
+----------------------------------------
+Primarily self-targeted (or cast on an ally when allowed).
+
+----------------------------------------
+Notes
+----------------------------------------
+Use before engagement for best value.
+#0
+
+TIME-SNARE
+----------------------------------------
+Name
+----------------------------------------
+Time Snare
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Imposes control pressure on the target to limit options.
+
+----------------------------------------
+Effect
+----------------------------------------
+Applies debuffs such as rooting, silence, fear, weakened offense, or brief disable effects.
+
+----------------------------------------
+Usage
+----------------------------------------
+Single-target offensive use in combat.
+
+----------------------------------------
+Notes
+----------------------------------------
+Combine with burst abilities while the target is constrained.
+#0
+
+PHASE-SHIFT
+----------------------------------------
+Name
+----------------------------------------
+Phase Shift
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Partially phases your form out of normal alignment.
+
+----------------------------------------
+Effect
+----------------------------------------
+Applies a defensive temporal/spatial buff that improves survivability.
+
+----------------------------------------
+Usage
+----------------------------------------
+Self-targeted buff.
+
+----------------------------------------
+Notes
+----------------------------------------
+Strong answer to burst-heavy enemy pressure.
+#0
+
+MIRROR-VEIL
+----------------------------------------
+Name
+----------------------------------------
+Mirror Veil
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Grants a beneficial spell effect that improves your combat readiness.
+
+----------------------------------------
+Effect
+----------------------------------------
+Applies one or more buffs such as defense, accuracy, resistance, or utility depending on the ability.
+
+----------------------------------------
+Usage
+----------------------------------------
+Primarily self-targeted (or cast on an ally when allowed).
+
+----------------------------------------
+Notes
+----------------------------------------
+Use before engagement for best value.
+#0
+
+ELEMENTAL-WARD-FIRE
+----------------------------------------
+Name
+----------------------------------------
+Elemental Ward Fire
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Grants a beneficial spell effect that improves your combat readiness.
+
+----------------------------------------
+Effect
+----------------------------------------
+Applies one or more buffs such as defense, accuracy, resistance, or utility depending on the ability.
+
+----------------------------------------
+Usage
+----------------------------------------
+Primarily self-targeted (or cast on an ally when allowed).
+
+----------------------------------------
+Notes
+----------------------------------------
+Use before engagement for best value.
+#0
+
+ELEMENTAL-WARD-COLD
+----------------------------------------
+Name
+----------------------------------------
+Elemental Ward Cold
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Grants a beneficial spell effect that improves your combat readiness.
+
+----------------------------------------
+Effect
+----------------------------------------
+Applies one or more buffs such as defense, accuracy, resistance, or utility depending on the ability.
+
+----------------------------------------
+Usage
+----------------------------------------
+Primarily self-targeted (or cast on an ally when allowed).
+
+----------------------------------------
+Notes
+----------------------------------------
+Use before engagement for best value.
+#0
+
+ELEMENTAL-WARD-LIGHTNING
+----------------------------------------
+Name
+----------------------------------------
+Elemental Ward Lightning
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Grants a beneficial spell effect that improves your combat readiness.
+
+----------------------------------------
+Effect
+----------------------------------------
+Applies one or more buffs such as defense, accuracy, resistance, or utility depending on the ability.
+
+----------------------------------------
+Usage
+----------------------------------------
+Primarily self-targeted (or cast on an ally when allowed).
+
+----------------------------------------
+Notes
+----------------------------------------
+Use before engagement for best value.
+#0
+
+ELEMENTAL-WARD-ACID
+----------------------------------------
+Name
+----------------------------------------
+Elemental Ward Acid
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Grants a beneficial spell effect that improves your combat readiness.
+
+----------------------------------------
+Effect
+----------------------------------------
+Applies one or more buffs such as defense, accuracy, resistance, or utility depending on the ability.
+
+----------------------------------------
+Usage
+----------------------------------------
+Primarily self-targeted (or cast on an ally when allowed).
+
+----------------------------------------
+Notes
+----------------------------------------
+Use before engagement for best value.
+#0
+
+COUNTERSPELL
+----------------------------------------
+Name
+----------------------------------------
+Counterspell
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Channels arcane power to produce a direct combat or utility outcome.
+
+----------------------------------------
+Effect
+----------------------------------------
+Commonly deals magical damage and/or applies a short-lived status effect.
+
+----------------------------------------
+Usage
+----------------------------------------
+Usually cast on self, a target, or enemies in your room depending on spell rules.
+
+----------------------------------------
+Notes
+----------------------------------------
+Observe target saves and resistances for best results.
+#0
+
+SPELL-STEAL
+----------------------------------------
+Name
+----------------------------------------
+Spell Steal
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+A combat technique executed through skill rather than spellcasting.
+
+----------------------------------------
+Effect
+----------------------------------------
+Provides direct offensive pressure, control, or tactical engagement tools.
+
+----------------------------------------
+Usage
+----------------------------------------
+Use as an active skill command against a target when conditions are met.
+
+----------------------------------------
+Notes
+----------------------------------------
+Timing and position significantly affect effectiveness.
+#0
+
+CANCELLATION
+----------------------------------------
+Name
+----------------------------------------
+Cancellation
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Channels arcane power to produce a direct combat or utility outcome.
+
+----------------------------------------
+Effect
+----------------------------------------
+Commonly deals magical damage and/or applies a short-lived status effect.
+
+----------------------------------------
+Usage
+----------------------------------------
+Usually cast on self, a target, or enemies in your room depending on spell rules.
+
+----------------------------------------
+Notes
+----------------------------------------
+Observe target saves and resistances for best results.
+#0
+
+HOLD-PERSON
+----------------------------------------
+Name
+----------------------------------------
+Hold Person
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Imposes control pressure on the target to limit options.
+
+----------------------------------------
+Effect
+----------------------------------------
+Applies debuffs such as rooting, silence, fear, weakened offense, or brief disable effects.
+
+----------------------------------------
+Usage
+----------------------------------------
+Single-target offensive use in combat.
+
+----------------------------------------
+Notes
+----------------------------------------
+Combine with burst abilities while the target is constrained.
+#0
+
+HOLD-MONSTER
+----------------------------------------
+Name
+----------------------------------------
+Hold Monster
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Imposes control pressure on the target to limit options.
+
+----------------------------------------
+Effect
+----------------------------------------
+Applies debuffs such as rooting, silence, fear, weakened offense, or brief disable effects.
+
+----------------------------------------
+Usage
+----------------------------------------
+Single-target offensive use in combat.
+
+----------------------------------------
+Notes
+----------------------------------------
+Combine with burst abilities while the target is constrained.
+#0
+
+CONFUSION
+----------------------------------------
+Name
+----------------------------------------
+Confusion
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Channels arcane power to produce a direct combat or utility outcome.
+
+----------------------------------------
+Effect
+----------------------------------------
+Commonly deals magical damage and/or applies a short-lived status effect.
+
+----------------------------------------
+Usage
+----------------------------------------
+Usually cast on self, a target, or enemies in your room depending on spell rules.
+
+----------------------------------------
+Notes
+----------------------------------------
+Observe target saves and resistances for best results.
+#0
+
+VERTIGO
+----------------------------------------
+Name
+----------------------------------------
+Vertigo
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Channels arcane power to produce a direct combat or utility outcome.
+
+----------------------------------------
+Effect
+----------------------------------------
+Commonly deals magical damage and/or applies a short-lived status effect.
+
+----------------------------------------
+Usage
+----------------------------------------
+Usually cast on self, a target, or enemies in your room depending on spell rules.
+
+----------------------------------------
+Notes
+----------------------------------------
+Observe target saves and resistances for best results.
+#0
+
+MASS-FEAR
+----------------------------------------
+Name
+----------------------------------------
+Mass Fear
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Imposes control pressure on the target to limit options.
+
+----------------------------------------
+Effect
+----------------------------------------
+Applies debuffs such as rooting, silence, fear, weakened offense, or brief disable effects.
+
+----------------------------------------
+Usage
+----------------------------------------
+Single-target offensive use in combat.
+
+----------------------------------------
+Notes
+----------------------------------------
+Combine with burst abilities while the target is constrained.
+#0
+
+NULL-FIELD
+----------------------------------------
+Name
+----------------------------------------
+Null Field
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Projects large-scale battlefield magic to pressure multiple enemies.
+
+----------------------------------------
+Effect
+----------------------------------------
+Deals area damage and/or establishes room-wide effects that influence positioning.
+
+----------------------------------------
+Usage
+----------------------------------------
+Room/area cast affecting enemies in the current location.
+
+----------------------------------------
+Notes
+----------------------------------------
+Powerful when enemies are grouped.
+#0
+
+SILENCE-FIELD
+----------------------------------------
+Name
+----------------------------------------
+Silence Field
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Projects large-scale battlefield magic to pressure multiple enemies.
+
+----------------------------------------
+Effect
+----------------------------------------
+Deals area damage and/or establishes room-wide effects that influence positioning.
+
+----------------------------------------
+Usage
+----------------------------------------
+Room/area cast affecting enemies in the current location.
+
+----------------------------------------
+Notes
+----------------------------------------
+Powerful when enemies are grouped.
+#0
+
+MIASMA
+----------------------------------------
+Name
+----------------------------------------
+Miasma
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Channels arcane power to produce a direct combat or utility outcome.
+
+----------------------------------------
+Effect
+----------------------------------------
+Commonly deals magical damage and/or applies a short-lived status effect.
+
+----------------------------------------
+Usage
+----------------------------------------
+Usually cast on self, a target, or enemies in your room depending on spell rules.
+
+----------------------------------------
+Notes
+----------------------------------------
+Observe target saves and resistances for best results.
+#0
+
+TOXIC-CLOUD
+----------------------------------------
+Name
+----------------------------------------
+Toxic Cloud
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Projects large-scale battlefield magic to pressure multiple enemies.
+
+----------------------------------------
+Effect
+----------------------------------------
+Deals area damage and/or establishes room-wide effects that influence positioning.
+
+----------------------------------------
+Usage
+----------------------------------------
+Room/area cast affecting enemies in the current location.
+
+----------------------------------------
+Notes
+----------------------------------------
+Powerful when enemies are grouped.
+#0
+
+WALL-OF-FIRE
+----------------------------------------
+Name
+----------------------------------------
+Wall of Fire
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Projects large-scale battlefield magic to pressure multiple enemies.
+
+----------------------------------------
+Effect
+----------------------------------------
+Deals area damage and/or establishes room-wide effects that influence positioning.
+
+----------------------------------------
+Usage
+----------------------------------------
+Room/area cast affecting enemies in the current location.
+
+----------------------------------------
+Notes
+----------------------------------------
+Powerful when enemies are grouped.
+#0
+
+STATIC-FIELD
+----------------------------------------
+Name
+----------------------------------------
+Static Field
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Projects large-scale battlefield magic to pressure multiple enemies.
+
+----------------------------------------
+Effect
+----------------------------------------
+Deals area damage and/or establishes room-wide effects that influence positioning.
+
+----------------------------------------
+Usage
+----------------------------------------
+Room/area cast affecting enemies in the current location.
+
+----------------------------------------
+Notes
+----------------------------------------
+Powerful when enemies are grouped.
+#0
+
+CONSECRATE
+----------------------------------------
+Name
+----------------------------------------
+Consecrate
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Channels arcane power to produce a direct combat or utility outcome.
+
+----------------------------------------
+Effect
+----------------------------------------
+Commonly deals magical damage and/or applies a short-lived status effect.
+
+----------------------------------------
+Usage
+----------------------------------------
+Usually cast on self, a target, or enemies in your room depending on spell rules.
+
+----------------------------------------
+Notes
+----------------------------------------
+Observe target saves and resistances for best results.
+#0
+
+GRAVITY-WELL
+----------------------------------------
+Name
+----------------------------------------
+Gravity Well
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Channels arcane power to produce a direct combat or utility outcome.
+
+----------------------------------------
+Effect
+----------------------------------------
+Commonly deals magical damage and/or applies a short-lived status effect.
+
+----------------------------------------
+Usage
+----------------------------------------
+Usually cast on self, a target, or enemies in your room depending on spell rules.
+
+----------------------------------------
+Notes
+----------------------------------------
+Observe target saves and resistances for best results.
+#0
+
+SHOCKWAVE
+----------------------------------------
+Name
+----------------------------------------
+Shockwave
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Channels arcane power to produce a direct combat or utility outcome.
+
+----------------------------------------
+Effect
+----------------------------------------
+Commonly deals magical damage and/or applies a short-lived status effect.
+
+----------------------------------------
+Usage
+----------------------------------------
+Usually cast on self, a target, or enemies in your room depending on spell rules.
+
+----------------------------------------
+Notes
+----------------------------------------
+Observe target saves and resistances for best results.
+#0
+
+NOVA
+----------------------------------------
+Name
+----------------------------------------
+Nova
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Projects large-scale battlefield magic to pressure multiple enemies.
+
+----------------------------------------
+Effect
+----------------------------------------
+Deals area damage and/or establishes room-wide effects that influence positioning.
+
+----------------------------------------
+Usage
+----------------------------------------
+Room/area cast affecting enemies in the current location.
+
+----------------------------------------
+Notes
+----------------------------------------
+Powerful when enemies are grouped.
+#0
+
+ICE-STORM
+----------------------------------------
+Name
+----------------------------------------
+Ice Storm
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Projects large-scale battlefield magic to pressure multiple enemies.
+
+----------------------------------------
+Effect
+----------------------------------------
+Deals area damage and/or establishes room-wide effects that influence positioning.
+
+----------------------------------------
+Usage
+----------------------------------------
+Room/area cast affecting enemies in the current location.
+
+----------------------------------------
+Notes
+----------------------------------------
+Powerful when enemies are grouped.
+#0
+
+BLIZZARD
+----------------------------------------
+Name
+----------------------------------------
+Blizzard
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Channels arcane power to produce a direct combat or utility outcome.
+
+----------------------------------------
+Effect
+----------------------------------------
+Commonly deals magical damage and/or applies a short-lived status effect.
+
+----------------------------------------
+Usage
+----------------------------------------
+Usually cast on self, a target, or enemies in your room depending on spell rules.
+
+----------------------------------------
+Notes
+----------------------------------------
+Observe target saves and resistances for best results.
+#0
+
+FROST-NOVA
+----------------------------------------
+Name
+----------------------------------------
+Frost Nova
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Projects large-scale battlefield magic to pressure multiple enemies.
+
+----------------------------------------
+Effect
+----------------------------------------
+Deals area damage and/or establishes room-wide effects that influence positioning.
+
+----------------------------------------
+Usage
+----------------------------------------
+Room/area cast affecting enemies in the current location.
+
+----------------------------------------
+Notes
+----------------------------------------
+Powerful when enemies are grouped.
+#0
+
+GREATER-FIREBALL
+----------------------------------------
+Name
+----------------------------------------
+Greater Fireball
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Channels arcane power to produce a direct combat or utility outcome.
+
+----------------------------------------
+Effect
+----------------------------------------
+Commonly deals magical damage and/or applies a short-lived status effect.
+
+----------------------------------------
+Usage
+----------------------------------------
+Usually cast on self, a target, or enemies in your room depending on spell rules.
+
+----------------------------------------
+Notes
+----------------------------------------
+Observe target saves and resistances for best results.
+#0
+
+ACID-RAIN
+----------------------------------------
+Name
+----------------------------------------
+Acid Rain
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Projects large-scale battlefield magic to pressure multiple enemies.
+
+----------------------------------------
+Effect
+----------------------------------------
+Deals area damage and/or establishes room-wide effects that influence positioning.
+
+----------------------------------------
+Usage
+----------------------------------------
+Room/area cast affecting enemies in the current location.
+
+----------------------------------------
+Notes
+----------------------------------------
+Powerful when enemies are grouped.
+#0
+
+SONIC-BURST
+----------------------------------------
+Name
+----------------------------------------
+Sonic Burst
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Channels arcane power to produce a direct combat or utility outcome.
+
+----------------------------------------
+Effect
+----------------------------------------
+Commonly deals magical damage and/or applies a short-lived status effect.
+
+----------------------------------------
+Usage
+----------------------------------------
+Usually cast on self, a target, or enemies in your room depending on spell rules.
+
+----------------------------------------
+Notes
+----------------------------------------
+Observe target saves and resistances for best results.
+#0
+
+WORD-OF-PAIN
+----------------------------------------
+Name
+----------------------------------------
+Word of Pain
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Channels arcane power to produce a direct combat or utility outcome.
+
+----------------------------------------
+Effect
+----------------------------------------
+Commonly deals magical damage and/or applies a short-lived status effect.
+
+----------------------------------------
+Usage
+----------------------------------------
+Usually cast on self, a target, or enemies in your room depending on spell rules.
+
+----------------------------------------
+Notes
+----------------------------------------
+Observe target saves and resistances for best results.
+#0
+
+VENTRILOQUATE
+----------------------------------------
+Name
+----------------------------------------
+Ventriloquate
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Channels arcane power to produce a direct combat or utility outcome.
+
+----------------------------------------
+Effect
+----------------------------------------
+Commonly deals magical damage and/or applies a short-lived status effect.
+
+----------------------------------------
+Usage
+----------------------------------------
+Usually cast on self, a target, or enemies in your room depending on spell rules.
+
+----------------------------------------
+Notes
+----------------------------------------
+Observe target saves and resistances for best results.
+#0
+
+BEAR-SPIRIT
+----------------------------------------
+Name
+----------------------------------------
+Bear Spirit
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Channels the Bear Spirit to harden your body for front-line combat.
+
+----------------------------------------
+Effect
+----------------------------------------
+Applies a defensive spirit buff that improves survivability and durability.
+
+----------------------------------------
+Usage
+----------------------------------------
+Self-targeted buff. Cast before engaging heavy melee opponents.
+
+----------------------------------------
+Notes
+----------------------------------------
+Best for tanking or holding aggro in difficult fights.
+#0
+
+WOLF-SPIRIT
+----------------------------------------
+Name
+----------------------------------------
+Wolf Spirit
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Channels the Wolf Spirit to sharpen instinct and coordinated strikes.
+
+----------------------------------------
+Effect
+----------------------------------------
+Applies an offensive/tempo spirit buff that supports pressure and pursuit.
+
+----------------------------------------
+Usage
+----------------------------------------
+Self-targeted buff. Use before opening or during sustained fights.
+
+----------------------------------------
+Notes
+----------------------------------------
+Pairs well with chase and single-target pressure play.
+#0
+
+TIGER-SPIRIT
+----------------------------------------
+Name
+----------------------------------------
+Tiger Spirit
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Channels the Tiger Spirit to emphasize burst aggression and lethal momentum.
+
+----------------------------------------
+Effect
+----------------------------------------
+Applies an offensive spirit buff focused on stronger attack output.
+
+----------------------------------------
+Usage
+----------------------------------------
+Self-targeted buff. Activate when committing to kill windows.
+
+----------------------------------------
+Notes
+----------------------------------------
+Most effective when combined with control on your target.
+#0
+
+EAGLE-SPIRIT
+----------------------------------------
+Name
+----------------------------------------
+Eagle Spirit
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Channels the Eagle Spirit to heighten awareness and tactical movement.
+
+----------------------------------------
+Effect
+----------------------------------------
+Applies a mobility/awareness spirit buff that improves battlefield control.
+
+----------------------------------------
+Usage
+----------------------------------------
+Self-targeted buff. Use when repositioning or scouting threats.
+
+----------------------------------------
+Notes
+----------------------------------------
+Strong utility choice when handling multiple opponents.
+#0
+
+DRAGON-SPIRIT
+----------------------------------------
+Name
+----------------------------------------
+Dragon Spirit
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Channels the Dragon Spirit, blending resilience and overwhelming force.
+
+----------------------------------------
+Effect
+----------------------------------------
+Applies a high-tier spirit buff with broad combat benefits.
+
+----------------------------------------
+Usage
+----------------------------------------
+Self-targeted buff. Use before major encounters or boss fights.
+
+----------------------------------------
+Notes
+----------------------------------------
+A premier all-around spirit form for difficult content.
+#0
+
+GROUP-RECALL
+----------------------------------------
+Name
+----------------------------------------
+Group Recall
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Restoration-focused magic for recovery and survival.
+
+----------------------------------------
+Effect
+----------------------------------------
+Heals damage and/or removes harmful conditions; recall variants provide repositioning.
+
+----------------------------------------
+Usage
+----------------------------------------
+Self, ally, or group use depending on the specific ability.
+
+----------------------------------------
+Notes
+----------------------------------------
+Critical for sustain during prolonged fights.
+#0
+
+CONJURE-ELEMENTAL
+----------------------------------------
+Name
+----------------------------------------
+Conjure Elemental
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Uses conjuration to call allies, create travel links, or bring entities into the field.
+
+----------------------------------------
+Effect
+----------------------------------------
+Creates summoned support or movement utility based on the specific ability.
+
+----------------------------------------
+Usage
+----------------------------------------
+Cast in-room; some variants require a valid target or corpse.
+
+----------------------------------------
+Notes
+----------------------------------------
+Most effective when planned before or at the start of combat.
+#0
+
+CALL-WOLVES
+----------------------------------------
+Name
+----------------------------------------
+Call Wolves
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Uses conjuration to call allies, create travel links, or bring entities into the field.
+
+----------------------------------------
+Effect
+----------------------------------------
+Creates summoned support or movement utility based on the specific ability.
+
+----------------------------------------
+Usage
+----------------------------------------
+Cast in-room; some variants require a valid target or corpse.
+
+----------------------------------------
+Notes
+----------------------------------------
+Most effective when planned before or at the start of combat.
+#0
+
+CALL-BEARS
+----------------------------------------
+Name
+----------------------------------------
+Call Bears
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Uses conjuration to call allies, create travel links, or bring entities into the field.
+
+----------------------------------------
+Effect
+----------------------------------------
+Creates summoned support or movement utility based on the specific ability.
+
+----------------------------------------
+Usage
+----------------------------------------
+Cast in-room; some variants require a valid target or corpse.
+
+----------------------------------------
+Notes
+----------------------------------------
+Most effective when planned before or at the start of combat.
+#0
+
+ANIMATE-DEAD-GREATER
+----------------------------------------
+Name
+----------------------------------------
+Animate Dead Greater
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Raises a stronger undead servant from suitable remains.
+
+----------------------------------------
+Effect
+----------------------------------------
+Summons a greater undead ally with improved combat impact.
+
+----------------------------------------
+Usage
+----------------------------------------
+Cast on a valid corpse in the room.
+
+----------------------------------------
+Notes
+----------------------------------------
+High-value summon for prolonged or difficult fights.
+#0
+
+ABYSS-GATE
+----------------------------------------
+Name
+----------------------------------------
+Abyss Gate
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Uses conjuration to call allies, create travel links, or bring entities into the field.
+
+----------------------------------------
+Effect
+----------------------------------------
+Creates summoned support or movement utility based on the specific ability.
+
+----------------------------------------
+Usage
+----------------------------------------
+Cast in-room; some variants require a valid target or corpse.
+
+----------------------------------------
+Notes
+----------------------------------------
+Most effective when planned before or at the start of combat.
+#0
+
+GATE
+----------------------------------------
+Name
+----------------------------------------
+Gate
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Uses conjuration to call allies, create travel links, or bring entities into the field.
+
+----------------------------------------
+Effect
+----------------------------------------
+Creates summoned support or movement utility based on the specific ability.
+
+----------------------------------------
+Usage
+----------------------------------------
+Cast in-room; some variants require a valid target or corpse.
+
+----------------------------------------
+Notes
+----------------------------------------
+Most effective when planned before or at the start of combat.
+#0
+
+PORTAL
+----------------------------------------
+Name
+----------------------------------------
+Portal
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Uses conjuration to call allies, create travel links, or bring entities into the field.
+
+----------------------------------------
+Effect
+----------------------------------------
+Creates summoned support or movement utility based on the specific ability.
+
+----------------------------------------
+Usage
+----------------------------------------
+Cast in-room; some variants require a valid target or corpse.
+
+----------------------------------------
+Notes
+----------------------------------------
+Most effective when planned before or at the start of combat.
+#0
+
+LOCATE-CORPSE
+----------------------------------------
+Name
+----------------------------------------
+Locate Corpse
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Provides reconnaissance or information utility that improves decision-making.
+
+----------------------------------------
+Effect
+----------------------------------------
+Reveals hidden details, status clues, or location-related information.
+
+----------------------------------------
+Usage
+----------------------------------------
+Usually self-targeted or used on an object/target.
+
+----------------------------------------
+Notes
+----------------------------------------
+Ideal before committing to combat or resource use.
+#0
+
+WORD-OF-RECALL-MASS
+----------------------------------------
+Name
+----------------------------------------
+Word of Recall Mass
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Uses conjuration to call allies, create travel links, or bring entities into the field.
+
+----------------------------------------
+Effect
+----------------------------------------
+Creates summoned support or movement utility based on the specific ability.
+
+----------------------------------------
+Usage
+----------------------------------------
+Cast in-room; some variants require a valid target or corpse.
+
+----------------------------------------
+Notes
+----------------------------------------
+Most effective when planned before or at the start of combat.
+#0
+
+ASTRAL-PROJECTION
+----------------------------------------
+Name
+----------------------------------------
+Astral Projection
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Channels arcane power to produce a direct combat or utility outcome.
+
+----------------------------------------
+Effect
+----------------------------------------
+Commonly deals magical damage and/or applies a short-lived status effect.
+
+----------------------------------------
+Usage
+----------------------------------------
+Usually cast on self, a target, or enemies in your room depending on spell rules.
+
+----------------------------------------
+Notes
+----------------------------------------
+Observe target saves and resistances for best results.
+#0
+
+ETHEREAL-JAUNT
+----------------------------------------
+Name
+----------------------------------------
+Ethereal Jaunt
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Channels arcane power to produce a direct combat or utility outcome.
+
+----------------------------------------
+Effect
+----------------------------------------
+Commonly deals magical damage and/or applies a short-lived status effect.
+
+----------------------------------------
+Usage
+----------------------------------------
+Usually cast on self, a target, or enemies in your room depending on spell rules.
+
+----------------------------------------
+Notes
+----------------------------------------
+Observe target saves and resistances for best results.
+#0
+
+LEYLINE-TAP
+----------------------------------------
+Name
+----------------------------------------
+Leyline Tap
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Channels arcane power to produce a direct combat or utility outcome.
+
+----------------------------------------
+Effect
+----------------------------------------
+Commonly deals magical damage and/or applies a short-lived status effect.
+
+----------------------------------------
+Usage
+----------------------------------------
+Usually cast on self, a target, or enemies in your room depending on spell rules.
+
+----------------------------------------
+Notes
+----------------------------------------
+Observe target saves and resistances for best results.
+#0
+
+TEMPORAL-SHIFT
+----------------------------------------
+Name
+----------------------------------------
+Temporal Shift
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Bends nearby temporal flow to your advantage.
+
+----------------------------------------
+Effect
+----------------------------------------
+Applies a time manipulation effect that alters combat rhythm.
+
+----------------------------------------
+Usage
+----------------------------------------
+Usually self-targeted preparation magic.
+
+----------------------------------------
+Notes
+----------------------------------------
+Pairs well with control and burst sequences.
+#0
+
+CHRONO-SHIFT
+----------------------------------------
+Name
+----------------------------------------
+Chrono Shift
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Recalibrates your combat pace through focused chronomancy.
+
+----------------------------------------
+Effect
+----------------------------------------
+Applies a time-aspected buff supporting tempo and action flow.
+
+----------------------------------------
+Usage
+----------------------------------------
+Self-targeted buff.
+
+----------------------------------------
+Notes
+----------------------------------------
+Use before sustained engagements to keep momentum.
+#0
+
+BALEFIRE
+----------------------------------------
+Name
+----------------------------------------
+Balefire
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Channels arcane power to produce a direct combat or utility outcome.
+
+----------------------------------------
+Effect
+----------------------------------------
+Commonly deals magical damage and/or applies a short-lived status effect.
+
+----------------------------------------
+Usage
+----------------------------------------
+Usually cast on self, a target, or enemies in your room depending on spell rules.
+
+----------------------------------------
+Notes
+----------------------------------------
+Observe target saves and resistances for best results.
+#0
+
+METEOR
+----------------------------------------
+Name
+----------------------------------------
+Meteor
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Channels arcane power to produce a direct combat or utility outcome.
+
+----------------------------------------
+Effect
+----------------------------------------
+Commonly deals magical damage and/or applies a short-lived status effect.
+
+----------------------------------------
+Usage
+----------------------------------------
+Usually cast on self, a target, or enemies in your room depending on spell rules.
+
+----------------------------------------
+Notes
+----------------------------------------
+Observe target saves and resistances for best results.
+#0
+
+METEOR-SWARM
+----------------------------------------
+Name
+----------------------------------------
+Meteor Swarm
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Projects large-scale battlefield magic to pressure multiple enemies.
+
+----------------------------------------
+Effect
+----------------------------------------
+Deals area damage and/or establishes room-wide effects that influence positioning.
+
+----------------------------------------
+Usage
+----------------------------------------
+Room/area cast affecting enemies in the current location.
+
+----------------------------------------
+Notes
+----------------------------------------
+Powerful when enemies are grouped.
+#0
+
+HELLFIRE
+----------------------------------------
+Name
+----------------------------------------
+Hellfire
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Channels arcane power to produce a direct combat or utility outcome.
+
+----------------------------------------
+Effect
+----------------------------------------
+Commonly deals magical damage and/or applies a short-lived status effect.
+
+----------------------------------------
+Usage
+----------------------------------------
+Usually cast on self, a target, or enemies in your room depending on spell rules.
+
+----------------------------------------
+Notes
+----------------------------------------
+Observe target saves and resistances for best results.
+#0
+
+WRATHFIRE
+----------------------------------------
+Name
+----------------------------------------
+Wrathfire
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Channels arcane power to produce a direct combat or utility outcome.
+
+----------------------------------------
+Effect
+----------------------------------------
+Commonly deals magical damage and/or applies a short-lived status effect.
+
+----------------------------------------
+Usage
+----------------------------------------
+Usually cast on self, a target, or enemies in your room depending on spell rules.
+
+----------------------------------------
+Notes
+----------------------------------------
+Observe target saves and resistances for best results.
+#0
+
+CELESTIAL-SMITE
+----------------------------------------
+Name
+----------------------------------------
+Celestial Smite
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Channels arcane power to produce a direct combat or utility outcome.
+
+----------------------------------------
+Effect
+----------------------------------------
+Commonly deals magical damage and/or applies a short-lived status effect.
+
+----------------------------------------
+Usage
+----------------------------------------
+Usually cast on self, a target, or enemies in your room depending on spell rules.
+
+----------------------------------------
+Notes
+----------------------------------------
+Observe target saves and resistances for best results.
+#0
+
+HAMMER-OF-GOD
+----------------------------------------
+Name
+----------------------------------------
+Hammer of God
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Channels arcane power to produce a direct combat or utility outcome.
+
+----------------------------------------
+Effect
+----------------------------------------
+Commonly deals magical damage and/or applies a short-lived status effect.
+
+----------------------------------------
+Usage
+----------------------------------------
+Usually cast on self, a target, or enemies in your room depending on spell rules.
+
+----------------------------------------
+Notes
+----------------------------------------
+Observe target saves and resistances for best results.
+#0
+
+DEATH-KNELL
+----------------------------------------
+Name
+----------------------------------------
+Death Knell
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Channels arcane power to produce a direct combat or utility outcome.
+
+----------------------------------------
+Effect
+----------------------------------------
+Commonly deals magical damage and/or applies a short-lived status effect.
+
+----------------------------------------
+Usage
+----------------------------------------
+Usually cast on self, a target, or enemies in your room depending on spell rules.
+
+----------------------------------------
+Notes
+----------------------------------------
+Observe target saves and resistances for best results.
+#0
+
+UNHOLY-WORD
+----------------------------------------
+Name
+----------------------------------------
+Unholy Word
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Channels arcane power to produce a direct combat or utility outcome.
+
+----------------------------------------
+Effect
+----------------------------------------
+Commonly deals magical damage and/or applies a short-lived status effect.
+
+----------------------------------------
+Usage
+----------------------------------------
+Usually cast on self, a target, or enemies in your room depending on spell rules.
+
+----------------------------------------
+Notes
+----------------------------------------
+Observe target saves and resistances for best results.
+#0
+
+HOLY-WORD
+----------------------------------------
+Name
+----------------------------------------
+Holy Word
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Channels arcane power to produce a direct combat or utility outcome.
+
+----------------------------------------
+Effect
+----------------------------------------
+Commonly deals magical damage and/or applies a short-lived status effect.
+
+----------------------------------------
+Usage
+----------------------------------------
+Usually cast on self, a target, or enemies in your room depending on spell rules.
+
+----------------------------------------
+Notes
+----------------------------------------
+Observe target saves and resistances for best results.
+#0
+
+FINGER-OF-DEATH
+----------------------------------------
+Name
+----------------------------------------
+Finger of Death
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Channels arcane power to produce a direct combat or utility outcome.
+
+----------------------------------------
+Effect
+----------------------------------------
+Commonly deals magical damage and/or applies a short-lived status effect.
+
+----------------------------------------
+Usage
+----------------------------------------
+Usually cast on self, a target, or enemies in your room depending on spell rules.
+
+----------------------------------------
+Notes
+----------------------------------------
+Observe target saves and resistances for best results.
+#0
+
+WAIL-OF-THE-BANSHEE
+----------------------------------------
+Name
+----------------------------------------
+Wail of the Banshee
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Channels arcane power to produce a direct combat or utility outcome.
+
+----------------------------------------
+Effect
+----------------------------------------
+Commonly deals magical damage and/or applies a short-lived status effect.
+
+----------------------------------------
+Usage
+----------------------------------------
+Usually cast on self, a target, or enemies in your room depending on spell rules.
+
+----------------------------------------
+Notes
+----------------------------------------
+Observe target saves and resistances for best results.
+#0
+
+POWER-WORD-KILL
+----------------------------------------
+Name
+----------------------------------------
+Power Word Kill
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Channels arcane power to produce a direct combat or utility outcome.
+
+----------------------------------------
+Effect
+----------------------------------------
+Commonly deals magical damage and/or applies a short-lived status effect.
+
+----------------------------------------
+Usage
+----------------------------------------
+Usually cast on self, a target, or enemies in your room depending on spell rules.
+
+----------------------------------------
+Notes
+----------------------------------------
+Observe target saves and resistances for best results.
+#0
+
+POWER-WORD-STUN
+----------------------------------------
+Name
+----------------------------------------
+Power Word Stun
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Imposes control pressure on the target to limit options.
+
+----------------------------------------
+Effect
+----------------------------------------
+Applies debuffs such as rooting, silence, fear, weakened offense, or brief disable effects.
+
+----------------------------------------
+Usage
+----------------------------------------
+Single-target offensive use in combat.
+
+----------------------------------------
+Notes
+----------------------------------------
+Combine with burst abilities while the target is constrained.
+#0
+
+POWER-WORD-BLIND
+----------------------------------------
+Name
+----------------------------------------
+Power Word Blind
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Channels arcane power to produce a direct combat or utility outcome.
+
+----------------------------------------
+Effect
+----------------------------------------
+Commonly deals magical damage and/or applies a short-lived status effect.
+
+----------------------------------------
+Usage
+----------------------------------------
+Usually cast on self, a target, or enemies in your room depending on spell rules.
+
+----------------------------------------
+Notes
+----------------------------------------
+Observe target saves and resistances for best results.
+#0
+
+POWER-WORD-SILENCE
+----------------------------------------
+Name
+----------------------------------------
+Power Word Silence
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Imposes control pressure on the target to limit options.
+
+----------------------------------------
+Effect
+----------------------------------------
+Applies debuffs such as rooting, silence, fear, weakened offense, or brief disable effects.
+
+----------------------------------------
+Usage
+----------------------------------------
+Single-target offensive use in combat.
+
+----------------------------------------
+Notes
+----------------------------------------
+Combine with burst abilities while the target is constrained.
+#0
+
+PSYCHIC-CRUSH
+----------------------------------------
+Name
+----------------------------------------
+Psychic Crush
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Channels arcane power to produce a direct combat or utility outcome.
+
+----------------------------------------
+Effect
+----------------------------------------
+Commonly deals magical damage and/or applies a short-lived status effect.
+
+----------------------------------------
+Usage
+----------------------------------------
+Usually cast on self, a target, or enemies in your room depending on spell rules.
+
+----------------------------------------
+Notes
+----------------------------------------
+Observe target saves and resistances for best results.
+#0
+
+TIME-STOP
+----------------------------------------
+Name
+----------------------------------------
+Time Stop
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Momentarily arrests the flow of time around combatants.
+
+----------------------------------------
+Effect
+----------------------------------------
+Creates a brief temporal control window that can disrupt enemy action timing.
+
+----------------------------------------
+Usage
+----------------------------------------
+Combat cast on enemies in the room.
+
+----------------------------------------
+Notes
+----------------------------------------
+Use to stabilize dangerous moments or set up follow-up abilities.
+#0
+
+BLACK-LANCE
+----------------------------------------
+Name
+----------------------------------------
+Black Lance
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Channels arcane power to produce a direct combat or utility outcome.
+
+----------------------------------------
+Effect
+----------------------------------------
+Commonly deals magical damage and/or applies a short-lived status effect.
+
+----------------------------------------
+Usage
+----------------------------------------
+Usually cast on self, a target, or enemies in your room depending on spell rules.
+
+----------------------------------------
+Notes
+----------------------------------------
+Observe target saves and resistances for best results.
+#0
+
+REALITY-SLASH
+----------------------------------------
+Name
+----------------------------------------
+Reality Slash
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Channels arcane power to produce a direct combat or utility outcome.
+
+----------------------------------------
+Effect
+----------------------------------------
+Commonly deals magical damage and/or applies a short-lived status effect.
+
+----------------------------------------
+Usage
+----------------------------------------
+Usually cast on self, a target, or enemies in your room depending on spell rules.
+
+----------------------------------------
+Notes
+----------------------------------------
+Observe target saves and resistances for best results.
+#0
+
+GRASP-HEART
+----------------------------------------
+Name
+----------------------------------------
+Grasp Heart
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Channels arcane power to produce a direct combat or utility outcome.
+
+----------------------------------------
+Effect
+----------------------------------------
+Commonly deals magical damage and/or applies a short-lived status effect.
+
+----------------------------------------
+Usage
+----------------------------------------
+Usually cast on self, a target, or enemies in your room depending on spell rules.
+
+----------------------------------------
+Notes
+----------------------------------------
+Observe target saves and resistances for best results.
+#0
+
+NEGATIVE-BURST
+----------------------------------------
+Name
+----------------------------------------
+Negative Burst
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Channels arcane power to produce a direct combat or utility outcome.
+
+----------------------------------------
+Effect
+----------------------------------------
+Commonly deals magical damage and/or applies a short-lived status effect.
+
+----------------------------------------
+Usage
+----------------------------------------
+Usually cast on self, a target, or enemies in your room depending on spell rules.
+
+----------------------------------------
+Notes
+----------------------------------------
+Observe target saves and resistances for best results.
+#0
+
+TRUE-DEATH
+----------------------------------------
+Name
+----------------------------------------
+True Death
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Calls absolute death energy that denies ordinary recovery.
+
+----------------------------------------
+Effect
+----------------------------------------
+Delivers severe lethal magic intended for decisive elimination.
+
+----------------------------------------
+Usage
+----------------------------------------
+Single-target offensive cast.
+
+----------------------------------------
+Notes
+----------------------------------------
+Use as a high-cost finisher against priority threats.
+#0
+
+PERFECT-UNKNOWABLE
+----------------------------------------
+Name
+----------------------------------------
+Perfect Unknowable
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Wraps the caster in incomprehensible occult perfection.
+
+----------------------------------------
+Effect
+----------------------------------------
+Applies a top-tier defensive/occult buff with strong survival value.
+
+----------------------------------------
+Usage
+----------------------------------------
+Self-targeted buff.
+
+----------------------------------------
+Notes
+----------------------------------------
+Best cast before entering high-risk engagements.
+#0
+
+CRYSTAL-BODY
+----------------------------------------
+Name
+----------------------------------------
+Crystal Body
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Channels arcane power to produce a direct combat or utility outcome.
+
+----------------------------------------
+Effect
+----------------------------------------
+Commonly deals magical damage and/or applies a short-lived status effect.
+
+----------------------------------------
+Usage
+----------------------------------------
+Usually cast on self, a target, or enemies in your room depending on spell rules.
+
+----------------------------------------
+Notes
+----------------------------------------
+Observe target saves and resistances for best results.
+#0
+
+GREATER-MAGIC-SEAL
+----------------------------------------
+Name
+----------------------------------------
+Greater Magic Seal
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Channels arcane power to produce a direct combat or utility outcome.
+
+----------------------------------------
+Effect
+----------------------------------------
+Commonly deals magical damage and/or applies a short-lived status effect.
+
+----------------------------------------
+Usage
+----------------------------------------
+Usually cast on self, a target, or enemies in your room depending on spell rules.
+
+----------------------------------------
+Notes
+----------------------------------------
+Observe target saves and resistances for best results.
+#0
+
+DESPAIR-AURA
+----------------------------------------
+Name
+----------------------------------------
+Despair Aura
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Channels arcane power to produce a direct combat or utility outcome.
+
+----------------------------------------
+Effect
+----------------------------------------
+Commonly deals magical damage and/or applies a short-lived status effect.
+
+----------------------------------------
+Usage
+----------------------------------------
+Usually cast on self, a target, or enemies in your room depending on spell rules.
+
+----------------------------------------
+Notes
+----------------------------------------
+Observe target saves and resistances for best results.
+#0
+
+OBLIVION-SPEAR
+----------------------------------------
+Name
+----------------------------------------
+Oblivion Spear
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Channels arcane power to produce a direct combat or utility outcome.
+
+----------------------------------------
+Effect
+----------------------------------------
+Commonly deals magical damage and/or applies a short-lived status effect.
+
+----------------------------------------
+Usage
+----------------------------------------
+Usually cast on self, a target, or enemies in your room depending on spell rules.
+
+----------------------------------------
+Notes
+----------------------------------------
+Observe target saves and resistances for best results.
+#0
+
+BONE-PRISON
+----------------------------------------
+Name
+----------------------------------------
+Bone Prison
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Imposes control pressure on the target to limit options.
+
+----------------------------------------
+Effect
+----------------------------------------
+Applies debuffs such as rooting, silence, fear, weakened offense, or brief disable effects.
+
+----------------------------------------
+Usage
+----------------------------------------
+Single-target offensive use in combat.
+
+----------------------------------------
+Notes
+----------------------------------------
+Combine with burst abilities while the target is constrained.
+#0
+
+UNDYING-WILL
+----------------------------------------
+Name
+----------------------------------------
+Undying Will
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Grants a beneficial spell effect that improves your combat readiness.
+
+----------------------------------------
+Effect
+----------------------------------------
+Applies one or more buffs such as defense, accuracy, resistance, or utility depending on the ability.
+
+----------------------------------------
+Usage
+----------------------------------------
+Primarily self-targeted (or cast on an ally when allowed).
+
+----------------------------------------
+Notes
+----------------------------------------
+Use before engagement for best value.
+#0
+
+DRAGON-LIGHTNING
+----------------------------------------
+Name
+----------------------------------------
+Dragon Lightning
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Channels arcane power to produce a direct combat or utility outcome.
+
+----------------------------------------
+Effect
+----------------------------------------
+Commonly deals magical damage and/or applies a short-lived status effect.
+
+----------------------------------------
+Usage
+----------------------------------------
+Usually cast on self, a target, or enemies in your room depending on spell rules.
+
+----------------------------------------
+Notes
+----------------------------------------
+Observe target saves and resistances for best results.
+#0
+
+CHAIN-DRAGON-LIGHTNING
+----------------------------------------
+Name
+----------------------------------------
+Chain Dragon Lightning
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Channels arcane power to produce a direct combat or utility outcome.
+
+----------------------------------------
+Effect
+----------------------------------------
+Commonly deals magical damage and/or applies a short-lived status effect.
+
+----------------------------------------
+Usage
+----------------------------------------
+Usually cast on self, a target, or enemies in your room depending on spell rules.
+
+----------------------------------------
+Notes
+----------------------------------------
+Observe target saves and resistances for best results.
+#0
+
+HELL-FLAME
+----------------------------------------
+Name
+----------------------------------------
+Hell Flame
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Channels arcane power to produce a direct combat or utility outcome.
+
+----------------------------------------
+Effect
+----------------------------------------
+Commonly deals magical damage and/or applies a short-lived status effect.
+
+----------------------------------------
+Usage
+----------------------------------------
+Usually cast on self, a target, or enemies in your room depending on spell rules.
+
+----------------------------------------
+Notes
+----------------------------------------
+Observe target saves and resistances for best results.
+#0
+
+GRAVITY-MAELSTROM
+----------------------------------------
+Name
+----------------------------------------
+Gravity Maelstrom
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Channels arcane power to produce a direct combat or utility outcome.
+
+----------------------------------------
+Effect
+----------------------------------------
+Commonly deals magical damage and/or applies a short-lived status effect.
+
+----------------------------------------
+Usage
+----------------------------------------
+Usually cast on self, a target, or enemies in your room depending on spell rules.
+
+----------------------------------------
+Notes
+----------------------------------------
+Observe target saves and resistances for best results.
+#0
+
+CALL-GREATER-THUNDER
+----------------------------------------
+Name
+----------------------------------------
+Call Greater Thunder
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Uses conjuration to call allies, create travel links, or bring entities into the field.
+
+----------------------------------------
+Effect
+----------------------------------------
+Creates summoned support or movement utility based on the specific ability.
+
+----------------------------------------
+Usage
+----------------------------------------
+Cast in-room; some variants require a valid target or corpse.
+
+----------------------------------------
+Notes
+----------------------------------------
+Most effective when planned before or at the start of combat.
+#0
+
+ASTRAL-SMITE
+----------------------------------------
+Name
+----------------------------------------
+Astral Smite
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Channels arcane power to produce a direct combat or utility outcome.
+
+----------------------------------------
+Effect
+----------------------------------------
+Commonly deals magical damage and/or applies a short-lived status effect.
+
+----------------------------------------
+Usage
+----------------------------------------
+Usually cast on self, a target, or enemies in your room depending on spell rules.
+
+----------------------------------------
+Notes
+----------------------------------------
+Observe target saves and resistances for best results.
+#0
+
+GREATER-REJECTION
+----------------------------------------
+Name
+----------------------------------------
+Greater Rejection
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Channels arcane power to produce a direct combat or utility outcome.
+
+----------------------------------------
+Effect
+----------------------------------------
+Commonly deals magical damage and/or applies a short-lived status effect.
+
+----------------------------------------
+Usage
+----------------------------------------
+Usually cast on self, a target, or enemies in your room depending on spell rules.
+
+----------------------------------------
+Notes
+----------------------------------------
+Observe target saves and resistances for best results.
+#0
+
+NAPALM
+----------------------------------------
+Name
+----------------------------------------
+Napalm
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Channels arcane power to produce a direct combat or utility outcome.
+
+----------------------------------------
+Effect
+----------------------------------------
+Commonly deals magical damage and/or applies a short-lived status effect.
+
+----------------------------------------
+Usage
+----------------------------------------
+Usually cast on self, a target, or enemies in your room depending on spell rules.
+
+----------------------------------------
+Notes
+----------------------------------------
+Observe target saves and resistances for best results.
+#0
+
+FALLEN-DOWN
+----------------------------------------
+Name
+----------------------------------------
+Fallen Down
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Channels arcane power to produce a direct combat or utility outcome.
+
+----------------------------------------
+Effect
+----------------------------------------
+Commonly deals magical damage and/or applies a short-lived status effect.
+
+----------------------------------------
+Usage
+----------------------------------------
+Usually cast on self, a target, or enemies in your room depending on spell rules.
+
+----------------------------------------
+Notes
+----------------------------------------
+Observe target saves and resistances for best results.
+#0
+
+IA-SHUB-NIGGURATH
+----------------------------------------
+Name
+----------------------------------------
+Ia Shub Niggurath
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Channels arcane power to produce a direct combat or utility outcome.
+
+----------------------------------------
+Effect
+----------------------------------------
+Commonly deals magical damage and/or applies a short-lived status effect.
+
+----------------------------------------
+Usage
+----------------------------------------
+Usually cast on self, a target, or enemies in your room depending on spell rules.
+
+----------------------------------------
+Notes
+----------------------------------------
+Observe target saves and resistances for best results.
+#0
+
+GOAL-OF-ALL-LIFE-IS-DEATH
+----------------------------------------
+Name
+----------------------------------------
+Goal of All Life is Death
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Invokes a death-state doctrine that empowers necrotic execution effects.
+
+----------------------------------------
+Effect
+----------------------------------------
+Applies a caster buff that amplifies lethal death magic interactions.
+
+----------------------------------------
+Usage
+----------------------------------------
+Self-targeted setup spell before major necromancy casts.
+
+----------------------------------------
+Notes
+----------------------------------------
+Designed to combo with other high-tier death spells.
+#0
+
+CRY-OF-THE-BANSHEE
+----------------------------------------
+Name
+----------------------------------------
+Cry of the Banshee
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Channels arcane power to produce a direct combat or utility outcome.
+
+----------------------------------------
+Effect
+----------------------------------------
+Commonly deals magical damage and/or applies a short-lived status effect.
+
+----------------------------------------
+Usage
+----------------------------------------
+Usually cast on self, a target, or enemies in your room depending on spell rules.
+
+----------------------------------------
+Notes
+----------------------------------------
+Observe target saves and resistances for best results.
+#0
+
+BODY-OF-EFFULGENT-BERYL
+----------------------------------------
+Name
+----------------------------------------
+Body of Effulgent Beryl
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Channels arcane power to produce a direct combat or utility outcome.
+
+----------------------------------------
+Effect
+----------------------------------------
+Commonly deals magical damage and/or applies a short-lived status effect.
+
+----------------------------------------
+Usage
+----------------------------------------
+Usually cast on self, a target, or enemies in your room depending on spell rules.
+
+----------------------------------------
+Notes
+----------------------------------------
+Observe target saves and resistances for best results.
+#0
+
+VERMILION-NOVA
+----------------------------------------
+Name
+----------------------------------------
+Vermilion Nova
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Projects large-scale battlefield magic to pressure multiple enemies.
+
+----------------------------------------
+Effect
+----------------------------------------
+Deals area damage and/or establishes room-wide effects that influence positioning.
+
+----------------------------------------
+Usage
+----------------------------------------
+Room/area cast affecting enemies in the current location.
+
+----------------------------------------
+Notes
+----------------------------------------
+Powerful when enemies are grouped.
+#0
+
+NUCLEAR-BLAST
+----------------------------------------
+Name
+----------------------------------------
+Nuclear Blast
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Unleashes an extreme detonation across the battlefield.
+
+----------------------------------------
+Effect
+----------------------------------------
+Deals very high area damage with overwhelming magical force.
+
+----------------------------------------
+Usage
+----------------------------------------
+Area offensive cast affecting enemies in the room.
+
+----------------------------------------
+Notes
+----------------------------------------
+High-tier finisher; best used when enemies are already grouped.
+#0
+
+GREATER-TELEPORTATION
+----------------------------------------
+Name
+----------------------------------------
+Greater Teleportation
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Channels arcane power to produce a direct combat or utility outcome.
+
+----------------------------------------
+Effect
+----------------------------------------
+Commonly deals magical damage and/or applies a short-lived status effect.
+
+----------------------------------------
+Usage
+----------------------------------------
+Usually cast on self, a target, or enemies in your room depending on spell rules.
+
+----------------------------------------
+Notes
+----------------------------------------
+Observe target saves and resistances for best results.
+#0
+
+SILENT-MAGIC
+----------------------------------------
+Name
+----------------------------------------
+Silent Magic
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Channels arcane power to produce a direct combat or utility outcome.
+
+----------------------------------------
+Effect
+----------------------------------------
+Commonly deals magical damage and/or applies a short-lived status effect.
+
+----------------------------------------
+Usage
+----------------------------------------
+Usually cast on self, a target, or enemies in your room depending on spell rules.
+
+----------------------------------------
+Notes
+----------------------------------------
+Observe target saves and resistances for best results.
+#0
+
+TRIPLE-MAXIMIZE-MAGIC
+----------------------------------------
+Name
+----------------------------------------
+Triple Maximize Magic
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Channels arcane power to produce a direct combat or utility outcome.
+
+----------------------------------------
+Effect
+----------------------------------------
+Commonly deals magical damage and/or applies a short-lived status effect.
+
+----------------------------------------
+Usage
+----------------------------------------
+Usually cast on self, a target, or enemies in your room depending on spell rules.
+
+----------------------------------------
+Notes
+----------------------------------------
+Observe target saves and resistances for best results.
+#0
+
+PANTHEON
+----------------------------------------
+Name
+----------------------------------------
+Pantheon
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Invokes divine alignment with a full celestial host.
+
+----------------------------------------
+Effect
+----------------------------------------
+Applies a major protective blessing improving defense and resistance.
+
+----------------------------------------
+Usage
+----------------------------------------
+Self-targeted buff.
+
+----------------------------------------
+Notes
+----------------------------------------
+Excellent pre-fight preparation for extended encounters.
+#0
+
+DIMENSIONAL-LOCK
+----------------------------------------
+Name
+----------------------------------------
+Dimensional Lock
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Channels arcane power to produce a direct combat or utility outcome.
+
+----------------------------------------
+Effect
+----------------------------------------
+Commonly deals magical damage and/or applies a short-lived status effect.
+
+----------------------------------------
+Usage
+----------------------------------------
+Usually cast on self, a target, or enemies in your room depending on spell rules.
+
+----------------------------------------
+Notes
+----------------------------------------
+Observe target saves and resistances for best results.
+#0
+
+SHADOW-BIND
+----------------------------------------
+Name
+----------------------------------------
+Shadow Bind
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Imposes control pressure on the target to limit options.
+
+----------------------------------------
+Effect
+----------------------------------------
+Applies debuffs such as rooting, silence, fear, weakened offense, or brief disable effects.
+
+----------------------------------------
+Usage
+----------------------------------------
+Single-target offensive use in combat.
+
+----------------------------------------
+Notes
+----------------------------------------
+Combine with burst abilities while the target is constrained.
+#0
+
+SHADOW-EXCHANGE
+----------------------------------------
+Name
+----------------------------------------
+Shadow Exchange
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Channels arcane power to produce a direct combat or utility outcome.
+
+----------------------------------------
+Effect
+----------------------------------------
+Commonly deals magical damage and/or applies a short-lived status effect.
+
+----------------------------------------
+Usage
+----------------------------------------
+Usually cast on self, a target, or enemies in your room depending on spell rules.
+
+----------------------------------------
+Notes
+----------------------------------------
+Observe target saves and resistances for best results.
+#0
+
+DAGGER-RAIN
+----------------------------------------
+Name
+----------------------------------------
+Dagger Rain
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Projects large-scale battlefield magic to pressure multiple enemies.
+
+----------------------------------------
+Effect
+----------------------------------------
+Deals area damage and/or establishes room-wide effects that influence positioning.
+
+----------------------------------------
+Usage
+----------------------------------------
+Room/area cast affecting enemies in the current location.
+
+----------------------------------------
+Notes
+----------------------------------------
+Powerful when enemies are grouped.
+#0
+
+MONARCHS-PRESSURE
+----------------------------------------
+Name
+----------------------------------------
+Monarchs Pressure
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Channels arcane power to produce a direct combat or utility outcome.
+
+----------------------------------------
+Effect
+----------------------------------------
+Commonly deals magical damage and/or applies a short-lived status effect.
+
+----------------------------------------
+Usage
+----------------------------------------
+Usually cast on self, a target, or enemies in your room depending on spell rules.
+
+----------------------------------------
+Notes
+----------------------------------------
+Observe target saves and resistances for best results.
+#0
+
+SHADOW-DOMAIN
+----------------------------------------
+Name
+----------------------------------------
+Shadow Domain
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Projects large-scale battlefield magic to pressure multiple enemies.
+
+----------------------------------------
+Effect
+----------------------------------------
+Deals area damage and/or establishes room-wide effects that influence positioning.
+
+----------------------------------------
+Usage
+----------------------------------------
+Room/area cast affecting enemies in the current location.
+
+----------------------------------------
+Notes
+----------------------------------------
+Powerful when enemies are grouped.
+#0
+
+FORCE-GRASP
+----------------------------------------
+Name
+----------------------------------------
+Force Grasp
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Channels arcane power to produce a direct combat or utility outcome.
+
+----------------------------------------
+Effect
+----------------------------------------
+Commonly deals magical damage and/or applies a short-lived status effect.
+
+----------------------------------------
+Usage
+----------------------------------------
+Usually cast on self, a target, or enemies in your room depending on spell rules.
+
+----------------------------------------
+Notes
+----------------------------------------
+Observe target saves and resistances for best results.
+#0
+
+SHADOW-STEP
+----------------------------------------
+Name
+----------------------------------------
+Shadow Step
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Channels arcane power to produce a direct combat or utility outcome.
+
+----------------------------------------
+Effect
+----------------------------------------
+Commonly deals magical damage and/or applies a short-lived status effect.
+
+----------------------------------------
+Usage
+----------------------------------------
+Usually cast on self, a target, or enemies in your room depending on spell rules.
+
+----------------------------------------
+Notes
+----------------------------------------
+Observe target saves and resistances for best results.
+#0
+
+BLACK-HEART
+----------------------------------------
+Name
+----------------------------------------
+Black Heart
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Channels arcane power to produce a direct combat or utility outcome.
+
+----------------------------------------
+Effect
+----------------------------------------
+Commonly deals magical damage and/or applies a short-lived status effect.
+
+----------------------------------------
+Usage
+----------------------------------------
+Usually cast on self, a target, or enemies in your room depending on spell rules.
+
+----------------------------------------
+Notes
+----------------------------------------
+Observe target saves and resistances for best results.
+#0
+
+CALL-SHADOW-LEGION
+----------------------------------------
+Name
+----------------------------------------
+Call Shadow Legion
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Summons multiple shadow-aligned allies into the fight.
+
+----------------------------------------
+Effect
+----------------------------------------
+Creates a legion of shadow servants for battlefield control and damage.
+
+----------------------------------------
+Usage
+----------------------------------------
+Summon cast in your current room.
+
+----------------------------------------
+Notes
+----------------------------------------
+Best used early in encounters to maximize servant uptime.
+#0
+
+NIGHT-HUNT
+----------------------------------------
+Name
+----------------------------------------
+Night Hunt
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Channels arcane power to produce a direct combat or utility outcome.
+
+----------------------------------------
+Effect
+----------------------------------------
+Commonly deals magical damage and/or applies a short-lived status effect.
+
+----------------------------------------
+Usage
+----------------------------------------
+Usually cast on self, a target, or enemies in your room depending on spell rules.
+
+----------------------------------------
+Notes
+----------------------------------------
+Observe target saves and resistances for best results.
+#0
+
+DARK-REBUKE
+----------------------------------------
+Name
+----------------------------------------
+Dark Rebuke
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Channels arcane power to produce a direct combat or utility outcome.
+
+----------------------------------------
+Effect
+----------------------------------------
+Commonly deals magical damage and/or applies a short-lived status effect.
+
+----------------------------------------
+Usage
+----------------------------------------
+Usually cast on self, a target, or enemies in your room depending on spell rules.
+
+----------------------------------------
+Notes
+----------------------------------------
+Observe target saves and resistances for best results.
+#0
+
+EXECUTION-MARK
+----------------------------------------
+Name
+----------------------------------------
+Execution Mark
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Imposes control pressure on the target to limit options.
+
+----------------------------------------
+Effect
+----------------------------------------
+Applies debuffs such as rooting, silence, fear, weakened offense, or brief disable effects.
+
+----------------------------------------
+Usage
+----------------------------------------
+Single-target offensive use in combat.
+
+----------------------------------------
+Notes
+----------------------------------------
+Combine with burst abilities while the target is constrained.
+#0
+
+SHADOW-EXTRACTION
+----------------------------------------
+Name
+----------------------------------------
+Shadow Extraction
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Tears shadow essence from the target to fuel your side.
+
+----------------------------------------
+Effect
+----------------------------------------
+Deals shadow-aligned impact while producing additional advantage.
+
+----------------------------------------
+Usage
+----------------------------------------
+Single-target offensive cast.
+
+----------------------------------------
+Notes
+----------------------------------------
+Synergizes with shadow servant and domination-style abilities.
+#0
+
+ARISE-GREATER
+----------------------------------------
+Name
+----------------------------------------
+Arise Greater
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Calls a greater risen undead entity to your service.
+
+----------------------------------------
+Effect
+----------------------------------------
+Summons a powerful undead combat servant.
+
+----------------------------------------
+Usage
+----------------------------------------
+Single cast summon ability.
+
+----------------------------------------
+Notes
+----------------------------------------
+Use when you need durable pressure and frontline support.
+#0
+
+MONARCHS-AUTHORITY
+----------------------------------------
+Name
+----------------------------------------
+Monarchs Authority
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Channels arcane power to produce a direct combat or utility outcome.
+
+----------------------------------------
+Effect
+----------------------------------------
+Commonly deals magical damage and/or applies a short-lived status effect.
+
+----------------------------------------
+Usage
+----------------------------------------
+Usually cast on self, a target, or enemies in your room depending on spell rules.
+
+----------------------------------------
+Notes
+----------------------------------------
+Observe target saves and resistances for best results.
+#0
+
+RULERS-HAND
+----------------------------------------
+Name
+----------------------------------------
+Rulers Hand
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Channels arcane power to produce a direct combat or utility outcome.
+
+----------------------------------------
+Effect
+----------------------------------------
+Commonly deals magical damage and/or applies a short-lived status effect.
+
+----------------------------------------
+Usage
+----------------------------------------
+Usually cast on self, a target, or enemies in your room depending on spell rules.
+
+----------------------------------------
+Notes
+----------------------------------------
+Observe target saves and resistances for best results.
+#0
+
+SHADOW-LANCE
+----------------------------------------
+Name
+----------------------------------------
+Shadow Lance
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Channels arcane power to produce a direct combat or utility outcome.
+
+----------------------------------------
+Effect
+----------------------------------------
+Commonly deals magical damage and/or applies a short-lived status effect.
+
+----------------------------------------
+Usage
+----------------------------------------
+Usually cast on self, a target, or enemies in your room depending on spell rules.
+
+----------------------------------------
+Notes
+----------------------------------------
+Observe target saves and resistances for best results.
+#0
+
+SHADOW-BURST
+----------------------------------------
+Name
+----------------------------------------
+Shadow Burst
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Channels arcane power to produce a direct combat or utility outcome.
+
+----------------------------------------
+Effect
+----------------------------------------
+Commonly deals magical damage and/or applies a short-lived status effect.
+
+----------------------------------------
+Usage
+----------------------------------------
+Usually cast on self, a target, or enemies in your room depending on spell rules.
+
+----------------------------------------
+Notes
+----------------------------------------
+Observe target saves and resistances for best results.
+#0
+
+SHADOW-STORM
+----------------------------------------
+Name
+----------------------------------------
+Shadow Storm
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Projects large-scale battlefield magic to pressure multiple enemies.
+
+----------------------------------------
+Effect
+----------------------------------------
+Deals area damage and/or establishes room-wide effects that influence positioning.
+
+----------------------------------------
+Usage
+----------------------------------------
+Room/area cast affecting enemies in the current location.
+
+----------------------------------------
+Notes
+----------------------------------------
+Powerful when enemies are grouped.
+#0
+
+FATAL-STRIKE
+----------------------------------------
+Name
+----------------------------------------
+Fatal Strike
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+A combat technique executed through skill rather than spellcasting.
+
+----------------------------------------
+Effect
+----------------------------------------
+Provides direct offensive pressure, control, or tactical engagement tools.
+
+----------------------------------------
+Usage
+----------------------------------------
+Use as an active skill command against a target when conditions are met.
+
+----------------------------------------
+Notes
+----------------------------------------
+Timing and position significantly affect effectiveness.
+#0
+
+DOMINION-OF-SHADOWS
+----------------------------------------
+Name
+----------------------------------------
+Dominion of Shadows
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Channels arcane power to produce a direct combat or utility outcome.
+
+----------------------------------------
+Effect
+----------------------------------------
+Commonly deals magical damage and/or applies a short-lived status effect.
+
+----------------------------------------
+Usage
+----------------------------------------
+Usually cast on self, a target, or enemies in your room depending on spell rules.
+
+----------------------------------------
+Notes
+----------------------------------------
+Observe target saves and resistances for best results.
+#0
+
+SHADOW-RECALL
+----------------------------------------
+Name
+----------------------------------------
+Shadow Recall
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Restoration-focused magic for recovery and survival.
+
+----------------------------------------
+Effect
+----------------------------------------
+Heals damage and/or removes harmful conditions; recall variants provide repositioning.
+
+----------------------------------------
+Usage
+----------------------------------------
+Self, ally, or group use depending on the specific ability.
+
+----------------------------------------
+Notes
+----------------------------------------
+Critical for sustain during prolonged fights.
+#0
+
+SHADOW-REGENESIS
+----------------------------------------
+Name
+----------------------------------------
+Shadow Regenesis
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Grants a beneficial spell effect that improves your combat readiness.
+
+----------------------------------------
+Effect
+----------------------------------------
+Applies one or more buffs such as defense, accuracy, resistance, or utility depending on the ability.
+
+----------------------------------------
+Usage
+----------------------------------------
+Primarily self-targeted (or cast on an ally when allowed).
+
+----------------------------------------
+Notes
+----------------------------------------
+Use before engagement for best value.
+#0
+
+ASSASSINS-INTENT
+----------------------------------------
+Name
+----------------------------------------
+Assassins Intent
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Grants a beneficial spell effect that improves your combat readiness.
+
+----------------------------------------
+Effect
+----------------------------------------
+Applies one or more buffs such as defense, accuracy, resistance, or utility depending on the ability.
+
+----------------------------------------
+Usage
+----------------------------------------
+Primarily self-targeted (or cast on an ally when allowed).
+
+----------------------------------------
+Notes
+----------------------------------------
+Use before engagement for best value.
+#0
+
+BLOOD-DAGGER-TEMPEST
+----------------------------------------
+Name
+----------------------------------------
+Blood Dagger Tempest
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Channels arcane power to produce a direct combat or utility outcome.
+
+----------------------------------------
+Effect
+----------------------------------------
+Commonly deals magical damage and/or applies a short-lived status effect.
+
+----------------------------------------
+Usage
+----------------------------------------
+Usually cast on self, a target, or enemies in your room depending on spell rules.
+
+----------------------------------------
+Notes
+----------------------------------------
+Observe target saves and resistances for best results.
+#0
+
+CHAIN-OF-SUBJUGATION
+----------------------------------------
+Name
+----------------------------------------
+Chain of Subjugation
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Imposes control pressure on the target to limit options.
+
+----------------------------------------
+Effect
+----------------------------------------
+Applies debuffs such as rooting, silence, fear, weakened offense, or brief disable effects.
+
+----------------------------------------
+Usage
+----------------------------------------
+Single-target offensive use in combat.
+
+----------------------------------------
+Notes
+----------------------------------------
+Combine with burst abilities while the target is constrained.
+#0
+
+SOVEREIGNS-STEP
+----------------------------------------
+Name
+----------------------------------------
+Sovereigns Step
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Channels arcane power to produce a direct combat or utility outcome.
+
+----------------------------------------
+Effect
+----------------------------------------
+Commonly deals magical damage and/or applies a short-lived status effect.
+
+----------------------------------------
+Usage
+----------------------------------------
+Usually cast on self, a target, or enemies in your room depending on spell rules.
+
+----------------------------------------
+Notes
+----------------------------------------
+Observe target saves and resistances for best results.
+#0
+
+KINGS-COMMAND
+----------------------------------------
+Name
+----------------------------------------
+Kings Command
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Imposes control pressure on the target to limit options.
+
+----------------------------------------
+Effect
+----------------------------------------
+Applies debuffs such as rooting, silence, fear, weakened offense, or brief disable effects.
+
+----------------------------------------
+Usage
+----------------------------------------
+Single-target offensive use in combat.
+
+----------------------------------------
+Notes
+----------------------------------------
+Combine with burst abilities while the target is constrained.
+#0
+
+DETECT-KILL-INTENT
+----------------------------------------
+Name
+----------------------------------------
+Detect Kill Intent
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Heightens awareness to hostile intent before strikes fully commit.
+
+----------------------------------------
+Effect
+----------------------------------------
+Applies a perceptive combat buff that improves tactical reaction.
+
+----------------------------------------
+Usage
+----------------------------------------
+Self-targeted utility buff.
+
+----------------------------------------
+Notes
+----------------------------------------
+Useful in PvP-like situations and dangerous pulls.
+#0
+
+MUTILATE
+----------------------------------------
+Name
+----------------------------------------
+Mutilate
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+A combat technique executed through skill rather than spellcasting.
+
+----------------------------------------
+Effect
+----------------------------------------
+Provides direct offensive pressure, control, or tactical engagement tools.
+
+----------------------------------------
+Usage
+----------------------------------------
+Use as an active skill command against a target when conditions are met.
+
+----------------------------------------
+Notes
+----------------------------------------
+Timing and position significantly affect effectiveness.
+#0
+
+SHADOW-ARMOR
+----------------------------------------
+Name
+----------------------------------------
+Shadow Armor
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Grants a beneficial spell effect that improves your combat readiness.
+
+----------------------------------------
+Effect
+----------------------------------------
+Applies one or more buffs such as defense, accuracy, resistance, or utility depending on the ability.
+
+----------------------------------------
+Usage
+----------------------------------------
+Primarily self-targeted (or cast on an ally when allowed).
+
+----------------------------------------
+Notes
+----------------------------------------
+Use before engagement for best value.
+#0
+
+TOTAL-OCCULTATION
+----------------------------------------
+Name
+----------------------------------------
+Total Occultation
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Grants a beneficial spell effect that improves your combat readiness.
+
+----------------------------------------
+Effect
+----------------------------------------
+Applies one or more buffs such as defense, accuracy, resistance, or utility depending on the ability.
+
+----------------------------------------
+Usage
+----------------------------------------
+Primarily self-targeted (or cast on an ally when allowed).
+
+----------------------------------------
+Notes
+----------------------------------------
+Use before engagement for best value.
+#0
+
+DOMAIN-BREAK
+----------------------------------------
+Name
+----------------------------------------
+Domain Break
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Projects large-scale battlefield magic to pressure multiple enemies.
+
+----------------------------------------
+Effect
+----------------------------------------
+Deals area damage and/or establishes room-wide effects that influence positioning.
+
+----------------------------------------
+Usage
+----------------------------------------
+Room/area cast affecting enemies in the current location.
+
+----------------------------------------
+Notes
+----------------------------------------
+Powerful when enemies are grouped.
+#0
+
+HUNTERS-INSTINCT
+----------------------------------------
+Name
+----------------------------------------
+Hunters Instinct
+
+----------------------------------------
+Type
+----------------------------------------
+Spell
+
+----------------------------------------
+Description
+----------------------------------------
+Grants a beneficial spell effect that improves your combat readiness.
+
+----------------------------------------
+Effect
+----------------------------------------
+Applies one or more buffs such as defense, accuracy, resistance, or utility depending on the ability.
+
+----------------------------------------
+Usage
+----------------------------------------
+Primarily self-targeted (or cast on an ally when allowed).
+
+----------------------------------------
+Notes
+----------------------------------------
+Use before engagement for best value.
+#0
+
+
+! --- Auto-generated missing skill help entries (2026-03-18) ---
+
+PICK-LOCK
+----------------------------------------
+Name
+----------------------------------------
+Pick Lock
+
+----------------------------------------
+Type
+----------------------------------------
+Skill
+
+----------------------------------------
+Description
+----------------------------------------
+A trained ability that improves performance in combat or tactical play.
+
+----------------------------------------
+Effect
+----------------------------------------
+Provides offensive pressure, defense, control, or utility depending on the skill.
+
+----------------------------------------
+Usage
+----------------------------------------
+Activate as a skill in the appropriate combat or exploration context.
+
+----------------------------------------
+Notes
+----------------------------------------
+Best used with class synergies and careful timing.
+#0
+
+BANDAGE
+----------------------------------------
+Name
+----------------------------------------
+Bandage
+
+----------------------------------------
+Type
+----------------------------------------
+Skill
+
+----------------------------------------
+Description
+----------------------------------------
+A trained ability that improves performance in combat or tactical play.
+
+----------------------------------------
+Effect
+----------------------------------------
+Provides offensive pressure, defense, control, or utility depending on the skill.
+
+----------------------------------------
+Usage
+----------------------------------------
+Activate as a skill in the appropriate combat or exploration context.
+
+----------------------------------------
+Notes
+----------------------------------------
+Best used with class synergies and careful timing.
+#0
+
+OVERLORD-PRESENCE
+----------------------------------------
+Name
+----------------------------------------
+Overlord Presence
+
+----------------------------------------
+Type
+----------------------------------------
+Skill
+
+----------------------------------------
+Description
+----------------------------------------
+A trained ability that improves performance in combat or tactical play.
+
+----------------------------------------
+Effect
+----------------------------------------
+Provides offensive pressure, defense, control, or utility depending on the skill.
+
+----------------------------------------
+Usage
+----------------------------------------
+Activate as a skill in the appropriate combat or exploration context.
+
+----------------------------------------
+Notes
+----------------------------------------
+Best used with class synergies and careful timing.
+#0
+
+SUPREME-CASTER-DISCIPLINE
+----------------------------------------
+Name
+----------------------------------------
+Supreme Caster Discipline
+
+----------------------------------------
+Type
+----------------------------------------
+Skill
+
+----------------------------------------
+Description
+----------------------------------------
+A trained ability that improves performance in combat or tactical play.
+
+----------------------------------------
+Effect
+----------------------------------------
+Provides offensive pressure, defense, control, or utility depending on the skill.
+
+----------------------------------------
+Usage
+----------------------------------------
+Activate as a skill in the appropriate combat or exploration context.
+
+----------------------------------------
+Notes
+----------------------------------------
+Best used with class synergies and careful timing.
+#0
+
+UNDEAD-COMMAND
+----------------------------------------
+Name
+----------------------------------------
+Undead Command
+
+----------------------------------------
+Type
+----------------------------------------
+Skill
+
+----------------------------------------
+Description
+----------------------------------------
+A trained ability that improves performance in combat or tactical play.
+
+----------------------------------------
+Effect
+----------------------------------------
+Provides offensive pressure, defense, control, or utility depending on the skill.
+
+----------------------------------------
+Usage
+----------------------------------------
+Activate as a skill in the appropriate combat or exploration context.
+
+----------------------------------------
+Notes
+----------------------------------------
+Best used with class synergies and careful timing.
+#0
+
+TACTICAL-SPELL-MEMORY
+----------------------------------------
+Name
+----------------------------------------
+Tactical Spell Memory
+
+----------------------------------------
+Type
+----------------------------------------
+Skill
+
+----------------------------------------
+Description
+----------------------------------------
+A trained ability that improves performance in combat or tactical play.
+
+----------------------------------------
+Effect
+----------------------------------------
+Provides offensive pressure, defense, control, or utility depending on the skill.
+
+----------------------------------------
+Usage
+----------------------------------------
+Activate as a skill in the appropriate combat or exploration context.
+
+----------------------------------------
+Notes
+----------------------------------------
+Best used with class synergies and careful timing.
+#0
+
+DREAD-DOMINION
+----------------------------------------
+Name
+----------------------------------------
+Dread Dominion
+
+----------------------------------------
+Type
+----------------------------------------
+Skill
+
+----------------------------------------
+Description
+----------------------------------------
+A trained ability that improves performance in combat or tactical play.
+
+----------------------------------------
+Effect
+----------------------------------------
+Provides offensive pressure, defense, control, or utility depending on the skill.
+
+----------------------------------------
+Usage
+----------------------------------------
+Activate as a skill in the appropriate combat or exploration context.
+
+----------------------------------------
+Notes
+----------------------------------------
+Best used with class synergies and careful timing.
+#0
+
+SHADOW-COMMANDER
+----------------------------------------
+Name
+----------------------------------------
+Shadow Commander
+
+----------------------------------------
+Type
+----------------------------------------
+Skill
+
+----------------------------------------
+Description
+----------------------------------------
+A trained ability that improves performance in combat or tactical play.
+
+----------------------------------------
+Effect
+----------------------------------------
+Provides offensive pressure, defense, control, or utility depending on the skill.
+
+----------------------------------------
+Usage
+----------------------------------------
+Activate as a skill in the appropriate combat or exploration context.
+
+----------------------------------------
+Notes
+----------------------------------------
+Best used with class synergies and careful timing.
+#0
+
+PREDATORS-ADVANCE
+----------------------------------------
+Name
+----------------------------------------
+Predators Advance
+
+----------------------------------------
+Type
+----------------------------------------
+Skill
+
+----------------------------------------
+Description
+----------------------------------------
+A trained ability that improves performance in combat or tactical play.
+
+----------------------------------------
+Effect
+----------------------------------------
+Provides offensive pressure, defense, control, or utility depending on the skill.
+
+----------------------------------------
+Usage
+----------------------------------------
+Activate as a skill in the appropriate combat or exploration context.
+
+----------------------------------------
+Notes
+----------------------------------------
+Best used with class synergies and careful timing.
+#0
+
+MONARCH-REFLEXES
+----------------------------------------
+Name
+----------------------------------------
+Monarch Reflexes
+
+----------------------------------------
+Type
+----------------------------------------
+Skill
+
+----------------------------------------
+Description
+----------------------------------------
+A trained ability that improves performance in combat or tactical play.
+
+----------------------------------------
+Effect
+----------------------------------------
+Provides offensive pressure, defense, control, or utility depending on the skill.
+
+----------------------------------------
+Usage
+----------------------------------------
+Activate as a skill in the appropriate combat or exploration context.
+
+----------------------------------------
+Notes
+----------------------------------------
+Best used with class synergies and careful timing.
+#0
+
+RELENTLESS-HUNT
+----------------------------------------
+Name
+----------------------------------------
+Relentless Hunt
+
+----------------------------------------
+Type
+----------------------------------------
+Skill
+
+----------------------------------------
+Description
+----------------------------------------
+A trained ability that improves performance in combat or tactical play.
+
+----------------------------------------
+Effect
+----------------------------------------
+Provides offensive pressure, defense, control, or utility depending on the skill.
+
+----------------------------------------
+Usage
+----------------------------------------
+Activate as a skill in the appropriate combat or exploration context.
+
+----------------------------------------
+Notes
+----------------------------------------
+Best used with class synergies and careful timing.
+#0
+
+SHADOW-RESERVOIR
+----------------------------------------
+Name
+----------------------------------------
+Shadow Reservoir
+
+----------------------------------------
+Type
+----------------------------------------
+Skill
+
+----------------------------------------
+Description
+----------------------------------------
+A trained ability that improves performance in combat or tactical play.
+
+----------------------------------------
+Effect
+----------------------------------------
+Provides offensive pressure, defense, control, or utility depending on the skill.
+
+----------------------------------------
+Usage
+----------------------------------------
+Activate as a skill in the appropriate combat or exploration context.
+
+----------------------------------------
+Notes
+----------------------------------------
+Best used with class synergies and careful timing.
+#0
+
+SHADOW-SURGE
+----------------------------------------
+Name
+----------------------------------------
+Shadow Surge
+
+----------------------------------------
+Type
+----------------------------------------
+Skill
+
+----------------------------------------
+Description
+----------------------------------------
+A trained ability that improves performance in combat or tactical play.
+
+----------------------------------------
+Effect
+----------------------------------------
+Provides offensive pressure, defense, control, or utility depending on the skill.
+
+----------------------------------------
+Usage
+----------------------------------------
+Activate as a skill in the appropriate combat or exploration context.
+
+----------------------------------------
+Notes
+----------------------------------------
+Best used with class synergies and careful timing.
+#0
+
+CHAIN-ASSASSAULT
+----------------------------------------
+Name
+----------------------------------------
+Chain Assassault
+
+----------------------------------------
+Type
+----------------------------------------
+Skill
+
+----------------------------------------
+Description
+----------------------------------------
+A trained ability that improves performance in combat or tactical play.
+
+----------------------------------------
+Effect
+----------------------------------------
+Provides offensive pressure, defense, control, or utility depending on the skill.
+
+----------------------------------------
+Usage
+----------------------------------------
+Activate as a skill in the appropriate combat or exploration context.
+
+----------------------------------------
+Notes
+----------------------------------------
+Best used with class synergies and careful timing.
+#0
+
+SOVEREIGN-PRESSURE
+----------------------------------------
+Name
+----------------------------------------
+Sovereign Pressure
+
+----------------------------------------
+Type
+----------------------------------------
+Skill
+
+----------------------------------------
+Description
+----------------------------------------
+A trained ability that improves performance in combat or tactical play.
+
+----------------------------------------
+Effect
+----------------------------------------
+Provides offensive pressure, defense, control, or utility depending on the skill.
+
+----------------------------------------
+Usage
+----------------------------------------
+Activate as a skill in the appropriate combat or exploration context.
+
+----------------------------------------
+Notes
+----------------------------------------
+Best used with class synergies and careful timing.
+#0
+
+KILL-WINDOW
+----------------------------------------
+Name
+----------------------------------------
+Kill Window
+
+----------------------------------------
+Type
+----------------------------------------
+Skill
+
+----------------------------------------
+Description
+----------------------------------------
+A trained ability that improves performance in combat or tactical play.
+
+----------------------------------------
+Effect
+----------------------------------------
+Provides offensive pressure, defense, control, or utility depending on the skill.
+
+----------------------------------------
+Usage
+----------------------------------------
+Activate as a skill in the appropriate combat or exploration context.
+
+----------------------------------------
+Notes
+----------------------------------------
+Best used with class synergies and careful timing.
+#0
+
+LEGION-MASTERY
+----------------------------------------
+Name
+----------------------------------------
+Legion Mastery
+
+----------------------------------------
+Type
+----------------------------------------
+Skill
+
+----------------------------------------
+Description
+----------------------------------------
+A trained ability that improves performance in combat or tactical play.
+
+----------------------------------------
+Effect
+----------------------------------------
+Provides offensive pressure, defense, control, or utility depending on the skill.
+
+----------------------------------------
+Usage
+----------------------------------------
+Activate as a skill in the appropriate combat or exploration context.
+
+----------------------------------------
+Notes
+----------------------------------------
+Best used with class synergies and careful timing.
+#0
+
+APPRAISE-ENEMY
+----------------------------------------
+Name
+----------------------------------------
+Appraise Enemy
+
+----------------------------------------
+Type
+----------------------------------------
+Skill
+
+----------------------------------------
+Description
+----------------------------------------
+Studies an enemy to reveal practical combat information.
+
+----------------------------------------
+Effect
+----------------------------------------
+Provides actionable target insight for threat assessment and planning.
+
+----------------------------------------
+Usage
+----------------------------------------
+Use on a visible target before or during combat.
+
+----------------------------------------
+Notes
+----------------------------------------
+Excellent opener when deciding threat priority.
+#0
