@@ -27,7 +27,6 @@ static int VALID_EDGE(room_rnum x, int y);
 static void bfs_enqueue(room_rnum room, int dir);
 static void bfs_dequeue(void);
 static void bfs_clear_queue(void);
-static int find_first_step(room_rnum src, room_rnum target);
 
 struct bfs_queue_struct {
   room_rnum room;
@@ -93,7 +92,7 @@ static void bfs_clear_queue(void)
  * on the shortest path from the source to the target. Intended usage: in 
  * mobile_activity, give a mob a dir to go if they're tracking another mob or a
  * PC.  Or, a 'track' skill for PCs. */
-static int find_first_step(room_rnum src, room_rnum target)
+int graph_find_first_step(room_rnum src, room_rnum target)
 {
   int curr_dir;
   room_rnum curr_room;
@@ -177,7 +176,7 @@ ACMD(do_track)
   }
 
   /* They passed the skill check. */
-  dir = find_first_step(IN_ROOM(ch), IN_ROOM(vict));
+  dir = graph_find_first_step(IN_ROOM(ch), IN_ROOM(vict));
 
   switch (dir) {
   case BFS_ERROR:
@@ -216,7 +215,7 @@ void hunt_victim(struct char_data *ch)
     HUNTING(ch) = NULL;
     return;
   }
-  if ((dir = find_first_step(IN_ROOM(ch), IN_ROOM(HUNTING(ch)))) < 0) {
+  if ((dir = graph_find_first_step(IN_ROOM(ch), IN_ROOM(HUNTING(ch)))) < 0) {
     char buf[MAX_INPUT_LENGTH];
 
     snprintf(buf, sizeof(buf), "Damn!  I lost %s!", HMHR(HUNTING(ch)));

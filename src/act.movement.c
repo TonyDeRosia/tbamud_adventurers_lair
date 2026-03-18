@@ -22,6 +22,8 @@
 #include "dg_scripts.h"
 #include "act.h"
 #include "fight.h"
+#include "graph.h"
+#include "quest.h"
 #include "oasis.h" /* for buildwalk */
 
 
@@ -206,6 +208,124 @@ static int run_dir_from_token(const char *token, int *consumed)
   return -1;
 }
 
+static int room_is_runto_safe(room_rnum room)
+{
+  if (!VALID_ROOM_RNUM(room))
+    return FALSE;
+
+  if (ROOM_FLAGGED(room, ROOM_DEATH) || ROOM_FLAGGED(room, ROOM_GODROOM))
+    return FALSE;
+
+  return TRUE;
+}
+
+static int runto_path_distance(room_rnum src, room_rnum target)
+{
+  int steps = 0;
+  room_rnum current = src;
+
+  if (!VALID_ROOM_RNUM(src) || !VALID_ROOM_RNUM(target))
+    return BFS_ERROR;
+  if (src == target)
+    return 0;
+
+  while (steps <= top_of_world + 1) {
+    int dir = graph_find_first_step(current, target);
+    room_rnum next_room;
+
+    if (dir == BFS_ALREADY_THERE)
+      return steps;
+    if (dir < 0)
+      return dir;
+    if (!world[current].dir_option[dir])
+      return BFS_NO_PATH;
+
+    next_room = world[current].dir_option[dir]->to_room;
+    if (!room_is_runto_safe(next_room))
+      return BFS_NO_PATH;
+
+    current = next_room;
+    steps++;
+    if (current == target)
+      return steps;
+  }
+
+  return BFS_NO_PATH;
+}
+
+static struct char_data *find_closest_mob_in_area_by_name(struct char_data *ch, const char *name)
+{
+  struct char_data *mob, *best = NULL;
+  int best_distance = INT_MAX;
+  zone_rnum zone;
+
+  if (!ch || !name || !*name || IN_ROOM(ch) == NOWHERE)
+    return NULL;
+
+  zone = world[IN_ROOM(ch)].zone;
+  for (mob = character_list; mob; mob = mob->next) {
+    int distance;
+
+    if (!IS_NPC(mob) || IN_ROOM(mob) == NOWHERE)
+      continue;
+    if (world[IN_ROOM(mob)].zone != zone)
+      continue;
+    if (!CAN_SEE(ch, mob))
+      continue;
+    if (!isname(name, mob->player.name))
+      continue;
+
+    distance = runto_path_distance(IN_ROOM(ch), IN_ROOM(mob));
+    if (distance < 0)
+      continue;
+    if (distance < best_distance) {
+      best = mob;
+      best_distance = distance;
+    }
+  }
+
+  return best;
+}
+
+static int execute_runto_path(struct char_data *ch, struct char_data *target)
+{
+  long target_id;
+  room_rnum target_room;
+
+  if (!ch || !target || IN_ROOM(ch) == NOWHERE || IN_ROOM(target) == NOWHERE)
+    return FALSE;
+
+  target_id = char_script_id(target);
+  target_room = IN_ROOM(target);
+
+  while (IN_ROOM(ch) != target_room) {
+    int dir;
+    room_rnum next_room;
+    struct char_data *current_target;
+
+    if (FIGHTING(ch))
+      return FALSE;
+
+    current_target = find_char(target_id);
+    if (!current_target || IN_ROOM(current_target) == NOWHERE)
+      return FALSE;
+
+    target_room = IN_ROOM(current_target);
+    dir = graph_find_first_step(IN_ROOM(ch), target_room);
+    if (dir < 0 || !EXIT(ch, dir))
+      return FALSE;
+
+    next_room = EXIT(ch, dir)->to_room;
+    if (!room_is_runto_safe(next_room))
+      return FALSE;
+
+    if (!perform_move(ch, dir, 0))
+      return FALSE;
+  }
+
+  return TRUE;
+}
+
 ACMD(do_run)
 {
   const char *p = argument;
@@ -256,6 +376,67 @@ ACMD(do_run)
 
   if (steps <= 0)
     send_to_char(ch, "You don't go anywhere.\r\n");
+}
+
+ACMD(do_runto)
+{
+  char arg[MAX_INPUT_LENGTH];
+  struct char_data *target = NULL;
+  int distance;
+
+  skip_spaces(&argument);
+  one_argument(argument, arg);
+  if (!*arg) {
+    send_to_char(ch, "Run to whom?\r\n");
+    return;
+  }
+
+  if (!str_cmp(argument, "quest") && GET_KQUEST_ACTIVE(ch) && GET_KQUEST_COMPLETE(ch)) {
+    struct char_data *mob;
+    zone_rnum zone = (IN_ROOM(ch) != NOWHERE) ? world[IN_ROOM(ch)].zone : NOWHERE;
+
+    for (mob = character_list; mob; mob = mob->next) {
+      if (!IS_NPC(mob) || IN_ROOM(mob) == NOWHERE)
+        continue;
+      if (world[IN_ROOM(mob)].zone != zone)
+        continue;
+      if (!CAN_SEE(ch, mob))
+        continue;
+      if (GET_MOB_SPEC(mob) != questmaster)
+        continue;
+      if (GET_KQUEST_GIVER(ch) != NOBODY && GET_MOB_VNUM(mob) != GET_KQUEST_GIVER(ch))
+        continue;
+      target = mob;
+      break;
+    }
+  }
+
+  if (!target)
+    target = find_closest_mob_in_area_by_name(ch, argument);
+
+  if (!target) {
+    send_to_char(ch, "No such target found in this area.\r\n");
+    return;
+  }
+
+  distance = runto_path_distance(IN_ROOM(ch), IN_ROOM(target));
+  if (distance < 0) {
+    send_to_char(ch, "You cannot find a path to that target.\r\n");
+    return;
+  }
+
+  send_to_char(ch, "You begin running toward %s...\r\n", GET_NAME(target));
+  if (!execute_runto_path(ch, target)) {
+    send_to_char(ch, "Your path is interrupted.\r\n");
+    return;
+  }
+
+  if (IN_ROOM(ch) != IN_ROOM(target)) {
+    send_to_char(ch, "You cannot find a path to that target.\r\n");
+    return;
+  }
+
+  send_to_char(ch, "You arrive near %s.\r\n", GET_NAME(target));
 }
 
 /* Simple function to determine if char can fly. */

@@ -174,6 +174,7 @@ ACMD(do_stand);
 ACMD(do_unfollow);
 ACMD(do_wake);
 ACMD(do_run);
+ACMD(do_runto);
 /* Global variables from act.movement.c */
 extern const char *cmd_door[];
 
