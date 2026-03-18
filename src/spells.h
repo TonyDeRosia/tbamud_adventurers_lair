@@ -130,8 +130,28 @@
 #define SPELL_BLOODLUST              89
 #define SPELL_GREATER_HEAL           90
 #define SPELL_CLEANSE                91
+#define SPELL_DISRUPT                92
+#define SPELL_ANTIMAGIC_SHELL        93
+#define SPELL_ENCHANTERS_FOCUS       94
+#define SPELL_TIME_SNARE             95
+#define SPELL_PHASE_SHIFT            96
+#define SPELL_MIRROR_VEIL            97
+#define SPELL_ELEMENTAL_WARD_FIRE    98
+#define SPELL_ELEMENTAL_WARD_COLD    99
+#define SPELL_ELEMENTAL_WARD_LIGHTNING 100
+#define SPELL_ELEMENTAL_WARD_ACID    101
+#define SPELL_COUNTERSPELL           102
+#define SPELL_SPELL_STEAL            103
+#define SPELL_CANCELLATION           104
+#define SPELL_HOLD_PERSON            105
+#define SPELL_HOLD_MONSTER           106
+#define SPELL_CONFUSION              107
+#define SPELL_VERTIGO                108
+#define SPELL_MASS_FEAR              109
+#define SPELL_NULL_FIELD             110
+#define SPELL_SILENCE_FIELD          111
 /** Total Number of defined spells */
-#define NUM_SPELLS                   91
+#define NUM_SPELLS                   111
 
 /* Insert new spells here, up to MAX_SPELLS */
 #define MAX_SPELLS		    130
@@ -309,6 +329,9 @@ ASPELL(spell_memento_mori);
 ASPELL(spell_vampiric_touch);
 ASPELL(spell_greater_heal);
 ASPELL(spell_cleanse);
+ASPELL(spell_counterspell);
+ASPELL(spell_spell_steal);
+ASPELL(spell_cancellation);
 void show_identify_item(struct char_data *ch, struct obj_data *obj, enum identify_detail_level detail);
 
 /* basic magic calling functions */

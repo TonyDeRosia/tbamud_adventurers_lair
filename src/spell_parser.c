@@ -108,6 +108,14 @@ void room_tick_effects(struct room_data *room)
     if (eff->duration > 0)
       eff->duration--;
     if (eff->duration <= 0) {
+      switch (eff->effect_type) {
+        case ROOM_EFFECT_NULL_FIELD:
+          send_to_room(real_room(room->number), "The null field collapses.\r\n");
+          break;
+        case ROOM_EFFECT_SILENCE_FIELD:
+          send_to_room(real_room(room->number), "The field of silence dissipates.\r\n");
+          break;
+      }
       if (prev)
         prev->next = next;
       else
@@ -502,6 +510,106 @@ static const struct cast_message cast_messages[] = {
     "Holy light cleanses all afflictions from $N!",
     "$n calls holy light to cleanse $N of all afflictions!",
     "Holy light washes away all your afflictions!"
+  },
+  [SPELL_DISRUPT] = {
+    "You slam a bolt of disruptive force into $N!",
+    "$n blasts $N with a crackling bolt of disruption!",
+    "A jarring force rattles your concentration!"
+  },
+  [SPELL_ANTIMAGIC_SHELL] = {
+    "You weave a shell of anti-magical energy around yourself!",
+    "$n disappears momentarily inside a flickering shell of energy!",
+    "A shell of anti-magical energy surrounds you."
+  },
+  [SPELL_ENCHANTERS_FOCUS] = {
+    "You draw ambient arcane energy into perfect focus.",
+    "Arcane light coalesces around $n in a focused halo.",
+    NULL
+  },
+  [SPELL_TIME_SNARE] = {
+    "You snare $N in a fold of slowed time!",
+    "$n traces a rune in the air and $N seems to move sluggishly!",
+    "Time thickens around you, slowing your every action!"
+  },
+  [SPELL_PHASE_SHIFT] = {
+    "You phase partially out of the material plane!",
+    "$n's form shimmers and becomes ghostly!",
+    NULL
+  },
+  [SPELL_MIRROR_VEIL] = {
+    "Shimmering mirror images of yourself surround you!",
+    "$n summons a veil of mirror images!",
+    NULL
+  },
+  [SPELL_ELEMENTAL_WARD_FIRE] = {
+    "A ward of fire resistance wraps around you.",
+    "$n glows briefly with a warm orange light.",
+    NULL
+  },
+  [SPELL_ELEMENTAL_WARD_COLD] = {
+    "A ward of cold resistance wraps around you.",
+    "$n glows briefly with a pale blue light.",
+    NULL
+  },
+  [SPELL_ELEMENTAL_WARD_LIGHTNING] = {
+    "A ward of lightning resistance wraps around you.",
+    "$n crackles with a brief mantle of electric light.",
+    NULL
+  },
+  [SPELL_ELEMENTAL_WARD_ACID] = {
+    "A ward of acid resistance wraps around you.",
+    "$n is briefly coated in a slick green sheen.",
+    NULL
+  },
+  [SPELL_COUNTERSPELL] = {
+    "You reach into the weave and unravel $N's spell!",
+    "$n disrupts $N's spellcasting with a counterspell!",
+    "Your spell is torn apart by $n's counterspell!"
+  },
+  [SPELL_SPELL_STEAL] = {
+    "You steal magical energy from $N and draw it into yourself!",
+    "$n steals a magical effect from $N!",
+    "You feel one of your magical protections ripped away!"
+  },
+  [SPELL_CANCELLATION] = {
+    "You channel raw anti-magic into $N, unraveling enchantments!",
+    "$n gestures sharply and $N's magical aura crackles and dims!",
+    "You feel your magical protections unraveling!"
+  },
+  [SPELL_HOLD_PERSON] = {
+    "You command $N to be still, and they obey!",
+    "$n holds $N motionless with a command!",
+    "You are held motionless by magical compulsion!"
+  },
+  [SPELL_HOLD_MONSTER] = {
+    "Your powerful hold magic freezes $N in place!",
+    "$n freezes $N solid with hold magic!",
+    "Powerful magic holds your body immobile!"
+  },
+  [SPELL_CONFUSION] = {
+    "Confusion floods $N's mind!",
+    "$n clouds $N's mind with confusion!",
+    "Confusion floods your mind and scrambles your thoughts!"
+  },
+  [SPELL_VERTIGO] = {
+    "You induce violent vertigo in $N!",
+    "$n causes $N to stagger with vertigo!",
+    "The world spins violently as vertigo seizes you!"
+  },
+  [SPELL_MASS_FEAR] = {
+    "You project waves of supernatural terror at all your enemies!",
+    "$n projects waves of supernatural terror!",
+    "Terror overwhelms you!"
+  },
+  [SPELL_NULL_FIELD] = {
+    "You create a null field that suppresses all magic in the area!",
+    "$n creates a null field that suppresses all magic in the area!",
+    NULL
+  },
+  [SPELL_SILENCE_FIELD] = {
+    "A field of magical silence falls over the entire area!",
+    "$n silences the entire area with a wave of a hand!",
+    NULL
   }
 };
 
@@ -552,9 +660,14 @@ static struct syllable syls[] = { { " ", " " }, { "ar", "abra" },
         "y", "l" }, { "z", "k" }, { "", "" } };
 
 static int mag_manacost(struct char_data *ch, int spellnum) {
-  return MAX(SINFO.mana_max - (SINFO.mana_change *
+  int mana = MAX(SINFO.mana_max - (SINFO.mana_change *
       (GET_LEVEL(ch) - SINFO.min_level[(int) GET_CLASS(ch)])),
   SINFO.mana_min);
+
+  if (ch && AFF_FLAGGED(ch, AFF_EMPOWERED))
+    mana = MAX(1, (mana * 9) / 10);
+
+  return mana;
 }
 
 static char *obfuscate_spell(const char *unobfuscated) {
@@ -1069,6 +1182,18 @@ int call_magic(struct char_data *caster, struct char_data *cvict,
     act("$n's magic fizzles out and dies.", FALSE, caster, 0, 0, TO_ROOM);
     return (0);
   }
+  if (room_has_effect(&world[IN_ROOM(caster)], ROOM_EFFECT_NULL_FIELD) &&
+      spellnum != SPELL_NULL_FIELD) {
+    send_to_char(caster, "The null field suppresses your spell completely!\r\n");
+    act("$n's spell collapses against the null field.", FALSE, caster, 0, 0, TO_ROOM);
+    return (0);
+  }
+  if (room_has_effect(&world[IN_ROOM(caster)], ROOM_EFFECT_SILENCE_FIELD) &&
+      spellnum != SPELL_SILENCE_FIELD) {
+    send_to_char(caster, "The silence field swallows your incantation.\r\n");
+    act("$n mouths arcane words, but the silence field devours them.", FALSE, caster, 0, 0, TO_ROOM);
+    return (0);
+  }
   if (ROOM_FLAGGED(IN_ROOM(caster), ROOM_PEACEFUL) && (SINFO.violent || IS_SET(SINFO.routines, MAG_DAMAGE))) {
     send_to_char(caster, "A flash of white light fills the room, dispelling your violent magic!\r\n");
     act("White light from no particular source suddenly fills the room, then vanishes.", FALSE, caster, 0, 0, TO_ROOM);
@@ -1212,6 +1337,18 @@ int call_magic(struct char_data *caster, struct char_data *cvict,
       break;
     case SPELL_CLEANSE:
       MANUAL_SPELL(spell_cleanse)
+      ;
+      break;
+    case SPELL_COUNTERSPELL:
+      MANUAL_SPELL(spell_counterspell)
+      ;
+      break;
+    case SPELL_SPELL_STEAL:
+      MANUAL_SPELL(spell_spell_steal)
+      ;
+      break;
+    case SPELL_CANCELLATION:
+      MANUAL_SPELL(spell_cancellation)
       ;
       break;
     }
@@ -2181,6 +2318,80 @@ void mag_assign_spells(void) {
 
   spello(SPELL_CLEANSE, "cleanse", 20, 20, 0, POS_STANDING,
   TAR_CHAR_ROOM, FALSE, MAG_MANUAL, NULL);
+
+  spello(SPELL_DISRUPT, "disrupt", 18, 18, 0, POS_FIGHTING,
+  TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_NOT_SELF, TRUE, MAG_DAMAGE | MAG_AFFECTS,
+  "Your concentration returns to normal.");
+
+  spello(SPELL_ANTIMAGIC_SHELL, "antimagic shell", 30, 30, 0, POS_STANDING,
+  TAR_CHAR_ROOM, FALSE, MAG_AFFECTS,
+  "Your anti-magic shell dissolves.");
+
+  spello(SPELL_ENCHANTERS_FOCUS, "enchanters focus", 25, 25, 0, POS_STANDING,
+  TAR_CHAR_ROOM | TAR_SELF_ONLY, FALSE, MAG_AFFECTS,
+  "Your arcane focus dissipates.");
+
+  spello(SPELL_TIME_SNARE, "time snare", 20, 20, 0, POS_FIGHTING,
+  TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_NOT_SELF, TRUE, MAG_AFFECTS,
+  "The temporal snare releases you.");
+
+  spello(SPELL_PHASE_SHIFT, "phase shift", 25, 25, 0, POS_STANDING,
+  TAR_CHAR_ROOM | TAR_SELF_ONLY, FALSE, MAG_AFFECTS,
+  "You solidify back into the material plane.");
+
+  spello(SPELL_MIRROR_VEIL, "mirror veil", 20, 20, 0, POS_STANDING,
+  TAR_CHAR_ROOM, FALSE, MAG_AFFECTS,
+  "Your mirror images wink out.");
+
+  spello(SPELL_ELEMENTAL_WARD_FIRE, "elemental ward fire", 15, 15, 0, POS_STANDING,
+  TAR_CHAR_ROOM, FALSE, MAG_AFFECTS,
+  "Your fire ward fades.");
+
+  spello(SPELL_ELEMENTAL_WARD_COLD, "elemental ward cold", 15, 15, 0, POS_STANDING,
+  TAR_CHAR_ROOM, FALSE, MAG_AFFECTS,
+  "Your cold ward fades.");
+
+  spello(SPELL_ELEMENTAL_WARD_LIGHTNING, "elemental ward lightning", 15, 15, 0, POS_STANDING,
+  TAR_CHAR_ROOM, FALSE, MAG_AFFECTS,
+  "Your lightning ward fades.");
+
+  spello(SPELL_ELEMENTAL_WARD_ACID, "elemental ward acid", 15, 15, 0, POS_STANDING,
+  TAR_CHAR_ROOM, FALSE, MAG_AFFECTS,
+  "Your acid ward fades.");
+
+  spello(SPELL_COUNTERSPELL, "counterspell", 30, 30, 0, POS_FIGHTING,
+  TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_NOT_SELF, TRUE, MAG_MANUAL, NULL);
+
+  spello(SPELL_SPELL_STEAL, "spell steal", 45, 45, 0, POS_FIGHTING,
+  TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_NOT_SELF, TRUE, MAG_MANUAL, NULL);
+
+  spello(SPELL_CANCELLATION, "cancellation", 25, 25, 0, POS_FIGHTING,
+  TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_NOT_SELF, TRUE, MAG_MANUAL, NULL);
+
+  spello(SPELL_HOLD_PERSON, "hold person", 20, 20, 0, POS_FIGHTING,
+  TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_NOT_SELF, TRUE, MAG_AFFECTS,
+  "You can move freely again.");
+
+  spello(SPELL_HOLD_MONSTER, "hold monster", 30, 30, 0, POS_FIGHTING,
+  TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_NOT_SELF, TRUE, MAG_AFFECTS,
+  "The hold magic finally releases you.");
+
+  spello(SPELL_CONFUSION, "confusion", 22, 22, 0, POS_FIGHTING,
+  TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_NOT_SELF, TRUE, MAG_AFFECTS,
+  "Your thoughts settle back into order.");
+
+  spello(SPELL_VERTIGO, "vertigo", 18, 18, 0, POS_FIGHTING,
+  TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_NOT_SELF, TRUE, MAG_AFFECTS,
+  "The spinning sensation finally fades.");
+
+  spello(SPELL_MASS_FEAR, "mass fear", 45, 45, 0, POS_FIGHTING,
+  TAR_IGNORE, TRUE, MAG_MASSES, "Your terror loosens its grip.");
+
+  spello(SPELL_NULL_FIELD, "null field", 60, 60, 0, POS_STANDING,
+  TAR_IGNORE, FALSE, MAG_ROOMS, NULL);
+
+  spello(SPELL_SILENCE_FIELD, "silence field", 40, 40, 0, POS_STANDING,
+  TAR_IGNORE, FALSE, MAG_ROOMS, NULL);
 
   spello(SPELL_SENSE_LIFE, "sense life", 20, 10, 2, POS_STANDING,
   TAR_CHAR_ROOM | TAR_SELF_ONLY, FALSE, MAG_AFFECTS,

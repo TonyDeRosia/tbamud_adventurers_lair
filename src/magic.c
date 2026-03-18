@@ -20,6 +20,7 @@
 #include "constants.h"
 #include "dg_scripts.h"
 #include "class.h"
+#include "race.h"
 #include "fight.h"
 #include "mud_event.h"
 #include "criticalhits.h"
@@ -417,6 +418,10 @@ int mag_damage(int level, struct char_data *ch, struct char_data *victim,
     if (local_damage_type == DAM_NONE) local_damage_type = DAM_NECROTIC;
     dam = spell_dmg_medium(level);
     break;
+  case SPELL_DISRUPT:
+    if (local_damage_type == DAM_NONE) local_damage_type = DAM_ARCANE;
+    dam = spell_dmg_low(level);
+    break;
 
     /* Area spells */
   case SPELL_EARTHQUAKE:
@@ -433,6 +438,9 @@ int mag_damage(int level, struct char_data *ch, struct char_data *victim,
 
   if (spellnum == SPELL_SHADOW_BOLT && IS_GOOD(victim))
     dam = (dam * 125) / 100;
+
+  if (dam > 0 && AFF_FLAGGED(ch, AFF_EMPOWERED))
+    dam = (dam * 110) / 100;
 
   /* and finally, inflict the damage */
 
@@ -978,6 +986,145 @@ void mag_affects(int level, struct char_data *ch, struct char_data *victim,
     SET_BIT_AR(af[0].bitvector, AFF_BLOODLUST);
     refresh_on_recast = TRUE;
     break;
+
+  case SPELL_DISRUPT:
+    af[0].duration = spell_dur_short(level);
+    af[0].location = APPLY_NONE;
+    SET_BIT_AR(af[0].bitvector, AFF_SPELLLOCK);
+    refresh_on_recast = TRUE;
+    break;
+
+  case SPELL_ANTIMAGIC_SHELL:
+    af[0].duration = spell_dur_medium(level);
+    af[0].location = APPLY_SAVING_SPELL;
+    af[0].modifier = -20;
+    SET_BIT_AR(af[0].bitvector, AFF_WARDED);
+    refresh_on_recast = TRUE;
+    break;
+
+  case SPELL_ENCHANTERS_FOCUS:
+    af[0].duration = spell_dur_medium(level);
+    af[0].location = APPLY_NONE;
+    SET_BIT_AR(af[0].bitvector, AFF_EMPOWERED);
+    refresh_on_recast = TRUE;
+    break;
+
+  case SPELL_TIME_SNARE:
+    if (mag_savingthrow(victim, savetype, 0))
+      return;
+    af[0].duration = spell_dur_short(level);
+    af[0].location = APPLY_NONE;
+    SET_BIT_AR(af[0].bitvector, AFF_TIME_SNARE);
+    refresh_on_recast = TRUE;
+    break;
+
+  case SPELL_PHASE_SHIFT:
+    af[0].duration = spell_dur_short(level);
+    af[0].location = APPLY_NONE;
+    SET_BIT_AR(af[0].bitvector, AFF_PHASE);
+    refresh_on_recast = TRUE;
+    break;
+
+  case SPELL_MIRROR_VEIL:
+    af[0].duration = spell_dur_medium(level);
+    af[0].location = APPLY_NONE;
+    SET_BIT_AR(af[0].bitvector, AFF_MIRROR_IMAGE);
+    refresh_on_recast = TRUE;
+    break;
+
+  case SPELL_ELEMENTAL_WARD_FIRE:
+    af[0].duration = spell_dur_medium(level);
+    af[0].location = APPLY_NONE;
+    SET_BIT_AR(af[0].bitvector, AFF_ELEMENTAL_WARD_FIRE);
+    refresh_on_recast = TRUE;
+    break;
+
+  case SPELL_ELEMENTAL_WARD_COLD:
+    af[0].duration = spell_dur_medium(level);
+    af[0].location = APPLY_NONE;
+    SET_BIT_AR(af[0].bitvector, AFF_ELEMENTAL_WARD_COLD);
+    refresh_on_recast = TRUE;
+    break;
+
+  case SPELL_ELEMENTAL_WARD_LIGHTNING:
+    af[0].duration = spell_dur_medium(level);
+    af[0].location = APPLY_NONE;
+    SET_BIT_AR(af[0].bitvector, AFF_ELEMENTAL_WARD_LIGHTNING);
+    refresh_on_recast = TRUE;
+    break;
+
+  case SPELL_ELEMENTAL_WARD_ACID:
+    af[0].duration = spell_dur_medium(level);
+    af[0].location = APPLY_NONE;
+    SET_BIT_AR(af[0].bitvector, AFF_ELEMENTAL_WARD_ACID);
+    refresh_on_recast = TRUE;
+    break;
+
+  case SPELL_HOLD_PERSON:
+    if (IS_NPC(victim) && GET_RACE(victim) > RACE_HUMAN) {
+      send_to_char(ch, "That target is not humanoid enough for hold person.\r\n");
+      return;
+    }
+    if (mag_savingthrow(victim, SAVING_PARA, 0)) {
+      af[0].duration = 1;
+      af[0].location = APPLY_NONE;
+      SET_BIT_AR(af[0].bitvector, AFF_TIME_SNARE);
+    } else {
+      af[0].duration = spell_dur_short(level);
+      af[0].location = APPLY_NONE;
+      SET_BIT_AR(af[0].bitvector, AFF_STUNNED);
+    }
+    refresh_on_recast = TRUE;
+    break;
+
+  case SPELL_HOLD_MONSTER:
+    if (GET_RACE(victim) == RACE_VAMPIRE) {
+      send_to_char(ch, "Undead are resistant to this hold.\r\n");
+      return;
+    }
+    if (mag_savingthrow(victim, SAVING_PARA, 0)) {
+      af[0].duration = spell_dur_short(level);
+      af[0].location = APPLY_NONE;
+      SET_BIT_AR(af[0].bitvector, AFF_TIME_SNARE);
+    } else {
+      af[0].duration = spell_dur_medium(level);
+      af[0].location = APPLY_NONE;
+      SET_BIT_AR(af[0].bitvector, AFF_STUNNED);
+    }
+    refresh_on_recast = TRUE;
+    break;
+
+  case SPELL_CONFUSION:
+    if (mag_savingthrow(victim, savetype, 0)) {
+      af[0].duration = 1;
+      af[0].location = APPLY_HITROLL;
+      af[0].modifier = -2;
+    } else {
+      af[0].duration = spell_dur_short(level);
+      af[0].location = APPLY_HITROLL;
+      af[0].modifier = -4;
+    }
+    refresh_on_recast = TRUE;
+    break;
+
+  case SPELL_VERTIGO:
+    if (mag_savingthrow(victim, savetype, 0)) {
+      af[0].duration = 1;
+      af[0].location = APPLY_DEX;
+      af[0].modifier = -1;
+    } else {
+      af[0].duration = spell_dur_short(level);
+      af[0].location = APPLY_DEX;
+      af[0].modifier = -3;
+      af[1].duration = spell_dur_short(level);
+      af[1].location = APPLY_HITROLL;
+      af[1].modifier = -4;
+      af[2].duration = 1;
+      af[2].location = APPLY_NONE;
+      SET_BIT_AR(af[2].bitvector, AFF_STUNNED);
+    }
+    refresh_on_recast = TRUE;
+    break;
   }
 
   /* If this is a mob that has this affect set in its mob file, do not perform
@@ -1153,8 +1300,34 @@ void mag_masses(int level, struct char_data *ch, int spellnum, int savetype)
     tch_next = tch->next_in_room;
     if (tch == ch)
       continue;
+    if (!IS_NPC(tch) && GET_LEVEL(tch) >= LVL_IMMORT)
+      continue;
+    if (!CONFIG_PK_ALLOWED && !IS_NPC(ch) && !IS_NPC(tch))
+      continue;
+    if (!IS_NPC(tch) && GROUP(tch) && GROUP(ch) && GROUP(ch) == GROUP(tch))
+      continue;
 
     switch (spellnum) {
+      case SPELL_MASS_FEAR:
+        if (mag_savingthrow(tch, SAVING_SPELL, 0)) {
+          struct affected_type af;
+          new_affect(&af);
+          af.spell = spellnum;
+          af.duration = 1;
+          af.location = APPLY_HITROLL;
+          af.modifier = -3;
+          affect_join(tch, &af, FALSE, FALSE, FALSE, FALSE);
+        } else {
+          struct affected_type af;
+          new_affect(&af);
+          af.spell = spellnum;
+          af.duration = spell_dur_short(level);
+          af.location = APPLY_HITROLL;
+          af.modifier = -10;
+          SET_BIT_AR(af.bitvector, AFF_FEARFUL);
+          affect_join(tch, &af, FALSE, FALSE, FALSE, FALSE);
+        }
+        break;
     }
   }
 }
@@ -1600,10 +1773,26 @@ void mag_rooms(int level, struct char_data *ch, int spellnum)
       msg = "You cast a shroud of darkness upon the area.";
       room = "$n casts a shroud of darkness upon this area.";
     break;
+    case SPELL_NULL_FIELD:
+      if (room_has_effect(&world[rnum], ROOM_EFFECT_NULL_FIELD))
+        failure = TRUE;
+      duration = spell_dur_medium(level);
+      room_add_effect(&world[rnum], ROOM_EFFECT_NULL_FIELD, duration, 0);
+      msg = "You create a null field that suppresses all magic in the area!";
+      room = "$n creates a null field that suppresses all magic in the area!";
+      break;
+    case SPELL_SILENCE_FIELD:
+      if (room_has_effect(&world[rnum], ROOM_EFFECT_SILENCE_FIELD))
+        failure = TRUE;
+      duration = spell_dur_short(level);
+      room_add_effect(&world[rnum], ROOM_EFFECT_SILENCE_FIELD, duration, 0);
+      msg = "A field of magical silence falls over the entire area!";
+      room = "$n silences the entire area with a wave of a hand!";
+      break;
   
   }
   
-  if (failure || IdNum == eNULL) {
+  if (failure || msg == NULL || room == NULL) {
     send_to_char(ch, "You failed!\r\n");
     return;
   }
@@ -1611,5 +1800,6 @@ void mag_rooms(int level, struct char_data *ch, int spellnum)
   send_to_char(ch, "%s\r\n", msg);
   act(room, FALSE, ch, 0, 0, TO_ROOM);
   
-  NEW_EVENT(eSPL_DARKNESS, &world[rnum], NULL, duration * PASSES_PER_SEC);
+  if (IdNum != eNULL)
+    NEW_EVENT(IdNum, &world[rnum], NULL, duration * PASSES_PER_SEC);
 }
