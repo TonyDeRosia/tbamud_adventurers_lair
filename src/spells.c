@@ -63,6 +63,31 @@ static int remove_flagged_affects(struct char_data *victim, int aff_flag)
   return removed;
 }
 
+static int remove_spell_affect_if_present(struct char_data *victim, int spellnum)
+{
+  if (!victim || spellnum <= 0)
+    return 0;
+  if (!affected_by_spell(victim, spellnum))
+    return 0;
+  affect_from_char(victim, spellnum);
+  return 1;
+}
+
+static int cancellation_remove_one(struct char_data *victim)
+{
+  if (remove_spell_affect_if_present(victim, SPELL_SANCTUARY)) return 1;
+  if (remove_flagged_affects(victim, AFF_FLYING)) return 1;
+  if (remove_flagged_affects(victim, AFF_DETECT_INVIS)) return 1;
+  if (remove_flagged_affects(victim, AFF_SENSE_LIFE)) return 1;
+  if (remove_flagged_affects(victim, AFF_INVISIBLE)) return 1;
+  if (remove_flagged_affects(victim, AFF_TRUESIGHT)) return 1;
+  if (remove_spell_affect_if_present(victim, SPELL_BARKSKIN)) return 1;
+  if (remove_spell_affect_if_present(victim, SPELL_STONE_SKIN)) return 1;
+  if (remove_flagged_affects(victim, AFF_WARDED)) return 1;
+  if (remove_flagged_affects(victim, AFF_SHIELDED)) return 1;
+  return 0;
+}
+
 static int identify_is_warning_flag(const char *flag)
 {
   if (!flag || !*flag)
@@ -885,6 +910,85 @@ ASPELL(spell_cleanse)
   remove_flagged_affects(victim, AFF_FEARFUL);
   remove_flagged_affects(victim, AFF_HEXED);
   remove_flagged_affects(victim, AFF_SPELLLOCK);
+}
+
+ASPELL(spell_counterspell)
+{
+  struct affected_type af;
+
+  if (!victim || !ch)
+    return;
+
+  new_affect(&af);
+  af.spell = SPELL_COUNTERSPELL;
+  af.duration = 1;
+  af.location = APPLY_NONE;
+  SET_BIT_AR(af.bitvector, AFF_SPELLLOCK);
+  affect_join(victim, &af, FALSE, FALSE, FALSE, FALSE);
+}
+
+ASPELL(spell_spell_steal)
+{
+  struct affected_type *af, *chosen = NULL, copied;
+  int failed_save;
+
+  if (!victim || !ch)
+    return;
+
+  for (af = victim->affected; af; af = af->next) {
+    if (af->spell <= 0 || af->duration <= 0)
+      continue;
+    if (IS_SET_AR(af->bitvector, AFF_CURSE) ||
+        IS_SET_AR(af->bitvector, AFF_POISON) ||
+        IS_SET_AR(af->bitvector, AFF_FEARFUL) ||
+        IS_SET_AR(af->bitvector, AFF_WEBBED) ||
+        IS_SET_AR(af->bitvector, AFF_SILENCED) ||
+        IS_SET_AR(af->bitvector, AFF_STUNNED) ||
+        IS_SET_AR(af->bitvector, AFF_TIME_SNARE) ||
+        IS_SET_AR(af->bitvector, AFF_SPELLLOCK))
+      continue;
+    if (af->modifier >= 0 || af->location == APPLY_NONE ||
+        IS_SET_AR(af->bitvector, AFF_SANCTUARY) ||
+        IS_SET_AR(af->bitvector, AFF_WARDED) ||
+        IS_SET_AR(af->bitvector, AFF_MIRROR_IMAGE) ||
+        IS_SET_AR(af->bitvector, AFF_ELEMENTAL_WARD_FIRE) ||
+        IS_SET_AR(af->bitvector, AFF_ELEMENTAL_WARD_COLD) ||
+        IS_SET_AR(af->bitvector, AFF_ELEMENTAL_WARD_LIGHTNING) ||
+        IS_SET_AR(af->bitvector, AFF_ELEMENTAL_WARD_ACID)) {
+      chosen = af;
+      break;
+    }
+  }
+
+  if (!chosen) {
+    act("There is nothing to steal from $N.", FALSE, ch, 0, victim, TO_CHAR);
+    return;
+  }
+
+  copied = *chosen;
+  failed_save = !mag_savingthrow(victim, SAVING_SPELL, 0);
+  affect_remove(victim, chosen);
+  if (failed_save) {
+    copied.next = NULL;
+    affect_join(ch, &copied, FALSE, FALSE, FALSE, FALSE);
+  }
+}
+
+ASPELL(spell_cancellation)
+{
+  int remove_count = 1;
+  int i;
+
+  if (!victim || !ch)
+    return;
+
+  if (!mag_savingthrow(victim, SAVING_SPELL, 0))
+    remove_count = 2;
+
+  for (i = 0; i < remove_count; i++) {
+    if (!cancellation_remove_one(victim))
+      break;
+  }
 }
 
 ASPELL(spell_identify)

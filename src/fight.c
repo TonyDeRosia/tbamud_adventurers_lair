@@ -1322,6 +1322,10 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
       dam = (dam * 6) / 10;
   }
 
+  if (dam > 0 && AFF_FLAGGED(victim, AFF_WARDED) &&
+      attacktype > 0 && attacktype <= MAX_SPELLS)
+    dam = (dam * 7) / 10;
+
   if (dam > 0 && damage_type == DAM_LIGHTNING && AFF_FLAGGED(victim, AFF_STATIC)) {
     dam = (dam * 125) / 100;
     if (remove_affects_by_flag(victim, AFF_STATIC))
@@ -1785,6 +1789,11 @@ void perform_violence(void)
 
     if (AFF_FLAGGED(ch, AFF_STUNNED)) {
       send_to_char(ch, "You are stunned and cannot act this round!\r\n");
+      continue;
+    }
+
+    if (affected_by_spell(ch, SPELL_CONFUSION) && rand_number(1, 100) <= 33) {
+      send_to_char(ch, "You falter in confusion and lose your action this round!\r\n");
       continue;
     }
 
