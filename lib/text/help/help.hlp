@@ -742,19 +742,40 @@ attach obj 1480 sword   - Attaches obj trigger 1480 to a sword.
 See also: DETACH, TRIG-ATTACH, TRIG-DETACH, OLC, TRIGEDIT, TSTAT, STAT, ROOMFLAGS
 #31
 AUCTION GOSSIP GRATS CONGRATULATIONS CONGRATS
-Usage: auction <message>
+Usage: auction
+       auction <item keyword> [minbid]
+       auction set <level>
+       auction sethigh <level>
+       auction -h <lines>
+       bid [amount]
        gossip <message>
        grats <message>
 
-These are channels reserved for specific purposes.  Messages on these
-channels reach everyone who is monitoring them.  You must be at least level
-three to use these channels.
+Auction can be used in several ways:
+  auction               - toggles your auction channel on/off
+  auction <item>        - starts an item auction (minimum starting bid 100 gold)
+  auction <item> <bid>  - starts an item auction with an explicit minimum bid
+  bid                   - shows the currently auctioned item and current bid
+  bid <amount>          - places a bid on the active auction
+  auction set <level>   - sets the lowest item level you want to see
+  auction sethigh <lvl> - sets the highest item level you want to see
+  auction -h <lines>    - shows auction channel history
 
-These channels should be used accordingly.
- 
+Auction sale tax is 10% by default and is taken from the seller when an
+auction completes. If your game uses player tiers, each tier can reduce this
+tax by 1% (up to 5%). If a seller outbids everyone and wins their own auction,
+an extra 10% seller fee applies.
+
+Messages on auction, gossip, and grats channels reach everyone who is
+monitoring them. You must be at least level three to use these channels.
+
 Examples:
 
-  > auction short sword -- minimum bid 100k
+  > auction short sword
+  > auction short sword 5000
+  > bid 7500
+  > auction set 15
+  > auction sethigh 40
   > gossip Hey, is that a short sword on your belt or are you happy to see me?
   > grats GRATS Detta!!!!!!!!
 
@@ -7854,7 +7875,7 @@ See Also: AUTOQUESTS
 #0
 QUESTS QUEST-LIST QUEST-HISTORY QUEST-PROGRESS QUEST-JOIN QUEST-LEAVE QUEST-STATUS QUEST-FLAG QUESTFLAG
 
-Usage: quest [list | join <#> | progress | leave | history]
+Usage: quest [list | join <#> | progress | leave | history | request | info | complete]
 
 quest          - Show usage information for the quest command.
 quest list     - Used at the questmaster to see which quests are available.
@@ -7862,6 +7883,9 @@ quest join #   - Used to the questmaster to join the quest listed as number 'nn'
 quest progress - Shows the player which quest they are doing, and their quest progress.
 quest leave    - Allows the player to abandon the current quest, taking the quest point penalty.
 quest history  - Shows all previously completed non-repeatable quests.
+quest request  - Request a kill quest from a questmaster in the room.
+quest info     - Show details for your current kill quest target and area.
+quest complete - Turn in a completed kill quest at a questmaster.
 
 See also: AUTOQUESTS
 #0

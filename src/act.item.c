@@ -1864,3 +1864,218 @@ ACMD(do_sac)
   }
   extract_obj(j);
 }
+
+struct auction_state_data {
+  struct obj_data *obj;
+  struct char_data *seller;
+  struct char_data *buyer;
+  long long current_bid;
+  long long min_bid;
+  int going;
+};
+
+static struct auction_state_data live_auction = { NULL, NULL, NULL, 0, 0, 0 };
+
+static void send_auction_message(const char *msg, int item_level)
+{
+  struct descriptor_data *d;
+
+  for (d = descriptor_list; d; d = d->next) {
+    if (STATE(d) != CON_PLAYING || !d->character)
+      continue;
+    if (PRF_FLAGGED(d->character, PRF_NOAUCT))
+      continue;
+    if (item_level > 1 &&
+        (GET_LEVEL(d->character) < GET_AUCTION_LOW(d->character) ||
+         GET_LEVEL(d->character) > GET_AUCTION_HIGH(d->character)))
+      continue;
+    send_to_char(d->character, "%s\r\n", msg);
+    add_history(d->character, (char *)msg, HIST_AUCTION);
+  }
+}
+
+static int seller_tax_percent(struct char_data *seller, int seller_won)
+{
+  int tier_discount = 0;
+  int tax = 10;
+
+  if (!seller)
+    return 10;
+
+  if (GET_CLAN_RANK(seller) > 0)
+    tier_discount = MIN(5, GET_CLAN_RANK(seller));
+  tax -= tier_discount;
+  if (seller_won)
+    tax += 10;
+  return MAX(0, tax);
+}
+
+void auction_update(void)
+{
+  char msg[MAX_STRING_LENGTH];
+  long long tax_amt, seller_take;
+  int tax_pct;
+
+  if (!live_auction.obj)
+    return;
+
+  live_auction.going++;
+  if (live_auction.going == 1) {
+    snprintf(msg, sizeof(msg), "[Auction] %s: current bid %lld gold.", GET_OBJ_SHORT(live_auction.obj), live_auction.current_bid);
+    send_auction_message(msg, GET_OBJ_LEVEL(live_auction.obj));
+    return;
+  }
+  if (live_auction.going == 2) {
+    snprintf(msg, sizeof(msg), "[Auction] %s: going once for %lld gold.", GET_OBJ_SHORT(live_auction.obj), live_auction.current_bid);
+    send_auction_message(msg, GET_OBJ_LEVEL(live_auction.obj));
+    return;
+  }
+  if (live_auction.going == 3) {
+    snprintf(msg, sizeof(msg), "[Auction] %s: going twice for %lld gold.", GET_OBJ_SHORT(live_auction.obj), live_auction.current_bid);
+    send_auction_message(msg, GET_OBJ_LEVEL(live_auction.obj));
+    return;
+  }
+
+  if (!live_auction.buyer) {
+    snprintf(msg, sizeof(msg), "[Auction] No bids for %s. Item returned to seller.", GET_OBJ_SHORT(live_auction.obj));
+    send_auction_message(msg, GET_OBJ_LEVEL(live_auction.obj));
+    if (live_auction.seller)
+      obj_to_char(live_auction.obj, live_auction.seller);
+  } else {
+    tax_pct = seller_tax_percent(live_auction.seller, live_auction.buyer == live_auction.seller);
+    tax_amt = (live_auction.current_bid * tax_pct) / 100;
+    seller_take = live_auction.current_bid - tax_amt;
+    increase_gold(live_auction.seller, seller_take);
+    obj_to_char(live_auction.obj, live_auction.buyer);
+
+    snprintf(msg, sizeof(msg),
+      "[Auction] SOLD: %s to %s for %lld gold. Seller tax %d%% (%lld gold).",
+      GET_OBJ_SHORT(live_auction.obj), GET_NAME(live_auction.buyer),
+      live_auction.current_bid, tax_pct, tax_amt);
+    send_auction_message(msg, GET_OBJ_LEVEL(live_auction.obj));
+  }
+
+  live_auction.obj = NULL;
+  live_auction.seller = NULL;
+  live_auction.buyer = NULL;
+  live_auction.current_bid = 0;
+  live_auction.min_bid = 0;
+  live_auction.going = 0;
+}
+
+ACMD(do_bid)
+{
+  long long amount;
+  char arg[MAX_INPUT_LENGTH];
+  char msg[MAX_STRING_LENGTH];
+
+  one_argument(argument, arg);
+
+  if (!live_auction.obj) {
+    send_to_char(ch, "There is no active auction right now.\r\n");
+    return;
+  }
+
+  if (!*arg) {
+    send_to_char(ch, "Current auction: %s. Current bid: %lld gold.\r\n",
+      GET_OBJ_SHORT(live_auction.obj), live_auction.current_bid);
+    return;
+  }
+  if (!is_number(arg)) {
+    send_to_char(ch, "Usage: bid <amount>\r\n");
+    return;
+  }
+
+  amount = atoll(arg);
+  if (amount <= live_auction.current_bid) {
+    send_to_char(ch, "Your bid must be higher than the current bid.\r\n");
+    return;
+  }
+  if ((long long)GET_GOLD(ch) < amount) {
+    send_to_char(ch, "You do not have that much gold on hand.\r\n");
+    return;
+  }
+
+  live_auction.current_bid = amount;
+  live_auction.buyer = ch;
+  live_auction.going = 0;
+  snprintf(msg, sizeof(msg), "[Auction] %s bids %lld gold on %s.",
+    GET_NAME(ch), amount, GET_OBJ_SHORT(live_auction.obj));
+  send_auction_message(msg, GET_OBJ_LEVEL(live_auction.obj));
+}
+
+ACMD(do_auction)
+{
+  char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], msg[MAX_STRING_LENGTH];
+  struct obj_data *obj;
+  long long min_bid = 100;
+
+  two_arguments(argument, arg1, arg2);
+
+  if (!*arg1) {
+    TOGGLE_BIT_AR(PRF_FLAGS(ch), PRF_NOAUCT);
+    send_to_char(ch, "Auction channel is now %s.\r\n", PRF_FLAGGED(ch, PRF_NOAUCT) ? "OFF" : "ON");
+    return;
+  }
+
+  if (!str_cmp(arg1, "-h")) {
+    char history_arg[] = "auction";
+    do_history(ch, history_arg, 0, 0);
+    return;
+  }
+  if (!str_cmp(arg1, "set")) {
+    if (!*arg2 || !is_number(arg2)) {
+      send_to_char(ch, "Usage: auction set <level>\r\n");
+      return;
+    }
+    GET_AUCTION_LOW(ch) = MAX(0, atoi(arg2));
+    if (GET_AUCTION_HIGH(ch) < GET_AUCTION_LOW(ch))
+      GET_AUCTION_HIGH(ch) = GET_AUCTION_LOW(ch);
+    send_to_char(ch, "Auction low-level filter set to %d.\r\n", GET_AUCTION_LOW(ch));
+    return;
+  }
+  if (!str_cmp(arg1, "sethigh")) {
+    if (!*arg2 || !is_number(arg2)) {
+      send_to_char(ch, "Usage: auction sethigh <level>\r\n");
+      return;
+    }
+    GET_AUCTION_HIGH(ch) = MAX(0, atoi(arg2));
+    if (GET_AUCTION_HIGH(ch) < GET_AUCTION_LOW(ch))
+      GET_AUCTION_LOW(ch) = GET_AUCTION_HIGH(ch);
+    send_to_char(ch, "Auction high-level filter set to %d.\r\n", GET_AUCTION_HIGH(ch));
+    return;
+  }
+
+  obj = get_obj_in_list_vis(ch, arg1, NULL, ch->carrying);
+  if (!obj) {
+    send_to_char(ch, "You don't seem to have that item.\r\n");
+    return;
+  }
+  if (OBJ_FLAGGED(obj, ITEM_NODROP)) {
+    send_to_char(ch, "You cannot auction that item.\r\n");
+    return;
+  }
+  if (live_auction.obj) {
+    send_to_char(ch, "There is already an auction in progress.\r\n");
+    return;
+  }
+  if (*arg2) {
+    if (!is_number(arg2)) {
+      send_to_char(ch, "Usage: auction <item> [minbid]\r\n");
+      return;
+    }
+    min_bid = MAX(100, atoll(arg2));
+  }
+
+  obj_from_char(obj);
+  live_auction.obj = obj;
+  live_auction.seller = ch;
+  live_auction.buyer = NULL;
+  live_auction.current_bid = min_bid;
+  live_auction.min_bid = min_bid;
+  live_auction.going = 0;
+
+  snprintf(msg, sizeof(msg), "[Auction] %s starts auctioning %s at %lld gold.",
+    GET_NAME(ch), GET_OBJ_SHORT(obj), min_bid);
+  send_auction_message(msg, GET_OBJ_LEVEL(obj));
+}

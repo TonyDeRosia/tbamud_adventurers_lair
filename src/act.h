@@ -144,6 +144,9 @@ ACMD(do_remove);
 ACMD(do_sac);
 ACMD(do_wear);
 ACMD(do_wield);
+ACMD(do_auction);
+ACMD(do_bid);
+void auction_update(void);
 
 
 /*****************************************************************************

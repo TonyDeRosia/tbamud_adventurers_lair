@@ -1018,6 +1018,15 @@ struct player_special_data_saved
   int    current_quest;         /**< vnum of current quest         */
   int    quest_time;            /**< time left on current quest    */
   int    quest_counter;         /**< Count of targets left to get  */
+  int    kill_quest_active;     /**< Dynamic kill quest is active  */
+  int    kill_quest_complete;   /**< Dynamic kill quest objective done */
+  mob_vnum kill_quest_target_vnum; /**< Assigned target mob vnum    */
+  room_vnum kill_quest_target_room; /**< Assigned target room vnum   */
+  mob_vnum kill_quest_giver_vnum;   /**< Quest master mob vnum       */
+  int    kill_quest_time;       /**< Time remaining (ticks)        */
+  long   kill_quest_target_id;  /**< Specific target instance id   */
+  int    auction_low_level;     /**< Lowest level shown on auction */
+  int    auction_high_level;    /**< Highest level shown on auction */
   time_t   lastmotd;            /**< Last time player read motd */
   time_t   lastnews;            /**< Last time player read news */
   long account_id; /* account linkage id */
