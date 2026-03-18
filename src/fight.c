@@ -1429,6 +1429,11 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
         count_shadow_servants_for(ch->master) >= 3)
       dam = (dam * 105) / 100;
   }
+  if (dam > 0 && ch && IS_NPC(ch) && ch->master &&
+      GET_SKILL(ch->master, SKILL_UNDEAD_COMMAND) > 0 &&
+      GET_CLASS(ch) == CLASS_UNDEAD) {
+    dam = (dam * 110) / 100;
+  }
 
   if (dam > 0 && ch && ch != victim && affected_by_spell(ch, SPELL_TIME_STOP)) {
     struct char_data *tch;
@@ -1703,6 +1708,14 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
 
   /* Uh oh.  Victim died. */
   if (GET_POS(victim) == POS_DEAD) {
+    if (ch != victim && ch && !IS_NPC(ch) &&
+        GET_SKILL(ch, SKILL_TACTICAL_SPELL_MEMORY) > 0 &&
+        attacktype > 0 && attacktype <= MAX_SPELLS) {
+      int mana_refund = MAX(1, GET_LEVEL(ch) / 4);
+      GET_MANA(ch) = MIN(effective_max_mana(ch), GET_MANA(ch) + mana_refund);
+      send_to_char(ch, "You retain tactical spell memory and recover %d mana.\r\n", mana_refund);
+    }
+
     if (ch != victim && (IS_NPC(victim) || victim->desc)) {
       if (GROUP(ch))
 	group_gain(ch, victim);
