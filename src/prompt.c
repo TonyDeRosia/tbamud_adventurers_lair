@@ -19,7 +19,7 @@ extern room_rnum top_of_world;
 /* External functions */
 int compute_armor_class(struct char_data *ch);
 
-static const char *default_prompt_template = "{W}[{R}%h{W}/{r}%H{W}]{X} {W}[{B}%m{W}/{b}%M{W}]{X} {W}[{G}%v{W}/{g}%V{W}]{X} {W}[{C}%kQT{W} {Y}%X{W}]{X} ";
+static const char *default_prompt_template = "{W}[{R}%h{D}/{r}%HHP{n} {B}%m{D}/{b}%MMA{n} {M}%v{D}/{m}%VMV{n} {C}%k{c}QT{n} {Y}%X{y}TNL{n}{W}]{X} ";
 
 static const char *translate_color_brace(char code)
 {
@@ -207,7 +207,20 @@ static void append_prompt_tnl(char *prompt, size_t *pos, struct descriptor_data 
 
 static void append_prompt_quest_timer(char *prompt, size_t *pos, struct descriptor_data *d)
 {
-  append_prompt_number(prompt, pos, get_quest_minutes_remaining(d->character));
+  struct char_data *ch = d->character;
+  int quest_minutes = get_quest_minutes_remaining(ch);
+
+  if (quest_minutes > 0) {
+    append_prompt_number(prompt, pos, quest_minutes);
+    return;
+  }
+
+  if (is_on_quest_cooldown(ch)) {
+    append_prompt_number(prompt, pos, get_quest_cooldown_minutes_remaining(ch));
+    return;
+  }
+
+  append_prompt_number(prompt, pos, 0);
 }
 
 static void append_prompt_level(char *prompt, size_t *pos, struct descriptor_data *d)
@@ -302,7 +315,7 @@ static const struct prompt_token_info prompt_tokens[] = {
   { 'V', "Maximum movement", append_prompt_max_move },
   { 'x', "Total experience", append_prompt_exp },
   { 'X', "Experience to next level", append_prompt_tnl },
-  { 'k', "Kill quest timer in real minutes (0 if inactive)", append_prompt_quest_timer },
+  { 'k', "Quest timer in real minutes (active quest, then cooldown, else 0)", append_prompt_quest_timer },
   { 'l', "Current level", append_prompt_level },
   { 'a', "Armor class", append_prompt_armor },
   { 'A', "Alignment", append_prompt_alignment },
