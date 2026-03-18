@@ -84,6 +84,36 @@ static const char *score_cond_label(int cond);
 
 static void build_visible_target_tags(struct char_data *viewer, struct char_data *target,
                                       char *out, size_t outsz, int include_afk);
+const char *get_aura_color(int aura_flag);
+
+enum aura_display_flag {
+  AURA_ANIMATED = 1,
+  AURA_ANGRY,
+  AURA_CHARMED,
+  AURA_DISEASED,
+  AURA_FLYING,
+  AURA_GOLDEN,
+  AURA_HIDDEN,
+  AURA_INVIS,
+  AURA_MARKED,
+  AURA_OPK,
+  AURA_PLAYER,
+  AURA_RED,
+  AURA_STEALTH,
+  AURA_TRANSLUCENT,
+  AURA_UNDEAD,
+  AURA_WHITE,
+  AURA_WOUNDED,
+  AURA_BLUE_OBJ,
+  AURA_GLOW_OBJ,
+  AURA_HUM_OBJ,
+  AURA_KEEP_OBJ,
+  AURA_MAGIC_OBJ,
+  AURA_CURSED_OBJ,
+  AURA_TEMPERED_OBJ,
+  AURA_ENVENOMED_OBJ,
+  AURA_ITEM
+};
 
 /* Encumbrance label for score display */
 /* Ensure exactly one blank line after room descriptions before exits/contents. */
@@ -157,6 +187,7 @@ static void list_obj_to_char(struct obj_data *list, struct char_data *ch, int mo
 /* do_look, do_equipment, do_examine, do_inventory */
 static void show_obj_to_char(struct obj_data *obj, struct char_data *ch, int mode);
 static void show_obj_modifiers(struct obj_data *obj, struct char_data *ch);
+static void build_obj_aura_tags(struct obj_data *obj, struct char_data *ch, char *out, size_t outsz);
 /* do_where utility functions */
 static void perform_immort_where(char_data *ch, const char *arg);
 static void perform_mortal_where(struct char_data *ch, char *arg);
@@ -172,6 +203,7 @@ static void show_obj_to_char(struct obj_data *obj, struct char_data *ch, int mod
 {
   int found = 0;
   struct char_data *temp;
+  char obj_tags[256];
 
   if (!obj || !ch) {
     log("SYSERR: NULL pointer in show_obj_to_char(): obj=%p ch=%p", (void *)obj, (void *)ch);
@@ -210,7 +242,9 @@ static void show_obj_to_char(struct obj_data *obj, struct char_data *ch, int mod
         else
           send_to_char(ch, "[TRIGS] ");
       }
-    }    send_to_char(ch, "%s", obj->description);
+    }
+    build_obj_aura_tags(obj, ch, obj_tags, sizeof(obj_tags));
+    send_to_char(ch, "%s%s", obj_tags, obj->description);
     
     send_to_char(ch, "%s", CCNRM(ch, C_NRM));break;
 
@@ -224,7 +258,8 @@ static void show_obj_to_char(struct obj_data *obj, struct char_data *ch, int mod
           send_to_char(ch, "[TRIGS] ");
       }
     }
-    send_to_char(ch, "%s", obj->short_description);
+    build_obj_aura_tags(obj, ch, obj_tags, sizeof(obj_tags));
+    send_to_char(ch, "%s%s", obj_tags, obj->short_description);
     break;
 
   case SHOW_OBJ_ACTION:
@@ -260,32 +295,17 @@ static void show_obj_to_char(struct obj_data *obj, struct char_data *ch, int mod
   }
   end:
 
-  show_obj_modifiers(obj, ch);
+  if (mode == SHOW_OBJ_ACTION)
+    show_obj_modifiers(obj, ch);
   send_to_char(ch, "\r\n");
 }
 
 static void show_obj_modifiers(struct obj_data *obj, struct char_data *ch)
 {
-  int shortflags = (!IS_NPC(ch) && PRF_FLAGGED(ch, PRF_SHORTFLAGS));
+  char obj_tags[256];
 
-  if (OBJ_FLAGGED(obj, ITEM_INVISIBLE))
-    send_to_char(ch, shortflags ? " (I)" : " (Invis)");
-
-  if (OBJ_FLAGGED(obj, ITEM_BLESS) && AFF_FLAGGED(ch, AFF_DETECT_ALIGN))
-    send_to_char(ch, shortflags ? " (B)" : " (Blue Aura)");
-
-  if (OBJ_FLAGGED(obj, ITEM_MAGIC) && AFF_FLAGGED(ch, AFF_DETECT_MAGIC))
-    send_to_char(ch, shortflags ? " (M)" : " (Magic)");
-
-  if (OBJ_FLAGGED(obj, ITEM_GLOW))
-    send_to_char(ch, shortflags ? " (G)" : " (Glow)");
-
-  if (OBJ_FLAGGED(obj, ITEM_HUM))
-    send_to_char(ch, shortflags ? " (H)" : " (Hum)");
-  if (OBJ_FLAGGED(obj, ITEM_NODROP))
-    send_to_char(ch, shortflags ? " (K)" : " (Cursed)");
-  if (OBJ_FLAGGED(obj, ITEM_ANTI_GOOD))
-    send_to_char(ch, shortflags ? " (R)" : " (Red Aura)");
+  build_obj_aura_tags(obj, ch, obj_tags, sizeof(obj_tags));
+  send_to_char(ch, " %s", obj_tags);
 }
 
 static void list_obj_to_char(struct obj_data *list, struct char_data *ch, int mode, int show)
@@ -405,6 +425,7 @@ static void look_at_char(struct char_data *i, struct char_data *ch)
 static void list_one_char(struct char_data *i, struct char_data *ch)
 {
   struct obj_data *furniture;
+  char tags[256];
   const char *positions[] = {
     " is lying here, dead.",
     " is lying here, mortally wounded.",
@@ -442,12 +463,8 @@ static void list_one_char(struct char_data *i, struct char_data *ch)
   if (IS_NPC(i) && i->player.long_descr && GET_POS(i) == GET_DEFAULT_POS(i)) {
     if (AFF_FLAGGED(i, AFF_INVISIBLE))
       send_to_char(ch, "*");
-
-    {
-      char tags[256];
-      build_visible_target_tags(ch, i, tags, sizeof(tags), FALSE);
-      send_to_char(ch, "%s", tags);
-    }
+    build_visible_target_tags(ch, i, tags, sizeof(tags), FALSE);
+    send_to_char(ch, "%s", tags);
     send_to_char(ch, "%s", i->player.long_descr);
 
     if (AFF_FLAGGED(i, AFF_SANCTUARY))
@@ -457,6 +474,10 @@ static void list_one_char(struct char_data *i, struct char_data *ch)
 
     return;
   }
+
+  build_visible_target_tags(ch, i, tags, sizeof(tags), FALSE);
+  if (*tags)
+    send_to_char(ch, "%s", tags);
 
   if (IS_NPC(i))
     send_to_char(ch, "%c%s", UPPER(*i->player.short_descr), i->player.short_descr + 1);
@@ -496,12 +517,6 @@ static void list_one_char(struct char_data *i, struct char_data *ch)
       send_to_char(ch, " is here struggling with thin air.");
   }
 
-  {
-    char tags[256];
-    build_visible_target_tags(ch, i, tags, sizeof(tags), FALSE);
-    if (*tags)
-      send_to_char(ch, " %s", tags);
-  }
   send_to_char(ch, "\r\n");
 
   if (AFF_FLAGGED(i, AFF_SANCTUARY))
@@ -826,6 +841,132 @@ static void out_append(char *dst, size_t dstsz, const char *src)
     return;
 
   snprintf(dst + len, dstsz - len, "%s", src);
+}
+
+const char *get_aura_color(int aura_flag)
+{
+  switch (aura_flag) {
+    case AURA_ANIMATED:   return BMAG;
+    case AURA_ANGRY:      return BRED;
+    case AURA_CHARMED:    return BCYN;
+    case AURA_DISEASED:   return KBLU;
+    case AURA_FLYING:     return BCYN;
+    case AURA_GOLDEN:     return BYEL;
+    case AURA_HIDDEN:     return KWHT;
+    case AURA_INVIS:      return KWHT;
+    case AURA_MARKED:     return KWHT;
+    case AURA_OPK:        return BMAG;
+    case AURA_PLAYER:     return BWHT;
+    case AURA_RED:        return BRED;
+    case AURA_STEALTH:    return BCYN;
+    case AURA_TRANSLUCENT:return KWHT;
+    case AURA_UNDEAD:     return BRED;
+    case AURA_WHITE:      return BWHT;
+    case AURA_WOUNDED:    return BRED;
+    case AURA_BLUE_OBJ:   return BBLU;
+    case AURA_GLOW_OBJ:   return BYEL;
+    case AURA_HUM_OBJ:    return BCYN;
+    case AURA_KEEP_OBJ:   return BRED;
+    case AURA_MAGIC_OBJ:  return BBLU;
+    case AURA_CURSED_OBJ: return KWHT;
+    case AURA_TEMPERED_OBJ:return BRED;
+    case AURA_ENVENOMED_OBJ:return BGRN;
+    case AURA_ITEM:       return BWHT;
+    default:              return KNRM;
+  }
+}
+
+static void append_colored_aura_tag(struct char_data *viewer, char *out, size_t outsz,
+                                    int aura_flag, const char *label)
+{
+  char tagbuf[96];
+  const char *clr = "";
+  const char *reset = "";
+
+  if (!out || !label)
+    return;
+
+  if (viewer && clr(viewer, C_NRM)) {
+    clr = get_aura_color(aura_flag);
+    reset = KNRM;
+  }
+
+  snprintf(tagbuf, sizeof(tagbuf), "%s%s%s ", clr, label, reset);
+  out_append(out, outsz, tagbuf);
+}
+
+static void append_char_aura_tag(struct char_data *viewer, char *out, size_t outsz,
+                                 int aura_flag, const char *long_tag, const char *short_tag,
+                                 int shortflags)
+{
+  const char *label = (shortflags && short_tag) ? short_tag : long_tag;
+
+  if (!label)
+    return;
+
+  if (aura_flag == AURA_MARKED && shortflags && short_tag)
+    append_colored_aura_tag(viewer, out, outsz, AURA_RED, label);
+  else
+    append_colored_aura_tag(viewer, out, outsz, aura_flag, label);
+}
+
+static bool obj_has_envenomed_state(const struct obj_data *obj)
+{
+  if (!obj)
+    return FALSE;
+
+  if ((GET_OBJ_TYPE(obj) == ITEM_DRINKCON || GET_OBJ_TYPE(obj) == ITEM_FOUNTAIN || GET_OBJ_TYPE(obj) == ITEM_FOOD) &&
+      GET_OBJ_VAL(obj, 3) > 0)
+    return TRUE;
+
+  return FALSE;
+}
+
+static bool obj_has_tempered_state(const struct obj_data *obj)
+{
+  if (!obj)
+    return FALSE;
+
+  return (GET_OBJ_TYPE(obj) == ITEM_WEAPON && OBJ_FLAGGED(obj, ITEM_ANTI_EVIL));
+}
+
+static void build_obj_aura_tags(struct obj_data *obj, struct char_data *ch, char *out, size_t outsz)
+{
+  int shortflags = (!IS_NPC(ch) && PRF_FLAGGED(ch, PRF_SHORTFLAGS));
+
+  if (!out || outsz == 0)
+    return;
+
+  out[0] = '\0';
+  append_colored_aura_tag(ch, out, outsz, AURA_ITEM, "(Item)");
+
+  if (OBJ_FLAGGED(obj, ITEM_MAGIC) && AFF_FLAGGED(ch, AFF_DETECT_MAGIC))
+    append_colored_aura_tag(ch, out, outsz, AURA_MAGIC_OBJ, shortflags ? "(M)" : "(Magic)");
+
+  if (OBJ_FLAGGED(obj, ITEM_BLESS) && AFF_FLAGGED(ch, AFF_DETECT_ALIGN))
+    append_colored_aura_tag(ch, out, outsz, AURA_BLUE_OBJ, shortflags ? "(B)" : "(Blue Aura)");
+
+  if (OBJ_FLAGGED(obj, ITEM_GLOW))
+    append_colored_aura_tag(ch, out, outsz, AURA_GLOW_OBJ, shortflags ? "(G)" : "(Glow)");
+
+  if (OBJ_FLAGGED(obj, ITEM_HUM))
+    append_colored_aura_tag(ch, out, outsz, AURA_HUM_OBJ, shortflags ? "(H)" : "(Hum)");
+
+  if (OBJ_FLAGGED(obj, ITEM_INVISIBLE))
+    append_colored_aura_tag(ch, out, outsz, AURA_INVIS, shortflags ? "(I)" : "(Invis)");
+
+  if (OBJ_FLAGGED(obj, ITEM_NODROP))
+    append_colored_aura_tag(ch, out, outsz, shortflags ? AURA_KEEP_OBJ : AURA_CURSED_OBJ,
+                            shortflags ? "(K)" : "(Cursed)");
+
+  if (OBJ_FLAGGED(obj, ITEM_ANTI_GOOD))
+    append_colored_aura_tag(ch, out, outsz, AURA_RED, shortflags ? "(R)" : "(Red Aura)");
+
+  if (obj_has_tempered_state(obj))
+    append_colored_aura_tag(ch, out, outsz, AURA_TEMPERED_OBJ, shortflags ? "(T)" : "(Tempered)");
+
+  if (obj_has_envenomed_state(obj))
+    append_colored_aura_tag(ch, out, outsz, AURA_ENVENOMED_OBJ, shortflags ? "(E)" : "(Envenomed)");
 }
 
 static void build_room_compass_map(struct char_data *ch, struct room_data *room,
@@ -4254,6 +4395,7 @@ static void build_visible_target_tags(struct char_data *viewer, struct char_data
                                    char *out, size_t outsz, int include_afk)
 {
   int shortflags = (!IS_NPC(viewer) && PRF_FLAGGED(viewer, PRF_SHORTFLAGS));
+  bool is_charmed_pet = (IS_NPC(target) && AFF_FLAGGED(target, AFF_CHARM));
 
   if (!out || outsz == 0)
     return;
@@ -4262,38 +4404,55 @@ static void build_visible_target_tags(struct char_data *viewer, struct char_data
 
   if (include_afk && !IS_NPC(target) && PRF_FLAGGED(target, PRF_AFK))
     out_append(out, outsz, "[AFK] ");
+
+  /* Type tags always first. */
   if (!IS_NPC(target))
-    out_append(out, outsz, shortflags ? "(P) " : "(Player) ");
-  if (AFF_FLAGGED(target, AFF_INVISIBLE))
-    out_append(out, outsz, shortflags ? "(I) " : "(Invis) ");
-  if (AFF_FLAGGED(target, AFF_HIDE))
-    out_append(out, outsz, shortflags ? "(H) " : "(Hidden) ");
-  if (AFF_FLAGGED(target, AFF_FLYING))
-    out_append(out, outsz, shortflags ? "(F) " : "(Flying) ");
-  if (AFF_FLAGGED(target, AFF_SANCTUARY))
-    out_append(out, outsz, shortflags ? "(W) " : "(White Aura) ");
-  if (AFF_FLAGGED(target, AFF_CHARM))
-    out_append(out, outsz, shortflags ? "(C) " : "(Charmed) ");
-  if (AFF_FLAGGED(target, AFF_POISON))
-    out_append(out, outsz, shortflags ? "(D) " : "(Diseased) ");
-  if (AFF_FLAGGED(target, AFF_SNEAK) && AFF_FLAGGED(viewer, AFF_SENSE_LIFE))
-    out_append(out, outsz, shortflags ? "(S) " : "(Stealth) ");
-  if (IS_NPC(target) && MOB_FLAGGED(target, MOB_AGGRESSIVE) && AFF_FLAGGED(viewer, AFF_SENSE_LIFE))
-    out_append(out, outsz, "(Angry) ");
-  if (GET_MAX_HIT(target) > 0 && (100 * GET_HIT(target) / GET_MAX_HIT(target)) < 60)
-    out_append(out, outsz, "(Wounded) ");
+    append_char_aura_tag(viewer, out, outsz, AURA_PLAYER, "(Player)", "(P)", shortflags);
+  else if (is_charmed_pet)
+    append_char_aura_tag(viewer, out, outsz, AURA_CHARMED, "(Charmed)", "(C)", shortflags);
+
+  /* Special status first. */
   if (!IS_NPC(target) && PLR_FLAGGED(target, PLR_KILLER))
-    out_append(out, outsz, "(OPK) ");
+    append_char_aura_tag(viewer, out, outsz, AURA_OPK, "(OPK)", NULL, shortflags);
+
+  /* Visibility/stealth state ordering. */
+  if (AFF_FLAGGED(target, AFF_INVISIBLE))
+    append_char_aura_tag(viewer, out, outsz, AURA_INVIS, "(Invis)", "(I)", shortflags);
+  if (AFF_FLAGGED(target, AFF_HIDE))
+    append_char_aura_tag(viewer, out, outsz, AURA_HIDDEN, "(Hidden)", "(H)", shortflags);
+  if (AFF_FLAGGED(target, AFF_SNEAK) && AFF_FLAGGED(viewer, AFF_SENSE_LIFE))
+    append_char_aura_tag(viewer, out, outsz, AURA_STEALTH, "(Stealth)", "(S)", shortflags);
+  if (AFF_FLAGGED(target, AFF_FLYING))
+    append_char_aura_tag(viewer, out, outsz, AURA_FLYING, "(Flying)", "(F)", shortflags);
+  if (AFF_FLAGGED(target, AFF_NOTRACK))
+    append_char_aura_tag(viewer, out, outsz, AURA_TRANSLUCENT, "(Translucent)", "(T)", shortflags);
+
+  /* Alignment/protection/major aura ordering. */
+  if (AFF_FLAGGED(target, AFF_SANCTUARY))
+    append_char_aura_tag(viewer, out, outsz, AURA_WHITE, "(White Aura)", "(W)", shortflags);
+  if (AFF_FLAGGED(viewer, AFF_DETECT_ALIGN)) {
+    if (IS_GOOD(target))
+      append_char_aura_tag(viewer, out, outsz, AURA_GOLDEN, "(Golden Aura)", "(G)", shortflags);
+    else if (IS_EVIL(target))
+      append_char_aura_tag(viewer, out, outsz, AURA_RED, "(Red Aura)", "(R)", shortflags);
+  }
+  if (AFF_FLAGGED(target, AFF_CURSE))
+    append_char_aura_tag(viewer, out, outsz, AURA_MARKED, "(Marked)", "(X)", shortflags);
+  if (AFF_FLAGGED(target, AFF_POISON))
+    append_char_aura_tag(viewer, out, outsz, AURA_DISEASED, "(Diseased)", "(D)", shortflags);
+  if (IS_NPC(target) && GET_CLASS(target) == CLASS_UNDEAD && AFF_FLAGGED(viewer, AFF_SENSE_LIFE))
+    append_char_aura_tag(viewer, out, outsz, AURA_UNDEAD, "(Undead)", "(U)", shortflags);
+
+  /* Secondary state ordering. */
+  if (is_charmed_pet)
+    append_char_aura_tag(viewer, out, outsz, AURA_ANIMATED, "(Animated)", "(A)", shortflags);
+  if (IS_NPC(target) && MOB_FLAGGED(target, MOB_AGGRESSIVE) && AFF_FLAGGED(viewer, AFF_SENSE_LIFE))
+    append_char_aura_tag(viewer, out, outsz, AURA_ANGRY, "(Angry)", NULL, shortflags);
+  if (GET_MAX_HIT(target) > 0 && (100 * GET_HIT(target) / GET_MAX_HIT(target)) < 60)
+    append_char_aura_tag(viewer, out, outsz, AURA_WOUNDED, "(Wounded)", NULL, shortflags);
+
   if (is_player_quest_target(viewer, target))
     out_append(out, outsz, "[QUEST] ");
-  if (AFF_FLAGGED(viewer, AFF_DETECT_ALIGN)) {
-    if (IS_EVIL(target))
-      out_append(out, outsz, shortflags ? "(R) " : "(Red Aura) ");
-    else if (IS_GOOD(target))
-      out_append(out, outsz, shortflags ? "(G) " : "(Golden Aura) ");
-  }
-
-  (void) viewer;
 }
 
 static void build_scan_target_tags(struct char_data *viewer, struct char_data *target,
