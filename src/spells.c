@@ -23,6 +23,7 @@
 #include "fight.h"
 #include "criticalhits.h"
 #include "mud_event.h"
+#include "screen.h"
 
 static int clampi(int v, int lo, int hi)
 {
@@ -36,6 +37,32 @@ static int clampi(int v, int lo, int hi)
 static int warlock_power(struct char_data *ch)
 {
   return GET_INT(ch) + GET_WIS(ch);
+}
+
+static int identify_is_warning_flag(const char *flag)
+{
+  if (!flag || !*flag)
+    return FALSE;
+
+  return !str_cmp(flag, "nodrop")
+      || !str_cmp(flag, "cursed")
+      || !str_cmp(flag, "no_sell")
+      || !str_cmp(flag, "nosell")
+      || !str_cmp(flag, "no-rent")
+      || !str_cmp(flag, "norent")
+      || !str_cmp(flag, "anti-good")
+      || !str_cmp(flag, "anti-evil")
+      || !str_cmp(flag, "anti-neutral");
+}
+
+static void identify_send_border(struct char_data *ch, const char *border, const char *reset)
+{
+  send_to_char(ch, "%s+------------------------------------------------------------------------------+%s\r\n", border, reset);
+}
+
+static void identify_send_section_header(struct char_data *ch, const char *border, const char *label, const char *reset, const char *title)
+{
+  send_to_char(ch, "%s|%s %s[%s]%s\r\n", border, reset, label, title, reset);
 }
 
 /* Handle followers when an owner teleports or recalls. */
@@ -613,24 +640,83 @@ ASPELL(spell_devour_soul)
 ASPELL(spell_identify)
 {
   int i, found;
-  size_t len;
+  size_t len, tok_len;
 
   if (obj) {
-    char bitbuf[MAX_STRING_LENGTH];
+    char bitbuf[MAX_STRING_LENGTH], typebuf[256], wearbuf[MAX_STRING_LENGTH];
+    char flags_buf[MAX_STRING_LENGTH], flag_word[128], aff_summary[256];
+    char line[MAX_STRING_LENGTH];
+    const char *B = CCBLU(ch, C_NRM);
+    const char *L = CCCYN(ch, C_NRM);
+    const char *R = CCNRM(ch, C_NRM);
+    const char *V = CCWHT(ch, C_NRM);
+    const char *G = CCGRN(ch, C_NRM);
+    const char *RED = CCRED(ch, C_NRM);
+    const char *Y = CCYEL(ch, C_NRM);
+    const char *M = CCMAG(ch, C_NRM);
+    int affect_count = 0;
+    int flag_columns = 0;
 
-    sprinttype(GET_OBJ_TYPE(obj), item_types, bitbuf, sizeof(bitbuf));
-    send_to_char(ch, "You feel informed:\r\nObject '%s', Item type: %s\r\n", obj->short_description, bitbuf);
+    sprinttype(GET_OBJ_TYPE(obj), item_types, typebuf, sizeof(typebuf));
+    sprintbitarray(GET_OBJ_WEAR(obj), wear_bits, TW_ARRAY_MAX, wearbuf);
+    sprintbitarray(GET_OBJ_EXTRA(obj), extra_bits, EF_ARRAY_MAX, flags_buf);
+
+    identify_send_border(ch, B, R);
+    send_to_char(ch, "%s|%s %sIdentify Appraisal%s%-57.57s%s |\r\n",
+                 B, R, L, R, "", B);
+    identify_send_border(ch, B, R);
+
+    identify_send_section_header(ch, B, L, R, "Header / Identity");
+    send_to_char(ch, "%s|%s %sName:%s %s%s\r\n", B, R, L, R, obj->short_description ? obj->short_description : "<None>", R);
+    send_to_char(ch, "%s|%s %sKeywords:%s %s%s\r\n", B, R, L, R, obj->name ? obj->name : "<None>", R);
+    send_to_char(ch, "%s|%s %sId:%s %s%ld%s  %sType:%s %s%s%s  %sLevel:%s %s%d%s\r\n",
+                 B, R, L, R, V, obj_script_id(obj), R, L, R, V, typebuf, R, L, R, V, GET_OBJ_LEVEL(obj), R);
 
     if (GET_OBJ_AFFECT(obj)) {
       sprintbitarray(GET_OBJ_AFFECT(obj), affected_bits, AF_ARRAY_MAX, bitbuf);
-      send_to_char(ch, "Item will give you following abilities:  %s\r\n", bitbuf);
+      send_to_char(ch, "%s|%s %sAbilities:%s %s%s%s\r\n", B, R, L, R, V, bitbuf, R);
     }
 
-    sprintbitarray(GET_OBJ_EXTRA(obj), extra_bits, EF_ARRAY_MAX, bitbuf);
-    send_to_char(ch, "Item is: %s\r\n", bitbuf);
+    identify_send_border(ch, B, R);
+    identify_send_section_header(ch, B, L, R, "Core Properties");
+    send_to_char(ch, "%s|%s %sWorth:%s %s%d%s  %sWeight:%s %s%d%s  %sRent:%s %s%d%s\r\n",
+                 B, R, L, R, V, GET_OBJ_COST(obj), R, L, R, V, GET_OBJ_WEIGHT(obj), R, L, R, V, GET_OBJ_RENT(obj), R);
+    send_to_char(ch, "%s|%s %sWearable:%s %s%s%s\r\n", B, R, L, R, V, wearbuf, R);
 
-    send_to_char(ch, "Weight: %d, Value: %d, Rent: %d, Min. level: %d\r\n",
-                     GET_OBJ_WEIGHT(obj), GET_OBJ_COST(obj), GET_OBJ_RENT(obj), GET_OBJ_LEVEL(obj));
+    send_to_char(ch, "%s|%s %sFlags:%s ", B, R, L, R);
+    found = FALSE;
+    tok_len = 0;
+    while (*(flags_buf + tok_len) && *(flags_buf + tok_len) == ' ')
+      tok_len++;
+    flags_buf[MAX_STRING_LENGTH - 1] = '\0';
+    for (len = tok_len; len <= strlen(flags_buf); len++) {
+      if (flags_buf[len] != ' ' && flags_buf[len] != '\0')
+        continue;
+      if (len == tok_len) {
+        tok_len = len + 1;
+        continue;
+      }
+      snprintf(flag_word, sizeof(flag_word), "%.*s", (int)(len - tok_len), flags_buf + tok_len);
+      send_to_char(ch, "%s%s%s%s",
+                   identify_is_warning_flag(flag_word) ? Y : V,
+                   flag_word,
+                   R,
+                   flags_buf[len] == '\0' ? "" : " ");
+      found = TRUE;
+      flag_columns++;
+      if (flag_columns >= 5 && flags_buf[len] != '\0') {
+        send_to_char(ch, "\r\n%s|%s %-8.8s ", B, R, "");
+        flag_columns = 0;
+      }
+      tok_len = len + 1;
+      while (*(flags_buf + tok_len) && *(flags_buf + tok_len) == ' ')
+        tok_len++;
+    }
+    if (!found)
+      send_to_char(ch, "%snone%s", V, R);
+    send_to_char(ch, "\r\n");
+
+    identify_send_border(ch, B, R);
 
     switch (GET_OBJ_TYPE(obj)) {
     case ITEM_SCROLL:
@@ -653,34 +739,59 @@ ASPELL(spell_identify)
 	snprintf(bitbuf + len, sizeof(bitbuf) - len, " %s", skill_name(GET_OBJ_VAL(obj, 3)));
       }
 
-      send_to_char(ch, "This %s casts: %s\r\n", item_types[(int) GET_OBJ_TYPE(obj)], bitbuf);
+      send_to_char(ch, "%s|%s %sSpell Data:%s This %s casts:%s %s%s\r\n",
+                   B, R, L, R, item_types[(int) GET_OBJ_TYPE(obj)], R, V, bitbuf);
       break;
     case ITEM_WAND:
     case ITEM_STAFF:
-      send_to_char(ch, "This %s casts: %s\r\nIt has %d maximum charge%s and %d remaining.\r\n",
-		item_types[(int) GET_OBJ_TYPE(obj)], skill_name(GET_OBJ_VAL(obj, 3)),
-		GET_OBJ_VAL(obj, 1), GET_OBJ_VAL(obj, 1) == 1 ? "" : "s", GET_OBJ_VAL(obj, 2));
+      send_to_char(ch, "%s|%s %sSpell Data:%s This %s casts:%s %s%s%s\r\n",
+                   B, R, L, R, item_types[(int) GET_OBJ_TYPE(obj)], R, V, skill_name(GET_OBJ_VAL(obj, 3)), R);
+      send_to_char(ch, "%s|%s %sCharges:%s %s%d%s maximum, %s%d%s remaining\r\n",
+                   B, R, L, R, V, GET_OBJ_VAL(obj, 1), R, V, GET_OBJ_VAL(obj, 2), R);
       break;
     case ITEM_WEAPON:
-      send_to_char(ch, "Damage Dice is '%dD%d' for an average per-round damage of %.1f.\r\n",
-		GET_OBJ_VAL(obj, 1), GET_OBJ_VAL(obj, 2), ((GET_OBJ_VAL(obj, 2) + 1) / 2.0) * GET_OBJ_VAL(obj, 1));
+      send_to_char(ch, "%s|%s %sWeapon Data:%s Damage dice %s%dD%d%s, avg/round %s%.1f%s\r\n",
+                   B, R, L, R, V, GET_OBJ_VAL(obj, 1), GET_OBJ_VAL(obj, 2), R, V,
+                   ((GET_OBJ_VAL(obj, 2) + 1) / 2.0) * GET_OBJ_VAL(obj, 1), R);
       break;
     case ITEM_ARMOR:
-      send_to_char(ch, "AC-apply is %d\r\n", GET_OBJ_VAL(obj, 0));
+      send_to_char(ch, "%s|%s %sArmor Data:%s AC apply %s%d%s\r\n",
+                   B, R, L, R, V, GET_OBJ_VAL(obj, 0), R);
+      break;
+    default:
       break;
     }
+
+    identify_send_border(ch, B, R);
+    identify_send_section_header(ch, B, L, R, "Notes / Summary");
+    for (i = 0; i < MAX_OBJ_AFFECT; i++) {
+      if ((obj->affected[i].location != APPLY_NONE) &&
+          (obj->affected[i].modifier != 0)) {
+        affect_count++;
+      }
+    }
+
+    snprintf(aff_summary, sizeof(aff_summary), "Item has %d modifier affect%s.", affect_count, affect_count == 1 ? "" : "s");
+    send_to_char(ch, "%s|%s %sNotes:%s %s%s%s\r\n", B, R, L, R, M, aff_summary, R);
+
+    identify_send_border(ch, B, R);
+    identify_send_section_header(ch, B, L, R, "Detailed Modifiers");
+
     found = FALSE;
     for (i = 0; i < MAX_OBJ_AFFECT; i++) {
       if ((obj->affected[i].location != APPLY_NONE) &&
-	  (obj->affected[i].modifier != 0)) {
-	if (!found) {
-	  send_to_char(ch, "Can affect you as :\r\n");
-	  found = TRUE;
-	}
-	sprinttype(obj->affected[i].location, apply_types, bitbuf, sizeof(bitbuf));
-	send_to_char(ch, "   Affects: %s By %d\r\n", bitbuf, obj->affected[i].modifier);
+          (obj->affected[i].modifier != 0)) {
+        sprinttype(obj->affected[i].location, apply_types, bitbuf, sizeof(bitbuf));
+        snprintf(line, sizeof(line), "%-22.22s : %s%+d%s", bitbuf,
+                 obj->affected[i].modifier >= 0 ? G : RED, obj->affected[i].modifier, R);
+        send_to_char(ch, "%s|%s %s%s%s\r\n", B, R, V, line, R);
+        found = TRUE;
       }
     }
+    if (!found)
+      send_to_char(ch, "%s|%s %sNo detailed modifiers on this item.%s\r\n", B, R, V, R);
+
+    identify_send_border(ch, B, R);
   } else if (victim) {		/* victim */
     send_to_char(ch, "Name: %s\r\n", GET_NAME(victim));
     if (!IS_NPC(victim))
