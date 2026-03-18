@@ -17,6 +17,7 @@
 
 /* clan editor */
 struct descriptor_data;
+struct room_effect_data;
 void clanedit_parse(struct descriptor_data *d, char *arg);
 
 /** If you want equipment to be automatically equipped to the same place
@@ -305,8 +306,46 @@ void clanedit_parse(struct descriptor_data *d, char *arg);
 #define AFF_HIDE           20   /**< Char is hidden */
 #define AFF_FREE           21   /**< Room for future expansion */
 #define AFF_CHARM          22   /**< Char is charmed */
+#define AFF_WEBBED         23
+#define AFF_SILENCED       24
+#define AFF_PHASE          25
+#define AFF_MARKED         26
+#define AFF_ARCANE_LEAK    27
+#define AFF_TIME_SNARE     28
+#define AFF_SPELLLOCK      29
+#define AFF_CORRODED       30
+#define AFF_FEARFUL        31
+#define AFF_STATIC         32
+#define AFF_BLOODLUST      33
+#define AFF_ELEMENTAL_WARD_FIRE      34
+#define AFF_ELEMENTAL_WARD_COLD      35
+#define AFF_ELEMENTAL_WARD_LIGHTNING 36
+#define AFF_ELEMENTAL_WARD_ACID      37
+#define AFF_STONESKIN      38
+#define AFF_MIRROR_IMAGE   39
+#define AFF_BURNING        40
+#define AFF_FROZEN         41
+#define AFF_ROOTED         42
+#define AFF_STUNNED        43
+#define AFF_BLINDED_MAGICAL 44
+#define AFF_WARDED         45
+#define AFF_HEXED          46
+#define AFF_SHIELDED       47
+#define AFF_REGENERATING   48
+#define AFF_TRUESIGHT      49
+#define AFF_EMPOWERED      50
+#define AFF_FORTIFIED      51
+#define AFF_WRAITHFORM     52
+#define AFF_BARKSKIN       53
+#define AFF_HOLY_AURA      54
+#define AFF_UNHOLY_AURA    55
+#define AFF_DEATH_WARD     56
+#define AFF_SPELL_REFLECT  57
+#define AFF_ADRENALINE     58
+#define AFF_CLARITY        59
+#define AFF_INFUSED        60
 /** Total number of affect flags */
-#define NUM_AFF_FLAGS   23
+#define NUM_AFF_FLAGS   61
 
 /* Modes of connectedness: used by descriptor_data.state                */
 #define CON_PLAYING       0 /**< Playing - Nominal state                */
@@ -852,6 +891,7 @@ struct room_data
   struct char_data *people;   /**< List of NPCs / PCs in room */
   
   struct list_data * events;  
+  struct room_effect_data *effects;
 };
 
 /* char-related structures */
@@ -1071,6 +1111,7 @@ struct player_special_data
   int last_olc_mode;     /**< ? Currently Unused ? */
   char *host;            /**< Resolved hostname, or ip, for player. */
   int buildwalk_sector;  /**< Default sector type for buildwalk */
+  int spell_cooldowns[MAX_SKILLS + 1]; /**< Per-spell round cooldown timers (runtime only). */
 };
 
 /** Special data used by NPCs, not PCs */
@@ -1082,6 +1123,15 @@ struct mob_special_data
   byte damnodice;     /**< The number of dice to roll for damage */
   byte damsizedice;   /**< The size of each die rolled for damage. */  long long gold_min; /* min roll on death */
   long long gold_max; /* max roll on death */
+  int summon_timer;   /**< Violence-pulse countdown for temporary summons (<=0 means permanent). */
+};
+
+struct room_effect_data
+{
+  int effect_type;
+  int duration;
+  int modifier;
+  struct room_effect_data *next;
 };
 
 struct ai_actor_profile;

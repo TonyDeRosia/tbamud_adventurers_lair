@@ -36,6 +36,95 @@ static void spello(int spl, const char *name, int max_mana, int min_mana,
     const char *wearoff);
 static int mag_manacost(struct char_data *ch, int spellnum);
 static bool is_spellup_beneficial_spell(int spellnum);
+static int reflect_suppressed = 0;
+
+int spell_on_cooldown(struct char_data *ch, int spellnum)
+{
+  if (!ch || IS_NPC(ch) || spellnum < 0 || spellnum > MAX_SKILLS)
+    return 0;
+  return GET_SPELL_COOLDOWN(ch, spellnum) > 0;
+}
+
+void set_spell_cooldown(struct char_data *ch, int spellnum, int rounds)
+{
+  if (!ch || IS_NPC(ch) || spellnum < 0 || spellnum > MAX_SKILLS)
+    return;
+  GET_SPELL_COOLDOWN(ch, spellnum) = MAX(0, rounds);
+}
+
+void tick_spell_cooldowns(struct char_data *ch)
+{
+  int i;
+  if (!ch || IS_NPC(ch))
+    return;
+
+  for (i = 0; i <= MAX_SKILLS; i++)
+    if (GET_SPELL_COOLDOWN(ch, i) > 0)
+      GET_SPELL_COOLDOWN(ch, i)--;
+}
+
+int room_has_effect(struct room_data *room, int effect_type)
+{
+  struct room_effect_data *eff;
+  if (!room)
+    return 0;
+
+  for (eff = room->effects; eff; eff = eff->next)
+    if (eff->effect_type == effect_type)
+      return 1;
+  return 0;
+}
+
+void room_add_effect(struct room_data *room, int effect_type, int duration, int modifier)
+{
+  struct room_effect_data *eff;
+  if (!room || duration <= 0)
+    return;
+
+  for (eff = room->effects; eff; eff = eff->next) {
+    if (eff->effect_type == effect_type) {
+      eff->duration = MAX(eff->duration, duration);
+      eff->modifier = modifier;
+      return;
+    }
+  }
+
+  CREATE(eff, struct room_effect_data, 1);
+  eff->effect_type = effect_type;
+  eff->duration = duration;
+  eff->modifier = modifier;
+  eff->next = room->effects;
+  room->effects = eff;
+}
+
+void room_tick_effects(struct room_data *room)
+{
+  struct room_effect_data *eff, *next, *prev = NULL;
+  if (!room)
+    return;
+
+  for (eff = room->effects; eff; eff = next) {
+    next = eff->next;
+    if (eff->duration > 0)
+      eff->duration--;
+    if (eff->duration <= 0) {
+      if (prev)
+        prev->next = next;
+      else
+        room->effects = next;
+      free(eff);
+      continue;
+    }
+    prev = eff;
+  }
+}
+
+void set_temp_summon_timer(struct char_data *mob, int rounds)
+{
+  if (!mob || !IS_NPC(mob))
+    return;
+  GET_SUMMON_TIMER(mob) = MAX(0, rounds);
+}
 
 struct cast_message {
   const char *to_caster;
@@ -889,6 +978,22 @@ int call_magic(struct char_data *caster, struct char_data *cvict,
     send_to_char(caster, "This mob is protected.\r\n");
     return (0);
   }
+
+  if (!reflect_suppressed &&
+      cvict && cvict != caster &&
+      SINFO.violent &&
+      (IS_SET(SINFO.targets, TAR_CHAR_ROOM) || IS_SET(SINFO.targets, TAR_CHAR_WORLD) ||
+       IS_SET(SINFO.targets, TAR_FIGHT_VICT) || IS_SET(SINFO.targets, TAR_FIGHT_SELF)) &&
+      AFF_FLAGGED(cvict, AFF_SPELL_REFLECT) &&
+      rand_number(1, 100) <= 20) {
+    act("A reflective ward around $N redirects your spell!", FALSE, caster, 0, cvict, TO_CHAR);
+    act("Your reflective ward flares and redirects $n's spell!", FALSE, caster, 0, cvict, TO_VICT);
+    act("$N's reflective ward flares and redirects $n's spell!", FALSE, caster, 0, cvict, TO_NOTVICT);
+    reflect_suppressed++;
+    call_magic(cvict, caster, NULL, spellnum, level, casttype);
+    reflect_suppressed--;
+    return 0;
+  }
   /* determine the type of saving throw */
   switch (casttype) {
   case CAST_STAFF:
@@ -1163,6 +1268,11 @@ int cast_spell(struct char_data *ch, struct char_data *tch,
     return (0);
   }
 
+  if (AFF_FLAGGED(ch, AFF_STUNNED)) {
+    send_to_char(ch, "You are too stunned to cast!\r\n");
+    return (0);
+  }
+
   if (GET_POS(ch) < SINFO.min_position) {
     switch (GET_POS(ch)) {
       case POS_SLEEPING:
@@ -1276,6 +1386,14 @@ ACMD(do_spellup)
     }
 
     any_eligible = TRUE;
+    if (AFF_FLAGGED(ch, AFF_SILENCED)) {
+      send_to_char(ch, "You open your mouth but no words come out!\r\n");
+      continue;
+    }
+    if (spell_on_cooldown(ch, spellnum)) {
+      send_to_char(ch, "That spell is still recovering.\r\n");
+      continue;
+    }
     mana = mag_manacost(ch, spellnum);
     if ((mana > 0) && (GET_MANA(ch) < mana) && (GET_LEVEL(ch) < LVL_IMMORT)) {
       skipped_mana++;
@@ -1283,6 +1401,13 @@ ACMD(do_spellup)
     }
 
     any_attempted = TRUE;
+    if (AFF_FLAGGED(ch, AFF_SPELLLOCK) && rand_number(1, 100) <= 40) {
+      send_to_char(ch, "Your concentration shatters and the spell fizzles!\r\n");
+      WAIT_STATE(ch, PULSE_VIOLENCE);
+      if (mana > 0)
+        GET_MANA(ch) = MAX(0, MIN(effective_max_mana(ch), GET_MANA(ch) - mana));
+      continue;
+    }
     if (rand_number(0, 101) > GET_SKILL(ch, spellnum)) {
       WAIT_STATE(ch, PULSE_VIOLENCE);
       if (!tch || !skill_message(0, ch, tch, spellnum))
@@ -1535,9 +1660,25 @@ ACMD(do_cast) {
     send_to_char(ch, "Cannot find the target of your spell!\r\n");
     return;
   }
+  if (AFF_FLAGGED(ch, AFF_SILENCED)) {
+    send_to_char(ch, "You open your mouth but no words come out!\r\n");
+    return;
+  }
+  if (spell_on_cooldown(ch, spellnum)) {
+    send_to_char(ch, "That spell is still recovering.\r\n");
+    return;
+  }
   mana = mag_manacost(ch, spellnum);
   if ((mana > 0) && (GET_MANA(ch) < mana) && (GET_LEVEL(ch) < LVL_IMMORT)) {
     send_to_char(ch, "You haven't the energy to cast that spell!\r\n");
+    return;
+  }
+
+  if (AFF_FLAGGED(ch, AFF_SPELLLOCK) && rand_number(1, 100) <= 40) {
+    send_to_char(ch, "Your concentration shatters and the spell fizzles!\r\n");
+    WAIT_STATE(ch, PULSE_VIOLENCE);
+    if (mana > 0)
+      GET_MANA(ch) = MAX(0, MIN(effective_max_mana(ch), GET_MANA(ch) - mana));
     return;
   }
 

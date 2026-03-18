@@ -554,6 +554,11 @@ int do_simple_move(struct char_data *ch, int dir, int need_specials_check)
     return (0);
   }
 
+  if (AFF_FLAGGED(ch, AFF_ROOTED)) {
+    send_to_char(ch, "Your feet are rooted in place!\r\n");
+    return (0);
+  }
+
   if (mount && (IN_ROOM(mount) != was_in || mount->master != ch)) {
     dismount_char(ch);
     mount = NULL;

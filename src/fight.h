@@ -29,6 +29,7 @@ void death_cry(struct char_data *ch);
 void die(struct char_data * ch, struct char_data * killer);
 void hit(struct char_data *ch, struct char_data *victim, int type);
 void perform_violence(void);
+void set_next_damage_type(int damage_type);
 void raw_kill(struct char_data * ch, struct char_data * killer);
 void  set_fighting(struct char_data *ch, struct char_data *victim);
 int skill_message(int dam, struct char_data *ch, struct char_data *vict,

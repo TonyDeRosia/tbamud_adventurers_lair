@@ -321,6 +321,11 @@ void affect_total(struct char_data *ch)
   for (af = ch->affected; af; af = af->next)
     affect_modify_ar(ch, af->location, af->modifier, af->bitvector, TRUE);
 
+  if (AFF_FLAGGED(ch, AFF_TRUESIGHT)) {
+    SET_BIT_AR(AFF_FLAGS(ch), AFF_DETECT_INVIS);
+    SET_BIT_AR(AFF_FLAGS(ch), AFF_SENSE_LIFE);
+  }
+
   /* Apply affects from furniture being used (sit/rest/sleep on ITEM_FURNITURE).
      These must be derived only, based on SITTING(ch). */
   if (SITTING(ch) && GET_OBJ_TYPE(SITTING(ch)) == ITEM_FURNITURE) {

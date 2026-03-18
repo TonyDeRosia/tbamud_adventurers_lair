@@ -242,6 +242,35 @@ enum identify_detail_level {
   IDENTIFY_FULL = 1
 };
 
+enum damage_type {
+  DAM_NONE = 0,
+  DAM_FIRE,
+  DAM_COLD,
+  DAM_LIGHTNING,
+  DAM_ACID,
+  DAM_NECROTIC,
+  DAM_HOLY,
+  DAM_SHADOW,
+  DAM_ARCANE,
+  DAM_FORCE,
+  DAM_SONIC,
+  DAM_POISON,
+  DAM_PSYCHIC,
+  DAM_EARTH
+};
+
+enum room_effect_type {
+  ROOM_EFFECT_NONE = 0,
+  ROOM_EFFECT_WALL_OF_FIRE,
+  ROOM_EFFECT_SILENCE_FIELD,
+  ROOM_EFFECT_NULL_FIELD,
+  ROOM_EFFECT_CONSECRATE,
+  ROOM_EFFECT_STATIC_FIELD,
+  ROOM_EFFECT_TOXIC_CLOUD,
+  ROOM_EFFECT_MIASMA,
+  ROOM_EFFECT_GRAVITY_WELL
+};
+
 ASPELL(spell_create_water);
 ASPELL(spell_recall);
 ASPELL(spell_teleport);
@@ -300,6 +329,16 @@ void mag_creations(int level, struct char_data *ch, int spellnum);
 
 int	call_magic(struct char_data *caster, struct char_data *cvict,
   struct obj_data *ovict, int spellnum, int level, int casttype);
+void set_spell_damage_type(enum damage_type type);
+int spell_on_cooldown(struct char_data *ch, int spellnum);
+void set_spell_cooldown(struct char_data *ch, int spellnum, int rounds);
+void tick_spell_cooldowns(struct char_data *ch);
+
+int room_has_effect(struct room_data *room, int effect_type);
+void room_add_effect(struct room_data *room, int effect_type, int duration, int modifier);
+void room_tick_effects(struct room_data *room);
+
+void set_temp_summon_timer(struct char_data *mob, int rounds);
 
 void	mag_objectmagic(struct char_data *ch, struct obj_data *obj,
 			char *argument);
