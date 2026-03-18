@@ -37,6 +37,12 @@ static void strip_sanctuary_effects(struct char_data *victim);
 static void sanctuary_messages(int spellnum, const char **to_vict, const char **to_room);
 static enum damage_type current_spell_damage_type = DAM_NONE;
 
+static int spell_dur_short(int level) { return 2 + (level / 10); }
+static int spell_dur_medium(int level) { return 4 + (level / 8); }
+static int spell_dur_long(int level) { return 6 + (level / 6); }
+static int spell_dmg_low(int level) { return (level * 2) + dice(2, MAX(1, level / 4)); }
+static int spell_dmg_medium(int level) { return (level * 3) + dice(3, MAX(1, level / 3)); }
+
 void set_spell_damage_type(enum damage_type type)
 {
   current_spell_damage_type = type;
@@ -383,6 +389,34 @@ int mag_damage(int level, struct char_data *ch, struct char_data *victim,
     else
       dam = dice(1, 10);
     break;
+  case SPELL_FIREBOLT:
+    if (local_damage_type == DAM_NONE) local_damage_type = DAM_FIRE;
+    dam = spell_dmg_low(level);
+    break;
+  case SPELL_FLAME_ARROW:
+    if (local_damage_type == DAM_NONE) local_damage_type = DAM_FIRE;
+    dam = spell_dmg_medium(level);
+    break;
+  case SPELL_FROSTBITE:
+    if (local_damage_type == DAM_NONE) local_damage_type = DAM_COLD;
+    dam = spell_dmg_low(level);
+    break;
+  case SPELL_VOLTAIC_BOLT:
+    if (local_damage_type == DAM_NONE) local_damage_type = DAM_LIGHTNING;
+    dam = spell_dmg_medium(level);
+    break;
+  case SPELL_ACID_BLAST:
+    if (local_damage_type == DAM_NONE) local_damage_type = DAM_ACID;
+    dam = spell_dmg_medium(level);
+    break;
+  case SPELL_SHADOW_BOLT:
+    if (local_damage_type == DAM_NONE) local_damage_type = DAM_SHADOW;
+    dam = spell_dmg_medium(level);
+    break;
+  case SPELL_VAMPIRIC_TOUCH:
+    if (local_damage_type == DAM_NONE) local_damage_type = DAM_NECROTIC;
+    dam = spell_dmg_medium(level);
+    break;
 
     /* Area spells */
   case SPELL_EARTHQUAKE:
@@ -396,6 +430,9 @@ int mag_damage(int level, struct char_data *ch, struct char_data *victim,
   /* divide damage by two if victim makes his saving throw */
   if (mag_savingthrow(victim, savetype, 0))
     dam /= 2;
+
+  if (spellnum == SPELL_SHADOW_BOLT && IS_GOOD(victim))
+    dam = (dam * 125) / 100;
 
   /* and finally, inflict the damage */
 
@@ -781,6 +818,165 @@ void mag_affects(int level, struct char_data *ch, struct char_data *victim,
 
     refresh_on_recast = TRUE;
     to_vict = "A venerable dragon spirit coils protectively around you.";
+    break;
+
+  case SPELL_FLAME_ARROW:
+    af[0].duration = spell_dur_short(level);
+    af[0].modifier = 5;
+    af[0].location = APPLY_NONE;
+    SET_BIT_AR(af[0].bitvector, AFF_BURNING);
+    refresh_on_recast = TRUE;
+    break;
+
+  case SPELL_FROSTBITE:
+    if (mag_savingthrow(victim, savetype, 0))
+      return;
+    af[0].duration = spell_dur_short(level);
+    af[0].modifier = -2;
+    af[0].location = APPLY_DEX;
+    SET_BIT_AR(af[0].bitvector, AFF_FROZEN);
+    refresh_on_recast = TRUE;
+    break;
+
+  case SPELL_VOLTAIC_BOLT:
+    af[0].duration = spell_dur_short(level);
+    af[0].location = APPLY_NONE;
+    SET_BIT_AR(af[0].bitvector, AFF_STATIC);
+    refresh_on_recast = TRUE;
+    break;
+
+  case SPELL_ACID_BLAST:
+    if (mag_savingthrow(victim, savetype, 0))
+      return;
+    af[0].duration = spell_dur_medium(level);
+    af[0].modifier = 30;
+    af[0].location = APPLY_AC;
+    SET_BIT_AR(af[0].bitvector, AFF_CORRODED);
+    refresh_on_recast = TRUE;
+    break;
+
+  case SPELL_WEB:
+    if (mag_savingthrow(victim, savetype, 0)) {
+      af[0].duration = spell_dur_short(level);
+      af[0].modifier = -2;
+    } else {
+      af[0].duration = spell_dur_medium(level);
+      af[0].modifier = -4;
+    }
+    af[0].location = APPLY_DEX;
+    SET_BIT_AR(af[0].bitvector, AFF_WEBBED);
+    refresh_on_recast = TRUE;
+    break;
+
+  case SPELL_SILENCE:
+    if (mag_savingthrow(victim, savetype, 0))
+      return;
+    af[0].duration = spell_dur_short(level);
+    af[0].location = APPLY_NONE;
+    SET_BIT_AR(af[0].bitvector, AFF_SILENCED);
+    refresh_on_recast = TRUE;
+    break;
+
+  case SPELL_FEAR:
+    if (mag_savingthrow(victim, savetype, 0)) {
+      af[0].duration = 1;
+      af[0].modifier = -4;
+    } else {
+      af[0].duration = spell_dur_short(level);
+      af[0].modifier = -10;
+    }
+    af[0].location = APPLY_HITROLL;
+    SET_BIT_AR(af[0].bitvector, AFF_FEARFUL);
+    refresh_on_recast = TRUE;
+    break;
+
+  case SPELL_TRUE_SEEING:
+    af[0].duration = spell_dur_long(level);
+    SET_BIT_AR(af[0].bitvector, AFF_DETECT_INVIS);
+    af[1].duration = spell_dur_long(level);
+    SET_BIT_AR(af[1].bitvector, AFF_SENSE_LIFE);
+    af[2].duration = spell_dur_long(level);
+    SET_BIT_AR(af[2].bitvector, AFF_TRUESIGHT);
+    refresh_on_recast = TRUE;
+    break;
+
+  case SPELL_STONE_SKIN:
+    af[0].duration = spell_dur_medium(level);
+    af[0].location = APPLY_AC;
+    af[0].modifier = -40;
+    SET_BIT_AR(af[0].bitvector, AFF_STONESKIN);
+    refresh_on_recast = TRUE;
+    break;
+
+  case SPELL_BARKSKIN:
+    af[0].duration = spell_dur_long(level);
+    af[0].location = APPLY_AC;
+    af[0].modifier = -20;
+    SET_BIT_AR(af[0].bitvector, AFF_BARKSKIN);
+    af[1].duration = spell_dur_long(level);
+    af[1].location = APPLY_CON;
+    af[1].modifier = 1;
+    SET_BIT_AR(af[1].bitvector, AFF_BARKSKIN);
+    refresh_on_recast = TRUE;
+    break;
+
+  case SPELL_GIANT_STRENGTH:
+    af[0].duration = spell_dur_long(level);
+    af[0].location = APPLY_STR;
+    af[0].modifier = 4;
+    af[1].duration = spell_dur_long(level);
+    af[1].location = APPLY_DAMROLL;
+    af[1].modifier = 3;
+    refresh_on_recast = TRUE;
+    break;
+
+  case SPELL_ADRENALINE_SURGE:
+    af[0].duration = 3;
+    af[0].location = APPLY_STR;
+    af[0].modifier = 3;
+    SET_BIT_AR(af[0].bitvector, AFF_ADRENALINE);
+    af[1].duration = 3;
+    af[1].location = APPLY_DEX;
+    af[1].modifier = 1;
+    SET_BIT_AR(af[1].bitvector, AFF_ADRENALINE);
+    af[2].duration = 3;
+    af[2].location = APPLY_AC;
+    af[2].modifier = -2;
+    SET_BIT_AR(af[2].bitvector, AFF_ADRENALINE);
+    refresh_on_recast = TRUE;
+    break;
+
+  case SPELL_CLARITY:
+    af[0].duration = spell_dur_medium(level);
+    af[0].location = APPLY_INT;
+    af[0].modifier = 3;
+    SET_BIT_AR(af[0].bitvector, AFF_CLARITY);
+    af[1].duration = spell_dur_medium(level);
+    af[1].location = APPLY_WIS;
+    af[1].modifier = 2;
+    SET_BIT_AR(af[1].bitvector, AFF_CLARITY);
+    af[2].duration = spell_dur_medium(level);
+    af[2].location = APPLY_NONE;
+    af[2].modifier = 5;
+    SET_BIT_AR(af[2].bitvector, AFF_CLARITY);
+    refresh_on_recast = TRUE;
+    break;
+
+  case SPELL_MARK_OF_DEATH:
+    if (mag_savingthrow(victim, savetype, 0))
+      return;
+    af[0].duration = spell_dur_medium(level);
+    af[0].location = APPLY_NONE;
+    SET_BIT_AR(af[0].bitvector, AFF_MARKED);
+    refresh_on_recast = TRUE;
+    break;
+
+  case SPELL_BLOODLUST:
+    af[0].duration = spell_dur_medium(level);
+    af[0].location = APPLY_DAMROLL;
+    af[0].modifier = 10;
+    SET_BIT_AR(af[0].bitvector, AFF_BLOODLUST);
+    refresh_on_recast = TRUE;
     break;
   }
 

@@ -29,6 +29,7 @@ static void check_idling(struct char_data *ch);
 static struct affected_type *find_affect(struct char_data *ch, int spellnum);
 static int best_regen_multiplier(struct char_data *ch);
 static int object_regen_multiplier(struct obj_data *obj);
+static int find_affect_modifier_for_flag(struct char_data *ch, int aff_flag, int fallback);
 
 
 /* When age < 15 return the value p0
@@ -105,6 +106,21 @@ static int best_regen_multiplier(struct char_data *ch)
   return mult;
 }
 
+static int find_affect_modifier_for_flag(struct char_data *ch, int aff_flag, int fallback)
+{
+  struct affected_type *af;
+
+  if (!ch)
+    return fallback;
+
+  for (af = ch->affected; af; af = af->next) {
+    if (IS_SET_AR(af->bitvector, aff_flag) && af->modifier != 0)
+      return af->modifier;
+  }
+
+  return fallback;
+}
+
 /* The hit_limit, mana_limit, and move_limit functions are gone.  They added an
  * unnecessary level of complexity to the internal structure, weren't
  * particularly useful, and led to some annoying bugs.  From the players' point
@@ -148,6 +164,9 @@ int mana_gain(struct char_data *ch)
 
   if (AFF_FLAGGED(ch, AFF_POISON))
     gain /= 4;
+
+  if (AFF_FLAGGED(ch, AFF_CLARITY))
+    gain += MAX(0, find_affect_modifier_for_flag(ch, AFF_CLARITY, 5));
 
   gain *= best_regen_multiplier(ch);
 
@@ -657,4 +676,3 @@ int decrease_bank(struct char_data *ch, int deduction_gold)
 {
   return increase_bank(ch, -deduction_gold);
 }
-

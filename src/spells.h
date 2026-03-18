@@ -110,8 +110,28 @@
 #define SPELL_ENFEEBLEMENT           69
 #define SPELL_DEVOUR_SOUL            70
 #define SPELL_MEMENTO_MORI           71
+#define SPELL_FIREBOLT               72
+#define SPELL_FLAME_ARROW            73
+#define SPELL_FROSTBITE              74
+#define SPELL_VOLTAIC_BOLT           75
+#define SPELL_ACID_BLAST             76
+#define SPELL_SHADOW_BOLT            77
+#define SPELL_VAMPIRIC_TOUCH         78
+#define SPELL_WEB                    79
+#define SPELL_SILENCE                80
+#define SPELL_FEAR                   81
+#define SPELL_TRUE_SEEING            82
+#define SPELL_STONE_SKIN             83
+#define SPELL_BARKSKIN               84
+#define SPELL_GIANT_STRENGTH         85
+#define SPELL_ADRENALINE_SURGE       86
+#define SPELL_CLARITY                87
+#define SPELL_MARK_OF_DEATH          88
+#define SPELL_BLOODLUST              89
+#define SPELL_GREATER_HEAL           90
+#define SPELL_CLEANSE                91
 /** Total Number of defined spells */
-#define NUM_SPELLS                   71
+#define NUM_SPELLS                   91
 
 /* Insert new spells here, up to MAX_SPELLS */
 #define MAX_SPELLS		    130
@@ -286,6 +306,9 @@ ASPELL(spell_plague_bolt);
 ASPELL(spell_enfeeblement);
 ASPELL(spell_devour_soul);
 ASPELL(spell_memento_mori);
+ASPELL(spell_vampiric_touch);
+ASPELL(spell_greater_heal);
+ASPELL(spell_cleanse);
 void show_identify_item(struct char_data *ch, struct obj_data *obj, enum identify_detail_level detail);
 
 /* basic magic calling functions */

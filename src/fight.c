@@ -84,6 +84,7 @@ static void dam_message(int dam, struct char_data *ch, struct char_data *victim,
 static void make_corpse(struct char_data *ch);
 static void process_round_effects(void);
 static int find_affect_modifier_for_flag(struct char_data *ch, int aff_flag, int fallback);
+static int remove_affects_by_flag(struct char_data *ch, int aff_flag);
 static void change_alignment(struct char_data *ch, struct char_data *victim);
 static void group_gain(struct char_data *ch, struct char_data *victim);
 static void solo_gain(struct char_data *ch, struct char_data *victim);
@@ -1173,6 +1174,30 @@ static int find_affect_modifier_for_flag(struct char_data *ch, int aff_flag, int
   return fallback;
 }
 
+static int remove_affects_by_flag(struct char_data *ch, int aff_flag)
+{
+  struct affected_type *af, *next;
+  int removed = 0;
+
+  if (!ch)
+    return 0;
+
+  for (af = ch->affected; af; af = next) {
+    next = af->next;
+    if (IS_SET_AR(af->bitvector, aff_flag)) {
+      affect_remove(ch, af);
+      removed = 1;
+    }
+  }
+
+  if (AFF_FLAGGED(ch, aff_flag)) {
+    REMOVE_BIT_AR(AFF_FLAGS(ch), aff_flag);
+    removed = 1;
+  }
+
+  return removed;
+}
+
 static void do_offhand_attack(struct char_data *ch, struct char_data *victim)
 {
   struct obj_data *prim = GET_EQ(ch, WEAR_WIELD);
@@ -1295,6 +1320,12 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
       dam = (dam * 6) / 10;
     else if (AFF_FLAGGED(victim, AFF_ELEMENTAL_WARD_ACID) && damage_type == DAM_ACID)
       dam = (dam * 6) / 10;
+  }
+
+  if (dam > 0 && damage_type == DAM_LIGHTNING && AFF_FLAGGED(victim, AFF_STATIC)) {
+    dam = (dam * 125) / 100;
+    if (remove_affects_by_flag(victim, AFF_STATIC))
+      send_to_char(victim, "The static charge around you dissipates.\r\n");
   }
 
 
@@ -1697,8 +1728,11 @@ static void process_round_effects(void)
     if (AFF_FLAGGED(i, AFF_TIME_SNARE))
       WAIT_STATE(i, PULSE_VIOLENCE);
 
-    if (AFF_FLAGGED(i, AFF_FEARFUL) && FIGHTING(i) && rand_number(1, 100) <= 60)
-      do_flee(i, NULL, 0, 0);
+    if (AFF_FLAGGED(i, AFF_FEARFUL) && FIGHTING(i)) {
+      int fear_penalty = find_affect_modifier_for_flag(i, AFF_FEARFUL, 0);
+      if (fear_penalty <= -10 && rand_number(1, 100) <= 60)
+        do_flee(i, NULL, 0, 0);
+    }
 
     if (IS_NPC(i) && GET_SUMMON_TIMER(i) > 0) {
       GET_SUMMON_TIMER(i)--;
