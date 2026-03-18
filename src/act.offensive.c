@@ -21,6 +21,7 @@
 #include "fight.h"
 #include "mud_event.h"
 #include "ai_actor.h"
+#include "race.h"
 
 static const char *appraise_level_band(const struct char_data *ch, const struct char_data *vict)
 {
@@ -70,7 +71,7 @@ static const char *appraise_role(const struct char_data *vict)
   if (AFF_FLAGGED(vict, AFF_REGENERATING) || AFF_FLAGGED(vict, AFF_HOLY_AURA))
     return "support fighter";
   if (IS_NPC(vict) && vict->master)
-    return "summoner";
+    return "summoned servant";
   return "unclear";
 }
 
@@ -745,12 +746,12 @@ ACMD(do_appraise_enemy)
   if (AFF_FLAGGED(vict, AFF_BURNING)) send_to_char(ch, "Flag: burning.\r\n");
   if (AFF_FLAGGED(vict, AFF_ROOTED) || AFF_FLAGGED(vict, AFF_WEBBED)) send_to_char(ch, "Flag: rooted.\r\n");
   if (AFF_FLAGGED(vict, AFF_STUNNED)) send_to_char(ch, "Flag: stunned.\r\n");
-  if (AFF_FLAGGED(vict, AFF_ADRENALINE)) send_to_char(ch, "Flag: hasted.\r\n");
+  if (AFF_FLAGGED(vict, AFF_ADRENALINE)) send_to_char(ch, "Flag: adrenaline surge.\r\n");
   if (AFF_FLAGGED(vict, AFF_FROZEN) || AFF_FLAGGED(vict, AFF_TIME_SNARE)) send_to_char(ch, "Flag: slowed.\r\n");
   if (AFF_FLAGGED(vict, AFF_WARDED) || AFF_FLAGGED(vict, AFF_SANCTUARY)) send_to_char(ch, "Flag: protected by magic.\r\n");
   if (AFF_FLAGGED(vict, AFF_SHIELDED)) send_to_char(ch, "Flag: shielded.\r\n");
   if (AFF_FLAGGED(vict, AFF_HIDE) || AFF_FLAGGED(vict, AFF_INVISIBLE)) send_to_char(ch, "Flag: hidden by shadow.\r\n");
-  if (IS_NPC(vict) && GET_CLASS(vict) == CLASS_UNDEAD) send_to_char(ch, "Flag: undead.\r\n");
+  if (GET_RACE(vict) == RACE_VAMPIRE) send_to_char(ch, "Flag: undead.\r\n");
   if (IS_NPC(vict) && vict->master) send_to_char(ch, "Flag: summoned.\r\n");
 
   if (quality >= 2) {
