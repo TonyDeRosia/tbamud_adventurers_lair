@@ -393,6 +393,9 @@ int load_char(const char *name, struct char_data *ch)
     GET_CAMPAIGN_EXPIRES_AT(ch) = PFDEF_CAMPAIGN_EXPIRES_AT;
     GET_CAMPAIGN_REWARD_QP(ch) = PFDEF_CAMPAIGN_REWARD_QP;
     GET_CAMPAIGN_REWARD_GOLD(ch) = PFDEF_CAMPAIGN_REWARD_GOLD;
+    GET_CAMPAIGN_REWARD_XP(ch) = PFDEF_CAMPAIGN_REWARD_XP;
+    GET_CAMPAIGN_REWARD_TRAINS(ch) = PFDEF_CAMPAIGN_REWARD_TRAINS;
+    GET_CAMPAIGN_REWARD_PRACTICES(ch) = PFDEF_CAMPAIGN_REWARD_PRACTICES;
     GET_CAMPAIGN_TARGET_COUNT(ch) = PFDEF_CAMPAIGN_TARGET_COUNT;
     for (i = 0; i < MAX_CAMPAIGN_TARGETS; i++) {
       GET_CAMPAIGN_TARGET_VNUM(ch, i) = NOBODY;
@@ -488,6 +491,9 @@ int load_char(const char *name, struct char_data *ch)
           else if (!strcmp(tag, "CpEx")) GET_CAMPAIGN_EXPIRES_AT(ch) = (time_t)atol(line);
           else if (!strcmp(tag, "CpQp")) GET_CAMPAIGN_REWARD_QP(ch) = atoi(line);
           else if (!strcmp(tag, "CpGo")) GET_CAMPAIGN_REWARD_GOLD(ch) = atoi(line);
+          else if (!strcmp(tag, "CpXp")) GET_CAMPAIGN_REWARD_XP(ch) = atoi(line);
+          else if (!strcmp(tag, "CpTr")) GET_CAMPAIGN_REWARD_TRAINS(ch) = atoi(line);
+          else if (!strcmp(tag, "CpPr")) GET_CAMPAIGN_REWARD_PRACTICES(ch) = atoi(line);
           else if (!strcmp(tag, "CpCt")) GET_CAMPAIGN_TARGET_COUNT(ch) = atoi(line);
           else if (sscanf(tag, "CpV%d", &idx) == 1 && idx >= 0 && idx < MAX_CAMPAIGN_TARGETS)
             GET_CAMPAIGN_TARGET_VNUM(ch, idx) = atoi(line);
@@ -902,6 +908,9 @@ void save_char(struct char_data * ch)
   if (GET_CAMPAIGN_EXPIRES_AT(ch) != PFDEF_CAMPAIGN_EXPIRES_AT) fprintf(fl, "CpEx: %ld\n", (long)GET_CAMPAIGN_EXPIRES_AT(ch));
   if (GET_CAMPAIGN_REWARD_QP(ch) != PFDEF_CAMPAIGN_REWARD_QP) fprintf(fl, "CpQp: %d\n", GET_CAMPAIGN_REWARD_QP(ch));
   if (GET_CAMPAIGN_REWARD_GOLD(ch) != PFDEF_CAMPAIGN_REWARD_GOLD) fprintf(fl, "CpGo: %d\n", GET_CAMPAIGN_REWARD_GOLD(ch));
+  if (GET_CAMPAIGN_REWARD_XP(ch) != PFDEF_CAMPAIGN_REWARD_XP) fprintf(fl, "CpXp: %d\n", GET_CAMPAIGN_REWARD_XP(ch));
+  if (GET_CAMPAIGN_REWARD_TRAINS(ch) != PFDEF_CAMPAIGN_REWARD_TRAINS) fprintf(fl, "CpTr: %d\n", GET_CAMPAIGN_REWARD_TRAINS(ch));
+  if (GET_CAMPAIGN_REWARD_PRACTICES(ch) != PFDEF_CAMPAIGN_REWARD_PRACTICES) fprintf(fl, "CpPr: %d\n", GET_CAMPAIGN_REWARD_PRACTICES(ch));
   if (GET_CAMPAIGN_TARGET_COUNT(ch) != PFDEF_CAMPAIGN_TARGET_COUNT) fprintf(fl, "CpCt: %d\n", GET_CAMPAIGN_TARGET_COUNT(ch));
   for (i = 0; i < MAX_CAMPAIGN_TARGETS; i++) {
     if (GET_CAMPAIGN_TARGET_VNUM(ch, i) != NOBODY) fprintf(fl, "CpV%d: %d\n", i, GET_CAMPAIGN_TARGET_VNUM(ch, i));

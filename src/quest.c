@@ -21,6 +21,7 @@
 #include "dg_scripts.h"
 #include "quest.h"
 #include "act.h" /* for do_tell */
+#include "class.h"
 #include "shop.h"
 #include "spec_procs.h"
 #include "mail.h"
@@ -64,9 +65,26 @@ static const char *quest_imm_usage =
 #define KQUEST_COOLDOWN_SECS (30 * 60)
 #define CAMPAIGN_DURATION_SECS (6 * 24 * 60 * 60)
 #define CAMPAIGN_MIN_TARGETS 8
+#define CAMPAIGN_SMALL_TARGETS 9
+#define CAMPAIGN_STANDARD_TARGETS 11
+
+#define CAMPAIGN_XP_MULTIPLIER_MIN_PCT 150
+#define CAMPAIGN_XP_MULTIPLIER_MAX_PCT 300
+#define CAMPAIGN_QP_MULTIPLIER_MIN_PCT 240
+#define CAMPAIGN_QP_MULTIPLIER_MAX_PCT 360
+#define CAMPAIGN_GOLD_MULTIPLIER_MIN_PCT 300
+#define CAMPAIGN_GOLD_MULTIPLIER_MAX_PCT 450
 
 static const char *campaign_cmd[] = {
   "request", "info", "quit", "check", "brief", "today", "\n"
+};
+
+struct campaign_rewards {
+  int xp;
+  int qp;
+  int gold;
+  int trains;
+  int practices;
 };
 
 static void clear_kill_quest(struct char_data *ch)
@@ -224,6 +242,88 @@ static int room_is_quest_safe(room_rnum room)
          ROOM_FLAGGED(room, ROOM_NOMOB);
 }
 
+static int campaign_size_step(int target_count)
+{
+  int divisor = MAX(1, MAX_CAMPAIGN_TARGETS - CAMPAIGN_MIN_TARGETS);
+  int numerator = URANGE(CAMPAIGN_MIN_TARGETS, target_count, MAX_CAMPAIGN_TARGETS) - CAMPAIGN_MIN_TARGETS;
+  return (numerator * 100) / divisor;
+}
+
+static int campaign_scaled_percent(int target_count, int min_pct, int max_pct)
+{
+  int step = campaign_size_step(target_count);
+  return min_pct + ((max_pct - min_pct) * step) / 100;
+}
+
+static int campaign_level_xp_span(struct char_data *ch)
+{
+  int level;
+  int at_level;
+  int next_level;
+
+  if (!ch || IS_NPC(ch))
+    return 0;
+
+  level = URANGE(1, GET_CAMPAIGN_LEVEL(ch), LVL_IMMORT - 1);
+  if (level >= LVL_IMMORT - 1)
+    return 0;
+
+  at_level = level_exp(GET_CLASS(ch), level);
+  next_level = level_exp(GET_CLASS(ch), level + 1);
+  return MAX(1, next_level - at_level);
+}
+
+static void calculate_campaign_rewards(struct char_data *ch, int target_count, struct campaign_rewards *out)
+{
+  int quest_qp_base;
+  int quest_gold_base;
+  int xp_span;
+  int xp_pct;
+  int qp_pct;
+  int gold_pct;
+  int level_bonus;
+
+  if (!out)
+    return;
+
+  out->xp = 0;
+  out->qp = 0;
+  out->gold = 0;
+  out->trains = 0;
+  out->practices = 0;
+
+  if (!ch || IS_NPC(ch))
+    return;
+
+  quest_qp_base = MAX(5, GET_LEVEL(ch) / 2);
+  quest_gold_base = MAX(100, GET_LEVEL(ch) * 75);
+  xp_span = campaign_level_xp_span(ch);
+
+  xp_pct = campaign_scaled_percent(target_count, CAMPAIGN_XP_MULTIPLIER_MIN_PCT, CAMPAIGN_XP_MULTIPLIER_MAX_PCT);
+  qp_pct = campaign_scaled_percent(target_count, CAMPAIGN_QP_MULTIPLIER_MIN_PCT, CAMPAIGN_QP_MULTIPLIER_MAX_PCT);
+  gold_pct = campaign_scaled_percent(target_count, CAMPAIGN_GOLD_MULTIPLIER_MIN_PCT, CAMPAIGN_GOLD_MULTIPLIER_MAX_PCT);
+
+  out->xp = (int)MIN((long long)INT_MAX, ((long long)xp_span * (long long)xp_pct) / 100LL);
+  out->qp = (int)MIN((long long)INT_MAX, ((long long)quest_qp_base * (long long)qp_pct) / 100LL);
+  out->gold = (int)MIN((long long)INT_MAX, ((long long)quest_gold_base * (long long)gold_pct) / 100LL);
+
+  level_bonus = MIN(8, MAX(0, GET_LEVEL(ch) / 15));
+
+  if (target_count <= CAMPAIGN_SMALL_TARGETS) {
+    out->trains = 1;
+    out->practices = 7;
+  } else if (target_count <= CAMPAIGN_STANDARD_TARGETS) {
+    out->trains = 2;
+    out->practices = 12;
+  } else {
+    out->trains = 3;
+    out->practices = 18;
+  }
+
+  out->trains = MIN(5, out->trains + (GET_LEVEL(ch) >= 45 ? 1 : 0));
+  out->practices = MIN(30, out->practices + level_bonus);
+}
+
 static void clear_campaign(struct char_data *ch)
 {
   int i;
@@ -232,6 +332,9 @@ static void clear_campaign(struct char_data *ch)
   GET_CAMPAIGN_EXPIRES_AT(ch) = 0;
   GET_CAMPAIGN_REWARD_QP(ch) = 0;
   GET_CAMPAIGN_REWARD_GOLD(ch) = 0;
+  GET_CAMPAIGN_REWARD_XP(ch) = 0;
+  GET_CAMPAIGN_REWARD_TRAINS(ch) = 0;
+  GET_CAMPAIGN_REWARD_PRACTICES(ch) = 0;
   GET_CAMPAIGN_TARGET_COUNT(ch) = 0;
   for (i = 0; i < MAX_CAMPAIGN_TARGETS; i++) {
     GET_CAMPAIGN_TARGET_VNUM(ch, i) = NOBODY;
@@ -591,6 +694,7 @@ static void campaign_show_header(struct char_data *ch)
 static void campaign_request(struct char_data *ch)
 {
   struct campaign_candidate_data selected[MAX_CAMPAIGN_TARGETS];
+  struct campaign_rewards rewards;
   int count, i;
 
   expire_campaign_if_needed(ch, TRUE);
@@ -609,8 +713,12 @@ static void campaign_request(struct char_data *ch)
   GET_CAMPAIGN_LEVEL(ch) = GET_LEVEL(ch);
   GET_CAMPAIGN_EXPIRES_AT(ch) = time(0) + CAMPAIGN_DURATION_SECS;
   GET_CAMPAIGN_TARGET_COUNT(ch) = count;
-  GET_CAMPAIGN_REWARD_QP(ch) = MAX(20, (GET_LEVEL(ch) * count) / 3);
-  GET_CAMPAIGN_REWARD_GOLD(ch) = MAX(1000, GET_LEVEL(ch) * count * 140);
+  calculate_campaign_rewards(ch, count, &rewards);
+  GET_CAMPAIGN_REWARD_QP(ch) = rewards.qp;
+  GET_CAMPAIGN_REWARD_GOLD(ch) = rewards.gold;
+  GET_CAMPAIGN_REWARD_XP(ch) = rewards.xp;
+  GET_CAMPAIGN_REWARD_TRAINS(ch) = rewards.trains;
+  GET_CAMPAIGN_REWARD_PRACTICES(ch) = rewards.practices;
 
   for (i = 0; i < count; i++) {
     GET_CAMPAIGN_TARGET_VNUM(ch, i) = selected[i].vnum;
@@ -644,8 +752,11 @@ static void campaign_info(struct char_data *ch)
   send_to_char(ch, "%sComplete By........:%s [ %s%s%s ]\r\n", QCYN, QNRM, QWHT, deadline_buf, QNRM);
   send_to_char(ch, "%sTime Left..........:%s [ %s%s%s ]\r\n", QCYN, QNRM, QGRN, left_buf, QNRM);
   send_to_char(ch, "%sLevel Taken........:%s [ %5d ]\r\n", QCYN, QNRM, GET_CAMPAIGN_LEVEL(ch));
+  send_to_char(ch, "%sExperience.........:%s [ %5d ]\r\n", QCYN, QNRM, GET_CAMPAIGN_REWARD_XP(ch));
   send_to_char(ch, "%sQuest Points.......:%s [ %5d ]\r\n", QCYN, QNRM, GET_CAMPAIGN_REWARD_QP(ch));
   send_to_char(ch, "%sGold Coins.........:%s [ %5d ]\r\n", QCYN, QNRM, GET_CAMPAIGN_REWARD_GOLD(ch));
+  send_to_char(ch, "%sTrains.............:%s [ %5d ]\r\n", QCYN, QNRM, GET_CAMPAIGN_REWARD_TRAINS(ch));
+  send_to_char(ch, "%sPractices..........:%s [ %5d ]\r\n", QCYN, QNRM, GET_CAMPAIGN_REWARD_PRACTICES(ch));
   send_to_char(ch, "%s----------------------------[ Campaign Victims ]-------------------------%s\r\n", QYEL, QNRM);
   send_to_char(ch, "The targets for this campaign are:\r\n");
   for (i = 0; i < GET_CAMPAIGN_TARGET_COUNT(ch); i++) {
@@ -1175,11 +1286,22 @@ void campaign_kill_trigger_check(struct char_data *ch, struct char_data *vict)
                  QYEL, QNRM, remaining, remaining == 1 ? "" : "s");
 
     if (remaining <= 0) {
+      int campaign_trains = GET_CAMPAIGN_REWARD_TRAINS(ch);
+      int campaign_practices = GET_CAMPAIGN_REWARD_PRACTICES(ch);
+
+      gain_exp(ch, GET_CAMPAIGN_REWARD_XP(ch));
       GET_QUESTPOINTS(ch) += GET_CAMPAIGN_REWARD_QP(ch);
       increase_gold(ch, GET_CAMPAIGN_REWARD_GOLD(ch));
-      send_to_char(ch, "%sCAMPAIGN COMPLETE!%s You receive %s%d%s quest points and %s%d%s gold coins.\r\n",
-                   QGRN, QNRM, QYEL, GET_CAMPAIGN_REWARD_QP(ch), QNRM,
-                   QYEL, GET_CAMPAIGN_REWARD_GOLD(ch), QNRM);
+      GET_TRAINS(ch) = MIN(INT_MAX - campaign_trains, GET_TRAINS(ch)) + campaign_trains;
+      GET_PRACTICES(ch) = MIN(INT_MAX - campaign_practices, GET_PRACTICES(ch)) + campaign_practices;
+      send_to_char(ch, "%sCAMPAIGN:%s You have completed your campaign!\r\n", QYEL, QNRM);
+      send_to_char(ch, "%sCAMPAIGN:%s You receive %s%d%s experience, %s%d%s gold, %s%d%s quest points, %s%d%s train%s, and %s%d%s practice%s.\r\n",
+                   QYEL, QNRM,
+                   QGRN, GET_CAMPAIGN_REWARD_XP(ch), QNRM,
+                   QGRN, GET_CAMPAIGN_REWARD_GOLD(ch), QNRM,
+                   QGRN, GET_CAMPAIGN_REWARD_QP(ch), QNRM,
+                   QGRN, campaign_trains, QNRM, campaign_trains == 1 ? "" : "s",
+                   QGRN, campaign_practices, QNRM, campaign_practices == 1 ? "" : "s");
       clear_campaign(ch);
     }
     save_char(ch);
