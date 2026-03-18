@@ -1876,6 +1876,70 @@ struct auction_state_data {
 
 static struct auction_state_data live_auction = { NULL, NULL, NULL, 0, 0, 0 };
 
+static const char *auction_item_display_name(struct obj_data *obj)
+{
+  if (!obj || !GET_OBJ_SHORT(obj))
+    return "something";
+  return GET_OBJ_SHORT(obj);
+}
+
+static int auction_item_num(struct obj_data *obj)
+{
+  if (!obj)
+    return -1;
+  return GET_OBJ_VNUM(obj);
+}
+
+static int auction_item_level(struct obj_data *obj)
+{
+  if (!obj)
+    return 0;
+  return GET_OBJ_LEVEL(obj);
+}
+
+static const char *auction_currency_name(void)
+{
+  return "gold";
+}
+
+static void format_market_listing_message(char *buf, size_t bufsz, struct char_data *seller, struct obj_data *obj)
+{
+  snprintf(buf, bufsz,
+           "%sMarket:%s %s%s%s is selling %s (Level %s%d%s, Num %s%d%s). Auction is for %s%s%s.",
+           KGRN, KNRM,
+           KYEL, seller ? GET_NAME(seller) : "Someone", KNRM,
+           auction_item_display_name(obj),
+           KCYN, auction_item_level(obj), KNRM,
+           KCYN, auction_item_num(obj), KNRM,
+           KYEL, auction_currency_name(), KNRM);
+}
+
+static void format_auction_listing_message(char *buf, size_t bufsz, struct char_data *seller,
+                                           struct obj_data *obj, long long current_bid)
+{
+  snprintf(buf, bufsz,
+           "%sAuction:%s %s%s%s is auctioning %s (Level %s%d%s, Num %s%d%s). Current bid is %s%lld%s.",
+           KMAG, KNRM,
+           KYEL, seller ? GET_NAME(seller) : "Someone", KNRM,
+           auction_item_display_name(obj),
+           KCYN, auction_item_level(obj), KNRM,
+           KCYN, auction_item_num(obj), KNRM,
+           KYEL, current_bid, KNRM);
+}
+
+static void format_auction_sale_message(char *buf, size_t bufsz, struct char_data *buyer,
+                                        struct char_data *seller, struct obj_data *obj, long long final_bid)
+{
+  snprintf(buf, bufsz,
+           "%sAuction:%s %s%s%s buys %s from %s%s%s for %s%lld%s %s%s%s.",
+           KMAG, KNRM,
+           KYEL, buyer ? GET_NAME(buyer) : "Someone", KNRM,
+           auction_item_display_name(obj),
+           KYEL, seller ? GET_NAME(seller) : "someone", KNRM,
+           KYEL, final_bid, KNRM,
+           KYEL, auction_currency_name(), KNRM);
+}
+
 static void send_auction_message(const char *msg, int item_level)
 {
   struct descriptor_data *d;
@@ -1921,24 +1985,31 @@ void auction_update(void)
 
   live_auction.going++;
   if (live_auction.going == 1) {
-    snprintf(msg, sizeof(msg), "[Auction] %s: current bid %lld gold.", GET_OBJ_SHORT(live_auction.obj), live_auction.current_bid);
-    send_auction_message(msg, GET_OBJ_LEVEL(live_auction.obj));
+    format_auction_listing_message(msg, sizeof(msg), live_auction.seller, live_auction.obj, live_auction.current_bid);
+    send_auction_message(msg, auction_item_level(live_auction.obj));
     return;
   }
   if (live_auction.going == 2) {
-    snprintf(msg, sizeof(msg), "[Auction] %s: going once for %lld gold.", GET_OBJ_SHORT(live_auction.obj), live_auction.current_bid);
-    send_auction_message(msg, GET_OBJ_LEVEL(live_auction.obj));
+    snprintf(msg, sizeof(msg), "%sAuction:%s %s going once for %s%lld%s %s.",
+             KMAG, KNRM, auction_item_display_name(live_auction.obj),
+             KYEL, live_auction.current_bid, KNRM,
+             auction_currency_name());
+    send_auction_message(msg, auction_item_level(live_auction.obj));
     return;
   }
   if (live_auction.going == 3) {
-    snprintf(msg, sizeof(msg), "[Auction] %s: going twice for %lld gold.", GET_OBJ_SHORT(live_auction.obj), live_auction.current_bid);
-    send_auction_message(msg, GET_OBJ_LEVEL(live_auction.obj));
+    snprintf(msg, sizeof(msg), "%sAuction:%s %s going twice for %s%lld%s %s.",
+             KMAG, KNRM, auction_item_display_name(live_auction.obj),
+             KYEL, live_auction.current_bid, KNRM,
+             auction_currency_name());
+    send_auction_message(msg, auction_item_level(live_auction.obj));
     return;
   }
 
   if (!live_auction.buyer) {
-    snprintf(msg, sizeof(msg), "[Auction] No bids for %s. Item returned to seller.", GET_OBJ_SHORT(live_auction.obj));
-    send_auction_message(msg, GET_OBJ_LEVEL(live_auction.obj));
+    snprintf(msg, sizeof(msg), "%sAuction:%s No bids for %s. Item returned to seller.",
+             KMAG, KNRM, auction_item_display_name(live_auction.obj));
+    send_auction_message(msg, auction_item_level(live_auction.obj));
     if (live_auction.seller)
       obj_to_char(live_auction.obj, live_auction.seller);
   } else {
@@ -1948,11 +2019,12 @@ void auction_update(void)
     increase_gold(live_auction.seller, seller_take);
     obj_to_char(live_auction.obj, live_auction.buyer);
 
-    snprintf(msg, sizeof(msg),
-      "[Auction] SOLD: %s to %s for %lld gold. Seller tax %d%% (%lld gold).",
-      GET_OBJ_SHORT(live_auction.obj), GET_NAME(live_auction.buyer),
-      live_auction.current_bid, tax_pct, tax_amt);
-    send_auction_message(msg, GET_OBJ_LEVEL(live_auction.obj));
+    format_auction_sale_message(msg, sizeof(msg), live_auction.buyer, live_auction.seller,
+                                live_auction.obj, live_auction.current_bid);
+    send_auction_message(msg, auction_item_level(live_auction.obj));
+    snprintf(msg, sizeof(msg), "%sAuction:%s Seller tax is %s%d%%%s (%s%lld%s %s).",
+             KMAG, KNRM, KYEL, tax_pct, KNRM, KYEL, tax_amt, KNRM, auction_currency_name());
+    send_auction_message(msg, auction_item_level(live_auction.obj));
   }
 
   live_auction.obj = NULL;
@@ -1977,8 +2049,8 @@ ACMD(do_bid)
   }
 
   if (!*arg) {
-    send_to_char(ch, "Current auction: %s. Current bid: %lld gold.\r\n",
-      GET_OBJ_SHORT(live_auction.obj), live_auction.current_bid);
+    format_auction_listing_message(msg, sizeof(msg), live_auction.seller, live_auction.obj, live_auction.current_bid);
+    send_to_char(ch, "%s\r\n", msg);
     return;
   }
   if (!is_number(arg)) {
@@ -1999,9 +2071,8 @@ ACMD(do_bid)
   live_auction.current_bid = amount;
   live_auction.buyer = ch;
   live_auction.going = 0;
-  snprintf(msg, sizeof(msg), "[Auction] %s bids %lld gold on %s.",
-    GET_NAME(ch), amount, GET_OBJ_SHORT(live_auction.obj));
-  send_auction_message(msg, GET_OBJ_LEVEL(live_auction.obj));
+  format_auction_listing_message(msg, sizeof(msg), live_auction.seller, live_auction.obj, live_auction.current_bid);
+  send_auction_message(msg, auction_item_level(live_auction.obj));
 }
 
 ACMD(do_auction)
@@ -2075,7 +2146,8 @@ ACMD(do_auction)
   live_auction.min_bid = min_bid;
   live_auction.going = 0;
 
-  snprintf(msg, sizeof(msg), "[Auction] %s starts auctioning %s at %lld gold.",
-    GET_NAME(ch), GET_OBJ_SHORT(obj), min_bid);
-  send_auction_message(msg, GET_OBJ_LEVEL(obj));
+  format_market_listing_message(msg, sizeof(msg), ch, obj);
+  send_auction_message(msg, auction_item_level(obj));
+  format_auction_listing_message(msg, sizeof(msg), ch, obj, min_bid);
+  send_auction_message(msg, auction_item_level(obj));
 }

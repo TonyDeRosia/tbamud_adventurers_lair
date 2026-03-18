@@ -386,6 +386,7 @@ int load_char(const char *name, struct char_data *ch)
     GET_KQUEST_TIME(ch) = PFDEF_KQUEST_TIME;
     GET_KQUEST_EXPIRES_AT(ch) = PFDEF_KQUEST_EXPIRES_AT;
     GET_KQUEST_COOLDOWN_EXPIRES_AT(ch) = PFDEF_KQUEST_COOLDOWN_EXPIRES_AT;
+    GET_KQUEST_COOLDOWN_NOTIFIED(ch) = PFDEF_KQUEST_COOLDOWN_NOTIFIED;
     GET_KQUEST_TARGET_ID(ch) = PFDEF_KQUEST_ID;
     GET_CAMPAIGN_ACTIVE(ch) = PFDEF_CAMPAIGN_ACTIVE;
     GET_CAMPAIGN_LEVEL(ch) = PFDEF_CAMPAIGN_LEVEL;
@@ -607,6 +608,7 @@ int load_char(const char *name, struct char_data *ch)
        else if (!strcmp(tag, "KQtm")) GET_KQUEST_TIME(ch) = atoi(line);
        else if (!strcmp(tag, "KQex")) GET_KQUEST_EXPIRES_AT(ch) = (time_t)atol(line);
        else if (!strcmp(tag, "KQcd")) GET_KQUEST_COOLDOWN_EXPIRES_AT(ch) = (time_t)atol(line);
+       else if (!strcmp(tag, "KQcn")) GET_KQUEST_COOLDOWN_NOTIFIED(ch) = atoi(line);
        else if (!strcmp(tag, "KQid")) GET_KQUEST_TARGET_ID(ch) = atol(line);
        break;
 
@@ -893,6 +895,7 @@ void save_char(struct char_data * ch)
   if (GET_KQUEST_TIME(ch) != PFDEF_KQUEST_TIME) fprintf(fl, "KQtm: %d\n", GET_KQUEST_TIME(ch));
   if (GET_KQUEST_EXPIRES_AT(ch) != PFDEF_KQUEST_EXPIRES_AT) fprintf(fl, "KQex: %ld\n", (long)GET_KQUEST_EXPIRES_AT(ch));
   if (GET_KQUEST_COOLDOWN_EXPIRES_AT(ch) != PFDEF_KQUEST_COOLDOWN_EXPIRES_AT) fprintf(fl, "KQcd: %ld\n", (long)GET_KQUEST_COOLDOWN_EXPIRES_AT(ch));
+  if (GET_KQUEST_COOLDOWN_NOTIFIED(ch) != PFDEF_KQUEST_COOLDOWN_NOTIFIED) fprintf(fl, "KQcn: %d\n", GET_KQUEST_COOLDOWN_NOTIFIED(ch));
   if (GET_KQUEST_TARGET_ID(ch) != PFDEF_KQUEST_ID) fprintf(fl, "KQid: %ld\n", GET_KQUEST_TARGET_ID(ch));
   if (GET_CAMPAIGN_ACTIVE(ch) != PFDEF_CAMPAIGN_ACTIVE) fprintf(fl, "CpAc: %d\n", GET_CAMPAIGN_ACTIVE(ch));
   if (GET_CAMPAIGN_LEVEL(ch) != PFDEF_CAMPAIGN_LEVEL) fprintf(fl, "CpLv: %d\n", GET_CAMPAIGN_LEVEL(ch));

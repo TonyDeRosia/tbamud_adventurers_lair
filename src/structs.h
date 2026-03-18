@@ -1027,6 +1027,7 @@ struct player_special_data_saved
   int    kill_quest_time;       /**< Legacy kill quest timer       */
   time_t kill_quest_expires_at; /**< Real-world quest expiration   */
   time_t kill_quest_cooldown_expires_at; /**< Real-world cooldown expiration */
+  int    kill_quest_cooldown_notified; /**< Cooldown-ready notice sent for current cycle */
   long   kill_quest_target_id;  /**< Specific target instance id   */
   int    campaign_active;       /**< Multi-target campaign active */
   int    campaign_level;        /**< Level when campaign was accepted */
