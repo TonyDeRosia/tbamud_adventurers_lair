@@ -96,11 +96,17 @@ static int appraise_is_hasted(struct char_data *vict)
   if (!vict)
     return FALSE;
 
-  /*
-   * There is no AFF_HASTE in this codebase; adrenaline surge is the
-   * implemented haste-style effect path.
-   */
-  return affected_by_spell(vict, SPELL_ADRENALINE_SURGE);
+  #ifdef AFF_HASTE
+  if (AFF_FLAGGED(vict, AFF_HASTE))
+    return TRUE;
+  #endif
+
+  #ifdef SPELL_HASTE
+  if (affected_by_spell(vict, SPELL_HASTE))
+    return TRUE;
+  #endif
+
+  return FALSE;
 }
 
 static int appraise_is_undead(struct char_data *vict)
@@ -108,13 +114,13 @@ static int appraise_is_undead(struct char_data *vict)
   if (!vict)
     return FALSE;
 
-  /*
-   * Match existing undead handling paths:
-   * - vampires are treated as undead by spell logic
-   * - NPC CLASS_UNDEAD is treated as undead by visibility/combat logic
-   */
-  return GET_RACE(vict) == RACE_VAMPIRE ||
-         (IS_NPC(vict) && GET_CLASS(vict) == CLASS_UNDEAD);
+  if (GET_RACE(vict) == RACE_VAMPIRE)
+    return TRUE;
+
+  if (IS_NPC(vict) && GET_CLASS(vict) == CLASS_UNDEAD)
+    return TRUE;
+
+  return FALSE;
 }
 
 ACMD(do_assist)
