@@ -510,6 +510,50 @@ ASPELL(spell_create_water)
   }
 }
 
+ASPELL(spell_control_weather)
+{
+  int change;
+
+  if (!OUTSIDE(ch)) {
+    send_to_char(ch, "You can only influence the weather from outside.\r\n");
+    return;
+  }
+
+  change = dice(1, 4) * (GET_ALIGNMENT(ch) >= 0 ? 1 : -1);
+  weather_info.change += change;
+  weather_info.change = MAX(-12, MIN(12, weather_info.change));
+
+  send_to_char(ch, "You weave your will into the sky.\r\n");
+  act("$n gestures skyward and the winds answer.", TRUE, ch, 0, 0, TO_ROOM);
+}
+
+ASPELL(spell_ventriloquate)
+{
+  struct char_data *to;
+  char msg[MAX_INPUT_LENGTH];
+  char from_name[MAX_NAME_LENGTH + 1];
+  const char *spoken = cast_arg2;
+
+  if (!ch || IN_ROOM(ch) == NOWHERE)
+    return;
+
+  if (!victim)
+    victim = ch;
+
+  if (!spoken || !*spoken)
+    spoken = "...";
+
+  snprintf(from_name, sizeof(from_name), "%s", GET_NAME(victim));
+  CAP(from_name);
+  snprintf(msg, sizeof(msg), "%s says, '%s'\r\n", from_name, spoken);
+
+  send_to_char(ch, "You throw your voice through %s.\r\n", GET_NAME(victim));
+  for (to = world[IN_ROOM(ch)].people; to; to = to->next_in_room) {
+    if (to != ch && to != victim)
+      send_to_char(to, "%s", msg);
+  }
+}
+
 ASPELL(spell_recall)
 {
   if (victim == NULL || IS_NPC(victim))

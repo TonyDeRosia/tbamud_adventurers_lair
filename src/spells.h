@@ -465,6 +465,8 @@ enum room_effect_type {
 };
 
 ASPELL(spell_create_water);
+ASPELL(spell_control_weather);
+ASPELL(spell_ventriloquate);
 ASPELL(spell_recall);
 ASPELL(spell_teleport);
 ASPELL(spell_summon);

@@ -1700,6 +1700,10 @@ int call_magic(struct char_data *caster, struct char_data *cvict,
       MANUAL_SPELL(spell_create_water)
       ;
       break;
+    case SPELL_CONTROL_WEATHER:
+      MANUAL_SPELL(spell_control_weather)
+      ;
+      break;
     case SPELL_DETECT_POISON:
       MANUAL_SPELL(spell_detect_poison)
       ;
@@ -1726,6 +1730,10 @@ int call_magic(struct char_data *caster, struct char_data *cvict,
       break;
     case SPELL_TELEPORT:
       MANUAL_SPELL(spell_teleport)
+      ;
+      break;
+    case SPELL_VENTRILOQUATE:
+      MANUAL_SPELL(spell_ventriloquate)
       ;
       break;
     case SPELL_CORRUPTION:
@@ -3080,6 +3088,8 @@ void mag_assign_spells(void) {
 
   spello(SPELL_TELEPORT, "teleport", 75, 50, 3, POS_STANDING,
   TAR_CHAR_ROOM, FALSE, MAG_MANUAL, NULL);
+  spello(SPELL_VENTRILOQUATE, "ventriloquate", 30, 5, 2, POS_STANDING,
+  TAR_CHAR_ROOM, FALSE, MAG_MANUAL, NULL);
 
   spello(SPELL_BEAR_SPIRIT, "bear spirit", 40, 20, 2, POS_STANDING,
   TAR_CHAR_ROOM, FALSE, MAG_AFFECTS, "The spirit of the bear withdraws from you.");
@@ -3101,6 +3111,8 @@ void mag_assign_spells(void) {
 
   spello(SPELL_WORD_OF_RECALL, "word of recall", 20, 10, 2, POS_FIGHTING,
   TAR_CHAR_ROOM, FALSE, MAG_MANUAL, NULL);
+  spello(SPELL_GROUP_RECALL, "group recall", 50, 30, 2, POS_STANDING,
+  TAR_IGNORE, FALSE, MAG_GROUPS, NULL);
 
   spello(SPELL_IDENTIFY, "identify", 50, 25, 5, POS_STANDING,
   TAR_CHAR_ROOM | TAR_OBJ_INV | TAR_OBJ_ROOM | TAR_OBJ_EQUIP, FALSE, MAG_MANUAL, NULL);
@@ -3237,10 +3249,6 @@ void mag_assign_spells(void) {
   spello(SPELL_TOTAL_OCCULTATION, "total occultation", 40, 40, 0, POS_STANDING, TAR_SELF_ONLY, FALSE, MAG_MANUAL, "The total occultation ends.");
   spello(SPELL_DOMAIN_BREAK, "domain break", 38, 38, 0, POS_FIGHTING, TAR_IGNORE, FALSE, MAG_MANUAL, NULL);
   spello(SPELL_HUNTERS_INSTINCT, "hunters instinct", 20, 20, 0, POS_STANDING, TAR_SELF_ONLY, FALSE, MAG_MANUAL, "Your hunter's instinct recedes.");
-
-  /* NON-castable spells should appear below here. */
-  spello(SPELL_IDENTIFY, "identify", 0, 0, 0, 0,
-  TAR_CHAR_ROOM | TAR_OBJ_INV | TAR_OBJ_ROOM | TAR_OBJ_EQUIP, FALSE, MAG_MANUAL, NULL);
 
   /* you might want to name this one something more fitting to your theme -Welcor*/
   spello(SPELL_DG_AFFECT, "Script-inflicted", 0, 0, 0, POS_SITTING,
