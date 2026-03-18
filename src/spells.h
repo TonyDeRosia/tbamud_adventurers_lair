@@ -300,6 +300,7 @@
 #define SKILL_SOVEREIGN_PRESSURE    256
 #define SKILL_KILL_WINDOW           257
 #define SKILL_LEGION_MASTERY        258
+#define SKILL_APPRAISE_ENEMY        259
 /* New skills may be added here up to MAX_SKILLS (200) */
 
 /* NON-PLAYER AND OBJECT SPELLS AND SKILLS: The practice levels for the spells
@@ -472,7 +473,7 @@ ASPELL(spell_teleport);
 ASPELL(spell_summon);
 ASPELL(spell_locate_object);
 ASPELL(spell_charm);
-ASPELL(spell_information);
+ASPELL(spell_energy_drain);
 ASPELL(spell_identify);
 ASPELL(spell_enchant_weapon);
 ASPELL(spell_detect_poison);

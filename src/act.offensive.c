@@ -22,6 +22,74 @@
 #include "mud_event.h"
 #include "ai_actor.h"
 
+static const char *appraise_level_band(const struct char_data *ch, const struct char_data *vict)
+{
+  int delta = GET_LEVEL(vict) - GET_LEVEL(ch);
+
+  if (delta <= -15)
+    return "trivial";
+  if (delta <= -5)
+    return "weaker than you";
+  if (delta <= 4)
+    return "near your level";
+  if (delta <= 12)
+    return "stronger than you";
+  return "far stronger than you";
+}
+
+static const char *appraise_condition(const struct char_data *vict)
+{
+  int pct;
+
+  if (!vict || GET_MAX_HIT(vict) <= 0)
+    return "unclear";
+  pct = (GET_HIT(vict) * 100) / GET_MAX_HIT(vict);
+  if (pct >= 95)
+    return "unwounded";
+  if (pct >= 75)
+    return "lightly hurt";
+  if (pct >= 45)
+    return "wounded";
+  if (pct >= 20)
+    return "badly wounded";
+  return "near collapse";
+}
+
+static const char *appraise_role(const struct char_data *vict)
+{
+  if (!vict)
+    return "unclear";
+  if (GET_INT(vict) >= 18 || AFF_FLAGGED(vict, AFF_TRUESIGHT))
+    return "spellcaster";
+  if (AFF_FLAGGED(vict, AFF_STONESKIN) || AFF_FLAGGED(vict, AFF_BARKSKIN))
+    return "armored defender";
+  if (GET_DEX(vict) >= 18 || AFF_FLAGGED(vict, AFF_SNEAK))
+    return "agile skirmisher";
+  if (GET_STR(vict) >= 18)
+    return "melee fighter";
+  if (AFF_FLAGGED(vict, AFF_REGENERATING) || AFF_FLAGGED(vict, AFF_HOLY_AURA))
+    return "support fighter";
+  if (IS_NPC(vict) && vict->master)
+    return "summoner";
+  return "unclear";
+}
+
+static int appraise_success_score(struct char_data *ch, struct char_data *vict)
+{
+  int score = GET_SKILL(ch, SKILL_APPRAISE_ENEMY);
+  int level_delta = GET_LEVEL(ch) - GET_LEVEL(vict);
+
+  score += level_delta * 2;
+  if (AFF_FLAGGED(vict, AFF_HIDE) || AFF_FLAGGED(vict, AFF_INVISIBLE))
+    score -= 20;
+  if (AFF_FLAGGED(vict, AFF_SNEAK))
+    score -= 10;
+  if (AFF_FLAGGED(ch, AFF_DETECT_INVIS) || AFF_FLAGGED(ch, AFF_SENSE_LIFE) ||
+      AFF_FLAGGED(ch, AFF_TRUESIGHT))
+    score += 10;
+  return score;
+}
+
 ACMD(do_assist)
 {
   char arg[MAX_INPUT_LENGTH];
@@ -605,6 +673,137 @@ ACMD(do_kick)
   improve_ability_from_use(ch, SKILL_KICK, (percent <= prob));
 
   WAIT_STATE(ch, PULSE_VIOLENCE * 3);
+}
+
+ACMD(do_appraise_enemy)
+{
+  char arg[MAX_INPUT_LENGTH];
+  struct char_data *vict;
+  int roll, score;
+  int move_cost = 8;
+  int quality = 0;
+
+  if (IS_NPC(ch) || !GET_SKILL(ch, SKILL_APPRAISE_ENEMY)) {
+    send_to_char(ch, "You have no idea how to read an opponent like that.\r\n");
+    return;
+  }
+  if (spell_on_cooldown(ch, SKILL_APPRAISE_ENEMY)) {
+    send_to_char(ch, "You need a moment before appraising another foe.\r\n");
+    return;
+  }
+  if (GET_MOVE(ch) < move_cost) {
+    send_to_char(ch, "You are too exhausted to appraise anyone right now.\r\n");
+    return;
+  }
+
+  one_argument(argument, arg);
+  if (!*arg) {
+    send_to_char(ch, "Appraise whom?\r\n");
+    return;
+  }
+
+  vict = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM);
+  if (!vict) {
+    send_to_char(ch, "You cannot get a clean read on anyone by that name here.\r\n");
+    return;
+  }
+  if (vict == ch) {
+    send_to_char(ch, "You already know your own strengths and flaws.\r\n");
+    return;
+  }
+
+  GET_MOVE(ch) = MAX(0, GET_MOVE(ch) - move_cost);
+  set_spell_cooldown(ch, SKILL_APPRAISE_ENEMY, 2);
+  WAIT_STATE(ch, PULSE_VIOLENCE * 2);
+
+  act("You study $N with a predator's eye, appraising strengths and weaknesses.", FALSE, ch, 0, vict, TO_CHAR);
+  act("$n studies $N with a cold, measuring stare.", FALSE, ch, 0, vict, TO_NOTVICT);
+
+  score = appraise_success_score(ch, vict);
+  roll = rand_number(1, 101);
+  if (roll <= score - 25)
+    quality = 3; /* excellent */
+  else if (roll <= score)
+    quality = 2; /* strong success */
+  else if (roll <= score + 20)
+    quality = 1; /* basic success */
+  else
+    quality = 0; /* failure */
+
+  if (quality == 0) {
+    send_to_char(ch, "Your appraisal of %s is uncertain.\r\n", PERS(vict, ch));
+    improve_ability_from_use(ch, SKILL_APPRAISE_ENEMY, 0);
+    return;
+  }
+
+  send_to_char(ch, "You appraise %s:\r\n", PERS(vict, ch));
+  send_to_char(ch, "Power: %s.\r\n", appraise_level_band(ch, vict));
+  send_to_char(ch, "Condition: %s.\r\n", appraise_condition(vict));
+  send_to_char(ch, "Role: %s.\r\n", appraise_role(vict));
+
+  if (AFF_FLAGGED(vict, AFF_POISON)) send_to_char(ch, "Flag: poisoned.\r\n");
+  if (AFF_FLAGGED(vict, AFF_BURNING)) send_to_char(ch, "Flag: burning.\r\n");
+  if (AFF_FLAGGED(vict, AFF_ROOTED) || AFF_FLAGGED(vict, AFF_WEBBED)) send_to_char(ch, "Flag: rooted.\r\n");
+  if (AFF_FLAGGED(vict, AFF_STUNNED)) send_to_char(ch, "Flag: stunned.\r\n");
+  if (AFF_FLAGGED(vict, AFF_ADRENALINE)) send_to_char(ch, "Flag: hasted.\r\n");
+  if (AFF_FLAGGED(vict, AFF_FROZEN) || AFF_FLAGGED(vict, AFF_TIME_SNARE)) send_to_char(ch, "Flag: slowed.\r\n");
+  if (AFF_FLAGGED(vict, AFF_WARDED) || AFF_FLAGGED(vict, AFF_SANCTUARY)) send_to_char(ch, "Flag: protected by magic.\r\n");
+  if (AFF_FLAGGED(vict, AFF_SHIELDED)) send_to_char(ch, "Flag: shielded.\r\n");
+  if (AFF_FLAGGED(vict, AFF_HIDE) || AFF_FLAGGED(vict, AFF_INVISIBLE)) send_to_char(ch, "Flag: hidden by shadow.\r\n");
+  if (IS_NPC(vict) && GET_CLASS(vict) == CLASS_UNDEAD) send_to_char(ch, "Flag: undead.\r\n");
+  if (IS_NPC(vict) && vict->master) send_to_char(ch, "Flag: summoned.\r\n");
+
+  if (quality >= 2) {
+    int phys = GET_DAMROLL(vict) + GET_HITROLL(vict);
+    int def = -compute_armor_class(vict);
+    int mag = GET_INT(vict) + GET_WIS(vict);
+
+    send_to_char(ch, "Threat (offense): %s.\r\n",
+        phys < 8 ? "low" : phys < 18 ? "moderate" : phys < 28 ? "high" : "severe");
+    send_to_char(ch, "Threat (defense): %s.\r\n",
+        def < 10 ? "fragile" : def < 30 ? "steady" : def < 55 ? "durable" : "extremely durable");
+    send_to_char(ch, "Threat (magic): %s.\r\n",
+        mag < 18 ? "none" : mag < 26 ? "minor" : mag < 34 ? "notable" : mag < 42 ? "dangerous" : "overwhelming");
+
+    if (AFF_FLAGGED(vict, AFF_STONESKIN)) send_to_char(ch, "Ward: stoneskin.\r\n");
+    if (AFF_FLAGGED(vict, AFF_BARKSKIN)) send_to_char(ch, "Ward: barkskin.\r\n");
+    if (AFF_FLAGGED(vict, AFF_MIRROR_IMAGE)) send_to_char(ch, "Ward: mirror effects.\r\n");
+    if (AFF_FLAGGED(vict, AFF_ELEMENTAL_WARD_FIRE) || AFF_FLAGGED(vict, AFF_ELEMENTAL_WARD_COLD) ||
+        AFF_FLAGGED(vict, AFF_ELEMENTAL_WARD_LIGHTNING) || AFF_FLAGGED(vict, AFF_ELEMENTAL_WARD_ACID))
+      send_to_char(ch, "Ward: elemental wards.\r\n");
+    if (AFF_FLAGGED(vict, AFF_DEATH_WARD)) send_to_char(ch, "Ward: death ward.\r\n");
+    if (AFF_FLAGGED(vict, AFF_TRUESIGHT)) send_to_char(ch, "Ward: truesight.\r\n");
+    if (AFF_FLAGGED(vict, AFF_BLOODLUST)) send_to_char(ch, "Ward: bloodlust.\r\n");
+    if (affected_by_spell(vict, SPELL_SHADOW_ARMOR)) send_to_char(ch, "Ward: shadow armor.\r\n");
+  }
+
+  if (quality >= 3) {
+    if (AFF_FLAGGED(vict, AFF_ELEMENTAL_WARD_FIRE)) send_to_char(ch, "Resistance: resistant to fire.\r\n");
+    if (AFF_FLAGGED(vict, AFF_ELEMENTAL_WARD_COLD)) send_to_char(ch, "Resistance: resistant to cold.\r\n");
+    if (AFF_FLAGGED(vict, AFF_ELEMENTAL_WARD_LIGHTNING)) send_to_char(ch, "Resistance: resistant to lightning.\r\n");
+    if (AFF_FLAGGED(vict, AFF_ELEMENTAL_WARD_ACID)) send_to_char(ch, "Resistance: resistant to acid.\r\n");
+    if (AFF_FLAGGED(vict, AFF_DEATH_WARD)) send_to_char(ch, "Resistance: resistant to death magic.\r\n");
+    if (MOB_FLAGGED(vict, MOB_NOBASH) || AFF_FLAGGED(vict, AFF_ROOTED)) send_to_char(ch, "Resistance: difficult to restrain.\r\n");
+    if (MOB_FLAGGED(vict, MOB_AWARE)) send_to_char(ch, "Resistance: difficult to frighten.\r\n");
+
+    if (compute_armor_class(vict) > 50) send_to_char(ch, "Weakness: lightly armored.\r\n");
+    if (AFF_FLAGGED(vict, AFF_ARCANE_LEAK) || AFF_FLAGGED(vict, AFF_HEXED)) send_to_char(ch, "Weakness: vulnerable to disruption.\r\n");
+    if (GET_HIT(vict) < (GET_MAX_HIT(vict) / 2)) send_to_char(ch, "Weakness: already weakened.\r\n");
+    if (AFF_FLAGGED(vict, AFF_FEARFUL) || AFF_FLAGGED(vict, AFF_STUNNED)) send_to_char(ch, "Weakness: unstable under pressure.\r\n");
+
+    if (GET_DAMROLL(vict) > GET_INT(vict))
+      send_to_char(ch, "Dominance: physically dominant.\r\n");
+    else if (GET_INT(vict) > GET_DAMROLL(vict) + 4)
+      send_to_char(ch, "Dominance: magically dominant.\r\n");
+    else
+      send_to_char(ch, "Dominance: balanced.\r\n");
+    if (GET_MOVE(vict) < (GET_MAX_MOVE(vict) / 4))
+      send_to_char(ch, "Posture: exhausted.\r\n");
+    if (AFF_FLAGGED(vict, AFF_HIDE) || AFF_FLAGGED(vict, AFF_INVISIBLE))
+      send_to_char(ch, "Posture: hiding true power.\r\n");
+  }
+
+  improve_ability_from_use(ch, SKILL_APPRAISE_ENEMY, 1);
 }
 
 ACMD(do_bandage)

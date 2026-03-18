@@ -1906,6 +1906,10 @@ int call_magic(struct char_data *caster, struct char_data *cvict,
       MANUAL_SPELL(spell_power_word_silence)
       ;
       break;
+    case SPELL_ENERGY_DRAIN:
+      MANUAL_SPELL(spell_energy_drain)
+      ;
+      break;
     case SPELL_PSYCHIC_CRUSH:
       MANUAL_SPELL(spell_psychic_crush)
       ;
@@ -3288,4 +3292,5 @@ void mag_assign_spells(void) {
   skillo_cost(SKILL_SOVEREIGN_PRESSURE, "sovereign pressure", 0);
   skillo_cost(SKILL_KILL_WINDOW, "kill window", 0);
   skillo_cost(SKILL_LEGION_MASTERY, "legion mastery", 0);
+  skillo_cost(SKILL_APPRAISE_ENEMY, "appraise enemy", 8);
 }
