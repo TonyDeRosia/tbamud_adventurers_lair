@@ -116,11 +116,11 @@ static void clan_help(struct char_data *ch)
     "  clan <message>       sends clan chat\r\n"
     "Shortcuts:\r\n"
     "  ccreate <Name>       create clan (admins level 104 only)\r\n"
-    "  cinvite <player>     not active yet\r\n"
-    "  cjoin                not active yet\r\n"
+    "  cinvite <player>     invite/recruit an online player\r\n"
+    "  cjoin <clan>         join a clan by name or id\r\n"
     "  cquit [yes]          leave clan (confirm with yes)\r\n"
-    "  cpromote ...         not active yet\r\n"
-    "  cdemote ...          not active yet\r\n"
+    "  cpromote <player>    raise a member rank\r\n"
+    "  cdemote <player>     lower a member rank\r\n"
   );
 }
 /* Online roster. Offline roster can be added later by reading clan.dat membership. */
@@ -687,6 +687,9 @@ ACMD(do_clan)
   char arg1[MAX_INPUT_LENGTH];
   char arg2[MAX_INPUT_LENGTH];
   int clan_id = 0;
+  struct char_data *vict = NULL;
+  int actor_rank;
+  const int clan_rank_max = 10;
 
   if (IS_NPC(ch))
     return;
@@ -744,15 +747,126 @@ ACMD(do_clan)
     return;
   }
 
-  if (!str_cmp(arg1, "invite") || !str_cmp(arg1, "promote") || !str_cmp(arg1, "demote")) {
+  actor_rank = GET_CLAN_RANK(ch);
+  if (!str_cmp(arg1, "invite")) {
     if (GET_CLAN_ID(ch) <= 0) {
       send_to_char(ch, "You are not in a clan.\r\n");
       return;
     }
-    send_to_char(ch, "That clan function is not implemented yet.\r\n");
+
+    if (GET_LEVEL(ch) < LVL_IMPL && actor_rank < CLAN_RANK_LEADER) {
+      send_to_char(ch, "Only clan leaders may invite members.\r\n");
+      return;
+    }
+
+    skip_spaces(&argument);
+    if (!*argument) {
+      send_to_char(ch, "Usage: cinvite <player>\r\n");
+      return;
+    }
+
+    argument = any_one_arg(argument, arg2);
+    if (!(vict = get_player_vis(ch, arg2, NULL, FIND_CHAR_WORLD))) {
+      send_to_char(ch, "No such player is online.\r\n");
+      return;
+    }
+
+    if (IS_NPC(vict)) {
+      send_to_char(ch, "You can only invite players.\r\n");
+      return;
+    }
+
+    if (vict == ch) {
+      send_to_char(ch, "You are already in your own clan.\r\n");
+      return;
+    }
+
+    if (GET_CLAN_ID(vict) > 0) {
+      send_to_char(ch, "%s is already in %s.\r\n", GET_NAME(vict), clan_display_name_by_id(GET_CLAN_ID(vict)));
+      return;
+    }
+
+    SET_CLAN_ID(vict, GET_CLAN_ID(ch));
+    SET_CLAN_RANK(vict, CLAN_RANK_MEMBER);
+    save_char(vict);
+
+    send_to_char(ch, "You invite %s into %s.\r\n", GET_NAME(vict), clan_display_name_by_id(GET_CLAN_ID(ch)));
+    send_to_char(vict, "%s invites you into %s.\r\n", GET_NAME(ch), clan_display_name_by_id(GET_CLAN_ID(ch)));
+    send_to_clan(GET_CLAN_ID(ch), "A new member has joined the clan.", NULL);
     return;
   }
 
+  if (!str_cmp(arg1, "promote") || !str_cmp(arg1, "demote")) {
+    int delta = !str_cmp(arg1, "promote") ? 1 : -1;
+    int new_rank;
+
+    if (GET_CLAN_ID(ch) <= 0) {
+      send_to_char(ch, "You are not in a clan.\r\n");
+      return;
+    }
+
+    if (GET_LEVEL(ch) < LVL_IMPL && actor_rank < CLAN_RANK_LEADER) {
+      send_to_char(ch, "Only clan leaders may change ranks.\r\n");
+      return;
+    }
+
+    skip_spaces(&argument);
+    if (!*argument) {
+      send_to_char(ch, "Usage: c%s <player>\r\n", (delta > 0) ? "promote" : "demote");
+      return;
+    }
+
+    argument = any_one_arg(argument, arg2);
+    if (!(vict = get_player_vis(ch, arg2, NULL, FIND_CHAR_WORLD))) {
+      send_to_char(ch, "No such player is online.\r\n");
+      return;
+    }
+
+    if (IS_NPC(vict)) {
+      send_to_char(ch, "You can only change player ranks.\r\n");
+      return;
+    }
+
+    if (vict == ch) {
+      send_to_char(ch, "You cannot change your own rank.\r\n");
+      return;
+    }
+
+    if (GET_CLAN_ID(vict) != GET_CLAN_ID(ch)) {
+      send_to_char(ch, "%s is not in your clan.\r\n", GET_NAME(vict));
+      return;
+    }
+
+    if (GET_LEVEL(ch) < LVL_IMPL && GET_CLAN_RANK(vict) >= actor_rank) {
+      send_to_char(ch, "You cannot change the rank of an equal or higher-ranked member.\r\n");
+      return;
+    }
+
+    new_rank = GET_CLAN_RANK(vict) + delta;
+    if (new_rank < CLAN_RANK_MEMBER) {
+      send_to_char(ch, "%s is already at the lowest rank.\r\n", GET_NAME(vict));
+      return;
+    }
+
+    if (new_rank > clan_rank_max) {
+      send_to_char(ch, "%s is already at the highest rank.\r\n", GET_NAME(vict));
+      return;
+    }
+
+    if (GET_LEVEL(ch) < LVL_IMPL && new_rank >= actor_rank) {
+      send_to_char(ch, "You may not raise someone to your own rank or higher.\r\n");
+      return;
+    }
+
+    SET_CLAN_RANK(vict, new_rank);
+    save_char(vict);
+
+    send_to_char(ch, "You %s %s to clan rank %d.\r\n",
+      (delta > 0) ? "promote" : "demote", GET_NAME(vict), new_rank);
+    send_to_char(vict, "%s %ss you to clan rank %d.\r\n",
+      GET_NAME(ch), (delta > 0) ? "promote" : "demote", new_rank);
+    return;
+  }
   /* Otherwise treat as clan chat. The wrapper also lands here for "join" only if something went wrong. */
   if (GET_CLAN_ID(ch) <= 0) {
     send_to_char(ch, "You are not in a clan.\r\n");

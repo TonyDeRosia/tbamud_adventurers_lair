@@ -1296,14 +1296,14 @@ void mag_creations(int level, struct char_data *ch, int spellnum)
     return;
   /* level = MAX(MIN(level, LVL_IMPL), 1); - Hm, not used. */
 
-  switch (spellnum) {
-  case SPELL_CREATE_FOOD:
-    z = 10;
-    break;
-  default:
-    send_to_char(ch, "Spell unimplemented, it would seem.\r\n");
+  if (spellnum != SPELL_CREATE_FOOD) {
+    send_to_char(ch, "Nothing happens.\r\n");
+    log("SYSERR: mag_creations: unsupported spell routing (spell %d, caster %s).",
+        spellnum, GET_NAME(ch));
     return;
   }
+
+  z = 10;
 
   if (!(tobj = read_object(z, VIRTUAL))) {
     send_to_char(ch, "I seem to have goofed.\r\n");

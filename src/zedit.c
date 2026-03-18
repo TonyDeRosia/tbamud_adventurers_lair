@@ -1252,6 +1252,12 @@ void zedit_parse(struct descriptor_data *d, char *arg)
       break;
       }
     else {
+      if ((number - 1) == ZONE_QUEST &&
+          !IS_SET_AR(OLC_ZONE(d)->zone_flags, ZONE_QUEST)) {
+        write_to_output(d, "ZONE_QUEST is deprecated and has no gameplay effect; it cannot be newly enabled.\r\n");
+        zedit_disp_flag_menu(d);
+        break;
+      }
       /*
        * Toggle the bit.
        */
