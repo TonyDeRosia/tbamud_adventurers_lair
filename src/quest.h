@@ -102,6 +102,7 @@ void remove_completed_quest(struct char_data *ch, qst_vnum vnum);
 void quest_timeout(struct char_data *ch);
 void check_timed_quests(void);
 void quest_kill_trigger_check(struct char_data *ch, struct char_data *vict);
+void campaign_kill_trigger_check(struct char_data *ch, struct char_data *vict);
 int is_player_quest_target(struct char_data *viewer, struct char_data *mob);
 int get_quest_minutes_remaining(struct char_data *ch);
 int get_quest_cooldown_minutes_remaining(struct char_data *ch);
@@ -111,6 +112,7 @@ bool is_quest_expired(struct char_data *ch);
 bool is_on_quest_cooldown(struct char_data *ch);
 SPECIAL(questmaster);
 ACMD(do_quest);
+ACMD(do_campaign);
 /* Implemented in qedit.c  */
 void qedit_parse(struct descriptor_data *d, char *arg);
 void qedit_string_cleanup(struct descriptor_data *d, int terminator);

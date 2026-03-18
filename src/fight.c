@@ -590,11 +590,13 @@ struct char_data *i;
         if(IN_ROOM(i) == IN_ROOM(ch)  || (world[IN_ROOM(i)].zone == world[IN_ROOM(ch)].zone)) {
           autoquest_trigger_check(i, ch, NULL, AQ_MOB_KILL);
           quest_kill_trigger_check(i, ch);
+          campaign_kill_trigger_check(i, ch);
         }
     } else
     {
       autoquest_trigger_check(killer, ch, NULL, AQ_MOB_KILL);
       quest_kill_trigger_check(killer, ch);
+      campaign_kill_trigger_check(killer, ch);
     }
   }
 

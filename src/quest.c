@@ -62,6 +62,12 @@ static const char *quest_imm_usage =
 
 #define KQUEST_DURATION_SECS (60 * 60)
 #define KQUEST_COOLDOWN_SECS (30 * 60)
+#define CAMPAIGN_DURATION_SECS (6 * 24 * 60 * 60)
+#define CAMPAIGN_MIN_TARGETS 8
+
+static const char *campaign_cmd[] = {
+  "request", "info", "quit", "check", "brief", "today", "\n"
+};
 
 static void clear_kill_quest(struct char_data *ch)
 {
@@ -196,6 +202,203 @@ static int room_is_quest_safe(room_rnum room)
          ROOM_FLAGGED(room, ROOM_GODROOM) ||
          ROOM_FLAGGED(room, ROOM_DEATH) ||
          ROOM_FLAGGED(room, ROOM_NOMOB);
+}
+
+static void clear_campaign(struct char_data *ch)
+{
+  int i;
+  GET_CAMPAIGN_ACTIVE(ch) = 0;
+  GET_CAMPAIGN_LEVEL(ch) = 0;
+  GET_CAMPAIGN_EXPIRES_AT(ch) = 0;
+  GET_CAMPAIGN_REWARD_QP(ch) = 0;
+  GET_CAMPAIGN_REWARD_GOLD(ch) = 0;
+  GET_CAMPAIGN_TARGET_COUNT(ch) = 0;
+  for (i = 0; i < MAX_CAMPAIGN_TARGETS; i++) {
+    GET_CAMPAIGN_TARGET_VNUM(ch, i) = NOBODY;
+    GET_CAMPAIGN_TARGET_ROOM(ch, i) = NOWHERE;
+    GET_CAMPAIGN_TARGET_REQUIRED(ch, i) = 0;
+    GET_CAMPAIGN_TARGET_REMAINING(ch, i) = 0;
+  }
+}
+
+static bool is_on_campaign(struct char_data *ch)
+{
+  return ch && !IS_NPC(ch) && GET_CAMPAIGN_ACTIVE(ch) != 0;
+}
+
+static bool is_campaign_expired(struct char_data *ch)
+{
+  time_t now;
+
+  if (!is_on_campaign(ch))
+    return FALSE;
+
+  now = time(0);
+  return GET_CAMPAIGN_EXPIRES_AT(ch) > 0 && now >= GET_CAMPAIGN_EXPIRES_AT(ch);
+}
+
+static int campaign_remaining_targets(struct char_data *ch)
+{
+  int i, remaining = 0;
+  for (i = 0; i < GET_CAMPAIGN_TARGET_COUNT(ch); i++)
+    if (GET_CAMPAIGN_TARGET_REMAINING(ch, i) > 0)
+      remaining += GET_CAMPAIGN_TARGET_REMAINING(ch, i);
+  return remaining;
+}
+
+static int campaign_seconds_remaining(struct char_data *ch)
+{
+  time_t now;
+  if (!is_on_campaign(ch))
+    return 0;
+  now = time(0);
+  if (GET_CAMPAIGN_EXPIRES_AT(ch) <= now)
+    return 0;
+  return (int)(GET_CAMPAIGN_EXPIRES_AT(ch) - now);
+}
+
+static void format_campaign_time_left(int total_seconds, char *buf, size_t bufsz)
+{
+  int days, hours, minutes;
+  if (total_seconds < 0)
+    total_seconds = 0;
+  days = total_seconds / (24 * 60 * 60);
+  total_seconds %= (24 * 60 * 60);
+  hours = total_seconds / (60 * 60);
+  total_seconds %= (60 * 60);
+  minutes = total_seconds / 60;
+  snprintf(buf, bufsz, "%d day%s, %d hour%s and %d minute%s",
+           days, days == 1 ? "" : "s",
+           hours, hours == 1 ? "" : "s",
+           minutes, minutes == 1 ? "" : "s");
+}
+
+static void format_campaign_deadline(time_t when, char *buf, size_t bufsz)
+{
+  struct tm *tm_ptr = localtime(&when);
+  if (!tm_ptr) {
+    strlcpy(buf, "Unknown", bufsz);
+    return;
+  }
+  strftime(buf, bufsz, "%I:%M%p on %d %b %Y", tm_ptr);
+}
+
+static const char *campaign_target_name(mob_vnum vnum)
+{
+  mob_rnum rnum = real_mobile(vnum);
+  if (rnum == NOBODY)
+    return "an unknown target";
+  return GET_NAME(&mob_proto[rnum]);
+}
+
+static const char *campaign_target_area(room_vnum rvnum)
+{
+  room_rnum rr = real_room(rvnum);
+  if (rr == NOWHERE)
+    return "Unknown Area";
+  return zone_table[world[rr].zone].name;
+}
+
+static void expire_campaign_if_needed(struct char_data *ch, bool notify)
+{
+  if (!is_on_campaign(ch) || !is_campaign_expired(ch))
+    return;
+
+  clear_campaign(ch);
+  if (notify)
+    send_to_char(ch, "%sYour campaign has expired. The contract has been revoked.%s\r\n", QRED, QNRM);
+  save_char(ch);
+}
+
+struct campaign_candidate_data {
+  mob_vnum vnum;
+  room_vnum room_vnum;
+  int zone;
+};
+
+static int select_campaign_targets(struct char_data *ch, struct campaign_candidate_data selected[MAX_CAMPAIGN_TARGETS], int *selected_count)
+{
+  struct char_data *mob;
+  struct campaign_candidate_data pool[2000];
+  int pool_count = 0, i, j, need, max_targets;
+  int level_window_low = GET_LEVEL(ch) - 5;
+  int level_window_high = GET_LEVEL(ch) + 2;
+
+  for (mob = character_list; mob; mob = mob->next) {
+    room_rnum in_room;
+    int mob_level;
+
+    if (!IS_NPC(mob) || IN_ROOM(mob) == NOWHERE)
+      continue;
+    if (is_service_or_protected_mob(mob))
+      continue;
+    if (MOB_FLAGGED(mob, MOB_NOTDEADYET))
+      continue;
+
+    in_room = IN_ROOM(mob);
+    if (room_is_quest_safe(in_room))
+      continue;
+
+    mob_level = GET_LEVEL(mob);
+    if (mob_level < level_window_low || mob_level > level_window_high)
+      continue;
+
+    if (pool_count >= (int)(sizeof(pool) / sizeof(pool[0])))
+      break;
+
+    pool[pool_count].vnum = GET_MOB_VNUM(mob);
+    pool[pool_count].room_vnum = GET_ROOM_VNUM(in_room);
+    pool[pool_count].zone = world[in_room].zone;
+    pool_count++;
+  }
+
+  if (pool_count < CAMPAIGN_MIN_TARGETS)
+    return 0;
+
+  max_targets = MIN(MAX_CAMPAIGN_TARGETS, pool_count);
+  need = rand_number(CAMPAIGN_MIN_TARGETS, max_targets);
+  *selected_count = 0;
+
+  for (i = 0; i < pool_count; i++) {
+    j = rand_number(i, pool_count - 1);
+    if (i != j) {
+      struct campaign_candidate_data tmp = pool[i];
+      pool[i] = pool[j];
+      pool[j] = tmp;
+    }
+  }
+
+  for (i = 0; i < pool_count && *selected_count < need; i++) {
+    mob_vnum vnum = pool[i].vnum;
+    int zone = pool[i].zone;
+    int seen_vnum = FALSE, seen_zone = FALSE;
+
+    for (j = 0; j < *selected_count; j++) {
+      if (selected[j].vnum == vnum)
+        seen_vnum = TRUE;
+      if (selected[j].zone == zone)
+        seen_zone = TRUE;
+    }
+    if (seen_vnum || seen_zone)
+      continue;
+
+    selected[*selected_count] = pool[i];
+    (*selected_count)++;
+  }
+
+  for (i = 0; i < pool_count && *selected_count < need; i++) {
+    mob_vnum vnum = pool[i].vnum;
+    int seen_vnum = FALSE;
+    for (j = 0; j < *selected_count; j++)
+      if (selected[j].vnum == vnum)
+        seen_vnum = TRUE;
+    if (seen_vnum)
+      continue;
+    selected[*selected_count] = pool[i];
+    (*selected_count)++;
+  }
+
+  return *selected_count >= CAMPAIGN_MIN_TARGETS;
 }
 
 static struct char_data *select_kill_quest_target(struct char_data *ch)
@@ -351,6 +554,157 @@ static void quest_complete_kill(struct char_data *ch)
 
   clear_kill_quest(ch);
   start_kill_quest_cooldown(ch);
+  save_char(ch);
+}
+
+static void campaign_show_header(struct char_data *ch)
+{
+  send_to_char(ch, "%s--------------------------[ YOUR CURRENT CAMPAIGN ]----------------------%s\r\n", QYEL, QNRM);
+}
+
+static void campaign_request(struct char_data *ch)
+{
+  struct campaign_candidate_data selected[MAX_CAMPAIGN_TARGETS];
+  int count, i;
+
+  expire_campaign_if_needed(ch, TRUE);
+  if (is_on_campaign(ch)) {
+    send_to_char(ch, "%sYou already have an active campaign. Use 'campaign info'.%s\r\n", QRED, QNRM);
+    return;
+  }
+
+  if (!select_campaign_targets(ch, selected, &count)) {
+    send_to_char(ch, "%sNo suitable campaign targets are available for your level right now. Please try again later.%s\r\n", QRED, QNRM);
+    return;
+  }
+
+  clear_campaign(ch);
+  GET_CAMPAIGN_ACTIVE(ch) = 1;
+  GET_CAMPAIGN_LEVEL(ch) = GET_LEVEL(ch);
+  GET_CAMPAIGN_EXPIRES_AT(ch) = time(0) + CAMPAIGN_DURATION_SECS;
+  GET_CAMPAIGN_TARGET_COUNT(ch) = count;
+  GET_CAMPAIGN_REWARD_QP(ch) = MAX(20, (GET_LEVEL(ch) * count) / 3);
+  GET_CAMPAIGN_REWARD_GOLD(ch) = MAX(1000, GET_LEVEL(ch) * count * 140);
+
+  for (i = 0; i < count; i++) {
+    GET_CAMPAIGN_TARGET_VNUM(ch, i) = selected[i].vnum;
+    GET_CAMPAIGN_TARGET_ROOM(ch, i) = selected[i].room_vnum;
+    GET_CAMPAIGN_TARGET_REQUIRED(ch, i) = 1;
+    GET_CAMPAIGN_TARGET_REMAINING(ch, i) = 1;
+  }
+
+  send_to_char(ch, "%sCampaign accepted.%s %sYou have %d targets and 6 real-world days to finish.%s\r\n",
+               QGRN, QNRM, QCYN, count, QNRM);
+  send_to_char(ch, "Use %s'campaign info'%s for full details, %s'cp check'%s for remaining targets.\r\n",
+               QYEL, QNRM, QYEL, QNRM);
+  save_char(ch);
+}
+
+static void campaign_info(struct char_data *ch)
+{
+  int i;
+  char left_buf[128], deadline_buf[64];
+
+  expire_campaign_if_needed(ch, TRUE);
+  if (!is_on_campaign(ch)) {
+    send_to_char(ch, "%sYou do not currently have an active campaign.%s\r\n", QRED, QNRM);
+    return;
+  }
+
+  format_campaign_time_left(campaign_seconds_remaining(ch), left_buf, sizeof(left_buf));
+  format_campaign_deadline(GET_CAMPAIGN_EXPIRES_AT(ch), deadline_buf, sizeof(deadline_buf));
+
+  campaign_show_header(ch);
+  send_to_char(ch, "%sComplete By........:%s [ %s%s%s ]\r\n", QCYN, QNRM, QWHT, deadline_buf, QNRM);
+  send_to_char(ch, "%sTime Left..........:%s [ %s%s%s ]\r\n", QCYN, QNRM, QGRN, left_buf, QNRM);
+  send_to_char(ch, "%sLevel Taken........:%s [ %5d ]\r\n", QCYN, QNRM, GET_CAMPAIGN_LEVEL(ch));
+  send_to_char(ch, "%sQuest Points.......:%s [ %5d ]\r\n", QCYN, QNRM, GET_CAMPAIGN_REWARD_QP(ch));
+  send_to_char(ch, "%sGold Coins.........:%s [ %5d ]\r\n", QCYN, QNRM, GET_CAMPAIGN_REWARD_GOLD(ch));
+  send_to_char(ch, "%s----------------------------[ Campaign Victims ]-------------------------%s\r\n", QYEL, QNRM);
+  send_to_char(ch, "The targets for this campaign are:\r\n");
+  for (i = 0; i < GET_CAMPAIGN_TARGET_COUNT(ch); i++) {
+    send_to_char(ch, "Find and kill %d * %s%s%s (%s%s%s)\r\n",
+                 GET_CAMPAIGN_TARGET_REQUIRED(ch, i),
+                 QGRN, campaign_target_name(GET_CAMPAIGN_TARGET_VNUM(ch, i)), QNRM,
+                 QCYN, campaign_target_area(GET_CAMPAIGN_TARGET_ROOM(ch, i)), QNRM);
+  }
+  send_to_char(ch, "%s--------------------------------------------------------------------------%s\r\n", QYEL, QNRM);
+  send_to_char(ch, "Use '%scp check%s' to see only targets that you still need to kill.\r\n", QYEL, QNRM);
+}
+
+static void campaign_check(struct char_data *ch)
+{
+  int i, shown = 0;
+  char left_buf[128];
+
+  expire_campaign_if_needed(ch, TRUE);
+  if (!is_on_campaign(ch)) {
+    send_to_char(ch, "%sYou do not currently have an active campaign.%s\r\n", QRED, QNRM);
+    return;
+  }
+
+  for (i = 0; i < GET_CAMPAIGN_TARGET_COUNT(ch); i++) {
+    if (GET_CAMPAIGN_TARGET_REMAINING(ch, i) <= 0)
+      continue;
+    shown++;
+    send_to_char(ch, "You still have to kill * %s%s%s (%s%s%s)\r\n",
+                 QGRN, campaign_target_name(GET_CAMPAIGN_TARGET_VNUM(ch, i)), QNRM,
+                 QCYN, campaign_target_area(GET_CAMPAIGN_TARGET_ROOM(ch, i)), QNRM);
+  }
+  if (!shown)
+    send_to_char(ch, "%sAll campaign targets are complete. Rewards will be granted automatically.%s\r\n", QGRN, QNRM);
+
+  format_campaign_time_left(campaign_seconds_remaining(ch), left_buf, sizeof(left_buf));
+  send_to_char(ch, "\r\nYou have %s%s%s left to finish this campaign.\r\n", QGRN, left_buf, QNRM);
+  send_to_char(ch, "You may take a campaign at this level.\r\n");
+}
+
+static void campaign_brief(struct char_data *ch)
+{
+  int i, shown = 0;
+  expire_campaign_if_needed(ch, TRUE);
+  if (!is_on_campaign(ch)) {
+    send_to_char(ch, "%sNo active campaign.%s\r\n", QRED, QNRM);
+    return;
+  }
+
+  send_to_char(ch, "%sCampaign brief:%s %d remaining target%s.\r\n",
+               QYEL, QNRM, campaign_remaining_targets(ch), campaign_remaining_targets(ch) == 1 ? "" : "s");
+  for (i = 0; i < GET_CAMPAIGN_TARGET_COUNT(ch); i++) {
+    if (GET_CAMPAIGN_TARGET_REMAINING(ch, i) <= 0)
+      continue;
+    shown++;
+    send_to_char(ch, " - %s%s%s (%s%s%s)\r\n",
+                 QGRN, campaign_target_name(GET_CAMPAIGN_TARGET_VNUM(ch, i)), QNRM,
+                 QCYN, campaign_target_area(GET_CAMPAIGN_TARGET_ROOM(ch, i)), QNRM);
+    if (shown >= 5)
+      break;
+  }
+}
+
+static void campaign_today(struct char_data *ch)
+{
+  char left_buf[128];
+  expire_campaign_if_needed(ch, FALSE);
+  if (!is_on_campaign(ch)) {
+    send_to_char(ch, "%sCampaign Status:%s You may request a campaign now.\r\n", QYEL, QNRM);
+    return;
+  }
+  format_campaign_time_left(campaign_seconds_remaining(ch), left_buf, sizeof(left_buf));
+  send_to_char(ch, "%sCampaign Status:%s Active with %s%d%s target%s remaining. Time left: %s%s%s.\r\n",
+               QYEL, QNRM, QGRN, campaign_remaining_targets(ch), QNRM,
+               campaign_remaining_targets(ch) == 1 ? "" : "s", QGRN, left_buf, QNRM);
+}
+
+static void campaign_quit(struct char_data *ch)
+{
+  expire_campaign_if_needed(ch, FALSE);
+  if (!is_on_campaign(ch)) {
+    send_to_char(ch, "%sYou have no active campaign to quit.%s\r\n", QRED, QNRM);
+    return;
+  }
+  clear_campaign(ch);
+  send_to_char(ch, "%sYou abandon your campaign and forfeit all rewards.%s\r\n", QRED, QNRM);
   save_char(ch);
 }
 
@@ -745,6 +1099,8 @@ void check_timed_quests(void)
         quest_timeout(ch);
     if (!IS_NPC(ch))
       expire_kill_quest_if_needed(ch, TRUE);
+    if (!IS_NPC(ch))
+      expire_campaign_if_needed(ch, TRUE);
   }
 }
 
@@ -764,6 +1120,43 @@ void quest_kill_trigger_check(struct char_data *ch, struct char_data *vict)
   send_to_char(ch, "\tYQUEST: You have almost completed your QUEST!\tn\r\n");
   send_to_char(ch, "\tYReturn to the questmaster before your time runs out.\tn\r\n");
   save_char(ch);
+}
+
+void campaign_kill_trigger_check(struct char_data *ch, struct char_data *vict)
+{
+  int i, remaining;
+
+  if (!ch || IS_NPC(ch) || !vict || !IS_NPC(vict))
+    return;
+
+  expire_campaign_if_needed(ch, TRUE);
+  if (!is_on_campaign(ch))
+    return;
+
+  for (i = 0; i < GET_CAMPAIGN_TARGET_COUNT(ch); i++) {
+    if (GET_CAMPAIGN_TARGET_REMAINING(ch, i) <= 0)
+      continue;
+    if (GET_CAMPAIGN_TARGET_VNUM(ch, i) != GET_MOB_VNUM(vict))
+      continue;
+
+    GET_CAMPAIGN_TARGET_REMAINING(ch, i)--;
+    remaining = campaign_remaining_targets(ch);
+    send_to_char(ch, "%sCAMPAIGN:%s You have slain one of your campaign targets: %s%s%s.\r\n",
+                 QYEL, QNRM, QGRN, campaign_target_name(GET_CAMPAIGN_TARGET_VNUM(ch, i)), QNRM);
+    send_to_char(ch, "%sCAMPAIGN:%s %d target%s remain.\r\n",
+                 QYEL, QNRM, remaining, remaining == 1 ? "" : "s");
+
+    if (remaining <= 0) {
+      GET_QUESTPOINTS(ch) += GET_CAMPAIGN_REWARD_QP(ch);
+      increase_gold(ch, GET_CAMPAIGN_REWARD_GOLD(ch));
+      send_to_char(ch, "%sCAMPAIGN COMPLETE!%s You receive %s%d%s quest points and %s%d%s gold coins.\r\n",
+                   QGRN, QNRM, QYEL, GET_CAMPAIGN_REWARD_QP(ch), QNRM,
+                   QYEL, GET_CAMPAIGN_REWARD_GOLD(ch), QNRM);
+      clear_campaign(ch);
+    }
+    save_char(ch);
+    return;
+  }
 }
 
 int is_player_quest_target(struct char_data *viewer, struct char_data *mob)
@@ -1133,6 +1526,36 @@ ACMD(do_quest)
                      quest_mort_usage : quest_imm_usage);
  break;
     } /* switch on subcmd number */
+  }
+}
+
+ACMD(do_campaign)
+{
+  char arg1[MAX_INPUT_LENGTH];
+  int tp;
+
+  one_argument(argument, arg1);
+  if (!*arg1) {
+    send_to_char(ch, "Campaign what? Options are - Request, Info, Quit, Check, Brief and Today.\r\n");
+    return;
+  }
+
+  tp = search_block(arg1, campaign_cmd, FALSE);
+  if (tp < 0) {
+    send_to_char(ch, "Campaign what? Options are - Request, Info, Quit, Check, Brief and Today.\r\n");
+    return;
+  }
+
+  switch (tp) {
+    case 0: campaign_request(ch); break;
+    case 1: campaign_info(ch); break;
+    case 2: campaign_quit(ch); break;
+    case 3: campaign_check(ch); break;
+    case 4: campaign_brief(ch); break;
+    case 5: campaign_today(ch); break;
+    default:
+      send_to_char(ch, "Campaign what? Options are - Request, Info, Quit, Check, Brief and Today.\r\n");
+      break;
   }
 }
 

@@ -145,6 +145,7 @@ cpp_extern const struct command_info cmd_info[] = {
   { "bug"      , "bug"     , POS_DEAD    , do_ibt      , 0, SCMD_BUG },
 
   { "cast"     , "c"       , POS_SITTING , do_cast     , 1, 0 },
+  { "campaign" , "camp"    , POS_DEAD    , do_campaign , 0, 0 },
   { "spellup"  , "spellup" , POS_SITTING , do_spellup  , 1, 0 },
   { "cedit"    , "cedit"   , POS_DEAD    , do_oasis_cedit, LVL_IMPL, 0 },
   { "changelog", "cha"     , POS_DEAD    , do_changelog, LVL_IMPL, 0 },
@@ -156,6 +157,7 @@ cpp_extern const struct command_info cmd_info[] = {
   { "consider" , "con"     , POS_RESTING , do_consider , 0, 0 },
   { "commands" , "com"     , POS_DEAD    , do_commands , 0, SCMD_COMMANDS },
   { "compact"  , "comp"    , POS_DEAD    , do_gen_tog  , 0, SCMD_COMPACT },
+  { "cp"       , "cp"      , POS_DEAD    , do_campaign , 0, 0 },
   { "copyover" , "copyover", POS_DEAD    , do_copyover , LVL_GRGOD, 0 },
   { "credits"  , "cred"    , POS_DEAD    , do_gen_ps   , 0, SCMD_CREDITS },
 

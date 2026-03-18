@@ -387,6 +387,18 @@ int load_char(const char *name, struct char_data *ch)
     GET_KQUEST_EXPIRES_AT(ch) = PFDEF_KQUEST_EXPIRES_AT;
     GET_KQUEST_COOLDOWN_EXPIRES_AT(ch) = PFDEF_KQUEST_COOLDOWN_EXPIRES_AT;
     GET_KQUEST_TARGET_ID(ch) = PFDEF_KQUEST_ID;
+    GET_CAMPAIGN_ACTIVE(ch) = PFDEF_CAMPAIGN_ACTIVE;
+    GET_CAMPAIGN_LEVEL(ch) = PFDEF_CAMPAIGN_LEVEL;
+    GET_CAMPAIGN_EXPIRES_AT(ch) = PFDEF_CAMPAIGN_EXPIRES_AT;
+    GET_CAMPAIGN_REWARD_QP(ch) = PFDEF_CAMPAIGN_REWARD_QP;
+    GET_CAMPAIGN_REWARD_GOLD(ch) = PFDEF_CAMPAIGN_REWARD_GOLD;
+    GET_CAMPAIGN_TARGET_COUNT(ch) = PFDEF_CAMPAIGN_TARGET_COUNT;
+    for (i = 0; i < MAX_CAMPAIGN_TARGETS; i++) {
+      GET_CAMPAIGN_TARGET_VNUM(ch, i) = NOBODY;
+      GET_CAMPAIGN_TARGET_ROOM(ch, i) = NOWHERE;
+      GET_CAMPAIGN_TARGET_REQUIRED(ch, i) = 0;
+      GET_CAMPAIGN_TARGET_REMAINING(ch, i) = 0;
+    }
     GET_AUCTION_LOW(ch) = PFDEF_AUCTION_LOW;
     GET_AUCTION_HIGH(ch) = PFDEF_AUCTION_HIGH;
     GET_NUM_QUESTS(ch) = PFDEF_COMPQUESTS;
@@ -468,6 +480,23 @@ int load_char(const char *name, struct char_data *ch)
 	else if (!strcmp(tag, "Con "))	ch->real_abils.con	= atoi(line);
 	else if (!strcmp(tag, "Clan"))	GET_CLAN_ID(ch)		= atoi(line);
 	else if (!strcmp(tag, "Clrk"))	GET_CLAN_RANK(ch)	= atoi(line);
+        else {
+          int idx;
+          if (!strcmp(tag, "CpAc")) GET_CAMPAIGN_ACTIVE(ch) = atoi(line);
+          else if (!strcmp(tag, "CpLv")) GET_CAMPAIGN_LEVEL(ch) = atoi(line);
+          else if (!strcmp(tag, "CpEx")) GET_CAMPAIGN_EXPIRES_AT(ch) = (time_t)atol(line);
+          else if (!strcmp(tag, "CpQp")) GET_CAMPAIGN_REWARD_QP(ch) = atoi(line);
+          else if (!strcmp(tag, "CpGo")) GET_CAMPAIGN_REWARD_GOLD(ch) = atoi(line);
+          else if (!strcmp(tag, "CpCt")) GET_CAMPAIGN_TARGET_COUNT(ch) = atoi(line);
+          else if (sscanf(tag, "CpV%d", &idx) == 1 && idx >= 0 && idx < MAX_CAMPAIGN_TARGETS)
+            GET_CAMPAIGN_TARGET_VNUM(ch, idx) = atoi(line);
+          else if (sscanf(tag, "CpR%d", &idx) == 1 && idx >= 0 && idx < MAX_CAMPAIGN_TARGETS)
+            GET_CAMPAIGN_TARGET_ROOM(ch, idx) = atoi(line);
+          else if (sscanf(tag, "CpN%d", &idx) == 1 && idx >= 0 && idx < MAX_CAMPAIGN_TARGETS)
+            GET_CAMPAIGN_TARGET_REQUIRED(ch, idx) = atoi(line);
+          else if (sscanf(tag, "CpM%d", &idx) == 1 && idx >= 0 && idx < MAX_CAMPAIGN_TARGETS)
+            GET_CAMPAIGN_TARGET_REMAINING(ch, idx) = atoi(line);
+        }
 	break;
 
       case 'D':
@@ -865,6 +894,18 @@ void save_char(struct char_data * ch)
   if (GET_KQUEST_EXPIRES_AT(ch) != PFDEF_KQUEST_EXPIRES_AT) fprintf(fl, "KQex: %ld\n", (long)GET_KQUEST_EXPIRES_AT(ch));
   if (GET_KQUEST_COOLDOWN_EXPIRES_AT(ch) != PFDEF_KQUEST_COOLDOWN_EXPIRES_AT) fprintf(fl, "KQcd: %ld\n", (long)GET_KQUEST_COOLDOWN_EXPIRES_AT(ch));
   if (GET_KQUEST_TARGET_ID(ch) != PFDEF_KQUEST_ID) fprintf(fl, "KQid: %ld\n", GET_KQUEST_TARGET_ID(ch));
+  if (GET_CAMPAIGN_ACTIVE(ch) != PFDEF_CAMPAIGN_ACTIVE) fprintf(fl, "CpAc: %d\n", GET_CAMPAIGN_ACTIVE(ch));
+  if (GET_CAMPAIGN_LEVEL(ch) != PFDEF_CAMPAIGN_LEVEL) fprintf(fl, "CpLv: %d\n", GET_CAMPAIGN_LEVEL(ch));
+  if (GET_CAMPAIGN_EXPIRES_AT(ch) != PFDEF_CAMPAIGN_EXPIRES_AT) fprintf(fl, "CpEx: %ld\n", (long)GET_CAMPAIGN_EXPIRES_AT(ch));
+  if (GET_CAMPAIGN_REWARD_QP(ch) != PFDEF_CAMPAIGN_REWARD_QP) fprintf(fl, "CpQp: %d\n", GET_CAMPAIGN_REWARD_QP(ch));
+  if (GET_CAMPAIGN_REWARD_GOLD(ch) != PFDEF_CAMPAIGN_REWARD_GOLD) fprintf(fl, "CpGo: %d\n", GET_CAMPAIGN_REWARD_GOLD(ch));
+  if (GET_CAMPAIGN_TARGET_COUNT(ch) != PFDEF_CAMPAIGN_TARGET_COUNT) fprintf(fl, "CpCt: %d\n", GET_CAMPAIGN_TARGET_COUNT(ch));
+  for (i = 0; i < MAX_CAMPAIGN_TARGETS; i++) {
+    if (GET_CAMPAIGN_TARGET_VNUM(ch, i) != NOBODY) fprintf(fl, "CpV%d: %d\n", i, GET_CAMPAIGN_TARGET_VNUM(ch, i));
+    if (GET_CAMPAIGN_TARGET_ROOM(ch, i) != NOWHERE) fprintf(fl, "CpR%d: %d\n", i, GET_CAMPAIGN_TARGET_ROOM(ch, i));
+    if (GET_CAMPAIGN_TARGET_REQUIRED(ch, i) > 0) fprintf(fl, "CpN%d: %d\n", i, GET_CAMPAIGN_TARGET_REQUIRED(ch, i));
+    if (GET_CAMPAIGN_TARGET_REMAINING(ch, i) > 0) fprintf(fl, "CpM%d: %d\n", i, GET_CAMPAIGN_TARGET_REMAINING(ch, i));
+  }
   if (GET_AUCTION_LOW(ch) != PFDEF_AUCTION_LOW) fprintf(fl, "AuLo: %d\n", GET_AUCTION_LOW(ch));
   if (GET_AUCTION_HIGH(ch) != PFDEF_AUCTION_HIGH) fprintf(fl, "AuHi: %d\n", GET_AUCTION_HIGH(ch));
 
