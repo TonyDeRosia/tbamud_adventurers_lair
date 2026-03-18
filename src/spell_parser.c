@@ -214,6 +214,9 @@ void room_tick_effects(struct room_data *room)
         case ROOM_EFFECT_ACID_RAIN:
           send_to_room(real_room(room->number), "The acid rain ceases.\r\n");
           break;
+        case ROOM_EFFECT_DIMENSIONAL_LOCK:
+          send_to_room(real_room(room->number), "The dimensional lock dissolves.\r\n");
+          break;
       }
       if (prev)
         prev->next = next;
@@ -1515,6 +1518,7 @@ int find_skill_num_with_ambig(const char *name, char *ambig_buf,
 int call_magic(struct char_data *caster, struct char_data *cvict,
     struct obj_data *ovict, int spellnum, int level, int casttype) {
   int savetype;
+  bool is_displacement_spell = FALSE;
 
   if (spellnum < 1 || spellnum > TOP_SPELL_DEFINE)
     return (0);
@@ -1538,9 +1542,27 @@ int call_magic(struct char_data *caster, struct char_data *cvict,
     return (0);
   }
   if (room_has_effect(&world[IN_ROOM(caster)], ROOM_EFFECT_SILENCE_FIELD) &&
-      spellnum != SPELL_SILENCE_FIELD) {
+      spellnum != SPELL_SILENCE_FIELD && !affected_by_spell(caster, SPELL_SILENT_MAGIC)) {
     send_to_char(caster, "The silence field swallows your incantation.\r\n");
     act("$n mouths arcane words, but the silence field devours them.", FALSE, caster, 0, 0, TO_ROOM);
+    return (0);
+  }
+  switch (spellnum) {
+    case SPELL_TELEPORT:
+    case SPELL_WORD_OF_RECALL:
+    case SPELL_GATE:
+    case SPELL_PORTAL:
+    case SPELL_WORD_OF_RECALL_MASS:
+    case SPELL_ASTRAL_PROJECTION:
+    case SPELL_ETHEREAL_JAUNT:
+    case SPELL_GREATER_TELEPORTATION:
+      is_displacement_spell = TRUE;
+      break;
+  }
+  if (is_displacement_spell &&
+      room_has_effect(&world[IN_ROOM(caster)], ROOM_EFFECT_DIMENSIONAL_LOCK)) {
+    send_to_char(caster, "Dimensional lock prevents any displacement magic here.\r\n");
+    act("$n's displacement magic collapses against the dimensional lock.", FALSE, caster, 0, 0, TO_ROOM);
     return (0);
   }
   if (ROOM_FLAGGED(IN_ROOM(caster), ROOM_PEACEFUL) && (SINFO.violent || IS_SET(SINFO.routines, MAG_DAMAGE))) {
@@ -1856,6 +1878,14 @@ int call_magic(struct char_data *caster, struct char_data *cvict,
     case SPELL_GOAL_OF_ALL_LIFE_IS_DEATH: MANUAL_SPELL(spell_goal_of_all_life_is_death); break;
     case SPELL_CRY_OF_THE_BANSHEE: MANUAL_SPELL(spell_cry_of_the_banshee); break;
     case SPELL_NAPALM: MANUAL_SPELL(spell_napalm); break;
+    case SPELL_BODY_OF_EFFULGENT_BERYL: MANUAL_SPELL(spell_body_of_effulgent_beryl); break;
+    case SPELL_VERMILION_NOVA: MANUAL_SPELL(spell_vermilion_nova); break;
+    case SPELL_NUCLEAR_BLAST: MANUAL_SPELL(spell_nuclear_blast); break;
+    case SPELL_GREATER_TELEPORTATION: MANUAL_SPELL(spell_greater_teleportation); break;
+    case SPELL_SILENT_MAGIC: MANUAL_SPELL(spell_silent_magic); break;
+    case SPELL_TRIPLE_MAXIMIZE_MAGIC: MANUAL_SPELL(spell_triple_maximize_magic); break;
+    case SPELL_PANTHEON: MANUAL_SPELL(spell_pantheon); break;
+    case SPELL_DIMENSIONAL_LOCK: MANUAL_SPELL(spell_dimensional_lock); break;
     }
 
   return (1);
@@ -2085,7 +2115,12 @@ int cast_spell(struct char_data *ch, struct char_data *tch,
 
   say_spell(ch, spellnum, tch, tobj);
 
-  return (call_magic(ch, tch, tobj, spellnum, GET_LEVEL(ch), CAST_SPELL));
+  {
+    int result = call_magic(ch, tch, tobj, spellnum, GET_LEVEL(ch), CAST_SPELL);
+    if (result && spellnum != SPELL_SILENT_MAGIC && affected_by_spell(ch, SPELL_SILENT_MAGIC))
+      affect_from_char(ch, SPELL_SILENT_MAGIC);
+    return result;
+  }
 }
 
 ACMD(do_spellup)
@@ -2140,7 +2175,7 @@ ACMD(do_spellup)
     }
 
     any_eligible = TRUE;
-    if (AFF_FLAGGED(ch, AFF_SILENCED)) {
+    if (AFF_FLAGGED(ch, AFF_SILENCED) && !affected_by_spell(ch, SPELL_SILENT_MAGIC)) {
       send_to_char(ch, "You open your mouth but no words come out!\r\n");
       continue;
     }
@@ -2414,7 +2449,7 @@ ACMD(do_cast) {
     send_to_char(ch, "Cannot find the target of your spell!\r\n");
     return;
   }
-  if (AFF_FLAGGED(ch, AFF_SILENCED)) {
+  if (AFF_FLAGGED(ch, AFF_SILENCED) && !affected_by_spell(ch, SPELL_SILENT_MAGIC)) {
     send_to_char(ch, "You open your mouth but no words come out!\r\n");
     return;
   }
@@ -3076,6 +3111,14 @@ void mag_assign_spells(void) {
   spello(SPELL_IA_SHUB_NIGGURATH, "ia shub niggurath", 90, 90, 0, POS_FIGHTING, TAR_IGNORE, TRUE, MAG_MANUAL, NULL);
   spello(SPELL_GOAL_OF_ALL_LIFE_IS_DEATH, "goal of all life is death", 60, 60, 0, POS_STANDING, TAR_SELF_ONLY, FALSE, MAG_MANUAL, "The certainty of death fades, but its truth remains.");
   spello(SPELL_CRY_OF_THE_BANSHEE, "cry of the banshee", 55, 55, 0, POS_FIGHTING, TAR_IGNORE, TRUE, MAG_MANUAL, NULL);
+  spello(SPELL_BODY_OF_EFFULGENT_BERYL, "body of effulgent beryl", 34, 34, 0, POS_STANDING, TAR_SELF_ONLY, FALSE, MAG_MANUAL, "The effulgent beryl radiance fades from your body.");
+  spello(SPELL_VERMILION_NOVA, "vermilion nova", 44, 44, 0, POS_FIGHTING, TAR_IGNORE, TRUE, MAG_MANUAL, NULL);
+  spello(SPELL_NUCLEAR_BLAST, "nuclear blast", 65, 65, 0, POS_FIGHTING, TAR_IGNORE, TRUE, MAG_MANUAL, NULL);
+  spello(SPELL_GREATER_TELEPORTATION, "greater teleportation", 45, 45, 0, POS_STANDING, TAR_CHAR_WORLD | TAR_NOT_SELF, FALSE, MAG_MANUAL, NULL);
+  spello(SPELL_SILENT_MAGIC, "silent magic", 22, 22, 0, POS_STANDING, TAR_SELF_ONLY, FALSE, MAG_MANUAL, "Your silent casting weave dissipates.");
+  spello(SPELL_TRIPLE_MAXIMIZE_MAGIC, "triple maximize magic", 55, 55, 0, POS_STANDING, TAR_SELF_ONLY, FALSE, MAG_MANUAL, "The triple maximize weave fades unused.");
+  spello(SPELL_PANTHEON, "pantheon", 48, 48, 0, POS_STANDING, TAR_SELF_ONLY, FALSE, MAG_MANUAL, "The mantle of Pantheon fades.");
+  spello(SPELL_DIMENSIONAL_LOCK, "dimensional lock", 36, 36, 0, POS_STANDING, TAR_IGNORE, FALSE, MAG_MANUAL, NULL);
 
   /* NON-castable spells should appear below here. */
   spello(SPELL_IDENTIFY, "identify", 0, 0, 0, 0,

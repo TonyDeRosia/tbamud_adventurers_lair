@@ -1307,6 +1307,11 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
   if (dam > 0 && AFF_FLAGGED(victim, AFF_MARKED))
     dam = (dam * 6) / 5;
 
+  if (dam > 0 && ch && victim &&
+      GET_SKILL(ch, SKILL_OVERLORD_PRESENCE) > 0 &&
+      IS_NPC(victim) && GET_LEVEL(ch) >= GET_LEVEL(victim) + 10)
+    dam += 2;
+
   if (dam > 0 && ch && ch != victim && affected_by_spell(ch, SPELL_TIME_STOP)) {
     struct char_data *tch;
     affect_from_char(ch, SPELL_TIME_STOP);
@@ -1324,11 +1329,18 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
   }
 
   if (dam > 0) {
+    if (affected_by_spell(victim, SPELL_BODY_OF_EFFULGENT_BERYL) &&
+        attacktype > 0 && IS_WEAPON(attacktype)) {
+      dam = (dam * 75) / 100;
+    }
     if (affected_by_spell(victim, SPELL_CRYSTAL_BODY) &&
         (damage_type == DAM_FIRE || damage_type == DAM_COLD ||
          damage_type == DAM_LIGHTNING || damage_type == DAM_ACID)) {
       dam = (dam * 75) / 100;
     }
+    if (affected_by_spell(victim, SPELL_PANTHEON) &&
+        (damage_type == DAM_HOLY || damage_type == DAM_SHADOW || damage_type == DAM_ARCANE))
+      dam = (dam * 75) / 100;
     if (AFF_FLAGGED(victim, AFF_ELEMENTAL_WARD_FIRE) && damage_type == DAM_FIRE)
       dam = (dam * 6) / 10;
     else if (AFF_FLAGGED(victim, AFF_ELEMENTAL_WARD_COLD) && damage_type == DAM_COLD)
@@ -1348,6 +1360,11 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
     if (remove_affects_by_flag(victim, AFF_STATIC))
       send_to_char(victim, "The static charge around you dissipates.\r\n");
   }
+
+  if (dam > 0 && ch && affected_by_spell(ch, SPELL_DESPAIR_AURA) &&
+      GET_SKILL(ch, SKILL_DREAD_DOMINION) > 0 &&
+      (damage_type == DAM_SHADOW || damage_type == DAM_NECROTIC))
+    dam = (dam * 105) / 100;
 
 
   /* Melee crits (only weapon attacks) */
@@ -1805,6 +1822,21 @@ static void process_round_effects(void)
 
     if (affected_by_spell(i, SPELL_DESPAIR_AURA)) {
       struct char_data *tch;
+      if (GET_SKILL(i, SKILL_DREAD_DOMINION) > 0) {
+        struct affected_type af;
+        new_affect(&af);
+        af.spell = SPELL_DESPAIR_AURA;
+        af.duration = 1;
+        af.location = APPLY_SAVING_SPELL;
+        af.modifier = 2;
+        affect_join(i, &af, FALSE, FALSE, FALSE, FALSE);
+        new_affect(&af);
+        af.spell = SPELL_DESPAIR_AURA;
+        af.duration = 1;
+        af.location = APPLY_AC;
+        af.modifier = -2;
+        affect_join(i, &af, FALSE, FALSE, FALSE, FALSE);
+      }
       for (tch = world[IN_ROOM(i)].people; tch; tch = tch->next_in_room) {
         struct affected_type af;
         if (tch == i)
