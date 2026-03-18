@@ -1686,16 +1686,23 @@ len = append_box_line(buf, len, sizeof(buf), B, R, "", W);
 
   /* Armor and Alignment */
   {
-  int raw_ac   = compute_armor_class(ch);   /* internal, scaled by 10 */
-  int shown_ac = raw_ac / 10;               /* player facing */
-  int base_ac  = GET_AC(ch) / 10;           /* without dex */
-  int dex_ac   = dex_app[GET_DEX(ch)].defensive;
+    int raw_ac   = compute_armor_class(ch);   /* internal, scaled by 10 */
+    int shown_ac = raw_ac / 10;               /* player facing */
+    int base_ac  = GET_AC(ch) / 10;           /* without dex */
+    int dex_ac   = dex_app[GET_DEX(ch)].defensive;
 
-  snprintf(line, sizeof(line),
-    "%sArmor Class:%s %d  (Base %d  Dex %+d  Raw %d)        %sAlignment:%s %d",
-    C, R, shown_ac, base_ac, dex_ac, raw_ac,
-    C, R, GET_ALIGNMENT(ch));
-}
+    if (GET_LEVEL(ch) >= LVL_IMMORT) {
+      snprintf(line, sizeof(line),
+        "%sArmor Class:%s %d  (Base %d  Dex %+d  Raw %d)        %sAlignment:%s %d",
+        C, R, shown_ac, base_ac, dex_ac, raw_ac,
+        C, R, GET_ALIGNMENT(ch));
+    } else {
+      snprintf(line, sizeof(line),
+        "%sArmor Class:%s %d                                      %sAlignment:%s %d",
+        C, R, shown_ac,
+        C, R, GET_ALIGNMENT(ch));
+    }
+  }
   len = append_box_line(buf, len, sizeof(buf), B, R, line, W);/* Combat Stats */
   len = append_box_line(buf, len, sizeof(buf), B, R, "", W);
   {
@@ -1755,23 +1762,27 @@ len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
 
   len = append_box_line(buf, len, sizeof(buf), B, R, "", W);
 
-/* Saves: these are your saving throw modifiers. Negative is better (helps saves). */
+  /* Unified player-facing save value: spell save (internal save system remains unchanged). */
+  snprintf(line, sizeof(line), "%sSaves:%s %d", C, R, GET_SAVE(ch, 4));
+  len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
+
+  if (GET_LEVEL(ch) >= LVL_IMMORT) {
+    snprintf(line, sizeof(line),
+             "%sSave detail:%s Para %d  Rod %d  Petri %d  Breath %d  Spell %d",
+             C, R,
+             GET_SAVE(ch, 0), GET_SAVE(ch, 1), GET_SAVE(ch, 2),
+             GET_SAVE(ch, 3), GET_SAVE(ch, 4));
+    len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
+  }
+
   if (GET_EQ(ch, WEAR_WIELD) && GET_OBJ_TYPE(GET_EQ(ch, WEAR_WIELD)) == ITEM_WEAPON) {
     struct obj_data *wobj = GET_EQ(ch, WEAR_WIELD);
     int nd = GET_OBJ_VAL(wobj, 1);
     int sd = GET_OBJ_VAL(wobj, 2);
-  snprintf(line, sizeof(line),
-           "%sSaving Throws:%s Paralyze %d  Rod %d  Spell %d   Weapon: %s (%dD%d)",
-           C, R,
-           GET_SAVE(ch, 0), GET_SAVE(ch, 1), GET_SAVE(ch, 4),
-           wobj->short_description, nd, sd);
-} else {
-  snprintf(line, sizeof(line),
-             "%sSaving Throws:%s Paralyze %d  Rod %d  Spell %d",
-             C, R,
-             GET_SAVE(ch, 0), GET_SAVE(ch, 1), GET_SAVE(ch, 4));
+
+    snprintf(line, sizeof(line), "%sWeapon:%s %s (%dD%d)", C, R, wobj->short_description, nd, sd);
+    len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
   }
-  len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
   /* Separator */
   len += snprintf(buf + len, sizeof(buf) - len,
     "%s╠═══════════════════════════════════════════════════════════════════════════════╣%s\r\n", B, R);
