@@ -146,6 +146,26 @@ int get_quest_cooldown_minutes_remaining(struct char_data *ch)
 static void start_kill_quest_cooldown(struct char_data *ch)
 {
   GET_KQUEST_COOLDOWN_EXPIRES_AT(ch) = time(0) + KQUEST_COOLDOWN_SECS;
+  GET_KQUEST_COOLDOWN_NOTIFIED(ch) = 0;
+}
+
+static void notify_quest_cooldown_ready_if_needed(struct char_data *ch)
+{
+  time_t now;
+
+  if (!ch || IS_NPC(ch))
+    return;
+
+  if (GET_KQUEST_COOLDOWN_EXPIRES_AT(ch) <= 0 || GET_KQUEST_COOLDOWN_NOTIFIED(ch))
+    return;
+
+  now = time(0);
+  if (now < GET_KQUEST_COOLDOWN_EXPIRES_AT(ch))
+    return;
+
+  send_to_char(ch, "%sQUEST: You may now quest again.%s\r\n", QRED, QNRM);
+  GET_KQUEST_COOLDOWN_NOTIFIED(ch) = 1;
+  save_char(ch);
 }
 
 static void expire_kill_quest_if_needed(struct char_data *ch, bool notify)
@@ -473,6 +493,7 @@ static void quest_request_kill(struct char_data *ch)
   GET_KQUEST_TIME(ch) = 60;
   GET_KQUEST_EXPIRES_AT(ch) = time(0) + KQUEST_DURATION_SECS;
   GET_KQUEST_TARGET_ID(ch) = char_script_id(target);
+  GET_KQUEST_COOLDOWN_NOTIFIED(ch) = 1;
 
   send_to_char(ch, "You ask %s for a quest.\r\n", GET_NAME(qm));
   send_to_char(ch, "%s tells you, 'Thank you, brave %s!'\r\n", GET_NAME(qm), GET_NAME(ch));
@@ -548,9 +569,14 @@ static void quest_complete_kill(struct char_data *ch)
   GET_QUESTPOINTS(ch) += qp_reward;
   increase_gold(ch, gold_reward);
   gain_exp(ch, exp_reward);
-  send_to_char(ch, "%s tells you, 'Excellent work, %s!'\r\n", GET_NAME(qm), GET_NAME(ch));
-  send_to_char(ch, "You receive %d quest points, %d gold, and %d experience.\r\n",
-      qp_reward, gold_reward, exp_reward);
+  send_to_char(ch, "You inform %s that you have completed your quest.\r\n", GET_NAME(qm));
+  send_to_char(ch, "%s tells you, 'Congratulations, %s, on completing your quest!'\r\n",
+               GET_NAME(qm), GET_NAME(ch));
+  send_to_char(ch, "%s tells you, 'As a reward, I am giving you %d quest points and %d gold.'\r\n",
+               GET_NAME(qm), qp_reward, gold_reward);
+  send_to_char(ch, "%s tells you, 'Give campaigns a try %s, see %sHELP CAMPAIGNS%s.'\r\n",
+               GET_NAME(qm), GET_NAME(ch), QYEL, QNRM);
+  send_to_char(ch, "You receive %d experience.\r\n", exp_reward);
 
   clear_kill_quest(ch);
   start_kill_quest_cooldown(ch);
@@ -1101,6 +1127,8 @@ void check_timed_quests(void)
       expire_kill_quest_if_needed(ch, TRUE);
     if (!IS_NPC(ch))
       expire_campaign_if_needed(ch, TRUE);
+    if (!IS_NPC(ch))
+      notify_quest_cooldown_ready_if_needed(ch);
   }
 }
 
