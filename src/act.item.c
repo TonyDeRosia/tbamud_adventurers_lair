@@ -1876,6 +1876,22 @@ struct auction_state_data {
 
 static struct auction_state_data live_auction = { NULL, NULL, NULL, 0, 0, 0 };
 
+static void auction_namebuf_append(char *dst, size_t dstsz, const char *src)
+{
+  size_t len;
+
+  if (!dst || dstsz == 0)
+    return;
+  if (!src)
+    src = "";
+
+  len = strlen(dst);
+  if (len >= dstsz)
+    return;
+
+  snprintf(dst + len, dstsz - len, "%s", src);
+}
+
 static const char *auction_item_display_name(struct obj_data *obj)
 {
   static char namebuf[MAX_STRING_LENGTH];
@@ -1885,20 +1901,20 @@ static const char *auction_item_display_name(struct obj_data *obj)
 
   namebuf[0] = '\0';
   if (OBJ_FLAGGED(obj, ITEM_BLESS))
-    strlcat(namebuf, "(Blue Aura) ", sizeof(namebuf));
+    auction_namebuf_append(namebuf, sizeof(namebuf), "(Blue Aura) ");
   if (OBJ_FLAGGED(obj, ITEM_GLOW))
-    strlcat(namebuf, "(Glow) ", sizeof(namebuf));
+    auction_namebuf_append(namebuf, sizeof(namebuf), "(Glow) ");
   if (OBJ_FLAGGED(obj, ITEM_HUM))
-    strlcat(namebuf, "(Hum) ", sizeof(namebuf));
+    auction_namebuf_append(namebuf, sizeof(namebuf), "(Hum) ");
   if (OBJ_FLAGGED(obj, ITEM_INVISIBLE))
-    strlcat(namebuf, "(Invis) ", sizeof(namebuf));
+    auction_namebuf_append(namebuf, sizeof(namebuf), "(Invis) ");
   if (OBJ_FLAGGED(obj, ITEM_NODROP))
-    strlcat(namebuf, "(K) ", sizeof(namebuf));
+    auction_namebuf_append(namebuf, sizeof(namebuf), "(K) ");
   if (OBJ_FLAGGED(obj, ITEM_MAGIC))
-    strlcat(namebuf, "(Magic) ", sizeof(namebuf));
+    auction_namebuf_append(namebuf, sizeof(namebuf), "(Magic) ");
   if (OBJ_FLAGGED(obj, ITEM_ANTI_GOOD))
-    strlcat(namebuf, "(Red Aura) ", sizeof(namebuf));
-  strlcat(namebuf, GET_OBJ_SHORT(obj), sizeof(namebuf));
+    auction_namebuf_append(namebuf, sizeof(namebuf), "(Red Aura) ");
+  auction_namebuf_append(namebuf, sizeof(namebuf), GET_OBJ_SHORT(obj));
   return namebuf;
 }
 

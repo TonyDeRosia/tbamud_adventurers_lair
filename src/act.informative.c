@@ -2231,13 +2231,37 @@ static int is_aff_debuff(const struct affected_type *af)
   return 0;
 }
 
+static void format_affect_duration(int duration, char *out, size_t outsz)
+{
+  long total_secs;
+  long hours;
+  long mins;
+
+  if (!out || outsz == 0)
+    return;
+
+  if (duration < 0) {
+    snprintf(out, outsz, "permanent");
+    return;
+  }
+
+  total_secs = (long)duration * SECS_PER_MUD_HOUR;
+  hours = total_secs / 3600;
+  mins = (total_secs % 3600) / 60;
+
+  if (hours > 0)
+    snprintf(out, outsz, "%ldh %ldm", hours, mins);
+  else
+    snprintf(out, outsz, "%ldm", mins);
+}
+
 static void build_aff_summary(const struct affected_type *af, char *out, size_t outsz)
 {
   const char *name = "Unknown";
   char eff[256];
   char flags[256];
   char firstflag[64];
-  char dur[64];
+  char dur[32];
 
   if (!out || outsz == 0) return;
   out[0] = '\0';
@@ -2255,10 +2279,7 @@ static void build_aff_summary(const struct affected_type *af, char *out, size_t 
   flags[0] = '\0';
   dur[0] = '\0';
 
-  if (af->duration < 0)
-    snprintf(dur, sizeof(dur), "permanent");
-  else
-    snprintf(dur, sizeof(dur), "dur %d", af->duration);
+  format_affect_duration(af->duration, dur, sizeof(dur));
 
 
   if (af->location != APPLY_NONE && af->modifier != 0) {
@@ -2332,16 +2353,12 @@ ACMD(do_affects)
 
       if (GET_LEVEL(ch) >= LVL_IMMORT) {
         char flags[256];
-  char dur[64];
+        char adur[32];
         const char *spell_name = "Unknown";
 
         flags[0] = '\0';
-  dur[0] = '\0';
-
-  if (af->duration < 0)
-    snprintf(dur, sizeof(dur), "permanent");
-  else
-    snprintf(dur, sizeof(dur), "dur %d", af->duration);
+        adur[0] = '\0';
+        format_affect_duration(af->duration, adur, sizeof(adur));
 
         sprintbitarray((int *)af->bitvector, affected_bits, AF_ARRAY_MAX, flags);
 
@@ -2349,14 +2366,9 @@ ACMD(do_affects)
           spell_name = spell_info[af->spell].name;
 
         /* duration column + Unknown fallback label */
-        char adur[16];
-              char lab[64];
+        char lab[64];
         size_t i = 0;
         lab[0] = '\0';
-        if (af->duration < 0)
-          snprintf(adur, sizeof(adur), "perm");
-        else
-          snprintf(adur, sizeof(adur), "%d", af->duration);
 
         if ((!spell_name || !*spell_name || !str_cmp(spell_name, "Unknown")) && flags[0]) {
           while (flags[i] && flags[i] != ' ' && i < sizeof(lab) - 1) {
@@ -2369,7 +2381,7 @@ ACMD(do_affects)
         }
 
         send_to_char(ch,
-          "  %-6s %s%s%s  apply %s  mod %+d  flags %s\r\n",
+          "  %-9s %s%s%s  apply %s  mod %+d  flags %s\r\n",
           adur,
           CCCYN(ch, C_NRM), spell_name, CCNRM(ch, C_NRM),
           aff_apply_name(af->location),
@@ -2394,16 +2406,12 @@ ACMD(do_affects)
 
       if (GET_LEVEL(ch) >= LVL_IMMORT) {
         char flags[256];
-  char dur[64];
+        char adur[32];
         const char *spell_name = "Unknown";
 
         flags[0] = '\0';
-  dur[0] = '\0';
-
-  if (af->duration < 0)
-    snprintf(dur, sizeof(dur), "permanent");
-  else
-    snprintf(dur, sizeof(dur), "dur %d", af->duration);
+        adur[0] = '\0';
+        format_affect_duration(af->duration, adur, sizeof(adur));
 
         sprintbitarray((int *)af->bitvector, affected_bits, AF_ARRAY_MAX, flags);
 
@@ -2411,14 +2419,9 @@ ACMD(do_affects)
           spell_name = spell_info[af->spell].name;
 
         /* duration column + Unknown fallback label */
-        char adur[16];
-              char lab[64];
+        char lab[64];
         size_t i = 0;
         lab[0] = '\0';
-        if (af->duration < 0)
-          snprintf(adur, sizeof(adur), "perm");
-        else
-          snprintf(adur, sizeof(adur), "%d", af->duration);
 
         if ((!spell_name || !*spell_name || !str_cmp(spell_name, "Unknown")) && flags[0]) {
           while (flags[i] && flags[i] != ' ' && i < sizeof(lab) - 1) {
@@ -2431,7 +2434,7 @@ ACMD(do_affects)
         }
 
         send_to_char(ch,
-          "  %-6s %s%s%s  apply %s  mod %+d  flags %s\r\n",
+          "  %-9s %s%s%s  apply %s  mod %+d  flags %s\r\n",
           adur,
           CCCYN(ch, C_NRM), spell_name, CCNRM(ch, C_NRM),
           aff_apply_name(af->location),
@@ -4256,39 +4259,42 @@ static void build_visible_target_tags(struct char_data *viewer, struct char_data
 {
   int shortflags = (!IS_NPC(viewer) && PRF_FLAGGED(viewer, PRF_SHORTFLAGS));
 
+  if (!out || outsz == 0)
+    return;
+
   out[0] = '\0';
 
   if (include_afk && !IS_NPC(target) && PRF_FLAGGED(target, PRF_AFK))
-    strlcat(out, "[AFK] ", outsz);
+    out_append(out, outsz, "[AFK] ");
   if (!IS_NPC(target))
-    strlcat(out, shortflags ? "(P) " : "(Player) ", outsz);
+    out_append(out, outsz, shortflags ? "(P) " : "(Player) ");
   if (AFF_FLAGGED(target, AFF_INVISIBLE))
-    strlcat(out, shortflags ? "(I) " : "(Invis) ", outsz);
+    out_append(out, outsz, shortflags ? "(I) " : "(Invis) ");
   if (AFF_FLAGGED(target, AFF_HIDE))
-    strlcat(out, shortflags ? "(H) " : "(Hidden) ", outsz);
+    out_append(out, outsz, shortflags ? "(H) " : "(Hidden) ");
   if (AFF_FLAGGED(target, AFF_FLYING))
-    strlcat(out, shortflags ? "(F) " : "(Flying) ", outsz);
+    out_append(out, outsz, shortflags ? "(F) " : "(Flying) ");
   if (AFF_FLAGGED(target, AFF_SANCTUARY))
-    strlcat(out, shortflags ? "(W) " : "(White Aura) ", outsz);
+    out_append(out, outsz, shortflags ? "(W) " : "(White Aura) ");
   if (AFF_FLAGGED(target, AFF_CHARM))
-    strlcat(out, shortflags ? "(C) " : "(Charmed) ", outsz);
+    out_append(out, outsz, shortflags ? "(C) " : "(Charmed) ");
   if (AFF_FLAGGED(target, AFF_POISON))
-    strlcat(out, shortflags ? "(D) " : "(Diseased) ", outsz);
+    out_append(out, outsz, shortflags ? "(D) " : "(Diseased) ");
   if (AFF_FLAGGED(target, AFF_SNEAK) && AFF_FLAGGED(viewer, AFF_SENSE_LIFE))
-    strlcat(out, shortflags ? "(S) " : "(Stealth) ", outsz);
+    out_append(out, outsz, shortflags ? "(S) " : "(Stealth) ");
   if (IS_NPC(target) && MOB_FLAGGED(target, MOB_AGGRESSIVE) && AFF_FLAGGED(viewer, AFF_SENSE_LIFE))
-    strlcat(out, "(Angry) ", outsz);
+    out_append(out, outsz, "(Angry) ");
   if (GET_MAX_HIT(target) > 0 && (100 * GET_HIT(target) / GET_MAX_HIT(target)) < 60)
-    strlcat(out, "(Wounded) ", outsz);
+    out_append(out, outsz, "(Wounded) ");
   if (!IS_NPC(target) && PLR_FLAGGED(target, PLR_KILLER))
-    strlcat(out, "(OPK) ", outsz);
+    out_append(out, outsz, "(OPK) ");
   if (is_player_quest_target(viewer, target))
-    strlcat(out, "[QUEST] ", outsz);
+    out_append(out, outsz, "[QUEST] ");
   if (AFF_FLAGGED(viewer, AFF_DETECT_ALIGN)) {
     if (IS_EVIL(target))
-      strlcat(out, shortflags ? "(R) " : "(Red Aura) ", outsz);
+      out_append(out, outsz, shortflags ? "(R) " : "(Red Aura) ");
     else if (IS_GOOD(target))
-      strlcat(out, shortflags ? "(G) " : "(Golden Aura) ", outsz);
+      out_append(out, outsz, shortflags ? "(G) " : "(Golden Aura) ");
   }
 
   (void) viewer;
@@ -4436,11 +4442,11 @@ ACMD(do_saffects)
     const char *kind = "Spell";
     char flags[256];
     char label[64];
-    int mins = 0;
-    int secs = 0;
+    char dur[32];
 
     flags[0] = '\0';
     label[0] = '\0';
+    dur[0] = '\0';
     any = 1;
 
     if (af->spell > 0 && af->spell <= TOP_SPELL_DEFINE && spell_info[af->spell].name)
@@ -4468,13 +4474,8 @@ ACMD(do_saffects)
       spells++;
     }
 
-    if (af->duration < 0) {
-      send_to_char(ch, "%-7s : %s (permanent)\r\n", kind, name);
-    } else {
-      mins = af->duration * SECS_PER_MUD_HOUR / 60;
-      secs = af->duration * SECS_PER_MUD_HOUR % 60;
-      send_to_char(ch, "%-7s : %s (%02d:%02d)\r\n", kind, name, mins, secs);
-    }
+    format_affect_duration(af->duration, dur, sizeof(dur));
+    send_to_char(ch, "%-7s : %s (%s)\r\n", kind, name, dur);
   }
 
   if (!any) {
