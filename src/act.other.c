@@ -99,6 +99,45 @@ static int is_active_on_char(struct char_data *ch, int spellnum)
   return 0;
 }
 
+static int contains_ci(const char *haystack, const char *needle)
+{
+  size_t nlen;
+
+  if (!needle || !*needle)
+    return TRUE;
+  if (!haystack)
+    return FALSE;
+
+  nlen = strlen(needle);
+  for (; *haystack; haystack++)
+    if (!strncasecmp(haystack, needle, nlen))
+      return TRUE;
+
+  return FALSE;
+}
+
+static int ability_matches_damage_filter(const char *filter, const char *nm)
+{
+  static const char *damage_words[] = {
+    "fire", "cold", "acid", "electric", "lightning", "poison", "disease",
+    "shadow", "holy", "mental", "energy", "water", "air", "earth",
+    "negative", "light", "magic", "sonic", NULL
+  };
+  int i;
+
+  if (!str_cmp(filter, "damage"))
+    filter = "";
+
+  for (i = 0; damage_words[i]; i++) {
+    if (*filter && str_cmp(filter, damage_words[i]))
+      continue;
+    if (contains_ci(nm, damage_words[i]))
+      return TRUE;
+  }
+
+  return FALSE;
+}
+
 static int ability_matches_filter(struct char_data *ch, int ability, const char *filter, int show_spells)
 {
   const struct spell_info_type *si = &spell_info[ability];
@@ -114,23 +153,36 @@ static int ability_matches_filter(struct char_data *ch, int ability, const char 
   if (!str_cmp(filter, "combat"))
     return si->violent || IS_SET(si->routines, MAG_DAMAGE);
   if (!str_cmp(filter, "healing") || !str_cmp(filter, "curative"))
-    return IS_SET(si->routines, MAG_POINTS) || strstr(nm, "cure");
+    return IS_SET(si->routines, MAG_POINTS) || contains_ci(nm, "cure") || contains_ci(nm, "heal");
   if (!str_cmp(filter, "movement"))
-    return strstr(nm, "fly") || strstr(nm, "recall") || strstr(nm, "portal");
+    return contains_ci(nm, "fly") || contains_ci(nm, "recall") || contains_ci(nm, "portal") || contains_ci(nm, "haste");
   if (!str_cmp(filter, "area"))
     return IS_SET(si->routines, MAG_AREAS | MAG_MASSES);
   if (!str_cmp(filter, "spellup"))
     return !si->violent && IS_SET(si->routines, MAG_AFFECTS) && IS_SET(si->targets, TAR_SELF_ONLY);
+  if (!str_cmp(filter, "resist"))
+    return contains_ci(nm, "resist") || contains_ci(nm, "protection");
+  if (!str_cmp(filter, "stats"))
+    return contains_ci(nm, "strength") || contains_ci(nm, "dex") || contains_ci(nm, "con")
+        || contains_ci(nm, "int") || contains_ci(nm, "wis") || contains_ci(nm, "charisma")
+        || contains_ci(nm, "armor") || contains_ci(nm, "bless");
+  if (!str_cmp(filter, "weapon"))
+    return contains_ci(nm, "weapon") || contains_ci(nm, "shield") || contains_ci(nm, "enchant");
   if (!str_cmp(filter, "learned"))
     return GET_SKILL(ch, ability) > 0;
   if (!str_cmp(filter, "object"))
     return IS_SET(si->targets, TAR_OBJ_ROOM | TAR_OBJ_INV | TAR_OBJ_WORLD | TAR_OBJ_EQUIP) || IS_SET(si->routines, MAG_ALTER_OBJS);
   if (!str_cmp(filter, "attack") || !str_cmp(filter, "bad"))
     return si->violent;
-  if (!str_cmp(filter, "fire") || !str_cmp(filter, "cold") || !str_cmp(filter, "acid") || !str_cmp(filter, "electric"))
-    return strstr(nm, filter) != NULL;
+  if (!str_cmp(filter, "damage") || !str_cmp(filter, "fire") || !str_cmp(filter, "cold") ||
+      !str_cmp(filter, "acid") || !str_cmp(filter, "electric") || !str_cmp(filter, "poison") ||
+      !str_cmp(filter, "disease") || !str_cmp(filter, "holy") || !str_cmp(filter, "shadow") ||
+      !str_cmp(filter, "mental") || !str_cmp(filter, "energy") || !str_cmp(filter, "water") ||
+      !str_cmp(filter, "air") || !str_cmp(filter, "earth") || !str_cmp(filter, "negative") ||
+      !str_cmp(filter, "light") || !str_cmp(filter, "magic") || !str_cmp(filter, "sonic"))
+    return ability_matches_damage_filter(filter, nm);
 
-  return strstr(nm, filter) != NULL;
+  return contains_ci(nm, filter);
 }
 
 static void show_ability_table_aligned(struct char_data *ch, int show_spells, int show_all, const char *filter)
@@ -227,6 +279,17 @@ static void show_ability_table_aligned(struct char_data *ch, int show_spells, in
 
   if (col != 0)
     send_to_char(ch, "\r\n");
+}
+
+static void show_ability_filter_help(struct char_data *ch, const char *cmd_name)
+{
+  send_to_char(ch,
+    "Usage: %s [all] [filter]\r\n"
+    "Filters: affected, unaffected, combat, healing, movement, area, spellup,\r\n"
+    "         resist, stats, weapon, learned, object, attack, damage,\r\n"
+    "         fire, cold, acid, electric, poison, disease, holy, shadow,\r\n"
+    "         mental, energy, water, air, earth, negative, light, magic, sonic.\r\n",
+    cmd_name);
 }
 
 
@@ -514,6 +577,11 @@ ACMD(do_skills)
   *filter = '\0';
 
   half_chop(argument, arg, filter);
+  if ((*arg && (!str_cmp(arg, "help") || !str_cmp(arg, "?"))) ||
+      (*filter && (!str_cmp(filter, "help") || !str_cmp(filter, "?")))) {
+    show_ability_filter_help(ch, "skills");
+    return;
+  }
   if (*arg && !str_cmp(arg, "all"))
     show_all = 1;
   else if (*arg && !*filter)
@@ -1602,6 +1670,11 @@ ACMD(do_spells)
   *filter = '\0';
 
   half_chop(argument, arg, arg2);
+  if ((*arg && (!str_cmp(arg, "help") || !str_cmp(arg, "?"))) ||
+      (*arg2 && (!str_cmp(arg2, "help") || !str_cmp(arg2, "?")))) {
+    show_ability_filter_help(ch, (subcmd == 1) ? "allspells" : "spells");
+    return;
+  }
   if (subcmd == 1) {
     show_all = 1;
     show_spells = 1;

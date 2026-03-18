@@ -1200,6 +1200,7 @@ ACMD(do_spellup)
   int mana;
   bool any_eligible = FALSE;
   bool any_attempted = FALSE;
+  int cast_count = 0, skipped_active = 0, skipped_mana = 0, skipped_combat = 0;
 
   if (IS_NPC(ch))
     return;
@@ -1217,6 +1218,11 @@ ACMD(do_spellup)
     tch = ch;
   }
 
+  if (FIGHTING(ch) && tch != ch) {
+    send_to_char(ch, "You are too busy fighting to buff someone else right now.\r\n");
+    return;
+  }
+
   for (spellnum = 1; spellnum <= MAX_SPELLS; spellnum++) {
     if (!is_buff_spell(spellnum))
       continue;
@@ -1228,11 +1234,21 @@ ACMD(do_spellup)
       continue;
     if (tch == ch && IS_SET(SINFO.targets, TAR_NOT_SELF))
       continue;
+    if (FIGHTING(ch) && (SINFO.min_position > POS_FIGHTING || !IS_SET(SINFO.targets, TAR_FIGHT_SELF))) {
+      skipped_combat++;
+      continue;
+    }
+    if (affected_by_spell(tch, spellnum)) {
+      skipped_active++;
+      continue;
+    }
 
     any_eligible = TRUE;
     mana = mag_manacost(ch, spellnum);
-    if ((mana > 0) && (GET_MANA(ch) < mana) && (GET_LEVEL(ch) < LVL_IMMORT))
+    if ((mana > 0) && (GET_MANA(ch) < mana) && (GET_LEVEL(ch) < LVL_IMMORT)) {
+      skipped_mana++;
       continue;
+    }
 
     any_attempted = TRUE;
     if (rand_number(0, 101) > GET_SKILL(ch, spellnum)) {
@@ -1250,6 +1266,7 @@ ACMD(do_spellup)
         WAIT_STATE(ch, PULSE_VIOLENCE);
         if (mana > 0)
           GET_MANA(ch) = MAX(0, MIN(effective_max_mana(ch), GET_MANA(ch) - mana));
+        cast_count++;
       }
     }
   }
@@ -1261,6 +1278,9 @@ ACMD(do_spellup)
       send_to_char(ch, "You don't know any buff spells to cast on them.\r\n");
   } else if (!any_attempted) {
     send_to_char(ch, "You don't have the energy to cast any buffs right now.\r\n");
+  } else {
+    send_to_char(ch, "Spellup complete: %d cast, %d already active, %d low mana, %d blocked in combat.\r\n",
+                 cast_count, skipped_active, skipped_mana, skipped_combat);
   }
 }
 

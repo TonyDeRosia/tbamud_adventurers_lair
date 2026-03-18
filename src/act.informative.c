@@ -80,6 +80,8 @@ static void format_color_field(char *out, size_t outsz, const char *src, size_t 
 #include "spec_procs.h"
 #include "criticalhits.h"
 
+static void build_visible_target_tags(struct char_data *viewer, struct char_data *target,
+                                      char *out, size_t outsz, int include_afk);
 
 /* Encumbrance label for score display */
 /* Ensure exactly one blank line after room descriptions before exits/contents. */
@@ -440,33 +442,9 @@ static void list_one_char(struct char_data *i, struct char_data *ch)
       send_to_char(ch, "*");
 
     {
-      int shortflags = (!IS_NPC(ch) && PRF_FLAGGED(ch, PRF_SHORTFLAGS));
-      if (!IS_NPC(i))
-        send_to_char(ch, shortflags ? "(P) " : "(Player) ");
-      if (AFF_FLAGGED(i, AFF_CHARM))
-        send_to_char(ch, shortflags ? "(C) " : "(Charmed) ");
-      if (AFF_FLAGGED(i, AFF_POISON))
-        send_to_char(ch, shortflags ? "(D) " : "(Diseased) ");
-      if (AFF_FLAGGED(i, AFF_FLYING))
-        send_to_char(ch, shortflags ? "(F) " : "(Flying) ");
-      if (AFF_FLAGGED(i, AFF_HIDE))
-        send_to_char(ch, shortflags ? "(H) " : "(Hidden) ");
-      if (AFF_FLAGGED(i, AFF_INVISIBLE))
-        send_to_char(ch, shortflags ? "(I) " : "(Invis) ");
-      if (AFF_FLAGGED(i, AFF_SNEAK) && AFF_FLAGGED(ch, AFF_SENSE_LIFE))
-        send_to_char(ch, shortflags ? "(S) " : "(Stealth) ");
-      if (AFF_FLAGGED(i, AFF_SANCTUARY))
-        send_to_char(ch, shortflags ? "(W) " : "(White Aura) ");
-      if (!IS_NPC(i) && PLR_FLAGGED(i, PLR_KILLER))
-        send_to_char(ch, "(OPK) ");
-      if (IS_NPC(i) && MOB_FLAGGED(i, MOB_AGGRESSIVE) && AFF_FLAGGED(ch, AFF_SENSE_LIFE))
-        send_to_char(ch, "(Angry) ");
-      if (AFF_FLAGGED(ch, AFF_DETECT_ALIGN)) {
-        if (IS_EVIL(i))
-          send_to_char(ch, shortflags ? "(R) " : "(Red Aura) ");
-        else if (IS_GOOD(i))
-          send_to_char(ch, shortflags ? "(G) " : "(Golden Aura) ");
-      }
+      char tags[256];
+      build_visible_target_tags(ch, i, tags, sizeof(tags), FALSE);
+      send_to_char(ch, "%s", tags);
     }
     send_to_char(ch, "%s", i->player.long_descr);
 
@@ -483,13 +461,6 @@ static void list_one_char(struct char_data *i, struct char_data *ch)
   else
     send_to_char(ch, "%s%s%s", i->player.name, *GET_TITLE(i) ? " " : "", GET_TITLE(i));
 
-  {
-    int shortflags = (!IS_NPC(ch) && PRF_FLAGGED(ch, PRF_SHORTFLAGS));
-    if (AFF_FLAGGED(i, AFF_INVISIBLE))
-      send_to_char(ch, shortflags ? " (I)" : " (invisible)");
-    if (AFF_FLAGGED(i, AFF_HIDE))
-      send_to_char(ch, shortflags ? " (H)" : " (hidden)");
-  }
   if (!IS_NPC(i) && !i->desc)
     send_to_char(ch, " (linkless)");
   if (!IS_NPC(i) && PLR_FLAGGED(i, PLR_WRITING))
@@ -524,34 +495,11 @@ static void list_one_char(struct char_data *i, struct char_data *ch)
   }
 
   {
-    int shortflags = (!IS_NPC(ch) && PRF_FLAGGED(ch, PRF_SHORTFLAGS));
-    if (!IS_NPC(i))
-      send_to_char(ch, shortflags ? " (P)" : " (Player)");
-    if (AFF_FLAGGED(i, AFF_CHARM))
-      send_to_char(ch, shortflags ? " (C)" : " (Charmed)");
-    if (AFF_FLAGGED(i, AFF_POISON))
-      send_to_char(ch, shortflags ? " (D)" : " (Diseased)");
-    if (AFF_FLAGGED(i, AFF_FLYING))
-      send_to_char(ch, shortflags ? " (F)" : " (Flying)");
-    if (AFF_FLAGGED(i, AFF_SNEAK) && AFF_FLAGGED(ch, AFF_SENSE_LIFE))
-      send_to_char(ch, shortflags ? " (S)" : " (Stealth)");
-    if (AFF_FLAGGED(i, AFF_SANCTUARY))
-      send_to_char(ch, shortflags ? " (W)" : " (White Aura)");
-    if (!IS_NPC(i) && PLR_FLAGGED(i, PLR_KILLER))
-      send_to_char(ch, " (OPK)");
-    if (IS_NPC(i) && MOB_FLAGGED(i, MOB_AGGRESSIVE) && AFF_FLAGGED(ch, AFF_SENSE_LIFE))
-      send_to_char(ch, " (Angry)");
-    if (GET_MAX_HIT(i) > 0 && (100 * GET_HIT(i) / GET_MAX_HIT(i)) < 60)
-      send_to_char(ch, " (Wounded)");
-    if (AFF_FLAGGED(ch, AFF_DETECT_ALIGN)) {
-      if (IS_EVIL(i))
-        send_to_char(ch, shortflags ? " (R)" : " (Red Aura)");
-      else if (IS_GOOD(i))
-        send_to_char(ch, shortflags ? " (G)" : " (Golden Aura)");
-    }
+    char tags[256];
+    build_visible_target_tags(ch, i, tags, sizeof(tags), FALSE);
+    if (*tags)
+      send_to_char(ch, " %s", tags);
   }
-  if (is_player_quest_target(ch, i))
-    send_to_char(ch, " %s[QUEST]%s", CCRED(ch, C_NRM), CCNRM(ch, C_NRM));
   send_to_char(ch, "\r\n");
 
   if (AFF_FLAGGED(i, AFF_SANCTUARY))
@@ -4303,14 +4251,14 @@ ACMD(do_areas)
     page_string(ch->desc, buf, TRUE);
 }
 
-static void build_scan_target_tags(struct char_data *viewer, struct char_data *target,
-                                   char *out, size_t outsz)
+static void build_visible_target_tags(struct char_data *viewer, struct char_data *target,
+                                   char *out, size_t outsz, int include_afk)
 {
   int shortflags = (!IS_NPC(viewer) && PRF_FLAGGED(viewer, PRF_SHORTFLAGS));
 
   out[0] = '\0';
 
-  if (!IS_NPC(target) && PRF_FLAGGED(target, PRF_AFK))
+  if (include_afk && !IS_NPC(target) && PRF_FLAGGED(target, PRF_AFK))
     strlcat(out, "[AFK] ", outsz);
   if (!IS_NPC(target))
     strlcat(out, shortflags ? "(P) " : "(Player) ", outsz);
@@ -4334,6 +4282,8 @@ static void build_scan_target_tags(struct char_data *viewer, struct char_data *t
     strlcat(out, "(Wounded) ", outsz);
   if (!IS_NPC(target) && PLR_FLAGGED(target, PLR_KILLER))
     strlcat(out, "(OPK) ", outsz);
+  if (is_player_quest_target(viewer, target))
+    strlcat(out, "[QUEST] ", outsz);
   if (AFF_FLAGGED(viewer, AFF_DETECT_ALIGN)) {
     if (IS_EVIL(target))
       strlcat(out, shortflags ? "(R) " : "(Red Aura) ", outsz);
@@ -4342,6 +4292,12 @@ static void build_scan_target_tags(struct char_data *viewer, struct char_data *t
   }
 
   (void) viewer;
+}
+
+static void build_scan_target_tags(struct char_data *viewer, struct char_data *target,
+                                   char *out, size_t outsz)
+{
+  build_visible_target_tags(viewer, target, out, outsz, TRUE);
 }
 
 static void send_scan_section_header(struct char_data *ch, int door, int range)
