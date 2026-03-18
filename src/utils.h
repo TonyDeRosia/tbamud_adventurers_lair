@@ -732,6 +732,7 @@ do                                                              \
 #define MEMORY(ch)		((ch)->mob_specials.memory)
 #define GET_SUMMON_TIMER(ch)      ((ch)->mob_specials.summon_timer)
 #define GET_SPELL_COOLDOWN(ch, sp) CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->spell_cooldowns[(sp)]))
+#define GET_HP_LAST_ROUND(ch) CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->hp_last_round))
 
 /** Return the equivalent strength of ch if ch has level 18 strength. */
 #define STRENGTH_APPLY_INDEX(ch) \

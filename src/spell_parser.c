@@ -789,6 +789,71 @@ static const struct cast_message cast_messages[] = {
     "You speak the Word of Pain into existence!",
     "$n speaks the Word of Pain into existence!",
     NULL
+  },
+  [SPELL_CONJURE_ELEMENTAL] = {
+    "You tear open a rift to the elemental planes!",
+    "$n tears open a rift to the elemental planes!",
+    NULL
+  },
+  [SPELL_CALL_WOLVES] = {
+    "You call wolves to your side!",
+    "$n calls wolves to $s side!",
+    NULL
+  },
+  [SPELL_CALL_BEARS] = {
+    "You call a bear to fight for you!",
+    "$n calls a bear to fight!",
+    NULL
+  },
+  [SPELL_ANIMATE_DEAD_GREATER] = {
+    "Dark power flows from you, raising the dead!",
+    "Dark power flows from $n, raising the dead!",
+    NULL
+  },
+  [SPELL_ABYSS_GATE] = {
+    "You tear open a gate to the Abyss!",
+    "$n tears open a gate to the Abyss!",
+    NULL
+  },
+  [SPELL_GATE] = {
+    "You tear open a gate to summon a mighty entity!",
+    "$n tears open a gate to summon a mighty entity!",
+    NULL
+  },
+  [SPELL_PORTAL] = {
+    "A shimmering portal tears open in the air here!",
+    "A shimmering portal tears open in the air here!",
+    NULL
+  },
+  [SPELL_WORD_OF_RECALL_MASS] = {
+    "You call your group home with mass recall!",
+    "$n calls $s group home with mass recall!",
+    NULL
+  },
+  [SPELL_ASTRAL_PROJECTION] = {
+    "Your astral form separates from your body and flies toward $N!",
+    "$n's astral form separates and flies toward $N!",
+    NULL
+  },
+  [SPELL_ETHEREAL_JAUNT] = {
+    "You jaunt through the ethereal plane and reappear elsewhere!",
+    "$n jaunts through the ethereal plane and vanishes!",
+    NULL
+  },
+  [SPELL_LEYLINE_TAP] = {
+    "You tap into a leyline of raw arcane energy, restoring your mana!",
+    "$n draws in a surge of raw arcane leyline energy!",
+    NULL
+  },
+  [SPELL_TEMPORAL_SHIFT] = {
+    "You shift $N's place in time!",
+    "$n shifts $N's place in time!",
+    "Time stutters around you for a heartbeat!"
+  },
+  [SPELL_CHRONO_SHIFT] = {
+    "You shift yourself back in time one round, undoing the damage!",
+    "$n flickers as time rewinds around $m!",
+    NULL
   }
 };
 
@@ -1528,6 +1593,62 @@ int call_magic(struct char_data *caster, struct char_data *cvict,
       break;
     case SPELL_CANCELLATION:
       MANUAL_SPELL(spell_cancellation)
+      ;
+      break;
+    case SPELL_CONJURE_ELEMENTAL:
+      MANUAL_SPELL(spell_conjure_elemental)
+      ;
+      break;
+    case SPELL_CALL_WOLVES:
+      MANUAL_SPELL(spell_call_wolves)
+      ;
+      break;
+    case SPELL_CALL_BEARS:
+      MANUAL_SPELL(spell_call_bears)
+      ;
+      break;
+    case SPELL_ANIMATE_DEAD_GREATER:
+      MANUAL_SPELL(spell_animate_dead_greater)
+      ;
+      break;
+    case SPELL_ABYSS_GATE:
+      MANUAL_SPELL(spell_abyss_gate)
+      ;
+      break;
+    case SPELL_GATE:
+      MANUAL_SPELL(spell_gate)
+      ;
+      break;
+    case SPELL_PORTAL:
+      MANUAL_SPELL(spell_portal)
+      ;
+      break;
+    case SPELL_LOCATE_CORPSE:
+      MANUAL_SPELL(spell_locate_corpse)
+      ;
+      break;
+    case SPELL_WORD_OF_RECALL_MASS:
+      MANUAL_SPELL(spell_word_of_recall_mass)
+      ;
+      break;
+    case SPELL_ASTRAL_PROJECTION:
+      MANUAL_SPELL(spell_astral_projection)
+      ;
+      break;
+    case SPELL_ETHEREAL_JAUNT:
+      MANUAL_SPELL(spell_ethereal_jaunt)
+      ;
+      break;
+    case SPELL_LEYLINE_TAP:
+      MANUAL_SPELL(spell_leyline_tap)
+      ;
+      break;
+    case SPELL_TEMPORAL_SHIFT:
+      MANUAL_SPELL(spell_temporal_shift)
+      ;
+      break;
+    case SPELL_CHRONO_SHIFT:
+      MANUAL_SPELL(spell_chrono_shift)
       ;
       break;
     }
@@ -2659,6 +2780,35 @@ void mag_assign_spells(void) {
 
   spello(SPELL_IDENTIFY, "identify", 50, 25, 5, POS_STANDING,
   TAR_CHAR_ROOM | TAR_OBJ_INV | TAR_OBJ_ROOM | TAR_OBJ_EQUIP, FALSE, MAG_MANUAL, NULL);
+
+  spello(SPELL_CONJURE_ELEMENTAL, "conjure elemental", 60, 60, 0, POS_STANDING,
+  TAR_IGNORE, FALSE, MAG_MANUAL, NULL);
+  spello(SPELL_CALL_WOLVES, "call wolves", 35, 35, 0, POS_STANDING,
+  TAR_IGNORE, FALSE, MAG_MANUAL, NULL);
+  spello(SPELL_CALL_BEARS, "call bears", 50, 50, 0, POS_STANDING,
+  TAR_IGNORE, FALSE, MAG_MANUAL, NULL);
+  spello(SPELL_ANIMATE_DEAD_GREATER, "animate dead greater", 55, 55, 0, POS_STANDING,
+  TAR_OBJ_ROOM, FALSE, MAG_MANUAL, NULL);
+  spello(SPELL_ABYSS_GATE, "abyss gate", 80, 80, 0, POS_STANDING,
+  TAR_IGNORE, TRUE, MAG_MANUAL, NULL);
+  spello(SPELL_GATE, "gate", 100, 100, 0, POS_STANDING,
+  TAR_IGNORE, FALSE, MAG_MANUAL, NULL);
+  spello(SPELL_PORTAL, "portal", 50, 50, 0, POS_STANDING,
+  TAR_CHAR_WORLD | TAR_NOT_SELF, FALSE, MAG_MANUAL, NULL);
+  spello(SPELL_LOCATE_CORPSE, "locate corpse", 20, 20, 0, POS_STANDING,
+  TAR_IGNORE, FALSE, MAG_MANUAL, NULL);
+  spello(SPELL_WORD_OF_RECALL_MASS, "word of recall mass", 75, 75, 0, POS_STANDING,
+  TAR_IGNORE, FALSE, MAG_MANUAL, NULL);
+  spello(SPELL_ASTRAL_PROJECTION, "astral projection", 40, 40, 0, POS_STANDING,
+  TAR_CHAR_WORLD | TAR_NOT_SELF, FALSE, MAG_MANUAL, NULL);
+  spello(SPELL_ETHEREAL_JAUNT, "ethereal jaunt", 40, 40, 0, POS_STANDING,
+  TAR_IGNORE, FALSE, MAG_MANUAL, NULL);
+  spello(SPELL_LEYLINE_TAP, "leyline tap", 0, 0, 0, POS_STANDING,
+  TAR_IGNORE, FALSE, MAG_MANUAL, NULL);
+  spello(SPELL_TEMPORAL_SHIFT, "temporal shift", 40, 40, 0, POS_FIGHTING,
+  TAR_CHAR_ROOM | TAR_FIGHT_SELF | TAR_FIGHT_VICT, TRUE, MAG_MANUAL, NULL);
+  spello(SPELL_CHRONO_SHIFT, "chrono shift", 50, 50, 0, POS_FIGHTING,
+  TAR_SELF_ONLY, FALSE, MAG_MANUAL, NULL);
 
   /* NON-castable spells should appear below here. */
   spello(SPELL_IDENTIFY, "identify", 0, 0, 0, 0,

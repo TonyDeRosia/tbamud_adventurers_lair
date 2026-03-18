@@ -1709,6 +1709,9 @@ static void process_round_effects(void)
   for (i = character_list; i; i = next_char) {
     next_char = i->next;
 
+    if (!IS_NPC(i))
+      GET_HP_LAST_ROUND(i) = GET_HIT(i);
+
     tick_spell_cooldowns(i);
 
     if (AFF_FLAGGED(i, AFF_BURNING)) {

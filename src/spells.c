@@ -24,6 +24,7 @@
 #include "criticalhits.h"
 #include "mud_event.h"
 #include "screen.h"
+#include "graph.h"
 
 static int clampi(int v, int lo, int hi)
 {
@@ -324,6 +325,101 @@ static int corruption_damage_per_tick(int level)
   int damage = 1 + (level / 10);
 
   return MIN(damage, 12);
+}
+
+static int active_temp_summons(struct char_data *ch)
+{
+  struct follow_type *f;
+  int count = 0;
+
+  if (!ch)
+    return 0;
+  for (f = ch->followers; f; f = f->next) {
+    struct char_data *mob = f->follower;
+    if (!mob || mob->master != ch || !IS_NPC(mob))
+      continue;
+    if (AFF_FLAGGED(mob, AFF_CHARM) && GET_SUMMON_TIMER(mob) > 0)
+      count++;
+  }
+  return count;
+}
+
+static struct char_data *summon_temp_follower(struct char_data *ch, mob_vnum vnum, int level, int rounds)
+{
+  struct char_data *mob = read_mobile(vnum, VIRTUAL);
+  if (!mob)
+    return NULL;
+
+  GET_LEVEL(mob) = MAX(1, level);
+  SET_BIT_AR(AFF_FLAGS(mob), AFF_CHARM);
+  char_to_room(mob, IN_ROOM(ch));
+  add_follower(mob, ch);
+  if (GROUP(ch) && GROUP_LEADER(GROUP(ch)) == ch)
+    join_group(mob, GROUP(ch));
+  GET_SUMMON_TIMER(mob) = MAX(1, rounds);
+  load_mtrigger(mob);
+  return mob;
+}
+
+static int bfs_within_range(room_rnum src, room_rnum target, int max_depth, int *first_dir_out)
+{
+  room_rnum *queue;
+  int *depth, *first_dir, head = 0, tail = 0, r;
+
+  if (src == NOWHERE || target == NOWHERE || max_depth < 0)
+    return FALSE;
+  if (src == target) {
+    if (first_dir_out)
+      *first_dir_out = BFS_ALREADY_THERE;
+    return TRUE;
+  }
+
+  CREATE(queue, room_rnum, top_of_world + 1);
+  CREATE(depth, int, top_of_world + 1);
+  CREATE(first_dir, int, top_of_world + 1);
+  for (r = 0; r <= top_of_world; r++)
+    first_dir[r] = BFS_NO_PATH;
+
+  queue[tail] = src;
+  depth[tail] = 0;
+  first_dir[src] = BFS_ALREADY_THERE;
+  tail++;
+
+  while (head < tail) {
+    room_rnum room = queue[head];
+    int d = depth[head];
+    int dir;
+    head++;
+    if (d >= max_depth)
+      continue;
+
+    for (dir = 0; dir < DIR_COUNT; dir++) {
+      struct room_direction_data *exit = world[room].dir_option[dir];
+      room_rnum nr;
+      if (!exit || exit->to_room == NOWHERE || IS_SET(exit->exit_info, EX_CLOSED))
+        continue;
+      nr = exit->to_room;
+      if (first_dir[nr] != BFS_NO_PATH)
+        continue;
+      first_dir[nr] = (first_dir[room] == BFS_ALREADY_THERE) ? dir : first_dir[room];
+      if (nr == target) {
+        if (first_dir_out)
+          *first_dir_out = first_dir[nr];
+        free(queue);
+        free(depth);
+        free(first_dir);
+        return TRUE;
+      }
+      queue[tail] = nr;
+      depth[tail] = d + 1;
+      tail++;
+    }
+  }
+
+  free(queue);
+  free(depth);
+  free(first_dir);
+  return FALSE;
 }
 
 /* Special spells appear below. */
@@ -1079,4 +1175,276 @@ ASPELL(spell_detect_poison)
       send_to_char(ch, "You sense that it should not be consumed.\r\n");
     }
   }
+}
+
+ASPELL(spell_conjure_elemental)
+{
+  mob_vnum vnum = MOBVNUM_LESSER_ELEMENTAL;
+
+  if (!ch)
+    return;
+  if (active_temp_summons(ch) > 0) {
+    send_to_char(ch, "You already control an active summon.\r\n");
+    return;
+  }
+  if (level >= 35)
+    vnum = MOBVNUM_ELDER_ELEMENTAL;
+  else if (level >= 25)
+    vnum = MOBVNUM_GREATER_ELEMENTAL;
+  else if (level >= 15)
+    vnum = MOBVNUM_ELEMENTAL;
+  summon_temp_follower(ch, vnum, MAX(1, level - 5), 10);
+}
+
+ASPELL(spell_call_wolves)
+{
+  int i, count;
+  if (!ch)
+    return;
+  count = dice(1, 2) + 1;
+  for (i = 0; i < count; i++)
+    summon_temp_follower(ch, MOBVNUM_SUMMONED_WOLF, MAX(2, level - 8), 8);
+}
+
+ASPELL(spell_call_bears)
+{
+  if (!ch)
+    return;
+  summon_temp_follower(ch, MOBVNUM_SUMMONED_BEAR, MAX(1, level - 5), 8);
+}
+
+ASPELL(spell_animate_dead_greater)
+{
+  struct obj_data *corpse = obj;
+
+  if (!ch)
+    return;
+  if (active_temp_summons(ch) > 0) {
+    send_to_char(ch, "You already control an active summon.\r\n");
+    return;
+  }
+  if (!corpse || !IS_CORPSE(corpse) || GET_OBJ_TIMER(corpse) > CONFIG_MAX_NPC_CORPSE_TIME) {
+    send_to_char(ch, "You must target an NPC corpse in this room.\r\n");
+    return;
+  }
+  summon_temp_follower(ch, MOBVNUM_GREATER_UNDEAD, MAX(1, level), 10);
+  extract_obj(corpse);
+}
+
+ASPELL(spell_abyss_gate)
+{
+  mob_vnum vnum;
+  struct char_data *mob;
+
+  if (!ch)
+    return;
+  if (level < 30)
+    vnum = MOBVNUM_LESSER_DEMON;
+  else if (level < 40)
+    vnum = MOBVNUM_DEMON;
+  else
+    vnum = MOBVNUM_GREATER_DEMON;
+
+  mob = summon_temp_follower(ch, vnum, MAX(1, level - 3), 5);
+  if (mob && rand_number(1, 100) <= 25) {
+    stop_follower(mob);
+    REMOVE_BIT_AR(AFF_FLAGS(mob), AFF_CHARM);
+    hit(mob, ch, TYPE_UNDEFINED);
+  }
+}
+
+ASPELL(spell_gate)
+{
+  mob_vnum vnum;
+
+  if (!ch)
+    return;
+  if (active_temp_summons(ch) > 0) {
+    send_to_char(ch, "You cannot open a mighty gate while another summon is active.\r\n");
+    return;
+  }
+  if (IS_GOOD(ch))
+    vnum = MOBVNUM_CELESTIAL_GUARDIAN;
+  else if (IS_EVIL(ch))
+    vnum = MOBVNUM_DEMON_LORD;
+  else
+    vnum = MOBVNUM_ELEMENTAL_TITAN;
+  summon_temp_follower(ch, vnum, level + 2, 3);
+}
+
+ASPELL(spell_portal)
+{
+  struct obj_data *origin, *dest;
+  room_rnum target_room;
+
+  if (!ch || !victim)
+    return;
+  target_room = IN_ROOM(victim);
+  if (target_room == NOWHERE || ROOM_FLAGGED(target_room, ROOM_PRIVATE) ||
+      ROOM_FLAGGED(target_room, ROOM_DEATH) || ROOM_FLAGGED(target_room, ROOM_NOMAGIC)) {
+    send_to_char(ch, "Your portal cannot anchor there.\r\n");
+    return;
+  }
+
+  origin = read_object(OBJVNUM_SPELL_PORTAL, VIRTUAL);
+  dest = read_object(OBJVNUM_SPELL_PORTAL, VIRTUAL);
+  if (!origin || !dest) {
+    send_to_char(ch, "The portal magic fizzles; the focus object is missing.\r\n");
+    return;
+  }
+  GET_OBJ_VAL(origin, 0) = GET_ROOM_VNUM(target_room);
+  GET_OBJ_VAL(dest, 0) = GET_ROOM_VNUM(IN_ROOM(ch));
+  GET_OBJ_TIMER(origin) = 5;
+  GET_OBJ_TIMER(dest) = 5;
+  obj_to_room(origin, IN_ROOM(ch));
+  obj_to_room(dest, target_room);
+  send_to_room(IN_ROOM(ch), "A shimmering portal tears open in the air here!\r\n");
+  send_to_room(target_room, "A shimmering portal tears open in the air here!\r\n");
+}
+
+ASPELL(spell_locate_corpse)
+{
+  struct obj_data *i;
+  room_rnum room = NOWHERE;
+  int dir = BFS_NO_PATH;
+  char *query = cast_arg2;
+
+  if (!ch || !query || !*query) {
+    send_to_char(ch, "Locate which corpse?\r\n");
+    return;
+  }
+
+  for (i = object_list; i; i = i->next) {
+    if (!IS_CORPSE(i) || !IN_ROOM(i))
+      continue;
+    if (strstr(i->short_description, query) || strstr(i->name, query)) {
+      room = IN_ROOM(i);
+      break;
+    }
+  }
+  if (room == NOWHERE) {
+    send_to_char(ch, "You sense no matching corpse.\r\n");
+    return;
+  }
+
+  if (bfs_within_range(IN_ROOM(ch), room, 10, &dir) && dir >= 0)
+    send_to_char(ch, "The corpse of %s lies in %s (vnum %d) to the %s.\r\n",
+                 query, world[room].name, GET_ROOM_VNUM(room), dirs[dir]);
+  else
+    send_to_char(ch, "The corpse of %s lies in %s (vnum %d) to the far away.\r\n",
+                 query, world[room].name, GET_ROOM_VNUM(room));
+}
+
+ASPELL(spell_word_of_recall_mass)
+{
+  struct char_data *tch;
+  if (!ch)
+    return;
+  if (ROOM_FLAGGED(IN_ROOM(ch), ROOM_DEATH) || ZONE_FLAGGED(GET_ROOM_ZONE(IN_ROOM(ch)), ZONE_NOASTRAL)) {
+    send_to_char(ch, "A dark force blocks your mass recall.\r\n");
+    return;
+  }
+
+  if (!GROUP(ch))
+    return;
+
+  while ((tch = (struct char_data *) simple_list(GROUP(ch)->members)) != NULL) {
+    room_rnum to_room;
+    if (IN_ROOM(tch) != IN_ROOM(ch))
+      continue;
+    to_room = (!IS_NPC(tch) && GET_LOADROOM(tch) != NOWHERE) ? real_room(GET_LOADROOM(tch)) : r_mortal_start_room;
+    if (to_room == NOWHERE)
+      to_room = r_mortal_start_room;
+    act("$n disappears.", TRUE, tch, 0, 0, TO_ROOM);
+    char_from_room(tch);
+    char_to_room(tch, to_room);
+    act("$n appears in the middle of the room.", TRUE, tch, 0, 0, TO_ROOM);
+    look_at_room(tch, 0);
+  }
+}
+
+ASPELL(spell_astral_projection)
+{
+  struct char_data *tch;
+  if (!ch || !victim)
+    return;
+  tch = victim;
+  send_to_char(ch, "[Astral] %s (vnum %d)\r\n%s\r\n",
+               world[IN_ROOM(tch)].name, GET_ROOM_VNUM(IN_ROOM(tch)), world[IN_ROOM(tch)].description);
+  for (tch = world[IN_ROOM(victim)].people; tch; tch = tch->next_in_room)
+    if (CAN_SEE(ch, tch))
+      send_to_char(ch, "  %s is here.\r\n", PERS(tch, ch));
+  WAIT_STATE(ch, 2 * PULSE_VIOLENCE);
+}
+
+ASPELL(spell_ethereal_jaunt)
+{
+  room_rnum to_room;
+  zone_rnum zone;
+  int tries = 200;
+
+  if (!ch)
+    return;
+  if (spell_on_cooldown(ch, SPELL_ETHEREAL_JAUNT)) {
+    send_to_char(ch, "Ethereal jaunt is still on cooldown.\r\n");
+    return;
+  }
+  zone = world[IN_ROOM(ch)].zone;
+  do {
+    to_room = rand_number(zone_table[zone].bot, zone_table[zone].top);
+  } while (--tries > 0 && (ROOM_FLAGGED(to_room, ROOM_PRIVATE) || ROOM_FLAGGED(to_room, ROOM_DEATH)));
+  if (tries <= 0) {
+    send_to_char(ch, "The ethereal plane refuses your passage.\r\n");
+    return;
+  }
+  act("$n blurs and vanishes through the ethereal plane.", TRUE, ch, 0, 0, TO_ROOM);
+  char_from_room(ch);
+  char_to_room(ch, to_room);
+  look_at_room(ch, 0);
+  set_spell_cooldown(ch, SPELL_ETHEREAL_JAUNT, 3);
+}
+
+ASPELL(spell_leyline_tap)
+{
+  int restored;
+  if (!ch)
+    return;
+  if (FIGHTING(ch)) {
+    send_to_char(ch, "You cannot tap a leyline while in combat.\r\n");
+    return;
+  }
+  if (spell_on_cooldown(ch, SPELL_LEYLINE_TAP)) {
+    send_to_char(ch, "You must wait before tapping another leyline.\r\n");
+    return;
+  }
+  restored = (level * 3) + dice(3, MAX(1, level));
+  GET_MANA(ch) = MIN(GET_MAX_MANA(ch), GET_MANA(ch) + restored);
+  set_spell_cooldown(ch, SPELL_LEYLINE_TAP, 5);
+}
+
+ASPELL(spell_temporal_shift)
+{
+  if (!ch)
+    return;
+  if (victim == ch) {
+    GET_WAIT_STATE(ch) = 0;
+    return;
+  }
+  if (!victim)
+    return;
+  if (!mag_savingthrow(victim, SAVING_SPELL, 0))
+    GET_WAIT_STATE(victim) = MAX(GET_WAIT_STATE(victim), 3 * PULSE_VIOLENCE);
+}
+
+ASPELL(spell_chrono_shift)
+{
+  if (!ch)
+    return;
+  if (spell_on_cooldown(ch, SPELL_CHRONO_SHIFT)) {
+    send_to_char(ch, "Your timeline is still stabilizing.\r\n");
+    return;
+  }
+  if (GET_HP_LAST_ROUND(ch) > GET_HIT(ch))
+    GET_HIT(ch) = MIN(GET_MAX_HIT(ch), GET_HP_LAST_ROUND(ch));
+  set_spell_cooldown(ch, SPELL_CHRONO_SHIFT, 10);
 }

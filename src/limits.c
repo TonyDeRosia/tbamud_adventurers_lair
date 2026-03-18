@@ -571,8 +571,13 @@ void point_update(void)
      * note to .rej hand-patchers: make this last in your point-update() */
     else if (GET_OBJ_TIMER(j)>0) {
       GET_OBJ_TIMER(j)--;
-      if (!GET_OBJ_TIMER(j))
+      if (!GET_OBJ_TIMER(j)) {
+        if (GET_OBJ_VNUM(j) == OBJVNUM_SPELL_PORTAL && IN_ROOM(j) != NOWHERE && world[IN_ROOM(j)].people) {
+          act("The shimmering portal collapses.", TRUE, world[IN_ROOM(j)].people, 0, 0, TO_ROOM);
+          act("The shimmering portal collapses.", TRUE, world[IN_ROOM(j)].people, 0, 0, TO_CHAR);
+        }
         timer_otrigger(j);
+      }
     }
   }
 
