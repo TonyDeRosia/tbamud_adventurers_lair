@@ -252,6 +252,10 @@ struct ai_actor_state {
   int role_scores[ROLE_BOSS + 1];
   char last_pool_name[48];
   char last_speak_reason[32];
+  int last_speech_hash;
+  int last_emote_hash;
+  int recent_speech_hashes[5];
+  int recent_emote_hashes[5];
   struct ai_actor_recent_event recent_events[AI_EVENT_RING_MAX];
   struct ai_actor_brain *brain;
 };
