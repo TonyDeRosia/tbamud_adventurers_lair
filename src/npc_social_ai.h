@@ -46,6 +46,18 @@ enum npc_priority {
   NPC_PRIO_SOCIALIZE
 };
 
+enum npc_say_intent {
+  SAY_INTENT_GREETING = 0,
+  SAY_INTENT_QUESTION,
+  SAY_INTENT_SERVICE,
+  SAY_INTENT_SMALLTALK,
+  SAY_INTENT_PRAISE,
+  SAY_INTENT_RUDE,
+  SAY_INTENT_INAPPROPRIATE,
+  SAY_INTENT_THREAT,
+  SAY_INTENT_UNCLEAR
+};
+
 struct npc_social_profile {
   enum npc_role role;
   enum npc_temperament temperament;
@@ -58,6 +70,7 @@ enum npc_priority npc_ai_choose_priority(struct char_data *ch, const struct npc_
 void npc_ai_handle_player_enter(struct char_data *ch, struct char_data *player, time_t now);
 void npc_ai_handle_player_leave(struct char_data *ch, struct char_data *player, time_t now);
 void npc_ai_handle_speech_event(struct char_data *ch, struct char_data *player, const char *text, time_t now);
+int npc_detect_say_intent(const char *msg);
 void npc_ai_handle_room_danger(struct char_data *ch, struct char_data *actor, time_t now);
 void npc_ai_maybe_do_ambient_action(struct char_data *ch, const struct npc_social_profile *profile, time_t now);
 const char *npc_ai_get_dialogue_line(const struct npc_social_profile *profile, enum npc_priority prio, int repeat);

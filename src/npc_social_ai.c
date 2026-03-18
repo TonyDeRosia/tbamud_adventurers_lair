@@ -19,6 +19,8 @@ ACMD(do_say);
 #define CLAMP(v, lo, hi) ((v) < (lo) ? (lo) : ((v) > (hi) ? (hi) : (v)))
 #define ARRAYSZ(a) (int)(sizeof(a) / sizeof((a)[0]))
 #define NPC_SOCIAL_RECENT_MAX 5
+#define NPC_ESCALATE_WINDOW 90
+#define NPC_CATEGORY_REPEAT_WINDOW 20
 
 enum npc_line_kind {
   LK_FIRST_GREET = 0,
@@ -146,6 +148,46 @@ static struct ai_actor_memory_entry *npc_mem_get(struct char_data *ch, long idnu
   memset(&ch->ai_state->mem[i], 0, sizeof(ch->ai_state->mem[i]));
   ch->ai_state->mem[i].idnum = idnum;
   return &ch->ai_state->mem[i];
+}
+
+static void npc_copy_lower(const char *src, char *dst, size_t sz)
+{
+  size_t i;
+  if (!dst || sz == 0) return;
+  if (!src) {
+    dst[0] = '\0';
+    return;
+  }
+  for (i = 0; i + 1 < sz && src[i]; i++)
+    dst[i] = LOWER(src[i]);
+  dst[i] = '\0';
+}
+
+int npc_detect_say_intent(const char *msg)
+{
+  char lower[256];
+  npc_copy_lower(msg, lower, sizeof(lower));
+  if (!*lower) return SAY_INTENT_UNCLEAR;
+
+  if (has_kw(lower, "kill you") || has_kw(lower, "fight me") || has_kw(lower, "attack"))
+    return SAY_INTENT_THREAT;
+  if (has_kw(lower, "touch me") || has_kw(lower, "lick me") || has_kw(lower, "kiss me"))
+    return SAY_INTENT_INAPPROPRIATE;
+  if (has_kw(lower, "idiot") || has_kw(lower, "stupid") || has_kw(lower, "shut up") || has_kw(lower, "eat one"))
+    return SAY_INTENT_RUDE;
+  if (has_kw(lower, "good job") || has_kw(lower, "nice") || has_kw(lower, "well done"))
+    return SAY_INTENT_PRAISE;
+  if (has_kw(lower, "train") || has_kw(lower, "buy") || has_kw(lower, "sell") || has_kw(lower, "heal") ||
+      has_kw(lower, "job") || has_kw(lower, "quest"))
+    return SAY_INTENT_SERVICE;
+  if (has_kw(lower, "weather") || has_kw(lower, "day") || has_kw(lower, "busy") || has_kw(lower, "quiet"))
+    return SAY_INTENT_SMALLTALK;
+  if (has_kw(lower, "hi") || has_kw(lower, "hello") || has_kw(lower, "hey") || has_kw(lower, "greetings"))
+    return SAY_INTENT_GREETING;
+  if (has_kw(lower, "what") || has_kw(lower, "why") || has_kw(lower, "how") || has_kw(lower, "huh") || has_kw(lower, "help"))
+    return SAY_INTENT_QUESTION;
+
+  return SAY_INTENT_UNCLEAR;
 }
 
 int npc_ai_is_humanoid_social_candidate(struct char_data *ch)
@@ -1084,6 +1126,73 @@ void npc_ai_update_memory(struct char_data *ch, struct char_data *player, int tr
   m->last_interaction_time = now;
 }
 
+static int npc_role_supports_combat_alarm(const struct npc_social_profile *p)
+{
+  return (p && (p->role == NPC_ROLE_GUARD || p->role == NPC_ROLE_TRAINER || p->role == NPC_ROLE_BANDIT));
+}
+
+static int npc_should_respond_to_speech(const struct npc_social_profile *p, int intent, int is_first_greeting)
+{
+  int chance = 60;
+  if (intent == SAY_INTENT_RUDE || intent == SAY_INTENT_INAPPROPRIATE || intent == SAY_INTENT_THREAT) return TRUE;
+  if (intent == SAY_INTENT_GREETING && is_first_greeting) return TRUE;
+
+  if (p) {
+    if (p->social_style == NPC_SOCIAL_EXTROVERT) chance = 70;
+    else if (p->social_style == NPC_SOCIAL_INTROVERT) chance = 50;
+  }
+  return (rand_number(1, 100) <= chance);
+}
+
+static void npc_decay_escalation(struct ai_actor_memory_entry *m, time_t now)
+{
+  if (!m) return;
+  if (m->last_reply_time <= 0 || (now - m->last_reply_time) > NPC_ESCALATE_WINDOW) m->last_intent = 0;
+  if (m->last_topic_time <= 0 || (now - m->last_topic_time) > NPC_ESCALATE_WINDOW) m->last_topic = 0;
+}
+
+static enum npc_line_kind npc_kind_for_service_role(const struct npc_social_profile *p)
+{
+  if (!p) return LK_TASK_PROMPT;
+  if (p->role == NPC_ROLE_MERCHANT || p->role == NPC_ROLE_HEALER || p->role == NPC_ROLE_OFFICIAL)
+    return LK_POLITE_SERVICE;
+  if (p->role == NPC_ROLE_TRAINER || p->role == NPC_ROLE_QUESTGIVER || p->role == NPC_ROLE_GENERIC_SERVICE)
+    return LK_TASK_PROMPT;
+  return LK_TASK_PROMPT;
+}
+
+static enum npc_line_kind npc_kind_for_question_role(const struct npc_social_profile *p)
+{
+  if (!p) return LK_TASK_PROMPT;
+  if (p->role == NPC_ROLE_MERCHANT || p->role == NPC_ROLE_HEALER || p->role == NPC_ROLE_OFFICIAL ||
+      p->role == NPC_ROLE_GENERIC_SERVICE)
+    return LK_POLITE_SERVICE;
+  return LK_TASK_PROMPT;
+}
+
+static int npc_try_speech_with_fallback(struct char_data *ch, const struct npc_social_profile *p, struct ai_actor_memory_entry *m, enum npc_line_kind kind, time_t now)
+{
+  const char *line = NULL;
+
+  if (m && m->last_topic_key[0] == (char)kind && (now - m->last_reaction) < NPC_CATEGORY_REPEAT_WINDOW)
+    line = NULL;
+  else
+    line = npc_pick_line_for_kind(ch, p, kind);
+
+  if (!line && kind != LK_IDLE_OBSERVATION)
+    line = npc_pick_line_for_kind(ch, p, LK_IDLE_OBSERVATION);
+  if (!line && kind != LK_DISMISSAL)
+    line = npc_pick_line_for_kind(ch, p, LK_DISMISSAL);
+  if (!line) {
+    if (rand_number(1, 100) <= 65) npc_ai_do_emote(ch, p, now);
+    return FALSE;
+  }
+
+  npc_say(ch, line);
+  ch->ai_state->last_spoke = now;
+  return TRUE;
+}
+
 enum npc_priority npc_ai_choose_priority(struct char_data *ch, const struct npc_social_profile *profile, time_t now)
 {
   (void)now;
@@ -1171,13 +1280,17 @@ void npc_ai_handle_speech_event(struct char_data *ch, struct char_data *player, 
   struct npc_social_profile p;
   enum npc_line_kind kind = LK_IDLE_OBSERVATION;
   struct ai_actor_memory_entry *m;
-  const char *line;
+  int intent = SAY_INTENT_UNCLEAR;
+  int is_first_greeting = FALSE;
+  int responded;
   int annoyance;
 
   if (!npc_ai_is_humanoid_social_candidate(ch) || !player || IS_NPC(player) || !ch->ai_state) return;
   npc_ai_build_profile(ch, &p);
   m = npc_mem_get(ch, GET_IDNUM(player));
   annoyance = m ? -m->attitude : 0;
+  intent = npc_detect_say_intent(text);
+  is_first_greeting = (intent == SAY_INTENT_GREETING && m && m->belief_confidence < 2.0f);
 
   if (text && (has_kw(text, "bye") || has_kw(text, "farewell") || has_kw(text, "goodbye"))) {
     kind = (rand_number(1, 100) <= 60) ? LK_FAREWELL : LK_DISMISSAL;
@@ -1185,38 +1298,83 @@ void npc_ai_handle_speech_event(struct char_data *ch, struct char_data *player, 
   } else if (text && (has_kw(text, "thank") || has_kw(text, "appreciate"))) {
     kind = LK_APPROVAL;
     npc_ai_update_memory(ch, player, 2, 0, -1, now);
-  } else if (text && (has_kw(text, "idiot") || has_kw(text, "stupid") || has_kw(text, "hate") || has_kw(text, "shut up"))) {
-    if (annoyance < 15) kind = LK_MILD_ANNOY;
-    else if (annoyance < 35) kind = LK_FIRM_ANNOY;
-    else kind = LK_WARNING;
-    npc_ai_update_memory(ch, player, -1, 9, 1, now);
-  } else if (text && (has_kw(text, "help") || has_kw(text, "quest") || has_kw(text, "buy") || has_kw(text, "trade") || has_kw(text, "train") || has_kw(text, "heal") || has_kw(text, "service"))) {
-    if (p.role == NPC_ROLE_MERCHANT || p.role == NPC_ROLE_HEALER || p.role == NPC_ROLE_OFFICIAL)
-      kind = LK_POLITE_SERVICE;
-    else if (p.role == NPC_ROLE_TRAINER || p.role == NPC_ROLE_QUESTGIVER || p.role == NPC_ROLE_GENERIC_SERVICE)
-      kind = LK_TASK_PROMPT;
-    else
-      kind = LK_IDLE_OBSERVATION;
-    npc_ai_update_memory(ch, player, 2, 0, 0, now);
-  } else if (text && (has_kw(text, "wait") || has_kw(text, "hmm") || has_kw(text, "..."))) {
-    kind = LK_MILD_SUSPICION;
-    npc_ai_update_memory(ch, player, 0, 2, 0, now);
   } else {
-    if (annoyance > 30) kind = LK_FIRM_ANNOY;
-    else if (annoyance > 15) kind = LK_MILD_ANNOY;
-    else kind = (rand_number(1, 100) <= 50) ? LK_IDLE_OBSERVATION : LK_REPEAT_GREET;
-    npc_ai_update_memory(ch, player, 1, 0, 0, now);
+    npc_decay_escalation(m, now);
+    switch (intent) {
+      case SAY_INTENT_GREETING:
+        kind = (m && m->trust >= 20) ? LK_WARM_RECOG : ((m && m->belief_confidence >= 2.0f) ? LK_REPEAT_GREET : LK_FIRST_GREET);
+        npc_ai_update_memory(ch, player, 2, 0, 0, now);
+        break;
+      case SAY_INTENT_QUESTION:
+        kind = npc_kind_for_question_role(&p);
+        npc_ai_update_memory(ch, player, 1, 0, 0, now);
+        break;
+      case SAY_INTENT_SERVICE:
+        kind = npc_kind_for_service_role(&p);
+        npc_ai_update_memory(ch, player, 2, 0, 0, now);
+        break;
+      case SAY_INTENT_SMALLTALK:
+        kind = LK_IDLE_OBSERVATION;
+        npc_ai_update_memory(ch, player, 1, 0, 0, now);
+        break;
+      case SAY_INTENT_PRAISE:
+        kind = (m && m->trust >= 12) ? LK_WARM_RECOG : LK_APPROVAL;
+        npc_ai_update_memory(ch, player, 2, 0, -1, now);
+        break;
+      case SAY_INTENT_RUDE:
+        if (m) {
+          m->last_intent = CLAMP(m->last_intent + 1, 1, 3);
+          m->last_reply_time = now;
+        }
+        kind = (m && m->last_intent >= 2) ? LK_FIRM_ANNOY : LK_MILD_ANNOY;
+        if (p.role == NPC_ROLE_GUARD && m && m->last_intent >= 2) kind = LK_WARNING;
+        else if (p.role == NPC_ROLE_BANDIT) kind = (m && m->last_intent >= 2) ? LK_WARNING : LK_FIRM_ANNOY;
+        else if (p.role == NPC_ROLE_HEALER) kind = LK_MILD_ANNOY;
+        else if (p.role == NPC_ROLE_MERCHANT || p.role == NPC_ROLE_TRAINER) kind = LK_FIRM_ANNOY;
+        npc_ai_update_memory(ch, player, -1, 9, 1, now);
+        break;
+      case SAY_INTENT_INAPPROPRIATE:
+        if (m) {
+          m->last_topic = CLAMP(m->last_topic + 1, 1, 3);
+          m->last_topic_time = now;
+        }
+        kind = (m && m->last_topic >= 2) ? LK_WARNING : LK_FIRM_ANNOY;
+        if (p.role == NPC_ROLE_GUARD) kind = LK_WARNING;
+        npc_ai_update_memory(ch, player, -2, 10, 2, now);
+        break;
+      case SAY_INTENT_THREAT:
+        if (p.role == NPC_ROLE_HEALER)
+          kind = (rand_number(1, 100) <= 65) ? LK_FEAR : LK_WARNING;
+        else if (npc_role_supports_combat_alarm(&p))
+          kind = LK_COMBAT_ALARM;
+        else
+          kind = LK_WARNING;
+        if (p.role == NPC_ROLE_GUARD) kind = LK_WARNING;
+        npc_ai_update_memory(ch, player, -3, 12, 4, now);
+        break;
+      case SAY_INTENT_UNCLEAR:
+      default:
+        if (annoyance > 30) kind = LK_FIRM_ANNOY;
+        else if (annoyance > 15) kind = LK_MILD_ANNOY;
+        else kind = (rand_number(1, 100) <= 50) ? LK_IDLE_OBSERVATION : LK_TASK_PROMPT;
+        npc_ai_update_memory(ch, player, 0, 0, 0, now);
+        break;
+    }
   }
 
-  if ((now - ch->ai_state->last_spoke) < 4) return;
+  if ((now - ch->ai_state->last_spoke) < 4) {
+    if (intent == SAY_INTENT_RUDE || intent == SAY_INTENT_INAPPROPRIATE || intent == SAY_INTENT_THREAT)
+      npc_ai_do_emote(ch, &p, now);
+    return;
+  }
+  if (!npc_should_respond_to_speech(&p, intent, is_first_greeting)) return;
 
-  line = npc_pick_line_for_kind(ch, &p, kind);
-  if (!line && kind == LK_WARNING)
-    line = npc_pick_line_for_kind(ch, &p, LK_FIRM_ANNOY);
-  if (!line) return;
-
-  npc_say(ch, line);
-  ch->ai_state->last_spoke = now;
+  responded = npc_try_speech_with_fallback(ch, &p, m, kind, now);
+  if (responded && m) {
+    m->last_topic_key[0] = (char)kind;
+    m->last_topic_key[1] = '\0';
+    m->last_reaction = now;
+  }
 }
 
 void npc_ai_handle_room_danger(struct char_data *ch, struct char_data *actor, time_t now)
