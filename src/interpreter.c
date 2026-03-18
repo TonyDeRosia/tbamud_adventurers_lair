@@ -119,6 +119,7 @@ cpp_extern const struct command_info cmd_info[] = {
   { "afk"      , "afk"     , POS_DEAD    , do_gen_tog  , 0, SCMD_AFK },
   { "areas"    , "are"     , POS_DEAD    , do_areas    , 0, 0 },
   { "assist"   , "as"      , POS_FIGHTING, do_assist   , 1, 0 },
+  { "appraise" , "app"     , POS_RESTING , do_appraise_enemy, 1, 0 },
   { "ask"      , "ask"     , POS_RESTING , do_spec_comm, 0, SCMD_ASK },
   { "astat"    , "ast"     , POS_DEAD    , do_astat    , 0, 0 },
   { "attach"   , "attach"  , POS_DEAD    , do_attach   , LVL_BUILDER, 0 },

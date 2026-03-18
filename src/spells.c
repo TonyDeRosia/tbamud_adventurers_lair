@@ -1173,6 +1173,48 @@ ASPELL(spell_identify)
   }
 }
 
+ASPELL(spell_energy_drain)
+{
+  struct affected_type af;
+  int mana_drain, move_drain;
+  int saved;
+
+  if (!ch || !victim || victim == ch)
+    return;
+
+  saved = mag_savingthrow(victim, SAVING_SPELL, 0);
+  mana_drain = clampi(level / 3, 6, 30);
+  move_drain = clampi(level / 4, 4, 20);
+
+  if (saved) {
+    mana_drain /= 2;
+    move_drain /= 2;
+  }
+
+  GET_MANA(victim) = MAX(0, GET_MANA(victim) - mana_drain);
+  GET_MOVE(victim) = MAX(0, GET_MOVE(victim) - move_drain);
+  GET_MANA(ch) = MIN(GET_MAX_MANA(ch), GET_MANA(ch) + MAX(1, mana_drain / 2));
+  GET_MOVE(ch) = MIN(GET_MAX_MOVE(ch), GET_MOVE(ch) + MAX(1, move_drain / 2));
+
+  if (!saved && !affected_by_spell(victim, SPELL_ENERGY_DRAIN)) {
+    memset(&af, 0, sizeof(af));
+    af.spell = SPELL_ENERGY_DRAIN;
+    af.duration = 2;
+    af.location = APPLY_HITROLL;
+    af.modifier = -1;
+    SET_BIT_AR(af.bitvector, AFF_ARCANE_LEAK);
+    affect_join(victim, &af, FALSE, FALSE, FALSE, FALSE);
+  }
+
+  if (saved) {
+    act("$N resists most of your draining grasp.", FALSE, ch, 0, victim, TO_CHAR);
+    act("You resist most of $n's draining grasp.", FALSE, ch, 0, victim, TO_VICT);
+  } else {
+    act("You siphon vitality from $N and feed your own reserves.", FALSE, ch, 0, victim, TO_CHAR);
+    act("$n tears vitality from you, leaving your reserves diminished.", FALSE, ch, 0, victim, TO_VICT);
+  }
+}
+
 /* Cannot use this spell on an equipped object or it will mess up the wielding
  * character's hit/dam totals. */
 ASPELL(spell_enchant_weapon)

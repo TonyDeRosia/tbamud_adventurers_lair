@@ -196,6 +196,7 @@ ACMD(do_kick);
 ACMD(do_kill);
 ACMD(do_order);
 ACMD(do_opet);
+ACMD(do_appraise_enemy);
 ACMD(do_rescue);
 ACMD(do_whirlwind);
 ACMD(do_bandage);
