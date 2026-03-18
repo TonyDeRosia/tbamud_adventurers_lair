@@ -112,13 +112,13 @@ static void clan_help(struct char_data *ch)
   send_to_char(ch,
     "Clan commands:\r\n"
     "  clan                 shows your clan status\r\n"
-    "  clan list            shows clan file location\r\n"
+    "  clan list            shows existing clans\r\n"
     "  clan <message>       sends clan chat\r\n"
     "Shortcuts:\r\n"
     "  ccreate <Name>       create clan (admins level 104 only)\r\n"
     "  cinvite <player>     invite/recruit an online player\r\n"
     "  cjoin <clan>         join a clan by name or id\r\n"
-    "  cquit [yes]          leave clan (confirm with yes)\r\n"
+    "  cquit                leave clan\r\n"
     "  cpromote <player>    raise a member rank\r\n"
     "  cdemote <player>     lower a member rank\r\n"
   );
