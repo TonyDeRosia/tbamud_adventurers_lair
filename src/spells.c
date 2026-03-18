@@ -44,6 +44,7 @@ static int spell_dmg_medium_manual(int level);
 static int spell_dmg_high_manual(int level);
 static int spell_dmg_extreme_manual(int level);
 static int spell_dmg_ultra_manual(int level);
+static struct char_data *summon_temp_follower(struct char_data *ch, mob_vnum vnum, int level, int rounds);
 
 static int warlock_power(struct char_data *ch)
 {
@@ -352,6 +353,54 @@ static int active_temp_summons(struct char_data *ch)
       count++;
   }
   return count;
+}
+
+static int is_shadow_servant(struct char_data *mob, struct char_data *owner)
+{
+  if (!mob || !IS_NPC(mob) || !AFF_FLAGGED(mob, AFF_CHARM) || GET_SUMMON_TIMER(mob) <= 0)
+    return FALSE;
+  if (owner && mob->master != owner)
+    return FALSE;
+  return affected_by_spell(mob, SPELL_CALL_SHADOW_LEGION)
+      || affected_by_spell(mob, SPELL_SHADOW_EXTRACTION)
+      || affected_by_spell(mob, SPELL_ARISE_GREATER);
+}
+
+static void mark_shadow_servant(struct char_data *mob, int source_spell, int duration)
+{
+  struct affected_type af;
+  if (!mob)
+    return;
+  new_affect(&af);
+  af.spell = source_spell;
+  af.duration = MAX(1, duration);
+  af.location = APPLY_NONE;
+  af.modifier = 1;
+  affect_join(mob, &af, FALSE, FALSE, FALSE, FALSE);
+}
+
+static int count_shadow_servants_in_room(struct char_data *ch)
+{
+  struct follow_type *f;
+  int count = 0;
+  if (!ch || IN_ROOM(ch) == NOWHERE)
+    return 0;
+  for (f = ch->followers; f; f = f->next) {
+    struct char_data *mob = f->follower;
+    if (!mob || IN_ROOM(mob) != IN_ROOM(ch))
+      continue;
+    if (is_shadow_servant(mob, ch))
+      count++;
+  }
+  return count;
+}
+
+static struct char_data *summon_shadow_servant(struct char_data *ch, mob_vnum vnum, int level, int rounds, int source_spell)
+{
+  struct char_data *mob = summon_temp_follower(ch, vnum, level, rounds);
+  if (mob)
+    mark_shadow_servant(mob, source_spell, rounds);
+  return mob;
 }
 
 static struct char_data *summon_temp_follower(struct char_data *ch, mob_vnum vnum, int level, int rounds)
@@ -2049,3 +2098,196 @@ ASPELL(spell_silent_magic) { if (ch) spell_apply_modifier(ch, SPELL_SILENT_MAGIC
 ASPELL(spell_triple_maximize_magic) { if (ch) spell_apply_modifier(ch, SPELL_TRIPLE_MAXIMIZE_MAGIC, 1, APPLY_NONE, 1); }
 ASPELL(spell_pantheon) { if (!ch) return; spell_apply_modifier(ch, SPELL_PANTHEON, spell_dur_medium_manual(level), APPLY_SAVING_SPELL, 6); spell_apply_modifier(ch, SPELL_PANTHEON, spell_dur_medium_manual(level), APPLY_AC, -15); spell_apply_modifier(ch, SPELL_PANTHEON, spell_dur_medium_manual(level), APPLY_NONE, 1); }
 ASPELL(spell_dimensional_lock) { if (ch && IN_ROOM(ch) != NOWHERE) room_add_effect(&world[IN_ROOM(ch)], ROOM_EFFECT_DIMENSIONAL_LOCK, spell_dur_medium_manual(level), 0); }
+
+ASPELL(spell_shadow_bind) { if (!ch || !victim) return; if (!mag_savingthrow(victim, SAVING_SPELL, 0)) { spell_apply_flag(victim, SPELL_SHADOW_BIND, spell_dur_medium_manual(level), AFF_ROOTED); spell_apply_modifier(victim, SPELL_SHADOW_BIND, spell_dur_medium_manual(level), APPLY_DEX, -2); } else spell_apply_flag(victim, SPELL_SHADOW_BIND, 1, AFF_ROOTED); act("Your shadow lashes out and binds $N in place!", FALSE, ch, 0, victim, TO_CHAR); act("Shadowy tendrils rise and bind your limbs!", FALSE, ch, 0, victim, TO_VICT); act("$n's shadow erupts and binds $N!", FALSE, ch, 0, victim, TO_NOTVICT); }
+
+ASPELL(spell_shadow_exchange)
+{
+  struct char_data *anchor = victim;
+  if (!ch || IN_ROOM(ch) == NOWHERE)
+    return;
+  if (!anchor || IN_ROOM(anchor) != IN_ROOM(ch) ||
+      !(is_shadow_servant(anchor, ch) || AFF_FLAGGED(anchor, AFF_MARKED))) {
+    send_to_char(ch, "You find no valid shadow exchange anchor.\r\n");
+    return;
+  }
+  spell_apply_modifier(ch, SPELL_SHADOW_EXCHANGE, 1, APPLY_HITROLL, 10);
+  act("You slip through shadow and exchange places in an instant!", FALSE, ch, 0, 0, TO_CHAR);
+  act("$n slips through shadow and reappears elsewhere!", FALSE, ch, 0, 0, TO_ROOM);
+}
+
+ASPELL(spell_dagger_rain) { int i, hits; if (!ch || !victim) return; hits = MIN(6, 3 + (level / 15)); act("A rain of shadow-forged blades tears into $N!", FALSE, ch, 0, victim, TO_CHAR); act("Shadow-forged blades rain into your flesh!", FALSE, ch, 0, victim, TO_VICT); act("$n sends a rain of shadow blades into $N!", FALSE, ch, 0, victim, TO_NOTVICT); for (i = 0; i < hits; i++) { int dam = spell_dmg_low_manual(level); if (mag_savingthrow(victim, SAVING_SPELL, 0)) dam /= 2; set_next_damage_type(DAM_SHADOW); if (damage(ch, victim, dam, SPELL_DAGGER_RAIN) == -1) break; } }
+
+ASPELL(spell_monarchs_pressure)
+{
+  struct char_data *tch, *next_tch;
+  if (!ch) return;
+  act("You release a crushing monarch's pressure over the battlefield!", FALSE, ch, 0, 0, TO_CHAR);
+  act("$n releases a crushing monarch's pressure!", FALSE, ch, 0, 0, TO_ROOM);
+  for (tch = world[IN_ROOM(ch)].people; tch; tch = next_tch) {
+    next_tch = tch->next_in_room;
+    if (!spell_is_enemy(ch, tch, SPELL_MONARCHS_PRESSURE))
+      continue;
+    if (!mag_savingthrow(tch, SAVING_SPELL, 0)) {
+      spell_apply_flag(tch, SPELL_MONARCHS_PRESSURE, spell_dur_short_manual(level), AFF_FEARFUL);
+      spell_apply_modifier(tch, SPELL_MONARCHS_PRESSURE, spell_dur_short_manual(level), APPLY_HITROLL, -6);
+      WAIT_STATE(tch, PULSE_VIOLENCE);
+      act("An overwhelming pressure crushes your will!", FALSE, ch, 0, tch, TO_VICT);
+    } else {
+      spell_apply_modifier(tch, SPELL_MONARCHS_PRESSURE, 1, APPLY_HITROLL, -2);
+    }
+  }
+}
+
+ASPELL(spell_shadow_domain) { if (!ch || IN_ROOM(ch) == NOWHERE) return; room_add_effect(&world[IN_ROOM(ch)], ROOM_EFFECT_SHADOW_DOMAIN, spell_dur_medium_manual(level), level); act("Darkness spreads outward as you establish a shadow domain!", FALSE, ch, 0, 0, TO_CHAR); act("Darkness spreads outward from $n into a living shadow domain!", FALSE, ch, 0, 0, TO_ROOM); }
+ASPELL(spell_force_grasp) { if (!ch || !victim) return; { int saved = mag_savingthrow(victim, SAVING_SPELL, 0), dam = spell_dmg_medium_manual(level); if (saved) dam /= 2; set_next_damage_type(DAM_FORCE); damage(ch, victim, dam, SPELL_FORCE_GRASP); if (!saved) spell_apply_flag(victim, SPELL_FORCE_GRASP, 1, AFF_STUNNED);} act("Invisible force crushes around $N!", FALSE, ch, 0, victim, TO_CHAR); act("Invisible force seizes and crushes you!", FALSE, ch, 0, victim, TO_VICT); act("$n seizes $N with an invisible crushing force!", FALSE, ch, 0, victim, TO_NOTVICT); }
+ASPELL(spell_shadow_step) { if (!ch) return; spell_apply_modifier(ch, SPELL_SHADOW_STEP, 1, APPLY_HITROLL, 8); act("You vanish into shadow, ready to strike from the dark!", FALSE, ch, 0, 0, TO_CHAR); act("$n vanishes into a blur of shadow!", FALSE, ch, 0, 0, TO_ROOM); }
+ASPELL(spell_black_heart) { int hp_loss, mana_gain; if (!ch) return; hp_loss = MAX(1, (GET_HIT(ch) * 20) / 100); GET_HIT(ch) = MAX(1, GET_HIT(ch) - hp_loss); mana_gain = (effective_max_mana(ch) * 35) / 100; GET_MANA(ch) = MIN(effective_max_mana(ch), GET_MANA(ch) + mana_gain); spell_apply_flag(ch, SPELL_BLACK_HEART, spell_dur_short_manual(level), AFF_EMPOWERED); act("You ignite the Black Heart within and trade blood for power!", FALSE, ch, 0, 0, TO_CHAR); act("$n's chest pulses with dark power as blood becomes mana!", FALSE, ch, 0, 0, TO_ROOM); }
+
+ASPELL(spell_call_shadow_legion)
+{
+  int i, count;
+  if (!ch) return;
+  for (i = 0; i < 4; i++) {
+    struct follow_type *f;
+    for (f = ch->followers; f; f = f->next) {
+      if (is_shadow_servant(f->follower, ch) && affected_by_spell(f->follower, SPELL_CALL_SHADOW_LEGION)) {
+        send_to_char(ch, "Only one shadow legion may be active at a time.\r\n");
+        return;
+      }
+    }
+  }
+  count = rand_number(2, 4);
+  for (i = 0; i < count; i++)
+    summon_shadow_servant(ch, MOBVNUM_SHADOW_SOLDIER, MAX(1, level - 6), 8, SPELL_CALL_SHADOW_LEGION);
+  act("Shadows rise at your command as your legion answers!", FALSE, ch, 0, 0, TO_CHAR);
+  act("Shadows rise from the ground to serve $n!", FALSE, ch, 0, 0, TO_ROOM);
+}
+
+ASPELL(spell_night_hunt) { if (!ch || !victim) return; if (mag_savingthrow(victim, SAVING_SPELL, 0)) return; spell_apply_flag(victim, SPELL_NIGHT_HUNT, spell_dur_long_manual(level), AFF_MARKED); act("You brand $N for the hunt!", FALSE, ch, 0, victim, TO_CHAR); act("A hunter's brand settles into your shadow!", FALSE, ch, 0, victim, TO_VICT); act("$n brands $N for the hunt!", FALSE, ch, 0, victim, TO_NOTVICT); }
+ASPELL(spell_dark_rebuke) { if (!ch || !victim) return; { int dam = spell_dmg_medium_manual(level); if (mag_savingthrow(victim, SAVING_SPELL, 0)) dam /= 2; set_next_damage_type(DAM_SHADOW); if (damage(ch, victim, dam, SPELL_DARK_REBUKE) != -1 && (victim->affected || GET_POS(victim) == POS_FIGHTING)) { set_next_damage_type(DAM_SHADOW); damage(ch, victim, spell_dmg_low_manual(level), SPELL_DARK_REBUKE); } } act("You rebuke $N with a lash of punishing shadow!", FALSE, ch, 0, victim, TO_CHAR); act("Punishing shadow lashes across your body!", FALSE, ch, 0, victim, TO_VICT); act("$n rebukes $N with punishing shadow!", FALSE, ch, 0, victim, TO_NOTVICT); }
+ASPELL(spell_execution_mark) { if (!ch || !victim) return; if (!mag_savingthrow(victim, SAVING_DEATH, 0)) spell_apply_flag(victim, SPELL_EXECUTION_MARK, spell_dur_medium_manual(level), AFF_MARKED); act("You place an execution mark upon $N!", FALSE, ch, 0, victim, TO_CHAR); act("A chilling execution mark settles over you!", FALSE, ch, 0, victim, TO_VICT); act("$n marks $N for execution!", FALSE, ch, 0, victim, TO_NOTVICT); }
+
+ASPELL(spell_shadow_extraction)
+{
+  struct obj_data *corpse = obj;
+  struct follow_type *f;
+  if (!ch) return;
+  if (!corpse || !IS_CORPSE(corpse)) {
+    send_to_char(ch, "You must target a fresh corpse in the room.\r\n");
+    return;
+  }
+  for (f = ch->followers; f; f = f->next) {
+    if (is_shadow_servant(f->follower, ch) && affected_by_spell(f->follower, SPELL_SHADOW_EXTRACTION)) {
+      send_to_char(ch, "You already control an extracted elite shadow.\r\n");
+      return;
+    }
+  }
+  summon_shadow_servant(ch, MOBVNUM_SHADOW_ELITE, MAX(1, level), 10, SPELL_SHADOW_EXTRACTION);
+  extract_obj(corpse);
+  act("You drag a shadow from the fallen and force it to rise!", FALSE, ch, 0, 0, TO_CHAR);
+  act("$n drags a shadow from the fallen and forces it to rise!", FALSE, ch, 0, 0, TO_ROOM);
+}
+
+ASPELL(spell_arise_greater)
+{
+  struct obj_data *corpse = obj;
+  struct follow_type *f;
+  if (!ch) return;
+  if (!corpse || !IS_CORPSE(corpse)) {
+    send_to_char(ch, "You must target a fresh strong corpse in the room.\r\n");
+    return;
+  }
+  for (f = ch->followers; f; f = f->next) {
+    if (is_shadow_servant(f->follower, ch) && affected_by_spell(f->follower, SPELL_ARISE_GREATER)) {
+      send_to_char(ch, "Only one greater arisen servant can answer you.\r\n");
+      return;
+    }
+  }
+  summon_shadow_servant(ch, MOBVNUM_GREATER_SHADOW, MAX(1, level + 2), 12, SPELL_ARISE_GREATER);
+  extract_obj(corpse);
+  act("You command the fallen to arise as a greater shadow!", FALSE, ch, 0, 0, TO_CHAR);
+  act("$n commands the fallen to arise as a greater shadow!", FALSE, ch, 0, 0, TO_ROOM);
+}
+
+ASPELL(spell_monarchs_authority) { struct char_data *tch,*next_tch; if (!ch) return; act("You exert the crushing authority of a monarch over the battlefield!", FALSE, ch, 0, 0, TO_CHAR); act("$n exerts a crushing monarch's authority over the battlefield!", FALSE, ch, 0, 0, TO_ROOM); for (tch = world[IN_ROOM(ch)].people; tch; tch = next_tch) { int s, dam; next_tch = tch->next_in_room; if (!spell_is_enemy(ch, tch, SPELL_MONARCHS_AUTHORITY)) continue; s = mag_savingthrow(tch, SAVING_SPELL, 0); dam = spell_dmg_medium_manual(level); if (s) dam /= 2; set_next_damage_type(DAM_FORCE); if (damage(ch, tch, dam, SPELL_MONARCHS_AUTHORITY) == -1) continue; if (!s) { spell_apply_flag(tch, SPELL_MONARCHS_AUTHORITY, spell_dur_short_manual(level), AFF_ROOTED); WAIT_STATE(tch, PULSE_VIOLENCE);} } }
+ASPELL(spell_rulers_hand) { if (!ch || !victim) return; { int s = mag_savingthrow(victim, SAVING_SPELL, 0), dam = spell_dmg_high_manual(level); if (s) dam /= 2; set_next_damage_type(DAM_FORCE); damage(ch, victim, dam, SPELL_RULERS_HAND); if (!s) spell_apply_flag(victim, SPELL_RULERS_HAND, 1, AFF_STUNNED);} act("You seize $N with the invisible force of the Ruler's Hand!", FALSE, ch, 0, victim, TO_CHAR); act("Invisible force seizes your body and crushes inward!", FALSE, ch, 0, victim, TO_VICT); act("$n seizes $N with an invisible crushing force!", FALSE, ch, 0, victim, TO_NOTVICT); }
+ASPELL(spell_shadow_lance) { if (!ch || !victim) return; { int s = mag_savingthrow(victim, SAVING_SPELL, 0), dam = spell_dmg_high_manual(level); if (s) dam /= 2; set_next_damage_type(DAM_SHADOW); if (damage(ch, victim, dam, SPELL_SHADOW_LANCE) != -1 && !s) spell_apply_modifier(victim, SPELL_SHADOW_LANCE, spell_dur_short_manual(level), APPLY_AC, 10);} act("You shape a razor-thin lance of shadow and drive it into $N!", FALSE, ch, 0, victim, TO_CHAR); act("A razor-thin lance of shadow pierces straight through you!", FALSE, ch, 0, victim, TO_VICT); act("$n drives a razor-thin lance of shadow into $N!", FALSE, ch, 0, victim, TO_NOTVICT); }
+ASPELL(spell_shadow_burst) { struct char_data *tch,*next_tch; int bonus = MIN(10, count_shadow_servants_in_room(ch) * 2); if (!ch) return; act("You detonate the darkness around you in a Shadow Burst!", FALSE, ch, 0, 0, TO_CHAR); act("$n detonates the darkness in a violent shadow burst!", FALSE, ch, 0, 0, TO_ROOM); for (tch = world[IN_ROOM(ch)].people; tch; tch = next_tch) { int dam; next_tch = tch->next_in_room; if (!spell_is_enemy(ch, tch, SPELL_SHADOW_BURST)) continue; dam = spell_dmg_medium_manual(level) + bonus; if (mag_savingthrow(tch, SAVING_SPELL, 0)) dam /= 2; set_next_damage_type(DAM_SHADOW); damage(ch, tch, dam, SPELL_SHADOW_BURST);} }
+ASPELL(spell_shadow_storm) { if (!ch || IN_ROOM(ch) == NOWHERE) return; room_add_effect(&world[IN_ROOM(ch)], ROOM_EFFECT_SHADOW_STORM, spell_dur_medium_manual(level), 0); act("You call forth a violent storm of living shadow!", FALSE, ch, 0, 0, TO_CHAR); act("$n calls forth a violent storm of living shadow!", FALSE, ch, 0, 0, TO_ROOM); }
+ASPELL(spell_fatal_strike) { if (!ch || !victim) return; { int dam = spell_dmg_high_manual(level); if (GET_HIT(victim) * 100 <= GET_MAX_HIT(victim) * 30) dam += spell_dmg_medium_manual(level); if (mag_savingthrow(victim, SAVING_SPELL, 0)) dam /= 2; set_next_damage_type(DAM_FORCE); damage(ch, victim, dam, SPELL_FATAL_STRIKE);} act("You drive a fatal strike into $N's opening!", FALSE, ch, 0, victim, TO_CHAR); act("A perfectly placed killing blow tears into you!", FALSE, ch, 0, victim, TO_VICT); act("$n drives a fatal strike into $N!", FALSE, ch, 0, victim, TO_NOTVICT); }
+ASPELL(spell_dominion_of_shadows) { if (!ch) return; spell_apply_modifier(ch, SPELL_DOMINION_OF_SHADOWS, spell_dur_medium_manual(level), APPLY_SAVING_SPELL, -3); spell_apply_modifier(ch, SPELL_DOMINION_OF_SHADOWS, spell_dur_medium_manual(level), APPLY_NONE, 1); act("The dominion of shadows gathers beneath your rule!", FALSE, ch, 0, 0, TO_CHAR); act("Shadows thicken and bow beneath $n's dominion!", FALSE, ch, 0, 0, TO_ROOM); }
+
+ASPELL(spell_shadow_recall)
+{
+  struct follow_type *f;
+  if (!ch || IN_ROOM(ch) == NOWHERE)
+    return;
+  for (f = ch->followers; f; f = f->next) {
+    struct char_data *mob = f->follower;
+    if (!is_shadow_servant(mob, ch) || IN_ROOM(mob) == NOWHERE)
+      continue;
+    if (world[IN_ROOM(mob)].zone != world[IN_ROOM(ch)].zone)
+      continue;
+    if (IN_ROOM(mob) == IN_ROOM(ch))
+      continue;
+    act("$n slips through the shadows.", FALSE, mob, 0, 0, TO_ROOM);
+    char_from_room(mob);
+    char_to_room(mob, IN_ROOM(ch));
+    act("$n slips from the edges of the room.", FALSE, mob, 0, 0, TO_ROOM);
+  }
+  act("You call your shadows back to your side!", FALSE, ch, 0, 0, TO_CHAR);
+  act("Dark shapes slip from the edges of the room to gather around $n!", FALSE, ch, 0, 0, TO_ROOM);
+}
+
+ASPELL(spell_shadow_regenesis) { if (!ch) return; spell_apply_flag(ch, SPELL_SHADOW_REGENESIS, spell_dur_long_manual(level), AFF_REGENERATING); spell_apply_modifier(ch, SPELL_SHADOW_REGENESIS, spell_dur_long_manual(level), APPLY_NONE, 4 + (level / 4)); act("Your body sinks into shadow and begins to regenerate!", FALSE, ch, 0, 0, TO_CHAR); act("$n's wounds seem to close in shadow.", FALSE, ch, 0, 0, TO_ROOM); }
+ASPELL(spell_assassins_intent) { if (!ch) return; spell_apply_modifier(ch, SPELL_ASSASSINS_INTENT, spell_dur_medium_manual(level), APPLY_HITROLL, 5); spell_apply_modifier(ch, SPELL_ASSASSINS_INTENT, spell_dur_medium_manual(level), APPLY_DAMROLL, 3); act("A killing stillness settles into your movements.", FALSE, ch, 0, 0, TO_CHAR); act("$n grows unnervingly still and lethal.", FALSE, ch, 0, 0, TO_ROOM); }
+ASPELL(spell_blood_dagger_tempest) { struct char_data *tch,*next_tch; if (!ch) return; act("You unleash a tempest of blood-dark daggers across the room!", FALSE, ch, 0, 0, TO_CHAR); act("$n unleashes a tempest of blood-dark daggers!", FALSE, ch, 0, 0, TO_ROOM); for (tch = world[IN_ROOM(ch)].people; tch; tch = next_tch) { int j; next_tch = tch->next_in_room; if (!spell_is_enemy(ch, tch, SPELL_BLOOD_DAGGER_TEMPEST)) continue; for (j = 0; j < 2; j++) { int dam = spell_dmg_low_manual(level); if (mag_savingthrow(tch, SAVING_SPELL, 0)) dam /= 2; set_next_damage_type(DAM_SHADOW); if (damage(ch, tch, dam, SPELL_BLOOD_DAGGER_TEMPEST) == -1) break; } } GET_HIT(ch) = MAX(1, GET_HIT(ch) - level); }
+ASPELL(spell_chain_of_subjugation) { if (!ch || !victim) return; if (!mag_savingthrow(victim, SAVING_SPELL, 0)) { spell_apply_flag(victim, SPELL_CHAIN_OF_SUBJUGATION, spell_dur_medium_manual(level), AFF_ROOTED); spell_apply_modifier(victim, SPELL_CHAIN_OF_SUBJUGATION, spell_dur_medium_manual(level), APPLY_HITROLL, -4); spell_apply_modifier(victim, SPELL_CHAIN_OF_SUBJUGATION, spell_dur_medium_manual(level), APPLY_DAMROLL, -4); } else spell_apply_flag(victim, SPELL_CHAIN_OF_SUBJUGATION, 1, AFF_ROOTED); act("Chains of shadow clamp down and subjugate $N!", FALSE, ch, 0, victim, TO_CHAR); act("Chains of shadow bind your body and crush your will!", FALSE, ch, 0, victim, TO_VICT); act("Chains of shadow erupt around $N at $n's command!", FALSE, ch, 0, victim, TO_NOTVICT); }
+ASPELL(spell_sovereigns_step) { if (!ch) return; spell_apply_modifier(ch, SPELL_SOVEREIGNS_STEP, spell_dur_medium_manual(level), APPLY_NONE, 10); act("You move with the effortless superiority of a sovereign.", FALSE, ch, 0, 0, TO_CHAR); act("$n begins moving with impossible precision.", FALSE, ch, 0, 0, TO_ROOM); }
+
+ASPELL(spell_kings_command)
+{
+  struct follow_type *f;
+  if (!ch) return;
+  for (f = ch->followers; f; f = f->next) {
+    struct char_data *mob = f->follower;
+    if (!mob || IN_ROOM(mob) != IN_ROOM(ch) || mob->master != ch || !AFF_FLAGGED(mob, AFF_CHARM))
+      continue;
+    spell_apply_modifier(mob, SPELL_KINGS_COMMAND, spell_dur_short_manual(level), APPLY_HITROLL, 4);
+    spell_apply_modifier(mob, SPELL_KINGS_COMMAND, spell_dur_short_manual(level), APPLY_DAMROLL, 4);
+    remove_flagged_affects(mob, AFF_FEARFUL);
+  }
+  act("Your command crashes out like a king's decree!", FALSE, ch, 0, 0, TO_CHAR);
+  act("$n's summons stiffen with deadly discipline under a king's command!", FALSE, ch, 0, 0, TO_ROOM);
+}
+
+ASPELL(spell_detect_kill_intent) { if (!ch) return; spell_apply_flag(ch, SPELL_DETECT_KILL_INTENT, spell_dur_medium_manual(level), AFF_TRUESIGHT); spell_apply_modifier(ch, SPELL_DETECT_KILL_INTENT, spell_dur_medium_manual(level), APPLY_SAVING_SPELL, -4); spell_apply_modifier(ch, SPELL_DETECT_KILL_INTENT, spell_dur_medium_manual(level), APPLY_HITROLL, 4); act("Your senses sharpen to detect even killing intent.", FALSE, ch, 0, 0, TO_CHAR); act("$n's awareness sharpens unnaturally.", FALSE, ch, 0, 0, TO_ROOM); }
+ASPELL(spell_mutilate) { if (!ch || !victim) return; { int s = mag_savingthrow(victim, SAVING_SPELL, 0), dam = spell_dmg_high_manual(level); if (s) dam /= 2; set_next_damage_type(DAM_SHADOW); if (damage(ch, victim, dam, SPELL_MUTILATE) != -1 && !s) { spell_apply_modifier(victim, SPELL_MUTILATE, spell_dur_short_manual(level), APPLY_STR, -2); spell_apply_modifier(victim, SPELL_MUTILATE, spell_dur_short_manual(level), APPLY_DEX, -2);} } act("You mutilate $N with a vicious shadow-infused strike!", FALSE, ch, 0, victim, TO_CHAR); act("A vicious shadow-infused strike tears your body apart!", FALSE, ch, 0, victim, TO_VICT); act("$n mutilates $N with a vicious shadow-infused strike!", FALSE, ch, 0, victim, TO_NOTVICT); }
+ASPELL(spell_shadow_armor) { if (!ch || !victim) victim = ch; if (!victim) return; spell_apply_modifier(victim, SPELL_SHADOW_ARMOR, spell_dur_long_manual(level), APPLY_AC, -25); spell_apply_modifier(victim, SPELL_SHADOW_ARMOR, spell_dur_long_manual(level), APPLY_NONE, 1); act("Living shadow forms a suit of armor around $N.", FALSE, ch, 0, victim, TO_CHAR); act("Living shadow hardens around you as armor.", FALSE, ch, 0, victim, TO_VICT); act("Living shadow hardens around $N as armor.", FALSE, ch, 0, victim, TO_NOTVICT); }
+ASPELL(spell_total_occultation) { if (!ch) return; spell_apply_flag(ch, SPELL_TOTAL_OCCULTATION, spell_dur_short_manual(level), AFF_INVISIBLE); spell_apply_flag(ch, SPELL_TOTAL_OCCULTATION, spell_dur_short_manual(level), AFF_HIDE); spell_apply_modifier(ch, SPELL_TOTAL_OCCULTATION, spell_dur_short_manual(level), APPLY_NONE, 1); act("You vanish completely into total occultation.", FALSE, ch, 0, 0, TO_CHAR); act("$n disappears into complete occultation.", FALSE, ch, 0, 0, TO_ROOM); }
+
+ASPELL(spell_domain_break)
+{
+  struct room_effect_data *eff, *prev = NULL;
+  int priorities[] = { ROOM_EFFECT_SHADOW_DOMAIN, ROOM_EFFECT_NULL_FIELD, ROOM_EFFECT_SILENCE_FIELD, ROOM_EFFECT_TOXIC_CLOUD, ROOM_EFFECT_MIASMA, ROOM_EFFECT_WALL_OF_FIRE, ROOM_EFFECT_STATIC_FIELD };
+  int i;
+  if (!ch || IN_ROOM(ch) == NOWHERE)
+    return;
+  for (i = 0; i < (int)(sizeof(priorities)/sizeof(priorities[0])); i++) {
+    prev = NULL;
+    for (eff = world[IN_ROOM(ch)].effects; eff; prev = eff, eff = eff->next) {
+      if (eff->effect_type != priorities[i])
+        continue;
+      if (prev) prev->next = eff->next;
+      else world[IN_ROOM(ch)].effects = eff->next;
+      free(eff);
+      act("You tear apart the dominant field in the room!", FALSE, ch, 0, 0, TO_CHAR);
+      act("$n tears apart the magical field saturating the room!", FALSE, ch, 0, 0, TO_ROOM);
+      return;
+    }
+  }
+  send_to_char(ch, "There is no hostile room field to break here.\r\n");
+}
+
+ASPELL(spell_hunters_instinct) { if (!ch) return; spell_apply_modifier(ch, SPELL_HUNTERS_INSTINCT, spell_dur_medium_manual(level), APPLY_HITROLL, 3); spell_apply_modifier(ch, SPELL_HUNTERS_INSTINCT, spell_dur_medium_manual(level), APPLY_SAVING_SPELL, -3); act("Your hunter's instinct surges to the surface.", FALSE, ch, 0, 0, TO_CHAR); act("$n's eyes sharpen with predatory instinct.", FALSE, ch, 0, 0, TO_ROOM); }

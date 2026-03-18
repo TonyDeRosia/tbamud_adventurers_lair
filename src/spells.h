@@ -230,32 +230,76 @@
 #define SPELL_TRIPLE_MAXIMIZE_MAGIC  189
 #define SPELL_PANTHEON               190
 #define SPELL_DIMENSIONAL_LOCK       191
+#define SPELL_SHADOW_BIND            192
+#define SPELL_SHADOW_EXCHANGE        193
+#define SPELL_DAGGER_RAIN            194
+#define SPELL_MONARCHS_PRESSURE      195
+#define SPELL_SHADOW_DOMAIN          196
+#define SPELL_FORCE_GRASP            197
+#define SPELL_SHADOW_STEP            198
+#define SPELL_BLACK_HEART            199
+#define SPELL_CALL_SHADOW_LEGION     200
+#define SPELL_NIGHT_HUNT             201
+#define SPELL_DARK_REBUKE            202
+#define SPELL_EXECUTION_MARK         203
+#define SPELL_SHADOW_EXTRACTION      204
+#define SPELL_ARISE_GREATER          205
+#define SPELL_MONARCHS_AUTHORITY     206
+#define SPELL_RULERS_HAND            207
+#define SPELL_SHADOW_LANCE           208
+#define SPELL_SHADOW_BURST           209
+#define SPELL_SHADOW_STORM           210
+#define SPELL_FATAL_STRIKE           211
+#define SPELL_DOMINION_OF_SHADOWS    212
+#define SPELL_SHADOW_RECALL          213
+#define SPELL_SHADOW_REGENESIS       214
+#define SPELL_ASSASSINS_INTENT       215
+#define SPELL_BLOOD_DAGGER_TEMPEST   216
+#define SPELL_CHAIN_OF_SUBJUGATION   217
+#define SPELL_SOVEREIGNS_STEP        218
+#define SPELL_KINGS_COMMAND          219
+#define SPELL_DETECT_KILL_INTENT     220
+#define SPELL_MUTILATE               221
+#define SPELL_SHADOW_ARMOR           222
+#define SPELL_TOTAL_OCCULTATION      223
+#define SPELL_DOMAIN_BREAK           224
+#define SPELL_HUNTERS_INSTINCT       225
 /** Total Number of defined spells */
-#define NUM_SPELLS                   191
+#define NUM_SPELLS                   225
 
 /* Insert new spells here, up to MAX_SPELLS */
-#define MAX_SPELLS		    198
+#define MAX_SPELLS		    230
 
 /* PLAYER SKILLS - Numbered from MAX_SPELLS+1 to MAX_SKILLS */
-#define SKILL_BACKSTAB              199 /* Reserved Skill[] DO NOT CHANGE */
-#define SKILL_BASH                  200 /* Reserved Skill[] DO NOT CHANGE */
-#define SKILL_HIDE                  201 /* Reserved Skill[] DO NOT CHANGE */
-#define SKILL_KICK                  202 /* Reserved Skill[] DO NOT CHANGE */
-#define SKILL_PICK_LOCK             203 /* Reserved Skill[] DO NOT CHANGE */
-#define SKILL_WHIRLWIND             204 
-#define SKILL_RESCUE                205 /* Reserved Skill[] DO NOT CHANGE */
-#define SKILL_SNEAK                 206 /* Reserved Skill[] DO NOT CHANGE */
-#define SKILL_STEAL                 207 /* Reserved Skill[] DO NOT CHANGE */
-#define SKILL_TRACK                 208 /* Reserved Skill[] DO NOT CHANGE */
-#define SKILL_BANDAGE               209 /* Reserved Skill[] DO NOT CHANGE */
+#define SKILL_BACKSTAB              231 /* Reserved Skill[] DO NOT CHANGE */
+#define SKILL_BASH                  232 /* Reserved Skill[] DO NOT CHANGE */
+#define SKILL_HIDE                  233 /* Reserved Skill[] DO NOT CHANGE */
+#define SKILL_KICK                  234 /* Reserved Skill[] DO NOT CHANGE */
+#define SKILL_PICK_LOCK             235 /* Reserved Skill[] DO NOT CHANGE */
+#define SKILL_WHIRLWIND             236 
+#define SKILL_RESCUE                237 /* Reserved Skill[] DO NOT CHANGE */
+#define SKILL_SNEAK                 238 /* Reserved Skill[] DO NOT CHANGE */
+#define SKILL_STEAL                 239 /* Reserved Skill[] DO NOT CHANGE */
+#define SKILL_TRACK                 240 /* Reserved Skill[] DO NOT CHANGE */
+#define SKILL_BANDAGE               241 /* Reserved Skill[] DO NOT CHANGE */
 
-#define SKILL_DUAL_WIELD            210 /* Reserved Skill[] DO NOT CHANGE */
-#define SKILL_RECALL                211 /* Reserved Skill[] DO NOT CHANGE */
-#define SKILL_OVERLORD_PRESENCE     212
-#define SKILL_SUPREME_CASTER_DISCIPLINE 213
-#define SKILL_UNDEAD_COMMAND        214
-#define SKILL_TACTICAL_SPELL_MEMORY 215
-#define SKILL_DREAD_DOMINION        216
+#define SKILL_DUAL_WIELD            242 /* Reserved Skill[] DO NOT CHANGE */
+#define SKILL_RECALL                243 /* Reserved Skill[] DO NOT CHANGE */
+#define SKILL_OVERLORD_PRESENCE     244
+#define SKILL_SUPREME_CASTER_DISCIPLINE 245
+#define SKILL_UNDEAD_COMMAND        246
+#define SKILL_TACTICAL_SPELL_MEMORY 247
+#define SKILL_DREAD_DOMINION        248
+#define SKILL_SHADOW_COMMANDER      249
+#define SKILL_PREDATORS_ADVANCE     250
+#define SKILL_MONARCH_REFLEXES      251
+#define SKILL_RELENTLESS_HUNT       252
+#define SKILL_SHADOW_RESERVOIR      253
+#define SKILL_SHADOW_SURGE          254
+#define SKILL_CHAIN_ASSASSAULT      255
+#define SKILL_SOVEREIGN_PRESSURE    256
+#define SKILL_KILL_WINDOW           257
+#define SKILL_LEGION_MASTERY        258
 /* New skills may be added here up to MAX_SKILLS (200) */
 
 /* NON-PLAYER AND OBJECT SPELLS AND SKILLS: The practice levels for the spells
@@ -315,6 +359,9 @@
 #define MOBVNUM_CELESTIAL_GUARDIAN    9311
 #define MOBVNUM_ELEMENTAL_TITAN       9312
 #define MOBVNUM_GREATER_UNDEAD        9313
+#define MOBVNUM_SHADOW_SOLDIER        9314
+#define MOBVNUM_GREATER_SHADOW        9315
+#define MOBVNUM_SHADOW_ELITE          9316
 
 /***
  **Possible Targets:
@@ -412,7 +459,9 @@ enum room_effect_type {
   ROOM_EFFECT_MIASMA,
   ROOM_EFFECT_GRAVITY_WELL,
   ROOM_EFFECT_ACID_RAIN,
-  ROOM_EFFECT_DIMENSIONAL_LOCK
+  ROOM_EFFECT_DIMENSIONAL_LOCK,
+  ROOM_EFFECT_SHADOW_DOMAIN,
+  ROOM_EFFECT_SHADOW_STORM
 };
 
 ASPELL(spell_create_water);
@@ -501,6 +550,40 @@ ASPELL(spell_silent_magic);
 ASPELL(spell_triple_maximize_magic);
 ASPELL(spell_pantheon);
 ASPELL(spell_dimensional_lock);
+ASPELL(spell_shadow_bind);
+ASPELL(spell_shadow_exchange);
+ASPELL(spell_dagger_rain);
+ASPELL(spell_monarchs_pressure);
+ASPELL(spell_shadow_domain);
+ASPELL(spell_force_grasp);
+ASPELL(spell_shadow_step);
+ASPELL(spell_black_heart);
+ASPELL(spell_call_shadow_legion);
+ASPELL(spell_night_hunt);
+ASPELL(spell_dark_rebuke);
+ASPELL(spell_execution_mark);
+ASPELL(spell_shadow_extraction);
+ASPELL(spell_arise_greater);
+ASPELL(spell_monarchs_authority);
+ASPELL(spell_rulers_hand);
+ASPELL(spell_shadow_lance);
+ASPELL(spell_shadow_burst);
+ASPELL(spell_shadow_storm);
+ASPELL(spell_fatal_strike);
+ASPELL(spell_dominion_of_shadows);
+ASPELL(spell_shadow_recall);
+ASPELL(spell_shadow_regenesis);
+ASPELL(spell_assassins_intent);
+ASPELL(spell_blood_dagger_tempest);
+ASPELL(spell_chain_of_subjugation);
+ASPELL(spell_sovereigns_step);
+ASPELL(spell_kings_command);
+ASPELL(spell_detect_kill_intent);
+ASPELL(spell_mutilate);
+ASPELL(spell_shadow_armor);
+ASPELL(spell_total_occultation);
+ASPELL(spell_domain_break);
+ASPELL(spell_hunters_instinct);
 void show_identify_item(struct char_data *ch, struct obj_data *obj, enum identify_detail_level detail);
 
 /* basic magic calling functions */

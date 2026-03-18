@@ -85,6 +85,8 @@ static void make_corpse(struct char_data *ch);
 static void process_round_effects(void);
 static int find_affect_modifier_for_flag(struct char_data *ch, int aff_flag, int fallback);
 static int remove_affects_by_flag(struct char_data *ch, int aff_flag);
+static int is_shadow_servant_for(struct char_data *owner, struct char_data *mob);
+static int count_shadow_servants_for(struct char_data *ch);
 static void change_alignment(struct char_data *ch, struct char_data *victim);
 static void group_gain(struct char_data *ch, struct char_data *victim);
 static void solo_gain(struct char_data *ch, struct char_data *victim);
@@ -141,6 +143,29 @@ static const char *severity_verb_base(int tier)
     case 9: return "pulverize";
     default: return "hit";
   }
+}
+
+static int is_shadow_servant_for(struct char_data *owner, struct char_data *mob)
+{
+  if (!owner || !mob || !IS_NPC(mob) || mob->master != owner)
+    return FALSE;
+  if (!AFF_FLAGGED(mob, AFF_CHARM) || GET_SUMMON_TIMER(mob) <= 0)
+    return FALSE;
+  return affected_by_spell(mob, SPELL_CALL_SHADOW_LEGION)
+      || affected_by_spell(mob, SPELL_SHADOW_EXTRACTION)
+      || affected_by_spell(mob, SPELL_ARISE_GREATER);
+}
+
+static int count_shadow_servants_for(struct char_data *ch)
+{
+  struct follow_type *f;
+  int n = 0;
+  if (!ch)
+    return 0;
+  for (f = ch->followers; f; f = f->next)
+    if (is_shadow_servant_for(ch, f->follower))
+      n++;
+  return n;
 }
 
 static const char *severity_verb_third(int tier)
@@ -690,6 +715,24 @@ struct char_data *i;
   if (killer) {
     autoquest_trigger_check(killer, NULL, NULL, AQ_MOB_SAVE);
     autoquest_trigger_check(killer, NULL, NULL, AQ_ROOM_CLEAR);
+    if (affected_by_spell(killer, SPELL_SHADOW_REGENESIS))
+      GET_MANA(killer) = MIN(effective_max_mana(killer), GET_MANA(killer) + (GET_LEVEL(killer) / 2));
+    if (GET_SKILL(killer, SKILL_SHADOW_SURGE) > 0 && count_shadow_servants_for(killer) > 0) {
+      struct affected_type af;
+      int stacks = 0;
+      struct affected_type *taf;
+      for (taf = killer->affected; taf; taf = taf->next)
+        if (taf->spell == SKILL_SHADOW_SURGE && taf->location == APPLY_DAMROLL)
+          stacks++;
+      if (stacks < 3) {
+        new_affect(&af);
+        af.spell = SKILL_SHADOW_SURGE;
+        af.duration = 2 + (GET_LEVEL(killer) / 10);
+        af.location = APPLY_DAMROLL;
+        af.modifier = 2;
+        affect_join(killer, &af, FALSE, FALSE, TRUE, FALSE);
+      }
+    }
   }
 }
 
@@ -1273,6 +1316,21 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
     act("$n strikes one of $N's mirror images, which shatters!", FALSE, ch, 0, victim, TO_NOTVICT);
     dam = 0;
   }
+  if (dam > 0 && IS_WEAPON(attacktype) && victim != ch &&
+      GET_SKILL(victim, SKILL_MONARCH_REFLEXES) > 0 &&
+      !affected_by_spell(victim, SKILL_MONARCH_REFLEXES) &&
+      rand_number(1, 100) <= 10) {
+    struct affected_type af;
+    new_affect(&af);
+    af.spell = SKILL_MONARCH_REFLEXES;
+    af.duration = 100;
+    af.location = APPLY_NONE;
+    af.modifier = 1;
+    affect_join(victim, &af, FALSE, FALSE, FALSE, FALSE);
+    act("You evade the opening strike with monarch reflexes!", FALSE, victim, 0, ch, TO_CHAR);
+    act("$N slips past your opening strike with terrifying reflexes!", FALSE, ch, 0, victim, TO_CHAR);
+    dam = 0;
+  }
 
   if (!IS_NPC(ch) && ch != victim)
     ai_actor_record_room_crime(NULL, ch, MEM_WANTED);
@@ -1304,13 +1362,73 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
   if (AFF_FLAGGED(victim, AFF_SANCTUARY) && dam >= 2)
     dam /= 2;
 
-  if (dam > 0 && AFF_FLAGGED(victim, AFF_MARKED))
-    dam = (dam * 6) / 5;
+  if (dam > 0 && AFF_FLAGGED(victim, AFF_MARKED)) {
+    if (affected_by_spell(victim, SPELL_EXECUTION_MARK) &&
+        GET_HIT(victim) * 100 <= GET_MAX_HIT(victim) * 25)
+      dam = (dam * 14) / 10;
+    else
+      dam = (dam * 6) / 5;
+  }
+
+  if (dam > 0 && ch && ch != victim && affected_by_spell(ch, SPELL_SHADOW_STEP)) {
+    dam = (dam * 110) / 100;
+    affect_from_char(ch, SPELL_SHADOW_STEP);
+  }
+  if (dam > 0 && ch && ch != victim && affected_by_spell(ch, SPELL_SHADOW_EXCHANGE)) {
+    affect_from_char(ch, SPELL_SHADOW_EXCHANGE);
+  }
+  if (dam > 0 && ch && ch != victim && affected_by_spell(ch, SPELL_TOTAL_OCCULTATION)) {
+    dam = (dam * 120) / 100;
+    affect_from_char(ch, SPELL_TOTAL_OCCULTATION);
+  }
+
+  if (dam > 0 && ch && ch != victim && GET_SKILL(ch, SKILL_PREDATORS_ADVANCE) > 0 &&
+      GET_HIT(victim) * 100 <= GET_MAX_HIT(victim) * 30)
+    dam = (dam * 110) / 100;
+
+  if (dam > 0 && ch && ch != victim && GET_SKILL(ch, SKILL_KILL_WINDOW) > 0 &&
+      GET_HIT(victim) * 100 <= GET_MAX_HIT(victim) * 25)
+    dam += 4;
+
+  if (dam > 0 && ch && ch != victim && affected_by_spell(ch, SPELL_ASSASSINS_INTENT) &&
+      (AFF_FLAGGED(victim, AFF_BLIND) || AFF_FLAGGED(victim, AFF_BLINDED_MAGICAL) ||
+       AFF_FLAGGED(victim, AFF_ROOTED) || AFF_FLAGGED(victim, AFF_STUNNED) ||
+       AFF_FLAGGED(victim, AFF_MARKED)))
+    dam = (dam * 110) / 100;
+
+  if (dam > 0 && ch && ch != victim && affected_by_spell(ch, SPELL_HUNTERS_INSTINCT) &&
+      GET_LEVEL(victim) > GET_LEVEL(ch))
+    dam = (dam * 110) / 100;
+
+  if (dam > 0 && ch && ch != victim && affected_by_spell(ch, SPELL_DOMINION_OF_SHADOWS) &&
+      damage_type == DAM_SHADOW)
+    dam = (dam * 105) / 100;
+
+  if (dam > 0 && ch && ch != victim && attacktype > 0 && attacktype <= MAX_SPELLS &&
+      GET_SKILL(ch, SKILL_CHAIN_ASSASSAULT) > 0 &&
+      affected_by_spell(ch, SKILL_CHAIN_ASSASSAULT) &&
+      !IS_SET(spell_info[attacktype].targets, TAR_IGNORE) &&
+      IS_SET(spell_info[attacktype].targets, TAR_CHAR_ROOM)) {
+    dam = (dam * 110) / 100;
+    affect_from_char(ch, SKILL_CHAIN_ASSASSAULT);
+  }
 
   if (dam > 0 && ch && victim &&
       GET_SKILL(ch, SKILL_OVERLORD_PRESENCE) > 0 &&
       IS_NPC(victim) && GET_LEVEL(ch) >= GET_LEVEL(victim) + 10)
     dam += 2;
+
+  if (dam > 0 && ch && IS_NPC(ch) && ch->master && is_shadow_servant_for(ch->master, ch)) {
+    if (GET_SKILL(ch->master, SKILL_SHADOW_COMMANDER) > 0)
+      dam = (dam * 110) / 100;
+    if (affected_by_spell(ch->master, SPELL_DOMINION_OF_SHADOWS))
+      dam = (dam * 110) / 100;
+    if (room_has_effect(&world[IN_ROOM(ch)], ROOM_EFFECT_SHADOW_DOMAIN))
+      dam = (dam * 110) / 100;
+    if (GET_SKILL(ch->master, SKILL_LEGION_MASTERY) > 0 &&
+        count_shadow_servants_for(ch->master) >= 3)
+      dam = (dam * 105) / 100;
+  }
 
   if (dam > 0 && ch && ch != victim && affected_by_spell(ch, SPELL_TIME_STOP)) {
     struct char_data *tch;
@@ -1349,6 +1467,9 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
       dam = (dam * 6) / 10;
     else if (AFF_FLAGGED(victim, AFF_ELEMENTAL_WARD_ACID) && damage_type == DAM_ACID)
       dam = (dam * 6) / 10;
+    if (affected_by_spell(victim, SPELL_SHADOW_ARMOR) &&
+        (damage_type == DAM_SHADOW || damage_type == DAM_FORCE))
+      dam = (dam * 8) / 10;
   }
 
   if (dam > 0 && AFF_FLAGGED(victim, AFF_WARDED) &&
@@ -1369,6 +1490,15 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
 
   /* Melee crits (only weapon attacks) */
   if (dam > 0 && ch && victim && ch != victim && IS_WEAPON(attacktype)) {
+    if (GET_SKILL(ch, SKILL_CHAIN_ASSASSAULT) > 0) {
+      struct affected_type af;
+      new_affect(&af);
+      af.spell = SKILL_CHAIN_ASSASSAULT;
+      af.duration = 1;
+      af.location = APPLY_NONE;
+      af.modifier = 1;
+      affect_join(ch, &af, FALSE, FALSE, FALSE, FALSE);
+    }
     int mult = 200;
     if (crit_check_melee(ch, &mult)) {
       dam = (dam * mult) / 100;
@@ -1762,6 +1892,9 @@ static void process_round_effects(void)
     if (!IS_NPC(i))
       GET_HP_LAST_ROUND(i) = GET_HIT(i);
 
+    if (!FIGHTING(i) && affected_by_spell(i, SKILL_MONARCH_REFLEXES))
+      affect_from_char(i, SKILL_MONARCH_REFLEXES);
+
     tick_spell_cooldowns(i);
 
     if (AFF_FLAGGED(i, AFF_BURNING)) {
@@ -1809,6 +1942,15 @@ static void process_round_effects(void)
         GET_HIT(i) = MIN(GET_MAX_HIT(i), GET_HIT(i) + regen);
     }
 
+    if (affected_by_spell(i, SPELL_SOVEREIGNS_STEP))
+      GET_MOVE(i) = MIN(GET_MAX_MOVE(i), GET_MOVE(i) + 10);
+
+    if (FIGHTING(i) && AFF_FLAGGED(FIGHTING(i), AFF_MARKED)) {
+      GET_MOVE(i) = MIN(GET_MAX_MOVE(i), GET_MOVE(i) + MAX(1, GET_MAX_MOVE(i) / 10));
+      if (GET_SKILL(i, SKILL_RELENTLESS_HUNT) > 0)
+        GET_MOVE(i) = MIN(GET_MAX_MOVE(i), GET_MOVE(i) + 5);
+    }
+
     if (AFF_FLAGGED(i, AFF_TIME_SNARE))
       WAIT_STATE(i, PULSE_VIOLENCE);
 
@@ -1818,6 +1960,75 @@ static void process_round_effects(void)
         do_flee(i, NULL, 0, 0);
       else if (affected_by_spell(i, SPELL_CRY_OF_THE_BANSHEE) && rand_number(1, 100) <= 40)
         do_flee(i, NULL, 0, 0);
+    }
+
+    if (affected_by_spell(i, SPELL_KINGS_COMMAND))
+      remove_affects_by_flag(i, AFF_FEARFUL);
+
+    if ((AFF_FLAGGED(i, AFF_FEARFUL) || AFF_FLAGGED(i, AFF_ROOTED) || AFF_FLAGGED(i, AFF_STUNNED))) {
+      struct char_data *src;
+      for (src = world[IN_ROOM(i)].people; src; src = src->next_in_room) {
+        if (GET_SKILL(src, SKILL_SOVEREIGN_PRESSURE) <= 0)
+          continue;
+        if (FIGHTING(src) != i && FIGHTING(i) != src)
+          continue;
+        {
+          struct affected_type af;
+          new_affect(&af);
+          af.spell = SKILL_SOVEREIGN_PRESSURE;
+          af.duration = 1;
+          af.location = APPLY_SAVING_SPELL;
+          af.modifier = 1;
+          affect_join(i, &af, FALSE, FALSE, FALSE, FALSE);
+        }
+        break;
+      }
+    }
+
+    if (!IS_NPC(i) && GET_SKILL(i, SKILL_LEGION_MASTERY) > 0 &&
+        count_shadow_servants_for(i) >= 3) {
+      struct affected_type af;
+      new_affect(&af);
+      af.spell = SKILL_LEGION_MASTERY;
+      af.duration = 1;
+      af.location = APPLY_SAVING_SPELL;
+      af.modifier = -2;
+      affect_join(i, &af, FALSE, FALSE, FALSE, FALSE);
+    }
+
+    if (IS_NPC(i) && i->master && is_shadow_servant_for(i->master, i) &&
+        GET_SKILL(i->master, SKILL_SHADOW_COMMANDER) > 0) {
+      struct affected_type af;
+      new_affect(&af);
+      af.spell = SKILL_SHADOW_COMMANDER;
+      af.duration = 1;
+      af.location = APPLY_HITROLL;
+      af.modifier = 2;
+      affect_join(i, &af, FALSE, FALSE, FALSE, FALSE);
+      new_affect(&af);
+      af.spell = SKILL_SHADOW_COMMANDER;
+      af.duration = 1;
+      af.location = APPLY_DAMROLL;
+      af.modifier = 2;
+      affect_join(i, &af, FALSE, FALSE, FALSE, FALSE);
+      GET_HIT(i) = MIN(GET_MAX_HIT(i), GET_HIT(i) + MAX(1, GET_MAX_HIT(i) / 10));
+    }
+
+    if (IS_NPC(i) && i->master && GET_SKILL(i->master, SKILL_LEGION_MASTERY) > 0 &&
+        count_shadow_servants_for(i->master) >= 3 && AFF_FLAGGED(i, AFF_CHARM)) {
+      struct affected_type af;
+      new_affect(&af);
+      af.spell = SKILL_LEGION_MASTERY;
+      af.duration = 1;
+      af.location = APPLY_HITROLL;
+      af.modifier = 1;
+      affect_join(i, &af, FALSE, FALSE, FALSE, FALSE);
+      new_affect(&af);
+      af.spell = SKILL_LEGION_MASTERY;
+      af.duration = 1;
+      af.location = APPLY_DAMROLL;
+      af.modifier = 1;
+      affect_join(i, &af, FALSE, FALSE, FALSE, FALSE);
     }
 
     if (affected_by_spell(i, SPELL_DESPAIR_AURA)) {
