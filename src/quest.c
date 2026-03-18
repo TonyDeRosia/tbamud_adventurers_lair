@@ -672,7 +672,8 @@ void quest_kill_trigger_check(struct char_data *ch, struct char_data *vict)
     return;
 
   GET_KQUEST_COMPLETE(ch) = 1;
-  send_to_char(ch, "You have slain your quest target! Return to a quest master and type 'quest complete'.\r\n");
+  send_to_char(ch, "\tYQUEST: You have almost completed your QUEST!\tn\r\n");
+  send_to_char(ch, "\tYReturn to the questmaster before your time runs out.\tn\r\n");
   save_char(ch);
 }
 

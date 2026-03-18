@@ -13,13 +13,14 @@ struct zone_data *zone_table = NULL;
 zone_rnum top_of_zone_table = 0;
 room_rnum top_of_world = 0;
 time_t boot_time = 0;
+int next_tick = 75;
 
 void basic_mud_log(const char *format, ...) { (void)format; }
 size_t write_to_output(struct descriptor_data *d, const char *txt, ...) { (void)d; (void)txt; return 0; }
 int level_exp(int class_num, int level) { (void)class_num; return level * 100; }
 int compute_armor_class(struct char_data *ch) { (void) ch; return 0; }
 struct time_info_data *real_time_passed(time_t t2, time_t t1) { static struct time_info_data dummy; (void) t2; (void) t1; return &dummy; }
-void send_to_char(struct char_data *ch, const char *messg, ...) { (void) ch; (void) messg; }
+size_t send_to_char(struct char_data *ch, const char *messg, ...) { (void) ch; (void) messg; return 0; }
 void skip_spaces(char **string) { (void) string; }
 
 #include "prompt.c"
@@ -80,7 +81,7 @@ int main(void)
   init_test_character(&d, &ch);
 
   const char *rendered = make_prompt(&d);
-  failures += expect_string_equals("default prompt", rendered, "[42 / 99] [10 / 20] [5 / 15] [150] ");
+  failures += expect_string_equals("default prompt", rendered, "[42 / 99] [10 / 20] [5 / 15] [0QT 150] ");
 
   translate_prompt_escapes("{R[%h{n", buffer, sizeof(buffer));
   failures += expect_string_equals("brace escape translation", buffer, "\x1B[1;31m[%h\x1B[0m");

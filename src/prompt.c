@@ -19,7 +19,7 @@ extern room_rnum top_of_world;
 /* External functions */
 int compute_armor_class(struct char_data *ch);
 
-static const char *default_prompt_template = "{W}[{R}%h{W}/{r}%H{W}]{X} {W}[{B}%m{W}/{b}%M{W}]{X} {W}[{G}%v{W}/{g}%V{W}]{X} {W}[{Y}%X{W}]{X} ";
+static const char *default_prompt_template = "{W}[{R}%h{W}/{r}%H{W}]{X} {W}[{B}%m{W}/{b}%M{W}]{X} {W}[{G}%v{W}/{g}%V{W}]{X} {W}[{C}%kQT{W} {Y}%X{W}]{X} ";
 
 static const char *translate_color_brace(char code)
 {
@@ -138,6 +138,25 @@ static int prompt_tnl(struct char_data *ch)
   return MAX(0, level_exp(GET_CLASS(ch), next_level) - GET_EXP(ch));
 }
 
+static int has_active_quest_timer(struct char_data *ch)
+{
+  return ch && !IS_NPC(ch) && GET_KQUEST_ACTIVE(ch) && GET_KQUEST_TIME(ch) > 0;
+}
+
+static int get_quest_minutes_remaining(struct char_data *ch)
+{
+  long seconds_remaining;
+
+  if (!has_active_quest_timer(ch))
+    return 0;
+
+  seconds_remaining = (long)(GET_KQUEST_TIME(ch) - 1) * SECS_PER_MUD_HOUR + MAX(0, next_tick);
+  if (seconds_remaining <= 0)
+    return 0;
+
+  return (int)((seconds_remaining + 59) / 60);
+}
+
 static void append_prompt_text(char *prompt, size_t *pos, const char *text)
 {
   size_t remaining = MAX_PROMPT_LENGTH - *pos;
@@ -203,6 +222,11 @@ static void append_prompt_exp(char *prompt, size_t *pos, struct descriptor_data 
 static void append_prompt_tnl(char *prompt, size_t *pos, struct descriptor_data *d)
 {
   append_prompt_number(prompt, pos, prompt_tnl(d->character));
+}
+
+static void append_prompt_quest_timer(char *prompt, size_t *pos, struct descriptor_data *d)
+{
+  append_prompt_number(prompt, pos, get_quest_minutes_remaining(d->character));
 }
 
 static void append_prompt_level(char *prompt, size_t *pos, struct descriptor_data *d)
@@ -297,6 +321,7 @@ static const struct prompt_token_info prompt_tokens[] = {
   { 'V', "Maximum movement", append_prompt_max_move },
   { 'x', "Total experience", append_prompt_exp },
   { 'X', "Experience to next level", append_prompt_tnl },
+  { 'k', "Kill quest timer in real minutes (0 if inactive)", append_prompt_quest_timer },
   { 'l', "Current level", append_prompt_level },
   { 'a', "Armor class", append_prompt_armor },
   { 'A', "Alignment", append_prompt_alignment },

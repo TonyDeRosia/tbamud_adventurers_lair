@@ -334,6 +334,7 @@ cpp_extern const struct command_info cmd_info[] = {
   { "resists"  , "res"     , POS_DEAD    , do_resists  , 0, 0 },
   { "speedwalk", "speedwalk", POS_DEAD   , do_speedwalk, 0, 0 },
   { "run"      , "run"     , POS_STANDING, do_run      , 0, 0 },
+  { "runto"    , "runto"   , POS_STANDING, do_runto    , 0, 0 },
   { "saudit"   , "saudit"   , POS_DEAD    , do_saudit   , LVL_IMMORT, 0 },
   { "saff"     , "saff"    , POS_DEAD    , do_saffects , 0, 0 },
   { "saffects" , "saffec"  , POS_DEAD    , do_saffects , 0, 0 },
