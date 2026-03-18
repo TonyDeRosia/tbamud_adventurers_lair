@@ -38,7 +38,9 @@ static int clampi(int v, int lo, int hi)
 
 static int spell_dur_short_manual(int level);
 static int spell_dur_medium_manual(int level);
+static int spell_dur_long_manual(int level);
 static int spell_dmg_low_manual(int level);
+static int spell_dmg_medium_manual(int level);
 static int spell_dmg_high_manual(int level);
 static int spell_dmg_extreme_manual(int level);
 static int spell_dmg_ultra_manual(int level);
@@ -1421,7 +1423,9 @@ ASPELL(spell_chrono_shift)
 
 static int spell_dur_short_manual(int level) { return 2 + (level / 10); }
 static int spell_dur_medium_manual(int level) { return 4 + (level / 8); }
+static int spell_dur_long_manual(int level) { return 6 + (level / 6); }
 static int spell_dmg_low_manual(int level) { return (level * 2) + dice(2, MAX(1, level / 4)); }
+static int spell_dmg_medium_manual(int level) { return (level * 3) + dice(3, MAX(1, level / 3)); }
 static int spell_dmg_high_manual(int level) { return (level * 4) + dice(4, MAX(1, level / 2)); }
 static int spell_dmg_extreme_manual(int level) { return (level * 5) + dice(5, MAX(1, level / 2)); }
 static int spell_dmg_ultra_manual(int level) { return (level * 6) + dice(6, MAX(1, level / 2)); }
@@ -1460,6 +1464,25 @@ static int spell_apply_flag(struct char_data *victim, int spellnum, int duration
   SET_BIT_AR(af.bitvector, flag);
   affect_join(victim, &af, FALSE, FALSE, FALSE, FALSE);
   return TRUE;
+}
+
+static int spell_apply_modifier(struct char_data *victim, int spellnum, int duration, int location, int modifier)
+{
+  struct affected_type af;
+  if (!victim)
+    return FALSE;
+  new_affect(&af);
+  af.spell = spellnum;
+  af.duration = MAX(1, duration);
+  af.location = location;
+  af.modifier = modifier;
+  affect_join(victim, &af, FALSE, FALSE, FALSE, FALSE);
+  return TRUE;
+}
+
+static int goal_of_all_life_is_death_active(struct char_data *ch)
+{
+  return ch && affected_by_spell(ch, SPELL_GOAL_OF_ALL_LIFE_IS_DEATH);
 }
 
 static int spell_instant_kill(struct char_data *ch, struct char_data *victim, int spellnum, enum damage_type dtype)
@@ -1828,6 +1851,10 @@ ASPELL(spell_time_stop)
   for (tch = world[IN_ROOM(ch)].people; tch; tch = tch->next_in_room) {
     if (tch == ch)
       continue;
+    if (!IS_NPC(tch))
+      continue;
+    if (!spell_is_enemy(ch, tch, SPELL_TIME_STOP))
+      continue;
     GET_WAIT_STATE(tch) = MAX(GET_WAIT_STATE(tch), 3 * PULSE_VIOLENCE);
   }
   if (affected_by_spell(ch, SPELL_TIME_STOP))
@@ -1839,3 +1866,140 @@ ASPELL(spell_time_stop)
   af.modifier = GET_ROOM_VNUM(IN_ROOM(ch));
   affect_join(ch, &af, FALSE, FALSE, FALSE, FALSE);
 }
+
+ASPELL(spell_black_lance)
+{
+  int saved, dam;
+  if (!ch || !victim) return;
+  saved = mag_savingthrow(victim, SAVING_SPELL, 0);
+  dam = spell_dmg_high_manual(level);
+  if (saved) dam /= 2;
+  set_next_damage_type(DAM_SHADOW);
+  if (damage(ch, victim, dam, SPELL_BLACK_LANCE) == -1) return;
+  if (!saved) {
+    spell_apply_flag(victim, SPELL_BLACK_LANCE, spell_dur_short_manual(level), AFF_CORRODED);
+    spell_apply_modifier(victim, SPELL_BLACK_LANCE, spell_dur_short_manual(level), APPLY_AC, 15);
+  }
+}
+
+ASPELL(spell_reality_slash)
+{
+  int saved, dam;
+  if (!ch || !victim) return;
+  saved = mag_savingthrow(victim, SAVING_SPELL, 0);
+  dam = spell_dmg_extreme_manual(level);
+  if (saved) dam /= 2;
+  set_next_damage_type(DAM_FORCE);
+  damage(ch, victim, dam, SPELL_REALITY_SLASH);
+}
+
+ASPELL(spell_grasp_heart)
+{
+  int saved, dam;
+  if (!ch || !victim) return;
+  if (GET_HIT(victim) * 100 <= GET_MAX_HIT(victim) * 30) {
+    /* GOAL_OF_ALL_LIFE_IS_DEATH_ACTIVE */
+    saved = goal_of_all_life_is_death_active(ch) ? FALSE : mag_savingthrow(victim, SAVING_DEATH, 0);
+    if (!saved && spell_instant_kill(ch, victim, SPELL_GRASP_HEART, DAM_NECROTIC))
+      return;
+    dam = spell_dmg_extreme_manual(level);
+  } else {
+    saved = mag_savingthrow(victim, SAVING_DEATH, 0);
+    dam = spell_dmg_high_manual(level);
+    if (saved) dam /= 2;
+  }
+  set_next_damage_type(DAM_NECROTIC);
+  if (damage(ch, victim, dam, SPELL_GRASP_HEART) == -1) return;
+  if (!saved && GET_HIT(victim) > 0 && GET_HIT(victim) * 100 > GET_MAX_HIT(victim) * 30)
+    spell_apply_flag(victim, SPELL_GRASP_HEART, 1, AFF_STUNNED);
+}
+
+ASPELL(spell_negative_burst)
+{
+  struct char_data *tch, *next_tch;
+  if (!ch) return;
+  for (tch = world[IN_ROOM(ch)].people; tch; tch = next_tch) {
+    int saved, dam;
+    next_tch = tch->next_in_room;
+    if (spell_is_enemy(ch, tch, SPELL_NEGATIVE_BURST)) {
+      saved = mag_savingthrow(tch, SAVING_SPELL, 0);
+      dam = spell_dmg_medium_manual(level);
+      if (saved) dam /= 2;
+      set_next_damage_type(DAM_NECROTIC);
+      damage(ch, tch, dam, SPELL_NEGATIVE_BURST);
+    } else if ((AFF_FLAGGED(tch, AFF_CHARM) && tch->master == ch) || spell_is_undead(tch)) {
+      GET_HIT(tch) = MIN(GET_MAX_HIT(tch), GET_HIT(tch) + spell_dmg_low_manual(level));
+    }
+  }
+}
+
+ASPELL(spell_true_death)
+{
+  int saved, dam;
+  if (!ch || !victim) return;
+  saved = mag_savingthrow(victim, SAVING_DEATH, 0);
+  dam = spell_dmg_extreme_manual(level);
+  if (saved) dam /= 2;
+  set_next_damage_type(DAM_NECROTIC);
+  if (damage(ch, victim, dam, SPELL_TRUE_DEATH) == -1) return;
+  if (!saved)
+    spell_apply_modifier(victim, SPELL_TRUE_DEATH, spell_dur_long_manual(level), APPLY_NONE, 1);
+}
+
+ASPELL(spell_perfect_unknowable)
+{
+  if (!ch) return;
+  spell_apply_flag(ch, SPELL_PERFECT_UNKNOWABLE, spell_dur_medium_manual(level), AFF_INVISIBLE);
+  spell_apply_flag(ch, SPELL_PERFECT_UNKNOWABLE, spell_dur_medium_manual(level), AFF_HIDE);
+}
+
+ASPELL(spell_crystal_body)
+{
+  if (!ch) return;
+  spell_apply_modifier(ch, SPELL_CRYSTAL_BODY, spell_dur_medium_manual(level), APPLY_AC, -25);
+}
+
+ASPELL(spell_greater_magic_seal)
+{
+  if (!ch || !victim) return;
+  if (!mag_savingthrow(victim, SAVING_SPELL, 0)) {
+    spell_apply_flag(victim, SPELL_GREATER_MAGIC_SEAL, spell_dur_medium_manual(level), AFF_SPELLLOCK);
+    spell_apply_modifier(victim, SPELL_GREATER_MAGIC_SEAL, spell_dur_medium_manual(level), APPLY_NONE, 1);
+  } else {
+    spell_apply_flag(victim, SPELL_GREATER_MAGIC_SEAL, spell_dur_short_manual(level), AFF_SPELLLOCK);
+  }
+}
+
+ASPELL(spell_despair_aura) { if (ch) spell_apply_modifier(ch, SPELL_DESPAIR_AURA, spell_dur_medium_manual(level), APPLY_NONE, 1); }
+ASPELL(spell_oblivion_spear) { if (ch && victim) { int s = mag_savingthrow(victim, SAVING_SPELL, 0), dam = spell_dmg_extreme_manual(level); if (s) dam /= 2; set_next_damage_type(DAM_SHADOW); if (damage(ch, victim, dam, SPELL_OBLIVION_SPEAR) != -1 && !s) GET_MANA(victim) = MAX(0, GET_MANA(victim) - dam / 4); } }
+ASPELL(spell_bone_prison) { if (ch && victim) { if (!mag_savingthrow(victim, SAVING_SPELL, 0)) { spell_apply_flag(victim, SPELL_BONE_PRISON, spell_dur_medium_manual(level), AFF_ROOTED); spell_apply_modifier(victim, SPELL_BONE_PRISON, spell_dur_medium_manual(level), APPLY_AC, 10);} else spell_apply_flag(victim, SPELL_BONE_PRISON, 1, AFF_ROOTED);} }
+ASPELL(spell_undying_will) { if (ch) spell_apply_modifier(ch, SPELL_UNDYING_WILL, spell_dur_long_manual(level), APPLY_NONE, 1); }
+ASPELL(spell_dragon_lightning) { if (ch && victim) { int s = mag_savingthrow(victim, SAVING_SPELL, 0), dam = spell_dmg_high_manual(level); if (s) dam /= 2; set_next_damage_type(DAM_LIGHTNING); damage(ch, victim, dam, SPELL_DRAGON_LIGHTNING);} }
+
+ASPELL(spell_chain_dragon_lightning)
+{
+  struct char_data *tch, *next_tch;
+  int jumps = 0;
+  if (!ch || !victim) return;
+  set_next_damage_type(DAM_LIGHTNING);
+  damage(ch, victim, mag_savingthrow(victim, SAVING_SPELL, 0) ? spell_dmg_high_manual(level) / 2 : spell_dmg_high_manual(level), SPELL_CHAIN_DRAGON_LIGHTNING);
+  for (tch = world[IN_ROOM(ch)].people; tch && jumps < 2; tch = next_tch) {
+    next_tch = tch->next_in_room;
+    if (tch == victim || !spell_is_enemy(ch, tch, SPELL_CHAIN_DRAGON_LIGHTNING))
+      continue;
+    set_next_damage_type(DAM_LIGHTNING);
+    damage(ch, tch, mag_savingthrow(tch, SAVING_SPELL, 0) ? spell_dmg_medium_manual(level) / 2 : spell_dmg_medium_manual(level), SPELL_CHAIN_DRAGON_LIGHTNING);
+    jumps++;
+  }
+}
+
+ASPELL(spell_hell_flame) { if (ch && victim) { set_next_damage_type(DAM_FIRE); damage(ch, victim, spell_dmg_low_manual(level), SPELL_HELL_FLAME); if (!mag_savingthrow(victim, SAVING_SPELL, 0)) spell_apply_modifier(victim, SPELL_HELL_FLAME, spell_dur_medium_manual(level), APPLY_NONE, 1); } }
+ASPELL(spell_gravity_maelstrom) { if (ch && victim) { int s = mag_savingthrow(victim, SAVING_SPELL, 0), dam = spell_dmg_extreme_manual(level); if (s) dam /= 2; set_next_damage_type(DAM_FORCE); if (damage(ch, victim, dam, SPELL_GRAVITY_MAELSTROM) == -1) return; if (!s) { spell_apply_modifier(victim, SPELL_GRAVITY_MAELSTROM, spell_dur_short_manual(level), APPLY_STR, -3); spell_apply_modifier(victim, SPELL_GRAVITY_MAELSTROM, spell_dur_short_manual(level), APPLY_DEX, -3); spell_apply_flag(victim, SPELL_GRAVITY_MAELSTROM, 1, AFF_ROOTED);} } }
+ASPELL(spell_call_greater_thunder) { if (ch && victim) { int dam = (level * 5) + (5 * MAX(1, level / 2)); if (mag_savingthrow(victim, SAVING_SPELL, 0)) dam /= 2; set_next_damage_type(DAM_LIGHTNING); damage(ch, victim, dam, SPELL_CALL_GREATER_THUNDER);} }
+ASPELL(spell_astral_smite) { if (ch && victim) { int dam = spell_dmg_high_manual(level); if (mag_savingthrow(victim, SAVING_SPELL, 0)) dam /= 2; set_next_damage_type(DAM_FORCE); damage(ch, victim, dam, SPELL_ASTRAL_SMITE);} }
+ASPELL(spell_greater_rejection) { if (ch && victim) { if (!mag_savingthrow(victim, SAVING_SPELL, 0) && ((AFF_FLAGGED(victim, AFF_CHARM) && victim->master && victim->master != ch) || spell_is_undead(victim))) { spell_instant_kill(ch, victim, SPELL_GREATER_REJECTION, DAM_FORCE); } else { int dam = spell_dmg_medium_manual(level); if (mag_savingthrow(victim, SAVING_SPELL, 0)) { dam = spell_dmg_low_manual(level); spell_apply_flag(victim, SPELL_GREATER_REJECTION, 1, AFF_STUNNED);} set_next_damage_type(DAM_FORCE); damage(ch, victim, dam, SPELL_GREATER_REJECTION);} } }
+ASPELL(spell_fallen_down) { struct char_data *tch,*next_tch; if (!ch) return; for (tch = world[IN_ROOM(ch)].people; tch; tch = next_tch) { int s, dam; next_tch = tch->next_in_room; if (!spell_is_enemy(ch, tch, SPELL_FALLEN_DOWN)) continue; s = mag_savingthrow(tch, SAVING_SPELL, 0); dam = spell_dmg_extreme_manual(level); if (s) dam /= 2; set_next_damage_type(DAM_FIRE); damage(ch, tch, dam, SPELL_FALLEN_DOWN);} }
+ASPELL(spell_ia_shub_niggurath) { struct char_data *tch,*next_tch; int tribute = 0; if (!ch) return; for (tch = world[IN_ROOM(ch)].people; tch; tch = next_tch) { int s; next_tch = tch->next_in_room; if (!spell_is_enemy(ch, tch, SPELL_IA_SHUB_NIGGURATH) || spell_is_undead(tch)) continue; /* GOAL_OF_ALL_LIFE_IS_DEATH_ACTIVE */ s = goal_of_all_life_is_death_active(ch) ? FALSE : mag_savingthrow(tch, SAVING_DEATH, 0); if (!s) { if (spell_instant_kill(ch, tch, SPELL_IA_SHUB_NIGGURATH, DAM_NECROTIC)) tribute++; } else { set_next_damage_type(DAM_NECROTIC); damage(ch, tch, spell_dmg_extreme_manual(level), SPELL_IA_SHUB_NIGGURATH);} } if (tribute >= 3) send_to_char(ch, "The void accepts your tribute and something stirs beyond.\r\n"); }
+ASPELL(spell_goal_of_all_life_is_death) { if (ch && !affected_by_spell(ch, SPELL_GOAL_OF_ALL_LIFE_IS_DEATH)) spell_apply_modifier(ch, SPELL_GOAL_OF_ALL_LIFE_IS_DEATH, spell_dur_short_manual(level), APPLY_NONE, 1); }
+ASPELL(spell_cry_of_the_banshee) { struct char_data *tch,*next_tch; if (!ch) return; for (tch = world[IN_ROOM(ch)].people; tch; tch = next_tch) { int s, dam; next_tch = tch->next_in_room; if (!spell_is_enemy(ch, tch, SPELL_CRY_OF_THE_BANSHEE)) continue; if (goal_of_all_life_is_death_active(ch)) { s = FALSE; dam = spell_dmg_extreme_manual(level); } else { s = mag_savingthrow(tch, SAVING_DEATH, 0); dam = spell_dmg_high_manual(level); if (s) dam /= 2; } set_next_damage_type(DAM_NECROTIC); if (damage(ch, tch, dam, SPELL_CRY_OF_THE_BANSHEE) == -1) continue; if (!s) spell_apply_flag(tch, SPELL_CRY_OF_THE_BANSHEE, spell_dur_short_manual(level), AFF_FEARFUL); } }
+ASPELL(spell_napalm) { struct char_data *tch,*next_tch; if (!ch) return; for (tch = world[IN_ROOM(ch)].people; tch; tch = next_tch) { int s, dam; next_tch = tch->next_in_room; if (!spell_is_enemy(ch, tch, SPELL_NAPALM)) continue; s = mag_savingthrow(tch, SAVING_SPELL, 0); dam = spell_dmg_medium_manual(level); if (s) dam /= 2; set_next_damage_type(DAM_FIRE); if (damage(ch, tch, dam, SPELL_NAPALM) == -1) continue; if (!s) spell_apply_modifier(tch, SPELL_NAPALM, 1, APPLY_NONE, 1); } }

@@ -1324,6 +1324,11 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
   }
 
   if (dam > 0) {
+    if (affected_by_spell(victim, SPELL_CRYSTAL_BODY) &&
+        (damage_type == DAM_FIRE || damage_type == DAM_COLD ||
+         damage_type == DAM_LIGHTNING || damage_type == DAM_ACID)) {
+      dam = (dam * 75) / 100;
+    }
     if (AFF_FLAGGED(victim, AFF_ELEMENTAL_WARD_FIRE) && damage_type == DAM_FIRE)
       dam = (dam * 6) / 10;
     else if (AFF_FLAGGED(victim, AFF_ELEMENTAL_WARD_COLD) && damage_type == DAM_COLD)
@@ -1396,6 +1401,22 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
     send_to_char(victim, "A death ward flares and saves you from a killing blow!\r\n");
     act("A death ward flares around $n, snatching $m from death!", TRUE, victim, 0, 0, TO_ROOM);
     dam = MAX(0, GET_HIT(victim) - 1);
+  }
+
+  if (dam > 0 && affected_by_spell(victim, SPELL_UNDYING_WILL) && GET_HIT(victim) - dam < 1) {
+    struct affected_type af;
+    affect_from_char(victim, SPELL_UNDYING_WILL);
+    GET_HIT(victim) = 1;
+    GET_MANA(victim) = MIN(GET_MAX_MANA(victim), GET_MANA(victim) + (GET_LEVEL(victim) * 2));
+    new_affect(&af);
+    af.spell = SPELL_UNDYING_WILL;
+    af.duration = 1;
+    af.location = APPLY_NONE;
+    SET_BIT_AR(af.bitvector, AFF_STUNNED);
+    affect_join(victim, &af, FALSE, FALSE, FALSE, FALSE);
+    send_to_char(victim, "Your undying will drags you back from the brink!\r\n");
+    act("$n refuses death through sheer will!", TRUE, victim, 0, 0, TO_ROOM);
+    dam = 0;
   }
 
   old_hit = GET_HIT(victim);
@@ -1746,6 +1767,19 @@ static void process_round_effects(void)
         call_magic(i, i, NULL, SPELL_POISON, GET_LEVEL(i), CAST_SPELL);
     }
 
+    if (affected_by_spell(i, SPELL_HELL_FLAME)) {
+      set_next_damage_type(DAM_FIRE);
+      if (damage(i, i, (GET_LEVEL(i) * 2) + dice(2, MAX(1, GET_LEVEL(i) / 4)), SPELL_HELL_FLAME) == -1)
+        continue;
+    }
+
+    if (affected_by_spell(i, SPELL_NAPALM)) {
+      set_next_damage_type(DAM_FIRE);
+      if (damage(i, i, (GET_LEVEL(i) * 2) + dice(2, MAX(1, GET_LEVEL(i) / 4)), SPELL_NAPALM) == -1)
+        continue;
+      affect_from_char(i, SPELL_NAPALM);
+    }
+
     if (AFF_FLAGGED(i, AFF_ARCANE_LEAK))
       GET_MANA(i) = MAX(0, GET_MANA(i) - 10);
 
@@ -1765,6 +1799,35 @@ static void process_round_effects(void)
       int fear_penalty = find_affect_modifier_for_flag(i, AFF_FEARFUL, 0);
       if (fear_penalty <= -10 && rand_number(1, 100) <= 60)
         do_flee(i, NULL, 0, 0);
+      else if (affected_by_spell(i, SPELL_CRY_OF_THE_BANSHEE) && rand_number(1, 100) <= 40)
+        do_flee(i, NULL, 0, 0);
+    }
+
+    if (affected_by_spell(i, SPELL_DESPAIR_AURA)) {
+      struct char_data *tch;
+      for (tch = world[IN_ROOM(i)].people; tch; tch = tch->next_in_room) {
+        struct affected_type af;
+        if (tch == i)
+          continue;
+        if (!IS_NPC(tch) && !IS_NPC(i) && !CONFIG_PK_ALLOWED)
+          continue;
+        if (!IS_NPC(i) && IS_NPC(tch) && AFF_FLAGGED(tch, AFF_CHARM))
+          continue;
+        new_affect(&af);
+        af.spell = SPELL_DESPAIR_AURA;
+        af.duration = 1;
+        af.location = APPLY_HITROLL;
+        af.modifier = -4;
+        affect_join(tch, &af, FALSE, FALSE, FALSE, FALSE);
+        new_affect(&af);
+        af.spell = SPELL_DESPAIR_AURA;
+        af.duration = 1;
+        af.location = APPLY_SAVING_SPELL;
+        af.modifier = -2;
+        affect_join(tch, &af, FALSE, FALSE, FALSE, FALSE);
+        if (FIGHTING(tch) && GET_LEVEL(tch) < GET_LEVEL(i) - 8 && rand_number(1, 100) <= 20)
+          do_flee(tch, NULL, 0, 0);
+      }
     }
 
     if (IS_NPC(i) && GET_SUMMON_TIMER(i) > 0) {

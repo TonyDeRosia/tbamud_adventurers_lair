@@ -447,6 +447,14 @@ int mag_damage(int level, struct char_data *ch, struct char_data *victim,
 
   if (dam > 0 && AFF_FLAGGED(ch, AFF_EMPOWERED))
     dam = (dam * 110) / 100;
+  if (dam > 0 && ch && GET_SKILL(ch, SKILL_SUPREME_CASTER_DISCIPLINE) > 0) {
+    int bonus_pct = 5;
+    if (affected_by_spell(ch, SPELL_ENCHANTERS_FOCUS))
+      bonus_pct += 10;
+    if (bonus_pct > 20)
+      bonus_pct = 20;
+    dam = (dam * (100 + bonus_pct)) / 100;
+  }
 
   /* and finally, inflict the damage */
 
