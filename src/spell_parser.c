@@ -1423,39 +1423,38 @@ ACMD(do_cast) {
   if (IS_SET(SINFO.targets, TAR_IGNORE)) {
     target = TRUE;
   } else if (target_argument != NULL && *target_argument) {
+    char *target_lookup;
     number = get_number(&targp);
+    target_lookup = (targp && *targp) ? targp : target_argument;
     if (!target && (IS_SET(SINFO.targets, TAR_CHAR_ROOM))) {
-      if ((tch = get_char_vis(ch, target_argument, &number, FIND_CHAR_ROOM)) != NULL)
+      if ((tch = get_char_vis(ch, target_lookup, &number, FIND_CHAR_ROOM)) != NULL)
         target = TRUE;
     }
     if (!target && IS_SET(SINFO.targets, TAR_CHAR_WORLD))
-      if ((tch = get_char_vis(ch, target_argument, &number, FIND_CHAR_WORLD)) != NULL)
+      if ((tch = get_char_vis(ch, target_lookup, &number, FIND_CHAR_WORLD)) != NULL)
         target = TRUE;
 
     if (!target && IS_SET(SINFO.targets, TAR_OBJ_INV))
-      if ((tobj = get_obj_in_list_vis(ch, target_argument, &number, ch->carrying)) != NULL)
+      if ((tobj = get_obj_in_list_vis(ch, target_lookup, &number, ch->carrying)) != NULL)
         target = TRUE;
 
     if (!target && IS_SET(SINFO.targets, TAR_OBJ_EQUIP)) {
-      for (i = 0; !target && i < NUM_WEARS; i++)
-        if (GET_EQ(ch, i) && isname(target_argument, GET_EQ(ch, i)->name)) {
-          tobj = GET_EQ(ch, i);
-          target = TRUE;
-        }
+      if ((tobj = get_obj_in_equip_vis(ch, target_lookup, &number, ch->equipment)) != NULL)
+        target = TRUE;
     }
     if (!target && IS_SET(SINFO.targets, TAR_OBJ_ROOM))
-      if ((tobj = get_obj_in_list_vis(ch, target_argument, &number,
+      if ((tobj = get_obj_in_list_vis(ch, target_lookup, &number,
           world[IN_ROOM(ch)].contents)) != NULL)
         target = TRUE;
 
     if (!target && IS_SET(SINFO.targets, TAR_OBJ_WORLD))
-      if ((tobj = get_obj_vis(ch, target_argument, &number)) != NULL)
+      if ((tobj = get_obj_vis(ch, target_lookup, &number)) != NULL)
         target = TRUE;
 
     if (!target && (IS_SET(SINFO.targets, TAR_CHAR_ROOM) ||
         IS_SET(SINFO.targets, TAR_CHAR_WORLD))) {
       bool include_fighting = IS_SET(SINFO.targets, TAR_FIGHT_VICT);
-      tch = find_char_prefix(ch, target_argument, number, include_fighting,
+      tch = find_char_prefix(ch, target_lookup, number, include_fighting,
           ambiguity, sizeof(ambiguity));
       if (tch)
         target = TRUE;

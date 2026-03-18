@@ -4703,7 +4703,6 @@ static int speedwalk_reverse_route(const char *route, char *out, size_t outsz)
 
 ACMD(do_identify)
 {
-  struct char_data *tch = NULL;
   struct obj_data *tobj = NULL;
   char arg[MAX_INPUT_LENGTH];
   char *name = arg;
@@ -4725,9 +4724,7 @@ ACMD(do_identify)
   }
 
   if (tobj)
-    cast_spell(ch, NULL, tobj, SPELL_IDENTIFY);
-  else if ((tch = get_char_vis(ch, name, &number, FIND_CHAR_ROOM)) != NULL)
-    cast_spell(ch, tch, NULL, SPELL_IDENTIFY);
+    show_identify_item(ch, tobj, IDENTIFY_BASIC);
   else
     send_to_char(ch, "You don't see that here.\r\n");
 }

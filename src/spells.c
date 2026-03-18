@@ -65,6 +65,163 @@ static void identify_send_section_header(struct char_data *ch, const char *borde
   send_to_char(ch, "%s|%s %s[%s]%s\r\n", border, reset, label, title, reset);
 }
 
+void show_identify_item(struct char_data *ch, struct obj_data *obj, enum identify_detail_level detail)
+{
+  int i, found;
+  size_t len, tok_len;
+  char bitbuf[MAX_STRING_LENGTH], typebuf[256], wearbuf[MAX_STRING_LENGTH];
+  char flags_buf[MAX_STRING_LENGTH], flag_word[128], aff_summary[256];
+  char line[MAX_STRING_LENGTH];
+  const char *B = CCBLU(ch, C_NRM);
+  const char *L = CCCYN(ch, C_NRM);
+  const char *R = CCNRM(ch, C_NRM);
+  const char *V = CCWHT(ch, C_NRM);
+  const char *G = CCGRN(ch, C_NRM);
+  const char *RED = CCRED(ch, C_NRM);
+  const char *Y = CCYEL(ch, C_NRM);
+  const char *M = CCMAG(ch, C_NRM);
+  int affect_count = 0;
+  int flag_columns = 0;
+
+  if (!ch || !obj)
+    return;
+
+  sprinttype(GET_OBJ_TYPE(obj), item_types, typebuf, sizeof(typebuf));
+  sprintbitarray(GET_OBJ_WEAR(obj), wear_bits, TW_ARRAY_MAX, wearbuf);
+  sprintbitarray(GET_OBJ_EXTRA(obj), extra_bits, EF_ARRAY_MAX, flags_buf);
+
+  identify_send_border(ch, B, R);
+  send_to_char(ch, "%s|%s %sIdentify Appraisal%s%-57.57s%s |\r\n",
+               B, R, L, R, "", B);
+  identify_send_border(ch, B, R);
+
+  identify_send_section_header(ch, B, L, R, "Header / Identity");
+  send_to_char(ch, "%s|%s %sName:%s %s%s\r\n", B, R, L, R, obj->short_description ? obj->short_description : "<None>", R);
+  send_to_char(ch, "%s|%s %sKeywords:%s %s%s\r\n", B, R, L, R, obj->name ? obj->name : "<None>", R);
+  send_to_char(ch, "%s|%s %sId:%s %s%ld%s  %sType:%s %s%s%s  %sLevel:%s %s%d%s\r\n",
+               B, R, L, R, V, obj_script_id(obj), R, L, R, V, typebuf, R, L, R, V, GET_OBJ_LEVEL(obj), R);
+
+  if (GET_OBJ_AFFECT(obj)) {
+    sprintbitarray(GET_OBJ_AFFECT(obj), affected_bits, AF_ARRAY_MAX, bitbuf);
+    send_to_char(ch, "%s|%s %sAbilities:%s %s%s%s\r\n", B, R, L, R, V, bitbuf, R);
+  }
+
+  identify_send_border(ch, B, R);
+  identify_send_section_header(ch, B, L, R, "Core Properties");
+  send_to_char(ch, "%s|%s %sWorth:%s %s%d%s  %sWeight:%s %s%d%s  %sRent:%s %s%d%s\r\n",
+               B, R, L, R, V, GET_OBJ_COST(obj), R, L, R, V, GET_OBJ_WEIGHT(obj), R, L, R, V, GET_OBJ_RENT(obj), R);
+  send_to_char(ch, "%s|%s %sWearable:%s %s%s%s\r\n", B, R, L, R, V, wearbuf, R);
+
+  send_to_char(ch, "%s|%s %sFlags:%s ", B, R, L, R);
+  found = FALSE;
+  tok_len = 0;
+  while (*(flags_buf + tok_len) && *(flags_buf + tok_len) == ' ')
+    tok_len++;
+  flags_buf[MAX_STRING_LENGTH - 1] = '\0';
+  for (len = tok_len; len <= strlen(flags_buf); len++) {
+    if (flags_buf[len] != ' ' && flags_buf[len] != '\0')
+      continue;
+    if (len == tok_len) {
+      tok_len = len + 1;
+      continue;
+    }
+    snprintf(flag_word, sizeof(flag_word), "%.*s", (int)(len - tok_len), flags_buf + tok_len);
+    send_to_char(ch, "%s%s%s%s",
+                 identify_is_warning_flag(flag_word) ? Y : V,
+                 flag_word,
+                 R,
+                 flags_buf[len] == '\0' ? "" : " ");
+    found = TRUE;
+    flag_columns++;
+    if (flag_columns >= 5 && flags_buf[len] != '\0') {
+      send_to_char(ch, "\r\n%s|%s %-8.8s ", B, R, "");
+      flag_columns = 0;
+    }
+    tok_len = len + 1;
+    while (*(flags_buf + tok_len) && *(flags_buf + tok_len) == ' ')
+      tok_len++;
+  }
+  if (!found)
+    send_to_char(ch, "%snone%s", V, R);
+  send_to_char(ch, "\r\n");
+
+  identify_send_border(ch, B, R);
+
+  switch (GET_OBJ_TYPE(obj)) {
+  case ITEM_SCROLL:
+  case ITEM_POTION:
+    len = i = 0;
+
+    if (GET_OBJ_VAL(obj, 1) >= 1) {
+      i = snprintf(bitbuf + len, sizeof(bitbuf) - len, " %s", skill_name(GET_OBJ_VAL(obj, 1)));
+      if (i >= 0)
+        len += i;
+    }
+
+    if (GET_OBJ_VAL(obj, 2) >= 1 && len < sizeof(bitbuf)) {
+      i = snprintf(bitbuf + len, sizeof(bitbuf) - len, " %s", skill_name(GET_OBJ_VAL(obj, 2)));
+      if (i >= 0)
+        len += i;
+    }
+
+    if (GET_OBJ_VAL(obj, 3) >= 1 && len < sizeof(bitbuf))
+      snprintf(bitbuf + len, sizeof(bitbuf) - len, " %s", skill_name(GET_OBJ_VAL(obj, 3)));
+
+    send_to_char(ch, "%s|%s %sSpell Data:%s This %s casts:%s %s%s\r\n",
+                 B, R, L, R, item_types[(int) GET_OBJ_TYPE(obj)], R, V, bitbuf);
+    break;
+  case ITEM_WAND:
+  case ITEM_STAFF:
+    send_to_char(ch, "%s|%s %sSpell Data:%s This %s casts:%s %s%s%s\r\n",
+                 B, R, L, R, item_types[(int) GET_OBJ_TYPE(obj)], R, V, skill_name(GET_OBJ_VAL(obj, 3)), R);
+    send_to_char(ch, "%s|%s %sCharges:%s %s%d%s maximum, %s%d%s remaining\r\n",
+                 B, R, L, R, V, GET_OBJ_VAL(obj, 1), R, V, GET_OBJ_VAL(obj, 2), R);
+    break;
+  case ITEM_WEAPON:
+    send_to_char(ch, "%s|%s %sWeapon Data:%s Damage dice %s%dD%d%s, avg/round %s%.1f%s\r\n",
+                 B, R, L, R, V, GET_OBJ_VAL(obj, 1), GET_OBJ_VAL(obj, 2), R, V,
+                 ((GET_OBJ_VAL(obj, 2) + 1) / 2.0) * GET_OBJ_VAL(obj, 1), R);
+    break;
+  case ITEM_ARMOR:
+    send_to_char(ch, "%s|%s %sArmor Data:%s AC apply %s%d%s\r\n",
+                 B, R, L, R, V, GET_OBJ_VAL(obj, 0), R);
+    break;
+  default:
+    break;
+  }
+
+  identify_send_border(ch, B, R);
+  identify_send_section_header(ch, B, L, R, "Notes / Summary");
+  for (i = 0; i < MAX_OBJ_AFFECT; i++) {
+    if (obj->affected[i].location != APPLY_NONE && obj->affected[i].modifier != 0) {
+      affect_count++;
+    }
+  }
+
+  snprintf(aff_summary, sizeof(aff_summary), "Item has %d modifier affect%s.", affect_count, affect_count == 1 ? "" : "s");
+  send_to_char(ch, "%s|%s %sNotes:%s %s%s%s\r\n", B, R, L, R, M, aff_summary, R);
+  if (detail == IDENTIFY_FULL) {
+    identify_send_border(ch, B, R);
+    identify_send_section_header(ch, B, L, R, "Detailed Modifiers");
+
+    found = FALSE;
+    for (i = 0; i < MAX_OBJ_AFFECT; i++) {
+      if ((obj->affected[i].location != APPLY_NONE) &&
+          (obj->affected[i].modifier != 0)) {
+        sprinttype(obj->affected[i].location, apply_types, bitbuf, sizeof(bitbuf));
+        snprintf(line, sizeof(line), "%-22.22s : %s%+d%s", bitbuf,
+                 obj->affected[i].modifier >= 0 ? G : RED, obj->affected[i].modifier, R);
+        send_to_char(ch, "%s|%s %s%s%s\r\n", B, R, V, line, R);
+        found = TRUE;
+      }
+    }
+    if (!found)
+      send_to_char(ch, "%s|%s %sNo detailed modifiers on this item.%s\r\n", B, R, V, R);
+  }
+
+  identify_send_border(ch, B, R);
+}
+
 /* Handle followers when an owner teleports or recalls. */
 void handle_followers_after_owner_teleport_or_recall(struct char_data *ch)
 {
@@ -639,165 +796,16 @@ ASPELL(spell_devour_soul)
 
 ASPELL(spell_identify)
 {
-  int i, found;
-  size_t len, tok_len;
-
   if (obj) {
-    char bitbuf[MAX_STRING_LENGTH], typebuf[256], wearbuf[MAX_STRING_LENGTH];
-    char flags_buf[MAX_STRING_LENGTH], flag_word[128], aff_summary[256];
-    char line[MAX_STRING_LENGTH];
-    const char *B = CCBLU(ch, C_NRM);
-    const char *L = CCCYN(ch, C_NRM);
-    const char *R = CCNRM(ch, C_NRM);
-    const char *V = CCWHT(ch, C_NRM);
-    const char *G = CCGRN(ch, C_NRM);
-    const char *RED = CCRED(ch, C_NRM);
-    const char *Y = CCYEL(ch, C_NRM);
-    const char *M = CCMAG(ch, C_NRM);
-    int affect_count = 0;
-    int flag_columns = 0;
-
-    sprinttype(GET_OBJ_TYPE(obj), item_types, typebuf, sizeof(typebuf));
-    sprintbitarray(GET_OBJ_WEAR(obj), wear_bits, TW_ARRAY_MAX, wearbuf);
-    sprintbitarray(GET_OBJ_EXTRA(obj), extra_bits, EF_ARRAY_MAX, flags_buf);
-
-    identify_send_border(ch, B, R);
-    send_to_char(ch, "%s|%s %sIdentify Appraisal%s%-57.57s%s |\r\n",
-                 B, R, L, R, "", B);
-    identify_send_border(ch, B, R);
-
-    identify_send_section_header(ch, B, L, R, "Header / Identity");
-    send_to_char(ch, "%s|%s %sName:%s %s%s\r\n", B, R, L, R, obj->short_description ? obj->short_description : "<None>", R);
-    send_to_char(ch, "%s|%s %sKeywords:%s %s%s\r\n", B, R, L, R, obj->name ? obj->name : "<None>", R);
-    send_to_char(ch, "%s|%s %sId:%s %s%ld%s  %sType:%s %s%s%s  %sLevel:%s %s%d%s\r\n",
-                 B, R, L, R, V, obj_script_id(obj), R, L, R, V, typebuf, R, L, R, V, GET_OBJ_LEVEL(obj), R);
-
-    if (GET_OBJ_AFFECT(obj)) {
-      sprintbitarray(GET_OBJ_AFFECT(obj), affected_bits, AF_ARRAY_MAX, bitbuf);
-      send_to_char(ch, "%s|%s %sAbilities:%s %s%s%s\r\n", B, R, L, R, V, bitbuf, R);
-    }
-
-    identify_send_border(ch, B, R);
-    identify_send_section_header(ch, B, L, R, "Core Properties");
-    send_to_char(ch, "%s|%s %sWorth:%s %s%d%s  %sWeight:%s %s%d%s  %sRent:%s %s%d%s\r\n",
-                 B, R, L, R, V, GET_OBJ_COST(obj), R, L, R, V, GET_OBJ_WEIGHT(obj), R, L, R, V, GET_OBJ_RENT(obj), R);
-    send_to_char(ch, "%s|%s %sWearable:%s %s%s%s\r\n", B, R, L, R, V, wearbuf, R);
-
-    send_to_char(ch, "%s|%s %sFlags:%s ", B, R, L, R);
-    found = FALSE;
-    tok_len = 0;
-    while (*(flags_buf + tok_len) && *(flags_buf + tok_len) == ' ')
-      tok_len++;
-    flags_buf[MAX_STRING_LENGTH - 1] = '\0';
-    for (len = tok_len; len <= strlen(flags_buf); len++) {
-      if (flags_buf[len] != ' ' && flags_buf[len] != '\0')
-        continue;
-      if (len == tok_len) {
-        tok_len = len + 1;
-        continue;
-      }
-      snprintf(flag_word, sizeof(flag_word), "%.*s", (int)(len - tok_len), flags_buf + tok_len);
-      send_to_char(ch, "%s%s%s%s",
-                   identify_is_warning_flag(flag_word) ? Y : V,
-                   flag_word,
-                   R,
-                   flags_buf[len] == '\0' ? "" : " ");
-      found = TRUE;
-      flag_columns++;
-      if (flag_columns >= 5 && flags_buf[len] != '\0') {
-        send_to_char(ch, "\r\n%s|%s %-8.8s ", B, R, "");
-        flag_columns = 0;
-      }
-      tok_len = len + 1;
-      while (*(flags_buf + tok_len) && *(flags_buf + tok_len) == ' ')
-        tok_len++;
-    }
-    if (!found)
-      send_to_char(ch, "%snone%s", V, R);
-    send_to_char(ch, "\r\n");
-
-    identify_send_border(ch, B, R);
-
-    switch (GET_OBJ_TYPE(obj)) {
-    case ITEM_SCROLL:
-    case ITEM_POTION:
-      len = i = 0;
-
-      if (GET_OBJ_VAL(obj, 1) >= 1) {
-	i = snprintf(bitbuf + len, sizeof(bitbuf) - len, " %s", skill_name(GET_OBJ_VAL(obj, 1)));
-        if (i >= 0)
-          len += i;
-      }
-
-      if (GET_OBJ_VAL(obj, 2) >= 1 && len < sizeof(bitbuf)) {
-	i = snprintf(bitbuf + len, sizeof(bitbuf) - len, " %s", skill_name(GET_OBJ_VAL(obj, 2)));
-        if (i >= 0)
-          len += i;
-      }
-
-      if (GET_OBJ_VAL(obj, 3) >= 1 && len < sizeof(bitbuf)) {
-	snprintf(bitbuf + len, sizeof(bitbuf) - len, " %s", skill_name(GET_OBJ_VAL(obj, 3)));
-      }
-
-      send_to_char(ch, "%s|%s %sSpell Data:%s This %s casts:%s %s%s\r\n",
-                   B, R, L, R, item_types[(int) GET_OBJ_TYPE(obj)], R, V, bitbuf);
-      break;
-    case ITEM_WAND:
-    case ITEM_STAFF:
-      send_to_char(ch, "%s|%s %sSpell Data:%s This %s casts:%s %s%s%s\r\n",
-                   B, R, L, R, item_types[(int) GET_OBJ_TYPE(obj)], R, V, skill_name(GET_OBJ_VAL(obj, 3)), R);
-      send_to_char(ch, "%s|%s %sCharges:%s %s%d%s maximum, %s%d%s remaining\r\n",
-                   B, R, L, R, V, GET_OBJ_VAL(obj, 1), R, V, GET_OBJ_VAL(obj, 2), R);
-      break;
-    case ITEM_WEAPON:
-      send_to_char(ch, "%s|%s %sWeapon Data:%s Damage dice %s%dD%d%s, avg/round %s%.1f%s\r\n",
-                   B, R, L, R, V, GET_OBJ_VAL(obj, 1), GET_OBJ_VAL(obj, 2), R, V,
-                   ((GET_OBJ_VAL(obj, 2) + 1) / 2.0) * GET_OBJ_VAL(obj, 1), R);
-      break;
-    case ITEM_ARMOR:
-      send_to_char(ch, "%s|%s %sArmor Data:%s AC apply %s%d%s\r\n",
-                   B, R, L, R, V, GET_OBJ_VAL(obj, 0), R);
-      break;
-    default:
-      break;
-    }
-
-    identify_send_border(ch, B, R);
-    identify_send_section_header(ch, B, L, R, "Notes / Summary");
-    for (i = 0; i < MAX_OBJ_AFFECT; i++) {
-      if ((obj->affected[i].location != APPLY_NONE) &&
-          (obj->affected[i].modifier != 0)) {
-        affect_count++;
-      }
-    }
-
-    snprintf(aff_summary, sizeof(aff_summary), "Item has %d modifier affect%s.", affect_count, affect_count == 1 ? "" : "s");
-    send_to_char(ch, "%s|%s %sNotes:%s %s%s%s\r\n", B, R, L, R, M, aff_summary, R);
-
-    identify_send_border(ch, B, R);
-    identify_send_section_header(ch, B, L, R, "Detailed Modifiers");
-
-    found = FALSE;
-    for (i = 0; i < MAX_OBJ_AFFECT; i++) {
-      if ((obj->affected[i].location != APPLY_NONE) &&
-          (obj->affected[i].modifier != 0)) {
-        sprinttype(obj->affected[i].location, apply_types, bitbuf, sizeof(bitbuf));
-        snprintf(line, sizeof(line), "%-22.22s : %s%+d%s", bitbuf,
-                 obj->affected[i].modifier >= 0 ? G : RED, obj->affected[i].modifier, R);
-        send_to_char(ch, "%s|%s %s%s%s\r\n", B, R, V, line, R);
-        found = TRUE;
-      }
-    }
-    if (!found)
-      send_to_char(ch, "%s|%s %sNo detailed modifiers on this item.%s\r\n", B, R, V, R);
-
-    identify_send_border(ch, B, R);
+    show_identify_item(ch, obj, IDENTIFY_FULL);
   } else if (victim) {		/* victim */
+    struct time_info_data *victim_age = age(victim);
+
     send_to_char(ch, "Name: %s\r\n", GET_NAME(victim));
     if (!IS_NPC(victim))
       send_to_char(ch, "%s is %d years, %d months, %d days and %d hours old.\r\n",
-	      GET_NAME(victim), age(victim)->year, age(victim)->month,
-	      age(victim)->day, age(victim)->hours);
+	      GET_NAME(victim), victim_age->year, victim_age->month,
+	      victim_age->day, victim_age->hours);
     send_to_char(ch, "Height %d cm, Weight %d pounds\r\n", GET_HEIGHT(victim), GET_WEIGHT(victim));
     send_to_char(ch, "Level: %d, Hits: %d, Mana: %d\r\n", GET_LEVEL(victim), GET_HIT(victim), GET_MANA(victim));
     send_to_char(ch, "AC: %d, Hitroll: %d, Damroll: %d\r\n", compute_armor_class(victim), GET_HITROLL(victim), GET_DAMROLL(victim));

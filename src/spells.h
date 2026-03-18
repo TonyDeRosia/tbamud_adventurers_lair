@@ -237,6 +237,11 @@ void	spellname(int level, struct char_data *ch, \
 
 #define MANUAL_SPELL(spellname)	spellname(level, caster, cvict, ovict);
 
+enum identify_detail_level {
+  IDENTIFY_BASIC = 0,
+  IDENTIFY_FULL = 1
+};
+
 ASPELL(spell_create_water);
 ASPELL(spell_recall);
 ASPELL(spell_teleport);
@@ -252,6 +257,7 @@ ASPELL(spell_plague_bolt);
 ASPELL(spell_enfeeblement);
 ASPELL(spell_devour_soul);
 ASPELL(spell_memento_mori);
+void show_identify_item(struct char_data *ch, struct obj_data *obj, enum identify_detail_level detail);
 
 /* basic magic calling functions */
 
