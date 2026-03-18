@@ -708,9 +708,14 @@ SPECIAL(pet_shops)
       { long long _pc = (long long)PET_PRICE(pet); char _pb[64]; format_price_gsc(_pb, sizeof(_pb), _pc); send_to_char(ch, "%8s - %s\r\n", _pb, GET_NAME(pet)); }
     }
     return (TRUE);
-  } else if (CMD_IS("buy")) {
+  } else if (CMD_IS("buy") || CMD_IS("adopt")) {
 
     two_arguments(argument, buf, pet_name);
+
+    if (CMD_IS("buy")) {
+      send_to_char(ch, "Use ADOPT <pet> [name] for pet purchases.\r\n");
+      return TRUE;
+    }
 
     if (!(pet = get_char_room(buf, NULL, pet_room)) || !IS_NPC(pet)) {
       send_to_char(ch, "There is no such pet!\r\n");
@@ -749,7 +754,7 @@ SPECIAL(pet_shops)
     return (TRUE);
   }
 
-  /* All commands except list and buy */
+  /* All commands except list and adopt */
   return (FALSE);
 }
 
