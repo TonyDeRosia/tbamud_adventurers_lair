@@ -1062,6 +1062,8 @@ static int mag_manacost(struct char_data *ch, int spellnum) {
 
   if (ch && GET_SKILL(ch, SKILL_SUPREME_CASTER_DISCIPLINE) > 0)
     reduction_pct += 5;
+  if (ch && GET_SKILL(ch, SKILL_TACTICAL_SPELL_MEMORY) > 0)
+    reduction_pct += 5;
   if (ch && affected_by_spell(ch, SPELL_ENCHANTERS_FOCUS))
     reduction_pct += 10;
   if (reduction_pct > 20)
