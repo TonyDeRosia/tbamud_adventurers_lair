@@ -14056,14 +14056,110 @@ allspells <filter>
 allspells all
 Shows class spell access, and accepts the same filters as spells.
 AURAS
-Character tags are shown when states are truly active and visible:
-Player, OPK, Invis, Hidden, Flying, Charmed, Diseased, Stealth,
-White Aura, Red Aura, Golden Aura, Angry, Wounded.
-OBJECT FLAGS
-Object aura tags can appear in room, inventory, equipment, and auction:
-Blue Aura, Glow, Hum, Invis, K, Magic, Cursed, Red Aura.
-WEAPON FLAGS
-Weapon-specific flags currently displayed through object auras include:
-Magic, Cursed (K), and Red Aura when present.
+----------------------------------------------------------------------------
+Help Keywords : Auras.
+Help Category : Information.
+Related Helps : Object Flags, Shortflags.
+Last Updated  : 2025-04-18 10:35:02.
+----------------------------------------------------------------------------
+When exploring the realms, you may find a person with a \tW(White Aura)\tn or a
+\tW(Marked)\tn flag.  This can be an interesting sight, indeed. These flags are
+actually side effects of certain spells or object properties. The list
+below explains what some of these flags mean.
+
+The single letter after the aura name is the shortened version of the
+flag.  To toggle whether you see the shortened or complete version of
+these flags, use the 'shortflags' command.
+
+Mob auras:
+
+\tM(Animated)\tn (\tM(A)\tn): Inanimate things given life and thought through magical means,
+                under their master's control (thus the \tC(Charmed)\tn aura).
+
+\tR(Angry)\tn: This flag shows on aggressive monsters when sensing anger.
+         (There is no short version of this flag.)
+
+\tC(Charmed)\tn (\tC(C)\tn): Monsters with this aura are under the command of someone
+               else.
+
+\tb(Diseased)\tn (\tb(D)\tn): A person or mob with this aura is diseased.
+
+\tC(Flying)\tn (\tC(F)\tn): A player or mob with this aura is flying and will not get
+              stuck in quicksand.
+
+\tY(Golden Aura)\tn (\tY(G)\tn): Players and mobs with this aura are of good alignment.
+                   Evil aligned players will get more xp for attacking mobs
+                   with this aura.
+
+\tw(Hidden)\tn (\tw(H)\tn): The player or mob is hiding but has been detected.
+
+\tw(Invis)\tn (\tw(I)\tn): The player or mob is invisible, and you have detection spells
+             to see it.
+
+\tw(Marked)\tn (\tR(X)\tn): A person or mob with this aura is under the effect of a
+              spell which makes one much more vulnerable to attacks.  Be
+              careful when adventuring with this aura!
+
+\tM(OPK)\tn: Players who opt in for Open Player Kill. See help OPK for details.
+
+\tW(Player)\tn (\tW(P)\tn): Congratulations! You have made a new friend who is not a mob!
+
+\tR(Red Aura)\tn (\tR(R)\tn): Players and mobs with this aura are of evil alignment.
+                Good aligned players will get more xp for attacking mobs
+                with this aura.
+
+\tC(Stealth)\tn (\tC(S)\tn): Those under the effect of the Oracle spell Eye of Warning
+               will see this flag next to stalking / stealthed players.
+
+\tw(Translucent)\tn (\tw(T)\tn): A person or mob with this aura can pass through many
+                   doors without bothering to open them or look for a
+                   key.
+
+\tR(Undead)\tn (\tR(U)\tn): Necromancers sensing undead will see this flag on applicable
+              monsters.
+
+\tW(White Aura)\tn (\tW(W)\tn): A person or mob with this aura is under the effect of
+                  a powerful spell which reduces the damage taken from
+                  enemy attacks.
+
+\tR(Wounded)\tn: A mob with this aura has been damaged to less than 60% of their
+           total hit points. Help Policies4 applies. It's important to note
+           that \tR(Wounded)\tn does not appear as a shortened flag. It's that
+           important.
+
+Object auras:
+
+\tB(Blue Aura)\tn (\tB(B)\tn): Objects with this aura have a divine touch.  Some spells
+                 will not work on objects with this aura.
+
+\tY(Glow)\tn (\tY(G)\tn): These objects produce a soft glow, which allows them to be
+            seen in darkened rooms, and can be worn or manipulated even if
+            invisible and otherwise undetectable.
+
+\tC(Hum)\tn (\tC(H)\tn): Objects with this flag resonate slightly, allowing them to be
+           felt and used while blind.
+
+\tw(Invis)\tn (\tw(I)\tn): These objects are normally invisible.  You must have some
+             form of detect invis (spell, ability, or true sight gear, etc.)
+             in order to see this item.
+
+\tR(K)\tn: The object has the kept flag (see 'help keep').  (There is no long
+     version of this flag.)
+
+\tB(Magic)\tn (\tB(M)\tn): Equipment, trash, and even corpses can have this aura. It
+             denotes objects of a magical nature.  Some spells do not work
+             on objects with this aura.
+
+\tw(Cursed)\tn (\tw(C)\tn): Cursed items can't be dropped and/or sold. You will
+              need to have them uncursed first.
+
+\tR(Red Aura)\tn (\tR(R)\tn): Evil spirits reside within this object.  Currently,
+                this has no effect on the object or character.
+
+\tR(Tempered)\tn (\tR(T)\tn): Blacksmiths will see this aura on tempered weapons.
+
+\tG(Envenomed)\tn (\tG(E)\tn): Shows on a weapon that has been coated with a nasty venom.
+
+----------------------------------------------------------------------------
 #0
 $~
