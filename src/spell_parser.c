@@ -402,6 +402,106 @@ static const struct cast_message cast_messages[] = {
     "You snuff the light with a cold gesture.",
     "Shadows thicken around $n, swallowing the room.",
     NULL
+  },
+  [SPELL_FIREBOLT] = {
+    "You hurl a bolt of fire at $N!",
+    "$n hurls a bolt of fire at $N!",
+    "A bolt of fire slams into you!"
+  },
+  [SPELL_FLAME_ARROW] = {
+    "You conjure a blazing arrow of fire and hurl it at $N!",
+    "$n hurls a blazing arrow of fire at $N!",
+    "A blazing arrow of fire pierces you and leaves you burning!"
+  },
+  [SPELL_FROSTBITE] = {
+    "You drain heat from $N's body in a flash of killing frost!",
+    "$n freezes the moisture around $N with killing frost!",
+    "Extreme cold bites into you, numbing your limbs!"
+  },
+  [SPELL_VOLTAIC_BOLT] = {
+    "A crackling bolt of electricity arcs from your fingers at $N!",
+    "$n fires a crackling bolt of electricity at $N!",
+    "A voltaic bolt slams into you, leaving you charged with static!"
+  },
+  [SPELL_ACID_BLAST] = {
+    "You unleash a blast of corrosive acid at $N!",
+    "$n launches a sizzling blast of acid at $N!",
+    "Searing acid eats through your armor and flesh!"
+  },
+  [SPELL_SHADOW_BOLT] = {
+    "You hurl a bolt of pure shadow energy at $N!",
+    "$n hurls a bolt of shadow at $N!",
+    "A bolt of shadow crashes into you!"
+  },
+  [SPELL_VAMPIRIC_TOUCH] = {
+    "You plunge necrotic energy into $N, draining life from the wound!",
+    "$n drains life from $N with necrotic power!",
+    "$n tears at your vitality with necrotic power!"
+  },
+  [SPELL_WEB] = {
+    "You hurl a mass of sticky webs at $N!",
+    "Sticky webs shoot from $n's hands and wrap around $N!",
+    "Thick strands of webbing wrap around you!"
+  },
+  [SPELL_SILENCE] = {
+    "You weave silence around $N's throat!",
+    "$n seals $N's voice with a gesture!",
+    "Your voice is stolen away by magical silence!"
+  },
+  [SPELL_FEAR] = {
+    "You project an aura of supernatural dread at $N!",
+    "$n unleashes supernatural fear at $N!",
+    "Terror seizes your heart as magical dread overwhelms you!"
+  },
+  [SPELL_TRUE_SEEING] = {
+    "Your vision sharpens to supernatural clarity.",
+    "$n's eyes glow with supernatural clarity.",
+    "A shimmer of arcane light washes over your eyes."
+  },
+  [SPELL_STONE_SKIN] = {
+    "Your skin hardens to the consistency of granite!",
+    "$n's skin hardens to a stony texture!",
+    "$n's skin takes on a rough, stony texture."
+  },
+  [SPELL_BARKSKIN] = {
+    "Your skin hardens into rough, bark-like armor!",
+    "$n's skin hardens to a bark-like texture!",
+    "$n's skin hardens to a bark-like texture."
+  },
+  [SPELL_GIANT_STRENGTH] = {
+    "Your muscles swell with giant-like strength!",
+    "$n swells with magical strength!",
+    "$n's muscles swell with magical strength!"
+  },
+  [SPELL_ADRENALINE_SURGE] = {
+    "Adrenaline surges through you!",
+    "$n surges with adrenaline!",
+    NULL
+  },
+  [SPELL_CLARITY] = {
+    "Your mind sharpens to perfect clarity!",
+    "$n's eyes clear with magical clarity!",
+    "$n's eyes clear as magical clarity takes hold."
+  },
+  [SPELL_MARK_OF_DEATH] = {
+    "You brand $N with the Mark of Death!",
+    "$n brands $N with a burning sigil!",
+    "A burning sigil sears itself into your flesh!"
+  },
+  [SPELL_BLOODLUST] = {
+    "Bloodlust seizes you as your body burns for violence!",
+    "$n's eyes go red with bloodlust!",
+    NULL
+  },
+  [SPELL_GREATER_HEAL] = {
+    "You channel powerful healing into $N!",
+    "$n channels powerful healing into $N!",
+    "Waves of powerful healing wash over you!"
+  },
+  [SPELL_CLEANSE] = {
+    "Holy light cleanses all afflictions from $N!",
+    "$n calls holy light to cleanse $N of all afflictions!",
+    "Holy light washes away all your afflictions!"
   }
 };
 
@@ -1100,6 +1200,18 @@ int call_magic(struct char_data *caster, struct char_data *cvict,
       break;
     case SPELL_MEMENTO_MORI:
       MANUAL_SPELL(spell_memento_mori)
+      ;
+      break;
+    case SPELL_VAMPIRIC_TOUCH:
+      MANUAL_SPELL(spell_vampiric_touch)
+      ;
+      break;
+    case SPELL_GREATER_HEAL:
+      MANUAL_SPELL(spell_greater_heal)
+      ;
+      break;
+    case SPELL_CLEANSE:
+      MANUAL_SPELL(spell_cleanse)
       ;
       break;
     }
@@ -1994,6 +2106,81 @@ void mag_assign_spells(void) {
   spello(SPELL_DEVOUR_SOUL, "devour soul", 120, 90, 3, POS_FIGHTING,
   TAR_CHAR_ROOM | TAR_FIGHT_VICT, TRUE, MAG_MANUAL,
   "The hollow ache in your soul fades.\tn");
+
+  spello(SPELL_FIREBOLT, "firebolt", 12, 12, 0, POS_FIGHTING,
+  TAR_CHAR_ROOM | TAR_FIGHT_VICT, TRUE, MAG_DAMAGE, NULL);
+
+  spello(SPELL_FLAME_ARROW, "flame arrow", 16, 16, 0, POS_FIGHTING,
+  TAR_CHAR_ROOM | TAR_FIGHT_VICT, TRUE, MAG_DAMAGE | MAG_AFFECTS,
+  "The flames consuming you gutter out.");
+
+  spello(SPELL_FROSTBITE, "frostbite", 14, 14, 0, POS_FIGHTING,
+  TAR_CHAR_ROOM | TAR_FIGHT_VICT, TRUE, MAG_DAMAGE | MAG_AFFECTS,
+  "Feeling returns to your limbs.");
+
+  spello(SPELL_VOLTAIC_BOLT, "voltaic bolt", 18, 18, 0, POS_FIGHTING,
+  TAR_CHAR_ROOM | TAR_FIGHT_VICT, TRUE, MAG_DAMAGE | MAG_AFFECTS,
+  "The static charge around you dissipates.");
+
+  spello(SPELL_ACID_BLAST, "acid blast", 20, 20, 0, POS_FIGHTING,
+  TAR_CHAR_ROOM | TAR_FIGHT_VICT, TRUE, MAG_DAMAGE | MAG_AFFECTS,
+  "The acid corroding your armor neutralizes.");
+
+  spello(SPELL_SHADOW_BOLT, "shadow bolt", 16, 16, 0, POS_FIGHTING,
+  TAR_CHAR_ROOM | TAR_FIGHT_VICT, TRUE, MAG_DAMAGE, NULL);
+
+  spello(SPELL_VAMPIRIC_TOUCH, "vampiric touch", 20, 20, 0, POS_FIGHTING,
+  TAR_CHAR_ROOM | TAR_FIGHT_VICT, TRUE, MAG_MANUAL, NULL);
+
+  spello(SPELL_WEB, "web", 15, 15, 0, POS_FIGHTING,
+  TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_NOT_SELF, TRUE, MAG_AFFECTS,
+  "The webs binding you dissolve away.");
+
+  spello(SPELL_SILENCE, "silence", 15, 15, 0, POS_FIGHTING,
+  TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_NOT_SELF, TRUE, MAG_AFFECTS,
+  "The magical silence lifts from your throat.");
+
+  spello(SPELL_FEAR, "fear", 18, 18, 0, POS_FIGHTING,
+  TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_NOT_SELF, TRUE, MAG_AFFECTS,
+  "The supernatural terror drains from you.");
+
+  spello(SPELL_TRUE_SEEING, "true seeing", 20, 20, 0, POS_STANDING,
+  TAR_CHAR_ROOM | TAR_SELF_ONLY, FALSE, MAG_AFFECTS,
+  "Your magically enhanced vision fades.");
+
+  spello(SPELL_STONE_SKIN, "stone skin", 20, 20, 0, POS_STANDING,
+  TAR_CHAR_ROOM, FALSE, MAG_AFFECTS,
+  "Your stone skin crumbles away.");
+
+  spello(SPELL_BARKSKIN, "barkskin", 15, 15, 0, POS_STANDING,
+  TAR_CHAR_ROOM, FALSE, MAG_AFFECTS,
+  "Your barkskin softens back to normal.");
+
+  spello(SPELL_GIANT_STRENGTH, "giant strength", 15, 15, 0, POS_STANDING,
+  TAR_CHAR_ROOM, FALSE, MAG_AFFECTS,
+  "Your giant-like strength fades.");
+
+  spello(SPELL_ADRENALINE_SURGE, "adrenaline surge", 15, 15, 0, POS_STANDING,
+  TAR_CHAR_ROOM | TAR_SELF_ONLY, FALSE, MAG_AFFECTS,
+  "The adrenaline rush leaves your body.");
+
+  spello(SPELL_CLARITY, "clarity", 20, 20, 0, POS_STANDING,
+  TAR_CHAR_ROOM, FALSE, MAG_AFFECTS,
+  "Your perfect clarity fades.");
+
+  spello(SPELL_MARK_OF_DEATH, "mark of death", 25, 25, 0, POS_FIGHTING,
+  TAR_CHAR_ROOM | TAR_FIGHT_VICT | TAR_NOT_SELF, TRUE, MAG_AFFECTS,
+  "The Mark of Death fades from your flesh.");
+
+  spello(SPELL_BLOODLUST, "bloodlust", 20, 20, 0, POS_STANDING,
+  TAR_CHAR_ROOM | TAR_SELF_ONLY, FALSE, MAG_AFFECTS,
+  "The bloodlust drains from you.");
+
+  spello(SPELL_GREATER_HEAL, "greater heal", 40, 40, 0, POS_FIGHTING,
+  TAR_CHAR_ROOM, FALSE, MAG_MANUAL, NULL);
+
+  spello(SPELL_CLEANSE, "cleanse", 20, 20, 0, POS_STANDING,
+  TAR_CHAR_ROOM, FALSE, MAG_MANUAL, NULL);
 
   spello(SPELL_SENSE_LIFE, "sense life", 20, 10, 2, POS_STANDING,
   TAR_CHAR_ROOM | TAR_SELF_ONLY, FALSE, MAG_AFFECTS,

@@ -246,11 +246,24 @@ ACMD(do_order)
 ACMD(do_flee)
 {
   int i, attempt, loss;
+  int web_penalty = 0;
   struct char_data *was_fighting;
+  struct affected_type *af;
 
   if (AFF_FLAGGED(ch, AFF_ROOTED)) {
     send_to_char(ch, "You are rooted and cannot flee!\r\n");
     return;
+  }
+
+  if (AFF_FLAGGED(ch, AFF_WEBBED)) {
+    for (af = ch->affected; af; af = af->next) {
+      if (IS_SET_AR(af->bitvector, AFF_WEBBED) && af->modifier < web_penalty)
+        web_penalty = af->modifier;
+    }
+    if (web_penalty <= -4) {
+      send_to_char(ch, "You are tightly webbed and cannot flee!\r\n");
+      return;
+    }
   }
 
   if (GET_POS(ch) < POS_FIGHTING) {

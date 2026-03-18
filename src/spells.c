@@ -39,6 +39,30 @@ static int warlock_power(struct char_data *ch)
   return GET_INT(ch) + GET_WIS(ch);
 }
 
+static int remove_flagged_affects(struct char_data *victim, int aff_flag)
+{
+  struct affected_type *af, *next;
+  int removed = 0;
+
+  if (!victim)
+    return 0;
+
+  for (af = victim->affected; af; af = next) {
+    next = af->next;
+    if (IS_SET_AR(af->bitvector, aff_flag)) {
+      affect_remove(victim, af);
+      removed = 1;
+    }
+  }
+
+  if (AFF_FLAGGED(victim, aff_flag)) {
+    REMOVE_BIT_AR(AFF_FLAGS(victim), aff_flag);
+    removed = 1;
+  }
+
+  return removed;
+}
+
 static int identify_is_warning_flag(const char *flag)
 {
   if (!flag || !*flag)
@@ -792,6 +816,75 @@ ASPELL(spell_devour_soul)
   af.modifier = sv_pen;
   af.location = APPLY_SAVING_SPELL;
   affect_join(victim, &af, FALSE, FALSE, FALSE, FALSE);
+}
+
+ASPELL(spell_vampiric_touch)
+{
+  int dam;
+  int healed;
+
+  if (victim == NULL || ch == NULL)
+    return;
+
+  set_spell_damage_type(DAM_NECROTIC);
+  dam = (level * 3) + dice(3, MAX(1, level / 3));
+  if (mag_savingthrow(victim, SAVING_SPELL, 0))
+    dam /= 2;
+
+  dam = damage(ch, victim, dam, SPELL_VAMPIRIC_TOUCH);
+  if (dam <= 0)
+    return;
+
+  healed = (dam * 40) / 100;
+  if (healed > 0)
+    GET_HIT(ch) = MIN(GET_MAX_HIT(ch), GET_HIT(ch) + healed);
+}
+
+ASPELL(spell_greater_heal)
+{
+  int healing;
+
+  if (victim == NULL || ch == NULL)
+    return;
+
+  healing = (level * 5) + dice(6, MAX(1, level));
+  GET_HIT(victim) = MIN(GET_MAX_HIT(victim), GET_HIT(victim) + healing);
+  update_pos(victim);
+
+  if (affected_by_spell(victim, SPELL_POISON))
+    affect_from_char(victim, SPELL_POISON);
+  if (affected_by_spell(victim, SPELL_CURSE))
+    affect_from_char(victim, SPELL_CURSE);
+  if (affected_by_spell(victim, SPELL_BLINDNESS))
+    affect_from_char(victim, SPELL_BLINDNESS);
+
+  remove_flagged_affects(victim, AFF_POISON);
+  remove_flagged_affects(victim, AFF_CURSE);
+  remove_flagged_affects(victim, AFF_BLIND);
+}
+
+ASPELL(spell_cleanse)
+{
+  if (victim == NULL || ch == NULL)
+    return;
+
+  if (affected_by_spell(victim, SPELL_POISON))
+    affect_from_char(victim, SPELL_POISON);
+  if (affected_by_spell(victim, SPELL_CURSE))
+    affect_from_char(victim, SPELL_CURSE);
+  if (affected_by_spell(victim, SPELL_BLINDNESS))
+    affect_from_char(victim, SPELL_BLINDNESS);
+
+  remove_flagged_affects(victim, AFF_POISON);
+  remove_flagged_affects(victim, AFF_CURSE);
+  remove_flagged_affects(victim, AFF_BLIND);
+  remove_flagged_affects(victim, AFF_SILENCED);
+  remove_flagged_affects(victim, AFF_CORRODED);
+  remove_flagged_affects(victim, AFF_WEBBED);
+  remove_flagged_affects(victim, AFF_ARCANE_LEAK);
+  remove_flagged_affects(victim, AFF_FEARFUL);
+  remove_flagged_affects(victim, AFF_HEXED);
+  remove_flagged_affects(victim, AFF_SPELLLOCK);
 }
 
 ASPELL(spell_identify)
