@@ -1684,24 +1684,17 @@ len = append_box_line(buf, len, sizeof(buf), B, R, "", W);
   len += snprintf(buf + len, sizeof(buf) - len,
     "%s╠═══════════════════════════════════════════════════════════════════════════════╣%s\r\n", B, R);
 
-  /* Armor and Alignment */
+  /* Armor, Spell Saves, and Alignment */
   {
-    int raw_ac   = compute_armor_class(ch);   /* internal, scaled by 10 */
-    int shown_ac = raw_ac / 10;               /* player facing */
-    int base_ac  = GET_AC(ch) / 10;           /* without dex */
-    int dex_ac   = dex_app[GET_DEX(ch)].defensive;
+    int shown_ac = compute_armor_class(ch) / 10;  /* player-facing AC */
+    int spell_save = GET_SAVE(ch, 4);
+    int alignment = GET_ALIGNMENT(ch);
 
-    if (GET_LEVEL(ch) >= LVL_IMMORT) {
-      snprintf(line, sizeof(line),
-        "%sArmor Class:%s %d  (Base %d  Dex %+d  Raw %d)        %sAlignment:%s %d",
-        C, R, shown_ac, base_ac, dex_ac, raw_ac,
-        C, R, GET_ALIGNMENT(ch));
-    } else {
-      snprintf(line, sizeof(line),
-        "%sArmor Class:%s %d                                      %sAlignment:%s %d",
-        C, R, shown_ac,
-        C, R, GET_ALIGNMENT(ch));
-    }
+    snprintf(line, sizeof(line),
+      "%sArmor Class:%s %-8d   %sSpell Saves:%s %-5d   %sAlignment:%s %-6d",
+      C, R, shown_ac,
+      C, R, spell_save,
+      C, R, alignment);
   }
   len = append_box_line(buf, len, sizeof(buf), B, R, line, W);/* Combat Stats */
   len = append_box_line(buf, len, sizeof(buf), B, R, "", W);
@@ -1761,11 +1754,6 @@ len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
   
 
   len = append_box_line(buf, len, sizeof(buf), B, R, "", W);
-
-  /* Player-facing save value: spell save (internal save system remains unchanged). */
-  snprintf(line, sizeof(line), "%sSpell Saves:%s %d", C, R, GET_SAVE(ch, 4));
-  len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
-
   if (GET_EQ(ch, WEAR_WIELD) && GET_OBJ_TYPE(GET_EQ(ch, WEAR_WIELD)) == ITEM_WEAPON) {
     struct obj_data *wobj = GET_EQ(ch, WEAR_WIELD);
     int nd = GET_OBJ_VAL(wobj, 1);
