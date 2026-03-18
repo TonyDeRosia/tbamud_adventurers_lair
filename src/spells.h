@@ -301,7 +301,7 @@
 #define SKILL_KILL_WINDOW           257
 #define SKILL_LEGION_MASTERY        258
 #define SKILL_APPRAISE_ENEMY        259
-/* New skills may be added here up to MAX_SKILLS (260). */
+/* New skills may be added here up to MAX_SKILLS (see structs.h). */
 
 /* NON-PLAYER AND OBJECT SPELLS AND SKILLS: The practice levels for the spells
  * and skills below are _not_ recorded in the players file; therefore, the
