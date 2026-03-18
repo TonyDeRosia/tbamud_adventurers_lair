@@ -9212,16 +9212,27 @@ Room Example: @RGOTO 7318@n, @RLOOK SIGN@n.
 #31
 SKILLS
 
-| Warrior       level |   Thief            level |
---------------------------------------------------
-| Kick            1   |   Sneak              1   |
-| Rescue          3   |   Pick Lock          2   |
-| Track           9   |   Backstab           3   |
-| Bash           12   |   Steal              4   |
-| Whirlwind      16   |   Hide               5   |
-|                     |   Track              6   |
---------------------------------------------------
+Current skill topics recognized by the game:
+  1) backstab                         2) bash
+  3) hide                             4) kick
+  5) pick lock                        6) rescue
+  7) sneak                            8) steal
+  9) track                           10) whirlwind
+ 11) bandage                         12) dual wield
+ 13) recall                          14) overlord presence
+ 15) supreme caster discipline       16) undead command
+ 17) tactical spell memory           18) dread dominion
+ 19) shadow commander                20) predators advance
+ 21) monarch reflexes                22) relentless hunt
+ 23) shadow reservoir                24) shadow surge
+ 25) chain assault                   26) sovereign pressure
+ 27) kill window                     28) legion mastery
+ 29) appraise enemy
 
+Tip: Use HELP <skill name>. Multi-word names can be typed with spaces
+(for example: HELP APPRAISE ENEMY).
+
+See also: SPELLS
 #0
 SKILLSET SETSKILL
 
@@ -9446,7 +9457,7 @@ mob or object vnum.
 
 See also: POSTMASTER, PETSHOPS, BANKS, GUILDMASTER, BOARDS
 #31
-SPELLS
+SPELLS-LEGACY MSGEDIT-SPELLS
 
  1) armor                 2) teleport              3) bless                
  4) blindness             5) burning hands         6) call lightning       
@@ -9470,40 +9481,85 @@ SPELLS
 #31
 SPELLS MAGICS SPELLBOOKS TOMBS SPELL-LEVELS SPELLS-STOCK SPELLLIST
 
-| Mage               level |   Cleric              level |
-----------------------------------------------------------
-| Magic Missile        1   |   Cure Light            1   |
-| Detect Invisibility  2   |   Armor                 1   |
-| Detect Magic         2   |   Create Food           2   |
-| Chill Touch          3   |   Create Water          2   |
-| Infravision          3   |   Detect Poison         3   |
-| Invisibility         4   |   Detect Alignment      4   |
-| Armor                4   |   Cure Blind            4   |
-| Burning Hands        5   |   Bless                 5   |
-| Locate Object        6   |   Detect Invisibility   6   |
-| Strength             6   |   Blindness             6   |
-| Shocking Grasp       7   |   Infravision           7   |
-| Sleep                8   |   Protection from Evil  8   |
-| Lightning Bolt       9   |   Poison                8   |
-| Blindness            9   |   Group Armor           9   |
-| Detect Poison       10   |   Cure Crit             9   |
-| Color Spray         11   |   Summon               10   |
-| Energy Drain        13   |   Remove Poison        10   |
-| Curse               14   |   Identify             11   |
-| Poison              14   |   Word of Recall       12   |
-| Fireball            15   |   Earthquake           12   |
-| Charm               16   |   Darkness             13   |
-| Identify            20   |   Dispel Evil          14   |
-| Enchant Weapon      26   |   Dispel Good          14   |
-| Clone               30   |   Sanctuary            15   |
-|                          |   Call Lightning       15   |
-|                          |   Heal                 16   |
-|                          |   Control Weather      17   |
-|                          |   Sense Life           18   |
-|                          |   Harm                 19   |
-|                          |   Group Heal           22   |
-|                          |   Remove Curse         26   |
-----------------------------------------------------------
+Current spell topics recognized by the game:
+  1) animate dead               2) armor                      3) bless
+  4) blindness                  5) burning hands              6) call lightning
+  7) charm person               8) chill touch                9) clone
+ 10) color spray               11) control weather           12) corruption
+ 13) create food               14) create water              15) cure blind
+ 16) cure critic               17) cure light                18) curse
+ 19) darkness                  20) detect alignment          21) detect invisibility
+ 22) detect magic              23) detect poison             24) dispel evil
+ 25) dispel good               26) earthquake                27) enchant weapon
+ 28) energy drain              29) group armor               30) fireball
+ 31) fly                       32) group heal                33) harm
+ 34) heal                      35) infravision               36) invisibility
+ 37) lightning bolt            38) locate object             39) magic missile
+ 40) poison                    41) protection from evil      42) remove curse
+ 43) remove poison             44) sanctuary                 45) arcane ward
+ 46) evasion                   47) ironskin                  48) divine bulwark
+ 49) song of resilience        50) dark aegis                51) nirvana
+ 52) plague bolt               53) enfeeblement              54) memento mori
+ 55) devour soul               56) firebolt                  57) flame arrow
+ 58) frostbite                 59) voltaic bolt              60) acid blast
+ 61) shadow bolt               62) vampiric touch            63) web
+ 64) silence                   65) fear                      66) true seeing
+ 67) stone skin                68) barkskin                  69) giant strength
+ 70) adrenaline surge          71) clarity                   72) mark of death
+ 73) bloodlust                 74) greater heal              75) cleanse
+ 76) disrupt                   77) antimagic shell           78) enchanters focus
+ 79) time snare                80) phase shift               81) mirror veil
+ 82) elemental ward fire       83) elemental ward cold       84) elemental ward lightning
+ 85) elemental ward acid       86) counterspell              87) spell steal
+ 88) cancellation              89) hold person               90) hold monster
+ 91) confusion                 92) vertigo                   93) mass fear
+ 94) null field                95) silence field             96) miasma
+ 97) toxic cloud               98) wall of fire              99) static field
+100) consecrate               101) gravity well             102) shockwave
+103) nova                     104) ice storm                105) blizzard
+106) frost nova               107) greater fireball         108) acid rain
+109) sonic burst              110) word of pain             111) sense life
+112) shocking grasp           113) sleep                    114) strength
+115) summon                   116) teleport                 117) ventriloquate
+118) bear spirit              119) wolf spirit              120) tiger spirit
+121) eagle spirit             122) dragon spirit            123) waterwalk
+124) word of recall           125) group recall             126) identify
+127) conjure elemental        128) call wolves              129) call bears
+130) animate dead greater     131) abyss gate               132) gate
+133) portal                   134) locate corpse            135) word of recall mass
+136) astral projection        137) ethereal jaunt           138) leyline tap
+139) temporal shift           140) chrono shift             141) balefire
+142) meteor                   143) meteor swarm             144) hellfire
+145) wrathfire                146) celestial smite          147) hammer of god
+148) death knell              149) unholy word              150) holy word
+151) finger of death          152) wail of the banshee      153) disintegrate
+154) power word kill          155) power word stun          156) power word blind
+157) power word silence       158) psychic crush            159) time stop
+160) black lance              161) reality slash            162) grasp heart
+163) negative burst           164) true death               165) perfect unknowable
+166) crystal body             167) greater magic seal       168) despair aura
+169) oblivion spear           170) bone prison              171) undying will
+172) dragon lightning         173) chain dragon lightning   174) hell flame
+175) gravity maelstrom        176) call greater thunder     177) astral smite
+178) greater rejection        179) napalm                   180) fallen down
+181) ia shub niggurath        182) goal of all life is death183) cry of the banshee
+184) body of effulgent beryl  185) vermilion nova           186) nuclear blast
+187) greater teleportation    188) silent magic             189) triple maximize magic
+190) pantheon                 191) dimensional lock         192) shadow bind
+193) shadow exchange          194) dagger rain              195) monarchs pressure
+196) shadow domain            197) force grasp              198) shadow step
+199) black heart              200) call shadow legion       201) night hunt
+202) dark rebuke              203) execution mark           204) shadow extraction
+205) arise greater            206) monarchs authority       207) rulers hand
+208) shadow lance             209) shadow burst             210) shadow storm
+211) fatal strike             212) dominion of shadows      213) shadow recall
+214) shadow regenesis         215) assassins intent         216) blood dagger tempest
+217) chain of subjugation     218) sovereigns step          219) kings command
+220) detect kill intent       221) mutilate                 222) shadow armor
+223) total occultation        224) domain break             225) hunters instinct
+
+Tip: Use HELP <spell name>. Multi-word names can be typed with spaces
+(for example: HELP BODY OF EFFULGENT BERYL).
 
 See also: SKILLS
 #0
@@ -20345,3 +20401,2127 @@ Notes
 ----------------------------------------
 Excellent opener when deciding threat priority.
 #0
+ARMOR
+
+ARMOR
+Type: SPELL
+Usage: cast armor
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+CLONE
+
+CLONE
+Type: SPELL
+Usage: cast clone
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+CORRUPTION
+
+CORRUPTION
+Type: SPELL
+Usage: cast corruption
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+GROUP-HEAL
+
+GROUP HEAL
+Type: SPELL
+Usage: cast group heal
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+ARCANE-WARD
+
+ARCANE WARD
+Type: SPELL
+Usage: cast arcane ward
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+EVASION
+
+EVASION
+Type: SPELL
+Usage: cast evasion
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+IRONSKIN
+
+IRONSKIN
+Type: SPELL
+Usage: cast ironskin
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+DIVINE-BULWARK
+
+DIVINE BULWARK
+Type: SPELL
+Usage: cast divine bulwark
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+SONG-OF-RESILIENCE
+
+SONG OF RESILIENCE
+Type: SPELL
+Usage: cast song of resilience
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+DARK-AEGIS
+
+DARK AEGIS
+Type: SPELL
+Usage: cast dark aegis
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+NIRVANA
+
+NIRVANA
+Type: SPELL
+Usage: cast nirvana
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+PLAGUE-BOLT
+
+PLAGUE BOLT
+Type: SPELL
+Usage: cast plague bolt
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+ENFEEBLEMENT
+
+ENFEEBLEMENT
+Type: SPELL
+Usage: cast enfeeblement
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+MEMENTO-MORI
+
+MEMENTO MORI
+Type: SPELL
+Usage: cast memento mori
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+DEVOUR-SOUL
+
+DEVOUR SOUL
+Type: SPELL
+Usage: cast devour soul
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+FIREBOLT
+
+FIREBOLT
+Type: SPELL
+Usage: cast firebolt
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+FLAME-ARROW
+
+FLAME ARROW
+Type: SPELL
+Usage: cast flame arrow
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+FROSTBITE
+
+FROSTBITE
+Type: SPELL
+Usage: cast frostbite
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+VOLTAIC-BOLT
+
+VOLTAIC BOLT
+Type: SPELL
+Usage: cast voltaic bolt
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+ACID-BLAST
+
+ACID BLAST
+Type: SPELL
+Usage: cast acid blast
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+SHADOW-BOLT
+
+SHADOW BOLT
+Type: SPELL
+Usage: cast shadow bolt
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+VAMPIRIC-TOUCH
+
+VAMPIRIC TOUCH
+Type: SPELL
+Usage: cast vampiric touch
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+WEB
+
+WEB
+Type: SPELL
+Usage: cast web
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+SILENCE
+
+SILENCE
+Type: SPELL
+Usage: cast silence
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+FEAR
+
+FEAR
+Type: SPELL
+Usage: cast fear
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+TRUE-SEEING
+
+TRUE SEEING
+Type: SPELL
+Usage: cast true seeing
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+STONE-SKIN
+
+STONE SKIN
+Type: SPELL
+Usage: cast stone skin
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+BARKSKIN
+
+BARKSKIN
+Type: SPELL
+Usage: cast barkskin
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+GIANT-STRENGTH
+
+GIANT STRENGTH
+Type: SPELL
+Usage: cast giant strength
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+ADRENALINE-SURGE
+
+ADRENALINE SURGE
+Type: SPELL
+Usage: cast adrenaline surge
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+CLARITY
+
+CLARITY
+Type: SPELL
+Usage: cast clarity
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+MARK-OF-DEATH
+
+MARK OF DEATH
+Type: SPELL
+Usage: cast mark of death
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+BLOODLUST
+
+BLOODLUST
+Type: SPELL
+Usage: cast bloodlust
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+GREATER-HEAL
+
+GREATER HEAL
+Type: SPELL
+Usage: cast greater heal
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+CLEANSE
+
+CLEANSE
+Type: SPELL
+Usage: cast cleanse
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+DISRUPT
+
+DISRUPT
+Type: SPELL
+Usage: cast disrupt
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+ANTIMAGIC-SHELL
+
+ANTIMAGIC SHELL
+Type: SPELL
+Usage: cast antimagic shell
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+ENCHANTERS-FOCUS
+
+ENCHANTERS FOCUS
+Type: SPELL
+Usage: cast enchanters focus
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+TIME-SNARE
+
+TIME SNARE
+Type: SPELL
+Usage: cast time snare
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+PHASE-SHIFT
+
+PHASE SHIFT
+Type: SPELL
+Usage: cast phase shift
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+MIRROR-VEIL
+
+MIRROR VEIL
+Type: SPELL
+Usage: cast mirror veil
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+ELEMENTAL-WARD-FIRE
+
+ELEMENTAL WARD FIRE
+Type: SPELL
+Usage: cast elemental ward fire
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+ELEMENTAL-WARD-COLD
+
+ELEMENTAL WARD COLD
+Type: SPELL
+Usage: cast elemental ward cold
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+ELEMENTAL-WARD-LIGHTNING
+
+ELEMENTAL WARD LIGHTNING
+Type: SPELL
+Usage: cast elemental ward lightning
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+ELEMENTAL-WARD-ACID
+
+ELEMENTAL WARD ACID
+Type: SPELL
+Usage: cast elemental ward acid
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+COUNTERSPELL
+
+COUNTERSPELL
+Type: SPELL
+Usage: cast counterspell
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+SPELL-STEAL
+
+SPELL STEAL
+Type: SPELL
+Usage: cast spell steal
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+CANCELLATION
+
+CANCELLATION
+Type: SPELL
+Usage: cast cancellation
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+HOLD-PERSON
+
+HOLD PERSON
+Type: SPELL
+Usage: cast hold person
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+HOLD-MONSTER
+
+HOLD MONSTER
+Type: SPELL
+Usage: cast hold monster
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+CONFUSION
+
+CONFUSION
+Type: SPELL
+Usage: cast confusion
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+VERTIGO
+
+VERTIGO
+Type: SPELL
+Usage: cast vertigo
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+MASS-FEAR
+
+MASS FEAR
+Type: SPELL
+Usage: cast mass fear
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+NULL-FIELD
+
+NULL FIELD
+Type: SPELL
+Usage: cast null field
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+SILENCE-FIELD
+
+SILENCE FIELD
+Type: SPELL
+Usage: cast silence field
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+MIASMA
+
+MIASMA
+Type: SPELL
+Usage: cast miasma
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+TOXIC-CLOUD
+
+TOXIC CLOUD
+Type: SPELL
+Usage: cast toxic cloud
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+WALL-OF-FIRE
+
+WALL OF FIRE
+Type: SPELL
+Usage: cast wall of fire
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+STATIC-FIELD
+
+STATIC FIELD
+Type: SPELL
+Usage: cast static field
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+CONSECRATE
+
+CONSECRATE
+Type: SPELL
+Usage: cast consecrate
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+GRAVITY-WELL
+
+GRAVITY WELL
+Type: SPELL
+Usage: cast gravity well
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+SHOCKWAVE
+
+SHOCKWAVE
+Type: SPELL
+Usage: cast shockwave
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+NOVA
+
+NOVA
+Type: SPELL
+Usage: cast nova
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+ICE-STORM
+
+ICE STORM
+Type: SPELL
+Usage: cast ice storm
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+BLIZZARD
+
+BLIZZARD
+Type: SPELL
+Usage: cast blizzard
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+FROST-NOVA
+
+FROST NOVA
+Type: SPELL
+Usage: cast frost nova
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+GREATER-FIREBALL
+
+GREATER FIREBALL
+Type: SPELL
+Usage: cast greater fireball
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+ACID-RAIN
+
+ACID RAIN
+Type: SPELL
+Usage: cast acid rain
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+SONIC-BURST
+
+SONIC BURST
+Type: SPELL
+Usage: cast sonic burst
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+WORD-OF-PAIN
+
+WORD OF PAIN
+Type: SPELL
+Usage: cast word of pain
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+VENTRILOQUATE
+
+VENTRILOQUATE
+Type: SPELL
+Usage: cast ventriloquate
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+BEAR-SPIRIT
+
+BEAR SPIRIT
+Type: SPELL
+Usage: cast bear spirit
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+WOLF-SPIRIT
+
+WOLF SPIRIT
+Type: SPELL
+Usage: cast wolf spirit
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+TIGER-SPIRIT
+
+TIGER SPIRIT
+Type: SPELL
+Usage: cast tiger spirit
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+EAGLE-SPIRIT
+
+EAGLE SPIRIT
+Type: SPELL
+Usage: cast eagle spirit
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+DRAGON-SPIRIT
+
+DRAGON SPIRIT
+Type: SPELL
+Usage: cast dragon spirit
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+GROUP-RECALL
+
+GROUP RECALL
+Type: SPELL
+Usage: cast group recall
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+CONJURE-ELEMENTAL
+
+CONJURE ELEMENTAL
+Type: SPELL
+Usage: cast conjure elemental
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+CALL-WOLVES
+
+CALL WOLVES
+Type: SPELL
+Usage: cast call wolves
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+CALL-BEARS
+
+CALL BEARS
+Type: SPELL
+Usage: cast call bears
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+ANIMATE-DEAD-GREATER
+
+ANIMATE DEAD GREATER
+Type: SPELL
+Usage: cast animate dead greater
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+ABYSS-GATE
+
+ABYSS GATE
+Type: SPELL
+Usage: cast abyss gate
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+GATE
+
+GATE
+Type: SPELL
+Usage: cast gate
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+PORTAL
+
+PORTAL
+Type: SPELL
+Usage: cast portal
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+LOCATE-CORPSE
+
+LOCATE CORPSE
+Type: SPELL
+Usage: cast locate corpse
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+WORD-OF-RECALL-MASS
+
+WORD OF RECALL MASS
+Type: SPELL
+Usage: cast word of recall mass
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+ASTRAL-PROJECTION
+
+ASTRAL PROJECTION
+Type: SPELL
+Usage: cast astral projection
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+ETHEREAL-JAUNT
+
+ETHEREAL JAUNT
+Type: SPELL
+Usage: cast ethereal jaunt
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+LEYLINE-TAP
+
+LEYLINE TAP
+Type: SPELL
+Usage: cast leyline tap
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+TEMPORAL-SHIFT
+
+TEMPORAL SHIFT
+Type: SPELL
+Usage: cast temporal shift
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+CHRONO-SHIFT
+
+CHRONO SHIFT
+Type: SPELL
+Usage: cast chrono shift
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+BALEFIRE
+
+BALEFIRE
+Type: SPELL
+Usage: cast balefire
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+METEOR
+
+METEOR
+Type: SPELL
+Usage: cast meteor
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+METEOR-SWARM
+
+METEOR SWARM
+Type: SPELL
+Usage: cast meteor swarm
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+HELLFIRE
+
+HELLFIRE
+Type: SPELL
+Usage: cast hellfire
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+WRATHFIRE
+
+WRATHFIRE
+Type: SPELL
+Usage: cast wrathfire
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+CELESTIAL-SMITE
+
+CELESTIAL SMITE
+Type: SPELL
+Usage: cast celestial smite
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+HAMMER-OF-GOD
+
+HAMMER OF GOD
+Type: SPELL
+Usage: cast hammer of god
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+DEATH-KNELL
+
+DEATH KNELL
+Type: SPELL
+Usage: cast death knell
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+UNHOLY-WORD
+
+UNHOLY WORD
+Type: SPELL
+Usage: cast unholy word
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+HOLY-WORD
+
+HOLY WORD
+Type: SPELL
+Usage: cast holy word
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+FINGER-OF-DEATH
+
+FINGER OF DEATH
+Type: SPELL
+Usage: cast finger of death
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+WAIL-OF-THE-BANSHEE
+
+WAIL OF THE BANSHEE
+Type: SPELL
+Usage: cast wail of the banshee
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+POWER-WORD-KILL
+
+POWER WORD KILL
+Type: SPELL
+Usage: cast power word kill
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+POWER-WORD-STUN
+
+POWER WORD STUN
+Type: SPELL
+Usage: cast power word stun
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+POWER-WORD-BLIND
+
+POWER WORD BLIND
+Type: SPELL
+Usage: cast power word blind
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+POWER-WORD-SILENCE
+
+POWER WORD SILENCE
+Type: SPELL
+Usage: cast power word silence
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+PSYCHIC-CRUSH
+
+PSYCHIC CRUSH
+Type: SPELL
+Usage: cast psychic crush
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+TIME-STOP
+
+TIME STOP
+Type: SPELL
+Usage: cast time stop
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+BLACK-LANCE
+
+BLACK LANCE
+Type: SPELL
+Usage: cast black lance
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+REALITY-SLASH
+
+REALITY SLASH
+Type: SPELL
+Usage: cast reality slash
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+GRASP-HEART
+
+GRASP HEART
+Type: SPELL
+Usage: cast grasp heart
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+NEGATIVE-BURST
+
+NEGATIVE BURST
+Type: SPELL
+Usage: cast negative burst
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+TRUE-DEATH
+
+TRUE DEATH
+Type: SPELL
+Usage: cast true death
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+PERFECT-UNKNOWABLE
+
+PERFECT UNKNOWABLE
+Type: SPELL
+Usage: cast perfect unknowable
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+CRYSTAL-BODY
+
+CRYSTAL BODY
+Type: SPELL
+Usage: cast crystal body
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+GREATER-MAGIC-SEAL
+
+GREATER MAGIC SEAL
+Type: SPELL
+Usage: cast greater magic seal
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+DESPAIR-AURA
+
+DESPAIR AURA
+Type: SPELL
+Usage: cast despair aura
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+OBLIVION-SPEAR
+
+OBLIVION SPEAR
+Type: SPELL
+Usage: cast oblivion spear
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+BONE-PRISON
+
+BONE PRISON
+Type: SPELL
+Usage: cast bone prison
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+UNDYING-WILL
+
+UNDYING WILL
+Type: SPELL
+Usage: cast undying will
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+DRAGON-LIGHTNING
+
+DRAGON LIGHTNING
+Type: SPELL
+Usage: cast dragon lightning
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+CHAIN-DRAGON-LIGHTNING
+
+CHAIN DRAGON LIGHTNING
+Type: SPELL
+Usage: cast chain dragon lightning
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+HELL-FLAME
+
+HELL FLAME
+Type: SPELL
+Usage: cast hell flame
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+GRAVITY-MAELSTROM
+
+GRAVITY MAELSTROM
+Type: SPELL
+Usage: cast gravity maelstrom
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+CALL-GREATER-THUNDER
+
+CALL GREATER THUNDER
+Type: SPELL
+Usage: cast call greater thunder
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+ASTRAL-SMITE
+
+ASTRAL SMITE
+Type: SPELL
+Usage: cast astral smite
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+GREATER-REJECTION
+
+GREATER REJECTION
+Type: SPELL
+Usage: cast greater rejection
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+NAPALM
+
+NAPALM
+Type: SPELL
+Usage: cast napalm
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+FALLEN-DOWN
+
+FALLEN DOWN
+Type: SPELL
+Usage: cast fallen down
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+IA-SHUB-NIGGURATH
+
+IA SHUB NIGGURATH
+Type: SPELL
+Usage: cast ia shub niggurath
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+GOAL-OF-ALL-LIFE-IS-DEATH
+
+GOAL OF ALL LIFE IS DEATH
+Type: SPELL
+Usage: cast goal of all life is death
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+CRY-OF-THE-BANSHEE
+
+CRY OF THE BANSHEE
+Type: SPELL
+Usage: cast cry of the banshee
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+BODY-OF-EFFULGENT-BERYL
+
+BODY OF EFFULGENT BERYL
+Type: SPELL
+Usage: cast body of effulgent beryl
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+VERMILION-NOVA
+
+VERMILION NOVA
+Type: SPELL
+Usage: cast vermilion nova
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+NUCLEAR-BLAST
+
+NUCLEAR BLAST
+Type: SPELL
+Usage: cast nuclear blast
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+GREATER-TELEPORTATION
+
+GREATER TELEPORTATION
+Type: SPELL
+Usage: cast greater teleportation
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+SILENT-MAGIC
+
+SILENT MAGIC
+Type: SPELL
+Usage: cast silent magic
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+TRIPLE-MAXIMIZE-MAGIC
+
+TRIPLE MAXIMIZE MAGIC
+Type: SPELL
+Usage: cast triple maximize magic
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+PANTHEON
+
+PANTHEON
+Type: SPELL
+Usage: cast pantheon
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+DIMENSIONAL-LOCK
+
+DIMENSIONAL LOCK
+Type: SPELL
+Usage: cast dimensional lock
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+SHADOW-BIND
+
+SHADOW BIND
+Type: SPELL
+Usage: cast shadow bind
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+SHADOW-EXCHANGE
+
+SHADOW EXCHANGE
+Type: SPELL
+Usage: cast shadow exchange
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+DAGGER-RAIN
+
+DAGGER RAIN
+Type: SPELL
+Usage: cast dagger rain
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+MONARCHS-PRESSURE
+
+MONARCHS PRESSURE
+Type: SPELL
+Usage: cast monarchs pressure
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+SHADOW-DOMAIN
+
+SHADOW DOMAIN
+Type: SPELL
+Usage: cast shadow domain
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+FORCE-GRASP
+
+FORCE GRASP
+Type: SPELL
+Usage: cast force grasp
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+SHADOW-STEP
+
+SHADOW STEP
+Type: SPELL
+Usage: cast shadow step
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+BLACK-HEART
+
+BLACK HEART
+Type: SPELL
+Usage: cast black heart
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+CALL-SHADOW-LEGION
+
+CALL SHADOW LEGION
+Type: SPELL
+Usage: cast call shadow legion
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+NIGHT-HUNT
+
+NIGHT HUNT
+Type: SPELL
+Usage: cast night hunt
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+DARK-REBUKE
+
+DARK REBUKE
+Type: SPELL
+Usage: cast dark rebuke
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+EXECUTION-MARK
+
+EXECUTION MARK
+Type: SPELL
+Usage: cast execution mark
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+SHADOW-EXTRACTION
+
+SHADOW EXTRACTION
+Type: SPELL
+Usage: cast shadow extraction
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+ARISE-GREATER
+
+ARISE GREATER
+Type: SPELL
+Usage: cast arise greater
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+MONARCHS-AUTHORITY
+
+MONARCHS AUTHORITY
+Type: SPELL
+Usage: cast monarchs authority
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+RULERS-HAND
+
+RULERS HAND
+Type: SPELL
+Usage: cast rulers hand
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+SHADOW-LANCE
+
+SHADOW LANCE
+Type: SPELL
+Usage: cast shadow lance
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+SHADOW-BURST
+
+SHADOW BURST
+Type: SPELL
+Usage: cast shadow burst
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+SHADOW-STORM
+
+SHADOW STORM
+Type: SPELL
+Usage: cast shadow storm
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+FATAL-STRIKE
+
+FATAL STRIKE
+Type: SPELL
+Usage: cast fatal strike
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+DOMINION-OF-SHADOWS
+
+DOMINION OF SHADOWS
+Type: SPELL
+Usage: cast dominion of shadows
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+SHADOW-RECALL
+
+SHADOW RECALL
+Type: SPELL
+Usage: cast shadow recall
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+SHADOW-REGENESIS
+
+SHADOW REGENESIS
+Type: SPELL
+Usage: cast shadow regenesis
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+ASSASSINS-INTENT
+
+ASSASSINS INTENT
+Type: SPELL
+Usage: cast assassins intent
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+BLOOD-DAGGER-TEMPEST
+
+BLOOD DAGGER TEMPEST
+Type: SPELL
+Usage: cast blood dagger tempest
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+CHAIN-OF-SUBJUGATION
+
+CHAIN OF SUBJUGATION
+Type: SPELL
+Usage: cast chain of subjugation
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+SOVEREIGNS-STEP
+
+SOVEREIGNS STEP
+Type: SPELL
+Usage: cast sovereigns step
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+KINGS-COMMAND
+
+KINGS COMMAND
+Type: SPELL
+Usage: cast kings command
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+DETECT-KILL-INTENT
+
+DETECT KILL INTENT
+Type: SPELL
+Usage: cast detect kill intent
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+MUTILATE
+
+MUTILATE
+Type: SPELL
+Usage: cast mutilate
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+SHADOW-ARMOR
+
+SHADOW ARMOR
+Type: SPELL
+Usage: cast shadow armor
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+TOTAL-OCCULTATION
+
+TOTAL OCCULTATION
+Type: SPELL
+Usage: cast total occultation
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+DOMAIN-BREAK
+
+DOMAIN BREAK
+Type: SPELL
+Usage: cast domain break
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+HUNTERS-INSTINCT
+
+HUNTERS INSTINCT
+Type: SPELL
+Usage: cast hunters instinct
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+PICK-LOCK
+
+PICK LOCK
+Type: SKILL
+Usage: use pick lock
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+BANDAGE
+
+BANDAGE
+Type: SKILL
+Usage: use bandage
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+OVERLORD-PRESENCE
+
+OVERLORD PRESENCE
+Type: SKILL
+Usage: use overlord presence
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+SUPREME-CASTER-DISCIPLINE
+
+SUPREME CASTER DISCIPLINE
+Type: SKILL
+Usage: use supreme caster discipline
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+UNDEAD-COMMAND
+
+UNDEAD COMMAND
+Type: SKILL
+Usage: use undead command
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+TACTICAL-SPELL-MEMORY
+
+TACTICAL SPELL MEMORY
+Type: SKILL
+Usage: use tactical spell memory
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+DREAD-DOMINION
+
+DREAD DOMINION
+Type: SKILL
+Usage: use dread dominion
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+SHADOW-COMMANDER
+
+SHADOW COMMANDER
+Type: SKILL
+Usage: use shadow commander
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+PREDATORS-ADVANCE
+
+PREDATORS ADVANCE
+Type: SKILL
+Usage: use predators advance
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+MONARCH-REFLEXES
+
+MONARCH REFLEXES
+Type: SKILL
+Usage: use monarch reflexes
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+RELENTLESS-HUNT
+
+RELENTLESS HUNT
+Type: SKILL
+Usage: use relentless hunt
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+SHADOW-RESERVOIR
+
+SHADOW RESERVOIR
+Type: SKILL
+Usage: use shadow reservoir
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+SHADOW-SURGE
+
+SHADOW SURGE
+Type: SKILL
+Usage: use shadow surge
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+CHAIN-ASSAULT
+
+CHAIN ASSAULT
+Type: SKILL
+Usage: use chain assault
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+SOVEREIGN-PRESSURE
+
+SOVEREIGN PRESSURE
+Type: SKILL
+Usage: use sovereign pressure
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+KILL-WINDOW
+
+KILL WINDOW
+Type: SKILL
+Usage: use kill window
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+LEGION-MASTERY
+
+LEGION MASTERY
+Type: SKILL
+Usage: use legion mastery
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+APPRAISE-ENEMY
+
+APPRAISE ENEMY
+Type: SKILL
+Usage: use appraise enemy
+
+This topic was added from the live ability table so HELP lookup matches
+the current in-game ability name.
+
+See also: SPELLS SKILLS
+#0
+$~
