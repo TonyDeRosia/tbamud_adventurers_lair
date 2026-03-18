@@ -223,7 +223,7 @@ cpp_extern const struct command_info cmd_info[] = {
   { "house"    , "house"   , POS_RESTING , do_house    , 0, 0 },
 
   { "inventory", "i"       , POS_DEAD    , do_inventory, 0, 0 },
-  { "identify" , "id"      , POS_STANDING, do_not_here , 1, 0 },
+  { "identify" , "id"      , POS_STANDING, do_identify , 1, 0 },
   { "idea"     , "ide"      , POS_DEAD    , do_ibt      , 0, SCMD_IDEA },
   { "imotd"    , "imo"     , POS_DEAD    , do_gen_ps   , LVL_IMMORT, SCMD_IMOTD },
   { "immlist"  , "imm"     , POS_DEAD    , do_gen_ps   , 0, SCMD_IMMLIST },

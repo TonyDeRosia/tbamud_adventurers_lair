@@ -93,6 +93,7 @@ ACMD(do_exits);
 ACMD(do_gold);
 ACMD(do_help);
 ACMD(do_history);
+ACMD(do_identify);
 ACMD(do_inventory);
 ACMD(do_levels);
 ACMD(do_scan);
