@@ -1762,18 +1762,9 @@ len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
 
   len = append_box_line(buf, len, sizeof(buf), B, R, "", W);
 
-  /* Unified player-facing save value: spell save (internal save system remains unchanged). */
-  snprintf(line, sizeof(line), "%sSaves:%s %d", C, R, GET_SAVE(ch, 4));
+  /* Player-facing save value: spell save (internal save system remains unchanged). */
+  snprintf(line, sizeof(line), "%sSpell Saves:%s %d", C, R, GET_SAVE(ch, 4));
   len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
-
-  if (GET_LEVEL(ch) >= LVL_IMMORT) {
-    snprintf(line, sizeof(line),
-             "%sSave detail:%s Para %d  Rod %d  Petri %d  Breath %d  Spell %d",
-             C, R,
-             GET_SAVE(ch, 0), GET_SAVE(ch, 1), GET_SAVE(ch, 2),
-             GET_SAVE(ch, 3), GET_SAVE(ch, 4));
-    len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
-  }
 
   if (GET_EQ(ch, WEAR_WIELD) && GET_OBJ_TYPE(GET_EQ(ch, WEAR_WIELD)) == ITEM_WEAPON) {
     struct obj_data *wobj = GET_EQ(ch, WEAR_WIELD);
