@@ -60,6 +60,20 @@ struct attack_hit_type attack_hit_text[] =
 
 /* local (file scope only) variables */
 static struct char_data *next_combat_list = NULL;
+static int pending_damage_type = DAM_NONE;
+static bool violence_tick_running = FALSE;
+
+void set_next_damage_type(int damage_type)
+{
+  pending_damage_type = damage_type;
+}
+
+static int take_next_damage_type(void)
+{
+  int damage_type = pending_damage_type;
+  pending_damage_type = DAM_NONE;
+  return damage_type;
+}
 
 /* local file scope utility functions */
 static void perform_group_gain(struct char_data *ch, int base, struct char_data *victim);
@@ -68,6 +82,8 @@ static int rare_kill_bonus_for_count(int live_count);
 static int rare_kill_bonus_for_victim(struct char_data *victim);
 static void dam_message(int dam, struct char_data *ch, struct char_data *victim, int w_type);
 static void make_corpse(struct char_data *ch);
+static void process_round_effects(void);
+static int find_affect_modifier_for_flag(struct char_data *ch, int aff_flag, int fallback);
 static void change_alignment(struct char_data *ch, struct char_data *victim);
 static void group_gain(struct char_data *ch, struct char_data *victim);
 static void solo_gain(struct char_data *ch, struct char_data *victim);
@@ -1143,6 +1159,20 @@ static int can_offhand_attack(struct char_data *ch)
   return 1;
 }
 
+static int find_affect_modifier_for_flag(struct char_data *ch, int aff_flag, int fallback)
+{
+  struct affected_type *af;
+
+  if (!ch)
+    return fallback;
+
+  for (af = ch->affected; af; af = af->next)
+    if (IS_SET_AR(af->bitvector, aff_flag))
+      return af->modifier;
+
+  return fallback;
+}
+
 static void do_offhand_attack(struct char_data *ch, struct char_data *victim)
 {
   struct obj_data *prim = GET_EQ(ch, WEAR_WIELD);
@@ -1165,6 +1195,7 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
     dam = (dam * OFFHAND_DAMAGE_PCT) / 100;
   }
 
+  int damage_type = take_next_damage_type();
   int old_hit = 0;
   int old_band = 0;
   long local_gold = 0, happy_gold = 0;
@@ -1205,6 +1236,19 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
   	return (0);
   }
 
+  if (dam > 0 && IS_WEAPON(attacktype) && victim != ch && AFF_FLAGGED(victim, AFF_PHASE) && rand_number(1, 100) <= 30) {
+    act("$N phases out of alignment and your attack passes through harmlessly!", FALSE, ch, 0, victim, TO_CHAR);
+    act("$n's attack passes through you as you phase out of alignment!", FALSE, ch, 0, victim, TO_VICT);
+    act("$n's attack passes right through $N!", FALSE, ch, 0, victim, TO_NOTVICT);
+    dam = 0;
+  }
+  if (dam > 0 && IS_WEAPON(attacktype) && victim != ch && AFF_FLAGGED(victim, AFF_MIRROR_IMAGE) && rand_number(1, 100) <= 20) {
+    act("Your strike shatters one of $N's mirror images!", FALSE, ch, 0, victim, TO_CHAR);
+    act("$n strikes one of your mirror images, which shatters!", FALSE, ch, 0, victim, TO_VICT);
+    act("$n strikes one of $N's mirror images, which shatters!", FALSE, ch, 0, victim, TO_NOTVICT);
+    dam = 0;
+  }
+
   if (!IS_NPC(ch) && ch != victim)
     ai_actor_record_room_crime(NULL, ch, MEM_WANTED);
 
@@ -1235,6 +1279,24 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
   if (AFF_FLAGGED(victim, AFF_SANCTUARY) && dam >= 2)
     dam /= 2;
 
+  if (dam > 0 && AFF_FLAGGED(victim, AFF_MARKED))
+    dam = (dam * 6) / 5;
+
+  if (dam > 0 && AFF_FLAGGED(victim, AFF_STONESKIN) && IS_WEAPON(attacktype)) {
+    dam = MAX(1, dam - 5);
+  }
+
+  if (dam > 0) {
+    if (AFF_FLAGGED(victim, AFF_ELEMENTAL_WARD_FIRE) && damage_type == DAM_FIRE)
+      dam = (dam * 6) / 10;
+    else if (AFF_FLAGGED(victim, AFF_ELEMENTAL_WARD_COLD) && damage_type == DAM_COLD)
+      dam = (dam * 6) / 10;
+    else if (AFF_FLAGGED(victim, AFF_ELEMENTAL_WARD_LIGHTNING) && damage_type == DAM_LIGHTNING)
+      dam = (dam * 6) / 10;
+    else if (AFF_FLAGGED(victim, AFF_ELEMENTAL_WARD_ACID) && damage_type == DAM_ACID)
+      dam = (dam * 6) / 10;
+  }
+
 
   /* Melee crits (only weapon attacks) */
   if (dam > 0 && ch && victim && ch != victim && IS_WEAPON(attacktype)) {
@@ -1254,6 +1316,41 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
 
   /* Set the maximum damage per round and subtract the hit points */
   dam = MAX(MIN(dam, 1000), 0);
+  if (dam > 0 && AFF_FLAGGED(victim, AFF_SHIELDED)) {
+    struct affected_type *af;
+    for (af = victim->affected; af; af = af->next) {
+      if (IS_SET_AR(af->bitvector, AFF_SHIELDED)) {
+        int absorbed = MIN(dam, MAX(0, af->modifier));
+        af->modifier = MAX(0, af->modifier - absorbed);
+        dam -= absorbed;
+        if (absorbed > 0) {
+          send_to_char(victim, "Your protective shield absorbs %d damage.\r\n", absorbed);
+          if (ch && ch != victim)
+            send_to_char(ch, "%s's shield absorbs part of your attack.\r\n", GET_NAME(victim));
+        }
+        if (af->modifier <= 0) {
+          act("Your protective shield shatters!", FALSE, victim, 0, 0, TO_CHAR);
+          act("$n's protective shield shatters!", FALSE, victim, 0, 0, TO_ROOM);
+          affect_remove(victim, af);
+        }
+        break;
+      }
+    }
+  }
+
+  if (dam > 0 && AFF_FLAGGED(victim, AFF_DEATH_WARD) && GET_HIT(victim) - dam < 1) {
+    struct affected_type *af;
+    for (af = victim->affected; af; af = af->next) {
+      if (IS_SET_AR(af->bitvector, AFF_DEATH_WARD)) {
+        affect_remove(victim, af);
+        break;
+      }
+    }
+    send_to_char(victim, "A death ward flares and saves you from a killing blow!\r\n");
+    act("A death ward flares around $n, snatching $m from death!", TRUE, victim, 0, 0, TO_ROOM);
+    dam = MAX(0, GET_HIT(victim) - 1);
+  }
+
   old_hit = GET_HIT(victim);
   old_band = victim_condition_band(victim);
   GET_HIT(victim) -= dam;
@@ -1446,6 +1543,7 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
 static int compute_thaco(struct char_data *ch, struct char_data *victim)
 {
   int calc_thaco;
+  int situational_hit_bonus = 0;
 
   if (!IS_NPC(ch))
     calc_thaco = thaco(GET_CLASS(ch), GET_LEVEL(ch));
@@ -1455,6 +1553,10 @@ static int compute_thaco(struct char_data *ch, struct char_data *victim)
   calc_thaco -= GET_HITROLL(ch);
   calc_thaco -= (int) ((GET_INT(ch) - 13) / 1.5);	/* Intelligence helps! */
   calc_thaco -= (int) ((GET_WIS(ch) - 13) / 1.5);	/* So does wisdom */
+  if (victim && AFF_FLAGGED(ch, AFF_TRUESIGHT) &&
+      (AFF_FLAGGED(victim, AFF_INVISIBLE) || AFF_FLAGGED(victim, AFF_HIDE)))
+    situational_hit_bonus = 10;
+  calc_thaco -= situational_hit_bonus;
   /* high level thaco floor: prevent endgame thaco from drifting into nonsense */
   int __thaco = (calc_thaco);
   __thaco -= GET_HITROLL(ch);
@@ -1564,10 +1666,63 @@ void hit(struct char_data *ch, struct char_data *victim, int type)
   hitprcnt_mtrigger(victim);
 }
 
+static void process_round_effects(void)
+{
+  struct char_data *i, *next_char;
+  room_rnum room;
+
+  for (i = character_list; i; i = next_char) {
+    next_char = i->next;
+
+    tick_spell_cooldowns(i);
+
+    if (AFF_FLAGGED(i, AFF_BURNING)) {
+      set_next_damage_type(DAM_FIRE);
+      if (damage(i, i, 5, TYPE_SUFFERING) == -1)
+        continue;
+    }
+
+    if (AFF_FLAGGED(i, AFF_ARCANE_LEAK))
+      GET_MANA(i) = MAX(0, GET_MANA(i) - 10);
+
+    if (AFF_FLAGGED(i, AFF_BLOODLUST))
+      GET_HIT(i) = MAX(1, GET_HIT(i) - 5);
+
+    if (AFF_FLAGGED(i, AFF_REGENERATING)) {
+      int regen = find_affect_modifier_for_flag(i, AFF_REGENERATING, 0);
+      if (regen > 0)
+        GET_HIT(i) = MIN(GET_MAX_HIT(i), GET_HIT(i) + regen);
+    }
+
+    if (AFF_FLAGGED(i, AFF_TIME_SNARE))
+      WAIT_STATE(i, PULSE_VIOLENCE);
+
+    if (AFF_FLAGGED(i, AFF_FEARFUL) && FIGHTING(i) && rand_number(1, 100) <= 60)
+      do_flee(i, NULL, 0, 0);
+
+    if (IS_NPC(i) && GET_SUMMON_TIMER(i) > 0) {
+      GET_SUMMON_TIMER(i)--;
+      if (GET_SUMMON_TIMER(i) <= 0) {
+        act("$n flickers and vanishes as the summoning fades.", FALSE, i, 0, 0, TO_ROOM);
+        extract_char(i);
+      }
+    }
+  }
+
+  for (room = 0; room <= top_of_world; room++)
+    room_tick_effects(&world[room]);
+}
+
 /* control the fights going on.  Called every 2 seconds from comm.c. */
 void perform_violence(void)
 {
   struct char_data *ch, *tch;
+
+  if (!violence_tick_running) {
+    violence_tick_running = TRUE;
+    process_round_effects();
+    violence_tick_running = FALSE;
+  }
 
   for (ch = combat_list; ch; ch = next_combat_list) {
     next_combat_list = ch->next_fighting;
@@ -1591,6 +1746,11 @@ void perform_violence(void)
 
     if (GET_POS(ch) < POS_FIGHTING) {
       send_to_char(ch, "You can't fight while sitting!!\r\n");
+      continue;
+    }
+
+    if (AFF_FLAGGED(ch, AFF_STUNNED)) {
+      send_to_char(ch, "You are stunned and cannot act this round!\r\n");
       continue;
     }
 

@@ -75,6 +75,11 @@ ACMD(do_hit)
 
  one_argument(argument, arg);
 
+  if (AFF_FLAGGED(ch, AFF_STUNNED)) {
+    send_to_char(ch, "You are stunned and cannot attack!\r\n");
+    return;
+  }
+
   if (!*arg)
     send_to_char(ch, "Hit who?\r\n");
   else if (!(vict = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM)))
@@ -108,6 +113,11 @@ ACMD(do_kill)
     return;
   }
   one_argument(argument, arg);
+
+  if (AFF_FLAGGED(ch, AFF_STUNNED)) {
+    send_to_char(ch, "You are stunned and cannot attack!\r\n");
+    return;
+  }
 
   if (!*arg) {
     send_to_char(ch, "Kill who?\r\n");
@@ -238,6 +248,11 @@ ACMD(do_flee)
   int i, attempt, loss;
   struct char_data *was_fighting;
 
+  if (AFF_FLAGGED(ch, AFF_ROOTED)) {
+    send_to_char(ch, "You are rooted and cannot flee!\r\n");
+    return;
+  }
+
   if (GET_POS(ch) < POS_FIGHTING) {
     send_to_char(ch, "You are in pretty bad shape, unable to flee!\r\n");
     return;
@@ -271,6 +286,11 @@ ACMD(do_flee)
 
 ACMD(do_bash)
 {
+  if (AFF_FLAGGED(ch, AFF_STUNNED)) {
+    send_to_char(ch, "You are stunned and cannot do that.\r\n");
+    return;
+  }
+
   int move_cost = 15;
   if (GET_MOVE(ch) < move_cost) {
     send_to_char(ch, "You are too exhausted to bash.\r\n");
@@ -522,6 +542,11 @@ ACMD(do_whirlwind)
 
 ACMD(do_kick)
 {
+  if (AFF_FLAGGED(ch, AFF_STUNNED)) {
+    send_to_char(ch, "You are stunned and cannot do that.\r\n");
+    return;
+  }
+
   int move_cost = 10;
   if (GET_MOVE(ch) < move_cost) {
     send_to_char(ch, "You are too exhausted to kick.\r\n");

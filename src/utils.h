@@ -730,6 +730,8 @@ do                                                              \
 #define GET_DEFAULT_POS(ch)	((ch)->mob_specials.default_pos)
 /** Return the memory of ch. */
 #define MEMORY(ch)		((ch)->mob_specials.memory)
+#define GET_SUMMON_TIMER(ch)      ((ch)->mob_specials.summon_timer)
+#define GET_SPELL_COOLDOWN(ch, sp) CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->spell_cooldowns[(sp)]))
 
 /** Return the equivalent strength of ch if ch has level 18 strength. */
 #define STRENGTH_APPLY_INDEX(ch) \

@@ -35,6 +35,12 @@ bool can_bind_spirit(struct char_data *ch, int spellnum);
 bool is_sanctuary_spell(int spellnum);
 static void strip_sanctuary_effects(struct char_data *victim);
 static void sanctuary_messages(int spellnum, const char **to_vict, const char **to_room);
+static enum damage_type current_spell_damage_type = DAM_NONE;
+
+void set_spell_damage_type(enum damage_type type)
+{
+  current_spell_damage_type = type;
+}
 
 bool is_sanctuary_spell(int spellnum)
 {
@@ -287,9 +293,12 @@ int mag_damage(int level, struct char_data *ch, struct char_data *victim,
 		     int spellnum, int savetype)
 {
   int dam = 0;
+  enum damage_type local_damage_type = current_spell_damage_type;
 
   if (victim == NULL || ch == NULL)
     return (0);
+
+  current_spell_damage_type = DAM_NONE;
 
   switch (spellnum) {
     /* Mostly mages */
@@ -301,18 +310,21 @@ int mag_damage(int level, struct char_data *ch, struct char_data *victim,
       dam = dice(1, 6) + 1;
     break;
   case SPELL_BURNING_HANDS:
+    if (local_damage_type == DAM_NONE) local_damage_type = DAM_FIRE;
     if (IS_MAGIC_USER(ch))
       dam = dice(3, 8) + 3;
     else
       dam = dice(3, 6) + 3;
     break;
   case SPELL_SHOCKING_GRASP:
+    if (local_damage_type == DAM_NONE) local_damage_type = DAM_LIGHTNING;
     if (IS_MAGIC_USER(ch))
       dam = dice(5, 8) + 5;
     else
       dam = dice(5, 6) + 5;
     break;
   case SPELL_LIGHTNING_BOLT:
+    if (local_damage_type == DAM_NONE) local_damage_type = DAM_LIGHTNING;
     if (IS_MAGIC_USER(ch))
       dam = dice(7, 8) + 7;
     else
@@ -325,6 +337,7 @@ int mag_damage(int level, struct char_data *ch, struct char_data *victim,
       dam = dice(9, 6) + 9;
     break;
   case SPELL_FIREBALL:
+    if (local_damage_type == DAM_NONE) local_damage_type = DAM_FIRE;
     if (IS_MAGIC_USER(ch))
       dam = dice(11, 8) + 11;
     else
@@ -355,6 +368,7 @@ int mag_damage(int level, struct char_data *ch, struct char_data *victim,
 
 
   case SPELL_CALL_LIGHTNING:
+    if (local_damage_type == DAM_NONE) local_damage_type = DAM_LIGHTNING;
     dam = dice(7, 8) + 7;
     break;
 
@@ -363,6 +377,7 @@ int mag_damage(int level, struct char_data *ch, struct char_data *victim,
     break;
 
   case SPELL_ENERGY_DRAIN:
+    if (local_damage_type == DAM_NONE) local_damage_type = DAM_NECROTIC;
     if (GET_LEVEL(victim) <= 2)
       dam = 100;
     else
@@ -371,6 +386,7 @@ int mag_damage(int level, struct char_data *ch, struct char_data *victim,
 
     /* Area spells */
   case SPELL_EARTHQUAKE:
+    if (local_damage_type == DAM_NONE) local_damage_type = DAM_EARTH;
     dam = dice(2, 8) + level;
     break;
 
@@ -392,6 +408,7 @@ int mag_damage(int level, struct char_data *ch, struct char_data *victim,
     }
   }
 
+  set_next_damage_type(local_damage_type);
   return (damage(ch, victim, dam, spellnum));
 }
 
