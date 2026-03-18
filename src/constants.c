@@ -92,7 +92,7 @@ const char *room_bits[] = {
 const char *zone_bits[] = {
   "CLOSED",
   "NO_IMMORT",
-  "QUEST",
+  "QUEST_DEPRECATED",
   "GRID",
   "NOBUILD",
   "!ASTRAL",

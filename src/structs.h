@@ -97,7 +97,7 @@ void clanedit_parse(struct descriptor_data *d, char *arg);
 /* Zone info: Used in zone_data.zone_flags */
 #define ZONE_CLOSED       0  /**< Zone is closed - players cannot enter */
 #define ZONE_NOIMMORT     1  /**< Immortals (below LVL_GRGOD) cannot enter this zone */
-#define ZONE_QUEST        2  /**< This zone is a quest zone (not implemented) */
+#define ZONE_QUEST        2  /**< Deprecated flag: retained for save compatibility; no gameplay effect */
 #define ZONE_GRID         3  /**< Zone is 'on the grid', connected, show on 'areas' */
 #define ZONE_NOBUILD      4  /**< Building is not allowed in the zone */
 #define ZONE_NOASTRAL     5  /**< No teleportation magic will work to or from this zone */
