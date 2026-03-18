@@ -378,6 +378,15 @@ int load_char(const char *name, struct char_data *ch)
     GET_QUESTPOINTS(ch) = PFDEF_QUESTPOINTS;
     GET_QUEST_COUNTER(ch) = PFDEF_QUESTCOUNT;
     GET_QUEST(ch) = PFDEF_CURRQUEST;
+    GET_KQUEST_ACTIVE(ch) = PFDEF_KQUEST_ACTIVE;
+    GET_KQUEST_COMPLETE(ch) = PFDEF_KQUEST_COMPLETE;
+    GET_KQUEST_TARGET(ch) = PFDEF_KQUEST_TARGET;
+    GET_KQUEST_ROOM(ch) = PFDEF_KQUEST_ROOM;
+    GET_KQUEST_GIVER(ch) = PFDEF_KQUEST_GIVER;
+    GET_KQUEST_TIME(ch) = PFDEF_KQUEST_TIME;
+    GET_KQUEST_TARGET_ID(ch) = PFDEF_KQUEST_ID;
+    GET_AUCTION_LOW(ch) = PFDEF_AUCTION_LOW;
+    GET_AUCTION_HIGH(ch) = PFDEF_AUCTION_HIGH;
     GET_NUM_QUESTS(ch) = PFDEF_COMPQUESTS;
     GET_LAST_MOTD(ch) = PFDEF_LASTMOTD;
     GET_LAST_NEWS(ch) = PFDEF_LASTNEWS;
@@ -419,6 +428,8 @@ int load_char(const char *name, struct char_data *ch)
 	if (!strcmp(tag, "Affs")) 	load_affects(fl, ch);
         else if (!strcmp(tag, "Alin"))	GET_ALIGNMENT(ch)	= atoi(line);
 	else if (!strcmp(tag, "Alis"))	read_aliases_ascii(fl, ch, atoi(line));
+	          else if (!strcmp(tag, "AuLo")) GET_AUCTION_LOW(ch) = atoi(line);
+	          else if (!strcmp(tag, "AuHi")) GET_AUCTION_HIGH(ch) = atoi(line);
 	          else if (!strcmp(tag, "Acct"))  GET_ACCOUNT_ID(ch) = atol(line);
                 if (ch->desc && ch->desc->acct_authed && ch->desc->acct_id > 0 &&
                     GET_ACCOUNT_ID(ch) > 0 && GET_ACCOUNT_ID(ch) != ch->desc->acct_id) {
@@ -555,6 +566,16 @@ int load_char(const char *name, struct char_data *ch)
        else if (!strcmp(tag, "Qcnt")) GET_QUEST_COUNTER(ch) = atoi(line);
        else if (!strcmp(tag, "Qest")) load_quests(fl, ch);
         break;
+
+      case 'K':
+       if (!strcmp(tag, "KQac")) GET_KQUEST_ACTIVE(ch) = atoi(line);
+       else if (!strcmp(tag, "KQcp")) GET_KQUEST_COMPLETE(ch) = atoi(line);
+       else if (!strcmp(tag, "KQtv")) GET_KQUEST_TARGET(ch) = atoi(line);
+       else if (!strcmp(tag, "KQtr")) GET_KQUEST_ROOM(ch) = atoi(line);
+       else if (!strcmp(tag, "KQgv")) GET_KQUEST_GIVER(ch) = atoi(line);
+       else if (!strcmp(tag, "KQtm")) GET_KQUEST_TIME(ch) = atoi(line);
+       else if (!strcmp(tag, "KQid")) GET_KQUEST_TARGET_ID(ch) = atol(line);
+       break;
 
       case 'R':
              if (!strcmp(tag, "Race"))  GET_RACE(ch) = atoi((line[0] ? (strchr(line,':') ? strchr(line,':')+1 : line) : line));
@@ -831,6 +852,15 @@ void save_char(struct char_data * ch)
     fprintf(fl, "%d\n", NOTHING);
   }
   if (GET_QUEST(ch)        != PFDEF_CURRQUEST)  fprintf(fl, "Qcur: %d\n", GET_QUEST(ch));
+  if (GET_KQUEST_ACTIVE(ch) != PFDEF_KQUEST_ACTIVE) fprintf(fl, "KQac: %d\n", GET_KQUEST_ACTIVE(ch));
+  if (GET_KQUEST_COMPLETE(ch) != PFDEF_KQUEST_COMPLETE) fprintf(fl, "KQcp: %d\n", GET_KQUEST_COMPLETE(ch));
+  if (GET_KQUEST_TARGET(ch) != PFDEF_KQUEST_TARGET) fprintf(fl, "KQtv: %d\n", GET_KQUEST_TARGET(ch));
+  if (GET_KQUEST_ROOM(ch) != PFDEF_KQUEST_ROOM) fprintf(fl, "KQtr: %d\n", GET_KQUEST_ROOM(ch));
+  if (GET_KQUEST_GIVER(ch) != PFDEF_KQUEST_GIVER) fprintf(fl, "KQgv: %d\n", GET_KQUEST_GIVER(ch));
+  if (GET_KQUEST_TIME(ch) != PFDEF_KQUEST_TIME) fprintf(fl, "KQtm: %d\n", GET_KQUEST_TIME(ch));
+  if (GET_KQUEST_TARGET_ID(ch) != PFDEF_KQUEST_ID) fprintf(fl, "KQid: %ld\n", GET_KQUEST_TARGET_ID(ch));
+  if (GET_AUCTION_LOW(ch) != PFDEF_AUCTION_LOW) fprintf(fl, "AuLo: %d\n", GET_AUCTION_LOW(ch));
+  if (GET_AUCTION_HIGH(ch) != PFDEF_AUCTION_HIGH) fprintf(fl, "AuHi: %d\n", GET_AUCTION_HIGH(ch));
 
  if (SCRIPT(ch)) {
    for (t = TRIGGERS(SCRIPT(ch)); t; t = t->next)

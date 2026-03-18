@@ -18,8 +18,12 @@
 #include "db.h"
 #include "comm.h"
 #include "screen.h"
+#include "dg_scripts.h"
 #include "quest.h"
 #include "act.h" /* for do_tell */
+#include "shop.h"
+#include "spec_procs.h"
+#include "mail.h"
 
 
 /*--------------------------------------------------------------------------
@@ -47,13 +51,216 @@ const char *aq_flags[] = {
 static int cmd_tell;
 
 static const char *quest_cmd[] = {
-  "list", "history", "join", "leave", "progress", "status", "\n"};
+  "list", "history", "join", "leave", "progress", "status",
+  "request", "info", "complete", "\n"};
 
 static const char *quest_mort_usage =
-  "Usage: quest list | history | progress | join <nn> | leave";
+  "Usage: quest list | history | progress | join <nn> | leave | request | info | complete";
 
 static const char *quest_imm_usage =
-  "Usage: quest list | history | progress | join <nn> | leave | status <vnum>";
+  "Usage: quest list | history | progress | join <nn> | leave | status <vnum> | request | info | complete";
+
+static void clear_kill_quest(struct char_data *ch)
+{
+  GET_KQUEST_ACTIVE(ch) = 0;
+  GET_KQUEST_COMPLETE(ch) = 0;
+  GET_KQUEST_TARGET(ch) = NOBODY;
+  GET_KQUEST_ROOM(ch) = NOWHERE;
+  GET_KQUEST_GIVER(ch) = NOBODY;
+  GET_KQUEST_TIME(ch) = 0;
+  GET_KQUEST_TARGET_ID(ch) = 0;
+}
+
+static struct char_data *find_present_questmaster(struct char_data *ch)
+{
+  struct char_data *mob;
+
+  for (mob = world[IN_ROOM(ch)].people; mob; mob = mob->next_in_room) {
+    if (IS_NPC(mob) && GET_MOB_SPEC(mob) == questmaster && CAN_SEE(ch, mob))
+      return mob;
+  }
+
+  return NULL;
+}
+
+static int is_service_or_protected_mob(struct char_data *mob)
+{
+  SPECIAL(*spec);
+
+  if (!mob || !IS_NPC(mob))
+    return TRUE;
+
+  if (MOB_FLAGGED(mob, MOB_NOKILL) || MOB_FLAGGED(mob, MOB_GUILD_MASTER))
+    return TRUE;
+
+  spec = GET_MOB_SPEC(mob);
+  if (spec == questmaster || spec == shop_keeper || spec == bank ||
+      spec == guild || spec == guild_guard || spec == cityguard ||
+      spec == pet_shops || spec == postmaster || spec == receptionist ||
+      spec == mayor) {
+    return TRUE;
+  }
+
+  return FALSE;
+}
+
+static int room_is_quest_safe(room_rnum room)
+{
+  if (!VALID_ROOM_RNUM(room))
+    return TRUE;
+
+  return ROOM_FLAGGED(room, ROOM_PEACEFUL) ||
+         ROOM_FLAGGED(room, ROOM_GODROOM) ||
+         ROOM_FLAGGED(room, ROOM_DEATH) ||
+         ROOM_FLAGGED(room, ROOM_NOMOB);
+}
+
+static struct char_data *select_kill_quest_target(struct char_data *ch)
+{
+  struct char_data *mob, *choice = NULL;
+  int weight, total = 0;
+  int level_diff;
+
+  for (mob = character_list; mob; mob = mob->next) {
+    if (!IS_NPC(mob) || IN_ROOM(mob) == NOWHERE)
+      continue;
+    if (room_is_quest_safe(IN_ROOM(mob)))
+      continue;
+    if (is_service_or_protected_mob(mob))
+      continue;
+    if (MOB_FLAGGED(mob, MOB_NOTDEADYET))
+      continue;
+
+    level_diff = GET_LEVEL(ch) - GET_LEVEL(mob);
+    if (level_diff < -3 || level_diff > 8)
+      continue;
+
+    if (level_diff >= 0 && level_diff <= 4)
+      weight = 6;
+    else if (level_diff <= 6)
+      weight = 3;
+    else
+      weight = 1;
+
+    total += weight;
+    if (rand_number(1, total) <= weight)
+      choice = mob;
+  }
+
+  return choice;
+}
+
+static void quest_request_kill(struct char_data *ch)
+{
+  struct char_data *qm, *target;
+  room_rnum tr;
+
+  qm = find_present_questmaster(ch);
+  if (!qm) {
+    send_to_char(ch, "You must be in the same room as a quest master to request a quest.\r\n");
+    return;
+  }
+  if (GET_QUEST(ch) != NOTHING || GET_KQUEST_ACTIVE(ch)) {
+    send_to_char(ch, "%s tells you, 'You already have a quest to finish first.'\r\n", GET_NAME(qm));
+    return;
+  }
+
+  target = select_kill_quest_target(ch);
+  if (!target) {
+    send_to_char(ch, "%s tells you, 'I have no suitable hunt for you right now. Return shortly.'\r\n", GET_NAME(qm));
+    return;
+  }
+
+  tr = IN_ROOM(target);
+  GET_KQUEST_ACTIVE(ch) = 1;
+  GET_KQUEST_COMPLETE(ch) = 0;
+  GET_KQUEST_TARGET(ch) = GET_MOB_VNUM(target);
+  GET_KQUEST_ROOM(ch) = GET_ROOM_VNUM(tr);
+  GET_KQUEST_GIVER(ch) = GET_MOB_VNUM(qm);
+  GET_KQUEST_TIME(ch) = 30;
+  GET_KQUEST_TARGET_ID(ch) = char_script_id(target);
+
+  send_to_char(ch, "You ask %s for a quest.\r\n", GET_NAME(qm));
+  send_to_char(ch, "%s tells you, 'Thank you, brave %s!'\r\n", GET_NAME(qm), GET_NAME(ch));
+  send_to_char(ch, "%s tells you, 'An enemy of mine, %s, is making vile threats against Ayla!'\r\n",
+      GET_NAME(qm), GET_NAME(target));
+  send_to_char(ch, "%s tells you, 'Seek %s out somewhere near %s in the area of %s.'\r\n",
+      GET_NAME(qm), GET_NAME(target), world[tr].name, zone_table[world[tr].zone].name);
+  send_to_char(ch, "%s tells you, 'Good luck, %s. Return safely!'\r\n", GET_NAME(qm), GET_NAME(ch));
+  send_to_char(ch, "%s tells you, 'You have %d minutes to complete your quest.'\r\n",
+      GET_NAME(qm), GET_KQUEST_TIME(ch));
+  save_char(ch);
+}
+
+static void quest_info_kill(struct char_data *ch)
+{
+  room_rnum room;
+  const char *target_name;
+
+  if (!GET_KQUEST_ACTIVE(ch)) {
+    send_to_char(ch, "You are not currently on a kill quest.\r\n");
+    return;
+  }
+  if (GET_KQUEST_COMPLETE(ch)) {
+    send_to_char(ch, "You have slain your target. Return to a quest master and type 'quest complete'.\r\n");
+    return;
+  }
+
+  room = real_room(GET_KQUEST_ROOM(ch));
+  if (room == NOWHERE) {
+    send_to_char(ch, "Your assigned target can no longer be located. Please request a new quest.\r\n");
+    return;
+  }
+
+  target_name = (real_mobile(GET_KQUEST_TARGET(ch)) != NOBODY) ?
+    GET_NAME(&mob_proto[real_mobile(GET_KQUEST_TARGET(ch))]) : "your target";
+  send_to_char(ch, "You are on a quest to slay %s!\r\n", target_name);
+  send_to_char(ch, "%s can be found in the vicinity of %s which\r\nis in the general area of %s.\r\n",
+      target_name,
+      world[room].name, zone_table[world[room].zone].name);
+  send_to_char(ch, "Time remaining: %d minute%s.\r\n", GET_KQUEST_TIME(ch), GET_KQUEST_TIME(ch) == 1 ? "" : "s");
+}
+
+static void quest_complete_kill(struct char_data *ch)
+{
+  struct char_data *qm;
+  int qp_reward, gold_reward, exp_reward;
+
+  if (!GET_KQUEST_ACTIVE(ch)) {
+    send_to_char(ch, "You have no active kill quest to complete.\r\n");
+    return;
+  }
+  if (GET_KQUEST_TIME(ch) <= 0) {
+    send_to_char(ch, "Your quest has expired.\r\n");
+    clear_kill_quest(ch);
+    save_char(ch);
+    return;
+  }
+  if (!GET_KQUEST_COMPLETE(ch)) {
+    send_to_char(ch, "You have not yet slain your assigned target.\r\n");
+    return;
+  }
+
+  qm = find_present_questmaster(ch);
+  if (!qm) {
+    send_to_char(ch, "You must return to a quest master to complete this quest.\r\n");
+    return;
+  }
+
+  qp_reward = MAX(5, GET_LEVEL(ch) / 2);
+  gold_reward = MAX(100, GET_LEVEL(ch) * 75);
+  exp_reward = MAX(250, GET_LEVEL(ch) * 250);
+
+  GET_QUESTPOINTS(ch) += qp_reward;
+  increase_gold(ch, gold_reward);
+  gain_exp(ch, exp_reward);
+  send_to_char(ch, "%s tells you, 'Excellent work, %s!'\r\n", GET_NAME(qm), GET_NAME(ch));
+  send_to_char(ch, "You receive %d quest points, %d gold, and %d experience.\r\n",
+      qp_reward, gold_reward, exp_reward);
+
+  clear_kill_quest(ch);
+  save_char(ch);
+}
 
 /*--------------------------------------------------------------------------*/
 /* Utility Functions                                                        */
@@ -440,10 +647,47 @@ void check_timed_quests(void)
 {
   struct char_data *ch;
 
-  for (ch = character_list; ch; ch = ch->next)
+  for (ch = character_list; ch; ch = ch->next) {
     if (!IS_NPC(ch) && (GET_QUEST(ch) != NOTHING) && (GET_QUEST_TIME(ch) != -1))
       if (--GET_QUEST_TIME(ch) == 0)
         quest_timeout(ch);
+    if (!IS_NPC(ch) && GET_KQUEST_ACTIVE(ch) && !GET_KQUEST_COMPLETE(ch) && GET_KQUEST_TIME(ch) > 0) {
+      if (--GET_KQUEST_TIME(ch) == 0) {
+        send_to_char(ch, "You have run out of time to complete your kill quest.\r\n");
+        clear_kill_quest(ch);
+      }
+    }
+  }
+}
+
+void quest_kill_trigger_check(struct char_data *ch, struct char_data *vict)
+{
+  if (!ch || IS_NPC(ch) || !vict || !IS_NPC(vict))
+    return;
+  if (!GET_KQUEST_ACTIVE(ch) || GET_KQUEST_COMPLETE(ch) || GET_KQUEST_TIME(ch) <= 0)
+    return;
+  if (GET_KQUEST_TARGET(ch) != GET_MOB_VNUM(vict))
+    return;
+  if (GET_KQUEST_TARGET_ID(ch) > 0 && GET_KQUEST_TARGET_ID(ch) != char_script_id(vict))
+    return;
+
+  GET_KQUEST_COMPLETE(ch) = 1;
+  send_to_char(ch, "You have slain your quest target! Return to a quest master and type 'quest complete'.\r\n");
+  save_char(ch);
+}
+
+int is_player_quest_target(struct char_data *viewer, struct char_data *mob)
+{
+  if (!viewer || IS_NPC(viewer) || !mob || !IS_NPC(mob))
+    return FALSE;
+  if (!GET_KQUEST_ACTIVE(viewer) || GET_KQUEST_COMPLETE(viewer) || GET_KQUEST_TIME(viewer) <= 0)
+    return FALSE;
+  if (GET_KQUEST_TARGET(viewer) != GET_MOB_VNUM(mob))
+    return FALSE;
+  if (GET_KQUEST_TARGET_ID(viewer) > 0 && GET_KQUEST_TARGET_ID(viewer) != char_script_id(mob))
+    return FALSE;
+
+  return TRUE;
 }
 
 /*--------------------------------------------------------------------------*/
@@ -778,6 +1022,15 @@ ACMD(do_quest)
       case SCMD_QUEST_PROGRESS:
  quest_progress(ch);
  break;
+      case SCMD_QUEST_REQUEST:
+        quest_request_kill(ch);
+        break;
+      case SCMD_QUEST_INFO:
+        quest_info_kill(ch);
+        break;
+      case SCMD_QUEST_COMPLETE:
+        quest_complete_kill(ch);
+        break;
       case SCMD_QUEST_STATUS:
         if (GET_LEVEL(ch) < LVL_IMMORT)
           send_to_char(ch, "%s\r\n", quest_mort_usage);

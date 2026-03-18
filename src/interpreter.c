@@ -122,7 +122,7 @@ cpp_extern const struct command_info cmd_info[] = {
   { "ask"      , "ask"     , POS_RESTING , do_spec_comm, 0, SCMD_ASK },
   { "astat"    , "ast"     , POS_DEAD    , do_astat    , 0, 0 },
   { "attach"   , "attach"  , POS_DEAD    , do_attach   , LVL_BUILDER, 0 },
-  { "auction"  , "auc"     , POS_SLEEPING, do_gen_comm , 0, SCMD_AUCTION },
+  { "auction"  , "auc"     , POS_SLEEPING, do_auction  , 0, 0 },
   { "autoexits" , "autoex"  , POS_DEAD    , do_gen_tog , 0, SCMD_AUTOEXIT },
   { "autoassist","autoass" , POS_DEAD    , do_gen_tog , 0, SCMD_AUTOASSIST },
   { "autodoor" , "autodoor", POS_DEAD    , do_gen_tog , 0, SCMD_AUTODOOR },
@@ -139,6 +139,7 @@ cpp_extern const struct command_info cmd_info[] = {
 
   { "bash"     , "bas"     , POS_FIGHTING, do_bash     , 1, 0 },
   { "brief"    , "br"      , POS_DEAD    , do_gen_tog  , 0, SCMD_BRIEF },
+  { "bid"      , "bid"     , POS_SLEEPING, do_bid      , 0, 0 },
   { "buildwalk", "buildwalk", POS_STANDING, do_gen_tog , LVL_BUILDER, SCMD_BUILDWALK },
   { "buy"      , "bu"      , POS_STANDING, do_not_here , 0, 0 },
   { "bug"      , "bug"     , POS_DEAD    , do_ibt      , 0, SCMD_BUG },

@@ -60,6 +60,15 @@
 #define PFDEF_QUESTCOUNT        0
 #define PFDEF_COMPQUESTS        0
 #define PFDEF_CURRQUEST         NOTHING
+#define PFDEF_KQUEST_ACTIVE     0
+#define PFDEF_KQUEST_COMPLETE   0
+#define PFDEF_KQUEST_TARGET     NOBODY
+#define PFDEF_KQUEST_ROOM       NOWHERE
+#define PFDEF_KQUEST_GIVER      NOBODY
+#define PFDEF_KQUEST_TIME       0
+#define PFDEF_KQUEST_ID         0
+#define PFDEF_AUCTION_LOW       0
+#define PFDEF_AUCTION_HIGH      100
 #define PFDEF_LASTMOTD          0
 #define PFDEF_LASTNEWS          0
 #define PFDEF_BOUNTY            0

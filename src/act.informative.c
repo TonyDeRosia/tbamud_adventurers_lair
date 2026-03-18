@@ -497,6 +497,8 @@ static void list_one_char(struct char_data *i, struct char_data *ch)
     else if (IS_GOOD(i))
       send_to_char(ch, " (Blue Aura)");
   }
+  if (is_player_quest_target(ch, i))
+    send_to_char(ch, " %s[QUEST]%s", CCRED(ch, C_NRM), CCNRM(ch, C_NRM));
   send_to_char(ch, "\r\n");
 
   if (AFF_FLAGGED(i, AFF_SANCTUARY))

@@ -587,10 +587,15 @@ struct char_data *i;
   if (killer) {
     if (killer->group) {
       while ((i = (struct char_data *) simple_list(killer->group->members)) != NULL)
-        if(IN_ROOM(i) == IN_ROOM(ch)  || (world[IN_ROOM(i)].zone == world[IN_ROOM(ch)].zone))
-          autoquest_trigger_check(i, ch, NULL, AQ_MOB_KILL);      
+        if(IN_ROOM(i) == IN_ROOM(ch)  || (world[IN_ROOM(i)].zone == world[IN_ROOM(ch)].zone)) {
+          autoquest_trigger_check(i, ch, NULL, AQ_MOB_KILL);
+          quest_kill_trigger_check(i, ch);
+        }
     } else
-        autoquest_trigger_check(killer, ch, NULL, AQ_MOB_KILL);
+    {
+      autoquest_trigger_check(killer, ch, NULL, AQ_MOB_KILL);
+      quest_kill_trigger_check(killer, ch);
+    }
   }
 
   /* Alert Group if Applicable */

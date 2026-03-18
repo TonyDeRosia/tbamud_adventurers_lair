@@ -31,6 +31,9 @@
 #define SCMD_QUEST_LEAVE    3   /* Leave a quest                        */
 #define SCMD_QUEST_PROGRESS 4   /* Show progress of current quest       */
 #define SCMD_QUEST_STATUS   5   /* Show complete details of a quest     */
+#define SCMD_QUEST_REQUEST  6   /* Request dynamic kill quest           */
+#define SCMD_QUEST_INFO     7   /* Show dynamic quest target info       */
+#define SCMD_QUEST_COMPLETE 8   /* Turn in dynamic quest                */
 /* AQ Flags (much room for expansion) ********************************* */
 #define AQ_REPEATABLE (1 << 0)  /* Quest can be repeated                */
 #define NUM_AQ_FLAGS        1
@@ -98,6 +101,8 @@ void add_completed_quest(struct char_data *ch, qst_vnum vnum);
 void remove_completed_quest(struct char_data *ch, qst_vnum vnum);
 void quest_timeout(struct char_data *ch);
 void check_timed_quests(void);
+void quest_kill_trigger_check(struct char_data *ch, struct char_data *vict);
+int is_player_quest_target(struct char_data *viewer, struct char_data *mob);
 SPECIAL(questmaster);
 ACMD(do_quest);
 /* Implemented in qedit.c  */

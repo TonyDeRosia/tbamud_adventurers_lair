@@ -681,6 +681,15 @@ do                                                              \
 #define GET_NUM_QUESTS(ch)      CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.num_completed_quests))
 /** The type of quest ch is currently participating in. */
 #define GET_QUEST_TYPE(ch)      (real_quest(GET_QUEST((ch))) != NOTHING ? aquest_table[real_quest(GET_QUEST((ch)))].type : AQ_UNDEFINED )
+#define GET_KQUEST_ACTIVE(ch)   CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.kill_quest_active))
+#define GET_KQUEST_COMPLETE(ch) CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.kill_quest_complete))
+#define GET_KQUEST_TARGET(ch)   CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.kill_quest_target_vnum))
+#define GET_KQUEST_ROOM(ch)     CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.kill_quest_target_room))
+#define GET_KQUEST_GIVER(ch)    CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.kill_quest_giver_vnum))
+#define GET_KQUEST_TIME(ch)     CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.kill_quest_time))
+#define GET_KQUEST_TARGET_ID(ch) CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.kill_quest_target_id))
+#define GET_AUCTION_LOW(ch)     CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.auction_low_level))
+#define GET_AUCTION_HIGH(ch)    CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.auction_high_level))
 
 /** The current skill level of ch for skill i. */
 #define GET_SKILL(ch, i)	CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.skills[i]))
