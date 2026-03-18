@@ -1717,6 +1717,20 @@ static void process_round_effects(void)
         continue;
     }
 
+    if (affected_by_spell(i, SPELL_MIASMA)) {
+      set_next_damage_type(DAM_POISON);
+      if (damage(i, i, 5, TYPE_SUFFERING) == -1)
+        continue;
+    }
+
+    if (affected_by_spell(i, SPELL_TOXIC_CLOUD)) {
+      set_next_damage_type(DAM_POISON);
+      if (damage(i, i, 6, TYPE_SUFFERING) == -1)
+        continue;
+      if (rand_number(1, 100) <= 30 && !AFF_FLAGGED(i, AFF_POISON))
+        call_magic(i, i, NULL, SPELL_POISON, GET_LEVEL(i), CAST_SPELL);
+    }
+
     if (AFF_FLAGGED(i, AFF_ARCANE_LEAK))
       GET_MANA(i) = MAX(0, GET_MANA(i) - 10);
 
