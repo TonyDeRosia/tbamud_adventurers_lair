@@ -25,6 +25,7 @@
 #include "mud_event.h"
 #include "screen.h"
 #include "graph.h"
+#include "race.h"
 
 static int clampi(int v, int lo, int hi)
 {
@@ -34,6 +35,13 @@ static int clampi(int v, int lo, int hi)
     return hi;
   return v;
 }
+
+static int spell_dur_short_manual(int level);
+static int spell_dur_medium_manual(int level);
+static int spell_dmg_low_manual(int level);
+static int spell_dmg_high_manual(int level);
+static int spell_dmg_extreme_manual(int level);
+static int spell_dmg_ultra_manual(int level);
 
 static int warlock_power(struct char_data *ch)
 {
@@ -874,69 +882,31 @@ ASPELL(spell_memento_mori)
 
 ASPELL(spell_devour_soul)
 {
-  struct affected_type af;
-  int power;
   int dam;
-  int mult = 200;
-  int pct;
-  int mana_d;
-  int move_d;
-  int hr_pen;
-  int sv_pen;
-  int dur_ticks;
+  int healed;
+  int mana_restored;
 
   if (victim == NULL || ch == NULL)
     return;
 
-  act("You reach out with \tDcold jaws\tn to \tDevour\tn $N's soul!\tn", FALSE, ch, 0, victim, TO_CHAR);
-  act("$n reaches out with \tDcold jaws\tn to \tDevour\tn your soul!\tn", FALSE, ch, 0, victim, TO_VICT);
-  act("$n reaches out with \tDcold jaws\tn to \tDevour\tn $N's soul!\tn", TRUE, ch, 0, victim, TO_ROOM);
+  act("You devour $N's soul, consuming their life essence!", FALSE, ch, 0, victim, TO_CHAR);
+  act("$n devours your soul, consuming your life essence!", FALSE, ch, 0, victim, TO_VICT);
+  act("$n devours $N's soul, consuming their life essence!", TRUE, ch, 0, victim, TO_NOTVICT);
 
-  power = warlock_power(ch);
-  dam = dice(8, 15) + (level * 3) + (power * 3 / 2);
-  pct = clampi(1 + MAX(0, power - 20) / 2, 1, 15);
-
-  if (mag_savingthrow(victim, SAVING_SPELL, 0)) {
-    dam = (dam * 75) / 100;
-    pct = MAX(1, pct / 2);
-  }
-
-  if (crit_check_spell(ch, &mult)) {
-    dam = (dam * mult) / 100;
-    crit_show_banner(ch, victim, mult);
-  }
-
-  if (damage(ch, victim, dam, SPELL_DEVOUR_SOUL) == -1)
+  dam = spell_dmg_extreme_manual(level);
+  if (mag_savingthrow(victim, SAVING_DEATH, 0))
+    dam /= 2;
+  set_next_damage_type(DAM_NECROTIC);
+  dam = damage(ch, victim, dam, SPELL_DEVOUR_SOUL);
+  if (dam <= 0)
     return;
 
-  mana_d = MAX(1, (GET_MAX_MANA(victim) * pct) / 100);
-  move_d = MAX(1, (GET_MAX_MOVE(victim) * pct) / 100);
-  mana_d = MIN(mana_d, GET_MANA(victim));
-  move_d = MIN(move_d, GET_MOVE(victim));
-
-  GET_MANA(victim) = MAX(0, GET_MANA(victim) - mana_d);
-  GET_MOVE(victim) = MAX(0, GET_MOVE(victim) - move_d);
-  GET_MANA(ch) = MIN(GET_MAX_MANA(ch), GET_MANA(ch) + mana_d);
-  GET_MOVE(ch) = MIN(GET_MAX_MOVE(ch), GET_MOVE(ch) + move_d);
-
-  act("You drink in $N's essence, restoring your power.\tn", FALSE, ch, 0, victim, TO_CHAR);
-  act("You feel your power ripped away as $n feeds on you!\tn", FALSE, ch, 0, victim, TO_VICT);
-  act("$n feeds on $N's essence!\tn", TRUE, ch, 0, victim, TO_ROOM);
-
-  hr_pen = clampi(1 + MAX(0, power - 20) / 8, 1, 6);
-  sv_pen = clampi(1 + MAX(0, power - 20) / 6, 1, 8);
-  dur_ticks = clampi(2 + MAX(0, power - 20) / 12, 2, 6);
-
-  new_affect(&af);
-  af.spell = SPELL_DEVOUR_SOUL;
-  af.duration = dur_ticks;
-  af.modifier = -hr_pen;
-  af.location = APPLY_HITROLL;
-  affect_join(victim, &af, FALSE, FALSE, FALSE, FALSE);
-
-  af.modifier = sv_pen;
-  af.location = APPLY_SAVING_SPELL;
-  affect_join(victim, &af, FALSE, FALSE, FALSE, FALSE);
+  healed = (dam * 60) / 100;
+  mana_restored = MIN(50, dam / 4);
+  if (healed > 0)
+    GET_HIT(ch) = MIN(GET_MAX_HIT(ch), GET_HIT(ch) + healed);
+  if (mana_restored > 0)
+    GET_MANA(ch) = MIN(GET_MAX_MANA(ch), GET_MANA(ch) + mana_restored);
 }
 
 ASPELL(spell_vampiric_touch)
@@ -1447,4 +1417,425 @@ ASPELL(spell_chrono_shift)
   if (GET_HP_LAST_ROUND(ch) > GET_HIT(ch))
     GET_HIT(ch) = MIN(GET_MAX_HIT(ch), GET_HP_LAST_ROUND(ch));
   set_spell_cooldown(ch, SPELL_CHRONO_SHIFT, 10);
+}
+
+static int spell_dur_short_manual(int level) { return 2 + (level / 10); }
+static int spell_dur_medium_manual(int level) { return 4 + (level / 8); }
+static int spell_dmg_low_manual(int level) { return (level * 2) + dice(2, MAX(1, level / 4)); }
+static int spell_dmg_high_manual(int level) { return (level * 4) + dice(4, MAX(1, level / 2)); }
+static int spell_dmg_extreme_manual(int level) { return (level * 5) + dice(5, MAX(1, level / 2)); }
+static int spell_dmg_ultra_manual(int level) { return (level * 6) + dice(6, MAX(1, level / 2)); }
+
+static int spell_is_enemy(struct char_data *ch, struct char_data *tch, int spellnum)
+{
+  if (!ch || !tch || tch == ch)
+    return FALSE;
+  if (!IS_NPC(tch) && GET_LEVEL(tch) >= LVL_IMMORT)
+    return FALSE;
+  if (!CONFIG_PK_ALLOWED && !IS_NPC(ch) && !IS_NPC(tch))
+    return FALSE;
+  if (!IS_NPC(ch) && IS_NPC(tch) && AFF_FLAGGED(tch, AFF_CHARM))
+    return FALSE;
+  if (!IS_NPC(tch) && spell_info[spellnum].violent && GROUP(tch) && GROUP(ch) && GROUP(ch) == GROUP(tch))
+    return FALSE;
+  return TRUE;
+}
+
+static int spell_is_undead(struct char_data *victim)
+{
+  if (!victim)
+    return FALSE;
+  return GET_RACE(victim) == RACE_VAMPIRE;
+}
+
+static int spell_apply_flag(struct char_data *victim, int spellnum, int duration, int flag)
+{
+  struct affected_type af;
+  if (!victim)
+    return FALSE;
+  new_affect(&af);
+  af.spell = spellnum;
+  af.duration = MAX(1, duration);
+  af.location = APPLY_NONE;
+  SET_BIT_AR(af.bitvector, flag);
+  affect_join(victim, &af, FALSE, FALSE, FALSE, FALSE);
+  return TRUE;
+}
+
+static int spell_instant_kill(struct char_data *ch, struct char_data *victim, int spellnum, enum damage_type dtype)
+{
+  int kill_dam;
+  if (!ch || !victim)
+    return FALSE;
+  kill_dam = MAX(1, GET_HIT(victim)) + 1000;
+  set_next_damage_type(dtype);
+  return (damage(ch, victim, kill_dam, spellnum) == -1);
+}
+
+ASPELL(spell_balefire)
+{
+  int dam;
+  if (!ch || !victim)
+    return;
+  if (spell_on_cooldown(ch, SPELL_BALEFIRE)) {
+    send_to_char(ch, "Balefire is still on cooldown.\r\n");
+    return;
+  }
+  act("You unleash a lance of pure balefire that tears through $N's very existence!", FALSE, ch, 0, victim, TO_CHAR);
+  act("$n unleashes a lance of pure balefire that tears through $N's very existence!", TRUE, ch, 0, victim, TO_NOTVICT);
+  dam = spell_dmg_extreme_manual(level);
+  if (mag_savingthrow(victim, SAVING_SPELL, 0))
+    dam /= 2;
+  set_next_damage_type(DAM_ARCANE);
+  if (damage(ch, victim, dam, SPELL_BALEFIRE) >= 0)
+    cancellation_remove_one(victim);
+  set_spell_cooldown(ch, SPELL_BALEFIRE, 3);
+}
+
+ASPELL(spell_meteor)
+{
+  struct char_data *tch, *next_tch;
+  int saved;
+  int dam;
+  if (!ch || !victim)
+    return;
+  act("You call down a meteor from the heavens onto $N!", FALSE, ch, 0, victim, TO_CHAR);
+  act("$n calls down a meteor from the heavens onto $N!", TRUE, ch, 0, victim, TO_NOTVICT);
+  saved = mag_savingthrow(victim, SAVING_SPELL, 0);
+  dam = spell_dmg_extreme_manual(level);
+  if (saved)
+    dam /= 2;
+  set_next_damage_type(DAM_FIRE);
+  if (damage(ch, victim, dam, SPELL_METEOR) == -1)
+    return;
+  if (saved)
+    return;
+  for (tch = world[IN_ROOM(ch)].people; tch; tch = next_tch) {
+    int splash;
+    next_tch = tch->next_in_room;
+    if (tch == victim || !spell_is_enemy(ch, tch, SPELL_METEOR))
+      continue;
+    splash = spell_dmg_low_manual(level);
+    set_next_damage_type(DAM_FIRE);
+    damage(ch, tch, splash, SPELL_METEOR);
+  }
+}
+
+ASPELL(spell_meteor_swarm)
+{
+  struct char_data *tch, *next_tch;
+  int i;
+  if (!ch)
+    return;
+  act("You call down a swarm of meteors from the heavens!", FALSE, ch, 0, 0, TO_CHAR);
+  act("$n calls down a swarm of meteors from the heavens!", TRUE, ch, 0, 0, TO_ROOM);
+  for (tch = world[IN_ROOM(ch)].people; tch; tch = next_tch) {
+    next_tch = tch->next_in_room;
+    if (!spell_is_enemy(ch, tch, SPELL_METEOR_SWARM))
+      continue;
+    for (i = 0; i < 4; i++) {
+      int dam = spell_dmg_high_manual(level);
+      if (mag_savingthrow(tch, SAVING_SPELL, 0))
+        dam /= 2;
+      set_next_damage_type(DAM_FIRE);
+      if (damage(ch, tch, dam, SPELL_METEOR_SWARM) == -1)
+        break;
+    }
+  }
+}
+
+ASPELL(spell_hellfire)
+{
+  int dam;
+  if (!ch || !victim)
+    return;
+  act("Hellfire erupts from below, incinerating $N!", FALSE, ch, 0, victim, TO_CHAR);
+  act("Hellfire erupts from below, incinerating $N!", TRUE, ch, 0, victim, TO_NOTVICT);
+  dam = spell_dmg_extreme_manual(level);
+  if (mag_savingthrow(victim, SAVING_SPELL, 0))
+    dam /= 2;
+  if (IS_GOOD(victim))
+    dam = (dam * 125) / 100;
+  else if (IS_EVIL(victim))
+    dam = (dam * 75) / 100;
+  set_next_damage_type(DAM_FIRE);
+  damage(ch, victim, dam, SPELL_HELLFIRE);
+}
+
+ASPELL(spell_wrathfire)
+{
+  int opposite = (IS_GOOD(ch) && IS_EVIL(victim)) || (IS_EVIL(ch) && IS_GOOD(victim));
+  int dam;
+  if (!ch || !victim)
+    return;
+  act("Wrathfire explodes from your hands, fueled by divine fury!", FALSE, ch, 0, victim, TO_CHAR);
+  act("$n releases wrathfire fueled by divine fury!", TRUE, ch, 0, victim, TO_NOTVICT);
+  dam = opposite ? spell_dmg_extreme_manual(level) : spell_dmg_low_manual(level);
+  if (mag_savingthrow(victim, SAVING_SPELL, 0))
+    dam /= 2;
+  set_next_damage_type(DAM_HOLY);
+  damage(ch, victim, dam, SPELL_WRATHFIRE);
+}
+
+ASPELL(spell_celestial_smite)
+{
+  int dam;
+  if (!ch || !victim)
+    return;
+  act("Celestial fire descends to smite $N in your deity's name!", FALSE, ch, 0, victim, TO_CHAR);
+  act("Celestial fire descends to smite $N in $n's deity's name!", TRUE, ch, 0, victim, TO_NOTVICT);
+  dam = spell_is_undead(victim) ? spell_dmg_ultra_manual(level) : spell_dmg_extreme_manual(level);
+  if (mag_savingthrow(victim, SAVING_SPELL, 0))
+    dam /= 2;
+  set_next_damage_type(DAM_HOLY);
+  damage(ch, victim, dam, SPELL_CELESTIAL_SMITE);
+}
+
+ASPELL(spell_hammer_of_god)
+{
+  int saved;
+  int dam;
+  if (!ch || !victim)
+    return;
+  act("The Hammer of God descends on $N!", FALSE, ch, 0, victim, TO_CHAR);
+  act("The Hammer of God descends on $N!", TRUE, ch, 0, victim, TO_NOTVICT);
+  saved = mag_savingthrow(victim, SAVING_SPELL, 0);
+  dam = spell_dmg_extreme_manual(level);
+  if (saved)
+    dam /= 2;
+  set_next_damage_type(DAM_HOLY);
+  if (damage(ch, victim, dam, SPELL_HAMMER_OF_GOD) == -1)
+    return;
+  if (!saved) {
+    spell_apply_flag(victim, SPELL_HAMMER_OF_GOD, 2, AFF_STUNNED);
+    spell_apply_flag(victim, SPELL_HAMMER_OF_GOD, spell_dur_short_manual(level), AFF_ROOTED);
+  }
+}
+
+ASPELL(spell_death_knell)
+{
+  int dam;
+  int saved;
+  if (!ch || !victim)
+    return;
+  act("You sound the death knell for $N's existence!", FALSE, ch, 0, victim, TO_CHAR);
+  act("$n sounds the death knell for $N's existence!", TRUE, ch, 0, victim, TO_NOTVICT);
+  if (GET_HIT(victim) * 100 <= GET_MAX_HIT(victim) * 20) {
+    dam = spell_dmg_extreme_manual(level) + MAX(0, GET_HIT(victim));
+    saved = mag_savingthrow(victim, SAVING_DEATH, 0);
+    if (saved)
+      dam /= 2;
+  } else {
+    send_to_char(ch, "Death Knell fails to find purchase. %s is too healthy.\r\n", GET_NAME(victim));
+    dam = spell_dmg_low_manual(level);
+  }
+  set_next_damage_type(DAM_NECROTIC);
+  damage(ch, victim, dam, SPELL_DEATH_KNELL);
+}
+
+ASPELL(spell_unholy_word)
+{
+  struct char_data *tch, *next_tch;
+  if (!ch)
+    return;
+  act("You unleash the Unholy Word, speaking blasphemy into reality!", FALSE, ch, 0, 0, TO_CHAR);
+  act("$n unleashes the Unholy Word, speaking blasphemy into reality!", TRUE, ch, 0, 0, TO_ROOM);
+  for (tch = world[IN_ROOM(ch)].people; tch; tch = next_tch) {
+    int saved;
+    int dam;
+    next_tch = tch->next_in_room;
+    if (!spell_is_enemy(ch, tch, SPELL_UNHOLY_WORD))
+      continue;
+    if (IS_EVIL(tch))
+      continue;
+    saved = mag_savingthrow(tch, SAVING_SPELL, 0);
+    dam = spell_dmg_extreme_manual(level);
+    if (saved)
+      dam /= 2;
+    set_next_damage_type(DAM_SHADOW);
+    if (damage(ch, tch, dam, SPELL_UNHOLY_WORD) == -1)
+      continue;
+    if (!saved) {
+      spell_apply_flag(tch, SPELL_UNHOLY_WORD, 2, AFF_STUNNED);
+      spell_apply_flag(tch, SPELL_UNHOLY_WORD, spell_dur_short_manual(level), AFF_BLINDED_MAGICAL);
+    }
+  }
+}
+
+ASPELL(spell_holy_word)
+{
+  struct char_data *tch, *next_tch;
+  if (!ch)
+    return;
+  act("You speak the Holy Word and divine light fills the room!", FALSE, ch, 0, 0, TO_CHAR);
+  act("$n speaks the Holy Word and divine light fills the room!", TRUE, ch, 0, 0, TO_ROOM);
+  for (tch = world[IN_ROOM(ch)].people; tch; tch = next_tch) {
+    int saved;
+    int dam;
+    next_tch = tch->next_in_room;
+    if (!spell_is_enemy(ch, tch, SPELL_HOLY_WORD))
+      continue;
+    if (IS_GOOD(tch))
+      continue;
+    if (!IS_EVIL(tch))
+      continue;
+    saved = mag_savingthrow(tch, SAVING_SPELL, 0);
+    dam = spell_dmg_extreme_manual(level);
+    if (saved)
+      dam /= 2;
+    set_next_damage_type(DAM_HOLY);
+    if (damage(ch, tch, dam, SPELL_HOLY_WORD) == -1)
+      continue;
+    if (!saved) {
+      spell_apply_flag(tch, SPELL_HOLY_WORD, 2, AFF_STUNNED);
+      spell_apply_flag(tch, SPELL_HOLY_WORD, spell_dur_short_manual(level), AFF_BLINDED_MAGICAL);
+    }
+  }
+}
+
+ASPELL(spell_finger_of_death)
+{
+  int saved;
+  if (!ch || !victim)
+    return;
+  act("You point your finger at $N, channeling the finger of death!", FALSE, ch, 0, victim, TO_CHAR);
+  act("$n points a finger at $N, channeling the finger of death!", TRUE, ch, 0, victim, TO_NOTVICT);
+  if (spell_is_undead(victim)) {
+    int dam = spell_dmg_high_manual(level);
+    set_next_damage_type(DAM_NECROTIC);
+    damage(ch, victim, dam, SPELL_FINGER_OF_DEATH);
+    return;
+  }
+  saved = mag_savingthrow(victim, SAVING_DEATH, 0);
+  if (!saved) {
+    if (spell_instant_kill(ch, victim, SPELL_FINGER_OF_DEATH, DAM_NECROTIC))
+      return;
+  }
+  set_next_damage_type(DAM_NECROTIC);
+  damage(ch, victim, spell_dmg_extreme_manual(level), SPELL_FINGER_OF_DEATH);
+}
+
+ASPELL(spell_wail_of_the_banshee)
+{
+  struct char_data *tch, *next_tch;
+  if (!ch)
+    return;
+  act("You unleash the wail of a banshee!", FALSE, ch, 0, 0, TO_CHAR);
+  act("$n unleashes the wail of a banshee!", TRUE, ch, 0, 0, TO_ROOM);
+  for (tch = world[IN_ROOM(ch)].people; tch; tch = next_tch) {
+    int saved;
+    next_tch = tch->next_in_room;
+    if (!spell_is_enemy(ch, tch, SPELL_WAIL_OF_THE_BANSHEE))
+      continue;
+    if (spell_is_undead(tch))
+      continue;
+    saved = mag_savingthrow(tch, SAVING_DEATH, 0);
+    if (!saved) {
+      if (spell_instant_kill(ch, tch, SPELL_WAIL_OF_THE_BANSHEE, DAM_NECROTIC))
+        continue;
+    }
+    set_next_damage_type(DAM_NECROTIC);
+    damage(ch, tch, spell_dmg_extreme_manual(level), SPELL_WAIL_OF_THE_BANSHEE);
+  }
+}
+
+ASPELL(spell_disintegrate)
+{
+  int saved;
+  int dam;
+  if (!ch || !victim)
+    return;
+  act("A green ray of disintegrating energy erupts from your hand at $N!", FALSE, ch, 0, victim, TO_CHAR);
+  act("A green ray of disintegrating energy erupts from $n's hand at $N!", TRUE, ch, 0, victim, TO_NOTVICT);
+  saved = mag_savingthrow(victim, SAVING_SPELL, -10);
+  dam = saved ? spell_dmg_high_manual(level) : (GET_MAX_HIT(victim) / 2 + spell_dmg_extreme_manual(level));
+  set_next_damage_type(DAM_ARCANE);
+  damage(ch, victim, dam, SPELL_DISINTEGRATE);
+}
+
+ASPELL(spell_power_word_kill)
+{
+  if (!ch || !victim)
+    return;
+  act("You speak the Power Word: Kill at $N!", FALSE, ch, 0, victim, TO_CHAR);
+  act("$n speaks the Power Word: Kill at $N!", TRUE, ch, 0, victim, TO_NOTVICT);
+  if (GET_MAX_HIT(victim) <= 50 + (level * 2)) {
+    if (spell_instant_kill(ch, victim, SPELL_POWER_WORD_KILL, DAM_ARCANE))
+      return;
+  }
+  set_next_damage_type(DAM_ARCANE);
+  damage(ch, victim, spell_dmg_extreme_manual(level), SPELL_POWER_WORD_KILL);
+}
+
+ASPELL(spell_power_word_stun)
+{
+  int dur;
+  if (!ch || !victim)
+    return;
+  act("You speak the Power Word: Stun at $N!", FALSE, ch, 0, victim, TO_CHAR);
+  act("$n speaks the Power Word: Stun at $N!", TRUE, ch, 0, victim, TO_NOTVICT);
+  dur = (GET_MAX_HIT(victim) <= 100 + (level * 3)) ? spell_dur_medium_manual(level) : spell_dur_short_manual(level);
+  spell_apply_flag(victim, SPELL_POWER_WORD_STUN, dur, AFF_STUNNED);
+}
+
+ASPELL(spell_power_word_blind)
+{
+  if (!ch || !victim)
+    return;
+  act("You speak the Power Word: Blind at $N!", FALSE, ch, 0, victim, TO_CHAR);
+  act("$n speaks the Power Word: Blind at $N!", TRUE, ch, 0, victim, TO_NOTVICT);
+  spell_apply_flag(victim, SPELL_POWER_WORD_BLIND, spell_dur_medium_manual(level), AFF_BLINDED_MAGICAL);
+}
+
+ASPELL(spell_power_word_silence)
+{
+  if (!ch || !victim)
+    return;
+  act("You speak the Power Word: Silence at $N!", FALSE, ch, 0, victim, TO_CHAR);
+  act("$n speaks the Power Word: Silence at $N!", TRUE, ch, 0, victim, TO_NOTVICT);
+  spell_apply_flag(victim, SPELL_POWER_WORD_SILENCE, spell_dur_medium_manual(level), AFF_SILENCED);
+}
+
+ASPELL(spell_psychic_crush)
+{
+  int saved;
+  int dam;
+  if (!ch || !victim)
+    return;
+  act("You crush $N's mind with overwhelming psychic force!", FALSE, ch, 0, victim, TO_CHAR);
+  act("$n crushes $N's mind with overwhelming psychic force!", TRUE, ch, 0, victim, TO_NOTVICT);
+  saved = mag_savingthrow(victim, SAVING_SPELL, 0);
+  dam = spell_dmg_extreme_manual(level);
+  if (saved)
+    dam /= 2;
+  set_next_damage_type(DAM_PSYCHIC);
+  if (damage(ch, victim, dam, SPELL_PSYCHIC_CRUSH) == -1)
+    return;
+  if (!saved && GET_HIT(victim) * 100 <= GET_MAX_HIT(victim) * 30) {
+    if (!mag_savingthrow(victim, SAVING_DEATH, 0))
+      spell_instant_kill(ch, victim, SPELL_PSYCHIC_CRUSH, DAM_PSYCHIC);
+  }
+}
+
+ASPELL(spell_time_stop)
+{
+  struct char_data *tch;
+  struct affected_type af;
+  if (!ch)
+    return;
+  act("Time itself grinds to a halt around you!", FALSE, ch, 0, 0, TO_CHAR);
+  act("$n speaks a single word and time freezes!", TRUE, ch, 0, 0, TO_ROOM);
+  for (tch = world[IN_ROOM(ch)].people; tch; tch = tch->next_in_room) {
+    if (tch == ch)
+      continue;
+    GET_WAIT_STATE(tch) = MAX(GET_WAIT_STATE(tch), 3 * PULSE_VIOLENCE);
+  }
+  if (affected_by_spell(ch, SPELL_TIME_STOP))
+    affect_from_char(ch, SPELL_TIME_STOP);
+  new_affect(&af);
+  af.spell = SPELL_TIME_STOP;
+  af.duration = 3;
+  af.location = APPLY_NONE;
+  af.modifier = GET_ROOM_VNUM(IN_ROOM(ch));
+  affect_join(ch, &af, FALSE, FALSE, FALSE, FALSE);
 }

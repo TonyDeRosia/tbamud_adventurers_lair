@@ -179,27 +179,46 @@
 #define SPELL_LEYLINE_TAP            138
 #define SPELL_TEMPORAL_SHIFT         139
 #define SPELL_CHRONO_SHIFT           140
+#define SPELL_BALEFIRE               141
+#define SPELL_METEOR                 142
+#define SPELL_METEOR_SWARM           143
+#define SPELL_HELLFIRE               144
+#define SPELL_WRATHFIRE              145
+#define SPELL_CELESTIAL_SMITE        146
+#define SPELL_HAMMER_OF_GOD          147
+#define SPELL_DEATH_KNELL            148
+#define SPELL_UNHOLY_WORD            149
+#define SPELL_HOLY_WORD              150
+#define SPELL_FINGER_OF_DEATH        151
+#define SPELL_WAIL_OF_THE_BANSHEE    152
+#define SPELL_DISINTEGRATE           153
+#define SPELL_POWER_WORD_KILL        154
+#define SPELL_POWER_WORD_STUN        155
+#define SPELL_POWER_WORD_BLIND       156
+#define SPELL_POWER_WORD_SILENCE     157
+#define SPELL_PSYCHIC_CRUSH          158
+#define SPELL_TIME_STOP              159
 /** Total Number of defined spells */
-#define NUM_SPELLS                   140
+#define NUM_SPELLS                   159
 
 /* Insert new spells here, up to MAX_SPELLS */
-#define MAX_SPELLS		    150
+#define MAX_SPELLS		    170
 
 /* PLAYER SKILLS - Numbered from MAX_SPELLS+1 to MAX_SKILLS */
-#define SKILL_BACKSTAB              151 /* Reserved Skill[] DO NOT CHANGE */
-#define SKILL_BASH                  152 /* Reserved Skill[] DO NOT CHANGE */
-#define SKILL_HIDE                  153 /* Reserved Skill[] DO NOT CHANGE */
-#define SKILL_KICK                  154 /* Reserved Skill[] DO NOT CHANGE */
-#define SKILL_PICK_LOCK             155 /* Reserved Skill[] DO NOT CHANGE */
-#define SKILL_WHIRLWIND             156 
-#define SKILL_RESCUE                157 /* Reserved Skill[] DO NOT CHANGE */
-#define SKILL_SNEAK                 158 /* Reserved Skill[] DO NOT CHANGE */
-#define SKILL_STEAL                 159 /* Reserved Skill[] DO NOT CHANGE */
-#define SKILL_TRACK                 160 /* Reserved Skill[] DO NOT CHANGE */
-#define SKILL_BANDAGE               161 /* Reserved Skill[] DO NOT CHANGE */
+#define SKILL_BACKSTAB              171 /* Reserved Skill[] DO NOT CHANGE */
+#define SKILL_BASH                  172 /* Reserved Skill[] DO NOT CHANGE */
+#define SKILL_HIDE                  173 /* Reserved Skill[] DO NOT CHANGE */
+#define SKILL_KICK                  174 /* Reserved Skill[] DO NOT CHANGE */
+#define SKILL_PICK_LOCK             175 /* Reserved Skill[] DO NOT CHANGE */
+#define SKILL_WHIRLWIND             176 
+#define SKILL_RESCUE                177 /* Reserved Skill[] DO NOT CHANGE */
+#define SKILL_SNEAK                 178 /* Reserved Skill[] DO NOT CHANGE */
+#define SKILL_STEAL                 179 /* Reserved Skill[] DO NOT CHANGE */
+#define SKILL_TRACK                 180 /* Reserved Skill[] DO NOT CHANGE */
+#define SKILL_BANDAGE               181 /* Reserved Skill[] DO NOT CHANGE */
 
-#define SKILL_DUAL_WIELD            162 /* Reserved Skill[] DO NOT CHANGE */
-#define SKILL_RECALL                163 /* Reserved Skill[] DO NOT CHANGE */
+#define SKILL_DUAL_WIELD            182 /* Reserved Skill[] DO NOT CHANGE */
+#define SKILL_RECALL                183 /* Reserved Skill[] DO NOT CHANGE */
 /* New skills may be added here up to MAX_SKILLS (200) */
 
 /* NON-PLAYER AND OBJECT SPELLS AND SKILLS: The practice levels for the spells
@@ -242,6 +261,7 @@
 #define SAVING_PETRI  2
 #define SAVING_BREATH 3
 #define SAVING_SPELL  4
+#define SAVING_DEATH  SAVING_PARA
 
 /* Reserved summon/portal VNUM constants for spell expansion. */
 #define OBJVNUM_SPELL_PORTAL          9300
@@ -392,6 +412,25 @@ ASPELL(spell_ethereal_jaunt);
 ASPELL(spell_leyline_tap);
 ASPELL(spell_temporal_shift);
 ASPELL(spell_chrono_shift);
+ASPELL(spell_balefire);
+ASPELL(spell_meteor);
+ASPELL(spell_meteor_swarm);
+ASPELL(spell_hellfire);
+ASPELL(spell_wrathfire);
+ASPELL(spell_celestial_smite);
+ASPELL(spell_hammer_of_god);
+ASPELL(spell_death_knell);
+ASPELL(spell_unholy_word);
+ASPELL(spell_holy_word);
+ASPELL(spell_finger_of_death);
+ASPELL(spell_wail_of_the_banshee);
+ASPELL(spell_disintegrate);
+ASPELL(spell_power_word_kill);
+ASPELL(spell_power_word_stun);
+ASPELL(spell_power_word_blind);
+ASPELL(spell_power_word_silence);
+ASPELL(spell_psychic_crush);
+ASPELL(spell_time_stop);
 void show_identify_item(struct char_data *ch, struct obj_data *obj, enum identify_detail_level detail);
 
 /* basic magic calling functions */
