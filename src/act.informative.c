@@ -4245,103 +4245,341 @@ ACMD(do_areas)
     page_string(ch->desc, buf, TRUE);
 }
 
-static void list_scanned_chars(struct char_data * list, struct char_data * ch, int
-distance, int door)
+static void build_scan_target_tags(struct char_data *viewer, struct char_data *target,
+                                   char *out, size_t outsz)
 {
-  char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH - 1];
+  out[0] = '\0';
 
-  const char *how_far[] = {
-    "close by",
-    "a ways off",
-    "far off to the"
-  };
+  if (!IS_NPC(target) && PRF_FLAGGED(target, PRF_AFK))
+    strlcat(out, "[AFK] ", outsz);
+  if (!IS_NPC(target))
+    strlcat(out, "(Player) ", outsz);
+  if (AFF_FLAGGED(target, AFF_INVISIBLE))
+    strlcat(out, "(Invis) ", outsz);
+  if (AFF_FLAGGED(target, AFF_HIDE))
+    strlcat(out, "(Hidden) ", outsz);
+  if (AFF_FLAGGED(target, AFF_FLYING))
+    strlcat(out, "(Flying) ", outsz);
+  if (AFF_FLAGGED(target, AFF_SANCTUARY))
+    strlcat(out, "(White Aura) ", outsz);
+  if (AFF_FLAGGED(target, AFF_CHARM))
+    strlcat(out, "(Charmed) ", outsz);
+  if (!IS_NPC(target) && PLR_FLAGGED(target, PLR_KILLER))
+    strlcat(out, "(OPK) ", outsz);
 
+  (void) viewer;
+}
+
+static void send_scan_section_header(struct char_data *ch, int door, int range)
+{
+  if (range == 0)
+    send_to_char(ch, "Right here you see:\r\n");
+  else if (range == 1)
+    send_to_char(ch, "%s from here you see:\r\n", dirs[door]);
+  else
+    send_to_char(ch, "%d %s from here you see:\r\n", range, dirs[door]);
+}
+
+static int count_scanned_group_visible(struct char_data *list, struct char_data *ch)
+{
   struct char_data *i;
-  int count = 0;
-  *buf = '\0';
-
-/* this loop is a quick, easy way to help make a grammatical sentence
-   (i.e., "You see x, x, y, and z." with commas, "and", etc.) */
+  int shown = 0;
 
   for (i = list; i; i = i->next_in_room)
-
-/* put any other conditions for scanning someone in this if statement -
-   i.e., if (CAN_SEE(ch, i) && condition2 && condition3) or whatever */
-
     if (CAN_SEE(ch, i))
-     count++;
+      shown++;
 
-  if (!count)
-    return;
+  return shown;
+}
+
+static int list_scanned_group(struct char_data *list, struct char_data *ch)
+{
+  struct char_data *i;
+  int shown = 0;
 
   for (i = list; i; i = i->next_in_room) {
-
-/* make sure to add changes to the if statement above to this one also, using
-   or's to join them.. i.e.,
-   if (!CAN_SEE(ch, i) || !condition2 || !condition3) */
+    char tags[256];
 
     if (!CAN_SEE(ch, i))
       continue;
-    if (!*buf)
-      snprintf(buf, sizeof(buf), "You see %s", GET_NAME(i));
-    else
-      strncat(buf, GET_NAME(i), sizeof(buf) - strlen(buf) - 1);
-    if (--count > 1)
-      strncat(buf, ", ", sizeof(buf) - strlen(buf) - 1);
-    else if (count == 1)
-      strncat(buf, " and ", sizeof(buf) - strlen(buf) - 1);
-    else {
-      snprintf(buf2, sizeof(buf2), " %s %s.\r\n", how_far[distance], dirs[door]);
-      strncat(buf, buf2, sizeof(buf) - strlen(buf) - 1);
-    }
 
+    build_scan_target_tags(ch, i, tags, sizeof(tags));
+    send_to_char(ch, "     - %s%s\r\n", tags, PERS(i, ch));
+    shown++;
   }
-  send_to_char(ch, "%s", buf);
+
+  return shown;
 }
 
 ACMD(do_scan)
 {
   int door;
-  bool found=FALSE;
-
+  bool found = FALSE;
   int range;
   int maxrange = 3;
-
-  room_rnum scanned_room = IN_ROOM(ch);
+  room_rnum scanned_room;
 
   if (IS_AFFECTED(ch, AFF_BLIND)) {
     send_to_char(ch, "You can't see a damned thing, you're blind!\r\n");
     return;
   }
 
+  if (world[IN_ROOM(ch)].people) {
+    int visible_here = count_scanned_group_visible(world[IN_ROOM(ch)].people, ch);
+    if (visible_here > 0) {
+      struct char_data *i;
+      send_scan_section_header(ch, NORTH, 0);
+      for (i = world[IN_ROOM(ch)].people; i; i = i->next_in_room) {
+        char tags[256];
+        if (!CAN_SEE(ch, i))
+          continue;
+        build_scan_target_tags(ch, i, tags, sizeof(tags));
+        send_to_char(ch, "     - %s%s\r\n", tags, PERS(i, ch));
+      }
+      found = TRUE;
+    }
+  }
+
   for (door = 0; door < DIR_COUNT; door++) {
+    scanned_room = IN_ROOM(ch);
     for (range = 1; range<= maxrange; range++) {
       if (world[scanned_room].dir_option[door] && world[scanned_room].dir_option[door]->to_room != NOWHERE &&
        !IS_SET(world[scanned_room].dir_option[door]->exit_info, EX_CLOSED) &&
        !IS_SET(world[scanned_room].dir_option[door]->exit_info, EX_HIDDEN)) {
+        int printed_header = FALSE;
+
         scanned_room = world[scanned_room].dir_option[door]->to_room;
         if (IS_DARK(scanned_room) && !CAN_SEE_IN_DARK(ch)) {
+          if (!printed_header) {
+            send_scan_section_header(ch, door, range);
+            printed_header = TRUE;
+          }
           if (world[scanned_room].people)
-            send_to_char(ch, "%s: It's too dark to see, but you can hear shuffling.\r\n", dirs[door]);
+            send_to_char(ch, "     - It's too dark to see, but you can hear shuffling.\r\n");
           else
-            send_to_char(ch, "%s: It is too dark to see anything.\r\n", dirs[door]);
-          found=TRUE;
+            send_to_char(ch, "     - It is too dark to see anything.\r\n");
+          found = TRUE;
+          break;
         } else {
-          if (world[scanned_room].people) {
-            list_scanned_chars(world[scanned_room].people, ch, range - 1, door);
-            found=TRUE;
+          int shown = 0;
+
+          if (world[scanned_room].people)
+            shown = count_scanned_group_visible(world[scanned_room].people, ch);
+
+          if (shown > 0) {
+            if (!printed_header) {
+              send_scan_section_header(ch, door, range);
+              printed_header = TRUE;
+            }
+            list_scanned_group(world[scanned_room].people, ch);
+            found = TRUE;
           }
         }
       }                  // end of if
       else
         break;
     }                    // end of range
-    scanned_room = IN_ROOM(ch);
   }                      // end of directions
   if (!found) {
     send_to_char(ch, "You don't see anything nearby!\r\n");
   }
 } // end of do_scan
+
+ACMD(do_saffects)
+{
+  const struct affected_type *af;
+  int skills = 0, spells = 0, any = 0;
+
+  if (!ch || IS_NPC(ch)) {
+    send_to_char(ch, "Not for mobiles.\r\n");
+    return;
+  }
+
+  if (!ch->affected) {
+    send_to_char(ch, "You are not affected by anything.\r\n");
+    return;
+  }
+
+  send_to_char(ch, "\r\nYou are affected by the following:\r\n");
+  for (af = ch->affected; af; af = af->next) {
+    const char *name = "Unknown";
+    const char *kind = "Spell";
+    char flags[256];
+    char label[64];
+    int mins = 0;
+    int secs = 0;
+
+    flags[0] = '\0';
+    label[0] = '\0';
+    any = 1;
+
+    if (af->spell > 0 && af->spell <= TOP_SPELL_DEFINE && spell_info[af->spell].name)
+      name = spell_info[af->spell].name;
+    else if (af->spell > TOP_SPELL_DEFINE)
+      name = skill_name(af->spell);
+
+    sprintbitarray((int *)af->bitvector, affected_bits, AF_ARRAY_MAX, flags);
+    if ((!name || !*name || !str_cmp(name, "Unknown")) && flags[0]) {
+      size_t i = 0;
+      while (flags[i] && flags[i] != ' ' && i < sizeof(label) - 1) {
+        label[i] = flags[i];
+        i++;
+      }
+      label[i] = '\0';
+      if (label[0])
+        name = label;
+    }
+
+    if (af->spell > 0 && IS_SKILL(af->spell)) {
+      kind = "Skill";
+      skills++;
+    } else {
+      kind = "Spell";
+      spells++;
+    }
+
+    if (af->duration < 0) {
+      send_to_char(ch, "%-7s : %s (permanent)\r\n", kind, name);
+    } else {
+      mins = af->duration * SECS_PER_MUD_HOUR / 60;
+      secs = af->duration * SECS_PER_MUD_HOUR % 60;
+      send_to_char(ch, "%-7s : %s (%02d:%02d)\r\n", kind, name, mins, secs);
+    }
+  }
+
+  if (!any) {
+    send_to_char(ch, "You are not affected by anything.\r\n");
+    return;
+  }
+
+  send_to_char(ch, "\r\nYou are affected by %d skills and %d spells.\r\n", skills, spells);
+}
+
+ACMD(do_attr)
+{
+  send_to_char(ch, "---------------------------------------------------------------------------\r\n");
+  send_to_char(ch, "Your main attributes are:\r\n\r\n");
+  send_to_char(ch,
+    "Str :[%3d/%3d]  Int :[%3d/%3d]  Wis :[%3d/%3d]  Hr :[%3d]\r\n",
+    GET_STR(ch), ch->real_abils.str,
+    GET_INT(ch), ch->real_abils.intel,
+    GET_WIS(ch), ch->real_abils.wis,
+    GET_HITROLL(ch));
+  send_to_char(ch,
+    "Dex :[%3d/%3d]  Con :[%3d/%3d]  Luck:[%3d/%3d]  Dr :[%3d]\r\n\r\n",
+    GET_DEX(ch), ch->real_abils.dex,
+    GET_CON(ch), ch->real_abils.con,
+    GET_CHA(ch), ch->real_abils.cha,
+    GET_DAMROLL(ch));
+
+  send_to_char(ch, "Hp:[%d/%d]  Mn:[%d/%d]  Mv:[%d/%d]\r\n\r\n",
+    GET_HIT(ch), GET_MAX_HIT(ch),
+    GET_MANA(ch), GET_MAX_MANA(ch),
+    GET_MOVE(ch), GET_MAX_MOVE(ch));
+
+  send_to_char(ch, "Trains: [%3d]  Pracs: [%3d]\r\n\r\n", GET_TRAINS(ch), GET_PRACTICES(ch));
+  send_to_char(ch, "(Use 'SCORE' and 'WHOIS' to see more details on your character)\r\n\r\n");
+  send_to_char(ch, "(Use 'RESISTS' to see your resistances.)\r\n");
+  send_to_char(ch, "---------------------------------------------------------------------------\r\n");
+}
+
+ACMD(do_resists)
+{
+  send_to_char(ch, "                      Spells & Equip\r\n");
+  send_to_char(ch, "Damage Type  Race     Amount      Pct    Total\r\n");
+  send_to_char(ch, "-----------  -------  ---------------  -------\r\n");
+  send_to_char(ch, "Bash         n/a      n/a         n/a    n/a\r\n");
+  send_to_char(ch, "Pierce       n/a      n/a         n/a    n/a\r\n");
+  send_to_char(ch, "Slash        n/a      n/a         n/a    n/a\r\n");
+  send_to_char(ch, "\r\n");
+  send_to_char(ch, "Acid         n/a      n/a         n/a    n/a\r\n");
+  send_to_char(ch, "Air          n/a      n/a         n/a    n/a\r\n");
+  send_to_char(ch, "Cold         n/a      n/a         n/a    n/a\r\n");
+  send_to_char(ch, "Disease      n/a      n/a         n/a    n/a\r\n");
+  send_to_char(ch, "Earth        n/a      n/a         n/a    n/a\r\n");
+  send_to_char(ch, "Electric     n/a      n/a         n/a    n/a\r\n");
+  send_to_char(ch, "Energy       n/a      n/a         n/a    n/a\r\n");
+  send_to_char(ch, "Fire         n/a      n/a         n/a    n/a\r\n");
+  send_to_char(ch, "Holy         n/a      n/a         n/a    n/a\r\n");
+  send_to_char(ch, "Light        n/a      n/a         n/a    n/a\r\n");
+  send_to_char(ch, "Magic        n/a      n/a         n/a    n/a\r\n");
+  send_to_char(ch, "Mental       n/a      n/a         n/a    n/a\r\n");
+  send_to_char(ch, "Negative     n/a      n/a         n/a    n/a\r\n");
+  send_to_char(ch, "Poison       n/a      n/a         n/a    n/a\r\n");
+  send_to_char(ch, "Shadow       n/a      n/a         n/a    n/a\r\n");
+  send_to_char(ch, "Sonic        n/a      n/a         n/a    n/a\r\n");
+  send_to_char(ch, "Water        n/a      n/a         n/a    n/a\r\n");
+}
+
+static int ci_contains(const char *haystack, const char *needle)
+{
+  size_t nlen;
+
+  if (!needle || !*needle)
+    return TRUE;
+  if (!haystack)
+    return FALSE;
+
+  nlen = strlen(needle);
+  for (; *haystack; haystack++)
+    if (!strncasecmp(haystack, needle, nlen))
+      return TRUE;
+
+  return FALSE;
+}
+
+ACMD(do_speedwalk)
+{
+  char arg[MAX_INPUT_LENGTH];
+  FILE *fl;
+  char line[256];
+  const char *recall_name = "mortal recall";
+  int shown = 0;
+
+  skip_spaces(&argument);
+  strlcpy(arg, argument, sizeof(arg));
+
+  fl = fopen("misc/speedwalk.lst", "r");
+  if (!fl) {
+    send_to_char(ch, "No speedwalk data is available right now.\r\n");
+    return;
+  }
+
+  if (r_mortal_start_room != NOWHERE && world[r_mortal_start_room].name)
+    recall_name = world[r_mortal_start_room].name;
+
+  send_to_char(ch, "                  Directions from %s\r\n\r\n", recall_name);
+  send_to_char(ch, "Area Name                       Speedwalk\r\n");
+  send_to_char(ch, "------------------------------  ----------------------------------------------\r\n");
+
+  while (fgets(line, sizeof(line), fl)) {
+    int zvnum;
+    char route[200];
+    zone_rnum z;
+
+    if (line[0] == '\0' || line[0] == '\n' || line[0] == '#')
+      continue;
+
+    route[0] = '\0';
+    if (sscanf(line, "%d %199[^\r\n]", &zvnum, route) != 2)
+      continue;
+
+    z = real_zone(zvnum);
+    if (z == NOWHERE)
+      continue;
+
+    if (*arg && !ci_contains(zone_table[z].name, arg))
+      continue;
+
+    send_to_char(ch, "%-30.30s  %s\r\n", zone_table[z].name, route);
+    shown++;
+  }
+
+  fclose(fl);
+
+  if (!shown)
+    send_to_char(ch, "No matching speedwalk routes found.\r\n");
+}
 
 ACMD(do_saudit)
 {

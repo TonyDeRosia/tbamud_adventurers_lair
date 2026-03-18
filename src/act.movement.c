@@ -185,6 +185,79 @@ static void place_char_on_furniture(struct char_data *ch, struct obj_data *furni
 NEXT_SITTING(ch) = NULL;
 }
 
+static int run_dir_from_token(const char *token, int *consumed)
+{
+  if (!token || !*token) return -1;
+
+  if (tolower((unsigned char)token[0]) == 'n') { *consumed = 1; return NORTH; }
+  if (tolower((unsigned char)token[0]) == 'e') { *consumed = 1; return EAST; }
+  if (tolower((unsigned char)token[0]) == 's') { *consumed = 1; return SOUTH; }
+  if (tolower((unsigned char)token[0]) == 'w') { *consumed = 1; return WEST; }
+  if (tolower((unsigned char)token[0]) == 'u') { *consumed = 1; return UP; }
+  if (tolower((unsigned char)token[0]) == 'd') { *consumed = 1; return DOWN; }
+
+  if (!strncasecmp(token, "north", 5)) { *consumed = 5; return NORTH; }
+  if (!strncasecmp(token, "east", 4))  { *consumed = 4; return EAST; }
+  if (!strncasecmp(token, "south", 5)) { *consumed = 5; return SOUTH; }
+  if (!strncasecmp(token, "west", 4))  { *consumed = 4; return WEST; }
+  if (!strncasecmp(token, "up", 2))    { *consumed = 2; return UP; }
+  if (!strncasecmp(token, "down", 4))  { *consumed = 4; return DOWN; }
+
+  return -1;
+}
+
+ACMD(do_run)
+{
+  const char *p = argument;
+  int steps = 0;
+
+  if (!*p) {
+    send_to_char(ch, "Run where?\r\n");
+    return;
+  }
+
+  while (*p) {
+    long reps = 0;
+    int dir = -1;
+    int consumed = 0;
+
+    while (*p && isspace((unsigned char)*p))
+      p++;
+    if (!*p)
+      break;
+
+    if (isdigit((unsigned char)*p)) {
+      char *endp = NULL;
+      reps = strtol(p, &endp, 10);
+      if (endp == p || reps <= 0 || reps > 1000) {
+        send_to_char(ch, "Invalid run repeat count near '%s'.\r\n", p);
+        return;
+      }
+      p = endp;
+    } else {
+      reps = 1;
+    }
+
+    dir = run_dir_from_token(p, &consumed);
+    if (dir < 0) {
+      send_to_char(ch, "Invalid run direction near '%s'.\r\n", p);
+      return;
+    }
+    p += consumed;
+
+    while (reps-- > 0) {
+      if (!perform_move(ch, dir, 0)) {
+        send_to_char(ch, "Run stopped after %d step%s.\r\n", steps, steps == 1 ? "" : "s");
+        return;
+      }
+      steps++;
+    }
+  }
+
+  if (steps <= 0)
+    send_to_char(ch, "You don't go anywhere.\r\n");
+}
+
 /* Simple function to determine if char can fly. */
 static int has_flight(struct char_data *ch)
 {
