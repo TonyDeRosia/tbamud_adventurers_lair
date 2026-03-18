@@ -4615,7 +4615,7 @@ static int speedwalk_reverse_token_to_dir(const char *token, int len)
 static int speedwalk_append_dir_token(char *out, size_t outsz, int dir, int count)
 {
   char token[16];
-  size_t used;
+  size_t len;
 
   if (dir < 0 || dir >= NUM_OF_DIRS || count <= 0)
     return FALSE;
@@ -4625,11 +4625,13 @@ static int speedwalk_append_dir_token(char *out, size_t outsz, int dir, int coun
   else
     snprintf(token, sizeof(token), "%s", autoexits[dir]);
 
-  used = strlen(out);
-  if (used + strlen(token) + 1 >= outsz)
+  len = strlen(out);
+  if (len + strlen(token) + 1 >= outsz)
     return FALSE;
 
-  strlcat(out, token, outsz);
+  if (len < outsz - 1)
+    snprintf(out + len, outsz - len, "%s", token);
+
   return TRUE;
 }
 
@@ -4812,8 +4814,12 @@ ACMD(do_speedwalk)
       if (z == current_zone) {
         strlcpy(display_route, "you are here", sizeof(display_route));
       } else if (speedwalk_reverse_route(current_route, rev, sizeof(rev))) {
+        size_t len;
+
         strlcpy(display_route, rev, sizeof(display_route));
-        strlcat(display_route, route, sizeof(display_route));
+        len = strlen(display_route);
+        if (len < sizeof(display_route) - 1)
+          snprintf(display_route + len, sizeof(display_route) - len, "%s", route);
       }
     }
 
