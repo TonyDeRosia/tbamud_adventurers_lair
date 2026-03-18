@@ -354,6 +354,8 @@ ACMD(do_save)
 
 ACMD(do_recall)
 {
+  int recall_move_cost;
+
   if (IS_NPC(ch) || !GET_SKILL(ch, SKILL_RECALL)) {
     send_to_char(ch, "You have no idea how.\r\n");
     return;
@@ -364,7 +366,10 @@ ACMD(do_recall)
     return;
   }
 
-  if (GET_MOVE(ch) <= 0) {
+  recall_move_cost = (GET_MAX_MOVE(ch) + 1) / 2;
+  recall_move_cost = MAX(1, recall_move_cost);
+
+  if (GET_MOVE(ch) < recall_move_cost) {
     send_to_char(ch, "You are too exhausted to recall.\r\n");
     return;
   }
@@ -377,7 +382,7 @@ ACMD(do_recall)
   send_to_char(ch, "You focus and force yourself back to safety, collapsing from exhaustion.\r\n");
   act("$n vanishes in a blur of motion.", TRUE, ch, 0, 0, TO_ROOM);
 
-  GET_MOVE(ch) = 0;
+  GET_MOVE(ch) = MAX(0, GET_MOVE(ch) - recall_move_cost);
   WAIT_STATE(ch, PULSE_VIOLENCE * 2);
 
   char_from_room(ch);
