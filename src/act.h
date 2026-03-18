@@ -96,7 +96,11 @@ ACMD(do_history);
 ACMD(do_inventory);
 ACMD(do_levels);
 ACMD(do_scan);
+ACMD(do_saffects);
 ACMD(do_score);
+ACMD(do_attr);
+ACMD(do_resists);
+ACMD(do_speedwalk);
 ACMD(do_time);
 ACMD(do_toggle);
 ACMD(do_users);
@@ -166,6 +170,7 @@ ACMD(do_sleep);
 ACMD(do_stand);
 ACMD(do_unfollow);
 ACMD(do_wake);
+ACMD(do_run);
 /* Global variables from act.movement.c */
 extern const char *cmd_door[];
 
