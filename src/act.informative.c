@@ -1321,81 +1321,98 @@ ACMD(do_gold)
     send_to_char(ch, "You have %lld gold coins.\r\n", ((long long)GET_GOLD(ch)));
 }
 
-/* Put these helpers above ACMD(do_score) in the same .c file */
-
-__attribute__((unused)) static size_t visible_strlen_mud(const char *s)
+ACMD(do_score)
 {
-  size_t vis = 0;
+  struct time_info_data playing_time;
+  int to_level = 0;
+  const char *status = "Standing";
+  const char *hunger = "Normal";
+  const char *thirst = "Normal";
 
-  while (s && *s) {
-    /* \tX color code */
-    if (*s == '\t' && s[1]) {
-      s += 2;
-      continue;
-    }
+  if (IS_NPC(ch))
+    return;
 
-    /* ANSI ESC[...m */
-    if ((unsigned char)*s == 27 && s[1] == '[') {
-      s += 2;
-      while (*s && *s != 'm') s++;
-      if (*s == 'm') s++;
-      continue;
-    }
-
-    vis++;
-    s++;
+  switch (GET_POS(ch)) {
+    case POS_SLEEPING: status = "Sleeping"; break;
+    case POS_RESTING: status = "Resting"; break;
+    case POS_SITTING: status = "Sitting"; break;
+    case POS_FIGHTING: status = "Fighting"; break;
+    case POS_STUNNED: status = "Stunned"; break;
+    case POS_INCAP: status = "Incapacitated"; break;
+    case POS_MORTALLYW: status = "Mortally wounded"; break;
+    case POS_DEAD: status = "Dead"; break;
+    default: break;
   }
 
-  return vis;
+  if (GET_COND(ch, HUNGER) <= 0) hunger = "Starving";
+  else if (GET_COND(ch, HUNGER) < 5) hunger = "Hungry";
+  else if (GET_COND(ch, HUNGER) < 12) hunger = "Peckish";
+  else if (GET_COND(ch, HUNGER) < 20) hunger = "Full";
+  else hunger = "Bloated";
+
+  if (GET_COND(ch, THIRST) <= 0) thirst = "Parched";
+  else if (GET_COND(ch, THIRST) < 5) thirst = "Thirsty";
+  else if (GET_COND(ch, THIRST) < 12) thirst = "Dry";
+  else if (GET_COND(ch, THIRST) < 20) thirst = "Quenched";
+  else thirst = "Soaked";
+
+  if (GET_LEVEL(ch) < LVL_IMMORT)
+    to_level = level_exp(GET_CLASS(ch), GET_LEVEL(ch) + 1) - GET_EXP(ch);
+
+  playing_time = *real_time_passed((time(0) - ch->player.time.logon) + ch->player.time.played, 0);
+
+  send_to_char(ch, "\r\n");
+  send_to_char(ch, "Str %2d/%-2d  Int %2d/%-2d  Wis %2d/%-2d  Dex %2d/%-2d  Con %2d/%-2d  Luck %2d/%-2d\r\n",
+    ch->aff_abils.str, ch->real_abils.str,
+    ch->aff_abils.intel, ch->real_abils.intel,
+    ch->aff_abils.wis, ch->real_abils.wis,
+    ch->aff_abils.dex, ch->real_abils.dex,
+    ch->aff_abils.con, ch->real_abils.con,
+    ch->aff_abils.cha, ch->real_abils.cha);
+
+  send_to_char(ch, "Race %-12s Class %-12s Gender %-8s Level %-3d Hit %+4d Dam %+4d Wimpy %-4d\r\n",
+    pc_race_types[GET_RACE(ch)], class_name(GET_CLASS(ch)), genders[(int)GET_SEX(ch)], GET_LEVEL(ch),
+    GET_HITROLL(ch), GET_DAMROLL(ch), GET_WIMP_LEV(ch));
+
+  send_to_char(ch, "Age %-3d Hours %-4d Prac %-3d Train %-3d QP %-6d QuestTime %-4d Quests %-4d\r\n",
+    GET_AGE(ch), playing_time.hours + (playing_time.day * 24), GET_PRACTICES(ch), GET_TRAINS(ch),
+    GET_QUESTPOINTS(ch), GET_QUEST_TIME(ch), GET_NUM_QUESTS(ch));
+
+  send_to_char(ch, "Weight %-5d/%-5d Items %-3d/%-3d Align %-5d Status %-16s\r\n",
+    IS_CARRYING_W(ch), CAN_CARRY_W(ch), IS_CARRYING_N(ch), CAN_CARRY_N(ch), GET_ALIGNMENT(ch), status);
+
+  send_to_char(ch, "Hunger %-3d (%-8s) Thirst %-3d (%-8s)\r\n", GET_COND(ch, HUNGER), hunger, GET_COND(ch, THIRST), thirst);
+
+  send_to_char(ch, "Hit %d/%d  Mana %d/%d  Move %d/%d  Gold %lld  To Lvl %d\r\n",
+    GET_HIT(ch), GET_MAX_HIT(ch), GET_MANA(ch), effective_max_mana(ch), GET_MOVE(ch), effective_max_move(ch),
+    (long long)GET_GOLD(ch), to_level);
+
+  send_to_char(ch, "Resists: Pierce N/A [----------]  Bash N/A [----------]  Slash N/A [----------]\r\n");
+  send_to_char(ch, "Type 'aff' for affects, 'attr' for stats only and 'whois' for other info.\r\n");
+  send_to_char(ch, "Type 'resists' for detailed resistance stats.\r\n");
 }
 
-static size_t copy_trunc_visible(char *dst, size_t dstsz, const char *src, size_t max_vis)
+static int append_box_line(char *buf, int len, size_t bufsz,
+                           const char *border_color, const char *reset_color,
+                           const char *content, size_t inner_width)
 {
-  size_t out = 0;
-  size_t vis = 0;
+  char line[2048];
+  snprintf(line, sizeof(line), "%-*.*s", (int)inner_width, (int)inner_width, content ? content : "");
+  return len + snprintf(buf + len, bufsz - len, "%s║ %s %s║%s\r\n", border_color, line, border_color, reset_color);
+}
 
-  if (dstsz == 0) return 0;
-  if (!src) { dst[0] = '\0'; return 0; }
-
-  while (*src && out + 1 < dstsz) {
-    /* \tX */
-    if (*src == '\t' && src[1]) {
-      if (out + 2 >= dstsz) break;
-      dst[out++] = *src++;
-      dst[out++] = *src++;
-      continue;
-    }
-
-    /* ANSI ESC[...m */
-    if ((unsigned char)*src == 27 && src[1] == '[') {
-      if (out + 2 >= dstsz) break;
-      dst[out++] = *src++;
-      dst[out++] = *src++;
-      while (*src && *src != 'm' && out + 1 < dstsz) dst[out++] = *src++;
-      if (*src == 'm' && out + 1 < dstsz) dst[out++] = *src++;
-      continue;
-    }
-
-    if (vis >= max_vis) break;
-    dst[out++] = *src++;
-    vis++;
-  }
-
-  dst[out] = '\0';
-  return vis;
+static int append_wrapped_box_text(char *buf, int len, size_t bufsz,
+                                   const char *border_color, const char *reset_color,
+                                   const char *text, size_t inner_width)
+{
+  return append_box_line(buf, len, bufsz, border_color, reset_color, text, inner_width);
 }
 
 static bool load_player_target(struct char_data *ch, const char *name, struct char_data **out, bool *from_file)
 {
-  char namebuf[MAX_INPUT_LENGTH];
-  struct char_data *vict;
-
-  strlcpy(namebuf, name, sizeof(namebuf));
-  vict = get_player_vis(ch, namebuf, NULL, FIND_CHAR_WORLD);
-
+  struct char_data *vict = get_player_vis(ch, name, NULL, FIND_CHAR_WORLD);
+  *from_file = FALSE;
   if (vict) {
-    if (from_file)
-      *from_file = FALSE;
     *out = vict;
     return TRUE;
   }
@@ -1404,557 +1421,26 @@ static bool load_player_target(struct char_data *ch, const char *name, struct ch
   clear_char(vict);
   new_mobile_data(vict);
   CREATE(vict->player_specials, struct player_special_data, 1);
-
-  const int pfilepos = load_char(name, vict);
-
-  if (pfilepos > -1) {
-    GET_PFILEPOS(vict) = pfilepos;
-    if (from_file)
-      *from_file = TRUE;
-    *out = vict;
-    return TRUE;
+  if (load_char(name, vict) <= -1) {
+    free_char(vict);
+    return FALSE;
   }
-
-  free_char(vict);
-  return FALSE;
+  *from_file = TRUE;
+  *out = vict;
+  return TRUE;
 }
 
 static bool parse_bounty_amount(const char *arg, long long *amount_out)
 {
-  char token[MAX_INPUT_LENGTH];
-  const char *p = arg;
-  long long total = 0;
-  bool saw_token = FALSE;
-
-  while (isspace((unsigned char)*p))
-    p++;
-
-  while (*p) {
-    size_t tlen = 0;
-    while (*p && !isspace((unsigned char)*p) && tlen + 1 < sizeof(token))
-      token[tlen++] = *(p++);
-    token[tlen] = '\0';
-
-    while (isspace((unsigned char)*p))
-      p++;
-
-    if (tlen == 0)
-      continue;
-
-    saw_token = TRUE;
-
-    char suffix = token[tlen - 1];
-    long long multiplier = 1;
-    if (isalpha((unsigned char)suffix)) {
-      token[tlen - 1] = '\0';
-      switch (tolower((unsigned char)suffix)) {
-        case 'g': multiplier = 1; break;
-        default: return FALSE; /* Unknown suffix */
-      }
-    }
-
-    if (token[0] == '\0')
-      return FALSE;
-
-    char *end = NULL;
-    long long value = strtoll(token, &end, 10);
-    if (end == NULL || *end != '\0' || value <= 0)
-      return FALSE;
-
-    if (multiplier != 0 && value > LLONG_MAX / multiplier)
-      return FALSE;
-
-    long long add = value * multiplier;
-    if (add > LLONG_MAX - total)
-      return FALSE;
-
-    total += add;
-  }
-
-  if (!saw_token || total <= 0)
+  char *end = NULL;
+  long long val;
+  if (!arg || !*arg)
     return FALSE;
-
-  *amount_out = total;
+  val = strtoll(arg, &end, 10);
+  if (end == arg || val <= 0)
+    return FALSE;
+  *amount_out = val;
   return TRUE;
-}
-
-static int append_box_line(char *buf, int len, size_t bufsz,
-                           const char *border_color, const char *reset_color,
-                           const char *content, size_t inner_width)
-{
-  char trimmed[2048];
-  size_t vis;
-  size_t pad;
-
-  vis = copy_trunc_visible(trimmed, sizeof(trimmed), content, inner_width);
-  pad = (vis < inner_width) ? (inner_width - vis) : 0;
-
-  if ((size_t)len < bufsz) {
-    len += snprintf(buf + len, bufsz - (size_t)len,
-      "%s║%s %s%*s %s║%s\r\n",
-      border_color, reset_color,
-      trimmed, (int)pad, "",
-      border_color, reset_color);
-  }
-
-  return len;
-}
-
-static int append_wrapped_box_text(char *buf, int len, size_t bufsz,
-                                   const char *border_color, const char *reset_color,
-                                   const char *text, size_t inner_width)
-{
-  const char *p = text ? text : "";
-  char linebuf[2048];
-
-  if (!*p)
-    return append_box_line(buf, len, bufsz, border_color, reset_color, "", inner_width);
-
-  while (*p) {
-    size_t vis = 0, idx = 0, last_space_idx = 0;
-    bool saw_space = FALSE;
-
-    /* Skip leading newlines */
-    if (*p == '\n' || *p == '\r') {
-      len = append_box_line(buf, len, bufsz, border_color, reset_color, "", inner_width);
-      while (*p == '\n' || *p == '\r')
-        p++;
-      continue;
-    }
-
-    while (p[idx] && p[idx] != '\n') {
-      if (p[idx] == '\t' && p[idx + 1]) {
-        idx += 2;
-        continue;
-      }
-
-      if ((unsigned char)p[idx] == 27 && p[idx + 1] == '[') {
-        idx += 2;
-        while (p[idx] && p[idx] != 'm')
-          idx++;
-        if (p[idx] == 'm')
-          idx++;
-        continue;
-      }
-
-      if (isspace((unsigned char)p[idx])) {
-        saw_space = TRUE;
-        last_space_idx = idx + 1;
-      }
-
-      vis++;
-      idx++;
-
-      if (vis >= inner_width)
-        break;
-    }
-
-    size_t break_idx = idx;
-    if (p[idx] == '\n')
-      break_idx = idx;
-    else if (vis >= inner_width && saw_space && last_space_idx > 0)
-      break_idx = last_space_idx;
-
-    while (break_idx > 0 && isspace((unsigned char)p[break_idx - 1]) && p[break_idx - 1] != '\t')
-      break_idx--;
-
-    snprintf(linebuf, sizeof(linebuf), "%.*s", (int)break_idx, p);
-    len = append_box_line(buf, len, bufsz, border_color, reset_color, linebuf, inner_width);
-
-    p += break_idx;
-    while (*p == ' ')
-      p++;
-    if (*p == '\n')
-      p++;
-  }
-
-  return len;
-}
-
-/* ========================================================================= 
- * MAIN SCORE FUNCTION - Replace your entire ACMD(do_score) with this
- * ========================================================================= */
-
-static const char *score_class_name(int class_num)
-{
-  if (class_num >= 0 && class_num < NUM_CLASSES)
-    return pc_class_types[class_num];
-
-  return "Unknown";
-}
-
-
-ACMD(do_score)
-{
-  struct time_info_data playing_time;
-  char buf[MAX_STRING_LENGTH];
-  char line[2048];
-  int len = 0;
-  const size_t W = 77;  /* Inner width of the box */
-  
-  const char *B = CCBLU(ch, C_NRM);   /* Border color */
-  const char *R = CCNRM(ch, C_NRM);   /* Reset/normal */
-  const char *Y = CCYEL(ch, C_NRM);   /* Yellow/gold */
-  const char *C = CCCYN(ch, C_NRM);   /* Cyan */
-  const char *M = CCMAG(ch, C_NRM);   /* Magenta */
-  const char *W_CLR = CCWHT(ch, C_NRM);   /* White */
-  const char *RED = CCRED(ch, C_NRM); /* Red */
-
-  if (IS_NPC(ch))
-    return;
-
-  /* Top border */
-  len += snprintf(buf + len, sizeof(buf) - len,
-    "\r\n%s╔═══════════════════════════════════════════════════════════════════════════════╗%s\r\n", B, R);
-
-  /* Title */
-  snprintf(line, sizeof(line), "%sCHARACTER STATUS%s", Y, R);
-  len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
-
-  /* Separator */
-  len += snprintf(buf + len, sizeof(buf) - len,
-    "%s╠═══════════════════════════════════════════════════════════════════════════════╣%s\r\n", B, R);
-
-  /* Name and Title */
-  snprintf(line, sizeof(line), "%sName:%s %-20s  %sTitle:%s %s",
-    C, R, GET_NAME(ch), C, R, GET_TITLE(ch));
-  len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
-
-    /* Race and Class */
-  snprintf(line, sizeof(line), "%sRace:%s %-20s  %sClass:%s %-20s",
-    C, R, pc_race_types[GET_RACE(ch)],
-    C, R, score_class_name(GET_CLASS(ch)));
-  len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
-
-  /* Level and Age */
-  snprintf(line, sizeof(line), "%sLevel:%s %-18d  %sAge:%s %d year%s old",
-    C, R, GET_LEVEL(ch), C, R, GET_AGE(ch), (GET_AGE(ch) == 1 ? "" : "s"));
-  len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
-
-  /* Birthday message */
-  if (age(ch)->month == 0 && age(ch)->day == 0) {
-    snprintf(line, sizeof(line), "%s*** It's your birthday today! ***%s", Y, R);
-    len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
-  }
-
-  /* Separator */
-  len += snprintf(buf + len, sizeof(buf) - len,
-    "%s╠═══════════════════════════════════════════════════════════════════════════════╣%s\r\n", B, R);
-
-/* HP, Mana, Move, Exp */
-snprintf(line, sizeof(line),
-  "%sHP:%s %d/%d  %sMana:%s %d/%d  %sMove:%s %d/%d     %sExp:%s %d",
-  C, R, GET_HIT(ch), GET_MAX_HIT(ch),
-  C, R, GET_MANA(ch), effective_max_mana(ch),
-  C, R, GET_MOVE(ch), effective_max_move(ch),
-  C, R, GET_EXP(ch));
-len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
-
-/* Blank spacer line */
-len = append_box_line(buf, len, sizeof(buf), B, R, "", W);
-
-/* Next level in */
-{
-  int next_need = 0;
-  if (GET_LEVEL(ch) < LVL_IMMORT) {
-    int next_level = GET_LEVEL(ch) + 1;
-    next_need = level_exp(GET_CLASS(ch), next_level) - GET_EXP(ch);
-  }
-  snprintf(line, sizeof(line), "%sNext level in:%s %d exp", C, R, next_need);
-}
-len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
-
-/* Blank spacer line */
-len = append_box_line(buf, len, sizeof(buf), B, R, "", W);
-
-/* Carry Capacity */
-{
-  int cap = CAN_CARRY_W(ch);
-  int cur = IS_CARRYING_W(ch);
-  const char *enc = "None";
-  if (cap > 0) {
-    int pct = (cur * 100) / cap;
-    if (pct < 25) enc = "Light";
-    else if (pct < 50) enc = "Moderate";
-    else if (pct < 75) enc = "Heavy";
-    else enc = "Overloaded";
-  }
-  snprintf(line, sizeof(line), "%sCarry Capacity:%s %d / %d  (%s)", C, R, cur, cap, encumbrance_text(ch));
-  len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
-}
-
-/* Separator */
-  len += snprintf(buf + len, sizeof(buf) - len,
-    "%s╠═══════════════════════════════════════════════════════════════════════════════╣%s\r\n", B, R);
-
-  /* Armor and Alignment */
-  {
-  int raw_ac   = compute_armor_class(ch);   /* internal, scaled by 10 */
-  int shown_ac = raw_ac / 10;               /* player facing */
-  int base_ac  = GET_AC(ch) / 10;           /* without dex */
-  int dex_ac   = dex_app[GET_DEX(ch)].defensive;
-
-  snprintf(line, sizeof(line),
-    "%sArmor Class:%s %d  (Base %d  Dex %+d  Raw %d)        %sAlignment:%s %d",
-    C, R, shown_ac, base_ac, dex_ac, raw_ac,
-    C, R, GET_ALIGNMENT(ch));
-}
-  len = append_box_line(buf, len, sizeof(buf), B, R, line, W);/* Combat Stats */
-  len = append_box_line(buf, len, sizeof(buf), B, R, "", W);
-  {
-    int base_thaco = thaco(GET_CLASS(ch), GET_LEVEL(ch));
-    int str_to_hit = str_app[STRENGTH_APPLY_INDEX(ch)].tohit;
-/* To Hit (vs AC 0): your hit target number versus Armor Class 0.
-       Lower is better. In combat, the target's Armor Class shifts this number. */
-    int to_hit_ac0 = base_thaco - str_to_hit - GET_HITROLL(ch);
-    int b_str = ch->real_abils.str;
-    int b_dex = ch->real_abils.dex;
-    int b_con = ch->real_abils.con;
-    int b_int = ch->real_abils.intel;
-    int b_wis = ch->real_abils.wis;
-    int b_cha = ch->real_abils.cha;
-
-    int m_str = ch->aff_abils.str - b_str;
-    int m_dex = ch->aff_abils.dex - b_dex;
-    int m_con = ch->aff_abils.con - b_con;
-    int m_int = ch->aff_abils.intel - b_int;
-    int m_wis = ch->aff_abils.wis - b_wis;
-    int m_cha = ch->aff_abils.cha - b_cha;
-
-    snprintf(line, sizeof(line),
-      "%sBase Stats:%s  Str %d (%+d)  Dex %d (%+d)  Con %d (%+d)",
-      C, R,
-      b_str, m_str,
-      b_dex, m_dex,
-      b_con, m_con);
-    len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
-
-    snprintf(line, sizeof(line),
-      "%s            %s  Int %d (%+d)  Wis %d (%+d)  Cha %d (%+d)",
-      C, R,
-      b_int, m_int,
-      b_wis, m_wis,
-      b_cha, m_cha);
-    len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
-    len = append_box_line(buf, len, sizeof(buf), B, R, "", W);
-
-    snprintf(line, sizeof(line),
-      "%sOffense:%s  Hitroll %+d  Damroll %+d  To Hit (vs AC 0) %d (lower is better)",
-      C, R,
-      GET_HITROLL(ch), GET_DAMROLL(ch), to_hit_ac0);
-    len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
-  }
-  len = append_box_line(buf, len, sizeof(buf), B, R, "", W);
-/* Crit chances */
-snprintf(line, sizeof(line),
-         "%sCritical hit:%s %d   %sCritical Spell:%s %d   %sCritical Heal:%s %d",
-         C, R, crit_total_melee(ch),
-         C, R, crit_total_spell(ch),
-         C, R, crit_total_heal(ch));
-len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
-
-
-  
-
-  len = append_box_line(buf, len, sizeof(buf), B, R, "", W);
-
-/* Saves: these are your saving throw modifiers. Negative is better (helps saves). */
-  if (GET_EQ(ch, WEAR_WIELD) && GET_OBJ_TYPE(GET_EQ(ch, WEAR_WIELD)) == ITEM_WEAPON) {
-    struct obj_data *wobj = GET_EQ(ch, WEAR_WIELD);
-    int nd = GET_OBJ_VAL(wobj, 1);
-    int sd = GET_OBJ_VAL(wobj, 2);
-  snprintf(line, sizeof(line),
-           "%sSaving Throws:%s Paralyze %d  Rod %d  Spell %d   Weapon: %s (%dD%d)",
-           C, R,
-           GET_SAVE(ch, 0), GET_SAVE(ch, 1), GET_SAVE(ch, 4),
-           wobj->short_description, nd, sd);
-} else {
-  snprintf(line, sizeof(line),
-             "%sSaving Throws:%s Paralyze %d  Rod %d  Spell %d",
-             C, R,
-             GET_SAVE(ch, 0), GET_SAVE(ch, 1), GET_SAVE(ch, 4));
-  }
-  len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
-  /* Separator */
-  len += snprintf(buf + len, sizeof(buf) - len,
-    "%s╠═══════════════════════════════════════════════════════════════════════════════╣%s\r\n", B, R);
-
-
-  /* Currencies */
-  snprintf(line, sizeof(line), "%sCurrencies%s", Y, R);
-  len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
-
-  snprintf(line, sizeof(line),
-    "%sGold:%s %8lld   %sDiamonds:%s %6d   %sGlory:%s %6d   %sBank:%s %8lld",
-    C, R, (long long)GET_GOLD(ch),
-    C, R, GET_DIAMONDS(ch),
-    C, R, GET_GLORY(ch),
-    C, R, (long long)GET_BANK_GOLD(ch));
-  len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
-
-/* Next Level (if mortal) */
-  if (GET_LEVEL(ch) < LVL_IMMORT) {
-    snprintf(line, sizeof(line), "%sNext level in:%s %d exp",
-      C, R, level_exp(GET_CLASS(ch), GET_LEVEL(ch) + 1) - GET_EXP(ch));
-    len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
-  }
-
-  /* Separator */
-  len += snprintf(buf + len, sizeof(buf) - len,
-    "%s╠═══════════════════════════════════════════════════════════════════════════════╣%s\r\n", B, R);
-
-  /* Quest Information */
-  snprintf(line, sizeof(line),
-    "%sQuests completed:%s %d                                   %sQuest Points:%s %d",
-    C, R, GET_NUM_QUESTS(ch), M, R, GET_QUESTPOINTS(ch));
-  len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
-
-  if (GET_QUEST(ch) != NOTHING) {
-    snprintf(line, sizeof(line), "%sCurrent quest:%s %s",
-      Y, R, QST_NAME(real_quest(GET_QUEST(ch))));
-    len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
-
-    if (!IS_NPC(ch) && PRF_FLAGGED(ch, PRF_SHOWVNUMS)) {
-      snprintf(line, sizeof(line), "%s[Quest VNUM: %d]%s",
-        W_CLR, GET_QUEST(ch), R);
-      len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
-    }
-  } else {
-    snprintf(line, sizeof(line), "%sNot currently on a quest.%s", RED, R);
-    len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
-  }
-
-  /* Separator */
-  len += snprintf(buf + len, sizeof(buf) - len,
-    "%s╠═══════════════════════════════════════════════════════════════════════════════╣%s\r\n", B, R);
-
-  /* Play Time */
-  playing_time = *real_time_passed((time(0) - ch->player.time.logon) + ch->player.time.played, 0);
-  snprintf(line, sizeof(line), "%sPlay time:%s %d day%s, %d hour%s",
-    C, R, playing_time.day, (playing_time.day == 1 ? "" : "s"),
-    playing_time.hours, (playing_time.hours == 1 ? "" : "s"));
-  len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
-  /* Position/Status */
-  switch (GET_POS(ch)) {
-    case POS_DEAD:
-      snprintf(line, sizeof(line), "%sStatus:%s %sYou are DEAD!%s", C, R, RED, R);
-      break;
-    case POS_MORTALLYW:
-      snprintf(line, sizeof(line), "%sStatus:%s %sMortally wounded!%s", C, R, RED, R);
-      break;
-    case POS_INCAP:
-      snprintf(line, sizeof(line), "%sStatus:%s %sIncapacitated%s", C, R, RED, R);
-      break;
-    case POS_STUNNED:
-      snprintf(line, sizeof(line), "%sStatus:%s %sStunned%s", C, R, Y, R);
-      break;
-    case POS_SLEEPING:
-      snprintf(line, sizeof(line), "%sStatus:%s Sleeping", C, R);
-      break;
-    case POS_RESTING:
-      snprintf(line, sizeof(line), "%sStatus:%s Resting", C, R);
-      break;
-    case POS_SITTING:
-      if (!SITTING(ch))
-        snprintf(line, sizeof(line), "%sStatus:%s Sitting", C, R);
-      else
-        snprintf(line, sizeof(line), "%sStatus:%s Sitting on %s", C, R, SITTING(ch)->short_description);
-      break;
-    case POS_FIGHTING:
-      snprintf(line, sizeof(line), "%sStatus:%s %sFighting %s%s",
-        C, R, RED, (FIGHTING(ch) ? PERS(FIGHTING(ch), ch) : "thin air"), R);
-      break;
-    case POS_STANDING:
-      snprintf(line, sizeof(line), "%sStatus:%s Standing", C, R);
-      break;
-    default:
-      snprintf(line, sizeof(line), "%sStatus:%s Floating", C, R);
-      break;
-  }
-  len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
-
-  /* Conditions */
-  if (GET_COND(ch, DRUNK) > 10) {
-    snprintf(line, sizeof(line), "%sYou are intoxicated.%s", Y, R);
-    len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
-  }
-  if (GET_COND(ch, HUNGER) == 0) {
-    snprintf(line, sizeof(line), "%sYou are hungry.%s", RED, R);
-    len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
-  }
-  if (GET_COND(ch, THIRST) == 0) {
-    snprintf(line, sizeof(line), "%sYou are thirsty.%s", RED, R);
-    len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
-  }
-
-  /* Active Effects/Affects */
-  if (AFF_FLAGGED(ch, AFF_BLIND) && GET_LEVEL(ch) < LVL_IMMORT) {
-    snprintf(line, sizeof(line), "%sYou have been blinded!%s", RED, R);
-    len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
-  }
-  if (AFF_FLAGGED(ch, AFF_INVISIBLE)) {
-    snprintf(line, sizeof(line), "%sYou are invisible.%s", M, R);
-    len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
-  }
-  if (AFF_FLAGGED(ch, AFF_DETECT_INVIS)) {
-    snprintf(line, sizeof(line), "%sYou sense invisible things.%s", C, R);
-    len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
-  }
-  if (AFF_FLAGGED(ch, AFF_SANCTUARY)) {snprintf(line, sizeof(line), "%sYou are protected by Sanctuary.%s", W_CLR, R);
-    len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
-  }
-  if (AFF_FLAGGED(ch, AFF_POISON)) {
-    snprintf(line, sizeof(line), "%sYou are poisoned!%s", RED, R);
-    len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
-  }
-  if (AFF_FLAGGED(ch, AFF_CHARM)) {
-    snprintf(line, sizeof(line), "%sYou have been charmed!%s", Y, R);
-    len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
-  }
-  if (AFF_FLAGGED(ch, AFF_INFRAVISION)) {
-    snprintf(line, sizeof(line), "%sYour eyes are glowing red.%s", RED, R);
-    len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
-  }
-  if (PRF_FLAGGED(ch, PRF_SUMMONABLE)) {
-    snprintf(line, sizeof(line), "%sYou are summonable by other players.%s", Y, R);
-    len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
-  }
-
-  /* Immortal Information */
-  if (GET_LEVEL(ch) >= LVL_IMMORT) {
-    len += snprintf(buf + len, sizeof(buf) - len,
-      "%s╠═══════════════════════════════════════════════════════════════════════════════╣%s\r\n", B, R);
-
-    if (POOFIN(ch))
-      snprintf(line, sizeof(line), "%sPOOFIN:%s %s %s",
-        Y, R, GET_NAME(ch), POOFIN(ch));
-    else
-      snprintf(line, sizeof(line), "%sPOOFIN:%s %s appears with an ear-splitting bang.",
-        Y, R, GET_NAME(ch));
-    len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
-
-    if (POOFOUT(ch))
-      snprintf(line, sizeof(line), "%sPOOFOUT:%s %s %s",
-        Y, R, GET_NAME(ch), POOFOUT(ch));
-    else
-      snprintf(line, sizeof(line), "%sPOOFOUT:%s %s disappears in a puff of smoke.",
-        Y, R, GET_NAME(ch));
-    len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
-
-    snprintf(line, sizeof(line), "%sYour current zone:%s %d",
-      C, R, GET_OLC_ZONE(ch));
-    len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
-  }
-
-  /* Bottom border */
-  len += snprintf(buf + len, sizeof(buf) - len,
-    "%s╚═══════════════════════════════════════════════════════════════════════════════╝%s\r\n", B, R);
-
-  /* Ensure null termination */
-  buf[sizeof(buf) - 1] = '\0';
-  
-  /* Send to character */
-  send_to_char(ch, "%s", buf);
 }
 
 ACMD(do_finger)
@@ -2167,282 +1653,141 @@ ACMD(do_balance)
 
 
 /* =======================================================================
- * AFF / AFFECTS COMMAND
- * Mortals: short summary (spell name + simple effect)
- * Immortals: more details (duration, apply, modifier, flags)
- * Place this block above ACMD(do_inventory) in act.informative.c
+ * AFF / AFFECTS COMMANDS
  * ======================================================================= */
 
-static const char *aff_apply_name(int loc)
+static int aff_is_spell_id(int i)
 {
-  /* tbaMUD has apply_types[] in spell_parser.c (or similar) */
-  extern const char *apply_types[];
-
-  if (loc <= APPLY_NONE)
-    return "none";
-  if (loc < 0 || loc >= NUM_APPLIES)
-    return "unknown";
-  if (!apply_types[loc])
-    return "unknown";
-
-  return apply_types[loc];
+#ifdef IS_SPELL
+  return IS_SPELL(i);
+#else
+  return (i > 0);
+#endif
 }
 
-static int is_aff_debuff(const struct affected_type *af)
+static const char *aff_source_label(int spell)
 {
-  if (!af) return 0;
-
-  /* Common debuff flags */
-#ifdef AFF_POISON
-  if (IS_SET_AR(af->bitvector, AFF_POISON)) return 1;
-#endif
-#ifdef AFF_BLIND
-  if (IS_SET_AR(af->bitvector, AFF_BLIND)) return 1;
-#endif
-#ifdef AFF_CURSE
-  if (IS_SET_AR(af->bitvector, AFF_CURSE)) return 1;
-#endif
-#ifdef AFF_CHARM
-  if (IS_SET_AR(af->bitvector, AFF_CHARM)) return 1;
-#endif
-
-  if (is_spirit_spell(af->spell))
-    return 0;
-
-  if (af->location == APPLY_NONE)
-    return 0;
-
-  switch (af->location) {
-    case APPLY_AC:
-    case APPLY_SAVING_BREATH:
-    case APPLY_SAVING_SPELL:
-    case APPLY_SAVING_PARA:
-    case APPLY_SAVING_ROD:
-    case APPLY_SAVING_PETRI:
-      return (af->modifier > 0);
-  }
-
-  if (af->modifier < 0)
-    return 1;
-
-  return 0;
+  return aff_is_spell_id(spell) ? "Spell" : "Skill";
 }
 
-static void build_aff_summary(const struct affected_type *af, char *out, size_t outsz)
+static const char *aff_name(const struct affected_type *af)
 {
-  const char *name = "Unknown";
-  char eff[256];
-  char flags[256];
-  char firstflag[64];
-  char dur[64];
+  if (!af)
+    return "Unknown";
+  if (af->spell > 0 && af->spell <= TOP_SPELL_DEFINE && spell_info[af->spell].name && *spell_info[af->spell].name)
+    return spell_info[af->spell].name;
+  return "Unknown";
+}
 
-  if (!out || outsz == 0) return;
-  out[0] = '\0';
+static void format_aff_duration(int duration, char *out, size_t outsz)
+{
+  long secs;
 
-  if (!af) {
-    snprintf(out, outsz, "Unknown effect.");
+  if (duration < 0) {
+    strlcpy(out, "permanent", outsz);
     return;
   }
 
-  /* In tbaMUD, affected_type usually stores the spell as af->spell */
-  if (af->spell > 0 && af->spell < MAX_SPELLS && spell_info[af->spell].name)
-    name = spell_info[af->spell].name;
-
-  eff[0] = '\0';
-  flags[0] = '\0';
-  dur[0] = '\0';
-
-  if (af->duration < 0)
-    snprintf(dur, sizeof(dur), "permanent");
-  else
-    snprintf(dur, sizeof(dur), "dur %d", af->duration);
-
-
-  if (af->location != APPLY_NONE && af->modifier != 0) {
-    snprintf(eff, sizeof(eff), "%s %s by %d",
-      (af->modifier >= 0 ? "increases" : "reduces"),
-      aff_apply_name(af->location),
-      abs(af->modifier));
-  }
-
-  /* sprintbitarray wants int[], but bitvector is treated like an array */
-  sprintbitarray((int *)af->bitvector, affected_bits, AF_ARRAY_MAX, flags);
-
-  /* AL: affects duration column + unknown fallback (clean) */
-  /* If spell name is Unknown, use the first flag token as the label (ex: SNEAK). */
-  if ((!name || !*name || !str_cmp(name, "Unknown")) && flags[0]) {
-    size_t i = 0;
-    while (flags[i] && flags[i] != ' ' && i < sizeof(firstflag) - 1) {
-      firstflag[i] = flags[i];
-      i++;
-    }
-    firstflag[i] = '\0';
-    if (firstflag[0])
-      name = firstflag;
-  }
-
-
-  if (*eff && *flags)
-    snprintf(out, outsz, "%s (%s): %s. Also: %s.", name, dur, eff, flags);
-  else if (*eff)
-    snprintf(out, outsz, "%s (%s): %s.", name, dur, eff);
-  else if (*flags)
-    snprintf(out, outsz, "%s (%s): %s.", name, dur, flags);
-  else
-    snprintf(out, outsz, "%s (%s).", name, dur);
+  secs = (long)duration * (long)SECS_PER_MUD_HOUR;
+  snprintf(out, outsz, "%02ld:%02ld", secs / 60L, secs % 60L);
 }
 
-ACMD(do_affects)
+static void send_affect_line(struct char_data *ch, const char *name, int first_line,
+                             const char *desc, const char *dur)
+{
+  if (first_line)
+    send_to_char(ch, "  %-24.24s : %s (%s)\r\n", name, desc, dur);
+  else
+    send_to_char(ch, "  %-24s : %s (%s)\r\n", "", desc, dur);
+}
+
+static void send_detailed_affect(struct char_data *ch, const struct affected_type *af)
+{
+  char dur[32];
+  int first = 1;
+  int lines = 0;
+  int i, bit;
+
+  format_aff_duration(af->duration, dur, sizeof(dur));
+
+  if (af->location != APPLY_NONE && af->modifier != 0 && af->location >= 0 && af->location < NUM_APPLIES && apply_types[af->location]) {
+    char desc[128];
+    snprintf(desc, sizeof(desc), "%s %+d", apply_types[af->location], af->modifier);
+    send_affect_line(ch, aff_name(af), first, desc, dur);
+    first = 0;
+    lines++;
+  }
+
+  for (i = 0; i < AF_ARRAY_MAX; i++) {
+    for (bit = 0; bit < 32; bit++) {
+      int idx = i * 32 + bit;
+      if (!affected_bits[idx] || !*affected_bits[idx] || !str_cmp(affected_bits[idx], "!UNUSED!"))
+        continue;
+      if (!IS_SET(af->bitvector[i], (1 << bit)))
+        continue;
+
+      {
+        char desc[128];
+        snprintf(desc, sizeof(desc), "sets %s effect", affected_bits[idx]);
+        send_affect_line(ch, aff_name(af), first, desc, dur);
+      }
+      first = 0;
+      lines++;
+    }
+  }
+
+  if (!lines)
+    send_affect_line(ch, aff_name(af), 1, "active", dur);
+}
+
+static void show_affects_common(struct char_data *ch, int short_mode)
 {
   const struct affected_type *af;
-  int any = 0, any_buff = 0, any_debuff = 0;
+  int spells = 0, skills = 0;
 
-  if (!ch || IS_NPC(ch)) {
+  if (IS_NPC(ch)) {
     send_to_char(ch, "Not for mobiles.\r\n");
     return;
   }
 
   if (!ch->affected) {
-    send_to_char(ch, "You have no active effects.\r\n");
+    send_to_char(ch, "You are not affected by any skills or spells.\r\n");
     return;
   }
+
+  if (!short_mode)
+    send_to_char(ch, "You are affected by the following skills/spells:\r\n");
 
   for (af = ch->affected; af; af = af->next) {
-    any = 1;
-    if (is_aff_debuff(af)) any_debuff = 1;
-    else any_buff = 1;
+    char dur[32];
+
+    if (aff_is_spell_id(af->spell))
+      spells++;
+    else
+      skills++;
+
+    format_aff_duration(af->duration, dur, sizeof(dur));
+
+    if (short_mode)
+      send_to_char(ch, "%-6s: %s (%s)\r\n", aff_source_label(af->spell), aff_name(af), dur);
+    else
+      send_detailed_affect(ch, af);
   }
 
-  if (!any) {
-    send_to_char(ch, "You have no active effects.\r\n");
-    return;
-  }
+  send_to_char(ch, "\r\nYou are affected by %d skills and %d spells.\r\n", skills, spells);
 
-  send_to_char(ch, "\r\n%sActive Effects%s\r\n", CCYEL(ch, C_NRM), CCNRM(ch, C_NRM));
+  if (!short_mode)
+    send_to_char(ch, "Use 'saffects' to see a short version of your affects.\r\n");
+}
 
-  /* Buffs */
-  if (any_buff) {
-    send_to_char(ch, "\r\n%sBuffs%s\r\n", CCGRN(ch, C_NRM), CCNRM(ch, C_NRM));
+ACMD(do_affects)
+{
+  show_affects_common(ch, 0);
+}
 
-    for (af = ch->affected; af; af = af->next) {
-      if (is_aff_debuff(af)) continue;
-
-      if (GET_LEVEL(ch) >= LVL_IMMORT) {
-        char flags[256];
-  char dur[64];
-        const char *spell_name = "Unknown";
-
-        flags[0] = '\0';
-  dur[0] = '\0';
-
-  if (af->duration < 0)
-    snprintf(dur, sizeof(dur), "permanent");
-  else
-    snprintf(dur, sizeof(dur), "dur %d", af->duration);
-
-        sprintbitarray((int *)af->bitvector, affected_bits, AF_ARRAY_MAX, flags);
-
-        if (af->spell > 0 && af->spell < MAX_SPELLS && spell_info[af->spell].name)
-          spell_name = spell_info[af->spell].name;
-
-        /* duration column + Unknown fallback label */
-        char adur[16];
-              char lab[64];
-        size_t i = 0;
-        lab[0] = '\0';
-        if (af->duration < 0)
-          snprintf(adur, sizeof(adur), "perm");
-        else
-          snprintf(adur, sizeof(adur), "%d", af->duration);
-
-        if ((!spell_name || !*spell_name || !str_cmp(spell_name, "Unknown")) && flags[0]) {
-          while (flags[i] && flags[i] != ' ' && i < sizeof(lab) - 1) {
-            lab[i] = flags[i];
-            i++;
-          }
-          lab[i] = '\0';
-          if (lab[0])
-            spell_name = lab;
-        }
-
-        send_to_char(ch,
-          "  %-6s %s%s%s  apply %s  mod %+d  flags %s\r\n",
-          adur,
-          CCCYN(ch, C_NRM), spell_name, CCNRM(ch, C_NRM),
-          aff_apply_name(af->location),
-          af->modifier,
-          flags);
-      } else {
-        char line[512];
-        build_aff_summary(af, line, sizeof(line));
-        send_to_char(ch, "  %s\r\n", line);
-      }
-    }
-  } else {
-    send_to_char(ch, "\r\n%sBuffs%s\r\n  None.\r\n", CCGRN(ch, C_NRM), CCNRM(ch, C_NRM));
-  }
-
-  /* Debuffs */
-  if (any_debuff) {
-    send_to_char(ch, "\r\n%sDebuffs%s\r\n", CCRED(ch, C_NRM), CCNRM(ch, C_NRM));
-
-    for (af = ch->affected; af; af = af->next) {
-      if (!is_aff_debuff(af)) continue;
-
-      if (GET_LEVEL(ch) >= LVL_IMMORT) {
-        char flags[256];
-  char dur[64];
-        const char *spell_name = "Unknown";
-
-        flags[0] = '\0';
-  dur[0] = '\0';
-
-  if (af->duration < 0)
-    snprintf(dur, sizeof(dur), "permanent");
-  else
-    snprintf(dur, sizeof(dur), "dur %d", af->duration);
-
-        sprintbitarray((int *)af->bitvector, affected_bits, AF_ARRAY_MAX, flags);
-
-        if (af->spell > 0 && af->spell < MAX_SPELLS && spell_info[af->spell].name)
-          spell_name = spell_info[af->spell].name;
-
-        /* duration column + Unknown fallback label */
-        char adur[16];
-              char lab[64];
-        size_t i = 0;
-        lab[0] = '\0';
-        if (af->duration < 0)
-          snprintf(adur, sizeof(adur), "perm");
-        else
-          snprintf(adur, sizeof(adur), "%d", af->duration);
-
-        if ((!spell_name || !*spell_name || !str_cmp(spell_name, "Unknown")) && flags[0]) {
-          while (flags[i] && flags[i] != ' ' && i < sizeof(lab) - 1) {
-            lab[i] = flags[i];
-            i++;
-          }
-          lab[i] = '\0';
-          if (lab[0])
-            spell_name = lab;
-        }
-
-        send_to_char(ch,
-          "  %-6s %s%s%s  apply %s  mod %+d  flags %s\r\n",
-          adur,
-          CCCYN(ch, C_NRM), spell_name, CCNRM(ch, C_NRM),
-          aff_apply_name(af->location),
-          af->modifier,
-          flags);
-      } else {
-        char line[512];
-        build_aff_summary(af, line, sizeof(line));
-        send_to_char(ch, "  %s\r\n", line);
-      }
-    }
-  } else {
-    send_to_char(ch, "\r\n%sDebuffs%s\r\n  None.\r\n", CCRED(ch, C_NRM), CCNRM(ch, C_NRM));
-  }
+ACMD(do_saffects)
+{
+  show_affects_common(ch, 1);
 }
 
 ACMD(do_inventory)
@@ -4040,94 +3385,144 @@ void add_history(struct char_data *ch, char *str, int type)
     add_history(ch, str, HIST_ALL);
 }
 
+
+struct speedwalk_entry {
+  int zone_vnum;
+  char route[128];
+};
+
+static int load_speedwalk_entries(struct speedwalk_entry *entries, int max_entries)
+{
+  FILE *fl;
+  char line[256];
+  int count = 0;
+
+  fl = fopen("lib/misc/speedwalk.lst", "r");
+  if (!fl)
+    return 0;
+
+  while (fgets(line, sizeof(line), fl) && count < max_entries) {
+    char *p = line;
+    int z;
+    while (*p && isspace((unsigned char)*p)) p++;
+    if (!*p || *p == '#') continue;
+    if (sscanf(p, "%d %127[^\r\n]", &z, entries[count].route) == 2) {
+      entries[count].zone_vnum = z;
+      count++;
+    }
+  }
+
+  fclose(fl);
+  return count;
+}
+
+static const char *find_speedwalk_route(int zone_vnum, struct speedwalk_entry *entries, int count)
+{
+  int i;
+  for (i = 0; i < count; i++)
+    if (entries[i].zone_vnum == zone_vnum)
+      return entries[i].route;
+  return "";
+}
+
+static int contains_text_ci(const char *haystack, const char *needle)
+{
+  size_t nlen;
+  if (!needle || !*needle)
+    return 1;
+  if (!haystack)
+    return 0;
+  nlen = strlen(needle);
+  while (*haystack) {
+    if (!strn_cmp(haystack, needle, (int)nlen))
+      return 1;
+    haystack++;
+  }
+  return 0;
+}
+
+ACMD(do_speedwalk)
+{
+  char arg[MAX_INPUT_LENGTH];
+  int i;
+  int shown = 0;
+  struct speedwalk_entry entries[1024];
+  int ecnt = load_speedwalk_entries(entries, 1024);
+  const char *recall_name = (r_mortal_start_room != NOWHERE && world[r_mortal_start_room].name) ? world[r_mortal_start_room].name : "recall";
+
+  one_argument(argument, arg);
+  send_to_char(ch, "Directions from %s\r\n", recall_name);
+  send_to_char(ch, "%-30s  %-46s\r\n", "Area Name", "Speedwalk");
+  send_to_char(ch, "------------------------------  ----------------------------------------------\r\n");
+
+  for (i = 0; i <= top_of_zone_table; i++) {
+    const char *name = zone_table[i].name ? zone_table[i].name : "(unnamed)";
+    const char *route;
+    if (*arg && !contains_text_ci(name, arg))
+      continue;
+    route = find_speedwalk_route(zone_table[i].number, entries, ecnt);
+    send_to_char(ch, "%-30.30s  %s\r\n", name, route);
+    shown++;
+  }
+
+  if (!shown)
+    send_to_char(ch, "No areas matched that filter.\r\n");
+}
+
 ACMD(do_whois)
 {
-  struct char_data *victim = 0;
-  int hours;
+  struct char_data *victim = NULL;
   int got_from_file = 0;
-  char buf[MAX_STRING_LENGTH];
+  int hours;
+  char arg[MAX_INPUT_LENGTH];
+  char whenbuf[128];
 
-  one_argument(argument, buf);
-
-  if (!*buf) {
+  one_argument(argument, arg);
+  if (!*arg) {
     send_to_char(ch, "Whois who?\r\n");
     return;
   }
 
-  if (!(victim=get_player_vis(ch, buf, NULL, FIND_CHAR_WORLD)))
-  {
-     CREATE(victim, struct char_data, 1);
-     clear_char(victim);
-
-     new_mobile_data(victim);
-
-     CREATE(victim->player_specials, struct player_special_data, 1);
-
-     if (load_char(buf, victim) > -1)
-       got_from_file = 1;
-     else {
-        send_to_char (ch, "There is no such player.\r\n");
-        free_char (victim);
-        return;
-     }
-  }
-
-  /* We either have our victim from file or he's playing or function has returned. */
-  sprinttype(GET_SEX(victim), genders, buf, sizeof(buf));
-  send_to_char(ch, "Name: %s %s\r\nSex: %s\r\n", GET_NAME(victim),
-                   (victim->player.title ? victim->player.title : ""), buf);
-
-  strlcpy(buf, class_name(victim->player.chclass), sizeof(buf));
-  send_to_char(ch, "Class: %s\r\n", buf);
-
-
-  send_to_char(ch, "Level: %d\r\n", GET_LEVEL(victim));
-
-  if (!(GET_LEVEL(victim) < LVL_IMMORT) || (GET_LEVEL(ch) >= GET_LEVEL(victim))) {
-    strftime(buf, sizeof(buf), "%a %b %d %Y", localtime(&(victim->player.time.logon)));
-
-    hours = (time(0) - victim->player.time.logon) / 3600;
-
-    if (!got_from_file) {
-      send_to_char(ch, "Last Logon: Playing now!  (Idle %d Minutes)",
-           victim->char_specials.timer * SECS_PER_MUD_HOUR / SECS_PER_REAL_MIN);
-
-      if (!victim->desc)
-        send_to_char(ch, "  (Linkless)\r\n");
-      else
-        send_to_char(ch, "\r\n");
-
-      if (PRF_FLAGGED(victim, PRF_AFK))
-        send_to_char(ch, "%s%s is afk right now, so %s may not respond to communication.%s\r\n", CBGRN(ch, C_NRM), GET_NAME(victim), HSSH(victim), CCNRM(ch, C_NRM));
+  victim = get_player_vis(ch, arg, NULL, FIND_CHAR_WORLD);
+  if (!victim) {
+    CREATE(victim, struct char_data, 1);
+    clear_char(victim);
+    new_mobile_data(victim);
+    CREATE(victim->player_specials, struct player_special_data, 1);
+    if (load_char(arg, victim) <= -1) {
+      send_to_char(ch, "There is no such player.\r\n");
+      free_char(victim);
+      return;
     }
-    else if (hours > 0)
-      send_to_char(ch, "Last Logon: %s (%d days & %d hours ago.)\r\n", buf, hours/24, hours%24);
-    else
-      send_to_char(ch, "Last Logon: %s (0 hours & %d minutes ago.)\r\n",
-                   buf, (int)(time(0) - victim->player.time.logon)/60);
+    got_from_file = 1;
   }
 
-  if (has_mail(GET_IDNUM(victim)))
-     act("$E$u has mail waiting.", FALSE, ch, 0, victim, TO_CHAR);
-  else
-     act("$E$u has no mail waiting.", FALSE, ch, 0, victim, TO_CHAR);
+  strftime(whenbuf, sizeof(whenbuf), "%a %b %d %Y", localtime(&(victim->player.time.birth)));
+  send_to_char(ch, "Name: %s %s\r\n", GET_NAME(victim), GET_TITLE(victim) ? GET_TITLE(victim) : "");
+  send_to_char(ch, "%s %s level %d\r\n",
+    pc_race_types[GET_RACE(victim)], class_name(GET_CLASS(victim)), GET_LEVEL(victim));
+  send_to_char(ch, "Gender: %s\r\n", genders[(int)GET_SEX(victim)]);
+  send_to_char(ch, "Quest points: %d  Quests complete: %d  Quest time: %d\r\n",
+    GET_QUESTPOINTS(victim), GET_NUM_QUESTS(victim), GET_QUEST_TIME(victim));
 
-  if (PLR_FLAGGED(victim, PLR_DELETED))
-    send_to_char (ch, "***DELETED***\r\n");
+  hours = (int)((time(0) - victim->player.time.logon) / 3600);
+  if (!got_from_file)
+    send_to_char(ch, "Hours online (this session): %d\r\n", hours);
 
-  if (!got_from_file && victim->desc != NULL && GET_LEVEL(ch) >= LVL_GOD) {
-    protocol_t * prot = victim->desc->pProtocol;
-    send_to_char(ch, "Client:  %s [%s]\r\n", prot->pVariables[eMSDP_CLIENT_ID]->pValueString, prot->pVariables[eMSDP_CLIENT_VERSION]->pValueString ? prot->pVariables[eMSDP_CLIENT_VERSION]->pValueString : "Unknown");
-    send_to_char(ch, "Color:   %s\r\n", prot->pVariables[eMSDP_XTERM_256_COLORS]->ValueInt ? "Xterm" : (prot->pVariables[eMSDP_ANSI_COLORS]->ValueInt ? "Ansi" : "None"));
-    send_to_char(ch, "MXP:     %s\r\n", prot->bMXP ? "Yes" : "No");
-    send_to_char(ch, "Charset: %s\r\n", prot->bCHARSET ? "Yes" : "No");
-    send_to_char(ch, "MSP:     %s\r\n", prot->bMSP ? "Yes" : "No");
-    send_to_char(ch, "ATCP:    %s\r\n", prot->bATCP ? "Yes" : "No");
-    send_to_char(ch, "MSDP:    %s\r\n", prot->bMSDP ? "Yes" : "No");
+  send_to_char(ch, "Birth date: %s\r\n", whenbuf);
+  send_to_char(ch, "Trained stats: Practices %d  Trains %d\r\n", GET_PRACTICES(victim), GET_TRAINS(victim));
+
+  if (victim->player.description && *victim->player.description) {
+    send_to_char(ch, "Description:\r\n");
+    send_to_char(ch, "%s\r\n", victim->player.description);
+  } else {
+    send_to_char(ch, "Description: (none)\r\n");
   }
+
+  send_to_char(ch, "To see warfare stats, use 'warinfo %s'.\r\n", GET_NAME(victim));
 
   if (got_from_file)
-    free_char (victim);
+    free_char(victim);
 }
 
 static bool get_zone_levels(zone_rnum znum, char *buf)
