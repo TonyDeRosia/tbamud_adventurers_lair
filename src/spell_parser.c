@@ -35,7 +35,7 @@ static void spello(int spl, const char *name, int max_mana, int min_mana,
     int mana_change, int minpos, int targets, int violent, int routines,
     const char *wearoff);
 static int mag_manacost(struct char_data *ch, int spellnum);
-static bool is_buff_spell(int spellnum);
+static bool is_spellup_beneficial_spell(int spellnum);
 
 struct cast_message {
   const char *to_caster;
@@ -459,13 +459,45 @@ static bool is_available_ability(int ability) {
       && str_cmp(spell_info[ability].name, unused_spellname) != 0);
 }
 
-static bool is_buff_spell(int spellnum)
+static bool is_spellup_beneficial_spell(int spellnum)
 {
   if (!is_available_spell(spellnum))
     return FALSE;
-  if (SINFO.violent)
-    return FALSE;
-  if (!IS_SET(SINFO.routines, MAG_AFFECTS))
+
+  /* Hard safety gate for spellup: only explicitly approved support buffs. */
+  switch (spellnum) {
+    case SPELL_ARMOR:
+    case SPELL_BLESS:
+    case SPELL_DETECT_ALIGN:
+    case SPELL_DETECT_INVIS:
+    case SPELL_DETECT_MAGIC:
+    case SPELL_FLY:
+    case SPELL_INFRAVISION:
+    case SPELL_INVISIBLE:
+    case SPELL_PROT_FROM_EVIL:
+    case SPELL_SANCTUARY:
+    case SPELL_ARCANE_WARD:
+    case SPELL_EVASION:
+    case SPELL_IRONSKIN:
+    case SPELL_DIVINE_BULWARK:
+    case SPELL_SONG_OF_RESILIENCE:
+    case SPELL_DARK_AEGIS:
+    case SPELL_NIRVANA:
+    case SPELL_SENSE_LIFE:
+    case SPELL_STRENGTH:
+    case SPELL_BEAR_SPIRIT:
+    case SPELL_WOLF_SPIRIT:
+    case SPELL_TIGER_SPIRIT:
+    case SPELL_EAGLE_SPIRIT:
+    case SPELL_DRAGON_SPIRIT:
+    case SPELL_WATERWALK:
+      break;
+    default:
+      return FALSE;
+  }
+
+  /* Defensive invariants: even whitelisted spells must be non-violent affects. */
+  if (SINFO.violent || !IS_SET(SINFO.routines, MAG_AFFECTS))
     return FALSE;
   if (!IS_SET(SINFO.targets, TAR_CHAR_ROOM | TAR_CHAR_WORLD | TAR_SELF_ONLY))
     return FALSE;
@@ -1224,7 +1256,7 @@ ACMD(do_spellup)
   }
 
   for (spellnum = 1; spellnum <= MAX_SPELLS; spellnum++) {
-    if (!is_buff_spell(spellnum))
+    if (!is_spellup_beneficial_spell(spellnum))
       continue;
     if (GET_LEVEL(ch) < SINFO.min_level[(int) GET_CLASS(ch)])
       continue;
