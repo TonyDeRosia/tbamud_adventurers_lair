@@ -1160,8 +1160,28 @@ ACMD(do_enter)
 {
   char buf[MAX_INPUT_LENGTH];
   int door;
+  struct obj_data *portal;
 
   one_argument(argument, buf);
+
+  if (*buf && !str_cmp(buf, "portal")) {
+    for (portal = world[IN_ROOM(ch)].contents; portal; portal = portal->next_content) {
+      room_rnum to_room;
+      if (GET_OBJ_VNUM(portal) != OBJVNUM_SPELL_PORTAL)
+        continue;
+      to_room = real_room(GET_OBJ_VAL(portal, 0));
+      if (to_room == NOWHERE)
+        continue;
+      act("$n steps into $p and vanishes.", TRUE, ch, portal, 0, TO_ROOM);
+      char_from_room(ch);
+      char_to_room(ch, to_room);
+      act("$n steps out of a shimmering portal.", TRUE, ch, 0, 0, TO_ROOM);
+      look_at_room(ch, 0);
+      return;
+    }
+    send_to_char(ch, "There is no portal here.\r\n");
+    return;
+  }
 
   if (*buf) {			/* an argument was supplied, search for door
 				 * keyword */

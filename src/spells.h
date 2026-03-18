@@ -165,27 +165,41 @@
 #define SPELL_ACID_RAIN              124
 #define SPELL_SONIC_BURST            125
 #define SPELL_WORD_OF_PAIN           126
+#define SPELL_CONJURE_ELEMENTAL      127
+#define SPELL_CALL_WOLVES            128
+#define SPELL_CALL_BEARS             129
+#define SPELL_ANIMATE_DEAD_GREATER   130
+#define SPELL_ABYSS_GATE             131
+#define SPELL_GATE                   132
+#define SPELL_PORTAL                 133
+#define SPELL_LOCATE_CORPSE          134
+#define SPELL_WORD_OF_RECALL_MASS    135
+#define SPELL_ASTRAL_PROJECTION      136
+#define SPELL_ETHEREAL_JAUNT         137
+#define SPELL_LEYLINE_TAP            138
+#define SPELL_TEMPORAL_SHIFT         139
+#define SPELL_CHRONO_SHIFT           140
 /** Total Number of defined spells */
-#define NUM_SPELLS                   126
+#define NUM_SPELLS                   140
 
 /* Insert new spells here, up to MAX_SPELLS */
-#define MAX_SPELLS		    130
+#define MAX_SPELLS		    150
 
 /* PLAYER SKILLS - Numbered from MAX_SPELLS+1 to MAX_SKILLS */
-#define SKILL_BACKSTAB              131 /* Reserved Skill[] DO NOT CHANGE */
-#define SKILL_BASH                  132 /* Reserved Skill[] DO NOT CHANGE */
-#define SKILL_HIDE                  133 /* Reserved Skill[] DO NOT CHANGE */
-#define SKILL_KICK                  134 /* Reserved Skill[] DO NOT CHANGE */
-#define SKILL_PICK_LOCK             135 /* Reserved Skill[] DO NOT CHANGE */
-#define SKILL_WHIRLWIND             136 
-#define SKILL_RESCUE                137 /* Reserved Skill[] DO NOT CHANGE */
-#define SKILL_SNEAK                 138 /* Reserved Skill[] DO NOT CHANGE */
-#define SKILL_STEAL                 139 /* Reserved Skill[] DO NOT CHANGE */
-#define SKILL_TRACK                 140 /* Reserved Skill[] DO NOT CHANGE */
-#define SKILL_BANDAGE               141 /* Reserved Skill[] DO NOT CHANGE */
+#define SKILL_BACKSTAB              151 /* Reserved Skill[] DO NOT CHANGE */
+#define SKILL_BASH                  152 /* Reserved Skill[] DO NOT CHANGE */
+#define SKILL_HIDE                  153 /* Reserved Skill[] DO NOT CHANGE */
+#define SKILL_KICK                  154 /* Reserved Skill[] DO NOT CHANGE */
+#define SKILL_PICK_LOCK             155 /* Reserved Skill[] DO NOT CHANGE */
+#define SKILL_WHIRLWIND             156 
+#define SKILL_RESCUE                157 /* Reserved Skill[] DO NOT CHANGE */
+#define SKILL_SNEAK                 158 /* Reserved Skill[] DO NOT CHANGE */
+#define SKILL_STEAL                 159 /* Reserved Skill[] DO NOT CHANGE */
+#define SKILL_TRACK                 160 /* Reserved Skill[] DO NOT CHANGE */
+#define SKILL_BANDAGE               161 /* Reserved Skill[] DO NOT CHANGE */
 
-#define SKILL_DUAL_WIELD            142 /* Reserved Skill[] DO NOT CHANGE */
-#define SKILL_RECALL                143 /* Reserved Skill[] DO NOT CHANGE */
+#define SKILL_DUAL_WIELD            162 /* Reserved Skill[] DO NOT CHANGE */
+#define SKILL_RECALL                163 /* Reserved Skill[] DO NOT CHANGE */
 /* New skills may be added here up to MAX_SKILLS (200) */
 
 /* NON-PLAYER AND OBJECT SPELLS AND SKILLS: The practice levels for the spells
@@ -228,6 +242,22 @@
 #define SAVING_PETRI  2
 #define SAVING_BREATH 3
 #define SAVING_SPELL  4
+
+/* Reserved summon/portal VNUM constants for spell expansion. */
+#define OBJVNUM_SPELL_PORTAL          9300
+#define MOBVNUM_LESSER_ELEMENTAL      9301
+#define MOBVNUM_ELEMENTAL             9302
+#define MOBVNUM_GREATER_ELEMENTAL     9303
+#define MOBVNUM_ELDER_ELEMENTAL       9304
+#define MOBVNUM_SUMMONED_WOLF         9305
+#define MOBVNUM_SUMMONED_BEAR         9306
+#define MOBVNUM_LESSER_DEMON          9307
+#define MOBVNUM_DEMON                 9308
+#define MOBVNUM_GREATER_DEMON         9309
+#define MOBVNUM_DEMON_LORD            9310
+#define MOBVNUM_CELESTIAL_GUARDIAN    9311
+#define MOBVNUM_ELEMENTAL_TITAN       9312
+#define MOBVNUM_GREATER_UNDEAD        9313
 
 /***
  **Possible Targets:
@@ -348,6 +378,20 @@ ASPELL(spell_cleanse);
 ASPELL(spell_counterspell);
 ASPELL(spell_spell_steal);
 ASPELL(spell_cancellation);
+ASPELL(spell_conjure_elemental);
+ASPELL(spell_call_wolves);
+ASPELL(spell_call_bears);
+ASPELL(spell_animate_dead_greater);
+ASPELL(spell_abyss_gate);
+ASPELL(spell_gate);
+ASPELL(spell_portal);
+ASPELL(spell_locate_corpse);
+ASPELL(spell_word_of_recall_mass);
+ASPELL(spell_astral_projection);
+ASPELL(spell_ethereal_jaunt);
+ASPELL(spell_leyline_tap);
+ASPELL(spell_temporal_shift);
+ASPELL(spell_chrono_shift);
 void show_identify_item(struct char_data *ch, struct obj_data *obj, enum identify_detail_level detail);
 
 /* basic magic calling functions */
