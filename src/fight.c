@@ -1328,8 +1328,8 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
     int tier = damage_severity_tier(dam, victim);
 
     if ((new_band > old_band && tier >= 4) || tier >= 7) {
-      send_to_char(ch, "\tC%s %s\tn\r\n", GET_NAME(victim), victim_condition_text(new_band));
-      if (GET_LEVEL(ch) >= LVL_IMMORT)
+      send_to_char(ch, "\tC%s %s\tn\r\n", PERS(victim, ch), victim_condition_text(new_band));
+      if (GET_LEVEL(ch) >= LVL_IMMORT && CONFIG_DEBUG_MODE >= NRM)
         send_to_char(ch, "\tD(cond: %d%% -> %d%%)\tn\r\n",
                      (old_hit * 100) / MAX(1, GET_MAX_HIT(victim)),
                      (GET_HIT(victim) * 100) / MAX(1, GET_MAX_HIT(victim)));
