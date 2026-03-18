@@ -85,6 +85,7 @@ ACMD(do_look);
 /* functions without subcommands */
 ACMD(do_areas);
 ACMD(do_affects);
+ACMD(do_saffects);
 ACMD(do_consider);
 ACMD(do_diagnose);
 ACMD(do_equipment);
@@ -97,6 +98,7 @@ ACMD(do_inventory);
 ACMD(do_levels);
 ACMD(do_scan);
 ACMD(do_score);
+ACMD(do_speedwalk);
 ACMD(do_time);
 ACMD(do_toggle);
 ACMD(do_users);
