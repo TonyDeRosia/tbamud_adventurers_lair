@@ -650,6 +650,7 @@ void clanedit_parse(struct descriptor_data *d, char *arg);
 #define MAX_HELP_KEYWORDS     256    /**< Max length of help keyword string */
 #define MAX_HELP_ENTRY        MAX_STRING_LENGTH /**< Max size of help entry */
 #define MAX_COMPLETED_QUESTS  1024   /**< Maximum number of completed quests allowed */
+#define MAX_CAMPAIGN_TARGETS  12
 
 /* Currency configuration. Primary currency is gold with premium diamonds. */
 #define GOLD_PER_DIAMOND    1000LL
@@ -1027,6 +1028,16 @@ struct player_special_data_saved
   time_t kill_quest_expires_at; /**< Real-world quest expiration   */
   time_t kill_quest_cooldown_expires_at; /**< Real-world cooldown expiration */
   long   kill_quest_target_id;  /**< Specific target instance id   */
+  int    campaign_active;       /**< Multi-target campaign active */
+  int    campaign_level;        /**< Level when campaign was accepted */
+  time_t campaign_expires_at;   /**< Real-world campaign expiration */
+  int    campaign_reward_qp;    /**< Stored quest point reward */
+  int    campaign_reward_gold;  /**< Stored gold reward */
+  int    campaign_target_count; /**< Number of active campaign targets */
+  mob_vnum campaign_target_vnum[MAX_CAMPAIGN_TARGETS];      /**< Target mob vnums */
+  room_vnum campaign_target_room[MAX_CAMPAIGN_TARGETS];     /**< Representative room per target */
+  int    campaign_target_required[MAX_CAMPAIGN_TARGETS];    /**< Required kills per target */
+  int    campaign_target_remaining[MAX_CAMPAIGN_TARGETS];   /**< Remaining kills per target */
   int    auction_low_level;     /**< Lowest level shown on auction */
   int    auction_high_level;    /**< Highest level shown on auction */
   time_t   lastmotd;            /**< Last time player read motd */
