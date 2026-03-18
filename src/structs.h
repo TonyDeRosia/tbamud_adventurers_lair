@@ -1035,6 +1035,9 @@ struct player_special_data_saved
   time_t campaign_expires_at;   /**< Real-world campaign expiration */
   int    campaign_reward_qp;    /**< Stored quest point reward */
   int    campaign_reward_gold;  /**< Stored gold reward */
+  int    campaign_reward_xp;    /**< Stored experience reward */
+  int    campaign_reward_trains;/**< Stored trains reward */
+  int    campaign_reward_practices; /**< Stored practices reward */
   int    campaign_target_count; /**< Number of active campaign targets */
   mob_vnum campaign_target_vnum[MAX_CAMPAIGN_TARGETS];      /**< Target mob vnums */
   room_vnum campaign_target_room[MAX_CAMPAIGN_TARGETS];     /**< Representative room per target */
