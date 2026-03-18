@@ -687,6 +687,8 @@ do                                                              \
 #define GET_KQUEST_ROOM(ch)     CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.kill_quest_target_room))
 #define GET_KQUEST_GIVER(ch)    CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.kill_quest_giver_vnum))
 #define GET_KQUEST_TIME(ch)     CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.kill_quest_time))
+#define GET_KQUEST_EXPIRES_AT(ch) CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.kill_quest_expires_at))
+#define GET_KQUEST_COOLDOWN_EXPIRES_AT(ch) CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.kill_quest_cooldown_expires_at))
 #define GET_KQUEST_TARGET_ID(ch) CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.kill_quest_target_id))
 #define GET_AUCTION_LOW(ch)     CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.auction_low_level))
 #define GET_AUCTION_HIGH(ch)    CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.auction_high_level))

@@ -60,6 +60,9 @@ static const char *quest_mort_usage =
 static const char *quest_imm_usage =
   "Usage: quest list | history | progress | join <nn> | leave | status <vnum> | request | info | complete";
 
+#define KQUEST_DURATION_SECS (60 * 60)
+#define KQUEST_COOLDOWN_SECS (30 * 60)
+
 static void clear_kill_quest(struct char_data *ch)
 {
   GET_KQUEST_ACTIVE(ch) = 0;
@@ -68,7 +71,87 @@ static void clear_kill_quest(struct char_data *ch)
   GET_KQUEST_ROOM(ch) = NOWHERE;
   GET_KQUEST_GIVER(ch) = NOBODY;
   GET_KQUEST_TIME(ch) = 0;
+  GET_KQUEST_EXPIRES_AT(ch) = 0;
   GET_KQUEST_TARGET_ID(ch) = 0;
+}
+
+static int seconds_to_minutes_ceiling(time_t seconds_remaining)
+{
+  if (seconds_remaining <= 0)
+    return 0;
+
+  return (int)((seconds_remaining + 59) / 60);
+}
+
+bool is_on_quest(struct char_data *ch)
+{
+  return ch && !IS_NPC(ch) && GET_KQUEST_ACTIVE(ch) != 0;
+}
+
+bool is_quest_ready(struct char_data *ch)
+{
+  return is_on_quest(ch) && GET_KQUEST_COMPLETE(ch) != 0;
+}
+
+bool is_quest_expired(struct char_data *ch)
+{
+  time_t now;
+
+  if (!is_on_quest(ch))
+    return FALSE;
+
+  now = time(0);
+  return GET_KQUEST_EXPIRES_AT(ch) > 0 && now >= GET_KQUEST_EXPIRES_AT(ch);
+}
+
+bool is_on_quest_cooldown(struct char_data *ch)
+{
+  time_t now;
+
+  if (!ch || IS_NPC(ch))
+    return FALSE;
+
+  now = time(0);
+  return GET_KQUEST_COOLDOWN_EXPIRES_AT(ch) > now;
+}
+
+int get_quest_minutes_remaining(struct char_data *ch)
+{
+  time_t now;
+
+  if (!is_on_quest(ch))
+    return 0;
+
+  now = time(0);
+  return seconds_to_minutes_ceiling(GET_KQUEST_EXPIRES_AT(ch) - now);
+}
+
+int get_quest_cooldown_minutes_remaining(struct char_data *ch)
+{
+  time_t now;
+
+  if (!ch || IS_NPC(ch))
+    return 0;
+
+  now = time(0);
+  return seconds_to_minutes_ceiling(GET_KQUEST_COOLDOWN_EXPIRES_AT(ch) - now);
+}
+
+static void start_kill_quest_cooldown(struct char_data *ch)
+{
+  GET_KQUEST_COOLDOWN_EXPIRES_AT(ch) = time(0) + KQUEST_COOLDOWN_SECS;
+}
+
+static void expire_kill_quest_if_needed(struct char_data *ch, bool notify)
+{
+  if (!is_on_quest(ch) || !is_quest_expired(ch))
+    return;
+
+  clear_kill_quest(ch);
+  start_kill_quest_cooldown(ch);
+  if (notify)
+    send_to_char(ch, "Your quest has expired. You have failed to complete it in time.\r\n");
+  save_char(ch);
 }
 
 static struct char_data *find_present_questmaster(struct char_data *ch)
@@ -160,8 +243,15 @@ static void quest_request_kill(struct char_data *ch)
     send_to_char(ch, "You must be in the same room as a quest master to request a quest.\r\n");
     return;
   }
+  expire_kill_quest_if_needed(ch, TRUE);
   if (GET_QUEST(ch) != NOTHING || GET_KQUEST_ACTIVE(ch)) {
     send_to_char(ch, "%s tells you, 'You already have a quest to finish first.'\r\n", GET_NAME(qm));
+    return;
+  }
+  if (is_on_quest_cooldown(ch)) {
+    send_to_char(ch, "You must wait %d minute%s before requesting another quest.\r\n",
+                 get_quest_cooldown_minutes_remaining(ch),
+                 get_quest_cooldown_minutes_remaining(ch) == 1 ? "" : "s");
     return;
   }
 
@@ -177,7 +267,8 @@ static void quest_request_kill(struct char_data *ch)
   GET_KQUEST_TARGET(ch) = GET_MOB_VNUM(target);
   GET_KQUEST_ROOM(ch) = GET_ROOM_VNUM(tr);
   GET_KQUEST_GIVER(ch) = GET_MOB_VNUM(qm);
-  GET_KQUEST_TIME(ch) = 30;
+  GET_KQUEST_TIME(ch) = 60;
+  GET_KQUEST_EXPIRES_AT(ch) = time(0) + KQUEST_DURATION_SECS;
   GET_KQUEST_TARGET_ID(ch) = char_script_id(target);
 
   send_to_char(ch, "You ask %s for a quest.\r\n", GET_NAME(qm));
@@ -187,8 +278,7 @@ static void quest_request_kill(struct char_data *ch)
   send_to_char(ch, "%s tells you, 'Seek %s out somewhere near %s in the area of %s.'\r\n",
       GET_NAME(qm), GET_NAME(target), world[tr].name, zone_table[world[tr].zone].name);
   send_to_char(ch, "%s tells you, 'Good luck, %s. Return safely!'\r\n", GET_NAME(qm), GET_NAME(ch));
-  send_to_char(ch, "%s tells you, 'You have %d minutes to complete your quest.'\r\n",
-      GET_NAME(qm), GET_KQUEST_TIME(ch));
+  send_to_char(ch, "You have 60 minutes to complete your quest.\r\n");
   save_char(ch);
 }
 
@@ -197,12 +287,16 @@ static void quest_info_kill(struct char_data *ch)
   room_rnum room;
   const char *target_name;
 
-  if (!GET_KQUEST_ACTIVE(ch)) {
+  expire_kill_quest_if_needed(ch, TRUE);
+  if (!is_on_quest(ch)) {
     send_to_char(ch, "You are not currently on a kill quest.\r\n");
     return;
   }
-  if (GET_KQUEST_COMPLETE(ch)) {
+  if (is_quest_ready(ch)) {
     send_to_char(ch, "You have slain your target. Return to a quest master and type 'quest complete'.\r\n");
+    send_to_char(ch, "Time remaining: %d minute%s.\r\n",
+                 get_quest_minutes_remaining(ch),
+                 get_quest_minutes_remaining(ch) == 1 ? "" : "s");
     return;
   }
 
@@ -218,7 +312,9 @@ static void quest_info_kill(struct char_data *ch)
   send_to_char(ch, "%s can be found in the vicinity of %s which\r\nis in the general area of %s.\r\n",
       target_name,
       world[room].name, zone_table[world[room].zone].name);
-  send_to_char(ch, "Time remaining: %d minute%s.\r\n", GET_KQUEST_TIME(ch), GET_KQUEST_TIME(ch) == 1 ? "" : "s");
+  send_to_char(ch, "Time remaining: %d minute%s.\r\n",
+               get_quest_minutes_remaining(ch),
+               get_quest_minutes_remaining(ch) == 1 ? "" : "s");
 }
 
 static void quest_complete_kill(struct char_data *ch)
@@ -226,17 +322,12 @@ static void quest_complete_kill(struct char_data *ch)
   struct char_data *qm;
   int qp_reward, gold_reward, exp_reward;
 
-  if (!GET_KQUEST_ACTIVE(ch)) {
+  expire_kill_quest_if_needed(ch, TRUE);
+  if (!is_on_quest(ch)) {
     send_to_char(ch, "You have no active kill quest to complete.\r\n");
     return;
   }
-  if (GET_KQUEST_TIME(ch) <= 0) {
-    send_to_char(ch, "Your quest has expired.\r\n");
-    clear_kill_quest(ch);
-    save_char(ch);
-    return;
-  }
-  if (!GET_KQUEST_COMPLETE(ch)) {
+  if (!is_quest_ready(ch)) {
     send_to_char(ch, "You have not yet slain your assigned target.\r\n");
     return;
   }
@@ -259,6 +350,7 @@ static void quest_complete_kill(struct char_data *ch)
       qp_reward, gold_reward, exp_reward);
 
   clear_kill_quest(ch);
+  start_kill_quest_cooldown(ch);
   save_char(ch);
 }
 
@@ -651,12 +743,8 @@ void check_timed_quests(void)
     if (!IS_NPC(ch) && (GET_QUEST(ch) != NOTHING) && (GET_QUEST_TIME(ch) != -1))
       if (--GET_QUEST_TIME(ch) == 0)
         quest_timeout(ch);
-    if (!IS_NPC(ch) && GET_KQUEST_ACTIVE(ch) && !GET_KQUEST_COMPLETE(ch) && GET_KQUEST_TIME(ch) > 0) {
-      if (--GET_KQUEST_TIME(ch) == 0) {
-        send_to_char(ch, "You have run out of time to complete your kill quest.\r\n");
-        clear_kill_quest(ch);
-      }
-    }
+    if (!IS_NPC(ch))
+      expire_kill_quest_if_needed(ch, TRUE);
   }
 }
 
@@ -664,7 +752,8 @@ void quest_kill_trigger_check(struct char_data *ch, struct char_data *vict)
 {
   if (!ch || IS_NPC(ch) || !vict || !IS_NPC(vict))
     return;
-  if (!GET_KQUEST_ACTIVE(ch) || GET_KQUEST_COMPLETE(ch) || GET_KQUEST_TIME(ch) <= 0)
+  expire_kill_quest_if_needed(ch, TRUE);
+  if (!is_on_quest(ch) || is_quest_ready(ch) || is_quest_expired(ch))
     return;
   if (GET_KQUEST_TARGET(ch) != GET_MOB_VNUM(vict))
     return;
@@ -681,7 +770,8 @@ int is_player_quest_target(struct char_data *viewer, struct char_data *mob)
 {
   if (!viewer || IS_NPC(viewer) || !mob || !IS_NPC(mob))
     return FALSE;
-  if (!GET_KQUEST_ACTIVE(viewer) || GET_KQUEST_COMPLETE(viewer) || GET_KQUEST_TIME(viewer) <= 0)
+  expire_kill_quest_if_needed(viewer, FALSE);
+  if (!is_on_quest(viewer) || is_quest_ready(viewer) || is_quest_expired(viewer))
     return FALSE;
   if (GET_KQUEST_TARGET(viewer) != GET_MOB_VNUM(mob))
     return FALSE;

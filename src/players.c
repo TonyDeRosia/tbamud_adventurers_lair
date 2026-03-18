@@ -384,6 +384,8 @@ int load_char(const char *name, struct char_data *ch)
     GET_KQUEST_ROOM(ch) = PFDEF_KQUEST_ROOM;
     GET_KQUEST_GIVER(ch) = PFDEF_KQUEST_GIVER;
     GET_KQUEST_TIME(ch) = PFDEF_KQUEST_TIME;
+    GET_KQUEST_EXPIRES_AT(ch) = PFDEF_KQUEST_EXPIRES_AT;
+    GET_KQUEST_COOLDOWN_EXPIRES_AT(ch) = PFDEF_KQUEST_COOLDOWN_EXPIRES_AT;
     GET_KQUEST_TARGET_ID(ch) = PFDEF_KQUEST_ID;
     GET_AUCTION_LOW(ch) = PFDEF_AUCTION_LOW;
     GET_AUCTION_HIGH(ch) = PFDEF_AUCTION_HIGH;
@@ -574,6 +576,8 @@ int load_char(const char *name, struct char_data *ch)
        else if (!strcmp(tag, "KQtr")) GET_KQUEST_ROOM(ch) = atoi(line);
        else if (!strcmp(tag, "KQgv")) GET_KQUEST_GIVER(ch) = atoi(line);
        else if (!strcmp(tag, "KQtm")) GET_KQUEST_TIME(ch) = atoi(line);
+       else if (!strcmp(tag, "KQex")) GET_KQUEST_EXPIRES_AT(ch) = (time_t)atol(line);
+       else if (!strcmp(tag, "KQcd")) GET_KQUEST_COOLDOWN_EXPIRES_AT(ch) = (time_t)atol(line);
        else if (!strcmp(tag, "KQid")) GET_KQUEST_TARGET_ID(ch) = atol(line);
        break;
 
@@ -858,6 +862,8 @@ void save_char(struct char_data * ch)
   if (GET_KQUEST_ROOM(ch) != PFDEF_KQUEST_ROOM) fprintf(fl, "KQtr: %d\n", GET_KQUEST_ROOM(ch));
   if (GET_KQUEST_GIVER(ch) != PFDEF_KQUEST_GIVER) fprintf(fl, "KQgv: %d\n", GET_KQUEST_GIVER(ch));
   if (GET_KQUEST_TIME(ch) != PFDEF_KQUEST_TIME) fprintf(fl, "KQtm: %d\n", GET_KQUEST_TIME(ch));
+  if (GET_KQUEST_EXPIRES_AT(ch) != PFDEF_KQUEST_EXPIRES_AT) fprintf(fl, "KQex: %ld\n", (long)GET_KQUEST_EXPIRES_AT(ch));
+  if (GET_KQUEST_COOLDOWN_EXPIRES_AT(ch) != PFDEF_KQUEST_COOLDOWN_EXPIRES_AT) fprintf(fl, "KQcd: %ld\n", (long)GET_KQUEST_COOLDOWN_EXPIRES_AT(ch));
   if (GET_KQUEST_TARGET_ID(ch) != PFDEF_KQUEST_ID) fprintf(fl, "KQid: %ld\n", GET_KQUEST_TARGET_ID(ch));
   if (GET_AUCTION_LOW(ch) != PFDEF_AUCTION_LOW) fprintf(fl, "AuLo: %d\n", GET_AUCTION_LOW(ch));
   if (GET_AUCTION_HIGH(ch) != PFDEF_AUCTION_HIGH) fprintf(fl, "AuHi: %d\n", GET_AUCTION_HIGH(ch));
