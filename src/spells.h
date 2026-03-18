@@ -222,32 +222,40 @@
 #define SPELL_GOAL_OF_ALL_LIFE_IS_DEATH 181
 #define SPELL_CRY_OF_THE_BANSHEE     182
 #define SPELL_NAPALM                 183
+#define SPELL_BODY_OF_EFFULGENT_BERYL 184
+#define SPELL_VERMILION_NOVA         185
+#define SPELL_NUCLEAR_BLAST          186
+#define SPELL_GREATER_TELEPORTATION  187
+#define SPELL_SILENT_MAGIC           188
+#define SPELL_TRIPLE_MAXIMIZE_MAGIC  189
+#define SPELL_PANTHEON               190
+#define SPELL_DIMENSIONAL_LOCK       191
 /** Total Number of defined spells */
-#define NUM_SPELLS                   183
+#define NUM_SPELLS                   191
 
 /* Insert new spells here, up to MAX_SPELLS */
-#define MAX_SPELLS		    190
+#define MAX_SPELLS		    198
 
 /* PLAYER SKILLS - Numbered from MAX_SPELLS+1 to MAX_SKILLS */
-#define SKILL_BACKSTAB              191 /* Reserved Skill[] DO NOT CHANGE */
-#define SKILL_BASH                  192 /* Reserved Skill[] DO NOT CHANGE */
-#define SKILL_HIDE                  193 /* Reserved Skill[] DO NOT CHANGE */
-#define SKILL_KICK                  194 /* Reserved Skill[] DO NOT CHANGE */
-#define SKILL_PICK_LOCK             195 /* Reserved Skill[] DO NOT CHANGE */
-#define SKILL_WHIRLWIND             196 
-#define SKILL_RESCUE                197 /* Reserved Skill[] DO NOT CHANGE */
-#define SKILL_SNEAK                 198 /* Reserved Skill[] DO NOT CHANGE */
-#define SKILL_STEAL                 199 /* Reserved Skill[] DO NOT CHANGE */
-#define SKILL_TRACK                 200 /* Reserved Skill[] DO NOT CHANGE */
-#define SKILL_BANDAGE               201 /* Reserved Skill[] DO NOT CHANGE */
+#define SKILL_BACKSTAB              199 /* Reserved Skill[] DO NOT CHANGE */
+#define SKILL_BASH                  200 /* Reserved Skill[] DO NOT CHANGE */
+#define SKILL_HIDE                  201 /* Reserved Skill[] DO NOT CHANGE */
+#define SKILL_KICK                  202 /* Reserved Skill[] DO NOT CHANGE */
+#define SKILL_PICK_LOCK             203 /* Reserved Skill[] DO NOT CHANGE */
+#define SKILL_WHIRLWIND             204 
+#define SKILL_RESCUE                205 /* Reserved Skill[] DO NOT CHANGE */
+#define SKILL_SNEAK                 206 /* Reserved Skill[] DO NOT CHANGE */
+#define SKILL_STEAL                 207 /* Reserved Skill[] DO NOT CHANGE */
+#define SKILL_TRACK                 208 /* Reserved Skill[] DO NOT CHANGE */
+#define SKILL_BANDAGE               209 /* Reserved Skill[] DO NOT CHANGE */
 
-#define SKILL_DUAL_WIELD            202 /* Reserved Skill[] DO NOT CHANGE */
-#define SKILL_RECALL                203 /* Reserved Skill[] DO NOT CHANGE */
-#define SKILL_OVERLORD_PRESENCE     204
-#define SKILL_SUPREME_CASTER_DISCIPLINE 205
-#define SKILL_UNDEAD_COMMAND        206
-#define SKILL_TACTICAL_SPELL_MEMORY 207
-#define SKILL_DREAD_DOMINION        208
+#define SKILL_DUAL_WIELD            210 /* Reserved Skill[] DO NOT CHANGE */
+#define SKILL_RECALL                211 /* Reserved Skill[] DO NOT CHANGE */
+#define SKILL_OVERLORD_PRESENCE     212
+#define SKILL_SUPREME_CASTER_DISCIPLINE 213
+#define SKILL_UNDEAD_COMMAND        214
+#define SKILL_TACTICAL_SPELL_MEMORY 215
+#define SKILL_DREAD_DOMINION        216
 /* New skills may be added here up to MAX_SKILLS (200) */
 
 /* NON-PLAYER AND OBJECT SPELLS AND SKILLS: The practice levels for the spells
@@ -403,7 +411,8 @@ enum room_effect_type {
   ROOM_EFFECT_TOXIC_CLOUD,
   ROOM_EFFECT_MIASMA,
   ROOM_EFFECT_GRAVITY_WELL,
-  ROOM_EFFECT_ACID_RAIN
+  ROOM_EFFECT_ACID_RAIN,
+  ROOM_EFFECT_DIMENSIONAL_LOCK
 };
 
 ASPELL(spell_create_water);
@@ -484,6 +493,14 @@ ASPELL(spell_ia_shub_niggurath);
 ASPELL(spell_goal_of_all_life_is_death);
 ASPELL(spell_cry_of_the_banshee);
 ASPELL(spell_napalm);
+ASPELL(spell_body_of_effulgent_beryl);
+ASPELL(spell_vermilion_nova);
+ASPELL(spell_nuclear_blast);
+ASPELL(spell_greater_teleportation);
+ASPELL(spell_silent_magic);
+ASPELL(spell_triple_maximize_magic);
+ASPELL(spell_pantheon);
+ASPELL(spell_dimensional_lock);
 void show_identify_item(struct char_data *ch, struct obj_data *obj, enum identify_detail_level detail);
 
 /* basic magic calling functions */
