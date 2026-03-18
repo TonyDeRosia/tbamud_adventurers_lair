@@ -1890,34 +1890,7 @@ len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
     len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
   }
 
-  /* Active Effects/Affects */
-  if (AFF_FLAGGED(ch, AFF_BLIND) && GET_LEVEL(ch) < LVL_IMMORT) {
-    snprintf(line, sizeof(line), "%sYou have been blinded!%s", RED, R);
-    len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
-  }
-  if (AFF_FLAGGED(ch, AFF_INVISIBLE)) {
-    snprintf(line, sizeof(line), "%sYou are invisible.%s", M, R);
-    len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
-  }
-  if (AFF_FLAGGED(ch, AFF_DETECT_INVIS)) {
-    snprintf(line, sizeof(line), "%sYou sense invisible things.%s", C, R);
-    len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
-  }
-  if (AFF_FLAGGED(ch, AFF_SANCTUARY)) {snprintf(line, sizeof(line), "%sYou are protected by Sanctuary.%s", W_CLR, R);
-    len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
-  }
-  if (AFF_FLAGGED(ch, AFF_POISON)) {
-    snprintf(line, sizeof(line), "%sYou are poisoned!%s", RED, R);
-    len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
-  }
-  if (AFF_FLAGGED(ch, AFF_CHARM)) {
-    snprintf(line, sizeof(line), "%sYou have been charmed!%s", Y, R);
-    len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
-  }
-  if (AFF_FLAGGED(ch, AFF_INFRAVISION)) {
-    snprintf(line, sizeof(line), "%sYour eyes are glowing red.%s", RED, R);
-    len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
-  }
+  /* Stable preference/status flags */
   if (PRF_FLAGGED(ch, PRF_SUMMONABLE)) {
     snprintf(line, sizeof(line), "%sYou are summonable by other players.%s", Y, R);
     len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
