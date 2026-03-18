@@ -1023,7 +1023,9 @@ struct player_special_data_saved
   mob_vnum kill_quest_target_vnum; /**< Assigned target mob vnum    */
   room_vnum kill_quest_target_room; /**< Assigned target room vnum   */
   mob_vnum kill_quest_giver_vnum;   /**< Quest master mob vnum       */
-  int    kill_quest_time;       /**< Time remaining (ticks)        */
+  int    kill_quest_time;       /**< Legacy kill quest timer       */
+  time_t kill_quest_expires_at; /**< Real-world quest expiration   */
+  time_t kill_quest_cooldown_expires_at; /**< Real-world cooldown expiration */
   long   kill_quest_target_id;  /**< Specific target instance id   */
   int    auction_low_level;     /**< Lowest level shown on auction */
   int    auction_high_level;    /**< Highest level shown on auction */

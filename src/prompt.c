@@ -138,25 +138,6 @@ static int prompt_tnl(struct char_data *ch)
   return MAX(0, level_exp(GET_CLASS(ch), next_level) - GET_EXP(ch));
 }
 
-static int has_active_quest_timer(struct char_data *ch)
-{
-  return ch && !IS_NPC(ch) && GET_KQUEST_ACTIVE(ch) && GET_KQUEST_TIME(ch) > 0;
-}
-
-static int get_quest_minutes_remaining(struct char_data *ch)
-{
-  long seconds_remaining;
-
-  if (!has_active_quest_timer(ch))
-    return 0;
-
-  seconds_remaining = (long)(GET_KQUEST_TIME(ch) - 1) * SECS_PER_MUD_HOUR + MAX(0, next_tick);
-  if (seconds_remaining <= 0)
-    return 0;
-
-  return (int)((seconds_remaining + 59) / 60);
-}
-
 static void append_prompt_text(char *prompt, size_t *pos, const char *text)
 {
   size_t remaining = MAX_PROMPT_LENGTH - *pos;

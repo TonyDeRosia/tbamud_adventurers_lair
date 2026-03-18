@@ -103,6 +103,12 @@ void quest_timeout(struct char_data *ch);
 void check_timed_quests(void);
 void quest_kill_trigger_check(struct char_data *ch, struct char_data *vict);
 int is_player_quest_target(struct char_data *viewer, struct char_data *mob);
+int get_quest_minutes_remaining(struct char_data *ch);
+int get_quest_cooldown_minutes_remaining(struct char_data *ch);
+bool is_on_quest(struct char_data *ch);
+bool is_quest_ready(struct char_data *ch);
+bool is_quest_expired(struct char_data *ch);
+bool is_on_quest_cooldown(struct char_data *ch);
 SPECIAL(questmaster);
 ACMD(do_quest);
 /* Implemented in qedit.c  */
