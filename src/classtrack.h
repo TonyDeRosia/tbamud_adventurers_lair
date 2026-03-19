@@ -19,9 +19,11 @@ void classtrack_init_new_player(struct char_data *ch);
 void classtrack_record_ability_use(struct char_data *ch, int ability, int was_spell);
 void classtrack_check_level_checkpoint(struct char_data *ch);
 
-/* Future study-system integration hook: call this before teaching a new ability
- * from the requested archetype. Returns 1 when learning should be allowed,
- * returns 0 when path commitment blocks new off-path study. */
+/* Future study-system integration hook:
+ * Best single hook point: skill_spell_ok() in src/spell_parser.c immediately
+ * before a learned spell/skill is accepted and practiced.
+ * Returns 1 when learning should be allowed, returns 0 when path commitment
+ * blocks new off-path study. */
 int classtrack_can_study_archetype(struct char_data *ch, int target_archetype,
                                    char *reason, size_t reason_len);
 
