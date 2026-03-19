@@ -2747,29 +2747,39 @@ int search_help(const char *argument, int level)
 {
   int chk, bot, top, mid, minlen;
 
-   bot = 0;
-   top = top_of_helpt;
-   minlen = strlen(argument);
+  if (!help_table || top_of_helpt <= 0 || !argument || !*argument)
+    return NOWHERE;
+
+  bot = 0;
+  top = top_of_helpt - 1;
+  minlen = strlen(argument);
 
   while (bot <= top) {
     mid = (bot + top) / 2;
 
-    if (!(chk = strn_cmp(argument, help_table[mid].keywords, minlen)))  {
-      while ((mid > 0) && !strn_cmp(argument, help_table[mid - 1].keywords, minlen))
-         mid--;
+    if (!help_table[mid].keywords)
+      return NOWHERE;
 
-      while (level < help_table[mid].min_level && mid < (bot + top) / 2)
+    if (!(chk = strn_cmp(argument, help_table[mid].keywords, minlen))) {
+      while ((mid > 0) && help_table[mid - 1].keywords &&
+             !strn_cmp(argument, help_table[mid - 1].keywords, minlen))
+        mid--;
+
+      while (mid < top_of_helpt && level < help_table[mid].min_level)
         mid++;
-      if (strn_cmp(argument, help_table[mid].keywords, minlen) || level < help_table[mid].min_level)
+
+      if (mid >= top_of_helpt || !help_table[mid].keywords ||
+          strn_cmp(argument, help_table[mid].keywords, minlen) ||
+          level < help_table[mid].min_level)
         break;
 
       return (mid);
-    }
-    else if (chk > 0)
+    } else if (chk > 0)
       bot = mid + 1;
     else
       top = mid - 1;
   }
+
   return NOWHERE;
 }
 
