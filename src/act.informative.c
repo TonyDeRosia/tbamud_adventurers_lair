@@ -2776,11 +2776,111 @@ static void normalize_help_keyword(const char *src, char *dst, size_t dstsz)
   dst[out] = '\0';
 }
 
+static void normalize_help_keyword_compact(const char *src, char *dst, size_t dstsz)
+{
+  size_t out = 0;
+
+  if (!dst || dstsz == 0)
+    return;
+
+  dst[0] = '\0';
+  if (!src)
+    return;
+
+  while (*src && out + 1 < dstsz) {
+    unsigned char c = (unsigned char)*src++;
+
+    if (isalnum(c))
+      dst[out++] = LOWER(c);
+  }
+
+  dst[out] = '\0';
+}
+
+static int help_keyword_matches_query(const char *keywords, const char *argument)
+{
+  char normalized_arg[MAX_INPUT_LENGTH];
+  char compact_arg[MAX_INPUT_LENGTH];
+  char keyword_copy[MAX_HELP_KEYWORDS + 1];
+  char *tokens[64];
+  int token_count = 0;
+  int i, j;
+
+  if (!keywords || !*keywords || !argument || !*argument)
+    return FALSE;
+
+  normalize_help_keyword(argument, normalized_arg, sizeof(normalized_arg));
+  normalize_help_keyword_compact(argument, compact_arg, sizeof(compact_arg));
+  if (!*normalized_arg || !*compact_arg)
+    return FALSE;
+
+  strlcpy(keyword_copy, keywords, sizeof(keyword_copy));
+
+  {
+    char *saveptr = NULL;
+    char *tok = strtok_r(keyword_copy, " \t\r\n", &saveptr);
+
+    while (tok && token_count < (int)(sizeof(tokens) / sizeof(tokens[0]))) {
+      tokens[token_count++] = tok;
+      tok = strtok_r(NULL, " \t\r\n", &saveptr);
+    }
+  }
+
+  for (i = 0; i < token_count; i++) {
+    char normalized_token[MAX_INPUT_LENGTH];
+    char compact_token[MAX_INPUT_LENGTH];
+    size_t compact_len;
+
+    normalize_help_keyword(tokens[i], normalized_token, sizeof(normalized_token));
+    normalize_help_keyword_compact(tokens[i], compact_token, sizeof(compact_token));
+    compact_len = strlen(compact_arg);
+
+    if ((*normalized_token && !str_cmp(normalized_arg, normalized_token)) ||
+        (*compact_token && !str_cmp(compact_arg, compact_token)))
+      return TRUE;
+
+    if (compact_len > 0 && *compact_token &&
+        !strncmp(compact_token, compact_arg, compact_len))
+      return TRUE;
+  }
+
+  for (i = 0; i < token_count; i++) {
+    char combined[MAX_INPUT_LENGTH];
+    size_t len = 0;
+
+    combined[0] = '\0';
+    for (j = i; j < token_count; j++) {
+      char compact_token[MAX_INPUT_LENGTH];
+      size_t tok_len;
+      size_t compact_len = strlen(compact_arg);
+
+      normalize_help_keyword_compact(tokens[j], compact_token, sizeof(compact_token));
+      if (!*compact_token)
+        continue;
+
+      tok_len = strlen(compact_token);
+      if (len + tok_len + 1 >= sizeof(combined))
+        break;
+
+      memcpy(combined + len, compact_token, tok_len);
+      len += tok_len;
+      combined[len] = '\0';
+
+      if (!str_cmp(compact_arg, combined))
+        return TRUE;
+      if (compact_len > 0 && len >= compact_len &&
+          !strncmp(combined, compact_arg, compact_len))
+        return TRUE;
+    }
+  }
+
+  return FALSE;
+}
+
 static int search_help_flexible(const char *argument, int level)
 {
   int i, exact;
   char normalized_arg[MAX_INPUT_LENGTH];
-  char normalized_key[MAX_INPUT_LENGTH];
 
   if (!argument || !*argument)
     return NOWHERE;
@@ -2800,8 +2900,7 @@ static int search_help_flexible(const char *argument, int level)
   for (i = 0; i < top_of_helpt; i++) {
     if (!help_table[i].keywords || help_table[i].min_level > level)
       continue;
-    normalize_help_keyword(help_table[i].keywords, normalized_key, sizeof(normalized_key));
-    if (*normalized_key && !str_cmp(normalized_arg, normalized_key))
+    if (help_keyword_matches_query(help_table[i].keywords, normalized_arg))
       return i;
   }
 
