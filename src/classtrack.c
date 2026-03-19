@@ -163,6 +163,26 @@ static int classtrack_pick_archetype_for_ability(int ability, int was_spell)
   return classtrack_lookup_mapped_archetype(ability, ct_skill_archetype_map);
 }
 
+static int classtrack_min_study_level_for_ability(int ability_id)
+{
+  int i;
+  int min_level = LVL_IMPL + 1;
+
+  if (ability_id <= 0 || ability_id > TOP_SPELL_DEFINE)
+    return -1;
+
+  for (i = 0; i < NUM_CLASSES; i++) {
+    int lvl = spell_info[ability_id].min_level[i];
+    if (lvl > 0 && lvl < min_level)
+      min_level = lvl;
+  }
+
+  if (min_level > LVL_IMMORT)
+    return -1;
+
+  return min_level;
+}
+
 static int classtrack_total_score(struct char_data *ch)
 {
   int i;
@@ -430,4 +450,86 @@ int classtrack_can_study_archetype(struct char_data *ch, int target_archetype,
   if (reason && reason_len > 0)
     strlcpy(reason, "You have gone too far down your current path to learn that kind of power.", reason_len);
   return 0;
+}
+
+const char *classtrack_display_class_name(struct char_data *ch)
+{
+  if (!ch || IS_NPC(ch))
+    return "Adventurer";
+
+  if (!GET_CLASS_LOCKED(ch))
+    return "Adventurer";
+
+  if (*GET_SOFT_CLASS_TITLE(ch))
+    return GET_SOFT_CLASS_TITLE(ch);
+
+  return "Adventurer";
+}
+
+const char *classtrack_display_class_abbrev(struct char_data *ch)
+{
+  static char abbrev[4];
+  const char *name;
+  int i, j;
+
+  if (!ch || IS_NPC(ch))
+    return "Adv";
+
+  if (!GET_CLASS_LOCKED(ch))
+    return "Adv";
+
+  name = classtrack_display_class_name(ch);
+  for (i = 0, j = 0; name[i] != '\0' && j < 3; i++) {
+    if (isalpha((unsigned char)name[i]))
+      abbrev[j++] = UPPER(name[i]);
+  }
+
+  if (j == 0)
+    return "Adv";
+
+  abbrev[j] = '\0';
+  return abbrev;
+}
+
+int classtrack_get_ability_archetype(int ability_id)
+{
+  int archetype;
+
+  if (ability_id <= 0 || ability_id > TOP_SPELL_DEFINE)
+    return -1;
+
+  archetype = classtrack_lookup_mapped_archetype(ability_id, ct_spell_archetype_map);
+  if (archetype >= 0)
+    return archetype;
+
+  return classtrack_lookup_mapped_archetype(ability_id, ct_skill_archetype_map);
+}
+
+int classtrack_can_study_ability(struct char_data *ch, int ability_id)
+{
+  int required_level;
+  int archetype;
+
+  if (!ch || IS_NPC(ch))
+    return 0;
+
+  if (ability_id <= 0 || ability_id > TOP_SPELL_DEFINE || ability_id > MAX_SKILLS)
+    return 0;
+
+  if (!spell_info[ability_id].name || !*spell_info[ability_id].name ||
+      !str_cmp(spell_info[ability_id].name, "!UNUSED!"))
+    return 0;
+
+  if (GET_SKILL(ch, ability_id) > 0)
+    return 0;
+
+  required_level = classtrack_min_study_level_for_ability(ability_id);
+  if (required_level > 0 && GET_LEVEL(ch) < required_level)
+    return 0;
+
+  archetype = classtrack_get_ability_archetype(ability_id);
+  if (archetype < 0 || archetype >= NUM_ARCHETYPES)
+    return 0;
+
+  return classtrack_can_study_archetype(ch, archetype, NULL, 0);
 }
