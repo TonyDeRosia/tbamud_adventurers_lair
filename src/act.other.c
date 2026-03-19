@@ -892,9 +892,9 @@ static int study_find_item_and_target(struct char_data *ch, char *argument,
 }
 
 static enum study_item_result study_try_from_item(struct char_data *ch, struct obj_data *study_obj,
-                                                  int requested_ability_id,
-                                                  int has_requested_ability,
-                                                  int *ability_id_out)
+                                                   int requested_ability_id,
+                                                   int has_requested_ability,
+                                                   int *ability_id_out)
 {
   int i;
   int raw_spell_ids[3];
@@ -1014,6 +1014,18 @@ static enum study_item_result study_try_from_item(struct char_data *ch, struct o
   return STUDY_ITEM_NO_STUDYABLE_SPELLS;
 }
 
+static int study_is_on_cooldown(struct char_data *ch, time_t now)
+{
+  time_t cooldown_until = GET_STUDY_COOLDOWN_UNTIL(ch);
+
+  return (cooldown_until > now);
+}
+
+static void study_apply_cooldown(struct char_data *ch, time_t now, int cooldown_secs)
+{
+  GET_STUDY_COOLDOWN_UNTIL(ch) = now + cooldown_secs;
+}
+
 ACMD(do_study)
 {
   struct obj_data *study_obj = NULL;
@@ -1024,7 +1036,8 @@ ACMD(do_study)
   int has_requested_ability = FALSE;
   int parsed_item = FALSE;
   enum study_item_result item_result;
-  const int study_cooldown = PULSE_VIOLENCE;
+  const int study_cooldown_secs = 2;
+  time_t now = time(NULL);
 
   skip_spaces(&argument);
 
@@ -1036,7 +1049,7 @@ ACMD(do_study)
     return;
   }
 
-  if (GET_WAIT_STATE(ch) > 0) {
+  if (study_is_on_cooldown(ch, now)) {
     send_to_char(ch, "You need a moment to gather your thoughts before studying again.\r\n");
     return;
   }
@@ -1050,14 +1063,14 @@ ACMD(do_study)
   if (study_is_valid_ability_id(ability_id)) {
     if (!study_can_learn_ability(ch, ability_id, reason, sizeof(reason))) {
       send_to_char(ch, "%s\r\n", *reason ? reason : "You cannot study that right now.");
-      WAIT_STATE(ch, study_cooldown);
+      study_apply_cooldown(ch, now, study_cooldown_secs);
       return;
     }
 
     SET_SKILL(ch, ability_id, 1);
     send_to_char(ch, "You study the knowledge of %s and begin to understand it.\r\n",
                  spell_info[ability_id].name);
-    WAIT_STATE(ch, study_cooldown);
+    study_apply_cooldown(ch, now, study_cooldown_secs);
     return;
   }
 
@@ -1066,7 +1079,6 @@ ACMD(do_study)
                                            &requested_ability_id, &has_requested_ability);
   if (!parsed_item || !study_obj) {
     send_to_char(ch, "You do not recognize that technique.\r\n");
-    WAIT_STATE(ch, study_cooldown);
     return;
   }
 
@@ -1097,7 +1109,10 @@ ACMD(do_study)
     }
     study_debug_imm(ch, "item-study result=%d for '%s' target=%d", item_result,
                     study_obj->short_description, requested_ability_id);
-    WAIT_STATE(ch, study_cooldown);
+    if (item_result != STUDY_ITEM_INVALID_SOURCE &&
+        item_result != STUDY_ITEM_NO_VALID_SLOTS &&
+        item_result != STUDY_ITEM_TARGET_NOT_PRESENT)
+      study_apply_cooldown(ch, now, study_cooldown_secs);
     return;
   }
 
@@ -1108,7 +1123,7 @@ ACMD(do_study)
   else
     send_to_char(ch, "You study %s and begin to understand %s.\r\n",
                  study_obj->short_description, spell_info[ability_id].name);
-  WAIT_STATE(ch, study_cooldown);
+  study_apply_cooldown(ch, now, study_cooldown_secs);
 }
 
 
