@@ -1414,24 +1414,9 @@ static bool ability_matches_input(const char *input, const char *ability_name,
   return TRUE;
 }
 
-static int find_spell_by_tokens(const char *name, char *ambig_buf,
-    size_t ambig_len, int *matched_tokens, bool allow_partial_name,
-    bool allow_extra_input) {
-  /* Adventurers Lair compatibility aliases:
-   * Keep these lightweight so legacy/variant ability names can reuse stable
-   * implementations without duplicating spell logic. */
-  static const struct {
-    const char *alias;
-    int spellnum;
-  } spell_aliases[] = {
-    { "colour spray", SPELL_COLOR_SPRAY },
-    { "detect invis", SPELL_DETECT_INVIS },
-    { "invis", SPELL_INVISIBLE },
-    { "night vision", SPELL_INFRAVISION },
-    { "shield", SPELL_ARMOR },
-    { "underwater breathing", SPELL_WATERWALK },
-    { NULL, 0 }
-  };
+static int find_known_spell_by_tokens(struct char_data *ch, const char *name,
+    char *ambig_buf, size_t ambig_len, int *matched_tokens,
+    bool allow_partial_name, bool allow_extra_input) {
   int best_spell = -1;
   int best_tokens = 0;
   int best_input_tokens = 0;
@@ -1443,20 +1428,13 @@ static int find_spell_by_tokens(const char *name, char *ambig_buf,
 
   *ambig_buf = '\0';
 
-  for (spellnum = 0; spell_aliases[spellnum].alias; spellnum++) {
-    if (ability_matches_input(name, spell_aliases[spellnum].alias,
-        allow_partial_name, allow_extra_input, NULL, NULL)) {
-      if (matched_tokens)
-        *matched_tokens = 1;
-      return spell_aliases[spellnum].spellnum;
-    }
-  }
-
   for (spellnum = 1; spellnum <= MAX_SPELLS; spellnum++) {
     int token_count = 0;
     int input_token_count = 0;
 
     if (!is_available_spell(spellnum))
+      continue;
+    if (!can_character_cast_known_spell(ch, spellnum))
       continue;
 
     if (!ability_matches_input(name, spell_info[spellnum].name,
@@ -1489,9 +1467,10 @@ static int find_spell_by_tokens(const char *name, char *ambig_buf,
   return -1;
 }
 
-static int find_spell_by_prefix(const char *name, char *ambig_buf,
-    size_t ambig_len) {
-  return find_spell_by_tokens(name, ambig_buf, ambig_len, NULL, TRUE, FALSE);
+static int find_known_spell_by_prefix(struct char_data *ch, const char *name,
+    char *ambig_buf, size_t ambig_len) {
+  return find_known_spell_by_tokens(ch, name, ambig_buf, ambig_len, NULL,
+      TRUE, FALSE);
 }
 
 static struct char_data *find_char_prefix(struct char_data *ch,
@@ -2470,11 +2449,12 @@ ACMD(do_cast) {
       target_argument = target_ptr;
     }
 
-    spellnum = find_spell_by_tokens(spell_input, ambiguity, sizeof(ambiguity),
-        &matched_tokens, FALSE, FALSE);
+    spellnum = find_known_spell_by_tokens(ch, spell_input, ambiguity,
+        sizeof(ambiguity), &matched_tokens, FALSE, FALSE);
   } else {
     int best_cut = -1;
     int best_spellnum = -1;
+    bool saw_ambiguous = FALSE;
     char ambiguity_local[MAX_STRING_LENGTH];
 
     strlcpy(work, argument, sizeof(work));
@@ -2487,11 +2467,14 @@ ACMD(do_cast) {
         *p = '\0';
 
         if (*work) {
-          int sn = find_spell_by_prefix(work, ambiguity_local,
+          int sn = find_known_spell_by_prefix(ch, work, ambiguity_local,
               sizeof(ambiguity_local));
           if (sn > 0) {
             best_spellnum = sn;
             best_cut = (int)(p - work);
+          } else if (sn == -2) {
+            saw_ambiguous = TRUE;
+            strlcpy(ambiguity, ambiguity_local, sizeof(ambiguity));
           }
         }
 
@@ -2500,11 +2483,14 @@ ACMD(do_cast) {
     }
 
     if (*work) {
-      int snfull = find_spell_by_prefix(work, ambiguity_local,
+      int snfull = find_known_spell_by_prefix(ch, work, ambiguity_local,
           sizeof(ambiguity_local));
       if (snfull > 0) {
         best_spellnum = snfull;
         best_cut = -1;
+      } else if (snfull == -2) {
+        saw_ambiguous = TRUE;
+        strlcpy(ambiguity, ambiguity_local, sizeof(ambiguity));
       }
     }
 
@@ -2518,14 +2504,16 @@ ACMD(do_cast) {
       }
       spellnum = best_spellnum;
     } else {
-      spellnum = find_spell_by_tokens(argument, ambiguity, sizeof(ambiguity),
-          &matched_tokens, TRUE, TRUE);
+      spellnum = find_known_spell_by_tokens(ch, argument, ambiguity,
+          sizeof(ambiguity), &matched_tokens, TRUE, TRUE);
       if (spellnum > 0) {
         char *target_ptr = argument;
         for (i = 0; i < matched_tokens && *target_ptr; i++)
           target_ptr = any_one_arg(target_ptr, spell_input);
         skip_spaces(&target_ptr);
         target_argument = target_ptr;
+      } else if (spellnum < 0 && saw_ambiguous) {
+        spellnum = -2;
       }
     }
   }
@@ -2537,7 +2525,7 @@ ACMD(do_cast) {
   }
 
   if ((spellnum < 1) || (spellnum > MAX_SPELLS)) {
-    send_to_char(ch, "Cast what?!?\r\n");
+    send_to_char(ch, "You do not know that spell.\r\n");
     return;
   }
   if (!can_character_cast_known_spell(ch, spellnum)) {
