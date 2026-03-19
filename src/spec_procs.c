@@ -27,6 +27,7 @@
 #include "class.h"
 #include "fight.h"
 #include "modify.h"
+#include "classtrack.h"
 
 #define PRACTICE_CAP 75
 
@@ -111,6 +112,7 @@ static size_t append_ability_section(struct char_data *ch, bool spells, char *bu
         continue;
 
       required_level = spell_info[ability].min_level[(int) GET_CLASS(ch)];
+      required_level = classtrack_get_study_display_level(ch, ability, required_level);
 
       if (required_level != level)
         continue;

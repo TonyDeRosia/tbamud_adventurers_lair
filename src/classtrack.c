@@ -581,4 +581,53 @@ void classtrack_ensure_study_skill(struct char_data *ch)
 
   if (GET_SKILL(ch, SKILL_STUDY) <= 0)
     SET_SKILL(ch, SKILL_STUDY, 1);
+
+  if (!GET_CLASS_LOCKED(ch)) {
+    if (GET_SKILL(ch, SPELL_MAGIC_MISSILE) > 0 && GET_STUDY_LEARN_LEVEL(ch, SPELL_MAGIC_MISSILE) == 0)
+      SET_STUDY_LEARN_LEVEL(ch, SPELL_MAGIC_MISSILE, 1);
+    if (GET_SKILL(ch, SKILL_RECALL) > 0 && GET_STUDY_LEARN_LEVEL(ch, SKILL_RECALL) == 0)
+      SET_STUDY_LEARN_LEVEL(ch, SKILL_RECALL, 1);
+    if (GET_SKILL(ch, SKILL_STUDY) > 0 && GET_STUDY_LEARN_LEVEL(ch, SKILL_STUDY) == 0)
+      SET_STUDY_LEARN_LEVEL(ch, SKILL_STUDY, 1);
+  }
+}
+
+void classtrack_record_study_learn_level(struct char_data *ch, int ability_id, int learned_level)
+{
+  int capped_level;
+
+  if (!ch || IS_NPC(ch))
+    return;
+
+  if (ability_id <= 0 || ability_id > MAX_SKILLS)
+    return;
+
+  capped_level = MAX(1, MIN(learned_level, 255));
+  SET_STUDY_LEARN_LEVEL(ch, ability_id, capped_level);
+}
+
+int classtrack_get_study_display_level(struct char_data *ch, int ability_id, int fallback_level)
+{
+  int learned_at;
+
+  if (!ch || IS_NPC(ch))
+    return fallback_level;
+
+  if (ability_id <= 0 || ability_id > MAX_SKILLS)
+    return fallback_level;
+
+  if (GET_CLASS_LOCKED(ch))
+    return fallback_level;
+
+  if (GET_SKILL(ch, ability_id) <= 0)
+    return fallback_level;
+
+  if (ability_id == SPELL_MAGIC_MISSILE || ability_id == SKILL_RECALL || ability_id == SKILL_STUDY)
+    return 1;
+
+  learned_at = GET_STUDY_LEARN_LEVEL(ch, ability_id);
+  if (learned_at > 0)
+    return learned_at;
+
+  return GET_LEVEL(ch);
 }

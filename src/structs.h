@@ -1041,6 +1041,7 @@ struct char_special_data
 struct player_special_data_saved
 {
   byte skills[MAX_SKILLS+1]; /**< Character skills. */
+  byte study_learned_level[MAX_SKILLS+1]; /**< Reactive Study learned-at level per ability (0 = unknown/not tracked). */
   int wimp_level;         /**< Below this # of hit points, flee! */
   byte freeze_level;      /**< Level of god who froze char, if any */
   sh_int invis_level;     /**< level of invisibility */

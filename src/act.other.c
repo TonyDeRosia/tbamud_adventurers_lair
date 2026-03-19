@@ -215,6 +215,7 @@ static void show_ability_table_aligned(struct char_data *ch, int show_spells, in
     lvl = spell_info[i].min_level[cls];
     if (i == SKILL_STUDY && (lvl <= 0 || lvl >= LVL_IMMORT))
       lvl = 1;
+    lvl = classtrack_get_study_display_level(ch, i, lvl);
     if (lvl <= 0) continue;
 
     if (show_all && lvl >= LVL_IMMORT) continue;
@@ -1102,6 +1103,7 @@ ACMD(do_study)
     }
 
     SET_SKILL(ch, ability_id, 1);
+    classtrack_record_study_learn_level(ch, ability_id, GET_LEVEL(ch));
     send_to_char(ch, "You study the knowledge of %s and begin to understand it.\r\n",
                  spell_info[ability_id].name);
     study_apply_cooldown(ch, now, study_cooldown_secs);
@@ -1157,6 +1159,7 @@ ACMD(do_study)
   }
 
   SET_SKILL(ch, ability_id, 1);
+  classtrack_record_study_learn_level(ch, ability_id, GET_LEVEL(ch));
   if (has_requested_ability)
     send_to_char(ch, "You focus on %s within %s and begin to understand it.\r\n",
                  spell_info[ability_id].name, study_obj->short_description);
