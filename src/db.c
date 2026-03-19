@@ -2417,6 +2417,9 @@ static int hsort(const void *a, const void *b)
   a1 = (const struct help_index_element *) a;
   b1 = (const struct help_index_element *) b;
 
+  if (!a1 || !a1->keywords) return -1;
+  if (!b1 || !b1->keywords) return 1;
+
   return (str_cmp(a1->keywords, b1->keywords));
 }
 
