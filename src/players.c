@@ -50,6 +50,7 @@
 /* local functions */
 static void load_affects(FILE *fl, struct char_data *ch);
 static void load_skills(FILE *fl, struct char_data *ch);
+static void load_study_levels(FILE *fl, struct char_data *ch);
 static void load_quests(FILE *fl, struct char_data *ch);
 static int upgrade_legacy_immortal_levels(struct char_data *ch);
 static void load_HMVS(struct char_data *ch, const char *line, int mode);
@@ -639,6 +640,7 @@ int load_char(const char *name, struct char_data *ch)
         else if (!strcmp(tag, "SoTi"))
           strlcpy(GET_SOFT_CLASS_TITLE(ch), line, sizeof(ch->player_specials->saved.soft_class_title));
 	else if (!strcmp(tag, "Skil"))	load_skills(fl, ch);
+        else if (!strcmp(tag, "StLv")) load_study_levels(fl, ch);
 	else if (!strcmp(tag, "Str "))	load_HMVS(ch, line, LOAD_STRENGTH);
 	break;
 
@@ -960,6 +962,13 @@ void save_char(struct char_data * ch)
   }
   fprintf(fl, "0 0\n");
 
+  fprintf(fl, "StLv:\n");
+  for (i = 1; i <= MAX_SKILLS; i++) {
+    if (GET_STUDY_LEARN_LEVEL(ch, i) > 0)
+      fprintf(fl, "%d %d\n", i, GET_STUDY_LEARN_LEVEL(ch, i));
+  }
+  fprintf(fl, "0 0\n");
+
   /* Save affects */
   if (tmp_aff[0].spell > 0) {
     fprintf(fl, "Affs:\n");
@@ -1177,6 +1186,28 @@ static void load_skills(FILE *fl, struct char_data *ch)
     for (num = 1; num <= MAX_SKILLS; num++)
       GET_SKILL(ch, num) = 100;
   }
+}
+
+static void load_study_levels(FILE *fl, struct char_data *ch)
+{
+  int num = 0, num2 = 0;
+  char line[MAX_INPUT_LENGTH + 1];
+
+  do {
+    get_line(fl, line);
+    sscanf(line, "%d %d", &num, &num2);
+    if (num != 0) {
+      if (num < 1 || num > MAX_SKILLS) {
+        log("SYSERR: Invalid study level id %d in pfile (%s)", num, GET_NAME(ch));
+        continue;
+      }
+      if (num2 < 0)
+        num2 = 0;
+      else if (num2 > 255)
+        num2 = 255;
+      SET_STUDY_LEARN_LEVEL(ch, num, num2);
+    }
+  } while (num != 0);
 }
 
 void load_quests(FILE *fl, struct char_data *ch)

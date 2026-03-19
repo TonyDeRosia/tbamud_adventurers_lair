@@ -1733,6 +1733,7 @@ void do_start(struct char_data *ch)
   }
 
   ensure_class_abilities(ch);
+  classtrack_ensure_study_skill(ch);
 
   advance_level(ch);
 
