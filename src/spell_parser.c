@@ -42,6 +42,8 @@ static int reflect_suppressed = 0;
 
 static int can_character_cast_known_spell(struct char_data *ch, int spellnum)
 {
+  int learned_at;
+  int is_reactive_identity;
   int required_level;
 
   if (!ch || IS_NPC(ch))
@@ -50,13 +52,19 @@ static int can_character_cast_known_spell(struct char_data *ch, int spellnum)
   if (spellnum < 1 || spellnum > MAX_SPELLS)
     return FALSE;
 
-  required_level = SINFO.min_level[(int) GET_CLASS(ch)];
-  required_level = classtrack_get_study_display_level(ch, spellnum, required_level);
-
-  if (GET_LEVEL(ch) < required_level)
+  if (GET_SKILL(ch, spellnum) <= 0)
     return FALSE;
 
-  return (GET_SKILL(ch, spellnum) > 0);
+  learned_at = GET_STUDY_LEARN_LEVEL(ch, spellnum);
+  is_reactive_identity = (GET_CLASS(ch) == CLASS_ADVENTURER) || (learned_at > 0);
+
+  if (is_reactive_identity) {
+    required_level = classtrack_get_study_display_level(ch, spellnum, 1);
+    return (GET_LEVEL(ch) >= required_level);
+  }
+
+  required_level = SINFO.min_level[(int) GET_CLASS(ch)];
+  return (GET_LEVEL(ch) >= required_level);
 }
 
 int spell_on_cooldown(struct char_data *ch, int spellnum)

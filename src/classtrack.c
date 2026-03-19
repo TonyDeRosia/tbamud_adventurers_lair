@@ -617,11 +617,16 @@ void classtrack_ensure_study_skill(struct char_data *ch)
 void classtrack_record_study_learn_level(struct char_data *ch, int ability_id, int learned_level)
 {
   int capped_level;
+  int existing_level;
 
   if (!ch || IS_NPC(ch))
     return;
 
   if (ability_id <= 0 || ability_id > MAX_SKILLS)
+    return;
+
+  existing_level = GET_STUDY_LEARN_LEVEL(ch, ability_id);
+  if (existing_level > 0)
     return;
 
   capped_level = MAX(1, MIN(learned_level, 255));
@@ -654,5 +659,5 @@ int classtrack_get_study_display_level(struct char_data *ch, int ability_id, int
   if (learned_at > 0)
     return learned_at;
 
-  return GET_LEVEL(ch);
+  return fallback_level;
 }
