@@ -45,22 +45,23 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Unleashes hostile magic meant to break enemy momentum in open combat.
+Single-target offensive spell focused on one enemy at a time.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-Delivers direct magical pressure and may leave foes weakened or disrupted if they fail to resist.
+Applies immediate burst damage to one target. Save outcome is not documented in this help entry, so treat it as damage-first without guaranteed control.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Cast at engaged enemies when you need burst damage, pressure, or a quick swing in tempo.
+Best used when your group is focusing a priority target and you need fast single-target pressure.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Best used on priority targets with poor saves or already under pressure.
+Bad use case: spending mana on this during large multi-enemy pulls where room-wide spells will produce higher total impact.
+
 #0
 
 GROUP-HEAL
@@ -333,22 +334,23 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Unleashes hostile magic meant to break enemy momentum in open combat.
+Single-target offensive spell focused on one enemy at a time.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-Delivers direct magical pressure and may leave foes weakened or disrupted if they fail to resist.
+Applies immediate burst damage to one target. Save outcome is not documented in this help entry, so treat it as damage-first without guaranteed control.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Cast at engaged enemies when you need burst damage, pressure, or a quick swing in tempo.
+Best used when your group is focusing a priority target and you need fast single-target pressure.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Best used on priority targets with poor saves or already under pressure.
+Bad use case: spending mana on this during large multi-enemy pulls where room-wide spells will produce higher total impact.
+
 #0
 
 ENFEEBLEMENT
@@ -461,22 +463,23 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Unleashes hostile magic meant to break enemy momentum in open combat.
+Single-target offensive spell focused on one enemy at a time.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-Delivers direct magical pressure and may leave foes weakened or disrupted if they fail to resist.
+Applies immediate burst damage to one target. Save outcome is not documented in this help entry, so treat it as damage-first without guaranteed control.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Cast at engaged enemies when you need burst damage, pressure, or a quick swing in tempo.
+Best used when your group is focusing a priority target and you need fast single-target pressure.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Best used on priority targets with poor saves or already under pressure.
+Bad use case: spending mana on this during large multi-enemy pulls where room-wide spells will produce higher total impact.
+
 #0
 
 FLAME-ARROW
@@ -525,22 +528,23 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Unleashes hostile magic meant to break enemy momentum in open combat.
+Single-target offensive spell focused on one enemy at a time.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-Delivers direct magical pressure and may leave foes weakened or disrupted if they fail to resist.
+Applies immediate burst damage to one target. Save outcome is not documented in this help entry, so treat it as damage-first without guaranteed control.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Cast at engaged enemies when you need burst damage, pressure, or a quick swing in tempo.
+Best used when your group is focusing a priority target and you need fast single-target pressure.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Best used on priority targets with poor saves or already under pressure.
+Bad use case: spending mana on this during large multi-enemy pulls where room-wide spells will produce higher total impact.
+
 #0
 
 VOLTAIC-BOLT
@@ -557,22 +561,23 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Unleashes hostile magic meant to break enemy momentum in open combat.
+Single-target offensive spell focused on one enemy at a time.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-Delivers direct magical pressure and may leave foes weakened or disrupted if they fail to resist.
+Applies immediate burst damage to one target. Save outcome is not documented in this help entry, so treat it as damage-first without guaranteed control.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Cast at engaged enemies when you need burst damage, pressure, or a quick swing in tempo.
+Best used when your group is focusing a priority target and you need fast single-target pressure.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Best used on priority targets with poor saves or already under pressure.
+Bad use case: spending mana on this during large multi-enemy pulls where room-wide spells will produce higher total impact.
+
 #0
 
 ACID-BLAST
@@ -589,22 +594,23 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Projects large-scale battlefield magic to pressure multiple enemies.
+Room-wide offensive spell that affects enemies in your current room.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-Deals area damage and/or establishes room-wide effects that influence positioning.
+Applies burst damage across multiple enemies. Save outcome and secondary riders are not documented here, so treat it primarily as an area-damage cast.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Room/area cast affecting enemies in the current location.
+Best used when multiple enemies are stacked in one room and you need immediate room-wide pressure.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Powerful when enemies are grouped.
+Bad use case: single-target encounters where focused one-target spells are usually more efficient.
+
 #0
 
 SHADOW-BOLT
@@ -621,22 +627,23 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Unleashes hostile magic meant to break enemy momentum in open combat.
+Single-target offensive spell focused on one enemy at a time.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-Delivers direct magical pressure and may leave foes weakened or disrupted if they fail to resist.
+Applies immediate burst damage to one target. Save outcome is not documented in this help entry, so treat it as damage-first without guaranteed control.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Cast at engaged enemies when you need burst damage, pressure, or a quick swing in tempo.
+Best used when your group is focusing a priority target and you need fast single-target pressure.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Best used on priority targets with poor saves or already under pressure.
+Bad use case: spending mana on this during large multi-enemy pulls where room-wide spells will produce higher total impact.
+
 #0
 
 VAMPIRIC-TOUCH
@@ -1677,22 +1684,23 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Projects large-scale battlefield magic to pressure multiple enemies.
+Room-wide offensive spell that affects enemies in your current room.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-Deals area damage and/or establishes room-wide effects that influence positioning.
+Applies burst damage across multiple enemies. Save outcome and secondary riders are not documented here, so treat it primarily as an area-damage cast.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Room/area cast affecting enemies in the current location.
+Best used when multiple enemies are stacked in one room and you need immediate room-wide pressure.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Powerful when enemies are grouped.
+Bad use case: single-target encounters where focused one-target spells are usually more efficient.
+
 #0
 
 SILENCE-FIELD
@@ -1709,22 +1717,23 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Projects large-scale battlefield magic to pressure multiple enemies.
+Room-wide offensive spell that affects enemies in your current room.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-Deals area damage and/or establishes room-wide effects that influence positioning.
+Applies burst damage across multiple enemies. Save outcome and secondary riders are not documented here, so treat it primarily as an area-damage cast.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Room/area cast affecting enemies in the current location.
+Best used when multiple enemies are stacked in one room and you need immediate room-wide pressure.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Powerful when enemies are grouped.
+Bad use case: single-target encounters where focused one-target spells are usually more efficient.
+
 #0
 
 MIASMA
@@ -1760,22 +1769,23 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Projects large-scale battlefield magic to pressure multiple enemies.
+Room-wide offensive spell that affects enemies in your current room.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-Deals area damage and/or establishes room-wide effects that influence positioning.
+Applies burst damage across multiple enemies. Save outcome and secondary riders are not documented here, so treat it primarily as an area-damage cast.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Room/area cast affecting enemies in the current location.
+Best used when multiple enemies are stacked in one room and you need immediate room-wide pressure.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Powerful when enemies are grouped.
+Bad use case: single-target encounters where focused one-target spells are usually more efficient.
+
 #0
 
 WALL-OF-FIRE
@@ -1792,22 +1802,22 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Projects large-scale battlefield magic to pressure multiple enemies.
+Room-wide offensive spell that affects enemies in your current room.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-Deals area damage and/or establishes room-wide effects that influence positioning.
+Applies burst damage across multiple enemies. Save outcome and secondary riders are not documented here, so treat it primarily as an area-damage cast.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Room/area cast affecting enemies in the current location.
+Best used when multiple enemies are stacked in one room and you need immediate room-wide pressure.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Powerful when enemies are grouped.
+Bad use case: single-target encounters where focused one-target spells are usually more efficient.
 #0
 
 STATIC-FIELD
@@ -1824,22 +1834,23 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Projects large-scale battlefield magic to pressure multiple enemies.
+Room-wide offensive spell that affects enemies in your current room.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-Deals area damage and/or establishes room-wide effects that influence positioning.
+Applies burst damage across multiple enemies. Save outcome and secondary riders are not documented here, so treat it primarily as an area-damage cast.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Room/area cast affecting enemies in the current location.
+Best used when multiple enemies are stacked in one room and you need immediate room-wide pressure.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Powerful when enemies are grouped.
+Bad use case: single-target encounters where focused one-target spells are usually more efficient.
+
 #0
 
 CONSECRATE
@@ -1920,22 +1931,23 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Unleashes hostile magic meant to break enemy momentum in open combat.
+Single-target offensive spell focused on one enemy at a time.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-Delivers direct magical pressure and may leave foes weakened or disrupted if they fail to resist.
+Applies immediate burst damage to one target. Save outcome is not documented in this help entry, so treat it as damage-first without guaranteed control.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Cast at engaged enemies when you need burst damage, pressure, or a quick swing in tempo.
+Best used when your group is focusing a priority target and you need fast single-target pressure.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Best used on priority targets with poor saves or already under pressure.
+Bad use case: spending mana on this during large multi-enemy pulls where room-wide spells will produce higher total impact.
+
 #0
 
 NOVA
@@ -1952,22 +1964,23 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Projects large-scale battlefield magic to pressure multiple enemies.
+Room-wide offensive spell that affects enemies in your current room.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-Deals area damage and/or establishes room-wide effects that influence positioning.
+Applies burst damage across multiple enemies. Save outcome and secondary riders are not documented here, so treat it primarily as an area-damage cast.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Room/area cast affecting enemies in the current location.
+Best used when multiple enemies are stacked in one room and you need immediate room-wide pressure.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Powerful when enemies are grouped.
+Bad use case: single-target encounters where focused one-target spells are usually more efficient.
+
 #0
 
 ICE-STORM
@@ -1984,22 +1997,23 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Projects large-scale battlefield magic to pressure multiple enemies.
+Room-wide offensive spell that affects enemies in your current room.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-Deals area damage and/or establishes room-wide effects that influence positioning.
+Applies burst damage across multiple enemies. Save outcome and secondary riders are not documented here, so treat it primarily as an area-damage cast.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Room/area cast affecting enemies in the current location.
+Best used when multiple enemies are stacked in one room and you need immediate room-wide pressure.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Powerful when enemies are grouped.
+Bad use case: single-target encounters where focused one-target spells are usually more efficient.
+
 #0
 
 BLIZZARD
@@ -2048,22 +2062,23 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Projects large-scale battlefield magic to pressure multiple enemies.
+Room-wide offensive spell that affects enemies in your current room.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-Deals area damage and/or establishes room-wide effects that influence positioning.
+Applies burst damage across multiple enemies. Save outcome and secondary riders are not documented here, so treat it primarily as an area-damage cast.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Room/area cast affecting enemies in the current location.
+Best used when multiple enemies are stacked in one room and you need immediate room-wide pressure.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Powerful when enemies are grouped.
+Bad use case: single-target encounters where focused one-target spells are usually more efficient.
+
 #0
 
 GREATER-FIREBALL
@@ -2080,22 +2095,23 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Unleashes hostile magic meant to break enemy momentum in open combat.
+Single-target offensive spell focused on one enemy at a time.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-Delivers direct magical pressure and may leave foes weakened or disrupted if they fail to resist.
+Applies immediate burst damage to one target. Save outcome is not documented in this help entry, so treat it as damage-first without guaranteed control.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Cast at engaged enemies when you need burst damage, pressure, or a quick swing in tempo.
+Best used when your group is focusing a priority target and you need fast single-target pressure.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Best used on priority targets with poor saves or already under pressure.
+Bad use case: spending mana on this during large multi-enemy pulls where room-wide spells will produce higher total impact.
+
 #0
 
 ACID-RAIN
@@ -2112,22 +2128,23 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Projects large-scale battlefield magic to pressure multiple enemies.
+Room-wide offensive spell that affects enemies in your current room.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-Deals area damage and/or establishes room-wide effects that influence positioning.
+Applies burst damage across multiple enemies. Save outcome and secondary riders are not documented here, so treat it primarily as an area-damage cast.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Room/area cast affecting enemies in the current location.
+Best used when multiple enemies are stacked in one room and you need immediate room-wide pressure.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Powerful when enemies are grouped.
+Bad use case: single-target encounters where focused one-target spells are usually more efficient.
+
 #0
 
 SONIC-BURST
@@ -2176,22 +2193,23 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Unleashes hostile magic meant to break enemy momentum in open combat.
+Single-target offensive spell focused on one enemy at a time.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-Delivers direct magical pressure and may leave foes weakened or disrupted if they fail to resist.
+Applies immediate burst damage to one target. Save outcome is not documented in this help entry, so treat it as damage-first without guaranteed control.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Cast at engaged enemies when you need burst damage, pressure, or a quick swing in tempo.
+Best used when your group is focusing a priority target and you need fast single-target pressure.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Best used on priority targets with poor saves or already under pressure.
+Bad use case: spending mana on this during large multi-enemy pulls where room-wide spells will produce higher total impact.
+
 #0
 
 VENTRILOQUATE
@@ -2867,22 +2885,23 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Unleashes hostile magic meant to break enemy momentum in open combat.
+Single-target offensive spell focused on one enemy at a time.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-Delivers direct magical pressure and may leave foes weakened or disrupted if they fail to resist.
+Applies immediate burst damage to one target. Save outcome is not documented in this help entry, so treat it as damage-first without guaranteed control.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Cast at engaged enemies when you need burst damage, pressure, or a quick swing in tempo.
+Best used when your group is focusing a priority target and you need fast single-target pressure.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Best used on priority targets with poor saves or already under pressure.
+Bad use case: spending mana on this during large multi-enemy pulls where room-wide spells will produce higher total impact.
+
 #0
 
 METEOR
@@ -2931,22 +2950,23 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Projects large-scale battlefield magic to pressure multiple enemies.
+Room-wide offensive spell that affects enemies in your current room.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-Deals area damage and/or establishes room-wide effects that influence positioning.
+Applies burst damage across multiple enemies. Save outcome and secondary riders are not documented here, so treat it primarily as an area-damage cast.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Room/area cast affecting enemies in the current location.
+Best used when multiple enemies are stacked in one room and you need immediate room-wide pressure.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Powerful when enemies are grouped.
+Bad use case: single-target encounters where focused one-target spells are usually more efficient.
+
 #0
 
 HELLFIRE
@@ -2963,22 +2983,23 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Unleashes hostile magic meant to break enemy momentum in open combat.
+Single-target offensive spell focused on one enemy at a time.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-Delivers direct magical pressure and may leave foes weakened or disrupted if they fail to resist.
+Applies immediate burst damage to one target. Save outcome is not documented in this help entry, so treat it as damage-first without guaranteed control.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Cast at engaged enemies when you need burst damage, pressure, or a quick swing in tempo.
+Best used when your group is focusing a priority target and you need fast single-target pressure.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Best used on priority targets with poor saves or already under pressure.
+Bad use case: spending mana on this during large multi-enemy pulls where room-wide spells will produce higher total impact.
+
 #0
 
 WRATHFIRE
@@ -2995,22 +3016,23 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Unleashes hostile magic meant to break enemy momentum in open combat.
+Single-target offensive spell focused on one enemy at a time.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-Delivers direct magical pressure and may leave foes weakened or disrupted if they fail to resist.
+Applies immediate burst damage to one target. Save outcome is not documented in this help entry, so treat it as damage-first without guaranteed control.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Cast at engaged enemies when you need burst damage, pressure, or a quick swing in tempo.
+Best used when your group is focusing a priority target and you need fast single-target pressure.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Best used on priority targets with poor saves or already under pressure.
+Bad use case: spending mana on this during large multi-enemy pulls where room-wide spells will produce higher total impact.
+
 #0
 
 CELESTIAL-SMITE
@@ -3091,22 +3113,23 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Unleashes hostile magic meant to break enemy momentum in open combat.
+Single-target offensive spell focused on one enemy at a time.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-Delivers direct magical pressure and may leave foes weakened or disrupted if they fail to resist.
+Applies immediate burst damage to one target. Save outcome is not documented in this help entry, so treat it as damage-first without guaranteed control.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Cast at engaged enemies when you need burst damage, pressure, or a quick swing in tempo.
+Best used when your group is focusing a priority target and you need fast single-target pressure.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Best used on priority targets with poor saves or already under pressure.
+Bad use case: spending mana on this during large multi-enemy pulls where room-wide spells will produce higher total impact.
+
 #0
 
 UNHOLY-WORD
@@ -3187,22 +3210,23 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Unleashes hostile magic meant to break enemy momentum in open combat.
+Single-target offensive spell focused on one enemy at a time.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-Delivers direct magical pressure and may leave foes weakened or disrupted if they fail to resist.
+Applies immediate burst damage to one target. Save outcome is not documented in this help entry, so treat it as damage-first without guaranteed control.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Cast at engaged enemies when you need burst damage, pressure, or a quick swing in tempo.
+Best used when your group is focusing a priority target and you need fast single-target pressure.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Best used on priority targets with poor saves or already under pressure.
+Bad use case: spending mana on this during large multi-enemy pulls where room-wide spells will produce higher total impact.
+
 #0
 
 WAIL-OF-THE-BANSHEE
@@ -3814,22 +3838,23 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Unleashes hostile magic meant to break enemy momentum in open combat.
+Single-target offensive spell focused on one enemy at a time.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-Delivers direct magical pressure and may leave foes weakened or disrupted if they fail to resist.
+Applies immediate burst damage to one target. Save outcome is not documented in this help entry, so treat it as damage-first without guaranteed control.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Cast at engaged enemies when you need burst damage, pressure, or a quick swing in tempo.
+Best used when your group is focusing a priority target and you need fast single-target pressure.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Best used on priority targets with poor saves or already under pressure.
+Bad use case: spending mana on this during large multi-enemy pulls where room-wide spells will produce higher total impact.
+
 #0
 
 CHAIN-DRAGON-LIGHTNING
@@ -3846,22 +3871,23 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Unleashes hostile magic meant to break enemy momentum in open combat.
+Single-target offensive spell focused on one enemy at a time.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-Delivers direct magical pressure and may leave foes weakened or disrupted if they fail to resist.
+Applies immediate burst damage to one target. Save outcome is not documented in this help entry, so treat it as damage-first without guaranteed control.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Cast at engaged enemies when you need burst damage, pressure, or a quick swing in tempo.
+Best used when your group is focusing a priority target and you need fast single-target pressure.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Best used on priority targets with poor saves or already under pressure.
+Bad use case: spending mana on this during large multi-enemy pulls where room-wide spells will produce higher total impact.
+
 #0
 
 HELL-FLAME
@@ -4217,22 +4243,23 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Projects large-scale battlefield magic to pressure multiple enemies.
+Room-wide offensive spell that affects enemies in your current room.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-Deals area damage and/or establishes room-wide effects that influence positioning.
+Applies burst damage across multiple enemies. Save outcome and secondary riders are not documented here, so treat it primarily as an area-damage cast.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Room/area cast affecting enemies in the current location.
+Best used when multiple enemies are stacked in one room and you need immediate room-wide pressure.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Powerful when enemies are grouped.
+Bad use case: single-target encounters where focused one-target spells are usually more efficient.
+
 #0
 
 NUCLEAR-BLAST
@@ -4505,22 +4532,23 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Projects large-scale battlefield magic to pressure multiple enemies.
+Room-wide offensive spell that affects enemies in your current room.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-Deals area damage and/or establishes room-wide effects that influence positioning.
+Applies burst damage across multiple enemies. Save outcome and secondary riders are not documented here, so treat it primarily as an area-damage cast.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Room/area cast affecting enemies in the current location.
+Best used when multiple enemies are stacked in one room and you need immediate room-wide pressure.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Powerful when enemies are grouped.
+Bad use case: single-target encounters where focused one-target spells are usually more efficient.
+
 #0
 
 MONARCHS-PRESSURE MONARCH-PRESSURE
@@ -4569,22 +4597,22 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Projects large-scale battlefield magic to pressure multiple enemies.
+Room-wide offensive spell that affects enemies in your current room.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-Deals area damage and/or establishes room-wide effects that influence positioning.
+Applies burst damage across multiple enemies. Save outcome and secondary riders are not documented here, so treat it primarily as an area-damage cast.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Room/area cast affecting enemies in the current location.
+Best used when multiple enemies are stacked in one room and you need immediate room-wide pressure.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Powerful when enemies are grouped.
+Bad use case: single-target encounters where focused one-target spells are usually more efficient.
 #0
 
 FORCE-GRASP
@@ -5004,22 +5032,23 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Projects large-scale battlefield magic to pressure multiple enemies.
+Room-wide offensive spell that affects enemies in your current room.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-Deals area damage and/or establishes room-wide effects that influence positioning.
+Applies burst damage across multiple enemies. Save outcome and secondary riders are not documented here, so treat it primarily as an area-damage cast.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Room/area cast affecting enemies in the current location.
+Best used when multiple enemies are stacked in one room and you need immediate room-wide pressure.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Powerful when enemies are grouped.
+Bad use case: single-target encounters where focused one-target spells are usually more efficient.
+
 #0
 
 FATAL-STRIKE
@@ -5073,7 +5102,7 @@ Self buff that improves spell-save performance.
 ----------------------------------------
 Effect
 ----------------------------------------
-Applies APPLY_SAVING_SPELL -3 for medium duration (improved resistance to hostile magic).
+Applies APPLY_SAVING_SPELL -3 for medium duration (improved resistance to enemy spell effects).
 
 ----------------------------------------
 Usage
