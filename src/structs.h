@@ -1116,6 +1116,7 @@ struct player_special_data
   char *host;            /**< Resolved hostname, or ip, for player. */
   int buildwalk_sector;  /**< Default sector type for buildwalk */
   int spell_cooldowns[MAX_SKILLS + 1]; /**< Per-spell round cooldown timers (runtime only). */
+  time_t study_cooldown_until; /**< Real-time study throttle (runtime only). */
   int hp_last_round;     /**< HP snapshot from previous combat round for chrono effects. */
 };
 

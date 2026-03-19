@@ -1333,6 +1333,7 @@ int enter_player_game (struct descriptor_data *d)
   room_vnum load_room;
 
   reset_char(d->character);
+  GET_STUDY_COOLDOWN_UNTIL(d->character) = 0;
 
   if (PLR_FLAGGED(d->character, PLR_INVSTART))
     GET_INVIS_LEV(d->character) = GET_LEVEL(d->character);
