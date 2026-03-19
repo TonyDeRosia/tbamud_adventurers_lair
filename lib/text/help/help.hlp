@@ -1728,35 +1728,22 @@ Powerful when enemies are grouped.
 #0
 
 MIASMA
-----------------------------------------
-Name
-----------------------------------------
 Miasma
+Type: Spell
 
-----------------------------------------
-Type
-----------------------------------------
-Spell
+Description:
+Miasma saturates the battlefield with toxic shadow haze that weakens enemy positioning and endurance.
 
-----------------------------------------
-Description
-----------------------------------------
-Channels arcane power to produce a direct combat or utility outcome.
+Effect:
+Room-control spell. Used as hostile environmental pressure and commonly paired with other area-control magic.
 
-----------------------------------------
-Effect
-----------------------------------------
-Commonly deals magical damage and/or applies a short-lived status effect.
+Usage:
+Combat spell affecting enemies in your current room.
 
-----------------------------------------
-Usage
-----------------------------------------
-Usually cast on self, a target, or enemies in your room depending on spell rules.
+Practical Notes:
+Best used to force movement and punish teams that stay stacked in one room. Combine with Domain Break awareness so your side can control when room effects stay up or get cleared.
 
-----------------------------------------
-Notes
-----------------------------------------
-Observe target saves and resistances for best results.
+See also: TOXIC-CLOUD DOMAIN-BREAK SHADOW-DOMAIN WALL-OF-FIRE SPELLS SKILLS
 #0
 
 TOXIC-CLOUD
@@ -2240,35 +2227,22 @@ Observe target saves and resistances for best results.
 #0
 
 BEAR-SPIRIT
-----------------------------------------
-Name
-----------------------------------------
 Bear Spirit
+Type: Spell
 
-----------------------------------------
-Type
-----------------------------------------
-Spell
+Description:
+Bear Spirit calls a defensive spirit aspect onto the caster, hardening you for front-line fighting.
 
-----------------------------------------
-Description
-----------------------------------------
-Channels the Bear Spirit to harden your body for front-line combat.
+Effect:
+Buff / protection. This spell applies a durability-focused spirit stance intended to reduce incoming pressure over sustained fights.
 
-----------------------------------------
-Effect
-----------------------------------------
-Applies a defensive spirit buff that improves survivability and durability.
+Usage:
+Self-cast combat buff. Cast before engaging or when you expect heavy melee damage.
 
-----------------------------------------
-Usage
-----------------------------------------
-Self-targeted buff. Cast before engaging heavy melee opponents.
+Practical Notes:
+Use this as your default spirit stance when survivability matters more than burst damage. It pairs well with pulls, tanking, and attrition fights.
 
-----------------------------------------
-Notes
-----------------------------------------
-Best for tanking or holding aggro in difficult fights.
+See also: WOLF-SPIRIT TIGER-SPIRIT EAGLE-SPIRIT DRAGON-SPIRIT SPELLS SKILLS
 #0
 
 WOLF-SPIRIT
@@ -3456,35 +3430,22 @@ Use to stabilize dangerous moments or set up follow-up abilities.
 #0
 
 BLACK-LANCE BLACKLANCE
-----------------------------------------
-Name
-----------------------------------------
 Black Lance
+Type: Spell
 
-----------------------------------------
-Type
-----------------------------------------
-Spell
+Description:
+You form a concentrated lance of shadow and drive it through a single enemy.
 
-----------------------------------------
-Description
-----------------------------------------
-Channels arcane power to produce a direct combat or utility outcome.
+Effect:
+Damage + debuff. Deals shadow damage (reduced on save); on a failed save it also corrodes the target, worsening armor class for a short time.
 
-----------------------------------------
-Effect
-----------------------------------------
-Commonly deals magical damage and/or applies a short-lived status effect.
+Usage:
+Enemy-targeted offensive spell in combat.
 
-----------------------------------------
-Usage
-----------------------------------------
-Usually cast on self, a target, or enemies in your room depending on spell rules.
+Practical Notes:
+Black Lance is a strong opener for physical follow-up because the corrosion debuff makes later hits connect harder. Use it early in focused single-target pressure.
 
-----------------------------------------
-Notes
-----------------------------------------
-Observe target saves and resistances for best results.
+See also: SHADOW-LANCE OBLIVION-SPEAR MUTILATE SPELLS SKILLS
 #0
 
 REALITY-SLASH
@@ -4224,35 +4185,22 @@ Observe target saves and resistances for best results.
 #0
 
 BODY-OF-EFFULGENT-BERYL EFFULGENT-BERYL EFFULGENT BERYL
-----------------------------------------
-Name
-----------------------------------------
 Body of Effulgent Beryl
+Type: Spell
 
-----------------------------------------
-Type
-----------------------------------------
-Spell
+Description:
+Your body crystallizes into radiant beryl, reinforcing your defenses with a sustained magical shell.
 
-----------------------------------------
-Description
-----------------------------------------
-Channels arcane power to produce a direct combat or utility outcome.
+Effect:
+Buff / protection. Grants a medium-duration armor-class improvement (better AC) and marks the effect as an active defensive state.
 
-----------------------------------------
-Effect
-----------------------------------------
-Commonly deals magical damage and/or applies a short-lived status effect.
+Usage:
+Self-cast defensive buff. Best used before entering sustained combat or when expecting focused pressure.
 
-----------------------------------------
-Usage
-----------------------------------------
-Usually cast on self, a target, or enemies in your room depending on spell rules.
+Practical Notes:
+This is a clean, reliable defensive layer for difficult encounters. Refresh it between fights to keep your baseline durability high.
 
-----------------------------------------
-Notes
-----------------------------------------
-Observe target saves and resistances for best results.
+See also: SHADOW-ARMOR CRYSTAL-BODY ARMOR SANCTUARY SPELLS SKILLS
 #0
 
 VERMILION-NOVA
@@ -4864,35 +4812,22 @@ Combine with burst abilities while the target is constrained.
 #0
 
 SHADOW-EXTRACTION SHADOWEXTRACTION EXTRACTION
-----------------------------------------
-Name
-----------------------------------------
 Shadow Extraction
+Type: Spell
 
-----------------------------------------
-Type
-----------------------------------------
-Spell
+Description:
+You extract shadow essence from a corpse in the room, turning the fallen into resources for your monarch toolkit.
 
-----------------------------------------
-Description
-----------------------------------------
-Tears shadow essence from the target to fuel your side.
+Effect:
+Summon / corpse utility. Consumes a corpse object and converts it into shadow-side advantage, enabling follow-up shadow-summon progression.
 
-----------------------------------------
-Effect
-----------------------------------------
-Deals shadow-aligned impact while producing additional advantage.
+Usage:
+Cast on a corpse in your current room.
 
-----------------------------------------
-Usage
-----------------------------------------
-Single-target offensive cast.
+Practical Notes:
+Shadow Extraction is setup magic: use it between kills to prepare for Arise-style summons and sustained shadow pressure in the next engagement.
 
-----------------------------------------
-Notes
-----------------------------------------
-Synergizes with shadow servant and domination-style abilities.
+See also: ARISE-GREATER CALL-SHADOW-LEGION MONARCHS-AUTHORITY SPELLS SKILLS
 #0
 
 ARISE-GREATER
@@ -5472,99 +5407,60 @@ Use before engagement for best value.
 #0
 
 TOTAL-OCCULTATION OCCULTATION TOTALOCCULTATION
-----------------------------------------
-Name
-----------------------------------------
 Total Occultation
+Type: Spell
 
-----------------------------------------
-Type
-----------------------------------------
-Spell
+Description:
+You completely conceal yourself in shadow, dropping from normal sight.
 
-----------------------------------------
-Description
-----------------------------------------
-Grants a beneficial spell effect that improves your combat readiness.
+Effect:
+Buff / concealment. Applies both invisibility and hide effects for a short duration.
 
-----------------------------------------
-Effect
-----------------------------------------
-Applies one or more buffs such as defense, accuracy, resistance, or utility depending on the ability.
+Usage:
+Self-cast only. Use before repositioning, disengaging, scouting, or setting up an opening.
 
-----------------------------------------
-Usage
-----------------------------------------
-Primarily self-targeted (or cast on an ally when allowed).
+Practical Notes:
+Total Occultation is strongest when used proactively. Damage-over-time fields and careless movement can still expose you, so combine it with clean pathing and timing.
 
-----------------------------------------
-Notes
-----------------------------------------
-Use before engagement for best value.
+See also: SHADOW-STEP PERFECT-UNKNOWABLE HIDE INVISIBLE SPELLS SKILLS
 #0
 
 DOMAIN-BREAK DOMAIN DOMAINBREAK
-----------------------------------------
-Name
-----------------------------------------
 Domain Break
+Type: Spell
 
-----------------------------------------
-Type
-----------------------------------------
-Spell
+Description:
+Domain Break tears down active hostile room fields so your group can fight on neutral ground.
 
-----------------------------------------
-Description
-----------------------------------------
-Projects large-scale battlefield magic to pressure multiple enemies.
+Effect:
+Utility / control. The spell removes one dominant room effect in priority order, including Shadow Domain, Null Field, Silence Field, Toxic Cloud, Miasma, Wall of Fire, and Static Field.
 
-----------------------------------------
-Effect
-----------------------------------------
-Deals area damage and/or establishes room-wide effects that influence positioning.
+Usage:
+Room-targeted utility cast (no direct victim). Cast in the room where the field is active.
 
-----------------------------------------
-Usage
-----------------------------------------
-Room/area cast affecting enemies in the current location.
+Practical Notes:
+This is a counter-field tool, not a damage spell. Fire it early when enemy room control goes up; if no eligible field exists, the spell reports that there is nothing to break.
 
-----------------------------------------
-Notes
-----------------------------------------
-Powerful when enemies are grouped.
+See also: SHADOW-DOMAIN NULL-FIELD SILENCE-FIELD TOXIC-CLOUD MIASMA SPELLS SKILLS
 #0
 
 HUNTERS-INSTINCT HUNTER INSTINCT
-----------------------------------------
-Name
-----------------------------------------
 Hunters Instinct
+Type: Spell
 
-----------------------------------------
-Type
-----------------------------------------
-Spell
+Description:
+Hunters Instinct sharpens predatory focus, improving your ability to land attacks while resisting hostile spell pressure.
 
-----------------------------------------
-Description
-----------------------------------------
-Grants a beneficial spell effect that improves your combat readiness.
+Effect:
+Buff. Grants hitroll and improves spell-save performance for a medium duration.
 
-----------------------------------------
-Effect
-----------------------------------------
-Applies one or more buffs such as defense, accuracy, resistance, or utility depending on the ability.
+Usage:
+Self-cast combat buff.
 
-----------------------------------------
-Usage
-----------------------------------------
-Primarily self-targeted (or cast on an ally when allowed).
+Practical Notes:
+Excellent pre-fight maintenance for duel or skirmish play. Cast before engaging evasive or caster-heavy enemies to stabilize your accuracy and survivability.
 
-----------------------------------------
-Notes
-----------------------------------------
-Use before engagement for best value.
+See also: ASSASSINS-INTENT DETECT-KILL-INTENT BLOODLUST SPELLS SKILLS
 #0
 
 
@@ -6115,35 +6011,22 @@ Best used with class synergies and careful timing.
 #0
 
 APPRAISE-ENEMY APPRAISE APPRAISE-FOE
-----------------------------------------
-Name
-----------------------------------------
 Appraise Enemy
+Type: Skill
 
-----------------------------------------
-Type
-----------------------------------------
-Skill
+Description:
+Appraise Enemy is an active command skill that reads a visible opponent and reports practical combat intelligence.
 
-----------------------------------------
-Description
-----------------------------------------
-Studies an enemy to reveal practical combat information.
+Effect:
+Utility / scouting. On success it reveals target power band, condition, role, and status flags; stronger successes add offense/defense/magic threat readouts plus ward, resistance, weakness, and posture clues.
 
-----------------------------------------
-Effect
-----------------------------------------
-Provides actionable target insight for threat assessment and planning.
+Usage:
+Command-driven skill: APPRAISE <target>. Requires a visible target in room, costs movement, applies a short cooldown, and cannot be used on yourself.
 
-----------------------------------------
-Usage
-----------------------------------------
-Use on a visible target before or during combat.
+Practical Notes:
+Use this at the start of dangerous fights to choose the right opener. Re-appraise when conditions change (new buffs, debuffs, or reinforcements) to keep decisions accurate.
 
-----------------------------------------
-Notes
-----------------------------------------
-Excellent opener when deciding threat priority.
+See also: SCAN CONSIDER SKILLS SPELLS
 #0
 ! ^ !
 
@@ -6968,27 +6851,22 @@ See also: OLC, REDIT, MEDIT, OEDIT, ZEDIT, SEDIT, TRIGEDIT, AEDIT
 
 #0
 APPRAISE-ENEMY APPRAISE APPRAISE-FOE
-
 Appraise Enemy
 Type: Skill
-Category: Detection Skill
 
 Description:
-Evaluates a visible opponent to reveal practical combat-read information.
+Appraise Enemy is an active command skill that reads a visible opponent and reports practical combat intelligence.
 
 Effect:
-Provides target assessment data to help prioritize threats and choose safe engagements.
+Utility / scouting. On success it reveals target power band, condition, role, and status flags; stronger successes add offense/defense/magic threat readouts plus ward, resistance, weakness, and posture clues.
 
 Usage:
-Use the appraise command on a visible target.
+Command-driven skill: APPRAISE <target>. Requires a visible target in room, costs movement, applies a short cooldown, and cannot be used on yourself.
 
-Tactical Notes:
-Use before committing resources so you can select correct tactics early.
+Practical Notes:
+Use this at the start of dangerous fights to choose the right opener. Re-appraise when conditions change (new buffs, debuffs, or reinforcements) to keep decisions accurate.
 
-Limitations:
-Requires a valid visible target.
-
-See also: SPELLS SKILLS
+See also: SCAN CONSIDER SKILLS SPELLS
 #0
 ARCANE-WARD
 
@@ -7606,27 +7484,22 @@ Requires valid combat/target context and is subject to normal skill checks.
 See also: SPELLS SKILLS
 #0
 BEAR-SPIRIT
-
 Bear Spirit
 Type: Spell
-Category: Spirit Buff Spell
 
 Description:
-Calls the Bear Spirit to emphasize durability and front-line staying power.
+Bear Spirit calls a defensive spirit aspect onto the caster, hardening you for front-line fighting.
 
 Effect:
-Applies a spirit aspect tuned toward toughness and damage endurance.
+Buff / protection. This spell applies a durability-focused spirit stance intended to reduce incoming pressure over sustained fights.
 
 Usage:
-Cast on yourself before heavy incoming damage phases.
+Self-cast combat buff. Cast before engaging or when you expect heavy melee damage.
 
-Tactical Notes:
-Excellent for tanking, solo sustain, and surviving attrition encounters.
+Practical Notes:
+Use this as your default spirit stance when survivability matters more than burst damage. It pairs well with pulls, tanking, and attrition fights.
 
-Limitations:
-Self-targeted spirit stance; intended as a maintenance buff.
-
-See also: SPELLS SKILLS
+See also: WOLF-SPIRIT TIGER-SPIRIT EAGLE-SPIRIT DRAGON-SPIRIT SPELLS SKILLS
 #0
 BITVECTORS NOBITS BITS
 
@@ -7661,27 +7534,22 @@ Subject to normal casting constraints (position, valid target/context, and resou
 See also: SPELLS SKILLS
 #0
 BLACK-LANCE BLACKLANCE
-
 Black Lance
 Type: Spell
-Category: Offensive Spell
 
 Description:
-Condenses dark force into a focused killing lance.
+You form a concentrated lance of shadow and drive it through a single enemy.
 
 Effect:
-Deals concentrated single-target offensive pressure.
+Damage + debuff. Deals shadow damage (reduced on save); on a failed save it also corrodes the target, worsening armor class for a short time.
 
 Usage:
-Cast on an enemy in the room, especially your current combat target.
+Enemy-targeted offensive spell in combat.
 
-Tactical Notes:
-Use to start or finish focused target burst sequences.
+Practical Notes:
+Black Lance is a strong opener for physical follow-up because the corrosion debuff makes later hits connect harder. Use it early in focused single-target pressure.
 
-Limitations:
-Direct-target hostile spell; requires a valid enemy target.
-
-See also: SPELLS SKILLS
+See also: SHADOW-LANCE OBLIVION-SPEAR MUTILATE SPELLS SKILLS
 #0
 BLAST SHOOT RANGED-WEAPONS FIRE-WEAPONS BOWS QUIVERS MISSILES GUNS FIREARMS AMMO
 
@@ -7829,27 +7697,22 @@ BOATS SHIPS FERRY TRANSPORTSS
 
 #31
 BODY-OF-EFFULGENT-BERYL EFFULGENT-BERYL EFFULGENT BERYL
-
-Body Of Effulgent Beryl
+Body of Effulgent Beryl
 Type: Spell
-Category: Defensive Spell
 
 Description:
-Transforms the caster with crystalline reinforcement for extreme survivability.
+Your body crystallizes into radiant beryl, reinforcing your defenses with a sustained magical shell.
 
 Effect:
-Applies a major defensive state that improves durability against incoming pressure.
+Buff / protection. Grants a medium-duration armor-class improvement (better AC) and marks the effect as an active defensive state.
 
 Usage:
-Cast on yourself before entering dangerous sustained combat.
+Self-cast defensive buff. Best used before entering sustained combat or when expecting focused pressure.
 
-Tactical Notes:
-Excellent for surviving focus fire and long attrition windows.
+Practical Notes:
+This is a clean, reliable defensive layer for difficult encounters. Refresh it between fights to keep your baseline durability high.
 
-Limitations:
-Self-only defensive maintenance buff.
-
-See also: SPELLS SKILLS
+See also: SHADOW-ARMOR CRYSTAL-BODY ARMOR SANCTUARY SPELLS SKILLS
 #0
 BONE-PRISON
 
@@ -10283,27 +10146,22 @@ Subject to normal casting constraints (position, valid target/context, and resou
 See also: SPELLS SKILLS
 #0
 DOMAIN-BREAK DOMAIN DOMAINBREAK
-
 Domain Break
 Type: Spell
-Category: Room Effect Spell
 
 Description:
-Domain Break is a room effect spell available in the live ability table.
+Domain Break tears down active hostile room fields so your group can fight on neutral ground.
 
 Effect:
-Establishes a persistent room-wide effect that alters positioning, pressure, and survivability while active.
+Utility / control. The spell removes one dominant room effect in priority order, including Shadow Domain, Null Field, Silence Field, Toxic Cloud, Miasma, Wall of Fire, and Static Field.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Room-targeted utility cast (no direct victim). Cast in the room where the field is active.
 
-Tactical Notes:
-Cast early to shape terrain advantage before enemies stabilize.
+Practical Notes:
+This is a counter-field tool, not a damage spell. Fire it early when enemy room control goes up; if no eligible field exists, the spell reports that there is nothing to break.
 
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
-
-See also: SPELLS SKILLS
+See also: SHADOW-DOMAIN NULL-FIELD SILENCE-FIELD TOXIC-CLOUD MIASMA SPELLS SKILLS
 #0
 DOMINION-OF-SHADOWS
 
@@ -12792,27 +12650,22 @@ Enter choice :
 See Also: HSEDIT, SHOW-HOUSES
 #31
 HUNTERS-INSTINCT HUNTER INSTINCT
-
 Hunters Instinct
 Type: Spell
-Category: Utility Spell
 
 Description:
-Hunters Instinct is a utility spell available in the live ability table.
+Hunters Instinct sharpens predatory focus, improving your ability to land attacks while resisting hostile spell pressure.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+Buff. Grants hitroll and improves spell-save performance for a medium duration.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Self-cast combat buff.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
+Practical Notes:
+Excellent pre-fight maintenance for duel or skirmish play. Cast before engaging evasive or caster-heavy enemies to stabilize your accuracy and survivability.
 
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
-
-See also: SPELLS SKILLS
+See also: ASSASSINS-INTENT DETECT-KILL-INTENT BLOODLUST SPELLS SKILLS
 #0
 IA-SHUB-NIGGURATH
 
@@ -15021,27 +14874,22 @@ Examples: @RTSTAT 19596, 19595, 41@n
 See also: TRIGEDIT-MOB-BRIBE
 #31
 MIASMA
-
 Miasma
 Type: Spell
-Category: Utility Spell
 
 Description:
-Miasma is a utility spell available in the live ability table.
+Miasma saturates the battlefield with toxic shadow haze that weakens enemy positioning and endurance.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+Room-control spell. Used as hostile environmental pressure and commonly paired with other area-control magic.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Combat spell affecting enemies in your current room.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
+Practical Notes:
+Best used to force movement and punish teams that stay stacked in one room. Combine with Domain Break awareness so your side can control when room effects stay up or get cleared.
 
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
-
-See also: SPELLS SKILLS
+See also: TOXIC-CLOUD DOMAIN-BREAK SHADOW-DOMAIN WALL-OF-FIRE SPELLS SKILLS
 #0
 MIRROR-VEIL
 
@@ -19360,27 +19208,22 @@ Subject to normal casting constraints (position, valid target/context, and resou
 See also: SPELLS SKILLS
 #0
 SHADOW-EXTRACTION SHADOWEXTRACTION EXTRACTION
-
 Shadow Extraction
 Type: Spell
-Category: Summoning Spell
 
 Description:
-Rips shadow essence from the battlefield to fuel shadow-side momentum.
+You extract shadow essence from a corpse in the room, turning the fallen into resources for your monarch toolkit.
 
 Effect:
-Generates a shadow-aligned summon/combat advantage tied to necro-shadow play.
+Summon / corpse utility. Consumes a corpse object and converts it into shadow-side advantage, enabling follow-up shadow-summon progression.
 
 Usage:
-Cast during combat when you need additional field control from shadows.
+Cast on a corpse in your current room.
 
-Tactical Notes:
-Very strong in monarch/shadow compositions and summon-supported fights.
+Practical Notes:
+Shadow Extraction is setup magic: use it between kills to prepare for Arise-style summons and sustained shadow pressure in the next engagement.
 
-Limitations:
-Requires valid combat context and target conditions.
-
-See also: SPELLS SKILLS
+See also: ARISE-GREATER CALL-SHADOW-LEGION MONARCHS-AUTHORITY SPELLS SKILLS
 #0
 SHADOW-LANCE
 
@@ -21940,27 +21783,22 @@ toggles no longer control prompt output.
 See also: PROMPT, NOSHOUT, NOSUMM, NOTELL, QUEST, REPEAT, WIMP
 #0
 TOTAL-OCCULTATION OCCULTATION TOTALOCCULTATION
-
 Total Occultation
 Type: Spell
-Category: Utility Spell
 
 Description:
-Total Occultation is a utility spell available in the live ability table.
+You completely conceal yourself in shadow, dropping from normal sight.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+Buff / concealment. Applies both invisibility and hide effects for a short duration.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Self-cast only. Use before repositioning, disengaging, scouting, or setting up an opening.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
+Practical Notes:
+Total Occultation is strongest when used proactively. Damage-over-time fields and careless movement can still expose you, so combine it with clean pathing and timing.
 
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
-
-See also: SPELLS SKILLS
+See also: SHADOW-STEP PERFECT-UNKNOWABLE HIDE INVISIBLE SPELLS SKILLS
 #0
 TOXIC-CLOUD
 
