@@ -1,3 +1,4 @@
+
 CLONE
 ----------------------------------------
 Name
@@ -12,23 +13,24 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Clone is a spell defined by SPELL_CLONE in the live ability table.
+Channels arcane power to produce a direct combat or utility outcome.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability summons creatures or entities.
+Commonly deals magical damage and/or applies a short-lived status effect.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target no direct target; it resolves through a self/room/system code path. You must be standing or better to cast it.
+Usually cast on self, a target, or enemies in your room depending on spell rules.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Observe target saves and resistances for best results.
 #0
+
 CORRUPTION
 ----------------------------------------
 Name
@@ -43,22 +45,22 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Corruption is a spell defined by SPELL_CORRUPTION in the live ability table.
+Channels arcane power to produce a direct combat or utility outcome.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability uses a dedicated code path in the spell system. It also runs custom manual logic for spell-specific behavior.
+Commonly deals magical damage and/or applies a short-lived status effect.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target a character in your room, your current combat target. You must be fighting or better to cast it. It is flagged violent, so peaceful-room and self-target restrictions apply.
+Usually cast on self, a target, or enemies in your room depending on spell rules.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Observe target saves and resistances for best results.
 #0
 
 GROUP-HEAL
@@ -92,6 +94,7 @@ Notes
 ----------------------------------------
 Critical for sustain during prolonged fights.
 #0
+
 ARCANE-WARD
 ----------------------------------------
 Name
@@ -106,23 +109,24 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Arcane Ward is a spell defined by SPELL_ARCANE_WARD in the live ability table.
+Grants a beneficial spell effect that improves your combat readiness.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability applies an ongoing status effect.
+Applies one or more buffs such as defense, accuracy, resistance, or utility depending on the ability.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target a character in your room, yourself only. You must be standing or better to cast it.
+Primarily self-targeted (or cast on an ally when allowed).
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Use before engagement for best value.
 #0
+
 EVASION
 ----------------------------------------
 Name
@@ -137,23 +141,24 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Evasion is a spell defined by SPELL_EVASION in the live ability table.
+Channels arcane power to produce a direct combat or utility outcome.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability applies an ongoing status effect.
+Commonly deals magical damage and/or applies a short-lived status effect.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target a character in your room, yourself only. You must be standing or better to cast it.
+Usually cast on self, a target, or enemies in your room depending on spell rules.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Observe target saves and resistances for best results.
 #0
+
 IRONSKIN
 ----------------------------------------
 Name
@@ -168,23 +173,24 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Ironskin is a spell defined by SPELL_IRONSKIN in the live ability table.
+Grants a beneficial spell effect that improves your combat readiness.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability applies an ongoing status effect.
+Applies one or more buffs such as defense, accuracy, resistance, or utility depending on the ability.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target a character in your room, yourself only. You must be standing or better to cast it.
+Primarily self-targeted (or cast on an ally when allowed).
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Use before engagement for best value.
 #0
+
 DIVINE-BULWARK
 ----------------------------------------
 Name
@@ -199,23 +205,24 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Divine Bulwark is a spell defined by SPELL_DIVINE_BULWARK in the live ability table.
+Grants a beneficial spell effect that improves your combat readiness.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability applies an ongoing status effect.
+Applies one or more buffs such as defense, accuracy, resistance, or utility depending on the ability.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target a character in your room, yourself only. You must be standing or better to cast it.
+Primarily self-targeted (or cast on an ally when allowed).
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Use before engagement for best value.
 #0
+
 SONG-OF-RESILIENCE
 ----------------------------------------
 Name
@@ -230,23 +237,24 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Song of Resilience is a spell defined by SPELL_SONG_OF_RESILIENCE in the live ability table.
+Channels arcane power to produce a direct combat or utility outcome.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability applies an ongoing status effect.
+Commonly deals magical damage and/or applies a short-lived status effect.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target a character in your room. You must be standing or better to cast it.
+Usually cast on self, a target, or enemies in your room depending on spell rules.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Observe target saves and resistances for best results.
 #0
+
 DARK-AEGIS
 ----------------------------------------
 Name
@@ -261,23 +269,24 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Dark Aegis is a spell defined by SPELL_DARK_AEGIS in the live ability table.
+Grants a beneficial spell effect that improves your combat readiness.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability applies an ongoing status effect.
+Applies one or more buffs such as defense, accuracy, resistance, or utility depending on the ability.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target a character in your room, yourself only. You must be standing or better to cast it.
+Primarily self-targeted (or cast on an ally when allowed).
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Use before engagement for best value.
 #0
+
 NIRVANA
 ----------------------------------------
 Name
@@ -292,23 +301,24 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Nirvana is a spell defined by SPELL_NIRVANA in the live ability table.
+Grants a beneficial spell effect that improves your combat readiness.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability applies an ongoing status effect.
+Applies one or more buffs such as defense, accuracy, resistance, or utility depending on the ability.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target a character in your room, yourself only. You must be standing or better to cast it.
+Primarily self-targeted (or cast on an ally when allowed).
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Use before engagement for best value.
 #0
+
 PLAGUE-BOLT
 ----------------------------------------
 Name
@@ -323,23 +333,24 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Plague Bolt is a spell defined by SPELL_PLAGUE_BOLT in the live ability table.
+Channels arcane power to produce a direct combat or utility outcome.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability uses a dedicated code path in the spell system. It also runs custom manual logic for spell-specific behavior.
+Commonly deals magical damage and/or applies a short-lived status effect.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target a character in your room, your current combat target. You must be fighting or better to cast it. It is flagged violent, so peaceful-room and self-target restrictions apply.
+Usually cast on self, a target, or enemies in your room depending on spell rules.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Observe target saves and resistances for best results.
 #0
+
 ENFEEBLEMENT
 ----------------------------------------
 Name
@@ -354,22 +365,22 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Enfeeblement is a spell defined by SPELL_ENFEEBLEMENT in the live ability table.
+Channels arcane power to produce a direct combat or utility outcome.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability uses a dedicated code path in the spell system. It also runs custom manual logic for spell-specific behavior.
+Commonly deals magical damage and/or applies a short-lived status effect.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target a character in your room, your current combat target, not yourself. You must be fighting or better to cast it. It is flagged violent, so peaceful-room and self-target restrictions apply.
+Usually cast on self, a target, or enemies in your room depending on spell rules.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Observe target saves and resistances for best results.
 #0
 
 MEMENTO-MORI
@@ -403,6 +414,7 @@ Notes
 ----------------------------------------
 Excellent setup before execute-style follow-up spells.
 #0
+
 DEVOUR-SOUL
 ----------------------------------------
 Name
@@ -417,23 +429,24 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Devour Soul is a spell defined by SPELL_DEVOUR_SOUL in the live ability table.
+Channels arcane power to produce a direct combat or utility outcome.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability uses a dedicated code path in the spell system. It also runs custom manual logic for spell-specific behavior.
+Commonly deals magical damage and/or applies a short-lived status effect.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target a character in your room, your current combat target. You must be fighting or better to cast it. It is flagged violent, so peaceful-room and self-target restrictions apply.
+Usually cast on self, a target, or enemies in your room depending on spell rules.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Observe target saves and resistances for best results.
 #0
+
 FIREBOLT
 ----------------------------------------
 Name
@@ -448,23 +461,24 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Firebolt is a spell defined by SPELL_FIREBOLT in the live ability table.
+Channels arcane power to produce a direct combat or utility outcome.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability deals direct magical damage.
+Commonly deals magical damage and/or applies a short-lived status effect.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target a character in your room, your current combat target. You must be fighting or better to cast it. It is flagged violent, so peaceful-room and self-target restrictions apply.
+Usually cast on self, a target, or enemies in your room depending on spell rules.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Observe target saves and resistances for best results.
 #0
+
 FLAME-ARROW
 ----------------------------------------
 Name
@@ -479,23 +493,24 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Flame Arrow is a spell defined by SPELL_FLAME_ARROW in the live ability table.
+Channels arcane power to produce a direct combat or utility outcome.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability deals direct magical damage; applies an ongoing status effect.
+Commonly deals magical damage and/or applies a short-lived status effect.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target a character in your room, your current combat target. You must be fighting or better to cast it. It is flagged violent, so peaceful-room and self-target restrictions apply.
+Usually cast on self, a target, or enemies in your room depending on spell rules.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Observe target saves and resistances for best results.
 #0
+
 FROSTBITE
 ----------------------------------------
 Name
@@ -510,23 +525,24 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Frostbite is a spell defined by SPELL_FROSTBITE in the live ability table.
+Channels arcane power to produce a direct combat or utility outcome.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability deals direct magical damage; applies an ongoing status effect.
+Commonly deals magical damage and/or applies a short-lived status effect.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target a character in your room, your current combat target. You must be fighting or better to cast it. It is flagged violent, so peaceful-room and self-target restrictions apply.
+Usually cast on self, a target, or enemies in your room depending on spell rules.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Observe target saves and resistances for best results.
 #0
+
 VOLTAIC-BOLT
 ----------------------------------------
 Name
@@ -541,22 +557,22 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Voltaic Bolt is a spell defined by SPELL_VOLTAIC_BOLT in the live ability table.
+Channels arcane power to produce a direct combat or utility outcome.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability deals direct magical damage; applies an ongoing status effect.
+Commonly deals magical damage and/or applies a short-lived status effect.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target a character in your room, your current combat target. You must be fighting or better to cast it. It is flagged violent, so peaceful-room and self-target restrictions apply.
+Usually cast on self, a target, or enemies in your room depending on spell rules.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Observe target saves and resistances for best results.
 #0
 
 ACID-BLAST
@@ -590,6 +606,7 @@ Notes
 ----------------------------------------
 Powerful when enemies are grouped.
 #0
+
 SHADOW-BOLT
 ----------------------------------------
 Name
@@ -604,23 +621,24 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Shadow Bolt is a spell defined by SPELL_SHADOW_BOLT in the live ability table.
+Channels arcane power to produce a direct combat or utility outcome.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability deals direct magical damage.
+Commonly deals magical damage and/or applies a short-lived status effect.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target a character in your room, your current combat target. You must be fighting or better to cast it. It is flagged violent, so peaceful-room and self-target restrictions apply.
+Usually cast on self, a target, or enemies in your room depending on spell rules.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Observe target saves and resistances for best results.
 #0
+
 VAMPIRIC-TOUCH
 ----------------------------------------
 Name
@@ -635,23 +653,24 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Vampiric Touch is a spell defined by SPELL_VAMPIRIC_TOUCH in the live ability table.
+Channels arcane power to produce a direct combat or utility outcome.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability uses a dedicated code path in the spell system. It also runs custom manual logic for spell-specific behavior.
+Commonly deals magical damage and/or applies a short-lived status effect.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target a character in your room, your current combat target. You must be fighting or better to cast it. It is flagged violent, so peaceful-room and self-target restrictions apply.
+Usually cast on self, a target, or enemies in your room depending on spell rules.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Observe target saves and resistances for best results.
 #0
+
 WEB
 ----------------------------------------
 Name
@@ -666,22 +685,22 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Web is a spell defined by SPELL_WEB in the live ability table.
+Channels arcane power to produce a direct combat or utility outcome.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability applies an ongoing status effect.
+Commonly deals magical damage and/or applies a short-lived status effect.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target a character in your room, your current combat target, not yourself. You must be fighting or better to cast it. It is flagged violent, so peaceful-room and self-target restrictions apply.
+Usually cast on self, a target, or enemies in your room depending on spell rules.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Observe target saves and resistances for best results.
 #0
 
 SILENCE
@@ -747,6 +766,7 @@ Notes
 ----------------------------------------
 Combine with burst abilities while the target is constrained.
 #0
+
 TRUE-SEEING
 ----------------------------------------
 Name
@@ -761,23 +781,24 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-True Seeing is a spell defined by SPELL_TRUE_SEEING in the live ability table.
+Grants a beneficial spell effect that improves your combat readiness.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability applies an ongoing status effect.
+Applies one or more buffs such as defense, accuracy, resistance, or utility depending on the ability.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target a character in your room, yourself only. You must be standing or better to cast it.
+Primarily self-targeted (or cast on an ally when allowed).
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Use before engagement for best value.
 #0
+
 STONE-SKIN
 ----------------------------------------
 Name
@@ -792,23 +813,24 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Stone Skin is a spell defined by SPELL_STONE_SKIN in the live ability table.
+Grants a beneficial spell effect that improves your combat readiness.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability applies an ongoing status effect.
+Applies one or more buffs such as defense, accuracy, resistance, or utility depending on the ability.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target a character in your room. You must be standing or better to cast it.
+Primarily self-targeted (or cast on an ally when allowed).
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Use before engagement for best value.
 #0
+
 BARKSKIN
 ----------------------------------------
 Name
@@ -823,23 +845,24 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Barkskin is a spell defined by SPELL_BARKSKIN in the live ability table.
+Grants a beneficial spell effect that improves your combat readiness.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability applies an ongoing status effect.
+Applies one or more buffs such as defense, accuracy, resistance, or utility depending on the ability.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target a character in your room. You must be standing or better to cast it.
+Primarily self-targeted (or cast on an ally when allowed).
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Use before engagement for best value.
 #0
+
 GIANT-STRENGTH
 ----------------------------------------
 Name
@@ -854,23 +877,24 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Giant Strength is a spell defined by SPELL_GIANT_STRENGTH in the live ability table.
+Channels arcane power to produce a direct combat or utility outcome.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability applies an ongoing status effect.
+Commonly deals magical damage and/or applies a short-lived status effect.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target a character in your room. You must be standing or better to cast it.
+Usually cast on self, a target, or enemies in your room depending on spell rules.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Observe target saves and resistances for best results.
 #0
+
 ADRENALINE-SURGE
 ----------------------------------------
 Name
@@ -885,23 +909,24 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Adrenaline Surge is a spell defined by SPELL_ADRENALINE_SURGE in the live ability table.
+Channels arcane power to produce a direct combat or utility outcome.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability applies an ongoing status effect.
+Commonly deals magical damage and/or applies a short-lived status effect.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target a character in your room, yourself only. You must be standing or better to cast it.
+Usually cast on self, a target, or enemies in your room depending on spell rules.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Observe target saves and resistances for best results.
 #0
+
 CLARITY
 ----------------------------------------
 Name
@@ -916,22 +941,22 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Clarity is a spell defined by SPELL_CLARITY in the live ability table.
+Grants a beneficial spell effect that improves your combat readiness.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability applies an ongoing status effect.
+Applies one or more buffs such as defense, accuracy, resistance, or utility depending on the ability.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target a character in your room. You must be standing or better to cast it.
+Primarily self-targeted (or cast on an ally when allowed).
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Use before engagement for best value.
 #0
 
 MARK-OF-DEATH
@@ -965,6 +990,7 @@ Notes
 ----------------------------------------
 Combine with burst abilities while the target is constrained.
 #0
+
 BLOODLUST
 ----------------------------------------
 Name
@@ -979,22 +1005,22 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Bloodlust is a spell defined by SPELL_BLOODLUST in the live ability table.
+Channels arcane power to produce a direct combat or utility outcome.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability applies an ongoing status effect.
+Commonly deals magical damage and/or applies a short-lived status effect.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target a character in your room, yourself only. You must be standing or better to cast it.
+Usually cast on self, a target, or enemies in your room depending on spell rules.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Observe target saves and resistances for best results.
 #0
 
 GREATER-HEAL
@@ -1060,6 +1086,7 @@ Notes
 ----------------------------------------
 Critical for sustain during prolonged fights.
 #0
+
 DISRUPT
 ----------------------------------------
 Name
@@ -1074,23 +1101,24 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Disrupt is a spell defined by SPELL_DISRUPT in the live ability table.
+Channels arcane power to produce a direct combat or utility outcome.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability deals direct magical damage; applies an ongoing status effect.
+Commonly deals magical damage and/or applies a short-lived status effect.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target a character in your room, your current combat target, not yourself. You must be fighting or better to cast it. It is flagged violent, so peaceful-room and self-target restrictions apply.
+Usually cast on self, a target, or enemies in your room depending on spell rules.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Observe target saves and resistances for best results.
 #0
+
 ANTIMAGIC-SHELL
 ----------------------------------------
 Name
@@ -1105,23 +1133,24 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Antimagic Shell is a spell defined by SPELL_ANTIMAGIC_SHELL in the live ability table.
+Channels arcane power to produce a direct combat or utility outcome.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability applies an ongoing status effect.
+Commonly deals magical damage and/or applies a short-lived status effect.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target a character in your room. You must be standing or better to cast it.
+Usually cast on self, a target, or enemies in your room depending on spell rules.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Observe target saves and resistances for best results.
 #0
+
 ENCHANTERS-FOCUS
 ----------------------------------------
 Name
@@ -1136,22 +1165,22 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Enchanters Focus is a spell defined by SPELL_ENCHANTERS_FOCUS in the live ability table.
+Grants a beneficial spell effect that improves your combat readiness.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability applies an ongoing status effect.
+Applies one or more buffs such as defense, accuracy, resistance, or utility depending on the ability.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target a character in your room, yourself only. You must be standing or better to cast it.
+Primarily self-targeted (or cast on an ally when allowed).
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Use before engagement for best value.
 #0
 
 TIME-SNARE
@@ -1217,6 +1246,7 @@ Notes
 ----------------------------------------
 Strong answer to burst-heavy enemy pressure.
 #0
+
 MIRROR-VEIL
 ----------------------------------------
 Name
@@ -1231,23 +1261,24 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Mirror Veil is a spell defined by SPELL_MIRROR_VEIL in the live ability table.
+Grants a beneficial spell effect that improves your combat readiness.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability applies an ongoing status effect.
+Applies one or more buffs such as defense, accuracy, resistance, or utility depending on the ability.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target a character in your room. You must be standing or better to cast it.
+Primarily self-targeted (or cast on an ally when allowed).
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Use before engagement for best value.
 #0
+
 ELEMENTAL-WARD-FIRE
 ----------------------------------------
 Name
@@ -1262,23 +1293,24 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Elemental Ward Fire is a spell defined by SPELL_ELEMENTAL_WARD_FIRE in the live ability table.
+Grants a beneficial spell effect that improves your combat readiness.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability applies an ongoing status effect.
+Applies one or more buffs such as defense, accuracy, resistance, or utility depending on the ability.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target a character in your room. You must be standing or better to cast it.
+Primarily self-targeted (or cast on an ally when allowed).
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Use before engagement for best value.
 #0
+
 ELEMENTAL-WARD-COLD
 ----------------------------------------
 Name
@@ -1293,23 +1325,24 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Elemental Ward Cold is a spell defined by SPELL_ELEMENTAL_WARD_COLD in the live ability table.
+Grants a beneficial spell effect that improves your combat readiness.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability applies an ongoing status effect.
+Applies one or more buffs such as defense, accuracy, resistance, or utility depending on the ability.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target a character in your room. You must be standing or better to cast it.
+Primarily self-targeted (or cast on an ally when allowed).
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Use before engagement for best value.
 #0
+
 ELEMENTAL-WARD-LIGHTNING
 ----------------------------------------
 Name
@@ -1324,23 +1357,24 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Elemental Ward Lightning is a spell defined by SPELL_ELEMENTAL_WARD_LIGHTNING in the live ability table.
+Grants a beneficial spell effect that improves your combat readiness.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability applies an ongoing status effect.
+Applies one or more buffs such as defense, accuracy, resistance, or utility depending on the ability.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target a character in your room. You must be standing or better to cast it.
+Primarily self-targeted (or cast on an ally when allowed).
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Use before engagement for best value.
 #0
+
 ELEMENTAL-WARD-ACID
 ----------------------------------------
 Name
@@ -1355,23 +1389,24 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Elemental Ward Acid is a spell defined by SPELL_ELEMENTAL_WARD_ACID in the live ability table.
+Grants a beneficial spell effect that improves your combat readiness.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability applies an ongoing status effect.
+Applies one or more buffs such as defense, accuracy, resistance, or utility depending on the ability.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target a character in your room. You must be standing or better to cast it.
+Primarily self-targeted (or cast on an ally when allowed).
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Use before engagement for best value.
 #0
+
 COUNTERSPELL
 ----------------------------------------
 Name
@@ -1386,23 +1421,24 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Counterspell is a spell defined by SPELL_COUNTERSPELL in the live ability table.
+Channels arcane power to produce a direct combat or utility outcome.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability uses a dedicated code path in the spell system. It also runs custom manual logic for spell-specific behavior.
+Commonly deals magical damage and/or applies a short-lived status effect.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target a character in your room, your current combat target, not yourself. You must be fighting or better to cast it. It is flagged violent, so peaceful-room and self-target restrictions apply.
+Usually cast on self, a target, or enemies in your room depending on spell rules.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Observe target saves and resistances for best results.
 #0
+
 SPELL-STEAL
 ----------------------------------------
 Name
@@ -1417,23 +1453,24 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Spell Steal is a spell defined by SPELL_SPELL_STEAL in the live ability table.
+A combat technique executed through skill rather than spellcasting.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability uses a dedicated code path in the spell system. It also runs custom manual logic for spell-specific behavior.
+Provides direct offensive pressure, control, or tactical engagement tools.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target a character in your room, your current combat target, not yourself. You must be fighting or better to cast it. It is flagged violent, so peaceful-room and self-target restrictions apply.
+Use as an active skill command against a target when conditions are met.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Timing and position significantly affect effectiveness.
 #0
+
 CANCELLATION
 ----------------------------------------
 Name
@@ -1448,22 +1485,22 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Cancellation is a spell defined by SPELL_CANCELLATION in the live ability table.
+Channels arcane power to produce a direct combat or utility outcome.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability uses a dedicated code path in the spell system. It also runs custom manual logic for spell-specific behavior.
+Commonly deals magical damage and/or applies a short-lived status effect.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target a character in your room, your current combat target, not yourself. You must be fighting or better to cast it. It is flagged violent, so peaceful-room and self-target restrictions apply.
+Usually cast on self, a target, or enemies in your room depending on spell rules.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Observe target saves and resistances for best results.
 #0
 
 HOLD-PERSON
@@ -1529,6 +1566,7 @@ Notes
 ----------------------------------------
 Combine with burst abilities while the target is constrained.
 #0
+
 CONFUSION
 ----------------------------------------
 Name
@@ -1543,23 +1581,24 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Confusion is a spell defined by SPELL_CONFUSION in the live ability table.
+Channels arcane power to produce a direct combat or utility outcome.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability applies an ongoing status effect.
+Commonly deals magical damage and/or applies a short-lived status effect.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target a character in your room, your current combat target, not yourself. You must be fighting or better to cast it. It is flagged violent, so peaceful-room and self-target restrictions apply.
+Usually cast on self, a target, or enemies in your room depending on spell rules.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Observe target saves and resistances for best results.
 #0
+
 VERTIGO
 ----------------------------------------
 Name
@@ -1574,22 +1613,22 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Vertigo is a spell defined by SPELL_VERTIGO in the live ability table.
+Channels arcane power to produce a direct combat or utility outcome.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability applies an ongoing status effect.
+Commonly deals magical damage and/or applies a short-lived status effect.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target a character in your room, your current combat target, not yourself. You must be fighting or better to cast it. It is flagged violent, so peaceful-room and self-target restrictions apply.
+Usually cast on self, a target, or enemies in your room depending on spell rules.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Observe target saves and resistances for best results.
 #0
 
 MASS-FEAR
@@ -1802,6 +1841,7 @@ Notes
 ----------------------------------------
 Powerful when enemies are grouped.
 #0
+
 CONSECRATE
 ----------------------------------------
 Name
@@ -1816,23 +1856,24 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Consecrate is a spell defined by SPELL_CONSECRATE in the live ability table.
+Channels arcane power to produce a direct combat or utility outcome.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability changes room-level conditions.
+Commonly deals magical damage and/or applies a short-lived status effect.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target no direct target; it resolves through a self/room/system code path. You must be standing or better to cast it.
+Usually cast on self, a target, or enemies in your room depending on spell rules.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Observe target saves and resistances for best results.
 #0
+
 GRAVITY-WELL
 ----------------------------------------
 Name
@@ -1847,23 +1888,24 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Gravity Well is a spell defined by SPELL_GRAVITY_WELL in the live ability table.
+Channels arcane power to produce a direct combat or utility outcome.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability hits multiple enemies in the room; changes room-level conditions.
+Commonly deals magical damage and/or applies a short-lived status effect.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target no direct target; it resolves through a self/room/system code path. You must be fighting or better to cast it. It is flagged violent, so peaceful-room and self-target restrictions apply.
+Usually cast on self, a target, or enemies in your room depending on spell rules.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Observe target saves and resistances for best results.
 #0
+
 SHOCKWAVE
 ----------------------------------------
 Name
@@ -1878,22 +1920,22 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Shockwave is a spell defined by SPELL_SHOCKWAVE in the live ability table.
+Channels arcane power to produce a direct combat or utility outcome.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability hits multiple enemies in the room.
+Commonly deals magical damage and/or applies a short-lived status effect.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target no direct target; it resolves through a self/room/system code path. You must be fighting or better to cast it. It is flagged violent, so peaceful-room and self-target restrictions apply.
+Usually cast on self, a target, or enemies in your room depending on spell rules.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Observe target saves and resistances for best results.
 #0
 
 NOVA
@@ -1959,6 +2001,7 @@ Notes
 ----------------------------------------
 Powerful when enemies are grouped.
 #0
+
 BLIZZARD
 ----------------------------------------
 Name
@@ -1973,22 +2016,22 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Blizzard is a spell defined by SPELL_BLIZZARD in the live ability table.
+Channels arcane power to produce a direct combat or utility outcome.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability hits multiple enemies in the room.
+Commonly deals magical damage and/or applies a short-lived status effect.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target no direct target; it resolves through a self/room/system code path. You must be fighting or better to cast it. It is flagged violent, so peaceful-room and self-target restrictions apply.
+Usually cast on self, a target, or enemies in your room depending on spell rules.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Observe target saves and resistances for best results.
 #0
 
 FROST-NOVA
@@ -2022,6 +2065,7 @@ Notes
 ----------------------------------------
 Powerful when enemies are grouped.
 #0
+
 GREATER-FIREBALL
 ----------------------------------------
 Name
@@ -2036,22 +2080,22 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Greater Fireball is a spell defined by SPELL_FIREBALL_GREATER in the live ability table.
+Channels arcane power to produce a direct combat or utility outcome.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability hits multiple enemies in the room.
+Commonly deals magical damage and/or applies a short-lived status effect.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target no direct target; it resolves through a self/room/system code path. You must be fighting or better to cast it. It is flagged violent, so peaceful-room and self-target restrictions apply.
+Usually cast on self, a target, or enemies in your room depending on spell rules.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Observe target saves and resistances for best results.
 #0
 
 ACID-RAIN
@@ -2085,6 +2129,7 @@ Notes
 ----------------------------------------
 Powerful when enemies are grouped.
 #0
+
 SONIC-BURST
 ----------------------------------------
 Name
@@ -2099,23 +2144,24 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Sonic Burst is a spell defined by SPELL_SONIC_BURST in the live ability table.
+Channels arcane power to produce a direct combat or utility outcome.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability hits multiple enemies in the room.
+Commonly deals magical damage and/or applies a short-lived status effect.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target no direct target; it resolves through a self/room/system code path. You must be fighting or better to cast it. It is flagged violent, so peaceful-room and self-target restrictions apply.
+Usually cast on self, a target, or enemies in your room depending on spell rules.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Observe target saves and resistances for best results.
 #0
+
 WORD-OF-PAIN
 ----------------------------------------
 Name
@@ -2130,23 +2176,24 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Word of Pain is a spell defined by SPELL_WORD_OF_PAIN in the live ability table.
+Channels arcane power to produce a direct combat or utility outcome.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability hits multiple enemies in the room.
+Commonly deals magical damage and/or applies a short-lived status effect.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target no direct target; it resolves through a self/room/system code path. You must be fighting or better to cast it. It is flagged violent, so peaceful-room and self-target restrictions apply.
+Usually cast on self, a target, or enemies in your room depending on spell rules.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Observe target saves and resistances for best results.
 #0
+
 VENTRILOQUATE
 ----------------------------------------
 Name
@@ -2161,22 +2208,22 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Ventriloquate is a spell defined by SPELL_VENTRILOQUATE in the live ability table.
+Channels arcane power to produce a direct combat or utility outcome.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability uses a dedicated code path in the spell system. It also runs custom manual logic for spell-specific behavior.
+Commonly deals magical damage and/or applies a short-lived status effect.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target a character in your room. You must be standing or better to cast it.
+Usually cast on self, a target, or enemies in your room depending on spell rules.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Observe target saves and resistances for best results.
 #0
 
 BEAR-SPIRIT
@@ -2645,6 +2692,7 @@ Notes
 ----------------------------------------
 Most effective when planned before or at the start of combat.
 #0
+
 ASTRAL-PROJECTION
 ----------------------------------------
 Name
@@ -2659,23 +2707,24 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Astral Projection is a spell defined by SPELL_ASTRAL_PROJECTION in the live ability table.
+Channels arcane power to produce a direct combat or utility outcome.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability uses a dedicated code path in the spell system. It also runs custom manual logic for spell-specific behavior.
+Commonly deals magical damage and/or applies a short-lived status effect.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target not yourself. You must be standing or better to cast it.
+Usually cast on self, a target, or enemies in your room depending on spell rules.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Observe target saves and resistances for best results.
 #0
+
 ETHEREAL-JAUNT
 ----------------------------------------
 Name
@@ -2690,23 +2739,24 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Ethereal Jaunt is a spell defined by SPELL_ETHEREAL_JAUNT in the live ability table.
+Channels arcane power to produce a direct combat or utility outcome.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability uses a dedicated code path in the spell system. It also runs custom manual logic for spell-specific behavior.
+Commonly deals magical damage and/or applies a short-lived status effect.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target no direct target; it resolves through a self/room/system code path. You must be standing or better to cast it.
+Usually cast on self, a target, or enemies in your room depending on spell rules.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Observe target saves and resistances for best results.
 #0
+
 LEYLINE-TAP
 ----------------------------------------
 Name
@@ -2721,22 +2771,22 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Leyline Tap is a spell defined by SPELL_LEYLINE_TAP in the live ability table.
+Channels arcane power to produce a direct combat or utility outcome.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability uses a dedicated code path in the spell system. It also runs custom manual logic for spell-specific behavior.
+Commonly deals magical damage and/or applies a short-lived status effect.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target no direct target; it resolves through a self/room/system code path. You must be standing or better to cast it.
+Usually cast on self, a target, or enemies in your room depending on spell rules.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Observe target saves and resistances for best results.
 #0
 
 TEMPORAL-SHIFT
@@ -2802,6 +2852,7 @@ Notes
 ----------------------------------------
 Use before sustained engagements to keep momentum.
 #0
+
 BALEFIRE
 ----------------------------------------
 Name
@@ -2816,23 +2867,24 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Balefire is a spell defined by SPELL_BALEFIRE in the live ability table.
+Channels arcane power to produce a direct combat or utility outcome.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability uses a dedicated code path in the spell system. It also runs custom manual logic for spell-specific behavior.
+Commonly deals magical damage and/or applies a short-lived status effect.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target a character in your room, your current combat target, not yourself. You must be fighting or better to cast it. It is flagged violent, so peaceful-room and self-target restrictions apply.
+Usually cast on self, a target, or enemies in your room depending on spell rules.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Observe target saves and resistances for best results.
 #0
+
 METEOR
 ----------------------------------------
 Name
@@ -2847,22 +2899,22 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Meteor is a spell defined by SPELL_METEOR in the live ability table.
+Channels arcane power to produce a direct combat or utility outcome.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability uses a dedicated code path in the spell system. It also runs custom manual logic for spell-specific behavior.
+Commonly deals magical damage and/or applies a short-lived status effect.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target a character in your room, your current combat target, not yourself. You must be fighting or better to cast it. It is flagged violent, so peaceful-room and self-target restrictions apply.
+Usually cast on self, a target, or enemies in your room depending on spell rules.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Observe target saves and resistances for best results.
 #0
 
 METEOR-SWARM
@@ -2896,6 +2948,7 @@ Notes
 ----------------------------------------
 Powerful when enemies are grouped.
 #0
+
 HELLFIRE
 ----------------------------------------
 Name
@@ -2910,23 +2963,24 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Hellfire is a spell defined by SPELL_HELLFIRE in the live ability table.
+Channels arcane power to produce a direct combat or utility outcome.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability uses a dedicated code path in the spell system. It also runs custom manual logic for spell-specific behavior.
+Commonly deals magical damage and/or applies a short-lived status effect.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target a character in your room, your current combat target, not yourself. You must be fighting or better to cast it. It is flagged violent, so peaceful-room and self-target restrictions apply.
+Usually cast on self, a target, or enemies in your room depending on spell rules.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Observe target saves and resistances for best results.
 #0
+
 WRATHFIRE
 ----------------------------------------
 Name
@@ -2941,23 +2995,24 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Wrathfire is a spell defined by SPELL_WRATHFIRE in the live ability table.
+Channels arcane power to produce a direct combat or utility outcome.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability uses a dedicated code path in the spell system. It also runs custom manual logic for spell-specific behavior.
+Commonly deals magical damage and/or applies a short-lived status effect.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target a character in your room, your current combat target, not yourself. You must be fighting or better to cast it. It is flagged violent, so peaceful-room and self-target restrictions apply.
+Usually cast on self, a target, or enemies in your room depending on spell rules.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Observe target saves and resistances for best results.
 #0
+
 CELESTIAL-SMITE
 ----------------------------------------
 Name
@@ -2972,23 +3027,24 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Celestial Smite is a spell defined by SPELL_CELESTIAL_SMITE in the live ability table.
+Channels arcane power to produce a direct combat or utility outcome.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability uses a dedicated code path in the spell system. It also runs custom manual logic for spell-specific behavior.
+Commonly deals magical damage and/or applies a short-lived status effect.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target a character in your room, your current combat target, not yourself. You must be fighting or better to cast it. It is flagged violent, so peaceful-room and self-target restrictions apply.
+Usually cast on self, a target, or enemies in your room depending on spell rules.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Observe target saves and resistances for best results.
 #0
+
 HAMMER-OF-GOD
 ----------------------------------------
 Name
@@ -3003,23 +3059,24 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Hammer of God is a spell defined by SPELL_HAMMER_OF_GOD in the live ability table.
+Channels arcane power to produce a direct combat or utility outcome.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability uses a dedicated code path in the spell system. It also runs custom manual logic for spell-specific behavior.
+Commonly deals magical damage and/or applies a short-lived status effect.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target a character in your room, your current combat target, not yourself. You must be fighting or better to cast it. It is flagged violent, so peaceful-room and self-target restrictions apply.
+Usually cast on self, a target, or enemies in your room depending on spell rules.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Observe target saves and resistances for best results.
 #0
+
 DEATH-KNELL
 ----------------------------------------
 Name
@@ -3034,23 +3091,24 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Death Knell is a spell defined by SPELL_DEATH_KNELL in the live ability table.
+Channels arcane power to produce a direct combat or utility outcome.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability uses a dedicated code path in the spell system. It also runs custom manual logic for spell-specific behavior.
+Commonly deals magical damage and/or applies a short-lived status effect.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target a character in your room, your current combat target, not yourself. You must be fighting or better to cast it. It is flagged violent, so peaceful-room and self-target restrictions apply.
+Usually cast on self, a target, or enemies in your room depending on spell rules.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Observe target saves and resistances for best results.
 #0
+
 UNHOLY-WORD
 ----------------------------------------
 Name
@@ -3065,23 +3123,24 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Unholy Word is a spell defined by SPELL_UNHOLY_WORD in the live ability table.
+Channels arcane power to produce a direct combat or utility outcome.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability uses a dedicated code path in the spell system. It also runs custom manual logic for spell-specific behavior.
+Commonly deals magical damage and/or applies a short-lived status effect.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target no direct target; it resolves through a self/room/system code path. You must be fighting or better to cast it. It is flagged violent, so peaceful-room and self-target restrictions apply.
+Usually cast on self, a target, or enemies in your room depending on spell rules.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Observe target saves and resistances for best results.
 #0
+
 HOLY-WORD
 ----------------------------------------
 Name
@@ -3096,23 +3155,24 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Holy Word is a spell defined by SPELL_HOLY_WORD in the live ability table.
+Channels arcane power to produce a direct combat or utility outcome.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability uses a dedicated code path in the spell system. It also runs custom manual logic for spell-specific behavior.
+Commonly deals magical damage and/or applies a short-lived status effect.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target no direct target; it resolves through a self/room/system code path. You must be fighting or better to cast it. It is flagged violent, so peaceful-room and self-target restrictions apply.
+Usually cast on self, a target, or enemies in your room depending on spell rules.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Observe target saves and resistances for best results.
 #0
+
 FINGER-OF-DEATH
 ----------------------------------------
 Name
@@ -3127,28 +3187,29 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Finger of Death is a spell defined by SPELL_FINGER_OF_DEATH in the live ability table.
+Channels arcane power to produce a direct combat or utility outcome.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability uses a dedicated code path in the spell system. It also runs custom manual logic for spell-specific behavior.
+Commonly deals magical damage and/or applies a short-lived status effect.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target a character in your room, your current combat target, not yourself. You must be fighting or better to cast it. It is flagged violent, so peaceful-room and self-target restrictions apply.
+Usually cast on self, a target, or enemies in your room depending on spell rules.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Observe target saves and resistances for best results.
 #0
+
 WAIL-OF-THE-BANSHEE
 ----------------------------------------
 Name
 ----------------------------------------
-Wail of The Banshee
+Wail of the Banshee
 
 ----------------------------------------
 Type
@@ -3158,23 +3219,24 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Wail of The Banshee is a spell defined by SPELL_WAIL_OF_THE_BANSHEE in the live ability table.
+Channels arcane power to produce a direct combat or utility outcome.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability uses a dedicated code path in the spell system. It also runs custom manual logic for spell-specific behavior.
+Commonly deals magical damage and/or applies a short-lived status effect.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target no direct target; it resolves through a self/room/system code path. You must be fighting or better to cast it. It is flagged violent, so peaceful-room and self-target restrictions apply.
+Usually cast on self, a target, or enemies in your room depending on spell rules.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Observe target saves and resistances for best results.
 #0
+
 POWER-WORD-KILL
 ----------------------------------------
 Name
@@ -3189,22 +3251,22 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Power Word Kill is a spell defined by SPELL_POWER_WORD_KILL in the live ability table.
+Channels arcane power to produce a direct combat or utility outcome.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability uses a dedicated code path in the spell system. It also runs custom manual logic for spell-specific behavior.
+Commonly deals magical damage and/or applies a short-lived status effect.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target a character in your room, your current combat target, not yourself. You must be fighting or better to cast it. It is flagged violent, so peaceful-room and self-target restrictions apply.
+Usually cast on self, a target, or enemies in your room depending on spell rules.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Observe target saves and resistances for best results.
 #0
 
 POWER-WORD-STUN
@@ -3238,6 +3300,7 @@ Notes
 ----------------------------------------
 Combine with burst abilities while the target is constrained.
 #0
+
 POWER-WORD-BLIND
 ----------------------------------------
 Name
@@ -3252,22 +3315,22 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Power Word Blind is a spell defined by SPELL_POWER_WORD_BLIND in the live ability table.
+Channels arcane power to produce a direct combat or utility outcome.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability uses a dedicated code path in the spell system. It also runs custom manual logic for spell-specific behavior.
+Commonly deals magical damage and/or applies a short-lived status effect.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target a character in your room, your current combat target, not yourself. You must be fighting or better to cast it. It is flagged violent, so peaceful-room and self-target restrictions apply.
+Usually cast on self, a target, or enemies in your room depending on spell rules.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Observe target saves and resistances for best results.
 #0
 
 POWER-WORD-SILENCE
@@ -3301,6 +3364,7 @@ Notes
 ----------------------------------------
 Combine with burst abilities while the target is constrained.
 #0
+
 PSYCHIC-CRUSH
 ----------------------------------------
 Name
@@ -3315,22 +3379,22 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Psychic Crush is a spell defined by SPELL_PSYCHIC_CRUSH in the live ability table.
+Channels arcane power to produce a direct combat or utility outcome.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability uses a dedicated code path in the spell system. It also runs custom manual logic for spell-specific behavior.
+Commonly deals magical damage and/or applies a short-lived status effect.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target a character in your room, your current combat target, not yourself. You must be fighting or better to cast it. It is flagged violent, so peaceful-room and self-target restrictions apply.
+Usually cast on self, a target, or enemies in your room depending on spell rules.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Observe target saves and resistances for best results.
 #0
 
 TIME-STOP
@@ -3383,6 +3447,7 @@ Black Lance is a strong opener for physical follow-up because the corrosion debu
 
 See also: SHADOW-LANCE OBLIVION-SPEAR MUTILATE SPELLS SKILLS
 #0
+
 REALITY-SLASH
 ----------------------------------------
 Name
@@ -3397,23 +3462,24 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Reality Slash is a spell defined by SPELL_REALITY_SLASH in the live ability table.
+Channels arcane power to produce a direct combat or utility outcome.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability uses a dedicated code path in the spell system. It also runs custom manual logic for spell-specific behavior.
+Commonly deals magical damage and/or applies a short-lived status effect.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target a character in your room, your current combat target, not yourself. You must be fighting or better to cast it. It is flagged violent, so peaceful-room and self-target restrictions apply.
+Usually cast on self, a target, or enemies in your room depending on spell rules.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Observe target saves and resistances for best results.
 #0
+
 GRASP-HEART
 ----------------------------------------
 Name
@@ -3428,23 +3494,24 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Grasp Heart is a spell defined by SPELL_GRASP_HEART in the live ability table.
+Channels arcane power to produce a direct combat or utility outcome.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability uses a dedicated code path in the spell system. It also runs custom manual logic for spell-specific behavior.
+Commonly deals magical damage and/or applies a short-lived status effect.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target a character in your room, your current combat target, not yourself. You must be fighting or better to cast it. It is flagged violent, so peaceful-room and self-target restrictions apply.
+Usually cast on self, a target, or enemies in your room depending on spell rules.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Observe target saves and resistances for best results.
 #0
+
 NEGATIVE-BURST NEG-BURST
 ----------------------------------------
 Name
@@ -3459,22 +3526,22 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Negative Burst is a spell defined by SPELL_NEGATIVE_BURST in the live ability table.
+Channels arcane power to produce a direct combat or utility outcome.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability uses a dedicated code path in the spell system. It also runs custom manual logic for spell-specific behavior.
+Commonly deals magical damage and/or applies a short-lived status effect.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target no direct target; it resolves through a self/room/system code path. You must be fighting or better to cast it. It is flagged violent, so peaceful-room and self-target restrictions apply.
+Usually cast on self, a target, or enemies in your room depending on spell rules.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Observe target saves and resistances for best results.
 #0
 
 TRUE-DEATH
@@ -3540,6 +3607,7 @@ Notes
 ----------------------------------------
 Best cast before entering high-risk engagements.
 #0
+
 CRYSTAL-BODY
 ----------------------------------------
 Name
@@ -3554,23 +3622,24 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Crystal Body is a spell defined by SPELL_CRYSTAL_BODY in the live ability table.
+Channels arcane power to produce a direct combat or utility outcome.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability uses a dedicated code path in the spell system. It also runs custom manual logic for spell-specific behavior.
+Commonly deals magical damage and/or applies a short-lived status effect.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target yourself only. You must be standing or better to cast it.
+Usually cast on self, a target, or enemies in your room depending on spell rules.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Observe target saves and resistances for best results.
 #0
+
 GREATER-MAGIC-SEAL
 ----------------------------------------
 Name
@@ -3585,23 +3654,24 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Greater Magic Seal is a spell defined by SPELL_GREATER_MAGIC_SEAL in the live ability table.
+Channels arcane power to produce a direct combat or utility outcome.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability uses a dedicated code path in the spell system. It also runs custom manual logic for spell-specific behavior.
+Commonly deals magical damage and/or applies a short-lived status effect.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target a character in your room, your current combat target, not yourself. You must be fighting or better to cast it. It is flagged violent, so peaceful-room and self-target restrictions apply.
+Usually cast on self, a target, or enemies in your room depending on spell rules.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Observe target saves and resistances for best results.
 #0
+
 DESPAIR-AURA
 ----------------------------------------
 Name
@@ -3616,23 +3686,24 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Despair Aura is a spell defined by SPELL_DESPAIR_AURA in the live ability table.
+Channels arcane power to produce a direct combat or utility outcome.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability uses a dedicated code path in the spell system. It also runs custom manual logic for spell-specific behavior.
+Commonly deals magical damage and/or applies a short-lived status effect.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target yourself only. You must be standing or better to cast it.
+Usually cast on self, a target, or enemies in your room depending on spell rules.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Observe target saves and resistances for best results.
 #0
+
 OBLIVION-SPEAR
 ----------------------------------------
 Name
@@ -3647,22 +3718,22 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Oblivion Spear is a spell defined by SPELL_OBLIVION_SPEAR in the live ability table.
+Channels arcane power to produce a direct combat or utility outcome.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability uses a dedicated code path in the spell system. It also runs custom manual logic for spell-specific behavior.
+Commonly deals magical damage and/or applies a short-lived status effect.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target a character in your room, your current combat target, not yourself. You must be fighting or better to cast it. It is flagged violent, so peaceful-room and self-target restrictions apply.
+Usually cast on self, a target, or enemies in your room depending on spell rules.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Observe target saves and resistances for best results.
 #0
 
 BONE-PRISON
@@ -3696,6 +3767,7 @@ Notes
 ----------------------------------------
 Combine with burst abilities while the target is constrained.
 #0
+
 UNDYING-WILL
 ----------------------------------------
 Name
@@ -3710,23 +3782,24 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Undying Will is a spell defined by SPELL_UNDYING_WILL in the live ability table.
+Grants a beneficial spell effect that improves your combat readiness.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability uses a dedicated code path in the spell system. It also runs custom manual logic for spell-specific behavior.
+Applies one or more buffs such as defense, accuracy, resistance, or utility depending on the ability.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target yourself only. You must be standing or better to cast it.
+Primarily self-targeted (or cast on an ally when allowed).
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Use before engagement for best value.
 #0
+
 DRAGON-LIGHTNING
 ----------------------------------------
 Name
@@ -3741,23 +3814,24 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Dragon Lightning is a spell defined by SPELL_DRAGON_LIGHTNING in the live ability table.
+Channels arcane power to produce a direct combat or utility outcome.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability uses a dedicated code path in the spell system. It also runs custom manual logic for spell-specific behavior.
+Commonly deals magical damage and/or applies a short-lived status effect.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target a character in your room, your current combat target, not yourself. You must be fighting or better to cast it. It is flagged violent, so peaceful-room and self-target restrictions apply.
+Usually cast on self, a target, or enemies in your room depending on spell rules.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Observe target saves and resistances for best results.
 #0
+
 CHAIN-DRAGON-LIGHTNING
 ----------------------------------------
 Name
@@ -3772,23 +3846,24 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Chain Dragon Lightning is a spell defined by SPELL_CHAIN_DRAGON_LIGHTNING in the live ability table.
+Channels arcane power to produce a direct combat or utility outcome.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability uses a dedicated code path in the spell system. It also runs custom manual logic for spell-specific behavior.
+Commonly deals magical damage and/or applies a short-lived status effect.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target a character in your room, your current combat target, not yourself. You must be fighting or better to cast it. It is flagged violent, so peaceful-room and self-target restrictions apply.
+Usually cast on self, a target, or enemies in your room depending on spell rules.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Observe target saves and resistances for best results.
 #0
+
 HELL-FLAME
 ----------------------------------------
 Name
@@ -3803,23 +3878,24 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Hell Flame is a spell defined by SPELL_HELL_FLAME in the live ability table.
+Channels arcane power to produce a direct combat or utility outcome.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability uses a dedicated code path in the spell system. It also runs custom manual logic for spell-specific behavior.
+Commonly deals magical damage and/or applies a short-lived status effect.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target a character in your room, your current combat target, not yourself. You must be fighting or better to cast it. It is flagged violent, so peaceful-room and self-target restrictions apply.
+Usually cast on self, a target, or enemies in your room depending on spell rules.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Observe target saves and resistances for best results.
 #0
+
 GRAVITY-MAELSTROM
 ----------------------------------------
 Name
@@ -3834,22 +3910,22 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Gravity Maelstrom is a spell defined by SPELL_GRAVITY_MAELSTROM in the live ability table.
+Channels arcane power to produce a direct combat or utility outcome.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability uses a dedicated code path in the spell system. It also runs custom manual logic for spell-specific behavior.
+Commonly deals magical damage and/or applies a short-lived status effect.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target a character in your room, your current combat target, not yourself. You must be fighting or better to cast it. It is flagged violent, so peaceful-room and self-target restrictions apply.
+Usually cast on self, a target, or enemies in your room depending on spell rules.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Observe target saves and resistances for best results.
 #0
 
 CALL-GREATER-THUNDER
@@ -3883,6 +3959,7 @@ Notes
 ----------------------------------------
 Most effective when planned before or at the start of combat.
 #0
+
 ASTRAL-SMITE
 ----------------------------------------
 Name
@@ -3897,23 +3974,24 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Astral Smite is a spell defined by SPELL_ASTRAL_SMITE in the live ability table.
+Channels arcane power to produce a direct combat or utility outcome.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability uses a dedicated code path in the spell system. It also runs custom manual logic for spell-specific behavior.
+Commonly deals magical damage and/or applies a short-lived status effect.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target a character in your room, your current combat target, not yourself. You must be fighting or better to cast it. It is flagged violent, so peaceful-room and self-target restrictions apply.
+Usually cast on self, a target, or enemies in your room depending on spell rules.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Observe target saves and resistances for best results.
 #0
+
 GREATER-REJECTION REJECTION
 ----------------------------------------
 Name
@@ -3928,23 +4006,24 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Greater Rejection is a spell defined by SPELL_GREATER_REJECTION in the live ability table.
+Channels arcane power to produce a direct combat or utility outcome.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability uses a dedicated code path in the spell system. It also runs custom manual logic for spell-specific behavior.
+Commonly deals magical damage and/or applies a short-lived status effect.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target a character in your room, your current combat target, not yourself. You must be fighting or better to cast it. It is flagged violent, so peaceful-room and self-target restrictions apply.
+Usually cast on self, a target, or enemies in your room depending on spell rules.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Observe target saves and resistances for best results.
 #0
+
 NAPALM
 ----------------------------------------
 Name
@@ -3959,23 +4038,24 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Napalm is a spell defined by SPELL_NAPALM in the live ability table.
+Channels arcane power to produce a direct combat or utility outcome.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability uses a dedicated code path in the spell system. It also runs custom manual logic for spell-specific behavior.
+Commonly deals magical damage and/or applies a short-lived status effect.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target no direct target; it resolves through a self/room/system code path. You must be fighting or better to cast it. It is flagged violent, so peaceful-room and self-target restrictions apply.
+Usually cast on self, a target, or enemies in your room depending on spell rules.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Observe target saves and resistances for best results.
 #0
+
 FALLEN-DOWN
 ----------------------------------------
 Name
@@ -3990,23 +4070,24 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Fallen Down is a spell defined by SPELL_FALLEN_DOWN in the live ability table.
+Channels arcane power to produce a direct combat or utility outcome.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability uses a dedicated code path in the spell system. It also runs custom manual logic for spell-specific behavior.
+Commonly deals magical damage and/or applies a short-lived status effect.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target no direct target; it resolves through a self/room/system code path. You must be fighting or better to cast it. It is flagged violent, so peaceful-room and self-target restrictions apply.
+Usually cast on self, a target, or enemies in your room depending on spell rules.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Observe target saves and resistances for best results.
 #0
+
 IA-SHUB-NIGGURATH
 ----------------------------------------
 Name
@@ -4021,22 +4102,22 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Ia Shub Niggurath is a spell defined by SPELL_IA_SHUB_NIGGURATH in the live ability table.
+Channels arcane power to produce a direct combat or utility outcome.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability uses a dedicated code path in the spell system. It also runs custom manual logic for spell-specific behavior.
+Commonly deals magical damage and/or applies a short-lived status effect.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target no direct target; it resolves through a self/room/system code path. You must be fighting or better to cast it. It is flagged violent, so peaceful-room and self-target restrictions apply.
+Usually cast on self, a target, or enemies in your room depending on spell rules.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Observe target saves and resistances for best results.
 #0
 
 GOAL-OF-ALL-LIFE-IS-DEATH GOAL-OF-LIFE-DEATH ALL-LIFE-IS-DEATH
@@ -4070,11 +4151,12 @@ Notes
 ----------------------------------------
 Designed to combo with other high-tier death spells.
 #0
+
 CRY-OF-THE-BANSHEE BANSHEE-CRY
 ----------------------------------------
 Name
 ----------------------------------------
-Cry of The Banshee
+Cry of the Banshee
 
 ----------------------------------------
 Type
@@ -4084,22 +4166,22 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Cry of The Banshee is a spell defined by SPELL_CRY_OF_THE_BANSHEE in the live ability table.
+Channels arcane power to produce a direct combat or utility outcome.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability uses a dedicated code path in the spell system. It also runs custom manual logic for spell-specific behavior.
+Commonly deals magical damage and/or applies a short-lived status effect.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target no direct target; it resolves through a self/room/system code path. You must be fighting or better to cast it. It is flagged violent, so peaceful-room and self-target restrictions apply.
+Usually cast on self, a target, or enemies in your room depending on spell rules.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Observe target saves and resistances for best results.
 #0
 
 BODY-OF-EFFULGENT-BERYL EFFULGENT-BERYL EFFULGENT BERYL
@@ -4184,6 +4266,7 @@ Notes
 ----------------------------------------
 High-tier finisher; best used when enemies are already grouped.
 #0
+
 GREATER-TELEPORTATION
 ----------------------------------------
 Name
@@ -4198,23 +4281,24 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Greater Teleportation is a spell defined by SPELL_GREATER_TELEPORTATION in the live ability table.
+Channels arcane power to produce a direct combat or utility outcome.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability uses a dedicated code path in the spell system. It also runs custom manual logic for spell-specific behavior.
+Commonly deals magical damage and/or applies a short-lived status effect.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target not yourself. You must be standing or better to cast it.
+Usually cast on self, a target, or enemies in your room depending on spell rules.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Observe target saves and resistances for best results.
 #0
+
 SILENT-MAGIC
 ----------------------------------------
 Name
@@ -4229,23 +4313,24 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Silent Magic is a spell defined by SPELL_SILENT_MAGIC in the live ability table.
+Channels arcane power to produce a direct combat or utility outcome.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability uses a dedicated code path in the spell system. It also runs custom manual logic for spell-specific behavior.
+Commonly deals magical damage and/or applies a short-lived status effect.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target yourself only. You must be standing or better to cast it.
+Usually cast on self, a target, or enemies in your room depending on spell rules.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Observe target saves and resistances for best results.
 #0
+
 TRIPLE-MAXIMIZE-MAGIC
 ----------------------------------------
 Name
@@ -4260,22 +4345,22 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Triple Maximize Magic is a spell defined by SPELL_TRIPLE_MAXIMIZE_MAGIC in the live ability table.
+Channels arcane power to produce a direct combat or utility outcome.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability uses a dedicated code path in the spell system. It also runs custom manual logic for spell-specific behavior.
+Commonly deals magical damage and/or applies a short-lived status effect.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target yourself only. You must be standing or better to cast it.
+Usually cast on self, a target, or enemies in your room depending on spell rules.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Observe target saves and resistances for best results.
 #0
 
 PANTHEON
@@ -4309,6 +4394,7 @@ Notes
 ----------------------------------------
 Excellent pre-fight preparation for extended encounters.
 #0
+
 DIMENSIONAL-LOCK
 ----------------------------------------
 Name
@@ -4323,22 +4409,22 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Dimensional Lock is a spell defined by SPELL_DIMENSIONAL_LOCK in the live ability table.
+Channels arcane power to produce a direct combat or utility outcome.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability uses a dedicated code path in the spell system. It also runs custom manual logic for spell-specific behavior.
+Commonly deals magical damage and/or applies a short-lived status effect.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target no direct target; it resolves through a self/room/system code path. You must be standing or better to cast it.
+Usually cast on self, a target, or enemies in your room depending on spell rules.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Observe target saves and resistances for best results.
 #0
 
 SHADOW-BIND
@@ -4372,6 +4458,7 @@ Notes
 ----------------------------------------
 Combine with burst abilities while the target is constrained.
 #0
+
 SHADOW-EXCHANGE
 ----------------------------------------
 Name
@@ -4386,22 +4473,22 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Shadow Exchange is a spell defined by SPELL_SHADOW_EXCHANGE in the live ability table.
+Channels arcane power to produce a direct combat or utility outcome.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability uses a dedicated code path in the spell system. It also runs custom manual logic for spell-specific behavior.
+Commonly deals magical damage and/or applies a short-lived status effect.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target a character in your room. You must be fighting or better to cast it.
+Usually cast on self, a target, or enemies in your room depending on spell rules.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Observe target saves and resistances for best results.
 #0
 
 DAGGER-RAIN
@@ -4435,6 +4522,7 @@ Notes
 ----------------------------------------
 Powerful when enemies are grouped.
 #0
+
 MONARCHS-PRESSURE MONARCH-PRESSURE
 ----------------------------------------
 Name
@@ -4449,22 +4537,22 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Monarchs Pressure is a spell defined by SPELL_MONARCHS_PRESSURE in the live ability table.
+Channels arcane power to produce a direct combat or utility outcome.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability uses a dedicated code path in the spell system. It also runs custom manual logic for spell-specific behavior.
+Commonly deals magical damage and/or applies a short-lived status effect.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target no direct target; it resolves through a self/room/system code path. You must be fighting or better to cast it. It is flagged violent, so peaceful-room and self-target restrictions apply.
+Usually cast on self, a target, or enemies in your room depending on spell rules.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Observe target saves and resistances for best results.
 #0
 
 SHADOW-DOMAIN SHADOWDOMAIN DOMAIN-SHADOW
@@ -4498,6 +4586,7 @@ Notes
 ----------------------------------------
 Powerful when enemies are grouped.
 #0
+
 FORCE-GRASP
 ----------------------------------------
 Name
@@ -4512,23 +4601,24 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Force Grasp is a spell defined by SPELL_FORCE_GRASP in the live ability table.
+Channels arcane power to produce a direct combat or utility outcome.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability uses a dedicated code path in the spell system. It also runs custom manual logic for spell-specific behavior.
+Commonly deals magical damage and/or applies a short-lived status effect.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target a character in your room, your current combat target, not yourself. You must be fighting or better to cast it. It is flagged violent, so peaceful-room and self-target restrictions apply.
+Usually cast on self, a target, or enemies in your room depending on spell rules.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Observe target saves and resistances for best results.
 #0
+
 SHADOW-STEP
 ----------------------------------------
 Name
@@ -4543,23 +4633,24 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Shadow Step is a spell defined by SPELL_SHADOW_STEP in the live ability table.
+Channels arcane power to produce a direct combat or utility outcome.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability uses a dedicated code path in the spell system. It also runs custom manual logic for spell-specific behavior.
+Commonly deals magical damage and/or applies a short-lived status effect.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target yourself only. You must be standing or better to cast it.
+Usually cast on self, a target, or enemies in your room depending on spell rules.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Observe target saves and resistances for best results.
 #0
+
 BLACK-HEART BLACKHEART
 ----------------------------------------
 Name
@@ -4574,22 +4665,22 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Black Heart is a spell defined by SPELL_BLACK_HEART in the live ability table.
+Channels arcane power to produce a direct combat or utility outcome.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability uses a dedicated code path in the spell system. It also runs custom manual logic for spell-specific behavior.
+Commonly deals magical damage and/or applies a short-lived status effect.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target yourself only. You must be fighting or better to cast it.
+Usually cast on self, a target, or enemies in your room depending on spell rules.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Observe target saves and resistances for best results.
 #0
 
 CALL-SHADOW-LEGION SHADOW-LEGION SHADOWLEGION LEGION-CALL
@@ -4623,6 +4714,7 @@ Notes
 ----------------------------------------
 Best used early in encounters to maximize servant uptime.
 #0
+
 NIGHT-HUNT
 ----------------------------------------
 Name
@@ -4637,23 +4729,24 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Night Hunt is a spell defined by SPELL_NIGHT_HUNT in the live ability table.
+Channels arcane power to produce a direct combat or utility outcome.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability uses a dedicated code path in the spell system. It also runs custom manual logic for spell-specific behavior.
+Commonly deals magical damage and/or applies a short-lived status effect.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target a character in your room, your current combat target, not yourself. You must be fighting or better to cast it. It is flagged violent, so peaceful-room and self-target restrictions apply.
+Usually cast on self, a target, or enemies in your room depending on spell rules.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Observe target saves and resistances for best results.
 #0
+
 DARK-REBUKE
 ----------------------------------------
 Name
@@ -4668,22 +4761,22 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Dark Rebuke is a spell defined by SPELL_DARK_REBUKE in the live ability table.
+Channels arcane power to produce a direct combat or utility outcome.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability uses a dedicated code path in the spell system. It also runs custom manual logic for spell-specific behavior.
+Commonly deals magical damage and/or applies a short-lived status effect.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target a character in your room, your current combat target, not yourself. You must be fighting or better to cast it. It is flagged violent, so peaceful-room and self-target restrictions apply.
+Usually cast on self, a target, or enemies in your room depending on spell rules.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Observe target saves and resistances for best results.
 #0
 
 EXECUTION-MARK
@@ -4768,6 +4861,7 @@ Notes
 ----------------------------------------
 Use when you need durable pressure and frontline support.
 #0
+
 MONARCHS-AUTHORITY MONARCH-AUTHORITY
 ----------------------------------------
 Name
@@ -4782,23 +4876,24 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Monarchs Authority is a spell defined by SPELL_MONARCHS_AUTHORITY in the live ability table.
+Channels arcane power to produce a direct combat or utility outcome.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability uses a dedicated code path in the spell system. It also runs custom manual logic for spell-specific behavior.
+Commonly deals magical damage and/or applies a short-lived status effect.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target no direct target; it resolves through a self/room/system code path. You must be fighting or better to cast it. It is flagged violent, so peaceful-room and self-target restrictions apply.
+Usually cast on self, a target, or enemies in your room depending on spell rules.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Observe target saves and resistances for best results.
 #0
+
 RULERS-HAND
 ----------------------------------------
 Name
@@ -4813,23 +4908,24 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Rulers Hand is a spell defined by SPELL_RULERS_HAND in the live ability table.
+Channels arcane power to produce a direct combat or utility outcome.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability uses a dedicated code path in the spell system. It also runs custom manual logic for spell-specific behavior.
+Commonly deals magical damage and/or applies a short-lived status effect.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target a character in your room, your current combat target, not yourself. You must be fighting or better to cast it. It is flagged violent, so peaceful-room and self-target restrictions apply.
+Usually cast on self, a target, or enemies in your room depending on spell rules.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Observe target saves and resistances for best results.
 #0
+
 SHADOW-LANCE
 ----------------------------------------
 Name
@@ -4844,23 +4940,24 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Shadow Lance is a spell defined by SPELL_SHADOW_LANCE in the live ability table.
+Channels arcane power to produce a direct combat or utility outcome.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability uses a dedicated code path in the spell system. It also runs custom manual logic for spell-specific behavior.
+Commonly deals magical damage and/or applies a short-lived status effect.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target a character in your room, your current combat target, not yourself. You must be fighting or better to cast it. It is flagged violent, so peaceful-room and self-target restrictions apply.
+Usually cast on self, a target, or enemies in your room depending on spell rules.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Observe target saves and resistances for best results.
 #0
+
 SHADOW-BURST
 ----------------------------------------
 Name
@@ -4875,22 +4972,22 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Shadow Burst is a spell defined by SPELL_SHADOW_BURST in the live ability table.
+Channels arcane power to produce a direct combat or utility outcome.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability uses a dedicated code path in the spell system. It also runs custom manual logic for spell-specific behavior.
+Commonly deals magical damage and/or applies a short-lived status effect.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target no direct target; it resolves through a self/room/system code path. You must be fighting or better to cast it. It is flagged violent, so peaceful-room and self-target restrictions apply.
+Usually cast on self, a target, or enemies in your room depending on spell rules.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Observe target saves and resistances for best results.
 #0
 
 SHADOW-STORM
@@ -4924,6 +5021,7 @@ Notes
 ----------------------------------------
 Powerful when enemies are grouped.
 #0
+
 FATAL-STRIKE
 ----------------------------------------
 Name
@@ -4938,23 +5036,24 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Fatal Strike is a spell defined by SPELL_FATAL_STRIKE in the live ability table.
+A combat technique executed through skill rather than spellcasting.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability uses a dedicated code path in the spell system. It also runs custom manual logic for spell-specific behavior.
+Provides direct offensive pressure, control, or tactical engagement tools.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target a character in your room, your current combat target, not yourself. You must be fighting or better to cast it. It is flagged violent, so peaceful-room and self-target restrictions apply.
+Use as an active skill command against a target when conditions are met.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Timing and position significantly affect effectiveness.
 #0
+
 DOMINION-OF-SHADOWS
 ----------------------------------------
 Name
@@ -4969,22 +5068,22 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Dominion of Shadows is a spell defined by SPELL_DOMINION_OF_SHADOWS in the live ability table.
+Channels arcane power to produce a direct combat or utility outcome.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability uses a dedicated code path in the spell system. It also runs custom manual logic for spell-specific behavior.
+Commonly deals magical damage and/or applies a short-lived status effect.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target yourself only. You must be standing or better to cast it.
+Usually cast on self, a target, or enemies in your room depending on spell rules.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Observe target saves and resistances for best results.
 #0
 
 SHADOW-RECALL
@@ -5018,6 +5117,7 @@ Notes
 ----------------------------------------
 Critical for sustain during prolonged fights.
 #0
+
 SHADOW-REGENESIS
 ----------------------------------------
 Name
@@ -5032,23 +5132,24 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Shadow Regenesis is a spell defined by SPELL_SHADOW_REGENESIS in the live ability table.
+Grants a beneficial spell effect that improves your combat readiness.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability uses a dedicated code path in the spell system. It also runs custom manual logic for spell-specific behavior.
+Applies one or more buffs such as defense, accuracy, resistance, or utility depending on the ability.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target yourself only. You must be fighting or better to cast it.
+Primarily self-targeted (or cast on an ally when allowed).
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Use before engagement for best value.
 #0
+
 ASSASSINS-INTENT
 ----------------------------------------
 Name
@@ -5063,23 +5164,24 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Assassins Intent is a spell defined by SPELL_ASSASSINS_INTENT in the live ability table.
+Grants a beneficial spell effect that improves your combat readiness.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability uses a dedicated code path in the spell system. It also runs custom manual logic for spell-specific behavior.
+Applies one or more buffs such as defense, accuracy, resistance, or utility depending on the ability.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target yourself only. You must be standing or better to cast it.
+Primarily self-targeted (or cast on an ally when allowed).
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Use before engagement for best value.
 #0
+
 BLOOD-DAGGER-TEMPEST DAGGER-TEMPEST
 ----------------------------------------
 Name
@@ -5094,22 +5196,22 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Blood Dagger Tempest is a spell defined by SPELL_BLOOD_DAGGER_TEMPEST in the live ability table.
+Channels arcane power to produce a direct combat or utility outcome.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability uses a dedicated code path in the spell system. It also runs custom manual logic for spell-specific behavior.
+Commonly deals magical damage and/or applies a short-lived status effect.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target no direct target; it resolves through a self/room/system code path. You must be fighting or better to cast it. It is flagged violent, so peaceful-room and self-target restrictions apply.
+Usually cast on self, a target, or enemies in your room depending on spell rules.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Observe target saves and resistances for best results.
 #0
 
 CHAIN-OF-SUBJUGATION SUBJUGATION-CHAIN
@@ -5143,6 +5245,7 @@ Notes
 ----------------------------------------
 Combine with burst abilities while the target is constrained.
 #0
+
 SOVEREIGNS-STEP
 ----------------------------------------
 Name
@@ -5157,22 +5260,22 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Sovereigns Step is a spell defined by SPELL_SOVEREIGNS_STEP in the live ability table.
+Channels arcane power to produce a direct combat or utility outcome.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability uses a dedicated code path in the spell system. It also runs custom manual logic for spell-specific behavior.
+Commonly deals magical damage and/or applies a short-lived status effect.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target yourself only. You must be standing or better to cast it.
+Usually cast on self, a target, or enemies in your room depending on spell rules.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Observe target saves and resistances for best results.
 #0
 
 KINGS-COMMAND KING-COMMAND
@@ -5238,6 +5341,7 @@ Notes
 ----------------------------------------
 Useful in PvP-like situations and dangerous pulls.
 #0
+
 MUTILATE
 ----------------------------------------
 Name
@@ -5252,23 +5356,24 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Mutilate is a spell defined by SPELL_MUTILATE in the live ability table.
+A combat technique executed through skill rather than spellcasting.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability uses a dedicated code path in the spell system. It also runs custom manual logic for spell-specific behavior.
+Provides direct offensive pressure, control, or tactical engagement tools.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target a character in your room, your current combat target, not yourself. You must be fighting or better to cast it. It is flagged violent, so peaceful-room and self-target restrictions apply.
+Use as an active skill command against a target when conditions are met.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Timing and position significantly affect effectiveness.
 #0
+
 SHADOW-ARMOR
 ----------------------------------------
 Name
@@ -5283,22 +5388,22 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Shadow Armor is a spell defined by SPELL_SHADOW_ARMOR in the live ability table.
+Grants a beneficial spell effect that improves your combat readiness.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This ability uses a dedicated code path in the spell system. It also runs custom manual logic for spell-specific behavior.
+Applies one or more buffs such as defense, accuracy, resistance, or utility depending on the ability.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target a character in your room. You must be standing or better to cast it.
+Primarily self-targeted (or cast on an ally when allowed).
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Use before engagement for best value.
 #0
 
 TOTAL-OCCULTATION OCCULTATION TOTALOCCULTATION
@@ -5375,23 +5480,24 @@ Skill
 ----------------------------------------
 Description
 ----------------------------------------
-Pick Lock is a utility skill (`SKILL_PICK_LOCK`) used by the `pick` door/container command.
+A trained ability that improves performance in combat or tactical play.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-Attempts to unlock a locked door or closeable container without using a key.
+Provides offensive pressure, defense, control, or utility depending on the skill.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Use `pick <door|container>`. Success checks Pick Lock skill plus Dexterity lock-picking bonus against a random roll; pickproof locks always fail.
+Activate as a skill in the appropriate combat or exploration context.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Requires a valid keyhole and a lockable target. On success, the lock toggles and nearby room messages confirm the pick.
+Best used with class synergies and careful timing.
 #0
+
 BANDAGE
 ----------------------------------------
 Name
@@ -5406,23 +5512,24 @@ Skill
 ----------------------------------------
 Description
 ----------------------------------------
-Bandage is a skill registered as SKILL_BANDAGE in the live ability table.
+A trained ability that improves performance in combat or tactical play.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This skill is executed through its command handler/manual logic rather than template spell routines.
+Provides offensive pressure, defense, control, or utility depending on the skill.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Use the skill command when its class/position/combat prerequisites are met; the engine checks success chance and then resolves the skill-specific effect.
+Activate as a skill in the appropriate combat or exploration context.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Best use depends on the exact command implementation (offense, mobility, utility, or control) and your current combat state.
+Best used with class synergies and careful timing.
 #0
+
 OVERLORD-PRESENCE
 ----------------------------------------
 Name
@@ -5437,23 +5544,24 @@ Skill
 ----------------------------------------
 Description
 ----------------------------------------
-Overlord Presence is a skill registered as SKILL_OVERLORD_PRESENCE in the live ability table.
+A trained ability that improves performance in combat or tactical play.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This skill is executed through its command handler/manual logic rather than template spell routines.
+Provides offensive pressure, defense, control, or utility depending on the skill.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Use the skill command when its class/position/combat prerequisites are met; the engine checks success chance and then resolves the skill-specific effect.
+Activate as a skill in the appropriate combat or exploration context.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Best use depends on the exact command implementation (offense, mobility, utility, or control) and your current combat state.
+Best used with class synergies and careful timing.
 #0
+
 SUPREME-CASTER-DISCIPLINE
 ----------------------------------------
 Name
@@ -5468,23 +5576,24 @@ Skill
 ----------------------------------------
 Description
 ----------------------------------------
-Supreme Caster Discipline is a skill registered as SKILL_SUPREME_CASTER_DISCIPLINE in the live ability table.
+A trained ability that improves performance in combat or tactical play.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This skill is executed through its command handler/manual logic rather than template spell routines.
+Provides offensive pressure, defense, control, or utility depending on the skill.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Use the skill command when its class/position/combat prerequisites are met; the engine checks success chance and then resolves the skill-specific effect.
+Activate as a skill in the appropriate combat or exploration context.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Best use depends on the exact command implementation (offense, mobility, utility, or control) and your current combat state.
+Best used with class synergies and careful timing.
 #0
+
 UNDEAD-COMMAND
 ----------------------------------------
 Name
@@ -5499,23 +5608,24 @@ Skill
 ----------------------------------------
 Description
 ----------------------------------------
-Undead Command is a skill registered as SKILL_UNDEAD_COMMAND in the live ability table.
+A trained ability that improves performance in combat or tactical play.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This skill is executed through its command handler/manual logic rather than template spell routines.
+Provides offensive pressure, defense, control, or utility depending on the skill.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Use the skill command when its class/position/combat prerequisites are met; the engine checks success chance and then resolves the skill-specific effect.
+Activate as a skill in the appropriate combat or exploration context.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Best use depends on the exact command implementation (offense, mobility, utility, or control) and your current combat state.
+Best used with class synergies and careful timing.
 #0
+
 TACTICAL-SPELL-MEMORY
 ----------------------------------------
 Name
@@ -5530,23 +5640,24 @@ Skill
 ----------------------------------------
 Description
 ----------------------------------------
-Tactical Spell Memory is a skill registered as SKILL_TACTICAL_SPELL_MEMORY in the live ability table.
+A trained ability that improves performance in combat or tactical play.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This skill is executed through its command handler/manual logic rather than template spell routines.
+Provides offensive pressure, defense, control, or utility depending on the skill.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Use the skill command when its class/position/combat prerequisites are met; the engine checks success chance and then resolves the skill-specific effect.
+Activate as a skill in the appropriate combat or exploration context.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Best use depends on the exact command implementation (offense, mobility, utility, or control) and your current combat state.
+Best used with class synergies and careful timing.
 #0
+
 DREAD-DOMINION
 ----------------------------------------
 Name
@@ -5561,23 +5672,24 @@ Skill
 ----------------------------------------
 Description
 ----------------------------------------
-Dread Dominion is a skill registered as SKILL_DREAD_DOMINION in the live ability table.
+A trained ability that improves performance in combat or tactical play.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This skill is executed through its command handler/manual logic rather than template spell routines.
+Provides offensive pressure, defense, control, or utility depending on the skill.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Use the skill command when its class/position/combat prerequisites are met; the engine checks success chance and then resolves the skill-specific effect.
+Activate as a skill in the appropriate combat or exploration context.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Best use depends on the exact command implementation (offense, mobility, utility, or control) and your current combat state.
+Best used with class synergies and careful timing.
 #0
+
 SHADOW-COMMANDER
 ----------------------------------------
 Name
@@ -5592,23 +5704,24 @@ Skill
 ----------------------------------------
 Description
 ----------------------------------------
-Shadow Commander is a skill registered as SKILL_SHADOW_COMMANDER in the live ability table.
+A trained ability that improves performance in combat or tactical play.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This skill is executed through its command handler/manual logic rather than template spell routines.
+Provides offensive pressure, defense, control, or utility depending on the skill.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Use the skill command when its class/position/combat prerequisites are met; the engine checks success chance and then resolves the skill-specific effect.
+Activate as a skill in the appropriate combat or exploration context.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Best use depends on the exact command implementation (offense, mobility, utility, or control) and your current combat state.
+Best used with class synergies and careful timing.
 #0
+
 PREDATORS-ADVANCE
 ----------------------------------------
 Name
@@ -5623,23 +5736,24 @@ Skill
 ----------------------------------------
 Description
 ----------------------------------------
-Predators Advance is a skill registered as SKILL_PREDATORS_ADVANCE in the live ability table.
+A trained ability that improves performance in combat or tactical play.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This skill is executed through its command handler/manual logic rather than template spell routines.
+Provides offensive pressure, defense, control, or utility depending on the skill.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Use the skill command when its class/position/combat prerequisites are met; the engine checks success chance and then resolves the skill-specific effect.
+Activate as a skill in the appropriate combat or exploration context.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Best use depends on the exact command implementation (offense, mobility, utility, or control) and your current combat state.
+Best used with class synergies and careful timing.
 #0
+
 MONARCH-REFLEXES
 ----------------------------------------
 Name
@@ -5654,23 +5768,24 @@ Skill
 ----------------------------------------
 Description
 ----------------------------------------
-Monarch Reflexes is a skill registered as SKILL_MONARCH_REFLEXES in the live ability table.
+A trained ability that improves performance in combat or tactical play.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This skill is executed through its command handler/manual logic rather than template spell routines.
+Provides offensive pressure, defense, control, or utility depending on the skill.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Use the skill command when its class/position/combat prerequisites are met; the engine checks success chance and then resolves the skill-specific effect.
+Activate as a skill in the appropriate combat or exploration context.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Best use depends on the exact command implementation (offense, mobility, utility, or control) and your current combat state.
+Best used with class synergies and careful timing.
 #0
+
 RELENTLESS-HUNT
 ----------------------------------------
 Name
@@ -5685,23 +5800,24 @@ Skill
 ----------------------------------------
 Description
 ----------------------------------------
-Relentless Hunt is a skill registered as SKILL_RELENTLESS_HUNT in the live ability table.
+A trained ability that improves performance in combat or tactical play.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This skill is executed through its command handler/manual logic rather than template spell routines.
+Provides offensive pressure, defense, control, or utility depending on the skill.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Use the skill command when its class/position/combat prerequisites are met; the engine checks success chance and then resolves the skill-specific effect.
+Activate as a skill in the appropriate combat or exploration context.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Best use depends on the exact command implementation (offense, mobility, utility, or control) and your current combat state.
+Best used with class synergies and careful timing.
 #0
+
 SHADOW-RESERVOIR
 ----------------------------------------
 Name
@@ -5716,23 +5832,24 @@ Skill
 ----------------------------------------
 Description
 ----------------------------------------
-Shadow Reservoir is a skill registered as SKILL_SHADOW_RESERVOIR in the live ability table.
+A trained ability that improves performance in combat or tactical play.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This skill is executed through its command handler/manual logic rather than template spell routines.
+Provides offensive pressure, defense, control, or utility depending on the skill.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Use the skill command when its class/position/combat prerequisites are met; the engine checks success chance and then resolves the skill-specific effect.
+Activate as a skill in the appropriate combat or exploration context.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Best use depends on the exact command implementation (offense, mobility, utility, or control) and your current combat state.
+Best used with class synergies and careful timing.
 #0
+
 SHADOW-SURGE
 ----------------------------------------
 Name
@@ -5747,22 +5864,22 @@ Skill
 ----------------------------------------
 Description
 ----------------------------------------
-Shadow Surge is a skill registered as SKILL_SHADOW_SURGE in the live ability table.
+A trained ability that improves performance in combat or tactical play.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This skill is executed through its command handler/manual logic rather than template spell routines.
+Provides offensive pressure, defense, control, or utility depending on the skill.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Use the skill command when its class/position/combat prerequisites are met; the engine checks success chance and then resolves the skill-specific effect.
+Activate as a skill in the appropriate combat or exploration context.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Best use depends on the exact command implementation (offense, mobility, utility, or control) and your current combat state.
+Best used with class synergies and careful timing.
 #0
 
 CHAIN-ASSASSAULT
@@ -5779,23 +5896,24 @@ Skill
 ----------------------------------------
 Description
 ----------------------------------------
-Chain Assault is a combat passive skill (`SKILL_CHAIN_ASSASSAULT`) that links melee and spell pressure.
+A trained ability that improves performance in combat or tactical play.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-After your melee weapon hit, the skill applies a 1-round proc state. If your next eligible targeted spell lands while that state is active, that spell's damage is increased by 10% and the proc is consumed.
+Provides offensive pressure, defense, control, or utility depending on the skill.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-No separate command: keep attacking in melee, then cast a character-targeted spell before the proc expires.
+Activate as a skill in the appropriate combat or exploration context.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-The bonus does not apply to `TAR_IGNORE` spells; timing your cast immediately after a weapon strike is the core optimization.
+Best used with class synergies and careful timing.
 #0
+
 SOVEREIGN-PRESSURE
 ----------------------------------------
 Name
@@ -5810,23 +5928,24 @@ Skill
 ----------------------------------------
 Description
 ----------------------------------------
-Sovereign Pressure is a skill registered as SKILL_SOVEREIGN_PRESSURE in the live ability table.
+A trained ability that improves performance in combat or tactical play.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This skill is executed through its command handler/manual logic rather than template spell routines.
+Provides offensive pressure, defense, control, or utility depending on the skill.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Use the skill command when its class/position/combat prerequisites are met; the engine checks success chance and then resolves the skill-specific effect.
+Activate as a skill in the appropriate combat or exploration context.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Best use depends on the exact command implementation (offense, mobility, utility, or control) and your current combat state.
+Best used with class synergies and careful timing.
 #0
+
 KILL-WINDOW
 ----------------------------------------
 Name
@@ -5841,23 +5960,24 @@ Skill
 ----------------------------------------
 Description
 ----------------------------------------
-Kill Window is a skill registered as SKILL_KILL_WINDOW in the live ability table.
+A trained ability that improves performance in combat or tactical play.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This skill is executed through its command handler/manual logic rather than template spell routines.
+Provides offensive pressure, defense, control, or utility depending on the skill.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Use the skill command when its class/position/combat prerequisites are met; the engine checks success chance and then resolves the skill-specific effect.
+Activate as a skill in the appropriate combat or exploration context.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Best use depends on the exact command implementation (offense, mobility, utility, or control) and your current combat state.
+Best used with class synergies and careful timing.
 #0
+
 LEGION-MASTERY
 ----------------------------------------
 Name
@@ -5872,22 +5992,22 @@ Skill
 ----------------------------------------
 Description
 ----------------------------------------
-Legion Mastery is a skill registered as SKILL_LEGION_MASTERY in the live ability table.
+A trained ability that improves performance in combat or tactical play.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-This skill is executed through its command handler/manual logic rather than template spell routines.
+Provides offensive pressure, defense, control, or utility depending on the skill.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Use the skill command when its class/position/combat prerequisites are met; the engine checks success chance and then resolves the skill-specific effect.
+Activate as a skill in the appropriate combat or exploration context.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Best use depends on the exact command implementation (offense, mobility, utility, or control) and your current combat state.
+Best used with class synergies and careful timing.
 #0
 
 APPRAISE-ENEMY APPRAISE APPRAISE-FOE
@@ -5942,22 +6062,22 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Armor is a defensive spell from SPELL_ARMOR that places a protection buff on a character.
+Grants a beneficial spell effect that improves your combat readiness.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-Applies an AC-improving magical protection effect (MAG_AFFECTS) until it wears off.
+Applies one or more buffs such as defense, accuracy, resistance, or utility depending on the ability.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Target a character in your room (self or ally). You can cast it while standing or in combat.
+Primarily self-targeted (or cast on an ally when allowed).
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Keep this active before and during hard fights to reduce incoming physical damage.
+Use before engagement for best value.
 #0
 #0
 %AT% WAT MAT OAT %MAT% %WAT% %OAT%
@@ -11223,35 +11343,27 @@ Examples: @RTSTAT 23612, 23613, 23614@n
 See also: REMOTE, VARIABLES, CONTEXT
 #31
 GOAL-OF-ALL-LIFE-IS-DEATH GOAL-OF-LIFE-DEATH ALL-LIFE-IS-DEATH
-----------------------------------------
-Name
-----------------------------------------
-Goal of All Life Is Death
 
-----------------------------------------
-Type
-----------------------------------------
-Spell
+Goal Of All Life Is Death
+Type: Spell
+Category: High-Tier Offensive Spell
 
-----------------------------------------
-Description
-----------------------------------------
-Goal of All Life Is Death is a spell defined by SPELL_GOAL_OF_ALL_LIFE_IS_DEATH in the live ability table.
+Description:
+Invokes an apex death-magic state designed to set up lethal necromantic pressure.
 
-----------------------------------------
-Effect
-----------------------------------------
-This ability uses a dedicated code path in the spell system. It also runs custom manual logic for spell-specific behavior.
+Effect:
+Creates a powerful death-aligned combat advantage and synergizes with execute-style magic.
 
-----------------------------------------
-Usage
-----------------------------------------
-Target yourself only. You must be standing or better to cast it.
+Usage:
+Cast before your biggest death-magic sequence.
 
-----------------------------------------
-Notes
-----------------------------------------
-Practical value depends on enemy saves, resistances, and immunities checked during resolution.
+Tactical Notes:
+Use as a setup tool before finishing rotations and coordinated burst.
+
+Limitations:
+High-tier spell with strong tactical value; intended for major encounters.
+
+See also: SPELLS SKILLS
 #0
 GOLD PURSE MONEY PLATINUM SILVER COPPER CASH COINS WEALTH CURRENCY MULTI-CURRENCY ECONOMY TREASURE
 
@@ -24402,3 +24514,4 @@ zlock - Locks one or all zones. Type zlock for usage.
 zunlock - Locks one or all zones. Type zunlock for usage.
 
 #31
+$
