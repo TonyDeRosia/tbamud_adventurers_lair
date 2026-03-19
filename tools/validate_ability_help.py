@@ -49,9 +49,13 @@ def entry_is_generic(entry):
 
 def coverage(abilities, by_keyword):
     total = len(abilities)
+    spells_total = sum(1 for _, typ, _ in abilities if typ == "Spell")
+    skills_total = sum(1 for _, typ, _ in abilities if typ == "Skill")
     unresolved = []
     generic = []
     static = 0
+    static_spells = 0
+    static_skills = 0
     for name, typ, _ in abilities:
         keys = [name.lower(), name.lower().replace(" ", "-")]
         matched = []
@@ -64,9 +68,17 @@ def coverage(abilities, by_keyword):
             generic.append((name, typ, "only generic/static fallback-style text"))
         else:
             static += 1
+            if typ == "Spell":
+                static_spells += 1
+            else:
+                static_skills += 1
     return {
         "total": total,
+        "spells_total": spells_total,
+        "skills_total": skills_total,
         "static": static,
+        "static_spells": static_spells,
+        "static_skills": static_skills,
         "unresolved": unresolved,
         "generic": generic,
     }
@@ -88,14 +100,20 @@ def main():
         base_help = subprocess.check_output(["git", "show", "HEAD:lib/text/help/help.hlp"], text=True)
         base = coverage(abilities, parse_help_entries(base_help))
         print("Before (HEAD):")
-        print(f"  total abilities: {base['total']}")
-        print(f"  with detailed static help: {base['static']}")
+        print(f"  total abilities: {base['total']} (spells: {base['spells_total']}, skills: {base['skills_total']})")
+        print(
+            f"  with detailed static help: {base['static']} "
+            f"(spells: {base['static_spells']}, skills: {base['static_skills']})"
+        )
         print(f"  unresolved (missing): {len(base['unresolved'])}")
         print(f"  unresolved (generic-only): {len(base['generic'])}")
         print("After (working tree):")
 
-    print(f"  total abilities: {current['total']}")
-    print(f"  with detailed static help: {current['static']}")
+    print(f"  total abilities: {current['total']} (spells: {current['spells_total']}, skills: {current['skills_total']})")
+    print(
+        f"  with detailed static help: {current['static']} "
+        f"(spells: {current['static_spells']}, skills: {current['static_skills']})"
+    )
     print(f"  unresolved (missing): {len(current['unresolved'])}")
     print(f"  unresolved (generic-only): {len(current['generic'])}")
 
@@ -103,6 +121,9 @@ def main():
         print("\nRemaining unresolved abilities:")
         for row in current["unresolved"] + current["generic"]:
             print(f"  - {row[0]} [{row[1]}]: {row[2]}")
+    else:
+        print("\nRemaining generic fallback abilities:")
+        print("  - (none)")
 
 
 if __name__ == "__main__":
