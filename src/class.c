@@ -133,6 +133,17 @@ const struct pc_class_definition pc_classes[] = {
     .prac_max_per_prac = 100,
     .prac_min_per_prac = 25,
     .prac_type = SPELL
+  },
+  [CLASS_ADVENTURER] = {
+    .name = "Adventurer",
+    .abbrev = "Ad",
+    .archetype_abbrev = "Adv",
+    .select_key = '\0',
+    .selectable = false,
+    .prac_learned_level = 95,
+    .prac_max_per_prac = 100,
+    .prac_min_per_prac = 25,
+    .prac_type = SPELL
   }
 };
 
@@ -149,6 +160,7 @@ const char *class_abbrevs[] = {
   [CLASS_WARLOCK] = pc_classes[CLASS_WARLOCK].abbrev,
   [CLASS_DRUID] = pc_classes[CLASS_DRUID].abbrev,
   [CLASS_MYSTIC] = pc_classes[CLASS_MYSTIC].abbrev,
+  [CLASS_ADVENTURER] = pc_classes[CLASS_ADVENTURER].abbrev,
   "\n"
 };
 
@@ -162,6 +174,7 @@ const char *pc_class_types[] = {
   [CLASS_WARLOCK] = pc_classes[CLASS_WARLOCK].name,
   [CLASS_DRUID] = pc_classes[CLASS_DRUID].name,
   [CLASS_MYSTIC] = pc_classes[CLASS_MYSTIC].name,
+  [CLASS_ADVENTURER] = pc_classes[CLASS_ADVENTURER].name,
   "\n"
 };
 
@@ -274,6 +287,8 @@ static int get_class_archetype(int class_num)
   case CLASS_DRUID:
     return CLASS_CLERIC;
   case CLASS_MYSTIC:
+    return CLASS_MAGIC_USER;
+  case CLASS_ADVENTURER:
     return CLASS_MAGIC_USER;
   default:
     return class_num;
@@ -1622,6 +1637,7 @@ void roll_real_abils(struct char_data *ch)
 
   switch (GET_CLASS(ch)) {
   case CLASS_MAGIC_USER:
+  case CLASS_ADVENTURER:
     ch->real_abils.intel = table[0];
     ch->real_abils.wis = table[1];
     ch->real_abils.dex = table[2];
@@ -1762,6 +1778,7 @@ void advance_level(struct char_data *ch)
   switch (GET_CLASS(ch)) {
 
   case CLASS_MAGIC_USER:
+  case CLASS_ADVENTURER:
     add_hp += rand_number(3, 8);
     add_mana = rand_number(GET_LEVEL(ch), (int)(1.5 * GET_LEVEL(ch)));
     add_mana = MIN(add_mana, 10);
@@ -1794,7 +1811,7 @@ void advance_level(struct char_data *ch)
   if (GET_LEVEL(ch) > 1)
     ch->points.max_mana += add_mana;
 
-  if (IS_MAGIC_USER(ch) || IS_CLERIC(ch))
+  if (IS_MAGIC_USER(ch) || IS_CLERIC(ch) || GET_CLASS(ch) == CLASS_ADVENTURER)
     GET_PRACTICES(ch) += MAX(2, wis_app[GET_WIS(ch)].bonus);
   else
     GET_PRACTICES(ch) += MIN(2, MAX(1, wis_app[GET_WIS(ch)].bonus));
@@ -1860,10 +1877,15 @@ void init_spell_levels(void)
 {
   int i;
 
-  for (i = 0; i < num_pc_classes(); i++)
+  for (i = 0; i < num_pc_classes(); i++) {
+    if (i == CLASS_ADVENTURER)
+      continue;
     spell_level(SKILL_KICK, i, 5);
+  }
   for (i = 0; i < num_pc_classes(); i++)
     spell_level(SKILL_RECALL, i, 1);
+  spell_level(SKILL_STUDY, CLASS_ADVENTURER, 1);
+  spell_level(SPELL_MAGIC_MISSILE, CLASS_ADVENTURER, 1);
 
   /* MAGES */
   spell_level(SPELL_MAGIC_MISSILE, CLASS_MAGIC_USER, 1);

@@ -3642,6 +3642,7 @@ void init_char(struct char_data *ch)
   GET_NUM_QUESTS(ch) = 0;
   ch->player_specials->saved.completed_quests = NULL;
   GET_QUEST(ch) = NOTHING;
+  GET_CLASS(ch) = CLASS_ADVENTURER;
 
   ch->player.time.birth = time(0);
   ch->player.time.logon = time(0);

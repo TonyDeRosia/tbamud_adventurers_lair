@@ -161,8 +161,9 @@ void clanedit_parse(struct descriptor_data *d, char *arg);
 #define CLASS_WARLOCK     6    /**< PC Class Warlock */
 #define CLASS_DRUID       7    /**< PC Class Druid */
 #define CLASS_MYSTIC      8    /**< PC Class Mystic */
+#define CLASS_ADVENTURER  9    /**< PC Class Adventurer (reactive pre-lock starter shell) */
 /** Total number of available PC Classes */
-#define NUM_CLASSES       9
+#define NUM_CLASSES       10
 
 /* NPC classes (currently unused - feel free to implement!) */
 #define CLASS_OTHER       0    /**< NPC Class Other (or undefined) */
