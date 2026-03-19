@@ -111,6 +111,7 @@ char *ideas = NULL;             /* ideas file                    */
 
 int top_of_helpt = 0;
 struct help_index_element *help_table = NULL;
+static int help_table_allocated = 0;
 
 struct social_messg *soc_mess_list = NULL;      /* list of socials */
 int top_of_socialt = -1;                        /* number of socials */
@@ -912,6 +913,18 @@ static int count_alias_records(FILE *fl)
   get_one_line(fl, key);
 
   while (*key != '$') {
+    char *keyp = key;
+
+    while (*keyp && isspace((unsigned char)*keyp))
+      keyp++;
+
+    if (!*keyp || *keyp == '!') {
+      get_one_line(fl, key);
+      if (feof(fl))
+        goto ackeof;
+      continue;
+    }
+
     /* skip the text */
     do {
       get_one_line(fl, line);
@@ -920,7 +933,7 @@ static int count_alias_records(FILE *fl)
     } while (*line != '#');
 
     /* now count keywords */
-    scan = key;
+    scan = keyp;
     do {
       scan = one_word(scan, next_key);
       if (*next_key)
@@ -1082,6 +1095,7 @@ void index_boot(int mode)
     break;
   case DB_BOOT_HLP:
     CREATE(help_table, struct help_index_element, rec_count);
+    help_table_allocated = rec_count;
     size[0] = sizeof(struct help_index_element) * rec_count;
     log("   %d entries, %d bytes.", rec_count, size[0]);
     break;
@@ -2345,6 +2359,7 @@ void free_help_table(void)
     free(help_table);
     help_table = NULL;
   }
+  help_table_allocated = 0;
   top_of_helpt = 0;
 }
 
@@ -2411,6 +2426,11 @@ void load_help(FILE * fl, char *name)
     scan = one_word(keyp, next_key);
 
     while (*next_key) {
+      if (top_of_helpt >= help_table_allocated) {
+        log("SYSERR: Help table overflow while loading %s (allocated=%d, next=%d, key='%s').",
+            hname, help_table_allocated, top_of_helpt + 1, next_key);
+        exit(1);
+      }
       el.keywords = strdup(next_key);
       help_table[top_of_helpt++] = el;
       el.duplicate++;
