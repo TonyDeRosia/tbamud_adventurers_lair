@@ -670,7 +670,8 @@ enum study_item_result {
   STUDY_ITEM_NO_STUDYABLE_SPELLS,
   STUDY_ITEM_ALL_KNOWN,
   STUDY_ITEM_ALL_TOO_ADVANCED,
-  STUDY_ITEM_ALL_BLOCKED_PATH
+  STUDY_ITEM_ALL_BLOCKED_PATH,
+  STUDY_ITEM_TARGET_NOT_PRESENT
 };
 
 struct study_item_debug_info {
@@ -779,6 +780,20 @@ static int study_extract_item_spells(struct obj_data *obj, int *out, int out_cap
   return c;
 }
 
+static int study_item_contains_spell(const int *spell_ids, int spell_count, int target_id)
+{
+  int i;
+
+  if (!spell_ids || spell_count <= 0 || target_id <= 0)
+    return FALSE;
+
+  for (i = 0; i < spell_count; i++)
+    if (spell_ids[i] == target_id)
+      return TRUE;
+
+  return FALSE;
+}
+
 static struct obj_data *study_find_item_source(struct char_data *student, char *name)
 {
   struct obj_data *obj;
@@ -800,7 +815,69 @@ static struct obj_data *study_find_item_source(struct char_data *student, char *
   return NULL;
 }
 
+static int study_find_item_and_target(struct char_data *ch, char *argument,
+                                      struct obj_data **study_obj_out,
+                                      int *target_id_out,
+                                      int *has_target_out)
+{
+  char work[MAX_INPUT_LENGTH];
+  char item_name[MAX_INPUT_LENGTH] = "";
+  char target_name[MAX_INPUT_LENGTH] = "";
+  char *tokens[64];
+  int token_count = 0;
+  char *tok;
+  int i, j;
+  struct obj_data *obj = NULL;
+
+  if (!ch || !study_obj_out || !target_id_out || !has_target_out || !argument || !*argument)
+    return FALSE;
+
+  *study_obj_out = NULL;
+  *target_id_out = -1;
+  *has_target_out = FALSE;
+
+  strlcpy(work, argument, sizeof(work));
+  tok = strtok(work, " ");
+  while (tok && token_count < 64) {
+    tokens[token_count++] = tok;
+    tok = strtok(NULL, " ");
+  }
+
+  if (token_count <= 0)
+    return FALSE;
+
+  for (i = token_count; i >= 1; i--) {
+    item_name[0] = '\0';
+    for (j = 0; j < i; j++) {
+      if (*item_name)
+        strlcat(item_name, " ", sizeof(item_name));
+      strlcat(item_name, tokens[j], sizeof(item_name));
+    }
+
+    obj = study_find_item_source(ch, item_name);
+    if (!obj)
+      continue;
+
+    *study_obj_out = obj;
+    if (i < token_count) {
+      target_name[0] = '\0';
+      for (j = i; j < token_count; j++) {
+        if (*target_name)
+          strlcat(target_name, " ", sizeof(target_name));
+        strlcat(target_name, tokens[j], sizeof(target_name));
+      }
+      *target_id_out = find_skill_num(target_name);
+      *has_target_out = TRUE;
+    }
+    return TRUE;
+  }
+
+  return FALSE;
+}
+
 static enum study_item_result study_try_from_item(struct char_data *ch, struct obj_data *study_obj,
+                                                  int requested_ability_id,
+                                                  int has_requested_ability,
                                                   int *ability_id_out)
 {
   int i;
@@ -829,10 +906,22 @@ static enum study_item_result study_try_from_item(struct char_data *ch, struct o
     return STUDY_ITEM_NO_VALID_SLOTS;
   }
 
+  if (has_requested_ability) {
+    if (!study_is_valid_ability_id(requested_ability_id) ||
+        !study_item_contains_spell(raw_spell_ids, raw_spell_count, requested_ability_id)) {
+      study_debug_imm(ch, "item '%s' does not contain requested ability id=%d",
+                      study_obj->short_description, requested_ability_id);
+      return STUDY_ITEM_TARGET_NOT_PRESENT;
+    }
+  }
+
   for (i = 0; i < raw_spell_count; i++) {
     int sid = raw_spell_ids[i];
     int required_level = classtrack_get_study_min_level(sid);
     int ability_archetype = classtrack_get_ability_archetype(sid);
+
+    if (has_requested_ability && sid != requested_ability_id)
+      continue;
 
     if (*raw_names)
       strlcat(raw_names, ", ", sizeof(raw_names));
@@ -860,8 +949,10 @@ static enum study_item_result study_try_from_item(struct char_data *ch, struct o
     strlcat(eligible_names, spell_info[sid].name, sizeof(eligible_names));
   }
 
-  study_debug_imm(ch, "item '%s' type %d candidates=[%s] eligible=[%s]",
+  study_debug_imm(ch, "item '%s' type %d target=%s candidates=[%s] eligible=[%s]",
                   study_obj->short_description, GET_OBJ_TYPE(study_obj),
+                  (has_requested_ability && study_is_valid_ability_id(requested_ability_id)) ?
+                    spell_info[requested_ability_id].name : "auto",
                   *raw_names ? raw_names : "none",
                   *eligible_names ? eligible_names : "none");
 
@@ -902,8 +993,13 @@ ACMD(do_study)
 {
   struct obj_data *study_obj = NULL;
   char reason[MAX_INPUT_LENGTH];
+  char argument_copy[MAX_INPUT_LENGTH];
   int ability_id;
+  int requested_ability_id = -1;
+  int has_requested_ability = FALSE;
+  int parsed_item = FALSE;
   enum study_item_result item_result;
+  const int study_cooldown = PULSE_VIOLENCE;
 
   skip_spaces(&argument);
 
@@ -912,6 +1008,11 @@ ACMD(do_study)
 
   if (!*argument) {
     send_to_char(ch, "Usage: study <spell, skill, or magical item>\r\n");
+    return;
+  }
+
+  if (GET_WAIT_STATE(ch) > 0) {
+    send_to_char(ch, "You need a moment to gather your thoughts before studying again.\r\n");
     return;
   }
 
@@ -924,27 +1025,36 @@ ACMD(do_study)
   if (study_is_valid_ability_id(ability_id)) {
     if (!study_can_learn_ability(ch, ability_id, reason, sizeof(reason))) {
       send_to_char(ch, "%s\r\n", *reason ? reason : "You cannot study that right now.");
+      WAIT_STATE(ch, study_cooldown);
       return;
     }
 
     SET_SKILL(ch, ability_id, 1);
     send_to_char(ch, "You study the knowledge of %s and begin to understand it.\r\n",
                  spell_info[ability_id].name);
+    WAIT_STATE(ch, study_cooldown);
     return;
   }
 
-  study_obj = study_find_item_source(ch, argument);
-  if (!study_obj) {
+  strlcpy(argument_copy, argument, sizeof(argument_copy));
+  parsed_item = study_find_item_and_target(ch, argument_copy, &study_obj,
+                                           &requested_ability_id, &has_requested_ability);
+  if (!parsed_item || !study_obj) {
     send_to_char(ch, "You do not recognize that technique.\r\n");
+    WAIT_STATE(ch, study_cooldown);
     return;
   }
 
-  item_result = study_try_from_item(ch, study_obj, &ability_id);
+  item_result = study_try_from_item(ch, study_obj, requested_ability_id,
+                                    has_requested_ability, &ability_id);
   if (item_result != STUDY_ITEM_SUCCESS) {
     switch (item_result) {
       case STUDY_ITEM_INVALID_SOURCE:
       case STUDY_ITEM_NO_VALID_SLOTS:
         send_to_char(ch, "There is no technique within that item for you to study.\r\n");
+        break;
+      case STUDY_ITEM_TARGET_NOT_PRESENT:
+        send_to_char(ch, "That item does not contain that technique.\r\n");
         break;
       case STUDY_ITEM_ALL_KNOWN:
         send_to_char(ch, "You already know all of the knowledge bound within that item.\r\n");
@@ -957,17 +1067,23 @@ ACMD(do_study)
         break;
       case STUDY_ITEM_NO_STUDYABLE_SPELLS:
       default:
-        send_to_char(ch, "You study %s, but find no technique you can currently learn.\r\n",
-                     study_obj->short_description);
+        send_to_char(ch, "You cannot yet make use of the knowledge bound within that item.\r\n");
         break;
     }
-    study_debug_imm(ch, "item-study result=%d for '%s'", item_result, study_obj->short_description);
+    study_debug_imm(ch, "item-study result=%d for '%s' target=%d", item_result,
+                    study_obj->short_description, requested_ability_id);
+    WAIT_STATE(ch, study_cooldown);
     return;
   }
 
   SET_SKILL(ch, ability_id, 1);
-  send_to_char(ch, "You study %s and begin to understand %s.\r\n",
-               study_obj->short_description, spell_info[ability_id].name);
+  if (has_requested_ability)
+    send_to_char(ch, "You focus on %s within %s and begin to understand it.\r\n",
+                 spell_info[ability_id].name, study_obj->short_description);
+  else
+    send_to_char(ch, "You study %s and begin to understand %s.\r\n",
+                 study_obj->short_description, spell_info[ability_id].name);
+  WAIT_STATE(ch, study_cooldown);
 }
 
 
