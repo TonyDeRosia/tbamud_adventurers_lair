@@ -15,6 +15,7 @@
 #include "interpreter.h"
 #include "spells.h"
 #include "class.h"
+#include "classtrack.h"
 #include "race.h"
 #include "handler.h"
 #include "comm.h"
@@ -38,6 +39,25 @@ static void spello(int spl, const char *name, int max_mana, int min_mana,
 static int mag_manacost(struct char_data *ch, int spellnum);
 static bool is_spellup_beneficial_spell(int spellnum);
 static int reflect_suppressed = 0;
+
+static int can_character_cast_known_spell(struct char_data *ch, int spellnum)
+{
+  int required_level;
+
+  if (!ch || IS_NPC(ch))
+    return FALSE;
+
+  if (spellnum < 1 || spellnum > MAX_SPELLS)
+    return FALSE;
+
+  required_level = SINFO.min_level[(int) GET_CLASS(ch)];
+  required_level = classtrack_get_study_display_level(ch, spellnum, required_level);
+
+  if (GET_LEVEL(ch) < required_level)
+    return FALSE;
+
+  return (GET_SKILL(ch, spellnum) > 0);
+}
 
 int spell_on_cooldown(struct char_data *ch, int spellnum)
 {
@@ -2512,12 +2532,8 @@ ACMD(do_cast) {
     send_to_char(ch, "Cast what?!?\r\n");
     return;
   }
-  if (GET_LEVEL(ch) < SINFO.min_level[(int) GET_CLASS(ch)]) {
+  if (!can_character_cast_known_spell(ch, spellnum)) {
     send_to_char(ch, "You do not know that spell!\r\n");
-    return;
-  }
-  if (GET_SKILL(ch, spellnum) == 0) {
-    send_to_char(ch, "You are unfamiliar with that spell.\r\n");
     return;
   }
   /* Find the target */
