@@ -3674,6 +3674,8 @@ void init_char(struct char_data *ch)
       SET_SKILL(ch, i, 100);
   }
 
+  classtrack_ensure_study_skill(ch);
+
   for (i = 0; i < AF_ARRAY_MAX; i++)
     AFF_FLAGS(ch)[i] = 0;
 

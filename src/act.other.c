@@ -213,6 +213,8 @@ static void show_ability_table_aligned(struct char_data *ch, int show_spells, in
     }
 
     lvl = spell_info[i].min_level[cls];
+    if (i == SKILL_STUDY && lvl <= 0)
+      lvl = 1;
     if (lvl <= 0) continue;
 
     if (show_all && lvl >= LVL_IMMORT) continue;
@@ -269,6 +271,86 @@ static void show_ability_table_aligned(struct char_data *ch, int show_spells, in
       snprintf(cell, sizeof(cell), "%s [%d%%]",
                rows[i].name,
                rows[i].pct);
+    send_to_char(ch, "%-*s", ABIL_COL_WIDTH + count_color_chars(cell), cell);
+
+    col++;
+    if (col >= 2) {
+      send_to_char(ch, "\r\n");
+      col = 0;
+    }
+  }
+
+  if (col != 0)
+    send_to_char(ch, "\r\n");
+}
+
+static void show_adventurer_study_catalog(struct char_data *ch, int show_spells, const char *filter)
+{
+  struct abil_row rows[TOP_SPELL_DEFINE + 1];
+  int i, n = 0;
+  int col = 0;
+  int last_lvl = -1;
+
+  send_to_char(ch,
+               "As an Adventurer, your future abilities are not defined by a fixed class list.\r\n"
+               "Use STUDY <ability> to pursue new techniques.\r\n");
+  send_to_char(ch, "%s:\r\n", show_spells ? "STUDYABLE SPELLS" : "STUDYABLE SKILLS");
+
+  for (i = 1; i <= MAX_SKILLS; i++) {
+    int lvl;
+    const char *nm;
+
+    if (!classtrack_is_study_catalog_ability(i, show_spells))
+      continue;
+
+    nm = spell_info[i].name;
+    if (!ability_matches_filter(ch, i, filter, show_spells))
+      continue;
+
+    lvl = classtrack_get_study_min_level(i);
+    if (lvl <= 0 || lvl >= LVL_IMMORT)
+      continue;
+
+    rows[n].id = i;
+    rows[n].lvl = lvl;
+    rows[n].name = nm;
+    rows[n].pct = GET_SKILL(ch, i);
+    if (rows[n].pct > 100)
+      rows[n].pct = 100;
+    n++;
+  }
+
+  if (n == 0) {
+    send_to_char(ch, "None.\r\n");
+    return;
+  }
+
+  qsort(rows, (size_t)n, sizeof(rows[0]), abil_row_cmp);
+
+  for (i = 0; i < n; i++) {
+    char cell[256];
+
+    if (rows[i].lvl != last_lvl) {
+      if (col != 0) {
+        send_to_char(ch, "\r\n");
+        col = 0;
+      }
+      send_to_char(ch, "%sLevel %-2d%s:%s ",
+                   CCCYN(ch, C_NRM),
+                   rows[i].lvl,
+                   CCWHT(ch, C_NRM),
+                   CCNRM(ch, C_NRM));
+      last_lvl = rows[i].lvl;
+    } else if (col == 0) {
+      send_to_char(ch, "\r\n%*s", LEVEL_LABEL_PADDING, "");
+    } else {
+      send_to_char(ch, "  ");
+    }
+
+    if (rows[i].pct <= 0)
+      snprintf(cell, sizeof(cell), "%s [ -- ]", rows[i].name);
+    else
+      snprintf(cell, sizeof(cell), "%s [%d%%]", rows[i].name, rows[i].pct);
     send_to_char(ch, "%-*s", ABIL_COL_WIDTH + count_color_chars(cell), cell);
 
     col++;
@@ -594,6 +676,10 @@ ACMD(do_skills)
     strlcpy(filter, arg, sizeof(filter));
 
   send_to_char(ch, "You have %d practice sessions remaining.\r\n", GET_PRACTICES(ch));
+  if (show_all && !GET_CLASS_LOCKED(ch)) {
+    show_adventurer_study_catalog(ch, 0, filter);
+    return;
+  }
   if (show_all)
     send_to_char(ch, "Showing all skills your class can learn at any level.\r\n");
   show_ability_table_aligned(ch, 0, show_all, filter);
@@ -637,26 +723,6 @@ static int can_use_practice_trainer(struct char_data *ch)
   return FALSE;
 }
 
-static int study_min_level_for_ability(int ability_id)
-{
-  int i;
-  int min_level = LVL_IMPL + 1;
-
-  if (ability_id <= 0 || ability_id > TOP_SPELL_DEFINE)
-    return -1;
-
-  for (i = 0; i < NUM_CLASSES; i++) {
-    int lvl = spell_info[ability_id].min_level[i];
-    if (lvl > 0 && lvl < min_level)
-      min_level = lvl;
-  }
-
-  if (min_level > LVL_IMMORT)
-    return -1;
-
-  return min_level;
-}
-
 ACMD(do_study)
 {
   char reason[MAX_INPUT_LENGTH];
@@ -687,7 +753,12 @@ ACMD(do_study)
     return;
   }
 
-  required_level = study_min_level_for_ability(ability_id);
+  if (GET_SKILL(ch, SKILL_STUDY) <= 0) {
+    send_to_char(ch, "You do not yet understand how to study new techniques.\r\n");
+    return;
+  }
+
+  required_level = classtrack_get_study_min_level(ability_id);
   if (required_level > 0 && GET_LEVEL(ch) < required_level) {
     send_to_char(ch, "You are not experienced enough to study that yet.\r\n");
     return;
@@ -1822,6 +1893,10 @@ ACMD(do_spells)
     strlcpy(filter, arg2, sizeof(filter));
 
   send_to_char(ch, "You have %d practice sessions remaining.\r\n", GET_PRACTICES(ch));
+  if ((show_all || subcmd == 1) && !GET_CLASS_LOCKED(ch)) {
+    show_adventurer_study_catalog(ch, 1, filter);
+    return;
+  }
   if (show_all || subcmd == 1)
     send_to_char(ch, "Showing all spells your class can learn at any level.\r\n");
   show_ability_table_aligned(ch, show_spells, show_all, filter);

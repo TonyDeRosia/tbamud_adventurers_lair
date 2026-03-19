@@ -112,6 +112,7 @@ static const struct ability_archetype_map ct_skill_archetype_map[] = {
   { SKILL_CHAIN_ASSASSAULT, ARCHETYPE_ROGUE },
   { SKILL_KILL_WINDOW, ARCHETYPE_ROGUE },
   { SKILL_APPRAISE_ENEMY, ARCHETYPE_ROGUE },
+  { SKILL_STUDY, ARCHETYPE_ARCANE },
   { 0, -1 }
 };
 
@@ -532,4 +533,52 @@ int classtrack_can_study_ability(struct char_data *ch, int ability_id)
     return 0;
 
   return classtrack_can_study_archetype(ch, archetype, NULL, 0);
+}
+
+int classtrack_get_study_min_level(int ability_id)
+{
+  return classtrack_min_study_level_for_ability(ability_id);
+}
+
+int classtrack_is_study_catalog_ability(int ability_id, int show_spells)
+{
+  int required_level;
+  int archetype;
+
+  if (ability_id <= 0 || ability_id > TOP_SPELL_DEFINE || ability_id > MAX_SKILLS)
+    return 0;
+
+  if (!spell_info[ability_id].name || !*spell_info[ability_id].name ||
+      !str_cmp(spell_info[ability_id].name, "!UNUSED!"))
+    return 0;
+
+  if (show_spells) {
+    if (ability_id > MAX_SPELLS)
+      return 0;
+  } else {
+    if (ability_id <= MAX_SPELLS)
+      return 0;
+  }
+
+  if (ability_id == SKILL_STUDY)
+    return 0;
+
+  required_level = classtrack_min_study_level_for_ability(ability_id);
+  if (required_level <= 0)
+    return 0;
+
+  archetype = classtrack_get_ability_archetype(ability_id);
+  if (archetype < 0 || archetype >= NUM_ARCHETYPES)
+    return 0;
+
+  return 1;
+}
+
+void classtrack_ensure_study_skill(struct char_data *ch)
+{
+  if (!ch || IS_NPC(ch))
+    return;
+
+  if (GET_SKILL(ch, SKILL_STUDY) <= 0)
+    SET_SKILL(ch, SKILL_STUDY, 1);
 }
