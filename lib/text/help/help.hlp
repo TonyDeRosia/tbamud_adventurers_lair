@@ -1421,22 +1421,22 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Uses non-damage magic to solve tactical problems such as movement, detection, control, or escape.
+Places a short anti-casting lock on a target.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-Creates a concrete tactical advantage outside raw DPS, such as safer pulls, repositioning, scouting, or disengage.
+Applies AFF_SPELLLOCK for 1 round on the target (ally or enemy), which is primarily used to stop or delay spellcasting.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Use when a non-damage solution is better than trading blows, such as escaping bad rooms, controlling tempo, or enabling safer engages.
+Cast on a dangerous caster right before their turn. It can also be used on an ally only if you intentionally want to prevent that ally from casting for one round.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Avoid spending turns on this when a kill is immediately available; switch to damage or hard control once position is secured.
+Very short duration, so timing matters more than raw uptime.
 #0
 
 SPELL-STEAL
@@ -1453,22 +1453,22 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-A combat technique executed through skill rather than spellcasting.
+Strips one removable positive magical affect from the target and may transfer it to you.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-Provides direct offensive pressure, control, or tactical engagement tools.
+Removes one qualifying buff from the victim. If the victim fails a spell save, that exact affect is copied to the caster; on a successful save, the buff is only removed.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Use as an active skill command against a target when conditions are met.
+Best against buffed enemies (sanctuary/wards/invisibility/mirror-style effects and similar). Cast early, before committing burst.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Timing and position significantly affect effectiveness.
+Fails with "nothing to steal" when the victim has no qualifying active affect.
 #0
 
 CANCELLATION
@@ -1485,22 +1485,22 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Uses non-damage magic to solve tactical problems such as movement, detection, control, or escape.
+Dispels one or two specific defensive/mobility buffs from the target.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-Creates a concrete tactical advantage outside raw DPS, such as safer pulls, repositioning, scouting, or disengage.
+Removes buffs in priority order (for example sanctuary, flying/invisibility/truesight-style flags, barkskin/stone skin, ward/shield states). If the target fails a save, it tries to remove two effects; otherwise one.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Use when a non-damage solution is better than trading blows, such as escaping bad rooms, controlling tempo, or enabling safer engages.
+Use before focused damage on protected targets.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Avoid spending turns on this when a kill is immediately available; switch to damage or hard control once position is secured.
+Does nothing when the target has no removable effect from its priority list.
 #0
 
 HOLD-PERSON
@@ -2707,22 +2707,22 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Uses non-damage magic to solve tactical problems such as movement, detection, control, or escape.
+Remote-scout spell that lets you view a target's room without moving there.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-Creates a concrete tactical advantage outside raw DPS, such as safer pulls, repositioning, scouting, or disengage.
+Shows the target room name, vnum, description, and visible occupants; also applies a short wait state to the caster.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Use when a non-damage solution is better than trading blows, such as escaping bad rooms, controlling tempo, or enabling safer engages.
+Cast on a character to confirm room safety, nearby mobs, and whether reinforcements are present before you commit.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Avoid spending turns on this when a kill is immediately available; switch to damage or hard control once position is secured.
+Information-only: no damage, no movement, and no direct control effect.
 #0
 
 ETHEREAL-JAUNT
@@ -2739,22 +2739,22 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Uses non-damage magic to solve tactical problems such as movement, detection, control, or escape.
+Random self-teleport inside your current zone.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-Creates a concrete tactical advantage outside raw DPS, such as safer pulls, repositioning, scouting, or disengage.
+Moves you to a random non-private, non-death room in-zone and applies a 3-round cooldown.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Use when a non-damage solution is better than trading blows, such as escaping bad rooms, controlling tempo, or enabling safer engages.
+Use as an emergency escape when your current room is unwinnable.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Avoid spending turns on this when a kill is immediately available; switch to damage or hard control once position is secured.
+Unreliable for precision travel because destination is random.
 #0
 
 LEYLINE-TAP
@@ -2771,22 +2771,22 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Uses non-damage magic to solve tactical problems such as movement, detection, control, or escape.
+Out-of-combat mana recovery spell.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-Creates a concrete tactical advantage outside raw DPS, such as safer pulls, repositioning, scouting, or disengage.
+Restores mana based on level, cannot be cast while fighting, and then goes on a 5-round cooldown.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Use when a non-damage solution is better than trading blows, such as escaping bad rooms, controlling tempo, or enabling safer engages.
+Use between pulls to refill mana before starting the next fight.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Avoid spending turns on this when a kill is immediately available; switch to damage or hard control once position is secured.
+If cast in combat it fails immediately, so do not hold a turn expecting emergency mana from it.
 #0
 
 TEMPORAL-SHIFT
@@ -2803,22 +2803,22 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Bends nearby temporal flow to your advantage.
+Time-control spell with two distinct modes.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-Applies a time manipulation effect that alters combat rhythm.
+On self-cast, it clears your wait state immediately. On an enemy who fails a save, it adds a heavy wait state (about 3 combat pulses).
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Usually self-targeted preparation magic.
+Self-cast to recover tempo after a slow action, or cast on a key enemy to delay their next actions.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Pairs well with control and burst sequences.
+Against high-save targets it is unreliable as crowd control.
 #0
 
 CHRONO-SHIFT
@@ -2835,22 +2835,22 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Recalibrates your combat pace through focused chronomancy.
+Self rewind that restores lost HP from the previous round.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-Applies a time-aspected buff supporting tempo and action flow.
+If you took damage last round, your HP is restored up to that previous value (not above max HP). Applies a 10-round cooldown.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Self-targeted buff.
+Use right after a large hit to recover without waiting for a healer.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Use before sustained engagements to keep momentum.
+Low value if you were not damaged in the prior round.
 #0
 
 BALEFIRE
@@ -3027,22 +3027,22 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Uses non-damage magic to solve tactical problems such as movement, detection, control, or escape.
+Single-target holy damage strike.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-Creates a concrete tactical advantage outside raw DPS, such as safer pulls, repositioning, scouting, or disengage.
+Deals heavy holy damage; versus undead targets it upgrades to an even higher damage tier.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Use when a non-damage solution is better than trading blows, such as escaping bad rooms, controlling tempo, or enabling safer engages.
+Use as priority single-target burst, especially against undead enemies.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Avoid spending turns on this when a kill is immediately available; switch to damage or hard control once position is secured.
+Pure damage spell: no root/stun rider.
 #0
 
 HAMMER-OF-GOD
@@ -3059,22 +3059,22 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Uses non-damage magic to solve tactical problems such as movement, detection, control, or escape.
+Heavy holy strike with control on failed save.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-Creates a concrete tactical advantage outside raw DPS, such as safer pulls, repositioning, scouting, or disengage.
+Deals high holy damage. If the target fails its spell save, it is stunned briefly and rooted for additional duration.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Use when a non-damage solution is better than trading blows, such as escaping bad rooms, controlling tempo, or enabling safer engages.
+Use to lock down a dangerous melee target while your group repositions or bursts.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Avoid spending turns on this when a kill is immediately available; switch to damage or hard control once position is secured.
+Still does damage on successful saves, but the control portion is the reason to cast it.
 #0
 
 DEATH-KNELL
@@ -3123,22 +3123,22 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Uses non-damage magic to solve tactical problems such as movement, detection, control, or escape.
+Room-wide shadow damage against non-evil enemies, with control on failed saves.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-Creates a concrete tactical advantage outside raw DPS, such as safer pulls, repositioning, scouting, or disengage.
+Hits enemy targets in room except evil-aligned ones. On failed save: heavy shadow damage plus short stun and magical blindness. On save: reduced damage only.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Use when a non-damage solution is better than trading blows, such as escaping bad rooms, controlling tempo, or enabling safer engages.
+Best when multiple non-evil enemies are grouped and you need immediate AoE pressure plus disruption.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Avoid spending turns on this when a kill is immediately available; switch to damage or hard control once position is secured.
+Poor choice if most enemies are evil-aligned, because they are skipped entirely.
 #0
 
 HOLY-WORD
@@ -3155,22 +3155,22 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Uses non-damage magic to solve tactical problems such as movement, detection, control, or escape.
+Room-wide holy damage plus control, but only against evil enemies.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-Creates a concrete tactical advantage outside raw DPS, such as safer pulls, repositioning, scouting, or disengage.
+Damages enemy evil targets in the room. On failed save: adds short stun and magical blindness. Neutral and good targets are not affected by its damage loop.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Use when a non-damage solution is better than trading blows, such as escaping bad rooms, controlling tempo, or enabling safer engages.
+Use when fighting multiple evil enemies at once; weak if the room is mostly neutral mobs.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Avoid spending turns on this when a kill is immediately available; switch to damage or hard control once position is secured.
+This is alignment-gated AoE, not a universal room nuke.
 #0
 
 FINGER-OF-DEATH
@@ -3219,22 +3219,22 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Uses non-damage magic to solve tactical problems such as movement, detection, control, or escape.
+Necrotic room attack that can instantly kill living enemies on failed death saves.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-Creates a concrete tactical advantage outside raw DPS, such as safer pulls, repositioning, scouting, or disengage.
+Checks each enemy in room (undead are skipped). Failed death save can trigger instant kill; otherwise the target takes extreme necrotic damage.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Use when a non-damage solution is better than trading blows, such as escaping bad rooms, controlling tempo, or enabling safer engages.
+Best as a high-impact opener against clustered living enemies.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Avoid spending turns on this when a kill is immediately available; switch to damage or hard control once position is secured.
+Inefficient into undead-heavy rooms since they are ignored by this spell.
 #0
 
 POWER-WORD-KILL
@@ -3251,22 +3251,22 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Uses non-damage magic to solve tactical problems such as movement, detection, control, or escape.
+Execution spell with an HP-threshold instant-kill check.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-Creates a concrete tactical advantage outside raw DPS, such as safer pulls, repositioning, scouting, or disengage.
+If target max HP is at or below (50 + 2*caster level), it attempts instant kill; otherwise it deals extreme arcane damage.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Use when a non-damage solution is better than trading blows, such as escaping bad rooms, controlling tempo, or enabling safer engages.
+Use to finish low-ceiling targets or weaker enemies quickly; still usable as damage when threshold is not met.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Avoid spending turns on this when a kill is immediately available; switch to damage or hard control once position is secured.
+Against bosses with high max HP, treat it as a damage nuke rather than guaranteed execution.
 #0
 
 POWER-WORD-STUN
@@ -3379,22 +3379,22 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Uses non-damage magic to solve tactical problems such as movement, detection, control, or escape.
+Heavy single-target psychic damage with a conditional execute chance.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-Creates a concrete tactical advantage outside raw DPS, such as safer pulls, repositioning, scouting, or disengage.
+Deals extreme psychic damage (reduced on save). If the target failed the spell save and is left at or below 30% HP, it can also fail a death save and die instantly.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Use when a non-damage solution is better than trading blows, such as escaping bad rooms, controlling tempo, or enabling safer engages.
+Use as a finisher after the target is already chunked down.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Avoid spending turns on this when a kill is immediately available; switch to damage or hard control once position is secured.
+Weak as an opener because the execute check only happens on low-health targets.
 #0
 
 TIME-STOP
@@ -3462,22 +3462,22 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Uses non-damage magic to solve tactical problems such as movement, detection, control, or escape.
+Straight single-target force-damage nuke.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-Creates a concrete tactical advantage outside raw DPS, such as safer pulls, repositioning, scouting, or disengage.
+Deals extreme force damage; damage is halved on successful spell save. No additional debuff or control rider.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Use when a non-damage solution is better than trading blows, such as escaping bad rooms, controlling tempo, or enabling safer engages.
+Use when you need reliable direct damage without setup conditions.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Avoid spending turns on this when a kill is immediately available; switch to damage or hard control once position is secured.
+Less efficient than conditional execute spells when the target is already near kill range.
 #0
 
 GRASP-HEART
@@ -3494,22 +3494,22 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Uses non-damage magic to solve tactical problems such as movement, detection, control, or escape.
+Necrotic single-target kill attempt that is strongest below 30% target HP.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-Creates a concrete tactical advantage outside raw DPS, such as safer pulls, repositioning, scouting, or disengage.
+At <=30% target HP: attempts instant kill (death save based), otherwise deals extreme necrotic damage. Above 30% HP it deals high necrotic damage and can briefly stun on failed save.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Use when a non-damage solution is better than trading blows, such as escaping bad rooms, controlling tempo, or enabling safer engages.
+Best used as an execute after your group pushes the target into low HP range.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Avoid spending turns on this when a kill is immediately available; switch to damage or hard control once position is secured.
+Can still be cast earlier for damage, but kill reliability is much lower.
 #0
 
 NEGATIVE-BURST NEG-BURST
@@ -3526,22 +3526,22 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Uses non-damage magic to solve tactical problems such as movement, detection, control, or escape.
+Mixed room spell: damages enemies while healing your undead/charmed side.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-Creates a concrete tactical advantage outside raw DPS, such as safer pulls, repositioning, scouting, or disengage.
+Enemy targets in room take medium necrotic damage (save for half). Your charmed followers and undead in room are healed instead.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Use when a non-damage solution is better than trading blows, such as escaping bad rooms, controlling tempo, or enabling safer engages.
+Use in summon/undead compositions when both teams are clustered in one room.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Avoid spending turns on this when a kill is immediately available; switch to damage or hard control once position is secured.
+Low value if you have no allied undead/charmed units nearby.
 #0
 
 TRUE-DEATH
@@ -3622,22 +3622,22 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Uses non-damage magic to solve tactical problems such as movement, detection, control, or escape.
+Self defensive buff that improves armor class.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-Creates a concrete tactical advantage outside raw DPS, such as safer pulls, repositioning, scouting, or disengage.
+Applies AC -25 for a medium duration.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Use when a non-damage solution is better than trading blows, such as escaping bad rooms, controlling tempo, or enabling safer engages.
+Cast before pull or when expecting sustained physical pressure.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Avoid spending turns on this when a kill is immediately available; switch to damage or hard control once position is secured.
+Efficient maintenance buff; low immediate impact if the fight ends quickly.
 #0
 
 GREATER-MAGIC-SEAL
@@ -3654,22 +3654,22 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Uses non-damage magic to solve tactical problems such as movement, detection, control, or escape.
+Longer anti-casting lockdown on a single target.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-Creates a concrete tactical advantage outside raw DPS, such as safer pulls, repositioning, scouting, or disengage.
+Applies AFF_SPELLLOCK. Failed save gives medium duration; successful save gives shorter duration.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Use when a non-damage solution is better than trading blows, such as escaping bad rooms, controlling tempo, or enabling safer engages.
+Use against dangerous casters when you need more than one round of casting denial.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Avoid spending turns on this when a kill is immediately available; switch to damage or hard control once position is secured.
+Directly overlaps with Counterspell; choose this when you need duration, not snap timing.
 #0
 
 DESPAIR-AURA
@@ -3878,22 +3878,22 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Uses non-damage magic to solve tactical problems such as movement, detection, control, or escape.
+Low direct fire hit with a save-gated secondary debuff marker.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-Creates a concrete tactical advantage outside raw DPS, such as safer pulls, repositioning, scouting, or disengage.
+Deals low fire damage; if the target fails save, it gains an additional temporary spell affect (exact downstream interaction appears to be handled elsewhere).
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Use when a non-damage solution is better than trading blows, such as escaping bad rooms, controlling tempo, or enabling safer engages.
+Use as a cheap setup cast if your build uses follow-ups that check this marker; otherwise it is mostly minor damage.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Avoid spending turns on this when a kill is immediately available; switch to damage or hard control once position is secured.
+By itself it is not an efficient burst option.
 #0
 
 GRAVITY-MAELSTROM
@@ -3910,22 +3910,22 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Uses non-damage magic to solve tactical problems such as movement, detection, control, or escape.
+Heavy force damage plus stat suppression on failed save.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-Creates a concrete tactical advantage outside raw DPS, such as safer pulls, repositioning, scouting, or disengage.
+Deals extreme force damage (save for half). On failed save, target gets STR -3, DEX -3, and a brief root.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Use when a non-damage solution is better than trading blows, such as escaping bad rooms, controlling tempo, or enabling safer engages.
+Use early against high-threat melee targets to cut offense and mobility while still dealing strong damage.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Avoid spending turns on this when a kill is immediately available; switch to damage or hard control once position is secured.
+Against save-heavy enemies it may land mostly as damage without the debuff package.
 #0
 
 CALL-GREATER-THUNDER
@@ -3974,22 +3974,22 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Uses non-damage magic to solve tactical problems such as movement, detection, control, or escape.
+Single-target force strike with optional Triple Maximize synergy.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-Creates a concrete tactical advantage outside raw DPS, such as safer pulls, repositioning, scouting, or disengage.
+Deals high force damage (save for half). If Triple Maximize Magic is active, this spell consumes it and significantly boosts damage.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Use when a non-damage solution is better than trading blows, such as escaping bad rooms, controlling tempo, or enabling safer engages.
+Use as your payoff hit immediately after setting Triple Maximize.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Avoid spending turns on this when a kill is immediately available; switch to damage or hard control once position is secured.
+Without maximize setup, it is a standard high-damage single-target cast.
 #0
 
 GREATER-REJECTION REJECTION
@@ -4006,22 +4006,22 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Uses non-damage magic to solve tactical problems such as movement, detection, control, or escape.
+Single-target force spell with banish-like instant-kill condition.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-Creates a concrete tactical advantage outside raw DPS, such as safer pulls, repositioning, scouting, or disengage.
+If target fails save and is either charmed by someone else or undead, it attempts instant kill. Otherwise it deals force damage; save results in lower damage and a brief stun.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Use when a non-damage solution is better than trading blows, such as escaping bad rooms, controlling tempo, or enabling safer engages.
+Use primarily as anti-summon/anti-undead tech; cast normally as fallback force damage when condition is not met.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Avoid spending turns on this when a kill is immediately available; switch to damage or hard control once position is secured.
+Highest value comes from target selection, not raw damage.
 #0
 
 NAPALM
@@ -4038,22 +4038,22 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Uses non-damage magic to solve tactical problems such as movement, detection, control, or escape.
+Room-wide fire damage spell with a short save-gated rider.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-Creates a concrete tactical advantage outside raw DPS, such as safer pulls, repositioning, scouting, or disengage.
+Damages all enemy targets in room for medium fire damage (save for half). On failed save, applies a 1-round secondary spell affect.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Use when a non-damage solution is better than trading blows, such as escaping bad rooms, controlling tempo, or enabling safer engages.
+Use against grouped enemies when you need immediate AoE chip and pressure.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Avoid spending turns on this when a kill is immediately available; switch to damage or hard control once position is secured.
+The secondary effect is brief, so this is mainly an AoE damage cast.
 #0
 
 FALLEN-DOWN
@@ -4070,22 +4070,22 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Uses non-damage magic to solve tactical problems such as movement, detection, control, or escape.
+High-damage fire AoE that strikes every enemy in the room.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-Creates a concrete tactical advantage outside raw DPS, such as safer pulls, repositioning, scouting, or disengage.
+Each enemy takes extreme fire damage, reduced on successful spell save.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Use when a non-damage solution is better than trading blows, such as escaping bad rooms, controlling tempo, or enabling safer engages.
+Use when multiple hostiles are stacked in one room and you need immediate room pressure.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Avoid spending turns on this when a kill is immediately available; switch to damage or hard control once position is secured.
+No control rider; if you need lockdown, pair with a separate control spell.
 #0
 
 IA-SHUB-NIGGURATH
@@ -4102,22 +4102,22 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Uses non-damage magic to solve tactical problems such as movement, detection, control, or escape.
+Necrotic room spell that attempts instant kills on living enemies.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-Creates a concrete tactical advantage outside raw DPS, such as safer pulls, repositioning, scouting, or disengage.
+Checks each enemy in room except undead. Failed death save attempts instant kill; successful save takes extreme necrotic damage instead. With Goal of All Life is Death active, save checks appear to be bypassed.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Use when a non-damage solution is better than trading blows, such as escaping bad rooms, controlling tempo, or enabling safer engages.
+Use in large living-enemy packs, especially after enabling Goal of All Life is Death.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Avoid spending turns on this when a kill is immediately available; switch to damage or hard control once position is secured.
+Provides little value against undead-heavy encounters.
 #0
 
 GOAL-OF-ALL-LIFE-IS-DEATH GOAL-OF-LIFE-DEATH ALL-LIFE-IS-DEATH
@@ -4473,22 +4473,22 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Uses non-damage magic to solve tactical problems such as movement, detection, control, or escape.
+Tactical reposition spell that requires a valid shadow anchor in your room.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-Creates a concrete tactical advantage outside raw DPS, such as safer pulls, repositioning, scouting, or disengage.
+Requires target anchor to be your shadow servant or a marked target in-room; if valid, grants a 1-round hitroll +10 exchange state.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Use when a non-damage solution is better than trading blows, such as escaping bad rooms, controlling tempo, or enabling safer engages.
+Use after setting up marks/servants to create a high-accuracy burst window.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Avoid spending turns on this when a kill is immediately available; switch to damage or hard control once position is secured.
+If no valid anchor exists, the spell fails with no benefit. The movement/exact position handling appears tied to combat scripting around this buff state.
 #0
 
 DAGGER-RAIN
@@ -4537,22 +4537,22 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Uses non-damage magic to solve tactical problems such as movement, detection, control, or escape.
+Room-wide fear/accuracy suppression with strong effect on failed saves.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-Creates a concrete tactical advantage outside raw DPS, such as safer pulls, repositioning, scouting, or disengage.
+Failed save: fearful state, hitroll -6, plus brief action delay. Successful save: still applies a short hitroll -2 penalty.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Use when a non-damage solution is better than trading blows, such as escaping bad rooms, controlling tempo, or enabling safer engages.
+Cast early in multi-enemy fights to reduce incoming accuracy before committing your burst cycle.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Avoid spending turns on this when a kill is immediately available; switch to damage or hard control once position is secured.
+Control-first spell; it does not deal direct damage.
 #0
 
 SHADOW-DOMAIN SHADOWDOMAIN DOMAIN-SHADOW
@@ -4633,22 +4633,22 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Uses non-damage magic to solve tactical problems such as movement, detection, control, or escape.
+Short self-buff for immediate accuracy spike.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-Creates a concrete tactical advantage outside raw DPS, such as safer pulls, repositioning, scouting, or disengage.
+Applies hitroll +8 for 1 round.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Use when a non-damage solution is better than trading blows, such as escaping bad rooms, controlling tempo, or enabling safer engages.
+Use right before a key single-target attack that must land.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Avoid spending turns on this when a kill is immediately available; switch to damage or hard control once position is secured.
+Very short duration; pre-casting too early wastes most of its value.
 #0
 
 BLACK-HEART BLACKHEART
@@ -4665,22 +4665,22 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Uses non-damage magic to solve tactical problems such as movement, detection, control, or escape.
+Self conversion spell: sacrifices HP to restore mana and gain empowered state.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-Creates a concrete tactical advantage outside raw DPS, such as safer pulls, repositioning, scouting, or disengage.
+Consumes 20% of current HP (cannot kill you), restores 35% of max mana, and applies AFF_EMPOWERED for a short duration.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Use when a non-damage solution is better than trading blows, such as escaping bad rooms, controlling tempo, or enabling safer engages.
+Use when you are mana-starved but can safely trade health (with healer support or low incoming damage).
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Avoid spending turns on this when a kill is immediately available; switch to damage or hard control once position is secured.
+Dangerous when you are already low HP or being focused.
 #0
 
 CALL-SHADOW-LEGION SHADOW-LEGION SHADOWLEGION LEGION-CALL
@@ -4729,22 +4729,22 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Uses non-damage magic to solve tactical problems such as movement, detection, control, or escape.
+Long-duration mark application on a single enemy (save negates).
 
 ----------------------------------------
 Effect
 ----------------------------------------
-Creates a concrete tactical advantage outside raw DPS, such as safer pulls, repositioning, scouting, or disengage.
+On failed spell save, applies AFF_MARKED for a long duration; on successful save, no effect.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Use when a non-damage solution is better than trading blows, such as escaping bad rooms, controlling tempo, or enabling safer engages.
+Cast early on priority targets to enable mark-dependent follow-up abilities.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Avoid spending turns on this when a kill is immediately available; switch to damage or hard control once position is secured.
+Do not spam into high-save targets unless your build specifically needs the mark to function.
 #0
 
 DARK-REBUKE
@@ -4761,22 +4761,22 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Uses non-damage magic to solve tactical problems such as movement, detection, control, or escape.
+Single-target shadow hit with bonus follow-up damage against active fighters/affected targets.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-Creates a concrete tactical advantage outside raw DPS, such as safer pulls, repositioning, scouting, or disengage.
+Deals medium shadow damage (save for half). If target survives and is in combat or has active affects, it takes an additional low shadow hit.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Use when a non-damage solution is better than trading blows, such as escaping bad rooms, controlling tempo, or enabling safer engages.
+Use in ongoing combat where the target is already engaged or buffed/debuffed to maximize two-hit value.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Avoid spending turns on this when a kill is immediately available; switch to damage or hard control once position is secured.
+Lower value as a clean opener on idle/unaffected targets.
 #0
 
 EXECUTION-MARK
@@ -4876,22 +4876,22 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Uses non-damage magic to solve tactical problems such as movement, detection, control, or escape.
+Room-wide force damage with save-gated root and action delay.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-Creates a concrete tactical advantage outside raw DPS, such as safer pulls, repositioning, scouting, or disengage.
+Enemies in room take medium force damage (save for half). Failed save also roots target briefly and imposes a wait-state delay.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Use when a non-damage solution is better than trading blows, such as escaping bad rooms, controlling tempo, or enabling safer engages.
+Use to soften and slow multiple enemies before your team commits to focused kills.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Avoid spending turns on this when a kill is immediately available; switch to damage or hard control once position is secured.
+Good opener in crowded rooms; weaker as a single-target finisher.
 #0
 
 RULERS-HAND
@@ -4908,22 +4908,22 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Uses non-damage magic to solve tactical problems such as movement, detection, control, or escape.
+Single-target force strike with brief stun on failed save.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-Creates a concrete tactical advantage outside raw DPS, such as safer pulls, repositioning, scouting, or disengage.
+Deals high force damage (save for half). Failed save applies 1-round stun.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Use when a non-damage solution is better than trading blows, such as escaping bad rooms, controlling tempo, or enabling safer engages.
+Use to interrupt a key enemy action while still delivering meaningful burst damage.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Avoid spending turns on this when a kill is immediately available; switch to damage or hard control once position is secured.
+If the target reliably saves, this becomes mostly a damage spell.
 #0
 
 SHADOW-LANCE
@@ -4940,22 +4940,22 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Uses non-damage magic to solve tactical problems such as movement, detection, control, or escape.
+High single-target shadow damage with armor softening on failed save.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-Creates a concrete tactical advantage outside raw DPS, such as safer pulls, repositioning, scouting, or disengage.
+Deals high shadow damage (save for half). Failed save adds AC penalty (APPLY_AC +10) for a short duration, making follow-up weapon pressure stronger.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Use when a non-damage solution is better than trading blows, such as escaping bad rooms, controlling tempo, or enabling safer engages.
+Use early in single-target focus to improve subsequent physical damage.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Avoid spending turns on this when a kill is immediately available; switch to damage or hard control once position is secured.
+Best when allies can capitalize on the AC debuff window.
 #0
 
 SHADOW-BURST
@@ -5068,22 +5068,22 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Uses non-damage magic to solve tactical problems such as movement, detection, control, or escape.
+Self buff that improves spell-save performance.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-Creates a concrete tactical advantage outside raw DPS, such as safer pulls, repositioning, scouting, or disengage.
+Applies APPLY_SAVING_SPELL -3 for medium duration (improved resistance to hostile magic).
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Use when a non-damage solution is better than trading blows, such as escaping bad rooms, controlling tempo, or enabling safer engages.
+Cast before caster-heavy fights or before entering enemy-control rooms.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Avoid spending turns on this when a kill is immediately available; switch to damage or hard control once position is secured.
+Defensive prep tool; provides no direct damage.
 #0
 
 SHADOW-RECALL
@@ -5196,22 +5196,22 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Uses non-damage magic to solve tactical problems such as movement, detection, control, or escape.
+Room-wide multi-hit shadow barrage that costs your own HP.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-Creates a concrete tactical advantage outside raw DPS, such as safer pulls, repositioning, scouting, or disengage.
+Each enemy in room is hit twice for low shadow damage (save for half each hit). Caster also loses HP equal to caster level.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Use when a non-damage solution is better than trading blows, such as escaping bad rooms, controlling tempo, or enabling safer engages.
+Use for wide-area chip/cleanup when you can afford the self-damage.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Avoid spending turns on this when a kill is immediately available; switch to damage or hard control once position is secured.
+Risky at low HP; avoid using it as a panic button.
 #0
 
 CHAIN-OF-SUBJUGATION SUBJUGATION-CHAIN
@@ -5260,22 +5260,22 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Uses non-damage magic to solve tactical problems such as movement, detection, control, or escape.
+Self mobility/evasion-style buff represented by a non-stat tracked modifier.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-Creates a concrete tactical advantage outside raw DPS, such as safer pulls, repositioning, scouting, or disengage.
+Applies a medium-duration special affect (APPLY_NONE +10), likely intended to support movement precision or avoidance in this spell set.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Use when a non-damage solution is better than trading blows, such as escaping bad rooms, controlling tempo, or enabling safer engages.
+Primarily used as pre-engage setup when you expect to kite or reposition often.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Avoid spending turns on this when a kill is immediately available; switch to damage or hard control once position is secured.
+Exact downstream benefit appears to be handled in broader combat logic, so treat this as a setup buff rather than instant power.
 #0
 
 KINGS-COMMAND KING-COMMAND
@@ -5292,22 +5292,22 @@ Spell
 ----------------------------------------
 Description
 ----------------------------------------
-Imposes control pressure on the target to limit options.
+Group command buff for your charmed summons in the same room.
 
 ----------------------------------------
 Effect
 ----------------------------------------
-Applies debuffs such as rooting, silence, fear, weakened offense, or brief disable effects.
+For each eligible charmed follower: grants hitroll +4 and damroll +4 for short duration and removes fearful status.
 
 ----------------------------------------
 Usage
 ----------------------------------------
-Single-target offensive use in combat.
+Cast right before summon burst windows or when your pets are fear-locked.
 
 ----------------------------------------
 Notes
 ----------------------------------------
-Combine with burst abilities while the target is constrained.
+Does nothing if you have no qualifying charmed followers nearby.
 #0
 
 DETECT-KILL-INTENT KILL-INTENT DETECT-INTENT
