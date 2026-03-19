@@ -2359,8 +2359,18 @@ void load_help(FILE * fl, char *name)
 
   get_one_line(fl, key);
   while (*key != '$') {
-    strcat(key, "\r\n"); /* strcat: OK (READ_SIZE - "\n"  "\r\n" == READ_SIZE  1) */
-    entrylen = strlcpy(entry, key, sizeof(entry));
+    char *keyp = key;
+
+    while (*keyp && isspace((unsigned char)*keyp))
+      keyp++;
+
+    if (!*keyp || *keyp == '!') {
+      get_one_line(fl, key);
+      continue;
+    }
+
+    strcat(keyp, "\r\n"); /* strcat: OK (READ_SIZE - "\n"  "\r\n" == READ_SIZE  1) */
+    entrylen = strlcpy(entry, keyp, sizeof(entry));
 
     /* Read in the corresponding help entry. */
     get_one_line(fl, line);
@@ -2398,7 +2408,7 @@ void load_help(FILE * fl, char *name)
     el.duplicate = 0;
     el.entry = strdup(entry);
     parse_at(el.entry);
-    scan = one_word(key, next_key);
+    scan = one_word(keyp, next_key);
 
     while (*next_key) {
       el.keywords = strdup(next_key);
