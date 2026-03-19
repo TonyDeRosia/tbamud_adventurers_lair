@@ -294,13 +294,23 @@ static const char *classtrack_final_title(struct char_data *ch)
 {
   int primary, secondary;
   int pscore, sscore;
+  int total_score;
 
   classtrack_get_top2(ch, &primary, &secondary);
   pscore = GET_ARCHETYPE_SCORE(ch, primary);
   sscore = GET_ARCHETYPE_SCORE(ch, secondary);
+  total_score = classtrack_total_score(ch);
 
-  if (pscore < CT_FINAL_MIN_SCORE)
-    return "Adventurer";
+  /*
+   * Adventurer is a pre-lock identity and is not a valid default final lock.
+   * If hard thresholds are not met, still resolve to the broad archetype title
+   * when there is any meaningful tracked identity signal.
+   */
+  if (pscore < CT_FINAL_MIN_SCORE) {
+    if (pscore > 0 || total_score > 0)
+      return ct_soft_titles[primary][0];
+    return "Unresolved";
+  }
 
   if ((pscore - sscore) <= CT_FINAL_HYBRID_MARGIN && classtrack_is_hybrid_pair(primary, secondary)) {
     if ((primary == ARCHETYPE_COMBAT && secondary == ARCHETYPE_DIVINE) ||
@@ -394,13 +404,23 @@ void classtrack_record_ability_use(struct char_data *ch, int ability, int was_sp
 void classtrack_check_level_checkpoint(struct char_data *ch)
 {
   const char *title;
+  const char *current_title;
 
   if (!ch || IS_NPC(ch) || GET_CLASS_LOCKED(ch))
     return;
 
+  current_title = GET_SOFT_CLASS_TITLE(ch);
+
   if (GET_LEVEL(ch) >= 100) {
     title = classtrack_final_title(ch);
-    classtrack_set_title(ch, title);
+    if (!str_cmp(title, "Adventurer"))
+      title = "Unresolved";
+    if (!str_cmp(title, "Unresolved")) {
+      send_to_char(ch, "\r\nYour path remains unresolved. Continue shaping your identity before locking.\r\n");
+      return;
+    }
+    if (!*current_title || str_cmp(current_title, title))
+      classtrack_set_title(ch, title);
     GET_CLASS_LOCKED(ch) = 1;
     send_to_char(ch, "\r\nYour path is now permanent. You are %s%s%s.\r\n",
                  CCYEL(ch, C_NRM), title, CCNRM(ch, C_NRM));
@@ -411,6 +431,8 @@ void classtrack_check_level_checkpoint(struct char_data *ch)
     return;
 
   title = classtrack_soft_title(ch);
+  if (*current_title && !str_cmp(current_title, title))
+    return;
   classtrack_set_title(ch, title);
   send_to_char(ch, "\r\nYour path sharpens. You are now known as %s%s%s.\r\n",
                CCYEL(ch, C_NRM), title, CCNRM(ch, C_NRM));
@@ -609,6 +631,7 @@ void classtrack_record_study_learn_level(struct char_data *ch, int ability_id, i
 int classtrack_get_study_display_level(struct char_data *ch, int ability_id, int fallback_level)
 {
   int learned_at;
+  int is_reactive_identity;
 
   if (!ch || IS_NPC(ch))
     return fallback_level;
@@ -616,16 +639,18 @@ int classtrack_get_study_display_level(struct char_data *ch, int ability_id, int
   if (ability_id <= 0 || ability_id > MAX_SKILLS)
     return fallback_level;
 
-  if (GET_CLASS_LOCKED(ch))
-    return fallback_level;
+  learned_at = GET_STUDY_LEARN_LEVEL(ch, ability_id);
+  is_reactive_identity = (GET_CLASS(ch) == CLASS_ADVENTURER) || (learned_at > 0);
 
   if (GET_SKILL(ch, ability_id) <= 0)
+    return fallback_level;
+
+  if (!is_reactive_identity)
     return fallback_level;
 
   if (ability_id == SPELL_MAGIC_MISSILE || ability_id == SKILL_RECALL || ability_id == SKILL_STUDY)
     return 1;
 
-  learned_at = GET_STUDY_LEARN_LEVEL(ch, ability_id);
   if (learned_at > 0)
     return learned_at;
 
