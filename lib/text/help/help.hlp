@@ -6437,19 +6437,19 @@ Acid Blast
 Type: Spell
 
 Description:
-Acid Blast focuses on these gameplay behaviors: deals direct spell damage, applies status or stat modifiers.
+Detonates corrosive acid against a single target.
 
 Effect:
-- Can apply statuses: corroded.
-- Targets may resist part or all of the effect with a saving throw.
+Single target acid damage spell. On a failed save it also worsens armor class for medium duration.
+On a successful save the extra corrosion does not apply.
 
 Usage:
-Target a character in your room, your current opponent in combat.
+Best used early against hard targets you want to soften for follow up attacks.
 
-Practical Notes:
-Targeting: a character in your room, your current combat target. If a saving throw is involved, expect reduced value on high-save targets.
+Notes:
+Excellent setup spell when your group will continue focusing the same enemy.
 
-See also: SPELLS SKILLS
+See also: VOLTAIC-BOLT SHADOW-LANCE MUTILATE SPELLS SKILLS
 #0
 ACID-RAIN
 
@@ -6457,18 +6457,18 @@ Acid Rain
 Type: Spell
 
 Description:
-Acid Rain focuses on these gameplay behaviors: mag rooms.
+Calls corrosive rain down over the entire room.
 
 Effect:
-- Creates room effects: acid rain.
+Creates a persistent acid based room effect for medium duration.
 
 Usage:
-Target no explicit target.
+Best used when enemies are grouped in one room and you want the room itself to keep working on them.
 
-Practical Notes:
-Targeting: no explicit target (self/room effect). If a saving throw is involved, expect reduced value on high-save targets.
+Notes:
+Use it as room denial and sustained area damage, not as a single target nuke.
 
-See also: SPELLS SKILLS
+See also: WALL-OF-FIRE STATIC-FIELD DOMAIN-BREAK SPELLS SKILLS
 #0
 ACRONYMS TERMINOLOGY VOCABULARY
 
@@ -6999,18 +6999,19 @@ Assassins Intent
 Type: Spell
 
 Description:
-Assassins Intent focuses on these gameplay behaviors: uses spell-specific custom logic.
+Settles your movement into killing stillness.
 
 Effect:
-- Core routines: uses spell-specific custom logic.
+Self offensive buff. Grants hitroll and damroll.
+While active, your damage increases further against enemies who are blinded, rooted, stunned, or marked.
 
 Usage:
-Target self only.
+Best used before focused single target attacks, especially if your build can reliably apply disables.
 
-Practical Notes:
-Targeting: yourself only. If a saving throw is involved, expect reduced value on high-save targets.
+Notes:
+This buff rewards setup. It is strongest when the target is already compromised.
 
-See also: SPELLS SKILLS
+See also: EXECUTION-MARK HUNTERS-INSTINCT MUTILATE SPELLS SKILLS
 #0
 ASSIST
 
@@ -7280,18 +7281,20 @@ BACKSTAB
 
 Backstab
 Type: Skill
-Category: Combat Skill
 
 Description:
-Backstab requires a wielded piercing weapon and a non-fighting target in your room. On success it performs a backstab attack through the normal hit system; on failure it deals no damage. Aware awake mobs can detect your attempt and counterattack immediately.
+Attempts a devastating surprise strike with a piercing weapon.
 
 Effect:
-Backstab requires a wielded piercing weapon and a non-fighting target in your room. On success it performs a backstab attack through the normal hit system; on failure it deals no damage. Aware awake mobs can detect your attempt and counterattack immediately.
+Weapon based opener that deals greatly increased damage when it lands successfully.
 
 Usage:
-Use command: backstab <target>. Target must not already be fighting. Applies a 2-round wait state.
+Best used from stealth or before the target is fully engaged with you.
 
-See also: SPELLS SKILLS
+Notes:
+This is an ambush skill. Its value drops once the fight is already underway.
+
+See also: HIDE SNEAK ASSASSINS-INTENT SKILLS
 #0
 BALANCE BALANCING
 
@@ -7359,18 +7362,20 @@ BANDAGE
 
 Bandage
 Type: Skill
-Category: Combat Skill
 
 Description:
-Bandage only works on a character in your room with negative hit points. On success it stabilizes the target to exactly 0 hit points. On failure it inflicts 2 suffering damage on the target.
+Treats wounds manually in the field.
 
 Effect:
-Bandage only works on a character in your room with negative hit points. On success it stabilizes the target to exactly 0 hit points. On failure it inflicts 2 suffering damage on the target.
+Utility recovery skill used outside immediate danger to restore condition.
 
 Usage:
-Use command: bandage <target> while standing. Applies a 2-round wait state.
+Best used after a fight or during a safe lull when you have time to recover.
 
-See also: SPELLS SKILLS
+Notes:
+Not a substitute for strong magical healing in the middle of a crisis.
+
+See also: CURE-LIGHT HEAL GREATER-HEAL SKILLS
 #0
 BANKS WITHDRAWING DEPOSITING BALANCES ATM-MACHINES
 
@@ -7421,18 +7426,20 @@ BASH
 
 Bash
 Type: Skill
-Category: Combat Skill
 
 Description:
-Bash spends 15 movement and attempts a skill check against one target in room (or your current opponent). Success deals 1 bash damage, forces the victim to sit, and applies one round of victim lag. Failure deals 0 damage and knocks you into sitting position.
+Crashes into an enemy to knock them down and disrupt their action.
 
 Effect:
-Bash spends 15 movement and attempts a skill check against one target in room (or your current opponent). Success deals 1 bash damage, forces the victim to sit, and applies one round of victim lag. Failure deals 0 damage and knocks you into sitting position.
+Melee control skill that can damage and disrupt the target, but carries failure risk and recovery cost.
 
 Usage:
-Use command: bash <target>. Requires a wielded weapon and fails in peaceful rooms.
+Best used to interrupt a dangerous opponent or create a brief advantage in melee.
 
-See also: SPELLS SKILLS
+Notes:
+Do not waste it blindly on targets you cannot afford to miss against.
+
+See also: KICK WHIRLWIND HOLD-PERSON SKILLS
 #0
 BEAR-SPIRIT
 Bear Spirit
@@ -8885,18 +8892,20 @@ Confusion
 Type: Spell
 
 Description:
-Confusion focuses on these gameplay behaviors: applies status or stat modifiers.
+Clouds the enemy's mind and ruins combat accuracy.
 
 Effect:
-- Targets may resist part or all of the effect with a saving throw.
+Single target debuff that lowers hitroll.
+A failed save gives the larger penalty and longer duration.
+A successful save still applies a smaller short penalty.
 
 Usage:
-Target a character in your room, your current opponent in combat.
+Best used against enemies that rely on landing weapon or spell attacks consistently.
 
-Practical Notes:
-Targeting: a character in your room, your current combat target, cannot target yourself. If a saving throw is involved, expect reduced value on high-save targets.
+Notes:
+A reliable accuracy debuff because it still does something on a save.
 
-See also: SPELLS SKILLS
+See also: VERTIGO FEAR BLINDNESS SPELLS SKILLS
 #0
 CONJURE-ELEMENTAL
 
@@ -8923,18 +8932,18 @@ Consecrate
 Type: Spell
 
 Description:
-Consecrate focuses on these gameplay behaviors: mag rooms.
+Sanctifies the ground in divine power.
 
 Effect:
-- Creates room effects: consecrate.
+Creates a long duration consecrated room effect.
 
 Usage:
-Target no explicit target.
+Best used when you plan to hold a room for a while and want holy ground established first.
 
-Practical Notes:
-Targeting: no explicit target (self/room effect). If a saving throw is involved, expect reduced value on high-save targets.
+Notes:
+This is set up magic, not burst damage.
 
-See also: SPELLS SKILLS
+See also: HOLY-WORD NULL-FIELD SPELLS SKILLS
 #0
 CONSIDER
 
@@ -9132,18 +9141,18 @@ Crystal Body
 Type: Spell
 
 Description:
-Crystal Body focuses on these gameplay behaviors: uses spell-specific custom logic.
+Hardens your body into a crystalline defensive shell.
 
 Effect:
-- Core routines: uses spell-specific custom logic.
+Self buff that improves armor class by 25 for a medium duration.
 
 Usage:
-Target self only.
+Cast before sustained combat when you want a durable defensive layer.
 
-Practical Notes:
-Targeting: yourself only. If a saving throw is involved, expect reduced value on high-save targets.
+Notes:
+A straightforward protection spell with no special trigger condition. Reliable maintenance buff.
 
-See also: SPELLS SKILLS
+See also: BODY-OF-EFFULGENT-BERYL SHADOW-ARMOR STONE-SKIN SPELLS SKILLS
 #0
 CURE-BLIND
 
@@ -9783,19 +9792,20 @@ Disintegrate
 Type: Spell
 
 Description:
-Disintegrate focuses on these gameplay behaviors: uses spell-specific custom logic.
+Fires a green ray of disintegrating energy at a single target.
 
 Effect:
-- Deals arcane damage.
-- Targets may resist part or all of the effect with a saving throw.
+Single target arcane damage spell. The target saves against spell at a penalty.
+On a failed save the spell deals extremely heavy damage based in part on the target's maximum health.
+On a successful save it still deals high damage.
 
 Usage:
-Target a character in your room, your current opponent in combat.
+Best used against tough single targets when you need a major burst hit instead of room wide damage.
 
-Practical Notes:
-Targeting: a character in your room, your current combat target, cannot target yourself. If a saving throw is involved, expect reduced value on high-save targets.
+Notes:
+A strong anti boss or anti elite nuke. More efficient on one important target than on trash enemies.
 
-See also: SPELLS SKILLS
+See also: TRUE-DEATH FINGER-OF-DEATH OBLIVION-SPEAR SPELLS SKILLS
 #0
 DISPEL-EVIL
 
@@ -9893,22 +9903,22 @@ See also: SHADOW-DOMAIN NULL-FIELD SILENCE-FIELD TOXIC-CLOUD MIASMA SPELLS SKILL
 #0
 DOMINION-OF-SHADOWS
 
-Dominion Of Shadows
+Dominion of Shadows
 Type: Spell
 
 Description:
-Dominion Of Shadows focuses on these gameplay behaviors: uses spell-specific custom logic.
+Calls shadow power fully under your rule.
 
 Effect:
-- Core routines: uses spell-specific custom logic.
+Self buff that improves your spell saves and increases your outgoing shadow damage while active.
 
 Usage:
-Target self only.
+Best used before shadow focused burst or when fighting enemy casters.
 
-Practical Notes:
-Targeting: yourself only. If a saving throw is involved, expect reduced value on high-save targets.
+Notes:
+Most valuable in a shadow damage rotation. Less useful if you are not leaning on shadow magic.
 
-See also: SPELLS SKILLS
+See also: SHADOW-BOLT SHADOW-LANCE SHADOW-BURST SPELLS SKILLS
 #0
 DONATE
 
@@ -9970,18 +9980,21 @@ DREAD-DOMINION
 
 Dread Dominion
 Type: Skill
-Category: Passive Skill
 
 Description:
-Dread Dominion is implemented as a trained skill value used directly by game code.
+Your despair based and dark damage grows heavier under your rule.
 
 Effect:
-This skill has no separate spell payload; its learned percentage is read by combat/control formulas where dread dominion is checked.
+Passive dark synergy skill. Improves shadow and necrotic damage while Despair Aura is active.
+It also strengthens the self buff portion of Despair Aura.
 
 Usage:
-There is no dedicated cast target. Train the skill and use its related command or trigger context; the effect is automatic when that check runs.
+Always on when your combat plan includes Despair Aura and dark damage.
 
-See also: SPELLS SKILLS
+Notes:
+This skill does very little if you are not maintaining Despair Aura.
+
+See also: DESPAIR-AURA DOMINION-OF-SHADOWS SKILLS
 #0
 DROP THROWN
 
@@ -10841,18 +10854,19 @@ Fatal Strike
 Type: Spell
 
 Description:
-Fatal Strike focuses on these gameplay behaviors: uses spell-specific custom logic.
+Drives a killing blow into an exposed opening.
 
 Effect:
-- Core routines: uses spell-specific custom logic.
+Single target force damage spell. It deals high damage normally and gains extra damage if the victim is already below 30 percent health.
+A successful save reduces the damage.
 
 Usage:
-Target a character in your room, your current opponent in combat.
+Best used as a finisher against wounded priority targets.
 
-Practical Notes:
-Targeting: a character in your room, your current combat target, cannot target yourself. If a saving throw is involved, expect reduced value on high-save targets.
+Notes:
+This is strongest after the enemy has already been softened up.
 
-See also: SPELLS SKILLS
+See also: EXECUTION-MARK TRUE-DEATH MUTILATE SPELLS SKILLS
 #0
 FEAR
 
@@ -11025,18 +11039,18 @@ Flame Arrow
 Type: Spell
 
 Description:
-Flame Arrow focuses on these gameplay behaviors: deals direct spell damage, applies status or stat modifiers.
+Drives a burning projectile into one target.
 
 Effect:
-- Can apply statuses: burning.
+Single target fire damage spell. It also applies burning for a short duration.
 
 Usage:
-Target a character in your room, your current opponent in combat.
+Best used when you want direct fire damage plus ongoing burn damage.
 
-Practical Notes:
-Targeting: a character in your room, your current combat target. If a saving throw is involved, expect reduced value on high-save targets.
+Notes:
+More than a plain nuke because the burn continues to matter after impact.
 
-See also: SPELLS SKILLS
+See also: FIREBOLT HELL-FLAME WALL-OF-FIRE SPELLS SKILLS
 #0
 FLEE
 
@@ -11202,19 +11216,19 @@ Frostbite
 Type: Spell
 
 Description:
-Frostbite focuses on these gameplay behaviors: deals direct spell damage, applies status or stat modifiers.
+Freezes flesh and movement with a concentrated burst of cold.
 
 Effect:
-- Can apply statuses: frozen.
-- Targets may resist part or all of the effect with a saving throw.
+Single target cold damage spell. On a failed save it also freezes the victim briefly and lowers Dexterity.
+On a successful save the extra debuff does not apply.
 
 Usage:
-Target a character in your room, your current opponent in combat.
+Best used to slow agile targets or punish enemies that rely on movement and accuracy.
 
-Practical Notes:
-Targeting: a character in your room, your current combat target. If a saving throw is involved, expect reduced value on high-save targets.
+Notes:
+Its control value is in the Dexterity loss and frozen status, not just the damage.
 
-See also: SPELLS SKILLS
+See also: ICE-STORM FROST-NOVA HOLD-PERSON SPELLS SKILLS
 #0
 FYRE
  
@@ -11486,18 +11500,18 @@ Gravity Well
 Type: Spell
 
 Description:
-Gravity Well focuses on these gameplay behaviors: affects the entire room area, mag rooms.
+Creates a crushing gravity anomaly in the room.
 
 Effect:
-- Creates room effects: gravity well.
+Applies a persistent room effect for short duration.
 
 Usage:
-Target no explicit target.
+Best used to pin enemies into a bad room or make repositioning harder during a close fight.
 
-Practical Notes:
-Targeting: no explicit target (self/room effect). If a saving throw is involved, expect reduced value on high-save targets.
+Notes:
+A short duration control field. Use it at the moment movement matters.
 
-See also: SPELLS SKILLS
+See also: SHADOW-BIND CHAIN-OF-SUBJUGATION DOMAIN-BREAK SPELLS SKILLS
 #0
 GREATER-FIREBALL
 
@@ -11543,18 +11557,19 @@ Greater Magic Seal
 Type: Spell
 
 Description:
-Greater Magic Seal focuses on these gameplay behaviors: uses spell-specific custom logic.
+Locks down a target's spellcasting with a stronger magical seal.
 
 Effect:
-- Core routines: uses spell-specific custom logic.
+Single target anti caster debuff. Applies spell lock on a failed spell save for medium duration.
+On a successful save it still applies a shorter spell lock.
 
 Usage:
-Target a character in your room, your current opponent in combat.
+Best used early against enemy casters, healers, or any target you need to shut down magically.
 
-Practical Notes:
-Targeting: a character in your room, your current combat target, cannot target yourself. If a saving throw is involved, expect reduced value on high-save targets.
+Notes:
+Useful even on a save because it still imposes a shorter seal.
 
-See also: SPELLS SKILLS
+See also: SILENCE POWER-WORD-SILENCE NULL-FIELD SPELLS SKILLS
 #0
 GREATER-REJECTION REJECTION
 
@@ -11988,18 +12003,20 @@ HIDE
 
 Hide
 Type: Skill
-Category: Mobility Skill
 
 Description:
-Hide attempts to set AFF_HIDE on yourself after a dexterity+skill roll. Reusing hide clears existing hide first and then rolls again.
+Attempts to disappear from plain sight without leaving the room.
 
 Effect:
-Hide attempts to set AFF_HIDE on yourself after a dexterity+skill roll. Reusing hide clears existing hide first and then rolls again.
+Applies a hidden state if the attempt succeeds.
 
 Usage:
-Use command: hide.
+Best used before an ambush, escape, or any moment where breaking sight matters.
 
-See also: SPELLS SKILLS
+Notes:
+Hide is strongest when combined with positioning and timing, not spammed in the open.
+
+See also: SNEAK BACKSTAB TOTAL-OCCULTATION SKILLS
 #0
 HINDEX INDEX
 
@@ -12039,19 +12056,20 @@ Hold Monster
 Type: Spell
 
 Description:
-Hold Monster focuses on these gameplay behaviors: applies status or stat modifiers.
+Forces a broad range of living creatures into magical paralysis.
 
 Effect:
-- Can apply statuses: stunned, time snare.
-- Targets may resist part or all of the effect with a saving throw.
+Single target control spell. Vampires resist this spell entirely.
+On a failed paralysis save the target is stunned for medium duration.
+On a successful save the target still suffers a shorter time snare.
 
 Usage:
-Target a character in your room, your current opponent in combat.
+Best used against dangerous non vampire threats you need to lock down immediately.
 
-Practical Notes:
-Targeting: a character in your room, your current combat target, cannot target yourself. If a saving throw is involved, expect reduced value on high-save targets.
+Notes:
+Better general control than Hold Person, but still useless against undead vampires.
 
-See also: SPELLS SKILLS
+See also: HOLD-PERSON TIME-SNARE GREATER-MAGIC-SEAL SPELLS SKILLS
 #0
 HOLD-PERSON
 
@@ -12059,19 +12077,20 @@ Hold Person
 Type: Spell
 
 Description:
-Hold Person focuses on these gameplay behaviors: applies status or stat modifiers.
+Attempts to lock a humanoid target in place.
 
 Effect:
-- Can apply statuses: stunned, time snare.
-- Targets may resist part or all of the effect with a saving throw.
+Humanoid only control spell. Non humanoid NPC targets are invalid.
+On a failed paralysis save the victim is stunned for a short duration.
+On a successful save the victim still suffers a brief time snare effect.
 
 Usage:
-Target a character in your room, your current opponent in combat.
+Best used to stop humanoid enemies from acting during key moments.
 
-Practical Notes:
-Targeting: a character in your room, your current combat target, cannot target yourself. If a saving throw is involved, expect reduced value on high-save targets.
+Notes:
+Do not waste it on clearly non humanoid targets.
 
-See also: SPELLS SKILLS
+See also: HOLD-MONSTER TIME-SNARE CONFUSION SPELLS SKILLS
 #0
 HOLY-WORD
 
@@ -12079,20 +12098,20 @@ Holy Word
 Type: Spell
 
 Description:
-Holy Word focuses on these gameplay behaviors: uses spell-specific custom logic.
+Speaks a divine word that floods the room with holy force.
 
 Effect:
-- Deals holy damage.
-- Can apply statuses: blinded magical, stunned.
-- Targets may resist part or all of the effect with a saving throw.
+Room wide hostile spell. It hits enemy targets in the room, but only affects evil enemies.
+Targets that fail their spell save take full holy damage, are stunned briefly, and suffer magical blindness.
+Targets that save take reduced damage only.
 
 Usage:
-Target no explicit target.
+Best used against grouped evil enemies when you want a strong divine area strike with added disruption.
 
-Practical Notes:
-Targeting: no explicit target (self/room effect). If a saving throw is involved, expect reduced value on high-save targets.
+Notes:
+Does nothing to good targets and skips non evil enemies. Use it when alignment clearly favors you.
 
-See also: SPELLS SKILLS
+See also: UNHOLY-WORD DISPEL-EVIL HAMMER-OF-GOD SPELLS SKILLS
 #0
 HOLYLIGHT LIGHTING LIGHTS TORCHES HOLY-LIGHTING 
 
@@ -13063,18 +13082,20 @@ KICK
 
 Kick
 Type: Skill
-Category: Combat Skill
 
 Description:
-Kick spends 10 movement and attempts a skill check versus the target. Success deals level/2 kick damage; failure deals 0 damage.
+Delivers a direct melee strike without relying on weapon damage.
 
 Effect:
-Kick spends 10 movement and attempts a skill check versus the target. Success deals level/2 kick damage; failure deals 0 damage.
+Simple offensive skill that deals modest damage on a successful hit.
 
 Usage:
-Use command: kick <target> (or defaults to your current opponent). Applies a 3-round wait state.
+Best used as a low cost combat button when you want extra damage between normal attacks.
 
-See also: SPELLS SKILLS
+Notes:
+Reliable filler damage, but not a fight deciding control skill.
+
+See also: BASH WHIRLWIND SKILLS
 #0
 KILL HIT FIGHT ATTACK SLAY BATTLES SMITE STRIKE CHOP VIOLENCE
 
@@ -13094,18 +13115,20 @@ KILL-WINDOW
 
 Kill Window
 Type: Skill
-Category: Passive Skill
 
 Description:
-Kill Window is implemented as a trained skill value used directly by game code.
+You instinctively exploit the final opening in a nearly dead enemy.
 
 Effect:
-This skill has no separate spell payload; its learned percentage is read by combat/control formulas where kill window is checked.
+Passive offensive skill. Adds flat bonus damage against targets below 25 percent health.
 
 Usage:
-There is no dedicated cast target. Train the skill and use its related command or trigger context; the effect is automatic when that check runs.
+Always on. It matters most in execute range.
 
-See also: SPELLS SKILLS
+Notes:
+Pairs naturally with Predators Advance and finisher spells.
+
+See also: PREDATORS-ADVANCE TRUE-DEATH FATAL-STRIKE SKILLS
 #0
 KILLERS PLAYERKILLING PLAYERKILLERS PKILLERS PKILLING
 
@@ -13204,18 +13227,20 @@ LEGION-MASTERY
 
 Legion Mastery
 Type: Skill
-Category: Passive Skill
 
 Description:
-Legion Mastery is implemented as a trained skill value used directly by game code.
+You fight better while commanding a full shadow host.
 
 Effect:
-This skill has no separate spell payload; its learned percentage is read by combat/control formulas where legion mastery is checked.
+Passive army skill. If you control at least three shadow servants, you gain improved spell saves, and your servants gain smaller offensive bonuses.
 
 Usage:
-There is no dedicated cast target. Train the skill and use its related command or trigger context; the effect is automatic when that check runs.
+Always on once your servant count is high enough.
 
-See also: SPELLS SKILLS
+Notes:
+This skill turns a large summon presence into a real combat threshold.
+
+See also: SHADOW-COMMANDER SHADOW-BURST SKILLS
 #0
 LEVEL LEVELS ATTAINING-LEVELS LEVEL-REQUIREMENTS
 @n
@@ -14448,24 +14473,20 @@ MONARCH-REFLEXES
 
 Monarch Reflexes
 Type: Skill
-Category: Passive Skill
 
 Description:
-Sharpens sovereign combat response timing under pressure.
+Gives you a chance to evade the opening strike of an incoming weapon attack.
 
 Effect:
-Passively improves reactive combat performance and survivability.
+Passive defensive skill. It can completely avoid an opening weapon hit, then goes on a temporary internal lockout before it can trigger again.
 
 Usage:
-Always on once learned.
+Always on. Most valuable against hard opening burst.
 
-Tactical Notes:
-High value in fast fights where timing errors are costly.
+Notes:
+This is a reactive survivability skill, not an activated defense.
 
-Limitations:
-No manual activation; scales with active combat participation.
-
-See also: SPELLS SKILLS
+See also: EVASION PHASE-SHIFT SKILLS
 #0
 MONARCHS-AUTHORITY MONARCH-AUTHORITY
 
@@ -14635,18 +14656,19 @@ Mutilate
 Type: Spell
 
 Description:
-Mutilate focuses on these gameplay behaviors: uses spell-specific custom logic.
+Tears into a target with a vicious shadow infused strike.
 
 Effect:
-- Core routines: uses spell-specific custom logic.
+Single target shadow damage spell. On a failed spell save it also reduces the victim's Strength and Dexterity for a short duration.
+On a successful save the damage is reduced and the stat damage does not apply.
 
 Usage:
-Target a character in your room, your current opponent in combat.
+Best used early against dangerous melee targets or any enemy you want weakened before a longer exchange.
 
-Practical Notes:
-Targeting: a character in your room, your current combat target, cannot target yourself. If a saving throw is involved, expect reduced value on high-save targets.
+Notes:
+Good against targets that rely on physical accuracy, damage, or mobility.
 
-See also: SPELLS SKILLS
+See also: SHADOW-LANCE CHAIN-OF-SUBJUGATION ASSASSINS-INTENT SPELLS SKILLS
 #0
 MV MOVEPOINTS MOVE-POINTS MOVEMENTPOINTS MOVEMENT-POINTS
 
@@ -14943,18 +14965,18 @@ Null Field
 Type: Spell
 
 Description:
-Null Field focuses on these gameplay behaviors: mag rooms.
+Suppresses active magic throughout the room.
 
 Effect:
-- Creates room effects: null field.
+Creates a room wide null field for medium duration.
 
 Usage:
-Target no explicit target.
+Best used when enemy spellcasting is the main threat and you need the room itself to resist magic.
 
-Practical Notes:
-Targeting: no explicit target (self/room effect). If a saving throw is involved, expect reduced value on high-save targets.
+Notes:
+This is anti magic terrain. Use it to blunt caster heavy groups.
 
-See also: SPELLS SKILLS
+See also: SILENCE-FIELD DOMAIN-BREAK SPELLS SKILLS
 #0
 NUMDICE DAMDICE NUM-DICE DAM-DICE NUMDAMDICE DICE DAMAGE-DICE HITPOINTS MODIFIERS WEAPONS-DAMAGE WEAPON-DAMAGE HP-DICE HP-BONUS DMG
 
@@ -15704,18 +15726,20 @@ OVERLORD-PRESENCE
 
 Overlord Presence
 Type: Skill
-Category: Passive Skill
 
 Description:
-Overlord Presence is implemented as a trained skill value used directly by game code.
+Your superiority over weaker foes translates into harsher hits.
 
 Effect:
-This skill has no separate spell payload; its learned percentage is read by combat/control formulas where overlord presence is checked.
+Passive combat skill. Your damage increases slightly against NPC enemies at least ten levels below you.
 
 Usage:
-There is no dedicated cast target. Train the skill and use its related command or trigger context; the effect is automatic when that check runs.
+Always on. Most useful when clearing weaker NPC enemies quickly.
 
-See also: SPELLS SKILLS
+Notes:
+This is a steady passive bonus, not a button you press.
+
+See also: PREDATORS-ADVANCE KILL-WINDOW SKILLS
 #0
 PAGELENGTHS PAGE_LENGTHS
 
@@ -15892,18 +15916,20 @@ PICK-LOCK
 
 Pick Lock
 Type: Skill
-Category: Combat Skill
 
 Description:
-Pick Lock is used by the pick door/container command and checks lockpick skill plus dexterity lockpick bonus. Success toggles the lock without a key. Pickproof or keyless locks cannot be picked.
+Uses finesse and tools to open locked exits or containers.
 
 Effect:
-Pick Lock is used by the pick door/container command and checks lockpick skill plus dexterity lockpick bonus. Success toggles the lock without a key. Pickproof or keyless locks cannot be picked.
+Utility skill for bypassing locks.
 
 Usage:
-Use command: pick <door|container>.
+Best used when you need access without a key and have time to work carefully.
 
-See also: SPELLS SKILLS
+Notes:
+Success depends heavily on skill and Dexterity.
+
+See also: STEAL SNEAK HIDE SKILLS
 #0
 PICK-LOCKS PICK LOCKS
 
@@ -16561,18 +16587,20 @@ PREDATORS-ADVANCE
 
 Predators Advance
 Type: Skill
-Category: Passive Skill
 
 Description:
-Predators Advance is implemented as a trained skill value used directly by game code.
+You press harder when prey is already near collapse.
 
 Effect:
-This skill has no separate spell payload; its learned percentage is read by combat/control formulas where predators advance is checked.
+Passive offensive skill. Your damage increases against targets below 30 percent health.
 
 Usage:
-There is no dedicated cast target. Train the skill and use its related command or trigger context; the effect is automatic when that check runs.
+Always on. Best in finishing sequences.
 
-See also: SPELLS SKILLS
+Notes:
+This rewards staying on wounded targets instead of swapping too early.
+
+See also: KILL-WINDOW EXECUTION-MARK SKILLS
 #0
 PREFEDIT PREFERENCE-EDITOR
 
@@ -18385,18 +18413,19 @@ Shadow Bind
 Type: Spell
 
 Description:
-Shadow Bind focuses on these gameplay behaviors: uses spell-specific custom logic.
+Your own shadow lashes out to pin an enemy in place.
 
 Effect:
-- Core routines: uses spell-specific custom logic.
+Single target control spell. On a failed spell save it roots the target and lowers Dexterity.
+On a successful save it still applies a brief root.
 
 Usage:
-Target a character in your room, your current opponent in combat.
+Best used to stop movement, hold a target in a bad room, or set up follow up attacks.
 
-Practical Notes:
-Targeting: a character in your room, your current combat target, cannot target yourself. If a saving throw is involved, expect reduced value on high-save targets.
+Notes:
+Even a saved target can still be pinned briefly, so it remains useful for disruption.
 
-See also: SPELLS SKILLS
+See also: WEB CHAIN-OF-SUBJUGATION BONE-PRISON SPELLS SKILLS
 #0
 SHADOW-BOLT
 
@@ -18423,35 +18452,38 @@ Shadow Burst
 Type: Spell
 
 Description:
-Shadow Burst focuses on these gameplay behaviors: uses spell-specific custom logic.
+Detonates the darkness around you into a room wide burst.
 
 Effect:
-- Core routines: uses spell-specific custom logic.
+Area shadow damage to enemies in the room.
+Damage increases based on the number of your shadow servants currently present, up to a capped bonus.
 
 Usage:
-Target no explicit target.
+Best used when your summons are already active and enemies are stacked in the same room.
 
-Practical Notes:
-Targeting: no explicit target (self/room effect). If a saving throw is involved, expect reduced value on high-save targets.
+Notes:
+This spell scales with your servant presence. Its value rises sharply once your shadow army is established.
 
-See also: SPELLS SKILLS
+See also: SHADOW-EXTRACTION CALL-SHADOW-LEGION SHADOW-STORM SPELLS SKILLS
 #0
 SHADOW-COMMANDER
 
 Shadow Commander
 Type: Skill
-Category: Passive Skill
 
 Description:
-Shadow Commander is implemented as a trained skill value used directly by game code.
+Your shadow servants fight harder under your direction.
 
 Effect:
-This skill has no separate spell payload; its learned percentage is read by combat/control formulas where shadow commander is checked.
+Passive summon leadership skill. Shadow servants under your control gain hitroll, damroll, and periodic healing in combat.
 
 Usage:
-There is no dedicated cast target. Train the skill and use its related command or trigger context; the effect is automatic when that check runs.
+Always on. Most valuable when you rely on summoned shadow servants for room damage.
 
-See also: SPELLS SKILLS
+Notes:
+This is a servant buff, not a direct player damage skill.
+
+See also: SHADOW-EXTRACTION LEGION-MASTERY CALL-SHADOW-LEGION SKILLS
 #0
 SHADOW-DOMAIN SHADOWDOMAIN DOMAIN-SHADOW
 
@@ -18515,18 +18547,19 @@ Shadow Lance
 Type: Spell
 
 Description:
-Shadow Lance focuses on these gameplay behaviors: uses spell-specific custom logic.
+Shapes a razor thin lance of shadow and drives it through a single enemy.
 
 Effect:
-- Core routines: uses spell-specific custom logic.
+Single target shadow damage spell. On a failed spell save it also worsens the target's armor class for a short time.
+On a successful save the damage is reduced and the armor break does not apply.
 
 Usage:
-Target a character in your room, your current opponent in combat.
+Best used early against a priority target you want to soften for melee or follow up burst.
 
-Practical Notes:
-Targeting: a character in your room, your current combat target, cannot target yourself. If a saving throw is involved, expect reduced value on high-save targets.
+Notes:
+The armor penalty makes later hits land harder. Good opener for focused attacks.
 
-See also: SPELLS SKILLS
+See also: BLACK-LANCE MUTILATE OBLIVION-SPEAR SPELLS SKILLS
 #0
 SHADOW-RECALL
 
@@ -18553,18 +18586,18 @@ Shadow Regenesis
 Type: Spell
 
 Description:
-Shadow Regenesis focuses on these gameplay behaviors: uses spell-specific custom logic.
+Lets your body recover through shadow regeneration.
 
 Effect:
-- Core routines: uses spell-specific custom logic.
+Self buff that grants regeneration for a long duration.
 
 Usage:
-Target self only.
+Best used before extended fights, attrition battles, or recovery periods between repeated engagements.
 
-Practical Notes:
-Targeting: yourself only. If a saving throw is involved, expect reduced value on high-save targets.
+Notes:
+This is long term sustain, not emergency healing.
 
-See also: SPELLS SKILLS
+See also: HEAL GREATER-HEAL UNDYING-WILL SPELLS SKILLS
 #0
 SHADOW-RESERVOIR
 
@@ -18608,18 +18641,18 @@ Shadow Storm
 Type: Spell
 
 Description:
-Shadow Storm focuses on these gameplay behaviors: uses spell-specific custom logic.
+Calls a violent storm of living shadow into the room.
 
 Effect:
-- Core routines: uses spell-specific custom logic.
+Creates a hostile room effect rather than an immediate direct strike.
 
 Usage:
-Target no explicit target.
+Best used before or during a room hold when you want the environment itself working for your side.
 
-Practical Notes:
-Targeting: no explicit target (self/room effect). If a saving throw is involved, expect reduced value on high-save targets.
+Notes:
+This is room control, not a simple nuke. Pair it with roots, concealment, or summoned servants.
 
-See also: SPELLS SKILLS
+See also: SHADOW-DOMAIN DOMAIN-BREAK TOXIC-CLOUD WALL-OF-FIRE SPELLS SKILLS
 #0
 SHADOW-SURGE
 
@@ -18841,18 +18874,18 @@ Silence Field
 Type: Spell
 
 Description:
-Silence Field focuses on these gameplay behaviors: mag rooms.
+Drops magical silence across the entire room.
 
 Effect:
-- Creates room effects: silence field.
+Creates a room wide silence field for a short duration.
 
 Usage:
-Target no explicit target.
+Best used to shut down casting in a contested room before enemy mages can stabilize.
 
-Practical Notes:
-Targeting: no explicit target (self/room effect). If a saving throw is involved, expect reduced value on high-save targets.
+Notes:
+Shorter duration than some other room fields, but excellent for a fast disruption window.
 
-See also: SPELLS SKILLS
+See also: NULL-FIELD DOMAIN-BREAK POWER-WORD-SILENCE SPELLS SKILLS
 #0
 SILENT-MAGIC
 
@@ -18974,18 +19007,20 @@ SNEAK
 
 Sneak
 Type: Skill
-Category: Mobility Skill
 
 Description:
-Sneak attempts to apply AFF_SNEAK to yourself for a duration equal to your level using skill plus dexterity sneak bonus. On failure no effect is applied.
+Softens your movement to avoid drawing attention while traveling.
 
 Effect:
-Sneak attempts to apply AFF_SNEAK to yourself for a duration equal to your level using skill plus dexterity sneak bonus. On failure no effect is applied.
+Applies a sneaking state that improves your ability to move quietly.
 
 Usage:
-Use command: sneak.
+Best used before scouting, stalking, or setting up an approach.
 
-See also: SPELLS SKILLS
+Notes:
+Pairs naturally with Hide, but they are not the same thing.
+
+See also: HIDE BACKSTAB TOTAL-OCCULTATION SKILLS
 #0
 SNOOP
 
@@ -19064,18 +19099,18 @@ Sonic Burst
 Type: Spell
 
 Description:
-Sonic Burst focuses on these gameplay behaviors: affects the entire room area.
+Detonates a burst of concussive sound from your position.
 
 Effect:
-- Core routines: affects the entire room area.
+Area spell that deals medium sonic damage to enemy targets in the room.
 
 Usage:
-Target no explicit target.
+Best used against grouped enemies when you want instant room wide damage rather than a persistent field.
 
-Practical Notes:
-Targeting: no explicit target (self/room effect). If a saving throw is involved, expect reduced value on high-save targets.
+Notes:
+This is a direct area burst, not a movement spell, escape spell, or scouting tool.
 
-See also: SPELLS SKILLS
+See also: SHOCKWAVE WORD-OF-PAIN BLIZZARD SPELLS SKILLS
 #0
 SOURCES RESOURCES CODEBASE FTP DOWNLOADS DOCUMENTATION WTFAQ FORUMS GROUPS 
 
@@ -19127,18 +19162,18 @@ Sovereigns Step
 Type: Spell
 
 Description:
-Sovereigns Step focuses on these gameplay behaviors: uses spell-specific custom logic.
+Lets you move with the precision and superiority of a sovereign.
 
 Effect:
-- Core routines: uses spell-specific custom logic.
+Self mobility buff that restores movement each combat tick while active.
 
 Usage:
-Target self only.
+Best used before long chases, mobile fights, or any encounter where movement economy matters.
 
-Practical Notes:
-Targeting: yourself only. If a saving throw is involved, expect reduced value on high-save targets.
+Notes:
+Pairs well with Relentless Hunt and marked target play.
 
-See also: SPELLS SKILLS
+See also: RELENTLESS-HUNT EXECUTION-MARK SHADOW-STEP SPELLS SKILLS
 #0
 SPAM
 
@@ -19637,35 +19672,37 @@ Static Field
 Type: Spell
 
 Description:
-Static Field focuses on these gameplay behaviors: mag rooms.
+Charges the air of the room with unstable lightning.
 
 Effect:
-- Creates room effects: static field.
+Creates a persistent static room effect for medium duration.
 
 Usage:
-Target no explicit target.
+Best used in controlled room fights where enemies are forced to stay engaged.
 
-Practical Notes:
-Targeting: no explicit target (self/room effect). If a saving throw is involved, expect reduced value on high-save targets.
+Notes:
+Another terrain control spell. Cast it when you want the environment working against the enemy.
 
-See also: SPELLS SKILLS
+See also: WALL-OF-FIRE ACID-RAIN DOMAIN-BREAK SPELLS SKILLS
 #0
 STEAL
 
 Steal
 Type: Skill
-Category: Combat Skill
 
 Description:
-Steal attempts to take coins or items from a target in your room. Chance depends on skill, dexterity pickpocket bonus, target state, and item weight. Failures alert the victim, and awake NPC victims may retaliate.
+Attempts to take coins or items from another character without open combat.
 
 Effect:
-Steal attempts to take coins or items from a target in your room. Chance depends on skill, dexterity pickpocket bonus, target state, and item weight. Failures alert the victim, and awake NPC victims may retaliate.
+Thievery skill with failure risk if the target notices.
 
 Usage:
-Use command: steal <item|coins> <target>.
+Best used when the target is distracted and the consequences of getting caught are acceptable.
 
-See also: SPELLS SKILLS
+Notes:
+A failed steal can create immediate trouble. Choose your mark carefully.
+
+See also: HIDE SNEAK BACKSTAB SKILLS
 #0
 STOCK
 
@@ -20265,24 +20302,20 @@ TACTICAL-SPELL-MEMORY
 
 Tactical Spell Memory
 Type: Skill
-Category: Passive Skill
 
 Description:
-Improves spell tempo and consistency through disciplined arcane recall.
+You retain enough structure after a kill to recover part of the mana spent getting there.
 
 Effect:
-Passively supports sustained casting performance in long engagements.
+Passive caster sustain skill. When you kill with a spell, you recover mana based on your level.
 
 Usage:
-Always on once learned.
+Always on. Most valuable in chains of kills where you keep ending fights with spells.
 
-Tactical Notes:
-Strong for caster builds that manage long rotations or burst chains.
+Notes:
+This rewards clean spell finishes, not wasted overkill.
 
-Limitations:
-No manual activation; benefits appear through casting systems.
-
-See also: SPELLS SKILLS
+See also: SHADOW-RESERVOIR SUPREME-CASTER-DISCIPLINE SKILLS
 #0
 TANK LEAD
 
@@ -20983,18 +21016,20 @@ TRACK
 
 Track
 Type: Skill
-Category: Detection Skill
 
 Description:
-Track uses BFS pathfinding to a named world target and reports the first direction. On failed skill checks it returns a random direction instead. Targets with AFF_NOTRACK cannot be tracked.
+Searches for the trail of a target across nearby rooms.
 
 Effect:
-Track uses BFS pathfinding to a named world target and reports the first direction. On failed skill checks it returns a random direction instead. Targets with AFF_NOTRACK cannot be tracked.
+Hunting and pursuit skill that points you toward your quarry when the attempt succeeds.
 
 Usage:
-Use command: track <target name>.
+Best used during pursuit, hunting, or when a target has recently fled.
 
-See also: SPELLS SKILLS
+Notes:
+Tracking is for finding people, not for winning the fight once you arrive.
+
+See also: RELENTLESS-HUNT APPRAISE-ENEMY SKILLS
 #0
 TRACKTHRU
 
@@ -22750,24 +22785,22 @@ TRUE-DEATH
 
 True Death
 Type: Spell
-Category: High-Tier Offensive Spell
 
 Description:
-Delivers uncompromising death magic intended to finish priority targets.
+Channels fatal necrotic force meant to end a target cleanly.
 
 Effect:
-Applies severe lethal pressure with execution-oriented intent.
+Single target death spell. It uses a death save rather than a normal spell save.
+A failed death save causes full necrotic damage and applies a long lasting True Death mark.
+A successful save halves the damage.
 
 Usage:
-Cast on a high-value enemy during kill windows.
+Best used as a finisher against dangerous targets you need to remove quickly.
 
-Tactical Notes:
-Best reserved for decisive moments rather than routine damage trading.
+Notes:
+This is a kill spell, not an opener. Use it after a target is already worn down or when a priority enemy must die now.
 
-Limitations:
-Single-target lethal spell; requires valid enemy target.
-
-See also: SPELLS SKILLS
+See also: FINGER-OF-DEATH DISINTEGRATE GRASP-HEART SPELLS SKILLS
 #0
 TRUE-SEEING
 
@@ -22816,24 +22849,20 @@ UNDEAD-COMMAND
 
 Undead Command
 Type: Skill
-Category: Passive Skill
 
 Description:
-Improves your authority over undead-oriented combat systems.
+Your control over undead servants makes them deadlier in battle.
 
 Effect:
-Passively strengthens undead command consistency and related outcomes.
+Passive summon skill. Undead followers under your control deal increased damage.
 
 Usage:
-Always on once learned.
+Always on when you are fielding undead servants.
 
-Tactical Notes:
-Core passive for necromancy-focused builds.
+Notes:
+Its value depends entirely on having undead allies present.
 
-Limitations:
-No manual activation; effect depends on undead interactions.
-
-See also: SPELLS SKILLS
+See also: ANIMATE-DEAD ANIMATE-DEAD-GREATER SPELLS SKILLS
 #0
 UNDYING-WILL
 
@@ -22875,20 +22904,20 @@ Unholy Word
 Type: Spell
 
 Description:
-Unholy Word focuses on these gameplay behaviors: uses spell-specific custom logic.
+Speaks a blasphemous word that lashes through the entire room with shadow power.
 
 Effect:
-- Deals shadow damage.
-- Can apply statuses: blinded magical, stunned.
-- Targets may resist part or all of the effect with a saving throw.
+Room wide hostile spell. It hits enemy targets in the room, but skips evil aligned enemies entirely.
+Targets that fail their spell save take full shadow damage, are stunned briefly, and suffer magical blindness.
+Targets that save take reduced damage only.
 
 Usage:
-Target no explicit target.
+Best used when several non evil enemies are grouped together and you want immediate area damage plus disruption.
 
-Practical Notes:
-Targeting: no explicit target (self/room effect). If a saving throw is involved, expect reduced value on high-save targets.
+Notes:
+Poor choice against mostly evil enemies because they are ignored completely. Strongest when the blind and stun can swing the room in your favor.
 
-See also: SPELLS SKILLS
+See also: HOLY-WORD MASS-FEAR CRY-OF-THE-BANSHEE SPELLS SKILLS
 #0
 UNSET
 
@@ -23114,19 +23143,19 @@ Vertigo
 Type: Spell
 
 Description:
-Vertigo focuses on these gameplay behaviors: applies status or stat modifiers.
+Overwhelms the target's balance and sense of direction.
 
 Effect:
-- Can apply statuses: stunned.
-- Targets may resist part or all of the effect with a saving throw.
+Single target debuff. On a failed save it lowers Dexterity and hitroll for a short duration.
+On a successful save it still applies a smaller Dexterity penalty.
 
 Usage:
-Target a character in your room, your current opponent in combat.
+Best used to blunt fast or evasive enemies before committing to melee attacks.
 
-Practical Notes:
-Targeting: a character in your room, your current combat target, cannot target yourself. If a saving throw is involved, expect reduced value on high-save targets.
+Notes:
+Strong against targets whose offense depends on Dexterity or accurate weapon hits.
 
-See also: SPELLS SKILLS
+See also: CONFUSION FROSTBITE SHADOW-BIND SPELLS SKILLS
 #0
 VIRTUAL-NUMBERS RNUM  
 
@@ -23186,18 +23215,18 @@ Voltaic Bolt
 Type: Spell
 
 Description:
-Voltaic Bolt focuses on these gameplay behaviors: deals direct spell damage, applies status or stat modifiers.
+Hurls a focused bolt of lightning into one target.
 
 Effect:
-- Can apply statuses: static.
+Single target lightning damage spell. It also applies a static status for a short duration.
 
 Usage:
-Target a character in your room, your current opponent in combat.
+Best used for direct single target damage when you want lightning damage plus a follow up electrical status effect.
 
-Practical Notes:
-Targeting: a character in your room, your current combat target. If a saving throw is involved, expect reduced value on high-save targets.
+Notes:
+This is not a utility spell. It is a direct damage bolt with added debuff value.
 
-See also: SPELLS SKILLS
+See also: LIGHTNING-BOLT DRAGON-LIGHTNING STATIC-FIELD SPELLS SKILLS
 #0
 VOTE VOTING
 
@@ -23225,23 +23254,24 @@ See also: LOAD, STAT, VNUM, TSTAT
 #31
 WAIL-OF-THE-BANSHEE
 
-Wail Of The Banshee
+Wail of the Banshee
 Type: Spell
 
 Description:
-Wail Of The Banshee focuses on these gameplay behaviors: uses spell-specific custom logic.
+Unleashes a deathly scream that can outright kill the living.
 
 Effect:
-- Deals necrotic damage.
-- Targets may resist part or all of the effect with a saving throw.
+Room wide death spell against enemies in the room. Undead targets are ignored.
+Each enemy makes a death save. On a failed save the spell attempts an instant necrotic kill.
+If the kill does not resolve, or the save succeeds, the target still takes extreme necrotic damage.
 
 Usage:
-Target no explicit target.
+Best used against living enemy groups when you want maximum room wide kill chance.
 
-Practical Notes:
-Targeting: no explicit target (self/room effect). If a saving throw is involved, expect reduced value on high-save targets.
+Notes:
+Undead are unaffected by the instant death portion. This is one of your strongest anti living room clears.
 
-See also: SPELLS SKILLS
+See also: CRY-OF-THE-BANSHEE TRUE-DEATH IA-SHUB-NIGGURATH SPELLS SKILLS
 #0
 WAIT PAUSE TRIGEDIT-TIMING TIMING TRIG-WAIT TRIGEDIT-WAIT
  
@@ -23287,22 +23317,22 @@ player recovers hitpoints faster when resting or sleeping.
 #0
 WALL-OF-FIRE
 
-Wall Of Fire
+Wall of Fire
 Type: Spell
 
 Description:
-Wall Of Fire focuses on these gameplay behaviors: mag rooms.
+Conjures a wall of magical fire that saturates the room.
 
 Effect:
-- Creates room effects: wall of fire.
+Creates a persistent room effect rather than an instant direct hit.
 
 Usage:
-Target no explicit target.
+Best used to claim a room and force enemies to fight inside hostile terrain.
 
-Practical Notes:
-Targeting: no explicit target (self/room effect). If a saving throw is involved, expect reduced value on high-save targets.
+Notes:
+This is room control. Cast it before enemies settle in, or use it to make holding ground more painful for them.
 
-See also: SPELLS SKILLS
+See also: STATIC-FIELD ACID-RAIN SHADOW-DOMAIN DOMAIN-BREAK SPELLS SKILLS
 #0
 WARRIOR FIGHTER
 
@@ -23465,18 +23495,20 @@ WHIRLWIND
 
 Whirlwind
 Type: Skill
-Category: Combat Skill
 
 Description:
-Whirlwind starts a repeating attack event. Each tick spends 12 movement and makes 1d4 random attacks against NPCs in your room. It ends when checks fail, no targets remain, or you run out of movement.
+Launches into a spinning melee assault against nearby foes.
 
 Effect:
-Whirlwind starts a repeating attack event. Each tick spends 12 movement and makes 1d4 random attacks against NPCs in your room. It ends when checks fail, no targets remain, or you run out of movement.
+Area melee skill for hitting multiple enemies in close combat.
 
 Usage:
-Use command: whirlwind while standing and not in peaceful rooms.
+Best used when surrounded or when several enemies are stacked on you at once.
 
-See also: SPELLS SKILLS
+Notes:
+Its value rises sharply in crowded fights and falls in simple one on one combat.
+
+See also: BASH KICK SHOCKWAVE SKILLS
 #0
 WHO WHOINVIS
 
@@ -23663,22 +23695,23 @@ See also: SPELLS SKILLS
 #0
 WORD-OF-PAIN
 
-Word Of Pain
+Word of Pain
 Type: Spell
 
 Description:
-Word Of Pain focuses on these gameplay behaviors: affects the entire room area.
+Speaks a killing syllable that lashes the room with sonic torment.
 
 Effect:
-- Core routines: affects the entire room area.
+Area sonic spell that deals high damage to most enemies in the room.
+Against vampires it deals extreme damage instead.
 
 Usage:
-Target no explicit target.
+Best used when room wide burst is needed, especially if vampires are among the enemy group.
 
-Practical Notes:
-Targeting: no explicit target (self/room effect). If a saving throw is involved, expect reduced value on high-save targets.
+Notes:
+A strong anti vampire area spell.
 
-See also: SPELLS SKILLS
+See also: SONIC-BURST HOLY-WORD UNHOLY-WORD SPELLS SKILLS
 #0
 WORD-OF-RECALL
 
