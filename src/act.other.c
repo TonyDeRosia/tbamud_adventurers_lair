@@ -847,11 +847,19 @@ static int study_find_item_and_target(struct char_data *ch, char *argument,
     return FALSE;
 
   for (i = token_count; i >= 1; i--) {
+    size_t item_len = 0;
     item_name[0] = '\0';
     for (j = 0; j < i; j++) {
-      if (*item_name)
-        strlcat(item_name, " ", sizeof(item_name));
-      strlcat(item_name, tokens[j], sizeof(item_name));
+      int wrote = snprintf(item_name + item_len, sizeof(item_name) - item_len,
+                           "%s%s", item_len ? " " : "", tokens[j]);
+      if (wrote < 0)
+        break;
+      if ((size_t)wrote >= sizeof(item_name) - item_len) {
+        item_len = sizeof(item_name) - 1;
+        item_name[item_len] = '\0';
+        break;
+      }
+      item_len += (size_t)wrote;
     }
 
     obj = study_find_item_source(ch, item_name);
@@ -860,11 +868,19 @@ static int study_find_item_and_target(struct char_data *ch, char *argument,
 
     *study_obj_out = obj;
     if (i < token_count) {
+      size_t target_len = 0;
       target_name[0] = '\0';
       for (j = i; j < token_count; j++) {
-        if (*target_name)
-          strlcat(target_name, " ", sizeof(target_name));
-        strlcat(target_name, tokens[j], sizeof(target_name));
+        int wrote = snprintf(target_name + target_len, sizeof(target_name) - target_len,
+                             "%s%s", target_len ? " " : "", tokens[j]);
+        if (wrote < 0)
+          break;
+        if ((size_t)wrote >= sizeof(target_name) - target_len) {
+          target_len = sizeof(target_name) - 1;
+          target_name[target_len] = '\0';
+          break;
+        }
+        target_len += (size_t)wrote;
       }
       *target_id_out = find_skill_num(target_name);
       *has_target_out = TRUE;
@@ -919,13 +935,17 @@ static enum study_item_result study_try_from_item(struct char_data *ch, struct o
     int sid = raw_spell_ids[i];
     int required_level = classtrack_get_study_min_level(sid);
     int ability_archetype = classtrack_get_ability_archetype(sid);
+    size_t raw_len = strlen(raw_names);
 
     if (has_requested_ability && sid != requested_ability_id)
       continue;
 
-    if (*raw_names)
-      strlcat(raw_names, ", ", sizeof(raw_names));
-    strlcat(raw_names, spell_info[sid].name, sizeof(raw_names));
+    {
+      int wrote = snprintf(raw_names + raw_len, sizeof(raw_names) - raw_len, "%s%s",
+                           raw_len ? ", " : "", spell_info[sid].name);
+      if (wrote >= (int)(sizeof(raw_names) - raw_len))
+        raw_names[sizeof(raw_names) - 1] = '\0';
+    }
 
     if (GET_SKILL(ch, sid) > 0) {
       debug_info.known_count++;
@@ -944,9 +964,14 @@ static enum study_item_result study_try_from_item(struct char_data *ch, struct o
     }
 
     eligible_spell_ids[eligible_count++] = sid;
-    if (*eligible_names)
-      strlcat(eligible_names, ", ", sizeof(eligible_names));
-    strlcat(eligible_names, spell_info[sid].name, sizeof(eligible_names));
+    {
+      size_t eligible_len = strlen(eligible_names);
+      int wrote = snprintf(eligible_names + eligible_len,
+                           sizeof(eligible_names) - eligible_len, "%s%s",
+                           eligible_len ? ", " : "", spell_info[sid].name);
+      if (wrote >= (int)(sizeof(eligible_names) - eligible_len))
+        eligible_names[sizeof(eligible_names) - 1] = '\0';
+    }
   }
 
   study_debug_imm(ch, "item '%s' type %d target=%s candidates=[%s] eligible=[%s]",
