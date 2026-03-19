@@ -5249,22 +5249,17 @@ See also: SHADOW-LANCE OBLIVION-SPEAR MUTILATE SPELLS SKILLS
 
 BLAST SHOOT RANGED-WEAPONS FIRE-WEAPONS BOWS QUIVERS MISSILES GUNS FIREARMS AMMO
 
-Bless
-Type: Spell
+Usage: shoot <target>
+       blast <target>
 
-Description:
-Bless focuses on these gameplay behaviors: applies status or stat modifiers, alters object properties.
-
-Effect:
-Applies a persistent magical condition that alters the target's combat performance.
-
-Usage:
-Target a character in your room, an item in your inventory.
+Ranged weapon combat uses bows, firearms, and other missile weapons.
+You need a suitable ranged weapon equipped and matching ammunition available.
 
 Notes:
-Targeting: a character in your room, an object in your inventory. If a saving throw is involved, expect reduced value on high-save targets.
+- Ammunition is consumed as you fire.
+- You must be able to see and legally target your opponent.
 
-See also: SPELLS SKILLS
+See also: WEAPONS AMMO QUIVERS
 #0
 
 BLINDED SOMEONE INVISIBLE WIZINVIS 
@@ -5620,22 +5615,14 @@ See also: MAIL, READ, WRITE
 
 BULLETINS BOARDS BULLETIN-BOARDS MESSAGE-BOARDS POSTING
 
-Bulletins
-Type: Spell
+Posting to a bulletin board:
+1) LOOK BOARD to see message numbers and subjects.
+2) WRITE <subject> to start a new post.
+3) End your message with /s on a line by itself.
+4) READ <number> to view a post.
+5) REMOVE <number> to remove your own post.
 
-Description:
-Burning Hands focuses on these gameplay behaviors: deals direct spell damage.
-
-Effect:
-Deals spell damage.
-
-Usage:
-Target a character in your room, your current opponent in combat.
-
-Notes:
-Targeting: a character in your room, your current combat target. If a saving throw is involved, expect reduced value on high-save targets.
-
-See also: MAIL, READ, WRITE, SPECIALS #31 BURNING-HANDS Burning Hands SPELLS SKILLS
+See also: BULLETINS READ WRITE MAIL
 #0
 
 BUY
@@ -6255,22 +6242,17 @@ See also: SPELLS SKILLS
 
 CHECKLOAD CHECKOBJ CHECKMOB
 
-Checkload
-Type: Spell
+Usage: checkload <o|m|t> <vnum>
 
-Description:
-Chill Touch focuses on these gameplay behaviors: deals direct spell damage, applies status or stat modifiers.
+CHECKLOAD scans zone reset data and reports where an object, mobile, or trigger
+is loaded.
 
-Effect:
-Targets may resist part or all of the effect with a saving throw.
+Examples:
+  checkload o 15004
+  checkload m 3062
+  checkload t 100
 
-Usage:
-checkload <O|M|T> <vnum> Checkload will scan the zone information and tell you where any given mob, obj, or trig loads. We recommend you use this in conjunction with the lists to ensure everything created in your zone is actually used. > checkload o 15004 Checking load info for a golden apple... [15017] By The Throne In The Great Hall (Equipped to King Welmar [15001][100% Load, 1 Max]) > checkload m 3062 Checking load info for the beastly fido... [ 3024] The Eastern End Of Poor Alley (15 Max.) [ 3025] The Common Square (15 Max.) [ 3016] Main Street (15 Max.) [ 3012] Main Street (15 Max.) > checkload t 100 Checking load info for the object trigger 'Portal to Midgaard - 100': (obj) [ 100] the portal Target a character in your room, your current opponent in combat.
-
-Notes:
-Targeting: a character in your room, your current combat target. If a saving throw is involved, expect reduced value on high-save targets.
-
-See also: LINKS, RLIST, OLIST, MLIST, SLIST #31 CHILL-TOUCH Chill Touch SPELLS SKILLS
+See also: RLIST OLIST MLIST SLIST LINKS
 #0
 
 CHMOD
@@ -7463,22 +7445,14 @@ deleted or donated depending on the quality.
 
 DISCONNECT FLOOD OVERFLOW CUTOFF CUT-OFF ENTERING-TEXT
 
-Disintegrate
-Type: Spell
+If your link drops while entering text, unfinished input may be lost.
+This can happen during long editor sessions or network instability.
 
-Description:
-Fires a green ray of disintegrating energy at a single target.
+Tips:
+- Save frequently in the text editor.
+- Keep important drafts in an external file until final paste.
 
-Effect:
-Single target arcane damage spell. The target saves against spell at a penalty. On a failed save the spell deals extremely heavy damage based in part on the target's maximum health. On a successful save it still deals high damage.
-
-Usage:
-Best used against tough single targets when you need a major burst hit instead of room wide damage.
-
-Notes:
-A strong anti boss or anti elite nuke. More efficient on one important target than on trash enemies.
-
-See also: TEXT-EDITOR #31 DISINTEGRATE TRUE-DEATH FINGER-OF-DEATH OBLIVION-SPEAR SPELLS SKILLS
+See also: TEXT-EDITOR
 #0
 
 DISPEL-EVIL
@@ -9322,22 +9296,10 @@ See also: SPELLS SKILLS
 
 HANDBOOK WIZHANDBOOK WIZ-HANDBOOK IMMHANDBOOK IMM-HANDBOOK
 
-Handbook
-Type: Spell
+Guidelines for immortal behavior, editing standards, and staff workflow.
+If you have immortal access, read this before active building or moderation.
 
-Description:
-Harm focuses on these gameplay behaviors: deals direct spell damage.
-
-Effect:
-Deals spell damage.
-
-Usage:
-handbook Guidelines for having an Immortal character -- you should read it. #31 HAPPYHOUR happyhour - show usage (this info) happyhour show - display current settings (what mortals see) happyhour time <ticks> - set happyhour time and start timer happyhour qp <num> - set qp percentage gain happyhour exp <num> - set exp percentage gain happyhour gold <num> - set gold percentage gain happyhour default - sets a default setting for happyhour Configure the happyhour settings and start a happyhour. Currently 1 hour IRL = 48 ticks If no number is specified, 0 (off) is assumed. The command happyhour time will therefore stop the happyhour timer. #31 HARM Harm Target a character in your room, your current opponent in combat.
-
-Notes:
-Targeting: a character in your room, your current combat target. If a saving throw is involved, expect reduced value on high-save targets.
-
-See also: SPELLS SKILLS
+See also: RULES POLICIES
 #0
 
 HAS_ITEM ACTOR.HAS_ITEM %ACTOR.HAS_ITEM% TRIG_HAS_ITEM 
@@ -9886,22 +9848,16 @@ See also: EQUIPMENT, GRAB, HOLD, REMOVE, WEAR
 
 INVIS SPOOFS
 
-Invisibility
-Type: Spell
+INVIS controls immortal invisibility level.
 
-Description:
-Invisibility focuses on these gameplay behaviors: applies status or stat modifiers, alters object properties.
+Usage: invis [level]
 
-Effect:
-Can apply statuses: invisible.
+With no argument, INVIS toggles visibility. With a level set, only immortals at
+or above that level can see you.
 
-Usage:
-invis [level] INVIS sets your invisibility level. With no argument, invis toggles between making you fully visible and fully invisible. If you specify a level, only people at and above the level you specify will be able to see you. TBA has been modified so this can not be abused, any action or communication you take will show your name. Examples: > invis > invis 30 Target a character in your room, an item in your inventory, an item in the room.
+Actions and communication still identify you; INVIS is not anonymous mode.
 
-Notes:
-Targeting: a character in your room, an object in your inventory, an object in your room. If a saving throw is involved, expect reduced value on high-save targets.
-
-See also: MEDIT-AFF, VISIBLE, INVISIBILITY #31 INVISIBILITY SPELLS SKILLS
+See also: VISIBLE WIZINVIS
 #0
 
 IRONSKIN
@@ -14170,22 +14126,16 @@ See also: TOGGLE
 
 PROPOSALS GUIDELINES ZONE-PROPOSALS PROPOSITIONS PROPOSE REQUESTS CRITERIA
 
-Proposals
-Type: Spell
+Use this topic for zone or project proposal standards.
+Describe your concept, scope, room count, level range, and dependencies.
 
-Description:
-Protection From Evil focuses on these gameplay behaviors: applies status or stat modifiers.
+A strong proposal includes:
+- clear design goals
+- realistic build scope
+- reset and balance considerations
+- evidence of area style compatibility
 
-Effect:
-Can apply statuses: protect evil.
-
-Usage:
-Target self only, a character in your room.
-
-Notes:
-Targeting: a character in your room, yourself only. If a saving throw is involved, expect reduced value on high-save targets.
-
-See also: EXAMPLE-PROPOSAL #31 PROTECTION-FROM-EVIL Protection From Evil SPELLS SKILLS
+See also: EXAMPLE-PROPOSAL
 #0
 
 PSYCHIC-CRUSH
@@ -15249,22 +15199,10 @@ See Also: TBA-ADVERTISING, TBA-STAFF
 
 RUMBLE-ALIASES
 
-Rumble Aliases
-Type: Spell
+Rumble aliases are optional command shortcuts used by staff and builders.
+Aliases can speed up repetitive tasks, but should stay readable and maintainable.
 
-Description:
-Sanctuary focuses on these gameplay behaviors: applies status or stat modifiers.
-
-Effect:
-Applies a persistent magical condition that alters the target's combat performance.
-
-Usage:
-Target a character in your room.
-
-Notes:
-Targeting: a character in your room. If a saving throw is involved, expect reduced value on high-save targets.
-
-See also: SPELLS SKILLS
+See also: ALIAS
 #0
 
 SAVEALL AUTOSAVE SAVE-ALL REDIT-SAVE ZSAVE
@@ -15633,22 +15571,12 @@ See also: BUY, LIST, SHOPS, VALUE
 
 SEND
 
-Send
-Type: Spell
+Usage: send <target> <message>
 
-Description:
-Sense Life focuses on these gameplay behaviors: applies status or stat modifiers.
+SEND displays a direct message to one player. It is commonly used by teachers
+while observing builders in OLC sessions.
 
-Effect:
-Can apply statuses: sense life.
-
-Usage:
-send [target] <message> SEND displays the message to a particular person. This is meant to be used by teachers to send text to builders while in OLC. Combined with the snoop command this allows a teacher to see and tell builders what to do. Here is a little shortcut alias I use. alias sa send alambil @M@MRumble sends you:@n@n $* With this I just type: sa <message>. This will use color to catch his attention and will list my name since send does not automatically show who the send is from. Wiznet is now viewable while in OLC so if the MUD isn't too crowded you can use that as well, but do not spam other builders. Target self only, a character in your room.
-
-Notes:
-Targeting: a character in your room, yourself only. If a saving throw is involved, expect reduced value on high-save targets.
-
-See also: TRIG-SEND #31 SENSE-LIFE Sense Life SPELLS SKILLS
+See also: TRIG-SEND TELL WIZNET
 #0
 
 SERVERS FREE-SERVERS HOSTINGS FREE-HOSTS
@@ -21783,5 +21711,186 @@ zlock - Locks one or all zones. Type zlock for usage.
 zunlock - Locks one or all zones. Type zunlock for usage.
 
 #31
+BLESS
+
+Bless
+Type: Spell
+
+Description:
+A divine buff that improves offensive accuracy and spell resistance.
+
+Effect:
+On characters, Bless adds hitroll and improves spell saving throw protection.
+Duration scales with caster level and is capped. Bless can also bless an inventory object, but only if the object is light enough for the caster level.
+
+Usage:
+Cast before combat as a maintenance buff. Use on allies who need better hit chance or saving throws.
+
+Notes:
+Bless is a low-cost upkeep spell. Recast to refresh duration when it is close to expiring.
+
+See also: ARMOR SANCTUARY PROTECTION-FROM-EVIL SPELLS SKILLS
+#0
+
+BURNING-HANDS BURNING HANDS
+
+Burning Hands
+Type: Spell
+
+Description:
+A fire damage spell for one target in combat.
+
+Effect:
+Deals direct fire damage to a single target. Target gets a normal spell save for reduced damage.
+
+Usage:
+Use early as a low-tier direct damage spell against your current opponent.
+
+Notes:
+Single-target only. Replace it with stronger spells as your spell list expands.
+
+See also: FIREBALL FLAME-ARROW FIREBOLT SPELLS SKILLS
+#0
+
+CHILL-TOUCH CHILL TOUCH
+
+Chill Touch
+Type: Spell
+
+Description:
+A single-target touch spell that damages and weakens strength.
+
+Effect:
+Deals direct spell damage and applies a strength penalty. On a successful save, damage is reduced and the debuff duration is shorter.
+
+Usage:
+Use on melee targets to lower their strength while dealing chip damage.
+
+Notes:
+Useful early because it combines damage plus debuff in one cast.
+
+See also: ENFEEBLEMENT SPELLS SKILLS
+#0
+
+DISINTEGRATE
+
+Disintegrate
+Type: Spell
+
+Description:
+A high-cost single-target arcane execution spell.
+
+Effect:
+Targets one enemy in combat. The target saves vs spell with a penalty; on a failed save, damage includes a large component based on the target's maximum hit points. On a successful save, it still deals heavy damage.
+
+Usage:
+Use against high-health priority targets when you need burst damage on one enemy.
+
+Notes:
+Not a room spell. Best value comes from casting it into high-HP enemies.
+
+See also: FINGER-OF-DEATH TRUE-DEATH OBLIVION-SPEAR SPELLS SKILLS
+#0
+
+HARM
+
+Harm
+Type: Spell
+
+Description:
+A direct single-target damage spell.
+
+Effect:
+Deals immediate spell damage to one target in combat. Target receives a normal spell save for reduced damage.
+
+Usage:
+Use when you need straightforward single-target damage.
+
+Notes:
+Harm has no built-in secondary debuff or control effect.
+
+See also: DISPEL-EVIL SPELLS SKILLS
+#0
+
+INVISIBILITY INVISIBLE
+
+Invisibility
+Type: Spell
+
+Description:
+Conceals a character or object from normal sight.
+
+Effect:
+Can target a character, an inventory object, or an object in the room. On characters it applies invisible status and an armor class bonus for the spell duration. On objects it applies the invisible object flag.
+
+Usage:
+Use for scouting, travel, setup, or pre-fight positioning.
+
+Notes:
+The effect ends in combat activity that strips invisibility from the attacker.
+
+See also: DETECT-INVISIBILITY SENSE-LIFE SPELLS SKILLS
+#0
+
+PROTECTION-FROM-EVIL PROTECTION FROM EVIL
+
+Protection From Evil
+Type: Spell
+
+Description:
+A self-maintenance defensive buff against evil-aligned threats.
+
+Effect:
+Self-target only. Applies the protect-evil status with level-scaled duration (capped).
+
+Usage:
+Cast before engaging evil enemies to maintain the protection effect.
+
+Notes:
+This is a maintenance buff, not an emergency reaction spell.
+
+See also: BLESS SANCTUARY ARMOR SPELLS SKILLS
+#0
+
+SANCTUARY
+
+Sanctuary
+Type: Spell
+
+Description:
+A high-value defensive ward that applies sanctuary status.
+
+Effect:
+Targets a character in your room. Applies sanctuary for a level-scaled duration (capped). Recasting sanctuary-style spells replaces existing sanctuary effects rather than stacking them.
+
+Usage:
+Keep this active on the current tank or focus target before heavy damage phases.
+
+Notes:
+Because sanctuary-family effects do not stack, coordinate recasts instead of overlapping them.
+
+See also: ARCANE-WARD IRONSKIN DIVINE-BULWARK DARK-AEGIS NIRVANA SPELLS SKILLS
+#0
+
+SENSE-LIFE SENSE LIFE
+
+Sense Life
+Type: Spell
+
+Description:
+A self-only awareness buff that grants life-sense detection.
+
+Effect:
+Self-target only. Applies sense-life status for a level-scaled duration (capped).
+
+Usage:
+Cast before travel or scouting when hidden life-sign detection matters.
+
+Notes:
+This is a passive detection buff and should be maintained proactively.
+
+See also: DETECT-INVISIBILITY DETECT-MAGIC INVISIBILITY SPELLS SKILLS
+#0
+
 $
 #0
