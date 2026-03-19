@@ -2826,6 +2826,36 @@ static int append_help_line(char *buf, size_t bufsz, size_t *len, const char *li
   return TRUE;
 }
 
+static int find_live_ability_by_name(const char *argument, int *ability_out)
+{
+  int i;
+  char normalized_arg[MAX_INPUT_LENGTH];
+  char normalized_name[MAX_INPUT_LENGTH];
+
+  if (!argument || !*argument || !ability_out)
+    return FALSE;
+
+  normalize_help_keyword(argument, normalized_arg, sizeof(normalized_arg));
+  if (!*normalized_arg)
+    return FALSE;
+
+  for (i = 1; i <= TOP_SPELL_DEFINE; i++) {
+    if (!spell_info[i].name || !str_cmp(spell_info[i].name, unused_spellname))
+      continue;
+
+    normalize_help_keyword(skill_name(i), normalized_name, sizeof(normalized_name));
+    if (!*normalized_name)
+      continue;
+
+    if (!str_cmp(normalized_arg, normalized_name)) {
+      *ability_out = i;
+      return TRUE;
+    }
+  }
+
+  return FALSE;
+}
+
 static void show_live_ability_help(struct char_data *ch, int show_skills)
 {
   int i, count = 0;
@@ -2859,6 +2889,40 @@ static void show_live_ability_help(struct char_data *ch, int show_skills)
     append_help_line(outbuf, sizeof(outbuf), &len, "No abilities are currently available.\r\n");
 
   append_help_line(outbuf, sizeof(outbuf), &len, "\r\nType HELP <name> for details.\r\n");
+  page_string(ch->desc, outbuf, 1);
+}
+
+static void show_live_ability_topic_help(struct char_data *ch, int ability)
+{
+  char outbuf[MAX_STRING_LENGTH];
+  size_t len = 0;
+  const char *name;
+  const char *type;
+
+  if (!ch || !ch->desc)
+    return;
+  if (ability < 1 || ability > TOP_SPELL_DEFINE)
+    return;
+
+  name = skill_name(ability);
+  if (!name || !*name || !str_cmp(name, unused_spellname))
+    return;
+
+  type = (ability <= MAX_SPELLS) ? "Spell" : "Skill";
+
+  outbuf[0] = '\0';
+  append_help_line(outbuf, sizeof(outbuf), &len, name);
+  append_help_line(outbuf, sizeof(outbuf), &len, "\r\n\r\n");
+  append_help_line(outbuf, sizeof(outbuf), &len, "Type: ");
+  append_help_line(outbuf, sizeof(outbuf), &len, type);
+  append_help_line(outbuf, sizeof(outbuf), &len, "\r\n");
+  append_help_line(outbuf, sizeof(outbuf), &len, "Source: Live ability table\r\n\r\n");
+  append_help_line(outbuf, sizeof(outbuf), &len,
+    "This help topic is resolved directly from the current in-game ability name.\r\n");
+  append_help_line(outbuf, sizeof(outbuf), &len,
+    "If this ability has a detailed static help page, use HSET/XHELP tools to add or update it.\r\n\r\n");
+  append_help_line(outbuf, sizeof(outbuf), &len, "See also: SPELLS SKILLS\r\n");
+
   page_string(ch->desc, outbuf, 1);
 }
 
@@ -2918,6 +2982,7 @@ ACMD(do_help)
 {
   int mid = 0;
   int i, found = 0;
+  int live_ability = 0;
   char help_query[MAX_INPUT_LENGTH];
   char normalized_query[MAX_INPUT_LENGTH];
 
@@ -2952,6 +3017,11 @@ ACMD(do_help)
   }
 
   if ((mid = search_help_flexible(help_query, GET_LEVEL(ch))) == NOWHERE) {
+    if (find_live_ability_by_name(help_query, &live_ability)) {
+      show_live_ability_topic_help(ch, live_ability);
+      return;
+    }
+
     send_to_char(ch, "There is no help on that word.\r\n");
     mudlog(NRM, MIN(LVL_IMPL, GET_INVIS_LEV(ch)), TRUE,
       "%s tried to get help on %s", GET_NAME(ch), help_query);
