@@ -1236,43 +1236,46 @@ ACMD(do_train)
 
   if (!*arg) {
     send_to_char(ch, "You have %d training sessions available.\r\n", GET_TRAINS(ch));
-    send_to_char(ch, "Train hit, mana, move (cost 1) or str dex con int wis cha (cost 10, cap 20).\r\n");
+    send_to_char(ch, "Train str dex con int wis cha (cost 1, cap 20) or hit mana move (cost 10).\r\n");
     return;
   }
 
   if (!str_cmp(arg, "hit")) {
-    if (GET_TRAINS(ch) < 1) {
-      send_to_char(ch, "You do not have enough training sessions.\r\n");
+    if (GET_TRAINS(ch) < 10) {
+      send_to_char(ch, "Training hit requires 10 training sessions. You currently have %d.\r\n",
+                   GET_TRAINS(ch));
       return;
     }
 
-    GET_TRAINS(ch)--;
+    GET_TRAINS(ch) -= 10;
     GET_MAX_HIT(ch) += 10;
-    send_to_char(ch, "You spend one training session and feel hardier.\r\n");
+    send_to_char(ch, "You spend ten training sessions and feel tougher and more durable.\r\n");
     return;
   }
 
   if (!str_cmp(arg, "mana")) {
-    if (GET_TRAINS(ch) < 1) {
-      send_to_char(ch, "You do not have enough training sessions.\r\n");
+    if (GET_TRAINS(ch) < 10) {
+      send_to_char(ch, "Training mana requires 10 training sessions. You currently have %d.\r\n",
+                   GET_TRAINS(ch));
       return;
     }
 
-    GET_TRAINS(ch)--;
+    GET_TRAINS(ch) -= 10;
     GET_MAX_MANA(ch) += 10;
-    send_to_char(ch, "You spend one training session and feel hardier.\r\n");
+    send_to_char(ch, "You spend ten training sessions and feel your arcane reserves deepen.\r\n");
     return;
   }
 
   if (!str_cmp(arg, "move")) {
-    if (GET_TRAINS(ch) < 1) {
-      send_to_char(ch, "You do not have enough training sessions.\r\n");
+    if (GET_TRAINS(ch) < 10) {
+      send_to_char(ch, "Training move requires 10 training sessions. You currently have %d.\r\n",
+                   GET_TRAINS(ch));
       return;
     }
 
-    GET_TRAINS(ch)--;
+    GET_TRAINS(ch) -= 10;
     GET_MAX_MOVE(ch) += 10;
-    send_to_char(ch, "You spend one training session and feel hardier.\r\n");
+    send_to_char(ch, "You spend ten training sessions and feel your stamina and endurance grow.\r\n");
     return;
   }
 
@@ -1297,8 +1300,8 @@ ACMD(do_train)
   }
 
   if (stat_field != NULL) {
-    if (GET_TRAINS(ch) < 10) {
-      send_to_char(ch, "Training %s requires 10 training sessions. You currently have %d.\r\n",
+    if (GET_TRAINS(ch) < 1) {
+      send_to_char(ch, "Training %s requires 1 training session. You currently have %d.\r\n",
                    arg, GET_TRAINS(ch));
       return;
     }
@@ -1308,15 +1311,15 @@ ACMD(do_train)
       return;
     }
 
-    GET_TRAINS(ch) -= 10;
+    GET_TRAINS(ch) -= 1;
     (*stat_field)++;
     affect_total(ch);
-    send_to_char(ch, "You spend ten training sessions and feel your %s improve.\r\n", stat_name);
+    send_to_char(ch, "You spend one training session and feel your %s improve.\r\n", stat_name);
     return;
   }
 
   send_to_char(ch, "You have %d training sessions available.\r\n", GET_TRAINS(ch));
-  send_to_char(ch, "Train hit, mana, move (cost 1) or str dex con int wis cha (cost 10, cap 20).\r\n");
+  send_to_char(ch, "Train str dex con int wis cha (cost 1, cap 20) or hit mana move (cost 10).\r\n");
 }
 
 ACMD(do_buytrain)
