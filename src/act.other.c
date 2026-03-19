@@ -833,6 +833,25 @@ struct study_item_lookup_ctx {
   struct obj_data *found;
 };
 
+static int study_is_numbered_item_token(const char *token)
+{
+  const char *dot;
+  const char *p;
+
+  if (!token || !*token)
+    return FALSE;
+
+  dot = strchr(token, '.');
+  if (!dot || dot == token || *(dot + 1) == '\0')
+    return FALSE;
+
+  for (p = token; p < dot; p++)
+    if (!isdigit(*p))
+      return FALSE;
+
+  return TRUE;
+}
+
 static void study_item_lookup_consider(struct study_item_lookup_ctx *ctx, struct obj_data *obj)
 {
   if (!ctx || !obj || !ctx->ch || !ctx->item_text || !*ctx->item_text)
@@ -966,6 +985,38 @@ static int study_find_item_and_target(struct char_data *ch, char *argument,
 
   if (token_count <= 0)
     return FALSE;
+
+  if (study_is_numbered_item_token(tokens[0])) {
+    enum study_item_lookup_result lookup_result;
+
+    lookup_result = study_resolve_item_source(ch, tokens[0], &obj);
+    if (lookup_result == STUDY_LOOKUP_AMBIGUOUS) {
+      *ambiguous_out = TRUE;
+      return FALSE;
+    }
+    if (lookup_result == STUDY_LOOKUP_FOUND) {
+      *study_obj_out = obj;
+      if (token_count > 1) {
+        size_t target_len = 0;
+        target_name[0] = '\0';
+        for (j = 1; j < token_count; j++) {
+          int wrote = snprintf(target_name + target_len, sizeof(target_name) - target_len,
+                               "%s%s", target_len ? " " : "", tokens[j]);
+          if (wrote < 0)
+            break;
+          if ((size_t)wrote >= sizeof(target_name) - target_len) {
+            target_len = sizeof(target_name) - 1;
+            target_name[target_len] = '\0';
+            break;
+          }
+          target_len += (size_t)wrote;
+        }
+        *target_id_out = find_skill_num(target_name);
+        *has_target_out = TRUE;
+      }
+      return TRUE;
+    }
+  }
 
   for (i = token_count - 1; i >= 1; i--) {
     size_t item_len = 0;
