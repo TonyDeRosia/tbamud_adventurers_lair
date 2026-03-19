@@ -25,6 +25,7 @@
 #include "ai_actor.h"
 #include "spec_procs.h"
 #include "class.h"
+#include "classtrack.h"
 #include "fight.h"
 #include "mail.h"  /* for has_mail() */
 #include "shop.h"
@@ -634,6 +635,85 @@ static int can_use_practice_trainer(struct char_data *ch)
       return TRUE;
 
   return FALSE;
+}
+
+static int study_min_level_for_ability(int ability_id)
+{
+  int i;
+  int min_level = LVL_IMPL + 1;
+
+  if (ability_id <= 0 || ability_id > TOP_SPELL_DEFINE)
+    return -1;
+
+  for (i = 0; i < NUM_CLASSES; i++) {
+    int lvl = spell_info[ability_id].min_level[i];
+    if (lvl > 0 && lvl < min_level)
+      min_level = lvl;
+  }
+
+  if (min_level > LVL_IMMORT)
+    return -1;
+
+  return min_level;
+}
+
+ACMD(do_study)
+{
+  char reason[MAX_INPUT_LENGTH];
+  int ability_id;
+  int required_level;
+  int ability_archetype;
+
+  skip_spaces(&argument);
+
+  if (IS_NPC(ch))
+    return;
+
+  if (!*argument) {
+    send_to_char(ch, "Usage: study <spell or skill>\r\n");
+    return;
+  }
+
+  ability_id = find_skill_num(argument);
+  if (ability_id <= 0 || ability_id > TOP_SPELL_DEFINE || ability_id > MAX_SKILLS ||
+      !spell_info[ability_id].name || !*spell_info[ability_id].name ||
+      !str_cmp(spell_info[ability_id].name, "!UNUSED!")) {
+    send_to_char(ch, "You do not recognize that technique.\r\n");
+    return;
+  }
+
+  if (GET_SKILL(ch, ability_id) > 0) {
+    send_to_char(ch, "You already know that.\r\n");
+    return;
+  }
+
+  required_level = study_min_level_for_ability(ability_id);
+  if (required_level > 0 && GET_LEVEL(ch) < required_level) {
+    send_to_char(ch, "You are not experienced enough to study that yet.\r\n");
+    return;
+  }
+
+  ability_archetype = classtrack_get_ability_archetype(ability_id);
+  if (ability_archetype < 0 || ability_archetype >= NUM_ARCHETYPES) {
+    send_to_char(ch, "You do not recognize that technique.\r\n");
+    return;
+  }
+
+  reason[0] = '\0';
+  if (!classtrack_can_study_archetype(ch, ability_archetype, reason, sizeof(reason))) {
+    send_to_char(ch, "%s\r\n", *reason ? reason :
+                 "You have gone too far down your current path to learn that kind of power.");
+    return;
+  }
+
+  if (!classtrack_can_study_ability(ch, ability_id)) {
+    send_to_char(ch, "You cannot study that right now.\r\n");
+    return;
+  }
+
+  SET_SKILL(ch, ability_id, 1);
+  send_to_char(ch, "You study the knowledge of %s and begin to understand it.\r\n",
+               spell_info[ability_id].name);
 }
 
 

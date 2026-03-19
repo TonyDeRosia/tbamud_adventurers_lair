@@ -18,6 +18,10 @@ enum classtrack_archetype {
 void classtrack_init_new_player(struct char_data *ch);
 void classtrack_record_ability_use(struct char_data *ch, int ability, int was_spell);
 void classtrack_check_level_checkpoint(struct char_data *ch);
+const char *classtrack_display_class_name(struct char_data *ch);
+const char *classtrack_display_class_abbrev(struct char_data *ch);
+int classtrack_get_ability_archetype(int ability_id);
+int classtrack_can_study_ability(struct char_data *ch, int ability_id);
 
 /* Future study-system integration hook:
  * Best single hook point: skill_spell_ok() in src/spell_parser.c immediately

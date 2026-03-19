@@ -73,6 +73,7 @@ static const char *score_cond_label(int cond);
 #include "act.h"
 #include "race.h"
 #include "class.h"
+#include "classtrack.h"
 #include "fight.h"
 #include "modify.h"
 #include "asciimap.h"
@@ -1721,12 +1722,9 @@ static int append_wrapped_box_text(char *buf, int len, size_t bufsz,
  * MAIN SCORE FUNCTION - Replace your entire ACMD(do_score) with this
  * ========================================================================= */
 
-static const char *score_class_name(int class_num)
+static const char *score_class_name(struct char_data *ch)
 {
-  if (class_num >= 0 && class_num < NUM_CLASSES)
-    return pc_class_types[class_num];
-
-  return "Unknown";
+  return classtrack_display_class_name(ch);
 }
 
 
@@ -1769,7 +1767,7 @@ ACMD(do_score)
     /* Race and Class */
   snprintf(line, sizeof(line), "%sRace:%s %-20s  %sClass:%s %-20s",
     C, R, pc_race_types[GET_RACE(ch)],
-    C, R, score_class_name(GET_CLASS(ch)));
+    C, R, score_class_name(ch));
   len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
 
   /* Level and Age */
@@ -2154,7 +2152,8 @@ ACMD(do_finger)
   snprintf(line, sizeof(line), "%sName:%s %-20s  %sRace:%s %-20s", C, R, GET_NAME(vict), C, R, race);
   len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
 
-  snprintf(line, sizeof(line), "%sClass:%s %-19s  %sLevel:%s %-5d", C, R, class_name(GET_CLASS(vict)), C, R, GET_LEVEL(vict));
+  snprintf(line, sizeof(line), "%sClass:%s %-19s  %sLevel:%s %-5d", C, R,
+           classtrack_display_class_name(vict), C, R, GET_LEVEL(vict));
   len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
 
   snprintf(line, sizeof(line), "%sClan:%s %s  %sBounty:%s %s%s%s", C, R, clan_buf, C, R, bounty_color, bounty_buf, R);
@@ -3312,7 +3311,7 @@ ACMD(do_who)
       if (short_list) {
         send_to_char(ch, "%s[%2d %3s] %-12.12s%s%s",
           (GET_LEVEL(tch) >= LVL_IMMORT ? CCYEL(ch, C_SPR) : ""),
-          GET_LEVEL(tch), get_class_display_abbrev(tch), GET_NAME(tch),
+          GET_LEVEL(tch), classtrack_display_class_abbrev(tch), GET_NAME(tch),
           CCNRM(ch, C_SPR), ((!(++num_can_see % 4)) ? "\r\n" : ""));
       } else {
         num_can_see++;
@@ -3367,7 +3366,7 @@ ACMD(do_who)
               
               send_to_char(ch, "%s[%2d %3s]%s%s%s%s%s",
                   (GET_LEVEL(tch) >= LVL_IMMORT ? CCYEL(ch, C_SPR) : ""),
-                  GET_LEVEL(tch), get_class_display_abbrev(tch),
+                  GET_LEVEL(tch), classtrack_display_class_abbrev(tch),
                   (*clan_chunk ? clan_chunk : " "),
                   GET_NAME(tch),
                   (*GET_TITLE(tch) ? " " : ""), GET_TITLE(tch),
@@ -3551,10 +3550,10 @@ ACMD(do_users)
 
       if (d->original)
     sprintf(classname, "[%2d %3s]", GET_LEVEL(d->original),
-        CLASS_ABBR(d->original));
+        classtrack_display_class_abbrev(d->original));
       else
     sprintf(classname, "[%2d %3s]", GET_LEVEL(d->character),
-        CLASS_ABBR(d->character));
+        classtrack_display_class_abbrev(d->character));
     } else
       strcpy(classname, "   -   ");
 
@@ -4555,7 +4554,7 @@ ACMD(do_whois)
   send_to_char(ch, "Name: %s %s\r\nSex: %s\r\n", GET_NAME(victim),
                    (victim->player.title ? victim->player.title : ""), buf);
 
-  strlcpy(buf, class_name(victim->player.chclass), sizeof(buf));
+  strlcpy(buf, classtrack_display_class_name(victim), sizeof(buf));
   send_to_char(ch, "Class: %s\r\n", buf);
 
 
