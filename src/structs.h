@@ -1094,6 +1094,9 @@ struct player_special_data_saved
 
   int clan_id;
   int clan_rank;
+  int archetype_scores[6]; /**< Reactive identity archetype scores (combat/rogue/arcane/divine/nature/dark). */
+  int class_locked; /**< Reactive identity lock set after final level checkpoint. */
+  char soft_class_title[32]; /**< Soft/final identity title overlay (Adventurer until progression). */
 };
 
 /** Specials needed only by PCs, not NPCs.  Space for this structure is

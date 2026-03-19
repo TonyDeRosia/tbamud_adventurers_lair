@@ -2174,30 +2174,7 @@ if (PLR_FLAGGED(d->character, PLR_DELETED)) {
     }
 
     GET_RACE(d->character) = race;
-
-    STATE(d) = CON_QCLASS;
-    write_to_output(d, "%sClass: ", class_menu());
-    return;
-  }
-
-
-case CON_QCLASS:
-{
-  if (!*arg) {
-    write_to_output(d, "\r\nThat's not a class.\r\nClass: ");
-    return;
-  }
-
-  load_result = parse_class(*arg);
-
-  if (load_result != CLASS_UNDEFINED && !pc_classes[load_result].selectable)
-    load_result = CLASS_UNDEFINED;
-}
-if (load_result == CLASS_UNDEFINED) {
-  write_to_output(d, "\r\nThat's not a class.\r\nClass: ");
-  return;
-} else {
-  GET_CLASS(d->character) = load_result;
+    write_to_output(d, "\r\nYou begin as an Adventurer. Your class will develop based on how you play.\r\n");
 
   if (d->olc) {
     free(d->olc);
@@ -2205,7 +2182,6 @@ if (load_result == CLASS_UNDEFINED) {
   }
   if (GET_PFILEPOS(d->character) < 0)
     GET_PFILEPOS(d->character) = create_entry(GET_PC_NAME(d->character));
-}
 
 /* Now GET_NAME() will work properly. */
 init_char(d->character);
@@ -2240,6 +2216,13 @@ if (AddRecentPlayer(GET_NAME(d->character), d->host, TRUE, FALSE) == FALSE)
          "Failure to AddRecentPlayer (returned FALSE).");
 }
 break;
+  }
+
+  case CON_QCLASS:
+    write_to_output(d, "\r\nClass selection is disabled. You begin as an Adventurer.\r\n");
+    STATE(d) = CON_QRACE;
+    write_to_output(d, "%s", race_menu);
+    return;
 
   case CON_QSTATS: {
     int choice = atoi(arg);

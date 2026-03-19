@@ -23,6 +23,7 @@
 #include "comm.h"
 #include "interpreter.h"
 #include "class.h"
+#include "classtrack.h"
 #include "genolc.h" /* for strip_cr */
 #include "config.h" /* for pclean_criteria[] */
 #include "dg_scripts.h" /* To enable saving of player variables to disk */
@@ -309,6 +310,7 @@ int load_char(const char *name, struct char_data *ch)
   long long __loaded_money_gold = -1;
   long long __loaded_bank_money = -1;
   long long __loaded_gold_units = -1;
+  int archetype_idx;
 
   if ((id = get_ptable_by_name(name)) < 0)
     return (-1);
@@ -411,6 +413,10 @@ int load_char(const char *name, struct char_data *ch)
     SET_BOUNTY(ch, PFDEF_BOUNTY);
     SET_CLAN_ID(ch, 0);
     SET_CLAN_RANK(ch, 0);
+    for (i = 0; i < NUM_ARCHETYPES; i++)
+      GET_ARCHETYPE_SCORE(ch, i) = 0;
+    GET_CLASS_LOCKED(ch) = 0;
+    GET_SOFT_CLASS_TITLE(ch)[0] = '\0';
     *GET_PROMPT(ch) = '\0';
 
     for (i = 0; i < AF_ARRAY_MAX; i++)
@@ -449,6 +455,9 @@ int load_char(const char *name, struct char_data *ch)
 	          else if (!strcmp(tag, "AuLo")) GET_AUCTION_LOW(ch) = atoi(line);
 	          else if (!strcmp(tag, "AuHi")) GET_AUCTION_HIGH(ch) = atoi(line);
 	          else if (!strcmp(tag, "Acct"))  GET_ACCOUNT_ID(ch) = atol(line);
+        else if (sscanf(tag, "ArSc%d", &archetype_idx) == 1 &&
+                 archetype_idx >= 0 && archetype_idx < NUM_ARCHETYPES)
+          GET_ARCHETYPE_SCORE(ch, archetype_idx) = atoi(line);
                 if (ch->desc && ch->desc->acct_authed && ch->desc->acct_id > 0 &&
                     GET_ACCOUNT_ID(ch) > 0 && GET_ACCOUNT_ID(ch) != ch->desc->acct_id) {
                   /* Wrong account trying to load this character */
@@ -484,6 +493,7 @@ int load_char(const char *name, struct char_data *ch)
 	else if (!strcmp(tag, "Con "))	ch->real_abils.con	= atoi(line);
 	else if (!strcmp(tag, "Clan"))	GET_CLAN_ID(ch)		= atoi(line);
 	else if (!strcmp(tag, "Clrk"))	GET_CLAN_RANK(ch)	= atoi(line);
+        else if (!strcmp(tag, "ClLo")) GET_CLASS_LOCKED(ch) = atoi(line);
         else {
           int idx;
           if (!strcmp(tag, "CpAc")) GET_CAMPAIGN_ACTIVE(ch) = atoi(line);
@@ -626,6 +636,8 @@ int load_char(const char *name, struct char_data *ch)
       case 'S':
 	     if (!strcmp(tag, "Sex "))	GET_SEX(ch)		= atoi(line);
   else if (!strcmp(tag, "ScrW"))  GET_SCREEN_WIDTH(ch) = atoi(line);
+        else if (!strcmp(tag, "SoTi"))
+          strlcpy(GET_SOFT_CLASS_TITLE(ch), line, sizeof(ch->player_specials->saved.soft_class_title));
 	else if (!strcmp(tag, "Skil"))	load_skills(fl, ch);
 	else if (!strcmp(tag, "Str "))	load_HMVS(ch, line, LOAD_STRENGTH);
 	break;
@@ -683,6 +695,9 @@ int load_char(const char *name, struct char_data *ch)
 
   /* Keep any existing characters in sync with their class spell/skill lists. */
   ensure_class_abilities(ch);
+
+  if (!*GET_SOFT_CLASS_TITLE(ch))
+    strlcpy(GET_SOFT_CLASS_TITLE(ch), "Adventurer", sizeof(ch->player_specials->saved.soft_class_title));
 
   affect_total(ch);
 
@@ -872,6 +887,12 @@ void save_char(struct char_data * ch)
   fprintf(fl, "Bounty: %lld\n", GET_BOUNTY(ch));
   if (GET_CLAN_ID(ch)) fprintf(fl, "Clan: %d\n", GET_CLAN_ID(ch));
   if (GET_CLAN_RANK(ch)) fprintf(fl, "Clrk: %d\n", GET_CLAN_RANK(ch));
+  if (GET_CLASS_LOCKED(ch)) fprintf(fl, "ClLo: %d\n", GET_CLASS_LOCKED(ch));
+  if (*GET_SOFT_CLASS_TITLE(ch)) fprintf(fl, "SoTi: %s\n", GET_SOFT_CLASS_TITLE(ch));
+  for (i = 0; i < NUM_ARCHETYPES; i++) {
+    if (GET_ARCHETYPE_SCORE(ch, i) > 0)
+      fprintf(fl, "ArSc%d: %d\n", i, GET_ARCHETYPE_SCORE(ch, i));
+  }
   if (GET_EXP(ch)	   != PFDEF_EXP)	fprintf(fl, "Exp : %d\n", GET_EXP(ch));
   if (GET_HITROLL(ch)	   != PFDEF_HITROLL)	fprintf(fl, "Hrol: %d\n", GET_HITROLL(ch));
   if (GET_DAMROLL(ch)	   != PFDEF_DAMROLL)	fprintf(fl, "Drol: %d\n", GET_DAMROLL(ch));

@@ -38,6 +38,7 @@
 #include "quest.h"
 #include "ibt.h"
 #include "mud_event.h"
+#include "classtrack.h"
 #include "msgedit.h"
 #include "screen.h"
 #include <sys/stat.h>
@@ -3645,6 +3646,7 @@ void init_char(struct char_data *ch)
   ch->player.time.birth = time(0);
   ch->player.time.logon = time(0);
   ch->player.time.played = 0;
+  classtrack_init_new_player(ch);
 
   GET_AC(ch) = 100;
 
