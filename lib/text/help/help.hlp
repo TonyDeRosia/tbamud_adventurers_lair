@@ -2687,7 +2687,7 @@ Notes
 Ideal before committing to combat or resource use.
 #0
 
-WORD-OF-RECALL-MASS MASS-RECALL
+WORD-OF-RECALL-MASS MASS-RECALL RECALL-MASS
 ----------------------------------------
 Name
 ----------------------------------------
@@ -3551,7 +3551,7 @@ Notes
 Observe target saves and resistances for best results.
 #0
 
-NEGATIVE-BURST
+NEGATIVE-BURST NEG-BURST
 ----------------------------------------
 Name
 ----------------------------------------
@@ -3615,7 +3615,7 @@ Notes
 Use as a high-cost finisher against priority threats.
 #0
 
-PERFECT-UNKNOWABLE
+PERFECT-UNKNOWABLE UNKNOWABLE
 ----------------------------------------
 Name
 ----------------------------------------
@@ -4031,7 +4031,7 @@ Notes
 Observe target saves and resistances for best results.
 #0
 
-GREATER-REJECTION
+GREATER-REJECTION REJECTION
 ----------------------------------------
 Name
 ----------------------------------------
@@ -4159,7 +4159,7 @@ Notes
 Observe target saves and resistances for best results.
 #0
 
-GOAL-OF-ALL-LIFE-IS-DEATH GOAL-OF-LIFE-DEATH
+GOAL-OF-ALL-LIFE-IS-DEATH GOAL-OF-LIFE-DEATH ALL-LIFE-IS-DEATH
 ----------------------------------------
 Name
 ----------------------------------------
@@ -4191,7 +4191,7 @@ Notes
 Designed to combo with other high-tier death spells.
 #0
 
-CRY-OF-THE-BANSHEE
+CRY-OF-THE-BANSHEE BANSHEE-CRY
 ----------------------------------------
 Name
 ----------------------------------------
@@ -4223,7 +4223,7 @@ Notes
 Observe target saves and resistances for best results.
 #0
 
-BODY-OF-EFFULGENT-BERYL EFFULGENT-BERYL
+BODY-OF-EFFULGENT-BERYL EFFULGENT-BERYL EFFULGENT BERYL
 ----------------------------------------
 Name
 ----------------------------------------
@@ -4575,7 +4575,7 @@ Notes
 Powerful when enemies are grouped.
 #0
 
-MONARCHS-PRESSURE
+MONARCHS-PRESSURE MONARCH-PRESSURE
 ----------------------------------------
 Name
 ----------------------------------------
@@ -4607,7 +4607,7 @@ Notes
 Observe target saves and resistances for best results.
 #0
 
-SHADOW-DOMAIN
+SHADOW-DOMAIN SHADOWDOMAIN DOMAIN-SHADOW
 ----------------------------------------
 Name
 ----------------------------------------
@@ -4703,7 +4703,7 @@ Notes
 Observe target saves and resistances for best results.
 #0
 
-BLACK-HEART
+BLACK-HEART BLACKHEART
 ----------------------------------------
 Name
 ----------------------------------------
@@ -4735,7 +4735,7 @@ Notes
 Observe target saves and resistances for best results.
 #0
 
-CALL-SHADOW-LEGION SHADOW-LEGION
+CALL-SHADOW-LEGION SHADOW-LEGION SHADOWLEGION LEGION-CALL
 ----------------------------------------
 Name
 ----------------------------------------
@@ -4863,7 +4863,7 @@ Notes
 Combine with burst abilities while the target is constrained.
 #0
 
-SHADOW-EXTRACTION SHADOWEXTRACTION
+SHADOW-EXTRACTION SHADOWEXTRACTION EXTRACTION
 ----------------------------------------
 Name
 ----------------------------------------
@@ -4927,7 +4927,7 @@ Notes
 Use when you need durable pressure and frontline support.
 #0
 
-MONARCHS-AUTHORITY
+MONARCHS-AUTHORITY MONARCH-AUTHORITY
 ----------------------------------------
 Name
 ----------------------------------------
@@ -5247,7 +5247,7 @@ Notes
 Use before engagement for best value.
 #0
 
-BLOOD-DAGGER-TEMPEST
+BLOOD-DAGGER-TEMPEST DAGGER-TEMPEST
 ----------------------------------------
 Name
 ----------------------------------------
@@ -5279,7 +5279,7 @@ Notes
 Observe target saves and resistances for best results.
 #0
 
-CHAIN-OF-SUBJUGATION
+CHAIN-OF-SUBJUGATION SUBJUGATION-CHAIN
 ----------------------------------------
 Name
 ----------------------------------------
@@ -5343,7 +5343,7 @@ Notes
 Observe target saves and resistances for best results.
 #0
 
-KINGS-COMMAND
+KINGS-COMMAND KING-COMMAND
 ----------------------------------------
 Name
 ----------------------------------------
@@ -5375,7 +5375,7 @@ Notes
 Combine with burst abilities while the target is constrained.
 #0
 
-DETECT-KILL-INTENT KILL-INTENT
+DETECT-KILL-INTENT KILL-INTENT DETECT-INTENT
 ----------------------------------------
 Name
 ----------------------------------------
@@ -5471,7 +5471,7 @@ Notes
 Use before engagement for best value.
 #0
 
-TOTAL-OCCULTATION OCCULTATION
+TOTAL-OCCULTATION OCCULTATION TOTALOCCULTATION
 ----------------------------------------
 Name
 ----------------------------------------
@@ -5503,7 +5503,7 @@ Notes
 Use before engagement for best value.
 #0
 
-DOMAIN-BREAK
+DOMAIN-BREAK DOMAIN DOMAINBREAK
 ----------------------------------------
 Name
 ----------------------------------------
@@ -5535,7 +5535,7 @@ Notes
 Powerful when enemies are grouped.
 #0
 
-HUNTERS-INSTINCT
+HUNTERS-INSTINCT HUNTER INSTINCT
 ----------------------------------------
 Name
 ----------------------------------------
@@ -6114,7 +6114,7 @@ Notes
 Best used with class synergies and careful timing.
 #0
 
-APPRAISE-ENEMY APPRAISE
+APPRAISE-ENEMY APPRAISE APPRAISE-FOE
 ----------------------------------------
 Name
 ----------------------------------------
@@ -6967,7 +6967,7 @@ and fill out the application.
 See also: OLC, REDIT, MEDIT, OEDIT, ZEDIT, SEDIT, TRIGEDIT, AEDIT
 
 #0
-APPRAISE-ENEMY APPRAISE
+APPRAISE-ENEMY APPRAISE APPRAISE-FOE
 
 Appraise Enemy
 Type: Skill
@@ -7637,7 +7637,7 @@ things as DARK PEACEFUL INDOORS etc.
    NOBITS means no flags are set.
 
 #31
-BLACK-HEART
+BLACK-HEART BLACKHEART
 
 Black Heart
 Type: Spell
@@ -7777,7 +7777,7 @@ Subject to normal casting constraints (position, valid target/context, and resou
 
 See also: SPELLS SKILLS
 #0
-BLOOD-DAGGER-TEMPEST
+BLOOD-DAGGER-TEMPEST DAGGER-TEMPEST
 
 Blood Dagger Tempest
 Type: Spell
@@ -7828,7 +7828,7 @@ BOATS SHIPS FERRY TRANSPORTSS
 @RTSTAT 13691@n
 
 #31
-BODY-OF-EFFULGENT-BERYL EFFULGENT-BERYL
+BODY-OF-EFFULGENT-BERYL EFFULGENT-BERYL EFFULGENT BERYL
 
 Body Of Effulgent Beryl
 Type: Spell
@@ -8277,7 +8277,7 @@ Subject to normal casting constraints (position, valid target/context, and resou
 
 See also: SPELLS SKILLS
 #0
-CALL-SHADOW-LEGION SHADOW-LEGION
+CALL-SHADOW-LEGION SHADOW-LEGION SHADOWLEGION LEGION-CALL
 
 Call Shadow Legion
 Type: Spell
@@ -8615,7 +8615,7 @@ Subject to normal casting constraints (position, valid target/context, and resou
 
 See also: SPELLS SKILLS
 #0
-CHAIN-OF-SUBJUGATION
+CHAIN-OF-SUBJUGATION SUBJUGATION-CHAIN
 
 Chain Of Subjugation
 Type: Spell
@@ -9424,7 +9424,7 @@ Subject to normal casting constraints (position, valid target/context, and resou
 
 See also: SPELLS SKILLS
 #0
-CRY-OF-THE-BANSHEE
+CRY-OF-THE-BANSHEE BANSHEE-CRY
 
 Cry Of The Banshee
 Type: Spell
@@ -9932,7 +9932,7 @@ Subject to normal casting constraints (position, valid target/context, and resou
 
 See also: SPELLS SKILLS
 #0
-DETECT-KILL-INTENT KILL-INTENT
+DETECT-KILL-INTENT KILL-INTENT DETECT-INTENT
 
 Detect Kill Intent
 Type: Spell
@@ -10282,7 +10282,7 @@ Subject to normal casting constraints (position, valid target/context, and resou
 
 See also: SPELLS SKILLS
 #0
-DOMAIN-BREAK
+DOMAIN-BREAK DOMAIN DOMAINBREAK
 
 Domain Break
 Type: Spell
@@ -11895,7 +11895,7 @@ Examples: @RTSTAT 23612, 23613, 23614@n
 
 See also: REMOTE, VARIABLES, CONTEXT
 #31
-GOAL-OF-ALL-LIFE-IS-DEATH GOAL-OF-LIFE-DEATH
+GOAL-OF-ALL-LIFE-IS-DEATH GOAL-OF-LIFE-DEATH ALL-LIFE-IS-DEATH
 
 Goal Of All Life Is Death
 Type: Spell
@@ -12104,7 +12104,7 @@ Subject to normal casting constraints (position, valid target/context, and resou
 
 See also: SPELLS SKILLS
 #0
-GREATER-REJECTION
+GREATER-REJECTION REJECTION
 
 Greater Rejection
 Type: Spell
@@ -12791,7 +12791,7 @@ Enter choice :
 
 See Also: HSEDIT, SHOW-HOUSES
 #31
-HUNTERS-INSTINCT
+HUNTERS-INSTINCT HUNTER INSTINCT
 
 Hunters Instinct
 Type: Spell
@@ -13754,7 +13754,7 @@ such a horrible and pointless thing you will need to be pardoned by the staff.
 
 See also: FLAGS, PARDON
 #0
-KINGS-COMMAND
+KINGS-COMMAND KING-COMMAND
 
 Kings Command
 Type: Spell
@@ -15161,7 +15161,7 @@ No manual activation; scales with active combat participation.
 
 See also: SPELLS SKILLS
 #0
-MONARCHS-AUTHORITY
+MONARCHS-AUTHORITY MONARCH-AUTHORITY
 
 Monarchs Authority
 Type: Spell
@@ -15184,7 +15184,7 @@ Subject to normal casting constraints (position, valid target/context, and resou
 
 See also: SPELLS SKILLS
 #0
-MONARCHS-PRESSURE
+MONARCHS-PRESSURE MONARCH-PRESSURE
 
 Monarchs Pressure
 Type: Spell
@@ -15406,7 +15406,7 @@ Subject to normal casting constraints (position, valid target/context, and resou
 
 See also: SPELLS SKILLS
 #0
-NEGATIVE-BURST
+NEGATIVE-BURST NEG-BURST
 
 Negative Burst
 Type: Spell
@@ -16552,7 +16552,7 @@ Usage : peace
    Stops all fighting within your current room.
 
 #31
-PERFECT-UNKNOWABLE
+PERFECT-UNKNOWABLE UNKNOWABLE
 
 Perfect Unknowable
 Type: Spell
@@ -19313,7 +19313,7 @@ No direct activation command; effectiveness depends on the systems using this pa
 
 See also: SPELLS SKILLS
 #0
-SHADOW-DOMAIN
+SHADOW-DOMAIN SHADOWDOMAIN DOMAIN-SHADOW
 
 Shadow Domain
 Type: Spell
@@ -19359,7 +19359,7 @@ Subject to normal casting constraints (position, valid target/context, and resou
 
 See also: SPELLS SKILLS
 #0
-SHADOW-EXTRACTION SHADOWEXTRACTION
+SHADOW-EXTRACTION SHADOWEXTRACTION EXTRACTION
 
 Shadow Extraction
 Type: Spell
@@ -21939,7 +21939,7 @@ toggles no longer control prompt output.
 
 See also: PROMPT, NOSHOUT, NOSUMM, NOTELL, QUEST, REPEAT, WIMP
 #0
-TOTAL-OCCULTATION OCCULTATION
+TOTAL-OCCULTATION OCCULTATION TOTALOCCULTATION
 
 Total Occultation
 Type: Spell
@@ -24771,7 +24771,7 @@ Subject to normal casting constraints (position, valid target/context, and resou
 
 See also: SPELLS SKILLS
 #0
-WORD-OF-RECALL-MASS MASS-RECALL
+WORD-OF-RECALL-MASS MASS-RECALL RECALL-MASS
 
 Word Of Recall Mass
 Type: Spell
