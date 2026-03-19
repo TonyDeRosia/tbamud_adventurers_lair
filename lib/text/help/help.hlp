@@ -1344,16 +1344,16 @@ Sonic Burst
 Type: Spell
 
 Description:
-Uses non-damage magic to solve tactical problems such as movement, detection, control, or escape.
+Releases a concussive sound blast from the caster.
 
 Effect:
-Creates a concrete tactical advantage outside raw DPS, such as safer pulls, repositioning, scouting, or disengage.
+Active room-area damage spell. It hits enemy targets in your current room for medium sonic damage. Targets that fail a spell save are also stunned for 1 round; targets that save take half damage and avoid the stun.
 
 Usage:
-Use when a escape or control option is better than trading blows, such as escaping bad rooms, controlling action timing, or enabling safer engages.
+Use when multiple enemies are stacked in one room and you want immediate area damage with a brief stun chance.
 
 Notes:
-Avoid spending turns on this when a kill is immediately available; switch to damage or hard control once position is secured.
+Do not treat this as movement, escape, or scouting. Against a single target, stronger single-target spells are usually a better turn.
 
 See also: SPELLS SKILLS
 #0
@@ -2244,16 +2244,16 @@ True Death
 Type: Spell
 
 Description:
-Calls absolute death energy that denies ordinary recovery.
+Fires a concentrated necrotic kill spell at one enemy in your room.
 
 Effect:
-Delivers severe lethal magic intended for decisive elimination.
+Active single-target damage spell. It rolls against a death save (not a normal spell save). On a failed death save, the target takes full extreme necrotic damage and gains a long-duration True Death mark. On a successful save, damage is halved.
 
 Usage:
-Single-target offensive cast.
+Use as a finisher on dangerous enemies that are already low or must be removed immediately.
 
 Notes:
-Use as a high-cost finisher against priority threats.
+This is direct damage plus a failed-save mark, not an instant-kill effect. Do not open with it into fresh targets when lower-cost damage is sufficient.
 
 See also: SPELLS SKILLS
 #0
@@ -2647,13 +2647,13 @@ Description:
 Your body crystallizes into radiant beryl, reinforcing your defenses with a sustained magical shell.
 
 Effect:
-Buff / protection. Grants a medium-duration armor-class improvement (better AC) and marks the effect as an active defensive state.
+Active self-only defensive buff. Applies a medium-duration AC bonus (AC -20). While active, incoming weapon attacks are reduced by 25%.
 
 Usage:
-Self-cast defensive buff. Best used before entering sustained combat or when expecting focused focus damage.
+Cast before sustained melee fights or when you expect many weapon hits.
 
 Notes:
-This is a clean, reliable defensive layer for difficult encounters. Refresh it between fights to keep your baseline durability high.
+This does not reduce spell or elemental damage directly; it mainly improves defense against physical weapon pressure.
 
 See also: SHADOW-ARMOR CRYSTAL-BODY ARMOR SANCTUARY SPELLS SKILLS
 #0
@@ -3624,16 +3624,16 @@ Shadow Commander
 Type: Skill
 
 Description:
-A command-oriented skill that strengthens allies and group room control.
+Passive summon-leadership skill for your shadow servants.
 
 Effect:
-Creates team value through coordination, focus damage management, or sustained action timing.
+When your shadow servant followers attack, their damage is increased by 10%. In combat upkeep, affected servants also receive temporary +2 hitroll, +2 damroll, and a small heal tick (about 10% max HP).
 
 Usage:
-Use in group content where shared timing and role discipline matter most.
+Use this by maintaining active shadow servants and keeping them in the fight.
 
 Notes:
-Call your usage so teammates can capitalize on the window you create.
+This is passive and does nothing by itself if you have no active shadow servants.
 
 See also: SPELLS SKILLS
 #0
@@ -15785,7 +15785,7 @@ Description:
 Your shadow servants fight harder under your direction.
 
 Effect:
-Passive summon leadership skill. Shadow servants under your control gain hitroll, damroll, and periodic healing in combat.
+Passive summon leadership skill. Your shadow servants deal 10% more damage. In combat upkeep they also gain temporary +2 hitroll, +2 damroll, and periodic healing.
 
 Usage:
 Always on. Most valuable when you rely on summoned shadow servants for room damage.
@@ -16399,7 +16399,7 @@ Description:
 Detonates a burst of concussive sound from your position.
 
 Effect:
-Area spell that deals medium sonic damage to enemy targets in the room.
+Active room-area damage spell. It deals medium sonic damage to enemy targets in your room. Targets that fail a spell save are stunned for 1 round; targets that save take half damage and are not stunned.
 
 Usage:
 Best used against grouped enemies when you want instant room wide damage rather than a persistent field.
@@ -20035,7 +20035,7 @@ Usage:
 Best used as a finisher against dangerous targets you need to remove quickly.
 
 Notes:
-This is a kill spell, not an opener. Use it after a target is already worn down or when a priority enemy must die now.
+This is heavy damage plus a failed-save mark, not an instant-kill effect. Use it after a target is already worn down or when a priority enemy must die now.
 
 See also: FINGER-OF-DEATH DISINTEGRATE GRASP-HEART SPELLS SKILLS
 #0
