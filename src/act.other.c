@@ -286,82 +286,11 @@ static void show_ability_table_aligned(struct char_data *ch, int show_spells, in
 
 static void show_adventurer_study_catalog(struct char_data *ch, int show_spells, const char *filter)
 {
-  struct abil_row rows[TOP_SPELL_DEFINE + 1];
-  int i, n = 0;
-  int col = 0;
-  int last_lvl = -1;
-
   send_to_char(ch,
                "As an Adventurer, your future abilities are not defined by a fixed class list.\r\n"
                "Use STUDY <ability> to pursue new techniques.\r\n");
-  send_to_char(ch, "%s:\r\n", show_spells ? "STUDYABLE SPELLS" : "STUDYABLE SKILLS");
-
-  for (i = 1; i <= MAX_SKILLS; i++) {
-    int lvl;
-    const char *nm;
-
-    if (!classtrack_is_study_catalog_ability(i, show_spells))
-      continue;
-
-    nm = spell_info[i].name;
-    if (!ability_matches_filter(ch, i, filter, show_spells))
-      continue;
-
-    lvl = classtrack_get_study_min_level(i);
-    if (lvl <= 0 || lvl >= LVL_IMMORT)
-      continue;
-
-    rows[n].id = i;
-    rows[n].lvl = lvl;
-    rows[n].name = nm;
-    rows[n].pct = GET_SKILL(ch, i);
-    if (rows[n].pct > 100)
-      rows[n].pct = 100;
-    n++;
-  }
-
-  if (n == 0) {
-    send_to_char(ch, "None.\r\n");
-    return;
-  }
-
-  qsort(rows, (size_t)n, sizeof(rows[0]), abil_row_cmp);
-
-  for (i = 0; i < n; i++) {
-    char cell[256];
-
-    if (rows[i].lvl != last_lvl) {
-      if (col != 0) {
-        send_to_char(ch, "\r\n");
-        col = 0;
-      }
-      send_to_char(ch, "%sLevel %-2d%s:%s ",
-                   CCCYN(ch, C_NRM),
-                   rows[i].lvl,
-                   CCWHT(ch, C_NRM),
-                   CCNRM(ch, C_NRM));
-      last_lvl = rows[i].lvl;
-    } else if (col == 0) {
-      send_to_char(ch, "\r\n%*s", LEVEL_LABEL_PADDING, "");
-    } else {
-      send_to_char(ch, "  ");
-    }
-
-    if (rows[i].pct <= 0)
-      snprintf(cell, sizeof(cell), "%s [ -- ]", rows[i].name);
-    else
-      snprintf(cell, sizeof(cell), "%s [%d%%]", rows[i].name, rows[i].pct);
-    send_to_char(ch, "%-*s", ABIL_COL_WIDTH + count_color_chars(cell), cell);
-
-    col++;
-    if (col >= 2) {
-      send_to_char(ch, "\r\n");
-      col = 0;
-    }
-  }
-
-  if (col != 0)
-    send_to_char(ch, "\r\n");
+  send_to_char(ch, "Known %s:\r\n", show_spells ? "spells" : "skills");
+  show_ability_table_aligned(ch, show_spells, 0, filter);
 }
 
 static void show_ability_filter_help(struct char_data *ch, const char *cmd_name)
