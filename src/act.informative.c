@@ -2757,8 +2757,20 @@ int search_help(const char *argument, int level)
   while (bot <= top) {
     mid = (bot + top) / 2;
 
-    if (!help_table[mid].keywords)
-      return NOWHERE;
+    if (!help_table[mid].keywords) {
+      int scan;
+      for (scan = bot; scan <= top; scan++) {
+        if (!help_table[scan].keywords)
+          continue;
+        chk = strn_cmp(argument, help_table[scan].keywords, minlen);
+        if (!chk) {
+          mid = scan;
+          break;
+        }
+      }
+      if (scan > top)
+        return NOWHERE;
+    }
 
     if (!(chk = strn_cmp(argument, help_table[mid].keywords, minlen))) {
       while ((mid > 0) && help_table[mid - 1].keywords &&
@@ -2813,6 +2825,8 @@ ACMD(do_help)
     mudlog(NRM, MIN(LVL_IMPL, GET_INVIS_LEV(ch)), TRUE,
       "%s tried to get help on %s", GET_NAME(ch), argument);
     for (i = 0; i < top_of_helpt; i++)  {
+      if (!help_table[i].keywords)
+        continue;
       if (help_table[i].min_level > GET_LEVEL(ch))
         continue;
       /* To help narrow down results, if they don't start with the same letters, move on. */
