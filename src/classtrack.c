@@ -11,12 +11,119 @@
 #include "screen.h"
 
 #define CT_SOFT_MIN_SCORE 10
+#define CT_SOFT_TOTAL_SCORE_MIN 24
+#define CT_SOFT_WEAK_DOMINANCE_MARGIN 8
 #define CT_SOFT_DOMINANCE_MARGIN 4
 #define CT_FINAL_MIN_SCORE 80
 #define CT_FINAL_MARGIN 12
+#define CT_FINAL_HYBRID_MARGIN 10
+#define CT_BROAD_ACTIVE_SCORE 8
 #define CT_COMMIT_LEVEL 50
 #define CT_COMMIT_PRIMARY 120
 #define CT_COMMIT_MARGIN 30
+
+struct ability_archetype_map {
+  int ability_id;
+  int archetype;
+};
+
+static const struct ability_archetype_map ct_spell_archetype_map[] = {
+  { SPELL_ARMOR, ARCHETYPE_DIVINE },
+  { SPELL_BLESS, ARCHETYPE_DIVINE },
+  { SPELL_CALL_LIGHTNING, ARCHETYPE_NATURE },
+  { SPELL_CURE_CRITIC, ARCHETYPE_DIVINE },
+  { SPELL_CURE_LIGHT, ARCHETYPE_DIVINE },
+  { SPELL_DISPEL_EVIL, ARCHETYPE_DIVINE },
+  { SPELL_EARTHQUAKE, ARCHETYPE_NATURE },
+  { SPELL_ENERGY_DRAIN, ARCHETYPE_DARK },
+  { SPELL_FIREBALL, ARCHETYPE_ARCANE },
+  { SPELL_HARM, ARCHETYPE_DARK },
+  { SPELL_HEAL, ARCHETYPE_DIVINE },
+  { SPELL_LIGHTNING_BOLT, ARCHETYPE_ARCANE },
+  { SPELL_MAGIC_MISSILE, ARCHETYPE_ARCANE },
+  { SPELL_POISON, ARCHETYPE_DARK },
+  { SPELL_SANCTUARY, ARCHETYPE_DIVINE },
+  { SPELL_STRENGTH, ARCHETYPE_COMBAT },
+  { SPELL_WORD_OF_RECALL, ARCHETYPE_DIVINE },
+  { SPELL_ANIMATE_DEAD, ARCHETYPE_DARK },
+  { SPELL_DARKNESS, ARCHETYPE_DARK },
+  { SPELL_BEAR_SPIRIT, ARCHETYPE_NATURE },
+  { SPELL_WOLF_SPIRIT, ARCHETYPE_NATURE },
+  { SPELL_ARCANE_WARD, ARCHETYPE_ARCANE },
+  { SPELL_IRONSKIN, ARCHETYPE_COMBAT },
+  { SPELL_DIVINE_BULWARK, ARCHETYPE_DIVINE },
+  { SPELL_DARK_AEGIS, ARCHETYPE_DARK },
+  { SPELL_PLAGUE_BOLT, ARCHETYPE_DARK },
+  { SPELL_DEVOUR_SOUL, ARCHETYPE_DARK },
+  { SPELL_FIREBOLT, ARCHETYPE_ARCANE },
+  { SPELL_FLAME_ARROW, ARCHETYPE_ARCANE },
+  { SPELL_FROSTBITE, ARCHETYPE_ARCANE },
+  { SPELL_VOLTAIC_BOLT, ARCHETYPE_ARCANE },
+  { SPELL_ACID_BLAST, ARCHETYPE_ARCANE },
+  { SPELL_SHADOW_BOLT, ARCHETYPE_DARK },
+  { SPELL_VAMPIRIC_TOUCH, ARCHETYPE_DARK },
+  { SPELL_STONE_SKIN, ARCHETYPE_COMBAT },
+  { SPELL_BARKSKIN, ARCHETYPE_NATURE },
+  { SPELL_GIANT_STRENGTH, ARCHETYPE_COMBAT },
+  { SPELL_GREATER_HEAL, ARCHETYPE_DIVINE },
+  { SPELL_CLEANSE, ARCHETYPE_DIVINE },
+  { SPELL_CONSECRATE, ARCHETYPE_DIVINE },
+  { SPELL_ICE_STORM, ARCHETYPE_ARCANE },
+  { SPELL_BLIZZARD, ARCHETYPE_ARCANE },
+  { SPELL_FIREBALL_GREATER, ARCHETYPE_ARCANE },
+  { SPELL_CALL_WOLVES, ARCHETYPE_NATURE },
+  { SPELL_CALL_BEARS, ARCHETYPE_NATURE },
+  { SPELL_ANIMATE_DEAD_GREATER, ARCHETYPE_DARK },
+  { SPELL_METEOR, ARCHETYPE_ARCANE },
+  { SPELL_METEOR_SWARM, ARCHETYPE_ARCANE },
+  { SPELL_HELLFIRE, ARCHETYPE_DARK },
+  { SPELL_CELESTIAL_SMITE, ARCHETYPE_DIVINE },
+  { SPELL_HAMMER_OF_GOD, ARCHETYPE_DIVINE },
+  { SPELL_DEATH_KNELL, ARCHETYPE_DARK },
+  { SPELL_UNHOLY_WORD, ARCHETYPE_DARK },
+  { SPELL_HOLY_WORD, ARCHETYPE_DIVINE },
+  { SPELL_FINGER_OF_DEATH, ARCHETYPE_DARK },
+  { SPELL_WAIL_OF_THE_BANSHEE, ARCHETYPE_DARK },
+  { SPELL_BLACK_LANCE, ARCHETYPE_DARK },
+  { SPELL_NEGATIVE_BURST, ARCHETYPE_DARK },
+  { SPELL_CALL_SHADOW_LEGION, ARCHETYPE_DARK },
+  { SPELL_SHADOW_REGENESIS, ARCHETYPE_DARK },
+  { 0, -1 }
+};
+
+static const struct ability_archetype_map ct_skill_archetype_map[] = {
+  { SKILL_BACKSTAB, ARCHETYPE_ROGUE },
+  { SKILL_BASH, ARCHETYPE_COMBAT },
+  { SKILL_HIDE, ARCHETYPE_ROGUE },
+  { SKILL_KICK, ARCHETYPE_COMBAT },
+  { SKILL_PICK_LOCK, ARCHETYPE_ROGUE },
+  { SKILL_WHIRLWIND, ARCHETYPE_COMBAT },
+  { SKILL_RESCUE, ARCHETYPE_COMBAT },
+  { SKILL_SNEAK, ARCHETYPE_ROGUE },
+  { SKILL_STEAL, ARCHETYPE_ROGUE },
+  { SKILL_TRACK, ARCHETYPE_NATURE },
+  { SKILL_BANDAGE, ARCHETYPE_DIVINE },
+  { SKILL_DUAL_WIELD, ARCHETYPE_COMBAT },
+  { SKILL_RECALL, ARCHETYPE_DIVINE },
+  { SKILL_UNDEAD_COMMAND, ARCHETYPE_DARK },
+  { SKILL_SHADOW_COMMANDER, ARCHETYPE_DARK },
+  { SKILL_PREDATORS_ADVANCE, ARCHETYPE_NATURE },
+  { SKILL_RELENTLESS_HUNT, ARCHETYPE_NATURE },
+  { SKILL_CHAIN_ASSASSAULT, ARCHETYPE_ROGUE },
+  { SKILL_KILL_WINDOW, ARCHETYPE_ROGUE },
+  { SKILL_APPRAISE_ENEMY, ARCHETYPE_ROGUE },
+  { 0, -1 }
+};
+
+static const int ct_study_compatibility[NUM_ARCHETYPES][NUM_ARCHETYPES] = {
+  /* From: Combat, Rogue, Arcane, Divine, Nature, Dark */
+  { 1, 1, 1, 1, 1, 1 }, /* Combat */
+  { 1, 1, 1, 0, 1, 0 }, /* Rogue */
+  { 1, 1, 1, 0, 0, 1 }, /* Arcane */
+  { 1, 0, 0, 1, 1, 0 }, /* Divine */
+  { 1, 1, 0, 1, 1, 0 }, /* Nature */
+  { 1, 0, 1, 0, 0, 1 }  /* Dark */
+};
 
 static const char *const ct_soft_titles[NUM_ARCHETYPES][6] = {
   { "Warrior", "Fighter", "Knight", "Berserker", "Barbarian", "Champion" },
@@ -37,73 +144,34 @@ static int classtrack_clamp_title_tier(int level)
   return tier;
 }
 
-static int classtrack_name_has(const char *name, const char *needle)
+static int classtrack_lookup_mapped_archetype(int ability,
+                                              const struct ability_archetype_map *map)
 {
-  return (name && *name && needle && *needle && strstr(name, needle) != NULL);
-}
+  int i;
 
-static int classtrack_pick_archetype_for_spell(int ability)
-{
-  const char *name;
-
-  if (ability <= 0 || ability > TOP_SPELL_DEFINE)
-    return ARCHETYPE_ARCANE;
-
-  name = spell_info[ability].name;
-  if (!name)
-    return ARCHETYPE_ARCANE;
-
-  if (classtrack_name_has(name, "heal") || classtrack_name_has(name, "holy") ||
-      classtrack_name_has(name, "bless") || classtrack_name_has(name, "sanct") ||
-      classtrack_name_has(name, "cleric") || classtrack_name_has(name, "divine"))
-    return ARCHETYPE_DIVINE;
-
-  if (classtrack_name_has(name, "dead") || classtrack_name_has(name, "death") ||
-      classtrack_name_has(name, "dark") || classtrack_name_has(name, "shadow") ||
-      classtrack_name_has(name, "unholy") || classtrack_name_has(name, "necro") ||
-      classtrack_name_has(name, "plague") || classtrack_name_has(name, "miasma"))
-    return ARCHETYPE_DARK;
-
-  if (classtrack_name_has(name, "wolf") || classtrack_name_has(name, "bear") ||
-      classtrack_name_has(name, "bark") || classtrack_name_has(name, "storm") ||
-      classtrack_name_has(name, "nature") || classtrack_name_has(name, "thunder") ||
-      classtrack_name_has(name, "lightning") || classtrack_name_has(name, "druid"))
-    return ARCHETYPE_NATURE;
-
-  if (classtrack_name_has(name, "fire") || classtrack_name_has(name, "frost") ||
-      classtrack_name_has(name, "ice") || classtrack_name_has(name, "arcane") ||
-      classtrack_name_has(name, "magic") || classtrack_name_has(name, "meteor") ||
-      classtrack_name_has(name, "bolt") || classtrack_name_has(name, "spell") ||
-      classtrack_name_has(name, "mana"))
-    return ARCHETYPE_ARCANE;
-
-  if (classtrack_name_has(name, "ward") || classtrack_name_has(name, "armor") ||
-      classtrack_name_has(name, "skin") || classtrack_name_has(name, "strength"))
-    return ARCHETYPE_COMBAT;
-
-  return ARCHETYPE_ARCANE;
-}
-
-static int classtrack_pick_archetype_for_skill(int ability)
-{
-  switch (ability) {
-    case SKILL_BACKSTAB:
-    case SKILL_HIDE:
-    case SKILL_PICK_LOCK:
-    case SKILL_STEAL:
-    case SKILL_SNEAK:
-    case SKILL_APPRAISE_ENEMY:
-      return ARCHETYPE_ROGUE;
-
-    case SKILL_TRACK:
-      return ARCHETYPE_NATURE;
-
-    case SKILL_RECALL:
-      return ARCHETYPE_DIVINE;
-
-    default:
-      return ARCHETYPE_COMBAT;
+  for (i = 0; map[i].ability_id > 0; i++) {
+    if (map[i].ability_id == ability)
+      return map[i].archetype;
   }
+  return -1;
+}
+
+static int classtrack_pick_archetype_for_ability(int ability, int was_spell)
+{
+  if (was_spell)
+    return classtrack_lookup_mapped_archetype(ability, ct_spell_archetype_map);
+  return classtrack_lookup_mapped_archetype(ability, ct_skill_archetype_map);
+}
+
+static int classtrack_total_score(struct char_data *ch)
+{
+  int i;
+  int total = 0;
+
+  for (i = 0; i < NUM_ARCHETYPES; i++)
+    total += MAX(0, GET_ARCHETYPE_SCORE(ch, i));
+
+  return total;
 }
 
 static void classtrack_get_top2(struct char_data *ch, int *primary, int *secondary)
@@ -125,7 +193,22 @@ static void classtrack_get_top2(struct char_data *ch, int *primary, int *seconda
   *secondary = second;
 }
 
+static int classtrack_get_primary(struct char_data *ch)
+{
+  int primary, secondary;
+  classtrack_get_top2(ch, &primary, &secondary);
+  return primary;
+}
+
 static int classtrack_is_compatible_pair(int a, int b)
+{
+  if (a < 0 || a >= NUM_ARCHETYPES || b < 0 || b >= NUM_ARCHETYPES)
+    return 0;
+
+  return ct_study_compatibility[a][b];
+}
+
+static int classtrack_is_hybrid_pair(int a, int b)
 {
   if ((a == ARCHETYPE_COMBAT && b == ARCHETYPE_DIVINE) ||
       (a == ARCHETYPE_DIVINE && b == ARCHETYPE_COMBAT))
@@ -167,18 +250,22 @@ static const char *classtrack_soft_title(struct char_data *ch)
   int primary, secondary;
   int pscore, sscore;
   int tier;
+  int total_score;
 
   classtrack_get_top2(ch, &primary, &secondary);
   pscore = GET_ARCHETYPE_SCORE(ch, primary);
   sscore = GET_ARCHETYPE_SCORE(ch, secondary);
+  total_score = classtrack_total_score(ch);
 
-  if (pscore < CT_SOFT_MIN_SCORE)
+  if (total_score < CT_SOFT_TOTAL_SCORE_MIN || pscore < CT_SOFT_MIN_SCORE)
     return "Adventurer";
 
   if ((pscore - sscore) < CT_SOFT_DOMINANCE_MARGIN)
-    return "Adventurer";
+    return ct_soft_titles[primary][0];
 
   tier = classtrack_clamp_title_tier(GET_LEVEL(ch));
+  if ((pscore - sscore) < CT_SOFT_WEAK_DOMINANCE_MARGIN && tier > 2)
+    tier = 2;
   return ct_soft_titles[primary][tier];
 }
 
@@ -194,7 +281,7 @@ static const char *classtrack_final_title(struct char_data *ch)
   if (pscore < CT_FINAL_MIN_SCORE)
     return "Adventurer";
 
-  if ((pscore - sscore) <= CT_FINAL_MARGIN && classtrack_is_compatible_pair(primary, secondary)) {
+  if ((pscore - sscore) <= CT_FINAL_HYBRID_MARGIN && classtrack_is_hybrid_pair(primary, secondary)) {
     if ((primary == ARCHETYPE_COMBAT && secondary == ARCHETYPE_DIVINE) ||
         (primary == ARCHETYPE_DIVINE && secondary == ARCHETYPE_COMBAT))
       return "Paladin";
@@ -214,6 +301,9 @@ static const char *classtrack_final_title(struct char_data *ch)
         (primary == ARCHETYPE_DARK && secondary == ARCHETYPE_COMBAT))
       return "Death Knight";
   }
+
+  if ((pscore - sscore) < CT_FINAL_MARGIN)
+    return ct_soft_titles[primary][0];
 
   return ct_soft_titles[primary][5];
 }
@@ -243,8 +333,9 @@ void classtrack_init_new_player(struct char_data *ch)
 void classtrack_record_ability_use(struct char_data *ch, int ability, int was_spell)
 {
   int archetype;
-  int gain = 1;
+  int gain = 2;
   int i, broad_count = 0;
+  int dominant;
 
   if (!ch || IS_NPC(ch) || GET_CLASS_LOCKED(ch))
     return;
@@ -252,23 +343,28 @@ void classtrack_record_ability_use(struct char_data *ch, int ability, int was_sp
   if (ability <= 0 || ability > MAX_SKILLS)
     return;
 
-  if (was_spell)
-    archetype = classtrack_pick_archetype_for_spell(ability);
-  else
-    archetype = classtrack_pick_archetype_for_skill(ability);
+  archetype = classtrack_pick_archetype_for_ability(ability, was_spell);
 
+  /* Neutral fallback for unmapped abilities: no score gain (prevents arcane bias). */
   if (archetype < 0 || archetype >= NUM_ARCHETYPES)
     return;
 
+  dominant = classtrack_get_primary(ch);
+
   for (i = 0; i < NUM_ARCHETYPES; i++) {
-    if (GET_ARCHETYPE_SCORE(ch, i) >= CT_SOFT_MIN_SCORE)
+    if (GET_ARCHETYPE_SCORE(ch, i) >= CT_BROAD_ACTIVE_SCORE)
       broad_count++;
   }
 
-  /* Anti-hoarding scaffold: broad investment reduces future cross-path gains. */
-  if (broad_count >= 3 && GET_ARCHETYPE_SCORE(ch, archetype) < CT_FINAL_MIN_SCORE)
+  if (GET_ARCHETYPE_SCORE(ch, dominant) > 0 && archetype == dominant) {
+    gain = 3;
+  } else if (GET_ARCHETYPE_SCORE(ch, dominant) > 0) {
     gain = 1;
-  else if (was_spell)
+  }
+
+  if (broad_count >= 3 && archetype != dominant)
+    gain = 1;
+  if (broad_count >= 4 && archetype == dominant)
     gain = 2;
 
   GET_ARCHETYPE_SCORE(ch, archetype) += gain;
