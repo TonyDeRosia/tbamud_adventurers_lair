@@ -6368,22 +6368,18 @@ ABYSS-GATE
 
 Abyss Gate
 Type: Spell
-Category: Summoning Spell
 
 Description:
-Abyss Gate is a summoning spell available in the live ability table.
+Abyss Gate is a spell implemented directly by the current game mechanics.
 
 Effect:
-Summons allies, manipulates portals, or expands battlefield presence through controlled entities.
+- Can apply statuses: charm, flags.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target no explicit target.
 
-Tactical Notes:
-Most effective when your group can protect summons and capitalize on added field presence.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -6412,22 +6408,19 @@ ACID-BLAST
 
 Acid Blast
 Type: Spell
-Category: Utility Spell
 
 Description:
-Acid Blast is a utility spell available in the live ability table.
+Acid Blast is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Can apply statuses: corroded.
+- Targets may resist part or all of the effect with a saving throw.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room, your current opponent in combat.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -6435,22 +6428,18 @@ ACID-RAIN
 
 Acid Rain
 Type: Spell
-Category: Room Effect Spell
 
 Description:
-Acid Rain is a room effect spell available in the live ability table.
+Acid Rain is a spell implemented directly by the current game mechanics.
 
 Effect:
-Establishes a persistent room-wide effect that alters positioning, pressure, and survivability while active.
+- Creates room effects: acid rain.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target no explicit target.
 
-Tactical Notes:
-Cast early to shape terrain advantage before enemies stabilize.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -6525,22 +6514,18 @@ ADRENALINE-SURGE
 
 Adrenaline Surge
 Type: Spell
-Category: Utility Spell
 
 Description:
-Adrenaline Surge is a utility spell available in the live ability table.
+Adrenaline Surge is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Can apply statuses: adrenaline.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target self only, a character in your room.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -6734,22 +6719,18 @@ ANIMATE-DEAD
 
 Animate Dead
 Type: Spell
-Category: Summoning Spell
 
 Description:
-Animate Dead is a summoning spell available in the live ability table.
+Animate Dead is a spell implemented directly by the current game mechanics.
 
 Effect:
-Summons allies, manipulates portals, or expands battlefield presence through controlled entities.
+- Summons creatures or moves targets.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target an item in the room.
 
-Tactical Notes:
-Most effective when your group can protect summons and capitalize on added field presence.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -6757,22 +6738,18 @@ ANIMATE-DEAD-GREATER
 
 Animate Dead Greater
 Type: Spell
-Category: Summoning Spell
 
 Description:
-Animate Dead Greater is a summoning spell available in the live ability table.
+Animate Dead Greater is a spell implemented directly by the current game mechanics.
 
 Effect:
-Summons allies, manipulates portals, or expands battlefield presence through controlled entities.
+- Uses standard spell routines from the live spell system.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target an item in the room.
 
-Tactical Notes:
-Most effective when your group can protect summons and capitalize on added field presence.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -6786,22 +6763,18 @@ ANTIMAGIC-SHELL
 
 Antimagic Shell
 Type: Spell
-Category: Defensive Spell
 
 Description:
-Antimagic Shell is a defensive spell available in the live ability table.
+Antimagic Shell is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides protection, resistance, mitigation, or sustained combat enhancement.
+- Can apply statuses: warded.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room.
 
-Tactical Notes:
-Use pre-fight or during recovery windows to increase endurance.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -6872,22 +6845,18 @@ ARCANE-WARD
 
 Arcane Ward
 Type: Spell
-Category: Defensive Spell
 
 Description:
-Arcane Ward is a defensive spell available in the live ability table.
+Arcane Ward is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides protection, resistance, mitigation, or sustained combat enhancement.
+- Applies magical status effects.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target self only, a character in your room.
 
-Tactical Notes:
-Use pre-fight or during recovery windows to increase endurance.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -6911,22 +6880,18 @@ ARISE-GREATER
 
 Arise Greater
 Type: Spell
-Category: Summoning Spell
 
 Description:
-Arise Greater is a summoning spell available in the live ability table.
+Arise Greater is a spell implemented directly by the current game mechanics.
 
 Effect:
-Summons allies, manipulates portals, or expands battlefield presence through controlled entities.
+- Uses standard spell routines from the live spell system.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target an item in the room.
 
-Tactical Notes:
-Most effective when your group can protect summons and capitalize on added field presence.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -6934,22 +6899,18 @@ ARMOR
 
 Armor
 Type: Spell
-Category: Defensive Spell
 
 Description:
-Armor is a defensive spell available in the live ability table.
+Armor is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides protection, resistance, mitigation, or sustained combat enhancement.
+- Applies magical status effects.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room.
 
-Tactical Notes:
-Use pre-fight or during recovery windows to increase endurance.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -7009,22 +6970,18 @@ ASSASSINS-INTENT
 
 Assassins Intent
 Type: Spell
-Category: Utility Spell
 
 Description:
-Assassins Intent is a utility spell available in the live ability table.
+Assassins Intent is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Uses standard spell routines from the live spell system.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target self only.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -7053,22 +7010,18 @@ ASTRAL-PROJECTION
 
 Astral Projection
 Type: Spell
-Category: Utility Spell
 
 Description:
-Astral Projection is a utility spell available in the live ability table.
+Astral Projection is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Uses standard spell routines from the live spell system.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character anywhere in the world.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -7076,22 +7029,18 @@ ASTRAL-SMITE
 
 Astral Smite
 Type: Spell
-Category: Utility Spell
 
 Description:
-Astral Smite is a utility spell available in the live ability table.
+Astral Smite is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Uses standard spell routines from the live spell system.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room, your current opponent in combat.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -7350,22 +7299,19 @@ BALEFIRE
 
 Balefire
 Type: Spell
-Category: Utility Spell
 
 Description:
-Balefire is a utility spell available in the live ability table.
+Balefire is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Deals arcane damage.
+- Targets may resist part or all of the effect with a saving throw.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room, your current opponent in combat.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -7441,22 +7387,18 @@ BARKSKIN
 
 Barkskin
 Type: Spell
-Category: Defensive Spell
 
 Description:
-Barkskin is a defensive spell available in the live ability table.
+Barkskin is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides protection, resistance, mitigation, or sustained combat enhancement.
+- Can apply statuses: barkskin.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room.
 
-Tactical Notes:
-Use pre-fight or during recovery windows to increase endurance.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -7514,22 +7456,18 @@ BLACK-HEART BLACKHEART
 
 Black Heart
 Type: Spell
-Category: Utility Spell
 
 Description:
-Black Heart is a utility spell available in the live ability table.
+Black Heart is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Uses standard spell routines from the live spell system.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target self only.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -7568,22 +7506,18 @@ BLESS
 
 Bless
 Type: Spell
-Category: Defensive Spell
 
 Description:
-Bless is a defensive spell available in the live ability table.
+Bless is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides protection, resistance, mitigation, or sustained combat enhancement.
+- Applies magical status effects.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room, an item in your inventory.
 
-Tactical Notes:
-Use pre-fight or during recovery windows to increase endurance.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -7603,22 +7537,19 @@ BLINDNESS
 
 Blindness
 Type: Spell
-Category: Utility Spell
 
 Description:
-Blindness is a utility spell available in the live ability table.
+Blindness is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Can apply statuses: blind.
+- Targets may resist part or all of the effect with a saving throw.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -7626,22 +7557,18 @@ BLIZZARD
 
 Blizzard
 Type: Spell
-Category: Utility Spell
 
 Description:
-Blizzard is a utility spell available in the live ability table.
+Blizzard is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Uses standard spell routines from the live spell system.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target no explicit target.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -7649,22 +7576,18 @@ BLOOD-DAGGER-TEMPEST DAGGER-TEMPEST
 
 Blood Dagger Tempest
 Type: Spell
-Category: Utility Spell
 
 Description:
-Blood Dagger Tempest is a utility spell available in the live ability table.
+Blood Dagger Tempest is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Uses standard spell routines from the live spell system.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target no explicit target.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -7672,22 +7595,18 @@ BLOODLUST
 
 Bloodlust
 Type: Spell
-Category: Utility Spell
 
 Description:
-Bloodlust is a utility spell available in the live ability table.
+Bloodlust is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Can apply statuses: bloodlust.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target self only, a character in your room.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -7718,22 +7637,18 @@ BONE-PRISON
 
 Bone Prison
 Type: Spell
-Category: Utility Spell
 
 Description:
-Bone Prison is a utility spell available in the live ability table.
+Bone Prison is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Uses standard spell routines from the live spell system.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room, your current opponent in combat.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -7986,22 +7901,18 @@ BURNING-HANDS
 
 Burning Hands
 Type: Spell
-Category: Utility Spell
 
 Description:
-Burning Hands is a utility spell available in the live ability table.
+Burning Hands is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Deals spell damage.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room, your current opponent in combat.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -8075,22 +7986,18 @@ CALL-BEARS
 
 Call Bears
 Type: Spell
-Category: Summoning Spell
 
 Description:
-Call Bears is a summoning spell available in the live ability table.
+Call Bears is a spell implemented directly by the current game mechanics.
 
 Effect:
-Summons allies, manipulates portals, or expands battlefield presence through controlled entities.
+- Uses standard spell routines from the live spell system.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target no explicit target.
 
-Tactical Notes:
-Most effective when your group can protect summons and capitalize on added field presence.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -8098,22 +8005,18 @@ CALL-GREATER-THUNDER
 
 Call Greater Thunder
 Type: Spell
-Category: Summoning Spell
 
 Description:
-Call Greater Thunder is a summoning spell available in the live ability table.
+Call Greater Thunder is a spell implemented directly by the current game mechanics.
 
 Effect:
-Summons allies, manipulates portals, or expands battlefield presence through controlled entities.
+- Uses standard spell routines from the live spell system.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room, your current opponent in combat.
 
-Tactical Notes:
-Most effective when your group can protect summons and capitalize on added field presence.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -8121,22 +8024,18 @@ CALL-LIGHTNING
 
 Call Lightning
 Type: Spell
-Category: Summoning Spell
 
 Description:
-Call Lightning is a summoning spell available in the live ability table.
+Call Lightning is a spell implemented directly by the current game mechanics.
 
 Effect:
-Summons allies, manipulates portals, or expands battlefield presence through controlled entities.
+- Deals spell damage.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room, your current opponent in combat.
 
-Tactical Notes:
-Most effective when your group can protect summons and capitalize on added field presence.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -8144,22 +8043,18 @@ CALL-SHADOW-LEGION SHADOW-LEGION SHADOWLEGION LEGION-CALL
 
 Call Shadow Legion
 Type: Spell
-Category: Summoning Spell
 
 Description:
-Call Shadow Legion is a summoning spell available in the live ability table.
+Call Shadow Legion is a spell implemented directly by the current game mechanics.
 
 Effect:
-Summons allies, manipulates portals, or expands battlefield presence through controlled entities.
+- Uses standard spell routines from the live spell system.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target no explicit target.
 
-Tactical Notes:
-Most effective when your group can protect summons and capitalize on added field presence.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -8167,22 +8062,18 @@ CALL-WOLVES
 
 Call Wolves
 Type: Spell
-Category: Summoning Spell
 
 Description:
-Call Wolves is a summoning spell available in the live ability table.
+Call Wolves is a spell implemented directly by the current game mechanics.
 
 Effect:
-Summons allies, manipulates portals, or expands battlefield presence through controlled entities.
+- Uses standard spell routines from the live spell system.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target no explicit target.
 
-Tactical Notes:
-Most effective when your group can protect summons and capitalize on added field presence.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -8199,22 +8090,18 @@ CANCELLATION
 
 Cancellation
 Type: Spell
-Category: Utility Spell
 
 Description:
-Cancellation is a utility spell available in the live ability table.
+Cancellation is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Targets may resist part or all of the effect with a saving throw.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room, your current opponent in combat.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -8413,22 +8300,19 @@ CELESTIAL-SMITE
 
 Celestial Smite
 Type: Spell
-Category: Utility Spell
 
 Description:
-Celestial Smite is a utility spell available in the live ability table.
+Celestial Smite is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Deals holy damage.
+- Targets may resist part or all of the effect with a saving throw.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room, your current opponent in combat.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -8459,22 +8343,18 @@ CHAIN-DRAGON-LIGHTNING
 
 Chain Dragon Lightning
 Type: Spell
-Category: Utility Spell
 
 Description:
-Chain Dragon Lightning is a utility spell available in the live ability table.
+Chain Dragon Lightning is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Uses standard spell routines from the live spell system.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room, your current opponent in combat.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -8482,22 +8362,18 @@ CHAIN-OF-SUBJUGATION SUBJUGATION-CHAIN
 
 Chain Of Subjugation
 Type: Spell
-Category: Utility Spell
 
 Description:
-Chain Of Subjugation is a utility spell available in the live ability table.
+Chain Of Subjugation is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Uses standard spell routines from the live spell system.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room, your current opponent in combat.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -8637,22 +8513,19 @@ CHARM-PERSON
 
 Charm Person
 Type: Spell
-Category: Utility Spell
 
 Description:
-Charm Person is a utility spell available in the live ability table.
+Charm Person is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Can apply statuses: charm, flagged, sanctuary.
+- Targets may resist part or all of the effect with a saving throw.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -8685,22 +8558,18 @@ CHILL-TOUCH
 
 Chill Touch
 Type: Spell
-Category: Utility Spell
 
 Description:
-Chill Touch is a utility spell available in the live ability table.
+Chill Touch is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Targets may resist part or all of the effect with a saving throw.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room, your current opponent in combat.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -8716,22 +8585,18 @@ CHRONO-SHIFT
 
 Chrono Shift
 Type: Spell
-Category: Utility Spell
 
 Description:
-Chrono Shift is a utility spell available in the live ability table.
+Chrono Shift is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Uses standard spell routines from the live spell system.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target self only.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -8785,22 +8650,18 @@ CLARITY
 
 Clarity
 Type: Spell
-Category: Utility Spell
 
 Description:
-Clarity is a utility spell available in the live ability table.
+Clarity is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Can apply statuses: clarity.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -8818,22 +8679,18 @@ CLEANSE
 
 Cleanse
 Type: Spell
-Category: Utility Spell
 
 Description:
-Cleanse is a utility spell available in the live ability table.
+Cleanse is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Can apply statuses: arcane leak, blind, corroded, curse, fearful, hexed.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -8860,22 +8717,18 @@ CLONE
 
 Clone
 Type: Spell
-Category: Utility Spell
 
 Description:
-Clone is a utility spell available in the live ability table.
+Clone is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Summons creatures or moves targets.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target no explicit target.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -8917,22 +8770,18 @@ COLOR-SPRAY
 
 Color Spray
 Type: Spell
-Category: Utility Spell
 
 Description:
-Color Spray is a utility spell available in the live ability table.
+Color Spray is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Deals spell damage.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room, your current opponent in combat.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -9031,22 +8880,18 @@ CONFUSION
 
 Confusion
 Type: Spell
-Category: Utility Spell
 
 Description:
-Confusion is a utility spell available in the live ability table.
+Confusion is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Targets may resist part or all of the effect with a saving throw.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room, your current opponent in combat.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -9054,22 +8899,18 @@ CONJURE-ELEMENTAL
 
 Conjure Elemental
 Type: Spell
-Category: Summoning Spell
 
 Description:
-Conjure Elemental is a summoning spell available in the live ability table.
+Conjure Elemental is a spell implemented directly by the current game mechanics.
 
 Effect:
-Summons allies, manipulates portals, or expands battlefield presence through controlled entities.
+- Uses standard spell routines from the live spell system.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target no explicit target.
 
-Tactical Notes:
-Most effective when your group can protect summons and capitalize on added field presence.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -9077,22 +8918,18 @@ CONSECRATE
 
 Consecrate
 Type: Spell
-Category: Room Effect Spell
 
 Description:
-Consecrate is a room effect spell available in the live ability table.
+Consecrate is a spell implemented directly by the current game mechanics.
 
 Effect:
-Establishes a persistent room-wide effect that alters positioning, pressure, and survivability while active.
+- Creates room effects: consecrate.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target no explicit target.
 
-Tactical Notes:
-Cast early to shape terrain advantage before enemies stabilize.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -9157,22 +8994,18 @@ CONTROL-WEATHER
 
 Control Weather
 Type: Spell
-Category: Utility Spell
 
 Description:
-Control Weather is a utility spell available in the live ability table.
+Control Weather is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Uses standard spell routines from the live spell system.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target no explicit target.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -9192,22 +9025,18 @@ CORRUPTION
 
 Corruption
 Type: Spell
-Category: Utility Spell
 
 Description:
-Corruption is a utility spell available in the live ability table.
+Corruption is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Deals direct spell damage.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room, your current opponent in combat.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -9215,22 +9044,18 @@ COUNTERSPELL
 
 Counterspell
 Type: Spell
-Category: Utility Spell
 
 Description:
-Counterspell is a utility spell available in the live ability table.
+Counterspell is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Can apply statuses: spelllock.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room, your current opponent in combat.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -9245,22 +9070,18 @@ CREATE-FOOD
 
 Create Food
 Type: Spell
-Category: Utility Spell
 
 Description:
-Create Food is a utility spell available in the live ability table.
+Create Food is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Creates objects.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target no explicit target.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -9268,22 +9089,18 @@ CREATE-WATER
 
 Create Water
 Type: Spell
-Category: Utility Spell
 
 Description:
-Create Water is a utility spell available in the live ability table.
+Create Water is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Uses standard spell routines from the live spell system.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target an item in your inventory.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -9291,22 +9108,18 @@ CRY-OF-THE-BANSHEE BANSHEE-CRY
 
 Cry Of The Banshee
 Type: Spell
-Category: Utility Spell
 
 Description:
-Cry Of The Banshee is a utility spell available in the live ability table.
+Cry Of The Banshee is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Uses standard spell routines from the live spell system.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target no explicit target.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -9314,22 +9127,18 @@ CRYSTAL-BODY
 
 Crystal Body
 Type: Spell
-Category: Defensive Spell
 
 Description:
-Crystal Body is a defensive spell available in the live ability table.
+Crystal Body is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides protection, resistance, mitigation, or sustained combat enhancement.
+- Uses standard spell routines from the live spell system.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target self only.
 
-Tactical Notes:
-Use pre-fight or during recovery windows to increase endurance.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -9337,22 +9146,18 @@ CURE-BLIND
 
 Cure Blind
 Type: Spell
-Category: Utility Spell
 
 Description:
-Cure Blind is a utility spell available in the live ability table.
+Cure Blind is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Removes magical ailments or curses.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -9360,22 +9165,18 @@ CURE-CRITIC
 
 Cure Critic
 Type: Spell
-Category: Utility Spell
 
 Description:
-Cure Critic is a utility spell available in the live ability table.
+Cure Critic is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Restores or adjusts hit points.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -9383,22 +9184,18 @@ CURE-LIGHT
 
 Cure Light
 Type: Spell
-Category: Utility Spell
 
 Description:
-Cure Light is a utility spell available in the live ability table.
+Cure Light is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Restores or adjusts hit points.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -9406,22 +9203,19 @@ CURSE
 
 Curse
 Type: Spell
-Category: Utility Spell
 
 Description:
-Curse is a utility spell available in the live ability table.
+Curse is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Can apply statuses: curse.
+- Targets may resist part or all of the effect with a saving throw.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room, an item in your inventory.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -9469,22 +9263,18 @@ DAGGER-RAIN
 
 Dagger Rain
 Type: Spell
-Category: Utility Spell
 
 Description:
-Dagger Rain is a utility spell available in the live ability table.
+Dagger Rain is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Uses standard spell routines from the live spell system.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room, your current opponent in combat.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -9501,22 +9291,18 @@ DARK-AEGIS
 
 Dark Aegis
 Type: Spell
-Category: Utility Spell
 
 Description:
-Dark Aegis is a utility spell available in the live ability table.
+Dark Aegis is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Can apply statuses: sanctuary.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target self only, a character in your room.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -9524,22 +9310,18 @@ DARK-REBUKE
 
 Dark Rebuke
 Type: Spell
-Category: Utility Spell
 
 Description:
-Dark Rebuke is a utility spell available in the live ability table.
+Dark Rebuke is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Uses standard spell routines from the live spell system.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room, your current opponent in combat.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -9547,22 +9329,18 @@ DARKNESS
 
 Darkness
 Type: Spell
-Category: Utility Spell
 
 Description:
-Darkness is a utility spell available in the live ability table.
+Darkness is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Uses standard spell routines from the live spell system.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target no explicit target.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -9589,22 +9367,19 @@ DEATH-KNELL
 
 Death Knell
 Type: Spell
-Category: Utility Spell
 
 Description:
-Death Knell is a utility spell available in the live ability table.
+Death Knell is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Deals necrotic damage.
+- Targets may resist part or all of the effect with a saving throw.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room, your current opponent in combat.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -9697,22 +9472,18 @@ DESPAIR-AURA
 
 Despair Aura
 Type: Spell
-Category: Utility Spell
 
 Description:
-Despair Aura is a utility spell available in the live ability table.
+Despair Aura is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Uses standard spell routines from the live spell system.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target self only.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -9753,22 +9524,18 @@ DETECT-ALIGNMENT
 
 Detect Alignment
 Type: Spell
-Category: Utility Spell
 
 Description:
-Detect Alignment is a utility spell available in the live ability table.
+Detect Alignment is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Can apply statuses: detect align.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target self only, a character in your room.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -9776,22 +9543,18 @@ DETECT-INVISIBILITY
 
 Detect Invisibility
 Type: Spell
-Category: Utility Spell
 
 Description:
-Detect Invisibility is a utility spell available in the live ability table.
+Detect Invisibility is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Can apply statuses: detect invis.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target self only, a character in your room.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -9799,22 +9562,18 @@ DETECT-KILL-INTENT KILL-INTENT DETECT-INTENT
 
 Detect Kill Intent
 Type: Spell
-Category: Utility Spell
 
 Description:
-Detect Kill Intent is a utility spell available in the live ability table.
+Detect Kill Intent is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Uses standard spell routines from the live spell system.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target self only.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -9822,22 +9581,18 @@ DETECT-MAGIC
 
 Detect Magic
 Type: Spell
-Category: Utility Spell
 
 Description:
-Detect Magic is a utility spell available in the live ability table.
+Detect Magic is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Can apply statuses: detect magic.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target self only, a character in your room.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -9845,22 +9600,18 @@ DETECT-POISON
 
 Detect Poison
 Type: Spell
-Category: Utility Spell
 
 Description:
-Detect Poison is a utility spell available in the live ability table.
+Detect Poison is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Can apply statuses: flagged, poison.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room, an item in your inventory, an item in the room.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -9877,22 +9628,19 @@ DEVOUR-SOUL
 
 Devour Soul
 Type: Spell
-Category: Utility Spell
 
 Description:
-Devour Soul is a utility spell available in the live ability table.
+Devour Soul is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Deals necrotic damage.
+- Targets may resist part or all of the effect with a saving throw.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room, your current opponent in combat.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -9983,22 +9731,18 @@ DIMENSIONAL-LOCK
 
 Dimensional Lock
 Type: Spell
-Category: Utility Spell
 
 Description:
-Dimensional Lock is a utility spell available in the live ability table.
+Dimensional Lock is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Uses standard spell routines from the live spell system.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target no explicit target.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -10034,22 +9778,19 @@ DISINTEGRATE
 
 Disintegrate
 Type: Spell
-Category: Utility Spell
 
 Description:
-Disintegrate is a utility spell available in the live ability table.
+Disintegrate is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Deals arcane damage.
+- Targets may resist part or all of the effect with a saving throw.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room, your current opponent in combat.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -10057,22 +9798,18 @@ DISPEL-EVIL
 
 Dispel Evil
 Type: Spell
-Category: Utility Spell
 
 Description:
-Dispel Evil is a utility spell available in the live ability table.
+Dispel Evil is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Deals spell damage.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room, your current opponent in combat.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -10080,22 +9817,18 @@ DISPEL-GOOD
 
 Dispel Good
 Type: Spell
-Category: Utility Spell
 
 Description:
-Dispel Good is a utility spell available in the live ability table.
+Dispel Good is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Deals spell damage.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room, your current opponent in combat.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -10103,22 +9836,18 @@ DISRUPT
 
 Disrupt
 Type: Spell
-Category: Utility Spell
 
 Description:
-Disrupt is a utility spell available in the live ability table.
+Disrupt is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Can apply statuses: spelllock.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room, your current opponent in combat.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -10126,22 +9855,18 @@ DIVINE-BULWARK
 
 Divine Bulwark
 Type: Spell
-Category: Defensive Spell
 
 Description:
-Divine Bulwark is a defensive spell available in the live ability table.
+Divine Bulwark is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides protection, resistance, mitigation, or sustained combat enhancement.
+- Applies magical status effects.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target self only, a character in your room.
 
-Tactical Notes:
-Use pre-fight or during recovery windows to increase endurance.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -10167,22 +9892,18 @@ DOMINION-OF-SHADOWS
 
 Dominion Of Shadows
 Type: Spell
-Category: Utility Spell
 
 Description:
-Dominion Of Shadows is a utility spell available in the live ability table.
+Dominion Of Shadows is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Uses standard spell routines from the live spell system.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target self only.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -10204,22 +9925,18 @@ DRAGON-LIGHTNING
 
 Dragon Lightning
 Type: Spell
-Category: Utility Spell
 
 Description:
-Dragon Lightning is a utility spell available in the live ability table.
+Dragon Lightning is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Uses standard spell routines from the live spell system.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room, your current opponent in combat.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -10368,22 +10085,18 @@ EARTHQUAKE
 
 Earthquake
 Type: Spell
-Category: Utility Spell
 
 Description:
-Earthquake is a utility spell available in the live ability table.
+Earthquake is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Uses standard spell routines from the live spell system.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target no explicit target.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -10440,22 +10153,18 @@ ELEMENTAL-WARD-ACID
 
 Elemental Ward Acid
 Type: Spell
-Category: Defensive Spell
 
 Description:
-Elemental Ward Acid is a defensive spell available in the live ability table.
+Elemental Ward Acid is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides protection, resistance, mitigation, or sustained combat enhancement.
+- Can apply statuses: elemental ward acid.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room.
 
-Tactical Notes:
-Use pre-fight or during recovery windows to increase endurance.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -10463,22 +10172,18 @@ ELEMENTAL-WARD-COLD
 
 Elemental Ward Cold
 Type: Spell
-Category: Defensive Spell
 
 Description:
-Elemental Ward Cold is a defensive spell available in the live ability table.
+Elemental Ward Cold is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides protection, resistance, mitigation, or sustained combat enhancement.
+- Can apply statuses: elemental ward cold.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room.
 
-Tactical Notes:
-Use pre-fight or during recovery windows to increase endurance.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -10486,22 +10191,18 @@ ELEMENTAL-WARD-FIRE
 
 Elemental Ward Fire
 Type: Spell
-Category: Defensive Spell
 
 Description:
-Elemental Ward Fire is a defensive spell available in the live ability table.
+Elemental Ward Fire is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides protection, resistance, mitigation, or sustained combat enhancement.
+- Can apply statuses: elemental ward fire.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room.
 
-Tactical Notes:
-Use pre-fight or during recovery windows to increase endurance.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -10509,22 +10210,18 @@ ELEMENTAL-WARD-LIGHTNING
 
 Elemental Ward Lightning
 Type: Spell
-Category: Defensive Spell
 
 Description:
-Elemental Ward Lightning is a defensive spell available in the live ability table.
+Elemental Ward Lightning is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides protection, resistance, mitigation, or sustained combat enhancement.
+- Can apply statuses: elemental ward lightning.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room.
 
-Tactical Notes:
-Use pre-fight or during recovery windows to increase endurance.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -10574,22 +10271,18 @@ ENCHANT-WEAPON
 
 Enchant Weapon
 Type: Spell
-Category: Utility Spell
 
 Description:
-Enchant Weapon is a utility spell available in the live ability table.
+Enchant Weapon is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Uses standard spell routines from the live spell system.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target an item in your inventory.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -10597,22 +10290,18 @@ ENCHANTERS-FOCUS
 
 Enchanters Focus
 Type: Spell
-Category: Utility Spell
 
 Description:
-Enchanters Focus is a utility spell available in the live ability table.
+Enchanters Focus is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Can apply statuses: empowered.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target self only, a character in your room.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -10620,22 +10309,19 @@ ENERGY-DRAIN
 
 Energy Drain
 Type: Spell
-Category: Utility Spell
 
 Description:
-Energy Drain is a utility spell available in the live ability table.
+Energy Drain is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Can apply statuses: arcane leak.
+- Targets may resist part or all of the effect with a saving throw.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room, your current opponent in combat.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -10643,22 +10329,18 @@ ENFEEBLEMENT
 
 Enfeeblement
 Type: Spell
-Category: Utility Spell
 
 Description:
-Enfeeblement is a utility spell available in the live ability table.
+Enfeeblement is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Targets may resist part or all of the effect with a saving throw.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room, your current opponent in combat.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -10774,22 +10456,18 @@ ETHEREAL-JAUNT
 
 Ethereal Jaunt
 Type: Spell
-Category: Utility Spell
 
 Description:
-Ethereal Jaunt is a utility spell available in the live ability table.
+Ethereal Jaunt is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Uses standard spell routines from the live spell system.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target no explicit target.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -10816,22 +10494,18 @@ EVASION
 
 Evasion
 Type: Spell
-Category: Utility Spell
 
 Description:
-Evasion is a utility spell available in the live ability table.
+Evasion is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Applies magical status effects.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target self only, a character in your room.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -10892,22 +10566,18 @@ EXECUTION-MARK
 
 Execution Mark
 Type: Spell
-Category: Utility Spell
 
 Description:
-Execution Mark is a utility spell available in the live ability table.
+Execution Mark is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Uses standard spell routines from the live spell system.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room, your current opponent in combat.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -11021,22 +10691,18 @@ FALLEN-DOWN
 
 Fallen Down
 Type: Spell
-Category: Utility Spell
 
 Description:
-Fallen Down is a utility spell available in the live ability table.
+Fallen Down is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Uses standard spell routines from the live spell system.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target no explicit target.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -11176,22 +10842,18 @@ FATAL-STRIKE
 
 Fatal Strike
 Type: Spell
-Category: Utility Spell
 
 Description:
-Fatal Strike is a utility spell available in the live ability table.
+Fatal Strike is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Uses standard spell routines from the live spell system.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room, your current opponent in combat.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -11199,22 +10861,19 @@ FEAR
 
 Fear
 Type: Spell
-Category: Utility Spell
 
 Description:
-Fear is a utility spell available in the live ability table.
+Fear is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Can apply statuses: fearful.
+- Targets may resist part or all of the effect with a saving throw.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room, your current opponent in combat.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -11272,22 +10931,19 @@ FINGER-OF-DEATH
 
 Finger Of Death
 Type: Spell
-Category: Utility Spell
 
 Description:
-Finger Of Death is a utility spell available in the live ability table.
+Finger Of Death is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Deals necrotic damage.
+- Targets may resist part or all of the effect with a saving throw.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room, your current opponent in combat.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -11295,22 +10951,18 @@ FIREBALL
 
 Fireball
 Type: Spell
-Category: Utility Spell
 
 Description:
-Fireball is a utility spell available in the live ability table.
+Fireball is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Deals spell damage.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room, your current opponent in combat.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -11318,22 +10970,18 @@ FIREBOLT
 
 Firebolt
 Type: Spell
-Category: Utility Spell
 
 Description:
-Firebolt is a utility spell available in the live ability table.
+Firebolt is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Deals spell damage.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room, your current opponent in combat.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -11378,22 +11026,18 @@ FLAME-ARROW
 
 Flame Arrow
 Type: Spell
-Category: Utility Spell
 
 Description:
-Flame Arrow is a utility spell available in the live ability table.
+Flame Arrow is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Can apply statuses: burning.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room, your current opponent in combat.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -11415,22 +11059,18 @@ FLY
 
 Fly
 Type: Spell
-Category: Utility Spell
 
 Description:
-Fly is a utility spell available in the live ability table.
+Fly is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Can apply statuses: flying.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -11465,22 +11105,18 @@ FORCE-GRASP
 
 Force Grasp
 Type: Spell
-Category: Utility Spell
 
 Description:
-Force Grasp is a utility spell available in the live ability table.
+Force Grasp is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Uses standard spell routines from the live spell system.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room, your current opponent in combat.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -11548,22 +11184,18 @@ FROST-NOVA
 
 Frost Nova
 Type: Spell
-Category: Utility Spell
 
 Description:
-Frost Nova is a utility spell available in the live ability table.
+Frost Nova is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Uses standard spell routines from the live spell system.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target no explicit target.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -11571,22 +11203,19 @@ FROSTBITE
 
 Frostbite
 Type: Spell
-Category: Utility Spell
 
 Description:
-Frostbite is a utility spell available in the live ability table.
+Frostbite is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Can apply statuses: frozen.
+- Targets may resist part or all of the effect with a saving throw.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room, your current opponent in combat.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -11608,22 +11237,18 @@ GATE
 
 Gate
 Type: Spell
-Category: Summoning Spell
 
 Description:
-Gate is a summoning spell available in the live ability table.
+Gate is a spell implemented directly by the current game mechanics.
 
 Effect:
-Summons allies, manipulates portals, or expands battlefield presence through controlled entities.
+- Uses standard spell routines from the live spell system.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target no explicit target.
 
-Tactical Notes:
-Most effective when your group can protect summons and capitalize on added field presence.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -11692,22 +11317,18 @@ GIANT-STRENGTH
 
 Giant Strength
 Type: Spell
-Category: Defensive Spell
 
 Description:
-Giant Strength is a defensive spell available in the live ability table.
+Giant Strength is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides protection, resistance, mitigation, or sustained combat enhancement.
+- Applies magical status effects.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room.
 
-Tactical Notes:
-Use pre-fight or during recovery windows to increase endurance.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -11828,22 +11449,18 @@ GRASP-HEART
 
 Grasp Heart
 Type: Spell
-Category: Utility Spell
 
 Description:
-Grasp Heart is a utility spell available in the live ability table.
+Grasp Heart is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Uses standard spell routines from the live spell system.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room, your current opponent in combat.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -11851,22 +11468,18 @@ GRAVITY-MAELSTROM
 
 Gravity Maelstrom
 Type: Spell
-Category: Utility Spell
 
 Description:
-Gravity Maelstrom is a utility spell available in the live ability table.
+Gravity Maelstrom is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Uses standard spell routines from the live spell system.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room, your current opponent in combat.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -11874,22 +11487,18 @@ GRAVITY-WELL
 
 Gravity Well
 Type: Spell
-Category: Room Effect Spell
 
 Description:
-Gravity Well is a room effect spell available in the live ability table.
+Gravity Well is a spell implemented directly by the current game mechanics.
 
 Effect:
-Establishes a persistent room-wide effect that alters positioning, pressure, and survivability while active.
+- Creates room effects: gravity well.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target no explicit target.
 
-Tactical Notes:
-Cast early to shape terrain advantage before enemies stabilize.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -11897,22 +11506,18 @@ GREATER-FIREBALL
 
 Greater Fireball
 Type: Spell
-Category: Utility Spell
 
 Description:
-Greater Fireball is a utility spell available in the live ability table.
+Greater Fireball is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Uses standard spell routines from the live spell system.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target no explicit target.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -11920,22 +11525,18 @@ GREATER-HEAL
 
 Greater Heal
 Type: Spell
-Category: Utility Spell
 
 Description:
-Greater Heal is a utility spell available in the live ability table.
+Greater Heal is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Can apply statuses: blind, curse, poison.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -11943,22 +11544,18 @@ GREATER-MAGIC-SEAL
 
 Greater Magic Seal
 Type: Spell
-Category: Utility Spell
 
 Description:
-Greater Magic Seal is a utility spell available in the live ability table.
+Greater Magic Seal is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Uses standard spell routines from the live spell system.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room, your current opponent in combat.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -11966,22 +11563,18 @@ GREATER-REJECTION REJECTION
 
 Greater Rejection
 Type: Spell
-Category: Utility Spell
 
 Description:
-Greater Rejection is a utility spell available in the live ability table.
+Greater Rejection is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Uses standard spell routines from the live spell system.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room, your current opponent in combat.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -11989,22 +11582,18 @@ GREATER-TELEPORTATION
 
 Greater Teleportation
 Type: Spell
-Category: Utility Spell
 
 Description:
-Greater Teleportation is a utility spell available in the live ability table.
+Greater Teleportation is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Uses standard spell routines from the live spell system.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character anywhere in the world.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -12074,22 +11663,18 @@ GROUP-ARMOR
 
 Group Armor
 Type: Spell
-Category: Defensive Spell
 
 Description:
-Group Armor is a defensive spell available in the live ability table.
+Group Armor is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides protection, resistance, mitigation, or sustained combat enhancement.
+- Uses standard spell routines from the live spell system.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target no explicit target.
 
-Tactical Notes:
-Use pre-fight or during recovery windows to increase endurance.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -12097,22 +11682,18 @@ GROUP-HEAL
 
 Group Heal
 Type: Spell
-Category: Utility Spell
 
 Description:
-Group Heal is a utility spell available in the live ability table.
+Group Heal is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Uses standard spell routines from the live spell system.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target no explicit target.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -12120,22 +11701,18 @@ GROUP-RECALL
 
 Group Recall
 Type: Spell
-Category: Utility Spell
 
 Description:
-Group Recall is a utility spell available in the live ability table.
+Group Recall is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Uses standard spell routines from the live spell system.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target no explicit target.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -12183,22 +11760,20 @@ HAMMER-OF-GOD
 
 Hammer Of God
 Type: Spell
-Category: Utility Spell
 
 Description:
-Hammer Of God is a utility spell available in the live ability table.
+Hammer Of God is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Deals holy damage.
+- Can apply statuses: rooted, stunned.
+- Targets may resist part or all of the effect with a saving throw.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room, your current opponent in combat.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -12229,22 +11804,18 @@ HARM
 
 Harm
 Type: Spell
-Category: Utility Spell
 
 Description:
-Harm is a utility spell available in the live ability table.
+Harm is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Deals spell damage.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room, your current opponent in combat.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -12292,22 +11863,18 @@ HEAL
 
 Heal
 Type: Spell
-Category: Utility Spell
 
 Description:
-Heal is a utility spell available in the live ability table.
+Heal is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Restores or adjusts hit points. Removes magical ailments or curses.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -12343,22 +11910,18 @@ HELL-FLAME
 
 Hell Flame
 Type: Spell
-Category: Utility Spell
 
 Description:
-Hell Flame is a utility spell available in the live ability table.
+Hell Flame is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Uses standard spell routines from the live spell system.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room, your current opponent in combat.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -12366,22 +11929,19 @@ HELLFIRE
 
 Hellfire
 Type: Spell
-Category: Utility Spell
 
 Description:
-Hellfire is a utility spell available in the live ability table.
+Hellfire is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Deals fire damage.
+- Targets may resist part or all of the effect with a saving throw.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room, your current opponent in combat.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -12486,22 +12046,19 @@ HOLD-MONSTER
 
 Hold Monster
 Type: Spell
-Category: Utility Spell
 
 Description:
-Hold Monster is a utility spell available in the live ability table.
+Hold Monster is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Can apply statuses: stunned, time snare.
+- Targets may resist part or all of the effect with a saving throw.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room, your current opponent in combat.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -12509,22 +12066,19 @@ HOLD-PERSON
 
 Hold Person
 Type: Spell
-Category: Utility Spell
 
 Description:
-Hold Person is a utility spell available in the live ability table.
+Hold Person is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Can apply statuses: stunned, time snare.
+- Targets may resist part or all of the effect with a saving throw.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room, your current opponent in combat.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -12532,22 +12086,20 @@ HOLY-WORD
 
 Holy Word
 Type: Spell
-Category: Utility Spell
 
 Description:
-Holy Word is a utility spell available in the live ability table.
+Holy Word is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Deals holy damage.
+- Can apply statuses: blinded magical, stunned.
+- Targets may resist part or all of the effect with a saving throw.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target no explicit target.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -12671,22 +12223,18 @@ IA-SHUB-NIGGURATH
 
 Ia Shub Niggurath
 Type: Spell
-Category: Utility Spell
 
 Description:
-Ia Shub Niggurath is a utility spell available in the live ability table.
+Ia Shub Niggurath is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Uses standard spell routines from the live spell system.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target no explicit target.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -12694,22 +12242,18 @@ ICE-STORM
 
 Ice Storm
 Type: Spell
-Category: Room Effect Spell
 
 Description:
-Ice Storm is a room effect spell available in the live ability table.
+Ice Storm is a spell implemented directly by the current game mechanics.
 
 Effect:
-Establishes a persistent room-wide effect that alters positioning, pressure, and survivability while active.
+- Uses standard spell routines from the live spell system.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target no explicit target.
 
-Tactical Notes:
-Cast early to shape terrain advantage before enemies stabilize.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -12717,22 +12261,18 @@ IDENTIFY
 
 Identify
 Type: Spell
-Category: Utility Spell
 
 Description:
-Identify is a utility spell available in the live ability table.
+Identify is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Uses standard spell routines from the live spell system.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room, an item in your inventory, an item in the room.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -12819,22 +12359,18 @@ INFRAVISION
 
 Infravision
 Type: Spell
-Category: Utility Spell
 
 Description:
-Infravision is a utility spell available in the live ability table.
+Infravision is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Can apply statuses: infravision.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target self only, a character in your room.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -12873,22 +12409,18 @@ INVISIBILITY
 
 Invisibility
 Type: Spell
-Category: Utility Spell
 
 Description:
-Invisibility is a utility spell available in the live ability table.
+Invisibility is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Can apply statuses: invisible.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room, an item in your inventory, an item in the room.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -12896,22 +12428,18 @@ IRONSKIN
 
 Ironskin
 Type: Spell
-Category: Defensive Spell
 
 Description:
-Ironskin is a defensive spell available in the live ability table.
+Ironskin is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides protection, resistance, mitigation, or sustained combat enhancement.
+- Applies magical status effects.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target self only, a character in your room.
 
-Tactical Notes:
-Use pre-fight or during recovery windows to increase endurance.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -13611,22 +13139,18 @@ KINGS-COMMAND KING-COMMAND
 
 Kings Command
 Type: Spell
-Category: Utility Spell
 
 Description:
-Kings Command is a utility spell available in the live ability table.
+Kings Command is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Uses standard spell routines from the live spell system.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target self only.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -13741,22 +13265,18 @@ LEYLINE-TAP
 
 Leyline Tap
 Type: Spell
-Category: Utility Spell
 
 Description:
-Leyline Tap is a utility spell available in the live ability table.
+Leyline Tap is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Uses standard spell routines from the live spell system.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target no explicit target.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -13969,22 +13489,18 @@ LIGHTNING-BOLT
 
 Lightning Bolt
 Type: Spell
-Category: Utility Spell
 
 Description:
-Lightning Bolt is a utility spell available in the live ability table.
+Lightning Bolt is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Deals spell damage.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room, your current opponent in combat.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -14111,22 +13627,18 @@ LOCATE-CORPSE
 
 Locate Corpse
 Type: Spell
-Category: Utility Spell
 
 Description:
-Locate Corpse is a utility spell available in the live ability table.
+Locate Corpse is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Uses standard spell routines from the live spell system.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target no explicit target.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -14134,22 +13646,18 @@ LOCATE-OBJECT
 
 Locate Object
 Type: Spell
-Category: Utility Spell
 
 Description:
-Locate Object is a utility spell available in the live ability table.
+Locate Object is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Uses standard spell routines from the live spell system.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target an item anywhere in the world.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -14232,22 +13740,18 @@ MAGIC-MISSILE
 
 Magic Missile
 Type: Spell
-Category: Utility Spell
 
 Description:
-Magic Missile is a utility spell available in the live ability table.
+Magic Missile is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Deals spell damage.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room, your current opponent in combat.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -14298,22 +13802,19 @@ MARK-OF-DEATH
 
 Mark Of Death
 Type: Spell
-Category: Utility Spell
 
 Description:
-Mark Of Death is a utility spell available in the live ability table.
+Mark Of Death is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Can apply statuses: marked.
+- Targets may resist part or all of the effect with a saving throw.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room, your current opponent in combat.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -14321,22 +13822,19 @@ MASS-FEAR
 
 Mass Fear
 Type: Spell
-Category: Utility Spell
 
 Description:
-Mass Fear is a utility spell available in the live ability table.
+Mass Fear is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Can apply statuses: fearful.
+- Targets may resist part or all of the effect with a saving throw.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target no explicit target.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -14729,22 +14227,19 @@ MEMENTO-MORI
 
 Memento Mori
 Type: Spell
-Category: Utility Spell
 
 Description:
-Memento Mori is a utility spell available in the live ability table.
+Memento Mori is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Can apply statuses: curse.
+- Targets may resist part or all of the effect with a saving throw.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room, your current opponent in combat.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -14787,22 +14282,19 @@ METEOR
 
 Meteor
 Type: Spell
-Category: Utility Spell
 
 Description:
-Meteor is a utility spell available in the live ability table.
+Meteor is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Deals fire damage.
+- Targets may resist part or all of the effect with a saving throw.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room, your current opponent in combat.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -14810,22 +14302,19 @@ METEOR-SWARM
 
 Meteor Swarm
 Type: Spell
-Category: Utility Spell
 
 Description:
-Meteor Swarm is a utility spell available in the live ability table.
+Meteor Swarm is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Deals fire damage.
+- Targets may resist part or all of the effect with a saving throw.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target no explicit target.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -14895,22 +14384,18 @@ MIRROR-VEIL
 
 Mirror Veil
 Type: Spell
-Category: Defensive Spell
 
 Description:
-Mirror Veil is a defensive spell available in the live ability table.
+Mirror Veil is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides protection, resistance, mitigation, or sustained combat enhancement.
+- Can apply statuses: mirror image.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room.
 
-Tactical Notes:
-Use pre-fight or during recovery windows to increase endurance.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -15013,22 +14498,18 @@ MONARCHS-AUTHORITY MONARCH-AUTHORITY
 
 Monarchs Authority
 Type: Spell
-Category: Utility Spell
 
 Description:
-Monarchs Authority is a utility spell available in the live ability table.
+Monarchs Authority is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Uses standard spell routines from the live spell system.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target no explicit target.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -15036,22 +14517,18 @@ MONARCHS-PRESSURE MONARCH-PRESSURE
 
 Monarchs Pressure
 Type: Spell
-Category: Utility Spell
 
 Description:
-Monarchs Pressure is a utility spell available in the live ability table.
+Monarchs Pressure is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Uses standard spell routines from the live spell system.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target no explicit target.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -15183,22 +14660,18 @@ MUTILATE
 
 Mutilate
 Type: Spell
-Category: Utility Spell
 
 Description:
-Mutilate is a utility spell available in the live ability table.
+Mutilate is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Uses standard spell routines from the live spell system.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room, your current opponent in combat.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -15235,22 +14708,18 @@ NAPALM
 
 Napalm
 Type: Spell
-Category: Utility Spell
 
 Description:
-Napalm is a utility spell available in the live ability table.
+Napalm is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Uses standard spell routines from the live spell system.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target no explicit target.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -15258,22 +14727,18 @@ NEGATIVE-BURST NEG-BURST
 
 Negative Burst
 Type: Spell
-Category: Utility Spell
 
 Description:
-Negative Burst is a utility spell available in the live ability table.
+Negative Burst is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Uses standard spell routines from the live spell system.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target no explicit target.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -15326,22 +14791,18 @@ NIGHT-HUNT
 
 Night Hunt
 Type: Spell
-Category: Utility Spell
 
 Description:
-Night Hunt is a utility spell available in the live ability table.
+Night Hunt is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Uses standard spell routines from the live spell system.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room, your current opponent in combat.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -15349,22 +14810,18 @@ NIRVANA
 
 Nirvana
 Type: Spell
-Category: Defensive Spell
 
 Description:
-Nirvana is a defensive spell available in the live ability table.
+Nirvana is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides protection, resistance, mitigation, or sustained combat enhancement.
+- Can apply statuses: sanctuary.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target self only, a character in your room.
 
-Tactical Notes:
-Use pre-fight or during recovery windows to increase endurance.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -15461,22 +14918,18 @@ NOVA
 
 Nova
 Type: Spell
-Category: Utility Spell
 
 Description:
-Nova is a utility spell available in the live ability table.
+Nova is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Uses standard spell routines from the live spell system.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target no explicit target.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -15515,22 +14968,18 @@ NULL-FIELD
 
 Null Field
 Type: Spell
-Category: Room Effect Spell
 
 Description:
-Null Field is a room effect spell available in the live ability table.
+Null Field is a spell implemented directly by the current game mechanics.
 
 Effect:
-Establishes a persistent room-wide effect that alters positioning, pressure, and survivability while active.
+- Creates room effects: null field.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target no explicit target.
 
-Tactical Notes:
-Cast early to shape terrain advantage before enemies stabilize.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -15659,22 +15108,18 @@ OBLIVION-SPEAR
 
 Oblivion Spear
 Type: Spell
-Category: Utility Spell
 
 Description:
-Oblivion Spear is a utility spell available in the live ability table.
+Oblivion Spear is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Uses standard spell routines from the live spell system.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room, your current opponent in combat.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -16333,22 +15778,18 @@ PANTHEON
 
 Pantheon
 Type: Spell
-Category: Defensive Spell
 
 Description:
-Pantheon is a defensive spell available in the live ability table.
+Pantheon is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides protection, resistance, mitigation, or sustained combat enhancement.
+- Uses standard spell routines from the live spell system.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target self only.
 
-Tactical Notes:
-Use pre-fight or during recovery windows to increase endurance.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -16465,22 +15906,18 @@ PHASE-SHIFT
 
 Phase Shift
 Type: Spell
-Category: Utility Spell
 
 Description:
-Phase Shift is a utility spell available in the live ability table.
+Phase Shift is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Can apply statuses: phase.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target self only, a character in your room.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -16526,22 +15963,20 @@ PLAGUE-BOLT
 
 Plague Bolt
 Type: Spell
-Category: Utility Spell
 
 Description:
-Plague Bolt is a utility spell available in the live ability table.
+Plague Bolt is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Deals direct spell damage.
+- Can apply statuses: poison.
+- Targets may resist part or all of the effect with a saving throw.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room, your current opponent in combat.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -16723,22 +16158,19 @@ POISON
 
 Poison
 Type: Spell
-Category: Utility Spell
 
 Description:
-Poison is a utility spell available in the live ability table.
+Poison is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Can apply statuses: poison.
+- Targets may resist part or all of the effect with a saving throw.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room, an item in your inventory.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -16769,22 +16201,18 @@ PORTAL
 
 Portal
 Type: Spell
-Category: Summoning Spell
 
 Description:
-Portal is a summoning spell available in the live ability table.
+Portal is a spell implemented directly by the current game mechanics.
 
 Effect:
-Summons allies, manipulates portals, or expands battlefield presence through controlled entities.
+- Uses standard spell routines from the live spell system.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character anywhere in the world.
 
-Tactical Notes:
-Most effective when your group can protect summons and capitalize on added field presence.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -16843,22 +16271,18 @@ POWER-WORD-BLIND
 
 Power Word Blind
 Type: Spell
-Category: Utility Spell
 
 Description:
-Power Word Blind is a utility spell available in the live ability table.
+Power Word Blind is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Can apply statuses: blinded magical.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room, your current opponent in combat.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -16866,22 +16290,18 @@ POWER-WORD-KILL
 
 Power Word Kill
 Type: Spell
-Category: Utility Spell
 
 Description:
-Power Word Kill is a utility spell available in the live ability table.
+Power Word Kill is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Deals arcane damage.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room, your current opponent in combat.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -16889,22 +16309,18 @@ POWER-WORD-SILENCE
 
 Power Word Silence
 Type: Spell
-Category: Utility Spell
 
 Description:
-Power Word Silence is a utility spell available in the live ability table.
+Power Word Silence is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Can apply statuses: silenced.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room, your current opponent in combat.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -16912,22 +16328,18 @@ POWER-WORD-STUN
 
 Power Word Stun
 Type: Spell
-Category: Utility Spell
 
 Description:
-Power Word Stun is a utility spell available in the live ability table.
+Power Word Stun is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Can apply statuses: stunned.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room, your current opponent in combat.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -17384,22 +16796,18 @@ PROTECTION-FROM-EVIL
 
 Protection From Evil
 Type: Spell
-Category: Utility Spell
 
 Description:
-Protection From Evil is a utility spell available in the live ability table.
+Protection From Evil is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Can apply statuses: protect evil.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target self only, a character in your room.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -17407,22 +16815,19 @@ PSYCHIC-CRUSH
 
 Psychic Crush
 Type: Spell
-Category: Utility Spell
 
 Description:
-Psychic Crush is a utility spell available in the live ability table.
+Psychic Crush is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Deals psychic damage.
+- Targets may resist part or all of the effect with a saving throw.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room, your current opponent in combat.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -17796,22 +17201,18 @@ REALITY-SLASH
 
 Reality Slash
 Type: Spell
-Category: Utility Spell
 
 Description:
-Reality Slash is a utility spell available in the live ability table.
+Reality Slash is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Uses standard spell routines from the live spell system.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room, your current opponent in combat.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -18241,22 +17642,18 @@ REMOVE-CURSE
 
 Remove Curse
 Type: Spell
-Category: Utility Spell
 
 Description:
-Remove Curse is a utility spell available in the live ability table.
+Remove Curse is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Removes magical ailments or curses.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room, an item in your inventory.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -18264,22 +17661,18 @@ REMOVE-POISON
 
 Remove Poison
 Type: Spell
-Category: Utility Spell
 
 Description:
-Remove Poison is a utility spell available in the live ability table.
+Remove Poison is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Removes magical ailments or curses.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room, an item in your inventory, an item in the room.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -18456,22 +17849,18 @@ RULERS-HAND
 
 Rulers Hand
 Type: Spell
-Category: Utility Spell
 
 Description:
-Rulers Hand is a utility spell available in the live ability table.
+Rulers Hand is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Uses standard spell routines from the live spell system.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room, your current opponent in combat.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -18506,22 +17895,18 @@ SANCTUARY
 
 Sanctuary
 Type: Spell
-Category: Defensive Spell
 
 Description:
-Sanctuary is a defensive spell available in the live ability table.
+Sanctuary is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides protection, resistance, mitigation, or sustained combat enhancement.
+- Applies magical status effects.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room.
 
-Tactical Notes:
-Use pre-fight or during recovery windows to increase endurance.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -18590,22 +17975,18 @@ SCRIPT-INFLICTED
 
 Script-Inflicted
 Type: Spell
-Category: Utility Spell
 
 Description:
-Script-Inflicted is a utility spell available in the live ability table.
+Script-Inflicted is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Uses standard spell routines from the live spell system.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target no explicit target.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -18911,22 +18292,18 @@ SENSE-LIFE
 
 Sense Life
 Type: Spell
-Category: Utility Spell
 
 Description:
-Sense Life is a utility spell available in the live ability table.
+Sense Life is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Can apply statuses: sense life.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target self only, a character in your room.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -19050,22 +18427,18 @@ SHADOW-ARMOR
 
 Shadow Armor
 Type: Spell
-Category: Defensive Spell
 
 Description:
-Shadow Armor is a defensive spell available in the live ability table.
+Shadow Armor is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides protection, resistance, mitigation, or sustained combat enhancement.
+- Uses standard spell routines from the live spell system.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room.
 
-Tactical Notes:
-Use pre-fight or during recovery windows to increase endurance.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -19073,22 +18446,18 @@ SHADOW-BIND
 
 Shadow Bind
 Type: Spell
-Category: Utility Spell
 
 Description:
-Shadow Bind is a utility spell available in the live ability table.
+Shadow Bind is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Uses standard spell routines from the live spell system.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room, your current opponent in combat.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -19096,22 +18465,18 @@ SHADOW-BOLT
 
 Shadow Bolt
 Type: Spell
-Category: Utility Spell
 
 Description:
-Shadow Bolt is a utility spell available in the live ability table.
+Shadow Bolt is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Deals spell damage.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room, your current opponent in combat.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -19119,22 +18484,18 @@ SHADOW-BURST
 
 Shadow Burst
 Type: Spell
-Category: Utility Spell
 
 Description:
-Shadow Burst is a utility spell available in the live ability table.
+Shadow Burst is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Uses standard spell routines from the live spell system.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target no explicit target.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -19165,22 +18526,18 @@ SHADOW-DOMAIN SHADOWDOMAIN DOMAIN-SHADOW
 
 Shadow Domain
 Type: Spell
-Category: Room Effect Spell
 
 Description:
-Shadow Domain is a room effect spell available in the live ability table.
+Shadow Domain is a spell implemented directly by the current game mechanics.
 
 Effect:
-Establishes a persistent room-wide effect that alters positioning, pressure, and survivability while active.
+- Uses standard spell routines from the live spell system.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target no explicit target.
 
-Tactical Notes:
-Cast early to shape terrain advantage before enemies stabilize.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -19188,22 +18545,18 @@ SHADOW-EXCHANGE
 
 Shadow Exchange
 Type: Spell
-Category: Utility Spell
 
 Description:
-Shadow Exchange is a utility spell available in the live ability table.
+Shadow Exchange is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Uses standard spell routines from the live spell system.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -19229,22 +18582,18 @@ SHADOW-LANCE
 
 Shadow Lance
 Type: Spell
-Category: Utility Spell
 
 Description:
-Shadow Lance is a utility spell available in the live ability table.
+Shadow Lance is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Uses standard spell routines from the live spell system.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room, your current opponent in combat.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -19252,22 +18601,18 @@ SHADOW-RECALL
 
 Shadow Recall
 Type: Spell
-Category: Utility Spell
 
 Description:
-Shadow Recall is a utility spell available in the live ability table.
+Shadow Recall is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Uses standard spell routines from the live spell system.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target self only.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -19275,22 +18620,18 @@ SHADOW-REGENESIS
 
 Shadow Regenesis
 Type: Spell
-Category: Utility Spell
 
 Description:
-Shadow Regenesis is a utility spell available in the live ability table.
+Shadow Regenesis is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Uses standard spell routines from the live spell system.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target self only.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -19321,22 +18662,18 @@ SHADOW-STEP
 
 Shadow Step
 Type: Spell
-Category: Utility Spell
 
 Description:
-Shadow Step is a utility spell available in the live ability table.
+Shadow Step is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Uses standard spell routines from the live spell system.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target self only.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -19344,22 +18681,18 @@ SHADOW-STORM
 
 Shadow Storm
 Type: Spell
-Category: Room Effect Spell
 
 Description:
-Shadow Storm is a room effect spell available in the live ability table.
+Shadow Storm is a spell implemented directly by the current game mechanics.
 
 Effect:
-Establishes a persistent room-wide effect that alters positioning, pressure, and survivability while active.
+- Uses standard spell routines from the live spell system.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target no explicit target.
 
-Tactical Notes:
-Cast early to shape terrain advantage before enemies stabilize.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -19404,22 +18737,18 @@ SHOCKING-GRASP
 
 Shocking Grasp
 Type: Spell
-Category: Utility Spell
 
 Description:
-Shocking Grasp is a utility spell available in the live ability table.
+Shocking Grasp is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Deals spell damage.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room, your current opponent in combat.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -19427,22 +18756,18 @@ SHOCKWAVE
 
 Shockwave
 Type: Spell
-Category: Utility Spell
 
 Description:
-Shockwave is a utility spell available in the live ability table.
+Shockwave is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Uses standard spell routines from the live spell system.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target no explicit target.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -19575,22 +18900,19 @@ SILENCE
 
 Silence
 Type: Spell
-Category: Utility Spell
 
 Description:
-Silence is a utility spell available in the live ability table.
+Silence is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Can apply statuses: silenced.
+- Targets may resist part or all of the effect with a saving throw.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room, your current opponent in combat.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -19598,22 +18920,18 @@ SILENCE-FIELD
 
 Silence Field
 Type: Spell
-Category: Room Effect Spell
 
 Description:
-Silence Field is a room effect spell available in the live ability table.
+Silence Field is a spell implemented directly by the current game mechanics.
 
 Effect:
-Establishes a persistent room-wide effect that alters positioning, pressure, and survivability while active.
+- Creates room effects: silence field.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target no explicit target.
 
-Tactical Notes:
-Cast early to shape terrain advantage before enemies stabilize.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -19621,22 +18939,18 @@ SILENT-MAGIC
 
 Silent Magic
 Type: Spell
-Category: Utility Spell
 
 Description:
-Silent Magic is a utility spell available in the live ability table.
+Silent Magic is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Uses standard spell routines from the live spell system.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target self only.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -19694,22 +19008,19 @@ SLEEP
 
 Sleep
 Type: Spell
-Category: Utility Spell
 
 Description:
-Sleep is a utility spell available in the live ability table.
+Sleep is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Can apply statuses: sleep.
+- Targets may resist part or all of the effect with a saving throw.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -19819,22 +19130,18 @@ SONG-OF-RESILIENCE
 
 Song Of Resilience
 Type: Spell
-Category: Utility Spell
 
 Description:
-Song Of Resilience is a utility spell available in the live ability table.
+Song Of Resilience is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Applies magical status effects.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -19842,22 +19149,18 @@ SONIC-BURST
 
 Sonic Burst
 Type: Spell
-Category: Utility Spell
 
 Description:
-Sonic Burst is a utility spell available in the live ability table.
+Sonic Burst is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Uses standard spell routines from the live spell system.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target no explicit target.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -19915,22 +19218,18 @@ SOVEREIGNS-STEP
 
 Sovereigns Step
 Type: Spell
-Category: Utility Spell
 
 Description:
-Sovereigns Step is a utility spell available in the live ability table.
+Sovereigns Step is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Uses standard spell routines from the live spell system.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target self only.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -20011,22 +19310,19 @@ SPELL-STEAL
 
 Spell Steal
 Type: Spell
-Category: Utility Spell
 
 Description:
-Spell Steal is a utility spell available in the live ability table.
+Spell Steal is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Can apply statuses: curse, elemental ward acid, elemental ward cold, elemental ward fire, elemental ward lightning, fearful.
+- Targets may resist part or all of the effect with a saving throw.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room, your current opponent in combat.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -20432,22 +19728,18 @@ STATIC-FIELD
 
 Static Field
 Type: Spell
-Category: Room Effect Spell
 
 Description:
-Static Field is a room effect spell available in the live ability table.
+Static Field is a spell implemented directly by the current game mechanics.
 
 Effect:
-Establishes a persistent room-wide effect that alters positioning, pressure, and survivability while active.
+- Creates room effects: static field.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target no explicit target.
 
-Tactical Notes:
-Cast early to shape terrain advantage before enemies stabilize.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -20522,22 +19814,18 @@ STONE-SKIN
 
 Stone Skin
 Type: Spell
-Category: Defensive Spell
 
 Description:
-Stone Skin is a defensive spell available in the live ability table.
+Stone Skin is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides protection, resistance, mitigation, or sustained combat enhancement.
+- Can apply statuses: stoneskin.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room.
 
-Tactical Notes:
-Use pre-fight or during recovery windows to increase endurance.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -20545,22 +19833,18 @@ STRENGTH
 
 Strength
 Type: Spell
-Category: Defensive Spell
 
 Description:
-Strength is a defensive spell available in the live ability table.
+Strength is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides protection, resistance, mitigation, or sustained combat enhancement.
+- Applies magical status effects.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room.
 
-Tactical Notes:
-Use pre-fight or during recovery windows to increase endurance.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -20949,22 +20233,18 @@ SUMMON
 
 Summon
 Type: Spell
-Category: Summoning Spell
 
 Description:
-Summon is a summoning spell available in the live ability table.
+Summon is a spell implemented directly by the current game mechanics.
 
 Effect:
-Summons allies, manipulates portals, or expands battlefield presence through controlled entities.
+- Targets may resist part or all of the effect with a saving throw.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character anywhere in the world.
 
-Tactical Notes:
-Most effective when your group can protect summons and capitalize on added field presence.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -21345,22 +20625,18 @@ TELEPORT
 
 Teleport
 Type: Spell
-Category: Utility Spell
 
 Description:
-Teleport is a utility spell available in the live ability table.
+Teleport is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Uses standard spell routines from the live spell system.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -21402,22 +20678,18 @@ TEMPORAL-SHIFT
 
 Temporal Shift
 Type: Spell
-Category: Utility Spell
 
 Description:
-Temporal Shift is a utility spell available in the live ability table.
+Temporal Shift is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Targets may resist part or all of the effect with a saving throw.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room, your current opponent in combat.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -21661,22 +20933,19 @@ TIME-SNARE
 
 Time Snare
 Type: Spell
-Category: Utility Spell
 
 Description:
-Time Snare is a utility spell available in the live ability table.
+Time Snare is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Can apply statuses: time snare.
+- Targets may resist part or all of the effect with a saving throw.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room, your current opponent in combat.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -21684,22 +20953,18 @@ TIME-STOP
 
 Time Stop
 Type: Spell
-Category: Utility Spell
 
 Description:
-Time Stop is a utility spell available in the live ability table.
+Time Stop is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Uses standard spell routines from the live spell system.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target no explicit target.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -21804,22 +21069,18 @@ TOXIC-CLOUD
 
 Toxic Cloud
 Type: Spell
-Category: Utility Spell
 
 Description:
-Toxic Cloud is a utility spell available in the live ability table.
+Toxic Cloud is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Uses standard spell routines from the live spell system.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target no explicit target.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -23581,22 +22842,18 @@ TRIPLE-MAXIMIZE-MAGIC
 
 Triple Maximize Magic
 Type: Spell
-Category: Utility Spell
 
 Description:
-Triple Maximize Magic is a utility spell available in the live ability table.
+Triple Maximize Magic is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Uses standard spell routines from the live spell system.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target self only.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -23627,22 +22884,18 @@ TRUE-SEEING
 
 True Seeing
 Type: Spell
-Category: Utility Spell
 
 Description:
-True Seeing is a utility spell available in the live ability table.
+True Seeing is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Can apply statuses: detect invis, sense life, truesight.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target self only, a character in your room.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -23697,22 +22950,18 @@ UNDYING-WILL
 
 Undying Will
 Type: Spell
-Category: Utility Spell
 
 Description:
-Undying Will is a utility spell available in the live ability table.
+Undying Will is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Uses standard spell routines from the live spell system.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target self only.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -23735,22 +22984,20 @@ UNHOLY-WORD
 
 Unholy Word
 Type: Spell
-Category: Utility Spell
 
 Description:
-Unholy Word is a utility spell available in the live ability table.
+Unholy Word is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Deals shadow damage.
+- Can apply statuses: blinded magical, stunned.
+- Targets may resist part or all of the effect with a saving throw.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target no explicit target.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -23887,22 +23134,19 @@ VAMPIRIC-TOUCH
 
 Vampiric Touch
 Type: Spell
-Category: Utility Spell
 
 Description:
-Vampiric Touch is a utility spell available in the live ability table.
+Vampiric Touch is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Deals direct spell damage.
+- Targets may resist part or all of the effect with a saving throw.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room, your current opponent in combat.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -23941,22 +23185,18 @@ VENTRILOQUATE
 
 Ventriloquate
 Type: Spell
-Category: Utility Spell
 
 Description:
-Ventriloquate is a utility spell available in the live ability table.
+Ventriloquate is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Uses standard spell routines from the live spell system.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -23964,22 +23204,18 @@ VERMILION-NOVA
 
 Vermilion Nova
 Type: Spell
-Category: Utility Spell
 
 Description:
-Vermilion Nova is a utility spell available in the live ability table.
+Vermilion Nova is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Uses standard spell routines from the live spell system.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target no explicit target.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -23987,22 +23223,19 @@ VERTIGO
 
 Vertigo
 Type: Spell
-Category: Utility Spell
 
 Description:
-Vertigo is a utility spell available in the live ability table.
+Vertigo is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Can apply statuses: stunned.
+- Targets may resist part or all of the effect with a saving throw.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room, your current opponent in combat.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -24062,22 +23295,18 @@ VOLTAIC-BOLT
 
 Voltaic Bolt
 Type: Spell
-Category: Utility Spell
 
 Description:
-Voltaic Bolt is a utility spell available in the live ability table.
+Voltaic Bolt is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Can apply statuses: static.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room, your current opponent in combat.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -24109,22 +23338,19 @@ WAIL-OF-THE-BANSHEE
 
 Wail Of The Banshee
 Type: Spell
-Category: Utility Spell
 
 Description:
-Wail Of The Banshee is a utility spell available in the live ability table.
+Wail Of The Banshee is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Deals necrotic damage.
+- Targets may resist part or all of the effect with a saving throw.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target no explicit target.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -24174,22 +23400,18 @@ WALL-OF-FIRE
 
 Wall Of Fire
 Type: Spell
-Category: Room Effect Spell
 
 Description:
-Wall Of Fire is a room effect spell available in the live ability table.
+Wall Of Fire is a spell implemented directly by the current game mechanics.
 
 Effect:
-Establishes a persistent room-wide effect that alters positioning, pressure, and survivability while active.
+- Creates room effects: wall of fire.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target no explicit target.
 
-Tactical Notes:
-Cast early to shape terrain advantage before enemies stabilize.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -24210,22 +23432,18 @@ WATERWALK
 
 Waterwalk
 Type: Spell
-Category: Utility Spell
 
 Description:
-Waterwalk is a utility spell available in the live ability table.
+Waterwalk is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Can apply statuses: waterwalk.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -24302,22 +23520,19 @@ WEB
 
 Web
 Type: Spell
-Category: Utility Spell
 
 Description:
-Web is a utility spell available in the live ability table.
+Web is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Can apply statuses: webbed.
+- Targets may resist part or all of the effect with a saving throw.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room, your current opponent in combat.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -24567,22 +23782,18 @@ WORD-OF-PAIN
 
 Word Of Pain
 Type: Spell
-Category: Utility Spell
 
 Description:
-Word Of Pain is a utility spell available in the live ability table.
+Word Of Pain is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Uses standard spell routines from the live spell system.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target no explicit target.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -24590,22 +23801,18 @@ WORD-OF-RECALL
 
 Word Of Recall
 Type: Spell
-Category: Utility Spell
 
 Description:
-Word Of Recall is a utility spell available in the live ability table.
+Word Of Recall is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Uses standard spell routines from the live spell system.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -24613,22 +23820,18 @@ WORD-OF-RECALL-MASS MASS-RECALL RECALL-MASS
 
 Word Of Recall Mass
 Type: Spell
-Category: Summoning Spell
 
 Description:
-Word Of Recall Mass is a summoning spell available in the live ability table.
+Word Of Recall Mass is a spell implemented directly by the current game mechanics.
 
 Effect:
-Summons allies, manipulates portals, or expands battlefield presence through controlled entities.
+- Uses standard spell routines from the live spell system.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target no explicit target.
 
-Tactical Notes:
-Most effective when your group can protect summons and capitalize on added field presence.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
@@ -24675,22 +23878,19 @@ WRATHFIRE
 
 Wrathfire
 Type: Spell
-Category: Utility Spell
 
 Description:
-Wrathfire is a utility spell available in the live ability table.
+Wrathfire is a spell implemented directly by the current game mechanics.
 
 Effect:
-Provides non-damage tactical value such as movement, detection, concealment, or setup control.
+- Deals holy damage.
+- Targets may resist part or all of the effect with a saving throw.
 
 Usage:
-Cast on self, ally, enemy, or room as permitted by spell targeting.
+Target a character in your room, your current opponent in combat.
 
-Tactical Notes:
-Best used proactively to control when and how fights begin.
-
-Limitations:
-Subject to normal casting constraints (position, valid target/context, and resource requirements).
+Practical Notes:
+Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
 
 See also: SPELLS SKILLS
 #0
