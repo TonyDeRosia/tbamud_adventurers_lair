@@ -5,6 +5,15 @@ GENERIC_MARKERS = [
     "available in the live ability table",
     "Source: Live ability table",
     "This help topic is resolved directly from the current in-game ability name.",
+    "provides tactical value",
+    "applies effects",
+    "used as needed",
+    "is a spell implemented directly by the current game mechanics",
+    "is a combat skill defined in the live skill table",
+    "is a mobility skill defined in the live skill table",
+    "is a passive skill defined in the live skill table",
+    "is a detection skill defined in the live skill table",
+    "uses standard spell routines from the live spell system",
 ]
 
 
@@ -53,6 +62,8 @@ def coverage(abilities, by_keyword):
     skills_total = sum(1 for _, typ, _ in abilities if typ == "Skill")
     unresolved = []
     generic = []
+    weak = []
+    duplicates = []
     static = 0
     static_spells = 0
     static_skills = 0
@@ -64,8 +75,27 @@ def coverage(abilities, by_keyword):
         if not matched:
             unresolved.append((name, typ, "missing static topic"))
             continue
+        # Exactly one canonical help block per ability keyword family.
+        unique_entries = []
+        for m in matched:
+            if m not in unique_entries:
+                unique_entries.append(m)
+        if len(unique_entries) > 1:
+            duplicates.append((name, typ, f"multiple help blocks found ({len(unique_entries)})"))
+            continue
+        entry = unique_entries[0]
         if all(entry_is_generic(e) for e in matched):
             generic.append((name, typ, "only generic/static fallback-style text"))
+            continue
+        lower = entry.lower()
+        if "effect:" not in lower or "usage:" not in lower:
+            weak.append((name, typ, "missing explicit Effect or Usage section"))
+            continue
+        effect = lower.split("effect:", 1)[1].split("usage:", 1)[0].strip()
+        usage = lower.split("usage:", 1)[1].strip()
+        if len(effect) < 12 or len(usage) < 10:
+            weak.append((name, typ, "Effect or Usage section is too short/vague"))
+            continue
         else:
             static += 1
             if typ == "Spell":
@@ -81,6 +111,8 @@ def coverage(abilities, by_keyword):
         "static_skills": static_skills,
         "unresolved": unresolved,
         "generic": generic,
+        "weak": weak,
+        "duplicates": duplicates,
     }
 
 
@@ -116,10 +148,12 @@ def main():
     )
     print(f"  unresolved (missing): {len(current['unresolved'])}")
     print(f"  unresolved (generic-only): {len(current['generic'])}")
+    print(f"  unresolved (weak/vague): {len(current['weak'])}")
+    print(f"  duplicate keyword conflicts: {len(current['duplicates'])}")
 
-    if current["unresolved"] or current["generic"]:
+    if current["unresolved"] or current["generic"] or current["weak"] or current["duplicates"]:
         print("\nRemaining unresolved abilities:")
-        for row in current["unresolved"] + current["generic"]:
+        for row in current["unresolved"] + current["generic"] + current["weak"] + current["duplicates"]:
             print(f"  - {row[0]} [{row[1]}]: {row[2]}")
     else:
         print("\nRemaining generic fallback abilities:")

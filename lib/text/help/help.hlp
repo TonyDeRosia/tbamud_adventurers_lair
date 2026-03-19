@@ -6370,7 +6370,7 @@ Abyss Gate
 Type: Spell
 
 Description:
-Abyss Gate is a spell implemented directly by the current game mechanics.
+Abyss Gate is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
 - Can apply statuses: charm, flags.
@@ -6379,7 +6379,7 @@ Usage:
 Target no explicit target.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: no explicit target (self/room effect). Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -6410,7 +6410,7 @@ Acid Blast
 Type: Spell
 
 Description:
-Acid Blast is a spell implemented directly by the current game mechanics.
+Acid Blast is implemented in code with these core mechanics: deals direct spell damage, applies status or stat modifiers.
 
 Effect:
 - Can apply statuses: corroded.
@@ -6420,7 +6420,7 @@ Usage:
 Target a character in your room, your current opponent in combat.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, your current combat target. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -6430,7 +6430,7 @@ Acid Rain
 Type: Spell
 
 Description:
-Acid Rain is a spell implemented directly by the current game mechanics.
+Acid Rain is implemented in code with these core mechanics: mag rooms.
 
 Effect:
 - Creates room effects: acid rain.
@@ -6439,7 +6439,7 @@ Usage:
 Target no explicit target.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: no explicit target (self/room effect). Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -6516,7 +6516,7 @@ Adrenaline Surge
 Type: Spell
 
 Description:
-Adrenaline Surge is a spell implemented directly by the current game mechanics.
+Adrenaline Surge is implemented in code with these core mechanics: applies status or stat modifiers.
 
 Effect:
 - Can apply statuses: adrenaline.
@@ -6525,7 +6525,7 @@ Usage:
 Target self only, a character in your room.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, yourself only. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -6721,7 +6721,7 @@ Animate Dead
 Type: Spell
 
 Description:
-Animate Dead is a spell implemented directly by the current game mechanics.
+Animate Dead is implemented in code with these core mechanics: summons creatures.
 
 Effect:
 - Summons creatures or moves targets.
@@ -6730,7 +6730,7 @@ Usage:
 Target an item in the room.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: an object in your room. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -6740,16 +6740,16 @@ Animate Dead Greater
 Type: Spell
 
 Description:
-Animate Dead Greater is a spell implemented directly by the current game mechanics.
+Animate Dead Greater is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
-- Uses standard spell routines from the live spell system.
+- Core routines: uses spell-specific custom logic.
 
 Usage:
 Target an item in the room.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: an object in your room. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -6765,7 +6765,7 @@ Antimagic Shell
 Type: Spell
 
 Description:
-Antimagic Shell is a spell implemented directly by the current game mechanics.
+Antimagic Shell is implemented in code with these core mechanics: applies status or stat modifiers.
 
 Effect:
 - Can apply statuses: warded.
@@ -6774,7 +6774,7 @@ Usage:
 Target a character in your room.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -6847,7 +6847,7 @@ Arcane Ward
 Type: Spell
 
 Description:
-Arcane Ward is a spell implemented directly by the current game mechanics.
+Arcane Ward is implemented in code with these core mechanics: applies status or stat modifiers.
 
 Effect:
 - Applies magical status effects.
@@ -6856,7 +6856,7 @@ Usage:
 Target self only, a character in your room.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, yourself only. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -6882,16 +6882,16 @@ Arise Greater
 Type: Spell
 
 Description:
-Arise Greater is a spell implemented directly by the current game mechanics.
+Arise Greater is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
-- Uses standard spell routines from the live spell system.
+- Core routines: uses spell-specific custom logic.
 
 Usage:
 Target an item in the room.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: an object in your room. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -6901,7 +6901,7 @@ Armor
 Type: Spell
 
 Description:
-Armor is a spell implemented directly by the current game mechanics.
+Armor is implemented in code with these core mechanics: applies status or stat modifiers.
 
 Effect:
 - Applies magical status effects.
@@ -6910,7 +6910,7 @@ Usage:
 Target a character in your room.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -6972,16 +6972,16 @@ Assassins Intent
 Type: Spell
 
 Description:
-Assassins Intent is a spell implemented directly by the current game mechanics.
+Assassins Intent is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
-- Uses standard spell routines from the live spell system.
+- Core routines: uses spell-specific custom logic.
 
 Usage:
 Target self only.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: yourself only. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -7012,16 +7012,16 @@ Astral Projection
 Type: Spell
 
 Description:
-Astral Projection is a spell implemented directly by the current game mechanics.
+Astral Projection is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
-- Uses standard spell routines from the live spell system.
+- Core routines: uses spell-specific custom logic.
 
 Usage:
 Target a character anywhere in the world.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character anywhere in the world, cannot target yourself. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -7031,16 +7031,16 @@ Astral Smite
 Type: Spell
 
 Description:
-Astral Smite is a spell implemented directly by the current game mechanics.
+Astral Smite is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
-- Uses standard spell routines from the live spell system.
+- Core routines: uses spell-specific custom logic.
 
 Usage:
 Target a character in your room, your current opponent in combat.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, your current combat target, cannot target yourself. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -7256,19 +7256,13 @@ Type: Skill
 Category: Combat Skill
 
 Description:
-Backstab is a combat skill defined in the live skill table.
+Backstab requires a wielded piercing weapon and a non-fighting target in your room. On success it performs a backstab attack through the normal hit system; on failure it deals no damage. Aware awake mobs can detect your attempt and counterattack immediately.
 
 Effect:
-Provides active tactical value through offense, control, survival, or battlefield information.
+Backstab requires a wielded piercing weapon and a non-fighting target in your room. On success it performs a backstab attack through the normal hit system; on failure it deals no damage. Aware awake mobs can detect your attempt and counterattack immediately.
 
 Usage:
-Use command: backstab <target>.
-
-Tactical Notes:
-Use with timing and target priority; do not spend it automatically without a plan.
-
-Limitations:
-Requires valid combat/target context and is subject to normal skill checks.
+Use command: backstab <target>. Target must not already be fighting. Applies a 2-round wait state.
 
 See also: SPELLS SKILLS
 #0
@@ -7301,7 +7295,7 @@ Balefire
 Type: Spell
 
 Description:
-Balefire is a spell implemented directly by the current game mechanics.
+Balefire is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
 - Deals arcane damage.
@@ -7311,7 +7305,7 @@ Usage:
 Target a character in your room, your current opponent in combat.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, your current combat target, cannot target yourself. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -7341,19 +7335,13 @@ Type: Skill
 Category: Combat Skill
 
 Description:
-Bandage is a combat skill defined in the live skill table.
+Bandage only works on a character in your room with negative hit points. On success it stabilizes the target to exactly 0 hit points. On failure it inflicts 2 suffering damage on the target.
 
 Effect:
-Provides active tactical value through offense, control, survival, or battlefield information.
+Bandage only works on a character in your room with negative hit points. On success it stabilizes the target to exactly 0 hit points. On failure it inflicts 2 suffering damage on the target.
 
 Usage:
-Use command: bandage <target>.
-
-Tactical Notes:
-Use with timing and target priority; do not spend it automatically without a plan.
-
-Limitations:
-Requires valid combat/target context and is subject to normal skill checks.
+Use command: bandage <target> while standing. Applies a 2-round wait state.
 
 See also: SPELLS SKILLS
 #0
@@ -7389,7 +7377,7 @@ Barkskin
 Type: Spell
 
 Description:
-Barkskin is a spell implemented directly by the current game mechanics.
+Barkskin is implemented in code with these core mechanics: applies status or stat modifiers.
 
 Effect:
 - Can apply statuses: barkskin.
@@ -7398,7 +7386,7 @@ Usage:
 Target a character in your room.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -7409,19 +7397,13 @@ Type: Skill
 Category: Combat Skill
 
 Description:
-Bash is a combat skill defined in the live skill table.
+Bash spends 15 movement and attempts a skill check against one target in room (or your current opponent). Success deals 1 bash damage, forces the victim to sit, and applies one round of victim lag. Failure deals 0 damage and knocks you into sitting position.
 
 Effect:
-Provides active tactical value through offense, control, survival, or battlefield information.
+Bash spends 15 movement and attempts a skill check against one target in room (or your current opponent). Success deals 1 bash damage, forces the victim to sit, and applies one round of victim lag. Failure deals 0 damage and knocks you into sitting position.
 
 Usage:
-Use command: bash <target>.
-
-Tactical Notes:
-Use with timing and target priority; do not spend it automatically without a plan.
-
-Limitations:
-Requires valid combat/target context and is subject to normal skill checks.
+Use command: bash <target>. Requires a wielded weapon and fails in peaceful rooms.
 
 See also: SPELLS SKILLS
 #0
@@ -7458,16 +7440,16 @@ Black Heart
 Type: Spell
 
 Description:
-Black Heart is a spell implemented directly by the current game mechanics.
+Black Heart is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
-- Uses standard spell routines from the live spell system.
+- Core routines: uses spell-specific custom logic.
 
 Usage:
 Target self only.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: yourself only. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -7508,7 +7490,7 @@ Bless
 Type: Spell
 
 Description:
-Bless is a spell implemented directly by the current game mechanics.
+Bless is implemented in code with these core mechanics: applies status or stat modifiers, alters object properties.
 
 Effect:
 - Applies magical status effects.
@@ -7517,7 +7499,7 @@ Usage:
 Target a character in your room, an item in your inventory.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, an object in your inventory. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -7539,7 +7521,7 @@ Blindness
 Type: Spell
 
 Description:
-Blindness is a spell implemented directly by the current game mechanics.
+Blindness is implemented in code with these core mechanics: applies status or stat modifiers.
 
 Effect:
 - Can apply statuses: blind.
@@ -7549,7 +7531,7 @@ Usage:
 Target a character in your room.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, cannot target yourself. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -7559,16 +7541,16 @@ Blizzard
 Type: Spell
 
 Description:
-Blizzard is a spell implemented directly by the current game mechanics.
+Blizzard is implemented in code with these core mechanics: affects the entire room area.
 
 Effect:
-- Uses standard spell routines from the live spell system.
+- Core routines: affects the entire room area.
 
 Usage:
 Target no explicit target.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: no explicit target (self/room effect). Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -7578,16 +7560,16 @@ Blood Dagger Tempest
 Type: Spell
 
 Description:
-Blood Dagger Tempest is a spell implemented directly by the current game mechanics.
+Blood Dagger Tempest is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
-- Uses standard spell routines from the live spell system.
+- Core routines: uses spell-specific custom logic.
 
 Usage:
 Target no explicit target.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: no explicit target (self/room effect). Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -7597,7 +7579,7 @@ Bloodlust
 Type: Spell
 
 Description:
-Bloodlust is a spell implemented directly by the current game mechanics.
+Bloodlust is implemented in code with these core mechanics: applies status or stat modifiers.
 
 Effect:
 - Can apply statuses: bloodlust.
@@ -7606,7 +7588,7 @@ Usage:
 Target self only, a character in your room.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, yourself only. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -7639,16 +7621,16 @@ Bone Prison
 Type: Spell
 
 Description:
-Bone Prison is a spell implemented directly by the current game mechanics.
+Bone Prison is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
-- Uses standard spell routines from the live spell system.
+- Core routines: uses spell-specific custom logic.
 
 Usage:
 Target a character in your room, your current opponent in combat.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, your current combat target, cannot target yourself. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -7903,7 +7885,7 @@ Burning Hands
 Type: Spell
 
 Description:
-Burning Hands is a spell implemented directly by the current game mechanics.
+Burning Hands is implemented in code with these core mechanics: deals direct spell damage.
 
 Effect:
 - Deals spell damage.
@@ -7912,7 +7894,7 @@ Usage:
 Target a character in your room, your current opponent in combat.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, your current combat target. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -7988,16 +7970,16 @@ Call Bears
 Type: Spell
 
 Description:
-Call Bears is a spell implemented directly by the current game mechanics.
+Call Bears is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
-- Uses standard spell routines from the live spell system.
+- Core routines: uses spell-specific custom logic.
 
 Usage:
 Target no explicit target.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: no explicit target (self/room effect). Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -8007,16 +7989,16 @@ Call Greater Thunder
 Type: Spell
 
 Description:
-Call Greater Thunder is a spell implemented directly by the current game mechanics.
+Call Greater Thunder is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
-- Uses standard spell routines from the live spell system.
+- Core routines: uses spell-specific custom logic.
 
 Usage:
 Target a character in your room, your current opponent in combat.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, your current combat target, cannot target yourself. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -8026,7 +8008,7 @@ Call Lightning
 Type: Spell
 
 Description:
-Call Lightning is a spell implemented directly by the current game mechanics.
+Call Lightning is implemented in code with these core mechanics: deals direct spell damage.
 
 Effect:
 - Deals spell damage.
@@ -8035,7 +8017,7 @@ Usage:
 Target a character in your room, your current opponent in combat.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, your current combat target. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -8045,16 +8027,16 @@ Call Shadow Legion
 Type: Spell
 
 Description:
-Call Shadow Legion is a spell implemented directly by the current game mechanics.
+Call Shadow Legion is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
-- Uses standard spell routines from the live spell system.
+- Core routines: uses spell-specific custom logic.
 
 Usage:
 Target no explicit target.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: no explicit target (self/room effect). Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -8064,16 +8046,16 @@ Call Wolves
 Type: Spell
 
 Description:
-Call Wolves is a spell implemented directly by the current game mechanics.
+Call Wolves is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
-- Uses standard spell routines from the live spell system.
+- Core routines: uses spell-specific custom logic.
 
 Usage:
 Target no explicit target.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: no explicit target (self/room effect). Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -8092,7 +8074,7 @@ Cancellation
 Type: Spell
 
 Description:
-Cancellation is a spell implemented directly by the current game mechanics.
+Cancellation is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
 - Targets may resist part or all of the effect with a saving throw.
@@ -8101,7 +8083,7 @@ Usage:
 Target a character in your room, your current opponent in combat.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, your current combat target, cannot target yourself. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -8302,7 +8284,7 @@ Celestial Smite
 Type: Spell
 
 Description:
-Celestial Smite is a spell implemented directly by the current game mechanics.
+Celestial Smite is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
 - Deals holy damage.
@@ -8312,7 +8294,7 @@ Usage:
 Target a character in your room, your current opponent in combat.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, your current combat target, cannot target yourself. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -8323,19 +8305,13 @@ Type: Skill
 Category: Passive Skill
 
 Description:
-Chain Assault is a passive skill defined in the live skill table.
+Chain Assault is implemented as a trained skill value used directly by game code.
 
 Effect:
-Provides always-on benefits after learning, improving sustained combat performance.
+This skill has no separate spell payload; its learned percentage is read by combat/control formulas where chain assault is checked.
 
 Usage:
-Passive and always active once learned.
-
-Tactical Notes:
-High long-term value because passive gains compound across all encounters.
-
-Limitations:
-No direct activation command; effectiveness depends on the systems using this passive.
+There is no dedicated cast target. Train the skill and use its related command or trigger context; the effect is automatic when that check runs.
 
 See also: SPELLS SKILLS
 #0
@@ -8345,16 +8321,16 @@ Chain Dragon Lightning
 Type: Spell
 
 Description:
-Chain Dragon Lightning is a spell implemented directly by the current game mechanics.
+Chain Dragon Lightning is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
-- Uses standard spell routines from the live spell system.
+- Core routines: uses spell-specific custom logic.
 
 Usage:
 Target a character in your room, your current opponent in combat.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, your current combat target, cannot target yourself. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -8364,16 +8340,16 @@ Chain Of Subjugation
 Type: Spell
 
 Description:
-Chain Of Subjugation is a spell implemented directly by the current game mechanics.
+Chain Of Subjugation is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
-- Uses standard spell routines from the live spell system.
+- Core routines: uses spell-specific custom logic.
 
 Usage:
 Target a character in your room, your current opponent in combat.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, your current combat target, cannot target yourself. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -8515,7 +8491,7 @@ Charm Person
 Type: Spell
 
 Description:
-Charm Person is a spell implemented directly by the current game mechanics.
+Charm Person is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
 - Can apply statuses: charm, flagged, sanctuary.
@@ -8525,7 +8501,7 @@ Usage:
 Target a character in your room.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, cannot target yourself. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -8560,7 +8536,7 @@ Chill Touch
 Type: Spell
 
 Description:
-Chill Touch is a spell implemented directly by the current game mechanics.
+Chill Touch is implemented in code with these core mechanics: deals direct spell damage, applies status or stat modifiers.
 
 Effect:
 - Targets may resist part or all of the effect with a saving throw.
@@ -8569,7 +8545,7 @@ Usage:
 Target a character in your room, your current opponent in combat.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, your current combat target. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -8587,16 +8563,16 @@ Chrono Shift
 Type: Spell
 
 Description:
-Chrono Shift is a spell implemented directly by the current game mechanics.
+Chrono Shift is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
-- Uses standard spell routines from the live spell system.
+- Core routines: uses spell-specific custom logic.
 
 Usage:
 Target self only.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: yourself only. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -8652,7 +8628,7 @@ Clarity
 Type: Spell
 
 Description:
-Clarity is a spell implemented directly by the current game mechanics.
+Clarity is implemented in code with these core mechanics: applies status or stat modifiers.
 
 Effect:
 - Can apply statuses: clarity.
@@ -8661,7 +8637,7 @@ Usage:
 Target a character in your room.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -8681,7 +8657,7 @@ Cleanse
 Type: Spell
 
 Description:
-Cleanse is a spell implemented directly by the current game mechanics.
+Cleanse is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
 - Can apply statuses: arcane leak, blind, corroded, curse, fearful, hexed.
@@ -8690,7 +8666,7 @@ Usage:
 Target a character in your room.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -8719,7 +8695,7 @@ Clone
 Type: Spell
 
 Description:
-Clone is a spell implemented directly by the current game mechanics.
+Clone is implemented in code with these core mechanics: summons creatures.
 
 Effect:
 - Summons creatures or moves targets.
@@ -8728,7 +8704,7 @@ Usage:
 Target no explicit target.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: no explicit target (self/room effect). Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -8772,7 +8748,7 @@ Color Spray
 Type: Spell
 
 Description:
-Color Spray is a spell implemented directly by the current game mechanics.
+Color Spray is implemented in code with these core mechanics: deals direct spell damage.
 
 Effect:
 - Deals spell damage.
@@ -8781,7 +8757,7 @@ Usage:
 Target a character in your room, your current opponent in combat.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, your current combat target. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -8882,7 +8858,7 @@ Confusion
 Type: Spell
 
 Description:
-Confusion is a spell implemented directly by the current game mechanics.
+Confusion is implemented in code with these core mechanics: applies status or stat modifiers.
 
 Effect:
 - Targets may resist part or all of the effect with a saving throw.
@@ -8891,7 +8867,7 @@ Usage:
 Target a character in your room, your current opponent in combat.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, your current combat target, cannot target yourself. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -8901,16 +8877,16 @@ Conjure Elemental
 Type: Spell
 
 Description:
-Conjure Elemental is a spell implemented directly by the current game mechanics.
+Conjure Elemental is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
-- Uses standard spell routines from the live spell system.
+- Core routines: uses spell-specific custom logic.
 
 Usage:
 Target no explicit target.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: no explicit target (self/room effect). Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -8920,7 +8896,7 @@ Consecrate
 Type: Spell
 
 Description:
-Consecrate is a spell implemented directly by the current game mechanics.
+Consecrate is implemented in code with these core mechanics: mag rooms.
 
 Effect:
 - Creates room effects: consecrate.
@@ -8929,7 +8905,7 @@ Usage:
 Target no explicit target.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: no explicit target (self/room effect). Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -8996,16 +8972,16 @@ Control Weather
 Type: Spell
 
 Description:
-Control Weather is a spell implemented directly by the current game mechanics.
+Control Weather is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
-- Uses standard spell routines from the live spell system.
+- Core routines: uses spell-specific custom logic.
 
 Usage:
 Target no explicit target.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: no explicit target (self/room effect). Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -9027,7 +9003,7 @@ Corruption
 Type: Spell
 
 Description:
-Corruption is a spell implemented directly by the current game mechanics.
+Corruption is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
 - Deals direct spell damage.
@@ -9036,7 +9012,7 @@ Usage:
 Target a character in your room, your current opponent in combat.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, your current combat target. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -9046,7 +9022,7 @@ Counterspell
 Type: Spell
 
 Description:
-Counterspell is a spell implemented directly by the current game mechanics.
+Counterspell is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
 - Can apply statuses: spelllock.
@@ -9055,7 +9031,7 @@ Usage:
 Target a character in your room, your current opponent in combat.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, your current combat target, cannot target yourself. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -9072,7 +9048,7 @@ Create Food
 Type: Spell
 
 Description:
-Create Food is a spell implemented directly by the current game mechanics.
+Create Food is implemented in code with these core mechanics: creates items or consumables.
 
 Effect:
 - Creates objects.
@@ -9081,7 +9057,7 @@ Usage:
 Target no explicit target.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: no explicit target (self/room effect). Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -9091,16 +9067,16 @@ Create Water
 Type: Spell
 
 Description:
-Create Water is a spell implemented directly by the current game mechanics.
+Create Water is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
-- Uses standard spell routines from the live spell system.
+- Core routines: uses spell-specific custom logic.
 
 Usage:
 Target an item in your inventory.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: an object in your inventory, an equipped object. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -9110,16 +9086,16 @@ Cry Of The Banshee
 Type: Spell
 
 Description:
-Cry Of The Banshee is a spell implemented directly by the current game mechanics.
+Cry Of The Banshee is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
-- Uses standard spell routines from the live spell system.
+- Core routines: uses spell-specific custom logic.
 
 Usage:
 Target no explicit target.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: no explicit target (self/room effect). Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -9129,16 +9105,16 @@ Crystal Body
 Type: Spell
 
 Description:
-Crystal Body is a spell implemented directly by the current game mechanics.
+Crystal Body is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
-- Uses standard spell routines from the live spell system.
+- Core routines: uses spell-specific custom logic.
 
 Usage:
 Target self only.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: yourself only. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -9148,7 +9124,7 @@ Cure Blind
 Type: Spell
 
 Description:
-Cure Blind is a spell implemented directly by the current game mechanics.
+Cure Blind is implemented in code with these core mechanics: removes existing magical effects.
 
 Effect:
 - Removes magical ailments or curses.
@@ -9157,7 +9133,7 @@ Usage:
 Target a character in your room.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -9167,7 +9143,7 @@ Cure Critic
 Type: Spell
 
 Description:
-Cure Critic is a spell implemented directly by the current game mechanics.
+Cure Critic is implemented in code with these core mechanics: restores or drains hit/mana/move points.
 
 Effect:
 - Restores or adjusts hit points.
@@ -9176,7 +9152,7 @@ Usage:
 Target a character in your room.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -9186,7 +9162,7 @@ Cure Light
 Type: Spell
 
 Description:
-Cure Light is a spell implemented directly by the current game mechanics.
+Cure Light is implemented in code with these core mechanics: restores or drains hit/mana/move points.
 
 Effect:
 - Restores or adjusts hit points.
@@ -9195,7 +9171,7 @@ Usage:
 Target a character in your room.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -9205,7 +9181,7 @@ Curse
 Type: Spell
 
 Description:
-Curse is a spell implemented directly by the current game mechanics.
+Curse is implemented in code with these core mechanics: applies status or stat modifiers, alters object properties.
 
 Effect:
 - Can apply statuses: curse.
@@ -9215,7 +9191,7 @@ Usage:
 Target a character in your room, an item in your inventory.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, an object in your inventory. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -9265,16 +9241,16 @@ Dagger Rain
 Type: Spell
 
 Description:
-Dagger Rain is a spell implemented directly by the current game mechanics.
+Dagger Rain is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
-- Uses standard spell routines from the live spell system.
+- Core routines: uses spell-specific custom logic.
 
 Usage:
 Target a character in your room, your current opponent in combat.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, your current combat target, cannot target yourself. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -9293,7 +9269,7 @@ Dark Aegis
 Type: Spell
 
 Description:
-Dark Aegis is a spell implemented directly by the current game mechanics.
+Dark Aegis is implemented in code with these core mechanics: applies status or stat modifiers.
 
 Effect:
 - Can apply statuses: sanctuary.
@@ -9302,7 +9278,7 @@ Usage:
 Target self only, a character in your room.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, yourself only. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -9312,16 +9288,16 @@ Dark Rebuke
 Type: Spell
 
 Description:
-Dark Rebuke is a spell implemented directly by the current game mechanics.
+Dark Rebuke is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
-- Uses standard spell routines from the live spell system.
+- Core routines: uses spell-specific custom logic.
 
 Usage:
 Target a character in your room, your current opponent in combat.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, your current combat target, cannot target yourself. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -9331,16 +9307,16 @@ Darkness
 Type: Spell
 
 Description:
-Darkness is a spell implemented directly by the current game mechanics.
+Darkness is implemented in code with these core mechanics: mag rooms.
 
 Effect:
-- Uses standard spell routines from the live spell system.
+- Core routines: mag rooms.
 
 Usage:
 Target no explicit target.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: no explicit target (self/room effect). Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -9369,7 +9345,7 @@ Death Knell
 Type: Spell
 
 Description:
-Death Knell is a spell implemented directly by the current game mechanics.
+Death Knell is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
 - Deals necrotic damage.
@@ -9379,7 +9355,7 @@ Usage:
 Target a character in your room, your current opponent in combat.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, your current combat target, cannot target yourself. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -9474,16 +9450,16 @@ Despair Aura
 Type: Spell
 
 Description:
-Despair Aura is a spell implemented directly by the current game mechanics.
+Despair Aura is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
-- Uses standard spell routines from the live spell system.
+- Core routines: uses spell-specific custom logic.
 
 Usage:
 Target self only.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: yourself only. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -9526,7 +9502,7 @@ Detect Alignment
 Type: Spell
 
 Description:
-Detect Alignment is a spell implemented directly by the current game mechanics.
+Detect Alignment is implemented in code with these core mechanics: applies status or stat modifiers.
 
 Effect:
 - Can apply statuses: detect align.
@@ -9535,7 +9511,7 @@ Usage:
 Target self only, a character in your room.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, yourself only. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -9545,7 +9521,7 @@ Detect Invisibility
 Type: Spell
 
 Description:
-Detect Invisibility is a spell implemented directly by the current game mechanics.
+Detect Invisibility is implemented in code with these core mechanics: applies status or stat modifiers.
 
 Effect:
 - Can apply statuses: detect invis.
@@ -9554,7 +9530,7 @@ Usage:
 Target self only, a character in your room.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, yourself only. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -9564,16 +9540,16 @@ Detect Kill Intent
 Type: Spell
 
 Description:
-Detect Kill Intent is a spell implemented directly by the current game mechanics.
+Detect Kill Intent is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
-- Uses standard spell routines from the live spell system.
+- Core routines: uses spell-specific custom logic.
 
 Usage:
 Target self only.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: yourself only. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -9583,7 +9559,7 @@ Detect Magic
 Type: Spell
 
 Description:
-Detect Magic is a spell implemented directly by the current game mechanics.
+Detect Magic is implemented in code with these core mechanics: applies status or stat modifiers.
 
 Effect:
 - Can apply statuses: detect magic.
@@ -9592,7 +9568,7 @@ Usage:
 Target self only, a character in your room.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, yourself only. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -9602,7 +9578,7 @@ Detect Poison
 Type: Spell
 
 Description:
-Detect Poison is a spell implemented directly by the current game mechanics.
+Detect Poison is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
 - Can apply statuses: flagged, poison.
@@ -9611,7 +9587,7 @@ Usage:
 Target a character in your room, an item in your inventory, an item in the room.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, an object in your inventory, an object in your room. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -9630,7 +9606,7 @@ Devour Soul
 Type: Spell
 
 Description:
-Devour Soul is a spell implemented directly by the current game mechanics.
+Devour Soul is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
 - Deals necrotic damage.
@@ -9640,7 +9616,7 @@ Usage:
 Target a character in your room, your current opponent in combat.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, your current combat target. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -9733,16 +9709,16 @@ Dimensional Lock
 Type: Spell
 
 Description:
-Dimensional Lock is a spell implemented directly by the current game mechanics.
+Dimensional Lock is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
-- Uses standard spell routines from the live spell system.
+- Core routines: uses spell-specific custom logic.
 
 Usage:
 Target no explicit target.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: no explicit target (self/room effect). Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -9780,7 +9756,7 @@ Disintegrate
 Type: Spell
 
 Description:
-Disintegrate is a spell implemented directly by the current game mechanics.
+Disintegrate is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
 - Deals arcane damage.
@@ -9790,7 +9766,7 @@ Usage:
 Target a character in your room, your current opponent in combat.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, your current combat target, cannot target yourself. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -9800,7 +9776,7 @@ Dispel Evil
 Type: Spell
 
 Description:
-Dispel Evil is a spell implemented directly by the current game mechanics.
+Dispel Evil is implemented in code with these core mechanics: deals direct spell damage.
 
 Effect:
 - Deals spell damage.
@@ -9809,7 +9785,7 @@ Usage:
 Target a character in your room, your current opponent in combat.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, your current combat target. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -9819,7 +9795,7 @@ Dispel Good
 Type: Spell
 
 Description:
-Dispel Good is a spell implemented directly by the current game mechanics.
+Dispel Good is implemented in code with these core mechanics: deals direct spell damage.
 
 Effect:
 - Deals spell damage.
@@ -9828,7 +9804,7 @@ Usage:
 Target a character in your room, your current opponent in combat.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, your current combat target. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -9838,7 +9814,7 @@ Disrupt
 Type: Spell
 
 Description:
-Disrupt is a spell implemented directly by the current game mechanics.
+Disrupt is implemented in code with these core mechanics: deals direct spell damage, applies status or stat modifiers.
 
 Effect:
 - Can apply statuses: spelllock.
@@ -9847,7 +9823,7 @@ Usage:
 Target a character in your room, your current opponent in combat.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, your current combat target, cannot target yourself. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -9857,7 +9833,7 @@ Divine Bulwark
 Type: Spell
 
 Description:
-Divine Bulwark is a spell implemented directly by the current game mechanics.
+Divine Bulwark is implemented in code with these core mechanics: applies status or stat modifiers.
 
 Effect:
 - Applies magical status effects.
@@ -9866,7 +9842,7 @@ Usage:
 Target self only, a character in your room.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, yourself only. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -9894,16 +9870,16 @@ Dominion Of Shadows
 Type: Spell
 
 Description:
-Dominion Of Shadows is a spell implemented directly by the current game mechanics.
+Dominion Of Shadows is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
-- Uses standard spell routines from the live spell system.
+- Core routines: uses spell-specific custom logic.
 
 Usage:
 Target self only.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: yourself only. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -9927,16 +9903,16 @@ Dragon Lightning
 Type: Spell
 
 Description:
-Dragon Lightning is a spell implemented directly by the current game mechanics.
+Dragon Lightning is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
-- Uses standard spell routines from the live spell system.
+- Core routines: uses spell-specific custom logic.
 
 Usage:
 Target a character in your room, your current opponent in combat.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, your current combat target, cannot target yourself. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -9970,19 +9946,13 @@ Type: Skill
 Category: Passive Skill
 
 Description:
-Dread Dominion is a passive skill defined in the live skill table.
+Dread Dominion is implemented as a trained skill value used directly by game code.
 
 Effect:
-Provides always-on benefits after learning, improving sustained combat performance.
+This skill has no separate spell payload; its learned percentage is read by combat/control formulas where dread dominion is checked.
 
 Usage:
-Passive and always active once learned.
-
-Tactical Notes:
-High long-term value because passive gains compound across all encounters.
-
-Limitations:
-No direct activation command; effectiveness depends on the systems using this passive.
+There is no dedicated cast target. Train the skill and use its related command or trigger context; the effect is automatic when that check runs.
 
 See also: SPELLS SKILLS
 #0
@@ -10087,16 +10057,16 @@ Earthquake
 Type: Spell
 
 Description:
-Earthquake is a spell implemented directly by the current game mechanics.
+Earthquake is implemented in code with these core mechanics: affects the entire room area.
 
 Effect:
-- Uses standard spell routines from the live spell system.
+- Core routines: affects the entire room area.
 
 Usage:
 Target no explicit target.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: no explicit target (self/room effect). Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -10155,7 +10125,7 @@ Elemental Ward Acid
 Type: Spell
 
 Description:
-Elemental Ward Acid is a spell implemented directly by the current game mechanics.
+Elemental Ward Acid is implemented in code with these core mechanics: applies status or stat modifiers.
 
 Effect:
 - Can apply statuses: elemental ward acid.
@@ -10164,7 +10134,7 @@ Usage:
 Target a character in your room.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -10174,7 +10144,7 @@ Elemental Ward Cold
 Type: Spell
 
 Description:
-Elemental Ward Cold is a spell implemented directly by the current game mechanics.
+Elemental Ward Cold is implemented in code with these core mechanics: applies status or stat modifiers.
 
 Effect:
 - Can apply statuses: elemental ward cold.
@@ -10183,7 +10153,7 @@ Usage:
 Target a character in your room.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -10193,7 +10163,7 @@ Elemental Ward Fire
 Type: Spell
 
 Description:
-Elemental Ward Fire is a spell implemented directly by the current game mechanics.
+Elemental Ward Fire is implemented in code with these core mechanics: applies status or stat modifiers.
 
 Effect:
 - Can apply statuses: elemental ward fire.
@@ -10202,7 +10172,7 @@ Usage:
 Target a character in your room.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -10212,7 +10182,7 @@ Elemental Ward Lightning
 Type: Spell
 
 Description:
-Elemental Ward Lightning is a spell implemented directly by the current game mechanics.
+Elemental Ward Lightning is implemented in code with these core mechanics: applies status or stat modifiers.
 
 Effect:
 - Can apply statuses: elemental ward lightning.
@@ -10221,7 +10191,7 @@ Usage:
 Target a character in your room.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -10273,16 +10243,16 @@ Enchant Weapon
 Type: Spell
 
 Description:
-Enchant Weapon is a spell implemented directly by the current game mechanics.
+Enchant Weapon is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
-- Uses standard spell routines from the live spell system.
+- Core routines: uses spell-specific custom logic.
 
 Usage:
 Target an item in your inventory.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: an object in your inventory. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -10292,7 +10262,7 @@ Enchanters Focus
 Type: Spell
 
 Description:
-Enchanters Focus is a spell implemented directly by the current game mechanics.
+Enchanters Focus is implemented in code with these core mechanics: applies status or stat modifiers.
 
 Effect:
 - Can apply statuses: empowered.
@@ -10301,7 +10271,7 @@ Usage:
 Target self only, a character in your room.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, yourself only. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -10311,7 +10281,7 @@ Energy Drain
 Type: Spell
 
 Description:
-Energy Drain is a spell implemented directly by the current game mechanics.
+Energy Drain is implemented in code with these core mechanics: deals direct spell damage, uses spell-specific custom logic.
 
 Effect:
 - Can apply statuses: arcane leak.
@@ -10321,7 +10291,7 @@ Usage:
 Target a character in your room, your current opponent in combat.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, your current combat target. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -10331,7 +10301,7 @@ Enfeeblement
 Type: Spell
 
 Description:
-Enfeeblement is a spell implemented directly by the current game mechanics.
+Enfeeblement is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
 - Targets may resist part or all of the effect with a saving throw.
@@ -10340,7 +10310,7 @@ Usage:
 Target a character in your room, your current opponent in combat.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, your current combat target, cannot target yourself. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -10458,16 +10428,16 @@ Ethereal Jaunt
 Type: Spell
 
 Description:
-Ethereal Jaunt is a spell implemented directly by the current game mechanics.
+Ethereal Jaunt is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
-- Uses standard spell routines from the live spell system.
+- Core routines: uses spell-specific custom logic.
 
 Usage:
 Target no explicit target.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: no explicit target (self/room effect). Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -10496,7 +10466,7 @@ Evasion
 Type: Spell
 
 Description:
-Evasion is a spell implemented directly by the current game mechanics.
+Evasion is implemented in code with these core mechanics: applies status or stat modifiers.
 
 Effect:
 - Applies magical status effects.
@@ -10505,7 +10475,7 @@ Usage:
 Target self only, a character in your room.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, yourself only. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -10568,16 +10538,16 @@ Execution Mark
 Type: Spell
 
 Description:
-Execution Mark is a spell implemented directly by the current game mechanics.
+Execution Mark is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
-- Uses standard spell routines from the live spell system.
+- Core routines: uses spell-specific custom logic.
 
 Usage:
 Target a character in your room, your current opponent in combat.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, your current combat target, cannot target yourself. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -10693,16 +10663,16 @@ Fallen Down
 Type: Spell
 
 Description:
-Fallen Down is a spell implemented directly by the current game mechanics.
+Fallen Down is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
-- Uses standard spell routines from the live spell system.
+- Core routines: uses spell-specific custom logic.
 
 Usage:
 Target no explicit target.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: no explicit target (self/room effect). Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -10844,16 +10814,16 @@ Fatal Strike
 Type: Spell
 
 Description:
-Fatal Strike is a spell implemented directly by the current game mechanics.
+Fatal Strike is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
-- Uses standard spell routines from the live spell system.
+- Core routines: uses spell-specific custom logic.
 
 Usage:
 Target a character in your room, your current opponent in combat.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, your current combat target, cannot target yourself. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -10863,7 +10833,7 @@ Fear
 Type: Spell
 
 Description:
-Fear is a spell implemented directly by the current game mechanics.
+Fear is implemented in code with these core mechanics: applies status or stat modifiers.
 
 Effect:
 - Can apply statuses: fearful.
@@ -10873,7 +10843,7 @@ Usage:
 Target a character in your room, your current opponent in combat.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, your current combat target, cannot target yourself. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -10933,7 +10903,7 @@ Finger Of Death
 Type: Spell
 
 Description:
-Finger Of Death is a spell implemented directly by the current game mechanics.
+Finger Of Death is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
 - Deals necrotic damage.
@@ -10943,7 +10913,7 @@ Usage:
 Target a character in your room, your current opponent in combat.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, your current combat target, cannot target yourself. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -10953,7 +10923,7 @@ Fireball
 Type: Spell
 
 Description:
-Fireball is a spell implemented directly by the current game mechanics.
+Fireball is implemented in code with these core mechanics: deals direct spell damage.
 
 Effect:
 - Deals spell damage.
@@ -10962,7 +10932,7 @@ Usage:
 Target a character in your room, your current opponent in combat.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, your current combat target. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -10972,7 +10942,7 @@ Firebolt
 Type: Spell
 
 Description:
-Firebolt is a spell implemented directly by the current game mechanics.
+Firebolt is implemented in code with these core mechanics: deals direct spell damage.
 
 Effect:
 - Deals spell damage.
@@ -10981,7 +10951,7 @@ Usage:
 Target a character in your room, your current opponent in combat.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, your current combat target. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -11028,7 +10998,7 @@ Flame Arrow
 Type: Spell
 
 Description:
-Flame Arrow is a spell implemented directly by the current game mechanics.
+Flame Arrow is implemented in code with these core mechanics: deals direct spell damage, applies status or stat modifiers.
 
 Effect:
 - Can apply statuses: burning.
@@ -11037,7 +11007,7 @@ Usage:
 Target a character in your room, your current opponent in combat.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, your current combat target. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -11061,7 +11031,7 @@ Fly
 Type: Spell
 
 Description:
-Fly is a spell implemented directly by the current game mechanics.
+Fly is implemented in code with these core mechanics: applies status or stat modifiers.
 
 Effect:
 - Can apply statuses: flying.
@@ -11070,7 +11040,7 @@ Usage:
 Target a character in your room.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -11107,16 +11077,16 @@ Force Grasp
 Type: Spell
 
 Description:
-Force Grasp is a spell implemented directly by the current game mechanics.
+Force Grasp is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
-- Uses standard spell routines from the live spell system.
+- Core routines: uses spell-specific custom logic.
 
 Usage:
 Target a character in your room, your current opponent in combat.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, your current combat target, cannot target yourself. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -11186,16 +11156,16 @@ Frost Nova
 Type: Spell
 
 Description:
-Frost Nova is a spell implemented directly by the current game mechanics.
+Frost Nova is implemented in code with these core mechanics: affects the entire room area.
 
 Effect:
-- Uses standard spell routines from the live spell system.
+- Core routines: affects the entire room area.
 
 Usage:
 Target no explicit target.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: no explicit target (self/room effect). Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -11205,7 +11175,7 @@ Frostbite
 Type: Spell
 
 Description:
-Frostbite is a spell implemented directly by the current game mechanics.
+Frostbite is implemented in code with these core mechanics: deals direct spell damage, applies status or stat modifiers.
 
 Effect:
 - Can apply statuses: frozen.
@@ -11215,7 +11185,7 @@ Usage:
 Target a character in your room, your current opponent in combat.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, your current combat target. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -11239,16 +11209,16 @@ Gate
 Type: Spell
 
 Description:
-Gate is a spell implemented directly by the current game mechanics.
+Gate is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
-- Uses standard spell routines from the live spell system.
+- Core routines: uses spell-specific custom logic.
 
 Usage:
 Target no explicit target.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: no explicit target (self/room effect). Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -11319,7 +11289,7 @@ Giant Strength
 Type: Spell
 
 Description:
-Giant Strength is a spell implemented directly by the current game mechanics.
+Giant Strength is implemented in code with these core mechanics: applies status or stat modifiers.
 
 Effect:
 - Applies magical status effects.
@@ -11328,7 +11298,7 @@ Usage:
 Target a character in your room.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -11451,16 +11421,16 @@ Grasp Heart
 Type: Spell
 
 Description:
-Grasp Heart is a spell implemented directly by the current game mechanics.
+Grasp Heart is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
-- Uses standard spell routines from the live spell system.
+- Core routines: uses spell-specific custom logic.
 
 Usage:
 Target a character in your room, your current opponent in combat.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, your current combat target, cannot target yourself. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -11470,16 +11440,16 @@ Gravity Maelstrom
 Type: Spell
 
 Description:
-Gravity Maelstrom is a spell implemented directly by the current game mechanics.
+Gravity Maelstrom is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
-- Uses standard spell routines from the live spell system.
+- Core routines: uses spell-specific custom logic.
 
 Usage:
 Target a character in your room, your current opponent in combat.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, your current combat target, cannot target yourself. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -11489,7 +11459,7 @@ Gravity Well
 Type: Spell
 
 Description:
-Gravity Well is a spell implemented directly by the current game mechanics.
+Gravity Well is implemented in code with these core mechanics: affects the entire room area, mag rooms.
 
 Effect:
 - Creates room effects: gravity well.
@@ -11498,7 +11468,7 @@ Usage:
 Target no explicit target.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: no explicit target (self/room effect). Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -11508,16 +11478,16 @@ Greater Fireball
 Type: Spell
 
 Description:
-Greater Fireball is a spell implemented directly by the current game mechanics.
+Greater Fireball is implemented in code with these core mechanics: affects the entire room area.
 
 Effect:
-- Uses standard spell routines from the live spell system.
+- Core routines: affects the entire room area.
 
 Usage:
 Target no explicit target.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: no explicit target (self/room effect). Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -11527,7 +11497,7 @@ Greater Heal
 Type: Spell
 
 Description:
-Greater Heal is a spell implemented directly by the current game mechanics.
+Greater Heal is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
 - Can apply statuses: blind, curse, poison.
@@ -11536,7 +11506,7 @@ Usage:
 Target a character in your room.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -11546,16 +11516,16 @@ Greater Magic Seal
 Type: Spell
 
 Description:
-Greater Magic Seal is a spell implemented directly by the current game mechanics.
+Greater Magic Seal is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
-- Uses standard spell routines from the live spell system.
+- Core routines: uses spell-specific custom logic.
 
 Usage:
 Target a character in your room, your current opponent in combat.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, your current combat target, cannot target yourself. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -11565,16 +11535,16 @@ Greater Rejection
 Type: Spell
 
 Description:
-Greater Rejection is a spell implemented directly by the current game mechanics.
+Greater Rejection is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
-- Uses standard spell routines from the live spell system.
+- Core routines: uses spell-specific custom logic.
 
 Usage:
 Target a character in your room, your current opponent in combat.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, your current combat target, cannot target yourself. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -11584,16 +11554,16 @@ Greater Teleportation
 Type: Spell
 
 Description:
-Greater Teleportation is a spell implemented directly by the current game mechanics.
+Greater Teleportation is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
-- Uses standard spell routines from the live spell system.
+- Core routines: uses spell-specific custom logic.
 
 Usage:
 Target a character anywhere in the world.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character anywhere in the world, cannot target yourself. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -11665,16 +11635,16 @@ Group Armor
 Type: Spell
 
 Description:
-Group Armor is a spell implemented directly by the current game mechanics.
+Group Armor is implemented in code with these core mechanics: affects your grouped allies.
 
 Effect:
-- Uses standard spell routines from the live spell system.
+- Core routines: affects your grouped allies.
 
 Usage:
 Target no explicit target.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: no explicit target (self/room effect). Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -11684,16 +11654,16 @@ Group Heal
 Type: Spell
 
 Description:
-Group Heal is a spell implemented directly by the current game mechanics.
+Group Heal is implemented in code with these core mechanics: affects your grouped allies.
 
 Effect:
-- Uses standard spell routines from the live spell system.
+- Core routines: affects your grouped allies.
 
 Usage:
 Target no explicit target.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: no explicit target (self/room effect). Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -11703,16 +11673,16 @@ Group Recall
 Type: Spell
 
 Description:
-Group Recall is a spell implemented directly by the current game mechanics.
+Group Recall is implemented in code with these core mechanics: affects your grouped allies.
 
 Effect:
-- Uses standard spell routines from the live spell system.
+- Core routines: affects your grouped allies.
 
 Usage:
 Target no explicit target.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: no explicit target (self/room effect). Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -11762,7 +11732,7 @@ Hammer Of God
 Type: Spell
 
 Description:
-Hammer Of God is a spell implemented directly by the current game mechanics.
+Hammer Of God is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
 - Deals holy damage.
@@ -11773,7 +11743,7 @@ Usage:
 Target a character in your room, your current opponent in combat.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, your current combat target, cannot target yourself. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -11806,7 +11776,7 @@ Harm
 Type: Spell
 
 Description:
-Harm is a spell implemented directly by the current game mechanics.
+Harm is implemented in code with these core mechanics: deals direct spell damage.
 
 Effect:
 - Deals spell damage.
@@ -11815,7 +11785,7 @@ Usage:
 Target a character in your room, your current opponent in combat.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, your current combat target. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -11865,7 +11835,7 @@ Heal
 Type: Spell
 
 Description:
-Heal is a spell implemented directly by the current game mechanics.
+Heal is implemented in code with these core mechanics: restores or drains hit/mana/move points, removes existing magical effects.
 
 Effect:
 - Restores or adjusts hit points. Removes magical ailments or curses.
@@ -11874,7 +11844,7 @@ Usage:
 Target a character in your room.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -11912,16 +11882,16 @@ Hell Flame
 Type: Spell
 
 Description:
-Hell Flame is a spell implemented directly by the current game mechanics.
+Hell Flame is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
-- Uses standard spell routines from the live spell system.
+- Core routines: uses spell-specific custom logic.
 
 Usage:
 Target a character in your room, your current opponent in combat.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, your current combat target, cannot target yourself. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -11931,7 +11901,7 @@ Hellfire
 Type: Spell
 
 Description:
-Hellfire is a spell implemented directly by the current game mechanics.
+Hellfire is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
 - Deals fire damage.
@@ -11941,7 +11911,7 @@ Usage:
 Target a character in your room, your current opponent in combat.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, your current combat target, cannot target yourself. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -11994,19 +11964,13 @@ Type: Skill
 Category: Mobility Skill
 
 Description:
-Hide is a mobility skill defined in the live skill table.
+Hide attempts to set AFF_HIDE on yourself after a dexterity+skill roll. Reusing hide clears existing hide first and then rolls again.
 
 Effect:
-Provides active tactical value through offense, control, survival, or battlefield information.
+Hide attempts to set AFF_HIDE on yourself after a dexterity+skill roll. Reusing hide clears existing hide first and then rolls again.
 
 Usage:
 Use command: hide.
-
-Tactical Notes:
-Use with timing and target priority; do not spend it automatically without a plan.
-
-Limitations:
-Requires valid combat/target context and is subject to normal skill checks.
 
 See also: SPELLS SKILLS
 #0
@@ -12048,7 +12012,7 @@ Hold Monster
 Type: Spell
 
 Description:
-Hold Monster is a spell implemented directly by the current game mechanics.
+Hold Monster is implemented in code with these core mechanics: applies status or stat modifiers.
 
 Effect:
 - Can apply statuses: stunned, time snare.
@@ -12058,7 +12022,7 @@ Usage:
 Target a character in your room, your current opponent in combat.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, your current combat target, cannot target yourself. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -12068,7 +12032,7 @@ Hold Person
 Type: Spell
 
 Description:
-Hold Person is a spell implemented directly by the current game mechanics.
+Hold Person is implemented in code with these core mechanics: applies status or stat modifiers.
 
 Effect:
 - Can apply statuses: stunned, time snare.
@@ -12078,7 +12042,7 @@ Usage:
 Target a character in your room, your current opponent in combat.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, your current combat target, cannot target yourself. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -12088,7 +12052,7 @@ Holy Word
 Type: Spell
 
 Description:
-Holy Word is a spell implemented directly by the current game mechanics.
+Holy Word is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
 - Deals holy damage.
@@ -12099,7 +12063,7 @@ Usage:
 Target no explicit target.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: no explicit target (self/room effect). Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -12225,16 +12189,16 @@ Ia Shub Niggurath
 Type: Spell
 
 Description:
-Ia Shub Niggurath is a spell implemented directly by the current game mechanics.
+Ia Shub Niggurath is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
-- Uses standard spell routines from the live spell system.
+- Core routines: uses spell-specific custom logic.
 
 Usage:
 Target no explicit target.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: no explicit target (self/room effect). Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -12244,16 +12208,16 @@ Ice Storm
 Type: Spell
 
 Description:
-Ice Storm is a spell implemented directly by the current game mechanics.
+Ice Storm is implemented in code with these core mechanics: affects the entire room area.
 
 Effect:
-- Uses standard spell routines from the live spell system.
+- Core routines: affects the entire room area.
 
 Usage:
 Target no explicit target.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: no explicit target (self/room effect). Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -12263,16 +12227,16 @@ Identify
 Type: Spell
 
 Description:
-Identify is a spell implemented directly by the current game mechanics.
+Identify is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
-- Uses standard spell routines from the live spell system.
+- Core routines: uses spell-specific custom logic.
 
 Usage:
 Target a character in your room, an item in your inventory, an item in the room.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, an object in your inventory, an object in your room, an equipped object. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -12361,7 +12325,7 @@ Infravision
 Type: Spell
 
 Description:
-Infravision is a spell implemented directly by the current game mechanics.
+Infravision is implemented in code with these core mechanics: applies status or stat modifiers.
 
 Effect:
 - Can apply statuses: infravision.
@@ -12370,7 +12334,7 @@ Usage:
 Target self only, a character in your room.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, yourself only. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -12411,7 +12375,7 @@ Invisibility
 Type: Spell
 
 Description:
-Invisibility is a spell implemented directly by the current game mechanics.
+Invisibility is implemented in code with these core mechanics: applies status or stat modifiers, alters object properties.
 
 Effect:
 - Can apply statuses: invisible.
@@ -12420,7 +12384,7 @@ Usage:
 Target a character in your room, an item in your inventory, an item in the room.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, an object in your inventory, an object in your room. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -12430,7 +12394,7 @@ Ironskin
 Type: Spell
 
 Description:
-Ironskin is a spell implemented directly by the current game mechanics.
+Ironskin is implemented in code with these core mechanics: applies status or stat modifiers.
 
 Effect:
 - Applies magical status effects.
@@ -12439,7 +12403,7 @@ Usage:
 Target self only, a character in your room.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, yourself only. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -13075,19 +13039,13 @@ Type: Skill
 Category: Combat Skill
 
 Description:
-Kick is a combat skill defined in the live skill table.
+Kick spends 10 movement and attempts a skill check versus the target. Success deals level/2 kick damage; failure deals 0 damage.
 
 Effect:
-Provides active tactical value through offense, control, survival, or battlefield information.
+Kick spends 10 movement and attempts a skill check versus the target. Success deals level/2 kick damage; failure deals 0 damage.
 
 Usage:
-Use command: kick <target>.
-
-Tactical Notes:
-Use with timing and target priority; do not spend it automatically without a plan.
-
-Limitations:
-Requires valid combat/target context and is subject to normal skill checks.
+Use command: kick <target> (or defaults to your current opponent). Applies a 3-round wait state.
 
 See also: SPELLS SKILLS
 #0
@@ -13112,19 +13070,13 @@ Type: Skill
 Category: Passive Skill
 
 Description:
-Kill Window is a passive skill defined in the live skill table.
+Kill Window is implemented as a trained skill value used directly by game code.
 
 Effect:
-Provides always-on benefits after learning, improving sustained combat performance.
+This skill has no separate spell payload; its learned percentage is read by combat/control formulas where kill window is checked.
 
 Usage:
-Passive and always active once learned.
-
-Tactical Notes:
-High long-term value because passive gains compound across all encounters.
-
-Limitations:
-No direct activation command; effectiveness depends on the systems using this passive.
+There is no dedicated cast target. Train the skill and use its related command or trigger context; the effect is automatic when that check runs.
 
 See also: SPELLS SKILLS
 #0
@@ -13141,16 +13093,16 @@ Kings Command
 Type: Spell
 
 Description:
-Kings Command is a spell implemented directly by the current game mechanics.
+Kings Command is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
-- Uses standard spell routines from the live spell system.
+- Core routines: uses spell-specific custom logic.
 
 Usage:
 Target self only.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: yourself only. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -13228,19 +13180,13 @@ Type: Skill
 Category: Passive Skill
 
 Description:
-Legion Mastery is a passive skill defined in the live skill table.
+Legion Mastery is implemented as a trained skill value used directly by game code.
 
 Effect:
-Provides always-on benefits after learning, improving sustained combat performance.
+This skill has no separate spell payload; its learned percentage is read by combat/control formulas where legion mastery is checked.
 
 Usage:
-Passive and always active once learned.
-
-Tactical Notes:
-High long-term value because passive gains compound across all encounters.
-
-Limitations:
-No direct activation command; effectiveness depends on the systems using this passive.
+There is no dedicated cast target. Train the skill and use its related command or trigger context; the effect is automatic when that check runs.
 
 See also: SPELLS SKILLS
 #0
@@ -13267,16 +13213,16 @@ Leyline Tap
 Type: Spell
 
 Description:
-Leyline Tap is a spell implemented directly by the current game mechanics.
+Leyline Tap is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
-- Uses standard spell routines from the live spell system.
+- Core routines: uses spell-specific custom logic.
 
 Usage:
 Target no explicit target.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: no explicit target (self/room effect). Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -13491,7 +13437,7 @@ Lightning Bolt
 Type: Spell
 
 Description:
-Lightning Bolt is a spell implemented directly by the current game mechanics.
+Lightning Bolt is implemented in code with these core mechanics: deals direct spell damage.
 
 Effect:
 - Deals spell damage.
@@ -13500,7 +13446,7 @@ Usage:
 Target a character in your room, your current opponent in combat.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, your current combat target. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -13629,16 +13575,16 @@ Locate Corpse
 Type: Spell
 
 Description:
-Locate Corpse is a spell implemented directly by the current game mechanics.
+Locate Corpse is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
-- Uses standard spell routines from the live spell system.
+- Core routines: uses spell-specific custom logic.
 
 Usage:
 Target no explicit target.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: no explicit target (self/room effect). Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -13648,16 +13594,16 @@ Locate Object
 Type: Spell
 
 Description:
-Locate Object is a spell implemented directly by the current game mechanics.
+Locate Object is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
-- Uses standard spell routines from the live spell system.
+- Core routines: uses spell-specific custom logic.
 
 Usage:
 Target an item anywhere in the world.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: an object in the world. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -13742,7 +13688,7 @@ Magic Missile
 Type: Spell
 
 Description:
-Magic Missile is a spell implemented directly by the current game mechanics.
+Magic Missile is implemented in code with these core mechanics: deals direct spell damage.
 
 Effect:
 - Deals spell damage.
@@ -13751,7 +13697,7 @@ Usage:
 Target a character in your room, your current opponent in combat.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, your current combat target. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -13804,7 +13750,7 @@ Mark Of Death
 Type: Spell
 
 Description:
-Mark Of Death is a spell implemented directly by the current game mechanics.
+Mark Of Death is implemented in code with these core mechanics: applies status or stat modifiers.
 
 Effect:
 - Can apply statuses: marked.
@@ -13814,7 +13760,7 @@ Usage:
 Target a character in your room, your current opponent in combat.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, your current combat target, cannot target yourself. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -13824,7 +13770,7 @@ Mass Fear
 Type: Spell
 
 Description:
-Mass Fear is a spell implemented directly by the current game mechanics.
+Mass Fear is implemented in code with these core mechanics: affects multiple targets in the room.
 
 Effect:
 - Can apply statuses: fearful.
@@ -13834,7 +13780,7 @@ Usage:
 Target no explicit target.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: no explicit target (self/room effect). Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -14229,7 +14175,7 @@ Memento Mori
 Type: Spell
 
 Description:
-Memento Mori is a spell implemented directly by the current game mechanics.
+Memento Mori is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
 - Can apply statuses: curse.
@@ -14239,7 +14185,7 @@ Usage:
 Target a character in your room, your current opponent in combat.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, your current combat target, cannot target yourself. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -14284,7 +14230,7 @@ Meteor
 Type: Spell
 
 Description:
-Meteor is a spell implemented directly by the current game mechanics.
+Meteor is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
 - Deals fire damage.
@@ -14294,7 +14240,7 @@ Usage:
 Target a character in your room, your current opponent in combat.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, your current combat target, cannot target yourself. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -14304,7 +14250,7 @@ Meteor Swarm
 Type: Spell
 
 Description:
-Meteor Swarm is a spell implemented directly by the current game mechanics.
+Meteor Swarm is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
 - Deals fire damage.
@@ -14314,7 +14260,7 @@ Usage:
 Target no explicit target.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: no explicit target (self/room effect). Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -14386,7 +14332,7 @@ Mirror Veil
 Type: Spell
 
 Description:
-Mirror Veil is a spell implemented directly by the current game mechanics.
+Mirror Veil is implemented in code with these core mechanics: applies status or stat modifiers.
 
 Effect:
 - Can apply statuses: mirror image.
@@ -14395,7 +14341,7 @@ Usage:
 Target a character in your room.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -14500,16 +14446,16 @@ Monarchs Authority
 Type: Spell
 
 Description:
-Monarchs Authority is a spell implemented directly by the current game mechanics.
+Monarchs Authority is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
-- Uses standard spell routines from the live spell system.
+- Core routines: uses spell-specific custom logic.
 
 Usage:
 Target no explicit target.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: no explicit target (self/room effect). Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -14519,16 +14465,16 @@ Monarchs Pressure
 Type: Spell
 
 Description:
-Monarchs Pressure is a spell implemented directly by the current game mechanics.
+Monarchs Pressure is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
-- Uses standard spell routines from the live spell system.
+- Core routines: uses spell-specific custom logic.
 
 Usage:
 Target no explicit target.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: no explicit target (self/room effect). Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -14662,16 +14608,16 @@ Mutilate
 Type: Spell
 
 Description:
-Mutilate is a spell implemented directly by the current game mechanics.
+Mutilate is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
-- Uses standard spell routines from the live spell system.
+- Core routines: uses spell-specific custom logic.
 
 Usage:
 Target a character in your room, your current opponent in combat.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, your current combat target, cannot target yourself. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -14710,16 +14656,16 @@ Napalm
 Type: Spell
 
 Description:
-Napalm is a spell implemented directly by the current game mechanics.
+Napalm is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
-- Uses standard spell routines from the live spell system.
+- Core routines: uses spell-specific custom logic.
 
 Usage:
 Target no explicit target.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: no explicit target (self/room effect). Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -14729,16 +14675,16 @@ Negative Burst
 Type: Spell
 
 Description:
-Negative Burst is a spell implemented directly by the current game mechanics.
+Negative Burst is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
-- Uses standard spell routines from the live spell system.
+- Core routines: uses spell-specific custom logic.
 
 Usage:
 Target no explicit target.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: no explicit target (self/room effect). Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -14793,16 +14739,16 @@ Night Hunt
 Type: Spell
 
 Description:
-Night Hunt is a spell implemented directly by the current game mechanics.
+Night Hunt is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
-- Uses standard spell routines from the live spell system.
+- Core routines: uses spell-specific custom logic.
 
 Usage:
 Target a character in your room, your current opponent in combat.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, your current combat target, cannot target yourself. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -14812,7 +14758,7 @@ Nirvana
 Type: Spell
 
 Description:
-Nirvana is a spell implemented directly by the current game mechanics.
+Nirvana is implemented in code with these core mechanics: applies status or stat modifiers.
 
 Effect:
 - Can apply statuses: sanctuary.
@@ -14821,7 +14767,7 @@ Usage:
 Target self only, a character in your room.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, yourself only. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -14920,16 +14866,16 @@ Nova
 Type: Spell
 
 Description:
-Nova is a spell implemented directly by the current game mechanics.
+Nova is implemented in code with these core mechanics: affects the entire room area.
 
 Effect:
-- Uses standard spell routines from the live spell system.
+- Core routines: affects the entire room area.
 
 Usage:
 Target no explicit target.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: no explicit target (self/room effect). Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -14970,7 +14916,7 @@ Null Field
 Type: Spell
 
 Description:
-Null Field is a spell implemented directly by the current game mechanics.
+Null Field is implemented in code with these core mechanics: mag rooms.
 
 Effect:
 - Creates room effects: null field.
@@ -14979,7 +14925,7 @@ Usage:
 Target no explicit target.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: no explicit target (self/room effect). Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -15110,16 +15056,16 @@ Oblivion Spear
 Type: Spell
 
 Description:
-Oblivion Spear is a spell implemented directly by the current game mechanics.
+Oblivion Spear is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
-- Uses standard spell routines from the live spell system.
+- Core routines: uses spell-specific custom logic.
 
 Usage:
 Target a character in your room, your current opponent in combat.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, your current combat target, cannot target yourself. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -15734,19 +15680,13 @@ Type: Skill
 Category: Passive Skill
 
 Description:
-Overlord Presence is a passive skill defined in the live skill table.
+Overlord Presence is implemented as a trained skill value used directly by game code.
 
 Effect:
-Provides always-on benefits after learning, improving sustained combat performance.
+This skill has no separate spell payload; its learned percentage is read by combat/control formulas where overlord presence is checked.
 
 Usage:
-Passive and always active once learned.
-
-Tactical Notes:
-High long-term value because passive gains compound across all encounters.
-
-Limitations:
-No direct activation command; effectiveness depends on the systems using this passive.
+There is no dedicated cast target. Train the skill and use its related command or trigger context; the effect is automatic when that check runs.
 
 See also: SPELLS SKILLS
 #0
@@ -15780,16 +15720,16 @@ Pantheon
 Type: Spell
 
 Description:
-Pantheon is a spell implemented directly by the current game mechanics.
+Pantheon is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
-- Uses standard spell routines from the live spell system.
+- Core routines: uses spell-specific custom logic.
 
 Usage:
 Target self only.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: yourself only. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -15908,7 +15848,7 @@ Phase Shift
 Type: Spell
 
 Description:
-Phase Shift is a spell implemented directly by the current game mechanics.
+Phase Shift is implemented in code with these core mechanics: applies status or stat modifiers.
 
 Effect:
 - Can apply statuses: phase.
@@ -15917,7 +15857,7 @@ Usage:
 Target self only, a character in your room.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, yourself only. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -15928,19 +15868,13 @@ Type: Skill
 Category: Combat Skill
 
 Description:
-Pick Lock is a combat skill defined in the live skill table.
+Pick Lock is used by the pick door/container command and checks lockpick skill plus dexterity lockpick bonus. Success toggles the lock without a key. Pickproof or keyless locks cannot be picked.
 
 Effect:
-Provides active tactical value through offense, control, survival, or battlefield information.
+Pick Lock is used by the pick door/container command and checks lockpick skill plus dexterity lockpick bonus. Success toggles the lock without a key. Pickproof or keyless locks cannot be picked.
 
 Usage:
-Use command: pick <door/container>.
-
-Tactical Notes:
-Use with timing and target priority; do not spend it automatically without a plan.
-
-Limitations:
-Requires valid combat/target context and is subject to normal skill checks.
+Use command: pick <door|container>.
 
 See also: SPELLS SKILLS
 #0
@@ -15965,7 +15899,7 @@ Plague Bolt
 Type: Spell
 
 Description:
-Plague Bolt is a spell implemented directly by the current game mechanics.
+Plague Bolt is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
 - Deals direct spell damage.
@@ -15976,7 +15910,7 @@ Usage:
 Target a character in your room, your current opponent in combat.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, your current combat target. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -16160,7 +16094,7 @@ Poison
 Type: Spell
 
 Description:
-Poison is a spell implemented directly by the current game mechanics.
+Poison is implemented in code with these core mechanics: applies status or stat modifiers, alters object properties.
 
 Effect:
 - Can apply statuses: poison.
@@ -16170,7 +16104,7 @@ Usage:
 Target a character in your room, an item in your inventory.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, cannot target yourself, an object in your inventory. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -16203,16 +16137,16 @@ Portal
 Type: Spell
 
 Description:
-Portal is a spell implemented directly by the current game mechanics.
+Portal is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
-- Uses standard spell routines from the live spell system.
+- Core routines: uses spell-specific custom logic.
 
 Usage:
 Target a character anywhere in the world.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character anywhere in the world, cannot target yourself. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -16273,7 +16207,7 @@ Power Word Blind
 Type: Spell
 
 Description:
-Power Word Blind is a spell implemented directly by the current game mechanics.
+Power Word Blind is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
 - Can apply statuses: blinded magical.
@@ -16282,7 +16216,7 @@ Usage:
 Target a character in your room, your current opponent in combat.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, your current combat target, cannot target yourself. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -16292,7 +16226,7 @@ Power Word Kill
 Type: Spell
 
 Description:
-Power Word Kill is a spell implemented directly by the current game mechanics.
+Power Word Kill is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
 - Deals arcane damage.
@@ -16301,7 +16235,7 @@ Usage:
 Target a character in your room, your current opponent in combat.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, your current combat target, cannot target yourself. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -16311,7 +16245,7 @@ Power Word Silence
 Type: Spell
 
 Description:
-Power Word Silence is a spell implemented directly by the current game mechanics.
+Power Word Silence is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
 - Can apply statuses: silenced.
@@ -16320,7 +16254,7 @@ Usage:
 Target a character in your room, your current opponent in combat.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, your current combat target, cannot target yourself. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -16330,7 +16264,7 @@ Power Word Stun
 Type: Spell
 
 Description:
-Power Word Stun is a spell implemented directly by the current game mechanics.
+Power Word Stun is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
 - Can apply statuses: stunned.
@@ -16339,7 +16273,7 @@ Usage:
 Target a character in your room, your current opponent in combat.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, your current combat target, cannot target yourself. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -16603,19 +16537,13 @@ Type: Skill
 Category: Passive Skill
 
 Description:
-Predators Advance is a passive skill defined in the live skill table.
+Predators Advance is implemented as a trained skill value used directly by game code.
 
 Effect:
-Provides always-on benefits after learning, improving sustained combat performance.
+This skill has no separate spell payload; its learned percentage is read by combat/control formulas where predators advance is checked.
 
 Usage:
-Passive and always active once learned.
-
-Tactical Notes:
-High long-term value because passive gains compound across all encounters.
-
-Limitations:
-No direct activation command; effectiveness depends on the systems using this passive.
+There is no dedicated cast target. Train the skill and use its related command or trigger context; the effect is automatic when that check runs.
 
 See also: SPELLS SKILLS
 #0
@@ -16798,7 +16726,7 @@ Protection From Evil
 Type: Spell
 
 Description:
-Protection From Evil is a spell implemented directly by the current game mechanics.
+Protection From Evil is implemented in code with these core mechanics: applies status or stat modifiers.
 
 Effect:
 - Can apply statuses: protect evil.
@@ -16807,7 +16735,7 @@ Usage:
 Target self only, a character in your room.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, yourself only. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -16817,7 +16745,7 @@ Psychic Crush
 Type: Spell
 
 Description:
-Psychic Crush is a spell implemented directly by the current game mechanics.
+Psychic Crush is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
 - Deals psychic damage.
@@ -16827,7 +16755,7 @@ Usage:
 Target a character in your room, your current opponent in combat.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, your current combat target, cannot target yourself. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -17203,16 +17131,16 @@ Reality Slash
 Type: Spell
 
 Description:
-Reality Slash is a spell implemented directly by the current game mechanics.
+Reality Slash is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
-- Uses standard spell routines from the live spell system.
+- Core routines: uses spell-specific custom logic.
 
 Usage:
 Target a character in your room, your current opponent in combat.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, your current combat target, cannot target yourself. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -17231,19 +17159,13 @@ Type: Skill
 Category: Mobility Skill
 
 Description:
-Recall is a mobility skill defined in the live skill table.
+Recall teleports you to the mortal start room, costs half your maximum movement, and applies lag. It fails when exhausted, stunned/sleeping, or in zones flagged ZONE_NOASTRAL.
 
 Effect:
-Provides active tactical value through offense, control, survival, or battlefield information.
+Recall teleports you to the mortal start room, costs half your maximum movement, and applies lag. It fails when exhausted, stunned/sleeping, or in zones flagged ZONE_NOASTRAL.
 
 Usage:
 Use command: recall.
-
-Tactical Notes:
-Use with timing and target priority; do not spend it automatically without a plan.
-
-Limitations:
-Requires valid combat/target context and is subject to normal skill checks.
 
 See also: SPELLS SKILLS
 #0
@@ -17542,19 +17464,13 @@ Type: Skill
 Category: Passive Skill
 
 Description:
-Relentless Hunt is a passive skill defined in the live skill table.
+Relentless Hunt is implemented as a trained skill value used directly by game code.
 
 Effect:
-Provides always-on benefits after learning, improving sustained combat performance.
+This skill has no separate spell payload; its learned percentage is read by combat/control formulas where relentless hunt is checked.
 
 Usage:
-Passive and always active once learned.
-
-Tactical Notes:
-High long-term value because passive gains compound across all encounters.
-
-Limitations:
-No direct activation command; effectiveness depends on the systems using this passive.
+There is no dedicated cast target. Train the skill and use its related command or trigger context; the effect is automatic when that check runs.
 
 See also: SPELLS SKILLS
 #0
@@ -17644,7 +17560,7 @@ Remove Curse
 Type: Spell
 
 Description:
-Remove Curse is a spell implemented directly by the current game mechanics.
+Remove Curse is implemented in code with these core mechanics: removes existing magical effects, alters object properties.
 
 Effect:
 - Removes magical ailments or curses.
@@ -17653,7 +17569,7 @@ Usage:
 Target a character in your room, an item in your inventory.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, an object in your inventory, an equipped object. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -17663,7 +17579,7 @@ Remove Poison
 Type: Spell
 
 Description:
-Remove Poison is a spell implemented directly by the current game mechanics.
+Remove Poison is implemented in code with these core mechanics: removes existing magical effects, alters object properties.
 
 Effect:
 - Removes magical ailments or curses.
@@ -17672,7 +17588,7 @@ Usage:
 Target a character in your room, an item in your inventory, an item in the room.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, an object in your inventory, an object in your room. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -17780,19 +17696,13 @@ Type: Skill
 Category: Combat Skill
 
 Description:
-Rescue is a combat skill defined in the live skill table.
+Rescue attempts to pull an ally out of combat by switching the attacker onto you. On success, the enemy stops fighting the ally and starts fighting you; on failure nothing changes.
 
 Effect:
-Provides active tactical value through offense, control, survival, or battlefield information.
+Rescue attempts to pull an ally out of combat by switching the attacker onto you. On success, the enemy stops fighting the ally and starts fighting you; on failure nothing changes.
 
 Usage:
-Use command: rescue <ally>.
-
-Tactical Notes:
-Use with timing and target priority; do not spend it automatically without a plan.
-
-Limitations:
-Requires valid combat/target context and is subject to normal skill checks.
+Use command: rescue <ally in room>.
 
 See also: SPELLS SKILLS
 #0
@@ -17851,16 +17761,16 @@ Rulers Hand
 Type: Spell
 
 Description:
-Rulers Hand is a spell implemented directly by the current game mechanics.
+Rulers Hand is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
-- Uses standard spell routines from the live spell system.
+- Core routines: uses spell-specific custom logic.
 
 Usage:
 Target a character in your room, your current opponent in combat.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, your current combat target, cannot target yourself. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -17897,7 +17807,7 @@ Sanctuary
 Type: Spell
 
 Description:
-Sanctuary is a spell implemented directly by the current game mechanics.
+Sanctuary is implemented in code with these core mechanics: applies status or stat modifiers.
 
 Effect:
 - Applies magical status effects.
@@ -17906,7 +17816,7 @@ Usage:
 Target a character in your room.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -17977,16 +17887,16 @@ Script-Inflicted
 Type: Spell
 
 Description:
-Script-Inflicted is a spell implemented directly by the current game mechanics.
+Script-Inflicted is an internal status spell applied by DG scripts and engine events, not a player-cast ability.
 
 Effect:
-- Uses standard spell routines from the live spell system.
+- Applies script-defined affects or damage payloads exactly as authored in the triggering script.
 
 Usage:
-Target no explicit target.
+No player command. This spell id is used by scripted triggers to tag and process scripted magical effects.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+If you see this in diagnostics, inspect the originating trigger/script for the real mechanic details.
 
 See also: SPELLS SKILLS
 #0
@@ -18294,7 +18204,7 @@ Sense Life
 Type: Spell
 
 Description:
-Sense Life is a spell implemented directly by the current game mechanics.
+Sense Life is implemented in code with these core mechanics: applies status or stat modifiers.
 
 Effect:
 - Can apply statuses: sense life.
@@ -18303,7 +18213,7 @@ Usage:
 Target self only, a character in your room.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, yourself only. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -18429,16 +18339,16 @@ Shadow Armor
 Type: Spell
 
 Description:
-Shadow Armor is a spell implemented directly by the current game mechanics.
+Shadow Armor is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
-- Uses standard spell routines from the live spell system.
+- Core routines: uses spell-specific custom logic.
 
 Usage:
 Target a character in your room.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -18448,16 +18358,16 @@ Shadow Bind
 Type: Spell
 
 Description:
-Shadow Bind is a spell implemented directly by the current game mechanics.
+Shadow Bind is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
-- Uses standard spell routines from the live spell system.
+- Core routines: uses spell-specific custom logic.
 
 Usage:
 Target a character in your room, your current opponent in combat.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, your current combat target, cannot target yourself. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -18467,7 +18377,7 @@ Shadow Bolt
 Type: Spell
 
 Description:
-Shadow Bolt is a spell implemented directly by the current game mechanics.
+Shadow Bolt is implemented in code with these core mechanics: deals direct spell damage.
 
 Effect:
 - Deals spell damage.
@@ -18476,7 +18386,7 @@ Usage:
 Target a character in your room, your current opponent in combat.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, your current combat target. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -18486,16 +18396,16 @@ Shadow Burst
 Type: Spell
 
 Description:
-Shadow Burst is a spell implemented directly by the current game mechanics.
+Shadow Burst is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
-- Uses standard spell routines from the live spell system.
+- Core routines: uses spell-specific custom logic.
 
 Usage:
 Target no explicit target.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: no explicit target (self/room effect). Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -18506,19 +18416,13 @@ Type: Skill
 Category: Passive Skill
 
 Description:
-Shadow Commander is a passive skill defined in the live skill table.
+Shadow Commander is implemented as a trained skill value used directly by game code.
 
 Effect:
-Provides always-on benefits after learning, improving sustained combat performance.
+This skill has no separate spell payload; its learned percentage is read by combat/control formulas where shadow commander is checked.
 
 Usage:
-Passive and always active once learned.
-
-Tactical Notes:
-High long-term value because passive gains compound across all encounters.
-
-Limitations:
-No direct activation command; effectiveness depends on the systems using this passive.
+There is no dedicated cast target. Train the skill and use its related command or trigger context; the effect is automatic when that check runs.
 
 See also: SPELLS SKILLS
 #0
@@ -18528,16 +18432,16 @@ Shadow Domain
 Type: Spell
 
 Description:
-Shadow Domain is a spell implemented directly by the current game mechanics.
+Shadow Domain is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
-- Uses standard spell routines from the live spell system.
+- Core routines: uses spell-specific custom logic.
 
 Usage:
 Target no explicit target.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: no explicit target (self/room effect). Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -18547,16 +18451,16 @@ Shadow Exchange
 Type: Spell
 
 Description:
-Shadow Exchange is a spell implemented directly by the current game mechanics.
+Shadow Exchange is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
-- Uses standard spell routines from the live spell system.
+- Core routines: uses spell-specific custom logic.
 
 Usage:
 Target a character in your room.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -18584,16 +18488,16 @@ Shadow Lance
 Type: Spell
 
 Description:
-Shadow Lance is a spell implemented directly by the current game mechanics.
+Shadow Lance is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
-- Uses standard spell routines from the live spell system.
+- Core routines: uses spell-specific custom logic.
 
 Usage:
 Target a character in your room, your current opponent in combat.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, your current combat target, cannot target yourself. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -18603,16 +18507,16 @@ Shadow Recall
 Type: Spell
 
 Description:
-Shadow Recall is a spell implemented directly by the current game mechanics.
+Shadow Recall is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
-- Uses standard spell routines from the live spell system.
+- Core routines: uses spell-specific custom logic.
 
 Usage:
 Target self only.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: yourself only. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -18622,16 +18526,16 @@ Shadow Regenesis
 Type: Spell
 
 Description:
-Shadow Regenesis is a spell implemented directly by the current game mechanics.
+Shadow Regenesis is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
-- Uses standard spell routines from the live spell system.
+- Core routines: uses spell-specific custom logic.
 
 Usage:
 Target self only.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: yourself only. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -18642,19 +18546,13 @@ Type: Skill
 Category: Passive Skill
 
 Description:
-Shadow Reservoir is a passive skill defined in the live skill table.
+Shadow Reservoir is implemented as a trained skill value used directly by game code.
 
 Effect:
-Provides always-on benefits after learning, improving sustained combat performance.
+This skill has no separate spell payload; its learned percentage is read by combat/control formulas where shadow reservoir is checked.
 
 Usage:
-Passive and always active once learned.
-
-Tactical Notes:
-High long-term value because passive gains compound across all encounters.
-
-Limitations:
-No direct activation command; effectiveness depends on the systems using this passive.
+There is no dedicated cast target. Train the skill and use its related command or trigger context; the effect is automatic when that check runs.
 
 See also: SPELLS SKILLS
 #0
@@ -18664,16 +18562,16 @@ Shadow Step
 Type: Spell
 
 Description:
-Shadow Step is a spell implemented directly by the current game mechanics.
+Shadow Step is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
-- Uses standard spell routines from the live spell system.
+- Core routines: uses spell-specific custom logic.
 
 Usage:
 Target self only.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: yourself only. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -18683,16 +18581,16 @@ Shadow Storm
 Type: Spell
 
 Description:
-Shadow Storm is a spell implemented directly by the current game mechanics.
+Shadow Storm is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
-- Uses standard spell routines from the live spell system.
+- Core routines: uses spell-specific custom logic.
 
 Usage:
 Target no explicit target.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: no explicit target (self/room effect). Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -18703,19 +18601,13 @@ Type: Skill
 Category: Passive Skill
 
 Description:
-Shadow Surge is a passive skill defined in the live skill table.
+Shadow Surge is implemented as a trained skill value used directly by game code.
 
 Effect:
-Provides always-on benefits after learning, improving sustained combat performance.
+This skill has no separate spell payload; its learned percentage is read by combat/control formulas where shadow surge is checked.
 
 Usage:
-Passive and always active once learned.
-
-Tactical Notes:
-High long-term value because passive gains compound across all encounters.
-
-Limitations:
-No direct activation command; effectiveness depends on the systems using this passive.
+There is no dedicated cast target. Train the skill and use its related command or trigger context; the effect is automatic when that check runs.
 
 See also: SPELLS SKILLS
 #0
@@ -18739,7 +18631,7 @@ Shocking Grasp
 Type: Spell
 
 Description:
-Shocking Grasp is a spell implemented directly by the current game mechanics.
+Shocking Grasp is implemented in code with these core mechanics: deals direct spell damage.
 
 Effect:
 - Deals spell damage.
@@ -18748,7 +18640,7 @@ Usage:
 Target a character in your room, your current opponent in combat.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, your current combat target. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -18758,16 +18650,16 @@ Shockwave
 Type: Spell
 
 Description:
-Shockwave is a spell implemented directly by the current game mechanics.
+Shockwave is implemented in code with these core mechanics: affects the entire room area.
 
 Effect:
-- Uses standard spell routines from the live spell system.
+- Core routines: affects the entire room area.
 
 Usage:
 Target no explicit target.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: no explicit target (self/room effect). Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -18902,7 +18794,7 @@ Silence
 Type: Spell
 
 Description:
-Silence is a spell implemented directly by the current game mechanics.
+Silence is implemented in code with these core mechanics: applies status or stat modifiers.
 
 Effect:
 - Can apply statuses: silenced.
@@ -18912,7 +18804,7 @@ Usage:
 Target a character in your room, your current opponent in combat.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, your current combat target, cannot target yourself. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -18922,7 +18814,7 @@ Silence Field
 Type: Spell
 
 Description:
-Silence Field is a spell implemented directly by the current game mechanics.
+Silence Field is implemented in code with these core mechanics: mag rooms.
 
 Effect:
 - Creates room effects: silence field.
@@ -18931,7 +18823,7 @@ Usage:
 Target no explicit target.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: no explicit target (self/room effect). Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -18941,16 +18833,16 @@ Silent Magic
 Type: Spell
 
 Description:
-Silent Magic is a spell implemented directly by the current game mechanics.
+Silent Magic is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
-- Uses standard spell routines from the live spell system.
+- Core routines: uses spell-specific custom logic.
 
 Usage:
 Target self only.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: yourself only. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -19010,7 +18902,7 @@ Sleep
 Type: Spell
 
 Description:
-Sleep is a spell implemented directly by the current game mechanics.
+Sleep is implemented in code with these core mechanics: applies status or stat modifiers.
 
 Effect:
 - Can apply statuses: sleep.
@@ -19020,7 +18912,7 @@ Usage:
 Target a character in your room.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -19058,19 +18950,13 @@ Type: Skill
 Category: Mobility Skill
 
 Description:
-Sneak is a mobility skill defined in the live skill table.
+Sneak attempts to apply AFF_SNEAK to yourself for a duration equal to your level using skill plus dexterity sneak bonus. On failure no effect is applied.
 
 Effect:
-Provides active tactical value through offense, control, survival, or battlefield information.
+Sneak attempts to apply AFF_SNEAK to yourself for a duration equal to your level using skill plus dexterity sneak bonus. On failure no effect is applied.
 
 Usage:
 Use command: sneak.
-
-Tactical Notes:
-Use with timing and target priority; do not spend it automatically without a plan.
-
-Limitations:
-Requires valid combat/target context and is subject to normal skill checks.
 
 See also: SPELLS SKILLS
 #0
@@ -19132,7 +19018,7 @@ Song Of Resilience
 Type: Spell
 
 Description:
-Song Of Resilience is a spell implemented directly by the current game mechanics.
+Song Of Resilience is implemented in code with these core mechanics: applies status or stat modifiers.
 
 Effect:
 - Applies magical status effects.
@@ -19141,7 +19027,7 @@ Usage:
 Target a character in your room.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -19151,16 +19037,16 @@ Sonic Burst
 Type: Spell
 
 Description:
-Sonic Burst is a spell implemented directly by the current game mechanics.
+Sonic Burst is implemented in code with these core mechanics: affects the entire room area.
 
 Effect:
-- Uses standard spell routines from the live spell system.
+- Core routines: affects the entire room area.
 
 Usage:
 Target no explicit target.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: no explicit target (self/room effect). Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -19198,19 +19084,13 @@ Type: Skill
 Category: Passive Skill
 
 Description:
-Sovereign Pressure is a passive skill defined in the live skill table.
+Sovereign Pressure is implemented as a trained skill value used directly by game code.
 
 Effect:
-Provides always-on benefits after learning, improving sustained combat performance.
+This skill has no separate spell payload; its learned percentage is read by combat/control formulas where sovereign pressure is checked.
 
 Usage:
-Passive and always active once learned.
-
-Tactical Notes:
-High long-term value because passive gains compound across all encounters.
-
-Limitations:
-No direct activation command; effectiveness depends on the systems using this passive.
+There is no dedicated cast target. Train the skill and use its related command or trigger context; the effect is automatic when that check runs.
 
 See also: SPELLS SKILLS
 #0
@@ -19220,16 +19100,16 @@ Sovereigns Step
 Type: Spell
 
 Description:
-Sovereigns Step is a spell implemented directly by the current game mechanics.
+Sovereigns Step is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
-- Uses standard spell routines from the live spell system.
+- Core routines: uses spell-specific custom logic.
 
 Usage:
 Target self only.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: yourself only. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -19312,7 +19192,7 @@ Spell Steal
 Type: Spell
 
 Description:
-Spell Steal is a spell implemented directly by the current game mechanics.
+Spell Steal is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
 - Can apply statuses: curse, elemental ward acid, elemental ward cold, elemental ward fire, elemental ward lightning, fearful.
@@ -19322,7 +19202,7 @@ Usage:
 Target a character in your room, your current opponent in combat.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, your current combat target, cannot target yourself. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -19730,7 +19610,7 @@ Static Field
 Type: Spell
 
 Description:
-Static Field is a spell implemented directly by the current game mechanics.
+Static Field is implemented in code with these core mechanics: mag rooms.
 
 Effect:
 - Creates room effects: static field.
@@ -19739,7 +19619,7 @@ Usage:
 Target no explicit target.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: no explicit target (self/room effect). Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -19750,19 +19630,13 @@ Type: Skill
 Category: Combat Skill
 
 Description:
-Steal is a combat skill defined in the live skill table.
+Steal attempts to take coins or items from a target in your room. Chance depends on skill, dexterity pickpocket bonus, target state, and item weight. Failures alert the victim, and awake NPC victims may retaliate.
 
 Effect:
-Provides active tactical value through offense, control, survival, or battlefield information.
+Steal attempts to take coins or items from a target in your room. Chance depends on skill, dexterity pickpocket bonus, target state, and item weight. Failures alert the victim, and awake NPC victims may retaliate.
 
 Usage:
-Use command: steal <target> <item>.
-
-Tactical Notes:
-Use with timing and target priority; do not spend it automatically without a plan.
-
-Limitations:
-Requires valid combat/target context and is subject to normal skill checks.
+Use command: steal <item|coins> <target>.
 
 See also: SPELLS SKILLS
 #0
@@ -19816,7 +19690,7 @@ Stone Skin
 Type: Spell
 
 Description:
-Stone Skin is a spell implemented directly by the current game mechanics.
+Stone Skin is implemented in code with these core mechanics: applies status or stat modifiers.
 
 Effect:
 - Can apply statuses: stoneskin.
@@ -19825,7 +19699,7 @@ Usage:
 Target a character in your room.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -19835,7 +19709,7 @@ Strength
 Type: Spell
 
 Description:
-Strength is a spell implemented directly by the current game mechanics.
+Strength is implemented in code with these core mechanics: applies status or stat modifiers.
 
 Effect:
 - Applies magical status effects.
@@ -19844,7 +19718,7 @@ Usage:
 Target a character in your room.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -20235,7 +20109,7 @@ Summon
 Type: Spell
 
 Description:
-Summon is a spell implemented directly by the current game mechanics.
+Summon is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
 - Targets may resist part or all of the effect with a saving throw.
@@ -20244,7 +20118,7 @@ Usage:
 Target a character anywhere in the world.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character anywhere in the world, cannot target yourself. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -20279,19 +20153,13 @@ Type: Skill
 Category: Passive Skill
 
 Description:
-Supreme Caster Discipline is a passive skill defined in the live skill table.
+Supreme Caster Discipline is implemented as a trained skill value used directly by game code.
 
 Effect:
-Provides always-on benefits after learning, improving sustained combat performance.
+This skill has no separate spell payload; its learned percentage is read by combat/control formulas where supreme caster discipline is checked.
 
 Usage:
-Passive and always active once learned.
-
-Tactical Notes:
-High long-term value because passive gains compound across all encounters.
-
-Limitations:
-No direct activation command; effectiveness depends on the systems using this passive.
+There is no dedicated cast target. Train the skill and use its related command or trigger context; the effect is automatic when that check runs.
 
 See also: SPELLS SKILLS
 #0
@@ -20627,16 +20495,16 @@ Teleport
 Type: Spell
 
 Description:
-Teleport is a spell implemented directly by the current game mechanics.
+Teleport is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
-- Uses standard spell routines from the live spell system.
+- Core routines: uses spell-specific custom logic.
 
 Usage:
 Target a character in your room.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -20680,7 +20548,7 @@ Temporal Shift
 Type: Spell
 
 Description:
-Temporal Shift is a spell implemented directly by the current game mechanics.
+Temporal Shift is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
 - Targets may resist part or all of the effect with a saving throw.
@@ -20689,7 +20557,7 @@ Usage:
 Target a character in your room, your current opponent in combat.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, tar fight self, your current combat target. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -20935,7 +20803,7 @@ Time Snare
 Type: Spell
 
 Description:
-Time Snare is a spell implemented directly by the current game mechanics.
+Time Snare is implemented in code with these core mechanics: applies status or stat modifiers.
 
 Effect:
 - Can apply statuses: time snare.
@@ -20945,7 +20813,7 @@ Usage:
 Target a character in your room, your current opponent in combat.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, your current combat target, cannot target yourself. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -20955,16 +20823,16 @@ Time Stop
 Type: Spell
 
 Description:
-Time Stop is a spell implemented directly by the current game mechanics.
+Time Stop is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
-- Uses standard spell routines from the live spell system.
+- Core routines: uses spell-specific custom logic.
 
 Usage:
 Target no explicit target.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: no explicit target (self/room effect). Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -21071,16 +20939,16 @@ Toxic Cloud
 Type: Spell
 
 Description:
-Toxic Cloud is a spell implemented directly by the current game mechanics.
+Toxic Cloud is implemented in code with these core mechanics: affects the entire room area.
 
 Effect:
-- Uses standard spell routines from the live spell system.
+- Core routines: affects the entire room area.
 
 Usage:
 Target no explicit target.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: no explicit target (self/room effect). Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -21091,19 +20959,13 @@ Type: Skill
 Category: Detection Skill
 
 Description:
-Track is a detection skill defined in the live skill table.
+Track uses BFS pathfinding to a named world target and reports the first direction. On failed skill checks it returns a random direction instead. Targets with AFF_NOTRACK cannot be tracked.
 
 Effect:
-Provides active tactical value through offense, control, survival, or battlefield information.
+Track uses BFS pathfinding to a named world target and reports the first direction. On failed skill checks it returns a random direction instead. Targets with AFF_NOTRACK cannot be tracked.
 
 Usage:
-Use command: track <name>.
-
-Tactical Notes:
-Use with timing and target priority; do not spend it automatically without a plan.
-
-Limitations:
-Requires valid combat/target context and is subject to normal skill checks.
+Use command: track <target name>.
 
 See also: SPELLS SKILLS
 #0
@@ -22844,16 +22706,16 @@ Triple Maximize Magic
 Type: Spell
 
 Description:
-Triple Maximize Magic is a spell implemented directly by the current game mechanics.
+Triple Maximize Magic is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
-- Uses standard spell routines from the live spell system.
+- Core routines: uses spell-specific custom logic.
 
 Usage:
 Target self only.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: yourself only. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -22886,7 +22748,7 @@ True Seeing
 Type: Spell
 
 Description:
-True Seeing is a spell implemented directly by the current game mechanics.
+True Seeing is implemented in code with these core mechanics: applies status or stat modifiers.
 
 Effect:
 - Can apply statuses: detect invis, sense life, truesight.
@@ -22895,7 +22757,7 @@ Usage:
 Target self only, a character in your room.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, yourself only. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -22952,16 +22814,16 @@ Undying Will
 Type: Spell
 
 Description:
-Undying Will is a spell implemented directly by the current game mechanics.
+Undying Will is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
-- Uses standard spell routines from the live spell system.
+- Core routines: uses spell-specific custom logic.
 
 Usage:
 Target self only.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: yourself only. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -22986,7 +22848,7 @@ Unholy Word
 Type: Spell
 
 Description:
-Unholy Word is a spell implemented directly by the current game mechanics.
+Unholy Word is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
 - Deals shadow damage.
@@ -22997,7 +22859,7 @@ Usage:
 Target no explicit target.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: no explicit target (self/room effect). Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -23136,7 +22998,7 @@ Vampiric Touch
 Type: Spell
 
 Description:
-Vampiric Touch is a spell implemented directly by the current game mechanics.
+Vampiric Touch is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
 - Deals direct spell damage.
@@ -23146,7 +23008,7 @@ Usage:
 Target a character in your room, your current opponent in combat.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, your current combat target. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -23187,16 +23049,16 @@ Ventriloquate
 Type: Spell
 
 Description:
-Ventriloquate is a spell implemented directly by the current game mechanics.
+Ventriloquate is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
-- Uses standard spell routines from the live spell system.
+- Core routines: uses spell-specific custom logic.
 
 Usage:
 Target a character in your room.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -23206,16 +23068,16 @@ Vermilion Nova
 Type: Spell
 
 Description:
-Vermilion Nova is a spell implemented directly by the current game mechanics.
+Vermilion Nova is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
-- Uses standard spell routines from the live spell system.
+- Core routines: uses spell-specific custom logic.
 
 Usage:
 Target no explicit target.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: no explicit target (self/room effect). Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -23225,7 +23087,7 @@ Vertigo
 Type: Spell
 
 Description:
-Vertigo is a spell implemented directly by the current game mechanics.
+Vertigo is implemented in code with these core mechanics: applies status or stat modifiers.
 
 Effect:
 - Can apply statuses: stunned.
@@ -23235,7 +23097,7 @@ Usage:
 Target a character in your room, your current opponent in combat.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, your current combat target, cannot target yourself. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -23297,7 +23159,7 @@ Voltaic Bolt
 Type: Spell
 
 Description:
-Voltaic Bolt is a spell implemented directly by the current game mechanics.
+Voltaic Bolt is implemented in code with these core mechanics: deals direct spell damage, applies status or stat modifiers.
 
 Effect:
 - Can apply statuses: static.
@@ -23306,7 +23168,7 @@ Usage:
 Target a character in your room, your current opponent in combat.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, your current combat target. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -23340,7 +23202,7 @@ Wail Of The Banshee
 Type: Spell
 
 Description:
-Wail Of The Banshee is a spell implemented directly by the current game mechanics.
+Wail Of The Banshee is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
 - Deals necrotic damage.
@@ -23350,7 +23212,7 @@ Usage:
 Target no explicit target.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: no explicit target (self/room effect). Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -23402,7 +23264,7 @@ Wall Of Fire
 Type: Spell
 
 Description:
-Wall Of Fire is a spell implemented directly by the current game mechanics.
+Wall Of Fire is implemented in code with these core mechanics: mag rooms.
 
 Effect:
 - Creates room effects: wall of fire.
@@ -23411,7 +23273,7 @@ Usage:
 Target no explicit target.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: no explicit target (self/room effect). Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -23434,7 +23296,7 @@ Waterwalk
 Type: Spell
 
 Description:
-Waterwalk is a spell implemented directly by the current game mechanics.
+Waterwalk is implemented in code with these core mechanics: applies status or stat modifiers.
 
 Effect:
 - Can apply statuses: waterwalk.
@@ -23443,7 +23305,7 @@ Usage:
 Target a character in your room.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -23522,7 +23384,7 @@ Web
 Type: Spell
 
 Description:
-Web is a spell implemented directly by the current game mechanics.
+Web is implemented in code with these core mechanics: applies status or stat modifiers.
 
 Effect:
 - Can apply statuses: webbed.
@@ -23532,7 +23394,7 @@ Usage:
 Target a character in your room, your current opponent in combat.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, your current combat target, cannot target yourself. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -23579,19 +23441,13 @@ Type: Skill
 Category: Combat Skill
 
 Description:
-Whirlwind is a combat skill defined in the live skill table.
+Whirlwind starts a repeating attack event. Each tick spends 12 movement and makes 1d4 random attacks against NPCs in your room. It ends when checks fail, no targets remain, or you run out of movement.
 
 Effect:
-Provides active tactical value through offense, control, survival, or battlefield information.
+Whirlwind starts a repeating attack event. Each tick spends 12 movement and makes 1d4 random attacks against NPCs in your room. It ends when checks fail, no targets remain, or you run out of movement.
 
 Usage:
-Use command: whirlwind.
-
-Tactical Notes:
-Use with timing and target priority; do not spend it automatically without a plan.
-
-Limitations:
-Requires valid combat/target context and is subject to normal skill checks.
+Use command: whirlwind while standing and not in peaceful rooms.
 
 See also: SPELLS SKILLS
 #0
@@ -23784,16 +23640,16 @@ Word Of Pain
 Type: Spell
 
 Description:
-Word Of Pain is a spell implemented directly by the current game mechanics.
+Word Of Pain is implemented in code with these core mechanics: affects the entire room area.
 
 Effect:
-- Uses standard spell routines from the live spell system.
+- Core routines: affects the entire room area.
 
 Usage:
 Target no explicit target.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: no explicit target (self/room effect). Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -23803,16 +23659,16 @@ Word Of Recall
 Type: Spell
 
 Description:
-Word Of Recall is a spell implemented directly by the current game mechanics.
+Word Of Recall is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
-- Uses standard spell routines from the live spell system.
+- Core routines: uses spell-specific custom logic.
 
 Usage:
 Target a character in your room.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -23822,16 +23678,16 @@ Word Of Recall Mass
 Type: Spell
 
 Description:
-Word Of Recall Mass is a spell implemented directly by the current game mechanics.
+Word Of Recall Mass is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
-- Uses standard spell routines from the live spell system.
+- Core routines: uses spell-specific custom logic.
 
 Usage:
 Target no explicit target.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: no explicit target (self/room effect). Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
@@ -23880,7 +23736,7 @@ Wrathfire
 Type: Spell
 
 Description:
-Wrathfire is a spell implemented directly by the current game mechanics.
+Wrathfire is implemented in code with these core mechanics: uses spell-specific custom logic.
 
 Effect:
 - Deals holy damage.
@@ -23890,7 +23746,7 @@ Usage:
 Target a character in your room, your current opponent in combat.
 
 Practical Notes:
-Use this with timing and target selection based on its implemented mechanics and saving throw interactions.
+Target profile: a character in your room, your current combat target, cannot target yourself. Saving throws apply only when this spell's internal logic checks one.
 
 See also: SPELLS SKILLS
 #0
