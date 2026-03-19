@@ -193,6 +193,33 @@ void list_known_abilities(struct char_data *ch)
   show_known_abilities(ch, TRUE, TRUE);
 }
 
+static int can_character_practice_ability(struct char_data *ch, int ability_id)
+{
+  int learned_at;
+  int is_reactive_identity;
+  int required_level;
+
+  if (!ch || IS_NPC(ch))
+    return FALSE;
+
+  if (ability_id < 1 || ability_id > MAX_SKILLS)
+    return FALSE;
+
+  learned_at = GET_STUDY_LEARN_LEVEL(ch, ability_id);
+  is_reactive_identity = (GET_CLASS(ch) == CLASS_ADVENTURER) || (learned_at > 0);
+
+  if (GET_SKILL(ch, ability_id) > 0) {
+    if (is_reactive_identity) {
+      required_level = classtrack_get_study_display_level(ch, ability_id, 1);
+      return (GET_LEVEL(ch) >= required_level);
+    }
+    return TRUE;
+  }
+
+  required_level = spell_info[ability_id].min_level[(int) GET_CLASS(ch)];
+  return (GET_LEVEL(ch) >= required_level);
+}
+
 SPECIAL(guild)
 {
   int skill_num, percent;
@@ -222,8 +249,7 @@ SPECIAL(guild)
     }
   }
 
-  if (skill_num < 1 ||
-      GET_LEVEL(ch) < spell_info[skill_num].min_level[(int) GET_CLASS(ch)]) {
+  if (!can_character_practice_ability(ch, skill_num)) {
     send_to_char(ch, "You do not know of that %s.\r\n", SPLSKL(ch));
     return (TRUE);
   }
