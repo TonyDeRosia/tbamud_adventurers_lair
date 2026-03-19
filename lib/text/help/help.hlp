@@ -2653,7 +2653,7 @@ Usage:
 Cast before sustained melee fights or when you expect many weapon hits.
 
 Notes:
-This does not reduce spell or elemental damage directly; it mainly improves defense against physical weapon pressure.
+This does not reduce spell or elemental damage directly; it mainly reduces incoming weapon-hit damage.
 
 See also: SHADOW-ARMOR CRYSTAL-BODY ARMOR SANCTUARY SPELLS SKILLS
 #0
@@ -9460,22 +9460,42 @@ See also: COMMANDS, SOCIALS
 
 HIDDEN-DOORS . HIDDEN-EXITS HIDDEN-ROOMS HIDDEN-OBJECTS HIDDEN-MOBS SECRETS UNSEEN
 
+Hidden Doors / Hidden Exits
+Type: Reference
+
+Description:
+Covers hidden world elements such as concealed exits, rooms, objects, and mobs.
+
+Effect:
+This is a reference topic, not an activated spell or skill entry.
+
+Usage:
+Use this topic when searching for information about hidden world features rather than player stealth skills.
+
+Notes:
+For player stealth commands, see the dedicated HIDE and SNEAK skill entries.
+
+See also: %DOOR% HIDE SNEAK
+#0
+
+HIDE
+
 Hide
 Type: Skill
 
 Description:
-Attempts to disappear from plain sight without leaving the room.
+You attempt to hide yourself in your current room.
 
 Effect:
-Applies a hidden state if the attempt succeeds.
+Active self-target stealth skill. On a successful hide skill check (skill plus Dexterity hide bonus), you gain the hidden state. On failure, nothing is applied. Reusing HIDE removes your current hide flag before rolling again.
 
 Usage:
-Best used before an ambush, escape, or any moment where breaking sight matters.
+Use before opening with ambush skills, or to break visibility when you can avoid immediate detection.
 
 Notes:
-Hide is strongest when combined with positioning and timing, not spammed in the open.
+HIDE has no fixed duration in this entry; it lasts until broken by normal visibility/stealth interactions.
 
-See also: %DOOR% #31 HIDE SNEAK BACKSTAB TOTAL-OCCULTATION SKILLS
+See also: SNEAK BACKSTAB TOTAL-OCCULTATION SKILLS
 #0
 
 HINDEX INDEX
@@ -15776,26 +15796,6 @@ This spell scales with your servant presence. Its value rises sharply once your 
 See also: SHADOW-EXTRACTION CALL-SHADOW-LEGION SHADOW-STORM SPELLS SKILLS
 #0
 
-SHADOW-COMMANDER
-
-Shadow Commander
-Type: Skill
-
-Description:
-Your shadow servants fight harder under your direction.
-
-Effect:
-Passive summon leadership skill. Your shadow servants deal 10% more damage. In combat upkeep they also gain temporary +2 hitroll, +2 damroll, and periodic healing.
-
-Usage:
-Always on. Most valuable when you rely on summoned shadow servants for room damage.
-
-Notes:
-This is a servant buff, not a direct player damage skill.
-
-See also: SHADOW-EXTRACTION LEGION-MASTERY CALL-SHADOW-LEGION SKILLS
-#0
-
 SHADOW-DOMAIN SHADOWDOMAIN DOMAIN-SHADOW
 
 Shadow Domain
@@ -16390,26 +16390,6 @@ Targeting: a character in your room. If a saving throw is involved, expect reduc
 See also: SPELLS SKILLS
 #0
 
-SONIC-BURST
-
-Sonic Burst
-Type: Spell
-
-Description:
-Detonates a burst of concussive sound from your position.
-
-Effect:
-Active room-area damage spell. It deals medium sonic damage to enemy targets in your room. Targets that fail a spell save are stunned for 1 round; targets that save take half damage and are not stunned.
-
-Usage:
-Best used against grouped enemies when you want instant room wide damage rather than a persistent field.
-
-Notes:
-This is a direct area burst, not a movement spell, escape spell, or scouting tool.
-
-See also: SHOCKWAVE WORD-OF-PAIN BLIZZARD SPELLS SKILLS
-#0
-
 SOURCES RESOURCES CODEBASE FTP DOWNLOADS DOCUMENTATION WTFAQ FORUMS GROUPS
 
 Sources
@@ -16935,6 +16915,26 @@ Notes:
 Another terrain control spell. Cast it when you want the environment working against the enemy.
 
 See also: VSTAT, TSTAT, DETACH #31 STATIC-FIELD Static Field WALL-OF-FIRE ACID-RAIN DOMAIN-BREAK SPELLS SKILLS
+#0
+
+SNEAK
+
+Sneak
+Type: Skill
+
+Description:
+You attempt to move silently so your movement is harder to notice.
+
+Effect:
+Active self-target stealth skill. On a successful sneak skill check (skill plus Dexterity sneak bonus), you gain the sneak flag for a duration equal to your level. On failure, no sneak effect is applied. Reusing SNEAK removes the old sneak effect before the new roll.
+
+Usage:
+Use while traveling through hostile areas when you want quieter movement between rooms.
+
+Notes:
+SNEAK does not hide you in place; combine it with HIDE when you need both movement stealth and concealment.
+
+See also: HIDE BACKSTAB TOTAL-OCCULTATION SKILLS
 #0
 
 STEAL
@@ -20020,26 +20020,6 @@ Targeting: yourself only. If a saving throw is involved, expect reduced value on
 See also: SPELLS SKILLS
 #0
 
-TRUE-DEATH
-
-True Death
-Type: Spell
-
-Description:
-Channels fatal necrotic force meant to end a target cleanly.
-
-Effect:
-Single target death spell. It uses a death save rather than a normal spell save. A failed death save causes full necrotic damage and applies a long lasting True Death mark. A successful save halves the damage.
-
-Usage:
-Best used as a finisher against dangerous targets you need to remove quickly.
-
-Notes:
-This is heavy damage plus a failed-save mark, not an instant-kill effect. Use it after a target is already worn down or when a priority enemy must die now.
-
-See also: FINGER-OF-DEATH DISINTEGRATE GRASP-HEART SPELLS SKILLS
-#0
-
 TRUE-SEEING
 
 True Seeing
@@ -20616,22 +20596,38 @@ the tbaMUD codebase.
 
 WHERE
 
-Where
+Usage: where <monster | player | object>
+
+Tells you the location of a monster, player, or object. Mortals can use WHERE
+only for monsters or players in their own zone. Immortals can use WHERE with
+no arguments to list players globally.
+
+Examples:
+  > where
+  > where torch
+  > where dragon
+
+See also: WHO
+#0
+
+WHIRLWIND
+
+Whirlwind
 Type: Skill
 
 Description:
-Launches into a spinning melee assault against nearby foes.
+You begin a spinning melee sequence that repeatedly strikes nearby NPC enemies.
 
 Effect:
-Area melee skill for hitting multiple enemies in close combat.
+Active combat skill that starts a repeating event. Every tick it spends movement points, selects random NPC targets in the room, and makes 1d4 weapon attacks. The sequence continues while you have movement and pass skill continuation checks; it stops on failure, exhaustion, or when no NPCs remain.
 
 Usage:
-where <monster | player> Tells you the location of a monster, a player or an object. Mortals can only where monsters or players, and only from their own zone. Immortals may type 'where' without arguments to see where everybody is. Example: > where > where torch > where dragon #31 WHILE DONE %NEXT% NEXT LOOPS TRIG-LOOPS TRIG-WHILE TRIG-DONE FOR-LOOP COUNT while expression The while command starts a loop, running until the expression becomes zero, negative, or a break is used. The while loop must be terminated by a done. While loops are disabled after looping 100 times. Room example: @RTSTAT 24, 2201, 18@n Obj example: @RTSTAT 23@n Mob example: @RTSTAT 11858@n #31 WHIRLWIND Whirlwind Best used when surrounded or when several enemies are stacked on you at once.
+Use in NPC-heavy fights when multiple enemies are in your room and you can afford ongoing movement cost.
 
 Notes:
-Its value rises sharply in crowded fights and falls in simple one on one combat.
+You must know the skill, be standing/fighting, and not be in a peaceful room. WHIRLWIND cannot be started again while already active.
 
-See also: BASH KICK SHOCKWAVE SKILLS
+See also: KICK BASH SKILLS
 #0
 
 WHO WHOINVIS
