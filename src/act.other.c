@@ -652,12 +652,142 @@ static int can_use_practice_trainer(struct char_data *ch)
   return FALSE;
 }
 
-ACMD(do_study)
+static int study_is_valid_ability_id(int id)
 {
-  char reason[MAX_INPUT_LENGTH];
-  int ability_id;
+  return (id > 0 &&
+          id <= TOP_SPELL_DEFINE &&
+          id <= MAX_SKILLS &&
+          spell_info[id].name &&
+          *spell_info[id].name &&
+          str_cmp(spell_info[id].name, "!UNUSED!"));
+}
+
+static int study_can_learn_ability(struct char_data *student, int id, char *why, size_t whylen)
+{
   int required_level;
   int ability_archetype;
+
+  if (!study_is_valid_ability_id(id)) {
+    if (why && whylen)
+      snprintf(why, whylen, "You do not recognize that technique.");
+    return FALSE;
+  }
+
+  if (GET_SKILL(student, id) > 0) {
+    if (why && whylen)
+      snprintf(why, whylen, "You already know that.");
+    return FALSE;
+  }
+
+  required_level = classtrack_get_study_min_level(id);
+  if (required_level > 0 && GET_LEVEL(student) < required_level) {
+    if (why && whylen)
+      snprintf(why, whylen, "You are not experienced enough to study that yet.");
+    return FALSE;
+  }
+
+  ability_archetype = classtrack_get_ability_archetype(id);
+  if (ability_archetype < 0 || ability_archetype >= NUM_ARCHETYPES) {
+    if (why && whylen)
+      snprintf(why, whylen, "You do not recognize that technique.");
+    return FALSE;
+  }
+
+  if (why && whylen)
+    why[0] = '\0';
+  if (!classtrack_can_study_archetype(student, ability_archetype, why, whylen)) {
+    if (why && whylen && !*why)
+      snprintf(why, whylen,
+               "You have gone too far down your current path to learn that kind of power.");
+    return FALSE;
+  }
+
+  if (!classtrack_can_study_ability(student, id)) {
+    if (why && whylen)
+      snprintf(why, whylen, "You cannot study that right now.");
+    return FALSE;
+  }
+
+  return TRUE;
+}
+
+static int study_extract_item_spells(struct obj_data *obj, int *out, int out_cap)
+{
+  int spell_slots[3];
+  int slot_count = 0;
+  int c, i, j;
+
+  if (!obj || !out || out_cap <= 0)
+    return 0;
+
+  switch (GET_OBJ_TYPE(obj)) {
+    case ITEM_WAND:
+    case ITEM_STAFF:
+      spell_slots[slot_count++] = GET_OBJ_VAL(obj, 3);
+      break;
+    case ITEM_SCROLL:
+      spell_slots[slot_count++] = GET_OBJ_VAL(obj, 1);
+      spell_slots[slot_count++] = GET_OBJ_VAL(obj, 2);
+      spell_slots[slot_count++] = GET_OBJ_VAL(obj, 3);
+      break;
+    default:
+      return 0;
+  }
+
+  c = 0;
+  for (i = 0; i < slot_count && c < out_cap; i++) {
+    int sid = spell_slots[i];
+    int duplicate = FALSE;
+
+    if (sid <= 0 || sid > TOP_SPELL_DEFINE || sid > MAX_SPELLS)
+      continue;
+    if (!study_is_valid_ability_id(sid))
+      continue;
+
+    for (j = 0; j < c; j++) {
+      if (out[j] == sid) {
+        duplicate = TRUE;
+        break;
+      }
+    }
+    if (!duplicate)
+      out[c++] = sid;
+  }
+
+  return c;
+}
+
+static struct obj_data *study_find_item_source(struct char_data *student, char *name)
+{
+  struct obj_data *obj;
+  int i;
+
+  for (obj = student->carrying; obj; obj = obj->next_content)
+    if (CAN_SEE_OBJ(student, obj) && isname(name, obj->name))
+      return obj;
+
+  for (i = 0; i < NUM_WEARS; i++)
+    if (GET_EQ(student, i) && CAN_SEE_OBJ(student, GET_EQ(student, i)) &&
+        isname(name, GET_EQ(student, i)->name))
+      return GET_EQ(student, i);
+
+  for (obj = world[IN_ROOM(student)].contents; obj; obj = obj->next_content)
+    if (CAN_SEE_OBJ(student, obj) && isname(name, obj->name))
+      return obj;
+
+  return NULL;
+}
+
+ACMD(do_study)
+{
+  struct obj_data *study_obj = NULL;
+  int i, chosen;
+  int raw_spell_ids[3];
+  int raw_spell_count = 0;
+  int eligible_spell_ids[3];
+  int eligible_count = 0;
+  char reason[MAX_INPUT_LENGTH];
+  int ability_id;
 
   skip_spaces(&argument);
 
@@ -665,20 +795,7 @@ ACMD(do_study)
     return;
 
   if (!*argument) {
-    send_to_char(ch, "Usage: study <spell or skill>\r\n");
-    return;
-  }
-
-  ability_id = find_skill_num(argument);
-  if (ability_id <= 0 || ability_id > TOP_SPELL_DEFINE || ability_id > MAX_SKILLS ||
-      !spell_info[ability_id].name || !*spell_info[ability_id].name ||
-      !str_cmp(spell_info[ability_id].name, "!UNUSED!")) {
-    send_to_char(ch, "You do not recognize that technique.\r\n");
-    return;
-  }
-
-  if (GET_SKILL(ch, ability_id) > 0) {
-    send_to_char(ch, "You already know that.\r\n");
+    send_to_char(ch, "Usage: study <spell, skill, or magical item>\r\n");
     return;
   }
 
@@ -687,33 +804,49 @@ ACMD(do_study)
     return;
   }
 
-  required_level = classtrack_get_study_min_level(ability_id);
-  if (required_level > 0 && GET_LEVEL(ch) < required_level) {
-    send_to_char(ch, "You are not experienced enough to study that yet.\r\n");
+  ability_id = find_skill_num(argument);
+  if (study_is_valid_ability_id(ability_id)) {
+    if (!study_can_learn_ability(ch, ability_id, reason, sizeof(reason))) {
+      send_to_char(ch, "%s\r\n", *reason ? reason : "You cannot study that right now.");
+      return;
+    }
+
+    SET_SKILL(ch, ability_id, 1);
+    send_to_char(ch, "You study the knowledge of %s and begin to understand it.\r\n",
+                 spell_info[ability_id].name);
     return;
   }
 
-  ability_archetype = classtrack_get_ability_archetype(ability_id);
-  if (ability_archetype < 0 || ability_archetype >= NUM_ARCHETYPES) {
+  study_obj = study_find_item_source(ch, argument);
+  if (!study_obj) {
     send_to_char(ch, "You do not recognize that technique.\r\n");
     return;
   }
 
-  reason[0] = '\0';
-  if (!classtrack_can_study_archetype(ch, ability_archetype, reason, sizeof(reason))) {
-    send_to_char(ch, "%s\r\n", *reason ? reason :
-                 "You have gone too far down your current path to learn that kind of power.");
+  raw_spell_count = study_extract_item_spells(study_obj, raw_spell_ids, 3);
+  if (raw_spell_count <= 0) {
+    send_to_char(ch, "There is no technique within that item for you to study.\r\n");
     return;
   }
 
-  if (!classtrack_can_study_ability(ch, ability_id)) {
-    send_to_char(ch, "You cannot study that right now.\r\n");
+  for (i = 0; i < raw_spell_count; i++) {
+    if (study_can_learn_ability(ch, raw_spell_ids[i], NULL, 0))
+      eligible_spell_ids[eligible_count++] = raw_spell_ids[i];
+  }
+
+  if (eligible_count <= 0) {
+    send_to_char(ch, "You study %s, but its secrets remain beyond your grasp.\r\n",
+                 study_obj->short_description);
     return;
   }
+
+  chosen = (eligible_count == 1) ? 0 : rand_number(0, eligible_count - 1);
+  ability_id = eligible_spell_ids[chosen];
 
   SET_SKILL(ch, ability_id, 1);
-  send_to_char(ch, "You study the knowledge of %s and begin to understand it.\r\n",
-               spell_info[ability_id].name);
+  send_to_char(ch, "You study %s and unravel part of its hidden knowledge.\r\n",
+               study_obj->short_description);
+  send_to_char(ch, "You begin to understand %s.\r\n", spell_info[ability_id].name);
 }
 
 
