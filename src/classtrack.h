@@ -22,6 +22,9 @@ const char *classtrack_display_class_name(struct char_data *ch);
 const char *classtrack_display_class_abbrev(struct char_data *ch);
 int classtrack_get_ability_archetype(int ability_id);
 int classtrack_can_study_ability(struct char_data *ch, int ability_id);
+int classtrack_get_study_min_level(int ability_id);
+int classtrack_is_study_catalog_ability(int ability_id, int show_spells);
+void classtrack_ensure_study_skill(struct char_data *ch);
 
 /* Future study-system integration hook:
  * Best single hook point: skill_spell_ok() in src/spell_parser.c immediately
