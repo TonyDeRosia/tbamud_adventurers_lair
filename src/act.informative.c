@@ -2743,6 +2743,125 @@ void space_to_minus(char *str)
     *str = '-';
 }
 
+static void normalize_help_keyword(const char *src, char *dst, size_t dstsz)
+{
+  size_t out = 0;
+  int last_was_sep = 1;
+
+  if (!dst || dstsz == 0)
+    return;
+
+  dst[0] = '\0';
+  if (!src)
+    return;
+
+  while (*src && out + 1 < dstsz) {
+    unsigned char c = (unsigned char)*src++;
+
+    if (isalnum(c)) {
+      dst[out++] = LOWER(c);
+      last_was_sep = 0;
+      continue;
+    }
+
+    if (!last_was_sep) {
+      dst[out++] = '-';
+      last_was_sep = 1;
+    }
+  }
+
+  while (out > 0 && dst[out - 1] == '-')
+    out--;
+
+  dst[out] = '\0';
+}
+
+static int search_help_flexible(const char *argument, int level)
+{
+  int i, exact;
+  char normalized_arg[MAX_INPUT_LENGTH];
+  char normalized_key[MAX_INPUT_LENGTH];
+
+  if (!argument || !*argument)
+    return NOWHERE;
+
+  exact = search_help(argument, level);
+  if (exact != NOWHERE)
+    return exact;
+
+  normalize_help_keyword(argument, normalized_arg, sizeof(normalized_arg));
+  if (!*normalized_arg)
+    return NOWHERE;
+
+  exact = search_help(normalized_arg, level);
+  if (exact != NOWHERE)
+    return exact;
+
+  for (i = 0; i < top_of_helpt; i++) {
+    if (!help_table[i].keywords || help_table[i].min_level > level)
+      continue;
+    normalize_help_keyword(help_table[i].keywords, normalized_key, sizeof(normalized_key));
+    if (*normalized_key && !str_cmp(normalized_arg, normalized_key))
+      return i;
+  }
+
+  return NOWHERE;
+}
+
+static int append_help_line(char *buf, size_t bufsz, size_t *len, const char *line)
+{
+  int wrote;
+
+  if (!buf || !len || !line || *len >= bufsz)
+    return FALSE;
+
+  wrote = snprintf(buf + *len, bufsz - *len, "%s", line);
+  if (wrote < 0 || (size_t)wrote >= bufsz - *len) {
+    *len = bufsz - 1;
+    buf[*len] = '\0';
+    return FALSE;
+  }
+
+  *len += (size_t)wrote;
+  return TRUE;
+}
+
+static void show_live_ability_help(struct char_data *ch, int show_skills)
+{
+  int i, count = 0;
+  int start = show_skills ? MAX_SPELLS + 1 : 1;
+  int end = show_skills ? TOP_SPELL_DEFINE : MAX_SPELLS;
+  char outbuf[MAX_STRING_LENGTH];
+  size_t len = 0;
+  const char *title = show_skills ? "SKILLS" : "SPELLS";
+
+  if (!ch || !ch->desc)
+    return;
+
+  outbuf[0] = '\0';
+  append_help_line(outbuf, sizeof(outbuf), &len, title);
+  append_help_line(outbuf, sizeof(outbuf), &len, "\r\n\r\n");
+
+  for (i = start; i <= end; i++) {
+    if (!spell_info[i].name || !str_cmp(spell_info[i].name, unused_spellname))
+      continue;
+    count++;
+    if (!append_help_line(outbuf, sizeof(outbuf), &len,
+        show_skills ? "  " : "  "))
+      break;
+    if (!append_help_line(outbuf, sizeof(outbuf), &len, skill_name(i)))
+      break;
+    if (!append_help_line(outbuf, sizeof(outbuf), &len, "\r\n"))
+      break;
+  }
+
+  if (!count)
+    append_help_line(outbuf, sizeof(outbuf), &len, "No abilities are currently available.\r\n");
+
+  append_help_line(outbuf, sizeof(outbuf), &len, "\r\nType HELP <name> for details.\r\n");
+  page_string(ch->desc, outbuf, 1);
+}
+
 int search_help(const char *argument, int level)
 {
   int chk, bot, top, mid, minlen;
@@ -2799,8 +2918,10 @@ ACMD(do_help)
 {
   int mid = 0;
   int i, found = 0;
+  char help_query[MAX_INPUT_LENGTH];
+  char normalized_query[MAX_INPUT_LENGTH];
 
-    if (!ch->desc)
+  if (!ch->desc)
     return;
 
   skip_spaces(&argument);
@@ -2818,21 +2939,39 @@ ACMD(do_help)
     return;
   }
 
-  space_to_minus(argument);
+  strlcpy(help_query, argument, sizeof(help_query));
+  normalize_help_keyword(help_query, normalized_query, sizeof(normalized_query));
 
-  if ((mid = search_help(argument, GET_LEVEL(ch))) == NOWHERE) {
+  if (!str_cmp(normalized_query, "spells")) {
+    show_live_ability_help(ch, FALSE);
+    return;
+  }
+  if (!str_cmp(normalized_query, "skills")) {
+    show_live_ability_help(ch, TRUE);
+    return;
+  }
+
+  if ((mid = search_help_flexible(help_query, GET_LEVEL(ch))) == NOWHERE) {
     send_to_char(ch, "There is no help on that word.\r\n");
     mudlog(NRM, MIN(LVL_IMPL, GET_INVIS_LEV(ch)), TRUE,
-      "%s tried to get help on %s", GET_NAME(ch), argument);
+      "%s tried to get help on %s", GET_NAME(ch), help_query);
     for (i = 0; i < top_of_helpt; i++)  {
+      char normalized_keyword[MAX_INPUT_LENGTH];
+
       if (!help_table[i].keywords)
         continue;
       if (help_table[i].min_level > GET_LEVEL(ch))
         continue;
-      /* To help narrow down results, if they don't start with the same letters, move on. */
-      if (*argument != *help_table[i].keywords)
+
+      normalize_help_keyword(help_table[i].keywords, normalized_keyword, sizeof(normalized_keyword));
+      if (!*normalized_keyword)
         continue;
-      if (levenshtein_distance(argument, help_table[i].keywords) <= 2) {
+
+      /* To help narrow down results, if they don't start with the same letters, move on. */
+      if (*normalized_query != *normalized_keyword)
+        continue;
+
+      if (levenshtein_distance(normalized_query, normalized_keyword) <= 2) {
         if (!found) {
           send_to_char(ch, "\r\nDid you mean:\r\n");
           found = 1;
