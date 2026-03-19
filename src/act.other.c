@@ -676,9 +676,17 @@ enum study_item_result {
 
 struct study_item_debug_info {
   int known_count;
-  int level_blocked_count;
+  int item_level_blocked_count;
   int path_blocked_count;
 };
+
+static int study_item_level_allows(struct char_data *ch, struct obj_data *study_obj)
+{
+  if (!ch || !study_obj)
+    return FALSE;
+
+  return (GET_LEVEL(ch) >= GET_OBJ_LEVEL(study_obj));
+}
 
 static void study_debug_imm(struct char_data *ch, const char *fmt, ...)
 {
@@ -693,6 +701,22 @@ static void study_debug_imm(struct char_data *ch, const char *fmt, ...)
   va_end(args);
 
   send_to_char(ch, "[study debug] %s\r\n", buf);
+}
+
+static const char *study_item_result_name(enum study_item_result result)
+{
+  switch (result) {
+    case STUDY_ITEM_SUCCESS: return "success";
+    case STUDY_ITEM_NOT_FOUND: return "not-found";
+    case STUDY_ITEM_INVALID_SOURCE: return "invalid-source";
+    case STUDY_ITEM_NO_VALID_SLOTS: return "no-valid-slots";
+    case STUDY_ITEM_NO_STUDYABLE_SPELLS: return "no-studyable-spells";
+    case STUDY_ITEM_ALL_KNOWN: return "all-known";
+    case STUDY_ITEM_ALL_TOO_ADVANCED: return "item-level-blocked";
+    case STUDY_ITEM_ALL_BLOCKED_PATH: return "path-blocked";
+    case STUDY_ITEM_TARGET_NOT_PRESENT: return "target-not-present";
+    default: return "unknown";
+  }
 }
 
 static int study_can_learn_ability(struct char_data *student, int id, char *why, size_t whylen)
@@ -902,6 +926,7 @@ static enum study_item_result study_try_from_item(struct char_data *ch, struct o
   int eligible_spell_ids[3];
   int eligible_count = 0;
   struct study_item_debug_info debug_info = {0, 0, 0};
+  int item_level_gate_passed = FALSE;
   char raw_names[MAX_STRING_LENGTH] = "";
   char eligible_names[MAX_STRING_LENGTH] = "";
 
@@ -931,9 +956,10 @@ static enum study_item_result study_try_from_item(struct char_data *ch, struct o
     }
   }
 
+  item_level_gate_passed = study_item_level_allows(ch, study_obj);
+
   for (i = 0; i < raw_spell_count; i++) {
     int sid = raw_spell_ids[i];
-    int required_level = classtrack_get_study_min_level(sid);
     int ability_archetype = classtrack_get_ability_archetype(sid);
     size_t raw_len = strlen(raw_names);
 
@@ -949,21 +975,29 @@ static enum study_item_result study_try_from_item(struct char_data *ch, struct o
 
     if (GET_SKILL(ch, sid) > 0) {
       debug_info.known_count++;
+      study_debug_imm(ch, "item-study spell=%s item_level=%d player_level=%d item_gate=pass path_gate=skip result=known",
+                      spell_info[sid].name, GET_OBJ_LEVEL(study_obj), GET_LEVEL(ch));
       continue;
     }
 
-    if (required_level > 0 && GET_LEVEL(ch) < required_level) {
-      debug_info.level_blocked_count++;
+    if (!item_level_gate_passed) {
+      debug_info.item_level_blocked_count++;
+      study_debug_imm(ch, "item-study spell=%s item_level=%d player_level=%d item_gate=fail path_gate=skip result=item-level-blocked",
+                      spell_info[sid].name, GET_OBJ_LEVEL(study_obj), GET_LEVEL(ch));
       continue;
     }
 
     if (ability_archetype >= 0 && ability_archetype < NUM_ARCHETYPES &&
         !classtrack_can_study_archetype(ch, ability_archetype, NULL, 0)) {
       debug_info.path_blocked_count++;
+      study_debug_imm(ch, "item-study spell=%s item_level=%d player_level=%d item_gate=pass path_gate=fail result=path-blocked",
+                      spell_info[sid].name, GET_OBJ_LEVEL(study_obj), GET_LEVEL(ch));
       continue;
     }
 
     eligible_spell_ids[eligible_count++] = sid;
+    study_debug_imm(ch, "item-study spell=%s item_level=%d player_level=%d item_gate=pass path_gate=pass result=eligible",
+                    spell_info[sid].name, GET_OBJ_LEVEL(study_obj), GET_LEVEL(ch));
     {
       size_t eligible_len = strlen(eligible_names);
       int wrote = snprintf(eligible_names + eligible_len,
@@ -988,24 +1022,24 @@ static enum study_item_result study_try_from_item(struct char_data *ch, struct o
   }
 
   if (debug_info.known_count > 0 &&
-      debug_info.level_blocked_count == 0 &&
+      debug_info.item_level_blocked_count == 0 &&
       debug_info.path_blocked_count == 0)
     return STUDY_ITEM_ALL_KNOWN;
 
-  if (debug_info.level_blocked_count > 0 &&
+  if (debug_info.item_level_blocked_count > 0 &&
       debug_info.known_count == 0 &&
       debug_info.path_blocked_count == 0)
     return STUDY_ITEM_ALL_TOO_ADVANCED;
 
   if (debug_info.path_blocked_count > 0 &&
       debug_info.known_count == 0 &&
-      debug_info.level_blocked_count == 0)
+      debug_info.item_level_blocked_count == 0)
     return STUDY_ITEM_ALL_BLOCKED_PATH;
 
   if (debug_info.known_count == raw_spell_count)
     return STUDY_ITEM_ALL_KNOWN;
 
-  if (debug_info.level_blocked_count == raw_spell_count)
+  if (debug_info.item_level_blocked_count == raw_spell_count)
     return STUDY_ITEM_ALL_TOO_ADVANCED;
 
   if (debug_info.path_blocked_count == raw_spell_count)
@@ -1097,7 +1131,7 @@ ACMD(do_study)
         send_to_char(ch, "You already know all of the knowledge bound within that item.\r\n");
         break;
       case STUDY_ITEM_ALL_TOO_ADVANCED:
-        send_to_char(ch, "The magic within that item is beyond your current understanding.\r\n");
+        send_to_char(ch, "That item is beyond your current ability to study.\r\n");
         break;
       case STUDY_ITEM_ALL_BLOCKED_PATH:
         send_to_char(ch, "Your current path rejects the knowledge bound within that item.\r\n");
@@ -1107,8 +1141,14 @@ ACMD(do_study)
         send_to_char(ch, "You cannot yet make use of the knowledge bound within that item.\r\n");
         break;
     }
-    study_debug_imm(ch, "item-study result=%d for '%s' target=%d", item_result,
-                    study_obj->short_description, requested_ability_id);
+    study_debug_imm(ch,
+                    "item-study final=%s item='%s' item_level=%d player_level=%d target=%s learned=none",
+                    study_item_result_name(item_result),
+                    study_obj->short_description,
+                    GET_OBJ_LEVEL(study_obj),
+                    GET_LEVEL(ch),
+                    (has_requested_ability && study_is_valid_ability_id(requested_ability_id)) ?
+                      spell_info[requested_ability_id].name : "auto");
     if (item_result != STUDY_ITEM_INVALID_SOURCE &&
         item_result != STUDY_ITEM_NO_VALID_SLOTS &&
         item_result != STUDY_ITEM_TARGET_NOT_PRESENT)
@@ -1123,6 +1163,14 @@ ACMD(do_study)
   else
     send_to_char(ch, "You study %s and begin to understand %s.\r\n",
                  study_obj->short_description, spell_info[ability_id].name);
+  study_debug_imm(ch,
+                  "item-study final=%s item='%s' item_level=%d player_level=%d stored_spell=%s learned=%s",
+                  study_item_result_name(STUDY_ITEM_SUCCESS),
+                  study_obj->short_description,
+                  GET_OBJ_LEVEL(study_obj),
+                  GET_LEVEL(ch),
+                  spell_info[ability_id].name,
+                  spell_info[ability_id].name);
   study_apply_cooldown(ch, now, study_cooldown_secs);
 }
 
