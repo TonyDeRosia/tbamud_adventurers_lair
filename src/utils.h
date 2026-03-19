@@ -581,6 +581,9 @@ do                                                              \
 /** Bounty on character (gold units) */
 #define GET_BOUNTY(ch)     ((ch)->player_specials->saved.bounty_gold)
 #define SET_BOUNTY(ch, v)  do { (ch)->player_specials->saved.bounty_gold = (v); } while (0)
+#define GET_ARCHETYPE_SCORE(ch, idx) CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.archetype_scores[(idx)]))
+#define GET_CLASS_LOCKED(ch) CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.class_locked))
+#define GET_SOFT_CLASS_TITLE(ch) CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.soft_class_title))
 
 /* Lvalue helpers for old code paths that used assignments */
 #define SET_GOLD(ch,g)       do { GET_GOLD(ch) = ((long long)(g)); } while (0)

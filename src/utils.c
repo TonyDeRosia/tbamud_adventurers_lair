@@ -22,6 +22,7 @@
 #include "handler.h"
 #include "interpreter.h"
 #include "class.h"
+#include "classtrack.h"
 
 
 /** Aportable random number function.
@@ -99,6 +100,9 @@ void improve_ability_from_use(struct char_data *ch, int ability, int success)
 
   if (rand_number(1, 100) <= chance)
     SET_SKILL(ch, ability, cur + 1);
+
+  if (success)
+    classtrack_record_ability_use(ch, ability, (ability <= MAX_SPELLS));
 }
 
 int MIN(int a, int b)

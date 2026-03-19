@@ -260,9 +260,15 @@ void set_title(struct char_data *ch, char *title)
     free(GET_TITLE(ch));
 
   if (title == NULL) {
-    GET_TITLE(ch) = strdup(GET_SEX(ch) == SEX_FEMALE ?
-      title_female(GET_CLASS(ch), GET_LEVEL(ch)) :
-      title_male(GET_CLASS(ch), GET_LEVEL(ch)));
+    if (!IS_NPC(ch) && *GET_SOFT_CLASS_TITLE(ch)) {
+      char dynamic_title[MAX_TITLE_LENGTH + 1];
+      snprintf(dynamic_title, sizeof(dynamic_title), "the %s", GET_SOFT_CLASS_TITLE(ch));
+      GET_TITLE(ch) = strdup(dynamic_title);
+    } else {
+      GET_TITLE(ch) = strdup(GET_SEX(ch) == SEX_FEMALE ?
+        title_female(GET_CLASS(ch), GET_LEVEL(ch)) :
+        title_male(GET_CLASS(ch), GET_LEVEL(ch)));
+    }
   } else {
     if (strlen(title) > MAX_TITLE_LENGTH)
       title[MAX_TITLE_LENGTH] = '\0';

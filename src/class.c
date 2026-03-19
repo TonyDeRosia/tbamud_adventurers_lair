@@ -25,6 +25,7 @@
 #include "constants.h"
 #include "act.h"
 #include "class.h"
+#include "classtrack.h"
 
 #ifndef ARRAY_SIZE
 #define ARRAY_SIZE(array) (sizeof(array) / sizeof((array)[0]))
@@ -1809,6 +1810,7 @@ void advance_level(struct char_data *ch)
   }
 
   snoop_check(ch);
+  classtrack_check_level_checkpoint(ch);
   save_char(ch);
 }
 

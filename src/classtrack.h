@@ -1,0 +1,28 @@
+#ifndef _CLASSTRACK_H_
+#define _CLASSTRACK_H_
+
+#include <stddef.h>
+
+struct char_data;
+
+enum classtrack_archetype {
+  ARCHETYPE_COMBAT = 0,
+  ARCHETYPE_ROGUE,
+  ARCHETYPE_ARCANE,
+  ARCHETYPE_DIVINE,
+  ARCHETYPE_NATURE,
+  ARCHETYPE_DARK,
+  NUM_ARCHETYPES
+};
+
+void classtrack_init_new_player(struct char_data *ch);
+void classtrack_record_ability_use(struct char_data *ch, int ability, int was_spell);
+void classtrack_check_level_checkpoint(struct char_data *ch);
+
+/* Future study-system integration hook: call this before teaching a new ability
+ * from the requested archetype. Returns 1 when learning should be allowed,
+ * returns 0 when path commitment blocks new off-path study. */
+int classtrack_can_study_archetype(struct char_data *ch, int target_archetype,
+                                   char *reason, size_t reason_len);
+
+#endif
