@@ -84,7 +84,7 @@ ACMD(do_oasis_hedit)
   
   OLC_ZNUM(d) = search_help(OLC_STORAGE(d), LVL_IMPL);
 
-  if (help_table[OLC_ZNUM(d)].duplicate) {
+  if (OLC_ZNUM(d) != NOWHERE && help_table[OLC_ZNUM(d)].duplicate) {
     for (i = 0; i < top_of_helpt; i++)
       if (help_table[i].duplicate == 0 && help_table[i].entry == help_table[OLC_ZNUM(d)].entry) {
         OLC_ZNUM(d) = i;
@@ -112,7 +112,7 @@ static void hedit_setup_new(struct descriptor_data *d)
   CREATE(OLC_HELP(d), struct help_index_element, 1);
 
   OLC_HELP(d)->keywords		= strdup(OLC_STORAGE(d));
-  OLC_HELP(d)->entry		= strdup("KEYWORDS\r\n\r\nThis help file is unfinished.\r\n");
+  OLC_HELP(d)->entry		= strdup("This help file is unfinished.\r\n");
   OLC_HELP(d)->min_level	= 0;
   OLC_HELP(d)->duplicate	= 0;
   OLC_VAL(d) = 0;
@@ -147,8 +147,13 @@ static void hedit_save_internally(struct descriptor_data *d)
     new_help_table[top_of_helpt++] = *OLC_HELP(d);
     free(help_table);
     help_table = new_help_table;
-  } else
+  } else {
+    if (help_table[OLC_ZNUM(d)].keywords)
+      free(help_table[OLC_ZNUM(d)].keywords);
+    if (help_table[OLC_ZNUM(d)].entry && !help_table[OLC_ZNUM(d)].duplicate)
+      free(help_table[OLC_ZNUM(d)].entry);
     help_table[OLC_ZNUM(d)] = *OLC_HELP(d);
+  }
 
   add_to_save_list(HEDIT_PERMISSION, SL_HLP);
   hedit_save_to_disk(d);
@@ -167,13 +172,15 @@ static void hedit_save_to_disk(struct descriptor_data *d)
   }
 
   for (i = 0; i < top_of_helpt; i++) {
+    const char *keywords = help_table[i].keywords ? help_table[i].keywords : "UNNAMED";
+
     if (help_table[i].duplicate)
       continue;
     strncpy(buf1, help_table[i].entry ? help_table[i].entry : "Empty\r\n", sizeof(buf1) - 1);
+    buf1[sizeof(buf1) - 1] = '\0';
     strip_cr(buf1);
 
-    /* Forget making a buffer, lets just write the thing now. */
-    fprintf(fp, "%s#%d\n", convert_from_tabs(buf1), help_table[i].min_level);
+    fprintf(fp, "%s\n\n%s#%d\n\n", keywords, convert_from_tabs(buf1), help_table[i].min_level);
   }
   /* Write final line and close. */
   fprintf(fp, "$~\n");
@@ -193,11 +200,13 @@ static void hedit_disp_menu(struct descriptor_data *d)
 
   write_to_output(d,
       "%s-- Help file editor\r\n"
-      "%s1%s) Entry       :\r\n%s%s"
-      "%s2%s) Min Level   : %s%d\r\n"
+      "%s1%s) Keywords    : %s%s\r\n"
+      "%s2%s) Entry       :\r\n%s%s"
+      "%s3%s) Min Level   : %s%d\r\n"
       "%sQ%s) Quit\r\n"
       "Enter choice : ",
        nrm,
+       grn, nrm, yel, OLC_HELP(d)->keywords ? OLC_HELP(d)->keywords : "(none)",
        grn, nrm, yel, OLC_HELP(d)->entry,
        grn, nrm, yel, OLC_HELP(d)->min_level,
        grn, nrm
@@ -300,6 +309,10 @@ void hedit_parse(struct descriptor_data *d, char *arg)
       }
       break;
     case '1':
+      write_to_output(d, "Enter keywords (space-separated): ");
+      OLC_MODE(d) = HEDIT_KEYWORDS;
+      break;
+    case '2':
       OLC_MODE(d) = HEDIT_ENTRY;
       clear_screen(d);
       send_editor_help(d);
@@ -311,7 +324,7 @@ void hedit_parse(struct descriptor_data *d, char *arg)
       string_write(d, &OLC_HELP(d)->entry, MAX_MESSAGE_LENGTH, 0, oldtext);
       OLC_VAL(d) = 1;
       break;
-    case '2':
+    case '3':
       write_to_output(d, "Enter min level : ");
       OLC_MODE(d) = HEDIT_MIN_LEVEL;
       break;
@@ -328,7 +341,11 @@ void hedit_parse(struct descriptor_data *d, char *arg)
     if (strlen(arg) > MAX_HELP_KEYWORDS)
       arg[MAX_HELP_KEYWORDS - 1] = '\0';
     strip_cr(arg);
-    OLC_HELP(d)->keywords = str_udup(arg);
+    skip_spaces(&arg);
+    if (*arg)
+      OLC_HELP(d)->keywords = str_udup(arg);
+    else
+      OLC_HELP(d)->keywords = str_udup(OLC_STORAGE(d));
     break;
 
   case HEDIT_ENTRY:
