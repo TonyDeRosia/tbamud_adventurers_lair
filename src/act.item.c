@@ -1106,7 +1106,9 @@ ACMD(do_eat)
   char arg[MAX_INPUT_LENGTH];
   struct obj_data *food;
   struct affected_type af;
-  int amount;
+  int hunger_amount;
+  int thirst_amount;
+  int sated_duration;
 
   one_argument(argument, arg);
 
@@ -1146,12 +1148,24 @@ ACMD(do_eat)
     act("$n tastes a little bit of $p.", TRUE, ch, food, 0, TO_ROOM);
   }
 
-  amount = (subcmd == SCMD_EAT ? GET_OBJ_VAL(food, 0) : 1);
+  if (subcmd == SCMD_EAT) {
+    hunger_amount = GET_OBJ_VAL(food, 0);
+    thirst_amount = GET_OBJ_VAL(food, 1);
+    sated_duration = GET_OBJ_VAL(food, 2);
+  } else {
+    hunger_amount = (GET_OBJ_VAL(food, 0) > 0) ? 1 : 0;
+    thirst_amount = (GET_OBJ_VAL(food, 1) > 0) ? 1 : 0;
+    sated_duration = (GET_OBJ_VAL(food, 2) > 0) ? 1 : 0;
+  }
 
-  gain_condition(ch, HUNGER, amount);
+  gain_condition(ch, HUNGER, hunger_amount);
+  gain_condition(ch, THIRST, thirst_amount);
+  ch->char_specials.food_sated_ticks = MAX(ch->char_specials.food_sated_ticks, 0) + MAX(sated_duration, 0);
 
   if (GET_COND(ch, HUNGER) > 20)
     send_to_char(ch, "You are full.\r\n");
+  if (GET_COND(ch, THIRST) > 20)
+    send_to_char(ch, "You don't feel thirsty any more.\r\n");
 
   if (GET_OBJ_VAL(food, 3) && (GET_LEVEL(ch) < LVL_IMMORT)) {
     /* The crap was poisoned ! */
@@ -1160,18 +1174,12 @@ ACMD(do_eat)
 
     new_affect(&af);
     af.spell = SPELL_POISON;
-    af.duration = amount * 2;
+    af.duration = MAX(1, hunger_amount) * 2;
     SET_BIT_AR(af.bitvector, AFF_POISON);
     affect_join(ch, &af, FALSE, FALSE, FALSE, FALSE);
   }
   if (subcmd == SCMD_EAT)
     extract_obj(food);
-  else {
-    if (!(--GET_OBJ_VAL(food, 0))) {
-      send_to_char(ch, "There's nothing left now.\r\n");
-      extract_obj(food);
-    }
-  }
 }
 
 ACMD(do_pour)

@@ -437,7 +437,7 @@ static void oedit_disp_val1_menu(struct descriptor_data *d)
     write_to_output(d, "Max drink units (-1 for unlimited) : ");
     break;
   case ITEM_FOOD:
-    write_to_output(d, "Hours to fill stomach : ");
+    write_to_output(d, "Hunger restore amount: ");
     break;
   case ITEM_MONEY:
     write_to_output(d, "Number of gold coins : ");
@@ -483,8 +483,7 @@ static void oedit_disp_val2_menu(struct descriptor_data *d)
     write_to_output(d, "Number of people it can hold (0 for unlimited) : ");
     break;
   case ITEM_FOOD:
-    /* Values 2 and 3 are unused, jump to 4...Odd. */
-    oedit_disp_val4_menu(d);
+    write_to_output(d, "Thirst restore amount: ");
     break;
   case ITEM_CONTAINER:
     /* These are flags, needs a bit of special handling. */
@@ -521,6 +520,9 @@ static void oedit_disp_val3_menu(struct descriptor_data *d)
   case ITEM_CONTAINER:
     write_to_output(d, "Vnum of key to open container (-1 for no key) : ");
     break;
+  case ITEM_FOOD:
+    write_to_output(d, "Sated duration: ");
+    break;
   case ITEM_DRINKCON:
   case ITEM_FOUNTAIN:
     oedit_liquid_type(d);
@@ -547,7 +549,7 @@ static void oedit_disp_val4_menu(struct descriptor_data *d)
   case ITEM_DRINKCON:
   case ITEM_FOUNTAIN:
   case ITEM_FOOD:
-    write_to_output(d, "Poisoned (0 = not poison) : ");
+    write_to_output(d, "Poisoned (0 = no, 1 = yes): ");
     break;
   default:
     oedit_disp_menu(d);
@@ -679,7 +681,7 @@ static void oedit_disp_menu(struct descriptor_data *d)
           "%sA%s) Cost/Day    : %s%d\r\n"
           "%sB%s) Timer       : %s%d\r\n"
           "%s"
-          "%sC%s) Values      : %s%d %d %d %d\r\n"
+          "%sC%s) Values      : %s%d %d %d %d%s\r\n"
           "%sD%s) Applies menu\r\n"
           "%sE%s) Extra descriptions menu: %s%s%s\r\n"
           "%sM%s) Min Level   : %s%d\r\n"
@@ -700,6 +702,7 @@ static void oedit_disp_menu(struct descriptor_data *d)
           GET_OBJ_VAL(obj, 1),
           GET_OBJ_VAL(obj, 2),
 	  GET_OBJ_VAL(obj, 3),
+          GET_OBJ_TYPE(obj) == ITEM_FOOD ? " (hunger thirst sated poison)" : "",
 	  grn, nrm, grn, nrm, cyn, obj->ex_description ? "Set." : "Not Set.", grn,
           grn, nrm, cyn, GET_OBJ_LEVEL(obj),
           grn, nrm, cyn, buf2,
