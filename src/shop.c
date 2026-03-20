@@ -74,6 +74,8 @@ static int read_type_list(FILE *shop_f, struct shop_buy_data *list, int new_form
 static int read_list(FILE *shop_f, struct shop_buy_data *list, int new_format, int max, int type);
 static void shopping_list(char *arg, struct char_data *ch, struct char_data *keeper, int shop_nr);
 static bool shopping_identify(char *arg, struct char_data *ch, struct char_data *keeper, int shop_nr);
+static bool shopping_appraise(char *arg, struct char_data *ch, struct char_data *keeper, int shop_nr);
+static bool shopping_inspect_item(char *arg, struct char_data *ch, struct char_data *keeper, int shop_nr, const char *no_arg_msg);
 static void shopping_value(char *arg, struct char_data *ch, struct char_data *keeper, int shop_nr);
 static void shopping_sell(char *arg, struct char_data *ch, struct char_data *keeper, int shop_nr);
 static struct obj_data *get_selling_obj(struct char_data *ch, char *name, struct char_data *keeper, int shop_nr, int msg);
@@ -105,10 +107,12 @@ struct buy_price_info {
 static int buy_price(struct obj_data *obj, int shop_nr, struct char_data *keeper, struct char_data *buyer);
 static int sell_price(struct obj_data *obj, int shop_nr, struct char_data *keeper, struct char_data *seller);
 static int ok_shop_room(int shop_nr, room_vnum room);
+static bool find_shopkeeper_for_room(struct char_data *ch, struct char_data **keeper_out, int *shop_nr_out);
 static int add_to_shop_list(struct shop_buy_data *list, int type, int *len, int *val);
 static int end_read_list(struct shop_buy_data *list, int len, int error);
 static void read_line(FILE *shop_f, const char *string, void *data);
 ACMD(do_shopdisc);
+ACMD(do_appraise);
 
 /* Local file scope only variables */
 static int cmd_say;
@@ -1113,6 +1117,8 @@ SPECIAL(shop_keeper)
   } else if (CMD_IS("list")) {
     shopping_list(argument, ch, keeper, shop_nr);
     return (TRUE);
+  } else if (CMD_IS("appraise")) {
+    return (shopping_appraise(argument, ch, keeper, shop_nr));
   } else if (CMD_IS("identify")) {
     return (shopping_identify(argument, ch, keeper, shop_nr));
   }
@@ -1684,9 +1690,18 @@ void destroy_shops(void)
 
 bool shopping_identify(char *arg, struct char_data *ch, struct char_data *keeper, int shop_nr)
 {
-  char buf[MAX_STRING_LENGTH];
+  return shopping_inspect_item(arg, ch, keeper, shop_nr, "Identify what?\r\n");
+}
+
+static bool shopping_appraise(char *arg, struct char_data *ch, struct char_data *keeper, int shop_nr)
+{
+  return shopping_inspect_item(arg, ch, keeper, shop_nr, "Appraise what?\r\n");
+}
+
+static bool shopping_inspect_item(char *arg, struct char_data *ch, struct char_data *keeper, int shop_nr, const char *no_arg_msg)
+{
+  char buy_buf[64], sell_buf[64];
   struct obj_data *obj;
-  int i, found;
 
   if (!is_ok(keeper, ch, shop_nr))
     return FALSE;
@@ -1695,105 +1710,52 @@ bool shopping_identify(char *arg, struct char_data *ch, struct char_data *keeper
     sort_keeper_objs(keeper, shop_nr);
 
   if (!*arg) {
-    snprintf(buf, sizeof(buf), "%s What do you want to identify??", GET_NAME(ch));
-    do_tell(keeper, buf, cmd_tell, 0);
+    send_to_char(ch, "%s", no_arg_msg);
     return TRUE;
   }
-  if (!(obj = get_purchase_obj(ch, arg, keeper, shop_nr, TRUE)))
+
+  if (!(obj = get_purchase_obj(ch, arg, keeper, shop_nr, FALSE))) {
+    send_to_char(ch, "That item is not sold here.\r\n");
+    return TRUE;
+  }
+
+  shop_format_price(buy_buf, sizeof(buy_buf), buy_price(obj, shop_nr, keeper, ch));
+  shop_format_price(sell_buf, sizeof(sell_buf), sell_price(obj, shop_nr, keeper, ch));
+
+  act("You take a closer look at $p.", FALSE, ch, obj, keeper, TO_CHAR);
+  send_to_char(ch, "Shop Price: %s%s%s (sell value: %s%s%s)\r\n",
+               QYEL, buy_buf, QNRM,
+               QYEL, sell_buf, QNRM);
+  show_identify_item(ch, obj, IDENTIFY_FULL);
+  return TRUE;
+}
+
+static bool find_shopkeeper_for_room(struct char_data *ch, struct char_data **keeper_out, int *shop_nr_out)
+{
+  struct char_data *keeper;
+  int shop_nr;
+
+  if (!ch || !keeper_out || !shop_nr_out || IN_ROOM(ch) == NOWHERE)
     return FALSE;
 
-  send_to_char(ch, "Name: %s\r\n", (obj->short_description) ? obj->short_description : "<None>");
-  sprinttype(GET_OBJ_TYPE(obj), item_types, buf, sizeof(buf));
-  send_to_char(ch, "Type: %s\r\n", buf);
-  send_to_char(ch, "Weight: %d, Cost to Sell: %s%d%s, Cost to Buy: %s%d%s\r\n",
-		GET_OBJ_WEIGHT(obj),
-		QYEL, sell_price(obj, shop_nr, keeper, ch), QNRM,
-		QYEL, buy_price(obj, shop_nr, keeper, ch), QNRM);
-		
-  sprintbitarray(GET_OBJ_WEAR(obj), wear_bits, TW_ARRAY_MAX, buf);
-  send_to_char(ch, "Can be worn on: %s\r\n", buf);
+  for (keeper = world[IN_ROOM(ch)].people; keeper; keeper = keeper->next_in_room) {
+    if (!IS_MOB(keeper) || GET_MOB_RNUM(keeper) == NOBODY)
+      continue;
+    if (mob_index[GET_MOB_RNUM(keeper)].func != shop_keeper)
+      continue;
 
-      switch (GET_OBJ_TYPE(obj)) {
-        case ITEM_LIGHT:
-          if (GET_OBJ_VAL(obj, 2) == -1)
-            send_to_char(ch, "Hours Remaining: (Infinite)\r\n");
-          else if (GET_OBJ_VAL(obj, 2) == 0)
-            send_to_char(ch, "Hours Remaining: None!\r\n");
-          else
-            send_to_char(ch, "Hours Remaining: %d\r\n", GET_OBJ_VAL(obj, 2));
-          break;
-        case ITEM_SCROLL:
-        case ITEM_POTION:
-          send_to_char(ch, "Spells: %s, %s, %s\r\n",
-                  skill_name(GET_OBJ_VAL(obj, 1)),
-                  skill_name(GET_OBJ_VAL(obj, 2)),
-                  skill_name(GET_OBJ_VAL(obj, 3)));
-          break;
-        case ITEM_WAND:
-        case ITEM_STAFF:
-          send_to_char(ch, "Spell: %s\r\n", skill_name(GET_OBJ_VAL(obj, 3)));
-          send_to_char(ch, "Charges: %d/%d\r\n", GET_OBJ_VAL(obj, 2), GET_OBJ_VAL(obj, 1));
-          break;
-        case ITEM_WEAPON:
-            send_to_char(ch, "Damage Dice is '%dD%d' for an average per-round damage of %.1f.\r\n",
-                        GET_OBJ_VAL(obj, 1), GET_OBJ_VAL(obj, 2),
-                        ((GET_OBJ_VAL(obj, 2) + 1) / 2.0) * GET_OBJ_VAL(obj, 1));
-            break;
-        case ITEM_ARMOR:
-          if(GET_OBJ_VAL(obj,1) == 0)
-          {
-            send_to_char(ch, "Armor: [%d]\r\n", GET_OBJ_VAL(obj, 0));
-          }
-          else
-          {
-            send_to_char(ch, "Armor: [%d] - This item has magical affects.\r\n", GET_OBJ_VAL(obj, 0));
-          }
-          break;
-        case ITEM_CONTAINER:
-          send_to_char(ch, "Capacity: %d/%d\r\n", GET_OBJ_WEIGHT(obj), GET_OBJ_VAL(obj, 0));
-          break;
-        case ITEM_DRINKCON:
-        case ITEM_FOUNTAIN:
-          send_to_char(ch, "Drinks: %d/%d\r\n", GET_OBJ_VAL(obj, 1), GET_OBJ_VAL(obj, 0));
-          break;
-        case ITEM_NOTE:
-          send_to_char(ch, "\r\n");
-          break;
-        case ITEM_KEY:
-          send_to_char(ch, "\r\n");
-          break;
-        case ITEM_FOOD:
-          send_to_char(ch, "\r\n");
-          break;
-        case ITEM_MONEY:
-          send_to_char(ch, "\r\n");
-          break;
-        case ITEM_WORN:
-          if(GET_OBJ_VAL(obj,1) > 0)
-            send_to_char(ch, "This item has magical affects.\r\n");
-          else
-            send_to_char(ch, "\r\n");
-          break;
-        default:
-          send_to_char(ch, "\r\n");
-          break;
+    for (shop_nr = 0; shop_nr <= top_shop; shop_nr++) {
+      if (SHOP_KEEPER(shop_nr) != keeper->nr)
+        continue;
+      if (ok_shop_room(shop_nr, GET_ROOM_VNUM(IN_ROOM(ch)))) {
+        *keeper_out = keeper;
+        *shop_nr_out = shop_nr;
+        return TRUE;
       }
+    }
+  }
 
-      found = 0;
-      send_to_char(ch, "Affections:");
-      for (i = 0; i < MAX_OBJ_AFFECT; i++)
-        if (obj->affected[i].modifier) {
-          sprinttype(obj->affected[i].location, apply_types, buf, sizeof(buf));
-          send_to_char(ch, "%s %+d to %s", found++ ? "," : "", obj->affected[i].modifier, buf);
-        }
-      if (!found)
-        send_to_char(ch, " None");
-
-      send_to_char(ch, "\r\nExtra Flags: ");
-      sprintbitarray(GET_OBJ_EXTRA(obj), extra_bits, EF_ARRAY_MAX, buf);
-      send_to_char(ch, "%s\r\n", buf);
-
-  return TRUE;
+  return FALSE;
 }
 
 ACMD(do_shopdisc)
@@ -1807,24 +1769,7 @@ ACMD(do_shopdisc)
   if (IS_NPC(ch))
     return;
 
-  for (keeper = world[IN_ROOM(ch)].people; keeper; keeper = keeper->next_in_room) {
-    if (!IS_MOB(keeper) || GET_MOB_RNUM(keeper) == NOBODY)
-      continue;
-    if (mob_index[GET_MOB_RNUM(keeper)].func != shop_keeper)
-      continue;
-
-    for (shop_nr = 0; shop_nr <= top_shop; shop_nr++) {
-      if (SHOP_KEEPER(shop_nr) != keeper->nr)
-        continue;
-      if (ok_shop_room(shop_nr, GET_ROOM_VNUM(IN_ROOM(ch))))
-        break;
-    }
-
-    if (shop_nr <= top_shop)
-      break;
-  }
-
-  if (!keeper || shop_nr < 0 || shop_nr > top_shop) {
+  if (!find_shopkeeper_for_room(ch, &keeper, &shop_nr)) {
     send_to_char(ch, "You must be in a shop to use that command.\r\n");
     return;
   }
@@ -1861,4 +1806,22 @@ ACMD(do_shopdisc)
 
     ch->aff_abils.cha = saved_cha;
   }
+}
+
+ACMD(do_appraise)
+{
+  struct char_data *keeper = NULL;
+  int shop_nr = -1;
+
+  if (!*argument) {
+    send_to_char(ch, "Appraise what?\r\n");
+    return;
+  }
+
+  if (!find_shopkeeper_for_room(ch, &keeper, &shop_nr)) {
+    send_to_char(ch, "There is no shopkeeper here to appraise that for you.\r\n");
+    return;
+  }
+
+  (void)shopping_appraise(argument, ch, keeper, shop_nr);
 }
