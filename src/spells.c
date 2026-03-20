@@ -443,6 +443,25 @@ static struct char_data *summon_shadow_servant(struct char_data *ch, mob_vnum vn
   return mob;
 }
 
+static int shadow_extraction_success_chance(struct char_data *ch, int corpse_level)
+{
+  int player_level = GET_LEVEL(ch);
+  int level_delta = corpse_level - player_level;
+  int level_mod = 0;
+  int chance = 35;
+
+  if (level_delta > 0)
+    level_mod = level_delta * 4;
+  else
+    level_mod = -(MIN(20, (-level_delta) * 2));
+
+  chance += GET_INT(ch) / 2;
+  chance += GET_WIS(ch) / 2;
+  chance -= level_mod;
+
+  return MAX(5, MIN(90, chance));
+}
+
 int summon_stored_shadow(struct char_data *ch, int slot)
 {
   struct char_data *mob;
@@ -2330,8 +2349,12 @@ ASPELL(spell_shadow_extraction)
   int slot = -1;
   int i;
   int capacity;
+  int attempts_remaining;
+  int chance;
+  int roll;
   char shadow_name[MAX_NAME_LENGTH + 1];
   mob_vnum source_vnum;
+  int corpse_level;
   int shadow_level;
   if (!ch) return;
   if (!corpse || !IS_CORPSE(corpse)) {
@@ -2340,6 +2363,15 @@ ASPELL(spell_shadow_extraction)
   }
   if (GET_OBJ_TIMER(corpse) <= 0) {
     send_to_char(ch, "That corpse has no shadow left to claim.\r\n");
+    return;
+  }
+  if (!CORPSE_SHADOW_ATTEMPTS_INIT(corpse)) {
+    CORPSE_SHADOW_ATTEMPTS(corpse) = 3;
+    CORPSE_SHADOW_ATTEMPTS_INIT(corpse) = 1;
+  }
+  attempts_remaining = CORPSE_SHADOW_ATTEMPTS(corpse);
+  if (attempts_remaining <= 0) {
+    send_to_char(ch, "There is no shadow left within this corpse to claim.\r\n");
     return;
   }
   capacity = 2 + (GET_INT(ch) / 8) + (GET_WIS(ch) / 8);
@@ -2355,8 +2387,23 @@ ASPELL(spell_shadow_extraction)
     return;
   }
 
+  corpse_level = GET_OBJ_VAL(corpse, 2) > 0 ? GET_OBJ_VAL(corpse, 2) : level;
+  chance = shadow_extraction_success_chance(ch, corpse_level);
+  roll = rand_number(1, 100);
+  if (roll > chance) {
+    CORPSE_SHADOW_ATTEMPTS(corpse) = MAX(0, CORPSE_SHADOW_ATTEMPTS(corpse) - 1);
+    attempts_remaining = CORPSE_SHADOW_ATTEMPTS(corpse);
+    if (attempts_remaining == 2)
+      send_to_char(ch, "You reach for the shadow, but it resists your command.\r\n");
+    else if (attempts_remaining == 1)
+      send_to_char(ch, "The shadow strains against your will and slips away.\r\n");
+    else
+      send_to_char(ch, "The shadow rejects your dominion and fades beyond your reach.\r\n");
+    return;
+  }
+
   source_vnum = GET_OBJ_VAL(corpse, 1);
-  shadow_level = MAX(1, MIN(level, GET_OBJ_VAL(corpse, 2) > 0 ? GET_OBJ_VAL(corpse, 2) : level));
+  shadow_level = MAX(1, MIN(level, corpse_level));
   strlcpy(shadow_name, corpse->short_description ? corpse->short_description : "nameless shadow", sizeof(shadow_name));
   if (!strncasecmp(shadow_name, "the corpse of ", 14))
     memmove(shadow_name, shadow_name + 14, strlen(shadow_name + 14) + 1);
