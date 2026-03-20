@@ -494,12 +494,15 @@ void appear(struct char_data *ch)
 
 int compute_armor_class(struct char_data *ch)
 {
-  int armorclass = GET_AC(ch);
+  int armor_bonus = ((GET_CON(ch) - 10) * 2) + (GET_STR(ch) - 10);
+  int armor = GET_ARMOR(ch) + armor_bonus;
+  return MAX(0, armor);
+}
 
-  if (AWAKE(ch))
-    armorclass += dex_app[GET_DEX(ch)].defensive * 10;
-
-  return (MAX(-100, armorclass));      /* -100 is lowest */
+int compute_evasion(struct char_data *ch)
+{
+  int evasion_bonus = (GET_DEX(ch) - 10) * 2;
+  return GET_EVASION(ch) + evasion_bonus;
 }
 
 void update_pos(struct char_data *victim)
@@ -1557,6 +1560,11 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
     dam = MAX(1, dam - 5);
   }
 
+  if (dam > 0 && IS_WEAPON(attacktype)) {
+    int armor = compute_armor_class(victim);
+    dam = (dam * 100) / (100 + armor);
+  }
+
   if (dam > 0) {
     if (affected_by_spell(victim, SPELL_BODY_OF_EFFULGENT_BERYL) &&
         attacktype > 0 && IS_WEAPON(attacktype)) {
@@ -1903,7 +1911,7 @@ static int compute_thaco(struct char_data *ch, struct char_data *victim)
 void hit(struct char_data *ch, struct char_data *victim, int type)
 {
   struct obj_data *wielded = GET_EQ(ch, WEAR_WIELD);
-  int w_type, victim_ac, calc_thaco, dam, diceroll;
+  int w_type, attacker_hit, defender_evasion, hit_chance, dam, roll;
 
   /* Check that the attacker and victim exist */
   if (!ch || !victim) return;
@@ -1928,31 +1936,18 @@ void hit(struct char_data *ch, struct char_data *victim, int type)
       w_type = TYPE_HIT;
   }
 
-  /* Calculate chance of hit. Lower THAC0 is better for attacker. */
-  calc_thaco = compute_thaco(ch, victim);
-
-  /* Calculate the raw armor including magic armor.  Lower AC is better for defender. */
-  victim_ac = compute_armor_class(victim) / 10;
-
-  /* roll the die and take your chances... */
-  diceroll = rand_number(1, 20);
+  attacker_hit = 100 - (compute_thaco(ch, victim) * 4);
+  defender_evasion = compute_evasion(victim);
+  hit_chance = attacker_hit - defender_evasion;
+  hit_chance = MAX(5, MIN(95, hit_chance));
+  roll = rand_number(1, 100);
 
   /* report for debugging if necessary */
   if (CONFIG_DEBUG_MODE >= NRM)
-    send_to_char(ch, "\t1Debug:\r\n   \t2Thaco: \t3%d\r\n   \t2AC: \t3%d\r\n   \t2Diceroll: \t3%d\tn\r\n", 
-      calc_thaco, victim_ac, diceroll);
+    send_to_char(ch, "\t1Debug:\r\n   \t2Attacker Hit: \t3%d\r\n   \t2Defender Evasion: \t3%d\r\n   \t2Hit Chance: \t3%d\r\n   \t2Roll: \t3%d\tn\r\n",
+      attacker_hit, defender_evasion, hit_chance, roll);
 
-  /* Decide whether this is a hit or a miss.
-   *  Victim asleep = hit, otherwise:
-   *     1   = Automatic miss.
-   *   2..19 = Checked vs. AC.
-   *    20   = Automatic hit. */
-  if (diceroll == 20 || !AWAKE(victim))
-    dam = TRUE;
-  else if (diceroll == 1)
-    dam = FALSE;
-  else
-    dam = (calc_thaco - diceroll <= victim_ac);
+  dam = (!AWAKE(victim) || roll <= hit_chance);
 
   if (!dam)
     /* the attacker missed the victim */
@@ -2166,7 +2161,7 @@ static void process_round_effects(void)
         af.spell = SPELL_DESPAIR_AURA;
         af.duration = 1;
         af.location = APPLY_AC;
-        af.modifier = -2;
+        af.modifier = 2;
         affect_join(i, &af, FALSE, FALSE, FALSE, FALSE);
       }
       for (tch = world[IN_ROOM(i)].people; tch; tch = tch->next_in_room) {

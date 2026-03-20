@@ -211,7 +211,7 @@ void room_tick_effects(struct room_data *room)
               af.spell = SPELL_ACID_RAIN;
               af.duration = MAX(1, eff->duration);
               af.location = APPLY_AC;
-              af.modifier = 20;
+              af.modifier = -20;
               SET_BIT_AR(af.bitvector, AFF_CORRODED);
               affect_join(tch, &af, FALSE, FALSE, FALSE, FALSE);
             }

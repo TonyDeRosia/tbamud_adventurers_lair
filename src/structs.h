@@ -522,7 +522,8 @@ void clanedit_parse(struct descriptor_data *d, char *arg);
 #define APPLY_MOVE             14	/**< Apply to max move points	*/
 #define APPLY_GOLD             15	/**< Reserved			*/
 #define APPLY_EXP              16	/**< Reserved			*/
-#define APPLY_AC               17	/**< Apply to Armor Class		*/
+#define APPLY_AC               17	/**< Apply to Armor			*/
+#define APPLY_EVASION          31    /**< Apply to Evasion               */
 #define APPLY_HITROLL          18	/**< Apply to hitroll		*/
 #define APPLY_DAMROLL          19	/**< Apply to damage roll		*/
 #define APPLY_SAVING_PARA      20	/**< Apply to save throw: paralysis	*/
@@ -538,7 +539,7 @@ void clanedit_parse(struct descriptor_data *d, char *arg);
 #define APPLY_HEAL_CRIT_MULT    30
 
 /** Total number of applies */
-#define NUM_APPLIES   25
+#define NUM_APPLIES   32
 
 /* Equals the total number of SAVING_* defines in spells.h */
 #define NUM_OF_SAVING_THROWS  5
@@ -990,12 +991,10 @@ struct char_point_data
   sh_int move;     /**< Current move point, or stamina, level */
   sh_int max_move; /**< Max move point, or stamina, level */
 
-  /** Current armor class. Internal use goes from -100 (totally armored) to
-   * 100 (totally naked). Externally expressed as -10 (totally armored) to
-   * 10 (totally naked). Currently follows the old and decrepit Advanced
-   * Dungeons and Dragons method of dealing with character defense, or
-   * Armor class. */
+  /** Base Armor value before stat-derived bonuses. Higher is better. */
   sh_int armor;
+  /** Base Evasion value before stat-derived bonuses. Higher is better. */
+  sh_int evasion;
   long long money;      /**< Currency carried, stored in gold units */
   long long bank_money; /**< Currency in bank, stored in gold units */
   int glory;            /**< Glory currency */

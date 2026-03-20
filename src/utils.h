@@ -539,8 +539,11 @@ do                                                              \
 
 /** Experience points of ch. */
 #define GET_EXP(ch)	  ((ch)->points.exp)
-/** Armor class of ch. */
+/** Armor of ch. */
 #define GET_AC(ch)        ((ch)->points.armor)
+#define GET_ARMOR(ch)     ((ch)->points.armor)
+/** Evasion of ch. */
+#define GET_EVASION(ch)   ((ch)->points.evasion)
 /** Current hit points (health) of ch. */
 #define GET_HIT(ch)	  ((ch)->points.hit)
 /** Maximum hit points of ch. */

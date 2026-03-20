@@ -529,10 +529,11 @@ const char *apply_types[] = {
   "SAVING_SPELL",
     "MELEE_CRIT",
     "SPELL_CRIT",
-    "HEAL_CRIT",
-    "MELEE_CRIT_MULT",
-    "SPELL_CRIT_MULT",
-    "HEAL_CRIT_MULT",
+  "HEAL_CRIT",
+  "MELEE_CRIT_MULT",
+  "SPELL_CRIT_MULT",
+  "HEAL_CRIT_MULT",
+  "EVASION",
 
   "\n"
 };

@@ -537,7 +537,7 @@ static void medit_disp_stats_menu(struct descriptor_data *d)
   "(%s5%s) HP Addition: %s[%s%5d%s]%s    (%s8%s) DamRoll:      %s[%s%5d%s]%s\r\n"
   "%-*s(range %s%d%s to %s%d%s)\r\n\r\n"
 
-  "(%sA%s) Armor Class: %s[%s%4d%s]%s        (%sD%s) Hitroll:   %s[%s%5d%s]%s\r\n"
+  "(%sA%s) Armor: %s[%s%4d%s]%s        (%sD%s) Hitroll:   %s[%s%5d%s]%s\r\n"
   "(%sB%s) Exp Points:  %s[%s%10d%s]%s  (%sE%s) Alignment: %s[%s%5d%s]%s\r\n"
   "(%sC%s) Gold Min/Max: %s[%s%5lld%s/%s%5lld%s]%s\r\n\r\n",
       cyn, yel, OLC_NUM(d), cyn, nrm,
@@ -1231,7 +1231,7 @@ void medit_autoroll_stats(struct descriptor_data *d)
 
   GET_HITROLL(OLC_MOB(d)) = mob_lev/3;           /* hitroll 0-10            */
   GET_EXP(OLC_MOB(d))     = (mob_lev*mob_lev*100);
-  SET_GOLD(OLC_MOB(d), (mob_lev*10));GET_AC(OLC_MOB(d))      = (100-(mob_lev*6));   /* AC 94 to -80            */
+  SET_GOLD(OLC_MOB(d), (mob_lev*10));GET_AC(OLC_MOB(d))      = (mob_lev * 6);        /* Armor 6 to 180          */
 
   /* 'Advanced' stats are only rolled if advanced options are enabled */
   if (CONFIG_MEDIT_ADVANCED) {
