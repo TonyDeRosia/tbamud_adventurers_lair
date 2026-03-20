@@ -560,6 +560,7 @@ ACMD(do_save)
 ACMD(do_recall)
 {
   int recall_move_cost;
+  int move_before_recall;
 
   if (IS_NPC(ch) || !GET_SKILL(ch, SKILL_RECALL)) {
     send_to_char(ch, "You have no idea how.\r\n");
@@ -571,14 +572,6 @@ ACMD(do_recall)
     return;
   }
 
-  recall_move_cost = (GET_MAX_MOVE(ch) + 1) / 2;
-  recall_move_cost = MAX(1, recall_move_cost);
-
-  if (GET_MOVE(ch) < recall_move_cost) {
-    send_to_char(ch, "You are too exhausted to recall.\r\n");
-    return;
-  }
-
   if (ZONE_FLAGGED(GET_ROOM_ZONE(IN_ROOM(ch)), ZONE_NOASTRAL)) {
     send_to_char(ch, "A bright flash prevents your recall from working!");
     return;
@@ -587,7 +580,9 @@ ACMD(do_recall)
   send_to_char(ch, "You focus and force yourself back to safety, collapsing from exhaustion.\r\n");
   act("$n vanishes in a blur of motion.", TRUE, ch, 0, 0, TO_ROOM);
 
-  GET_MOVE(ch) = MAX(0, GET_MOVE(ch) - recall_move_cost);
+  move_before_recall = GET_MOVE(ch);
+  recall_move_cost = MAX(1, move_before_recall / 2);
+  GET_MOVE(ch) = MAX(0, move_before_recall - recall_move_cost);
   WAIT_STATE(ch, PULSE_VIOLENCE * 2);
 
   char_from_room(ch);
@@ -2195,7 +2190,7 @@ ACMD(do_shadow)
       if (mob->player.short_descr && mob->player.short_descr != proto_short)
         free(mob->player.short_descr);
       mob->player.short_descr = strdup(safe_name);
-      snprintf(long_buf, sizeof(long_buf), "%s stands here.", safe_name);
+      snprintf(long_buf, sizeof(long_buf), "%s stands here.\r\n", safe_name);
       long_buf[0] = UPPER(long_buf[0]);
       if (mob->player.long_descr && mob->player.long_descr != proto_long)
         free(mob->player.long_descr);
@@ -2769,32 +2764,24 @@ ACMD(do_happyhour)
 }
 ACMD(do_spells)
 {
-  char arg[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], filter[MAX_INPUT_LENGTH];
+  char arg[MAX_INPUT_LENGTH], filter[MAX_INPUT_LENGTH];
   int show_all = 0;
-  int show_spells = 1;
   *filter = '\0';
 
-  half_chop(argument, arg, arg2);
+  half_chop(argument, arg, filter);
   if ((*arg && (!str_cmp(arg, "help") || !str_cmp(arg, "?"))) ||
-      (*arg2 && (!str_cmp(arg2, "help") || !str_cmp(arg2, "?")))) {
+      (*filter && (!str_cmp(filter, "help") || !str_cmp(filter, "?")))) {
     show_ability_filter_help(ch, (subcmd == 1) ? "allspells" : "spells");
     return;
   }
   if (subcmd == 1) {
     show_all = 1;
-    show_spells = 1;
-    if (*arg && !str_cmp(arg, "all"))
-      strlcpy(filter, "", sizeof(filter));
-    else if (*arg && is_number(arg))
-      strlcpy(filter, "", sizeof(filter));
-    else
+    if (*arg && !*filter)
       strlcpy(filter, arg, sizeof(filter));
   } else if (*arg && !str_cmp(arg, "all"))
     show_all = 1;
-  else if (*arg)
+  else if (*arg && !*filter)
     strlcpy(filter, arg, sizeof(filter));
-  if (*arg2)
-    strlcpy(filter, arg2, sizeof(filter));
 
   send_to_char(ch, "You have %d practice sessions remaining.\r\n", GET_PRACTICES(ch));
   if ((show_all || subcmd == 1) && !GET_CLASS_LOCKED(ch)) {
@@ -2803,5 +2790,5 @@ ACMD(do_spells)
   }
   if (show_all || subcmd == 1)
     send_to_char(ch, "Showing all spells your class can learn at any level.\r\n");
-  show_ability_table_aligned(ch, show_spells, show_all, filter);
+  show_ability_table_aligned(ch, 1, show_all, filter);
 }
