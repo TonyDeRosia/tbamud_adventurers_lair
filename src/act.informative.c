@@ -2393,13 +2393,41 @@ static void format_affect_duration(int duration, char *out, size_t outsz)
 
 static int aff_flags_has_meaningful_bits(const char *flags)
 {
+  char cleaned[256];
+  size_t i = 0;
+
   if (!flags || !*flags)
     return 0;
+
   while (*flags == ' ')
     flags++;
   if (!*flags)
     return 0;
-  return str_cmp(flags, "NOBITS ");
+
+  while (*flags && i + 1 < sizeof(cleaned)) {
+    if (*flags != ' ' && *flags != '.')
+      cleaned[i++] = UPPER(*flags);
+    flags++;
+  }
+  cleaned[i] = '\0';
+
+  if (!*cleaned)
+    return 0;
+  if (!strcmp(cleaned, "NOBITS"))
+    return 0;
+
+  return 1;
+}
+
+static const char *aff_apply_verb(int location, int modifier)
+{
+  if (location == APPLY_AC) {
+    if (modifier < 0)
+      return "improves";
+    return "worsens";
+  }
+
+  return (modifier >= 0) ? "increases" : "reduces";
 }
 
 static int aff_seen_contains(const struct affected_type * const *seen, int seen_count,
@@ -2503,7 +2531,7 @@ static void build_grouped_aff_summary(const struct affected_type *list,
       continue;
 
     snprintf(piece, sizeof(piece), "%s %s by %d",
-      (mod_totals[i] >= 0 ? "increases" : "reduces"),
+      aff_apply_verb(i, mod_totals[i]),
       aff_apply_name(i),
       abs(mod_totals[i]));
 
