@@ -4,6 +4,7 @@
 #include "accounts.h"
 #include "utils.h"
 #include "db.h"
+#include "dg_scripts.h"
 
 #include "comm.h"
 #include <dirent.h>
@@ -543,6 +544,7 @@ void acct_show_character_menu(struct descriptor_data *d)
   write_to_output(d, "\r\nOptions:\r\n");
   write_to_output(d, "  NEW   Create a new character\r\n");
   write_to_output(d, "  PASS  Change your account password\r\n");
+  write_to_output(d, "  DEL <slot|name>   Delete a character on this account\r\n");
   write_to_output(d, "  0     Disconnect\r\n");
   write_to_output(d, "\r\nSelect: ");
 }
@@ -570,6 +572,99 @@ void account_remove_character(struct account_data *acct, const char *name)
       break;
     }
   }
+}
+
+int account_find_character_on_roster(const struct account_data *acct, const char *slot_or_name,
+                                     int *out_index, char *out_name, size_t out_name_len)
+{
+  int i, slot;
+
+  if (out_index)
+    *out_index = -1;
+  if (out_name && out_name_len > 0)
+    *out_name = '\0';
+
+  if (!acct || !slot_or_name || !*slot_or_name)
+    return 0;
+
+  while (*slot_or_name == ' ' || *slot_or_name == '\t')
+    slot_or_name++;
+  if (!*slot_or_name)
+    return 0;
+
+  if (isdigit((unsigned char)*slot_or_name)) {
+    slot = atoi(slot_or_name);
+    if (slot < 1 || slot > acct->num_chars)
+      return 0;
+    i = slot - 1;
+    if (i >= MAX_CHARS_PER_ACCOUNT || !acct->chars[i].name[0])
+      return 0;
+    if (out_index)
+      *out_index = i;
+    if (out_name && out_name_len > 0)
+      strlcpy(out_name, acct->chars[i].name, out_name_len);
+    return 1;
+  }
+
+  for (i = 0; i < acct->num_chars && i < MAX_CHARS_PER_ACCOUNT; i++) {
+    if (!acct->chars[i].name[0])
+      continue;
+    if (!str_cmp(slot_or_name, acct->chars[i].name)) {
+      if (out_index)
+        *out_index = i;
+      if (out_name && out_name_len > 0)
+        strlcpy(out_name, acct->chars[i].name, out_name_len);
+      return 1;
+    }
+  }
+
+  return 0;
+}
+
+int account_character_is_in_use(const char *name)
+{
+  struct descriptor_data *d;
+
+  if (!name || !*name)
+    return 0;
+
+  for (d = descriptor_list; d; d = d->next) {
+    if (!d->character || !GET_NAME(d->character))
+      continue;
+    if (STATE(d) == CON_CLOSE)
+      continue;
+    if (!str_cmp(GET_NAME(d->character), name))
+      return 1;
+  }
+
+  return 0;
+}
+
+int account_delete_character_data(const char *name)
+{
+  int i, pfilepos;
+  char filename[PATH_MAX];
+
+  if (!name || !*name)
+    return 0;
+
+  for (i = 0; i < MAX_FILES; i++) {
+    if (!get_filename(filename, sizeof(filename), i, name))
+      continue;
+    if (unlink(filename) != 0 && errno != ENOENT) {
+      mudlog(CMP, LVL_IMPL, TRUE, "SYSERR: Could not remove %s for %s: %s",
+             filename, name, strerror(errno));
+      return 0;
+    }
+  }
+
+  delete_variables(name);
+
+  pfilepos = get_ptable_by_name(name);
+  if (pfilepos >= 0)
+    remove_player(pfilepos);
+
+  return 1;
 }
 
 static size_t count_account_files(const char *dirpath)
@@ -638,6 +733,3 @@ void account_storage_report(void)
   ensure_account_dirs();
   report_storage_diagnostics();
 }
-
-
-

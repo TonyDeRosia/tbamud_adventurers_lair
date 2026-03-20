@@ -1660,6 +1660,7 @@ void nanny(struct descriptor_data *d, char *arg)
       d->acct_id = 0;
       d->acct_authed = 0;
       d->acct_tmp_pass[0] = '\0';
+      d->acct_pending_delete[0] = '\0';
 
       strlcpy(d->acct_name, arg, sizeof(d->acct_name));
 
@@ -1711,6 +1712,7 @@ void nanny(struct descriptor_data *d, char *arg)
       d->acct_id = aid;
       d->acct_authed = 1;
       d->acct_prompted_menu = 0;
+      d->acct_pending_delete[0] = '\0';
 
       if (acct.force_pw_change) {
         write_to_output(d, "\r\nThis account must set a new password now.\r\nNew password: ");
@@ -1866,6 +1868,7 @@ void nanny(struct descriptor_data *d, char *arg)
     case CON_ACCT_MENU: {
       struct account_data acct;
       int i, choice;
+      char cmd[MAX_INPUT_LENGTH], target[MAX_INPUT_LENGTH], resolved_name[64];
 
       if (!*arg) {
         if (!d->acct_prompted_menu) {
@@ -1906,6 +1909,33 @@ void nanny(struct descriptor_data *d, char *arg)
         return;
       }
 
+      half_chop(arg, cmd, target);
+      if (!str_cmp(cmd, "del") || !str_cmp(cmd, "delete")) {
+        if (!*target) {
+          write_to_output(d, "\r\nUsage: DEL <slot|name>\r\n");
+          acct_show_character_menu(d);
+          return;
+        }
+
+        if (!account_find_character_on_roster(&acct, target, NULL, resolved_name, sizeof(resolved_name))) {
+          write_to_output(d, "\r\nThat character is not on this account.\r\n");
+          acct_show_character_menu(d);
+          return;
+        }
+
+        if (account_character_is_in_use(resolved_name)) {
+          write_to_output(d, "\r\nCannot delete a character that is currently in use.\r\n");
+          acct_show_character_menu(d);
+          return;
+        }
+
+        strlcpy(d->acct_pending_delete, resolved_name, sizeof(d->acct_pending_delete));
+        STATE(d) = CON_ACCT_DELETE_CONFIRM;
+        write_to_output(d, "\r\nDelete character %s? Type YES to confirm or NO to cancel: ",
+                        d->acct_pending_delete);
+        return;
+      }
+
       if (isdigit((unsigned char)*arg)) {
         choice = atoi(arg);
         if (choice < 1 || choice > acct.num_chars) {
@@ -1936,6 +1966,84 @@ void nanny(struct descriptor_data *d, char *arg)
       }
 
       write_to_output(d, "\r\nThat character is not on this account.\r\n");
+      acct_show_character_menu(d);
+      return;
+    }
+
+    case CON_ACCT_DELETE_CONFIRM: {
+      struct account_data acct;
+
+      while (*arg == ' ' || *arg == '\t') arg++;
+      if (!*d->acct_pending_delete || !*arg) {
+        write_to_output(d, "\r\nDeletion cancelled.\r\n");
+        d->acct_pending_delete[0] = '\0';
+        STATE(d) = CON_ACCT_MENU;
+        acct_show_character_menu(d);
+        return;
+      }
+
+      if (!str_cmp(arg, "no")) {
+        write_to_output(d, "\r\nDeletion cancelled.\r\n");
+        d->acct_pending_delete[0] = '\0';
+        STATE(d) = CON_ACCT_MENU;
+        acct_show_character_menu(d);
+        return;
+      }
+
+      if (str_cmp(arg, "yes")) {
+        write_to_output(d, "\r\nType YES to confirm or NO to cancel: ");
+        return;
+      }
+
+      memset(&acct, 0, sizeof(acct));
+      if (!(d->acct_id > 0 && account_load_any(d->acct_id, &acct))) {
+        write_to_output(d, "\r\nCould not load account data.\r\n");
+        d->acct_pending_delete[0] = '\0';
+        STATE(d) = CON_ACCT_MENU;
+        acct_show_character_menu(d);
+        return;
+      }
+
+      if (!account_find_character_on_roster(&acct, d->acct_pending_delete, NULL, NULL, 0)) {
+        write_to_output(d, "\r\nThat character is not on this account.\r\n");
+        d->acct_pending_delete[0] = '\0';
+        STATE(d) = CON_ACCT_MENU;
+        acct_show_character_menu(d);
+        return;
+      }
+
+      if (account_character_is_in_use(d->acct_pending_delete)) {
+        write_to_output(d, "\r\nCannot delete a character that is currently in use.\r\n");
+        d->acct_pending_delete[0] = '\0';
+        STATE(d) = CON_ACCT_MENU;
+        acct_show_character_menu(d);
+        return;
+      }
+
+      if (!account_delete_character_data(d->acct_pending_delete)) {
+        write_to_output(d, "\r\nCould not delete character data.\r\n");
+        d->acct_pending_delete[0] = '\0';
+        STATE(d) = CON_ACCT_MENU;
+        acct_show_character_menu(d);
+        return;
+      }
+
+      account_remove_character(&acct, d->acct_pending_delete);
+      if (!account_find_character_on_roster(&acct, d->acct_pending_delete, NULL, NULL, 0)) {
+        account_save_any(&acct);
+        memset(&acct, 0, sizeof(acct));
+        if (!(d->acct_id > 0 && account_load_any(d->acct_id, &acct)) ||
+            account_find_character_on_roster(&acct, d->acct_pending_delete, NULL, NULL, 0)) {
+          write_to_output(d, "\r\nCharacter data deleted, but account update failed. Contact staff.\r\n");
+        } else {
+          write_to_output(d, "\r\nCharacter %s deleted.\r\n", d->acct_pending_delete);
+        }
+      } else {
+        write_to_output(d, "\r\nCould not update account roster.\r\n");
+      }
+
+      d->acct_pending_delete[0] = '\0';
+      STATE(d) = CON_ACCT_MENU;
       acct_show_character_menu(d);
       return;
     }
