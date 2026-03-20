@@ -192,6 +192,7 @@ static void show_ability_table_aligned(struct char_data *ch, int show_spells, in
   int cls = GET_CLASS(ch);
   int col = 0;
   int last_lvl = -1;
+  int col_width = show_spells ? 34 : ABIL_COL_WIDTH;
 
   /* "Level 99: " is 10 chars; padding below matches practice output. */
 
@@ -266,13 +267,10 @@ static void show_ability_table_aligned(struct char_data *ch, int show_spells, in
     }
 
     if (rows[i].pct < 0)
-      snprintf(cell, sizeof(cell), "%s [ -- ]",
-               rows[i].name);
+      snprintf(cell, sizeof(cell), "%s [ -- ]", rows[i].name);
     else
-      snprintf(cell, sizeof(cell), "%s [%d%%]",
-               rows[i].name,
-               rows[i].pct);
-    send_to_char(ch, "%-*s", ABIL_COL_WIDTH + count_color_chars(cell), cell);
+      snprintf(cell, sizeof(cell), "%s [%3d%%]", rows[i].name, rows[i].pct);
+    send_to_char(ch, "%-*s", col_width + count_color_chars(cell), cell);
 
     col++;
     if (col >= 2) {

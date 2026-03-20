@@ -2058,9 +2058,16 @@ if (PLR_FLAGGED(d->character, PLR_DELETED)) {
 	return;
       }
       perform_new_char_dupe_check(d);
-      write_to_output(d, "New character.\r\nGive me a password for %s: ", GET_PC_NAME(d->character));
-      echo_off(d);
-      STATE(d) = CON_NEWPASSWD;
+      if (d->acct_authed && d->acct_id > 0) {
+        strncpy(GET_PASSWD(d->character), CRYPT(d->acct_name, GET_PC_NAME(d->character)), MAX_PWD_LENGTH);	/* strncpy: OK (G_P:MAX_PWD_LENGTH+1) */
+        *(GET_PASSWD(d->character) + MAX_PWD_LENGTH) = '\0';
+        write_to_output(d, "New character.\r\nWhat is your sex (\t(M\t)/\t(F\t))? ");
+        STATE(d) = CON_QSEX;
+      } else {
+        write_to_output(d, "New character.\r\nGive me a password for %s: ", GET_PC_NAME(d->character));
+        echo_off(d);
+        STATE(d) = CON_NEWPASSWD;
+      }
     } else if (*arg == 'n' || *arg == 'N') {
       write_to_output(d, "Okay, what IS it, then? ");
       free(d->character->player.name);
