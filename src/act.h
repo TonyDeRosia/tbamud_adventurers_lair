@@ -275,6 +275,7 @@ ACMD(do_split);
 ACMD(do_steal);
 ACMD(do_title);
 ACMD(do_visible);
+void show_ability_table_aligned(struct char_data *ch, int show_spells, int show_all, const char *filter);
 
 
 /*****************************************************************************

@@ -336,7 +336,7 @@ static int ability_matches_filter(struct char_data *ch, int ability, const char 
   return contains_ci(nm, filter);
 }
 
-static void show_ability_table_aligned(struct char_data *ch, int show_spells, int show_all, const char *filter)
+void show_ability_table_aligned(struct char_data *ch, int show_spells, int show_all, const char *filter)
 {
   int i;
   int cls = GET_CLASS(ch);
