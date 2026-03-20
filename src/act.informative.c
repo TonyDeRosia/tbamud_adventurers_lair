@@ -2391,61 +2391,131 @@ static void format_affect_duration(int duration, char *out, size_t outsz)
     snprintf(out, outsz, "%ldm", mins);
 }
 
-static void build_aff_summary(const struct affected_type *af, char *out, size_t outsz)
+static int aff_flags_has_meaningful_bits(const char *flags)
+{
+  if (!flags || !*flags)
+    return 0;
+  while (*flags == ' ')
+    flags++;
+  if (!*flags)
+    return 0;
+  return str_cmp(flags, "NOBITS ");
+}
+
+static void append_aff_modifier(char *mods, size_t modsz, const struct affected_type *af)
+{
+  char piece[128];
+
+  if (!mods || modsz == 0 || !af)
+    return;
+  if (af->location == APPLY_NONE || af->modifier == 0)
+    return;
+
+  snprintf(piece, sizeof(piece), "%s %s by %d",
+    (af->modifier >= 0 ? "increases" : "reduces"),
+    aff_apply_name(af->location),
+    abs(af->modifier));
+
+  if (*mods)
+    strlcat(mods, ", ", modsz);
+  strlcat(mods, piece, modsz);
+}
+
+static int aff_seen_contains(const struct affected_type * const *seen, int seen_count,
+                             const struct affected_type *af)
+{
+  int i;
+
+  for (i = 0; i < seen_count; i++)
+    if (seen[i] == af)
+      return 1;
+
+  return 0;
+}
+
+static void aff_seen_add(const struct affected_type **seen, int *seen_count,
+                         const struct affected_type *af)
+{
+  if (!seen || !seen_count || !af)
+    return;
+  if (*seen_count >= MAX_AFFECT)
+    return;
+  seen[*seen_count] = af;
+  (*seen_count)++;
+}
+
+static const char *aff_name_from_spell_and_flags(int spell, const char *flags, char *fallback, size_t fallbacksz)
 {
   const char *name = "Unknown";
-  char eff[256];
-  char flags[256];
-  char firstflag[64];
-  char dur[32];
+  size_t i = 0;
 
-  if (!out || outsz == 0) return;
-  out[0] = '\0';
+  if (spell > 0 && spell < MAX_SPELLS && spell_info[spell].name)
+    name = spell_info[spell].name;
 
-  if (!af) {
-    snprintf(out, outsz, "Unknown effect.");
-    return;
-  }
-
-  /* In tbaMUD, affected_type usually stores the spell as af->spell */
-  if (af->spell > 0 && af->spell < MAX_SPELLS && spell_info[af->spell].name)
-    name = spell_info[af->spell].name;
-
-  eff[0] = '\0';
-  flags[0] = '\0';
-  dur[0] = '\0';
-
-  format_affect_duration(af->duration, dur, sizeof(dur));
-
-
-  if (af->location != APPLY_NONE && af->modifier != 0) {
-    snprintf(eff, sizeof(eff), "%s %s by %d",
-      (af->modifier >= 0 ? "increases" : "reduces"),
-      aff_apply_name(af->location),
-      abs(af->modifier));
-  }
-
-  /* sprintbitarray wants int[], but bitvector is treated like an array */
-  sprintbitarray((int *)af->bitvector, affected_bits, AF_ARRAY_MAX, flags);
-
-  /* AL: affects duration column + unknown fallback (clean) */
-  /* If spell name is Unknown, use the first flag token as the label (ex: SNEAK). */
-  if ((!name || !*name || !str_cmp(name, "Unknown")) && flags[0]) {
-    size_t i = 0;
-    while (flags[i] && flags[i] != ' ' && i < sizeof(firstflag) - 1) {
-      firstflag[i] = flags[i];
+  if ((!name || !*name || !str_cmp(name, "Unknown")) && aff_flags_has_meaningful_bits(flags)) {
+    while (flags[i] && flags[i] != ' ' && i + 1 < fallbacksz) {
+      fallback[i] = flags[i];
       i++;
     }
-    firstflag[i] = '\0';
-    if (firstflag[0])
-      name = firstflag;
+    fallback[i] = '\0';
+    if (*fallback)
+      name = fallback;
   }
 
+  return name;
+}
 
-  if (*eff && *flags)
-    snprintf(out, outsz, "%s (%s): %s. Also: %s.", name, dur, eff, flags);
-  else if (*eff)
-    snprintf(out, outsz, "%s (%s): %s.", name, dur, eff);
+static void build_grouped_aff_summary(const struct affected_type *list,
+                                      const struct affected_type *seed,
+                                      int only_debuff,
+                                      const struct affected_type **seen,
+                                      int *seen_count,
+                                      char *out, size_t outsz)
+{
+  const struct affected_type *af;
+  char mods[384];
+  char flags[256];
+  int bits[AF_ARRAY_MAX];
+  char name_fallback[64];
+  const char *name;
+  char dur[32];
+  int i;
+
+  if (!out || outsz == 0 || !seed || !list || !seen || !seen_count)
+    return;
+  out[0] = '\0';
+
+  mods[0] = '\0';
+  flags[0] = '\0';
+  dur[0] = '\0';
+  name_fallback[0] = '\0';
+  for (i = 0; i < AF_ARRAY_MAX; i++)
+    bits[i] = 0;
+
+  for (af = list; af; af = af->next) {
+    if (aff_seen_contains(seen, *seen_count, af))
+      continue;
+    if ((af->spell != seed->spell) || (af->duration != seed->duration))
+      continue;
+    if (!!is_aff_debuff(af) != !!only_debuff)
+      continue;
+
+    aff_seen_add(seen, seen_count, af);
+    append_aff_modifier(mods, sizeof(mods), af);
+    for (i = 0; i < AF_ARRAY_MAX; i++)
+      bits[i] |= af->bitvector[i];
+  }
+
+  sprintbitarray(bits, affected_bits, AF_ARRAY_MAX, flags);
+  if (!aff_flags_has_meaningful_bits(flags))
+    flags[0] = '\0';
+  format_affect_duration(seed->duration, dur, sizeof(dur));
+  name = aff_name_from_spell_and_flags(seed->spell, flags, name_fallback, sizeof(name_fallback));
+
+  if (*mods && *flags)
+    snprintf(out, outsz, "%s (%s): %s, %s.", name, dur, mods, flags);
+  else if (*mods)
+    snprintf(out, outsz, "%s (%s): %s.", name, dur, mods);
   else if (*flags)
     snprintf(out, outsz, "%s (%s): %s.", name, dur, flags);
   else
@@ -2455,6 +2525,8 @@ static void build_aff_summary(const struct affected_type *af, char *out, size_t 
 ACMD(do_affects)
 {
   const struct affected_type *af;
+  const struct affected_type *seen[MAX_AFFECT];
+  int seen_count = 0;
   int any = 0, any_buff = 0, any_debuff = 0;
 
   if (!ch || IS_NPC(ch)) {
@@ -2485,49 +2557,13 @@ ACMD(do_affects)
     send_to_char(ch, "\r\n%sBuffs%s\r\n", CCGRN(ch, C_NRM), CCNRM(ch, C_NRM));
 
     for (af = ch->affected; af; af = af->next) {
+      char line[512];
       if (is_aff_debuff(af)) continue;
+      if (aff_seen_contains(seen, seen_count, af))
+        continue;
 
-      if (GET_LEVEL(ch) >= LVL_IMMORT) {
-        char flags[256];
-        char adur[32];
-        const char *spell_name = "Unknown";
-
-        flags[0] = '\0';
-        adur[0] = '\0';
-        format_affect_duration(af->duration, adur, sizeof(adur));
-
-        sprintbitarray((int *)af->bitvector, affected_bits, AF_ARRAY_MAX, flags);
-
-        if (af->spell > 0 && af->spell < MAX_SPELLS && spell_info[af->spell].name)
-          spell_name = spell_info[af->spell].name;
-
-        /* duration column + Unknown fallback label */
-        char lab[64];
-        size_t i = 0;
-        lab[0] = '\0';
-
-        if ((!spell_name || !*spell_name || !str_cmp(spell_name, "Unknown")) && flags[0]) {
-          while (flags[i] && flags[i] != ' ' && i < sizeof(lab) - 1) {
-            lab[i] = flags[i];
-            i++;
-          }
-          lab[i] = '\0';
-          if (lab[0])
-            spell_name = lab;
-        }
-
-        send_to_char(ch,
-          "  %-9s %s%s%s  apply %s  mod %+d  flags %s\r\n",
-          adur,
-          CCCYN(ch, C_NRM), spell_name, CCNRM(ch, C_NRM),
-          aff_apply_name(af->location),
-          af->modifier,
-          flags);
-      } else {
-        char line[512];
-        build_aff_summary(af, line, sizeof(line));
-        send_to_char(ch, "  %s\r\n", line);
-      }
+      build_grouped_aff_summary(ch->affected, af, 0, seen, &seen_count, line, sizeof(line));
+      send_to_char(ch, "  %s\r\n", line);
     }
   } else {
     send_to_char(ch, "\r\n%sBuffs%s\r\n  None.\r\n", CCGRN(ch, C_NRM), CCNRM(ch, C_NRM));
@@ -2538,49 +2574,13 @@ ACMD(do_affects)
     send_to_char(ch, "\r\n%sDebuffs%s\r\n", CCRED(ch, C_NRM), CCNRM(ch, C_NRM));
 
     for (af = ch->affected; af; af = af->next) {
+      char line[512];
       if (!is_aff_debuff(af)) continue;
+      if (aff_seen_contains(seen, seen_count, af))
+        continue;
 
-      if (GET_LEVEL(ch) >= LVL_IMMORT) {
-        char flags[256];
-        char adur[32];
-        const char *spell_name = "Unknown";
-
-        flags[0] = '\0';
-        adur[0] = '\0';
-        format_affect_duration(af->duration, adur, sizeof(adur));
-
-        sprintbitarray((int *)af->bitvector, affected_bits, AF_ARRAY_MAX, flags);
-
-        if (af->spell > 0 && af->spell < MAX_SPELLS && spell_info[af->spell].name)
-          spell_name = spell_info[af->spell].name;
-
-        /* duration column + Unknown fallback label */
-        char lab[64];
-        size_t i = 0;
-        lab[0] = '\0';
-
-        if ((!spell_name || !*spell_name || !str_cmp(spell_name, "Unknown")) && flags[0]) {
-          while (flags[i] && flags[i] != ' ' && i < sizeof(lab) - 1) {
-            lab[i] = flags[i];
-            i++;
-          }
-          lab[i] = '\0';
-          if (lab[0])
-            spell_name = lab;
-        }
-
-        send_to_char(ch,
-          "  %-9s %s%s%s  apply %s  mod %+d  flags %s\r\n",
-          adur,
-          CCCYN(ch, C_NRM), spell_name, CCNRM(ch, C_NRM),
-          aff_apply_name(af->location),
-          af->modifier,
-          flags);
-      } else {
-        char line[512];
-        build_aff_summary(af, line, sizeof(line));
-        send_to_char(ch, "  %s\r\n", line);
-      }
+      build_grouped_aff_summary(ch->affected, af, 1, seen, &seen_count, line, sizeof(line));
+      send_to_char(ch, "  %s\r\n", line);
     }
   } else {
     send_to_char(ch, "\r\n%sDebuffs%s\r\n  None.\r\n", CCRED(ch, C_NRM), CCNRM(ch, C_NRM));
@@ -4910,6 +4910,8 @@ ACMD(do_scan)
 ACMD(do_saffects)
 {
   const struct affected_type *af;
+  const struct affected_type *seen[MAX_AFFECT];
+  int seen_count = 0;
   int skills = 0, spells = 0, any = 0;
 
   if (!ch || IS_NPC(ch)) {
@@ -4924,15 +4926,20 @@ ACMD(do_saffects)
 
   send_to_char(ch, "\r\nYou are affected by the following:\r\n");
   for (af = ch->affected; af; af = af->next) {
+    const struct affected_type *scan;
     const char *name = "Unknown";
     const char *kind = "Spell";
-    char flags[256];
-    char label[64];
     char dur[32];
+    int is_skill = 0;
 
-    flags[0] = '\0';
-    label[0] = '\0';
     dur[0] = '\0';
+    if (aff_seen_contains(seen, seen_count, af))
+      continue;
+
+    for (scan = ch->affected; scan; scan = scan->next) {
+      if ((scan->spell == af->spell) && (scan->duration == af->duration))
+        aff_seen_add(seen, &seen_count, scan);
+    }
     any = 1;
 
     if (af->spell > 0 && af->spell <= TOP_SPELL_DEFINE && spell_info[af->spell].name)
@@ -4940,25 +4947,14 @@ ACMD(do_saffects)
     else if (af->spell > TOP_SPELL_DEFINE)
       name = skill_name(af->spell);
 
-    sprintbitarray((int *)af->bitvector, affected_bits, AF_ARRAY_MAX, flags);
-    if ((!name || !*name || !str_cmp(name, "Unknown")) && flags[0]) {
-      size_t i = 0;
-      while (flags[i] && flags[i] != ' ' && i < sizeof(label) - 1) {
-        label[i] = flags[i];
-        i++;
-      }
-      label[i] = '\0';
-      if (label[0])
-        name = label;
-    }
-
     if (af->spell > 0 && IS_SKILL(af->spell)) {
       kind = "Skill";
-      skills++;
+      is_skill = 1;
     } else {
       kind = "Spell";
-      spells++;
     }
+    if (is_skill) skills++;
+    else spells++;
 
     format_affect_duration(af->duration, dur, sizeof(dur));
     send_to_char(ch, "%-7s : %s (%s)\r\n", kind, name, dur);
