@@ -369,7 +369,23 @@ void affect_total(struct char_data *ch)
  * apropriate bits and apply's */
 void affect_to_char(struct char_data *ch, struct affected_type *af)
 {
+  struct affected_type *cur;
   struct affected_type *affected_alloc;
+
+  /* Guard against exact duplicate entries. If all affect fields match except
+   * duration, refresh the existing entry instead of stacking another copy. */
+  for (cur = ch->affected; cur; cur = cur->next) {
+    if (cur->spell == af->spell &&
+        cur->location == af->location &&
+        cur->modifier == af->modifier &&
+        cur->bitvector[0] == af->bitvector[0] &&
+        cur->bitvector[1] == af->bitvector[1] &&
+        cur->bitvector[2] == af->bitvector[2] &&
+        cur->bitvector[3] == af->bitvector[3]) {
+      cur->duration = MAX(cur->duration, af->duration);
+      return;
+    }
+  }
 
   CREATE(affected_alloc, struct affected_type, 1);
 
@@ -428,9 +444,8 @@ void affect_join(struct char_data *ch, struct affected_type *af,
 		      bool add_dur, bool avg_dur, bool add_mod, bool avg_mod)
 {
   struct affected_type *hjp, *next;
-  bool found = FALSE;
 
-  for (hjp = ch->affected; !found && hjp; hjp = next) {
+  for (hjp = ch->affected; hjp; hjp = next) {
     next = hjp->next;
 
     if ((hjp->spell == af->spell) && (hjp->location == af->location)) {
@@ -444,12 +459,10 @@ void affect_join(struct char_data *ch, struct affected_type *af,
         af->modifier = (af->modifier+hjp->modifier)/2;
 
       affect_remove(ch, hjp);
-      affect_to_char(ch, af);
-      found = TRUE;
     }
   }
-  if (!found)
-    affect_to_char(ch, af);
+
+  affect_to_char(ch, af);
 }
 
 /* move a player out of a room */
