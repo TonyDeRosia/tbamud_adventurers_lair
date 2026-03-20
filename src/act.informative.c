@@ -2402,25 +2402,6 @@ static int aff_flags_has_meaningful_bits(const char *flags)
   return str_cmp(flags, "NOBITS ");
 }
 
-static void append_aff_modifier(char *mods, size_t modsz, const struct affected_type *af)
-{
-  char piece[128];
-
-  if (!mods || modsz == 0 || !af)
-    return;
-  if (af->location == APPLY_NONE || af->modifier == 0)
-    return;
-
-  snprintf(piece, sizeof(piece), "%s %s by %d",
-    (af->modifier >= 0 ? "increases" : "reduces"),
-    aff_apply_name(af->location),
-    abs(af->modifier));
-
-  if (*mods)
-    strlcat(mods, ", ", modsz);
-  strlcat(mods, piece, modsz);
-}
-
 static int aff_seen_contains(const struct affected_type * const *seen, int seen_count,
                              const struct affected_type *af)
 {
@@ -2474,6 +2455,8 @@ static void build_grouped_aff_summary(const struct affected_type *list,
 {
   const struct affected_type *af;
   char mods[384];
+  int mod_totals[NUM_APPLIES];
+  int mod_used[NUM_APPLIES];
   char flags[256];
   int bits[AF_ARRAY_MAX];
   char name_fallback[64];
@@ -2491,6 +2474,10 @@ static void build_grouped_aff_summary(const struct affected_type *list,
   name_fallback[0] = '\0';
   for (i = 0; i < AF_ARRAY_MAX; i++)
     bits[i] = 0;
+  for (i = 0; i < NUM_APPLIES; i++) {
+    mod_totals[i] = 0;
+    mod_used[i] = 0;
+  }
 
   for (af = list; af; af = af->next) {
     if (aff_seen_contains(seen, *seen_count, af))
@@ -2501,9 +2488,28 @@ static void build_grouped_aff_summary(const struct affected_type *list,
       continue;
 
     aff_seen_add(seen, seen_count, af);
-    append_aff_modifier(mods, sizeof(mods), af);
+    if (af->location > APPLY_NONE && af->location < NUM_APPLIES && af->modifier != 0) {
+      mod_totals[af->location] += af->modifier;
+      mod_used[af->location] = 1;
+    }
     for (i = 0; i < AF_ARRAY_MAX; i++)
       bits[i] |= af->bitvector[i];
+  }
+
+  for (i = APPLY_NONE + 1; i < NUM_APPLIES; i++) {
+    char piece[128];
+
+    if (!mod_used[i] || mod_totals[i] == 0)
+      continue;
+
+    snprintf(piece, sizeof(piece), "%s %s by %d",
+      (mod_totals[i] >= 0 ? "increases" : "reduces"),
+      aff_apply_name(i),
+      abs(mod_totals[i]));
+
+    if (*mods)
+      strlcat(mods, ", ", sizeof(mods));
+    strlcat(mods, piece, sizeof(mods));
   }
 
   sprintbitarray(bits, affected_bits, AF_ARRAY_MAX, flags);
