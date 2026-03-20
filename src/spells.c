@@ -327,7 +327,16 @@ void show_identify_item(struct char_data *ch, struct obj_data *obj, enum identif
 
   identify_send_border(ch, B, R);
 
+  identify_send_section_header(ch, B, L, R, "Type-Specific Properties");
   switch (GET_OBJ_TYPE(obj)) {
+  case ITEM_LIGHT:
+    if (GET_OBJ_VAL(obj, 2) == -1)
+      send_to_char(ch, "%s|%s %sLight Properties:%s Hours remaining %sInfinite%s\r\n",
+                   B, R, L, R, V, R);
+    else
+      send_to_char(ch, "%s|%s %sLight Properties:%s Hours remaining %s%d%s\r\n",
+                   B, R, L, R, V, GET_OBJ_VAL(obj, 2), R);
+    break;
   case ITEM_SCROLL:
   case ITEM_POTION:
     len = i = 0;
@@ -366,7 +375,47 @@ void show_identify_item(struct char_data *ch, struct obj_data *obj, enum identif
     send_to_char(ch, "%s|%s %sArmor Data:%s Armor %s%d%s\r\n",
                  B, R, L, R, V, GET_OBJ_VAL(obj, 0), R);
     break;
+  case ITEM_CONTAINER:
+    sprintbit(GET_OBJ_VAL(obj, 1), container_bits, bitbuf, sizeof(bitbuf));
+    send_to_char(ch, "%s|%s %sContainer Properties:%s Capacity %s%d%s  %sKey VNUM:%s %s%d%s\r\n",
+                 B, R, L, R, V, GET_OBJ_VAL(obj, 0), R, L, R, V, GET_OBJ_VAL(obj, 2), R);
+    send_to_char(ch, "%s|%s %-22.22s %sFlags:%s %s%s%s\r\n",
+                 B, R, "", L, R, V, bitbuf, R);
+    break;
+  case ITEM_DRINKCON:
+  case ITEM_FOUNTAIN:
+    if (GET_OBJ_VAL(obj, 2) >= 0 && GET_OBJ_VAL(obj, 2) < NUM_LIQ_TYPES)
+      snprintf(bitbuf, sizeof(bitbuf), "%s", drinks[GET_OBJ_VAL(obj, 2)]);
+    else
+      snprintf(bitbuf, sizeof(bitbuf), "unknown");
+
+    send_to_char(ch, "%s|%s %sDrink Properties:%s Current %s%d%s  %sCapacity:%s %s%d%s\r\n",
+                 B, R, L, R, V, GET_OBJ_VAL(obj, 1), R, L, R, V, GET_OBJ_VAL(obj, 0), R);
+    send_to_char(ch, "%s|%s %-22.22s %sLiquid type:%s %s%s%s  %sPoisoned:%s %s%s%s\r\n",
+                 B, R, "", L, R, V, bitbuf, R, L, R, V, GET_OBJ_VAL(obj, 3) ? "Yes" : "No", R);
+    if (GET_OBJ_VAL(obj, 2) >= 0 && GET_OBJ_VAL(obj, 2) < NUM_LIQ_TYPES) {
+      send_to_char(ch, "%s|%s %-22.22s %sEffects:%s Drunk %s%+d%s, Hunger %s%+d%s, Thirst %s%+d%s\r\n",
+                   B, R, "", L, R,
+                   V, drink_aff[GET_OBJ_VAL(obj, 2)][DRUNK], R,
+                   V, drink_aff[GET_OBJ_VAL(obj, 2)][HUNGER], R,
+                   V, drink_aff[GET_OBJ_VAL(obj, 2)][THIRST], R);
+    }
+    break;
+  case ITEM_FOOD:
+    send_to_char(ch, "%s|%s %sFood Properties:%s Fills hunger %s%d%s  %sPoisoned:%s %s%s%s\r\n",
+                 B, R, L, R, V, GET_OBJ_VAL(obj, 0), R, L, R, V, GET_OBJ_VAL(obj, 3) ? "Yes" : "No", R);
+    break;
+  case ITEM_MONEY:
+    send_to_char(ch, "%s|%s %sMoney Properties:%s Amount %s%d%s\r\n",
+                 B, R, L, R, V, GET_OBJ_VAL(obj, 0), R);
+    break;
+  case ITEM_KEY:
+    send_to_char(ch, "%s|%s %sKey Properties:%s Key id %s%d%s\r\n",
+                 B, R, L, R, V, GET_OBJ_VAL(obj, 0), R);
+    break;
   default:
+    send_to_char(ch, "%s|%s %sType Properties:%s No additional details.\r\n",
+                 B, R, L, R);
     break;
   }
 
