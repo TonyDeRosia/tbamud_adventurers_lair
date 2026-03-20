@@ -775,6 +775,7 @@ static int study_extract_item_spells(struct obj_data *obj, int *out, int out_cap
       spell_slots[slot_count++] = GET_OBJ_VAL(obj, 3);
       break;
     case ITEM_SCROLL:
+    case ITEM_POTION:
       spell_slots[slot_count++] = GET_OBJ_VAL(obj, 1);
       spell_slots[slot_count++] = GET_OBJ_VAL(obj, 2);
       spell_slots[slot_count++] = GET_OBJ_VAL(obj, 3);
@@ -954,7 +955,8 @@ static enum study_item_result study_try_from_item(struct char_data *ch, struct o
 
   if (GET_OBJ_TYPE(study_obj) != ITEM_WAND &&
       GET_OBJ_TYPE(study_obj) != ITEM_STAFF &&
-      GET_OBJ_TYPE(study_obj) != ITEM_SCROLL) {
+      GET_OBJ_TYPE(study_obj) != ITEM_SCROLL &&
+      GET_OBJ_TYPE(study_obj) != ITEM_POTION) {
     study_debug_imm(ch, "item '%s' type %d is not a study source",
                     study_obj->short_description, GET_OBJ_TYPE(study_obj));
     return STUDY_ITEM_INVALID_SOURCE;
@@ -1245,7 +1247,8 @@ ACMD(do_study)
   source_complexity = 0;
   if (GET_OBJ_TYPE(study_obj) == ITEM_SCROLL ||
       GET_OBJ_TYPE(study_obj) == ITEM_WAND ||
-      GET_OBJ_TYPE(study_obj) == ITEM_STAFF) {
+      GET_OBJ_TYPE(study_obj) == ITEM_STAFF ||
+      GET_OBJ_TYPE(study_obj) == ITEM_POTION) {
     int i;
     for (i = 1; i <= 3; i++) {
       int sid = GET_OBJ_VAL(study_obj, i);
