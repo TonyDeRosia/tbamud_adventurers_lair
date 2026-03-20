@@ -89,6 +89,7 @@ static int is_shadow_servant_for(struct char_data *owner, struct char_data *mob)
 static int count_shadow_servants_for(struct char_data *ch);
 static int extracted_shadow_slot(struct char_data *mob);
 static int return_extracted_shadow_to_storage(struct char_data *mob);
+static void prepare_shadow_servant_for_removal(struct char_data *mob);
 static void change_alignment(struct char_data *ch, struct char_data *victim);
 static void group_gain(struct char_data *ch, struct char_data *victim);
 static void solo_gain(struct char_data *ch, struct char_data *victim);
@@ -185,6 +186,29 @@ static int extracted_shadow_slot(struct char_data *mob)
   return -1;
 }
 
+static void prepare_shadow_servant_for_removal(struct char_data *mob)
+{
+  struct char_data *fighter, *next_fighter;
+
+  if (!mob)
+    return;
+
+  GET_SUMMON_TIMER(mob) = 0;
+  HUNTING(mob) = NULL;
+
+  if (FIGHTING(mob))
+    stop_fighting(mob);
+
+  for (fighter = combat_list; fighter; fighter = next_fighter) {
+    next_fighter = fighter->next_fighting;
+    if (FIGHTING(fighter) == mob)
+      stop_fighting(fighter);
+  }
+
+  if (mob->followers || mob->master)
+    die_follower(mob);
+}
+
 static int shadow_name_looks_valid(const char *name)
 {
   const char *p;
@@ -246,9 +270,7 @@ static int return_extracted_shadow_to_storage(struct char_data *mob)
   send_to_char(owner, "Your shadow %s is defeated and returns to your shadow storage.\r\n",
                shadow_display_name_for_owner(owner, slot, mob));
 
-  if (FIGHTING(mob))
-    stop_fighting(mob);
-
+  prepare_shadow_servant_for_removal(mob);
   extract_char(mob);
   save_char(owner);
   return TRUE;
@@ -1994,6 +2016,8 @@ static void process_round_effects(void)
 
   for (i = character_list; i; i = next_char) {
     next_char = i->next;
+    if (DEAD(i))
+      continue;
 
     if (!IS_NPC(i))
       GET_HP_LAST_ROUND(i) = GET_HIT(i);
@@ -2182,7 +2206,15 @@ static void process_round_effects(void)
     if (IS_NPC(i) && GET_SUMMON_TIMER(i) > 0) {
       GET_SUMMON_TIMER(i)--;
       if (GET_SUMMON_TIMER(i) <= 0) {
+        struct char_data *owner = i->master;
+        int slot = extracted_shadow_slot(i);
+        if (owner && !IS_NPC(owner) && slot >= 0 && slot < MAX_SHADOW_ROSTER &&
+            SHADOW_SLOT_OCCUPIED(owner, slot)) {
+          SHADOW_SLOT_ACTIVE(owner, slot) = 0;
+          save_char(owner);
+        }
         act("$n flickers and vanishes as the summoning fades.", FALSE, i, 0, 0, TO_ROOM);
+        prepare_shadow_servant_for_removal(i);
         extract_char(i);
       }
     }
