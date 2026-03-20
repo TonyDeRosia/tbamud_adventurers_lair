@@ -285,6 +285,7 @@ cpp_extern const struct command_info cmd_info[] = {
   { "buypractice", "buyprac", POS_RESTING , do_buypractice , 0, 0 },
   { "buytrain" , "buytr"   , POS_RESTING , do_buytrain , 0, 0 },
   { "practice" , "pr"      , POS_RESTING , do_practice , 1, 0 },
+  { "study"    , "stu"     , POS_RESTING , do_study    , 1, 0 },
   { "train"    , "tr"      , POS_RESTING , do_train    , 1, 0 },
   { "skills"    , "sk"      , POS_RESTING , do_skills   , 1, 0 },
   { "allspells" , "allspells", POS_RESTING, do_spells   , 1, 1 },
@@ -2174,9 +2175,28 @@ if (PLR_FLAGGED(d->character, PLR_DELETED)) {
     }
 
     GET_RACE(d->character) = race;
+    GET_CLASS(d->character) = CLASS_UNDEFINED;
 
-    STATE(d) = CON_QCLASS;
-    write_to_output(d, "%sClass: ", class_menu());
+    if (d->olc) {
+      free(d->olc);
+      d->olc = NULL;
+    }
+    if (GET_PFILEPOS(d->character) < 0)
+      GET_PFILEPOS(d->character) = create_entry(GET_PC_NAME(d->character));
+
+    init_char(d->character);
+    d->character->real_abils.str = 10;
+    d->character->real_abils.dex = 10;
+    d->character->real_abils.con = 10;
+    d->character->real_abils.intel = 10;
+    d->character->real_abils.wis = 10;
+    d->character->real_abils.cha = 10;
+    affect_total(d->character);
+    apply_racial_perks_once(d->character);
+    stat_alloc_snapshot_base(d);
+
+    STATE(d) = CON_QSTATS;
+    stat_alloc_show(d);
     return;
   }
 

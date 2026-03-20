@@ -2204,7 +2204,7 @@ ACMD(do_last)
 
     send_to_char(ch, "[%5ld] [%2d %s] %-12s : %-18s : %-24s\r\n",
     GET_IDNUM(vict), (int) GET_LEVEL(vict),
-    class_abbrevs[(int) GET_CLASS(vict)], GET_NAME(vict),
+    class_abbrev((int) GET_CLASS(vict)), GET_NAME(vict),
     GET_HOST(vict) && *GET_HOST(vict) ? GET_HOST(vict) : "(NOHOST)", timestr);
     free_char(vict);
     return;

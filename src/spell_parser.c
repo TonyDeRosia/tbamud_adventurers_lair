@@ -1052,8 +1052,9 @@ static struct syllable syls[] = { { " ", " " }, { "ar", "abra" },
         "y", "l" }, { "z", "k" }, { "", "" } };
 
 static int mag_manacost(struct char_data *ch, int spellnum) {
+  int class_id = is_valid_class(GET_CLASS(ch)) ? GET_CLASS(ch) : CLASS_WARRIOR;
   int mana = MAX(SINFO.mana_max - (SINFO.mana_change *
-      (GET_LEVEL(ch) - SINFO.min_level[(int) GET_CLASS(ch)])),
+      (GET_LEVEL(ch) - SINFO.min_level[(int) class_id])),
   SINFO.mana_min);
   int reduction_pct = 0;
 
@@ -2324,7 +2325,7 @@ ACMD(do_spellup)
   for (spellnum = 1; spellnum <= MAX_SPELLS; spellnum++) {
     if (!is_spellup_beneficial_spell(spellnum))
       continue;
-    if (GET_LEVEL(ch) < SINFO.min_level[(int) GET_CLASS(ch)])
+    if (GET_LEVEL(ch) < SINFO.min_level[(int) (is_valid_class(GET_CLASS(ch)) ? GET_CLASS(ch) : CLASS_WARRIOR)])
       continue;
     if (GET_SKILL(ch, spellnum) == 0)
       continue;
@@ -2512,7 +2513,7 @@ ACMD(do_cast) {
     send_to_char(ch, "Cast what?!?\r\n");
     return;
   }
-  if (GET_LEVEL(ch) < SINFO.min_level[(int) GET_CLASS(ch)]) {
+  if (GET_LEVEL(ch) < SINFO.min_level[(int) (is_valid_class(GET_CLASS(ch)) ? GET_CLASS(ch) : CLASS_WARRIOR)]) {
     send_to_char(ch, "You do not know that spell!\r\n");
     return;
   }

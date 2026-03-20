@@ -176,6 +176,9 @@ int is_valid_class(int class_num)
 
 const char *class_name(int class_id)
 {
+  if (class_id == CLASS_UNDEFINED)
+    return "Adventurer";
+
   if (!is_valid_class(class_id))
     return "Unknown";
 
@@ -184,10 +187,18 @@ const char *class_name(int class_id)
 
 const char *class_abbrev(int class_id)
 {
+  if (class_id == CLASS_UNDEFINED)
+    return "Ad";
+
   if (!is_valid_class(class_id))
     return "Unknown";
 
   return pc_classes[class_id].abbrev;
+}
+
+const char *class_display_name(int class_id)
+{
+  return class_name(class_id);
 }
 
 const char *get_archetype_abbrev(struct char_data *ch)
