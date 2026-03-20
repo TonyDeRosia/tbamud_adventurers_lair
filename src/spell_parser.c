@@ -2272,6 +2272,10 @@ int cast_spell(struct char_data *ch, struct char_data *tch,
     send_to_char(ch, "You are afraid you might hurt your master!\r\n");
     return (0);
   }
+  if (SINFO.violent && is_owned_follower_target(ch, tch)) {
+    send_to_char(ch, "You cannot cast hostile magic on one of your own followers.\r\n");
+    return (0);
+  }
   if ((tch != ch) && IS_SET(SINFO.targets, TAR_SELF_ONLY)) {
     if (is_sanctuary_spell(spellnum))
       send_to_char(ch, "You can only invoke this protection on yourself.\r\n");
@@ -2655,6 +2659,10 @@ ACMD(do_cast) {
 
   if (target && (tch == ch) && SINFO.violent) {
     send_to_char(ch, "You shouldn't cast that on yourself -- could be bad for your health!\r\n");
+    return;
+  }
+  if (target && SINFO.violent && is_owned_follower_target(ch, tch)) {
+    send_to_char(ch, "You cannot cast hostile magic on one of your own followers.\r\n");
     return;
   }
   if (!target) {

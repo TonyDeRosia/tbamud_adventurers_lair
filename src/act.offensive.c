@@ -188,7 +188,9 @@ ACMD(do_hit)
   else if (vict == ch) {
     send_to_char(ch, "You hit yourself...OUCH!.\r\n");
     act("$n hits $mself, and says OUCH!", FALSE, ch, 0, vict, TO_ROOM);
-  } else if (AFF_FLAGGED(ch, AFF_CHARM) && (ch->master == vict))
+  } else if (is_owned_follower_target(ch, vict))
+    send_to_char(ch, "You cannot attack one of your own followers.\r\n");
+  else if (AFF_FLAGGED(ch, AFF_CHARM) && (ch->master == vict))
     act("$N is just such a good friend, you simply can't hit $M.", FALSE, ch, 0, vict, TO_CHAR);
   else {
     if (!CONFIG_PK_ALLOWED && !IS_NPC(vict) && !IS_NPC(ch)) 
@@ -227,6 +229,8 @@ ACMD(do_kill)
       send_to_char(ch, "That player is not here.\r\n");
     else if (ch == vict)
       send_to_char(ch, "Your mother would be so sad.. :(\r\n");
+    else if (is_owned_follower_target(ch, vict))
+      send_to_char(ch, "You cannot attack one of your own followers.\r\n");
     else {
       act("You chop $M to pieces!  Ah!  The blood!", FALSE, ch, 0, vict, TO_CHAR);
       act("$N chops you to pieces!", FALSE, vict, 0, ch, TO_CHAR);
@@ -255,6 +259,10 @@ ACMD(do_backstab)
   }
   if (vict == ch) {
     send_to_char(ch, "How can you sneak up on yourself?\r\n");
+    return;
+  }
+  if (is_owned_follower_target(ch, vict)) {
+    send_to_char(ch, "You cannot attack one of your own followers.\r\n");
     return;
   }
   if (!GET_EQ(ch, WEAR_WIELD)) {
@@ -446,6 +454,10 @@ ACMD(do_bash)
     send_to_char(ch, "Aren't we funny today...\r\n");
     return;
   }
+  if (is_owned_follower_target(ch, vict)) {
+    send_to_char(ch, "You cannot attack one of your own followers.\r\n");
+    return;
+  }
   if (MOB_FLAGGED(vict, MOB_NOKILL)) {
     send_to_char(ch, "This mob is protected.\r\n");
     return;
@@ -572,7 +584,7 @@ EVENTFUNC(event_whirlwind)
   /* We search through the "next_in_room", and grab all NPCs and add them
    * to our list */
   for (tch = world[IN_ROOM(ch)].people; tch; tch = tch->next_in_room)  
-    if (IS_NPC(tch))
+    if (IS_NPC(tch) && !is_owned_follower_target(ch, tch))
       add_to_list(tch, room_list);
       
   /* If our list is empty or has "0" entries, we free it from memory and
@@ -693,6 +705,10 @@ ACMD(do_kick)
   }
   if (vict == ch) {
     send_to_char(ch, "Aren't we funny today...\r\n");
+    return;
+  }
+  if (is_owned_follower_target(ch, vict)) {
+    send_to_char(ch, "You cannot attack one of your own followers.\r\n");
     return;
   }
   /* 101% is a complete failure */
