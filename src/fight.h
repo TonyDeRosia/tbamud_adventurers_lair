@@ -28,6 +28,7 @@ int compute_armor(struct char_data *ch);
 int compute_armor_class(struct char_data *ch);
 int compute_evasion(struct char_data *ch);
 int compute_offensive_hit_value(struct char_data *ch, struct char_data *victim);
+int compute_hit_chance_from_values(int offensive_hit, int target_evasion);
 int damage(struct char_data *ch, struct char_data *victim, int dam, int attacktype);
 void death_cry(struct char_data *ch);
 void die(struct char_data * ch, struct char_data * killer);
