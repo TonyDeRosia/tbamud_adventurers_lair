@@ -39,6 +39,8 @@ void mobile_activity(void)
 
     if (!IS_MOB(ch))
       continue;
+    if (DEAD(ch))
+      continue;
 
     /* Examine call for special procedure */
     if (MOB_FLAGGED(ch, MOB_SPEC) && !no_specials) {

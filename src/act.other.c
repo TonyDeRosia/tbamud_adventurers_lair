@@ -262,6 +262,29 @@ static struct char_data *shadow_active_mob(struct char_data *ch, int slot)
   return NULL;
 }
 
+static void shadow_prepare_for_removal(struct char_data *mob)
+{
+  struct char_data *fighter, *next_fighter;
+
+  if (!mob)
+    return;
+
+  GET_SUMMON_TIMER(mob) = 0;
+  HUNTING(mob) = NULL;
+
+  if (FIGHTING(mob))
+    stop_fighting(mob);
+
+  for (fighter = combat_list; fighter; fighter = next_fighter) {
+    next_fighter = fighter->next_fighting;
+    if (FIGHTING(fighter) == mob)
+      stop_fighting(fighter);
+  }
+
+  if (mob->followers || mob->master)
+    die_follower(mob);
+}
+
 static void shadow_sync_active_flags(struct char_data *ch)
 {
   int i;
@@ -2000,6 +2023,8 @@ ACMD(do_shadow)
 
   if (is_abbrev(shadow_subcmd, "summon")) {
     int mana_cost;
+    const char *resolved_name;
+    char summon_name[MAX_SHADOW_NAME_LENGTH + 1];
 
     if (!*selector) {
       send_to_char(ch, "Usage: shadow summon <slot|name>\r\n");
@@ -2025,6 +2050,8 @@ ACMD(do_shadow)
       send_to_char(ch, "You lack the mana to summon this shadow.\r\n");
       return;
     }
+    resolved_name = shadow_display_name(ch, slot, NULL);
+    strlcpy(summon_name, resolved_name ? resolved_name : "a shadow", sizeof(summon_name));
     GET_MANA(ch) -= mana_cost;
     if (!summon_stored_shadow(ch, slot)) {
       GET_MANA(ch) += mana_cost;
@@ -2032,7 +2059,11 @@ ACMD(do_shadow)
       return;
     }
     mob = shadow_active_mob(ch, slot);
-    strlcpy(display_name, shadow_display_name(ch, slot, mob), sizeof(display_name));
+    if (!shadow_name_looks_valid(summon_name)) {
+      strlcpy(display_name, shadow_display_name(ch, slot, mob), sizeof(display_name));
+    } else {
+      strlcpy(display_name, summon_name, sizeof(display_name));
+    }
     act("You call forth $t from your shadow storage.", FALSE, ch, NULL, display_name, TO_CHAR);
     act("$n calls forth $t from $s shadow storage.", FALSE, ch, NULL, display_name, TO_ROOM);
     send_to_char(ch, "You expend %d mana.\r\n", mana_cost);
@@ -2057,8 +2088,9 @@ ACMD(do_shadow)
       save_char(ch);
       return;
     }
-    SHADOW_SLOT_ACTIVE(ch, slot) = 0;
     strlcpy(display_name, shadow_display_name(ch, slot, mob), sizeof(display_name));
+    SHADOW_SLOT_ACTIVE(ch, slot) = 0;
+    shadow_prepare_for_removal(mob);
     extract_char(mob);
     send_to_char(ch, "You return %s to your shadow storage.\r\n", display_name);
     save_char(ch);
@@ -2077,8 +2109,10 @@ ACMD(do_shadow)
     }
     mob = shadow_active_mob(ch, slot);
     strlcpy(display_name, shadow_display_name(ch, slot, mob), sizeof(display_name));
-    if (mob)
+    if (mob) {
+      shadow_prepare_for_removal(mob);
       extract_char(mob);
+    }
     act("You release $t back into the void.", FALSE, ch, NULL, display_name, TO_CHAR);
     act("$n releases $t back into the void.", FALSE, ch, NULL, display_name, TO_ROOM);
     SHADOW_SLOT_OCCUPIED(ch, slot) = 0;
