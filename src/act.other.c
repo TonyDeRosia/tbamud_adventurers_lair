@@ -403,68 +403,71 @@ void show_ability_table_aligned(struct char_data *ch, int show_spells, int show_
 
   if (show_spells) {
     int idx = 0;
-    int global_max_entry_len = 0;
+    int global_left_name_len = 0;
+    int global_right_name_len = 0;
+    int fixed_left_cell_width;
+    int fixed_right_cell_width;
 
     for (i = 0; i < n; i++) {
-      char entry[256];
-      int entry_len;
+      int level = rows[i].lvl;
+      int level_idx = 0;
 
-      if (rows[i].pct < 0)
-        snprintf(entry, sizeof(entry), "%s [ -- ]", rows[i].name);
-      else
-        snprintf(entry, sizeof(entry), "%s [%3d%%]", rows[i].name, rows[i].pct);
+      while (i + level_idx < n && rows[i + level_idx].lvl == level) {
+        int name_len = (int)strlen(rows[i + level_idx].name);
 
-      entry_len = (int)strlen(entry);
-      if (entry_len > global_max_entry_len)
-        global_max_entry_len = entry_len;
+        if ((level_idx % 2) == 0) {
+          if (name_len > global_left_name_len)
+            global_left_name_len = name_len;
+        } else {
+          if (name_len > global_right_name_len)
+            global_right_name_len = name_len;
+        }
+        level_idx++;
+      }
+      i += (level_idx - 1);
     }
+    fixed_left_cell_width = global_left_name_len + 7;   /* " [100%]" or " [ -- ]" */
+    fixed_right_cell_width = global_right_name_len + 7; /* " [100%]" or " [ -- ]" */
 
     while (idx < n) {
       int level = rows[idx].lvl;
       int level_start = idx;
       int level_count = 0;
-      int left_width;
-      int target_left_width;
       int first_row_for_level = 1;
 
       while ((level_start + level_count) < n && rows[level_start + level_count].lvl == level) {
         level_count++;
       }
 
-      left_width = SPELL_TERM_WIDTH - LEVEL_LABEL_PADDING - SPELL_ROW_GAP;
-      if (left_width < SPELL_LEFT_MIN_WIDTH)
-        left_width = SPELL_LEFT_MIN_WIDTH;
-      target_left_width = MAX(SPELL_LEFT_MIN_WIDTH, SPELL_LEFT_COL_WIDTH);
-      target_left_width = MAX(target_left_width, global_max_entry_len);
-      target_left_width = MIN(target_left_width, left_width);
-      target_left_width = MIN(target_left_width, SPELL_LEFT_MAX_WIDTH);
-
       i = level_start;
       while (i < level_start + level_count) {
-        char left[256];
-        char right[256];
+        char left_cell[256];
+        char right_cell[256];
         int has_right = (i + 1 < level_start + level_count);
-        int left_len;
-        int right_len = 0;
+        int left_name_len = (int)strlen(rows[i].name);
+        int right_name_len = 0;
+        int left_pad = MAX(0, global_left_name_len - left_name_len);
+        int right_pad = 0;
         int pair_fits = FALSE;
         int avail_after_indent = SPELL_TERM_WIDTH - LEVEL_LABEL_PADDING;
 
+        if (has_right) {
+          right_name_len = (int)strlen(rows[i + 1].name);
+          right_pad = MAX(0, global_right_name_len - right_name_len);
+          if (fixed_left_cell_width + SPELL_ROW_GAP + fixed_right_cell_width <= avail_after_indent)
+            pair_fits = TRUE;
+        }
+
         if (rows[i].pct < 0)
-          snprintf(left, sizeof(left), "%s [ -- ]", rows[i].name);
+          snprintf(left_cell, sizeof(left_cell), "%s%*s [ -- ]", rows[i].name, left_pad, "");
         else
-          snprintf(left, sizeof(left), "%s [%3d%%]", rows[i].name, rows[i].pct);
-        left_len = (int)strlen(left);
+          snprintf(left_cell, sizeof(left_cell), "%s%*s [%3d%%]", rows[i].name, left_pad, "", rows[i].pct);
 
         if (has_right) {
           if (rows[i + 1].pct < 0)
-            snprintf(right, sizeof(right), "%s [ -- ]", rows[i + 1].name);
+            snprintf(right_cell, sizeof(right_cell), "%s%*s [ -- ]", rows[i + 1].name, right_pad, "");
           else
-            snprintf(right, sizeof(right), "%s [%3d%%]", rows[i + 1].name, rows[i + 1].pct);
-          right_len = (int)strlen(right);
-
-          if (left_len + SPELL_ROW_GAP + right_len <= avail_after_indent &&
-              target_left_width + SPELL_ROW_GAP + right_len <= avail_after_indent)
-            pair_fits = TRUE;
+            snprintf(right_cell, sizeof(right_cell), "%s%*s [%3d%%]", rows[i + 1].name, right_pad, "", rows[i + 1].pct);
         }
 
         if (first_row_for_level) {
@@ -480,11 +483,11 @@ void show_ability_table_aligned(struct char_data *ch, int show_spells, int show_
 
         if (pair_fits) {
           send_to_char(ch, "%-*s%*s%s",
-                       target_left_width + count_color_chars(left), left,
-                       SPELL_ROW_GAP, "", right);
+                       fixed_left_cell_width + count_color_chars(left_cell), left_cell,
+                       SPELL_ROW_GAP, "", right_cell);
           i += 2;
         } else {
-          send_to_char(ch, "%s", left);
+          send_to_char(ch, "%s", left_cell);
           i++;
         }
       }
