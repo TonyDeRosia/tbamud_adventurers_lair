@@ -842,6 +842,10 @@ do                                                              \
 /** Defines if an obj is a corpse. */
 #define IS_CORPSE(obj)		(GET_OBJ_TYPE(obj) == ITEM_CONTAINER && \
 					GET_OBJ_VAL((obj), 3) == 1)
+/** Remaining shadow extraction attempts on a corpse. */
+#define CORPSE_SHADOW_ATTEMPTS(obj)	((obj)->shadow_extract_attempts)
+/** Whether a corpse's shadow attempts were initialized. */
+#define CORPSE_SHADOW_ATTEMPTS_INIT(obj)	((obj)->shadow_extract_initialized)
 
 /** Can the obj be worn on body part? */
 #define CAN_WEAR(obj, part)	OBJWEAR_FLAGGED((obj), (part))

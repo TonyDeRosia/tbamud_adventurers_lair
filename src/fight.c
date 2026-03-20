@@ -508,6 +508,8 @@ static void make_corpse(struct char_data *ch)
   GET_OBJ_VAL(corpse, 1) = IS_NPC(ch) ? GET_MOB_VNUM(ch) : NOBODY; /* source mob vnum for shadow extraction */
   GET_OBJ_VAL(corpse, 2) = GET_LEVEL(ch); /* source level snapshot for shadow extraction */
   GET_OBJ_VAL(corpse, 3) = 1;	/* corpse identifier */
+  CORPSE_SHADOW_ATTEMPTS(corpse) = 3; /* shadow extraction attempts remaining */
+  CORPSE_SHADOW_ATTEMPTS_INIT(corpse) = 1; /* shadow extraction fields initialized */
   GET_OBJ_WEIGHT(corpse) = GET_WEIGHT(ch) + IS_CARRYING_W(ch);
   GET_OBJ_RENT(corpse) = 100000;
   if (IS_NPC(ch))
