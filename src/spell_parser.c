@@ -3335,7 +3335,7 @@ void mag_assign_spells(void) {
   spello(SPELL_SHADOW_ARMOR, "shadow armor", 26, 26, 0, POS_STANDING, TAR_CHAR_ROOM, FALSE, MAG_MANUAL, "Your shadow armor melts away.");
   spello(SPELL_TOTAL_OCCULTATION, "total occultation", 40, 40, 0, POS_STANDING, TAR_SELF_ONLY, FALSE, MAG_MANUAL, "The total occultation ends.");
   spello(SPELL_DOMAIN_BREAK, "domain break", 38, 38, 0, POS_FIGHTING, TAR_IGNORE, FALSE, MAG_MANUAL, NULL);
-  spello(SPELL_HUNTERS_INSTINCT, "hunters instinct", 20, 20, 0, POS_STANDING, TAR_SELF_ONLY, FALSE, MAG_MANUAL, "Your hunter's instinct recedes.");
+  spello(SPELL_HUNTERS_INSTINCT, "hunters instinct", 20, 20, 0, POS_STANDING, TAR_CHAR_ROOM | TAR_SELF_ONLY, FALSE, MAG_MANUAL, "Your hunter's instinct recedes.");
 
   /* you might want to name this one something more fitting to your theme -Welcor*/
   spello(SPELL_DG_AFFECT, "Script-inflicted", 0, 0, 0, POS_SITTING,
