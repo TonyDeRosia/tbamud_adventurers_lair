@@ -24,6 +24,7 @@
 #include "act.h"
 #include "hedit.h"
 #include "modify.h"
+#include <stdarg.h>
 
 /* local functions */
 static void hedit_disp_menu(struct descriptor_data *);
@@ -31,6 +32,31 @@ static void hedit_setup_new(struct descriptor_data *);
 static void hedit_setup_existing(struct descriptor_data *, int);
 static void hedit_save_to_disk(struct descriptor_data *);
 static void hedit_save_internally(struct descriptor_data *);
+static size_t append_to_buf(char *dst, size_t dst_sz, size_t len, const char *fmt, ...);
+
+static size_t append_to_buf(char *dst, size_t dst_sz, size_t len, const char *fmt, ...)
+{
+  int written;
+  va_list args;
+
+  if (!dst || dst_sz == 0)
+    return 0;
+
+  if (len >= dst_sz)
+    return dst_sz - 1;
+
+  va_start(args, fmt);
+  written = vsnprintf(dst + len, dst_sz - len, fmt, args);
+  va_end(args);
+
+  if (written < 0)
+    return len;
+
+  if ((size_t)written >= (dst_sz - len))
+    return dst_sz - 1;
+
+  return len + (size_t)written;
+}
 
 
 ACMD(do_oasis_hedit)
@@ -399,7 +425,8 @@ ACMD(do_helpcheck)
 
 ACMD(do_hindex)
 {
-  int len, len2, count = 0, count2=0, i;
+  size_t len, len2;
+  int count = 0, count2 = 0, i;
   char buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH];
 
   skip_spaces(&argument);
@@ -409,35 +436,36 @@ ACMD(do_hindex)
     return;
   }
 
-  len = sprintf(buf, "\t1Help index entries beginning with '%s':\t2\r\n", argument);
-  len2 = sprintf(buf2, "\t1Help index entries containing '%s':\t2\r\n", argument);
+  len = append_to_buf(buf, sizeof(buf), 0,
+      "\t1Help index entries beginning with '%s':\t2\r\n", argument);
+  len2 = append_to_buf(buf2, sizeof(buf2), 0,
+      "\t1Help index entries containing '%s':\t2\r\n", argument);
   for (i = 0; i < top_of_helpt; i++) {
     if (is_abbrev(argument, help_table[i].keywords)
         && (GET_LEVEL(ch) >= help_table[i].min_level))
-      len +=
-          snprintf(buf + len, sizeof(buf) - len, "%-20.20s%s", help_table[i].keywords,
-                   (++count % 3 ? "" : "\r\n"));
+      len = append_to_buf(buf, sizeof(buf), len, "%-20.20s%s", help_table[i].keywords,
+                          (++count % 3 ? "" : "\r\n"));
     else if (strstr(help_table[i].keywords, argument)
         && (GET_LEVEL(ch) >= help_table[i].min_level))
-      len2 +=
-          snprintf(buf2 + len2, sizeof(buf2) - len2, "%-20.20s%s", help_table[i].keywords,
-                   (++count2 % 3 ? "" : "\r\n"));
+      len2 = append_to_buf(buf2, sizeof(buf2), len2, "%-20.20s%s", help_table[i].keywords,
+                           (++count2 % 3 ? "" : "\r\n"));
   }
   if (count % 3)
-    len += snprintf(buf + len, sizeof(buf) - len, "\r\n");
+    len = append_to_buf(buf, sizeof(buf), len, "\r\n");
   if (count2 % 3)
-    len2 += snprintf(buf2 + len2, sizeof(buf2) - len2, "\r\n");
+    len2 = append_to_buf(buf2, sizeof(buf2), len2, "\r\n");
 
   if (!count)
-    len += snprintf(buf + len, sizeof(buf) - len, "  None.\r\n");
+    len = append_to_buf(buf, sizeof(buf), len, "  None.\r\n");
   if (!count2)
-    snprintf(buf2 + len2, sizeof(buf2) - len2, "  None.\r\n");
+    len2 = append_to_buf(buf2, sizeof(buf2), len2, "  None.\r\n");
 
   // Join the two strings
-  len += snprintf(buf + len, sizeof(buf) - len, "%s", buf2);
+  len = append_to_buf(buf, sizeof(buf), len, "%s", buf2);
 
-  snprintf(buf + len, sizeof(buf) - len, "\t1Applicable Index Entries: \t3%d\r\n"
-                                                 "\t1Total Index Entries: \t3%d\tn\r\n", count + count2, top_of_helpt);
+  append_to_buf(buf, sizeof(buf), len, "\t1Applicable Index Entries: \t3%d\r\n"
+                                      "\t1Total Index Entries: \t3%d\tn\r\n",
+                count + count2, top_of_helpt);
 
   page_string(ch->desc, buf, TRUE);
 }
