@@ -51,6 +51,7 @@
 static void load_affects(FILE *fl, struct char_data *ch);
 static void load_skills(FILE *fl, struct char_data *ch);
 static void load_study_levels(FILE *fl, struct char_data *ch);
+static void load_identified_items(FILE *fl, struct char_data *ch);
 static void load_quests(FILE *fl, struct char_data *ch);
 static int upgrade_legacy_immortal_levels(struct char_data *ch);
 static void load_HMVS(struct char_data *ch, const char *line, int mode);
@@ -426,6 +427,9 @@ int load_char(const char *name, struct char_data *ch)
       SHADOW_SLOT_VNUM(ch, i) = NOBODY;
       SHADOW_SLOT_NAME(ch, i)[0] = '\0';
     }
+    ch->player_specials->saved.identified_item_count = 0;
+    for (i = 0; i < MAX_IDENTIFIED_ITEMS; i++)
+      ch->player_specials->saved.identified_item_vnums[i] = NOTHING;
     *GET_PROMPT(ch) = '\0';
 
     for (i = 0; i < AF_ARRAY_MAX; i++)
@@ -561,6 +565,7 @@ int load_char(const char *name, struct char_data *ch)
 
       case 'I':
 	     if (!strcmp(tag, "Id  "))	GET_IDNUM(ch)		= atol(line);
+        else if (!strcmp(tag, "IdKn")) load_identified_items(fl, ch);
 	else if (!strcmp(tag, "Int "))	ch->real_abils.intel	= atoi(line);
 	else if (!strcmp(tag, "Invs"))	GET_INVIS_LEV(ch)	= atoi(line);
 	break;
@@ -1020,6 +1025,14 @@ void save_char(struct char_data * ch)
   }
   fprintf(fl, "0 0\n");
 
+  fprintf(fl, "IdKn:\n");
+  for (i = 0; i < ch->player_specials->saved.identified_item_count &&
+              i < MAX_IDENTIFIED_ITEMS; i++) {
+    if (ch->player_specials->saved.identified_item_vnums[i] > NOTHING)
+      fprintf(fl, "%d\n", ch->player_specials->saved.identified_item_vnums[i]);
+  }
+  fprintf(fl, "0\n");
+
   /* Save affects */
   if (tmp_aff[0].spell > 0) {
     fprintf(fl, "Affs:\n");
@@ -1259,6 +1272,25 @@ static void load_study_levels(FILE *fl, struct char_data *ch)
       SET_STUDY_LEARN_LEVEL(ch, num, num2);
     }
   } while (num != 0);
+}
+
+static void load_identified_items(FILE *fl, struct char_data *ch)
+{
+  int vnum = 0;
+  char line[MAX_INPUT_LENGTH + 1];
+  int count = 0;
+
+  do {
+    get_line(fl, line);
+    sscanf(line, "%d", &vnum);
+    if (vnum <= NOTHING)
+      continue;
+    if (count >= MAX_IDENTIFIED_ITEMS)
+      continue;
+    ch->player_specials->saved.identified_item_vnums[count++] = vnum;
+  } while (vnum != 0);
+
+  ch->player_specials->saved.identified_item_count = count;
 }
 
 void load_quests(FILE *fl, struct char_data *ch)

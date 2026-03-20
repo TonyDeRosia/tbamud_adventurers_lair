@@ -646,6 +646,8 @@ void set_temp_summon_timer(struct char_data *mob, int rounds);
 
 void	mag_objectmagic(struct char_data *ch, struct obj_data *obj,
 			char *argument);
+int player_knows_identified_item(struct char_data *ch, struct obj_data *obj);
+void player_record_identified_item(struct char_data *ch, struct obj_data *obj);
 
 int	cast_spell(struct char_data *ch, struct char_data *tch,
   struct obj_data *tobj, int spellnum);

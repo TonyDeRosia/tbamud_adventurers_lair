@@ -693,6 +693,7 @@ void clanedit_parse(struct descriptor_data *d, char *arg);
 #define MAX_COMPLETED_QUESTS  1024   /**< Maximum number of completed quests allowed */
 #define MAX_CAMPAIGN_TARGETS  12
 #define MAX_SHADOW_ROSTER     12
+#define MAX_IDENTIFIED_ITEMS  128
 
 /* Currency configuration. Primary currency is gold with premium diamonds. */
 #define GOLD_PER_DIAMOND    1000LL
@@ -1109,6 +1110,8 @@ struct player_special_data_saved
     int active; /**< Slot currently has an active summoned instance. */
     char name[MAX_NAME_LENGTH + 1]; /**< Stored display name. */
   } shadow_roster[MAX_SHADOW_ROSTER];
+  obj_vnum identified_item_vnums[MAX_IDENTIFIED_ITEMS]; /**< Per-player identified item knowledge ring (vnums). */
+  ubyte identified_item_count; /**< Number of stored identified item entries. */
 };
 
 /** Specials needed only by PCs, not NPCs.  Space for this structure is

@@ -5204,7 +5204,8 @@ ACMD(do_identify)
   }
 
   if (tobj)
-    show_identify_item(ch, tobj, IDENTIFY_BASIC);
+    show_identify_item(ch, tobj,
+      player_knows_identified_item(ch, tobj) ? IDENTIFY_FULL : IDENTIFY_BASIC);
   else
     send_to_char(ch, "You don't see that here.\r\n");
 }
