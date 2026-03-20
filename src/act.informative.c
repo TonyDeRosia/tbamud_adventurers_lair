@@ -1855,7 +1855,8 @@ ACMD(do_score)
   /* Combat Stats */
   {
     int offensive_hit = compute_offensive_hit_value(ch, NULL);
-    int accuracy_pct = compute_hit_chance_from_values(offensive_hit, 10); /* Neutral target Evasion baseline. */
+    /* Display estimate targets an equal-level neutral defender profile. */
+    int accuracy_pct = compute_hit_chance_from_values(offensive_hit + 25, 10);
     int shown_armor = compute_armor_class(ch);
     int shown_evasion = compute_evasion(ch);
     int spell_save = GET_SAVE(ch, 4);
