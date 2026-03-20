@@ -658,17 +658,17 @@ int load_char(const char *name, struct char_data *ch)
                    shadow_slot_idx >= 0 && shadow_slot_idx < MAX_SHADOW_ROSTER) {
           int occupied = 0, active = 0, level = 0;
           int source_vnum = NOBODY;
-          char shadow_name[MAX_NAME_LENGTH + 1];
+          char shadow_name[MAX_SHADOW_NAME_LENGTH + 1];
           shadow_name[0] = '\0';
-          if (sscanf(line, "%d %d %d %d %[^\n]", &occupied, &active, &level, &source_vnum, shadow_name) >= 4) {
+          if (sscanf(line, "%d %d %d %d %80[^\n]", &occupied, &active, &level, &source_vnum, shadow_name) >= 4) {
             SHADOW_SLOT_OCCUPIED(ch, shadow_slot_idx) = occupied ? 1 : 0;
             SHADOW_SLOT_ACTIVE(ch, shadow_slot_idx) = active ? 1 : 0;
             SHADOW_SLOT_LEVEL(ch, shadow_slot_idx) = MAX(1, level);
             SHADOW_SLOT_VNUM(ch, shadow_slot_idx) = source_vnum;
             if (shadow_name[0])
-              strlcpy(SHADOW_SLOT_NAME(ch, shadow_slot_idx), shadow_name, MAX_NAME_LENGTH + 1);
+              strlcpy(SHADOW_SLOT_NAME(ch, shadow_slot_idx), shadow_name, MAX_SHADOW_NAME_LENGTH + 1);
             else
-              strlcpy(SHADOW_SLOT_NAME(ch, shadow_slot_idx), "nameless shadow", MAX_NAME_LENGTH + 1);
+              strlcpy(SHADOW_SLOT_NAME(ch, shadow_slot_idx), "nameless shadow", MAX_SHADOW_NAME_LENGTH + 1);
           }
         }
 	else if (!strcmp(tag, "Skil"))	load_skills(fl, ch);

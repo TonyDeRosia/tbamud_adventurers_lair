@@ -148,6 +148,85 @@ static int shadow_capacity(struct char_data *ch)
   return MIN(MAX_SHADOW_ROSTER, MAX(2, cap));
 }
 
+static int shadow_name_looks_valid(const char *name)
+{
+  const char *p;
+  int visible = 0;
+
+  if (!name)
+    return FALSE;
+
+  while (*name && isspace((unsigned char)*name))
+    name++;
+  if (!*name)
+    return FALSE;
+  if (!str_cmp(name, "<NULL>"))
+    return FALSE;
+  if (!strncasecmp(name, "the ", 4) && strlen(name) <= 6)
+    return FALSE;
+
+  for (p = name; *p; p++) {
+    if (!iscntrl((unsigned char)*p) && !isspace((unsigned char)*p))
+      visible++;
+  }
+
+  return visible > 0;
+}
+
+static int sanitize_shadow_name_input(const char *input, char *out, size_t out_sz)
+{
+  const char *src;
+  char *dst;
+  size_t remaining;
+
+  if (!input || !out || out_sz == 0)
+    return FALSE;
+
+  while (*input && isspace((unsigned char)*input))
+    input++;
+  if (!*input)
+    return FALSE;
+
+  src = input;
+  dst = out;
+  remaining = out_sz - 1;
+  while (*src && remaining > 0) {
+    unsigned char c = (unsigned char)*src;
+
+    if (iscntrl(c))
+      return FALSE;
+    if (c == '%' || c == '&' || c == '{' || c == '}' || c == '`')
+      return FALSE;
+
+    *dst++ = *src++;
+    remaining--;
+  }
+  *dst = '\0';
+
+  while (dst > out && isspace((unsigned char)dst[-1])) {
+    dst--;
+    *dst = '\0';
+  }
+
+  return shadow_name_looks_valid(out);
+}
+
+static const char *shadow_display_name(struct char_data *ch, int slot, struct char_data *mob)
+{
+  if (ch && slot >= 0 && slot < MAX_SHADOW_ROSTER &&
+      SHADOW_SLOT_OCCUPIED(ch, slot) &&
+      shadow_name_looks_valid(SHADOW_SLOT_NAME(ch, slot)))
+    return SHADOW_SLOT_NAME(ch, slot);
+
+  if (mob && shadow_name_looks_valid(mob->player.short_descr))
+    return mob->player.short_descr;
+
+  if (mob && shadow_name_looks_valid(mob->player.name))
+    return mob->player.name;
+
+  return "a shadow";
+}
+
 static int shadow_find_slot(struct char_data *ch, const char *selector)
 {
   int slot, i;
@@ -196,22 +275,6 @@ static void shadow_sync_active_flags(struct char_data *ch)
     if (SHADOW_SLOT_ACTIVE(ch, i) && !shadow_active_mob(ch, i))
       SHADOW_SLOT_ACTIVE(ch, i) = 0;
   }
-}
-
-static char *shadow_display_name(struct char_data *ch, int slot, struct char_data *mob)
-{
-  if (ch && slot >= 0 && slot < MAX_SHADOW_ROSTER &&
-      SHADOW_SLOT_OCCUPIED(ch, slot) &&
-      SHADOW_SLOT_NAME(ch, slot)[0])
-    return SHADOW_SLOT_NAME(ch, slot);
-
-  if (mob && mob->player.short_descr && *mob->player.short_descr)
-    return mob->player.short_descr;
-
-  if (mob && mob->player.name && *mob->player.name)
-    return mob->player.name;
-
-  return "a shadow";
 }
 
 static int ability_matches_filter(struct char_data *ch, int ability, const char *filter, int show_spells)
@@ -1890,6 +1953,7 @@ ACMD(do_heel)
 ACMD(do_shadow)
 {
   char shadow_subcmd[MAX_INPUT_LENGTH], selector[MAX_INPUT_LENGTH];
+  char display_name[MAX_SHADOW_NAME_LENGTH + 1];
   int i, slot, used = 0, active = 0, cap;
   struct char_data *mob;
 
@@ -1916,9 +1980,9 @@ ACMD(do_shadow)
         if (!SHADOW_SLOT_OCCUPIED(ch, i))
           send_to_char(ch, " [%2d] %s[Empty]%s\r\n", i + 1, CCGRN(ch, C_NRM), CCNRM(ch, C_NRM));
         else
-          send_to_char(ch, " [%2d] %s[Shadow: %-20s]%s Lvl %-3d %s%s%s\r\n",
+          send_to_char(ch, " [%2d] %s[Shadow: %-30.30s]%s Lvl %-3d %s%s%s\r\n",
                        i + 1,
-                       CCYEL(ch, C_NRM), SHADOW_SLOT_NAME(ch, i), CCNRM(ch, C_NRM),
+                       CCYEL(ch, C_NRM), shadow_name_looks_valid(SHADOW_SLOT_NAME(ch, i)) ? SHADOW_SLOT_NAME(ch, i) : "a shadow", CCNRM(ch, C_NRM),
                        SHADOW_SLOT_LEVEL(ch, i),
                        SHADOW_SLOT_ACTIVE(ch, i) ? CCGRN(ch, C_NRM) : "",
                        SHADOW_SLOT_ACTIVE(ch, i) ? "[Active]" : "[Stored]",
@@ -1929,6 +1993,7 @@ ACMD(do_shadow)
     send_to_char(ch, "  shadow summon <slot|name>\r\n");
     send_to_char(ch, "  shadow store <slot|name>\r\n");
     send_to_char(ch, "  shadow release <slot|name>\r\n");
+    send_to_char(ch, "  shadow rename <slot|name> <new name>\r\n");
     send_to_char(ch, "  shadow list\r\n");
     return;
   }
@@ -1967,8 +2032,9 @@ ACMD(do_shadow)
       return;
     }
     mob = shadow_active_mob(ch, slot);
-    act("You call forth $t from your shadow storage.", FALSE, ch, NULL, shadow_display_name(ch, slot, mob), TO_CHAR);
-    act("$n calls forth $t from $s shadow storage.", FALSE, ch, NULL, shadow_display_name(ch, slot, mob), TO_ROOM);
+    strlcpy(display_name, shadow_display_name(ch, slot, mob), sizeof(display_name));
+    act("You call forth $t from your shadow storage.", FALSE, ch, NULL, display_name, TO_CHAR);
+    act("$n calls forth $t from $s shadow storage.", FALSE, ch, NULL, display_name, TO_ROOM);
     send_to_char(ch, "You expend %d mana.\r\n", mana_cost);
     save_char(ch);
     return;
@@ -1992,8 +2058,9 @@ ACMD(do_shadow)
       return;
     }
     SHADOW_SLOT_ACTIVE(ch, slot) = 0;
+    strlcpy(display_name, shadow_display_name(ch, slot, mob), sizeof(display_name));
     extract_char(mob);
-    send_to_char(ch, "You return %s to your shadow storage.\r\n", shadow_display_name(ch, slot, mob));
+    send_to_char(ch, "You return %s to your shadow storage.\r\n", display_name);
     save_char(ch);
     return;
   }
@@ -2009,10 +2076,11 @@ ACMD(do_shadow)
       return;
     }
     mob = shadow_active_mob(ch, slot);
+    strlcpy(display_name, shadow_display_name(ch, slot, mob), sizeof(display_name));
     if (mob)
       extract_char(mob);
-    act("You release $t back into the void.", FALSE, ch, NULL, shadow_display_name(ch, slot, mob), TO_CHAR);
-    act("$n releases $t back into the void.", FALSE, ch, NULL, shadow_display_name(ch, slot, mob), TO_ROOM);
+    act("You release $t back into the void.", FALSE, ch, NULL, display_name, TO_CHAR);
+    act("$n releases $t back into the void.", FALSE, ch, NULL, display_name, TO_ROOM);
     SHADOW_SLOT_OCCUPIED(ch, slot) = 0;
     SHADOW_SLOT_ACTIVE(ch, slot) = 0;
     SHADOW_SLOT_LEVEL(ch, slot) = 0;
@@ -2022,7 +2090,42 @@ ACMD(do_shadow)
     return;
   }
 
-  send_to_char(ch, "Usage: shadow <list|summon|store|release>\r\n");
+  if (is_abbrev(shadow_subcmd, "rename")) {
+    char target[MAX_INPUT_LENGTH], new_name[MAX_INPUT_LENGTH];
+    char safe_name[MAX_SHADOW_NAME_LENGTH + 1];
+
+    half_chop(selector, target, new_name);
+    if (!*target) {
+      send_to_char(ch, "Usage: shadow rename <slot|name> <new name>\r\n");
+      return;
+    }
+    if (!*new_name) {
+      send_to_char(ch, "Rename it to what?\r\n");
+      return;
+    }
+
+    slot = shadow_find_slot(ch, target);
+    if (slot < 0 || slot >= cap || !SHADOW_SLOT_OCCUPIED(ch, slot)) {
+      send_to_char(ch, "You do not have that shadow.\r\n");
+      return;
+    }
+    if (!sanitize_shadow_name_input(new_name, safe_name, sizeof(safe_name))) {
+      send_to_char(ch, "That is not a valid shadow name.\r\n");
+      return;
+    }
+
+    strlcpy(SHADOW_SLOT_NAME(ch, slot), safe_name, MAX_SHADOW_NAME_LENGTH + 1);
+    mob = shadow_active_mob(ch, slot);
+    if (mob) {
+      free(mob->player.short_descr);
+      mob->player.short_descr = strdup(safe_name);
+    }
+    send_to_char(ch, "You rename the shadow to %s.\r\n", safe_name);
+    save_char(ch);
+    return;
+  }
+
+  send_to_char(ch, "Usage: shadow <list|summon|store|release|rename>\r\n");
 }
 
 ACMD(do_opet)
