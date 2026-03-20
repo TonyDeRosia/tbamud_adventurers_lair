@@ -32,6 +32,7 @@ static void hedit_setup_existing(struct descriptor_data *, int);
 static void hedit_save_to_disk(struct descriptor_data *);
 static void hedit_save_internally(struct descriptor_data *);
 static void hedit_collect_keywords_for_entry(int rnum, char *out, size_t outsz);
+static void hedit_append_bounded(char *dst, size_t dstsz, const char *src);
 
 
 ACMD(do_oasis_hedit)
@@ -182,8 +183,8 @@ static void hedit_save_to_disk(struct descriptor_data *d)
         continue;
 
       if (*keywords && strlen(keywords) + 1 < sizeof(keywords))
-        strlcat(keywords, " ", sizeof(keywords));
-      strlcat(keywords, help_table[j].keywords, sizeof(keywords));
+        hedit_append_bounded(keywords, sizeof(keywords), " ");
+      hedit_append_bounded(keywords, sizeof(keywords), help_table[j].keywords);
     }
     if (!*keywords)
       strlcpy(keywords, "UNNAMED", sizeof(keywords));
@@ -221,9 +222,23 @@ static void hedit_collect_keywords_for_entry(int rnum, char *out, size_t outsz)
       continue;
 
     if (*out && strlen(out) + 1 < outsz)
-      strlcat(out, " ", outsz);
-    strlcat(out, help_table[i].keywords, outsz);
+      hedit_append_bounded(out, outsz, " ");
+    hedit_append_bounded(out, outsz, help_table[i].keywords);
   }
+}
+
+static void hedit_append_bounded(char *dst, size_t dstsz, const char *src)
+{
+  size_t used;
+
+  if (!dst || !src || dstsz == 0)
+    return;
+
+  used = strlen(dst);
+  if (used >= dstsz)
+    return;
+
+  snprintf(dst + used, dstsz - used, "%s", src);
 }
 
 /* The main menu. */
