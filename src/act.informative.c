@@ -2437,9 +2437,50 @@ static int aff_flags_has_meaningful_bits(const char *flags)
 
 static const char *aff_apply_verb(int location, int modifier)
 {
+  switch (location) {
+    case APPLY_SAVING_BREATH:
+    case APPLY_SAVING_SPELL:
+    case APPLY_SAVING_PARA:
+    case APPLY_SAVING_ROD:
+    case APPLY_SAVING_PETRI:
+      return (modifier < 0) ? "improves" : "worsens";
+  }
+
   if (location == APPLY_AC || location == APPLY_EVASION)
     return (modifier >= 0) ? "improves" : "reduces";
   return (modifier >= 0) ? "increases" : "reduces";
+}
+
+static int is_saving_apply(int location)
+{
+  switch (location) {
+    case APPLY_SAVING_BREATH:
+    case APPLY_SAVING_SPELL:
+    case APPLY_SAVING_PARA:
+    case APPLY_SAVING_ROD:
+    case APPLY_SAVING_PETRI:
+      return 1;
+  }
+
+  return 0;
+}
+
+static const char *saving_apply_player_name(int location)
+{
+  switch (location) {
+    case APPLY_SAVING_SPELL:
+      return "spell saves";
+    case APPLY_SAVING_BREATH:
+      return "breath saves";
+    case APPLY_SAVING_PARA:
+      return "paralysis saves";
+    case APPLY_SAVING_ROD:
+      return "rod saves";
+    case APPLY_SAVING_PETRI:
+      return "petrification saves";
+  }
+
+  return "saves";
 }
 
 static int aff_seen_contains(const struct affected_type * const *seen, int seen_count,
@@ -2542,7 +2583,12 @@ static void build_grouped_aff_summary(const struct affected_type *list,
     if (!mod_used[i] || mod_totals[i] == 0)
       continue;
 
-    if (i == APPLY_AC)
+    if (is_saving_apply(i))
+      snprintf(piece, sizeof(piece), "%s %s by %d",
+        aff_apply_verb(i, mod_totals[i]),
+        saving_apply_player_name(i),
+        abs(mod_totals[i]));
+    else if (i == APPLY_AC)
       snprintf(piece, sizeof(piece), "%s Armor by %d", aff_apply_verb(i, mod_totals[i]), abs(mod_totals[i]));
     else if (i == APPLY_EVASION)
       snprintf(piece, sizeof(piece), "%s Evasion by %d", aff_apply_verb(i, mod_totals[i]), abs(mod_totals[i]));
