@@ -1361,7 +1361,7 @@ static void append_match(char *buffer, size_t buf_size, const char *name,
 
 static bool ability_matches_input(const char *input, const char *ability_name,
     bool allow_partial_name, bool allow_extra_input, int *name_tokens,
-    int *input_tokens) {
+    int *input_tokens, bool *exact_name_match) {
   char input_buf[MAX_INPUT_LENGTH];
   char name_buf[MAX_INPUT_LENGTH];
   char input_token[MAX_INPUT_LENGTH];
@@ -1375,6 +1375,8 @@ static bool ability_matches_input(const char *input, const char *ability_name,
     *name_tokens = 0;
   if (input_tokens)
     *input_tokens = 0;
+  if (exact_name_match)
+    *exact_name_match = FALSE;
 
   if (!input || !*input || !ability_name || !*ability_name)
     return FALSE;
@@ -1394,13 +1396,12 @@ static bool ability_matches_input(const char *input, const char *ability_name,
     name_ptr = any_one_arg(name_ptr, name_token);
   }
 
+  if (exact_name_match && !*input_token && !*name_token)
+    *exact_name_match = TRUE;
+
   if (!*input_token && *name_token) {
     if (!allow_partial_name)
       return FALSE;
-    while (*name_token) {
-      matched_name_tokens++;
-      name_ptr = any_one_arg(name_ptr, name_token);
-    }
   } else if (*input_token && !*name_token) {
     if (!allow_extra_input)
       return FALSE;
@@ -1419,6 +1420,7 @@ static int find_known_spell_by_tokens(struct char_data *ch, const char *name,
     bool allow_partial_name, bool allow_extra_input) {
   int best_spell = -1;
   int best_tokens = 0;
+  bool best_exact = FALSE;
   int best_input_tokens = 0;
   int match_count = 0;
   int spellnum;
@@ -1431,6 +1433,7 @@ static int find_known_spell_by_tokens(struct char_data *ch, const char *name,
   for (spellnum = 1; spellnum <= MAX_SPELLS; spellnum++) {
     int token_count = 0;
     int input_token_count = 0;
+    bool exact_name_match = FALSE;
 
     if (!is_available_spell(spellnum))
       continue;
@@ -1439,18 +1442,20 @@ static int find_known_spell_by_tokens(struct char_data *ch, const char *name,
 
     if (!ability_matches_input(name, spell_info[spellnum].name,
         allow_partial_name, allow_extra_input, &token_count,
-        &input_token_count))
+        &input_token_count, &exact_name_match))
       continue;
 
-    if (token_count > best_tokens) {
+    if (token_count > best_tokens ||
+        (token_count == best_tokens && exact_name_match && !best_exact)) {
       best_tokens = token_count;
+      best_exact = exact_name_match;
       best_input_tokens = input_token_count;
       best_spell = spellnum;
       match_count = 0;
       *ambig_buf = '\0';
       append_match(ambig_buf, ambig_len, spell_info[spellnum].name,
           &match_count);
-    } else if (token_count == best_tokens) {
+    } else if (token_count == best_tokens && exact_name_match == best_exact) {
       append_match(ambig_buf, ambig_len, spell_info[spellnum].name,
           &match_count);
     }
@@ -1531,6 +1536,7 @@ static int find_ability_by_tokens(const char *name, char *ambig_buf,
   };
   int best_ability = -1;
   int best_tokens = 0;
+  bool best_exact = FALSE;
   int best_input_tokens = 0;
   int match_count = 0;
   int ability;
@@ -1542,7 +1548,7 @@ static int find_ability_by_tokens(const char *name, char *ambig_buf,
 
   for (ability = 0; ability_aliases[ability].alias; ability++) {
     if (ability_matches_input(name, ability_aliases[ability].alias,
-        allow_partial_name, allow_extra_input, NULL, NULL)) {
+        allow_partial_name, allow_extra_input, NULL, NULL, NULL)) {
       if (matched_tokens)
         *matched_tokens = 1;
       return ability_aliases[ability].ability;
@@ -1552,24 +1558,27 @@ static int find_ability_by_tokens(const char *name, char *ambig_buf,
   for (ability = 1; ability <= TOP_SPELL_DEFINE; ability++) {
     int token_count = 0;
     int input_token_count = 0;
+    bool exact_name_match = FALSE;
 
     if (!is_available_ability(ability))
       continue;
 
     if (!ability_matches_input(name, spell_info[ability].name,
         allow_partial_name, allow_extra_input, &token_count,
-        &input_token_count))
+        &input_token_count, &exact_name_match))
       continue;
 
-    if (token_count > best_tokens) {
+    if (token_count > best_tokens ||
+        (token_count == best_tokens && exact_name_match && !best_exact)) {
       best_tokens = token_count;
+      best_exact = exact_name_match;
       best_input_tokens = input_token_count;
       best_ability = ability;
       match_count = 0;
       *ambig_buf = '\0';
       append_match(ambig_buf, ambig_len, spell_info[ability].name,
           &match_count);
-    } else if (token_count == best_tokens) {
+    } else if (token_count == best_tokens && exact_name_match == best_exact) {
       append_match(ambig_buf, ambig_len, spell_info[ability].name,
           &match_count);
     }
@@ -1609,14 +1618,14 @@ int find_skill_num(char *name) {
 
   for (skill_num = 0; direct_aliases[skill_num].alias; skill_num++)
     if (ability_matches_input(cleaned, direct_aliases[skill_num].alias,
-        TRUE, FALSE, NULL, NULL))
+        TRUE, FALSE, NULL, NULL, NULL))
       return direct_aliases[skill_num].ability;
 
   for (skill_num = 1; skill_num <= TOP_SPELL_DEFINE; skill_num++) {
     if (!is_available_ability(skill_num))
       continue;
     if (ability_matches_input(cleaned, spell_info[skill_num].name,
-        TRUE, FALSE, NULL, NULL))
+        TRUE, FALSE, NULL, NULL, NULL))
       return skill_num;
   }
 
