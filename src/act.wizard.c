@@ -323,6 +323,7 @@ ACMD(do_trans)
 	return;
       }
       act("$n disappears in a mushroom cloud.", FALSE, victim, 0, 0, TO_ROOM);
+      shadow_return_active_to_storage(victim, FALSE);
       char_from_room(victim);
       char_to_room(victim, IN_ROOM(ch));
       act("$n arrives from a puff of smoke.", FALSE, victim, 0, 0, TO_ROOM);
@@ -343,6 +344,7 @@ ACMD(do_trans)
 	if (GET_LEVEL(victim) >= GET_LEVEL(ch))
 	  continue;
 	act("$n disappears in a mushroom cloud.", FALSE, victim, 0, 0, TO_ROOM);
+	shadow_return_active_to_storage(victim, FALSE);
 	char_from_room(victim);
 	char_to_room(victim, IN_ROOM(ch));
 	act("$n arrives from a puff of smoke.", FALSE, victim, 0, 0, TO_ROOM);
@@ -375,6 +377,7 @@ ACMD(do_teleport)
   else if ((target = find_target_room(ch, buf2)) != NOWHERE) {
     send_to_char(ch, "%s", CONFIG_OK);
     act("$n disappears in a puff of smoke.", FALSE, victim, 0, 0, TO_ROOM);
+    shadow_return_active_to_storage(victim, FALSE);
     char_from_room(victim);
     char_to_room(victim, target);
     act("$n arrives from a puff of smoke.", FALSE, victim, 0, 0, TO_ROOM);
