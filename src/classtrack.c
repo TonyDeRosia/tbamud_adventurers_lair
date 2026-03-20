@@ -214,6 +214,32 @@ static void classtrack_get_top2(struct char_data *ch, int *primary, int *seconda
   *secondary = second;
 }
 
+static int classtrack_ready_to_commit(struct char_data *ch, int *primary_out, int *secondary_out)
+{
+  int primary, secondary;
+  int pscore, sscore;
+
+  if (!ch || IS_NPC(ch))
+    return 0;
+
+  classtrack_get_top2(ch, &primary, &secondary);
+  pscore = GET_ARCHETYPE_SCORE(ch, primary);
+  sscore = GET_ARCHETYPE_SCORE(ch, secondary);
+
+  if (primary_out)
+    *primary_out = primary;
+  if (secondary_out)
+    *secondary_out = secondary;
+
+  if (GET_LEVEL(ch) < CT_COMMIT_LEVEL)
+    return 0;
+
+  if (pscore < CT_COMMIT_PRIMARY || (pscore - sscore) < CT_COMMIT_MARGIN)
+    return 0;
+
+  return 1;
+}
+
 static int classtrack_get_primary(struct char_data *ch)
 {
   int primary, secondary;
@@ -411,18 +437,24 @@ void classtrack_check_level_checkpoint(struct char_data *ch)
 
   current_title = GET_SOFT_CLASS_TITLE(ch);
 
-  if (GET_LEVEL(ch) >= 100) {
-    title = classtrack_final_title(ch);
-    if (!str_cmp(title, "Adventurer"))
-      title = "Unresolved";
-    if (!str_cmp(title, "Unresolved")) {
-      send_to_char(ch, "\r\nYour path remains unresolved. Continue shaping your identity before locking.\r\n");
+  if (GET_LEVEL(ch) >= CT_COMMIT_LEVEL) {
+    if (!classtrack_ready_to_commit(ch, NULL, NULL)) {
+      if (GET_LEVEL(ch) == CT_COMMIT_LEVEL) {
+        send_to_char(ch, "\r\nYour path remains unresolved. Continue shaping your identity.\r\n");
+      }
       return;
     }
+
+    title = classtrack_final_title(ch);
+
+    if (!str_cmp(title, "Adventurer") || !str_cmp(title, "Unresolved"))
+      title = ct_soft_titles[classtrack_get_primary(ch)][0];
+
     if (!*current_title || str_cmp(current_title, title))
       classtrack_set_title(ch, title);
+
     GET_CLASS_LOCKED(ch) = 1;
-    send_to_char(ch, "\r\nYour path is now permanent. You are %s%s%s.\r\n",
+    send_to_char(ch, "\r\nYour path solidifies. You are now permanently known as %s%s%s.\r\n",
                  CCYEL(ch, C_NRM), title, CCNRM(ch, C_NRM));
     return;
   }
@@ -442,7 +474,6 @@ int classtrack_can_study_archetype(struct char_data *ch, int target_archetype,
                                    char *reason, size_t reason_len)
 {
   int primary, secondary;
-  int pscore, sscore;
 
   if (!ch || IS_NPC(ch))
     return 1;
@@ -450,12 +481,7 @@ int classtrack_can_study_archetype(struct char_data *ch, int target_archetype,
   if (target_archetype < 0 || target_archetype >= NUM_ARCHETYPES)
     return 1;
 
-  classtrack_get_top2(ch, &primary, &secondary);
-  pscore = GET_ARCHETYPE_SCORE(ch, primary);
-  sscore = GET_ARCHETYPE_SCORE(ch, secondary);
-
-  if (GET_LEVEL(ch) < CT_COMMIT_LEVEL || pscore < CT_COMMIT_PRIMARY ||
-      (pscore - sscore) < CT_COMMIT_MARGIN)
+  if (!classtrack_ready_to_commit(ch, &primary, &secondary))
     return 1;
 
   if (target_archetype == primary || target_archetype == secondary)
