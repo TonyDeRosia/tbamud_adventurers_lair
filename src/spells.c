@@ -2407,13 +2407,15 @@ ASPELL(spell_execution_mark) { if (!ch || !victim) return; if (!mag_savingthrow(
 ASPELL(spell_shadow_extraction)
 {
   struct obj_data *corpse = obj;
+  mob_rnum source_rnum;
+  const char *source_short = NULL;
   int slot = -1;
   int i;
   int capacity;
   int attempts_remaining;
   int chance;
   int roll;
-  char shadow_name[MAX_NAME_LENGTH + 1];
+  char shadow_name[MAX_SHADOW_NAME_LENGTH + 1];
   mob_vnum source_vnum;
   int corpse_level;
   int shadow_level;
@@ -2464,15 +2466,21 @@ ASPELL(spell_shadow_extraction)
   }
 
   source_vnum = GET_OBJ_VAL(corpse, 1);
+  source_rnum = real_mobile(source_vnum);
+  if (source_rnum != NOBODY && mob_proto[source_rnum].player.short_descr && *mob_proto[source_rnum].player.short_descr)
+    source_short = mob_proto[source_rnum].player.short_descr;
   shadow_level = MAX(1, MIN(level, corpse_level));
-  strlcpy(shadow_name, corpse->short_description ? corpse->short_description : "nameless shadow", sizeof(shadow_name));
+  strlcpy(shadow_name,
+          source_short ? source_short :
+          (corpse->short_description ? corpse->short_description : "nameless shadow"),
+          sizeof(shadow_name));
   if (!strncasecmp(shadow_name, "the corpse of ", 14))
     memmove(shadow_name, shadow_name + 14, strlen(shadow_name + 14) + 1);
   SHADOW_SLOT_OCCUPIED(ch, slot) = 1;
   SHADOW_SLOT_ACTIVE(ch, slot) = 0;
   SHADOW_SLOT_LEVEL(ch, slot) = shadow_level;
   SHADOW_SLOT_VNUM(ch, slot) = source_vnum;
-  strlcpy(SHADOW_SLOT_NAME(ch, slot), shadow_name, MAX_NAME_LENGTH + 1);
+  strlcpy(SHADOW_SLOT_NAME(ch, slot), shadow_name, MAX_SHADOW_NAME_LENGTH + 1);
   extract_obj(corpse);
   save_char(ch);
   act("You wrench a shadow from the corpse and bind it to your dominion.", FALSE, ch, 0, 0, TO_CHAR);

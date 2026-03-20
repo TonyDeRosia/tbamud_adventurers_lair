@@ -679,6 +679,7 @@ void clanedit_parse(struct descriptor_data *d, char *arg);
 #define MAX_RAW_INPUT_LENGTH  (12 * 1024) /**< Max size of *raw* input */
 #define MAX_MESSAGES          60     /**< Max Different attack message types */
 #define MAX_NAME_LENGTH       20     /**< Max PC/NPC name length */
+#define MAX_SHADOW_NAME_LENGTH 80    /**< Max stored shadow display name length */
 #define MAX_PWD_LENGTH        30     /**< Max PC password length */
 #define MAX_TITLE_LENGTH      80     /**< Max PC title length */
 #define HOST_LENGTH           40     /**< Max hostname resolution length */
@@ -1108,7 +1109,7 @@ struct player_special_data_saved
     int level; /**< Stored level/power tier used for summoning. */
     int occupied; /**< Slot contains a stored shadow. */
     int active; /**< Slot currently has an active summoned instance. */
-    char name[MAX_NAME_LENGTH + 1]; /**< Stored display name. */
+    char name[MAX_SHADOW_NAME_LENGTH + 1]; /**< Stored display name. */
   } shadow_roster[MAX_SHADOW_ROSTER];
   obj_vnum identified_item_vnums[MAX_IDENTIFIED_ITEMS]; /**< Per-player identified item knowledge ring (vnums). */
   ubyte identified_item_count; /**< Number of stored identified item entries. */

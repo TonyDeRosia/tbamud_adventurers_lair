@@ -198,6 +198,22 @@ static void shadow_sync_active_flags(struct char_data *ch)
   }
 }
 
+static char *shadow_display_name(struct char_data *ch, int slot, struct char_data *mob)
+{
+  if (ch && slot >= 0 && slot < MAX_SHADOW_ROSTER &&
+      SHADOW_SLOT_OCCUPIED(ch, slot) &&
+      SHADOW_SLOT_NAME(ch, slot)[0])
+    return SHADOW_SLOT_NAME(ch, slot);
+
+  if (mob && mob->player.short_descr && *mob->player.short_descr)
+    return mob->player.short_descr;
+
+  if (mob && mob->player.name && *mob->player.name)
+    return mob->player.name;
+
+  return "a shadow";
+}
+
 static int ability_matches_filter(struct char_data *ch, int ability, const char *filter, int show_spells)
 {
   const struct spell_info_type *si = &spell_info[ability];
@@ -1889,19 +1905,24 @@ ACMD(do_shadow)
           active++;
       }
     }
-    send_to_char(ch, "@YShadow Storage@n: %d / %d slots used. @GActive@n: %d.\r\n", used, cap, active);
+    send_to_char(ch, "%sShadow Storage%s: %d / %d slots used. %sActive%s: %d.\r\n",
+                 CCYEL(ch, C_NRM), CCNRM(ch, C_NRM),
+                 used, cap,
+                 CCGRN(ch, C_NRM), CCNRM(ch, C_NRM), active);
     if (!used) {
       send_to_char(ch, "You have no stored shadows.\r\n");
     } else {
       for (i = 0; i < cap; i++) {
         if (!SHADOW_SLOT_OCCUPIED(ch, i))
-          send_to_char(ch, " [%2d] @D[Empty]@n\r\n", i + 1);
+          send_to_char(ch, " [%2d] %s[Empty]%s\r\n", i + 1, CCGRN(ch, C_NRM), CCNRM(ch, C_NRM));
         else
-          send_to_char(ch, " [%2d] @C[Shadow: %-20s]@n Lvl %-3d %s\r\n",
+          send_to_char(ch, " [%2d] %s[Shadow: %-20s]%s Lvl %-3d %s%s%s\r\n",
                        i + 1,
-                       SHADOW_SLOT_NAME(ch, i),
+                       CCYEL(ch, C_NRM), SHADOW_SLOT_NAME(ch, i), CCNRM(ch, C_NRM),
                        SHADOW_SLOT_LEVEL(ch, i),
-                       SHADOW_SLOT_ACTIVE(ch, i) ? "@G[Active]@n" : "[Stored]");
+                       SHADOW_SLOT_ACTIVE(ch, i) ? CCGRN(ch, C_NRM) : "",
+                       SHADOW_SLOT_ACTIVE(ch, i) ? "[Active]" : "[Stored]",
+                       SHADOW_SLOT_ACTIVE(ch, i) ? CCNRM(ch, C_NRM) : "");
       }
     }
     send_to_char(ch, "Commands:\r\n");
@@ -1945,8 +1966,9 @@ ACMD(do_shadow)
       send_to_char(ch, "The shadow resists your call right now.\r\n");
       return;
     }
-    act("You call forth $t from your shadow storage.", FALSE, ch, NULL, SHADOW_SLOT_NAME(ch, slot), TO_CHAR);
-    act("$n calls forth $t from $s shadow storage.", FALSE, ch, NULL, SHADOW_SLOT_NAME(ch, slot), TO_ROOM);
+    mob = shadow_active_mob(ch, slot);
+    act("You call forth $t from your shadow storage.", FALSE, ch, NULL, shadow_display_name(ch, slot, mob), TO_CHAR);
+    act("$n calls forth $t from $s shadow storage.", FALSE, ch, NULL, shadow_display_name(ch, slot, mob), TO_ROOM);
     send_to_char(ch, "You expend %d mana.\r\n", mana_cost);
     save_char(ch);
     return;
@@ -1971,7 +1993,7 @@ ACMD(do_shadow)
     }
     SHADOW_SLOT_ACTIVE(ch, slot) = 0;
     extract_char(mob);
-    send_to_char(ch, "You return %s to your shadow storage.\r\n", SHADOW_SLOT_NAME(ch, slot));
+    send_to_char(ch, "You return %s to your shadow storage.\r\n", shadow_display_name(ch, slot, mob));
     save_char(ch);
     return;
   }
@@ -1989,8 +2011,8 @@ ACMD(do_shadow)
     mob = shadow_active_mob(ch, slot);
     if (mob)
       extract_char(mob);
-    act("You release $t back into the void.", FALSE, ch, NULL, SHADOW_SLOT_NAME(ch, slot), TO_CHAR);
-    act("$n releases $t back into the void.", FALSE, ch, NULL, SHADOW_SLOT_NAME(ch, slot), TO_ROOM);
+    act("You release $t back into the void.", FALSE, ch, NULL, shadow_display_name(ch, slot, mob), TO_CHAR);
+    act("$n releases $t back into the void.", FALSE, ch, NULL, shadow_display_name(ch, slot, mob), TO_ROOM);
     SHADOW_SLOT_OCCUPIED(ch, slot) = 0;
     SHADOW_SLOT_ACTIVE(ch, slot) = 0;
     SHADOW_SLOT_LEVEL(ch, slot) = 0;
