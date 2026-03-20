@@ -1239,30 +1239,73 @@ static bool is_spellup_buff_active(struct char_data *victim, int spellnum)
   }
 }
 
+static bool is_spellup_manual_persistent_buff(int spellnum)
+{
+  switch (spellnum) {
+    case SPELL_PERFECT_UNKNOWABLE:
+    case SPELL_CRYSTAL_BODY:
+    case SPELL_BODY_OF_EFFULGENT_BERYL:
+    case SPELL_UNDYING_WILL:
+    case SPELL_PANTHEON:
+    case SPELL_DESPAIR_AURA:
+    case SPELL_DOMINION_OF_SHADOWS:
+    case SPELL_SHADOW_REGENESIS:
+    case SPELL_ASSASSINS_INTENT:
+    case SPELL_SOVEREIGNS_STEP:
+    case SPELL_DETECT_KILL_INTENT:
+    case SPELL_SHADOW_ARMOR:
+    case SPELL_TOTAL_OCCULTATION:
+    case SPELL_HUNTERS_INSTINCT:
+      return TRUE;
+    default:
+      return FALSE;
+  }
+}
+
 static bool is_spellup_beneficial_spell(int spellnum)
 {
-  bool affects_or_manual;
+  bool affects_or_manual_buff;
   bool char_targeted;
   bool self_castable;
 
   if (!is_available_spell(spellnum))
     return FALSE;
 
-  affects_or_manual = IS_SET(SINFO.routines, MAG_AFFECTS) ||
-      IS_SET(SINFO.routines, MAG_MANUAL);
+  affects_or_manual_buff = IS_SET(SINFO.routines, MAG_AFFECTS) ||
+      (IS_SET(SINFO.routines, MAG_MANUAL) &&
+      is_spellup_manual_persistent_buff(spellnum));
   char_targeted = IS_SET(SINFO.targets,
       TAR_CHAR_ROOM | TAR_CHAR_WORLD | TAR_SELF_ONLY | TAR_FIGHT_SELF);
   self_castable = IS_SET(SINFO.targets, TAR_SELF_ONLY | TAR_FIGHT_SELF) ||
       (!IS_SET(SINFO.targets, TAR_NOT_SELF) &&
       IS_SET(SINFO.targets, TAR_CHAR_ROOM | TAR_CHAR_WORLD));
 
-  /* Metadata-driven spellup gate: non-violent buffs that can target the caster. */
-  if (SINFO.violent || !affects_or_manual)
+  /* Spellup gate: non-violent persistent buffs that can target the caster. */
+  if (SINFO.violent || !affects_or_manual_buff)
     return FALSE;
   if (!char_targeted || !self_castable)
     return FALSE;
   if (IS_SET(SINFO.targets, TAR_IGNORE))
     return FALSE;
+  if (IS_SET(SINFO.routines, MAG_DAMAGE | MAG_POINTS | MAG_UNAFFECTS))
+    return FALSE;
+
+  switch (spellnum) {
+    case SPELL_IDENTIFY:
+    case SPELL_CURE_LIGHT:
+    case SPELL_CURE_CRITIC:
+    case SPELL_HEAL:
+    case SPELL_GREATER_HEAL:
+    case SPELL_CLEANSE:
+    case SPELL_WORD_OF_RECALL:
+    case SPELL_WORD_OF_RECALL_MASS:
+    case SPELL_TELEPORT:
+    case SPELL_GREATER_TELEPORTATION:
+    case SPELL_ASTRAL_PROJECTION:
+    case SPELL_ETHEREAL_JAUNT:
+    case SPELL_SHADOW_RECALL:
+      return FALSE;
+  }
 
   return TRUE;
 }
@@ -2277,6 +2320,7 @@ ACMD(do_spellup)
   char arg[MAX_INPUT_LENGTH];
   int spellnum;
   int mana;
+  room_rnum start_room;
   bool any_eligible = FALSE;
   bool any_attempted = FALSE;
   int cast_count = 0, skipped_active = 0, skipped_mana = 0, skipped_combat = 0;
@@ -2301,6 +2345,8 @@ ACMD(do_spellup)
     send_to_char(ch, "You are too busy fighting to buff someone else right now.\r\n");
     return;
   }
+
+  start_room = IN_ROOM(ch);
 
   for (spellnum = 1; spellnum <= MAX_SPELLS; spellnum++) {
     if (!is_spellup_beneficial_spell(spellnum))
@@ -2354,6 +2400,10 @@ ACMD(do_spellup)
       improve_ability_from_use(ch, spellnum, 0);
     } else {
       if (cast_spell(ch, tch, NULL, spellnum)) {
+        if (IN_ROOM(ch) != start_room) {
+          send_to_char(ch, "Spellup halted: your location changed.\r\n");
+          break;
+        }
         improve_ability_from_use(ch, spellnum, 1);
         WAIT_STATE(ch, PULSE_VIOLENCE);
         if (mana > 0)
