@@ -1927,7 +1927,6 @@ static int compute_thaco(struct char_data *ch, struct char_data *victim)
   calc_thaco -= situational_hit_bonus;
   /* high level thaco floor: prevent endgame thaco from drifting into nonsense */
   int __thaco = (calc_thaco);
-  __thaco -= GET_HITROLL(ch);
   __thaco = MAX(1, __thaco);
   if (GET_LEVEL(ch) >= 50)
     __thaco = MIN(__thaco, 15);
