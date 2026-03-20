@@ -38,6 +38,9 @@ static void spello(int spl, const char *name, int max_mana, int min_mana,
     const char *wearoff);
 static int mag_manacost(struct char_data *ch, int spellnum);
 static bool is_spellup_beneficial_spell(int spellnum);
+static int find_ability_by_tokens(const char *name, char *ambig_buf,
+    size_t ambig_len, int *matched_tokens, bool allow_partial_name,
+    bool allow_extra_input);
 static int reflect_suppressed = 0;
 
 static int can_character_cast_known_spell(struct char_data *ch, int spellnum)
@@ -1238,72 +1241,25 @@ static bool is_spellup_buff_active(struct char_data *victim, int spellnum)
 
 static bool is_spellup_beneficial_spell(int spellnum)
 {
+  bool affects_or_manual;
+  bool char_targeted;
+  bool self_castable;
+
   if (!is_available_spell(spellnum))
     return FALSE;
 
-  /* Hard safety gate for spellup: only explicitly approved support buffs. */
-  switch (spellnum) {
-    case SPELL_ARMOR:
-    case SPELL_BLESS:
-    case SPELL_DETECT_ALIGN:
-    case SPELL_DETECT_INVIS:
-    case SPELL_DETECT_MAGIC:
-    case SPELL_FLY:
-    case SPELL_INFRAVISION:
-    case SPELL_INVISIBLE:
-    case SPELL_PROT_FROM_EVIL:
-    case SPELL_SANCTUARY:
-    case SPELL_ARCANE_WARD:
-    case SPELL_EVASION:
-    case SPELL_IRONSKIN:
-    case SPELL_DIVINE_BULWARK:
-    case SPELL_SONG_OF_RESILIENCE:
-    case SPELL_DARK_AEGIS:
-    case SPELL_NIRVANA:
-    case SPELL_SENSE_LIFE:
-    case SPELL_STRENGTH:
-    case SPELL_BEAR_SPIRIT:
-    case SPELL_WOLF_SPIRIT:
-    case SPELL_TIGER_SPIRIT:
-    case SPELL_EAGLE_SPIRIT:
-    case SPELL_DRAGON_SPIRIT:
-    case SPELL_WATERWALK:
-    case SPELL_TRUE_SEEING:
-    case SPELL_STONE_SKIN:
-    case SPELL_BARKSKIN:
-    case SPELL_GIANT_STRENGTH:
-    case SPELL_CLARITY:
-    case SPELL_ANTIMAGIC_SHELL:
-    case SPELL_ENCHANTERS_FOCUS:
-    case SPELL_PHASE_SHIFT:
-    case SPELL_MIRROR_VEIL:
-    case SPELL_ELEMENTAL_WARD_FIRE:
-    case SPELL_ELEMENTAL_WARD_COLD:
-    case SPELL_ELEMENTAL_WARD_LIGHTNING:
-    case SPELL_ELEMENTAL_WARD_ACID:
-    case SPELL_SHADOW_ARMOR:
-    case SPELL_TOTAL_OCCULTATION:
-    case SPELL_HUNTERS_INSTINCT:
-    case SPELL_ASSASSINS_INTENT:
-    case SPELL_SOVEREIGNS_STEP:
-    case SPELL_DETECT_KILL_INTENT:
-    case SPELL_PANTHEON:
-    case SPELL_PERFECT_UNKNOWABLE:
-    case SPELL_CRYSTAL_BODY:
-    case SPELL_BODY_OF_EFFULGENT_BERYL:
-    case SPELL_UNDYING_WILL:
-    case SPELL_DOMINION_OF_SHADOWS:
-    case SPELL_SHADOW_REGENESIS:
-      break;
-    default:
-      return FALSE;
-  }
+  affects_or_manual = IS_SET(SINFO.routines, MAG_AFFECTS) ||
+      IS_SET(SINFO.routines, MAG_MANUAL);
+  char_targeted = IS_SET(SINFO.targets,
+      TAR_CHAR_ROOM | TAR_CHAR_WORLD | TAR_SELF_ONLY | TAR_FIGHT_SELF);
+  self_castable = IS_SET(SINFO.targets, TAR_SELF_ONLY | TAR_FIGHT_SELF) ||
+      (!IS_SET(SINFO.targets, TAR_NOT_SELF) &&
+      IS_SET(SINFO.targets, TAR_CHAR_ROOM | TAR_CHAR_WORLD));
 
-  /* Defensive invariants: even whitelisted spells must be non-violent affects/manual buffs. */
-  if (SINFO.violent || (!IS_SET(SINFO.routines, MAG_AFFECTS) &&
-      !IS_SET(SINFO.routines, MAG_MANUAL)))
+  /* Metadata-driven spellup gate: non-violent buffs that can target the caster. */
+  if (SINFO.violent || !affects_or_manual)
     return FALSE;
-  if (!IS_SET(SINFO.targets, TAR_CHAR_ROOM | TAR_CHAR_WORLD | TAR_SELF_ONLY))
+  if (!char_targeted || !self_castable)
     return FALSE;
   if (IS_SET(SINFO.targets, TAR_IGNORE))
     return FALSE;
@@ -1389,7 +1345,8 @@ static bool ability_matches_input(const char *input, const char *ability_name,
   name_ptr = any_one_arg(name_ptr, name_token);
 
   while (*input_token && *name_token) {
-    if (!is_abbrev(input_token, name_token))
+    if (!is_abbrev(input_token, name_token) &&
+        !is_abbrev(name_token, input_token))
       return FALSE;
     matched_name_tokens++;
     matched_input_tokens++;
@@ -1473,10 +1430,26 @@ static int find_known_spell_by_tokens(struct char_data *ch, const char *name,
   return -1;
 }
 
-static int find_known_spell_by_prefix(struct char_data *ch, const char *name,
-    char *ambig_buf, size_t ambig_len) {
-  return find_known_spell_by_tokens(ch, name, ambig_buf, ambig_len, NULL,
-      TRUE, FALSE);
+int resolve_spell_by_player_input(struct char_data *ch, const char *name,
+    bool known_only, bool allow_partial_name, bool allow_extra_input,
+    int *matched_tokens, char *ambig_buf, size_t ambig_len) {
+  char cleaned[MAX_INPUT_LENGTH];
+
+  if (matched_tokens)
+    *matched_tokens = 0;
+  if (ambig_buf && ambig_len > 0)
+    *ambig_buf = '\0';
+
+  normalize_ability_input(name, cleaned, sizeof(cleaned));
+  if (!*cleaned)
+    return -1;
+
+  if (known_only)
+    return find_known_spell_by_tokens(ch, cleaned, ambig_buf, ambig_len,
+        matched_tokens, allow_partial_name, allow_extra_input);
+
+  return find_ability_by_tokens(cleaned, ambig_buf, ambig_len,
+      matched_tokens, allow_partial_name, allow_extra_input);
 }
 
 static struct char_data *find_char_prefix(struct char_data *ch,
@@ -1635,17 +1608,8 @@ int find_skill_num(char *name) {
 
 int find_skill_num_with_ambig(const char *name, char *ambig_buf,
     size_t ambig_len) {
-  char cleaned[MAX_INPUT_LENGTH];
-
-  normalize_ability_input(name, cleaned, sizeof(cleaned));
-  if (!*cleaned) {
-    if (ambig_buf)
-      *ambig_buf = '\0';
-    return (-1);
-  }
-
-  return find_ability_by_tokens(cleaned, ambig_buf, ambig_len, NULL,
-      TRUE, FALSE);
+  return resolve_spell_by_player_input(NULL, name, FALSE, TRUE, FALSE, NULL,
+      ambig_buf, ambig_len);
 }
 
 /* This function is the very heart of the entire magic system.  All invocations
@@ -2341,9 +2305,7 @@ ACMD(do_spellup)
   for (spellnum = 1; spellnum <= MAX_SPELLS; spellnum++) {
     if (!is_spellup_beneficial_spell(spellnum))
       continue;
-    if (GET_LEVEL(ch) < SINFO.min_level[(int) GET_CLASS(ch)])
-      continue;
-    if (GET_SKILL(ch, spellnum) == 0)
+    if (!can_character_cast_known_spell(ch, spellnum))
       continue;
     if (tch != ch && IS_SET(SINFO.targets, TAR_SELF_ONLY))
       continue;
@@ -2459,8 +2421,8 @@ ACMD(do_cast) {
       target_argument = target_ptr;
     }
 
-    spellnum = find_known_spell_by_tokens(ch, spell_input, ambiguity,
-        sizeof(ambiguity), &matched_tokens, FALSE, FALSE);
+    spellnum = resolve_spell_by_player_input(ch, spell_input, TRUE, FALSE,
+        FALSE, &matched_tokens, ambiguity, sizeof(ambiguity));
   } else {
     int best_cut = -1;
     int best_spellnum = -1;
@@ -2477,8 +2439,8 @@ ACMD(do_cast) {
         *p = '\0';
 
         if (*work) {
-          int sn = find_known_spell_by_prefix(ch, work, ambiguity_local,
-              sizeof(ambiguity_local));
+          int sn = resolve_spell_by_player_input(ch, work, TRUE, TRUE, FALSE,
+              NULL, ambiguity_local, sizeof(ambiguity_local));
           if (sn > 0) {
             best_spellnum = sn;
             best_cut = (int)(p - work);
@@ -2493,8 +2455,8 @@ ACMD(do_cast) {
     }
 
     if (*work) {
-      int snfull = find_known_spell_by_prefix(ch, work, ambiguity_local,
-          sizeof(ambiguity_local));
+      int snfull = resolve_spell_by_player_input(ch, work, TRUE, TRUE, FALSE,
+          NULL, ambiguity_local, sizeof(ambiguity_local));
       if (snfull > 0) {
         best_spellnum = snfull;
         best_cut = -1;
@@ -2514,8 +2476,8 @@ ACMD(do_cast) {
       }
       spellnum = best_spellnum;
     } else {
-      spellnum = find_known_spell_by_tokens(ch, argument, ambiguity,
-          sizeof(ambiguity), &matched_tokens, TRUE, TRUE);
+      spellnum = resolve_spell_by_player_input(ch, argument, TRUE, TRUE, TRUE,
+          &matched_tokens, ambiguity, sizeof(ambiguity));
       if (spellnum > 0) {
         char *target_ptr = argument;
         for (i = 0; i < matched_tokens && *target_ptr; i++)

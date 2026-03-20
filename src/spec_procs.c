@@ -248,7 +248,8 @@ SPECIAL(guild)
   {
     char ambiguity[MAX_STRING_LENGTH];
 
-    skill_num = find_skill_num_with_ambig(argument, ambiguity, sizeof(ambiguity));
+    skill_num = resolve_spell_by_player_input(ch, argument, TRUE, TRUE, FALSE,
+        NULL, ambiguity, sizeof(ambiguity));
     if (skill_num == -2) {
       send_to_char(ch, "Ambiguous %s name. Did you mean: %s?\r\n",
           SPLSKL(ch), ambiguity);
