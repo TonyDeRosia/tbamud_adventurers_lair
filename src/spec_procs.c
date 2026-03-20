@@ -73,6 +73,9 @@ static const char *prac_types[] = {
 };
 
 #define ABILITY_COL_WIDTH 27
+#define SPELL_COL_WIDTH 38
+#define SPELL_NAME_WIDTH 28
+#define SKILL_NAME_WIDTH 17
 #define ABILITIES_PER_LINE 2
 #define LEVEL_LABEL_PADDING 14
 #define LEARNED(ch) (MIN(PRACTICE_CAP, get_class_prac_learned_level((int)GET_CLASS(ch))))
@@ -95,6 +98,8 @@ static size_t append_ability_section(struct char_data *ch, bool spells, char *bu
 {
   const char *title = spells ? "SPELLS" : "SKILLS";
   int sortpos, ability, required_level, level, column = 0, total = 0;
+  int col_width = spells ? SPELL_COL_WIDTH : ABILITY_COL_WIDTH;
+  int name_width = spells ? SPELL_NAME_WIDTH : SKILL_NAME_WIDTH;
   size_t len = 0;
 
   len += snprintf(buf + len, buf_size - len, "%s:\r\n", title);
@@ -128,16 +133,18 @@ static size_t append_ability_section(struct char_data *ch, bool spells, char *bu
         len += snprintf(buf + len, buf_size - len, "  ");
       }
 
-      /* PCT_PATCH_SKILL_SPELL_LIST */
       {
         int abil_pct = GET_SKILL(ch, ability);
-        char abil_with_pct[256];
+        char cell[256];
 
-        if (abil_pct < 0) abil_pct = 0;
-        if (abil_pct > 100) abil_pct = 100;
+        if (abil_pct < 0)
+          abil_pct = 0;
+        if (abil_pct > 100)
+          abil_pct = 100;
 
-        snprintf(abil_with_pct, sizeof(abil_with_pct), "%s [%d%%]", spell_info[ability].name, abil_pct);
-        len += snprintf(buf + len, buf_size - len, "%-*s", ABILITY_COL_WIDTH, abil_with_pct);
+        snprintf(cell, sizeof(cell), "%-*.*s [%3d%%]",
+                 name_width, name_width, spell_info[ability].name, abil_pct);
+        len += snprintf(buf + len, buf_size - len, "%-*s", col_width, cell);
       }
       column++;
       total++;
