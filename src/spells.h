@@ -587,6 +587,9 @@ ASPELL(spell_mutilate);
 ASPELL(spell_shadow_armor);
 
 int summon_stored_shadow(struct char_data *ch, int slot);
+int shadow_name_looks_valid(const char *name);
+const char *shadow_slot_display_name(struct char_data *ch, int slot);
+void apply_shadow_identity_to_mob(struct char_data *owner, struct char_data *mob, int slot);
 int shadow_active_count(struct char_data *ch);
 int shadow_max_active_count(struct char_data *ch);
 bool shadow_can_summon_more(struct char_data *ch, char *reason, size_t reason_sz);

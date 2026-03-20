@@ -148,31 +148,6 @@ static int shadow_capacity(struct char_data *ch)
   return MIN(MAX_SHADOW_ROSTER, MAX(2, cap));
 }
 
-static int shadow_name_looks_valid(const char *name)
-{
-  const char *p;
-  int visible = 0;
-
-  if (!name)
-    return FALSE;
-
-  while (*name && isspace((unsigned char)*name))
-    name++;
-  if (!*name)
-    return FALSE;
-  if (!str_cmp(name, "<NULL>"))
-    return FALSE;
-  if (!strncasecmp(name, "the ", 4) && strlen(name) <= 6)
-    return FALSE;
-
-  for (p = name; *p; p++) {
-    if (!iscntrl((unsigned char)*p) && !isspace((unsigned char)*p))
-      visible++;
-  }
-
-  return visible > 0;
-}
-
 static int sanitize_shadow_name_input(const char *input, char *out, size_t out_sz)
 {
   const char *src;
@@ -209,22 +184,6 @@ static int sanitize_shadow_name_input(const char *input, char *out, size_t out_s
   }
 
   return shadow_name_looks_valid(out);
-}
-
-static const char *shadow_display_name(struct char_data *ch, int slot, struct char_data *mob)
-{
-  if (ch && slot >= 0 && slot < MAX_SHADOW_ROSTER &&
-      SHADOW_SLOT_OCCUPIED(ch, slot) &&
-      shadow_name_looks_valid(SHADOW_SLOT_NAME(ch, slot)))
-    return SHADOW_SLOT_NAME(ch, slot);
-
-  if (mob && shadow_name_looks_valid(mob->player.short_descr))
-    return mob->player.short_descr;
-
-  if (mob && shadow_name_looks_valid(mob->player.name))
-    return mob->player.name;
-
-  return "a shadow";
 }
 
 static int shadow_find_slot(struct char_data *ch, const char *selector)
@@ -2030,7 +1989,7 @@ ACMD(do_shadow)
         else
           send_to_char(ch, " [%2d] %s[Shadow: %-30.30s]%s Lvl %-3d %s%s%s\r\n",
                        i + 1,
-                       CCYEL(ch, C_NRM), shadow_name_looks_valid(SHADOW_SLOT_NAME(ch, i)) ? SHADOW_SLOT_NAME(ch, i) : "a shadow", CCNRM(ch, C_NRM),
+                       CCYEL(ch, C_NRM), shadow_slot_display_name(ch, i), CCNRM(ch, C_NRM),
                        SHADOW_SLOT_LEVEL(ch, i),
                        SHADOW_SLOT_ACTIVE(ch, i) ? CCGRN(ch, C_NRM) : "",
                        SHADOW_SLOT_ACTIVE(ch, i) ? "[Active]" : "[Stored]",
@@ -2078,10 +2037,7 @@ ACMD(do_shadow)
       send_to_char(ch, "The shadow resists your call right now.\r\n");
       return;
     }
-    mob = shadow_active_mob(ch, slot);
-    strlcpy(display_name, shadow_display_name(ch, slot, mob), sizeof(display_name));
-    if (!shadow_name_looks_valid(display_name))
-      strlcpy(display_name, "a shadow", sizeof(display_name));
+    strlcpy(display_name, shadow_slot_display_name(ch, slot), sizeof(display_name));
     act("You call forth $t from your shadow storage.", FALSE, ch, NULL, display_name, TO_CHAR);
     act("$n calls forth $t from $s shadow storage.", FALSE, ch, NULL, display_name, TO_ROOM);
     send_to_char(ch, "You expend %d mana.\r\n", mana_cost);
@@ -2106,7 +2062,7 @@ ACMD(do_shadow)
       save_char(ch);
       return;
     }
-    strlcpy(display_name, shadow_display_name(ch, slot, mob), sizeof(display_name));
+    strlcpy(display_name, shadow_slot_display_name(ch, slot), sizeof(display_name));
     SHADOW_SLOT_ACTIVE(ch, slot) = 0;
     shadow_prepare_for_removal(mob);
     extract_char(mob);
@@ -2126,7 +2082,7 @@ ACMD(do_shadow)
       return;
     }
     mob = shadow_active_mob(ch, slot);
-    strlcpy(display_name, shadow_display_name(ch, slot, mob), sizeof(display_name));
+    strlcpy(display_name, shadow_slot_display_name(ch, slot), sizeof(display_name));
     if (mob) {
       shadow_prepare_for_removal(mob);
       extract_char(mob);
@@ -2182,20 +2138,8 @@ ACMD(do_shadow)
 
     strlcpy(SHADOW_SLOT_NAME(ch, slot), safe_name, MAX_SHADOW_NAME_LENGTH + 1);
     mob = shadow_active_mob(ch, slot);
-    if (mob) {
-      mob_rnum rnum = GET_MOB_RNUM(mob);
-      const char *proto_short = (rnum != NOBODY) ? mob_proto[rnum].player.short_descr : NULL;
-      const char *proto_long = (rnum != NOBODY) ? mob_proto[rnum].player.long_descr : NULL;
-      char long_buf[MAX_STRING_LENGTH];
-      if (mob->player.short_descr && mob->player.short_descr != proto_short)
-        free(mob->player.short_descr);
-      mob->player.short_descr = strdup(safe_name);
-      snprintf(long_buf, sizeof(long_buf), "%s stands here.\r\n", safe_name);
-      long_buf[0] = UPPER(long_buf[0]);
-      if (mob->player.long_descr && mob->player.long_descr != proto_long)
-        free(mob->player.long_descr);
-      mob->player.long_descr = strdup(long_buf);
-    }
+    if (mob)
+      apply_shadow_identity_to_mob(ch, mob, slot);
     send_to_char(ch, "You rename the shadow to %s.\r\n", safe_name);
     save_char(ch);
     return;
