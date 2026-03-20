@@ -819,20 +819,6 @@ static int study_item_contains_spell(const int *spell_ids, int spell_count, int 
   return FALSE;
 }
 
-enum study_item_lookup_result {
-  STUDY_LOOKUP_NOT_FOUND = 0,
-  STUDY_LOOKUP_FOUND,
-  STUDY_LOOKUP_AMBIGUOUS
-};
-
-struct study_item_lookup_ctx {
-  struct char_data *ch;
-  const char *item_text;
-  int want_exact_short;
-  int match_count;
-  struct obj_data *found;
-};
-
 static int study_is_numbered_item_token(const char *token)
 {
   const char *dot;
@@ -852,110 +838,23 @@ static int study_is_numbered_item_token(const char *token)
   return TRUE;
 }
 
-static void study_item_lookup_consider(struct study_item_lookup_ctx *ctx, struct obj_data *obj)
+static struct obj_data *study_resolve_inventory_item_source(struct char_data *ch,
+                                                            const char *item_text)
 {
-  if (!ctx || !obj || !ctx->ch || !ctx->item_text || !*ctx->item_text)
-    return;
-  if (!CAN_SEE_OBJ(ctx->ch, obj))
-    return;
-  if (ctx->want_exact_short) {
-    if (str_cmp(ctx->item_text, obj->short_description))
-      return;
-  } else if (!isname(ctx->item_text, obj->name))
-    return;
+  char lookup[MAX_INPUT_LENGTH];
 
-  ctx->match_count++;
-  if (!ctx->found)
-    ctx->found = obj;
-}
+  if (!ch || !item_text || !*item_text)
+    return NULL;
 
-static enum study_item_lookup_result study_lookup_item_in_scope(struct char_data *ch,
-                                                                const char *item_text,
-                                                                int exact_short_only,
-                                                                struct obj_data **study_obj_out)
-{
-  struct study_item_lookup_ctx ctx;
-  struct obj_data *obj;
-  int i;
-
-  if (!ch || !item_text || !*item_text || !study_obj_out)
-    return STUDY_LOOKUP_NOT_FOUND;
-
-  *study_obj_out = NULL;
-  ctx.ch = ch;
-  ctx.item_text = item_text;
-  ctx.want_exact_short = exact_short_only;
-  ctx.match_count = 0;
-  ctx.found = NULL;
-
-  for (obj = ch->carrying; obj; obj = obj->next_content)
-    study_item_lookup_consider(&ctx, obj);
-
-  for (i = 0; i < NUM_WEARS; i++)
-    if (GET_EQ(ch, i))
-      study_item_lookup_consider(&ctx, GET_EQ(ch, i));
-
-  for (obj = world[IN_ROOM(ch)].contents; obj; obj = obj->next_content)
-    study_item_lookup_consider(&ctx, obj);
-
-  if (ctx.match_count == 1) {
-    *study_obj_out = ctx.found;
-    return STUDY_LOOKUP_FOUND;
-  }
-  if (ctx.match_count > 1)
-    return STUDY_LOOKUP_AMBIGUOUS;
-
-  return STUDY_LOOKUP_NOT_FOUND;
-}
-
-static enum study_item_lookup_result study_resolve_item_source(struct char_data *ch,
-                                                               const char *item_text,
-                                                               struct obj_data **study_obj_out)
-{
-  enum study_item_lookup_result result;
-  struct obj_data *obj = NULL;
-  struct char_data *tmp_ch = NULL;
-  char *dot = strchr(item_text, '.');
-  int has_explicit_number = FALSE;
-
-  if (!ch || !item_text || !*item_text || !study_obj_out)
-    return STUDY_LOOKUP_NOT_FOUND;
-
-  if (dot && dot != item_text) {
-    const char *p;
-    has_explicit_number = TRUE;
-    for (p = item_text; p < dot; p++) {
-      if (!isdigit(*p)) {
-        has_explicit_number = FALSE;
-        break;
-      }
-    }
-  }
-
-  if (has_explicit_number) {
-    char lookup[MAX_INPUT_LENGTH];
-    strlcpy(lookup, item_text, sizeof(lookup));
-    if (generic_find(lookup, FIND_OBJ_INV | FIND_OBJ_EQUIP | FIND_OBJ_ROOM,
-                     ch, &tmp_ch, &obj) != 0 &&
-        obj != NULL) {
-      *study_obj_out = obj;
-      return STUDY_LOOKUP_FOUND;
-    }
-    return STUDY_LOOKUP_NOT_FOUND;
-  }
-
-  result = study_lookup_item_in_scope(ch, item_text, TRUE, study_obj_out);
-  if (result != STUDY_LOOKUP_NOT_FOUND)
-    return result;
-
-  return study_lookup_item_in_scope(ch, item_text, FALSE, study_obj_out);
+  strlcpy(lookup, item_text, sizeof(lookup));
+  return get_obj_in_list_vis(ch, lookup, NULL, ch->carrying);
 }
 
 static int study_find_item_and_target(struct char_data *ch, char *argument,
                                       struct obj_data **study_obj_out,
                                       int *target_id_out,
                                       int *has_target_out,
-                                      int *ambiguous_out)
+                                      int *used_numbered_item_token_out)
 {
   char work[MAX_INPUT_LENGTH];
   char item_name[MAX_INPUT_LENGTH] = "";
@@ -965,16 +864,16 @@ static int study_find_item_and_target(struct char_data *ch, char *argument,
   char *tok;
   int i, j;
   struct obj_data *obj = NULL;
-  int ambiguous_seen = FALSE;
-  int valid_target_split_found = FALSE;
+  int first_token_numbered = FALSE;
 
-  if (!ch || !study_obj_out || !target_id_out || !has_target_out || !ambiguous_out || !argument || !*argument)
+  if (!ch || !study_obj_out || !target_id_out || !has_target_out ||
+      !used_numbered_item_token_out || !argument || !*argument)
     return FALSE;
 
   *study_obj_out = NULL;
   *target_id_out = -1;
   *has_target_out = FALSE;
-  *ambiguous_out = FALSE;
+  *used_numbered_item_token_out = FALSE;
 
   strlcpy(work, argument, sizeof(work));
   tok = strtok(work, " ");
@@ -986,92 +885,11 @@ static int study_find_item_and_target(struct char_data *ch, char *argument,
   if (token_count <= 0)
     return FALSE;
 
-  if (study_is_numbered_item_token(tokens[0])) {
-    enum study_item_lookup_result lookup_result;
-
-    lookup_result = study_resolve_item_source(ch, tokens[0], &obj);
-    if (lookup_result == STUDY_LOOKUP_AMBIGUOUS) {
-      *ambiguous_out = TRUE;
-      return FALSE;
-    }
-    if (lookup_result == STUDY_LOOKUP_FOUND) {
-      *study_obj_out = obj;
-      if (token_count > 1) {
-        size_t target_len = 0;
-        target_name[0] = '\0';
-        for (j = 1; j < token_count; j++) {
-          int wrote = snprintf(target_name + target_len, sizeof(target_name) - target_len,
-                               "%s%s", target_len ? " " : "", tokens[j]);
-          if (wrote < 0)
-            break;
-          if ((size_t)wrote >= sizeof(target_name) - target_len) {
-            target_len = sizeof(target_name) - 1;
-            target_name[target_len] = '\0';
-            break;
-          }
-          target_len += (size_t)wrote;
-        }
-        *target_id_out = find_skill_num(target_name);
-        *has_target_out = TRUE;
-      }
-      return TRUE;
-    }
-  }
-
-  for (i = token_count - 1; i >= 1; i--) {
-    size_t item_len = 0;
-    enum study_item_lookup_result lookup_result;
-    item_name[0] = '\0';
-
-    for (j = 0; j < i; j++) {
-      int wrote = snprintf(item_name + item_len, sizeof(item_name) - item_len,
-                           "%s%s", item_len ? " " : "", tokens[j]);
-      if (wrote < 0)
-        break;
-      if ((size_t)wrote >= sizeof(item_name) - item_len) {
-        item_len = sizeof(item_name) - 1;
-        item_name[item_len] = '\0';
-        break;
-      }
-      item_len += (size_t)wrote;
-    }
-
-    lookup_result = study_resolve_item_source(ch, item_name, &obj);
-    if (lookup_result == STUDY_LOOKUP_AMBIGUOUS) {
-      ambiguous_seen = TRUE;
-      continue;
-    }
-    if (lookup_result != STUDY_LOOKUP_FOUND)
-      continue;
-
-    {
-      size_t target_len = 0;
-      target_name[0] = '\0';
-      for (j = i; j < token_count; j++) {
-        int wrote = snprintf(target_name + target_len, sizeof(target_name) - target_len,
-                             "%s%s", target_len ? " " : "", tokens[j]);
-        if (wrote < 0)
-          break;
-        if ((size_t)wrote >= sizeof(target_name) - target_len) {
-          target_len = sizeof(target_name) - 1;
-          target_name[target_len] = '\0';
-          break;
-        }
-        target_len += (size_t)wrote;
-      }
-      *target_id_out = find_skill_num(target_name);
-      if (study_is_valid_ability_id(*target_id_out)) {
-        *study_obj_out = obj;
-        *has_target_out = TRUE;
-        return TRUE;
-      }
-      valid_target_split_found = TRUE;
-    }
-  }
+  first_token_numbered = study_is_numbered_item_token(tokens[0]);
+  *used_numbered_item_token_out = first_token_numbered;
 
   for (i = token_count; i >= 1; i--) {
     size_t item_len = 0;
-    enum study_item_lookup_result lookup_result;
     item_name[0] = '\0';
     for (j = 0; j < i; j++) {
       int wrote = snprintf(item_name + item_len, sizeof(item_name) - item_len,
@@ -1086,12 +904,8 @@ static int study_find_item_and_target(struct char_data *ch, char *argument,
       item_len += (size_t)wrote;
     }
 
-    lookup_result = study_resolve_item_source(ch, item_name, &obj);
-    if (lookup_result == STUDY_LOOKUP_AMBIGUOUS) {
-      ambiguous_seen = TRUE;
-      continue;
-    }
-    if (lookup_result != STUDY_LOOKUP_FOUND)
+    obj = study_resolve_inventory_item_source(ch, item_name);
+    if (!obj)
       continue;
 
     *study_obj_out = obj;
@@ -1112,14 +926,9 @@ static int study_find_item_and_target(struct char_data *ch, char *argument,
       }
       *target_id_out = find_skill_num(target_name);
       *has_target_out = TRUE;
-      if (!study_is_valid_ability_id(*target_id_out) && valid_target_split_found)
-        *has_target_out = FALSE;
     }
     return TRUE;
   }
-
-  if (ambiguous_seen)
-    *ambiguous_out = TRUE;
 
   return FALSE;
 }
@@ -1278,7 +1087,7 @@ ACMD(do_study)
   int ability_id;
   int requested_ability_id = -1;
   int has_requested_ability = FALSE;
-  int ambiguous_item = FALSE;
+  int used_numbered_item_token = FALSE;
   int parsed_item = FALSE;
   enum study_item_result item_result;
   const int study_cooldown_secs = 2;
@@ -1323,10 +1132,10 @@ ACMD(do_study)
   strlcpy(argument_copy, argument, sizeof(argument_copy));
   parsed_item = study_find_item_and_target(ch, argument_copy, &study_obj,
                                            &requested_ability_id, &has_requested_ability,
-                                           &ambiguous_item);
+                                           &used_numbered_item_token);
   if (!parsed_item || !study_obj) {
-    if (ambiguous_item)
-      send_to_char(ch, "Be more specific about which item you want to study.\r\n");
+    if (used_numbered_item_token)
+      send_to_char(ch, "You do not have that item to study.\r\n");
     else
       send_to_char(ch, "You do not recognize that technique.\r\n");
     return;
