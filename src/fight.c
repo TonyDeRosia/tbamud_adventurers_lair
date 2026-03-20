@@ -159,6 +159,26 @@ static int is_shadow_servant_for(struct char_data *owner, struct char_data *mob)
       || affected_by_spell(mob, SPELL_ARISE_GREATER);
 }
 
+int is_owned_follower_target(struct char_data *attacker, struct char_data *victim)
+{
+  if (!attacker || !victim || attacker == victim || !IS_NPC(victim))
+    return FALSE;
+
+  if (victim->master != attacker)
+    return FALSE;
+
+  if (AFF_FLAGGED(victim, AFF_CHARM))
+    return TRUE;
+
+  if (GET_SUMMON_TIMER(victim) > 0)
+    return TRUE;
+
+  if (is_shadow_servant_for(attacker, victim))
+    return TRUE;
+
+  return FALSE;
+}
+
 static int count_shadow_servants_for(struct char_data *ch)
 {
   struct follow_type *f;
@@ -1417,6 +1437,12 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
     return (-1);			/* -je, 7/7/92 */
   }
 
+  if (ch && victim != ch && is_owned_follower_target(ch, victim)) {
+    if (!IS_NPC(ch))
+      send_to_char(ch, "You cannot attack one of your own followers.\r\n");
+    return (0);
+  }
+
   /* peaceful rooms */
   if (ch->nr != real_mobile(DG_CASTER_PROXY) &&
       ch != victim && ROOM_FLAGGED(IN_ROOM(ch), ROOM_PEACEFUL)) {
@@ -1940,6 +1966,11 @@ void hit(struct char_data *ch, struct char_data *victim, int type)
 
   /* Check that the attacker and victim exist */
   if (!ch || !victim) return;
+  if (is_owned_follower_target(ch, victim)) {
+    if (!IS_NPC(ch))
+      send_to_char(ch, "You cannot attack one of your own followers.\r\n");
+    return;
+  }
 
   /* check if the character has a fight trigger */
   fight_mtrigger(ch);
