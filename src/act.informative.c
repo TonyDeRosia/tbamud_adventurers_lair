@@ -1723,10 +1723,7 @@ static int append_wrapped_box_text(char *buf, int len, size_t bufsz,
 
 static const char *score_class_name(int class_num)
 {
-  if (class_num >= 0 && class_num < NUM_CLASSES)
-    return pc_class_types[class_num];
-
-  return "Unknown";
+  return class_display_name(class_num);
 }
 
 
@@ -1773,7 +1770,7 @@ ACMD(do_score)
   len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
 
   /* Level and Age */
-  snprintf(line, sizeof(line), "%sLevel:%s %-18d  %sAge:%s %d year%s old",
+  snprintf(line, sizeof(line), "%sLevel:%s %-18d  %sAge:%s %d year%s",
     C, R, GET_LEVEL(ch), C, R, GET_AGE(ch), (GET_AGE(ch) == 1 ? "" : "s"));
   len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
 
@@ -1799,14 +1796,16 @@ len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
 /* Blank spacer line */
 len = append_box_line(buf, len, sizeof(buf), B, R, "", W);
 
-/* Next level in */
+/* Next level in / immortal milestone */
 {
   int next_need = 0;
   if (GET_LEVEL(ch) < LVL_IMMORT) {
     int next_level = GET_LEVEL(ch) + 1;
     next_need = level_exp(GET_CLASS(ch), next_level) - GET_EXP(ch);
+    snprintf(line, sizeof(line), "%sNext level in:%s %d exp", C, R, MAX(0, next_need));
+  } else {
+    snprintf(line, sizeof(line), "%sNext level:%s Immortal progression", C, R);
   }
-  snprintf(line, sizeof(line), "%sNext level in:%s %d exp", C, R, next_need);
 }
 len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
 
@@ -1868,7 +1867,7 @@ len = append_box_line(buf, len, sizeof(buf), B, R, "", W);
     len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
 
     snprintf(line, sizeof(line),
-      "%s            %s  Int %d (%+d)  Wis %d (%+d)  Cha %d (%+d)",
+      "%sBase Stats:%s  Int %d (%+d)  Wis %d (%+d)  Cha %d (%+d)",
       C, R,
       b_int, m_int,
       b_wis, m_wis,
@@ -1919,13 +1918,6 @@ len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
     C, R, GET_GLORY(ch),
     C, R, (long long)GET_BANK_GOLD(ch));
   len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
-
-/* Next Level (if mortal) */
-  if (GET_LEVEL(ch) < LVL_IMMORT) {
-    snprintf(line, sizeof(line), "%sNext level in:%s %d exp",
-      C, R, level_exp(GET_CLASS(ch), GET_LEVEL(ch) + 1) - GET_EXP(ch));
-    len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
-  }
 
   /* Separator */
   len += snprintf(buf + len, sizeof(buf) - len,

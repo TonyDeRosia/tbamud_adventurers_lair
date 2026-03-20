@@ -110,7 +110,7 @@ static size_t append_ability_section(struct char_data *ch, bool spells, char *bu
       if (spells ? !ability_is_spell(ability) : !ability_is_skill(ability))
         continue;
 
-      required_level = spell_info[ability].min_level[(int) GET_CLASS(ch)];
+      required_level = spell_info[ability].min_level[(int) (is_valid_class(GET_CLASS(ch)) ? GET_CLASS(ch) : CLASS_WARRIOR)];
 
       if (required_level != level)
         continue;
@@ -221,7 +221,7 @@ SPECIAL(guild)
   }
 
   if (skill_num < 1 ||
-      GET_LEVEL(ch) < spell_info[skill_num].min_level[(int) GET_CLASS(ch)]) {
+      GET_LEVEL(ch) < spell_info[skill_num].min_level[(int) (is_valid_class(GET_CLASS(ch)) ? GET_CLASS(ch) : CLASS_WARRIOR)]) {
     send_to_char(ch, "You do not know of that %s.\r\n", SPLSKL(ch));
     return (TRUE);
   }

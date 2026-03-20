@@ -30,6 +30,7 @@ static struct affected_type *find_affect(struct char_data *ch, int spellnum);
 static int best_regen_multiplier(struct char_data *ch);
 static int object_regen_multiplier(struct obj_data *obj);
 static int find_affect_modifier_for_flag(struct char_data *ch, int aff_flag, int fallback);
+static int condition_stage_penalty(int cond);
 
 
 /* When age < 15 return the value p0
@@ -121,6 +122,17 @@ static int find_affect_modifier_for_flag(struct char_data *ch, int aff_flag, int
   return fallback;
 }
 
+static int condition_stage_penalty(int cond)
+{
+  if (cond <= 0)
+    return 4;
+  if (cond <= 4)
+    return 3;
+  if (cond <= 9)
+    return 2;
+  return 1;
+}
+
 /* The hit_limit, mana_limit, and move_limit functions are gone.  They added an
  * unnecessary level of complexity to the internal structure, weren't
  * particularly useful, and led to some annoying bugs.  From the players' point
@@ -158,8 +170,13 @@ int mana_gain(struct char_data *ch)
     if (IS_MAGIC_USER(ch) || IS_CLERIC(ch))
       gain *= 2;
 
-    if ((GET_COND(ch, HUNGER) == 0) || (GET_COND(ch, THIRST) == 0))
-      gain /= 4;
+    {
+      int hunger_pen = condition_stage_penalty(GET_COND(ch, HUNGER));
+      int thirst_pen = condition_stage_penalty(GET_COND(ch, THIRST));
+      int pen = MAX(hunger_pen, thirst_pen);
+      if (pen > 1)
+        gain = MAX(1, gain / pen);
+    }
   }
 
   if (AFF_FLAGGED(ch, AFF_POISON))
@@ -204,8 +221,13 @@ int hit_gain(struct char_data *ch)
     if (IS_MAGIC_USER(ch) || IS_CLERIC(ch))
       gain /= 2;	/* Ouch. */
 
-    if ((GET_COND(ch, HUNGER) == 0) || (GET_COND(ch, THIRST) == 0))
-      gain /= 4;
+    {
+      int hunger_pen = condition_stage_penalty(GET_COND(ch, HUNGER));
+      int thirst_pen = condition_stage_penalty(GET_COND(ch, THIRST));
+      int pen = MAX(hunger_pen, thirst_pen);
+      if (pen > 1)
+        gain = MAX(1, gain / pen);
+    }
   }
 
   if (AFF_FLAGGED(ch, AFF_POISON))
@@ -242,8 +264,13 @@ int move_gain(struct char_data *ch)
       break;
     }
 
-    if ((GET_COND(ch, HUNGER) == 0) || (GET_COND(ch, THIRST) == 0))
-      gain /= 4;
+    {
+      int hunger_pen = condition_stage_penalty(GET_COND(ch, HUNGER));
+      int thirst_pen = condition_stage_penalty(GET_COND(ch, THIRST));
+      int pen = MAX(hunger_pen, thirst_pen);
+      if (pen > 1)
+        gain = MAX(1, gain / pen);
+    }
   }
 
   if (AFF_FLAGGED(ch, AFF_POISON))
@@ -431,10 +458,16 @@ void gain_condition(struct char_data *ch, int condition, int value)
 
   switch (condition) {
   case HUNGER:
-    send_to_char(ch, "You are hungry.\r\n");
+    if (GET_COND(ch, HUNGER) <= 0)
+      send_to_char(ch, "%sYou are starving!%s\r\n", CCRED(ch, C_NRM), CCNRM(ch, C_NRM));
+    else
+      send_to_char(ch, "%sYou are hungry.%s\r\n", CCRED(ch, C_NRM), CCNRM(ch, C_NRM));
     break;
   case THIRST:
-    send_to_char(ch, "You are thirsty.\r\n");
+    if (GET_COND(ch, THIRST) <= 0)
+      send_to_char(ch, "%sYou are dehydrated!%s\r\n", CCRED(ch, C_NRM), CCNRM(ch, C_NRM));
+    else
+      send_to_char(ch, "%sYou are thirsty.%s\r\n", CCRED(ch, C_NRM), CCNRM(ch, C_NRM));
     break;
   case DRUNK:
     if (intoxicated)

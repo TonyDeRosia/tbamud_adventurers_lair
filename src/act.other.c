@@ -655,6 +655,63 @@ ACMD(do_practice)
   list_known_abilities(ch);
 }
 
+ACMD(do_study)
+{
+  char arg[MAX_INPUT_LENGTH];
+  int i, chosen = CLASS_UNDEFINED;
+
+  if (IS_NPC(ch))
+    return;
+
+  one_argument(argument, arg);
+
+  if (!*arg) {
+    send_to_char(ch, "You are currently aligned as %s.\r\n", class_display_name(GET_CLASS(ch)));
+    send_to_char(ch, "Study lets Adventurers choose a class identity through gameplay.\r\n");
+    send_to_char(ch, "Usage: study <class>\r\nAvailable classes:");
+    for (i = 0; i < num_pc_classes(); i++) {
+      if (!pc_classes[i].selectable)
+        continue;
+      send_to_char(ch, " %s", pc_classes[i].name);
+    }
+    send_to_char(ch, "\r\n");
+    return;
+  }
+
+  for (i = 0; i < num_pc_classes(); i++) {
+    if (!pc_classes[i].selectable)
+      continue;
+    if (!str_cmp(arg, pc_classes[i].name) || LOWER(*arg) == pc_classes[i].select_key) {
+      chosen = i;
+      break;
+    }
+  }
+
+  if (chosen == CLASS_UNDEFINED) {
+    send_to_char(ch, "You can study toward: mage cleric thief warrior paladin bard warlock druid mystic.\r\n");
+    return;
+  }
+
+  if (GET_CLASS(ch) == chosen) {
+    send_to_char(ch, "You are already following the %s path.\r\n", class_display_name(chosen));
+    return;
+  }
+
+  if (GET_PRACTICES(ch) < 1) {
+    send_to_char(ch, "You need at least one practice session to commit your studies.\r\n");
+    return;
+  }
+
+  GET_PRACTICES(ch)--;
+  GET_CLASS(ch) = chosen;
+  ensure_class_abilities(ch);
+  send_to_char(ch, "You devote your studies to the %s path. (Practices remaining: %d)\r\n",
+               class_display_name(chosen), GET_PRACTICES(ch));
+  act("$n focuses on disciplined study and adopts a new class path.",
+      FALSE, ch, 0, 0, TO_ROOM);
+  save_char(ch);
+}
+
 ACMD(do_buypractice)
 {
   if (IS_NPC(ch))
@@ -696,6 +753,7 @@ ACMD(do_train)
   if (!*arg) {
     send_to_char(ch, "You have %d training sessions available.\r\n", GET_TRAINS(ch));
     send_to_char(ch, "Train hit, mana, move (cost 1) or str dex con int wis cha (cost 10, cap 20).\r\n");
+    send_to_char(ch, "Tip: use 'study <class>' to define your Adventurer class path.\r\n");
     return;
   }
 

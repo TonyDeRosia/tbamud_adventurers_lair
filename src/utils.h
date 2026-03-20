@@ -946,7 +946,7 @@ do                                                              \
 		((dir) == SOUTHEAST) || ((dir) == SOUTHWEST) )
 
 /** Return the class abbreviation for ch. */
-#define CLASS_ABBR(ch) (IS_NPC(ch) ? "--" : class_abbrevs[(int)GET_CLASS(ch)])
+#define CLASS_ABBR(ch) (IS_NPC(ch) ? "--" : class_abbrev((int)GET_CLASS(ch)))
 
 /** 1 if ch is magic user class, 0 if not. */
 #define IS_MAGIC_USER(ch)	(!IS_NPC(ch) && \
