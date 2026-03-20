@@ -532,7 +532,7 @@ static int active_temp_summons(struct char_data *ch)
   return count;
 }
 
-static int shadow_name_looks_valid(const char *name)
+int shadow_name_looks_valid(const char *name)
 {
   const char *p;
   int visible = 0;
@@ -570,7 +570,36 @@ static void replace_mobile_string_safe(struct char_data *mob, char **field, cons
     *field = strdup(new_value);
 }
 
-static void apply_shadow_identity_to_mob(struct char_data *mob, const char *identity_name)
+const char *shadow_slot_display_name(struct char_data *ch, int slot)
+{
+  mob_rnum rnum;
+  mob_vnum vnum;
+  const char *proto_name = NULL;
+  const char *proto_short = NULL;
+
+  if (ch && slot >= 0 && slot < MAX_SHADOW_ROSTER &&
+      SHADOW_SLOT_OCCUPIED(ch, slot) &&
+      shadow_name_looks_valid(SHADOW_SLOT_NAME(ch, slot)))
+    return SHADOW_SLOT_NAME(ch, slot);
+
+  if (!ch || slot < 0 || slot >= MAX_SHADOW_ROSTER)
+    return "a shadow";
+
+  vnum = SHADOW_SLOT_VNUM(ch, slot);
+  rnum = real_mobile(vnum);
+  if (rnum != NOBODY) {
+    proto_short = mob_proto[rnum].player.short_descr;
+    proto_name = mob_proto[rnum].player.name;
+    if (shadow_name_looks_valid(proto_short))
+      return proto_short;
+    if (shadow_name_looks_valid(proto_name))
+      return proto_name;
+  }
+
+  return "a shadow";
+}
+
+static void apply_shadow_identity_to_mob_name(struct char_data *mob, const char *identity_name)
 {
   char long_buf[MAX_STRING_LENGTH];
   mob_rnum rnum;
@@ -593,6 +622,17 @@ static void apply_shadow_identity_to_mob(struct char_data *mob, const char *iden
   snprintf(long_buf, sizeof(long_buf), "%s stands here.\r\n", safe_name);
   long_buf[0] = UPPER(long_buf[0]);
   replace_mobile_string_safe(mob, &mob->player.long_descr, long_buf, proto_long);
+}
+
+void apply_shadow_identity_to_mob(struct char_data *owner, struct char_data *mob, int slot)
+{
+  const char *identity_name;
+
+  if (!owner || !mob)
+    return;
+
+  identity_name = shadow_slot_display_name(owner, slot);
+  apply_shadow_identity_to_mob_name(mob, identity_name);
 }
 
 static void restore_shadow_combat_profile(struct char_data *ch, int slot, struct char_data *mob)
@@ -765,7 +805,7 @@ static struct char_data *summon_shadow_servant(struct char_data *ch, mob_vnum vn
   struct char_data *mob = summon_temp_follower(ch, vnum, level, rounds, identity_name, silent_follow);
   if (mob) {
     if (shadow_name_looks_valid(identity_name))
-      apply_shadow_identity_to_mob(mob, identity_name);
+      apply_shadow_identity_to_mob_name(mob, identity_name);
     mark_shadow_servant(mob, source_spell, rounds);
   }
   return mob;
@@ -793,9 +833,7 @@ static int shadow_extraction_success_chance(struct char_data *ch, int corpse_lev
 int summon_stored_shadow(struct char_data *ch, int slot)
 {
   struct char_data *mob;
-  const char *resolved_name = NULL;
-  mob_vnum source_vnum;
-  char stored_name[MAX_SHADOW_NAME_LENGTH + 1];
+  const char *resolved_name;
   mob_vnum vnum;
   int level;
   if (!ch || IS_NPC(ch) || slot < 0 || slot >= MAX_SHADOW_ROSTER)
@@ -805,32 +843,20 @@ int summon_stored_shadow(struct char_data *ch, int slot)
   if (find_active_shadow_for_slot(ch, slot))
     return FALSE;
 
-  source_vnum = SHADOW_SLOT_VNUM(ch, slot);
-  strlcpy(stored_name, SHADOW_SLOT_NAME(ch, slot), sizeof(stored_name));
-
   vnum = SHADOW_SLOT_VNUM(ch, slot);
   if (real_mobile(vnum) == NOBODY)
     vnum = MOBVNUM_SHADOW_ELITE;
 
   level = MAX(1, SHADOW_SLOT_LEVEL(ch, slot));
-  if (shadow_name_looks_valid(stored_name))
-    resolved_name = stored_name;
-  else
-    resolved_name = NULL;
+  resolved_name = shadow_slot_display_name(ch, slot);
 
   mob = summon_shadow_servant(ch, vnum, level, 15, SPELL_SHADOW_EXTRACTION, resolved_name, TRUE);
   if (!mob)
     return FALSE;
 
-  if (!shadow_name_looks_valid(resolved_name) && shadow_name_looks_valid(mob->player.short_descr))
-    resolved_name = mob->player.short_descr;
-  else if (!shadow_name_looks_valid(resolved_name) && shadow_name_looks_valid(mob->player.name))
-    resolved_name = mob->player.name;
-  else if (!shadow_name_looks_valid(resolved_name))
-    resolved_name = "a shadow";
-
-  strlcpy(SHADOW_SLOT_NAME(ch, slot), resolved_name, MAX_SHADOW_NAME_LENGTH + 1);
-  apply_shadow_identity_to_mob(mob, SHADOW_SLOT_NAME(ch, slot));
+  if (!shadow_name_looks_valid(SHADOW_SLOT_NAME(ch, slot)))
+    strlcpy(SHADOW_SLOT_NAME(ch, slot), resolved_name, MAX_SHADOW_NAME_LENGTH + 1);
+  apply_shadow_identity_to_mob(ch, mob, slot);
   restore_shadow_combat_profile(ch, slot, mob);
   apply_shadow_servant_bonuses(ch, mob);
   SHADOW_SLOT_ACTIVE(ch, slot) = 1;
@@ -847,7 +873,7 @@ static struct char_data *summon_temp_follower(struct char_data *ch, mob_vnum vnu
   GET_LEVEL(mob) = MAX(1, level);
   SET_BIT_AR(AFF_FLAGS(mob), AFF_CHARM);
   if (shadow_name_looks_valid(identity_name))
-    apply_shadow_identity_to_mob(mob, identity_name);
+    apply_shadow_identity_to_mob_name(mob, identity_name);
   char_to_room(mob, IN_ROOM(ch));
   if (silent_follow)
     add_follower_silent(mob, ch);

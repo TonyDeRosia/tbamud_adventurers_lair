@@ -239,45 +239,6 @@ static void prepare_shadow_servant_for_removal(struct char_data *mob)
   REMOVE_BIT_AR(AFF_FLAGS(mob), AFF_CHARM);
 }
 
-static int shadow_name_looks_valid(const char *name)
-{
-  const char *p;
-  int visible = 0;
-
-  if (!name)
-    return FALSE;
-
-  while (*name && isspace((unsigned char)*name))
-    name++;
-  if (!*name)
-    return FALSE;
-  if (!str_cmp(name, "<NULL>"))
-    return FALSE;
-
-  for (p = name; *p; p++) {
-    if (!iscntrl((unsigned char)*p) && !isspace((unsigned char)*p))
-      visible++;
-  }
-
-  return visible > 0;
-}
-
-static const char *shadow_display_name_for_owner(struct char_data *owner, int slot, struct char_data *mob)
-{
-  if (owner && slot >= 0 && slot < MAX_SHADOW_ROSTER &&
-      SHADOW_SLOT_OCCUPIED(owner, slot) &&
-      shadow_name_looks_valid(SHADOW_SLOT_NAME(owner, slot)))
-    return SHADOW_SLOT_NAME(owner, slot);
-
-  if (mob && shadow_name_looks_valid(mob->player.short_descr))
-    return mob->player.short_descr;
-
-  if (mob && shadow_name_looks_valid(mob->player.name))
-    return mob->player.name;
-
-  return "a shadow";
-}
-
 static int return_extracted_shadow_to_storage(struct char_data *mob)
 {
   struct char_data *owner;
@@ -298,7 +259,7 @@ static int return_extracted_shadow_to_storage(struct char_data *mob)
   if (IN_ROOM(mob) != NOWHERE)
     act("$n dissolves into darkness.", FALSE, mob, 0, 0, TO_ROOM);
   send_to_char(owner, "Your shadow %s is defeated and returns to your shadow storage.\r\n",
-               shadow_display_name_for_owner(owner, slot, mob));
+               shadow_slot_display_name(owner, slot));
 
   prepare_shadow_servant_for_removal(mob);
   extract_char(mob);
