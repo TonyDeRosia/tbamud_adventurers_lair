@@ -678,7 +678,7 @@ static void oedit_disp_menu(struct descriptor_data *d)
 	  "%s7%s) Wear flags  : %s%s\r\n"
           "%s8%s) Weight      : %s%d\r\n"
           "%s9%s) Cost        : %s%d\r\n"
-          "%sA%s) Cost/Day    : %s%d\r\n"
+          "%sA%s) Cost/Day (legacy, unused): %s%d\r\n"
           "%sB%s) Timer       : %s%d\r\n"
           "%s"
           "%sC%s) Values      : %s%d %d %d %d%s\r\n"
@@ -809,7 +809,7 @@ void oedit_parse(struct descriptor_data *d, char *arg)
       break;
     case 'a':
     case 'A':
-      write_to_output(d, "Enter cost per day : ");
+      write_to_output(d, "Enter cost per day (legacy/unused) : ");
       OLC_MODE(d) = OEDIT_COSTPERDAY;
       break;
     case 'b':

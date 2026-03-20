@@ -2444,10 +2444,6 @@ save_char(d->character);
       look_at_room(d->character, 0);
       if (has_mail(GET_IDNUM(d->character)))
 	send_to_char(d->character, "You have mail waiting.\r\n");
-      if (load_result == 2) {	/* rented items lost */
-	send_to_char(d->character, "\r\n\007You could not afford your rent!\r\n"
-		"Your possesions have been donated to the Salvation Army!\r\n");
-      }
       d->has_prompt = 0;
       /* We've updated to 3.1 - some bits might be set wrongly: */
       REMOVE_BIT_AR(PRF_FLAGS(d->character), PRF_BUILDWALK);

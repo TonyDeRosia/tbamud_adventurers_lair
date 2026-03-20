@@ -288,8 +288,8 @@ void show_identify_item(struct char_data *ch, struct obj_data *obj, enum identif
 
   identify_send_border(ch, B, R);
   identify_send_section_header(ch, B, L, R, "Core Properties");
-  send_to_char(ch, "%s|%s %sWorth:%s %s%d%s  %sWeight:%s %s%d%s  %sRent:%s %s%d%s\r\n",
-               B, R, L, R, V, GET_OBJ_COST(obj), R, L, R, V, GET_OBJ_WEIGHT(obj), R, L, R, V, GET_OBJ_RENT(obj), R);
+  send_to_char(ch, "%s|%s %sWorth:%s %s%d%s  %sWeight:%s %s%d%s\r\n",
+               B, R, L, R, V, GET_OBJ_COST(obj), R, L, R, V, GET_OBJ_WEIGHT(obj), R);
   send_to_char(ch, "%s|%s %sWearable:%s %s%s%s\r\n", B, R, L, R, V, wearbuf, R);
 
   send_to_char(ch, "%s|%s %sFlags:%s ", B, R, L, R);
