@@ -369,6 +369,7 @@ void clanedit_parse(struct descriptor_data *d, char *arg);
 #define CON_ACCT_FORCEPASS2 44 /**< Forced account password change: verify */
 #define CON_ACCT_CHANGEPASS1 45 /**< Voluntary account password change: new pass */
 #define CON_ACCT_CHANGEPASS2 46 /**< Voluntary account password change: verify */
+#define CON_ACCT_DELETE_CONFIRM 47 /**< Account menu character deletion confirm */
 
 #define CON_NAME_CNFRM    3 /**< New character, confirm name */
 #define CON_PASSWORD      4 /**< Login with password */
@@ -1255,6 +1256,7 @@ struct descriptor_data
   char acct_name[64];
   int acct_authed;
   char acct_tmp_pass[128];
+  char acct_pending_delete[64];
 
   socket_t descriptor;      /**< file descriptor for socket */
   char host[HOST_LENGTH+1]; /**< hostname */
