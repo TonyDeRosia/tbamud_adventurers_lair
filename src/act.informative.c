@@ -2536,8 +2536,8 @@ static void build_grouped_aff_summary(const struct affected_type *list,
       abs(mod_totals[i]));
 
     if (*mods)
-      strlcat(mods, ", ", sizeof(mods));
-    strlcat(mods, piece, sizeof(mods));
+      out_append(mods, sizeof(mods), ", ");
+    out_append(mods, sizeof(mods), piece);
   }
 
   sprintbitarray(bits, affected_bits, AF_ARRAY_MAX, flags);
