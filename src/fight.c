@@ -492,11 +492,24 @@ void appear(struct char_data *ch)
 	FALSE, ch, 0, 0, TO_ROOM);
 }
 
-int compute_armor_class(struct char_data *ch)
+int legacy_ac_to_armor(int legacy_ac)
 {
-  int armor_bonus = ((GET_CON(ch) - 10) * 2) + (GET_STR(ch) - 10);
+  /* Legacy AC was lower-is-better with 100 as "no armor". Convert to
+   * the new higher-is-better Armor scale without inflating durability. */
+  int armor = (100 - legacy_ac + 2) / 4; /* rounded integer divide by 4 */
+  return MAX(0, MIN(200, armor));
+}
+
+int compute_armor(struct char_data *ch)
+{
+  int armor_bonus = (GET_CON(ch) - 10) + ((GET_STR(ch) - 10) / 2);
   int armor = GET_ARMOR(ch) + armor_bonus;
   return MAX(0, armor);
+}
+
+int compute_armor_class(struct char_data *ch)
+{
+  return compute_armor(ch);
 }
 
 int compute_evasion(struct char_data *ch)
@@ -1561,7 +1574,7 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
   }
 
   if (dam > 0 && IS_WEAPON(attacktype)) {
-    int armor = compute_armor_class(victim);
+    int armor = compute_armor(victim);
     dam = (dam * 100) / (100 + armor);
   }
 

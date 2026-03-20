@@ -24,6 +24,7 @@
 #include "interpreter.h"
 #include "class.h"
 #include "classtrack.h"
+#include "fight.h"
 #include "genolc.h" /* for strip_cr */
 #include "config.h" /* for pclean_criteria[] */
 #include "dg_scripts.h" /* To enable saving of player variables to disk */
@@ -314,6 +315,8 @@ int load_char(const char *name, struct char_data *ch)
   long long __loaded_gold_units = -1;
   int archetype_idx;
   int shadow_slot_idx;
+  bool armor_seen = FALSE, legacy_ac_seen = FALSE;
+  int legacy_ac_raw = 0;
 
   if ((id = get_ptable_by_name(name)) < 0)
     return (-1);
@@ -459,7 +462,14 @@ int load_char(const char *name, struct char_data *ch)
 
       switch (*tag) {
       case 'A':
-        if (!strcmp(tag, "Ac  "))	GET_AC(ch)		= MAX(0, 100 - atoi(line));
+        if (!strcmp(tag, "Ac  ")) {
+          legacy_ac_raw = atoi(line);
+          legacy_ac_seen = TRUE;
+        }
+        else if (!strcmp(tag, "Armr")) {
+          GET_AC(ch) = MAX(0, atoi(line));
+          armor_seen = TRUE;
+        }
 	else if (!strcmp(tag, "Act ")) {
          if (sscanf(line, "%s %s %s %s", f1, f2, f3, f4) == 4) {
           PLR_FLAGS(ch)[0] = asciiflag_conv(f1);
@@ -751,6 +761,9 @@ int load_char(const char *name, struct char_data *ch)
     }
   }
 
+    if (!armor_seen && legacy_ac_seen)
+      GET_AC(ch) = legacy_ac_to_armor(legacy_ac_raw);
+
     if (money_seen && __loaded_money_gold >= 0) {
       GET_MONEY(ch) = normalize_currency_units(__loaded_money_gold);
     } else if (!money_seen && __loaded_gold_units >= 0) {
@@ -953,7 +966,7 @@ void save_char(struct char_data * ch)
   if (GET_CON(ch)	   != PFDEF_CON)	fprintf(fl, "Con : %d\n", GET_CON(ch));
   if (GET_CHA(ch)	   != PFDEF_CHA)	fprintf(fl, "Cha : %d\n", GET_CHA(ch));
 
-  if (GET_AC(ch)   != PFDEF_AC)         fprintf(fl, "Ac  : %d\n", GET_AC(ch));
+  if (GET_AC(ch)   != PFDEF_AC)         fprintf(fl, "Armr: %d\n", GET_AC(ch));
   if (GET_EVASION(ch) != 0)             fprintf(fl, "Evad: %d\n", GET_EVASION(ch));
 
   /* Gold is canonical; persist it directly. */

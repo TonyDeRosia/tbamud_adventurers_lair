@@ -1596,7 +1596,7 @@ static void parse_simple_mob(FILE *mob_f, int i, int nr)
   GET_HITROLL(mob_proto + i) = 20 - t[1];
   {
     int legacy_ac = 10 * t[2];
-    GET_AC(mob_proto + i) = MAX(0, 100 - legacy_ac);
+    GET_AC(mob_proto + i) = legacy_ac_to_armor(legacy_ac);
     GET_EVASION(mob_proto + i) = 0;
   }
 

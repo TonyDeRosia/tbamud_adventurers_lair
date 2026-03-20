@@ -696,7 +696,7 @@ ACMD(do_kick)
     return;
   }
   /* 101% is a complete failure */
-  percent = ((10 - (compute_armor_class(vict) / 10)) * 2) + rand_number(1, 101);
+  percent = ((compute_armor(vict) / 10) * 2) + rand_number(1, 101);
   prob = GET_SKILL(ch, SKILL_KICK);
 
   if (percent > prob) {
@@ -789,7 +789,7 @@ ACMD(do_appraise_enemy)
 
   if (quality >= 2) {
     int phys = GET_DAMROLL(vict) + GET_HITROLL(vict);
-    int def = -compute_armor_class(vict);
+    int def = compute_armor(vict);
     int mag = GET_INT(vict) + GET_WIS(vict);
 
     send_to_char(ch, "Threat (offense): %s.\r\n",
@@ -820,7 +820,7 @@ ACMD(do_appraise_enemy)
     if (MOB_FLAGGED(vict, MOB_NOBASH) || AFF_FLAGGED(vict, AFF_ROOTED)) send_to_char(ch, "Resistance: difficult to restrain.\r\n");
     if (MOB_FLAGGED(vict, MOB_AWARE)) send_to_char(ch, "Resistance: difficult to frighten.\r\n");
 
-    if (compute_armor_class(vict) > 50) send_to_char(ch, "Weakness: lightly armored.\r\n");
+    if (compute_armor(vict) < 20) send_to_char(ch, "Weakness: lightly armored.\r\n");
     if (AFF_FLAGGED(vict, AFF_ARCANE_LEAK) || AFF_FLAGGED(vict, AFF_HEXED)) send_to_char(ch, "Weakness: vulnerable to disruption.\r\n");
     if (GET_HIT(vict) < (GET_MAX_HIT(vict) / 2)) send_to_char(ch, "Weakness: already weakened.\r\n");
     if (AFF_FLAGGED(vict, AFF_FEARFUL) || AFF_FLAGGED(vict, AFF_STUNNED)) send_to_char(ch, "Weakness: unstable under pressure.\r\n");
