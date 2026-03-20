@@ -54,6 +54,8 @@ enum condition_penalty_stage {
 #define STARVING_HP_DRAIN_MAX 2
 #define DEHYDRATED_HP_DRAIN_MIN 1
 #define DEHYDRATED_HP_DRAIN_MAX 3
+#define STARVING_MANA_DRAIN 1
+#define DEHYDRATED_MANA_DRAIN 1
 
 
 /* When age < 15 return the value p0
@@ -193,6 +195,7 @@ static void apply_condition_tick_penalties(struct char_data *ch)
 {
   int move_drain = 0;
   int hp_drain = 0;
+  int mana_drain = 0;
   bool starving = FALSE;
   bool dehydrated = FALSE;
   bool prolonged_starving = FALSE;
@@ -218,9 +221,15 @@ static void apply_condition_tick_penalties(struct char_data *ch)
     hp_drain += rand_number(STARVING_HP_DRAIN_MIN, STARVING_HP_DRAIN_MAX);
   if (prolonged_dehydrated)
     hp_drain += rand_number(DEHYDRATED_HP_DRAIN_MIN, DEHYDRATED_HP_DRAIN_MAX);
+  if (prolonged_starving)
+    mana_drain += STARVING_MANA_DRAIN;
+  if (prolonged_dehydrated)
+    mana_drain += DEHYDRATED_MANA_DRAIN;
 
   if (hp_drain > 0)
     GET_HIT(ch) = MAX(1, GET_HIT(ch) - hp_drain);
+  if (mana_drain > 0)
+    GET_MANA(ch) = MAX(0, GET_MANA(ch) - mana_drain);
 
   if ((starving || dehydrated) && !(prolonged_starving || prolonged_dehydrated)) {
     if (((starving ? ch->char_specials.starving_ticks : ch->char_specials.dehydrated_ticks) % 8) == 1) {
