@@ -1785,27 +1785,28 @@ ACMD(do_score)
   len += snprintf(buf + len, sizeof(buf) - len,
     "%s╠═══════════════════════════════════════════════════════════════════════════════╣%s\r\n", B, R);
 
-/* HP, Mana, Move, Exp, Alignment */
+/* HP, Mana, Move, Alignment */
 snprintf(line, sizeof(line),
-  "%sHP:%s %d/%d  %sMana:%s %d/%d  %sMove:%s %d/%d  %sExp:%s %d  %sAlignment:%s %d",
+  "%sHP:%s %d/%d  %sMana:%s %d/%d  %sMove:%s %d/%d  %sAlignment:%s %d",
   C, R, GET_HIT(ch), GET_MAX_HIT(ch),
   C, R, GET_MANA(ch), effective_max_mana(ch),
   C, R, GET_MOVE(ch), effective_max_move(ch),
-  C, R, GET_EXP(ch),
   C, R, GET_ALIGNMENT(ch));
 len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
 
 /* Blank spacer line */
 len = append_box_line(buf, len, sizeof(buf), B, R, "", W);
 
-/* Next level in */
+/* Experience and TNL */
 {
   int next_need = 0;
   if (GET_LEVEL(ch) < LVL_IMMORT) {
     int next_level = GET_LEVEL(ch) + 1;
     next_need = level_exp(GET_CLASS(ch), next_level) - GET_EXP(ch);
   }
-  snprintf(line, sizeof(line), "%sNext level in:%s %d exp", C, R, next_need);
+  snprintf(line, sizeof(line),
+    "%sExp:%s %d                                   %sTNL:%s %d",
+    C, R, GET_EXP(ch), C, R, next_need);
 }
 len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
 
@@ -1841,7 +1842,7 @@ len = append_box_line(buf, len, sizeof(buf), B, R, "", W);
   {
     int base_thaco = thaco(GET_CLASS(ch), GET_LEVEL(ch));
     int str_to_hit = str_app[STRENGTH_APPLY_INDEX(ch)].tohit;
-    int to_hit_score = 100 - ((base_thaco - str_to_hit - GET_HITROLL(ch)) * 4);
+    int accuracy_pct = 100 - ((base_thaco - str_to_hit - GET_HITROLL(ch)) * 4);
     int b_str = ch->real_abils.str;
     int b_dex = ch->real_abils.dex;
     int b_con = ch->real_abils.con;
@@ -1873,10 +1874,15 @@ len = append_box_line(buf, len, sizeof(buf), B, R, "", W);
     len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
     len = append_box_line(buf, len, sizeof(buf), B, R, "", W);
 
+    if (accuracy_pct < 0)
+      accuracy_pct = 0;
+    else if (accuracy_pct > 100)
+      accuracy_pct = 100;
+
     snprintf(line, sizeof(line),
-      "%sOffense:%s  Hitroll %+d  Damroll %+d  Hit Score %d (higher is better)",
+      "%sOffense:%s  Hitroll %+d  Damroll %+d  Accuracy: %d%%",
       C, R,
-      GET_HITROLL(ch), GET_DAMROLL(ch), to_hit_score);
+      GET_HITROLL(ch), GET_DAMROLL(ch), accuracy_pct);
     len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
   }
   len = append_box_line(buf, len, sizeof(buf), B, R, "", W);
@@ -1919,7 +1925,7 @@ len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
 
 /* Next Level (if mortal) */
   if (GET_LEVEL(ch) < LVL_IMMORT) {
-    snprintf(line, sizeof(line), "%sNext level in:%s %d exp",
+    snprintf(line, sizeof(line), "%sTNL:%s %d exp",
       C, R, level_exp(GET_CLASS(ch), GET_LEVEL(ch) + 1) - GET_EXP(ch));
     len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
   }
