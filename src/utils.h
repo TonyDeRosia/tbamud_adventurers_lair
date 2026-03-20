@@ -584,6 +584,12 @@ do                                                              \
 #define GET_ARCHETYPE_SCORE(ch, idx) CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.archetype_scores[(idx)]))
 #define GET_CLASS_LOCKED(ch) CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.class_locked))
 #define GET_SOFT_CLASS_TITLE(ch) CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.soft_class_title))
+#define GET_SHADOW_SLOT(ch, idx) CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.shadow_roster[(idx)]))
+#define SHADOW_SLOT_OCCUPIED(ch, idx) (GET_SHADOW_SLOT((ch), (idx)).occupied)
+#define SHADOW_SLOT_ACTIVE(ch, idx)   (GET_SHADOW_SLOT((ch), (idx)).active)
+#define SHADOW_SLOT_LEVEL(ch, idx)    (GET_SHADOW_SLOT((ch), (idx)).level)
+#define SHADOW_SLOT_VNUM(ch, idx)     (GET_SHADOW_SLOT((ch), (idx)).source_vnum)
+#define SHADOW_SLOT_NAME(ch, idx)     (GET_SHADOW_SLOT((ch), (idx)).name)
 
 /* Lvalue helpers for old code paths that used assignments */
 #define SET_GOLD(ch,g)       do { GET_GOLD(ch) = ((long long)(g)); } while (0)

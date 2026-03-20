@@ -312,6 +312,7 @@ int load_char(const char *name, struct char_data *ch)
   long long __loaded_bank_money = -1;
   long long __loaded_gold_units = -1;
   int archetype_idx;
+  int shadow_slot_idx;
 
   if ((id = get_ptable_by_name(name)) < 0)
     return (-1);
@@ -418,6 +419,13 @@ int load_char(const char *name, struct char_data *ch)
       GET_ARCHETYPE_SCORE(ch, i) = 0;
     GET_CLASS_LOCKED(ch) = 0;
     GET_SOFT_CLASS_TITLE(ch)[0] = '\0';
+    for (i = 0; i < MAX_SHADOW_ROSTER; i++) {
+      SHADOW_SLOT_OCCUPIED(ch, i) = 0;
+      SHADOW_SLOT_ACTIVE(ch, i) = 0;
+      SHADOW_SLOT_LEVEL(ch, i) = 0;
+      SHADOW_SLOT_VNUM(ch, i) = NOBODY;
+      SHADOW_SLOT_NAME(ch, i)[0] = '\0';
+    }
     *GET_PROMPT(ch) = '\0';
 
     for (i = 0; i < AF_ARRAY_MAX; i++)
@@ -639,6 +647,25 @@ int load_char(const char *name, struct char_data *ch)
   else if (!strcmp(tag, "ScrW"))  GET_SCREEN_WIDTH(ch) = atoi(line);
         else if (!strcmp(tag, "SoTi"))
           strlcpy(GET_SOFT_CLASS_TITLE(ch), line, sizeof(ch->player_specials->saved.soft_class_title));
+        else if (!strcmp(tag, "ShCt")) {
+          /* Reserved for future expansion; slots load via ShSl# entries. */
+        } else if (sscanf(tag, "ShSl%d", &shadow_slot_idx) == 1 &&
+                   shadow_slot_idx >= 0 && shadow_slot_idx < MAX_SHADOW_ROSTER) {
+          int occupied = 0, active = 0, level = 0;
+          int source_vnum = NOBODY;
+          char shadow_name[MAX_NAME_LENGTH + 1];
+          shadow_name[0] = '\0';
+          if (sscanf(line, "%d %d %d %d %[^\n]", &occupied, &active, &level, &source_vnum, shadow_name) >= 4) {
+            SHADOW_SLOT_OCCUPIED(ch, shadow_slot_idx) = occupied ? 1 : 0;
+            SHADOW_SLOT_ACTIVE(ch, shadow_slot_idx) = active ? 1 : 0;
+            SHADOW_SLOT_LEVEL(ch, shadow_slot_idx) = MAX(1, level);
+            SHADOW_SLOT_VNUM(ch, shadow_slot_idx) = source_vnum;
+            if (shadow_name[0])
+              strlcpy(SHADOW_SLOT_NAME(ch, shadow_slot_idx), shadow_name, MAX_NAME_LENGTH + 1);
+            else
+              strlcpy(SHADOW_SLOT_NAME(ch, shadow_slot_idx), "nameless shadow", MAX_NAME_LENGTH + 1);
+          }
+        }
 	else if (!strcmp(tag, "Skil"))	load_skills(fl, ch);
         else if (!strcmp(tag, "StLv")) load_study_levels(fl, ch);
 	else if (!strcmp(tag, "Str "))	load_HMVS(ch, line, LOAD_STRENGTH);
@@ -701,6 +728,9 @@ int load_char(const char *name, struct char_data *ch)
 
   if (!*GET_SOFT_CLASS_TITLE(ch))
     strlcpy(GET_SOFT_CLASS_TITLE(ch), "Adventurer", sizeof(ch->player_specials->saved.soft_class_title));
+
+  for (i = 0; i < MAX_SHADOW_ROSTER; i++)
+    SHADOW_SLOT_ACTIVE(ch, i) = 0;
 
   affect_total(ch);
 
@@ -895,6 +925,27 @@ void save_char(struct char_data * ch)
   for (i = 0; i < NUM_ARCHETYPES; i++) {
     if (GET_ARCHETYPE_SCORE(ch, i) > 0)
       fprintf(fl, "ArSc%d: %d\n", i, GET_ARCHETYPE_SCORE(ch, i));
+  }
+  {
+    int shadow_count = 0;
+    for (i = 0; i < MAX_SHADOW_ROSTER; i++) {
+      if (SHADOW_SLOT_OCCUPIED(ch, i))
+        shadow_count++;
+    }
+    if (shadow_count > 0) {
+      fprintf(fl, "ShCt: %d\n", shadow_count);
+      for (i = 0; i < MAX_SHADOW_ROSTER; i++) {
+        if (!SHADOW_SLOT_OCCUPIED(ch, i))
+          continue;
+        fprintf(fl, "ShSl%d: %d %d %d %d %s\n",
+                i,
+                SHADOW_SLOT_OCCUPIED(ch, i),
+                SHADOW_SLOT_ACTIVE(ch, i),
+                SHADOW_SLOT_LEVEL(ch, i),
+                SHADOW_SLOT_VNUM(ch, i),
+                SHADOW_SLOT_NAME(ch, i)[0] ? SHADOW_SLOT_NAME(ch, i) : "nameless shadow");
+      }
+    }
   }
   if (GET_EXP(ch)	   != PFDEF_EXP)	fprintf(fl, "Exp : %d\n", GET_EXP(ch));
   if (GET_HITROLL(ch)	   != PFDEF_HITROLL)	fprintf(fl, "Hrol: %d\n", GET_HITROLL(ch));

@@ -585,6 +585,8 @@ ASPELL(spell_kings_command);
 ASPELL(spell_detect_kill_intent);
 ASPELL(spell_mutilate);
 ASPELL(spell_shadow_armor);
+
+int summon_stored_shadow(struct char_data *ch, int slot);
 ASPELL(spell_total_occultation);
 ASPELL(spell_domain_break);
 ASPELL(spell_hunters_instinct);

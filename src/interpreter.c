@@ -63,6 +63,7 @@ ACMD(do_affremove);
 ACMD(do_smartspawn);
 ACMD(do_aistate);
 ACMD(do_aictl);
+ACMD(do_shadow);
 
 /* local (file scope) functions */
 static int perform_dupe_check(struct descriptor_data *d);
@@ -336,6 +337,7 @@ cpp_extern const struct command_info cmd_info[] = {
   { "vnumsshow", "vnumsshow", POS_DEAD   , do_gen_tog  , LVL_IMMORT, SCMD_SHOWVNUMS },
 
   { "sacrifice", "sac"     , POS_RESTING , do_sac      , 0, 0 },
+  { "shadow"   , "shadow"  , POS_RESTING , do_shadow   , 0, 0 },
   { "say"      , "s"       , POS_RESTING , do_say      , 0, 0 },
   { "score"    , "sc"      , POS_DEAD    , do_score    , 0, 0 },
   { "attr"     , "attr"    , POS_DEAD    , do_attr     , 0, 0 },
