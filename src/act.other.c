@@ -41,6 +41,10 @@
 #define ABIL_COL_WIDTH 27
 #endif
 #define LEVEL_LABEL_PADDING 14
+#define SPELL_ROW_GAP 2
+#define SPELL_TERM_WIDTH 78
+#define SPELL_LEFT_MIN_WIDTH 24
+#define SPELL_LEFT_MAX_WIDTH 40
 
 struct abil_row {
   int id;
@@ -395,6 +399,97 @@ void show_ability_table_aligned(struct char_data *ch, int show_spells, int show_
   }
 
   qsort(rows, (size_t)n, sizeof(rows[0]), abil_row_cmp);
+
+  if (show_spells) {
+    int idx = 0;
+
+    while (idx < n) {
+      int level = rows[idx].lvl;
+      int level_start = idx;
+      int level_count = 0;
+      int max_entry_len = 0;
+      int left_width;
+      int target_left_width;
+      int first_row_for_level = 1;
+
+      while ((level_start + level_count) < n && rows[level_start + level_count].lvl == level) {
+        char entry[256];
+        int entry_len;
+        const struct abil_row *row = &rows[level_start + level_count];
+
+        if (row->pct < 0)
+          snprintf(entry, sizeof(entry), "%s [ -- ]", row->name);
+        else
+          snprintf(entry, sizeof(entry), "%s [%3d%%]", row->name, row->pct);
+
+        entry_len = (int)strlen(entry);
+        if (entry_len > max_entry_len)
+          max_entry_len = entry_len;
+        level_count++;
+      }
+
+      left_width = SPELL_TERM_WIDTH - LEVEL_LABEL_PADDING - SPELL_ROW_GAP;
+      if (left_width < SPELL_LEFT_MIN_WIDTH)
+        left_width = SPELL_LEFT_MIN_WIDTH;
+      target_left_width = MAX(SPELL_LEFT_MIN_WIDTH, max_entry_len);
+      target_left_width = MIN(target_left_width, left_width);
+      target_left_width = MIN(target_left_width, SPELL_LEFT_MAX_WIDTH);
+
+      i = level_start;
+      while (i < level_start + level_count) {
+        char left[256];
+        char right[256];
+        int has_right = (i + 1 < level_start + level_count);
+        int left_len;
+        int right_len = 0;
+        int pair_fits = FALSE;
+        int avail_after_indent = SPELL_TERM_WIDTH - LEVEL_LABEL_PADDING;
+
+        if (rows[i].pct < 0)
+          snprintf(left, sizeof(left), "%s [ -- ]", rows[i].name);
+        else
+          snprintf(left, sizeof(left), "%s [%3d%%]", rows[i].name, rows[i].pct);
+        left_len = (int)strlen(left);
+
+        if (has_right) {
+          if (rows[i + 1].pct < 0)
+            snprintf(right, sizeof(right), "%s [ -- ]", rows[i + 1].name);
+          else
+            snprintf(right, sizeof(right), "%s [%3d%%]", rows[i + 1].name, rows[i + 1].pct);
+          right_len = (int)strlen(right);
+
+          if (left_len + SPELL_ROW_GAP + right_len <= avail_after_indent &&
+              target_left_width + SPELL_ROW_GAP + right_len <= avail_after_indent)
+            pair_fits = TRUE;
+        }
+
+        if (first_row_for_level) {
+          send_to_char(ch, "%sLevel %-2d%s:%s ",
+                       CCCYN(ch, C_NRM),
+                       level,
+                       CCWHT(ch, C_NRM),
+                       CCNRM(ch, C_NRM));
+          first_row_for_level = 0;
+        } else {
+          send_to_char(ch, "\r\n%*s", LEVEL_LABEL_PADDING, "");
+        }
+
+        if (pair_fits) {
+          send_to_char(ch, "%-*s%*s%s",
+                       target_left_width + count_color_chars(left), left,
+                       SPELL_ROW_GAP, "", right);
+          i += 2;
+        } else {
+          send_to_char(ch, "%s", left);
+          i++;
+        }
+      }
+
+      send_to_char(ch, "\r\n");
+      idx = level_start + level_count;
+    }
+    return;
+  }
 
   /* Print */
   for (i = 0; i < n; i++) {
