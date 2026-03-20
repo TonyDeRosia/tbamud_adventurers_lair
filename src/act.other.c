@@ -1968,7 +1968,7 @@ ACMD(do_shadow)
   cap = shadow_capacity(ch);
   shadow_sync_active_flags(ch);
 
-  if (!*shadow_subcmd || is_abbrev(shadow_subcmd, "list")) {
+  if (!*shadow_subcmd || is_abbrev(shadow_subcmd, "list") || is_abbrev(shadow_subcmd, "storage")) {
     for (i = 0; i < cap; i++) {
       if (SHADOW_SLOT_OCCUPIED(ch, i)) {
         used++;
@@ -2001,7 +2001,6 @@ ACMD(do_shadow)
     send_to_char(ch, "  shadow store <slot|name>\r\n");
     send_to_char(ch, "  shadow release <slot|name>\r\n");
     send_to_char(ch, "  shadow rename <slot|name> <new name>\r\n");
-    send_to_char(ch, "  shadow list\r\n");
     return;
   }
 
@@ -2145,7 +2144,7 @@ ACMD(do_shadow)
     return;
   }
 
-  send_to_char(ch, "Usage: shadow <list|summon|store|release|rename>\r\n");
+  send_to_char(ch, "Usage: shadow <list|storage|summon|store|release|rename>\r\n");
 }
 
 ACMD(do_opet)

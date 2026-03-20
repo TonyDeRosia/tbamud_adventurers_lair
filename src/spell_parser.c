@@ -1300,7 +1300,8 @@ static bool is_spellup_beneficial_spell(int spellnum)
   }
 
   /* Defensive invariants: even whitelisted spells must be non-violent affects/manual buffs. */
-  if (SINFO.violent || !IS_SET(SINFO.routines, MAG_AFFECTS | MAG_MANUAL))
+  if (SINFO.violent || (!IS_SET(SINFO.routines, MAG_AFFECTS) &&
+      !IS_SET(SINFO.routines, MAG_MANUAL)))
     return FALSE;
   if (!IS_SET(SINFO.targets, TAR_CHAR_ROOM | TAR_CHAR_WORLD | TAR_SELF_ONLY))
     return FALSE;
@@ -2557,6 +2558,13 @@ ACMD(do_cast) {
   if (IS_SET(SINFO.targets, TAR_IGNORE)) {
     target = TRUE;
   } else if (target_argument != NULL && *target_argument) {
+    if ((IS_SET(SINFO.targets, TAR_CHAR_ROOM) || IS_SET(SINFO.targets, TAR_CHAR_WORLD) ||
+        IS_SET(SINFO.targets, TAR_SELF_ONLY)) &&
+        (!str_cmp(target_argument, "self") || !str_cmp(target_argument, "me") ||
+        !str_cmp(target_argument, "myself"))) {
+      tch = ch;
+      target = TRUE;
+    }
     char *target_lookup;
     number = get_number(&targp);
     target_lookup = (targp && *targp) ? targp : target_argument;
@@ -2600,6 +2608,10 @@ ACMD(do_cast) {
     }
 
   } else { /* if target string is empty */
+    if (!target && IS_SET(SINFO.targets, TAR_SELF_ONLY)) {
+      tch = ch;
+      target = TRUE;
+    }
     if (!target && IS_SET(SINFO.targets, TAR_FIGHT_VICT))
       if (FIGHTING(ch) != NULL) {
         tch = FIGHTING(ch);
@@ -3303,7 +3315,7 @@ void mag_assign_spells(void) {
   spello(SPELL_IA_SHUB_NIGGURATH, "ia shub niggurath", 90, 90, 0, POS_FIGHTING, TAR_IGNORE, TRUE, MAG_MANUAL, NULL);
   spello(SPELL_GOAL_OF_ALL_LIFE_IS_DEATH, "goal of all life is death", 60, 60, 0, POS_STANDING, TAR_SELF_ONLY, FALSE, MAG_MANUAL, "The certainty of death fades, but its truth remains.");
   spello(SPELL_CRY_OF_THE_BANSHEE, "cry of the banshee", 55, 55, 0, POS_FIGHTING, TAR_IGNORE, TRUE, MAG_MANUAL, NULL);
-  spello(SPELL_BODY_OF_EFFULGENT_BERYL, "body of effulgent beryl", 34, 34, 0, POS_STANDING, TAR_SELF_ONLY, FALSE, MAG_MANUAL, "The effulgent beryl radiance fades from your body.");
+  spello(SPELL_BODY_OF_EFFULGENT_BERYL, "body of effulgent beryl", 34, 34, 0, POS_STANDING, TAR_CHAR_ROOM | TAR_SELF_ONLY, FALSE, MAG_MANUAL, "The effulgent beryl radiance fades from your body.");
   spello(SPELL_VERMILION_NOVA, "vermilion nova", 44, 44, 0, POS_FIGHTING, TAR_IGNORE, TRUE, MAG_MANUAL, NULL);
   spello(SPELL_NUCLEAR_BLAST, "nuclear blast", 65, 65, 0, POS_FIGHTING, TAR_IGNORE, TRUE, MAG_MANUAL, NULL);
   spello(SPELL_GREATER_TELEPORTATION, "greater teleportation", 45, 45, 0, POS_STANDING, TAR_CHAR_WORLD | TAR_NOT_SELF, FALSE, MAG_MANUAL, NULL);
