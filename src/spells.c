@@ -126,6 +126,67 @@ static void identify_send_section_header(struct char_data *ch, const char *borde
   send_to_char(ch, "%s|%s %s[%s]%s\r\n", border, reset, label, title, reset);
 }
 
+int player_knows_identified_item(struct char_data *ch, struct obj_data *obj)
+{
+  int i;
+  int count;
+  obj_vnum vnum;
+
+  if (!ch || !obj || IS_NPC(ch))
+    return FALSE;
+
+  vnum = GET_OBJ_VNUM(obj);
+  if (vnum <= NOTHING)
+    return FALSE;
+
+  count = ch->player_specials->saved.identified_item_count;
+  if (count < 0)
+    count = 0;
+  if (count > MAX_IDENTIFIED_ITEMS)
+    count = MAX_IDENTIFIED_ITEMS;
+
+  for (i = 0; i < count; i++) {
+    if (ch->player_specials->saved.identified_item_vnums[i] == vnum)
+      return TRUE;
+  }
+  return FALSE;
+}
+
+void player_record_identified_item(struct char_data *ch, struct obj_data *obj)
+{
+  int i;
+  int count;
+  obj_vnum vnum;
+
+  if (!ch || !obj || IS_NPC(ch))
+    return;
+
+  vnum = GET_OBJ_VNUM(obj);
+  if (vnum <= NOTHING)
+    return;
+
+  if (player_knows_identified_item(ch, obj))
+    return;
+
+  count = ch->player_specials->saved.identified_item_count;
+  if (count < 0)
+    count = 0;
+  if (count > MAX_IDENTIFIED_ITEMS)
+    count = MAX_IDENTIFIED_ITEMS;
+
+  if (count >= MAX_IDENTIFIED_ITEMS) {
+    for (i = 1; i < MAX_IDENTIFIED_ITEMS; i++)
+      ch->player_specials->saved.identified_item_vnums[i - 1] =
+        ch->player_specials->saved.identified_item_vnums[i];
+    ch->player_specials->saved.identified_item_vnums[MAX_IDENTIFIED_ITEMS - 1] = vnum;
+    ch->player_specials->saved.identified_item_count = MAX_IDENTIFIED_ITEMS;
+    return;
+  }
+
+  ch->player_specials->saved.identified_item_vnums[count] = vnum;
+  ch->player_specials->saved.identified_item_count = count + 1;
+}
+
 void show_identify_item(struct char_data *ch, struct obj_data *obj, enum identify_detail_level detail)
 {
   int i, found;

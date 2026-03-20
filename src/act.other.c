@@ -1330,6 +1330,7 @@ ACMD(do_study)
 
   SET_SKILL(ch, ability_id, 1);
   classtrack_record_study_learn_level(ch, ability_id, GET_LEVEL(ch));
+  player_record_identified_item(ch, study_obj);
   if (has_requested_ability)
     send_to_char(ch, "You focus on %s within %s and begin to understand it.\r\n",
                  spell_info[ability_id].name, study_obj->short_description);

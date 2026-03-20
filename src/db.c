@@ -3641,6 +3641,9 @@ void init_char(struct char_data *ch)
 
   GET_NUM_QUESTS(ch) = 0;
   ch->player_specials->saved.completed_quests = NULL;
+  ch->player_specials->saved.identified_item_count = 0;
+  for (i = 0; i < MAX_IDENTIFIED_ITEMS; i++)
+    ch->player_specials->saved.identified_item_vnums[i] = NOTHING;
   GET_QUEST(ch) = NOTHING;
   GET_CLASS(ch) = CLASS_ADVENTURER;
 
