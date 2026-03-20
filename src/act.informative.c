@@ -1840,9 +1840,8 @@ len = append_box_line(buf, len, sizeof(buf), B, R, "", W);
   len = append_box_line(buf, len, sizeof(buf), B, R, line, W);/* Combat Stats */
   len = append_box_line(buf, len, sizeof(buf), B, R, "", W);
   {
-    int base_thaco = thaco(GET_CLASS(ch), GET_LEVEL(ch));
-    int str_to_hit = str_app[STRENGTH_APPLY_INDEX(ch)].tohit;
-    int accuracy_pct = 100 - ((base_thaco - str_to_hit - GET_HITROLL(ch)) * 4);
+    int offensive_hit = compute_offensive_hit_value(ch, NULL);
+    int accuracy_pct = offensive_hit - 10; /* Neutral target Evasion baseline. */
     int b_str = ch->real_abils.str;
     int b_dex = ch->real_abils.dex;
     int b_con = ch->real_abils.con;
@@ -1874,10 +1873,10 @@ len = append_box_line(buf, len, sizeof(buf), B, R, "", W);
     len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
     len = append_box_line(buf, len, sizeof(buf), B, R, "", W);
 
-    if (accuracy_pct < 0)
-      accuracy_pct = 0;
-    else if (accuracy_pct > 100)
-      accuracy_pct = 100;
+    if (accuracy_pct < 5)
+      accuracy_pct = 5;
+    else if (accuracy_pct > 95)
+      accuracy_pct = 95;
 
     snprintf(line, sizeof(line),
       "%sOffense:%s  Hitroll %+d  Damroll %+d  Accuracy: %d%%",

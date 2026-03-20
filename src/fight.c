@@ -502,7 +502,7 @@ int legacy_ac_to_armor(int legacy_ac)
 
 int compute_armor(struct char_data *ch)
 {
-  int armor_bonus = (GET_CON(ch) - 10) + ((GET_STR(ch) - 10) / 2);
+  int armor_bonus = 10 + (GET_CON(ch) - 10) + ((GET_STR(ch) - 10) / 2);
   int armor = GET_ARMOR(ch) + armor_bonus;
   return MAX(0, armor);
 }
@@ -514,8 +514,14 @@ int compute_armor_class(struct char_data *ch)
 
 int compute_evasion(struct char_data *ch)
 {
-  int evasion_bonus = (GET_DEX(ch) - 10) * 2;
-  return GET_EVASION(ch) + evasion_bonus;
+  int evasion_bonus = 10 + ((GET_DEX(ch) - 10) * 2);
+  int evasion = GET_EVASION(ch) + evasion_bonus;
+  return MAX(0, evasion);
+}
+
+int compute_offensive_hit_value(struct char_data *ch, struct char_data *victim)
+{
+  return 100 - (compute_thaco(ch, victim) * 4);
 }
 
 void update_pos(struct char_data *victim)
@@ -1949,7 +1955,7 @@ void hit(struct char_data *ch, struct char_data *victim, int type)
       w_type = TYPE_HIT;
   }
 
-  attacker_hit = 100 - (compute_thaco(ch, victim) * 4);
+  attacker_hit = compute_offensive_hit_value(ch, victim);
   defender_evasion = compute_evasion(victim);
   hit_chance = attacker_hit - defender_evasion;
   hit_chance = MAX(5, MIN(95, hit_chance));
