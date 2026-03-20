@@ -186,6 +186,25 @@ static int extracted_shadow_slot(struct char_data *mob)
   return -1;
 }
 
+static void remove_follower_link_silently(struct char_data *master, struct char_data *follower)
+{
+  struct follow_type *node, *prev = NULL;
+
+  if (!master || !follower)
+    return;
+
+  for (node = master->followers; node; prev = node, node = node->next) {
+    if (node->follower != follower)
+      continue;
+    if (prev)
+      prev->next = node->next;
+    else
+      master->followers = node->next;
+    free(node);
+    break;
+  }
+}
+
 static void prepare_shadow_servant_for_removal(struct char_data *mob)
 {
   struct char_data *fighter, *next_fighter;
@@ -205,8 +224,19 @@ static void prepare_shadow_servant_for_removal(struct char_data *mob)
       stop_fighting(fighter);
   }
 
-  if (mob->followers || mob->master)
-    die_follower(mob);
+  while (mob->followers) {
+    struct follow_type *next = mob->followers->next;
+    if (mob->followers->follower)
+      mob->followers->follower->master = NULL;
+    free(mob->followers);
+    mob->followers = next;
+  }
+
+  if (mob->master) {
+    remove_follower_link_silently(mob->master, mob);
+    mob->master = NULL;
+  }
+  REMOVE_BIT_AR(AFF_FLAGS(mob), AFF_CHARM);
 }
 
 static int shadow_name_looks_valid(const char *name)

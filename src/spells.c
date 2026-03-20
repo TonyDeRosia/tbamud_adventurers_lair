@@ -441,6 +441,78 @@ static int shadow_name_looks_valid(const char *name)
   return visible > 0;
 }
 
+static void replace_mobile_string_safe(struct char_data *mob, char **field, const char *new_value, const char *proto_value)
+{
+  if (!mob || !field)
+    return;
+
+  if (*field && *field != proto_value)
+    free(*field);
+  *field = NULL;
+
+  if (new_value && *new_value)
+    *field = strdup(new_value);
+}
+
+static void apply_shadow_identity_to_mob(struct char_data *mob, const char *identity_name)
+{
+  char long_buf[MAX_STRING_LENGTH];
+  mob_rnum rnum;
+  const char *safe_name;
+  const char *proto_short = NULL;
+  const char *proto_long = NULL;
+
+  if (!mob)
+    return;
+
+  safe_name = shadow_name_looks_valid(identity_name) ? identity_name : "a shadow";
+  rnum = GET_MOB_RNUM(mob);
+  if (rnum != NOBODY) {
+    proto_short = mob_proto[rnum].player.short_descr;
+    proto_long = mob_proto[rnum].player.long_descr;
+  }
+
+  replace_mobile_string_safe(mob, &mob->player.short_descr, safe_name, proto_short);
+
+  snprintf(long_buf, sizeof(long_buf), "%s stands here.", safe_name);
+  long_buf[0] = UPPER(long_buf[0]);
+  replace_mobile_string_safe(mob, &mob->player.long_descr, long_buf, proto_long);
+}
+
+static void restore_shadow_combat_profile(struct char_data *ch, int slot, struct char_data *mob)
+{
+  if (!ch || !mob || slot < 0 || slot >= MAX_SHADOW_ROSTER)
+    return;
+
+  if (!SHADOW_SLOT_PROFILE_VALID(ch, slot))
+    return;
+
+  GET_LEVEL(mob) = MAX(1, SHADOW_SLOT_LEVEL(ch, slot));
+  GET_MAX_HIT(mob) = MAX(1, SHADOW_SLOT_MAX_HIT(ch, slot));
+  GET_HIT(mob) = GET_MAX_HIT(mob);
+  GET_AC(mob) = SHADOW_SLOT_AC(ch, slot);
+  GET_HITROLL(mob) = SHADOW_SLOT_HITROLL(ch, slot);
+  GET_DAMROLL(mob) = SHADOW_SLOT_DAMROLL(ch, slot);
+  GET_MAX_MANA(mob) = MAX(0, SHADOW_SLOT_MAX_MANA(ch, slot));
+  GET_MANA(mob) = GET_MAX_MANA(mob);
+  mob->mob_specials.damnodice = MAX(1, SHADOW_SLOT_DAMNODICE(ch, slot));
+  mob->mob_specials.damsizedice = MAX(1, SHADOW_SLOT_DAMSIZEDICE(ch, slot));
+  mob->real_abils.str = SHADOW_SLOT_STR(ch, slot);
+  mob->real_abils.intel = SHADOW_SLOT_INT(ch, slot);
+  mob->real_abils.wis = SHADOW_SLOT_WIS(ch, slot);
+  mob->real_abils.dex = SHADOW_SLOT_DEX(ch, slot);
+  mob->real_abils.con = SHADOW_SLOT_CON(ch, slot);
+  mob->real_abils.cha = SHADOW_SLOT_CHA(ch, slot);
+  mob->aff_abils = mob->real_abils;
+}
+
+static void apply_shadow_servant_bonuses(struct char_data *owner, struct char_data *mob)
+{
+  (void)owner;
+  (void)mob;
+  /* Scaffolding hook for future monarch/support buffs that should affect all active shadows. */
+}
+
 static int is_shadow_servant(struct char_data *mob, struct char_data *owner)
 {
   if (!mob || !IS_NPC(mob) || !AFF_FLAGGED(mob, AFF_CHARM) || GET_SUMMON_TIMER(mob) <= 0)
@@ -551,13 +623,8 @@ static int shadow_extraction_success_chance(struct char_data *ch, int corpse_lev
 int summon_stored_shadow(struct char_data *ch, int slot)
 {
   struct char_data *mob;
-  char *new_short = NULL;
   const char *resolved_name = NULL;
-  const char *template_short = NULL;
-  const char *proto_short = NULL;
   mob_vnum source_vnum;
-  mob_rnum source_rnum;
-  mob_rnum summon_rnum;
   char stored_name[MAX_SHADOW_NAME_LENGTH + 1];
   mob_vnum vnum;
   int level;
@@ -569,17 +636,11 @@ int summon_stored_shadow(struct char_data *ch, int slot)
     return FALSE;
 
   source_vnum = SHADOW_SLOT_VNUM(ch, slot);
-  source_rnum = real_mobile(source_vnum);
-  if (source_rnum != NOBODY && shadow_name_looks_valid(mob_proto[source_rnum].player.short_descr))
-    template_short = mob_proto[source_rnum].player.short_descr;
   strlcpy(stored_name, SHADOW_SLOT_NAME(ch, slot), sizeof(stored_name));
 
   vnum = SHADOW_SLOT_VNUM(ch, slot);
   if (real_mobile(vnum) == NOBODY)
     vnum = MOBVNUM_SHADOW_ELITE;
-  summon_rnum = real_mobile(vnum);
-  if (summon_rnum != NOBODY)
-    proto_short = mob_proto[summon_rnum].player.short_descr;
 
   level = MAX(1, SHADOW_SLOT_LEVEL(ch, slot));
   mob = summon_shadow_servant(ch, vnum, level, 15, SPELL_SHADOW_EXTRACTION);
@@ -590,22 +651,15 @@ int summon_stored_shadow(struct char_data *ch, int slot)
     resolved_name = stored_name;
   else if (shadow_name_looks_valid(mob->player.short_descr))
     resolved_name = mob->player.short_descr;
-  else if (shadow_name_looks_valid(template_short))
-    resolved_name = template_short;
   else if (shadow_name_looks_valid(mob->player.name))
     resolved_name = mob->player.name;
   else
     resolved_name = "a shadow";
 
   strlcpy(SHADOW_SLOT_NAME(ch, slot), resolved_name, MAX_SHADOW_NAME_LENGTH + 1);
-  if (shadow_name_looks_valid(SHADOW_SLOT_NAME(ch, slot))) {
-    new_short = strdup(SHADOW_SLOT_NAME(ch, slot));
-    if (new_short) {
-      if (mob->player.short_descr && mob->player.short_descr != proto_short)
-        free(mob->player.short_descr);
-      mob->player.short_descr = new_short;
-    }
-  }
+  apply_shadow_identity_to_mob(mob, SHADOW_SLOT_NAME(ch, slot));
+  restore_shadow_combat_profile(ch, slot, mob);
+  apply_shadow_servant_bonuses(ch, mob);
   SHADOW_SLOT_ACTIVE(ch, slot) = 1;
   mark_shadow_roster_slot(mob, slot);
   return TRUE;
@@ -2527,7 +2581,7 @@ ASPELL(spell_shadow_extraction)
   source_rnum = real_mobile(source_vnum);
   if (source_rnum != NOBODY && mob_proto[source_rnum].player.short_descr && *mob_proto[source_rnum].player.short_descr)
     source_short = mob_proto[source_rnum].player.short_descr;
-  shadow_level = MAX(1, MIN(level, corpse_level));
+  shadow_level = MAX(1, corpse_level);
   strlcpy(shadow_name,
           source_short ? source_short :
           (corpse->short_description ? corpse->short_description : "nameless shadow"),
@@ -2539,6 +2593,38 @@ ASPELL(spell_shadow_extraction)
   SHADOW_SLOT_LEVEL(ch, slot) = shadow_level;
   SHADOW_SLOT_VNUM(ch, slot) = source_vnum;
   strlcpy(SHADOW_SLOT_NAME(ch, slot), shadow_name, MAX_SHADOW_NAME_LENGTH + 1);
+  if (source_rnum != NOBODY) {
+    struct char_data *src = &mob_proto[source_rnum];
+    SHADOW_SLOT_PROFILE_VALID(ch, slot) = 1;
+    SHADOW_SLOT_MAX_HIT(ch, slot) = MAX(1, GET_MAX_HIT(src));
+    SHADOW_SLOT_AC(ch, slot) = GET_AC(src);
+    SHADOW_SLOT_HITROLL(ch, slot) = GET_HITROLL(src);
+    SHADOW_SLOT_DAMROLL(ch, slot) = GET_DAMROLL(src);
+    SHADOW_SLOT_MAX_MANA(ch, slot) = MAX(0, GET_MAX_MANA(src));
+    SHADOW_SLOT_DAMNODICE(ch, slot) = MAX(1, src->mob_specials.damnodice);
+    SHADOW_SLOT_DAMSIZEDICE(ch, slot) = MAX(1, src->mob_specials.damsizedice);
+    SHADOW_SLOT_STR(ch, slot) = src->real_abils.str;
+    SHADOW_SLOT_INT(ch, slot) = src->real_abils.intel;
+    SHADOW_SLOT_WIS(ch, slot) = src->real_abils.wis;
+    SHADOW_SLOT_DEX(ch, slot) = src->real_abils.dex;
+    SHADOW_SLOT_CON(ch, slot) = src->real_abils.con;
+    SHADOW_SLOT_CHA(ch, slot) = src->real_abils.cha;
+  } else {
+    SHADOW_SLOT_PROFILE_VALID(ch, slot) = 1;
+    SHADOW_SLOT_MAX_HIT(ch, slot) = MAX(1, shadow_level * 12);
+    SHADOW_SLOT_AC(ch, slot) = 100 - (shadow_level * 2);
+    SHADOW_SLOT_HITROLL(ch, slot) = shadow_level / 3;
+    SHADOW_SLOT_DAMROLL(ch, slot) = shadow_level / 4;
+    SHADOW_SLOT_MAX_MANA(ch, slot) = 0;
+    SHADOW_SLOT_DAMNODICE(ch, slot) = MAX(1, 1 + (shadow_level / 20));
+    SHADOW_SLOT_DAMSIZEDICE(ch, slot) = MAX(2, 4 + (shadow_level / 15));
+    SHADOW_SLOT_STR(ch, slot) = 12;
+    SHADOW_SLOT_INT(ch, slot) = 12;
+    SHADOW_SLOT_WIS(ch, slot) = 12;
+    SHADOW_SLOT_DEX(ch, slot) = 12;
+    SHADOW_SLOT_CON(ch, slot) = 12;
+    SHADOW_SLOT_CHA(ch, slot) = 12;
+  }
   extract_obj(corpse);
   save_char(ch);
   act("You wrench a shadow from the corpse and bind it to your dominion.", FALSE, ch, 0, 0, TO_CHAR);

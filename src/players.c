@@ -425,6 +425,20 @@ int load_char(const char *name, struct char_data *ch)
       SHADOW_SLOT_ACTIVE(ch, i) = 0;
       SHADOW_SLOT_LEVEL(ch, i) = 0;
       SHADOW_SLOT_VNUM(ch, i) = NOBODY;
+      SHADOW_SLOT_PROFILE_VALID(ch, i) = 0;
+      SHADOW_SLOT_MAX_HIT(ch, i) = 0;
+      SHADOW_SLOT_AC(ch, i) = 0;
+      SHADOW_SLOT_HITROLL(ch, i) = 0;
+      SHADOW_SLOT_DAMROLL(ch, i) = 0;
+      SHADOW_SLOT_MAX_MANA(ch, i) = 0;
+      SHADOW_SLOT_DAMNODICE(ch, i) = 0;
+      SHADOW_SLOT_DAMSIZEDICE(ch, i) = 0;
+      SHADOW_SLOT_STR(ch, i) = 0;
+      SHADOW_SLOT_INT(ch, i) = 0;
+      SHADOW_SLOT_WIS(ch, i) = 0;
+      SHADOW_SLOT_DEX(ch, i) = 0;
+      SHADOW_SLOT_CON(ch, i) = 0;
+      SHADOW_SLOT_CHA(ch, i) = 0;
       SHADOW_SLOT_NAME(ch, i)[0] = '\0';
     }
     ch->player_specials->saved.identified_item_count = 0;
@@ -669,6 +683,30 @@ int load_char(const char *name, struct char_data *ch)
               strlcpy(SHADOW_SLOT_NAME(ch, shadow_slot_idx), shadow_name, MAX_SHADOW_NAME_LENGTH + 1);
             else
               strlcpy(SHADOW_SLOT_NAME(ch, shadow_slot_idx), "nameless shadow", MAX_SHADOW_NAME_LENGTH + 1);
+          }
+        } else if (sscanf(tag, "ShCp%d", &shadow_slot_idx) == 1 &&
+                   shadow_slot_idx >= 0 && shadow_slot_idx < MAX_SHADOW_ROSTER) {
+          int valid = 0;
+          int max_hit = 0, armor = 0, hitroll = 0, damroll = 0, max_mana = 0;
+          int damnodice = 0, damsizedice = 0;
+          int str = 0, intel = 0, wis = 0, dex = 0, con = 0, cha = 0;
+          if (sscanf(line, "%d %d %d %d %d %d %d %d %d %d %d %d %d %d",
+                     &valid, &max_hit, &armor, &hitroll, &damroll, &max_mana,
+                     &damnodice, &damsizedice, &str, &intel, &wis, &dex, &con, &cha) == 14) {
+            SHADOW_SLOT_PROFILE_VALID(ch, shadow_slot_idx) = valid ? 1 : 0;
+            SHADOW_SLOT_MAX_HIT(ch, shadow_slot_idx) = MAX(1, max_hit);
+            SHADOW_SLOT_AC(ch, shadow_slot_idx) = armor;
+            SHADOW_SLOT_HITROLL(ch, shadow_slot_idx) = hitroll;
+            SHADOW_SLOT_DAMROLL(ch, shadow_slot_idx) = damroll;
+            SHADOW_SLOT_MAX_MANA(ch, shadow_slot_idx) = MAX(0, max_mana);
+            SHADOW_SLOT_DAMNODICE(ch, shadow_slot_idx) = MAX(1, damnodice);
+            SHADOW_SLOT_DAMSIZEDICE(ch, shadow_slot_idx) = MAX(1, damsizedice);
+            SHADOW_SLOT_STR(ch, shadow_slot_idx) = str;
+            SHADOW_SLOT_INT(ch, shadow_slot_idx) = intel;
+            SHADOW_SLOT_WIS(ch, shadow_slot_idx) = wis;
+            SHADOW_SLOT_DEX(ch, shadow_slot_idx) = dex;
+            SHADOW_SLOT_CON(ch, shadow_slot_idx) = con;
+            SHADOW_SLOT_CHA(ch, shadow_slot_idx) = cha;
           }
         }
 	else if (!strcmp(tag, "Skil"))	load_skills(fl, ch);
@@ -949,6 +987,22 @@ void save_char(struct char_data * ch)
                 SHADOW_SLOT_LEVEL(ch, i),
                 SHADOW_SLOT_VNUM(ch, i),
                 SHADOW_SLOT_NAME(ch, i)[0] ? SHADOW_SLOT_NAME(ch, i) : "nameless shadow");
+        fprintf(fl, "ShCp%d: %d %d %d %d %d %d %d %d %d %d %d %d %d %d\n",
+                i,
+                SHADOW_SLOT_PROFILE_VALID(ch, i),
+                SHADOW_SLOT_MAX_HIT(ch, i),
+                SHADOW_SLOT_AC(ch, i),
+                SHADOW_SLOT_HITROLL(ch, i),
+                SHADOW_SLOT_DAMROLL(ch, i),
+                SHADOW_SLOT_MAX_MANA(ch, i),
+                SHADOW_SLOT_DAMNODICE(ch, i),
+                SHADOW_SLOT_DAMSIZEDICE(ch, i),
+                SHADOW_SLOT_STR(ch, i),
+                SHADOW_SLOT_INT(ch, i),
+                SHADOW_SLOT_WIS(ch, i),
+                SHADOW_SLOT_DEX(ch, i),
+                SHADOW_SLOT_CON(ch, i),
+                SHADOW_SLOT_CHA(ch, i));
       }
     }
   }
