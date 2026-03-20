@@ -618,6 +618,7 @@ void mag_rooms(int level, struct char_data *ch, int spellnum);
 void mag_summons(int level, struct char_data *ch, struct obj_data *obj,
  int spellnum, int savetype);
 
+int shadow_return_active_to_storage(struct char_data *owner, int quiet_mode);
 void handle_followers_after_owner_teleport_or_recall(struct char_data *ch);
 
 void mag_points(int level, struct char_data *ch, struct char_data *victim,

@@ -616,6 +616,7 @@ ACMD(do_mteleport)
       next_ch = vict->next_in_room;
 
       if (valid_dg_target(vict, DG_ALLOW_GODS)) {
+        shadow_return_active_to_storage(vict, FALSE);
         char_from_room(vict);
         char_to_room(vict, target);
         enter_wtrigger(&world[IN_ROOM(vict)], vict, -1);
@@ -633,6 +634,7 @@ ACMD(do_mteleport)
     }
 
     if (valid_dg_target(vict, DG_ALLOW_GODS)) {
+      shadow_return_active_to_storage(vict, FALSE);
       char_from_room(vict);
       char_to_room(vict, target);
       enter_wtrigger(&world[IN_ROOM(vict)], vict, -1);

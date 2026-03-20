@@ -46,6 +46,64 @@ static int spell_dmg_extreme_manual(int level);
 static int spell_dmg_ultra_manual(int level);
 static struct char_data *summon_temp_follower(struct char_data *ch, mob_vnum vnum, int level, int rounds);
 
+static void remove_follower_link_silently(struct char_data *master, struct char_data *follower)
+{
+  struct follow_type *node, *prev = NULL;
+
+  if (!master || !follower)
+    return;
+
+  for (node = master->followers; node; prev = node, node = node->next) {
+    if (node->follower != follower)
+      continue;
+
+    if (prev)
+      prev->next = node->next;
+    else
+      master->followers = node->next;
+
+    free(node);
+    break;
+  }
+}
+
+static void shadow_prepare_for_storage_return(struct char_data *mob)
+{
+  struct char_data *fighter, *next_fighter;
+
+  if (!mob)
+    return;
+
+  GET_SUMMON_TIMER(mob) = 0;
+  HUNTING(mob) = NULL;
+
+  if (FIGHTING(mob))
+    stop_fighting(mob);
+
+  for (fighter = combat_list; fighter; fighter = next_fighter) {
+    next_fighter = fighter->next_fighting;
+    if (FIGHTING(fighter) == mob)
+      stop_fighting(fighter);
+  }
+
+  while (mob->followers) {
+    struct follow_type *next = mob->followers->next;
+
+    if (mob->followers->follower)
+      mob->followers->follower->master = NULL;
+
+    free(mob->followers);
+    mob->followers = next;
+  }
+
+  if (mob->master) {
+    remove_follower_link_silently(mob->master, mob);
+    mob->master = NULL;
+  }
+
+  REMOVE_BIT_AR(AFF_FLAGS(mob), AFF_CHARM);
+}
+
 static int warlock_power(struct char_data *ch)
 {
   return GET_INT(ch) + GET_WIS(ch);
@@ -344,6 +402,62 @@ void show_identify_item(struct char_data *ch, struct obj_data *obj, enum identif
   identify_send_border(ch, B, R);
 }
 
+int shadow_return_active_to_storage(struct char_data *owner, int quiet_mode)
+{
+  int slot;
+  int returned = 0;
+
+  if (!owner || IS_NPC(owner))
+    return 0;
+
+  for (slot = 0; slot < MAX_SHADOW_ROSTER; slot++) {
+    struct follow_type *f;
+    struct char_data *active_mob = NULL;
+
+    if (!SHADOW_SLOT_OCCUPIED(owner, slot)) {
+      SHADOW_SLOT_ACTIVE(owner, slot) = 0;
+      continue;
+    }
+
+    if (!SHADOW_SLOT_ACTIVE(owner, slot))
+      continue;
+
+    for (f = owner->followers; f; f = f->next) {
+      struct char_data *mob = f->follower;
+      struct affected_type *af;
+
+      if (!mob || mob->master != owner)
+        continue;
+
+      for (af = mob->affected; af; af = af->next) {
+        if (af->spell == SPELL_SHADOW_EXTRACTION &&
+            af->location == APPLY_NONE &&
+            af->modifier == slot + 2) {
+          active_mob = mob;
+          break;
+        }
+      }
+
+      if (active_mob)
+        break;
+    }
+
+    SHADOW_SLOT_ACTIVE(owner, slot) = 0;
+
+    if (!active_mob)
+      continue;
+
+    shadow_prepare_for_storage_return(active_mob);
+    extract_char(active_mob);
+    returned++;
+  }
+
+  if (!quiet_mode && returned > 0)
+    send_to_char(owner, "Your active shadows dissolve and return to your storage.\r\n");
+
+  return returned;
+}
+
 /* Handle followers when an owner teleports or recalls. */
 void handle_followers_after_owner_teleport_or_recall(struct char_data *ch)
 {
@@ -351,6 +465,8 @@ void handle_followers_after_owner_teleport_or_recall(struct char_data *ch)
 
   if (!ch)
     return;
+
+  shadow_return_active_to_storage(ch, FALSE);
 
   for (f = ch->followers; f; f = next) {
     struct char_data *follower = f->follower;
@@ -1729,6 +1845,7 @@ ASPELL(spell_word_of_recall_mass)
     char_to_room(tch, to_room);
     act("$n appears in the middle of the room.", TRUE, tch, 0, 0, TO_ROOM);
     look_at_room(tch, 0);
+    handle_followers_after_owner_teleport_or_recall(tch);
   }
 }
 
@@ -1770,6 +1887,7 @@ ASPELL(spell_ethereal_jaunt)
   char_from_room(ch);
   char_to_room(ch, to_room);
   look_at_room(ch, 0);
+  handle_followers_after_owner_teleport_or_recall(ch);
   set_spell_cooldown(ch, SPELL_ETHEREAL_JAUNT, 3);
 }
 
