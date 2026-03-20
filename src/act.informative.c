@@ -1760,19 +1760,19 @@ ACMD(do_score)
     "%s╠═══════════════════════════════════════════════════════════════════════════════╣%s\r\n", B, R);
 
   /* Name and Title */
-  snprintf(line, sizeof(line), "%sName:%s %-20s  %sTitle:%s %s",
-    C, R, GET_NAME(ch), C, R, GET_TITLE(ch));
+  snprintf(line, sizeof(line), "%sName:%s %-20s  %s%-6s%s %s",
+    C, R, GET_NAME(ch), C, "Title:", R, GET_TITLE(ch));
   len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
 
     /* Race and Class */
-  snprintf(line, sizeof(line), "%sRace:%s %-20s  %sClass:%s %-20s",
+  snprintf(line, sizeof(line), "%sRace:%s %-20s  %s%-6s%s %-20s",
     C, R, pc_race_types[GET_RACE(ch)],
-    C, R, score_class_name(ch));
+    C, "Class:", R, score_class_name(ch));
   len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
 
   /* Level and Age */
-  snprintf(line, sizeof(line), "%sLevel:%s %-18d  %sAge:%s %d year%s old",
-    C, R, GET_LEVEL(ch), C, R, GET_AGE(ch), (GET_AGE(ch) == 1 ? "" : "s"));
+  snprintf(line, sizeof(line), "%sLevel:%s %-20d  %s%-6s%s %d year%s old",
+    C, R, GET_LEVEL(ch), C, "Age:", R, GET_AGE(ch), (GET_AGE(ch) == 1 ? "" : "s"));
   len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
 
   /* Birthday message */
