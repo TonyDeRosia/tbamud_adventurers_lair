@@ -1889,7 +1889,7 @@ ACMD(do_shadow)
           active++;
       }
     }
-    send_to_char(ch, "@YShadow Inventory@n: %d / %d slots used. @GActive@n: %d.\r\n", used, cap, active);
+    send_to_char(ch, "@YShadow Storage@n: %d / %d slots used. @GActive@n: %d.\r\n", used, cap, active);
     if (!used) {
       send_to_char(ch, "You have no stored shadows.\r\n");
     } else {
@@ -1906,12 +1906,15 @@ ACMD(do_shadow)
     }
     send_to_char(ch, "Commands:\r\n");
     send_to_char(ch, "  shadow summon <slot|name>\r\n");
+    send_to_char(ch, "  shadow store <slot|name>\r\n");
     send_to_char(ch, "  shadow release <slot|name>\r\n");
     send_to_char(ch, "  shadow list\r\n");
     return;
   }
 
   if (is_abbrev(shadow_subcmd, "summon")) {
+    int mana_cost;
+
     if (!*selector) {
       send_to_char(ch, "Usage: shadow summon <slot|name>\r\n");
       return;
@@ -1922,7 +1925,7 @@ ACMD(do_shadow)
       return;
     }
     if (SHADOW_SLOT_ACTIVE(ch, slot)) {
-      send_to_char(ch, "%s is already summoned.\r\n", SHADOW_SLOT_NAME(ch, slot));
+      send_to_char(ch, "That shadow is already summoned.\r\n");
       return;
     }
     for (i = 0; i < cap; i++) {
@@ -1931,12 +1934,44 @@ ACMD(do_shadow)
         return;
       }
     }
+    mana_cost = 10 + (MAX(1, SHADOW_SLOT_LEVEL(ch, slot)) * 2);
+    if (GET_MANA(ch) < mana_cost) {
+      send_to_char(ch, "You lack the mana to summon this shadow.\r\n");
+      return;
+    }
+    GET_MANA(ch) -= mana_cost;
     if (!summon_stored_shadow(ch, slot)) {
+      GET_MANA(ch) += mana_cost;
       send_to_char(ch, "The shadow resists your call right now.\r\n");
       return;
     }
-    act("You call forth $t from your shadow inventory.", FALSE, ch, NULL, SHADOW_SLOT_NAME(ch, slot), TO_CHAR);
-    act("$n calls forth $t from $s shadow inventory.", FALSE, ch, NULL, SHADOW_SLOT_NAME(ch, slot), TO_ROOM);
+    act("You call forth $t from your shadow storage.", FALSE, ch, NULL, SHADOW_SLOT_NAME(ch, slot), TO_CHAR);
+    act("$n calls forth $t from $s shadow storage.", FALSE, ch, NULL, SHADOW_SLOT_NAME(ch, slot), TO_ROOM);
+    send_to_char(ch, "You expend %d mana.\r\n", mana_cost);
+    save_char(ch);
+    return;
+  }
+
+  if (is_abbrev(shadow_subcmd, "store")) {
+    if (!*selector) {
+      send_to_char(ch, "Usage: shadow store <slot|name>\r\n");
+      return;
+    }
+    slot = shadow_find_slot(ch, selector);
+    if (slot < 0 || slot >= cap || !SHADOW_SLOT_OCCUPIED(ch, slot)) {
+      send_to_char(ch, "No stored shadow matches '%s'.\r\n", selector);
+      return;
+    }
+    mob = shadow_active_mob(ch, slot);
+    if (!mob) {
+      send_to_char(ch, "That shadow is not currently summoned.\r\n");
+      SHADOW_SLOT_ACTIVE(ch, slot) = 0;
+      save_char(ch);
+      return;
+    }
+    SHADOW_SLOT_ACTIVE(ch, slot) = 0;
+    extract_char(mob);
+    send_to_char(ch, "You return %s to your shadow storage.\r\n", SHADOW_SLOT_NAME(ch, slot));
     save_char(ch);
     return;
   }
@@ -1965,7 +2000,7 @@ ACMD(do_shadow)
     return;
   }
 
-  send_to_char(ch, "Usage: shadow <list|summon|release>\r\n");
+  send_to_char(ch, "Usage: shadow <list|summon|store|release>\r\n");
 }
 
 ACMD(do_opet)

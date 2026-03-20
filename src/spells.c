@@ -2444,7 +2444,7 @@ ASPELL(spell_shadow_extraction)
     }
   }
   if (slot < 0) {
-    send_to_char(ch, "Your shadow inventory is full. Release a shadow before claiming another.\r\n");
+    send_to_char(ch, "Your shadow storage is full. Release a shadow before claiming another.\r\n");
     return;
   }
 

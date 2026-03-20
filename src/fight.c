@@ -87,6 +87,8 @@ static int find_affect_modifier_for_flag(struct char_data *ch, int aff_flag, int
 static int remove_affects_by_flag(struct char_data *ch, int aff_flag);
 static int is_shadow_servant_for(struct char_data *owner, struct char_data *mob);
 static int count_shadow_servants_for(struct char_data *ch);
+static int extracted_shadow_slot(struct char_data *mob);
+static int return_extracted_shadow_to_storage(struct char_data *mob);
 static void change_alignment(struct char_data *ch, struct char_data *victim);
 static void group_gain(struct char_data *ch, struct char_data *victim);
 static void solo_gain(struct char_data *ch, struct char_data *victim);
@@ -166,6 +168,50 @@ static int count_shadow_servants_for(struct char_data *ch)
     if (is_shadow_servant_for(ch, f->follower))
       n++;
   return n;
+}
+
+static int extracted_shadow_slot(struct char_data *mob)
+{
+  struct affected_type *af;
+
+  if (!mob)
+    return -1;
+
+  for (af = mob->affected; af; af = af->next) {
+    if (af->spell == SPELL_SHADOW_EXTRACTION && af->location == APPLY_NONE && af->modifier > 1)
+      return af->modifier - 2;
+  }
+
+  return -1;
+}
+
+static int return_extracted_shadow_to_storage(struct char_data *mob)
+{
+  struct char_data *owner;
+  int slot;
+
+  if (!mob || !IS_NPC(mob))
+    return FALSE;
+
+  owner = mob->master;
+  slot = extracted_shadow_slot(mob);
+  if (!owner || IS_NPC(owner) || slot < 0 || slot >= MAX_SHADOW_ROSTER)
+    return FALSE;
+  if (!SHADOW_SLOT_OCCUPIED(owner, slot))
+    return FALSE;
+
+  SHADOW_SLOT_ACTIVE(owner, slot) = 0;
+
+  if (IN_ROOM(mob) != NOWHERE)
+    act("$n dissolves into darkness.", FALSE, mob, 0, 0, TO_ROOM);
+  send_to_char(owner, "Your shadow %s is defeated and returns to your shadow storage.\r\n", SHADOW_SLOT_NAME(owner, slot));
+
+  if (FIGHTING(mob))
+    stop_fighting(mob);
+
+  extract_char(mob);
+  save_char(owner);
+  return TRUE;
 }
 
 static const char *severity_verb_third(int tier)
@@ -742,6 +788,9 @@ struct char_data *i;
 
 void die(struct char_data * ch, struct char_data * killer)
 {
+  if (return_extracted_shadow_to_storage(ch))
+    return;
+
   if (killer && killer != ch && !IS_NPC(ch) && !IS_NPC(killer) && GET_LEVEL(killer) < LVL_IMMORT && GET_BOUNTY(ch) > 0) {
     long long reward = GET_BOUNTY(ch);
     char reward_buf[64];
