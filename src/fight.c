@@ -185,17 +185,40 @@ static int extracted_shadow_slot(struct char_data *mob)
   return -1;
 }
 
+static int shadow_name_looks_valid(const char *name)
+{
+  const char *p;
+  int visible = 0;
+
+  if (!name)
+    return FALSE;
+
+  while (*name && isspace((unsigned char)*name))
+    name++;
+  if (!*name)
+    return FALSE;
+  if (!str_cmp(name, "<NULL>"))
+    return FALSE;
+
+  for (p = name; *p; p++) {
+    if (!iscntrl((unsigned char)*p) && !isspace((unsigned char)*p))
+      visible++;
+  }
+
+  return visible > 0;
+}
+
 static const char *shadow_display_name_for_owner(struct char_data *owner, int slot, struct char_data *mob)
 {
   if (owner && slot >= 0 && slot < MAX_SHADOW_ROSTER &&
       SHADOW_SLOT_OCCUPIED(owner, slot) &&
-      SHADOW_SLOT_NAME(owner, slot)[0])
+      shadow_name_looks_valid(SHADOW_SLOT_NAME(owner, slot)))
     return SHADOW_SLOT_NAME(owner, slot);
 
-  if (mob && mob->player.short_descr && *mob->player.short_descr)
+  if (mob && shadow_name_looks_valid(mob->player.short_descr))
     return mob->player.short_descr;
 
-  if (mob && mob->player.name && *mob->player.name)
+  if (mob && shadow_name_looks_valid(mob->player.name))
     return mob->player.name;
 
   return "a shadow";

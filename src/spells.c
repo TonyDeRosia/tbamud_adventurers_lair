@@ -416,6 +416,31 @@ static int active_temp_summons(struct char_data *ch)
   return count;
 }
 
+static int shadow_name_looks_valid(const char *name)
+{
+  const char *p;
+  int visible = 0;
+
+  if (!name)
+    return FALSE;
+
+  while (*name && isspace((unsigned char)*name))
+    name++;
+  if (!*name)
+    return FALSE;
+  if (!str_cmp(name, "<NULL>"))
+    return FALSE;
+  if (!strncasecmp(name, "the ", 4) && strlen(name) <= 6)
+    return FALSE;
+
+  for (p = name; *p; p++) {
+    if (!iscntrl((unsigned char)*p) && !isspace((unsigned char)*p))
+      visible++;
+  }
+
+  return visible > 0;
+}
+
 static int is_shadow_servant(struct char_data *mob, struct char_data *owner)
 {
   if (!mob || !IS_NPC(mob) || !AFF_FLAGGED(mob, AFF_CHARM) || GET_SUMMON_TIMER(mob) <= 0)
@@ -526,6 +551,11 @@ static int shadow_extraction_success_chance(struct char_data *ch, int corpse_lev
 int summon_stored_shadow(struct char_data *ch, int slot)
 {
   struct char_data *mob;
+  const char *resolved_name = NULL;
+  const char *template_short = NULL;
+  mob_vnum source_vnum;
+  mob_rnum source_rnum;
+  char stored_name[MAX_SHADOW_NAME_LENGTH + 1];
   mob_vnum vnum;
   int level;
   if (!ch || IS_NPC(ch) || slot < 0 || slot >= MAX_SHADOW_ROSTER)
@@ -534,6 +564,12 @@ int summon_stored_shadow(struct char_data *ch, int slot)
     return FALSE;
   if (find_active_shadow_for_slot(ch, slot))
     return FALSE;
+
+  source_vnum = SHADOW_SLOT_VNUM(ch, slot);
+  source_rnum = real_mobile(source_vnum);
+  if (source_rnum != NOBODY && shadow_name_looks_valid(mob_proto[source_rnum].player.short_descr))
+    template_short = mob_proto[source_rnum].player.short_descr;
+  strlcpy(stored_name, SHADOW_SLOT_NAME(ch, slot), sizeof(stored_name));
 
   vnum = SHADOW_SLOT_VNUM(ch, slot);
   if (real_mobile(vnum) == NOBODY)
@@ -544,7 +580,19 @@ int summon_stored_shadow(struct char_data *ch, int slot)
   if (!mob)
     return FALSE;
 
-  if (SHADOW_SLOT_NAME(ch, slot)[0]) {
+  if (shadow_name_looks_valid(stored_name))
+    resolved_name = stored_name;
+  else if (shadow_name_looks_valid(mob->player.short_descr))
+    resolved_name = mob->player.short_descr;
+  else if (shadow_name_looks_valid(template_short))
+    resolved_name = template_short;
+  else if (shadow_name_looks_valid(mob->player.name))
+    resolved_name = mob->player.name;
+  else
+    resolved_name = "a shadow";
+
+  strlcpy(SHADOW_SLOT_NAME(ch, slot), resolved_name, MAX_SHADOW_NAME_LENGTH + 1);
+  if (shadow_name_looks_valid(SHADOW_SLOT_NAME(ch, slot))) {
     free(mob->player.short_descr);
     mob->player.short_descr = strdup(SHADOW_SLOT_NAME(ch, slot));
   }
