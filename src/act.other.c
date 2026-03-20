@@ -45,6 +45,7 @@
 #define SPELL_TERM_WIDTH 78
 #define SPELL_LEFT_MIN_WIDTH 24
 #define SPELL_LEFT_MAX_WIDTH 40
+#define SPELL_LEFT_COL_WIDTH 34
 
 struct abil_row {
   int id;
@@ -402,36 +403,39 @@ void show_ability_table_aligned(struct char_data *ch, int show_spells, int show_
 
   if (show_spells) {
     int idx = 0;
+    int global_max_entry_len = 0;
+
+    for (i = 0; i < n; i++) {
+      char entry[256];
+      int entry_len;
+
+      if (rows[i].pct < 0)
+        snprintf(entry, sizeof(entry), "%s [ -- ]", rows[i].name);
+      else
+        snprintf(entry, sizeof(entry), "%s [%3d%%]", rows[i].name, rows[i].pct);
+
+      entry_len = (int)strlen(entry);
+      if (entry_len > global_max_entry_len)
+        global_max_entry_len = entry_len;
+    }
 
     while (idx < n) {
       int level = rows[idx].lvl;
       int level_start = idx;
       int level_count = 0;
-      int max_entry_len = 0;
       int left_width;
       int target_left_width;
       int first_row_for_level = 1;
 
       while ((level_start + level_count) < n && rows[level_start + level_count].lvl == level) {
-        char entry[256];
-        int entry_len;
-        const struct abil_row *row = &rows[level_start + level_count];
-
-        if (row->pct < 0)
-          snprintf(entry, sizeof(entry), "%s [ -- ]", row->name);
-        else
-          snprintf(entry, sizeof(entry), "%s [%3d%%]", row->name, row->pct);
-
-        entry_len = (int)strlen(entry);
-        if (entry_len > max_entry_len)
-          max_entry_len = entry_len;
         level_count++;
       }
 
       left_width = SPELL_TERM_WIDTH - LEVEL_LABEL_PADDING - SPELL_ROW_GAP;
       if (left_width < SPELL_LEFT_MIN_WIDTH)
         left_width = SPELL_LEFT_MIN_WIDTH;
-      target_left_width = MAX(SPELL_LEFT_MIN_WIDTH, max_entry_len);
+      target_left_width = MAX(SPELL_LEFT_MIN_WIDTH, SPELL_LEFT_COL_WIDTH);
+      target_left_width = MAX(target_left_width, global_max_entry_len);
       target_left_width = MIN(target_left_width, left_width);
       target_left_width = MIN(target_left_width, SPELL_LEFT_MAX_WIDTH);
 
@@ -2132,8 +2136,8 @@ ACMD(do_shadow)
       return;
     }
     strlcpy(display_name, shadow_slot_display_name(ch, slot), sizeof(display_name));
-    act("You call forth $t from your shadow storage.", FALSE, ch, NULL, display_name, TO_CHAR);
-    act("$n calls forth $t from $s shadow storage.", FALSE, ch, NULL, display_name, TO_ROOM);
+    act("You call forth $T from your shadow storage.", FALSE, ch, NULL, display_name, TO_CHAR);
+    act("$n calls forth $T from $s shadow storage.", FALSE, ch, NULL, display_name, TO_ROOM);
     send_to_char(ch, "You expend %d mana.\r\n", mana_cost);
     save_char(ch);
     return;
