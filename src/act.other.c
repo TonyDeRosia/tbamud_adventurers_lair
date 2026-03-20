@@ -2052,6 +2052,7 @@ ACMD(do_shadow)
   }
 
   if (is_abbrev(shadow_subcmd, "summon")) {
+    char deny_reason[MAX_INPUT_LENGTH];
     int mana_cost;
 
     if (!*selector) {
@@ -2067,11 +2068,9 @@ ACMD(do_shadow)
       send_to_char(ch, "That shadow is already summoned.\r\n");
       return;
     }
-    for (i = 0; i < cap; i++) {
-      if (i != slot && SHADOW_SLOT_ACTIVE(ch, i)) {
-        send_to_char(ch, "You can only maintain one active stored shadow at a time. Release it first.\r\n");
-        return;
-      }
+    if (!shadow_can_summon_more(ch, deny_reason, sizeof(deny_reason))) {
+      send_to_char(ch, "%s\r\n", *deny_reason ? deny_reason : "You cannot maintain any more active shadows right now.");
+      return;
     }
     mana_cost = 10 + (MAX(1, SHADOW_SLOT_LEVEL(ch, slot)) * 2);
     if (GET_MANA(ch) < mana_cost) {

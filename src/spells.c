@@ -667,6 +667,57 @@ static struct char_data *find_active_shadow_for_slot(struct char_data *ch, int s
   return NULL;
 }
 
+int shadow_active_count(struct char_data *ch)
+{
+  int slot;
+  int active = 0;
+
+  if (!ch || IS_NPC(ch))
+    return 0;
+
+  for (slot = 0; slot < MAX_SHADOW_ROSTER; slot++) {
+    if (!SHADOW_SLOT_OCCUPIED(ch, slot)) {
+      SHADOW_SLOT_ACTIVE(ch, slot) = 0;
+      continue;
+    }
+
+    if (find_active_shadow_for_slot(ch, slot)) {
+      SHADOW_SLOT_ACTIVE(ch, slot) = 1;
+      active++;
+    } else {
+      SHADOW_SLOT_ACTIVE(ch, slot) = 0;
+    }
+  }
+
+  return active;
+}
+
+int shadow_max_active_count(struct char_data *ch)
+{
+  (void)ch;
+  return 2;
+}
+
+bool shadow_can_summon_more(struct char_data *ch, char *reason, size_t reason_sz)
+{
+  int max_active;
+
+  if (reason && reason_sz > 0)
+    reason[0] = '\0';
+
+  if (!ch || IS_NPC(ch))
+    return FALSE;
+
+  max_active = shadow_max_active_count(ch);
+  if (shadow_active_count(ch) >= max_active) {
+    if (reason && reason_sz > 0)
+      strlcpy(reason, "You cannot maintain any more active shadows right now.", reason_sz);
+    return FALSE;
+  }
+
+  return TRUE;
+}
+
 static void mark_shadow_servant(struct char_data *mob, int source_spell, int duration)
 {
   struct affected_type af;
