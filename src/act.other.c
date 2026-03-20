@@ -139,6 +139,65 @@ static int ability_matches_damage_filter(const char *filter, const char *nm)
   return FALSE;
 }
 
+static int shadow_capacity(struct char_data *ch)
+{
+  int cap;
+  if (!ch)
+    return 0;
+  cap = 2 + (GET_INT(ch) / 8) + (GET_WIS(ch) / 8);
+  return MIN(MAX_SHADOW_ROSTER, MAX(2, cap));
+}
+
+static int shadow_find_slot(struct char_data *ch, const char *selector)
+{
+  int slot, i;
+  if (!ch || !selector || !*selector)
+    return -1;
+  if (isdigit((unsigned char)*selector)) {
+    slot = atoi(selector) - 1;
+    if (slot >= 0 && slot < MAX_SHADOW_ROSTER)
+      return slot;
+  }
+  for (i = 0; i < MAX_SHADOW_ROSTER; i++) {
+    if (SHADOW_SLOT_OCCUPIED(ch, i) && isname(selector, SHADOW_SLOT_NAME(ch, i)))
+      return i;
+  }
+  return -1;
+}
+
+static struct char_data *shadow_active_mob(struct char_data *ch, int slot)
+{
+  struct follow_type *f;
+  struct affected_type *af;
+  if (!ch || slot < 0)
+    return NULL;
+  for (f = ch->followers; f; f = f->next) {
+    struct char_data *mob = f->follower;
+    if (!mob || mob->master != ch)
+      continue;
+    for (af = mob->affected; af; af = af->next) {
+      if (af->spell == SPELL_SHADOW_EXTRACTION && af->location == APPLY_NONE && af->modifier == slot + 2)
+        return mob;
+    }
+  }
+  return NULL;
+}
+
+static void shadow_sync_active_flags(struct char_data *ch)
+{
+  int i;
+  if (!ch)
+    return;
+  for (i = 0; i < MAX_SHADOW_ROSTER; i++) {
+    if (!SHADOW_SLOT_OCCUPIED(ch, i)) {
+      SHADOW_SLOT_ACTIVE(ch, i) = 0;
+      continue;
+    }
+    if (SHADOW_SLOT_ACTIVE(ch, i) && !shadow_active_mob(ch, i))
+      SHADOW_SLOT_ACTIVE(ch, i) = 0;
+  }
+}
+
 static int ability_matches_filter(struct char_data *ch, int ability, const char *filter, int show_spells)
 {
   const struct spell_info_type *si = &spell_info[ability];
@@ -1809,6 +1868,103 @@ ACMD(do_heel)
   act("You whistle sharply and $N heels to your side.", FALSE, ch, 0, pet, TO_CHAR);
   act("$N hustles back to $n and takes position at $s side.", FALSE, ch, 0, pet, TO_ROOM);
   act("$n hustles in and heels beside $N.", FALSE, pet, 0, ch, TO_ROOM);
+}
+
+ACMD(do_shadow)
+{
+  char shadow_subcmd[MAX_INPUT_LENGTH], selector[MAX_INPUT_LENGTH];
+  int i, slot, used = 0, active = 0, cap;
+  struct char_data *mob;
+
+  half_chop(argument, shadow_subcmd, selector);
+  cap = shadow_capacity(ch);
+  shadow_sync_active_flags(ch);
+
+  if (!*shadow_subcmd || is_abbrev(shadow_subcmd, "list")) {
+    for (i = 0; i < cap; i++) {
+      if (SHADOW_SLOT_OCCUPIED(ch, i)) {
+        used++;
+        if (SHADOW_SLOT_ACTIVE(ch, i))
+          active++;
+      }
+    }
+    send_to_char(ch, "&zShadow Inventory&0: %d / %d slots used. Active: %d.\r\n", used, cap, active);
+    if (!used) {
+      send_to_char(ch, "You have no stored shadows.\r\n");
+    } else {
+      for (i = 0; i < cap; i++) {
+        if (!SHADOW_SLOT_OCCUPIED(ch, i))
+          send_to_char(ch, " [%2d] (empty)\r\n", i + 1);
+        else
+          send_to_char(ch, " [%2d] %-20s Lvl %-3d %s\r\n",
+                       i + 1,
+                       SHADOW_SLOT_NAME(ch, i),
+                       SHADOW_SLOT_LEVEL(ch, i),
+                       SHADOW_SLOT_ACTIVE(ch, i) ? "(summoned)" : "(stored)");
+      }
+    }
+    send_to_char(ch, "Commands:\r\n");
+    send_to_char(ch, "  shadow summon <slot|name>\r\n");
+    send_to_char(ch, "  shadow release <slot|name>\r\n");
+    send_to_char(ch, "  shadow list\r\n");
+    return;
+  }
+
+  if (is_abbrev(shadow_subcmd, "summon")) {
+    if (!*selector) {
+      send_to_char(ch, "Usage: shadow summon <slot|name>\r\n");
+      return;
+    }
+    slot = shadow_find_slot(ch, selector);
+    if (slot < 0 || slot >= cap || !SHADOW_SLOT_OCCUPIED(ch, slot)) {
+      send_to_char(ch, "No stored shadow matches '%s'.\r\n", selector);
+      return;
+    }
+    if (SHADOW_SLOT_ACTIVE(ch, slot)) {
+      send_to_char(ch, "%s is already summoned.\r\n", SHADOW_SLOT_NAME(ch, slot));
+      return;
+    }
+    for (i = 0; i < cap; i++) {
+      if (i != slot && SHADOW_SLOT_ACTIVE(ch, i)) {
+        send_to_char(ch, "You can only maintain one active stored shadow at a time. Release it first.\r\n");
+        return;
+      }
+    }
+    if (!summon_stored_shadow(ch, slot)) {
+      send_to_char(ch, "The shadow resists your call right now.\r\n");
+      return;
+    }
+    act("You call forth $t from your shadow inventory.", FALSE, ch, NULL, SHADOW_SLOT_NAME(ch, slot), TO_CHAR);
+    act("$n calls forth $t from $s shadow inventory.", FALSE, ch, NULL, SHADOW_SLOT_NAME(ch, slot), TO_ROOM);
+    save_char(ch);
+    return;
+  }
+
+  if (is_abbrev(shadow_subcmd, "release")) {
+    if (!*selector) {
+      send_to_char(ch, "Usage: shadow release <slot|name>\r\n");
+      return;
+    }
+    slot = shadow_find_slot(ch, selector);
+    if (slot < 0 || slot >= cap || !SHADOW_SLOT_OCCUPIED(ch, slot)) {
+      send_to_char(ch, "No stored shadow matches '%s'.\r\n", selector);
+      return;
+    }
+    mob = shadow_active_mob(ch, slot);
+    if (mob)
+      extract_char(mob);
+    act("You release $t back into the void.", FALSE, ch, NULL, SHADOW_SLOT_NAME(ch, slot), TO_CHAR);
+    act("$n releases $t back into the void.", FALSE, ch, NULL, SHADOW_SLOT_NAME(ch, slot), TO_ROOM);
+    SHADOW_SLOT_OCCUPIED(ch, slot) = 0;
+    SHADOW_SLOT_ACTIVE(ch, slot) = 0;
+    SHADOW_SLOT_LEVEL(ch, slot) = 0;
+    SHADOW_SLOT_VNUM(ch, slot) = NOBODY;
+    SHADOW_SLOT_NAME(ch, slot)[0] = '\0';
+    save_char(ch);
+    return;
+  }
+
+  send_to_char(ch, "Usage: shadow <list|summon|release>\r\n");
 }
 
 ACMD(do_opet)

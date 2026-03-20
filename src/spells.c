@@ -366,6 +366,33 @@ static int is_shadow_servant(struct char_data *mob, struct char_data *owner)
       || affected_by_spell(mob, SPELL_ARISE_GREATER);
 }
 
+static int shadow_servant_slot(struct char_data *mob)
+{
+  struct affected_type *af;
+  if (!mob)
+    return -1;
+  for (af = mob->affected; af; af = af->next) {
+    if (af->spell == SPELL_SHADOW_EXTRACTION && af->location == APPLY_NONE && af->modifier > 1)
+      return af->modifier - 2;
+  }
+  return -1;
+}
+
+static struct char_data *find_active_shadow_for_slot(struct char_data *ch, int slot)
+{
+  struct follow_type *f;
+  if (!ch || slot < 0)
+    return NULL;
+  for (f = ch->followers; f; f = f->next) {
+    struct char_data *mob = f->follower;
+    if (!mob || mob->master != ch)
+      continue;
+    if (is_shadow_servant(mob, ch) && shadow_servant_slot(mob) == slot)
+      return mob;
+  }
+  return NULL;
+}
+
 static void mark_shadow_servant(struct char_data *mob, int source_spell, int duration)
 {
   struct affected_type af;
@@ -376,6 +403,19 @@ static void mark_shadow_servant(struct char_data *mob, int source_spell, int dur
   af.duration = MAX(1, duration);
   af.location = APPLY_NONE;
   af.modifier = 1;
+  affect_join(mob, &af, FALSE, FALSE, FALSE, FALSE);
+}
+
+static void mark_shadow_roster_slot(struct char_data *mob, int slot)
+{
+  struct affected_type af;
+  if (!mob || slot < 0)
+    return;
+  new_affect(&af);
+  af.spell = SPELL_SHADOW_EXTRACTION;
+  af.duration = MAX(2, GET_SUMMON_TIMER(mob));
+  af.location = APPLY_NONE;
+  af.modifier = slot + 2;
   affect_join(mob, &af, FALSE, FALSE, FALSE, FALSE);
 }
 
@@ -401,6 +441,36 @@ static struct char_data *summon_shadow_servant(struct char_data *ch, mob_vnum vn
   if (mob)
     mark_shadow_servant(mob, source_spell, rounds);
   return mob;
+}
+
+int summon_stored_shadow(struct char_data *ch, int slot)
+{
+  struct char_data *mob;
+  mob_vnum vnum;
+  int level;
+  if (!ch || IS_NPC(ch) || slot < 0 || slot >= MAX_SHADOW_ROSTER)
+    return FALSE;
+  if (!SHADOW_SLOT_OCCUPIED(ch, slot))
+    return FALSE;
+  if (find_active_shadow_for_slot(ch, slot))
+    return FALSE;
+
+  vnum = SHADOW_SLOT_VNUM(ch, slot);
+  if (real_mobile(vnum) == NOBODY)
+    vnum = MOBVNUM_SHADOW_ELITE;
+
+  level = MAX(1, SHADOW_SLOT_LEVEL(ch, slot));
+  mob = summon_shadow_servant(ch, vnum, level, 15, SPELL_SHADOW_EXTRACTION);
+  if (!mob)
+    return FALSE;
+
+  if (SHADOW_SLOT_NAME(ch, slot)[0]) {
+    free(mob->player.short_descr);
+    mob->player.short_descr = strdup(SHADOW_SLOT_NAME(ch, slot));
+  }
+  SHADOW_SLOT_ACTIVE(ch, slot) = 1;
+  mark_shadow_roster_slot(mob, slot);
+  return TRUE;
 }
 
 static struct char_data *summon_temp_follower(struct char_data *ch, mob_vnum vnum, int level, int rounds)
@@ -2257,22 +2327,48 @@ ASPELL(spell_execution_mark) { if (!ch || !victim) return; if (!mag_savingthrow(
 ASPELL(spell_shadow_extraction)
 {
   struct obj_data *corpse = obj;
-  struct follow_type *f;
+  int slot = -1;
+  int i;
+  int capacity;
+  char shadow_name[MAX_NAME_LENGTH + 1];
+  mob_vnum source_vnum;
+  int shadow_level;
   if (!ch) return;
   if (!corpse || !IS_CORPSE(corpse)) {
     send_to_char(ch, "You must target a fresh corpse in the room.\r\n");
     return;
   }
-  for (f = ch->followers; f; f = f->next) {
-    if (is_shadow_servant(f->follower, ch) && affected_by_spell(f->follower, SPELL_SHADOW_EXTRACTION)) {
-      send_to_char(ch, "You already control an extracted elite shadow.\r\n");
-      return;
+  if (GET_OBJ_TIMER(corpse) <= 0) {
+    send_to_char(ch, "That corpse has no shadow left to claim.\r\n");
+    return;
+  }
+  capacity = 2 + (GET_INT(ch) / 8) + (GET_WIS(ch) / 8);
+  capacity = MIN(MAX_SHADOW_ROSTER, MAX(2, capacity));
+  for (i = 0; i < capacity; i++) {
+    if (!SHADOW_SLOT_OCCUPIED(ch, i)) {
+      slot = i;
+      break;
     }
   }
-  summon_shadow_servant(ch, MOBVNUM_SHADOW_ELITE, MAX(1, level), 10, SPELL_SHADOW_EXTRACTION);
+  if (slot < 0) {
+    send_to_char(ch, "Your shadow inventory is full. Release a shadow before claiming another.\r\n");
+    return;
+  }
+
+  source_vnum = GET_OBJ_VAL(corpse, 1);
+  shadow_level = MAX(1, MIN(level, GET_OBJ_VAL(corpse, 2) > 0 ? GET_OBJ_VAL(corpse, 2) : level));
+  strlcpy(shadow_name, corpse->short_description ? corpse->short_description : "nameless shadow", sizeof(shadow_name));
+  if (!strncasecmp(shadow_name, "the corpse of ", 14))
+    memmove(shadow_name, shadow_name + 14, strlen(shadow_name + 14) + 1);
+  SHADOW_SLOT_OCCUPIED(ch, slot) = 1;
+  SHADOW_SLOT_ACTIVE(ch, slot) = 0;
+  SHADOW_SLOT_LEVEL(ch, slot) = shadow_level;
+  SHADOW_SLOT_VNUM(ch, slot) = source_vnum;
+  strlcpy(SHADOW_SLOT_NAME(ch, slot), shadow_name, MAX_NAME_LENGTH + 1);
   extract_obj(corpse);
-  act("You drag a shadow from the fallen and force it to rise!", FALSE, ch, 0, 0, TO_CHAR);
-  act("$n drags a shadow from the fallen and forces it to rise!", FALSE, ch, 0, 0, TO_ROOM);
+  save_char(ch);
+  act("You wrench a shadow from the corpse and bind it to your dominion.", FALSE, ch, 0, 0, TO_CHAR);
+  act("$n wrenches a shadow from the corpse and binds it to $s dominion.", FALSE, ch, 0, 0, TO_ROOM);
 }
 
 ASPELL(spell_arise_greater)

@@ -692,6 +692,7 @@ void clanedit_parse(struct descriptor_data *d, char *arg);
 #define MAX_HELP_ENTRY        MAX_STRING_LENGTH /**< Max size of help entry */
 #define MAX_COMPLETED_QUESTS  1024   /**< Maximum number of completed quests allowed */
 #define MAX_CAMPAIGN_TARGETS  12
+#define MAX_SHADOW_ROSTER     12
 
 /* Currency configuration. Primary currency is gold with premium diamonds. */
 #define GOLD_PER_DIAMOND    1000LL
@@ -1099,6 +1100,13 @@ struct player_special_data_saved
   int archetype_scores[6]; /**< Reactive identity archetype scores (combat/rogue/arcane/divine/nature/dark). */
   int class_locked; /**< Reactive identity lock set after final level checkpoint. */
   char soft_class_title[32]; /**< Soft/final identity title overlay (Adventurer until progression). */
+  struct shadow_roster_entry {
+    mob_vnum source_vnum; /**< Captured source mob vnum when known, NOBODY otherwise. */
+    int level; /**< Stored level/power tier used for summoning. */
+    int occupied; /**< Slot contains a stored shadow. */
+    int active; /**< Slot currently has an active summoned instance. */
+    char name[MAX_NAME_LENGTH + 1]; /**< Stored display name. */
+  } shadow_roster[MAX_SHADOW_ROSTER];
 };
 
 /** Specials needed only by PCs, not NPCs.  Space for this structure is
