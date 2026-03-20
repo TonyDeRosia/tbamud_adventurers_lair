@@ -4961,7 +4961,7 @@ ACMD(do_scan)
 ACMD(do_saffects)
 {
   const struct affected_type *af;
-  const struct affected_type *seen[MAX_AFFECT];
+  int seen_spells[MAX_AFFECT];
   int seen_count = 0;
   int skills = 0, spells = 0, any = 0;
 
@@ -4978,19 +4978,30 @@ ACMD(do_saffects)
   send_to_char(ch, "\r\nYou are affected by the following:\r\n");
   for (af = ch->affected; af; af = af->next) {
     const struct affected_type *scan;
+    int max_duration = af->duration;
     const char *name = "Unknown";
     const char *kind = "Spell";
     char dur[32];
     int is_skill = 0;
+    int already_seen = FALSE;
+    int i;
 
     dur[0] = '\0';
-    if (aff_seen_contains(seen, seen_count, af))
+    for (i = 0; i < seen_count; i++) {
+      if (seen_spells[i] == af->spell) {
+        already_seen = TRUE;
+        break;
+      }
+    }
+    if (already_seen)
       continue;
 
     for (scan = ch->affected; scan; scan = scan->next) {
-      if ((scan->spell == af->spell) && (scan->duration == af->duration))
-        aff_seen_add(seen, &seen_count, scan);
+      if (scan->spell == af->spell)
+        max_duration = MAX(max_duration, scan->duration);
     }
+    if (seen_count < MAX_AFFECT)
+      seen_spells[seen_count++] = af->spell;
     any = 1;
 
     if (af->spell > 0 && af->spell <= TOP_SPELL_DEFINE && spell_info[af->spell].name)
@@ -5007,7 +5018,7 @@ ACMD(do_saffects)
     if (is_skill) skills++;
     else spells++;
 
-    format_affect_duration(af->duration, dur, sizeof(dur));
+    format_affect_duration(max_duration, dur, sizeof(dur));
     send_to_char(ch, "%-7s : %s (%s)\r\n", kind, name, dur);
   }
 
