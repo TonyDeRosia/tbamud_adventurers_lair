@@ -658,7 +658,10 @@ void point_update(void)
   for (i = character_list; i; i = next_char) {
     next_char = i->next;
 
-    gain_condition(i, HUNGER, -1);
+    if (!IS_NPC(i) && i->char_specials.food_sated_ticks > 0)
+      i->char_specials.food_sated_ticks--;
+    else
+      gain_condition(i, HUNGER, -1);
     gain_condition(i, DRUNK, -1);
     gain_condition(i, THIRST, -1);
     update_starvation_trackers(i);

@@ -1040,6 +1040,7 @@ struct char_special_data
   int timer;        /**< Timer for update */
   int starving_ticks;   /**< Consecutive ticks at starving hunger threshold. */
   int dehydrated_ticks; /**< Consecutive ticks at dehydrated thirst threshold. */
+  int food_sated_ticks; /**< Ticks of food-based satiety remaining. */
 
   struct char_special_data_saved saved; /**< Constants saved for PCs. */
 };

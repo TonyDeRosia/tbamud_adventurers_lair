@@ -205,11 +205,11 @@ static void perform_obj_type_list(struct char_data * ch, char *arg)
           case ITEM_FOOD:
             v2 = (obj_proto[num].obj_flags.value[3]);
             if (v2 != 0)
-              tmp_len = snprintf(buf+len, sizeof(buf)-len,"%s%3d%s) %s[%s%8d%s]%s (%dhrs) %s%s %sPoisoned!%s\r\n",
-                   QGRN, ++found, QNRM, QCYN, QYEL, ov, QCYN, QNRM, v1, QCYN, obj_proto[r_num].short_description, QBGRN, QNRM);
+              tmp_len = snprintf(buf+len, sizeof(buf)-len,"%s%3d%s) %s[%s%8d%s]%s (H:%d T:%d S:%d) %s%s %sPoisoned!%s\r\n",
+                   QGRN, ++found, QNRM, QCYN, QYEL, ov, QCYN, QNRM, v1, obj_proto[num].obj_flags.value[1], obj_proto[num].obj_flags.value[2], QCYN, obj_proto[r_num].short_description, QBGRN, QNRM);
             else
-              tmp_len = snprintf(buf+len, sizeof(buf)-len,"%s%3d%s) %s[%s%8d%s]%s (%dhrs) %s%s%s\r\n",
-                   QGRN, ++found, QNRM, QCYN, QYEL, ov, QCYN, QNRM, v1, QCYN, obj_proto[r_num].short_description, QNRM);
+              tmp_len = snprintf(buf+len, sizeof(buf)-len,"%s%3d%s) %s[%s%8d%s]%s (H:%d T:%d S:%d) %s%s%s\r\n",
+                   QGRN, ++found, QNRM, QCYN, QYEL, ov, QCYN, QNRM, v1, obj_proto[num].obj_flags.value[1], obj_proto[num].obj_flags.value[2], QCYN, obj_proto[r_num].short_description, QNRM);
             break;
 
           case ITEM_MONEY:

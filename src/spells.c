@@ -402,8 +402,15 @@ void show_identify_item(struct char_data *ch, struct obj_data *obj, enum identif
     }
     break;
   case ITEM_FOOD:
-    send_to_char(ch, "%s|%s %sFood Properties:%s Fills hunger %s%d%s  %sPoisoned:%s %s%s%s\r\n",
-                 B, R, L, R, V, GET_OBJ_VAL(obj, 0), R, L, R, V, GET_OBJ_VAL(obj, 3) ? "Yes" : "No", R);
+    send_to_char(ch, "%s|%s %s[Food Properties]%s\r\n", B, R, L, R);
+    send_to_char(ch, "%s|%s %-22.22s %sHunger restore:%s %s%d%s\r\n",
+                 B, R, "", L, R, V, GET_OBJ_VAL(obj, 0), R);
+    send_to_char(ch, "%s|%s %-22.22s %sThirst restore:%s %s%d%s\r\n",
+                 B, R, "", L, R, V, GET_OBJ_VAL(obj, 1), R);
+    send_to_char(ch, "%s|%s %-22.22s %sSated duration:%s %s%d%s\r\n",
+                 B, R, "", L, R, V, GET_OBJ_VAL(obj, 2), R);
+    send_to_char(ch, "%s|%s %-22.22s %sPoisoned:%s %s%s%s\r\n",
+                 B, R, "", L, R, V, GET_OBJ_VAL(obj, 3) ? "Yes" : "No", R);
     break;
   case ITEM_MONEY:
     send_to_char(ch, "%s|%s %sMoney Properties:%s Amount %s%d%s\r\n",
