@@ -144,6 +144,7 @@ cpp_extern const struct command_info cmd_info[] = {
   { "bid"      , "bid"     , POS_SLEEPING, do_bid      , 0, 0 },
   { "buildwalk", "buildwalk", POS_STANDING, do_gen_tog , LVL_BUILDER, SCMD_BUILDWALK },
   { "adopt"    , "ad"      , POS_STANDING, do_not_here , 0, 0 },
+  { "appraise" , "app"     , POS_STANDING, do_appraise , 0, 0 },
   { "buy"      , "bu"      , POS_STANDING, do_not_here , 0, 0 },
   { "bug"      , "bug"     , POS_DEAD    , do_ibt      , 0, SCMD_BUG },
 
