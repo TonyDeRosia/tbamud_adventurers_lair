@@ -1810,8 +1810,10 @@ ACMD(do_score)
   /* Experience and TNL */
   {
     int next_need = 0;
+    int alignment_col = 0;
     char exp_part[128];
     char tnl_part[80];
+    char resource_prefix[256];
     int spacer;
 
     if (GET_LEVEL(ch) < LVL_IMMORT) {
@@ -1819,9 +1821,16 @@ ACMD(do_score)
       next_need = level_exp(GET_CLASS(ch), next_level) - GET_EXP(ch);
     }
 
+    snprintf(resource_prefix, sizeof(resource_prefix),
+      "%sHP:%s %d/%d  %sMana:%s %d/%d  %sMove:%s %d/%d  ",
+      C, R, GET_HIT(ch), GET_MAX_HIT(ch),
+      C, R, GET_MANA(ch), effective_max_mana(ch),
+      C, R, GET_MOVE(ch), effective_max_move(ch));
+    alignment_col = (int)visible_strlen_mud(resource_prefix);
+
     snprintf(exp_part, sizeof(exp_part), "%sExp:%s %d", C, R, GET_EXP(ch));
     snprintf(tnl_part, sizeof(tnl_part), "%sTNL:%s %d", C, R, next_need);
-    spacer = (int)W - (int)visible_strlen_mud(exp_part) - (int)visible_strlen_mud(tnl_part);
+    spacer = alignment_col - (int)visible_strlen_mud(exp_part);
     if (spacer < 2)
       spacer = 2;
     snprintf(line, sizeof(line), "%s%*s%s", exp_part, spacer, "", tnl_part);
