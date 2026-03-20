@@ -237,9 +237,9 @@ static void apply_condition_tick_penalties(struct char_data *ch)
   if (move_drain > 0)
     GET_MOVE(ch) = MAX(0, GET_MOVE(ch) - move_drain);
 
-  if (prolonged_starving)
+  if (starving)
     hp_drain += rand_number(STARVING_HP_DRAIN_MIN, STARVING_HP_DRAIN_MAX);
-  if (prolonged_dehydrated)
+  if (dehydrated)
     hp_drain += rand_number(DEHYDRATED_HP_DRAIN_MIN, DEHYDRATED_HP_DRAIN_MAX);
   if (prolonged_starving)
     mana_drain += rand_number(STARVING_MANA_DRAIN_MIN, STARVING_MANA_DRAIN_MAX);
