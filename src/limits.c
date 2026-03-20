@@ -30,6 +30,30 @@ static struct affected_type *find_affect(struct char_data *ch, int spellnum);
 static int best_regen_multiplier(struct char_data *ch);
 static int object_regen_multiplier(struct obj_data *obj);
 static int find_affect_modifier_for_flag(struct char_data *ch, int aff_flag, int fallback);
+static int condition_stage_value(int cond_value);
+static int condition_regen_percent(int cond_value);
+static int combined_condition_regen_percent(struct char_data *ch);
+static void update_starvation_trackers(struct char_data *ch);
+static void apply_condition_tick_penalties(struct char_data *ch);
+
+enum condition_penalty_stage {
+  COND_STAGE_NORMAL = 1,
+  COND_STAGE_HUNGRY = 2,
+  COND_STAGE_STARVING = 3,
+  COND_STAGE_PROLONGED = 4
+};
+
+#define HUNGRY_THRESHOLD 4
+#define STARVING_THRESHOLD 0
+#define PROLONGED_TICK_THRESHOLD 6
+#define STARVING_MOVE_DRAIN_MIN 1
+#define STARVING_MOVE_DRAIN_MAX 2
+#define DEHYDRATED_MOVE_DRAIN_MIN 1
+#define DEHYDRATED_MOVE_DRAIN_MAX 3
+#define STARVING_HP_DRAIN_MIN 1
+#define STARVING_HP_DRAIN_MAX 2
+#define DEHYDRATED_HP_DRAIN_MIN 1
+#define DEHYDRATED_HP_DRAIN_MAX 3
 
 
 /* When age < 15 return the value p0
@@ -121,6 +145,104 @@ static int find_affect_modifier_for_flag(struct char_data *ch, int aff_flag, int
   return fallback;
 }
 
+static int condition_stage_value(int cond_value)
+{
+  if (cond_value <= STARVING_THRESHOLD)
+    return COND_STAGE_STARVING;
+  if (cond_value <= HUNGRY_THRESHOLD)
+    return COND_STAGE_HUNGRY;
+  return COND_STAGE_NORMAL;
+}
+
+static int condition_regen_percent(int cond_value)
+{
+  int stage = condition_stage_value(cond_value);
+
+  if (stage == COND_STAGE_HUNGRY)
+    return 50;
+  if (stage >= COND_STAGE_STARVING)
+    return 0;
+  return 100;
+}
+
+static int combined_condition_regen_percent(struct char_data *ch)
+{
+  int hunger_percent = condition_regen_percent(GET_COND(ch, HUNGER));
+  int thirst_percent = condition_regen_percent(GET_COND(ch, THIRST));
+
+  return MIN(hunger_percent, thirst_percent);
+}
+
+static void update_starvation_trackers(struct char_data *ch)
+{
+  if (!ch || IS_NPC(ch))
+    return;
+
+  if (GET_COND(ch, HUNGER) <= STARVING_THRESHOLD)
+    ch->char_specials.starving_ticks++;
+  else
+    ch->char_specials.starving_ticks = 0;
+
+  if (GET_COND(ch, THIRST) <= STARVING_THRESHOLD)
+    ch->char_specials.dehydrated_ticks++;
+  else
+    ch->char_specials.dehydrated_ticks = 0;
+}
+
+static void apply_condition_tick_penalties(struct char_data *ch)
+{
+  int move_drain = 0;
+  int hp_drain = 0;
+  bool starving = FALSE;
+  bool dehydrated = FALSE;
+  bool prolonged_starving = FALSE;
+  bool prolonged_dehydrated = FALSE;
+
+  if (!ch || IS_NPC(ch) || GET_LEVEL(ch) >= LVL_IMMORT)
+    return;
+
+  starving = (condition_stage_value(GET_COND(ch, HUNGER)) >= COND_STAGE_STARVING);
+  dehydrated = (condition_stage_value(GET_COND(ch, THIRST)) >= COND_STAGE_STARVING);
+  prolonged_starving = starving && (ch->char_specials.starving_ticks >= PROLONGED_TICK_THRESHOLD);
+  prolonged_dehydrated = dehydrated && (ch->char_specials.dehydrated_ticks >= PROLONGED_TICK_THRESHOLD);
+
+  if (starving)
+    move_drain += rand_number(STARVING_MOVE_DRAIN_MIN, STARVING_MOVE_DRAIN_MAX);
+  if (dehydrated)
+    move_drain += rand_number(DEHYDRATED_MOVE_DRAIN_MIN, DEHYDRATED_MOVE_DRAIN_MAX);
+
+  if (move_drain > 0)
+    GET_MOVE(ch) = MAX(0, GET_MOVE(ch) - move_drain);
+
+  if (prolonged_starving)
+    hp_drain += rand_number(STARVING_HP_DRAIN_MIN, STARVING_HP_DRAIN_MAX);
+  if (prolonged_dehydrated)
+    hp_drain += rand_number(DEHYDRATED_HP_DRAIN_MIN, DEHYDRATED_HP_DRAIN_MAX);
+
+  if (hp_drain > 0)
+    GET_HIT(ch) = MAX(1, GET_HIT(ch) - hp_drain);
+
+  if ((starving || dehydrated) && !(prolonged_starving || prolonged_dehydrated)) {
+    if (((starving ? ch->char_specials.starving_ticks : ch->char_specials.dehydrated_ticks) % 8) == 1) {
+      if (starving && dehydrated)
+        send_to_char(ch, "Hunger and thirst leave you drained.\r\n");
+      else if (starving)
+        send_to_char(ch, "Hunger weakens your body.\r\n");
+      else
+        send_to_char(ch, "Thirst leaves you drained.\r\n");
+    }
+  } else if (prolonged_starving || prolonged_dehydrated) {
+    if (((prolonged_starving ? ch->char_specials.starving_ticks : ch->char_specials.dehydrated_ticks) % 6) == 0) {
+      if (prolonged_starving && prolonged_dehydrated)
+        send_to_char(ch, "Starvation and dehydration wrack your body.\r\n");
+      else if (prolonged_starving)
+        send_to_char(ch, "Starvation gnaws at your flesh.\r\n");
+      else
+        send_to_char(ch, "Dehydration wracks your body.\r\n");
+    }
+  }
+}
+
 /* The hit_limit, mana_limit, and move_limit functions are gone.  They added an
  * unnecessary level of complexity to the internal structure, weren't
  * particularly useful, and led to some annoying bugs.  From the players' point
@@ -158,8 +280,7 @@ int mana_gain(struct char_data *ch)
     if (IS_MAGIC_USER(ch) || IS_CLERIC(ch))
       gain *= 2;
 
-    if ((GET_COND(ch, HUNGER) == 0) || (GET_COND(ch, THIRST) == 0))
-      gain /= 4;
+    gain = (gain * combined_condition_regen_percent(ch)) / 100;
   }
 
   if (AFF_FLAGGED(ch, AFF_POISON))
@@ -204,8 +325,7 @@ int hit_gain(struct char_data *ch)
     if (IS_MAGIC_USER(ch) || IS_CLERIC(ch))
       gain /= 2;	/* Ouch. */
 
-    if ((GET_COND(ch, HUNGER) == 0) || (GET_COND(ch, THIRST) == 0))
-      gain /= 4;
+    gain = (gain * combined_condition_regen_percent(ch)) / 100;
   }
 
   if (AFF_FLAGGED(ch, AFF_POISON))
@@ -242,8 +362,7 @@ int move_gain(struct char_data *ch)
       break;
     }
 
-    if ((GET_COND(ch, HUNGER) == 0) || (GET_COND(ch, THIRST) == 0))
-      gain /= 4;
+    gain = (gain * combined_condition_regen_percent(ch)) / 100;
   }
 
   if (AFF_FLAGGED(ch, AFF_POISON))
@@ -504,6 +623,7 @@ void point_update(void)
     gain_condition(i, HUNGER, -1);
     gain_condition(i, DRUNK, -1);
     gain_condition(i, THIRST, -1);
+    update_starvation_trackers(i);
 
     if (GET_POS(i) >= POS_STUNNED) {
       struct affected_type *corruption = NULL;
@@ -511,6 +631,7 @@ void point_update(void)
       GET_HIT(i) = MIN(GET_HIT(i) + hit_gain(i), GET_MAX_HIT(i));
       GET_MANA(i) = MIN(GET_MANA(i) + mana_gain(i), effective_max_mana(i));
       GET_MOVE(i) = MIN(GET_MOVE(i) + move_gain(i), effective_max_move(i));
+      apply_condition_tick_penalties(i);
       if (AFF_FLAGGED(i, AFF_POISON))
         if (damage(i, i, 2, SPELL_POISON) == -1)
           continue;     /* Oops, they died. -gg 6/24/98 */
