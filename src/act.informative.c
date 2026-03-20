@@ -1882,7 +1882,7 @@ ACMD(do_score)
     len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
 
     snprintf(line, sizeof(line),
-      "%s            %s  Int %d (%+d)  Wis %d (%+d)  Cha %d (%+d)",
+      "%s           %s  Int %d (%+d)  Wis %d (%+d)  Cha %d (%+d)",
       C, R,
       b_int, m_int,
       b_wis, m_wis,
