@@ -33,6 +33,8 @@ static int find_affect_modifier_for_flag(struct char_data *ch, int aff_flag, int
 static int condition_stage_value(int cond_value);
 static int condition_regen_percent(int cond_value);
 static int combined_condition_regen_percent(struct char_data *ch);
+static bool is_starving(struct char_data *ch);
+static bool is_dehydrated(struct char_data *ch);
 static void update_starvation_trackers(struct char_data *ch);
 static void apply_condition_tick_penalties(struct char_data *ch);
 
@@ -48,14 +50,16 @@ enum condition_penalty_stage {
 #define PROLONGED_TICK_THRESHOLD 6
 #define STARVING_MOVE_DRAIN_MIN 1
 #define STARVING_MOVE_DRAIN_MAX 2
-#define DEHYDRATED_MOVE_DRAIN_MIN 1
+#define DEHYDRATED_MOVE_DRAIN_MIN 2
 #define DEHYDRATED_MOVE_DRAIN_MAX 3
-#define STARVING_HP_DRAIN_MIN 1
-#define STARVING_HP_DRAIN_MAX 2
-#define DEHYDRATED_HP_DRAIN_MIN 1
-#define DEHYDRATED_HP_DRAIN_MAX 3
-#define STARVING_MANA_DRAIN 1
-#define DEHYDRATED_MANA_DRAIN 1
+#define STARVING_HP_DRAIN_MIN 2
+#define STARVING_HP_DRAIN_MAX 4
+#define DEHYDRATED_HP_DRAIN_MIN 2
+#define DEHYDRATED_HP_DRAIN_MAX 4
+#define STARVING_MANA_DRAIN_MIN 0
+#define STARVING_MANA_DRAIN_MAX 1
+#define DEHYDRATED_MANA_DRAIN_MIN 1
+#define DEHYDRATED_MANA_DRAIN_MAX 2
 
 
 /* When age < 15 return the value p0
@@ -175,6 +179,22 @@ static int combined_condition_regen_percent(struct char_data *ch)
   return MIN(hunger_percent, thirst_percent);
 }
 
+static bool is_starving(struct char_data *ch)
+{
+  if (!ch)
+    return FALSE;
+
+  return (condition_stage_value(GET_COND(ch, HUNGER)) >= COND_STAGE_STARVING);
+}
+
+static bool is_dehydrated(struct char_data *ch)
+{
+  if (!ch)
+    return FALSE;
+
+  return (condition_stage_value(GET_COND(ch, THIRST)) >= COND_STAGE_STARVING);
+}
+
 static void update_starvation_trackers(struct char_data *ch)
 {
   if (!ch || IS_NPC(ch))
@@ -204,8 +224,8 @@ static void apply_condition_tick_penalties(struct char_data *ch)
   if (!ch || IS_NPC(ch) || GET_LEVEL(ch) >= LVL_IMMORT)
     return;
 
-  starving = (condition_stage_value(GET_COND(ch, HUNGER)) >= COND_STAGE_STARVING);
-  dehydrated = (condition_stage_value(GET_COND(ch, THIRST)) >= COND_STAGE_STARVING);
+  starving = is_starving(ch);
+  dehydrated = is_dehydrated(ch);
   prolonged_starving = starving && (ch->char_specials.starving_ticks >= PROLONGED_TICK_THRESHOLD);
   prolonged_dehydrated = dehydrated && (ch->char_specials.dehydrated_ticks >= PROLONGED_TICK_THRESHOLD);
 
@@ -222,9 +242,9 @@ static void apply_condition_tick_penalties(struct char_data *ch)
   if (prolonged_dehydrated)
     hp_drain += rand_number(DEHYDRATED_HP_DRAIN_MIN, DEHYDRATED_HP_DRAIN_MAX);
   if (prolonged_starving)
-    mana_drain += STARVING_MANA_DRAIN;
+    mana_drain += rand_number(STARVING_MANA_DRAIN_MIN, STARVING_MANA_DRAIN_MAX);
   if (prolonged_dehydrated)
-    mana_drain += DEHYDRATED_MANA_DRAIN;
+    mana_drain += rand_number(DEHYDRATED_MANA_DRAIN_MIN, DEHYDRATED_MANA_DRAIN_MAX);
 
   if (hp_drain > 0)
     GET_HIT(ch) = MAX(1, GET_HIT(ch) - hp_drain);
@@ -292,6 +312,9 @@ int mana_gain(struct char_data *ch)
     gain = (gain * combined_condition_regen_percent(ch)) / 100;
   }
 
+  if (!IS_NPC(ch) && (is_starving(ch) || is_dehydrated(ch)))
+    return 0;
+
   if (AFF_FLAGGED(ch, AFF_POISON))
     gain /= 4;
 
@@ -337,6 +360,9 @@ int hit_gain(struct char_data *ch)
     gain = (gain * combined_condition_regen_percent(ch)) / 100;
   }
 
+  if (!IS_NPC(ch) && (is_starving(ch) || is_dehydrated(ch)))
+    return 0;
+
   if (AFF_FLAGGED(ch, AFF_POISON))
     gain /= 4;
 
@@ -373,6 +399,9 @@ int move_gain(struct char_data *ch)
 
     gain = (gain * combined_condition_regen_percent(ch)) / 100;
   }
+
+  if (!IS_NPC(ch) && (is_starving(ch) || is_dehydrated(ch)))
+    return 0;
 
   if (AFF_FLAGGED(ch, AFF_POISON))
     gain /= 4;
