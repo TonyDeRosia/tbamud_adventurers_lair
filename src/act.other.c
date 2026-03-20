@@ -192,7 +192,8 @@ static void show_ability_table_aligned(struct char_data *ch, int show_spells, in
   int cls = GET_CLASS(ch);
   int col = 0;
   int last_lvl = -1;
-  int col_width = show_spells ? 34 : ABIL_COL_WIDTH;
+  int col_width = show_spells ? 36 : ABIL_COL_WIDTH;
+  int name_width = show_spells ? 24 : 17;
 
   /* "Level 99: " is 10 chars; padding below matches practice output. */
 
@@ -267,9 +268,11 @@ static void show_ability_table_aligned(struct char_data *ch, int show_spells, in
     }
 
     if (rows[i].pct < 0)
-      snprintf(cell, sizeof(cell), "%s [ -- ]", rows[i].name);
+      snprintf(cell, sizeof(cell), "%-*.*s [ -- ]",
+               name_width, name_width, rows[i].name);
     else
-      snprintf(cell, sizeof(cell), "%s [%3d%%]", rows[i].name, rows[i].pct);
+      snprintf(cell, sizeof(cell), "%-*.*s [%3d%%]",
+               name_width, name_width, rows[i].name, rows[i].pct);
     send_to_char(ch, "%-*s", col_width + count_color_chars(cell), cell);
 
     col++;
@@ -1072,6 +1075,48 @@ static int study_is_on_cooldown(struct char_data *ch, time_t now)
   return (cooldown_until > now);
 }
 
+static int study_success_chance(struct char_data *ch, int source_level, int source_complexity)
+{
+  int study_pct;
+  int level_delta;
+  int chance;
+
+  if (!ch)
+    return 0;
+
+  study_pct = GET_SKILL(ch, SKILL_STUDY);
+  if (study_pct < 0)
+    study_pct = 0;
+  if (study_pct > 100)
+    study_pct = 100;
+
+  if (source_level < 1)
+    source_level = 1;
+  if (source_complexity < 1)
+    source_complexity = 1;
+
+  level_delta = GET_LEVEL(ch) - source_level;
+
+  /* Keep low Study mastery difficult while still allowing easy sources. */
+  chance = 5 + (study_pct * 3) / 4;
+  chance += URANGE(-20, level_delta * 4, 20);
+  if (source_level <= 5)
+    chance += 10;
+  else if (source_level <= 10)
+    chance += 5;
+
+  /* Simpler sources (single-technique study) are slightly easier. */
+  chance += (source_complexity == 1) ? 5 : 0;
+
+  return URANGE(3, chance, 95);
+}
+
+static int study_attempt_succeeds(struct char_data *ch, int source_level, int source_complexity)
+{
+  int chance = study_success_chance(ch, source_level, source_complexity);
+  return (rand_number(1, 100) <= chance);
+}
+
 static void study_apply_cooldown(struct char_data *ch, time_t now, int cooldown_secs)
 {
   GET_STUDY_COOLDOWN_UNTIL(ch) = now + cooldown_secs;
@@ -1090,6 +1135,8 @@ ACMD(do_study)
   enum study_item_result item_result;
   const int study_cooldown_secs = 2;
   time_t now = time(NULL);
+  int source_level = 1;
+  int source_complexity = 1;
 
   skip_spaces(&argument);
 
@@ -1115,6 +1162,14 @@ ACMD(do_study)
   if (study_is_valid_ability_id(ability_id)) {
     if (!study_can_learn_ability(ch, ability_id, reason, sizeof(reason))) {
       send_to_char(ch, "%s\r\n", *reason ? reason : "You cannot study that right now.");
+      study_apply_cooldown(ch, now, study_cooldown_secs);
+      return;
+    }
+    source_level = classtrack_get_study_min_level(ability_id);
+    if (source_level < 1)
+      source_level = 1;
+    if (!study_attempt_succeeds(ch, source_level, 1)) {
+      send_to_char(ch, "You misread the pattern and learn nothing.\r\n");
       study_apply_cooldown(ch, now, study_cooldown_secs);
       return;
     }
@@ -1183,6 +1238,31 @@ ACMD(do_study)
         item_result != STUDY_ITEM_NO_VALID_SLOTS &&
         item_result != STUDY_ITEM_TARGET_NOT_PRESENT)
       study_apply_cooldown(ch, now, study_cooldown_secs);
+    return;
+  }
+
+  source_level = GET_OBJ_LEVEL(study_obj);
+  source_complexity = 0;
+  if (GET_OBJ_TYPE(study_obj) == ITEM_SCROLL ||
+      GET_OBJ_TYPE(study_obj) == ITEM_WAND ||
+      GET_OBJ_TYPE(study_obj) == ITEM_STAFF) {
+    int i;
+    for (i = 1; i <= 3; i++) {
+      int sid = GET_OBJ_VAL(study_obj, i);
+      if (study_is_valid_ability_id(sid))
+        source_complexity++;
+    }
+  }
+  if (!study_attempt_succeeds(ch, source_level, source_complexity)) {
+    send_to_char(ch, "You fail to properly grasp the knowledge within it.\r\n");
+    study_debug_imm(ch,
+                    "item-study final=attempt-failed item='%s' vnum=%d item_level=%d player_level=%d stored_spell=%s learned=none",
+                    study_obj->short_description,
+                    GET_OBJ_VNUM(study_obj),
+                    GET_OBJ_LEVEL(study_obj),
+                    GET_LEVEL(ch),
+                    spell_info[ability_id].name);
+    study_apply_cooldown(ch, now, study_cooldown_secs);
     return;
   }
 
