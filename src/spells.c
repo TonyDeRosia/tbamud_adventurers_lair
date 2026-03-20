@@ -590,7 +590,7 @@ static void apply_shadow_identity_to_mob(struct char_data *mob, const char *iden
 
   replace_mobile_string_safe(mob, &mob->player.short_descr, safe_name, proto_short);
 
-  snprintf(long_buf, sizeof(long_buf), "%s stands here.", safe_name);
+  snprintf(long_buf, sizeof(long_buf), "%s stands here.\r\n", safe_name);
   long_buf[0] = UPPER(long_buf[0]);
   replace_mobile_string_safe(mob, &mob->player.long_descr, long_buf, proto_long);
 }
