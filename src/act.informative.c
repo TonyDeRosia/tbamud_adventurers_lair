@@ -1785,13 +1785,14 @@ ACMD(do_score)
   len += snprintf(buf + len, sizeof(buf) - len,
     "%s╠═══════════════════════════════════════════════════════════════════════════════╣%s\r\n", B, R);
 
-/* HP, Mana, Move, Exp */
+/* HP, Mana, Move, Exp, Alignment */
 snprintf(line, sizeof(line),
-  "%sHP:%s %d/%d  %sMana:%s %d/%d  %sMove:%s %d/%d     %sExp:%s %d",
+  "%sHP:%s %d/%d  %sMana:%s %d/%d  %sMove:%s %d/%d  %sExp:%s %d  %sAlignment:%s %d",
   C, R, GET_HIT(ch), GET_MAX_HIT(ch),
   C, R, GET_MANA(ch), effective_max_mana(ch),
   C, R, GET_MOVE(ch), effective_max_move(ch),
-  C, R, GET_EXP(ch));
+  C, R, GET_EXP(ch),
+  C, R, GET_ALIGNMENT(ch));
 len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
 
 /* Blank spacer line */
@@ -1823,26 +1824,24 @@ len = append_box_line(buf, len, sizeof(buf), B, R, "", W);
   len += snprintf(buf + len, sizeof(buf) - len,
     "%s╠═══════════════════════════════════════════════════════════════════════════════╣%s\r\n", B, R);
 
-  /* Armor, Spell Saves, and Alignment */
+  /* Defensive line */
   {
-    int shown_ac = compute_armor_class(ch) / 10;  /* player-facing AC */
+    int shown_armor = compute_armor_class(ch);
+    int shown_evasion = compute_evasion(ch);
     int spell_save = GET_SAVE(ch, 4);
-    int alignment = GET_ALIGNMENT(ch);
 
     snprintf(line, sizeof(line),
-      "%sArmor Class:%s %-8d   %sSpell Saves:%s %-5d   %sAlignment:%s %-6d",
-      C, R, shown_ac,
-      C, R, spell_save,
-      C, R, alignment);
+      "%sArmor:%s %-8d   %sEvasion:%s %-5d   %sSpell Saves:%s %-6d",
+      C, R, shown_armor,
+      C, R, shown_evasion,
+      C, R, spell_save);
   }
   len = append_box_line(buf, len, sizeof(buf), B, R, line, W);/* Combat Stats */
   len = append_box_line(buf, len, sizeof(buf), B, R, "", W);
   {
     int base_thaco = thaco(GET_CLASS(ch), GET_LEVEL(ch));
     int str_to_hit = str_app[STRENGTH_APPLY_INDEX(ch)].tohit;
-/* To Hit (vs AC 0): your hit target number versus Armor Class 0.
-       Lower is better. In combat, the target's Armor Class shifts this number. */
-    int to_hit_ac0 = base_thaco - str_to_hit - GET_HITROLL(ch);
+    int to_hit_score = 100 - ((base_thaco - str_to_hit - GET_HITROLL(ch)) * 4);
     int b_str = ch->real_abils.str;
     int b_dex = ch->real_abils.dex;
     int b_con = ch->real_abils.con;
@@ -1875,9 +1874,9 @@ len = append_box_line(buf, len, sizeof(buf), B, R, "", W);
     len = append_box_line(buf, len, sizeof(buf), B, R, "", W);
 
     snprintf(line, sizeof(line),
-      "%sOffense:%s  Hitroll %+d  Damroll %+d  To Hit (vs AC 0) %d (lower is better)",
+      "%sOffense:%s  Hitroll %+d  Damroll %+d  Hit Score %d (higher is better)",
       C, R,
-      GET_HITROLL(ch), GET_DAMROLL(ch), to_hit_ac0);
+      GET_HITROLL(ch), GET_DAMROLL(ch), to_hit_score);
     len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
   }
   len = append_box_line(buf, len, sizeof(buf), B, R, "", W);
@@ -2353,6 +2352,8 @@ static int is_aff_debuff(const struct affected_type *af)
 
   switch (af->location) {
     case APPLY_AC:
+    case APPLY_EVASION:
+      return (af->modifier < 0);
     case APPLY_SAVING_BREATH:
     case APPLY_SAVING_SPELL:
     case APPLY_SAVING_PARA:
@@ -2421,12 +2422,8 @@ static int aff_flags_has_meaningful_bits(const char *flags)
 
 static const char *aff_apply_verb(int location, int modifier)
 {
-  if (location == APPLY_AC) {
-    if (modifier < 0)
-      return "improves";
-    return "worsens";
-  }
-
+  if (location == APPLY_AC || location == APPLY_EVASION)
+    return (modifier >= 0) ? "improves" : "reduces";
   return (modifier >= 0) ? "increases" : "reduces";
 }
 
@@ -2530,10 +2527,15 @@ static void build_grouped_aff_summary(const struct affected_type *list,
     if (!mod_used[i] || mod_totals[i] == 0)
       continue;
 
-    snprintf(piece, sizeof(piece), "%s %s by %d",
-      aff_apply_verb(i, mod_totals[i]),
-      aff_apply_name(i),
-      abs(mod_totals[i]));
+    if (i == APPLY_AC)
+      snprintf(piece, sizeof(piece), "%s Armor by %d", aff_apply_verb(i, mod_totals[i]), abs(mod_totals[i]));
+    else if (i == APPLY_EVASION)
+      snprintf(piece, sizeof(piece), "%s Evasion by %d", aff_apply_verb(i, mod_totals[i]), abs(mod_totals[i]));
+    else
+      snprintf(piece, sizeof(piece), "%s %s by %d",
+        aff_apply_verb(i, mod_totals[i]),
+        aff_apply_name(i),
+        abs(mod_totals[i]));
 
     if (*mods)
       out_append(mods, sizeof(mods), ", ");

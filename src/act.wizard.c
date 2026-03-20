@@ -706,7 +706,7 @@ static void do_stat_object(struct char_data *ch, struct obj_data *j)
 	    GET_OBJ_VAL(j, 1), GET_OBJ_VAL(j, 2), ((GET_OBJ_VAL(j, 2) + 1) / 2.0) * GET_OBJ_VAL(j, 1),  attack_hit_text[GET_OBJ_VAL(j, 3)].singular);
     break;
   case ITEM_ARMOR:
-    send_to_char(ch, "AC-apply: [%d]\r\n", GET_OBJ_VAL(j, 0));
+    send_to_char(ch, "Armor: [%d]\r\n", GET_OBJ_VAL(j, 0));
     break;
   case ITEM_CONTAINER:
     sprintbit(GET_OBJ_VAL(j, 1), container_bits, buf, sizeof(buf));
@@ -911,8 +911,8 @@ static void do_stat_character(struct char_data *ch, struct char_data *k)
                       CCCYN(ch, C_NRM), CCYEL(ch, C_NRM), GET_SCREEN_WIDTH(k), CCNRM(ch, C_NRM),
                       CCYEL(ch, C_NRM), GET_PAGE_LENGTH(k), CCCYN(ch, C_NRM), CCNRM(ch, C_NRM));
 
-  send_to_char(ch, "AC: [%d%+d/10], Hitroll: [%2d], Damroll: [%2d], Saving throws: [%d/%d/%d/%d/%d]\r\n",
-	  GET_AC(k), dex_app[GET_DEX(k)].defensive, k->points.hitroll,
+  send_to_char(ch, "Armor: [%d], Evasion: [%d], Hitroll: [%2d], Damroll: [%2d], Saving throws: [%d/%d/%d/%d/%d]\r\n",
+	  compute_armor_class(k), compute_evasion(k), k->points.hitroll,
 	  k->points.damroll, GET_SAVE(k, 0), GET_SAVE(k, 1), GET_SAVE(k, 2),
 	  GET_SAVE(k, 3), GET_SAVE(k, 4));
 
@@ -3787,7 +3787,7 @@ static struct zcheck_affs {
   {APPLY_MOVE,       -50,  50, "movement"},
   {APPLY_GOLD,         0,   0, "gold"},
   {APPLY_EXP,          0,   0, "experience"},
-  {APPLY_AC,         -10,  10, "magical AC"},
+  {APPLY_AC,         -10,  10, "magical Armor"},
   {APPLY_HITROLL,      0, -99, "hitroll"},       /* Handled seperately below */
   {APPLY_DAMROLL,      0, -99, "damroll"},       /* Handled seperately below */
   {APPLY_SAVING_PARA, -2,   2, "saving throw (paralysis)"},
@@ -3963,7 +3963,7 @@ ACMD (do_zcheck)
           for (j=0; j<TOTAL_WEAR_CHECKS;j++) {
             if (CAN_WEAR(obj,zarmor[j].bitvector) && (ac>zarmor[j].ac_allowed) && (found=1))
               len += snprintf(buf + len, sizeof(buf) - len,
-                                   "- Has AC %d (%s limit is %d)\r\n",
+                                   "- Has Armor %d (%s limit is %d)\r\n",
                                    ac, zarmor[j].message, zarmor[j].ac_allowed);
           }
           break;

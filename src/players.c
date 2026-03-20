@@ -361,6 +361,7 @@ int load_char(const char *name, struct char_data *ch)
     GET_SPELL_CRIT_MULT(ch) = 0;
     GET_HEAL_CRIT_MULT(ch) = 0;
     GET_AC(ch) = PFDEF_AC;
+    GET_EVASION(ch) = 0;
     ch->real_abils.str = PFDEF_STR;
     ch->real_abils.str_add = PFDEF_STRADD;
     ch->real_abils.dex = PFDEF_DEX;
@@ -458,7 +459,7 @@ int load_char(const char *name, struct char_data *ch)
 
       switch (*tag) {
       case 'A':
-        if (!strcmp(tag, "Ac  "))	GET_AC(ch)		= atoi(line);
+        if (!strcmp(tag, "Ac  "))	GET_AC(ch)		= MAX(0, 100 - atoi(line));
 	else if (!strcmp(tag, "Act ")) {
          if (sscanf(line, "%s %s %s %s", f1, f2, f3, f4) == 4) {
           PLR_FLAGS(ch)[0] = asciiflag_conv(f1);
@@ -553,6 +554,7 @@ int load_char(const char *name, struct char_data *ch)
 
       case 'E':
 	     if (!strcmp(tag, "Exp "))	GET_EXP(ch)		= atoi(line);
+        else if (!strcmp(tag, "Evad")) GET_EVASION(ch) = atoi(line);
 	break;
 
       case 'F':
@@ -952,6 +954,7 @@ void save_char(struct char_data * ch)
   if (GET_CHA(ch)	   != PFDEF_CHA)	fprintf(fl, "Cha : %d\n", GET_CHA(ch));
 
   if (GET_AC(ch)   != PFDEF_AC)         fprintf(fl, "Ac  : %d\n", GET_AC(ch));
+  if (GET_EVASION(ch) != 0)             fprintf(fl, "Evad: %d\n", GET_EVASION(ch));
 
   /* Gold is canonical; persist it directly. */
   fprintf(fl, "Gold: %lld\n", ((long long)GET_MONEY(ch)));

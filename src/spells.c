@@ -363,7 +363,7 @@ void show_identify_item(struct char_data *ch, struct obj_data *obj, enum identif
                  ((GET_OBJ_VAL(obj, 2) + 1) / 2.0) * GET_OBJ_VAL(obj, 1), R);
     break;
   case ITEM_ARMOR:
-    send_to_char(ch, "%s|%s %sArmor Data:%s AC apply %s%d%s\r\n",
+    send_to_char(ch, "%s|%s %sArmor Data:%s Armor %s%d%s\r\n",
                  B, R, L, R, V, GET_OBJ_VAL(obj, 0), R);
     break;
   default:
@@ -1632,7 +1632,8 @@ ASPELL(spell_identify)
 	      victim_age->day, victim_age->hours);
     send_to_char(ch, "Height %d cm, Weight %d pounds\r\n", GET_HEIGHT(victim), GET_WEIGHT(victim));
     send_to_char(ch, "Level: %d, Hits: %d, Mana: %d\r\n", GET_LEVEL(victim), GET_HIT(victim), GET_MANA(victim));
-    send_to_char(ch, "AC: %d, Hitroll: %d, Damroll: %d\r\n", compute_armor_class(victim), GET_HITROLL(victim), GET_DAMROLL(victim));
+    send_to_char(ch, "Armor: %d, Evasion: %d, Hitroll: %d, Damroll: %d\r\n",
+      compute_armor_class(victim), compute_evasion(victim), GET_HITROLL(victim), GET_DAMROLL(victim));
     send_to_char(ch, "Str: %d/%d, Int: %d, Wis: %d, Dex: %d, Con: %d, Cha: %d\r\n",
 	GET_STR(victim), GET_ADD(victim), GET_INT(victim),
 	GET_WIS(victim), GET_DEX(victim), GET_CON(victim), GET_CHA(victim));
@@ -2495,7 +2496,7 @@ ASPELL(spell_black_lance)
   if (damage(ch, victim, dam, SPELL_BLACK_LANCE) == -1) return;
   if (!saved) {
     spell_apply_flag(victim, SPELL_BLACK_LANCE, spell_dur_short_manual(level), AFF_CORRODED);
-    spell_apply_modifier(victim, SPELL_BLACK_LANCE, spell_dur_short_manual(level), APPLY_AC, 15);
+    spell_apply_modifier(victim, SPELL_BLACK_LANCE, spell_dur_short_manual(level), APPLY_AC, -15);
   }
 }
 
@@ -2573,7 +2574,7 @@ ASPELL(spell_perfect_unknowable)
 ASPELL(spell_crystal_body)
 {
   if (!ch) return;
-  spell_apply_modifier(ch, SPELL_CRYSTAL_BODY, spell_dur_medium_manual(level), APPLY_AC, -25);
+  spell_apply_modifier(ch, SPELL_CRYSTAL_BODY, spell_dur_medium_manual(level), APPLY_AC, 25);
 }
 
 ASPELL(spell_greater_magic_seal)
@@ -2589,7 +2590,7 @@ ASPELL(spell_greater_magic_seal)
 
 ASPELL(spell_despair_aura) { if (ch) spell_apply_modifier(ch, SPELL_DESPAIR_AURA, spell_dur_medium_manual(level), APPLY_NONE, 1); }
 ASPELL(spell_oblivion_spear) { if (ch && victim) { int s = mag_savingthrow(victim, SAVING_SPELL, 0), dam = triple_maximize_magic_active(ch) ? (3 * ((level * 5) + (5 * MAX(1, level / 2)))) : spell_dmg_extreme_manual(level); if (triple_maximize_magic_active(ch)) affect_from_char(ch, SPELL_TRIPLE_MAXIMIZE_MAGIC); if (s) dam /= 2; set_next_damage_type(DAM_SHADOW); if (damage(ch, victim, dam, SPELL_OBLIVION_SPEAR) != -1 && !s) GET_MANA(victim) = MAX(0, GET_MANA(victim) - dam / 4); } }
-ASPELL(spell_bone_prison) { if (ch && victim) { if (!mag_savingthrow(victim, SAVING_SPELL, 0)) { spell_apply_flag(victim, SPELL_BONE_PRISON, spell_dur_medium_manual(level), AFF_ROOTED); spell_apply_modifier(victim, SPELL_BONE_PRISON, spell_dur_medium_manual(level), APPLY_AC, 10);} else spell_apply_flag(victim, SPELL_BONE_PRISON, 1, AFF_ROOTED);} }
+ASPELL(spell_bone_prison) { if (ch && victim) { if (!mag_savingthrow(victim, SAVING_SPELL, 0)) { spell_apply_flag(victim, SPELL_BONE_PRISON, spell_dur_medium_manual(level), AFF_ROOTED); spell_apply_modifier(victim, SPELL_BONE_PRISON, spell_dur_medium_manual(level), APPLY_AC, -10);} else spell_apply_flag(victim, SPELL_BONE_PRISON, 1, AFF_ROOTED);} }
 ASPELL(spell_undying_will) { if (ch) spell_apply_modifier(ch, SPELL_UNDYING_WILL, spell_dur_long_manual(level), APPLY_NONE, 1); }
 ASPELL(spell_dragon_lightning) { if (ch && victim) { int s = mag_savingthrow(victim, SAVING_SPELL, 0), dam = triple_maximize_magic_active(ch) ? (3 * ((level * 4) + (4 * MAX(1, level / 2)))) : spell_dmg_high_manual(level); if (triple_maximize_magic_active(ch)) affect_from_char(ch, SPELL_TRIPLE_MAXIMIZE_MAGIC); if (s) dam /= 2; set_next_damage_type(DAM_LIGHTNING); damage(ch, victim, dam, SPELL_DRAGON_LIGHTNING);} }
 
@@ -2620,7 +2621,7 @@ ASPELL(spell_ia_shub_niggurath) { struct char_data *tch,*next_tch; int tribute =
 ASPELL(spell_goal_of_all_life_is_death) { if (ch && !affected_by_spell(ch, SPELL_GOAL_OF_ALL_LIFE_IS_DEATH)) spell_apply_modifier(ch, SPELL_GOAL_OF_ALL_LIFE_IS_DEATH, spell_dur_short_manual(level), APPLY_NONE, 1); }
 ASPELL(spell_cry_of_the_banshee) { struct char_data *tch,*next_tch; if (!ch) return; for (tch = world[IN_ROOM(ch)].people; tch; tch = next_tch) { int s, dam; next_tch = tch->next_in_room; if (!spell_is_enemy(ch, tch, SPELL_CRY_OF_THE_BANSHEE)) continue; if (goal_of_all_life_is_death_active(ch)) { s = FALSE; dam = spell_dmg_extreme_manual(level); } else { s = mag_savingthrow(tch, SAVING_DEATH, 0); dam = spell_dmg_high_manual(level); if (s) dam /= 2; } set_next_damage_type(DAM_NECROTIC); if (damage(ch, tch, dam, SPELL_CRY_OF_THE_BANSHEE) == -1) continue; if (!s) spell_apply_flag(tch, SPELL_CRY_OF_THE_BANSHEE, spell_dur_short_manual(level), AFF_FEARFUL); } }
 ASPELL(spell_napalm) { struct char_data *tch,*next_tch; if (!ch) return; for (tch = world[IN_ROOM(ch)].people; tch; tch = next_tch) { int s, dam; next_tch = tch->next_in_room; if (!spell_is_enemy(ch, tch, SPELL_NAPALM)) continue; s = mag_savingthrow(tch, SAVING_SPELL, 0); dam = spell_dmg_medium_manual(level); if (s) dam /= 2; set_next_damage_type(DAM_FIRE); if (damage(ch, tch, dam, SPELL_NAPALM) == -1) continue; if (!s) spell_apply_modifier(tch, SPELL_NAPALM, 1, APPLY_NONE, 1); } }
-ASPELL(spell_body_of_effulgent_beryl) { if (!ch) return; spell_apply_modifier(ch, SPELL_BODY_OF_EFFULGENT_BERYL, spell_dur_medium_manual(level), APPLY_AC, -20); spell_apply_modifier(ch, SPELL_BODY_OF_EFFULGENT_BERYL, spell_dur_medium_manual(level), APPLY_NONE, 1); }
+ASPELL(spell_body_of_effulgent_beryl) { if (!ch) return; spell_apply_modifier(ch, SPELL_BODY_OF_EFFULGENT_BERYL, spell_dur_medium_manual(level), APPLY_AC, 20); spell_apply_modifier(ch, SPELL_BODY_OF_EFFULGENT_BERYL, spell_dur_medium_manual(level), APPLY_NONE, 1); }
 ASPELL(spell_vermilion_nova) { struct char_data *tch,*next_tch; if (!ch) return; for (tch = world[IN_ROOM(ch)].people; tch; tch = next_tch) { int s, dam; next_tch = tch->next_in_room; if (!spell_is_enemy(ch, tch, SPELL_VERMILION_NOVA)) continue; s = mag_savingthrow(tch, SAVING_SPELL, 0); dam = spell_dmg_high_manual(level); if (s) dam /= 2; set_next_damage_type(DAM_FIRE); if (damage(ch, tch, dam, SPELL_VERMILION_NOVA) == -1) continue; if (!s) spell_apply_flag(tch, SPELL_VERMILION_NOVA, spell_dur_short_manual(level), AFF_BURNING); } }
 ASPELL(spell_nuclear_blast) { struct char_data *tch,*next_tch; if (!ch) return; for (tch = world[IN_ROOM(ch)].people; tch; tch = next_tch) { int s, dam; next_tch = tch->next_in_room; if (!spell_is_enemy(ch, tch, SPELL_NUCLEAR_BLAST)) continue; s = mag_savingthrow(tch, SAVING_SPELL, 0); dam = spell_dmg_extreme_manual(level); if (s) dam /= 2; set_next_damage_type(DAM_FORCE); if (damage(ch, tch, dam, SPELL_NUCLEAR_BLAST) == -1) continue; set_next_damage_type(DAM_FIRE); damage(ch, tch, spell_dmg_low_manual(level), SPELL_NUCLEAR_BLAST); } }
 ASPELL(spell_greater_teleportation)
@@ -2650,7 +2651,7 @@ ASPELL(spell_greater_teleportation)
 }
 ASPELL(spell_silent_magic) { if (ch) spell_apply_modifier(ch, SPELL_SILENT_MAGIC, spell_dur_short_manual(level), APPLY_NONE, 1); }
 ASPELL(spell_triple_maximize_magic) { if (ch) spell_apply_modifier(ch, SPELL_TRIPLE_MAXIMIZE_MAGIC, 1, APPLY_NONE, 1); }
-ASPELL(spell_pantheon) { if (!ch) return; spell_apply_modifier(ch, SPELL_PANTHEON, spell_dur_medium_manual(level), APPLY_SAVING_SPELL, 6); spell_apply_modifier(ch, SPELL_PANTHEON, spell_dur_medium_manual(level), APPLY_AC, -15); spell_apply_modifier(ch, SPELL_PANTHEON, spell_dur_medium_manual(level), APPLY_NONE, 1); }
+ASPELL(spell_pantheon) { if (!ch) return; spell_apply_modifier(ch, SPELL_PANTHEON, spell_dur_medium_manual(level), APPLY_SAVING_SPELL, 6); spell_apply_modifier(ch, SPELL_PANTHEON, spell_dur_medium_manual(level), APPLY_AC, 15); spell_apply_modifier(ch, SPELL_PANTHEON, spell_dur_medium_manual(level), APPLY_NONE, 1); }
 ASPELL(spell_dimensional_lock) { if (ch && IN_ROOM(ch) != NOWHERE) room_add_effect(&world[IN_ROOM(ch)], ROOM_EFFECT_DIMENSIONAL_LOCK, spell_dur_medium_manual(level), 0); }
 
 ASPELL(spell_shadow_bind) { if (!ch || !victim) return; if (!mag_savingthrow(victim, SAVING_SPELL, 0)) { spell_apply_flag(victim, SPELL_SHADOW_BIND, spell_dur_medium_manual(level), AFF_ROOTED); spell_apply_modifier(victim, SPELL_SHADOW_BIND, spell_dur_medium_manual(level), APPLY_DEX, -2); } else spell_apply_flag(victim, SPELL_SHADOW_BIND, 1, AFF_ROOTED); act("Your shadow lashes out and binds $N in place!", FALSE, ch, 0, victim, TO_CHAR); act("Shadowy tendrils rise and bind your limbs!", FALSE, ch, 0, victim, TO_VICT); act("$n's shadow erupts and binds $N!", FALSE, ch, 0, victim, TO_NOTVICT); }
@@ -2860,7 +2861,7 @@ ASPELL(spell_arise_greater)
 
 ASPELL(spell_monarchs_authority) { struct char_data *tch,*next_tch; if (!ch) return; act("You exert the crushing authority of a monarch over the battlefield!", FALSE, ch, 0, 0, TO_CHAR); act("$n exerts a crushing monarch's authority over the battlefield!", FALSE, ch, 0, 0, TO_ROOM); for (tch = world[IN_ROOM(ch)].people; tch; tch = next_tch) { int s, dam; next_tch = tch->next_in_room; if (!spell_is_enemy(ch, tch, SPELL_MONARCHS_AUTHORITY)) continue; s = mag_savingthrow(tch, SAVING_SPELL, 0); dam = spell_dmg_medium_manual(level); if (s) dam /= 2; set_next_damage_type(DAM_FORCE); if (damage(ch, tch, dam, SPELL_MONARCHS_AUTHORITY) == -1) continue; if (!s) { spell_apply_flag(tch, SPELL_MONARCHS_AUTHORITY, spell_dur_short_manual(level), AFF_ROOTED); WAIT_STATE(tch, PULSE_VIOLENCE);} } }
 ASPELL(spell_rulers_hand) { if (!ch || !victim) return; { int s = mag_savingthrow(victim, SAVING_SPELL, 0), dam = spell_dmg_high_manual(level); if (s) dam /= 2; set_next_damage_type(DAM_FORCE); damage(ch, victim, dam, SPELL_RULERS_HAND); if (!s) spell_apply_flag(victim, SPELL_RULERS_HAND, 1, AFF_STUNNED);} act("You seize $N with the invisible force of the Ruler's Hand!", FALSE, ch, 0, victim, TO_CHAR); act("Invisible force seizes your body and crushes inward!", FALSE, ch, 0, victim, TO_VICT); act("$n seizes $N with an invisible crushing force!", FALSE, ch, 0, victim, TO_NOTVICT); }
-ASPELL(spell_shadow_lance) { if (!ch || !victim) return; { int s = mag_savingthrow(victim, SAVING_SPELL, 0), dam = spell_dmg_high_manual(level); if (s) dam /= 2; set_next_damage_type(DAM_SHADOW); if (damage(ch, victim, dam, SPELL_SHADOW_LANCE) != -1 && !s) spell_apply_modifier(victim, SPELL_SHADOW_LANCE, spell_dur_short_manual(level), APPLY_AC, 10);} act("You shape a razor-thin lance of shadow and drive it into $N!", FALSE, ch, 0, victim, TO_CHAR); act("A razor-thin lance of shadow pierces straight through you!", FALSE, ch, 0, victim, TO_VICT); act("$n drives a razor-thin lance of shadow into $N!", FALSE, ch, 0, victim, TO_NOTVICT); }
+ASPELL(spell_shadow_lance) { if (!ch || !victim) return; { int s = mag_savingthrow(victim, SAVING_SPELL, 0), dam = spell_dmg_high_manual(level); if (s) dam /= 2; set_next_damage_type(DAM_SHADOW); if (damage(ch, victim, dam, SPELL_SHADOW_LANCE) != -1 && !s) spell_apply_modifier(victim, SPELL_SHADOW_LANCE, spell_dur_short_manual(level), APPLY_AC, -10);} act("You shape a razor-thin lance of shadow and drive it into $N!", FALSE, ch, 0, victim, TO_CHAR); act("A razor-thin lance of shadow pierces straight through you!", FALSE, ch, 0, victim, TO_VICT); act("$n drives a razor-thin lance of shadow into $N!", FALSE, ch, 0, victim, TO_NOTVICT); }
 ASPELL(spell_shadow_burst) { struct char_data *tch,*next_tch; int bonus = MIN(10, count_shadow_servants_in_room(ch) * 2); if (!ch) return; act("You detonate the darkness around you in a Shadow Burst!", FALSE, ch, 0, 0, TO_CHAR); act("$n detonates the darkness in a violent shadow burst!", FALSE, ch, 0, 0, TO_ROOM); for (tch = world[IN_ROOM(ch)].people; tch; tch = next_tch) { int dam; next_tch = tch->next_in_room; if (!spell_is_enemy(ch, tch, SPELL_SHADOW_BURST)) continue; dam = spell_dmg_medium_manual(level) + bonus; if (mag_savingthrow(tch, SAVING_SPELL, 0)) dam /= 2; set_next_damage_type(DAM_SHADOW); damage(ch, tch, dam, SPELL_SHADOW_BURST);} }
 ASPELL(spell_shadow_storm) { if (!ch || IN_ROOM(ch) == NOWHERE) return; room_add_effect(&world[IN_ROOM(ch)], ROOM_EFFECT_SHADOW_STORM, spell_dur_medium_manual(level), 0); act("You call forth a violent storm of living shadow!", FALSE, ch, 0, 0, TO_CHAR); act("$n calls forth a violent storm of living shadow!", FALSE, ch, 0, 0, TO_ROOM); }
 ASPELL(spell_fatal_strike) { if (!ch || !victim) return; { int dam = spell_dmg_high_manual(level); if (GET_HIT(victim) * 100 <= GET_MAX_HIT(victim) * 30) dam += spell_dmg_medium_manual(level); if (mag_savingthrow(victim, SAVING_SPELL, 0)) dam /= 2; set_next_damage_type(DAM_FORCE); damage(ch, victim, dam, SPELL_FATAL_STRIKE);} act("You drive a fatal strike into $N's opening!", FALSE, ch, 0, victim, TO_CHAR); act("A perfectly placed killing blow tears into you!", FALSE, ch, 0, victim, TO_VICT); act("$n drives a fatal strike into $N!", FALSE, ch, 0, victim, TO_NOTVICT); }
@@ -2912,7 +2913,7 @@ ASPELL(spell_kings_command)
 
 ASPELL(spell_detect_kill_intent) { if (!ch) return; spell_apply_flag(ch, SPELL_DETECT_KILL_INTENT, spell_dur_medium_manual(level), AFF_TRUESIGHT); spell_apply_modifier(ch, SPELL_DETECT_KILL_INTENT, spell_dur_medium_manual(level), APPLY_SAVING_SPELL, -4); spell_apply_modifier(ch, SPELL_DETECT_KILL_INTENT, spell_dur_medium_manual(level), APPLY_HITROLL, 4); act("Your senses sharpen to detect even killing intent.", FALSE, ch, 0, 0, TO_CHAR); act("$n's awareness sharpens unnaturally.", FALSE, ch, 0, 0, TO_ROOM); }
 ASPELL(spell_mutilate) { if (!ch || !victim) return; { int s = mag_savingthrow(victim, SAVING_SPELL, 0), dam = spell_dmg_high_manual(level); if (s) dam /= 2; set_next_damage_type(DAM_SHADOW); if (damage(ch, victim, dam, SPELL_MUTILATE) != -1 && !s) { spell_apply_modifier(victim, SPELL_MUTILATE, spell_dur_short_manual(level), APPLY_STR, -2); spell_apply_modifier(victim, SPELL_MUTILATE, spell_dur_short_manual(level), APPLY_DEX, -2);} } act("You mutilate $N with a vicious shadow-infused strike!", FALSE, ch, 0, victim, TO_CHAR); act("A vicious shadow-infused strike tears your body apart!", FALSE, ch, 0, victim, TO_VICT); act("$n mutilates $N with a vicious shadow-infused strike!", FALSE, ch, 0, victim, TO_NOTVICT); }
-ASPELL(spell_shadow_armor) { if (!ch || !victim) victim = ch; if (!victim) return; spell_apply_modifier(victim, SPELL_SHADOW_ARMOR, spell_dur_long_manual(level), APPLY_AC, -25); spell_apply_modifier(victim, SPELL_SHADOW_ARMOR, spell_dur_long_manual(level), APPLY_NONE, 1); act("Living shadow forms a suit of armor around $N.", FALSE, ch, 0, victim, TO_CHAR); act("Living shadow hardens around you as armor.", FALSE, ch, 0, victim, TO_VICT); act("Living shadow hardens around $N as armor.", FALSE, ch, 0, victim, TO_NOTVICT); }
+ASPELL(spell_shadow_armor) { if (!ch || !victim) victim = ch; if (!victim) return; spell_apply_modifier(victim, SPELL_SHADOW_ARMOR, spell_dur_long_manual(level), APPLY_AC, 25); spell_apply_modifier(victim, SPELL_SHADOW_ARMOR, spell_dur_long_manual(level), APPLY_NONE, 1); act("Living shadow forms a suit of armor around $N.", FALSE, ch, 0, victim, TO_CHAR); act("Living shadow hardens around you as armor.", FALSE, ch, 0, victim, TO_VICT); act("Living shadow hardens around $N as armor.", FALSE, ch, 0, victim, TO_NOTVICT); }
 ASPELL(spell_total_occultation) { if (!ch) return; spell_apply_flag(ch, SPELL_TOTAL_OCCULTATION, spell_dur_short_manual(level), AFF_INVISIBLE); spell_apply_flag(ch, SPELL_TOTAL_OCCULTATION, spell_dur_short_manual(level), AFF_HIDE); spell_apply_modifier(ch, SPELL_TOTAL_OCCULTATION, spell_dur_short_manual(level), APPLY_NONE, 1); act("You vanish completely into total occultation.", FALSE, ch, 0, 0, TO_CHAR); act("$n disappears into complete occultation.", FALSE, ch, 0, 0, TO_ROOM); }
 
 ASPELL(spell_domain_break)

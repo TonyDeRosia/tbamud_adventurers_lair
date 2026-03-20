@@ -31,7 +31,7 @@
 static int extractions_pending = 0;
 
 /* local file scope functions */
-static int apply_ac(struct char_data *ch, int eq_pos);
+static int apply_armor(struct char_data *ch, int eq_pos);
 static void update_object(struct obj_data *obj, int use);
 static void affect_modify_ar(struct char_data * ch, byte loc, sbyte mod, int bitv[], bool add);
 
@@ -170,6 +170,9 @@ static void aff_apply_modify(struct char_data *ch, byte loc, sbyte mod, char *ms
 
   case APPLY_AC:
     GET_AC(ch) += mod;
+    break;
+  case APPLY_EVASION:
+    GET_EVASION(ch) += mod;
     break;
 
   case APPLY_HITROLL:
@@ -549,10 +552,8 @@ void obj_from_char(struct obj_data *object)
 }
 
 /* Return the effect of a piece of armor in position eq_pos */
-static int apply_ac(struct char_data *ch, int eq_pos)
+static int apply_armor(struct char_data *ch, int eq_pos)
 {
-  int factor;
-
   if (GET_EQ(ch, eq_pos) == NULL) {
     core_dump();
     return (0);
@@ -560,24 +561,7 @@ static int apply_ac(struct char_data *ch, int eq_pos)
 
   if (!(GET_OBJ_TYPE(GET_EQ(ch, eq_pos)) == ITEM_ARMOR))
     return (0);
-
-  switch (eq_pos) {
-
-  case WEAR_BODY:
-    factor = 3;
-    break;			/* 30% */
-  case WEAR_HEAD:
-    factor = 2;
-    break;			/* 20% */
-  case WEAR_LEGS:
-    factor = 2;
-    break;			/* 20% */
-  default:
-    factor = 1;
-    break;			/* all others 10% */
-  }
-
-  return (factor * GET_OBJ_VAL(GET_EQ(ch, eq_pos), 0));
+  return GET_OBJ_VAL(GET_EQ(ch, eq_pos), 0);
 }
 
 int invalid_align(struct char_data *ch, struct obj_data *obj)
@@ -626,7 +610,7 @@ void equip_char(struct char_data *ch, struct obj_data *obj, int pos)
   obj->worn_on = pos;
 
   if (GET_OBJ_TYPE(obj) == ITEM_ARMOR)
-    GET_AC(ch) -= apply_ac(ch, pos);
+    GET_AC(ch) += apply_armor(ch, pos);
 
   if (IN_ROOM(ch) != NOWHERE) {
     if (pos == WEAR_LIGHT && GET_OBJ_TYPE(obj) == ITEM_LIGHT)
@@ -658,7 +642,7 @@ struct obj_data *unequip_char(struct char_data *ch, int pos)
   obj->worn_on = -1;
 
   if (GET_OBJ_TYPE(obj) == ITEM_ARMOR)
-    GET_AC(ch) += apply_ac(ch, pos);
+    GET_AC(ch) -= apply_armor(ch, pos);
 
   if (IN_ROOM(ch) != NOWHERE) {
     if (pos == WEAR_LIGHT && GET_OBJ_TYPE(obj) == ITEM_LIGHT)

@@ -1427,7 +1427,7 @@ byte saving_throws(int class_num, int type, int level)
   return 100;
 }
 
-/* THAC0 for classes and levels.  (To Hit Armor Class 0) */
+/* THAC0 for classes and levels (legacy compatibility table). */
 int thaco(int class_num, int level)
 {
   class_num = get_class_archetype(class_num);

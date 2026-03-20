@@ -284,7 +284,7 @@ static void perform_obj_aff_list(struct char_data * ch, char *arg)
     if (apply == APPLY_CLASS)
       len = snprintf(buf, sizeof(buf), "Highest average damage per hit for Weapons\r\n");
     else if (apply == APPLY_LEVEL)
-      len = snprintf(buf, sizeof(buf), "Highest AC Apply for Armor\r\n");
+      len = snprintf(buf, sizeof(buf), "Highest Armor for Armor\r\n");
 
     for (i = 0; i < MAX_OBJ_LIST; i++){
       if ((r_num = real_object(lst[i].vobj)) != NOTHING) {
@@ -461,8 +461,8 @@ ACMD(do_oasis_list)
             for (i = 0; i < NUM_APPLIES; i++) {
               if (i == APPLY_CLASS)       /* Special Case 1 - Weapon Dam */
                 send_to_char(ch, "%s%2d-%s%-14s%s", QNRM, i, QYEL, "Weapon Dam", QNRM);
-              else if (i == APPLY_LEVEL)  /* Special Case 2 - Armor AC Apply */
-                send_to_char(ch, "%s%2d-%s%-14s%s", QNRM, i, QYEL, "AC Apply", QNRM);
+              else if (i == APPLY_LEVEL)  /* Special Case 2 - Armor Armor */
+                send_to_char(ch, "%s%2d-%s%-14s%s", QNRM, i, QYEL, "Armor", QNRM);
               else
                 send_to_char(ch, "%s%2d-%s%-14s%s", QNRM, i, QYEL, apply_types[i], QNRM);
               if (!((i+1)%4))  send_to_char(ch, "\r\n");

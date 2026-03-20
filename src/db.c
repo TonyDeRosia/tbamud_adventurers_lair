@@ -1594,7 +1594,11 @@ static void parse_simple_mob(FILE *mob_f, int i, int nr)
 
   GET_LEVEL(mob_proto + i) = t[0];
   GET_HITROLL(mob_proto + i) = 20 - t[1];
-  GET_AC(mob_proto + i) = 10 * t[2];
+  {
+    int legacy_ac = 10 * t[2];
+    GET_AC(mob_proto + i) = MAX(0, 100 - legacy_ac);
+    GET_EVASION(mob_proto + i) = 0;
+  }
 
   /* max hit = 0 is a flag that H, M, V is xdy+z */
   GET_MAX_HIT(mob_proto + i) = 0;
@@ -3596,7 +3600,8 @@ void clear_char(struct char_data *ch)
   ch->mob_specials.default_pos = POS_STANDING;
   ch->events = NULL;
   
-  GET_AC(ch) = 100;		/* Basic Armor */
+  GET_AC(ch) = 0;
+  GET_EVASION(ch) = 0;
   if (ch->points.max_mana < 100)
     ch->points.max_mana = 100;
 }
@@ -3652,7 +3657,8 @@ void init_char(struct char_data *ch)
   ch->player.time.played = 0;
   classtrack_init_new_player(ch);
 
-  GET_AC(ch) = 100;
+  GET_AC(ch) = 0;
+  GET_EVASION(ch) = 0;
 
   /* Bias the height and weight of the character depending on what gender
    * they have chosen. While it is possible to have a tall, heavy female it's

@@ -515,7 +515,7 @@ void mag_affects(int level, struct char_data *ch, struct char_data *victim,
 
   case SPELL_ARMOR:
     af[0].location = APPLY_AC;
-    af[0].modifier = -20;
+    af[0].modifier = 20;
     af[0].duration = 12 + (level / 6);
     if (af[0].duration > 18)
       af[0].duration = 18;
@@ -552,7 +552,7 @@ void mag_affects(int level, struct char_data *ch, struct char_data *victim,
     SET_BIT_AR(af[0].bitvector, AFF_BLIND);
 
     af[1].location = APPLY_AC;
-    af[1].modifier = 40;
+    af[1].modifier = -40;
     af[1].duration = 2;
     SET_BIT_AR(af[1].bitvector, AFF_BLIND);
 
@@ -635,7 +635,7 @@ void mag_affects(int level, struct char_data *ch, struct char_data *victim,
     af[0].duration = 12 + (GET_LEVEL(ch) / 6);
     if (af[0].duration > 20)
       af[0].duration = 20;
-    af[0].modifier = -40;
+    af[0].modifier = 40;
     af[0].location = APPLY_AC;
     SET_BIT_AR(af[0].bitvector, AFF_INVISIBLE);
     refresh_on_recast = TRUE;
@@ -739,7 +739,7 @@ void mag_affects(int level, struct char_data *ch, struct char_data *victim,
     SET_BIT_AR(af[0].bitvector, AFF_SANCTUARY);
 
     af[1].location = APPLY_AC;
-    af[1].modifier = -15;
+    af[1].modifier = 15;
     af[1].duration = buff_duration;
 
     af[2].location = APPLY_HIT;
@@ -807,7 +807,7 @@ void mag_affects(int level, struct char_data *ch, struct char_data *victim,
     SET_BIT_AR(af[1].bitvector, AFF_SENSE_LIFE);
 
     af[2].location = APPLY_AC;
-    af[2].modifier = -10;
+    af[2].modifier = 10;
     af[2].duration = buff_duration;
 
     af[3].duration = buff_duration;
@@ -871,7 +871,7 @@ void mag_affects(int level, struct char_data *ch, struct char_data *victim,
     if (mag_savingthrow(victim, savetype, 0))
       return;
     af[0].duration = spell_dur_medium(level);
-    af[0].modifier = 30;
+    af[0].modifier = -30;
     af[0].location = APPLY_AC;
     SET_BIT_AR(af[0].bitvector, AFF_CORRODED);
     refresh_on_recast = TRUE;
@@ -925,7 +925,7 @@ void mag_affects(int level, struct char_data *ch, struct char_data *victim,
   case SPELL_STONE_SKIN:
     af[0].duration = spell_dur_medium(level);
     af[0].location = APPLY_AC;
-    af[0].modifier = -40;
+    af[0].modifier = 40;
     SET_BIT_AR(af[0].bitvector, AFF_STONESKIN);
     refresh_on_recast = TRUE;
     break;
@@ -933,7 +933,7 @@ void mag_affects(int level, struct char_data *ch, struct char_data *victim,
   case SPELL_BARKSKIN:
     af[0].duration = spell_dur_long(level);
     af[0].location = APPLY_AC;
-    af[0].modifier = -20;
+    af[0].modifier = 20;
     SET_BIT_AR(af[0].bitvector, AFF_BARKSKIN);
     af[1].duration = spell_dur_long(level);
     af[1].location = APPLY_CON;
@@ -963,7 +963,7 @@ void mag_affects(int level, struct char_data *ch, struct char_data *victim,
     SET_BIT_AR(af[1].bitvector, AFF_ADRENALINE);
     af[2].duration = 3;
     af[2].location = APPLY_AC;
-    af[2].modifier = -2;
+    af[2].modifier = 2;
     SET_BIT_AR(af[2].bitvector, AFF_ADRENALINE);
     refresh_on_recast = TRUE;
     break;
@@ -1011,7 +1011,7 @@ void mag_affects(int level, struct char_data *ch, struct char_data *victim,
   case SPELL_ANTIMAGIC_SHELL:
     af[0].duration = spell_dur_medium(level);
     af[0].location = APPLY_SAVING_SPELL;
-    af[0].modifier = -20;
+    af[0].modifier = 20;
     SET_BIT_AR(af[0].bitvector, AFF_WARDED);
     refresh_on_recast = TRUE;
     break;
