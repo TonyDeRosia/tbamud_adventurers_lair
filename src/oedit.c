@@ -44,9 +44,15 @@ static void oedit_disp_wear_menu(struct descriptor_data *d);
 static void oedit_disp_menu(struct descriptor_data *d);
 static void oedit_disp_perm_menu(struct descriptor_data *d);
 static void oedit_save_to_disk(int zone_num);
+static int oedit_type_supports_regen_mult(int obj_type);
 
 /* handy macro */
 #define S_PRODUCT(s, i) ((s)->producing[(i)])
+
+static int oedit_type_supports_regen_mult(int obj_type)
+{
+  return (obj_type == ITEM_FURNITURE || obj_type == ITEM_WEAPON);
+}
 
 /* Utility and exported functions */
 ACMD(do_oasis_oedit)
@@ -623,16 +629,22 @@ static void oedit_disp_menu(struct descriptor_data *d)
   char buf1[MAX_STRING_LENGTH];
   char buf2[MAX_STRING_LENGTH];
   char regen_buf[MAX_INPUT_LENGTH];
+  char regen_line[MAX_STRING_LENGTH];
   struct obj_data *obj;
 
   obj = OLC_OBJ(d);
   get_char_colors(d->character);
   clear_screen(d);
 
-  if (GET_OBJ_TYPE(obj) == ITEM_FURNITURE || GET_OBJ_TYPE(obj) == ITEM_WEAPON)
+  if (oedit_type_supports_regen_mult(GET_OBJ_TYPE(obj)))
     snprintf(regen_buf, sizeof(regen_buf), "%d", GET_OBJ_VAL(obj, 0));
   else
     snprintf(regen_buf, sizeof(regen_buf), "N/A");
+
+  if (oedit_type_supports_regen_mult(GET_OBJ_TYPE(obj)))
+    snprintf(regen_line, sizeof(regen_line), "%sR%s) Regen Mult  : %s%s\r\n", grn, nrm, cyn, regen_buf);
+  else
+    *regen_line = '\0';
 
   /* Build buffers for first part of menu. */
   sprinttype(GET_OBJ_TYPE(obj), item_types, buf1, sizeof(buf1));
@@ -666,7 +678,7 @@ static void oedit_disp_menu(struct descriptor_data *d)
           "%s9%s) Cost        : %s%d\r\n"
           "%sA%s) Cost/Day    : %s%d\r\n"
           "%sB%s) Timer       : %s%d\r\n"
-          "%sR%s) Regen Mult  : %s%s\r\n"
+          "%s"
           "%sC%s) Values      : %s%d %d %d %d\r\n"
           "%sD%s) Applies menu\r\n"
           "%sE%s) Extra descriptions menu: %s%s%s\r\n"
@@ -683,7 +695,7 @@ static void oedit_disp_menu(struct descriptor_data *d)
           grn, nrm, cyn, GET_OBJ_COST(obj),
           grn, nrm, cyn, GET_OBJ_RENT(obj),
           grn, nrm, cyn, GET_OBJ_TIMER(obj),
-          grn, nrm, cyn, regen_buf,
+          regen_line,
           grn, nrm, cyn, GET_OBJ_VAL(obj, 0),
           GET_OBJ_VAL(obj, 1),
           GET_OBJ_VAL(obj, 2),
@@ -804,7 +816,7 @@ void oedit_parse(struct descriptor_data *d, char *arg)
       break;
     case 'r':
     case 'R':
-      if (GET_OBJ_TYPE(OLC_OBJ(d)) != ITEM_FURNITURE && GET_OBJ_TYPE(OLC_OBJ(d)) != ITEM_WEAPON) {
+      if (!oedit_type_supports_regen_mult(GET_OBJ_TYPE(OLC_OBJ(d)))) {
         write_to_output(d, "This object type does not support a regen multiplier.\r\n");
         oedit_disp_menu(d);
       } else {
