@@ -41,7 +41,6 @@ static void format_price_gsc(char *out, size_t outsz, long long total_gold)
 static int compare_spells(const void *x, const void *y);
 static void npc_steal(struct char_data *ch, struct char_data *victim);
 static void show_known_abilities(struct char_data *ch, bool include_spells, bool include_skills);
-static size_t append_ability_section(struct char_data *ch, bool spells, char *buf, size_t buf_size);
 
 /* Special procedures for mobiles. */
 static int spell_sort_info[MAX_SKILLS + 1];
@@ -72,127 +71,32 @@ static const char *prac_types[] = {
   "skill"
 };
 
-#define ABILITY_COL_WIDTH 27
-#define SPELL_COL_WIDTH 38
-#define SPELL_NAME_WIDTH 28
-#define SKILL_NAME_WIDTH 17
-#define ABILITIES_PER_LINE 2
-#define LEVEL_LABEL_PADDING 14
 #define LEARNED(ch) (MIN(PRACTICE_CAP, get_class_prac_learned_level((int)GET_CLASS(ch))))
 
 #define MINGAIN(ch) (get_class_prac_min_per_prac((int)GET_CLASS(ch)))
 #define MAXGAIN(ch) (get_class_prac_max_per_prac((int)GET_CLASS(ch)))
 #define SPLSKL(ch) (prac_types[get_class_prac_type((int)GET_CLASS(ch))])
 
-static bool ability_is_spell(int ability)
-{
-  return ability > SPELL_RESERVED_DBC && ability <= MAX_SPELLS;
-}
-
-static bool ability_is_skill(int ability)
-{
-  return ability > MAX_SPELLS && ability <= MAX_SKILLS;
-}
-
-static size_t append_ability_section(struct char_data *ch, bool spells, char *buf, size_t buf_size)
-{
-  const char *title = spells ? "SPELLS" : "SKILLS";
-  int sortpos, ability, required_level, level, column = 0, total = 0;
-  int col_width = spells ? SPELL_COL_WIDTH : ABILITY_COL_WIDTH;
-  int name_width = spells ? SPELL_NAME_WIDTH : SKILL_NAME_WIDTH;
-  size_t len = 0;
-
-  len += snprintf(buf + len, buf_size - len, "%s:\r\n", title);
-
-  for (level = 1; level <= GET_LEVEL(ch); level++) {
-    bool level_started = FALSE;
-
-    for (sortpos = 1; sortpos <= MAX_SKILLS; sortpos++) {
-      ability = spell_sort_info[sortpos];
-
-      if (!spell_info[ability].name)
-        continue;
-
-      if (spells ? !ability_is_spell(ability) : !ability_is_skill(ability))
-        continue;
-
-      required_level = spell_info[ability].min_level[(int) GET_CLASS(ch)];
-      required_level = classtrack_get_study_display_level(ch, ability, required_level);
-
-      if (required_level != level)
-        continue;
-
-      if (!level_started) {
-        len += snprintf(buf + len, buf_size - len, "%sLevel %-2d%s:%s ",
-                        CCCYN(ch, C_NRM), level, CCWHT(ch, C_NRM), CCNRM(ch, C_NRM));
-        level_started = TRUE;
-        column = 0;
-      } else if (column % ABILITIES_PER_LINE == 0) {
-        len += snprintf(buf + len, buf_size - len, "\r\n%*s", LEVEL_LABEL_PADDING, "");
-      } else {
-        len += snprintf(buf + len, buf_size - len, "  ");
-      }
-
-      {
-        int abil_pct = GET_SKILL(ch, ability);
-        char cell[256];
-
-        if (abil_pct < 0)
-          abil_pct = 0;
-        if (abil_pct > 100)
-          abil_pct = 100;
-
-        snprintf(cell, sizeof(cell), "%-*.*s [%3d%%]",
-                 name_width, name_width, spell_info[ability].name, abil_pct);
-        len += snprintf(buf + len, buf_size - len, "%-*s", col_width, cell);
-      }
-      column++;
-      total++;
-    }
-
-    if (level_started)
-      len += snprintf(buf + len, buf_size - len, "\r\n");
-  }
-
-  if (!total)
-    len += snprintf(buf + len, buf_size - len, "  You have not learned any %s yet.\r\n",
-                    spells ? "spells" : "skills");
-  else
-    len += snprintf(buf + len, buf_size - len, "\r\n");
-
-  return len;
-}
-
 static void show_known_abilities(struct char_data *ch, bool include_spells, bool include_skills)
 {
-  const char *overflow = "\r\n**OVERFLOW**\r\n";
-  size_t len = 0;
-  char buf2[MAX_STRING_LENGTH];
-
-  len += snprintf(buf2 + len, sizeof(buf2) - len,
-                  "You have %d practice session%s remaining.\r\n",
-                  GET_PRACTICES(ch), GET_PRACTICES(ch) == 1 ? "" : "s");
+  send_to_char(ch, "You have %d practice session%s remaining.\r\n",
+               GET_PRACTICES(ch), GET_PRACTICES(ch) == 1 ? "" : "s");
 
   if (include_skills)
-    len += append_ability_section(ch, FALSE, buf2 + len, sizeof(buf2) - len);
+    show_ability_table_aligned(ch, FALSE, FALSE, NULL);
 
   if (include_spells)
-    len += append_ability_section(ch, TRUE, buf2 + len, sizeof(buf2) - len);
-
-  if (len >= sizeof(buf2))
-    strcpy(buf2 + sizeof(buf2) - strlen(overflow) - 1, overflow); /* strcpy: OK */
-
-  page_string(ch->desc, buf2, TRUE);
+    show_ability_table_aligned(ch, TRUE, FALSE, NULL);
 }
 
 void list_skills(struct char_data *ch)
 {
-  show_known_abilities(ch, FALSE, TRUE);
+  show_ability_table_aligned(ch, FALSE, FALSE, NULL);
 }
 
 void list_spells(struct char_data *ch)
 {
-  show_known_abilities(ch, TRUE, FALSE);
+  show_ability_table_aligned(ch, TRUE, FALSE, NULL);
 }
 
 void list_known_abilities(struct char_data *ch)
