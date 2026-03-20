@@ -2176,13 +2176,13 @@ static void process_round_effects(void)
       if (GET_SKILL(i, SKILL_DREAD_DOMINION) > 0) {
         struct affected_type af;
         new_affect(&af);
-        af.spell = SPELL_DESPAIR_AURA;
+        af.spell = SKILL_DREAD_DOMINION;
         af.duration = 1;
         af.location = APPLY_SAVING_SPELL;
         af.modifier = 2;
         affect_join(i, &af, FALSE, FALSE, FALSE, FALSE);
         new_affect(&af);
-        af.spell = SPELL_DESPAIR_AURA;
+        af.spell = SKILL_DREAD_DOMINION;
         af.duration = 1;
         af.location = APPLY_AC;
         af.modifier = 2;
@@ -2197,13 +2197,13 @@ static void process_round_effects(void)
         if (!IS_NPC(i) && IS_NPC(tch) && AFF_FLAGGED(tch, AFF_CHARM))
           continue;
         new_affect(&af);
-        af.spell = SPELL_DESPAIR_AURA;
+        af.spell = SKILL_DREAD_DOMINION;
         af.duration = 1;
         af.location = APPLY_HITROLL;
         af.modifier = -4;
         affect_join(tch, &af, FALSE, FALSE, FALSE, FALSE);
         new_affect(&af);
-        af.spell = SPELL_DESPAIR_AURA;
+        af.spell = SKILL_DREAD_DOMINION;
         af.duration = 1;
         af.location = APPLY_SAVING_SPELL;
         af.modifier = -2;
