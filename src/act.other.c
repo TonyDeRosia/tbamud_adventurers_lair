@@ -40,12 +40,12 @@
 #ifndef ABIL_COL_WIDTH
 #define ABIL_COL_WIDTH 27
 #endif
-#define LEVEL_LABEL_PADDING 14
+#define LEVEL_LABEL_PADDING 10
 #define SPELL_ROW_GAP 2
 #define SPELL_TERM_WIDTH 78
 #define SPELL_LEFT_MIN_WIDTH 24
 #define SPELL_LEFT_MAX_WIDTH 40
-#define SPELL_LEFT_COL_WIDTH 34
+#define SPELL_LEFT_COL_WIDTH 36
 
 struct abil_row {
   int id;
