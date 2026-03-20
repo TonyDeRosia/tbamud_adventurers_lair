@@ -1889,19 +1889,19 @@ ACMD(do_shadow)
           active++;
       }
     }
-    send_to_char(ch, "&zShadow Inventory&0: %d / %d slots used. Active: %d.\r\n", used, cap, active);
+    send_to_char(ch, "@YShadow Inventory@n: %d / %d slots used. @GActive@n: %d.\r\n", used, cap, active);
     if (!used) {
       send_to_char(ch, "You have no stored shadows.\r\n");
     } else {
       for (i = 0; i < cap; i++) {
         if (!SHADOW_SLOT_OCCUPIED(ch, i))
-          send_to_char(ch, " [%2d] (empty)\r\n", i + 1);
+          send_to_char(ch, " [%2d] @D[Empty]@n\r\n", i + 1);
         else
-          send_to_char(ch, " [%2d] %-20s Lvl %-3d %s\r\n",
+          send_to_char(ch, " [%2d] @C[Shadow: %-20s]@n Lvl %-3d %s\r\n",
                        i + 1,
                        SHADOW_SLOT_NAME(ch, i),
                        SHADOW_SLOT_LEVEL(ch, i),
-                       SHADOW_SLOT_ACTIVE(ch, i) ? "(summoned)" : "(stored)");
+                       SHADOW_SLOT_ACTIVE(ch, i) ? "@G[Active]@n" : "[Stored]");
       }
     }
     send_to_char(ch, "Commands:\r\n");
