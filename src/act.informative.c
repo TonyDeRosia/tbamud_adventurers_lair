@@ -1760,22 +1760,55 @@ ACMD(do_score)
     "%s╠═══════════════════════════════════════════════════════════════════════════════╣%s\r\n", B, R);
 
   /* Name and Title */
-  snprintf(line, sizeof(line), "%sName:%s %-20s  %s%-7s%s %-20s",
-    C, R, GET_NAME(ch), C, "Title:", R, GET_TITLE(ch));
+  {
+    char left_part[256];
+    char right_part[256];
+    int spacer;
+
+    snprintf(left_part, sizeof(left_part), "%sName:%s %-20s",
+      C, R, GET_NAME(ch));
+    snprintf(right_part, sizeof(right_part), "%s%-7s%s %s",
+      C, "Title:", R, GET_TITLE(ch));
+    spacer = (int)W - (int)visible_strlen_mud(left_part) - (int)visible_strlen_mud(right_part);
+    if (spacer < 2)
+      spacer = 2;
+    snprintf(line, sizeof(line), "%s%*s%s", left_part, spacer, "", right_part);
+  }
   len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
 
-    /* Race and Class */
-  snprintf(line, sizeof(line), "%sRace:%s %-20s  %s%-7s%s %-20s",
-    C, R, pc_race_types[GET_RACE(ch)],
-    C, "Class:", R, score_class_name(ch));
+  /* Race and Class */
+  {
+    char left_part[256];
+    char right_part[256];
+    int spacer;
+
+    snprintf(left_part, sizeof(left_part), "%sRace:%s %-20s",
+      C, R, pc_race_types[GET_RACE(ch)]);
+    snprintf(right_part, sizeof(right_part), "%s%-7s%s %s",
+      C, "Class:", R, score_class_name(ch));
+    spacer = (int)W - (int)visible_strlen_mud(left_part) - (int)visible_strlen_mud(right_part);
+    if (spacer < 2)
+      spacer = 2;
+    snprintf(line, sizeof(line), "%s%*s%s", left_part, spacer, "", right_part);
+  }
   len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
 
   /* Level and Age */
   {
     char age_text[32];
+    char left_part[256];
+    char right_part[256];
+    int spacer;
+
     snprintf(age_text, sizeof(age_text), "%d year%s old", GET_AGE(ch), (GET_AGE(ch) == 1 ? "" : "s"));
-    snprintf(line, sizeof(line), "%sLevel:%s %-20d  %s%-7s%s %-20s",
-      C, R, GET_LEVEL(ch), C, "Age:", R, age_text);
+    snprintf(left_part, sizeof(left_part), "%sLevel:%s %-20d",
+      C, R, GET_LEVEL(ch));
+    snprintf(right_part, sizeof(right_part), "%s%-7s%s %s",
+      C, "Age:", R, age_text);
+    spacer = (int)W - (int)visible_strlen_mud(left_part) - (int)visible_strlen_mud(right_part);
+    if (spacer < 2)
+      spacer = 2;
+    snprintf(line, sizeof(line), "%s%*s%s", left_part, spacer, "", right_part);
   }
   len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
 
@@ -1790,12 +1823,23 @@ ACMD(do_score)
     "%s╠═══════════════════════════════════════════════════════════════════════════════╣%s\r\n", B, R);
 
 /* HP, Mana, Move, Alignment */
-snprintf(line, sizeof(line),
-  "%sHP:%s %d/%d  %sMana:%s %d/%d  %sMove:%s %d/%d  %sAlignment:%s %d",
-  C, R, GET_HIT(ch), GET_MAX_HIT(ch),
-  C, R, GET_MANA(ch), effective_max_mana(ch),
-  C, R, GET_MOVE(ch), effective_max_move(ch),
-  C, R, GET_ALIGNMENT(ch));
+{
+  char left_part[256];
+  char right_part[128];
+  int spacer;
+
+  snprintf(left_part, sizeof(left_part),
+    "%sHP:%s %d/%d  %sMana:%s %d/%d  %sMove:%s %d/%d",
+    C, R, GET_HIT(ch), GET_MAX_HIT(ch),
+    C, R, GET_MANA(ch), effective_max_mana(ch),
+    C, R, GET_MOVE(ch), effective_max_move(ch));
+  snprintf(right_part, sizeof(right_part), "%sAlignment:%s %d",
+    C, R, GET_ALIGNMENT(ch));
+  spacer = (int)W - (int)visible_strlen_mud(left_part) - (int)visible_strlen_mud(right_part);
+  if (spacer < 2)
+    spacer = 2;
+  snprintf(line, sizeof(line), "%s%*s%s", left_part, spacer, "", right_part);
+}
 len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
 
 /* Blank spacer line */
@@ -1926,13 +1970,6 @@ len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
     C, R, GET_GLORY(ch),
     C, R, (long long)GET_BANK_GOLD(ch));
   len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
-
-/* Next Level (if mortal) */
-  if (GET_LEVEL(ch) < LVL_IMMORT) {
-    snprintf(line, sizeof(line), "%sTNL:%s %d exp",
-      C, R, level_exp(GET_CLASS(ch), GET_LEVEL(ch) + 1) - GET_EXP(ch));
-    len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
-  }
 
   /* Separator */
   len += snprintf(buf + len, sizeof(buf) - len,
