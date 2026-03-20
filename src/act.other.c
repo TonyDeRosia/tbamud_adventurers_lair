@@ -262,6 +262,25 @@ static struct char_data *shadow_active_mob(struct char_data *ch, int slot)
   return NULL;
 }
 
+static void remove_follower_link_silently(struct char_data *master, struct char_data *follower)
+{
+  struct follow_type *node, *prev = NULL;
+
+  if (!master || !follower)
+    return;
+
+  for (node = master->followers; node; prev = node, node = node->next) {
+    if (node->follower != follower)
+      continue;
+    if (prev)
+      prev->next = node->next;
+    else
+      master->followers = node->next;
+    free(node);
+    break;
+  }
+}
+
 static void shadow_prepare_for_removal(struct char_data *mob)
 {
   struct char_data *fighter, *next_fighter;
@@ -281,8 +300,19 @@ static void shadow_prepare_for_removal(struct char_data *mob)
       stop_fighting(fighter);
   }
 
-  if (mob->followers || mob->master)
-    die_follower(mob);
+  while (mob->followers) {
+    struct follow_type *next = mob->followers->next;
+    if (mob->followers->follower)
+      mob->followers->follower->master = NULL;
+    free(mob->followers);
+    mob->followers = next;
+  }
+
+  if (mob->master) {
+    remove_follower_link_silently(mob->master, mob);
+    mob->master = NULL;
+  }
+  REMOVE_BIT_AR(AFF_FLAGS(mob), AFF_CHARM);
 }
 
 static void shadow_sync_active_flags(struct char_data *ch)
@@ -2064,6 +2094,8 @@ ACMD(do_shadow)
     } else {
       strlcpy(display_name, summon_name, sizeof(display_name));
     }
+    if (!shadow_name_looks_valid(display_name))
+      strlcpy(display_name, "a shadow", sizeof(display_name));
     act("You call forth $t from your shadow storage.", FALSE, ch, NULL, display_name, TO_CHAR);
     act("$n calls forth $t from $s shadow storage.", FALSE, ch, NULL, display_name, TO_ROOM);
     send_to_char(ch, "You expend %d mana.\r\n", mana_cost);
@@ -2119,6 +2151,20 @@ ACMD(do_shadow)
     SHADOW_SLOT_ACTIVE(ch, slot) = 0;
     SHADOW_SLOT_LEVEL(ch, slot) = 0;
     SHADOW_SLOT_VNUM(ch, slot) = NOBODY;
+    SHADOW_SLOT_PROFILE_VALID(ch, slot) = 0;
+    SHADOW_SLOT_MAX_HIT(ch, slot) = 0;
+    SHADOW_SLOT_AC(ch, slot) = 0;
+    SHADOW_SLOT_HITROLL(ch, slot) = 0;
+    SHADOW_SLOT_DAMROLL(ch, slot) = 0;
+    SHADOW_SLOT_MAX_MANA(ch, slot) = 0;
+    SHADOW_SLOT_DAMNODICE(ch, slot) = 0;
+    SHADOW_SLOT_DAMSIZEDICE(ch, slot) = 0;
+    SHADOW_SLOT_STR(ch, slot) = 0;
+    SHADOW_SLOT_INT(ch, slot) = 0;
+    SHADOW_SLOT_WIS(ch, slot) = 0;
+    SHADOW_SLOT_DEX(ch, slot) = 0;
+    SHADOW_SLOT_CON(ch, slot) = 0;
+    SHADOW_SLOT_CHA(ch, slot) = 0;
     SHADOW_SLOT_NAME(ch, slot)[0] = '\0';
     save_char(ch);
     return;
@@ -2151,8 +2197,18 @@ ACMD(do_shadow)
     strlcpy(SHADOW_SLOT_NAME(ch, slot), safe_name, MAX_SHADOW_NAME_LENGTH + 1);
     mob = shadow_active_mob(ch, slot);
     if (mob) {
-      free(mob->player.short_descr);
+      mob_rnum rnum = GET_MOB_RNUM(mob);
+      const char *proto_short = (rnum != NOBODY) ? mob_proto[rnum].player.short_descr : NULL;
+      const char *proto_long = (rnum != NOBODY) ? mob_proto[rnum].player.long_descr : NULL;
+      char long_buf[MAX_STRING_LENGTH];
+      if (mob->player.short_descr && mob->player.short_descr != proto_short)
+        free(mob->player.short_descr);
       mob->player.short_descr = strdup(safe_name);
+      snprintf(long_buf, sizeof(long_buf), "%s stands here.", safe_name);
+      long_buf[0] = UPPER(long_buf[0]);
+      if (mob->player.long_descr && mob->player.long_descr != proto_long)
+        free(mob->player.long_descr);
+      mob->player.long_descr = strdup(long_buf);
     }
     send_to_char(ch, "You rename the shadow to %s.\r\n", safe_name);
     save_char(ch);

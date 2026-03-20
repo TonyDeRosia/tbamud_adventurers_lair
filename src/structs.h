@@ -1108,6 +1108,20 @@ struct player_special_data_saved
   struct shadow_roster_entry {
     mob_vnum source_vnum; /**< Captured source mob vnum when known, NOBODY otherwise. */
     int level; /**< Stored level/power tier used for summoning. */
+    int combat_profile_valid; /**< Whether explicit combat profile fields are present. */
+    int max_hit; /**< Stored max hit points from source shadow profile. */
+    int armor; /**< Stored armor class from source shadow profile. */
+    int hitroll; /**< Stored hitroll from source shadow profile. */
+    int damroll; /**< Stored damroll from source shadow profile. */
+    int max_mana; /**< Stored mana pool for caster-style shadows. */
+    int damnodice; /**< Stored damage dice count. */
+    int damsizedice; /**< Stored damage dice size. */
+    sbyte str; /**< Stored strength stat. */
+    sbyte intel; /**< Stored intelligence stat. */
+    sbyte wis; /**< Stored wisdom stat. */
+    sbyte dex; /**< Stored dexterity stat. */
+    sbyte con; /**< Stored constitution stat. */
+    sbyte cha; /**< Stored charisma stat. */
     int occupied; /**< Slot contains a stored shadow. */
     int active; /**< Slot currently has an active summoned instance. */
     char name[MAX_SHADOW_NAME_LENGTH + 1]; /**< Stored display name. */
