@@ -1015,7 +1015,7 @@ break;
     return;
 
   case MEDIT_AC:
-    GET_AC(OLC_MOB(d)) = LIMIT(i, -200, 200);
+    GET_AC(OLC_MOB(d)) = LIMIT(i, 0, 200);
     OLC_VAL(d) = TRUE;
     medit_disp_stats_menu(d);
     return;
