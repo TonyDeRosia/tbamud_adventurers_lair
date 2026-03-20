@@ -551,10 +551,13 @@ static int shadow_extraction_success_chance(struct char_data *ch, int corpse_lev
 int summon_stored_shadow(struct char_data *ch, int slot)
 {
   struct char_data *mob;
+  char *new_short = NULL;
   const char *resolved_name = NULL;
   const char *template_short = NULL;
+  const char *proto_short = NULL;
   mob_vnum source_vnum;
   mob_rnum source_rnum;
+  mob_rnum summon_rnum;
   char stored_name[MAX_SHADOW_NAME_LENGTH + 1];
   mob_vnum vnum;
   int level;
@@ -574,6 +577,9 @@ int summon_stored_shadow(struct char_data *ch, int slot)
   vnum = SHADOW_SLOT_VNUM(ch, slot);
   if (real_mobile(vnum) == NOBODY)
     vnum = MOBVNUM_SHADOW_ELITE;
+  summon_rnum = real_mobile(vnum);
+  if (summon_rnum != NOBODY)
+    proto_short = mob_proto[summon_rnum].player.short_descr;
 
   level = MAX(1, SHADOW_SLOT_LEVEL(ch, slot));
   mob = summon_shadow_servant(ch, vnum, level, 15, SPELL_SHADOW_EXTRACTION);
@@ -593,8 +599,12 @@ int summon_stored_shadow(struct char_data *ch, int slot)
 
   strlcpy(SHADOW_SLOT_NAME(ch, slot), resolved_name, MAX_SHADOW_NAME_LENGTH + 1);
   if (shadow_name_looks_valid(SHADOW_SLOT_NAME(ch, slot))) {
-    free(mob->player.short_descr);
-    mob->player.short_descr = strdup(SHADOW_SLOT_NAME(ch, slot));
+    new_short = strdup(SHADOW_SLOT_NAME(ch, slot));
+    if (new_short) {
+      if (mob->player.short_descr && mob->player.short_descr != proto_short)
+        free(mob->player.short_descr);
+      mob->player.short_descr = new_short;
+    }
   }
   SHADOW_SLOT_ACTIVE(ch, slot) = 1;
   mark_shadow_roster_slot(mob, slot);
