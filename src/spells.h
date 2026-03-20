@@ -587,6 +587,9 @@ ASPELL(spell_mutilate);
 ASPELL(spell_shadow_armor);
 
 int summon_stored_shadow(struct char_data *ch, int slot);
+int shadow_active_count(struct char_data *ch);
+int shadow_max_active_count(struct char_data *ch);
+bool shadow_can_summon_more(struct char_data *ch, char *reason, size_t reason_sz);
 ASPELL(spell_total_occultation);
 ASPELL(spell_domain_break);
 ASPELL(spell_hunters_instinct);
