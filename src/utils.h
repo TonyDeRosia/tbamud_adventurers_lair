@@ -115,6 +115,7 @@ char *CAP(char *txt);
 int	num_followers_charmed(struct char_data *ch);
 void	die_follower(struct char_data *ch);
 void	add_follower(struct char_data *ch, struct char_data *leader);
+void	add_follower_silent(struct char_data *ch, struct char_data *leader);
 void	stop_follower(struct char_data *ch);
 void	break_charm_follower(struct char_data *ch, struct char_data *vict);
 void	dismount_char(struct char_data *rider);

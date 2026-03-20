@@ -383,8 +383,8 @@ static void show_ability_table_aligned(struct char_data *ch, int show_spells, in
   int cls = GET_CLASS(ch);
   int col = 0;
   int last_lvl = -1;
-  int col_width = show_spells ? 36 : ABIL_COL_WIDTH;
-  int name_width = show_spells ? 24 : 17;
+  int col_width = ABIL_COL_WIDTH;
+  int name_width = 17;
 
   /* "Level 99: " is 10 chars; padding below matches practice output. */
 
@@ -2053,8 +2053,6 @@ ACMD(do_shadow)
 
   if (is_abbrev(shadow_subcmd, "summon")) {
     int mana_cost;
-    const char *resolved_name;
-    char summon_name[MAX_SHADOW_NAME_LENGTH + 1];
 
     if (!*selector) {
       send_to_char(ch, "Usage: shadow summon <slot|name>\r\n");
@@ -2080,8 +2078,6 @@ ACMD(do_shadow)
       send_to_char(ch, "You lack the mana to summon this shadow.\r\n");
       return;
     }
-    resolved_name = shadow_display_name(ch, slot, NULL);
-    strlcpy(summon_name, resolved_name ? resolved_name : "a shadow", sizeof(summon_name));
     GET_MANA(ch) -= mana_cost;
     if (!summon_stored_shadow(ch, slot)) {
       GET_MANA(ch) += mana_cost;
@@ -2089,11 +2085,7 @@ ACMD(do_shadow)
       return;
     }
     mob = shadow_active_mob(ch, slot);
-    if (!shadow_name_looks_valid(summon_name)) {
-      strlcpy(display_name, shadow_display_name(ch, slot, mob), sizeof(display_name));
-    } else {
-      strlcpy(display_name, summon_name, sizeof(display_name));
-    }
+    strlcpy(display_name, shadow_display_name(ch, slot, mob), sizeof(display_name));
     if (!shadow_name_looks_valid(display_name))
       strlcpy(display_name, "a shadow", sizeof(display_name));
     act("You call forth $t from your shadow storage.", FALSE, ch, NULL, display_name, TO_CHAR);

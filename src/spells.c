@@ -44,7 +44,7 @@ static int spell_dmg_medium_manual(int level);
 static int spell_dmg_high_manual(int level);
 static int spell_dmg_extreme_manual(int level);
 static int spell_dmg_ultra_manual(int level);
-static struct char_data *summon_temp_follower(struct char_data *ch, mob_vnum vnum, int level, int rounds);
+static struct char_data *summon_temp_follower(struct char_data *ch, mob_vnum vnum, int level, int rounds, const char *identity_name, int silent_follow);
 
 static void remove_follower_link_silently(struct char_data *master, struct char_data *follower)
 {
@@ -709,11 +709,14 @@ static int count_shadow_servants_in_room(struct char_data *ch)
   return count;
 }
 
-static struct char_data *summon_shadow_servant(struct char_data *ch, mob_vnum vnum, int level, int rounds, int source_spell)
+static struct char_data *summon_shadow_servant(struct char_data *ch, mob_vnum vnum, int level, int rounds, int source_spell, const char *identity_name, int silent_follow)
 {
-  struct char_data *mob = summon_temp_follower(ch, vnum, level, rounds);
-  if (mob)
+  struct char_data *mob = summon_temp_follower(ch, vnum, level, rounds, identity_name, silent_follow);
+  if (mob) {
+    if (shadow_name_looks_valid(identity_name))
+      apply_shadow_identity_to_mob(mob, identity_name);
     mark_shadow_servant(mob, source_spell, rounds);
+  }
   return mob;
 }
 
@@ -759,17 +762,20 @@ int summon_stored_shadow(struct char_data *ch, int slot)
     vnum = MOBVNUM_SHADOW_ELITE;
 
   level = MAX(1, SHADOW_SLOT_LEVEL(ch, slot));
-  mob = summon_shadow_servant(ch, vnum, level, 15, SPELL_SHADOW_EXTRACTION);
+  if (shadow_name_looks_valid(stored_name))
+    resolved_name = stored_name;
+  else
+    resolved_name = NULL;
+
+  mob = summon_shadow_servant(ch, vnum, level, 15, SPELL_SHADOW_EXTRACTION, resolved_name, TRUE);
   if (!mob)
     return FALSE;
 
-  if (shadow_name_looks_valid(stored_name))
-    resolved_name = stored_name;
-  else if (shadow_name_looks_valid(mob->player.short_descr))
+  if (!shadow_name_looks_valid(resolved_name) && shadow_name_looks_valid(mob->player.short_descr))
     resolved_name = mob->player.short_descr;
-  else if (shadow_name_looks_valid(mob->player.name))
+  else if (!shadow_name_looks_valid(resolved_name) && shadow_name_looks_valid(mob->player.name))
     resolved_name = mob->player.name;
-  else
+  else if (!shadow_name_looks_valid(resolved_name))
     resolved_name = "a shadow";
 
   strlcpy(SHADOW_SLOT_NAME(ch, slot), resolved_name, MAX_SHADOW_NAME_LENGTH + 1);
@@ -781,7 +787,7 @@ int summon_stored_shadow(struct char_data *ch, int slot)
   return TRUE;
 }
 
-static struct char_data *summon_temp_follower(struct char_data *ch, mob_vnum vnum, int level, int rounds)
+static struct char_data *summon_temp_follower(struct char_data *ch, mob_vnum vnum, int level, int rounds, const char *identity_name, int silent_follow)
 {
   struct char_data *mob = read_mobile(vnum, VIRTUAL);
   if (!mob)
@@ -789,8 +795,13 @@ static struct char_data *summon_temp_follower(struct char_data *ch, mob_vnum vnu
 
   GET_LEVEL(mob) = MAX(1, level);
   SET_BIT_AR(AFF_FLAGS(mob), AFF_CHARM);
+  if (shadow_name_looks_valid(identity_name))
+    apply_shadow_identity_to_mob(mob, identity_name);
   char_to_room(mob, IN_ROOM(ch));
-  add_follower(mob, ch);
+  if (silent_follow)
+    add_follower_silent(mob, ch);
+  else
+    add_follower(mob, ch);
   if (GROUP(ch) && GROUP_LEADER(GROUP(ch)) == ch)
     join_group(mob, GROUP(ch));
   GET_SUMMON_TIMER(mob) = MAX(1, rounds);
@@ -1678,7 +1689,7 @@ ASPELL(spell_conjure_elemental)
     vnum = MOBVNUM_GREATER_ELEMENTAL;
   else if (level >= 15)
     vnum = MOBVNUM_ELEMENTAL;
-  summon_temp_follower(ch, vnum, MAX(1, level - 5), 10);
+  summon_temp_follower(ch, vnum, MAX(1, level - 5), 10, NULL, FALSE);
 }
 
 ASPELL(spell_call_wolves)
@@ -1688,14 +1699,14 @@ ASPELL(spell_call_wolves)
     return;
   count = dice(1, 2) + 1;
   for (i = 0; i < count; i++)
-    summon_temp_follower(ch, MOBVNUM_SUMMONED_WOLF, MAX(2, level - 8), 8);
+    summon_temp_follower(ch, MOBVNUM_SUMMONED_WOLF, MAX(2, level - 8), 8, NULL, FALSE);
 }
 
 ASPELL(spell_call_bears)
 {
   if (!ch)
     return;
-  summon_temp_follower(ch, MOBVNUM_SUMMONED_BEAR, MAX(1, level - 5), 8);
+  summon_temp_follower(ch, MOBVNUM_SUMMONED_BEAR, MAX(1, level - 5), 8, NULL, FALSE);
 }
 
 ASPELL(spell_animate_dead_greater)
@@ -1712,7 +1723,7 @@ ASPELL(spell_animate_dead_greater)
     send_to_char(ch, "You must target an NPC corpse in this room.\r\n");
     return;
   }
-  summon_temp_follower(ch, MOBVNUM_GREATER_UNDEAD, MAX(1, level), 10);
+  summon_temp_follower(ch, MOBVNUM_GREATER_UNDEAD, MAX(1, level), 10, NULL, FALSE);
   extract_obj(corpse);
 }
 
@@ -1730,7 +1741,7 @@ ASPELL(spell_abyss_gate)
   else
     vnum = MOBVNUM_GREATER_DEMON;
 
-  mob = summon_temp_follower(ch, vnum, MAX(1, level - 3), 5);
+  mob = summon_temp_follower(ch, vnum, MAX(1, level - 3), 5, NULL, FALSE);
   if (mob && rand_number(1, 100) <= 25) {
     stop_follower(mob);
     REMOVE_BIT_AR(AFF_FLAGS(mob), AFF_CHARM);
@@ -1754,7 +1765,7 @@ ASPELL(spell_gate)
     vnum = MOBVNUM_DEMON_LORD;
   else
     vnum = MOBVNUM_ELEMENTAL_TITAN;
-  summon_temp_follower(ch, vnum, level + 2, 3);
+  summon_temp_follower(ch, vnum, level + 2, 3, NULL, FALSE);
 }
 
 ASPELL(spell_portal)
@@ -2625,7 +2636,7 @@ ASPELL(spell_call_shadow_legion)
   }
   count = rand_number(2, 4);
   for (i = 0; i < count; i++)
-    summon_shadow_servant(ch, MOBVNUM_SHADOW_SOLDIER, MAX(1, level - 6), 8, SPELL_CALL_SHADOW_LEGION);
+    summon_shadow_servant(ch, MOBVNUM_SHADOW_SOLDIER, MAX(1, level - 6), 8, SPELL_CALL_SHADOW_LEGION, NULL, FALSE);
   act("Shadows rise at your command as your legion answers!", FALSE, ch, 0, 0, TO_CHAR);
   act("Shadows rise from the ground to serve $n!", FALSE, ch, 0, 0, TO_ROOM);
 }
@@ -2764,7 +2775,7 @@ ASPELL(spell_arise_greater)
       return;
     }
   }
-  summon_shadow_servant(ch, MOBVNUM_GREATER_SHADOW, MAX(1, level + 2), 12, SPELL_ARISE_GREATER);
+  summon_shadow_servant(ch, MOBVNUM_GREATER_SHADOW, MAX(1, level + 2), 12, SPELL_ARISE_GREATER, NULL, FALSE);
   extract_obj(corpse);
   act("You command the fallen to arise as a greater shadow!", FALSE, ch, 0, 0, TO_CHAR);
   act("$n commands the fallen to arise as a greater shadow!", FALSE, ch, 0, 0, TO_ROOM);

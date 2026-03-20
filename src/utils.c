@@ -744,7 +744,7 @@ void die_follower(struct char_data *ch)
  * be following anyone, otherwise core dump.
  * @param ch The character to follow.
  * @param leader The character to be followed. */
-void add_follower(struct char_data *ch, struct char_data *leader)
+static void add_follower_internal(struct char_data *ch, struct char_data *leader, int send_messages)
 {
   struct follow_type *k;
 
@@ -761,10 +761,22 @@ void add_follower(struct char_data *ch, struct char_data *leader)
   k->next = leader->followers;
   leader->followers = k;
 
-  act("You now follow $N.", FALSE, ch, 0, leader, TO_CHAR);
-  if (CAN_SEE(leader, ch))
-    act("$n starts following you.", TRUE, ch, 0, leader, TO_VICT);
-  act("$n starts to follow $N.", TRUE, ch, 0, leader, TO_NOTVICT);
+  if (send_messages) {
+    act("You now follow $N.", FALSE, ch, 0, leader, TO_CHAR);
+    if (CAN_SEE(leader, ch))
+      act("$n starts following you.", TRUE, ch, 0, leader, TO_VICT);
+    act("$n starts to follow $N.", TRUE, ch, 0, leader, TO_NOTVICT);
+  }
+}
+
+void add_follower(struct char_data *ch, struct char_data *leader)
+{
+  add_follower_internal(ch, leader, TRUE);
+}
+
+void add_follower_silent(struct char_data *ch, struct char_data *leader)
+{
+  add_follower_internal(ch, leader, FALSE);
 }
 
 /** Reads the next non-blank line off of the input stream. Empty lines are
