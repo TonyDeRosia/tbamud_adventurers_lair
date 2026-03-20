@@ -1760,55 +1760,28 @@ ACMD(do_score)
     "%s╠═══════════════════════════════════════════════════════════════════════════════╣%s\r\n", B, R);
 
   /* Name and Title */
-  {
-    char left_part[256];
-    char right_part[256];
-    int spacer;
-
-    snprintf(left_part, sizeof(left_part), "%sName:%s %-20s",
-      C, R, GET_NAME(ch));
-    snprintf(right_part, sizeof(right_part), "%s%-7s%s %s",
-      C, "Title:", R, GET_TITLE(ch));
-    spacer = (int)W - (int)visible_strlen_mud(left_part) - (int)visible_strlen_mud(right_part);
-    if (spacer < 2)
-      spacer = 2;
-    snprintf(line, sizeof(line), "%s%*s%s", left_part, spacer, "", right_part);
-  }
+  snprintf(line, sizeof(line),
+    "%sName:%s %-22s  %sTitle:%s %s",
+    C, R, GET_NAME(ch),
+    C, R, GET_TITLE(ch));
   len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
 
   /* Race and Class */
-  {
-    char left_part[256];
-    char right_part[256];
-    int spacer;
-
-    snprintf(left_part, sizeof(left_part), "%sRace:%s %-20s",
-      C, R, pc_race_types[GET_RACE(ch)]);
-    snprintf(right_part, sizeof(right_part), "%s%-7s%s %s",
-      C, "Class:", R, score_class_name(ch));
-    spacer = (int)W - (int)visible_strlen_mud(left_part) - (int)visible_strlen_mud(right_part);
-    if (spacer < 2)
-      spacer = 2;
-    snprintf(line, sizeof(line), "%s%*s%s", left_part, spacer, "", right_part);
-  }
+  snprintf(line, sizeof(line),
+    "%sRace:%s %-22s  %sClass:%s %s",
+    C, R, pc_race_types[GET_RACE(ch)],
+    C, R, score_class_name(ch));
   len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
 
   /* Level and Age */
   {
     char age_text[32];
-    char left_part[256];
-    char right_part[256];
-    int spacer;
 
     snprintf(age_text, sizeof(age_text), "%d year%s old", GET_AGE(ch), (GET_AGE(ch) == 1 ? "" : "s"));
-    snprintf(left_part, sizeof(left_part), "%sLevel:%s %-20d",
-      C, R, GET_LEVEL(ch));
-    snprintf(right_part, sizeof(right_part), "%s%-7s%s %s",
-      C, "Age:", R, age_text);
-    spacer = (int)W - (int)visible_strlen_mud(left_part) - (int)visible_strlen_mud(right_part);
-    if (spacer < 2)
-      spacer = 2;
-    snprintf(line, sizeof(line), "%s%*s%s", left_part, spacer, "", right_part);
+    snprintf(line, sizeof(line),
+      "%sLevel:%s %-21d  %sAge:%s %s",
+      C, R, GET_LEVEL(ch),
+      C, R, age_text);
   }
   len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
 
@@ -1822,80 +1795,61 @@ ACMD(do_score)
   len += snprintf(buf + len, sizeof(buf) - len,
     "%s╠═══════════════════════════════════════════════════════════════════════════════╣%s\r\n", B, R);
 
-/* HP, Mana, Move, Alignment */
-{
-  char left_part[256];
-  char right_part[128];
-  int spacer;
-
-  snprintf(left_part, sizeof(left_part),
-    "%sHP:%s %d/%d  %sMana:%s %d/%d  %sMove:%s %d/%d",
+  /* HP, Mana, Move, Alignment */
+  snprintf(line, sizeof(line),
+    "%sHP:%s %d/%d  %sMana:%s %d/%d  %sMove:%s %d/%d  %sAlignment:%s %d",
     C, R, GET_HIT(ch), GET_MAX_HIT(ch),
     C, R, GET_MANA(ch), effective_max_mana(ch),
-    C, R, GET_MOVE(ch), effective_max_move(ch));
-  snprintf(right_part, sizeof(right_part), "%sAlignment:%s %d",
+    C, R, GET_MOVE(ch), effective_max_move(ch),
     C, R, GET_ALIGNMENT(ch));
-  spacer = (int)W - (int)visible_strlen_mud(left_part) - (int)visible_strlen_mud(right_part);
-  if (spacer < 2)
-    spacer = 2;
-  snprintf(line, sizeof(line), "%s%*s%s", left_part, spacer, "", right_part);
-}
-len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
-
-/* Blank spacer line */
-len = append_box_line(buf, len, sizeof(buf), B, R, "", W);
-
-/* Experience and TNL */
-{
-  char exp_part[128];
-  char tnl_part[80];
-  int spacer;
-  int next_need = 0;
-  if (GET_LEVEL(ch) < LVL_IMMORT) {
-    int next_level = GET_LEVEL(ch) + 1;
-    next_need = level_exp(GET_CLASS(ch), next_level) - GET_EXP(ch);
-  }
-  snprintf(exp_part, sizeof(exp_part), "%sExp:%s %d", C, R, GET_EXP(ch));
-  snprintf(tnl_part, sizeof(tnl_part), "%sTNL:%s %d", C, R, next_need);
-  spacer = (int)W - (int)visible_strlen_mud(exp_part) - (int)visible_strlen_mud(tnl_part);
-  if (spacer < 2)
-    spacer = 2;
-  snprintf(line, sizeof(line), "%s%*s%s", exp_part, spacer, "", tnl_part);
-}
-len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
-
-/* Blank spacer line */
-len = append_box_line(buf, len, sizeof(buf), B, R, "", W);
-
-/* Carry Capacity */
-{
-  int cap = CAN_CARRY_W(ch);
-  int cur = IS_CARRYING_W(ch);
-  snprintf(line, sizeof(line), "%sCarry Capacity:%s %d / %d  (%s)", C, R, cur, cap, encumbrance_text(ch));
   len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
-}
+
+  /* Blank spacer line */
+  len = append_box_line(buf, len, sizeof(buf), B, R, "", W);
+
+  /* Experience and TNL */
+  {
+    int next_need = 0;
+    char exp_part[128];
+    char tnl_part[80];
+    int spacer;
+
+    if (GET_LEVEL(ch) < LVL_IMMORT) {
+      int next_level = GET_LEVEL(ch) + 1;
+      next_need = level_exp(GET_CLASS(ch), next_level) - GET_EXP(ch);
+    }
+
+    snprintf(exp_part, sizeof(exp_part), "%sExp:%s %d", C, R, GET_EXP(ch));
+    snprintf(tnl_part, sizeof(tnl_part), "%sTNL:%s %d", C, R, next_need);
+    spacer = (int)W - (int)visible_strlen_mud(exp_part) - (int)visible_strlen_mud(tnl_part);
+    if (spacer < 2)
+      spacer = 2;
+    snprintf(line, sizeof(line), "%s%*s%s", exp_part, spacer, "", tnl_part);
+  }
+  len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
+
+  /* Blank spacer line */
+  len = append_box_line(buf, len, sizeof(buf), B, R, "", W);
+
+  /* Carry Capacity */
+  {
+    int cap = CAN_CARRY_W(ch);
+    int cur = IS_CARRYING_W(ch);
+    snprintf(line, sizeof(line), "%sCarry Capacity:%s %d / %d  (%s)", C, R, cur, cap, encumbrance_text(ch));
+    len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
+  }
 
 /* Separator */
   len += snprintf(buf + len, sizeof(buf) - len,
     "%s╠═══════════════════════════════════════════════════════════════════════════════╣%s\r\n", B, R);
 
-  /* Defensive line */
-  {
-    int shown_armor = compute_armor_class(ch);
-    int shown_evasion = compute_evasion(ch);
-    int spell_save = GET_SAVE(ch, 4);
-
-    snprintf(line, sizeof(line),
-      "%sArmor:%s %-8d   %sEvasion:%s %-5d   %sSpell Saves:%s %-6d",
-      C, R, shown_armor,
-      C, R, shown_evasion,
-      C, R, spell_save);
-  }
-  len = append_box_line(buf, len, sizeof(buf), B, R, line, W);/* Combat Stats */
-  len = append_box_line(buf, len, sizeof(buf), B, R, "", W);
+  /* Combat Stats */
   {
     int offensive_hit = compute_offensive_hit_value(ch, NULL);
     int accuracy_pct = compute_hit_chance_from_values(offensive_hit, 10); /* Neutral target Evasion baseline. */
+    int shown_armor = compute_armor_class(ch);
+    int shown_evasion = compute_evasion(ch);
+    int spell_save = GET_SAVE(ch, 4);
     int b_str = ch->real_abils.str;
     int b_dex = ch->real_abils.dex;
     int b_con = ch->real_abils.con;
@@ -1928,32 +1882,27 @@ len = append_box_line(buf, len, sizeof(buf), B, R, "", W);
     len = append_box_line(buf, len, sizeof(buf), B, R, "", W);
 
     snprintf(line, sizeof(line),
+      "%sArmor:%s %-8d   %sEvasion:%s %-5d   %sSpell Saves:%s %-6d",
+      C, R, shown_armor,
+      C, R, shown_evasion,
+      C, R, spell_save);
+    len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
+    len = append_box_line(buf, len, sizeof(buf), B, R, "", W);
+
+    snprintf(line, sizeof(line),
       "%sOffense:%s  Hitroll %+d  Damroll %+d  Accuracy: %d%%",
       C, R,
       GET_HITROLL(ch), GET_DAMROLL(ch), accuracy_pct);
     len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
   }
   len = append_box_line(buf, len, sizeof(buf), B, R, "", W);
-/* Crit chances */
-snprintf(line, sizeof(line),
-         "%sCritical hit:%s %d   %sCritical Spell:%s %d   %sCritical Heal:%s %d",
-         C, R, crit_total_melee(ch),
-         C, R, crit_total_spell(ch),
-         C, R, crit_total_heal(ch));
-len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
-
-
-  
-
-  len = append_box_line(buf, len, sizeof(buf), B, R, "", W);
-  if (GET_EQ(ch, WEAR_WIELD) && GET_OBJ_TYPE(GET_EQ(ch, WEAR_WIELD)) == ITEM_WEAPON) {
-    struct obj_data *wobj = GET_EQ(ch, WEAR_WIELD);
-    int nd = GET_OBJ_VAL(wobj, 1);
-    int sd = GET_OBJ_VAL(wobj, 2);
-
-    snprintf(line, sizeof(line), "%sWeapon:%s %s (%dD%d)", C, R, wobj->short_description, nd, sd);
-    len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
-  }
+  /* Crit chances */
+  snprintf(line, sizeof(line),
+           "%sCritical hit:%s %d   %sCritical Spell:%s %d   %sCritical Heal:%s %d",
+           C, R, crit_total_melee(ch),
+           C, R, crit_total_spell(ch),
+           C, R, crit_total_heal(ch));
+  len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
   /* Separator */
   len += snprintf(buf + len, sizeof(buf) - len,
     "%s╠═══════════════════════════════════════════════════════════════════════════════╣%s\r\n", B, R);
@@ -1976,9 +1925,18 @@ len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
     "%s╠═══════════════════════════════════════════════════════════════════════════════╣%s\r\n", B, R);
 
   /* Quest Information */
-  snprintf(line, sizeof(line),
-    "%sQuests completed:%s %d                                   %sQuest Points:%s %d",
-    C, R, GET_NUM_QUESTS(ch), M, R, GET_QUESTPOINTS(ch));
+  {
+    char left_part[128];
+    char right_part[128];
+    int spacer;
+
+    snprintf(left_part, sizeof(left_part), "%sQuests completed:%s %d", C, R, GET_NUM_QUESTS(ch));
+    snprintf(right_part, sizeof(right_part), "%sQuest Points:%s %d", M, R, GET_QUESTPOINTS(ch));
+    spacer = (int)W - (int)visible_strlen_mud(left_part) - (int)visible_strlen_mud(right_part);
+    if (spacer < 2)
+      spacer = 2;
+    snprintf(line, sizeof(line), "%s%*s%s", left_part, spacer, "", right_part);
+  }
   len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
 
   if (GET_QUEST(ch) != NOTHING) {
