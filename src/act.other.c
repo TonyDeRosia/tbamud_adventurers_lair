@@ -30,6 +30,7 @@
 #include "mail.h"  /* for has_mail() */
 #include "shop.h"
 #include "quest.h"
+#include "criticalhits.h"
 
 #define GLORY_PRACTICE_COST 250
 #define GLORY_TRAIN_COST 600
@@ -1583,6 +1584,18 @@ ACMD(do_train)
   char arg[MAX_INPUT_LENGTH];
   sbyte *stat_field = NULL;
   const char *stat_name = NULL;
+  const char *stat_label = NULL;
+  int old_trains, new_trains;
+  int old_val, new_val;
+  int old_carry, new_carry;
+  int old_evasion, new_evasion;
+  int old_melee_crit, new_melee_crit;
+  int old_spell_crit, new_spell_crit;
+  int old_heal_crit, new_heal_crit;
+  int old_max_hit, new_max_hit;
+  int old_max_mana, new_max_mana;
+  int old_max_move, new_max_move;
+  const int stat_cap = 20;
 
   if (IS_NPC(ch))
     return;
@@ -1595,91 +1608,171 @@ ACMD(do_train)
   }
 
   if (!*arg) {
-    send_to_char(ch, "You have %d training sessions available.\r\n", GET_TRAINS(ch));
-    send_to_char(ch, "Train str dex con int wis cha (cost 1, cap 20) or hit mana move (cost 10).\r\n");
+    send_to_char(ch, "You have %d training sessions available.\r\n\r\n", GET_TRAINS(ch));
+    send_to_char(ch, "Base stats\r\n");
+    send_to_char(ch, "  Str %d/%d%s   Dex %d/%d%s   Con %d/%d%s\r\n",
+                 ch->real_abils.str, stat_cap, ch->real_abils.str >= stat_cap ? " [MAX]" : "",
+                 ch->real_abils.dex, stat_cap, ch->real_abils.dex >= stat_cap ? " [MAX]" : "",
+                 ch->real_abils.con, stat_cap, ch->real_abils.con >= stat_cap ? " [MAX]" : "");
+    send_to_char(ch, "  Int %d/%d%s   Wis %d/%d%s   Cha %d/%d%s\r\n\r\n",
+                 ch->real_abils.intel, stat_cap, ch->real_abils.intel >= stat_cap ? " [MAX]" : "",
+                 ch->real_abils.wis, stat_cap, ch->real_abils.wis >= stat_cap ? " [MAX]" : "",
+                 ch->real_abils.cha, stat_cap, ch->real_abils.cha >= stat_cap ? " [MAX]" : "");
+    send_to_char(ch, "Train str dex con int wis cha (cost 1, cap %d)\r\n", stat_cap);
+    send_to_char(ch, "Train hit mana move (cost 10)\r\n");
     return;
   }
 
   if (!str_cmp(arg, "hit")) {
     if (GET_TRAINS(ch) < 10) {
-      send_to_char(ch, "Training hit requires 10 training sessions. You currently have %d.\r\n",
-                   GET_TRAINS(ch));
+      send_to_char(ch, "Training hit requires 10 training sessions.\r\n");
+      send_to_char(ch, "  Hit points: %d\r\n", GET_MAX_HIT(ch));
+      send_to_char(ch, "  Training sessions remaining: %d\r\n", GET_TRAINS(ch));
       return;
     }
 
+    old_trains = GET_TRAINS(ch);
+    old_max_hit = GET_MAX_HIT(ch);
     GET_TRAINS(ch) -= 10;
     GET_MAX_HIT(ch) += 10;
-    send_to_char(ch, "You spend ten training sessions and feel tougher and more durable.\r\n");
+    new_trains = GET_TRAINS(ch);
+    new_max_hit = GET_MAX_HIT(ch);
+    send_to_char(ch, "Training successful.\r\n");
+    send_to_char(ch, "  Hit points: %d -> %d\r\n", old_max_hit, new_max_hit);
+    send_to_char(ch, "  Training sessions: %d -> %d\r\n", old_trains, new_trains);
     return;
   }
 
   if (!str_cmp(arg, "mana")) {
     if (GET_TRAINS(ch) < 10) {
-      send_to_char(ch, "Training mana requires 10 training sessions. You currently have %d.\r\n",
-                   GET_TRAINS(ch));
+      send_to_char(ch, "Training mana requires 10 training sessions.\r\n");
+      send_to_char(ch, "  Mana: %d\r\n", effective_max_mana(ch));
+      send_to_char(ch, "  Training sessions remaining: %d\r\n", GET_TRAINS(ch));
       return;
     }
 
+    old_trains = GET_TRAINS(ch);
+    old_max_mana = effective_max_mana(ch);
     GET_TRAINS(ch) -= 10;
     GET_MAX_MANA(ch) += 10;
-    send_to_char(ch, "You spend ten training sessions and feel your arcane reserves deepen.\r\n");
+    new_trains = GET_TRAINS(ch);
+    new_max_mana = effective_max_mana(ch);
+    send_to_char(ch, "Training successful.\r\n");
+    send_to_char(ch, "  Mana: %d -> %d\r\n", old_max_mana, new_max_mana);
+    send_to_char(ch, "  Training sessions: %d -> %d\r\n", old_trains, new_trains);
     return;
   }
 
   if (!str_cmp(arg, "move")) {
     if (GET_TRAINS(ch) < 10) {
-      send_to_char(ch, "Training move requires 10 training sessions. You currently have %d.\r\n",
-                   GET_TRAINS(ch));
+      send_to_char(ch, "Training move requires 10 training sessions.\r\n");
+      send_to_char(ch, "  Move: %d\r\n", effective_max_move(ch));
+      send_to_char(ch, "  Training sessions remaining: %d\r\n", GET_TRAINS(ch));
       return;
     }
 
+    old_trains = GET_TRAINS(ch);
+    old_max_move = effective_max_move(ch);
     GET_TRAINS(ch) -= 10;
     GET_MAX_MOVE(ch) += 10;
-    send_to_char(ch, "You spend ten training sessions and feel your stamina and endurance grow.\r\n");
+    new_trains = GET_TRAINS(ch);
+    new_max_move = effective_max_move(ch);
+    send_to_char(ch, "Training successful.\r\n");
+    send_to_char(ch, "  Move: %d -> %d\r\n", old_max_move, new_max_move);
+    send_to_char(ch, "  Training sessions: %d -> %d\r\n", old_trains, new_trains);
     return;
   }
 
   if (!str_cmp(arg, "str")) {
     stat_field = &ch->real_abils.str;
-    stat_name = "strength";
+    stat_name = "str";
+    stat_label = "Strength";
   } else if (!str_cmp(arg, "dex")) {
     stat_field = &ch->real_abils.dex;
-    stat_name = "dexterity";
+    stat_name = "dex";
+    stat_label = "Dexterity";
   } else if (!str_cmp(arg, "con")) {
     stat_field = &ch->real_abils.con;
-    stat_name = "constitution";
+    stat_name = "con";
+    stat_label = "Constitution";
   } else if (!str_cmp(arg, "int")) {
     stat_field = &ch->real_abils.intel;
-    stat_name = "intelligence";
+    stat_name = "int";
+    stat_label = "Intelligence";
   } else if (!str_cmp(arg, "wis")) {
     stat_field = &ch->real_abils.wis;
-    stat_name = "wisdom";
+    stat_name = "wis";
+    stat_label = "Wisdom";
   } else if (!str_cmp(arg, "cha")) {
     stat_field = &ch->real_abils.cha;
-    stat_name = "charisma";
+    stat_name = "cha";
+    stat_label = "Charisma";
   }
 
   if (stat_field != NULL) {
     if (GET_TRAINS(ch) < 1) {
       send_to_char(ch, "Training %s requires 1 training session. You currently have %d.\r\n",
-                   arg, GET_TRAINS(ch));
+                   stat_name, GET_TRAINS(ch));
+      send_to_char(ch, "  %s: %d/%d\r\n", stat_label, *stat_field, stat_cap);
       return;
     }
 
-    if (*stat_field >= 20) {
-      send_to_char(ch, "That base stat is already at 20 and cannot be trained higher.\r\n");
+    if (*stat_field >= stat_cap) {
+      send_to_char(ch, "%s is already at %d/%d and cannot be trained higher.\r\n",
+                   stat_label, *stat_field, stat_cap);
+      send_to_char(ch, "  Training sessions remaining: %d\r\n", GET_TRAINS(ch));
       return;
     }
 
+    old_trains = GET_TRAINS(ch);
+    old_val = *stat_field;
+    old_carry = CAN_CARRY_W(ch);
+    old_evasion = compute_evasion(ch);
+    old_melee_crit = crit_total_melee(ch);
+    old_spell_crit = crit_total_spell(ch);
+    old_heal_crit = crit_total_heal(ch);
+    old_max_hit = GET_MAX_HIT(ch);
+    old_max_mana = effective_max_mana(ch);
+    old_max_move = effective_max_move(ch);
     GET_TRAINS(ch) -= 1;
     (*stat_field)++;
     affect_total(ch);
-    send_to_char(ch, "You spend one training session and feel your %s improve.\r\n", stat_name);
+    new_trains = GET_TRAINS(ch);
+    new_val = *stat_field;
+    new_carry = CAN_CARRY_W(ch);
+    new_evasion = compute_evasion(ch);
+    new_melee_crit = crit_total_melee(ch);
+    new_spell_crit = crit_total_spell(ch);
+    new_heal_crit = crit_total_heal(ch);
+    new_max_hit = GET_MAX_HIT(ch);
+    new_max_mana = effective_max_mana(ch);
+    new_max_move = effective_max_move(ch);
+
+    send_to_char(ch, "Training successful.\r\n");
+    send_to_char(ch, "  %s: %d -> %d\r\n", stat_label, old_val, new_val);
+    send_to_char(ch, "  Training sessions: %d -> %d\r\n", old_trains, new_trains);
+    if (old_carry != new_carry)
+      send_to_char(ch, "  Carry Capacity: %d -> %d\r\n", old_carry, new_carry);
+    if (old_evasion != new_evasion)
+      send_to_char(ch, "  Evasion: %d -> %d\r\n", old_evasion, new_evasion);
+    if (old_melee_crit != new_melee_crit)
+      send_to_char(ch, "  Critical hit: %d -> %d\r\n", old_melee_crit, new_melee_crit);
+    if (old_spell_crit != new_spell_crit)
+      send_to_char(ch, "  Critical Spell: %d -> %d\r\n", old_spell_crit, new_spell_crit);
+    if (old_heal_crit != new_heal_crit)
+      send_to_char(ch, "  Critical Heal: %d -> %d\r\n", old_heal_crit, new_heal_crit);
+    if (old_max_hit != new_max_hit)
+      send_to_char(ch, "  Hit points: %d -> %d\r\n", old_max_hit, new_max_hit);
+    if (old_max_mana != new_max_mana)
+      send_to_char(ch, "  Mana: %d -> %d\r\n", old_max_mana, new_max_mana);
+    if (old_max_move != new_max_move)
+      send_to_char(ch, "  Move: %d -> %d\r\n", old_max_move, new_max_move);
     return;
   }
 
   send_to_char(ch, "You have %d training sessions available.\r\n", GET_TRAINS(ch));
-  send_to_char(ch, "Train str dex con int wis cha (cost 1, cap 20) or hit mana move (cost 10).\r\n");
+  send_to_char(ch, "Train str dex con int wis cha (cost 1, cap %d) or hit mana move (cost 10).\r\n",
+               stat_cap);
 }
 
 ACMD(do_buytrain)
