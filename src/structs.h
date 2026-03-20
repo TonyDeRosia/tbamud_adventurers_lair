@@ -1038,6 +1038,8 @@ struct char_special_data
   int carry_weight; /**< Carried weight */
   byte carry_items; /**< Number of items carried */
   int timer;        /**< Timer for update */
+  int starving_ticks;   /**< Consecutive ticks at starving hunger threshold. */
+  int dehydrated_ticks; /**< Consecutive ticks at dehydrated thirst threshold. */
 
   struct char_special_data_saved saved; /**< Constants saved for PCs. */
 };
