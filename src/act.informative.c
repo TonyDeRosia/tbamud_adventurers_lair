@@ -1760,19 +1760,23 @@ ACMD(do_score)
     "%s╠═══════════════════════════════════════════════════════════════════════════════╣%s\r\n", B, R);
 
   /* Name and Title */
-  snprintf(line, sizeof(line), "%sName:%s %-20s  %s%-6s%s %s",
+  snprintf(line, sizeof(line), "%sName:%s %-20s  %s%-7s%s %-20s",
     C, R, GET_NAME(ch), C, "Title:", R, GET_TITLE(ch));
   len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
 
     /* Race and Class */
-  snprintf(line, sizeof(line), "%sRace:%s %-20s  %s%-6s%s %-20s",
+  snprintf(line, sizeof(line), "%sRace:%s %-20s  %s%-7s%s %-20s",
     C, R, pc_race_types[GET_RACE(ch)],
     C, "Class:", R, score_class_name(ch));
   len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
 
   /* Level and Age */
-  snprintf(line, sizeof(line), "%sLevel:%s %-20d  %s%-6s%s %d year%s old",
-    C, R, GET_LEVEL(ch), C, "Age:", R, GET_AGE(ch), (GET_AGE(ch) == 1 ? "" : "s"));
+  {
+    char age_text[32];
+    snprintf(age_text, sizeof(age_text), "%d year%s old", GET_AGE(ch), (GET_AGE(ch) == 1 ? "" : "s"));
+    snprintf(line, sizeof(line), "%sLevel:%s %-20d  %s%-7s%s %-20s",
+      C, R, GET_LEVEL(ch), C, "Age:", R, age_text);
+  }
   len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
 
   /* Birthday message */
@@ -1799,14 +1803,20 @@ len = append_box_line(buf, len, sizeof(buf), B, R, "", W);
 
 /* Experience and TNL */
 {
+  char exp_part[128];
+  char tnl_part[80];
+  int spacer;
   int next_need = 0;
   if (GET_LEVEL(ch) < LVL_IMMORT) {
     int next_level = GET_LEVEL(ch) + 1;
     next_need = level_exp(GET_CLASS(ch), next_level) - GET_EXP(ch);
   }
-  snprintf(line, sizeof(line),
-    "%sExp:%s %d                                   %sTNL:%s %d",
-    C, R, GET_EXP(ch), C, R, next_need);
+  snprintf(exp_part, sizeof(exp_part), "%sExp:%s %d", C, R, GET_EXP(ch));
+  snprintf(tnl_part, sizeof(tnl_part), "%sTNL:%s %d", C, R, next_need);
+  spacer = (int)W - (int)visible_strlen_mud(exp_part) - (int)visible_strlen_mud(tnl_part);
+  if (spacer < 2)
+    spacer = 2;
+  snprintf(line, sizeof(line), "%s%*s%s", exp_part, spacer, "", tnl_part);
 }
 len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
 
@@ -1841,7 +1851,7 @@ len = append_box_line(buf, len, sizeof(buf), B, R, "", W);
   len = append_box_line(buf, len, sizeof(buf), B, R, "", W);
   {
     int offensive_hit = compute_offensive_hit_value(ch, NULL);
-    int accuracy_pct = offensive_hit - 10; /* Neutral target Evasion baseline. */
+    int accuracy_pct = compute_hit_chance_from_values(offensive_hit, 10); /* Neutral target Evasion baseline. */
     int b_str = ch->real_abils.str;
     int b_dex = ch->real_abils.dex;
     int b_con = ch->real_abils.con;
@@ -1872,11 +1882,6 @@ len = append_box_line(buf, len, sizeof(buf), B, R, "", W);
       b_cha, m_cha);
     len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
     len = append_box_line(buf, len, sizeof(buf), B, R, "", W);
-
-    if (accuracy_pct < 5)
-      accuracy_pct = 5;
-    else if (accuracy_pct > 95)
-      accuracy_pct = 95;
 
     snprintf(line, sizeof(line),
       "%sOffense:%s  Hitroll %+d  Damroll %+d  Accuracy: %d%%",

@@ -524,6 +524,13 @@ int compute_offensive_hit_value(struct char_data *ch, struct char_data *victim)
   return 100 - (compute_thaco(ch, victim) * 4);
 }
 
+int compute_hit_chance_from_values(int offensive_hit, int target_evasion)
+{
+  int hit_chance = offensive_hit - target_evasion;
+
+  return MAX(5, MIN(95, hit_chance));
+}
+
 void update_pos(struct char_data *victim)
 {
   if ((GET_HIT(victim) > 0) && (GET_POS(victim) > POS_STUNNED))
@@ -1957,8 +1964,7 @@ void hit(struct char_data *ch, struct char_data *victim, int type)
 
   attacker_hit = compute_offensive_hit_value(ch, victim);
   defender_evasion = compute_evasion(victim);
-  hit_chance = attacker_hit - defender_evasion;
-  hit_chance = MAX(5, MIN(95, hit_chance));
+  hit_chance = compute_hit_chance_from_values(attacker_hit, defender_evasion);
   roll = rand_number(1, 100);
 
   /* report for debugging if necessary */
