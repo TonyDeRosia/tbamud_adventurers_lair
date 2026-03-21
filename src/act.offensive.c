@@ -298,15 +298,82 @@ ACMD(do_backstab)
   WAIT_STATE(ch, 2 * PULSE_VIOLENCE);
 }
 
+static int is_ordered_attack_command(const char *message, char *verb, char *target)
+{
+  char local[MAX_INPUT_LENGTH];
+
+  if (!message || !*message)
+    return FALSE;
+
+  strlcpy(local, message, sizeof(local));
+  half_chop(local, verb, target);
+  if (!*verb || !*target)
+    return FALSE;
+
+  return (is_abbrev(verb, "hit") || is_abbrev(verb, "kill"));
+}
+
+static int execute_ordered_attack(struct char_data *issuer, struct char_data *follower,
+                                  const char *target_name)
+{
+  struct char_data *victim = NULL;
+  char victim_arg[MAX_INPUT_LENGTH];
+
+  if (!issuer || !follower || !target_name || !*target_name)
+    return FALSE;
+
+  if (IN_ROOM(follower) != IN_ROOM(issuer)) {
+    send_to_char(issuer, "You can't order %s to attack from another room.\r\n",
+      GET_NAME(follower));
+    return TRUE;
+  }
+
+  strlcpy(victim_arg, target_name, sizeof(victim_arg));
+  victim = get_char_vis(follower, victim_arg, NULL, FIND_CHAR_ROOM);
+  if (!victim) {
+    send_to_char(issuer, "%s cannot find '%s' here.\r\n", GET_NAME(follower), target_name);
+    return TRUE;
+  }
+
+  if (victim == follower) {
+    send_to_char(issuer, "%s refuses to attack itself.\r\n", GET_NAME(follower));
+    return TRUE;
+  }
+
+  if (is_owned_follower_target(follower, victim)) {
+    send_to_char(issuer, "%s refuses to attack its own allies.\r\n", GET_NAME(follower));
+    return TRUE;
+  }
+
+  if (GET_POS(follower) < POS_STANDING) {
+    send_to_char(issuer, "%s is unable to fight right now.\r\n", GET_NAME(follower));
+    return TRUE;
+  }
+
+  if (FIGHTING(follower) && FIGHTING(follower) != victim)
+    stop_fighting(follower);
+
+  if (!FIGHTING(follower))
+    set_fighting(follower, victim);
+  if (!FIGHTING(victim))
+    set_fighting(victim, follower);
+
+  hit(follower, victim, TYPE_UNDEFINED);
+  return TRUE;
+}
+
 ACMD(do_order)
 {
   char name[MAX_INPUT_LENGTH], message[MAX_INPUT_LENGTH];
+  char command_verb[MAX_INPUT_LENGTH], target[MAX_INPUT_LENGTH];
   int order_all = FALSE;
+  int ordered_attack = FALSE;
   bool found = FALSE;
   struct char_data *vict = NULL;
   struct follow_type *k;
 
   half_chop(argument, name, message);
+  ordered_attack = is_ordered_attack_command(message, command_verb, target);
 
   order_all = (is_abbrev(name, "followers") || is_abbrev(name, "all"));
 
@@ -345,8 +412,12 @@ ACMD(do_order)
       if ((vict->master != ch) || !AFF_FLAGGED(vict, AFF_CHARM))
         act("$n has an indifferent look.", FALSE, vict, 0, 0, TO_ROOM);
       else {
+        if (ordered_attack)
+          execute_ordered_attack(ch, vict, target);
+        else
+          command_interpreter(vict, message);
+
         send_to_char(ch, "%s", CONFIG_OK);
-        command_interpreter(vict, message);
       }
     } else {			/* This is order "followers"/"all" */
       char buf[MAX_STRING_LENGTH];
@@ -358,7 +429,10 @@ ACMD(do_order)
         if (IN_ROOM(ch) == IN_ROOM(k->follower))
           if (AFF_FLAGGED(k->follower, AFF_CHARM)) {
             found = TRUE;
-            command_interpreter(k->follower, message);
+            if (ordered_attack)
+              execute_ordered_attack(ch, k->follower, target);
+            else
+              command_interpreter(k->follower, message);
           }
       }
       if (found)
