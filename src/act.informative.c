@@ -2524,11 +2524,11 @@ static int aff_seen_contains(const struct affected_type * const *seen, int seen_
 }
 
 static void aff_seen_add(const struct affected_type **seen, int *seen_count,
-                         const struct affected_type *af)
+                         int seen_cap, const struct affected_type *af)
 {
   if (!seen || !seen_count || !af)
     return;
-  if (*seen_count >= MAX_AFFECT)
+  if (*seen_count >= seen_cap)
     return;
   seen[*seen_count] = af;
   (*seen_count)++;
@@ -2617,11 +2617,12 @@ static void build_grouped_aff_entry(const struct affected_type *list,
                                     int only_debuff,
                                     const struct affected_type **seen,
                                     int *seen_count,
+                                    int seen_cap,
                                     struct aff_display_entry *entry)
 {
   const struct affected_type *af;
-  const struct affected_type *sig_nodes[MAX_AFFECT];
-  int sig_freq[MAX_AFFECT];
+  const struct affected_type **sig_nodes = NULL;
+  int *sig_freq = NULL;
   int mod_totals[NUM_APPLIES];
   int mod_used[NUM_APPLIES];
   int bits[AF_ARRAY_MAX];
@@ -2647,7 +2648,12 @@ static void build_grouped_aff_entry(const struct affected_type *list,
     mod_totals[i] = 0;
     mod_used[i] = 0;
   }
-  for (i = 0; i < MAX_AFFECT; i++) {
+  if (seen_cap <= 0)
+    seen_cap = MAX_AFFECT;
+
+  CREATE(sig_nodes, const struct affected_type *, seen_cap);
+  CREATE(sig_freq, int, seen_cap);
+  for (i = 0; i < seen_cap; i++) {
     sig_nodes[i] = NULL;
     sig_freq[i] = 0;
   }
@@ -2660,7 +2666,7 @@ static void build_grouped_aff_entry(const struct affected_type *list,
     if (!!is_aff_debuff(af) != !!only_debuff)
       continue;
 
-    aff_seen_add(seen, seen_count, af);
+    aff_seen_add(seen, seen_count, seen_cap, af);
     count++;
     {
       int found_sig = 0;
@@ -2676,7 +2682,7 @@ static void build_grouped_aff_entry(const struct affected_type *list,
           break;
         }
       }
-      if (!found_sig && sig_count < MAX_AFFECT) {
+      if (!found_sig && sig_count < seen_cap) {
         sig_nodes[sig_count] = af;
         sig_freq[sig_count] = 1;
         sig_count++;
@@ -2736,6 +2742,9 @@ static void build_grouped_aff_entry(const struct affected_type *list,
     entry->count = 1;
   }
   drain_desc_for_affect(seed->spell, bits, entry->drain, sizeof(entry->drain));
+
+  free(sig_nodes);
+  free(sig_freq);
 }
 
 static int aff_entry_same_visible(const struct aff_display_entry *a, const struct aff_display_entry *b)
@@ -2817,14 +2826,15 @@ static void format_aff_display_entry_line(const struct aff_display_entry *entry,
 ACMD(do_affects)
 {
   const struct affected_type *af;
-  const struct affected_type *seen[MAX_AFFECT];
-  struct aff_display_entry buff_entries[MAX_AFFECT];
-  struct aff_display_entry debuff_entries[(MAX_AFFECT * 2) + 4];
+  const struct affected_type **seen = NULL;
+  struct aff_display_entry *buff_entries = NULL;
+  struct aff_display_entry *debuff_entries = NULL;
   int buff_count = 0, debuff_count = 0;
   int seen_count = 0;
   int any = 0, any_buff = 0, any_debuff = 0;
   int i, j;
   int added_hidden_drain = 0;
+  int affect_count = 0;
 
   enum { AFF_PROLONGED_TICK_THRESHOLD = 6 };
 
@@ -2839,6 +2849,7 @@ ACMD(do_affects)
   }
 
   for (af = ch->affected; af; af = af->next) {
+    affect_count++;
     any = 1;
     if (is_aff_debuff(af)) any_debuff = 1;
     else any_buff = 1;
@@ -2849,13 +2860,17 @@ ACMD(do_affects)
     return;
   }
 
+  CREATE(seen, const struct affected_type *, affect_count);
+  CREATE(buff_entries, struct aff_display_entry, affect_count);
+  CREATE(debuff_entries, struct aff_display_entry, (affect_count * 2) + 4);
+
   for (af = ch->affected; af; af = af->next) {
     struct aff_display_entry entry;
     struct aff_display_entry *target = NULL;
     if (aff_seen_contains(seen, seen_count, af))
       continue;
 
-    build_grouped_aff_entry(ch->affected, af, is_aff_debuff(af), seen, &seen_count, &entry);
+    build_grouped_aff_entry(ch->affected, af, is_aff_debuff(af), seen, &seen_count, affect_count, &entry);
 
     target = is_aff_debuff(af) ? debuff_entries : buff_entries;
     if (is_aff_debuff(af)) {
@@ -2867,7 +2882,7 @@ ACMD(do_affects)
           break;
         }
       }
-      if (target && debuff_count < (int)(sizeof(debuff_entries) / sizeof(debuff_entries[0])))
+      if (target && debuff_count < (affect_count * 2 + 4))
         debuff_entries[debuff_count++] = entry;
     } else {
       for (i = 0; i < buff_count; i++) {
@@ -2878,7 +2893,7 @@ ACMD(do_affects)
           break;
         }
       }
-      if (target && buff_count < MAX_AFFECT)
+      if (target && buff_count < affect_count)
         buff_entries[buff_count++] = entry;
     }
   }
@@ -2886,7 +2901,7 @@ ACMD(do_affects)
   for (i = 0; i < buff_count; i++) {
     if (!*buff_entries[i].drain)
       continue;
-    if (debuff_count >= (int)(sizeof(debuff_entries) / sizeof(debuff_entries[0])))
+    if (debuff_count >= (affect_count * 2 + 4))
       break;
     debuff_entries[debuff_count] = buff_entries[i];
     debuff_entries[debuff_count].mods[0] = '\0';
@@ -2907,7 +2922,7 @@ ACMD(do_affects)
                : "drains Move over time");
     e.max_duration = -1;
     e.count = 1;
-    if (debuff_count < (int)(sizeof(debuff_entries) / sizeof(debuff_entries[0])))
+    if (debuff_count < (affect_count * 2 + 4))
       debuff_entries[debuff_count++] = e;
     added_hidden_drain = 1;
   }
@@ -2922,7 +2937,7 @@ ACMD(do_affects)
                : "drains Move over time");
     e.max_duration = -1;
     e.count = 1;
-    if (debuff_count < (int)(sizeof(debuff_entries) / sizeof(debuff_entries[0])))
+    if (debuff_count < (affect_count * 2 + 4))
       debuff_entries[debuff_count++] = e;
     added_hidden_drain = 1;
   }
@@ -2968,6 +2983,10 @@ ACMD(do_affects)
   } else {
     send_to_char(ch, "\r\n%sDebuffs%s\r\n  None.\r\n", CCRED(ch, C_NRM), CCNRM(ch, C_NRM));
   }
+
+  free(seen);
+  free(buff_entries);
+  free(debuff_entries);
 }
 
 ACMD(do_inventory)
