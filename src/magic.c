@@ -1039,7 +1039,7 @@ void mag_affects(int level, struct char_data *ch, struct char_data *victim,
   case SPELL_ANTIMAGIC_SHELL:
     af[0].duration = spell_dur_medium(level);
     af[0].location = APPLY_SAVING_SPELL;
-    af[0].modifier = 20;
+    af[0].modifier = -20;
     SET_BIT_AR(af[0].bitvector, AFF_WARDED);
     refresh_on_recast = TRUE;
     break;
