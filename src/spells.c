@@ -2643,6 +2643,7 @@ ASPELL(spell_meteor_swarm)
         break;
     }
   }
+  set_spell_cooldown(ch, SPELL_METEOR_SWARM, 13);
 }
 
 ASPELL(spell_hellfire)
@@ -2805,15 +2806,19 @@ ASPELL(spell_finger_of_death)
     int dam = spell_dmg_high_manual(level);
     set_next_damage_type(DAM_NECROTIC);
     damage(ch, victim, dam, SPELL_FINGER_OF_DEATH);
+    set_spell_cooldown(ch, SPELL_FINGER_OF_DEATH, 13);
     return;
   }
   saved = mag_savingthrow(victim, SAVING_DEATH, 0);
   if (!saved) {
-    if (spell_instant_kill(ch, victim, SPELL_FINGER_OF_DEATH, DAM_NECROTIC))
+    if (spell_instant_kill(ch, victim, SPELL_FINGER_OF_DEATH, DAM_NECROTIC)) {
+      set_spell_cooldown(ch, SPELL_FINGER_OF_DEATH, 13);
       return;
+    }
   }
   set_next_damage_type(DAM_NECROTIC);
   damage(ch, victim, spell_dmg_extreme_manual(level), SPELL_FINGER_OF_DEATH);
+  set_spell_cooldown(ch, SPELL_FINGER_OF_DEATH, 13);
 }
 
 ASPELL(spell_wail_of_the_banshee)
@@ -2852,6 +2857,7 @@ ASPELL(spell_disintegrate)
   dam = saved ? spell_dmg_high_manual(level) : (GET_MAX_HIT(victim) / 2 + spell_dmg_extreme_manual(level));
   set_next_damage_type(DAM_ARCANE);
   damage(ch, victim, dam, SPELL_DISINTEGRATE);
+  set_spell_cooldown(ch, SPELL_DISINTEGRATE, 10);
 }
 
 ASPELL(spell_power_word_kill)
@@ -2861,11 +2867,14 @@ ASPELL(spell_power_word_kill)
   act("You speak the Power Word: Kill at $N!", FALSE, ch, 0, victim, TO_CHAR);
   act("$n speaks the Power Word: Kill at $N!", TRUE, ch, 0, victim, TO_NOTVICT);
   if (GET_MAX_HIT(victim) <= 50 + (level * 2)) {
-    if (spell_instant_kill(ch, victim, SPELL_POWER_WORD_KILL, DAM_ARCANE))
+    if (spell_instant_kill(ch, victim, SPELL_POWER_WORD_KILL, DAM_ARCANE)) {
+      set_spell_cooldown(ch, SPELL_POWER_WORD_KILL, 15);
       return;
+    }
   }
   set_next_damage_type(DAM_ARCANE);
   damage(ch, victim, spell_dmg_extreme_manual(level), SPELL_POWER_WORD_KILL);
+  set_spell_cooldown(ch, SPELL_POWER_WORD_KILL, 15);
 }
 
 ASPELL(spell_power_word_stun)
@@ -2877,6 +2886,7 @@ ASPELL(spell_power_word_stun)
   act("$n speaks the Power Word: Stun at $N!", TRUE, ch, 0, victim, TO_NOTVICT);
   dur = (GET_MAX_HIT(victim) <= 100 + (level * 3)) ? spell_dur_medium_manual(level) : spell_dur_short_manual(level);
   spell_apply_flag(victim, SPELL_POWER_WORD_STUN, dur, AFF_STUNNED);
+  set_spell_cooldown(ch, SPELL_POWER_WORD_STUN, 10);
 }
 
 ASPELL(spell_power_word_blind)
@@ -2895,6 +2905,7 @@ ASPELL(spell_power_word_silence)
   act("You speak the Power Word: Silence at $N!", FALSE, ch, 0, victim, TO_CHAR);
   act("$n speaks the Power Word: Silence at $N!", TRUE, ch, 0, victim, TO_NOTVICT);
   spell_apply_flag(victim, SPELL_POWER_WORD_SILENCE, spell_dur_medium_manual(level), AFF_SILENCED);
+  set_spell_cooldown(ch, SPELL_POWER_WORD_SILENCE, 7);
 }
 
 ASPELL(spell_psychic_crush)
@@ -2916,6 +2927,7 @@ ASPELL(spell_psychic_crush)
     if (!mag_savingthrow(victim, SAVING_DEATH, 0))
       spell_instant_kill(ch, victim, SPELL_PSYCHIC_CRUSH, DAM_PSYCHIC);
   }
+  set_spell_cooldown(ch, SPELL_PSYCHIC_CRUSH, 7);
 }
 
 ASPELL(spell_time_stop)
@@ -2943,6 +2955,7 @@ ASPELL(spell_time_stop)
   af.location = APPLY_NONE;
   af.modifier = GET_ROOM_VNUM(IN_ROOM(ch));
   affect_join(ch, &af, FALSE, FALSE, FALSE, FALSE);
+  set_spell_cooldown(ch, SPELL_TIME_STOP, 25);
 }
 
 ASPELL(spell_black_lance)
@@ -2982,7 +2995,7 @@ ASPELL(spell_grasp_heart)
     /* GOAL_OF_ALL_LIFE_IS_DEATH_ACTIVE */
     saved = goal_of_all_life_is_death_active(ch) ? FALSE : mag_savingthrow(victim, SAVING_DEATH, 0);
     if (!saved && spell_instant_kill(ch, victim, SPELL_GRASP_HEART, DAM_NECROTIC)) {
-      set_spell_cooldown(ch, SPELL_GRASP_HEART, 8);
+      set_spell_cooldown(ch, SPELL_GRASP_HEART, 10);
       return;
     }
     dam = spell_dmg_extreme_manual(level);
@@ -2993,10 +3006,10 @@ ASPELL(spell_grasp_heart)
   }
   set_next_damage_type(DAM_NECROTIC);
   if (damage(ch, victim, dam, SPELL_GRASP_HEART) == -1) {
-    set_spell_cooldown(ch, SPELL_GRASP_HEART, 8);
+    set_spell_cooldown(ch, SPELL_GRASP_HEART, 10);
     return;
   }
-  set_spell_cooldown(ch, SPELL_GRASP_HEART, 8);
+  set_spell_cooldown(ch, SPELL_GRASP_HEART, 10);
   if (!saved && GET_HIT(victim) > 0 && GET_HIT(victim) * 100 > GET_MAX_HIT(victim) * 30)
     spell_apply_flag(victim, SPELL_GRASP_HEART, 1, AFF_STUNNED);
 }
@@ -3028,9 +3041,13 @@ ASPELL(spell_true_death)
   dam = spell_dmg_extreme_manual(level);
   if (saved) dam /= 2;
   set_next_damage_type(DAM_NECROTIC);
-  if (damage(ch, victim, dam, SPELL_TRUE_DEATH) == -1) return;
+  if (damage(ch, victim, dam, SPELL_TRUE_DEATH) == -1) {
+    set_spell_cooldown(ch, SPELL_TRUE_DEATH, 13);
+    return;
+  }
   if (!saved)
     spell_apply_modifier(victim, SPELL_TRUE_DEATH, spell_dur_long_manual(level), APPLY_NONE, 1);
+  set_spell_cooldown(ch, SPELL_TRUE_DEATH, 13);
 }
 
 ASPELL(spell_perfect_unknowable)
@@ -3055,10 +3072,11 @@ ASPELL(spell_greater_magic_seal)
   } else {
     spell_apply_flag(victim, SPELL_GREATER_MAGIC_SEAL, spell_dur_short_manual(level), AFF_SPELLLOCK);
   }
+  set_spell_cooldown(ch, SPELL_GREATER_MAGIC_SEAL, 10);
 }
 
 ASPELL(spell_despair_aura) { if (ch) spell_apply_modifier(ch, SPELL_DESPAIR_AURA, spell_dur_medium_manual(level), APPLY_NONE, 1); }
-ASPELL(spell_oblivion_spear) { if (ch && victim) { int s = mag_savingthrow(victim, SAVING_SPELL, 0), dam = triple_maximize_magic_active(ch) ? (3 * ((level * 5) + (5 * MAX(1, level / 2)))) : spell_dmg_extreme_manual(level); if (triple_maximize_magic_active(ch)) affect_from_char(ch, SPELL_TRIPLE_MAXIMIZE_MAGIC); if (s) dam /= 2; set_next_damage_type(DAM_SHADOW); if (damage(ch, victim, dam, SPELL_OBLIVION_SPEAR) != -1 && !s) GET_MANA(victim) = MAX(0, GET_MANA(victim) - dam / 4); } }
+ASPELL(spell_oblivion_spear) { if (ch && victim) { int s = mag_savingthrow(victim, SAVING_SPELL, 0), dam = triple_maximize_magic_active(ch) ? (3 * ((level * 5) + (5 * MAX(1, level / 2)))) : spell_dmg_extreme_manual(level); if (triple_maximize_magic_active(ch)) affect_from_char(ch, SPELL_TRIPLE_MAXIMIZE_MAGIC); if (s) dam /= 2; set_next_damage_type(DAM_SHADOW); if (damage(ch, victim, dam, SPELL_OBLIVION_SPEAR) != -1 && !s) GET_MANA(victim) = MAX(0, GET_MANA(victim) - dam / 4); set_spell_cooldown(ch, SPELL_OBLIVION_SPEAR, 7); } }
 ASPELL(spell_bone_prison) { if (ch && victim) { if (!mag_savingthrow(victim, SAVING_SPELL, 0)) { spell_apply_flag(victim, SPELL_BONE_PRISON, spell_dur_medium_manual(level), AFF_ROOTED); spell_apply_modifier(victim, SPELL_BONE_PRISON, spell_dur_medium_manual(level), APPLY_AC, -10);} else spell_apply_flag(victim, SPELL_BONE_PRISON, 1, AFF_ROOTED);} }
 ASPELL(spell_undying_will) { if (ch) spell_apply_modifier(ch, SPELL_UNDYING_WILL, spell_dur_long_manual(level), APPLY_NONE, 1); }
 ASPELL(spell_dragon_lightning) { if (ch && victim) { int s = mag_savingthrow(victim, SAVING_SPELL, 0), dam = triple_maximize_magic_active(ch) ? (3 * ((level * 4) + (4 * MAX(1, level / 2)))) : spell_dmg_high_manual(level); if (triple_maximize_magic_active(ch)) affect_from_char(ch, SPELL_TRIPLE_MAXIMIZE_MAGIC); if (s) dam /= 2; set_next_damage_type(DAM_LIGHTNING); damage(ch, victim, dam, SPELL_DRAGON_LIGHTNING);} }
@@ -3092,7 +3110,7 @@ ASPELL(spell_cry_of_the_banshee) { struct char_data *tch,*next_tch; if (!ch) ret
 ASPELL(spell_napalm) { struct char_data *tch,*next_tch; if (!ch) return; for (tch = world[IN_ROOM(ch)].people; tch; tch = next_tch) { int s, dam; next_tch = tch->next_in_room; if (!spell_is_enemy(ch, tch, SPELL_NAPALM)) continue; s = mag_savingthrow(tch, SAVING_SPELL, 0); dam = spell_dmg_medium_manual(level); if (s) dam /= 2; set_next_damage_type(DAM_FIRE); if (damage(ch, tch, dam, SPELL_NAPALM) == -1) continue; if (!s) spell_apply_modifier(tch, SPELL_NAPALM, 1, APPLY_NONE, 1); } }
 ASPELL(spell_body_of_effulgent_beryl) { if (!ch) return; spell_apply_modifier(ch, SPELL_BODY_OF_EFFULGENT_BERYL, spell_dur_medium_manual(level), APPLY_AC, 20); spell_apply_modifier(ch, SPELL_BODY_OF_EFFULGENT_BERYL, spell_dur_medium_manual(level), APPLY_NONE, 1); }
 ASPELL(spell_vermilion_nova) { struct char_data *tch,*next_tch; if (!ch) return; for (tch = world[IN_ROOM(ch)].people; tch; tch = next_tch) { int s, dam; next_tch = tch->next_in_room; if (!spell_is_enemy(ch, tch, SPELL_VERMILION_NOVA)) continue; s = mag_savingthrow(tch, SAVING_SPELL, 0); dam = spell_dmg_high_manual(level); if (s) dam /= 2; set_next_damage_type(DAM_FIRE); if (damage(ch, tch, dam, SPELL_VERMILION_NOVA) == -1) continue; if (!s) spell_apply_flag(tch, SPELL_VERMILION_NOVA, spell_dur_short_manual(level), AFF_BURNING); } }
-ASPELL(spell_nuclear_blast) { struct char_data *tch,*next_tch; if (!ch) return; for (tch = world[IN_ROOM(ch)].people; tch; tch = next_tch) { int s, dam; next_tch = tch->next_in_room; if (!spell_is_enemy(ch, tch, SPELL_NUCLEAR_BLAST)) continue; s = mag_savingthrow(tch, SAVING_SPELL, 0); dam = spell_dmg_extreme_manual(level); if (s) dam /= 2; set_next_damage_type(DAM_FORCE); if (damage(ch, tch, dam, SPELL_NUCLEAR_BLAST) == -1) continue; set_next_damage_type(DAM_FIRE); damage(ch, tch, spell_dmg_low_manual(level), SPELL_NUCLEAR_BLAST); } }
+ASPELL(spell_nuclear_blast) { struct char_data *tch,*next_tch; if (!ch) return; for (tch = world[IN_ROOM(ch)].people; tch; tch = next_tch) { int s, dam; next_tch = tch->next_in_room; if (!spell_is_enemy(ch, tch, SPELL_NUCLEAR_BLAST)) continue; s = mag_savingthrow(tch, SAVING_SPELL, 0); dam = spell_dmg_extreme_manual(level); if (s) dam /= 2; set_next_damage_type(DAM_FORCE); if (damage(ch, tch, dam, SPELL_NUCLEAR_BLAST) == -1) continue; set_next_damage_type(DAM_FIRE); damage(ch, tch, spell_dmg_low_manual(level), SPELL_NUCLEAR_BLAST); } set_spell_cooldown(ch, SPELL_NUCLEAR_BLAST, 15); }
 ASPELL(spell_greater_teleportation)
 {
   room_rnum to_room;
@@ -3117,6 +3135,7 @@ ASPELL(spell_greater_teleportation)
   greet_mtrigger(ch, -1);
   greet_memory_mtrigger(ch);
   handle_followers_after_owner_teleport_or_recall(ch);
+  set_spell_cooldown(ch, SPELL_GREATER_TELEPORTATION, 10);
 }
 ASPELL(spell_silent_magic) { if (ch) spell_apply_modifier(ch, SPELL_SILENT_MAGIC, spell_dur_short_manual(level), APPLY_NONE, 1); }
 ASPELL(spell_triple_maximize_magic) { if (ch) spell_apply_modifier(ch, SPELL_TRIPLE_MAXIMIZE_MAGIC, 1, APPLY_NONE, 1); }
@@ -3166,7 +3185,7 @@ ASPELL(spell_monarchs_pressure)
 ASPELL(spell_shadow_domain) { if (!ch || IN_ROOM(ch) == NOWHERE) return; room_add_effect(&world[IN_ROOM(ch)], ROOM_EFFECT_SHADOW_DOMAIN, spell_dur_medium_manual(level), level); act("Darkness spreads outward as you establish a shadow domain!", FALSE, ch, 0, 0, TO_CHAR); act("Darkness spreads outward from $n into a living shadow domain!", FALSE, ch, 0, 0, TO_ROOM); }
 ASPELL(spell_force_grasp) { if (!ch || !victim) return; { int saved = mag_savingthrow(victim, SAVING_SPELL, 0), dam = spell_dmg_medium_manual(level); if (saved) dam /= 2; set_next_damage_type(DAM_FORCE); damage(ch, victim, dam, SPELL_FORCE_GRASP); if (!saved) spell_apply_flag(victim, SPELL_FORCE_GRASP, 1, AFF_STUNNED);} act("Invisible force crushes around $N!", FALSE, ch, 0, victim, TO_CHAR); act("Invisible force seizes and crushes you!", FALSE, ch, 0, victim, TO_VICT); act("$n seizes $N with an invisible crushing force!", FALSE, ch, 0, victim, TO_NOTVICT); }
 ASPELL(spell_shadow_step) { if (!ch) return; spell_apply_modifier(ch, SPELL_SHADOW_STEP, 1, APPLY_HITROLL, 8); act("You vanish into shadow, ready to strike from the dark!", FALSE, ch, 0, 0, TO_CHAR); act("$n vanishes into a blur of shadow!", FALSE, ch, 0, 0, TO_ROOM); }
-ASPELL(spell_black_heart) { int hp_loss, mana_gain; if (!ch) return; hp_loss = MAX(1, (GET_HIT(ch) * 20) / 100); GET_HIT(ch) = MAX(1, GET_HIT(ch) - hp_loss); mana_gain = (effective_max_mana(ch) * 35) / 100; GET_MANA(ch) = MIN(effective_max_mana(ch), GET_MANA(ch) + mana_gain); spell_apply_flag(ch, SPELL_BLACK_HEART, spell_dur_short_manual(level), AFF_EMPOWERED); act("You ignite the Black Heart within and trade blood for power!", FALSE, ch, 0, 0, TO_CHAR); act("$n's chest pulses with dark power as blood becomes mana!", FALSE, ch, 0, 0, TO_ROOM); }
+ASPELL(spell_black_heart) { int hp_loss, mana_gain; if (!ch) return; hp_loss = MAX(1, (GET_HIT(ch) * 20) / 100); GET_HIT(ch) = MAX(1, GET_HIT(ch) - hp_loss); mana_gain = (effective_max_mana(ch) * 35) / 100; GET_MANA(ch) = MIN(effective_max_mana(ch), GET_MANA(ch) + mana_gain); spell_apply_flag(ch, SPELL_BLACK_HEART, spell_dur_short_manual(level), AFF_EMPOWERED); act("You ignite the Black Heart within and trade blood for power!", FALSE, ch, 0, 0, TO_CHAR); act("$n's chest pulses with dark power as blood becomes mana!", FALSE, ch, 0, 0, TO_ROOM); set_spell_cooldown(ch, SPELL_BLACK_HEART, 15); }
 
 ASPELL(spell_call_shadow_legion)
 {
@@ -3186,6 +3205,7 @@ ASPELL(spell_call_shadow_legion)
     summon_shadow_servant(ch, MOBVNUM_SHADOW_SOLDIER, MAX(1, level - 6), 8, SPELL_CALL_SHADOW_LEGION, NULL, FALSE);
   act("Shadows rise at your command as your legion answers!", FALSE, ch, 0, 0, TO_CHAR);
   act("Shadows rise from the ground to serve $n!", FALSE, ch, 0, 0, TO_ROOM);
+  set_spell_cooldown(ch, SPELL_CALL_SHADOW_LEGION, 25);
 }
 
 ASPELL(spell_night_hunt) { if (!ch || !victim) return; if (mag_savingthrow(victim, SAVING_SPELL, 0)) return; spell_apply_flag(victim, SPELL_NIGHT_HUNT, spell_dur_long_manual(level), AFF_MARKED); act("You brand $N for the hunt!", FALSE, ch, 0, victim, TO_CHAR); act("A hunter's brand settles into your shadow!", FALSE, ch, 0, victim, TO_VICT); act("$n brands $N for the hunt!", FALSE, ch, 0, victim, TO_NOTVICT); }
@@ -3358,6 +3378,7 @@ ASPELL(spell_shadow_recall)
   }
   act("You call your shadows back to your side!", FALSE, ch, 0, 0, TO_CHAR);
   act("Dark shapes slip from the edges of the room to gather around $n!", FALSE, ch, 0, 0, TO_ROOM);
+  set_spell_cooldown(ch, SPELL_SHADOW_RECALL, 10);
 }
 
 ASPELL(spell_shadow_regenesis) { if (!ch) return; { struct affected_type af; new_affect(&af); af.spell = SPELL_SHADOW_REGENESIS; af.duration = spell_dur_long_manual(level); af.location = APPLY_NONE; af.modifier = 4 + (level / 4); SET_BIT_AR(af.bitvector, AFF_REGENERATING); affect_join(ch, &af, FALSE, FALSE, FALSE, FALSE); } act("Your body sinks into shadow and begins to regenerate!", FALSE, ch, 0, 0, TO_CHAR); act("$n's wounds seem to close in shadow.", FALSE, ch, 0, 0, TO_ROOM); }
