@@ -2852,6 +2852,8 @@ ACMD(do_affects)
     if (debuff_count >= (int)(sizeof(debuff_entries) / sizeof(debuff_entries[0])))
       break;
     debuff_entries[debuff_count] = buff_entries[i];
+    debuff_entries[debuff_count].mods[0] = '\0';
+    debuff_entries[debuff_count].flags[0] = '\0';
     debuff_entries[debuff_count].name[0] = '\0';
     out_append(debuff_entries[debuff_count].name, sizeof(debuff_entries[debuff_count].name), buff_entries[i].name);
     out_append(debuff_entries[debuff_count].name, sizeof(debuff_entries[debuff_count].name), " strain");
