@@ -1217,14 +1217,14 @@ static void dam_message(int dam, struct char_data *ch, struct char_data *victim,
   } else {
     pct = (dam * 100) / MAX(1, GET_MAX_HIT(victim));
 
-    if (pct <= 4)        msgnum = 1;
-    else if (pct <= 9)   msgnum = 2;
-    else if (pct <= 19)  msgnum = 3;
-    else if (pct <= 29)  msgnum = 4;
-    else if (pct <= 44)  msgnum = 5;
-    else if (pct <= 59)  msgnum = 6;
-    else if (pct <= 74)  msgnum = 7;
-    else if (pct <= 89)  msgnum = 8;
+    if (pct <= 2)        msgnum = 1;
+    else if (pct <= 6)   msgnum = 2;
+    else if (pct <= 14)  msgnum = 3;
+    else if (pct <= 24)  msgnum = 4;
+    else if (pct <= 39)  msgnum = 5;
+    else if (pct <= 54)  msgnum = 6;
+    else if (pct <= 69)  msgnum = 7;
+    else if (pct <= 84)  msgnum = 8;
     else                 msgnum = 9;
   }
 /* damage message to onlookers */
@@ -1846,7 +1846,7 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
     if (GET_HIT(victim) < (GET_MAX_HIT(victim) / 4)) {
       send_to_char(victim, "%sYou wish that your wounds would stop BLEEDING so much!%s\r\n",
 		CCRED(victim, C_SPR), CCNRM(victim, C_SPR));
-      if (ch != victim && MOB_FLAGGED(victim, MOB_WIMPY))
+      if (ch != victim && MOB_FLAGGED(victim, MOB_WIMPY) && !MOB_FLAGGED(victim, MOB_HELPER))
 	do_flee(victim, NULL, 0, 0);
     }
     if (!IS_NPC(victim) && GET_WIMP_LEV(victim) && (victim != ch) &&
@@ -1938,6 +1938,7 @@ static int compute_thaco(struct char_data *ch, struct char_data *victim)
 {
   int calc_thaco;
   int situational_hit_bonus = 0;
+  int level_gap_bonus = 0;
 
   if (!IS_NPC(ch))
     calc_thaco = thaco(GET_CLASS(ch), GET_LEVEL(ch));
@@ -1947,22 +1948,21 @@ static int compute_thaco(struct char_data *ch, struct char_data *victim)
   calc_thaco -= GET_HITROLL(ch);
   calc_thaco -= (int) ((GET_INT(ch) - 13) / 1.5);	/* Intelligence helps! */
   calc_thaco -= (int) ((GET_WIS(ch) - 13) / 1.5);	/* So does wisdom */
+  if (victim)
+    level_gap_bonus = (GET_LEVEL(ch) - GET_LEVEL(victim)) / 3;
+  calc_thaco -= level_gap_bonus;
   if (victim && AFF_FLAGGED(ch, AFF_TRUESIGHT) &&
       (AFF_FLAGGED(victim, AFF_INVISIBLE) || AFF_FLAGGED(victim, AFF_HIDE)))
     situational_hit_bonus = 10;
   calc_thaco -= situational_hit_bonus;
-  /* high level thaco floor: prevent endgame thaco from drifting into nonsense */
-  int __thaco = (calc_thaco);
-  __thaco = MAX(1, __thaco);
-  if (GET_LEVEL(ch) >= 50)
-    __thaco = MIN(__thaco, 15);
-  return __thaco;
+  return MAX(1, calc_thaco);
 }
 
 void hit(struct char_data *ch, struct char_data *victim, int type)
 {
   struct obj_data *wielded = GET_EQ(ch, WEAR_WIELD);
   int w_type, attacker_hit, defender_evasion, hit_chance, dam, roll;
+  int victim_ac, diceroll, calc_thaco;
 
   /* Check that the attacker and victim exist */
   if (!ch || !victim) return;
@@ -1996,13 +1996,18 @@ void hit(struct char_data *ch, struct char_data *victim, int type)
   defender_evasion = compute_evasion(victim);
   hit_chance = compute_hit_chance_from_values(attacker_hit, defender_evasion);
   roll = rand_number(1, 100);
+  calc_thaco = compute_thaco(ch, victim);
+  victim_ac = compute_armor_class(victim) / 10;
+  victim_ac = MAX(-10, MIN(10, victim_ac));
+  diceroll = rand_number(1, 20);
 
   /* report for debugging if necessary */
   if (CONFIG_DEBUG_MODE >= NRM)
-    send_to_char(ch, "\t1Debug:\r\n   \t2Attacker Hit: \t3%d\r\n   \t2Defender Evasion: \t3%d\r\n   \t2Hit Chance: \t3%d\r\n   \t2Roll: \t3%d\tn\r\n",
-      attacker_hit, defender_evasion, hit_chance, roll);
+    send_to_char(ch, "\t1Debug:\r\n   \t2Attacker Lvl: \t3%d\r\n   \t2Victim Lvl: \t3%d\r\n   \t2THAC0: \t3%d\r\n   \t2Victim AC: \t3%d\r\n   \t2Hitroll: \t3%d\r\n   \t2Damroll: \t3%d\r\n   \t2Hit Eval: \t3%d - d20(%d) <= %d\r\n   \t2Legacy Hit%%: \t3%d (roll %d)\tn\r\n",
+      GET_LEVEL(ch), GET_LEVEL(victim), calc_thaco, victim_ac, GET_HITROLL(ch), GET_DAMROLL(ch),
+      calc_thaco, diceroll, victim_ac, hit_chance, roll);
 
-  dam = (!AWAKE(victim) || roll <= hit_chance);
+  dam = (!AWAKE(victim) || diceroll == 20 || (diceroll != 1 && (calc_thaco - diceroll <= victim_ac)));
 
   if (!dam)
     /* the attacker missed the victim */
@@ -2022,8 +2027,12 @@ void hit(struct char_data *ch, struct char_data *victim, int type)
         if (IS_NPC(ch))
           dam += dice(ch->mob_specials.damnodice, ch->mob_specials.damsizedice);
         else
-          dam += rand_number(0, 2);	/* Max 2 bare hand damage for players */
+          dam += dice(MIN(4, 1 + (GET_LEVEL(ch) / 30)),
+                      MIN(7, 2 + (GET_LEVEL(ch) / 20)));
     }
+
+    if (victim && GET_LEVEL(ch) > GET_LEVEL(victim))
+      dam += MAX(1, (GET_LEVEL(ch) - GET_LEVEL(victim)) / 8);
 
     /* Include a damage multiplier if victim isn't ready to fight:
      * Position sitting  1.33 x normal

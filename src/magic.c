@@ -306,6 +306,7 @@ int mag_damage(int level, struct char_data *ch, struct char_data *victim,
 		     int spellnum, int savetype)
 {
   int dam = 0;
+  int save_modifier = 0;
   enum damage_type local_damage_type = current_spell_damage_type;
 
   if (victim == NULL || ch == NULL)
@@ -321,6 +322,7 @@ int mag_damage(int level, struct char_data *ch, struct char_data *victim,
       dam = dice(1, 8) + 1;
     else
       dam = dice(1, 6) + 1;
+    dam += MAX(0, level / 12);
     break;
   case SPELL_BURNING_HANDS:
     if (local_damage_type == DAM_NONE) local_damage_type = DAM_FIRE;
@@ -438,8 +440,18 @@ int mag_damage(int level, struct char_data *ch, struct char_data *victim,
   } /* switch(spellnum) */
 
 
+  if (victim) {
+    int level_gap = GET_LEVEL(ch) - GET_LEVEL(victim);
+    if (level_gap > 0)
+      save_modifier += MIN(20, level_gap);
+    else if (level_gap < 0)
+      save_modifier += MAX(-10, level_gap / 2);
+  }
+  if (spellnum == SPELL_MAGIC_MISSILE || spellnum == SPELL_CHILL_TOUCH)
+    save_modifier += 8;
+
   /* divide damage by two if victim makes his saving throw */
-  if (mag_savingthrow(victim, savetype, 0))
+  if (mag_savingthrow(victim, savetype, save_modifier))
     dam /= 2;
 
   if (spellnum == SPELL_SHADOW_BOLT && IS_GOOD(victim))
