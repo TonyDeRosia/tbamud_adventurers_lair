@@ -150,6 +150,8 @@ cpp_extern const struct command_info cmd_info[] = {
 
   { "cast"     , "c"       , POS_SITTING , do_cast     , 1, 0 },
   { "campaign" , "camp"    , POS_DEAD    , do_campaign , 0, 0 },
+  { "cd"       , "cd"      , POS_DEAD    , do_cooldown , 0, 0 },
+  { "cooldown" , "cooldown", POS_DEAD    , do_cooldown , 0, 0 },
   { "spellup"  , "spellup" , POS_SITTING , do_spellup  , 1, 0 },
   { "cedit"    , "cedit"   , POS_DEAD    , do_oasis_cedit, LVL_IMPL, 0 },
   { "changelog", "cha"     , POS_DEAD    , do_changelog, LVL_IMPL, 0 },

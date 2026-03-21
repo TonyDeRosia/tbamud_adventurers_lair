@@ -86,6 +86,7 @@ ACMD(do_look);
 ACMD(do_areas);
 ACMD(do_affects);
 ACMD(do_consider);
+ACMD(do_cooldown);
 ACMD(do_diagnose);
 ACMD(do_equipment);
 ACMD(do_examine);
