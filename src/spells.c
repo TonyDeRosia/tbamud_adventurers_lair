@@ -752,9 +752,32 @@ static void restore_shadow_combat_profile(struct char_data *ch, int slot, struct
 
 static void apply_shadow_servant_bonuses(struct char_data *owner, struct char_data *mob)
 {
-  (void)owner;
-  (void)mob;
-  /* Scaffolding hook for future monarch/support buffs that should affect all active shadows. */
+  int stored_level;
+
+  if (!owner || !mob)
+    return;
+
+  /* Narrow polish for low-tier extracted shadows:
+   * improve consistency/survival slightly without changing their burst profile. */
+  if (!affected_by_spell(mob, SPELL_SHADOW_EXTRACTION))
+    return;
+
+  stored_level = GET_LEVEL(mob);
+  if (stored_level <= 5) {
+    GET_MAX_HIT(mob) = MAX(GET_MAX_HIT(mob), 70 + (stored_level * 8));
+    GET_HIT(mob) = MIN(GET_MAX_HIT(mob), MAX(GET_HIT(mob), GET_MAX_HIT(mob)));
+    GET_AC(mob) -= 18;
+    GET_HITROLL(mob) += 5;
+  } else if (stored_level <= 12) {
+    GET_MAX_HIT(mob) = MAX(GET_MAX_HIT(mob), 95 + (stored_level * 6));
+    GET_HIT(mob) = MIN(GET_MAX_HIT(mob), MAX(GET_HIT(mob), GET_MAX_HIT(mob)));
+    GET_AC(mob) -= 10;
+    GET_HITROLL(mob) += 3;
+  }
+
+  /* Keep owner scaling conservative so low-tier shadows stay relevant but not dominant. */
+  if (!IS_NPC(owner) && GET_LEVEL(owner) >= 35 && stored_level <= 12)
+    GET_HITROLL(mob) += 1;
 }
 
 static int is_shadow_servant(struct char_data *mob, struct char_data *owner)

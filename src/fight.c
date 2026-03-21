@@ -1990,6 +1990,14 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
   if (GET_POS(victim) == POS_DEAD) {
     struct char_data *reward_killer = resolve_reward_killer(ch);
 
+    if (ch && reward_killer && reward_killer != ch &&
+        CONFIG_DEBUG_MODE >= NRM && GET_LEVEL(reward_killer) >= LVL_BUILDER) {
+      send_to_char(reward_killer,
+        "\t1Combat Debug:\r\n"
+        "   \t2Kill Attribution:\t3%s credited via %s\tn\r\n",
+        GET_NAME(reward_killer), GET_NAME(ch));
+    }
+
     if (ch != victim && ch && !IS_NPC(ch) &&
         GET_SKILL(ch, SKILL_TACTICAL_SPELL_MEMORY) > 0 &&
         attacktype > 0 && attacktype <= MAX_SPELLS) {
@@ -2082,6 +2090,7 @@ void hit(struct char_data *ch, struct char_data *victim, int type)
   int thaco_legacy, victim_ac_legacy, diceroll_legacy;
   int attacker_level, victim_level, hitroll_bonus, stat_bonus, mental_bonus;
   int level_gap_bonus, situational_bonus, defender_level_bonus;
+  int shadow_assist_bonus = 0;
   int final_hit_roll;
 
   /* Check that the attacker and victim exist */
@@ -2126,8 +2135,15 @@ void hit(struct char_data *ch, struct char_data *victim, int type)
   situational_bonus = (AFF_FLAGGED(ch, AFF_TRUESIGHT) &&
       (AFF_FLAGGED(victim, AFF_INVISIBLE) || AFF_FLAGGED(victim, AFF_HIDE))) ? 6 : 0;
 
+  if (IS_NPC(ch) && ch->master && !IS_NPC(ch->master) &&
+      is_shadow_servant_for(ch->master, ch) && victim && IS_NPC(victim)) {
+    int owner_gap = GET_LEVEL(ch->master) - GET_LEVEL(victim);
+    if (owner_gap >= 8)
+      shadow_assist_bonus = MIN(14, 4 + (owner_gap / 4));
+  }
+
   attacker_hit = 30 + attacker_level + hitroll_bonus + stat_bonus +
-                 mental_bonus + level_gap_bonus + situational_bonus;
+                 mental_bonus + level_gap_bonus + situational_bonus + shadow_assist_bonus;
   defender_evasion = compute_defensive_evasion_value(victim, &defender_level_bonus);
   hit_chance = compute_hit_chance_from_values(attacker_hit, defender_evasion);
   final_hit_roll = rand_number(1, 100);
@@ -2147,12 +2163,13 @@ void hit(struct char_data *ch, struct char_data *victim, int type)
       "   \t2Hitroll Contribution:\t3%d\r\n"
       "   \t2Stat Contribution:\t3%d (STR) + %d (INT/WIS)\r\n"
       "   \t2Level-gap Contribution:\t3%d\r\n"
+      "   \t2Shadow Assist Contribution:\t3%d\r\n"
       "   \t2Defender Level Contribution:\t3%d\r\n"
       "   \t2Final Hit Chance:\t3%d%%\r\n"
       "   \t2Final Hit Roll:\t3%d\r\n"
       "   \t2Legacy THAC0 Check:\t3THAC0 %d vs AC %d on d20(%d)\tn\r\n",
       attacker_level, victim_level, attacker_hit, defender_evasion, hitroll_bonus,
-      stat_bonus, mental_bonus, level_gap_bonus, defender_level_bonus,
+      stat_bonus, mental_bonus, level_gap_bonus, shadow_assist_bonus, defender_level_bonus,
       hit_chance, final_hit_roll, thaco_legacy, victim_ac_legacy, diceroll_legacy);
 
   dam = (!AWAKE(victim) || final_hit_roll <= hit_chance);
