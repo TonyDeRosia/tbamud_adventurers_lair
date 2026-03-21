@@ -2628,7 +2628,7 @@ static void build_grouped_aff_entry(const struct affected_type *list,
   char name_fallback[64];
   const char *name;
   int max_duration = seed->duration;
-  int count = 0, sig_count = 0, max_sig_freq = 1;
+  int count = 0, sig_count = 0;
   int i;
 
   if (!entry || !seed || !list || !seen || !seen_count)
@@ -2723,9 +2723,18 @@ static void build_grouped_aff_entry(const struct affected_type *list,
   name = aff_name_from_spell_and_flags(seed->spell, entry->flags, name_fallback, sizeof(name_fallback));
   snprintf(entry->name, sizeof(entry->name), "%s", name);
   entry->max_duration = max_duration;
-  for (i = 0; i < sig_count; i++)
-    max_sig_freq = MAX(max_sig_freq, sig_freq[i]);
-  entry->count = (count > 0) ? max_sig_freq : 1;
+  /* Display stack count as full repeated "sets" of this spell's affect
+   * signature. Using the minimum signature frequency avoids overstating
+   * stacks for multi-component spells (e.g. one cast that applies multiple
+   * different modifiers). */
+  if (count > 0 && sig_count > 0) {
+    int min_sig_freq = sig_freq[0];
+    for (i = 1; i < sig_count; i++)
+      min_sig_freq = MIN(min_sig_freq, sig_freq[i]);
+    entry->count = MAX(1, min_sig_freq);
+  } else {
+    entry->count = 1;
+  }
   drain_desc_for_affect(seed->spell, bits, entry->drain, sizeof(entry->drain));
 }
 
