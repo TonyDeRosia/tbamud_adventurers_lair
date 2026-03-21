@@ -539,14 +539,46 @@ int compute_evasion(struct char_data *ch)
   return MAX(0, evasion);
 }
 
+static int compute_defensive_evasion_value(struct char_data *victim, int *level_component)
+{
+  int level_bonus = 0;
+
+  if (!victim) {
+    if (level_component)
+      *level_component = 0;
+    return 0;
+  }
+
+  level_bonus = GET_LEVEL(victim);
+  if (level_component)
+    *level_component = level_bonus;
+
+  return compute_evasion(victim) + level_bonus;
+}
+
 int compute_offensive_hit_value(struct char_data *ch, struct char_data *victim)
 {
-  return 100 - (compute_thaco(ch, victim) * 4);
+  int level_bonus = GET_LEVEL(ch);
+  int hitroll_bonus = GET_HITROLL(ch);
+  int stat_bonus = str_app[STRENGTH_APPLY_INDEX(ch)].tohit;
+  int mental_bonus = (GET_INT(ch) - 10) / 4 + (GET_WIS(ch) - 10) / 4;
+  int level_gap_bonus = 0;
+  int situational_bonus = 0;
+
+  if (victim)
+    level_gap_bonus = (GET_LEVEL(ch) - GET_LEVEL(victim)) / 2;
+
+  if (victim && AFF_FLAGGED(ch, AFF_TRUESIGHT) &&
+      (AFF_FLAGGED(victim, AFF_INVISIBLE) || AFF_FLAGGED(victim, AFF_HIDE)))
+    situational_bonus = 6;
+
+  return 30 + level_bonus + hitroll_bonus + stat_bonus + mental_bonus +
+         level_gap_bonus + situational_bonus;
 }
 
 int compute_hit_chance_from_values(int offensive_hit, int target_evasion)
 {
-  int hit_chance = offensive_hit - target_evasion;
+  int hit_chance = 50 + (offensive_hit - target_evasion);
 
   return MAX(5, MIN(95, hit_chance));
 }
@@ -1961,8 +1993,11 @@ static int compute_thaco(struct char_data *ch, struct char_data *victim)
 void hit(struct char_data *ch, struct char_data *victim, int type)
 {
   struct obj_data *wielded = GET_EQ(ch, WEAR_WIELD);
-  int w_type, attacker_hit, defender_evasion, hit_chance, dam, roll;
-  int victim_ac, diceroll, calc_thaco;
+  int w_type, attacker_hit, defender_evasion, hit_chance, dam;
+  int thaco_legacy, victim_ac_legacy, diceroll_legacy;
+  int attacker_level, victim_level, hitroll_bonus, stat_bonus, mental_bonus;
+  int level_gap_bonus, situational_bonus, defender_level_bonus;
+  int final_hit_roll;
 
   /* Check that the attacker and victim exist */
   if (!ch || !victim) return;
@@ -1992,22 +2027,45 @@ void hit(struct char_data *ch, struct char_data *victim, int type)
       w_type = TYPE_HIT;
   }
 
-  attacker_hit = compute_offensive_hit_value(ch, victim);
-  defender_evasion = compute_evasion(victim);
+  attacker_level = GET_LEVEL(ch);
+  victim_level = GET_LEVEL(victim);
+  hitroll_bonus = GET_HITROLL(ch);
+  stat_bonus = str_app[STRENGTH_APPLY_INDEX(ch)].tohit;
+  mental_bonus = (GET_INT(ch) - 10) / 4 + (GET_WIS(ch) - 10) / 4;
+  level_gap_bonus = (attacker_level - victim_level) / 2;
+  situational_bonus = (AFF_FLAGGED(ch, AFF_TRUESIGHT) &&
+      (AFF_FLAGGED(victim, AFF_INVISIBLE) || AFF_FLAGGED(victim, AFF_HIDE))) ? 6 : 0;
+
+  attacker_hit = 30 + attacker_level + hitroll_bonus + stat_bonus +
+                 mental_bonus + level_gap_bonus + situational_bonus;
+  defender_evasion = compute_defensive_evasion_value(victim, &defender_level_bonus);
   hit_chance = compute_hit_chance_from_values(attacker_hit, defender_evasion);
-  roll = rand_number(1, 100);
-  calc_thaco = compute_thaco(ch, victim);
-  victim_ac = compute_armor_class(victim) / 10;
-  victim_ac = MAX(-10, MIN(10, victim_ac));
-  diceroll = rand_number(1, 20);
+  final_hit_roll = rand_number(1, 100);
+  thaco_legacy = compute_thaco(ch, victim);
+  victim_ac_legacy = compute_armor_class(victim) / 10;
+  victim_ac_legacy = MAX(-10, MIN(10, victim_ac_legacy));
+  diceroll_legacy = rand_number(1, 20);
 
   /* report for debugging if necessary */
-  if (CONFIG_DEBUG_MODE >= NRM)
-    send_to_char(ch, "\t1Debug:\r\n   \t2Attacker Lvl: \t3%d\r\n   \t2Victim Lvl: \t3%d\r\n   \t2THAC0: \t3%d\r\n   \t2Victim AC: \t3%d\r\n   \t2Hitroll: \t3%d\r\n   \t2Damroll: \t3%d\r\n   \t2Hit Eval: \t3%d - d20(%d) <= %d\r\n   \t2Legacy Hit%%: \t3%d (roll %d)\tn\r\n",
-      GET_LEVEL(ch), GET_LEVEL(victim), calc_thaco, victim_ac, GET_HITROLL(ch), GET_DAMROLL(ch),
-      calc_thaco, diceroll, victim_ac, hit_chance, roll);
+  if (CONFIG_DEBUG_MODE >= NRM && GET_LEVEL(ch) >= LVL_BUILDER)
+    send_to_char(ch,
+      "\t1Combat Debug:\r\n"
+      "   \t2Attacker Lvl:\t3%d\r\n"
+      "   \t2Victim Lvl:\t3%d\r\n"
+      "   \t2Accuracy Value:\t3%d\r\n"
+      "   \t2Evasion Value:\t3%d\r\n"
+      "   \t2Hitroll Contribution:\t3%d\r\n"
+      "   \t2Stat Contribution:\t3%d (STR) + %d (INT/WIS)\r\n"
+      "   \t2Level-gap Contribution:\t3%d\r\n"
+      "   \t2Defender Level Contribution:\t3%d\r\n"
+      "   \t2Final Hit Chance:\t3%d%%\r\n"
+      "   \t2Final Hit Roll:\t3%d\r\n"
+      "   \t2Legacy THAC0 Check:\t3THAC0 %d vs AC %d on d20(%d)\tn\r\n",
+      attacker_level, victim_level, attacker_hit, defender_evasion, hitroll_bonus,
+      stat_bonus, mental_bonus, level_gap_bonus, defender_level_bonus,
+      hit_chance, final_hit_roll, thaco_legacy, victim_ac_legacy, diceroll_legacy);
 
-  dam = (!AWAKE(victim) || diceroll == 20 || (diceroll != 1 && (calc_thaco - diceroll <= victim_ac)));
+  dam = (!AWAKE(victim) || final_hit_roll <= hit_chance);
 
   if (!dam)
     /* the attacker missed the victim */
