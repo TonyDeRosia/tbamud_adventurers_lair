@@ -614,6 +614,23 @@ static int compute_defensive_evasion_value(struct char_data *victim, int *level_
   return compute_evasion(victim) + level_bonus;
 }
 
+static int concealment_hit_modifier(struct char_data *ch, struct char_data *victim)
+{
+  if (!ch || !victim)
+    return 0;
+
+  if (!(AFF_FLAGGED(victim, AFF_INVISIBLE) || AFF_FLAGGED(victim, AFF_HIDE)))
+    return 0;
+
+  if (AFF_FLAGGED(ch, AFF_TRUESIGHT))
+    return 6;
+
+  if (AFF_FLAGGED(ch, AFF_DETECT_INVIS) || AFF_FLAGGED(ch, AFF_SENSE_LIFE))
+    return 3;
+
+  return -12;
+}
+
 int compute_offensive_hit_value(struct char_data *ch, struct char_data *victim)
 {
   int level_bonus = GET_LEVEL(ch);
@@ -631,9 +648,7 @@ int compute_offensive_hit_value(struct char_data *ch, struct char_data *victim)
       level_gap_bonus = level_gap / 3;
   }
 
-  if (victim && AFF_FLAGGED(ch, AFF_TRUESIGHT) &&
-      (AFF_FLAGGED(victim, AFF_INVISIBLE) || AFF_FLAGGED(victim, AFF_HIDE)))
-    situational_bonus = 6;
+  situational_bonus = concealment_hit_modifier(ch, victim);
 
   return 30 + level_bonus + hitroll_bonus + stat_bonus + mental_bonus +
          level_gap_bonus + situational_bonus;
@@ -2112,9 +2127,7 @@ static int compute_thaco(struct char_data *ch, struct char_data *victim)
   if (victim)
     level_gap_bonus = (GET_LEVEL(ch) - GET_LEVEL(victim)) / 3;
   calc_thaco -= level_gap_bonus;
-  if (victim && AFF_FLAGGED(ch, AFF_TRUESIGHT) &&
-      (AFF_FLAGGED(victim, AFF_INVISIBLE) || AFF_FLAGGED(victim, AFF_HIDE)))
-    situational_hit_bonus = 10;
+  situational_hit_bonus = concealment_hit_modifier(ch, victim);
   calc_thaco -= situational_hit_bonus;
   return MAX(1, calc_thaco);
 }
@@ -2169,8 +2182,7 @@ void hit(struct char_data *ch, struct char_data *victim, int type)
     level_gap_bonus = (attacker_level - victim_level) / 3;
   else
     level_gap_bonus = 0;
-  situational_bonus = (AFF_FLAGGED(ch, AFF_TRUESIGHT) &&
-      (AFF_FLAGGED(victim, AFF_INVISIBLE) || AFF_FLAGGED(victim, AFF_HIDE))) ? 6 : 0;
+  situational_bonus = concealment_hit_modifier(ch, victim);
 
   if (IS_NPC(ch) && ch->master && !IS_NPC(ch->master) &&
       is_shadow_servant_for(ch->master, ch) && victim && IS_NPC(victim)) {
