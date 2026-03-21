@@ -188,7 +188,7 @@ static void list_obj_to_char(struct obj_data *list, struct char_data *ch, int mo
 /* do_look, do_equipment, do_examine, do_inventory */
 static void show_obj_to_char(struct obj_data *obj, struct char_data *ch, int mode);
 static void show_obj_modifiers(struct obj_data *obj, struct char_data *ch);
-static void build_obj_aura_tags(struct obj_data *obj, struct char_data *ch, char *out, size_t outsz);
+static void build_obj_aura_tags(struct obj_data *obj, struct char_data *ch, char *out, size_t outsz, int include_item_tag);
 /* do_where utility functions */
 static void perform_immort_where(char_data *ch, const char *arg);
 static void perform_mortal_where(struct char_data *ch, char *arg);
@@ -244,7 +244,7 @@ static void show_obj_to_char(struct obj_data *obj, struct char_data *ch, int mod
           send_to_char(ch, "[TRIGS] ");
       }
     }
-    build_obj_aura_tags(obj, ch, obj_tags, sizeof(obj_tags));
+    build_obj_aura_tags(obj, ch, obj_tags, sizeof(obj_tags), TRUE);
     send_to_char(ch, "%s%s", obj_tags, obj->description);
     
     send_to_char(ch, "%s", CCNRM(ch, C_NRM));break;
@@ -259,7 +259,7 @@ static void show_obj_to_char(struct obj_data *obj, struct char_data *ch, int mod
           send_to_char(ch, "[TRIGS] ");
       }
     }
-    build_obj_aura_tags(obj, ch, obj_tags, sizeof(obj_tags));
+    build_obj_aura_tags(obj, ch, obj_tags, sizeof(obj_tags), TRUE);
     send_to_char(ch, "%s%s", obj_tags, obj->short_description);
     break;
 
@@ -305,7 +305,7 @@ static void show_obj_modifiers(struct obj_data *obj, struct char_data *ch)
 {
   char obj_tags[256];
 
-  build_obj_aura_tags(obj, ch, obj_tags, sizeof(obj_tags));
+  build_obj_aura_tags(obj, ch, obj_tags, sizeof(obj_tags), TRUE);
   send_to_char(ch, " %s", obj_tags);
 }
 
@@ -931,7 +931,7 @@ static bool obj_has_tempered_state(const struct obj_data *obj)
   return (GET_OBJ_TYPE(obj) == ITEM_WEAPON && OBJ_FLAGGED(obj, ITEM_ANTI_EVIL));
 }
 
-static void build_obj_aura_tags(struct obj_data *obj, struct char_data *ch, char *out, size_t outsz)
+static void build_obj_aura_tags(struct obj_data *obj, struct char_data *ch, char *out, size_t outsz, int include_item_tag)
 {
   int shortflags = (!IS_NPC(ch) && PRF_FLAGGED(ch, PRF_SHORTFLAGS));
 
@@ -939,7 +939,8 @@ static void build_obj_aura_tags(struct obj_data *obj, struct char_data *ch, char
     return;
 
   out[0] = '\0';
-  append_colored_aura_tag(ch, out, outsz, AURA_ITEM, "(Item)");
+  if (include_item_tag)
+    append_colored_aura_tag(ch, out, outsz, AURA_ITEM, "(Item)");
 
   if (OBJ_FLAGGED(obj, ITEM_MAGIC) && AFF_FLAGGED(ch, AFF_DETECT_MAGIC))
     append_colored_aura_tag(ch, out, outsz, AURA_MAGIC_OBJ, shortflags ? "(M)" : "(Magic)");
@@ -3021,7 +3022,7 @@ ACMD(do_equipment)
 
   static const char *eq_labels[] = {
     "Head",
-    "Neck 1",
+    "Neck",
     "Neck 2",
     "Back",
     "Body",
@@ -3065,7 +3066,10 @@ ACMD(do_equipment)
     }
 
     if (CAN_SEE_OBJ(ch, obj)) {
-      show_obj_to_char(obj, ch, SHOW_OBJ_SHORT); /* prints newline */
+      char obj_tags[256];
+
+      build_obj_aura_tags(obj, ch, obj_tags, sizeof(obj_tags), FALSE);
+      send_to_char(ch, "%s%s\r\n", obj_tags, obj->short_description);
     } else {
       send_to_char(ch, "Something.\r\n");
     }
