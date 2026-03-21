@@ -309,7 +309,9 @@ ACMD(do_order)
 
   if (!*name || !*message)
     send_to_char(ch, "Order who to do what?\r\n");
-  else if (!(vict = get_char_vis(ch, name, NULL, FIND_CHAR_ROOM)) && !is_abbrev(name, "followers"))
+  else if (!(vict = get_char_vis(ch, name, NULL, FIND_CHAR_ROOM)) &&
+           !is_abbrev(name, "followers") &&
+           !is_abbrev(name, "all"))
     send_to_char(ch, "That person isn't here.\r\n");
   else if (ch == vict)
     send_to_char(ch, "You obviously suffer from skitzofrenia.\r\n");
@@ -331,7 +333,7 @@ ACMD(do_order)
         send_to_char(ch, "%s", CONFIG_OK);
         command_interpreter(vict, message);
       }
-    } else {			/* This is order "followers" */
+    } else {			/* This is order "followers"/"all" */
       char buf[MAX_STRING_LENGTH];
 
       snprintf(buf, sizeof(buf), "$n issues the order '%s'.", message);
