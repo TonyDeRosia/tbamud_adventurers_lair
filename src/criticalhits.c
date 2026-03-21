@@ -36,7 +36,7 @@ static int clamp_mult(int v)
 
 int crit_base_melee(const struct char_data *ch)
 {
-  return (GET_DEX(ch) / 2);
+  return (GET_DEX(ch) / 2) + MAX(0, (GET_DEX(ch) - 10) / 3);
 }
 
 int crit_base_spell(const struct char_data *ch)
@@ -66,7 +66,8 @@ int crit_total_heal(const struct char_data *ch)
 
 int crit_mult_melee(const struct char_data *ch)
 {
-  return clamp_mult(200 + GET_MELEE_CRIT_MULT(ch));
+  int stat_mult_bonus = MAX(0, GET_STR(ch) - 10) + MAX(0, (GET_DEX(ch) - 10) / 2);
+  return clamp_mult(200 + GET_MELEE_CRIT_MULT(ch) + stat_mult_bonus);
 }
 
 int crit_mult_spell(const struct char_data *ch)
@@ -177,4 +178,3 @@ int crit_check_heal(struct char_data *ch, int *mult)
   *mult = crit_mult_heal(ch);
   return 1;
 }
-

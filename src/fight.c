@@ -2230,7 +2230,8 @@ void hit(struct char_data *ch, struct char_data *victim, int type)
     /* okay, we know the guy has been hit.  now calculate damage.
      * Start with the damage bonuses: the damroll and strength apply */
     dam = str_app[STRENGTH_APPLY_INDEX(ch)].todam;
-    dam += (GET_DAMROLL(ch) * 3) / 2;
+    dam += GET_DAMROLL(ch) * 2;
+    dam += MAX(0, (GET_STR(ch) - 10) / 2);
     melee_level_bonus = MAX(0, GET_LEVEL(ch) / 10);
     dam += melee_level_bonus;
 
