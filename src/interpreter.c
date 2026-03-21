@@ -64,6 +64,7 @@ ACMD(do_smartspawn);
 ACMD(do_aistate);
 ACMD(do_aictl);
 ACMD(do_shadow);
+ACMD(do_areatemplate);
 
 /* local (file scope) functions */
 static int perform_dupe_check(struct descriptor_data *d);
@@ -119,6 +120,7 @@ cpp_extern const struct command_info cmd_info[] = {
   { "affects"  , "aff"     , POS_DEAD    , do_affects  , 0, 0 },
   { "afk"      , "afk"     , POS_DEAD    , do_gen_tog  , 0, SCMD_AFK },
   { "areas"    , "are"     , POS_DEAD    , do_areas    , 0, 0 },
+  { "areatemplate", "areatemplate", POS_DEAD, do_areatemplate, LVL_BUILDER, 0 },
   { "assist"   , "as"      , POS_FIGHTING, do_assist   , 1, 0 },
   { "appraise" , "app"     , POS_RESTING , do_appraise_enemy, 1, 0 },
   { "ask"      , "ask"     , POS_RESTING , do_spec_comm, 0, SCMD_ASK },

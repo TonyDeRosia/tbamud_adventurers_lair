@@ -21888,5 +21888,46 @@ This is a passive detection buff and should be maintained proactively.
 See also: DETECT-INVISIBILITY DETECT-MAGIC INVISIBILITY SPELLS SKILLS
 #0
 
+AREATEMPLATE
+
+AREATEMPLATE
+
+Usage:
+  areatemplate <zone_vnum> <start_room_vnum> <room_count> "<zone name>"
+
+Description:
+  Creates a new area (zone) and a grid of connected rooms.
+
+  This command will:
+  - create a new zone using the given zone vnum
+  - assign the zone a room range starting at the given room vnum
+  - generate a near-square grid of rooms
+  - automatically link north, south, east, and west exits
+  - assign default names and descriptions to all rooms
+
+  The resulting area is a template intended for builders to customize.
+
+Arguments:
+  zone_vnum         The new zone number (must not already exist)
+  start_room_vnum   The first room vnum to use
+  room_count        Number of rooms to create
+  "zone name"       Name of the new area (must be in quotes)
+
+Notes:
+  - The command will fail if any room in the requested range already exists.
+  - The command will fail if the zone vnum already exists.
+  - The layout is automatically generated as a compact grid.
+  - Rooms are created empty and must be customized.
+
+Example:
+  areatemplate 50 5000 25 "Forgotten Ruins"
+
+See also:
+  REDIT MEDIT OEDIT ZEDIT
+
+Minimum level:
+  LVL_BUILDER
+#0
+
 $
 #0
