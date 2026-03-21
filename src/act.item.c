@@ -990,8 +990,9 @@ ACMD(do_drink)
       case SECT_WATER_SWIM:
       case SECT_WATER_NOSWIM:
       case SECT_UNDERWATER:
-        if ((GET_COND(ch, HUNGER) > 20) && (GET_COND(ch, THIRST) > 0)) {
-          send_to_char(ch, "Your stomach can't contain anymore!\r\n");
+        if (GET_COND(ch, THIRST) > 20) {
+          send_to_char(ch, "You don't feel thirsty any more.\r\n");
+          return;
         }
         snprintf(buf, sizeof(buf), "$n takes a refreshing drink.");
         act(buf, TRUE, ch, 0, 0, TO_ROOM);
@@ -1027,8 +1028,8 @@ ACMD(do_drink)
     act("$n tries to drink but misses $s mouth!", TRUE, ch, 0, 0, TO_ROOM);
     return;
   }
-  if ((GET_COND(ch, HUNGER) > 20) && (GET_COND(ch, THIRST) > 0)) {
-    send_to_char(ch, "Your stomach can't contain anymore!\r\n");
+  if (GET_COND(ch, THIRST) > 20) {
+    send_to_char(ch, "You don't feel thirsty any more.\r\n");
     return;
   }
   if (GET_OBJ_VAL(temp, 1) < 1) {
@@ -1067,7 +1068,6 @@ ACMD(do_drink)
   }
 
   gain_condition(ch, DRUNK,  drink_aff[GET_OBJ_VAL(temp, 2)][DRUNK]  * amount / 4);
-  gain_condition(ch, HUNGER,   drink_aff[GET_OBJ_VAL(temp, 2)][HUNGER]   * amount / 4);
   gain_condition(ch, THIRST, drink_aff[GET_OBJ_VAL(temp, 2)][THIRST] * amount / 4);
 
   if (GET_COND(ch, DRUNK) > 10)
@@ -1075,9 +1075,6 @@ ACMD(do_drink)
 
   if (GET_COND(ch, THIRST) > 20)
     send_to_char(ch, "You don't feel thirsty any more.\r\n");
-
-  if (GET_COND(ch, HUNGER) > 20)
-    send_to_char(ch, "You are full.\r\n");
 
   if (GET_OBJ_VAL(temp, 3) && GET_LEVEL(ch) < LVL_IMMORT) { /* The crap was poisoned ! */
     send_to_char(ch, "Oops, it tasted rather strange!\r\n");
@@ -1107,7 +1104,6 @@ ACMD(do_eat)
   struct obj_data *food;
   struct affected_type af;
   int hunger_amount;
-  int thirst_amount;
   int sated_duration;
 
   one_argument(argument, arg);
@@ -1150,23 +1146,17 @@ ACMD(do_eat)
 
   if (subcmd == SCMD_EAT) {
     hunger_amount = GET_OBJ_VAL(food, 0);
-    thirst_amount = GET_OBJ_VAL(food, 1);
     sated_duration = GET_OBJ_VAL(food, 2);
   } else {
     hunger_amount = (GET_OBJ_VAL(food, 0) > 0) ? 1 : 0;
-    thirst_amount = (GET_OBJ_VAL(food, 1) > 0) ? 1 : 0;
     sated_duration = (GET_OBJ_VAL(food, 2) > 0) ? 1 : 0;
   }
 
   gain_condition(ch, HUNGER, hunger_amount);
-  gain_condition(ch, THIRST, thirst_amount);
   ch->char_specials.food_sated_ticks = MAX(ch->char_specials.food_sated_ticks, 0) + MAX(sated_duration, 0);
 
   if (GET_COND(ch, HUNGER) > 20)
     send_to_char(ch, "You are full.\r\n");
-  if (GET_COND(ch, THIRST) > 20)
-    send_to_char(ch, "You don't feel thirsty any more.\r\n");
-
   if (GET_OBJ_VAL(food, 3) && (GET_LEVEL(ch) < LVL_IMMORT)) {
     /* The crap was poisoned ! */
     send_to_char(ch, "Oops, that tasted rather strange!\r\n");
