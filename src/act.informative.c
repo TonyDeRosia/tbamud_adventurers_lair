@@ -2835,16 +2835,13 @@ ACMD(do_affects)
   int i, j;
   int added_hidden_drain = 0;
   int affect_count = 0;
+  int hunger_drain = 0;
+  int thirst_drain = 0;
 
   enum { AFF_PROLONGED_TICK_THRESHOLD = 6 };
 
   if (!ch || IS_NPC(ch)) {
     send_to_char(ch, "Not for mobiles.\r\n");
-    return;
-  }
-
-  if (!ch->affected) {
-    send_to_char(ch, "You have no active effects.\r\n");
     return;
   }
 
@@ -2855,10 +2852,16 @@ ACMD(do_affects)
     else any_buff = 1;
   }
 
-  if (!any) {
+  hunger_drain = hunger_is_actively_draining(ch);
+  thirst_drain = thirst_is_actively_draining(ch);
+
+  if (!any && !hunger_drain && !thirst_drain) {
     send_to_char(ch, "You have no active effects.\r\n");
     return;
   }
+
+  if (affect_count < 1)
+    affect_count = 1;
 
   CREATE(seen, const struct affected_type *, affect_count);
   CREATE(buff_entries, struct aff_display_entry, affect_count);
@@ -2912,7 +2915,7 @@ ACMD(do_affects)
     debuff_count++;
   }
 
-  if (hunger_is_actively_draining(ch)) {
+  if (hunger_drain) {
     struct aff_display_entry e;
     memset(&e, 0, sizeof(e));
     snprintf(e.name, sizeof(e.name), "hunger strain");
@@ -2927,7 +2930,7 @@ ACMD(do_affects)
     added_hidden_drain = 1;
   }
 
-  if (thirst_is_actively_draining(ch)) {
+  if (thirst_drain) {
     struct aff_display_entry e;
     memset(&e, 0, sizeof(e));
     snprintf(e.name, sizeof(e.name), "thirst strain");
