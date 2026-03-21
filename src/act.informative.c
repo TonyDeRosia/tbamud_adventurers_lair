@@ -2702,6 +2702,30 @@ static int aff_entry_same_visible(const struct aff_display_entry *a, const struc
       && !strcmp(a->drain, b->drain);
 }
 
+static int hunger_is_actively_draining(const struct char_data *ch)
+{
+  if (!ch || IS_NPC(ch))
+    return 0;
+  if (GET_LEVEL(ch) >= LVL_IMMORT)
+    return 0;
+  if (GET_POS(ch) < POS_STUNNED)
+    return 0;
+
+  return (GET_COND(ch, HUNGER) <= 0);
+}
+
+static int thirst_is_actively_draining(const struct char_data *ch)
+{
+  if (!ch || IS_NPC(ch))
+    return 0;
+  if (GET_LEVEL(ch) >= LVL_IMMORT)
+    return 0;
+  if (GET_POS(ch) < POS_STUNNED)
+    return 0;
+
+  return (GET_COND(ch, THIRST) <= 0);
+}
+
 static void format_aff_display_entry_line(const struct aff_display_entry *entry,
                                           char *out, size_t outsz)
 {
@@ -2825,7 +2849,7 @@ ACMD(do_affects)
     debuff_count++;
   }
 
-  if (GET_LEVEL(ch) < LVL_IMMORT && GET_COND(ch, HUNGER) <= 0) {
+  if (hunger_is_actively_draining(ch)) {
     struct aff_display_entry e;
     memset(&e, 0, sizeof(e));
     snprintf(e.name, sizeof(e.name), "hunger strain");
@@ -2840,7 +2864,7 @@ ACMD(do_affects)
     added_hidden_drain = 1;
   }
 
-  if (GET_LEVEL(ch) < LVL_IMMORT && GET_COND(ch, THIRST) <= 0) {
+  if (thirst_is_actively_draining(ch)) {
     struct aff_display_entry e;
     memset(&e, 0, sizeof(e));
     snprintf(e.name, sizeof(e.name), "thirst strain");
