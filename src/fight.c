@@ -31,8 +31,6 @@
 #define PVP_GLORY_COOLDOWN 600 /* seconds */
 
 #define RARE_KILL_MAX_COUNT 10
-#define RARE_KILL_BASE_BONUS 5
-#define RARE_KILL_STEP_BONUS 2
 
 
 /* locally defined global variables, used externally */
@@ -76,10 +74,11 @@ static int take_next_damage_type(void)
 }
 
 /* local file scope utility functions */
-static void perform_group_gain(struct char_data *ch, int base, struct char_data *victim);
+static void perform_group_gain(struct char_data *ch, struct char_data *victim, int base_override);
+static int mob_kill_base_xp(struct char_data *ch, struct char_data *victim);
 static int count_live_mobs_by_vnum(mob_vnum vnum);
-static int rare_kill_bonus_for_count(int live_count);
-static int rare_kill_bonus_for_victim(struct char_data *victim);
+static int rare_kill_bonus_for_count(int live_count, int base_xp);
+static int rare_kill_bonus_for_victim(struct char_data *victim, int base_xp);
 static struct char_data *resolve_reward_killer(struct char_data *killer);
 static void dam_message(int dam, struct char_data *ch, struct char_data *victim, int w_type);
 static void make_corpse(struct char_data *ch);
@@ -1078,12 +1077,13 @@ void die(struct char_data * ch, struct char_data * killer)
   raw_kill(ch, killer);
 }
 
-static void perform_group_gain(struct char_data *ch, int base,
-			     struct char_data *victim)
+static void perform_group_gain(struct char_data *ch, struct char_data *victim, int base_override)
 {
   int share, hap_share, rare_bonus;
 
-  share = MIN(CONFIG_MAX_EXP_GAIN, MAX(1, base));
+  share = (base_override >= 0) ? base_override : mob_kill_base_xp(ch, victim);
+
+  share = MIN(CONFIG_MAX_EXP_GAIN, MAX(1, share));
 
   if ((IS_HAPPYHOUR) && (IS_HAPPYEXP))
   {
@@ -1096,7 +1096,7 @@ static void perform_group_gain(struct char_data *ch, int base,
   else
     send_to_char(ch, "You receive your share of experience -- one measly little point!\r\n");
 
-  rare_bonus = rare_kill_bonus_for_victim(victim);
+  rare_bonus = rare_kill_bonus_for_victim(victim, share);
   if (rare_bonus > 0) {
     share += rare_bonus;
     send_to_char(ch, "You receive \ty%d\tn '\tcRare Kill\tn' \tCexperience\tn bonus.\r\n", rare_bonus);
@@ -1110,41 +1110,45 @@ static void group_gain(struct char_data *ch, struct char_data *victim)
 {
   int tot_members = 0, base, tot_gain;
   struct char_data *k;
-  
-  while ((k = (struct char_data *) simple_list(GROUP(ch)->members)) != NULL)
-    if (IN_ROOM(ch) == IN_ROOM(k))
-      tot_members++;
 
-  /* round up to the nearest tot_members */
-  tot_gain = (GET_EXP(victim) / 3) + tot_members - 1;
+  if (!IS_NPC(victim)) {
+    while ((k = (struct char_data *) simple_list(GROUP(ch)->members)) != NULL)
+      if (IN_ROOM(ch) == IN_ROOM(k))
+        tot_members++;
 
-  /* prevent illegal xp creation when killing players */
-  if (!IS_NPC(victim))
+    /* round up to the nearest tot_members */
+    tot_gain = (GET_EXP(victim) / 3) + tot_members - 1;
     tot_gain = MIN(CONFIG_MAX_EXP_LOSS * 2 / 3, tot_gain);
+    base = (tot_members >= 1) ? MAX(1, tot_gain / tot_members) : 0;
 
-  if (tot_members >= 1)
-    base = MAX(1, tot_gain / tot_members);
-  else
-    base = 0;
+    while ((k = (struct char_data *) simple_list(GROUP(ch)->members)) != NULL)
+      if (IN_ROOM(k) == IN_ROOM(ch))
+        perform_group_gain(k, victim, base);
+    return;
+  }
 
   while ((k = (struct char_data *) simple_list(GROUP(ch)->members)) != NULL)
     if (IN_ROOM(k) == IN_ROOM(ch))
-      perform_group_gain(k, base, victim);
+      perform_group_gain(k, victim, -1);
 }
 
 static void solo_gain(struct char_data *ch, struct char_data *victim)
 {
   int exp, happy_exp, rare_bonus;
 
-  exp = MIN(CONFIG_MAX_EXP_GAIN, GET_EXP(victim) / 3);
+  if (IS_NPC(victim)) {
+    exp = mob_kill_base_xp(ch, victim);
+    exp = MIN(CONFIG_MAX_EXP_GAIN, MAX(1, exp));
+  } else {
+    exp = MIN(CONFIG_MAX_EXP_GAIN, GET_EXP(victim) / 3);
 
-  /* Calculate level-difference bonus */
-  if (IS_NPC(ch))
-    exp += MAX(0, (exp * MIN(4, (GET_LEVEL(victim) - GET_LEVEL(ch)))) / 8);
-  else
-    exp += MAX(0, (exp * MIN(8, (GET_LEVEL(victim) - GET_LEVEL(ch)))) / 8);
+    if (IS_NPC(ch))
+      exp += MAX(0, (exp * MIN(4, (GET_LEVEL(victim) - GET_LEVEL(ch)))) / 8);
+    else
+      exp += MAX(0, (exp * MIN(8, (GET_LEVEL(victim) - GET_LEVEL(ch)))) / 8);
 
-  exp = MAX(exp, 1);
+    exp = MAX(exp, 1);
+  }
 
   if (IS_HAPPYHOUR && IS_HAPPYEXP) {
     happy_exp = exp + (int)((float)exp * ((float)HAPPY_EXP / (float)(100)));
@@ -1156,7 +1160,7 @@ static void solo_gain(struct char_data *ch, struct char_data *victim)
   else
     send_to_char(ch, "You receive one lousy experience point.\r\n");
 
-  rare_bonus = rare_kill_bonus_for_victim(victim);
+  rare_bonus = rare_kill_bonus_for_victim(victim, exp);
   if (rare_bonus > 0) {
     exp += rare_bonus;
     send_to_char(ch, "You receive \ty%d\tn '\tcRare Kill\tn' \tCexperience\tn bonus.\r\n", rare_bonus);
@@ -1186,20 +1190,45 @@ static int count_live_mobs_by_vnum(mob_vnum vnum)
   return count;
 }
 
-static int rare_kill_bonus_for_count(int live_count)
+static int mob_kill_base_xp(struct char_data *ch, struct char_data *victim)
+{
+  int delta;
+
+  if (!ch || !victim || !IS_NPC(victim))
+    return 0;
+
+  delta = GET_LEVEL(victim) - GET_LEVEL(ch);
+
+  if (delta <= -15) return 1;
+  if (delta <= -10) return 3;
+  if (delta <= -8)  return 5;
+  if (delta <= -5)  return 15;
+  if (delta <= -3)  return 40;
+  if (delta == -2)  return 60;
+  if (delta == -1)  return 90;
+  if (delta == 0)   return 120;
+  if (delta == 1)   return 150;
+  if (delta == 2)   return 180;
+  if (delta == 3)   return 220;
+  if (delta == 4)   return 260;
+  if (delta == 5)   return 300;
+  return 350;
+}
+
+static int rare_kill_bonus_for_count(int live_count, int base_xp)
 {
   if (live_count <= 0 || live_count > RARE_KILL_MAX_COUNT)
     return 0;
 
-  return RARE_KILL_BASE_BONUS + ((RARE_KILL_MAX_COUNT - live_count) * RARE_KILL_STEP_BONUS);
+  return MAX(1, base_xp / 4);
 }
 
-static int rare_kill_bonus_for_victim(struct char_data *victim)
+static int rare_kill_bonus_for_victim(struct char_data *victim, int base_xp)
 {
   if (!victim || !IS_NPC(victim))
     return 0;
 
-  return rare_kill_bonus_for_count(count_live_mobs_by_vnum(GET_MOB_VNUM(victim)));
+  return rare_kill_bonus_for_count(count_live_mobs_by_vnum(GET_MOB_VNUM(victim)), base_xp);
 }
 
 static struct char_data *resolve_reward_killer(struct char_data *killer)
