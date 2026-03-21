@@ -1802,6 +1802,12 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
       (damage_type == DAM_SHADOW || damage_type == DAM_NECROTIC))
     dam = (dam * 105) / 100;
 
+  if (dam > 0 && victim && IS_SPELL(attacktype) && GET_MAX_HIT(victim) > 0) {
+    int half_max = GET_MAX_HIT(victim) / 2;
+    if (dam > half_max)
+      dam = half_max + (dam / 4);
+  }
+
 
   /* Melee crits (only weapon attacks) */
   if (dam > 0 && ch && victim && ch != victim && IS_WEAPON(attacktype)) {
@@ -2121,6 +2127,7 @@ void hit(struct char_data *ch, struct char_data *victim, int type)
   int attacker_level, victim_level, hitroll_bonus, stat_bonus, mental_bonus;
   int level_gap_bonus, situational_bonus, defender_level_bonus;
   int shadow_assist_bonus = 0;
+  int melee_level_bonus = 0;
   int final_hit_roll;
 
   /* Check that the attacker and victim exist */
@@ -2211,7 +2218,9 @@ void hit(struct char_data *ch, struct char_data *victim, int type)
     /* okay, we know the guy has been hit.  now calculate damage.
      * Start with the damage bonuses: the damroll and strength apply */
     dam = str_app[STRENGTH_APPLY_INDEX(ch)].todam;
-    dam += GET_DAMROLL(ch);
+    dam += (GET_DAMROLL(ch) * 3) / 2;
+    melee_level_bonus = MAX(0, GET_LEVEL(ch) / 10);
+    dam += melee_level_bonus;
 
     {
     int unarmed_base_roll = 0;
@@ -2236,17 +2245,21 @@ void hit(struct char_data *ch, struct char_data *victim, int type)
     }
 
     if (victim && GET_LEVEL(ch) > GET_LEVEL(victim)) {
-      level_gap_damage_bonus = MAX(1, (GET_LEVEL(ch) - GET_LEVEL(victim)) / 6);
+      int level_gap = GET_LEVEL(ch) - GET_LEVEL(victim);
+      level_gap_damage_bonus = MAX(1, level_gap / 6);
+      if (level_gap >= 10)
+        level_gap_damage_bonus += level_gap / 2;
       dam += level_gap_damage_bonus;
     }
 
     if (CONFIG_DEBUG_MODE >= NRM && GET_LEVEL(ch) >= LVL_BUILDER)
       send_to_char(ch,
         "\t1Combat Debug:\r\n"
+        "   \t2Melee Level Bonus:\t3%d\r\n"
         "   \t2Unarmed Base Damage Roll:\t3%d\r\n"
         "   \t2Unarmed Level Scaling Bonus:\t3%d\r\n"
         "   \t2Level-gap Damage Bonus:\t3%d\tn\r\n",
-        unarmed_base_roll, unarmed_level_scaling_bonus, level_gap_damage_bonus);
+        melee_level_bonus, unarmed_base_roll, unarmed_level_scaling_bonus, level_gap_damage_bonus);
     }
 
     /* Include a damage multiplier if victim isn't ready to fight:

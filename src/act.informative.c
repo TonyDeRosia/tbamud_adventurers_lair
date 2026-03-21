@@ -2518,13 +2518,15 @@ static void aff_seen_add(const struct affected_type **seen, int *seen_count,
   (*seen_count)++;
 }
 
-static const char *aff_name_from_spell_and_flags(int spell, const char *flags, char *fallback, size_t fallbacksz)
+static const char *resolve_affect_display_name(int spell, const char *flags, char *fallback, size_t fallbacksz)
 {
-  const char *name = "Unknown";
+  const char *name = NULL;
   size_t i = 0;
 
-  if (spell > 0 && spell < MAX_SPELLS && spell_info[spell].name)
+  if (spell > 0 && spell <= TOP_SPELL_DEFINE && spell_info[spell].name)
     name = spell_info[spell].name;
+  else if (spell > TOP_SPELL_DEFINE && spell <= MAX_SKILLS)
+    name = skill_name(spell);
 
   if ((!name || !*name || !str_cmp(name, "Unknown")) && aff_flags_has_meaningful_bits(flags)) {
     while (flags[i] && flags[i] != ' ' && i + 1 < fallbacksz) {
@@ -2536,7 +2538,15 @@ static const char *aff_name_from_spell_and_flags(int spell, const char *flags, c
       name = fallback;
   }
 
+  if (!name || !*name || !str_cmp(name, "Unknown"))
+    name = "System effect";
+
   return name;
+}
+
+static const char *aff_name_from_spell_and_flags(int spell, const char *flags, char *fallback, size_t fallbacksz)
+{
+  return resolve_affect_display_name(spell, flags, fallback, fallbacksz);
 }
 
 static void build_grouped_aff_summary(const struct affected_type *list,
@@ -2555,6 +2565,7 @@ static void build_grouped_aff_summary(const struct affected_type *list,
   char name_fallback[64];
   const char *name;
   char dur[32];
+  int max_duration = seed->duration;
   int i;
 
   if (!out || outsz == 0 || !seed || !list || !seen || !seen_count)
@@ -2575,12 +2586,13 @@ static void build_grouped_aff_summary(const struct affected_type *list,
   for (af = list; af; af = af->next) {
     if (aff_seen_contains(seen, *seen_count, af))
       continue;
-    if ((af->spell != seed->spell) || (af->duration != seed->duration))
+    if (af->spell != seed->spell)
       continue;
     if (!!is_aff_debuff(af) != !!only_debuff)
       continue;
 
     aff_seen_add(seen, seen_count, af);
+    max_duration = MAX(max_duration, af->duration);
     if (af->location > APPLY_NONE && af->location < NUM_APPLIES && af->modifier != 0) {
       mod_totals[af->location] += af->modifier;
       mod_used[af->location] = 1;
@@ -2618,7 +2630,7 @@ static void build_grouped_aff_summary(const struct affected_type *list,
   sprintbitarray(bits, affected_bits, AF_ARRAY_MAX, flags);
   if (!aff_flags_has_meaningful_bits(flags))
     flags[0] = '\0';
-  format_affect_duration(seed->duration, dur, sizeof(dur));
+  format_affect_duration(max_duration, dur, sizeof(dur));
   name = aff_name_from_spell_and_flags(seed->spell, flags, name_fallback, sizeof(name_fallback));
 
   if (*mods && *flags)
@@ -5037,9 +5049,12 @@ ACMD(do_saffects)
   for (af = ch->affected; af; af = af->next) {
     const struct affected_type *scan;
     int max_duration = af->duration;
-    const char *name = "Unknown";
+    const char *name = "System effect";
     const char *kind = "Spell";
     char dur[32];
+    char name_fallback[64];
+    char flags[256];
+    int bits[AF_ARRAY_MAX];
     int is_skill = 0;
     int already_seen = FALSE;
     int i;
@@ -5062,10 +5077,18 @@ ACMD(do_saffects)
       seen_spells[seen_count++] = af->spell;
     any = 1;
 
-    if (af->spell > 0 && af->spell <= TOP_SPELL_DEFINE && spell_info[af->spell].name)
-      name = spell_info[af->spell].name;
-    else if (af->spell > TOP_SPELL_DEFINE)
-      name = skill_name(af->spell);
+    name_fallback[0] = '\0';
+    for (i = 0; i < AF_ARRAY_MAX; i++)
+      bits[i] = 0;
+    for (scan = ch->affected; scan; scan = scan->next) {
+      if (scan->spell == af->spell)
+        for (i = 0; i < AF_ARRAY_MAX; i++)
+          bits[i] |= scan->bitvector[i];
+    }
+    sprintbitarray(bits, affected_bits, AF_ARRAY_MAX, flags);
+    if (!aff_flags_has_meaningful_bits(flags))
+      flags[0] = '\0';
+    name = resolve_affect_display_name(af->spell, flags, name_fallback, sizeof(name_fallback));
 
     if (af->spell > 0 && IS_SKILL(af->spell)) {
       kind = "Skill";
