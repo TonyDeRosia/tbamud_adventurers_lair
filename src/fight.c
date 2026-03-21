@@ -825,11 +825,11 @@ void death_cry(struct char_data *ch)
 {
   int door;
 
-  act("Your blood freezes as you hear $n's death cry.", FALSE, ch, 0, 0, TO_ROOM);
+  act("\tRYour blood freezes as you hear $n's death cry.\tn", FALSE, ch, 0, 0, TO_ROOM);
 
   for (door = 0; door < DIR_COUNT; door++)
     if (CAN_GO(ch, door))
-      send_to_room(world[IN_ROOM(ch)].dir_option[door]->to_room, "Your blood freezes as you hear someone's death cry.\r\n");
+      send_to_room(world[IN_ROOM(ch)].dir_option[door]->to_room, "\tRYour blood freezes as you hear someone's death cry.\tn\r\n");
 }
 
 void raw_kill(struct char_data * ch, struct char_data * killer)
@@ -1003,7 +1003,7 @@ void die(struct char_data * ch, struct char_data * killer)
       char buf[64];
       format_gold_as_currency(buf, sizeof(buf), gold_gain);
       increase_money_gold(killer, gold_gain);
-      send_to_char(killer, "You receive %s from the kill.\r\n", buf);
+      send_to_char(killer, "You receive \ty%s\tn from the kill.\r\n", buf);
     }
 
     /* prevent corpse gold duplication */
@@ -1029,14 +1029,14 @@ static void perform_group_gain(struct char_data *ch, int base,
     share = MIN(CONFIG_MAX_EXP_GAIN, MAX(1, hap_share));
   }
   if (share > 1)
-    send_to_char(ch, "You receive your share of experience -- %s%d%s points.\r\n", CCYEL(ch, C_NRM), share, CCNRM(ch, C_NRM));
+    send_to_char(ch, "You receive your share of \tYexperience\tn -- \ty%d\tn points.\r\n", share);
   else
     send_to_char(ch, "You receive your share of experience -- one measly little point!\r\n");
 
   rare_bonus = rare_kill_bonus_for_victim(victim);
   if (rare_bonus > 0) {
     share += rare_bonus;
-    send_to_char(ch, "You receive %d 'rare kill' experience bonus.\r\n", rare_bonus);
+    send_to_char(ch, "You receive \ty%d\tn '\tyrare kill\tn' \tYexperience\tn bonus.\r\n", rare_bonus);
   }
 
   gain_exp(ch, share);
@@ -1089,14 +1089,14 @@ static void solo_gain(struct char_data *ch, struct char_data *victim)
   }
 
   if (exp > 1)
-    send_to_char(ch, "You receive %s%d%s experience points.\r\n", CCYEL(ch, C_NRM), exp, CCNRM(ch, C_NRM));
+    send_to_char(ch, "You receive \ty%d\tn \tYexperience\tn points.\r\n", exp);
   else
     send_to_char(ch, "You receive one lousy experience point.\r\n");
 
   rare_bonus = rare_kill_bonus_for_victim(victim);
   if (rare_bonus > 0) {
     exp += rare_bonus;
-    send_to_char(ch, "You receive %d 'rare kill' experience bonus.\r\n", rare_bonus);
+    send_to_char(ch, "You receive \ty%d\tn '\tyrare kill\tn' \tYexperience\tn bonus.\r\n", rare_bonus);
   }
 
   gain_exp(ch, exp);
@@ -1867,7 +1867,7 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
     send_to_char(victim, "You're stunned, but will probably regain consciousness again.\r\n");
     break;
   case POS_DEAD:
-    act("$n is dead!  R.I.P.", FALSE, victim, 0, 0, TO_ROOM);
+    act("$n is dead!  \tYR.I.P.\tn", FALSE, victim, 0, 0, TO_ROOM);
     send_to_char(victim, "You are dead!  Sorry...\r\n");
     break;
 
