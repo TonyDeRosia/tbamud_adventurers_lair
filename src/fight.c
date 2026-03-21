@@ -1624,6 +1624,15 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
   	return (0);
   }
 
+  if (dam > 0 &&
+      ch &&
+      ch != victim &&
+      IS_SPELL(attacktype) &&
+      affected_by_spell(ch, SPELL_TRIPLE_MAXIMIZE_MAGIC)) {
+    dam *= 3;
+    affect_from_char(ch, SPELL_TRIPLE_MAXIMIZE_MAGIC);
+  }
+
   if (dam > 0 && IS_WEAPON(attacktype) && victim != ch && AFF_FLAGGED(victim, AFF_PHASE) && rand_number(1, 100) <= 30) {
     act("$N phases out of alignment and your attack passes through harmlessly!", FALSE, ch, 0, victim, TO_CHAR);
     act("$n's attack passes through you as you phase out of alignment!", FALSE, ch, 0, victim, TO_VICT);

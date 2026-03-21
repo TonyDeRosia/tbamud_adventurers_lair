@@ -2378,6 +2378,8 @@ ACMD(do_spellup)
     if (spell_on_cooldown(ch, spellnum)) {
       if (spellnum == SPELL_GRASP_HEART)
         send_to_char(ch, "You have not yet recovered enough to grasp another heart.\r\n");
+      else if (spellnum == SPELL_TRIPLE_MAXIMIZE_MAGIC)
+        send_to_char(ch, "Triple maximize magic is still on cooldown.\r\n");
       else
         send_to_char(ch, "That spell is still recovering.\r\n");
       continue;
@@ -2679,6 +2681,8 @@ ACMD(do_cast) {
   if (spell_on_cooldown(ch, spellnum)) {
     if (spellnum == SPELL_GRASP_HEART)
       send_to_char(ch, "You have not yet recovered enough to grasp another heart.\r\n");
+    else if (spellnum == SPELL_TRIPLE_MAXIMIZE_MAGIC)
+      send_to_char(ch, "Triple maximize magic is still on cooldown.\r\n");
     else
       send_to_char(ch, "That spell is still recovering.\r\n");
     return;
