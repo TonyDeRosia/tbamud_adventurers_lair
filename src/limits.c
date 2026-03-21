@@ -173,6 +173,9 @@ static int condition_regen_percent(int cond_value)
 
 static int combined_condition_regen_percent(struct char_data *ch)
 {
+  if (!ch || IS_NPC(ch) || GET_LEVEL(ch) >= LVL_IMMORT)
+    return 100;
+
   int hunger_percent = condition_regen_percent(GET_COND(ch, HUNGER));
   int thirst_percent = condition_regen_percent(GET_COND(ch, THIRST));
 
@@ -183,6 +186,8 @@ static bool is_starving(struct char_data *ch)
 {
   if (!ch)
     return FALSE;
+  if (IS_NPC(ch) || GET_LEVEL(ch) >= LVL_IMMORT)
+    return FALSE;
 
   return (condition_stage_value(GET_COND(ch, HUNGER)) >= COND_STAGE_STARVING);
 }
@@ -190,6 +195,8 @@ static bool is_starving(struct char_data *ch)
 static bool is_dehydrated(struct char_data *ch)
 {
   if (!ch)
+    return FALSE;
+  if (IS_NPC(ch) || GET_LEVEL(ch) >= LVL_IMMORT)
     return FALSE;
 
   return (condition_stage_value(GET_COND(ch, THIRST)) >= COND_STAGE_STARVING);
@@ -199,6 +206,11 @@ static void update_starvation_trackers(struct char_data *ch)
 {
   if (!ch || IS_NPC(ch))
     return;
+  if (GET_LEVEL(ch) >= LVL_IMMORT) {
+    ch->char_specials.starving_ticks = 0;
+    ch->char_specials.dehydrated_ticks = 0;
+    return;
+  }
 
   if (GET_COND(ch, HUNGER) <= STARVING_THRESHOLD)
     ch->char_specials.starving_ticks++;
@@ -580,6 +592,9 @@ void gain_condition(struct char_data *ch, int condition, int value)
   bool intoxicated;
 
   if (IS_NPC(ch) || GET_COND(ch, condition) == -1)	/* No change */
+    return;
+  if (GET_LEVEL(ch) >= LVL_IMMORT &&
+      (condition == HUNGER || condition == THIRST))
     return;
 
   intoxicated = (GET_COND(ch, DRUNK) > 0);
