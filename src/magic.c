@@ -442,13 +442,22 @@ int mag_damage(int level, struct char_data *ch, struct char_data *victim,
 
   if (victim) {
     int level_gap = GET_LEVEL(ch) - GET_LEVEL(victim);
-    if (level_gap > 0)
-      save_modifier += MIN(20, level_gap);
-    else if (level_gap < 0)
-      save_modifier += MAX(-10, level_gap / 2);
+    if (spellnum == SPELL_MAGIC_MISSILE || spellnum == SPELL_CHILL_TOUCH) {
+      if (level_gap >= 8)
+        save_modifier -= 6 + MIN(8, level_gap / 3);
+      else if (level_gap < 0)
+        save_modifier += MIN(6, (-level_gap) / 4);
+    }
   }
-  if (spellnum == SPELL_MAGIC_MISSILE || spellnum == SPELL_CHILL_TOUCH)
-    save_modifier += 8;
+
+  if (spellnum == SPELL_MAGIC_MISSILE && CONFIG_DEBUG_MODE >= NRM &&
+      GET_LEVEL(ch) >= LVL_BUILDER)
+    send_to_char(ch,
+      "\t1Combat Debug:\r\n"
+      "   \t2Magic Missile Caster Lvl:\t3%d\r\n"
+      "   \t2Magic Missile Victim Lvl:\t3%d\r\n"
+      "   \t2Magic Missile Save Adj:\t3%d\tn\r\n",
+      GET_LEVEL(ch), GET_LEVEL(victim), save_modifier);
 
   /* divide damage by two if victim makes his saving throw */
   if (mag_savingthrow(victim, savetype, save_modifier))
