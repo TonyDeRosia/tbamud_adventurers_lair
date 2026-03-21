@@ -723,33 +723,6 @@ void apply_shadow_identity_to_mob(struct char_data *owner, struct char_data *mob
   apply_shadow_identity_to_mob_name(mob, identity_name);
 }
 
-static void restore_shadow_combat_profile(struct char_data *ch, int slot, struct char_data *mob)
-{
-  if (!ch || !mob || slot < 0 || slot >= MAX_SHADOW_ROSTER)
-    return;
-
-  if (!SHADOW_SLOT_PROFILE_VALID(ch, slot))
-    return;
-
-  GET_LEVEL(mob) = MAX(1, SHADOW_SLOT_LEVEL(ch, slot));
-  GET_MAX_HIT(mob) = MAX(1, SHADOW_SLOT_MAX_HIT(ch, slot));
-  GET_HIT(mob) = GET_MAX_HIT(mob);
-  GET_AC(mob) = SHADOW_SLOT_AC(ch, slot);
-  GET_HITROLL(mob) = SHADOW_SLOT_HITROLL(ch, slot);
-  GET_DAMROLL(mob) = SHADOW_SLOT_DAMROLL(ch, slot);
-  GET_MAX_MANA(mob) = MAX(0, SHADOW_SLOT_MAX_MANA(ch, slot));
-  GET_MANA(mob) = GET_MAX_MANA(mob);
-  mob->mob_specials.damnodice = MAX(1, SHADOW_SLOT_DAMNODICE(ch, slot));
-  mob->mob_specials.damsizedice = MAX(1, SHADOW_SLOT_DAMSIZEDICE(ch, slot));
-  mob->real_abils.str = SHADOW_SLOT_STR(ch, slot);
-  mob->real_abils.intel = SHADOW_SLOT_INT(ch, slot);
-  mob->real_abils.wis = SHADOW_SLOT_WIS(ch, slot);
-  mob->real_abils.dex = SHADOW_SLOT_DEX(ch, slot);
-  mob->real_abils.con = SHADOW_SLOT_CON(ch, slot);
-  mob->real_abils.cha = SHADOW_SLOT_CHA(ch, slot);
-  mob->aff_abils = mob->real_abils;
-}
-
 static void apply_shadow_servant_bonuses(struct char_data *owner, struct char_data *mob)
 {
   int stored_level;
@@ -963,6 +936,194 @@ static void mark_shadow_roster_slot(struct char_data *mob, int slot)
   affect_join(mob, &af, FALSE, FALSE, FALSE, FALSE);
 }
 
+struct shadow_source_profile {
+  mob_vnum source_vnum;
+  int source_level;
+  int source_attack_type;
+  int source_max_hit;
+  int source_ac;
+  int source_hitroll;
+  int source_damroll;
+  int source_max_mana;
+  int source_damnodice;
+  int source_damsizedice;
+  int source_str;
+  int source_int;
+  int source_wis;
+  int source_dex;
+  int source_con;
+  int source_cha;
+  char source_name[MAX_SHADOW_NAME_LENGTH + 1];
+};
+
+static void clear_shadow_servant_role_flags(struct char_data *mob)
+{
+  if (!mob)
+    return;
+
+  REMOVE_BIT_AR(MOB_FLAGS(mob), MOB_SPEC);
+  REMOVE_BIT_AR(MOB_FLAGS(mob), MOB_SENTINEL);
+  REMOVE_BIT_AR(MOB_FLAGS(mob), MOB_SCAVENGER);
+  REMOVE_BIT_AR(MOB_FLAGS(mob), MOB_AWARE);
+  REMOVE_BIT_AR(MOB_FLAGS(mob), MOB_AGGRESSIVE);
+  REMOVE_BIT_AR(MOB_FLAGS(mob), MOB_AGGR_EVIL);
+  REMOVE_BIT_AR(MOB_FLAGS(mob), MOB_AGGR_GOOD);
+  REMOVE_BIT_AR(MOB_FLAGS(mob), MOB_AGGR_NEUTRAL);
+  REMOVE_BIT_AR(MOB_FLAGS(mob), MOB_MEMORY);
+  REMOVE_BIT_AR(MOB_FLAGS(mob), MOB_HELPER);
+  REMOVE_BIT_AR(MOB_FLAGS(mob), MOB_NOCHARM);
+  REMOVE_BIT_AR(MOB_FLAGS(mob), MOB_NOSUMMON);
+  REMOVE_BIT_AR(MOB_FLAGS(mob), MOB_NOSLEEP);
+  REMOVE_BIT_AR(MOB_FLAGS(mob), MOB_NOBASH);
+  REMOVE_BIT_AR(MOB_FLAGS(mob), MOB_NOBLIND);
+  REMOVE_BIT_AR(MOB_FLAGS(mob), MOB_NOKILL);
+  REMOVE_BIT_AR(MOB_FLAGS(mob), MOB_GUILD_MASTER);
+  REMOVE_BIT_AR(MOB_FLAGS(mob), MOB_AI_ACTOR);
+}
+
+static void init_shadow_servant_base(struct char_data *mob, struct char_data *owner, int rounds, int silent_follow)
+{
+  if (!mob || !owner)
+    return;
+
+  SET_BIT_AR(MOB_FLAGS(mob), MOB_ISNPC);
+  clear_shadow_servant_role_flags(mob);
+  SET_BIT_AR(AFF_FLAGS(mob), AFF_CHARM);
+  GET_POS(mob) = POS_STANDING;
+  GET_DEFAULT_POS(mob) = POS_STANDING;
+  GET_SUMMON_TIMER(mob) = MAX(1, rounds);
+  HUNTING(mob) = NULL;
+
+  if (SCRIPT(mob))
+    extract_script(mob, MOB_TRIGGER);
+  if (SCRIPT_MEM(mob)) {
+    extract_script_mem(SCRIPT_MEM(mob));
+    SCRIPT_MEM(mob) = NULL;
+  }
+
+  char_to_room(mob, IN_ROOM(owner));
+  if (silent_follow)
+    add_follower_silent(mob, owner);
+  else
+    add_follower(mob, owner);
+  if (GROUP(owner) && GROUP_LEADER(GROUP(owner)) == owner)
+    join_group(mob, GROUP(owner));
+}
+
+static void build_shadow_source_profile(struct char_data *owner, int slot, mob_vnum fallback_vnum, int fallback_level, const char *fallback_name, struct shadow_source_profile *profile)
+{
+  mob_rnum source_rnum;
+  struct char_data *src;
+  const char *identity = fallback_name;
+
+  if (!profile)
+    return;
+
+  memset(profile, 0, sizeof(*profile));
+  profile->source_vnum = fallback_vnum;
+  profile->source_level = MAX(1, fallback_level);
+  profile->source_attack_type = TYPE_HIT;
+  profile->source_max_hit = MAX(1, profile->source_level * 12);
+  profile->source_ac = 100 - (profile->source_level * 2);
+  profile->source_hitroll = profile->source_level / 3;
+  profile->source_damroll = profile->source_level / 4;
+  profile->source_damnodice = MAX(1, 1 + (profile->source_level / 20));
+  profile->source_damsizedice = MAX(2, 4 + (profile->source_level / 15));
+  profile->source_str = 12;
+  profile->source_int = 12;
+  profile->source_wis = 12;
+  profile->source_dex = 12;
+  profile->source_con = 12;
+  profile->source_cha = 12;
+  strlcpy(profile->source_name, shadow_name_looks_valid(identity) ? identity : "a shadow", sizeof(profile->source_name));
+
+  if (owner && !IS_NPC(owner) && slot >= 0 && slot < MAX_SHADOW_ROSTER && SHADOW_SLOT_OCCUPIED(owner, slot)) {
+    profile->source_vnum = SHADOW_SLOT_VNUM(owner, slot);
+    profile->source_level = MAX(1, SHADOW_SLOT_LEVEL(owner, slot));
+    identity = shadow_slot_display_name(owner, slot);
+    strlcpy(profile->source_name, shadow_name_looks_valid(identity) ? identity : "a shadow", sizeof(profile->source_name));
+
+    if (SHADOW_SLOT_PROFILE_VALID(owner, slot)) {
+      profile->source_max_hit = MAX(1, SHADOW_SLOT_MAX_HIT(owner, slot));
+      profile->source_ac = SHADOW_SLOT_AC(owner, slot);
+      profile->source_hitroll = SHADOW_SLOT_HITROLL(owner, slot);
+      profile->source_damroll = SHADOW_SLOT_DAMROLL(owner, slot);
+      profile->source_max_mana = MAX(0, SHADOW_SLOT_MAX_MANA(owner, slot));
+      profile->source_damnodice = MAX(1, SHADOW_SLOT_DAMNODICE(owner, slot));
+      profile->source_damsizedice = MAX(1, SHADOW_SLOT_DAMSIZEDICE(owner, slot));
+      profile->source_str = SHADOW_SLOT_STR(owner, slot);
+      profile->source_int = SHADOW_SLOT_INT(owner, slot);
+      profile->source_wis = SHADOW_SLOT_WIS(owner, slot);
+      profile->source_dex = SHADOW_SLOT_DEX(owner, slot);
+      profile->source_con = SHADOW_SLOT_CON(owner, slot);
+      profile->source_cha = SHADOW_SLOT_CHA(owner, slot);
+    }
+  }
+
+  source_rnum = real_mobile(profile->source_vnum);
+  if (source_rnum != NOBODY) {
+    src = &mob_proto[source_rnum];
+    profile->source_attack_type = src->mob_specials.attack_type + TYPE_HIT;
+    if (!owner || slot < 0 || slot >= MAX_SHADOW_ROSTER || !SHADOW_SLOT_PROFILE_VALID(owner, slot)) {
+      profile->source_max_hit = MAX(1, GET_MAX_HIT(src));
+      profile->source_ac = GET_AC(src);
+      profile->source_hitroll = GET_HITROLL(src);
+      profile->source_damroll = GET_DAMROLL(src);
+      profile->source_max_mana = MAX(0, GET_MAX_MANA(src));
+      profile->source_damnodice = MAX(1, src->mob_specials.damnodice);
+      profile->source_damsizedice = MAX(1, src->mob_specials.damsizedice);
+      profile->source_str = src->real_abils.str;
+      profile->source_int = src->real_abils.intel;
+      profile->source_wis = src->real_abils.wis;
+      profile->source_dex = src->real_abils.dex;
+      profile->source_con = src->real_abils.con;
+      profile->source_cha = src->real_abils.cha;
+      if (shadow_name_looks_valid(src->player.short_descr))
+        strlcpy(profile->source_name, src->player.short_descr, sizeof(profile->source_name));
+    }
+  }
+}
+
+static void apply_shadow_source_profile(struct char_data *mob, const struct shadow_source_profile *profile, struct char_data *owner, int rounds, int silent_follow)
+{
+  if (!mob || !profile || !owner)
+    return;
+
+  init_shadow_servant_base(mob, owner, rounds, silent_follow);
+
+  GET_LEVEL(mob) = MAX(1, profile->source_level);
+  GET_MAX_HIT(mob) = MAX(1, profile->source_max_hit);
+  GET_HIT(mob) = GET_MAX_HIT(mob);
+  GET_AC(mob) = profile->source_ac;
+  GET_HITROLL(mob) = profile->source_hitroll;
+  GET_DAMROLL(mob) = profile->source_damroll;
+  GET_MAX_MANA(mob) = MAX(0, profile->source_max_mana);
+  GET_MANA(mob) = GET_MAX_MANA(mob);
+  mob->mob_specials.attack_type = profile->source_attack_type >= TYPE_HIT ? (profile->source_attack_type - TYPE_HIT) : 0;
+  mob->mob_specials.damnodice = MAX(1, profile->source_damnodice);
+  mob->mob_specials.damsizedice = MAX(1, profile->source_damsizedice);
+  mob->real_abils.str = profile->source_str;
+  mob->real_abils.intel = profile->source_int;
+  mob->real_abils.wis = profile->source_wis;
+  mob->real_abils.dex = profile->source_dex;
+  mob->real_abils.con = profile->source_con;
+  mob->real_abils.cha = profile->source_cha;
+  mob->aff_abils = mob->real_abils;
+  apply_shadow_identity_to_mob_name(mob, profile->source_name);
+
+  clear_shadow_servant_role_flags(mob);
+  SET_BIT_AR(AFF_FLAGS(mob), AFF_CHARM);
+  GET_POS(mob) = POS_STANDING;
+  GET_DEFAULT_POS(mob) = POS_STANDING;
+  GET_SUMMON_TIMER(mob) = MAX(1, rounds);
+  if (SCRIPT(mob))
+    extract_script(mob, MOB_TRIGGER);
+  if (SCRIPT_MEM(mob)) {
+    extract_script_mem(SCRIPT_MEM(mob));
+    SCRIPT_MEM(mob) = NULL;
+  }
+}
+
 static int count_shadow_servants_in_room(struct char_data *ch)
 {
   struct follow_type *f;
@@ -981,10 +1142,12 @@ static int count_shadow_servants_in_room(struct char_data *ch)
 
 static struct char_data *summon_shadow_servant(struct char_data *ch, mob_vnum vnum, int level, int rounds, int source_spell, const char *identity_name, int silent_follow)
 {
-  struct char_data *mob = summon_temp_follower(ch, vnum, level, rounds, identity_name, silent_follow);
+  struct char_data *mob;
+  struct shadow_source_profile profile;
+  mob = read_mobile(vnum, VIRTUAL);
   if (mob) {
-    if (shadow_name_looks_valid(identity_name))
-      apply_shadow_identity_to_mob_name(mob, identity_name);
+    build_shadow_source_profile(NULL, -1, vnum, level, identity_name, &profile);
+    apply_shadow_source_profile(mob, &profile, ch, rounds, silent_follow);
     mark_shadow_servant(mob, source_spell, rounds);
   }
   return mob;
@@ -1012,7 +1175,7 @@ static int shadow_extraction_success_chance(struct char_data *ch, int corpse_lev
 int summon_stored_shadow(struct char_data *ch, int slot)
 {
   struct char_data *mob;
-  const char *resolved_name;
+  struct shadow_source_profile profile;
   mob_vnum vnum;
   int level;
   if (!ch || IS_NPC(ch) || slot < 0 || slot >= MAX_SHADOW_ROSTER)
@@ -1027,17 +1190,16 @@ int summon_stored_shadow(struct char_data *ch, int slot)
     vnum = MOBVNUM_SHADOW_ELITE;
 
   level = MAX(1, SHADOW_SLOT_LEVEL(ch, slot));
-  resolved_name = shadow_slot_display_name(ch, slot);
-
-  mob = summon_shadow_servant(ch, vnum, level, 15, SPELL_SHADOW_EXTRACTION, resolved_name, TRUE);
+  build_shadow_source_profile(ch, slot, vnum, level, shadow_slot_display_name(ch, slot), &profile);
+  mob = read_mobile(vnum, VIRTUAL);
   if (!mob)
     return FALSE;
 
+  apply_shadow_source_profile(mob, &profile, ch, 15, TRUE);
   if (!shadow_name_looks_valid(SHADOW_SLOT_NAME(ch, slot)))
-    strlcpy(SHADOW_SLOT_NAME(ch, slot), resolved_name, MAX_SHADOW_NAME_LENGTH + 1);
-  apply_shadow_identity_to_mob(ch, mob, slot);
-  restore_shadow_combat_profile(ch, slot, mob);
+    strlcpy(SHADOW_SLOT_NAME(ch, slot), profile.source_name, MAX_SHADOW_NAME_LENGTH + 1);
   apply_shadow_servant_bonuses(ch, mob);
+  mark_shadow_servant(mob, SPELL_SHADOW_EXTRACTION, 15);
   SHADOW_SLOT_ACTIVE(ch, slot) = 1;
   mark_shadow_roster_slot(mob, slot);
   return TRUE;
