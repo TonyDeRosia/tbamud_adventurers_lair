@@ -1678,22 +1678,22 @@ Ideal before committing to combat or resource use.
 See also: SPELLS SKILLS
 #0
 
-WORD-OF-RECALL-MASS MASS-RECALL RECALL-MASS
+NEXUS-GATE WORD-OF-RECALL-MASS MASS-RECALL RECALL-MASS
 
-Word of Recall Mass
+Nexus Gate
 Type: Spell
 
 Description:
-Uses conjuration to call allies, create travel links, or bring entities into the field.
+Tears open a temporary gate through the nexus, transporting the caster and nearby allies to a bound recall point.
 
 Effect:
-Provides either action timingrary summoned support or positional movement tools that change engagement distance and threat handling.
+Moves the caster's in-room group members to each member's loadroom, or to the default mortal start room when no personal anchor is set.
 
 Usage:
-Cast in-room; some variants require a valid target or corpse.
+Use to extract a group from danger, regroup quickly, or return from exploration.
 
 Notes:
-Most effective when planned before or at the start of combat.
+Usually blocked in death rooms, no-astral zones, or places warded against displacement magic.
 
 See also: SPELLS SKILLS
 #0
@@ -16663,7 +16663,7 @@ Total topics: 226
 132) gate
 133) portal
 134) locate corpse
-135) word of recall mass
+135) nexus gate
 136) astral projection
 137) ethereal jaunt
 138) leyline tap
@@ -20858,22 +20858,22 @@ Targeting: a character in your room. If a saving throw is involved, expect reduc
 See also: SPELLS SKILLS
 #0
 
-WORD-OF-RECALL-MASS MASS-RECALL RECALL-MASS
+NEXUS-GATE WORD-OF-RECALL-MASS MASS-RECALL RECALL-MASS
 
-Word Of Recall Mass
+Nexus Gate
 Type: Spell
 
 Description:
-Word Of Recall Mass focuses on these gameplay behaviors: uses spell-specific custom logic.
+Tears open a temporary gate through the nexus, transporting the caster and nearby allies to a bound recall point.
 
 Effect:
-Core routines: uses spell-specific custom logic.
+Moves the caster's in-room group members to each member's loadroom, or to the default mortal start room when no personal anchor is set.
 
 Usage:
-Target no explicit target.
+Use to extract a group from danger, regroup quickly, or return from exploration.
 
 Notes:
-Targeting: no explicit target (self/room effect). If a saving throw is involved, expect reduced value on high-save targets.
+Usually blocked in death rooms, no-astral zones, or places warded against displacement magic.
 
 See also: SPELLS SKILLS
 #0

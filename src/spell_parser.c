@@ -910,8 +910,8 @@ static const struct cast_message cast_messages[] = {
     NULL
   },
   [SPELL_WORD_OF_RECALL_MASS] = {
-    "You call your group home with mass recall!",
-    "$n calls $s group home with mass recall!",
+    "You tear open a Nexus Gate to your anchored recall point!",
+    "$n tears open a Nexus Gate to an anchored recall point!",
     NULL
   },
   [SPELL_ASTRAL_PROJECTION] = {
@@ -1549,6 +1549,7 @@ static int find_ability_by_tokens(const char *name, char *ambig_buf,
     { "night vision", SPELL_INFRAVISION },
     { "shield", SPELL_ARMOR },
     { "underwater breathing", SPELL_WATERWALK },
+    { "word of recall mass", SPELL_WORD_OF_RECALL_MASS },
     { NULL, 0 }
   };
   int best_ability = -1;
@@ -1626,6 +1627,7 @@ int find_skill_num(char *name) {
     { "night vision", SPELL_INFRAVISION },
     { "shield", SPELL_ARMOR },
     { "underwater breathing", SPELL_WATERWALK },
+    { "word of recall mass", SPELL_WORD_OF_RECALL_MASS },
     { NULL, 0 }
   };
 
@@ -3271,7 +3273,7 @@ void mag_assign_spells(void) {
   TAR_CHAR_WORLD | TAR_NOT_SELF, FALSE, MAG_MANUAL, NULL);
   spello(SPELL_LOCATE_CORPSE, "locate corpse", 20, 20, 0, POS_STANDING,
   TAR_IGNORE, FALSE, MAG_MANUAL, NULL);
-  spello(SPELL_WORD_OF_RECALL_MASS, "word of recall mass", 75, 75, 0, POS_STANDING,
+  spello(SPELL_WORD_OF_RECALL_MASS, "nexus gate", 75, 75, 0, POS_STANDING,
   TAR_IGNORE, FALSE, MAG_MANUAL, NULL);
   spello(SPELL_ASTRAL_PROJECTION, "astral projection", 40, 40, 0, POS_STANDING,
   TAR_CHAR_WORLD | TAR_NOT_SELF, FALSE, MAG_MANUAL, NULL);
