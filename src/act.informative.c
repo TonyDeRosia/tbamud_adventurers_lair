@@ -2620,13 +2620,15 @@ static void build_grouped_aff_entry(const struct affected_type *list,
                                     struct aff_display_entry *entry)
 {
   const struct affected_type *af;
+  const struct affected_type *sig_nodes[MAX_AFFECT];
+  int sig_freq[MAX_AFFECT];
   int mod_totals[NUM_APPLIES];
   int mod_used[NUM_APPLIES];
   int bits[AF_ARRAY_MAX];
   char name_fallback[64];
   const char *name;
   int max_duration = seed->duration;
-  int count = 0;
+  int count = 0, sig_count = 0, max_sig_freq = 1;
   int i;
 
   if (!entry || !seed || !list || !seen || !seen_count)
@@ -2645,6 +2647,10 @@ static void build_grouped_aff_entry(const struct affected_type *list,
     mod_totals[i] = 0;
     mod_used[i] = 0;
   }
+  for (i = 0; i < MAX_AFFECT; i++) {
+    sig_nodes[i] = NULL;
+    sig_freq[i] = 0;
+  }
 
   for (af = list; af; af = af->next) {
     if (aff_seen_contains(seen, *seen_count, af))
@@ -2656,6 +2662,26 @@ static void build_grouped_aff_entry(const struct affected_type *list,
 
     aff_seen_add(seen, seen_count, af);
     count++;
+    {
+      int found_sig = 0;
+      for (i = 0; i < sig_count; i++) {
+        if (sig_nodes[i]->location == af->location &&
+            sig_nodes[i]->modifier == af->modifier &&
+            sig_nodes[i]->bitvector[0] == af->bitvector[0] &&
+            sig_nodes[i]->bitvector[1] == af->bitvector[1] &&
+            sig_nodes[i]->bitvector[2] == af->bitvector[2] &&
+            sig_nodes[i]->bitvector[3] == af->bitvector[3]) {
+          sig_freq[i]++;
+          found_sig = 1;
+          break;
+        }
+      }
+      if (!found_sig && sig_count < MAX_AFFECT) {
+        sig_nodes[sig_count] = af;
+        sig_freq[sig_count] = 1;
+        sig_count++;
+      }
+    }
     max_duration = MAX(max_duration, af->duration);
     if (af->location > APPLY_NONE && af->location < NUM_APPLIES && af->modifier != 0) {
       mod_totals[af->location] += af->modifier;
@@ -2697,7 +2723,9 @@ static void build_grouped_aff_entry(const struct affected_type *list,
   name = aff_name_from_spell_and_flags(seed->spell, entry->flags, name_fallback, sizeof(name_fallback));
   snprintf(entry->name, sizeof(entry->name), "%s", name);
   entry->max_duration = max_duration;
-  entry->count = MAX(1, count);
+  for (i = 0; i < sig_count; i++)
+    max_sig_freq = MAX(max_sig_freq, sig_freq[i]);
+  entry->count = (count > 0) ? max_sig_freq : 1;
   drain_desc_for_affect(seed->spell, bits, entry->drain, sizeof(entry->drain));
 }
 
