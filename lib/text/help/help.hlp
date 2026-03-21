@@ -524,18 +524,18 @@ Barkskin
 Type: Spell
 
 Description:
-Grants a beneficial spell effect that improves your combat readiness.
+Defensive buff that hardens skin and improves toughness.
 
 Effect:
-Improves core combat stats such as durability, hit chance, saves, or resistance for the target.
+Applies a long-duration barkskin ward that adds a Constitution bonus and an armor-class modifier.
 
 Usage:
-Primarily self-targeted (or cast on an ally when allowed).
+Cast before sustained fights when you expect repeated incoming weapon hits.
 
 Notes:
-Use before engagement for best value.
+This is a self/ally maintenance buff, not a damage spell.
 
-See also: SPELLS SKILLS
+See also: STONE-SKIN GIANT-STRENGTH SPELLS SKILLS
 #0
 
 GIANT-STRENGTH
@@ -544,18 +544,18 @@ Giant Strength
 Type: Spell
 
 Description:
-Uses non-damage magic to solve tactical problems such as movement, detection, control, or escape.
+Long-duration strength buff for melee pressure.
 
 Effect:
-Creates a concrete tactical advantage outside raw DPS, such as safer pulls, repositioning, scouting, or disengage.
+Increases Strength and Damroll for the duration.
 
 Usage:
-Use when a escape or control option is better than trading blows, such as escaping bad rooms, controlling action timing, or enabling safer engages.
+Use before melee-focused fights, or when you need extra carrying and weapon damage value.
 
 Notes:
-Avoid spending turns on this when a kill is immediately available; switch to damage or hard control once position is secured.
+Pure buff spell with no direct control or burst component.
 
-See also: SPELLS SKILLS
+See also: BARKSKIN BLOODLUST SPELLS SKILLS
 #0
 
 ADRENALINE-SURGE
@@ -624,18 +624,18 @@ Bloodlust
 Type: Spell
 
 Description:
-Uses non-damage magic to solve tactical problems such as movement, detection, control, or escape.
+Offensive self-buff that pushes raw physical damage.
 
 Effect:
-Creates a concrete tactical advantage outside raw DPS, such as safer pulls, repositioning, scouting, or disengage.
+Applies AFF_BLOODLUST and grants a large Damroll increase for a medium duration.
 
 Usage:
-Use when a escape or control option is better than trading blows, such as escaping bad rooms, controlling action timing, or enabling safer engages.
+Cast before or during melee damage windows when you can stay on target.
 
 Notes:
-Avoid spending turns on this when a kill is immediately available; switch to damage or hard control once position is secured.
+Provides damage only; it does not add control, healing, or defense.
 
-See also: SPELLS SKILLS
+See also: GIANT-STRENGTH HUNTERS-INSTINCT SPELLS SKILLS
 #0
 
 GREATER-HEAL
@@ -704,18 +704,18 @@ Antimagic Shell
 Type: Spell
 
 Description:
-Uses non-damage magic to solve tactical problems such as movement, detection, control, or escape.
+Defensive anti-magic ward.
 
 Effect:
-Creates a concrete tactical advantage outside raw DPS, such as safer pulls, repositioning, scouting, or disengage.
+Applies AFF_WARDED and strongly improves spell saving throws for a medium duration.
 
 Usage:
-Use when a escape or control option is better than trading blows, such as escaping bad rooms, controlling action timing, or enabling safer engages.
+Use before fighting caster-heavy enemies or entering rooms with heavy spell pressure.
 
 Notes:
-Avoid spending turns on this when a kill is immediately available; switch to damage or hard control once position is secured.
+This is mitigation, not spell reflection or spell lock.
 
-See also: SPELLS SKILLS
+See also: GREATER-MAGIC-SEAL PANTHEON SPELLS SKILLS
 #0
 
 ENCHANTERS-FOCUS
@@ -2004,18 +2004,18 @@ Finger of Death
 Type: Spell
 
 Description:
-Single-target offensive spell focused on one enemy at a time.
+Single-target necrotic kill spell with a death-save check.
 
 Effect:
-Applies immediate burst damage to one target. Save outcome is not documented in this help entry, so treat it as damage-first without guaranteed control.
+Against living targets: failed death save attempts an instant kill; otherwise deals extreme necrotic damage. Against undead targets: no instant-kill check, only high necrotic damage.
 
 Usage:
-Best used when your group is focusing a priority target and you need fast single-target focus damage.
+Use on priority living targets when you want a chance to remove them immediately.
 
 Notes:
-Bad use case: spending mana on this during large multi-enemy pulls where room-wide spells will produce higher total impact.
+Has a cooldown. Undead are resistant to the execute portion.
 
-See also: SPELLS SKILLS
+See also: GRASP-HEART TRUE-DEATH DISINTEGRATE SPELLS SKILLS
 #0
 
 WAIL-OF-THE-BANSHEE
@@ -2044,18 +2044,18 @@ Power Word Kill
 Type: Spell
 
 Description:
-Execution spell with an HP-threshold instant-kill check.
+Single-target execution spell gated by target max HP.
 
 Effect:
-If target max HP is at or below (50 + 2*caster level), it attempts instant kill; otherwise it deals extreme arcane damage.
+If target max HP is at or below (50 + 2 * caster level), it attempts instant kill. Otherwise it deals extreme arcane damage.
 
 Usage:
-Use to finish low-ceiling targets or weaker enemies quickly; still usable as damage when threshold is not met.
+Best as a finisher on lower-ceiling or weakened enemies.
 
 Notes:
-Against bosses with high max HP, treat it as a damage nuke rather than guaranteed execution.
+Has a cooldown. Against high-max-HP bosses, treat it as burst damage instead of guaranteed execute.
 
-See also: SPELLS SKILLS
+See also: FINGER-OF-DEATH GRASP-HEART TRUE-DEATH SPELLS SKILLS
 #0
 
 POWER-WORD-STUN
@@ -2064,18 +2064,18 @@ Power Word Stun
 Type: Spell
 
 Description:
-Imposes control focus damage on the target to limit options.
+Single-target hard control spell.
 
 Effect:
-Applies debuffs such as rooting, silence, fear, weakened offense, or brief disable effects.
+Applies stunned status with duration based on target max HP: longer on lower-max-HP targets, shorter on tougher targets.
 
 Usage:
-Single-target offensive use in combat.
+Use to interrupt dangerous actions or create a burst window on one enemy.
 
 Notes:
-Combine with burst abilities while the target is constrained.
+Has a cooldown and does not deal direct damage.
 
-See also: SPELLS SKILLS
+See also: POWER-WORD-SILENCE GREATER-MAGIC-SEAL SPELLS SKILLS
 #0
 
 POWER-WORD-BLIND
@@ -2104,18 +2104,18 @@ Power Word Silence
 Type: Spell
 
 Description:
-Imposes control focus damage on the target to limit options.
+Single-target casting lockout.
 
 Effect:
-Applies debuffs such as rooting, silence, fear, weakened offense, or brief disable effects.
+Applies magical silence for a medium duration.
 
 Usage:
-Single-target offensive use in combat.
+Use against caster targets before or during their cast cycle.
 
 Notes:
-Combine with burst abilities while the target is constrained.
+Has a cooldown. This is control utility, not a damage spell.
 
-See also: SPELLS SKILLS
+See also: POWER-WORD-STUN GREATER-MAGIC-SEAL SPELLS SKILLS
 #0
 
 PSYCHIC-CRUSH
@@ -2124,18 +2124,18 @@ Psychic Crush
 Type: Spell
 
 Description:
-Heavy single-target psychic damage with a conditional execute chance.
+Heavy psychic nuke with conditional execute follow-up.
 
 Effect:
-Deals extreme psychic damage (reduced on save). If the target failed the spell save and is left at or below 30% HP, it can also fail a death save and die instantly.
+Deals extreme psychic damage (save for half). If the target fails the spell save and drops to 30% HP or less, it then makes a death save; failing that death save causes instant kill.
 
 Usage:
-Use as a finisher after the target is already chunked down.
+Strong as a finisher after the target is already damaged.
 
 Notes:
-Weak as an opener because the execute check only happens on low-health targets.
+Has a cooldown. The execute check only happens after damage and only when the target is low.
 
-See also: SPELLS SKILLS
+See also: GRASP-HEART POWER-WORD-KILL SPELLS SKILLS
 #0
 
 TIME-STOP
@@ -2144,18 +2144,18 @@ Time Stop
 Type: Spell
 
 Description:
-Momentarily arrests the flow of time around combatants.
+Battlefield tempo spell with two stages.
 
 Effect:
-Creates a brief action timingral control window that can disrupt enemy action timing.
+On cast, enemy NPCs in the room are delayed (wait state). You also gain a short Time Stop state. When you next deal damage, the Time Stop state ends and clears room wait states, resuming normal flow.
 
 Usage:
-Combat cast on enemies in the room.
+Use to create a brief setup window before a coordinated hit.
 
 Notes:
-Use to stabilize dangerous moments or set up follow-up abilities.
+Has a long cooldown. Affects enemies in-room at cast time, not global time freeze.
 
-See also: SPELLS SKILLS
+See also: POWER-WORD-STUN POWER-WORD-SILENCE SPELLS SKILLS
 #0
 
 BLACK-LANCE BLACKLANCE
@@ -2164,18 +2164,18 @@ Black Lance
 Type: Spell
 
 Description:
-You form a concentrated lance of shadow and drive it through a single enemy.
+Single-target shadow strike that softens armor on failed save.
 
 Effect:
-Damage + debuff. Deals shadow damage (reduced on save); on a failed save it also corrodes the target, worsening armor class for a short time.
+Deals high shadow damage (save for half). On failed save, applies corrosion and an AC penalty for a short duration.
 
 Usage:
-Enemy-targeted offensive spell in combat.
+Use early in focused single-target pressure to improve follow-up physical hits.
 
 Notes:
-Black Lance is a strong opener for physical follow-up because the corrosion debuff makes later hits connect harder. Use it early in focused single-target focus damage.
+Debuff only applies on failed save.
 
-See also: SHADOW-LANCE OBLIVION-SPEAR MUTILATE SPELLS SKILLS
+See also: SHADOW-LANCE OBLIVION-SPEAR SPELLS SKILLS
 #0
 
 REALITY-SLASH
@@ -2204,18 +2204,18 @@ Grasp Heart
 Type: Spell
 
 Description:
-Necrotic single-target kill attempt that is strongest below 30% target HP.
+Necrotic single-target execute spell with stronger payoff below 30% HP.
 
 Effect:
-At <=30% target HP: attempts instant kill (death save based), otherwise deals extreme necrotic damage. Above 30% HP it deals high necrotic damage and can briefly stun on failed save.
+If target is at 30% HP or lower: checks death save and may instantly kill; if not killed, still deals extreme necrotic damage. Above 30% HP: deals high necrotic damage (save for half), and on failed save can apply a 1-round stun.
 
 Usage:
-Best used as an execute after your group pushes the target into low HP range.
+Best used as a finisher after your group pushes a target into execute range.
 
 Notes:
-Can still be cast earlier for damage, but kill reliability is much lower.
+Has a cooldown. It still deals damage when execute fails.
 
-See also: SPELLS SKILLS
+See also: FINGER-OF-DEATH TRUE-DEATH POWER-WORD-KILL SPELLS SKILLS
 #0
 
 NEGATIVE-BURST NEG-BURST
@@ -2244,18 +2244,18 @@ True Death
 Type: Spell
 
 Description:
-Fires a concentrated necrotic kill spell at one enemy in your room.
+Single-target necrotic nuke using a death save.
 
 Effect:
-Active single-target damage spell. It rolls against a death save (not a normal spell save). On a failed death save, the target takes full extreme necrotic damage and gains a long-duration True Death mark. On a successful save, damage is halved.
+Deals extreme necrotic damage; successful death save halves damage. On failed death save, also applies a long-duration True Death marker affect.
 
 Usage:
-Use as a finisher on dangerous enemies that are already low or must be removed immediately.
+Use for heavy single-target pressure, especially when you can capitalize on death-save pressure.
 
 Notes:
-This is direct damage plus a failed-save mark, not an instant-kill effect. Do not open with it into fresh targets when lower-cost damage is sufficient.
+Has a cooldown. This is not an automatic execute.
 
-See also: SPELLS SKILLS
+See also: FINGER-OF-DEATH GRASP-HEART SPELLS SKILLS
 #0
 
 PERFECT-UNKNOWABLE UNKNOWABLE
@@ -2304,18 +2304,18 @@ Greater Magic Seal
 Type: Spell
 
 Description:
-Longer anti-casting lockdown on a single target.
+Single-target anti-caster lockdown.
 
 Effect:
-Applies AFF_SPELLLOCK. Failed save gives medium duration; successful save gives shorter duration.
+Applies spell lock (cannot cast). Failed save applies medium duration and an extra seal marker; successful save still applies a shorter spell lock.
 
 Usage:
-Use against dangerous casters when you need more than one round of casting denial.
+Use to shut down dangerous casters or force weapon-only turns.
 
 Notes:
-Directly overlaps with Counterspell; choose this when you need duration, not snap timing.
+Has a cooldown.
 
-See also: SPELLS SKILLS
+See also: POWER-WORD-SILENCE POWER-WORD-STUN SPELLS SKILLS
 #0
 
 DESPAIR-AURA
@@ -2344,18 +2344,18 @@ Oblivion Spear
 Type: Spell
 
 Description:
-Uses non-damage magic to solve tactical problems such as movement, detection, control, or escape.
+Heavy single-target shadow nuke with mana burn on failed save.
 
 Effect:
-Creates a concrete tactical advantage outside raw DPS, such as safer pulls, repositioning, scouting, or disengage.
+Deals extreme shadow damage (save for half). On failed save and if damage lands, also burns target mana equal to 25% of damage dealt.
 
 Usage:
-Use when a escape or control option is better than trading blows, such as escaping bad rooms, controlling action timing, or enabling safer engages.
+Use against caster or mana-reliant enemies to combine burst with resource denial.
 
 Notes:
-Avoid spending turns on this when a kill is immediately available; switch to damage or hard control once position is secured.
+Has a cooldown.
 
-See also: SPELLS SKILLS
+See also: BLACK-LANCE DRAGON-LIGHTNING SPELLS SKILLS
 #0
 
 BONE-PRISON
@@ -2404,18 +2404,18 @@ Dragon Lightning
 Type: Spell
 
 Description:
-Single-target offensive spell focused on one enemy at a time.
+Direct single-target lightning burst.
 
 Effect:
-Applies immediate burst damage to one target. Save outcome is not documented in this help entry, so treat it as damage-first without guaranteed control.
+Deals high lightning damage to one target (save for half).
 
 Usage:
-Best used when your group is focusing a priority target and you need fast single-target focus damage.
+Reliable single-target damage when you need immediate burst without setup.
 
 Notes:
-Bad use case: spending mana on this during large multi-enemy pulls where room-wide spells will produce higher total impact.
+No built-in stun, chain, or debuff rider on this base version.
 
-See also: SPELLS SKILLS
+See also: CHAIN-DRAGON-LIGHTNING ASTRAL-SMITE SPELLS SKILLS
 #0
 
 CHAIN-DRAGON-LIGHTNING
@@ -2424,18 +2424,18 @@ Chain Dragon Lightning
 Type: Spell
 
 Description:
-Single-target offensive spell focused on one enemy at a time.
+Lightning strike that jumps across multiple enemies.
 
 Effect:
-Applies immediate burst damage to one target. Save outcome is not documented in this help entry, so treat it as damage-first without guaranteed control.
+Hits primary target for high lightning damage (save for half), then jumps to up to two additional enemy targets in the room for medium lightning damage each (save for half).
 
 Usage:
-Best used when your group is focusing a priority target and you need fast single-target focus damage.
+Use when enemies are grouped and you want stronger total room pressure than a pure single-target cast.
 
 Notes:
-Bad use case: spending mana on this during large multi-enemy pulls where room-wide spells will produce higher total impact.
+Jump selection is room-based enemy iteration; not player-targeted per jump.
 
-See also: SPELLS SKILLS
+See also: DRAGON-LIGHTNING SHADOW-BURST SPELLS SKILLS
 #0
 
 HELL-FLAME
@@ -2504,18 +2504,18 @@ Astral Smite
 Type: Spell
 
 Description:
-Single-target force strike with optional Triple Maximize synergy.
+High single-target force burst.
 
 Effect:
-Deals high force damage (save for half). If Triple Maximize Magic is active, this spell consumes it and significantly boosts damage.
+Deals high force damage (save for half).
 
 Usage:
-Use as your payoff hit immediately after setting Triple Maximize.
+Use for direct burst on priority targets.
 
 Notes:
-Without maximize setup, it is a standard high-damage single-target cast.
+If Triple Maximize Magic is active, this damage can be tripled and the Triple Maximize effect is consumed on that spell hit.
 
-See also: SPELLS SKILLS
+See also: TRIPLE-MAXIMIZE-MAGIC DRAGON-LIGHTNING SPELLS SKILLS
 #0
 
 GREATER-REJECTION REJECTION
@@ -2644,18 +2644,18 @@ Body of Effulgent Beryl
 Type: Spell
 
 Description:
-Your body crystallizes into radiant beryl, reinforcing your defenses with a sustained magical shell.
+Defensive self-buff that hardens you and reduces incoming weapon damage.
 
 Effect:
-Active self-only defensive buff. Applies a medium-duration AC bonus (AC -20). While active, incoming weapon attacks are reduced by 25%.
+Applies a medium-duration AC modifier plus a special beryl state. While active, incoming weapon damage is reduced by 25%.
 
 Usage:
-Cast before sustained melee fights or when you expect many weapon hits.
+Use before melee-heavy fights or when enemies are landing many weapon attacks.
 
 Notes:
-This does not reduce spell or elemental damage directly; it mainly reduces incoming weapon-hit damage.
+The damage reduction applies to weapon attacks, not elemental spell damage.
 
-See also: SHADOW-ARMOR CRYSTAL-BODY ARMOR SANCTUARY SPELLS SKILLS
+See also: PANTHEON CRYSTAL-BODY SHADOW-ARMOR SPELLS SKILLS
 #0
 
 VERMILION-NOVA
@@ -2744,18 +2744,18 @@ Triple Maximize Magic
 Type: Spell
 
 Description:
-Uses non-damage magic to solve tactical problems such as movement, detection, control, or escape.
+One-hit spell amplification setup.
 
 Effect:
-Creates a concrete tactical advantage outside raw DPS, such as safer pulls, repositioning, scouting, or disengage.
+Applies a 1-round self buff. The next spell damage you successfully deal is tripled, then the buff is consumed.
 
 Usage:
-Use when a escape or control option is better than trading blows, such as escaping bad rooms, controlling action timing, or enabling safer engages.
+Cast immediately before a high-damage spell to spike burst.
 
 Notes:
-Avoid spending turns on this when a kill is immediately available; switch to damage or hard control once position is secured.
+Has its own cooldown. If you do not land damaging spell output promptly, value is wasted.
 
-See also: SPELLS SKILLS
+See also: ASTRAL-SMITE DISINTEGRATE OBLIVION-SPEAR SPELLS SKILLS
 #0
 
 PANTHEON
@@ -2764,18 +2764,18 @@ Pantheon
 Type: Spell
 
 Description:
-Invokes divine alignment with a full celestial host.
+Major defensive self-buff for anti-magic survival.
 
 Effect:
-Applies a major protective blessing improving defense and resistance.
+Applies spell-save improvement, an AC modifier, and a Pantheon state. While active, incoming holy, shadow, and arcane damage is reduced by 25%.
 
 Usage:
-Self-targeted buff.
+Use before caster-heavy encounters or mixed holy/shadow/arcane pressure.
 
 Notes:
-Excellent pre-fight preparation for extended encounters.
+Self-targeted preparation spell; no direct offensive effect.
 
-See also: SPELLS SKILLS
+See also: ANTIMAGIC-SHELL BODY-OF-EFFULGENT-BERYL SPELLS SKILLS
 #0
 
 DIMENSIONAL-LOCK
@@ -2924,18 +2924,18 @@ Shadow Step
 Type: Spell
 
 Description:
-Short self-buff for immediate accuracy spike.
+Short offensive setup for your next hit.
 
 Effect:
-Applies hitroll +8 for 1 round.
+Applies a 1-round hitroll bonus. When you next deal damage while it is active, that hit gains bonus damage and Shadow Step is consumed.
 
 Usage:
-Use right before a key single-target attack that must land.
+Cast right before a key attack that must connect.
 
 Notes:
-Very short duration; pre-casting too early wastes most of its value.
+Very short duration and consumed on hit.
 
-See also: SPELLS SKILLS
+See also: SHADOW-BURST BLACK-LANCE SPELLS SKILLS
 #0
 
 BLACK-HEART BLACKHEART
@@ -2944,18 +2944,18 @@ Black Heart
 Type: Spell
 
 Description:
-Self conversion spell: sacrifices HP to restore mana and gain empowered state.
+Self-conversion spell that trades health for mana and empowerment.
 
 Effect:
-Consumes 20% of current HP (cannot kill you), restores 35% of max mana, and applies AFF_EMPOWERED for a short duration.
+Consumes 20% of your current HP (cannot kill you), restores 35% of your max mana, applies empowered status for a short duration, and starts cooldown.
 
 Usage:
-Use when you are mana-starved but can safely trade health (with healer support or low incoming damage).
+Use when mana-starved and you can safely spend health.
 
 Notes:
-Dangerous when you are already low HP or being focused.
+High risk when focused or low HP.
 
-See also: SPELLS SKILLS
+See also: SHADOW-REGENESIS TRIPLE-MAXIMIZE-MAGIC SPELLS SKILLS
 #0
 
 CALL-SHADOW-LEGION SHADOW-LEGION SHADOWLEGION LEGION-CALL
@@ -2964,18 +2964,18 @@ Call Shadow Legion
 Type: Spell
 
 Description:
-Summons multiple shadow-aligned allies into the fight.
+Summons a temporary group of shadow servants.
 
 Effect:
-Creates a legion of shadow servants for room control and damage.
+Summons 2 to 4 shadow soldiers to follow you. Only one active legion from this spell can exist at a time, and the spell has a long cooldown.
 
 Usage:
-Summon cast in your current room.
+Cast before major fights to establish servant pressure and synergy.
 
 Notes:
-Best used early in encounters to maximize servant uptime.
+Fails if an existing Call Shadow Legion servant group is already active for you.
 
-See also: SPELLS SKILLS
+See also: SHADOW-RECALL SHADOW-BURST DOMINION-OF-SHADOWS SPELLS SKILLS
 #0
 
 NIGHT-HUNT
@@ -3144,18 +3144,18 @@ Shadow Burst
 Type: Spell
 
 Description:
-Uses non-damage magic to solve tactical problems such as movement, detection, control, or escape.
+Room-wide shadow detonation centered on the caster.
 
 Effect:
-Creates a concrete tactical advantage outside raw DPS, such as safer pulls, repositioning, scouting, or disengage.
+Damages enemy targets in the room for medium shadow damage (save for half). Damage gains bonus per shadow servant in the room, up to a capped bonus.
 
 Usage:
-Use when a escape or control option is better than trading blows, such as escaping bad rooms, controlling action timing, or enabling safer engages.
+Use when enemies are clustered near you, especially with summoned shadows present.
 
 Notes:
-Avoid spending turns on this when a kill is immediately available; switch to damage or hard control once position is secured.
+This is an AoE spell and can hit multiple enemies in the room.
 
-See also: SPELLS SKILLS
+See also: CALL-SHADOW-LEGION CHAIN-DRAGON-LIGHTNING SPELLS SKILLS
 #0
 
 SHADOW-STORM
@@ -3204,18 +3204,18 @@ Dominion of Shadows
 Type: Spell
 
 Description:
-Self buff that improves spell-save performance.
+Self-buff that strengthens shadow-aligned offense and spell resilience.
 
 Effect:
-Applies APPLY_SAVING_SPELL -3 for medium duration (improved resistance to enemy spell effects).
+Applies spell-save improvement and a dominion state. While active, your shadow damage is increased, and your shadow servants gain additional damage bonuses.
 
 Usage:
-Cast before caster-heavy fights or before entering enemy-control rooms.
+Use before shadow-focused burst windows or summon-driven fights.
 
 Notes:
-Defensive prep tool; provides no direct damage.
+No direct damage on cast.
 
-See also: SPELLS SKILLS
+See also: SHADOW-BURST CALL-SHADOW-LEGION HUNTERS-INSTINCT SPELLS SKILLS
 #0
 
 SHADOW-RECALL
@@ -3224,18 +3224,18 @@ Shadow Recall
 Type: Spell
 
 Description:
-Restoration-focused magic for recovery and survival.
+Utility command that calls your shadow servants back to your room.
 
 Effect:
-Heals damage and/or removes harmful conditions; recall variants provide repositioning.
+Moves your shadow servants from other rooms in the same zone to your current room. Servants already with you are unchanged.
 
 Usage:
-Use before difficult pulls and immediately after heavy party damage; prioritize frontliners first if resources are limited.
+Use to regroup summons before pulls, after splits, or when repositioning through a zone.
 
 Notes:
-Best in long fights and multi-wave pulls; avoid overcasting when incoming damage is low and mana efficiency matters.
+Has a cooldown and does not heal or restore resources.
 
-See also: SPELLS SKILLS
+See also: CALL-SHADOW-LEGION SHADOW-REGENESIS SPELLS SKILLS
 #0
 
 SHADOW-REGENESIS
@@ -3244,18 +3244,18 @@ Shadow Regenesis
 Type: Spell
 
 Description:
-Grants a beneficial spell effect that improves your combat readiness.
+Long-duration self-regeneration buff with kill-trigger mana recovery.
 
 Effect:
-Improves core combat stats such as durability, hit chance, saves, or resistance for the target.
+Applies regenerating status with a regen value based on level. While active, kills by the buffed character also restore mana.
 
 Usage:
-Primarily self-targeted (or cast on an ally when allowed).
+Use before extended combat chains where sustain and repeated kills matter.
 
 Notes:
-Use before engagement for best value.
+Not an instant heal; value comes over time and on kill events.
 
-See also: SPELLS SKILLS
+See also: BLACK-HEART SHADOW-RECALL SPELLS SKILLS
 #0
 
 ASSASSINS-INTENT
@@ -3464,18 +3464,18 @@ Hunters Instinct
 Type: Spell
 
 Description:
-Hunters Instinct sharpens predatory focus, improving your ability to land attacks while resisting hostile spell focus damage.
+Combat focus buff for accuracy and anti-spell reliability.
 
 Effect:
-Buff. Grants hitroll and improves spell-save performance for a medium duration.
+Applies hitroll and spell-save improvements for a medium duration. Also increases your damage against targets higher level than you.
 
 Usage:
-Self-cast combat buff.
+Use before duels, boss fights, or evasive/caster encounters.
 
 Notes:
-Excellent pre-fight maintenance for duel or skirmish play. Cast before engaging evasive or caster-heavy enemies to stabilize your accuracy and survivability.
+Best value in fights versus stronger-level enemies.
 
-See also: ASSASSINS-INTENT DETECT-KILL-INTENT BLOODLUST SPELLS SKILLS
+See also: BLOODLUST ASSASSINS-INTENT SPELLS SKILLS
 #0
 
 ! --- Auto-generated missing skill help entries (2026-03-18) ---
@@ -4552,18 +4552,18 @@ Antimagic Shell
 Type: Spell
 
 Description:
-Antimagic Shell focuses on these gameplay behaviors: applies status or stat modifiers.
+Defensive anti-magic ward.
 
 Effect:
-Can apply statuses: warded.
+Applies AFF_WARDED and strongly improves spell saving throws for a medium duration.
 
 Usage:
-Target a character in your room.
+Use before fighting caster-heavy enemies or entering rooms with heavy spell pressure.
 
 Notes:
-Targeting: a character in your room. If a saving throw is involved, expect reduced value on high-save targets.
+This is mitigation, not spell reflection or spell lock.
 
-See also: SPELLS SKILLS
+See also: GREATER-MAGIC-SEAL PANTHEON SPELLS SKILLS
 #0
 
 APOSTROPHES
@@ -4831,18 +4831,18 @@ Astral Smite
 Type: Spell
 
 Description:
-Astral Smite focuses on these gameplay behaviors: uses spell-specific custom logic.
+High single-target force burst.
 
 Effect:
-Core routines: uses spell-specific custom logic.
+Deals high force damage (save for half).
 
 Usage:
-Target a character in your room, your current opponent in combat.
+Use for direct burst on priority targets.
 
 Notes:
-Targeting: a character in your room, your current combat target, cannot target yourself. If a saving throw is involved, expect reduced value on high-save targets.
+If Triple Maximize Magic is active, this damage can be tripled and the Triple Maximize effect is consumed on that spell hit.
 
-See also: SPELLS SKILLS
+See also: TRIPLE-MAXIMIZE-MAGIC DRAGON-LIGHTNING SPELLS SKILLS
 #0
 
 ATTACH
@@ -5153,18 +5153,18 @@ Barkskin
 Type: Spell
 
 Description:
-Barkskin focuses on these gameplay behaviors: applies status or stat modifiers.
+Defensive buff that hardens skin and improves toughness.
 
 Effect:
-Can apply statuses: barkskin.
+Applies a long-duration barkskin ward that adds a Constitution bonus and an armor-class modifier.
 
 Usage:
-Target a character in your room.
+Cast before sustained fights when you expect repeated incoming weapon hits.
 
 Notes:
-Targeting: a character in your room. If a saving throw is involved, expect reduced value on high-save targets.
+This is a self/ally maintenance buff, not a damage spell.
 
-See also: SPELLS SKILLS
+See also: STONE-SKIN GIANT-STRENGTH SPELLS SKILLS
 #0
 
 BASH
@@ -5233,18 +5233,18 @@ Black Lance
 Type: Spell
 
 Description:
-You form a concentrated lance of shadow and drive it through a single enemy.
+Single-target shadow strike that softens armor on failed save.
 
 Effect:
-Damage + debuff. Deals shadow damage (reduced on save); on a failed save it also corrodes the target, worsening armor class for a short time.
+Deals high shadow damage (save for half). On failed save, applies corrosion and an AC penalty for a short duration.
 
 Usage:
-Enemy-targeted offensive spell in combat.
+Use early in focused single-target pressure to improve follow-up physical hits.
 
 Notes:
-Black Lance is a strong opener for physical follow-up because the corrosion debuff makes later hits connect harder. Use it early in focused single-target focus damage.
+Debuff only applies on failed save.
 
-See also: SHADOW-LANCE OBLIVION-SPEAR MUTILATE SPELLS SKILLS
+See also: SHADOW-LANCE OBLIVION-SPEAR SPELLS SKILLS
 #0
 
 BLAST SHOOT RANGED-WEAPONS FIRE-WEAPONS BOWS QUIVERS MISSILES GUNS FIREARMS AMMO
@@ -5341,18 +5341,18 @@ Bloodlust
 Type: Spell
 
 Description:
-Bloodlust focuses on these gameplay behaviors: applies status or stat modifiers.
+Offensive self-buff that pushes raw physical damage.
 
 Effect:
-Can apply statuses: bloodlust.
+Applies AFF_BLOODLUST and grants a large Damroll increase for a medium duration.
 
 Usage:
-Target self only, a character in your room.
+Cast before or during melee damage windows when you can stay on target.
 
 Notes:
-Targeting: a character in your room, yourself only. If a saving throw is involved, expect reduced value on high-save targets.
+Provides damage only; it does not add control, healing, or defense.
 
-See also: SPELLS SKILLS
+See also: GIANT-STRENGTH HUNTERS-INSTINCT SPELLS SKILLS
 #0
 
 BOATS SHIPS FERRY TRANSPORTSS
@@ -5759,18 +5759,18 @@ Call Shadow Legion
 Type: Spell
 
 Description:
-Call Shadow Legion focuses on these gameplay behaviors: uses spell-specific custom logic.
+Summons a temporary group of shadow servants.
 
 Effect:
-Core routines: uses spell-specific custom logic.
+Summons 2 to 4 shadow soldiers to follow you. Only one active legion from this spell can exist at a time, and the spell has a long cooldown.
 
 Usage:
-Target no explicit target.
+Cast before major fights to establish servant pressure and synergy.
 
 Notes:
-Targeting: no explicit target (self/room effect). If a saving throw is involved, expect reduced value on high-save targets.
+Fails if an existing Call Shadow Legion servant group is already active for you.
 
-See also: SPELLS SKILLS
+See also: SHADOW-RECALL SHADOW-BURST DOMINION-OF-SHADOWS SPELLS SKILLS
 #0
 
 CALL-WOLVES
@@ -6052,18 +6052,18 @@ Chain Dragon Lightning
 Type: Spell
 
 Description:
-Chain Dragon Lightning focuses on these gameplay behaviors: uses spell-specific custom logic.
+Lightning strike that jumps across multiple enemies.
 
 Effect:
-Core routines: uses spell-specific custom logic.
+Hits primary target for high lightning damage (save for half), then jumps to up to two additional enemy targets in the room for medium lightning damage each (save for half).
 
 Usage:
-Target a character in your room, your current opponent in combat.
+Use when enemies are grouped and you want stronger total room pressure than a pure single-target cast.
 
 Notes:
-Targeting: a character in your room, your current combat target, cannot target yourself. If a saving throw is involved, expect reduced value on high-save targets.
+Jump selection is room-based enemy iteration; not player-targeted per jump.
 
-See also: SPELLS SKILLS
+See also: DRAGON-LIGHTNING SHADOW-BURST SPELLS SKILLS
 #0
 
 CHAIN-OF-SUBJUGATION SUBJUGATION-CHAIN
@@ -7561,18 +7561,18 @@ Dominion of Shadows
 Type: Spell
 
 Description:
-Calls shadow power fully under your rule.
+Self-buff that strengthens shadow-aligned offense and spell resilience.
 
 Effect:
-Self buff that improves your spell saves and increases your outgoing shadow damage while active.
+Applies spell-save improvement and a dominion state. While active, your shadow damage is increased, and your shadow servants gain additional damage bonuses.
 
 Usage:
-Best used before shadow focused burst or when fighting enemy casters.
+Use before shadow-focused burst windows or summon-driven fights.
 
 Notes:
-Most valuable in a shadow damage rotation. Less useful if you are not leaning on shadow magic.
+No direct damage on cast.
 
-See also: SHADOW-BOLT SHADOW-LANCE SHADOW-BURST SPELLS SKILLS
+See also: SHADOW-BURST CALL-SHADOW-LEGION HUNTERS-INSTINCT SPELLS SKILLS
 #0
 
 DONATE
@@ -7596,18 +7596,18 @@ Dragon Lightning
 Type: Spell
 
 Description:
-Dragon Lightning focuses on these gameplay behaviors: uses spell-specific custom logic.
+Direct single-target lightning burst.
 
 Effect:
-Core routines: uses spell-specific custom logic.
+Deals high lightning damage to one target (save for half).
 
 Usage:
-Target a character in your room, your current opponent in combat.
+Reliable single-target damage when you need immediate burst without setup.
 
 Notes:
-Targeting: a character in your room, your current combat target, cannot target yourself. If a saving throw is involved, expect reduced value on high-save targets.
+No built-in stun, chain, or debuff rider on this base version.
 
-See also: SPELLS SKILLS
+See also: CHAIN-DRAGON-LIGHTNING ASTRAL-SMITE SPELLS SKILLS
 #0
 
 DRAGON-SPIRIT DRAGONSPIRIT
@@ -8903,18 +8903,18 @@ Giant Strength
 Type: Spell
 
 Description:
-Giant Strength focuses on these gameplay behaviors: applies status or stat modifiers.
+Long-duration strength buff for melee pressure.
 
 Effect:
-Applies a persistent magical condition that alters the target's combat performance.
+Increases Strength and Damroll for the duration.
 
 Usage:
-Target a character in your room.
+Use before melee-focused fights, or when you need extra carrying and weapon damage value.
 
 Notes:
-Targeting: a character in your room. If a saving throw is involved, expect reduced value on high-save targets.
+Pure buff spell with no direct control or burst component.
 
-See also: SPELLS SKILLS
+See also: BARKSKIN BLOODLUST SPELLS SKILLS
 #0
 
 GITHUB SVN SUBVERSION
@@ -9086,18 +9086,18 @@ Greater Magic Seal
 Type: Spell
 
 Description:
-Locks down a target's spellcasting with a stronger magical seal.
+Single-target anti-caster lockdown.
 
 Effect:
-Single target anti caster debuff. Applies spell lock on a failed spell save for medium duration. On a successful save it still applies a shorter spell lock.
+Applies spell lock (cannot cast). Failed save applies medium duration and an extra seal marker; successful save still applies a shorter spell lock.
 
 Usage:
-Best used early against enemy casters, healers, or any target you need to shut down magically.
+Use to shut down dangerous casters or force weapon-only turns.
 
 Notes:
-Useful even on a save because it still imposes a shorter seal.
+Has a cooldown.
 
-See also: SILENCE POWER-WORD-SILENCE NULL-FIELD SPELLS SKILLS
+See also: POWER-WORD-SILENCE POWER-WORD-STUN SPELLS SKILLS
 #0
 
 GREATER-REJECTION REJECTION
@@ -12561,18 +12561,18 @@ Oblivion Spear
 Type: Spell
 
 Description:
-Oblivion Spear focuses on these gameplay behaviors: uses spell-specific custom logic.
+Heavy single-target shadow nuke with mana burn on failed save.
 
 Effect:
-Core routines: uses spell-specific custom logic.
+Deals extreme shadow damage (save for half). On failed save and if damage lands, also burns target mana equal to 25% of damage dealt.
 
 Usage:
-Target a character in your room, your current opponent in combat.
+Use against caster or mana-reliant enemies to combine burst with resource denial.
 
 Notes:
-Targeting: a character in your room, your current combat target, cannot target yourself. If a saving throw is involved, expect reduced value on high-save targets.
+Has a cooldown.
 
-See also: SPELLS SKILLS
+See also: BLACK-LANCE DRAGON-LIGHTNING SPELLS SKILLS
 #0
 
 OEDIT OBJECT-CREATION OCREATE OEDIT-CREATE CREATE-OBJECT 
@@ -13659,18 +13659,18 @@ Power Word Kill
 Type: Spell
 
 Description:
-Power Word Kill focuses on these gameplay behaviors: uses spell-specific custom logic.
+Single-target execution spell gated by target max HP.
 
 Effect:
-Deals arcane damage.
+If target max HP is at or below (50 + 2 * caster level), it attempts instant kill. Otherwise it deals extreme arcane damage.
 
 Usage:
-Target a character in your room, your current opponent in combat.
+Best as a finisher on lower-ceiling or weakened enemies.
 
 Notes:
-Targeting: a character in your room, your current combat target, cannot target yourself. If a saving throw is involved, expect reduced value on high-save targets.
+Has a cooldown. Against high-max-HP bosses, treat it as burst damage instead of guaranteed execute.
 
-See also: SPELLS SKILLS
+See also: FINGER-OF-DEATH GRASP-HEART TRUE-DEATH SPELLS SKILLS
 #0
 
 POWER-WORD-SILENCE
@@ -13679,18 +13679,18 @@ Power Word Silence
 Type: Spell
 
 Description:
-Power Word Silence focuses on these gameplay behaviors: uses spell-specific custom logic.
+Single-target casting lockout.
 
 Effect:
-Can apply statuses: silenced.
+Applies magical silence for a medium duration.
 
 Usage:
-Target a character in your room, your current opponent in combat.
+Use against caster targets before or during their cast cycle.
 
 Notes:
-Targeting: a character in your room, your current combat target, cannot target yourself. If a saving throw is involved, expect reduced value on high-save targets.
+Has a cooldown. This is control utility, not a damage spell.
 
-See also: SPELLS SKILLS
+See also: POWER-WORD-STUN GREATER-MAGIC-SEAL SPELLS SKILLS
 #0
 
 POWER-WORD-STUN
@@ -13699,18 +13699,18 @@ Power Word Stun
 Type: Spell
 
 Description:
-Power Word Stun focuses on these gameplay behaviors: uses spell-specific custom logic.
+Single-target hard control spell.
 
 Effect:
-Can apply statuses: stunned.
+Applies stunned status with duration based on target max HP: longer on lower-max-HP targets, shorter on tougher targets.
 
 Usage:
-Target a character in your room, your current opponent in combat.
+Use to interrupt dangerous actions or create a burst window on one enemy.
 
 Notes:
-Targeting: a character in your room, your current combat target, cannot target yourself. If a saving throw is involved, expect reduced value on high-save targets.
+Has a cooldown and does not deal direct damage.
 
-See also: SPELLS SKILLS
+See also: POWER-WORD-SILENCE GREATER-MAGIC-SEAL SPELLS SKILLS
 #0
 
 PRACTICE PRACTISE TRAINING GUILDS GUILDMASTERS PRACTICING EXPERIENCES 
@@ -14164,18 +14164,18 @@ Psychic Crush
 Type: Spell
 
 Description:
-Psychic Crush focuses on these gameplay behaviors: uses spell-specific custom logic.
+Heavy psychic nuke with conditional execute follow-up.
 
 Effect:
-Deals psychic damage. Targets may resist part or all of the effect with a saving throw.
+Deals extreme psychic damage (save for half). If the target fails the spell save and drops to 30% HP or less, it then makes a death save; failing that death save causes instant kill.
 
 Usage:
-Target a character in your room, your current opponent in combat.
+Strong as a finisher after the target is already damaged.
 
 Notes:
-Targeting: a character in your room, your current combat target, cannot target yourself. If a saving throw is involved, expect reduced value on high-save targets.
+Has a cooldown. The execute check only happens after damage and only when the target is low.
 
-See also: SPELLS SKILLS
+See also: GRASP-HEART POWER-WORD-KILL SPELLS SKILLS
 #0
 
 PUT
@@ -15782,18 +15782,18 @@ Shadow Burst
 Type: Spell
 
 Description:
-Detonates the darkness around you into a room wide burst.
+Room-wide shadow detonation centered on the caster.
 
 Effect:
-Area shadow damage to enemies in the room. Damage increases based on the number of your shadow servants currently present, up to a capped bonus.
+Damages enemy targets in the room for medium shadow damage (save for half). Damage gains bonus per shadow servant in the room, up to a capped bonus.
 
 Usage:
-Best used when your summons are already active and enemies are stacked in the same room.
+Use when enemies are clustered near you, especially with summoned shadows present.
 
 Notes:
-This spell scales with your servant presence. Its value rises sharply once your shadow army is established.
+This is an AoE spell and can hit multiple enemies in the room.
 
-See also: SHADOW-EXTRACTION CALL-SHADOW-LEGION SHADOW-STORM SPELLS SKILLS
+See also: CALL-SHADOW-LEGION CHAIN-DRAGON-LIGHTNING SPELLS SKILLS
 #0
 
 SHADOW-DOMAIN SHADOWDOMAIN DOMAIN-SHADOW
@@ -15882,18 +15882,18 @@ Shadow Recall
 Type: Spell
 
 Description:
-Shadow Recall focuses on these gameplay behaviors: uses spell-specific custom logic.
+Utility command that calls your shadow servants back to your room.
 
 Effect:
-Core routines: uses spell-specific custom logic.
+Moves your shadow servants from other rooms in the same zone to your current room. Servants already with you are unchanged.
 
 Usage:
-Target self only.
+Use to regroup summons before pulls, after splits, or when repositioning through a zone.
 
 Notes:
-Targeting: yourself only. If a saving throw is involved, expect reduced value on high-save targets.
+Has a cooldown and does not heal or restore resources.
 
-See also: SPELLS SKILLS
+See also: CALL-SHADOW-LEGION SHADOW-REGENESIS SPELLS SKILLS
 #0
 
 SHADOW-REGENESIS
@@ -15902,18 +15902,18 @@ Shadow Regenesis
 Type: Spell
 
 Description:
-Lets your body recover through shadow regeneration.
+Long-duration self-regeneration buff with kill-trigger mana recovery.
 
 Effect:
-Self buff that grants regeneration for a long duration.
+Applies regenerating status with a regen value based on level. While active, kills by the buffed character also restore mana.
 
 Usage:
-Best used before extended fights, attrition battles, or recovery periods between repeated engagements.
+Use before extended combat chains where sustain and repeated kills matter.
 
 Notes:
-This is long term sustain, not emergency healing.
+Not an instant heal; value comes over time and on kill events.
 
-See also: HEAL GREATER-HEAL UNDYING-WILL SPELLS SKILLS
+See also: BLACK-HEART SHADOW-RECALL SPELLS SKILLS
 #0
 
 SHADOW-RESERVOIR
@@ -15942,18 +15942,18 @@ Shadow Step
 Type: Spell
 
 Description:
-Shadow Step focuses on these gameplay behaviors: uses spell-specific custom logic.
+Short offensive setup for your next hit.
 
 Effect:
-Core routines: uses spell-specific custom logic.
+Applies a 1-round hitroll bonus. When you next deal damage while it is active, that hit gains bonus damage and Shadow Step is consumed.
 
 Usage:
-Target self only.
+Cast right before a key attack that must connect.
 
 Notes:
-Targeting: yourself only. If a saving throw is involved, expect reduced value on high-save targets.
+Very short duration and consumed on hit.
 
-See also: SPELLS SKILLS
+See also: SHADOW-BURST BLACK-LANCE SPELLS SKILLS
 #0
 
 SHADOW-STORM
@@ -18110,18 +18110,18 @@ Time Stop
 Type: Spell
 
 Description:
-Time Stop focuses on these gameplay behaviors: uses spell-specific custom logic.
+Battlefield tempo spell with two stages.
 
 Effect:
-Core routines: uses spell-specific custom logic.
+On cast, enemy NPCs in the room are delayed (wait state). You also gain a short Time Stop state. When you next deal damage, the Time Stop state ends and clears room wait states, resuming normal flow.
 
 Usage:
-Target no explicit target.
+Use to create a brief setup window before a coordinated hit.
 
 Notes:
-Targeting: no explicit target (self/room effect). If a saving throw is involved, expect reduced value on high-save targets.
+Has a long cooldown. Affects enemies in-room at cast time, not global time freeze.
 
-See also: SPELLS SKILLS
+See also: POWER-WORD-STUN POWER-WORD-SILENCE SPELLS SKILLS
 #0
 
 TITLES
@@ -20006,18 +20006,18 @@ Triple Maximize Magic
 Type: Spell
 
 Description:
-Triple Maximize Magic focuses on these gameplay behaviors: uses spell-specific custom logic.
+One-hit spell amplification setup.
 
 Effect:
-Core routines: uses spell-specific custom logic.
+Applies a 1-round self buff. The next spell damage you successfully deal is tripled, then the buff is consumed.
 
 Usage:
-Target self only.
+Cast immediately before a high-damage spell to spike burst.
 
 Notes:
-Targeting: yourself only. If a saving throw is involved, expect reduced value on high-save targets.
+Has its own cooldown. If you do not land damaging spell output promptly, value is wasted.
 
-See also: SPELLS SKILLS
+See also: ASTRAL-SMITE DISINTEGRATE OBLIVION-SPEAR SPELLS SKILLS
 #0
 
 TRUE-SEEING
@@ -21774,18 +21774,18 @@ Disintegrate
 Type: Spell
 
 Description:
-A high-cost single-target arcane execution spell.
+Single-target arcane burst with very high damage on failed save.
 
 Effect:
-Targets one enemy in combat. The target saves vs spell with a penalty; on a failed save, damage includes a large component based on the target's maximum hit points. On a successful save, it still deals heavy damage.
+Target makes a spell save at penalty. On failed save, damage includes a large max-HP-based component plus extreme base damage. On successful save, it still takes high damage.
 
 Usage:
-Use against high-health priority targets when you need burst damage on one enemy.
+Use on high-HP priority targets for strong burst.
 
 Notes:
-Not a room spell. Best value comes from casting it into high-HP enemies.
+Has a cooldown and no room-wide effect.
 
-See also: FINGER-OF-DEATH TRUE-DEATH OBLIVION-SPEAR SPELLS SKILLS
+See also: FINGER-OF-DEATH OBLIVION-SPEAR TRIPLE-MAXIMIZE-MAGIC SPELLS SKILLS
 #0
 
 HARM
