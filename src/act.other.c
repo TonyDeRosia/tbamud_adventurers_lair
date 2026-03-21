@@ -2265,6 +2265,7 @@ ACMD(do_shadow)
     }
     strlcpy(display_name, shadow_slot_display_name(ch, slot), sizeof(display_name));
     SHADOW_SLOT_ACTIVE(ch, slot) = 0;
+    shadow_store_profile_from_mob(ch, slot, mob);
     shadow_prepare_for_removal(mob);
     extract_char(mob);
     send_to_char(ch, "You return %s to your shadow storage.\r\n", display_name);

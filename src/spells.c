@@ -104,6 +104,39 @@ static void shadow_prepare_for_storage_return(struct char_data *mob)
   REMOVE_BIT_AR(AFF_FLAGS(mob), AFF_CHARM);
 }
 
+static int shadow_profile_is_valid(struct char_data *owner, int slot)
+{
+  if (!owner || IS_NPC(owner) || slot < 0 || slot >= MAX_SHADOW_ROSTER)
+    return FALSE;
+  if (!SHADOW_SLOT_OCCUPIED(owner, slot) || !SHADOW_SLOT_PROFILE_VALID(owner, slot))
+    return FALSE;
+
+  return SHADOW_SLOT_MAX_HIT(owner, slot) > 1;
+}
+
+void shadow_store_profile_from_mob(struct char_data *owner, int slot, struct char_data *mob)
+{
+  if (!owner || IS_NPC(owner) || !mob || slot < 0 || slot >= MAX_SHADOW_ROSTER)
+    return;
+  if (!SHADOW_SLOT_OCCUPIED(owner, slot))
+    return;
+
+  SHADOW_SLOT_PROFILE_VALID(owner, slot) = 1;
+  SHADOW_SLOT_MAX_HIT(owner, slot) = MAX(1, GET_MAX_HIT(mob));
+  SHADOW_SLOT_AC(owner, slot) = GET_AC(mob);
+  SHADOW_SLOT_HITROLL(owner, slot) = GET_HITROLL(mob);
+  SHADOW_SLOT_DAMROLL(owner, slot) = GET_DAMROLL(mob);
+  SHADOW_SLOT_MAX_MANA(owner, slot) = MAX(0, GET_MAX_MANA(mob));
+  SHADOW_SLOT_DAMNODICE(owner, slot) = MAX(1, mob->mob_specials.damnodice);
+  SHADOW_SLOT_DAMSIZEDICE(owner, slot) = MAX(1, mob->mob_specials.damsizedice);
+  SHADOW_SLOT_STR(owner, slot) = mob->real_abils.str;
+  SHADOW_SLOT_INT(owner, slot) = mob->real_abils.intel;
+  SHADOW_SLOT_WIS(owner, slot) = mob->real_abils.wis;
+  SHADOW_SLOT_DEX(owner, slot) = mob->real_abils.dex;
+  SHADOW_SLOT_CON(owner, slot) = mob->real_abils.con;
+  SHADOW_SLOT_CHA(owner, slot) = mob->real_abils.cha;
+}
+
 static int warlock_power(struct char_data *ch)
 {
   return GET_INT(ch) + GET_WIS(ch);
@@ -503,6 +536,7 @@ int shadow_return_active_to_storage(struct char_data *owner, int quiet_mode)
     if (!active_mob)
       continue;
 
+    shadow_store_profile_from_mob(owner, slot, active_mob);
     shadow_prepare_for_storage_return(active_mob);
     extract_char(active_mob);
     returned++;
@@ -778,7 +812,7 @@ void compute_shadow_preview_stats(struct char_data *owner, int slot, int *previe
 
   level = MAX(1, SHADOW_SLOT_LEVEL(owner, slot));
 
-  if (SHADOW_SLOT_PROFILE_VALID(owner, slot)) {
+  if (shadow_profile_is_valid(owner, slot)) {
     max_hit = MAX(1, SHADOW_SLOT_MAX_HIT(owner, slot));
     hitroll = SHADOW_SLOT_HITROLL(owner, slot);
     damroll = SHADOW_SLOT_DAMROLL(owner, slot);
@@ -1015,6 +1049,7 @@ static void build_shadow_source_profile(struct char_data *owner, int slot, mob_v
   mob_rnum source_rnum;
   struct char_data *src;
   const char *identity = fallback_name;
+  int stored_profile_valid = FALSE;
 
   if (!profile)
     return;
@@ -1043,7 +1078,8 @@ static void build_shadow_source_profile(struct char_data *owner, int slot, mob_v
     identity = shadow_slot_display_name(owner, slot);
     strlcpy(profile->source_name, shadow_name_looks_valid(identity) ? identity : "a shadow", sizeof(profile->source_name));
 
-    if (SHADOW_SLOT_PROFILE_VALID(owner, slot)) {
+    stored_profile_valid = shadow_profile_is_valid(owner, slot);
+    if (stored_profile_valid) {
       profile->source_max_hit = MAX(1, SHADOW_SLOT_MAX_HIT(owner, slot));
       profile->source_ac = SHADOW_SLOT_AC(owner, slot);
       profile->source_hitroll = SHADOW_SLOT_HITROLL(owner, slot);
@@ -1064,7 +1100,7 @@ static void build_shadow_source_profile(struct char_data *owner, int slot, mob_v
   if (source_rnum != NOBODY) {
     src = &mob_proto[source_rnum];
     profile->source_attack_type = src->mob_specials.attack_type + TYPE_HIT;
-    if (!owner || slot < 0 || slot >= MAX_SHADOW_ROSTER || !SHADOW_SLOT_PROFILE_VALID(owner, slot)) {
+    if (!owner || slot < 0 || slot >= MAX_SHADOW_ROSTER || !stored_profile_valid) {
       profile->source_max_hit = MAX(1, GET_MAX_HIT(src));
       profile->source_ac = GET_AC(src);
       profile->source_hitroll = GET_HITROLL(src);
