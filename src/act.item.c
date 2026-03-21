@@ -1337,9 +1337,6 @@ static void wear_message(struct char_data *ch, struct obj_data *obj, int where)
     {"$n wears $p around $s neck.",
     "You wear $p around your neck."},
 
-    {"$n wears $p around $s neck.",
-    "You wear $p around your neck."},
-
     {"$n wears $p on $s body.",
     "You wear $p on your body."},
 
@@ -1476,7 +1473,7 @@ static void perform_wear(struct char_data *ch, struct obj_data *obj, int where)
 
   int wear_bitvectors[] = {
     ITEM_WEAR_TAKE, ITEM_WEAR_FINGER, ITEM_WEAR_FINGER, ITEM_WEAR_NECK,
-    ITEM_WEAR_NECK, ITEM_WEAR_BODY, ITEM_WEAR_HEAD, ITEM_WEAR_LEGS,
+    ITEM_WEAR_BODY, ITEM_WEAR_HEAD, ITEM_WEAR_LEGS,
     ITEM_WEAR_FEET, ITEM_WEAR_HANDS, ITEM_WEAR_ARMS, ITEM_WEAR_SHIELD,
     ITEM_WEAR_ABOUT, ITEM_WEAR_WAIST, ITEM_WEAR_WRIST, ITEM_WEAR_WRIST,
     ITEM_WEAR_WIELD, ITEM_WEAR_TAKE
@@ -1486,7 +1483,6 @@ static void perform_wear(struct char_data *ch, struct obj_data *obj, int where)
     "You're already using a light.\r\n",
     "YOU SHOULD NEVER SEE THIS MESSAGE.  PLEASE REPORT.\r\n",
     "You're already wearing something on both of your ring fingers.\r\n",
-    "YOU SHOULD NEVER SEE THIS MESSAGE.  PLEASE REPORT.\r\n",
     "You can't wear anything else around your neck.\r\n",
     "You're already wearing something on your body.\r\n",
     "You're already wearing something on your head.\r\n",
@@ -1508,8 +1504,8 @@ static void perform_wear(struct char_data *ch, struct obj_data *obj, int where)
     act("You can't wear $p there.", FALSE, ch, obj, 0, TO_CHAR);
     return;
   }
-  /* for neck, finger, and wrist, try pos 2 if pos 1 is already full */
-  if ((where == WEAR_FINGER_R) || (where == WEAR_NECK_1) || (where == WEAR_WRIST_R))
+  /* for finger and wrist, try pos 2 if pos 1 is already full */
+  if ((where == WEAR_FINGER_R) || (where == WEAR_WRIST_R))
     if (GET_EQ(ch, where))
       where++;
 
@@ -1536,7 +1532,6 @@ int find_eq_pos(struct char_data *ch, struct obj_data *obj, char *arg)
     "finger",
     "!RESERVED!",
     "neck",
-    "!RESERVED!",
     "body",
     "head",
     "legs",
