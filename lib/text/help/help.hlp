@@ -1527,7 +1527,7 @@ Description:
 Uses conjuration to call allies, create travel links, or bring entities into the field.
 
 Effect:
-Provides either action timingrary summoned support or positional movement tools that change engagement distance and threat handling.
+Provides either temporary summoned support or positional movement tools that change engagement distance and threat handling.
 
 Usage:
 Cast in-room; some variants require a valid target or corpse.
@@ -1547,7 +1547,7 @@ Description:
 Uses conjuration to call allies, create travel links, or bring entities into the field.
 
 Effect:
-Provides either action timingrary summoned support or positional movement tools that change engagement distance and threat handling.
+Provides either temporary summoned support or positional movement tools that change engagement distance and threat handling.
 
 Usage:
 Cast in-room; some variants require a valid target or corpse.
@@ -1567,7 +1567,7 @@ Description:
 Uses conjuration to call allies, create travel links, or bring entities into the field.
 
 Effect:
-Provides either action timingrary summoned support or positional movement tools that change engagement distance and threat handling.
+Provides either temporary summoned support or positional movement tools that change engagement distance and threat handling.
 
 Usage:
 Cast in-room; some variants require a valid target or corpse.
@@ -1607,7 +1607,7 @@ Description:
 Uses conjuration to call allies, create travel links, or bring entities into the field.
 
 Effect:
-Provides either action timingrary summoned support or positional movement tools that change engagement distance and threat handling.
+Provides either temporary summoned support or positional movement tools that change engagement distance and threat handling.
 
 Usage:
 Cast in-room; some variants require a valid target or corpse.
@@ -1627,7 +1627,7 @@ Description:
 Uses conjuration to call allies, create travel links, or bring entities into the field.
 
 Effect:
-Provides either action timingrary summoned support or positional movement tools that change engagement distance and threat handling.
+Provides either temporary summoned support or positional movement tools that change engagement distance and threat handling.
 
 Usage:
 Cast in-room; some variants require a valid target or corpse.
@@ -1647,7 +1647,7 @@ Description:
 Uses conjuration to call allies, create travel links, or bring entities into the field.
 
 Effect:
-Provides either action timingrary summoned support or positional movement tools that change engagement distance and threat handling.
+Provides either temporary summoned support or positional movement tools that change engagement distance and threat handling.
 
 Usage:
 Cast in-room; some variants require a valid target or corpse.
@@ -1687,7 +1687,7 @@ Description:
 Uses conjuration to call allies, create travel links, or bring entities into the field.
 
 Effect:
-Provides either action timingrary summoned support or positional movement tools that change engagement distance and threat handling.
+Provides either temporary summoned support or positional movement tools that change engagement distance and threat handling.
 
 Usage:
 Cast in-room; some variants require a valid target or corpse.
@@ -2487,7 +2487,7 @@ Description:
 Uses conjuration to call allies, create travel links, or bring entities into the field.
 
 Effect:
-Provides either action timingrary summoned support or positional movement tools that change engagement distance and threat handling.
+Provides either temporary summoned support or positional movement tools that change engagement distance and threat handling.
 
 Usage:
 Cast in-room; some variants require a valid target or corpse.
@@ -20860,20 +20860,20 @@ See also: SPELLS SKILLS
 
 WORD-OF-RECALL-MASS MASS-RECALL RECALL-MASS
 
-Word Of Recall Mass
+Word of Recall Mass
 Type: Spell
 
 Description:
-Word Of Recall Mass focuses on these gameplay behaviors: uses spell-specific custom logic.
+Uses conjuration to call allies, create travel links, or bring entities into the field.
 
 Effect:
-Core routines: uses spell-specific custom logic.
+Provides either temporary summoned support or positional movement tools that change engagement distance and threat handling.
 
 Usage:
-Target no explicit target.
+Cast in-room; some variants require a valid target or corpse.
 
 Notes:
-Targeting: no explicit target (self/room effect). If a saving throw is involved, expect reduced value on high-save targets.
+Most effective when planned before or at the start of combat.
 
 See also: SPELLS SKILLS
 #0
