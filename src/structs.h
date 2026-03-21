@@ -816,6 +816,7 @@ struct obj_data
   struct obj_data *next_content;  /**< For 'contains' lists   */
   struct obj_data *next;          /**< For the object list */
   struct char_data *sitting_here; /**< For furniture, who is sitting in it */
+  int corpse_source_vnum;         /**< Source mob vnum snapshot for corpse-derived effects */
   int shadow_extract_attempts;    /**< Remaining shadow extraction attempts for corpses */
   int shadow_extract_initialized; /**< Whether shadow extraction attempts were initialized */
   
