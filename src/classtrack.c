@@ -663,6 +663,7 @@ int classtrack_get_study_display_level(struct char_data *ch, int ability_id, int
 {
   int learned_at;
   int is_reactive_identity;
+  int safe_fallback;
 
   if (!ch || IS_NPC(ch))
     return fallback_level;
@@ -684,6 +685,14 @@ int classtrack_get_study_display_level(struct char_data *ch, int ability_id, int
 
   if (learned_at > 0)
     return learned_at;
+
+  /* If a learned reactive ability has no recorded learned-at level yet, avoid
+   * leaking class-table sentinel values such as LVL_IMMORT (101) in player
+   * displays. Keep a conservative per-player fallback capped below immortal.
+   */
+  safe_fallback = MAX(1, MIN(GET_LEVEL(ch), LVL_IMMORT - 1));
+  if (fallback_level >= LVL_IMMORT)
+    return safe_fallback;
 
   return fallback_level;
 }
