@@ -749,9 +749,10 @@ static void make_corpse(struct char_data *ch)
   SET_BIT_AR(GET_OBJ_WEAR(corpse), ITEM_WEAR_TAKE);
   SET_BIT_AR(GET_OBJ_EXTRA(corpse), ITEM_NODONATE);
   GET_OBJ_VAL(corpse, 0) = 0;	/* You can't store stuff in a corpse */
-  GET_OBJ_VAL(corpse, 1) = IS_NPC(ch) ? GET_MOB_VNUM(ch) : NOBODY; /* source mob vnum for shadow extraction */
+  GET_OBJ_VAL(corpse, 1) = 0; /* container flags: corpse is open/non-closeable */
   GET_OBJ_VAL(corpse, 2) = GET_LEVEL(ch); /* source level snapshot for shadow extraction */
   GET_OBJ_VAL(corpse, 3) = 1;	/* corpse identifier */
+  CORPSE_SOURCE_VNUM(corpse) = IS_NPC(ch) ? GET_MOB_VNUM(ch) : NOBODY; /* source mob vnum for shadow extraction */
   CORPSE_SHADOW_ATTEMPTS(corpse) = 3; /* shadow extraction attempts remaining */
   CORPSE_SHADOW_ATTEMPTS_INIT(corpse) = 1; /* shadow extraction fields initialized */
   GET_OBJ_WEIGHT(corpse) = GET_WEIGHT(ch) + IS_CARRYING_W(ch);

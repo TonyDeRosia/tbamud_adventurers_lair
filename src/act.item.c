@@ -1655,8 +1655,13 @@ ACMD(do_wield)
       send_to_char(ch, "It's too heavy for you to use.\r\n");
     else if (GET_LEVEL(ch) < GET_OBJ_LEVEL(obj))
       send_to_char(ch, "You are not experienced enough to use that.\r\n");
-    else
-      perform_wear(ch, obj, WEAR_WIELD);
+    else {
+      if (GET_EQ(ch, WEAR_WIELD))
+        perform_remove(ch, WEAR_WIELD);
+
+      if (!GET_EQ(ch, WEAR_WIELD) && obj->carried_by == ch)
+        perform_wear(ch, obj, WEAR_WIELD);
+    }
   }
 }
 

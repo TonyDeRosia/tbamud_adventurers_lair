@@ -2895,7 +2895,9 @@ ASPELL(spell_shadow_extraction)
     return;
   }
 
-  source_vnum = GET_OBJ_VAL(corpse, 1);
+  source_vnum = CORPSE_SOURCE_VNUM(corpse);
+  if (source_vnum == 0)
+    source_vnum = GET_OBJ_VAL(corpse, 1);
   source_rnum = real_mobile(source_vnum);
   if (source_rnum != NOBODY && mob_proto[source_rnum].player.short_descr && *mob_proto[source_rnum].player.short_descr)
     source_short = mob_proto[source_rnum].player.short_descr;

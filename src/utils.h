@@ -860,6 +860,8 @@ do                                                              \
 /** Defines if an obj is a corpse. */
 #define IS_CORPSE(obj)		(GET_OBJ_TYPE(obj) == ITEM_CONTAINER && \
 					GET_OBJ_VAL((obj), 3) == 1)
+/** Snapshot of the source mob vnum for corpse-derived effects. */
+#define CORPSE_SOURCE_VNUM(obj)	((obj)->corpse_source_vnum)
 /** Remaining shadow extraction attempts on a corpse. */
 #define CORPSE_SHADOW_ATTEMPTS(obj)	((obj)->shadow_extract_attempts)
 /** Whether a corpse's shadow attempts were initialized. */
