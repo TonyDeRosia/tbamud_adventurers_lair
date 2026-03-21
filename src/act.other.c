@@ -2164,6 +2164,8 @@ ACMD(do_shadow)
   shadow_sync_active_flags(ch);
 
   if (!*shadow_subcmd || is_abbrev(shadow_subcmd, "list") || is_abbrev(shadow_subcmd, "storage")) {
+    int preview_level, preview_max_hp, preview_hitroll, preview_power;
+
     for (i = 0; i < cap; i++) {
       if (SHADOW_SLOT_OCCUPIED(ch, i)) {
         used++;
@@ -2181,14 +2183,19 @@ ACMD(do_shadow)
       for (i = 0; i < cap; i++) {
         if (!SHADOW_SLOT_OCCUPIED(ch, i))
           send_to_char(ch, " [%2d] %s[Empty]%s\r\n", i + 1, CCGRN(ch, C_NRM), CCNRM(ch, C_NRM));
-        else
-          send_to_char(ch, " [%2d] %s[Shadow: %-30.30s]%s Lvl %-3d %s%s%s\r\n",
+        else {
+          compute_shadow_preview_stats(ch, i, &preview_level, &preview_max_hp, &preview_hitroll, NULL, &preview_power);
+          send_to_char(ch, " [%2d] %s[Shadow: %-30.30s]%s Lvl %-3d [Power:%-3d] [HP:%-3d] [Hit:%+d] %s%s%s\r\n",
                        i + 1,
                        CCYEL(ch, C_NRM), shadow_slot_display_name(ch, i), CCNRM(ch, C_NRM),
-                       SHADOW_SLOT_LEVEL(ch, i),
+                       preview_level,
+                       preview_power,
+                       preview_max_hp,
+                       preview_hitroll,
                        SHADOW_SLOT_ACTIVE(ch, i) ? CCGRN(ch, C_NRM) : "",
                        SHADOW_SLOT_ACTIVE(ch, i) ? "[Active]" : "[Stored]",
                        SHADOW_SLOT_ACTIVE(ch, i) ? CCNRM(ch, C_NRM) : "");
+        }
       }
     }
     send_to_char(ch, "Commands:\r\n");
