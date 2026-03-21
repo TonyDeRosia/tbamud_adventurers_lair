@@ -110,8 +110,90 @@ static int shadow_profile_is_valid(struct char_data *owner, int slot)
     return FALSE;
   if (!SHADOW_SLOT_OCCUPIED(owner, slot) || !SHADOW_SLOT_PROFILE_VALID(owner, slot))
     return FALSE;
+  if (SHADOW_SLOT_MAX_HIT(owner, slot) <= 1)
+    return FALSE;
+  if (SHADOW_SLOT_DAMNODICE(owner, slot) <= 0 || SHADOW_SLOT_DAMSIZEDICE(owner, slot) <= 0)
+    return FALSE;
 
-  return SHADOW_SLOT_MAX_HIT(owner, slot) > 1;
+  return TRUE;
+}
+
+static int shadow_proto_estimated_max_hit(struct char_data *proto)
+{
+  int hit_dice_count;
+  int hit_dice_size;
+  int hp_from_dice = 0;
+
+  if (!proto)
+    return 1;
+
+  if (GET_MAX_HIT(proto) > 1)
+    return GET_MAX_HIT(proto);
+
+  hit_dice_count = MAX(0, GET_HIT(proto));
+  hit_dice_size = MAX(0, GET_MANA(proto));
+  if (hit_dice_count <= 0 || hit_dice_size <= 0)
+    return 1;
+
+  /* read_mobile() rolls this randomly; use deterministic midpoint for consistency. */
+  if (GET_MAX_HIT(proto) == 0)
+    hp_from_dice = (hit_dice_count * (hit_dice_size + 1)) / 2;
+  else
+    hp_from_dice = (MIN(hit_dice_count, hit_dice_size) + MAX(hit_dice_count, hit_dice_size)) / 2;
+
+  return MAX(1, hp_from_dice + MAX(0, GET_MOVE(proto)));
+}
+
+static void shadow_try_repair_legacy_slot_profile(struct char_data *owner, int slot)
+{
+  mob_vnum vnum;
+  mob_rnum rnum;
+  struct char_data *src;
+  int level;
+
+  if (!owner || IS_NPC(owner) || slot < 0 || slot >= MAX_SHADOW_ROSTER)
+    return;
+  if (!SHADOW_SLOT_OCCUPIED(owner, slot))
+    return;
+  if (shadow_profile_is_valid(owner, slot))
+    return;
+
+  level = MAX(1, SHADOW_SLOT_LEVEL(owner, slot));
+  vnum = SHADOW_SLOT_VNUM(owner, slot);
+  rnum = real_mobile(vnum);
+
+  if (rnum != NOBODY) {
+    src = &mob_proto[rnum];
+    SHADOW_SLOT_MAX_HIT(owner, slot) = shadow_proto_estimated_max_hit(src);
+    SHADOW_SLOT_AC(owner, slot) = GET_AC(src);
+    SHADOW_SLOT_HITROLL(owner, slot) = GET_HITROLL(src);
+    SHADOW_SLOT_DAMROLL(owner, slot) = GET_DAMROLL(src);
+    SHADOW_SLOT_MAX_MANA(owner, slot) = MAX(0, GET_MAX_MANA(src));
+    SHADOW_SLOT_DAMNODICE(owner, slot) = MAX(1, src->mob_specials.damnodice);
+    SHADOW_SLOT_DAMSIZEDICE(owner, slot) = MAX(1, src->mob_specials.damsizedice);
+    SHADOW_SLOT_STR(owner, slot) = src->real_abils.str;
+    SHADOW_SLOT_INT(owner, slot) = src->real_abils.intel;
+    SHADOW_SLOT_WIS(owner, slot) = src->real_abils.wis;
+    SHADOW_SLOT_DEX(owner, slot) = src->real_abils.dex;
+    SHADOW_SLOT_CON(owner, slot) = src->real_abils.con;
+    SHADOW_SLOT_CHA(owner, slot) = src->real_abils.cha;
+  } else {
+    SHADOW_SLOT_MAX_HIT(owner, slot) = MAX(1, level * 12);
+    SHADOW_SLOT_AC(owner, slot) = 100 - (level * 2);
+    SHADOW_SLOT_HITROLL(owner, slot) = level / 3;
+    SHADOW_SLOT_DAMROLL(owner, slot) = level / 4;
+    SHADOW_SLOT_MAX_MANA(owner, slot) = 0;
+    SHADOW_SLOT_DAMNODICE(owner, slot) = MAX(1, 1 + (level / 20));
+    SHADOW_SLOT_DAMSIZEDICE(owner, slot) = MAX(2, 4 + (level / 15));
+    SHADOW_SLOT_STR(owner, slot) = 12;
+    SHADOW_SLOT_INT(owner, slot) = 12;
+    SHADOW_SLOT_WIS(owner, slot) = 12;
+    SHADOW_SLOT_DEX(owner, slot) = 12;
+    SHADOW_SLOT_CON(owner, slot) = 12;
+    SHADOW_SLOT_CHA(owner, slot) = 12;
+  }
+
+  SHADOW_SLOT_PROFILE_VALID(owner, slot) = 1;
 }
 
 void shadow_store_profile_from_mob(struct char_data *owner, int slot, struct char_data *mob)
@@ -811,6 +893,7 @@ void compute_shadow_preview_stats(struct char_data *owner, int slot, int *previe
   }
 
   level = MAX(1, SHADOW_SLOT_LEVEL(owner, slot));
+  shadow_try_repair_legacy_slot_profile(owner, slot);
 
   if (shadow_profile_is_valid(owner, slot)) {
     max_hit = MAX(1, SHADOW_SLOT_MAX_HIT(owner, slot));
@@ -1220,6 +1303,8 @@ int summon_stored_shadow(struct char_data *ch, int slot)
     return FALSE;
   if (find_active_shadow_for_slot(ch, slot))
     return FALSE;
+
+  shadow_try_repair_legacy_slot_profile(ch, slot);
 
   vnum = SHADOW_SLOT_VNUM(ch, slot);
   if (real_mobile(vnum) == NOBODY)
