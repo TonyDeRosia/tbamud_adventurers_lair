@@ -5396,6 +5396,35 @@ ACMD(do_saffects)
   send_to_char(ch, "\r\nYou are affected by %d skills and %d spells.\r\n", skills, spells);
 }
 
+ACMD(do_cooldown)
+{
+  int spellnum;
+  int found = 0;
+  const int seconds_per_round = (PULSE_VIOLENCE / PASSES_PER_SEC);
+
+  if (!ch || IS_NPC(ch)) {
+    send_to_char(ch, "Not for mobiles.\r\n");
+    return;
+  }
+
+  send_to_char(ch, "Active Cooldowns\r\n\r\n");
+
+  for (spellnum = 1; spellnum <= MAX_SKILLS; spellnum++) {
+    int rounds_remaining = GET_SPELL_COOLDOWN(ch, spellnum);
+
+    if (rounds_remaining <= 0)
+      continue;
+
+    found = 1;
+    send_to_char(ch, "  %s (%ds)\r\n",
+                 skill_name(spellnum),
+                 rounds_remaining * seconds_per_round);
+  }
+
+  if (!found)
+    send_to_char(ch, "  None.\r\n");
+}
+
 ACMD(do_attr)
 {
   send_to_char(ch, "---------------------------------------------------------------------------\r\n");
