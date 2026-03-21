@@ -2370,6 +2370,13 @@ static int is_aff_debuff(const struct affected_type *af)
 #ifdef AFF_CHARM
   if (IS_SET_AR(af->bitvector, AFF_CHARM)) return 1;
 #endif
+#ifdef AFF_ARCANE_LEAK
+  if (IS_SET_AR(af->bitvector, AFF_ARCANE_LEAK)) return 1;
+#endif
+
+#ifdef SPELL_CORRUPTION
+  if (af->spell == SPELL_CORRUPTION) return 1;
+#endif
 
   if (is_spirit_spell(af->spell))
     return 0;
@@ -2549,32 +2556,79 @@ static const char *aff_name_from_spell_and_flags(int spell, const char *flags, c
   return resolve_affect_display_name(spell, flags, fallback, fallbacksz);
 }
 
-static void build_grouped_aff_summary(const struct affected_type *list,
-                                      const struct affected_type *seed,
-                                      int only_debuff,
-                                      const struct affected_type **seen,
-                                      int *seen_count,
-                                      char *out, size_t outsz)
-{
-  const struct affected_type *af;
+struct aff_display_entry {
+  char name[128];
   char mods[384];
-  int mod_totals[NUM_APPLIES];
-  int mod_used[NUM_APPLIES];
   char flags[256];
-  int bits[AF_ARRAY_MAX];
-  char name_fallback[64];
-  const char *name;
-  char dur[32];
-  int max_duration = seed->duration;
-  int i;
+  char drain[128];
+  int max_duration;
+  int count;
+};
 
-  if (!out || outsz == 0 || !seed || !list || !seen || !seen_count)
+static void drain_desc_for_affect(int spell, const int bits[AF_ARRAY_MAX],
+                                  char *out, size_t outsz)
+{
+  int hp = 0, mana = 0, move = 0;
+
+  if (!out || outsz == 0)
     return;
   out[0] = '\0';
 
-  mods[0] = '\0';
-  flags[0] = '\0';
-  dur[0] = '\0';
+#ifdef AFF_ARCANE_LEAK
+  if (IS_SET_AR(bits, AFF_ARCANE_LEAK))
+    mana = 1;
+#endif
+#ifdef AFF_BLOODLUST
+  if (IS_SET_AR(bits, AFF_BLOODLUST))
+    hp = 1;
+#endif
+#ifdef SPELL_CORRUPTION
+  if (spell == SPELL_CORRUPTION)
+    hp = 1;
+#endif
+
+  if (hp && mana && move)
+    snprintf(out, outsz, "drains HP, Mana, and Move over time");
+  else if (hp && mana)
+    snprintf(out, outsz, "drains HP and Mana over time");
+  else if (hp && move)
+    snprintf(out, outsz, "drains HP and Move over time");
+  else if (mana && move)
+    snprintf(out, outsz, "drains Mana and Move over time");
+  else if (hp)
+    snprintf(out, outsz, "drains HP over time");
+  else if (mana)
+    snprintf(out, outsz, "drains Mana over time");
+  else if (move)
+    snprintf(out, outsz, "drains Move over time");
+}
+
+static void build_grouped_aff_entry(const struct affected_type *list,
+                                    const struct affected_type *seed,
+                                    int only_debuff,
+                                    const struct affected_type **seen,
+                                    int *seen_count,
+                                    struct aff_display_entry *entry)
+{
+  const struct affected_type *af;
+  int mod_totals[NUM_APPLIES];
+  int mod_used[NUM_APPLIES];
+  int bits[AF_ARRAY_MAX];
+  char name_fallback[64];
+  const char *name;
+  int max_duration = seed->duration;
+  int count = 0;
+  int i;
+
+  if (!entry || !seed || !list || !seen || !seen_count)
+    return;
+  entry->name[0] = '\0';
+  entry->mods[0] = '\0';
+  entry->flags[0] = '\0';
+  entry->drain[0] = '\0';
+  entry->max_duration = seed->duration;
+  entry->count = 1;
+
   name_fallback[0] = '\0';
   for (i = 0; i < AF_ARRAY_MAX; i++)
     bits[i] = 0;
@@ -2592,6 +2646,7 @@ static void build_grouped_aff_summary(const struct affected_type *list,
       continue;
 
     aff_seen_add(seen, seen_count, af);
+    count++;
     max_duration = MAX(max_duration, af->duration);
     if (af->location > APPLY_NONE && af->location < NUM_APPLIES && af->modifier != 0) {
       mod_totals[af->location] += af->modifier;
@@ -2622,33 +2677,86 @@ static void build_grouped_aff_summary(const struct affected_type *list,
         aff_apply_name(i),
         abs(mod_totals[i]));
 
-    if (*mods)
-      out_append(mods, sizeof(mods), ", ");
-    out_append(mods, sizeof(mods), piece);
+    if (*entry->mods)
+      out_append(entry->mods, sizeof(entry->mods), ", ");
+    out_append(entry->mods, sizeof(entry->mods), piece);
   }
 
-  sprintbitarray(bits, affected_bits, AF_ARRAY_MAX, flags);
-  if (!aff_flags_has_meaningful_bits(flags))
-    flags[0] = '\0';
-  format_affect_duration(max_duration, dur, sizeof(dur));
-  name = aff_name_from_spell_and_flags(seed->spell, flags, name_fallback, sizeof(name_fallback));
+  sprintbitarray(bits, affected_bits, AF_ARRAY_MAX, entry->flags);
+  if (!aff_flags_has_meaningful_bits(entry->flags))
+    entry->flags[0] = '\0';
+  name = aff_name_from_spell_and_flags(seed->spell, entry->flags, name_fallback, sizeof(name_fallback));
+  snprintf(entry->name, sizeof(entry->name), "%s", name);
+  entry->max_duration = max_duration;
+  entry->count = MAX(1, count);
+  drain_desc_for_affect(seed->spell, bits, entry->drain, sizeof(entry->drain));
+}
 
-  if (*mods && *flags)
-    snprintf(out, outsz, "%s (%s): %s, %s.", name, dur, mods, flags);
-  else if (*mods)
-    snprintf(out, outsz, "%s (%s): %s.", name, dur, mods);
-  else if (*flags)
-    snprintf(out, outsz, "%s (%s): %s.", name, dur, flags);
+static int aff_entry_same_visible(const struct aff_display_entry *a, const struct aff_display_entry *b)
+{
+  if (!a || !b)
+    return 0;
+  return !strcmp(a->name, b->name)
+      && !strcmp(a->mods, b->mods)
+      && !strcmp(a->flags, b->flags)
+      && !strcmp(a->drain, b->drain);
+}
+
+static void format_aff_display_entry_line(const struct aff_display_entry *entry,
+                                          char *out, size_t outsz)
+{
+  char dur[32];
+  char dur_with_count[64];
+  int need_sep = 0;
+
+  if (!entry || !out || outsz == 0)
+    return;
+
+  out[0] = '\0';
+  format_affect_duration(entry->max_duration, dur, sizeof(dur));
+  if (entry->count > 1)
+    snprintf(dur_with_count, sizeof(dur_with_count), "%s x%d", dur, entry->count);
   else
-    snprintf(out, outsz, "%s (%s).", name, dur);
+    snprintf(dur_with_count, sizeof(dur_with_count), "%s", dur);
+
+  snprintf(out, outsz, "%s (%s)", entry->name, dur_with_count);
+  if (!*entry->mods && !*entry->flags && !*entry->drain) {
+    out_append(out, outsz, ".");
+    return;
+  }
+
+  out_append(out, outsz, ": ");
+  if (*entry->mods) {
+    out_append(out, outsz, entry->mods);
+    need_sep = 1;
+  }
+  if (*entry->flags) {
+    if (need_sep)
+      out_append(out, outsz, ", ");
+    out_append(out, outsz, entry->flags);
+    need_sep = 1;
+  }
+  if (*entry->drain) {
+    if (need_sep)
+      out_append(out, outsz, ", ");
+    out_append(out, outsz, entry->drain);
+  }
+  out_append(out, outsz, ".");
 }
 
 ACMD(do_affects)
 {
   const struct affected_type *af;
   const struct affected_type *seen[MAX_AFFECT];
+  struct aff_display_entry buff_entries[MAX_AFFECT];
+  struct aff_display_entry debuff_entries[(MAX_AFFECT * 2) + 4];
+  int buff_count = 0, debuff_count = 0;
   int seen_count = 0;
   int any = 0, any_buff = 0, any_debuff = 0;
+  int i, j;
+  int added_hidden_drain = 0;
+
+  enum { AFF_PROLONGED_TICK_THRESHOLD = 6 };
 
   if (!ch || IS_NPC(ch)) {
     send_to_char(ch, "Not for mobiles.\r\n");
@@ -2671,19 +2779,106 @@ ACMD(do_affects)
     return;
   }
 
+  for (af = ch->affected; af; af = af->next) {
+    struct aff_display_entry entry;
+    struct aff_display_entry *target = NULL;
+    if (aff_seen_contains(seen, seen_count, af))
+      continue;
+
+    build_grouped_aff_entry(ch->affected, af, is_aff_debuff(af), seen, &seen_count, &entry);
+
+    target = is_aff_debuff(af) ? debuff_entries : buff_entries;
+    if (is_aff_debuff(af)) {
+      for (i = 0; i < debuff_count; i++) {
+        if (aff_entry_same_visible(&debuff_entries[i], &entry)) {
+          debuff_entries[i].count += entry.count;
+          debuff_entries[i].max_duration = MAX(debuff_entries[i].max_duration, entry.max_duration);
+          target = NULL;
+          break;
+        }
+      }
+      if (target && debuff_count < (int)(sizeof(debuff_entries) / sizeof(debuff_entries[0])))
+        debuff_entries[debuff_count++] = entry;
+    } else {
+      for (i = 0; i < buff_count; i++) {
+        if (aff_entry_same_visible(&buff_entries[i], &entry)) {
+          buff_entries[i].count += entry.count;
+          buff_entries[i].max_duration = MAX(buff_entries[i].max_duration, entry.max_duration);
+          target = NULL;
+          break;
+        }
+      }
+      if (target && buff_count < MAX_AFFECT)
+        buff_entries[buff_count++] = entry;
+    }
+  }
+
+  for (i = 0; i < buff_count; i++) {
+    if (!*buff_entries[i].drain)
+      continue;
+    if (debuff_count >= (int)(sizeof(debuff_entries) / sizeof(debuff_entries[0])))
+      break;
+    debuff_entries[debuff_count] = buff_entries[i];
+    debuff_entries[debuff_count].name[0] = '\0';
+    out_append(debuff_entries[debuff_count].name, sizeof(debuff_entries[debuff_count].name), buff_entries[i].name);
+    out_append(debuff_entries[debuff_count].name, sizeof(debuff_entries[debuff_count].name), " strain");
+    debuff_count++;
+  }
+
+  if (GET_COND(ch, HUNGER) <= 0) {
+    struct aff_display_entry e;
+    memset(&e, 0, sizeof(e));
+    snprintf(e.name, sizeof(e.name), "hunger strain");
+    snprintf(e.drain, sizeof(e.drain),
+             (ch->char_specials.starving_ticks >= AFF_PROLONGED_TICK_THRESHOLD)
+               ? "drains HP, Mana, and Move over time"
+               : "drains Move over time");
+    e.max_duration = -1;
+    e.count = 1;
+    if (debuff_count < (int)(sizeof(debuff_entries) / sizeof(debuff_entries[0])))
+      debuff_entries[debuff_count++] = e;
+    added_hidden_drain = 1;
+  }
+
+  if (GET_COND(ch, THIRST) <= 0) {
+    struct aff_display_entry e;
+    memset(&e, 0, sizeof(e));
+    snprintf(e.name, sizeof(e.name), "thirst strain");
+    snprintf(e.drain, sizeof(e.drain),
+             (ch->char_specials.dehydrated_ticks >= AFF_PROLONGED_TICK_THRESHOLD)
+               ? "drains HP, Mana, and Move over time"
+               : "drains Move over time");
+    e.max_duration = -1;
+    e.count = 1;
+    if (debuff_count < (int)(sizeof(debuff_entries) / sizeof(debuff_entries[0])))
+      debuff_entries[debuff_count++] = e;
+    added_hidden_drain = 1;
+  }
+
+  for (i = 0; i < debuff_count; i++) {
+    for (j = i + 1; j < debuff_count; ) {
+      if (aff_entry_same_visible(&debuff_entries[i], &debuff_entries[j])) {
+        debuff_entries[i].count += debuff_entries[j].count;
+        debuff_entries[i].max_duration = MAX(debuff_entries[i].max_duration, debuff_entries[j].max_duration);
+        for (; j + 1 < debuff_count; j++)
+          debuff_entries[j] = debuff_entries[j + 1];
+        debuff_count--;
+      } else
+        j++;
+    }
+  }
+
+  any_buff = (buff_count > 0);
+  any_debuff = (debuff_count > 0) || added_hidden_drain;
+
   send_to_char(ch, "\r\n%sActive Effects%s\r\n", CCYEL(ch, C_NRM), CCNRM(ch, C_NRM));
 
   /* Buffs */
   if (any_buff) {
     send_to_char(ch, "\r\n%sBuffs%s\r\n", CCGRN(ch, C_NRM), CCNRM(ch, C_NRM));
-
-    for (af = ch->affected; af; af = af->next) {
+    for (i = 0; i < buff_count; i++) {
       char line[512];
-      if (is_aff_debuff(af)) continue;
-      if (aff_seen_contains(seen, seen_count, af))
-        continue;
-
-      build_grouped_aff_summary(ch->affected, af, 0, seen, &seen_count, line, sizeof(line));
+      format_aff_display_entry_line(&buff_entries[i], line, sizeof(line));
       send_to_char(ch, "  %s\r\n", line);
     }
   } else {
@@ -2693,14 +2888,9 @@ ACMD(do_affects)
   /* Debuffs */
   if (any_debuff) {
     send_to_char(ch, "\r\n%sDebuffs%s\r\n", CCRED(ch, C_NRM), CCNRM(ch, C_NRM));
-
-    for (af = ch->affected; af; af = af->next) {
+    for (i = 0; i < debuff_count; i++) {
       char line[512];
-      if (!is_aff_debuff(af)) continue;
-      if (aff_seen_contains(seen, seen_count, af))
-        continue;
-
-      build_grouped_aff_summary(ch->affected, af, 1, seen, &seen_count, line, sizeof(line));
+      format_aff_display_entry_line(&debuff_entries[i], line, sizeof(line));
       send_to_char(ch, "  %s\r\n", line);
     }
   } else {
