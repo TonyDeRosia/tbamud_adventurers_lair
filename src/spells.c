@@ -2377,7 +2377,7 @@ ASPELL(spell_word_of_recall_mass)
   if (!ch)
     return;
   if (ROOM_FLAGGED(IN_ROOM(ch), ROOM_DEATH) || ZONE_FLAGGED(GET_ROOM_ZONE(IN_ROOM(ch)), ZONE_NOASTRAL)) {
-    send_to_char(ch, "A dark force blocks your mass recall.\r\n");
+    send_to_char(ch, "The nexus will not open from this location.\r\n");
     return;
   }
 
@@ -2391,10 +2391,10 @@ ASPELL(spell_word_of_recall_mass)
     to_room = (!IS_NPC(tch) && GET_LOADROOM(tch) != NOWHERE) ? real_room(GET_LOADROOM(tch)) : r_mortal_start_room;
     if (to_room == NOWHERE)
       to_room = r_mortal_start_room;
-    act("$n disappears.", TRUE, tch, 0, 0, TO_ROOM);
+    act("$n steps through a rippling nexus gate and vanishes.", TRUE, tch, 0, 0, TO_ROOM);
     char_from_room(tch);
     char_to_room(tch, to_room);
-    act("$n appears in the middle of the room.", TRUE, tch, 0, 0, TO_ROOM);
+    act("$n emerges from a rippling nexus gate.", TRUE, tch, 0, 0, TO_ROOM);
     look_at_room(tch, 0);
     handle_followers_after_owner_teleport_or_recall(tch);
   }
