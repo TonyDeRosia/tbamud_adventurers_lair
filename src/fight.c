@@ -90,6 +90,8 @@ static int count_shadow_servants_for(struct char_data *ch);
 static int extracted_shadow_slot(struct char_data *mob);
 static int return_extracted_shadow_to_storage(struct char_data *mob);
 static void prepare_shadow_servant_for_removal(struct char_data *mob);
+static int should_owned_follower_auto_assist(struct char_data *owner, struct char_data *follower);
+static void auto_assist_owned_followers(struct char_data *owner);
 static void change_alignment(struct char_data *ch, struct char_data *victim);
 static void group_gain(struct char_data *ch, struct char_data *victim);
 static void solo_gain(struct char_data *ch, struct char_data *victim);
@@ -189,6 +191,54 @@ static int count_shadow_servants_for(struct char_data *ch)
     if (is_shadow_servant_for(ch, f->follower))
       n++;
   return n;
+}
+
+static int should_owned_follower_auto_assist(struct char_data *owner, struct char_data *follower)
+{
+  if (!owner || !follower || !IS_NPC(follower))
+    return FALSE;
+  if (follower->master != owner)
+    return FALSE;
+  if (IN_ROOM(follower) != IN_ROOM(owner))
+    return FALSE;
+  if (FIGHTING(follower))
+    return FALSE;
+
+  /* Owned combat allies are charmed pets/summons and temporary summons. */
+  if (!AFF_FLAGGED(follower, AFF_CHARM) &&
+      GET_SUMMON_TIMER(follower) <= 0 &&
+      !is_shadow_servant_for(owner, follower))
+    return FALSE;
+
+  /* Keep existing incapacity checks aligned with combat eligibility. */
+  if (GET_POS(follower) < POS_FIGHTING ||
+      AFF_FLAGGED(follower, AFF_STUNNED) ||
+      AFF_FLAGGED(follower, AFF_FEARFUL) ||
+      AFF_FLAGGED(follower, AFF_ROOTED))
+    return FALSE;
+
+  if (!CAN_SEE(follower, owner))
+    return FALSE;
+
+  return TRUE;
+}
+
+static void auto_assist_owned_followers(struct char_data *owner)
+{
+  struct follow_type *f;
+
+  if (!owner || !FIGHTING(owner))
+    return;
+
+  /* Debug trace point: owner/follower eligibility for auto-assist is gated
+   * through should_owned_follower_auto_assist(). */
+  for (f = owner->followers; f; f = f->next) {
+    if (!should_owned_follower_auto_assist(owner, f->follower))
+      continue;
+
+    /* Resolve target from the follower's current room via assist helper. */
+    do_assist(f->follower, GET_NAME(owner), 0, 0);
+  }
 }
 
 static int extracted_shadow_slot(struct char_data *mob)
@@ -2399,6 +2449,8 @@ void perform_violence(void)
         do_assist(tch, GET_NAME(ch), 0, 0);				  
       }
     }
+
+    auto_assist_owned_followers(ch);
 
     hit(ch, FIGHTING(ch), TYPE_UNDEFINED);
     
