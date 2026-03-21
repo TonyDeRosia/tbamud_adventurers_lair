@@ -1064,10 +1064,8 @@ void die(struct char_data * ch, struct char_data * killer)
     }
 
     if (gold_gain > 0) {
-      char buf[64];
-      format_gold_as_currency(buf, sizeof(buf), gold_gain);
       increase_money_gold(killer, gold_gain);
-      send_to_char(killer, "You receive \tY%s\tn \tygold\tn from the kill.\r\n", buf);
+      send_to_char(killer, "You receive \ty%lld\tn \tYgold\tn from the kill.\r\n", gold_gain);
     }
 
     /* prevent corpse gold duplication */
