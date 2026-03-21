@@ -301,19 +301,34 @@ ACMD(do_backstab)
 ACMD(do_order)
 {
   char name[MAX_INPUT_LENGTH], message[MAX_INPUT_LENGTH];
+  int order_all = FALSE;
   bool found = FALSE;
-  struct char_data *vict;
+  struct char_data *vict = NULL;
   struct follow_type *k;
 
   half_chop(argument, name, message);
 
+  order_all = (is_abbrev(name, "followers") || is_abbrev(name, "all"));
+
   if (!*name || !*message)
     send_to_char(ch, "Order who to do what?\r\n");
-  else if (!(vict = get_char_vis(ch, name, NULL, FIND_CHAR_ROOM)) &&
-           !is_abbrev(name, "followers") &&
-           !is_abbrev(name, "all"))
+  else if (!order_all && !(vict = get_char_vis(ch, name, NULL, FIND_CHAR_ROOM))) {
+    for (k = ch->followers; k; k = k->next) {
+      if (!k->follower || IN_ROOM(k->follower) != IN_ROOM(ch))
+        continue;
+      if ((k->follower->master == ch) &&
+          (isname(name, GET_NAME(k->follower)) ||
+           (k->follower->player.short_descr &&
+            isname(name, k->follower->player.short_descr)))) {
+        vict = k->follower;
+        break;
+      }
+    }
+  }
+
+  if (!order_all && !vict)
     send_to_char(ch, "That person isn't here.\r\n");
-  else if (ch == vict)
+  else if (!order_all && ch == vict)
     send_to_char(ch, "You obviously suffer from skitzofrenia.\r\n");
   else {
     if (AFF_FLAGGED(ch, AFF_CHARM)) {
