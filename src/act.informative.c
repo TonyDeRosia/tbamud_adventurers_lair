@@ -1854,6 +1854,7 @@ ACMD(do_score)
 
   /* Combat Stats */
   {
+    struct obj_data *wielded = GET_EQ(ch, WEAR_WIELD);
     int offensive_hit = compute_offensive_hit_value(ch, NULL);
     /* Display estimate targets an equal-level defender with your current evasion profile. */
     int accuracy_pct = compute_hit_chance_from_values(offensive_hit,
@@ -1905,6 +1906,24 @@ ACMD(do_score)
       C, R,
       GET_HITROLL(ch), GET_DAMROLL(ch), accuracy_pct);
     len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
+
+    if (wielded && GET_OBJ_TYPE(wielded) == ITEM_WEAPON) {
+      int weapon_num = GET_OBJ_VAL(wielded, 1);
+      int weapon_size = GET_OBJ_VAL(wielded, 2);
+      int weapon_avg = weapon_num * (weapon_size + 1) / 2;
+      snprintf(line, sizeof(line),
+        "%sWeapon Dice:%s %dd%d  (Avg %d per hit, before bonuses)",
+        C, R, weapon_num, weapon_size, weapon_avg);
+      len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
+    } else {
+      int unarmed_num = MIN(4, 1 + (GET_LEVEL(ch) / 30));
+      int unarmed_size = MIN(7, 2 + (GET_LEVEL(ch) / 20));
+      int unarmed_avg = (unarmed_num * (unarmed_size + 1)) / 2 + MAX(0, GET_LEVEL(ch) / 30);
+      snprintf(line, sizeof(line),
+        "%sUnarmed Dice:%s %dd%d + %d  (Avg %d per hit, before bonuses)",
+        C, R, unarmed_num, unarmed_size, MAX(0, GET_LEVEL(ch) / 30), unarmed_avg);
+      len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
+    }
   }
   len = append_box_line(buf, len, sizeof(buf), B, R, "", W);
   /* Crit chances */
