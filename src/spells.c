@@ -2977,11 +2977,14 @@ ASPELL(spell_grasp_heart)
 {
   int saved, dam;
   if (!ch || !victim) return;
+
   if (GET_HIT(victim) * 100 <= GET_MAX_HIT(victim) * 30) {
     /* GOAL_OF_ALL_LIFE_IS_DEATH_ACTIVE */
     saved = goal_of_all_life_is_death_active(ch) ? FALSE : mag_savingthrow(victim, SAVING_DEATH, 0);
-    if (!saved && spell_instant_kill(ch, victim, SPELL_GRASP_HEART, DAM_NECROTIC))
+    if (!saved && spell_instant_kill(ch, victim, SPELL_GRASP_HEART, DAM_NECROTIC)) {
+      set_spell_cooldown(ch, SPELL_GRASP_HEART, 8);
       return;
+    }
     dam = spell_dmg_extreme_manual(level);
   } else {
     saved = mag_savingthrow(victim, SAVING_DEATH, 0);
@@ -2989,7 +2992,11 @@ ASPELL(spell_grasp_heart)
     if (saved) dam /= 2;
   }
   set_next_damage_type(DAM_NECROTIC);
-  if (damage(ch, victim, dam, SPELL_GRASP_HEART) == -1) return;
+  if (damage(ch, victim, dam, SPELL_GRASP_HEART) == -1) {
+    set_spell_cooldown(ch, SPELL_GRASP_HEART, 8);
+    return;
+  }
+  set_spell_cooldown(ch, SPELL_GRASP_HEART, 8);
   if (!saved && GET_HIT(victim) > 0 && GET_HIT(victim) * 100 > GET_MAX_HIT(victim) * 30)
     spell_apply_flag(victim, SPELL_GRASP_HEART, 1, AFF_STUNNED);
 }

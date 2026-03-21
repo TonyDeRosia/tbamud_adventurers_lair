@@ -2376,7 +2376,10 @@ ACMD(do_spellup)
       continue;
     }
     if (spell_on_cooldown(ch, spellnum)) {
-      send_to_char(ch, "That spell is still recovering.\r\n");
+      if (spellnum == SPELL_GRASP_HEART)
+        send_to_char(ch, "You have not yet recovered enough to grasp another heart.\r\n");
+      else
+        send_to_char(ch, "That spell is still recovering.\r\n");
       continue;
     }
     mana = mag_manacost(ch, spellnum);
@@ -2674,7 +2677,10 @@ ACMD(do_cast) {
     return;
   }
   if (spell_on_cooldown(ch, spellnum)) {
-    send_to_char(ch, "That spell is still recovering.\r\n");
+    if (spellnum == SPELL_GRASP_HEART)
+      send_to_char(ch, "You have not yet recovered enough to grasp another heart.\r\n");
+    else
+      send_to_char(ch, "That spell is still recovering.\r\n");
     return;
   }
   mana = mag_manacost(ch, spellnum);
