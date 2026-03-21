@@ -2825,7 +2825,7 @@ ACMD(do_affects)
     debuff_count++;
   }
 
-  if (GET_COND(ch, HUNGER) <= 0) {
+  if (GET_LEVEL(ch) < LVL_IMMORT && GET_COND(ch, HUNGER) <= 0) {
     struct aff_display_entry e;
     memset(&e, 0, sizeof(e));
     snprintf(e.name, sizeof(e.name), "hunger strain");
@@ -2840,7 +2840,7 @@ ACMD(do_affects)
     added_hidden_drain = 1;
   }
 
-  if (GET_COND(ch, THIRST) <= 0) {
+  if (GET_LEVEL(ch) < LVL_IMMORT && GET_COND(ch, THIRST) <= 0) {
     struct aff_display_entry e;
     memset(&e, 0, sizeof(e));
     snprintf(e.name, sizeof(e.name), "thirst strain");
