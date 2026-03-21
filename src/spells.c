@@ -780,6 +780,74 @@ static void apply_shadow_servant_bonuses(struct char_data *owner, struct char_da
     GET_HITROLL(mob) += 1;
 }
 
+void compute_shadow_preview_stats(struct char_data *owner, int slot, int *preview_level_out, int *preview_max_hp_out, int *preview_hitroll_out, int *preview_damroll_out, int *preview_power_out)
+{
+  mob_rnum rnum;
+  mob_vnum vnum;
+  int level = 1;
+  int max_hit = 1;
+  int hitroll = 0;
+  int damroll = 0;
+
+  if (!owner || IS_NPC(owner) || slot < 0 || slot >= MAX_SHADOW_ROSTER || !SHADOW_SLOT_OCCUPIED(owner, slot)) {
+    if (preview_level_out)
+      *preview_level_out = level;
+    if (preview_max_hp_out)
+      *preview_max_hp_out = max_hit;
+    if (preview_hitroll_out)
+      *preview_hitroll_out = hitroll;
+    if (preview_damroll_out)
+      *preview_damroll_out = damroll;
+    if (preview_power_out)
+      *preview_power_out = (level * 2) + (max_hit / 2) + (hitroll * 3) + (damroll * 2);
+    return;
+  }
+
+  level = MAX(1, SHADOW_SLOT_LEVEL(owner, slot));
+
+  if (SHADOW_SLOT_PROFILE_VALID(owner, slot)) {
+    max_hit = MAX(1, SHADOW_SLOT_MAX_HIT(owner, slot));
+    hitroll = SHADOW_SLOT_HITROLL(owner, slot);
+    damroll = SHADOW_SLOT_DAMROLL(owner, slot);
+  } else {
+    vnum = SHADOW_SLOT_VNUM(owner, slot);
+    if (real_mobile(vnum) == NOBODY)
+      vnum = MOBVNUM_SHADOW_ELITE;
+    rnum = real_mobile(vnum);
+    if (rnum != NOBODY) {
+      max_hit = MAX(1, GET_MAX_HIT(&mob_proto[rnum]));
+      hitroll = GET_HITROLL(&mob_proto[rnum]);
+      damroll = GET_DAMROLL(&mob_proto[rnum]);
+    } else {
+      max_hit = MAX(1, SHADOW_SLOT_MAX_HIT(owner, slot));
+      hitroll = SHADOW_SLOT_HITROLL(owner, slot);
+      damroll = SHADOW_SLOT_DAMROLL(owner, slot);
+    }
+  }
+
+  /* Mirror summon-time low-tier extraction tuning for display-only preview values. */
+  if (level <= 5) {
+    max_hit = MAX(max_hit, 70 + (level * 8));
+    hitroll += 5;
+  } else if (level <= 12) {
+    max_hit = MAX(max_hit, 95 + (level * 6));
+    hitroll += 3;
+  }
+  if (GET_LEVEL(owner) >= 35 && level <= 12)
+    hitroll += 1;
+
+  if (preview_level_out)
+    *preview_level_out = level;
+  if (preview_max_hp_out)
+    *preview_max_hp_out = max_hit;
+  if (preview_hitroll_out)
+    *preview_hitroll_out = hitroll;
+  if (preview_damroll_out)
+    *preview_damroll_out = damroll;
+  if (preview_power_out)
+    *preview_power_out = (level * 2) + (max_hit / 2) + (hitroll * 3) + (damroll * 2);
+}
+
 static int is_shadow_servant(struct char_data *mob, struct char_data *owner)
 {
   if (!mob || !IS_NPC(mob) || !AFF_FLAGGED(mob, AFF_CHARM) || GET_SUMMON_TIMER(mob) <= 0)

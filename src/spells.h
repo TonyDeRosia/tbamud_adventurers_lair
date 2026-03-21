@@ -590,6 +590,7 @@ int summon_stored_shadow(struct char_data *ch, int slot);
 int shadow_name_looks_valid(const char *name);
 const char *shadow_slot_display_name(struct char_data *ch, int slot);
 void apply_shadow_identity_to_mob(struct char_data *owner, struct char_data *mob, int slot);
+void compute_shadow_preview_stats(struct char_data *owner, int slot, int *preview_level_out, int *preview_max_hp_out, int *preview_hitroll_out, int *preview_damroll_out, int *preview_power_out);
 int shadow_active_count(struct char_data *ch);
 int shadow_max_active_count(struct char_data *ch);
 bool shadow_can_summon_more(struct char_data *ch, char *reason, size_t reason_sz);
