@@ -2200,7 +2200,7 @@ void hit(struct char_data *ch, struct char_data *victim, int type)
       } else {
         unarmed_base_roll = dice(MIN(4, 1 + (GET_LEVEL(ch) / 30)),
                                  MIN(7, 2 + (GET_LEVEL(ch) / 20)));
-        unarmed_level_scaling_bonus = MAX(0, GET_LEVEL(ch) / 25);
+        unarmed_level_scaling_bonus = MAX(0, GET_LEVEL(ch) / 30);
         dam += unarmed_base_roll + unarmed_level_scaling_bonus;
       }
     }
