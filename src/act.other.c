@@ -295,41 +295,6 @@ static void shadow_sync_active_flags(struct char_data *ch)
   }
 }
 
-static void shadow_slot_effective_combat_stats(struct char_data *ch, int slot, int *level_out, int *max_hit_out, int *hitroll_out, int *damroll_out, int *power_out)
-{
-  int level, max_hit, hitroll, damroll;
-
-  if (!ch || slot < 0 || slot >= MAX_SHADOW_ROSTER || !SHADOW_SLOT_OCCUPIED(ch, slot))
-    return;
-
-  level = MAX(1, SHADOW_SLOT_LEVEL(ch, slot));
-  max_hit = MAX(1, SHADOW_SLOT_MAX_HIT(ch, slot));
-  hitroll = SHADOW_SLOT_HITROLL(ch, slot);
-  damroll = SHADOW_SLOT_DAMROLL(ch, slot);
-
-  /* Keep display values aligned with summon-time shadow servant tuning. */
-  if (level <= 5) {
-    max_hit = MAX(max_hit, 70 + (level * 8));
-    hitroll += 5;
-  } else if (level <= 12) {
-    max_hit = MAX(max_hit, 95 + (level * 6));
-    hitroll += 3;
-  }
-  if (!IS_NPC(ch) && GET_LEVEL(ch) >= 35 && level <= 12)
-    hitroll += 1;
-
-  if (level_out)
-    *level_out = level;
-  if (max_hit_out)
-    *max_hit_out = max_hit;
-  if (hitroll_out)
-    *hitroll_out = hitroll;
-  if (damroll_out)
-    *damroll_out = damroll;
-  if (power_out)
-    *power_out = (level * 2) + (max_hit / 2) + (hitroll * 3) + (damroll * 2);
-}
-
 static int ability_matches_filter(struct char_data *ch, int ability, const char *filter, int show_spells)
 {
   const struct spell_info_type *si = &spell_info[ability];
@@ -2199,8 +2164,6 @@ ACMD(do_shadow)
   shadow_sync_active_flags(ch);
 
   if (!*shadow_subcmd || is_abbrev(shadow_subcmd, "list") || is_abbrev(shadow_subcmd, "storage")) {
-    int display_level, display_hp, display_hitroll, display_power;
-
     for (i = 0; i < cap; i++) {
       if (SHADOW_SLOT_OCCUPIED(ch, i)) {
         used++;
@@ -2218,23 +2181,14 @@ ACMD(do_shadow)
       for (i = 0; i < cap; i++) {
         if (!SHADOW_SLOT_OCCUPIED(ch, i))
           send_to_char(ch, " [%2d] %s[Empty]%s\r\n", i + 1, CCGRN(ch, C_NRM), CCNRM(ch, C_NRM));
-        else {
-          display_level = MAX(1, SHADOW_SLOT_LEVEL(ch, i));
-          display_hp = MAX(1, SHADOW_SLOT_MAX_HIT(ch, i));
-          display_hitroll = SHADOW_SLOT_HITROLL(ch, i);
-          display_power = (display_level * 2) + (display_hp / 2) + (display_hitroll * 3) + (SHADOW_SLOT_DAMROLL(ch, i) * 2);
-          shadow_slot_effective_combat_stats(ch, i, &display_level, &display_hp, &display_hitroll, NULL, &display_power);
-          send_to_char(ch, " [%2d] %s[Shadow: %-30.30s]%s Lvl %-3d [Power:%-3d] [HP:%-3d] [Hit:%+d] %s%s%s\r\n",
+        else
+          send_to_char(ch, " [%2d] %s[Shadow: %-30.30s]%s Lvl %-3d %s%s%s\r\n",
                        i + 1,
                        CCYEL(ch, C_NRM), shadow_slot_display_name(ch, i), CCNRM(ch, C_NRM),
-                       display_level,
-                       display_power,
-                       display_hp,
-                       display_hitroll,
+                       SHADOW_SLOT_LEVEL(ch, i),
                        SHADOW_SLOT_ACTIVE(ch, i) ? CCGRN(ch, C_NRM) : "",
                        SHADOW_SLOT_ACTIVE(ch, i) ? "[Active]" : "[Stored]",
                        SHADOW_SLOT_ACTIVE(ch, i) ? CCNRM(ch, C_NRM) : "");
-        }
       }
     }
     send_to_char(ch, "Commands:\r\n");
