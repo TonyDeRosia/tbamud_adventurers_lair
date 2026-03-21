@@ -615,15 +615,22 @@ int shadow_name_looks_valid(const char *name)
 
 static void replace_mobile_string_safe(struct char_data *mob, char **field, const char *new_value, const char *proto_value)
 {
+  char value_buf[MAX_STRING_LENGTH];
+
   if (!mob || !field)
     return;
+
+  if (new_value && *new_value)
+    strlcpy(value_buf, new_value, sizeof(value_buf));
+  else
+    value_buf[0] = '\0';
 
   if (*field && *field != proto_value)
     free(*field);
   *field = NULL;
 
-  if (new_value && *new_value)
-    *field = strdup(new_value);
+  if (*value_buf)
+    *field = strdup(value_buf);
 }
 
 const char *shadow_slot_display_name(struct char_data *ch, int slot)
@@ -657,9 +664,14 @@ const char *shadow_slot_display_name(struct char_data *ch, int slot)
 
 static void apply_shadow_identity_to_mob_name(struct char_data *mob, const char *identity_name)
 {
+  char keywords_buf[MAX_STRING_LENGTH];
   char long_buf[MAX_STRING_LENGTH];
+  size_t out_len = 0;
+  int prev_space = TRUE;
+  const char *src;
   mob_rnum rnum;
   const char *safe_name;
+  const char *proto_name = NULL;
   const char *proto_short = NULL;
   const char *proto_long = NULL;
 
@@ -669,10 +681,30 @@ static void apply_shadow_identity_to_mob_name(struct char_data *mob, const char 
   safe_name = shadow_name_looks_valid(identity_name) ? identity_name : "a shadow";
   rnum = GET_MOB_RNUM(mob);
   if (rnum != NOBODY) {
+    proto_name = mob_proto[rnum].player.name;
     proto_short = mob_proto[rnum].player.short_descr;
     proto_long = mob_proto[rnum].player.long_descr;
   }
 
+  keywords_buf[0] = '\0';
+  for (src = safe_name; *src && out_len + 1 < sizeof(keywords_buf); src++) {
+    unsigned char c = (unsigned char)*src;
+
+    if (isalnum(c)) {
+      keywords_buf[out_len++] = LOWER(c);
+      prev_space = FALSE;
+    } else if (!prev_space) {
+      keywords_buf[out_len++] = ' ';
+      prev_space = TRUE;
+    }
+  }
+  while (out_len > 0 && keywords_buf[out_len - 1] == ' ')
+    out_len--;
+  keywords_buf[out_len] = '\0';
+  if (!*keywords_buf)
+    strlcpy(keywords_buf, "shadow", sizeof(keywords_buf));
+
+  replace_mobile_string_safe(mob, &mob->player.name, keywords_buf, proto_name);
   replace_mobile_string_safe(mob, &mob->player.short_descr, safe_name, proto_short);
 
   snprintf(long_buf, sizeof(long_buf), "%s stands here.\r\n", safe_name);

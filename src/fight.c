@@ -80,6 +80,7 @@ static void perform_group_gain(struct char_data *ch, int base, struct char_data 
 static int count_live_mobs_by_vnum(mob_vnum vnum);
 static int rare_kill_bonus_for_count(int live_count);
 static int rare_kill_bonus_for_victim(struct char_data *victim);
+static struct char_data *resolve_reward_killer(struct char_data *killer);
 static void dam_message(int dam, struct char_data *ch, struct char_data *victim, int w_type);
 static void make_corpse(struct char_data *ch);
 static void process_round_effects(void);
@@ -1066,7 +1067,7 @@ void die(struct char_data * ch, struct char_data * killer)
       char buf[64];
       format_gold_as_currency(buf, sizeof(buf), gold_gain);
       increase_money_gold(killer, gold_gain);
-      send_to_char(killer, "You receive \ty%s\tn from the kill.\r\n", buf);
+      send_to_char(killer, "You receive \tY%s\tn \tygold\tn from the kill.\r\n", buf);
     }
 
     /* prevent corpse gold duplication */
@@ -1092,14 +1093,14 @@ static void perform_group_gain(struct char_data *ch, int base,
     share = MIN(CONFIG_MAX_EXP_GAIN, MAX(1, hap_share));
   }
   if (share > 1)
-    send_to_char(ch, "You receive your share of \tYexperience\tn -- \ty%d\tn points.\r\n", share);
+    send_to_char(ch, "You receive your share of \tCexperience\tn -- \ty%d\tn points.\r\n", share);
   else
     send_to_char(ch, "You receive your share of experience -- one measly little point!\r\n");
 
   rare_bonus = rare_kill_bonus_for_victim(victim);
   if (rare_bonus > 0) {
     share += rare_bonus;
-    send_to_char(ch, "You receive \ty%d\tn '\tyrare kill\tn' \tYexperience\tn bonus.\r\n", rare_bonus);
+    send_to_char(ch, "You receive \ty%d\tn '\tcRare Kill\tn' \tCexperience\tn bonus.\r\n", rare_bonus);
   }
 
   gain_exp(ch, share);
@@ -1152,14 +1153,14 @@ static void solo_gain(struct char_data *ch, struct char_data *victim)
   }
 
   if (exp > 1)
-    send_to_char(ch, "You receive \ty%d\tn \tYexperience\tn points.\r\n", exp);
+    send_to_char(ch, "You receive \ty%d\tn \tCexperience\tn points.\r\n", exp);
   else
     send_to_char(ch, "You receive one lousy experience point.\r\n");
 
   rare_bonus = rare_kill_bonus_for_victim(victim);
   if (rare_bonus > 0) {
     exp += rare_bonus;
-    send_to_char(ch, "You receive \ty%d\tn '\tyrare kill\tn' \tYexperience\tn bonus.\r\n", rare_bonus);
+    send_to_char(ch, "You receive \ty%d\tn '\tcRare Kill\tn' \tCexperience\tn bonus.\r\n", rare_bonus);
   }
 
   gain_exp(ch, exp);
@@ -1200,6 +1201,26 @@ static int rare_kill_bonus_for_victim(struct char_data *victim)
     return 0;
 
   return rare_kill_bonus_for_count(count_live_mobs_by_vnum(GET_MOB_VNUM(victim)));
+}
+
+static struct char_data *resolve_reward_killer(struct char_data *killer)
+{
+  int hops = 0;
+  struct char_data *iter = killer;
+
+  if (!killer)
+    return NULL;
+  if (!IS_NPC(killer))
+    return killer;
+
+  while (iter && iter->master && hops < 20) {
+    iter = iter->master;
+    if (iter && !IS_NPC(iter))
+      return iter;
+    hops++;
+  }
+
+  return killer;
 }
 
 static char *replace_string(const char *str, const char *weapon_singular, const char *weapon_plural)
@@ -1969,6 +1990,8 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
 
   /* Uh oh.  Victim died. */
   if (GET_POS(victim) == POS_DEAD) {
+    struct char_data *reward_killer = resolve_reward_killer(ch);
+
     if (ch != victim && ch && !IS_NPC(ch) &&
         GET_SKILL(ch, SKILL_TACTICAL_SPELL_MEMORY) > 0 &&
         attacktype > 0 && attacktype <= MAX_SPELLS) {
@@ -1977,11 +2000,12 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
       send_to_char(ch, "You retain tactical spell memory and recover %d mana.\r\n", mana_refund);
     }
 
-    if (ch != victim && (IS_NPC(victim) || victim->desc)) {
-      if (GROUP(ch))
-	group_gain(ch, victim);
+    if (reward_killer && reward_killer != victim && !IS_NPC(reward_killer) &&
+        (IS_NPC(victim) || victim->desc)) {
+      if (GROUP(reward_killer))
+	group_gain(reward_killer, victim);
       else
-        solo_gain(ch, victim);
+        solo_gain(reward_killer, victim);
     }
 
     if (!IS_NPC(victim)) {
@@ -1990,8 +2014,8 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
       if (MOB_FLAGGED(ch, MOB_MEMORY))
         forget(ch, victim);
     }
-    if (ch != victim)
-      grant_glory_for_kill(ch, victim);
+    if (reward_killer && reward_killer != victim)
+      grant_glory_for_kill(reward_killer, victim);
     /* Cant determine GET_GOLD on corpse, so do now and store */
     if (IS_NPC(victim)) {
       if ((IS_HAPPYHOUR) && (IS_HAPPYGOLD))
@@ -2004,22 +2028,22 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
       sprintf(local_buf,"%ld", (long)local_gold);
     }
 
-    die(victim, ch);
-    if (GROUP(ch) && (local_gold > 0) && PRF_FLAGGED(ch, PRF_AUTOSPLIT) ) {
-      generic_find("corpse", FIND_OBJ_ROOM, ch, &tmp_char, &corpse_obj);
+    die(victim, reward_killer);
+    if (reward_killer && GROUP(reward_killer) && (local_gold > 0) && PRF_FLAGGED(reward_killer, PRF_AUTOSPLIT) ) {
+      generic_find("corpse", FIND_OBJ_ROOM, reward_killer, &tmp_char, &corpse_obj);
       if (corpse_obj) {
-        do_get(ch, "all.coin corpse", 0, 0);
-        do_split(ch, local_buf, 0, 0);
+        do_get(reward_killer, "all.coin corpse", 0, 0);
+        do_split(reward_killer, local_buf, 0, 0);
       }
       /* need to remove the gold from the corpse */
-    } else if (!IS_NPC(ch) && (ch != victim) && PRF_FLAGGED(ch, PRF_AUTOGOLD)) {
-      do_get(ch, "all.coin corpse", 0, 0);
+    } else if (reward_killer && !IS_NPC(reward_killer) && (reward_killer != victim) && PRF_FLAGGED(reward_killer, PRF_AUTOGOLD)) {
+      do_get(reward_killer, "all.coin corpse", 0, 0);
     }
-    if (!IS_NPC(ch) && (ch != victim) && PRF_FLAGGED(ch, PRF_AUTOLOOT)) {
-      do_get(ch, "all corpse", 0, 0);
+    if (reward_killer && !IS_NPC(reward_killer) && (reward_killer != victim) && PRF_FLAGGED(reward_killer, PRF_AUTOLOOT)) {
+      do_get(reward_killer, "all corpse", 0, 0);
     }
-    if (IS_NPC(victim) && !IS_NPC(ch) && PRF_FLAGGED(ch, PRF_AUTOSAC)) {
-      do_sac(ch,"corpse",0,0);
+    if (reward_killer && IS_NPC(victim) && !IS_NPC(reward_killer) && PRF_FLAGGED(reward_killer, PRF_AUTOSAC)) {
+      do_sac(reward_killer,"corpse",0,0);
     }
     return (-1);
   }
