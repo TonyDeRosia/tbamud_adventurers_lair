@@ -131,6 +131,7 @@ ACMD(do_smartspawn);
 ACMD(do_aistate);
 ACMD(do_aictl);
 ACMD(do_heel);
+ACMD(do_areatemplate);
 
 
 #endif /* _INTERPRETER_H_ */
