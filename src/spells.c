@@ -3113,7 +3113,7 @@ ASPELL(spell_greater_teleportation)
 }
 ASPELL(spell_silent_magic) { if (ch) spell_apply_modifier(ch, SPELL_SILENT_MAGIC, spell_dur_short_manual(level), APPLY_NONE, 1); }
 ASPELL(spell_triple_maximize_magic) { if (ch) spell_apply_modifier(ch, SPELL_TRIPLE_MAXIMIZE_MAGIC, 1, APPLY_NONE, 1); }
-ASPELL(spell_pantheon) { if (!ch) return; spell_apply_modifier(ch, SPELL_PANTHEON, spell_dur_medium_manual(level), APPLY_SAVING_SPELL, 6); spell_apply_modifier(ch, SPELL_PANTHEON, spell_dur_medium_manual(level), APPLY_AC, 15); spell_apply_modifier(ch, SPELL_PANTHEON, spell_dur_medium_manual(level), APPLY_NONE, 1); }
+ASPELL(spell_pantheon) { if (!ch) return; spell_apply_modifier(ch, SPELL_PANTHEON, spell_dur_medium_manual(level), APPLY_SAVING_SPELL, -6); spell_apply_modifier(ch, SPELL_PANTHEON, spell_dur_medium_manual(level), APPLY_AC, 15); spell_apply_modifier(ch, SPELL_PANTHEON, spell_dur_medium_manual(level), APPLY_NONE, 1); }
 ASPELL(spell_dimensional_lock) { if (ch && IN_ROOM(ch) != NOWHERE) room_add_effect(&world[IN_ROOM(ch)], ROOM_EFFECT_DIMENSIONAL_LOCK, spell_dur_medium_manual(level), 0); }
 
 ASPELL(spell_shadow_bind) { if (!ch || !victim) return; if (!mag_savingthrow(victim, SAVING_SPELL, 0)) { spell_apply_flag(victim, SPELL_SHADOW_BIND, spell_dur_medium_manual(level), AFF_ROOTED); spell_apply_modifier(victim, SPELL_SHADOW_BIND, spell_dur_medium_manual(level), APPLY_DEX, -2); } else spell_apply_flag(victim, SPELL_SHADOW_BIND, 1, AFF_ROOTED); act("Your shadow lashes out and binds $N in place!", FALSE, ch, 0, victim, TO_CHAR); act("Shadowy tendrils rise and bind your limbs!", FALSE, ch, 0, victim, TO_VICT); act("$n's shadow erupts and binds $N!", FALSE, ch, 0, victim, TO_NOTVICT); }

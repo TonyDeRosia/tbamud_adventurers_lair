@@ -1869,6 +1869,15 @@ ACMD(do_score)
     int b_wis = ch->real_abils.wis;
     int b_cha = ch->real_abils.cha;
 
+    if (!IS_NPC(ch)) {
+      b_str += race_abil_bonus(GET_RACE(ch), 0);
+      b_dex += race_abil_bonus(GET_RACE(ch), 1);
+      b_con += race_abil_bonus(GET_RACE(ch), 2);
+      b_int += race_abil_bonus(GET_RACE(ch), 3);
+      b_wis += race_abil_bonus(GET_RACE(ch), 4);
+      b_cha += race_abil_bonus(GET_RACE(ch), 5);
+    }
+
     int m_str = ch->aff_abils.str - b_str;
     int m_dex = ch->aff_abils.dex - b_dex;
     int m_con = ch->aff_abils.con - b_con;
