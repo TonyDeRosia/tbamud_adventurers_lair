@@ -211,7 +211,7 @@ static int should_owned_follower_auto_assist(struct char_data *owner, struct cha
     return FALSE;
 
   /* Keep existing incapacity checks aligned with combat eligibility. */
-  if (GET_POS(follower) < POS_FIGHTING ||
+  if (GET_POS(follower) < POS_STANDING ||
       AFF_FLAGGED(follower, AFF_STUNNED) ||
       AFF_FLAGGED(follower, AFF_FEARFUL) ||
       AFF_FLAGGED(follower, AFF_ROOTED))
@@ -226,6 +226,7 @@ static int should_owned_follower_auto_assist(struct char_data *owner, struct cha
 static void auto_assist_owned_followers(struct char_data *owner)
 {
   struct follow_type *f;
+  int assist_fired = FALSE;
 
   if (!owner || !FIGHTING(owner))
     return;
@@ -238,6 +239,13 @@ static void auto_assist_owned_followers(struct char_data *owner)
 
     /* Resolve target from the follower's current room via assist helper. */
     do_assist(f->follower, GET_NAME(owner), 0, 0);
+    assist_fired = TRUE;
+  }
+
+  if (assist_fired && CONFIG_DEBUG_MODE >= NRM && GET_LEVEL(owner) >= LVL_BUILDER) {
+    send_to_char(owner,
+      "\t1Combat Debug:\r\n"
+      "   \t2Summon Auto-aid:\t3fired\tn\r\n");
   }
 }
 
@@ -615,8 +623,13 @@ int compute_offensive_hit_value(struct char_data *ch, struct char_data *victim)
   int level_gap_bonus = 0;
   int situational_bonus = 0;
 
-  if (victim)
-    level_gap_bonus = (GET_LEVEL(ch) - GET_LEVEL(victim)) / 2;
+  if (victim) {
+    int level_gap = GET_LEVEL(ch) - GET_LEVEL(victim);
+    if (level_gap > 0)
+      level_gap_bonus = (level_gap / 2) + (level_gap / 4);
+    else if (level_gap < 0)
+      level_gap_bonus = level_gap / 3;
+  }
 
   if (victim && AFF_FLAGGED(ch, AFF_TRUESIGHT) &&
       (AFF_FLAGGED(victim, AFF_INVISIBLE) || AFF_FLAGGED(victim, AFF_HIDE)))
@@ -2082,7 +2095,12 @@ void hit(struct char_data *ch, struct char_data *victim, int type)
   hitroll_bonus = GET_HITROLL(ch);
   stat_bonus = str_app[STRENGTH_APPLY_INDEX(ch)].tohit;
   mental_bonus = (GET_INT(ch) - 10) / 4 + (GET_WIS(ch) - 10) / 4;
-  level_gap_bonus = (attacker_level - victim_level) / 2;
+  if (attacker_level > victim_level)
+    level_gap_bonus = ((attacker_level - victim_level) / 2) + ((attacker_level - victim_level) / 4);
+  else if (attacker_level < victim_level)
+    level_gap_bonus = (attacker_level - victim_level) / 3;
+  else
+    level_gap_bonus = 0;
   situational_bonus = (AFF_FLAGGED(ch, AFF_TRUESIGHT) &&
       (AFF_FLAGGED(victim, AFF_INVISIBLE) || AFF_FLAGGED(victim, AFF_HIDE))) ? 6 : 0;
 
@@ -2126,21 +2144,41 @@ void hit(struct char_data *ch, struct char_data *victim, int type)
     dam = str_app[STRENGTH_APPLY_INDEX(ch)].todam;
     dam += GET_DAMROLL(ch);
 
+    {
+    int unarmed_base_roll = 0;
+    int unarmed_level_scaling_bonus = 0;
+    int level_gap_damage_bonus = 0;
+
     /* Maybe holding arrow? */
     if (wielded && GET_OBJ_TYPE(wielded) == ITEM_WEAPON) {
       /* Add weapon-based damage if a weapon is being wielded */
       dam += dice(GET_OBJ_VAL(wielded, 1), GET_OBJ_VAL(wielded, 2));
     } else {
       /* If no weapon, add bare hand damage instead */
-        if (IS_NPC(ch))
-          dam += dice(ch->mob_specials.damnodice, ch->mob_specials.damsizedice);
-        else
-          dam += dice(MIN(4, 1 + (GET_LEVEL(ch) / 30)),
-                      MIN(7, 2 + (GET_LEVEL(ch) / 20)));
+      if (IS_NPC(ch)) {
+        unarmed_base_roll = dice(ch->mob_specials.damnodice, ch->mob_specials.damsizedice);
+        dam += unarmed_base_roll;
+      } else {
+        unarmed_base_roll = dice(MIN(4, 1 + (GET_LEVEL(ch) / 30)),
+                                 MIN(7, 2 + (GET_LEVEL(ch) / 20)));
+        unarmed_level_scaling_bonus = MAX(0, GET_LEVEL(ch) / 25);
+        dam += unarmed_base_roll + unarmed_level_scaling_bonus;
+      }
     }
 
-    if (victim && GET_LEVEL(ch) > GET_LEVEL(victim))
-      dam += MAX(1, (GET_LEVEL(ch) - GET_LEVEL(victim)) / 8);
+    if (victim && GET_LEVEL(ch) > GET_LEVEL(victim)) {
+      level_gap_damage_bonus = MAX(1, (GET_LEVEL(ch) - GET_LEVEL(victim)) / 6);
+      dam += level_gap_damage_bonus;
+    }
+
+    if (CONFIG_DEBUG_MODE >= NRM && GET_LEVEL(ch) >= LVL_BUILDER)
+      send_to_char(ch,
+        "\t1Combat Debug:\r\n"
+        "   \t2Unarmed Base Damage Roll:\t3%d\r\n"
+        "   \t2Unarmed Level Scaling Bonus:\t3%d\r\n"
+        "   \t2Level-gap Damage Bonus:\t3%d\tn\r\n",
+        unarmed_base_roll, unarmed_level_scaling_bonus, level_gap_damage_bonus);
+    }
 
     /* Include a damage multiplier if victim isn't ready to fight:
      * Position sitting  1.33 x normal
