@@ -410,28 +410,27 @@ void clanedit_parse(struct descriptor_data *d, char *arg);
 /* Character equipment positions: used as index for char_data.equipment[] */
 /* NOTE: Don't confuse these constants with the ITEM_ bitvectors
  which control the valid places you can wear a piece of equipment.
- For example, there are two neck positions on the player, and items
- only get the generic neck type. */
+ For example, there are two finger and wrist positions on the player,
+ and items only get the generic finger/wrist type. */
 #define WEAR_LIGHT      0  /**< Equipment Location Light */
 #define WEAR_FINGER_R   1  /**< Equipment Location Right Finger */
 #define WEAR_FINGER_L   2  /**< Equipment Location Left Finger */
-#define WEAR_NECK_1     3  /**< Equipment Location Neck #1 */
-#define WEAR_NECK_2     4  /**< Equipment Location Neck #2 */
-#define WEAR_BODY       5  /**< Equipment Location Body */
-#define WEAR_HEAD       6  /**< Equipment Location Head */
-#define WEAR_LEGS       7  /**< Equipment Location Legs */
-#define WEAR_FEET       8  /**< Equipment Location Feet */
-#define WEAR_HANDS      9  /**< Equipment Location Hands */
-#define WEAR_ARMS      10  /**< Equipment Location Arms */
-#define WEAR_SHIELD    11  /**< Equipment Location Shield */
-#define WEAR_ABOUT     12  /**< Equipment Location about body (like a cape)*/
-#define WEAR_WAIST     13  /**< Equipment Location Waist */
-#define WEAR_WRIST_R   14  /**< Equipment Location Right Wrist */
-#define WEAR_WRIST_L   15  /**< Equipment Location Left Wrist */
-#define WEAR_WIELD     16  /**< Equipment Location Weapon */
-#define WEAR_HOLD      17  /**< Equipment Location held in offhand */
+#define WEAR_NECK_1     3  /**< Equipment Location Neck */
+#define WEAR_BODY       4  /**< Equipment Location Body */
+#define WEAR_HEAD       5  /**< Equipment Location Head */
+#define WEAR_LEGS       6  /**< Equipment Location Legs */
+#define WEAR_FEET       7  /**< Equipment Location Feet */
+#define WEAR_HANDS      8  /**< Equipment Location Hands */
+#define WEAR_ARMS       9  /**< Equipment Location Arms */
+#define WEAR_SHIELD    10  /**< Equipment Location Shield */
+#define WEAR_ABOUT     11  /**< Equipment Location about body (like a cape)*/
+#define WEAR_WAIST     12  /**< Equipment Location Waist */
+#define WEAR_WRIST_R   13  /**< Equipment Location Right Wrist */
+#define WEAR_WRIST_L   14  /**< Equipment Location Left Wrist */
+#define WEAR_WIELD     15  /**< Equipment Location Weapon */
+#define WEAR_HOLD      16  /**< Equipment Location held in offhand */
 /** Total number of available equipment lcoations */
-#define NUM_WEARS      18
+#define NUM_WEARS      17
 
 /* object-related defines */
 /* Item types: used by obj_data.obj_flags.type_flag */
