@@ -21929,5 +21929,46 @@ Minimum level:
   LVL_BUILDER
 #0
 
+MOBTEMPLATE
+
+MOBTEMPLATE
+
+Usage:
+  mobtemplate <start_mob_vnum> <min_level> <max_level> <mob_count> "<base name>"
+
+Description:
+  Creates a batch of new template mob prototypes.
+
+  This command will:
+  - create new mob prototypes in sequence starting at the given mob vnum
+  - assign levels evenly across the requested level range
+  - generate default keywords and descriptions from the given base name
+  - assign safe starter stats and flags
+
+  The resulting mobs are templates intended for builders to customize.
+
+Arguments:
+  start_mob_vnum   The first mob vnum to use
+  min_level        Minimum generated mob level
+  max_level        Maximum generated mob level
+  mob_count        Number of mobs to create
+  "base name"      Base thematic name for generated mob strings
+
+Notes:
+  - The command will fail if any mob in the requested range already exists.
+  - The command does not place mobs into rooms.
+  - The command does not create zone resets.
+  - Generated mobs should be reviewed and customized by builders.
+
+Example:
+  mobtemplate 8000 10 15 8 "bandit"
+
+See also:
+  MEDIT ZEDIT AREATEMPLATE
+
+Minimum level:
+  LVL_BUILDER
+#0
+
 $
 #0

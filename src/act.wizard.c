@@ -29,6 +29,7 @@
 #include "class.h"
 #include "genolc.h"
 #include "genobj.h"
+#include "genmob.h"
 #include "race.h"
 #include "fight.h"
 #include "house.h"
@@ -76,6 +77,22 @@ static bool parse_areatemplate_args(char *argument, zone_vnum *zone_vnum_out, ro
 static int areatemplate_cell_to_vnum(room_vnum start, int room_count, int width, int x, int y, room_vnum *out_vnum);
 static int link_areatemplate_rooms(room_vnum start, int room_count, int width, int height);
 static void free_areatemplate_room_strings(struct room_data *room);
+static int mobtemplate_compute_level(int min_level, int max_level, int mob_count, int index);
+static bool parse_mobtemplate_args(char *argument, mob_vnum *start_vnum_out, int *min_level_out,
+                                   int *max_level_out, int *mob_count_out,
+                                   char *base_name_out, size_t base_name_sz);
+static bool mobtemplate_range_is_clear(mob_vnum start, int mob_count, char *errmsg, size_t errmsg_sz);
+static bool mobtemplate_builder_can_edit_range(struct char_data *ch, mob_vnum start, int mob_count,
+                                               char *errmsg, size_t errmsg_sz);
+static void mobtemplate_build_strings(const char *base_name, int number,
+                                      char *keywords, size_t ksz,
+                                      char *shortd, size_t ssz,
+                                      char *longd, size_t lsz,
+                                      char *desc, size_t dsz);
+static bool mobtemplate_create_one(mob_vnum vnum, const char *base_name, int number, int level,
+                                   char *errmsg, size_t errmsg_sz);
+static bool mobtemplate_save_affected_zones(struct char_data *ch, mob_vnum start, int mob_count,
+                                            char *errmsg, size_t errmsg_sz);
 
 /* Local Globals */
 static struct recent_player *recent_list = NULL;  /** Global list of recent players */
@@ -5545,6 +5562,349 @@ static void free_areatemplate_room_strings(struct room_data *room)
     free(room->description);
   room->name = NULL;
   room->description = NULL;
+}
+
+static int mobtemplate_compute_level(int min_level, int max_level, int mob_count, int index)
+{
+  if (mob_count <= 1)
+    return min_level;
+
+  return min_level + ((index * (max_level - min_level)) / (mob_count - 1));
+}
+
+static bool parse_mobtemplate_args(char *argument, mob_vnum *start_vnum_out, int *min_level_out,
+                                   int *max_level_out, int *mob_count_out,
+                                   char *base_name_out, size_t base_name_sz)
+{
+  char start_arg[MAX_INPUT_LENGTH];
+  char min_arg[MAX_INPUT_LENGTH];
+  char max_arg[MAX_INPUT_LENGTH];
+  char count_arg[MAX_INPUT_LENGTH];
+  char *p, *q;
+  size_t len;
+
+  argument = one_argument(argument, start_arg);
+  argument = one_argument(argument, min_arg);
+  argument = one_argument(argument, max_arg);
+  argument = one_argument(argument, count_arg);
+  skip_spaces(&argument);
+
+  if (!*start_arg || !*min_arg || !*max_arg || !*count_arg || !*argument)
+    return FALSE;
+  if (!is_number(start_arg) || !is_number(min_arg) || !is_number(max_arg) || !is_number(count_arg))
+    return FALSE;
+
+  *start_vnum_out = atoi(start_arg);
+  *min_level_out = atoi(min_arg);
+  *max_level_out = atoi(max_arg);
+  *mob_count_out = atoi(count_arg);
+
+  p = argument;
+  if (*p != '\"')
+    return FALSE;
+  p++;
+  q = strrchr(p, '\"');
+  if (!q)
+    return FALSE;
+  {
+    char *trail = q + 1;
+    while (*trail && isspace(*trail))
+      trail++;
+    if (*trail)
+      return FALSE;
+  }
+  *q = '\0';
+
+  while (*p && isspace(*p))
+    p++;
+  len = strlen(p);
+  while (len > 0 && isspace(p[len - 1])) {
+    p[len - 1] = '\0';
+    len--;
+  }
+
+  if (!*p)
+    return FALSE;
+
+  strlcpy(base_name_out, p, base_name_sz);
+  return TRUE;
+}
+
+static bool mobtemplate_range_is_clear(mob_vnum start, int mob_count, char *errmsg, size_t errmsg_sz)
+{
+  int i;
+
+  for (i = 0; i < mob_count; i++) {
+    mob_vnum vnum = start + i;
+
+    if (real_mobile(vnum) != NOBODY) {
+      snprintf(errmsg, errmsg_sz, "Mob vnum %d already exists.\r\n", vnum);
+      return FALSE;
+    }
+  }
+
+  return TRUE;
+}
+
+static bool mobtemplate_builder_can_edit_range(struct char_data *ch, mob_vnum start, int mob_count,
+                                               char *errmsg, size_t errmsg_sz)
+{
+  int i;
+
+  for (i = 0; i < mob_count; i++) {
+    mob_vnum vnum = start + i;
+    zone_rnum rznum = real_zone_by_thing(vnum);
+
+    if (rznum == NOWHERE) {
+      snprintf(errmsg, errmsg_sz, "Mob vnum %d does not belong to a valid editable zone.\r\n", vnum);
+      return FALSE;
+    }
+
+    if (!can_edit_zone(ch, rznum)) {
+      snprintf(errmsg, errmsg_sz, "You are not allowed to create mobs in that vnum range.\r\n");
+      return FALSE;
+    }
+  }
+
+  return TRUE;
+}
+
+static void mobtemplate_build_strings(const char *base_name, int number,
+                                      char *keywords, size_t ksz,
+                                      char *shortd, size_t ssz,
+                                      char *longd, size_t lsz,
+                                      char *desc, size_t dsz)
+{
+  snprintf(keywords, ksz, "template %s mob %d", base_name, number);
+  snprintf(shortd, ssz, "a template %s %d", base_name, number);
+  snprintf(longd, lsz, "A template %s %d stands here awaiting builder customization.\r\n",
+           base_name, number);
+  snprintf(desc, dsz,
+           "This mob was generated by the mobtemplate command.\r\n"
+           "Builders should customize its keywords, descriptions, stats, flags, and behavior.\r\n");
+}
+
+static bool mobtemplate_create_one(mob_vnum vnum, const char *base_name, int number, int level,
+                                   char *errmsg, size_t errmsg_sz)
+{
+  struct char_data mob;
+  char keywords[MAX_INPUT_LENGTH];
+  char shortd[MAX_INPUT_LENGTH];
+  char longd[MAX_STRING_LENGTH];
+  char desc[MAX_STRING_LENGTH];
+  int new_rnum;
+
+  memset(&mob, 0, sizeof(mob));
+  clear_char(&mob);
+  mob.player_specials = &dummy_mob;
+
+  GET_HIT(&mob) = 1;
+  GET_MANA(&mob) = 1;
+  GET_MAX_MANA(&mob) = 100;
+  GET_MAX_MOVE(&mob) = 100;
+  GET_NDD(&mob) = 1;
+  GET_SDD(&mob) = 1;
+  GET_WEIGHT(&mob) = 200;
+  GET_HEIGHT(&mob) = 198;
+  GET_PET_PRICE(&mob) = 0;
+  mob.real_abils.str = mob.real_abils.intel = mob.real_abils.wis = 11;
+  mob.real_abils.dex = mob.real_abils.con = mob.real_abils.cha = 11;
+  mob.aff_abils = mob.real_abils;
+  GET_SAVE(&mob, SAVING_PARA) = 0;
+  GET_SAVE(&mob, SAVING_ROD) = 0;
+  GET_SAVE(&mob, SAVING_PETRI) = 0;
+  GET_SAVE(&mob, SAVING_BREATH) = 0;
+  GET_SAVE(&mob, SAVING_SPELL) = 0;
+  SET_BIT_AR(MOB_FLAGS(&mob), MOB_ISNPC);
+
+  mobtemplate_build_strings(base_name, number, keywords, sizeof(keywords), shortd, sizeof(shortd),
+                            longd, sizeof(longd), desc, sizeof(desc));
+
+  GET_ALIAS(&mob) = strdup(keywords);
+  GET_SDESC(&mob) = strdup(shortd);
+  GET_LDESC(&mob) = strdup(longd);
+  GET_DDESC(&mob) = strdup(desc);
+  if (!GET_ALIAS(&mob) || !GET_SDESC(&mob) || !GET_LDESC(&mob) || !GET_DDESC(&mob)) {
+    free_mobile_strings(&mob);
+    snprintf(errmsg, errmsg_sz, "Failed to allocate mob strings for vnum %d.\r\n", vnum);
+    return FALSE;
+  }
+
+  GET_LEVEL(&mob) = level;
+  GET_SEX(&mob) = SEX_NEUTRAL;
+  GET_CLASS(&mob) = CLASS_OTHER;
+  GET_RACE(&mob) = RACE_UNDEFINED;
+  GET_POS(&mob) = POS_STANDING;
+  GET_DEFAULT_POS(&mob) = POS_STANDING;
+  GET_ATTACK(&mob) = TYPE_HIT - TYPE_HIT;
+  GET_ALIGNMENT(&mob) = 0;
+  GET_GOLD(&mob) = 0;
+  mob.mob_specials.gold_min = 0;
+  mob.mob_specials.gold_max = 0;
+  GET_EXP(&mob) = 0;
+  GET_HITROLL(&mob) = MAX(1, level / 2);
+  GET_AC(&mob) = 100 - MIN(level * 4, 80);
+  GET_HIT(&mob) = MAX(1, level);
+  GET_MANA(&mob) = 8;
+  GET_MOVE(&mob) = level * 2;
+  GET_NDD(&mob) = MAX(1, (level / 10) + 1);
+  GET_SDD(&mob) = 4;
+  GET_DAMROLL(&mob) = MAX(0, level / 3);
+
+  new_rnum = add_mobile(&mob, vnum);
+  free_mobile_strings(&mob);
+
+  if (new_rnum == NOBODY || real_mobile(vnum) == NOBODY) {
+    snprintf(errmsg, errmsg_sz, "Failed to create mob vnum %d.\r\n", vnum);
+    return FALSE;
+  }
+
+  return TRUE;
+}
+
+static bool mobtemplate_save_affected_zones(struct char_data *ch, mob_vnum start, int mob_count,
+                                            char *errmsg, size_t errmsg_sz)
+{
+  bool *saved;
+  int i;
+
+  CREATE(saved, bool, top_of_zone_table + 1);
+  for (i = 0; i <= top_of_zone_table; i++)
+    saved[i] = FALSE;
+
+  for (i = 0; i < mob_count; i++) {
+    mob_vnum vnum = start + i;
+    zone_rnum rznum = real_zone_by_thing(vnum);
+
+    if (rznum == NOWHERE) {
+      free(saved);
+      snprintf(errmsg, errmsg_sz, "Cannot save mobs: vnum %d has no valid zone.\r\n", vnum);
+      return FALSE;
+    }
+
+    if (saved[rznum])
+      continue;
+
+    if (!save_mobiles(rznum)) {
+      free(saved);
+      snprintf(errmsg, errmsg_sz, "Failed saving mobile data for zone %d.\r\n",
+               zone_table[rznum].number);
+      return FALSE;
+    }
+    saved[rznum] = TRUE;
+    mudlog(CMP, MAX(LVL_BUILDER, GET_INVIS_LEV(ch)), TRUE,
+           "OLC: %s saved mobile templates in zone %d.",
+           GET_NAME(ch), zone_table[rznum].number);
+  }
+
+  free(saved);
+  return TRUE;
+}
+
+ACMD(do_mobtemplate)
+{
+  char usage[] = "Usage: mobtemplate <start_mob_vnum> <min_level> <max_level> <mob_count> \"<base name>\"\r\n";
+  char base_name[MAX_INPUT_LENGTH];
+  char errmsg[MAX_STRING_LENGTH];
+  mob_vnum start_vnum, top_vnum;
+  int min_level, max_level, mob_count;
+  int i, created = 0;
+
+  if (IS_NPC(ch) || !ch->desc || STATE(ch->desc) != CON_PLAYING)
+    return;
+
+  if (GET_LEVEL(ch) < LVL_BUILDER) {
+    send_to_char(ch, "You do not have builder permissions for this command.\r\n");
+    return;
+  }
+
+  if (!parse_mobtemplate_args(argument, &start_vnum, &min_level, &max_level, &mob_count,
+                              base_name, sizeof(base_name))) {
+    send_to_char(ch, "%s", usage);
+    return;
+  }
+
+  if (start_vnum <= 0) {
+    send_to_char(ch, "Start mob vnum must be numeric and greater than 0.\r\n");
+    return;
+  }
+
+  if (min_level <= 0) {
+    send_to_char(ch, "Minimum level must be numeric and greater than 0.\r\n");
+    return;
+  }
+
+  if (max_level <= 0) {
+    send_to_char(ch, "Maximum level must be numeric and greater than 0.\r\n");
+    return;
+  }
+
+  if (mob_count <= 0) {
+    send_to_char(ch, "Mob count must be numeric and greater than 0.\r\n");
+    return;
+  }
+
+  if (!*base_name) {
+    send_to_char(ch, "Base name must be present and non-empty.\r\n");
+    return;
+  }
+
+  if (min_level > max_level) {
+    send_to_char(ch, "Minimum level must be less than or equal to maximum level.\r\n");
+    return;
+  }
+
+  if (((long long)start_vnum + (long long)mob_count - 1) > IDXTYPE_MAX) {
+    send_to_char(ch, "Computed top mob vnum exceeds valid vnum range.\r\n");
+    return;
+  }
+  top_vnum = start_vnum + mob_count - 1;
+
+  if (!mobtemplate_range_is_clear(start_vnum, mob_count, errmsg, sizeof(errmsg))) {
+    send_to_char(ch, "%s", errmsg);
+    return;
+  }
+
+  if (!mobtemplate_builder_can_edit_range(ch, start_vnum, mob_count, errmsg, sizeof(errmsg))) {
+    send_to_char(ch, "%s", errmsg);
+    return;
+  }
+
+  for (i = 0; i < mob_count; i++) {
+    mob_vnum vnum = start_vnum + i;
+    int level = mobtemplate_compute_level(min_level, max_level, mob_count, i);
+
+    if (!mobtemplate_create_one(vnum, base_name, i + 1, level, errmsg, sizeof(errmsg))) {
+      int rollback;
+
+      for (rollback = 0; rollback < created; rollback++) {
+        mob_vnum created_vnum = start_vnum + rollback;
+        mob_rnum rmob = real_mobile(created_vnum);
+        if (rmob != NOBODY)
+          delete_mobile(rmob);
+      }
+      send_to_char(ch, "%s", errmsg);
+      return;
+    }
+    created++;
+  }
+
+  if (!mobtemplate_save_affected_zones(ch, start_vnum, mob_count, errmsg, sizeof(errmsg))) {
+    send_to_char(ch, "%s", errmsg);
+    return;
+  }
+
+  send_to_char(ch,
+    "Mob template created successfully.\r\n"
+    "Mob range: %d-%d\r\n"
+    "Mobs created: %d\r\n"
+    "Level range: %d-%d\r\n"
+    "Base name: %s\r\n",
+    start_vnum, top_vnum, mob_count, min_level, max_level, base_name);
+
+  mudlog(CMP, MAX(LVL_BUILDER, GET_INVIS_LEV(ch)), TRUE,
+         "OLC: %s used mobtemplate for mobs %d-%d (%d mobs, level %d-%d, base '%s').",
+         GET_NAME(ch), start_vnum, top_vnum, mob_count, min_level, max_level, base_name);
 }
 
 ACMD(do_areatemplate)
