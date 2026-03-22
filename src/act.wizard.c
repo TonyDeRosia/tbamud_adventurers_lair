@@ -72,6 +72,10 @@ static int acctlist_show_entry(long id, const char *name, void *arg);
 
 static int compute_areatemplate_width(int room_count);
 static int compute_areatemplate_height(int room_count, int width);
+static void zonemap_append(char *buf, size_t bufsz, size_t *len, const char *fmt, ...);
+static bool zonemap_has_exit_to(room_rnum from, int dir, room_rnum to);
+static void zonemap_cell_text(room_vnum vnum, room_rnum rrnum, room_vnum player_room_vnum,
+                              char out[3]);
 static bool room_range_is_clear(room_vnum start, int room_count, char *errmsg, size_t errmsg_sz);
 static bool roomtemplate_range_is_valid(room_vnum start, int room_count, zone_rnum *zone_out,
                                         char *errmsg, size_t errmsg_sz);
@@ -122,6 +126,57 @@ static bool objtemplate_save_affected_zones(struct char_data *ch, obj_vnum start
 
 /* Local Globals */
 static struct recent_player *recent_list = NULL;  /** Global list of recent players */
+
+static void zonemap_append(char *buf, size_t bufsz, size_t *len, const char *fmt, ...)
+{
+  va_list args;
+  int wrote;
+
+  if (*len >= bufsz)
+    return;
+
+  va_start(args, fmt);
+  wrote = vsnprintf(buf + *len, bufsz - *len, fmt, args);
+  va_end(args);
+
+  if (wrote < 0)
+    return;
+
+  if ((size_t)wrote >= bufsz - *len)
+    *len = bufsz - 1;
+  else
+    *len += (size_t)wrote;
+}
+
+static bool zonemap_has_exit_to(room_rnum from, int dir, room_rnum to)
+{
+  struct room_direction_data *exit;
+
+  if (from == NOWHERE || to == NOWHERE || dir < NORTH || dir > WEST)
+    return FALSE;
+
+  exit = W_EXIT(from, dir);
+  if (exit == NULL || exit->to_room == NOWHERE)
+    return FALSE;
+
+  return exit->to_room == to;
+}
+
+static void zonemap_cell_text(room_vnum vnum, room_rnum rrnum, room_vnum player_room_vnum,
+                              char out[3])
+{
+  if (rrnum == NOWHERE) {
+    strlcpy(out, "..", 3);
+    return;
+  }
+
+  if (player_room_vnum != NOWHERE && vnum == player_room_vnum) {
+    snprintf(out, 3, "@%1d", (int)(vnum % 10));
+    return;
+  }
+
+  snprintf(out, 3, "%02d", (int)(vnum % 100));
+}
 
 static int purge_room(room_rnum room)
 {
@@ -6047,6 +6102,195 @@ ACMD(do_mobtemplate)
   mudlog(CMP, MAX(LVL_BUILDER, GET_INVIS_LEV(ch)), TRUE,
          "OLC: %s used mobtemplate for mobs %d-%d (%d mobs, level %d-%d, base '%s').",
          GET_NAME(ch), start_vnum, top_vnum, mob_count, min_level, max_level, base_name);
+}
+
+ACMD(do_zonemap)
+{
+  const int map_width = 10;
+  char arg[MAX_INPUT_LENGTH];
+  room_vnum bottom, top, vnum, player_room_vnum = NOWHERE;
+  zone_vnum zone_vnum_input;
+  zone_rnum zone;
+  int slots_scanned, rows, row, col;
+  int existing_rooms = 0, missing_rooms = 0, isolated_rooms = 0, one_way_links = 0;
+  size_t estimated_line_len, estimated_bufsz, outlen = 0;
+  room_rnum *room_cache;
+  char *outbuf;
+
+  one_argument(argument, arg);
+  if (!*arg) {
+    send_to_char(ch, "Usage: zonemap <zone_vnum>\r\n");
+    return;
+  }
+
+  if (!str_cmp(arg, "here")) {
+    if (IN_ROOM(ch) == NOWHERE) {
+      send_to_char(ch, "You are not currently in a room.\r\n");
+      return;
+    }
+    zone = world[IN_ROOM(ch)].zone;
+    zone_vnum_input = zone_table[zone].number;
+  } else if (!is_number(arg)) {
+    send_to_char(ch, "Zone not found.\r\n");
+    return;
+  } else {
+    zone_vnum_input = atoi(arg);
+    zone = real_zone(zone_vnum_input);
+    if (zone == NOWHERE) {
+      send_to_char(ch, "Zone not found.\r\n");
+      return;
+    }
+  }
+
+  if (GET_LEVEL(ch) < LVL_GRGOD && !can_edit_zone(ch, zone)) {
+    send_cannot_edit(ch, zone_table[zone].number);
+    return;
+  }
+
+  bottom = zone_table[zone].bot;
+  top = zone_table[zone].top;
+  slots_scanned = top - bottom + 1;
+  if (slots_scanned <= 0) {
+    send_to_char(ch, "Zone range is invalid.\r\n");
+    return;
+  }
+
+  CREATE(room_cache, room_rnum, slots_scanned);
+  for (vnum = bottom; vnum <= top; vnum++) {
+    room_rnum rrnum = real_room(vnum);
+    int idx = vnum - bottom;
+
+    room_cache[idx] = rrnum;
+    if (rrnum == NOWHERE)
+      missing_rooms++;
+    else
+      existing_rooms++;
+  }
+
+  if (IN_ROOM(ch) != NOWHERE &&
+      world[IN_ROOM(ch)].number >= bottom &&
+      world[IN_ROOM(ch)].number <= top)
+    player_room_vnum = world[IN_ROOM(ch)].number;
+
+  for (vnum = bottom; vnum <= top; vnum++) {
+    room_rnum rrnum = room_cache[vnum - bottom];
+
+    if (rrnum == NOWHERE)
+      continue;
+
+    if (W_EXIT(rrnum, NORTH) == NULL && W_EXIT(rrnum, EAST) == NULL &&
+        W_EXIT(rrnum, SOUTH) == NULL && W_EXIT(rrnum, WEST) == NULL)
+      isolated_rooms++;
+  }
+
+  rows = (slots_scanned + map_width - 1) / map_width;
+  estimated_line_len = (size_t)(map_width * 2) + (size_t)((map_width - 1) * 2) + 16;
+  estimated_bufsz = 4096 + (size_t)rows * (estimated_line_len * 2 + 8);
+  CREATE(outbuf, char, estimated_bufsz);
+  outbuf[0] = '\0';
+
+  zonemap_append(outbuf, estimated_bufsz, &outlen,
+                 "Zone %d: %s\r\nRange: %d-%d\r\n",
+                 zone_table[zone].number,
+                 zone_table[zone].name ? zone_table[zone].name : "<unnamed>",
+                 bottom, top);
+  if (player_room_vnum != NOWHERE)
+    zonemap_append(outbuf, estimated_bufsz, &outlen, "You are in: %d\r\n", player_room_vnum);
+  else
+    zonemap_append(outbuf, estimated_bufsz, &outlen, "You are in: (outside this zone)\r\n");
+
+  zonemap_append(outbuf, estimated_bufsz, &outlen,
+                 "\r\nLegend:\r\n"
+                 "  00 = room exists\r\n"
+                 "  .. = missing room\r\n"
+                 "  -- and | = two-way exits\r\n"
+                 "  -> <- ^ v = one-way exits\r\n"
+                 "  @ = your current room\r\n\r\n");
+
+  for (row = 0; row < rows; row++) {
+    for (col = 0; col < map_width; col++) {
+      int idx = (row * map_width) + col;
+      char cell[3];
+
+      if (idx >= slots_scanned) {
+        zonemap_append(outbuf, estimated_bufsz, &outlen, "  ");
+      } else {
+        room_vnum cell_vnum = bottom + idx;
+        room_rnum cell_room = room_cache[idx];
+
+        zonemap_cell_text(cell_vnum, cell_room, player_room_vnum, cell);
+        zonemap_append(outbuf, estimated_bufsz, &outlen, "%s", cell);
+      }
+
+      if (col < map_width - 1) {
+        int right_idx = idx + 1;
+
+        if (idx < slots_scanned && right_idx < slots_scanned) {
+          room_rnum left_room = room_cache[idx];
+          room_rnum right_room = room_cache[right_idx];
+          bool east_link = zonemap_has_exit_to(left_room, EAST, right_room);
+          bool west_link = zonemap_has_exit_to(right_room, WEST, left_room);
+
+          if (east_link && west_link)
+            zonemap_append(outbuf, estimated_bufsz, &outlen, "--");
+          else if (east_link)
+            zonemap_append(outbuf, estimated_bufsz, &outlen, "->");
+          else if (west_link)
+            zonemap_append(outbuf, estimated_bufsz, &outlen, "<-");
+          else
+            zonemap_append(outbuf, estimated_bufsz, &outlen, "  ");
+
+          if (east_link != west_link)
+            one_way_links++;
+        } else {
+          zonemap_append(outbuf, estimated_bufsz, &outlen, "  ");
+        }
+      }
+    }
+    zonemap_append(outbuf, estimated_bufsz, &outlen, "\r\n");
+
+    if (row < rows - 1) {
+      for (col = 0; col < map_width; col++) {
+        int idx = (row * map_width) + col;
+        int down_idx = idx + map_width;
+        char vconn = ' ';
+
+        if (idx < slots_scanned && down_idx < slots_scanned) {
+          room_rnum top_room = room_cache[idx];
+          room_rnum bottom_room = room_cache[down_idx];
+          bool south_link = zonemap_has_exit_to(top_room, SOUTH, bottom_room);
+          bool north_link = zonemap_has_exit_to(bottom_room, NORTH, top_room);
+
+          if (south_link && north_link)
+            vconn = '|';
+          else if (south_link)
+            vconn = 'v';
+          else if (north_link)
+            vconn = '^';
+
+          if (south_link != north_link)
+            one_way_links++;
+        }
+
+        zonemap_append(outbuf, estimated_bufsz, &outlen, "%c", vconn);
+        if (col < map_width - 1)
+          zonemap_append(outbuf, estimated_bufsz, &outlen, "   ");
+      }
+      zonemap_append(outbuf, estimated_bufsz, &outlen, "\r\n");
+    }
+  }
+
+  zonemap_append(outbuf, estimated_bufsz, &outlen,
+                 "\r\nSummary:\r\n"
+                 "- Existing rooms: %d / %d slots scanned\r\n"
+                 "- Missing rooms: %d\r\n"
+                 "- One-way links: %d\r\n"
+                 "- Isolated rooms: %d\r\n",
+                 existing_rooms, slots_scanned, missing_rooms, one_way_links, isolated_rooms);
+
+  page_string(ch->desc, outbuf, TRUE);
+  free(outbuf);
+  free(room_cache);
 }
 
 ACMD(do_areatemplate)
