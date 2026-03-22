@@ -457,6 +457,8 @@ cpp_extern const struct command_info cmd_info[] = {
   { "zlock"    , "zlock"   , POS_DEAD    , do_zlock    , LVL_GOD, 0 },
   { "zunlock"  , "zunlock" , POS_DEAD    , do_zunlock  , LVL_GOD, 0 },
   { "zcheck"   , "zcheck"  , POS_DEAD    , do_zcheck   , LVL_BUILDER, 0 },
+  { "zmap"     , "zmap"    , POS_DEAD    , do_zonemap  , LVL_BUILDER, 0 },
+  { "zonemap"  , "zonemap" , POS_DEAD    , do_zonemap  , LVL_BUILDER, 0 },
   { "zpurge"   , "zpurge"  , POS_DEAD    , do_zpurge   , LVL_BUILDER, 0 },
   { "balance", "bal", POS_DEAD, do_balance, 0, 0 },
   { "bounty"   , "bounty"  , POS_DEAD    , do_bounty   , 0, 0 },
