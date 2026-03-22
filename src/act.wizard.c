@@ -6163,6 +6163,7 @@ ACMD(do_zonemap)
   room_vnum bottom, top, vnum, player_room_vnum = NOWHERE;
   zone_vnum zone_vnum_input;
   zone_rnum zone;
+  int player_row = -1, player_col = -1;
   int slots_scanned, rows, row, col;
   int existing_rooms = 0, missing_rooms = 0, isolated_rooms = 0, one_way_links = 0;
   size_t estimated_line_len, estimated_bufsz, outlen = 0;
@@ -6224,6 +6225,12 @@ ACMD(do_zonemap)
       world[IN_ROOM(ch)].number <= top)
     player_room_vnum = world[IN_ROOM(ch)].number;
 
+  if (player_room_vnum != NOWHERE) {
+    int player_index = player_room_vnum - bottom;
+    player_row = player_index / map_width;
+    player_col = player_index % map_width;
+  }
+
   for (vnum = bottom; vnum <= top; vnum++) {
     room_rnum rrnum = room_cache[vnum - bottom];
 
@@ -6236,7 +6243,7 @@ ACMD(do_zonemap)
   }
 
   rows = (slots_scanned + map_width - 1) / map_width;
-  estimated_line_len = (size_t)(map_width * 2) + (size_t)((map_width - 1) * 2) + 16;
+  estimated_line_len = (size_t)(map_width * 2) + (size_t)((map_width - 1) * 2) + 24;
   estimated_bufsz = 4096 + (size_t)rows * (estimated_line_len * 2 + 8);
   CREATE(outbuf, char, estimated_bufsz);
   outbuf[0] = '\0';
@@ -6247,7 +6254,9 @@ ACMD(do_zonemap)
                  zone_table[zone].name ? zone_table[zone].name : "<unnamed>",
                  bottom, top);
   if (player_room_vnum != NOWHERE)
-    zonemap_append(outbuf, estimated_bufsz, &outlen, "You are in: %d\r\n", player_room_vnum);
+    zonemap_append(outbuf, estimated_bufsz, &outlen,
+                   "You are in: %d (row %d, col %d)\r\n",
+                   player_room_vnum, player_row, player_col);
   else
     zonemap_append(outbuf, estimated_bufsz, &outlen, "You are in: (outside this zone)\r\n");
 
@@ -6259,7 +6268,17 @@ ACMD(do_zonemap)
                  "  -> <- ^ v = one-way exits\r\n"
                  "  @ = your current room\r\n\r\n");
 
+  zonemap_append(outbuf, estimated_bufsz, &outlen, "    ");
+  for (col = 0; col < map_width; col++) {
+    zonemap_append(outbuf, estimated_bufsz, &outlen, "%02d", col);
+    if (col < map_width - 1)
+      zonemap_append(outbuf, estimated_bufsz, &outlen, "  ");
+  }
+  zonemap_append(outbuf, estimated_bufsz, &outlen, "\r\n");
+
   for (row = 0; row < rows; row++) {
+    zonemap_append(outbuf, estimated_bufsz, &outlen, "%02d  ", row);
+
     for (col = 0; col < map_width; col++) {
       int idx = (row * map_width) + col;
       char cell[3];
@@ -6302,6 +6321,7 @@ ACMD(do_zonemap)
     zonemap_append(outbuf, estimated_bufsz, &outlen, "\r\n");
 
     if (row < rows - 1) {
+      zonemap_append(outbuf, estimated_bufsz, &outlen, "    ");
       for (col = 0; col < map_width; col++) {
         int idx = (row * map_width) + col;
         int down_idx = idx + map_width;
