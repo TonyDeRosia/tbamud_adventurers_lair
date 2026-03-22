@@ -109,7 +109,7 @@ a danish pastry~
 A nice looking delicious danish pastry has been placed here.~
 ~
 19 0 0 0 0 a 0 0 0 0 0 0 0
-5 0 0 0
+100 0 10 0
 1 1 5 0 0
 #3012
 taco mexican~
@@ -162,6 +162,8 @@ A dagger with a long thin blade is here.~
 5 n 0 0 0 an 0 0 0 0 0 0 0
 0 1 4 11
 1 2 10 0 0
+A
+18 1
 #3021
 sword small~
 a small sword~
@@ -170,13 +172,15 @@ A small sword lies here.~
 5 e 0 0 0 an 0 0 0 0 0 0 0
 0 1 6 11
 3 4 10 0 0
-E
-sword small~
-   The small sword seems to have an inscription of some sort.
-~
+A
+18 1
 E
 inscription~
    It says: 'May this sword be a good companion.  '
+~
+E
+sword small~
+   The small sword seems to have an inscription of some sort.
 ~
 #3022
 sword long~
@@ -194,14 +198,18 @@ A simple looking wooden club is here.~
 5 0 0 0 0 an 0 0 0 0 0 0 0
 0 1 3 7
 3 1 10 0 0
+A
+19 1
 #3024
 warhammer hammer~
 a warhammer~
 A medium sized warhammer is here.~
 ~
 5 0 0 0 0 an 0 0 0 0 0 0 0
-0 1 5 7
+0 2 6 7
 6 10 10 0 0
+A
+19 1
 #3025
 flail large~
 a flail~
@@ -653,12 +661,12 @@ A large, sociable bulletin board is mounted on a wall here.~
 0 0 0 0
 0 0 0 0 0
 E
-board~
-   If you can read this, the board is not working.
-~
-E
 social bulletin~
    Use 'look board' to read the board.
+~
+E
+board~
+   If you can read this, the board is not working.
 ~
 #3097
 boards frozen bulletin gen_boards~
@@ -669,12 +677,12 @@ A large bulletin board is here, carved from a block of ice.~
 0 0 0 0
 0 0 0 0 0
 E
-board~
-   If you can read this, the board is not working.
-~
-E
 freeze bulletin~
    Use 'look board' to read the board.
+~
+E
+board~
+   If you can read this, the board is not working.
 ~
 #3098
 boards holy bulletin gen_boards~
@@ -685,12 +693,12 @@ A large bulletin board is mounted on a wall here.  It glows with a faint aura.~
 0 0 0 0
 0 0 0 0 0
 E
-board~
-   If you can read this, the board is not working.
-~
-E
 holy bulletin~
    Use 'look board' to read the board.
+~
+E
+board~
+   If you can read this, the board is not working.
 ~
 #3099
 boards bulletin gen_boards~
@@ -701,11 +709,11 @@ A large bulletin board is mounted on a wall here.~
 0 0 0 0
 0 0 0 0 0
 E
-board~
-   If you can read this, the board is not working.
-~
-E
 bulletin~
    Use 'look board' to read the board.
+~
+E
+board~
+   If you can read this, the board is not working.
 ~
 $~

@@ -27,7 +27,7 @@ mound upon which the temple is built and ends on the temple square below.
 To the west, you see the Reading Room.  The donation room is in a small
 alcove to your east.
 ~
-30 156 0 0 0 0
+30 28 0 0 0 0
 D0
 At the northern end of the temple hall is a statue and a huge altar.
 ~
@@ -978,6 +978,10 @@ east, blocking any further movement.  A small warehouse is directly south of
 here.
 ~
 30 0 0 0 0 1
+D1
+~
+~
+0 0 16400
 D2
 You see the warehouse.
 ~

@@ -104,6 +104,121 @@ static void shadow_prepare_for_storage_return(struct char_data *mob)
   REMOVE_BIT_AR(AFF_FLAGS(mob), AFF_CHARM);
 }
 
+static int shadow_profile_is_valid(struct char_data *owner, int slot)
+{
+  if (!owner || IS_NPC(owner) || slot < 0 || slot >= MAX_SHADOW_ROSTER)
+    return FALSE;
+  if (!SHADOW_SLOT_OCCUPIED(owner, slot) || !SHADOW_SLOT_PROFILE_VALID(owner, slot))
+    return FALSE;
+  if (SHADOW_SLOT_MAX_HIT(owner, slot) <= 1)
+    return FALSE;
+  if (SHADOW_SLOT_DAMNODICE(owner, slot) <= 0 || SHADOW_SLOT_DAMSIZEDICE(owner, slot) <= 0)
+    return FALSE;
+
+  return TRUE;
+}
+
+static int shadow_proto_estimated_max_hit(struct char_data *proto)
+{
+  int hit_dice_count;
+  int hit_dice_size;
+  int hp_from_dice = 0;
+
+  if (!proto)
+    return 1;
+
+  if (GET_MAX_HIT(proto) > 1)
+    return GET_MAX_HIT(proto);
+
+  hit_dice_count = MAX(0, GET_HIT(proto));
+  hit_dice_size = MAX(0, GET_MANA(proto));
+  if (hit_dice_count <= 0 || hit_dice_size <= 0)
+    return 1;
+
+  /* read_mobile() rolls this randomly; use deterministic midpoint for consistency. */
+  if (GET_MAX_HIT(proto) == 0)
+    hp_from_dice = (hit_dice_count * (hit_dice_size + 1)) / 2;
+  else
+    hp_from_dice = (MIN(hit_dice_count, hit_dice_size) + MAX(hit_dice_count, hit_dice_size)) / 2;
+
+  return MAX(1, hp_from_dice + MAX(0, GET_MOVE(proto)));
+}
+
+static void shadow_try_repair_legacy_slot_profile(struct char_data *owner, int slot)
+{
+  mob_vnum vnum;
+  mob_rnum rnum;
+  struct char_data *src;
+  int level;
+
+  if (!owner || IS_NPC(owner) || slot < 0 || slot >= MAX_SHADOW_ROSTER)
+    return;
+  if (!SHADOW_SLOT_OCCUPIED(owner, slot))
+    return;
+  if (shadow_profile_is_valid(owner, slot))
+    return;
+
+  level = MAX(1, SHADOW_SLOT_LEVEL(owner, slot));
+  vnum = SHADOW_SLOT_VNUM(owner, slot);
+  rnum = real_mobile(vnum);
+
+  if (rnum != NOBODY) {
+    src = &mob_proto[rnum];
+    SHADOW_SLOT_MAX_HIT(owner, slot) = shadow_proto_estimated_max_hit(src);
+    SHADOW_SLOT_AC(owner, slot) = GET_AC(src);
+    SHADOW_SLOT_HITROLL(owner, slot) = GET_HITROLL(src);
+    SHADOW_SLOT_DAMROLL(owner, slot) = GET_DAMROLL(src);
+    SHADOW_SLOT_MAX_MANA(owner, slot) = MAX(0, GET_MAX_MANA(src));
+    SHADOW_SLOT_DAMNODICE(owner, slot) = MAX(1, src->mob_specials.damnodice);
+    SHADOW_SLOT_DAMSIZEDICE(owner, slot) = MAX(1, src->mob_specials.damsizedice);
+    SHADOW_SLOT_STR(owner, slot) = src->real_abils.str;
+    SHADOW_SLOT_INT(owner, slot) = src->real_abils.intel;
+    SHADOW_SLOT_WIS(owner, slot) = src->real_abils.wis;
+    SHADOW_SLOT_DEX(owner, slot) = src->real_abils.dex;
+    SHADOW_SLOT_CON(owner, slot) = src->real_abils.con;
+    SHADOW_SLOT_CHA(owner, slot) = src->real_abils.cha;
+  } else {
+    SHADOW_SLOT_MAX_HIT(owner, slot) = MAX(1, level * 12);
+    SHADOW_SLOT_AC(owner, slot) = 100 - (level * 2);
+    SHADOW_SLOT_HITROLL(owner, slot) = level / 3;
+    SHADOW_SLOT_DAMROLL(owner, slot) = level / 4;
+    SHADOW_SLOT_MAX_MANA(owner, slot) = 0;
+    SHADOW_SLOT_DAMNODICE(owner, slot) = MAX(1, 1 + (level / 20));
+    SHADOW_SLOT_DAMSIZEDICE(owner, slot) = MAX(2, 4 + (level / 15));
+    SHADOW_SLOT_STR(owner, slot) = 12;
+    SHADOW_SLOT_INT(owner, slot) = 12;
+    SHADOW_SLOT_WIS(owner, slot) = 12;
+    SHADOW_SLOT_DEX(owner, slot) = 12;
+    SHADOW_SLOT_CON(owner, slot) = 12;
+    SHADOW_SLOT_CHA(owner, slot) = 12;
+  }
+
+  SHADOW_SLOT_PROFILE_VALID(owner, slot) = 1;
+}
+
+void shadow_store_profile_from_mob(struct char_data *owner, int slot, struct char_data *mob)
+{
+  if (!owner || IS_NPC(owner) || !mob || slot < 0 || slot >= MAX_SHADOW_ROSTER)
+    return;
+  if (!SHADOW_SLOT_OCCUPIED(owner, slot))
+    return;
+
+  SHADOW_SLOT_PROFILE_VALID(owner, slot) = 1;
+  SHADOW_SLOT_MAX_HIT(owner, slot) = MAX(1, GET_MAX_HIT(mob));
+  SHADOW_SLOT_AC(owner, slot) = GET_AC(mob);
+  SHADOW_SLOT_HITROLL(owner, slot) = GET_HITROLL(mob);
+  SHADOW_SLOT_DAMROLL(owner, slot) = GET_DAMROLL(mob);
+  SHADOW_SLOT_MAX_MANA(owner, slot) = MAX(0, GET_MAX_MANA(mob));
+  SHADOW_SLOT_DAMNODICE(owner, slot) = MAX(1, mob->mob_specials.damnodice);
+  SHADOW_SLOT_DAMSIZEDICE(owner, slot) = MAX(1, mob->mob_specials.damsizedice);
+  SHADOW_SLOT_STR(owner, slot) = mob->real_abils.str;
+  SHADOW_SLOT_INT(owner, slot) = mob->real_abils.intel;
+  SHADOW_SLOT_WIS(owner, slot) = mob->real_abils.wis;
+  SHADOW_SLOT_DEX(owner, slot) = mob->real_abils.dex;
+  SHADOW_SLOT_CON(owner, slot) = mob->real_abils.con;
+  SHADOW_SLOT_CHA(owner, slot) = mob->real_abils.cha;
+}
+
 static int warlock_power(struct char_data *ch)
 {
   return GET_INT(ch) + GET_WIS(ch);
@@ -503,6 +618,7 @@ int shadow_return_active_to_storage(struct char_data *owner, int quiet_mode)
     if (!active_mob)
       continue;
 
+    shadow_store_profile_from_mob(owner, slot, active_mob);
     shadow_prepare_for_storage_return(active_mob);
     extract_char(active_mob);
     returned++;
@@ -615,15 +731,22 @@ int shadow_name_looks_valid(const char *name)
 
 static void replace_mobile_string_safe(struct char_data *mob, char **field, const char *new_value, const char *proto_value)
 {
+  char value_buf[MAX_STRING_LENGTH];
+
   if (!mob || !field)
     return;
+
+  if (new_value && *new_value)
+    strlcpy(value_buf, new_value, sizeof(value_buf));
+  else
+    value_buf[0] = '\0';
 
   if (*field && *field != proto_value)
     free(*field);
   *field = NULL;
 
-  if (new_value && *new_value)
-    *field = strdup(new_value);
+  if (*value_buf)
+    *field = strdup(value_buf);
 }
 
 const char *shadow_slot_display_name(struct char_data *ch, int slot)
@@ -657,9 +780,14 @@ const char *shadow_slot_display_name(struct char_data *ch, int slot)
 
 static void apply_shadow_identity_to_mob_name(struct char_data *mob, const char *identity_name)
 {
+  char keywords_buf[MAX_STRING_LENGTH];
   char long_buf[MAX_STRING_LENGTH];
+  size_t out_len = 0;
+  int prev_space = TRUE;
+  const char *src;
   mob_rnum rnum;
   const char *safe_name;
+  const char *proto_name = NULL;
   const char *proto_short = NULL;
   const char *proto_long = NULL;
 
@@ -669,10 +797,30 @@ static void apply_shadow_identity_to_mob_name(struct char_data *mob, const char 
   safe_name = shadow_name_looks_valid(identity_name) ? identity_name : "a shadow";
   rnum = GET_MOB_RNUM(mob);
   if (rnum != NOBODY) {
+    proto_name = mob_proto[rnum].player.name;
     proto_short = mob_proto[rnum].player.short_descr;
     proto_long = mob_proto[rnum].player.long_descr;
   }
 
+  keywords_buf[0] = '\0';
+  for (src = safe_name; *src && out_len + 1 < sizeof(keywords_buf); src++) {
+    unsigned char c = (unsigned char)*src;
+
+    if (isalnum(c)) {
+      keywords_buf[out_len++] = LOWER(c);
+      prev_space = FALSE;
+    } else if (!prev_space) {
+      keywords_buf[out_len++] = ' ';
+      prev_space = TRUE;
+    }
+  }
+  while (out_len > 0 && keywords_buf[out_len - 1] == ' ')
+    out_len--;
+  keywords_buf[out_len] = '\0';
+  if (!*keywords_buf)
+    strlcpy(keywords_buf, "shadow", sizeof(keywords_buf));
+
+  replace_mobile_string_safe(mob, &mob->player.name, keywords_buf, proto_name);
   replace_mobile_string_safe(mob, &mob->player.short_descr, safe_name, proto_short);
 
   snprintf(long_buf, sizeof(long_buf), "%s stands here.\r\n", safe_name);
@@ -691,38 +839,103 @@ void apply_shadow_identity_to_mob(struct char_data *owner, struct char_data *mob
   apply_shadow_identity_to_mob_name(mob, identity_name);
 }
 
-static void restore_shadow_combat_profile(struct char_data *ch, int slot, struct char_data *mob)
-{
-  if (!ch || !mob || slot < 0 || slot >= MAX_SHADOW_ROSTER)
-    return;
-
-  if (!SHADOW_SLOT_PROFILE_VALID(ch, slot))
-    return;
-
-  GET_LEVEL(mob) = MAX(1, SHADOW_SLOT_LEVEL(ch, slot));
-  GET_MAX_HIT(mob) = MAX(1, SHADOW_SLOT_MAX_HIT(ch, slot));
-  GET_HIT(mob) = GET_MAX_HIT(mob);
-  GET_AC(mob) = SHADOW_SLOT_AC(ch, slot);
-  GET_HITROLL(mob) = SHADOW_SLOT_HITROLL(ch, slot);
-  GET_DAMROLL(mob) = SHADOW_SLOT_DAMROLL(ch, slot);
-  GET_MAX_MANA(mob) = MAX(0, SHADOW_SLOT_MAX_MANA(ch, slot));
-  GET_MANA(mob) = GET_MAX_MANA(mob);
-  mob->mob_specials.damnodice = MAX(1, SHADOW_SLOT_DAMNODICE(ch, slot));
-  mob->mob_specials.damsizedice = MAX(1, SHADOW_SLOT_DAMSIZEDICE(ch, slot));
-  mob->real_abils.str = SHADOW_SLOT_STR(ch, slot);
-  mob->real_abils.intel = SHADOW_SLOT_INT(ch, slot);
-  mob->real_abils.wis = SHADOW_SLOT_WIS(ch, slot);
-  mob->real_abils.dex = SHADOW_SLOT_DEX(ch, slot);
-  mob->real_abils.con = SHADOW_SLOT_CON(ch, slot);
-  mob->real_abils.cha = SHADOW_SLOT_CHA(ch, slot);
-  mob->aff_abils = mob->real_abils;
-}
-
 static void apply_shadow_servant_bonuses(struct char_data *owner, struct char_data *mob)
 {
-  (void)owner;
-  (void)mob;
-  /* Scaffolding hook for future monarch/support buffs that should affect all active shadows. */
+  int stored_level;
+
+  if (!owner || !mob)
+    return;
+
+  /* Narrow polish for low-tier extracted shadows:
+   * improve consistency/survival slightly without changing their burst profile. */
+  if (!affected_by_spell(mob, SPELL_SHADOW_EXTRACTION))
+    return;
+
+  stored_level = GET_LEVEL(mob);
+  if (stored_level <= 5) {
+    GET_MAX_HIT(mob) = MAX(GET_MAX_HIT(mob), 70 + (stored_level * 8));
+    GET_HIT(mob) = MIN(GET_MAX_HIT(mob), MAX(GET_HIT(mob), GET_MAX_HIT(mob)));
+    GET_AC(mob) -= 18;
+    GET_HITROLL(mob) += 5;
+  } else if (stored_level <= 12) {
+    GET_MAX_HIT(mob) = MAX(GET_MAX_HIT(mob), 95 + (stored_level * 6));
+    GET_HIT(mob) = MIN(GET_MAX_HIT(mob), MAX(GET_HIT(mob), GET_MAX_HIT(mob)));
+    GET_AC(mob) -= 10;
+    GET_HITROLL(mob) += 3;
+  }
+
+  /* Keep owner scaling conservative so low-tier shadows stay relevant but not dominant. */
+  if (!IS_NPC(owner) && GET_LEVEL(owner) >= 35 && stored_level <= 12)
+    GET_HITROLL(mob) += 1;
+}
+
+void compute_shadow_preview_stats(struct char_data *owner, int slot, int *preview_level_out, int *preview_max_hp_out, int *preview_hitroll_out, int *preview_damroll_out, int *preview_power_out)
+{
+  mob_rnum rnum;
+  mob_vnum vnum;
+  int level = 1;
+  int max_hit = 1;
+  int hitroll = 0;
+  int damroll = 0;
+
+  if (!owner || IS_NPC(owner) || slot < 0 || slot >= MAX_SHADOW_ROSTER || !SHADOW_SLOT_OCCUPIED(owner, slot)) {
+    if (preview_level_out)
+      *preview_level_out = level;
+    if (preview_max_hp_out)
+      *preview_max_hp_out = max_hit;
+    if (preview_hitroll_out)
+      *preview_hitroll_out = hitroll;
+    if (preview_damroll_out)
+      *preview_damroll_out = damroll;
+    if (preview_power_out)
+      *preview_power_out = (level * 2) + (max_hit / 2) + (hitroll * 3) + (damroll * 2);
+    return;
+  }
+
+  level = MAX(1, SHADOW_SLOT_LEVEL(owner, slot));
+  shadow_try_repair_legacy_slot_profile(owner, slot);
+
+  if (shadow_profile_is_valid(owner, slot)) {
+    max_hit = MAX(1, SHADOW_SLOT_MAX_HIT(owner, slot));
+    hitroll = SHADOW_SLOT_HITROLL(owner, slot);
+    damroll = SHADOW_SLOT_DAMROLL(owner, slot);
+  } else {
+    vnum = SHADOW_SLOT_VNUM(owner, slot);
+    if (real_mobile(vnum) == NOBODY)
+      vnum = MOBVNUM_SHADOW_ELITE;
+    rnum = real_mobile(vnum);
+    if (rnum != NOBODY) {
+      max_hit = MAX(1, GET_MAX_HIT(&mob_proto[rnum]));
+      hitroll = GET_HITROLL(&mob_proto[rnum]);
+      damroll = GET_DAMROLL(&mob_proto[rnum]);
+    } else {
+      max_hit = MAX(1, SHADOW_SLOT_MAX_HIT(owner, slot));
+      hitroll = SHADOW_SLOT_HITROLL(owner, slot);
+      damroll = SHADOW_SLOT_DAMROLL(owner, slot);
+    }
+  }
+
+  /* Mirror summon-time low-tier extraction tuning for display-only preview values. */
+  if (level <= 5) {
+    max_hit = MAX(max_hit, 70 + (level * 8));
+    hitroll += 5;
+  } else if (level <= 12) {
+    max_hit = MAX(max_hit, 95 + (level * 6));
+    hitroll += 3;
+  }
+  if (GET_LEVEL(owner) >= 35 && level <= 12)
+    hitroll += 1;
+
+  if (preview_level_out)
+    *preview_level_out = level;
+  if (preview_max_hp_out)
+    *preview_max_hp_out = max_hit;
+  if (preview_hitroll_out)
+    *preview_hitroll_out = hitroll;
+  if (preview_damroll_out)
+    *preview_damroll_out = damroll;
+  if (preview_power_out)
+    *preview_power_out = (level * 2) + (max_hit / 2) + (hitroll * 3) + (damroll * 2);
 }
 
 static int is_shadow_servant(struct char_data *mob, struct char_data *owner)
@@ -840,6 +1053,196 @@ static void mark_shadow_roster_slot(struct char_data *mob, int slot)
   affect_join(mob, &af, FALSE, FALSE, FALSE, FALSE);
 }
 
+struct shadow_source_profile {
+  mob_vnum source_vnum;
+  int source_level;
+  int source_attack_type;
+  int source_max_hit;
+  int source_ac;
+  int source_hitroll;
+  int source_damroll;
+  int source_max_mana;
+  int source_damnodice;
+  int source_damsizedice;
+  int source_str;
+  int source_int;
+  int source_wis;
+  int source_dex;
+  int source_con;
+  int source_cha;
+  char source_name[MAX_SHADOW_NAME_LENGTH + 1];
+};
+
+static void clear_shadow_servant_role_flags(struct char_data *mob)
+{
+  if (!mob)
+    return;
+
+  REMOVE_BIT_AR(MOB_FLAGS(mob), MOB_SPEC);
+  REMOVE_BIT_AR(MOB_FLAGS(mob), MOB_SENTINEL);
+  REMOVE_BIT_AR(MOB_FLAGS(mob), MOB_SCAVENGER);
+  REMOVE_BIT_AR(MOB_FLAGS(mob), MOB_AWARE);
+  REMOVE_BIT_AR(MOB_FLAGS(mob), MOB_AGGRESSIVE);
+  REMOVE_BIT_AR(MOB_FLAGS(mob), MOB_AGGR_EVIL);
+  REMOVE_BIT_AR(MOB_FLAGS(mob), MOB_AGGR_GOOD);
+  REMOVE_BIT_AR(MOB_FLAGS(mob), MOB_AGGR_NEUTRAL);
+  REMOVE_BIT_AR(MOB_FLAGS(mob), MOB_MEMORY);
+  REMOVE_BIT_AR(MOB_FLAGS(mob), MOB_HELPER);
+  REMOVE_BIT_AR(MOB_FLAGS(mob), MOB_NOCHARM);
+  REMOVE_BIT_AR(MOB_FLAGS(mob), MOB_NOSUMMON);
+  REMOVE_BIT_AR(MOB_FLAGS(mob), MOB_NOSLEEP);
+  REMOVE_BIT_AR(MOB_FLAGS(mob), MOB_NOBASH);
+  REMOVE_BIT_AR(MOB_FLAGS(mob), MOB_NOBLIND);
+  REMOVE_BIT_AR(MOB_FLAGS(mob), MOB_NOKILL);
+  REMOVE_BIT_AR(MOB_FLAGS(mob), MOB_GUILD_MASTER);
+  REMOVE_BIT_AR(MOB_FLAGS(mob), MOB_AI_ACTOR);
+}
+
+static void init_shadow_servant_base(struct char_data *mob, struct char_data *owner, int rounds, int silent_follow)
+{
+  if (!mob || !owner)
+    return;
+
+  SET_BIT_AR(MOB_FLAGS(mob), MOB_ISNPC);
+  clear_shadow_servant_role_flags(mob);
+  SET_BIT_AR(AFF_FLAGS(mob), AFF_CHARM);
+  GET_POS(mob) = POS_STANDING;
+  GET_DEFAULT_POS(mob) = POS_STANDING;
+  GET_SUMMON_TIMER(mob) = MAX(1, rounds);
+  HUNTING(mob) = NULL;
+
+  if (SCRIPT(mob))
+    extract_script(mob, MOB_TRIGGER);
+  if (SCRIPT_MEM(mob)) {
+    extract_script_mem(SCRIPT_MEM(mob));
+    SCRIPT_MEM(mob) = NULL;
+  }
+
+  char_to_room(mob, IN_ROOM(owner));
+  if (silent_follow)
+    add_follower_silent(mob, owner);
+  else
+    add_follower(mob, owner);
+  if (GROUP(owner) && GROUP_LEADER(GROUP(owner)) == owner)
+    join_group(mob, GROUP(owner));
+}
+
+static void build_shadow_source_profile(struct char_data *owner, int slot, mob_vnum fallback_vnum, int fallback_level, const char *fallback_name, struct shadow_source_profile *profile)
+{
+  mob_rnum source_rnum;
+  struct char_data *src;
+  const char *identity = fallback_name;
+  int stored_profile_valid = FALSE;
+
+  if (!profile)
+    return;
+
+  memset(profile, 0, sizeof(*profile));
+  profile->source_vnum = fallback_vnum;
+  profile->source_level = MAX(1, fallback_level);
+  profile->source_attack_type = TYPE_HIT;
+  profile->source_max_hit = MAX(1, profile->source_level * 12);
+  profile->source_ac = 100 - (profile->source_level * 2);
+  profile->source_hitroll = profile->source_level / 3;
+  profile->source_damroll = profile->source_level / 4;
+  profile->source_damnodice = MAX(1, 1 + (profile->source_level / 20));
+  profile->source_damsizedice = MAX(2, 4 + (profile->source_level / 15));
+  profile->source_str = 12;
+  profile->source_int = 12;
+  profile->source_wis = 12;
+  profile->source_dex = 12;
+  profile->source_con = 12;
+  profile->source_cha = 12;
+  strlcpy(profile->source_name, shadow_name_looks_valid(identity) ? identity : "a shadow", sizeof(profile->source_name));
+
+  if (owner && !IS_NPC(owner) && slot >= 0 && slot < MAX_SHADOW_ROSTER && SHADOW_SLOT_OCCUPIED(owner, slot)) {
+    profile->source_vnum = SHADOW_SLOT_VNUM(owner, slot);
+    profile->source_level = MAX(1, SHADOW_SLOT_LEVEL(owner, slot));
+    identity = shadow_slot_display_name(owner, slot);
+    strlcpy(profile->source_name, shadow_name_looks_valid(identity) ? identity : "a shadow", sizeof(profile->source_name));
+
+    stored_profile_valid = shadow_profile_is_valid(owner, slot);
+    if (stored_profile_valid) {
+      profile->source_max_hit = MAX(1, SHADOW_SLOT_MAX_HIT(owner, slot));
+      profile->source_ac = SHADOW_SLOT_AC(owner, slot);
+      profile->source_hitroll = SHADOW_SLOT_HITROLL(owner, slot);
+      profile->source_damroll = SHADOW_SLOT_DAMROLL(owner, slot);
+      profile->source_max_mana = MAX(0, SHADOW_SLOT_MAX_MANA(owner, slot));
+      profile->source_damnodice = MAX(1, SHADOW_SLOT_DAMNODICE(owner, slot));
+      profile->source_damsizedice = MAX(1, SHADOW_SLOT_DAMSIZEDICE(owner, slot));
+      profile->source_str = SHADOW_SLOT_STR(owner, slot);
+      profile->source_int = SHADOW_SLOT_INT(owner, slot);
+      profile->source_wis = SHADOW_SLOT_WIS(owner, slot);
+      profile->source_dex = SHADOW_SLOT_DEX(owner, slot);
+      profile->source_con = SHADOW_SLOT_CON(owner, slot);
+      profile->source_cha = SHADOW_SLOT_CHA(owner, slot);
+    }
+  }
+
+  source_rnum = real_mobile(profile->source_vnum);
+  if (source_rnum != NOBODY) {
+    src = &mob_proto[source_rnum];
+    profile->source_attack_type = src->mob_specials.attack_type + TYPE_HIT;
+    if (!owner || slot < 0 || slot >= MAX_SHADOW_ROSTER || !stored_profile_valid) {
+      profile->source_max_hit = MAX(1, GET_MAX_HIT(src));
+      profile->source_ac = GET_AC(src);
+      profile->source_hitroll = GET_HITROLL(src);
+      profile->source_damroll = GET_DAMROLL(src);
+      profile->source_max_mana = MAX(0, GET_MAX_MANA(src));
+      profile->source_damnodice = MAX(1, src->mob_specials.damnodice);
+      profile->source_damsizedice = MAX(1, src->mob_specials.damsizedice);
+      profile->source_str = src->real_abils.str;
+      profile->source_int = src->real_abils.intel;
+      profile->source_wis = src->real_abils.wis;
+      profile->source_dex = src->real_abils.dex;
+      profile->source_con = src->real_abils.con;
+      profile->source_cha = src->real_abils.cha;
+      if (shadow_name_looks_valid(src->player.short_descr))
+        strlcpy(profile->source_name, src->player.short_descr, sizeof(profile->source_name));
+    }
+  }
+}
+
+static void apply_shadow_source_profile(struct char_data *mob, const struct shadow_source_profile *profile, struct char_data *owner, int rounds, int silent_follow)
+{
+  if (!mob || !profile || !owner)
+    return;
+
+  init_shadow_servant_base(mob, owner, rounds, silent_follow);
+
+  GET_LEVEL(mob) = MAX(1, profile->source_level);
+  GET_MAX_HIT(mob) = MAX(1, profile->source_max_hit);
+  GET_HIT(mob) = GET_MAX_HIT(mob);
+  GET_AC(mob) = profile->source_ac;
+  GET_HITROLL(mob) = profile->source_hitroll;
+  GET_DAMROLL(mob) = profile->source_damroll;
+  GET_MAX_MANA(mob) = MAX(0, profile->source_max_mana);
+  GET_MANA(mob) = GET_MAX_MANA(mob);
+  mob->mob_specials.attack_type = profile->source_attack_type >= TYPE_HIT ? (profile->source_attack_type - TYPE_HIT) : 0;
+  mob->mob_specials.damnodice = MAX(1, profile->source_damnodice);
+  mob->mob_specials.damsizedice = MAX(1, profile->source_damsizedice);
+  mob->real_abils.str = profile->source_str;
+  mob->real_abils.intel = profile->source_int;
+  mob->real_abils.wis = profile->source_wis;
+  mob->real_abils.dex = profile->source_dex;
+  mob->real_abils.con = profile->source_con;
+  mob->real_abils.cha = profile->source_cha;
+  mob->aff_abils = mob->real_abils;
+  apply_shadow_identity_to_mob_name(mob, profile->source_name);
+
+  clear_shadow_servant_role_flags(mob);
+  SET_BIT_AR(AFF_FLAGS(mob), AFF_CHARM);
+  GET_POS(mob) = POS_STANDING;
+  GET_DEFAULT_POS(mob) = POS_STANDING;
+  GET_SUMMON_TIMER(mob) = MAX(1, rounds);
+  if (SCRIPT(mob))
+    extract_script(mob, MOB_TRIGGER);
+  if (SCRIPT_MEM(mob)) {
+    extract_script_mem(SCRIPT_MEM(mob));
+    SCRIPT_MEM(mob) = NULL;
+  }
+}
+
 static int count_shadow_servants_in_room(struct char_data *ch)
 {
   struct follow_type *f;
@@ -858,10 +1261,12 @@ static int count_shadow_servants_in_room(struct char_data *ch)
 
 static struct char_data *summon_shadow_servant(struct char_data *ch, mob_vnum vnum, int level, int rounds, int source_spell, const char *identity_name, int silent_follow)
 {
-  struct char_data *mob = summon_temp_follower(ch, vnum, level, rounds, identity_name, silent_follow);
+  struct char_data *mob;
+  struct shadow_source_profile profile;
+  mob = read_mobile(vnum, VIRTUAL);
   if (mob) {
-    if (shadow_name_looks_valid(identity_name))
-      apply_shadow_identity_to_mob_name(mob, identity_name);
+    build_shadow_source_profile(NULL, -1, vnum, level, identity_name, &profile);
+    apply_shadow_source_profile(mob, &profile, ch, rounds, silent_follow);
     mark_shadow_servant(mob, source_spell, rounds);
   }
   return mob;
@@ -889,7 +1294,7 @@ static int shadow_extraction_success_chance(struct char_data *ch, int corpse_lev
 int summon_stored_shadow(struct char_data *ch, int slot)
 {
   struct char_data *mob;
-  const char *resolved_name;
+  struct shadow_source_profile profile;
   mob_vnum vnum;
   int level;
   if (!ch || IS_NPC(ch) || slot < 0 || slot >= MAX_SHADOW_ROSTER)
@@ -899,22 +1304,23 @@ int summon_stored_shadow(struct char_data *ch, int slot)
   if (find_active_shadow_for_slot(ch, slot))
     return FALSE;
 
+  shadow_try_repair_legacy_slot_profile(ch, slot);
+
   vnum = SHADOW_SLOT_VNUM(ch, slot);
   if (real_mobile(vnum) == NOBODY)
     vnum = MOBVNUM_SHADOW_ELITE;
 
   level = MAX(1, SHADOW_SLOT_LEVEL(ch, slot));
-  resolved_name = shadow_slot_display_name(ch, slot);
-
-  mob = summon_shadow_servant(ch, vnum, level, 15, SPELL_SHADOW_EXTRACTION, resolved_name, TRUE);
+  build_shadow_source_profile(ch, slot, vnum, level, shadow_slot_display_name(ch, slot), &profile);
+  mob = read_mobile(vnum, VIRTUAL);
   if (!mob)
     return FALSE;
 
+  apply_shadow_source_profile(mob, &profile, ch, 15, TRUE);
   if (!shadow_name_looks_valid(SHADOW_SLOT_NAME(ch, slot)))
-    strlcpy(SHADOW_SLOT_NAME(ch, slot), resolved_name, MAX_SHADOW_NAME_LENGTH + 1);
-  apply_shadow_identity_to_mob(ch, mob, slot);
-  restore_shadow_combat_profile(ch, slot, mob);
+    strlcpy(SHADOW_SLOT_NAME(ch, slot), profile.source_name, MAX_SHADOW_NAME_LENGTH + 1);
   apply_shadow_servant_bonuses(ch, mob);
+  mark_shadow_servant(mob, SPELL_SHADOW_EXTRACTION, 15);
   SHADOW_SLOT_ACTIVE(ch, slot) = 1;
   mark_shadow_roster_slot(mob, slot);
   return TRUE;
@@ -1971,7 +2377,7 @@ ASPELL(spell_word_of_recall_mass)
   if (!ch)
     return;
   if (ROOM_FLAGGED(IN_ROOM(ch), ROOM_DEATH) || ZONE_FLAGGED(GET_ROOM_ZONE(IN_ROOM(ch)), ZONE_NOASTRAL)) {
-    send_to_char(ch, "A dark force blocks your mass recall.\r\n");
+    send_to_char(ch, "The nexus will not open from this location.\r\n");
     return;
   }
 
@@ -1985,10 +2391,10 @@ ASPELL(spell_word_of_recall_mass)
     to_room = (!IS_NPC(tch) && GET_LOADROOM(tch) != NOWHERE) ? real_room(GET_LOADROOM(tch)) : r_mortal_start_room;
     if (to_room == NOWHERE)
       to_room = r_mortal_start_room;
-    act("$n disappears.", TRUE, tch, 0, 0, TO_ROOM);
+    act("$n steps through a rippling nexus gate and vanishes.", TRUE, tch, 0, 0, TO_ROOM);
     char_from_room(tch);
     char_to_room(tch, to_room);
-    act("$n appears in the middle of the room.", TRUE, tch, 0, 0, TO_ROOM);
+    act("$n emerges from a rippling nexus gate.", TRUE, tch, 0, 0, TO_ROOM);
     look_at_room(tch, 0);
     handle_followers_after_owner_teleport_or_recall(tch);
   }
@@ -2145,11 +2551,6 @@ static int goal_of_all_life_is_death_active(struct char_data *ch)
   return ch && affected_by_spell(ch, SPELL_GOAL_OF_ALL_LIFE_IS_DEATH);
 }
 
-static int triple_maximize_magic_active(struct char_data *ch)
-{
-  return ch && affected_by_spell(ch, SPELL_TRIPLE_MAXIMIZE_MAGIC);
-}
-
 static int dimensional_lock_blocks_room(room_rnum room)
 {
   if (room == NOWHERE)
@@ -2237,6 +2638,7 @@ ASPELL(spell_meteor_swarm)
         break;
     }
   }
+  set_spell_cooldown(ch, SPELL_METEOR_SWARM, 13);
 }
 
 ASPELL(spell_hellfire)
@@ -2399,15 +2801,19 @@ ASPELL(spell_finger_of_death)
     int dam = spell_dmg_high_manual(level);
     set_next_damage_type(DAM_NECROTIC);
     damage(ch, victim, dam, SPELL_FINGER_OF_DEATH);
+    set_spell_cooldown(ch, SPELL_FINGER_OF_DEATH, 13);
     return;
   }
   saved = mag_savingthrow(victim, SAVING_DEATH, 0);
   if (!saved) {
-    if (spell_instant_kill(ch, victim, SPELL_FINGER_OF_DEATH, DAM_NECROTIC))
+    if (spell_instant_kill(ch, victim, SPELL_FINGER_OF_DEATH, DAM_NECROTIC)) {
+      set_spell_cooldown(ch, SPELL_FINGER_OF_DEATH, 13);
       return;
+    }
   }
   set_next_damage_type(DAM_NECROTIC);
   damage(ch, victim, spell_dmg_extreme_manual(level), SPELL_FINGER_OF_DEATH);
+  set_spell_cooldown(ch, SPELL_FINGER_OF_DEATH, 13);
 }
 
 ASPELL(spell_wail_of_the_banshee)
@@ -2446,6 +2852,7 @@ ASPELL(spell_disintegrate)
   dam = saved ? spell_dmg_high_manual(level) : (GET_MAX_HIT(victim) / 2 + spell_dmg_extreme_manual(level));
   set_next_damage_type(DAM_ARCANE);
   damage(ch, victim, dam, SPELL_DISINTEGRATE);
+  set_spell_cooldown(ch, SPELL_DISINTEGRATE, 10);
 }
 
 ASPELL(spell_power_word_kill)
@@ -2455,11 +2862,14 @@ ASPELL(spell_power_word_kill)
   act("You speak the Power Word: Kill at $N!", FALSE, ch, 0, victim, TO_CHAR);
   act("$n speaks the Power Word: Kill at $N!", TRUE, ch, 0, victim, TO_NOTVICT);
   if (GET_MAX_HIT(victim) <= 50 + (level * 2)) {
-    if (spell_instant_kill(ch, victim, SPELL_POWER_WORD_KILL, DAM_ARCANE))
+    if (spell_instant_kill(ch, victim, SPELL_POWER_WORD_KILL, DAM_ARCANE)) {
+      set_spell_cooldown(ch, SPELL_POWER_WORD_KILL, 15);
       return;
+    }
   }
   set_next_damage_type(DAM_ARCANE);
   damage(ch, victim, spell_dmg_extreme_manual(level), SPELL_POWER_WORD_KILL);
+  set_spell_cooldown(ch, SPELL_POWER_WORD_KILL, 15);
 }
 
 ASPELL(spell_power_word_stun)
@@ -2471,6 +2881,7 @@ ASPELL(spell_power_word_stun)
   act("$n speaks the Power Word: Stun at $N!", TRUE, ch, 0, victim, TO_NOTVICT);
   dur = (GET_MAX_HIT(victim) <= 100 + (level * 3)) ? spell_dur_medium_manual(level) : spell_dur_short_manual(level);
   spell_apply_flag(victim, SPELL_POWER_WORD_STUN, dur, AFF_STUNNED);
+  set_spell_cooldown(ch, SPELL_POWER_WORD_STUN, 10);
 }
 
 ASPELL(spell_power_word_blind)
@@ -2489,6 +2900,7 @@ ASPELL(spell_power_word_silence)
   act("You speak the Power Word: Silence at $N!", FALSE, ch, 0, victim, TO_CHAR);
   act("$n speaks the Power Word: Silence at $N!", TRUE, ch, 0, victim, TO_NOTVICT);
   spell_apply_flag(victim, SPELL_POWER_WORD_SILENCE, spell_dur_medium_manual(level), AFF_SILENCED);
+  set_spell_cooldown(ch, SPELL_POWER_WORD_SILENCE, 7);
 }
 
 ASPELL(spell_psychic_crush)
@@ -2510,6 +2922,7 @@ ASPELL(spell_psychic_crush)
     if (!mag_savingthrow(victim, SAVING_DEATH, 0))
       spell_instant_kill(ch, victim, SPELL_PSYCHIC_CRUSH, DAM_PSYCHIC);
   }
+  set_spell_cooldown(ch, SPELL_PSYCHIC_CRUSH, 7);
 }
 
 ASPELL(spell_time_stop)
@@ -2537,6 +2950,7 @@ ASPELL(spell_time_stop)
   af.location = APPLY_NONE;
   af.modifier = GET_ROOM_VNUM(IN_ROOM(ch));
   affect_join(ch, &af, FALSE, FALSE, FALSE, FALSE);
+  set_spell_cooldown(ch, SPELL_TIME_STOP, 25);
 }
 
 ASPELL(spell_black_lance)
@@ -2544,9 +2958,7 @@ ASPELL(spell_black_lance)
   int saved, dam;
   if (!ch || !victim) return;
   saved = mag_savingthrow(victim, SAVING_SPELL, 0);
-  dam = triple_maximize_magic_active(ch) ? (3 * ((level * 4) + (4 * MAX(1, level / 2)))) : spell_dmg_high_manual(level);
-  if (triple_maximize_magic_active(ch))
-    affect_from_char(ch, SPELL_TRIPLE_MAXIMIZE_MAGIC);
+  dam = spell_dmg_high_manual(level);
   if (saved) dam /= 2;
   set_next_damage_type(DAM_SHADOW);
   if (damage(ch, victim, dam, SPELL_BLACK_LANCE) == -1) return;
@@ -2571,11 +2983,14 @@ ASPELL(spell_grasp_heart)
 {
   int saved, dam;
   if (!ch || !victim) return;
+
   if (GET_HIT(victim) * 100 <= GET_MAX_HIT(victim) * 30) {
     /* GOAL_OF_ALL_LIFE_IS_DEATH_ACTIVE */
     saved = goal_of_all_life_is_death_active(ch) ? FALSE : mag_savingthrow(victim, SAVING_DEATH, 0);
-    if (!saved && spell_instant_kill(ch, victim, SPELL_GRASP_HEART, DAM_NECROTIC))
+    if (!saved && spell_instant_kill(ch, victim, SPELL_GRASP_HEART, DAM_NECROTIC)) {
+      set_spell_cooldown(ch, SPELL_GRASP_HEART, 10);
       return;
+    }
     dam = spell_dmg_extreme_manual(level);
   } else {
     saved = mag_savingthrow(victim, SAVING_DEATH, 0);
@@ -2583,7 +2998,11 @@ ASPELL(spell_grasp_heart)
     if (saved) dam /= 2;
   }
   set_next_damage_type(DAM_NECROTIC);
-  if (damage(ch, victim, dam, SPELL_GRASP_HEART) == -1) return;
+  if (damage(ch, victim, dam, SPELL_GRASP_HEART) == -1) {
+    set_spell_cooldown(ch, SPELL_GRASP_HEART, 10);
+    return;
+  }
+  set_spell_cooldown(ch, SPELL_GRASP_HEART, 10);
   if (!saved && GET_HIT(victim) > 0 && GET_HIT(victim) * 100 > GET_MAX_HIT(victim) * 30)
     spell_apply_flag(victim, SPELL_GRASP_HEART, 1, AFF_STUNNED);
 }
@@ -2615,9 +3034,13 @@ ASPELL(spell_true_death)
   dam = spell_dmg_extreme_manual(level);
   if (saved) dam /= 2;
   set_next_damage_type(DAM_NECROTIC);
-  if (damage(ch, victim, dam, SPELL_TRUE_DEATH) == -1) return;
+  if (damage(ch, victim, dam, SPELL_TRUE_DEATH) == -1) {
+    set_spell_cooldown(ch, SPELL_TRUE_DEATH, 13);
+    return;
+  }
   if (!saved)
     spell_apply_modifier(victim, SPELL_TRUE_DEATH, spell_dur_long_manual(level), APPLY_NONE, 1);
+  set_spell_cooldown(ch, SPELL_TRUE_DEATH, 13);
 }
 
 ASPELL(spell_perfect_unknowable)
@@ -2642,13 +3065,14 @@ ASPELL(spell_greater_magic_seal)
   } else {
     spell_apply_flag(victim, SPELL_GREATER_MAGIC_SEAL, spell_dur_short_manual(level), AFF_SPELLLOCK);
   }
+  set_spell_cooldown(ch, SPELL_GREATER_MAGIC_SEAL, 10);
 }
 
 ASPELL(spell_despair_aura) { if (ch) spell_apply_modifier(ch, SPELL_DESPAIR_AURA, spell_dur_medium_manual(level), APPLY_NONE, 1); }
-ASPELL(spell_oblivion_spear) { if (ch && victim) { int s = mag_savingthrow(victim, SAVING_SPELL, 0), dam = triple_maximize_magic_active(ch) ? (3 * ((level * 5) + (5 * MAX(1, level / 2)))) : spell_dmg_extreme_manual(level); if (triple_maximize_magic_active(ch)) affect_from_char(ch, SPELL_TRIPLE_MAXIMIZE_MAGIC); if (s) dam /= 2; set_next_damage_type(DAM_SHADOW); if (damage(ch, victim, dam, SPELL_OBLIVION_SPEAR) != -1 && !s) GET_MANA(victim) = MAX(0, GET_MANA(victim) - dam / 4); } }
+ASPELL(spell_oblivion_spear) { if (ch && victim) { int s = mag_savingthrow(victim, SAVING_SPELL, 0), dam = spell_dmg_extreme_manual(level); if (s) dam /= 2; set_next_damage_type(DAM_SHADOW); if (damage(ch, victim, dam, SPELL_OBLIVION_SPEAR) != -1 && !s) GET_MANA(victim) = MAX(0, GET_MANA(victim) - dam / 4); set_spell_cooldown(ch, SPELL_OBLIVION_SPEAR, 7); } }
 ASPELL(spell_bone_prison) { if (ch && victim) { if (!mag_savingthrow(victim, SAVING_SPELL, 0)) { spell_apply_flag(victim, SPELL_BONE_PRISON, spell_dur_medium_manual(level), AFF_ROOTED); spell_apply_modifier(victim, SPELL_BONE_PRISON, spell_dur_medium_manual(level), APPLY_AC, -10);} else spell_apply_flag(victim, SPELL_BONE_PRISON, 1, AFF_ROOTED);} }
 ASPELL(spell_undying_will) { if (ch) spell_apply_modifier(ch, SPELL_UNDYING_WILL, spell_dur_long_manual(level), APPLY_NONE, 1); }
-ASPELL(spell_dragon_lightning) { if (ch && victim) { int s = mag_savingthrow(victim, SAVING_SPELL, 0), dam = triple_maximize_magic_active(ch) ? (3 * ((level * 4) + (4 * MAX(1, level / 2)))) : spell_dmg_high_manual(level); if (triple_maximize_magic_active(ch)) affect_from_char(ch, SPELL_TRIPLE_MAXIMIZE_MAGIC); if (s) dam /= 2; set_next_damage_type(DAM_LIGHTNING); damage(ch, victim, dam, SPELL_DRAGON_LIGHTNING);} }
+ASPELL(spell_dragon_lightning) { if (ch && victim) { int s = mag_savingthrow(victim, SAVING_SPELL, 0), dam = spell_dmg_high_manual(level); if (s) dam /= 2; set_next_damage_type(DAM_LIGHTNING); damage(ch, victim, dam, SPELL_DRAGON_LIGHTNING);} }
 
 ASPELL(spell_chain_dragon_lightning)
 {
@@ -2670,7 +3094,7 @@ ASPELL(spell_chain_dragon_lightning)
 ASPELL(spell_hell_flame) { if (ch && victim) { set_next_damage_type(DAM_FIRE); damage(ch, victim, spell_dmg_low_manual(level), SPELL_HELL_FLAME); if (!mag_savingthrow(victim, SAVING_SPELL, 0)) spell_apply_modifier(victim, SPELL_HELL_FLAME, spell_dur_medium_manual(level), APPLY_NONE, 1); } }
 ASPELL(spell_gravity_maelstrom) { if (ch && victim) { int s = mag_savingthrow(victim, SAVING_SPELL, 0), dam = spell_dmg_extreme_manual(level); if (s) dam /= 2; set_next_damage_type(DAM_FORCE); if (damage(ch, victim, dam, SPELL_GRAVITY_MAELSTROM) == -1) return; if (!s) { spell_apply_modifier(victim, SPELL_GRAVITY_MAELSTROM, spell_dur_short_manual(level), APPLY_STR, -3); spell_apply_modifier(victim, SPELL_GRAVITY_MAELSTROM, spell_dur_short_manual(level), APPLY_DEX, -3); spell_apply_flag(victim, SPELL_GRAVITY_MAELSTROM, 1, AFF_ROOTED);} } }
 ASPELL(spell_call_greater_thunder) { if (ch && victim) { int dam = (level * 5) + (5 * MAX(1, level / 2)); if (mag_savingthrow(victim, SAVING_SPELL, 0)) dam /= 2; set_next_damage_type(DAM_LIGHTNING); damage(ch, victim, dam, SPELL_CALL_GREATER_THUNDER);} }
-ASPELL(spell_astral_smite) { if (ch && victim) { int dam = triple_maximize_magic_active(ch) ? (3 * ((level * 4) + (4 * MAX(1, level / 2)))) : spell_dmg_high_manual(level); if (triple_maximize_magic_active(ch)) affect_from_char(ch, SPELL_TRIPLE_MAXIMIZE_MAGIC); if (mag_savingthrow(victim, SAVING_SPELL, 0)) dam /= 2; set_next_damage_type(DAM_FORCE); damage(ch, victim, dam, SPELL_ASTRAL_SMITE);} }
+ASPELL(spell_astral_smite) { if (ch && victim) { int dam = spell_dmg_high_manual(level); if (mag_savingthrow(victim, SAVING_SPELL, 0)) dam /= 2; set_next_damage_type(DAM_FORCE); damage(ch, victim, dam, SPELL_ASTRAL_SMITE);} }
 ASPELL(spell_greater_rejection) { if (ch && victim) { if (!mag_savingthrow(victim, SAVING_SPELL, 0) && ((AFF_FLAGGED(victim, AFF_CHARM) && victim->master && victim->master != ch) || spell_is_undead(victim))) { spell_instant_kill(ch, victim, SPELL_GREATER_REJECTION, DAM_FORCE); } else { int dam = spell_dmg_medium_manual(level); if (mag_savingthrow(victim, SAVING_SPELL, 0)) { dam = spell_dmg_low_manual(level); spell_apply_flag(victim, SPELL_GREATER_REJECTION, 1, AFF_STUNNED);} set_next_damage_type(DAM_FORCE); damage(ch, victim, dam, SPELL_GREATER_REJECTION);} } }
 ASPELL(spell_fallen_down) { struct char_data *tch,*next_tch; if (!ch) return; for (tch = world[IN_ROOM(ch)].people; tch; tch = next_tch) { int s, dam; next_tch = tch->next_in_room; if (!spell_is_enemy(ch, tch, SPELL_FALLEN_DOWN)) continue; s = mag_savingthrow(tch, SAVING_SPELL, 0); dam = spell_dmg_extreme_manual(level); if (s) dam /= 2; set_next_damage_type(DAM_FIRE); damage(ch, tch, dam, SPELL_FALLEN_DOWN);} }
 ASPELL(spell_ia_shub_niggurath) { struct char_data *tch,*next_tch; int tribute = 0; if (!ch) return; for (tch = world[IN_ROOM(ch)].people; tch; tch = next_tch) { int s; next_tch = tch->next_in_room; if (!spell_is_enemy(ch, tch, SPELL_IA_SHUB_NIGGURATH) || spell_is_undead(tch)) continue; /* GOAL_OF_ALL_LIFE_IS_DEATH_ACTIVE */ s = goal_of_all_life_is_death_active(ch) ? FALSE : mag_savingthrow(tch, SAVING_DEATH, 0); if (!s) { if (spell_instant_kill(ch, tch, SPELL_IA_SHUB_NIGGURATH, DAM_NECROTIC)) tribute++; } else { set_next_damage_type(DAM_NECROTIC); damage(ch, tch, spell_dmg_extreme_manual(level), SPELL_IA_SHUB_NIGGURATH);} } if (tribute >= 3) send_to_char(ch, "The void accepts your tribute and something stirs beyond.\r\n"); }
@@ -2679,7 +3103,7 @@ ASPELL(spell_cry_of_the_banshee) { struct char_data *tch,*next_tch; if (!ch) ret
 ASPELL(spell_napalm) { struct char_data *tch,*next_tch; if (!ch) return; for (tch = world[IN_ROOM(ch)].people; tch; tch = next_tch) { int s, dam; next_tch = tch->next_in_room; if (!spell_is_enemy(ch, tch, SPELL_NAPALM)) continue; s = mag_savingthrow(tch, SAVING_SPELL, 0); dam = spell_dmg_medium_manual(level); if (s) dam /= 2; set_next_damage_type(DAM_FIRE); if (damage(ch, tch, dam, SPELL_NAPALM) == -1) continue; if (!s) spell_apply_modifier(tch, SPELL_NAPALM, 1, APPLY_NONE, 1); } }
 ASPELL(spell_body_of_effulgent_beryl) { if (!ch) return; spell_apply_modifier(ch, SPELL_BODY_OF_EFFULGENT_BERYL, spell_dur_medium_manual(level), APPLY_AC, 20); spell_apply_modifier(ch, SPELL_BODY_OF_EFFULGENT_BERYL, spell_dur_medium_manual(level), APPLY_NONE, 1); }
 ASPELL(spell_vermilion_nova) { struct char_data *tch,*next_tch; if (!ch) return; for (tch = world[IN_ROOM(ch)].people; tch; tch = next_tch) { int s, dam; next_tch = tch->next_in_room; if (!spell_is_enemy(ch, tch, SPELL_VERMILION_NOVA)) continue; s = mag_savingthrow(tch, SAVING_SPELL, 0); dam = spell_dmg_high_manual(level); if (s) dam /= 2; set_next_damage_type(DAM_FIRE); if (damage(ch, tch, dam, SPELL_VERMILION_NOVA) == -1) continue; if (!s) spell_apply_flag(tch, SPELL_VERMILION_NOVA, spell_dur_short_manual(level), AFF_BURNING); } }
-ASPELL(spell_nuclear_blast) { struct char_data *tch,*next_tch; if (!ch) return; for (tch = world[IN_ROOM(ch)].people; tch; tch = next_tch) { int s, dam; next_tch = tch->next_in_room; if (!spell_is_enemy(ch, tch, SPELL_NUCLEAR_BLAST)) continue; s = mag_savingthrow(tch, SAVING_SPELL, 0); dam = spell_dmg_extreme_manual(level); if (s) dam /= 2; set_next_damage_type(DAM_FORCE); if (damage(ch, tch, dam, SPELL_NUCLEAR_BLAST) == -1) continue; set_next_damage_type(DAM_FIRE); damage(ch, tch, spell_dmg_low_manual(level), SPELL_NUCLEAR_BLAST); } }
+ASPELL(spell_nuclear_blast) { struct char_data *tch,*next_tch; if (!ch) return; for (tch = world[IN_ROOM(ch)].people; tch; tch = next_tch) { int s, dam; next_tch = tch->next_in_room; if (!spell_is_enemy(ch, tch, SPELL_NUCLEAR_BLAST)) continue; s = mag_savingthrow(tch, SAVING_SPELL, 0); dam = spell_dmg_extreme_manual(level); if (s) dam /= 2; set_next_damage_type(DAM_FORCE); if (damage(ch, tch, dam, SPELL_NUCLEAR_BLAST) == -1) continue; set_next_damage_type(DAM_FIRE); damage(ch, tch, spell_dmg_low_manual(level), SPELL_NUCLEAR_BLAST); } set_spell_cooldown(ch, SPELL_NUCLEAR_BLAST, 15); }
 ASPELL(spell_greater_teleportation)
 {
   room_rnum to_room;
@@ -2704,10 +3128,25 @@ ASPELL(spell_greater_teleportation)
   greet_mtrigger(ch, -1);
   greet_memory_mtrigger(ch);
   handle_followers_after_owner_teleport_or_recall(ch);
+  set_spell_cooldown(ch, SPELL_GREATER_TELEPORTATION, 10);
 }
 ASPELL(spell_silent_magic) { if (ch) spell_apply_modifier(ch, SPELL_SILENT_MAGIC, spell_dur_short_manual(level), APPLY_NONE, 1); }
-ASPELL(spell_triple_maximize_magic) { if (ch) spell_apply_modifier(ch, SPELL_TRIPLE_MAXIMIZE_MAGIC, 1, APPLY_NONE, 1); }
-ASPELL(spell_pantheon) { if (!ch) return; spell_apply_modifier(ch, SPELL_PANTHEON, spell_dur_medium_manual(level), APPLY_SAVING_SPELL, 6); spell_apply_modifier(ch, SPELL_PANTHEON, spell_dur_medium_manual(level), APPLY_AC, 15); spell_apply_modifier(ch, SPELL_PANTHEON, spell_dur_medium_manual(level), APPLY_NONE, 1); }
+ASPELL(spell_triple_maximize_magic)
+{
+  const int triple_maximize_cooldown_rounds = 18; /* 36s with 2s combat rounds */
+
+  if (!ch)
+    return;
+
+  if (spell_on_cooldown(ch, SPELL_TRIPLE_MAXIMIZE_MAGIC)) {
+    send_to_char(ch, "Triple maximize magic is still on cooldown.\r\n");
+    return;
+  }
+
+  spell_apply_modifier(ch, SPELL_TRIPLE_MAXIMIZE_MAGIC, 1, APPLY_NONE, 1);
+  set_spell_cooldown(ch, SPELL_TRIPLE_MAXIMIZE_MAGIC, triple_maximize_cooldown_rounds);
+}
+ASPELL(spell_pantheon) { if (!ch) return; spell_apply_modifier(ch, SPELL_PANTHEON, spell_dur_medium_manual(level), APPLY_SAVING_SPELL, -6); spell_apply_modifier(ch, SPELL_PANTHEON, spell_dur_medium_manual(level), APPLY_AC, 15); spell_apply_modifier(ch, SPELL_PANTHEON, spell_dur_medium_manual(level), APPLY_NONE, 1); }
 ASPELL(spell_dimensional_lock) { if (ch && IN_ROOM(ch) != NOWHERE) room_add_effect(&world[IN_ROOM(ch)], ROOM_EFFECT_DIMENSIONAL_LOCK, spell_dur_medium_manual(level), 0); }
 
 ASPELL(spell_shadow_bind) { if (!ch || !victim) return; if (!mag_savingthrow(victim, SAVING_SPELL, 0)) { spell_apply_flag(victim, SPELL_SHADOW_BIND, spell_dur_medium_manual(level), AFF_ROOTED); spell_apply_modifier(victim, SPELL_SHADOW_BIND, spell_dur_medium_manual(level), APPLY_DEX, -2); } else spell_apply_flag(victim, SPELL_SHADOW_BIND, 1, AFF_ROOTED); act("Your shadow lashes out and binds $N in place!", FALSE, ch, 0, victim, TO_CHAR); act("Shadowy tendrils rise and bind your limbs!", FALSE, ch, 0, victim, TO_VICT); act("$n's shadow erupts and binds $N!", FALSE, ch, 0, victim, TO_NOTVICT); }
@@ -2753,7 +3192,7 @@ ASPELL(spell_monarchs_pressure)
 ASPELL(spell_shadow_domain) { if (!ch || IN_ROOM(ch) == NOWHERE) return; room_add_effect(&world[IN_ROOM(ch)], ROOM_EFFECT_SHADOW_DOMAIN, spell_dur_medium_manual(level), level); act("Darkness spreads outward as you establish a shadow domain!", FALSE, ch, 0, 0, TO_CHAR); act("Darkness spreads outward from $n into a living shadow domain!", FALSE, ch, 0, 0, TO_ROOM); }
 ASPELL(spell_force_grasp) { if (!ch || !victim) return; { int saved = mag_savingthrow(victim, SAVING_SPELL, 0), dam = spell_dmg_medium_manual(level); if (saved) dam /= 2; set_next_damage_type(DAM_FORCE); damage(ch, victim, dam, SPELL_FORCE_GRASP); if (!saved) spell_apply_flag(victim, SPELL_FORCE_GRASP, 1, AFF_STUNNED);} act("Invisible force crushes around $N!", FALSE, ch, 0, victim, TO_CHAR); act("Invisible force seizes and crushes you!", FALSE, ch, 0, victim, TO_VICT); act("$n seizes $N with an invisible crushing force!", FALSE, ch, 0, victim, TO_NOTVICT); }
 ASPELL(spell_shadow_step) { if (!ch) return; spell_apply_modifier(ch, SPELL_SHADOW_STEP, 1, APPLY_HITROLL, 8); act("You vanish into shadow, ready to strike from the dark!", FALSE, ch, 0, 0, TO_CHAR); act("$n vanishes into a blur of shadow!", FALSE, ch, 0, 0, TO_ROOM); }
-ASPELL(spell_black_heart) { int hp_loss, mana_gain; if (!ch) return; hp_loss = MAX(1, (GET_HIT(ch) * 20) / 100); GET_HIT(ch) = MAX(1, GET_HIT(ch) - hp_loss); mana_gain = (effective_max_mana(ch) * 35) / 100; GET_MANA(ch) = MIN(effective_max_mana(ch), GET_MANA(ch) + mana_gain); spell_apply_flag(ch, SPELL_BLACK_HEART, spell_dur_short_manual(level), AFF_EMPOWERED); act("You ignite the Black Heart within and trade blood for power!", FALSE, ch, 0, 0, TO_CHAR); act("$n's chest pulses with dark power as blood becomes mana!", FALSE, ch, 0, 0, TO_ROOM); }
+ASPELL(spell_black_heart) { int hp_loss, mana_gain; if (!ch) return; hp_loss = MAX(1, (GET_HIT(ch) * 20) / 100); GET_HIT(ch) = MAX(1, GET_HIT(ch) - hp_loss); mana_gain = (effective_max_mana(ch) * 35) / 100; GET_MANA(ch) = MIN(effective_max_mana(ch), GET_MANA(ch) + mana_gain); spell_apply_flag(ch, SPELL_BLACK_HEART, spell_dur_short_manual(level), AFF_EMPOWERED); act("You ignite the Black Heart within and trade blood for power!", FALSE, ch, 0, 0, TO_CHAR); act("$n's chest pulses with dark power as blood becomes mana!", FALSE, ch, 0, 0, TO_ROOM); set_spell_cooldown(ch, SPELL_BLACK_HEART, 15); }
 
 ASPELL(spell_call_shadow_legion)
 {
@@ -2773,6 +3212,7 @@ ASPELL(spell_call_shadow_legion)
     summon_shadow_servant(ch, MOBVNUM_SHADOW_SOLDIER, MAX(1, level - 6), 8, SPELL_CALL_SHADOW_LEGION, NULL, FALSE);
   act("Shadows rise at your command as your legion answers!", FALSE, ch, 0, 0, TO_CHAR);
   act("Shadows rise from the ground to serve $n!", FALSE, ch, 0, 0, TO_ROOM);
+  set_spell_cooldown(ch, SPELL_CALL_SHADOW_LEGION, 25);
 }
 
 ASPELL(spell_night_hunt) { if (!ch || !victim) return; if (mag_savingthrow(victim, SAVING_SPELL, 0)) return; spell_apply_flag(victim, SPELL_NIGHT_HUNT, spell_dur_long_manual(level), AFF_MARKED); act("You brand $N for the hunt!", FALSE, ch, 0, victim, TO_CHAR); act("A hunter's brand settles into your shadow!", FALSE, ch, 0, victim, TO_VICT); act("$n brands $N for the hunt!", FALSE, ch, 0, victim, TO_NOTVICT); }
@@ -2840,7 +3280,9 @@ ASPELL(spell_shadow_extraction)
     return;
   }
 
-  source_vnum = GET_OBJ_VAL(corpse, 1);
+  source_vnum = CORPSE_SOURCE_VNUM(corpse);
+  if (source_vnum == 0)
+    source_vnum = GET_OBJ_VAL(corpse, 1);
   source_rnum = real_mobile(source_vnum);
   if (source_rnum != NOBODY && mob_proto[source_rnum].player.short_descr && *mob_proto[source_rnum].player.short_descr)
     source_short = mob_proto[source_rnum].player.short_descr;
@@ -2943,9 +3385,10 @@ ASPELL(spell_shadow_recall)
   }
   act("You call your shadows back to your side!", FALSE, ch, 0, 0, TO_CHAR);
   act("Dark shapes slip from the edges of the room to gather around $n!", FALSE, ch, 0, 0, TO_ROOM);
+  set_spell_cooldown(ch, SPELL_SHADOW_RECALL, 10);
 }
 
-ASPELL(spell_shadow_regenesis) { if (!ch) return; spell_apply_flag(ch, SPELL_SHADOW_REGENESIS, spell_dur_long_manual(level), AFF_REGENERATING); spell_apply_modifier(ch, SPELL_SHADOW_REGENESIS, spell_dur_long_manual(level), APPLY_NONE, 4 + (level / 4)); act("Your body sinks into shadow and begins to regenerate!", FALSE, ch, 0, 0, TO_CHAR); act("$n's wounds seem to close in shadow.", FALSE, ch, 0, 0, TO_ROOM); }
+ASPELL(spell_shadow_regenesis) { if (!ch) return; { struct affected_type af; new_affect(&af); af.spell = SPELL_SHADOW_REGENESIS; af.duration = spell_dur_long_manual(level); af.location = APPLY_NONE; af.modifier = 4 + (level / 4); SET_BIT_AR(af.bitvector, AFF_REGENERATING); affect_join(ch, &af, FALSE, FALSE, FALSE, FALSE); } act("Your body sinks into shadow and begins to regenerate!", FALSE, ch, 0, 0, TO_CHAR); act("$n's wounds seem to close in shadow.", FALSE, ch, 0, 0, TO_ROOM); }
 ASPELL(spell_assassins_intent) { if (!ch) return; spell_apply_modifier(ch, SPELL_ASSASSINS_INTENT, spell_dur_medium_manual(level), APPLY_HITROLL, 5); spell_apply_modifier(ch, SPELL_ASSASSINS_INTENT, spell_dur_medium_manual(level), APPLY_DAMROLL, 3); act("A killing stillness settles into your movements.", FALSE, ch, 0, 0, TO_CHAR); act("$n grows unnervingly still and lethal.", FALSE, ch, 0, 0, TO_ROOM); }
 ASPELL(spell_blood_dagger_tempest) { struct char_data *tch,*next_tch; if (!ch) return; act("You unleash a tempest of blood-dark daggers across the room!", FALSE, ch, 0, 0, TO_CHAR); act("$n unleashes a tempest of blood-dark daggers!", FALSE, ch, 0, 0, TO_ROOM); for (tch = world[IN_ROOM(ch)].people; tch; tch = next_tch) { int j; next_tch = tch->next_in_room; if (!spell_is_enemy(ch, tch, SPELL_BLOOD_DAGGER_TEMPEST)) continue; for (j = 0; j < 2; j++) { int dam = spell_dmg_low_manual(level); if (mag_savingthrow(tch, SAVING_SPELL, 0)) dam /= 2; set_next_damage_type(DAM_SHADOW); if (damage(ch, tch, dam, SPELL_BLOOD_DAGGER_TEMPEST) == -1) break; } } GET_HIT(ch) = MAX(1, GET_HIT(ch) - level); }
 ASPELL(spell_chain_of_subjugation) { if (!ch || !victim) return; if (!mag_savingthrow(victim, SAVING_SPELL, 0)) { spell_apply_flag(victim, SPELL_CHAIN_OF_SUBJUGATION, spell_dur_medium_manual(level), AFF_ROOTED); spell_apply_modifier(victim, SPELL_CHAIN_OF_SUBJUGATION, spell_dur_medium_manual(level), APPLY_HITROLL, -4); spell_apply_modifier(victim, SPELL_CHAIN_OF_SUBJUGATION, spell_dur_medium_manual(level), APPLY_DAMROLL, -4); } else spell_apply_flag(victim, SPELL_CHAIN_OF_SUBJUGATION, 1, AFF_ROOTED); act("Chains of shadow clamp down and subjugate $N!", FALSE, ch, 0, victim, TO_CHAR); act("Chains of shadow bind your body and crush your will!", FALSE, ch, 0, victim, TO_VICT); act("Chains of shadow erupt around $N at $n's command!", FALSE, ch, 0, victim, TO_NOTVICT); }

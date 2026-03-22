@@ -188,7 +188,9 @@ ACMD(do_hit)
   else if (vict == ch) {
     send_to_char(ch, "You hit yourself...OUCH!.\r\n");
     act("$n hits $mself, and says OUCH!", FALSE, ch, 0, vict, TO_ROOM);
-  } else if (AFF_FLAGGED(ch, AFF_CHARM) && (ch->master == vict))
+  } else if (is_owned_follower_target(ch, vict))
+    send_to_char(ch, "You cannot attack one of your own followers.\r\n");
+  else if (AFF_FLAGGED(ch, AFF_CHARM) && (ch->master == vict))
     act("$N is just such a good friend, you simply can't hit $M.", FALSE, ch, 0, vict, TO_CHAR);
   else {
     if (!CONFIG_PK_ALLOWED && !IS_NPC(vict) && !IS_NPC(ch)) 
@@ -227,6 +229,8 @@ ACMD(do_kill)
       send_to_char(ch, "That player is not here.\r\n");
     else if (ch == vict)
       send_to_char(ch, "Your mother would be so sad.. :(\r\n");
+    else if (is_owned_follower_target(ch, vict))
+      send_to_char(ch, "You cannot attack one of your own followers.\r\n");
     else {
       act("You chop $M to pieces!  Ah!  The blood!", FALSE, ch, 0, vict, TO_CHAR);
       act("$N chops you to pieces!", FALSE, vict, 0, ch, TO_CHAR);
@@ -255,6 +259,10 @@ ACMD(do_backstab)
   }
   if (vict == ch) {
     send_to_char(ch, "How can you sneak up on yourself?\r\n");
+    return;
+  }
+  if (is_owned_follower_target(ch, vict)) {
+    send_to_char(ch, "You cannot attack one of your own followers.\r\n");
     return;
   }
   if (!GET_EQ(ch, WEAR_WIELD)) {
@@ -290,20 +298,104 @@ ACMD(do_backstab)
   WAIT_STATE(ch, 2 * PULSE_VIOLENCE);
 }
 
+static int is_ordered_attack_command(const char *message, char *verb, char *target)
+{
+  char local[MAX_INPUT_LENGTH];
+
+  if (!message || !*message)
+    return FALSE;
+
+  strlcpy(local, message, sizeof(local));
+  half_chop(local, verb, target);
+  if (!*verb || !*target)
+    return FALSE;
+
+  return (is_abbrev(verb, "hit") || is_abbrev(verb, "kill"));
+}
+
+static int execute_ordered_attack(struct char_data *issuer, struct char_data *follower,
+                                  const char *target_name)
+{
+  struct char_data *victim = NULL;
+  char victim_arg[MAX_INPUT_LENGTH];
+
+  if (!issuer || !follower || !target_name || !*target_name)
+    return FALSE;
+
+  if (IN_ROOM(follower) != IN_ROOM(issuer)) {
+    send_to_char(issuer, "You can't order %s to attack from another room.\r\n",
+      GET_NAME(follower));
+    return TRUE;
+  }
+
+  strlcpy(victim_arg, target_name, sizeof(victim_arg));
+  victim = get_char_vis(follower, victim_arg, NULL, FIND_CHAR_ROOM);
+  if (!victim) {
+    send_to_char(issuer, "%s cannot find '%s' here.\r\n", GET_NAME(follower), target_name);
+    return TRUE;
+  }
+
+  if (victim == follower) {
+    send_to_char(issuer, "%s refuses to attack itself.\r\n", GET_NAME(follower));
+    return TRUE;
+  }
+
+  if (is_owned_follower_target(follower, victim)) {
+    send_to_char(issuer, "%s refuses to attack its own allies.\r\n", GET_NAME(follower));
+    return TRUE;
+  }
+
+  if (GET_POS(follower) < POS_STANDING) {
+    send_to_char(issuer, "%s is unable to fight right now.\r\n", GET_NAME(follower));
+    return TRUE;
+  }
+
+  if (FIGHTING(follower) && FIGHTING(follower) != victim)
+    stop_fighting(follower);
+
+  if (!FIGHTING(follower))
+    set_fighting(follower, victim);
+  if (!FIGHTING(victim))
+    set_fighting(victim, follower);
+
+  hit(follower, victim, TYPE_UNDEFINED);
+  return TRUE;
+}
+
 ACMD(do_order)
 {
   char name[MAX_INPUT_LENGTH], message[MAX_INPUT_LENGTH];
+  char command_verb[MAX_INPUT_LENGTH], target[MAX_INPUT_LENGTH];
+  int order_all = FALSE;
+  int ordered_attack = FALSE;
   bool found = FALSE;
-  struct char_data *vict;
+  struct char_data *vict = NULL;
   struct follow_type *k;
 
   half_chop(argument, name, message);
+  ordered_attack = is_ordered_attack_command(message, command_verb, target);
+
+  order_all = (is_abbrev(name, "followers") || is_abbrev(name, "all"));
 
   if (!*name || !*message)
     send_to_char(ch, "Order who to do what?\r\n");
-  else if (!(vict = get_char_vis(ch, name, NULL, FIND_CHAR_ROOM)) && !is_abbrev(name, "followers"))
+  else if (!order_all && !(vict = get_char_vis(ch, name, NULL, FIND_CHAR_ROOM))) {
+    for (k = ch->followers; k; k = k->next) {
+      if (!k->follower || IN_ROOM(k->follower) != IN_ROOM(ch))
+        continue;
+      if ((k->follower->master == ch) &&
+          (isname(name, GET_NAME(k->follower)) ||
+           (k->follower->player.short_descr &&
+            isname(name, k->follower->player.short_descr)))) {
+        vict = k->follower;
+        break;
+      }
+    }
+  }
+
+  if (!order_all && !vict)
     send_to_char(ch, "That person isn't here.\r\n");
-  else if (ch == vict)
+  else if (!order_all && ch == vict)
     send_to_char(ch, "You obviously suffer from skitzofrenia.\r\n");
   else {
     if (AFF_FLAGGED(ch, AFF_CHARM)) {
@@ -320,10 +412,14 @@ ACMD(do_order)
       if ((vict->master != ch) || !AFF_FLAGGED(vict, AFF_CHARM))
         act("$n has an indifferent look.", FALSE, vict, 0, 0, TO_ROOM);
       else {
+        if (ordered_attack)
+          execute_ordered_attack(ch, vict, target);
+        else
+          command_interpreter(vict, message);
+
         send_to_char(ch, "%s", CONFIG_OK);
-        command_interpreter(vict, message);
       }
-    } else {			/* This is order "followers" */
+    } else {			/* This is order "followers"/"all" */
       char buf[MAX_STRING_LENGTH];
 
       snprintf(buf, sizeof(buf), "$n issues the order '%s'.", message);
@@ -333,7 +429,10 @@ ACMD(do_order)
         if (IN_ROOM(ch) == IN_ROOM(k->follower))
           if (AFF_FLAGGED(k->follower, AFF_CHARM)) {
             found = TRUE;
-            command_interpreter(k->follower, message);
+            if (ordered_attack)
+              execute_ordered_attack(ch, k->follower, target);
+            else
+              command_interpreter(k->follower, message);
           }
       }
       if (found)
@@ -444,6 +543,10 @@ ACMD(do_bash)
   }
   if (vict == ch) {
     send_to_char(ch, "Aren't we funny today...\r\n");
+    return;
+  }
+  if (is_owned_follower_target(ch, vict)) {
+    send_to_char(ch, "You cannot attack one of your own followers.\r\n");
     return;
   }
   if (MOB_FLAGGED(vict, MOB_NOKILL)) {
@@ -572,7 +675,7 @@ EVENTFUNC(event_whirlwind)
   /* We search through the "next_in_room", and grab all NPCs and add them
    * to our list */
   for (tch = world[IN_ROOM(ch)].people; tch; tch = tch->next_in_room)  
-    if (IS_NPC(tch))
+    if (IS_NPC(tch) && !is_owned_follower_target(ch, tch))
       add_to_list(tch, room_list);
       
   /* If our list is empty or has "0" entries, we free it from memory and
@@ -693,6 +796,10 @@ ACMD(do_kick)
   }
   if (vict == ch) {
     send_to_char(ch, "Aren't we funny today...\r\n");
+    return;
+  }
+  if (is_owned_follower_target(ch, vict)) {
+    send_to_char(ch, "You cannot attack one of your own followers.\r\n");
     return;
   }
   /* 101% is a complete failure */

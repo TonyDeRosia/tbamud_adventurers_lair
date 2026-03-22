@@ -25,9 +25,11 @@
 #include "shop.h"
 #include "act.h"
 #include "genzon.h" /* for real_zone_by_thing */
+#include "genwld.h"
 #include "class.h"
 #include "genolc.h"
 #include "genobj.h"
+#include "genmob.h"
 #include "race.h"
 #include "fight.h"
 #include "house.h"
@@ -66,9 +68,119 @@ struct acct_list_ctx {
 };
 
 static int acctlist_show_entry(long id, const char *name, void *arg);
+#define MAX_TEMPLATE_BASENAME_LEN 120
+
+static int compute_areatemplate_width(int room_count);
+static int compute_areatemplate_height(int room_count, int width);
+static void compute_template_dimensions(int room_count, int *width_out, int *height_out);
+static void zonemap_append(char *buf, size_t bufsz, size_t *len, const char *fmt, ...);
+static bool zonemap_has_exit_to(room_rnum from, int dir, room_rnum to);
+static void zonemap_cell_text(room_vnum vnum, room_rnum rrnum, room_vnum player_room_vnum,
+                              char out[3]);
+static bool room_range_is_clear(room_vnum start, int room_count, char *errmsg, size_t errmsg_sz);
+static bool roomtemplate_range_is_valid(room_vnum start, int room_count, zone_rnum *zone_out,
+                                        char *errmsg, size_t errmsg_sz);
+static bool roomtemplate_builder_can_edit(struct char_data *ch, zone_rnum rznum,
+                                          char *errmsg, size_t errmsg_sz);
+static void init_areatemplate_room(struct room_data *room, room_vnum vnum, zone_rnum rznum);
+static bool areatemplate_set_zone_name(zone_rnum rznum, const char *new_name);
+static bool parse_areatemplate_args(char *argument, zone_vnum *zone_vnum_out, room_vnum *start_room_out, int *room_count_out, char *zone_name_out, size_t zone_name_sz);
+static bool parse_roomtemplate_args(char *argument, room_vnum *start_room_out, int *room_count_out);
+static room_vnum template_room_vnum_from_index(room_vnum start, int index);
+static bool areatemplate_set_exit(room_rnum from_rnum, int dir, room_rnum to_rnum);
+static bool template_link_pair(room_rnum from_rnum, int dir_from, room_rnum to_rnum, int dir_to);
+static void link_areatemplate_rooms(room_vnum start, int room_count, int width,
+                                    int *ew_links, int *ns_links, int *skipped_neighbors);
+static void free_areatemplate_room_strings(struct room_data *room);
+static bool save_roomtemplate_zone(struct char_data *ch, zone_rnum rznum, char *errmsg, size_t errmsg_sz);
+static int template_compute_level(int min_level, int max_level, int count, int index);
+static char *template_alloc_printf(const char *fmt, ...);
+static int mobtemplate_compute_level(int min_level, int max_level, int mob_count, int index);
+static bool parse_mobtemplate_args(char *argument, mob_vnum *start_vnum_out, int *min_level_out,
+                                   int *max_level_out, int *mob_count_out,
+                                   char *base_name_out, size_t base_name_sz);
+static bool mobtemplate_range_is_clear(mob_vnum start, int mob_count, char *errmsg, size_t errmsg_sz);
+static bool mobtemplate_builder_can_edit_range(struct char_data *ch, mob_vnum start, int mob_count,
+                                               char *errmsg, size_t errmsg_sz);
+static bool mobtemplate_build_strings(const char *base_name, int number,
+                                      char **keywords, char **shortd,
+                                      char **longd, char **desc,
+                                      char *errmsg, size_t errmsg_sz);
+static bool mobtemplate_create_one(mob_vnum vnum, const char *base_name, int number, int level,
+                                   char *errmsg, size_t errmsg_sz);
+static bool mobtemplate_save_affected_zones(struct char_data *ch, mob_vnum start, int mob_count,
+                                            char *errmsg, size_t errmsg_sz);
+static bool parse_objtemplate_args(char *argument, obj_vnum *start_vnum_out, int *min_level_out,
+                                   int *max_level_out, int *obj_count_out,
+                                   char *base_name_out, size_t base_name_sz,
+                                   char *type_out, size_t type_sz);
+static bool objtemplate_range_is_clear(obj_vnum start, int obj_count, char *errmsg, size_t errmsg_sz);
+static bool objtemplate_builder_can_edit_range(struct char_data *ch, obj_vnum start, int obj_count,
+                                               char *errmsg, size_t errmsg_sz);
+static bool objtemplate_build_strings(const char *base_name, int number,
+                                      char **keywords, char **shortd,
+                                      char **longd, char **action_desc,
+                                      char *errmsg, size_t errmsg_sz);
+static int objtemplate_type_from_name(const char *type_name);
+static bool objtemplate_apply_defaults(struct obj_data *obj, int type, int level);
+static bool objtemplate_create_one(obj_vnum vnum, const char *base_name, int number, int level,
+                                   const char *type_name, char *errmsg, size_t errmsg_sz);
+static bool objtemplate_save_affected_zones(struct char_data *ch, obj_vnum start, int obj_count,
+                                            char *errmsg, size_t errmsg_sz);
 
 /* Local Globals */
 static struct recent_player *recent_list = NULL;  /** Global list of recent players */
+
+static void zonemap_append(char *buf, size_t bufsz, size_t *len, const char *fmt, ...)
+{
+  va_list args;
+  int wrote;
+
+  if (*len >= bufsz)
+    return;
+
+  va_start(args, fmt);
+  wrote = vsnprintf(buf + *len, bufsz - *len, fmt, args);
+  va_end(args);
+
+  if (wrote < 0)
+    return;
+
+  if ((size_t)wrote >= bufsz - *len)
+    *len = bufsz - 1;
+  else
+    *len += (size_t)wrote;
+}
+
+static bool zonemap_has_exit_to(room_rnum from, int dir, room_rnum to)
+{
+  struct room_direction_data *exit;
+
+  if (from == NOWHERE || to == NOWHERE || dir < NORTH || dir > WEST)
+    return FALSE;
+
+  exit = W_EXIT(from, dir);
+  if (exit == NULL || exit->to_room == NOWHERE)
+    return FALSE;
+
+  return exit->to_room == to;
+}
+
+static void zonemap_cell_text(room_vnum vnum, room_rnum rrnum, room_vnum player_room_vnum,
+                              char out[3])
+{
+  if (rrnum == NOWHERE) {
+    strlcpy(out, "..", 3);
+    return;
+  }
+
+  if (player_room_vnum != NOWHERE && vnum == player_room_vnum) {
+    snprintf(out, 3, "@%1d", (int)(vnum % 10));
+    return;
+  }
+
+  snprintf(out, 3, "%02d", (int)(vnum % 100));
+}
 
 static int purge_room(room_rnum room)
 {
@@ -5335,6 +5447,1506 @@ ACMD(do_zlock)
   {
     send_to_char(ch, "Unable to save zone changes.  Check syslog!\r\n");
   }
+}
+
+static int compute_areatemplate_width(int room_count)
+{
+  int width = 1;
+
+  while ((width * width) < room_count)
+    width++;
+
+  return width;
+}
+
+static int compute_areatemplate_height(int room_count, int width)
+{
+  return (room_count + width - 1) / width;
+}
+
+static void compute_template_dimensions(int room_count, int *width_out, int *height_out)
+{
+  /* Width is chosen first (smallest square-ish fit), then height rounds up. */
+  int width = compute_areatemplate_width(room_count);
+  int height = compute_areatemplate_height(room_count, width);
+
+  if (width_out)
+    *width_out = width;
+  if (height_out)
+    *height_out = height;
+}
+
+static int template_compute_level(int min_level, int max_level, int count, int index)
+{
+  if (count <= 1)
+    return min_level;
+
+  return min_level + ((index * (max_level - min_level)) / (count - 1));
+}
+
+static char *template_alloc_printf(const char *fmt, ...)
+{
+  va_list args;
+  va_list args_copy;
+  int needed;
+  char *out;
+
+  va_start(args, fmt);
+  va_copy(args_copy, args);
+  needed = vsnprintf(NULL, 0, fmt, args_copy);
+  va_end(args_copy);
+  if (needed < 0) {
+    va_end(args);
+    return NULL;
+  }
+
+  CREATE(out, char, (size_t)needed + 1);
+  vsnprintf(out, (size_t)needed + 1, fmt, args);
+  va_end(args);
+  return out;
+}
+
+static bool room_range_is_clear(room_vnum start, int room_count, char *errmsg, size_t errmsg_sz)
+{
+  int i;
+
+  for (i = 0; i < room_count; i++) {
+    room_vnum vnum = start + i;
+
+    if (real_room(vnum) != NOWHERE) {
+      snprintf(errmsg, errmsg_sz, "Room vnum %d already exists.\r\n", vnum);
+      return FALSE;
+    }
+
+    if (real_zone_by_thing(vnum) != NOWHERE) {
+      snprintf(errmsg, errmsg_sz, "Room vnum %d falls inside an existing zone range.\r\n", vnum);
+      return FALSE;
+    }
+  }
+
+  return TRUE;
+}
+
+static bool roomtemplate_range_is_valid(room_vnum start, int room_count, zone_rnum *zone_out,
+                                        char *errmsg, size_t errmsg_sz)
+{
+  int i;
+  zone_rnum owning_zone = NOWHERE;
+
+  for (i = 0; i < room_count; i++) {
+    room_vnum vnum = start + i;
+    zone_rnum rznum = real_zone_by_thing(vnum);
+
+    if (rznum == NOWHERE) {
+      snprintf(errmsg, errmsg_sz, "Room vnum %d is not inside an existing zone range.\r\n", vnum);
+      return FALSE;
+    }
+
+    if (owning_zone == NOWHERE)
+      owning_zone = rznum;
+    else if (rznum != owning_zone) {
+      snprintf(errmsg, errmsg_sz, "Roomtemplate cannot span multiple zones.\r\n");
+      return FALSE;
+    }
+
+    if (real_room(vnum) != NOWHERE) {
+      snprintf(errmsg, errmsg_sz, "Room vnum %d already exists.\r\n", vnum);
+      return FALSE;
+    }
+  }
+
+  *zone_out = owning_zone;
+  return TRUE;
+}
+
+static bool roomtemplate_builder_can_edit(struct char_data *ch, zone_rnum rznum,
+                                          char *errmsg, size_t errmsg_sz)
+{
+  if (rznum == NOWHERE || !can_edit_zone(ch, rznum)) {
+    snprintf(errmsg, errmsg_sz, "You are not allowed to create rooms in that vnum range.\r\n");
+    return FALSE;
+  }
+  return TRUE;
+}
+
+static void init_areatemplate_room(struct room_data *room, room_vnum vnum, zone_rnum rznum)
+{
+  int i;
+
+  memset(room, 0, sizeof(*room));
+  room->number = vnum;
+  room->zone = rznum;
+  room->name = strdup("An Unfinished Area");
+  room->description = strdup(
+    "This room was generated by the areatemplate command.\r\n"
+    "Builders should customize the room name, description, exits, and contents.\r\n");
+  room->sector_type = SECT_FIELD;
+
+  for (i = 0; i < DIR_COUNT; i++)
+    room->dir_option[i] = NULL;
+}
+
+static bool areatemplate_set_zone_name(zone_rnum rznum, const char *new_name)
+{
+  if (rznum == NOWHERE || !new_name || !*new_name)
+    return FALSE;
+
+  if (zone_table[rznum].name)
+    free(zone_table[rznum].name);
+  zone_table[rznum].name = strdup(new_name);
+  return (zone_table[rznum].name != NULL);
+}
+
+static bool parse_areatemplate_args(char *argument, zone_vnum *zone_vnum_out,
+                                    room_vnum *start_room_out, int *room_count_out,
+                                    char *zone_name_out, size_t zone_name_sz)
+{
+  char zone_arg[MAX_INPUT_LENGTH];
+  char start_arg[MAX_INPUT_LENGTH];
+  char count_arg[MAX_INPUT_LENGTH];
+  char *p, *q;
+  size_t len;
+
+  argument = one_argument(argument, zone_arg);
+  argument = one_argument(argument, start_arg);
+  argument = one_argument(argument, count_arg);
+  skip_spaces(&argument);
+
+  if (!*zone_arg || !*start_arg || !*count_arg || !*argument)
+    return FALSE;
+  if (!is_number(zone_arg) || !is_number(start_arg) || !is_number(count_arg))
+    return FALSE;
+
+  *zone_vnum_out = atoi(zone_arg);
+  *start_room_out = atoi(start_arg);
+  *room_count_out = atoi(count_arg);
+
+  p = argument;
+  if (*p != '\"')
+    return FALSE;
+  p++;
+  q = strrchr(p, '\"');
+  if (q == NULL)
+    return FALSE;
+  {
+    char *trail = q + 1;
+    while (*trail && isspace(*trail))
+      trail++;
+    if (*trail)
+      return FALSE;
+  }
+  *q = '\0';
+
+  while (*p && isspace(*p))
+    p++;
+  len = strlen(p);
+  while (len > 0 && isspace(p[len - 1])) {
+    p[len - 1] = '\0';
+    len--;
+  }
+
+  if (!*p)
+    return FALSE;
+
+  strlcpy(zone_name_out, p, zone_name_sz);
+  return TRUE;
+}
+
+static bool parse_roomtemplate_args(char *argument, room_vnum *start_room_out, int *room_count_out)
+{
+  char start_arg[MAX_INPUT_LENGTH];
+  char count_arg[MAX_INPUT_LENGTH];
+
+  argument = one_argument(argument, start_arg);
+  argument = one_argument(argument, count_arg);
+  skip_spaces(&argument);
+
+  if (!*start_arg || !*count_arg || *argument)
+    return FALSE;
+  if (!is_number(start_arg) || !is_number(count_arg))
+    return FALSE;
+
+  *start_room_out = atoi(start_arg);
+  *room_count_out = atoi(count_arg);
+  return TRUE;
+}
+
+static room_vnum template_room_vnum_from_index(room_vnum start, int index)
+{
+  return start + index;
+}
+
+static bool areatemplate_set_exit(room_rnum from_rnum, int dir, room_rnum to_rnum)
+{
+  struct room_direction_data *exit_data;
+
+  if (from_rnum == NOWHERE || to_rnum == NOWHERE || dir < 0 || dir >= DIR_COUNT)
+    return FALSE;
+
+  if (W_EXIT(from_rnum, dir) == NULL) {
+    CREATE(W_EXIT(from_rnum, dir), struct room_direction_data, 1);
+    if (W_EXIT(from_rnum, dir) == NULL)
+      return FALSE;
+    W_EXIT(from_rnum, dir)->general_description = NULL;
+    W_EXIT(from_rnum, dir)->keyword = NULL;
+  }
+
+  exit_data = W_EXIT(from_rnum, dir);
+  if (exit_data->general_description) {
+    free(exit_data->general_description);
+    exit_data->general_description = NULL;
+  }
+  if (exit_data->keyword) {
+    free(exit_data->keyword);
+    exit_data->keyword = NULL;
+  }
+  exit_data->exit_info = 0;
+  exit_data->key = NOTHING;
+  exit_data->to_room = to_rnum;
+  return TRUE;
+}
+
+static bool template_link_pair(room_rnum from_rnum, int dir_from, room_rnum to_rnum, int dir_to)
+{
+  if (!areatemplate_set_exit(from_rnum, dir_from, to_rnum))
+    return FALSE;
+  if (!areatemplate_set_exit(to_rnum, dir_to, from_rnum))
+    return FALSE;
+  return TRUE;
+}
+
+static void link_areatemplate_rooms(room_vnum start, int room_count, int width,
+                                    int *ew_links, int *ns_links, int *skipped_neighbors)
+{
+  int i;
+  int height = compute_areatemplate_height(room_count, width);
+  int ew = 0, ns = 0, skipped = 0;
+
+  for (i = 0; i < room_count; i++) {
+    int row = i / width;
+    int col = i % width;
+    room_vnum from_vnum = template_room_vnum_from_index(start, i);
+    room_rnum from_rnum = real_room(from_vnum);
+
+    if (from_rnum == NOWHERE)
+      continue;
+
+    /*
+     * Build the grid with explicit row/column math.
+     * East links are only valid when we are not on the last column and the
+     * target index exists in room_count, which prevents row wraparound.
+     */
+    if ((col + 1) < width) {
+      int east_index = i + 1;
+
+      if (east_index < room_count) {
+        room_rnum east_rnum = real_room(template_room_vnum_from_index(start, east_index));
+        if (east_rnum != NOWHERE && template_link_pair(from_rnum, EAST, east_rnum, WEST))
+          ew++;
+      } else {
+        skipped++;
+      }
+    } else {
+      skipped++;
+    }
+
+    /*
+     * South links are only valid when i + width is still inside room_count.
+     * This blocks links into non-existent cells in a partial final row.
+     */
+    if ((row + 1) < height) {
+      int south_index = ((row + 1) * width) + col;
+
+      if (south_index >= room_count) {
+        skipped++;
+        continue;
+      }
+
+      room_rnum south_rnum = real_room(template_room_vnum_from_index(start, south_index));
+      if (south_rnum != NOWHERE && template_link_pair(from_rnum, SOUTH, south_rnum, NORTH))
+        ns++;
+    } else {
+      skipped++;
+    }
+  }
+
+  if (ew_links)
+    *ew_links = ew;
+  if (ns_links)
+    *ns_links = ns;
+  if (skipped_neighbors)
+    *skipped_neighbors = skipped;
+}
+
+static void free_areatemplate_room_strings(struct room_data *room)
+{
+  if (room->name)
+    free(room->name);
+  if (room->description)
+    free(room->description);
+  room->name = NULL;
+  room->description = NULL;
+}
+
+static bool save_roomtemplate_zone(struct char_data *ch, zone_rnum rznum, char *errmsg, size_t errmsg_sz)
+{
+  add_to_save_list(zone_table[rznum].number, SL_WLD);
+  if (!save_rooms(rznum)) {
+    snprintf(errmsg, errmsg_sz, "Room data could not be saved to disk.\r\n");
+    return FALSE;
+  }
+
+  mudlog(CMP, MAX(LVL_BUILDER, GET_INVIS_LEV(ch)), TRUE,
+         "OLC: %s saved room templates in zone %d.",
+         GET_NAME(ch), zone_table[rznum].number);
+  return TRUE;
+}
+
+static int mobtemplate_compute_level(int min_level, int max_level, int mob_count, int index)
+{
+  return template_compute_level(min_level, max_level, mob_count, index);
+}
+
+static bool parse_mobtemplate_args(char *argument, mob_vnum *start_vnum_out, int *min_level_out,
+                                   int *max_level_out, int *mob_count_out,
+                                   char *base_name_out, size_t base_name_sz)
+{
+  char start_arg[MAX_INPUT_LENGTH];
+  char min_arg[MAX_INPUT_LENGTH];
+  char max_arg[MAX_INPUT_LENGTH];
+  char count_arg[MAX_INPUT_LENGTH];
+  char *p, *q;
+  size_t len;
+
+  argument = one_argument(argument, start_arg);
+  argument = one_argument(argument, min_arg);
+  argument = one_argument(argument, max_arg);
+  argument = one_argument(argument, count_arg);
+  skip_spaces(&argument);
+
+  if (!*start_arg || !*min_arg || !*max_arg || !*count_arg || !*argument)
+    return FALSE;
+  if (!is_number(start_arg) || !is_number(min_arg) || !is_number(max_arg) || !is_number(count_arg))
+    return FALSE;
+
+  *start_vnum_out = atoi(start_arg);
+  *min_level_out = atoi(min_arg);
+  *max_level_out = atoi(max_arg);
+  *mob_count_out = atoi(count_arg);
+
+  p = argument;
+  if (*p != '\"')
+    return FALSE;
+  p++;
+  q = strrchr(p, '\"');
+  if (!q)
+    return FALSE;
+  {
+    char *trail = q + 1;
+    while (*trail && isspace(*trail))
+      trail++;
+    if (*trail)
+      return FALSE;
+  }
+  *q = '\0';
+
+  while (*p && isspace(*p))
+    p++;
+  len = strlen(p);
+  while (len > 0 && isspace(p[len - 1])) {
+    p[len - 1] = '\0';
+    len--;
+  }
+
+  if (!*p)
+    return FALSE;
+
+  strlcpy(base_name_out, p, base_name_sz);
+  return TRUE;
+}
+
+static bool mobtemplate_range_is_clear(mob_vnum start, int mob_count, char *errmsg, size_t errmsg_sz)
+{
+  int i;
+
+  for (i = 0; i < mob_count; i++) {
+    mob_vnum vnum = start + i;
+
+    if (real_mobile(vnum) != NOBODY) {
+      snprintf(errmsg, errmsg_sz, "Mob vnum %d already exists.\r\n", vnum);
+      return FALSE;
+    }
+  }
+
+  return TRUE;
+}
+
+static bool mobtemplate_builder_can_edit_range(struct char_data *ch, mob_vnum start, int mob_count,
+                                               char *errmsg, size_t errmsg_sz)
+{
+  int i;
+
+  for (i = 0; i < mob_count; i++) {
+    mob_vnum vnum = start + i;
+    zone_rnum rznum = real_zone_by_thing(vnum);
+
+    if (rznum == NOWHERE) {
+      snprintf(errmsg, errmsg_sz, "Mob vnum %d does not belong to a valid editable zone.\r\n", vnum);
+      return FALSE;
+    }
+
+    if (!can_edit_zone(ch, rznum)) {
+      snprintf(errmsg, errmsg_sz, "You are not allowed to create mobs in that vnum range.\r\n");
+      return FALSE;
+    }
+  }
+
+  return TRUE;
+}
+
+static bool mobtemplate_build_strings(const char *base_name, int number,
+                                      char **keywords, char **shortd,
+                                      char **longd, char **desc,
+                                      char *errmsg, size_t errmsg_sz)
+{
+  *keywords = template_alloc_printf("template %s mob %d", base_name, number);
+  *shortd = template_alloc_printf("a template %s %d", base_name, number);
+  *longd = template_alloc_printf(
+    "A template %s %d stands here awaiting builder customization.\r\n", base_name, number);
+  *desc = template_alloc_printf(
+    "This mob was generated by the mobtemplate command.\r\n"
+    "Builders should customize its keywords, descriptions, stats, flags, and behavior.\r\n");
+
+  if (!*keywords || !*shortd || !*longd || !*desc) {
+    free(*keywords);
+    free(*shortd);
+    free(*longd);
+    free(*desc);
+    *keywords = *shortd = *longd = *desc = NULL;
+    snprintf(errmsg, errmsg_sz, "Failed to allocate mob strings.\r\n");
+    return FALSE;
+  }
+
+  return TRUE;
+}
+
+static bool mobtemplate_create_one(mob_vnum vnum, const char *base_name, int number, int level,
+                                   char *errmsg, size_t errmsg_sz)
+{
+  struct char_data mob;
+  char *keywords = NULL, *shortd = NULL, *longd = NULL, *desc = NULL;
+  int new_rnum;
+
+  memset(&mob, 0, sizeof(mob));
+  clear_char(&mob);
+  mob.player_specials = &dummy_mob;
+
+  GET_HIT(&mob) = 1;
+  GET_MANA(&mob) = 1;
+  GET_MAX_MANA(&mob) = 100;
+  GET_MAX_MOVE(&mob) = 100;
+  GET_NDD(&mob) = 1;
+  GET_SDD(&mob) = 1;
+  GET_WEIGHT(&mob) = 200;
+  GET_HEIGHT(&mob) = 198;
+  GET_PET_PRICE(&mob) = 0;
+  mob.real_abils.str = mob.real_abils.intel = mob.real_abils.wis = 11;
+  mob.real_abils.dex = mob.real_abils.con = mob.real_abils.cha = 11;
+  mob.aff_abils = mob.real_abils;
+  GET_SAVE(&mob, SAVING_PARA) = 0;
+  GET_SAVE(&mob, SAVING_ROD) = 0;
+  GET_SAVE(&mob, SAVING_PETRI) = 0;
+  GET_SAVE(&mob, SAVING_BREATH) = 0;
+  GET_SAVE(&mob, SAVING_SPELL) = 0;
+  SET_BIT_AR(MOB_FLAGS(&mob), MOB_ISNPC);
+
+  if (!mobtemplate_build_strings(base_name, number, &keywords, &shortd, &longd, &desc,
+                                 errmsg, errmsg_sz))
+    return FALSE;
+
+  GET_ALIAS(&mob) = keywords;
+  GET_SDESC(&mob) = shortd;
+  GET_LDESC(&mob) = longd;
+  GET_DDESC(&mob) = desc;
+  if (!GET_ALIAS(&mob) || !GET_SDESC(&mob) || !GET_LDESC(&mob) || !GET_DDESC(&mob)) {
+    free_mobile_strings(&mob);
+    snprintf(errmsg, errmsg_sz, "Failed to allocate mob strings for vnum %d.\r\n", vnum);
+    return FALSE;
+  }
+
+  GET_LEVEL(&mob) = level;
+  GET_SEX(&mob) = SEX_NEUTRAL;
+  GET_CLASS(&mob) = CLASS_OTHER;
+  GET_RACE(&mob) = RACE_UNDEFINED;
+  GET_POS(&mob) = POS_STANDING;
+  GET_DEFAULT_POS(&mob) = POS_STANDING;
+  GET_ATTACK(&mob) = TYPE_HIT - TYPE_HIT;
+  GET_ALIGNMENT(&mob) = 0;
+  GET_GOLD(&mob) = 0;
+  mob.mob_specials.gold_min = 0;
+  mob.mob_specials.gold_max = 0;
+  GET_EXP(&mob) = 0;
+  GET_HITROLL(&mob) = MAX(1, level / 2);
+  GET_AC(&mob) = 100 - MIN(level * 4, 80);
+  GET_HIT(&mob) = MAX(1, level);
+  GET_MANA(&mob) = 8;
+  GET_MOVE(&mob) = level * 2;
+  GET_NDD(&mob) = MAX(1, (level / 10) + 1);
+  GET_SDD(&mob) = 4;
+  GET_DAMROLL(&mob) = MAX(0, level / 3);
+
+  new_rnum = add_mobile(&mob, vnum);
+  free_mobile_strings(&mob);
+
+  if (new_rnum == NOBODY || real_mobile(vnum) == NOBODY) {
+    snprintf(errmsg, errmsg_sz, "Failed to create mob vnum %d.\r\n", vnum);
+    return FALSE;
+  }
+
+  return TRUE;
+}
+
+static bool mobtemplate_save_affected_zones(struct char_data *ch, mob_vnum start, int mob_count,
+                                            char *errmsg, size_t errmsg_sz)
+{
+  bool *saved;
+  int i;
+
+  CREATE(saved, bool, top_of_zone_table + 1);
+  for (i = 0; i <= top_of_zone_table; i++)
+    saved[i] = FALSE;
+
+  for (i = 0; i < mob_count; i++) {
+    mob_vnum vnum = start + i;
+    zone_rnum rznum = real_zone_by_thing(vnum);
+
+    if (rznum == NOWHERE) {
+      free(saved);
+      snprintf(errmsg, errmsg_sz, "Cannot save mobs: vnum %d has no valid zone.\r\n", vnum);
+      return FALSE;
+    }
+
+    if (saved[rznum])
+      continue;
+
+    if (!save_mobiles(rznum)) {
+      free(saved);
+      snprintf(errmsg, errmsg_sz, "Failed saving mobile data for zone %d.\r\n",
+               zone_table[rznum].number);
+      return FALSE;
+    }
+    saved[rznum] = TRUE;
+    mudlog(CMP, MAX(LVL_BUILDER, GET_INVIS_LEV(ch)), TRUE,
+           "OLC: %s saved mobile templates in zone %d.",
+           GET_NAME(ch), zone_table[rznum].number);
+  }
+
+  free(saved);
+  return TRUE;
+}
+
+ACMD(do_mobtemplate)
+{
+  char usage[] = "Usage: mobtemplate <start_mob_vnum> <min_level> <max_level> <mob_count> \"<base name>\"\r\n";
+  char base_name[MAX_INPUT_LENGTH];
+  char errmsg[MAX_STRING_LENGTH];
+  mob_vnum start_vnum, top_vnum;
+  int min_level, max_level, mob_count;
+  int i, created = 0;
+
+  if (IS_NPC(ch) || !ch->desc || STATE(ch->desc) != CON_PLAYING)
+    return;
+
+  if (GET_LEVEL(ch) < LVL_BUILDER) {
+    send_to_char(ch, "You do not have builder permissions for this command.\r\n");
+    return;
+  }
+
+  if (!parse_mobtemplate_args(argument, &start_vnum, &min_level, &max_level, &mob_count,
+                              base_name, sizeof(base_name))) {
+    send_to_char(ch, "%s", usage);
+    return;
+  }
+
+  if (start_vnum <= 0) {
+    send_to_char(ch, "Start mob vnum must be numeric and greater than 0.\r\n");
+    return;
+  }
+
+  if (min_level <= 0) {
+    send_to_char(ch, "Minimum level must be numeric and greater than 0.\r\n");
+    return;
+  }
+
+  if (max_level <= 0) {
+    send_to_char(ch, "Maximum level must be numeric and greater than 0.\r\n");
+    return;
+  }
+
+  if (mob_count <= 0) {
+    send_to_char(ch, "Mob count must be numeric and greater than 0.\r\n");
+    return;
+  }
+
+  if (!*base_name) {
+    send_to_char(ch, "Base name must be present and non-empty.\r\n");
+    return;
+  }
+  if (strlen(base_name) > MAX_TEMPLATE_BASENAME_LEN) {
+    send_to_char(ch, "Base name is too long. Maximum length is %d characters.\r\n",
+                 MAX_TEMPLATE_BASENAME_LEN);
+    return;
+  }
+
+  if (min_level > max_level) {
+    send_to_char(ch, "Minimum level must be less than or equal to maximum level.\r\n");
+    return;
+  }
+
+  if (((long long)start_vnum + (long long)mob_count - 1) > IDXTYPE_MAX) {
+    send_to_char(ch, "Computed top mob vnum exceeds valid vnum range.\r\n");
+    return;
+  }
+  top_vnum = start_vnum + mob_count - 1;
+
+  if (!mobtemplate_range_is_clear(start_vnum, mob_count, errmsg, sizeof(errmsg))) {
+    send_to_char(ch, "%s", errmsg);
+    return;
+  }
+
+  if (!mobtemplate_builder_can_edit_range(ch, start_vnum, mob_count, errmsg, sizeof(errmsg))) {
+    send_to_char(ch, "%s", errmsg);
+    return;
+  }
+
+  for (i = 0; i < mob_count; i++) {
+    mob_vnum vnum = start_vnum + i;
+    int level = mobtemplate_compute_level(min_level, max_level, mob_count, i);
+
+    if (!mobtemplate_create_one(vnum, base_name, i + 1, level, errmsg, sizeof(errmsg))) {
+      int rollback;
+
+      for (rollback = 0; rollback < created; rollback++) {
+        mob_vnum created_vnum = start_vnum + rollback;
+        mob_rnum rmob = real_mobile(created_vnum);
+        if (rmob != NOBODY)
+          delete_mobile(rmob);
+      }
+      send_to_char(ch, "%s", errmsg);
+      return;
+    }
+    created++;
+  }
+
+  if (!mobtemplate_save_affected_zones(ch, start_vnum, mob_count, errmsg, sizeof(errmsg))) {
+    send_to_char(ch, "%s", errmsg);
+    return;
+  }
+
+  send_to_char(ch,
+    "Mob template created successfully.\r\n"
+    "Mob range: %d-%d\r\n"
+    "Mobs created: %d\r\n"
+    "Level range: %d-%d\r\n"
+    "Base name: %s\r\n",
+    start_vnum, top_vnum, mob_count, min_level, max_level, base_name);
+
+  mudlog(CMP, MAX(LVL_BUILDER, GET_INVIS_LEV(ch)), TRUE,
+         "OLC: %s used mobtemplate for mobs %d-%d (%d mobs, level %d-%d, base '%s').",
+         GET_NAME(ch), start_vnum, top_vnum, mob_count, min_level, max_level, base_name);
+}
+
+ACMD(do_zonemap)
+{
+  const int map_width = 10;
+  char arg[MAX_INPUT_LENGTH];
+  room_vnum bottom, top, vnum, player_room_vnum = NOWHERE;
+  zone_vnum zone_vnum_input;
+  zone_rnum zone;
+  int player_row = -1, player_col = -1;
+  int slots_scanned, rows, row, col;
+  int existing_rooms = 0, missing_rooms = 0, isolated_rooms = 0, one_way_links = 0;
+  size_t estimated_line_len, estimated_bufsz, outlen = 0;
+  room_rnum *room_cache;
+  char *outbuf;
+
+  one_argument(argument, arg);
+  if (!*arg) {
+    send_to_char(ch, "Usage: zonemap <zone_vnum>\r\n");
+    return;
+  }
+
+  if (!str_cmp(arg, "here")) {
+    if (IN_ROOM(ch) == NOWHERE) {
+      send_to_char(ch, "You are not currently in a room.\r\n");
+      return;
+    }
+    zone = world[IN_ROOM(ch)].zone;
+    zone_vnum_input = zone_table[zone].number;
+  } else if (!is_number(arg)) {
+    send_to_char(ch, "Zone not found.\r\n");
+    return;
+  } else {
+    zone_vnum_input = atoi(arg);
+    zone = real_zone(zone_vnum_input);
+    if (zone == NOWHERE) {
+      send_to_char(ch, "Zone not found.\r\n");
+      return;
+    }
+  }
+
+  if (GET_LEVEL(ch) < LVL_GRGOD && !can_edit_zone(ch, zone)) {
+    send_cannot_edit(ch, zone_table[zone].number);
+    return;
+  }
+
+  bottom = zone_table[zone].bot;
+  top = zone_table[zone].top;
+  slots_scanned = top - bottom + 1;
+  if (slots_scanned <= 0) {
+    send_to_char(ch, "Zone range is invalid.\r\n");
+    return;
+  }
+
+  CREATE(room_cache, room_rnum, slots_scanned);
+  for (vnum = bottom; vnum <= top; vnum++) {
+    room_rnum rrnum = real_room(vnum);
+    int idx = vnum - bottom;
+
+    room_cache[idx] = rrnum;
+    if (rrnum == NOWHERE)
+      missing_rooms++;
+    else
+      existing_rooms++;
+  }
+
+  if (IN_ROOM(ch) != NOWHERE &&
+      world[IN_ROOM(ch)].number >= bottom &&
+      world[IN_ROOM(ch)].number <= top)
+    player_room_vnum = world[IN_ROOM(ch)].number;
+
+  if (player_room_vnum != NOWHERE) {
+    int player_index = player_room_vnum - bottom;
+    player_row = player_index / map_width;
+    player_col = player_index % map_width;
+  }
+
+  for (vnum = bottom; vnum <= top; vnum++) {
+    room_rnum rrnum = room_cache[vnum - bottom];
+
+    if (rrnum == NOWHERE)
+      continue;
+
+    if (W_EXIT(rrnum, NORTH) == NULL && W_EXIT(rrnum, EAST) == NULL &&
+        W_EXIT(rrnum, SOUTH) == NULL && W_EXIT(rrnum, WEST) == NULL)
+      isolated_rooms++;
+  }
+
+  rows = (slots_scanned + map_width - 1) / map_width;
+  estimated_line_len = (size_t)(map_width * 2) + (size_t)((map_width - 1) * 2) + 24;
+  estimated_bufsz = 4096 + (size_t)rows * (estimated_line_len * 2 + 8);
+  CREATE(outbuf, char, estimated_bufsz);
+  outbuf[0] = '\0';
+
+  zonemap_append(outbuf, estimated_bufsz, &outlen,
+                 "Zone %d: %s\r\nRange: %d-%d\r\n",
+                 zone_table[zone].number,
+                 zone_table[zone].name ? zone_table[zone].name : "<unnamed>",
+                 bottom, top);
+  if (player_room_vnum != NOWHERE)
+    zonemap_append(outbuf, estimated_bufsz, &outlen,
+                   "You are in: %d (row %d, col %d)\r\n",
+                   player_room_vnum, player_row, player_col);
+  else
+    zonemap_append(outbuf, estimated_bufsz, &outlen, "You are in: (outside this zone)\r\n");
+
+  zonemap_append(outbuf, estimated_bufsz, &outlen,
+                 "\r\nLegend:\r\n"
+                 "  00 = room exists\r\n"
+                 "  .. = missing room\r\n"
+                 "  -- and | = two-way exits\r\n"
+                 "  -> <- ^ v = one-way exits\r\n"
+                 "  @ = your current room\r\n\r\n");
+
+  zonemap_append(outbuf, estimated_bufsz, &outlen, "    ");
+  for (col = 0; col < map_width; col++) {
+    zonemap_append(outbuf, estimated_bufsz, &outlen, "%02d", col);
+    if (col < map_width - 1)
+      zonemap_append(outbuf, estimated_bufsz, &outlen, "  ");
+  }
+  zonemap_append(outbuf, estimated_bufsz, &outlen, "\r\n");
+
+  for (row = 0; row < rows; row++) {
+    zonemap_append(outbuf, estimated_bufsz, &outlen, "%02d  ", row);
+
+    for (col = 0; col < map_width; col++) {
+      int idx = (row * map_width) + col;
+      char cell[3];
+
+      if (idx >= slots_scanned) {
+        zonemap_append(outbuf, estimated_bufsz, &outlen, "  ");
+      } else {
+        room_vnum cell_vnum = bottom + idx;
+        room_rnum cell_room = room_cache[idx];
+
+        zonemap_cell_text(cell_vnum, cell_room, player_room_vnum, cell);
+        zonemap_append(outbuf, estimated_bufsz, &outlen, "%s", cell);
+      }
+
+      if (col < map_width - 1) {
+        int right_idx = idx + 1;
+
+        if (idx < slots_scanned && right_idx < slots_scanned) {
+          room_rnum left_room = room_cache[idx];
+          room_rnum right_room = room_cache[right_idx];
+          bool east_link = zonemap_has_exit_to(left_room, EAST, right_room);
+          bool west_link = zonemap_has_exit_to(right_room, WEST, left_room);
+
+          if (east_link && west_link)
+            zonemap_append(outbuf, estimated_bufsz, &outlen, "--");
+          else if (east_link)
+            zonemap_append(outbuf, estimated_bufsz, &outlen, "->");
+          else if (west_link)
+            zonemap_append(outbuf, estimated_bufsz, &outlen, "<-");
+          else
+            zonemap_append(outbuf, estimated_bufsz, &outlen, "  ");
+
+          if (east_link != west_link)
+            one_way_links++;
+        } else {
+          zonemap_append(outbuf, estimated_bufsz, &outlen, "  ");
+        }
+      }
+    }
+    zonemap_append(outbuf, estimated_bufsz, &outlen, "\r\n");
+
+    if (row < rows - 1) {
+      zonemap_append(outbuf, estimated_bufsz, &outlen, "    ");
+      for (col = 0; col < map_width; col++) {
+        int idx = (row * map_width) + col;
+        int down_idx = idx + map_width;
+        char vconn = ' ';
+
+        if (idx < slots_scanned && down_idx < slots_scanned) {
+          room_rnum top_room = room_cache[idx];
+          room_rnum bottom_room = room_cache[down_idx];
+          bool south_link = zonemap_has_exit_to(top_room, SOUTH, bottom_room);
+          bool north_link = zonemap_has_exit_to(bottom_room, NORTH, top_room);
+
+          if (south_link && north_link)
+            vconn = '|';
+          else if (south_link)
+            vconn = 'v';
+          else if (north_link)
+            vconn = '^';
+
+          if (south_link != north_link)
+            one_way_links++;
+        }
+
+        zonemap_append(outbuf, estimated_bufsz, &outlen, "%c", vconn);
+        if (col < map_width - 1)
+          zonemap_append(outbuf, estimated_bufsz, &outlen, "   ");
+      }
+      zonemap_append(outbuf, estimated_bufsz, &outlen, "\r\n");
+    }
+  }
+
+  zonemap_append(outbuf, estimated_bufsz, &outlen,
+                 "\r\nSummary:\r\n"
+                 "- Existing rooms: %d / %d slots scanned\r\n"
+                 "- Missing rooms: %d\r\n"
+                 "- One-way links: %d\r\n"
+                 "- Isolated rooms: %d\r\n",
+                 existing_rooms, slots_scanned, missing_rooms, one_way_links, isolated_rooms);
+
+  page_string(ch->desc, outbuf, TRUE);
+  free(outbuf);
+  free(room_cache);
+}
+
+ACMD(do_areatemplate)
+{
+  char usage[] = "Usage: areatemplate <zone_vnum> <start_room_vnum> <room_count> \"<zone name>\"\r\n";
+  char zone_name[MAX_INPUT_LENGTH];
+  char errmsg[MAX_STRING_LENGTH];
+  const char *create_err = NULL;
+  zone_vnum zone_vnum_input;
+  room_vnum start_room_vnum;
+  room_vnum top_room_vnum;
+  zone_rnum new_zone_rnum;
+  int room_count, width, height;
+  int ew_links = 0, ns_links = 0, skipped_neighbors = 0;
+  int i;
+  bool can_edit_new_zone = FALSE;
+
+  if (IS_NPC(ch) || !ch->desc || STATE(ch->desc) != CON_PLAYING)
+    return;
+
+  if (!parse_areatemplate_args(argument, &zone_vnum_input, &start_room_vnum, &room_count,
+                               zone_name, sizeof(zone_name))) {
+    send_to_char(ch, "%s", usage);
+    return;
+  }
+
+  if (GET_LEVEL(ch) < LVL_BUILDER) {
+    send_to_char(ch, "You do not have builder permissions for this command.\r\n");
+    return;
+  }
+
+  if (zone_vnum_input < 0 || zone_vnum_input > IDXTYPE_MAX) {
+    send_to_char(ch, "Zone vnum must be numeric and valid.\r\n");
+    return;
+  }
+
+  if (start_room_vnum <= 0) {
+    send_to_char(ch, "Start room vnum must be numeric and greater than 0.\r\n");
+    return;
+  }
+
+  if (room_count <= 0) {
+    send_to_char(ch, "Room count must be numeric and greater than 0.\r\n");
+    return;
+  }
+
+  if (!*zone_name) {
+    send_to_char(ch, "Zone name must be present and non-empty.\r\n");
+    return;
+  }
+
+  if (((long long) start_room_vnum + (long long) room_count - 1) > IDXTYPE_MAX) {
+    send_to_char(ch, "Computed top room exceeds valid vnum range.\r\n");
+    return;
+  }
+  top_room_vnum = start_room_vnum + room_count - 1;
+
+  if (real_zone(zone_vnum_input) != NOWHERE) {
+    send_to_char(ch, "That zone vnum already exists.\r\n");
+    return;
+  }
+
+  if (!room_range_is_clear(start_room_vnum, room_count, errmsg, sizeof(errmsg))) {
+    send_to_char(ch, "%s", errmsg);
+    return;
+  }
+
+  if (GET_LEVEL(ch) >= LVL_GRGOD || GET_OLC_ZONE(ch) == ALL_PERMISSION)
+    can_edit_new_zone = TRUE;
+  else if (GET_LEVEL(ch) >= LVL_BUILDER && GET_OLC_ZONE(ch) != NOWHERE &&
+           GET_OLC_ZONE(ch) == zone_vnum_input)
+    can_edit_new_zone = TRUE;
+
+  if (!can_edit_new_zone) {
+    send_cannot_edit(ch, zone_vnum_input);
+    return;
+  }
+
+  new_zone_rnum = create_new_zone(zone_vnum_input, start_room_vnum, top_room_vnum, &create_err);
+  if (new_zone_rnum == NOWHERE) {
+    send_to_char(ch, "%s", create_err ? create_err : "Unable to create zone.\r\n");
+    return;
+  }
+
+  if (!areatemplate_set_zone_name(new_zone_rnum, zone_name)) {
+    send_to_char(ch, "Unable to set zone name.\r\n");
+    return;
+  }
+
+  compute_template_dimensions(room_count, &width, &height);
+
+  for (i = 0; i < room_count; i++) {
+    struct room_data new_room;
+
+    init_areatemplate_room(&new_room, start_room_vnum + i, new_zone_rnum);
+    if (add_room(&new_room) == NOWHERE) {
+      free_areatemplate_room_strings(&new_room);
+      send_to_char(ch, "Room creation failed at vnum %d.\r\n", start_room_vnum + i);
+      return;
+    }
+    free_areatemplate_room_strings(&new_room);
+  }
+
+  link_areatemplate_rooms(start_room_vnum, room_count, width,
+                          &ew_links, &ns_links, &skipped_neighbors);
+  add_to_save_list(zone_table[new_zone_rnum].number, SL_WLD);
+  add_to_save_list(zone_table[new_zone_rnum].number, SL_ZON);
+
+  if (!save_rooms(new_zone_rnum)) {
+    send_to_char(ch, "Room data could not be saved to disk.\r\n");
+    return;
+  }
+  if (!save_zone(new_zone_rnum)) {
+    send_to_char(ch, "Zone data could not be saved to disk.\r\n");
+    return;
+  }
+
+  send_to_char(ch,
+    "Area template created successfully.\r\n"
+    "Zone: %d\r\n"
+    "Name: %s\r\n"
+    "Room range: %d-%d\r\n"
+    "Rooms created: %d\r\n"
+    "Layout: %d x %d\r\n"
+    "East/West links created: %d\r\n"
+    "North/South links created: %d\r\n"
+    "Skipped edge/nonexistent neighbors: %d\r\n",
+    zone_table[new_zone_rnum].number,
+    zone_table[new_zone_rnum].name ? zone_table[new_zone_rnum].name : "New Zone",
+    start_room_vnum, top_room_vnum,
+    room_count, width, height,
+    ew_links, ns_links, skipped_neighbors);
+
+  mudlog(CMP, MAX(LVL_BUILDER, GET_INVIS_LEV(ch)), TRUE,
+         "OLC: %s used areatemplate for zone %d (%d-%d, %d rooms, %dx%d).",
+         GET_NAME(ch), zone_table[new_zone_rnum].number, start_room_vnum, top_room_vnum,
+         room_count, width, height);
+}
+
+ACMD(do_roomtemplate)
+{
+  char usage[] = "Usage: roomtemplate <start_room_vnum> <room_count>\r\n";
+  char errmsg[MAX_STRING_LENGTH];
+  room_vnum start_room_vnum, top_room_vnum;
+  zone_rnum owning_zone;
+  int room_count, width, height;
+  int ew_links = 0, ns_links = 0, skipped_neighbors = 0;
+  int i;
+
+  if (IS_NPC(ch) || !ch->desc || STATE(ch->desc) != CON_PLAYING)
+    return;
+
+  if (GET_LEVEL(ch) < LVL_BUILDER) {
+    send_to_char(ch, "You do not have builder permissions for this command.\r\n");
+    return;
+  }
+
+  if (!parse_roomtemplate_args(argument, &start_room_vnum, &room_count)) {
+    send_to_char(ch, "%s", usage);
+    return;
+  }
+
+  if (start_room_vnum <= 0) {
+    send_to_char(ch, "Start room vnum must be numeric and greater than 0.\r\n");
+    return;
+  }
+  if (room_count <= 0) {
+    send_to_char(ch, "Room count must be numeric and greater than 0.\r\n");
+    return;
+  }
+  if (((long long)start_room_vnum + (long long)room_count - 1) > IDXTYPE_MAX) {
+    send_to_char(ch, "Computed top room exceeds valid vnum range.\r\n");
+    return;
+  }
+  top_room_vnum = start_room_vnum + room_count - 1;
+
+  if (!roomtemplate_range_is_valid(start_room_vnum, room_count, &owning_zone, errmsg, sizeof(errmsg))) {
+    send_to_char(ch, "%s", errmsg);
+    return;
+  }
+  if (!roomtemplate_builder_can_edit(ch, owning_zone, errmsg, sizeof(errmsg))) {
+    send_to_char(ch, "%s", errmsg);
+    return;
+  }
+
+  compute_template_dimensions(room_count, &width, &height);
+
+  for (i = 0; i < room_count; i++) {
+    struct room_data new_room;
+
+    init_areatemplate_room(&new_room, start_room_vnum + i, owning_zone);
+    if (add_room(&new_room) == NOWHERE) {
+      free_areatemplate_room_strings(&new_room);
+      send_to_char(ch, "Room creation failed at vnum %d.\r\n", start_room_vnum + i);
+      return;
+    }
+    free_areatemplate_room_strings(&new_room);
+  }
+
+  link_areatemplate_rooms(start_room_vnum, room_count, width,
+                          &ew_links, &ns_links, &skipped_neighbors);
+  if (!save_roomtemplate_zone(ch, owning_zone, errmsg, sizeof(errmsg))) {
+    send_to_char(ch, "%s", errmsg);
+    return;
+  }
+
+  send_to_char(ch,
+    "Room template created successfully.\r\n"
+    "Zone: %d\r\n"
+    "Room range: %d-%d\r\n"
+    "Rooms created: %d\r\n"
+    "Layout: %d x %d\r\n"
+    "East/West links created: %d\r\n"
+    "North/South links created: %d\r\n"
+    "Skipped edge/nonexistent neighbors: %d\r\n",
+    zone_table[owning_zone].number, start_room_vnum, top_room_vnum, room_count, width, height,
+    ew_links, ns_links, skipped_neighbors);
+
+  mudlog(CMP, MAX(LVL_BUILDER, GET_INVIS_LEV(ch)), TRUE,
+         "OLC: %s used roomtemplate in zone %d (%d-%d, %d rooms, %dx%d).",
+         GET_NAME(ch), zone_table[owning_zone].number,
+         start_room_vnum, top_room_vnum, room_count, width, height);
+}
+
+static bool parse_objtemplate_args(char *argument, obj_vnum *start_vnum_out, int *min_level_out,
+                                   int *max_level_out, int *obj_count_out,
+                                   char *base_name_out, size_t base_name_sz,
+                                   char *type_out, size_t type_sz)
+{
+  char start_arg[MAX_INPUT_LENGTH];
+  char min_arg[MAX_INPUT_LENGTH];
+  char max_arg[MAX_INPUT_LENGTH];
+  char count_arg[MAX_INPUT_LENGTH];
+  char *p, *q;
+  size_t len;
+
+  argument = one_argument(argument, start_arg);
+  argument = one_argument(argument, min_arg);
+  argument = one_argument(argument, max_arg);
+  argument = one_argument(argument, count_arg);
+  skip_spaces(&argument);
+
+  if (!*start_arg || !*min_arg || !*max_arg || !*count_arg || !*argument)
+    return FALSE;
+  if (!is_number(start_arg) || !is_number(min_arg) || !is_number(max_arg) || !is_number(count_arg))
+    return FALSE;
+
+  *start_vnum_out = atoi(start_arg);
+  *min_level_out = atoi(min_arg);
+  *max_level_out = atoi(max_arg);
+  *obj_count_out = atoi(count_arg);
+
+  p = argument;
+  if (*p != '\"')
+    return FALSE;
+  p++;
+  q = strrchr(p, '\"');
+  if (!q)
+    return FALSE;
+  *q = '\0';
+
+  while (*p && isspace(*p))
+    p++;
+  len = strlen(p);
+  while (len > 0 && isspace(p[len - 1])) {
+    p[len - 1] = '\0';
+    len--;
+  }
+  if (!*p)
+    return FALSE;
+  strlcpy(base_name_out, p, base_name_sz);
+
+  q++;
+  while (*q && isspace(*q))
+    q++;
+  if (!*q)
+    return FALSE;
+  {
+    char *end = q + strlen(q) - 1;
+    while (end > q && isspace(*end))
+      *end-- = '\0';
+  }
+  if (!*q || strchr(q, ' '))
+    return FALSE;
+  strlcpy(type_out, q, type_sz);
+  return TRUE;
+}
+
+static bool objtemplate_range_is_clear(obj_vnum start, int obj_count, char *errmsg, size_t errmsg_sz)
+{
+  int i;
+  for (i = 0; i < obj_count; i++) {
+    obj_vnum vnum = start + i;
+    if (real_object(vnum) != NOTHING) {
+      snprintf(errmsg, errmsg_sz, "Object vnum %d already exists.\r\n", vnum);
+      return FALSE;
+    }
+  }
+  return TRUE;
+}
+
+static bool objtemplate_builder_can_edit_range(struct char_data *ch, obj_vnum start, int obj_count,
+                                               char *errmsg, size_t errmsg_sz)
+{
+  int i;
+  for (i = 0; i < obj_count; i++) {
+    zone_rnum rznum = real_zone_by_thing(start + i);
+    if (rznum == NOWHERE || !can_edit_zone(ch, rznum)) {
+      snprintf(errmsg, errmsg_sz, "You are not allowed to create objects in that vnum range.\r\n");
+      return FALSE;
+    }
+  }
+  return TRUE;
+}
+
+static bool objtemplate_build_strings(const char *base_name, int number,
+                                      char **keywords, char **shortd,
+                                      char **longd, char **action_desc,
+                                      char *errmsg, size_t errmsg_sz)
+{
+  *keywords = template_alloc_printf("template %s object %d", base_name, number);
+  *shortd = template_alloc_printf("a template %s %d", base_name, number);
+  *longd = template_alloc_printf(
+    "A template %s %d is here awaiting builder customization.\r\n", base_name, number);
+  *action_desc = strdup("");
+
+  if (!*keywords || !*shortd || !*longd || !*action_desc) {
+    free(*keywords);
+    free(*shortd);
+    free(*longd);
+    free(*action_desc);
+    *keywords = *shortd = *longd = *action_desc = NULL;
+    snprintf(errmsg, errmsg_sz, "Failed to allocate object strings.\r\n");
+    return FALSE;
+  }
+  return TRUE;
+}
+
+static int objtemplate_type_from_name(const char *type_name)
+{
+  if (!strcmp(type_name, "trash"))
+    return ITEM_TRASH;
+  if (!strcmp(type_name, "treasure"))
+    return ITEM_TREASURE;
+  if (!strcmp(type_name, "weapon"))
+    return ITEM_WEAPON;
+  if (!strcmp(type_name, "armor"))
+    return ITEM_ARMOR;
+  if (!strcmp(type_name, "container"))
+    return ITEM_CONTAINER;
+  return -1;
+}
+
+static bool objtemplate_apply_defaults(struct obj_data *obj, int type, int level)
+{
+  int i;
+
+  GET_OBJ_TYPE(obj) = type;
+  GET_OBJ_COST(obj) = 0;
+  GET_OBJ_RENT(obj) = 0;
+  GET_OBJ_LEVEL(obj) = level;
+  GET_OBJ_TIMER(obj) = 0;
+  for (i = 0; i < NUM_OBJ_VAL_POSITIONS; i++)
+    GET_OBJ_VAL(obj, i) = 0;
+
+  switch (type) {
+    case ITEM_TRASH:
+    case ITEM_TREASURE:
+      SET_BIT_AR(GET_OBJ_WEAR(obj), ITEM_WEAR_TAKE);
+      GET_OBJ_WEIGHT(obj) = MAX(1, (level / 5) + 1);
+      break;
+    case ITEM_WEAPON:
+      SET_BIT_AR(GET_OBJ_WEAR(obj), ITEM_WEAR_TAKE);
+      SET_BIT_AR(GET_OBJ_WEAR(obj), ITEM_WEAR_WIELD);
+      GET_OBJ_WEIGHT(obj) = MAX(1, (level / 4) + 2);
+      GET_OBJ_VAL(obj, 0) = 0;
+      GET_OBJ_VAL(obj, 1) = MAX(1, (level / 10) + 1);
+      GET_OBJ_VAL(obj, 2) = 4;
+      GET_OBJ_VAL(obj, 3) = TYPE_HIT - TYPE_HIT;
+      break;
+    case ITEM_ARMOR:
+      SET_BIT_AR(GET_OBJ_WEAR(obj), ITEM_WEAR_TAKE);
+      SET_BIT_AR(GET_OBJ_WEAR(obj), ITEM_WEAR_BODY);
+      GET_OBJ_WEIGHT(obj) = MAX(1, (level / 4) + 2);
+      GET_OBJ_VAL(obj, 0) = MAX(1, level / 3);
+      break;
+    case ITEM_CONTAINER:
+      SET_BIT_AR(GET_OBJ_WEAR(obj), ITEM_WEAR_TAKE);
+      GET_OBJ_WEIGHT(obj) = MAX(1, (level / 4) + 2);
+      GET_OBJ_VAL(obj, 0) = MAX(10, level * 2);
+      GET_OBJ_VAL(obj, 1) = 0;
+      GET_OBJ_VAL(obj, 2) = NOTHING;
+      GET_OBJ_VAL(obj, 3) = 0;
+      break;
+    default:
+      return FALSE;
+  }
+
+  return TRUE;
+}
+
+static bool objtemplate_create_one(obj_vnum vnum, const char *base_name, int number, int level,
+                                   const char *type_name, char *errmsg, size_t errmsg_sz)
+{
+  struct obj_data obj;
+  char *keywords = NULL, *shortd = NULL, *longd = NULL, *action_desc = NULL;
+  int type = objtemplate_type_from_name(type_name);
+  obj_rnum new_rnum;
+
+  if (type < 0) {
+    snprintf(errmsg, errmsg_sz,
+             "Unknown object template type. Valid types are: trash treasure weapon armor container.\r\n");
+    return FALSE;
+  }
+
+  memset(&obj, 0, sizeof(obj));
+  clear_object(&obj);
+  if (!objtemplate_build_strings(base_name, number, &keywords, &shortd, &longd, &action_desc,
+                                 errmsg, errmsg_sz))
+    return FALSE;
+
+  obj.name = keywords;
+  obj.short_description = shortd;
+  obj.description = longd;
+  obj.action_description = action_desc;
+
+  if (!objtemplate_apply_defaults(&obj, type, level)) {
+    free_object_strings(&obj);
+    snprintf(errmsg, errmsg_sz, "Failed to apply object defaults for vnum %d.\r\n", vnum);
+    return FALSE;
+  }
+
+  new_rnum = add_object(&obj, vnum);
+  free_object_strings(&obj);
+
+  if (new_rnum == NOTHING || real_object(vnum) == NOTHING) {
+    snprintf(errmsg, errmsg_sz, "Failed to create object vnum %d.\r\n", vnum);
+    return FALSE;
+  }
+
+  return TRUE;
+}
+
+static bool objtemplate_save_affected_zones(struct char_data *ch, obj_vnum start, int obj_count,
+                                            char *errmsg, size_t errmsg_sz)
+{
+  bool *saved;
+  int i;
+
+  CREATE(saved, bool, top_of_zone_table + 1);
+  for (i = 0; i <= top_of_zone_table; i++)
+    saved[i] = FALSE;
+
+  for (i = 0; i < obj_count; i++) {
+    zone_rnum rznum = real_zone_by_thing(start + i);
+    if (rznum == NOWHERE) {
+      free(saved);
+      snprintf(errmsg, errmsg_sz, "Cannot save objects: vnum %d has no valid zone.\r\n", start + i);
+      return FALSE;
+    }
+
+    if (saved[rznum])
+      continue;
+    if (!save_objects(rznum)) {
+      free(saved);
+      snprintf(errmsg, errmsg_sz, "Failed saving object data for zone %d.\r\n", zone_table[rznum].number);
+      return FALSE;
+    }
+    saved[rznum] = TRUE;
+    mudlog(CMP, MAX(LVL_BUILDER, GET_INVIS_LEV(ch)), TRUE,
+           "OLC: %s saved object templates in zone %d.",
+           GET_NAME(ch), zone_table[rznum].number);
+  }
+
+  free(saved);
+  return TRUE;
+}
+
+ACMD(do_objtemplate)
+{
+  char usage[] = "Usage: objtemplate <start_obj_vnum> <min_level> <max_level> <obj_count> \"<base name>\" <type>\r\n";
+  char errmsg[MAX_STRING_LENGTH];
+  char base_name[MAX_INPUT_LENGTH];
+  char type_name[MAX_INPUT_LENGTH];
+  obj_vnum start_vnum, top_vnum;
+  int min_level, max_level, obj_count;
+  int i, created = 0;
+
+  if (IS_NPC(ch) || !ch->desc || STATE(ch->desc) != CON_PLAYING)
+    return;
+
+  if (GET_LEVEL(ch) < LVL_BUILDER) {
+    send_to_char(ch, "You do not have builder permissions for this command.\r\n");
+    return;
+  }
+
+  if (!parse_objtemplate_args(argument, &start_vnum, &min_level, &max_level, &obj_count,
+                              base_name, sizeof(base_name), type_name, sizeof(type_name))) {
+    send_to_char(ch, "%s", usage);
+    return;
+  }
+
+  if (start_vnum <= 0) {
+    send_to_char(ch, "Start object vnum must be numeric and greater than 0.\r\n");
+    return;
+  }
+  if (min_level <= 0) {
+    send_to_char(ch, "Minimum level must be numeric and greater than 0.\r\n");
+    return;
+  }
+  if (max_level <= 0) {
+    send_to_char(ch, "Maximum level must be numeric and greater than 0.\r\n");
+    return;
+  }
+  if (obj_count <= 0) {
+    send_to_char(ch, "Object count must be numeric and greater than 0.\r\n");
+    return;
+  }
+  if (!*base_name) {
+    send_to_char(ch, "Base name must be present and non-empty.\r\n");
+    return;
+  }
+  if (strlen(base_name) > MAX_TEMPLATE_BASENAME_LEN) {
+    send_to_char(ch, "Base name is too long. Maximum length is %d characters.\r\n",
+                 MAX_TEMPLATE_BASENAME_LEN);
+    return;
+  }
+  if (objtemplate_type_from_name(type_name) < 0) {
+    send_to_char(ch, "Unknown object template type. Valid types are: trash treasure weapon armor container.\r\n");
+    return;
+  }
+  if (min_level > max_level) {
+    send_to_char(ch, "Minimum level must be less than or equal to maximum level.\r\n");
+    return;
+  }
+  if (((long long)start_vnum + (long long)obj_count - 1) > IDXTYPE_MAX) {
+    send_to_char(ch, "Computed top object vnum exceeds valid vnum range.\r\n");
+    return;
+  }
+  top_vnum = start_vnum + obj_count - 1;
+
+  if (!objtemplate_range_is_clear(start_vnum, obj_count, errmsg, sizeof(errmsg))) {
+    send_to_char(ch, "%s", errmsg);
+    return;
+  }
+  if (!objtemplate_builder_can_edit_range(ch, start_vnum, obj_count, errmsg, sizeof(errmsg))) {
+    send_to_char(ch, "%s", errmsg);
+    return;
+  }
+
+  for (i = 0; i < obj_count; i++) {
+    obj_vnum vnum = start_vnum + i;
+    int level = template_compute_level(min_level, max_level, obj_count, i);
+
+    if (!objtemplate_create_one(vnum, base_name, i + 1, level, type_name, errmsg, sizeof(errmsg))) {
+      int rollback;
+      for (rollback = 0; rollback < created; rollback++) {
+        obj_rnum robj = real_object(start_vnum + rollback);
+        if (robj != NOTHING)
+          delete_object(robj);
+      }
+      send_to_char(ch, "%s", errmsg);
+      return;
+    }
+    created++;
+  }
+
+  if (!objtemplate_save_affected_zones(ch, start_vnum, obj_count, errmsg, sizeof(errmsg))) {
+    send_to_char(ch, "%s", errmsg);
+    return;
+  }
+
+  send_to_char(ch,
+    "Object template created successfully.\r\n"
+    "Object range: %d-%d\r\n"
+    "Objects created: %d\r\n"
+    "Level range: %d-%d\r\n"
+    "Base name: %s\r\n"
+    "Type: %s\r\n",
+    start_vnum, top_vnum, obj_count, min_level, max_level, base_name, type_name);
+
+  mudlog(CMP, MAX(LVL_BUILDER, GET_INVIS_LEV(ch)), TRUE,
+         "OLC: %s used objtemplate for objects %d-%d (%d objects, level %d-%d, base '%s', type '%s').",
+         GET_NAME(ch), start_vnum, top_vnum, obj_count, min_level, max_level, base_name, type_name);
 }
 
 ACMD(do_zunlock)

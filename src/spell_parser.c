@@ -910,8 +910,8 @@ static const struct cast_message cast_messages[] = {
     NULL
   },
   [SPELL_WORD_OF_RECALL_MASS] = {
-    "You call your group home with mass recall!",
-    "$n calls $s group home with mass recall!",
+    "You tear open a Nexus Gate to your anchored recall point!",
+    "$n tears open a Nexus Gate to an anchored recall point!",
     NULL
   },
   [SPELL_ASTRAL_PROJECTION] = {
@@ -1549,6 +1549,7 @@ static int find_ability_by_tokens(const char *name, char *ambig_buf,
     { "night vision", SPELL_INFRAVISION },
     { "shield", SPELL_ARMOR },
     { "underwater breathing", SPELL_WATERWALK },
+    { "word of recall mass", SPELL_WORD_OF_RECALL_MASS },
     { NULL, 0 }
   };
   int best_ability = -1;
@@ -1626,6 +1627,7 @@ int find_skill_num(char *name) {
     { "night vision", SPELL_INFRAVISION },
     { "shield", SPELL_ARMOR },
     { "underwater breathing", SPELL_WATERWALK },
+    { "word of recall mass", SPELL_WORD_OF_RECALL_MASS },
     { NULL, 0 }
   };
 
@@ -2272,6 +2274,10 @@ int cast_spell(struct char_data *ch, struct char_data *tch,
     send_to_char(ch, "You are afraid you might hurt your master!\r\n");
     return (0);
   }
+  if (SINFO.violent && is_owned_follower_target(ch, tch)) {
+    send_to_char(ch, "You cannot cast hostile magic on one of your own followers.\r\n");
+    return (0);
+  }
   if ((tch != ch) && IS_SET(SINFO.targets, TAR_SELF_ONLY)) {
     if (is_sanctuary_spell(spellnum))
       send_to_char(ch, "You can only invoke this protection on yourself.\r\n");
@@ -2372,7 +2378,12 @@ ACMD(do_spellup)
       continue;
     }
     if (spell_on_cooldown(ch, spellnum)) {
-      send_to_char(ch, "That spell is still recovering.\r\n");
+      if (spellnum == SPELL_GRASP_HEART)
+        send_to_char(ch, "You have not yet recovered enough to grasp another heart.\r\n");
+      else if (spellnum == SPELL_TRIPLE_MAXIMIZE_MAGIC)
+        send_to_char(ch, "Triple maximize magic is still on cooldown.\r\n");
+      else
+        send_to_char(ch, "That spell is still recovering.\r\n");
       continue;
     }
     mana = mag_manacost(ch, spellnum);
@@ -2657,6 +2668,10 @@ ACMD(do_cast) {
     send_to_char(ch, "You shouldn't cast that on yourself -- could be bad for your health!\r\n");
     return;
   }
+  if (target && SINFO.violent && is_owned_follower_target(ch, tch)) {
+    send_to_char(ch, "You cannot cast hostile magic on one of your own followers.\r\n");
+    return;
+  }
   if (!target) {
     send_to_char(ch, "Cannot find the target of your spell!\r\n");
     return;
@@ -2666,7 +2681,12 @@ ACMD(do_cast) {
     return;
   }
   if (spell_on_cooldown(ch, spellnum)) {
-    send_to_char(ch, "That spell is still recovering.\r\n");
+    if (spellnum == SPELL_GRASP_HEART)
+      send_to_char(ch, "You have not yet recovered enough to grasp another heart.\r\n");
+    else if (spellnum == SPELL_TRIPLE_MAXIMIZE_MAGIC)
+      send_to_char(ch, "Triple maximize magic is still on cooldown.\r\n");
+    else
+      send_to_char(ch, "That spell is still recovering.\r\n");
     return;
   }
   mana = mag_manacost(ch, spellnum);
@@ -3253,7 +3273,7 @@ void mag_assign_spells(void) {
   TAR_CHAR_WORLD | TAR_NOT_SELF, FALSE, MAG_MANUAL, NULL);
   spello(SPELL_LOCATE_CORPSE, "locate corpse", 20, 20, 0, POS_STANDING,
   TAR_IGNORE, FALSE, MAG_MANUAL, NULL);
-  spello(SPELL_WORD_OF_RECALL_MASS, "word of recall mass", 75, 75, 0, POS_STANDING,
+  spello(SPELL_WORD_OF_RECALL_MASS, "nexus gate", 75, 75, 0, POS_STANDING,
   TAR_IGNORE, FALSE, MAG_MANUAL, NULL);
   spello(SPELL_ASTRAL_PROJECTION, "astral projection", 40, 40, 0, POS_STANDING,
   TAR_CHAR_WORLD | TAR_NOT_SELF, FALSE, MAG_MANUAL, NULL);

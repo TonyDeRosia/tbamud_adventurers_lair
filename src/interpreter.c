@@ -64,6 +64,10 @@ ACMD(do_smartspawn);
 ACMD(do_aistate);
 ACMD(do_aictl);
 ACMD(do_shadow);
+ACMD(do_areatemplate);
+ACMD(do_roomtemplate);
+ACMD(do_mobtemplate);
+ACMD(do_objtemplate);
 
 /* local (file scope) functions */
 static int perform_dupe_check(struct descriptor_data *d);
@@ -119,6 +123,10 @@ cpp_extern const struct command_info cmd_info[] = {
   { "affects"  , "aff"     , POS_DEAD    , do_affects  , 0, 0 },
   { "afk"      , "afk"     , POS_DEAD    , do_gen_tog  , 0, SCMD_AFK },
   { "areas"    , "are"     , POS_DEAD    , do_areas    , 0, 0 },
+  { "areatemplate", "areatemplate", POS_DEAD, do_areatemplate, LVL_BUILDER, 0 },
+  { "roomtemplate", "roomtemplate", POS_DEAD, do_roomtemplate, LVL_BUILDER, 0 },
+  { "mobtemplate", "mobtemplate", POS_DEAD, do_mobtemplate, LVL_BUILDER, 0 },
+  { "objtemplate", "objtemplate", POS_DEAD, do_objtemplate, LVL_BUILDER, 0 },
   { "assist"   , "as"      , POS_FIGHTING, do_assist   , 1, 0 },
   { "appraise" , "app"     , POS_RESTING , do_appraise_enemy, 1, 0 },
   { "ask"      , "ask"     , POS_RESTING , do_spec_comm, 0, SCMD_ASK },
@@ -150,6 +158,8 @@ cpp_extern const struct command_info cmd_info[] = {
 
   { "cast"     , "c"       , POS_SITTING , do_cast     , 1, 0 },
   { "campaign" , "camp"    , POS_DEAD    , do_campaign , 0, 0 },
+  { "cd"       , "cd"      , POS_DEAD    , do_cooldown , 0, 0 },
+  { "cooldown" , "cooldown", POS_DEAD    , do_cooldown , 0, 0 },
   { "spellup"  , "spellup" , POS_SITTING , do_spellup  , 1, 0 },
   { "cedit"    , "cedit"   , POS_DEAD    , do_oasis_cedit, LVL_IMPL, 0 },
   { "changelog", "cha"     , POS_DEAD    , do_changelog, LVL_IMPL, 0 },
@@ -447,6 +457,8 @@ cpp_extern const struct command_info cmd_info[] = {
   { "zlock"    , "zlock"   , POS_DEAD    , do_zlock    , LVL_GOD, 0 },
   { "zunlock"  , "zunlock" , POS_DEAD    , do_zunlock  , LVL_GOD, 0 },
   { "zcheck"   , "zcheck"  , POS_DEAD    , do_zcheck   , LVL_BUILDER, 0 },
+  { "zmap"     , "zmap"    , POS_DEAD    , do_zonemap  , LVL_BUILDER, 0 },
+  { "zonemap"  , "zonemap" , POS_DEAD    , do_zonemap  , LVL_BUILDER, 0 },
   { "zpurge"   , "zpurge"  , POS_DEAD    , do_zpurge   , LVL_BUILDER, 0 },
   { "balance", "bal", POS_DEAD, do_balance, 0, 0 },
   { "bounty"   , "bounty"  , POS_DEAD    , do_bounty   , 0, 0 },

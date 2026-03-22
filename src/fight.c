@@ -31,8 +31,6 @@
 #define PVP_GLORY_COOLDOWN 600 /* seconds */
 
 #define RARE_KILL_MAX_COUNT 10
-#define RARE_KILL_BASE_BONUS 5
-#define RARE_KILL_STEP_BONUS 2
 
 
 /* locally defined global variables, used externally */
@@ -76,10 +74,12 @@ static int take_next_damage_type(void)
 }
 
 /* local file scope utility functions */
-static void perform_group_gain(struct char_data *ch, int base, struct char_data *victim);
+static void perform_group_gain(struct char_data *ch, struct char_data *victim, int base_override);
+static int mob_kill_base_xp(struct char_data *ch, struct char_data *victim);
 static int count_live_mobs_by_vnum(mob_vnum vnum);
-static int rare_kill_bonus_for_count(int live_count);
-static int rare_kill_bonus_for_victim(struct char_data *victim);
+static int rare_kill_bonus_for_count(int live_count, int base_xp);
+static int rare_kill_bonus_for_victim(struct char_data *victim, int base_xp);
+static struct char_data *resolve_reward_killer(struct char_data *killer);
 static void dam_message(int dam, struct char_data *ch, struct char_data *victim, int w_type);
 static void make_corpse(struct char_data *ch);
 static void process_round_effects(void);
@@ -90,6 +90,8 @@ static int count_shadow_servants_for(struct char_data *ch);
 static int extracted_shadow_slot(struct char_data *mob);
 static int return_extracted_shadow_to_storage(struct char_data *mob);
 static void prepare_shadow_servant_for_removal(struct char_data *mob);
+static int should_owned_follower_auto_assist(struct char_data *owner, struct char_data *follower);
+static void auto_assist_owned_followers(struct char_data *owner);
 static void change_alignment(struct char_data *ch, struct char_data *victim);
 static void group_gain(struct char_data *ch, struct char_data *victim);
 static void solo_gain(struct char_data *ch, struct char_data *victim);
@@ -159,6 +161,26 @@ static int is_shadow_servant_for(struct char_data *owner, struct char_data *mob)
       || affected_by_spell(mob, SPELL_ARISE_GREATER);
 }
 
+int is_owned_follower_target(struct char_data *attacker, struct char_data *victim)
+{
+  if (!attacker || !victim || attacker == victim || !IS_NPC(victim))
+    return FALSE;
+
+  if (victim->master != attacker)
+    return FALSE;
+
+  if (AFF_FLAGGED(victim, AFF_CHARM))
+    return TRUE;
+
+  if (GET_SUMMON_TIMER(victim) > 0)
+    return TRUE;
+
+  if (is_shadow_servant_for(attacker, victim))
+    return TRUE;
+
+  return FALSE;
+}
+
 static int count_shadow_servants_for(struct char_data *ch)
 {
   struct follow_type *f;
@@ -169,6 +191,62 @@ static int count_shadow_servants_for(struct char_data *ch)
     if (is_shadow_servant_for(ch, f->follower))
       n++;
   return n;
+}
+
+static int should_owned_follower_auto_assist(struct char_data *owner, struct char_data *follower)
+{
+  if (!owner || !follower || !IS_NPC(follower))
+    return FALSE;
+  if (follower->master != owner)
+    return FALSE;
+  if (IN_ROOM(follower) != IN_ROOM(owner))
+    return FALSE;
+  if (FIGHTING(follower))
+    return FALSE;
+
+  /* Owned combat allies are charmed pets/summons and temporary summons. */
+  if (!AFF_FLAGGED(follower, AFF_CHARM) &&
+      GET_SUMMON_TIMER(follower) <= 0 &&
+      !is_shadow_servant_for(owner, follower))
+    return FALSE;
+
+  /* Keep existing incapacity checks aligned with combat eligibility. */
+  if (GET_POS(follower) < POS_STANDING ||
+      AFF_FLAGGED(follower, AFF_STUNNED) ||
+      AFF_FLAGGED(follower, AFF_FEARFUL) ||
+      AFF_FLAGGED(follower, AFF_ROOTED))
+    return FALSE;
+
+  if (!CAN_SEE(follower, owner))
+    return FALSE;
+
+  return TRUE;
+}
+
+static void auto_assist_owned_followers(struct char_data *owner)
+{
+  struct follow_type *f;
+  int assist_fired = FALSE;
+
+  if (!owner || !FIGHTING(owner))
+    return;
+
+  /* Debug trace point: owner/follower eligibility for auto-assist is gated
+   * through should_owned_follower_auto_assist(). */
+  for (f = owner->followers; f; f = f->next) {
+    if (!should_owned_follower_auto_assist(owner, f->follower))
+      continue;
+
+    /* Resolve target from the follower's current room via assist helper. */
+    do_assist(f->follower, GET_NAME(owner), 0, 0);
+    assist_fired = TRUE;
+  }
+
+  if (assist_fired && CONFIG_DEBUG_MODE >= NRM && GET_LEVEL(owner) >= LVL_BUILDER) {
+    send_to_char(owner,
+      "\t1Combat Debug:\r\n"
+      "   \t2Summon Auto-aid:\t3fired\tn\r\n");
+  }
 }
 
 static int extracted_shadow_slot(struct char_data *mob)
@@ -519,14 +597,66 @@ int compute_evasion(struct char_data *ch)
   return MAX(0, evasion);
 }
 
+static int compute_defensive_evasion_value(struct char_data *victim, int *level_component)
+{
+  int level_bonus = 0;
+
+  if (!victim) {
+    if (level_component)
+      *level_component = 0;
+    return 0;
+  }
+
+  level_bonus = GET_LEVEL(victim);
+  if (level_component)
+    *level_component = level_bonus;
+
+  return compute_evasion(victim) + level_bonus;
+}
+
+static int concealment_hit_modifier(struct char_data *ch, struct char_data *victim)
+{
+  if (!ch || !victim)
+    return 0;
+
+  if (!(AFF_FLAGGED(victim, AFF_INVISIBLE) || AFF_FLAGGED(victim, AFF_HIDE)))
+    return 0;
+
+  if (AFF_FLAGGED(ch, AFF_TRUESIGHT))
+    return 6;
+
+  if (AFF_FLAGGED(ch, AFF_DETECT_INVIS) || AFF_FLAGGED(ch, AFF_SENSE_LIFE))
+    return 3;
+
+  return -12;
+}
+
 int compute_offensive_hit_value(struct char_data *ch, struct char_data *victim)
 {
-  return 100 - (compute_thaco(ch, victim) * 4);
+  int level_bonus = GET_LEVEL(ch);
+  int hitroll_bonus = GET_HITROLL(ch);
+  int stat_bonus = str_app[STRENGTH_APPLY_INDEX(ch)].tohit;
+  int mental_bonus = (GET_INT(ch) - 10) / 4 + (GET_WIS(ch) - 10) / 4;
+  int level_gap_bonus = 0;
+  int situational_bonus = 0;
+
+  if (victim) {
+    int level_gap = GET_LEVEL(ch) - GET_LEVEL(victim);
+    if (level_gap > 0)
+      level_gap_bonus = (level_gap / 2) + (level_gap / 4);
+    else if (level_gap < 0)
+      level_gap_bonus = level_gap / 3;
+  }
+
+  situational_bonus = concealment_hit_modifier(ch, victim);
+
+  return 30 + level_bonus + hitroll_bonus + stat_bonus + mental_bonus +
+         level_gap_bonus + situational_bonus;
 }
 
 int compute_hit_chance_from_values(int offensive_hit, int target_evasion)
 {
-  int hit_chance = offensive_hit - target_evasion;
+  int hit_chance = 50 + (offensive_hit - target_evasion);
 
   return MAX(5, MIN(95, hit_chance));
 }
@@ -633,9 +763,10 @@ static void make_corpse(struct char_data *ch)
   SET_BIT_AR(GET_OBJ_WEAR(corpse), ITEM_WEAR_TAKE);
   SET_BIT_AR(GET_OBJ_EXTRA(corpse), ITEM_NODONATE);
   GET_OBJ_VAL(corpse, 0) = 0;	/* You can't store stuff in a corpse */
-  GET_OBJ_VAL(corpse, 1) = IS_NPC(ch) ? GET_MOB_VNUM(ch) : NOBODY; /* source mob vnum for shadow extraction */
+  GET_OBJ_VAL(corpse, 1) = 0; /* container flags: corpse is open/non-closeable */
   GET_OBJ_VAL(corpse, 2) = GET_LEVEL(ch); /* source level snapshot for shadow extraction */
   GET_OBJ_VAL(corpse, 3) = 1;	/* corpse identifier */
+  CORPSE_SOURCE_VNUM(corpse) = IS_NPC(ch) ? GET_MOB_VNUM(ch) : NOBODY; /* source mob vnum for shadow extraction */
   CORPSE_SHADOW_ATTEMPTS(corpse) = 3; /* shadow extraction attempts remaining */
   CORPSE_SHADOW_ATTEMPTS_INIT(corpse) = 1; /* shadow extraction fields initialized */
   GET_OBJ_WEIGHT(corpse) = GET_WEIGHT(ch) + IS_CARRYING_W(ch);
@@ -773,11 +904,11 @@ void death_cry(struct char_data *ch)
 {
   int door;
 
-  act("Your blood freezes as you hear $n's death cry.", FALSE, ch, 0, 0, TO_ROOM);
+  act("\tRYour blood freezes as you hear $n's death cry.\tn", FALSE, ch, 0, 0, TO_ROOM);
 
   for (door = 0; door < DIR_COUNT; door++)
     if (CAN_GO(ch, door))
-      send_to_room(world[IN_ROOM(ch)].dir_option[door]->to_room, "Your blood freezes as you hear someone's death cry.\r\n");
+      send_to_room(world[IN_ROOM(ch)].dir_option[door]->to_room, "\tRYour blood freezes as you hear someone's death cry.\tn\r\n");
 }
 
 void raw_kill(struct char_data * ch, struct char_data * killer)
@@ -948,10 +1079,8 @@ void die(struct char_data * ch, struct char_data * killer)
     }
 
     if (gold_gain > 0) {
-      char buf[64];
-      format_gold_as_currency(buf, sizeof(buf), gold_gain);
       increase_money_gold(killer, gold_gain);
-      send_to_char(killer, "You receive %s from the kill.\r\n", buf);
+      send_to_char(killer, "You receive \ty%lld\tn \tYgold\tn from the kill.\r\n", gold_gain);
     }
 
     /* prevent corpse gold duplication */
@@ -963,12 +1092,13 @@ void die(struct char_data * ch, struct char_data * killer)
   raw_kill(ch, killer);
 }
 
-static void perform_group_gain(struct char_data *ch, int base,
-			     struct char_data *victim)
+static void perform_group_gain(struct char_data *ch, struct char_data *victim, int base_override)
 {
   int share, hap_share, rare_bonus;
 
-  share = MIN(CONFIG_MAX_EXP_GAIN, MAX(1, base));
+  share = (base_override >= 0) ? base_override : mob_kill_base_xp(ch, victim);
+
+  share = MIN(CONFIG_MAX_EXP_GAIN, MAX(1, share));
 
   if ((IS_HAPPYHOUR) && (IS_HAPPYEXP))
   {
@@ -977,14 +1107,14 @@ static void perform_group_gain(struct char_data *ch, int base,
     share = MIN(CONFIG_MAX_EXP_GAIN, MAX(1, hap_share));
   }
   if (share > 1)
-    send_to_char(ch, "You receive your share of experience -- %s%d%s points.\r\n", CCYEL(ch, C_NRM), share, CCNRM(ch, C_NRM));
+    send_to_char(ch, "You receive your share of \tCexperience\tn -- \ty%d\tn points.\r\n", share);
   else
     send_to_char(ch, "You receive your share of experience -- one measly little point!\r\n");
 
-  rare_bonus = rare_kill_bonus_for_victim(victim);
+  rare_bonus = rare_kill_bonus_for_victim(victim, share);
   if (rare_bonus > 0) {
     share += rare_bonus;
-    send_to_char(ch, "You receive %d 'rare kill' experience bonus.\r\n", rare_bonus);
+    send_to_char(ch, "You receive \ty%d\tn '\tcRare Kill\tn' \tCexperience\tn bonus.\r\n", rare_bonus);
   }
 
   gain_exp(ch, share);
@@ -995,41 +1125,45 @@ static void group_gain(struct char_data *ch, struct char_data *victim)
 {
   int tot_members = 0, base, tot_gain;
   struct char_data *k;
-  
-  while ((k = (struct char_data *) simple_list(GROUP(ch)->members)) != NULL)
-    if (IN_ROOM(ch) == IN_ROOM(k))
-      tot_members++;
 
-  /* round up to the nearest tot_members */
-  tot_gain = (GET_EXP(victim) / 3) + tot_members - 1;
+  if (!IS_NPC(victim)) {
+    while ((k = (struct char_data *) simple_list(GROUP(ch)->members)) != NULL)
+      if (IN_ROOM(ch) == IN_ROOM(k))
+        tot_members++;
 
-  /* prevent illegal xp creation when killing players */
-  if (!IS_NPC(victim))
+    /* round up to the nearest tot_members */
+    tot_gain = (GET_EXP(victim) / 3) + tot_members - 1;
     tot_gain = MIN(CONFIG_MAX_EXP_LOSS * 2 / 3, tot_gain);
+    base = (tot_members >= 1) ? MAX(1, tot_gain / tot_members) : 0;
 
-  if (tot_members >= 1)
-    base = MAX(1, tot_gain / tot_members);
-  else
-    base = 0;
+    while ((k = (struct char_data *) simple_list(GROUP(ch)->members)) != NULL)
+      if (IN_ROOM(k) == IN_ROOM(ch))
+        perform_group_gain(k, victim, base);
+    return;
+  }
 
   while ((k = (struct char_data *) simple_list(GROUP(ch)->members)) != NULL)
     if (IN_ROOM(k) == IN_ROOM(ch))
-      perform_group_gain(k, base, victim);
+      perform_group_gain(k, victim, -1);
 }
 
 static void solo_gain(struct char_data *ch, struct char_data *victim)
 {
   int exp, happy_exp, rare_bonus;
 
-  exp = MIN(CONFIG_MAX_EXP_GAIN, GET_EXP(victim) / 3);
+  if (IS_NPC(victim)) {
+    exp = mob_kill_base_xp(ch, victim);
+    exp = MIN(CONFIG_MAX_EXP_GAIN, MAX(1, exp));
+  } else {
+    exp = MIN(CONFIG_MAX_EXP_GAIN, GET_EXP(victim) / 3);
 
-  /* Calculate level-difference bonus */
-  if (IS_NPC(ch))
-    exp += MAX(0, (exp * MIN(4, (GET_LEVEL(victim) - GET_LEVEL(ch)))) / 8);
-  else
-    exp += MAX(0, (exp * MIN(8, (GET_LEVEL(victim) - GET_LEVEL(ch)))) / 8);
+    if (IS_NPC(ch))
+      exp += MAX(0, (exp * MIN(4, (GET_LEVEL(victim) - GET_LEVEL(ch)))) / 8);
+    else
+      exp += MAX(0, (exp * MIN(8, (GET_LEVEL(victim) - GET_LEVEL(ch)))) / 8);
 
-  exp = MAX(exp, 1);
+    exp = MAX(exp, 1);
+  }
 
   if (IS_HAPPYHOUR && IS_HAPPYEXP) {
     happy_exp = exp + (int)((float)exp * ((float)HAPPY_EXP / (float)(100)));
@@ -1037,14 +1171,14 @@ static void solo_gain(struct char_data *ch, struct char_data *victim)
   }
 
   if (exp > 1)
-    send_to_char(ch, "You receive %s%d%s experience points.\r\n", CCYEL(ch, C_NRM), exp, CCNRM(ch, C_NRM));
+    send_to_char(ch, "You receive \ty%d\tn \tCexperience\tn points.\r\n", exp);
   else
     send_to_char(ch, "You receive one lousy experience point.\r\n");
 
-  rare_bonus = rare_kill_bonus_for_victim(victim);
+  rare_bonus = rare_kill_bonus_for_victim(victim, exp);
   if (rare_bonus > 0) {
     exp += rare_bonus;
-    send_to_char(ch, "You receive %d 'rare kill' experience bonus.\r\n", rare_bonus);
+    send_to_char(ch, "You receive \ty%d\tn '\tcRare Kill\tn' \tCexperience\tn bonus.\r\n", rare_bonus);
   }
 
   gain_exp(ch, exp);
@@ -1071,20 +1205,65 @@ static int count_live_mobs_by_vnum(mob_vnum vnum)
   return count;
 }
 
-static int rare_kill_bonus_for_count(int live_count)
+static int mob_kill_base_xp(struct char_data *ch, struct char_data *victim)
+{
+  int delta;
+
+  if (!ch || !victim || !IS_NPC(victim))
+    return 0;
+
+  delta = GET_LEVEL(victim) - GET_LEVEL(ch);
+
+  if (delta <= -15) return 1;
+  if (delta <= -10) return 3;
+  if (delta <= -8)  return 5;
+  if (delta <= -5)  return 15;
+  if (delta <= -3)  return 40;
+  if (delta == -2)  return 60;
+  if (delta == -1)  return 90;
+  if (delta == 0)   return 120;
+  if (delta == 1)   return 150;
+  if (delta == 2)   return 180;
+  if (delta == 3)   return 220;
+  if (delta == 4)   return 260;
+  if (delta == 5)   return 300;
+  return 350;
+}
+
+static int rare_kill_bonus_for_count(int live_count, int base_xp)
 {
   if (live_count <= 0 || live_count > RARE_KILL_MAX_COUNT)
     return 0;
 
-  return RARE_KILL_BASE_BONUS + ((RARE_KILL_MAX_COUNT - live_count) * RARE_KILL_STEP_BONUS);
+  return MAX(1, base_xp / 4);
 }
 
-static int rare_kill_bonus_for_victim(struct char_data *victim)
+static int rare_kill_bonus_for_victim(struct char_data *victim, int base_xp)
 {
   if (!victim || !IS_NPC(victim))
     return 0;
 
-  return rare_kill_bonus_for_count(count_live_mobs_by_vnum(GET_MOB_VNUM(victim)));
+  return rare_kill_bonus_for_count(count_live_mobs_by_vnum(GET_MOB_VNUM(victim)), base_xp);
+}
+
+static struct char_data *resolve_reward_killer(struct char_data *killer)
+{
+  int hops = 0;
+  struct char_data *iter = killer;
+
+  if (!killer)
+    return NULL;
+  if (!IS_NPC(killer))
+    return killer;
+
+  while (iter && iter->master && hops < 20) {
+    iter = iter->master;
+    if (iter && !IS_NPC(iter))
+      return iter;
+    hops++;
+  }
+
+  return killer;
 }
 
 static char *replace_string(const char *str, const char *weapon_singular, const char *weapon_plural)
@@ -1197,14 +1376,14 @@ static void dam_message(int dam, struct char_data *ch, struct char_data *victim,
   } else {
     pct = (dam * 100) / MAX(1, GET_MAX_HIT(victim));
 
-    if (pct <= 4)        msgnum = 1;
-    else if (pct <= 9)   msgnum = 2;
-    else if (pct <= 19)  msgnum = 3;
-    else if (pct <= 29)  msgnum = 4;
-    else if (pct <= 44)  msgnum = 5;
-    else if (pct <= 59)  msgnum = 6;
-    else if (pct <= 74)  msgnum = 7;
-    else if (pct <= 89)  msgnum = 8;
+    if (pct <= 2)        msgnum = 1;
+    else if (pct <= 6)   msgnum = 2;
+    else if (pct <= 14)  msgnum = 3;
+    else if (pct <= 24)  msgnum = 4;
+    else if (pct <= 39)  msgnum = 5;
+    else if (pct <= 54)  msgnum = 6;
+    else if (pct <= 69)  msgnum = 7;
+    else if (pct <= 84)  msgnum = 8;
     else                 msgnum = 9;
   }
 /* damage message to onlookers */
@@ -1417,6 +1596,12 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
     return (-1);			/* -je, 7/7/92 */
   }
 
+  if (ch && victim != ch && is_owned_follower_target(ch, victim)) {
+    if (!IS_NPC(ch))
+      send_to_char(ch, "You cannot attack one of your own followers.\r\n");
+    return (0);
+  }
+
   /* peaceful rooms */
   if (ch->nr != real_mobile(DG_CASTER_PROXY) &&
       ch != victim && ROOM_FLAGGED(IN_ROOM(ch), ROOM_PEACEFUL)) {
@@ -1437,6 +1622,15 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
   dam = damage_mtrigger(ch, victim, dam, attacktype);
   if (dam == -1) {
   	return (0);
+  }
+
+  if (dam > 0 &&
+      ch &&
+      ch != victim &&
+      IS_SPELL(attacktype) &&
+      affected_by_spell(ch, SPELL_TRIPLE_MAXIMIZE_MAGIC)) {
+    dam *= 3;
+    affect_from_char(ch, SPELL_TRIPLE_MAXIMIZE_MAGIC);
   }
 
   if (dam > 0 && IS_WEAPON(attacktype) && victim != ch && AFF_FLAGGED(victim, AFF_PHASE) && rand_number(1, 100) <= 30) {
@@ -1632,6 +1826,12 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
       (damage_type == DAM_SHADOW || damage_type == DAM_NECROTIC))
     dam = (dam * 105) / 100;
 
+  if (dam > 0 && victim && IS_SPELL(attacktype) && GET_MAX_HIT(victim) > 0) {
+    int half_max = GET_MAX_HIT(victim) / 2;
+    if (dam > half_max)
+      dam = half_max + (dam / 4);
+  }
+
 
   /* Melee crits (only weapon attacks) */
   if (dam > 0 && ch && victim && ch != victim && IS_WEAPON(attacktype)) {
@@ -1809,7 +2009,7 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
     send_to_char(victim, "You're stunned, but will probably regain consciousness again.\r\n");
     break;
   case POS_DEAD:
-    act("$n is dead!  R.I.P.", FALSE, victim, 0, 0, TO_ROOM);
+    act("$n is dead!  \tYR.I.P.\tn", FALSE, victim, 0, 0, TO_ROOM);
     send_to_char(victim, "You are dead!  Sorry...\r\n");
     break;
 
@@ -1820,7 +2020,7 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
     if (GET_HIT(victim) < (GET_MAX_HIT(victim) / 4)) {
       send_to_char(victim, "%sYou wish that your wounds would stop BLEEDING so much!%s\r\n",
 		CCRED(victim, C_SPR), CCNRM(victim, C_SPR));
-      if (ch != victim && MOB_FLAGGED(victim, MOB_WIMPY))
+      if (ch != victim && MOB_FLAGGED(victim, MOB_WIMPY) && !MOB_FLAGGED(victim, MOB_HELPER))
 	do_flee(victim, NULL, 0, 0);
     }
     if (!IS_NPC(victim) && GET_WIMP_LEV(victim) && (victim != ch) &&
@@ -1848,6 +2048,16 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
 
   /* Uh oh.  Victim died. */
   if (GET_POS(victim) == POS_DEAD) {
+    struct char_data *reward_killer = resolve_reward_killer(ch);
+
+    if (ch && reward_killer && reward_killer != ch &&
+        CONFIG_DEBUG_MODE >= NRM && GET_LEVEL(reward_killer) >= LVL_BUILDER) {
+      send_to_char(reward_killer,
+        "\t1Combat Debug:\r\n"
+        "   \t2Kill Attribution:\t3%s credited via %s\tn\r\n",
+        GET_NAME(reward_killer), GET_NAME(ch));
+    }
+
     if (ch != victim && ch && !IS_NPC(ch) &&
         GET_SKILL(ch, SKILL_TACTICAL_SPELL_MEMORY) > 0 &&
         attacktype > 0 && attacktype <= MAX_SPELLS) {
@@ -1856,11 +2066,12 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
       send_to_char(ch, "You retain tactical spell memory and recover %d mana.\r\n", mana_refund);
     }
 
-    if (ch != victim && (IS_NPC(victim) || victim->desc)) {
-      if (GROUP(ch))
-	group_gain(ch, victim);
+    if (reward_killer && reward_killer != victim && !IS_NPC(reward_killer) &&
+        (IS_NPC(victim) || victim->desc)) {
+      if (GROUP(reward_killer))
+	group_gain(reward_killer, victim);
       else
-        solo_gain(ch, victim);
+        solo_gain(reward_killer, victim);
     }
 
     if (!IS_NPC(victim)) {
@@ -1869,8 +2080,8 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
       if (MOB_FLAGGED(ch, MOB_MEMORY))
         forget(ch, victim);
     }
-    if (ch != victim)
-      grant_glory_for_kill(ch, victim);
+    if (reward_killer && reward_killer != victim)
+      grant_glory_for_kill(reward_killer, victim);
     /* Cant determine GET_GOLD on corpse, so do now and store */
     if (IS_NPC(victim)) {
       if ((IS_HAPPYHOUR) && (IS_HAPPYGOLD))
@@ -1883,22 +2094,22 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
       sprintf(local_buf,"%ld", (long)local_gold);
     }
 
-    die(victim, ch);
-    if (GROUP(ch) && (local_gold > 0) && PRF_FLAGGED(ch, PRF_AUTOSPLIT) ) {
-      generic_find("corpse", FIND_OBJ_ROOM, ch, &tmp_char, &corpse_obj);
+    die(victim, reward_killer);
+    if (reward_killer && GROUP(reward_killer) && (local_gold > 0) && PRF_FLAGGED(reward_killer, PRF_AUTOSPLIT) ) {
+      generic_find("corpse", FIND_OBJ_ROOM, reward_killer, &tmp_char, &corpse_obj);
       if (corpse_obj) {
-        do_get(ch, "all.coin corpse", 0, 0);
-        do_split(ch, local_buf, 0, 0);
+        do_get(reward_killer, "all.coin corpse", 0, 0);
+        do_split(reward_killer, local_buf, 0, 0);
       }
       /* need to remove the gold from the corpse */
-    } else if (!IS_NPC(ch) && (ch != victim) && PRF_FLAGGED(ch, PRF_AUTOGOLD)) {
-      do_get(ch, "all.coin corpse", 0, 0);
+    } else if (reward_killer && !IS_NPC(reward_killer) && (reward_killer != victim) && PRF_FLAGGED(reward_killer, PRF_AUTOGOLD)) {
+      do_get(reward_killer, "all.coin corpse", 0, 0);
     }
-    if (!IS_NPC(ch) && (ch != victim) && PRF_FLAGGED(ch, PRF_AUTOLOOT)) {
-      do_get(ch, "all corpse", 0, 0);
+    if (reward_killer && !IS_NPC(reward_killer) && (reward_killer != victim) && PRF_FLAGGED(reward_killer, PRF_AUTOLOOT)) {
+      do_get(reward_killer, "all corpse", 0, 0);
     }
-    if (IS_NPC(victim) && !IS_NPC(ch) && PRF_FLAGGED(ch, PRF_AUTOSAC)) {
-      do_sac(ch,"corpse",0,0);
+    if (reward_killer && IS_NPC(victim) && !IS_NPC(reward_killer) && PRF_FLAGGED(reward_killer, PRF_AUTOSAC)) {
+      do_sac(reward_killer,"corpse",0,0);
     }
     return (-1);
   }
@@ -1912,6 +2123,7 @@ static int compute_thaco(struct char_data *ch, struct char_data *victim)
 {
   int calc_thaco;
   int situational_hit_bonus = 0;
+  int level_gap_bonus = 0;
 
   if (!IS_NPC(ch))
     calc_thaco = thaco(GET_CLASS(ch), GET_LEVEL(ch));
@@ -1921,25 +2133,32 @@ static int compute_thaco(struct char_data *ch, struct char_data *victim)
   calc_thaco -= GET_HITROLL(ch);
   calc_thaco -= (int) ((GET_INT(ch) - 13) / 1.5);	/* Intelligence helps! */
   calc_thaco -= (int) ((GET_WIS(ch) - 13) / 1.5);	/* So does wisdom */
-  if (victim && AFF_FLAGGED(ch, AFF_TRUESIGHT) &&
-      (AFF_FLAGGED(victim, AFF_INVISIBLE) || AFF_FLAGGED(victim, AFF_HIDE)))
-    situational_hit_bonus = 10;
+  if (victim)
+    level_gap_bonus = (GET_LEVEL(ch) - GET_LEVEL(victim)) / 3;
+  calc_thaco -= level_gap_bonus;
+  situational_hit_bonus = concealment_hit_modifier(ch, victim);
   calc_thaco -= situational_hit_bonus;
-  /* high level thaco floor: prevent endgame thaco from drifting into nonsense */
-  int __thaco = (calc_thaco);
-  __thaco = MAX(1, __thaco);
-  if (GET_LEVEL(ch) >= 50)
-    __thaco = MIN(__thaco, 15);
-  return __thaco;
+  return MAX(1, calc_thaco);
 }
 
 void hit(struct char_data *ch, struct char_data *victim, int type)
 {
   struct obj_data *wielded = GET_EQ(ch, WEAR_WIELD);
-  int w_type, attacker_hit, defender_evasion, hit_chance, dam, roll;
+  int w_type, attacker_hit, defender_evasion, hit_chance, dam;
+  int thaco_legacy, victim_ac_legacy, diceroll_legacy;
+  int attacker_level, victim_level, hitroll_bonus, stat_bonus, mental_bonus;
+  int level_gap_bonus, situational_bonus, defender_level_bonus;
+  int shadow_assist_bonus = 0;
+  int melee_level_bonus = 0;
+  int final_hit_roll;
 
   /* Check that the attacker and victim exist */
   if (!ch || !victim) return;
+  if (is_owned_follower_target(ch, victim)) {
+    if (!IS_NPC(ch))
+      send_to_char(ch, "You cannot attack one of your own followers.\r\n");
+    return;
+  }
 
   /* check if the character has a fight trigger */
   fight_mtrigger(ch);
@@ -1961,17 +2180,57 @@ void hit(struct char_data *ch, struct char_data *victim, int type)
       w_type = TYPE_HIT;
   }
 
-  attacker_hit = compute_offensive_hit_value(ch, victim);
-  defender_evasion = compute_evasion(victim);
+  attacker_level = GET_LEVEL(ch);
+  victim_level = GET_LEVEL(victim);
+  hitroll_bonus = GET_HITROLL(ch);
+  stat_bonus = str_app[STRENGTH_APPLY_INDEX(ch)].tohit;
+  mental_bonus = (GET_INT(ch) - 10) / 4 + (GET_WIS(ch) - 10) / 4;
+  if (attacker_level > victim_level)
+    level_gap_bonus = ((attacker_level - victim_level) / 2) + ((attacker_level - victim_level) / 4);
+  else if (attacker_level < victim_level)
+    level_gap_bonus = (attacker_level - victim_level) / 3;
+  else
+    level_gap_bonus = 0;
+  situational_bonus = concealment_hit_modifier(ch, victim);
+
+  if (IS_NPC(ch) && ch->master && !IS_NPC(ch->master) &&
+      is_shadow_servant_for(ch->master, ch) && victim && IS_NPC(victim)) {
+    int owner_gap = GET_LEVEL(ch->master) - GET_LEVEL(victim);
+    if (owner_gap >= 8)
+      shadow_assist_bonus = MIN(14, 4 + (owner_gap / 4));
+  }
+
+  attacker_hit = 30 + attacker_level + hitroll_bonus + stat_bonus +
+                 mental_bonus + level_gap_bonus + situational_bonus + shadow_assist_bonus;
+  defender_evasion = compute_defensive_evasion_value(victim, &defender_level_bonus);
   hit_chance = compute_hit_chance_from_values(attacker_hit, defender_evasion);
-  roll = rand_number(1, 100);
+  final_hit_roll = rand_number(1, 100);
+  thaco_legacy = compute_thaco(ch, victim);
+  victim_ac_legacy = compute_armor_class(victim) / 10;
+  victim_ac_legacy = MAX(-10, MIN(10, victim_ac_legacy));
+  diceroll_legacy = rand_number(1, 20);
 
   /* report for debugging if necessary */
-  if (CONFIG_DEBUG_MODE >= NRM)
-    send_to_char(ch, "\t1Debug:\r\n   \t2Attacker Hit: \t3%d\r\n   \t2Defender Evasion: \t3%d\r\n   \t2Hit Chance: \t3%d\r\n   \t2Roll: \t3%d\tn\r\n",
-      attacker_hit, defender_evasion, hit_chance, roll);
+  if (CONFIG_DEBUG_MODE >= NRM && GET_LEVEL(ch) >= LVL_BUILDER)
+    send_to_char(ch,
+      "\t1Combat Debug:\r\n"
+      "   \t2Attacker Lvl:\t3%d\r\n"
+      "   \t2Victim Lvl:\t3%d\r\n"
+      "   \t2Accuracy Value:\t3%d\r\n"
+      "   \t2Evasion Value:\t3%d\r\n"
+      "   \t2Hitroll Contribution:\t3%d\r\n"
+      "   \t2Stat Contribution:\t3%d (STR) + %d (INT/WIS)\r\n"
+      "   \t2Level-gap Contribution:\t3%d\r\n"
+      "   \t2Shadow Assist Contribution:\t3%d\r\n"
+      "   \t2Defender Level Contribution:\t3%d\r\n"
+      "   \t2Final Hit Chance:\t3%d%%\r\n"
+      "   \t2Final Hit Roll:\t3%d\r\n"
+      "   \t2Legacy THAC0 Check:\t3THAC0 %d vs AC %d on d20(%d)\tn\r\n",
+      attacker_level, victim_level, attacker_hit, defender_evasion, hitroll_bonus,
+      stat_bonus, mental_bonus, level_gap_bonus, shadow_assist_bonus, defender_level_bonus,
+      hit_chance, final_hit_roll, thaco_legacy, victim_ac_legacy, diceroll_legacy);
 
-  dam = (!AWAKE(victim) || roll <= hit_chance);
+  dam = (!AWAKE(victim) || final_hit_roll <= hit_chance);
 
   if (!dam)
     /* the attacker missed the victim */
@@ -1980,7 +2239,15 @@ void hit(struct char_data *ch, struct char_data *victim, int type)
     /* okay, we know the guy has been hit.  now calculate damage.
      * Start with the damage bonuses: the damroll and strength apply */
     dam = str_app[STRENGTH_APPLY_INDEX(ch)].todam;
-    dam += GET_DAMROLL(ch);
+    dam += GET_DAMROLL(ch) * 2;
+    dam += MAX(0, (GET_STR(ch) - 10) / 2);
+    melee_level_bonus = MAX(0, GET_LEVEL(ch) / 10);
+    dam += melee_level_bonus;
+
+    {
+    int unarmed_base_roll = 0;
+    int unarmed_level_scaling_bonus = 0;
+    int level_gap_damage_bonus = 0;
 
     /* Maybe holding arrow? */
     if (wielded && GET_OBJ_TYPE(wielded) == ITEM_WEAPON) {
@@ -1988,10 +2255,33 @@ void hit(struct char_data *ch, struct char_data *victim, int type)
       dam += dice(GET_OBJ_VAL(wielded, 1), GET_OBJ_VAL(wielded, 2));
     } else {
       /* If no weapon, add bare hand damage instead */
-        if (IS_NPC(ch))
-          dam += dice(ch->mob_specials.damnodice, ch->mob_specials.damsizedice);
-        else
-          dam += rand_number(0, 2);	/* Max 2 bare hand damage for players */
+      if (IS_NPC(ch)) {
+        unarmed_base_roll = dice(ch->mob_specials.damnodice, ch->mob_specials.damsizedice);
+        dam += unarmed_base_roll;
+      } else {
+        unarmed_base_roll = dice(MIN(4, 1 + (GET_LEVEL(ch) / 30)),
+                                 MIN(7, 2 + (GET_LEVEL(ch) / 20)));
+        unarmed_level_scaling_bonus = MAX(0, GET_LEVEL(ch) / 30);
+        dam += unarmed_base_roll + unarmed_level_scaling_bonus;
+      }
+    }
+
+    if (victim && GET_LEVEL(ch) > GET_LEVEL(victim)) {
+      int level_gap = GET_LEVEL(ch) - GET_LEVEL(victim);
+      level_gap_damage_bonus = MAX(1, level_gap / 6);
+      if (level_gap >= 10)
+        level_gap_damage_bonus += level_gap / 2;
+      dam += level_gap_damage_bonus;
+    }
+
+    if (CONFIG_DEBUG_MODE >= NRM && GET_LEVEL(ch) >= LVL_BUILDER)
+      send_to_char(ch,
+        "\t1Combat Debug:\r\n"
+        "   \t2Melee Level Bonus:\t3%d\r\n"
+        "   \t2Unarmed Base Damage Roll:\t3%d\r\n"
+        "   \t2Unarmed Level Scaling Bonus:\t3%d\r\n"
+        "   \t2Level-gap Damage Bonus:\t3%d\tn\r\n",
+        melee_level_bonus, unarmed_base_roll, unarmed_level_scaling_bonus, level_gap_damage_bonus);
     }
 
     /* Include a damage multiplier if victim isn't ready to fight:
@@ -2176,13 +2466,13 @@ static void process_round_effects(void)
       if (GET_SKILL(i, SKILL_DREAD_DOMINION) > 0) {
         struct affected_type af;
         new_affect(&af);
-        af.spell = SPELL_DESPAIR_AURA;
+        af.spell = SKILL_DREAD_DOMINION;
         af.duration = 1;
         af.location = APPLY_SAVING_SPELL;
         af.modifier = 2;
         affect_join(i, &af, FALSE, FALSE, FALSE, FALSE);
         new_affect(&af);
-        af.spell = SPELL_DESPAIR_AURA;
+        af.spell = SKILL_DREAD_DOMINION;
         af.duration = 1;
         af.location = APPLY_AC;
         af.modifier = 2;
@@ -2197,13 +2487,13 @@ static void process_round_effects(void)
         if (!IS_NPC(i) && IS_NPC(tch) && AFF_FLAGGED(tch, AFF_CHARM))
           continue;
         new_affect(&af);
-        af.spell = SPELL_DESPAIR_AURA;
+        af.spell = SKILL_DREAD_DOMINION;
         af.duration = 1;
         af.location = APPLY_HITROLL;
         af.modifier = -4;
         affect_join(tch, &af, FALSE, FALSE, FALSE, FALSE);
         new_affect(&af);
-        af.spell = SPELL_DESPAIR_AURA;
+        af.spell = SKILL_DREAD_DOMINION;
         af.duration = 1;
         af.location = APPLY_SAVING_SPELL;
         af.modifier = -2;
@@ -2301,6 +2591,8 @@ void perform_violence(void)
         do_assist(tch, GET_NAME(ch), 0, 0);				  
       }
     }
+
+    auto_assist_owned_followers(ch);
 
     hit(ch, FIGHTING(ch), TYPE_UNDEFINED);
     

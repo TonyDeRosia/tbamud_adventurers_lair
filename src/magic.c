@@ -306,6 +306,7 @@ int mag_damage(int level, struct char_data *ch, struct char_data *victim,
 		     int spellnum, int savetype)
 {
   int dam = 0;
+  int save_modifier = 0;
   enum damage_type local_damage_type = current_spell_damage_type;
 
   if (victim == NULL || ch == NULL)
@@ -321,6 +322,7 @@ int mag_damage(int level, struct char_data *ch, struct char_data *victim,
       dam = dice(1, 8) + 1;
     else
       dam = dice(1, 6) + 1;
+    dam += MAX(0, level / 12);
     break;
   case SPELL_BURNING_HANDS:
     if (local_damage_type == DAM_NONE) local_damage_type = DAM_FIRE;
@@ -438,9 +440,35 @@ int mag_damage(int level, struct char_data *ch, struct char_data *victim,
   } /* switch(spellnum) */
 
 
+  if (victim) {
+    int level_gap = GET_LEVEL(ch) - GET_LEVEL(victim);
+    if (spellnum == SPELL_MAGIC_MISSILE || spellnum == SPELL_CHILL_TOUCH) {
+      if (level_gap >= 8)
+        save_modifier -= 8 + MIN(10, level_gap / 3);
+      else if (level_gap < 0)
+        save_modifier += MIN(6, (-level_gap) / 4);
+    }
+  }
+
   /* divide damage by two if victim makes his saving throw */
-  if (mag_savingthrow(victim, savetype, 0))
+  if (mag_savingthrow(victim, savetype, save_modifier))
     dam /= 2;
+
+  if (spellnum == SPELL_MAGIC_MISSILE && victim) {
+    int level_gap = GET_LEVEL(ch) - GET_LEVEL(victim);
+    if (level_gap >= 10 && dam > 0)
+      dam = MAX(2, dam);
+  }
+
+  if (spellnum == SPELL_MAGIC_MISSILE && CONFIG_DEBUG_MODE >= NRM &&
+      GET_LEVEL(ch) >= LVL_BUILDER)
+    send_to_char(ch,
+      "\t1Combat Debug:\r\n"
+      "   \t2Magic Missile Caster Lvl:\t3%d\r\n"
+      "   \t2Magic Missile Victim Lvl:\t3%d\r\n"
+      "   \t2Magic Missile Save Adj:\t3%d\r\n"
+      "   \t2Magic Missile Final Damage:\t3%d\tn\r\n",
+      GET_LEVEL(ch), GET_LEVEL(victim), save_modifier, dam);
 
   if (spellnum == SPELL_SHADOW_BOLT && IS_GOOD(victim))
     dam = (dam * 125) / 100;
@@ -1011,7 +1039,7 @@ void mag_affects(int level, struct char_data *ch, struct char_data *victim,
   case SPELL_ANTIMAGIC_SHELL:
     af[0].duration = spell_dur_medium(level);
     af[0].location = APPLY_SAVING_SPELL;
-    af[0].modifier = 20;
+    af[0].modifier = -20;
     SET_BIT_AR(af[0].bitvector, AFF_WARDED);
     refresh_on_recast = TRUE;
     break;

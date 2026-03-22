@@ -990,8 +990,9 @@ ACMD(do_drink)
       case SECT_WATER_SWIM:
       case SECT_WATER_NOSWIM:
       case SECT_UNDERWATER:
-        if ((GET_COND(ch, HUNGER) > 20) && (GET_COND(ch, THIRST) > 0)) {
-          send_to_char(ch, "Your stomach can't contain anymore!\r\n");
+        if (GET_COND(ch, THIRST) > 20) {
+          send_to_char(ch, "You don't feel thirsty any more.\r\n");
+          return;
         }
         snprintf(buf, sizeof(buf), "$n takes a refreshing drink.");
         act(buf, TRUE, ch, 0, 0, TO_ROOM);
@@ -1027,8 +1028,8 @@ ACMD(do_drink)
     act("$n tries to drink but misses $s mouth!", TRUE, ch, 0, 0, TO_ROOM);
     return;
   }
-  if ((GET_COND(ch, HUNGER) > 20) && (GET_COND(ch, THIRST) > 0)) {
-    send_to_char(ch, "Your stomach can't contain anymore!\r\n");
+  if (GET_COND(ch, THIRST) > 20) {
+    send_to_char(ch, "You don't feel thirsty any more.\r\n");
     return;
   }
   if (GET_OBJ_VAL(temp, 1) < 1) {
@@ -1067,7 +1068,6 @@ ACMD(do_drink)
   }
 
   gain_condition(ch, DRUNK,  drink_aff[GET_OBJ_VAL(temp, 2)][DRUNK]  * amount / 4);
-  gain_condition(ch, HUNGER,   drink_aff[GET_OBJ_VAL(temp, 2)][HUNGER]   * amount / 4);
   gain_condition(ch, THIRST, drink_aff[GET_OBJ_VAL(temp, 2)][THIRST] * amount / 4);
 
   if (GET_COND(ch, DRUNK) > 10)
@@ -1075,9 +1075,6 @@ ACMD(do_drink)
 
   if (GET_COND(ch, THIRST) > 20)
     send_to_char(ch, "You don't feel thirsty any more.\r\n");
-
-  if (GET_COND(ch, HUNGER) > 20)
-    send_to_char(ch, "You are full.\r\n");
 
   if (GET_OBJ_VAL(temp, 3) && GET_LEVEL(ch) < LVL_IMMORT) { /* The crap was poisoned ! */
     send_to_char(ch, "Oops, it tasted rather strange!\r\n");
@@ -1107,7 +1104,6 @@ ACMD(do_eat)
   struct obj_data *food;
   struct affected_type af;
   int hunger_amount;
-  int thirst_amount;
   int sated_duration;
 
   one_argument(argument, arg);
@@ -1150,23 +1146,17 @@ ACMD(do_eat)
 
   if (subcmd == SCMD_EAT) {
     hunger_amount = GET_OBJ_VAL(food, 0);
-    thirst_amount = GET_OBJ_VAL(food, 1);
     sated_duration = GET_OBJ_VAL(food, 2);
   } else {
     hunger_amount = (GET_OBJ_VAL(food, 0) > 0) ? 1 : 0;
-    thirst_amount = (GET_OBJ_VAL(food, 1) > 0) ? 1 : 0;
     sated_duration = (GET_OBJ_VAL(food, 2) > 0) ? 1 : 0;
   }
 
   gain_condition(ch, HUNGER, hunger_amount);
-  gain_condition(ch, THIRST, thirst_amount);
   ch->char_specials.food_sated_ticks = MAX(ch->char_specials.food_sated_ticks, 0) + MAX(sated_duration, 0);
 
   if (GET_COND(ch, HUNGER) > 20)
     send_to_char(ch, "You are full.\r\n");
-  if (GET_COND(ch, THIRST) > 20)
-    send_to_char(ch, "You don't feel thirsty any more.\r\n");
-
   if (GET_OBJ_VAL(food, 3) && (GET_LEVEL(ch) < LVL_IMMORT)) {
     /* The crap was poisoned ! */
     send_to_char(ch, "Oops, that tasted rather strange!\r\n");
@@ -1347,9 +1337,6 @@ static void wear_message(struct char_data *ch, struct obj_data *obj, int where)
     {"$n wears $p around $s neck.",
     "You wear $p around your neck."},
 
-    {"$n wears $p around $s neck.",
-    "You wear $p around your neck."},
-
     {"$n wears $p on $s body.",
     "You wear $p on your body."},
 
@@ -1486,7 +1473,7 @@ static void perform_wear(struct char_data *ch, struct obj_data *obj, int where)
 
   int wear_bitvectors[] = {
     ITEM_WEAR_TAKE, ITEM_WEAR_FINGER, ITEM_WEAR_FINGER, ITEM_WEAR_NECK,
-    ITEM_WEAR_NECK, ITEM_WEAR_BODY, ITEM_WEAR_HEAD, ITEM_WEAR_LEGS,
+    ITEM_WEAR_BODY, ITEM_WEAR_HEAD, ITEM_WEAR_LEGS,
     ITEM_WEAR_FEET, ITEM_WEAR_HANDS, ITEM_WEAR_ARMS, ITEM_WEAR_SHIELD,
     ITEM_WEAR_ABOUT, ITEM_WEAR_WAIST, ITEM_WEAR_WRIST, ITEM_WEAR_WRIST,
     ITEM_WEAR_WIELD, ITEM_WEAR_TAKE
@@ -1496,7 +1483,6 @@ static void perform_wear(struct char_data *ch, struct obj_data *obj, int where)
     "You're already using a light.\r\n",
     "YOU SHOULD NEVER SEE THIS MESSAGE.  PLEASE REPORT.\r\n",
     "You're already wearing something on both of your ring fingers.\r\n",
-    "YOU SHOULD NEVER SEE THIS MESSAGE.  PLEASE REPORT.\r\n",
     "You can't wear anything else around your neck.\r\n",
     "You're already wearing something on your body.\r\n",
     "You're already wearing something on your head.\r\n",
@@ -1518,8 +1504,8 @@ static void perform_wear(struct char_data *ch, struct obj_data *obj, int where)
     act("You can't wear $p there.", FALSE, ch, obj, 0, TO_CHAR);
     return;
   }
-  /* for neck, finger, and wrist, try pos 2 if pos 1 is already full */
-  if ((where == WEAR_FINGER_R) || (where == WEAR_NECK_1) || (where == WEAR_WRIST_R))
+  /* for finger and wrist, try pos 2 if pos 1 is already full */
+  if ((where == WEAR_FINGER_R) || (where == WEAR_WRIST_R))
     if (GET_EQ(ch, where))
       where++;
 
@@ -1546,7 +1532,6 @@ int find_eq_pos(struct char_data *ch, struct obj_data *obj, char *arg)
     "finger",
     "!RESERVED!",
     "neck",
-    "!RESERVED!",
     "body",
     "head",
     "legs",
@@ -1665,8 +1650,13 @@ ACMD(do_wield)
       send_to_char(ch, "It's too heavy for you to use.\r\n");
     else if (GET_LEVEL(ch) < GET_OBJ_LEVEL(obj))
       send_to_char(ch, "You are not experienced enough to use that.\r\n");
-    else
-      perform_wear(ch, obj, WEAR_WIELD);
+    else {
+      if (GET_EQ(ch, WEAR_WIELD))
+        perform_remove(ch, WEAR_WIELD);
+
+      if (!GET_EQ(ch, WEAR_WIELD) && obj->carried_by == ch)
+        perform_wear(ch, obj, WEAR_WIELD);
+    }
   }
 }
 

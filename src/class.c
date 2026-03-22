@@ -2320,41 +2320,24 @@ void init_spell_levels(void)
  * exp required for immortality, plus at least 20,000 or so. */
 #define EXP_MAX  40000000
 
-/* Extend mortal experience requirements past the explicit tables by
- * linearly interpolating between the last defined mortal level and the
- * experience required for immortality. */
+/* Mortal progression uses a fixed TNL step; immortal thresholds remain explicit. */
 
 
 /* Function to return the exp required for each class/level */
 int level_exp(int chclass, int level)
 {
-  /*
-   * Smooth 1..(LVL_IMMORT-1) leveling curve.
-   *
-   * Tune:
-   *   MORTAL_XP_CAP  total XP required to reach LVL_IMMORT
-   *   XP_CURVE_EXP   exponent (higher slows late game more)
-   */
-  const double MORTAL_XP_CAP = 20000000.0;
-  const double XP_CURVE_EXP  = 2.75;
+  const int FIXED_TNL_XP = 1000;
 
   (void)chclass;
 
   if (level <= 1)
     return 0;
 
-  if (level < LVL_IMMORT) {
-    const double max_mortal = (double)(LVL_IMMORT - 1);
-    const double x = ((double)(level - 1)) / max_mortal; /* 0..1 */
-    long xp = (long)(MORTAL_XP_CAP * pow(x, XP_CURVE_EXP));
-
-    if (xp < 0) xp = 0;
-    if (xp >= (long)MORTAL_XP_CAP) xp = (long)MORTAL_XP_CAP - 1;
-    return (int)xp;
-  }
+  if (level < LVL_IMMORT)
+    return (level - 1) * FIXED_TNL_XP;
 
   if (level == LVL_IMMORT)
-    return (int)MORTAL_XP_CAP + 1;
+    return ((LVL_IMMORT - 1) * FIXED_TNL_XP) + 1;
 
   if (level > LVL_IMPL)
     return EXP_MAX;

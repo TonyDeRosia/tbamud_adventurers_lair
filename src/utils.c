@@ -92,8 +92,9 @@ void improve_ability_from_use(struct char_data *ch, int ability, int success)
 
   /* Slow curve as you approach 100. */
   chance = 1 + (stat / 12) + ((100 - cur) / 20);
+  /* Genuine failures should teach more than routine success. */
   if (!success)
-    chance /= 2;
+    chance *= 4;
 
   if (chance < 1) chance = 1;
   if (chance > 15) chance = 15;
