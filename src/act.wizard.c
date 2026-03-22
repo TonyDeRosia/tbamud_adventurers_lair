@@ -72,6 +72,7 @@ static int acctlist_show_entry(long id, const char *name, void *arg);
 
 static int compute_areatemplate_width(int room_count);
 static int compute_areatemplate_height(int room_count, int width);
+static void compute_template_dimensions(int room_count, int *width_out, int *height_out);
 static void zonemap_append(char *buf, size_t bufsz, size_t *len, const char *fmt, ...);
 static bool zonemap_has_exit_to(room_rnum from, int dir, room_rnum to);
 static void zonemap_cell_text(room_vnum vnum, room_rnum rrnum, room_vnum player_room_vnum,
@@ -85,8 +86,11 @@ static void init_areatemplate_room(struct room_data *room, room_vnum vnum, zone_
 static bool areatemplate_set_zone_name(zone_rnum rznum, const char *new_name);
 static bool parse_areatemplate_args(char *argument, zone_vnum *zone_vnum_out, room_vnum *start_room_out, int *room_count_out, char *zone_name_out, size_t zone_name_sz);
 static bool parse_roomtemplate_args(char *argument, room_vnum *start_room_out, int *room_count_out);
-static int areatemplate_cell_to_vnum(room_vnum start, int room_count, int width, int x, int y, room_vnum *out_vnum);
-static int link_areatemplate_rooms(room_vnum start, int room_count, int width, int height);
+static room_vnum template_room_vnum_from_index(room_vnum start, int index);
+static bool areatemplate_set_exit(room_rnum from_rnum, int dir, room_rnum to_rnum);
+static bool template_link_pair(room_rnum from_rnum, int dir_from, room_rnum to_rnum, int dir_to);
+static void link_areatemplate_rooms(room_vnum start, int room_count, int width,
+                                    int *ew_links, int *ns_links, int *skipped_neighbors);
 static void free_areatemplate_room_strings(struct room_data *room);
 static bool save_roomtemplate_zone(struct char_data *ch, zone_rnum rznum, char *errmsg, size_t errmsg_sz);
 static int template_compute_level(int min_level, int max_level, int count, int index);
@@ -5460,6 +5464,18 @@ static int compute_areatemplate_height(int room_count, int width)
   return (room_count + width - 1) / width;
 }
 
+static void compute_template_dimensions(int room_count, int *width_out, int *height_out)
+{
+  /* Width is chosen first (smallest square-ish fit), then height rounds up. */
+  int width = compute_areatemplate_width(room_count);
+  int height = compute_areatemplate_height(room_count, width);
+
+  if (width_out)
+    *width_out = width;
+  if (height_out)
+    *height_out = height;
+}
+
 static int template_compute_level(int min_level, int max_level, int count, int index)
 {
   if (count <= 1)
@@ -5655,75 +5671,111 @@ static bool parse_roomtemplate_args(char *argument, room_vnum *start_room_out, i
   return TRUE;
 }
 
-static int areatemplate_cell_to_vnum(room_vnum start, int room_count, int width, int x, int y, room_vnum *out_vnum)
+static room_vnum template_room_vnum_from_index(room_vnum start, int index)
 {
-  int index = (y * width) + x;
+  return start + index;
+}
 
-  if (index < 0 || index >= room_count)
+static bool areatemplate_set_exit(room_rnum from_rnum, int dir, room_rnum to_rnum)
+{
+  struct room_direction_data *exit_data;
+
+  if (from_rnum == NOWHERE || to_rnum == NOWHERE || dir < 0 || dir >= DIR_COUNT)
     return FALSE;
 
-  *out_vnum = start + index;
+  if (W_EXIT(from_rnum, dir) == NULL) {
+    CREATE(W_EXIT(from_rnum, dir), struct room_direction_data, 1);
+    if (W_EXIT(from_rnum, dir) == NULL)
+      return FALSE;
+    W_EXIT(from_rnum, dir)->general_description = NULL;
+    W_EXIT(from_rnum, dir)->keyword = NULL;
+  }
+
+  exit_data = W_EXIT(from_rnum, dir);
+  if (exit_data->general_description) {
+    free(exit_data->general_description);
+    exit_data->general_description = NULL;
+  }
+  if (exit_data->keyword) {
+    free(exit_data->keyword);
+    exit_data->keyword = NULL;
+  }
+  exit_data->exit_info = 0;
+  exit_data->key = NOTHING;
+  exit_data->to_room = to_rnum;
   return TRUE;
 }
 
-static int link_areatemplate_rooms(room_vnum start, int room_count, int width, int height)
+static bool template_link_pair(room_rnum from_rnum, int dir_from, room_rnum to_rnum, int dir_to)
 {
-  int x, y, linked = 0;
+  if (!areatemplate_set_exit(from_rnum, dir_from, to_rnum))
+    return FALSE;
+  if (!areatemplate_set_exit(to_rnum, dir_to, from_rnum))
+    return FALSE;
+  return TRUE;
+}
 
-  for (y = 0; y < height; y++) {
-    for (x = 0; x < width; x++) {
-      room_vnum from_vnum, to_vnum;
-      room_rnum from_rnum, to_rnum;
+static void link_areatemplate_rooms(room_vnum start, int room_count, int width,
+                                    int *ew_links, int *ns_links, int *skipped_neighbors)
+{
+  int i;
+  int height = compute_areatemplate_height(room_count, width);
+  int ew = 0, ns = 0, skipped = 0;
 
-      if (!areatemplate_cell_to_vnum(start, room_count, width, x, y, &from_vnum))
+  for (i = 0; i < room_count; i++) {
+    int row = i / width;
+    int col = i % width;
+    room_vnum from_vnum = template_room_vnum_from_index(start, i);
+    room_rnum from_rnum = real_room(from_vnum);
+
+    if (from_rnum == NOWHERE)
+      continue;
+
+    /*
+     * Build the grid with explicit row/column math.
+     * East links are only valid when we are not on the last column and the
+     * target index exists in room_count, which prevents row wraparound.
+     */
+    if ((col + 1) < width) {
+      int east_index = i + 1;
+
+      if (east_index < room_count) {
+        room_rnum east_rnum = real_room(template_room_vnum_from_index(start, east_index));
+        if (east_rnum != NOWHERE && template_link_pair(from_rnum, EAST, east_rnum, WEST))
+          ew++;
+      } else {
+        skipped++;
+      }
+    } else {
+      skipped++;
+    }
+
+    /*
+     * South links are only valid when i + width is still inside room_count.
+     * This blocks links into non-existent cells in a partial final row.
+     */
+    if ((row + 1) < height) {
+      int south_index = ((row + 1) * width) + col;
+
+      if (south_index >= room_count) {
+        skipped++;
         continue;
-      from_rnum = real_room(from_vnum);
-      if (from_rnum == NOWHERE)
-        continue;
-
-      if (areatemplate_cell_to_vnum(start, room_count, width, x + 1, y, &to_vnum)) {
-        to_rnum = real_room(to_vnum);
-        if (to_rnum != NOWHERE) {
-          CREATE(W_EXIT(from_rnum, EAST), struct room_direction_data, 1);
-          W_EXIT(from_rnum, EAST)->general_description = NULL;
-          W_EXIT(from_rnum, EAST)->keyword = NULL;
-          W_EXIT(from_rnum, EAST)->exit_info = 0;
-          W_EXIT(from_rnum, EAST)->key = NOTHING;
-          W_EXIT(from_rnum, EAST)->to_room = to_rnum;
-
-          CREATE(W_EXIT(to_rnum, WEST), struct room_direction_data, 1);
-          W_EXIT(to_rnum, WEST)->general_description = NULL;
-          W_EXIT(to_rnum, WEST)->keyword = NULL;
-          W_EXIT(to_rnum, WEST)->exit_info = 0;
-          W_EXIT(to_rnum, WEST)->key = NOTHING;
-          W_EXIT(to_rnum, WEST)->to_room = from_rnum;
-          linked++;
-        }
       }
 
-      if (areatemplate_cell_to_vnum(start, room_count, width, x, y + 1, &to_vnum)) {
-        to_rnum = real_room(to_vnum);
-        if (to_rnum != NOWHERE) {
-          CREATE(W_EXIT(from_rnum, SOUTH), struct room_direction_data, 1);
-          W_EXIT(from_rnum, SOUTH)->general_description = NULL;
-          W_EXIT(from_rnum, SOUTH)->keyword = NULL;
-          W_EXIT(from_rnum, SOUTH)->exit_info = 0;
-          W_EXIT(from_rnum, SOUTH)->key = NOTHING;
-          W_EXIT(from_rnum, SOUTH)->to_room = to_rnum;
-
-          CREATE(W_EXIT(to_rnum, NORTH), struct room_direction_data, 1);
-          W_EXIT(to_rnum, NORTH)->general_description = NULL;
-          W_EXIT(to_rnum, NORTH)->keyword = NULL;
-          W_EXIT(to_rnum, NORTH)->exit_info = 0;
-          W_EXIT(to_rnum, NORTH)->key = NOTHING;
-          W_EXIT(to_rnum, NORTH)->to_room = from_rnum;
-          linked++;
-        }
-      }
+      room_rnum south_rnum = real_room(template_room_vnum_from_index(start, south_index));
+      if (south_rnum != NOWHERE && template_link_pair(from_rnum, SOUTH, south_rnum, NORTH))
+        ns++;
+    } else {
+      skipped++;
     }
   }
 
-  return linked;
+  if (ew_links)
+    *ew_links = ew;
+  if (ns_links)
+    *ns_links = ns;
+  if (skipped_neighbors)
+    *skipped_neighbors = skipped;
 }
 
 static void free_areatemplate_room_strings(struct room_data *room)
@@ -6304,6 +6356,7 @@ ACMD(do_areatemplate)
   room_vnum top_room_vnum;
   zone_rnum new_zone_rnum;
   int room_count, width, height;
+  int ew_links = 0, ns_links = 0, skipped_neighbors = 0;
   int i;
   bool can_edit_new_zone = FALSE;
 
@@ -6379,8 +6432,7 @@ ACMD(do_areatemplate)
     return;
   }
 
-  width = compute_areatemplate_width(room_count);
-  height = compute_areatemplate_height(room_count, width);
+  compute_template_dimensions(room_count, &width, &height);
 
   for (i = 0; i < room_count; i++) {
     struct room_data new_room;
@@ -6394,7 +6446,8 @@ ACMD(do_areatemplate)
     free_areatemplate_room_strings(&new_room);
   }
 
-  link_areatemplate_rooms(start_room_vnum, room_count, width, height);
+  link_areatemplate_rooms(start_room_vnum, room_count, width,
+                          &ew_links, &ns_links, &skipped_neighbors);
   add_to_save_list(zone_table[new_zone_rnum].number, SL_WLD);
   add_to_save_list(zone_table[new_zone_rnum].number, SL_ZON);
 
@@ -6414,11 +6467,14 @@ ACMD(do_areatemplate)
     "Room range: %d-%d\r\n"
     "Rooms created: %d\r\n"
     "Layout: %d x %d\r\n"
-    "Exits linked: yes\r\n",
+    "East/West links created: %d\r\n"
+    "North/South links created: %d\r\n"
+    "Skipped edge/nonexistent neighbors: %d\r\n",
     zone_table[new_zone_rnum].number,
     zone_table[new_zone_rnum].name ? zone_table[new_zone_rnum].name : "New Zone",
     start_room_vnum, top_room_vnum,
-    room_count, width, height);
+    room_count, width, height,
+    ew_links, ns_links, skipped_neighbors);
 
   mudlog(CMP, MAX(LVL_BUILDER, GET_INVIS_LEV(ch)), TRUE,
          "OLC: %s used areatemplate for zone %d (%d-%d, %d rooms, %dx%d).",
@@ -6433,6 +6489,7 @@ ACMD(do_roomtemplate)
   room_vnum start_room_vnum, top_room_vnum;
   zone_rnum owning_zone;
   int room_count, width, height;
+  int ew_links = 0, ns_links = 0, skipped_neighbors = 0;
   int i;
 
   if (IS_NPC(ch) || !ch->desc || STATE(ch->desc) != CON_PLAYING)
@@ -6471,8 +6528,7 @@ ACMD(do_roomtemplate)
     return;
   }
 
-  width = compute_areatemplate_width(room_count);
-  height = compute_areatemplate_height(room_count, width);
+  compute_template_dimensions(room_count, &width, &height);
 
   for (i = 0; i < room_count; i++) {
     struct room_data new_room;
@@ -6486,7 +6542,8 @@ ACMD(do_roomtemplate)
     free_areatemplate_room_strings(&new_room);
   }
 
-  link_areatemplate_rooms(start_room_vnum, room_count, width, height);
+  link_areatemplate_rooms(start_room_vnum, room_count, width,
+                          &ew_links, &ns_links, &skipped_neighbors);
   if (!save_roomtemplate_zone(ch, owning_zone, errmsg, sizeof(errmsg))) {
     send_to_char(ch, "%s", errmsg);
     return;
@@ -6498,8 +6555,11 @@ ACMD(do_roomtemplate)
     "Room range: %d-%d\r\n"
     "Rooms created: %d\r\n"
     "Layout: %d x %d\r\n"
-    "Exits linked: yes\r\n",
-    zone_table[owning_zone].number, start_room_vnum, top_room_vnum, room_count, width, height);
+    "East/West links created: %d\r\n"
+    "North/South links created: %d\r\n"
+    "Skipped edge/nonexistent neighbors: %d\r\n",
+    zone_table[owning_zone].number, start_room_vnum, top_room_vnum, room_count, width, height,
+    ew_links, ns_links, skipped_neighbors);
 
   mudlog(CMP, MAX(LVL_BUILDER, GET_INVIS_LEV(ch)), TRUE,
          "OLC: %s used roomtemplate in zone %d (%d-%d, %d rooms, %dx%d).",
