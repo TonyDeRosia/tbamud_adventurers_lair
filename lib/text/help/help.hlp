@@ -21896,34 +21896,71 @@ Usage:
   areatemplate <zone_vnum> <start_room_vnum> <room_count> "<zone name>"
 
 Description:
-  Creates a new area (zone) and a grid of connected rooms.
+  Creates a new area and a grid of connected rooms.
 
   This command will:
-  - create a new zone using the given zone vnum
-  - assign the zone a room range starting at the given room vnum
-  - generate a near-square grid of rooms
-  - automatically link north, south, east, and west exits
-  - assign default names and descriptions to all rooms
+  create a new zone using the given zone vnum
+  assign the zone a room range starting at the given room vnum
+  generate a near-square grid of rooms
+  automatically link north, south, east, and west exits
+  assign default names and descriptions to all rooms
 
   The resulting area is a template intended for builders to customize.
 
 Arguments:
-  zone_vnum         The new zone number (must not already exist)
+  zone_vnum         The new zone number
   start_room_vnum   The first room vnum to use
   room_count        Number of rooms to create
-  "zone name"       Name of the new area (must be in quotes)
+  "zone name"       Name of the new area
 
 Notes:
-  - The command will fail if any room in the requested range already exists.
-  - The command will fail if the zone vnum already exists.
-  - The layout is automatically generated as a compact grid.
-  - Rooms are created empty and must be customized.
+  The command will fail if any room in the requested range already exists.
+  The command will fail if the zone vnum already exists.
+  The layout is automatically generated as a compact grid.
+  Rooms are created empty and must be customized.
 
 Example:
   areatemplate 50 5000 25 "Forgotten Ruins"
 
 See also:
-  REDIT MEDIT OEDIT ZEDIT
+  ROOMTEMPLATE REDIT MEDIT OEDIT ZEDIT
+
+Minimum level:
+  LVL_BUILDER
+#0
+
+ROOMTEMPLATE
+
+ROOMTEMPLATE
+
+Usage:
+  roomtemplate <start_room_vnum> <room_count>
+
+Description:
+  Creates a batch of template rooms inside an existing zone.
+
+  This command will:
+  create new rooms in sequence starting at the given room vnum
+  require that all rooms belong to one existing zone
+  generate a near-square grid of rooms
+  automatically link north, south, east, and west exits among the new rooms
+
+  The resulting rooms are templates intended for builders to customize.
+
+Arguments:
+  start_room_vnum   The first room vnum to use
+  room_count        Number of rooms to create
+
+Notes:
+  The command will fail if any target room already exists.
+  The command will fail if the range is outside an existing zone.
+  The command will fail if the range spans multiple zones.
+
+Example:
+  roomtemplate 5050 9
+
+See also:
+  AREATEMPLATE REDIT ZEDIT
 
 Minimum level:
   LVL_BUILDER
@@ -21964,7 +22001,49 @@ Example:
   mobtemplate 8000 10 15 8 "bandit"
 
 See also:
-  MEDIT ZEDIT AREATEMPLATE
+  MEDIT ZEDIT AREATEMPLATE OBJTEMPLATE
+
+Minimum level:
+  LVL_BUILDER
+#0
+
+OBJTEMPLATE
+
+OBJTEMPLATE
+
+Usage:
+  objtemplate <start_obj_vnum> <min_level> <max_level> <obj_count> "<base name>" <type>
+
+Description:
+  Creates a batch of new template object prototypes.
+
+  This command will:
+  create new object prototypes in sequence starting at the given object vnum
+  assign levels evenly across the requested level range
+  generate default keywords and descriptions from the given base name
+  assign safe starter values based on the requested type
+
+  The resulting objects are templates intended for builders to customize.
+
+Arguments:
+  start_obj_vnum   The first object vnum to use
+  min_level        Minimum generated object level
+  max_level        Maximum generated object level
+  obj_count        Number of objects to create
+  "base name"      Base thematic name for generated object strings
+  type             One of: trash treasure weapon armor container
+
+Notes:
+  The command will fail if any object in the requested range already exists.
+  The command does not place objects into rooms.
+  The command does not create zone resets.
+  Generated objects should be reviewed and customized by builders.
+
+Example:
+  objtemplate 15000 40 50 10 "ashen blade" weapon
+
+See also:
+  OEDIT ZEDIT AREATEMPLATE MOBTEMPLATE
 
 Minimum level:
   LVL_BUILDER

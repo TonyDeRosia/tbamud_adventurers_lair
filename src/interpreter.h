@@ -132,7 +132,9 @@ ACMD(do_aistate);
 ACMD(do_aictl);
 ACMD(do_heel);
 ACMD(do_areatemplate);
+ACMD(do_roomtemplate);
 ACMD(do_mobtemplate);
+ACMD(do_objtemplate);
 
 
 #endif /* _INTERPRETER_H_ */
