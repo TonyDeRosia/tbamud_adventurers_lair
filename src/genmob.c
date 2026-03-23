@@ -327,6 +327,8 @@ int save_mobiles(zone_rnum rznum)
 
 int write_mobile_espec(mob_vnum mvnum, struct char_data *mob, FILE *fd)
 {
+  int i;
+
   if (GET_ATTACK(mob) != 0)
     fprintf(fd, "BareHandAttack: %d\n", GET_ATTACK(mob));
   if (GET_STR(mob) != 11)
@@ -357,12 +359,26 @@ int write_mobile_espec(mob_vnum mvnum, struct char_data *mob, FILE *fd)
     fprintf(fd, "PetPrice: %d\n", GET_PET_PRICE(mob));
   if (GET_MOB_WIMP_LEV(mob) > 0)
     fprintf(fd, "Wimpy: %d\n", GET_MOB_WIMP_LEV(mob));
+  if (GET_EVASION(mob) != 0)
+    fprintf(fd, "Evasion: %d\n", GET_EVASION(mob));
   
   /* Persist gold min/max (used for corpse coin rolls). */
   if ((long long)mob->mob_specials.gold_min != 0 || (long long)mob->mob_specials.gold_max != 0) {
     fprintf(fd, "GoldMin: %lld\n", (long long)mob->mob_specials.gold_min);
     fprintf(fd, "GoldMax: %lld\n", (long long)mob->mob_specials.gold_max);
   }
+  for (i = 0; i < mob->mob_specials.equip_loadout_count; i++)
+    fprintf(fd, "EquipItem: %d %d\n",
+            mob->mob_specials.equip_loadout[i].vnum,
+            mob->mob_specials.equip_loadout[i].wear_pos);
+  for (i = 0; i < mob->mob_specials.inventory_loadout_count; i++)
+    fprintf(fd, "InvItem: %d %d\n",
+            mob->mob_specials.inventory_loadout[i].vnum,
+            mob->mob_specials.inventory_loadout[i].count);
+  for (i = 0; i < mob->mob_specials.loot_table_count; i++)
+    fprintf(fd, "LootItem: %d %d\n",
+            mob->mob_specials.loot_table[i].vnum,
+            mob->mob_specials.loot_table[i].chance);
 fputs("E\n", fd);
   return TRUE;
 }

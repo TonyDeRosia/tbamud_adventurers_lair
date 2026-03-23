@@ -220,6 +220,10 @@ extern const char *nrm, *grn, *cyn, *yel;
 #define REDIT_EXTRADESC_DESCRIPTION 	16
 #define REDIT_DELETE			17
 #define REDIT_COPY			18
+#define REDIT_RESETS_MENU              19
+#define REDIT_RESETS_ADD_MOB           20
+#define REDIT_RESETS_ADD_OBJ           21
+#define REDIT_RESETS_DELETE            22
 
 /* Submodes of ZEDIT connectedness. */
 #define ZEDIT_MAIN_MENU              	0
@@ -290,6 +294,20 @@ extern const char *nrm, *grn, *cyn, *yel;
 #define MEDIT_SPELL                     39
 #define MEDIT_PET_PRICE                 40
 #define MEDIT_WIMPY_THRESH              41
+#define MEDIT_LEVEL_AUTOFILL_CONFIRM    42
+#define MEDIT_EVASION                   43
+#define MEDIT_STR_ADD                   44
+#define MEDIT_LOADOUT_MENU              45
+#define MEDIT_LOADOUT_EQUIP_VNUM        46
+#define MEDIT_LOADOUT_EQUIP_SLOT        47
+#define MEDIT_LOADOUT_EQUIP_REPLACE     48
+#define MEDIT_LOADOUT_INV_VNUM          49
+#define MEDIT_LOADOUT_INV_COUNT         50
+#define MEDIT_LOADOUT_LOOT_VNUM         51
+#define MEDIT_LOADOUT_LOOT_CHANCE       52
+#define MEDIT_LOADOUT_REMOVE_EQUIP      53
+#define MEDIT_LOADOUT_REMOVE_INV        54
+#define MEDIT_LOADOUT_REMOVE_LOOT       55
 
 /* Submodes of SEDIT connectedness. */
 #define SEDIT_MAIN_MENU              	0

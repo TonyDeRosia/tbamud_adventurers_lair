@@ -178,6 +178,8 @@ static void do_auto_exits(struct char_data *ch);
 static void list_char_to_char(struct char_data *list, struct char_data *ch);
 static void list_one_char(struct char_data *i, struct char_data *ch);
 static void look_at_char(struct char_data *i, struct char_data *ch);
+static int can_view_mob_inventory(struct char_data *viewer, struct char_data *target);
+static void show_mob_equipment_to_char(struct char_data *viewer, struct char_data *target);
 static void look_at_target(struct char_data *ch, char *arg);
 static void look_in_direction(struct char_data *ch, int dir);
 static void look_in_obj(struct char_data *ch, char *arg);
@@ -189,6 +191,8 @@ static void list_obj_to_char(struct obj_data *list, struct char_data *ch, int mo
 static void show_obj_to_char(struct obj_data *obj, struct char_data *ch, int mode);
 static void show_obj_modifiers(struct obj_data *obj, struct char_data *ch);
 static void build_obj_aura_tags(struct obj_data *obj, struct char_data *ch, char *out, size_t outsz, int include_item_tag);
+static void build_player_kept_marker(struct obj_data *obj, struct char_data *ch, char *out, size_t outsz);
+static void out_append(char *dst, size_t dstsz, const char *src);
 /* do_where utility functions */
 static void perform_immort_where(char_data *ch, const char *arg);
 static void perform_mortal_where(struct char_data *ch, char *arg);
@@ -259,7 +263,11 @@ static void show_obj_to_char(struct obj_data *obj, struct char_data *ch, int mod
           send_to_char(ch, "[TRIGS] ");
       }
     }
-    build_obj_aura_tags(obj, ch, obj_tags, sizeof(obj_tags), TRUE);
+    if (!IS_NPC(ch) && GET_LEVEL(ch) < LVL_IMMORT &&
+        (obj->carried_by == ch || obj->worn_by == ch))
+      build_player_kept_marker(obj, ch, obj_tags, sizeof(obj_tags));
+    else
+      build_obj_aura_tags(obj, ch, obj_tags, sizeof(obj_tags), TRUE);
     send_to_char(ch, "%s%s", obj_tags, obj->short_description);
     break;
 
@@ -307,6 +315,16 @@ static void show_obj_modifiers(struct obj_data *obj, struct char_data *ch)
 
   build_obj_aura_tags(obj, ch, obj_tags, sizeof(obj_tags), TRUE);
   send_to_char(ch, " %s", obj_tags);
+}
+
+static void build_player_kept_marker(struct obj_data *obj, struct char_data *ch, char *out, size_t outsz)
+{
+  if (!out || outsz == 0)
+    return;
+
+  out[0] = '\0';
+  if (obj && OBJ_FLAGGED(obj, ITEM_KEPT))
+    out_append(out, outsz, "\tr[Kept]\tn ");
 }
 
 static void list_obj_to_char(struct obj_data *list, struct char_data *ch, int mode, int show)
@@ -391,8 +409,6 @@ static void diag_char_to_char(struct char_data *i, struct char_data *ch)
 
 static void look_at_char(struct char_data *i, struct char_data *ch)
 {
-  int j, found;
-
   if (!ch->desc)
     return;
 
@@ -402,24 +418,62 @@ static void look_at_char(struct char_data *i, struct char_data *ch)
     act("You see nothing special about $m.", FALSE, i, 0, ch, TO_VICT);
 
   diag_char_to_char(i, ch);
+  if (IS_NPC(i)) {
+    show_mob_equipment_to_char(ch, i);
 
-  found = FALSE;
+    if (ch != i && can_view_mob_inventory(ch, i)) {
+      act("\r\nYou size up what $n is carrying:", FALSE, i, 0, ch, TO_VICT);
+      if (i->carrying)
+        list_obj_to_char(i->carrying, ch, SHOW_OBJ_SHORT, TRUE);
+      else
+        send_to_char(ch, " Nothing.\r\n");
+    }
+  }
+}
+
+static int can_view_mob_inventory(struct char_data *viewer, struct char_data *target)
+{
+  if (!viewer || !target || !IS_NPC(target))
+    return FALSE;
+
+  if (GET_LEVEL(viewer) >= LVL_IMMORT)
+    return TRUE;
+
+  if (IS_THIEF(viewer))
+    return TRUE;
+
+  if (AFF_FLAGGED(viewer, AFF_TRUESIGHT))
+    return TRUE;
+
+  return FALSE;
+}
+
+static void show_mob_equipment_to_char(struct char_data *viewer, struct char_data *target)
+{
+  int j, found = FALSE;
+
+  if (!viewer || !target)
+    return;
+
   for (j = 0; !found && j < NUM_WEARS; j++)
-    if (GET_EQ(i, j) && CAN_SEE_OBJ(ch, GET_EQ(i, j)))
+    if (GET_EQ(target, j) && CAN_SEE_OBJ(viewer, GET_EQ(target, j)))
       found = TRUE;
 
-  if (found) {
-    send_to_char(ch, "\r\n");    /* act() does capitalization. */
-    act("$n is using:", FALSE, i, 0, ch, TO_VICT);
-    for (j = 0; j < NUM_WEARS; j++)
-      if (GET_EQ(i, j) && CAN_SEE_OBJ(ch, GET_EQ(i, j))) {
-        send_to_char(ch, "%s", wear_where[j]);
-        show_obj_to_char(GET_EQ(i, j), ch, SHOW_OBJ_SHORT);
-      }
-  }
-  if (ch != i && (IS_THIEF(ch) || GET_LEVEL(ch) >= LVL_IMMORT)) {
-    act("\r\nYou attempt to peek at $s inventory:", FALSE, i, 0, ch, TO_VICT);
-    list_obj_to_char(i->carrying, ch, SHOW_OBJ_SHORT, TRUE);
+  if (!found)
+    return;
+
+  send_to_char(viewer, "\r\n");
+  act("$n is using:", FALSE, target, 0, viewer, TO_VICT);
+  for (j = 0; j < NUM_WEARS; j++) {
+    struct obj_data *obj = GET_EQ(target, j);
+    if (!obj || !CAN_SEE_OBJ(viewer, obj))
+      continue;
+
+    send_to_char(viewer, "%s", wear_where[j]);
+    if (GET_LEVEL(viewer) >= LVL_IMMORT)
+      send_to_char(viewer, "[%d] %s\r\n", GET_OBJ_VNUM(obj), obj->short_description);
+    else
+      send_to_char(viewer, "%s\r\n", obj->short_description);
   }
 }
 
@@ -3065,8 +3119,10 @@ ACMD(do_equipment)
 
     if (CAN_SEE_OBJ(ch, obj)) {
       char obj_tags[256];
-
-      build_obj_aura_tags(obj, ch, obj_tags, sizeof(obj_tags), FALSE);
+      if (!IS_NPC(ch) && GET_LEVEL(ch) < LVL_IMMORT)
+        build_player_kept_marker(obj, ch, obj_tags, sizeof(obj_tags));
+      else
+        build_obj_aura_tags(obj, ch, obj_tags, sizeof(obj_tags), FALSE);
       send_to_char(ch, "%s%s\r\n", obj_tags, obj->short_description);
     } else {
       send_to_char(ch, "Something.\r\n");

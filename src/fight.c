@@ -82,6 +82,7 @@ static int rare_kill_bonus_for_victim(struct char_data *victim, int base_xp);
 static struct char_data *resolve_reward_killer(struct char_data *killer);
 static void dam_message(int dam, struct char_data *ch, struct char_data *victim, int w_type);
 static void make_corpse(struct char_data *ch);
+static void apply_mob_loot_table(struct char_data *ch, struct obj_data *corpse);
 static void process_round_effects(void);
 static int find_affect_modifier_for_flag(struct char_data *ch, int aff_flag, int fallback);
 static int remove_affects_by_flag(struct char_data *ch, int aff_flag);
@@ -820,12 +821,40 @@ static void make_corpse(struct char_data *ch)
       money = create_money((int)dropped_gold, 0);
       obj_to_obj(money, corpse);
     }
+    apply_mob_loot_table(ch, corpse);
   }
 ch->carrying = NULL;
   IS_CARRYING_N(ch) = 0;
   IS_CARRYING_W(ch) = 0;
 
   obj_to_room(corpse, IN_ROOM(ch));
+}
+
+static void apply_mob_loot_table(struct char_data *ch, struct obj_data *corpse)
+{
+  int i;
+
+  if (!ch || !corpse || !IS_NPC(ch))
+    return;
+
+  for (i = 0; i < ch->mob_specials.loot_table_count; i++) {
+    int chance = MAX(0, MIN(100, ch->mob_specials.loot_table[i].chance));
+    obj_rnum ornum;
+    struct obj_data *obj;
+
+    if (chance <= 0 || rand_number(1, 100) > chance)
+      continue;
+
+    ornum = real_object(ch->mob_specials.loot_table[i].vnum);
+    if (ornum == NOTHING)
+      continue;
+
+    obj = read_object(ornum, REAL);
+    if (!obj)
+      continue;
+
+    obj_to_obj(obj, corpse);
+  }
 }
 
 /* When ch kills victim */

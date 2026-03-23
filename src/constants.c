@@ -492,9 +492,10 @@ const char *extra_bits[] = {
   "ANTI_WARRIOR",
   "NO_SELL",
   "QUEST_ITEM",
-    "TWO_HANDER",
+  "TWO_HANDER",
   "OFFHAND",
-"\n"
+  "KEPT",
+  "\n"
 };
 
 /** Describes the apply types.
