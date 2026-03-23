@@ -7,7 +7,7 @@ It looks unfinished.
 This adorable little field mouse scurries around the plains, just trying to survive day to day.
 ~
 200 0 0 0 2048 0 0 0 0 E
-10 15 0 2d1+1 2d1+5
+10 15 25 2d5+1 2d1+5
 0 5
 8 8 3
 BareHandAttack: 4
