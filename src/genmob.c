@@ -357,6 +357,8 @@ int write_mobile_espec(mob_vnum mvnum, struct char_data *mob, FILE *fd)
     fprintf(fd, "PetPrice: %d\n", GET_PET_PRICE(mob));
   if (GET_MOB_WIMP_LEV(mob) > 0)
     fprintf(fd, "Wimpy: %d\n", GET_MOB_WIMP_LEV(mob));
+  if (GET_EVASION(mob) != 0)
+    fprintf(fd, "Evasion: %d\n", GET_EVASION(mob));
   
   /* Persist gold min/max (used for corpse coin rolls). */
   if ((long long)mob->mob_specials.gold_min != 0 || (long long)mob->mob_specials.gold_max != 0) {
