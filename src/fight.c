@@ -1094,22 +1094,34 @@ void die(struct char_data * ch, struct char_data * killer)
 
 static void perform_group_gain(struct char_data *ch, struct char_data *victim, int base_override)
 {
-  int share, hap_share, rare_bonus;
+  int share, hap_share, rare_bonus, bonus_xp;
 
   share = (base_override >= 0) ? base_override : mob_kill_base_xp(ch, victim);
 
-  share = MIN(CONFIG_MAX_EXP_GAIN, MAX(1, share));
+  if (IS_NPC(victim)) {
+    /* Builder-controlled additive bonus XP from mob exp field. */
+    bonus_xp = GET_EXP(victim);
+    share = MAX(0, share + bonus_xp);
+    share = MIN(CONFIG_MAX_EXP_GAIN, share);
+  } else {
+    share = MIN(CONFIG_MAX_EXP_GAIN, MAX(1, share));
+  }
 
   if ((IS_HAPPYHOUR) && (IS_HAPPYEXP))
   {
     /* This only reports the correct amount - the calc is done in gain_exp */
     hap_share = share + (int)((float)share * ((float)HAPPY_EXP / (float)(100)));
-    share = MIN(CONFIG_MAX_EXP_GAIN, MAX(1, hap_share));
+    if (IS_NPC(victim))
+      share = MIN(CONFIG_MAX_EXP_GAIN, MAX(0, hap_share));
+    else
+      share = MIN(CONFIG_MAX_EXP_GAIN, MAX(1, hap_share));
   }
   if (share > 1)
     send_to_char(ch, "You receive your share of \tCexperience\tn -- \ty%d\tn points.\r\n", share);
-  else
+  else if (share == 1)
     send_to_char(ch, "You receive your share of experience -- one measly little point!\r\n");
+  else
+    send_to_char(ch, "You receive your share of experience, but gain no points.\r\n");
 
   rare_bonus = rare_kill_bonus_for_victim(victim, share);
   if (rare_bonus > 0) {
@@ -1149,11 +1161,14 @@ static void group_gain(struct char_data *ch, struct char_data *victim)
 
 static void solo_gain(struct char_data *ch, struct char_data *victim)
 {
-  int exp, happy_exp, rare_bonus;
+  int exp, happy_exp, rare_bonus, bonus_xp;
 
   if (IS_NPC(victim)) {
     exp = mob_kill_base_xp(ch, victim);
-    exp = MIN(CONFIG_MAX_EXP_GAIN, MAX(1, exp));
+    /* Builder-controlled additive bonus XP from mob exp field. */
+    bonus_xp = GET_EXP(victim);
+    exp = MAX(0, exp + bonus_xp);
+    exp = MIN(CONFIG_MAX_EXP_GAIN, exp);
   } else {
     exp = MIN(CONFIG_MAX_EXP_GAIN, GET_EXP(victim) / 3);
 
@@ -1167,13 +1182,18 @@ static void solo_gain(struct char_data *ch, struct char_data *victim)
 
   if (IS_HAPPYHOUR && IS_HAPPYEXP) {
     happy_exp = exp + (int)((float)exp * ((float)HAPPY_EXP / (float)(100)));
-    exp = MAX(happy_exp, 1);
+    if (IS_NPC(victim))
+      exp = MAX(happy_exp, 0);
+    else
+      exp = MAX(happy_exp, 1);
   }
 
   if (exp > 1)
     send_to_char(ch, "You receive \ty%d\tn \tCexperience\tn points.\r\n", exp);
-  else
+  else if (exp == 1)
     send_to_char(ch, "You receive one lousy experience point.\r\n");
+  else
+    send_to_char(ch, "You receive no experience points.\r\n");
 
   rare_bonus = rare_kill_bonus_for_victim(victim, exp);
   if (rare_bonus > 0) {
@@ -1207,12 +1227,17 @@ static int count_live_mobs_by_vnum(mob_vnum vnum)
 
 static int mob_kill_base_xp(struct char_data *ch, struct char_data *victim)
 {
-  int delta;
-
   if (!ch || !victim || !IS_NPC(victim))
     return 0;
 
-  delta = GET_LEVEL(victim) - GET_LEVEL(ch);
+  return mob_kill_base_xp_for_levels(GET_LEVEL(ch), GET_LEVEL(victim));
+}
+
+int mob_kill_base_xp_for_levels(int attacker_level, int victim_level)
+{
+  int delta;
+
+  delta = victim_level - attacker_level;
 
   if (delta <= -15) return 1;
   if (delta <= -10) return 3;

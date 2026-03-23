@@ -518,6 +518,7 @@ static void medit_disp_stats_menu(struct descriptor_data *d)
 {
   struct char_data *mob;
   char buf[MAX_STRING_LENGTH];
+  int base_xp_preview, bonus_xp_preview, total_xp_preview;
 
   mob = OLC_MOB(d);
   get_char_colors(d->character);
@@ -525,6 +526,9 @@ static void medit_disp_stats_menu(struct descriptor_data *d)
 
   /* Color codes have to be used here, for count_color_codes to work */
   sprintf(buf, "(range \ty%d\tn to \ty%d\tn)", GET_HIT(mob) + GET_MOVE(mob), (GET_HIT(mob) * GET_MANA(mob)) + GET_MOVE(mob));
+  base_xp_preview = mob_kill_base_xp_for_levels(GET_LEVEL(mob), GET_LEVEL(mob));
+  bonus_xp_preview = GET_EXP(mob);
+  total_xp_preview = MAX(0, base_xp_preview + bonus_xp_preview);
 
   /* Top section - standard stats */
   write_to_output(d,
@@ -538,9 +542,12 @@ static void medit_disp_stats_menu(struct descriptor_data *d)
   "%-*s(range %s%d%s to %s%d%s)\r\n\r\n"
 
   "(%sA%s) Armor: %s[%s%4d%s]%s        (%sD%s) Hitroll:   %s[%s%5d%s]%s\r\n"
-  "(%sB%s) Exp Points:  %s[%s%10d%s]%s  (%sE%s) Alignment: %s[%s%5d%s]%s\r\n"
+  "(%sB%s) Bonus XP:    %s[%s%10d%s]%s  (%sE%s) Alignment: %s[%s%5d%s]%s\r\n"
   "(%sC%s) Gold Min/Max: %s[%s%5lld%s/%s%5lld%s]%s\r\n"
-  "(%sR%s) Wimpy Threshold: %s[%s%5d%s]%s\r\n\r\n",
+  "(%sR%s) Wimpy Threshold: %s[%s%5d%s]%s\r\n"
+  "    Reward Rule: NPC kill XP uses the live formula; Bonus XP is added on top.\r\n"
+  "    Same-level XP preview (read-only): Base %s[%s%5d%s]%s + Bonus %s[%s%5d%s]%s = Total %s[%s%5d%s]%s\r\n"
+  "    Rare Kill bonus may add extra XP when few live copies of this mob exist.\r\n\r\n",
       cyn, yel, OLC_NUM(d), cyn, nrm,
       cyn, nrm, cyn, yel, GET_LEVEL(mob), cyn, nrm,
       cyn, nrm, cyn, nrm,
@@ -556,7 +563,10 @@ static void medit_disp_stats_menu(struct descriptor_data *d)
       cyn, nrm, cyn, yel, GET_EXP(mob), cyn, nrm,  cyn, nrm, cyn, yel, GET_ALIGNMENT(mob), cyn, nrm,
       cyn, nrm, cyn, yel, (long long)OLC_MOB(d)->mob_specials.gold_min, cyn,
       yel, (long long)OLC_MOB(d)->mob_specials.gold_max, cyn, nrm,
-      cyn, nrm, cyn, yel, GET_MOB_WIMP_LEV(mob), cyn, nrm);
+      cyn, nrm, cyn, yel, GET_MOB_WIMP_LEV(mob), cyn, nrm,
+      cyn, yel, base_xp_preview, cyn, nrm,
+      cyn, yel, bonus_xp_preview, cyn, nrm,
+      cyn, yel, total_xp_preview, cyn, nrm);
 
   if (CONFIG_MEDIT_ADVANCED) {
     /* Bottom section - non-standard stats, togglable in cedit */
@@ -1246,8 +1256,10 @@ void medit_autoroll_stats(struct descriptor_data *d)
   GET_DAMROLL(OLC_MOB(d)) = mob_lev/6;           /* damroll (dam bonus) 0-5 */
 
   GET_HITROLL(OLC_MOB(d)) = mob_lev/3;           /* hitroll 0-10            */
-  GET_EXP(OLC_MOB(d))     = (mob_lev*mob_lev*100);
-  SET_GOLD(OLC_MOB(d), (mob_lev*10));GET_AC(OLC_MOB(d))      = (mob_lev * 6);        /* Armor 6 to 180          */
+  GET_EXP(OLC_MOB(d))     = 0;                   /* additive bonus XP defaults to none */
+  OLC_MOB(d)->mob_specials.gold_min = MAX(0, mob_lev * 3);
+  OLC_MOB(d)->mob_specials.gold_max = MAX(OLC_MOB(d)->mob_specials.gold_min, mob_lev * 6);
+  GET_AC(OLC_MOB(d))      = (mob_lev * 6);       /* Armor 6 to 180          */
 
   /* 'Advanced' stats are only rolled if advanced options are enabled */
   if (CONFIG_MEDIT_ADVANCED) {
