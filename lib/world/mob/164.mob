@@ -3,16 +3,22 @@ field mouse~
 a field mouse.~
 An adorable little field mouse is here.
 ~
-It looks unfinished.
 This adorable little field mouse scurries around the plains, just trying to survive day to day.
 ~
 200 0 0 0 2048 0 0 0 0 E
-10 15 25 2d5+1 2d1+5
-0 5
+10 17 3 2d3+80 1d2+2
+0 7
 8 8 3
 BareHandAttack: 4
+StrAdd: 2
+SavingPara: 2
+SavingRod: 2
+SavingPetri: 2
+SavingBreath: 2
+SavingSpell: 2
 Wimpy: 10
-GoldMin: 1
-GoldMax: 5
+Evasion: 2
+GoldMin: 30
+GoldMax: 60
 E
 $
