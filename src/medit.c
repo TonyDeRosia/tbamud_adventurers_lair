@@ -74,6 +74,9 @@ static int  medit_get_mob_flag_by_number(int num);
 static void medit_disp_mob_flags(struct descriptor_data *d);
 static void medit_disp_aff_flags(struct descriptor_data *d);
 static void medit_disp_menu(struct descriptor_data *d);
+static void medit_disp_loadout_menu(struct descriptor_data *d);
+static int medit_slot_required_wear_flag(int wear_pos);
+static int medit_object_can_equip_slot(struct obj_data *obj, int wear_pos);
 
 /*  utility functions */
 ACMD(do_oasis_medit)
@@ -456,6 +459,118 @@ static void medit_disp_aff_flags(struct descriptor_data *d)
                           cyn, flags, nrm);
 }
 
+static int medit_slot_required_wear_flag(int wear_pos)
+{
+  switch (wear_pos) {
+    case WEAR_LIGHT:    return ITEM_WEAR_TAKE;
+    case WEAR_FINGER_R:
+    case WEAR_FINGER_L: return ITEM_WEAR_FINGER;
+    case WEAR_NECK_1:   return ITEM_WEAR_NECK;
+    case WEAR_BODY:     return ITEM_WEAR_BODY;
+    case WEAR_HEAD:     return ITEM_WEAR_HEAD;
+    case WEAR_LEGS:     return ITEM_WEAR_LEGS;
+    case WEAR_FEET:     return ITEM_WEAR_FEET;
+    case WEAR_HANDS:    return ITEM_WEAR_HANDS;
+    case WEAR_ARMS:     return ITEM_WEAR_ARMS;
+    case WEAR_SHIELD:   return ITEM_WEAR_SHIELD;
+    case WEAR_ABOUT:    return ITEM_WEAR_ABOUT;
+    case WEAR_WAIST:    return ITEM_WEAR_WAIST;
+    case WEAR_WRIST_R:
+    case WEAR_WRIST_L:  return ITEM_WEAR_WRIST;
+    case WEAR_WIELD:    return ITEM_WEAR_WIELD;
+    case WEAR_HOLD:     return ITEM_WEAR_TAKE;
+    default:            return ITEM_WEAR_TAKE;
+  }
+}
+
+static int medit_object_can_equip_slot(struct obj_data *obj, int wear_pos)
+{
+  if (!obj || wear_pos < 0 || wear_pos >= NUM_WEARS)
+    return FALSE;
+
+  if (wear_pos == WEAR_HOLD && GET_OBJ_TYPE(obj) == ITEM_WEAPON && OBJ_FLAGGED(obj, ITEM_OFFHAND))
+    return TRUE;
+
+  return CAN_WEAR(obj, medit_slot_required_wear_flag(wear_pos));
+}
+
+static void medit_disp_loadout_menu(struct descriptor_data *d)
+{
+  static const int eq_order[] = {
+    WEAR_HEAD, WEAR_NECK_1, WEAR_ABOUT, WEAR_BODY, WEAR_ARMS, WEAR_WRIST_R,
+    WEAR_WRIST_L, WEAR_HANDS, WEAR_FINGER_R, WEAR_FINGER_L, WEAR_WAIST,
+    WEAR_LEGS, WEAR_FEET, WEAR_WIELD, WEAR_HOLD, WEAR_SHIELD, WEAR_LIGHT
+  };
+  static const char *eq_labels[] = {
+    "Head", "Neck", "Back", "Body", "Arms", "Wrist Right", "Wrist Left",
+    "Hands", "Finger Right", "Finger Left", "Waist", "Legs", "Feet",
+    "Wield", "Hold", "Shield", "Light"
+  };
+  struct char_data *mob = OLC_MOB(d);
+  int i, j;
+
+  get_char_colors(d->character);
+  clear_screen(d);
+  write_to_output(d, "-- LOADOUT / LOOT: [%d] %s\r\n\r\n", OLC_NUM(d), GET_SDESC(mob));
+
+  write_to_output(d, "EQUIPPED ITEMS\r\n%s is using:\r\n", GET_SDESC(mob));
+  for (i = 0; i < (int)(sizeof(eq_order) / sizeof(eq_order[0])); i++) {
+    int slot = eq_order[i];
+    int found_idx = -1;
+    for (j = 0; j < mob->mob_specials.equip_loadout_count; j++) {
+      if (mob->mob_specials.equip_loadout[j].wear_pos == slot) {
+        found_idx = j;
+        break;
+      }
+    }
+
+    if (found_idx < 0) {
+      write_to_output(d, "%-14s [NOTHING]\r\n", eq_labels[i]);
+    } else {
+      obj_rnum ornum = real_object(mob->mob_specials.equip_loadout[found_idx].vnum);
+      const char *sdesc = (ornum != NOTHING) ? obj_proto[ornum].short_description : "<missing object>";
+      write_to_output(d, "%-14s [%d] %s\r\n",
+        eq_labels[i], mob->mob_specials.equip_loadout[found_idx].vnum, sdesc);
+    }
+  }
+
+  write_to_output(d, "\r\nINVENTORY ITEMS\r\n");
+  if (mob->mob_specials.inventory_loadout_count <= 0)
+    write_to_output(d, "  [NONE]\r\n");
+  for (i = 0; i < mob->mob_specials.inventory_loadout_count; i++) {
+    obj_rnum ornum = real_object(mob->mob_specials.inventory_loadout[i].vnum);
+    const char *sdesc = (ornum != NOTHING) ? obj_proto[ornum].short_description : "<missing object>";
+    int count = MAX(1, mob->mob_specials.inventory_loadout[i].count);
+    if (count > 1)
+      write_to_output(d, "  %2d) [%d] %s x%d\r\n", i + 1,
+        mob->mob_specials.inventory_loadout[i].vnum, sdesc, count);
+    else
+      write_to_output(d, "  %2d) [%d] %s\r\n", i + 1,
+        mob->mob_specials.inventory_loadout[i].vnum, sdesc);
+  }
+
+  write_to_output(d, "\r\nLOOT TABLE\r\n");
+  if (mob->mob_specials.loot_table_count <= 0)
+    write_to_output(d, "  [NONE]\r\n");
+  for (i = 0; i < mob->mob_specials.loot_table_count; i++) {
+    obj_rnum ornum = real_object(mob->mob_specials.loot_table[i].vnum);
+    const char *sdesc = (ornum != NOTHING) ? obj_proto[ornum].short_description : "<missing object>";
+    write_to_output(d, "  %2d) [%d] %-30s %3d%%\r\n", i + 1,
+      mob->mob_specials.loot_table[i].vnum, sdesc, mob->mob_specials.loot_table[i].chance);
+  }
+
+  write_to_output(d,
+    "\r\nA) Equip object\r\n"
+    "B) Add inventory item\r\n"
+    "C) Add loot item\r\n"
+    "D) Remove equipped item\r\n"
+    "E) Remove inventory item\r\n"
+    "F) Remove loot item\r\n"
+    "Q) Quit\r\n"
+    "Enter choice : ");
+  OLC_MODE(d) = MEDIT_LOADOUT_MENU;
+}
+
 /* Display main menu. */
 static void medit_disp_menu(struct descriptor_data *d)
 {
@@ -497,6 +612,7 @@ static void medit_disp_menu(struct descriptor_data *d)
           "%sA%s) NPC Flags : %s%s\r\n"
           "%sB%s) AFF Flags : %s%s\r\n"
           "%sP%s) Pet Price : %s%s\r\n"
+          "%sR%s) Loadout / Loot\r\n"
           "%sS%s) Script    : %s%s\r\n"
           "%sW%s) Copy mob\r\n"
           "%sX%s) Delete mob\r\n"
@@ -510,6 +626,7 @@ static void medit_disp_menu(struct descriptor_data *d)
           grn, nrm, cyn, flags,
           grn, nrm, cyn, flag2,
           grn, nrm, yel, price_buf,
+          grn, nrm,
           grn, nrm, cyn, OLC_SCRIPT(d) ?"Set.":"Not Set.",
           grn, nrm,
           grn, nrm,
@@ -639,7 +756,9 @@ void medit_parse(struct descriptor_data *d, char *arg)
       OLC_MODE(d) == MEDIT_DELETE) {
     if (!genolc_checkstring(d, arg))
       return;
-  } else if (OLC_MODE(d) > MEDIT_NUMERICAL_RESPONSE) {
+  } else if (OLC_MODE(d) > MEDIT_NUMERICAL_RESPONSE &&
+             OLC_MODE(d) != MEDIT_LOADOUT_MENU &&
+             OLC_MODE(d) != MEDIT_LOADOUT_EQUIP_REPLACE) {
     char *endptr = NULL;
     long parsed;
 
@@ -755,6 +874,10 @@ void medit_parse(struct descriptor_data *d, char *arg)
     case 'P':
       OLC_MODE(d) = MEDIT_PET_PRICE;
       write_to_output(d, "Enter pet price in gold (0 = automatic): ");
+      return;
+    case 'r':
+    case 'R':
+      medit_disp_loadout_menu(d);
       return;
     case 'w':
     case 'W':
@@ -994,6 +1117,290 @@ void medit_parse(struct descriptor_data *d, char *arg)
     REMOVE_BIT_AR(AFF_FLAGS(OLC_MOB(d)), AFF_SLEEP);
     medit_disp_aff_flags(d);
     return;
+
+  case MEDIT_LOADOUT_MENU:
+    switch (*arg) {
+      case 'q':
+      case 'Q':
+        if (OLC_STORAGE(d)) {
+          free(OLC_STORAGE(d));
+          OLC_STORAGE(d) = NULL;
+        }
+        medit_disp_menu(d);
+        return;
+      case 'a':
+      case 'A':
+        OLC_MODE(d) = MEDIT_LOADOUT_EQUIP_VNUM;
+        write_to_output(d, "Enter object vnum to equip: ");
+        return;
+      case 'b':
+      case 'B':
+        OLC_MODE(d) = MEDIT_LOADOUT_INV_VNUM;
+        write_to_output(d, "Enter object vnum to add to inventory: ");
+        return;
+      case 'c':
+      case 'C':
+        OLC_MODE(d) = MEDIT_LOADOUT_LOOT_VNUM;
+        write_to_output(d, "Enter object vnum to add to loot table: ");
+        return;
+      case 'd':
+      case 'D':
+        OLC_MODE(d) = MEDIT_LOADOUT_REMOVE_EQUIP;
+        write_to_output(d, "Enter equipment slot (0-%d): ", NUM_WEARS - 1);
+        return;
+      case 'e':
+      case 'E':
+        OLC_MODE(d) = MEDIT_LOADOUT_REMOVE_INV;
+        write_to_output(d, "Enter inventory list index to remove: ");
+        return;
+      case 'f':
+      case 'F':
+        OLC_MODE(d) = MEDIT_LOADOUT_REMOVE_LOOT;
+        write_to_output(d, "Enter loot list index to remove: ");
+        return;
+      default:
+        medit_disp_loadout_menu(d);
+        return;
+    }
+
+  case MEDIT_LOADOUT_EQUIP_VNUM:
+    if (real_object(i) == NOTHING) {
+      write_to_output(d, "No object exists with vnum %d. Enter object vnum: ", i);
+      return;
+    }
+    if (OLC_STORAGE(d))
+      free(OLC_STORAGE(d));
+    CREATE(OLC_STORAGE(d), char, 32);
+    if (OLC_STORAGE(d))
+      snprintf(OLC_STORAGE(d), 32, "%d", i);
+    OLC_MODE(d) = MEDIT_LOADOUT_EQUIP_SLOT;
+    write_to_output(d, "Enter equip slot (0-%d): ", NUM_WEARS - 1);
+    return;
+
+  case MEDIT_LOADOUT_EQUIP_SLOT:
+  {
+    int slot = i, idx;
+    obj_rnum ornum;
+    struct obj_data *obj;
+    struct char_data *mob = OLC_MOB(d);
+
+    if (slot < 0 || slot >= NUM_WEARS) {
+      write_to_output(d, "Invalid slot. Enter equip slot (0-%d): ", NUM_WEARS - 1);
+      return;
+    }
+
+    ornum = real_object(OLC_STORAGE(d) ? atoi(OLC_STORAGE(d)) : NOTHING);
+    if (ornum == NOTHING) {
+      write_to_output(d, "Selected object no longer exists.\r\n");
+      medit_disp_loadout_menu(d);
+      return;
+    }
+    obj = &obj_proto[ornum];
+    if (!medit_object_can_equip_slot(obj, slot)) {
+      write_to_output(d, "That object cannot be equipped in slot %d.\r\n", slot);
+      medit_disp_loadout_menu(d);
+      return;
+    }
+
+    for (idx = 0; idx < mob->mob_specials.equip_loadout_count; idx++) {
+      if (mob->mob_specials.equip_loadout[idx].wear_pos == slot) {
+        OLC_MODE(d) = MEDIT_LOADOUT_EQUIP_REPLACE;
+        if (OLC_STORAGE(d))
+          free(OLC_STORAGE(d));
+        CREATE(OLC_STORAGE(d), char, 48);
+        if (OLC_STORAGE(d))
+          snprintf(OLC_STORAGE(d), 48, "%d %d", obj_index[ornum].vnum, slot);
+        write_to_output(d, "Slot already contains [%d] %s. Replace it? (Y/N): ",
+          mob->mob_specials.equip_loadout[idx].vnum,
+          real_object(mob->mob_specials.equip_loadout[idx].vnum) != NOTHING ?
+            obj_proto[real_object(mob->mob_specials.equip_loadout[idx].vnum)].short_description :
+            "<missing object>");
+        return;
+      }
+    }
+
+    if (mob->mob_specials.equip_loadout_count >= MAX_MOB_LOADOUT_ITEMS) {
+      write_to_output(d, "Equip loadout is full (max %d entries).\r\n", MAX_MOB_LOADOUT_ITEMS);
+      medit_disp_loadout_menu(d);
+      return;
+    }
+
+    idx = mob->mob_specials.equip_loadout_count++;
+    mob->mob_specials.equip_loadout[idx].vnum = obj_index[ornum].vnum;
+    mob->mob_specials.equip_loadout[idx].wear_pos = slot;
+    OLC_VAL(d) = TRUE;
+    if (OLC_STORAGE(d)) {
+      free(OLC_STORAGE(d));
+      OLC_STORAGE(d) = NULL;
+    }
+    medit_disp_loadout_menu(d);
+    return;
+  }
+
+  case MEDIT_LOADOUT_EQUIP_REPLACE:
+  {
+    int new_vnum = NOTHING, slot = -1;
+    int idx = -1;
+    struct char_data *mob = OLC_MOB(d);
+    if (OLC_STORAGE(d))
+      sscanf(OLC_STORAGE(d), "%d %d", &new_vnum, &slot);
+    for (j = 0; j < mob->mob_specials.equip_loadout_count; j++) {
+      if (mob->mob_specials.equip_loadout[j].wear_pos == slot) {
+        idx = j;
+        break;
+      }
+    }
+
+    if ((*arg == 'y' || *arg == 'Y') &&
+        idx >= 0 && idx < mob->mob_specials.equip_loadout_count) {
+      mob->mob_specials.equip_loadout[idx].vnum = new_vnum;
+      OLC_VAL(d) = TRUE;
+    } else if (!(*arg == 'n' || *arg == 'N')) {
+      write_to_output(d, "Please answer Y or N: ");
+      return;
+    }
+    if (OLC_STORAGE(d)) {
+      free(OLC_STORAGE(d));
+      OLC_STORAGE(d) = NULL;
+    }
+    medit_disp_loadout_menu(d);
+    return;
+  }
+
+  case MEDIT_LOADOUT_INV_VNUM:
+    if (real_object(i) == NOTHING) {
+      write_to_output(d, "No object exists with vnum %d. Enter object vnum: ", i);
+      return;
+    }
+    if (OLC_STORAGE(d))
+      free(OLC_STORAGE(d));
+    CREATE(OLC_STORAGE(d), char, 32);
+    if (OLC_STORAGE(d))
+      snprintf(OLC_STORAGE(d), 32, "%d", i);
+    OLC_MODE(d) = MEDIT_LOADOUT_INV_COUNT;
+    write_to_output(d, "Enter count (1+): ");
+    return;
+
+  case MEDIT_LOADOUT_INV_COUNT:
+  {
+    struct char_data *mob = OLC_MOB(d);
+    int idx;
+    if (i <= 0) {
+      write_to_output(d, "Count must be a positive integer. Enter count: ");
+      return;
+    }
+    if (mob->mob_specials.inventory_loadout_count >= MAX_MOB_LOADOUT_ITEMS) {
+      write_to_output(d, "Inventory loadout is full (max %d entries).\r\n", MAX_MOB_LOADOUT_ITEMS);
+      medit_disp_loadout_menu(d);
+      return;
+    }
+    idx = mob->mob_specials.inventory_loadout_count++;
+    mob->mob_specials.inventory_loadout[idx].vnum = OLC_STORAGE(d) ? atoi(OLC_STORAGE(d)) : NOTHING;
+    mob->mob_specials.inventory_loadout[idx].count = i;
+    OLC_VAL(d) = TRUE;
+    if (OLC_STORAGE(d)) {
+      free(OLC_STORAGE(d));
+      OLC_STORAGE(d) = NULL;
+    }
+    medit_disp_loadout_menu(d);
+    return;
+  }
+
+  case MEDIT_LOADOUT_LOOT_VNUM:
+    if (real_object(i) == NOTHING) {
+      write_to_output(d, "No object exists with vnum %d. Enter object vnum: ", i);
+      return;
+    }
+    if (OLC_STORAGE(d))
+      free(OLC_STORAGE(d));
+    CREATE(OLC_STORAGE(d), char, 32);
+    if (OLC_STORAGE(d))
+      snprintf(OLC_STORAGE(d), 32, "%d", i);
+    OLC_MODE(d) = MEDIT_LOADOUT_LOOT_CHANCE;
+    write_to_output(d, "Enter drop chance percent (1-100): ");
+    return;
+
+  case MEDIT_LOADOUT_LOOT_CHANCE:
+  {
+    struct char_data *mob = OLC_MOB(d);
+    int idx;
+    if (i < 1 || i > 100) {
+      write_to_output(d, "Chance must be 1-100. Enter drop chance: ");
+      return;
+    }
+    if (mob->mob_specials.loot_table_count >= MAX_MOB_LOOT_ITEMS) {
+      write_to_output(d, "Loot table is full (max %d entries).\r\n", MAX_MOB_LOOT_ITEMS);
+      medit_disp_loadout_menu(d);
+      return;
+    }
+    idx = mob->mob_specials.loot_table_count++;
+    mob->mob_specials.loot_table[idx].vnum = OLC_STORAGE(d) ? atoi(OLC_STORAGE(d)) : NOTHING;
+    mob->mob_specials.loot_table[idx].chance = i;
+    OLC_VAL(d) = TRUE;
+    if (OLC_STORAGE(d)) {
+      free(OLC_STORAGE(d));
+      OLC_STORAGE(d) = NULL;
+    }
+    medit_disp_loadout_menu(d);
+    return;
+  }
+
+  case MEDIT_LOADOUT_REMOVE_EQUIP:
+  {
+    struct char_data *mob = OLC_MOB(d);
+    int slot = i, idx;
+    if (slot < 0 || slot >= NUM_WEARS) {
+      write_to_output(d, "Invalid slot. Enter equipment slot (0-%d): ", NUM_WEARS - 1);
+      return;
+    }
+    for (idx = 0; idx < mob->mob_specials.equip_loadout_count; idx++) {
+      if (mob->mob_specials.equip_loadout[idx].wear_pos == slot) {
+        for (; idx + 1 < mob->mob_specials.equip_loadout_count; idx++)
+          mob->mob_specials.equip_loadout[idx] = mob->mob_specials.equip_loadout[idx + 1];
+        mob->mob_specials.equip_loadout_count--;
+        OLC_VAL(d) = TRUE;
+        medit_disp_loadout_menu(d);
+        return;
+      }
+    }
+    write_to_output(d, "That slot has no configured object.\r\n");
+    medit_disp_loadout_menu(d);
+    return;
+  }
+
+  case MEDIT_LOADOUT_REMOVE_INV:
+  {
+    struct char_data *mob = OLC_MOB(d);
+    int idx = i - 1;
+    if (idx < 0 || idx >= mob->mob_specials.inventory_loadout_count) {
+      write_to_output(d, "Invalid list index.\r\n");
+      medit_disp_loadout_menu(d);
+      return;
+    }
+    for (; idx + 1 < mob->mob_specials.inventory_loadout_count; idx++)
+      mob->mob_specials.inventory_loadout[idx] = mob->mob_specials.inventory_loadout[idx + 1];
+    mob->mob_specials.inventory_loadout_count--;
+    OLC_VAL(d) = TRUE;
+    medit_disp_loadout_menu(d);
+    return;
+  }
+
+  case MEDIT_LOADOUT_REMOVE_LOOT:
+  {
+    struct char_data *mob = OLC_MOB(d);
+    int idx = i - 1;
+    if (idx < 0 || idx >= mob->mob_specials.loot_table_count) {
+      write_to_output(d, "Invalid list index.\r\n");
+      medit_disp_loadout_menu(d);
+      return;
+    }
+    for (; idx + 1 < mob->mob_specials.loot_table_count; idx++)
+      mob->mob_specials.loot_table[idx] = mob->mob_specials.loot_table[idx + 1];
+    mob->mob_specials.loot_table_count--;
+    OLC_VAL(d) = TRUE;
+    medit_disp_loadout_menu(d);
+    return;
+  }
 
 /* Numerical responses. */
 
