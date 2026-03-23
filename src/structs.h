@@ -505,7 +505,8 @@ void clanedit_parse(struct descriptor_data *d, char *arg);
 /** Total number of item flags */
 #define ITEM_TWO_HANDER 18  /**< Weapon requires two hands */
 #define ITEM_OFFHAND   19  /**< Weapon allowed in offhand */
-#define NUM_ITEM_FLAGS 20
+#define ITEM_KEPT      20  /**< Player-marked keep protection */
+#define NUM_ITEM_FLAGS 21
 
 /* Modifier constants used with obj affects ('A' fields) */
 #define APPLY_NONE              0	/**< No effect			*/
