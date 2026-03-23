@@ -120,8 +120,13 @@ static bool objtemplate_builder_can_edit_range(struct char_data *ch, obj_vnum st
 static int room_reset_cmd_room(const struct reset_com *cmd);
 static int room_reset_chain_end(struct reset_com *cmd, int root_index);
 static int find_room_reset_insert_pos(zone_rnum zone_num, room_rnum room_num);
+static room_rnum resolve_room_reset_room(struct char_data *ch, const char *room_arg);
+static int collect_matching_room_reset_roots(zone_rnum zone_num, char reset_type, int thing_rnum,
+                                             room_rnum room_num, int **roots, int **chain_ends);
+static void delete_room_reset_chain(struct zone_data *zone, int root_index, int chain_end);
 static bool parse_room_reset_count(const char *count_arg, int *count_out);
 static void perform_room_reset(struct char_data *ch, char reset_type, int thing_vnum, const char *room_arg, const char *count_arg);
+static void perform_room_reset_delete(struct char_data *ch, char reset_type, int thing_vnum, const char *room_arg);
 static void show_room_resets(struct char_data *ch, room_rnum room_num);
 static bool objtemplate_build_strings(const char *base_name, int number,
                                       char **keywords, char **shortd,
@@ -1641,6 +1646,61 @@ static int find_room_reset_insert_pos(zone_rnum zone_num, room_rnum room_num)
   return total;
 }
 
+static room_rnum resolve_room_reset_room(struct char_data *ch, const char *room_arg)
+{
+  if (room_arg == NULL || *room_arg == '\0' || !strcasecmp(room_arg, "here"))
+    return IN_ROOM(ch);
+
+  if (is_number(room_arg))
+    return real_room(atoi(room_arg));
+
+  return NOWHERE;
+}
+
+static int collect_matching_room_reset_roots(zone_rnum zone_num, char reset_type, int thing_rnum,
+                                             room_rnum room_num, int **roots, int **chain_ends)
+{
+  int i, total, matches = 0;
+  struct reset_com *cmd = zone_table[zone_num].cmd;
+
+  *roots = NULL;
+  *chain_ends = NULL;
+  total = count_commands(cmd);
+
+  if (total <= 0)
+    return 0;
+
+  CREATE(*roots, int, total);
+  CREATE(*chain_ends, int, total);
+
+  for (i = 0; i < total; i++) {
+    if (cmd[i].command == reset_type &&
+        cmd[i].arg1 == thing_rnum &&
+        cmd[i].arg3 == room_num) {
+      (*roots)[matches] = i;
+      (*chain_ends)[matches] = room_reset_chain_end(cmd, i);
+      matches++;
+    }
+  }
+
+  if (matches == 0) {
+    free(*roots);
+    free(*chain_ends);
+    *roots = NULL;
+    *chain_ends = NULL;
+  }
+
+  return matches;
+}
+
+static void delete_room_reset_chain(struct zone_data *zone, int root_index, int chain_end)
+{
+  int i;
+
+  for (i = root_index; i <= chain_end; i++)
+    delete_zone_command(zone, root_index);
+}
+
 static bool parse_room_reset_count(const char *count_arg, int *count_out)
 {
   if (!count_arg || !*count_arg || !is_number(count_arg))
@@ -1654,13 +1714,12 @@ static void perform_room_reset(struct char_data *ch, char reset_type, int thing_
 {
   room_rnum room_rnum_value = NOWHERE;
   zone_rnum zone_rnum_value;
-  int count, insert_pos;
+  int count, insert_pos, match_count, i;
+  int *match_roots = NULL, *match_chain_ends = NULL;
+  int keep_root = NOWHERE;
   struct reset_com new_reset;
 
-  if (!strcasecmp(room_arg, "here"))
-    room_rnum_value = IN_ROOM(ch);
-  else if (is_number(room_arg))
-    room_rnum_value = real_room(atoi(room_arg));
+  room_rnum_value = resolve_room_reset_room(ch, room_arg);
 
   if (room_rnum_value == NOWHERE) {
     send_to_char(ch, "Invalid room vnum.\r\n");
@@ -1709,8 +1768,30 @@ static void perform_room_reset(struct char_data *ch, char reset_type, int thing_
     return;
   }
 
-  insert_pos = find_room_reset_insert_pos(zone_rnum_value, room_rnum_value);
-  add_cmd_to_list(&zone_table[zone_rnum_value].cmd, &new_reset, insert_pos);
+  match_count = collect_matching_room_reset_roots(zone_rnum_value, new_reset.command,
+                                                  new_reset.arg1, room_rnum_value,
+                                                  &match_roots, &match_chain_ends);
+
+  if (match_count > 0) {
+    keep_root = match_roots[0];
+    zone_table[zone_rnum_value].cmd[keep_root].arg2 = count;
+
+    for (i = match_count - 1; i >= 1; i--) {
+      delete_room_reset_chain(&zone_table[zone_rnum_value], match_roots[i], match_chain_ends[i]);
+      if (match_roots[i] < keep_root)
+        keep_root -= (match_chain_ends[i] - match_roots[i] + 1);
+    }
+
+    zone_table[zone_rnum_value].cmd[keep_root].arg2 = count;
+  } else {
+    insert_pos = find_room_reset_insert_pos(zone_rnum_value, room_rnum_value);
+    add_cmd_to_list(&zone_table[zone_rnum_value].cmd, &new_reset, insert_pos);
+  }
+
+  if (match_roots)
+    free(match_roots);
+  if (match_chain_ends)
+    free(match_chain_ends);
 
   add_to_save_list(zone_table[zone_rnum_value].number, SL_ZON);
   if (!save_zone(zone_rnum_value)) {
@@ -1733,6 +1814,79 @@ static void perform_room_reset(struct char_data *ch, char reset_type, int thing_
       world[room_rnum_value].name,
       new_reset.arg2);
   }
+}
+
+static void perform_room_reset_delete(struct char_data *ch, char reset_type, int thing_vnum, const char *room_arg)
+{
+  room_rnum room_rnum_value;
+  zone_rnum zone_rnum_value;
+  int *match_roots = NULL, *match_chain_ends = NULL;
+  int match_count, i, removed = 0;
+  int thing_rnum = NOWHERE;
+  const char *thing_label;
+  int thing_real_vnum = NOWHERE;
+
+  room_rnum_value = resolve_room_reset_room(ch, room_arg);
+  if (room_rnum_value == NOWHERE) {
+    send_to_char(ch, "Invalid room vnum.\r\n");
+    return;
+  }
+
+  zone_rnum_value = world[room_rnum_value].zone;
+  if (zone_rnum_value == NOWHERE || zone_rnum_value > top_of_zone_table) {
+    send_to_char(ch, "That room is not attached to a valid zone.\r\n");
+    return;
+  }
+
+  if (!can_edit_zone(ch, zone_rnum_value)) {
+    send_to_char(ch, "You don't have permission to edit that zone.\r\n");
+    return;
+  }
+
+  if (reset_type == 'M') {
+    thing_rnum = real_mobile(thing_vnum);
+    thing_label = "mob";
+    if (thing_rnum == NOBODY) {
+      send_to_char(ch, "Invalid mob vnum.\r\n");
+      return;
+    }
+    thing_real_vnum = mob_index[thing_rnum].vnum;
+  } else if (reset_type == 'O') {
+    thing_rnum = real_object(thing_vnum);
+    thing_label = "obj";
+    if (thing_rnum == NOTHING) {
+      send_to_char(ch, "Invalid object vnum.\r\n");
+      return;
+    }
+    thing_real_vnum = obj_index[thing_rnum].vnum;
+  } else {
+    send_to_char(ch, "Internal error: invalid reset type.\r\n");
+    return;
+  }
+
+  match_count = collect_matching_room_reset_roots(zone_rnum_value, reset_type, thing_rnum,
+                                                  room_rnum_value, &match_roots, &match_chain_ends);
+  if (match_count <= 0) {
+    send_to_char(ch, "No matching reset found\r\n");
+    return;
+  }
+
+  for (i = match_count - 1; i >= 0; i--) {
+    removed++;
+    delete_room_reset_chain(&zone_table[zone_rnum_value], match_roots[i], match_chain_ends[i]);
+  }
+
+  free(match_roots);
+  free(match_chain_ends);
+
+  add_to_save_list(zone_table[zone_rnum_value].number, SL_ZON);
+  if (!save_zone(zone_rnum_value)) {
+    send_to_char(ch, "Unable to save zone data.\r\n");
+    return;
+  }
+
+  send_to_char(ch, "Removed %d reset(s): %s [%d] from room [%d]\r\n",
+               removed, thing_label, thing_real_vnum, world[room_rnum_value].number);
 }
 
 static void show_room_resets(struct char_data *ch, room_rnum room_num)
@@ -1936,17 +2090,39 @@ ACMD(do_mreset)
 
 ACMD(do_rreset)
 {
+  char subcmd_arg[MAX_INPUT_LENGTH];
   char type_arg[MAX_INPUT_LENGTH];
   char thing_arg[MAX_INPUT_LENGTH];
   char room_arg[MAX_INPUT_LENGTH];
   char count_arg[MAX_INPUT_LENGTH];
 
-  half_chop(argument, type_arg, argument);
+  half_chop(argument, subcmd_arg, argument);
+
+  if (is_abbrev(subcmd_arg, "del")) {
+    half_chop(argument, type_arg, argument);
+    half_chop(argument, thing_arg, room_arg);
+
+    if (!*type_arg || !*thing_arg || !is_number(thing_arg)) {
+      send_to_char(ch, "Usage: rreset del <mob|obj> <vnum> [room vnum|here]\r\n");
+      return;
+    }
+
+    if (is_abbrev(type_arg, "mob"))
+      perform_room_reset_delete(ch, 'M', atoi(thing_arg), room_arg);
+    else if (is_abbrev(type_arg, "obj"))
+      perform_room_reset_delete(ch, 'O', atoi(thing_arg), room_arg);
+    else
+      send_to_char(ch, "Usage: rreset del <mob|obj> <vnum> [room vnum|here]\r\n");
+    return;
+  }
+
+  strlcpy(type_arg, subcmd_arg, sizeof(type_arg));
   half_chop(argument, thing_arg, argument);
   half_chop(argument, room_arg, count_arg);
 
   if (!*type_arg || !*thing_arg || !*room_arg || !*count_arg || !is_number(thing_arg)) {
     send_to_char(ch, "Usage: rreset <mob|obj> <vnum> <room vnum|here> <count>\r\n");
+    send_to_char(ch, "       rreset del <mob|obj> <vnum> [room vnum|here]\r\n");
     return;
   }
 
@@ -1954,8 +2130,10 @@ ACMD(do_rreset)
     perform_room_reset(ch, 'M', atoi(thing_arg), room_arg, count_arg);
   else if (is_abbrev(type_arg, "obj"))
     perform_room_reset(ch, 'O', atoi(thing_arg), room_arg, count_arg);
-  else
+  else {
     send_to_char(ch, "Usage: rreset <mob|obj> <vnum> <room vnum|here> <count>\r\n");
+    send_to_char(ch, "       rreset del <mob|obj> <vnum> [room vnum|here]\r\n");
+  }
 }
 
 ACMD(do_reset)
