@@ -1656,7 +1656,7 @@ static void parse_simple_mob(FILE *mob_f, int i, int nr)
 
   GET_POS(mob_proto + i) = t[0];
   GET_DEFAULT_POS(mob_proto + i) = t[1];
-  GET_SEX(mob_proto + i) = t[2];
+  GET_SEX(mob_proto + i) = LIMIT(t[2], SEX_NEUTRAL, NUM_GENDERS - 1);
 
   GET_CLASS(mob_proto + i) = 0;
   GET_WEIGHT(mob_proto + i) = 200;
@@ -1739,6 +1739,10 @@ static void interpret_espec(const char *keyword, const char *value, int i, int n
 
   CASE("GoldMax") {
     mob_proto[i].mob_specials.gold_max = atoll(value);
+  }
+  CASE("Wimpy") {
+    RANGE(0, 30000);
+    mob_proto[i].mob_specials.wimpy_threshold = num_arg;
   }
   CASE("SavingPara") {
     RANGE(0, 100);
@@ -2549,6 +2553,8 @@ struct char_data *read_mobile(mob_vnum nr, int type) /* and mob_rnum */
   clear_char(mob);
  
   *mob = mob_proto[i];
+  if (GET_SEX(mob) == SEX_RANDOM)
+    GET_SEX(mob) = rand_number(SEX_MALE, SEX_FEMALE);
   mob->next = character_list;
   character_list = mob;
   

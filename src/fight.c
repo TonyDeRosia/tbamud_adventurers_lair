@@ -2020,8 +2020,18 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
     if (GET_HIT(victim) < (GET_MAX_HIT(victim) / 4)) {
       send_to_char(victim, "%sYou wish that your wounds would stop BLEEDING so much!%s\r\n",
 		CCRED(victim, C_SPR), CCNRM(victim, C_SPR));
-      if (ch != victim && MOB_FLAGGED(victim, MOB_WIMPY) && !MOB_FLAGGED(victim, MOB_HELPER))
-	do_flee(victim, NULL, 0, 0);
+    }
+    if (ch != victim && IS_NPC(victim) &&
+        MOB_FLAGGED(victim, MOB_WIMPY) && !MOB_FLAGGED(victim, MOB_HELPER) &&
+        GET_HIT(victim) > 0) {
+      int flee_threshold = GET_MOB_WIMP_LEV(victim);
+
+      /* Legacy fallback: old behavior when no mob-specific threshold is set. */
+      if (flee_threshold <= 0)
+        flee_threshold = GET_MAX_HIT(victim) / 4;
+
+      if (GET_HIT(victim) < flee_threshold)
+        do_flee(victim, NULL, 0, 0);
     }
     if (!IS_NPC(victim) && GET_WIMP_LEV(victim) && (victim != ch) &&
 	GET_HIT(victim) < GET_WIMP_LEV(victim) && GET_HIT(victim) > 0) {
