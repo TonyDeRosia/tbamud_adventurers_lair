@@ -4326,6 +4326,7 @@ ACMD(do_levels)
 ACMD(do_consider)
 {
   char buf[MAX_INPUT_LENGTH];
+  const char *vict_name;
   struct char_data *victim;
   int diff;
 
@@ -4343,30 +4344,27 @@ ACMD(do_consider)
     send_to_char(ch, "Would you like to borrow a cross and a shovel?\r\n");
     return;
   }
+  vict_name = PERS(victim, ch);
   diff = (GET_LEVEL(victim) - GET_LEVEL(ch));
 
   if (diff <= -10)
-    send_to_char(ch, "Now where did that chicken go?\r\n");
-  else if (diff <= -5)
-    send_to_char(ch, "You could do it with a needle!\r\n");
-  else if (diff <= -2)
-    send_to_char(ch, "Easy.\r\n");
-  else if (diff <= -1)
-    send_to_char(ch, "Fairly easy.\r\n");
-  else if (diff == 0)
-    send_to_char(ch, "The perfect match!\r\n");
-  else if (diff <= 1)
-    send_to_char(ch, "You would need some luck!\r\n");
+    send_to_char(ch, "You would absolutely destroy %s.\r\n", vict_name);
+  else if (diff <= -6)
+    send_to_char(ch, "%s would be no match for you.\r\n", vict_name);
+  else if (diff <= -3)
+    send_to_char(ch, "You should handle %s with little trouble.\r\n", vict_name);
   else if (diff <= 2)
-    send_to_char(ch, "You would need a lot of luck!\r\n");
-  else if (diff <= 3)
-    send_to_char(ch, "You would need a lot of luck and great equipment!\r\n");
+    send_to_char(ch, "%s might put up a decent fight.\r\n", vict_name);
   else if (diff <= 5)
-    send_to_char(ch, "Do you feel lucky, punk?\r\n");
-  else if (diff <= 10)
-    send_to_char(ch, "Are you mad!?\r\n");
-  else if (diff <= 100)
-    send_to_char(ch, "You ARE mad!\r\n");
+    send_to_char(ch, "%s would put up a good fight.\r\n", vict_name);
+  else if (diff <= 8)
+    send_to_char(ch, "%s looks dangerous.\r\n", vict_name);
+  else if (diff <= 11)
+    send_to_char(ch, "%s would be a serious threat.\r\n", vict_name);
+  else if (diff <= 15)
+    send_to_char(ch, "%s might overwhelm you.\r\n", vict_name);
+  else
+    send_to_char(ch, "%s would likely destroy you.\r\n", vict_name);
 
   if (AFF_FLAGGED(ch, AFF_DETECT_ALIGN)) {
     if (GET_ALIGNMENT(victim) >= 800)
