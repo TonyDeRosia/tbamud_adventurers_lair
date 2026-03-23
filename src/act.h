@@ -353,6 +353,8 @@ ACMD(do_load);
 ACMD(do_mload_admin);
 ACMD(do_mob);
 ACMD(do_mreset);
+ACMD(do_reset);
+ACMD(do_rreset);
 ACMD(do_acctlist);
 ACMD(do_acctshow);
 ACMD(do_acctforcepw);
