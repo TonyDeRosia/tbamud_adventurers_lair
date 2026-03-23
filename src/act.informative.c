@@ -179,7 +179,7 @@ static void list_char_to_char(struct char_data *list, struct char_data *ch);
 static void list_one_char(struct char_data *i, struct char_data *ch);
 static void look_at_char(struct char_data *i, struct char_data *ch);
 static int can_view_mob_inventory(struct char_data *viewer, struct char_data *target);
-static void show_mob_equipment_to_char(struct char_data *viewer, struct char_data *target, int show_empty);
+static void show_mob_equipment_to_char(struct char_data *viewer, struct char_data *target);
 static void look_at_target(struct char_data *ch, char *arg);
 static void look_in_direction(struct char_data *ch, int dir);
 static void look_in_obj(struct char_data *ch, char *arg);
@@ -419,11 +419,14 @@ static void look_at_char(struct char_data *i, struct char_data *ch)
 
   diag_char_to_char(i, ch);
   if (IS_NPC(i)) {
-    show_mob_equipment_to_char(ch, i, GET_LEVEL(ch) >= LVL_IMMORT);
+    show_mob_equipment_to_char(ch, i);
 
     if (ch != i && can_view_mob_inventory(ch, i)) {
       act("\r\nYou size up what $n is carrying:", FALSE, i, 0, ch, TO_VICT);
-      list_obj_to_char(i->carrying, ch, SHOW_OBJ_SHORT, TRUE);
+      if (i->carrying)
+        list_obj_to_char(i->carrying, ch, SHOW_OBJ_SHORT, TRUE);
+      else
+        send_to_char(ch, " Nothing.\r\n");
     }
   }
 }
@@ -445,7 +448,7 @@ static int can_view_mob_inventory(struct char_data *viewer, struct char_data *ta
   return FALSE;
 }
 
-static void show_mob_equipment_to_char(struct char_data *viewer, struct char_data *target, int show_empty)
+static void show_mob_equipment_to_char(struct char_data *viewer, struct char_data *target)
 {
   int j, found = FALSE;
 
@@ -456,29 +459,21 @@ static void show_mob_equipment_to_char(struct char_data *viewer, struct char_dat
     if (GET_EQ(target, j) && CAN_SEE_OBJ(viewer, GET_EQ(target, j)))
       found = TRUE;
 
-  if (!found && !show_empty)
+  if (!found)
     return;
 
   send_to_char(viewer, "\r\n");
   act("$n is using:", FALSE, target, 0, viewer, TO_VICT);
   for (j = 0; j < NUM_WEARS; j++) {
     struct obj_data *obj = GET_EQ(target, j);
-    if (!show_empty && (!obj || !CAN_SEE_OBJ(viewer, obj)))
+    if (!obj || !CAN_SEE_OBJ(viewer, obj))
       continue;
 
     send_to_char(viewer, "%s", wear_where[j]);
-    if (!obj) {
-      send_to_char(viewer, "[NOTHING]\r\n");
-      continue;
-    }
-
-    if (CAN_SEE_OBJ(viewer, obj)) {
-      if (GET_LEVEL(viewer) >= LVL_IMMORT)
-        send_to_char(viewer, "[%d] %s\r\n", GET_OBJ_VNUM(obj), obj->short_description);
-      else
-        send_to_char(viewer, "%s\r\n", obj->short_description);
-    } else
-      send_to_char(viewer, "Something.\r\n");
+    if (GET_LEVEL(viewer) >= LVL_IMMORT)
+      send_to_char(viewer, "[%d] %s\r\n", GET_OBJ_VNUM(obj), obj->short_description);
+    else
+      send_to_char(viewer, "%s\r\n", obj->short_description);
   }
 }
 
