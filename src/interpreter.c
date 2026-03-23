@@ -263,8 +263,11 @@ cpp_extern const struct command_info cmd_info[] = {
   { "mail"     , "mail"    , POS_STANDING, do_not_here , 1, 0 },
   { "map"      , "map"     , POS_STANDING, do_map      , 1, 0 },
   { "medit"    , "med"     , POS_DEAD    , do_oasis_medit, LVL_BUILDER, 0 },
+  { "mload"    , "mload"   , POS_DEAD    , do_mload_admin, LVL_BUILDER, 0 },
   { "mlist"    , "mlist"   , POS_DEAD    , do_oasis_list, LVL_BUILDER, SCMD_OASIS_MLIST },
+  { "mob"      , "mob"     , POS_DEAD    , do_mob      , LVL_BUILDER, 0 },
   { "mcopy"    , "mcopy"   , POS_DEAD    , do_oasis_copy, LVL_GOD, CON_MEDIT },
+  { "mreset"   , "mreset"  , POS_DEAD    , do_mreset   , LVL_BUILDER, 0 },
   { "msgedit"  , "msgedit" , POS_DEAD    , do_msgedit,   LVL_GOD, 0 },
   { "mute"     , "mute"    , POS_DEAD    , do_wizutil  , LVL_GOD, SCMD_MUTE },
 

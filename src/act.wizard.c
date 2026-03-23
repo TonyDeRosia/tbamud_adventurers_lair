@@ -1585,6 +1585,127 @@ ACMD(do_load)
     send_to_char(ch, "That'll have to be either 'obj' or 'mob'.\r\n");
 }
 
+static void perform_mob_reset(struct char_data *ch, mob_vnum mob_vnum_input, room_vnum room_vnum_input)
+{
+  mob_rnum mob_rnum_value;
+  room_rnum room_rnum_value;
+  zone_rnum zone_rnum_value;
+  struct reset_com new_reset;
+  int insert_pos;
+
+  mob_rnum_value = real_mobile(mob_vnum_input);
+  if (mob_rnum_value == NOBODY) {
+    send_to_char(ch, "Invalid mob vnum.\r\n");
+    return;
+  }
+
+  room_rnum_value = real_room(room_vnum_input);
+  if (room_rnum_value == NOWHERE) {
+    send_to_char(ch, "Invalid room vnum.\r\n");
+    return;
+  }
+
+  zone_rnum_value = world[room_rnum_value].zone;
+  if (!can_edit_zone(ch, zone_rnum_value)) {
+    send_to_char(ch, "You don't have permission to edit that zone.\r\n");
+    return;
+  }
+
+  memset(&new_reset, 0, sizeof(new_reset));
+  new_reset.command = 'M';
+  new_reset.if_flag = 0;
+  new_reset.arg1 = mob_rnum_value;
+  new_reset.arg2 = 1;
+  new_reset.arg3 = room_rnum_value;
+
+  insert_pos = count_commands(zone_table[zone_rnum_value].cmd);
+  add_cmd_to_list(&zone_table[zone_rnum_value].cmd, &new_reset, insert_pos);
+
+  add_to_save_list(zone_table[zone_rnum_value].number, SL_ZON);
+  if (!save_zone(zone_rnum_value)) {
+    send_to_char(ch, "Unable to save zone data.\r\n");
+    return;
+  }
+
+  send_to_char(ch, "Mob %d will now reset in room %d.\r\n", mob_vnum_input, room_vnum_input);
+}
+
+ACMD(do_mload_admin)
+{
+  char mob_arg[MAX_INPUT_LENGTH];
+  char room_arg[MAX_INPUT_LENGTH];
+  mob_vnum mob_vnum_input;
+  room_rnum target_room;
+  struct char_data *mob;
+
+  two_arguments(argument, mob_arg, room_arg);
+
+  if (!*mob_arg || !is_number(mob_arg)) {
+    send_to_char(ch, "Usage: mload <mob vnum> [room vnum]\r\n");
+    return;
+  }
+
+  mob_vnum_input = atoi(mob_arg);
+  target_room = IN_ROOM(ch);
+
+  if (*room_arg) {
+    if (!is_number(room_arg) || (target_room = real_room(atoi(room_arg))) == NOWHERE) {
+      send_to_char(ch, "Invalid room vnum.\r\n");
+      return;
+    }
+  }
+
+  if (GET_LEVEL(ch) < LVL_GRGOD && !can_edit_zone(ch, world[target_room].zone)) {
+    send_to_char(ch, "Sorry, you can't load mobs there.\r\n");
+    return;
+  }
+
+  if ((mob = read_mobile(mob_vnum_input, VIRTUAL)) == NULL) {
+    send_to_char(ch, "Invalid mob vnum.\r\n");
+    return;
+  }
+
+  char_to_room(mob, target_room);
+  load_mtrigger(mob);
+  send_to_char(ch, "Mob %d loaded.\r\n", mob_vnum_input);
+}
+
+ACMD(do_mob)
+{
+  char mob_subcmd[MAX_INPUT_LENGTH];
+  char mob_arg[MAX_INPUT_LENGTH];
+  char room_arg[MAX_INPUT_LENGTH];
+
+  argument = any_one_arg(argument, mob_subcmd);
+
+  if (!*mob_subcmd || !is_abbrev(mob_subcmd, "reset")) {
+    send_to_char(ch, "Usage: mob reset <mob vnum> <room vnum>\r\n");
+    return;
+  }
+
+  two_arguments(argument, mob_arg, room_arg);
+  if (!*mob_arg || !*room_arg || !is_number(mob_arg) || !is_number(room_arg)) {
+    send_to_char(ch, "Usage: mob reset <mob vnum> <room vnum>\r\n");
+    return;
+  }
+
+  perform_mob_reset(ch, atoi(mob_arg), atoi(room_arg));
+}
+
+ACMD(do_mreset)
+{
+  char mob_arg[MAX_INPUT_LENGTH];
+  char room_arg[MAX_INPUT_LENGTH];
+
+  two_arguments(argument, mob_arg, room_arg);
+  if (!*mob_arg || !*room_arg || !is_number(mob_arg) || !is_number(room_arg)) {
+    send_to_char(ch, "Usage: mreset <mob vnum> <room vnum>\r\n");
+    return;
+  }
+
+  perform_mob_reset(ch, atoi(mob_arg), atoi(room_arg));
+}
+
 ACMD(do_vstat)
 {
   char buf[MAX_INPUT_LENGTH], buf2[MAX_INPUT_LENGTH];

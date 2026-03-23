@@ -177,8 +177,9 @@ void clanedit_parse(struct descriptor_data *d, char *arg);
 #define SEX_NEUTRAL   0   /**< Neutral Sex (Hermaphrodite) */
 #define SEX_MALE      1   /**< Male Sex (XY Chromosome) */
 #define SEX_FEMALE    2   /**< Female Sex (XX Chromosome) */
+#define SEX_RANDOM    3   /**< Prototype-only: resolves to male/female on spawn */
 /** Total number of Genders */
-#define NUM_GENDERS   3
+#define NUM_GENDERS   4
 
 /* Positions */
 #define POS_DEAD       0	/**< Position = dead */
@@ -1159,7 +1160,9 @@ struct mob_special_data
   byte attack_type;   /**< The primary attack type (bite, sting, hit, etc.) */
   byte default_pos;   /**< Default position (standing, sleeping, etc.) */
   byte damnodice;     /**< The number of dice to roll for damage */
-  byte damsizedice;   /**< The size of each die rolled for damage. */  long long gold_min; /* min roll on death */
+  byte damsizedice;   /**< The size of each die rolled for damage. */
+  int wimpy_threshold; /**< NPC flee threshold HP (0 = legacy behavior). */
+  long long gold_min; /* min roll on death */
   long long gold_max; /* max roll on death */
   int summon_timer;   /**< Violence-pulse countdown for temporary summons (<=0 means permanent). */
 };
