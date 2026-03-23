@@ -1303,20 +1303,20 @@ void medit_autoroll_stats(struct descriptor_data *d)
   mob_lev = GET_LEVEL(OLC_MOB(d));
   mob_lev = GET_LEVEL(OLC_MOB(d)) = LIMIT(mob_lev, 1, LVL_IMPL);
 
-  GET_MOVE(OLC_MOB(d))    = mob_lev*10;          /* hit point bonus (mobs don't use movement points */
-  GET_HIT(OLC_MOB(d))     = mob_lev/5;           /* number of hitpoint dice */
-  GET_MANA(OLC_MOB(d))    = mob_lev/5;           /* size of hitpoint dice   */
+  GET_MOVE(OLC_MOB(d))    = mob_lev * 5;                 /* HP addition baseline */
+  GET_HIT(OLC_MOB(d))     = MAX(1, mob_lev / 6);         /* number of HP dice */
+  GET_MANA(OLC_MOB(d))    = MAX(4, (mob_lev / 6) + 2);   /* size of HP dice */
 
-  GET_NDD(OLC_MOB(d))     = MAX(1, mob_lev/6);   /* number damage dice 1-5  */
-  GET_SDD(OLC_MOB(d))     = MAX(2, mob_lev/6);   /* size of damage dice 2-5 */
-  GET_DAMROLL(OLC_MOB(d)) = mob_lev/6;           /* damroll (dam bonus) 0-5 */
+  GET_NDD(OLC_MOB(d))     = MAX(1, (mob_lev + 4) / 8);   /* number of damage dice */
+  GET_SDD(OLC_MOB(d))     = MAX(2, (mob_lev + 9) / 10);  /* size of damage dice */
+  GET_DAMROLL(OLC_MOB(d)) = mob_lev / 12;                /* damage bonus */
 
-  GET_HITROLL(OLC_MOB(d)) = mob_lev/3;           /* hitroll 0-10            */
-  OLC_MOB(d)->mob_specials.gold_min = MAX(0, mob_lev * 3);
-  OLC_MOB(d)->mob_specials.gold_max = MAX(OLC_MOB(d)->mob_specials.gold_min, mob_lev * 6);
-  GET_AC(OLC_MOB(d))      = (mob_lev * 6);       /* Armor 6 to 180          */
-  GET_EVASION(OLC_MOB(d)) = mob_lev;             /* Evasion baseline        */
-  GET_MOB_WIMP_LEV(OLC_MOB(d)) = mob_lev;        /* Wimpy threshold         */
+  GET_HITROLL(OLC_MOB(d)) = mob_lev / 8;                 /* conservative early hit chance */
+  OLC_MOB(d)->mob_specials.gold_min = MAX(0, mob_lev);
+  OLC_MOB(d)->mob_specials.gold_max = MAX(OLC_MOB(d)->mob_specials.gold_min, mob_lev * 2);
+  GET_AC(OLC_MOB(d))      = 20 + mob_lev;                /* gentler armor scaling */
+  GET_EVASION(OLC_MOB(d)) = mob_lev / 3;                 /* conservative evasion */
+  GET_MOB_WIMP_LEV(OLC_MOB(d)) = MAX(1, mob_lev / 2);    /* default flee threshold */
 
   /* 'Advanced' stats are only rolled if advanced options are enabled */
   if (CONFIG_MEDIT_ADVANCED) {
