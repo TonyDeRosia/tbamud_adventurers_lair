@@ -19,6 +19,7 @@
 #include "oasis.h"
 #include "improved-edit.h"
 #include "dg_olc.h"
+#include "dg_scripts.h"
 #include "constants.h"
 #include "modify.h"
 
@@ -30,6 +31,13 @@ static void redit_disp_exit_flag_menu(struct descriptor_data *d);
 static void redit_disp_flag_menu(struct descriptor_data *d);
 static void redit_disp_sector_menu(struct descriptor_data *d);
 static void redit_disp_menu(struct descriptor_data *d);
+static void redit_disp_resets_menu(struct descriptor_data *d);
+static void redit_setup_reset_editor(struct descriptor_data *d);
+static void redit_save_resets(struct descriptor_data *d);
+
+static int redit_cmd_room(const struct reset_com *cmd);
+static int redit_collect_room_resets(struct descriptor_data *d, int **entries, int **chain_ends, int **roots);
+static int redit_find_room_insert_pos(struct descriptor_data *d);
 
 /* Utils and exported functions. */
 ACMD(do_oasis_redit)
@@ -292,6 +300,19 @@ void redit_save_internally(struct descriptor_data *d)
   }
 }
 
+static void redit_save_resets(struct descriptor_data *d)
+{
+  if (!OLC_ZONE(d) || !OLC_ZONE(d)->age || !OLC_ZONE(d)->cmd)
+    return;
+
+  free(zone_table[OLC_ZNUM(d)].cmd);
+  zone_table[OLC_ZNUM(d)].cmd = OLC_ZONE(d)->cmd;
+  OLC_ZONE(d)->cmd = NULL;
+  OLC_ZONE(d)->age = 0;
+
+  add_to_save_list(zone_table[OLC_ZNUM(d)].number, SL_ZON);
+}
+
 void redit_save_to_disk(zone_vnum zone_num)
 {
   save_rooms(zone_num);		/* :) */
@@ -493,6 +514,7 @@ static void redit_disp_menu(struct descriptor_data *d)
       "%s9%s) Exit up     : %s%d\r\n"
       "%sA%s) Exit down   : %s%d\r\n"
       "%sF%s) Extra descriptions menu\r\n"
+      "%sR%s) Room Resets\r\n"
       "%sS%s) Script      : %s%s\r\n"
        "%sW%s) Copy Room\r\n"
       "%sX%s) Delete Room\r\n"
@@ -505,6 +527,7 @@ static void redit_disp_menu(struct descriptor_data *d)
       room->dir_option[DOWN] && room->dir_option[DOWN]->to_room != NOWHERE ?
       world[room->dir_option[DOWN]->to_room].number : -1,
       grn, nrm,
+      grn, nrm,
           grn, nrm, cyn, OLC_SCRIPT(d) ? "Set." : "Not Set.",
           grn, nrm,
       grn, nrm,
@@ -512,6 +535,229 @@ static void redit_disp_menu(struct descriptor_data *d)
       );
 
   OLC_MODE(d) = REDIT_MAIN_MENU;
+}
+
+static int redit_cmd_room(const struct reset_com *cmd)
+{
+  switch (cmd->command) {
+    case 'M':
+    case 'O':
+    case 'T':
+    case 'V':
+      return cmd->arg3;
+    case 'D':
+    case 'R':
+      return cmd->arg1;
+    default:
+      return NOWHERE;
+  }
+}
+
+static void redit_setup_reset_editor(struct descriptor_data *d)
+{
+  int count, i;
+  struct zone_data *zone;
+
+  if (OLC_ZONE(d))
+    return;
+
+  CREATE(zone, struct zone_data, 1);
+  count = count_commands(zone_table[OLC_ZNUM(d)].cmd);
+  CREATE(zone->cmd, struct reset_com, count + 1);
+  for (i = 0; i <= count; i++)
+    zone->cmd[i] = zone_table[OLC_ZNUM(d)].cmd[i];
+
+  zone->age = 0;
+  OLC_ZONE(d) = zone;
+}
+
+static int redit_collect_room_resets(struct descriptor_data *d, int **entries, int **chain_ends, int **roots)
+{
+  int i = 0, j, k, count = 0;
+  int room_num = real_room(OLC_NUM(d));
+  int total = count_commands(OLC_ZONE(d)->cmd);
+  struct reset_com *cmd = OLC_ZONE(d)->cmd;
+
+  if (room_num == NOWHERE || total <= 0) {
+    *entries = *chain_ends = *roots = NULL;
+    return 0;
+  }
+
+  CREATE(*entries, int, total);
+  CREATE(*chain_ends, int, total);
+  CREATE(*roots, int, total);
+
+  while (cmd[i].command != 'S') {
+    if ((cmd[i].command == 'M' || cmd[i].command == 'O') && cmd[i].arg3 == room_num) {
+      j = i + 1;
+      while (cmd[j].command != 'S' &&
+             cmd[j].command != 'M' &&
+             cmd[j].command != 'O' &&
+             cmd[j].command != 'D' &&
+             cmd[j].command != 'R')
+        j++;
+
+      for (k = i; k < j; k++) {
+        (*entries)[count] = k;
+        (*chain_ends)[count] = (k == i) ? (j - 1) : k;
+        (*roots)[count] = (k == i);
+        count++;
+      }
+      i = j;
+      continue;
+    } else if (redit_cmd_room(&cmd[i]) == room_num) {
+      (*entries)[count] = i;
+      (*chain_ends)[count] = i;
+      (*roots)[count] = 1;
+      count++;
+    }
+    i++;
+  }
+
+  return count;
+}
+
+static int redit_find_room_insert_pos(struct descriptor_data *d)
+{
+  int i, count, room_num, cmd_room;
+  int *entries = NULL, *chain_ends = NULL, *roots = NULL;
+
+  count = redit_collect_room_resets(d, &entries, &chain_ends, &roots);
+  if (count > 0) {
+    i = chain_ends[count - 1] + 1;
+    free(entries);
+    free(chain_ends);
+    free(roots);
+    return i;
+  }
+
+  room_num = real_room(OLC_NUM(d));
+  for (i = 0; OLC_ZONE(d)->cmd[i].command != 'S'; i++) {
+    cmd_room = redit_cmd_room(&OLC_ZONE(d)->cmd[i]);
+    if (cmd_room != NOWHERE && cmd_room > room_num)
+      return i;
+  }
+  return i;
+}
+
+static void redit_disp_resets_menu(struct descriptor_data *d)
+{
+  int i, count, zone_index, *entries = NULL, *chain_ends = NULL, *roots = NULL;
+  int current_mob = NOWHERE;
+  struct reset_com *cmd;
+  room_rnum room_num = real_room(OLC_NUM(d));
+
+  redit_setup_reset_editor(d);
+  cmd = OLC_ZONE(d)->cmd;
+  count = (room_num == NOWHERE) ? 0 : redit_collect_room_resets(d, &entries, &chain_ends, &roots);
+
+  clear_screen(d);
+  write_to_output(d, "-- Room Resets: [%d] %s\r\n\r\n", OLC_NUM(d),
+    OLC_ROOM(d)->name ? OLC_ROOM(d)->name : "<unnamed room>");
+
+  if (room_num == NOWHERE) {
+    write_to_output(d, "This room does not exist yet. Save the room first, then edit resets.\r\n");
+  } else if (count <= 0) {
+    write_to_output(d, "No resets found for this room.\r\n");
+  } else {
+    for (i = 0; i < count; i++) {
+      zone_index = entries[i];
+      write_to_output(d, "%2d) ", i + 1);
+      switch (cmd[zone_index].command) {
+        case 'M':
+          current_mob = (cmd[zone_index].arg1 >= 0 && cmd[zone_index].arg1 <= top_of_mobt) ?
+            mob_index[cmd[zone_index].arg1].vnum : NOWHERE;
+          write_to_output(d, "Mob [%d] %-30.30s max:%d\r\n",
+            (cmd[zone_index].arg1 >= 0 && cmd[zone_index].arg1 <= top_of_mobt) ?
+              mob_index[cmd[zone_index].arg1].vnum : -1,
+            (cmd[zone_index].arg1 >= 0 && cmd[zone_index].arg1 <= top_of_mobt) ?
+              mob_proto[cmd[zone_index].arg1].player.short_descr : "<invalid mob>",
+            cmd[zone_index].arg2);
+          break;
+        case 'O':
+          current_mob = NOWHERE;
+          write_to_output(d, "Obj [%d] %-30.30s room object max:%d\r\n",
+            (cmd[zone_index].arg1 >= 0 && cmd[zone_index].arg1 <= top_of_objt) ?
+              obj_index[cmd[zone_index].arg1].vnum : -1,
+            (cmd[zone_index].arg1 >= 0 && cmd[zone_index].arg1 <= top_of_objt) ?
+              obj_proto[cmd[zone_index].arg1].short_description : "<invalid object>",
+            cmd[zone_index].arg2);
+          break;
+        case 'E':
+          write_to_output(d, "Obj [%d] %-30.30s equip on mob [%d] (%s) max:%d\r\n",
+            (cmd[zone_index].arg1 >= 0 && cmd[zone_index].arg1 <= top_of_objt) ?
+              obj_index[cmd[zone_index].arg1].vnum : -1,
+            (cmd[zone_index].arg1 >= 0 && cmd[zone_index].arg1 <= top_of_objt) ?
+              obj_proto[cmd[zone_index].arg1].short_description : "<invalid object>",
+            current_mob,
+            (cmd[zone_index].arg3 >= 0 && cmd[zone_index].arg3 < NUM_WEARS) ?
+              equipment_types[cmd[zone_index].arg3] : "invalid slot",
+            cmd[zone_index].arg2);
+          break;
+        case 'G':
+          write_to_output(d, "Obj [%d] %-30.30s give to mob [%d] max:%d\r\n",
+            (cmd[zone_index].arg1 >= 0 && cmd[zone_index].arg1 <= top_of_objt) ?
+              obj_index[cmd[zone_index].arg1].vnum : -1,
+            (cmd[zone_index].arg1 >= 0 && cmd[zone_index].arg1 <= top_of_objt) ?
+              obj_proto[cmd[zone_index].arg1].short_description : "<invalid object>",
+            current_mob,
+            cmd[zone_index].arg2);
+          break;
+        case 'P':
+          write_to_output(d, "Obj [%d] %-30.30s put in obj [%d] max:%d\r\n",
+            (cmd[zone_index].arg1 >= 0 && cmd[zone_index].arg1 <= top_of_objt) ?
+              obj_index[cmd[zone_index].arg1].vnum : -1,
+            (cmd[zone_index].arg1 >= 0 && cmd[zone_index].arg1 <= top_of_objt) ?
+              obj_proto[cmd[zone_index].arg1].short_description : "<invalid object>",
+            (cmd[zone_index].arg3 >= 0 && cmd[zone_index].arg3 <= top_of_objt) ?
+              obj_index[cmd[zone_index].arg3].vnum : -1,
+            cmd[zone_index].arg2);
+          break;
+        case 'R':
+          write_to_output(d, "Obj [%d] %-30.30s remove from room\r\n",
+            (cmd[zone_index].arg2 >= 0 && cmd[zone_index].arg2 <= top_of_objt) ?
+              obj_index[cmd[zone_index].arg2].vnum : -1,
+            (cmd[zone_index].arg2 >= 0 && cmd[zone_index].arg2 <= top_of_objt) ?
+              obj_proto[cmd[zone_index].arg2].short_description : "<invalid object>");
+          break;
+        case 'D':
+          write_to_output(d, "Door %-9s set to %s\r\n",
+            dirs[cmd[zone_index].arg2],
+            (cmd[zone_index].arg3 == 2) ? "locked" :
+            ((cmd[zone_index].arg3 == 1) ? "closed" : "open"));
+          break;
+        case 'T':
+          write_to_output(d, "Trigger [%d] attach to %s\r\n",
+            trig_index[cmd[zone_index].arg2]->vnum,
+            cmd[zone_index].arg1 == MOB_TRIGGER ? "mob" :
+            (cmd[zone_index].arg1 == OBJ_TRIGGER ? "object" : "room"));
+          break;
+        case 'V':
+          write_to_output(d, "Var %s:%d = %s (%s)\r\n",
+            cmd[zone_index].sarg1 ? cmd[zone_index].sarg1 : "<none>",
+            cmd[zone_index].arg2,
+            cmd[zone_index].sarg2 ? cmd[zone_index].sarg2 : "<none>",
+            cmd[zone_index].arg1 == MOB_TRIGGER ? "mob" :
+            (cmd[zone_index].arg1 == OBJ_TRIGGER ? "object" : "room"));
+          break;
+        default:
+          write_to_output(d, "Command %c\r\n", cmd[zone_index].command);
+          break;
+      }
+    }
+  }
+
+  write_to_output(d,
+    "\r\nA) Add mob reset\r\n"
+    "B) Add object reset\r\n"
+    "D) Delete reset\r\n"
+    "Q) Quit\r\n"
+    "Enter choice: ");
+  OLC_MODE(d) = REDIT_RESETS_MENU;
+
+  if (entries) free(entries);
+  if (chain_ends) free(chain_ends);
+  if (roots) free(roots);
 }
 
 /* The main loop*/
@@ -525,10 +771,12 @@ void redit_parse(struct descriptor_data *d, char *arg)
     switch (*arg) {
     case 'y':
     case 'Y':
+      redit_save_resets(d);
       redit_save_internally(d);
       mudlog(CMP, MAX(LVL_BUILDER, GET_INVIS_LEV(d->character)), TRUE, "OLC: %s edits room %d.", GET_NAME(d->character), OLC_NUM(d));
       if (CONFIG_OLC_SAVE) {
         redit_save_to_disk(real_zone_by_thing(OLC_NUM(d)));
+        save_zone(OLC_ZNUM(d));
         write_to_output(d, "Room saved to disk.\r\n");
       } else
         write_to_output(d, "Room saved to memory.\r\n");
@@ -660,6 +908,10 @@ void redit_parse(struct descriptor_data *d, char *arg)
       write_to_output(d, "Copy what room? ");
       OLC_MODE(d) = REDIT_COPY;
       break;
+    case 'r':
+    case 'R':
+      redit_disp_resets_menu(d);
+      return;
     case 'x':
     case 'X':
       /* Delete the room, prompt first. */
@@ -909,6 +1161,187 @@ void redit_parse(struct descriptor_data *d, char *arg)
       write_to_output(d, "Please answer 'Y' or 'N': ");
 
     break;
+
+  case REDIT_RESETS_MENU:
+    switch (*arg) {
+      case 'a':
+      case 'A':
+        write_to_output(d, "Enter mob vnum and max existing (0 to cancel): ");
+        OLC_MODE(d) = REDIT_RESETS_ADD_MOB;
+        return;
+      case 'b':
+      case 'B':
+        write_to_output(d, "Enter object vnum and max existing (0 to cancel): ");
+        OLC_MODE(d) = REDIT_RESETS_ADD_OBJ;
+        return;
+      case 'd':
+      case 'D':
+        write_to_output(d, "Delete which room reset number (0 to cancel)? ");
+        OLC_MODE(d) = REDIT_RESETS_DELETE;
+        return;
+      case 'q':
+      case 'Q':
+        redit_disp_menu(d);
+        return;
+      default:
+        write_to_output(d, "Invalid choice!\r\n");
+        redit_disp_resets_menu(d);
+        return;
+    }
+    break;
+
+  case REDIT_RESETS_ADD_MOB:
+  {
+    char mob_arg[MAX_INPUT_LENGTH], max_arg[MAX_INPUT_LENGTH];
+    mob_rnum mob_num;
+    room_rnum room_num;
+    int max_existing;
+    struct reset_com newcmd;
+
+    two_arguments(arg, mob_arg, max_arg);
+    if (!*mob_arg || *mob_arg == '0') {
+      redit_disp_resets_menu(d);
+      return;
+    }
+    room_num = real_room(OLC_NUM(d));
+    if (room_num == NOWHERE) {
+      write_to_output(d, "You must save this room before adding resets.\r\n");
+      redit_disp_resets_menu(d);
+      return;
+    }
+
+    if (!isdigit(*mob_arg) || (mob_num = real_mobile(atoi(mob_arg))) == NOBODY) {
+      write_to_output(d, "Invalid mob vnum.\r\n");
+      redit_disp_resets_menu(d);
+      return;
+    }
+
+    if (!*max_arg || !isdigit(*max_arg)) {
+      write_to_output(d, "Invalid max existing value.\r\n");
+      redit_disp_resets_menu(d);
+      return;
+    }
+
+    max_existing = atoi(max_arg);
+    if (max_existing < 0 || max_existing > MAX_DUPLICATES) {
+      write_to_output(d, "Max existing must be between 0 and %d.\r\n", MAX_DUPLICATES);
+      redit_disp_resets_menu(d);
+      return;
+    }
+
+    memset(&newcmd, 0, sizeof(newcmd));
+    newcmd.command = 'M';
+    newcmd.if_flag = 0;
+    newcmd.arg1 = mob_num;
+    newcmd.arg2 = max_existing;
+    newcmd.arg3 = room_num;
+    add_cmd_to_list(&OLC_ZONE(d)->cmd, &newcmd, redit_find_room_insert_pos(d));
+    OLC_ZONE(d)->age = 1;
+    OLC_VAL(d) = 1;
+    redit_disp_resets_menu(d);
+    return;
+  }
+
+  case REDIT_RESETS_ADD_OBJ:
+  {
+    char obj_arg[MAX_INPUT_LENGTH], max_arg[MAX_INPUT_LENGTH];
+    obj_rnum obj_num;
+    room_rnum room_num;
+    int max_existing;
+    struct reset_com newcmd;
+
+    two_arguments(arg, obj_arg, max_arg);
+    if (!*obj_arg || *obj_arg == '0') {
+      redit_disp_resets_menu(d);
+      return;
+    }
+    room_num = real_room(OLC_NUM(d));
+    if (room_num == NOWHERE) {
+      write_to_output(d, "You must save this room before adding resets.\r\n");
+      redit_disp_resets_menu(d);
+      return;
+    }
+
+    if (!isdigit(*obj_arg) || (obj_num = real_object(atoi(obj_arg))) == NOTHING) {
+      write_to_output(d, "Invalid object vnum.\r\n");
+      redit_disp_resets_menu(d);
+      return;
+    }
+
+    if (!*max_arg || !isdigit(*max_arg)) {
+      write_to_output(d, "Invalid max existing value.\r\n");
+      redit_disp_resets_menu(d);
+      return;
+    }
+
+    max_existing = atoi(max_arg);
+    if (max_existing < 0 || max_existing > MAX_DUPLICATES) {
+      write_to_output(d, "Max existing must be between 0 and %d.\r\n", MAX_DUPLICATES);
+      redit_disp_resets_menu(d);
+      return;
+    }
+
+    memset(&newcmd, 0, sizeof(newcmd));
+    newcmd.command = 'O';
+    newcmd.if_flag = 0;
+    newcmd.arg1 = obj_num;
+    newcmd.arg2 = max_existing;
+    newcmd.arg3 = room_num;
+    add_cmd_to_list(&OLC_ZONE(d)->cmd, &newcmd, redit_find_room_insert_pos(d));
+    OLC_ZONE(d)->age = 1;
+    OLC_VAL(d) = 1;
+    redit_disp_resets_menu(d);
+    return;
+  }
+
+  case REDIT_RESETS_DELETE:
+  {
+    int entry, count;
+    int *entries = NULL, *chain_ends = NULL, *roots = NULL;
+    int zone_index, i;
+    struct reset_com *cmd;
+
+    entry = atoi(arg);
+    if (entry <= 0) {
+      redit_disp_resets_menu(d);
+      return;
+    }
+
+    count = redit_collect_room_resets(d, &entries, &chain_ends, &roots);
+    if (entry > count) {
+      write_to_output(d, "Invalid reset number.\r\n");
+      redit_disp_resets_menu(d);
+      if (entries) free(entries);
+      if (chain_ends) free(chain_ends);
+      if (roots) free(roots);
+      return;
+    }
+
+    zone_index = entries[entry - 1];
+    cmd = OLC_ZONE(d)->cmd;
+    if (!roots[entry - 1] &&
+        (cmd[zone_index].command == 'G' || cmd[zone_index].command == 'E' ||
+         cmd[zone_index].command == 'P' || cmd[zone_index].command == 'T' ||
+         cmd[zone_index].command == 'V')) {
+      write_to_output(d, "Delete the parent room load reset to remove this child reset safely.\r\n");
+      redit_disp_resets_menu(d);
+      free(entries);
+      free(chain_ends);
+      free(roots);
+      return;
+    }
+
+    for (i = zone_index; i <= chain_ends[entry - 1]; i++)
+      delete_zone_command(OLC_ZONE(d), zone_index);
+
+    OLC_ZONE(d)->age = 1;
+    OLC_VAL(d) = 1;
+    redit_disp_resets_menu(d);
+    free(entries);
+    free(chain_ends);
+    free(roots);
+    return;
+  }
 
   default:
     /* We should never get here. */
