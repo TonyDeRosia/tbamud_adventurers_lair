@@ -762,6 +762,7 @@ do                                                              \
 /** Return the memory of ch. */
 #define MEMORY(ch)		((ch)->mob_specials.memory)
 #define GET_SUMMON_TIMER(ch)      ((ch)->mob_specials.summon_timer)
+#define GET_MOB_WIMP_LEV(ch)      ((ch)->mob_specials.wimpy_threshold)
 #define GET_SPELL_COOLDOWN(ch, sp) CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->spell_cooldowns[(sp)]))
 #define GET_STUDY_COOLDOWN_UNTIL(ch) CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->study_cooldown_until))
 #define GET_HP_LAST_ROUND(ch) CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->hp_last_round))
