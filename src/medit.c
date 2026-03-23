@@ -633,7 +633,8 @@ void medit_parse(struct descriptor_data *d, char *arg)
   int i = -1, j;
   char *oldtext = NULL;
 
-  if (OLC_MODE(d) == MEDIT_GOLD ||
+  if (OLC_MODE(d) == MEDIT_STATS_MENU ||
+      OLC_MODE(d) == MEDIT_GOLD ||
       OLC_MODE(d) == MEDIT_LEVEL_AUTOFILL_CONFIRM ||
       OLC_MODE(d) == MEDIT_DELETE) {
     if (!genolc_checkstring(d, arg))
