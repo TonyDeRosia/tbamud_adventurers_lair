@@ -1,1 +1,15 @@
+#16400
+field mouse~
+a field mouse.~
+An adorable little field mouse is here.
+~
+It looks unfinished.
+This adorable little field mouse scurries around the plains, just trying to survive day to day.
+~
+200 0 0 0 0 0 0 0 0 E
+10 20 0 2d1+1 2d1+5
+0 0
+8 8 0
+BareHandAttack: 4
+E
 $
