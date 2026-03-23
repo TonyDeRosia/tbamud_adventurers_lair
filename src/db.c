@@ -2641,10 +2641,22 @@ static void apply_mob_loadout(struct char_data *mob)
     if (!obj)
       continue;
 
-    if (mob_object_can_equip_slot(obj, wear_pos))
-      equip_char(mob, obj, wear_pos);
-    else
+    /* Mirror zone reset equip behavior: fire load/wear triggers and only ever
+     * keep the item on the mob (equipped or inventory), never the room. */
+    if (!mob_object_can_equip_slot(obj, wear_pos)) {
       obj_to_char(obj, mob);
+      continue;
+    }
+
+    IN_ROOM(obj) = IN_ROOM(mob);
+    load_otrigger(obj);
+    if (wear_otrigger(obj, mob, wear_pos) && !GET_EQ(mob, wear_pos)) {
+      IN_ROOM(obj) = NOWHERE;
+      equip_char(mob, obj, wear_pos);
+    } else {
+      IN_ROOM(obj) = NOWHERE;
+      obj_to_char(obj, mob);
+    }
   }
 
   for (i = 0; i < mob->mob_specials.inventory_loadout_count; i++) {
@@ -2657,6 +2669,9 @@ static void apply_mob_loadout(struct char_data *mob)
       struct obj_data *obj = read_object(ornum, REAL);
       if (!obj)
         break;
+      IN_ROOM(obj) = IN_ROOM(mob);
+      load_otrigger(obj);
+      IN_ROOM(obj) = NOWHERE;
       obj_to_char(obj, mob);
     }
   }
