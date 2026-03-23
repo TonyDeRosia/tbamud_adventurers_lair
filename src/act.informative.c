@@ -253,23 +253,22 @@ static void show_obj_to_char(struct obj_data *obj, struct char_data *ch, int mod
     
     send_to_char(ch, "%s", CCNRM(ch, C_NRM));break;
 
-  case SHOW_OBJ_SHORT:
-    if (!IS_NPC(ch) && PRF_FLAGGED(ch, PRF_SHOWVNUMS)) {
-      send_to_char(ch, "[%d] ", GET_OBJ_VNUM(obj));
-      if (SCRIPT(obj)) {
-        if (!TRIGGERS(SCRIPT(obj))->next)
-          send_to_char(ch, "[T%d] ", GET_TRIG_VNUM(TRIGGERS(SCRIPT(obj))));
-        else
-          send_to_char(ch, "[TRIGS] ");
-      }
+case SHOW_OBJ_SHORT:
+  if (!IS_NPC(ch) && PRF_FLAGGED(ch, PRF_SHOWVNUMS)) {
+    send_to_char(ch, "[%d] ", GET_OBJ_VNUM(obj));
+    if (SCRIPT(obj)) {
+      if (!TRIGGERS(SCRIPT(obj))->next)
+        send_to_char(ch, "[T%d] ", GET_TRIG_VNUM(TRIGGERS(SCRIPT(obj))));
+      else
+        send_to_char(ch, "[TRIGS] ");
     }
-    if (!IS_NPC(ch) && GET_LEVEL(ch) < LVL_IMMORT &&
-        (obj->carried_by == ch || obj->worn_by == ch))
-      build_player_kept_marker(obj, ch, obj_tags, sizeof(obj_tags));
-    else
-      build_obj_aura_tags(obj, ch, obj_tags, sizeof(obj_tags), TRUE);
-    send_to_char(ch, "%s%s", obj_tags, obj->short_description);
-    break;
+  }
+  if (!IS_NPC(ch) && (obj->carried_by == ch || obj->worn_by == ch))
+    build_player_kept_marker(obj, ch, obj_tags, sizeof(obj_tags));
+  else
+    build_obj_aura_tags(obj, ch, obj_tags, sizeof(obj_tags), TRUE);
+  send_to_char(ch, "%s%s", obj_tags, obj->short_description);
+  break;
 
   case SHOW_OBJ_ACTION:
     switch (GET_OBJ_TYPE(obj)) {
