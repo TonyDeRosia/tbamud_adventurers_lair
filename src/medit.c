@@ -523,79 +523,107 @@ static void medit_disp_menu(struct descriptor_data *d)
 static void medit_disp_stats_menu(struct descriptor_data *d)
 {
   struct char_data *mob;
-  char buf[MAX_STRING_LENGTH];
-  int base_xp_preview, bonus_xp_preview, total_xp_preview;
+  char title[MAX_STRING_LENGTH];
+  int hp_min, hp_max;
+  int dmg_min, dmg_max;
+  int base_xp_preview, total_xp_preview;
 
   mob = OLC_MOB(d);
   get_char_colors(d->character);
   clear_screen(d);
 
-  /* Color codes have to be used here, for count_color_codes to work */
-  sprintf(buf, "(range \ty%d\tn to \ty%d\tn)", GET_HIT(mob) + GET_MOVE(mob), (GET_HIT(mob) * GET_MANA(mob)) + GET_MOVE(mob));
+  hp_min = GET_HIT(mob) + GET_MOVE(mob);
+  hp_max = (GET_HIT(mob) * GET_MANA(mob)) + GET_MOVE(mob);
+  dmg_min = GET_NDD(mob) + GET_DAMROLL(mob);
+  dmg_max = (GET_NDD(mob) * GET_SDD(mob)) + GET_DAMROLL(mob);
   base_xp_preview = mob_kill_base_xp_for_levels(GET_LEVEL(mob), GET_LEVEL(mob));
-  bonus_xp_preview = GET_EXP(mob);
-  total_xp_preview = MAX(0, base_xp_preview + bonus_xp_preview);
+  total_xp_preview = LIMIT(base_xp_preview + GET_EXP(mob), 0, MAX_MOB_EXP);
+  snprintf(title, sizeof(title), "MOB BUILD: [%d] %s", OLC_NUM(d), GET_SDESC(mob));
 
-  /* Top section - standard stats */
   write_to_output(d,
-  "-- Mob Number:  %s[%s%d%s]%s\r\n"
-  "(%s1%s) Level:       %s[%s%4d%s]%s\r\n"
-  "(%s2%s) %sAuto Set Stats (based on level)%s\r\n\r\n"
-  "    Tip: After changing level, use Auto Set Stats to prefill recommended values.\r\n"
-  "         You can also accept the immediate Y/N prompt after a level change.\r\n\r\n"
-  "Hit Points  (xdy+z):        Bare Hand Damage (xdy+z): \r\n"
-  "(%s3%s) HP NumDice:  %s[%s%5d%s]%s    (%s6%s) BHD NumDice:  %s[%s%5d%s]%s\r\n"
-  "(%s4%s) HP SizeDice: %s[%s%5d%s]%s    (%s7%s) BHD SizeDice: %s[%s%5d%s]%s\r\n"
-  "(%s5%s) HP Addition: %s[%s%5d%s]%s    (%s8%s) DamRoll:      %s[%s%5d%s]%s\r\n"
-  "%-*s(range %s%d%s to %s%d%s)\r\n\r\n"
-
-  "(%sA%s) Armor: %s[%s%4d%s]%s        (%sD%s) Hitroll:   %s[%s%5d%s]%s\r\n"
-  "(%sB%s) Bonus XP:    %s[%s%10d%s]%s  (%sE%s) Alignment: %s[%s%5d%s]%s\r\n"
-  "(%sC%s) Gold Min/Max: %s[%s%5lld%s/%s%5lld%s]%s\r\n"
-  "(%sR%s) Wimpy Threshold: %s[%s%5d%s]%s\r\n"
-  "    Reward Rule: NPC kill XP uses the live formula; Bonus XP is added on top.\r\n"
-  "    Same-level XP preview (read-only): Base %s[%s%5d%s]%s + Bonus %s[%s%5d%s]%s = Total %s[%s%5d%s]%s\r\n"
-  "    Rare Kill bonus may add extra XP when few live copies of this mob exist.\r\n\r\n",
-      cyn, yel, OLC_NUM(d), cyn, nrm,
+  "-------------------------------------------------------------------------------\r\n"
+  "%-79.79s\r\n"
+  "-------------------------------------------------------------------------------\r\n"
+  "QUICK BUILD\r\n"
+  "(%s1%s) Level:                     %s[%s%5d%s]%s\r\n"
+  "(%s2%s) Reapply Recommended Stats\r\n"
+  "\r\n"
+  "Tip: Set the level first.\r\n"
+  "     After changing level, accept the Y/N prompt to fill recommended stats.\r\n"
+  "     Use option 2 later if you want to refresh recommended values again.\r\n"
+  "-------------------------------------------------------------------------------\r\n"
+  "HIT POINTS\r\n"
+  "(%s3%s) HP NumDice:                %s[%s%5d%s]%s\r\n"
+  "(%s4%s) HP SizeDice:               %s[%s%5d%s]%s\r\n"
+  "(%s5%s) HP Addition:               %s[%s%5d%s]%s\r\n"
+  "    HP Preview:                %s[%s%5d%s to %s%5d%s]%s\r\n"
+  "-------------------------------------------------------------------------------\r\n"
+  "DAMAGE\r\n"
+  "(%s6%s) BHD NumDice:               %s[%s%5d%s]%s\r\n"
+  "(%s7%s) BHD SizeDice:              %s[%s%5d%s]%s\r\n"
+  "(%s8%s) Damroll:                   %s[%s%5d%s]%s\r\n"
+  "    Damage Preview:            %s[%s%5d%s to %s%5d%s]%s\r\n"
+  "-------------------------------------------------------------------------------\r\n"
+  "COMBAT\r\n"
+  "(%sA%s) Armor:                     %s[%s%5d%s]%s\r\n"
+  "(%sB%s) Hitroll:                   %s[%s%5d%s]%s\r\n"
+  "(%sC%s) Evasion:                   %s[%s%5d%s]%s\r\n"
+  "(%sD%s) Alignment:                 %s[%s%5d%s]%s\r\n"
+  "(%sE%s) Wimpy Threshold:           %s[%s%5d%s]%s\r\n"
+  "-------------------------------------------------------------------------------\r\n"
+  "REWARDS\r\n"
+  "(%sF%s) Bonus XP:                  %s[%s%5d%s]%s\r\n"
+  "(%sG%s) Gold Min/Max:              %s[%s%5lld%s / %s%5lld%s]%s\r\n"
+  "    Base XP Preview:           %s[%s%5d%s]%s\r\n"
+  "    Total XP Preview:          %s[%s%5d%s]%s\r\n"
+  "    Note: Bonus XP is added on top of live kill XP.\r\n"
+  "    Note: Rare Kill bonus may add extra XP when few live copies exist.\r\n"
+  "-------------------------------------------------------------------------------\r\n"
+  "ATTRIBUTES\r\n"
+  "(%sH%s) Str: %s[%s%2d/%3d%s]%s   (%sI%s) Int: %s[%s%2d%s]%s   (%sJ%s) Wis: %s[%s%2d%s]%s\r\n"
+  "(%sK%s) Dex: %s[%s%2d%s]%s     (%sL%s) Con: %s[%s%2d%s]%s   (%sM%s) Cha: %s[%s%2d%s]%s\r\n"
+  "-------------------------------------------------------------------------------\r\n"
+  "SAVING THROWS\r\n"
+  "(%sN%s) Paralysis:               %s[%s%5d%s]%s\r\n"
+  "(%sO%s) Rods/Staves:             %s[%s%5d%s]%s\r\n"
+  "(%sP%s) Petrification:           %s[%s%5d%s]%s\r\n"
+  "(%sR%s) Breath:                  %s[%s%5d%s]%s\r\n"
+  "(%sS%s) Spells:                  %s[%s%5d%s]%s\r\n"
+  "-------------------------------------------------------------------------------\r\n"
+  "(%sQ%s) Quit to main menu\r\n"
+  "Enter choice : ",
+      title,
       cyn, nrm, cyn, yel, GET_LEVEL(mob), cyn, nrm,
-      cyn, nrm, cyn, nrm,
-      cyn, nrm, cyn, yel, GET_HIT(mob), cyn, nrm,   cyn, nrm, cyn, yel, GET_NDD(mob), cyn, nrm,
-      cyn, nrm, cyn, yel, GET_MANA(mob), cyn, nrm,  cyn, nrm, cyn, yel, GET_SDD(mob), cyn, nrm,
-      cyn, nrm, cyn, yel, GET_MOVE(mob), cyn, nrm,  cyn, nrm, cyn, yel, GET_DAMROLL(mob), cyn, nrm,
-
-      count_color_chars(buf)+28, buf,
-      yel, GET_NDD(mob) + GET_DAMROLL(mob), nrm,
-      yel, (GET_NDD(mob) * GET_SDD(mob)) + GET_DAMROLL(mob), nrm,
-
-      cyn, nrm, cyn, yel, GET_AC(mob), cyn, nrm,   cyn, nrm, cyn, yel, GET_HITROLL(mob), cyn, nrm,
-      cyn, nrm, cyn, yel, GET_EXP(mob), cyn, nrm,  cyn, nrm, cyn, yel, GET_ALIGNMENT(mob), cyn, nrm,
-      cyn, nrm, cyn, yel, (long long)OLC_MOB(d)->mob_specials.gold_min, cyn,
-      yel, (long long)OLC_MOB(d)->mob_specials.gold_max, cyn, nrm,
+      cyn, nrm,
+      cyn, nrm, cyn, yel, GET_HIT(mob), cyn, nrm,
+      cyn, nrm, cyn, yel, GET_MANA(mob), cyn, nrm,
+      cyn, nrm, cyn, yel, GET_MOVE(mob), cyn, nrm,
+      cyn, yel, hp_min, cyn, yel, hp_max, cyn, nrm,
+      cyn, nrm, cyn, yel, GET_NDD(mob), cyn, nrm,
+      cyn, nrm, cyn, yel, GET_SDD(mob), cyn, nrm,
+      cyn, nrm, cyn, yel, GET_DAMROLL(mob), cyn, nrm,
+      cyn, yel, dmg_min, cyn, yel, dmg_max, cyn, nrm,
+      cyn, nrm, cyn, yel, GET_AC(mob), cyn, nrm,
+      cyn, nrm, cyn, yel, GET_HITROLL(mob), cyn, nrm,
+      cyn, nrm, cyn, yel, GET_EVASION(mob), cyn, nrm,
+      cyn, nrm, cyn, yel, GET_ALIGNMENT(mob), cyn, nrm,
       cyn, nrm, cyn, yel, GET_MOB_WIMP_LEV(mob), cyn, nrm,
+      cyn, nrm, cyn, yel, GET_EXP(mob), cyn, nrm,
+      cyn, nrm, cyn, yel, (long long)mob->mob_specials.gold_min, cyn, yel, (long long)mob->mob_specials.gold_max, cyn, nrm,
       cyn, yel, base_xp_preview, cyn, nrm,
-      cyn, yel, bonus_xp_preview, cyn, nrm,
-      cyn, yel, total_xp_preview, cyn, nrm);
-
-  if (CONFIG_MEDIT_ADVANCED) {
-    /* Bottom section - non-standard stats, togglable in cedit */
-    write_to_output(d,
-    "(%sF%s) Str: %s[%s%2d/%3d%s]%s   Saving Throws\r\n"
-    "(%sG%s) Int: %s[%s%3d%s]%s      (%sL%s) Paralysis     %s[%s%3d%s]%s\r\n"
-    "(%sH%s) Wis: %s[%s%3d%s]%s      (%sM%s) Rods/Staves   %s[%s%3d%s]%s\r\n"
-    "(%sI%s) Dex: %s[%s%3d%s]%s      (%sN%s) Petrification %s[%s%3d%s]%s\r\n"
-    "(%sJ%s) Con: %s[%s%3d%s]%s      (%sO%s) Breath        %s[%s%3d%s]%s\r\n"
-    "(%sK%s) Cha: %s[%s%3d%s]%s      (%sP%s) Spells        %s[%s%3d%s]%s\r\n\r\n",
-        cyn, nrm, cyn, yel, GET_STR(mob), GET_ADD(mob), cyn, nrm,
-        cyn, nrm, cyn, yel, GET_INT(mob), cyn, nrm,   cyn, nrm, cyn, yel, GET_SAVE(mob, SAVING_PARA), cyn, nrm,
-        cyn, nrm, cyn, yel, GET_WIS(mob), cyn, nrm,   cyn, nrm, cyn, yel, GET_SAVE(mob, SAVING_ROD), cyn, nrm,
-        cyn, nrm, cyn, yel, GET_DEX(mob), cyn, nrm,   cyn, nrm, cyn, yel, GET_SAVE(mob, SAVING_PETRI), cyn, nrm,
-        cyn, nrm, cyn, yel, GET_CON(mob), cyn, nrm,   cyn, nrm, cyn, yel, GET_SAVE(mob, SAVING_BREATH), cyn, nrm,
-        cyn, nrm, cyn, yel, GET_CHA(mob), cyn, nrm,   cyn, nrm, cyn, yel, GET_SAVE(mob, SAVING_SPELL), cyn, nrm
-        );
-  }
-
-  /* Quit to previous menu option */
-  write_to_output(d, "(%sQ%s) Quit to main menu\r\nEnter choice : ", cyn, nrm);
+      cyn, yel, total_xp_preview, cyn, nrm,
+      cyn, nrm, cyn, yel, GET_STR(mob), GET_ADD(mob), cyn, nrm,
+      cyn, nrm, cyn, yel, GET_INT(mob), cyn, nrm,
+      cyn, nrm, cyn, yel, GET_WIS(mob), cyn, nrm,
+      cyn, nrm, cyn, yel, GET_DEX(mob), cyn, nrm,
+      cyn, nrm, cyn, yel, GET_CON(mob), cyn, nrm,
+      cyn, nrm, cyn, yel, GET_CHA(mob), cyn, nrm,
+      cyn, nrm, cyn, yel, GET_SAVE(mob, SAVING_PARA), cyn, nrm,
+      cyn, nrm, cyn, yel, GET_SAVE(mob, SAVING_ROD), cyn, nrm,
+      cyn, nrm, cyn, yel, GET_SAVE(mob, SAVING_PETRI), cyn, nrm,
+      cyn, nrm, cyn, yel, GET_SAVE(mob, SAVING_BREATH), cyn, nrm,
+      cyn, nrm, cyn, yel, GET_SAVE(mob, SAVING_SPELL), cyn, nrm,
+      cyn, nrm);
 
   OLC_MODE(d) = MEDIT_STATS_MENU;
 }
@@ -605,7 +633,12 @@ void medit_parse(struct descriptor_data *d, char *arg)
   int i = -1, j;
   char *oldtext = NULL;
 
-  if (OLC_MODE(d) > MEDIT_NUMERICAL_RESPONSE) {
+  if (OLC_MODE(d) == MEDIT_GOLD ||
+      OLC_MODE(d) == MEDIT_LEVEL_AUTOFILL_CONFIRM ||
+      OLC_MODE(d) == MEDIT_DELETE) {
+    if (!genolc_checkstring(d, arg))
+      return;
+  } else if (OLC_MODE(d) > MEDIT_NUMERICAL_RESPONSE) {
     char *endptr = NULL;
     long parsed;
 
@@ -798,126 +831,86 @@ void medit_parse(struct descriptor_data *d, char *arg)
       break;
     case 'b':
     case 'B':
-      OLC_MODE(d) = MEDIT_EXP;
+      OLC_MODE(d) = MEDIT_HITROLL;
       i++;
       break;
-      case 'c':
-      case 'C':
-        OLC_MODE(d) = MEDIT_GOLD;
-        write_to_output(d, "Enter gold min and max (example: 10 50) or a single value: ");
-        return;
-
     case 'd':
     case 'D':
-      OLC_MODE(d) = MEDIT_HITROLL;
+      OLC_MODE(d) = MEDIT_ALIGNMENT;
+      i++;
+      break;
+    case 'c':
+    case 'C':
+      OLC_MODE(d) = MEDIT_EVASION;
       i++;
       break;
     case 'e':
     case 'E':
-      OLC_MODE(d) = MEDIT_ALIGNMENT;
-      i++;
-      break;
-    case 'r':
-    case 'R':
       OLC_MODE(d) = MEDIT_WIMPY_THRESH;
       i++;
       break;
     case 'f':
     case 'F':
-      if (!CONFIG_MEDIT_ADVANCED) {
-        write_to_output(d, "Invalid Choice!\r\nEnter Choice : ");
-        return;
-	  }
-      OLC_MODE(d) = MEDIT_STR;
+      OLC_MODE(d) = MEDIT_EXP;
       i++;
       break;
     case 'g':
     case 'G':
-      if (!CONFIG_MEDIT_ADVANCED) {
-        write_to_output(d, "Invalid Choice!\r\nEnter Choice : ");
-        return;
-	  }
-      OLC_MODE(d) = MEDIT_INT;
-      i++;
-      break;
+      OLC_MODE(d) = MEDIT_GOLD;
+      write_to_output(d, "Enter gold min and max (example: 10 50) or a single value: ");
+      return;
     case 'h':
     case 'H':
-      if (!CONFIG_MEDIT_ADVANCED) {
-        write_to_output(d, "Invalid Choice!\r\nEnter Choice : ");
-        return;
-	  }
-      OLC_MODE(d) = MEDIT_WIS;
-      i++;
-      break;
+      OLC_MODE(d) = MEDIT_STR;
+      write_to_output(d, "\r\nEnter Strength base value [3-25]: ");
+      return;
     case 'i':
     case 'I':
-      if (!CONFIG_MEDIT_ADVANCED) {
-        write_to_output(d, "Invalid Choice!\r\nEnter Choice : ");
-        return;
-	  }
-      OLC_MODE(d) = MEDIT_DEX;
+      OLC_MODE(d) = MEDIT_INT;
       i++;
       break;
     case 'j':
     case 'J':
-      if (!CONFIG_MEDIT_ADVANCED) {
-        write_to_output(d, "Invalid Choice!\r\nEnter Choice : ");
-        return;
-	  }
-      OLC_MODE(d) = MEDIT_CON;
+      OLC_MODE(d) = MEDIT_WIS;
       i++;
       break;
     case 'k':
     case 'K':
-      if (!CONFIG_MEDIT_ADVANCED) {
-        write_to_output(d, "Invalid Choice!\r\nEnter Choice : ");
-        return;
-	  }
-      OLC_MODE(d) = MEDIT_CHA;
+      OLC_MODE(d) = MEDIT_DEX;
       i++;
       break;
     case 'l':
     case 'L':
-      if (!CONFIG_MEDIT_ADVANCED) {
-        write_to_output(d, "Invalid Choice!\r\nEnter Choice : ");
-        return;
-	  }
-      OLC_MODE(d) = MEDIT_PARA;
+      OLC_MODE(d) = MEDIT_CON;
       i++;
       break;
     case 'm':
     case 'M':
-      if (!CONFIG_MEDIT_ADVANCED) {
-        write_to_output(d, "Invalid Choice!\r\nEnter Choice : ");
-        return;
-	  }
-      OLC_MODE(d) = MEDIT_ROD;
+      OLC_MODE(d) = MEDIT_CHA;
       i++;
       break;
     case 'n':
     case 'N':
-      if (!CONFIG_MEDIT_ADVANCED) {
-        write_to_output(d, "Invalid Choice!\r\nEnter Choice : ");
-        return;
-	  }
-      OLC_MODE(d) = MEDIT_PETRI;
+      OLC_MODE(d) = MEDIT_PARA;
       i++;
       break;
     case 'o':
     case 'O':
-      if (!CONFIG_MEDIT_ADVANCED) {
-        write_to_output(d, "Invalid Choice!\r\nEnter Choice : ");
-        return;
-	  }
-      OLC_MODE(d) = MEDIT_BREATH;
+      OLC_MODE(d) = MEDIT_ROD;
       i++;
       break;
     case 'p':
     case 'P':
-      if (!CONFIG_MEDIT_ADVANCED) {
-        write_to_output(d, "Invalid Choice!\r\nEnter Choice : ");
-        return;
-	  }
+      OLC_MODE(d) = MEDIT_PETRI;
+      i++;
+      break;
+    case 'r':
+    case 'R':
+      OLC_MODE(d) = MEDIT_BREATH;
+      i++;
+      break;
+    case 's':
+    case 'S':
       OLC_MODE(d) = MEDIT_SPELL;
       i++;
       break;
@@ -1061,6 +1054,12 @@ void medit_parse(struct descriptor_data *d, char *arg)
     medit_disp_stats_menu(d);
     return;
 
+  case MEDIT_EVASION:
+    GET_EVASION(OLC_MOB(d)) = LIMIT(i, 0, 200);
+    OLC_VAL(d) = TRUE;
+    medit_disp_stats_menu(d);
+    return;
+
   case MEDIT_EXP:
     GET_EXP(OLC_MOB(d)) = LIMIT(i, 0, MAX_MOB_EXP);
     OLC_VAL(d) = TRUE;
@@ -1116,37 +1115,51 @@ void medit_parse(struct descriptor_data *d, char *arg)
   }
 
   case MEDIT_STR:
-    GET_STR(OLC_MOB(d)) = LIMIT(i, 11, 25);
+    GET_STR(OLC_MOB(d)) = LIMIT(i, 3, 25);
+    OLC_MOB(d)->real_abils.str = GET_STR(OLC_MOB(d));
+    OLC_MODE(d) = MEDIT_STR_ADD;
+    OLC_VAL(d) = TRUE;
+    write_to_output(d, "Enter Strength add value [0-100]: ");
+    return;
+
+  case MEDIT_STR_ADD:
+    GET_ADD(OLC_MOB(d)) = LIMIT(i, 0, 100);
+    OLC_MOB(d)->real_abils.str_add = GET_ADD(OLC_MOB(d));
     OLC_VAL(d) = TRUE;
     medit_disp_stats_menu(d);
     return;
 
   case MEDIT_INT:
-    GET_INT(OLC_MOB(d)) = LIMIT(i, 11, 25);
+    GET_INT(OLC_MOB(d)) = LIMIT(i, 3, 25);
+    OLC_MOB(d)->real_abils.intel = GET_INT(OLC_MOB(d));
     OLC_VAL(d) = TRUE;
     medit_disp_stats_menu(d);
     return;
 
   case MEDIT_WIS:
-    GET_WIS(OLC_MOB(d)) = LIMIT(i, 11, 25);
+    GET_WIS(OLC_MOB(d)) = LIMIT(i, 3, 25);
+    OLC_MOB(d)->real_abils.wis = GET_WIS(OLC_MOB(d));
     OLC_VAL(d) = TRUE;
     medit_disp_stats_menu(d);
     return;
 
   case MEDIT_DEX:
-    GET_DEX(OLC_MOB(d)) = LIMIT(i, 11, 25);
+    GET_DEX(OLC_MOB(d)) = LIMIT(i, 3, 25);
+    OLC_MOB(d)->real_abils.dex = GET_DEX(OLC_MOB(d));
     OLC_VAL(d) = TRUE;
     medit_disp_stats_menu(d);
     return;
 
   case MEDIT_CON:
-    GET_CON(OLC_MOB(d)) = LIMIT(i, 11, 25);
+    GET_CON(OLC_MOB(d)) = LIMIT(i, 3, 25);
+    OLC_MOB(d)->real_abils.con = GET_CON(OLC_MOB(d));
     OLC_VAL(d) = TRUE;
     medit_disp_stats_menu(d);
     return;
 
   case MEDIT_CHA:
-    GET_CHA(OLC_MOB(d)) = LIMIT(i, 11, 25);
+    GET_CHA(OLC_MOB(d)) = LIMIT(i, 3, 25);
+    OLC_MOB(d)->real_abils.cha = GET_CHA(OLC_MOB(d));
     OLC_VAL(d) = TRUE;
     medit_disp_stats_menu(d);
     return;
@@ -1298,10 +1311,11 @@ void medit_autoroll_stats(struct descriptor_data *d)
   GET_DAMROLL(OLC_MOB(d)) = mob_lev/6;           /* damroll (dam bonus) 0-5 */
 
   GET_HITROLL(OLC_MOB(d)) = mob_lev/3;           /* hitroll 0-10            */
-  GET_EXP(OLC_MOB(d))     = 0;                   /* additive bonus XP defaults to none */
   OLC_MOB(d)->mob_specials.gold_min = MAX(0, mob_lev * 3);
   OLC_MOB(d)->mob_specials.gold_max = MAX(OLC_MOB(d)->mob_specials.gold_min, mob_lev * 6);
   GET_AC(OLC_MOB(d))      = (mob_lev * 6);       /* Armor 6 to 180          */
+  GET_EVASION(OLC_MOB(d)) = mob_lev;             /* Evasion baseline        */
+  GET_MOB_WIMP_LEV(OLC_MOB(d)) = mob_lev;        /* Wimpy threshold         */
 
   /* 'Advanced' stats are only rolled if advanced options are enabled */
   if (CONFIG_MEDIT_ADVANCED) {
@@ -1311,6 +1325,12 @@ void medit_autoroll_stats(struct descriptor_data *d)
     GET_DEX(OLC_MOB(d))     = LIMIT((mob_lev*2)/3, 11, 18);
     GET_CON(OLC_MOB(d))     = LIMIT((mob_lev*2)/3, 11, 18);
     GET_CHA(OLC_MOB(d))     = LIMIT((mob_lev*2)/3, 11, 18);
+    OLC_MOB(d)->real_abils.str   = GET_STR(OLC_MOB(d));
+    OLC_MOB(d)->real_abils.intel = GET_INT(OLC_MOB(d));
+    OLC_MOB(d)->real_abils.wis   = GET_WIS(OLC_MOB(d));
+    OLC_MOB(d)->real_abils.dex   = GET_DEX(OLC_MOB(d));
+    OLC_MOB(d)->real_abils.con   = GET_CON(OLC_MOB(d));
+    OLC_MOB(d)->real_abils.cha   = GET_CHA(OLC_MOB(d));
 
     GET_SAVE(OLC_MOB(d), SAVING_PARA)   = mob_lev / 4;  /* All Saving throws */
     GET_SAVE(OLC_MOB(d), SAVING_ROD)    = mob_lev / 4;  /* set to a quarter  */

@@ -1744,6 +1744,10 @@ static void interpret_espec(const char *keyword, const char *value, int i, int n
     RANGE(0, 30000);
     mob_proto[i].mob_specials.wimpy_threshold = num_arg;
   }
+  CASE("Evasion") {
+    RANGE(0, 200);
+    GET_EVASION(&mob_proto[i]) = num_arg;
+  }
   CASE("SavingPara") {
     RANGE(0, 100);
     mob_proto[i].char_specials.saved.apply_saving_throw[SAVING_PARA] = num_arg;

@@ -291,6 +291,8 @@ extern const char *nrm, *grn, *cyn, *yel;
 #define MEDIT_PET_PRICE                 40
 #define MEDIT_WIMPY_THRESH              41
 #define MEDIT_LEVEL_AUTOFILL_CONFIRM    42
+#define MEDIT_EVASION                   43
+#define MEDIT_STR_ADD                   44
 
 /* Submodes of SEDIT connectedness. */
 #define SEDIT_MAIN_MENU              	0
