@@ -6,7 +6,7 @@ An adorable little field mouse is here.
 This adorable little field mouse scurries around the plains, just trying to survive day to day.
 ~
 200 0 0 0 2048 0 0 0 0 E
-10 19 20 1d4+50 1d2+0
+10 19 0 1d4+50 1d2+0
 0 7
 8 8 3
 BareHandAttack: 4
