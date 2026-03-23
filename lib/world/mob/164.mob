@@ -1,12 +1,12 @@
 #16400
 field mouse~
-a field mouse.~
+a field mouse~
 An adorable little field mouse is here.
 ~
 This adorable little field mouse scurries around the plains, just trying to survive day to day.
 ~
 200 0 0 0 2048 0 0 0 0 E
-10 17 3 2d3+80 1d2+2
+10 19 20 1d4+50 1d2+0
 0 7
 8 8 3
 BareHandAttack: 4
@@ -16,9 +16,9 @@ SavingRod: 2
 SavingPetri: 2
 SavingBreath: 2
 SavingSpell: 2
-Wimpy: 10
-Evasion: 2
-GoldMin: 30
-GoldMax: 60
+Wimpy: 5
+Evasion: 3
+GoldMin: 10
+GoldMax: 20
 E
 $
