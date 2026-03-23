@@ -152,7 +152,13 @@ ACMD(do_oasis_medit)
   /* Find the zone. */
   OLC_ZNUM(d) = save ? real_zone(number) : real_zone_by_thing(number);
   if (OLC_ZNUM(d) == NOWHERE) {
-    send_to_char(ch, "Sorry, there is no zone for that number!\r\n");
+    if (save) {
+      send_to_char(ch, "Zone %d does not exist.\r\n", number);
+    } else if (real_mobile(number) == NOBODY) {
+      send_to_char(ch, "Mobile vnum %d does not exist and no zone owns that vnum.\r\n", number);
+    } else {
+      send_to_char(ch, "Mobile vnum %d exists but is not in any valid editable zone range.\r\n", number);
+    }
     free(d->olc);
     d->olc = NULL;
     return;
@@ -535,6 +541,8 @@ static void medit_disp_stats_menu(struct descriptor_data *d)
   "-- Mob Number:  %s[%s%d%s]%s\r\n"
   "(%s1%s) Level:       %s[%s%4d%s]%s\r\n"
   "(%s2%s) %sAuto Set Stats (based on level)%s\r\n\r\n"
+  "    Tip: After changing level, use Auto Set Stats to prefill recommended values.\r\n"
+  "         You can also accept the immediate Y/N prompt after a level change.\r\n\r\n"
   "Hit Points  (xdy+z):        Bare Hand Damage (xdy+z): \r\n"
   "(%s3%s) HP NumDice:  %s[%s%5d%s]%s    (%s6%s) BHD NumDice:  %s[%s%5d%s]%s\r\n"
   "(%s4%s) HP SizeDice: %s[%s%5d%s]%s    (%s7%s) BHD SizeDice: %s[%s%5d%s]%s\r\n"
@@ -598,11 +606,18 @@ void medit_parse(struct descriptor_data *d, char *arg)
   char *oldtext = NULL;
 
   if (OLC_MODE(d) > MEDIT_NUMERICAL_RESPONSE) {
-    i = atoi(arg);
-    if (!*arg || (!isdigit(arg[0]) && ((*arg == '-') && !isdigit(arg[1])))) {
+    char *endptr = NULL;
+    long parsed;
+
+    parsed = strtol(arg, &endptr, 10);
+    while (endptr && *endptr && isspace((unsigned char)*endptr))
+      endptr++;
+
+    if (!*arg || endptr == arg || (endptr && *endptr != '\0')) {
       write_to_output(d, "Try again : ");
       return;
     }
+    i = (int)parsed;
   } else {	/* String response. */
     if (!genolc_checkstring(d, arg))
       return;
@@ -1179,8 +1194,35 @@ void medit_parse(struct descriptor_data *d, char *arg)
     break;
 
   case MEDIT_LEVEL:
-    GET_LEVEL(OLC_MOB(d)) = LIMIT(i, 1, LVL_IMPL);
+  {
+    int old_level = GET_LEVEL(OLC_MOB(d));
+    int new_level = LIMIT(i, 1, LVL_IMPL);
+
+    GET_LEVEL(OLC_MOB(d)) = new_level;
     OLC_VAL(d) = TRUE;
+    if (new_level != old_level) {
+      OLC_MODE(d) = MEDIT_LEVEL_AUTOFILL_CONFIRM;
+      write_to_output(d, "Apply recommended stats for level %d? (Y/N): ", new_level);
+      return;
+    }
+    medit_disp_stats_menu(d);
+    return;
+  }
+
+  case MEDIT_LEVEL_AUTOFILL_CONFIRM:
+    switch (*arg) {
+    case 'y':
+    case 'Y':
+      medit_autoroll_stats(d);
+      OLC_VAL(d) = TRUE;
+      break;
+    case 'n':
+    case 'N':
+      break;
+    default:
+      write_to_output(d, "Please answer Y or N: ");
+      return;
+    }
     medit_disp_stats_menu(d);
     return;
 
