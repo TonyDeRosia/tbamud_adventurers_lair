@@ -4367,6 +4367,19 @@ ACMD(do_consider)
     send_to_char(ch, "Are you mad!?\r\n");
   else if (diff <= 100)
     send_to_char(ch, "You ARE mad!\r\n");
+
+  if (AFF_FLAGGED(ch, AFF_DETECT_ALIGN)) {
+    if (GET_ALIGNMENT(victim) >= 800)
+      send_to_char(ch, "You sense a deeply benevolent presence.\r\n");
+    else if (GET_ALIGNMENT(victim) >= 300)
+      send_to_char(ch, "There is a faint sense of virtue about them.\r\n");
+    else if (GET_ALIGNMENT(victim) <= -800)
+      send_to_char(ch, "They radiate a deeply malevolent aura.\r\n");
+    else if (GET_ALIGNMENT(victim) <= -300)
+      send_to_char(ch, "Something about them feels off.\r\n");
+    else
+      send_to_char(ch, "You sense little moral weight from them.\r\n");
+  }
 }
 
 ACMD(do_diagnose)
