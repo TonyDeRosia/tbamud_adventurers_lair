@@ -1166,12 +1166,12 @@ void redit_parse(struct descriptor_data *d, char *arg)
     switch (*arg) {
       case 'a':
       case 'A':
-        write_to_output(d, "Enter mob vnum and max existing (0 to cancel): ");
+        write_to_output(d, "Enter mob vnum and max existing (1-%d, 0 to cancel): ", MAX_DUPLICATES);
         OLC_MODE(d) = REDIT_RESETS_ADD_MOB;
         return;
       case 'b':
       case 'B':
-        write_to_output(d, "Enter object vnum and max existing (0 to cancel): ");
+        write_to_output(d, "Enter object vnum and max existing (1-%d, 0 to cancel): ", MAX_DUPLICATES);
         OLC_MODE(d) = REDIT_RESETS_ADD_OBJ;
         return;
       case 'd':
@@ -1223,8 +1223,8 @@ void redit_parse(struct descriptor_data *d, char *arg)
     }
 
     max_existing = atoi(max_arg);
-    if (max_existing < 0 || max_existing > MAX_DUPLICATES) {
-      write_to_output(d, "Max existing must be between 0 and %d.\r\n", MAX_DUPLICATES);
+    if (max_existing <= 0 || max_existing > MAX_DUPLICATES) {
+      write_to_output(d, "Max existing must be between 1 and %d.\r\n", MAX_DUPLICATES);
       redit_disp_resets_menu(d);
       return;
     }
@@ -1275,8 +1275,8 @@ void redit_parse(struct descriptor_data *d, char *arg)
     }
 
     max_existing = atoi(max_arg);
-    if (max_existing < 0 || max_existing > MAX_DUPLICATES) {
-      write_to_output(d, "Max existing must be between 0 and %d.\r\n", MAX_DUPLICATES);
+    if (max_existing <= 0 || max_existing > MAX_DUPLICATES) {
+      write_to_output(d, "Max existing must be between 1 and %d.\r\n", MAX_DUPLICATES);
       redit_disp_resets_menu(d);
       return;
     }
