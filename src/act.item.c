@@ -58,13 +58,41 @@ static void perform_remove(struct char_data *ch, int pos);
 /* do_wear utility functions */
 static void perform_wear(struct char_data *ch, struct obj_data *obj, int where);
 static void wear_message(struct char_data *ch, struct obj_data *obj, int where);
+static int is_kept_item_for(struct char_data *ch, struct obj_data *obj);
+static int reject_kept_item_action(struct char_data *ch, struct obj_data *obj);
 
 
 
+
+static int is_kept_item_for(struct char_data *ch, struct obj_data *obj)
+{
+  if (!ch || !obj)
+    return FALSE;
+
+  if (!OBJ_FLAGGED(obj, ITEM_KEPT))
+    return FALSE;
+
+  if (obj->carried_by == ch || obj->worn_by == ch)
+    return TRUE;
+
+  return FALSE;
+}
+
+static int reject_kept_item_action(struct char_data *ch, struct obj_data *obj)
+{
+  if (!is_kept_item_for(ch, obj))
+    return FALSE;
+
+  act("You are keeping $p safe. Unlock it first.", FALSE, ch, obj, 0, TO_CHAR);
+  return TRUE;
+}
 
 static void perform_put(struct char_data *ch, struct obj_data *obj, struct obj_data *cont)
 {
   long object_id = obj_script_id(obj);
+
+  if (reject_kept_item_action(ch, obj))
+    return;
 
   if (!drop_otrigger(obj, ch))
     return;
@@ -480,6 +508,8 @@ static int perform_drop(struct char_data *ch, struct obj_data *obj,
     act(buf, FALSE, ch, obj, 0, TO_CHAR);
     return (0);
   }
+  if (reject_kept_item_action(ch, obj))
+    return (0);
 
   snprintf(buf, sizeof(buf), "You %s $p.%s", sname, VANISH(mode));
   act(buf, FALSE, ch, obj, 0, TO_CHAR);
@@ -713,6 +743,8 @@ static void perform_give(struct char_data *ch, struct char_data *vict,
     act("You can't let go of $p!!  Yeech!", FALSE, ch, obj, 0, TO_CHAR);
     return;
   }
+  if (reject_kept_item_action(ch, obj))
+    return;
   if (IS_CARRYING_N(vict) >= CAN_CARRY_N(vict) && GET_LEVEL(ch) < LVL_IMMORT && GET_LEVEL(vict) < LVL_IMMORT) {
     act("$N seems to have $S hands full.", FALSE, ch, 0, vict, TO_CHAR);
     return;
@@ -1797,6 +1829,62 @@ ACMD(do_remove)
   }
 }
 
+ACMD(do_ilock)
+{
+  char arg[MAX_INPUT_LENGTH];
+  struct obj_data *obj = NULL;
+  struct char_data *tmp_char = NULL;
+
+  one_argument(argument, arg);
+
+  if (!*arg) {
+    send_to_char(ch, "Lock which item?\r\n");
+    return;
+  }
+
+  generic_find(arg, FIND_OBJ_INV | FIND_OBJ_EQUIP, ch, &tmp_char, &obj);
+  if (!obj) {
+    send_to_char(ch, "You don't seem to have that item.\r\n");
+    return;
+  }
+
+  if (OBJ_FLAGGED(obj, ITEM_KEPT)) {
+    act("You are already keeping $p safe.", FALSE, ch, obj, 0, TO_CHAR);
+    return;
+  }
+
+  SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_KEPT);
+  act("You mark $p to be kept safe.", FALSE, ch, obj, 0, TO_CHAR);
+}
+
+ACMD(do_iunlock)
+{
+  char arg[MAX_INPUT_LENGTH];
+  struct obj_data *obj = NULL;
+  struct char_data *tmp_char = NULL;
+
+  one_argument(argument, arg);
+
+  if (!*arg) {
+    send_to_char(ch, "Unlock which item?\r\n");
+    return;
+  }
+
+  generic_find(arg, FIND_OBJ_INV | FIND_OBJ_EQUIP, ch, &tmp_char, &obj);
+  if (!obj) {
+    send_to_char(ch, "You don't seem to have that item.\r\n");
+    return;
+  }
+
+  if (!OBJ_FLAGGED(obj, ITEM_KEPT)) {
+    act("You are not keeping $p safe.", FALSE, ch, obj, 0, TO_CHAR);
+    return;
+  }
+
+  REMOVE_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_KEPT);
+  act("You remove the keep protection from $p.", FALSE, ch, obj, 0, TO_CHAR);
+}
+
 ACMD(do_sac)
 {
   char arg[MAX_INPUT_LENGTH];
@@ -1813,6 +1901,9 @@ ACMD(do_sac)
     send_to_char(ch, "It doesn't seem to be here.\n\r");
     return;
   }
+
+  if (reject_kept_item_action(ch, j))
+    return;
 
   if (!CAN_WEAR(j, ITEM_WEAR_TAKE)) {
     send_to_char(ch, "You can't sacrifice that!\n\r");
@@ -2159,6 +2250,8 @@ ACMD(do_auction)
     send_to_char(ch, "You cannot auction that item.\r\n");
     return;
   }
+  if (reject_kept_item_action(ch, obj))
+    return;
   if (live_auction.obj) {
     send_to_char(ch, "There is already an auction in progress.\r\n");
     return;

@@ -242,10 +242,12 @@ cpp_extern const struct command_info cmd_info[] = {
   { "immlist"  , "imm"     , POS_DEAD    , do_gen_ps   , 0, SCMD_IMMLIST },
   { "info"     , "info"    , POS_SLEEPING, do_gen_ps   , 0, SCMD_INFO },
   { "invis"    , "invi"    , POS_DEAD    , do_invis    , LVL_IMMORT, 0 },
+  { "ilock"    , "ilock"   , POS_RESTING , do_ilock    , 0, 0 },
 
   { "junk"     , "j"       , POS_RESTING , do_drop     , 0, SCMD_JUNK },
 
   { "kill"     , "k"       , POS_FIGHTING, do_kill     , 0, 0 },
+  { "keep"     , "keep"    , POS_RESTING , do_ilock    , 0, 0 },
   { "kick"     , "ki"      , POS_FIGHTING, do_kick     , 1, 0 },
 
   { "look"     , "l"       , POS_RESTING , do_look     , 0, SCMD_LOOK },
@@ -414,8 +416,10 @@ cpp_extern const struct command_info cmd_info[] = {
   { "tstat"    , "tstat"   , POS_DEAD    , do_tstat    , LVL_BUILDER, 0 },
 
   { "unlock"   , "unlock"  , POS_SITTING , do_gen_door , 0, SCMD_UNLOCK },
+  { "iunlock"  , "iunlock" , POS_RESTING , do_iunlock  , 0, 0 },
   { "unban"    , "unban"   , POS_DEAD    , do_unban    , LVL_GRGOD, 0 },
   { "unaffect" , "unaffect", POS_DEAD    , do_wizutil  , LVL_GOD, SCMD_UNAFFECT },
+  { "unkeep"   , "unkeep"  , POS_RESTING , do_iunlock  , 0, 0 },
   { "unpull"   , "unpull"  , POS_DEAD    , do_unpull   , LVL_GRGOD, 0 },
   { "unfollow" , "unf"     , POS_RESTING , do_unfollow , 0, 0 },
   { "uptime"   , "uptime"  , POS_DEAD    , do_date     , LVL_GOD, SCMD_UPTIME },

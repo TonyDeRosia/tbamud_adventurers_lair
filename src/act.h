@@ -143,6 +143,8 @@ ACMD(do_drink);
 ACMD(do_get);
 ACMD(do_give);
 ACMD(do_grab);
+ACMD(do_ilock);
+ACMD(do_iunlock);
 ACMD(do_put);
 ACMD(do_remove);
 ACMD(do_sac);

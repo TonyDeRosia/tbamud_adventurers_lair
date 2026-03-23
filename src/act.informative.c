@@ -191,6 +191,8 @@ static void list_obj_to_char(struct obj_data *list, struct char_data *ch, int mo
 static void show_obj_to_char(struct obj_data *obj, struct char_data *ch, int mode);
 static void show_obj_modifiers(struct obj_data *obj, struct char_data *ch);
 static void build_obj_aura_tags(struct obj_data *obj, struct char_data *ch, char *out, size_t outsz, int include_item_tag);
+static void build_player_kept_marker(struct obj_data *obj, struct char_data *ch, char *out, size_t outsz);
+static void out_append(char *dst, size_t dstsz, const char *src);
 /* do_where utility functions */
 static void perform_immort_where(char_data *ch, const char *arg);
 static void perform_mortal_where(struct char_data *ch, char *arg);
@@ -261,7 +263,11 @@ static void show_obj_to_char(struct obj_data *obj, struct char_data *ch, int mod
           send_to_char(ch, "[TRIGS] ");
       }
     }
-    build_obj_aura_tags(obj, ch, obj_tags, sizeof(obj_tags), TRUE);
+    if (!IS_NPC(ch) && GET_LEVEL(ch) < LVL_IMMORT &&
+        (obj->carried_by == ch || obj->worn_by == ch))
+      build_player_kept_marker(obj, ch, obj_tags, sizeof(obj_tags));
+    else
+      build_obj_aura_tags(obj, ch, obj_tags, sizeof(obj_tags), TRUE);
     send_to_char(ch, "%s%s", obj_tags, obj->short_description);
     break;
 
@@ -309,6 +315,16 @@ static void show_obj_modifiers(struct obj_data *obj, struct char_data *ch)
 
   build_obj_aura_tags(obj, ch, obj_tags, sizeof(obj_tags), TRUE);
   send_to_char(ch, " %s", obj_tags);
+}
+
+static void build_player_kept_marker(struct obj_data *obj, struct char_data *ch, char *out, size_t outsz)
+{
+  if (!out || outsz == 0)
+    return;
+
+  out[0] = '\0';
+  if (obj && OBJ_FLAGGED(obj, ITEM_KEPT))
+    out_append(out, outsz, "\tr[Kept]\tn ");
 }
 
 static void list_obj_to_char(struct obj_data *list, struct char_data *ch, int mode, int show)
@@ -3108,8 +3124,10 @@ ACMD(do_equipment)
 
     if (CAN_SEE_OBJ(ch, obj)) {
       char obj_tags[256];
-
-      build_obj_aura_tags(obj, ch, obj_tags, sizeof(obj_tags), FALSE);
+      if (!IS_NPC(ch) && GET_LEVEL(ch) < LVL_IMMORT)
+        build_player_kept_marker(obj, ch, obj_tags, sizeof(obj_tags));
+      else
+        build_obj_aura_tags(obj, ch, obj_tags, sizeof(obj_tags), FALSE);
       send_to_char(ch, "%s%s\r\n", obj_tags, obj->short_description);
     } else {
       send_to_char(ch, "Something.\r\n");
