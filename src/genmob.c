@@ -327,6 +327,8 @@ int save_mobiles(zone_rnum rznum)
 
 int write_mobile_espec(mob_vnum mvnum, struct char_data *mob, FILE *fd)
 {
+  int i;
+
   if (GET_ATTACK(mob) != 0)
     fprintf(fd, "BareHandAttack: %d\n", GET_ATTACK(mob));
   if (GET_STR(mob) != 11)
@@ -365,6 +367,18 @@ int write_mobile_espec(mob_vnum mvnum, struct char_data *mob, FILE *fd)
     fprintf(fd, "GoldMin: %lld\n", (long long)mob->mob_specials.gold_min);
     fprintf(fd, "GoldMax: %lld\n", (long long)mob->mob_specials.gold_max);
   }
+  for (i = 0; i < mob->mob_specials.equip_loadout_count; i++)
+    fprintf(fd, "EquipItem: %d %d\n",
+            mob->mob_specials.equip_loadout[i].vnum,
+            mob->mob_specials.equip_loadout[i].wear_pos);
+  for (i = 0; i < mob->mob_specials.inventory_loadout_count; i++)
+    fprintf(fd, "InvItem: %d %d\n",
+            mob->mob_specials.inventory_loadout[i].vnum,
+            mob->mob_specials.inventory_loadout[i].count);
+  for (i = 0; i < mob->mob_specials.loot_table_count; i++)
+    fprintf(fd, "LootItem: %d %d\n",
+            mob->mob_specials.loot_table[i].vnum,
+            mob->mob_specials.loot_table[i].chance);
 fputs("E\n", fd);
   return TRUE;
 }

@@ -433,6 +433,9 @@ void clanedit_parse(struct descriptor_data *d, char *arg);
 /** Total number of available equipment lcoations */
 #define NUM_WEARS      17
 
+#define MAX_MOB_LOADOUT_ITEMS 32
+#define MAX_MOB_LOOT_ITEMS    32
+
 /* object-related defines */
 /* Item types: used by obj_data.obj_flags.type_flag */
 #define ITEM_LIGHT      1		/**< Item is a light source	*/
@@ -1156,6 +1159,24 @@ struct player_special_data
 /** Special data used by NPCs, not PCs */
 struct mob_special_data
 {
+  struct mob_equip_entry {
+    obj_vnum vnum;
+    byte wear_pos;
+  } equip_loadout[MAX_MOB_LOADOUT_ITEMS];
+  int equip_loadout_count;
+
+  struct mob_inventory_entry {
+    obj_vnum vnum;
+    int count;
+  } inventory_loadout[MAX_MOB_LOADOUT_ITEMS];
+  int inventory_loadout_count;
+
+  struct mob_loot_entry {
+    obj_vnum vnum;
+    int chance; /* 1-100 percent */
+  } loot_table[MAX_MOB_LOOT_ITEMS];
+  int loot_table_count;
+
   memory_rec *memory; /**< List of PCs to remember */
   byte attack_type;   /**< The primary attack type (bite, sting, hit, etc.) */
   byte default_pos;   /**< Default position (standing, sleeping, etc.) */

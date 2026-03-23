@@ -143,6 +143,7 @@ static void parse_simple_mob(FILE *mob_f, int i, int nr);
 static void interpret_espec(const char *keyword, const char *value, int i, int nr);
 static void parse_espec(char *buf, int i, int nr);
 static void parse_enhanced_mob(FILE *mob_f, int i, int nr);
+static void apply_mob_loadout(struct char_data *mob);
 static void get_one_line(FILE *fl, char *buf);
 static void check_start_rooms(void);
 static void renum_zone_table(void);
@@ -1740,6 +1741,54 @@ static void interpret_espec(const char *keyword, const char *value, int i, int n
   CASE("GoldMax") {
     mob_proto[i].mob_specials.gold_max = atoll(value);
   }
+
+  if (value && !matched && !str_cmp(keyword, "EquipItem")) {
+    int vnum, wear_pos;
+    matched = TRUE;
+    if (sscanf(value, "%d %d", &vnum, &wear_pos) == 2) {
+      if (mob_proto[i].mob_specials.equip_loadout_count < MAX_MOB_LOADOUT_ITEMS) {
+        int idx = mob_proto[i].mob_specials.equip_loadout_count++;
+        mob_proto[i].mob_specials.equip_loadout[idx].vnum = vnum;
+        mob_proto[i].mob_specials.equip_loadout[idx].wear_pos = LIMIT(wear_pos, 0, NUM_WEARS - 1);
+      } else {
+        log("SYSERR: Mob #%d exceeds MAX_MOB_LOADOUT_ITEMS for EquipItem.", nr);
+      }
+    } else {
+      log("SYSERR: Bad EquipItem format in mob #%d", nr);
+    }
+  }
+
+  if (value && !matched && !str_cmp(keyword, "InvItem")) {
+    int vnum, count;
+    matched = TRUE;
+    if (sscanf(value, "%d %d", &vnum, &count) == 2) {
+      if (mob_proto[i].mob_specials.inventory_loadout_count < MAX_MOB_LOADOUT_ITEMS) {
+        int idx = mob_proto[i].mob_specials.inventory_loadout_count++;
+        mob_proto[i].mob_specials.inventory_loadout[idx].vnum = vnum;
+        mob_proto[i].mob_specials.inventory_loadout[idx].count = MAX(1, count);
+      } else {
+        log("SYSERR: Mob #%d exceeds MAX_MOB_LOADOUT_ITEMS for InvItem.", nr);
+      }
+    } else {
+      log("SYSERR: Bad InvItem format in mob #%d", nr);
+    }
+  }
+
+  if (value && !matched && !str_cmp(keyword, "LootItem")) {
+    int vnum, chance;
+    matched = TRUE;
+    if (sscanf(value, "%d %d", &vnum, &chance) == 2) {
+      if (mob_proto[i].mob_specials.loot_table_count < MAX_MOB_LOOT_ITEMS) {
+        int idx = mob_proto[i].mob_specials.loot_table_count++;
+        mob_proto[i].mob_specials.loot_table[idx].vnum = vnum;
+        mob_proto[i].mob_specials.loot_table[idx].chance = LIMIT(chance, 0, 100);
+      } else {
+        log("SYSERR: Mob #%d exceeds MAX_MOB_LOOT_ITEMS for LootItem.", nr);
+      }
+    } else {
+      log("SYSERR: Bad LootItem format in mob #%d", nr);
+    }
+  }
   CASE("Wimpy") {
     RANGE(0, 30000);
     mob_proto[i].mob_specials.wimpy_threshold = num_arg;
@@ -2538,6 +2587,81 @@ void new_mobile_data(struct char_data *ch)
   ch->group    = NULL;
 }
 
+static int mob_slot_required_wear_flag(int wear_pos)
+{
+  switch (wear_pos) {
+    case WEAR_LIGHT:    return ITEM_WEAR_TAKE;
+    case WEAR_FINGER_R:
+    case WEAR_FINGER_L: return ITEM_WEAR_FINGER;
+    case WEAR_NECK_1:   return ITEM_WEAR_NECK;
+    case WEAR_BODY:     return ITEM_WEAR_BODY;
+    case WEAR_HEAD:     return ITEM_WEAR_HEAD;
+    case WEAR_LEGS:     return ITEM_WEAR_LEGS;
+    case WEAR_FEET:     return ITEM_WEAR_FEET;
+    case WEAR_HANDS:    return ITEM_WEAR_HANDS;
+    case WEAR_ARMS:     return ITEM_WEAR_ARMS;
+    case WEAR_SHIELD:   return ITEM_WEAR_SHIELD;
+    case WEAR_ABOUT:    return ITEM_WEAR_ABOUT;
+    case WEAR_WAIST:    return ITEM_WEAR_WAIST;
+    case WEAR_WRIST_R:
+    case WEAR_WRIST_L:  return ITEM_WEAR_WRIST;
+    case WEAR_WIELD:    return ITEM_WEAR_WIELD;
+    case WEAR_HOLD:     return ITEM_WEAR_TAKE;
+    default:            return ITEM_WEAR_TAKE;
+  }
+}
+
+static int mob_object_can_equip_slot(struct obj_data *obj, int wear_pos)
+{
+  if (!obj || wear_pos < 0 || wear_pos >= NUM_WEARS)
+    return FALSE;
+
+  if (wear_pos == WEAR_HOLD && GET_OBJ_TYPE(obj) == ITEM_WEAPON && OBJ_FLAGGED(obj, ITEM_OFFHAND))
+    return TRUE;
+
+  return CAN_WEAR(obj, mob_slot_required_wear_flag(wear_pos));
+}
+
+static void apply_mob_loadout(struct char_data *mob)
+{
+  int i, j;
+
+  if (!mob || !IS_NPC(mob))
+    return;
+
+  for (i = 0; i < mob->mob_specials.equip_loadout_count; i++) {
+    int wear_pos = mob->mob_specials.equip_loadout[i].wear_pos;
+    obj_rnum ornum = real_object(mob->mob_specials.equip_loadout[i].vnum);
+    struct obj_data *obj;
+
+    if (ornum == NOTHING || wear_pos < 0 || wear_pos >= NUM_WEARS || GET_EQ(mob, wear_pos))
+      continue;
+
+    obj = read_object(ornum, REAL);
+    if (!obj)
+      continue;
+
+    if (mob_object_can_equip_slot(obj, wear_pos))
+      equip_char(mob, obj, wear_pos);
+    else
+      obj_to_char(obj, mob);
+  }
+
+  for (i = 0; i < mob->mob_specials.inventory_loadout_count; i++) {
+    obj_rnum ornum = real_object(mob->mob_specials.inventory_loadout[i].vnum);
+    int count = MAX(1, mob->mob_specials.inventory_loadout[i].count);
+    if (ornum == NOTHING)
+      continue;
+
+    for (j = 0; j < count; j++) {
+      struct obj_data *obj = read_object(ornum, REAL);
+      if (!obj)
+        break;
+      obj_to_char(obj, mob);
+    }
+  }
+}
+
 
 /* create a new mobile from a prototype */
 struct char_data *read_mobile(mob_vnum nr, int type) /* and mob_rnum */
@@ -2584,6 +2708,7 @@ struct char_data *read_mobile(mob_vnum nr, int type) /* and mob_rnum */
 
   copy_proto_script(&mob_proto[i], mob, MOB_TRIGGER);
   assign_triggers(mob, MOB_TRIGGER);
+  apply_mob_loadout(mob);
 
   if (MOB_FLAGGED(mob, MOB_AI_ACTOR))
     ai_actor_refresh_profile(mob, TRUE);
