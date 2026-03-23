@@ -20,31 +20,32 @@ static void remove_cmd_from_list(struct reset_com **list, int pos);
 /* real zone of room/mobile/object/shop given */
 zone_rnum real_zone_by_thing(room_vnum vznum)
 {
-  zone_rnum bot, top, mid;
+  zone_rnum znum, best = NOWHERE;
   int low, high;
+  int best_span = 0;
 
-  bot = 0;
-  top = top_of_zone_table;
+  if (top_of_zone_table < 0)
+    return NOWHERE;
 
-  if (genolc_zone_bottom(bot) > vznum || zone_table[top].top < vznum)
-    return (NOWHERE);
+  /*
+   * Do a full scan instead of binary search.
+   * Some worlds include zone index entries that are not sorted by bottom vnum
+   * (for example test/reserved zones appended at the end). A binary search on
+   * unsorted data can report NOWHERE for valid vnums.
+   */
+  for (znum = 0; znum <= top_of_zone_table; znum++) {
+    low = genolc_zone_bottom(znum);
+    high = zone_table[znum].top;
 
-  /* perform binary search on zone-table */
-  while (bot <= top) {
-    mid = (bot + top) / 2;
-
-    /* Upper/lower bounds of the zone. */
-    low = genolc_zone_bottom(mid);
-    high = zone_table[mid].top;
-
-    if (low <= vznum && vznum <= high)
-      return mid;
-    if (low > vznum)
-      top = mid - 1;
-    else
-      bot = mid + 1;
+    if (low <= vznum && vznum <= high) {
+      int span = high - low;
+      if (best == NOWHERE || span < best_span) {
+        best = znum;
+        best_span = span;
+      }
+    }
   }
-  return (NOWHERE);
+  return best;
 }
 
 zone_rnum create_new_zone(zone_vnum vzone_num, room_vnum bottom, room_vnum top, const char **error)
@@ -586,4 +587,3 @@ void delete_zone_command(struct zone_data *zone, int pos)
   /* Ok, let's zap it. */
   remove_cmd_from_list(&zone->cmd, pos);
 }
-
