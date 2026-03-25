@@ -903,6 +903,51 @@ static int can_use_practice_trainer(struct char_data *ch)
   return FALSE;
 }
 
+static int parse_profession_learn_alias(const char *arg, int *skill_id, int *trainer_flag, const char **profession_name)
+{
+  if (!arg || !*arg)
+    return FALSE;
+
+  if (!str_cmp(arg, "scrib") || !str_cmp(arg, "scribe") || !str_cmp(arg, "scribing")) {
+    *skill_id = SKILL_SCRIBING;
+    *trainer_flag = MOB_TEACH_SCRIBING;
+    *profession_name = "scribing";
+    return TRUE;
+  }
+
+  if (!str_cmp(arg, "alch") || !str_cmp(arg, "alchemy")) {
+    *skill_id = SKILL_ALCHEMY;
+    *trainer_flag = MOB_TEACH_ALCHEMY;
+    *profession_name = "alchemy";
+    return TRUE;
+  }
+
+  if (!str_cmp(arg, "ench") || !str_cmp(arg, "enchant") || !str_cmp(arg, "enchanting")) {
+    *skill_id = SKILL_ENCHANTING;
+    *trainer_flag = MOB_TEACH_ENCHANTING;
+    *profession_name = "enchanting";
+    return TRUE;
+  }
+
+  return FALSE;
+}
+
+static int has_profession_trainer_in_room(struct char_data *ch, int trainer_flag)
+{
+  struct char_data *trainer;
+
+  for (trainer = world[IN_ROOM(ch)].people; trainer; trainer = trainer->next_in_room) {
+    if (!IS_NPC(trainer))
+      continue;
+    if (MOB_FLAGGED(trainer, MOB_NOTDEADYET))
+      continue;
+    if (MOB_FLAGGED(trainer, trainer_flag))
+      return TRUE;
+  }
+
+  return FALSE;
+}
+
 static int study_is_valid_ability_id(int id)
 {
   return (id > 0 &&
@@ -1556,6 +1601,37 @@ ACMD(do_practice)
   }
 
   list_known_abilities(ch);
+}
+
+ACMD(do_learn)
+{
+  char arg[MAX_INPUT_LENGTH];
+  int profession_skill = 0;
+  int trainer_flag = 0;
+  const char *profession_name = NULL;
+
+  if (IS_NPC(ch))
+    return;
+
+  one_argument(argument, arg);
+
+  if (!parse_profession_learn_alias(arg, &profession_skill, &trainer_flag, &profession_name)) {
+    send_to_char(ch, "You can only learn: scribing, alchemy, or enchanting.\r\n");
+    return;
+  }
+
+  if (!has_profession_trainer_in_room(ch, trainer_flag)) {
+    send_to_char(ch, "There is no one here who can teach you that.\r\n");
+    return;
+  }
+
+  if (GET_SKILL(ch, profession_skill) > 0) {
+    send_to_char(ch, "You already know the basics of that profession.\r\n");
+    return;
+  }
+
+  SET_SKILL(ch, profession_skill, 1);
+  send_to_char(ch, "You learn the basics of %s.\r\n", profession_name);
 }
 
 ACMD(do_buypractice)

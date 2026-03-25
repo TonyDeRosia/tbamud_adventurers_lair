@@ -303,6 +303,7 @@ cpp_extern const struct command_info cmd_info[] = {
   { "pick"     , "pi"      , POS_STANDING, do_gen_door , 1, SCMD_PICK },
   { "buypractice", "buyprac", POS_RESTING , do_buypractice , 0, 0 },
   { "buytrain" , "buytr"   , POS_RESTING , do_buytrain , 0, 0 },
+  { "learn"    , "lea"     , POS_RESTING , do_learn    , 0, 0 },
   { "practice" , "pr"      , POS_RESTING , do_practice , 1, 0 },
   { "train"    , "tr"      , POS_RESTING , do_train    , 1, 0 },
   { "skills"    , "sk"      , POS_RESTING , do_skills   , 1, 0 },
