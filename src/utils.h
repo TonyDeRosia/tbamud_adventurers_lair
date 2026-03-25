@@ -58,6 +58,7 @@ void core_dump_real(const char *who, int line);
 int count_color_chars(char *string);
 int room_is_dark(room_rnum room);
 int levenshtein_distance(const char *s1, const char *s2);
+int max_carry_weight(struct char_data *ch);
 struct time_info_data *real_time_passed(time_t t2, time_t t1);
 struct time_info_data *mud_time_passed(time_t t2, time_t t1);
 void prune_crlf(char *txt);
@@ -777,7 +778,7 @@ do                                                              \
         )
 
 /** Return how much weight ch can carry. */
-#define CAN_CARRY_W(ch) (str_app[STRENGTH_APPLY_INDEX(ch)].carry_w)
+#define CAN_CARRY_W(ch) (max_carry_weight(ch))
 /** Return how many items ch can carry. */
 #define CAN_CARRY_N(ch) (5 + (GET_DEX(ch) >> 1) + (GET_LEVEL(ch) >> 1))
 /** Return whether or not ch is awake. */

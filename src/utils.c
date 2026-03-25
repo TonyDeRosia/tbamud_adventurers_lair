@@ -23,6 +23,7 @@
 #include "interpreter.h"
 #include "class.h"
 #include "classtrack.h"
+#include "race.h"
 
 
 /** Aportable random number function.
@@ -45,6 +46,28 @@ int rand_number(int from, int to)
    * standard deviation of both are identical (within the realm of statistical
    * identity) if the rand() implementation is non-broken. */
   return ((circle_random() % (to - from + 1)) + from);
+}
+
+/* Grounded carry-capacity scaling:
+ * - Base (real + racial) strength contributes at full rate.
+ * - Bonus (effective - base) strength contributes at reduced rate.
+ * Keeps normal gameplay in the low hundreds while preserving progression. */
+int max_carry_weight(struct char_data *ch)
+{
+  int base_str, effective_str, bonus_str;
+
+  if (ch == NULL)
+    return 0;
+
+  base_str = ch->real_abils.str;
+  if (!IS_NPC(ch))
+    base_str += race_abil_bonus(GET_RACE(ch), 0);
+
+  effective_str = GET_STR(ch);
+  bonus_str = MAX(0, effective_str - base_str);
+  base_str = MAX(0, base_str);
+
+  return 50 + (base_str * 12) + (bonus_str * 4);
 }
 
 /** Simulates a single dice roll from one to many of a certain sized die.
