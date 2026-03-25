@@ -68,21 +68,32 @@ void mobile_activity(void)
     hunt_victim(ch);
 
     /* Scavenger (picking up objects) */
-    if (MOB_FLAGGED(ch, MOB_SCAVENGER))
-      if (world[IN_ROOM(ch)].contents && !rand_number(0, 10)) {
-	max = 1;
-	best_obj = NULL;
-	for (obj = world[IN_ROOM(ch)].contents; obj; obj = obj->next_content)
-	  if (CAN_GET_OBJ(ch, obj) && GET_OBJ_COST(obj) > max) {
-	    best_obj = obj;
-	    max = GET_OBJ_COST(obj);
-	  }
-	if (best_obj != NULL) {
-	  obj_from_room(best_obj);
-	  obj_to_char(best_obj, ch);
-	  act("$n gets $p.", FALSE, ch, best_obj, 0, TO_ROOM);
-	}
+    if (MOB_FLAGGED(ch, MOB_SCAVENGER) && world[IN_ROOM(ch)].contents) {
+      max = -1;
+      best_obj = NULL;
+
+      for (obj = world[IN_ROOM(ch)].contents; obj; obj = obj->next_content) {
+        if (!CAN_GET_OBJ(ch, obj))
+          continue;
+
+        /* Corpses are always valid scavenger targets, even with zero value. */
+        if (IS_CORPSE(obj)) {
+          best_obj = obj;
+          break;
+        }
+
+        if (GET_OBJ_COST(obj) > max) {
+          best_obj = obj;
+          max = GET_OBJ_COST(obj);
+        }
       }
+
+      if (best_obj != NULL) {
+        obj_from_room(best_obj);
+        obj_to_char(best_obj, ch);
+        act("$n gets $p.", FALSE, ch, best_obj, 0, TO_ROOM);
+      }
+    }
 
     /* Mob Movement */
     if (!MOB_FLAGGED(ch, MOB_SENTINEL) && (GET_POS(ch) == POS_STANDING) &&
