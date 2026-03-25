@@ -443,9 +443,19 @@ ACMD(do_scribe)
   two_arguments(argument, mode, work);
 
   if (!*mode || !str_cmp(mode, "list")) {
+    send_to_char(ch, "Scribing guide:\r\n");
+    send_to_char(ch, "  Required tool: scribing tool\r\n");
+    send_to_char(ch, "  Required materials: 1 scribing material per spell\r\n");
+    send_to_char(ch, "  Max spells per scroll: %d\r\n", MAX_SCRIBE_SPELLS);
+    send_to_char(ch, "\r\n");
     send_to_char(ch, "Scribing usage:\r\n");
     send_to_char(ch, "  scribe list\r\n");
     send_to_char(ch, "  scribe create <spell1> [spell2] [spell3] [spell4]\r\n");
+    send_to_char(ch, "\r\n");
+    send_to_char(ch, "Examples:\r\n");
+    send_to_char(ch, "  scribe create weaken\r\n");
+    send_to_char(ch, "  scribe create blind weaken\r\n");
+    send_to_char(ch, "  scribe create fireball fireball fireball weaken\r\n");
     return;
   }
 

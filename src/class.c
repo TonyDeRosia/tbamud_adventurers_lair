@@ -1689,6 +1689,21 @@ void ensure_class_abilities(struct char_data *ch)
     if (!spell_info[ability].name)
       continue;
 
+    switch (ability) {
+      case SKILL_SCRIBING:
+      case SKILL_ALCHEMY:
+      case SKILL_ENCHANTING:
+      case SKILL_SCRIBING_MASTERY:
+      case SKILL_ALCHEMY_MASTERY:
+      case SKILL_ENCHANTING_MASTERY:
+      case SKILL_CAREFUL_HANDS:
+      case SKILL_EFFICIENT_CRAFTING:
+      case SKILL_STEADY_MIND:
+        continue;
+      default:
+        break;
+    }
+
     int required_level = spell_info[ability].min_level[(int)GET_CLASS(ch)];
 
     if (required_level <= 0 || required_level > GET_LEVEL(ch))
@@ -1765,6 +1780,21 @@ static void grant_new_abilities_one_percent(struct char_data *ch)
   lvl = GET_LEVEL(ch);
 
   for (i = 1; i <= MAX_SKILLS; i++) {
+    switch (i) {
+      case SKILL_SCRIBING:
+      case SKILL_ALCHEMY:
+      case SKILL_ENCHANTING:
+      case SKILL_SCRIBING_MASTERY:
+      case SKILL_ALCHEMY_MASTERY:
+      case SKILL_ENCHANTING_MASTERY:
+      case SKILL_CAREFUL_HANDS:
+      case SKILL_EFFICIENT_CRAFTING:
+      case SKILL_STEADY_MIND:
+        continue;
+      default:
+        break;
+    }
+
     if (spell_info[i].min_level[cls] == lvl && GET_SKILL(ch, i) <= 0)
       SET_SKILL(ch, i, start_prof);
   }
