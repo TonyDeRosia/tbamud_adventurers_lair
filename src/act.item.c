@@ -60,6 +60,7 @@ static void perform_wear(struct char_data *ch, struct obj_data *obj, int where);
 static void wear_message(struct char_data *ch, struct obj_data *obj, int where);
 static int is_kept_item_for(struct char_data *ch, struct obj_data *obj);
 static int reject_kept_item_action(struct char_data *ch, struct obj_data *obj);
+static int has_unique_equip_conflict(struct char_data *ch, struct obj_data *obj);
 
 
 
@@ -85,6 +86,34 @@ static int reject_kept_item_action(struct char_data *ch, struct obj_data *obj)
 
   act("You are keeping $p safe. Unlock it first.", FALSE, ch, obj, 0, TO_CHAR);
   return TRUE;
+}
+
+static int has_unique_equip_conflict(struct char_data *ch, struct obj_data *obj)
+{
+  int i;
+  obj_vnum vnum;
+  struct obj_data *eq_obj;
+
+  if (!ch || !obj || !OBJ_FLAGGED(obj, ITEM_UNIQUE_EQUIP))
+    return FALSE;
+
+  vnum = GET_OBJ_VNUM(obj);
+  if (vnum == NOTHING)
+    return FALSE;
+
+  for (i = 0; i < NUM_WEARS; i++) {
+    eq_obj = GET_EQ(ch, i);
+    if (!eq_obj)
+      continue;
+
+    if (!OBJ_FLAGGED(eq_obj, ITEM_UNIQUE_EQUIP))
+      continue;
+
+    if (GET_OBJ_VNUM(eq_obj) == vnum)
+      return TRUE;
+  }
+
+  return FALSE;
 }
 
 static void perform_put(struct char_data *ch, struct obj_data *obj, struct obj_data *cont)
@@ -1555,6 +1584,11 @@ static void perform_wear(struct char_data *ch, struct obj_data *obj, int where)
 
   if (GET_EQ(ch, where)) {
     send_to_char(ch, "%s", already_wearing[where]);
+    return;
+  }
+
+  if (has_unique_equip_conflict(ch, obj)) {
+    send_to_char(ch, "You may only equip one of that item at a time.\r\n");
     return;
   }
 

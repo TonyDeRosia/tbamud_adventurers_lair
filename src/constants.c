@@ -503,6 +503,7 @@ const char *extra_bits[] = {
   "TWO_HANDER",
   "OFFHAND",
   "KEPT",
+  "UNIQUE_EQUIP",
   "\n"
 };
 
