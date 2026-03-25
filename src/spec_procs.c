@@ -28,6 +28,7 @@
 #include "fight.h"
 #include "modify.h"
 #include "classtrack.h"
+#include "crafting.h"
 
 #define PRACTICE_CAP 75
 
@@ -163,6 +164,10 @@ SPECIAL(guild)
 
   if (!can_character_practice_ability(ch, skill_num)) {
     send_to_char(ch, "You do not know of that %s.\r\n", SPLSKL(ch));
+    return (TRUE);
+  }
+  if (!crafting_can_teach_ability((struct char_data *)me, skill_num)) {
+    send_to_char(ch, "They cannot teach you that.\r\n");
     return (TRUE);
   }
   if (GET_SKILL(ch, skill_num) >= LEARNED(ch)) {
