@@ -139,6 +139,8 @@ static bool objtemplate_create_one(obj_vnum vnum, const char *base_name, int num
 static bool objtemplate_save_affected_zones(struct char_data *ch, obj_vnum start, int obj_count,
                                             char *errmsg, size_t errmsg_sz);
 
+static void restore_character_basics(struct char_data *vict);
+
 /* Local Globals */
 static struct recent_player *recent_list = NULL;  /** Global list of recent players */
 
@@ -222,6 +224,15 @@ static int purge_room(room_rnum room)
     extract_obj(world[room].contents);
 
   return 1;
+}
+
+static void restore_character_basics(struct char_data *vict)
+{
+  GET_HIT(vict) = GET_MAX_HIT(vict);
+  GET_MANA(vict) = effective_max_mana(vict);
+  GET_MOVE(vict) = effective_max_move(vict);
+  update_pos(vict);
+  affect_total(vict);
 }
 
 ACMD(do_wizhelp) 
@@ -2380,16 +2391,29 @@ ACMD(do_restore)
   one_argument(argument, buf);
   if (!*buf)
     send_to_char(ch, "Whom do you wish to restore?\r\n");
-   else if (is_abbrev(buf, "all")) {
+  else if (is_abbrev(buf, "all")) {
     mudlog(NRM, MAX(LVL_GOD, GET_INVIS_LEV(ch)), TRUE, "(GC) %s restored all",GET_NAME(ch));
 
     for (vict = character_list; vict; vict = next_vict) {
       next_vict = vict->next;
-      GET_HIT(vict) = GET_MAX_HIT(vict);
-      GET_MANA(vict) = effective_max_mana(vict);
-      GET_MOVE(vict) = effective_max_move(vict);
-      update_pos(vict);
-      affect_total(vict);
+      if (IS_NPC(vict))
+        continue;
+
+      restore_character_basics(vict);
+      restored++;
+
+      if (vict->desc && IS_PLAYING(vict->desc))
+        act("You have been fully healed by $N!", FALSE, vict, 0, ch, TO_CHAR);
+    }
+
+    send_to_char(ch, "Restored %d players.\r\n", restored);
+  }
+  else if (is_abbrev(buf, "world")) {
+    mudlog(NRM, MAX(LVL_GOD, GET_INVIS_LEV(ch)), TRUE, "(GC) %s restored world", GET_NAME(ch));
+
+    for (vict = character_list; vict; vict = next_vict) {
+      next_vict = vict->next;
+      restore_character_basics(vict);
       restored++;
 
       if (!IS_NPC(vict) && vict->desc && IS_PLAYING(vict->desc))
@@ -2405,9 +2429,7 @@ ACMD(do_restore)
   else {
     mudlog(NRM, MAX(LVL_GOD, GET_INVIS_LEV(ch)), TRUE, "(GC) %s restored %s",GET_NAME(ch), GET_NAME(vict));
 
-    GET_HIT(vict) = GET_MAX_HIT(vict);
-    GET_MANA(vict) = effective_max_mana(vict);
-    GET_MOVE(vict) = effective_max_move(vict);
+    restore_character_basics(vict);
 
     if (!IS_NPC(vict) && GET_LEVEL(ch) >= LVL_GRGOD) {
       if (GET_LEVEL(vict) >= LVL_IMMORT)
@@ -2425,8 +2447,6 @@ ACMD(do_restore)
         clamp_base_stats(vict);
       }
     }
-    update_pos(vict);
-    affect_total(vict);
     send_to_char(ch, "%s", CONFIG_OK);
     act("You have been fully healed by $N!", FALSE, vict, 0, ch, TO_CHAR);
   }
