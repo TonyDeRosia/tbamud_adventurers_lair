@@ -2618,6 +2618,9 @@ static int mob_slot_required_wear_flag(int wear_pos)
     case WEAR_NECK_1:   return ITEM_WEAR_NECK;
     case WEAR_BODY:     return ITEM_WEAR_BODY;
     case WEAR_HEAD:     return ITEM_WEAR_HEAD;
+    case WEAR_EYES:     return ITEM_WEAR_EYES;
+    case WEAR_EAR_L:
+    case WEAR_EAR_R:    return ITEM_WEAR_EAR;
     case WEAR_LEGS:     return ITEM_WEAR_LEGS;
     case WEAR_FEET:     return ITEM_WEAR_FEET;
     case WEAR_HANDS:    return ITEM_WEAR_HANDS;

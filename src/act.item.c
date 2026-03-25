@@ -1406,7 +1406,16 @@ static void wear_message(struct char_data *ch, struct obj_data *obj, int where)
     "You wield $p."},
 
     {"$n grabs $p.",
-    "You grab $p."}
+    "You grab $p."},
+
+    {"$n wears $p over $s eyes.",
+    "You wear $p over your eyes."},
+
+    {"$n wears $p on $s left ear.",
+    "You wear $p on your left ear."},
+
+    {"$n wears $p on $s right ear.",
+    "You wear $p on your right ear."}
   };
 
   act(wear_messages[where][0], TRUE, ch, obj, 0, TO_ROOM);
@@ -1508,7 +1517,7 @@ static void perform_wear(struct char_data *ch, struct obj_data *obj, int where)
     ITEM_WEAR_BODY, ITEM_WEAR_HEAD, ITEM_WEAR_LEGS,
     ITEM_WEAR_FEET, ITEM_WEAR_HANDS, ITEM_WEAR_ARMS, ITEM_WEAR_SHIELD,
     ITEM_WEAR_ABOUT, ITEM_WEAR_WAIST, ITEM_WEAR_WRIST, ITEM_WEAR_WRIST,
-    ITEM_WEAR_WIELD, ITEM_WEAR_TAKE
+    ITEM_WEAR_WIELD, ITEM_WEAR_TAKE, ITEM_WEAR_EYES, ITEM_WEAR_EAR, ITEM_WEAR_EAR
   };
 
   const char *already_wearing[] = {
@@ -1528,7 +1537,10 @@ static void perform_wear(struct char_data *ch, struct obj_data *obj, int where)
     "YOU SHOULD NEVER SEE THIS MESSAGE.  PLEASE REPORT.\r\n",
     "You're already wearing something around both of your wrists.\r\n",
     "You're already wielding a weapon.\r\n",
-    "You're already holding something.\r\n"
+    "You're already holding something.\r\n",
+    "You're already wearing something over your eyes.\r\n",
+    "YOU SHOULD NEVER SEE THIS MESSAGE.  PLEASE REPORT.\r\n",
+    "You're already wearing something on both of your ears.\r\n"
   };
 
   /* first, make sure that the wear position is valid. */
@@ -1537,7 +1549,7 @@ static void perform_wear(struct char_data *ch, struct obj_data *obj, int where)
     return;
   }
   /* for finger and wrist, try pos 2 if pos 1 is already full */
-  if ((where == WEAR_FINGER_R) || (where == WEAR_WRIST_R))
+  if ((where == WEAR_FINGER_R) || (where == WEAR_WRIST_R) || (where == WEAR_EAR_L))
     if (GET_EQ(ch, where))
       where++;
 
@@ -1558,6 +1570,7 @@ static void perform_wear(struct char_data *ch, struct obj_data *obj, int where)
 int find_eq_pos(struct char_data *ch, struct obj_data *obj, char *arg)
 {
   int where = -1;
+  char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
 
   const char *keywords[] = {
     "light",
@@ -1577,6 +1590,9 @@ int find_eq_pos(struct char_data *ch, struct obj_data *obj, char *arg)
     "!RESERVED!",
     "!RESERVED!",
     "!RESERVED!",
+    "eyes",
+    "ear",
+    "!RESERVED!",
     "\n"
   };
 
@@ -1595,8 +1611,24 @@ int find_eq_pos(struct char_data *ch, struct obj_data *obj, char *arg)
     if (CAN_WEAR(obj, ITEM_WEAR_ABOUT))       where = WEAR_ABOUT;
     if (CAN_WEAR(obj, ITEM_WEAR_WAIST))       where = WEAR_WAIST;
     if (CAN_WEAR(obj, ITEM_WEAR_WRIST))       where = WEAR_WRIST_R;
-  } else if ((where = search_block(arg, keywords, FALSE)) < 0)
-    send_to_char(ch, "'%s'?  What part of your body is THAT?\r\n", arg);
+    if (CAN_WEAR(obj, ITEM_WEAR_EYES))        where = WEAR_EYES;
+    if (CAN_WEAR(obj, ITEM_WEAR_EAR))         where = WEAR_EAR_L;
+  } else {
+    two_arguments(arg, arg1, arg2);
+
+    if (is_abbrev(arg1, "around") && is_abbrev(arg2, "body"))
+      where = WEAR_ABOUT;
+    else if (is_abbrev(arg1, "left") && is_abbrev(arg2, "ear"))
+      where = WEAR_EAR_L;
+    else if (is_abbrev(arg1, "right") && is_abbrev(arg2, "ear"))
+      where = WEAR_EAR_R;
+    else if (is_abbrev(arg1, "eyes"))
+      where = WEAR_EYES;
+    else if (is_abbrev(arg1, "ear"))
+      where = WEAR_EAR_L;
+    else if ((where = search_block(arg1, keywords, FALSE)) < 0)
+      send_to_char(ch, "'%s'?  What part of your body is THAT?\r\n", arg);
+  }
 
   return (where);
 }
@@ -1605,10 +1637,13 @@ ACMD(do_wear)
 {
   char arg1[MAX_INPUT_LENGTH];
   char arg2[MAX_INPUT_LENGTH];
+  char *slot_arg = NULL;
   struct obj_data *obj, *next_obj;
   int where, dotmode, items_worn = 0;
 
-  two_arguments(argument, arg1, arg2);
+  slot_arg = one_argument(argument, arg1);
+  skip_spaces(&slot_arg);
+  strlcpy(arg2, slot_arg, sizeof(arg2));
 
   if (!*arg1) {
     send_to_char(ch, "Wear what?\r\n");

@@ -3055,8 +3055,11 @@ ACMD(do_equipment)
   /* Custom EQ display: always show all slots in a fixed order. */
   static const int eq_order[] = {
     WEAR_HEAD,
+    WEAR_EYES,
+    WEAR_EAR_L,
+    WEAR_EAR_R,
     WEAR_NECK_1,
-    WEAR_ABOUT,     /* Back */
+    WEAR_ABOUT,
     WEAR_BODY,
     WEAR_ARMS,
     WEAR_WRIST_R,
@@ -3075,8 +3078,11 @@ ACMD(do_equipment)
 
   static const char *eq_labels[] = {
     "Head",
+    "Eyes",
+    "Ear Left",
+    "Ear Right",
     "Neck",
-    "Back",
+    "Around Body",
     "Body",
     "Arms",
     "Wrist Right",
