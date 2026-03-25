@@ -1560,7 +1560,7 @@ int find_eq_pos(struct char_data *ch, struct obj_data *obj, char *arg)
   int where = -1;
 
   const char *keywords[] = {
-    "!RESERVED!",
+    "light",
     "finger",
     "!RESERVED!",
     "neck",
@@ -1581,6 +1581,8 @@ int find_eq_pos(struct char_data *ch, struct obj_data *obj, char *arg)
   };
 
   if (!arg || !*arg) {
+    if (GET_OBJ_TYPE(obj) == ITEM_LIGHT && CAN_WEAR(obj, ITEM_WEAR_TAKE))
+      where = WEAR_LIGHT;
     if (CAN_WEAR(obj, ITEM_WEAR_FINGER))      where = WEAR_FINGER_R;
     if (CAN_WEAR(obj, ITEM_WEAR_NECK))        where = WEAR_NECK_1;
     if (CAN_WEAR(obj, ITEM_WEAR_BODY))        where = WEAR_BODY;
