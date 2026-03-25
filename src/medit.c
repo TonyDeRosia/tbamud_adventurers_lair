@@ -32,35 +32,9 @@ SPECIAL(guild);
 #include "modify.h"      /* for smash_tilde */
 #include "ai_actor.h"
 
-/* Builder-friendly NPC flags list:
- * action_bits[] ends with reserved "DEAD" which should not be exposed in OLC menus.
- * This wrapper omits that final entry while keeping numbering stable for builders.
+/* Use shared action_bits[] for display so OLC remains aligned with runtime
+ * bit names as new mob flags are added.
  */
-static const char *action_bits_olc[] = {
-  "SPEC",
-  "SENTINEL",
-  "SCAVENGER",
-  "ISNPC",
-  "AWARE",
-  "AGGR",
-  "STAY-ZONE",
-  "WIMPY",
-  "AGGR_EVIL",
-  "AGGR_GOOD",
-  "AGGR_NEUTRAL",
-  "MEMORY",
-  "HELPER",
-  "NO_CHARM",
-  "NO_SUMMN",
-  "NO_SLEEP",
-  "NO_BASH",
-  "NO_BLIND",
-  "NO_KILL",
-  "GUILD_MASTER",
-  "RESERVED",
-  "AI_ACTOR",
-  "\n"
-};
 
 /* local functions */
 static void medit_setup_new(struct descriptor_data *d);
@@ -418,7 +392,6 @@ static bool medit_illegal_mob_flag(int fl)
   const int illegal_flags[] = {
     MOB_ISNPC,
     MOB_NOTDEADYET,
-    20,
   };
 
   const int num_illegal_flags = sizeof(illegal_flags)/sizeof(int);
@@ -461,7 +434,7 @@ static void medit_disp_mob_flags(struct descriptor_data *d)
                 !(++columns % 2) ? "\r\n" : "");
   }
 
-  sprintbitarray(MOB_FLAGS(OLC_MOB(d)), action_bits_olc, AF_ARRAY_MAX, flags);
+  sprintbitarray(MOB_FLAGS(OLC_MOB(d)), action_bits, AF_ARRAY_MAX, flags);
   write_to_output(d, "\r\nCurrent flags : %s%s%s\r\nEnter mob flags (0 to quit) : ", cyn, flags, nrm);
 }
 
@@ -746,7 +719,7 @@ static void medit_disp_menu(struct descriptor_data *d)
 	  grn, nrm, yel, GET_DDESC(mob)
 	  );
 
-  sprintbitarray(MOB_FLAGS(mob), action_bits_olc, AF_ARRAY_MAX, flags);
+  sprintbitarray(MOB_FLAGS(mob), action_bits, AF_ARRAY_MAX, flags);
   sprintbitarray(AFF_FLAGS(mob), affected_bits, AF_ARRAY_MAX, flag2);
   write_to_output(d,
           "%s6%s) Position  : %s%s\r\n"
