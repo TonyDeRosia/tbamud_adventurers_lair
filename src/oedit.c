@@ -950,8 +950,13 @@ void oedit_parse(struct descriptor_data *d, char *arg)
     }
 
   case OEDIT_WEIGHT:
-    GET_OBJ_WEIGHT(OLC_OBJ(d)) = LIMIT(atoi(arg), 0, MAX_OBJ_WEIGHT);
+  {
+    int parsed_weight = atoi(arg);
+    if (parsed_weight < 0)
+      parsed_weight = 0;
+    GET_OBJ_WEIGHT(OLC_OBJ(d)) = MIN(parsed_weight, MAX_OBJ_WEIGHT);
     break;
+  }
 
   case OEDIT_COST:
     GET_OBJ_COST(OLC_OBJ(d)) = LIMIT(atoi(arg), 0, MAX_OBJ_COST);

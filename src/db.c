@@ -2179,7 +2179,7 @@ char *parse_object(FILE *obj_f, int nr)
     }
   }
 
-  GET_OBJ_WEIGHT(obj_proto + i) = t[0];
+  GET_OBJ_WEIGHT(obj_proto + i) = MAX(0, t[0]);
   GET_OBJ_COST(obj_proto + i) = t[1];
   GET_OBJ_RENT(obj_proto + i) = t[2];
   GET_OBJ_LEVEL(obj_proto + i) = t[3];
