@@ -250,11 +250,60 @@ static void affect_modify_ar(struct char_data * ch, byte loc, sbyte mod, int bit
   aff_apply_modify(ch, loc, mod, "affect_modify_ar");
 }
 
+static bool eq_vnum_seen(const obj_vnum *seen_vnums, int seen_count, obj_vnum vnum)
+{
+  int i;
+
+  for (i = 0; i < seen_count; i++)
+    if (seen_vnums[i] == vnum)
+      return TRUE;
+
+  return FALSE;
+}
+
+static bool eq_has_duplicate_vnum_before(struct char_data *ch, int pos, obj_vnum vnum)
+{
+  int i;
+  struct obj_data *eq;
+
+  if (vnum == NOTHING)
+    return FALSE;
+
+  for (i = 0; i < pos; i++) {
+    eq = GET_EQ(ch, i);
+    if (eq && GET_OBJ_VNUM(eq) == vnum)
+      return TRUE;
+  }
+
+  return FALSE;
+}
+
+static int eq_first_vnum_slot(struct char_data *ch, obj_vnum vnum, int skip_pos)
+{
+  int i;
+  struct obj_data *eq;
+
+  if (vnum == NOTHING)
+    return -1;
+
+  for (i = 0; i < NUM_WEARS; i++) {
+    if (i == skip_pos)
+      continue;
+    eq = GET_EQ(ch, i);
+    if (eq && GET_OBJ_VNUM(eq) == vnum)
+      return i;
+  }
+
+  return -1;
+}
+
 /* This updates a character by subtracting everything he is affected by
  * restoring original abilities, and then affecting all again. */
 void affect_total(struct char_data *ch)
 {
   struct affected_type *af;
+  obj_vnum seen_vnums[NUM_WEARS];
+  int seen_count = 0;
   int i, j;
 
   /* Rebuild affected flags from the saved baseline every time. */
@@ -311,13 +360,22 @@ void affect_total(struct char_data *ch)
 
   /* Reapply equipment modifiers and bits. */
   for (i = 0; i < NUM_WEARS; i++) {
-    if (GET_EQ(ch, i))
+    if (GET_EQ(ch, i)) {
+      obj_vnum vnum = GET_OBJ_VNUM(GET_EQ(ch, i));
+
+      /* Allow wearing duplicates, but only apply one copy's effects. */
+      if (vnum != NOTHING && eq_vnum_seen(seen_vnums, seen_count, vnum))
+        continue;
+      if (vnum != NOTHING && seen_count < NUM_WEARS)
+        seen_vnums[seen_count++] = vnum;
+
       for (j = 0; j < MAX_OBJ_AFFECT; j++)
         affect_modify_ar(ch,
           GET_EQ(ch, i)->affected[j].location,
           GET_EQ(ch, i)->affected[j].modifier,
           GET_OBJ_AFFECT(GET_EQ(ch, i)),
           TRUE);
+    }
   }
 
   /* Reapply spell/skill affects. */
@@ -590,6 +648,8 @@ int invalid_align(struct char_data *ch, struct obj_data *obj)
 
 void equip_char(struct char_data *ch, struct obj_data *obj, int pos)
 {
+  int first_slot;
+  bool apply_obj_effects;
   int j;
 
   if (pos < 0 || pos >= NUM_WEARS) {
@@ -622,8 +682,15 @@ void equip_char(struct char_data *ch, struct obj_data *obj, int pos)
   obj->worn_by = ch;
   obj->worn_on = pos;
 
-  if (GET_OBJ_TYPE(obj) == ITEM_ARMOR)
+  first_slot = eq_first_vnum_slot(ch, GET_OBJ_VNUM(obj), -1);
+  apply_obj_effects = !eq_has_duplicate_vnum_before(ch, pos, GET_OBJ_VNUM(obj));
+
+  if (GET_OBJ_TYPE(obj) == ITEM_ARMOR && first_slot == pos) {
+    int previous_slot = eq_first_vnum_slot(ch, GET_OBJ_VNUM(obj), pos);
+    if (previous_slot >= 0 && GET_OBJ_TYPE(GET_EQ(ch, previous_slot)) == ITEM_ARMOR)
+      GET_AC(ch) -= apply_armor(ch, previous_slot);
     GET_AC(ch) += apply_armor(ch, pos);
+  }
 
   if (IN_ROOM(ch) != NOWHERE) {
     if (pos == WEAR_LIGHT && GET_OBJ_TYPE(obj) == ITEM_LIGHT)
@@ -632,16 +699,20 @@ void equip_char(struct char_data *ch, struct obj_data *obj, int pos)
   } else
     log("SYSERR: IN_ROOM(ch) = NOWHERE when equipping char %s.", GET_NAME(ch));
 
-  for (j = 0; j < MAX_OBJ_AFFECT; j++)
-    affect_modify_ar(ch, obj->affected[j].location,
-		  obj->affected[j].modifier,
-		  GET_OBJ_AFFECT(obj), TRUE);
+  if (apply_obj_effects) {
+    for (j = 0; j < MAX_OBJ_AFFECT; j++)
+      affect_modify_ar(ch, obj->affected[j].location,
+		    obj->affected[j].modifier,
+		    GET_OBJ_AFFECT(obj), TRUE);
+  }
 
   affect_total(ch);
 }
 
 struct obj_data *unequip_char(struct char_data *ch, int pos)
 {
+  int first_slot, replacement_slot;
+  bool had_prior_duplicate;
   int j;
   struct obj_data *obj;
 
@@ -651,11 +722,17 @@ struct obj_data *unequip_char(struct char_data *ch, int pos)
   }
 
   obj = GET_EQ(ch, pos);
+  first_slot = eq_first_vnum_slot(ch, GET_OBJ_VNUM(obj), -1);
+  replacement_slot = eq_first_vnum_slot(ch, GET_OBJ_VNUM(obj), pos);
+  had_prior_duplicate = eq_has_duplicate_vnum_before(ch, pos, GET_OBJ_VNUM(obj));
   obj->worn_by = NULL;
   obj->worn_on = -1;
 
-  if (GET_OBJ_TYPE(obj) == ITEM_ARMOR)
+  if (GET_OBJ_TYPE(obj) == ITEM_ARMOR && first_slot == pos) {
     GET_AC(ch) -= apply_armor(ch, pos);
+    if (replacement_slot >= 0 && GET_OBJ_TYPE(GET_EQ(ch, replacement_slot)) == ITEM_ARMOR)
+      GET_AC(ch) += apply_armor(ch, replacement_slot);
+  }
 
   if (IN_ROOM(ch) != NOWHERE) {
     if (pos == WEAR_LIGHT && GET_OBJ_TYPE(obj) == ITEM_LIGHT)
@@ -666,10 +743,12 @@ struct obj_data *unequip_char(struct char_data *ch, int pos)
 
   GET_EQ(ch, pos) = NULL;
 
-  for (j = 0; j < MAX_OBJ_AFFECT; j++)
-    affect_modify_ar(ch, obj->affected[j].location,
-		  obj->affected[j].modifier,
-		  GET_OBJ_AFFECT(obj), FALSE);
+  if (!had_prior_duplicate) {
+    for (j = 0; j < MAX_OBJ_AFFECT; j++)
+      affect_modify_ar(ch, obj->affected[j].location,
+		    obj->affected[j].modifier,
+		    GET_OBJ_AFFECT(obj), FALSE);
+  }
 
   affect_total(ch);
 
