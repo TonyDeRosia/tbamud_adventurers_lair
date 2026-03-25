@@ -477,7 +477,7 @@ static int Crash_save(struct obj_data *obj, FILE *fp, int location)
     result = objsave_save_obj_record(obj, fp, location);
 
     for (tmp = obj->in_obj; tmp; tmp = tmp->in_obj)
-      GET_OBJ_WEIGHT(tmp) -= GET_OBJ_WEIGHT(obj);
+      GET_OBJ_WEIGHT(tmp) = MAX(0, GET_OBJ_WEIGHT(tmp) - MAX(0, GET_OBJ_WEIGHT(obj)));
 
     if (!result)
       return FALSE;
@@ -491,7 +491,7 @@ static void Crash_restore_weight(struct obj_data *obj)
     Crash_restore_weight(obj->contains);
     Crash_restore_weight(obj->next_content);
     if (obj->in_obj)
-      GET_OBJ_WEIGHT(obj->in_obj) += GET_OBJ_WEIGHT(obj);
+      GET_OBJ_WEIGHT(obj->in_obj) = MAX(0, GET_OBJ_WEIGHT(obj->in_obj)) + MAX(0, GET_OBJ_WEIGHT(obj));
   }
 }
 
@@ -1080,7 +1080,7 @@ obj_save_data *objsave_parse_objects(FILE *fl)
         GET_OBJ_WEAR(temp)[3] = asciiflag_conv(f4);
       }
       else if (!strcmp(tag, "Wght"))
-        GET_OBJ_WEIGHT(temp) = num;
+        GET_OBJ_WEIGHT(temp) = MAX(0, num);
       break;
     case 'V':
       if (!strcmp(tag, "Vals")) {

@@ -942,7 +942,7 @@ do                                                              \
 
 /** Can ch carry obj? */
 #define CAN_CARRY_OBJ(ch,obj)  \
-   (((IS_CARRYING_W(ch) + GET_OBJ_WEIGHT(obj)) <= CAN_CARRY_W(ch)) &&   \
+   (((MAX(0, IS_CARRYING_W(ch)) + MAX(0, GET_OBJ_WEIGHT(obj))) <= CAN_CARRY_W(ch)) &&   \
     ((IS_CARRYING_N(ch) + 1) <= CAN_CARRY_N(ch)))
 
 /** Can ch pick up obj? */
