@@ -155,7 +155,7 @@ static void ensure_one_blank_line_after_desc(struct char_data *ch, const char *d
 static const char *encumbrance_text(struct char_data *ch)
 {
   int cap = CAN_CARRY_W(ch);
-  int cur = IS_CARRYING_W(ch);
+  int cur = MAX(0, IS_CARRYING_W(ch));
 
   if (cap <= 0)
     return "None";
@@ -1898,7 +1898,7 @@ ACMD(do_score)
   /* Carry Capacity */
   {
     int cap = CAN_CARRY_W(ch);
-    int cur = IS_CARRYING_W(ch);
+    int cur = MAX(0, IS_CARRYING_W(ch));
     snprintf(line, sizeof(line), "%sCarry Capacity:%s %d / %d  (%s)", C, R, cur, cap, encumbrance_text(ch));
     len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
   }

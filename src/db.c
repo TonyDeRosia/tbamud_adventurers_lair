@@ -826,6 +826,13 @@ void boot_db(void)
     reset_zone(i);
   }
 
+  {
+    struct obj_data *obj;
+    for (obj = object_list; obj; obj = obj->next)
+      if (GET_OBJ_WEIGHT(obj) < 0)
+        GET_OBJ_WEIGHT(obj) = 0;
+  }
+
   reset_q.head = reset_q.tail = NULL;
 
   if (!boot_time)
@@ -2787,6 +2794,8 @@ struct obj_data *read_object(obj_vnum nr, int type) /* and obj_rnum */
   CREATE(obj, struct obj_data, 1);
   clear_object(obj);
   *obj = obj_proto[i];
+  if (GET_OBJ_WEIGHT(obj) < 0)
+    GET_OBJ_WEIGHT(obj) = 0;
   obj->next = object_list;
   object_list = obj;
   

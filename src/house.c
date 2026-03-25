@@ -101,7 +101,7 @@ int House_save(struct obj_data *obj, FILE *fp)
       return (0);
 
     for (tmp = obj->in_obj; tmp; tmp = tmp->in_obj)
-      GET_OBJ_WEIGHT(tmp) -= GET_OBJ_WEIGHT(obj);
+      GET_OBJ_WEIGHT(tmp) = MAX(0, GET_OBJ_WEIGHT(tmp) - MAX(0, GET_OBJ_WEIGHT(obj)));
   }
   return (1);
 }
@@ -113,7 +113,7 @@ static void House_restore_weight(struct obj_data *obj)
     House_restore_weight(obj->contains);
     House_restore_weight(obj->next_content);
     if (obj->in_obj)
-      GET_OBJ_WEIGHT(obj->in_obj) += GET_OBJ_WEIGHT(obj);
+      GET_OBJ_WEIGHT(obj->in_obj) = MAX(0, GET_OBJ_WEIGHT(obj->in_obj)) + MAX(0, GET_OBJ_WEIGHT(obj));
   }
 }
 
@@ -742,7 +742,7 @@ static struct obj_data *Obj_from_store(struct obj_file_elem object, int *locatio
   GET_OBJ_VAL(obj, 3) = object.value[3];
   for(taeller = 0; taeller < EF_ARRAY_MAX; taeller++)
     GET_OBJ_EXTRA(obj)[taeller] = object.extra_flags[taeller];
-  GET_OBJ_WEIGHT(obj) = object.weight;
+  GET_OBJ_WEIGHT(obj) = MAX(0, object.weight);
   GET_OBJ_TIMER(obj) = object.timer;
   for(taeller = 0; taeller < AF_ARRAY_MAX; taeller++)
     GET_OBJ_AFFECT(obj)[taeller] = object.bitvector[taeller];

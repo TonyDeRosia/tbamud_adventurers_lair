@@ -34,6 +34,25 @@ static int extractions_pending = 0;
 static int apply_armor(struct char_data *ch, int eq_pos);
 static void update_object(struct obj_data *obj, int use);
 static void affect_modify_ar(struct char_data * ch, byte loc, sbyte mod, int bitv[], bool add);
+static inline int obj_weight_runtime(struct obj_data *obj);
+static inline void clamp_carry_weight(struct char_data *ch);
+
+static inline int obj_weight_runtime(struct obj_data *obj)
+{
+  if (!obj)
+    return 0;
+
+  if (GET_OBJ_WEIGHT(obj) < 0)
+    GET_OBJ_WEIGHT(obj) = 0;
+
+  return GET_OBJ_WEIGHT(obj);
+}
+
+static inline void clamp_carry_weight(struct char_data *ch)
+{
+  if (ch && IS_CARRYING_W(ch) < 0)
+    IS_CARRYING_W(ch) = 0;
+}
 
 char *fname(const char *namelist)
 {
@@ -544,11 +563,14 @@ void char_to_room(struct char_data *ch, room_rnum room)
 void obj_to_char(struct obj_data *object, struct char_data *ch)
 {
   if (object && ch) {
+    int obj_weight = obj_weight_runtime(object);
+
     object->next_content = ch->carrying;
     ch->carrying = object;
     object->carried_by = ch;
     IN_ROOM(object) = NOWHERE;
-    IS_CARRYING_W(ch) += GET_OBJ_WEIGHT(object);
+    IS_CARRYING_W(ch) += obj_weight;
+    clamp_carry_weight(ch);
     IS_CARRYING_N(ch)++;
 
     autoquest_trigger_check(ch, NULL, object, AQ_OBJ_FIND);
@@ -575,7 +597,8 @@ void obj_from_char(struct obj_data *object)
   if (!IS_NPC(object->carried_by))
     SET_BIT_AR(PLR_FLAGS(object->carried_by), PLR_CRASH);
 
-  IS_CARRYING_W(object->carried_by) -= GET_OBJ_WEIGHT(object);
+  IS_CARRYING_W(object->carried_by) -= obj_weight_runtime(object);
+  clamp_carry_weight(object->carried_by);
   IS_CARRYING_N(object->carried_by)--;
   object->carried_by = NULL;
   object->next_content = NULL;
@@ -832,6 +855,7 @@ void obj_from_room(struct obj_data *object)
 void obj_to_obj(struct obj_data *obj, struct obj_data *obj_to)
 {
   struct obj_data *tmp_obj;
+  int obj_weight;
 
   if (!obj || !obj_to || obj == obj_to) {
     log("SYSERR: NULL object (%p) or same source (%p) and target (%p) obj passed to obj_to_obj.",
@@ -842,16 +866,19 @@ void obj_to_obj(struct obj_data *obj, struct obj_data *obj_to)
   obj->next_content = obj_to->contains;
   obj_to->contains = obj;
   obj->in_obj = obj_to;
+  obj_weight = obj_weight_runtime(obj);
 
   /* Add weight to container, unless unlimited. */
   if (GET_OBJ_VAL(obj->in_obj, 0) > 0) {
     for (tmp_obj = obj->in_obj; tmp_obj->in_obj; tmp_obj = tmp_obj->in_obj)
-      GET_OBJ_WEIGHT(tmp_obj) += GET_OBJ_WEIGHT(obj);
+      GET_OBJ_WEIGHT(tmp_obj) = MAX(0, GET_OBJ_WEIGHT(tmp_obj)) + obj_weight;
 
     /* top level object.  Subtract weight from inventory if necessary. */
-    GET_OBJ_WEIGHT(tmp_obj) += GET_OBJ_WEIGHT(obj);
-    if (tmp_obj->carried_by)
-      IS_CARRYING_W(tmp_obj->carried_by) += GET_OBJ_WEIGHT(obj);
+    GET_OBJ_WEIGHT(tmp_obj) = MAX(0, GET_OBJ_WEIGHT(tmp_obj)) + obj_weight;
+    if (tmp_obj->carried_by) {
+      IS_CARRYING_W(tmp_obj->carried_by) += obj_weight;
+      clamp_carry_weight(tmp_obj->carried_by);
+    }
   }
 }
 
@@ -859,6 +886,7 @@ void obj_to_obj(struct obj_data *obj, struct obj_data *obj_to)
 void obj_from_obj(struct obj_data *obj)
 {
   struct obj_data *temp, *obj_from;
+  int obj_weight;
 
   if (obj->in_obj == NULL) {
     log("SYSERR: (%s): trying to illegally extract obj from obj.", __FILE__);
@@ -866,16 +894,19 @@ void obj_from_obj(struct obj_data *obj)
   }
   obj_from = obj->in_obj;
   REMOVE_FROM_LIST(obj, obj_from->contains, next_content);
+  obj_weight = obj_weight_runtime(obj);
 
   /* Subtract weight from containers container unless unlimited. */
   if (GET_OBJ_VAL(obj->in_obj, 0) > 0) {
     for (temp = obj->in_obj; temp->in_obj; temp = temp->in_obj)
-      GET_OBJ_WEIGHT(temp) -= GET_OBJ_WEIGHT(obj);
+      GET_OBJ_WEIGHT(temp) = MAX(0, GET_OBJ_WEIGHT(temp) - obj_weight);
 
     /* Subtract weight from char that carries the object */
-    GET_OBJ_WEIGHT(temp) -= GET_OBJ_WEIGHT(obj);
-    if (temp->carried_by)
-      IS_CARRYING_W(temp->carried_by) -= GET_OBJ_WEIGHT(obj);
+    GET_OBJ_WEIGHT(temp) = MAX(0, GET_OBJ_WEIGHT(temp) - obj_weight);
+    if (temp->carried_by) {
+      IS_CARRYING_W(temp->carried_by) -= obj_weight;
+      clamp_carry_weight(temp->carried_by);
+    }
   }
   obj->in_obj = NULL;
   obj->next_content = NULL;
