@@ -127,6 +127,27 @@ void assign_mobiles(void)
     }
   }
 
+  /* Auto-assign questmaster spec from MOB_QUEST_MASTER flag.
+   * This gives builders an explicit in-game path (MEDIT mob flags) to assign
+   * questmaster behavior without hardcoding vnums in this file.
+   */
+  {
+    mob_rnum i;
+    const char *nm;
+
+    for (i = 0; i <= top_of_mobt; i++) {
+      if (MOB_FLAGGED(&mob_proto[i], MOB_QUEST_MASTER)) {
+        if (mob_index[i].func == NULL || mob_index[i].func == questmaster || mob_index[i].func == guild) {
+          mob_index[i].func = questmaster;
+        } else {
+          nm = get_spec_func_name(mob_index[i].func);
+          log("SYSERR: mob %d flagged QUEST_MASTER but already has spec %s",
+              mob_index[i].vnum, nm ? nm : "Unknown");
+        }
+      }
+    }
+  }
+
   ASSIGNMOB(3105, mayor);
 
   ASSIGNMOB(110, postmaster);
@@ -223,4 +244,3 @@ const char *get_spec_func_name(SPECIAL(*func))
   } 
   return NULL; 
 } 
-

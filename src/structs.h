@@ -242,8 +242,9 @@ void clanedit_parse(struct descriptor_data *d, char *arg);
 #define MOB_TEACH_SCRIBING 22   /**< Mob can train scribing profession */
 #define MOB_TEACH_ALCHEMY  23   /**< Mob can train alchemy profession */
 #define MOB_TEACH_ENCHANTING 24 /**< Mob can train enchanting profession */
+#define MOB_QUEST_MASTER   25   /**< Mob should run questmaster spec-proc */
 
-#define NUM_MOB_FLAGS      25
+#define NUM_MOB_FLAGS      26
 
 /* Preference flags: used by char_data.player_specials.pref */
 #define PRF_BRIEF         0   /**< Room descs won't normally be shown */

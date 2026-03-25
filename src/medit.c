@@ -12,6 +12,7 @@
 
 /* Needed for MOB_GUILD_MASTER auto-sync in medit_save_internally() */
 SPECIAL(guild);
+SPECIAL(questmaster);
 #include "utils.h"
 #include "interpreter.h"
 #include "comm.h"
@@ -299,8 +300,12 @@ void medit_save_internally(struct descriptor_data *d)
   }
 
 
-  /* Auto-sync GUILD_MASTER flag with the guild spec-proc. */
-  if (IS_SET_AR(MOB_FLAGS(OLC_MOB(d)), MOB_GUILD_MASTER)) {
+  /* Auto-sync QUEST_MASTER / GUILD_MASTER flags with service spec-procs.
+   * QUEST_MASTER takes precedence so builders can reliably assign it in MEDIT.
+   */
+  if (IS_SET_AR(MOB_FLAGS(OLC_MOB(d)), MOB_QUEST_MASTER)) {
+    mob_index[new_rnum].func = questmaster;
+  } else if (IS_SET_AR(MOB_FLAGS(OLC_MOB(d)), MOB_GUILD_MASTER)) {
     mob_index[new_rnum].func = guild;
   } else if (mob_index[new_rnum].func == guild) {
     mob_index[new_rnum].func = NULL;

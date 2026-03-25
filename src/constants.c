@@ -217,6 +217,7 @@ const char *action_bits[] = {
   "TEACH_SCRIBING",
   "TEACH_ALCHEMY",
   "TEACH_ENCHANTING",
+  "QUEST_MASTER",
   "DEAD",    /* You should never see this. */
   "\n"
 };
