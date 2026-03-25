@@ -31,6 +31,7 @@
 #include "shop.h"
 #include "quest.h"
 #include "criticalhits.h"
+#include "crafting.h"
 
 #define GLORY_PRACTICE_COST 250
 #define GLORY_TRAIN_COST 600
@@ -2519,6 +2520,9 @@ ACMD(do_use)
 {
   char buf[MAX_INPUT_LENGTH], arg[MAX_INPUT_LENGTH];
   struct obj_data *mag_item;
+
+  if (subcmd == SCMD_RECITE && crafting_try_recite_tome(ch, argument))
+    return;
 
   half_chop(argument, arg, buf);
   if (!*arg) {

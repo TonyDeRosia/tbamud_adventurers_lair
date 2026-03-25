@@ -24,6 +24,7 @@
 #include "act.h"
 #include "quest.h"
 #include "screen.h"
+#include "crafting.h"
 /* Helpers for handedness and offhand logic */
 static int is_two_hander(const struct obj_data *obj)
 {
@@ -132,6 +133,8 @@ static void perform_put(struct char_data *ch, struct obj_data *obj, struct obj_d
   if ((GET_OBJ_VAL(cont, 0) > 0) &&
       (GET_OBJ_WEIGHT(cont) + GET_OBJ_WEIGHT(obj) > GET_OBJ_VAL(cont, 0)))
     act("$p won't fit in $P.", FALSE, ch, obj, cont, TO_CHAR);
+  else if (crafting_handle_tome_put(ch, obj, cont))
+    return;
   else if (OBJ_FLAGGED(obj, ITEM_NODROP) && IN_ROOM(cont) != NOWHERE)
     act("You can't get $p out of your hand.", FALSE, ch, obj, NULL, TO_CHAR);
   else {

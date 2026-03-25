@@ -214,6 +214,9 @@ const char *action_bits[] = {
   "GUILD_MASTER",
   "NOTDEADYET",
   "AI_ACTOR",
+  "TEACH_SCRIBING",
+  "TEACH_ALCHEMY",
+  "TEACH_ENCHANTING",
   "DEAD",    /* You should never see this. */
   "\n"
 };
@@ -504,6 +507,9 @@ const char *extra_bits[] = {
   "OFFHAND",
   "KEPT",
   "UNIQUE_EQUIP",
+  "CRAFT_MATERIAL",
+  "CRAFT_TOOL",
+  "SPELLTOME",
   "\n"
 };
 

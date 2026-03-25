@@ -26,6 +26,7 @@
 #include "quest.h"
 #include "mud_event.h"
 #include "race.h"
+#include "crafting.h"
 
 /* local file scope variables */
 static int extractions_pending = 0;
@@ -563,7 +564,15 @@ void char_to_room(struct char_data *ch, room_rnum room)
 void obj_to_char(struct obj_data *object, struct char_data *ch)
 {
   if (object && ch) {
+    struct obj_data *iter;
     int obj_weight = obj_weight_runtime(object);
+
+    if (GET_OBJ_TYPE(object) == ITEM_POTION) {
+      for (iter = ch->carrying; iter; iter = iter->next_content) {
+        if (crafting_try_merge_potion_stack(iter, object))
+          return;
+      }
+    }
 
     object->next_content = ch->carrying;
     ch->carrying = object;

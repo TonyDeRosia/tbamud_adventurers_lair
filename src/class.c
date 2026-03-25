@@ -1885,6 +1885,17 @@ void init_spell_levels(void)
   }
   for (i = 0; i < num_pc_classes(); i++)
     spell_level(SKILL_RECALL, i, 1);
+  for (i = 0; i < num_pc_classes(); i++) {
+    spell_level(SKILL_SCRIBING, i, 1);
+    spell_level(SKILL_ALCHEMY, i, 1);
+    spell_level(SKILL_ENCHANTING, i, 1);
+    spell_level(SKILL_SCRIBING_MASTERY, i, 1);
+    spell_level(SKILL_ALCHEMY_MASTERY, i, 1);
+    spell_level(SKILL_ENCHANTING_MASTERY, i, 1);
+    spell_level(SKILL_CAREFUL_HANDS, i, 1);
+    spell_level(SKILL_EFFICIENT_CRAFTING, i, 1);
+    spell_level(SKILL_STEADY_MIND, i, 1);
+  }
   spell_level(SKILL_STUDY, CLASS_ADVENTURER, 1);
   spell_level(SPELL_MAGIC_MISSILE, CLASS_ADVENTURER, 1);
 

@@ -16,6 +16,7 @@
 #include "spells.h"
 #include "class.h"
 #include "classtrack.h"
+#include "crafting.h"
 #include "race.h"
 #include "handler.h"
 #include "comm.h"
@@ -2197,10 +2198,37 @@ void mag_objectmagic(struct char_data *ch, struct obj_data *obj, char *argument)
       act("$n recites $p.", FALSE, ch, obj, NULL, TO_ROOM);
 
     WAIT_STATE(ch, PULSE_VIOLENCE);
-    for (i = 1; i <= 3; i++)
-      if (call_magic(ch, tch, tobj, GET_OBJ_VAL(obj, i), GET_OBJ_VAL(obj, 0),
-          CAST_SCROLL) <= 0)
-        break;
+    {
+      const char *payload = NULL;
+      struct extra_descr_data *ex;
+      int spells[4];
+      int count = 0;
+      for (ex = obj->ex_description; ex; ex = ex->next)
+        if (ex->keyword && ex->description && !strcmp(ex->keyword, "__craft_scroll_spells")) {
+          payload = ex->description;
+          break;
+        }
+      if (payload && *payload) {
+        char tmp[256], *tok;
+        strlcpy(tmp, payload, sizeof(tmp));
+        tok = strtok(tmp, " ");
+        while (tok && count < 4) {
+          spells[count++] = atoi(tok);
+          tok = strtok(NULL, " ");
+        }
+      }
+
+      if (count > 0) {
+        for (i = 0; i < count; i++)
+          if (call_magic(ch, tch, tobj, spells[i], GET_OBJ_VAL(obj, 0), CAST_SCROLL) <= 0)
+            break;
+      } else {
+        for (i = 1; i <= 3; i++)
+          if (call_magic(ch, tch, tobj, GET_OBJ_VAL(obj, i), GET_OBJ_VAL(obj, 0),
+              CAST_SCROLL) <= 0)
+            break;
+      }
+    }
 
     if (obj != NULL)
       extract_obj(obj);
@@ -2223,8 +2251,13 @@ void mag_objectmagic(struct char_data *ch, struct obj_data *obj, char *argument)
           CAST_POTION) <= 0)
         break;
 
-    if (obj != NULL)
-      extract_obj(obj);
+    if (obj != NULL) {
+      int stack_count = crafting_get_potion_stack(obj);
+      if (stack_count > 1)
+        crafting_set_potion_stack(obj, stack_count - 1);
+      else
+        extract_obj(obj);
+    }
     break;
   default:
     log("SYSERR: Unknown object_type %d in mag_objectmagic.",
@@ -3428,4 +3461,13 @@ void mag_assign_spells(void) {
   skillo_cost(SKILL_LEGION_MASTERY, "legion mastery", 0);
   skillo_cost(SKILL_APPRAISE_ENEMY, "appraise enemy", 8);
   skillo_cost(SKILL_STUDY, "study", 0);
+  skillo_cost(SKILL_SCRIBING, "scribing", 0);
+  skillo_cost(SKILL_ALCHEMY, "alchemy", 0);
+  skillo_cost(SKILL_ENCHANTING, "enchanting", 0);
+  skillo_cost(SKILL_SCRIBING_MASTERY, "scribing mastery", 0);
+  skillo_cost(SKILL_ALCHEMY_MASTERY, "alchemy mastery", 0);
+  skillo_cost(SKILL_ENCHANTING_MASTERY, "enchanting mastery", 0);
+  skillo_cost(SKILL_CAREFUL_HANDS, "careful hands", 0);
+  skillo_cost(SKILL_EFFICIENT_CRAFTING, "efficient crafting", 0);
+  skillo_cost(SKILL_STEADY_MIND, "steady mind", 0);
 }

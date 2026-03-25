@@ -239,8 +239,11 @@ void clanedit_parse(struct descriptor_data *d, char *arg);
 #define MOB_GUILD_MASTER   19   /**< Mob is a guildmaster */
 #define MOB_NOTDEADYET     20   /**< (R) Mob being extracted */
 #define MOB_AI_ACTOR       21   /**< Mob uses inferred AI actor behavior */
+#define MOB_TEACH_SCRIBING 22   /**< Mob can train scribing profession */
+#define MOB_TEACH_ALCHEMY  23   /**< Mob can train alchemy profession */
+#define MOB_TEACH_ENCHANTING 24 /**< Mob can train enchanting profession */
 
-#define NUM_MOB_FLAGS      22
+#define NUM_MOB_FLAGS      25
 
 /* Preference flags: used by char_data.player_specials.pref */
 #define PRF_BRIEF         0   /**< Room descs won't normally be shown */
@@ -512,7 +515,10 @@ void clanedit_parse(struct descriptor_data *d, char *arg);
 #define ITEM_OFFHAND   19  /**< Weapon allowed in offhand */
 #define ITEM_KEPT      20  /**< Player-marked keep protection */
 #define ITEM_UNIQUE_EQUIP 21  /**< Only one identical vnum may be equipped */
-#define NUM_ITEM_FLAGS 22
+#define ITEM_CRAFT_MATERIAL 22 /**< Crafting material for professions */
+#define ITEM_CRAFT_TOOL    23  /**< Crafting tool for professions */
+#define ITEM_SPELLTOME     24  /**< Special scroll container for charges */
+#define NUM_ITEM_FLAGS 25
 
 /* Modifier constants used with obj affects ('A' fields) */
 #define APPLY_NONE              0	/**< No effect			*/
@@ -696,7 +702,7 @@ void clanedit_parse(struct descriptor_data *d, char *arg);
 #define MAX_TITLE_LENGTH      80     /**< Max PC title length */
 #define HOST_LENGTH           40     /**< Max hostname resolution length */
 #define PLR_DESC_LENGTH       4096   /**< Max length for PC description */
-#define MAX_SKILLS            260    /**< Max number of skills/spells */
+#define MAX_SKILLS            270    /**< Max number of skills/spells */
 #define MAX_AFFECT            32     /**< Max number of player affections */
 #define MAX_OBJ_AFFECT        6      /**< Max object affects */
 #define MAX_NOTE_LENGTH       4000   /**< Max length of text on a note obj */
