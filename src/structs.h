@@ -430,8 +430,11 @@ void clanedit_parse(struct descriptor_data *d, char *arg);
 #define WEAR_WRIST_L   14  /**< Equipment Location Left Wrist */
 #define WEAR_WIELD     15  /**< Equipment Location Weapon */
 #define WEAR_HOLD      16  /**< Equipment Location held in offhand */
+#define WEAR_EYES      17  /**< Equipment Location Eyes */
+#define WEAR_EAR_L     18  /**< Equipment Location Left Ear */
+#define WEAR_EAR_R     19  /**< Equipment Location Right Ear */
 /** Total number of available equipment lcoations */
-#define NUM_WEARS      17
+#define NUM_WEARS      20
 
 #define MAX_MOB_LOADOUT_ITEMS 32
 #define MAX_MOB_LOOT_ITEMS    32
@@ -480,8 +483,10 @@ void clanedit_parse(struct descriptor_data *d, char *arg);
 #define ITEM_WEAR_WRIST	   12   /**< Item can be worn on wrist */
 #define ITEM_WEAR_WIELD	   13   /**< Item can be wielded */
 #define ITEM_WEAR_HOLD     14   /**< Item can be held */
+#define ITEM_WEAR_EYES     15   /**< Item can be worn on eyes */
+#define ITEM_WEAR_EAR      16   /**< Item can be worn on ear */
 /** Total number of item wears */
-#define NUM_ITEM_WEARS    15
+#define NUM_ITEM_WEARS    17
 
 /* Extra object flags: used by obj_data.obj_flags.extra_flags */
 #define ITEM_GLOW              0   /**< Item is glowing */

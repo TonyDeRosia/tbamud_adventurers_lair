@@ -87,13 +87,13 @@ static void medit_disp_remove_inventory_picker(struct descriptor_data *d);
 static void medit_disp_remove_loot_picker(struct descriptor_data *d);
 
 static const int medit_eq_picker_slots[] = {
-  WEAR_HEAD, WEAR_NECK_1, WEAR_ABOUT, WEAR_BODY, WEAR_ARMS, WEAR_WRIST_R,
+  WEAR_HEAD, WEAR_EYES, WEAR_EAR_L, WEAR_EAR_R, WEAR_NECK_1, WEAR_ABOUT, WEAR_BODY, WEAR_ARMS, WEAR_WRIST_R,
   WEAR_WRIST_L, WEAR_HANDS, WEAR_FINGER_R, WEAR_FINGER_L, WEAR_WAIST,
   WEAR_LEGS, WEAR_FEET, WEAR_WIELD, WEAR_HOLD, WEAR_SHIELD, WEAR_LIGHT
 };
 
 static const char *medit_eq_picker_labels[] = {
-  "Head", "Neck", "Back", "Body", "Arms", "Wrist Right", "Wrist Left",
+  "Head", "Eyes", "Ear Left", "Ear Right", "Neck", "Around Body", "Body", "Arms", "Wrist Right", "Wrist Left",
   "Hands", "Finger Right", "Finger Left", "Waist", "Legs", "Feet",
   "Wield", "Hold", "Shield", "Light"
 };
@@ -488,6 +488,9 @@ static int medit_slot_required_wear_flag(int wear_pos)
     case WEAR_NECK_1:   return ITEM_WEAR_NECK;
     case WEAR_BODY:     return ITEM_WEAR_BODY;
     case WEAR_HEAD:     return ITEM_WEAR_HEAD;
+    case WEAR_EYES:     return ITEM_WEAR_EYES;
+    case WEAR_EAR_L:
+    case WEAR_EAR_R:    return ITEM_WEAR_EAR;
     case WEAR_LEGS:     return ITEM_WEAR_LEGS;
     case WEAR_FEET:     return ITEM_WEAR_FEET;
     case WEAR_HANDS:    return ITEM_WEAR_HANDS;
@@ -579,6 +582,9 @@ static const char *medit_required_wear_flag_desc(int wear_pos)
     case WEAR_HEAD:     return "wearable on head";
     case WEAR_NECK_1:   return "wearable around neck";
     case WEAR_ABOUT:    return "wearable on back/about body";
+    case WEAR_EYES:     return "wearable on eyes";
+    case WEAR_EAR_L:
+    case WEAR_EAR_R:    return "wearable on ear";
     case WEAR_BODY:     return "wearable on body";
     case WEAR_ARMS:     return "wearable on arms";
     case WEAR_WRIST_R:

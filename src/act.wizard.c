@@ -4443,6 +4443,8 @@ static struct zcheck_armor {
   {ITEM_WEAR_ABOUT,  10, "Cloak"},
   {ITEM_WEAR_WAIST,  10, "Belt"},
   {ITEM_WEAR_WRIST,  10, "Wristwear"},
+  {ITEM_WEAR_EYES,   10, "Eyewear"},
+  {ITEM_WEAR_EAR,    10, "Earwear"},
   {ITEM_WEAR_HOLD,   10, "Held item"}
 };
 
