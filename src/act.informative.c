@@ -501,6 +501,7 @@ static void list_one_char(struct char_data *i, struct char_data *ch)
       else
         send_to_char(ch, "[TRIGS] ");
     }
+    send_to_char(ch, "%s", CCNRM(ch, C_NRM));
   }
 
   if (GROUP(i)) {
