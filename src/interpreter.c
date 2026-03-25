@@ -2154,12 +2154,20 @@ if (PLR_FLAGGED(d->character, PLR_DELETED)) {
           REMOVE_BIT_AR(PLR_FLAGS(d->character), PLR_CRYO);
           d->character->player.time.logon = time(0);
           d->idle_tics = 0;
-          if (d->acct_authed && d->acct_id > 0 && GET_ACCOUNT_ID(d->character) == d->acct_id) {
+          /*
+           * Account-first login: character passwords are legacy-only and are
+           * never required after successful account authentication.
+           */
+          if (d->acct_id > 0) {
             if (!complete_character_login(d))
               return;
             break;
           }
 
+          /*
+           * Fallback for non-account flows (should not normally be reached with
+           * account-first enforcement enabled).
+           */
           write_to_output(d, "Password: ");
           echo_off(d);
           STATE(d) = CON_PASSWORD;
