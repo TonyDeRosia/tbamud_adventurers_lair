@@ -2373,29 +2373,30 @@ ACMD(do_restore)
 {
   char buf[MAX_INPUT_LENGTH];
   struct char_data *vict;
-  struct descriptor_data *j;
+  struct char_data *next_vict;
   int i;
+  int restored = 0;
 
   one_argument(argument, buf);
   if (!*buf)
     send_to_char(ch, "Whom do you wish to restore?\r\n");
-   else if (is_abbrev(buf, "all"))
-   {
+   else if (is_abbrev(buf, "all")) {
     mudlog(NRM, MAX(LVL_GOD, GET_INVIS_LEV(ch)), TRUE, "(GC) %s restored all",GET_NAME(ch));
 
-     for (j = descriptor_list; j; j = j->next)
-    {
-      if (!IS_PLAYING(j) || !(vict = j->character) || GET_LEVEL(vict) >= LVL_IMMORT)
-     continue;
-
-      GET_HIT(vict)  = GET_MAX_HIT(vict);
+    for (vict = character_list; vict; vict = next_vict) {
+      next_vict = vict->next;
+      GET_HIT(vict) = GET_MAX_HIT(vict);
       GET_MANA(vict) = effective_max_mana(vict);
       GET_MOVE(vict) = effective_max_move(vict);
-
       update_pos(vict);
-      send_to_char(ch, "%s has been fully healed.\r\n", GET_NAME(vict));
-      act("You have been fully healed by $N!", FALSE, vict, 0, ch, TO_CHAR);
+      affect_total(vict);
+      restored++;
+
+      if (!IS_NPC(vict) && vict->desc && IS_PLAYING(vict->desc))
+        act("You have been fully healed by $N!", FALSE, vict, 0, ch, TO_CHAR);
     }
+
+    send_to_char(ch, "Restored %d characters in the world.\r\n", restored);
   }
   else if (!(vict = get_char_vis(ch, buf, NULL, FIND_CHAR_WORLD)))
     send_to_char(ch, "%s", CONFIG_NOPERSON);
