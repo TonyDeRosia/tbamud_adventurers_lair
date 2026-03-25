@@ -56,7 +56,7 @@ static const char *quest_cmd[] = {
   "request", "info", "complete", "\n"};
 
 static const char *quest_mort_usage =
-  "Usage: quest list | history | progress | join <nn> | leave | request | info | complete";
+  "Usage: quest list | history | progress | status | join <nn> | leave | request | info | complete";
 
 static const char *quest_imm_usage =
   "Usage: quest list | history | progress | join <nn> | leave | status <vnum> | request | info | complete";
@@ -616,7 +616,14 @@ static void quest_info_kill(struct char_data *ch)
 
   expire_kill_quest_if_needed(ch, TRUE);
   if (!is_on_quest(ch)) {
-    send_to_char(ch, "You are not currently on a kill quest.\r\n");
+    if (is_on_quest_cooldown(ch)) {
+      send_to_char(ch, "You are not currently on a kill quest.\r\n");
+      send_to_char(ch, "You may request another quest in %d minute%s.\r\n",
+                   get_quest_cooldown_minutes_remaining(ch),
+                   get_quest_cooldown_minutes_remaining(ch) == 1 ? "" : "s");
+    } else {
+      send_to_char(ch, "You are not currently on a kill quest.\r\n");
+    }
     return;
   }
   if (is_quest_ready(ch)) {
@@ -1463,6 +1470,18 @@ static void quest_quit(struct char_data *ch)
 {
   qst_rnum rnum;
 
+  expire_kill_quest_if_needed(ch, TRUE);
+  if (is_on_quest(ch)) {
+    clear_kill_quest(ch);
+    start_kill_quest_cooldown(ch);
+    send_to_char(ch, "You abandon your current kill quest.\r\n");
+    send_to_char(ch, "You must wait %d minute%s before requesting another quest.\r\n",
+                 get_quest_cooldown_minutes_remaining(ch),
+                 get_quest_cooldown_minutes_remaining(ch) == 1 ? "" : "s");
+    save_char(ch);
+    return;
+  }
+
   if (GET_QUEST(ch) == NOTHING)
     send_to_char(ch, "But you currently aren't on a quest!\r\n");
   else if ((rnum = real_quest(GET_QUEST(ch))) == NOTHING) {
@@ -1489,9 +1508,32 @@ static void quest_progress(struct char_data *ch)
 {
   qst_rnum rnum;
 
-  if (GET_QUEST(ch) == NOTHING)
-    send_to_char(ch, "But you currently aren't on a quest!\r\n");
-  else if ((rnum = real_quest(GET_QUEST(ch))) == NOTHING) {
+  expire_kill_quest_if_needed(ch, TRUE);
+  if (is_on_quest(ch)) {
+    if (is_quest_ready(ch)) {
+      send_to_char(ch, "You have completed your kill objective.\r\n");
+      send_to_char(ch, "Return to a quest master and type 'quest complete'.\r\n");
+    } else {
+      send_to_char(ch, "You are currently on a kill quest.\r\n");
+      quest_info_kill(ch);
+      return;
+    }
+    send_to_char(ch, "Time remaining: %d minute%s.\r\n",
+                 get_quest_minutes_remaining(ch),
+                 get_quest_minutes_remaining(ch) == 1 ? "" : "s");
+    return;
+  }
+
+  if (GET_QUEST(ch) == NOTHING) {
+    if (is_on_quest_cooldown(ch)) {
+      send_to_char(ch, "You are not currently on a quest.\r\n");
+      send_to_char(ch, "You may request another kill quest in %d minute%s.\r\n",
+                   get_quest_cooldown_minutes_remaining(ch),
+                   get_quest_cooldown_minutes_remaining(ch) == 1 ? "" : "s");
+    } else {
+      send_to_char(ch, "But you currently aren't on a quest!\r\n");
+    }
+  } else if ((rnum = real_quest(GET_QUEST(ch))) == NOTHING) {
     clear_quest(ch);
     send_to_char(ch, "Your quest seems to no longer exist.\r\n");
   } else {
@@ -1667,9 +1709,12 @@ ACMD(do_quest)
         quest_complete_kill(ch);
         break;
       case SCMD_QUEST_STATUS:
-        if (GET_LEVEL(ch) < LVL_IMMORT)
-          send_to_char(ch, "%s\r\n", quest_mort_usage);
-        else
+        if (GET_LEVEL(ch) < LVL_IMMORT) {
+          if (*arg2)
+            send_to_char(ch, "%s\r\n", quest_mort_usage);
+          else
+            quest_progress(ch);
+        } else
           quest_stat(ch, arg2);
         break;
       default: /* Whe should never get here, but... */
