@@ -792,7 +792,7 @@ static void medit_disp_stats_menu(struct descriptor_data *d)
   dmg_min = GET_NDD(mob) + GET_DAMROLL(mob);
   dmg_max = (GET_NDD(mob) * GET_SDD(mob)) + GET_DAMROLL(mob);
   base_xp_preview = mob_kill_base_xp_for_levels(GET_LEVEL(mob), GET_LEVEL(mob));
-  total_xp_preview = LIMIT(base_xp_preview + GET_EXP(mob), 0, MAX_MOB_EXP);
+  total_xp_preview = LIMIT(base_xp_preview + mob->mob_specials.bonus_xp_min, 0, MAX_MOB_EXP);
   snprintf(title, sizeof(title), "MOB BUILD: [%d] %s", OLC_NUM(d), GET_SDESC(mob));
 
   write_to_output(d,
@@ -827,7 +827,7 @@ static void medit_disp_stats_menu(struct descriptor_data *d)
   "(%sE%s) Wimpy Threshold:           %s[%s%5d%s]%s\r\n"
   "-------------------------------------------------------------------------------\r\n"
   "REWARDS\r\n"
-  "(%sF%s) Bonus XP:                  %s[%s%5d%s]%s\r\n"
+  "(%sF%s) Bonus XP:                  %s[ %s%d%s / %s%d%s ]%s\r\n"
   "(%sG%s) Gold Min/Max:              %s[%s%5lld%s / %s%5lld%s]%s\r\n"
   "    Base XP Preview:           %s[%s%5d%s]%s\r\n"
   "    Total XP Preview:          %s[%s%5d%s]%s\r\n"
@@ -863,7 +863,7 @@ static void medit_disp_stats_menu(struct descriptor_data *d)
       cyn, nrm, cyn, yel, GET_EVASION(mob), cyn, nrm,
       cyn, nrm, cyn, yel, GET_ALIGNMENT(mob), cyn, nrm,
       cyn, nrm, cyn, yel, GET_MOB_WIMP_LEV(mob), cyn, nrm,
-      cyn, nrm, cyn, yel, GET_EXP(mob), cyn, nrm,
+      cyn, nrm, cyn, yel, mob->mob_specials.bonus_xp_min, cyn, yel, mob->mob_specials.bonus_xp_max, cyn, nrm,
       cyn, nrm, cyn, yel, (long long)mob->mob_specials.gold_min, cyn, yel, (long long)mob->mob_specials.gold_max, cyn, nrm,
       cyn, yel, base_xp_preview, cyn, nrm,
       cyn, yel, total_xp_preview, cyn, nrm,
@@ -890,6 +890,7 @@ void medit_parse(struct descriptor_data *d, char *arg)
 
   if (OLC_MODE(d) == MEDIT_STATS_MENU ||
       OLC_MODE(d) == MEDIT_GOLD ||
+      OLC_MODE(d) == MEDIT_BONUS_XP ||
       OLC_MODE(d) == MEDIT_LEVEL_AUTOFILL_CONFIRM ||
       OLC_MODE(d) == MEDIT_DELETE) {
     if (!genolc_checkstring(d, arg))
@@ -1122,9 +1123,9 @@ void medit_parse(struct descriptor_data *d, char *arg)
       break;
     case 'f':
     case 'F':
-      OLC_MODE(d) = MEDIT_EXP;
-      i++;
-      break;
+      OLC_MODE(d) = MEDIT_BONUS_XP;
+      write_to_output(d, "Enter Bonus XP min and max (example: 7 13) or a single value: ");
+      return;
     case 'g':
     case 'G':
       OLC_MODE(d) = MEDIT_GOLD;
@@ -1758,8 +1759,38 @@ void medit_parse(struct descriptor_data *d, char *arg)
 
   case MEDIT_EXP:
     GET_EXP(OLC_MOB(d)) = LIMIT(i, 0, MAX_MOB_EXP);
+    OLC_MOB(d)->mob_specials.bonus_xp_min = GET_EXP(OLC_MOB(d));
+    OLC_MOB(d)->mob_specials.bonus_xp_max = GET_EXP(OLC_MOB(d));
     OLC_VAL(d) = TRUE;
     medit_disp_stats_menu(d);
+    return;
+
+  case MEDIT_BONUS_XP: {
+      int xmin = 0, xmax = 0;
+
+      if (sscanf(arg, "%d %d", &xmin, &xmax) == 2) {
+        /* ok */
+      } else if (sscanf(arg, "%d", &xmin) == 1) {
+        xmax = xmin;
+      } else {
+        write_to_output(d, "Enter Bonus XP min and max (example: 7 13) or a single value: ");
+        return;
+      }
+
+      if (xmin < 0) xmin = 0;
+      if (xmax < 0) xmax = 0;
+      if (xmax < xmin) {
+        int tmp = xmin;
+        xmin = xmax;
+        xmax = tmp;
+      }
+
+      OLC_MOB(d)->mob_specials.bonus_xp_min = LIMIT(xmin, 0, MAX_MOB_EXP);
+      OLC_MOB(d)->mob_specials.bonus_xp_max = LIMIT(xmax, 0, MAX_MOB_EXP);
+      GET_EXP(OLC_MOB(d)) = OLC_MOB(d)->mob_specials.bonus_xp_min; /* legacy fallback */
+      OLC_VAL(d) = TRUE;
+      medit_disp_stats_menu(d);
+    }
     return;
 
   case MEDIT_GOLD: {

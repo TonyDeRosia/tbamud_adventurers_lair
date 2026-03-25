@@ -79,6 +79,7 @@ static int mob_kill_base_xp(struct char_data *ch, struct char_data *victim);
 static int count_live_mobs_by_vnum(mob_vnum vnum);
 static int rare_kill_bonus_for_count(int live_count, int base_xp);
 static int rare_kill_bonus_for_victim(struct char_data *victim, int base_xp);
+static int mob_bonus_xp_roll(const struct char_data *victim);
 static struct char_data *resolve_reward_killer(struct char_data *killer);
 static void dam_message(int dam, struct char_data *ch, struct char_data *victim, int w_type);
 static void make_corpse(struct char_data *ch);
@@ -1128,8 +1129,8 @@ static void perform_group_gain(struct char_data *ch, struct char_data *victim, i
   share = (base_override >= 0) ? base_override : mob_kill_base_xp(ch, victim);
 
   if (IS_NPC(victim)) {
-    /* Builder-controlled additive bonus XP from mob exp field. */
-    bonus_xp = GET_EXP(victim);
+    /* Builder-controlled additive bonus XP from mob bonus XP range. */
+    bonus_xp = mob_bonus_xp_roll(victim);
     share = MAX(0, share + bonus_xp);
     share = MIN(CONFIG_MAX_EXP_GAIN, share);
   } else {
@@ -1194,8 +1195,8 @@ static void solo_gain(struct char_data *ch, struct char_data *victim)
 
   if (IS_NPC(victim)) {
     exp = mob_kill_base_xp(ch, victim);
-    /* Builder-controlled additive bonus XP from mob exp field. */
-    bonus_xp = GET_EXP(victim);
+    /* Builder-controlled additive bonus XP from mob bonus XP range. */
+    bonus_xp = mob_bonus_xp_roll(victim);
     exp = MAX(0, exp + bonus_xp);
     exp = MIN(CONFIG_MAX_EXP_GAIN, exp);
   } else {
@@ -1298,6 +1299,24 @@ static int rare_kill_bonus_for_victim(struct char_data *victim, int base_xp)
     return 0;
 
   return rare_kill_bonus_for_count(count_live_mobs_by_vnum(GET_MOB_VNUM(victim)), base_xp);
+}
+
+static int mob_bonus_xp_roll(const struct char_data *victim)
+{
+  int min_bonus, max_bonus;
+
+  if (!victim || !IS_NPC(victim))
+    return 0;
+
+  min_bonus = MAX(0, victim->mob_specials.bonus_xp_min);
+  max_bonus = MAX(0, victim->mob_specials.bonus_xp_max);
+  if (max_bonus < min_bonus) {
+    int tmp = min_bonus;
+    min_bonus = max_bonus;
+    max_bonus = tmp;
+  }
+
+  return (min_bonus == max_bonus) ? min_bonus : rand_number(min_bonus, max_bonus);
 }
 
 static struct char_data *resolve_reward_killer(struct char_data *killer)
