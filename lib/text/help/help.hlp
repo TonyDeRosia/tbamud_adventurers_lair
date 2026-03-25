@@ -14458,13 +14458,14 @@ See Also: AUTOQUESTS
 
 QUESTS QUEST-LIST QUEST-HISTORY QUEST-PROGRESS QUEST-JOIN QUEST-LEAVE QUEST-STATUS QUEST-FLAG QUESTFLAG
 
-Usage: quest [list | join <#> | progress | leave | history | request | info | complete]
+Usage: quest [list | join <#> | progress | status | leave | history | request | info | complete]
 
 quest          - Show usage information for the quest command.
 quest list     - Used at the questmaster to see which quests are available.
 quest join #   - Used to the questmaster to join the quest listed as number 'nn' on quest list.
-quest progress - Shows the player which quest they are doing, and their quest progress.
-quest leave    - Allows the player to abandon the current quest, taking the quest point penalty.
+quest progress - Shows your current quest progress. If on a kill quest, also shows remaining time and target area.
+quest status   - Alias of quest progress for players; immortals may use 'quest status <vnum>'.
+quest leave    - Abandons your current quest. Leaving a kill quest starts its cooldown immediately.
 quest history  - Shows all previously completed non-repeatable quests.
 quest request  - Request a kill quest from a questmaster in the room.
 quest info     - Show details for your current kill quest target and area.
