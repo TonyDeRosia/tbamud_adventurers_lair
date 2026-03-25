@@ -1474,6 +1474,63 @@ static int find_known_spell_by_tokens(struct char_data *ch, const char *name,
   return -1;
 }
 
+static int find_known_ability_by_tokens(struct char_data *ch, const char *name,
+    char *ambig_buf, size_t ambig_len, int *matched_tokens,
+    bool allow_partial_name, bool allow_extra_input) {
+  int best_ability = -1;
+  int best_tokens = 0;
+  bool best_exact = FALSE;
+  int best_input_tokens = 0;
+  int match_count = 0;
+  int ability;
+
+  if (matched_tokens)
+    *matched_tokens = 0;
+
+  *ambig_buf = '\0';
+
+  for (ability = 1; ability <= TOP_SPELL_DEFINE; ability++) {
+    int token_count = 0;
+    int input_token_count = 0;
+    bool exact_name_match = FALSE;
+
+    if (!is_available_ability(ability))
+      continue;
+    if (GET_SKILL(ch, ability) <= 0)
+      continue;
+
+    if (!ability_matches_input(name, spell_info[ability].name,
+        allow_partial_name, allow_extra_input, &token_count,
+        &input_token_count, &exact_name_match))
+      continue;
+
+    if (token_count > best_tokens ||
+        (token_count == best_tokens && exact_name_match && !best_exact)) {
+      best_tokens = token_count;
+      best_exact = exact_name_match;
+      best_input_tokens = input_token_count;
+      best_ability = ability;
+      match_count = 0;
+      *ambig_buf = '\0';
+      append_match(ambig_buf, ambig_len, spell_info[ability].name,
+          &match_count);
+    } else if (token_count == best_tokens && exact_name_match == best_exact) {
+      append_match(ambig_buf, ambig_len, spell_info[ability].name,
+          &match_count);
+    }
+  }
+
+  if (matched_tokens)
+    *matched_tokens = best_input_tokens;
+
+  if (match_count == 1)
+    return best_ability;
+  if (match_count > 1)
+    return -2;
+
+  return -1;
+}
+
 int resolve_spell_by_player_input(struct char_data *ch, const char *name,
     bool known_only, bool allow_partial_name, bool allow_extra_input,
     int *matched_tokens, char *ambig_buf, size_t ambig_len) {
@@ -1493,6 +1550,24 @@ int resolve_spell_by_player_input(struct char_data *ch, const char *name,
         matched_tokens, allow_partial_name, allow_extra_input);
 
   return find_ability_by_tokens(cleaned, ambig_buf, ambig_len,
+      matched_tokens, allow_partial_name, allow_extra_input);
+}
+
+int resolve_known_ability_by_player_input(struct char_data *ch,
+    const char *name, bool allow_partial_name, bool allow_extra_input,
+    int *matched_tokens, char *ambig_buf, size_t ambig_len) {
+  char cleaned[MAX_INPUT_LENGTH];
+
+  if (matched_tokens)
+    *matched_tokens = 0;
+  if (ambig_buf && ambig_len > 0)
+    *ambig_buf = '\0';
+
+  normalize_ability_input(name, cleaned, sizeof(cleaned));
+  if (!*cleaned)
+    return -1;
+
+  return find_known_ability_by_tokens(ch, cleaned, ambig_buf, ambig_len,
       matched_tokens, allow_partial_name, allow_extra_input);
 }
 

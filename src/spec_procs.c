@@ -67,16 +67,10 @@ void sort_spells(void)
   qsort(&spell_sort_info[1], MAX_SKILLS, sizeof(int), compare_spells);
 }
 
-static const char *prac_types[] = {
-  "spell",
-  "skill"
-};
-
 #define LEARNED(ch) (MIN(PRACTICE_CAP, get_class_prac_learned_level((int)GET_CLASS(ch))))
 
 #define MINGAIN(ch) (get_class_prac_min_per_prac((int)GET_CLASS(ch)))
 #define MAXGAIN(ch) (get_class_prac_max_per_prac((int)GET_CLASS(ch)))
-#define SPLSKL(ch) (prac_types[get_class_prac_type((int)GET_CLASS(ch))])
 
 static void show_known_abilities(struct char_data *ch, bool include_spells, bool include_skills)
 {
@@ -153,17 +147,17 @@ SPECIAL(guild)
   {
     char ambiguity[MAX_STRING_LENGTH];
 
-    skill_num = resolve_spell_by_player_input(ch, argument, TRUE, TRUE, FALSE,
-        NULL, ambiguity, sizeof(ambiguity));
+    skill_num = resolve_known_ability_by_player_input(ch, argument, TRUE,
+        FALSE, NULL, ambiguity, sizeof(ambiguity));
     if (skill_num == -2) {
-      send_to_char(ch, "Ambiguous %s name. Did you mean: %s?\r\n",
-          SPLSKL(ch), ambiguity);
+      send_to_char(ch, "Ambiguous ability name. Did you mean: %s?\r\n",
+          ambiguity);
       return (TRUE);
     }
   }
 
   if (!can_character_practice_ability(ch, skill_num)) {
-    send_to_char(ch, "You do not know of that %s.\r\n", SPLSKL(ch));
+    send_to_char(ch, "You do not know of that ability.\r\n");
     return (TRUE);
   }
   if (!crafting_can_teach_ability((struct char_data *)me, skill_num)) {
