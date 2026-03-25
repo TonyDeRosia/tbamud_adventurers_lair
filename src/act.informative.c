@@ -4214,21 +4214,25 @@ static void perform_immort_where(char_data *ch, const char *arg)
   const size_t buf_size = sizeof(buf) - strlen(error_message) - 1;
 
   if (!*arg) {
-    send_to_char(ch, "Players  Room    Location                       Zone\r\n");
-    send_to_char(ch, "-------- ------- ------------------------------ -------------------\r\n");
+    send_to_char(ch, "Players  Room    Location                       Zone              Level\r\n");
+    send_to_char(ch, "-------- ------- ------------------------------ ----------------- -------\r\n");
     for (d = descriptor_list; d; d = d->next)
       if (IS_PLAYING(d)) {
         i = (d->original ? d->original : d->character);
         if (i && CAN_SEE(ch, i) && (IN_ROOM(i) != NOWHERE)) {
           if (d->original)
-            send_to_char(ch, "%-8s%s - [%5d] %s%s (in %s%s)\r\n",
+            send_to_char(ch, "%-8s%s - [%5d] %s%s (in %s%s) %3d-%-3d\r\n",
               GET_NAME(i), QNRM, GET_ROOM_VNUM(IN_ROOM(d->character)),
-              world[IN_ROOM(d->character)].name, QNRM, GET_NAME(d->character), QNRM);
+              world[IN_ROOM(d->character)].name, QNRM, GET_NAME(d->character), QNRM,
+              zone_table[(world[IN_ROOM(d->character)].zone)].min_level,
+              zone_table[(world[IN_ROOM(d->character)].zone)].max_level);
           else
-            send_to_char(ch, "%-8s%s %s[%s%5d%s]%s %-*s%s %s%s\r\n", GET_NAME(i), QNRM,
+            send_to_char(ch, "%-8s%s %s[%s%5d%s]%s %-*s%s %-17s %3d-%-3d\r\n", GET_NAME(i), QNRM,
               QCYN, QYEL, GET_ROOM_VNUM(IN_ROOM(i)), QCYN, QNRM,
               30+count_color_chars(world[IN_ROOM(i)].name), world[IN_ROOM(i)].name, QNRM,
-              zone_table[(world[IN_ROOM(i)].zone)].name, QNRM);
+              zone_table[(world[IN_ROOM(i)].zone)].name,
+              zone_table[(world[IN_ROOM(i)].zone)].min_level,
+              zone_table[(world[IN_ROOM(i)].zone)].max_level);
         }
       }
   } else {
