@@ -1484,16 +1484,26 @@ static void dam_message(int dam, struct char_data *ch, struct char_data *victim,
 
 /*  message for doing damage with a spell or skill. Also used for weapon
  *  damage on miss and death blows. */
+static int g_last_skill_message_had_severity = 0;
+
+static int skill_message_last_had_severity(void)
+{
+  return g_last_skill_message_had_severity;
+}
+
 int skill_message(int dam, struct char_data *ch, struct char_data *vict,
 		      int attacktype)
 {
   int i, j, nr;
   struct message_type *msg;
+  int has_severity = 0;
 
   char wmsg_att[MAX_STRING_LENGTH];
   char wmsg_vic[MAX_STRING_LENGTH];
   char wmsg_room[MAX_STRING_LENGTH];
   struct obj_data *weap = GET_EQ(ch, WEAR_WIELD);
+  /* Reset on each call; queried by damage() in this file only. */
+  g_last_skill_message_had_severity = 0;
 
   /* @todo restructure the messages library to a pointer based system as
    * opposed to the current cyclic location system. */
@@ -1507,6 +1517,21 @@ int skill_message(int dam, struct char_data *ch, struct char_data *vict,
         act(msg->god_msg.victim_msg, FALSE, ch, weap, vict, TO_VICT);
         act(msg->god_msg.room_msg, FALSE, ch, weap, vict, TO_NOTVICT);
       } else if (dam != 0) {
+        const char *att = NULL;
+        const char *vic = NULL;
+        const char *room = NULL;
+        if (GET_POS(vict) == POS_DEAD) {
+          att = msg->die_msg.attacker_msg;
+          vic = msg->die_msg.victim_msg;
+          room = msg->die_msg.room_msg;
+        } else {
+          att = msg->hit_msg.attacker_msg;
+          vic = msg->hit_msg.victim_msg;
+          room = msg->hit_msg.room_msg;
+        }
+        if ((att && strstr(att, "#w")) || (vic && strstr(vic, "#w")) || (room && strstr(room, "#w")))
+          has_severity = 1;
+
         /*
          * Don't send redundant color codes for TYPE_SUFFERING & other types
          * of damage without attacker_msg.
@@ -1555,9 +1580,11 @@ int skill_message(int dam, struct char_data *ch, struct char_data *vict,
 
         act(msg->miss_msg.room_msg, FALSE, ch, weap, vict, TO_NOTVICT);
       }
+      g_last_skill_message_had_severity = has_severity;
       return (1);
     }
   }
+  g_last_skill_message_had_severity = 0;
   return (0);
 }
 
@@ -2006,9 +2033,10 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
     int shown = skill_message(dam, ch, victim, attacktype);
     int is_spell_attack = (attacktype > 0 && attacktype <= MAX_SPELLS);
     const char *source_noun = is_spell_attack ? "magic" : "attack";
+    int has_existing_severity = skill_message_last_had_severity();
 
     /* Always add a short severity verb line for successful spell/skill hits. */
-    if (dam > 0 && IN_ROOM(victim) != NOWHERE) {
+    if (dam > 0 && IN_ROOM(victim) != NOWHERE && !has_existing_severity) {
       static const char *const v3[] = {
         "misses", "grazes", "glances", "hits", "strikes", "slams", "crushes", "blasts", "shreds", "pulverizes"
       };
@@ -2030,10 +2058,11 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
         act(to_char, FALSE, ch, NULL, victim, TO_CHAR);
         act(to_vict, FALSE, ch, NULL, victim, TO_VICT | TO_SLEEP);
       } else {
-        send_to_char(victim, "Lingering magic %s%s%s%s\tn you.\r\n", col, pre, v3[tier], post);
+        const char *lingering_noun = is_spell_attack ? "magic" : "effect";
+        send_to_char(victim, "Lingering %s %s%s%s%s\tn you.\r\n", lingering_noun, col, pre, v3[tier], post);
         {
           char roommsg[160];
-          snprintf(roommsg, sizeof(roommsg), "$n is %s%s%s%s\tn by lingering magic.", col, pre, v3_past[tier], post);
+          snprintf(roommsg, sizeof(roommsg), "$n is %s%s%s%s\tn by lingering %s.", col, pre, v3_past[tier], post, lingering_noun);
           act(roommsg, TRUE, victim, 0, 0, TO_ROOM);
         }
       }
