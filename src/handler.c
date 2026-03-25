@@ -345,15 +345,28 @@ void affect_total(struct char_data *ch)
     }
   }
 
-  /* Clamp fully modified stats. */
-  ch->aff_abils.str   = MAX(0, MIN(ch->aff_abils.str,   EFFECTIVE_STAT_CAP));
-  ch->aff_abils.dex   = MAX(0, MIN(ch->aff_abils.dex,   EFFECTIVE_STAT_CAP));
-  ch->aff_abils.con   = MAX(0, MIN(ch->aff_abils.con,   EFFECTIVE_STAT_CAP));
-  ch->aff_abils.intel = MAX(0, MIN(ch->aff_abils.intel, EFFECTIVE_STAT_CAP));
-  ch->aff_abils.wis   = MAX(0, MIN(ch->aff_abils.wis,   EFFECTIVE_STAT_CAP));
-  ch->aff_abils.cha   = MAX(0, MIN(ch->aff_abils.cha,   EFFECTIVE_STAT_CAP));
+  /* Clamp fully modified stats.
+   * EFFECTIVE_STAT_CAP <= 0 means "no upper cap" so stacked item bonuses
+   * continue to accumulate naturally. */
+  if (EFFECTIVE_STAT_CAP > 0) {
+    ch->aff_abils.str   = MAX(0, MIN(ch->aff_abils.str,   EFFECTIVE_STAT_CAP));
+    ch->aff_abils.dex   = MAX(0, MIN(ch->aff_abils.dex,   EFFECTIVE_STAT_CAP));
+    ch->aff_abils.con   = MAX(0, MIN(ch->aff_abils.con,   EFFECTIVE_STAT_CAP));
+    ch->aff_abils.intel = MAX(0, MIN(ch->aff_abils.intel, EFFECTIVE_STAT_CAP));
+    ch->aff_abils.wis   = MAX(0, MIN(ch->aff_abils.wis,   EFFECTIVE_STAT_CAP));
+    ch->aff_abils.cha   = MAX(0, MIN(ch->aff_abils.cha,   EFFECTIVE_STAT_CAP));
+  } else {
+    ch->aff_abils.str   = MAX(0, ch->aff_abils.str);
+    ch->aff_abils.dex   = MAX(0, ch->aff_abils.dex);
+    ch->aff_abils.con   = MAX(0, ch->aff_abils.con);
+    ch->aff_abils.intel = MAX(0, ch->aff_abils.intel);
+    ch->aff_abils.wis   = MAX(0, ch->aff_abils.wis);
+    ch->aff_abils.cha   = MAX(0, ch->aff_abils.cha);
+  }
 
-  /* Convert mortal strength beyond 18 into exceptional strength. */
+  /* Legacy 18/xx strength conversion is only valid in classic 18-cap systems.
+   * For modern base-stat systems (>18), keep STR as a normal accumulating stat. */
+#if BASE_STAT_CAP <= 18
   if (!(IS_NPC(ch) || GET_LEVEL(ch) >= LVL_GRGOD)) {
     if (GET_STR(ch) > 18) {
       i = GET_ADD(ch) + ((GET_STR(ch) - 18) * 10);
@@ -361,6 +374,9 @@ void affect_total(struct char_data *ch)
       GET_STR(ch) = 18;
     }
   }
+#else
+  GET_ADD(ch) = 0;
+#endif
 
   clamp_mana_to_effective_max(ch);
   clamp_move_to_effective_max(ch);
