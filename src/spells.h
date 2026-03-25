@@ -617,6 +617,9 @@ int find_skill_num_with_ambig(const char *name, char *ambig_buf,
 int resolve_spell_by_player_input(struct char_data *ch, const char *name,
     bool known_only, bool allow_partial_name, bool allow_extra_input,
     int *matched_tokens, char *ambig_buf, size_t ambig_len);
+int resolve_known_ability_by_player_input(struct char_data *ch,
+    const char *name, bool allow_partial_name, bool allow_extra_input,
+    int *matched_tokens, char *ambig_buf, size_t ambig_len);
 int can_character_cast_known_spell(struct char_data *ch, int spellnum);
 
 int mag_damage(int level, struct char_data *ch, struct char_data *victim,
