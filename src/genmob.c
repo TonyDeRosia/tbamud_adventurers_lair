@@ -367,6 +367,11 @@ int write_mobile_espec(mob_vnum mvnum, struct char_data *mob, FILE *fd)
     fprintf(fd, "GoldMin: %lld\n", (long long)mob->mob_specials.gold_min);
     fprintf(fd, "GoldMax: %lld\n", (long long)mob->mob_specials.gold_max);
   }
+  if (mob->mob_specials.bonus_xp_min != GET_EXP(mob) ||
+      mob->mob_specials.bonus_xp_max != GET_EXP(mob)) {
+    fprintf(fd, "BonusXPMin: %d\n", mob->mob_specials.bonus_xp_min);
+    fprintf(fd, "BonusXPMax: %d\n", mob->mob_specials.bonus_xp_max);
+  }
   for (i = 0; i < mob->mob_specials.equip_loadout_count; i++)
     fprintf(fd, "EquipItem: %d %d\n",
             mob->mob_specials.equip_loadout[i].vnum,

@@ -1642,6 +1642,8 @@ static void parse_simple_mob(FILE *mob_f, int i, int nr)
     mob_proto[i].mob_specials.gold_max = mob_proto[i].mob_specials.gold_min;
 
   GET_EXP(mob_proto + i) = t[1];
+  mob_proto[i].mob_specials.bonus_xp_min = MAX(0, GET_EXP(mob_proto + i));
+  mob_proto[i].mob_specials.bonus_xp_max = MAX(0, GET_EXP(mob_proto + i));
 
   if (!get_line(mob_f, line)) {
     log("SYSERR: Format error in last line of mob #%d\n"
@@ -1740,6 +1742,16 @@ static void interpret_espec(const char *keyword, const char *value, int i, int n
 
   CASE("GoldMax") {
     mob_proto[i].mob_specials.gold_max = atoll(value);
+  }
+
+  CASE("BonusXPMin") {
+    RANGE(0, MAX_MOB_EXP);
+    mob_proto[i].mob_specials.bonus_xp_min = num_arg;
+  }
+
+  CASE("BonusXPMax") {
+    RANGE(0, MAX_MOB_EXP);
+    mob_proto[i].mob_specials.bonus_xp_max = num_arg;
   }
 
   if (value && !matched && !str_cmp(keyword, "EquipItem")) {
@@ -1879,6 +1891,16 @@ static void parse_enhanced_mob(FILE *mob_f, int i, int nr)
     mob_proto[i].mob_specials.gold_min = 0;
   if ((long long)mob_proto[i].mob_specials.gold_max < (long long)mob_proto[i].mob_specials.gold_min)
     mob_proto[i].mob_specials.gold_max = mob_proto[i].mob_specials.gold_min;
+
+  if (mob_proto[i].mob_specials.bonus_xp_min < 0)
+    mob_proto[i].mob_specials.bonus_xp_min = 0;
+  if (mob_proto[i].mob_specials.bonus_xp_max < 0)
+    mob_proto[i].mob_specials.bonus_xp_max = 0;
+  if (mob_proto[i].mob_specials.bonus_xp_max < mob_proto[i].mob_specials.bonus_xp_min) {
+    int tmp = mob_proto[i].mob_specials.bonus_xp_min;
+    mob_proto[i].mob_specials.bonus_xp_min = mob_proto[i].mob_specials.bonus_xp_max;
+    mob_proto[i].mob_specials.bonus_xp_max = tmp;
+  }
 
   }
 

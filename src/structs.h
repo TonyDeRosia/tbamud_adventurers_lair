@@ -1186,6 +1186,8 @@ struct mob_special_data
   int wimpy_threshold; /**< NPC flee threshold HP (0 = legacy behavior). */
   long long gold_min; /* min roll on death */
   long long gold_max; /* max roll on death */
+  int bonus_xp_min;   /* min additive bonus XP on kill */
+  int bonus_xp_max;   /* max additive bonus XP on kill */
   int summon_timer;   /**< Violence-pulse countdown for temporary summons (<=0 means permanent). */
 };
 
