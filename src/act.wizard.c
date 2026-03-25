@@ -1704,6 +1704,45 @@ static int collect_matching_room_reset_roots(zone_rnum zone_num, char reset_type
   return matches;
 }
 
+static int collect_matching_object_delete_reset_roots(zone_rnum zone_num, int obj_rnum,
+                                                      room_rnum room_num, int **roots, int **chain_ends)
+{
+  int i, total, matches = 0;
+  struct reset_com *cmd = zone_table[zone_num].cmd;
+
+  *roots = NULL;
+  *chain_ends = NULL;
+  total = count_commands(cmd);
+
+  if (total <= 0)
+    return 0;
+
+  CREATE(*roots, int, total);
+  CREATE(*chain_ends, int, total);
+
+  for (i = 0; i < total; i++) {
+    if ((cmd[i].command == 'O' &&
+         cmd[i].arg1 == obj_rnum &&
+         cmd[i].arg3 == room_num) ||
+        (cmd[i].command == 'R' &&
+         cmd[i].arg1 == room_num &&
+         cmd[i].arg2 == obj_rnum)) {
+      (*roots)[matches] = i;
+      (*chain_ends)[matches] = room_reset_chain_end(cmd, i);
+      matches++;
+    }
+  }
+
+  if (matches == 0) {
+    free(*roots);
+    free(*chain_ends);
+    *roots = NULL;
+    *chain_ends = NULL;
+  }
+
+  return matches;
+}
+
 static void delete_room_reset_chain(struct zone_data *zone, int root_index, int chain_end)
 {
   int i;
@@ -1875,8 +1914,12 @@ static void perform_room_reset_delete(struct char_data *ch, char reset_type, int
     return;
   }
 
-  match_count = collect_matching_room_reset_roots(zone_rnum_value, reset_type, thing_rnum,
-                                                  room_rnum_value, &match_roots, &match_chain_ends);
+  if (reset_type == 'O')
+    match_count = collect_matching_object_delete_reset_roots(zone_rnum_value, thing_rnum,
+                                                             room_rnum_value, &match_roots, &match_chain_ends);
+  else
+    match_count = collect_matching_room_reset_roots(zone_rnum_value, reset_type, thing_rnum,
+                                                    room_rnum_value, &match_roots, &match_chain_ends);
   if (match_count <= 0) {
     send_to_char(ch, "No matching reset found\r\n");
     return;
