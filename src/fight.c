@@ -97,6 +97,10 @@ static void auto_assist_owned_followers(struct char_data *owner);
 static void change_alignment(struct char_data *ch, struct char_data *victim);
 static void group_gain(struct char_data *ch, struct char_data *victim);
 static void solo_gain(struct char_data *ch, struct char_data *victim);
+static int round_target_health_percent(const struct char_data *victim);
+static int round_tnl(const struct char_data *ch);
+static int round_quest_timer(const struct char_data *ch);
+static void send_combat_round_update(struct char_data *ch);
 /** @todo refactor this function name */
 static char *replace_string(const char *str, const char *weapon_singular, const char *weapon_plural);
 static void do_spirit_procs(struct char_data *ch, struct char_data *vict);
@@ -411,6 +415,65 @@ static const char *victim_condition_text(int band)
     case 4: return "has some big nasty wounds and scratches.";
     case 5: return "is gravely injured.";
     default: return "needs a hospital.";
+  }
+}
+
+static int round_target_health_percent(const struct char_data *victim)
+{
+  if (!victim || GET_MAX_HIT(victim) <= 0)
+    return -1;
+
+  return MAX(0, MIN(100, (GET_HIT(victim) * 100) / GET_MAX_HIT(victim)));
+}
+
+static int round_tnl(const struct char_data *ch)
+{
+  if (!ch || GET_LEVEL(ch) >= LVL_IMMORT)
+    return 0;
+
+  return MAX(0, level_exp(GET_CLASS(ch), GET_LEVEL(ch) + 1) - GET_EXP(ch));
+}
+
+static int round_quest_timer(const struct char_data *ch)
+{
+  if (!ch)
+    return 0;
+  if (GET_QUEST(ch) != NOTHING)
+    return GET_QUEST_TIME(ch);
+  return get_quest_cooldown_minutes_remaining((struct char_data *) ch);
+}
+
+static void send_combat_round_update(struct char_data *ch)
+{
+  struct char_data *victim;
+  int enemy_pct;
+
+  if (!ch || IS_NPC(ch))
+    return;
+  if (GET_POS(ch) <= POS_STUNNED)
+    return;
+
+  victim = FIGHTING(ch);
+  if (!victim || GET_POS(victim) <= POS_DEAD || GET_HIT(victim) <= 0)
+    return;
+
+  send_to_char(ch, "\tC%s %s\tn\r\n", PERS(victim, ch), victim_condition_text(victim_condition_band(victim)));
+
+  enemy_pct = round_target_health_percent(victim);
+  if (enemy_pct >= 0) {
+    send_to_char(ch,
+                 "[Fighting: %d/%dHP %d/%dMA %d/%dMV %dQT %dTNL Enemy: %d%%]\r\n",
+                 GET_HIT(ch), GET_MAX_HIT(ch),
+                 GET_MANA(ch), effective_max_mana(ch),
+                 GET_MOVE(ch), effective_max_move(ch),
+                 round_quest_timer(ch), round_tnl(ch), enemy_pct);
+  } else {
+    send_to_char(ch,
+                 "[Fighting: %d/%dHP %d/%dMA %d/%dMV %dQT %dTNL Enemy: ?]\r\n",
+                 GET_HIT(ch), GET_MAX_HIT(ch),
+                 GET_MANA(ch), effective_max_mana(ch),
+                 GET_MOVE(ch), effective_max_move(ch),
+                 round_quest_timer(ch), round_tnl(ch));
   }
 }
 
@@ -1678,8 +1741,6 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
   }
 
   int damage_type = take_next_damage_type();
-  int old_hit = 0;
-  int old_band = 0;
   long local_gold = 0, happy_gold = 0;
   char local_buf[256];
   struct char_data *tmp_char;
@@ -2011,8 +2072,6 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
     dam = 0;
   }
 
-  old_hit = GET_HIT(victim);
-  old_band = victim_condition_band(victim);
   GET_HIT(victim) -= dam;
 
   /* Gain exp for the hit */
@@ -2091,20 +2150,6 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
       dam_message(dam, ch, victim, attacktype);
     }
   }
-  if (ch && victim && ch != victim && GET_POS(victim) > POS_DEAD && dam > 0) {
-    int new_band = victim_condition_band(victim);
-    int tier = damage_severity_tier(dam, victim);
-
-    if ((new_band > old_band && tier >= 4) || tier >= 7) {
-      send_to_char(ch, "\tC%s %s\tn\r\n", PERS(victim, ch), victim_condition_text(new_band));
-      if (GET_LEVEL(ch) >= LVL_IMMORT && CONFIG_DEBUG_MODE >= NRM)
-        send_to_char(ch, "\tD(cond: %d%% -> %d%%)\tn\r\n",
-                     (old_hit * 100) / MAX(1, GET_MAX_HIT(victim)),
-                     (GET_HIT(victim) * 100) / MAX(1, GET_MAX_HIT(victim)));
-    }
-  }
-
-
   /* Use send_to_char -- act() doesn't send message if you are DEAD. */
   switch (GET_POS(victim)) {
   case POS_MORTALLYW:
@@ -2678,16 +2723,19 @@ void perform_violence(void)
 
     if (GET_POS(ch) < POS_FIGHTING) {
       send_to_char(ch, "You can't fight while sitting!!\r\n");
+      send_combat_round_update(ch);
       continue;
     }
 
     if (AFF_FLAGGED(ch, AFF_STUNNED)) {
       send_to_char(ch, "You are stunned and cannot act this round!\r\n");
+      send_combat_round_update(ch);
       continue;
     }
 
     if (affected_by_spell(ch, SPELL_CONFUSION) && rand_number(1, 100) <= 33) {
       send_to_char(ch, "You falter in confusion and lose your action this round!\r\n");
+      send_combat_round_update(ch);
       continue;
     }
 
@@ -2725,5 +2773,7 @@ void perform_violence(void)
       char actbuf[MAX_INPUT_LENGTH] = "";
       (GET_MOB_SPEC(ch)) (ch, ch, 0, actbuf);
     }
+
+    send_combat_round_update(ch);
   }
 }
