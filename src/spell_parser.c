@@ -44,7 +44,7 @@ static int find_ability_by_tokens(const char *name, char *ambig_buf,
     bool allow_extra_input);
 static int reflect_suppressed = 0;
 
-static int can_character_cast_known_spell(struct char_data *ch, int spellnum)
+int can_character_cast_known_spell(struct char_data *ch, int spellnum)
 {
   int learned_at;
   int is_reactive_identity;

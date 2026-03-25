@@ -2003,9 +2003,12 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
    * death blow, send a skill_message if one exists; if not, default to a
    * dam_message. Otherwise, always send a dam_message. */
   if (!IS_WEAPON(attacktype)) {
-    /* Always add a short severity verb line for spells, skills, DoTs. */
     int shown = skill_message(dam, ch, victim, attacktype);
-    if (!shown && dam > 0 && IN_ROOM(victim) != NOWHERE) {
+    int is_spell_attack = (attacktype > 0 && attacktype <= MAX_SPELLS);
+    const char *source_noun = is_spell_attack ? "magic" : "attack";
+
+    /* Always add a short severity verb line for successful spell/skill hits. */
+    if (dam > 0 && IN_ROOM(victim) != NOWHERE) {
       static const char *const v3[] = {
         "misses", "grazes", "glances", "hits", "strikes", "slams", "crushes", "blasts", "shreds", "pulverizes"
       };
@@ -2020,9 +2023,9 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
       if (tier > 9) tier = 9;
       if (ch) {
         char to_char[160], to_vict[160], to_room[160];
-        snprintf(to_char, sizeof(to_char), "Your magic %s%s%s%s\tn $N.", col, pre, v3[tier], post);
-        snprintf(to_vict, sizeof(to_vict), "$n's magic %s%s%s%s\tn you.", col, pre, v3[tier], post);
-        snprintf(to_room, sizeof(to_room), "$n's magic %s%s%s%s\tn $N.", col, pre, v3[tier], post);
+        snprintf(to_char, sizeof(to_char), "Your %s %s%s%s%s\tn $N.", source_noun, col, pre, v3[tier], post);
+        snprintf(to_vict, sizeof(to_vict), "$n's %s %s%s%s%s\tn you.", source_noun, col, pre, v3[tier], post);
+        snprintf(to_room, sizeof(to_room), "$n's %s %s%s%s%s\tn $N.", source_noun, col, pre, v3[tier], post);
         act(to_room, FALSE, ch, NULL, victim, TO_NOTVICT);
         act(to_char, FALSE, ch, NULL, victim, TO_CHAR);
         act(to_vict, FALSE, ch, NULL, victim, TO_VICT | TO_SLEEP);
@@ -2035,11 +2038,17 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
         }
       }
     } else if (!shown) {
-      /* If a spell has no messages and did 0 damage, still show something. */
+      /* If no message exists and no damage landed, still show a source-appropriate miss. */
       if (ch) {
-        act("Your magic misses $N.", FALSE, ch, NULL, victim, TO_CHAR);
-        act("$n's magic misses you.", FALSE, ch, NULL, victim, TO_VICT | TO_SLEEP);
-        act("$n's magic misses $N.", FALSE, ch, NULL, victim, TO_NOTVICT);
+        if (is_spell_attack) {
+          act("Your magic misses $N.", FALSE, ch, NULL, victim, TO_CHAR);
+          act("$n's magic misses you.", FALSE, ch, NULL, victim, TO_VICT | TO_SLEEP);
+          act("$n's magic misses $N.", FALSE, ch, NULL, victim, TO_NOTVICT);
+        } else {
+          act("Your attack misses $N.", FALSE, ch, NULL, victim, TO_CHAR);
+          act("$n's attack misses you.", FALSE, ch, NULL, victim, TO_VICT | TO_SLEEP);
+          act("$n's attack misses $N.", FALSE, ch, NULL, victim, TO_NOTVICT);
+        }
       } else {
         send_to_char(victim, "You suffer.\r\n");
         act("$n suffers.", TRUE, victim, 0, 0, TO_ROOM);

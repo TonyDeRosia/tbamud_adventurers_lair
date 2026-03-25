@@ -380,6 +380,7 @@ void show_ability_table_aligned(struct char_data *ch, int show_spells, int show_
     if (show_all && lvl >= LVL_IMMORT) continue;
     pct = GET_SKILL(ch, i);
     if (!show_all && pct <= 0) continue;
+    if (!show_all && show_spells && !can_character_cast_known_spell(ch, i)) continue;
     if (pct <= 0) pct = -1;
     nm = spell_info[i].name;
     if (!nm || !*nm) continue;
