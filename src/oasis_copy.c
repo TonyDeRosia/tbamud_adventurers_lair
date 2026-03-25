@@ -27,6 +27,8 @@
 /* Local, filescope function prototypes */
 /* Utility function for buildwalk */
 static room_vnum redit_find_new_vnum(zone_rnum zone);
+static int parse_deldir_direction(const char *arg);
+static int delete_room_exit(room_rnum room, int dir);
 
 
 /***********************************************************
@@ -287,6 +289,108 @@ ACMD(do_dig)
   }
 }
 
+ACMD(do_deldir)
+{
+  char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH];
+  int both_mode = FALSE;
+  int dir, rev;
+  room_vnum source_vnum;
+  room_rnum source_room, dest_room = NOWHERE;
+  struct room_direction_data *exit;
+
+  *arg3 = '\0';
+  {
+    char *remaining = two_arguments(argument, arg1, arg2);
+    skip_spaces(&remaining);
+    if (*remaining)
+      one_argument(remaining, arg3);
+  }
+
+  if (!*arg1) {
+    send_to_char(ch, "Syntax: deldir <direction>\r\n"
+                     "        deldir <room vnum> <direction>\r\n"
+                     "        deldir both <direction>\r\n"
+                     "        deldir both <room vnum> <direction>\r\n");
+    return;
+  }
+
+  if (!str_cmp(arg1, "both")) {
+    both_mode = TRUE;
+    if (!*arg2) {
+      send_to_char(ch, "Syntax: deldir both <direction>\r\n"
+                       "        deldir both <room vnum> <direction>\r\n");
+      return;
+    }
+
+    if (*arg3) {
+      if (!is_number(arg2)) {
+        send_to_char(ch, "No such room.\r\n");
+        return;
+      }
+      source_vnum = atoi(arg2);
+      source_room = real_room(source_vnum);
+      dir = parse_deldir_direction(arg3);
+    } else {
+      source_room = IN_ROOM(ch);
+      source_vnum = GET_ROOM_VNUM(source_room);
+      dir = parse_deldir_direction(arg2);
+    }
+  } else if (*arg2) {
+    if (!is_number(arg1)) {
+      send_to_char(ch, "No such room.\r\n");
+      return;
+    }
+    source_vnum = atoi(arg1);
+    source_room = real_room(source_vnum);
+    dir = parse_deldir_direction(arg2);
+  } else {
+    source_room = IN_ROOM(ch);
+    source_vnum = GET_ROOM_VNUM(source_room);
+    dir = parse_deldir_direction(arg1);
+  }
+
+  if (source_room == NOWHERE) {
+    send_to_char(ch, "No such room.\r\n");
+    return;
+  }
+
+  if (dir < 0 || dir >= DIR_COUNT) {
+    send_to_char(ch, "Invalid direction.\r\n");
+    return;
+  }
+
+  if (!can_edit_zone(ch, world[source_room].zone)) {
+    send_to_char(ch, "You do not have permission to edit room #%d.\r\n", source_vnum);
+    return;
+  }
+
+  exit = W_EXIT(source_room, dir);
+  if (!exit) {
+    send_to_char(ch, "There is no exit %s from room %d.\r\n", dirs[dir], source_vnum);
+    return;
+  }
+
+  if (both_mode && exit->to_room != NOWHERE)
+    dest_room = exit->to_room;
+
+  delete_room_exit(source_room, dir);
+
+  if (both_mode && dest_room != NOWHERE) {
+    rev = rev_dir[dir];
+    if (rev >= 0 && rev < DIR_COUNT && W_EXIT(dest_room, rev) &&
+        W_EXIT(dest_room, rev)->to_room == source_room &&
+        can_edit_zone(ch, world[dest_room].zone)) {
+      room_vnum dest_vnum = GET_ROOM_VNUM(dest_room);
+      delete_room_exit(dest_room, rev);
+      send_to_char(ch, "Exit %s deleted from room %d. Reverse exit %s deleted from room %d.\r\n",
+                   dirs[dir], source_vnum, dirs[rev], dest_vnum);
+      return;
+    }
+  }
+
+  send_to_char(ch, "Exit %s deleted from room %d.\r\n", dirs[dir], source_vnum);
+}
+
 /* BuildWalk - OasisOLC Extension by D. Tyler Barnes. */
 /* For buildwalk. Finds the next free vnum in the zone */
 static room_vnum redit_find_new_vnum(zone_rnum zone)
@@ -366,4 +470,30 @@ int buildwalk(struct char_data *ch, int dir)
   }
 
   return(0);
+}
+
+static int parse_deldir_direction(const char *arg)
+{
+  int dir = search_block((char *)arg, dirs, FALSE);
+
+  if (dir < 0)
+    dir = search_block((char *)arg, autoexits, FALSE);
+
+  return dir;
+}
+
+static int delete_room_exit(room_rnum room, int dir)
+{
+  struct room_direction_data *exit = W_EXIT(room, dir);
+
+  if (!exit)
+    return FALSE;
+
+  if (exit->general_description)
+    free(exit->general_description);
+  if (exit->keyword)
+    free(exit->keyword);
+  free(exit);
+  W_EXIT(room, dir) = NULL;
+  return TRUE;
 }
