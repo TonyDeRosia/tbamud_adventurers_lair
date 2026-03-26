@@ -215,6 +215,7 @@ void clanedit_parse(struct descriptor_data *d, char *arg);
 #define PLR_BUG          17   /**< Player is writing a bug */
 #define PLR_IDEA         18   /**< Player is writing an idea */
 #define PLR_TYPO         19   /**< Player is writing a typo */
+#define PLR_FORCED_RENAME 20  /**< Player must complete forced rename flow */
 
 /* Mobile flags: used by char_data.char_specials.act */
 #define MOB_SPEC            0   /**< Mob has a callable spec-proc */
@@ -375,6 +376,8 @@ void clanedit_parse(struct descriptor_data *d, char *arg);
 #define CON_ACCT_CHANGEPASS1 45 /**< Voluntary account password change: new pass */
 #define CON_ACCT_CHANGEPASS2 46 /**< Voluntary account password change: verify */
 #define CON_ACCT_DELETE_CONFIRM 47 /**< Account menu character deletion confirm */
+#define CON_FORCED_RENAME 48 /**< Forced rename: enter new name */
+#define CON_FORCED_RENAME_CONFIRM 49 /**< Forced rename: confirm new name */
 
 #define CON_NAME_CNFRM    3 /**< New character, confirm name */
 #define CON_PASSWORD      4 /**< Login with password */
@@ -1316,6 +1319,7 @@ struct descriptor_data
   int acct_authed;
   char acct_tmp_pass[128];
   char acct_pending_delete[64];
+  char forced_rename_name[64];
 
   socket_t descriptor;      /**< file descriptor for socket */
   char host[HOST_LENGTH+1]; /**< hostname */

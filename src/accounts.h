@@ -40,5 +40,6 @@ int account_find_character_on_roster(const struct account_data *acct, const char
                                      int *out_index, char *out_name, size_t out_name_len);
 int account_character_is_in_use(const char *name);
 int account_delete_character_data(const char *name);
+int account_rename_character(long acct_id, const char *old_name, const char *new_name);
 
 #endif
