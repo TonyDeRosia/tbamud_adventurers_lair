@@ -231,6 +231,10 @@ static void restore_character_basics(struct char_data *vict)
   GET_HIT(vict) = GET_MAX_HIT(vict);
   GET_MANA(vict) = effective_max_mana(vict);
   GET_MOVE(vict) = effective_max_move(vict);
+  if (GET_COND(vict, HUNGER) != -1)
+    GET_COND(vict, HUNGER) = 24;
+  if (GET_COND(vict, THIRST) != -1)
+    GET_COND(vict, THIRST) = 24;
   update_pos(vict);
   affect_total(vict);
 }

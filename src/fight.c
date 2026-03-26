@@ -462,14 +462,14 @@ static void send_combat_round_update(struct char_data *ch)
   enemy_pct = round_target_health_percent(victim);
   if (enemy_pct >= 0) {
     send_to_char(ch,
-                 "[Fighting: %d/%dHP %d/%dMA %d/%dMV %dQT %dTNL Enemy: %d%%]\r\n",
+                 "\r\n[Fighting: %d/%dHP %d/%dMA %d/%dMV %dQT %dTNL Enemy: %d%%]\r\n\r\n",
                  GET_HIT(ch), GET_MAX_HIT(ch),
                  GET_MANA(ch), effective_max_mana(ch),
                  GET_MOVE(ch), effective_max_move(ch),
                  round_quest_timer(ch), round_tnl(ch), enemy_pct);
   } else {
     send_to_char(ch,
-                 "[Fighting: %d/%dHP %d/%dMA %d/%dMV %dQT %dTNL Enemy: ?]\r\n",
+                 "\r\n[Fighting: %d/%dHP %d/%dMA %d/%dMV %dQT %dTNL Enemy: ?]\r\n\r\n",
                  GET_HIT(ch), GET_MAX_HIT(ch),
                  GET_MANA(ch), effective_max_mana(ch),
                  GET_MOVE(ch), effective_max_move(ch),
