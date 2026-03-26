@@ -83,6 +83,7 @@ static const char *score_cond_label(int cond);
 #include "shop.h"
 #include "spec_procs.h"
 #include "criticalhits.h"
+#include "crafting.h"
 
 static void build_visible_target_tags(struct char_data *viewer, struct char_data *target,
                                       char *out, size_t outsz, int include_afk);
@@ -210,6 +211,7 @@ static void show_obj_to_char(struct obj_data *obj, struct char_data *ch, int mod
   int found = 0;
   struct char_data *temp;
   char obj_tags[256];
+  char enchant_tag[128];
 
   if (!obj || !ch) {
     log("SYSERR: NULL pointer in show_obj_to_char(): obj=%p ch=%p", (void *)obj, (void *)ch);
@@ -268,7 +270,8 @@ case SHOW_OBJ_SHORT:
     build_player_kept_marker(obj, ch, obj_tags, sizeof(obj_tags));
   else
     build_obj_aura_tags(obj, ch, obj_tags, sizeof(obj_tags), TRUE);
-  send_to_char(ch, "%s%s", obj_tags, obj->short_description);
+  crafting_build_enchant_tag(obj, enchant_tag, sizeof(enchant_tag));
+  send_to_char(ch, "%s%s%s", obj_tags, enchant_tag, obj->short_description);
   break;
 
   case SHOW_OBJ_ACTION:
@@ -3250,11 +3253,13 @@ ACMD(do_equipment)
 
     if (CAN_SEE_OBJ(ch, obj)) {
       char obj_tags[256];
+      char enchant_tag[128];
       if (!IS_NPC(ch) && GET_LEVEL(ch) < LVL_IMMORT)
         build_player_kept_marker(obj, ch, obj_tags, sizeof(obj_tags));
       else
         build_obj_aura_tags(obj, ch, obj_tags, sizeof(obj_tags), FALSE);
-      send_to_char(ch, "%s%s\r\n", obj_tags, obj->short_description);
+      crafting_build_enchant_tag(obj, enchant_tag, sizeof(enchant_tag));
+      send_to_char(ch, "%s%s%s\r\n", obj_tags, enchant_tag, obj->short_description);
     } else {
       send_to_char(ch, "Something.\r\n");
     }

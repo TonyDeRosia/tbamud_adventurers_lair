@@ -7958,6 +7958,29 @@ Empty
 Empty
 #0
 
+ENCHANT ENCHANT-CRAFTING
+
+Enchant (Crafting)
+Type: Profession Command
+
+Usage:
+  enchant list
+  enchant <recipe> <item>
+
+Notes:
+- Only equippable gear may be enchanted.
+- Items can hold up to 4 enchant applications.
+- Higher enchant counts are significantly riskier.
+- A failed 4th enchant attempt may destroy the item.
+
+Current recipes:
+  sturdy
+  accurate
+  keen
+
+See also: LEARN PRACTICE CRAFT
+#0
+
 ENCHANT-WEAPON
 
 Enchant Weapon

@@ -1,6 +1,8 @@
 #ifndef _CRAFTING_H_
 #define _CRAFTING_H_
 
+#include <stddef.h>
+
 struct char_data;
 struct obj_data;
 
@@ -20,5 +22,11 @@ int crafting_scrolls_identical(const struct obj_data *a, const struct obj_data *
 int crafting_get_potion_stack(const struct obj_data *obj);
 void crafting_set_potion_stack(struct obj_data *obj, int count);
 int crafting_try_merge_potion_stack(struct obj_data *dest, struct obj_data *src);
+
+int crafting_get_enchant_count(const struct obj_data *obj);
+int crafting_get_enchant_recipe_count(const struct obj_data *obj, const char *recipe_name);
+int crafting_is_item_enchanted(const struct obj_data *obj);
+void crafting_build_enchant_tag(const struct obj_data *obj, char *out, size_t outsz);
+void crafting_build_enchant_recipe_summary(const struct obj_data *obj, char *out, size_t outsz);
 
 #endif
