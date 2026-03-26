@@ -873,7 +873,7 @@ static void shopping_sell(char *arg, struct char_data *ch, struct char_data *kee
   dotmode = find_all_dots(name);
 
   if (dotmode != FIND_INDIV) {
-    for (obj = ch->carrying; obj && sold < sellnum; obj = next_obj) {
+    for (obj = ch->carrying; obj; obj = next_obj) {
       int charged;
       int result;
 
