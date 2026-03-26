@@ -1320,6 +1320,7 @@ struct descriptor_data
   char acct_tmp_pass[128];
   char acct_pending_delete[64];
   char forced_rename_name[64];
+  byte forced_rename_step; /* 0=new name prompt, 1=confirmation prompt */
 
   socket_t descriptor;      /**< file descriptor for socket */
   char host[HOST_LENGTH+1]; /**< hostname */
