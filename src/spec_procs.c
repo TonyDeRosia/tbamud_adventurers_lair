@@ -127,6 +127,42 @@ static int can_character_practice_ability(struct char_data *ch, int ability_id)
   return (GET_LEVEL(ch) >= required_level);
 }
 
+static int profession_trainer_flag_for_ability(int ability_id)
+{
+  switch (ability_id) {
+  case SKILL_SCRIBING:
+    return MOB_TEACH_SCRIBING;
+  case SKILL_ALCHEMY:
+    return MOB_TEACH_ALCHEMY;
+  case SKILL_ENCHANTING:
+    return MOB_TEACH_ENCHANTING;
+  default:
+    return 0;
+  }
+}
+
+static int room_has_profession_trainer(struct char_data *ch, int ability_id)
+{
+  struct char_data *trainer;
+  int trainer_flag;
+
+  if (!ch || IN_ROOM(ch) == NOWHERE)
+    return FALSE;
+
+  trainer_flag = profession_trainer_flag_for_ability(ability_id);
+  if (!trainer_flag)
+    return FALSE;
+
+  for (trainer = world[IN_ROOM(ch)].people; trainer; trainer = trainer->next_in_room) {
+    if (!IS_NPC(trainer))
+      continue;
+    if (MOB_FLAGGED(trainer, trainer_flag))
+      return TRUE;
+  }
+
+  return FALSE;
+}
+
 SPECIAL(guild)
 {
   int skill_num, percent;
@@ -161,7 +197,12 @@ SPECIAL(guild)
     send_to_char(ch, "You do not know of that ability.\r\n");
     return (TRUE);
   }
-  if (!crafting_can_teach_ability((struct char_data *)me, skill_num)) {
+  if (profession_trainer_flag_for_ability(skill_num)) {
+    if (!room_has_profession_trainer(ch, skill_num)) {
+      send_to_char(ch, "They cannot teach you that.\r\n");
+      return (TRUE);
+    }
+  } else if (!crafting_can_teach_ability((struct char_data *)me, skill_num)) {
     send_to_char(ch, "They cannot teach you that.\r\n");
     return (TRUE);
   }
