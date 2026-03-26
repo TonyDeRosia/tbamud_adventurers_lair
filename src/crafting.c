@@ -347,22 +347,42 @@ int crafting_try_merge_potion_stack(struct obj_data *dest, struct obj_data *src)
 
 int crafting_can_teach_ability(struct char_data *trainer, int ability_id)
 {
+  int trainer_flag = 0;
+  struct char_data *cand;
+
   if (!trainer || !IS_NPC(trainer))
     return TRUE;
 
   switch (ability_id) {
   case SKILL_SCRIBING:
   case SKILL_SCRIBING_MASTERY:
-    return MOB_FLAGGED(trainer, MOB_TEACH_SCRIBING);
+    trainer_flag = MOB_TEACH_SCRIBING;
+    break;
   case SKILL_ALCHEMY:
   case SKILL_ALCHEMY_MASTERY:
-    return MOB_FLAGGED(trainer, MOB_TEACH_ALCHEMY);
+    trainer_flag = MOB_TEACH_ALCHEMY;
+    break;
   case SKILL_ENCHANTING:
   case SKILL_ENCHANTING_MASTERY:
-    return MOB_FLAGGED(trainer, MOB_TEACH_ENCHANTING);
+    trainer_flag = MOB_TEACH_ENCHANTING;
+    break;
   default:
     return TRUE;
   }
+
+  if (MOB_FLAGGED(trainer, trainer_flag))
+    return TRUE;
+
+  for (cand = world[IN_ROOM(trainer)].people; cand; cand = cand->next_in_room) {
+    if (!IS_NPC(cand))
+      continue;
+    if (MOB_FLAGGED(cand, MOB_NOTDEADYET))
+      continue;
+    if (MOB_FLAGGED(cand, trainer_flag))
+      return TRUE;
+  }
+
+  return FALSE;
 }
 
 int crafting_handle_tome_put(struct char_data *ch, struct obj_data *obj, struct obj_data *cont)
