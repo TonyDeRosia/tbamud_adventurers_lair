@@ -75,7 +75,7 @@ int crit_mult_melee(const struct char_data *ch)
   int str_for_combat = combat_effective_stat(ch, APPLY_STR);
   int dex_for_combat = combat_effective_stat(ch, APPLY_DEX);
   int stat_mult_bonus = MAX(0, str_for_combat - 10) + MAX(0, (dex_for_combat - 10) / 2);
-  return clamp_mult(150 + GET_MELEE_CRIT_MULT(ch) + stat_mult_bonus);
+  return clamp_mult(150 + (GET_MELEE_CRIT_MULT(ch) * 5) + stat_mult_bonus);
 }
 
 int crit_mult_spell(const struct char_data *ch)
@@ -83,7 +83,7 @@ int crit_mult_spell(const struct char_data *ch)
   int int_for_combat = combat_effective_stat(ch, APPLY_INT);
   int wis_for_combat = combat_effective_stat(ch, APPLY_WIS);
   int stat_mult_bonus = MAX(0, int_for_combat - 10) + MAX(0, (wis_for_combat - 10) / 2);
-  return clamp_mult(150 + GET_SPELL_CRIT_MULT(ch) + stat_mult_bonus);
+  return clamp_mult(150 + (GET_SPELL_CRIT_MULT(ch) * 5) + stat_mult_bonus);
 }
 
 int crit_mult_heal(const struct char_data *ch)
@@ -91,7 +91,7 @@ int crit_mult_heal(const struct char_data *ch)
   int int_for_combat = combat_effective_stat(ch, APPLY_INT);
   int cha_for_combat = combat_effective_stat(ch, APPLY_CHA);
   int stat_mult_bonus = MAX(0, int_for_combat - 10) + MAX(0, (cha_for_combat - 10) / 2);
-  return clamp_mult(150 + GET_HEAL_CRIT_MULT(ch) + stat_mult_bonus);
+  return clamp_mult(150 + (GET_HEAL_CRIT_MULT(ch) * 5) + stat_mult_bonus);
 }
 
 int roll_melee_crit(struct char_data *ch, int diceroll)
