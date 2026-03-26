@@ -197,7 +197,7 @@ SPECIAL(guild)
     send_to_char(ch, "You do not know of that ability.\r\n");
     return (TRUE);
   }
-  if (profession_trainer_flag_for_ability(skill_num)) {
+  if (profession_trainer_flag_for_ability(skill_num) && GET_SKILL(ch, skill_num) <= 0) {
     if (!room_has_profession_trainer(ch, skill_num)) {
       send_to_char(ch, "They cannot teach you that.\r\n");
       return (TRUE);
