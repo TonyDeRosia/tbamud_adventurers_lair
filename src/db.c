@@ -1649,8 +1649,8 @@ static void parse_simple_mob(FILE *mob_f, int i, int nr)
     mob_proto[i].mob_specials.gold_max = mob_proto[i].mob_specials.gold_min;
 
   GET_EXP(mob_proto + i) = t[1];
-  mob_proto[i].mob_specials.bonus_xp_min = MAX(0, GET_EXP(mob_proto + i));
-  mob_proto[i].mob_specials.bonus_xp_max = MAX(0, GET_EXP(mob_proto + i));
+  mob_proto[i].mob_specials.bonus_xp_min = 0;
+  mob_proto[i].mob_specials.bonus_xp_max = 0;
 
   if (!get_line(mob_f, line)) {
     log("SYSERR: Format error in last line of mob #%d\n"
@@ -2039,6 +2039,10 @@ void parse_mobile(FILE *mob_f, int nr)
     log("SYSERR: Unsupported mob type '%c' in mob #%d", letter, nr);
     exit(1);
   }
+
+  /* One-time normalization policy: legacy per-mob bonus XP data is ignored. */
+  mob_proto[i].mob_specials.bonus_xp_min = 0;
+  mob_proto[i].mob_specials.bonus_xp_max = 0;
 
   /* DG triggers -- script info follows mob S/E section */
   letter = fread_letter(mob_f);

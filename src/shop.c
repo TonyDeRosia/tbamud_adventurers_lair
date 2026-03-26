@@ -848,8 +848,9 @@ static void sort_keeper_objs(struct char_data *keeper, int shop_nr)
 static void shopping_sell(char *arg, struct char_data *ch, struct char_data *keeper, int shop_nr)
 {
   char tempstr[MAX_INPUT_LENGTH - 10], name[MAX_INPUT_LENGTH], tempbuf[MAX_INPUT_LENGTH]; // - 10 to make room for constants in format
-  struct obj_data *obj;
+  struct obj_data *obj, *next_obj;
   int sellnum, sold = 0, goldamt = 0;
+  int dotmode;
 
   if (!(is_ok(keeper, ch, shop_nr)))
     return;
@@ -869,6 +870,82 @@ static void shopping_sell(char *arg, struct char_data *ch, struct char_data *kee
     return;
   }
   one_argument(arg, name);
+  dotmode = find_all_dots(name);
+
+  if (dotmode != FIND_INDIV) {
+    for (obj = ch->carrying; obj && sold < sellnum; obj = next_obj) {
+      int charged;
+      int result;
+
+      next_obj = obj->next_content;
+
+      if (dotmode == FIND_ALLDOT && !isname(name, obj->name))
+        continue;
+      if (OBJ_FLAGGED(obj, ITEM_KEPT))
+        continue;
+      if (is_active_quest_item_for_char(ch, obj))
+        continue;
+
+      result = trade_with(obj, shop_nr);
+      if (result != OBJECT_OK)
+        continue;
+
+      charged = sell_price(obj, shop_nr, keeper, ch);
+      if (!IS_SET(SHOP_BITVECTOR(shop_nr), HAS_UNLIMITED_CASH) &&
+          GET_GOLD(keeper) + SHOP_BANK(shop_nr) < charged)
+        continue;
+
+      goldamt += charged;
+      if (!IS_SET(SHOP_BITVECTOR(shop_nr), HAS_UNLIMITED_CASH)) {
+        long long remaining = charged;
+
+        if (GET_GOLD(keeper) >= remaining) {
+          GET_GOLD(keeper) -= remaining;
+        } else {
+          remaining -= GET_GOLD(keeper);
+          SET_GOLD(keeper, 0);
+
+          if (SHOP_BANK(shop_nr) >= remaining)
+            SHOP_BANK(shop_nr) -= remaining;
+          else {
+            log("SYSERR: Shop %d bank underflow paying %s.", shop_nr,
+                GET_NAME(ch) ? GET_NAME(ch) : "(unknown)");
+            SHOP_BANK(shop_nr) = 0;
+          }
+        }
+
+        if (GET_GOLD(keeper) < 0) {
+          log("SYSERR: Negative gold balance for keeper %s after shop payout.",
+              GET_NAME(keeper) ? GET_NAME(keeper) : "(unknown)");
+          SET_GOLD(keeper, 0);
+        }
+      }
+
+      sold++;
+      obj_from_char(obj);
+      slide_obj(obj, keeper, shop_nr);    /* Seems we don't use return value. */
+    }
+
+    if (sold <= 0) {
+      snprintf(tempbuf, sizeof(tempbuf), "%s You don't seem to have anything I want to buy.", GET_NAME(ch));
+      do_tell(keeper, tempbuf, cmd_tell, 0);
+      return;
+    }
+
+    GET_GOLD(ch) += goldamt;
+    act("$n sells some items.", FALSE, ch, NULL, 0, TO_ROOM);
+    send_to_char(ch, "You sell %d item%s for %d gold.\r\n", sold, sold == 1 ? "" : "s", goldamt);
+    snprintf(tempbuf, sizeof(tempbuf), shop_index[shop_nr].message_sell, GET_NAME(ch), goldamt);
+    do_tell(keeper, tempbuf, cmd_tell, 0);
+
+    if (GET_GOLD(keeper) < MIN_OUTSIDE_BANK) {
+      goldamt = MIN(MAX_OUTSIDE_BANK - GET_GOLD(keeper), SHOP_BANK(shop_nr));
+      SHOP_BANK(shop_nr) -= goldamt;
+      GET_GOLD(keeper) += goldamt;
+    }
+    return;
+  }
+
   if (!(obj = get_selling_obj(ch, name, keeper, shop_nr, TRUE)))
     return;
 
