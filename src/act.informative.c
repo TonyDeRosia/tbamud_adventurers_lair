@@ -4238,6 +4238,10 @@ static void perform_mortal_where(struct char_data *ch, char *arg)
   struct char_data *i;
   struct descriptor_data *d;
   zone_rnum zone;
+  zone_rnum player_zone;
+  const char *area_name;
+  int min_level;
+  int max_level;
 
   zone = world[IN_ROOM(ch)].zone;
 
@@ -4247,33 +4251,57 @@ static void perform_mortal_where(struct char_data *ch, char *arg)
     send_to_char(ch, "%-16s %-25s %s\r\n", "Name", "Area", "Level Range");
     send_to_char(ch, "%-16s %-25s %s\r\n", "----------------", "-------------------------", "-----------");
     for (d = descriptor_list; d; d = d->next) {
-      if (STATE(d) != CON_PLAYING || d->character == ch)
+      if (STATE(d) != CON_PLAYING)
     continue;
       if ((i = (d->original ? d->original : d->character)) == NULL)
     continue;
       if (IN_ROOM(i) == NOWHERE || !CAN_SEE(ch, i))
     continue;
-      if (zone != world[IN_ROOM(i)].zone)
+      player_zone = world[IN_ROOM(i)].zone;
+      if (zone != player_zone)
     continue;
+
+      if (player_zone >= 0 && player_zone <= top_of_zone_table) {
+        area_name = zone_table[player_zone].name;
+        min_level = zone_table[player_zone].min_level;
+        max_level = zone_table[player_zone].max_level;
+      } else {
+        area_name = "Unknown Area";
+        min_level = 0;
+        max_level = 0;
+      }
+
       send_to_char(ch, "%-16s %-25s %3d-%-3d\r\n",
                    GET_NAME(i),
-                   zone_table[world[IN_ROOM(i)].zone].name,
-                   zone_table[world[IN_ROOM(i)].zone].min_level,
-                   zone_table[world[IN_ROOM(i)].zone].max_level);
+                   area_name,
+                   min_level,
+                   max_level);
     }
   } else {            /* print only FIRST char, not all. */
     for (i = character_list; i; i = i->next) {
-      if (IN_ROOM(i) == NOWHERE || i == ch)
+      if (IN_ROOM(i) == NOWHERE)
     continue;
       if (!CAN_SEE(ch, i) || world[IN_ROOM(i)].zone != zone)
     continue;
       if (!isname(arg, i->player.name))
     continue;
+
+      player_zone = world[IN_ROOM(i)].zone;
+      if (player_zone >= 0 && player_zone <= top_of_zone_table) {
+        area_name = zone_table[player_zone].name;
+        min_level = zone_table[player_zone].min_level;
+        max_level = zone_table[player_zone].max_level;
+      } else {
+        area_name = "Unknown Area";
+        min_level = 0;
+        max_level = 0;
+      }
+
       send_to_char(ch, "%-16s %-25s %3d-%-3d\r\n",
                    GET_NAME(i),
-                   zone_table[world[IN_ROOM(i)].zone].name,
-                   zone_table[world[IN_ROOM(i)].zone].min_level,
-                   zone_table[world[IN_ROOM(i)].zone].max_level);
+                   area_name,
+                   min_level,
+                   max_level);
       return;
     }
     send_to_char(ch, "Nobody around by that name.\r\n");
