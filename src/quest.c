@@ -81,6 +81,8 @@ static const char *campaign_cmd[] = {
 };
 
 static void cleanup_kill_quest_item(struct char_data *ch, bool notify);
+static int kill_quest_target_matches_mob(struct char_data *ch, struct char_data *mob);
+static int count_matching_kill_targets_in_room(struct char_data *ch, room_rnum room);
 
 struct campaign_rewards {
   int xp;
@@ -103,6 +105,32 @@ static void clear_kill_quest(struct char_data *ch)
   GET_KQUEST_EXPIRES_AT(ch) = 0;
   GET_KQUEST_TARGET_ID(ch) = 0;
   GET_KQUEST_ITEM_ID(ch) = 0;
+}
+
+static int kill_quest_target_matches_mob(struct char_data *ch, struct char_data *mob)
+{
+  if (!ch || IS_NPC(ch) || !mob || !IS_NPC(mob))
+    return FALSE;
+  if (GET_KQUEST_TYPE(ch) != KQUEST_KILL)
+    return FALSE;
+  if (!is_on_quest(ch) || is_quest_ready(ch) || is_quest_expired(ch))
+    return FALSE;
+  return GET_KQUEST_TARGET(ch) == GET_MOB_VNUM(mob);
+}
+
+static int count_matching_kill_targets_in_room(struct char_data *ch, room_rnum room)
+{
+  struct char_data *mob;
+  int matches = 0;
+
+  if (!ch || room == NOWHERE)
+    return 0;
+
+  for (mob = world[room].people; mob; mob = mob->next_in_room)
+    if (kill_quest_target_matches_mob(ch, mob))
+      matches++;
+
+  return matches;
 }
 
 static int seconds_to_minutes_ceiling(time_t seconds_remaining)
@@ -1050,6 +1078,7 @@ static void quest_info_kill(struct char_data *ch)
         world[room].name, zone_table[world[room].zone].name);
   }
   if (GET_LEVEL(ch) >= LVL_IMMORT) {
+    int matching_here = count_matching_kill_targets_in_room(ch, IN_ROOM(ch));
     send_to_char(ch, "[Quest Debug] type=%s target_vnum=%d item_vnum=%d target_room=%d zone=%d (%s) target_id=%ld item_id=%ld reachable=%s\r\n",
                  GET_KQUEST_TYPE(ch) == KQUEST_ITEM ? "item" : "kill",
                  GET_KQUEST_TARGET(ch),
@@ -1059,6 +1088,8 @@ static void quest_info_kill(struct char_data *ch)
                  GET_KQUEST_TARGET_ID(ch),
                  GET_KQUEST_ITEM_ID(ch),
                  quest_target_room_valid(ch, room) ? "yes" : "no");
+    if (GET_KQUEST_TYPE(ch) == KQUEST_KILL)
+      send_to_char(ch, "[Quest Debug] matching_target_mobs_in_current_room=%d\r\n", matching_here);
   }
   send_to_char(ch, "Time remaining: %d minute%s.\r\n",
                get_quest_minutes_remaining(ch),
@@ -1690,11 +1721,7 @@ void quest_kill_trigger_check(struct char_data *ch, struct char_data *vict)
   if (!ch || IS_NPC(ch) || !vict || !IS_NPC(vict))
     return;
   expire_kill_quest_if_needed(ch, TRUE);
-  if (GET_KQUEST_TYPE(ch) != KQUEST_KILL)
-    return;
-  if (!is_on_quest(ch) || is_quest_ready(ch) || is_quest_expired(ch))
-    return;
-  if (GET_KQUEST_TARGET(ch) != GET_MOB_VNUM(vict))
+  if (!kill_quest_target_matches_mob(ch, vict))
     return;
 
   GET_KQUEST_COMPLETE(ch) = 1;
@@ -1778,14 +1805,7 @@ int is_player_quest_target(struct char_data *viewer, struct char_data *mob)
   if (!viewer || IS_NPC(viewer) || !mob || !IS_NPC(mob))
     return FALSE;
   expire_kill_quest_if_needed(viewer, FALSE);
-  if (GET_KQUEST_TYPE(viewer) != KQUEST_KILL)
-    return FALSE;
-  if (!is_on_quest(viewer) || is_quest_ready(viewer) || is_quest_expired(viewer))
-    return FALSE;
-  if (GET_KQUEST_TARGET(viewer) != GET_MOB_VNUM(mob))
-    return FALSE;
-
-  return TRUE;
+  return kill_quest_target_matches_mob(viewer, mob);
 }
 
 /*--------------------------------------------------------------------------*/
