@@ -62,6 +62,7 @@ static void wear_message(struct char_data *ch, struct obj_data *obj, int where);
 static int is_kept_item_for(struct char_data *ch, struct obj_data *obj);
 static int reject_kept_item_action(struct char_data *ch, struct obj_data *obj);
 static int has_unique_equip_conflict(struct char_data *ch, struct obj_data *obj);
+static int can_wield_from_wear(struct char_data *ch, struct obj_data *obj);
 
 
 
@@ -120,6 +121,26 @@ static int has_unique_equip_conflict(struct char_data *ch, struct obj_data *obj)
   }
 
   return FALSE;
+}
+
+static int can_wield_from_wear(struct char_data *ch, struct obj_data *obj)
+{
+  if (!CAN_WEAR(obj, ITEM_WEAR_WIELD)) {
+    send_to_char(ch, "You can't wield that.\r\n");
+    return FALSE;
+  }
+
+  if (GET_OBJ_WEIGHT(obj) > str_app[STRENGTH_APPLY_INDEX(ch)].wield_w) {
+    send_to_char(ch, "It's too heavy for you to use.\r\n");
+    return FALSE;
+  }
+
+  if (GET_LEVEL(ch) < GET_OBJ_LEVEL(obj)) {
+    send_to_char(ch, "You are not experienced enough to use that.\r\n");
+    return FALSE;
+  }
+
+  return TRUE;
 }
 
 static void perform_put(struct char_data *ch, struct obj_data *obj, struct obj_data *cont)
@@ -1663,6 +1684,7 @@ int find_eq_pos(struct char_data *ch, struct obj_data *obj, char *arg)
     if (CAN_WEAR(obj, ITEM_WEAR_ABOUT))       where = WEAR_ABOUT;
     if (CAN_WEAR(obj, ITEM_WEAR_WAIST))       where = WEAR_WAIST;
     if (CAN_WEAR(obj, ITEM_WEAR_WRIST))       where = WEAR_WRIST_R;
+    if (CAN_WEAR(obj, ITEM_WEAR_WIELD))       where = WEAR_WIELD;
     if (CAN_WEAR(obj, ITEM_WEAR_EYES))        where = WEAR_EYES;
     if (CAN_WEAR(obj, ITEM_WEAR_EAR))         where = WEAR_EAR_L;
   } else {
@@ -1711,7 +1733,9 @@ ACMD(do_wear)
     for (obj = ch->carrying; obj; obj = next_obj) {
       next_obj = obj->next_content;
       if (CAN_SEE_OBJ(ch, obj) && (where = find_eq_pos(ch, obj, 0)) >= 0) {
-        if (GET_LEVEL(ch) < GET_OBJ_LEVEL(obj))
+        if (where == WEAR_WIELD && !can_wield_from_wear(ch, obj))
+          continue;
+        else if (GET_LEVEL(ch) < GET_OBJ_LEVEL(obj))
           send_to_char(ch, "You are not experienced enough to use that.\r\n");
         else {
           items_worn++;
@@ -1733,9 +1757,13 @@ ACMD(do_wear)
     else
       while (obj) {
 	next_obj = get_obj_in_list_vis(ch, arg1, NULL, obj->next_content);
-	if ((where = find_eq_pos(ch, obj, 0)) >= 0)
+	if ((where = find_eq_pos(ch, obj, 0)) >= 0) {
+          if (where == WEAR_WIELD && !can_wield_from_wear(ch, obj)) {
+            obj = next_obj;
+            continue;
+          }
 	  perform_wear(ch, obj, where);
-	else
+	} else
 	  act("You can't wear $p.", FALSE, ch, obj, 0, TO_CHAR);
 	obj = next_obj;
       }
@@ -1745,9 +1773,11 @@ ACMD(do_wear)
     else if (GET_LEVEL(ch) < GET_OBJ_LEVEL(obj))
       send_to_char(ch, "You are not experienced enough to use that.\r\n");
     else {
-      if ((where = find_eq_pos(ch, obj, arg2)) >= 0)
+      if ((where = find_eq_pos(ch, obj, arg2)) >= 0) {
+        if (where == WEAR_WIELD && !can_wield_from_wear(ch, obj))
+          return;
 	perform_wear(ch, obj, where);
-      else if (!*arg2)
+      } else if (!*arg2)
 	act("You can't wear $p.", FALSE, ch, obj, 0, TO_CHAR);
     }
   }
