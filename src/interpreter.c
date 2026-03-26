@@ -325,6 +325,8 @@ cpp_extern const struct command_info cmd_info[] = {
   { "page"     , "pag"     , POS_DEAD    , do_page     , 1, 0 },
   { "pardon"   , "pardon"  , POS_DEAD    , do_wizutil  , LVL_GOD, SCMD_PARDON },
   { "plist"    , "plist"   , POS_DEAD    , do_plist    , LVL_GOD, 0 },
+  { "poofin"   , "poofin"  , POS_DEAD    , do_poofin   , LVL_IMMORT, 0 },
+  { "poofout"  , "poofout" , POS_DEAD    , do_poofout  , LVL_IMMORT, 0 },
   { "policy"   , "pol"     , POS_DEAD    , do_gen_ps   , 0, SCMD_POLICIES },
   { "pour"     , "pour"    , POS_STANDING, do_pour     , 0, SCMD_POUR },
 //   { "prompt"   , "pro"     , POS_DEAD    , do_display  , 0, 0 },
