@@ -5932,8 +5932,12 @@ ACMD(do_namechange)
 bool change_player_name(struct char_data *ch, struct char_data *vict, char *new_name)
 {
   struct char_data *temp_ch=NULL;
-  int plr_i = 0, i, k;
-  char old_name[MAX_NAME_LENGTH], old_pfile[50], new_pfile[50];
+  int plr_i = 0, i, k, idx;
+  char old_name[MAX_NAME_LENGTH];
+  char old_aux[MAX_FILES][PATH_MAX], new_aux[MAX_FILES][PATH_MAX];
+  int aux_modes[MAX_FILES] = { PLR_FILE, CRASH_FILE, ETEXT_FILE, SCRIPT_VARS_FILE };
+  const char *aux_labels[MAX_FILES] = { "pfile", "crash/rent", "player text", "script vars" };
+  int old_exists[MAX_FILES], new_exists[MAX_FILES], renamed[MAX_FILES];
 
   if (!vict)
   {
@@ -5991,38 +5995,68 @@ bool change_player_name(struct char_data *ch, struct char_data *vict, char *new_
 
   /* Set up a few variables that will be needed */
   sprintf(old_name, "%s", GET_NAME(vict));
-  if (!get_filename(old_pfile, sizeof(old_pfile), PLR_FILE, old_name))
-  {
-    if (ch)
-      send_to_char(ch, "Unable to ascertain player's old pfile name.\r\n");
-    return FALSE;
-  }
-  if (!get_filename(new_pfile, sizeof(new_pfile), PLR_FILE, new_name))
-  {
-    if (ch)
-      send_to_char(ch, "Unable to ascertain player's new pfile name.\r\n");
-    return FALSE;
+  for (idx = 0; idx < MAX_FILES; idx++) {
+    old_exists[idx] = new_exists[idx] = renamed[idx] = FALSE;
+
+    if (!get_filename(old_aux[idx], sizeof(old_aux[idx]), aux_modes[idx], old_name) ||
+        !get_filename(new_aux[idx], sizeof(new_aux[idx]), aux_modes[idx], new_name)) {
+      mudlog(BRF, LVL_IMMORT, TRUE,
+             "SYSERR: change_player_name failed to resolve %s file for %s -> %s.",
+             aux_labels[idx], old_name, new_name);
+      if (ch)
+        send_to_char(ch, "Unable to resolve %s file path for rename.\r\n", aux_labels[idx]);
+      return FALSE;
+    }
+
+    old_exists[idx] = (access(old_aux[idx], F_OK) == 0);
+    new_exists[idx] = (access(new_aux[idx], F_OK) == 0);
+    if (new_exists[idx]) {
+      mudlog(BRF, LVL_IMMORT, TRUE,
+             "SYSERR: change_player_name blocked: target %s file already exists (%s).",
+             aux_labels[idx], new_aux[idx]);
+      if (ch)
+        send_to_char(ch, "Rename blocked: target %s data already exists.\r\n", aux_labels[idx]);
+      return FALSE;
+    }
   }
 
-  /* Now start changing the name over - all checks and setup have passed */
-  free(player_table[i].name);              // Free the old name in the index
-  player_table[i].name = strdup(new_name); // Insert the new name into the index
+  for (idx = 0; idx < MAX_FILES; idx++) {
+    if (!old_exists[idx]) {
+      mudlog(NRM, LVL_IMMORT, TRUE,
+             "Namechange: no %s file to migrate for %s (%s).",
+             aux_labels[idx], old_name, old_aux[idx]);
+      continue;
+    }
+
+    if (rename(old_aux[idx], new_aux[idx]) != 0) {
+      mudlog(BRF, LVL_IMMORT, TRUE,
+             "SYSERR: change_player_name failed to rename %s file %s -> %s: %s",
+             aux_labels[idx], old_aux[idx], new_aux[idx], strerror(errno));
+      while (--idx >= 0) {
+        if (renamed[idx] && rename(new_aux[idx], old_aux[idx]) != 0) {
+          mudlog(BRF, LVL_IMMORT, TRUE,
+                 "SYSERR: change_player_name rollback failed for %s file %s -> %s: %s",
+                 aux_labels[idx], new_aux[idx], old_aux[idx], strerror(errno));
+        }
+      }
+      if (ch)
+        send_to_char(ch, "Namechange aborted while migrating data files.\r\n");
+      return FALSE;
+    }
+
+    renamed[idx] = TRUE;
+    mudlog(NRM, LVL_IMMORT, TRUE,
+           "Namechange: migrated %s file %s -> %s.",
+           aux_labels[idx], old_aux[idx], new_aux[idx]);
+  }
+
+  /* All file moves succeeded: update index and in-memory name. */
+  free(player_table[i].name);
+  player_table[i].name = strdup(new_name);
   for (k=0; (*(player_table[i].name+k) = LOWER(*(player_table[i].name+k))); k++);
 
   free(GET_PC_NAME(vict));
-  GET_PC_NAME(vict) = strdup(CAP(new_name));    // Change the name in the victims char struct
-
-  /* Rename the player's pfile */
-  if (rename(old_pfile, new_pfile) != 0) {
-    mudlog(BRF, LVL_IMMORT, TRUE, "SYSERR: change_player_name failed to rename pfile %s -> %s: %s",
-           old_pfile, new_pfile, strerror(errno));
-    free(player_table[i].name);
-    player_table[i].name = strdup(old_name);
-    for (k = 0; (*(player_table[i].name + k) = LOWER(*(player_table[i].name + k))); k++);
-    free(GET_PC_NAME(vict));
-    GET_PC_NAME(vict) = strdup(old_name);
-    return FALSE;
-  }
+  GET_PC_NAME(vict) = strdup(CAP(new_name));
 
   save_char(vict);
   account_rename_character(GET_ACCOUNT_ID(vict), old_name, new_name);
