@@ -8006,7 +8006,7 @@ ACMD(do_pull)
          GET_NAME(vict), GET_ROOM_VNUM(IN_ROOM(ch)));
 }
 
-ACMD(do_unpull)
+ACMD(do_push)
 {
   char arg[MAX_INPUT_LENGTH];
   struct char_data *vict;
@@ -8014,17 +8014,22 @@ ACMD(do_unpull)
   one_argument(argument, arg);
 
   if (!*arg) {
-    send_to_char(ch, "Usage: unpull <playername>\r\n");
+    send_to_char(ch, "Usage: push <playername>\r\n");
     return;
   }
 
-  if (!(vict = get_player_vis(ch, arg, NULL, FIND_CHAR_WORLD)) || IS_NPC(vict)) {
+  if (!(vict = get_player_vis(ch, arg, NULL, FIND_CHAR_WORLD))) {
     send_to_char(ch, "You do not see that player here.\r\n");
     return;
   }
 
+  if (IS_NPC(vict)) {
+    send_to_char(ch, "You can only push player characters.\r\n");
+    return;
+  }
+
   if (vict->desc) {
-    send_to_char(ch, "They are currently connected; unpull aborted.\r\n");
+    send_to_char(ch, "That player is connected. Use dc for connected players.\r\n");
     return;
   }
 
@@ -8032,12 +8037,17 @@ ACMD(do_unpull)
   Crash_rentsave(vict, 0);
   save_char(vict);
 
-  mudlog(NRM, MAX(LVL_GOD, GET_LEVEL(ch)), TRUE, "%s unpulled %s from room %d", GET_NAME(ch),
+  mudlog(NRM, MAX(LVL_GOD, GET_LEVEL(ch)), TRUE, "%s pushed %s out of room %d", GET_NAME(ch),
          GET_NAME(vict), GET_ROOM_VNUM(IN_ROOM(vict)));
 
-  act("$n vanishes in a swirl of magic.", FALSE, vict, 0, 0, TO_ROOM);
-  send_to_char(ch, "You unpull %s.\r\n", GET_NAME(vict));
+  act("$n gestures, and $N is pushed out of the world.", FALSE, ch, 0, vict, TO_ROOM);
+  send_to_char(ch, "You push %s back out of the world.\r\n", GET_NAME(vict));
   extract_char(vict);
+}
+
+ACMD(do_unpull)
+{
+  do_push(ch, argument, cmd, subcmd);
 }
 
 ACMD(do_cleanse)
