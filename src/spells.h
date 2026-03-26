@@ -410,9 +410,13 @@ struct spell_info_type {
    int routines;
    byte violent;
    int targets;         /* See below for use with TAR_XXX  */
+   int craft_flags;     /* Spell crafting metadata flags. */
    const char *name;	/* Input size not limited. Originates from string constants. */
    const char *wear_off_msg;	/* Input size not limited. Originates from string constants. */
 };
+
+#define SPELL_CRAFT_BREWABLE (1 << 0)
+#define SPELL_FLAGGED(spl, flag) (IS_SET(spell_info[(spl)].craft_flags, (flag)))
 
 /* Possible Targets:
    bit 0 : IGNORE TARGET

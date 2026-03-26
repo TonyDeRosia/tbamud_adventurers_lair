@@ -2875,6 +2875,7 @@ static void spello(int spl, const char *name, int max_mana, int min_mana,
   spell_info[spl].targets = targets;
   spell_info[spl].violent = violent;
   spell_info[spl].routines = routines;
+  spell_info[spl].craft_flags = 0;
   spell_info[spl].name = name;
   spell_info[spl].wear_off_msg = wearoff;
 }
@@ -2891,7 +2892,15 @@ void unused_spell(int spl) {
   spell_info[spl].targets = 0;
   spell_info[spl].violent = 0;
   spell_info[spl].routines = 0;
+  spell_info[spl].craft_flags = 0;
   spell_info[spl].name = unused_spellname;
+}
+
+static void set_spell_craft_flag(int spell, int flag)
+{
+  if (spell <= 0 || spell > TOP_SPELL_DEFINE)
+    return;
+  SET_BIT(spell_info[spell].craft_flags, flag);
 }
 
 /* Skills use MOVE costs. We store the cost in spell_info[].mana_* fields
@@ -3501,6 +3510,44 @@ void mag_assign_spells(void) {
   /* you might want to name this one something more fitting to your theme -Welcor*/
   spello(SPELL_DG_AFFECT, "Script-inflicted", 0, 0, 0, POS_SITTING,
   TAR_IGNORE, TRUE, 0, NULL);
+
+  /* Explicit alchemy allow-list: brewable potion spells only. */
+  set_spell_craft_flag(SPELL_ARMOR, SPELL_CRAFT_BREWABLE);
+  set_spell_craft_flag(SPELL_BLESS, SPELL_CRAFT_BREWABLE);
+  set_spell_craft_flag(SPELL_DETECT_INVIS, SPELL_CRAFT_BREWABLE);
+  set_spell_craft_flag(SPELL_DETECT_MAGIC, SPELL_CRAFT_BREWABLE);
+  set_spell_craft_flag(SPELL_INFRAVISION, SPELL_CRAFT_BREWABLE);
+  set_spell_craft_flag(SPELL_PROT_FROM_EVIL, SPELL_CRAFT_BREWABLE);
+  set_spell_craft_flag(SPELL_SANCTUARY, SPELL_CRAFT_BREWABLE);
+  set_spell_craft_flag(SPELL_ARCANE_WARD, SPELL_CRAFT_BREWABLE);
+  set_spell_craft_flag(SPELL_EVASION, SPELL_CRAFT_BREWABLE);
+  set_spell_craft_flag(SPELL_IRONSKIN, SPELL_CRAFT_BREWABLE);
+  set_spell_craft_flag(SPELL_DIVINE_BULWARK, SPELL_CRAFT_BREWABLE);
+  set_spell_craft_flag(SPELL_SONG_OF_RESILIENCE, SPELL_CRAFT_BREWABLE);
+  set_spell_craft_flag(SPELL_DARK_AEGIS, SPELL_CRAFT_BREWABLE);
+  set_spell_craft_flag(SPELL_NIRVANA, SPELL_CRAFT_BREWABLE);
+  set_spell_craft_flag(SPELL_TRUE_SEEING, SPELL_CRAFT_BREWABLE);
+  set_spell_craft_flag(SPELL_STONE_SKIN, SPELL_CRAFT_BREWABLE);
+  set_spell_craft_flag(SPELL_BARKSKIN, SPELL_CRAFT_BREWABLE);
+  set_spell_craft_flag(SPELL_GIANT_STRENGTH, SPELL_CRAFT_BREWABLE);
+  set_spell_craft_flag(SPELL_ADRENALINE_SURGE, SPELL_CRAFT_BREWABLE);
+  set_spell_craft_flag(SPELL_CLARITY, SPELL_CRAFT_BREWABLE);
+  set_spell_craft_flag(SPELL_BLOODLUST, SPELL_CRAFT_BREWABLE);
+  set_spell_craft_flag(SPELL_ANTIMAGIC_SHELL, SPELL_CRAFT_BREWABLE);
+  set_spell_craft_flag(SPELL_ENCHANTERS_FOCUS, SPELL_CRAFT_BREWABLE);
+  set_spell_craft_flag(SPELL_PHASE_SHIFT, SPELL_CRAFT_BREWABLE);
+  set_spell_craft_flag(SPELL_MIRROR_VEIL, SPELL_CRAFT_BREWABLE);
+  set_spell_craft_flag(SPELL_ELEMENTAL_WARD_FIRE, SPELL_CRAFT_BREWABLE);
+  set_spell_craft_flag(SPELL_ELEMENTAL_WARD_COLD, SPELL_CRAFT_BREWABLE);
+  set_spell_craft_flag(SPELL_ELEMENTAL_WARD_LIGHTNING, SPELL_CRAFT_BREWABLE);
+  set_spell_craft_flag(SPELL_ELEMENTAL_WARD_ACID, SPELL_CRAFT_BREWABLE);
+  set_spell_craft_flag(SPELL_SENSE_LIFE, SPELL_CRAFT_BREWABLE);
+  set_spell_craft_flag(SPELL_STRENGTH, SPELL_CRAFT_BREWABLE);
+  set_spell_craft_flag(SPELL_BEAR_SPIRIT, SPELL_CRAFT_BREWABLE);
+  set_spell_craft_flag(SPELL_WOLF_SPIRIT, SPELL_CRAFT_BREWABLE);
+  set_spell_craft_flag(SPELL_TIGER_SPIRIT, SPELL_CRAFT_BREWABLE);
+  set_spell_craft_flag(SPELL_EAGLE_SPIRIT, SPELL_CRAFT_BREWABLE);
+  set_spell_craft_flag(SPELL_DRAGON_SPIRIT, SPELL_CRAFT_BREWABLE);
 
   /* Declaration of skills - this actually doesn't do anything except set it up
    * so that immortals can use these skills by default.  The min level to use

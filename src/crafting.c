@@ -18,24 +18,11 @@
 #define MAX_CRAFT_PAYLOAD 256
 #define MAX_POTION_STACK 100
 
-struct alchemy_recipe {
-  const char *name;
-  int spell;
-  int min_level;
-};
-
 struct enchant_recipe {
   const char *name;
   int apply_loc;
   int modifier;
   int min_level;
-};
-
-static const struct alchemy_recipe alchemy_recipes[] = {
-  {"minor-healing", SPELL_CURE_LIGHT, 1},
-  {"focus", SPELL_DETECT_MAGIC, 8},
-  {"swiftstep", SPELL_FLY, 15},
-  {NULL, 0, 0}
 };
 
 static const struct enchant_recipe enchant_recipes[] = {
@@ -266,6 +253,28 @@ static int can_use_spell_for_scribing(struct char_data *ch, int spell)
   if (spell <= 0 || spell > MAX_SPELLS)
     return FALSE;
   return GET_SKILL(ch, spell) > 0;
+}
+
+static int can_use_spell_for_brewing(struct char_data *ch, int spell)
+{
+  if (spell <= 0 || spell > MAX_SPELLS)
+    return FALSE;
+  if (GET_SKILL(ch, spell) <= 0)
+    return FALSE;
+  return SPELL_FLAGGED(spell, SPELL_CRAFT_BREWABLE);
+}
+
+static int brew_spell_level_for_char(struct char_data *ch, int spell)
+{
+  int min_level;
+
+  if (!ch || spell <= 0 || spell > MAX_SPELLS)
+    return 0;
+
+  min_level = spell_info[spell].min_level[(int)GET_CLASS(ch)];
+  if (min_level >= LVL_IMMORT)
+    min_level = MAX(1, GET_LEVEL(ch));
+  return min_level;
 }
 
 static struct obj_data *create_crafted_scroll(struct char_data *ch, const int spells[], int count)
@@ -552,16 +561,49 @@ ACMD(do_scribe)
 
 ACMD(do_brew)
 {
-  char arg[MAX_INPUT_LENGTH];
-  int i, found = -1;
+  char mode[MAX_INPUT_LENGTH];
+  char spell_arg[MAX_INPUT_LENGTH];
+  char *rest;
+  int spellnum;
+  int i, found_any = FALSE;
   int difficulty;
   struct obj_data *p;
 
-  one_argument(argument, arg);
-  if (!*arg || !str_cmp(arg, "list")) {
-    send_to_char(ch, "Available brew recipes:\r\n");
-    for (i = 0; alchemy_recipes[i].name; i++)
-      send_to_char(ch, "  %-14s (lvl %d)\r\n", alchemy_recipes[i].name, alchemy_recipes[i].min_level);
+  rest = one_argument(argument, mode);
+  while (*rest && isspace((unsigned char)*rest))
+    rest++;
+
+  if (!*mode || !str_cmp(mode, "list")) {
+    send_to_char(ch, "Brew guide:\r\n");
+    send_to_char(ch, "  Required tool: alchemy tool\r\n");
+    send_to_char(ch, "  Required materials: 1 alchemy material per potion\r\n");
+    send_to_char(ch, "\r\n");
+    send_to_char(ch, "Brew usage:\r\n");
+    send_to_char(ch, "  brew list\r\n");
+    send_to_char(ch, "  brew create <spellname>\r\n");
+    send_to_char(ch, "\r\n");
+    send_to_char(ch, "Known brewable spells:\r\n");
+
+    for (i = 1; i <= MAX_SPELLS; i++) {
+      if (!can_use_spell_for_brewing(ch, i))
+        continue;
+      send_to_char(ch, "  %-26s (lvl %d)\r\n", skill_name(i), brew_spell_level_for_char(ch, i));
+      found_any = TRUE;
+    }
+
+    if (!found_any)
+      send_to_char(ch, "  You do not know any spells that can be brewed.\r\n");
+    return;
+  }
+
+  if (str_cmp(mode, "create")) {
+    send_to_char(ch, "Use 'brew list' or 'brew create <spellname>'.\r\n");
+    return;
+  }
+
+  strlcpy(spell_arg, rest, sizeof(spell_arg));
+  if (!*spell_arg) {
+    send_to_char(ch, "Brew which spell?\r\n");
     return;
   }
 
@@ -574,16 +616,17 @@ ACMD(do_brew)
     return;
   }
 
-  for (i = 0; alchemy_recipes[i].name; i++)
-    if (!str_cmp(arg, alchemy_recipes[i].name))
-      found = i;
-  if (found < 0) {
-    send_to_char(ch, "Unknown brew recipe. Use 'brew list'.\r\n");
+  spellnum = resolve_spell_by_player_input(ch, spell_arg, TRUE, FALSE, TRUE, NULL, NULL, 0);
+  if (spellnum <= 0 || spellnum > MAX_SPELLS) {
+    send_to_char(ch, "'%s' is not a valid player spell.\r\n", spell_arg);
     return;
   }
-
-  if (GET_LEVEL(ch) < alchemy_recipes[found].min_level) {
-    send_to_char(ch, "You are not ready to brew that recipe yet.\r\n");
+  if (GET_SKILL(ch, spellnum) <= 0) {
+    send_to_char(ch, "You do not know %s.\r\n", skill_name(spellnum));
+    return;
+  }
+  if (!SPELL_FLAGGED(spellnum, SPELL_CRAFT_BREWABLE)) {
+    send_to_char(ch, "You cannot brew %s.\r\n", skill_name(spellnum));
     return;
   }
   if (!find_prof_material(ch, CRAFT_DISC_ALCHEMY)) {
@@ -591,7 +634,8 @@ ACMD(do_brew)
     return;
   }
 
-  difficulty = 20 + (alchemy_recipes[found].min_level / 2);
+  difficulty = 20 + MAX(1, spell_info[spellnum].mana_max / 12);
+  /* Hook: apply future alchemy mastery scaling adjustments to difficulty here. */
   if (!profession_roll_success(ch, SKILL_ALCHEMY, SKILL_ALCHEMY_MASTERY, difficulty)) {
     craft_fail_consume(ch, CRAFT_DISC_ALCHEMY, 1, rand_number(1, 100));
     send_to_char(ch, "The mixture erupts and is ruined.\r\n");
@@ -608,7 +652,7 @@ ACMD(do_brew)
   p->obj_flags.type_flag = ITEM_POTION;
   SET_BIT_AR(p->obj_flags.wear_flags, ITEM_WEAR_TAKE);
   GET_OBJ_VAL(p, 0) = MAX(1, GET_LEVEL(ch));
-  GET_OBJ_VAL(p, 1) = alchemy_recipes[found].spell;
+  GET_OBJ_VAL(p, 1) = spellnum;
   GET_OBJ_VAL(p, 2) = -1;
   GET_OBJ_VAL(p, 3) = -1;
   crafting_set_potion_stack(p, 1);
