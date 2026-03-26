@@ -116,6 +116,8 @@ bool is_quest_ready(struct char_data *ch);
 bool is_quest_expired(struct char_data *ch);
 bool is_on_quest_cooldown(struct char_data *ch);
 bool is_active_quest_item_for_char(struct char_data *ch, struct obj_data *obj);
+bool is_active_spawned_quest_item_instance(struct obj_data *obj);
+bool can_char_take_active_spawned_quest_item(struct char_data *ch, struct obj_data *obj, bool send_message);
 SPECIAL(questmaster);
 ACMD(do_quest);
 ACMD(do_campaign);
