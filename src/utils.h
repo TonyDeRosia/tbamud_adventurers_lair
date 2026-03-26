@@ -721,6 +721,7 @@ do                                                              \
 #define GET_KQUEST_COOLDOWN_EXPIRES_AT(ch) CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.kill_quest_cooldown_expires_at))
 #define GET_KQUEST_COOLDOWN_NOTIFIED(ch) CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.kill_quest_cooldown_notified))
 #define GET_KQUEST_TARGET_ID(ch) CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.kill_quest_target_id))
+#define GET_KQUEST_ITEM_ID(ch) CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.kill_quest_item_id))
 #define GET_CAMPAIGN_ACTIVE(ch)  CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.campaign_active))
 #define GET_CAMPAIGN_LEVEL(ch)   CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.campaign_level))
 #define GET_CAMPAIGN_EXPIRES_AT(ch) CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.campaign_expires_at))
