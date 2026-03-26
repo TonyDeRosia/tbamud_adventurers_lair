@@ -5889,38 +5889,79 @@ ACMD(do_wizupdate)
   send_to_char(ch, "Wizlists updated.\n\r");
 }
 
+ACMD(do_namechange)
+{
+  char arg[MAX_INPUT_LENGTH];
+  struct char_data *vict;
+
+  one_argument(argument, arg);
+
+  if (!*arg) {
+    send_to_char(ch, "Usage: namechange <player>\r\n");
+    return;
+  }
+
+  vict = get_player_vis(ch, arg, NULL, FIND_CHAR_WORLD);
+  if (!vict || IS_NPC(vict)) {
+    send_to_char(ch, "That player is not online.\r\n");
+    return;
+  }
+
+  if (GET_LEVEL(vict) >= GET_LEVEL(ch) && ch != vict) {
+    send_to_char(ch, "You can't require that player to rename.\r\n");
+    return;
+  }
+
+  SET_BIT_AR(PLR_FLAGS(vict), PLR_FORCED_RENAME);
+  save_char(vict);
+
+  mudlog(BRF, MAX(LVL_IMMORT, GET_INVIS_LEV(ch)), TRUE,
+         "%s has required %s to choose a new name.", GET_NAME(ch), GET_NAME(vict));
+
+  send_to_char(ch, "You require %s to choose a new name.\r\n", GET_NAME(vict));
+
+  if (vict->desc) {
+    vict->desc->forced_rename_name[0] = '\0';
+    send_to_char(vict, "An immortal has required you to choose a new name.\r\n");
+    send_to_char(vict, "Enter your new name: ");
+    STATE(vict->desc) = CON_FORCED_RENAME;
+  }
+}
+
 /* NOTE: This is called from perform_set */
 bool change_player_name(struct char_data *ch, struct char_data *vict, char *new_name)
 {
   struct char_data *temp_ch=NULL;
   int plr_i = 0, i, k;
-  char old_name[MAX_NAME_LENGTH], old_pfile[50], new_pfile[50], buf[MAX_STRING_LENGTH];
-
-  if (!ch)
-  {
-    log("SYSERR: No char passed to change_player_name.");
-    return FALSE;
-  }
+  char old_name[MAX_NAME_LENGTH], old_pfile[50], new_pfile[50];
 
   if (!vict)
   {
     log("SYSERR: No victim passed to change_player_name.");
-    send_to_char(ch, "Invalid victim.\r\n");
+    if (ch)
+      send_to_char(ch, "Invalid victim.\r\n");
     return FALSE;
   }
 
   if (!new_name || !(*new_name) || strlen(new_name) < 2 ||
       strlen(new_name) > MAX_NAME_LENGTH || !valid_name(new_name) ||
       fill_word(new_name) || reserved_word(new_name) ) {
-    send_to_char(ch, "Invalid new name.\r\n");
+    if (ch)
+      send_to_char(ch, "Invalid new name.\r\n");
     return FALSE;
   }
 
   /* Check that someone with new_name isn't already logged in */
-  if ((temp_ch = get_player_vis(ch, new_name, NULL, FIND_CHAR_WORLD)) != NULL) {
-    send_to_char(ch, "Sorry, the new name already exists.\r\n");
-    return FALSE;
-  } else  {
+  for (temp_ch = character_list; temp_ch; temp_ch = temp_ch->next) {
+    if (IS_NPC(temp_ch) || temp_ch == vict)
+      continue;
+    if (!str_cmp(GET_NAME(temp_ch), new_name)) {
+      if (ch)
+        send_to_char(ch, "Sorry, the new name already exists.\r\n");
+      return FALSE;
+    }
+  }
+  {
     /* try to load the player off disk */
     CREATE(temp_ch, struct char_data, 1);
     clear_char(temp_ch);
@@ -5928,9 +5969,11 @@ bool change_player_name(struct char_data *ch, struct char_data *vict, char *new_
     new_mobile_data(temp_ch);
     if ((plr_i = load_char(new_name, temp_ch)) > -1) {
       free_char(temp_ch);
-      send_to_char(ch, "Sorry, the new name already exists.\r\n");
+      if (ch)
+        send_to_char(ch, "Sorry, the new name already exists.\r\n");
       return FALSE;
     }
+    free_char(temp_ch);
   }
 
   /* New playername is OK - find the entry in the index */
@@ -5940,7 +5983,8 @@ bool change_player_name(struct char_data *ch, struct char_data *vict, char *new_
 
   if (player_table[i].id != GET_IDNUM(vict))
   {
-    send_to_char(ch, "Your target was not found in the player index.\r\n");
+    if (ch)
+      send_to_char(ch, "Your target was not found in the player index.\r\n");
     log("SYSERR: Player %s, with ID %ld, could not be found in the player index.", GET_NAME(vict), GET_IDNUM(vict));
     return FALSE;
   }
@@ -5949,12 +5993,14 @@ bool change_player_name(struct char_data *ch, struct char_data *vict, char *new_
   sprintf(old_name, "%s", GET_NAME(vict));
   if (!get_filename(old_pfile, sizeof(old_pfile), PLR_FILE, old_name))
   {
-    send_to_char(ch, "Unable to ascertain player's old pfile name.\r\n");
+    if (ch)
+      send_to_char(ch, "Unable to ascertain player's old pfile name.\r\n");
     return FALSE;
   }
   if (!get_filename(new_pfile, sizeof(new_pfile), PLR_FILE, new_name))
   {
-    send_to_char(ch, "Unable to ascertain player's new pfile name.\r\n");
+    if (ch)
+      send_to_char(ch, "Unable to ascertain player's new pfile name.\r\n");
     return FALSE;
   }
 
@@ -5967,16 +6013,31 @@ bool change_player_name(struct char_data *ch, struct char_data *vict, char *new_
   GET_PC_NAME(vict) = strdup(CAP(new_name));    // Change the name in the victims char struct
 
   /* Rename the player's pfile */
-  sprintf(buf, "mv %s %s", old_pfile, new_pfile);
+  if (rename(old_pfile, new_pfile) != 0) {
+    mudlog(BRF, LVL_IMMORT, TRUE, "SYSERR: change_player_name failed to rename pfile %s -> %s: %s",
+           old_pfile, new_pfile, strerror(errno));
+    free(player_table[i].name);
+    player_table[i].name = strdup(old_name);
+    for (k = 0; (*(player_table[i].name + k) = LOWER(*(player_table[i].name + k))); k++);
+    free(GET_PC_NAME(vict));
+    GET_PC_NAME(vict) = strdup(old_name);
+    return FALSE;
+  }
 
-  /* Save the changed player index - the pfile is saved by perform_set */
+  save_char(vict);
+  account_rename_character(GET_ACCOUNT_ID(vict), old_name, new_name);
+
+  /* Save the changed player index */
   save_player_index();
 
-  mudlog(BRF, LVL_IMMORT, TRUE, "(GC) %s changed the name of %s to %s", GET_NAME(ch), old_name, new_name);
+  if (ch) {
+    mudlog(BRF, LVL_IMMORT, TRUE, "(GC) %s changed the name of %s to %s", GET_NAME(ch), old_name, new_name);
+  } else {
+    mudlog(BRF, LVL_IMMORT, TRUE, "(GC) Forced name change completed: %s is now %s", old_name, new_name);
+  }
 
   if (vict->desc)  /* Descriptor is set if the victim is logged in */
-    send_to_char(vict, "Your login name has changed from %s%s%s to %s%s%s.\r\n", CCYEL(vict, C_NRM), old_name, CCNRM(vict, C_NRM),
-                                                                                 CCYEL(vict, C_NRM), new_name, CCNRM(vict, C_NRM));
+    send_to_char(vict, "Your name has been changed to %s.\r\n", CAP(new_name));
 
   return TRUE;
 }

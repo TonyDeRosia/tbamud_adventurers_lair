@@ -640,6 +640,33 @@ int account_character_is_in_use(const char *name)
   return 0;
 }
 
+int account_rename_character(long acct_id, const char *old_name, const char *new_name)
+{
+  struct account_data acct;
+  int i;
+
+  if (acct_id <= 0 || !old_name || !*old_name || !new_name || !*new_name)
+    return 0;
+
+  memset(&acct, 0, sizeof(acct));
+  if (!account_load_any(acct_id, &acct))
+    return 0;
+
+  for (i = 0; i < acct.num_chars && i < MAX_CHARS_PER_ACCOUNT; i++) {
+    if (!acct.chars[i].name[0])
+      continue;
+    if (!str_cmp(acct.chars[i].name, old_name)) {
+      char capped[sizeof(acct.chars[i].name)];
+      strlcpy(capped, new_name, sizeof(capped));
+      strlcpy(acct.chars[i].name, CAP(capped), sizeof(acct.chars[i].name));
+      account_save_any(&acct);
+      return 1;
+    }
+  }
+
+  return 0;
+}
+
 int account_delete_character_data(const char *name)
 {
   int i, pfilepos;

@@ -64,6 +64,7 @@ ACMD(do_cleanse);
 ACMD(do_smartspawn);
 ACMD(do_aistate);
 ACMD(do_aictl);
+ACMD(do_namechange);
 ACMD(do_shadow);
 ACMD(do_areatemplate);
 ACMD(do_roomtemplate);
@@ -289,6 +290,8 @@ cpp_extern const struct command_info cmd_info[] = {
   { "notell"   , "notell"  , POS_DEAD    , do_gen_tog  , 1, SCMD_NOTELL },
   { "notitle"  , "notitle" , POS_DEAD    , do_wizutil  , LVL_GOD, SCMD_NOTITLE },
   { "nowiz"    , "nowiz"   , POS_DEAD    , do_gen_tog  , LVL_IMMORT, SCMD_NOWIZ },
+  { "namechange", "namechange", POS_DEAD , do_namechange, LVL_IMMORT, 0 },
+  { "nchange"  , "nchange" , POS_DEAD    , do_namechange, LVL_IMMORT, 0 },
 
   { "open"     , "o"       , POS_SITTING , do_gen_door , 0, SCMD_OPEN },
   { "opet"     , "opet"    , POS_RESTING , do_opet     , 1, 0 },
@@ -614,6 +617,16 @@ void command_interpreter(struct char_data *ch, char *argument)
   skip_spaces(&argument);
   if (!*argument)
     return;
+
+  if (!IS_NPC(ch) && PLR_FLAGGED(ch, PLR_FORCED_RENAME)) {
+    if (ch->desc) {
+      ch->desc->forced_rename_name[0] = '\0';
+      STATE(ch->desc) = CON_FORCED_RENAME;
+      send_to_char(ch, "An immortal has required you to choose a new name.\r\n");
+      send_to_char(ch, "Enter your new name: ");
+    }
+    return;
+  }
 
   /* special case to handle one-character, non-alphanumeric commands; requested
    * by many people so "'hi" or ";godnet test" is possible. Patch sent by Eric
@@ -2079,6 +2092,62 @@ void nanny(struct descriptor_data *d, char *arg)
       return;
     }
 
+  case CON_FORCED_RENAME: {
+      char buf[MAX_INPUT_LENGTH], tmp_name[MAX_INPUT_LENGTH];
+
+      if (!d->character) {
+        STATE(d) = CON_CLOSE;
+        return;
+      }
+
+      if (!*arg) {
+        write_to_output(d, "Enter your new name: ");
+        return;
+      }
+
+      if ((_parse_name(arg, tmp_name)) || strlen(tmp_name) < 2 ||
+          strlen(tmp_name) > MAX_NAME_LENGTH || !valid_name(tmp_name) ||
+          fill_word(strcpy(buf, tmp_name)) || reserved_word(buf)) {
+        write_to_output(d, "That name is not allowed.\r\nEnter your new name: ");
+        return;
+      }
+
+      strlcpy(d->forced_rename_name, tmp_name, sizeof(d->forced_rename_name));
+      write_to_output(d, "Please re-enter the name to confirm: ");
+      STATE(d) = CON_FORCED_RENAME_CONFIRM;
+      return;
+    }
+
+  case CON_FORCED_RENAME_CONFIRM: {
+      char tmp_name[MAX_INPUT_LENGTH];
+
+      if (!d->character) {
+        STATE(d) = CON_CLOSE;
+        return;
+      }
+
+      if ((_parse_name(arg, tmp_name)) || str_cmp(tmp_name, d->forced_rename_name)) {
+        write_to_output(d, "Names did not match.\r\nEnter your new name: ");
+        d->forced_rename_name[0] = '\0';
+        STATE(d) = CON_FORCED_RENAME;
+        return;
+      }
+
+      if (!change_player_name(NULL, d->character, d->forced_rename_name)) {
+        write_to_output(d, "That name is not available.\r\nEnter your new name: ");
+        d->forced_rename_name[0] = '\0';
+        STATE(d) = CON_FORCED_RENAME;
+        return;
+      }
+
+      REMOVE_BIT_AR(PLR_FLAGS(d->character), PLR_FORCED_RENAME);
+      d->forced_rename_name[0] = '\0';
+      save_char(d->character);
+      write_to_output(d, "\r\n*** PRESS RETURN: ");
+      STATE(d) = CON_RMOTD;
+      return;
+    }
+
 case CON_GET_NAME:             /* wait for input of name */
   /* Account-first enforcement */
   if (!(d->acct_id > 0)) {
@@ -2460,6 +2529,14 @@ break;
 
     case '1':
       load_result = enter_player_game(d);
+      if (PLR_FLAGGED(d->character, PLR_FORCED_RENAME)) {
+        send_to_char(d->character, "An immortal has required you to choose a new name.\r\n");
+        send_to_char(d->character, "Enter your new name: ");
+        d->forced_rename_name[0] = '\0';
+        STATE(d) = CON_FORCED_RENAME;
+        break;
+      }
+
       send_to_char(d->character, "%s", CONFIG_WELC_MESSG);
 
       /* Clear their load room if it's not persistant. */
