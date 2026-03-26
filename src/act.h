@@ -254,6 +254,7 @@ ACMD(do_gen_tog);
 ACMD(do_quit);
 #define SCMD_QUI  0
 #define SCMD_QUIT 1
+#define SCMD_MENU 2
 /* do_use */
 ACMD(do_use);
 #define SCMD_USE  0

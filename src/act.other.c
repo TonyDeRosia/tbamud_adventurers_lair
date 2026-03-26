@@ -528,7 +528,7 @@ ACMD(do_quit)
   if (IS_NPC(ch) || !ch->desc)
     return;
 
-  if (subcmd != SCMD_QUIT && GET_LEVEL(ch) < LVL_IMMORT)
+  if (subcmd == SCMD_QUI && GET_LEVEL(ch) < LVL_IMMORT)
     send_to_char(ch, "You have to type quit--no less, to quit!\r\n");
   else if (GET_POS(ch) == POS_FIGHTING)
     send_to_char(ch, "No way!  You're fighting for your life!\r\n");
@@ -542,7 +542,10 @@ ACMD(do_quit)
     if (GET_QUEST_TIME(ch) != -1)
       quest_timeout(ch);
 
-    send_to_char(ch, "Goodbye, friend.. Come back soon!\r\n");
+    if (subcmd == SCMD_MENU)
+      send_to_char(ch, "You leave the world and return to the character menu.\r\n");
+    else
+      send_to_char(ch, "You leave the world. Goodbye.\r\n");
 
     /* We used to check here for duping attempts, but we may as well do it right
      * in extract_char(), since there is no check if a player rents out and it
@@ -559,6 +562,9 @@ ACMD(do_quit)
       ch->desc->snoop_by->snooping = NULL;
       ch->desc->snoop_by = NULL;
     }
+
+    if (subcmd == SCMD_QUIT)
+      STATE(ch->desc) = CON_CLOSE;
 
     extract_char(ch);		/* Char is saved before extracting. */
   }

@@ -267,7 +267,9 @@ cpp_extern const struct command_info cmd_info[] = {
   { "load"     , "load"     , POS_DEAD    , do_load     , LVL_BUILDER, 0 },
 
   { "motd"     , "motd"    , POS_DEAD    , do_gen_ps   , 0, SCMD_MOTD },
+  { "menu"     , "menu"    , POS_DEAD    , do_quit     , 0, SCMD_MENU },
   { "mount"    , "mou"     , POS_STANDING, do_mount    , 0, 0 },
+  { "account"  , "account" , POS_DEAD    , do_quit     , 0, SCMD_MENU },
   { "mail"     , "mail"    , POS_STANDING, do_not_here , 1, 0 },
   { "map"      , "map"     , POS_STANDING, do_map      , 1, 0 },
   { "medit"    , "med"     , POS_DEAD    , do_oasis_medit, LVL_BUILDER, 0 },

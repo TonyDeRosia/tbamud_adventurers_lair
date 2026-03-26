@@ -1069,8 +1069,10 @@ void extract_char_final(struct char_data *ch)
         if (d->character && GET_IDNUM(ch) == GET_IDNUM(d->character))
           STATE(d) = CON_CLOSE;
       }
-      STATE(ch->desc) = CON_MENU;
-      write_to_output(ch->desc, "%s", CONFIG_MENU);
+      if (STATE(ch->desc) != CON_CLOSE) {
+        STATE(ch->desc) = CON_MENU;
+        write_to_output(ch->desc, "%s", CONFIG_MENU);
+      }
     }
   }
 
