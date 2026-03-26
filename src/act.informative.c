@@ -2901,6 +2901,30 @@ static void aff_flags_token_to_readable(const char *token, char *out, size_t out
   out[i] = '\0';
 }
 
+static const char *equipment_apply_label(int loc)
+{
+  switch (loc) {
+    case APPLY_STR: return "STR";
+    case APPLY_DEX: return "DEX";
+    case APPLY_INT: return "INT";
+    case APPLY_WIS: return "WIS";
+    case APPLY_CON: return "CON";
+    case APPLY_CHA: return "CHA";
+    default: return aff_apply_name(loc);
+  }
+}
+
+static void append_item_effect_piece(char *effects, size_t effectssz, const char *piece, int *need_sep)
+{
+  if (!effects || !effectssz || !piece || !*piece || !need_sep)
+    return;
+
+  if (*need_sep)
+    out_append(effects, effectssz, ", ");
+  out_append(effects, effectssz, piece);
+  *need_sep = 1;
+}
+
 static int send_equipment_affect_display(struct char_data *ch)
 {
   int slot;
@@ -2914,11 +2938,17 @@ static int send_equipment_affect_display(struct char_data *ch)
     int apply_totals[NUM_APPLIES];
     char flags[256];
     char readable[128];
+    char effect_piece[128];
+    char effects[768];
+    const char *item_name;
     char *tok;
+    int need_sep = 0;
     int i;
 
     if (!obj)
       continue;
+
+    effects[0] = '\0';
 
     for (i = 0; i < NUM_APPLIES; i++)
       apply_totals[i] = 0;
@@ -2931,8 +2961,7 @@ static int send_equipment_affect_display(struct char_data *ch)
         aff_flags_token_to_readable(tok, readable, sizeof(readable));
         if (!*readable)
           continue;
-        send_to_char(ch, "  [Item] %s\r\n", readable);
-        shown++;
+        append_item_effect_piece(effects, sizeof(effects), readable, &need_sep);
       }
     }
 
@@ -2948,9 +2977,17 @@ static int send_equipment_affect_display(struct char_data *ch)
     for (i = APPLY_NONE + 1; i < NUM_APPLIES; i++) {
       if (apply_totals[i] == 0)
         continue;
-      send_to_char(ch, "  [Item] %+d %s\r\n", apply_totals[i], aff_apply_name(i));
-      shown++;
+      snprintf(effect_piece, sizeof(effect_piece), "%+d %s", apply_totals[i], equipment_apply_label(i));
+      append_item_effect_piece(effects, sizeof(effects), effect_piece, &need_sep);
     }
+
+    if (!*effects)
+      continue;
+
+    item_name = (obj->short_description && *obj->short_description) ? obj->short_description :
+                ((obj->name && *obj->name) ? obj->name : "item");
+    send_to_char(ch, "  [Item] [%s] %s\r\n", item_name, effects);
+    shown++;
   }
 
   return shown;
