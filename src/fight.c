@@ -727,6 +727,15 @@ int compute_evasion(struct char_data *ch)
   return MAX(0, evasion);
 }
 
+int compute_baseline_target_evasion(int level)
+{
+  /* Equal-level training target baseline:
+   * - no gear evasion bonus (GET_EVASION = 0)
+   * - neutral combat dex (10) => compute_evasion contribution = 10
+   * - level contribution mirrors compute_defensive_evasion_value() */
+  return MAX(0, 10 + MAX(0, level));
+}
+
 static int compute_defensive_evasion_value(struct char_data *victim, int *level_component)
 {
   int level_bonus = 0;
