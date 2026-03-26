@@ -29,6 +29,7 @@
 #include "modify.h"
 #include "classtrack.h"
 #include "crafting.h"
+#include "quest.h"
 
 #define PRACTICE_CAP 75
 
@@ -537,6 +538,9 @@ SPECIAL(janitor)
     return (FALSE);
 
   for (i = world[IN_ROOM(ch)].contents; i; i = i->next_content) {
+    if (!can_char_take_active_spawned_quest_item(ch, i, FALSE))
+      continue;
+
     if (!CAN_WEAR(i, ITEM_WEAR_TAKE))
       continue;
     if (GET_OBJ_TYPE(i) != ITEM_DRINKCON && GET_OBJ_COST(i) >= 15)

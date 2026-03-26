@@ -22,6 +22,7 @@
 #include "graph.h"
 #include "fight.h"
 #include "ai_actor.h"
+#include "quest.h"
 
 
 /* local file scope only function prototypes */
@@ -73,6 +74,9 @@ void mobile_activity(void)
       best_obj = NULL;
 
       for (obj = world[IN_ROOM(ch)].contents; obj; obj = obj->next_content) {
+        if (!can_char_take_active_spawned_quest_item(ch, obj, FALSE))
+          continue;
+
         if (!CAN_GET_OBJ(ch, obj))
           continue;
 

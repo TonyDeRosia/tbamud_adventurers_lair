@@ -195,6 +195,58 @@ bool is_active_quest_item_for_char(struct char_data *ch, struct obj_data *obj)
   return TRUE;
 }
 
+static struct char_data *active_spawned_quest_item_owner(struct obj_data *obj)
+{
+  struct char_data *owner;
+  long obj_id;
+
+  if (!obj)
+    return NULL;
+
+  obj_id = obj_script_id(obj);
+  if (obj_id <= 0)
+    return NULL;
+
+  for (owner = character_list; owner; owner = owner->next) {
+    if (IS_NPC(owner))
+      continue;
+    if (!is_on_quest(owner) || is_quest_expired(owner))
+      continue;
+    if (GET_KQUEST_TYPE(owner) != KQUEST_ITEM)
+      continue;
+    if (GET_KQUEST_ITEM_ID(owner) <= 0)
+      continue;
+    if (GET_KQUEST_ITEM_ID(owner) == obj_id)
+      return owner;
+  }
+
+  return NULL;
+}
+
+bool is_active_spawned_quest_item_instance(struct obj_data *obj)
+{
+  return active_spawned_quest_item_owner(obj) != NULL;
+}
+
+bool can_char_take_active_spawned_quest_item(struct char_data *ch, struct obj_data *obj, bool send_message)
+{
+  struct char_data *owner = active_spawned_quest_item_owner(obj);
+
+  if (!owner)
+    return TRUE;
+
+  if (!ch || IS_NPC(ch))
+    return FALSE;
+
+  if (ch == owner)
+    return TRUE;
+
+  if (send_message)
+    send_to_char(ch, "That item is not meant for you.\r\n");
+
+  return FALSE;
+}
+
 int get_quest_minutes_remaining(struct char_data *ch)
 {
   time_t now;

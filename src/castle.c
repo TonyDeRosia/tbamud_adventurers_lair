@@ -20,6 +20,7 @@
 #include "act.h"
 #include "spec_procs.h" /**< castle.c is part of the spec_procs module */
 #include "fight.h"
+#include "quest.h"
 
 /* IMPORTANT! The below defined number is the zone number of the Kings Castle.
  * Change it to apply to your chosen zone number. The default zone number 
@@ -622,6 +623,9 @@ static int castle_cleaner(struct char_data *ch, int cmd, int gripe)
     return (FALSE);
 
   for (i = world[IN_ROOM(ch)].contents; i; i = i->next_content) {
+    if (!can_char_take_active_spawned_quest_item(ch, i, FALSE))
+      continue;
+
     if (!is_trash(i))
       continue;
 

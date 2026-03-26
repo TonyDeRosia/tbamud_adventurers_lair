@@ -239,6 +239,9 @@ ACMD(do_put)
 
 static int can_take_obj(struct char_data *ch, struct obj_data *obj)
 {
+if (!can_char_take_active_spawned_quest_item(ch, obj, !IS_NPC(ch)))
+  return (0);
+
 if (!(CAN_WEAR(obj, ITEM_WEAR_TAKE))) {
   act("$p: you can't take that!", FALSE, ch, obj, 0, TO_CHAR);
   return (0);
@@ -280,6 +283,9 @@ static void get_check_money(struct char_data *ch, struct obj_data *obj)
 static void perform_get_from_container(struct char_data *ch, struct obj_data *obj,
 				     struct obj_data *cont, int mode)
 {
+  if (!can_char_take_active_spawned_quest_item(ch, obj, !IS_NPC(ch)))
+    return;
+
   if (mode == FIND_OBJ_INV || can_take_obj(ch, obj)) {
     if (IS_CARRYING_N(ch) >= CAN_CARRY_N(ch))
       act("$p: you can't hold any more items.", FALSE, ch, obj, 0, TO_CHAR);
