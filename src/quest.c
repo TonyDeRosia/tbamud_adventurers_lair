@@ -653,7 +653,7 @@ static void quest_request_kill(struct char_data *ch)
 
   send_to_char(ch, "You ask %s for a quest.\r\n", GET_NAME(qm));
   send_to_char(ch, "%s tells you, 'Thank you, brave %s!'\r\n", GET_NAME(qm), GET_NAME(ch));
-  send_to_char(ch, "%s tells you, 'An enemy of mine, %s, is making vile threats against Ayla!'\r\n",
+  send_to_char(ch, "%s tells you, 'An enemy of mine, %s, is making vile threats against the realm!'\r\n",
       GET_NAME(qm), GET_NAME(target));
   send_to_char(ch, "%s tells you, 'Seek %s out somewhere near %s in the area of %s.'\r\n",
       GET_NAME(qm), GET_NAME(target), world[tr].name, zone_table[world[tr].zone].name);
