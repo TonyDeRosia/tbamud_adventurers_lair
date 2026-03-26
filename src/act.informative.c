@@ -4237,11 +4237,15 @@ static void perform_mortal_where(struct char_data *ch, char *arg)
 {
   struct char_data *i;
   struct descriptor_data *d;
-  int j;
+  zone_rnum zone;
+
+  zone = world[IN_ROOM(ch)].zone;
 
   if (!*arg) {
-    j = world[(IN_ROOM(ch))].zone;
-    send_to_char(ch, "Players in %s\tn.\r\n--------------------\r\n", zone_table[j].name);
+    send_to_char(ch, "Players in the realm:\r\n");
+    send_to_char(ch, "--------------------\r\n");
+    send_to_char(ch, "%-16s %-25s %s\r\n", "Name", "Area", "Level Range");
+    send_to_char(ch, "%-16s %-25s %s\r\n", "----------------", "-------------------------", "-----------");
     for (d = descriptor_list; d; d = d->next) {
       if (STATE(d) != CON_PLAYING || d->character == ch)
     continue;
@@ -4249,19 +4253,27 @@ static void perform_mortal_where(struct char_data *ch, char *arg)
     continue;
       if (IN_ROOM(i) == NOWHERE || !CAN_SEE(ch, i))
     continue;
-      if (world[IN_ROOM(ch)].zone != world[IN_ROOM(i)].zone)
+      if (zone != world[IN_ROOM(i)].zone)
     continue;
-      send_to_char(ch, "%-20s%s - %s%s\r\n", GET_NAME(i), QNRM, world[IN_ROOM(i)].name, QNRM);
+      send_to_char(ch, "%-16s %-25s %3d-%-3d\r\n",
+                   GET_NAME(i),
+                   zone_table[world[IN_ROOM(i)].zone].name,
+                   zone_table[world[IN_ROOM(i)].zone].min_level,
+                   zone_table[world[IN_ROOM(i)].zone].max_level);
     }
   } else {            /* print only FIRST char, not all. */
     for (i = character_list; i; i = i->next) {
       if (IN_ROOM(i) == NOWHERE || i == ch)
     continue;
-      if (!CAN_SEE(ch, i) || world[IN_ROOM(i)].zone != world[IN_ROOM(ch)].zone)
+      if (!CAN_SEE(ch, i) || world[IN_ROOM(i)].zone != zone)
     continue;
       if (!isname(arg, i->player.name))
     continue;
-      send_to_char(ch, "%-25s%s - %s%s\r\n", GET_NAME(i), QNRM, world[IN_ROOM(i)].name, QNRM);
+      send_to_char(ch, "%-16s %-25s %3d-%-3d\r\n",
+                   GET_NAME(i),
+                   zone_table[world[IN_ROOM(i)].zone].name,
+                   zone_table[world[IN_ROOM(i)].zone].min_level,
+                   zone_table[world[IN_ROOM(i)].zone].max_level);
       return;
     }
     send_to_char(ch, "Nobody around by that name.\r\n");
