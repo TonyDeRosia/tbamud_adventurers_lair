@@ -347,10 +347,6 @@ void show_ability_table_aligned(struct char_data *ch, int show_spells, int show_
 {
   int i;
   int cls = GET_CLASS(ch);
-  int col = 0;
-  int last_lvl = -1;
-  int col_width = ABIL_COL_WIDTH;
-  int name_width = 17;
 
   /* "Level 99: " is 10 chars; padding below matches practice output. */
 
@@ -404,7 +400,7 @@ void show_ability_table_aligned(struct char_data *ch, int show_spells, int show_
 
   qsort(rows, (size_t)n, sizeof(rows[0]), abil_row_cmp);
 
-  if (show_spells) {
+  {
     int idx = 0;
     int global_left_name_len = 0;
     int global_right_name_len = 0;
@@ -498,47 +494,7 @@ void show_ability_table_aligned(struct char_data *ch, int show_spells, int show_
       send_to_char(ch, "\r\n");
       idx = level_start + level_count;
     }
-    return;
   }
-
-  /* Print */
-  for (i = 0; i < n; i++) {
-    char cell[256];
-
-    if (rows[i].lvl != last_lvl) {
-      if (col != 0) {
-        send_to_char(ch, "\r\n");
-        col = 0;
-      }
-      send_to_char(ch, "%sLevel %-2d%s:%s ",
-                   CCCYN(ch, C_NRM),
-                   rows[i].lvl,
-                   CCWHT(ch, C_NRM),
-                   CCNRM(ch, C_NRM));
-      last_lvl = rows[i].lvl;
-    } else if (col == 0) {
-      send_to_char(ch, "\r\n%*s", LEVEL_LABEL_PADDING, "");
-    } else {
-      send_to_char(ch, "  ");
-    }
-
-    if (rows[i].pct < 0)
-      snprintf(cell, sizeof(cell), "%-*.*s [ -- ]",
-               name_width, name_width, rows[i].name);
-    else
-      snprintf(cell, sizeof(cell), "%-*.*s [%3d%%]",
-               name_width, name_width, rows[i].name, rows[i].pct);
-    send_to_char(ch, "%-*s", col_width + count_color_chars(cell), cell);
-
-    col++;
-    if (col >= 2) {
-      send_to_char(ch, "\r\n");
-      col = 0;
-    }
-  }
-
-  if (col != 0)
-    send_to_char(ch, "\r\n");
 }
 
 static void show_adventurer_study_catalog(struct char_data *ch, int show_spells, const char *filter)
