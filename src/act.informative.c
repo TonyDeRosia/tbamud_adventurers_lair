@@ -5264,6 +5264,37 @@ static bool get_zone_levels(zone_rnum znum, char *buf)
   return TRUE;
 }
 
+static bool zone_has_complete_area_metadata(zone_rnum znum)
+{
+  const char *name;
+
+  if (znum < 0 || znum > top_of_zone_table)
+    return FALSE;
+
+  if (zone_table[znum].number < 0)
+    return FALSE;
+
+  name = zone_table[znum].name;
+  if (!name)
+    return FALSE;
+  while (*name && isspace((unsigned char)*name))
+    name++;
+  if (!*name)
+    return FALSE;
+
+  if (zone_table[znum].bot < 0 || zone_table[znum].top < 0)
+    return FALSE;
+  if (zone_table[znum].top < zone_table[znum].bot)
+    return FALSE;
+
+  if (zone_table[znum].min_level < 0 || zone_table[znum].max_level < 0)
+    return FALSE;
+  if (zone_table[znum].max_level < zone_table[znum].min_level)
+    return FALSE;
+
+  return TRUE;
+}
+
 ACMD(do_areas)
 {
   int i, hilev=-1, lolev=-1, zcount=0, lev_set, len=0, tmp_len=0;
@@ -5312,28 +5343,22 @@ ACMD(do_areas)
     show_zone = FALSE;
     overlap = FALSE;
 
-    if (ZONE_FLAGGED(i, ZONE_GRID)) {           /* Is this zone 'on the grid' ?    */
-      if (lolev == -1) {
-        /* No range supplied, show all zones */
-        show_zone = TRUE;
-      } else if ((hilev == -1) && (lolev >= ZONE_MINLVL(i)) && (lolev <= ZONE_MAXLVL(i))) {
-        /* Single number supplied, it's in this zone's range */
-        show_zone = TRUE;
-      } else if ((hilev != -1) && (lolev >= ZONE_MINLVL(i)) && (hilev <= ZONE_MAXLVL(i))) {
-        /* Range supplied, it's completely within this zone's range (no overlap) */
-        show_zone = TRUE;
-      } else if ((hilev != -1) && ((lolev >= ZONE_MINLVL(i) && lolev <= ZONE_MAXLVL(i)) || (hilev <= ZONE_MAXLVL(i) && hilev >= ZONE_MINLVL(i)))) {
-        /* Range supplied, it overlaps this zone's range */
-        show_zone = TRUE;
-        overlap = TRUE;
-      } else if (ZONE_MAXLVL(i) < 0 && (lolev >= ZONE_MINLVL(i))) {
-        /* Max level not set for this zone, but specified min in range */
-        show_zone = TRUE;
-      } else if (ZONE_MAXLVL(i) < 0 && (hilev >= ZONE_MINLVL(i))) {
-        /* Max level not set for this zone, so just display it as red */
-        show_zone = TRUE;
-        overlap = TRUE;
-      }
+    if (!zone_has_complete_area_metadata(i))
+      continue;
+
+    if (lolev == -1) {
+      /* No range supplied, show all complete zones */
+      show_zone = TRUE;
+    } else if ((hilev == -1) && (lolev >= ZONE_MINLVL(i)) && (lolev <= ZONE_MAXLVL(i))) {
+      /* Single number supplied, it's in this zone's range */
+      show_zone = TRUE;
+    } else if ((hilev != -1) && (lolev >= ZONE_MINLVL(i)) && (hilev <= ZONE_MAXLVL(i))) {
+      /* Range supplied, it's completely within this zone's range (no overlap) */
+      show_zone = TRUE;
+    } else if ((hilev != -1) && ((lolev >= ZONE_MINLVL(i) && lolev <= ZONE_MAXLVL(i)) || (hilev <= ZONE_MAXLVL(i) && hilev >= ZONE_MINLVL(i)))) {
+      /* Range supplied, it overlaps this zone's range */
+      show_zone = TRUE;
+      overlap = TRUE;
     }
 
     if (show_zone) {
