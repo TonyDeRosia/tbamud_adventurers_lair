@@ -81,21 +81,21 @@ See also: SPELLS SKILLS
 EVASION
 
 Evasion
-Type: Spell
+Type: Stat
 
 Description:
-Uses non-damage magic to solve tactical problems such as movement, detection, control, or escape.
+A defensive score sheet stat that represents how hard you are to hit with physical attacks.
 
 Effect:
-Creates a concrete tactical advantage outside raw DPS, such as safer pulls, repositioning, scouting, or disengage.
+Higher Evasion makes physical attacks less likely to land on you.
 
 Usage:
-Use when a escape or control option is better than trading blows, such as escaping bad rooms, controlling action timing, or enabling safer engages.
+Raise Evasion through gear, buffs, and other progression sources when you want more avoidance.
 
 Notes:
-Avoid spending turns on this when a kill is immediately available; switch to damage or hard control once position is secured.
+Evasion is a player-facing combat stat; higher is better.
 
-See also: SPELLS SKILLS
+See also: ARMOR HITROLL ACCURACY SPELL-SAVE-IMPROVEMENT
 #0
 
 IRONSKIN
@@ -4460,19 +4460,28 @@ people have done with their zone.
 See also: ^, RUMBLE-ALIASES
 #0
 
-ALIGNMENT GOOD NEUTRAL EVIL %ACTOR.ALIGN% %ALIGN% %ALIGNMENT% 
+ALIGNMENT GOOD NEUTRAL EVIL %ACTOR.ALIGN% %ALIGN% %ALIGNMENT%
 
-   Different characters and mobs have different alignments depending upon their
-way of life. Because of this, they may be aggressive or friendly depending on 
-the mix. Some objects cannot be used by certain alignments. For mobs alignment 
-ranges from:
+Alignment
+Type: Stat
 
- -1000 to -350  Evil
-  -350 to  350  Neutral
-   350 to 1000  Good
+Description:
+A score sheet value that shows your character's moral position on the good/neutral/evil scale.
 
-See also: ALIGNMENTS
-#31
+Effect:
+Your alignment places you in a range from evil to good and can affect how some game content reacts to you.
+
+Usage:
+Check this stat when you need to know where your character currently sits on the alignment spectrum.
+
+Notes:
+Common ranges are:
+-1000 to -351: Evil
+-350 to 350: Neutral
+351 to 1000: Good
+
+See also: ALIGNMENTS SCORE
+#0
 ALIGNMENTS
 
    Many good areas stick to a defined level range, such as 10-20 or 25-30. Do 
@@ -4691,21 +4700,21 @@ See also: SPELLS SKILLS
 ARMOR
 
 Armor
-Type: Spell
+Type: Stat
 
 Description:
-Armor focuses on these gameplay behaviors: applies status or stat modifiers.
+A defensive score sheet stat representing your physical durability in combat.
 
 Effect:
-Applies a persistent magical condition that alters the target's combat performance.
+Higher Armor improves your protection against physical danger.
 
 Usage:
-Target a character in your room.
+Increase Armor through equipment, buffs, and progression choices when you need more survivability.
 
 Notes:
-Targeting: a character in your room. If a saving throw is involved, expect reduced value on high-save targets.
+Armor is shown as a player-facing stat; higher is better.
 
-See also: SPELLS SKILLS
+See also: EVASION HITROLL DAMROLL
 #0
 
 ARMOR-SPELL
@@ -6967,14 +6976,44 @@ Targeting: a character in your room, your current combat target, cannot target y
 See also: SPELLS SKILLS
 #0
 
-DAMROLL ROLL DAMAGEROLL DAMAGE-ROLL 
+DAMROLL ROLL DAMAGEROLL DAMAGE-ROLL
 
-   A bonus added to your armor and weapons that allows your character to hit 
-things harder and with a stronger force.
-   A player at level fifteen with a Damroll +15 will do more damage to a 
-creature, than a level fifteen player would do with a Damroll of +10.
+Damroll
+Type: Stat
 
-See also: HITROLL, AC, STATS
+Description:
+A score sheet stat that adds to your physical damage output.
+
+Effect:
+Higher Damroll increases the physical damage you deal when attacks land.
+
+Usage:
+Build Damroll when you want stronger weapon and other physical hits.
+
+Notes:
+Damroll improves damage, while Hitroll helps attacks connect.
+
+See also: HITROLL ACCURACY UNARMED-DICE
+#0
+
+ACCURACY
+
+Accuracy
+Type: Stat
+
+Description:
+A score sheet estimate of your chance to land attacks under the game's displayed assumptions.
+
+Effect:
+Higher Accuracy means your shown estimated hit chance is better.
+
+Usage:
+Use Accuracy as a quick read of offensive reliability when comparing gear or buffs.
+
+Notes:
+This is an estimate shown to players, not a full breakdown of every combat factor.
+
+See also: HITROLL EVASION DAMROLL
 #0
 
 DARK-AEGIS
@@ -9523,13 +9562,22 @@ See also: CHANNELS, MUD-HISTORY
 
 HITROLL
 
-   A bonus added to your armor and weapons that increases your chances of 
-hitting a creature while in battle. This does not affect how hard you hit, 
-just how often.
-   A player at level fifteen with a Hitroll of +25 will hit a creature more
-often than a level fifteen player would with a Hitroll of +10.
+Hitroll
+Type: Stat
 
-See also: DAMROLL, AC, STATS, DAMAGE
+Description:
+A score sheet stat that improves your chance to land physical attacks.
+
+Effect:
+Higher Hitroll helps your melee and ranged attacks connect more often.
+
+Usage:
+Increase Hitroll when your attacks are missing too frequently.
+
+Notes:
+Hitroll improves chance to hit; Damroll improves damage when you do hit.
+
+See also: DAMROLL ACCURACY EVASION
 #0
 
 HOLD-MONSTER
@@ -18154,8 +18202,142 @@ See also: TSTAT, TRIGEDIT, OLC
 #31
 TNL
 
-   An acronym for to next level. The amount of experience required before you 
-can attain the next level.
+TNL
+Type: Stat
+
+Description:
+Short for "To Next Level," this score sheet stat shows the experience still needed for your next level.
+
+Effect:
+As you gain experience, TNL decreases toward zero.
+
+Usage:
+Check TNL to track leveling progress and estimate how much more experience you need.
+
+Notes:
+TNL is a progress indicator only; it does not change combat stats directly.
+
+See also: EXPERIENCE LEVEL SCORE
+#0
+
+SPELL-SAVE-IMPROVEMENT SPELL-SAVE SPELL-SAVES SPELL-SAVE-IMPROVE SPELL-SAVE-IMPROVEMENTS
+
+Spell Save Improvement
+Type: Stat
+
+Description:
+A score sheet stat showing how much your magic defense has been improved.
+
+Effect:
+Higher Spell Save Improvement is better from the player perspective and helps your resistance to hostile magic.
+
+Usage:
+Raise this stat through gear, buffs, and progression when fighting caster-heavy enemies.
+
+Notes:
+This entry describes the player-facing stat display, not internal saving throw formulas.
+
+See also: EVASION ARMOR RESISTANCE
+#0
+
+UNARMED-DICE UNARMED
+
+Unarmed Dice
+Type: Stat
+
+Description:
+A score sheet stat that shows your base unarmed damage dice.
+
+Effect:
+This value represents your unarmed damage foundation before other bonuses are applied.
+
+Usage:
+Check Unarmed Dice when comparing forms, classes, or setups that rely on unarmed attacks.
+
+Notes:
+Other effects can still change final damage after this base value.
+
+See also: DAMROLL HITROLL CRIT-HIT
+#0
+
+CRIT-HIT
+
+Crit Hit
+Type: Stat
+
+Description:
+A score sheet stat showing your chance to trigger a physical critical hit.
+
+Effect:
+Higher Crit Hit means physical attacks crit more often.
+
+Usage:
+Increase Crit Hit when building for burst physical damage.
+
+Notes:
+This entry is player-facing and does not list internal crit formulas.
+
+See also: CRIT-SPELL CRIT-HEAL DAMROLL
+#0
+
+CRIT-SPELL
+
+Crit Spell
+Type: Stat
+
+Description:
+A score sheet stat showing your chance to trigger a spell critical.
+
+Effect:
+Higher Crit Spell means offensive spells crit more often.
+
+Usage:
+Increase Crit Spell when optimizing caster burst potential.
+
+Notes:
+This entry is player-facing and does not list internal crit formulas.
+
+See also: CRIT-HIT CRIT-HEAL SPELL-SAVE-IMPROVEMENT
+#0
+
+CRIT-HEAL
+
+Crit Heal
+Type: Stat
+
+Description:
+A score sheet stat showing your chance to trigger a healing critical.
+
+Effect:
+Higher Crit Heal means healing effects critically heal more often.
+
+Usage:
+Increase Crit Heal when focusing on stronger healing throughput.
+
+Notes:
+This entry is player-facing and does not list internal crit formulas.
+
+See also: CRIT-SPELL CRIT-HIT HEALING
+#0
+
+CARRY-CAPACITY CARRYCAPACITY CARRY-WEIGHT
+
+Carry Capacity
+Type: Stat
+
+Description:
+A score sheet stat showing your current carried weight versus your maximum carrying limit.
+
+Effect:
+It tells you how close you are to your carry limit.
+
+Usage:
+Check Carry Capacity before looting, shopping, or long runs to avoid overloading.
+
+Notes:
+If current weight approaches max capacity, free space by dropping, storing, or selling items.
+
+See also: INVENTORY EQUIPMENT WEIGHT
 #0
 
 TOGGLES CONFIGURE SETTINGS
