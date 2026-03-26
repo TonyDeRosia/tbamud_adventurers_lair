@@ -68,6 +68,7 @@ static const char *score_cond_label(int cond);
 #include "clan.h"
 #include "constants.h"
 #include "dg_scripts.h"
+#include "graph.h"
 #include "mud_event.h"
 #include "mail.h"         /**< For the has_mail function */
 #include "act.h"
@@ -5588,38 +5589,6 @@ static const char *score_cond_label(int cond)
   return "Full";
 }
 
-static int speedwalk_reverse_token_to_dir(const char *token, int len)
-{
-  char dirbuf[8];
-
-  if (len <= 0 || len >= (int)sizeof(dirbuf))
-    return -1;
-
-  snprintf(dirbuf, sizeof(dirbuf), "%.*s", len, token);
-  if (!str_cmp(dirbuf, "n"))
-    return NORTH;
-  if (!str_cmp(dirbuf, "e"))
-    return EAST;
-  if (!str_cmp(dirbuf, "s"))
-    return SOUTH;
-  if (!str_cmp(dirbuf, "w"))
-    return WEST;
-  if (!str_cmp(dirbuf, "u"))
-    return UP;
-  if (!str_cmp(dirbuf, "d"))
-    return DOWN;
-  if (!str_cmp(dirbuf, "nw"))
-    return NORTHWEST;
-  if (!str_cmp(dirbuf, "ne"))
-    return NORTHEAST;
-  if (!str_cmp(dirbuf, "se"))
-    return SOUTHEAST;
-  if (!str_cmp(dirbuf, "sw"))
-    return SOUTHWEST;
-
-  return -1;
-}
-
 static int speedwalk_append_dir_token(char *out, size_t outsz, int dir, int count)
 {
   char token[16];
@@ -5643,70 +5612,63 @@ static int speedwalk_append_dir_token(char *out, size_t outsz, int dir, int coun
   return TRUE;
 }
 
-static int speedwalk_reverse_route(const char *route, char *out, size_t outsz)
+static int speedwalk_build_route(room_rnum src, room_rnum target, char *out, size_t outsz)
 {
-  int dirs_seen[256];
-  int dir_count = 0;
-  int i = 0;
-  int count = 0;
+  room_rnum current;
+  int dir, count;
 
-  if (!route || !out || outsz == 0)
+  if (!out || outsz == 0)
     return FALSE;
-
   out[0] = '\0';
 
-  while (route[i] != '\0') {
-    int start;
-    int dir;
-    int k;
+  if (!VALID_ROOM_RNUM(src) || !VALID_ROOM_RNUM(target))
+    return FALSE;
+  if (src == target)
+    return TRUE;
 
-    if (isspace((unsigned char)route[i])) {
-      i++;
-      continue;
-    }
+  current = src;
+  while (current != target) {
+    room_rnum next_room;
 
-    count = 0;
-    while (isdigit((unsigned char)route[i])) {
-      count = (count * 10) + (route[i] - '0');
-      i++;
-    }
-    if (count <= 0)
-      count = 1;
-
-    start = i;
-    while (isalpha((unsigned char)route[i]))
-      i++;
-
-    dir = speedwalk_reverse_token_to_dir(route + start, i - start);
-    if (dir < 0)
+    dir = graph_find_first_step(current, target);
+    if (dir < 0 || dir >= NUM_OF_DIRS)
       return FALSE;
 
-    for (k = 0; k < count; k++) {
-      if (dir_count >= (int)(sizeof(dirs_seen) / sizeof(dirs_seen[0])))
-        return FALSE;
-      dirs_seen[dir_count++] = dir;
-    }
-  }
-
-  if (dir_count == 0)
-    return FALSE;
-
-  i = dir_count - 1;
-  while (i >= 0) {
-    int rev = rev_dir[dirs_seen[i]];
-    int step;
     count = 1;
-    i--;
-    while (i >= 0 && rev_dir[dirs_seen[i]] == rev) {
+    next_room = world[current].dir_option[dir] ? world[current].dir_option[dir]->to_room : NOWHERE;
+    if (next_room == NOWHERE)
+      return FALSE;
+    current = next_room;
+
+    while (current != target) {
+      int next_dir = graph_find_first_step(current, target);
+      room_rnum chain_room;
+
+      if (next_dir != dir)
+        break;
+      chain_room = world[current].dir_option[next_dir] ? world[current].dir_option[next_dir]->to_room : NOWHERE;
+      if (chain_room == NOWHERE)
+        break;
       count++;
-      i--;
+      current = chain_room;
     }
-    step = speedwalk_append_dir_token(out, outsz, rev, count);
-    if (!step)
+
+    if (!speedwalk_append_dir_token(out, outsz, dir, count))
       return FALSE;
   }
 
   return TRUE;
+}
+
+static int speedwalk_zone_matches_filter(zone_rnum z, const char *filter, int numeric_filter, int has_numeric_filter)
+{
+  if (!*filter)
+    return TRUE;
+
+  if (has_numeric_filter && zone_table[z].number == numeric_filter)
+    return TRUE;
+
+  return ci_contains(zone_table[z].name, filter);
 }
 
 ACMD(do_identify)
@@ -5741,99 +5703,89 @@ ACMD(do_identify)
 ACMD(do_speedwalk)
 {
   char arg[MAX_INPUT_LENGTH];
-  FILE *fl;
-  char line[256];
-  char current_route[200];
+  char current_path_probe[400];
   const char *recall_name = "mortal recall";
+  room_rnum source_room = NOWHERE;
+  int numeric_filter = 0, has_numeric_filter = FALSE;
   int shown = 0;
   zone_rnum current_zone = NOWHERE;
+  int z;
+  int current_known = FALSE;
 
   skip_spaces(&argument);
   strlcpy(arg, argument, sizeof(arg));
-  current_route[0] = '\0';
+  if (*arg) {
+    char *p = arg;
+    has_numeric_filter = TRUE;
+    if (*p == '+' || *p == '-')
+      p++;
+    if (!isdigit((unsigned char)*p))
+      has_numeric_filter = FALSE;
+    while (*p) {
+      if (!isdigit((unsigned char)*p)) {
+        has_numeric_filter = FALSE;
+        break;
+      }
+      p++;
+    }
+    if (has_numeric_filter)
+      numeric_filter = atoi(arg);
+  }
 
   if (IN_ROOM(ch) != NOWHERE)
     current_zone = world[IN_ROOM(ch)].zone;
 
-  fl = fopen("misc/speedwalk.lst", "r");
-  if (!fl) {
-    send_to_char(ch, "No speedwalk routes are available.\r\n");
-    return;
-  }
+  if (VALID_ROOM_RNUM(r_mortal_start_room))
+    source_room = r_mortal_start_room;
+  else if (VALID_ROOM_RNUM(r_immort_start_room))
+    source_room = r_immort_start_room;
+  else if (IN_ROOM(ch) != NOWHERE)
+    source_room = IN_ROOM(ch);
+  else
+    source_room = 0;
 
-  if (r_mortal_start_room != NOWHERE && world[r_mortal_start_room].name)
-    recall_name = world[r_mortal_start_room].name;
+  if (VALID_ROOM_RNUM(source_room) && world[source_room].name)
+    recall_name = world[source_room].name;
 
   send_to_char(ch, "                  Directions from %s\r\n\r\n", recall_name);
   send_to_char(ch, "Area Name                       Speedwalk\r\n");
   send_to_char(ch, "------------------------------  ----------------------------------------------\r\n");
 
-  while (fgets(line, sizeof(line), fl)) {
-    int zvnum;
-    char route[200];
-    zone_rnum z;
+  if (current_zone != NOWHERE)
+    current_known = speedwalk_build_route(source_room, IN_ROOM(ch), current_path_probe, sizeof(current_path_probe));
 
-    if (line[0] == '\0' || line[0] == '\n' || line[0] == '#')
-      continue;
-
-    route[0] = '\0';
-    if (sscanf(line, "%d %199[^\r\n]", &zvnum, route) != 2)
-      continue;
-
-    z = real_zone(zvnum);
-    if (z == NOWHERE)
-      continue;
-
-    if (*arg && !ci_contains(zone_table[z].name, arg))
-      continue;
-
-    if (current_zone != NOWHERE && z == current_zone)
-      strlcpy(current_route, route, sizeof(current_route));
-  }
-
-  rewind(fl);
-
-  while (fgets(line, sizeof(line), fl)) {
-    int zvnum;
-    char route[200];
+  for (z = 0; z <= top_of_zone_table; z++) {
     char display_route[400];
-    zone_rnum z;
+    room_rnum target = NOWHERE;
+    room_rnum rv;
+    int has_route = FALSE;
 
-    if (line[0] == '\0' || line[0] == '\n' || line[0] == '#')
+    if (!speedwalk_zone_matches_filter(z, arg, numeric_filter, has_numeric_filter))
       continue;
 
-    route[0] = '\0';
-    if (sscanf(line, "%d %199[^\r\n]", &zvnum, route) != 2)
-      continue;
-
-    z = real_zone(zvnum);
-    if (z == NOWHERE)
-      continue;
-
-    if (*arg && !ci_contains(zone_table[z].name, arg))
-      continue;
-
-    strlcpy(display_route, route, sizeof(display_route));
-    if (*current_route) {
-      char rev[400];
-
-      if (z == current_zone) {
-        strlcpy(display_route, "you are here", sizeof(display_route));
-      } else if (speedwalk_reverse_route(current_route, rev, sizeof(rev))) {
-        size_t len;
-
-        strlcpy(display_route, rev, sizeof(display_route));
-        len = strlen(display_route);
-        if (len < sizeof(display_route) - 1)
-          snprintf(display_route + len, sizeof(display_route) - len, "%s", route);
+    for (rv = 0; rv <= top_of_world; rv++) {
+      if (world[rv].zone != z)
+        continue;
+      if (speedwalk_build_route(source_room, rv, display_route, sizeof(display_route))) {
+        target = rv;
+        has_route = TRUE;
+        break;
       }
+    }
+    if (!has_route)
+      continue;
+
+    if (current_known && z == current_zone && IN_ROOM(ch) != NOWHERE) {
+      strlcpy(display_route, "you are here", sizeof(display_route));
+    } else if (current_known) {
+      char from_current[400];
+      if (speedwalk_build_route(IN_ROOM(ch), target, from_current, sizeof(from_current)))
+        strlcpy(display_route, from_current, sizeof(display_route));
     }
 
     send_to_char(ch, "%-30.30s  %s\r\n", zone_table[z].name, display_route);
     shown++;
   }
-
-  fclose(fl);
 
   if (!shown) {
     if (*arg)

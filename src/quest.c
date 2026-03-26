@@ -25,6 +25,7 @@
 #include "shop.h"
 #include "spec_procs.h"
 #include "mail.h"
+#include "graph.h"
 
 
 /*--------------------------------------------------------------------------
@@ -240,6 +241,50 @@ static int room_is_quest_safe(room_rnum room)
          ROOM_FLAGGED(room, ROOM_GODROOM) ||
          ROOM_FLAGGED(room, ROOM_DEATH) ||
          ROOM_FLAGGED(room, ROOM_NOMOB);
+}
+
+static room_rnum quest_reachability_anchor(struct char_data *ch)
+{
+  if (ch && VALID_ROOM_RNUM(IN_ROOM(ch)))
+    return IN_ROOM(ch);
+  if (VALID_ROOM_RNUM(r_mortal_start_room))
+    return r_mortal_start_room;
+  if (VALID_ROOM_RNUM(r_immort_start_room))
+    return r_immort_start_room;
+  if (top_of_world >= 0)
+    return 0;
+  return NOWHERE;
+}
+
+static int quest_target_room_is_reachable(room_rnum source, room_rnum target)
+{
+  int step;
+
+  if (!VALID_ROOM_RNUM(source) || !VALID_ROOM_RNUM(target))
+    return FALSE;
+  if (source == target)
+    return TRUE;
+
+  step = graph_find_first_step(source, target);
+  return (step >= 0 && step < NUM_OF_DIRS);
+}
+
+static int quest_target_room_valid(struct char_data *ch, room_rnum room)
+{
+  room_rnum anchor;
+
+  if (!VALID_ROOM_RNUM(room))
+    return FALSE;
+  if (world[room].zone < 0 || world[room].zone > top_of_zone_table)
+    return FALSE;
+  if (room_is_quest_safe(room))
+    return FALSE;
+
+  anchor = quest_reachability_anchor(ch);
+  if (!VALID_ROOM_RNUM(anchor))
+    return TRUE; /* If no reliable anchor exists, don't hard-fail all quests. */
+
+  return quest_target_room_is_reachable(anchor, room);
 }
 
 static int campaign_size_step(int target_count)
@@ -459,7 +504,9 @@ static int select_campaign_targets(struct char_data *ch, struct campaign_candida
       continue;
 
     in_room = IN_ROOM(mob);
-    if (room_is_quest_safe(in_room))
+    if (!quest_target_room_valid(ch, in_room))
+      continue;
+    if (real_mobile(GET_MOB_VNUM(mob)) == NOBODY)
       continue;
 
     mob_level = GET_LEVEL(mob);
@@ -526,37 +573,43 @@ static int select_campaign_targets(struct char_data *ch, struct campaign_candida
 
 static struct char_data *select_kill_quest_target(struct char_data *ch)
 {
-  struct char_data *mob, *choice = NULL;
-  int weight, total = 0;
+  struct char_data *mob;
+  struct char_data *candidates[2000];
+  int cand_count = 0;
   int level_diff;
+  int i;
 
   for (mob = character_list; mob; mob = mob->next) {
     if (!IS_NPC(mob) || IN_ROOM(mob) == NOWHERE)
       continue;
-    if (room_is_quest_safe(IN_ROOM(mob)))
+    if (!quest_target_room_valid(ch, IN_ROOM(mob)))
       continue;
     if (is_service_or_protected_mob(mob))
       continue;
     if (MOB_FLAGGED(mob, MOB_NOTDEADYET))
       continue;
+    if (real_mobile(GET_MOB_VNUM(mob)) == NOBODY)
+      continue;
 
     level_diff = GET_LEVEL(ch) - GET_LEVEL(mob);
     if (level_diff < -3 || level_diff > 8)
       continue;
-
-    if (level_diff >= 0 && level_diff <= 4)
-      weight = 6;
-    else if (level_diff <= 6)
-      weight = 3;
-    else
-      weight = 1;
-
-    total += weight;
-    if (rand_number(1, total) <= weight)
-      choice = mob;
+    if (cand_count >= (int)(sizeof(candidates) / sizeof(candidates[0])))
+      break;
+    candidates[cand_count++] = mob;
   }
 
-  return choice;
+  if (cand_count == 0)
+    return NULL;
+
+  for (i = 0; i < cand_count; i++) {
+    int j = rand_number(i, cand_count - 1);
+    struct char_data *tmp = candidates[i];
+    candidates[i] = candidates[j];
+    candidates[j] = tmp;
+  }
+
+  return candidates[0];
 }
 
 static void quest_request_kill(struct char_data *ch)
@@ -606,6 +659,12 @@ static void quest_request_kill(struct char_data *ch)
       GET_NAME(qm), GET_NAME(target), world[tr].name, zone_table[world[tr].zone].name);
   send_to_char(ch, "%s tells you, 'Good luck, %s. Return safely!'\r\n", GET_NAME(qm), GET_NAME(ch));
   send_to_char(ch, "You have 60 minutes to complete your quest.\r\n");
+  if (GET_LEVEL(ch) >= LVL_IMMORT) {
+    send_to_char(ch, "[Quest Debug] target_vnum=%d target_room=%d zone=%d (%s) target_id=%ld reachable=yes\r\n",
+                 GET_KQUEST_TARGET(ch), GET_KQUEST_ROOM(ch),
+                 zone_table[world[tr].zone].number, zone_table[world[tr].zone].name,
+                 GET_KQUEST_TARGET_ID(ch));
+  }
   save_char(ch);
 }
 
@@ -646,6 +705,13 @@ static void quest_info_kill(struct char_data *ch)
   send_to_char(ch, "%s can be found in the vicinity of %s which\r\nis in the general area of %s.\r\n",
       target_name,
       world[room].name, zone_table[world[room].zone].name);
+  if (GET_LEVEL(ch) >= LVL_IMMORT) {
+    send_to_char(ch, "[Quest Debug] target_vnum=%d target_room=%d zone=%d (%s) target_id=%ld reachable=%s\r\n",
+                 GET_KQUEST_TARGET(ch), GET_KQUEST_ROOM(ch),
+                 zone_table[world[room].zone].number, zone_table[world[room].zone].name,
+                 GET_KQUEST_TARGET_ID(ch),
+                 quest_target_room_valid(ch, room) ? "yes" : "no");
+  }
   send_to_char(ch, "Time remaining: %d minute%s.\r\n",
                get_quest_minutes_remaining(ch),
                get_quest_minutes_remaining(ch) == 1 ? "" : "s");
