@@ -34,6 +34,10 @@
 #define SCMD_QUEST_REQUEST  6   /* Request dynamic kill quest           */
 #define SCMD_QUEST_INFO     7   /* Show dynamic quest target info       */
 #define SCMD_QUEST_COMPLETE 8   /* Turn in dynamic quest                */
+
+#define KQUEST_NONE 0
+#define KQUEST_KILL 1
+#define KQUEST_ITEM 2
 /* AQ Flags (much room for expansion) ********************************* */
 #define AQ_REPEATABLE (1 << 0)  /* Quest can be repeated                */
 #define NUM_AQ_FLAGS        1
@@ -102,6 +106,7 @@ void remove_completed_quest(struct char_data *ch, qst_vnum vnum);
 void quest_timeout(struct char_data *ch);
 void check_timed_quests(void);
 void quest_kill_trigger_check(struct char_data *ch, struct char_data *vict);
+void quest_item_trigger_check(struct char_data *ch, struct obj_data *obj);
 void campaign_kill_trigger_check(struct char_data *ch, struct char_data *vict);
 int is_player_quest_target(struct char_data *viewer, struct char_data *mob);
 int get_quest_minutes_remaining(struct char_data *ch);

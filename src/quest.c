@@ -91,8 +91,10 @@ struct campaign_rewards {
 static void clear_kill_quest(struct char_data *ch)
 {
   GET_KQUEST_ACTIVE(ch) = 0;
+  GET_KQUEST_TYPE(ch) = KQUEST_NONE;
   GET_KQUEST_COMPLETE(ch) = 0;
   GET_KQUEST_TARGET(ch) = NOBODY;
+  GET_KQUEST_ITEM(ch) = NOTHING;
   GET_KQUEST_ROOM(ch) = NOWHERE;
   GET_KQUEST_GIVER(ch) = NOBODY;
   GET_KQUEST_TIME(ch) = 0;
@@ -298,6 +300,21 @@ struct kill_quest_target_stats {
   int rejected_level_range;
   int pool_limit_hit;
   int final_candidates;
+};
+
+struct item_quest_target_stats {
+  int world_entries;
+  int rejected_not_quest_item;
+  int rejected_no_real_object;
+  int rejected_no_room;
+  int rejected_invalid_room;
+  int final_candidates;
+};
+
+struct item_quest_candidate {
+  struct obj_data *obj;
+  obj_vnum obj_vnum;
+  room_vnum room_vnum;
 };
 
 static int campaign_size_step(int target_count)
@@ -660,11 +677,100 @@ static struct char_data *select_kill_quest_target(struct char_data *ch,
   return candidates[0];
 }
 
+static room_rnum quest_item_root_room(struct obj_data *obj)
+{
+  struct obj_data *root;
+
+  if (!obj)
+    return NOWHERE;
+  if (obj->carried_by || obj->worn_by)
+    return NOWHERE;
+  if (obj->in_room != NOWHERE)
+    return obj->in_room;
+
+  root = obj;
+  while (root->in_obj)
+    root = root->in_obj;
+
+  if (root->in_room != NOWHERE)
+    return root->in_room;
+  if (root->carried_by || root->worn_by)
+    return NOWHERE;
+  return NOWHERE;
+}
+
+static struct item_quest_candidate select_item_quest_target(struct char_data *ch,
+                                                             struct item_quest_target_stats *stats)
+{
+  struct item_quest_candidate none = { NULL, NOTHING, NOWHERE };
+  struct item_quest_candidate candidates[2000];
+  struct obj_data *obj;
+  int cand_count = 0, i;
+
+  if (stats)
+    memset(stats, 0, sizeof(*stats));
+
+  for (obj = object_list; obj; obj = obj->next) {
+    room_rnum room;
+    obj_rnum rr;
+
+    if (stats)
+      stats->world_entries++;
+    if (!OBJ_FLAGGED(obj, ITEM_QUEST)) {
+      if (stats)
+        stats->rejected_not_quest_item++;
+      continue;
+    }
+    rr = GET_OBJ_RNUM(obj);
+    if (rr == NOTHING || rr < 0 || rr > top_of_objt) {
+      if (stats)
+        stats->rejected_no_real_object++;
+      continue;
+    }
+
+    room = quest_item_root_room(obj);
+    if (!VALID_ROOM_RNUM(room)) {
+      if (stats)
+        stats->rejected_no_room++;
+      continue;
+    }
+    if (!quest_target_room_valid(ch, room)) {
+      if (stats)
+        stats->rejected_invalid_room++;
+      continue;
+    }
+    if (cand_count >= (int)(sizeof(candidates) / sizeof(candidates[0])))
+      break;
+
+    candidates[cand_count].obj = obj;
+    candidates[cand_count].obj_vnum = GET_OBJ_VNUM(obj);
+    candidates[cand_count].room_vnum = GET_ROOM_VNUM(room);
+    cand_count++;
+  }
+
+  if (stats)
+    stats->final_candidates = cand_count;
+  if (cand_count == 0)
+    return none;
+
+  for (i = 0; i < cand_count; i++) {
+    int j = rand_number(i, cand_count - 1);
+    struct item_quest_candidate tmp = candidates[i];
+    candidates[i] = candidates[j];
+    candidates[j] = tmp;
+  }
+
+  return candidates[0];
+}
+
 static void quest_request_kill(struct char_data *ch)
 {
   struct char_data *qm, *target;
   struct kill_quest_target_stats stats;
+  struct item_quest_target_stats item_stats;
+  struct item_quest_candidate item_target;
   room_rnum tr;
+  int assign_item = FALSE;
 
   qm = find_present_questmaster(ch);
   if (!qm) {
@@ -683,12 +789,14 @@ static void quest_request_kill(struct char_data *ch)
     return;
   }
 
+  item_target = select_item_quest_target(ch, &item_stats);
   target = select_kill_quest_target(ch, &stats);
-  if (!target) {
-    send_to_char(ch, "%s tells you, 'I have no suitable hunt for you right now. Return shortly.'\r\n", GET_NAME(qm));
+
+  if (!item_target.obj && !target) {
+    send_to_char(ch, "%s tells you, 'I have no suitable quest for you right now. Return shortly.'\r\n", GET_NAME(qm));
     if (GET_LEVEL(ch) >= LVL_IMMORT) {
       send_to_char(ch,
-                   "[Quest Debug] lvl=%d world=%d npc_with_room=%d viable_before_level=%d "
+                   "[Quest Debug] kill: lvl=%d world=%d npc_with_room=%d viable_before_level=%d "
                    "final=%d rej:room=%d service=%d notdeadyet=%d noreal=%d level=%d%s\r\n",
                    GET_LEVEL(ch),
                    stats.world_entries,
@@ -701,34 +809,67 @@ static void quest_request_kill(struct char_data *ch)
                    stats.rejected_no_real_mobile,
                    stats.rejected_level_range,
                    stats.pool_limit_hit ? " pool_limit_hit=1" : "");
+      send_to_char(ch,
+                   "[Quest Debug] item: world=%d final=%d rej:notquest=%d noreal=%d noroom=%d badroom=%d\r\n",
+                   item_stats.world_entries,
+                   item_stats.final_candidates,
+                   item_stats.rejected_not_quest_item,
+                   item_stats.rejected_no_real_object,
+                   item_stats.rejected_no_room,
+                   item_stats.rejected_invalid_room);
     }
     return;
   }
 
-  tr = IN_ROOM(target);
+  if (item_target.obj && (!target || rand_number(0, 1) == 0))
+    assign_item = TRUE;
+
   GET_KQUEST_ACTIVE(ch) = 1;
+  GET_KQUEST_TYPE(ch) = assign_item ? KQUEST_ITEM : KQUEST_KILL;
   GET_KQUEST_COMPLETE(ch) = 0;
-  GET_KQUEST_TARGET(ch) = GET_MOB_VNUM(target);
-  GET_KQUEST_ROOM(ch) = GET_ROOM_VNUM(tr);
   GET_KQUEST_GIVER(ch) = GET_MOB_VNUM(qm);
   GET_KQUEST_TIME(ch) = 60;
   GET_KQUEST_EXPIRES_AT(ch) = time(0) + KQUEST_DURATION_SECS;
-  GET_KQUEST_TARGET_ID(ch) = char_script_id(target);
+  GET_KQUEST_TARGET(ch) = NOBODY;
+  GET_KQUEST_ITEM(ch) = NOTHING;
+  GET_KQUEST_ROOM(ch) = NOWHERE;
+  GET_KQUEST_TARGET_ID(ch) = 0;
   GET_KQUEST_COOLDOWN_NOTIFIED(ch) = 1;
 
   send_to_char(ch, "You ask %s for a quest.\r\n", GET_NAME(qm));
   send_to_char(ch, "%s tells you, 'Thank you, brave %s!'\r\n", GET_NAME(qm), GET_NAME(ch));
-  send_to_char(ch, "%s tells you, 'An enemy of mine, %s, is making vile threats against the realm!'\r\n",
-      GET_NAME(qm), GET_NAME(target));
-  send_to_char(ch, "%s tells you, 'Seek %s out somewhere near %s in the area of %s.'\r\n",
-      GET_NAME(qm), GET_NAME(target), world[tr].name, zone_table[world[tr].zone].name);
+  if (assign_item) {
+    room_rnum item_room = real_room(item_target.room_vnum);
+    GET_KQUEST_ITEM(ch) = item_target.obj_vnum;
+    GET_KQUEST_ROOM(ch) = item_target.room_vnum;
+    send_to_char(ch, "%s tells you, 'A valuable item has been misplaced.'\r\n", GET_NAME(qm));
+    send_to_char(ch, "%s tells you, 'Seek %s near %s in the area of %s.'\r\n",
+                 GET_NAME(qm), item_target.obj->short_description,
+                 world[item_room].name, zone_table[world[item_room].zone].name);
+    send_to_char(ch, "%s tells you, 'Return it to me and you will be rewarded.'\r\n", GET_NAME(qm));
+  } else {
+    tr = IN_ROOM(target);
+    GET_KQUEST_TARGET(ch) = GET_MOB_VNUM(target);
+    GET_KQUEST_ROOM(ch) = GET_ROOM_VNUM(tr);
+    GET_KQUEST_TARGET_ID(ch) = char_script_id(target);
+    send_to_char(ch, "%s tells you, 'An enemy of mine, %s, is making vile threats against the realm!'\r\n",
+        GET_NAME(qm), GET_NAME(target));
+    send_to_char(ch, "%s tells you, 'Seek %s out somewhere near %s in the area of %s.'\r\n",
+        GET_NAME(qm), GET_NAME(target), world[tr].name, zone_table[world[tr].zone].name);
+  }
   send_to_char(ch, "%s tells you, 'Good luck, %s. Return safely!'\r\n", GET_NAME(qm), GET_NAME(ch));
   send_to_char(ch, "You have 60 minutes to complete your quest.\r\n");
   if (GET_LEVEL(ch) >= LVL_IMMORT) {
-    send_to_char(ch, "[Quest Debug] target_vnum=%d target_room=%d zone=%d (%s) target_id=%ld reachable=yes\r\n",
-                 GET_KQUEST_TARGET(ch), GET_KQUEST_ROOM(ch),
-                 zone_table[world[tr].zone].number, zone_table[world[tr].zone].name,
-                 GET_KQUEST_TARGET_ID(ch));
+    room_rnum debug_room = real_room(GET_KQUEST_ROOM(ch));
+    send_to_char(ch, "[Quest Debug] type=%s target_vnum=%d item_vnum=%d target_room=%d zone=%d (%s) target_id=%ld reachable=%s\r\n",
+                 GET_KQUEST_TYPE(ch) == KQUEST_ITEM ? "item" : "kill",
+                 GET_KQUEST_TARGET(ch),
+                 GET_KQUEST_ITEM(ch),
+                 GET_KQUEST_ROOM(ch),
+                 (debug_room != NOWHERE ? zone_table[world[debug_room].zone].number : -1),
+                 (debug_room != NOWHERE ? zone_table[world[debug_room].zone].name : "Unknown"),
+                 GET_KQUEST_TARGET_ID(ch),
+                 (debug_room != NOWHERE && quest_target_room_valid(ch, debug_room)) ? "yes" : "no");
   }
   save_char(ch);
 }
@@ -736,22 +877,25 @@ static void quest_request_kill(struct char_data *ch)
 static void quest_info_kill(struct char_data *ch)
 {
   room_rnum room;
-  const char *target_name;
+  const char *target_name, *item_name;
 
   expire_kill_quest_if_needed(ch, TRUE);
   if (!is_on_quest(ch)) {
     if (is_on_quest_cooldown(ch)) {
-      send_to_char(ch, "You are not currently on a kill quest.\r\n");
+      send_to_char(ch, "You are not currently on a quest.\r\n");
       send_to_char(ch, "You may request another quest in %d minute%s.\r\n",
                    get_quest_cooldown_minutes_remaining(ch),
                    get_quest_cooldown_minutes_remaining(ch) == 1 ? "" : "s");
     } else {
-      send_to_char(ch, "You are not currently on a kill quest.\r\n");
+      send_to_char(ch, "You are not currently on a quest.\r\n");
     }
     return;
   }
   if (is_quest_ready(ch)) {
-    send_to_char(ch, "You have slain your target. Return to a quest master and type 'quest complete'.\r\n");
+    if (GET_KQUEST_TYPE(ch) == KQUEST_ITEM)
+      send_to_char(ch, "You have recovered the quest item. Return to a quest master and type 'quest complete'.\r\n");
+    else
+      send_to_char(ch, "You have slain your target. Return to a quest master and type 'quest complete'.\r\n");
     send_to_char(ch, "Time remaining: %d minute%s.\r\n",
                  get_quest_minutes_remaining(ch),
                  get_quest_minutes_remaining(ch) == 1 ? "" : "s");
@@ -764,15 +908,27 @@ static void quest_info_kill(struct char_data *ch)
     return;
   }
 
-  target_name = (real_mobile(GET_KQUEST_TARGET(ch)) != NOBODY) ?
-    GET_NAME(&mob_proto[real_mobile(GET_KQUEST_TARGET(ch))]) : "your target";
-  send_to_char(ch, "You are on a quest to slay %s!\r\n", target_name);
-  send_to_char(ch, "%s can be found in the vicinity of %s which\r\nis in the general area of %s.\r\n",
-      target_name,
-      world[room].name, zone_table[world[room].zone].name);
+  if (GET_KQUEST_TYPE(ch) == KQUEST_ITEM) {
+    item_name = (real_object(GET_KQUEST_ITEM(ch)) != NOTHING) ?
+      obj_proto[real_object(GET_KQUEST_ITEM(ch))].short_description : "the missing item";
+    send_to_char(ch, "You are on a quest to recover %s.\r\n", item_name);
+    send_to_char(ch, "Seek it near %s which is in the general area of %s.\r\n",
+        world[room].name, zone_table[world[room].zone].name);
+    send_to_char(ch, "You must be carrying the item when you return for turn-in.\r\n");
+  } else {
+    target_name = (real_mobile(GET_KQUEST_TARGET(ch)) != NOBODY) ?
+      GET_NAME(&mob_proto[real_mobile(GET_KQUEST_TARGET(ch))]) : "your target";
+    send_to_char(ch, "You are on a quest to slay %s!\r\n", target_name);
+    send_to_char(ch, "%s can be found in the vicinity of %s which\r\nis in the general area of %s.\r\n",
+        target_name,
+        world[room].name, zone_table[world[room].zone].name);
+  }
   if (GET_LEVEL(ch) >= LVL_IMMORT) {
-    send_to_char(ch, "[Quest Debug] target_vnum=%d target_room=%d zone=%d (%s) target_id=%ld reachable=%s\r\n",
-                 GET_KQUEST_TARGET(ch), GET_KQUEST_ROOM(ch),
+    send_to_char(ch, "[Quest Debug] type=%s target_vnum=%d item_vnum=%d target_room=%d zone=%d (%s) target_id=%ld reachable=%s\r\n",
+                 GET_KQUEST_TYPE(ch) == KQUEST_ITEM ? "item" : "kill",
+                 GET_KQUEST_TARGET(ch),
+                 GET_KQUEST_ITEM(ch),
+                 GET_KQUEST_ROOM(ch),
                  zone_table[world[room].zone].number, zone_table[world[room].zone].name,
                  GET_KQUEST_TARGET_ID(ch),
                  quest_target_room_valid(ch, room) ? "yes" : "no");
@@ -785,15 +941,12 @@ static void quest_info_kill(struct char_data *ch)
 static void quest_complete_kill(struct char_data *ch)
 {
   struct char_data *qm;
+  struct obj_data *obj, *obj_next, *turnin = NULL;
   int qp_reward, gold_reward, exp_reward;
 
   expire_kill_quest_if_needed(ch, TRUE);
   if (!is_on_quest(ch)) {
-    send_to_char(ch, "You have no active kill quest to complete.\r\n");
-    return;
-  }
-  if (!is_quest_ready(ch)) {
-    send_to_char(ch, "You have not yet slain your assigned target.\r\n");
+    send_to_char(ch, "You have no active quest to complete.\r\n");
     return;
   }
 
@@ -806,6 +959,30 @@ static void quest_complete_kill(struct char_data *ch)
   qp_reward = MAX(5, GET_LEVEL(ch) / 2);
   gold_reward = MAX(100, GET_LEVEL(ch) * 75);
   exp_reward = MAX(250, GET_LEVEL(ch) * 250);
+
+  if (GET_KQUEST_TYPE(ch) == KQUEST_ITEM) {
+    for (obj = ch->carrying; obj; obj = obj_next) {
+      obj_next = obj->next_content;
+      if (GET_OBJ_VNUM(obj) == GET_KQUEST_ITEM(ch)) {
+        turnin = obj;
+        break;
+      }
+    }
+    if (!turnin && !is_quest_ready(ch)) {
+      send_to_char(ch, "%s tells you, 'You do not appear to be carrying the item I requested.'\r\n",
+                   GET_NAME(qm));
+      return;
+    }
+    if (!turnin) {
+      send_to_char(ch, "%s tells you, 'Bring me the assigned item to complete this quest.'\r\n", GET_NAME(qm));
+      return;
+    }
+    obj_from_char(turnin);
+    extract_obj(turnin);
+  } else if (!is_quest_ready(ch)) {
+    send_to_char(ch, "You have not yet slain your assigned target.\r\n");
+    return;
+  }
 
   GET_QUESTPOINTS(ch) += qp_reward;
   increase_gold(ch, gold_reward);
@@ -1386,6 +1563,8 @@ void quest_kill_trigger_check(struct char_data *ch, struct char_data *vict)
   if (!ch || IS_NPC(ch) || !vict || !IS_NPC(vict))
     return;
   expire_kill_quest_if_needed(ch, TRUE);
+  if (GET_KQUEST_TYPE(ch) != KQUEST_KILL)
+    return;
   if (!is_on_quest(ch) || is_quest_ready(ch) || is_quest_expired(ch))
     return;
   if (GET_KQUEST_TARGET(ch) != GET_MOB_VNUM(vict))
@@ -1397,6 +1576,25 @@ void quest_kill_trigger_check(struct char_data *ch, struct char_data *vict)
   send_to_char(ch, "\tRQuest Target Slain!\tn\r\n");
   send_to_char(ch, "\tYQUEST: You have almost completed your QUEST!\tn\r\n");
   send_to_char(ch, "\tYReturn to the questmaster before your time runs out.\tn\r\n");
+  save_char(ch);
+}
+
+void quest_item_trigger_check(struct char_data *ch, struct obj_data *obj)
+{
+  if (!ch || IS_NPC(ch) || !obj)
+    return;
+
+  expire_kill_quest_if_needed(ch, TRUE);
+  if (GET_KQUEST_TYPE(ch) != KQUEST_ITEM)
+    return;
+  if (!is_on_quest(ch) || is_quest_ready(ch) || is_quest_expired(ch))
+    return;
+  if (GET_OBJ_VNUM(obj) != GET_KQUEST_ITEM(ch))
+    return;
+
+  GET_KQUEST_COMPLETE(ch) = 1;
+  send_to_char(ch, "\tRQuest Item Recovered!\tn\r\n");
+  send_to_char(ch, "\tYQUEST: Return to the questmaster with the item before time runs out.\tn\r\n");
   save_char(ch);
 }
 
@@ -1453,6 +1651,8 @@ int is_player_quest_target(struct char_data *viewer, struct char_data *mob)
   if (!viewer || IS_NPC(viewer) || !mob || !IS_NPC(mob))
     return FALSE;
   expire_kill_quest_if_needed(viewer, FALSE);
+  if (GET_KQUEST_TYPE(viewer) != KQUEST_KILL)
+    return FALSE;
   if (!is_on_quest(viewer) || is_quest_ready(viewer) || is_quest_expired(viewer))
     return FALSE;
   if (GET_KQUEST_TARGET(viewer) != GET_MOB_VNUM(mob))
@@ -1603,9 +1803,10 @@ static void quest_quit(struct char_data *ch)
 
   expire_kill_quest_if_needed(ch, TRUE);
   if (is_on_quest(ch)) {
+    const char *quest_label = (GET_KQUEST_TYPE(ch) == KQUEST_ITEM) ? "item retrieval" : "kill";
     clear_kill_quest(ch);
     start_kill_quest_cooldown(ch);
-    send_to_char(ch, "You abandon your current kill quest.\r\n");
+    send_to_char(ch, "You abandon your current %s quest.\r\n", quest_label);
     send_to_char(ch, "You must wait %d minute%s before requesting another quest.\r\n",
                  get_quest_cooldown_minutes_remaining(ch),
                  get_quest_cooldown_minutes_remaining(ch) == 1 ? "" : "s");
@@ -1642,10 +1843,16 @@ static void quest_progress(struct char_data *ch)
   expire_kill_quest_if_needed(ch, TRUE);
   if (is_on_quest(ch)) {
     if (is_quest_ready(ch)) {
-      send_to_char(ch, "You have completed your kill objective.\r\n");
+      if (GET_KQUEST_TYPE(ch) == KQUEST_ITEM)
+        send_to_char(ch, "You have recovered your quest item.\r\n");
+      else
+        send_to_char(ch, "You have completed your kill objective.\r\n");
       send_to_char(ch, "Return to a quest master and type 'quest complete'.\r\n");
     } else {
-      send_to_char(ch, "You are currently on a kill quest.\r\n");
+      if (GET_KQUEST_TYPE(ch) == KQUEST_ITEM)
+        send_to_char(ch, "You are currently on an item retrieval quest.\r\n");
+      else
+        send_to_char(ch, "You are currently on a kill quest.\r\n");
       quest_info_kill(ch);
       return;
     }
@@ -1658,7 +1865,7 @@ static void quest_progress(struct char_data *ch)
   if (GET_QUEST(ch) == NOTHING) {
     if (is_on_quest_cooldown(ch)) {
       send_to_char(ch, "You are not currently on a quest.\r\n");
-      send_to_char(ch, "You may request another kill quest in %d minute%s.\r\n",
+      send_to_char(ch, "You may request another quest in %d minute%s.\r\n",
                    get_quest_cooldown_minutes_remaining(ch),
                    get_quest_cooldown_minutes_remaining(ch) == 1 ? "" : "s");
     } else {

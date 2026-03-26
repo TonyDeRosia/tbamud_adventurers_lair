@@ -249,6 +249,7 @@ cpp_extern const struct command_info cmd_info[] = {
   { "junk"     , "j"       , POS_RESTING , do_drop     , 0, SCMD_JUNK },
 
   { "kill"     , "k"       , POS_FIGHTING, do_kill     , 0, 0 },
+  { "smite"    , "smi"     , POS_FIGHTING, do_smite    , LVL_GRGOD, 0 },
   { "keep"     , "keep"    , POS_RESTING , do_ilock    , 0, 0 },
   { "kick"     , "ki"      , POS_FIGHTING, do_kick     , 1, 0 },
 

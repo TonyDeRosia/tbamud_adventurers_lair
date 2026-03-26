@@ -583,6 +583,7 @@ void obj_to_char(struct obj_data *object, struct char_data *ch)
     IS_CARRYING_N(ch)++;
 
     autoquest_trigger_check(ch, NULL, object, AQ_OBJ_FIND);
+    quest_item_trigger_check(ch, object);
 
     /* set flag for crash-save system, but not on mobs! */
     if (!IS_NPC(ch))
