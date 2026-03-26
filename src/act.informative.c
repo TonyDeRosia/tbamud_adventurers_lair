@@ -1978,7 +1978,8 @@ ACMD(do_score)
       GET_HITROLL(ch), GET_DAMROLL(ch), accuracy_pct);
     len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
 
-    if (!(wielded && GET_OBJ_TYPE(wielded) == ITEM_WEAPON)) {
+    if (GET_LEVEL(ch) >= LVL_IMMORT &&
+        !(wielded && GET_OBJ_TYPE(wielded) == ITEM_WEAPON)) {
       int unarmed_num = MIN(4, 1 + (GET_LEVEL(ch) / 25));
       int unarmed_size = MIN(7, 2 + (GET_LEVEL(ch) / 25));
       int unarmed_avg = (unarmed_num * (unarmed_size + 1)) / 2 + MAX(0, GET_LEVEL(ch) / 25);
