@@ -287,6 +287,19 @@ static int quest_target_room_valid(struct char_data *ch, room_rnum room)
   return quest_target_room_is_reachable(anchor, room);
 }
 
+struct kill_quest_target_stats {
+  int world_entries;
+  int npc_with_room;
+  int rejected_invalid_room;
+  int rejected_service_or_protected;
+  int rejected_notdeadyet;
+  int rejected_no_real_mobile;
+  int viable_before_level;
+  int rejected_level_range;
+  int pool_limit_hit;
+  int final_candidates;
+};
+
 static int campaign_size_step(int target_count)
 {
   int divisor = MAX(1, MAX_CAMPAIGN_TARGETS - CAMPAIGN_MIN_TARGETS);
@@ -571,7 +584,8 @@ static int select_campaign_targets(struct char_data *ch, struct campaign_candida
   return *selected_count >= CAMPAIGN_MIN_TARGETS;
 }
 
-static struct char_data *select_kill_quest_target(struct char_data *ch)
+static struct char_data *select_kill_quest_target(struct char_data *ch,
+                                                   struct kill_quest_target_stats *stats)
 {
   struct char_data *mob;
   struct char_data *candidates[2000];
@@ -579,25 +593,59 @@ static struct char_data *select_kill_quest_target(struct char_data *ch)
   int level_diff;
   int i;
 
+  if (stats)
+    memset(stats, 0, sizeof(*stats));
+
   for (mob = character_list; mob; mob = mob->next) {
+    if (stats)
+      stats->world_entries++;
     if (!IS_NPC(mob) || IN_ROOM(mob) == NOWHERE)
       continue;
+    if (stats)
+      stats->npc_with_room++;
     if (!quest_target_room_valid(ch, IN_ROOM(mob)))
+    {
+      if (stats)
+        stats->rejected_invalid_room++;
       continue;
+    }
     if (is_service_or_protected_mob(mob))
+    {
+      if (stats)
+        stats->rejected_service_or_protected++;
       continue;
+    }
     if (MOB_FLAGGED(mob, MOB_NOTDEADYET))
+    {
+      if (stats)
+        stats->rejected_notdeadyet++;
       continue;
+    }
     if (real_mobile(GET_MOB_VNUM(mob)) == NOBODY)
+    {
+      if (stats)
+        stats->rejected_no_real_mobile++;
       continue;
+    }
+    if (stats)
+      stats->viable_before_level++;
 
     level_diff = GET_LEVEL(ch) - GET_LEVEL(mob);
-    if (level_diff < -3 || level_diff > 8)
+    if (level_diff < -3 || level_diff > 8) {
+      if (stats)
+        stats->rejected_level_range++;
       continue;
-    if (cand_count >= (int)(sizeof(candidates) / sizeof(candidates[0])))
+    }
+    if (cand_count >= (int)(sizeof(candidates) / sizeof(candidates[0]))) {
+      if (stats)
+        stats->pool_limit_hit = 1;
       break;
+    }
     candidates[cand_count++] = mob;
   }
+
+  if (stats)
+    stats->final_candidates = cand_count;
 
   if (cand_count == 0)
     return NULL;
@@ -615,6 +663,7 @@ static struct char_data *select_kill_quest_target(struct char_data *ch)
 static void quest_request_kill(struct char_data *ch)
 {
   struct char_data *qm, *target;
+  struct kill_quest_target_stats stats;
   room_rnum tr;
 
   qm = find_present_questmaster(ch);
@@ -634,9 +683,25 @@ static void quest_request_kill(struct char_data *ch)
     return;
   }
 
-  target = select_kill_quest_target(ch);
+  target = select_kill_quest_target(ch, &stats);
   if (!target) {
     send_to_char(ch, "%s tells you, 'I have no suitable hunt for you right now. Return shortly.'\r\n", GET_NAME(qm));
+    if (GET_LEVEL(ch) >= LVL_IMMORT) {
+      send_to_char(ch,
+                   "[Quest Debug] lvl=%d world=%d npc_with_room=%d viable_before_level=%d "
+                   "final=%d rej:room=%d service=%d notdeadyet=%d noreal=%d level=%d%s\r\n",
+                   GET_LEVEL(ch),
+                   stats.world_entries,
+                   stats.npc_with_room,
+                   stats.viable_before_level,
+                   stats.final_candidates,
+                   stats.rejected_invalid_room,
+                   stats.rejected_service_or_protected,
+                   stats.rejected_notdeadyet,
+                   stats.rejected_no_real_mobile,
+                   stats.rejected_level_range,
+                   stats.pool_limit_hit ? " pool_limit_hit=1" : "");
+    }
     return;
   }
 
