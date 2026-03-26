@@ -60,6 +60,7 @@ ACMD(do_clanedit);
 ACMD(do_clist);
 
 ACMD(do_affremove);
+ACMD(do_cleanse);
 ACMD(do_smartspawn);
 ACMD(do_aistate);
 ACMD(do_aictl);
@@ -167,6 +168,7 @@ cpp_extern const struct command_info cmd_info[] = {
   { "checkload", "checkl"  , POS_DEAD    , do_checkloadstatus, LVL_GOD, 0 },
   { "close"    , "cl"      , POS_SITTING , do_gen_door , 0, SCMD_CLOSE },
   { "clear"    , "cle"     , POS_DEAD    , do_gen_ps   , 0, SCMD_CLEAR },
+  { "cleanse"  , "cleanse" , POS_DEAD    , do_cleanse  , LVL_IMMORT, 0 },
   { "cls"      , "cls"     , POS_DEAD    , do_gen_ps   , 0, SCMD_CLEAR },
   { "consider" , "con"     , POS_RESTING , do_consider , 0, 0 },
   { "commands" , "com"     , POS_DEAD    , do_commands , 0, SCMD_COMMANDS },

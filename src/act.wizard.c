@@ -7979,6 +7979,41 @@ ACMD(do_unpull)
   extract_char(vict);
 }
 
+ACMD(do_cleanse)
+{
+  char arg[MAX_INPUT_LENGTH];
+  struct char_data *vict;
+  struct affected_type *af, *next_af;
+  int removed = 0;
+
+  one_argument(argument, arg);
+
+  if (!*arg) {
+    send_to_char(ch, "Usage: cleanse <target>\r\n");
+    return;
+  }
+
+  if (!(vict = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM))) {
+    send_to_char(ch, "%s", CONFIG_NOPERSON);
+    return;
+  }
+
+  for (af = vict->affected; af; af = next_af) {
+    next_af = af->next;
+    affect_remove(vict, af);
+    removed++;
+  }
+
+  send_to_char(ch, "You cleanse %s of all active effects.\r\n", GET_NAME(vict));
+  if (vict != ch)
+    send_to_char(vict, "A cleansing force washes over you, stripping away all active effects.\r\n");
+  act("$n gestures, and a cleansing force washes over $N.", FALSE, ch, NULL, vict, TO_NOTVICT);
+
+  mudlog(CMP, MAX(LVL_IMMORT, GET_INVIS_LEV(ch)), TRUE,
+         "%s cleansed %s (%d affect%s removed).",
+         GET_NAME(ch), GET_NAME(vict), removed, removed == 1 ? "" : "s");
+}
+
 /* AFFREMOVE COMMAND BEGIN */
 ACMD(do_affremove)
 {
