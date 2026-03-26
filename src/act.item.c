@@ -82,6 +82,11 @@ static int is_kept_item_for(struct char_data *ch, struct obj_data *obj)
 
 static int reject_kept_item_action(struct char_data *ch, struct obj_data *obj)
 {
+  if (is_active_quest_item_for_char(ch, obj)) {
+    act("You must return $p to the Quest Master.", FALSE, ch, obj, 0, TO_CHAR);
+    return TRUE;
+  }
+
   if (!is_kept_item_for(ch, obj))
     return FALSE;
 
@@ -1194,6 +1199,10 @@ ACMD(do_eat)
   }
   if (GET_COND(ch, HUNGER) > 20) { /* Stomach full */
     send_to_char(ch, "You are too full to eat more!\r\n");
+    return;
+  }
+  if (is_active_quest_item_for_char(ch, food)) {
+    send_to_char(ch, "You cannot get rid of that item while the quest is active.\r\n");
     return;
   }
 

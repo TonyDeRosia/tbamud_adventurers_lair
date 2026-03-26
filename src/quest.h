@@ -115,6 +115,7 @@ bool is_on_quest(struct char_data *ch);
 bool is_quest_ready(struct char_data *ch);
 bool is_quest_expired(struct char_data *ch);
 bool is_on_quest_cooldown(struct char_data *ch);
+bool is_active_quest_item_for_char(struct char_data *ch, struct obj_data *obj);
 SPECIAL(questmaster);
 ACMD(do_quest);
 ACMD(do_campaign);

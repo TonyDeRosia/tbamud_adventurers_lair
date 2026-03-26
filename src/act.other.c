@@ -775,6 +775,10 @@ ACMD(do_steal)
 	  send_to_char(ch, "Steal the equipment now?  Impossible!\r\n");
 	  return;
 	} else {
+          if (is_active_quest_item_for_char(vict, obj)) {
+            send_to_char(ch, "That item is bound to %s current quest.\r\n", HSHR(vict));
+            return;
+          }
           if (!give_otrigger(obj, vict, ch) ||
               !receive_mtrigger(ch, vict, obj) ) {
             send_to_char(ch, "Impossible!\r\n");
@@ -795,6 +799,10 @@ ACMD(do_steal)
 	act("$n tried to steal something from you!", FALSE, ch, 0, vict, TO_VICT);
 	act("$n tries to steal something from $N.", TRUE, ch, 0, vict, TO_NOTVICT);
       } else {			/* Steal the item */
+        if (is_active_quest_item_for_char(vict, obj)) {
+          send_to_char(ch, "That item is bound to %s current quest.\r\n", HSHR(vict));
+          return;
+        }
 	if (IS_CARRYING_N(ch) + 1 < CAN_CARRY_N(ch)) {
           if (!give_otrigger(obj, vict, ch) ||
               !receive_mtrigger(ch, vict, obj) ) {
