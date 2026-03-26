@@ -408,6 +408,38 @@ static int campaign_level_xp_span(struct char_data *ch)
   return MAX(1, next_level - at_level);
 }
 
+static int quest_turnin_xp_reward(struct char_data *ch)
+{
+  int level;
+  int one_level_floor;
+  int three_level_cap;
+  int current_tnl;
+  long long reward;
+
+  if (!ch || IS_NPC(ch))
+    return 0;
+
+  level = URANGE(1, GET_LEVEL(ch), LVL_IMMORT - 1);
+  if (level >= LVL_IMMORT - 1)
+    return 0;
+
+  one_level_floor = level_exp(GET_CLASS(ch), level + 1) -
+                    level_exp(GET_CLASS(ch), level);
+  three_level_cap = level_exp(GET_CLASS(ch), MIN(level + 3, LVL_IMMORT)) -
+                    level_exp(GET_CLASS(ch), level);
+  current_tnl = level_exp(GET_CLASS(ch), level + 1) - GET_EXP(ch);
+
+  one_level_floor = MAX(1, one_level_floor);
+  three_level_cap = MAX(one_level_floor, three_level_cap);
+  current_tnl = MAX(0, current_tnl);
+
+  /* Target ~2 levels of current progression, while hard-bounding to 1..3 levels. */
+  reward = (long long)current_tnl * 2LL;
+  reward = URANGE((long long)one_level_floor, reward, (long long)three_level_cap);
+
+  return (int)MIN((long long)INT_MAX, reward);
+}
+
 static void calculate_campaign_rewards(struct char_data *ch, int target_count, struct campaign_rewards *out)
 {
   int quest_qp_base;
@@ -1116,7 +1148,7 @@ static void quest_complete_kill(struct char_data *ch)
 
   qp_reward = MAX(5, GET_LEVEL(ch) / 2);
   gold_reward = MAX(100, GET_LEVEL(ch) * 75);
-  exp_reward = MAX(250, GET_LEVEL(ch) * 250);
+  exp_reward = quest_turnin_xp_reward(ch);
 
   if (GET_KQUEST_TYPE(ch) == KQUEST_ITEM) {
     for (obj = ch->carrying; obj; obj = obj->next_content) {
