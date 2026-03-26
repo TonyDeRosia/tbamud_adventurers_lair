@@ -1015,6 +1015,74 @@ int count_non_protocol_chars(char * str)
   return count;
 }
 
+/**
+ * Copy a color-coded string into a fixed visible-width field.
+ *
+ * Keeps inline @/\t color tokens and ANSI escape sequences intact, but
+ * truncates/pads using only visible character width.
+ */
+void format_color_field_visible(char *out, size_t outsz, const char *src, size_t width)
+{
+  size_t pos = 0, vis = 0;
+  const char *p;
+
+  if (!out || outsz == 0)
+    return;
+
+  out[0] = '\0';
+
+  if (!src)
+    src = "";
+
+  for (p = src; *p && pos + 1 < outsz; ) {
+    if ((*p == '@' || *p == '\t') && *(p + 1)) {
+      if (pos + 2 >= outsz)
+        break;
+      out[pos++] = *p++;
+      out[pos++] = *p++;
+      continue;
+    }
+
+    if (*p == '\x1B') {
+      const char *start = p;
+      const char *scan = p + 1;
+      size_t seq_len;
+
+      if (*scan == '[') {
+        scan++;
+        while (*scan && ((*scan >= '0' && *scan <= '9') || *scan == ';'))
+          scan++;
+        if (*scan)
+          scan++;
+      } else if (*scan) {
+        scan++;
+      }
+
+      seq_len = (size_t)(scan - start);
+      if (seq_len == 0 || pos + seq_len >= outsz)
+        break;
+
+      while (start < scan)
+        out[pos++] = *start++;
+      p = scan;
+      continue;
+    }
+
+    if (vis >= width)
+      break;
+
+    out[pos++] = *p++;
+    vis++;
+  }
+
+  while (vis < width && pos + 1 < outsz) {
+    out[pos++] = ' ';
+    vis++;
+  }
+
+  out[pos] = '\0';
+}
+
 /** Tests to see if a room is dark. Rules (unless overridden by ROOM_DARK):
  * Inside and City rooms are always lit. Outside rooms are dark at sunset and
  * night.

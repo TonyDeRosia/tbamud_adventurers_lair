@@ -1952,6 +1952,7 @@ static void show_room_resets(struct char_data *ch, room_rnum room_num)
   struct reset_com *cmd;
   int i, index = 1, total;
   int current_mob = NOWHERE;
+  char display_name[128];
   bool found = FALSE;
   zone_rnum zone_num;
 
@@ -1978,17 +1979,23 @@ static void show_room_resets(struct char_data *ch, room_rnum room_num)
       found = TRUE;
       if (cmd[i].command == 'M') {
         current_mob = (cmd[i].arg1 >= 0 && cmd[i].arg1 <= top_of_mobt) ? mob_index[cmd[i].arg1].vnum : NOWHERE;
-        send_to_char(ch, "%2d) Mob [%d] %-30.30s max: %d\r\n",
+        format_color_field_visible(display_name, sizeof(display_name),
+          (cmd[i].arg1 >= 0 && cmd[i].arg1 <= top_of_mobt) ? mob_proto[cmd[i].arg1].player.short_descr : "<invalid mob>",
+          30);
+        send_to_char(ch, "%2d) Mob [%d] %s max: %d\r\n",
           index++,
           (cmd[i].arg1 >= 0 && cmd[i].arg1 <= top_of_mobt) ? mob_index[cmd[i].arg1].vnum : -1,
-          (cmd[i].arg1 >= 0 && cmd[i].arg1 <= top_of_mobt) ? mob_proto[cmd[i].arg1].player.short_descr : "<invalid mob>",
+          display_name,
           cmd[i].arg2);
       } else {
         current_mob = NOWHERE;
-        send_to_char(ch, "%2d) Obj [%d] %-30.30s room object max: %d\r\n",
+        format_color_field_visible(display_name, sizeof(display_name),
+          (cmd[i].arg1 >= 0 && cmd[i].arg1 <= top_of_objt) ? obj_proto[cmd[i].arg1].short_description : "<invalid object>",
+          30);
+        send_to_char(ch, "%2d) Obj [%d] %s room object max: %d\r\n",
           index++,
           (cmd[i].arg1 >= 0 && cmd[i].arg1 <= top_of_objt) ? obj_index[cmd[i].arg1].vnum : -1,
-          (cmd[i].arg1 >= 0 && cmd[i].arg1 <= top_of_objt) ? obj_proto[cmd[i].arg1].short_description : "<invalid object>",
+          display_name,
           cmd[i].arg2);
       }
 
@@ -1999,25 +2006,34 @@ static void show_room_resets(struct char_data *ch, room_rnum room_num)
              cmd[j].command != 'D' &&
              cmd[j].command != 'R') {
         if (cmd[j].command == 'E') {
-          send_to_char(ch, "%2d) Obj [%d] %-30.30s equip on mob [%d] (%s) max: %d\r\n",
+          format_color_field_visible(display_name, sizeof(display_name),
+            (cmd[j].arg1 >= 0 && cmd[j].arg1 <= top_of_objt) ? obj_proto[cmd[j].arg1].short_description : "<invalid object>",
+            30);
+          send_to_char(ch, "%2d) Obj [%d] %s equip on mob [%d] (%s) max: %d\r\n",
             index++,
             (cmd[j].arg1 >= 0 && cmd[j].arg1 <= top_of_objt) ? obj_index[cmd[j].arg1].vnum : -1,
-            (cmd[j].arg1 >= 0 && cmd[j].arg1 <= top_of_objt) ? obj_proto[cmd[j].arg1].short_description : "<invalid object>",
+            display_name,
             current_mob,
             (cmd[j].arg3 >= 0 && cmd[j].arg3 < NUM_WEARS) ? equipment_types[cmd[j].arg3] : "invalid slot",
             cmd[j].arg2);
         } else if (cmd[j].command == 'G') {
-          send_to_char(ch, "%2d) Obj [%d] %-30.30s give to mob [%d] max: %d\r\n",
+          format_color_field_visible(display_name, sizeof(display_name),
+            (cmd[j].arg1 >= 0 && cmd[j].arg1 <= top_of_objt) ? obj_proto[cmd[j].arg1].short_description : "<invalid object>",
+            30);
+          send_to_char(ch, "%2d) Obj [%d] %s give to mob [%d] max: %d\r\n",
             index++,
             (cmd[j].arg1 >= 0 && cmd[j].arg1 <= top_of_objt) ? obj_index[cmd[j].arg1].vnum : -1,
-            (cmd[j].arg1 >= 0 && cmd[j].arg1 <= top_of_objt) ? obj_proto[cmd[j].arg1].short_description : "<invalid object>",
+            display_name,
             current_mob,
             cmd[j].arg2);
         } else if (cmd[j].command == 'P') {
-          send_to_char(ch, "%2d) Obj [%d] %-30.30s put in obj [%d] max: %d\r\n",
+          format_color_field_visible(display_name, sizeof(display_name),
+            (cmd[j].arg1 >= 0 && cmd[j].arg1 <= top_of_objt) ? obj_proto[cmd[j].arg1].short_description : "<invalid object>",
+            30);
+          send_to_char(ch, "%2d) Obj [%d] %s put in obj [%d] max: %d\r\n",
             index++,
             (cmd[j].arg1 >= 0 && cmd[j].arg1 <= top_of_objt) ? obj_index[cmd[j].arg1].vnum : -1,
-            (cmd[j].arg1 >= 0 && cmd[j].arg1 <= top_of_objt) ? obj_proto[cmd[j].arg1].short_description : "<invalid object>",
+            display_name,
             (cmd[j].arg3 >= 0 && cmd[j].arg3 <= top_of_objt) ? obj_index[cmd[j].arg3].vnum : -1,
             cmd[j].arg2);
         }
@@ -2032,10 +2048,13 @@ static void show_room_resets(struct char_data *ch, room_rnum room_num)
 
     found = TRUE;
     if (cmd[i].command == 'R') {
-      send_to_char(ch, "%2d) Obj [%d] %-30.30s remove from room\r\n",
+      format_color_field_visible(display_name, sizeof(display_name),
+        (cmd[i].arg2 >= 0 && cmd[i].arg2 <= top_of_objt) ? obj_proto[cmd[i].arg2].short_description : "<invalid object>",
+        30);
+      send_to_char(ch, "%2d) Obj [%d] %s remove from room\r\n",
         index++,
         (cmd[i].arg2 >= 0 && cmd[i].arg2 <= top_of_objt) ? obj_index[cmd[i].arg2].vnum : -1,
-        (cmd[i].arg2 >= 0 && cmd[i].arg2 <= top_of_objt) ? obj_proto[cmd[i].arg2].short_description : "<invalid object>");
+        display_name);
     } else if (cmd[i].command == 'D') {
       send_to_char(ch, "%2d) Door %-9s set to %s\r\n",
         index++,
