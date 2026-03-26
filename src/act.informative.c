@@ -1974,12 +1974,12 @@ ACMD(do_score)
     len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
 
     if (!(wielded && GET_OBJ_TYPE(wielded) == ITEM_WEAPON)) {
-      int unarmed_num = MIN(4, 1 + (GET_LEVEL(ch) / 30));
-      int unarmed_size = MIN(7, 2 + (GET_LEVEL(ch) / 20));
-      int unarmed_avg = (unarmed_num * (unarmed_size + 1)) / 2 + MAX(0, GET_LEVEL(ch) / 30);
+      int unarmed_num = MIN(4, 1 + (GET_LEVEL(ch) / 25));
+      int unarmed_size = MIN(7, 2 + (GET_LEVEL(ch) / 25));
+      int unarmed_avg = (unarmed_num * (unarmed_size + 1)) / 2 + MAX(0, GET_LEVEL(ch) / 25);
       snprintf(line, sizeof(line),
         "%sUnarmed Dice:%s %dd%d + %d  (Avg %d per hit, before bonuses)",
-        C, R, unarmed_num, unarmed_size, MAX(0, GET_LEVEL(ch) / 30), unarmed_avg);
+        C, R, unarmed_num, unarmed_size, MAX(0, GET_LEVEL(ch) / 25), unarmed_avg);
       len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
     }
   }

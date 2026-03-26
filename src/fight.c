@@ -22,6 +22,7 @@
 #include "dg_scripts.h"
 #include "act.h"
 #include "class.h"
+#include "race.h"
 #include "fight.h"
 #include "ai_actor.h"
 #include "shop.h"
@@ -643,9 +644,72 @@ int legacy_ac_to_armor(int legacy_ac)
   return MAX(0, MIN(200, armor));
 }
 
+static int racial_base_stat(const struct char_data *ch, int stat_apply)
+{
+  int race_bonus = 0;
+
+  if (!ch)
+    return 0;
+
+  if (!IS_NPC(ch)) {
+    switch (stat_apply) {
+    case APPLY_STR: race_bonus = race_abil_bonus(GET_RACE(ch), 0); break;
+    case APPLY_DEX: race_bonus = race_abil_bonus(GET_RACE(ch), 1); break;
+    case APPLY_CON: race_bonus = race_abil_bonus(GET_RACE(ch), 2); break;
+    case APPLY_INT: race_bonus = race_abil_bonus(GET_RACE(ch), 3); break;
+    case APPLY_WIS: race_bonus = race_abil_bonus(GET_RACE(ch), 4); break;
+    case APPLY_CHA: race_bonus = race_abil_bonus(GET_RACE(ch), 5); break;
+    default: break;
+    }
+  }
+
+  switch (stat_apply) {
+  case APPLY_STR: return MAX(0, ch->real_abils.str + race_bonus);
+  case APPLY_DEX: return MAX(0, ch->real_abils.dex + race_bonus);
+  case APPLY_CON: return MAX(0, ch->real_abils.con + race_bonus);
+  case APPLY_INT: return MAX(0, ch->real_abils.intel + race_bonus);
+  case APPLY_WIS: return MAX(0, ch->real_abils.wis + race_bonus);
+  case APPLY_CHA: return MAX(0, ch->real_abils.cha + race_bonus);
+  default: return 0;
+  }
+}
+
+int combat_effective_stat(const struct char_data *ch, int stat_apply)
+{
+  int base_stat, effective_stat, bonus_over_base, diminished_bonus;
+
+  if (!ch)
+    return 0;
+
+  base_stat = racial_base_stat(ch, stat_apply);
+
+  switch (stat_apply) {
+  case APPLY_STR: effective_stat = GET_STR(ch); break;
+  case APPLY_DEX: effective_stat = GET_DEX(ch); break;
+  case APPLY_CON: effective_stat = GET_CON(ch); break;
+  case APPLY_INT: effective_stat = GET_INT(ch); break;
+  case APPLY_WIS: effective_stat = GET_WIS(ch); break;
+  case APPLY_CHA: effective_stat = GET_CHA(ch); break;
+  default: return 0;
+  }
+
+  bonus_over_base = MAX(0, effective_stat - base_stat);
+
+  /* Keep normal progression untouched for modest bonuses.
+   * Large stacked bonuses keep helping, but at reduced efficiency. */
+  if (bonus_over_base <= 8)
+    diminished_bonus = bonus_over_base;
+  else
+    diminished_bonus = 8 + ((bonus_over_base - 8) / 3);
+
+  return MAX(0, base_stat + diminished_bonus);
+}
+
 int compute_armor(struct char_data *ch)
 {
-  int armor_bonus = 10 + (GET_CON(ch) - 10) + ((GET_STR(ch) - 10) / 2);
+  int con_for_combat = combat_effective_stat(ch, APPLY_CON);
+  int str_for_combat = combat_effective_stat(ch, APPLY_STR);
+  int armor_bonus = 10 + (con_for_combat - 10) + ((str_for_combat - 10) / 2);
   int armor = GET_ARMOR(ch) + armor_bonus;
   return MAX(0, armor);
 }
@@ -657,7 +721,8 @@ int compute_armor_class(struct char_data *ch)
 
 int compute_evasion(struct char_data *ch)
 {
-  int evasion_bonus = 10 + ((GET_DEX(ch) - 10) * 2);
+  int dex_for_combat = combat_effective_stat(ch, APPLY_DEX);
+  int evasion_bonus = 10 + ((dex_for_combat - 10) * 2);
   int evasion = GET_EVASION(ch) + evasion_bonus;
   return MAX(0, evasion);
 }
@@ -698,10 +763,13 @@ static int concealment_hit_modifier(struct char_data *ch, struct char_data *vict
 
 int compute_offensive_hit_value(struct char_data *ch, struct char_data *victim)
 {
+  int str_for_combat = combat_effective_stat(ch, APPLY_STR);
+  int int_for_combat = combat_effective_stat(ch, APPLY_INT);
+  int wis_for_combat = combat_effective_stat(ch, APPLY_WIS);
   int level_bonus = GET_LEVEL(ch);
   int hitroll_bonus = GET_HITROLL(ch);
-  int stat_bonus = str_app[STRENGTH_APPLY_INDEX(ch)].tohit;
-  int mental_bonus = (GET_INT(ch) - 10) / 4 + (GET_WIS(ch) - 10) / 4;
+  int stat_bonus = str_app[MIN(25, str_for_combat)].tohit;
+  int mental_bonus = (int_for_combat - 10) / 4 + (wis_for_combat - 10) / 4;
   int level_gap_bonus = 0;
   int situational_bonus = 0;
 
@@ -2290,15 +2358,18 @@ static int compute_thaco(struct char_data *ch, struct char_data *victim)
   int calc_thaco;
   int situational_hit_bonus = 0;
   int level_gap_bonus = 0;
+  int str_for_combat = combat_effective_stat(ch, APPLY_STR);
+  int int_for_combat = combat_effective_stat(ch, APPLY_INT);
+  int wis_for_combat = combat_effective_stat(ch, APPLY_WIS);
 
   if (!IS_NPC(ch))
     calc_thaco = thaco(GET_CLASS(ch), GET_LEVEL(ch));
   else		/* THAC0 for monsters is set in the HitRoll */
     calc_thaco = 20;
-  calc_thaco -= str_app[STRENGTH_APPLY_INDEX(ch)].tohit;
+  calc_thaco -= str_app[MIN(25, str_for_combat)].tohit;
   calc_thaco -= GET_HITROLL(ch);
-  calc_thaco -= (int) ((GET_INT(ch) - 13) / 1.5);	/* Intelligence helps! */
-  calc_thaco -= (int) ((GET_WIS(ch) - 13) / 1.5);	/* So does wisdom */
+  calc_thaco -= (int) ((int_for_combat - 13) / 1.5);	/* Intelligence helps! */
+  calc_thaco -= (int) ((wis_for_combat - 13) / 1.5);	/* So does wisdom */
   if (victim)
     level_gap_bonus = (GET_LEVEL(ch) - GET_LEVEL(victim)) / 3;
   calc_thaco -= level_gap_bonus;
@@ -2317,6 +2388,7 @@ void hit(struct char_data *ch, struct char_data *victim, int type)
   int shadow_assist_bonus = 0;
   int melee_level_bonus = 0;
   int final_hit_roll;
+  int str_for_combat, int_for_combat, wis_for_combat;
 
   /* Check that the attacker and victim exist */
   if (!ch || !victim) return;
@@ -2348,9 +2420,12 @@ void hit(struct char_data *ch, struct char_data *victim, int type)
 
   attacker_level = GET_LEVEL(ch);
   victim_level = GET_LEVEL(victim);
+  str_for_combat = combat_effective_stat(ch, APPLY_STR);
+  int_for_combat = combat_effective_stat(ch, APPLY_INT);
+  wis_for_combat = combat_effective_stat(ch, APPLY_WIS);
   hitroll_bonus = GET_HITROLL(ch);
-  stat_bonus = str_app[STRENGTH_APPLY_INDEX(ch)].tohit;
-  mental_bonus = (GET_INT(ch) - 10) / 4 + (GET_WIS(ch) - 10) / 4;
+  stat_bonus = str_app[MIN(25, str_for_combat)].tohit;
+  mental_bonus = (int_for_combat - 10) / 4 + (wis_for_combat - 10) / 4;
   if (attacker_level > victim_level)
     level_gap_bonus = ((attacker_level - victim_level) / 2) + ((attacker_level - victim_level) / 4);
   else if (attacker_level < victim_level)
@@ -2404,9 +2479,9 @@ void hit(struct char_data *ch, struct char_data *victim, int type)
   else {
     /* okay, we know the guy has been hit.  now calculate damage.
      * Start with the damage bonuses: the damroll and strength apply */
-    dam = str_app[STRENGTH_APPLY_INDEX(ch)].todam;
+    dam = str_app[MIN(25, str_for_combat)].todam;
     dam += GET_DAMROLL(ch) * 2;
-    dam += MAX(0, (GET_STR(ch) - 10) / 2);
+    dam += MAX(0, (str_for_combat - 10) / 2);
     melee_level_bonus = MAX(0, GET_LEVEL(ch) / 10);
     dam += melee_level_bonus;
 
@@ -2425,9 +2500,9 @@ void hit(struct char_data *ch, struct char_data *victim, int type)
         unarmed_base_roll = dice(ch->mob_specials.damnodice, ch->mob_specials.damsizedice);
         dam += unarmed_base_roll;
       } else {
-        unarmed_base_roll = dice(MIN(4, 1 + (GET_LEVEL(ch) / 30)),
-                                 MIN(7, 2 + (GET_LEVEL(ch) / 20)));
-        unarmed_level_scaling_bonus = MAX(0, GET_LEVEL(ch) / 30);
+        unarmed_base_roll = dice(MIN(4, 1 + (GET_LEVEL(ch) / 25)),
+                                 MIN(7, 2 + (GET_LEVEL(ch) / 25)));
+        unarmed_level_scaling_bonus = MAX(0, GET_LEVEL(ch) / 25);
         dam += unarmed_base_roll + unarmed_level_scaling_bonus;
       }
     }
