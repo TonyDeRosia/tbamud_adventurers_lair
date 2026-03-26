@@ -678,7 +678,6 @@ static void oedit_disp_menu(struct descriptor_data *d)
 	  "%s7%s) Wear flags  : %s%s\r\n"
           "%s8%s) Weight      : %s%d\r\n"
           "%s9%s) Cost        : %s%d\r\n"
-          "%sA%s) Cost/Day (legacy, unused): %s%d\r\n"
           "%sB%s) Timer       : %s%d\r\n"
           "%s"
           "%sC%s) Values      : %s%d %d %d %d%s\r\n"
@@ -695,7 +694,6 @@ static void oedit_disp_menu(struct descriptor_data *d)
 	  grn, nrm, cyn, buf1,
           grn, nrm, cyn, GET_OBJ_WEIGHT(obj),
           grn, nrm, cyn, GET_OBJ_COST(obj),
-          grn, nrm, cyn, GET_OBJ_RENT(obj),
           grn, nrm, cyn, GET_OBJ_TIMER(obj),
           regen_line,
           grn, nrm, cyn, GET_OBJ_VAL(obj, 0),
