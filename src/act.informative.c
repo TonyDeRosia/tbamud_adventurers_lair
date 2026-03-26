@@ -1920,7 +1920,7 @@ ACMD(do_score)
     int shown_armor = compute_armor_class(ch);
     int shown_evasion = compute_evasion(ch);
     int spell_save = GET_SAVE(ch, SAVING_SPELL);
-    int display_saves = -spell_save;
+    int spell_save_improvement = MAX(0, -spell_save);
     int b_str = ch->real_abils.str;
     int b_dex = ch->real_abils.dex;
     int b_con = ch->real_abils.con;
@@ -1961,14 +1961,11 @@ ACMD(do_score)
     len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
     len = append_box_line(buf, len, sizeof(buf), B, R, "", W);
 
-    if (display_saves < 0)
-      display_saves = 0;
-
     snprintf(line, sizeof(line),
       "%sArmor:%s %-8d   %sEvasion:%s %-5d   %sSpell Save Improvement:%s %-6d",
       C, R, shown_armor,
       C, R, shown_evasion,
-      C, R, display_saves);
+      C, R, spell_save_improvement);
     len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
     len = append_box_line(buf, len, sizeof(buf), B, R, "", W);
 
