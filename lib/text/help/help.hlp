@@ -4717,7 +4717,7 @@ Armor is shown as a player-facing stat; higher is better.
 See also: EVASION HITROLL DAMROLL
 #0
 
-SPELL-ARMOR ARMOR-SPELL
+ARMOR-SPELL SPELL-ARMOR
 
 Armor (Spell)
 Type: Spell
