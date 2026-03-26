@@ -5279,7 +5279,7 @@ static void build_visible_target_tags(struct char_data *viewer, struct char_data
   if (is_player_quest_target(viewer, target))
   {
     char quest_tag[64];
-    snprintf(quest_tag, sizeof(quest_tag), "%s[QUEST]%s ", CCYEL(viewer, C_NRM), CCNRM(viewer, C_NRM));
+    snprintf(quest_tag, sizeof(quest_tag), "%s[QUEST]%s ", CCRED(viewer, C_NRM), CCNRM(viewer, C_NRM));
     out_append(out, outsz, quest_tag);
   }
 }
