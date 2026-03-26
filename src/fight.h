@@ -27,6 +27,7 @@ int legacy_ac_to_armor(int legacy_ac);
 int compute_armor(struct char_data *ch);
 int compute_armor_class(struct char_data *ch);
 int compute_evasion(struct char_data *ch);
+int combat_effective_stat(const struct char_data *ch, int stat_apply);
 int compute_offensive_hit_value(struct char_data *ch, struct char_data *victim);
 int compute_hit_chance_from_values(int offensive_hit, int target_evasion);
 int mob_kill_base_xp_for_levels(int attacker_level, int victim_level);
