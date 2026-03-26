@@ -5922,9 +5922,9 @@ ACMD(do_namechange)
 
   if (vict->desc) {
     vict->desc->forced_rename_name[0] = '\0';
+    vict->desc->forced_rename_step = 0;
     send_to_char(vict, "An immortal has required you to choose a new name.\r\n");
     send_to_char(vict, "Enter your new name: ");
-    STATE(vict->desc) = CON_FORCED_RENAME;
   }
 }
 
