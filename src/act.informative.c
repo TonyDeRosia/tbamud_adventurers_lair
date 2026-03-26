@@ -1996,6 +1996,12 @@ ACMD(do_score)
            C, R, crit_total_spell(ch),
            C, R, crit_total_heal(ch));
   len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
+  snprintf(line, sizeof(line),
+           "%sCrit DMG Multi:%s %d%%   %sCrit Spell Multi:%s %d%%   %sCrit Heal Multi:%s %d%%",
+           C, R, crit_mult_melee(ch),
+           C, R, crit_mult_spell(ch),
+           C, R, crit_mult_heal(ch));
+  len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
   /* Separator */
   len += snprintf(buf + len, sizeof(buf) - len,
     "%s╠═══════════════════════════════════════════════════════════════════════════════╣%s\r\n", B, R);
