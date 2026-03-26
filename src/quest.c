@@ -142,6 +142,26 @@ bool is_on_quest_cooldown(struct char_data *ch)
   return GET_KQUEST_COOLDOWN_EXPIRES_AT(ch) > now;
 }
 
+bool is_active_quest_item_for_char(struct char_data *ch, struct obj_data *obj)
+{
+  if (!ch || !obj || IS_NPC(ch))
+    return FALSE;
+
+  if (!is_on_quest(ch) || is_quest_expired(ch))
+    return FALSE;
+
+  if (GET_KQUEST_TYPE(ch) != KQUEST_ITEM || GET_KQUEST_ITEM(ch) == NOTHING)
+    return FALSE;
+
+  if (GET_OBJ_VNUM(obj) != GET_KQUEST_ITEM(ch))
+    return FALSE;
+
+  if (obj->carried_by != ch && obj->worn_by != ch)
+    return FALSE;
+
+  return TRUE;
+}
+
 int get_quest_minutes_remaining(struct char_data *ch)
 {
   time_t now;
@@ -191,8 +211,36 @@ static void notify_quest_cooldown_ready_if_needed(struct char_data *ch)
 
 static void expire_kill_quest_if_needed(struct char_data *ch, bool notify)
 {
+  struct obj_data *obj, *obj_next;
+  int i;
+
   if (!is_on_quest(ch) || !is_quest_expired(ch))
     return;
+
+  if (GET_KQUEST_TYPE(ch) == KQUEST_ITEM) {
+    for (obj = ch->carrying; obj; obj = obj_next) {
+      obj_next = obj->next_content;
+      if (is_active_quest_item_for_char(ch, obj)) {
+        obj_from_char(obj);
+        extract_obj(obj);
+        send_to_char(ch, "The quest item crumbles away as your time runs out.\r\n");
+        break;
+      }
+    }
+
+    if (!obj) {
+      for (i = 0; i < NUM_WEARS; i++) {
+        obj = GET_EQ(ch, i);
+        if (!is_active_quest_item_for_char(ch, obj))
+          continue;
+
+        obj = unequip_char(ch, i);
+        extract_obj(obj);
+        send_to_char(ch, "The quest item crumbles away as your time runs out.\r\n");
+        break;
+      }
+    }
+  }
 
   clear_kill_quest(ch);
   start_kill_quest_cooldown(ch);
@@ -963,7 +1011,7 @@ static void quest_complete_kill(struct char_data *ch)
   if (GET_KQUEST_TYPE(ch) == KQUEST_ITEM) {
     for (obj = ch->carrying; obj; obj = obj_next) {
       obj_next = obj->next_content;
-      if (GET_OBJ_VNUM(obj) == GET_KQUEST_ITEM(ch)) {
+      if (is_active_quest_item_for_char(ch, obj)) {
         turnin = obj;
         break;
       }

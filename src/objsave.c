@@ -21,6 +21,7 @@
 #include "class.h"
 #include "config.h"
 #include "modify.h"
+#include "quest.h"
 #include "genolc.h" /* for strip_cr and sprintascii */
 
 /* these factors should be unique integers */
@@ -746,6 +747,11 @@ static int Crash_report_unrentables(struct char_data *ch, struct char_data *rece
   int has_norents = 0;
 
   if (obj) {
+    if (is_active_quest_item_for_char(ch, obj)) {
+      has_norents = 1;
+      sprintf(buf, "$n tells you, 'You must return %s to the Quest Master first.'", OBJS(obj, ch));
+      act(buf, FALSE, recep, 0, ch, TO_VICT);
+    } else
     if (Crash_is_unrentable(obj)) {
       has_norents = 1;
       sprintf(buf, "$n tells you, 'You cannot store %s.'", OBJS(obj, ch));

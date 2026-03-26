@@ -26,6 +26,7 @@
 #include "spells.h"  /* for skill_name() */
 #include "screen.h"
 #include "shop_prices.h"
+#include "quest.h"
 
 
 /* shop currency helpers (display and payment in gold total) */
@@ -753,6 +754,11 @@ static struct obj_data *get_selling_obj(struct char_data *ch, char *name, struct
   if (OBJ_FLAGGED(obj, ITEM_KEPT)) {
     if (msg)
       do_tell(keeper, "You are keeping that item safe. Unlock it first.", cmd_tell, 0);
+    return (NULL);
+  }
+  if (is_active_quest_item_for_char(ch, obj)) {
+    if (msg)
+      do_tell(keeper, "That item is bound to your current quest. Return it to the Quest Master.", cmd_tell, 0);
     return (NULL);
   }
   if ((result = trade_with(obj, shop_nr)) == OBJECT_OK)
