@@ -5116,6 +5116,7 @@ ACMD(do_areas)
   int i, hilev=-1, lolev=-1, zcount=0, lev_set, len=0, tmp_len=0;
   char arg[MAX_INPUT_LENGTH], *second, lev_str[MAX_INPUT_LENGTH], buf[MAX_STRING_LENGTH];
   bool show_zone = FALSE, overlap = FALSE, overlap_shown = FALSE;
+  bool show_vnums = (GET_LEVEL(ch) >= LVL_IMMORT);
 
   one_argument(argument, arg);
 
@@ -5185,9 +5186,20 @@ ACMD(do_areas)
     if (show_zone) {
       if (overlap) overlap_shown = TRUE;
       lev_set = get_zone_levels(i, lev_str);
-      tmp_len = snprintf(buf+len, sizeof(buf)-len, "\tn(%3d) %s%-*s\tn %s%s\tn\r\n", ++zcount, overlap ? QRED : QCYN,
-                 count_color_chars(zone_table[i].name)+30, zone_table[i].name,
-                 lev_set ? "\tc" : "\tn", lev_set ? lev_str : "All Levels");
+      ++zcount;
+
+      if (show_vnums) {
+        tmp_len = snprintf(buf+len, sizeof(buf)-len,
+                  "\tn[%3d] %s%-*s\tn %s%s\tn  \tyVnums %d-%d\tn\r\n",
+                  zone_table[i].number, overlap ? QRED : QCYN,
+                  count_color_chars(zone_table[i].name)+30, zone_table[i].name,
+                  lev_set ? "\tc" : "\tn", lev_set ? lev_str : "All Levels",
+                  zone_table[i].bot, zone_table[i].top);
+      } else {
+        tmp_len = snprintf(buf+len, sizeof(buf)-len, "\tn(%3d) %s%-*s\tn %s%s\tn\r\n", zcount, overlap ? QRED : QCYN,
+                  count_color_chars(zone_table[i].name)+30, zone_table[i].name,
+                  lev_set ? "\tc" : "\tn", lev_set ? lev_str : "All Levels");
+      }
       len += tmp_len;
     }
   }
