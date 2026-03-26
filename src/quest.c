@@ -977,7 +977,6 @@ static void quest_request_kill(struct char_data *ch)
     tr = IN_ROOM(target);
     GET_KQUEST_TARGET(ch) = GET_MOB_VNUM(target);
     GET_KQUEST_ROOM(ch) = GET_ROOM_VNUM(tr);
-    GET_KQUEST_TARGET_ID(ch) = char_script_id(target);
     send_to_char(ch, "%s tells you, 'An enemy of mine, %s, is making vile threats against the realm!'\r\n",
         GET_NAME(qm), GET_NAME(target));
     send_to_char(ch, "%s tells you, 'Seek %s out somewhere near %s in the area of %s.'\r\n",
@@ -1697,8 +1696,6 @@ void quest_kill_trigger_check(struct char_data *ch, struct char_data *vict)
     return;
   if (GET_KQUEST_TARGET(ch) != GET_MOB_VNUM(vict))
     return;
-  if (GET_KQUEST_TARGET_ID(ch) > 0 && GET_KQUEST_TARGET_ID(ch) != char_script_id(vict))
-    return;
 
   GET_KQUEST_COMPLETE(ch) = 1;
   send_to_char(ch, "\tRQuest Target Slain!\tn\r\n");
@@ -1786,8 +1783,6 @@ int is_player_quest_target(struct char_data *viewer, struct char_data *mob)
   if (!is_on_quest(viewer) || is_quest_ready(viewer) || is_quest_expired(viewer))
     return FALSE;
   if (GET_KQUEST_TARGET(viewer) != GET_MOB_VNUM(mob))
-    return FALSE;
-  if (GET_KQUEST_TARGET_ID(viewer) > 0 && GET_KQUEST_TARGET_ID(viewer) != char_script_id(mob))
     return FALSE;
 
   return TRUE;

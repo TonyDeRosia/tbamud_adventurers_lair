@@ -246,7 +246,7 @@ ACMD(do_smite)
   struct char_data *vict;
   int old_hp;
 
-  if (GET_LEVEL(ch) < LVL_GRGOD || IS_NPC(ch) || !PRF_FLAGGED(ch, PRF_NOHASSLE)) {
+  if (GET_LEVEL(ch) < LVL_GRGOD || IS_NPC(ch)) {
     send_to_char(ch, "You are not holy enough to smite.\r\n");
     return;
   }
