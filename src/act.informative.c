@@ -1919,7 +1919,8 @@ ACMD(do_score)
       offensive_hit, compute_baseline_target_evasion(GET_LEVEL(ch)));
     int shown_armor = compute_armor_class(ch);
     int shown_evasion = compute_evasion(ch);
-    int spell_save = GET_SAVE(ch, 4);
+    int spell_save = GET_SAVE(ch, SAVING_SPELL);
+    int display_saves = -spell_save;
     int b_str = ch->real_abils.str;
     int b_dex = ch->real_abils.dex;
     int b_con = ch->real_abils.con;
@@ -1960,11 +1961,14 @@ ACMD(do_score)
     len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
     len = append_box_line(buf, len, sizeof(buf), B, R, "", W);
 
+    if (display_saves < 0)
+      display_saves = 0;
+
     snprintf(line, sizeof(line),
-      "%sArmor:%s %-8d   %sEvasion:%s %-5d   %sSpell Saves:%s %-6d",
+      "%sArmor:%s %-8d   %sEvasion:%s %-5d   %sSpell Save Improvement:%s %-6d",
       C, R, shown_armor,
       C, R, shown_evasion,
-      C, R, spell_save);
+      C, R, display_saves);
     len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
     len = append_box_line(buf, len, sizeof(buf), B, R, "", W);
 
@@ -1987,7 +1991,7 @@ ACMD(do_score)
   len = append_box_line(buf, len, sizeof(buf), B, R, "", W);
   /* Crit chances */
   snprintf(line, sizeof(line),
-           "%sCritical hit:%s %d   %sCritical Spell:%s %d   %sCritical Heal:%s %d",
+           "%sCrit Hit:%s %d%%   %sCrit Spell:%s %d%%   %sCrit Heal:%s %d%%",
            C, R, crit_total_melee(ch),
            C, R, crit_total_spell(ch),
            C, R, crit_total_heal(ch));
