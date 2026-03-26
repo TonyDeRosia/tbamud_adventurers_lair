@@ -371,6 +371,8 @@ ACMD(do_acctsetpass);
 ACMD(do_oset);
 ACMD(do_peace);
 ACMD(do_plist);
+ACMD(do_poofin);
+ACMD(do_poofout);
 ACMD(do_purge);
 ACMD(do_recent);
 ACMD(do_cleanse);

@@ -4227,6 +4227,44 @@ static void show_set_help(struct char_data *ch)
   page_string(ch->desc, buf, TRUE);
 }
 
+static void set_poof_string(struct char_data *ch, char *argument, int subcmd)
+{
+  char **poof;
+
+  if (IS_NPC(ch)) {
+    send_to_char(ch, "Monsters can't set poof messages.\r\n");
+    return;
+  }
+
+  skip_spaces(&argument);
+  parse_at(argument);
+
+  poof = (subcmd == SCMD_POOFIN) ? &POOFIN(ch) : &POOFOUT(ch);
+
+  if (*poof)
+    free(*poof);
+
+  if (!*argument) {
+    *poof = NULL;
+    send_to_char(ch, "%s cleared.\r\n", subcmd == SCMD_POOFIN ? "Poofin" : "Poofout");
+  } else {
+    *poof = strdup(argument);
+    send_to_char(ch, "%s set to: %s\r\n", subcmd == SCMD_POOFIN ? "Poofin" : "Poofout", *poof);
+  }
+
+  save_char(ch);
+}
+
+ACMD(do_poofin)
+{
+  set_poof_string(ch, argument, SCMD_POOFIN);
+}
+
+ACMD(do_poofout)
+{
+  set_poof_string(ch, argument, SCMD_POOFOUT);
+}
+
 ACMD(do_set)
 {
   struct char_data *vict = NULL, *cbuf = NULL;
