@@ -5342,10 +5342,10 @@ ACMD(do_areas)
       ++zcount;
 
       if (show_vnums) {
-        tmp_len = snprintf(buf+len, sizeof(buf)-len,
-                  "\tn[%3d] %s%-*s\tn %s%s\tn  \tyVnums %d-%d\tn\r\n",
+        tmp_len = snprintf(buf + len, sizeof(buf) - len,
+                  "\tn[%5d] %s%-*s\tn  %s%-20s\tn  \tyVnums %5d-%-5d\tn\r\n",
                   zone_table[i].number, overlap ? QRED : QCYN,
-                  count_color_chars(zone_table[i].name)+30, zone_table[i].name,
+                  count_color_chars(zone_table[i].name) + 30, zone_table[i].name,
                   lev_set ? "\tc" : "\tn", lev_set ? lev_str : "All Levels",
                   zone_table[i].bot, zone_table[i].top);
       } else {
