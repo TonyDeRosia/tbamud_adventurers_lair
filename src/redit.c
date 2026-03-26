@@ -644,6 +644,7 @@ static void redit_disp_resets_menu(struct descriptor_data *d)
 {
   int i, count, zone_index, *entries = NULL, *chain_ends = NULL, *roots = NULL;
   int current_mob = NOWHERE;
+  char display_name[128];
   struct reset_com *cmd;
   room_rnum room_num = real_room(OLC_NUM(d));
 
@@ -667,58 +668,76 @@ static void redit_disp_resets_menu(struct descriptor_data *d)
         case 'M':
           current_mob = (cmd[zone_index].arg1 >= 0 && cmd[zone_index].arg1 <= top_of_mobt) ?
             mob_index[cmd[zone_index].arg1].vnum : NOWHERE;
-          write_to_output(d, "Mob [%d] %-30.30s max:%d\r\n",
-            (cmd[zone_index].arg1 >= 0 && cmd[zone_index].arg1 <= top_of_mobt) ?
-              mob_index[cmd[zone_index].arg1].vnum : -1,
+          format_color_field_visible(display_name, sizeof(display_name),
             (cmd[zone_index].arg1 >= 0 && cmd[zone_index].arg1 <= top_of_mobt) ?
               mob_proto[cmd[zone_index].arg1].player.short_descr : "<invalid mob>",
+            30);
+          write_to_output(d, "Mob [%d] %s max:%d\r\n",
+            (cmd[zone_index].arg1 >= 0 && cmd[zone_index].arg1 <= top_of_mobt) ?
+              mob_index[cmd[zone_index].arg1].vnum : -1,
+            display_name,
             cmd[zone_index].arg2);
           break;
         case 'O':
           current_mob = NOWHERE;
-          write_to_output(d, "Obj [%d] %-30.30s room object max:%d\r\n",
-            (cmd[zone_index].arg1 >= 0 && cmd[zone_index].arg1 <= top_of_objt) ?
-              obj_index[cmd[zone_index].arg1].vnum : -1,
+          format_color_field_visible(display_name, sizeof(display_name),
             (cmd[zone_index].arg1 >= 0 && cmd[zone_index].arg1 <= top_of_objt) ?
               obj_proto[cmd[zone_index].arg1].short_description : "<invalid object>",
+            30);
+          write_to_output(d, "Obj [%d] %s room object max:%d\r\n",
+            (cmd[zone_index].arg1 >= 0 && cmd[zone_index].arg1 <= top_of_objt) ?
+              obj_index[cmd[zone_index].arg1].vnum : -1,
+            display_name,
             cmd[zone_index].arg2);
           break;
         case 'E':
-          write_to_output(d, "Obj [%d] %-30.30s equip on mob [%d] (%s) max:%d\r\n",
-            (cmd[zone_index].arg1 >= 0 && cmd[zone_index].arg1 <= top_of_objt) ?
-              obj_index[cmd[zone_index].arg1].vnum : -1,
+          format_color_field_visible(display_name, sizeof(display_name),
             (cmd[zone_index].arg1 >= 0 && cmd[zone_index].arg1 <= top_of_objt) ?
               obj_proto[cmd[zone_index].arg1].short_description : "<invalid object>",
+            30);
+          write_to_output(d, "Obj [%d] %s equip on mob [%d] (%s) max:%d\r\n",
+            (cmd[zone_index].arg1 >= 0 && cmd[zone_index].arg1 <= top_of_objt) ?
+              obj_index[cmd[zone_index].arg1].vnum : -1,
+            display_name,
             current_mob,
             (cmd[zone_index].arg3 >= 0 && cmd[zone_index].arg3 < NUM_WEARS) ?
               equipment_types[cmd[zone_index].arg3] : "invalid slot",
             cmd[zone_index].arg2);
           break;
         case 'G':
-          write_to_output(d, "Obj [%d] %-30.30s give to mob [%d] max:%d\r\n",
-            (cmd[zone_index].arg1 >= 0 && cmd[zone_index].arg1 <= top_of_objt) ?
-              obj_index[cmd[zone_index].arg1].vnum : -1,
+          format_color_field_visible(display_name, sizeof(display_name),
             (cmd[zone_index].arg1 >= 0 && cmd[zone_index].arg1 <= top_of_objt) ?
               obj_proto[cmd[zone_index].arg1].short_description : "<invalid object>",
+            30);
+          write_to_output(d, "Obj [%d] %s give to mob [%d] max:%d\r\n",
+            (cmd[zone_index].arg1 >= 0 && cmd[zone_index].arg1 <= top_of_objt) ?
+              obj_index[cmd[zone_index].arg1].vnum : -1,
+            display_name,
             current_mob,
             cmd[zone_index].arg2);
           break;
         case 'P':
-          write_to_output(d, "Obj [%d] %-30.30s put in obj [%d] max:%d\r\n",
-            (cmd[zone_index].arg1 >= 0 && cmd[zone_index].arg1 <= top_of_objt) ?
-              obj_index[cmd[zone_index].arg1].vnum : -1,
+          format_color_field_visible(display_name, sizeof(display_name),
             (cmd[zone_index].arg1 >= 0 && cmd[zone_index].arg1 <= top_of_objt) ?
               obj_proto[cmd[zone_index].arg1].short_description : "<invalid object>",
+            30);
+          write_to_output(d, "Obj [%d] %s put in obj [%d] max:%d\r\n",
+            (cmd[zone_index].arg1 >= 0 && cmd[zone_index].arg1 <= top_of_objt) ?
+              obj_index[cmd[zone_index].arg1].vnum : -1,
+            display_name,
             (cmd[zone_index].arg3 >= 0 && cmd[zone_index].arg3 <= top_of_objt) ?
               obj_index[cmd[zone_index].arg3].vnum : -1,
             cmd[zone_index].arg2);
           break;
         case 'R':
-          write_to_output(d, "Obj [%d] %-30.30s remove from room\r\n",
+          format_color_field_visible(display_name, sizeof(display_name),
+            (cmd[zone_index].arg2 >= 0 && cmd[zone_index].arg2 <= top_of_objt) ?
+              obj_proto[cmd[zone_index].arg2].short_description : "<invalid object>",
+            30);
+          write_to_output(d, "Obj [%d] %s remove from room\r\n",
             (cmd[zone_index].arg2 >= 0 && cmd[zone_index].arg2 <= top_of_objt) ?
               obj_index[cmd[zone_index].arg2].vnum : -1,
-            (cmd[zone_index].arg2 >= 0 && cmd[zone_index].arg2 <= top_of_objt) ?
-              obj_proto[cmd[zone_index].arg2].short_description : "<invalid object>");
+            display_name);
           break;
         case 'D':
           write_to_output(d, "Door %-9s set to %s\r\n",
