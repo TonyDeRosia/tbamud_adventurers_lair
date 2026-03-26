@@ -141,6 +141,18 @@ static int profession_trainer_flag_for_ability(int ability_id)
   }
 }
 
+static int is_core_profession_skill(int ability_id)
+{
+  switch (ability_id) {
+  case SKILL_SCRIBING:
+  case SKILL_ALCHEMY:
+  case SKILL_ENCHANTING:
+    return TRUE;
+  default:
+    return FALSE;
+  }
+}
+
 static int room_has_profession_trainer(struct char_data *ch, int ability_id)
 {
   struct char_data *trainer;
@@ -202,7 +214,8 @@ SPECIAL(guild)
       send_to_char(ch, "They cannot teach you that.\r\n");
       return (TRUE);
     }
-  } else if (!crafting_can_teach_ability((struct char_data *)me, skill_num)) {
+  } else if (!is_core_profession_skill(skill_num) &&
+             !crafting_can_teach_ability((struct char_data *)me, skill_num)) {
     send_to_char(ch, "They cannot teach you that.\r\n");
     return (TRUE);
   }

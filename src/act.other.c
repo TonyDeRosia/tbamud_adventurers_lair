@@ -903,6 +903,32 @@ static int parse_profession_learn_alias(const char *arg, int *skill_id, int *tra
   return FALSE;
 }
 
+static int has_profession_trainer_in_room(struct char_data *ch, int trainer_flag);
+
+static int try_practice_profession_unlock(struct char_data *ch, const char *arg)
+{
+  int profession_skill = 0;
+  int trainer_flag = 0;
+  const char *profession_name = NULL;
+
+  if (!parse_profession_learn_alias(arg, &profession_skill, &trainer_flag, &profession_name))
+    return FALSE;
+
+  if (!has_profession_trainer_in_room(ch, trainer_flag)) {
+    send_to_char(ch, "There is no one here who can teach you that.\r\n");
+    return TRUE;
+  }
+
+  if (GET_SKILL(ch, profession_skill) > 0) {
+    send_to_char(ch, "You already know the basics of %s.\r\n", profession_name);
+    return TRUE;
+  }
+
+  SET_SKILL(ch, profession_skill, 1);
+  send_to_char(ch, "You learn the basics of %s.\r\n", profession_name);
+  return TRUE;
+}
+
 static int has_profession_trainer_in_room(struct char_data *ch, int trainer_flag)
 {
   struct char_data *trainer;
@@ -1566,6 +1592,9 @@ ACMD(do_practice)
   one_argument(argument, arg);
 
   if (*arg) {
+    if (try_practice_profession_unlock(ch, arg))
+      return;
+
     if (!can_use_practice_trainer(ch))
       send_to_char(ch, "You can only practice skills in your guild.\r\n");
     return;
