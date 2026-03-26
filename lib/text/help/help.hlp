@@ -4717,16 +4717,24 @@ Armor is shown as a player-facing stat; higher is better.
 See also: EVASION HITROLL DAMROLL
 #0
 
-ARMOR-SPELL
+SPELL-ARMOR ARMOR-SPELL
 
-Usage       : cast 'armor' [target]
-Accumulative: No
-Duration    : 24 Hours
-Level       : Mage level 4, Cleric level 1.
+Armor (Spell)
+Type: Spell
 
-The Armor spell will improve your AC by 20 points or up to 10%.
+Description:
+A spell help entry for the castable Armor buff.
 
-See also: AC
+Effect:
+Improves armor class for the spell duration.
+
+Usage:
+cast 'armor' [target]
+
+Notes:
+This topic documents the spell behavior. For the score sheet Armor stat, see ARMOR.
+
+See also: ARMOR AC SPELLS
 #0
 
 ASCII-ART ART
@@ -18258,6 +18266,46 @@ Notes:
 Other effects can still change final damage after this base value.
 
 See also: DAMROLL HITROLL CRIT-HIT
+#0
+
+BASE-STATS BASE-STAT BASE
+
+Base Stats
+Type: Stat
+
+Description:
+A score sheet section that displays your six core character stats.
+
+Effect:
+Base Stats shows your current Str, Dex, Con, Int, Wis, and Cha values at a glance.
+
+Usage:
+Use this section to compare builds, equipment, and buffs that change your core stat profile.
+
+Notes:
+Values shown in parentheses are the displayed improvements/modifiers shown beside each core stat value.
+
+See also: STR DEX CON INT WIS CHA SCORE
+#0
+
+CRIT CRITICAL
+
+Critical Stats Overview
+Type: Stat
+
+Description:
+A score sheet overview topic for your critical-related stats.
+
+Effect:
+Your score sheet tracks separate critical chances for Crit Hit, Crit Spell, and Crit Heal.
+
+Usage:
+Use HELP CRIT for the overview, then check HELP CRIT-HIT, HELP CRIT-SPELL, and HELP CRIT-HEAL for details.
+
+Notes:
+This overview does not replace the dedicated critical stat entries.
+
+See also: CRIT-HIT CRIT-SPELL CRIT-HEAL
 #0
 
 CRIT-HIT
