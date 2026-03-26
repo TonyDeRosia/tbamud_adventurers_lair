@@ -199,6 +199,7 @@ ACMD(do_backstab);
 ACMD(do_flee);
 ACMD(do_kick);
 ACMD(do_kill);
+ACMD(do_smite);
 ACMD(do_order);
 ACMD(do_opet);
 ACMD(do_appraise_enemy);

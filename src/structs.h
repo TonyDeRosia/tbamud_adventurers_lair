@@ -1089,8 +1089,10 @@ struct player_special_data_saved
   int    quest_time;            /**< time left on current quest    */
   int    quest_counter;         /**< Count of targets left to get  */
   int    kill_quest_active;     /**< Dynamic kill quest is active  */
+  int    kill_quest_type;       /**< Dynamic quest type (kill/item) */
   int    kill_quest_complete;   /**< Dynamic kill quest objective done */
   mob_vnum kill_quest_target_vnum; /**< Assigned target mob vnum    */
+  obj_vnum kill_quest_item_vnum;/**< Assigned target item vnum    */
   room_vnum kill_quest_target_room; /**< Assigned target room vnum   */
   mob_vnum kill_quest_giver_vnum;   /**< Quest master mob vnum       */
   int    kill_quest_time;       /**< Legacy kill quest timer       */

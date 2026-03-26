@@ -240,6 +240,50 @@ ACMD(do_kill)
   }
 }
 
+ACMD(do_smite)
+{
+  char arg[MAX_INPUT_LENGTH];
+  struct char_data *vict;
+  int old_hp;
+
+  if (GET_LEVEL(ch) < LVL_GRGOD || IS_NPC(ch) || !PRF_FLAGGED(ch, PRF_NOHASSLE)) {
+    send_to_char(ch, "You are not holy enough to smite.\r\n");
+    return;
+  }
+
+  one_argument(argument, arg);
+  if (!*arg) {
+    send_to_char(ch, "Smite who?\r\n");
+    return;
+  }
+  if (!(vict = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM))) {
+    send_to_char(ch, "That player is not here.\r\n");
+    return;
+  }
+  if (vict == ch) {
+    send_to_char(ch, "Smite yourself? That seems unwise.\r\n");
+    return;
+  }
+  if (is_owned_follower_target(ch, vict)) {
+    send_to_char(ch, "You cannot smite one of your own followers.\r\n");
+    return;
+  }
+
+  old_hp = GET_HIT(vict);
+  GET_HIT(vict) = 1;
+  update_pos(vict);
+
+  if (old_hp <= 1) {
+    act("You gesture sternly toward $N. $E remains at the brink.", FALSE, ch, 0, vict, TO_CHAR);
+    act("$n gestures sternly toward you, leaving you at the brink.", FALSE, ch, 0, vict, TO_VICT);
+    act("$n gestures sternly toward $N, but spares $M.", FALSE, ch, 0, vict, TO_NOTVICT);
+  } else {
+    act("You smite $N, reducing $M to a single breath of life!", FALSE, ch, 0, vict, TO_CHAR);
+    act("$n smites you, reducing you to a single breath of life!", FALSE, ch, 0, vict, TO_VICT);
+    act("$n smites $N, leaving $M barely alive!", FALSE, ch, 0, vict, TO_NOTVICT);
+  }
+}
+
 ACMD(do_backstab)
 {
   char buf[MAX_INPUT_LENGTH];

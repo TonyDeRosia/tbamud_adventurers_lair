@@ -710,8 +710,10 @@ do                                                              \
 /** The type of quest ch is currently participating in. */
 #define GET_QUEST_TYPE(ch)      (real_quest(GET_QUEST((ch))) != NOTHING ? aquest_table[real_quest(GET_QUEST((ch)))].type : AQ_UNDEFINED )
 #define GET_KQUEST_ACTIVE(ch)   CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.kill_quest_active))
+#define GET_KQUEST_TYPE(ch)     CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.kill_quest_type))
 #define GET_KQUEST_COMPLETE(ch) CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.kill_quest_complete))
 #define GET_KQUEST_TARGET(ch)   CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.kill_quest_target_vnum))
+#define GET_KQUEST_ITEM(ch)     CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.kill_quest_item_vnum))
 #define GET_KQUEST_ROOM(ch)     CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.kill_quest_target_room))
 #define GET_KQUEST_GIVER(ch)    CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.kill_quest_giver_vnum))
 #define GET_KQUEST_TIME(ch)     CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.kill_quest_time))
