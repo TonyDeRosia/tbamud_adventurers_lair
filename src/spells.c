@@ -26,6 +26,7 @@
 #include "screen.h"
 #include "graph.h"
 #include "race.h"
+#include "crafting.h"
 
 static int clampi(int v, int lo, int hi)
 {
@@ -377,6 +378,9 @@ void show_identify_item(struct char_data *ch, struct obj_data *obj, enum identif
   const char *M = CCMAG(ch, C_NRM);
   int affect_count = 0;
   int flag_columns = 0;
+  int enchant_count = 0;
+  char enchant_tag[128];
+  char enchant_summary[256];
 
   if (!ch || !obj)
     return;
@@ -391,7 +395,10 @@ void show_identify_item(struct char_data *ch, struct obj_data *obj, enum identif
   identify_send_border(ch, B, R);
 
   identify_send_section_header(ch, B, L, R, "Header / Identity");
+  crafting_build_enchant_tag(obj, enchant_tag, sizeof(enchant_tag));
   send_to_char(ch, "%s|%s %sName:%s %s%s\r\n", B, R, L, R, obj->short_description ? obj->short_description : "<None>", R);
+  if (*enchant_tag)
+    send_to_char(ch, "%s|%s %sEnchant:%s %s%s%s\r\n", B, R, L, R, V, enchant_tag, R);
   send_to_char(ch, "%s|%s %sKeywords:%s %s%s\r\n", B, R, L, R, obj->name ? obj->name : "<None>", R);
   send_to_char(ch, "%s|%s %sId:%s %s%ld%s  %sType:%s %s%s%s  %sLevel:%s %s%d%s\r\n",
                B, R, L, R, V, obj_script_id(obj), R, L, R, V, typebuf, R, L, R, V, GET_OBJ_LEVEL(obj), R);
@@ -551,6 +558,13 @@ void show_identify_item(struct char_data *ch, struct obj_data *obj, enum identif
 
   snprintf(aff_summary, sizeof(aff_summary), "Item has %d modifier affect%s.", affect_count, affect_count == 1 ? "" : "s");
   send_to_char(ch, "%s|%s %sNotes:%s %s%s%s\r\n", B, R, L, R, M, aff_summary, R);
+  enchant_count = crafting_get_enchant_count(obj);
+  if (enchant_count > 0) {
+    crafting_build_enchant_recipe_summary(obj, enchant_summary, sizeof(enchant_summary));
+    send_to_char(ch, "%s|%s %sEnchant layers:%s %s%d/4%s\r\n", B, R, L, R, V, enchant_count, R);
+    if (*enchant_summary)
+      send_to_char(ch, "%s|%s %sEnchant history:%s %s%s%s\r\n", B, R, L, R, V, enchant_summary, R);
+  }
   if (detail == IDENTIFY_FULL) {
     identify_send_border(ch, B, R);
     identify_send_section_header(ch, B, L, R, "Detailed Modifiers");
