@@ -2881,12 +2881,88 @@ static void format_aff_display_entry_line(const struct aff_display_entry *entry,
   out_append(out, outsz, ".");
 }
 
+static void aff_flags_token_to_readable(const char *token, char *out, size_t outsz)
+{
+  size_t i;
+
+  if (!out || outsz == 0)
+    return;
+
+  out[0] = '\0';
+  if (!token || !*token)
+    return;
+
+  for (i = 0; token[i] && i + 1 < outsz; i++) {
+    if (token[i] == '-' || token[i] == '_')
+      out[i] = ' ';
+    else
+      out[i] = LOWER(token[i]);
+  }
+  out[i] = '\0';
+}
+
+static int send_equipment_affect_display(struct char_data *ch)
+{
+  int slot;
+  int shown = 0;
+
+  if (!ch)
+    return 0;
+
+  for (slot = 0; slot < NUM_WEARS; slot++) {
+    struct obj_data *obj = GET_EQ(ch, slot);
+    int apply_totals[NUM_APPLIES];
+    char flags[256];
+    char readable[128];
+    char *tok;
+    int i;
+
+    if (!obj)
+      continue;
+
+    for (i = 0; i < NUM_APPLIES; i++)
+      apply_totals[i] = 0;
+
+    sprintbitarray(GET_OBJ_AFFECT(obj), affected_bits, AF_ARRAY_MAX, flags);
+    if (aff_flags_has_meaningful_bits(flags)) {
+      for (tok = strtok(flags, " "); tok; tok = strtok(NULL, " ")) {
+        if (!*tok)
+          continue;
+        aff_flags_token_to_readable(tok, readable, sizeof(readable));
+        if (!*readable)
+          continue;
+        send_to_char(ch, "  [Item] %s\r\n", readable);
+        shown++;
+      }
+    }
+
+    for (i = 0; i < MAX_OBJ_AFFECT; i++) {
+      int location = obj->affected[i].location;
+      int modifier = obj->affected[i].modifier;
+
+      if (location <= APPLY_NONE || location >= NUM_APPLIES || modifier == 0)
+        continue;
+      apply_totals[location] += modifier;
+    }
+
+    for (i = APPLY_NONE + 1; i < NUM_APPLIES; i++) {
+      if (apply_totals[i] == 0)
+        continue;
+      send_to_char(ch, "  [Item] %+d %s\r\n", apply_totals[i], aff_apply_name(i));
+      shown++;
+    }
+  }
+
+  return shown;
+}
+
 ACMD(do_affects)
 {
   const struct affected_type *af;
   const struct affected_type **seen = NULL;
   struct aff_display_entry *buff_entries = NULL;
   struct aff_display_entry *debuff_entries = NULL;
+  int item_effects = 0;
   int buff_count = 0, debuff_count = 0;
   int seen_count = 0;
   int any = 0, any_buff = 0, any_debuff = 0;
@@ -2901,25 +2977,18 @@ ACMD(do_affects)
     return;
   }
 
-  if (!ch->affected) {
-    send_to_char(ch, "You have no active effects.\r\n");
-    return;
+  if (ch->affected) {
+    for (af = ch->affected; af; af = af->next) {
+      affect_count++;
+      any = 1;
+      if (is_aff_debuff(af)) any_debuff = 1;
+      else any_buff = 1;
+    }
   }
 
-  for (af = ch->affected; af; af = af->next) {
-    affect_count++;
-    any = 1;
-    if (is_aff_debuff(af)) any_debuff = 1;
-    else any_buff = 1;
-  }
-
-  if (!any) {
-    send_to_char(ch, "You have no active effects.\r\n");
-    return;
-  }
-
-  CREATE(seen, const struct affected_type *, affect_count);
-  CREATE(buff_entries, struct aff_display_entry, affect_count);
+  if (affect_count > 0)
+    CREATE(seen, const struct affected_type *, affect_count);
+  CREATE(buff_entries, struct aff_display_entry, MAX(affect_count, 1));
   CREATE(debuff_entries, struct aff_display_entry, (affect_count * 2) + 4);
 
   for (af = ch->affected; af; af = af->next) {
@@ -2951,7 +3020,7 @@ ACMD(do_affects)
           break;
         }
       }
-      if (target && buff_count < affect_count)
+      if (target && buff_count < MAX(affect_count, 1))
         buff_entries[buff_count++] = entry;
     }
   }
@@ -3041,6 +3110,11 @@ ACMD(do_affects)
   } else {
     send_to_char(ch, "\r\n%sDebuffs%s\r\n  None.\r\n", CCRED(ch, C_NRM), CCNRM(ch, C_NRM));
   }
+
+  send_to_char(ch, "\r\n%sEquipment Effects%s\r\n", CCCYN(ch, C_NRM), CCNRM(ch, C_NRM));
+  item_effects = send_equipment_affect_display(ch);
+  if (!item_effects)
+    send_to_char(ch, "  None.\r\n");
 
   free(seen);
   free(buff_entries);
@@ -5413,14 +5487,10 @@ ACMD(do_saffects)
   int seen_spells[MAX_AFFECT];
   int seen_count = 0;
   int skills = 0, spells = 0, any = 0;
+  int item_effects = 0;
 
   if (!ch || IS_NPC(ch)) {
     send_to_char(ch, "Not for mobiles.\r\n");
-    return;
-  }
-
-  if (!ch->affected) {
-    send_to_char(ch, "You are not affected by anything.\r\n");
     return;
   }
 
@@ -5482,8 +5552,13 @@ ACMD(do_saffects)
     send_to_char(ch, "%-7s : %s (%s)\r\n", kind, name, dur);
   }
 
-  if (!any) {
-    send_to_char(ch, "You are not affected by anything.\r\n");
+  send_to_char(ch, "\r\nEquipment effects:\r\n");
+  item_effects = send_equipment_affect_display(ch);
+  if (!item_effects)
+    send_to_char(ch, "  None.\r\n");
+
+  if (!any && !item_effects) {
+    send_to_char(ch, "\r\nYou are not affected by anything.\r\n");
     return;
   }
 
