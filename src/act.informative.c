@@ -212,6 +212,7 @@ static void show_obj_to_char(struct obj_data *obj, struct char_data *ch, int mod
   struct char_data *temp;
   char obj_tags[256];
   char enchant_tag[128];
+  char outbuf[MAX_STRING_LENGTH];
 
   if (!obj || !ch) {
     log("SYSERR: NULL pointer in show_obj_to_char(): obj=%p ch=%p", (void *)obj, (void *)ch);
@@ -271,7 +272,9 @@ case SHOW_OBJ_SHORT:
   else
     build_obj_aura_tags(obj, ch, obj_tags, sizeof(obj_tags), TRUE);
   crafting_build_enchant_tag(obj, enchant_tag, sizeof(enchant_tag));
-  send_to_char(ch, "%s%s%s", obj_tags, enchant_tag, obj->short_description);
+  snprintf(outbuf, sizeof(outbuf), "%s%s%s", obj_tags, enchant_tag, obj->short_description);
+  parse_at(outbuf);
+  send_to_char(ch, "%s", outbuf);
   break;
 
   case SHOW_OBJ_ACTION:
@@ -3261,12 +3264,15 @@ ACMD(do_equipment)
     if (CAN_SEE_OBJ(ch, obj)) {
       char obj_tags[256];
       char enchant_tag[128];
+      char outbuf[MAX_STRING_LENGTH];
       if (!IS_NPC(ch) && GET_LEVEL(ch) < LVL_IMMORT)
         build_player_kept_marker(obj, ch, obj_tags, sizeof(obj_tags));
       else
         build_obj_aura_tags(obj, ch, obj_tags, sizeof(obj_tags), FALSE);
       crafting_build_enchant_tag(obj, enchant_tag, sizeof(enchant_tag));
-      send_to_char(ch, "%s%s%s\r\n", obj_tags, enchant_tag, obj->short_description);
+      snprintf(outbuf, sizeof(outbuf), "%s%s%s", obj_tags, enchant_tag, obj->short_description);
+      parse_at(outbuf);
+      send_to_char(ch, "%s\r\n", outbuf);
     } else {
       send_to_char(ch, "Something.\r\n");
     }
