@@ -265,6 +265,7 @@ cpp_extern const struct command_info cmd_info[] = {
   { "links"    , "lin"     , POS_STANDING, do_links    , LVL_GOD, 0 },
   { "lock"     , "loc"     , POS_SITTING , do_gen_door , 0, SCMD_LOCK },
   { "load"     , "load"     , POS_DEAD    , do_load     , LVL_BUILDER, 0 },
+  { "oload"    , "oload"    , POS_DEAD    , do_oload    , LVL_BUILDER, 0 },
 
   { "motd"     , "motd"    , POS_DEAD    , do_gen_ps   , 0, SCMD_MOTD },
   { "menu"     , "menu"    , POS_DEAD    , do_quit     , 0, SCMD_MENU },
