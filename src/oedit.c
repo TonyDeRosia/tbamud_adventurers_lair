@@ -46,6 +46,7 @@ static void oedit_disp_menu(struct descriptor_data *d);
 static void oedit_disp_perm_menu(struct descriptor_data *d);
 static void oedit_save_to_disk(int zone_num);
 static int oedit_type_supports_regen_mult(int obj_type);
+static void oedit_disp_craft_tool_discipline_menu(struct descriptor_data *d);
 static void oedit_disp_craft_material_discipline_menu(struct descriptor_data *d);
 static void oedit_disp_craft_material_tier_prompt(struct descriptor_data *d);
 
@@ -55,6 +56,17 @@ static void oedit_disp_craft_material_tier_prompt(struct descriptor_data *d);
 static int oedit_type_supports_regen_mult(int obj_type)
 {
   return (obj_type == ITEM_FURNITURE || obj_type == ITEM_WEAPON);
+}
+
+static void oedit_disp_craft_tool_discipline_menu(struct descriptor_data *d)
+{
+  OLC_MODE(d) = OEDIT_CRAFT_TOOL_DISCIPLINE;
+  write_to_output(d,
+      "\r\nCraft tool discipline (stored in value 0):\r\n"
+      "  1) Scribing\r\n"
+      "  2) Alchemy\r\n"
+      "  3) Enchanting\r\n"
+      "Enter discipline (1-3): ");
 }
 
 static void oedit_disp_craft_material_discipline_menu(struct descriptor_data *d)
@@ -657,6 +669,11 @@ static void oedit_disp_menu(struct descriptor_data *d)
   char buf2[MAX_STRING_LENGTH];
   char regen_buf[MAX_INPUT_LENGTH];
   char regen_line[MAX_STRING_LENGTH];
+  char craft_tool_line[MAX_STRING_LENGTH];
+  char craft_material_line[MAX_STRING_LENGTH];
+  const char *tool_disc_name;
+  const char *mat_disc_name;
+  const char *mat_tier_name;
   struct obj_data *obj;
 
   obj = OLC_OBJ(d);
@@ -672,6 +689,34 @@ static void oedit_disp_menu(struct descriptor_data *d)
     snprintf(regen_line, sizeof(regen_line), "%sR%s) Regen Mult  : %s%s\r\n", grn, nrm, cyn, regen_buf);
   else
     *regen_line = '\0';
+
+  if (OBJ_FLAGGED(obj, ITEM_CRAFT_TOOL)) {
+    if (crafting_is_valid_discipline(GET_OBJ_VAL(obj, 0))) {
+      tool_disc_name = crafting_discipline_name(GET_OBJ_VAL(obj, 0));
+      snprintf(craft_tool_line, sizeof(craft_tool_line),
+               "%sT%s) Craft Tool Discipline : %s%s%s (value 0)\r\n",
+               grn, nrm, cyn, tool_disc_name, nrm);
+    } else {
+      snprintf(craft_tool_line, sizeof(craft_tool_line),
+               "%sT%s) Craft Tool Discipline : %s<INVALID/UNSET>%s (value 0=%d)\r\n",
+               grn, nrm, cyn, nrm, GET_OBJ_VAL(obj, 0));
+    }
+  } else
+    *craft_tool_line = '\0';
+
+  if (OBJ_FLAGGED(obj, ITEM_CRAFT_MATERIAL)) {
+    mat_disc_name = crafting_is_valid_discipline(GET_OBJ_VAL(obj, 0)) ?
+        crafting_discipline_name(GET_OBJ_VAL(obj, 0)) : "<INVALID/UNSET>";
+    mat_tier_name = crafting_is_valid_material_tier(GET_OBJ_VAL(obj, 1)) ?
+        crafting_material_tier_name(GET_OBJ_VAL(obj, 1)) : "<INVALID/UNSET>";
+    snprintf(craft_material_line, sizeof(craft_material_line),
+             "%sY%s) Craft Material Meta   : %s%s%s / %s%s%s (disc value 0=%d, tier value 1=%d)\r\n",
+             grn, nrm,
+             cyn, mat_disc_name, nrm,
+             cyn, mat_tier_name, nrm,
+             GET_OBJ_VAL(obj, 0), GET_OBJ_VAL(obj, 1));
+  } else
+    *craft_material_line = '\0';
 
   /* Build buffers for first part of menu. */
   sprinttype(GET_OBJ_TYPE(obj), item_types, buf1, sizeof(buf1));
@@ -705,6 +750,8 @@ static void oedit_disp_menu(struct descriptor_data *d)
           "%s9%s) Cost        : %s%d\r\n"
           "%sB%s) Timer       : %s%d\r\n"
           "%s"
+          "%s"
+          "%s"
           "%sC%s) Values      : %s%d %d %d %d%s\r\n"
           "%sD%s) Applies menu\r\n"
           "%sE%s) Extra descriptions menu: %s%s%s\r\n"
@@ -721,6 +768,8 @@ static void oedit_disp_menu(struct descriptor_data *d)
           grn, nrm, cyn, GET_OBJ_COST(obj),
           grn, nrm, cyn, GET_OBJ_TIMER(obj),
           regen_line,
+          craft_tool_line,
+          craft_material_line,
           grn, nrm, cyn, GET_OBJ_VAL(obj, 0),
           GET_OBJ_VAL(obj, 1),
           GET_OBJ_VAL(obj, 2),
@@ -860,6 +909,22 @@ void oedit_parse(struct descriptor_data *d, char *arg)
       OLC_VAL(d) = 1;
       oedit_disp_val1_menu(d);
       break;
+    case 't':
+    case 'T':
+      if (!OBJ_FLAGGED(OLC_OBJ(d), ITEM_CRAFT_TOOL)) {
+        write_to_output(d, "Set CRAFT_TOOL first in extra flags.\r\n");
+        oedit_disp_menu(d);
+      } else
+        oedit_disp_craft_tool_discipline_menu(d);
+      return;
+    case 'y':
+    case 'Y':
+      if (!OBJ_FLAGGED(OLC_OBJ(d), ITEM_CRAFT_MATERIAL)) {
+        write_to_output(d, "Set CRAFT_MATERIAL first in extra flags.\r\n");
+        oedit_disp_menu(d);
+      } else
+        oedit_disp_craft_material_discipline_menu(d);
+      return;
     case 'd':
     case 'D':
       oedit_disp_prompt_apply_menu(d);
@@ -954,6 +1019,11 @@ void oedit_parse(struct descriptor_data *d, char *arg)
       break;
     else {
       TOGGLE_BIT_AR(GET_OBJ_EXTRA(OLC_OBJ(d)), (number - 1));
+      if ((number - 1) == ITEM_CRAFT_TOOL &&
+          OBJ_FLAGGED(OLC_OBJ(d), ITEM_CRAFT_TOOL)) {
+        oedit_disp_craft_tool_discipline_menu(d);
+        return;
+      }
       if ((number - 1) == ITEM_CRAFT_MATERIAL &&
           OBJ_FLAGGED(OLC_OBJ(d), ITEM_CRAFT_MATERIAL)) {
         oedit_disp_craft_material_discipline_menu(d);
@@ -1208,6 +1278,16 @@ void oedit_parse(struct descriptor_data *d, char *arg)
       return;
     }
     GET_OBJ_VAL(OLC_OBJ(d), 1) = number;
+    oedit_disp_extra_menu(d);
+    return;
+
+  case OEDIT_CRAFT_TOOL_DISCIPLINE:
+    number = atoi(arg);
+    if (!crafting_is_valid_discipline(number)) {
+      oedit_disp_craft_tool_discipline_menu(d);
+      return;
+    }
+    GET_OBJ_VAL(OLC_OBJ(d), 0) = number;
     oedit_disp_extra_menu(d);
     return;
 
