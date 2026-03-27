@@ -5,6 +5,7 @@
 #include "structs.h"
 #include "utils.h"
 #include "comm.h"
+#include "act.h"
 #include "handler.h"
 #include "interpreter.h"
 #include "spells.h"
@@ -279,30 +280,33 @@ static int scaled_enchant_modifier(int base_modifier, int stack_count_before_app
   return (base_modifier > 0) ? scaled : -scaled;
 }
 
-static int item_has_real_equip_wear_flag(const struct obj_data *obj)
+static int item_can_resolve_to_hold_slot(const struct obj_data *obj)
 {
   if (!obj)
     return FALSE;
 
-  if (CAN_WEAR((struct obj_data *)obj, ITEM_WEAR_FINGER) ||
-      CAN_WEAR((struct obj_data *)obj, ITEM_WEAR_NECK) ||
-      CAN_WEAR((struct obj_data *)obj, ITEM_WEAR_BODY) ||
-      CAN_WEAR((struct obj_data *)obj, ITEM_WEAR_HEAD) ||
-      CAN_WEAR((struct obj_data *)obj, ITEM_WEAR_LEGS) ||
-      CAN_WEAR((struct obj_data *)obj, ITEM_WEAR_FEET) ||
-      CAN_WEAR((struct obj_data *)obj, ITEM_WEAR_HANDS) ||
-      CAN_WEAR((struct obj_data *)obj, ITEM_WEAR_ARMS) ||
-      CAN_WEAR((struct obj_data *)obj, ITEM_WEAR_SHIELD) ||
-      CAN_WEAR((struct obj_data *)obj, ITEM_WEAR_ABOUT) ||
-      CAN_WEAR((struct obj_data *)obj, ITEM_WEAR_WAIST) ||
-      CAN_WEAR((struct obj_data *)obj, ITEM_WEAR_WRIST) ||
-      CAN_WEAR((struct obj_data *)obj, ITEM_WEAR_WIELD) ||
-      CAN_WEAR((struct obj_data *)obj, ITEM_WEAR_HOLD) ||
-      CAN_WEAR((struct obj_data *)obj, ITEM_WEAR_EYES) ||
-      CAN_WEAR((struct obj_data *)obj, ITEM_WEAR_EAR))
+  /*
+   * Mirror the actual HOLD entry points used by the game:
+   * - do_grab() allows objects with ITEM_WEAR_HOLD.
+   * - do_offhand() allows ITEM_WEAPON with ITEM_OFFHAND into WEAR_HOLD.
+   */
+  if (CAN_WEAR((struct obj_data *)obj, ITEM_WEAR_HOLD))
     return TRUE;
 
-  return (GET_OBJ_TYPE((struct obj_data *)obj) == ITEM_LIGHT && CAN_WEAR((struct obj_data *)obj, ITEM_WEAR_TAKE));
+  return (GET_OBJ_TYPE((struct obj_data *)obj) == ITEM_WEAPON &&
+          OBJ_FLAGGED((struct obj_data *)obj, ITEM_OFFHAND));
+}
+
+static int item_can_resolve_to_real_eq_slot(struct char_data *ch, const struct obj_data *obj)
+{
+  if (!obj)
+    return FALSE;
+
+  /* Reuse the actual wear slot resolver used by do_wear(). */
+  if (find_eq_pos(ch, (struct obj_data *)obj, NULL) >= 0)
+    return TRUE;
+
+  return item_can_resolve_to_hold_slot(obj);
 }
 
 static int item_type_is_disallowed_for_enchant(const struct obj_data *obj)
@@ -331,13 +335,13 @@ static int item_type_is_disallowed_for_enchant(const struct obj_data *obj)
   }
 }
 
-static int item_is_valid_for_enchant(const struct obj_data *obj)
+static int item_is_valid_for_enchant(struct char_data *ch, const struct obj_data *obj)
 {
   if (!obj)
     return FALSE;
   if (item_type_is_disallowed_for_enchant(obj))
     return FALSE;
-  return item_has_real_equip_wear_flag(obj);
+  return item_can_resolve_to_real_eq_slot(ch, obj);
 }
 
 static int find_free_enchant_affect_slot(const struct obj_data *obj)
@@ -348,7 +352,7 @@ static int find_free_enchant_affect_slot(const struct obj_data *obj)
     return -1;
 
   for (i = 0; i < MAX_OBJ_AFFECT; i++) {
-    if (obj->affected[i].location == APPLY_NONE && obj->affected[i].modifier == 0)
+    if (obj->affected[i].location == APPLY_NONE)
       return i;
   }
 
@@ -950,7 +954,7 @@ ACMD(do_enchant)
     return;
   }
 
-  if (!item_is_valid_for_enchant(obj)) {
+  if (!item_is_valid_for_enchant(ch, obj)) {
     send_to_char(ch, "You can only enchant equippable gear.\r\n");
     return;
   }
@@ -963,7 +967,7 @@ ACMD(do_enchant)
 
   affect_slot = find_free_enchant_affect_slot(obj);
   if (affect_slot < 0) {
-    send_to_char(ch, "There is no safe free affect slot available on that item.\r\n");
+    send_to_char(ch, "That item has no remaining space for another enchant.\r\n");
     return;
   }
 
