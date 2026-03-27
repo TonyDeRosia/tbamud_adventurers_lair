@@ -431,7 +431,7 @@ void crafting_build_enchant_tag(const struct obj_data *obj, char *out, size_t ou
   if (count <= 0)
     return;
 
-  snprintf(out, outsz, "@m[@MEn@mch@Ma@mnt@Med@m %d/%d]@n ", MIN(MAX_OBJ_ENCHANTS, count), MAX_OBJ_ENCHANTS);
+  snprintf(out, outsz, "\tm[\tMEn\tmch\tMa\tmnt\tMed\tm %d/%d]\tn ", MIN(MAX_OBJ_ENCHANTS, count), MAX_OBJ_ENCHANTS);
 }
 
 void crafting_build_enchant_recipe_summary(const struct obj_data *obj, char *out, size_t outsz)
