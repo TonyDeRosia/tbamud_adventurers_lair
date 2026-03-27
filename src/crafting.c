@@ -60,6 +60,8 @@ static const struct enchant_recipe enchant_recipes[] = {
   {NULL, NULL, 0, 0, 0, 0, 0}
 };
 
+static void sync_item_enchant_history(struct obj_data *obj);
+
 static int enchant_recipe_index_is_valid(int idx)
 {
   if (idx < 0)
@@ -67,6 +69,70 @@ static int enchant_recipe_index_is_valid(int idx)
   if ((size_t)idx >= (sizeof(enchant_recipes) / sizeof(enchant_recipes[0])))
     return FALSE;
   return enchant_recipes[idx].name != NULL;
+}
+
+int crafting_enchant_recipe_index_is_valid(int idx)
+{
+  return enchant_recipe_index_is_valid(idx);
+}
+
+int crafting_enchant_overlay_entry_is_valid(int recipe_index, int location, int modifier, int order)
+{
+  if (!enchant_recipe_index_is_valid(recipe_index))
+    return FALSE;
+  if (location <= APPLY_NONE || location >= NUM_APPLIES)
+    return FALSE;
+  if (modifier < SCHAR_MIN || modifier > SCHAR_MAX)
+    return FALSE;
+  if (order < 0 || order >= MAX_OBJ_ENCHANTS)
+    return FALSE;
+  return TRUE;
+}
+
+int crafting_sanitize_loaded_enchant_overlay(struct obj_data *obj, const char *owner_name)
+{
+  int i;
+  int dropped = 0;
+  int kept = 0;
+  struct obj_enchant_type sanitized[MAX_OBJ_ENCHANTS];
+
+  if (!obj)
+    return 0;
+
+  for (i = 0; i < MAX_OBJ_ENCHANTS; i++) {
+    int recipe_index = obj->enchants[i].recipe_index;
+    int location = obj->enchants[i].location;
+    int modifier = obj->enchants[i].modifier;
+    int order = obj->enchants[i].order;
+    int active = (i < obj->enchant_count);
+
+    if (!active)
+      continue;
+
+    if (!crafting_enchant_overlay_entry_is_valid(recipe_index, location, modifier, order)) {
+      dropped++;
+      log("SYSERR: Dropping invalid enchant overlay on '%s' (owner=%s): recipe=%d loc=%d mod=%d order=%d slot=%d",
+          obj->short_description ? obj->short_description : "<unnamed item>",
+          owner_name ? owner_name : "<unknown>",
+          recipe_index, location, modifier, order, i);
+      continue;
+    }
+
+    sanitized[kept] = obj->enchants[i];
+    sanitized[kept].order = (byte)kept;
+    kept++;
+  }
+
+  if (dropped <= 0)
+    return 0;
+
+  memset(obj->enchants, 0, sizeof(obj->enchants));
+  for (i = 0; i < kept; i++)
+    obj->enchants[i] = sanitized[i];
+  obj->enchant_count = (byte)kept;
+  sync_item_enchant_history(obj);
+
+  return dropped;
 }
 
 static int enchant_recipe_index_by_name(const char *name)

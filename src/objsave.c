@@ -447,7 +447,7 @@ void Crash_listrent(struct char_data *ch, char *name)
     break;
   }
 
-	loaded = objsave_parse_objects(fl);
+	loaded = objsave_parse_objects(fl, GET_NAME(ch));
 
 	for (current = loaded; current != NULL; current=current->next)
 	  len += snprintf(buf+len, sizeof(buf)-len, "[%5d] (%5dau) %-20s\r\n",
@@ -915,7 +915,7 @@ void Crash_save_all(void)
 /* Parses the object records stored in fl, and returns the first object in a
  * linked list, which also handles location if worn. This list can then be
  * handled by house code, listrent code, autoeq code, etc. */
-obj_save_data *objsave_parse_objects(FILE *fl)
+obj_save_data *objsave_parse_objects(FILE *fl, const char *owner_name)
 {
   obj_save_data *head, *current, *tempsave;
   char f1[128], f2[128], f3[128], f4[128], line[READ_SIZE];
@@ -949,6 +949,7 @@ obj_save_data *objsave_parse_objects(FILE *fl)
         }
       }
     else if (temp != NULL && current->obj == NULL) {
+      crafting_sanitize_loaded_enchant_overlay(temp, owner_name);
       crafting_try_migrate_legacy_enchants(temp);
       current->obj = temp;
     }
@@ -976,6 +977,7 @@ obj_save_data *objsave_parse_objects(FILE *fl)
           }
           
         if (temp) {
+          crafting_sanitize_loaded_enchant_overlay(temp, owner_name);
           crafting_try_migrate_legacy_enchants(temp);
           current->obj = temp;
           CREATE(current->next, obj_save_data, 1);
@@ -1054,12 +1056,18 @@ obj_save_data *objsave_parse_objects(FILE *fl)
         int recipe_index, location, modifier, order;
         if (sscanf(line, "%d %d %d %d", &recipe_index, &location, &modifier, &order) == 4) {
           int slot = temp->enchant_count;
-          if (slot >= 0 && slot < MAX_OBJ_ENCHANTS) {
+          if (slot >= 0 && slot < MAX_OBJ_ENCHANTS &&
+              crafting_enchant_overlay_entry_is_valid(recipe_index, location, modifier, order)) {
             temp->enchants[slot].recipe_index = recipe_index;
             temp->enchants[slot].location = (byte)location;
             temp->enchants[slot].modifier = (sbyte)modifier;
             temp->enchants[slot].order = (byte)order;
             temp->enchant_count++;
+          } else {
+            log("SYSERR: Ignoring malformed Ench line for '%s' (owner=%s): recipe=%d loc=%d mod=%d order=%d",
+                temp->short_description ? temp->short_description : "<unnamed item>",
+                owner_name ? owner_name : "<unknown>",
+                recipe_index, location, modifier, order);
           }
         }
       }
@@ -1193,7 +1201,7 @@ static int Crash_load_objs(struct char_data *ch) {
     break;
   }
 
-	loaded = objsave_parse_objects(fl);
+	loaded = objsave_parse_objects(fl, GET_NAME(ch));
 	for (current = loaded; current != NULL; current = current->next) {
 	  if (current->locate == 18) {
 	    legacy_two_neck_slots = TRUE;
