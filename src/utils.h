@@ -501,6 +501,8 @@ do                                                              \
 #define GET_TITLE(ch)   ((ch)->player.title)
 /** Level of PC or NPC. */
 #define GET_LEVEL(ch)   ((ch)->player.level)
+/** Immortal/admin no-failure test range for testing convenience. */
+#define IS_IMMORTAL_NOFAIL(ch) ((ch) && !IS_NPC(ch) && GET_LEVEL(ch) >= 101 && GET_LEVEL(ch) <= 104)
 /** Password of PC. */
 #define GET_PASSWD(ch)	((ch)->player.passwd)
 /** The player file position of PC. */

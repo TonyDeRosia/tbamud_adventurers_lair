@@ -644,7 +644,8 @@ ACMD(do_sneak)
 
   percent = rand_number(1, 101);	/* 101% is a complete failure */
 
-  if (percent > GET_SKILL(ch, SKILL_SNEAK) + dex_app_skill[GET_DEX(ch)].sneak)
+  if (!IS_IMMORTAL_NOFAIL(ch) &&
+      percent > GET_SKILL(ch, SKILL_SNEAK) + dex_app_skill[GET_DEX(ch)].sneak)
     return;
 
   new_affect(&af);
@@ -670,7 +671,8 @@ ACMD(do_hide)
 
   percent = rand_number(1, 101);	/* 101% is a complete failure */
 
-  if (percent > GET_SKILL(ch, SKILL_HIDE) + dex_app_skill[GET_DEX(ch)].hide)
+  if (!IS_IMMORTAL_NOFAIL(ch) &&
+      percent > GET_SKILL(ch, SKILL_HIDE) + dex_app_skill[GET_DEX(ch)].hide)
     return;
 
   SET_BIT_AR(AFF_FLAGS(ch), AFF_HIDE);
@@ -755,7 +757,7 @@ ACMD(do_steal)
 
       percent += GET_OBJ_WEIGHT(obj);	/* Make heavy harder */
 
-      if (percent > GET_SKILL(ch, SKILL_STEAL)) {
+      if (!IS_IMMORTAL_NOFAIL(ch) && percent > GET_SKILL(ch, SKILL_STEAL)) {
 	ohoh = TRUE;
 	send_to_char(ch, "Oops..\r\n");
 	act("$n tried to steal something from you!", FALSE, ch, 0, vict, TO_VICT);
@@ -781,7 +783,7 @@ ACMD(do_steal)
       }
     }
   } else {			/* Steal some coins */
-    if (AWAKE(vict) && (percent > GET_SKILL(ch, SKILL_STEAL))) {
+    if (!IS_IMMORTAL_NOFAIL(ch) && AWAKE(vict) && (percent > GET_SKILL(ch, SKILL_STEAL))) {
       ohoh = TRUE;
       send_to_char(ch, "Oops..\r\n");
       act("You discover that $n has $s hands in your wallet.", FALSE, ch, 0, vict, TO_VICT);

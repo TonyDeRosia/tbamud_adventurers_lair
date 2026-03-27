@@ -357,7 +357,7 @@ ACMD(do_backstab)
   percent = rand_number(1, 101);	/* 101% is a complete failure */
   prob = GET_SKILL(ch, SKILL_BACKSTAB);
 
-  if (AWAKE(vict) && (percent > prob)) {
+  if (!IS_IMMORTAL_NOFAIL(ch) && AWAKE(vict) && (percent > prob)) {
     damage(ch, vict, 0, SKILL_BACKSTAB);
     if (GET_POS(vict) > POS_DEAD)
       perform_haste_bonus_skill_hit(ch, vict, SKILL_BACKSTAB, 0);
@@ -366,7 +366,7 @@ ACMD(do_backstab)
     if (GET_POS(vict) > POS_DEAD)
       perform_haste_bonus_skill_hit(ch, vict, SKILL_BACKSTAB, -1);
   }
-  improve_ability_from_use(ch, SKILL_BACKSTAB, !(AWAKE(vict) && (percent > prob)));
+  improve_ability_from_use(ch, SKILL_BACKSTAB, !(!IS_IMMORTAL_NOFAIL(ch) && AWAKE(vict) && (percent > prob)));
 
   WAIT_STATE(ch, 2 * PULSE_VIOLENCE);
 }
@@ -633,7 +633,7 @@ ACMD(do_bash)
   if (MOB_FLAGGED(vict, MOB_NOBASH))
     percent = 101;
 
-  if (percent > prob) {
+  if (!IS_IMMORTAL_NOFAIL(ch) && percent > prob) {
     damage(ch, vict, 0, SKILL_BASH);
     if (GET_POS(vict) > POS_DEAD)
       perform_haste_bonus_skill_hit(ch, vict, SKILL_BASH, 0);
@@ -654,7 +654,7 @@ ACMD(do_bash)
         GET_POS(vict) = POS_SITTING;
     }
   }
-  improve_ability_from_use(ch, SKILL_BASH, (percent <= prob));
+  improve_ability_from_use(ch, SKILL_BASH, (IS_IMMORTAL_NOFAIL(ch) || percent <= prob));
   WAIT_STATE(ch, PULSE_VIOLENCE * 2);
 }
 
@@ -701,7 +701,7 @@ ACMD(do_rescue)
   percent = rand_number(1, 101);	/* 101% is a complete failure */
   prob = GET_SKILL(ch, SKILL_RESCUE);
 
-  if (percent > prob) {
+  if (!IS_IMMORTAL_NOFAIL(ch) && percent > prob) {
     send_to_char(ch, "You fail the rescue!\r\n");
     return;
   }
@@ -792,7 +792,7 @@ EVENTFUNC(event_whirlwind)
   /* The "return" of the event function is the time until the event is called
    * again. If we return 0, then the event is freed and removed from the list, but
    * any other numerical response will be the delay until the next call */
-  if (GET_SKILL(ch, SKILL_WHIRLWIND) < rand_number(1, 101)) {
+  if (!IS_IMMORTAL_NOFAIL(ch) && GET_SKILL(ch, SKILL_WHIRLWIND) < rand_number(1, 101)) {
     send_to_char(ch, "You stop spinning.\r\n");
     return 0;
   } else
@@ -884,7 +884,7 @@ ACMD(do_kick)
   percent = ((compute_armor(vict) / 10) * 2) + rand_number(1, 101);
   prob = GET_SKILL(ch, SKILL_KICK);
 
-  if (percent > prob) {
+  if (!IS_IMMORTAL_NOFAIL(ch) && percent > prob) {
     damage(ch, vict, 0, SKILL_KICK);
     if (GET_POS(vict) > POS_DEAD)
       perform_haste_bonus_skill_hit(ch, vict, SKILL_KICK, 0);
@@ -894,7 +894,7 @@ ACMD(do_kick)
     if (GET_POS(vict) > POS_DEAD)
       perform_haste_bonus_skill_hit(ch, vict, SKILL_KICK, kick_dam);
   }
-  improve_ability_from_use(ch, SKILL_KICK, (percent <= prob));
+  improve_ability_from_use(ch, SKILL_KICK, (IS_IMMORTAL_NOFAIL(ch) || percent <= prob));
 
   WAIT_STATE(ch, PULSE_VIOLENCE * 3);
 }
@@ -954,7 +954,7 @@ ACMD(do_appraise_enemy)
   else
     quality = 0; /* failure */
 
-  if (quality == 0) {
+  if (!IS_IMMORTAL_NOFAIL(ch) && quality == 0) {
     send_to_char(ch, "Your appraisal of %s is uncertain.\r\n", PERS(vict, ch));
     improve_ability_from_use(ch, SKILL_APPRAISE_ENEMY, 0);
     return;
@@ -1065,7 +1065,7 @@ ACMD(do_bandage)
   percent = rand_number(1, 101);        /* 101% is a complete failure */
   prob = GET_SKILL(ch, SKILL_BANDAGE);
 
-  if (percent <= prob) {
+  if (!IS_IMMORTAL_NOFAIL(ch) && percent <= prob) {
     act("Your attempt to bandage fails.", FALSE, ch, 0, 0, TO_CHAR);
     act("$n tries to bandage $N, but fails miserably.", TRUE, ch, 
       0, vict, TO_NOTVICT);

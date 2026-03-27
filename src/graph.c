@@ -165,7 +165,7 @@ ACMD(do_track)
   }
 
   /* 101 is a complete failure, no matter what the proficiency. */
-  if (rand_number(0, 101) >= GET_SKILL(ch, SKILL_TRACK)) {
+  if (!IS_IMMORTAL_NOFAIL(ch) && rand_number(0, 101) >= GET_SKILL(ch, SKILL_TRACK)) {
     int tries = 10;
     /* Find a random direction. :) */
     do {
