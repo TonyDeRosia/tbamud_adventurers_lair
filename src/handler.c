@@ -37,6 +37,7 @@ static void update_object(struct obj_data *obj, int use);
 static void affect_modify_ar(struct char_data * ch, byte loc, sbyte mod, int bitv[], bool add);
 static inline int obj_weight_runtime(struct obj_data *obj);
 static inline void clamp_carry_weight(struct char_data *ch);
+static int has_equipped_swiftness_enchant(const struct char_data *ch);
 
 static inline int obj_weight_runtime(struct obj_data *obj)
 {
@@ -53,6 +54,24 @@ static inline void clamp_carry_weight(struct char_data *ch)
 {
   if (ch && IS_CARRYING_W(ch) < 0)
     IS_CARRYING_W(ch) = 0;
+}
+
+static int has_equipped_swiftness_enchant(const struct char_data *ch)
+{
+  int wear;
+
+  if (!ch)
+    return FALSE;
+
+  for (wear = 0; wear < NUM_WEARS; wear++) {
+    const struct obj_data *eq = GET_EQ((struct char_data *)ch, wear);
+    if (!eq)
+      continue;
+    if (crafting_get_enchant_recipe_count(eq, "swiftness") > 0)
+      return TRUE;
+  }
+
+  return FALSE;
 }
 
 char *fname(const char *namelist)
@@ -344,6 +363,13 @@ void affect_total(struct char_data *ch)
   /* Reapply spell/skill affects. */
   for (af = ch->affected; af; af = af->next)
     affect_modify_ar(ch, af->location, af->modifier, af->bitvector, TRUE);
+
+  /* Derived haste state from equipped swiftness enchant overlays.
+   * Binary: at least one active swiftness overlay grants AFF_HASTE. */
+  if (has_equipped_swiftness_enchant(ch))
+    SET_BIT_AR(AFF_FLAGS(ch), AFF_HASTE);
+  else
+    REMOVE_BIT_AR(AFF_FLAGS(ch), AFF_HASTE);
 
   if (AFF_FLAGGED(ch, AFF_TRUESIGHT)) {
     SET_BIT_AR(AFF_FLAGS(ch), AFF_DETECT_INVIS);

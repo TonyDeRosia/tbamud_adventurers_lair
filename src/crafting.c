@@ -60,6 +60,15 @@ static const struct enchant_recipe enchant_recipes[] = {
   {NULL, NULL, 0, 0, 0, 0, 0}
 };
 
+static int enchant_recipe_index_is_valid(int idx)
+{
+  if (idx < 0)
+    return FALSE;
+  if ((size_t)idx >= (sizeof(enchant_recipes) / sizeof(enchant_recipes[0])))
+    return FALSE;
+  return enchant_recipes[idx].name != NULL;
+}
+
 static int enchant_recipe_index_by_name(const char *name)
 {
   int i;
@@ -153,7 +162,7 @@ static int parse_enchant_payload(const char *payload, int out[], int max_out)
     if (!*tok)
       continue;
     idx = atoi(tok);
-    if (idx < 0 || !enchant_recipes[idx].name)
+    if (!enchant_recipe_index_is_valid(idx))
       return 0;
     if (count >= max_out)
       return 0;
@@ -329,7 +338,7 @@ void crafting_build_enchant_recipe_summary(const struct obj_data *obj, char *out
   for (i = 0; i < count; i++) {
     int idx = recipes[i];
     int wrote;
-    if (idx < 0 || !enchant_recipes[idx].name)
+    if (!enchant_recipe_index_is_valid(idx))
       continue;
     wrote = snprintf(out + used, outsz - (size_t)used, "%s%s", (used == 0) ? "" : ", ", enchant_recipes[idx].name);
     if (wrote < 0 || (size_t)wrote >= outsz - (size_t)used)
@@ -377,7 +386,7 @@ void crafting_try_migrate_legacy_enchants(struct obj_data *obj)
     int same_before = 0;
 
     slot_map[i] = -1;
-    if (recipe_idx < 0 || !enchant_recipes[recipe_idx].name)
+    if (!enchant_recipe_index_is_valid(recipe_idx))
       return;
 
     for (j = 0; j < i; j++)
