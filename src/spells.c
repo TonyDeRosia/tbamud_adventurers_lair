@@ -27,6 +27,7 @@
 #include "graph.h"
 #include "race.h"
 #include "crafting.h"
+#include "modify.h"
 
 static int clampi(int v, int lo, int hi)
 {
@@ -398,6 +399,7 @@ void show_identify_item(struct char_data *ch, struct obj_data *obj, enum identif
 
   identify_send_section_header(ch, B, L, R, "Header / Identity");
   crafting_build_enchant_tag(obj, enchant_tag, sizeof(enchant_tag));
+  parse_at(enchant_tag);
   send_to_char(ch, "%s|%s %sName:%s %s%s\r\n", B, R, L, R, obj->short_description ? obj->short_description : "<None>", R);
   if (*enchant_tag)
     send_to_char(ch, "%s|%s %sEnchant:%s %s%s%s\r\n", B, R, L, R, V, enchant_tag, R);
