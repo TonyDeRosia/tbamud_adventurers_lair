@@ -44,20 +44,20 @@ enum enchant_compat_flags {
 };
 
 static const struct enchant_recipe enchant_recipes[] = {
-  {"sturdy",        "Sturdy",        1,   APPLY_AC,          -2, CRAFT_MAT_TIER_LESSER,   ENCH_COMPAT_ARMOR | ENCH_COMPAT_SHIELD},
-  {"accurate",      "Accurate",      8,   APPLY_HITROLL,      1, CRAFT_MAT_TIER_LESSER,   ENCH_COMPAT_WEAPON},
-  {"mighty",        "Mighty",        14,  APPLY_DAMROLL,      1, CRAFT_MAT_TIER_LESSER,   ENCH_COMPAT_WEAPON},
+  {"sturdy",        "Sturdy",        1,   APPLY_AC,          -2, CRAFT_MAT_TIER_LESSER,   ENCH_COMPAT_ANY_EQUIPPABLE},
+  {"accurate",      "Accurate",      8,   APPLY_HITROLL,      1, CRAFT_MAT_TIER_LESSER,   ENCH_COMPAT_ANY_EQUIPPABLE},
+  {"mighty",        "Mighty",        14,  APPLY_DAMROLL,      1, CRAFT_MAT_TIER_LESSER,   ENCH_COMPAT_ANY_EQUIPPABLE},
   {"vitality",      "Vitality",      20,  APPLY_HIT,          8, CRAFT_MAT_TIER_LESSER,   ENCH_COMPAT_ANY_EQUIPPABLE},
-  {"precision",     "Precision",     28,  APPLY_HITROLL,      2, CRAFT_MAT_TIER_GREATER,  ENCH_COMPAT_WEAPON},
-  {"slaying",       "Slaying",       36,  APPLY_DAMROLL,      2, CRAFT_MAT_TIER_GREATER,  ENCH_COMPAT_WEAPON},
-  {"fortified",     "Fortified",     44,  APPLY_AC,          -4, CRAFT_MAT_TIER_GREATER,  ENCH_COMPAT_ARMOR | ENCH_COMPAT_SHIELD},
+  {"precision",     "Precision",     28,  APPLY_HITROLL,      2, CRAFT_MAT_TIER_GREATER,  ENCH_COMPAT_ANY_EQUIPPABLE},
+  {"slaying",       "Slaying",       36,  APPLY_DAMROLL,      2, CRAFT_MAT_TIER_GREATER,  ENCH_COMPAT_ANY_EQUIPPABLE},
+  {"fortified",     "Fortified",     44,  APPLY_AC,          -4, CRAFT_MAT_TIER_GREATER,  ENCH_COMPAT_ANY_EQUIPPABLE},
   {"warding",       "Warding",       52,  APPLY_SAVING_SPELL,-1, CRAFT_MAT_TIER_GREATER,  ENCH_COMPAT_ANY_EQUIPPABLE},
   {"focus",         "Focus",         60,  APPLY_WIS,          1, CRAFT_MAT_TIER_GREATER,  ENCH_COMPAT_ANY_EQUIPPABLE},
   {"fury",          "Fury",          68,  APPLY_STR,          1, CRAFT_MAT_TIER_GREATER,  ENCH_COMPAT_ANY_EQUIPPABLE},
   {"swiftness",     "Swiftness",     76,  APPLY_DEX,          1, CRAFT_MAT_TIER_SUPERIOR, ENCH_COMPAT_ANY_EQUIPPABLE},
-  {"bulwark",       "Bulwark",       84,  APPLY_AC,          -6, CRAFT_MAT_TIER_SUPERIOR, ENCH_COMPAT_ARMOR | ENCH_COMPAT_SHIELD},
+  {"bulwark",       "Bulwark",       84,  APPLY_AC,          -6, CRAFT_MAT_TIER_SUPERIOR, ENCH_COMPAT_ANY_EQUIPPABLE},
   {"spellward",     "Spellward",     92,  APPLY_SAVING_SPELL,-2, CRAFT_MAT_TIER_SUPERIOR, ENCH_COMPAT_ANY_EQUIPPABLE},
-  {"grandmastery",  "Grandmastery",  100, APPLY_HITROLL,      3, CRAFT_MAT_TIER_SUPERIOR, ENCH_COMPAT_WEAPON},
+  {"grandmastery",  "Grandmastery",  100, APPLY_HITROLL,      3, CRAFT_MAT_TIER_SUPERIOR, ENCH_COMPAT_ANY_EQUIPPABLE},
   {NULL, NULL, 0, 0, 0, 0, 0}
 };
 
