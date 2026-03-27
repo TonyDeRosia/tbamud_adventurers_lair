@@ -921,12 +921,27 @@ static void do_stat_object(struct char_data *ch, struct obj_data *j)
   }
 
   found = FALSE;
-  send_to_char(ch, "Affections:");
+  send_to_char(ch, "Native affections:");
   for (i = 0; i < MAX_OBJ_AFFECT; i++)
     if (j->affected[i].modifier) {
       sprinttype(j->affected[i].location, apply_types, buf, sizeof(buf));
       send_to_char(ch, "%s %+d to %s", found++ ? "," : "", j->affected[i].modifier, buf);
     }
+  if (!found)
+    send_to_char(ch, " None");
+
+  found = FALSE;
+  send_to_char(ch, "\r\nEnchant overlay:");
+  for (i = 0; i < crafting_get_enchant_overlay_count(j); i++) {
+    int recipe_idx;
+    byte loc;
+    sbyte mod;
+    int order;
+    if (!crafting_get_enchant_overlay_entry(j, i, &recipe_idx, &loc, &mod, &order))
+      continue;
+    sprinttype(loc, apply_types, buf, sizeof(buf));
+    send_to_char(ch, "%s #%d %+d to %s (recipe %d)", found++ ? "," : "", order + 1, mod, buf, recipe_idx);
+  }
   if (!found)
     send_to_char(ch, " None");
 

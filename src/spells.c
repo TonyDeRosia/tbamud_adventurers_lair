@@ -377,6 +377,8 @@ void show_identify_item(struct char_data *ch, struct obj_data *obj, enum identif
   const char *Y = CCYEL(ch, C_NRM);
   const char *M = CCMAG(ch, C_NRM);
   int affect_count = 0;
+  int native_affect_count = 0;
+  int enchant_affect_count = 0;
   int flag_columns = 0;
   int enchant_count = 0;
   char enchant_tag[128];
@@ -553,10 +555,14 @@ void show_identify_item(struct char_data *ch, struct obj_data *obj, enum identif
   for (i = 0; i < MAX_OBJ_AFFECT; i++) {
     if (obj->affected[i].location != APPLY_NONE && obj->affected[i].modifier != 0) {
       affect_count++;
+      native_affect_count++;
     }
   }
+  enchant_affect_count = crafting_get_enchant_overlay_count(obj);
+  affect_count += enchant_affect_count;
 
-  snprintf(aff_summary, sizeof(aff_summary), "Item has %d modifier affect%s.", affect_count, affect_count == 1 ? "" : "s");
+  snprintf(aff_summary, sizeof(aff_summary), "Item has %d total modifier affect%s (%d native, %d enchant overlay).",
+           affect_count, affect_count == 1 ? "" : "s", native_affect_count, enchant_affect_count);
   send_to_char(ch, "%s|%s %sNotes:%s %s%s%s\r\n", B, R, L, R, M, aff_summary, R);
   enchant_count = crafting_get_enchant_count(obj);
   if (enchant_count > 0) {
@@ -570,6 +576,7 @@ void show_identify_item(struct char_data *ch, struct obj_data *obj, enum identif
     identify_send_section_header(ch, B, L, R, "Detailed Modifiers");
 
     found = FALSE;
+    send_to_char(ch, "%s|%s %sNative item modifiers:%s\r\n", B, R, V, R);
     for (i = 0; i < MAX_OBJ_AFFECT; i++) {
       if ((obj->affected[i].location != APPLY_NONE) &&
           (obj->affected[i].modifier != 0)) {
@@ -581,7 +588,26 @@ void show_identify_item(struct char_data *ch, struct obj_data *obj, enum identif
       }
     }
     if (!found)
-      send_to_char(ch, "%s|%s %sNo detailed modifiers on this item.%s\r\n", B, R, V, R);
+      send_to_char(ch, "%s|%s %sNone.%s\r\n", B, R, V, R);
+
+    found = FALSE;
+    send_to_char(ch, "%s|%s %sEnchant overlay modifiers:%s\r\n", B, R, V, R);
+    for (i = 0; i < crafting_get_enchant_overlay_count(obj); i++) {
+      int recipe_idx;
+      byte loc;
+      sbyte mod;
+      if (!crafting_get_enchant_overlay_entry(obj, i, &recipe_idx, &loc, &mod, NULL))
+        continue;
+      if (loc == APPLY_NONE || mod == 0)
+        continue;
+      sprinttype(loc, apply_types, bitbuf, sizeof(bitbuf));
+      snprintf(line, sizeof(line), "%-22.22s : %s%+d%s (layer %d)", bitbuf,
+               mod >= 0 ? G : RED, mod, R, i + 1);
+      send_to_char(ch, "%s|%s %s%s%s\r\n", B, R, V, line, R);
+      found = TRUE;
+    }
+    if (!found)
+      send_to_char(ch, "%s|%s %sNone.%s\r\n", B, R, V, R);
   }
 
   identify_send_border(ch, B, R);

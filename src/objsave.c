@@ -23,6 +23,7 @@
 #include "modify.h"
 #include "quest.h"
 #include "genolc.h" /* for strip_cr and sprintascii */
+#include "crafting.h"
 
 /* these factors should be unique integers */
 #define RENT_FACTOR    1
@@ -126,6 +127,15 @@ int objsave_save_obj_record(struct obj_data *obj, FILE *fp, int locate)
                obj->affected[counter2].location,
                obj->affected[counter2].modifier
                );
+  for (counter2 = 0; counter2 < crafting_get_enchant_overlay_count(obj); counter2++) {
+    int recipe_index;
+    byte location;
+    sbyte modifier;
+    int order;
+    if (!crafting_get_enchant_overlay_entry(obj, counter2, &recipe_index, &location, &modifier, &order))
+      continue;
+    fprintf(fp, "Ench: %d %d %d %d\n", recipe_index, location, modifier, order);
+  }
 
   /* Do we have extra descriptions? */
   if (obj->ex_description || temp->ex_description) {
@@ -938,8 +948,10 @@ obj_save_data *objsave_parse_objects(FILE *fl)
           free(current);
         }
       }
-    else if (temp != NULL && current->obj == NULL)
+    else if (temp != NULL && current->obj == NULL) {
+      crafting_try_migrate_legacy_enchants(temp);
       current->obj = temp;
+    }
     else if (temp == NULL && current->obj != NULL) {
       /* Do nothing. */
   } else if (temp != NULL && current->obj != NULL) {
@@ -964,6 +976,7 @@ obj_save_data *objsave_parse_objects(FILE *fl)
           }
           
         if (temp) {
+          crafting_try_migrate_legacy_enchants(temp);
           current->obj = temp;
           CREATE(current->next, obj_save_data, 1);
           current=current->next;
@@ -1037,6 +1050,18 @@ obj_save_data *objsave_parse_objects(FILE *fl)
         new_desc->description = fread_string(fl, error);
         new_desc->next = temp->ex_description;
         temp->ex_description = new_desc;
+      } else if (!strcmp(tag, "Ench")) {
+        int recipe_index, location, modifier, order;
+        if (sscanf(line, "%d %d %d %d", &recipe_index, &location, &modifier, &order) == 4) {
+          int slot = temp->enchant_count;
+          if (slot >= 0 && slot < MAX_OBJ_ENCHANTS) {
+            temp->enchants[slot].recipe_index = recipe_index;
+            temp->enchants[slot].location = (byte)location;
+            temp->enchants[slot].modifier = (sbyte)modifier;
+            temp->enchants[slot].order = (byte)order;
+            temp->enchant_count++;
+          }
+        }
       }
       break;
     case 'F':

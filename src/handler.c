@@ -641,6 +641,7 @@ int invalid_align(struct char_data *ch, struct obj_data *obj)
 void equip_char(struct char_data *ch, struct obj_data *obj, int pos)
 {
   int j;
+  int ench_count;
 
   if (pos < 0 || pos >= NUM_WEARS) {
     core_dump();
@@ -688,12 +689,21 @@ void equip_char(struct char_data *ch, struct obj_data *obj, int pos)
                   obj->affected[j].modifier,
                   GET_OBJ_AFFECT(obj), TRUE);
 
+  ench_count = crafting_get_enchant_overlay_count(obj);
+  for (j = 0; j < ench_count; j++) {
+    byte loc;
+    sbyte mod;
+    if (crafting_get_enchant_overlay_entry(obj, j, NULL, &loc, &mod, NULL))
+      affect_modify_ar(ch, loc, mod, GET_OBJ_AFFECT(obj), TRUE);
+  }
+
   affect_total(ch);
 }
 
 struct obj_data *unequip_char(struct char_data *ch, int pos)
 {
   int j;
+  int ench_count;
   struct obj_data *obj;
 
   if ((pos < 0 || pos >= NUM_WEARS) || GET_EQ(ch, pos) == NULL) {
@@ -722,6 +732,14 @@ struct obj_data *unequip_char(struct char_data *ch, int pos)
     affect_modify_ar(ch, obj->affected[j].location,
                   obj->affected[j].modifier,
                   GET_OBJ_AFFECT(obj), FALSE);
+
+  ench_count = crafting_get_enchant_overlay_count(obj);
+  for (j = 0; j < ench_count; j++) {
+    byte loc;
+    sbyte mod;
+    if (crafting_get_enchant_overlay_entry(obj, j, NULL, &loc, &mod, NULL))
+      affect_modify_ar(ch, loc, mod, GET_OBJ_AFFECT(obj), FALSE);
+  }
 
   affect_total(ch);
 

@@ -709,6 +709,7 @@ void clanedit_parse(struct descriptor_data *d, char *arg);
 #define MAX_SKILLS            270    /**< Max number of skills/spells */
 #define MAX_AFFECT            32     /**< Max number of player affections */
 #define MAX_OBJ_AFFECT        6      /**< Max object affects */
+#define MAX_OBJ_ENCHANTS      4      /**< Max enchant overlay entries */
 #define MAX_NOTE_LENGTH       4000   /**< Max length of text on a note obj */
 #define MAX_LAST_ENTRIES      6000   /**< Max log entries?? */
 #define MAX_HELP_KEYWORDS     256    /**< Max length of help keyword string */
@@ -808,6 +809,14 @@ struct obj_affected_type
   sbyte modifier; /**< How much it changes by              */
 };
 
+struct obj_enchant_type
+{
+  sh_int recipe_index; /**< Enchant recipe index (crafting.c table index) */
+  byte location;       /**< APPLY_XXX affected by this enchant */
+  sbyte modifier;      /**< Final scaled modifier for this enchant */
+  byte order;          /**< Application order (0-based) */
+};
+
 /** The Object structure. */
 struct obj_data
 {
@@ -816,6 +825,8 @@ struct obj_data
 
   struct obj_flag_data obj_flags;  /**< Object information            */
   struct obj_affected_type affected[MAX_OBJ_AFFECT]; /**< affects */
+  byte enchant_count; /**< Number of enchant overlay entries */
+  struct obj_enchant_type enchants[MAX_OBJ_ENCHANTS]; /**< enchant overlays */
 
   char *name;        /**< Keyword reference(s) for object. */
   char *description; /**< Shown when the object is lying in a room. */
