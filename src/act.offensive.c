@@ -123,6 +123,30 @@ static int appraise_is_undead(struct char_data *vict)
   return FALSE;
 }
 
+static int g_haste_bonus_skill_hit_active = 0;
+
+static void perform_haste_bonus_skill_hit(struct char_data *ch, struct char_data *vict,
+                                          int skill_attacktype, int dam)
+{
+  if (!ch || !vict)
+    return;
+  if (g_haste_bonus_skill_hit_active)
+    return;
+  if (!AFF_FLAGGED(ch, AFF_HASTE))
+    return;
+  if (IN_ROOM(ch) == NOWHERE || IN_ROOM(ch) != IN_ROOM(vict))
+    return;
+  if (GET_POS(ch) < POS_FIGHTING || GET_POS(vict) <= POS_DEAD)
+    return;
+
+  g_haste_bonus_skill_hit_active = 1;
+  if (dam >= 0)
+    damage(ch, vict, dam, skill_attacktype);
+  else
+    hit(ch, vict, skill_attacktype);
+  g_haste_bonus_skill_hit_active = 0;
+}
+
 ACMD(do_assist)
 {
   char arg[MAX_INPUT_LENGTH];
@@ -333,10 +357,15 @@ ACMD(do_backstab)
   percent = rand_number(1, 101);	/* 101% is a complete failure */
   prob = GET_SKILL(ch, SKILL_BACKSTAB);
 
-  if (AWAKE(vict) && (percent > prob))
+  if (AWAKE(vict) && (percent > prob)) {
     damage(ch, vict, 0, SKILL_BACKSTAB);
-  else
+    if (GET_POS(vict) > POS_DEAD)
+      perform_haste_bonus_skill_hit(ch, vict, SKILL_BACKSTAB, 0);
+  } else {
     hit(ch, vict, SKILL_BACKSTAB);
+    if (GET_POS(vict) > POS_DEAD)
+      perform_haste_bonus_skill_hit(ch, vict, SKILL_BACKSTAB, -1);
+  }
   improve_ability_from_use(ch, SKILL_BACKSTAB, !(AWAKE(vict) && (percent > prob)));
 
   WAIT_STATE(ch, 2 * PULSE_VIOLENCE);
@@ -606,6 +635,8 @@ ACMD(do_bash)
 
   if (percent > prob) {
     damage(ch, vict, 0, SKILL_BASH);
+    if (GET_POS(vict) > POS_DEAD)
+      perform_haste_bonus_skill_hit(ch, vict, SKILL_BASH, 0);
     GET_POS(ch) = POS_SITTING;
   } else {
     /*
@@ -614,7 +645,10 @@ ACMD(do_bash)
      * first to make sure they don't flee, then we can't bash them!  So now
      * we only set them sitting if they didn't flee. -gg 9/21/98
      */
-    if (damage(ch, vict, 1, SKILL_BASH) > 0) {	/* -1 = dead, 0 = miss */
+    int bash_result = damage(ch, vict, 1, SKILL_BASH);
+    if (GET_POS(vict) > POS_DEAD)
+      perform_haste_bonus_skill_hit(ch, vict, SKILL_BASH, 1);
+    if (bash_result > 0) {	/* -1 = dead, 0 = miss */
       WAIT_STATE(vict, PULSE_VIOLENCE);
       if (IN_ROOM(ch) == IN_ROOM(vict))
         GET_POS(vict) = POS_SITTING;
@@ -852,8 +886,14 @@ ACMD(do_kick)
 
   if (percent > prob) {
     damage(ch, vict, 0, SKILL_KICK);
-  } else
-    damage(ch, vict, GET_LEVEL(ch) / 2, SKILL_KICK);
+    if (GET_POS(vict) > POS_DEAD)
+      perform_haste_bonus_skill_hit(ch, vict, SKILL_KICK, 0);
+  } else {
+    int kick_dam = GET_LEVEL(ch) / 2;
+    damage(ch, vict, kick_dam, SKILL_KICK);
+    if (GET_POS(vict) > POS_DEAD)
+      perform_haste_bonus_skill_hit(ch, vict, SKILL_KICK, kick_dam);
+  }
   improve_ability_from_use(ch, SKILL_KICK, (percent <= prob));
 
   WAIT_STATE(ch, PULSE_VIOLENCE * 3);

@@ -2848,6 +2848,10 @@ void perform_violence(void)
     auto_assist_owned_followers(ch);
 
     hit(ch, FIGHTING(ch), TYPE_UNDEFINED);
+    if (FIGHTING(ch) &&
+        IN_ROOM(ch) == IN_ROOM(FIGHTING(ch)) &&
+        AFF_FLAGGED(ch, AFF_HASTE))
+      hit(ch, FIGHTING(ch), TYPE_UNDEFINED);
     
     do_offhand_attack(ch, FIGHTING(ch));
     if (FIGHTING(ch))
