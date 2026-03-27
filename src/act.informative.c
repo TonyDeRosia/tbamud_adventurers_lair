@@ -78,12 +78,12 @@ static const char *score_cond_label(int cond);
 #include "fight.h"
 #include "modify.h"
 #include "asciimap.h"
+#include "crafting.h"
 #include "quest.h"
 #include "boards.h"
 #include "shop.h"
 #include "spec_procs.h"
 #include "criticalhits.h"
-#include "crafting.h"
 
 static void build_visible_target_tags(struct char_data *viewer, struct char_data *target,
                                       char *out, size_t outsz, int include_afk);
@@ -3020,6 +3020,7 @@ ACMD(do_affects)
   int i, j;
   int added_hidden_drain = 0;
   int affect_count = 0;
+  int swiftness_haste_chance = 0;
 
   enum { AFF_PROLONGED_TICK_THRESHOLD = 6 };
 
@@ -3039,7 +3040,7 @@ ACMD(do_affects)
 
   if (affect_count > 0)
     CREATE(seen, const struct affected_type *, affect_count);
-  CREATE(buff_entries, struct aff_display_entry, MAX(affect_count, 1));
+  CREATE(buff_entries, struct aff_display_entry, MAX(affect_count + 1, 1));
   CREATE(debuff_entries, struct aff_display_entry, (affect_count * 2) + 4);
 
   for (af = ch->affected; af; af = af->next) {
@@ -3131,6 +3132,17 @@ ACMD(do_affects)
       } else
         j++;
     }
+  }
+
+  swiftness_haste_chance = crafting_get_swiftness_haste_chance(ch);
+  if (swiftness_haste_chance > 0 && buff_count < MAX(affect_count + 1, 1)) {
+    struct aff_display_entry e;
+    memset(&e, 0, sizeof(e));
+    snprintf(e.name, sizeof(e.name), "haste");
+    snprintf(e.mods, sizeof(e.mods), "swiftness enchant: %d%% extra strike chance", swiftness_haste_chance);
+    e.max_duration = -1;
+    e.count = 1;
+    buff_entries[buff_count++] = e;
   }
 
   any_buff = (buff_count > 0);
@@ -5606,6 +5618,7 @@ ACMD(do_saffects)
   int seen_count = 0;
   int skills = 0, spells = 0, any = 0;
   int item_effects = 0;
+  int swiftness_haste_chance = 0;
 
   if (!ch || IS_NPC(ch)) {
     send_to_char(ch, "Not for mobiles.\r\n");
@@ -5668,6 +5681,13 @@ ACMD(do_saffects)
 
     format_affect_duration(max_duration, dur, sizeof(dur));
     send_to_char(ch, "%-7s : %s (%s)\r\n", kind, name, dur);
+  }
+
+  swiftness_haste_chance = crafting_get_swiftness_haste_chance(ch);
+  if (swiftness_haste_chance > 0) {
+    send_to_char(ch, "%-7s : haste (swiftness enchant, %d%% extra strike chance)\r\n",
+                 "Buff", swiftness_haste_chance);
+    any = 1;
   }
 
   send_to_char(ch, "\r\nEquipment effects:\r\n");

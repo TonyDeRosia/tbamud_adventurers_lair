@@ -351,8 +351,9 @@ void clanedit_parse(struct descriptor_data *d, char *arg);
 #define AFF_ADRENALINE     58
 #define AFF_CLARITY        59
 #define AFF_INFUSED        60
+#define AFF_HASTE          61
 /** Total number of affect flags */
-#define NUM_AFF_FLAGS   61
+#define NUM_AFF_FLAGS   62
 
 /* Modes of connectedness: used by descriptor_data.state                */
 #define CON_PLAYING       0 /**< Playing - Nominal state                */

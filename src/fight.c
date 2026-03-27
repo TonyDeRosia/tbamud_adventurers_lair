@@ -28,6 +28,7 @@
 #include "shop.h"
 #include "quest.h"
 #include "criticalhits.h"
+#include "crafting.h"
 
 #define PVP_GLORY_COOLDOWN 600 /* seconds */
 
@@ -1738,6 +1739,19 @@ int skill_message(int dam, struct char_data *ch, struct char_data *vict,
 
 static int g_offhand_attack = 0;
 
+static int haste_extra_attack_chance(struct char_data *ch)
+{
+  int swiftness_chance = crafting_get_swiftness_haste_chance(ch);
+
+  if (!ch)
+    return 0;
+
+  if (AFF_FLAGGED(ch, AFF_HASTE))
+    return 100;
+
+  return swiftness_chance;
+}
+
 static int can_offhand_attack(struct char_data *ch)
 {
   struct obj_data *prim = GET_EQ(ch, WEAR_WIELD);
@@ -2850,6 +2864,11 @@ void perform_violence(void)
     hit(ch, FIGHTING(ch), TYPE_UNDEFINED);
     
     do_offhand_attack(ch, FIGHTING(ch));
+    if (FIGHTING(ch)) {
+      int haste_chance = haste_extra_attack_chance(ch);
+      if (haste_chance > 0 && rand_number(1, 100) <= haste_chance)
+        hit(ch, FIGHTING(ch), TYPE_UNDEFINED);
+    }
     if (FIGHTING(ch))
       do_spirit_procs(ch, FIGHTING(ch));
 
