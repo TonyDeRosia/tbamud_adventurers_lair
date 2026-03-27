@@ -331,6 +331,7 @@ const char *affected_bits[] =
   "ADRENALINE",
   "CLARITY",
   "INFUSED",
+  "HASTE",
   "\n"
 };
 
