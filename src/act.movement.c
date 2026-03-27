@@ -1072,7 +1072,7 @@ static int ok_pick(struct char_data *ch, obj_vnum keynum, int pickproof, int scm
     send_to_char(ch, "Odd - you can't seem to find a keyhole.\r\n");
   else if (pickproof)
     send_to_char(ch, "It resists your attempts to pick it.\r\n");
-  else if (percent > skill_lvl)
+  else if (!IS_IMMORTAL_NOFAIL(ch) && percent > skill_lvl)
     send_to_char(ch, "You failed to pick the lock.\r\n");
   else
     return (1);

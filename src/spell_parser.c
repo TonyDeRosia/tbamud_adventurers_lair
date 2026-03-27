@@ -2506,14 +2506,16 @@ ACMD(do_spellup)
     }
 
     any_attempted = TRUE;
-    if (AFF_FLAGGED(ch, AFF_SPELLLOCK) && rand_number(1, 100) <= 40) {
+    if (!IS_IMMORTAL_NOFAIL(ch) &&
+        AFF_FLAGGED(ch, AFF_SPELLLOCK) && rand_number(1, 100) <= 40) {
       send_to_char(ch, "Your concentration shatters and the spell fizzles!\r\n");
       WAIT_STATE(ch, PULSE_VIOLENCE);
       if (mana > 0)
         GET_MANA(ch) = MAX(0, MIN(effective_max_mana(ch), GET_MANA(ch) - mana));
       continue;
     }
-    if (rand_number(0, 101) > GET_SKILL(ch, spellnum)) {
+    if (!IS_IMMORTAL_NOFAIL(ch) &&
+        rand_number(0, 101) > GET_SKILL(ch, spellnum)) {
       WAIT_STATE(ch, PULSE_VIOLENCE);
       if (!tch || !skill_message(0, ch, tch, spellnum))
         send_to_char(ch, "You lost your concentration!\r\n");
@@ -2808,7 +2810,8 @@ ACMD(do_cast) {
     return;
   }
 
-  if (AFF_FLAGGED(ch, AFF_SPELLLOCK) && rand_number(1, 100) <= 40) {
+  if (!IS_IMMORTAL_NOFAIL(ch) &&
+      AFF_FLAGGED(ch, AFF_SPELLLOCK) && rand_number(1, 100) <= 40) {
     send_to_char(ch, "Your concentration shatters and the spell fizzles!\r\n");
     WAIT_STATE(ch, PULSE_VIOLENCE);
     if (mana > 0)
@@ -2817,7 +2820,8 @@ ACMD(do_cast) {
   }
 
   /* You throws the dice and you takes your chances.. 101% is total failure */
-  if (rand_number(1, 100) > GET_SKILL(ch, spellnum)) {
+  if (!IS_IMMORTAL_NOFAIL(ch) &&
+      rand_number(1, 100) > GET_SKILL(ch, spellnum)) {
     WAIT_STATE(ch, PULSE_VIOLENCE);
     if (!tch || !skill_message(0, ch, tch, spellnum))
       send_to_char(ch, "You lost your concentration!\r\n");

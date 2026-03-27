@@ -828,6 +828,9 @@ static int profession_roll_success(struct char_data *ch, int core, int mastery, 
 {
   int chance;
 
+  if (IS_IMMORTAL_NOFAIL(ch))
+    return TRUE;
+
   chance = GET_SKILL(ch, core);
   chance += GET_SKILL(ch, mastery) / 2;
   chance -= difficulty;
@@ -1426,8 +1429,8 @@ ACMD(do_enchant)
   if (!profession_roll_success(ch, SKILL_ENCHANTING, SKILL_ENCHANTING_MASTERY, difficulty)) {
     craft_fail_consume(ch, CRAFT_DISC_ENCHANTING, 1, rand_number(1, 100));
     if (attempt_number == MAX_OBJ_ENCHANTS && rand_number(1, 100) <= fourth_enchant_fail_destroy_pct) {
-      act("@rThe unbound magical energy overloads $p and tears it apart!@n", FALSE, ch, obj, 0, TO_CHAR);
-      act("@rThe unbound magical energy overloads $p and tears it apart!@n", TRUE, ch, obj, 0, TO_ROOM);
+      act("\trThe unbound magical energy overloads $p and tears it apart!\tn", FALSE, ch, obj, 0, TO_CHAR);
+      act("\trThe unbound magical energy overloads $p and tears it apart!\tn", TRUE, ch, obj, 0, TO_ROOM);
       extract_obj(obj);
       return;
     }
