@@ -200,6 +200,8 @@ extern const char *nrm, *grn, *cyn, *yel;
 #define OEDIT_DELETE                    27
 #define OEDIT_COPY                      28
 #define OEDIT_REGEN_MULT                29
+#define OEDIT_CRAFT_MATERIAL_DISCIPLINE 30
+#define OEDIT_CRAFT_MATERIAL_TIER       31
 
 /* Submodes of REDIT connectedness. */
 #define REDIT_MAIN_MENU 		1

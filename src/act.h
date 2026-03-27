@@ -272,6 +272,7 @@ ACMD(do_study);
 ACMD(do_scribe);
 ACMD(do_brew);
 ACMD(do_enchant);
+ACMD(do_disenchant);
 ACMD(do_learn);
 ACMD(do_practice);
 ACMD(do_buypractice);

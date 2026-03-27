@@ -25,19 +25,42 @@
 static const int enchant_attempt_penalty[MAX_ITEM_ENCHANTS] = {0, 15, 35, 60};
 static const int enchant_stack_scale_pct[MAX_ITEM_ENCHANTS] = {100, 75, 50, 25};
 static const int fourth_enchant_fail_destroy_pct = 35;
+static const char *crafting_discipline_name(int disc);
+static const char *crafting_material_tier_name(int tier);
 
 struct enchant_recipe {
   const char *name;
-  int apply_loc;
-  int modifier;
+  const char *label;
   int min_level;
+  int apply_loc;
+  int base_modifier;
+  int required_tier;
+  int compat_flags;
+};
+
+enum enchant_compat_flags {
+  ENCH_COMPAT_ANY_EQUIPPABLE = 1 << 0,
+  ENCH_COMPAT_WEAPON         = 1 << 1,
+  ENCH_COMPAT_ARMOR          = 1 << 2,
+  ENCH_COMPAT_SHIELD         = 1 << 3
 };
 
 static const struct enchant_recipe enchant_recipes[] = {
-  {"sturdy", APPLY_AC, -5, 1},
-  {"accurate", APPLY_HITROLL, 1, 10},
-  {"keen", APPLY_DAMROLL, 1, 15},
-  {NULL, 0, 0, 0}
+  {"sturdy",        "Sturdy",        1,   APPLY_AC,          -2, CRAFT_MAT_TIER_LESSER,   ENCH_COMPAT_ARMOR | ENCH_COMPAT_SHIELD},
+  {"accurate",      "Accurate",      8,   APPLY_HITROLL,      1, CRAFT_MAT_TIER_LESSER,   ENCH_COMPAT_WEAPON},
+  {"mighty",        "Mighty",        14,  APPLY_DAMROLL,      1, CRAFT_MAT_TIER_LESSER,   ENCH_COMPAT_WEAPON},
+  {"vitality",      "Vitality",      20,  APPLY_HIT,          8, CRAFT_MAT_TIER_LESSER,   ENCH_COMPAT_ANY_EQUIPPABLE},
+  {"precision",     "Precision",     28,  APPLY_HITROLL,      2, CRAFT_MAT_TIER_GREATER,  ENCH_COMPAT_WEAPON},
+  {"slaying",       "Slaying",       36,  APPLY_DAMROLL,      2, CRAFT_MAT_TIER_GREATER,  ENCH_COMPAT_WEAPON},
+  {"fortified",     "Fortified",     44,  APPLY_AC,          -4, CRAFT_MAT_TIER_GREATER,  ENCH_COMPAT_ARMOR | ENCH_COMPAT_SHIELD},
+  {"warding",       "Warding",       52,  APPLY_SAVING_SPELL,-1, CRAFT_MAT_TIER_GREATER,  ENCH_COMPAT_ANY_EQUIPPABLE},
+  {"focus",         "Focus",         60,  APPLY_WIS,          1, CRAFT_MAT_TIER_GREATER,  ENCH_COMPAT_ANY_EQUIPPABLE},
+  {"fury",          "Fury",          68,  APPLY_STR,          1, CRAFT_MAT_TIER_GREATER,  ENCH_COMPAT_ANY_EQUIPPABLE},
+  {"swiftness",     "Swiftness",     76,  APPLY_DEX,          1, CRAFT_MAT_TIER_SUPERIOR, ENCH_COMPAT_ANY_EQUIPPABLE},
+  {"bulwark",       "Bulwark",       84,  APPLY_AC,          -6, CRAFT_MAT_TIER_SUPERIOR, ENCH_COMPAT_ARMOR | ENCH_COMPAT_SHIELD},
+  {"spellward",     "Spellward",     92,  APPLY_SAVING_SPELL,-2, CRAFT_MAT_TIER_SUPERIOR, ENCH_COMPAT_ANY_EQUIPPABLE},
+  {"grandmastery",  "Grandmastery",  100, APPLY_HITROLL,      3, CRAFT_MAT_TIER_SUPERIOR, ENCH_COMPAT_WEAPON},
+  {NULL, NULL, 0, 0, 0, 0, 0}
 };
 
 static int enchant_recipe_index_by_name(const char *name)
@@ -359,6 +382,103 @@ static int find_free_enchant_affect_slot(const struct obj_data *obj)
   return -1;
 }
 
+static int recipe_is_compatible_with_item(const struct enchant_recipe *recipe, const struct obj_data *obj)
+{
+  int type;
+  int is_armor_like;
+
+  if (!recipe || !obj)
+    return FALSE;
+
+  if (recipe->compat_flags & ENCH_COMPAT_ANY_EQUIPPABLE)
+    return TRUE;
+
+  type = GET_OBJ_TYPE((struct obj_data *)obj);
+  is_armor_like = (type == ITEM_ARMOR || type == ITEM_WORN);
+
+  if ((recipe->compat_flags & ENCH_COMPAT_WEAPON) && type == ITEM_WEAPON)
+    return TRUE;
+  if ((recipe->compat_flags & ENCH_COMPAT_SHIELD) && type == ITEM_ARMOR &&
+      CAN_WEAR((struct obj_data *)obj, ITEM_WEAR_SHIELD))
+    return TRUE;
+  if ((recipe->compat_flags & ENCH_COMPAT_ARMOR) && is_armor_like && !CAN_WEAR((struct obj_data *)obj, ITEM_WEAR_WIELD))
+    return TRUE;
+
+  return FALSE;
+}
+
+static int item_disenchant_effect_score(const struct obj_data *obj)
+{
+  int i, score = 0;
+  int enchant_count = 0;
+
+  if (!obj)
+    return 0;
+
+  for (i = 0; i < MAX_OBJ_AFFECT; i++) {
+    int loc = obj->affected[i].location;
+    int mod = obj->affected[i].modifier;
+    if (loc == APPLY_NONE || mod == 0)
+      continue;
+    score += 4;
+    score += MIN(12, abs(mod) / 2);
+  }
+
+  enchant_count = crafting_get_enchant_count(obj);
+  if (enchant_count > 0)
+    score += enchant_count * 6;
+
+  if (crafting_is_item_enchanted(obj))
+    score += 4;
+
+  if (OBJ_FLAGGED((struct obj_data *)obj, ITEM_MAGIC))
+    score += 6;
+
+  return score;
+}
+
+static int disenchant_tier_from_score(int score)
+{
+  if (score >= 28)
+    return CRAFT_MAT_TIER_SUPERIOR;
+  if (score >= 12)
+    return CRAFT_MAT_TIER_GREATER;
+  return CRAFT_MAT_TIER_LESSER;
+}
+
+static struct obj_data *create_craft_material_item(int discipline, int tier)
+{
+  struct obj_data *obj;
+  const char *tier_name = crafting_material_tier_name(tier);
+  char name_buf[MAX_INPUT_LENGTH];
+  char short_buf[MAX_INPUT_LENGTH];
+  char desc_buf[MAX_INPUT_LENGTH];
+
+  obj = create_obj();
+  if (!obj)
+    return NULL;
+
+  snprintf(name_buf, sizeof(name_buf), "%s %s material crafting", tier_name, crafting_discipline_name(discipline));
+  snprintf(short_buf, sizeof(short_buf), "a %s %s material", tier_name, crafting_discipline_name(discipline));
+  snprintf(desc_buf, sizeof(desc_buf), "A %s %s material has been left here.", tier_name, crafting_discipline_name(discipline));
+
+  obj->item_number = NOTHING;
+  obj->name = strdup(name_buf);
+  obj->short_description = strdup(short_buf);
+  obj->description = strdup(desc_buf);
+  obj->obj_flags.type_flag = ITEM_OTHER;
+  SET_BIT_AR(obj->obj_flags.wear_flags, ITEM_WEAR_TAKE);
+  SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_CRAFT_MATERIAL);
+  GET_OBJ_VAL(obj, 0) = discipline;
+  GET_OBJ_VAL(obj, 1) = tier;
+  GET_OBJ_VAL(obj, 2) = 0;
+  GET_OBJ_VAL(obj, 3) = 0;
+  obj->obj_flags.weight = 1;
+  obj->obj_flags.cost = 10 * tier;
+
+  return obj;
+}
+
 static int get_scroll_spells(const struct obj_data *obj, int out[], int max_out)
 {
   const char *payload;
@@ -453,23 +573,54 @@ static int has_prof_tool(struct char_data *ch, int disc)
   return FALSE;
 }
 
-static struct obj_data *find_prof_material(struct char_data *ch, int disc)
+static const char *crafting_discipline_name(int disc)
 {
-  struct obj_data *obj;
-  for (obj = ch->carrying; obj; obj = obj->next_content)
-    if (OBJ_FLAGGED(obj, ITEM_CRAFT_MATERIAL) && GET_OBJ_VAL(obj, 0) == disc)
-      return obj;
-  return NULL;
+  switch (disc) {
+  case CRAFT_DISC_SCRIBING:   return "scribing";
+  case CRAFT_DISC_ALCHEMY:    return "alchemy";
+  case CRAFT_DISC_ENCHANTING: return "enchanting";
+  default:                    return "unknown";
+  }
 }
 
-static int consume_prof_materials(struct char_data *ch, int disc, int needed, int preserve_one)
+static const char *crafting_material_tier_name(int tier)
+{
+  switch (tier) {
+  case CRAFT_MAT_TIER_LESSER:   return "lesser";
+  case CRAFT_MAT_TIER_GREATER:  return "greater";
+  case CRAFT_MAT_TIER_SUPERIOR: return "superior";
+  default:                      return "unknown";
+  }
+}
+
+static int is_matching_material(const struct obj_data *obj, int disc, int min_tier)
+{
+  if (!obj || !OBJ_FLAGGED((struct obj_data *)obj, ITEM_CRAFT_MATERIAL))
+    return FALSE;
+  if (GET_OBJ_VAL((struct obj_data *)obj, 0) != disc)
+    return FALSE;
+  return GET_OBJ_VAL((struct obj_data *)obj, 1) >= min_tier;
+}
+
+static int count_prof_materials(struct char_data *ch, int disc, int min_tier)
+{
+  int count = 0;
+  struct obj_data *obj;
+
+  for (obj = ch->carrying; obj; obj = obj->next_content)
+    if (is_matching_material(obj, disc, min_tier))
+      count++;
+  return count;
+}
+
+static int consume_prof_materials(struct char_data *ch, int disc, int min_tier, int needed, int preserve_one)
 {
   int consumed = 0;
   struct obj_data *obj, *next;
 
   for (obj = ch->carrying; obj && consumed < needed; obj = next) {
     next = obj->next_content;
-    if (!OBJ_FLAGGED(obj, ITEM_CRAFT_MATERIAL) || GET_OBJ_VAL(obj, 0) != disc)
+    if (!is_matching_material(obj, disc, min_tier))
       continue;
     if (preserve_one && consumed == needed - 1)
       break;
@@ -706,7 +857,7 @@ static void craft_fail_consume(struct char_data *ch, int disc, int needed, int s
   }
 
   if (!saved)
-    consume_prof_materials(ch, disc, needed, FALSE);
+    consume_prof_materials(ch, disc, CRAFT_MAT_TIER_LESSER, needed, FALSE);
 }
 
 ACMD(do_scribe)
@@ -779,16 +930,9 @@ ACMD(do_scribe)
     return;
   }
 
-  {
-    int have = 0;
-    struct obj_data *obj;
-    for (obj = ch->carrying; obj; obj = obj->next_content)
-      if (OBJ_FLAGGED(obj, ITEM_CRAFT_MATERIAL) && GET_OBJ_VAL(obj, 0) == CRAFT_DISC_SCRIBING)
-        have++;
-    if (have < count) {
-      send_to_char(ch, "You lack enough scribing materials (%d needed).\r\n", count);
-      return;
-    }
+  if (count_prof_materials(ch, CRAFT_DISC_SCRIBING, CRAFT_MAT_TIER_LESSER) < count) {
+    send_to_char(ch, "You lack enough scribing materials (%d lesser-tier or better needed).\r\n", count);
+    return;
   }
 
   difficulty = get_scroll_difficulty(spells, count);
@@ -798,7 +942,7 @@ ACMD(do_scribe)
     return;
   }
 
-  consume_prof_materials(ch, CRAFT_DISC_SCRIBING, count, (GET_SKILL(ch, SKILL_EFFICIENT_CRAFTING) > 0 && rand_number(1, 100) <= MIN(35, GET_SKILL(ch, SKILL_EFFICIENT_CRAFTING) / 2)));
+  consume_prof_materials(ch, CRAFT_DISC_SCRIBING, CRAFT_MAT_TIER_LESSER, count, (GET_SKILL(ch, SKILL_EFFICIENT_CRAFTING) > 0 && rand_number(1, 100) <= MIN(35, GET_SKILL(ch, SKILL_EFFICIENT_CRAFTING) / 2)));
 
   made = create_crafted_scroll(ch, spells, count);
   obj_to_char(made, ch);
@@ -876,8 +1020,8 @@ ACMD(do_brew)
     send_to_char(ch, "You cannot brew %s.\r\n", skill_name(spellnum));
     return;
   }
-  if (!find_prof_material(ch, CRAFT_DISC_ALCHEMY)) {
-    send_to_char(ch, "You need alchemical materials.\r\n");
+  if (count_prof_materials(ch, CRAFT_DISC_ALCHEMY, CRAFT_MAT_TIER_LESSER) < 1) {
+    send_to_char(ch, "You need alchemical materials (lesser-tier or better).\r\n");
     return;
   }
 
@@ -889,7 +1033,7 @@ ACMD(do_brew)
     return;
   }
 
-  consume_prof_materials(ch, CRAFT_DISC_ALCHEMY, 1, (GET_SKILL(ch, SKILL_EFFICIENT_CRAFTING) > 0 && rand_number(1, 100) <= MIN(35, GET_SKILL(ch, SKILL_EFFICIENT_CRAFTING) / 2)));
+  consume_prof_materials(ch, CRAFT_DISC_ALCHEMY, CRAFT_MAT_TIER_LESSER, 1, (GET_SKILL(ch, SKILL_EFFICIENT_CRAFTING) > 0 && rand_number(1, 100) <= MIN(35, GET_SKILL(ch, SKILL_EFFICIENT_CRAFTING) / 2)));
 
   p = create_obj();
   p->item_number = NOTHING;
@@ -919,12 +1063,26 @@ ACMD(do_enchant)
 
   two_arguments(argument, recipe, item_name);
   if (!*recipe || !str_cmp(recipe, "list")) {
-    send_to_char(ch, "Available enchant recipes:\r\n");
-    for (found = 0; enchant_recipes[found].name; found++)
-      send_to_char(ch, "  %-10s (lvl %d)\r\n", enchant_recipes[found].name, enchant_recipes[found].min_level);
-    send_to_char(ch, "Usage: enchant <recipe> <item>\r\n");
-    send_to_char(ch, "Rules: only equippable gear can be enchanted; max %d enchants per item.\r\n", MAX_ITEM_ENCHANTS);
-    send_to_char(ch, "Higher enchant counts are riskier. A failed 4th enchant can destroy the item.\r\n");
+    send_to_char(ch, "Enchanting guide:\r\n");
+    send_to_char(ch, "  Recipes unlock by enchanting skill (1-100), not by known spells.\r\n");
+    send_to_char(ch, "  Materials are obtained via: disenchant <item>\r\n");
+    send_to_char(ch, "  Material tiers: lesser, greater, superior\r\n");
+    send_to_char(ch, "  Max enchant applications per item: %d\r\n", MAX_ITEM_ENCHANTS);
+    send_to_char(ch, "  Higher enchant counts are riskier; failed 4th attempts may destroy the item.\r\n");
+    send_to_char(ch, "\r\n");
+    send_to_char(ch, "Usage:\r\n");
+    send_to_char(ch, "  enchant list\r\n");
+    send_to_char(ch, "  enchant <recipe> <item>\r\n");
+    send_to_char(ch, "\r\n");
+    send_to_char(ch, "Unlocked recipes:\r\n");
+    for (found = 0; enchant_recipes[found].name; found++) {
+      if (GET_SKILL(ch, SKILL_ENCHANTING) < enchant_recipes[found].min_level)
+        continue;
+      send_to_char(ch, "  %-12s lvl %-3d mat:%-8s\r\n",
+                   enchant_recipes[found].name,
+                   enchant_recipes[found].min_level,
+                   crafting_material_tier_name(enchant_recipes[found].required_tier));
+    }
     return;
   }
 
@@ -948,6 +1106,11 @@ ACMD(do_enchant)
     send_to_char(ch, "Unknown enchant recipe. Use 'enchant list'.\r\n");
     return;
   }
+  if (GET_SKILL(ch, SKILL_ENCHANTING) < enchant_recipes[found].min_level) {
+    send_to_char(ch, "You need enchanting skill %d for %s.\r\n",
+                 enchant_recipes[found].min_level, enchant_recipes[found].name);
+    return;
+  }
 
   if (!(obj = get_obj_in_list_vis(ch, item_name, NULL, ch->carrying))) {
     send_to_char(ch, "You don't seem to have %s %s.\r\n", AN(item_name), item_name);
@@ -956,6 +1119,10 @@ ACMD(do_enchant)
 
   if (!item_is_valid_for_enchant(ch, obj)) {
     send_to_char(ch, "You can only enchant equippable gear.\r\n");
+    return;
+  }
+  if (!recipe_is_compatible_with_item(&enchant_recipes[found], obj)) {
+    send_to_char(ch, "That recipe is not compatible with this item type.\r\n");
     return;
   }
 
@@ -972,14 +1139,15 @@ ACMD(do_enchant)
   }
 
   same_recipe_count = crafting_get_enchant_recipe_count(obj, enchant_recipes[found].name);
-  scaled_modifier = scaled_enchant_modifier(enchant_recipes[found].modifier, same_recipe_count);
+  scaled_modifier = scaled_enchant_modifier(enchant_recipes[found].base_modifier, same_recipe_count);
   if (scaled_modifier == 0) {
     send_to_char(ch, "That enchant cannot be applied safely right now.\r\n");
     return;
   }
 
-  if (!find_prof_material(ch, CRAFT_DISC_ENCHANTING)) {
-    send_to_char(ch, "You need enchanting materials.\r\n");
+  if (count_prof_materials(ch, CRAFT_DISC_ENCHANTING, enchant_recipes[found].required_tier) < 1) {
+    send_to_char(ch, "You need %s enchanting materials for that recipe.\r\n",
+                 crafting_material_tier_name(enchant_recipes[found].required_tier));
     return;
   }
 
@@ -997,7 +1165,7 @@ ACMD(do_enchant)
     return;
   }
 
-  consume_prof_materials(ch, CRAFT_DISC_ENCHANTING, 1, (GET_SKILL(ch, SKILL_EFFICIENT_CRAFTING) > 0 && rand_number(1, 100) <= MIN(35, GET_SKILL(ch, SKILL_EFFICIENT_CRAFTING) / 2)));
+  consume_prof_materials(ch, CRAFT_DISC_ENCHANTING, enchant_recipes[found].required_tier, 1, (GET_SKILL(ch, SKILL_EFFICIENT_CRAFTING) > 0 && rand_number(1, 100) <= MIN(35, GET_SKILL(ch, SKILL_EFFICIENT_CRAFTING) / 2)));
 
   obj->affected[affect_slot].location = enchant_recipes[found].apply_loc;
   obj->affected[affect_slot].modifier = scaled_modifier;
@@ -1005,6 +1173,50 @@ ACMD(do_enchant)
   SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_MAGIC);
   act("You complete the enchantment on $p.", FALSE, ch, obj, 0, TO_CHAR);
   act("$n completes an enchantment on $p.", TRUE, ch, obj, 0, TO_ROOM);
+}
+
+ACMD(do_disenchant)
+{
+  char item_name[MAX_INPUT_LENGTH];
+  struct obj_data *obj;
+  struct obj_data *material;
+  int score, tier;
+
+  one_argument(argument, item_name);
+  if (!*item_name) {
+    send_to_char(ch, "Usage: disenchant <item>\r\n");
+    send_to_char(ch, "Disenchant destroys magical/effect-bearing items and yields enchanting materials.\r\n");
+    return;
+  }
+
+  if (GET_SKILL(ch, SKILL_ENCHANTING) <= 0) {
+    send_to_char(ch, "You have no training in enchanting.\r\n");
+    return;
+  }
+
+  if (!(obj = get_obj_in_list_vis(ch, item_name, NULL, ch->carrying))) {
+    send_to_char(ch, "You don't seem to have %s %s.\r\n", AN(item_name), item_name);
+    return;
+  }
+
+  score = item_disenchant_effect_score(obj);
+  if (score <= 0) {
+    send_to_char(ch, "That item has no meaningful magical essence to extract.\r\n");
+    return;
+  }
+
+  tier = disenchant_tier_from_score(score);
+  material = create_craft_material_item(CRAFT_DISC_ENCHANTING, tier);
+  if (!material) {
+    send_to_char(ch, "Disenchanting fails unexpectedly.\r\n");
+    return;
+  }
+
+  act("You unravel $p into raw arcane essence.", FALSE, ch, obj, 0, TO_CHAR);
+  act("$n unravels $p into raw arcane essence.", TRUE, ch, obj, 0, TO_ROOM);
+  extract_obj(obj);
+  obj_to_char(material, ch);
+  send_to_char(ch, "You extract %s enchanting material.\r\n", crafting_material_tier_name(tier));
 }
 
 int crafting_try_recite_tome(struct char_data *ch, char *argument)

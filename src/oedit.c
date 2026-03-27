@@ -24,6 +24,7 @@
 #include "dg_olc.h"
 #include "fight.h"
 #include "modify.h"
+#include "crafting.h"
 
 /* local functions */
 static void oedit_setup_new(struct descriptor_data *d);
@@ -45,6 +46,8 @@ static void oedit_disp_menu(struct descriptor_data *d);
 static void oedit_disp_perm_menu(struct descriptor_data *d);
 static void oedit_save_to_disk(int zone_num);
 static int oedit_type_supports_regen_mult(int obj_type);
+static void oedit_disp_craft_material_discipline_menu(struct descriptor_data *d);
+static void oedit_disp_craft_material_tier_prompt(struct descriptor_data *d);
 
 /* handy macro */
 #define S_PRODUCT(s, i) ((s)->producing[(i)])
@@ -52,6 +55,28 @@ static int oedit_type_supports_regen_mult(int obj_type);
 static int oedit_type_supports_regen_mult(int obj_type)
 {
   return (obj_type == ITEM_FURNITURE || obj_type == ITEM_WEAPON);
+}
+
+static void oedit_disp_craft_material_discipline_menu(struct descriptor_data *d)
+{
+  OLC_MODE(d) = OEDIT_CRAFT_MATERIAL_DISCIPLINE;
+  write_to_output(d,
+      "\r\nCraft material discipline (stored in value 0):\r\n"
+      "  1) Scribing\r\n"
+      "  2) Alchemy\r\n"
+      "  3) Enchanting\r\n"
+      "Enter discipline (1-3): ");
+}
+
+static void oedit_disp_craft_material_tier_prompt(struct descriptor_data *d)
+{
+  OLC_MODE(d) = OEDIT_CRAFT_MATERIAL_TIER;
+  write_to_output(d,
+      "Craft material tier (stored in value 1):\r\n"
+      "  1) Lesser\r\n"
+      "  2) Greater\r\n"
+      "  3) Superior\r\n"
+      "Enter tier (1-3): ");
 }
 
 /* Utility and exported functions */
@@ -929,6 +954,11 @@ void oedit_parse(struct descriptor_data *d, char *arg)
       break;
     else {
       TOGGLE_BIT_AR(GET_OBJ_EXTRA(OLC_OBJ(d)), (number - 1));
+      if ((number - 1) == ITEM_CRAFT_MATERIAL &&
+          OBJ_FLAGGED(OLC_OBJ(d), ITEM_CRAFT_MATERIAL)) {
+        oedit_disp_craft_material_discipline_menu(d);
+        return;
+      }
       oedit_disp_extra_menu(d);
       return;
     }
@@ -1159,6 +1189,26 @@ void oedit_parse(struct descriptor_data *d, char *arg)
   case OEDIT_APPLYMOD:
     OLC_OBJ(d)->affected[OLC_VAL(d)].modifier = atoi(arg);
     oedit_disp_prompt_apply_menu(d);
+    return;
+
+  case OEDIT_CRAFT_MATERIAL_DISCIPLINE:
+    number = atoi(arg);
+    if (number < CRAFT_DISC_SCRIBING || number > CRAFT_DISC_ENCHANTING) {
+      oedit_disp_craft_material_discipline_menu(d);
+      return;
+    }
+    GET_OBJ_VAL(OLC_OBJ(d), 0) = number;
+    oedit_disp_craft_material_tier_prompt(d);
+    return;
+
+  case OEDIT_CRAFT_MATERIAL_TIER:
+    number = atoi(arg);
+    if (number < CRAFT_MAT_TIER_LESSER || number > CRAFT_MAT_TIER_SUPERIOR) {
+      oedit_disp_craft_material_tier_prompt(d);
+      return;
+    }
+    GET_OBJ_VAL(OLC_OBJ(d), 1) = number;
+    oedit_disp_extra_menu(d);
     return;
 
   case OEDIT_EXTRADESC_KEY:
