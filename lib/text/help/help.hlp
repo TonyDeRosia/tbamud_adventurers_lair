@@ -7966,19 +7966,38 @@ Type: Profession Command
 Usage:
   enchant list
   enchant <recipe> <item>
+  disenchant <item>
 
 Notes:
 - Only equippable gear may be enchanted.
 - Items can hold up to 4 enchant applications.
 - Higher enchant counts are significantly riskier.
 - A failed 4th enchant attempt may destroy the item.
+- Recipes unlock by enchanting profession skill level (1-100).
+- Enchanting uses enchanting materials by tier: lesser, greater, superior.
+- Disenchanting a magical/effect-bearing item destroys it and yields enchanting material.
 
-Current recipes:
-  sturdy
-  accurate
-  keen
+Use 'enchant list' to view currently unlocked recipes.
 
-See also: LEARN PRACTICE CRAFT
+See also: LEARN PRACTICE CRAFT DISENCHANT
+#0
+
+DISENCHANT
+
+Disenchant (Crafting)
+Type: Profession Command
+
+Usage:
+  disenchant <item>
+
+Notes:
+- Requires enchanting profession training.
+- The target item must have meaningful magical/effect value.
+- Successful disenchant destroys the item and grants enchanting material.
+- Weak magic yields lesser material, stronger magic yields greater,
+  and highly-enhanced or powerful magical items yield superior material.
+
+See also: ENCHANT CRAFT
 #0
 
 ENCHANT-WEAPON

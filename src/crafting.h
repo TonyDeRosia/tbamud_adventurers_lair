@@ -10,9 +10,14 @@ struct obj_data;
 #define CRAFT_DISC_ALCHEMY    2
 #define CRAFT_DISC_ENCHANTING 3
 
+#define CRAFT_MAT_TIER_LESSER   1
+#define CRAFT_MAT_TIER_GREATER  2
+#define CRAFT_MAT_TIER_SUPERIOR 3
+
 void do_scribe(struct char_data *ch, char *argument, int cmd, int subcmd);
 void do_brew(struct char_data *ch, char *argument, int cmd, int subcmd);
 void do_enchant(struct char_data *ch, char *argument, int cmd, int subcmd);
+void do_disenchant(struct char_data *ch, char *argument, int cmd, int subcmd);
 
 int crafting_try_recite_tome(struct char_data *ch, char *argument);
 int crafting_handle_tome_put(struct char_data *ch, struct obj_data *obj, struct obj_data *cont);
