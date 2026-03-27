@@ -2943,7 +2943,7 @@ static int send_equipment_affect_display(struct char_data *ch)
 {
   int slot;
   int shown = 0;
-  int has_swiftness_overlay = FALSE;
+  int derived_haste = FALSE;
 
   if (!ch)
     return 0;
@@ -2962,9 +2962,6 @@ static int send_equipment_affect_display(struct char_data *ch)
 
     if (!obj)
       continue;
-
-    if (crafting_get_enchant_recipe_count(obj, "swiftness") > 0)
-      has_swiftness_overlay = TRUE;
 
     effects[0] = '\0';
 
@@ -3008,7 +3005,8 @@ static int send_equipment_affect_display(struct char_data *ch)
     shown++;
   }
 
-  if (has_swiftness_overlay) {
+  derived_haste = AFF_FLAGGED(ch, AFF_HASTE) && !affected_by_spell(ch, SPELL_HASTE);
+  if (derived_haste) {
     send_to_char(ch, "  [Enchant] haste\r\n");
     shown++;
   }

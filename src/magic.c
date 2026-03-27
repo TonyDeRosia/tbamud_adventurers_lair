@@ -996,6 +996,13 @@ void mag_affects(int level, struct char_data *ch, struct char_data *victim,
     refresh_on_recast = TRUE;
     break;
 
+  case SPELL_HASTE:
+    af[0].duration = spell_dur_short(level);
+    af[0].location = APPLY_NONE;
+    SET_BIT_AR(af[0].bitvector, AFF_HASTE);
+    refresh_on_recast = TRUE;
+    break;
+
   case SPELL_CLARITY:
     af[0].duration = spell_dur_medium(level);
     af[0].location = APPLY_INT;
