@@ -670,6 +670,11 @@ static const struct cast_message cast_messages[] = {
     "$n surges with adrenaline!",
     NULL
   },
+  [SPELL_HASTE] = {
+    "You move with supernatural speed!",
+    "$n blurs with supernatural speed!",
+    NULL
+  },
   [SPELL_CLARITY] = {
     "Your mind sharpens to perfect clarity!",
     "$n's eyes clear with magical clarity!",
@@ -3189,6 +3194,10 @@ void mag_assign_spells(void) {
   spello(SPELL_ADRENALINE_SURGE, "adrenaline surge", 15, 15, 0, POS_STANDING,
   TAR_CHAR_ROOM | TAR_SELF_ONLY, FALSE, MAG_AFFECTS,
   "The adrenaline rush leaves your body.");
+
+  spello(SPELL_HASTE, "haste", 20, 20, 0, POS_STANDING,
+  TAR_CHAR_ROOM, FALSE, MAG_AFFECTS,
+  "You slow back down to normal speed.");
 
   spello(SPELL_CLARITY, "clarity", 20, 20, 0, POS_STANDING,
   TAR_CHAR_ROOM, FALSE, MAG_AFFECTS,

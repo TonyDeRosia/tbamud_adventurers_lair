@@ -2263,6 +2263,7 @@ void init_spell_levels(void)
   spell_level(SPELL_BARKSKIN, CLASS_DRUID, 26);
   spell_level(SPELL_GIANT_STRENGTH, CLASS_WARRIOR, 20);
   spell_level(SPELL_ADRENALINE_SURGE, CLASS_WARRIOR, 24);
+  spell_level(SPELL_HASTE, CLASS_MAGIC_USER, 24);
   spell_level(SPELL_CLARITY, CLASS_MYSTIC, 20);
   spell_level(SPELL_MARK_OF_DEATH, CLASS_WARLOCK, 32);
   spell_level(SPELL_BLOODLUST, CLASS_WARLOCK, 36);
