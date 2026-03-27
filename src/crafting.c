@@ -61,6 +61,7 @@ static const struct enchant_recipe enchant_recipes[] = {
 };
 
 static void sync_item_enchant_history(struct obj_data *obj);
+static int remove_exdesc_value(struct obj_data *obj, const char *key);
 
 static int enchant_recipe_index_is_valid(int idx)
 {
@@ -94,6 +95,7 @@ int crafting_sanitize_loaded_enchant_overlay(struct obj_data *obj, const char *o
   int i;
   int dropped = 0;
   int kept = 0;
+  int removed_legacy = 0;
   struct obj_enchant_type sanitized[MAX_OBJ_ENCHANTS];
 
   if (!obj)
@@ -123,16 +125,32 @@ int crafting_sanitize_loaded_enchant_overlay(struct obj_data *obj, const char *o
     kept++;
   }
 
-  if (dropped <= 0)
-    return 0;
+  if (dropped > 0 || obj->enchant_count != kept) {
+    memset(obj->enchants, 0, sizeof(obj->enchants));
+    for (i = 0; i < kept; i++)
+      obj->enchants[i] = sanitized[i];
+    obj->enchant_count = (byte)kept;
+  }
 
-  memset(obj->enchants, 0, sizeof(obj->enchants));
-  for (i = 0; i < kept; i++)
-    obj->enchants[i] = sanitized[i];
-  obj->enchant_count = (byte)kept;
-  sync_item_enchant_history(obj);
+  /*
+   * Hybrid legacy+overlay save states are normalized at load:
+   * once valid overlay entries exist, old legacy exdesc metadata is stripped
+   * so migration/application cannot run from both systems.
+   */
+  if (kept > 0) {
+    removed_legacy += remove_exdesc_value(obj, CRAFT_ENCHANT_MARK_KEY);
+    removed_legacy += remove_exdesc_value(obj, CRAFT_ENCHANT_LIST_KEY);
+    if (removed_legacy > 0) {
+      log("Normalizing hybrid enchant state on '%s' (owner=%s): removed %d legacy enchant exdesc entr%s (overlay=%d)",
+          obj->short_description ? obj->short_description : "<unnamed item>",
+          owner_name ? owner_name : "<unknown>",
+          removed_legacy, removed_legacy == 1 ? "y" : "ies", kept);
+    }
+  } else if (dropped > 0) {
+    sync_item_enchant_history(obj);
+  }
 
-  return dropped;
+  return dropped + removed_legacy;
 }
 
 static int enchant_recipe_index_by_name(const char *name)
@@ -161,6 +179,38 @@ static const char *find_exdesc_value(const struct obj_data *obj, const char *key
       return ex->description;
 
   return NULL;
+}
+
+static int remove_exdesc_value(struct obj_data *obj, const char *key)
+{
+  struct extra_descr_data *ex, *prev = NULL;
+  int removed = 0;
+
+  if (!obj || !key)
+    return 0;
+
+  ex = obj->ex_description;
+  while (ex) {
+    struct extra_descr_data *next = ex->next;
+    if (ex->keyword && !strcmp(ex->keyword, key)) {
+      if (prev)
+        prev->next = next;
+      else
+        obj->ex_description = next;
+
+      if (ex->keyword)
+        free(ex->keyword);
+      if (ex->description)
+        free(ex->description);
+      free(ex);
+      removed++;
+    } else {
+      prev = ex;
+    }
+    ex = next;
+  }
+
+  return removed;
 }
 
 static void set_exdesc_value(struct obj_data *obj, const char *key, const char *value)
