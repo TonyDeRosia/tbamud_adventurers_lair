@@ -20,10 +20,9 @@
 #define MAX_SCRIBE_SPELLS 4
 #define MAX_CRAFT_PAYLOAD 256
 #define MAX_POTION_STACK 100
-#define MAX_ITEM_ENCHANTS 4
 
-static const int enchant_attempt_penalty[MAX_ITEM_ENCHANTS] = {0, 15, 35, 60};
-static const int enchant_stack_scale_pct[MAX_ITEM_ENCHANTS] = {100, 75, 50, 25};
+static const int enchant_attempt_penalty[MAX_OBJ_ENCHANTS] = {0, 15, 35, 60};
+static const int enchant_stack_scale_pct[MAX_OBJ_ENCHANTS] = {100, 75, 50, 25};
 static const int fourth_enchant_fail_destroy_pct = 35;
 
 struct enchant_recipe {
@@ -183,10 +182,18 @@ static void build_spell_payload(const int spells[], int count, char *out, size_t
 
 static int get_item_enchant_history(const struct obj_data *obj, int out[], int max_out)
 {
+  int i;
   const char *payload;
 
   if (!obj || !out || max_out <= 0)
     return 0;
+
+  if (obj->enchant_count > 0) {
+    int count = MIN((int)obj->enchant_count, max_out);
+    for (i = 0; i < count; i++)
+      out[i] = obj->enchants[i].recipe_index;
+    return count;
+  }
 
   payload = find_exdesc_value(obj, CRAFT_ENCHANT_LIST_KEY);
   if (!payload || !*payload)
@@ -195,41 +202,86 @@ static int get_item_enchant_history(const struct obj_data *obj, int out[], int m
   return parse_enchant_payload(payload, out, max_out);
 }
 
-static void append_item_enchant_history(struct obj_data *obj, int recipe_index)
+static void sync_item_enchant_history(struct obj_data *obj)
 {
-  int recipes[MAX_ITEM_ENCHANTS];
+  int recipes[MAX_OBJ_ENCHANTS] = {0};
   int count;
   char payload[MAX_CRAFT_PAYLOAD];
 
-  if (!obj || recipe_index < 0 || !enchant_recipes[recipe_index].name)
+  if (!obj)
     return;
 
-  count = get_item_enchant_history(obj, recipes, MAX_ITEM_ENCHANTS);
-  if (count < 0 || count >= MAX_ITEM_ENCHANTS)
-    return;
-
-  recipes[count++] = recipe_index;
+  count = MIN((int)obj->enchant_count, MAX_OBJ_ENCHANTS);
+  if (count > 0) {
+    int i;
+    for (i = 0; i < count; i++)
+      recipes[i] = obj->enchants[i].recipe_index;
+  }
   build_spell_payload(recipes, count, payload, sizeof(payload));
   set_exdesc_value(obj, CRAFT_ENCHANT_LIST_KEY, payload);
-  set_exdesc_value(obj, CRAFT_ENCHANT_MARK_KEY, "1");
+  set_exdesc_value(obj, CRAFT_ENCHANT_MARK_KEY, count > 0 ? "1" : "0");
+}
+
+static int append_item_enchant_overlay(struct obj_data *obj, int recipe_index, int location, int modifier)
+{
+  int slot;
+
+  if (!obj || recipe_index < 0 || !enchant_recipes[recipe_index].name)
+    return FALSE;
+  if (obj->enchant_count >= MAX_OBJ_ENCHANTS)
+    return FALSE;
+
+  slot = obj->enchant_count;
+  obj->enchants[slot].recipe_index = recipe_index;
+  obj->enchants[slot].location = (byte)location;
+  obj->enchants[slot].modifier = (sbyte)modifier;
+  obj->enchants[slot].order = (byte)slot;
+  obj->enchant_count++;
+  sync_item_enchant_history(obj);
+
+  return TRUE;
+}
+
+int crafting_get_enchant_overlay_count(const struct obj_data *obj)
+{
+  if (!obj)
+    return 0;
+  return MIN((int)obj->enchant_count, MAX_OBJ_ENCHANTS);
+}
+
+int crafting_get_enchant_overlay_entry(const struct obj_data *obj, int index, int *recipe_index, byte *location, sbyte *modifier, int *order)
+{
+  if (!obj || index < 0 || index >= crafting_get_enchant_overlay_count(obj))
+    return FALSE;
+
+  if (recipe_index)
+    *recipe_index = obj->enchants[index].recipe_index;
+  if (location)
+    *location = obj->enchants[index].location;
+  if (modifier)
+    *modifier = obj->enchants[index].modifier;
+  if (order)
+    *order = obj->enchants[index].order;
+
+  return TRUE;
 }
 
 int crafting_get_enchant_count(const struct obj_data *obj)
 {
-  int recipes[MAX_ITEM_ENCHANTS];
-  return get_item_enchant_history(obj, recipes, MAX_ITEM_ENCHANTS);
+  int recipes[MAX_OBJ_ENCHANTS];
+  return get_item_enchant_history(obj, recipes, MAX_OBJ_ENCHANTS);
 }
 
 int crafting_get_enchant_recipe_count(const struct obj_data *obj, const char *recipe_name)
 {
-  int recipes[MAX_ITEM_ENCHANTS];
+  int recipes[MAX_OBJ_ENCHANTS];
   int i, count, idx, found = 0;
 
   idx = enchant_recipe_index_by_name(recipe_name);
   if (idx < 0)
     return 0;
 
-  count = get_item_enchant_history(obj, recipes, MAX_ITEM_ENCHANTS);
+  count = get_item_enchant_history(obj, recipes, MAX_OBJ_ENCHANTS);
   for (i = 0; i < count; i++)
     if (recipes[i] == idx)
       found++;
@@ -260,12 +312,12 @@ void crafting_build_enchant_tag(const struct obj_data *obj, char *out, size_t ou
   if (count <= 0)
     return;
 
-  snprintf(out, outsz, "@m[@MEn@mch@Ma@mnt@Med@m %d/%d]@n ", MIN(MAX_ITEM_ENCHANTS, count), MAX_ITEM_ENCHANTS);
+  snprintf(out, outsz, "@m[@MEn@mch@Ma@mnt@Med@m %d/%d]@n ", MIN(MAX_OBJ_ENCHANTS, count), MAX_OBJ_ENCHANTS);
 }
 
 void crafting_build_enchant_recipe_summary(const struct obj_data *obj, char *out, size_t outsz)
 {
-  int recipes[MAX_ITEM_ENCHANTS];
+  int recipes[MAX_OBJ_ENCHANTS];
   int i, count;
   int used = 0;
 
@@ -273,7 +325,7 @@ void crafting_build_enchant_recipe_summary(const struct obj_data *obj, char *out
     return;
   out[0] = '\0';
 
-  count = get_item_enchant_history(obj, recipes, MAX_ITEM_ENCHANTS);
+  count = get_item_enchant_history(obj, recipes, MAX_OBJ_ENCHANTS);
   for (i = 0; i < count; i++) {
     int idx = recipes[i];
     int wrote;
@@ -293,12 +345,98 @@ static int scaled_enchant_modifier(int base_modifier, int stack_count_before_app
   if (base_modifier == 0)
     return 0;
 
-  scale_idx = MAX(0, MIN(MAX_ITEM_ENCHANTS - 1, stack_count_before_apply));
+  scale_idx = MAX(0, MIN(MAX_OBJ_ENCHANTS - 1, stack_count_before_apply));
   pct = enchant_stack_scale_pct[scale_idx];
   scaled = (abs(base_modifier) * pct + 99) / 100;
   if (scaled <= 0)
     scaled = 1;
   return (base_modifier > 0) ? scaled : -scaled;
+}
+
+void crafting_try_migrate_legacy_enchants(struct obj_data *obj)
+{
+  int recipes[MAX_OBJ_ENCHANTS];
+  int expected_loc[MAX_OBJ_ENCHANTS];
+  int expected_mod[MAX_OBJ_ENCHANTS];
+  int slot_map[MAX_OBJ_ENCHANTS];
+  int i, j, count;
+  const struct obj_data *proto = NULL;
+
+  if (!obj || obj->enchant_count > 0)
+    return;
+
+  count = get_item_enchant_history(obj, recipes, MAX_OBJ_ENCHANTS);
+  if (count <= 0)
+    return;
+
+  if (GET_OBJ_RNUM(obj) != NOTHING)
+    proto = &obj_proto[GET_OBJ_RNUM(obj)];
+
+  for (i = 0; i < count; i++) {
+    int recipe_idx = recipes[i];
+    int same_before = 0;
+
+    slot_map[i] = -1;
+    if (recipe_idx < 0 || !enchant_recipes[recipe_idx].name)
+      return;
+
+    for (j = 0; j < i; j++)
+      if (recipes[j] == recipe_idx)
+        same_before++;
+
+    expected_loc[i] = enchant_recipes[recipe_idx].apply_loc;
+    expected_mod[i] = scaled_enchant_modifier(enchant_recipes[recipe_idx].base_modifier, same_before);
+    if (expected_mod[i] == 0)
+      return;
+  }
+
+  for (i = 0; i < count; i++) {
+    int best = -1;
+    int k;
+
+    for (j = 0; j < MAX_OBJ_AFFECT; j++) {
+      int used = FALSE;
+      int proto_diff = TRUE;
+
+      if (obj->affected[j].location != expected_loc[i] || obj->affected[j].modifier != expected_mod[i])
+        continue;
+
+      for (k = 0; k < i; k++) {
+        if (slot_map[k] == j) {
+          used = TRUE;
+          break;
+        }
+      }
+      if (used)
+        continue;
+
+      if (proto) {
+        if (proto->affected[j].location == obj->affected[j].location &&
+            proto->affected[j].modifier == obj->affected[j].modifier)
+          proto_diff = FALSE;
+      }
+
+      if (proto_diff) {
+        best = j;
+        break;
+      }
+
+      if (best < 0)
+        best = j;
+    }
+
+    if (best < 0)
+      return;
+
+    slot_map[i] = best;
+  }
+
+  for (i = 0; i < count; i++) {
+    if (!append_item_enchant_overlay(obj, recipes[i], expected_loc[i], expected_mod[i]))
+      return;
+    obj->affected[slot_map[i]].location = APPLY_NONE;
+    obj->affected[slot_map[i]].modifier = 0;
+  }
 }
 
 static int item_can_resolve_to_hold_slot(const struct obj_data *obj)
@@ -365,21 +503,6 @@ static int item_is_valid_for_enchant(struct char_data *ch, const struct obj_data
   return item_can_resolve_to_real_eq_slot(ch, obj);
 }
 
-static int find_free_enchant_affect_slot(const struct obj_data *obj)
-{
-  int i;
-
-  if (!obj)
-    return -1;
-
-  for (i = 0; i < MAX_OBJ_AFFECT; i++) {
-    if (obj->affected[i].location == APPLY_NONE)
-      return i;
-  }
-
-  return -1;
-}
-
 static int recipe_is_compatible_with_item(const struct enchant_recipe *recipe, const struct obj_data *obj)
 {
   int type;
@@ -420,6 +543,17 @@ static int item_disenchant_effect_score(const struct obj_data *obj)
       continue;
     score += 4;
     score += MIN(12, abs(mod) / 2);
+  }
+
+  for (i = 0; i < crafting_get_enchant_overlay_count(obj); i++) {
+    byte loc;
+    sbyte mod;
+    if (!crafting_get_enchant_overlay_entry(obj, i, NULL, &loc, &mod, NULL))
+      continue;
+    if (loc == APPLY_NONE || mod == 0)
+      continue;
+    score += 4;
+    score += MIN(12, abs((int)mod) / 2);
   }
 
   enchant_count = crafting_get_enchant_count(obj);
@@ -1077,7 +1211,7 @@ ACMD(do_enchant)
   char recipe[MAX_INPUT_LENGTH], item_name[MAX_INPUT_LENGTH];
   int found = -1;
   int difficulty;
-  int existing_count, same_recipe_count, scaled_modifier, affect_slot;
+  int existing_count, same_recipe_count, scaled_modifier;
   int attempt_number;
   struct obj_data *obj;
 
@@ -1119,6 +1253,7 @@ ACMD(do_enchant)
     send_to_char(ch, "You don't seem to have %s %s.\r\n", AN(item_name), item_name);
     return;
   }
+  crafting_try_migrate_legacy_enchants(obj);
 
   if (!item_is_valid_for_enchant(ch, obj)) {
     send_to_char(ch, "You can only enchant equippable gear.\r\n");
@@ -1130,14 +1265,8 @@ ACMD(do_enchant)
   }
 
   existing_count = crafting_get_enchant_count(obj);
-  if (existing_count >= MAX_ITEM_ENCHANTS) {
+  if (existing_count >= MAX_OBJ_ENCHANTS) {
     send_to_char(ch, "That item cannot hold any more enchantments.\r\n");
-    return;
-  }
-
-  affect_slot = find_free_enchant_affect_slot(obj);
-  if (affect_slot < 0) {
-    send_to_char(ch, "That item has no remaining space for another enchant.\r\n");
     return;
   }
 
@@ -1158,24 +1287,25 @@ ACMD(do_enchant)
   difficulty = 20 + enchant_recipes[found].min_level + enchant_attempt_penalty[existing_count];
   if (!profession_roll_success(ch, SKILL_ENCHANTING, SKILL_ENCHANTING_MASTERY, difficulty)) {
     craft_fail_consume(ch, CRAFT_DISC_ENCHANTING, 1, rand_number(1, 100));
-    if (attempt_number == MAX_ITEM_ENCHANTS && rand_number(1, 100) <= fourth_enchant_fail_destroy_pct) {
-      act("@rArcane energies detonate around $p, reducing it to ash!@n", FALSE, ch, obj, 0, TO_CHAR);
-      act("@rArcane energies detonate around $p, reducing it to ash!@n", TRUE, ch, obj, 0, TO_ROOM);
+    if (attempt_number == MAX_OBJ_ENCHANTS && rand_number(1, 100) <= fourth_enchant_fail_destroy_pct) {
+      act("@rThe unbound magical energy overloads $p and tears it apart!@n", FALSE, ch, obj, 0, TO_CHAR);
+      act("@rThe unbound magical energy overloads $p and tears it apart!@n", TRUE, ch, obj, 0, TO_ROOM);
       extract_obj(obj);
       return;
     }
-    send_to_char(ch, "The enchantment collapses.\r\n");
+    send_to_char(ch, "The dust flashes into raw magical energy, then destabilizes and collapses.\r\n");
     return;
   }
 
   consume_prof_materials(ch, CRAFT_DISC_ENCHANTING, enchant_recipes[found].required_tier, 1, (GET_SKILL(ch, SKILL_EFFICIENT_CRAFTING) > 0 && rand_number(1, 100) <= MIN(35, GET_SKILL(ch, SKILL_EFFICIENT_CRAFTING) / 2)));
 
-  obj->affected[affect_slot].location = enchant_recipes[found].apply_loc;
-  obj->affected[affect_slot].modifier = scaled_modifier;
-  append_item_enchant_history(obj, found);
+  if (!append_item_enchant_overlay(obj, found, enchant_recipes[found].apply_loc, scaled_modifier)) {
+    send_to_char(ch, "That item cannot hold any more enchantments.\r\n");
+    return;
+  }
   SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_MAGIC);
-  act("You complete the enchantment on $p.", FALSE, ch, obj, 0, TO_CHAR);
-  act("$n completes an enchantment on $p.", TRUE, ch, obj, 0, TO_ROOM);
+  act("The dust on $p dissipates into raw magical energy, flows into it, and stabilizes into a new pattern.", FALSE, ch, obj, 0, TO_CHAR);
+  act("Dust around $p dissolves into raw magical energy and sinks into the item as $n's enchantment stabilizes.", TRUE, ch, obj, 0, TO_ROOM);
 }
 
 ACMD(do_disenchant)
@@ -1188,7 +1318,7 @@ ACMD(do_disenchant)
   one_argument(argument, item_name);
   if (!*item_name) {
     send_to_char(ch, "Usage: disenchant <item>\r\n");
-    send_to_char(ch, "Disenchant destroys magical/effect-bearing items and yields enchanting dust.\r\n");
+    send_to_char(ch, "Disenchant unravels magical/effect-bearing items into condensed enchanting dust.\r\n");
     return;
   }
 
@@ -1202,6 +1332,7 @@ ACMD(do_disenchant)
     send_to_char(ch, "You don't seem to have %s %s.\r\n", AN(item_name), item_name);
     return;
   }
+  crafting_try_migrate_legacy_enchants(obj);
 
   score = item_disenchant_effect_score(obj);
   if (score <= 0) {
@@ -1216,8 +1347,8 @@ ACMD(do_disenchant)
     return;
   }
 
-  act("You unravel $p into raw arcane essence.", FALSE, ch, obj, 0, TO_CHAR);
-  act("$n unravels $p into raw arcane essence.", TRUE, ch, obj, 0, TO_ROOM);
+  act("You unravel the magic woven through $p and condense it into enchanting dust.", FALSE, ch, obj, 0, TO_CHAR);
+  act("$n unravels the magic in $p, condensing it into enchanting dust.", TRUE, ch, obj, 0, TO_ROOM);
   extract_obj(obj);
   obj_to_char(material, ch);
   send_to_char(ch, "You extract %s enchanting dust.\r\n", crafting_material_tier_name(tier));

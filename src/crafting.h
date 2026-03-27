@@ -43,5 +43,8 @@ int crafting_get_enchant_recipe_count(const struct obj_data *obj, const char *re
 int crafting_is_item_enchanted(const struct obj_data *obj);
 void crafting_build_enchant_tag(const struct obj_data *obj, char *out, size_t outsz);
 void crafting_build_enchant_recipe_summary(const struct obj_data *obj, char *out, size_t outsz);
+int crafting_get_enchant_overlay_count(const struct obj_data *obj);
+int crafting_get_enchant_overlay_entry(const struct obj_data *obj, int index, int *recipe_index, signed char *location, signed char *modifier, int *order);
+void crafting_try_migrate_legacy_enchants(struct obj_data *obj);
 
 #endif
