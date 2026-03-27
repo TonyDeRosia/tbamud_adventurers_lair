@@ -1696,6 +1696,7 @@ void ensure_class_abilities(struct char_data *ch)
       case SKILL_SCRIBING_MASTERY:
       case SKILL_ALCHEMY_MASTERY:
       case SKILL_ENCHANTING_MASTERY:
+      case SKILL_DISENCHANT:
       case SKILL_CAREFUL_HANDS:
       case SKILL_EFFICIENT_CRAFTING:
       case SKILL_STEADY_MIND:
@@ -1787,6 +1788,7 @@ static void grant_new_abilities_one_percent(struct char_data *ch)
       case SKILL_SCRIBING_MASTERY:
       case SKILL_ALCHEMY_MASTERY:
       case SKILL_ENCHANTING_MASTERY:
+      case SKILL_DISENCHANT:
       case SKILL_CAREFUL_HANDS:
       case SKILL_EFFICIENT_CRAFTING:
       case SKILL_STEADY_MIND:
@@ -1922,6 +1924,7 @@ void init_spell_levels(void)
     spell_level(SKILL_SCRIBING_MASTERY, i, 1);
     spell_level(SKILL_ALCHEMY_MASTERY, i, 1);
     spell_level(SKILL_ENCHANTING_MASTERY, i, 1);
+    spell_level(SKILL_DISENCHANT, i, 1);
     spell_level(SKILL_CAREFUL_HANDS, i, 1);
     spell_level(SKILL_EFFICIENT_CRAFTING, i, 1);
     spell_level(SKILL_STEADY_MIND, i, 1);

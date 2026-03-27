@@ -311,6 +311,7 @@
 #define SKILL_CAREFUL_HANDS         267
 #define SKILL_EFFICIENT_CRAFTING    268
 #define SKILL_STEADY_MIND           269
+#define SKILL_DISENCHANT            270
 /* New skills may be added here up to MAX_SKILLS (see structs.h). */
 
 /* NON-PLAYER AND OBJECT SPELLS AND SKILLS: The practice levels for the spells
