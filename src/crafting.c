@@ -289,44 +289,6 @@ int crafting_get_enchant_recipe_count(const struct obj_data *obj, const char *re
   return found;
 }
 
-int crafting_get_equipped_enchant_recipe_count(const struct char_data *ch, const char *recipe_name)
-{
-  int slot;
-  int found = 0;
-
-  if (!ch || !recipe_name || !*recipe_name)
-    return 0;
-
-  for (slot = 0; slot < NUM_WEARS; slot++) {
-    const struct obj_data *obj = GET_EQ(ch, slot);
-    if (!obj)
-      continue;
-    found += crafting_get_enchant_recipe_count(obj, recipe_name);
-  }
-
-  return found;
-}
-
-int crafting_get_swiftness_haste_chance(const struct char_data *ch)
-{
-  int swiftness_stacks;
-
-  if (!ch)
-    return 0;
-
-  /* Controlled haste scaling from equipped swiftness overlays only. */
-  swiftness_stacks = crafting_get_equipped_enchant_recipe_count(ch, "swiftness");
-  if (swiftness_stacks <= 0)
-    return 0;
-  if (swiftness_stacks == 1)
-    return 20;
-  if (swiftness_stacks == 2)
-    return 30;
-  if (swiftness_stacks == 3)
-    return 40;
-  return 50;
-}
-
 int crafting_is_item_enchanted(const struct obj_data *obj)
 {
   const char *marker = find_exdesc_value(obj, CRAFT_ENCHANT_MARK_KEY);
