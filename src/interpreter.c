@@ -318,6 +318,7 @@ cpp_extern const struct command_info cmd_info[] = {
   { "skills"    , "sk"      , POS_RESTING , do_skills   , 1, 0 },
   { "study"     , "stu"     , POS_RESTING , do_study    , 0, 0 },
   { "brew"      , "brew"    , POS_RESTING , do_brew     , 0, 0 },
+  { "codex"     , "codex"   , POS_RESTING , do_codex    , 0, 0 },
   { "enchant"   , "ench"    , POS_RESTING , do_enchant  , 0, 0 },
   { "disenchant", "disen"   , POS_RESTING , do_disenchant, 0, 0 },
   { "allspells" , "allspells", POS_RESTING, do_spells   , 1, 1 },

@@ -24,6 +24,7 @@
 #include "interpreter.h"
 #include "class.h"
 #include "classtrack.h"
+#include "crafting.h"
 #include "fight.h"
 #include "genolc.h" /* for strip_cr */
 #include "config.h" /* for pclean_criteria[] */
@@ -789,6 +790,7 @@ int load_char(const char *name, struct char_data *ch)
   /* Keep any existing characters in sync with their class spell/skill lists. */
   ensure_class_abilities(ch);
   classtrack_ensure_study_skill(ch);
+  crafting_sync_enchanting_disenchant(ch);
 
   if (!*GET_SOFT_CLASS_TITLE(ch))
     strlcpy(GET_SOFT_CLASS_TITLE(ch), "Adventurer", sizeof(ch->player_specials->saved.soft_class_title));

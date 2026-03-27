@@ -925,6 +925,8 @@ static int try_practice_profession_unlock(struct char_data *ch, const char *arg)
   }
 
   SET_SKILL(ch, profession_skill, 1);
+  if (profession_skill == SKILL_ENCHANTING)
+    crafting_sync_enchanting_disenchant(ch);
   send_to_char(ch, "You learn the basics of %s.\r\n", profession_name);
   return TRUE;
 }
@@ -1631,6 +1633,8 @@ ACMD(do_learn)
   }
 
   SET_SKILL(ch, profession_skill, 1);
+  if (profession_skill == SKILL_ENCHANTING)
+    crafting_sync_enchanting_disenchant(ch);
   send_to_char(ch, "You learn the basics of %s.\r\n", profession_name);
 }
 

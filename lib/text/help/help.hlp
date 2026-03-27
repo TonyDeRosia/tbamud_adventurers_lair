@@ -7964,9 +7964,7 @@ Enchant (Crafting)
 Type: Profession Command
 
 Usage:
-  enchant list
   enchant <recipe> <item>
-  disenchant <item>
 
 Notes:
 - Only equippable gear may be enchanted.
@@ -7975,11 +7973,10 @@ Notes:
 - A failed 4th enchant attempt may destroy the item.
 - Recipes unlock by enchanting profession skill level (1-100).
 - Enchanting uses enchanting materials by tier: lesser, greater, superior.
-- Disenchanting a magical/effect-bearing item destroys it and yields enchanting material.
+- Disenchanting a magical/effect-bearing item destroys it and yields enchanting dust.
+- Use 'codex' to view your currently unlocked enchantments.
 
-Use 'enchant list' to view currently unlocked recipes.
-
-See also: LEARN PRACTICE CRAFT DISENCHANT
+See also: LEARN PRACTICE CRAFT CODEX DISENCHANT
 #0
 
 DISENCHANT
@@ -7991,13 +7988,33 @@ Usage:
   disenchant <item>
 
 Notes:
-- Requires enchanting profession training.
+- Requires enchanting profession training and disenchant knowledge.
 - The target item must have meaningful magical/effect value.
-- Successful disenchant destroys the item and grants enchanting material.
+- Successful disenchant destroys the item and grants enchanting dust.
 - Weak magic yields lesser material, stronger magic yields greater,
   and highly-enhanced or powerful magical items yield superior material.
 
-See also: ENCHANT CRAFT
+See also: ENCHANT CODEX CRAFT
+#0
+
+CODEX ENCHANTING-CODEX
+
+Enchanter's Codex
+Type: Profession Command
+
+Usage:
+  codex
+
+Notes:
+- Codex is enchanting-only in this update.
+- Shows only enchantments currently unlocked by your enchanting skill.
+- Each recipe line lists required enchanting level and dust tier.
+- Includes quick reminders for:
+    enchant <recipe> <item>
+    disenchant <item>
+- If you do not know enchanting, codex is unavailable.
+
+See also: ENCHANT DISENCHANT LEARN PRACTICE
 #0
 
 ENCHANT-WEAPON

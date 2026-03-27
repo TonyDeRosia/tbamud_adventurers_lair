@@ -3592,4 +3592,5 @@ void mag_assign_spells(void) {
   skillo_cost(SKILL_CAREFUL_HANDS, "careful hands", 0);
   skillo_cost(SKILL_EFFICIENT_CRAFTING, "efficient crafting", 0);
   skillo_cost(SKILL_STEADY_MIND, "steady mind", 0);
+  skillo_cost(SKILL_DISENCHANT, "disenchant", 0);
 }

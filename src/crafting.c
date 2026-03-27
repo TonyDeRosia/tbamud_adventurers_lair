@@ -450,6 +450,8 @@ static struct obj_data *create_craft_material_item(int discipline, int tier)
 {
   struct obj_data *obj;
   const char *tier_name = crafting_material_tier_name(tier);
+  const char *discipline_name = crafting_discipline_name(discipline);
+  const char *mat_noun = (discipline == CRAFT_DISC_ENCHANTING) ? "dust" : "material";
   char name_buf[MAX_INPUT_LENGTH];
   char short_buf[MAX_INPUT_LENGTH];
   char desc_buf[MAX_INPUT_LENGTH];
@@ -458,9 +460,9 @@ static struct obj_data *create_craft_material_item(int discipline, int tier)
   if (!obj)
     return NULL;
 
-  snprintf(name_buf, sizeof(name_buf), "%s %s material crafting", tier_name, crafting_discipline_name(discipline));
-  snprintf(short_buf, sizeof(short_buf), "a %s %s material", tier_name, crafting_discipline_name(discipline));
-  snprintf(desc_buf, sizeof(desc_buf), "A %s %s material has been left here.", tier_name, crafting_discipline_name(discipline));
+  snprintf(name_buf, sizeof(name_buf), "%s %s %s crafting", tier_name, discipline_name, mat_noun);
+  snprintf(short_buf, sizeof(short_buf), "a %s %s %s", tier_name, discipline_name, mat_noun);
+  snprintf(desc_buf, sizeof(desc_buf), "A %s %s %s has been left here.", tier_name, discipline_name, mat_noun);
 
   obj->item_number = NOTHING;
   obj->name = strdup(name_buf);
@@ -631,6 +633,15 @@ static int consume_prof_materials(struct char_data *ch, int disc, int min_tier, 
   return consumed;
 }
 
+void crafting_sync_enchanting_disenchant(struct char_data *ch)
+{
+  if (!ch || IS_NPC(ch))
+    return;
+
+  if (GET_SKILL(ch, SKILL_ENCHANTING) > 0 && GET_SKILL(ch, SKILL_DISENCHANT) <= 0)
+    SET_SKILL(ch, SKILL_DISENCHANT, 1);
+}
+
 static int get_scroll_difficulty(const int spells[], int count)
 {
   int i, difficulty = 15;
@@ -771,6 +782,7 @@ int crafting_can_teach_ability(struct char_data *trainer, int ability_id)
     break;
   case SKILL_ENCHANTING:
   case SKILL_ENCHANTING_MASTERY:
+  case SKILL_DISENCHANT:
     trainer_flag = MOB_TEACH_ENCHANTING;
     break;
   default:
@@ -1063,31 +1075,14 @@ ACMD(do_enchant)
 
   two_arguments(argument, recipe, item_name);
   if (!*recipe || !str_cmp(recipe, "list")) {
-    send_to_char(ch, "Enchanting guide:\r\n");
-    send_to_char(ch, "  Recipes unlock by enchanting skill (1-100), not by known spells.\r\n");
-    send_to_char(ch, "  Materials are obtained via: disenchant <item>\r\n");
-    send_to_char(ch, "  Material tiers: lesser, greater, superior\r\n");
-    send_to_char(ch, "  Max enchant applications per item: %d\r\n", MAX_ITEM_ENCHANTS);
-    send_to_char(ch, "  Higher enchant counts are riskier; failed 4th attempts may destroy the item.\r\n");
-    send_to_char(ch, "\r\n");
-    send_to_char(ch, "Usage:\r\n");
-    send_to_char(ch, "  enchant list\r\n");
-    send_to_char(ch, "  enchant <recipe> <item>\r\n");
-    send_to_char(ch, "\r\n");
-    send_to_char(ch, "Unlocked recipes:\r\n");
-    for (found = 0; enchant_recipes[found].name; found++) {
-      if (GET_SKILL(ch, SKILL_ENCHANTING) < enchant_recipes[found].min_level)
-        continue;
-      send_to_char(ch, "  %-12s lvl %-3d mat:%-8s\r\n",
-                   enchant_recipes[found].name,
-                   enchant_recipes[found].min_level,
-                   crafting_material_tier_name(enchant_recipes[found].required_tier));
-    }
+    send_to_char(ch, "Usage: enchant <recipe> <item>\r\n");
+    send_to_char(ch, "Type 'codex' to view available enchantments.\r\n");
     return;
   }
 
   if (!*item_name) {
-    send_to_char(ch, "Enchant what item?\r\n");
+    send_to_char(ch, "Usage: enchant <recipe> <item>\r\n");
+    send_to_char(ch, "Type 'codex' to view available enchantments.\r\n");
     return;
   }
 
@@ -1103,7 +1098,7 @@ ACMD(do_enchant)
 
   found = enchant_recipe_index_by_name(recipe);
   if (found < 0) {
-    send_to_char(ch, "Unknown enchant recipe. Use 'enchant list'.\r\n");
+    send_to_char(ch, "Unknown enchant recipe. Type 'codex' to view unlocked enchantments.\r\n");
     return;
   }
   if (GET_SKILL(ch, SKILL_ENCHANTING) < enchant_recipes[found].min_level) {
@@ -1185,11 +1180,12 @@ ACMD(do_disenchant)
   one_argument(argument, item_name);
   if (!*item_name) {
     send_to_char(ch, "Usage: disenchant <item>\r\n");
-    send_to_char(ch, "Disenchant destroys magical/effect-bearing items and yields enchanting materials.\r\n");
+    send_to_char(ch, "Disenchant destroys magical/effect-bearing items and yields enchanting dust.\r\n");
     return;
   }
 
-  if (GET_SKILL(ch, SKILL_ENCHANTING) <= 0) {
+  crafting_sync_enchanting_disenchant(ch);
+  if (GET_SKILL(ch, SKILL_ENCHANTING) <= 0 || GET_SKILL(ch, SKILL_DISENCHANT) <= 0) {
     send_to_char(ch, "You have no training in enchanting.\r\n");
     return;
   }
@@ -1216,7 +1212,45 @@ ACMD(do_disenchant)
   act("$n unravels $p into raw arcane essence.", TRUE, ch, obj, 0, TO_ROOM);
   extract_obj(obj);
   obj_to_char(material, ch);
-  send_to_char(ch, "You extract %s enchanting material.\r\n", crafting_material_tier_name(tier));
+  send_to_char(ch, "You extract %s enchanting dust.\r\n", crafting_material_tier_name(tier));
+}
+
+ACMD(do_codex)
+{
+  int i, shown = 0;
+
+  skip_spaces(&argument);
+  if (*argument) {
+    send_to_char(ch, "Usage: codex\r\n");
+    return;
+  }
+
+  if (GET_SKILL(ch, SKILL_ENCHANTING) <= 0) {
+    send_to_char(ch, "You do not know how to use an enchanter's codex.\r\n");
+    return;
+  }
+
+  send_to_char(ch, "Enchanter's Codex\r\n");
+  send_to_char(ch, "Recipes unlock by enchanting skill level.\r\n");
+  send_to_char(ch, "\r\n");
+  send_to_char(ch, "Unlocked recipes:\r\n");
+  for (i = 0; enchant_recipes[i].name; i++) {
+    if (GET_SKILL(ch, SKILL_ENCHANTING) < enchant_recipes[i].min_level)
+      continue;
+    send_to_char(ch, "  %-12s lvl %-3d dust:%-8s\r\n",
+                 enchant_recipes[i].name,
+                 enchant_recipes[i].min_level,
+                 crafting_material_tier_name(enchant_recipes[i].required_tier));
+    shown++;
+  }
+
+  if (!shown)
+    send_to_char(ch, "  None unlocked yet.\r\n");
+
+  send_to_char(ch, "\r\n");
+  send_to_char(ch, "Actions:\r\n");
+  send_to_char(ch, "  enchant <recipe> <item>\r\n");
+  send_to_char(ch, "  disenchant <item>\r\n");
 }
 
 int crafting_try_recite_tome(struct char_data *ch, char *argument)

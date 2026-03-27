@@ -271,6 +271,7 @@ ACMD(do_spells);
 ACMD(do_study);
 ACMD(do_scribe);
 ACMD(do_brew);
+ACMD(do_codex);
 ACMD(do_enchant);
 ACMD(do_disenchant);
 ACMD(do_learn);
