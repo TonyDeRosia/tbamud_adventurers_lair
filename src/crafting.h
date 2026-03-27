@@ -13,6 +13,10 @@ struct obj_data;
 #define CRAFT_MAT_TIER_LESSER   1
 #define CRAFT_MAT_TIER_GREATER  2
 #define CRAFT_MAT_TIER_SUPERIOR 3
+/* Crafting item value layout:
+ *  - ITEM_CRAFT_TOOL:     value[0] = discipline (CRAFT_DISC_*)
+ *  - ITEM_CRAFT_MATERIAL: value[0] = discipline (CRAFT_DISC_*),
+ *                         value[1] = tier (CRAFT_MAT_TIER_*) */
 
 void do_scribe(struct char_data *ch, char *argument, int cmd, int subcmd);
 void do_brew(struct char_data *ch, char *argument, int cmd, int subcmd);
@@ -20,6 +24,10 @@ void do_codex(struct char_data *ch, char *argument, int cmd, int subcmd);
 void do_enchant(struct char_data *ch, char *argument, int cmd, int subcmd);
 void do_disenchant(struct char_data *ch, char *argument, int cmd, int subcmd);
 void crafting_sync_enchanting_disenchant(struct char_data *ch);
+int crafting_is_valid_discipline(int disc);
+int crafting_is_valid_material_tier(int tier);
+const char *crafting_discipline_name(int disc);
+const char *crafting_material_tier_name(int tier);
 
 int crafting_try_recite_tome(struct char_data *ch, char *argument);
 int crafting_handle_tome_put(struct char_data *ch, struct obj_data *obj, struct obj_data *cont);

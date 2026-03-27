@@ -40,6 +40,7 @@
 #include "accounts.h"
 #include "ai_actor.h"
 #include "ai_actor_brain.h"
+#include "crafting.h"
 
 /* local utility functions with file scope */
 static int perform_set(struct char_data *ch, struct char_data *vict, int mode, char *val_arg);
@@ -773,6 +774,8 @@ static void do_stat_object(struct char_data *ch, struct obj_data *j)
   struct extra_descr_data *desc;
   char buf[MAX_STRING_LENGTH];
   struct char_data *tempch;
+  const char *craft_disc_name;
+  const char *craft_tier_name;
 
   send_to_char(ch, "Name: '%s%s%s', Keywords: %s\r\n", CCYEL(ch, C_NRM),
 	  j->short_description ? j->short_description : "<None>",
@@ -807,6 +810,22 @@ static void do_stat_object(struct char_data *ch, struct obj_data *j)
 
   sprintbitarray(GET_OBJ_EXTRA(j), extra_bits, EF_ARRAY_MAX, buf);
   send_to_char(ch, "Extra flags   : %s\r\n", buf);
+  if (OBJ_FLAGGED(j, ITEM_CRAFT_TOOL)) {
+    if (crafting_is_valid_discipline(GET_OBJ_VAL(j, 0)))
+      send_to_char(ch, "Craft tool    : %s (value 0=%d)\r\n",
+                   crafting_discipline_name(GET_OBJ_VAL(j, 0)), GET_OBJ_VAL(j, 0));
+    else
+      send_to_char(ch, "Craft tool    : INVALID/UNSET discipline (value 0=%d)\r\n",
+                   GET_OBJ_VAL(j, 0));
+  }
+  if (OBJ_FLAGGED(j, ITEM_CRAFT_MATERIAL)) {
+    craft_disc_name = crafting_is_valid_discipline(GET_OBJ_VAL(j, 0)) ?
+      crafting_discipline_name(GET_OBJ_VAL(j, 0)) : "INVALID/UNSET";
+    craft_tier_name = crafting_is_valid_material_tier(GET_OBJ_VAL(j, 1)) ?
+      crafting_material_tier_name(GET_OBJ_VAL(j, 1)) : "INVALID/UNSET";
+    send_to_char(ch, "Craft material: discipline=%s (value 0=%d), tier=%s (value 1=%d)\r\n",
+                 craft_disc_name, GET_OBJ_VAL(j, 0), craft_tier_name, GET_OBJ_VAL(j, 1));
+  }
 
   send_to_char(ch, "Weight: %d, Value: %d, Cost/day: %d, Timer: %d, Min level: %d\r\n",
      GET_OBJ_WEIGHT(j), GET_OBJ_COST(j), GET_OBJ_RENT(j), GET_OBJ_TIMER(j), GET_OBJ_LEVEL(j));

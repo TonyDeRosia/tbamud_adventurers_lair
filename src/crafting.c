@@ -25,8 +25,6 @@
 static const int enchant_attempt_penalty[MAX_ITEM_ENCHANTS] = {0, 15, 35, 60};
 static const int enchant_stack_scale_pct[MAX_ITEM_ENCHANTS] = {100, 75, 50, 25};
 static const int fourth_enchant_fail_destroy_pct = 35;
-static const char *crafting_discipline_name(int disc);
-static const char *crafting_material_tier_name(int tier);
 
 struct enchant_recipe {
   const char *name;
@@ -575,7 +573,17 @@ static int has_prof_tool(struct char_data *ch, int disc)
   return FALSE;
 }
 
-static const char *crafting_discipline_name(int disc)
+int crafting_is_valid_discipline(int disc)
+{
+  return (disc >= CRAFT_DISC_SCRIBING && disc <= CRAFT_DISC_ENCHANTING);
+}
+
+int crafting_is_valid_material_tier(int tier)
+{
+  return (tier >= CRAFT_MAT_TIER_LESSER && tier <= CRAFT_MAT_TIER_SUPERIOR);
+}
+
+const char *crafting_discipline_name(int disc)
 {
   switch (disc) {
   case CRAFT_DISC_SCRIBING:   return "scribing";
@@ -585,7 +593,7 @@ static const char *crafting_discipline_name(int disc)
   }
 }
 
-static const char *crafting_material_tier_name(int tier)
+const char *crafting_material_tier_name(int tier)
 {
   switch (tier) {
   case CRAFT_MAT_TIER_LESSER:   return "lesser";
