@@ -914,16 +914,20 @@ void oedit_parse(struct descriptor_data *d, char *arg)
       if (!OBJ_FLAGGED(OLC_OBJ(d), ITEM_CRAFT_TOOL)) {
         write_to_output(d, "Set CRAFT_TOOL first in extra flags.\r\n");
         oedit_disp_menu(d);
-      } else
+      } else {
         oedit_disp_craft_tool_discipline_menu(d);
+        OLC_MODE(d) = OEDIT_CRAFT_TOOL_DISCIPLINE_MAIN;
+      }
       return;
     case 'y':
     case 'Y':
       if (!OBJ_FLAGGED(OLC_OBJ(d), ITEM_CRAFT_MATERIAL)) {
         write_to_output(d, "Set CRAFT_MATERIAL first in extra flags.\r\n");
         oedit_disp_menu(d);
-      } else
+      } else {
         oedit_disp_craft_material_discipline_menu(d);
+        OLC_MODE(d) = OEDIT_CRAFT_MATERIAL_DISCIPLINE_MAIN;
+      }
       return;
     case 'd':
     case 'D':
@@ -1262,34 +1266,64 @@ void oedit_parse(struct descriptor_data *d, char *arg)
     return;
 
   case OEDIT_CRAFT_MATERIAL_DISCIPLINE:
+  case OEDIT_CRAFT_MATERIAL_DISCIPLINE_MAIN:
+  {
+    int from_main_menu = (OLC_MODE(d) == OEDIT_CRAFT_MATERIAL_DISCIPLINE_MAIN);
     number = atoi(arg);
     if (number < CRAFT_DISC_SCRIBING || number > CRAFT_DISC_ENCHANTING) {
       oedit_disp_craft_material_discipline_menu(d);
+      if (from_main_menu)
+        OLC_MODE(d) = OEDIT_CRAFT_MATERIAL_DISCIPLINE_MAIN;
       return;
     }
     GET_OBJ_VAL(OLC_OBJ(d), 0) = number;
     oedit_disp_craft_material_tier_prompt(d);
+    if (from_main_menu)
+      OLC_MODE(d) = OEDIT_CRAFT_MATERIAL_TIER_MAIN;
     return;
+  }
 
   case OEDIT_CRAFT_MATERIAL_TIER:
+  case OEDIT_CRAFT_MATERIAL_TIER_MAIN:
+  {
+    int from_main_menu = (OLC_MODE(d) == OEDIT_CRAFT_MATERIAL_TIER_MAIN);
     number = atoi(arg);
     if (number < CRAFT_MAT_TIER_LESSER || number > CRAFT_MAT_TIER_SUPERIOR) {
       oedit_disp_craft_material_tier_prompt(d);
+      if (from_main_menu)
+        OLC_MODE(d) = OEDIT_CRAFT_MATERIAL_TIER_MAIN;
       return;
     }
     GET_OBJ_VAL(OLC_OBJ(d), 1) = number;
-    oedit_disp_extra_menu(d);
+    if (from_main_menu)
+      oedit_disp_menu(d);
+    else {
+      OLC_MODE(d) = OEDIT_EXTRAS;
+      oedit_disp_extra_menu(d);
+    }
     return;
+  }
 
   case OEDIT_CRAFT_TOOL_DISCIPLINE:
+  case OEDIT_CRAFT_TOOL_DISCIPLINE_MAIN:
+  {
+    int from_main_menu = (OLC_MODE(d) == OEDIT_CRAFT_TOOL_DISCIPLINE_MAIN);
     number = atoi(arg);
     if (!crafting_is_valid_discipline(number)) {
       oedit_disp_craft_tool_discipline_menu(d);
+      if (from_main_menu)
+        OLC_MODE(d) = OEDIT_CRAFT_TOOL_DISCIPLINE_MAIN;
       return;
     }
     GET_OBJ_VAL(OLC_OBJ(d), 0) = number;
-    oedit_disp_extra_menu(d);
+    if (from_main_menu)
+      oedit_disp_menu(d);
+    else {
+      OLC_MODE(d) = OEDIT_EXTRAS;
+      oedit_disp_extra_menu(d);
+    }
     return;
+  }
 
   case OEDIT_EXTRADESC_KEY:
     if (genolc_checkstring(d, arg)) {
