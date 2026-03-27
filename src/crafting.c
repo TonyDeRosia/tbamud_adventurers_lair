@@ -329,22 +329,16 @@ static int get_item_enchant_history(const struct obj_data *obj, int out[], int m
 
 static void sync_item_enchant_history(struct obj_data *obj)
 {
-  int recipes[MAX_OBJ_ENCHANTS] = {0};
-  int count;
-  char payload[MAX_CRAFT_PAYLOAD];
-
   if (!obj)
     return;
 
-  count = MIN((int)obj->enchant_count, MAX_OBJ_ENCHANTS);
-  if (count > 0) {
-    int i;
-    for (i = 0; i < count; i++)
-      recipes[i] = obj->enchants[i].recipe_index;
-  }
-  build_spell_payload(recipes, count, payload, sizeof(payload));
-  set_exdesc_value(obj, CRAFT_ENCHANT_LIST_KEY, payload);
-  set_exdesc_value(obj, CRAFT_ENCHANT_MARK_KEY, count > 0 ? "1" : "0");
+  /*
+   * Enchant overlays are the authoritative format.
+   * Never regenerate legacy enchant exdesc metadata from overlay data.
+   * If any legacy keys are still present on this object, strip them.
+   */
+  remove_exdesc_value(obj, CRAFT_ENCHANT_LIST_KEY);
+  remove_exdesc_value(obj, CRAFT_ENCHANT_MARK_KEY);
 }
 
 static int append_item_enchant_overlay(struct obj_data *obj, int recipe_index, int location, int modifier)
