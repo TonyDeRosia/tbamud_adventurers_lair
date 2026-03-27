@@ -419,6 +419,7 @@ int crafting_is_item_enchanted(const struct obj_data *obj)
 void crafting_build_enchant_tag(const struct obj_data *obj, char *out, size_t outsz)
 {
   int count;
+  const char *tag = NULL;
 
   if (!out || outsz == 0)
     return;
@@ -431,7 +432,25 @@ void crafting_build_enchant_tag(const struct obj_data *obj, char *out, size_t ou
   if (count <= 0)
     return;
 
-  snprintf(out, outsz, "@m[@MEn@mch@Ma@mnt@Med@m %d/%d]@n ", MIN(MAX_OBJ_ENCHANTS, count), MAX_OBJ_ENCHANTS);
+  switch (count) {
+  case 1:
+    tag = "@m[@MEn@mch@Ma@mnt@Med @m1/4]@n ";
+    break;
+  case 2:
+    tag = "@M[@CEn@Mch@Ca@Mnt@Ced @M2/4]@n ";
+    break;
+  case 3:
+    tag = "@P[@CEn@Pch@Ca@Pnt@Ced @P3/4]@n ";
+    break;
+  case 4:
+    tag = "@b[@CEn@bch@Ca@bnt@Ced @b4/4]@n ";
+    break;
+  default:
+    snprintf(out, outsz, "[Enchanted %d/4] ", count);
+    return;
+  }
+
+  snprintf(out, outsz, "%s", tag);
 }
 
 void crafting_build_enchant_recipe_summary(const struct obj_data *obj, char *out, size_t outsz)
