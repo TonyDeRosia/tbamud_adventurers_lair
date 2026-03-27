@@ -1573,6 +1573,21 @@ ACMD(do_return)
   }
 }
 
+ACMD(do_oload)
+{
+  char vnum[MAX_INPUT_LENGTH], extra[MAX_INPUT_LENGTH], load_args[MAX_INPUT_LENGTH + 4];
+
+  two_arguments(argument, vnum, extra);
+
+  if (!*vnum || *extra) {
+    send_to_char(ch, "Usage: load < obj | mob > <vnum> <number>\r\n");
+    return;
+  }
+
+  snprintf(load_args, sizeof(load_args), "obj %s", vnum);
+  do_load(ch, load_args, cmd, subcmd);
+}
+
 ACMD(do_load)
 {
   char buf[MAX_INPUT_LENGTH], buf2[MAX_INPUT_LENGTH], buf3[MAX_INPUT_LENGTH];
