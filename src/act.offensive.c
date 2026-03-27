@@ -22,7 +22,6 @@
 #include "mud_event.h"
 #include "ai_actor.h"
 #include "race.h"
-#include "crafting.h"
 
 static const char *appraise_level_band(const struct char_data *ch, const struct char_data *vict)
 {
@@ -97,10 +96,15 @@ static int appraise_is_hasted(struct char_data *vict)
   if (!vict)
     return FALSE;
 
+  #ifdef AFF_HASTE
   if (AFF_FLAGGED(vict, AFF_HASTE))
     return TRUE;
-  if (crafting_get_swiftness_haste_chance(vict) > 0)
+  #endif
+
+  #ifdef SPELL_HASTE
+  if (affected_by_spell(vict, SPELL_HASTE))
     return TRUE;
+  #endif
 
   return FALSE;
 }
