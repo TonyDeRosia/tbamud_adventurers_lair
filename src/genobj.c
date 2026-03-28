@@ -212,26 +212,18 @@ int save_objects(zone_rnum zone_num)
       } else
         *buf = '\0';
 
-      int n = snprintf(buf2, MAX_STRING_LENGTH,
+      snprintf(buf2, sizeof(buf2),
 	      "#%d\n"
 	      "%s~\n"
 	      "%s~\n"
 	      "%s~\n"
 	      "%s~\n",
-
 	      GET_OBJ_VNUM(obj),
 	      (obj->name && *obj->name) ? obj->name : "undefined",
 	      (obj->short_description && *obj->short_description) ? obj->short_description : "undefined",
 	      (obj->description && *obj->description) ?	obj->description : "undefined",
 	      buf);
-        
-      if(n >= MAX_STRING_LENGTH) {
-        mudlog(BRF,LVL_BUILDER,TRUE,
-               "SYSERR: Could not save object #%d due to size (%d > maximum of %d).",
-               GET_OBJ_VNUM(obj), n, MAX_STRING_LENGTH);
-        continue;
-      }
-      
+
       fprintf(fp, "%s", convert_from_tabs(buf2));
 
       sprintascii(ebuf1, GET_OBJ_EXTRA(obj)[0]);

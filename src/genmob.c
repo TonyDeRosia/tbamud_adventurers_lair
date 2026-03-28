@@ -37,7 +37,6 @@ int add_mobile(struct char_data *mob, mob_vnum vnum)
         update_mobile_strings(live_mob, &mob_proto[rnum]);
 
     add_to_save_list(zone_table[real_zone_by_thing(vnum)].number, SL_MOB);
-    log("GenOLC: add_mobile: Updated existing mobile #%d.", vnum);
     return rnum;
   }
 
@@ -68,8 +67,6 @@ int add_mobile(struct char_data *mob, mob_vnum vnum)
     mob_index[0].number = 0;
     mob_index[0].func = 0;
   }
-
-  log("GenOLC: add_mobile: Added mobile %d at index #%d.", vnum, found);
 
   /* Update live mobile rnums. */
   for (live_mob = character_list; live_mob; live_mob = live_mob->next)
@@ -284,10 +281,10 @@ int save_mobiles(zone_rnum rznum)
 {
   zone_vnum vznum;
   FILE *mobfd;
-  room_vnum i;
+  mob_vnum i, bottom, top;
   mob_rnum rmob;
   int written;
-  char mobfname[64], usedfname[64];
+  char mobfname[128], usedfname[128];
 
 #if CIRCLE_UNSIGNED_INDEX
   if (rznum == NOWHERE || rznum > top_of_zone_table) {
@@ -305,12 +302,12 @@ int save_mobiles(zone_rnum rznum)
     return FALSE;
   }
 
-  for (i = genolc_zone_bottom(rznum); i <= zone_table[rznum].top; i++) {
+  bottom = genolc_zone_bottom(rznum);
+  top = zone_table[rznum].top;
+  for (i = bottom; i <= top; i++) {
     if ((rmob = real_mobile(i)) == NOBODY)
       continue;
-    check_mobile_strings(&mob_proto[rmob]);
-    if (write_mobile_record(i, &mob_proto[rmob], mobfd) < 0)
-      log("SYSERR: GenOLC: Error writing mobile #%d.", i);
+    write_mobile_record(i, &mob_proto[rmob], mobfd);
   }
   fputs("$\n", mobfd);
   written = ftell(mobfd);
