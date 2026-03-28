@@ -24,7 +24,7 @@ static void extract_mobile_all(mob_vnum vnum);
 int add_mobile(struct char_data *mob, mob_vnum vnum)
 {
   int rnum, i, found = FALSE, shop, cmd_no;
-  zone_rnum zone;
+  zone_rnum zone, rznum;
   struct char_data *live_mob;
 
   if ((rnum = real_mobile(vnum)) != NOBODY) {
@@ -36,7 +36,10 @@ int add_mobile(struct char_data *mob, mob_vnum vnum)
       if (rnum == live_mob->nr)
         update_mobile_strings(live_mob, &mob_proto[rnum]);
 
-    add_to_save_list(zone_table[real_zone_by_thing(vnum)].number, SL_MOB);
+    if ((rznum = real_zone_by_thing(vnum)) != NOWHERE)
+      add_to_save_list(zone_table[rznum].number, SL_MOB);
+    else
+      log("SYSERR: GenOLC: add_mobile: Cannot determine owning zone for vnum %d.", vnum);
     return rnum;
   }
 
@@ -83,7 +86,10 @@ int add_mobile(struct char_data *mob, mob_vnum vnum)
     for (shop = 0; shop <= top_shop; shop++)
       SHOP_KEEPER(shop) += (SHOP_KEEPER(shop) != NOTHING && SHOP_KEEPER(shop) >= found);
 
-  add_to_save_list(zone_table[real_zone_by_thing(vnum)].number, SL_MOB);
+  if ((rznum = real_zone_by_thing(vnum)) != NOWHERE)
+    add_to_save_list(zone_table[rznum].number, SL_MOB);
+  else
+    log("SYSERR: GenOLC: add_mobile: Cannot determine owning zone for vnum %d.", vnum);
   return found;
 }
 
