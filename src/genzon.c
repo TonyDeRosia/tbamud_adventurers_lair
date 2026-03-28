@@ -20,53 +20,30 @@ static void remove_cmd_from_list(struct reset_com **list, int pos);
 /* real zone of room/mobile/object/shop given */
 zone_rnum real_zone_by_thing(room_vnum vznum)
 {
-  zone_rnum znum, best = NOWHERE;
-  int low, high;
-  int best_span = 0;
-  zone_rnum fallback = NOWHERE;
-  zone_vnum expected_zone;
+  int bot, top, mid;
 
-  if (top_of_zone_table < 0)
+#if CIRCLE_UNSIGNED_INDEX
+  if (vznum == NOWHERE)
+#else
+  if (vznum < 0)
+#endif
     return NOWHERE;
 
-  /*
-   * Do a full scan instead of binary search.
-   * Some worlds include zone index entries that are not sorted by bottom vnum
-   * (for example test/reserved zones appended at the end). A binary search on
-   * unsorted data can report NOWHERE for valid vnums.
-   */
-  for (znum = 0; znum <= top_of_zone_table; znum++) {
-    low = genolc_zone_bottom(znum);
-    high = zone_table[znum].top;
+  bot = 0;
+  top = top_of_zone_table;
 
-    if (low <= vznum && vznum <= high) {
-      int span = high - low;
-      if (best == NOWHERE || span < best_span) {
-        best = znum;
-        best_span = span;
-      }
-    }
+  while (bot <= top) {
+    mid = (bot + top) / 2;
+
+    if ((genolc_zone_bottom(mid) <= vznum) && (zone_table[mid].top >= vznum))
+      return mid;
+    else if (genolc_zone_bottom(mid) > vznum)
+      top = mid - 1;
+    else
+      bot = mid + 1;
   }
 
-  if (best != NOWHERE)
-    return best;
-
-  /*
-   * Fallback for worlds using unsigned IDXTYPE where zone boundaries may have
-   * been read through signed paths on older data/compilers (e.g. >32767).
-   *
-   * If no explicit [bot, top] range matched, map by classic vnum ownership:
-   * zone N owns N00..N99.
-   */
-  expected_zone = vznum / 100;
-  for (znum = 0; znum <= top_of_zone_table; znum++) {
-    if (zone_table[znum].number == expected_zone) {
-      fallback = znum;
-      break;
-    }
-  }
-
-  return fallback;
+  return NOWHERE;
 }
 
 zone_rnum create_new_zone(zone_vnum vzone_num, room_vnum bottom, room_vnum top, const char **error)

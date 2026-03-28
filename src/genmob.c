@@ -20,26 +20,6 @@
 
 /* local functions */
 static void extract_mobile_all(mob_vnum vnum);
-static void queue_mobile_zone_save(mob_vnum vnum);
-
-static void queue_mobile_zone_save(mob_vnum vnum)
-{
-  zone_rnum rznum;
-  zone_vnum zvnum;
-
-  rznum = real_zone_by_thing(vnum);
-  if (rznum == NOWHERE) {
-    zvnum = vnum / 100;
-    rznum = real_zone(zvnum);
-  }
-
-  if (rznum == NOWHERE || rznum > top_of_zone_table) {
-    log("SYSERR: GenOLC: add_mobile: Could not resolve zone for mobile vnum %d.", vnum);
-    return;
-  }
-
-  add_to_save_list(zone_table[rznum].number, SL_MOB);
-}
 
 int add_mobile(struct char_data *mob, mob_vnum vnum)
 {
@@ -56,7 +36,7 @@ int add_mobile(struct char_data *mob, mob_vnum vnum)
       if (rnum == live_mob->nr)
         update_mobile_strings(live_mob, &mob_proto[rnum]);
 
-    queue_mobile_zone_save(vnum);
+    add_to_save_list(zone_table[real_zone_by_thing(vnum)].number, SL_MOB);
     log("GenOLC: add_mobile: Updated existing mobile #%d.", vnum);
     return rnum;
   }
@@ -106,7 +86,7 @@ int add_mobile(struct char_data *mob, mob_vnum vnum)
     for (shop = 0; shop <= top_shop; shop++)
       SHOP_KEEPER(shop) += (SHOP_KEEPER(shop) != NOTHING && SHOP_KEEPER(shop) >= found);
 
-  queue_mobile_zone_save(vnum);
+  add_to_save_list(zone_table[real_zone_by_thing(vnum)].number, SL_MOB);
   return found;
 }
 
@@ -304,9 +284,8 @@ int save_mobiles(zone_rnum rznum)
 {
   zone_vnum vznum;
   FILE *mobfd;
+  room_vnum i;
   mob_rnum rmob;
-  mob_vnum mvnum;
-  zone_rnum thing_rznum;
   int written;
   char mobfname[64], usedfname[64];
 
@@ -320,26 +299,18 @@ int save_mobiles(zone_rnum rznum)
   }
 
   vznum = zone_table[rznum].number;
-  log("DBG33002: save_mobiles entry rznum=%d zone_vnum=%d", rznum, vznum);
   snprintf(mobfname, sizeof(mobfname), "%s%d.new", MOB_PREFIX, vznum);
   if ((mobfd = fopen(mobfname, "w")) == NULL) {
     mudlog(BRF, LVL_GOD, TRUE, "SYSERR: GenOLC: Cannot open mob file for writing.");
     return FALSE;
   }
 
-  for (rmob = 0; rmob <= top_of_mobt; rmob++) {
-    mvnum = mob_index[rmob].vnum;
-    thing_rznum = real_zone_by_thing(mvnum);
-    if (vznum == 330 || mvnum == 33002)
-      log("DBG33002: save_mobiles scan rmob=%d mvnum=%d real_zone_by_thing=%d target_rznum=%d",
-          rmob, mvnum, thing_rznum, rznum);
-    if (thing_rznum != rznum)
+  for (i = genolc_zone_bottom(rznum); i <= zone_table[rznum].top; i++) {
+    if ((rmob = real_mobile(i)) == NOBODY)
       continue;
     check_mobile_strings(&mob_proto[rmob]);
-    if (mvnum == 33002)
-      log("DBG33002: save_mobiles writing mob #33002 in zone_vnum=%d", vznum);
-    if (write_mobile_record(mvnum, &mob_proto[rmob], mobfd) < 0)
-      log("SYSERR: GenOLC: Error writing mobile #%d.", mvnum);
+    if (write_mobile_record(i, &mob_proto[rmob], mobfd) < 0)
+      log("SYSERR: GenOLC: Error writing mobile #%d.", i);
   }
   fputs("$\n", mobfd);
   written = ftell(mobfd);
@@ -350,8 +321,6 @@ int save_mobiles(zone_rnum rznum)
 
   if (in_save_list(vznum, SL_MOB))
     remove_from_save_list(vznum, SL_MOB);
-  if (vznum == 330)
-    log("DBG33002: save_mobiles final bytes zone_vnum=330 bytes=%d file=%s", written, usedfname);
   log("GenOLC: '%s' saved, %d bytes written.", usedfname, written);
   return written;
 }
