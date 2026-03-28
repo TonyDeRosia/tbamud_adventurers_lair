@@ -108,14 +108,12 @@ int save_all(void)
           break;
         default:
           log("SYSERR: GenOLC: Invalid save type %d in save list.\n", save_list->type);
-          save_list = save_list->next;    /* Fatal error, skip this one. */
           break;
         }
-    } else if ((*save_types[save_list->type].func)(real_zone(save_list->zone)) < 0) {
-      save_list = save_list->next;      /* Fatal error, skip this one. */
+      } else if ((*save_types[save_list->type].func) (real_zone(save_list->zone)) < 0)
+        save_list = save_list->next;      /* Fatal error, skip this one. */
     }
-  }
-  return TRUE;
+    return TRUE;
 }
 
 /* NOTE: This changes the buffer passed in. */
