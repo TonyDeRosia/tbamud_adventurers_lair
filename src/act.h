@@ -366,6 +366,7 @@ ACMD(do_delmob);
 ACMD(do_mob);
 ACMD(do_mreset);
 ACMD(do_reset);
+ACMD(do_resetlist);
 ACMD(do_rreset);
 ACMD(do_acctlist);
 ACMD(do_acctshow);
