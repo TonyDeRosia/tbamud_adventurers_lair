@@ -95,18 +95,19 @@ char *str_udupnl(const char *txt)
 /* Original use: to be called at shutdown time. */
 int save_all(void)
 {
-  struct save_list_data *item, *next;
+  struct save_list_data *item;
   int i;
 
-  for (item = save_list; item; item = next) {
+  while ((item = save_list) != NULL) {
     zone_rnum rznum;
     int handled = FALSE;
+    zone_vnum zone = item->zone;
+    int type = item->type;
 
-    next = item->next;
-    rznum = real_zone(item->zone);
+    rznum = real_zone(zone);
 
-    if (item->type < 0 || item->type > SL_MAX) {
-      switch (item->type) {
+    if (type < 0 || type > SL_MAX) {
+      switch (type) {
         case SL_ACT:
           log("Actions not saved - can not autosave. Use 'aedit save'.");
           break;
@@ -114,34 +115,33 @@ int save_all(void)
           log("Help not saved - can not autosave. Use 'hedit save'.");
           break;
         default:
-          log("SYSERR: GenOLC: Invalid save type %d in save list.\n", item->type);
+          log("SYSERR: GenOLC: Invalid save type %d in save list.\n", type);
           break;
       }
     } else {
       for (i = 0; save_types[i].save_type != -1; i++) {
-        if (save_types[i].save_type != item->type)
+        if (save_types[i].save_type != type)
           continue;
         handled = TRUE;
         if (!save_types[i].func) {
-          log("SYSERR: GenOLC: Save type %d has no save function.", item->type);
+          log("SYSERR: GenOLC: Save type %d has no save function.", type);
           break;
         }
         if (rznum == NOWHERE || rznum > top_of_zone_table) {
-          log("SYSERR: GenOLC: Invalid zone %d queued for save type %d.", item->zone, item->type);
+          log("SYSERR: GenOLC: Invalid zone %d queued for save type %d.", zone, type);
           break;
         }
         if ((*save_types[i].func)(rznum) < 0)
-          log("SYSERR: GenOLC: Saving type %d for zone %d failed.", item->type, item->zone);
+          log("SYSERR: GenOLC: Saving type %d for zone %d failed.", type, zone);
         break;
       }
       if (!handled)
-        log("SYSERR: GenOLC: Unknown save type %d in save list.", item->type);
+        log("SYSERR: GenOLC: Unknown save type %d in save list.", type);
     }
 
-    free(item);
+    if (in_save_list(zone, type))
+      remove_from_save_list(zone, type);
   }
-
-  save_list = NULL;
   return TRUE;
 }
 
