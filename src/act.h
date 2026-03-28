@@ -362,6 +362,7 @@ ACMD(do_links);
 ACMD(do_load);
 ACMD(do_oload);
 ACMD(do_mload_admin);
+ACMD(do_delmob);
 ACMD(do_mob);
 ACMD(do_mreset);
 ACMD(do_reset);

@@ -183,6 +183,7 @@ cpp_extern const struct command_info cmd_info[] = {
   { "dc"       , "dc"      , POS_DEAD    , do_dc       , LVL_GOD, 0 },
   { "deposit"  , "depo"    , POS_STANDING, do_not_here , 1, 0 },
   { "deldir"   , "deldir"  , POS_DEAD    , do_deldir   , LVL_BUILDER, 0 },
+  { "delmob"   , "delmob"  , POS_DEAD    , do_delmob   , LVL_BUILDER, 0 },
   { "detach"   , "detach"  , POS_DEAD    , do_detach   , LVL_BUILDER, 0 },
   { "diagnose" , "diag"    , POS_RESTING , do_diagnose , 0, 0 },
   { "dig"      , "dig"     , POS_DEAD    , do_dig      , LVL_BUILDER, 0 },
