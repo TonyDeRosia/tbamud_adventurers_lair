@@ -10,9 +10,6 @@
 #include "sysdep.h"
 #include "structs.h"
 
-/* Needed for MOB_GUILD_MASTER auto-sync in medit_save_internally() */
-SPECIAL(guild);
-SPECIAL(questmaster);
 #include "utils.h"
 #include "interpreter.h"
 #include "comm.h"
@@ -31,7 +28,6 @@ SPECIAL(questmaster);
 #include "screen.h"
 #include "fight.h"
 #include "modify.h"      /* for smash_tilde */
-#include "ai_actor.h"
 
 /* Use shared action_bits[] for display so OLC remains aligned with runtime
  * bit names as new mob flags are added.
@@ -300,17 +296,6 @@ void medit_save_internally(struct descriptor_data *d)
   }
 
 
-  /* Auto-sync QUEST_MASTER / GUILD_MASTER flags with service spec-procs.
-   * QUEST_MASTER takes precedence so builders can reliably assign it in MEDIT.
-   */
-  if (IS_SET_AR(MOB_FLAGS(OLC_MOB(d)), MOB_QUEST_MASTER)) {
-    mob_index[new_rnum].func = questmaster;
-  } else if (IS_SET_AR(MOB_FLAGS(OLC_MOB(d)), MOB_GUILD_MASTER)) {
-    mob_index[new_rnum].func = guild;
-  } else if (mob_index[new_rnum].func == guild) {
-    mob_index[new_rnum].func = NULL;
-  }
-
   /* Update triggers and free old proto list */
   if (mob_proto[new_rnum].proto_script &&
       mob_proto[new_rnum].proto_script != OLC_SCRIPT(d))
@@ -332,8 +317,6 @@ void medit_save_internally(struct descriptor_data *d)
     assign_triggers(mob, MOB_TRIGGER);
   }
   /* end trigger update */
-
-  ai_actor_refresh_live_mobs_by_vnum(OLC_NUM(d));
 
   if (!i)	/* Only renumber on new mobiles. */
     return;
