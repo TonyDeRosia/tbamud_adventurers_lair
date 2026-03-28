@@ -104,7 +104,6 @@ int save_all(void)
     zone_vnum zone = item->zone;
     int type = item->type;
 
-    log("DBG33002: save_all queue item zone=%d type=%d", zone, type);
     rznum = real_zone(zone);
 
     if (type < 0 || type > SL_MAX) {
@@ -132,8 +131,6 @@ int save_all(void)
           log("SYSERR: GenOLC: Invalid zone %d queued for save type %d.", zone, type);
           break;
         }
-        if (type == SL_MOB && zone == 330)
-          log("DBG33002: save_all dispatching SL_MOB for zone=330 rznum=%d", rznum);
         if ((*save_types[i].func)(rznum) < 0)
           log("SYSERR: GenOLC: Saving type %d for zone %d failed.", type, zone);
         break;
@@ -239,8 +236,6 @@ int add_to_save_list(zone_vnum zone, int type)
   nitem->type = type;
   nitem->next = save_list;
   save_list = nitem;
-  if (type == SL_MOB || zone == 330)
-    log("DBG33002: add_to_save_list added zone=%d type=%d", zone, type);
   return TRUE;
 }
 

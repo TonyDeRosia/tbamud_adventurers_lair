@@ -289,9 +289,6 @@ void medit_save_internally(struct descriptor_data *d)
 {
   int i;
   mob_rnum new_rnum;
-  zone_rnum mob_rznum;
-  zone_vnum queued_zone_vnum;
-  int queued;
   struct descriptor_data *dsc;
   struct char_data *mob;
 
@@ -300,28 +297,6 @@ void medit_save_internally(struct descriptor_data *d)
   if ((new_rnum = add_mobile(OLC_MOB(d), OLC_NUM(d))) == NOBODY) {
     log("medit_save_internally: add_mobile failed.");
     return;
-  }
-
-  mob_rznum = real_zone_by_thing(OLC_NUM(d));
-  queued_zone_vnum = (mob_rznum != NOWHERE) ? zone_table[mob_rznum].number : NOWHERE;
-  log("DBG33002: medit_save_internally mob_vnum=%d OLC_ZNUM=%d OLC_zone_vnum=%d mob_rznum=%d mob_zone_vnum=%d",
-      OLC_NUM(d),
-      OLC_ZNUM(d),
-      (OLC_ZNUM(d) != NOWHERE ? zone_table[OLC_ZNUM(d)].number : NOWHERE),
-      mob_rznum,
-      queued_zone_vnum);
-
-  /*
-   * Ensure the edited mobile's zone is always queued for SL_MOB changed-zone
-   * persistence (saveall/asave changed), even if add_mobile() was reached via
-   * a path that did not leave the expected queue entry behind.
-   */
-  if (mob_rznum == NOWHERE) {
-    log("SYSERR: DBG33002: medit_save_internally could not resolve zone for mob_vnum=%d", OLC_NUM(d));
-  } else {
-    queued = add_to_save_list(queued_zone_vnum, SL_MOB);
-    log("DBG33002: medit_save_internally add_to_save_list(zone=%d,type=%d[SL_MOB]) called result=%d",
-        queued_zone_vnum, SL_MOB, queued);
   }
 
 
