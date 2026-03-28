@@ -95,24 +95,53 @@ char *str_udupnl(const char *txt)
 /* Original use: to be called at shutdown time. */
 int save_all(void)
 {
-  while (save_list) {
-    if (save_list->type < 0 || save_list->type > SL_MAX) {
-      switch (save_list->type) {
+  struct save_list_data *item, *next;
+  int i;
+
+  for (item = save_list; item; item = next) {
+    zone_rnum rznum;
+    int handled = FALSE;
+
+    next = item->next;
+    rznum = real_zone(item->zone);
+
+    if (item->type < 0 || item->type > SL_MAX) {
+      switch (item->type) {
         case SL_ACT:
           log("Actions not saved - can not autosave. Use 'aedit save'.");
-          save_list = save_list->next;    /* Fatal error, skip this one. */
           break;
         case SL_HLP:
           log("Help not saved - can not autosave. Use 'hedit save'.");
-          save_list = save_list->next;    /* Fatal error, skip this one. */
           break;
         default:
-          log("SYSERR: GenOLC: Invalid save type %d in save list.\n", save_list->type);
+          log("SYSERR: GenOLC: Invalid save type %d in save list.\n", item->type);
+          break;
+      }
+    } else {
+      for (i = 0; save_types[i].save_type != -1; i++) {
+        if (save_types[i].save_type != item->type)
+          continue;
+        handled = TRUE;
+        if (!save_types[i].func) {
+          log("SYSERR: GenOLC: Save type %d has no save function.", item->type);
           break;
         }
-      } else if ((*save_types[save_list->type].func) (real_zone(save_list->zone)) < 0)
-        save_list = save_list->next;      /* Fatal error, skip this one. */
+        if (rznum == NOWHERE || rznum > top_of_zone_table) {
+          log("SYSERR: GenOLC: Invalid zone %d queued for save type %d.", item->zone, item->type);
+          break;
+        }
+        if ((*save_types[i].func)(rznum) < 0)
+          log("SYSERR: GenOLC: Saving type %d for zone %d failed.", item->type, item->zone);
+        break;
+      }
+      if (!handled)
+        log("SYSERR: GenOLC: Unknown save type %d in save list.", item->type);
+    }
+
+    free(item);
   }
+
+  save_list = NULL;
   return TRUE;
 }
 
