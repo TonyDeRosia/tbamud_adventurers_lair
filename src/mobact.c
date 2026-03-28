@@ -102,7 +102,7 @@ void mobile_activity(void)
       found = FALSE;
       for (vict = world[IN_ROOM(ch)].people; vict && !found; vict = vict->next_in_room) {
 	if (IS_NPC(vict) || !CAN_SEE(ch, vict) || PRF_FLAGGED(vict, PRF_NOHASSLE) ||
-            (GET_LEVEL(vict) >= LVL_IMMORT && GET_LEVEL(vict) <= LVL_IMPL))
+            GET_LEVEL(vict) >= LVL_IMMORT)
 	  continue;
 
 	if (MOB_FLAGGED(ch, MOB_WIMPY) && AWAKE(vict))
