@@ -20,7 +20,7 @@ static void remove_cmd_from_list(struct reset_com **list, int pos);
 /* real zone of room/mobile/object/shop given */
 zone_rnum real_zone_by_thing(room_vnum vznum)
 {
-  int bot, top, mid;
+  zone_rnum zrnum;
 
 #if CIRCLE_UNSIGNED_INDEX
   if (vznum == NOWHERE)
@@ -29,19 +29,9 @@ zone_rnum real_zone_by_thing(room_vnum vznum)
 #endif
     return NOWHERE;
 
-  bot = 0;
-  top = top_of_zone_table;
-
-  while (bot <= top) {
-    mid = (bot + top) / 2;
-
-    if ((genolc_zone_bottom(mid) <= vznum) && (zone_table[mid].top >= vznum))
-      return mid;
-    else if (genolc_zone_bottom(mid) > vznum)
-      top = mid - 1;
-    else
-      bot = mid + 1;
-  }
+  for (zrnum = 0; zrnum <= top_of_zone_table; zrnum++)
+    if (genolc_zone_bottom(zrnum) <= vznum && zone_table[zrnum].top >= vznum)
+      return zrnum;
 
   return NOWHERE;
 }

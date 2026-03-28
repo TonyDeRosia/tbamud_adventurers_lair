@@ -36,7 +36,7 @@
 /* local functions */
 static void medit_setup_new(struct descriptor_data *d);
 static void init_mobile(struct char_data *mob);
-static void medit_save_to_disk(zone_vnum zone_num);
+static void medit_save_to_disk(zone_rnum zone_num);
 static void medit_disp_positions(struct descriptor_data *d);
 static void medit_disp_sex(struct descriptor_data *d);
 static void medit_disp_attack_types(struct descriptor_data *d);
@@ -205,9 +205,9 @@ ACMD(do_oasis_medit)
     GET_NAME(ch), zone_table[OLC_ZNUM(d)].number, GET_OLC_ZONE(ch));
 }
 
-static void medit_save_to_disk(zone_vnum foo)
+static void medit_save_to_disk(zone_rnum zone_num)
 {
-  save_mobiles(real_zone(foo));
+  save_mobiles(zone_num);
 }
 
 static void medit_setup_new(struct descriptor_data *d)
@@ -901,7 +901,7 @@ void medit_parse(struct descriptor_data *d, char *arg)
       medit_save_internally(d);
       mudlog(CMP, MAX(LVL_BUILDER, GET_INVIS_LEV(d->character)), TRUE, "OLC: %s edits mob %d", GET_NAME(d->character), OLC_NUM(d));
       if (CONFIG_OLC_SAVE) {
-        medit_save_to_disk(zone_table[real_zone_by_thing(OLC_NUM(d))].number);
+        medit_save_to_disk(OLC_ZNUM(d));
         write_to_output(d, "Mobile saved to disk.\r\n");
       } else
         write_to_output(d, "Mobile saved to memory.\r\n");
