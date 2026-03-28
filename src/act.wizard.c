@@ -4526,13 +4526,40 @@ do_set_save_and_cleanup:
 
 ACMD(do_saveall)
 {
- if (GET_LEVEL(ch) < LVL_BUILDER)
-    send_to_char (ch, "You are not holy enough to use this privelege.\n\r");
- else {
-    save_all();
-    House_save_all();
-    send_to_char(ch, "World and house files saved.\n\r");
- }
+  zone_rnum zrnum;
+  int dirty_saved = 0, full_saved = 0;
+
+  if (GET_LEVEL(ch) < LVL_BUILDER) {
+    send_to_char(ch, "You are not holy enough to use this privilege.\r\n");
+    return;
+  }
+
+  /* First, flush anything currently queued in the OLC save list. */
+  dirty_saved = save_all();
+
+  /*
+   * Then perform a full world write for key builder-owned data.
+   *
+   * Rationale: save list entries can be missed (for example after process
+   * lifecycle interruptions or malformed edit flows).  Builders use saveall
+   * as an explicit "persist everything now" command before updates/restarts,
+   * so force-writing mobile/object/zone data makes this command reliable.
+   */
+  for (zrnum = 0; zrnum <= top_of_zone_table; zrnum++) {
+    if (save_mobiles(zrnum) >= 0)
+      full_saved++;
+    if (save_objects(zrnum) >= 0)
+      full_saved++;
+    if (save_zone(zrnum) >= 0)
+      full_saved++;
+  }
+
+  House_save_all();
+
+  send_to_char(ch,
+      "Queued saves flushed (%s). Full save completed for %d zone data files; houses saved.\r\n",
+      dirty_saved ? "ok" : "none queued",
+      full_saved);
 }
 
 ACMD(do_links)
