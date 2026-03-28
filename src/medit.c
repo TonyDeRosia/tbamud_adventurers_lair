@@ -299,6 +299,13 @@ void medit_save_internally(struct descriptor_data *d)
     return;
   }
 
+  /*
+   * Ensure the edited mobile's zone is always queued for SL_MOB changed-zone
+   * persistence (saveall/asave changed), even if add_mobile() was reached via
+   * a path that did not leave the expected queue entry behind.
+   */
+  add_to_save_list(zone_table[OLC_ZNUM(d)].number, SL_MOB);
+
 
   /* Auto-sync QUEST_MASTER / GUILD_MASTER flags with service spec-procs.
    * QUEST_MASTER takes precedence so builders can reliably assign it in MEDIT.
