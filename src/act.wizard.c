@@ -2568,12 +2568,12 @@ ACMD(do_resetlist)
   }
 
   if (!strcasecmp(arg1, "here")) {
-    room_scope = IN_ROOM(ch);
-    zone_scope = world[room_scope].zone;
-    room_mode = TRUE;
+    zone_scope = world[IN_ROOM(ch)].zone;
+    room_scope = NOWHERE;
+    zone_mode = TRUE;
   } else if (!strcasecmp(arg1, "zone")) {
-    room_scope = IN_ROOM(ch);
-    zone_scope = world[room_scope].zone;
+    zone_scope = world[IN_ROOM(ch)].zone;
+    room_scope = NOWHERE;
     zone_mode = TRUE;
   } else if (!is_number(arg1)) {
     send_to_char(ch, "Usage: resetlist here\r\n");
