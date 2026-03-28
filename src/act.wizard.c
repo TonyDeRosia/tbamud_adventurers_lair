@@ -129,6 +129,13 @@ static bool parse_room_reset_count(const char *count_arg, int *count_out);
 static void perform_room_reset(struct char_data *ch, char reset_type, int thing_vnum, const char *room_arg, const char *count_arg);
 static void perform_room_reset_delete(struct char_data *ch, char reset_type, int thing_vnum, const char *room_arg);
 static void show_room_resets(struct char_data *ch, room_rnum room_num);
+static void resetlist_collect_zone(struct char_data *ch, zone_rnum zone_num, room_rnum room_filter,
+                                   int mode);
+static void resetlist_print_room_group(struct char_data *ch, int room_rnum, const int *entries,
+                                       int entry_count, struct reset_com *cmd, int mode,
+                                       const int *parent_obj_map, const bool *orphan_map);
+static void resetlist_format_entry(struct char_data *ch, const struct reset_com *zcmd, int mode,
+                                   int indent, int parent_obj_vnum);
 static bool objtemplate_build_strings(const char *base_name, int number,
                                       char **keywords, char **shortd,
                                       char **longd, char **action_desc,
@@ -2128,6 +2135,471 @@ static void show_room_resets(struct char_data *ch, room_rnum room_num)
 
   if (!found)
     send_to_char(ch, "No resets found for this room.\r\n");
+}
+
+enum {
+  RESETLIST_MODE_NORMAL = 0,
+  RESETLIST_MODE_COMPACT,
+  RESETLIST_MODE_RAW
+};
+#define RESETLIST_ZONE_ORPHAN_ROOM -999999
+
+static int resetlist_room_sort_cmp(const void *a, const void *b)
+{
+  const int room_a = *(const int *)a;
+  const int room_b = *(const int *)b;
+  int vnum_a = (room_a >= 0 && room_a <= top_of_world) ? world[room_a].number : room_a;
+  int vnum_b = (room_b >= 0 && room_b <= top_of_world) ? world[room_b].number : room_b;
+
+  if (room_a == RESETLIST_ZONE_ORPHAN_ROOM)
+    vnum_a = INT_MAX;
+  if (room_b == RESETLIST_ZONE_ORPHAN_ROOM)
+    vnum_b = INT_MAX;
+
+  if (vnum_a < vnum_b)
+    return -1;
+  if (vnum_a > vnum_b)
+    return 1;
+  return 0;
+}
+
+static const char *resetlist_mob_name(int mob_rnum)
+{
+  if (mob_rnum >= 0 && mob_rnum <= top_of_mobt && mob_proto[mob_rnum].player.short_descr)
+    return mob_proto[mob_rnum].player.short_descr;
+  return "<unknown mob>";
+}
+
+static int resetlist_mob_vnum(int mob_rnum)
+{
+  if (mob_rnum >= 0 && mob_rnum <= top_of_mobt)
+    return mob_index[mob_rnum].vnum;
+  return -1;
+}
+
+static const char *resetlist_obj_name(int obj_rnum)
+{
+  if (obj_rnum >= 0 && obj_rnum <= top_of_objt && obj_proto[obj_rnum].short_description)
+    return obj_proto[obj_rnum].short_description;
+  return "<unknown obj>";
+}
+
+static int resetlist_obj_vnum(int obj_rnum)
+{
+  if (obj_rnum >= 0 && obj_rnum <= top_of_objt)
+    return obj_index[obj_rnum].vnum;
+  return -1;
+}
+
+static const char *resetlist_wear_slot_name(int wear_pos)
+{
+  if (wear_pos >= 0 && wear_pos < NUM_WEARS)
+    return equipment_types[wear_pos];
+  return "invalid";
+}
+
+static const char *resetlist_dir_name(int dir)
+{
+  if (dir >= 0 && dir < NUM_OF_DIRS)
+    return dirs[dir];
+  return "invalid";
+}
+
+static const char *resetlist_door_state_name(int state)
+{
+  if (state == 2)
+    return "locked";
+  if (state == 1)
+    return "closed";
+  return "open";
+}
+
+static void resetlist_format_entry(struct char_data *ch, const struct reset_com *zcmd, int mode,
+                                   int indent, int parent_obj_vnum)
+{
+  const char *pad = (indent >= 4) ? "    " : "  ";
+
+  if (mode == RESETLIST_MODE_COMPACT) {
+    switch (zcmd->command) {
+      case 'M':
+        send_to_char(ch, "%sM %d\r\n", pad, resetlist_mob_vnum(zcmd->arg1));
+        break;
+      case 'E':
+        send_to_char(ch, "%sE %d %s\r\n", pad, resetlist_obj_vnum(zcmd->arg1),
+                     resetlist_wear_slot_name(zcmd->arg3));
+        break;
+      case 'G':
+        send_to_char(ch, "%sG %d\r\n", pad, resetlist_obj_vnum(zcmd->arg1));
+        break;
+      case 'O':
+        send_to_char(ch, "%sO %d\r\n", pad, resetlist_obj_vnum(zcmd->arg1));
+        break;
+      case 'P':
+        send_to_char(ch, "%sP %d in %d\r\n", pad, resetlist_obj_vnum(zcmd->arg1), parent_obj_vnum);
+        break;
+      case 'D':
+        send_to_char(ch, "%sD %s %s\r\n", pad, resetlist_dir_name(zcmd->arg2),
+                     resetlist_door_state_name(zcmd->arg3));
+        break;
+      case 'R':
+        send_to_char(ch, "%sR %d\r\n", pad, resetlist_obj_vnum(zcmd->arg2));
+        break;
+      default:
+        break;
+    }
+    return;
+  }
+
+  if (mode == RESETLIST_MODE_RAW) {
+    switch (zcmd->command) {
+      case 'M':
+        send_to_char(ch, "%sM: args=[%d %d %d %d] mob %d %s\r\n", pad, zcmd->if_flag ? 1 : 0,
+                     zcmd->arg1, zcmd->arg2, zcmd->arg3, resetlist_mob_vnum(zcmd->arg1),
+                     resetlist_mob_name(zcmd->arg1));
+        break;
+      case 'E':
+        send_to_char(ch, "%sE: args=[%d %d %d %d] obj %d %s wear:%s\r\n", pad,
+                     zcmd->if_flag ? 1 : 0, zcmd->arg1, zcmd->arg2, zcmd->arg3,
+                     resetlist_obj_vnum(zcmd->arg1), resetlist_obj_name(zcmd->arg1),
+                     resetlist_wear_slot_name(zcmd->arg3));
+        break;
+      case 'G':
+        send_to_char(ch, "%sG: args=[%d %d %d %d] obj %d %s\r\n", pad, zcmd->if_flag ? 1 : 0,
+                     zcmd->arg1, zcmd->arg2, zcmd->arg3, resetlist_obj_vnum(zcmd->arg1),
+                     resetlist_obj_name(zcmd->arg1));
+        break;
+      case 'O':
+        send_to_char(ch, "%sO: args=[%d %d %d %d] obj %d %s\r\n", pad, zcmd->if_flag ? 1 : 0,
+                     zcmd->arg1, zcmd->arg2, zcmd->arg3, resetlist_obj_vnum(zcmd->arg1),
+                     resetlist_obj_name(zcmd->arg1));
+        break;
+      case 'P':
+        send_to_char(ch, "%sP: args=[%d %d %d %d] obj %d %s in:%d\r\n", pad,
+                     zcmd->if_flag ? 1 : 0, zcmd->arg1, zcmd->arg2, zcmd->arg3,
+                     resetlist_obj_vnum(zcmd->arg1), resetlist_obj_name(zcmd->arg1),
+                     parent_obj_vnum);
+        break;
+      case 'D':
+        send_to_char(ch, "%sD: args=[%d %d %d %d] dir:%s state:%s\r\n", pad,
+                     zcmd->if_flag ? 1 : 0, zcmd->arg1, zcmd->arg2, zcmd->arg3,
+                     resetlist_dir_name(zcmd->arg2), resetlist_door_state_name(zcmd->arg3));
+        break;
+      case 'R':
+        send_to_char(ch, "%sR: args=[%d %d %d %d] remove obj %d %s\r\n", pad,
+                     zcmd->if_flag ? 1 : 0, zcmd->arg1, zcmd->arg2, zcmd->arg3,
+                     resetlist_obj_vnum(zcmd->arg2), resetlist_obj_name(zcmd->arg2));
+        break;
+      default:
+        break;
+    }
+    return;
+  }
+
+  switch (zcmd->command) {
+    case 'M':
+      send_to_char(ch, "%sM: mob %d %s  max:%d room_max:%d\r\n", pad,
+                   resetlist_mob_vnum(zcmd->arg1), resetlist_mob_name(zcmd->arg1),
+                   zcmd->arg2, zcmd->arg2);
+      break;
+    case 'E':
+      send_to_char(ch, "%sE: obj %d %s  wear:%s\r\n", pad, resetlist_obj_vnum(zcmd->arg1),
+                   resetlist_obj_name(zcmd->arg1), resetlist_wear_slot_name(zcmd->arg3));
+      break;
+    case 'G':
+      send_to_char(ch, "%sG: obj %d %s\r\n", pad, resetlist_obj_vnum(zcmd->arg1),
+                   resetlist_obj_name(zcmd->arg1));
+      break;
+    case 'O':
+      send_to_char(ch, "%sO: obj %d %s  room_max:%d\r\n", pad, resetlist_obj_vnum(zcmd->arg1),
+                   resetlist_obj_name(zcmd->arg1), zcmd->arg2);
+      break;
+    case 'P':
+      send_to_char(ch, "%sP: obj %d %s  in:%d\r\n", pad, resetlist_obj_vnum(zcmd->arg1),
+                   resetlist_obj_name(zcmd->arg1), parent_obj_vnum);
+      break;
+    case 'D':
+      send_to_char(ch, "%sD: %s door  state:%s\r\n", pad, resetlist_dir_name(zcmd->arg2),
+                   resetlist_door_state_name(zcmd->arg3));
+      break;
+    case 'R':
+      send_to_char(ch, "%sR: remove obj %d from room\r\n", pad, resetlist_obj_vnum(zcmd->arg2));
+      break;
+    default:
+      break;
+  }
+}
+
+static void resetlist_print_room_group(struct char_data *ch, int room_rnum, const int *entries,
+                                       int entry_count, struct reset_com *cmd, int mode,
+                                       const int *parent_obj_map, const bool *orphan_map)
+{
+  int i;
+  bool orphan_header = FALSE;
+  const char *room_name = "<invalid room>";
+  int room_vnum = room_rnum;
+
+  if (room_rnum == RESETLIST_ZONE_ORPHAN_ROOM) {
+    send_to_char(ch, "[zone orphans]\r\n");
+    room_name = NULL;
+  } else if (room_rnum >= 0 && room_rnum <= top_of_world) {
+    room_name = world[room_rnum].name ? world[room_rnum].name : "<invalid room>";
+    room_vnum = world[room_rnum].number;
+  }
+
+  if (room_name)
+    send_to_char(ch, "[%d] %s\r\n", room_vnum, room_name);
+  for (i = 0; i < entry_count; i++) {
+    int idx = entries[i];
+    int indent = (cmd[idx].command == 'E' || cmd[idx].command == 'G' || cmd[idx].command == 'P') ? 4 : 2;
+    int parent_vnum = -1;
+
+    if (orphan_map[idx]) {
+      if (mode != RESETLIST_MODE_COMPACT && !orphan_header) {
+        send_to_char(ch, "  Orphan resets:\r\n");
+        orphan_header = TRUE;
+      }
+      indent = 4;
+    }
+
+    if (parent_obj_map[idx] >= 0)
+      parent_vnum = resetlist_obj_vnum(parent_obj_map[idx]);
+
+    resetlist_format_entry(ch, &cmd[idx], mode, indent, parent_vnum);
+  }
+  send_to_char(ch, "\r\n");
+}
+
+static void resetlist_collect_zone(struct char_data *ch, zone_rnum zone_num, room_rnum room_filter,
+                                   int mode)
+{
+  struct reset_com *cmd;
+  int total, i;
+  int *rooms = NULL, rooms_count = 0;
+  int *entry_rooms = NULL, *entry_indices = NULL, entry_count = 0;
+  int *parent_obj_map = NULL;
+  bool *orphan_map = NULL;
+  int active_mob_room = NOWHERE, active_obj_room = NOWHERE;
+  int active_mob_rnum = NOBODY, active_obj_rnum = NOTHING;
+  int mob_count = 0, obj_count = 0, door_count = 0, remove_count = 0;
+
+  if (zone_num == NOWHERE || zone_num > top_of_zone_table)
+    return;
+
+  cmd = zone_table[zone_num].cmd;
+  total = count_commands(cmd);
+  if (total <= 0) {
+    send_to_char(ch, "No resets found for the requested scope.\r\n");
+    return;
+  }
+  CREATE(parent_obj_map, int, total);
+  CREATE(orphan_map, bool, total);
+  for (i = 0; i < total; i++) {
+    parent_obj_map[i] = -1;
+    orphan_map[i] = FALSE;
+  }
+
+  for (i = 0; i < total; i++) {
+    int room_for_cmd = NOWHERE;
+    int parent_obj_rnum = -1;
+    bool orphan = FALSE;
+
+    switch (cmd[i].command) {
+      case 'M':
+        room_for_cmd = cmd[i].arg3;
+        active_mob_room = room_for_cmd;
+        active_mob_rnum = cmd[i].arg1;
+        active_obj_room = NOWHERE;
+        active_obj_rnum = NOTHING;
+        mob_count++;
+        break;
+      case 'O':
+        room_for_cmd = cmd[i].arg3;
+        active_obj_room = room_for_cmd;
+        active_obj_rnum = cmd[i].arg1;
+        active_mob_room = NOWHERE;
+        active_mob_rnum = NOBODY;
+        obj_count++;
+        break;
+      case 'D':
+        room_for_cmd = cmd[i].arg1;
+        active_mob_room = NOWHERE;
+        active_obj_room = NOWHERE;
+        door_count++;
+        break;
+      case 'R':
+        room_for_cmd = cmd[i].arg1;
+        active_mob_room = NOWHERE;
+        active_obj_room = NOWHERE;
+        remove_count++;
+        break;
+      case 'G':
+      case 'E':
+        if (active_mob_room != NOWHERE && active_mob_rnum != NOBODY &&
+            active_mob_rnum >= 0 && active_mob_rnum <= top_of_mobt)
+          room_for_cmd = active_mob_room;
+        else {
+          room_for_cmd = active_mob_room;
+          orphan = TRUE;
+        }
+        break;
+      case 'P':
+        if (active_obj_room != NOWHERE && active_obj_rnum != NOTHING &&
+            active_obj_rnum >= 0 && active_obj_rnum <= top_of_objt) {
+          room_for_cmd = active_obj_room;
+          parent_obj_rnum = active_obj_rnum;
+        } else {
+          room_for_cmd = active_obj_room;
+          orphan = TRUE;
+        }
+        break;
+      default:
+        continue;
+    }
+
+    if (room_filter != NOWHERE && room_for_cmd != room_filter)
+      continue;
+
+    if (room_for_cmd == NOWHERE)
+      room_for_cmd = RESETLIST_ZONE_ORPHAN_ROOM;
+
+    RECREATE(entry_rooms, int, entry_count + 1);
+    RECREATE(entry_indices, int, entry_count + 1);
+    entry_rooms[entry_count] = room_for_cmd;
+    entry_indices[entry_count] = i;
+    entry_count++;
+
+    orphan_map[i] = orphan;
+    if (cmd[i].command == 'P')
+      parent_obj_map[i] = parent_obj_rnum;
+
+    if (rooms_count == 0 || rooms[rooms_count - 1] != room_for_cmd) {
+      int seen = FALSE, j;
+      for (j = 0; j < rooms_count; j++) {
+        if (rooms[j] == room_for_cmd) {
+          seen = TRUE;
+          break;
+        }
+      }
+      if (!seen) {
+        RECREATE(rooms, int, rooms_count + 1);
+        rooms[rooms_count++] = room_for_cmd;
+      }
+    }
+  }
+
+  if (entry_count <= 0) {
+    send_to_char(ch, "No resets found for the requested scope.\r\n");
+    free(rooms);
+    free(entry_rooms);
+    free(entry_indices);
+    free(parent_obj_map);
+    free(orphan_map);
+    return;
+  }
+
+  if (room_filter == NOWHERE) {
+    qsort(rooms, rooms_count, sizeof(int), resetlist_room_sort_cmp);
+    if (mode != RESETLIST_MODE_COMPACT) {
+      send_to_char(ch, "Reset list for zone %d: %s\r\n",
+                   zone_table[zone_num].number, zone_table[zone_num].name);
+      send_to_char(ch, "Rooms with resets: %d, mob resets: %d, object resets: %d, door resets: %d, remove resets: %d\r\n\r\n",
+                   rooms_count, mob_count, obj_count, door_count, remove_count);
+    }
+  } else if (mode != RESETLIST_MODE_COMPACT) {
+    send_to_char(ch, "Reset list for room [%d]: %s\r\n\r\n",
+                 (room_filter >= 0 && room_filter <= top_of_world) ? world[room_filter].number : room_filter,
+                 (room_filter >= 0 && room_filter <= top_of_world && world[room_filter].name) ? world[room_filter].name : "<invalid room>");
+  }
+
+  for (i = 0; i < rooms_count; i++) {
+    int room = rooms[i];
+    int j, room_entry_count = 0;
+    int *room_entries = NULL;
+
+    for (j = 0; j < entry_count; j++) {
+      if (entry_rooms[j] == room) {
+        RECREATE(room_entries, int, room_entry_count + 1);
+        room_entries[room_entry_count++] = entry_indices[j];
+      }
+    }
+
+    if (room_entry_count > 0)
+      resetlist_print_room_group(ch, room, room_entries, room_entry_count, cmd, mode,
+                                 parent_obj_map, orphan_map);
+    free(room_entries);
+  }
+
+  free(rooms);
+  free(entry_rooms);
+  free(entry_indices);
+  free(parent_obj_map);
+  free(orphan_map);
+}
+
+ACMD(do_resetlist)
+{
+  char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
+  int mode = RESETLIST_MODE_NORMAL;
+  room_rnum room_scope = NOWHERE;
+  zone_rnum zone_scope = NOWHERE;
+  int target_vnum;
+
+  two_arguments(argument, arg1, arg2);
+
+  if (!*arg1) {
+    send_to_char(ch, "Usage: resetlist here\r\n");
+    send_to_char(ch, "       resetlist <room vnum>\r\n");
+    send_to_char(ch, "       resetlist <zone vnum> [compact|raw]\r\n");
+    return;
+  }
+
+  if (*arg2) {
+    if (is_abbrev(arg2, "compact"))
+      mode = RESETLIST_MODE_COMPACT;
+    else if (is_abbrev(arg2, "raw"))
+      mode = RESETLIST_MODE_RAW;
+    else {
+      send_to_char(ch, "Usage: resetlist <zone vnum> [compact|raw]\r\n");
+      return;
+    }
+  }
+
+  if (!strcasecmp(arg1, "here")) {
+    room_scope = IN_ROOM(ch);
+    zone_scope = world[room_scope].zone;
+  } else if (!is_number(arg1)) {
+    send_to_char(ch, "Usage: resetlist here\r\n");
+    send_to_char(ch, "       resetlist <room vnum>\r\n");
+    send_to_char(ch, "       resetlist <zone vnum> [compact|raw]\r\n");
+    return;
+  } else {
+    target_vnum = atoi(arg1);
+    if (*arg2) {
+      zone_scope = real_zone(target_vnum);
+      if (zone_scope == NOWHERE) {
+        send_to_char(ch, "Invalid zone vnum.\r\n");
+        return;
+      }
+    } else {
+      room_scope = real_room(target_vnum);
+      if (room_scope != NOWHERE)
+        zone_scope = world[room_scope].zone;
+      else {
+        zone_scope = real_zone(target_vnum);
+        if (zone_scope == NOWHERE) {
+          send_to_char(ch, "That is neither a valid room vnum nor a valid zone vnum.\r\n");
+          return;
+        }
+      }
+    }
+  }
+
+  if (!can_edit_zone(ch, zone_scope)) {
+    send_to_char(ch, "You don't have permission to view that zone's resets.\r\n");
+    return;
+  }
+
+  resetlist_collect_zone(ch, zone_scope, room_scope, mode);
 }
 
 ACMD(do_mload_admin)
