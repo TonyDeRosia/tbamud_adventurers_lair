@@ -23,6 +23,8 @@ zone_rnum real_zone_by_thing(room_vnum vznum)
   zone_rnum znum, best = NOWHERE;
   int low, high;
   int best_span = 0;
+  zone_rnum fallback = NOWHERE;
+  zone_vnum expected_zone;
 
   if (top_of_zone_table < 0)
     return NOWHERE;
@@ -45,7 +47,26 @@ zone_rnum real_zone_by_thing(room_vnum vznum)
       }
     }
   }
-  return best;
+
+  if (best != NOWHERE)
+    return best;
+
+  /*
+   * Fallback for worlds using unsigned IDXTYPE where zone boundaries may have
+   * been read through signed paths on older data/compilers (e.g. >32767).
+   *
+   * If no explicit [bot, top] range matched, map by classic vnum ownership:
+   * zone N owns N00..N99.
+   */
+  expected_zone = vznum / 100;
+  for (znum = 0; znum <= top_of_zone_table; znum++) {
+    if (zone_table[znum].number == expected_zone) {
+      fallback = znum;
+      break;
+    }
+  }
+
+  return fallback;
 }
 
 zone_rnum create_new_zone(zone_vnum vzone_num, room_vnum bottom, room_vnum top, const char **error)
