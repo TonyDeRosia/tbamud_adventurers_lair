@@ -305,8 +305,9 @@ int save_mobiles(zone_rnum rznum)
     return FALSE;
   }
 
-  for (i = genolc_zone_bottom(rznum); i <= zone_table[rznum].top; i++) {
-    if ((rmob = real_mobile(i)) == NOBODY)
+  for (rmob = 0; rmob <= top_of_mobt; rmob++) {
+    i = mob_index[rmob].vnum;
+    if (real_zone_by_thing(i) != rznum)
       continue;
     check_mobile_strings(&mob_proto[rmob]);
     if (write_mobile_record(i, &mob_proto[rmob], mobfd) < 0)

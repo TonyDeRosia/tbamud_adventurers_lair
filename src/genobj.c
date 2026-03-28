@@ -202,8 +202,9 @@ int save_objects(zone_rnum zone_num)
     return FALSE;
   }
   /* Start running through all objects in this zone. */
-  for (counter = genolc_zone_bottom(zone_num); counter <= zone_table[zone_num].top; counter++) {
-    if ((realcounter = real_object(counter)) != NOTHING) {
+  for (realcounter = 0; realcounter <= top_of_objt; realcounter++) {
+    counter = obj_index[realcounter].vnum;
+    if (real_zone_by_thing(counter) == zone_num) {
       if ((obj = &obj_proto[realcounter])->action_description) {
         strncpy(buf, obj->action_description, sizeof(buf) - 1);
         strip_cr(buf);
