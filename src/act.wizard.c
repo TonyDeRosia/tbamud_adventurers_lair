@@ -4526,6 +4526,35 @@ do_set_save_and_cleanup:
 
 ACMD(do_saveall)
 {
+  struct save_list_data *item;
+  unsigned char *changed_zones;
+  zone_rnum zrnum;
+
+  /*
+   * Builders expect saveall / asave changed to persist all editable world
+   * files related to changed zones, not only whichever specific SL_* type
+   * happened to be queued.
+   */
+  CREATE(changed_zones, unsigned char, top_of_zone_table + 1);
+  for (zrnum = 0; zrnum <= top_of_zone_table; zrnum++)
+    changed_zones[zrnum] = FALSE;
+
+  for (item = save_list; item; item = item->next) {
+    zrnum = real_zone(item->zone);
+    if (zrnum != NOWHERE && zrnum <= top_of_zone_table)
+      changed_zones[zrnum] = TRUE;
+  }
+
+  for (zrnum = 0; zrnum <= top_of_zone_table; zrnum++) {
+    if (!changed_zones[zrnum])
+      continue;
+    save_mobiles(zrnum);
+    save_objects(zrnum);
+    save_rooms(zrnum);
+    save_zone(zrnum);
+  }
+
+  free(changed_zones);
   save_all();
   send_to_char(ch, "Done.\r\n");
 }
@@ -4543,8 +4572,7 @@ ACMD(do_asave)
   }
 
   if (is_abbrev(arg1, "changed")) {
-    save_all();
-    send_to_char(ch, "Done.\r\n");
+    do_saveall(ch, "", 0, 0);
     return;
   }
 
