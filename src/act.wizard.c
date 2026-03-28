@@ -2543,6 +2543,9 @@ ACMD(do_resetlist)
   room_rnum room_scope = NOWHERE;
   zone_rnum zone_scope = NOWHERE;
   int target_vnum;
+  int i;
+  bool zone_mode = FALSE;
+  bool room_mode = FALSE;
 
   two_arguments(argument, arg1, arg2);
 
@@ -2567,6 +2570,11 @@ ACMD(do_resetlist)
   if (!strcasecmp(arg1, "here")) {
     room_scope = IN_ROOM(ch);
     zone_scope = world[room_scope].zone;
+    room_mode = TRUE;
+  } else if (!strcasecmp(arg1, "zone")) {
+    room_scope = IN_ROOM(ch);
+    zone_scope = world[room_scope].zone;
+    zone_mode = TRUE;
   } else if (!is_number(arg1)) {
     send_to_char(ch, "Usage: resetlist here\r\n");
     send_to_char(ch, "       resetlist <room vnum>\r\n");
@@ -2574,28 +2582,37 @@ ACMD(do_resetlist)
     return;
   } else {
     target_vnum = atoi(arg1);
-    if (*arg2) {
-      zone_scope = real_zone(target_vnum);
-      if (zone_scope == NOWHERE) {
-        send_to_char(ch, "Invalid zone vnum.\r\n");
-        return;
-      }
+    room_scope = real_room(target_vnum);
+    if (room_scope != NOWHERE) {
+      zone_scope = world[room_scope].zone;
+      room_mode = TRUE;
     } else {
-      room_scope = real_room(target_vnum);
-      if (room_scope != NOWHERE)
-        zone_scope = world[room_scope].zone;
-      else {
-        zone_scope = real_zone(target_vnum);
-        if (zone_scope == NOWHERE) {
-          send_to_char(ch, "That is neither a valid room vnum nor a valid zone vnum.\r\n");
-          return;
+      for (i = 0; i <= top_of_zone_table; i++) {
+        if (zone_table[i].number == target_vnum) {
+          zone_scope = i;
+          zone_mode = TRUE;
+          break;
         }
+      }
+      if (!zone_mode) {
+        send_to_char(ch, "Invalid zone number.\r\n");
+        return;
       }
     }
   }
 
+  if (room_mode && *arg2) {
+    send_to_char(ch, "Usage: resetlist <zone vnum> [compact|raw]\r\n");
+    return;
+  }
+
   if (!can_edit_zone(ch, zone_scope)) {
     send_to_char(ch, "You don't have permission to view that zone's resets.\r\n");
+    return;
+  }
+
+  if (zone_mode && count_commands(zone_table[zone_scope].cmd) <= 0) {
+    send_to_char(ch, "Zone %d has no reset commands.\r\n", zone_table[zone_scope].number);
     return;
   }
 
