@@ -182,7 +182,8 @@ int save_objects(zone_rnum zone_num)
   char ebuf1[MAX_STRING_LENGTH], ebuf2[MAX_STRING_LENGTH], ebuf3[MAX_STRING_LENGTH], ebuf4[MAX_STRING_LENGTH];
   char wbuf1[MAX_STRING_LENGTH], wbuf2[MAX_STRING_LENGTH], wbuf3[MAX_STRING_LENGTH], wbuf4[MAX_STRING_LENGTH];
   char pbuf1[MAX_STRING_LENGTH], pbuf2[MAX_STRING_LENGTH], pbuf3[MAX_STRING_LENGTH], pbuf4[MAX_STRING_LENGTH];
-  int counter, counter2, realcounter;
+  int counter2, realcounter;
+  obj_vnum ovnum;
   FILE *fp;
   struct obj_data *obj;
   struct extra_descr_data *ex_desc;
@@ -202,8 +203,9 @@ int save_objects(zone_rnum zone_num)
     return FALSE;
   }
   /* Start running through all objects in this zone. */
-  for (counter = genolc_zone_bottom(zone_num); counter <= zone_table[zone_num].top; counter++) {
-    if ((realcounter = real_object(counter)) != NOTHING) {
+  for (realcounter = 0; realcounter <= top_of_objt; realcounter++) {
+    ovnum = obj_index[realcounter].vnum;
+    if (real_zone_by_thing(ovnum) == zone_num) {
       if ((obj = &obj_proto[realcounter])->action_description) {
         strncpy(buf, obj->action_description, sizeof(buf) - 1);
         strip_cr(buf);

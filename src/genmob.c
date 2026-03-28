@@ -284,8 +284,8 @@ int save_mobiles(zone_rnum rznum)
 {
   zone_vnum vznum;
   FILE *mobfd;
-  room_vnum i;
   mob_rnum rmob;
+  mob_vnum mvnum;
   int written;
   char mobfname[64], usedfname[64];
 
@@ -305,12 +305,13 @@ int save_mobiles(zone_rnum rznum)
     return FALSE;
   }
 
-  for (i = genolc_zone_bottom(rznum); i <= zone_table[rznum].top; i++) {
-    if ((rmob = real_mobile(i)) == NOBODY)
+  for (rmob = 0; rmob <= top_of_mobt; rmob++) {
+    mvnum = mob_index[rmob].vnum;
+    if (real_zone_by_thing(mvnum) != rznum)
       continue;
     check_mobile_strings(&mob_proto[rmob]);
-    if (write_mobile_record(i, &mob_proto[rmob], mobfd) < 0)
-      log("SYSERR: GenOLC: Error writing mobile #%d.", i);
+    if (write_mobile_record(mvnum, &mob_proto[rmob], mobfd) < 0)
+      log("SYSERR: GenOLC: Error writing mobile #%d.", mvnum);
   }
   fputs("$\n", mobfd);
   written = ftell(mobfd);
