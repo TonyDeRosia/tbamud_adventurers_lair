@@ -2170,6 +2170,44 @@ ACMD(do_mload_admin)
   send_to_char(ch, "Mob %d loaded.\r\n", mob_vnum_input);
 }
 
+ACMD(do_delmob)
+{
+  char arg[MAX_INPUT_LENGTH], extra[MAX_INPUT_LENGTH];
+  mob_vnum vnum;
+  mob_rnum rnum;
+  zone_rnum zrnum;
+
+  two_arguments(argument, arg, extra);
+
+  if (!*arg || *extra || !is_number(arg)) {
+    send_to_char(ch, "Usage: delmob <mob vnum>\r\n");
+    return;
+  }
+
+  vnum = atoi(arg);
+  rnum = real_mobile(vnum);
+
+  if (rnum == NOBODY) {
+    send_to_char(ch, "No mobile exists with that vnum.\r\n");
+    return;
+  }
+
+  zrnum = real_zone_by_thing(vnum);
+  if (zrnum == NOWHERE || (!can_edit_zone(ch, zrnum) && GET_LEVEL(ch) <= LVL_IMMORT)) {
+    send_to_char(ch, "You do not have permission to edit that zone.\r\n");
+    return;
+  }
+
+  if (delete_mobile(rnum) == NOBODY) {
+    send_to_char(ch, "Unable to delete mob %d.\r\n", vnum);
+    return;
+  }
+
+  send_to_char(ch, "Deleted mob %d.\r\n", vnum);
+  mudlog(CMP, MAX(LVL_BUILDER, GET_INVIS_LEV(ch)), TRUE,
+         "OLC: %s deleted mob %d.", GET_NAME(ch), vnum);
+}
+
 ACMD(do_mob)
 {
   char mob_subcmd[MAX_INPUT_LENGTH];
