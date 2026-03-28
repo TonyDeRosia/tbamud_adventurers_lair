@@ -4526,19 +4526,68 @@ do_set_save_and_cleanup:
 
 ACMD(do_saveall)
 {
-  int dirty_saved = 0;
+  save_all();
+  send_to_char(ch, "Done.\r\n");
+}
 
-  if (GET_LEVEL(ch) < LVL_BUILDER) {
-    send_to_char(ch, "You are not holy enough to use this privilege.\r\n");
+ACMD(do_asave)
+{
+  char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
+  zone_rnum zrnum;
+
+  two_arguments(argument, arg1, arg2);
+
+  if (!*arg1) {
+    send_to_char(ch, "Usage: asave <changed | zone <vnum|here> | world>\r\n");
     return;
   }
 
-  /* First, flush anything currently queued in the OLC save list. */
-  dirty_saved = save_all();
+  if (is_abbrev(arg1, "changed")) {
+    save_all();
+    send_to_char(ch, "Done.\r\n");
+    return;
+  }
 
-  House_save_all();
+  if (is_abbrev(arg1, "zone")) {
+    if (!*arg2) {
+      send_to_char(ch, "Usage: asave <changed | zone <vnum|here> | world>\r\n");
+      return;
+    }
 
-  send_to_char(ch, "Done.\r\n");
+    if (is_abbrev(arg2, "here")) {
+      zrnum = world[IN_ROOM(ch)].zone;
+    } else if (is_number(arg2)) {
+      zrnum = real_zone(atoi(arg2));
+    } else {
+      send_to_char(ch, "Invalid zone. Usage: asave zone <vnum|here>\r\n");
+      return;
+    }
+
+    if (zrnum == NOWHERE) {
+      send_to_char(ch, "Invalid zone. No zone found with that vnum.\r\n");
+      return;
+    }
+
+    save_mobiles(zrnum);
+    save_objects(zrnum);
+    save_rooms(zrnum);
+    save_zone(zrnum);
+    send_to_char(ch, "Done.\r\n");
+    return;
+  }
+
+  if (is_abbrev(arg1, "world")) {
+    for (zrnum = 0; zrnum <= top_of_zone_table; zrnum++) {
+      save_mobiles(zrnum);
+      save_objects(zrnum);
+      save_rooms(zrnum);
+      save_zone(zrnum);
+    }
+    send_to_char(ch, "Done.\r\n");
+    return;
+  }
+
+  send_to_char(ch, "Usage: asave <changed | zone <vnum|here> | world>\r\n");
 }
 
 ACMD(do_links)

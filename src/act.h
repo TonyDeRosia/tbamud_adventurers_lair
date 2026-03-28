@@ -371,6 +371,7 @@ ACMD(do_acctshow);
 ACMD(do_acctforcepw);
 ACMD(do_acctclearpw);
 ACMD(do_acctsetpass);
+ACMD(do_asave);
 ACMD(do_oset);
 ACMD(do_peace);
 ACMD(do_plist);

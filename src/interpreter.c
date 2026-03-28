@@ -380,6 +380,7 @@ cpp_extern const struct command_info cmd_info[] = {
   { "score"    , "sc"      , POS_DEAD    , do_score    , 0, 0 },
   { "scribe"   , "scri"    , POS_RESTING , do_scribe   , 0, 0 },
   { "attr"     , "attr"    , POS_DEAD    , do_attr     , 0, 0 },
+  { "asave"    , "asave"   , POS_DEAD    , do_asave    , LVL_BUILDER, 0 },
   { "resists"  , "res"     , POS_DEAD    , do_resists  , 0, 0 },
   { "speedwalk", "speedwalk", POS_DEAD   , do_speedwalk, 0, 0 },
   { "run"      , "run"     , POS_STANDING, do_run      , 0, 0 },
