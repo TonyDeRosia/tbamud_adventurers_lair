@@ -286,6 +286,7 @@ int save_mobiles(zone_rnum rznum)
   FILE *mobfd;
   mob_rnum rmob;
   mob_vnum mvnum;
+  zone_rnum thing_rznum;
   int written;
   char mobfname[64], usedfname[64];
 
@@ -299,6 +300,7 @@ int save_mobiles(zone_rnum rznum)
   }
 
   vznum = zone_table[rznum].number;
+  log("DBG33002: save_mobiles entry rznum=%d zone_vnum=%d", rznum, vznum);
   snprintf(mobfname, sizeof(mobfname), "%s%d.new", MOB_PREFIX, vznum);
   if ((mobfd = fopen(mobfname, "w")) == NULL) {
     mudlog(BRF, LVL_GOD, TRUE, "SYSERR: GenOLC: Cannot open mob file for writing.");
@@ -307,9 +309,15 @@ int save_mobiles(zone_rnum rznum)
 
   for (rmob = 0; rmob <= top_of_mobt; rmob++) {
     mvnum = mob_index[rmob].vnum;
-    if (real_zone_by_thing(mvnum) != rznum)
+    thing_rznum = real_zone_by_thing(mvnum);
+    if (vznum == 330 || mvnum == 33002)
+      log("DBG33002: save_mobiles scan rmob=%d mvnum=%d real_zone_by_thing=%d target_rznum=%d",
+          rmob, mvnum, thing_rznum, rznum);
+    if (thing_rznum != rznum)
       continue;
     check_mobile_strings(&mob_proto[rmob]);
+    if (mvnum == 33002)
+      log("DBG33002: save_mobiles writing mob #33002 in zone_vnum=%d", vznum);
     if (write_mobile_record(mvnum, &mob_proto[rmob], mobfd) < 0)
       log("SYSERR: GenOLC: Error writing mobile #%d.", mvnum);
   }
@@ -322,6 +330,8 @@ int save_mobiles(zone_rnum rznum)
 
   if (in_save_list(vznum, SL_MOB))
     remove_from_save_list(vznum, SL_MOB);
+  if (vznum == 330)
+    log("DBG33002: save_mobiles final bytes zone_vnum=330 bytes=%d file=%s", written, usedfname);
   log("GenOLC: '%s' saved, %d bytes written.", usedfname, written);
   return written;
 }
