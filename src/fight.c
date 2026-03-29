@@ -24,6 +24,7 @@
 #include "class.h"
 #include "race.h"
 #include "fight.h"
+#include "mob_behavior.h"
 #include "ai_actor.h"
 #include "shop.h"
 #include "quest.h"
@@ -852,6 +853,8 @@ void set_fighting(struct char_data *ch, struct char_data *vict)
 
   FIGHTING(ch) = vict;
   GET_POS(ch) = POS_FIGHTING;
+  if (IS_NPC(ch))
+    mob_behavior_on_combat_start(ch, vict);
 
   ai_actor_event_combat_start(ch, vict);
 
@@ -870,6 +873,8 @@ void stop_fighting(struct char_data *ch)
   REMOVE_FROM_LIST(ch, combat_list, next_fighting);
   ch->next_fighting = NULL;
   FIGHTING(ch) = NULL;
+  if (IS_NPC(ch))
+    mob_behavior_on_combat_end(ch);
   GET_POS(ch) = POS_STANDING;
   update_pos(ch);
 }
@@ -1084,6 +1089,9 @@ void death_cry(struct char_data *ch)
 void raw_kill(struct char_data * ch, struct char_data * killer)
 {
 struct char_data *i;
+
+  if (IS_NPC(ch))
+    mob_behavior_handle_event(ch, MOB_EVENT_DEATH, killer);
 
   if (FIGHTING(ch))
     stop_fighting(ch);
@@ -1822,6 +1830,9 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
   char local_buf[256];
   struct char_data *tmp_char;
   struct obj_data *corpse_obj;
+
+  if (victim && IS_NPC(victim) && ch && ch != victim)
+    mob_behavior_handle_event(victim, MOB_EVENT_ATTACKED, ch);
 
   if (GET_POS(victim) <= POS_DEAD) {
     /* This is "normal"-ish now with delayed extraction. -gg 3/15/2001 */
@@ -2781,6 +2792,7 @@ void perform_violence(void)
 
   if (!violence_tick_running) {
     violence_tick_running = TRUE;
+    mob_behavior_advance_pulse();
     process_round_effects();
     violence_tick_running = FALSE;
   }
@@ -2846,6 +2858,9 @@ void perform_violence(void)
     }
 
     auto_assist_owned_followers(ch);
+
+    if (IS_NPC(ch) && FIGHTING(ch) && IN_ROOM(ch) == IN_ROOM(FIGHTING(ch)))
+      mob_behavior_eval_combat_round(ch);
 
     hit(ch, FIGHTING(ch), TYPE_UNDEFINED);
     if (FIGHTING(ch) &&

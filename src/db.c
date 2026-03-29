@@ -1808,6 +1808,62 @@ static void interpret_espec(const char *keyword, const char *value, int i, int n
       log("SYSERR: Bad LootItem format in mob #%d", nr);
     }
   }
+  if (value && !matched && !str_cmp(keyword, "CombatAbility")) {
+    int en, atype, target, mode, avnum, rmin, rmax, cooldown, prio;
+    int once, maxuses, tna, sna, selfhp, tarhp;
+    matched = TRUE;
+    if (sscanf(value, "%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d",
+               &en, &atype, &target, &mode, &avnum, &rmin, &rmax, &cooldown, &prio,
+               &once, &maxuses, &tna, &sna, &selfhp, &tarhp) == 15) {
+      if (mob_proto[i].mob_specials.combat_ability_count < MAX_MOB_COMBAT_ABILITIES) {
+        int idx = mob_proto[i].mob_specials.combat_ability_count++;
+        struct mob_combat_ability *ab = &mob_proto[i].mob_specials.combat_abilities[idx];
+        ab->enabled = (en != 0);
+        ab->ability_type = LIMIT(atype, MOB_ABILITY_NONE, MOB_ABILITY_SKILL);
+        ab->target_type = LIMIT(target, MOB_TARGET_SELF, MOB_TARGET_ALLY);
+        ab->trigger_mode = LIMIT(mode, MOB_TRIGGER_OPENER, MOB_TRIGGER_TARGET_HP_THRESHOLD);
+        ab->ability_vnum = avnum;
+        ab->round_min = MAX(1, rmin);
+        ab->round_max = MAX(ab->round_min, rmax);
+        ab->cooldown_rounds = MAX(0, cooldown);
+        ab->priority = prio;
+        ab->once_per_fight = (once != 0);
+        ab->max_uses_per_fight = MAX(0, maxuses);
+        ab->require_target_not_affected = (tna != 0);
+        ab->require_self_not_affected = (sna != 0);
+        ab->self_hp_pct_max = LIMIT(selfhp, 0, 100);
+        ab->target_hp_pct_max = LIMIT(tarhp, 0, 100);
+      } else
+        log("SYSERR: Mob #%d exceeds MAX_MOB_COMBAT_ABILITIES.", nr);
+    } else
+      log("SYSERR: Bad CombatAbility format in mob #%d", nr);
+  }
+
+  if (value && !matched && !str_cmp(keyword, "EventReaction")) {
+    int en, etype, action, target, avnum, cooldown, chance, once, hpth;
+    char text[MAX_INPUT_LENGTH] = "";
+    matched = TRUE;
+    if (sscanf(value, "%d %d %d %d %d %d %d %d %d |%1023[^|]|",
+               &en, &etype, &action, &target, &avnum, &cooldown, &chance,
+               &once, &hpth, text) >= 9) {
+      if (mob_proto[i].mob_specials.event_reaction_count < MAX_MOB_EVENT_REACTIONS) {
+        int idx = mob_proto[i].mob_specials.event_reaction_count++;
+        struct mob_event_reaction *ev = &mob_proto[i].mob_specials.event_reactions[idx];
+        ev->enabled = (en != 0);
+        ev->event_type = LIMIT(etype, MOB_EVENT_PLAYER_ENTERS_ROOM, MOB_EVENT_DEATH);
+        ev->action_type = LIMIT(action, MOB_EVENT_ACTION_CAST_SPELL, MOB_EVENT_ACTION_EMOTE_TEXT);
+        ev->target_type = LIMIT(target, MOB_TARGET_SELF, MOB_TARGET_ALLY);
+        ev->ability_vnum = avnum;
+        ev->cooldown_pulses = MAX(0, cooldown);
+        ev->chance_percent = LIMIT(chance, 0, 100);
+        ev->once_per_reset = (once != 0);
+        ev->hp_pct_threshold = LIMIT(hpth, 1, 100);
+        strlcpy(ev->argument, text, sizeof(ev->argument));
+      } else
+        log("SYSERR: Mob #%d exceeds MAX_MOB_EVENT_REACTIONS.", nr);
+    } else
+      log("SYSERR: Bad EventReaction format in mob #%d", nr);
+  }
   CASE("Wimpy") {
     RANGE(0, 30000);
     mob_proto[i].mob_specials.wimpy_threshold = num_arg;

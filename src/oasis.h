@@ -105,6 +105,9 @@ struct oasis_olc_data {
   struct message_type *m_type;
   int script_mode;
   int trigger_position;
+  int behavior_edit_type;
+  int behavior_slot;
+  int behavior_field;
   int item_type;
   struct trig_proto_list *script; /* for assigning triggers in [r|o|m]edit*/
   struct help_index_element*help;   /* Hedit uses this */
@@ -315,6 +318,20 @@ extern const char *nrm, *grn, *cyn, *yel;
 #define MEDIT_LOADOUT_REMOVE_INV        54
 #define MEDIT_LOADOUT_REMOVE_LOOT       55
 #define MEDIT_BONUS_XP                  56
+#define MEDIT_COMBAT_ABILITIES_MENU     57
+#define MEDIT_COMBAT_ABILITIES_ADD      58
+#define MEDIT_COMBAT_ABILITIES_EDIT     59
+#define MEDIT_COMBAT_ABILITIES_DELETE   60
+#define MEDIT_COMBAT_ABILITIES_TOGGLE   61
+#define MEDIT_COMBAT_ABILITY_FIELD_MENU 62
+#define MEDIT_COMBAT_ABILITY_FIELD_VALUE 63
+#define MEDIT_EVENT_REACTIONS_MENU      64
+#define MEDIT_EVENT_REACTIONS_ADD       65
+#define MEDIT_EVENT_REACTIONS_EDIT      66
+#define MEDIT_EVENT_REACTIONS_DELETE    67
+#define MEDIT_EVENT_REACTIONS_TOGGLE    68
+#define MEDIT_EVENT_REACTION_FIELD_MENU 69
+#define MEDIT_EVENT_REACTION_FIELD_VALUE 70
 
 /* Submodes of SEDIT connectedness. */
 #define SEDIT_MAIN_MENU              	0

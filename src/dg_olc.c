@@ -999,8 +999,8 @@ int dg_script_edit_parse(struct descriptor_data *d, char *arg)
 	   * free()'d, and the prototype not touched. */
           return 0;
         case 'n':
-          write_to_output(d, "\r\nPlease enter position, vnum   (ex: 1, 200):");
-          OLC_SCRIPT_EDIT_MODE(d) = SCRIPT_NEW_TRIGGER;
+          write_to_output(d, "Enter trigger vnum to attach, or Q to cancel: ");
+          OLC_SCRIPT_EDIT_MODE(d) = SCRIPT_NEW_TRIGGER_VNUM;
           break;
         case 'x':
           write_to_output(d, "     Which entry should be deleted?  0 to abort :");
@@ -1046,6 +1046,45 @@ int dg_script_edit_parse(struct descriptor_data *d, char *arg)
         currtrig->next = trig;
       }
       OLC_VAL(d)++;
+      break;
+
+    case SCRIPT_NEW_TRIGGER_VNUM:
+      if (tolower(*arg) == 'q') {
+        write_to_output(d, "Attachment canceled.\r\n");
+        break;
+      }
+      vnum = atoi(arg);
+      if (vnum <= 0) {
+        write_to_output(d, "No such trigger.\r\n");
+        break;
+      }
+      if (real_trigger(vnum) == NOTHING) {
+        write_to_output(d, "No such trigger.\r\n");
+        break;
+      }
+      if (trig_index[real_trigger(vnum)]->proto->attach_type != OLC_ITEM_TYPE(d)) {
+        if (OLC_ITEM_TYPE(d) == MOB_TRIGGER)
+          write_to_output(d, "That trigger is not a mobile trigger.\r\n");
+        else if (OLC_ITEM_TYPE(d) == OBJ_TRIGGER)
+          write_to_output(d, "That trigger is not an object trigger.\r\n");
+        else
+          write_to_output(d, "That trigger is not a room trigger.\r\n");
+        break;
+      }
+
+      currtrig = OLC_SCRIPT(d);
+      CREATE(trig, struct trig_proto_list, 1);
+      trig->vnum = vnum;
+      trig->next = NULL;
+      if (!currtrig)
+        OLC_SCRIPT(d) = trig;
+      else {
+        while (currtrig->next)
+          currtrig = currtrig->next;
+        currtrig->next = trig;
+      }
+      OLC_VAL(d)++;
+      write_to_output(d, "Trigger attached.\r\n");
       break;
 
     case SCRIPT_DEL_TRIGGER:

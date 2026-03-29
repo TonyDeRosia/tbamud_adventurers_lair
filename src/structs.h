@@ -446,6 +446,8 @@ void clanedit_parse(struct descriptor_data *d, char *arg);
 
 #define MAX_MOB_LOADOUT_ITEMS 32
 #define MAX_MOB_LOOT_ITEMS    32
+#define MAX_MOB_COMBAT_ABILITIES 10
+#define MAX_MOB_EVENT_REACTIONS 10
 
 /* object-related defines */
 /* Item types: used by obj_data.obj_flags.type_flag */
@@ -1188,6 +1190,73 @@ struct player_special_data
   int hp_last_round;     /**< HP snapshot from previous combat round for chrono effects. */
 };
 
+enum mob_ability_type {
+  MOB_ABILITY_NONE = 0,
+  MOB_ABILITY_SPELL = 1,
+  MOB_ABILITY_SKILL = 2
+};
+
+enum mob_ability_target {
+  MOB_TARGET_SELF = 0,
+  MOB_TARGET_FIGHTING = 1,
+  MOB_TARGET_RANDOM_ENEMY = 2,
+  MOB_TARGET_ALLY = 3
+};
+
+enum mob_ability_trigger_mode {
+  MOB_TRIGGER_OPENER = 0,
+  MOB_TRIGGER_COOLDOWN = 1,
+  MOB_TRIGGER_RANDOM_ROUND_WINDOW = 2,
+  MOB_TRIGGER_SELF_HP_THRESHOLD = 3,
+  MOB_TRIGGER_TARGET_HP_THRESHOLD = 4
+};
+
+enum mob_event_type {
+  MOB_EVENT_PLAYER_ENTERS_ROOM = 0,
+  MOB_EVENT_COMBAT_STARTS = 1,
+  MOB_EVENT_LOW_HP = 2,
+  MOB_EVENT_ATTACKED = 3,
+  MOB_EVENT_DEATH = 4
+};
+
+enum mob_event_action_type {
+  MOB_EVENT_ACTION_CAST_SPELL = 0,
+  MOB_EVENT_ACTION_USE_SKILL = 1,
+  MOB_EVENT_ACTION_SAY_TEXT = 2,
+  MOB_EVENT_ACTION_EMOTE_TEXT = 3
+};
+
+struct mob_combat_ability {
+  byte enabled;
+  byte ability_type;   /* mob_ability_type */
+  byte target_type;    /* mob_ability_target */
+  byte trigger_mode;   /* mob_ability_trigger_mode */
+  int ability_vnum;    /* spell or skill number */
+  int round_min;
+  int round_max;
+  int cooldown_rounds;
+  int priority;        /* lower value = higher priority */
+  byte once_per_fight;
+  int max_uses_per_fight; /* attempt cap; 0 = unlimited */
+  byte require_target_not_affected;
+  byte require_self_not_affected;
+  int self_hp_pct_max;
+  int target_hp_pct_max;
+};
+
+struct mob_event_reaction {
+  byte enabled;
+  byte event_type;       /* mob_event_type */
+  byte action_type;      /* mob_event_action_type */
+  byte target_type;      /* mob_ability_target */
+  int ability_vnum;      /* spell or skill number if action uses one */
+  int cooldown_pulses;   /* cooldown in pulses */
+  int chance_percent;
+  byte once_per_reset;
+  int hp_pct_threshold;  /* used by low hp event */
+  char argument[MAX_INPUT_LENGTH]; /* say/emote text */
+};
+
 /** Special data used by NPCs, not PCs */
 struct mob_special_data
 {
@@ -1220,6 +1289,10 @@ struct mob_special_data
   int bonus_xp_min;   /* min additive bonus XP on kill */
   int bonus_xp_max;   /* max additive bonus XP on kill */
   int summon_timer;   /**< Violence-pulse countdown for temporary summons (<=0 means permanent). */
+  struct mob_combat_ability combat_abilities[MAX_MOB_COMBAT_ABILITIES];
+  int combat_ability_count;
+  struct mob_event_reaction event_reactions[MAX_MOB_EVENT_REACTIONS];
+  int event_reaction_count;
 };
 
 struct room_effect_data
@@ -1297,6 +1370,17 @@ struct char_data
   long pref; /**< unique session id */
   
   struct list_data * events;
+  int mob_behavior_in_combat;
+  int mob_behavior_fight_round;
+  int mob_behavior_round_marker;
+  int mob_behavior_uses[MAX_MOB_COMBAT_ABILITIES];
+  int mob_behavior_last_used_round[MAX_MOB_COMBAT_ABILITIES];
+  int mob_behavior_random_round[MAX_MOB_COMBAT_ABILITIES];
+  byte mob_behavior_random_spent[MAX_MOB_COMBAT_ABILITIES];
+  byte mob_behavior_opener_attempted[MAX_MOB_COMBAT_ABILITIES];
+  int mob_behavior_event_cooldown_until[MAX_MOB_EVENT_REACTIONS];
+  byte mob_behavior_event_used_this_reset[MAX_MOB_EVENT_REACTIONS];
+  long mob_behavior_last_entry_actor_id;
 };
 
 /** descriptor-related structures */

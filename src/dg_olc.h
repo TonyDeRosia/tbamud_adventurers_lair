@@ -34,6 +34,7 @@
 #define SCRIPT_MAIN_MENU		0
 #define SCRIPT_NEW_TRIGGER		1
 #define SCRIPT_DEL_TRIGGER		2
+#define SCRIPT_NEW_TRIGGER_VNUM         3
 
 #define OLC_SCRIPT_EDIT_MODE(d)	(OLC(d)->script_mode)	/* parse input mode */
 #define OLC_SCRIPT(d)           (OLC(d)->script)	/* script editing   */

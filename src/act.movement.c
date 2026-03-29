@@ -22,6 +22,7 @@
 #include "dg_scripts.h"
 #include "act.h"
 #include "fight.h"
+#include "mob_behavior.h"
 #include "graph.h"
 #include "quest.h"
 #include "oasis.h" /* for buildwalk */
@@ -731,6 +732,14 @@ int do_simple_move(struct char_data *ch, int dir, int need_specials_check)
   }
   else
     greet_memory_mtrigger(ch);
+
+  if (!IS_NPC(ch)) {
+    struct char_data *watcher;
+    for (watcher = world[IN_ROOM(ch)].people; watcher; watcher = watcher->next_in_room) {
+      if (IS_NPC(watcher))
+        mob_behavior_handle_event(watcher, MOB_EVENT_PLAYER_ENTERS_ROOM, ch);
+    }
+  }
   /*---------------------------------------------------------------------*/
   /* End: Post-move operations. */
 
