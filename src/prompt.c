@@ -446,7 +446,7 @@ ACMD(do_prompt)
 
   skip_spaces(&argument);
 
-  if (!*argument) {
+  if (!*argument || !strcasecmp(argument, "help") || !strcmp(argument, "?")) {
     const char *current = GET_PROMPT(ch);
     size_t i;
 
