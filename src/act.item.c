@@ -2224,7 +2224,7 @@ static void send_auction_message(const char *msg, int item_level)
         (item_level < GET_AUCTION_LOW(d->character) ||
          item_level > GET_AUCTION_HIGH(d->character)))
       continue;
-    send_to_char(d->character, "%s\r\n", msg);
+    send_to_char(d->character, "\r\n%s\r\n", msg);
     add_history(d->character, (char *)msg, HIST_AUCTION);
   }
 }
