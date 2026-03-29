@@ -9604,6 +9604,26 @@ HIDE has no fixed duration in this entry; it lasts until broken by normal visibi
 See also: SNEAK BACKSTAB TOTAL-OCCULTATION SKILLS
 #0
 
+PEEK
+
+Peek
+Type: Skill
+
+Description:
+You quietly snoop around another player's belongings.
+
+Effect:
+On a successful skill check, you can view the target player's carried inventory. Failure reveals nothing.
+
+Usage:
+peek <player>
+
+Notes:
+PEEK only works on visible player targets in your room and only shows carried items, not worn equipment.
+
+See also: STEAL INVENTORY LOOK SKILLS
+#0
+
 HINDEX INDEX
 
 USAGE: hindex < letter | phrase >

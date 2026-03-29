@@ -2139,6 +2139,7 @@ void init_spell_levels(void)
   spell_level(SKILL_BACKSTAB, CLASS_THIEF, 3);
   spell_level(SKILL_STEAL, CLASS_THIEF, 4);
   spell_level(SKILL_HIDE, CLASS_THIEF, 6);
+  spell_level(SKILL_PEEK, CLASS_THIEF, 8);
   spell_level(SKILL_TRACK, CLASS_THIEF, 10);
   spell_level(SKILL_BANDAGE, CLASS_THIEF, 15);
   spell_level(SKILL_DUAL_WIELD, CLASS_THIEF, 20);
