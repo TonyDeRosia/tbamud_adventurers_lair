@@ -21,6 +21,7 @@ static int mob_behavior_use_combat_ability(struct char_data *mob, int idx, struc
 static int mob_behavior_execute_reaction(struct char_data *mob, const struct mob_event_reaction *ev, struct char_data *actor);
 static void mob_behavior_debug_notify(struct char_data *mob, const char *fmt, ...);
 static int mob_behavior_use_skill(struct char_data *mob, struct char_data *target, int skillnum);
+static int mob_behavior_spell_supports_affect_check(int spellnum);
 
 void mob_behavior_advance_pulse(void)
 {
@@ -129,10 +130,20 @@ void mob_behavior_on_combat_start(struct char_data *mob, struct char_data *oppon
 
   mob_behavior_reset_fight_state(mob);
   mob->mob_behavior_in_combat = 1;
-  mob_behavior_debug_notify(mob, "combat start vs %s", opponent ? GET_NAME(opponent) : "<none>");
+  mob_behavior_debug_notify(mob, "combat start vs %s abilities=%d",
+                            opponent ? GET_NAME(opponent) : "<none>",
+                            mob->mob_specials.combat_ability_count);
 
   for (i = 0; i < mob->mob_specials.combat_ability_count && i < MAX_MOB_COMBAT_ABILITIES; i++) {
     const struct mob_combat_ability *ab = &mob->mob_specials.combat_abilities[i];
+    mob_behavior_debug_notify(mob,
+                              "ability slot=%d enabled=%d type=%s id=%d name=%s target=%s trigger=%s cooldown=%d priority=%d once=%d maxuses=%d",
+                              i + 1, ab->enabled,
+                              mob_behavior_ability_type_name(ab->ability_type),
+                              ab->ability_id, (ab->ability_id > 0 ? skill_name(ab->ability_id) : "<unset>"),
+                              mob_behavior_target_name(ab->target_type),
+                              mob_behavior_trigger_mode_name(ab->trigger_mode),
+                              ab->cooldown_rounds, ab->priority, ab->once_per_fight, ab->max_uses_per_fight);
     if (ab->trigger_mode == MOB_TRIGGER_RANDOM_ROUND_WINDOW)
       mob_behavior_schedule_random_round(mob, i, ab);
   }
@@ -202,7 +213,7 @@ static int mob_behavior_can_use_combat_ability(struct char_data *mob, int idx, s
 #define FAIL_REASON(msg) do { if (reason_out) *reason_out = (msg); return 0; } while (0)
 
   if (!mob || !IS_NPC(mob) || !FIGHTING(mob))
-    FAIL_REASON("not in combat");
+    FAIL_REASON("not fighting");
   if (idx < 0 || idx >= mob->mob_specials.combat_ability_count)
     FAIL_REASON("bad slot");
 
@@ -210,11 +221,13 @@ static int mob_behavior_can_use_combat_ability(struct char_data *mob, int idx, s
   if (!ab->enabled)
     FAIL_REASON("disabled");
   if (ab->ability_id <= 0)
-    FAIL_REASON("missing ability id");
+    FAIL_REASON("no ability id");
+  if (ab->ability_type == MOB_ABILITY_SPELL && !IS_SPELL(ab->ability_id))
+    FAIL_REASON("invalid spell");
   if (ab->ability_type == MOB_ABILITY_SKILL && !mob_behavior_validate_skill(ab->ability_id)) {
     log("SYSERR: Native mob behavior unsupported skill id %d on mob vnum %d.",
         ab->ability_id, GET_MOB_VNUM(mob));
-    FAIL_REASON("unsupported skill");
+    FAIL_REASON("invalid skill");
   }
 
   if (ab->once_per_fight && mob->mob_behavior_uses[idx] > 0)
@@ -223,18 +236,18 @@ static int mob_behavior_can_use_combat_ability(struct char_data *mob, int idx, s
     FAIL_REASON("max uses reached");
   if (ab->cooldown_rounds > 0 &&
       mob->mob_behavior_fight_round - mob->mob_behavior_last_used_round[idx] < ab->cooldown_rounds)
-    FAIL_REASON("cooldown");
+    FAIL_REASON("cooldown active");
 
   switch (ab->trigger_mode) {
     case MOB_TRIGGER_OPENER:
       if (mob->mob_behavior_opener_attempted[idx])
-        FAIL_REASON("opener already attempted");
+        FAIL_REASON("scheduled round spent");
       if (mob->mob_behavior_fight_round != 1)
-        FAIL_REASON("not opener round");
+        FAIL_REASON("scheduled round not reached");
       break;
     case MOB_TRIGGER_RANDOM_ROUND_WINDOW:
       if (mob->mob_behavior_random_spent[idx])
-        FAIL_REASON("random window already spent");
+        FAIL_REASON("scheduled round spent");
       if (mob->mob_behavior_random_round[idx] <= 0)
         mob_behavior_schedule_random_round(mob, idx, ab);
       if (mob->mob_behavior_fight_round != mob->mob_behavior_random_round[idx])
@@ -244,7 +257,7 @@ static int mob_behavior_can_use_combat_ability(struct char_data *mob, int idx, s
       if (GET_MAX_HIT(mob) <= 0)
         FAIL_REASON("invalid self max hp");
       if (((GET_HIT(mob) * 100) / GET_MAX_HIT(mob)) > MAX(0, ab->self_hp_pct_max))
-        FAIL_REASON("hp threshold not met");
+        FAIL_REASON("self hp threshold not met");
       break;
     case MOB_TRIGGER_TARGET_HP_THRESHOLD:
       if (!FIGHTING(mob) || GET_MAX_HIT(FIGHTING(mob)) <= 0)
@@ -260,11 +273,23 @@ static int mob_behavior_can_use_combat_ability(struct char_data *mob, int idx, s
   target = mob_behavior_pick_target(mob, ab, NULL);
   if (!target)
     FAIL_REASON("target missing");
+  if (ab->ability_type == MOB_ABILITY_SPELL) {
+    int stargets = spell_info[ab->ability_id].targets;
+    int char_target_ok = IS_SET(stargets, TAR_CHAR_ROOM | TAR_CHAR_WORLD | TAR_FIGHT_VICT | TAR_FIGHT_SELF | TAR_SELF_ONLY);
+    if (!char_target_ok)
+      FAIL_REASON("cast path rejected");
+    if (target == mob && IS_SET(stargets, TAR_NOT_SELF))
+      FAIL_REASON("cast path rejected");
+    if (target != mob && IS_SET(stargets, TAR_SELF_ONLY))
+      FAIL_REASON("cast path rejected");
+  }
 
-  if (ab->require_target_not_affected && mob_behavior_target_has_effect(target, ab->ability_id))
-    FAIL_REASON("target already affected");
-  if (ab->require_self_not_affected && mob_behavior_target_has_effect(mob, ab->ability_id))
-    FAIL_REASON("self already affected");
+  if (ab->ability_type == MOB_ABILITY_SPELL && mob_behavior_spell_supports_affect_check(ab->ability_id)) {
+    if (ab->require_target_not_affected && mob_behavior_target_has_effect(target, ab->ability_id))
+      FAIL_REASON("target already affected");
+    if (ab->require_self_not_affected && mob_behavior_target_has_effect(mob, ab->ability_id))
+      FAIL_REASON("self already affected");
+  }
 
   if (out_target)
     *out_target = target;
@@ -277,26 +302,43 @@ static int mob_behavior_can_use_combat_ability(struct char_data *mob, int idx, s
 static int mob_behavior_use_combat_ability(struct char_data *mob, int idx, struct char_data *target)
 {
   struct mob_combat_ability *ab = &mob->mob_specials.combat_abilities[idx];
-  char arg[MAX_INPUT_LENGTH];
-  int attempted = 0;
+  int attempted = 0, exec_result = 0;
 
   if (ab->trigger_mode == MOB_TRIGGER_OPENER)
     mob->mob_behavior_opener_attempted[idx] = 1;
 
+  mob_behavior_debug_notify(mob,
+                            "execution start: slot=%d type=%s id=%d name=%s target=%s round=%d uses=%d last_used=%d",
+                            idx + 1,
+                            mob_behavior_ability_type_name(ab->ability_type),
+                            ab->ability_id, skill_name(ab->ability_id),
+                            target ? GET_NAME(target) : "<none>",
+                            mob->mob_behavior_fight_round,
+                            mob->mob_behavior_uses[idx],
+                            mob->mob_behavior_last_used_round[idx]);
+
   if (ab->ability_type == MOB_ABILITY_SPELL) {
-    if (cast_spell(mob, target, NULL, ab->ability_id))
-      attempted = 1;
+    attempted = 1;
+    mob_behavior_debug_notify(mob, "attempting spell %s (%d) on %s",
+                              skill_name(ab->ability_id), ab->ability_id,
+                              target ? GET_NAME(target) : "<none>");
+    exec_result = cast_spell(mob, target, NULL, ab->ability_id);
   } else if (ab->ability_type == MOB_ABILITY_SKILL) {
     if (!target)
       return 0;
-    snprintf(arg, sizeof(arg), "%s", GET_NAME(target));
-    attempted = mob_behavior_use_skill(mob, target, ab->ability_id);
+    attempted = 1;
+    mob_behavior_debug_notify(mob, "attempting skill %s (%d) on %s",
+                              skill_name(ab->ability_id), ab->ability_id, GET_NAME(target));
+    exec_result = mob_behavior_use_skill(mob, target, ab->ability_id);
+  } else {
+    mob_behavior_debug_notify(mob, "ability attempt failed: slot=%d reason=no ability id", idx + 1);
+    return 0;
   }
 
   if (ab->trigger_mode == MOB_TRIGGER_RANDOM_ROUND_WINDOW)
     mob->mob_behavior_random_spent[idx] = 1;
 
-  if (attempted) {
+  if (attempted && (ab->ability_type == MOB_ABILITY_SPELL || exec_result)) {
     mob->mob_behavior_uses[idx]++;
     mob->mob_behavior_last_used_round[idx] = mob->mob_behavior_fight_round;
 
@@ -309,14 +351,25 @@ static int mob_behavior_use_combat_ability(struct char_data *mob, int idx, struc
     }
   }
 
-  if (attempted)
-    mob_behavior_debug_notify(mob, "ability used: slot=%d ability=%s target=%s",
-                              idx + 1, skill_name(ab->ability_id), target ? GET_NAME(target) : "<none>");
-  else
-    mob_behavior_debug_notify(mob, "ability attempt failed: slot=%d ability=%s",
+  if (ab->ability_type == MOB_ABILITY_SPELL) {
+    if (exec_result < 0)
+      mob_behavior_debug_notify(mob, "execution succeeded: slot=%d spell=%s result=%d",
+                                idx + 1, skill_name(ab->ability_id), exec_result);
+    else if (exec_result == 0)
+      mob_behavior_debug_notify(mob, "execution dispatched: slot=%d spell=%s result=0 (cast path may reject or complete without success code)",
+                                idx + 1, skill_name(ab->ability_id));
+    else
+      mob_behavior_debug_notify(mob, "execution succeeded: slot=%d spell=%s result=%d",
+                                idx + 1, skill_name(ab->ability_id), exec_result);
+  } else if (exec_result) {
+    mob_behavior_debug_notify(mob, "execution succeeded: slot=%d skill=%s",
                               idx + 1, skill_name(ab->ability_id));
+  } else {
+    mob_behavior_debug_notify(mob, "execution failed: slot=%d reason=skill path rejected",
+                              idx + 1);
+  }
 
-  return attempted;
+  return (ab->ability_type == MOB_ABILITY_SPELL) ? 1 : exec_result;
 }
 
 void mob_behavior_eval_combat_round(struct char_data *mob)
@@ -337,7 +390,11 @@ void mob_behavior_eval_combat_round(struct char_data *mob)
     struct char_data *tmp_target = NULL;
     const char *reason = "ineligible";
     struct mob_combat_ability *ab = &mob->mob_specials.combat_abilities[i];
+    mob_behavior_debug_notify(mob, "consider slot=%d enabled=%d trigger=%s cooldown=%d uses=%d max=%d once=%d",
+                              i + 1, ab->enabled, mob_behavior_trigger_mode_name(ab->trigger_mode),
+                              ab->cooldown_rounds, mob->mob_behavior_uses[i], ab->max_uses_per_fight, ab->once_per_fight);
     if (!mob_behavior_can_use_combat_ability(mob, i, &tmp_target, &reason)) {
+      mob_behavior_debug_notify(mob, "skip slot=%d reason=%s", i + 1, reason);
       if (ab->trigger_mode == MOB_TRIGGER_RANDOM_ROUND_WINDOW &&
           !mob->mob_behavior_random_spent[i] &&
           mob->mob_behavior_random_round[i] > 0 &&
@@ -493,6 +550,14 @@ static int mob_behavior_use_skill(struct char_data *mob, struct char_data *targe
     default:
       return 0;
   }
+}
+
+static int mob_behavior_spell_supports_affect_check(int spellnum)
+{
+  if (spellnum <= 0 || spellnum > TOP_SPELL_DEFINE || !IS_SPELL(spellnum))
+    return 0;
+
+  return IS_SET(spell_info[spellnum].routines, MAG_AFFECTS | MAG_UNAFFECTS);
 }
 
 static void mob_behavior_debug_notify(struct char_data *mob, const char *fmt, ...)

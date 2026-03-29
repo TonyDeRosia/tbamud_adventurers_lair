@@ -32,6 +32,7 @@
 #include "genobj.h" /* for free_object_strings */
 #include "config.h" /* for the default config values. */
 #include "fight.h"
+#include "mob_behavior.h"
 #include "modify.h"
 #include "shop.h"
 #include "clan.h"
@@ -1838,7 +1839,8 @@ static void interpret_espec(const char *keyword, const char *value, int i, int n
           log("SYSERR: Mob #%d loaded legacy CombatAbility line; converted to ability_id model.", nr);
         if (ab->ability_id <= 0 ||
             (ab->ability_type == MOB_ABILITY_SPELL && !IS_SPELL(ab->ability_id)) ||
-            (ab->ability_type == MOB_ABILITY_SKILL && !IS_SKILL(ab->ability_id))) {
+            (ab->ability_type == MOB_ABILITY_SKILL &&
+             (!IS_SKILL(ab->ability_id) || !mob_behavior_validate_skill(ab->ability_id)))) {
           log("SYSERR: Mob #%d has invalid CombatAbility ability id %d; entry skipped.", nr, ab->ability_id);
           mob_proto[i].mob_specials.combat_ability_count--;
         }
@@ -1872,7 +1874,8 @@ static void interpret_espec(const char *keyword, const char *value, int i, int n
         if (legacy_line)
           log("SYSERR: Mob #%d loaded legacy EventReaction line; converted to ability_id model.", nr);
         if ((ev->action_type == MOB_EVENT_ACTION_CAST_SPELL && (ev->ability_id <= 0 || !IS_SPELL(ev->ability_id))) ||
-            (ev->action_type == MOB_EVENT_ACTION_USE_SKILL && (ev->ability_id <= 0 || !IS_SKILL(ev->ability_id)))) {
+            (ev->action_type == MOB_EVENT_ACTION_USE_SKILL &&
+             (ev->ability_id <= 0 || !IS_SKILL(ev->ability_id) || !mob_behavior_validate_skill(ev->ability_id)))) {
           log("SYSERR: Mob #%d has invalid EventReaction ability id %d; entry skipped.", nr, ev->ability_id);
           mob_proto[i].mob_specials.event_reaction_count--;
         }
