@@ -2417,8 +2417,15 @@ ACMD(do_auction)
 
   if (!str_cmp(arg1, "-h")) {
     if (!*arg2) {
-      char history_arg[] = "auction";
-      do_history(ch, history_arg, 0, 0);
+      if (!GET_HISTORY(ch, HIST_AUCTION)) {
+        send_to_char(ch, "You have no history in that channel.\r\n");
+        return;
+      }
+
+      for (tmp = GET_HISTORY(ch, HIST_AUCTION); tmp; tmp = tmp->next) {
+        if (tmp->text)
+          send_to_char(ch, "%s\r\n", tmp->text);
+      }
       return;
     }
     if (!is_number(arg2) || (lines = atoi(arg2)) <= 0) {
@@ -2439,7 +2446,7 @@ ACMD(do_auction)
     for (i = MAX(0, count - lines); i < count; i++) {
       tmp = ring[i % lines];
       if (tmp && tmp->text)
-        send_to_char(ch, "%s", tmp->text);
+        send_to_char(ch, "%s\r\n", tmp->text);
     }
     free(ring);
     return;
