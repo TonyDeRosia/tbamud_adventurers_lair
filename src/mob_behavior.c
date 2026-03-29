@@ -111,6 +111,8 @@ void mob_behavior_reset_fight_state(struct char_data *mob)
   mob->mob_behavior_in_combat = 0;
   mob->mob_behavior_fight_round = 0;
   mob->mob_behavior_round_marker = 0;
+  mob->mob_behavior_active_spellnum = 0;
+  mob->mob_behavior_active_spell_cast = 0;
 
   for (i = 0; i < MAX_MOB_COMBAT_ABILITIES; i++) {
     mob->mob_behavior_uses[i] = 0;
@@ -119,6 +121,31 @@ void mob_behavior_reset_fight_state(struct char_data *mob)
     mob->mob_behavior_random_spent[i] = 0;
     mob->mob_behavior_opener_attempted[i] = 0;
   }
+}
+
+void mob_behavior_begin_native_spell_cast(struct char_data *mob, int spellnum)
+{
+  if (!mob || !IS_NPC(mob))
+    return;
+  mob->mob_behavior_active_spellnum = spellnum;
+  mob->mob_behavior_active_spell_cast = 1;
+}
+
+void mob_behavior_end_native_spell_cast(struct char_data *mob)
+{
+  if (!mob || !IS_NPC(mob))
+    return;
+  mob->mob_behavior_active_spellnum = 0;
+  mob->mob_behavior_active_spell_cast = 0;
+}
+
+int mob_behavior_is_native_spell_cast_active(const struct char_data *mob, int spellnum)
+{
+  if (!mob || !IS_NPC(mob))
+    return 0;
+  if (!mob->mob_behavior_active_spell_cast)
+    return 0;
+  return (spellnum > 0 && mob->mob_behavior_active_spellnum == spellnum);
 }
 
 void mob_behavior_on_combat_start(struct char_data *mob, struct char_data *opponent)
@@ -283,8 +310,10 @@ static int mob_behavior_use_combat_ability(struct char_data *mob, int idx, struc
     mob->mob_behavior_opener_attempted[idx] = 1;
 
   if (ab->ability_type == MOB_ABILITY_SPELL) {
+    mob_behavior_begin_native_spell_cast(mob, ab->ability_id);
     if (cast_spell(mob, target, NULL, ab->ability_id))
       attempted = 1;
+    mob_behavior_end_native_spell_cast(mob);
   } else if (ab->ability_type == MOB_ABILITY_SKILL) {
     if (!target)
       return 0;
@@ -379,7 +408,12 @@ static int mob_behavior_execute_reaction(struct char_data *mob, const struct mob
     case MOB_EVENT_ACTION_CAST_SPELL:
       if (!target)
         target = mob;
-      return cast_spell(mob, target, NULL, ev->ability_id) ? 1 : 0;
+      mob_behavior_begin_native_spell_cast(mob, ev->ability_id);
+      {
+        int casted = cast_spell(mob, target, NULL, ev->ability_id) ? 1 : 0;
+        mob_behavior_end_native_spell_cast(mob);
+        return casted;
+      }
     case MOB_EVENT_ACTION_USE_SKILL:
       if (!target)
         return 0;

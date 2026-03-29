@@ -1382,6 +1382,8 @@ struct char_data
   byte mob_behavior_event_used_this_reset[MAX_MOB_EVENT_REACTIONS];
   long mob_behavior_event_last_actor_id[MAX_MOB_EVENT_REACTIONS];
   int mob_behavior_event_last_trigger_pulse[MAX_MOB_EVENT_REACTIONS];
+  int mob_behavior_active_spellnum;
+  byte mob_behavior_active_spell_cast;
 };
 
 /** descriptor-related structures */

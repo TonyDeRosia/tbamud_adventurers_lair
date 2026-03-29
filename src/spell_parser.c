@@ -23,6 +23,7 @@
 #include "db.h"
 #include "dg_scripts.h"
 #include "fight.h"  /* for hit() */
+#include "mob_behavior.h"
 
 #define SINFO spell_info[spellnum]
 
@@ -2380,6 +2381,8 @@ void mag_objectmagic(struct char_data *ch, struct obj_data *obj, char *argument)
  * for spells cast by NPCs via specprocs. */
 int cast_spell(struct char_data *ch, struct char_data *tch,
     struct obj_data *tobj, int spellnum) {
+  int native_mob_spell_cast;
+
   if (spellnum < 0 || spellnum > TOP_SPELL_DEFINE) {
     log("SYSERR: cast_spell trying to call spellnum %d/%d.", spellnum,
     TOP_SPELL_DEFINE);
@@ -2437,6 +2440,11 @@ int cast_spell(struct char_data *ch, struct char_data *tch,
   if (is_spirit_spell(spellnum) && !can_bind_spirit(ch, spellnum))
     return (0);
   send_to_char(ch, "%s", CONFIG_OK);
+  native_mob_spell_cast = mob_behavior_is_native_spell_cast_active(ch, spellnum);
+
+  if (native_mob_spell_cast) {
+    say_spell(ch, spellnum, tch, tobj);
+  }
 
   if (!send_cast_message(ch, tch, tobj, spellnum)) {
     /* fallback feedback */
@@ -2456,7 +2464,9 @@ int cast_spell(struct char_data *ch, struct char_data *tch,
     send_native_cast_fallback_message(ch, tch, tobj, spellnum);
   }
 
-  say_spell(ch, spellnum, tch, tobj);
+  if (!native_mob_spell_cast) {
+    say_spell(ch, spellnum, tch, tobj);
+  }
 
   {
     int result = call_magic(ch, tch, tobj, spellnum, GET_LEVEL(ch), CAST_SPELL);
