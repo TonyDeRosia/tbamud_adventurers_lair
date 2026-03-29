@@ -179,12 +179,14 @@ static void diag_char_to_char(struct char_data *i, struct char_data *ch);
 static void do_auto_exits(struct char_data *ch);
 static void list_char_to_char(struct char_data *list, struct char_data *ch);
 static void list_one_char(struct char_data *i, struct char_data *ch);
-static void look_at_char(struct char_data *i, struct char_data *ch);
+static void look_at_char(struct char_data *i, struct char_data *ch, bool allow_passive_peek);
 static int can_view_mob_inventory(struct char_data *viewer, struct char_data *target);
 static void show_mob_equipment_to_char(struct char_data *viewer, struct char_data *target);
-static void look_at_target(struct char_data *ch, char *arg);
+static void look_at_target(struct char_data *ch, char *arg, bool allow_passive_peek);
 static void look_in_direction(struct char_data *ch, int dir);
 static void look_in_obj(struct char_data *ch, char *arg);
+static int peek_success_chance(struct char_data *ch, struct char_data *vict);
+static bool attempt_peek_inventory(struct char_data *ch, struct char_data *vict, bool passive);
 static bool load_player_target(struct char_data *ch, const char *name, struct char_data **out, bool *from_file);
 static bool parse_bounty_amount(const char *arg, long long *amount_out);
 /* do_look, do_inventory utility functions */
@@ -413,7 +415,7 @@ static void diag_char_to_char(struct char_data *i, struct char_data *ch)
   send_to_char(ch, "%c%s %s\r\n", UPPER(*pers), pers + 1, diagnosis[ar_index].text);
 }
 
-static void look_at_char(struct char_data *i, struct char_data *ch)
+static void look_at_char(struct char_data *i, struct char_data *ch, bool allow_passive_peek)
 {
   if (!ch->desc)
     return;
@@ -425,6 +427,10 @@ static void look_at_char(struct char_data *i, struct char_data *ch)
 
   diag_char_to_char(i, ch);
   show_mob_equipment_to_char(ch, i);
+
+  if (allow_passive_peek && !IS_NPC(i) && ch != i)
+    attempt_peek_inventory(ch, i, TRUE);
+
   if (IS_NPC(i)) {
     if (ch != i && can_view_mob_inventory(ch, i)) {
       act("\r\nYou size up what $n is carrying:", FALSE, i, 0, ch, TO_VICT);
@@ -1359,7 +1365,7 @@ char *find_exdesc(char *word, struct extra_descr_data *list)
  * matches the target.  First, see if there is another char in the room with
  * the name.  Then check local objs for exdescs. Thanks to Angus Mezick for
  * the suggested fix to this problem. */
-static void look_at_target(struct char_data *ch, char *arg)
+static void look_at_target(struct char_data *ch, char *arg, bool allow_passive_peek)
 {
   int bits, found = FALSE, j, fnum, i = 0;
   struct char_data *found_char = NULL;
@@ -1379,7 +1385,7 @@ static void look_at_target(struct char_data *ch, char *arg)
 
   /* Is the target a character? */
   if (found_char != NULL) {
-    look_at_char(found_char, ch);
+    look_at_char(found_char, ch, allow_passive_peek);
     if (ch != found_char) {
       if (CAN_SEE(found_char, ch))
     act("$n looks at you.", TRUE, ch, 0, found_char, TO_VICT);
@@ -1462,7 +1468,7 @@ ACMD(do_look)
       if (!*arg)
     send_to_char(ch, "Read what?\r\n");
       else
-    look_at_target(ch, strcpy(tempsave, arg));
+    look_at_target(ch, strcpy(tempsave, arg), FALSE);
       return;
     }
     if (!*arg)            /* "look" alone, without an argument at all */
@@ -1473,7 +1479,7 @@ ACMD(do_look)
     else if ((look_type = search_block(arg, dirs, FALSE)) >= 0)
       look_in_direction(ch, look_type);
     else if (is_abbrev(arg, "at"))
-      look_at_target(ch, strcpy(tempsave, arg2));
+      look_at_target(ch, strcpy(tempsave, arg2), TRUE);
     else if (is_abbrev(arg, "around")) {
       struct extra_descr_data *i;
 
@@ -1487,7 +1493,7 @@ ACMD(do_look)
       if (!found)
          send_to_char(ch, "You couldn't find anything noticeable.\r\n");
     } else
-      look_at_target(ch, strcpy(tempsave, arg));
+      look_at_target(ch, strcpy(tempsave, arg), TRUE);
   }
 }
 
@@ -1505,7 +1511,7 @@ ACMD(do_examine)
   }
 
   /* look_at_target() eats the number. */
-  look_at_target(ch, strcpy(tempsave, arg));    /* strcpy: OK */
+  look_at_target(ch, strcpy(tempsave, arg), FALSE);    /* strcpy: OK */
 
   generic_find(arg, FIND_OBJ_INV | FIND_OBJ_ROOM | FIND_CHAR_ROOM |
               FIND_OBJ_EQUIP, ch, &tmp_char, &tmp_object);
@@ -3187,11 +3193,63 @@ ACMD(do_inventory)
   list_obj_to_char(ch->carrying, ch, SHOW_OBJ_SHORT, TRUE);
 }
 
+static int peek_success_chance(struct char_data *ch, struct char_data *vict)
+{
+  int level_delta;
+  int chance;
+
+  if (!ch || !vict)
+    return 0;
+
+  level_delta = GET_LEVEL(ch) - GET_LEVEL(vict);
+  chance = GET_SKILL(ch, SKILL_PEEK) + dex_app_skill[GET_DEX(ch)].p_pocket + (level_delta * 5);
+
+  if (level_delta <= -10)
+    chance -= 50;
+
+  if (chance < 1)
+    chance = 1;
+  else if (chance > 95)
+    chance = 95;
+
+  return chance;
+}
+
+static bool attempt_peek_inventory(struct char_data *ch, struct char_data *vict, bool passive)
+{
+  int percent;
+  int prob;
+  bool success;
+
+  if (!ch || !vict || IS_NPC(ch) || IS_NPC(vict) || ch == vict || !GET_SKILL(ch, SKILL_PEEK))
+    return FALSE;
+
+  percent = rand_number(1, 101);
+  prob = peek_success_chance(ch, vict);
+  success = IS_IMMORTAL_NOFAIL(ch) || (percent <= prob);
+
+  if (!success) {
+    if (!passive)
+      send_to_char(ch, "You fail to peek into %s inventory.\r\n", HSHR(vict));
+    improve_ability_from_use(ch, SKILL_PEEK, FALSE);
+    return FALSE;
+  }
+
+  send_to_char(ch, "You snoop around and peek at %s's inventory.\r\n", GET_NAME(vict));
+  if (vict->carrying) {
+    send_to_char(ch, "%s is carrying:\r\n", GET_NAME(vict));
+    list_obj_to_char(vict->carrying, ch, SHOW_OBJ_SHORT, TRUE);
+  } else
+    send_to_char(ch, "%s is carrying nothing.\r\n", GET_NAME(vict));
+
+  improve_ability_from_use(ch, SKILL_PEEK, TRUE);
+  return TRUE;
+}
+
 ACMD(do_peek)
 {
   struct char_data *vict;
   char arg[MAX_INPUT_LENGTH];
-  int percent, prob;
 
   one_argument(argument, arg);
 
@@ -3221,24 +3279,7 @@ ACMD(do_peek)
     send_to_char(ch, "You can only peek at another player.\r\n");
     return;
   }
-
-  percent = rand_number(1, 101);
-  prob = GET_SKILL(ch, SKILL_PEEK) + dex_app_skill[GET_DEX(ch)].p_pocket;
-
-  if (!IS_IMMORTAL_NOFAIL(ch) && percent > prob) {
-    send_to_char(ch, "You fail to peek into %s inventory.\r\n", HSHR(vict));
-    improve_ability_from_use(ch, SKILL_PEEK, FALSE);
-    return;
-  }
-
-  send_to_char(ch, "You snoop around and peek at %s's inventory.\r\n", GET_NAME(vict));
-  if (vict->carrying) {
-    send_to_char(ch, "%s is carrying:\r\n", GET_NAME(vict));
-    list_obj_to_char(vict->carrying, ch, SHOW_OBJ_SHORT, TRUE);
-  } else
-    send_to_char(ch, "%s is carrying nothing.\r\n", GET_NAME(vict));
-
-  improve_ability_from_use(ch, SKILL_PEEK, TRUE);
+  attempt_peek_inventory(ch, vict, FALSE);
 }
 
 ACMD(do_equipment)
