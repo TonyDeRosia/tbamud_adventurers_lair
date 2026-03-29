@@ -138,10 +138,22 @@ static int prompt_tnl(struct char_data *ch)
   return MAX(0, level_exp(GET_CLASS(ch), next_level) - GET_EXP(ch));
 }
 
-static void append_prompt_text(char *prompt, size_t *pos, const char *text)
+static void append_prompt_text_sized(char *prompt, size_t prompt_size, size_t *pos, const char *text)
 {
-  size_t remaining = MAX_PROMPT_LENGTH - *pos;
-  size_t add_len = MIN(remaining, strlen(text));
+  size_t remaining;
+  size_t add_len;
+
+  if (prompt == NULL || pos == NULL || text == NULL || prompt_size == 0)
+    return;
+
+  if (*pos >= prompt_size) {
+    prompt[prompt_size - 1] = '\0';
+    *pos = prompt_size - 1;
+    return;
+  }
+
+  remaining = prompt_size - 1 - *pos;
+  add_len = MIN(remaining, strlen(text));
 
   if (add_len > 0) {
     memcpy(prompt + *pos, text, add_len);
@@ -151,12 +163,22 @@ static void append_prompt_text(char *prompt, size_t *pos, const char *text)
   prompt[*pos] = '\0';
 }
 
-static void append_prompt_number(char *prompt, size_t *pos, int value)
+static void append_prompt_text(char *prompt, size_t *pos, const char *text)
+{
+  append_prompt_text_sized(prompt, MAX_PROMPT_LENGTH, pos, text);
+}
+
+static void append_prompt_number_sized(char *prompt, size_t prompt_size, size_t *pos, int value)
 {
   char numbuf[24];
 
   snprintf(numbuf, sizeof(numbuf), "%d", value);
-  append_prompt_text(prompt, pos, numbuf);
+  append_prompt_text_sized(prompt, prompt_size, pos, numbuf);
+}
+
+static void append_prompt_number(char *prompt, size_t *pos, int value)
+{
+  append_prompt_number_sized(prompt, MAX_PROMPT_LENGTH, pos, value);
 }
 
 static void append_prompt_percent(char *prompt, size_t *pos, struct descriptor_data *d)
@@ -299,6 +321,37 @@ static void append_prompt_playtime(char *prompt, size_t *pos, struct descriptor_
   append_prompt_text(prompt, pos, buf);
 }
 
+static void append_prompt_target_name(char *prompt, size_t *pos, struct descriptor_data *d)
+{
+  if (FIGHTING(d->character))
+    append_prompt_text(prompt, pos, GET_NAME(FIGHTING(d->character)));
+  else
+    append_prompt_text(prompt, pos, "none");
+}
+
+static void append_prompt_target_hp_percent(char *prompt, size_t *pos, struct descriptor_data *d)
+{
+  struct char_data *target = FIGHTING(d->character);
+  int pct = 0;
+
+  if (target && GET_MAX_HIT(target) > 0)
+    pct = MAX(0, MIN(100, (GET_HIT(target) * 100) / GET_MAX_HIT(target)));
+
+  append_prompt_number(prompt, pos, pct);
+}
+
+static void append_prompt_newline(char *prompt, size_t *pos, struct descriptor_data *d)
+{
+  (void) d;
+  append_prompt_text(prompt, pos, "\r\n");
+}
+
+static void append_prompt_carriage_return(char *prompt, size_t *pos, struct descriptor_data *d)
+{
+  (void) d;
+  append_prompt_text(prompt, pos, "\r");
+}
+
 struct prompt_token_info {
   char code;
   const char *description;
@@ -328,6 +381,10 @@ static const struct prompt_token_info prompt_tokens[] = {
   { 'n', "Character name", append_prompt_name },
   { 'y', "Age in years", append_prompt_age },
   { 't', "Total playtime (days/hours)", append_prompt_playtime },
+  { 'z', "Current fighting target name (or 'none')", append_prompt_target_name },
+  { 'Z', "Current fighting target health percent (0-100)", append_prompt_target_hp_percent },
+  { 'u', "Insert newline (CRLF)", append_prompt_newline },
+  { 'R', "Insert carriage return", append_prompt_carriage_return },
 };
 
 static const struct prompt_token_info *find_prompt_token(char code)
@@ -341,28 +398,27 @@ static const struct prompt_token_info *find_prompt_token(char code)
   return NULL;
 }
 
-static void build_custom_prompt(char *prompt, struct descriptor_data *d)
+static void build_custom_prompt_to_buffer(char *prompt, size_t prompt_size, struct descriptor_data *d)
 {
   const char *tpl = GET_PROMPT(d->character);
   char processed_tpl[MAX_PROMPT_LENGTH * 4];
   size_t pos = 0;
 
+  if (prompt == NULL || prompt_size == 0)
+    return;
+
+  *prompt = '\0';
+
   if (tpl == NULL || *tpl == '\0')
     tpl = default_prompt_template;
 
-  /* Debug: log what we're translating */
-  log("DEBUG: Original template: %s", tpl);
-  
   /* First pass: translate escape sequences and color codes in the template */
   translate_prompt_escapes(tpl, processed_tpl, sizeof(processed_tpl));
-  
-  /* Debug: log what we got after translation */
-  log("DEBUG: After translation: %s", processed_tpl);
-  
+
   tpl = processed_tpl;
 
   /* Second pass: expand prompt tokens (%, %h, %m, etc.) */
-  for (; *tpl && pos < MAX_PROMPT_LENGTH - 1; tpl++) {
+  for (; *tpl && pos + 1 < prompt_size; tpl++) {
     if (*tpl != '%') {
       prompt[pos++] = *tpl;
       continue;
@@ -380,9 +436,9 @@ static void build_custom_prompt(char *prompt, struct descriptor_data *d)
     if (token)
       token->append(prompt, &pos, d);
     else {
-      if (pos < MAX_PROMPT_LENGTH - 1)
+      if (pos + 1 < prompt_size)
         prompt[pos++] = '%';
-      if (pos < MAX_PROMPT_LENGTH - 1)
+      if (pos + 1 < prompt_size)
         prompt[pos++] = *tpl;
     }
   }
@@ -390,9 +446,21 @@ static void build_custom_prompt(char *prompt, struct descriptor_data *d)
   prompt[pos] = '\0';
 
   /* Append color reset at the end if there's room */
-  if (pos + 2 < MAX_PROMPT_LENGTH) {
-    strcat(prompt, "\tn");  /* strcat: OK (size checked above) */
-  }
+  append_prompt_text_sized(prompt, prompt_size, &pos, "\tn");
+}
+
+void build_prompt(struct char_data *ch, char *buffer, size_t buffer_size)
+{
+  char local_prompt[MAX_PROMPT_LENGTH + 1];
+
+  if (buffer == NULL || buffer_size == 0) return;
+  *buffer = '\0';
+
+  if (ch == NULL || ch->desc == NULL)
+    return;
+
+  build_custom_prompt_to_buffer(local_prompt, sizeof(local_prompt), ch->desc);
+  strlcpy(buffer, local_prompt, buffer_size);
 }
 
 static void render_prompt_preview(struct char_data *ch, char *out, size_t out_size)
@@ -405,12 +473,12 @@ static void render_prompt_preview(struct char_data *ch, char *out, size_t out_si
     return;
   }
 
-  build_custom_prompt(out, ch->desc);
+  build_prompt(ch, out, out_size);
 }
 
 char *make_prompt(struct descriptor_data *d)
 {
-  static char prompt[MAX_PROMPT_LENGTH];
+  static char prompt[MAX_PROMPT_LENGTH + 1];
 
   *prompt = '\0';
 
@@ -421,7 +489,7 @@ char *make_prompt(struct descriptor_data *d)
   else if (d->str)
     strcpy(prompt, "] ");       /* strcpy: OK (for 'MAX_PROMPT_LENGTH >= 3') */
   else if (STATE(d) == CON_PLAYING && d->character)
-    build_custom_prompt(prompt, d);
+    build_custom_prompt_to_buffer(prompt, sizeof(prompt), d);
 
   return prompt;
 }
@@ -460,6 +528,7 @@ ACMD(do_prompt)
       send_to_char(ch, "  %%%c - %s\r\n", prompt_tokens[i].code, prompt_tokens[i].description);
 
     send_to_char(ch, "\r\nColor codes:\r\n");
+    send_to_char(ch, "  @X color codes remain supported exactly as before (example: @rred@n)\r\n");
     send_to_char(ch, "  \\tX or {X} where X is a color code (r=red, g=green, b=blue, etc.)\r\n");
     send_to_char(ch, "  Example: \\tG[%%h/%%H\\tn] creates a green prompt with reset\r\n");
 
@@ -468,6 +537,18 @@ ACMD(do_prompt)
     if (*preview)
       send_to_char(ch, "\r\nCurrent preview: %s\r\n", preview);
 
+    return;
+  }
+
+  if (!strcasecmp(argument, "help") || !strcmp(argument, "?")) {
+    send_to_char(ch, "Usage:\r\n");
+    send_to_char(ch, "  prompt            - show current prompt, tokens, and preview\r\n");
+    send_to_char(ch, "  prompt <template> - set prompt template\r\n");
+    send_to_char(ch, "  prompt reset      - reset to default prompt\r\n");
+    send_to_char(ch, "\r\nExamples:\r\n");
+    send_to_char(ch, "  prompt @rHP:@n %%h/%%H %%z(%%Z%%%%)\r\n");
+    send_to_char(ch, "  prompt {G}[%%h/%%H {Y}%%m/%%M{G}]\\tn\r\n");
+    send_to_char(ch, "Type 'prompt' with no arguments for the full token list.\r\n");
     return;
   }
 
