@@ -1003,7 +1003,12 @@ int dg_script_edit_parse(struct descriptor_data *d, char *arg)
           OLC_SCRIPT_EDIT_MODE(d) = SCRIPT_NEW_TRIGGER_VNUM;
           break;
         case 'x':
-          write_to_output(d, "     Which entry should be deleted?  0 to abort :");
+          if (!OLC_SCRIPT(d)) {
+            write_to_output(d, "No triggers attached.\r\n");
+            dg_script_menu(d);
+            return 1;
+          }
+          write_to_output(d, "Enter attached trigger number to detach, or Q to cancel: ");
           OLC_SCRIPT_EDIT_MODE(d) = SCRIPT_DEL_TRIGGER;
           break;
         default:
@@ -1088,14 +1093,22 @@ int dg_script_edit_parse(struct descriptor_data *d, char *arg)
       break;
 
     case SCRIPT_DEL_TRIGGER:
+      if (tolower(*arg) == 'q') {
+        write_to_output(d, "Attachment canceled.\r\n");
+        break;
+      }
       pos = atoi(arg);
-      if (pos<=0) break;
+      if (pos<=0) {
+        write_to_output(d, "No such trigger.\r\n");
+        break;
+      }
 
       if (pos==1 && OLC_SCRIPT(d)) {
         OLC_VAL(d)++;
         currtrig = OLC_SCRIPT(d);
         OLC_SCRIPT(d) = currtrig->next;
         free(currtrig);
+        write_to_output(d, "Trigger detached.\r\n");
         break;
       }
 
@@ -1108,6 +1121,9 @@ int dg_script_edit_parse(struct descriptor_data *d, char *arg)
         trig = currtrig->next;
         currtrig->next = trig->next;
         free(trig);
+        write_to_output(d, "Trigger detached.\r\n");
+      } else {
+        write_to_output(d, "No such trigger.\r\n");
       }
       break;
   }
