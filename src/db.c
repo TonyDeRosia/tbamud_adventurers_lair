@@ -41,6 +41,7 @@
 #include "classtrack.h"
 #include "msgedit.h"
 #include "screen.h"
+#include "custom_channels.h"
 #include <sys/stat.h>
 
 /*  declarations of most of the 'global' variables */
@@ -800,9 +801,12 @@ void boot_db(void)
 
   /* Moved here so the object limit code works. -gg 6/24/98 */
   if (!mini_mud)  {
-    log("Booting houses.");
-    House_boot();
+  log("Booting houses.");
+  House_boot();
   }
+
+  log("Loading custom channels.");
+  custom_channels_boot();
 
   log("Cleaning up last log.");
   clean_llog_entries();

@@ -22,6 +22,7 @@
 #include "act.h"
 #include "modify.h"
 #include "ai_actor.h"
+#include "custom_channels.h"
 
 static bool legal_communication(char * arg);
 
@@ -544,4 +545,218 @@ ACMD(do_qcomm)
       if (STATE(i) == CON_PLAYING && i != ch->desc && PRF_FLAGGED(i->character, PRF_QUEST))
         act(buf, 0, ch, 0, i->character, TO_VICT | TO_SLEEP);
   }
+}
+
+ACMD(do_chan)
+{
+  char chan_name[MAX_INPUT_LENGTH];
+  struct custom_channel_data *channel;
+
+  argument = one_argument(argument, chan_name);
+  skip_spaces(&argument);
+
+  if (!*chan_name || !*argument) {
+    send_to_char(ch, "Usage: chan <channel> <message>\r\n");
+    return;
+  }
+
+  channel = custom_channel_find(chan_name);
+  if (!channel) {
+    send_to_char(ch, "No such custom channel '%s'.\r\n", chan_name);
+    return;
+  }
+
+  custom_channel_send(ch, channel, argument);
+}
+
+ACMD(do_channel)
+{
+  struct custom_channel_data *chan;
+  char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH], rest[MAX_INPUT_LENGTH];
+  char err[MAX_INPUT_LENGTH];
+
+  err[0] = '\0';
+  half_chop(argument, arg1, rest);
+
+  if (!*arg1 || is_abbrev(arg1, "list")) {
+    send_to_char(ch, "Custom channels:\r\n");
+    if (!custom_channel_list) {
+      send_to_char(ch, "  (none)\r\n");
+      return;
+    }
+    for (chan = custom_channel_list; chan; chan = chan->next) {
+      send_to_char(ch, "  %-14s display='%-12s' alias='%-10s' %s minsend=%d minhear=%d type=%s scope=%s log=%s\r\n",
+                   chan->name,
+                   chan->display,
+                   *chan->alias ? chan->alias : "-",
+                   chan->enabled ? "enabled " : "disabled",
+                   chan->min_send_level,
+                   chan->min_hear_level,
+                   custom_channel_type_name(chan->type),
+                   custom_channel_scope_name(chan->scope),
+                   chan->log_enabled ? "on" : "off");
+    }
+    return;
+  }
+
+  if (is_abbrev(arg1, "create")) {
+    one_argument(rest, arg2);
+    if (!*arg2) {
+      send_to_char(ch, "Usage: channel create <name>\r\n");
+      return;
+    }
+    if (!custom_channel_create(arg2, err, sizeof(err)))
+      send_to_char(ch, "%s\r\n", err);
+    else
+      send_to_char(ch, "Custom channel '%s' created.\r\n", arg2);
+    return;
+  }
+
+  if (is_abbrev(arg1, "delete")) {
+    one_argument(rest, arg2);
+    if (!*arg2) {
+      send_to_char(ch, "Usage: channel delete <name>\r\n");
+      return;
+    }
+    if (!custom_channel_delete(arg2, err, sizeof(err)))
+      send_to_char(ch, "%s\r\n", err);
+    else
+      send_to_char(ch, "Custom channel '%s' deleted.\r\n", arg2);
+    return;
+  }
+
+  if (is_abbrev(arg1, "show")) {
+    one_argument(rest, arg2);
+    chan = custom_channel_find_by_name(arg2);
+    if (!chan) {
+      send_to_char(ch, "No such custom channel.\r\n");
+      return;
+    }
+
+    send_to_char(ch, "Channel: %s\r\n", chan->name);
+    send_to_char(ch, "  display : %s\r\n", chan->display);
+    send_to_char(ch, "  alias   : %s\r\n", *chan->alias ? chan->alias : "(none)");
+    send_to_char(ch, "  color   : %s\r\n", chan->color);
+    send_to_char(ch, "  enabled : %s\r\n", chan->enabled ? "yes" : "no");
+    send_to_char(ch, "  minsend : %d\r\n", chan->min_send_level);
+    send_to_char(ch, "  minhear : %d\r\n", chan->min_hear_level);
+    send_to_char(ch, "  type    : %s\r\n", custom_channel_type_name(chan->type));
+    send_to_char(ch, "  scope   : %s\r\n", custom_channel_scope_name(chan->scope));
+    send_to_char(ch, "  log     : %s\r\n", chan->log_enabled ? "on" : "off");
+    return;
+  }
+
+  if (is_abbrev(arg1, "enable") || is_abbrev(arg1, "disable")) {
+    one_argument(rest, arg2);
+    chan = custom_channel_find_by_name(arg2);
+    if (!chan) {
+      send_to_char(ch, "No such custom channel.\r\n");
+      return;
+    }
+    chan->enabled = is_abbrev(arg1, "enable") ? TRUE : FALSE;
+    if (!custom_channels_save())
+      send_to_char(ch, "Failed to save custom channel configuration.\r\n");
+    else
+      send_to_char(ch, "Channel '%s' is now %s.\r\n", chan->name, chan->enabled ? "enabled" : "disabled");
+    return;
+  }
+
+  if (is_abbrev(arg1, "set")) {
+    char value[MAX_INPUT_LENGTH];
+    char set_rest[MAX_INPUT_LENGTH];
+    char *value_ptr;
+
+    half_chop(rest, arg2, set_rest); /* name */
+    half_chop(set_rest, arg3, value);    /* field and value */
+    value_ptr = value;
+    skip_spaces(&value_ptr);
+
+    if (!*arg2 || !*arg3 || !*value_ptr) {
+      send_to_char(ch, "Usage: channel set <name> <display|alias|color|minsend|minhear|type|scope|log> <value>\r\n");
+      return;
+    }
+
+    chan = custom_channel_find_by_name(arg2);
+    if (!chan) {
+      send_to_char(ch, "No such custom channel.\r\n");
+      return;
+    }
+
+    if (is_abbrev(arg3, "display")) {
+      if (!custom_channel_set_display(chan, value_ptr, err, sizeof(err)))
+        send_to_char(ch, "%s\r\n", err);
+      else
+        send_to_char(ch, "Display updated.\r\n");
+      return;
+    }
+    if (is_abbrev(arg3, "alias")) {
+      if (!custom_channel_set_alias(chan, value_ptr, err, sizeof(err)))
+        send_to_char(ch, "%s\r\n", err);
+      else
+        send_to_char(ch, "Alias updated.\r\n");
+      return;
+    }
+    if (is_abbrev(arg3, "color")) {
+      if (!custom_channel_set_color(chan, value_ptr, err, sizeof(err)))
+        send_to_char(ch, "%s\r\n", err);
+      else
+        send_to_char(ch, "Color updated.\r\n");
+      return;
+    }
+    if (is_abbrev(arg3, "minsend")) {
+      if (!is_number(value_ptr) || !custom_channel_set_minsend(chan, atoi(value_ptr), err, sizeof(err)))
+        send_to_char(ch, "%s\r\n", *err ? err : "Invalid minsend value.");
+      else
+        send_to_char(ch, "minsend updated.\r\n");
+      return;
+    }
+    if (is_abbrev(arg3, "minhear")) {
+      if (!is_number(value_ptr) || !custom_channel_set_minhear(chan, atoi(value_ptr), err, sizeof(err)))
+        send_to_char(ch, "%s\r\n", *err ? err : "Invalid minhear value.");
+      else
+        send_to_char(ch, "minhear updated.\r\n");
+      return;
+    }
+    if (is_abbrev(arg3, "type")) {
+      if (!custom_channel_set_type(chan, value_ptr, err, sizeof(err)))
+        send_to_char(ch, "%s\r\n", err);
+      else
+        send_to_char(ch, "Type updated.\r\n");
+      return;
+    }
+    if (is_abbrev(arg3, "scope")) {
+      if (!custom_channel_set_scope(chan, value_ptr, err, sizeof(err)))
+        send_to_char(ch, "%s\r\n", err);
+      else
+        send_to_char(ch, "Scope updated.\r\n");
+      return;
+    }
+    if (is_abbrev(arg3, "log")) {
+      if (!custom_channel_set_log(chan, value_ptr, err, sizeof(err)))
+        send_to_char(ch, "%s\r\n", err);
+      else
+        send_to_char(ch, "Log setting updated.\r\n");
+      return;
+    }
+
+    send_to_char(ch, "Unknown field '%s'.\r\n", arg3);
+    return;
+  }
+
+  send_to_char(ch,
+    "Usage:\r\n"
+    "  channel list\r\n"
+    "  channel create <name>\r\n"
+    "  channel delete <name>\r\n"
+    "  channel enable <name>\r\n"
+    "  channel disable <name>\r\n"
+    "  channel set <name> display <text>\r\n"
+    "  channel set <name> alias <text>\r\n"
+    "  channel set <name> color <code>\r\n"
+    "  channel set <name> minsend <level>\r\n"
+    "  channel set <name> minhear <level>\r\n"
+    "  channel set <name> type <ic|ooc|staff|generic>\r\n"
+    "  channel set <name> scope <global|zone|room>\r\n"
+    "  channel set <name> log <on|off>\r\n"
+    "  channel show <name>\r\n");
 }
