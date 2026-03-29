@@ -387,6 +387,25 @@ int write_mobile_espec(mob_vnum mvnum, struct char_data *mob, FILE *fd)
     fprintf(fd, "LootItem: %d %d\n",
             mob->mob_specials.loot_table[i].vnum,
             mob->mob_specials.loot_table[i].chance);
+  for (i = 0; i < mob->mob_specials.combat_ability_count; i++) {
+    const struct mob_combat_ability *ab = &mob->mob_specials.combat_abilities[i];
+    fprintf(fd,
+            "CombatAbility: %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d\n",
+            ab->enabled, ab->ability_type, ab->target_type, ab->trigger_mode,
+            ab->ability_vnum, ab->round_min, ab->round_max, ab->cooldown_rounds,
+            ab->priority, ab->once_per_fight, ab->max_uses_per_fight,
+            ab->require_target_not_affected, ab->require_self_not_affected,
+            ab->self_hp_pct_max, ab->target_hp_pct_max);
+  }
+  for (i = 0; i < mob->mob_specials.event_reaction_count; i++) {
+    const struct mob_event_reaction *ev = &mob->mob_specials.event_reactions[i];
+    fprintf(fd,
+            "EventReaction: %d %d %d %d %d %d %d %d %d |%s|\n",
+            ev->enabled, ev->event_type, ev->action_type, ev->target_type,
+            ev->ability_vnum, ev->cooldown_pulses, ev->chance_percent,
+            ev->once_per_reset, ev->hp_pct_threshold,
+            ev->argument);
+  }
 fputs("E\n", fd);
   return TRUE;
 }
