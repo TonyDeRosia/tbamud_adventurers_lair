@@ -59,11 +59,24 @@ static void medit_disp_remove_inventory_picker(struct descriptor_data *d);
 static void medit_disp_remove_loot_picker(struct descriptor_data *d);
 static void medit_disp_combat_abilities_menu(struct descriptor_data *d);
 static void medit_disp_combat_ability_field_menu(struct descriptor_data *d);
+static void medit_disp_combat_ability_type_menu(struct descriptor_data *d);
+static void medit_disp_combat_ability_target_menu(struct descriptor_data *d);
+static void medit_disp_combat_ability_trigger_menu(struct descriptor_data *d);
+static void medit_disp_combat_ability_timing_menu(struct descriptor_data *d);
+static void medit_disp_combat_ability_usage_menu(struct descriptor_data *d);
+static void medit_disp_combat_ability_flags_menu(struct descriptor_data *d);
 static void medit_disp_event_reactions_menu(struct descriptor_data *d);
 static void medit_disp_event_reaction_field_menu(struct descriptor_data *d);
+static void medit_disp_event_reaction_event_menu(struct descriptor_data *d);
+static void medit_disp_event_reaction_action_menu(struct descriptor_data *d);
+static void medit_disp_event_reaction_target_menu(struct descriptor_data *d);
+static void medit_disp_event_reaction_cooldown_menu(struct descriptor_data *d);
+static void medit_disp_event_reaction_limits_menu(struct descriptor_data *d);
 static int medit_validate_combat_ability(struct descriptor_data *d, struct mob_combat_ability *ab);
 static int medit_validate_event_reaction(struct descriptor_data *d, struct mob_event_reaction *ev);
 static const char *medit_native_skill_support_text(void);
+static int medit_event_action_uses_target(int action_type);
+static void medit_list_available_spells(struct descriptor_data *d);
 
 static const int medit_eq_picker_slots[] = {
   WEAR_HEAD, WEAR_EYES, WEAR_EAR_L, WEAR_EAR_R, WEAR_NECK_1, WEAR_ABOUT, WEAR_BODY, WEAR_ARMS, WEAR_WRIST_R,
@@ -895,31 +908,104 @@ static void medit_disp_combat_ability_field_menu(struct descriptor_data *d)
   int idx = OLC(d)->behavior_slot;
   struct mob_combat_ability *ab = &OLC_MOB(d)->mob_specials.combat_abilities[idx];
   write_to_output(d,
-    "\r\nEditing combat ability slot %d\r\n"
+    "\r\nCombat Ability Editor (slot %d)\r\n"
+    "Choose what this mob can do during combat, who it targets, and when it should attempt the action.\r\n"
     "1) Type: %s\r\n"
-    "2) Spell/Skill: %s (id=%d)\r\n"
+    "2) Spell/Skill: %s\r\n"
     "3) Target: %s\r\n"
     "4) Trigger mode: %s\r\n"
-    "5) Round min: %d\r\n"
-    "6) Round max: %d\r\n"
-    "7) Cooldown rounds: %d\r\n"
-    "8) Priority: %d (lower acts first)\r\n"
-    "9) Once per fight: %d\r\n"
-    "A) Max uses per fight (attempt cap): %d\r\n"
-    "B) Require target not affected: %d\r\n"
-    "C) Require self not affected: %d\r\n"
-    "D) Self hp %% max: %d\r\n"
-    "E) Target hp %% max: %d\r\n"
+    "5) Timing / Condition Details\r\n"
+    "6) Usage Limits\r\n"
+    "7) Status Flags\r\n"
     "Q) Back\r\nEnter field: ",
     idx + 1,
     mob_behavior_ability_type_name(ab->ability_type),
-    (ab->ability_id > 0 ? skill_name(ab->ability_id) : "<unset>"), ab->ability_id,
+    (ab->ability_id > 0 ? skill_name(ab->ability_id) : "<unset>"),
     mob_behavior_target_name(ab->target_type),
-    mob_behavior_trigger_mode_name(ab->trigger_mode),
-    ab->round_min, ab->round_max, ab->cooldown_rounds, ab->priority,
-    ab->once_per_fight, ab->max_uses_per_fight, ab->require_target_not_affected,
-    ab->require_self_not_affected, ab->self_hp_pct_max, ab->target_hp_pct_max);
+    mob_behavior_trigger_mode_name(ab->trigger_mode));
   OLC_MODE(d) = MEDIT_COMBAT_ABILITY_FIELD_MENU;
+}
+
+static void medit_disp_combat_ability_type_menu(struct descriptor_data *d)
+{
+  write_to_output(d, "\r\nCombat Ability Type\r\n1) Spell\r\n2) Skill\r\nQ) Cancel\r\nEnter choice: ");
+  OLC_MODE(d) = MEDIT_COMBAT_ABILITY_TYPE_MENU;
+}
+
+static void medit_disp_combat_ability_target_menu(struct descriptor_data *d)
+{
+  write_to_output(d,
+    "\r\nCombat Ability Target\r\n"
+    "1) Self\r\n2) Fighting target\r\n3) Random enemy in room\r\n4) Ally in room\r\nQ) Cancel\r\nEnter choice: ");
+  OLC_MODE(d) = MEDIT_COMBAT_ABILITY_TARGET_MENU;
+}
+
+static void medit_disp_combat_ability_trigger_menu(struct descriptor_data *d)
+{
+  write_to_output(d,
+    "\r\nCombat Ability Trigger Mode\r\n"
+    "1) Opener\r\n2) Cooldown\r\n3) Random round window\r\n4) Self HP threshold\r\n5) Target HP threshold\r\nQ) Cancel\r\nEnter choice: ");
+  OLC_MODE(d) = MEDIT_COMBAT_ABILITY_TRIGGER_MENU;
+}
+
+static void medit_disp_combat_ability_timing_menu(struct descriptor_data *d)
+{
+  struct mob_combat_ability *ab = &OLC_MOB(d)->mob_specials.combat_abilities[OLC(d)->behavior_slot];
+  write_to_output(d, "\r\nTiming / Condition Details (%s)\r\n", mob_behavior_trigger_mode_name(ab->trigger_mode));
+  switch (ab->trigger_mode) {
+    case MOB_TRIGGER_OPENER:
+      write_to_output(d, "1) Once per fight: %d\r\n2) Cooldown rounds: %d\r\nQ) Back\r\nEnter choice: ",
+                      ab->once_per_fight, ab->cooldown_rounds);
+      break;
+    case MOB_TRIGGER_COOLDOWN:
+      write_to_output(d, "1) Cooldown rounds: %d\r\n2) Once per fight: %d\r\n3) Max uses per fight: %d\r\nQ) Back\r\nEnter choice: ",
+                      ab->cooldown_rounds, ab->once_per_fight, ab->max_uses_per_fight);
+      break;
+    case MOB_TRIGGER_RANDOM_ROUND_WINDOW:
+      write_to_output(d,
+        "1) Round min: %d\r\n2) Round max: %d\r\n3) Cooldown rounds: %d\r\n4) Once per fight: %d\r\n5) Max uses per fight: %d\r\nQ) Back\r\nEnter choice: ",
+        ab->round_min, ab->round_max, ab->cooldown_rounds, ab->once_per_fight, ab->max_uses_per_fight);
+      break;
+    case MOB_TRIGGER_SELF_HP_THRESHOLD:
+      write_to_output(d,
+        "1) Self HP %% max: %d\r\n2) Cooldown rounds: %d\r\n3) Once per fight: %d\r\n4) Max uses per fight: %d\r\nQ) Back\r\nEnter choice: ",
+        ab->self_hp_pct_max, ab->cooldown_rounds, ab->once_per_fight, ab->max_uses_per_fight);
+      break;
+    case MOB_TRIGGER_TARGET_HP_THRESHOLD:
+      write_to_output(d,
+        "1) Target HP %% max: %d\r\n2) Cooldown rounds: %d\r\n3) Once per fight: %d\r\n4) Max uses per fight: %d\r\nQ) Back\r\nEnter choice: ",
+        ab->target_hp_pct_max, ab->cooldown_rounds, ab->once_per_fight, ab->max_uses_per_fight);
+      break;
+    default:
+      write_to_output(d, "Q) Back\r\nEnter choice: ");
+      break;
+  }
+  OLC_MODE(d) = MEDIT_COMBAT_ABILITY_TIMING_MENU;
+}
+
+static void medit_disp_combat_ability_usage_menu(struct descriptor_data *d)
+{
+  struct mob_combat_ability *ab = &OLC_MOB(d)->mob_specials.combat_abilities[OLC(d)->behavior_slot];
+  write_to_output(d,
+    "\r\nUsage Limits\r\n"
+    "1) Priority: %d (lower acts first)\r\n"
+    "2) Once per fight: %d\r\n"
+    "3) Max uses per fight: %d\r\n"
+    "Q) Back\r\nEnter choice: ",
+    ab->priority, ab->once_per_fight, ab->max_uses_per_fight);
+  OLC_MODE(d) = MEDIT_COMBAT_ABILITY_USAGE_MENU;
+}
+
+static void medit_disp_combat_ability_flags_menu(struct descriptor_data *d)
+{
+  struct mob_combat_ability *ab = &OLC_MOB(d)->mob_specials.combat_abilities[OLC(d)->behavior_slot];
+  write_to_output(d,
+    "\r\nStatus Flags\r\n"
+    "1) Require target not affected: %d\r\n"
+    "2) Require self not affected: %d\r\n"
+    "Q) Back\r\nEnter choice: ",
+    ab->require_target_not_affected, ab->require_self_not_affected);
+  OLC_MODE(d) = MEDIT_COMBAT_ABILITY_FLAGS_MENU;
 }
 
 static void medit_disp_event_reactions_menu(struct descriptor_data *d)
@@ -949,25 +1035,68 @@ static void medit_disp_event_reaction_field_menu(struct descriptor_data *d)
   int idx = OLC(d)->behavior_slot;
   struct mob_event_reaction *ev = &OLC_MOB(d)->mob_specials.event_reactions[idx];
   write_to_output(d,
-    "\r\nEditing event reaction slot %d\r\n"
+    "\r\nEvent Reaction Editor (slot %d)\r\n"
+    "Choose what event triggers the reaction, what action is taken, and any cooldown or one-time limits.\r\n"
     "1) Event type: %s\r\n"
     "2) Action type: %s\r\n"
-    "3) Spell/skill: %s (id=%d)\r\n"
-    "4) Target: %s\r\n"
-    "5) Cooldown pulses: %d\r\n"
-    "6) Chance %%: %d\r\n"
-    "7) Once per reset: %d\r\n"
-    "8) HP threshold %% (low hp): %d\r\n"
-    "9) Message/argument: %s\r\n"
+    "3) Action Data: %s\r\n"
+    "%s"
+    "5) Cooldown / Chance\r\n"
+    "6) Limits / Conditions\r\n"
     "Q) Back\r\nEnter field: ",
     idx + 1,
     mob_behavior_event_type_name(ev->event_type),
     mob_behavior_event_action_name(ev->action_type),
-    (ev->ability_id > 0 ? skill_name(ev->ability_id) : "<unset>"), ev->ability_id,
-    mob_behavior_target_name(ev->target_type),
-    ev->cooldown_pulses, ev->chance_percent, ev->once_per_reset,
-    ev->hp_pct_threshold, ev->argument);
+    (ev->action_type == MOB_EVENT_ACTION_CAST_SPELL || ev->action_type == MOB_EVENT_ACTION_USE_SKILL) ?
+      (ev->ability_id > 0 ? skill_name(ev->ability_id) : "<unset>") : ev->argument,
+    medit_event_action_uses_target(ev->action_type) ?
+      "4) Target: configurable\r\n" :
+      "4) Target: not used for this action\r\n");
   OLC_MODE(d) = MEDIT_EVENT_REACTION_FIELD_MENU;
+}
+
+static void medit_disp_event_reaction_event_menu(struct descriptor_data *d)
+{
+  write_to_output(d,
+    "\r\nEvent Type\r\n"
+    "1) Player enters room\r\n2) Combat starts\r\n3) Low HP\r\n4) Attacked\r\n5) Death\r\nQ) Cancel\r\nEnter choice: ");
+  OLC_MODE(d) = MEDIT_EVENT_REACTION_EVENT_MENU;
+}
+
+static void medit_disp_event_reaction_action_menu(struct descriptor_data *d)
+{
+  write_to_output(d,
+    "\r\nAction Type\r\n"
+    "1) Cast spell\r\n2) Use skill\r\n3) Say text\r\n4) Emote text\r\nQ) Cancel\r\nEnter choice: ");
+  OLC_MODE(d) = MEDIT_EVENT_REACTION_ACTION_MENU;
+}
+
+static void medit_disp_event_reaction_target_menu(struct descriptor_data *d)
+{
+  write_to_output(d,
+    "\r\nReaction Target\r\n"
+    "1) Self\r\n2) Fighting target\r\n3) Entering player (for player-enters-room)\r\n4) Random enemy in room\r\n5) Ally in room\r\nQ) Cancel\r\nEnter choice: ");
+  OLC_MODE(d) = MEDIT_EVENT_REACTION_TARGET_MENU;
+}
+
+static void medit_disp_event_reaction_cooldown_menu(struct descriptor_data *d)
+{
+  struct mob_event_reaction *ev = &OLC_MOB(d)->mob_specials.event_reactions[OLC(d)->behavior_slot];
+  write_to_output(d, "\r\nCooldown / Chance\r\n1) Cooldown pulses: %d\r\n2) Chance %%: %d\r\nQ) Back\r\nEnter choice: ",
+                  ev->cooldown_pulses, ev->chance_percent);
+  OLC_MODE(d) = MEDIT_EVENT_REACTION_COOLDOWN_MENU;
+}
+
+static void medit_disp_event_reaction_limits_menu(struct descriptor_data *d)
+{
+  struct mob_event_reaction *ev = &OLC_MOB(d)->mob_specials.event_reactions[OLC(d)->behavior_slot];
+  write_to_output(d, "\r\nLimits / Conditions\r\n1) Once per reset: %d\r\n", ev->once_per_reset);
+  if (ev->event_type == MOB_EVENT_LOW_HP)
+    write_to_output(d, "2) HP threshold %%: %d\r\n", ev->hp_pct_threshold);
+  else
+    write_to_output(d, "2) HP threshold %%: Not used for current event\r\n");
+  write_to_output(d, "Q) Back\r\nEnter choice: ");
+  OLC_MODE(d) = MEDIT_EVENT_REACTION_LIMITS_MENU;
 }
 
 static const char *medit_native_skill_support_text(void)
@@ -986,6 +1115,25 @@ static const char *medit_native_skill_support_text(void)
 #endif
            );
   return buf;
+}
+
+static int medit_event_action_uses_target(int action_type)
+{
+  return action_type == MOB_EVENT_ACTION_CAST_SPELL || action_type == MOB_EVENT_ACTION_USE_SKILL;
+}
+
+static void medit_list_available_spells(struct descriptor_data *d)
+{
+  int i, shown = 0;
+  write_to_output(d, "Available spells:\r\n");
+  for (i = 1; i <= TOP_SPELL_DEFINE; i++) {
+    if (!IS_SPELL(i))
+      continue;
+    write_to_output(d, "  %s\r\n", skill_name(i));
+    shown++;
+  }
+  if (!shown)
+    write_to_output(d, "  [none]\r\n");
 }
 
 static int medit_validate_combat_ability(struct descriptor_data *d, struct mob_combat_ability *ab)
@@ -1014,7 +1162,14 @@ static int medit_validate_combat_ability(struct descriptor_data *d, struct mob_c
     write_to_output(d, "Random round window requires round_min <= round_max.\r\n");
     return 0;
   }
-  write_to_output(d, "Priority uses lower numbers first.\r\n");
+  if (ab->priority < 0) {
+    write_to_output(d, "Priority must be 0 or greater.\r\n");
+    return 0;
+  }
+  if (ab->max_uses_per_fight < 0) {
+    write_to_output(d, "Max uses per fight must be 0 or greater.\r\n");
+    return 0;
+  }
   ab->round_min = MAX(1, ab->round_min);
   ab->round_max = MAX(ab->round_min, ab->round_max);
   ab->cooldown_rounds = MAX(0, ab->cooldown_rounds);
@@ -1026,9 +1181,12 @@ static int medit_validate_combat_ability(struct descriptor_data *d, struct mob_c
 
 static int medit_validate_event_reaction(struct descriptor_data *d, struct mob_event_reaction *ev)
 {
-  ev->chance_percent = LIMIT(ev->chance_percent, 0, 100);
   ev->cooldown_pulses = MAX(0, ev->cooldown_pulses);
   ev->hp_pct_threshold = LIMIT(ev->hp_pct_threshold, 1, 100);
+  if (ev->chance_percent < 0 || ev->chance_percent > 100) {
+    write_to_output(d, "Chance must be between 0 and 100.\r\n");
+    return 0;
+  }
 
   if (ev->action_type == MOB_EVENT_ACTION_CAST_SPELL) {
     if (!IS_SPELL(ev->ability_id)) {
@@ -1044,7 +1202,7 @@ static int medit_validate_event_reaction(struct descriptor_data *d, struct mob_e
     }
   }
   if (ev->event_type == MOB_EVENT_PLAYER_ENTERS_ROOM && ev->cooldown_pulses < 1) {
-    write_to_output(d, "Player-enter-room reaction requires cooldown >= 1.\r\n");
+    write_to_output(d, "Player enters room reaction requires cooldown >= 1.\r\n");
     return 0;
   }
 
@@ -1084,9 +1242,27 @@ void medit_parse(struct descriptor_data *d, char *arg)
              OLC_MODE(d) != MEDIT_COMBAT_ABILITIES_MENU &&
              OLC_MODE(d) != MEDIT_COMBAT_ABILITY_FIELD_MENU &&
              OLC_MODE(d) != MEDIT_COMBAT_ABILITY_FIELD_VALUE &&
+             OLC_MODE(d) != MEDIT_COMBAT_ABILITY_TYPE_MENU &&
+             OLC_MODE(d) != MEDIT_COMBAT_ABILITY_TARGET_MENU &&
+             OLC_MODE(d) != MEDIT_COMBAT_ABILITY_TRIGGER_MENU &&
+             OLC_MODE(d) != MEDIT_COMBAT_ABILITY_TIMING_MENU &&
+             OLC_MODE(d) != MEDIT_COMBAT_ABILITY_USAGE_MENU &&
+             OLC_MODE(d) != MEDIT_COMBAT_ABILITY_FLAGS_MENU &&
+             OLC_MODE(d) != MEDIT_COMBAT_ABILITY_SPELLSKILL_VALUE &&
+             OLC_MODE(d) != MEDIT_COMBAT_ABILITY_TIMING_VALUE &&
+             OLC_MODE(d) != MEDIT_COMBAT_ABILITY_USAGE_VALUE &&
+             OLC_MODE(d) != MEDIT_COMBAT_ABILITY_FLAGS_VALUE &&
              OLC_MODE(d) != MEDIT_EVENT_REACTIONS_MENU &&
              OLC_MODE(d) != MEDIT_EVENT_REACTION_FIELD_MENU &&
-             OLC_MODE(d) != MEDIT_EVENT_REACTION_FIELD_VALUE) {
+             OLC_MODE(d) != MEDIT_EVENT_REACTION_FIELD_VALUE &&
+             OLC_MODE(d) != MEDIT_EVENT_REACTION_EVENT_MENU &&
+             OLC_MODE(d) != MEDIT_EVENT_REACTION_ACTION_MENU &&
+             OLC_MODE(d) != MEDIT_EVENT_REACTION_ACTION_DATA_VALUE &&
+             OLC_MODE(d) != MEDIT_EVENT_REACTION_TARGET_MENU &&
+             OLC_MODE(d) != MEDIT_EVENT_REACTION_COOLDOWN_MENU &&
+             OLC_MODE(d) != MEDIT_EVENT_REACTION_COOLDOWN_VALUE &&
+             OLC_MODE(d) != MEDIT_EVENT_REACTION_LIMITS_MENU &&
+             OLC_MODE(d) != MEDIT_EVENT_REACTION_LIMITS_VALUE) {
     char *endptr = NULL;
     long parsed;
 
@@ -1956,43 +2132,236 @@ void medit_parse(struct descriptor_data *d, char *arg)
     return;
 
   case MEDIT_COMBAT_ABILITY_FIELD_MENU: {
-    struct mob_combat_ability *ab = &OLC_MOB(d)->mob_specials.combat_abilities[OLC(d)->behavior_slot];
     if (LOWER(*arg) == 'q') {
-      if (medit_validate_combat_ability(d, ab))
+      if (medit_validate_combat_ability(d, &OLC_MOB(d)->mob_specials.combat_abilities[OLC(d)->behavior_slot]))
         OLC_VAL(d) = 1;
       medit_disp_combat_abilities_menu(d);
       return;
     }
-    OLC(d)->behavior_field = toupper(*arg);
-    write_to_output(d, "Enter new value: ");
-    OLC_MODE(d) = MEDIT_COMBAT_ABILITY_FIELD_VALUE;
-    return;
+    switch (*arg) {
+      case '1': medit_disp_combat_ability_type_menu(d); return;
+      case '2':
+      {
+        struct mob_combat_ability *ab = &OLC_MOB(d)->mob_specials.combat_abilities[OLC(d)->behavior_slot];
+        OLC_MODE(d) = MEDIT_COMBAT_ABILITY_SPELLSKILL_VALUE;
+        if (ab->ability_type == MOB_ABILITY_SKILL)
+          write_to_output(d, "Enter skill name, or ? to list supported native combat skills, or Q to cancel: ");
+        else
+          write_to_output(d, "Enter spell name, or ? to list available spells, or Q to cancel: ");
+        return;
+      }
+      case '3': medit_disp_combat_ability_target_menu(d); return;
+      case '4': medit_disp_combat_ability_trigger_menu(d); return;
+      case '5': medit_disp_combat_ability_timing_menu(d); return;
+      case '6': medit_disp_combat_ability_usage_menu(d); return;
+      case '7': medit_disp_combat_ability_flags_menu(d); return;
+      default:
+        medit_disp_combat_ability_field_menu(d);
+        return;
+    }
   }
 
-  case MEDIT_COMBAT_ABILITY_FIELD_VALUE: {
-    struct mob_combat_ability *ab = &OLC_MOB(d)->mob_specials.combat_abilities[OLC(d)->behavior_slot];
-    switch (OLC(d)->behavior_field) {
-      case '1': ab->ability_type = LIMIT(atoi(arg), MOB_ABILITY_SPELL, MOB_ABILITY_SKILL); break;
-      case '2': ab->ability_id = find_skill_num(arg); break;
-      case '3': ab->target_type = LIMIT(atoi(arg), MOB_TARGET_SELF, MOB_TARGET_ALLY); break;
-      case '4': ab->trigger_mode = LIMIT(atoi(arg), MOB_TRIGGER_OPENER, MOB_TRIGGER_TARGET_HP_THRESHOLD); break;
-      case '5': ab->round_min = atoi(arg); break;
-      case '6': ab->round_max = atoi(arg); break;
-      case '7': ab->cooldown_rounds = atoi(arg); break;
-      case '8': ab->priority = atoi(arg); break;
-      case '9': ab->once_per_fight = atoi(arg) ? 1 : 0; break;
-      case 'A': ab->max_uses_per_fight = atoi(arg); break;
-      case 'B': ab->require_target_not_affected = atoi(arg) ? 1 : 0; break;
-      case 'C': ab->require_self_not_affected = atoi(arg) ? 1 : 0; break;
-      case 'D': ab->self_hp_pct_max = atoi(arg); break;
-      case 'E': ab->target_hp_pct_max = atoi(arg); break;
-      default: break;
+  case MEDIT_COMBAT_ABILITY_TYPE_MENU:
+    if (LOWER(*arg) == 'q') {
+      medit_disp_combat_ability_field_menu(d);
+      return;
     }
-    if (medit_validate_combat_ability(d, ab))
+    if (*arg == '1' || *arg == '2') {
+      struct mob_combat_ability *ab = &OLC_MOB(d)->mob_specials.combat_abilities[OLC(d)->behavior_slot];
+      ab->ability_type = (*arg == '1') ? MOB_ABILITY_SPELL : MOB_ABILITY_SKILL;
       OLC_VAL(d) = 1;
+      medit_disp_combat_ability_field_menu(d);
+      return;
+    }
+    write_to_output(d, "Choose 1-2 or Q to cancel: ");
+    return;
+
+  case MEDIT_COMBAT_ABILITY_TARGET_MENU:
+    if (LOWER(*arg) == 'q') {
+      medit_disp_combat_ability_field_menu(d);
+      return;
+    }
+    if (*arg >= '1' && *arg <= '4') {
+      OLC_MOB(d)->mob_specials.combat_abilities[OLC(d)->behavior_slot].target_type = (*arg - '1');
+      OLC_VAL(d) = 1;
+      medit_disp_combat_ability_field_menu(d);
+      return;
+    }
+    write_to_output(d, "Choose 1-4 or Q to cancel: ");
+    return;
+
+  case MEDIT_COMBAT_ABILITY_TRIGGER_MENU:
+    if (LOWER(*arg) == 'q') {
+      medit_disp_combat_ability_field_menu(d);
+      return;
+    }
+    if (*arg >= '1' && *arg <= '5') {
+      OLC_MOB(d)->mob_specials.combat_abilities[OLC(d)->behavior_slot].trigger_mode = (*arg - '1');
+      OLC_VAL(d) = 1;
+      medit_disp_combat_ability_field_menu(d);
+      return;
+    }
+    write_to_output(d, "Choose 1-5 or Q to cancel: ");
+    return;
+
+  case MEDIT_COMBAT_ABILITY_SPELLSKILL_VALUE: {
+    struct mob_combat_ability *ab = &OLC_MOB(d)->mob_specials.combat_abilities[OLC(d)->behavior_slot];
+    int sn;
+    if (medit_arg_is_cancel(arg)) {
+      medit_disp_combat_ability_field_menu(d);
+      return;
+    }
+    if (*arg == '?') {
+      if (ab->ability_type == MOB_ABILITY_SKILL)
+        write_to_output(d, "Supported native combat skills: %s\r\n", medit_native_skill_support_text());
+      else
+        medit_list_available_spells(d);
+      if (ab->ability_type == MOB_ABILITY_SKILL)
+        write_to_output(d, "Enter skill name, or ? to list supported native combat skills, or Q to cancel: ");
+      else
+        write_to_output(d, "Enter spell name, or ? to list available spells, or Q to cancel: ");
+      return;
+    }
+    sn = find_skill_num(arg);
+    if (sn <= 0) {
+      write_to_output(d, "%s: %s\r\n",
+                      (ab->ability_type == MOB_ABILITY_SKILL) ? "Unsupported native skill" : "Unknown spell", arg);
+      medit_disp_combat_ability_field_menu(d);
+      return;
+    }
+    if (ab->ability_type == MOB_ABILITY_SKILL && !mob_behavior_validate_skill(sn)) {
+      write_to_output(d, "Unsupported native skill: %s\r\n", arg);
+      medit_disp_combat_ability_field_menu(d);
+      return;
+    }
+    if (ab->ability_type == MOB_ABILITY_SPELL && !IS_SPELL(sn)) {
+      write_to_output(d, "Unknown spell: %s\r\n", arg);
+      medit_disp_combat_ability_field_menu(d);
+      return;
+    }
+    ab->ability_id = sn;
+    OLC_VAL(d) = 1;
     medit_disp_combat_ability_field_menu(d);
     return;
   }
+
+  case MEDIT_COMBAT_ABILITY_TIMING_MENU: {
+    struct mob_combat_ability *ab = &OLC_MOB(d)->mob_specials.combat_abilities[OLC(d)->behavior_slot];
+    if (LOWER(*arg) == 'q') {
+      medit_disp_combat_ability_field_menu(d);
+      return;
+    }
+    OLC(d)->behavior_field = *arg;
+    switch (ab->trigger_mode) {
+      case MOB_TRIGGER_OPENER:
+        if (*arg == '1' || *arg == '2') { OLC_MODE(d) = MEDIT_COMBAT_ABILITY_TIMING_VALUE; write_to_output(d, "Enter new value: "); return; }
+        break;
+      case MOB_TRIGGER_COOLDOWN:
+        if (*arg >= '1' && *arg <= '3') { OLC_MODE(d) = MEDIT_COMBAT_ABILITY_TIMING_VALUE; write_to_output(d, "Enter new value: "); return; }
+        break;
+      case MOB_TRIGGER_RANDOM_ROUND_WINDOW:
+        if (*arg >= '1' && *arg <= '5') { OLC_MODE(d) = MEDIT_COMBAT_ABILITY_TIMING_VALUE; write_to_output(d, "Enter new value: "); return; }
+        break;
+      case MOB_TRIGGER_SELF_HP_THRESHOLD:
+      case MOB_TRIGGER_TARGET_HP_THRESHOLD:
+        if (*arg >= '1' && *arg <= '4') { OLC_MODE(d) = MEDIT_COMBAT_ABILITY_TIMING_VALUE; write_to_output(d, "Enter new value: "); return; }
+        break;
+    }
+    medit_disp_combat_ability_timing_menu(d);
+    return;
+  }
+
+  case MEDIT_COMBAT_ABILITY_TIMING_VALUE: {
+    struct mob_combat_ability *ab = &OLC_MOB(d)->mob_specials.combat_abilities[OLC(d)->behavior_slot];
+    int val = atoi(arg);
+    switch (ab->trigger_mode) {
+      case MOB_TRIGGER_OPENER:
+        if (OLC(d)->behavior_field == '1') ab->once_per_fight = val ? 1 : 0;
+        else if (OLC(d)->behavior_field == '2') ab->cooldown_rounds = val;
+        break;
+      case MOB_TRIGGER_COOLDOWN:
+        if (OLC(d)->behavior_field == '1') ab->cooldown_rounds = val;
+        else if (OLC(d)->behavior_field == '2') ab->once_per_fight = val ? 1 : 0;
+        else if (OLC(d)->behavior_field == '3') ab->max_uses_per_fight = val;
+        break;
+      case MOB_TRIGGER_RANDOM_ROUND_WINDOW:
+        if (OLC(d)->behavior_field == '1') ab->round_min = val;
+        else if (OLC(d)->behavior_field == '2') ab->round_max = val;
+        else if (OLC(d)->behavior_field == '3') ab->cooldown_rounds = val;
+        else if (OLC(d)->behavior_field == '4') ab->once_per_fight = val ? 1 : 0;
+        else if (OLC(d)->behavior_field == '5') ab->max_uses_per_fight = val;
+        break;
+      case MOB_TRIGGER_SELF_HP_THRESHOLD:
+        if (OLC(d)->behavior_field == '1') ab->self_hp_pct_max = val;
+        else if (OLC(d)->behavior_field == '2') ab->cooldown_rounds = val;
+        else if (OLC(d)->behavior_field == '3') ab->once_per_fight = val ? 1 : 0;
+        else if (OLC(d)->behavior_field == '4') ab->max_uses_per_fight = val;
+        break;
+      case MOB_TRIGGER_TARGET_HP_THRESHOLD:
+        if (OLC(d)->behavior_field == '1') ab->target_hp_pct_max = val;
+        else if (OLC(d)->behavior_field == '2') ab->cooldown_rounds = val;
+        else if (OLC(d)->behavior_field == '3') ab->once_per_fight = val ? 1 : 0;
+        else if (OLC(d)->behavior_field == '4') ab->max_uses_per_fight = val;
+        break;
+    }
+    if (medit_validate_combat_ability(d, ab))
+      OLC_VAL(d) = 1;
+    medit_disp_combat_ability_timing_menu(d);
+    return;
+  }
+
+  case MEDIT_COMBAT_ABILITY_USAGE_MENU:
+    if (LOWER(*arg) == 'q') {
+      medit_disp_combat_ability_field_menu(d);
+      return;
+    }
+    if (*arg >= '1' && *arg <= '3') {
+      OLC(d)->behavior_field = *arg;
+      OLC_MODE(d) = MEDIT_COMBAT_ABILITY_USAGE_VALUE;
+      write_to_output(d, "Enter new value: ");
+      return;
+    }
+    medit_disp_combat_ability_usage_menu(d);
+    return;
+
+  case MEDIT_COMBAT_ABILITY_USAGE_VALUE: {
+    struct mob_combat_ability *ab = &OLC_MOB(d)->mob_specials.combat_abilities[OLC(d)->behavior_slot];
+    int val = atoi(arg);
+    if (OLC(d)->behavior_field == '1') ab->priority = val;
+    else if (OLC(d)->behavior_field == '2') ab->once_per_fight = val ? 1 : 0;
+    else if (OLC(d)->behavior_field == '3') ab->max_uses_per_fight = val;
+    if (medit_validate_combat_ability(d, ab))
+      OLC_VAL(d) = 1;
+    medit_disp_combat_ability_usage_menu(d);
+    return;
+  }
+
+  case MEDIT_COMBAT_ABILITY_FLAGS_MENU:
+    if (LOWER(*arg) == 'q') {
+      medit_disp_combat_ability_field_menu(d);
+      return;
+    }
+    if (*arg == '1' || *arg == '2') {
+      OLC(d)->behavior_field = *arg;
+      OLC_MODE(d) = MEDIT_COMBAT_ABILITY_FLAGS_VALUE;
+      write_to_output(d, "Enter 0 or 1: ");
+      return;
+    }
+    medit_disp_combat_ability_flags_menu(d);
+    return;
+
+  case MEDIT_COMBAT_ABILITY_FLAGS_VALUE: {
+    struct mob_combat_ability *ab = &OLC_MOB(d)->mob_specials.combat_abilities[OLC(d)->behavior_slot];
+    if (OLC(d)->behavior_field == '1') ab->require_target_not_affected = atoi(arg) ? 1 : 0;
+    else if (OLC(d)->behavior_field == '2') ab->require_self_not_affected = atoi(arg) ? 1 : 0;
+    OLC_VAL(d) = 1;
+    medit_disp_combat_ability_flags_menu(d);
+    return;
+  }
+
+  case MEDIT_COMBAT_ABILITY_FIELD_VALUE:
+    medit_disp_combat_ability_field_menu(d);
+    return;
 
   case MEDIT_EVENT_REACTIONS_MENU:
     switch (LOWER(*arg)) {
@@ -2075,30 +2444,189 @@ void medit_parse(struct descriptor_data *d, char *arg)
       medit_disp_event_reactions_menu(d);
       return;
     }
-    OLC(d)->behavior_field = toupper(*arg);
-    write_to_output(d, "Enter new value: ");
-    OLC_MODE(d) = MEDIT_EVENT_REACTION_FIELD_VALUE;
+    switch (*arg) {
+      case '1': medit_disp_event_reaction_event_menu(d); return;
+      case '2': medit_disp_event_reaction_action_menu(d); return;
+      case '3':
+      {
+        struct mob_event_reaction *ev = &OLC_MOB(d)->mob_specials.event_reactions[OLC(d)->behavior_slot];
+        OLC_MODE(d) = MEDIT_EVENT_REACTION_ACTION_DATA_VALUE;
+        if (ev->action_type == MOB_EVENT_ACTION_CAST_SPELL)
+          write_to_output(d, "Enter spell name, or ? to list available spells, or Q to cancel: ");
+        else if (ev->action_type == MOB_EVENT_ACTION_USE_SKILL)
+          write_to_output(d, "Enter skill name, or ? to list supported native reaction skills, or Q to cancel: ");
+        else if (ev->action_type == MOB_EVENT_ACTION_SAY_TEXT)
+          write_to_output(d, "Enter speech text, or Q to cancel: ");
+        else
+          write_to_output(d, "Enter emote text, or Q to cancel: ");
+        return;
+      }
+      case '4':
+      {
+        struct mob_event_reaction *ev = &OLC_MOB(d)->mob_specials.event_reactions[OLC(d)->behavior_slot];
+        if (!medit_event_action_uses_target(ev->action_type)) {
+          write_to_output(d, "Target selection is not used for this action type.\r\n");
+          medit_disp_event_reaction_field_menu(d);
+          return;
+        }
+        medit_disp_event_reaction_target_menu(d);
+        return;
+      }
+      case '5': medit_disp_event_reaction_cooldown_menu(d); return;
+      case '6': medit_disp_event_reaction_limits_menu(d); return;
+      default:
+        medit_disp_event_reaction_field_menu(d);
+        return;
+    }
+
+  case MEDIT_EVENT_REACTION_EVENT_MENU:
+    if (LOWER(*arg) == 'q') {
+      medit_disp_event_reaction_field_menu(d);
+      return;
+    }
+    if (*arg >= '1' && *arg <= '5') {
+      OLC_MOB(d)->mob_specials.event_reactions[OLC(d)->behavior_slot].event_type = (*arg - '1');
+      OLC_VAL(d) = 1;
+      medit_disp_event_reaction_field_menu(d);
+      return;
+    }
+    write_to_output(d, "Choose 1-5 or Q to cancel: ");
     return;
 
-  case MEDIT_EVENT_REACTION_FIELD_VALUE: {
+  case MEDIT_EVENT_REACTION_ACTION_MENU:
+    if (LOWER(*arg) == 'q') {
+      medit_disp_event_reaction_field_menu(d);
+      return;
+    }
+    if (*arg >= '1' && *arg <= '4') {
+      OLC_MOB(d)->mob_specials.event_reactions[OLC(d)->behavior_slot].action_type = (*arg - '1');
+      OLC_VAL(d) = 1;
+      medit_disp_event_reaction_field_menu(d);
+      return;
+    }
+    write_to_output(d, "Choose 1-4 or Q to cancel: ");
+    return;
+
+  case MEDIT_EVENT_REACTION_ACTION_DATA_VALUE: {
     struct mob_event_reaction *ev = &OLC_MOB(d)->mob_specials.event_reactions[OLC(d)->behavior_slot];
-    switch (OLC(d)->behavior_field) {
-      case '1': ev->event_type = LIMIT(atoi(arg), MOB_EVENT_PLAYER_ENTERS_ROOM, MOB_EVENT_DEATH); break;
-      case '2': ev->action_type = LIMIT(atoi(arg), MOB_EVENT_ACTION_CAST_SPELL, MOB_EVENT_ACTION_EMOTE_TEXT); break;
-      case '3': ev->ability_id = find_skill_num(arg); break;
-      case '4': ev->target_type = LIMIT(atoi(arg), MOB_TARGET_SELF, MOB_TARGET_ALLY); break;
-      case '5': ev->cooldown_pulses = atoi(arg); break;
-      case '6': ev->chance_percent = atoi(arg); break;
-      case '7': ev->once_per_reset = atoi(arg) ? 1 : 0; break;
-      case '8': ev->hp_pct_threshold = atoi(arg); break;
-      case '9': strlcpy(ev->argument, arg, sizeof(ev->argument)); break;
-      default: break;
+    int sn;
+    if (medit_arg_is_cancel(arg)) {
+      medit_disp_event_reaction_field_menu(d);
+      return;
+    }
+    if ((ev->action_type == MOB_EVENT_ACTION_CAST_SPELL || ev->action_type == MOB_EVENT_ACTION_USE_SKILL) && *arg == '?') {
+      if (ev->action_type == MOB_EVENT_ACTION_USE_SKILL) {
+        write_to_output(d, "Supported native reaction skills: %s\r\n", medit_native_skill_support_text());
+        write_to_output(d, "Enter skill name, or ? to list supported native reaction skills, or Q to cancel: ");
+      } else {
+        medit_list_available_spells(d);
+        write_to_output(d, "Enter spell name, or ? to list available spells, or Q to cancel: ");
+      }
+      return;
+    }
+    if (ev->action_type == MOB_EVENT_ACTION_CAST_SPELL || ev->action_type == MOB_EVENT_ACTION_USE_SKILL) {
+      sn = find_skill_num(arg);
+      if (sn <= 0 || (ev->action_type == MOB_EVENT_ACTION_CAST_SPELL && !IS_SPELL(sn))) {
+        write_to_output(d, "Unknown spell: %s\r\n", arg);
+        medit_disp_event_reaction_field_menu(d);
+        return;
+      }
+      if (ev->action_type == MOB_EVENT_ACTION_USE_SKILL && (!IS_SKILL(sn) || !mob_behavior_validate_skill(sn))) {
+        write_to_output(d, "Unsupported native skill: %s\r\n", arg);
+        medit_disp_event_reaction_field_menu(d);
+        return;
+      }
+      ev->ability_id = sn;
+    } else {
+      strlcpy(ev->argument, arg, sizeof(ev->argument));
     }
     if (medit_validate_event_reaction(d, ev))
       OLC_VAL(d) = 1;
     medit_disp_event_reaction_field_menu(d);
     return;
   }
+
+  case MEDIT_EVENT_REACTION_TARGET_MENU:
+    if (LOWER(*arg) == 'q') {
+      medit_disp_event_reaction_field_menu(d);
+      return;
+    }
+    if (*arg >= '1' && *arg <= '5') {
+      int mapped = MOB_TARGET_SELF;
+      switch (*arg) {
+        case '1': mapped = MOB_TARGET_SELF; break;
+        case '2': mapped = MOB_TARGET_FIGHTING; break;
+        case '3': mapped = MOB_TARGET_FIGHTING; break; /* entering player follows actor semantics */
+        case '4': mapped = MOB_TARGET_RANDOM_ENEMY; break;
+        case '5': mapped = MOB_TARGET_ALLY; break;
+      }
+      OLC_MOB(d)->mob_specials.event_reactions[OLC(d)->behavior_slot].target_type = mapped;
+      OLC_VAL(d) = 1;
+      medit_disp_event_reaction_field_menu(d);
+      return;
+    }
+    write_to_output(d, "Choose 1-5 or Q to cancel: ");
+    return;
+
+  case MEDIT_EVENT_REACTION_COOLDOWN_MENU:
+    if (LOWER(*arg) == 'q') {
+      medit_disp_event_reaction_field_menu(d);
+      return;
+    }
+    if (*arg == '1' || *arg == '2') {
+      OLC(d)->behavior_field = *arg;
+      OLC_MODE(d) = MEDIT_EVENT_REACTION_COOLDOWN_VALUE;
+      write_to_output(d, "Enter new value: ");
+      return;
+    }
+    medit_disp_event_reaction_cooldown_menu(d);
+    return;
+
+  case MEDIT_EVENT_REACTION_COOLDOWN_VALUE: {
+    struct mob_event_reaction *ev = &OLC_MOB(d)->mob_specials.event_reactions[OLC(d)->behavior_slot];
+    if (OLC(d)->behavior_field == '1') ev->cooldown_pulses = atoi(arg);
+    else if (OLC(d)->behavior_field == '2') ev->chance_percent = atoi(arg);
+    if (medit_validate_event_reaction(d, ev))
+      OLC_VAL(d) = 1;
+    medit_disp_event_reaction_cooldown_menu(d);
+    return;
+  }
+
+  case MEDIT_EVENT_REACTION_LIMITS_MENU:
+    if (LOWER(*arg) == 'q') {
+      medit_disp_event_reaction_field_menu(d);
+      return;
+    }
+    if (*arg == '1' || *arg == '2') {
+      OLC(d)->behavior_field = *arg;
+      OLC_MODE(d) = MEDIT_EVENT_REACTION_LIMITS_VALUE;
+      write_to_output(d, "Enter new value: ");
+      return;
+    }
+    medit_disp_event_reaction_limits_menu(d);
+    return;
+
+  case MEDIT_EVENT_REACTION_LIMITS_VALUE: {
+    struct mob_event_reaction *ev = &OLC_MOB(d)->mob_specials.event_reactions[OLC(d)->behavior_slot];
+    if (OLC(d)->behavior_field == '1')
+      ev->once_per_reset = atoi(arg) ? 1 : 0;
+    else if (OLC(d)->behavior_field == '2') {
+      if (ev->event_type != MOB_EVENT_LOW_HP) {
+        write_to_output(d, "HP threshold only applies to Low HP event.\r\n");
+        medit_disp_event_reaction_limits_menu(d);
+        return;
+      }
+      ev->hp_pct_threshold = atoi(arg);
+    }
+    if (medit_validate_event_reaction(d, ev))
+      OLC_VAL(d) = 1;
+    medit_disp_event_reaction_limits_menu(d);
+    return;
+  }
+
+  case MEDIT_EVENT_REACTION_FIELD_VALUE:
+    medit_disp_event_reaction_field_menu(d);
+    return;
   }
 
 /* Numerical responses. */
