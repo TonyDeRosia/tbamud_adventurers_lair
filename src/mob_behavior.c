@@ -21,7 +21,6 @@ static int mob_behavior_use_combat_ability(struct char_data *mob, int idx, struc
 static int mob_behavior_execute_reaction(struct char_data *mob, const struct mob_event_reaction *ev, struct char_data *actor);
 static void mob_behavior_debug_notify(struct char_data *mob, const char *fmt, ...);
 static int mob_behavior_use_skill(struct char_data *mob, struct char_data *target, int skillnum);
-static int mob_behavior_skill_has_specific_message(int skillnum);
 
 void mob_behavior_advance_pulse(void)
 {
@@ -477,15 +476,6 @@ static int mob_behavior_use_skill(struct char_data *mob, struct char_data *targe
 
   snprintf(arg, sizeof(arg), "%s", GET_NAME(target));
 
-  if (!mob_behavior_skill_has_specific_message(skillnum)) {
-    if (target == mob) {
-      act("$n uses $t on $mself!", FALSE, mob, (struct obj_data *)skill_name(skillnum), NULL, TO_ROOM);
-    } else {
-      act("$n uses $t on $N!", FALSE, mob, (struct obj_data *)skill_name(skillnum), target, TO_NOTVICT);
-      act("$n uses $t on you!", FALSE, mob, (struct obj_data *)skill_name(skillnum), target, TO_VICT);
-    }
-  }
-
   switch (skillnum) {
     case SKILL_BASH: do_bash(mob, arg, 0, 0); return 1;
     case SKILL_KICK: do_kick(mob, arg, 0, 0); return 1;
@@ -501,18 +491,6 @@ static int mob_behavior_use_skill(struct char_data *mob, struct char_data *targe
     default:
       return 0;
   }
-}
-
-static int mob_behavior_skill_has_specific_message(int skillnum)
-{
-  int i;
-
-  for (i = 0; i < MAX_MESSAGES && fight_messages[i].a_type; i++) {
-    if (fight_messages[i].a_type == skillnum && fight_messages[i].msg)
-      return 1;
-  }
-
-  return 0;
 }
 
 static void mob_behavior_debug_notify(struct char_data *mob, const char *fmt, ...)
