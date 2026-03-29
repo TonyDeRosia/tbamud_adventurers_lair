@@ -1069,6 +1069,7 @@ void medit_parse(struct descriptor_data *d, char *arg)
     if (!genolc_checkstring(d, arg))
       return;
   } else if (OLC_MODE(d) > MEDIT_NUMERICAL_RESPONSE &&
+             OLC_MODE(d) != OLC_SCRIPT_EDIT &&
              OLC_MODE(d) != MEDIT_LOADOUT_MENU &&
              OLC_MODE(d) != MEDIT_LOADOUT_EQUIP_VNUM &&
              OLC_MODE(d) != MEDIT_LOADOUT_EQUIP_SLOT &&
