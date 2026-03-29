@@ -4891,7 +4891,8 @@ Usage: auction
        auction set <level>
        auction sethigh <level>
        auction -h <lines>
-       bid [amount]
+       bid
+       bid <auction_id> <amount>
        gossip <message>
        grats <message>
 
@@ -4899,23 +4900,27 @@ Auction can be used in several ways:
   auction               - toggles your auction channel on/off
   auction <item>        - starts an item auction (minimum starting bid 100 gold)
   auction <item> <bid>  - starts an item auction with an explicit minimum bid
-  bid                   - shows the currently auctioned item and current bid
-  bid <amount>          - places a bid on the active auction
+  bid                   - shows the active auction status and bid usage
+  bid <id> <amount>     - places a bid on the active auction ID
   auction set <level>   - sets the lowest item level you want to see
   auction sethigh <lvl> - sets the highest item level you want to see
   auction -h <lines>    - shows your most recent auction history lines (up to 100)
 
-Auction filters are based on the ITEM LEVEL being auctioned, not your player
-level. For example, if your filter is 15..40 then you will only see auctions
-for items whose level is between 15 and 40.
+Each live auction has a visible numeric Auction ID in channel messages.
+Bids must target that ID exactly. Old shorthand bid syntax without an ID is
+not accepted.
+
+Auction filters are based on ITEM LEVEL, not player level. For example, if
+your filter is 15..40 then you will only see auctions for items with level
+between 15 and 40. This applies the same way to mortals and immortals.
 
 Only items you are carrying can be auctioned. NODROP items cannot be auctioned.
 If no one bids, the item is returned to the seller.
 
-Auction sale tax is 10% by default and is taken from the seller when an
-auction completes. If your game uses player tiers, each tier can reduce this
-tax by 1% (up to 5%). If a seller outbids everyone and wins their own auction,
-an extra 10% seller fee applies.
+Auction sale tax is 10% by default and is taken from the seller when an auction
+completes. If your game uses player tiers, each tier can reduce this tax by 1%
+(up to 5%). If a seller outbids everyone and wins their own auction, an extra
+10% seller fee applies. Seller sale messages include gross sale, tax, and net.
 
 Messages on auction, gossip, and grats channels reach everyone who is
 monitoring them. You must be at least level three to use these channels.
@@ -4924,7 +4929,8 @@ Examples:
 
   > auction short sword
   > auction short sword 5000
-  > bid 7500
+  > bid
+  > bid 12 7500
   > auction set 15
   > auction sethigh 40
   > gossip Hey, is that a short sword on your belt or are you happy to see me?
