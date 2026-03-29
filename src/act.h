@@ -47,6 +47,8 @@ ACMD(do_page);
 ACMD(do_reply);
 ACMD(do_tell);
 ACMD(do_write);
+ACMD(do_chan);
+ACMD(do_channel);
 /*****************************************************************************
  * Begin Functions and defines for act.informative.c
  ****************************************************************************/

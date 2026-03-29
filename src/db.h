@@ -133,6 +133,7 @@
 /* END: Assumed default locations for logfiles, mainly used in do_file. */
 
 #define CONFIG_FILE	LIB_ETC"config"    /* OasisOLC * GAME CONFIG FL */
+#define CUSTOM_CHANNELS_FILE LIB_ETC"custom_channels.cfg" /* dynamic custom channels */
 #define PLAYER_FILE	LIB_ETC"players"   /* the player database	*/
 #define MAIL_FILE	LIB_ETC"plrmail"   /* for the mudmail system	*/
 #define MAIL_FILE_TMP	LIB_ETC"plrmail_tmp"   /* for the mudmail system	*/

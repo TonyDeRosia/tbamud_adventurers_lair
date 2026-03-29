@@ -40,6 +40,7 @@
 #include "ibt.h"
 #include "mud_event.h"
 #include "prompt.h"
+#include "custom_channels.h"
 ACMD(do_saudit);
 ACMD(do_shopdisc);
 ACMD(do_pull);
@@ -166,6 +167,8 @@ cpp_extern const struct command_info cmd_info[] = {
   { "cooldown" , "cooldown", POS_DEAD    , do_cooldown , 0, 0 },
   { "spellup"  , "spellup" , POS_SITTING , do_spellup  , 1, 0 },
   { "cedit"    , "cedit"   , POS_DEAD    , do_oasis_cedit, LVL_IMPL, 0 },
+  { "chan"     , "chan"    , POS_SLEEPING, do_chan     , 0, 0 },
+  { "channel"  , "channel" , POS_DEAD    , do_channel  , LVL_IMMORT, 0 },
   { "changelog", "cha"     , POS_DEAD    , do_changelog, LVL_IMPL, 0 },
   { "check"    , "ch"      , POS_STANDING, do_not_here , 1, 0 },
   { "checkload", "checkl"  , POS_DEAD    , do_checkloadstatus, LVL_GOD, 0 },
@@ -743,6 +746,10 @@ void command_interpreter(struct char_data *ch, char *argument)
           !strncmp(complete_cmd_info[cmd].command, arg, length))
         if (GET_LEVEL(ch) >= complete_cmd_info[cmd].minimum_level)
           break;
+
+  if (*complete_cmd_info[cmd].command == '\n' &&
+      custom_channel_try_alias_command(ch, arg, line))
+    return;
 
   if (*complete_cmd_info[cmd].command == '\n') {
     int found = 0;

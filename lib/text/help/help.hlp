@@ -22359,5 +22359,44 @@ Minimum level:
   LVL_BUILDER
 #0
 
-$
+CHAN CHANNEL CUSTOM-CHANNELS
+
+Custom Channels
+Type: Communication
+
+Players:
+Use custom channels with:
+  chan <channel> <message>
+
+Examples:
+  chan ooc anyone know where the quest master is
+  chan market selling enchanted sword
+
+Admins:
+Manage custom channels with the channel command:
+  channel list
+  channel create <name>
+  channel delete <name>
+  channel enable <name>
+  channel disable <name>
+  channel set <name> display <text>
+  channel set <name> alias <text>
+  channel set <name> color <code>
+  channel set <name> minsend <level>
+  channel set <name> minhear <level>
+  channel set <name> type <ic|ooc|staff|generic>
+  channel set <name> scope <global|zone|room>
+  channel set <name> log <on|off>
+  channel show <name>
+
+Scope:
+  global - everyone eligible can hear
+  zone   - only same zone as sender
+  room   - only same room as sender
+
+Color:
+Set a single existing color letter (for example C, Y, R, g, W).
+Custom channel output always ends with a reset to prevent color bleed.
 #0
+
+$
