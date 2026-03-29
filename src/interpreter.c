@@ -316,6 +316,7 @@ cpp_extern const struct command_info cmd_info[] = {
   { "buytrain" , "buytr"   , POS_RESTING , do_buytrain , 0, 0 },
   { "learn"    , "lea"     , POS_RESTING , do_learn    , 0, 0 },
   { "practice" , "pr"      , POS_RESTING , do_practice , 1, 0 },
+  { "peek"     , "pee"     , POS_STANDING, do_peek     , 1, 0 },
   { "train"    , "tr"      , POS_RESTING , do_train    , 1, 0 },
   { "skills"    , "sk"      , POS_RESTING , do_skills   , 1, 0 },
   { "study"     , "stu"     , POS_RESTING , do_study    , 0, 0 },

@@ -424,9 +424,8 @@ static void look_at_char(struct char_data *i, struct char_data *ch)
     act("You see nothing special about $m.", FALSE, i, 0, ch, TO_VICT);
 
   diag_char_to_char(i, ch);
+  show_mob_equipment_to_char(ch, i);
   if (IS_NPC(i)) {
-    show_mob_equipment_to_char(ch, i);
-
     if (ch != i && can_view_mob_inventory(ch, i)) {
       act("\r\nYou size up what $n is carrying:", FALSE, i, 0, ch, TO_VICT);
       if (i->carrying)
@@ -3186,6 +3185,60 @@ ACMD(do_inventory)
 {
   send_to_char(ch, "You are carrying:\r\n");
   list_obj_to_char(ch->carrying, ch, SHOW_OBJ_SHORT, TRUE);
+}
+
+ACMD(do_peek)
+{
+  struct char_data *vict;
+  char arg[MAX_INPUT_LENGTH];
+  int percent, prob;
+
+  one_argument(argument, arg);
+
+  if (IS_NPC(ch) || !GET_SKILL(ch, SKILL_PEEK)) {
+    send_to_char(ch, "You have no idea how to do that.\r\n");
+    return;
+  }
+
+  if (!*arg) {
+    send_to_char(ch, "Peek at whom?\r\n");
+    return;
+  }
+
+  if (!(vict = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM))) {
+    send_to_char(ch, "No-one by that name here.\r\n");
+    return;
+  }
+
+  if (vict == ch) {
+    send_to_char(ch, "You glance over your own belongings.\r\n");
+    send_to_char(ch, "You are carrying:\r\n");
+    list_obj_to_char(ch->carrying, ch, SHOW_OBJ_SHORT, TRUE);
+    return;
+  }
+
+  if (IS_NPC(vict)) {
+    send_to_char(ch, "You can only peek at another player.\r\n");
+    return;
+  }
+
+  percent = rand_number(1, 101);
+  prob = GET_SKILL(ch, SKILL_PEEK) + dex_app_skill[GET_DEX(ch)].p_pocket;
+
+  if (!IS_IMMORTAL_NOFAIL(ch) && percent > prob) {
+    send_to_char(ch, "You fail to peek into %s inventory.\r\n", HSHR(vict));
+    improve_ability_from_use(ch, SKILL_PEEK, FALSE);
+    return;
+  }
+
+  send_to_char(ch, "You snoop around and peek at %s's inventory.\r\n", GET_NAME(vict));
+  if (vict->carrying) {
+    send_to_char(ch, "%s is carrying:\r\n", GET_NAME(vict));
+    list_obj_to_char(vict->carrying, ch, SHOW_OBJ_SHORT, TRUE);
+  } else
+    send_to_char(ch, "%s is carrying nothing.\r\n", GET_NAME(vict));
+
+  improve_ability_from_use(ch, SKILL_PEEK, TRUE);
 }
 
 ACMD(do_equipment)
