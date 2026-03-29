@@ -109,6 +109,7 @@ struct oasis_olc_data {
   int behavior_slot;
   int behavior_field;
   int behavior_picker_kind;
+  int behavior_picker_selection_mode;
   char behavior_picker_filter[MAX_INPUT_LENGTH];
   int item_type;
   struct trig_proto_list *script; /* for assigning triggers in [r|o|m]edit*/
