@@ -41,6 +41,7 @@
 #include "ai_actor.h"
 #include "ai_actor_brain.h"
 #include "crafting.h"
+#include "mob_behavior.h"
 
 /* local utility functions with file scope */
 static int perform_set(struct char_data *ch, struct char_data *vict, int mode, char *val_arg);
@@ -1132,6 +1133,42 @@ static void do_stat_character(struct char_data *ch, struct char_data *k)
     send_to_char(ch, "Mob Spec-Proc: %s, NPC Bare Hand Dam: %dd%d\r\n",
         (mob_index[GET_MOB_RNUM(k)].func ? get_spec_func_name(mob_index[GET_MOB_RNUM(k)].func) : "None"),
 	    k->mob_specials.damnodice, k->mob_specials.damsizedice);
+
+  if (IS_MOB(k) && k->mob_specials.combat_ability_count > 0) {
+    int mbi;
+    send_to_char(ch, "NativeMobBehavior: in_combat=%d round=%d\r\n",
+                 k->mob_behavior_in_combat, k->mob_behavior_fight_round);
+    for (mbi = 0; mbi < k->mob_specials.combat_ability_count && mbi < MAX_MOB_COMBAT_ABILITIES; mbi++) {
+      struct mob_combat_ability *ab = &k->mob_specials.combat_abilities[mbi];
+      send_to_char(ch,
+                   "  CA#%d %s %s/%s prio=%d uses=%d/%d cd_left=%d rand=%d spent=%d trig=%s\r\n",
+                   mbi + 1, (ab->enabled ? "EN" : "DIS"),
+                   mob_behavior_ability_type_name(ab->ability_type),
+                   (ab->ability_id > 0 ? skill_name(ab->ability_id) : "<unset>"),
+                   ab->priority,
+                   k->mob_behavior_uses[mbi],
+                   ab->max_uses_per_fight,
+                   MAX(0, ab->cooldown_rounds - (k->mob_behavior_fight_round - k->mob_behavior_last_used_round[mbi])),
+                   k->mob_behavior_random_round[mbi],
+                   k->mob_behavior_random_spent[mbi],
+                   mob_behavior_trigger_mode_name(ab->trigger_mode));
+    }
+  }
+  if (IS_MOB(k) && k->mob_specials.event_reaction_count > 0) {
+    int mbi;
+    send_to_char(ch, "NativeMobReactions:\r\n");
+    for (mbi = 0; mbi < k->mob_specials.event_reaction_count && mbi < MAX_MOB_EVENT_REACTIONS; mbi++) {
+      struct mob_event_reaction *ev = &k->mob_specials.event_reactions[mbi];
+      send_to_char(ch, "  ER#%d %s %s/%s cd_until=%d once=%d last_actor=%ld last_pulse=%d\r\n",
+                   mbi + 1, (ev->enabled ? "EN" : "DIS"),
+                   mob_behavior_event_type_name(ev->event_type),
+                   mob_behavior_event_action_name(ev->action_type),
+                   k->mob_behavior_event_cooldown_until[mbi],
+                   k->mob_behavior_event_used_this_reset[mbi],
+                   k->mob_behavior_event_last_actor_id[mbi],
+                   k->mob_behavior_event_last_trigger_pulse[mbi]);
+    }
+  }
 
   if (IS_MOB(k) && MOB_FLAGGED(k, MOB_AI_ACTOR) && k->ai_prof) {
     long last_said = 0;

@@ -1808,9 +1808,10 @@ static void interpret_espec(const char *keyword, const char *value, int i, int n
       log("SYSERR: Bad LootItem format in mob #%d", nr);
     }
   }
-  if (value && !matched && !str_cmp(keyword, "CombatAbility")) {
+  if (value && !matched && (!str_cmp(keyword, "CombatAbility2") || !str_cmp(keyword, "CombatAbility"))) {
     int en, atype, target, mode, avnum, rmin, rmax, cooldown, prio;
     int once, maxuses, tna, sna, selfhp, tarhp;
+    int legacy_line = !str_cmp(keyword, "CombatAbility");
     matched = TRUE;
     if (sscanf(value, "%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d",
                &en, &atype, &target, &mode, &avnum, &rmin, &rmax, &cooldown, &prio,
@@ -1822,7 +1823,7 @@ static void interpret_espec(const char *keyword, const char *value, int i, int n
         ab->ability_type = LIMIT(atype, MOB_ABILITY_NONE, MOB_ABILITY_SKILL);
         ab->target_type = LIMIT(target, MOB_TARGET_SELF, MOB_TARGET_ALLY);
         ab->trigger_mode = LIMIT(mode, MOB_TRIGGER_OPENER, MOB_TRIGGER_TARGET_HP_THRESHOLD);
-        ab->ability_vnum = avnum;
+        ab->ability_id = avnum;
         ab->round_min = MAX(1, rmin);
         ab->round_max = MAX(ab->round_min, rmax);
         ab->cooldown_rounds = MAX(0, cooldown);
@@ -1833,15 +1834,24 @@ static void interpret_espec(const char *keyword, const char *value, int i, int n
         ab->require_self_not_affected = (sna != 0);
         ab->self_hp_pct_max = LIMIT(selfhp, 0, 100);
         ab->target_hp_pct_max = LIMIT(tarhp, 0, 100);
+        if (legacy_line)
+          log("SYSERR: Mob #%d loaded legacy CombatAbility line; converted to ability_id model.", nr);
+        if (ab->ability_id <= 0 ||
+            (ab->ability_type == MOB_ABILITY_SPELL && !IS_SPELL(ab->ability_id)) ||
+            (ab->ability_type == MOB_ABILITY_SKILL && !IS_SKILL(ab->ability_id))) {
+          log("SYSERR: Mob #%d has invalid CombatAbility ability id %d; entry skipped.", nr, ab->ability_id);
+          mob_proto[i].mob_specials.combat_ability_count--;
+        }
       } else
         log("SYSERR: Mob #%d exceeds MAX_MOB_COMBAT_ABILITIES.", nr);
     } else
       log("SYSERR: Bad CombatAbility format in mob #%d", nr);
   }
 
-  if (value && !matched && !str_cmp(keyword, "EventReaction")) {
+  if (value && !matched && (!str_cmp(keyword, "EventReaction2") || !str_cmp(keyword, "EventReaction"))) {
     int en, etype, action, target, avnum, cooldown, chance, once, hpth;
     char text[MAX_INPUT_LENGTH] = "";
+    int legacy_line = !str_cmp(keyword, "EventReaction");
     matched = TRUE;
     if (sscanf(value, "%d %d %d %d %d %d %d %d %d |%1023[^|]|",
                &en, &etype, &action, &target, &avnum, &cooldown, &chance,
@@ -1853,12 +1863,19 @@ static void interpret_espec(const char *keyword, const char *value, int i, int n
         ev->event_type = LIMIT(etype, MOB_EVENT_PLAYER_ENTERS_ROOM, MOB_EVENT_DEATH);
         ev->action_type = LIMIT(action, MOB_EVENT_ACTION_CAST_SPELL, MOB_EVENT_ACTION_EMOTE_TEXT);
         ev->target_type = LIMIT(target, MOB_TARGET_SELF, MOB_TARGET_ALLY);
-        ev->ability_vnum = avnum;
+        ev->ability_id = avnum;
         ev->cooldown_pulses = MAX(0, cooldown);
         ev->chance_percent = LIMIT(chance, 0, 100);
         ev->once_per_reset = (once != 0);
         ev->hp_pct_threshold = LIMIT(hpth, 1, 100);
         strlcpy(ev->argument, text, sizeof(ev->argument));
+        if (legacy_line)
+          log("SYSERR: Mob #%d loaded legacy EventReaction line; converted to ability_id model.", nr);
+        if ((ev->action_type == MOB_EVENT_ACTION_CAST_SPELL && (ev->ability_id <= 0 || !IS_SPELL(ev->ability_id))) ||
+            (ev->action_type == MOB_EVENT_ACTION_USE_SKILL && (ev->ability_id <= 0 || !IS_SKILL(ev->ability_id)))) {
+          log("SYSERR: Mob #%d has invalid EventReaction ability id %d; entry skipped.", nr, ev->ability_id);
+          mob_proto[i].mob_specials.event_reaction_count--;
+        }
       } else
         log("SYSERR: Mob #%d exceeds MAX_MOB_EVENT_REACTIONS.", nr);
     } else

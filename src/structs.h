@@ -1231,7 +1231,7 @@ struct mob_combat_ability {
   byte ability_type;   /* mob_ability_type */
   byte target_type;    /* mob_ability_target */
   byte trigger_mode;   /* mob_ability_trigger_mode */
-  int ability_vnum;    /* spell or skill number */
+  int ability_id;      /* spell/skill id (spellnum/skillnum), not world vnum */
   int round_min;
   int round_max;
   int cooldown_rounds;
@@ -1249,7 +1249,7 @@ struct mob_event_reaction {
   byte event_type;       /* mob_event_type */
   byte action_type;      /* mob_event_action_type */
   byte target_type;      /* mob_ability_target */
-  int ability_vnum;      /* spell or skill number if action uses one */
+  int ability_id;        /* spell/skill id (spellnum/skillnum), not world vnum */
   int cooldown_pulses;   /* cooldown in pulses */
   int chance_percent;
   byte once_per_reset;
@@ -1380,7 +1380,8 @@ struct char_data
   byte mob_behavior_opener_attempted[MAX_MOB_COMBAT_ABILITIES];
   int mob_behavior_event_cooldown_until[MAX_MOB_EVENT_REACTIONS];
   byte mob_behavior_event_used_this_reset[MAX_MOB_EVENT_REACTIONS];
-  long mob_behavior_last_entry_actor_id;
+  long mob_behavior_event_last_actor_id[MAX_MOB_EVENT_REACTIONS];
+  int mob_behavior_event_last_trigger_pulse[MAX_MOB_EVENT_REACTIONS];
 };
 
 /** descriptor-related structures */
