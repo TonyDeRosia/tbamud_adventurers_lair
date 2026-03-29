@@ -1068,6 +1068,34 @@ static bool send_cast_message(struct char_data *ch, struct char_data *tch, struc
   return TRUE;
 }
 
+static void send_native_cast_fallback_message(struct char_data *ch, struct char_data *tch,
+                                              struct obj_data *tobj, int spellnum)
+{
+  const char *spell;
+
+  if (!ch || !IS_NPC(ch))
+    return;
+
+  spell = skill_name(spellnum);
+
+  if (tch) {
+    if (tch == ch) {
+      act("$n casts $t on $mself!", FALSE, ch, (struct obj_data *)spell, NULL, TO_ROOM);
+    } else {
+      act("$n casts $t at $N!", FALSE, ch, (struct obj_data *)spell, tch, TO_NOTVICT);
+      act("$n casts $t at you!", FALSE, ch, (struct obj_data *)spell, tch, TO_VICT);
+    }
+    return;
+  }
+
+  if (tobj) {
+    act("$n casts $t at $p!", FALSE, ch, (struct obj_data *)spell, tobj, TO_ROOM);
+    return;
+  }
+
+  act("$n casts $t!", FALSE, ch, (struct obj_data *)spell, NULL, TO_ROOM);
+}
+
 /* Local (File Scope) Variables */
 struct syllable {
   const char *org;
@@ -2412,7 +2440,9 @@ int cast_spell(struct char_data *ch, struct char_data *tch,
 
   if (!send_cast_message(ch, tch, tobj, spellnum)) {
     /* fallback feedback */
-    if (!IS_NPC(ch)) {
+    if (IS_NPC(ch)) {
+      send_native_cast_fallback_message(ch, tch, tobj, spellnum);
+    } else {
       if (tch) {
         send_to_char(ch, "You cast %s on %s.\r\n", skill_name(spellnum), (tch == ch) ? "yourself" : GET_NAME(tch));
       } else if (tobj) {
