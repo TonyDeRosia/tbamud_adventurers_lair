@@ -1132,12 +1132,15 @@ static int medit_event_action_uses_target(int action_type)
 static void medit_behavior_picker_begin(struct descriptor_data *d, int picker_kind)
 {
   OLC(d)->behavior_picker_kind = picker_kind;
+  OLC(d)->behavior_picker_selection_mode = 0;
   OLC(d)->behavior_picker_filter[0] = '\0';
 }
 
 static void medit_behavior_picker_prompt(struct descriptor_data *d, int picker_kind)
 {
-  if (picker_kind == MEDIT_PICKER_SKILL)
+  if (OLC(d)->behavior_picker_selection_mode)
+    write_to_output(d, "Selection (number, name, /filter, Q to cancel): ");
+  else if (picker_kind == MEDIT_PICKER_SKILL)
     write_to_output(d, "Enter skill name, number, ? to list, /filter, or Q to cancel: ");
   else
     write_to_output(d, "Enter spell name, number, ? to list, /filter, or Q to cancel: ");
@@ -1224,13 +1227,12 @@ static int medit_behavior_picker_parse_selection(struct descriptor_data *d, int 
   if (medit_arg_is_cancel(arg))
     return -1;
 
-  if (!arg || !*arg) {
-    medit_behavior_picker_prompt(d, picker_kind);
-    return 0;
-  }
+  if (!arg || !*arg)
+    return -1;
 
   if (*arg == '?') {
     medit_behavior_picker_show_list(d, picker_kind, OLC(d)->behavior_picker_filter);
+    OLC(d)->behavior_picker_selection_mode = 1;
     medit_behavior_picker_prompt(d, picker_kind);
     return 0;
   }
@@ -1241,6 +1243,7 @@ static int medit_behavior_picker_parse_selection(struct descriptor_data *d, int 
       filter++;
     strlcpy(OLC(d)->behavior_picker_filter, filter, sizeof(OLC(d)->behavior_picker_filter));
     medit_behavior_picker_show_list(d, picker_kind, OLC(d)->behavior_picker_filter);
+    OLC(d)->behavior_picker_selection_mode = 1;
     medit_behavior_picker_prompt(d, picker_kind);
     return 0;
   }
