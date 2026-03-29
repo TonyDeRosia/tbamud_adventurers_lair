@@ -63,6 +63,7 @@ static void medit_disp_event_reactions_menu(struct descriptor_data *d);
 static void medit_disp_event_reaction_field_menu(struct descriptor_data *d);
 static int medit_validate_combat_ability(struct descriptor_data *d, struct mob_combat_ability *ab);
 static int medit_validate_event_reaction(struct descriptor_data *d, struct mob_event_reaction *ev);
+static const char *medit_native_skill_support_text(void);
 
 static const int medit_eq_picker_slots[] = {
   WEAR_HEAD, WEAR_EYES, WEAR_EAR_L, WEAR_EAR_R, WEAR_NECK_1, WEAR_ABOUT, WEAR_BODY, WEAR_ARMS, WEAR_WRIST_R,
@@ -871,13 +872,18 @@ static void medit_disp_combat_abilities_menu(struct descriptor_data *d)
     write_to_output(d, "  [NONE]\r\n");
   for (i = 0; i < mob->mob_specials.combat_ability_count; i++) {
     struct mob_combat_ability *ab = &mob->mob_specials.combat_abilities[i];
-    write_to_output(d, "%2d) [%s] %-5s %-20s target:%-14s mode:%-20s prio:%d\r\n",
+    write_to_output(d, "%2d) [%s] %-5s %-20s target:%-14s mode:%-20s prio:%d (lower acts first) once:%d",
       i + 1, ab->enabled ? "EN" : "DIS",
       mob_behavior_ability_type_name(ab->ability_type),
-      (ab->ability_vnum > 0 ? skill_name(ab->ability_vnum) : "<unset>"),
+      (ab->ability_id > 0 ? skill_name(ab->ability_id) : "<unset>"),
       mob_behavior_target_name(ab->target_type),
       mob_behavior_trigger_mode_name(ab->trigger_mode),
-      ab->priority);
+      ab->priority, ab->once_per_fight);
+    if (ab->trigger_mode == MOB_TRIGGER_RANDOM_ROUND_WINDOW)
+      write_to_output(d, " rounds:[%d-%d]", ab->round_min, ab->round_max);
+    if (ab->cooldown_rounds > 0)
+      write_to_output(d, " cooldown:%d", ab->cooldown_rounds);
+    write_to_output(d, "\r\n");
   }
   write_to_output(d,
     "\r\nA) Add  E) Edit  D) Delete  T) Toggle  Q) Quit\r\nEnter choice: ");
@@ -891,13 +897,13 @@ static void medit_disp_combat_ability_field_menu(struct descriptor_data *d)
   write_to_output(d,
     "\r\nEditing combat ability slot %d\r\n"
     "1) Type: %s\r\n"
-    "2) Spell/Skill: %s\r\n"
+    "2) Spell/Skill: %s (id=%d)\r\n"
     "3) Target: %s\r\n"
     "4) Trigger mode: %s\r\n"
     "5) Round min: %d\r\n"
     "6) Round max: %d\r\n"
     "7) Cooldown rounds: %d\r\n"
-    "8) Priority (lower first): %d\r\n"
+    "8) Priority: %d (lower acts first)\r\n"
     "9) Once per fight: %d\r\n"
     "A) Max uses per fight (attempt cap): %d\r\n"
     "B) Require target not affected: %d\r\n"
@@ -907,7 +913,7 @@ static void medit_disp_combat_ability_field_menu(struct descriptor_data *d)
     "Q) Back\r\nEnter field: ",
     idx + 1,
     mob_behavior_ability_type_name(ab->ability_type),
-    (ab->ability_vnum > 0 ? skill_name(ab->ability_vnum) : "<unset>"),
+    (ab->ability_id > 0 ? skill_name(ab->ability_id) : "<unset>"), ab->ability_id,
     mob_behavior_target_name(ab->target_type),
     mob_behavior_trigger_mode_name(ab->trigger_mode),
     ab->round_min, ab->round_max, ab->cooldown_rounds, ab->priority,
@@ -926,13 +932,13 @@ static void medit_disp_event_reactions_menu(struct descriptor_data *d)
     write_to_output(d, "  [NONE]\r\n");
   for (i = 0; i < mob->mob_specials.event_reaction_count; i++) {
     struct mob_event_reaction *ev = &mob->mob_specials.event_reactions[i];
-    write_to_output(d, "%2d) [%s] event:%-18s action:%-12s data:%-18.18s chance:%d cooldown:%d\r\n",
+    write_to_output(d, "%2d) [%s] event:%-18s action:%-12s data:%-18.18s chance:%d cooldown:%d once_reset:%d\r\n",
       i + 1, ev->enabled ? "EN" : "DIS",
       mob_behavior_event_type_name(ev->event_type),
       mob_behavior_event_action_name(ev->action_type),
       (ev->action_type == MOB_EVENT_ACTION_CAST_SPELL || ev->action_type == MOB_EVENT_ACTION_USE_SKILL) ?
-        (ev->ability_vnum > 0 ? skill_name(ev->ability_vnum) : "<unset>") : ev->argument,
-      ev->chance_percent, ev->cooldown_pulses);
+        (ev->ability_id > 0 ? skill_name(ev->ability_id) : "<unset>") : ev->argument,
+      ev->chance_percent, ev->cooldown_pulses, ev->once_per_reset);
   }
   write_to_output(d, "\r\nA) Add  E) Edit  D) Delete  T) Toggle  Q) Quit\r\nEnter choice: ");
   OLC_MODE(d) = MEDIT_EVENT_REACTIONS_MENU;
@@ -946,7 +952,7 @@ static void medit_disp_event_reaction_field_menu(struct descriptor_data *d)
     "\r\nEditing event reaction slot %d\r\n"
     "1) Event type: %s\r\n"
     "2) Action type: %s\r\n"
-    "3) Spell/skill id: %d (%s)\r\n"
+    "3) Spell/skill: %s (id=%d)\r\n"
     "4) Target: %s\r\n"
     "5) Cooldown pulses: %d\r\n"
     "6) Chance %%: %d\r\n"
@@ -957,27 +963,46 @@ static void medit_disp_event_reaction_field_menu(struct descriptor_data *d)
     idx + 1,
     mob_behavior_event_type_name(ev->event_type),
     mob_behavior_event_action_name(ev->action_type),
-    ev->ability_vnum, (ev->ability_vnum > 0 ? skill_name(ev->ability_vnum) : "<unset>"),
+    (ev->ability_id > 0 ? skill_name(ev->ability_id) : "<unset>"), ev->ability_id,
     mob_behavior_target_name(ev->target_type),
     ev->cooldown_pulses, ev->chance_percent, ev->once_per_reset,
     ev->hp_pct_threshold, ev->argument);
   OLC_MODE(d) = MEDIT_EVENT_REACTION_FIELD_MENU;
 }
 
+static const char *medit_native_skill_support_text(void)
+{
+  static char buf[128];
+
+  snprintf(buf, sizeof(buf), "bash, kick"
+#ifdef SKILL_DISARM
+           ", disarm"
+#endif
+#ifdef SKILL_DIRT_KICK
+           ", dirt kick"
+#endif
+#ifdef SKILL_TRIP
+           ", trip"
+#endif
+           );
+  return buf;
+}
+
 static int medit_validate_combat_ability(struct descriptor_data *d, struct mob_combat_ability *ab)
 {
   if (ab->ability_type == MOB_ABILITY_SPELL) {
-    if (ab->ability_vnum <= 0 || !IS_SPELL(ab->ability_vnum)) {
-      write_to_output(d, "Invalid spell selection.\r\n");
+    if (ab->ability_id <= 0 || !IS_SPELL(ab->ability_id)) {
+      write_to_output(d, "Unknown spell: %s\r\n", (ab->ability_id > 0 ? skill_name(ab->ability_id) : "<unset>"));
       return 0;
     }
   } else if (ab->ability_type == MOB_ABILITY_SKILL) {
-    if (ab->ability_vnum <= 0 || !IS_SKILL(ab->ability_vnum)) {
-      write_to_output(d, "Invalid skill selection.\r\n");
+    if (ab->ability_id <= 0 || !IS_SKILL(ab->ability_id)) {
+      write_to_output(d, "Unknown skill: %s\r\n", (ab->ability_id > 0 ? skill_name(ab->ability_id) : "<unset>"));
       return 0;
     }
-    if (!mob_behavior_validate_skill(ab->ability_vnum)) {
-      write_to_output(d, "Unsupported skill for native mob behavior (supported: bash, kick).\r\n");
+    if (!mob_behavior_validate_skill(ab->ability_id)) {
+      write_to_output(d, "Unsupported native skill: %s (supported: %s).\r\n",
+                      skill_name(ab->ability_id), medit_native_skill_support_text());
       return 0;
     }
   } else {
@@ -986,9 +1011,10 @@ static int medit_validate_combat_ability(struct descriptor_data *d, struct mob_c
   }
 
   if (ab->trigger_mode == MOB_TRIGGER_RANDOM_ROUND_WINDOW && ab->round_min > ab->round_max) {
-    write_to_output(d, "round_min must be <= round_max.\r\n");
+    write_to_output(d, "Random round window requires round_min <= round_max.\r\n");
     return 0;
   }
+  write_to_output(d, "Priority uses lower numbers first.\r\n");
   ab->round_min = MAX(1, ab->round_min);
   ab->round_max = MAX(ab->round_min, ab->round_max);
   ab->cooldown_rounds = MAX(0, ab->cooldown_rounds);
@@ -1005,15 +1031,21 @@ static int medit_validate_event_reaction(struct descriptor_data *d, struct mob_e
   ev->hp_pct_threshold = LIMIT(ev->hp_pct_threshold, 1, 100);
 
   if (ev->action_type == MOB_EVENT_ACTION_CAST_SPELL) {
-    if (!IS_SPELL(ev->ability_vnum)) {
-      write_to_output(d, "Invalid spell for event reaction.\r\n");
+    if (!IS_SPELL(ev->ability_id)) {
+      write_to_output(d, "Unknown spell: %s\r\n", (ev->ability_id > 0 ? skill_name(ev->ability_id) : "<unset>"));
       return 0;
     }
   } else if (ev->action_type == MOB_EVENT_ACTION_USE_SKILL) {
-    if (!IS_SKILL(ev->ability_vnum) || !mob_behavior_validate_skill(ev->ability_vnum)) {
-      write_to_output(d, "Invalid/unsupported skill for event reaction.\r\n");
+    if (!IS_SKILL(ev->ability_id) || !mob_behavior_validate_skill(ev->ability_id)) {
+      write_to_output(d, "Unsupported native skill: %s (supported: %s).\r\n",
+                      (ev->ability_id > 0 ? skill_name(ev->ability_id) : "<unset>"),
+                      medit_native_skill_support_text());
       return 0;
     }
+  }
+  if (ev->event_type == MOB_EVENT_PLAYER_ENTERS_ROOM && ev->cooldown_pulses < 1) {
+    write_to_output(d, "Player-enter-room reaction requires cooldown >= 1.\r\n");
+    return 0;
   }
 
   if ((ev->action_type == MOB_EVENT_ACTION_SAY_TEXT || ev->action_type == MOB_EVENT_ACTION_EMOTE_TEXT) &&
@@ -1940,7 +1972,7 @@ void medit_parse(struct descriptor_data *d, char *arg)
     struct mob_combat_ability *ab = &OLC_MOB(d)->mob_specials.combat_abilities[OLC(d)->behavior_slot];
     switch (OLC(d)->behavior_field) {
       case '1': ab->ability_type = LIMIT(atoi(arg), MOB_ABILITY_SPELL, MOB_ABILITY_SKILL); break;
-      case '2': ab->ability_vnum = find_skill_num(arg); break;
+      case '2': ab->ability_id = find_skill_num(arg); break;
       case '3': ab->target_type = LIMIT(atoi(arg), MOB_TARGET_SELF, MOB_TARGET_ALLY); break;
       case '4': ab->trigger_mode = LIMIT(atoi(arg), MOB_TRIGGER_OPENER, MOB_TRIGGER_TARGET_HP_THRESHOLD); break;
       case '5': ab->round_min = atoi(arg); break;
@@ -2052,7 +2084,7 @@ void medit_parse(struct descriptor_data *d, char *arg)
     switch (OLC(d)->behavior_field) {
       case '1': ev->event_type = LIMIT(atoi(arg), MOB_EVENT_PLAYER_ENTERS_ROOM, MOB_EVENT_DEATH); break;
       case '2': ev->action_type = LIMIT(atoi(arg), MOB_EVENT_ACTION_CAST_SPELL, MOB_EVENT_ACTION_EMOTE_TEXT); break;
-      case '3': ev->ability_vnum = find_skill_num(arg); break;
+      case '3': ev->ability_id = find_skill_num(arg); break;
       case '4': ev->target_type = LIMIT(atoi(arg), MOB_TARGET_SELF, MOB_TARGET_ALLY); break;
       case '5': ev->cooldown_pulses = atoi(arg); break;
       case '6': ev->chance_percent = atoi(arg); break;
