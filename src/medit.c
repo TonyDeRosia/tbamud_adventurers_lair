@@ -76,7 +76,14 @@ static int medit_validate_combat_ability(struct descriptor_data *d, struct mob_c
 static int medit_validate_event_reaction(struct descriptor_data *d, struct mob_event_reaction *ev);
 static const char *medit_native_skill_support_text(void);
 static int medit_event_action_uses_target(int action_type);
-static void medit_list_available_spells(struct descriptor_data *d);
+static void medit_behavior_picker_begin(struct descriptor_data *d, int picker_kind);
+static void medit_behavior_picker_prompt(struct descriptor_data *d, int picker_kind);
+static int medit_behavior_picker_build_visible_list(int picker_kind, const char *filter, int *visible_ids, int max_ids);
+static void medit_behavior_picker_show_list(struct descriptor_data *d, int picker_kind, const char *filter);
+static int medit_behavior_picker_parse_selection(struct descriptor_data *d, int picker_kind, const char *arg, int *chosen_id);
+
+#define MEDIT_PICKER_SPELL 1
+#define MEDIT_PICKER_SKILL 2
 
 static const int medit_eq_picker_slots[] = {
   WEAR_HEAD, WEAR_EYES, WEAR_EAR_L, WEAR_EAR_R, WEAR_NECK_1, WEAR_ABOUT, WEAR_BODY, WEAR_ARMS, WEAR_WRIST_R,
@@ -1122,18 +1129,148 @@ static int medit_event_action_uses_target(int action_type)
   return action_type == MOB_EVENT_ACTION_CAST_SPELL || action_type == MOB_EVENT_ACTION_USE_SKILL;
 }
 
-static void medit_list_available_spells(struct descriptor_data *d)
+static void medit_behavior_picker_begin(struct descriptor_data *d, int picker_kind)
 {
-  int i, shown = 0;
-  write_to_output(d, "Available spells:\r\n");
-  for (i = 1; i <= TOP_SPELL_DEFINE; i++) {
-    if (!IS_SPELL(i))
-      continue;
-    write_to_output(d, "  %s\r\n", skill_name(i));
-    shown++;
+  OLC(d)->behavior_picker_kind = picker_kind;
+  OLC(d)->behavior_picker_filter[0] = '\0';
+}
+
+static void medit_behavior_picker_prompt(struct descriptor_data *d, int picker_kind)
+{
+  if (picker_kind == MEDIT_PICKER_SKILL)
+    write_to_output(d, "Enter skill name, number, ? to list, /filter, or Q to cancel: ");
+  else
+    write_to_output(d, "Enter spell name, number, ? to list, /filter, or Q to cancel: ");
+}
+
+static int medit_behavior_picker_matches_filter(const char *name, const char *filter)
+{
+  const char *n;
+  size_t flen;
+
+  if (!filter || !*filter)
+    return 1;
+
+  flen = strlen(filter);
+  for (n = name; *n; n++) {
+    size_t i = 0;
+    while (i < flen && n[i] &&
+           LOWER((unsigned char)n[i]) == LOWER((unsigned char)filter[i]))
+      i++;
+    if (i == flen)
+      return 1;
   }
-  if (!shown)
-    write_to_output(d, "  [none]\r\n");
+  return 0;
+}
+
+static int medit_behavior_picker_build_visible_list(int picker_kind, const char *filter, int *visible_ids, int max_ids)
+{
+  int i, count = 0;
+
+  for (i = 1; i <= TOP_SPELL_DEFINE; i++) {
+    const char *name = skill_name(i);
+
+    if (!name || !*name || !str_cmp(name, "!UNUSED!"))
+      continue;
+    if (picker_kind == MEDIT_PICKER_SPELL) {
+      if (!IS_SPELL(i))
+        continue;
+    } else if (picker_kind == MEDIT_PICKER_SKILL) {
+      if (!IS_SKILL(i) || !mob_behavior_validate_skill(i))
+        continue;
+    } else {
+      continue;
+    }
+    if (!medit_behavior_picker_matches_filter(name, filter))
+      continue;
+    if (count < max_ids)
+      visible_ids[count] = i;
+    count++;
+  }
+
+  return count;
+}
+
+static void medit_behavior_picker_show_list(struct descriptor_data *d, int picker_kind, const char *filter)
+{
+  int visible_ids[TOP_SPELL_DEFINE];
+  int count, idx;
+
+  count = medit_behavior_picker_build_visible_list(picker_kind, filter, visible_ids, TOP_SPELL_DEFINE);
+  if (!count) {
+    if (picker_kind == MEDIT_PICKER_SKILL)
+      write_to_output(d, "No matching skills.\r\n");
+    else
+      write_to_output(d, "No matching spells.\r\n");
+    return;
+  }
+
+  if (filter && *filter)
+    write_to_output(d, "Matching %s for \"%s\":\r\n",
+                    (picker_kind == MEDIT_PICKER_SKILL) ? "skills" : "spells", filter);
+  else
+    write_to_output(d, "Available %s:\r\n", (picker_kind == MEDIT_PICKER_SKILL) ? "skills" : "spells");
+
+  for (idx = 0; idx < count; idx++)
+    write_to_output(d, "  %d) %s\r\n", idx + 1, skill_name(visible_ids[idx]));
+}
+
+static int medit_behavior_picker_parse_selection(struct descriptor_data *d, int picker_kind, const char *arg, int *chosen_id)
+{
+  int visible_ids[TOP_SPELL_DEFINE];
+  int visible_count, pick;
+  int sn;
+
+  if (medit_arg_is_cancel(arg))
+    return -1;
+
+  if (!arg || !*arg) {
+    medit_behavior_picker_prompt(d, picker_kind);
+    return 0;
+  }
+
+  if (*arg == '?') {
+    medit_behavior_picker_show_list(d, picker_kind, OLC(d)->behavior_picker_filter);
+    medit_behavior_picker_prompt(d, picker_kind);
+    return 0;
+  }
+
+  if (*arg == '/') {
+    const char *filter = arg + 1;
+    while (*filter && isspace((unsigned char)*filter))
+      filter++;
+    strlcpy(OLC(d)->behavior_picker_filter, filter, sizeof(OLC(d)->behavior_picker_filter));
+    medit_behavior_picker_show_list(d, picker_kind, OLC(d)->behavior_picker_filter);
+    medit_behavior_picker_prompt(d, picker_kind);
+    return 0;
+  }
+
+  if (medit_parse_int_argument(arg, &pick)) {
+    visible_count = medit_behavior_picker_build_visible_list(
+      picker_kind, OLC(d)->behavior_picker_filter, visible_ids, TOP_SPELL_DEFINE);
+    if (pick < 1 || pick > visible_count) {
+      write_to_output(d, "Invalid selection.\r\n");
+      medit_behavior_picker_prompt(d, picker_kind);
+      return 0;
+    }
+    *chosen_id = visible_ids[pick - 1];
+    return 1;
+  }
+
+  sn = find_skill_num((char *)arg);
+  if (sn <= 0)
+    return (picker_kind == MEDIT_PICKER_SKILL) ? -3 : -2;
+
+  if (picker_kind == MEDIT_PICKER_SPELL) {
+    if (!IS_SPELL(sn))
+      return -2;
+  } else if (picker_kind == MEDIT_PICKER_SKILL) {
+    if (!IS_SKILL(sn) || !mob_behavior_validate_skill(sn))
+      return -3;
+  }
+
+  *chosen_id = sn;
+  return 1;
 }
 
 static int medit_validate_combat_ability(struct descriptor_data *d, struct mob_combat_ability *ab)
@@ -2144,10 +2281,8 @@ void medit_parse(struct descriptor_data *d, char *arg)
       {
         struct mob_combat_ability *ab = &OLC_MOB(d)->mob_specials.combat_abilities[OLC(d)->behavior_slot];
         OLC_MODE(d) = MEDIT_COMBAT_ABILITY_SPELLSKILL_VALUE;
-        if (ab->ability_type == MOB_ABILITY_SKILL)
-          write_to_output(d, "Enter skill name, or ? to list supported native combat skills, or Q to cancel: ");
-        else
-          write_to_output(d, "Enter spell name, or ? to list available spells, or Q to cancel: ");
+        medit_behavior_picker_begin(d, (ab->ability_type == MOB_ABILITY_SKILL) ? MEDIT_PICKER_SKILL : MEDIT_PICKER_SPELL);
+        medit_behavior_picker_prompt(d, OLC(d)->behavior_picker_kind);
         return;
       }
       case '3': medit_disp_combat_ability_target_menu(d); return;
@@ -2206,27 +2341,24 @@ void medit_parse(struct descriptor_data *d, char *arg)
 
   case MEDIT_COMBAT_ABILITY_SPELLSKILL_VALUE: {
     struct mob_combat_ability *ab = &OLC_MOB(d)->mob_specials.combat_abilities[OLC(d)->behavior_slot];
-    int sn;
-    if (medit_arg_is_cancel(arg)) {
+    int sn = 0;
+    int picker_kind = (ab->ability_type == MOB_ABILITY_SKILL) ? MEDIT_PICKER_SKILL : MEDIT_PICKER_SPELL;
+    int picker_result = medit_behavior_picker_parse_selection(d, picker_kind, arg, &sn);
+
+    if (picker_result == -1) {
       medit_disp_combat_ability_field_menu(d);
       return;
     }
-    if (*arg == '?') {
-      if (ab->ability_type == MOB_ABILITY_SKILL)
-        write_to_output(d, "Supported native combat skills: %s\r\n", medit_native_skill_support_text());
-      else
-        medit_list_available_spells(d);
-      if (ab->ability_type == MOB_ABILITY_SKILL)
-        write_to_output(d, "Enter skill name, or ? to list supported native combat skills, or Q to cancel: ");
-      else
-        write_to_output(d, "Enter spell name, or ? to list available spells, or Q to cancel: ");
+    if (picker_result == 0)
+      return;
+    if (picker_result == -2) {
+      write_to_output(d, "Unknown spell: %s\r\n", arg);
+      medit_behavior_picker_prompt(d, picker_kind);
       return;
     }
-    sn = find_skill_num(arg);
-    if (sn <= 0) {
-      write_to_output(d, "%s: %s\r\n",
-                      (ab->ability_type == MOB_ABILITY_SKILL) ? "Unsupported native skill" : "Unknown spell", arg);
-      medit_disp_combat_ability_field_menu(d);
+    if (picker_result == -3) {
+      write_to_output(d, "Unsupported native skill: %s\r\n", arg);
+      medit_behavior_picker_prompt(d, picker_kind);
       return;
     }
     if (ab->ability_type == MOB_ABILITY_SKILL && !mob_behavior_validate_skill(sn)) {
@@ -2451,11 +2583,10 @@ void medit_parse(struct descriptor_data *d, char *arg)
       {
         struct mob_event_reaction *ev = &OLC_MOB(d)->mob_specials.event_reactions[OLC(d)->behavior_slot];
         OLC_MODE(d) = MEDIT_EVENT_REACTION_ACTION_DATA_VALUE;
-        if (ev->action_type == MOB_EVENT_ACTION_CAST_SPELL)
-          write_to_output(d, "Enter spell name, or ? to list available spells, or Q to cancel: ");
-        else if (ev->action_type == MOB_EVENT_ACTION_USE_SKILL)
-          write_to_output(d, "Enter skill name, or ? to list supported native reaction skills, or Q to cancel: ");
-        else if (ev->action_type == MOB_EVENT_ACTION_SAY_TEXT)
+        if (ev->action_type == MOB_EVENT_ACTION_CAST_SPELL || ev->action_type == MOB_EVENT_ACTION_USE_SKILL) {
+          medit_behavior_picker_begin(d, (ev->action_type == MOB_EVENT_ACTION_USE_SKILL) ? MEDIT_PICKER_SKILL : MEDIT_PICKER_SPELL);
+          medit_behavior_picker_prompt(d, OLC(d)->behavior_picker_kind);
+        } else if (ev->action_type == MOB_EVENT_ACTION_SAY_TEXT)
           write_to_output(d, "Enter speech text, or Q to cancel: ");
         else
           write_to_output(d, "Enter emote text, or Q to cancel: ");
@@ -2509,31 +2640,28 @@ void medit_parse(struct descriptor_data *d, char *arg)
 
   case MEDIT_EVENT_REACTION_ACTION_DATA_VALUE: {
     struct mob_event_reaction *ev = &OLC_MOB(d)->mob_specials.event_reactions[OLC(d)->behavior_slot];
-    int sn;
+    int sn = 0;
     if (medit_arg_is_cancel(arg)) {
       medit_disp_event_reaction_field_menu(d);
       return;
     }
-    if ((ev->action_type == MOB_EVENT_ACTION_CAST_SPELL || ev->action_type == MOB_EVENT_ACTION_USE_SKILL) && *arg == '?') {
-      if (ev->action_type == MOB_EVENT_ACTION_USE_SKILL) {
-        write_to_output(d, "Supported native reaction skills: %s\r\n", medit_native_skill_support_text());
-        write_to_output(d, "Enter skill name, or ? to list supported native reaction skills, or Q to cancel: ");
-      } else {
-        medit_list_available_spells(d);
-        write_to_output(d, "Enter spell name, or ? to list available spells, or Q to cancel: ");
-      }
-      return;
-    }
     if (ev->action_type == MOB_EVENT_ACTION_CAST_SPELL || ev->action_type == MOB_EVENT_ACTION_USE_SKILL) {
-      sn = find_skill_num(arg);
-      if (sn <= 0 || (ev->action_type == MOB_EVENT_ACTION_CAST_SPELL && !IS_SPELL(sn))) {
-        write_to_output(d, "Unknown spell: %s\r\n", arg);
+      int picker_kind = (ev->action_type == MOB_EVENT_ACTION_USE_SKILL) ? MEDIT_PICKER_SKILL : MEDIT_PICKER_SPELL;
+      int picker_result = medit_behavior_picker_parse_selection(d, picker_kind, arg, &sn);
+      if (picker_result == -1) {
         medit_disp_event_reaction_field_menu(d);
         return;
       }
-      if (ev->action_type == MOB_EVENT_ACTION_USE_SKILL && (!IS_SKILL(sn) || !mob_behavior_validate_skill(sn))) {
+      if (picker_result == 0)
+        return;
+      if (picker_result == -2) {
+        write_to_output(d, "Unknown spell: %s\r\n", arg);
+        medit_behavior_picker_prompt(d, picker_kind);
+        return;
+      }
+      if (picker_result == -3 || (ev->action_type == MOB_EVENT_ACTION_USE_SKILL && (!IS_SKILL(sn) || !mob_behavior_validate_skill(sn)))) {
         write_to_output(d, "Unsupported native skill: %s\r\n", arg);
-        medit_disp_event_reaction_field_menu(d);
+        medit_behavior_picker_prompt(d, picker_kind);
         return;
       }
       ev->ability_id = sn;
