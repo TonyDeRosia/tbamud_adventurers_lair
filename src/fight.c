@@ -1639,6 +1639,14 @@ static int skill_message_last_had_severity(void)
   return g_last_skill_message_had_severity;
 }
 
+static const char *spell_impact_noun(struct char_data *ch, int attacktype)
+{
+  if (attacktype > 0 && attacktype <= MAX_SPELLS &&
+      mob_behavior_is_native_spell_cast_active(ch, attacktype))
+    return skill_name(attacktype);
+  return "magic";
+}
+
 int skill_message(int dam, struct char_data *ch, struct char_data *vict,
 		      int attacktype)
 {
@@ -2179,7 +2187,7 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
   if (!IS_WEAPON(attacktype)) {
     int shown = skill_message(dam, ch, victim, attacktype);
     int is_spell_attack = (attacktype > 0 && attacktype <= MAX_SPELLS);
-    const char *source_noun = is_spell_attack ? "magic" : "attack";
+    const char *source_noun = is_spell_attack ? spell_impact_noun(ch, attacktype) : "attack";
     int has_existing_severity = skill_message_last_had_severity();
 
     /* Always add a short severity verb line for successful spell/skill hits. */
@@ -2217,9 +2225,15 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
       /* If no message exists and no damage landed, still show a source-appropriate miss. */
       if (ch) {
         if (is_spell_attack) {
-          act("Your magic misses $N.", FALSE, ch, NULL, victim, TO_CHAR);
-          act("$n's magic misses you.", FALSE, ch, NULL, victim, TO_VICT | TO_SLEEP);
-          act("$n's magic misses $N.", FALSE, ch, NULL, victim, TO_NOTVICT);
+          if (mob_behavior_is_native_spell_cast_active(ch, attacktype)) {
+            act("Your $t misses $N.", FALSE, ch, (struct obj_data *)skill_name(attacktype), victim, TO_CHAR);
+            act("$n's $t misses you.", FALSE, ch, (struct obj_data *)skill_name(attacktype), victim, TO_VICT | TO_SLEEP);
+            act("$n's $t misses $N.", FALSE, ch, (struct obj_data *)skill_name(attacktype), victim, TO_NOTVICT);
+          } else {
+            act("Your magic misses $N.", FALSE, ch, NULL, victim, TO_CHAR);
+            act("$n's magic misses you.", FALSE, ch, NULL, victim, TO_VICT | TO_SLEEP);
+            act("$n's magic misses $N.", FALSE, ch, NULL, victim, TO_NOTVICT);
+          }
         } else {
           act("Your attack misses $N.", FALSE, ch, NULL, victim, TO_CHAR);
           act("$n's attack misses you.", FALSE, ch, NULL, victim, TO_VICT | TO_SLEEP);
