@@ -4903,7 +4903,14 @@ Auction can be used in several ways:
   bid <amount>          - places a bid on the active auction
   auction set <level>   - sets the lowest item level you want to see
   auction sethigh <lvl> - sets the highest item level you want to see
-  auction -h <lines>    - shows auction channel history
+  auction -h <lines>    - shows your most recent auction history lines (up to 100)
+
+Auction filters are based on the ITEM LEVEL being auctioned, not your player
+level. For example, if your filter is 15..40 then you will only see auctions
+for items whose level is between 15 and 40.
+
+Only items you are carrying can be auctioned. NODROP items cannot be auctioned.
+If no one bids, the item is returned to the seller.
 
 Auction sale tax is 10% by default and is taken from the seller when an
 auction completes. If your game uses player tiers, each tier can reduce this
