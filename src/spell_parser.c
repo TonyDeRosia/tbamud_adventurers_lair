@@ -2451,6 +2451,9 @@ int cast_spell(struct char_data *ch, struct char_data *tch,
         send_to_char(ch, "You cast %s.\r\n", skill_name(spellnum));
       }
     }
+  } else if (IS_NPC(ch)) {
+    /* Mobs do not receive TO_CHAR output; add a name-explicit room/target line. */
+    send_native_cast_fallback_message(ch, tch, tobj, spellnum);
   }
 
   say_spell(ch, spellnum, tch, tobj);
