@@ -3235,6 +3235,9 @@ static bool attempt_peek_inventory(struct char_data *ch, struct char_data *vict,
     return FALSE;
   }
 
+  if (passive)
+    send_to_char(ch, "\r\n");
+
   send_to_char(ch, "You snoop around and peek at %s's inventory.\r\n", GET_NAME(vict));
   if (vict->carrying) {
     send_to_char(ch, "%s is carrying:\r\n", GET_NAME(vict));
