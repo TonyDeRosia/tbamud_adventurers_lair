@@ -2241,7 +2241,7 @@ static int seller_tax_percent(struct char_data *seller, int seller_won)
     tier_discount = MIN(5, GET_CLAN_RANK(seller));
   tax -= tier_discount;
   if (seller_won)
-    tax += 10;
+    tax += 0;
   return MAX(0, tax);
 }
 
