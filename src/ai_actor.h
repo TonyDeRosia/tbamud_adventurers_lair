@@ -7,7 +7,7 @@
 #define AI_EVENT_RING_MAX 12
 #define AI_INTENT_KEYWORDS_MAX 192
 #define AI_ACTOR_PERSONALITIES 12
-#define AI_DIALOGUE_CATEGORIES 12
+#define AI_DIALOGUE_CATEGORIES 20
 #define AI_DIALOGUE_MAX_LINES 8
 #define AI_DIALOGUE_LINE_MAX 240
 #define AI_SOCIAL_COOLDOWN_MIN 1
@@ -16,21 +16,37 @@
 #define AI_TARGET_WEIGHTS 8
 #define AI_HELP_EVENT_MAX 16
 #define AI_HELP_EVENT_RESPONDERS 10
+#define AI_SCHEDULE_MAX 16
+#define AI_PATROL_MAX 8
+#define AI_PATROL_WAYPOINT_MAX 16
+#define AI_DAY_MASK_ALL 0x7f
 
 enum mob_ai_profile_mode { MOB_AI_INFERRED = 0, MOB_AI_CUSTOM, MOB_AI_INFERRED_OVERRIDES };
 enum mob_ai_personality { AI_TRAIT_AGGRESSION, AI_TRAIT_BRAVERY, AI_TRAIT_SOCIABILITY, AI_TRAIT_CURIOSITY, AI_TRAIT_DISCIPLINE, AI_TRAIT_HONESTY, AI_TRAIT_GREED, AI_TRAIT_COMPASSION, AI_TRAIT_LOYALTY, AI_TRAIT_PATIENCE, AI_TRAIT_SUSPICION, AI_TRAIT_PRIDE };
 enum ai_social_style { AI_SOCIAL_SILENT, AI_SOCIAL_RESERVED, AI_SOCIAL_POLITE, AI_SOCIAL_FRIENDLY, AI_SOCIAL_TALKATIVE, AI_SOCIAL_BOASTFUL, AI_SOCIAL_RUDE, AI_SOCIAL_HOSTILE, AI_SOCIAL_EXTORTING, AI_SOCIAL_PREACHER, AI_SOCIAL_GOSSIP };
-enum ai_dialogue_category { AI_DIALOGUE_GREETING, AI_DIALOGUE_FRIENDLY, AI_DIALOGUE_SUSPICIOUS, AI_DIALOGUE_HOSTILE, AI_DIALOGUE_AMBIENT_SPEECH, AI_DIALOGUE_AMBIENT_EMOTE, AI_DIALOGUE_FAREWELL, AI_DIALOGUE_WARNING, AI_DIALOGUE_CHALLENGE, AI_DIALOGUE_THREAT, AI_DIALOGUE_CALL_HELP, AI_DIALOGUE_FEAR };
+enum ai_dialogue_category { AI_DIALOGUE_GREETING, AI_DIALOGUE_FRIENDLY, AI_DIALOGUE_SUSPICIOUS, AI_DIALOGUE_HOSTILE, AI_DIALOGUE_AMBIENT_SPEECH, AI_DIALOGUE_AMBIENT_EMOTE, AI_DIALOGUE_FAREWELL, AI_DIALOGUE_WARNING, AI_DIALOGUE_CHALLENGE, AI_DIALOGUE_THREAT, AI_DIALOGUE_CALL_HELP, AI_DIALOGUE_FEAR, AI_DIALOGUE_SCHEDULE_DEPARTURE, AI_DIALOGUE_SCHEDULE_ARRIVAL, AI_DIALOGUE_WORK, AI_DIALOGUE_GUARD, AI_DIALOGUE_PATROL, AI_DIALOGUE_SLEEP, AI_DIALOGUE_WAKE, AI_DIALOGUE_SCHEDULE_FAILURE };
 enum ai_threat_response { AI_THREAT_OBSERVE, AI_THREAT_WARN, AI_THREAT_CHALLENGE, AI_THREAT_CALL_HELP, AI_THREAT_ASSIST, AI_THREAT_FOLLOW, AI_THREAT_ARREST, AI_THREAT_ATTACK, AI_THREAT_FLEE, AI_THREAT_SURRENDER, AI_THREAT_IGNORE, AI_THREAT_RESPONSE_MAX };
 enum ai_combat_style { AI_COMBAT_PASSIVE, AI_COMBAT_DEFENSIVE, AI_COMBAT_BALANCED, AI_COMBAT_AGGRESSIVE, AI_COMBAT_PROTECTOR, AI_COMBAT_COWARDLY, AI_COMBAT_FANATICAL, AI_COMBAT_OPPORTUNIST, AI_COMBAT_CONTROLLER, AI_COMBAT_BOSS, AI_COMBAT_STYLE_MAX };
 enum ai_target_weight { AI_TARGET_CURRENT_ATTACKER, AI_TARGET_TRUSTED_ATTACKER, AI_TARGET_GROUP_ATTACKER, AI_TARGET_KNOWN_HOSTILE, AI_TARGET_LOW_HEALTH, AI_TARGET_PLAYER, AI_TARGET_NPC, AI_TARGET_PREVIOUS };
 struct ai_threat_step { int type, minimum_severity, cooldown, max_repetitions, advance_on_failure; };
 enum mob_ai_config_movement { AI_MOVE_STATIONARY, AI_MOVE_RANDOM, AI_MOVE_PATROL, AI_MOVE_SCHEDULED, AI_MOVE_GUARD_ROOM, AI_MOVE_RETURN_HOME };
+enum ai_schedule_activity { AI_SCHEDULE_REMAIN, AI_SCHEDULE_TRAVEL, AI_SCHEDULE_PATROL, AI_SCHEDULE_IDLE_SOCIAL, AI_SCHEDULE_GUARD, AI_SCHEDULE_WORK, AI_SCHEDULE_SLEEP, AI_SCHEDULE_REST, AI_SCHEDULE_RETURN_HOME, AI_SCHEDULE_ACTIVITY_MAX };
+enum ai_schedule_destination { AI_DEST_CURRENT_ROOM, AI_DEST_ROOM_VNUM, AI_DEST_HOME, AI_DEST_WORK, AI_DEST_GUARD, AI_DEST_PATROL, AI_DEST_SPAWN, AI_DESTINATION_MAX };
+enum ai_schedule_action { AI_SCHEDULE_ACTION_NONE, AI_SCHEDULE_ACTION_SIT, AI_SCHEDULE_ACTION_REST, AI_SCHEDULE_ACTION_SLEEP, AI_SCHEDULE_ACTION_STAND, AI_SCHEDULE_ACTION_WAKE, AI_SCHEDULE_ACTION_MAX };
+enum ai_schedule_interrupt { AI_INTERRUPT_IGNORE, AI_INTERRUPT_PAUSE_RESUME, AI_INTERRUPT_RESTART, AI_INTERRUPT_SKIP, AI_INTERRUPT_ABORT, AI_INTERRUPT_FALLBACK, AI_INTERRUPT_MAX };
+enum ai_schedule_failure { AI_FAILURE_WAIT_RETRY, AI_FAILURE_SKIP, AI_FAILURE_ABORT, AI_FAILURE_FALLBACK, AI_FAILURE_MAX };
+enum ai_patrol_loop { AI_PATROL_LOOP, AI_PATROL_PINGPONG, AI_PATROL_ONCE, AI_PATROL_RANDOM, AI_PATROL_LOOP_MAX };
+struct ai_schedule_entry { int id, enabled, start_hour, end_hour, day_mask, priority, activity, destination, destination_value, arrival_action, departure_action, interruption_policy, failure_policy, max_travel_time, max_attempts, wait_duration, route_id; };
+struct ai_patrol_waypoint { int room_vnum, wait_duration, arrival_action; };
+struct ai_patrol_route { int id, enabled, loop_mode, failure_policy, waypoint_count; char label[32]; struct ai_patrol_waypoint waypoints[AI_PATROL_WAYPOINT_MAX]; };
 struct mob_ai_config {
   int mode, role, movement, social;
   unsigned long override_mask;
   int personality[AI_ACTOR_PERSONALITIES];
-  int home_room_vnum, work_room_vnum, guard_room_vnum, roam_radius, pursuit_distance, movement_delay;
+  int home_room_vnum, work_room_vnum, guard_room_vnum, sleep_room_vnum, fallback_room_vnum, schedule_enabled, resume_after_interrupt, default_failure_policy, schedule_count, patrol_count, next_schedule_id, next_patrol_id;
+  struct ai_schedule_entry schedules[AI_SCHEDULE_MAX];
+  struct ai_patrol_route patrols[AI_PATROL_MAX];
+  int roam_radius, pursuit_distance, movement_delay;
   int greeting_enabled, ambient_speech_enabled, ambient_emotes_enabled, whisper_enabled;
   int respond_strangers, respond_trusted, respond_feared, respond_hostile;
   int speech_cooldown, room_speech_cooldown, emote_cooldown;
@@ -342,6 +358,8 @@ struct ai_actor_state {
   unsigned long last_assist_event_id, last_help_heard_event_id, last_help_answered_event_id;
   int combat_active, combat_end_recorded, combat_end_reason;
   time_t combat_started_at;
+  int active_schedule_id, previous_schedule_id, schedule_destination_vnum, schedule_route_id, schedule_waypoint, patrol_direction, schedule_failures, schedule_interrupted, schedule_reason, expected_room_vnum;
+  time_t schedule_started_at, last_schedule_eval, last_schedule_move, schedule_wait_until;
 };
 
 uint32_t ai_actor_compute_signature(struct char_data *mob);
@@ -353,6 +371,20 @@ void ai_actor_refresh_live_mobs_by_vnum(mob_vnum vnum);
 void ai_actor_init(struct char_data *mob);
 void ai_actor_free(struct char_data *mob);
 int ai_actor_tick(struct char_data *mob, time_t now);
+/* Pure schedule helpers use the canonical in-game time_info calendar. */
+int ai_schedule_time_matches(int start, int end, int hour);
+int ai_schedule_day_matches(int mask, int day);
+int ai_schedule_select(const struct mob_ai_config *c, int day, int hour);
+int ai_schedule_entries_overlap(const struct ai_schedule_entry *a, const struct ai_schedule_entry *b);
+int ai_patrol_advance(const struct ai_patrol_route *route, int index, int direction, int *next_direction);
+int ai_schedule_add(struct mob_ai_config *c, const struct ai_schedule_entry *entry);
+int ai_schedule_delete(struct mob_ai_config *c, int index);
+int ai_schedule_move(struct mob_ai_config *c, int from, int to);
+int ai_schedule_duplicate(struct mob_ai_config *c, int index);
+int ai_patrol_add(struct mob_ai_config *c, const struct ai_patrol_route *route);
+int ai_patrol_waypoint_move(struct ai_patrol_route *route, int from, int to);
+void ai_actor_schedule_preview(const struct mob_ai_config *c, int day, int hour, char *out, size_t size);
+void ai_actor_schedule_validate(const struct mob_ai_config *c, char *out, size_t size);
 void ai_actor_record_damage(struct char_data *mob, struct char_data *actor, int dam);
 void ai_actor_record_help(struct char_data *mob, struct char_data *actor, int amount);
 void ai_actor_record_crime(struct char_data *mob, struct char_data *criminal, int flags);

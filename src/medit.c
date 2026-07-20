@@ -726,6 +726,9 @@ static void medit_disp_ai_dialogue_lines(struct descriptor_data *d, int category
 static void medit_disp_ai_dialogue(struct descriptor_data *d) { struct mob_ai_config*c=OLC_MOB(d)->ai_config; int i; write_to_output(d,"\r\nAI Actor Dialogue\r\n"); for(i=0;i<AI_DIALOGUE_CATEGORIES;i++) write_to_output(d,"%d) %s: %d/%d\r\n",i,ai_dialogue_category_name(i),c->dialogue_count[i],AI_DIALOGUE_MAX_LINES); write_to_output(d,"Select category; Q) Return\r\nChoice: "); OLC_MODE(d)=MEDIT_AI_DIALOGUE; }
 
 
+static void medit_disp_ai_schedule(struct descriptor_data *d) { struct mob_ai_config*c=OLC_MOB(d)->ai_config; int i; write_to_output(d,"\r\nAI Actor Schedule\r\n1) Enabled:%s 2) Home:%d 3) Work:%d 4) Sleep:%d 5) Guard:%d 6) Fallback:%d\r\nEntries (%d/%d):\r\n",c->schedule_enabled?"Yes":"No",c->home_room_vnum,c->work_room_vnum,c->sleep_room_vnum,c->guard_room_vnum,c->fallback_room_vnum,c->schedule_count,AI_SCHEDULE_MAX); for(i=0;i<c->schedule_count;i++)write_to_output(d," %d) id %d %02d-%02d priority %d activity %d destination %d\r\n",i+1,c->schedules[i].id,c->schedules[i].start_hour,c->schedules[i].end_hour,c->schedules[i].priority,c->schedules[i].activity,c->schedules[i].destination);write_to_output(d,"A) Add default entry D <n>) Delete U <n>) Move up N <n>) Move down X <n>) Duplicate P) Preview V) Validate Q) Return\r\nChoice: ");OLC_MODE(d)=MEDIT_AI_SCHEDULE;}
+
+
 /* Display main menu. */
 static void medit_disp_menu(struct descriptor_data *d)
 {
@@ -803,11 +806,13 @@ static void medit_disp_ai_menu(struct descriptor_data *d)
   if (!c) OLC_MOB(d)->ai_config = c = mob_ai_config_new();
   write_to_output(d,
     "\r\nAI Actor Configuration\r\n"
-    "1) Profile mode: %s\r\n2) Role: %d\r\n3) Movement: %d\r\n4) Personality\r\n5) Social behavior\r\n6) Dialogue lines\r\n7) Perception\r\n8) Memory\r\n9) Threat response\r\n0) Combat reactions\r\n"
+    "1) Profile mode: %s\r\n2) Role: %d\r\n3) Movement: %d\r\n4) Personality\r\n5) Social behavior\r\n6) Dialogue lines\r\n7) Perception\r\n8) Memory\r\n9) Threat response\r\n0) Combat reactions\r\nS) Schedules and patrol-safe routines\r\n"
     "P) Preview compiled profile\r\nR) Reset to inferred defaults\r\nQ) Return\r\nChoice: ",
     c->mode == MOB_AI_CUSTOM ? "Custom" : c->mode == MOB_AI_INFERRED_OVERRIDES ? "Inferred with overrides" : "Inferred", c->role, c->movement);
   OLC_MODE(d) = MEDIT_AI_MENU;
 }
+
+
 
 
 /* Display main menu. */
@@ -942,7 +947,7 @@ void medit_parse(struct descriptor_data *d, char *arg)
              OLC_MODE(d) != MEDIT_LOADOUT_REMOVE_EQUIP &&
              OLC_MODE(d) != MEDIT_LOADOUT_REMOVE_INV &&
              OLC_MODE(d) != MEDIT_LOADOUT_REMOVE_LOOT &&
-             OLC_MODE(d) != MEDIT_AI_MENU && OLC_MODE(d) != MEDIT_AI_PERSONALITY && OLC_MODE(d) != MEDIT_AI_SOCIAL && OLC_MODE(d) != MEDIT_AI_DIALOGUE && OLC_MODE(d) != MEDIT_AI_DIALOGUE_ADD) {
+             OLC_MODE(d) != MEDIT_AI_MENU && OLC_MODE(d) != MEDIT_AI_SCHEDULE && OLC_MODE(d) != MEDIT_AI_PERSONALITY && OLC_MODE(d) != MEDIT_AI_SOCIAL && OLC_MODE(d) != MEDIT_AI_DIALOGUE && OLC_MODE(d) != MEDIT_AI_DIALOGUE_ADD) {
     char *endptr = NULL;
     long parsed;
 
@@ -1306,6 +1311,7 @@ void medit_parse(struct descriptor_data *d, char *arg)
       case '8': medit_disp_ai_memory(d); return;
       case '9': medit_disp_ai_threat(d); return;
       case '0': medit_disp_ai_combat(d); return;
+      case 's': medit_disp_ai_schedule(d); return;
       case 'r': mob_ai_config_free(OLC_MOB(d)->ai_config); OLC_MOB(d)->ai_config = NULL; OLC_VAL(d) = 1; medit_disp_ai_menu(d); return;
       case 'p': { struct ai_actor_profile *p; int n; ai_actor_refresh_profile(OLC_MOB(d), TRUE); p=OLC_MOB(d)->ai_prof; write_to_output(d, "Compiled profile: role=%d movement=%d social=%s\r\nSpeech: greet=%s ambient=%s emotes=%s whisper=%s cooldowns=%d/%d/%d\r\nResponses: strangers=%s trusted=%s feared=%s hostile=%s; response modifier=%+d\r\nTraits:", p->role, p->movement, ai_social_style_name(p->social), p->greeting_enabled?"on":"off",p->ambient_speech_enabled?"on":"off",p->ambient_emotes_enabled?"on":"off",p->whisper_enabled?"on":"off",p->talk_cooldown_secs,p->room_talk_cooldown_secs,p->emote_cooldown_secs,p->respond_strangers?"on":"off",p->respond_trusted?"on":"off",p->respond_feared?"on":"off",p->respond_hostile?"on":"off",ai_actor_personality_response_modifier(p->personality)); for(n=0;n<AI_ACTOR_PERSONALITIES;n++) write_to_output(d," %s=%d",ai_trait_names[n],p->personality[n]); write_to_output(d,"\r\nDialogue pools:"); for(n=0;n<AI_DIALOGUE_CATEGORIES;n++) write_to_output(d," %s=%d",ai_dialogue_category_name(n),p->dialogue_count[n]); write_to_output(d,"\r\n"); medit_disp_ai_menu(d); return; }
       default: medit_disp_ai_menu(d); return;
@@ -1344,6 +1350,7 @@ void medit_parse(struct descriptor_data *d, char *arg)
     if(LOWER(*arg)=='q'){medit_disp_ai_menu(d);return;} if(LOWER(*arg)=='e'){medit_disp_ai_threat_sequence(d);return;} if(LOWER(*arg)=='r'){mob_ai_config_free(OLC_MOB(d)->ai_config);OLC_MOB(d)->ai_config=mob_ai_config_new();OLC_VAL(d)=1;medit_disp_ai_threat(d);return;} i=(LOWER(*arg)>='a'&&LOWER(*arg)<='d')?10+LOWER(*arg)-'a':atoi(arg); if(i>=1&&i<=5){if(i==5){medit_disp_ai_threat(d);return;} OLC_MOB(d)->ai_config->threat_enabled[i-1]=!OLC_MOB(d)->ai_config->threat_enabled[i-1];OLC_VAL(d)=1;medit_disp_ai_threat(d);return;}if(i==8||i==9){OLC_MOB(d)->ai_config->threat_enabled[i-1]=!OLC_MOB(d)->ai_config->threat_enabled[i-1];OLC_VAL(d)=1;medit_disp_ai_threat(d);return;}if(i>=11&&i<=13){OLC_VAL(d)=i;OLC_MODE(d)=MEDIT_AI_THREAT_VALUE;write_to_output(d,"Value: ");return;}medit_disp_ai_threat(d);return;
   case MEDIT_AI_THREAT_VALUE: if(i<1||i>(OLC_VAL(d)==12?3600:600)){write_to_output(d,"Invalid value: ");return;} if(OLC_VAL(d)==11)OLC_MOB(d)->ai_config->threat_cooldown=i;else if(OLC_VAL(d)==12)OLC_MOB(d)->ai_config->calm_reset_time=i;else OLC_MOB(d)->ai_config->repeated_event_window=i;OLC_VAL(d)=1;medit_disp_ai_threat(d);return;
   case MEDIT_AI_THREAT_SEQUENCE: { struct mob_ai_config*c=OLC_MOB(d)->ai_config; int a,b,cc,e,f,n=atoi(arg)-1; if(LOWER(*arg)=='q'){medit_disp_ai_threat(d);return;} if(sscanf(arg,"a %d %d %d %d %d",&a,&b,&cc,&e,&f)==5&&c->threat_step_count<AI_THREAT_STEP_MAX){struct ai_threat_step z={a,AI_MEDIT_CLAMP(b,0,100),AI_MEDIT_CLAMP(cc,0,300),AI_MEDIT_CLAMP(e,1,10),!!f};if(ai_threat_step_valid(&z,c->threat_enabled)){c->threat_steps[c->threat_step_count++]=z;OLC_VAL(d)=1;}medit_disp_ai_threat_sequence(d);return;}if(sscanf(arg,"e %d %d %d %d %d %d",&n,&a,&b,&cc,&e,&f)==6){n--;if(n>=0&&n<c->threat_step_count){struct ai_threat_step z={a,AI_MEDIT_CLAMP(b,0,100),AI_MEDIT_CLAMP(cc,0,300),AI_MEDIT_CLAMP(e,1,10),!!f};if(ai_threat_step_valid(&z,c->threat_enabled)){c->threat_steps[n]=z;OLC_VAL(d)=1;}}medit_disp_ai_threat_sequence(d);return;}if(LOWER(*arg)=='d'&&n>=0&&n<c->threat_step_count){memmove(&c->threat_steps[n],&c->threat_steps[n+1],sizeof(c->threat_steps[0])*(c->threat_step_count-n-1));c->threat_step_count--;OLC_VAL(d)=1;}else if(LOWER(*arg)=='u'&&n>0&&n<c->threat_step_count){struct ai_threat_step z=c->threat_steps[n];c->threat_steps[n]=c->threat_steps[n-1];c->threat_steps[n-1]=z;OLC_VAL(d)=1;}else if(LOWER(*arg)=='n'&&n>=0&&n+1<c->threat_step_count){struct ai_threat_step z=c->threat_steps[n];c->threat_steps[n]=c->threat_steps[n+1];c->threat_steps[n+1]=z;OLC_VAL(d)=1;}medit_disp_ai_threat_sequence(d);return; }
+  case MEDIT_AI_SCHEDULE: { struct mob_ai_config*c=OLC_MOB(d)->ai_config; char cmd=LOWER(*arg); int n=atoi(arg+1)-1; char report[MAX_STRING_LENGTH]; if(cmd=='q'){medit_disp_ai_menu(d);return;}if(cmd=='1'){c->schedule_enabled=!c->schedule_enabled;OLC_VAL(d)=1;}else if(cmd=='a'){struct ai_schedule_entry e;memset(&e,0,sizeof(e));e.enabled=TRUE;e.start_hour=0;e.end_hour=0;e.day_mask=AI_DAY_MASK_ALL;e.activity=AI_SCHEDULE_REMAIN;e.destination=AI_DEST_CURRENT_ROOM;e.max_attempts=3;if(ai_schedule_add(c,&e))OLC_VAL(d)=1;}else if(cmd=='d'&&ai_schedule_delete(c,n))OLC_VAL(d)=1;else if(cmd=='u'&&ai_schedule_move(c,n,n-1))OLC_VAL(d)=1;else if(cmd=='n'&&ai_schedule_move(c,n,n+1))OLC_VAL(d)=1;else if(cmd=='x'&&ai_schedule_duplicate(c,n))OLC_VAL(d)=1;else if(cmd=='p'){ai_actor_schedule_preview(c,((35*time_info.month)+(time_info.day+1))%7,time_info.hours,report,sizeof(report));write_to_output(d,"%s",report);}else if(cmd=='v'){ai_actor_schedule_validate(c,report,sizeof(report));write_to_output(d,"%s",report);}medit_disp_ai_schedule(d);return; }
   case MEDIT_AI_ENABLE_CONFIRM: if (LOWER(*arg)=='y') { SET_BIT_AR(MOB_FLAGS(OLC_MOB(d)), MOB_AI_ACTOR); OLC_VAL(d)=1; medit_disp_ai_menu(d); return; } if (LOWER(*arg)=='n') { medit_disp_menu(d); return; } write_to_output(d,"Please answer Y or N: "); return;
   case MEDIT_AI_MODE:
   case MEDIT_AI_ROLE:
