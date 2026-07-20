@@ -55,12 +55,19 @@ struct mob_ai_config *mob_ai_config_new(void)
   for (i = 0; i < AI_ACTOR_PERSONALITIES; i++) c->personality[i] = 50;
   return c;
 }
-struct mob_ai_config *mob_ai_config_copy(const struct mob_ai_config *from)
-{
-  struct mob_ai_config *c; int k, i;
-  if (!from) return NULL; CREATE(c, struct mob_ai_config, 1); if (!c) return NULL;
+struct mob_ai_config *mob_ai_config_copy(const struct mob_ai_config *from) {
+  struct mob_ai_config *c;
+  int k, i;
+  if (!from)
+    return NULL;
+  CREATE(c, struct mob_ai_config, 1);
+  if (!c)
+    return NULL;
   *c = *from;
-  for (k=0;k<AI_DIALOGUE_CATEGORIES;k++) for(i=0;i<AI_DIALOGUE_MAX_LINES;i++) c->dialogue[k][i] = from->dialogue[k][i] ? strdup(from->dialogue[k][i]) : NULL;
+  for (k = 0; k < AI_DIALOGUE_CATEGORIES; k++)
+    for (i = 0; i < AI_DIALOGUE_MAX_LINES; i++)
+      c->dialogue[k][i] =
+          from->dialogue[k][i] ? strdup(from->dialogue[k][i]) : NULL;
   return c;
 }
 void mob_ai_config_free(struct mob_ai_config *c) { int k,i; if (!c) return; for(k=0;k<AI_DIALOGUE_CATEGORIES;k++) for(i=0;i<AI_DIALOGUE_MAX_LINES;i++) free(c->dialogue[k][i]); free(c); }
@@ -96,12 +103,258 @@ int ai_patrol_waypoint_duplicate(struct ai_patrol_route*r,int i){struct ai_patro
 int ai_patrol_waypoint_move(struct ai_patrol_route*r,int a,int b){struct ai_patrol_waypoint z;if(!r||a<0||b<0||a>=r->waypoint_count||b>=r->waypoint_count)return FALSE;z=r->waypoints[a];if(a<b)memmove(&r->waypoints[a],&r->waypoints[a+1],sizeof(z)*(b-a));else memmove(&r->waypoints[b+1],&r->waypoints[b],sizeof(z)*(a-b));r->waypoints[b]=z;return TRUE;}
 static const char *sched_name(int v){static const char*n[]={"Remain","Travel","Patrol","Idle","Guard","Work","Sleep","Rest","Return home"};return v>=0&&v<AI_SCHEDULE_ACTIVITY_MAX?n[v]:"INVALID";}
 static int sched_width(const struct ai_schedule_entry *e){return (e->end_hour-e->start_hour+24)%24;}
-static int sched_days(int m){int i,n=0;for(i=0;i<7;i++)n+=(m>>i)&1;return n;}
-static void sched_room(char *b,size_t n,int v){room_rnum r;if(!v)snprintf(b,n,"None");else {r=real_room(v);snprintf(b,n,"%d - %s",v,r==NOWHERE?"INVALID":world[r].name);}}
-static int sched_adj(int a,int b){room_rnum x=real_room(a),y=real_room(b);int d;if(x==NOWHERE||y==NOWHERE)return 0;for(d=0;d<DIR_COUNT;d++)if(world[x].dir_option[d]&&world[x].dir_option[d]->to_room==y)return 1;return 0;}
-void ai_actor_schedule_preview(const struct mob_ai_config*c,int d,int h,char*out,size_t n){int i,j,w;char room[128];if(!out||!n)return;out[0]=0;if(!c){ai_preview_add(out,n,"Compiled prototype preview\r\nERROR: no schedule configuration.\r\n");return;}w=ai_schedule_select(c,d,h);ai_preview_add(out,n,"Compiled prototype preview; live runtime suppression unavailable.\r\nSchedule enabled: %s; resume: %s; default failure policy: %d\r\nMovement boundary: adjacent destinations, one perform_move(mob, direction, 1), no BFS.\r\nPreview day/hour: %d/%02d; entries: %d; routes: %d\r\n",c->schedule_enabled?"Yes":"No",c->resume_after_interrupt?"Yes":"No",c->default_failure_policy,d,h,c->schedule_count,c->patrol_count);for(i=0;i<5;i++){sched_room(room,sizeof(room),i==0?c->home_room_vnum:i==1?c->work_room_vnum:i==2?c->sleep_room_vnum:i==3?c->guard_room_vnum:c->fallback_room_vnum);ai_preview_add(out,n,"%s room: %s\r\n",i==0?"Home":i==1?"Work":i==2?"Sleep":i==3?"Guard":"Fallback",room);}for(i=0;i<c->schedule_count;i++){const struct ai_schedule_entry*e=&c->schedules[i];int active=e->enabled&&ai_schedule_day_matches(e->day_mask,d)&&ai_schedule_time_matches(e->start_hour,e->end_hour,h);ai_preview_add(out,n,"\r\nEntry position %d; stable ID %d; enabled %s; %02d-%02d%s; days 0x%02x; specificity %d; width %d; priority %d\r\nActivity %s; destination type %d value %d; arrival %d; departure %d; interruption %d; failure %d; travel timeout %d; attempts %d; retry/wait %d\r\nValidation: %s; preview day: %s; preview hour: %s; live suppression: unavailable; rank: %s\r\n",i+1,e->id,e->enabled?"Yes":"No",e->start_hour,e->end_hour,e->start_hour>e->end_hour?" overnight":"",e->day_mask,sched_days(e->day_mask),sched_width(e),e->priority,sched_name(e->activity),e->destination,e->destination_value,e->arrival_action,e->departure_action,e->interruption_policy,e->failure_policy,e->max_travel_time,e->max_attempts,e->wait_duration,(e->id>0&&e->day_mask&&e->activity>=0&&e->activity<AI_SCHEDULE_ACTIVITY_MAX)?"valid":"INVALID",ai_schedule_day_matches(e->day_mask,d)?"Yes":"No",ai_schedule_time_matches(e->start_hour,e->end_hour,h)?"Yes":"No",i==w?"WINNER":"loser");if(e->destination==AI_DEST_ROOM_VNUM){sched_room(room,sizeof(room),e->destination_value);ai_preview_add(out,n,"Resolved room: %s\r\n",room);}if(i==w)ai_preview_add(out,n,"Winner explanation: eligible; canonical selection compares higher priority, more-specific day rule, narrower window, then stored order. Wandering: %s.\r\n",(e->activity==AI_SCHEDULE_REMAIN||e->activity==AI_SCHEDULE_IDLE_SOCIAL)?"depends on runtime state":"blocks generic wandering while active");else if(active&&w>=0){const struct ai_schedule_entry*x=&c->schedules[w];ai_preview_add(out,n,"Losing active candidate: %s.\r\n",e->priority<x->priority?"Lower priority":sched_days(e->day_mask)>sched_days(x->day_mask)?"Less-specific day mask":sched_width(e)>sched_width(x)?"Wider time window":"Later stored order; Resolved by stored order");}}
-if(w<0)ai_preview_add(out,n,"Winner: none. Wandering: allows normal wandering.\r\n");for(i=0;i<c->patrol_count;i++){const struct ai_patrol_route*r=&c->patrols[i];ai_preview_add(out,n,"\r\nPatrol position %d; stable route ID %d; label %s; enabled %s; mode %d; failure %d; waypoints %d; movement boundary adjacent.\r\n",i+1,r->id,r->label,r->enabled?"Yes":"No",r->loop_mode,r->failure_policy,r->waypoint_count);for(j=0;j<r->waypoint_count;j++){sched_room(room,sizeof(room),r->waypoints[j].room_vnum);ai_preview_add(out,n,"Waypoint %d: %s; wait %d; arrival %d; forward adjacency %s\r\n",j+1,room,r->waypoints[j].wait_duration,r->waypoints[j].arrival_action,j+1<r->waypoint_count?(sched_adj(r->waypoints[j].room_vnum,r->waypoints[j+1].room_vnum)?"adjacent":"NOT ADJACENT"):r->loop_mode==AI_PATROL_LOOP?(sched_adj(r->waypoints[j].room_vnum,r->waypoints[0].room_vnum)?"loop closure adjacent":"loop closure NOT ADJACENT"):"terminal");}ai_preview_add(out,n,"Traversal: %s\r\n",r->loop_mode==AI_PATROL_LOOP?"1 -> 2 -> 3 -> 1":r->loop_mode==AI_PATROL_PINGPONG?"1 -> 2 -> 3 -> 2 -> 1":"1 -> 2 -> 3 -> Complete");}}
-void ai_actor_schedule_validate(const struct mob_ai_config*c,char*out,size_t n){int i,j;if(!out||!n)return;out[0]=0;ai_preview_add(out,n,"Schedule Errors\r\n");if(!c){ai_preview_add(out,n,"ERROR: no schedule configuration.\r\n");return;}if(c->schedule_enabled&&!c->schedule_count)ai_preview_add(out,n,"ERROR: schedule enabled with zero entries.\r\n");for(i=0;i<c->schedule_count;i++){const struct ai_schedule_entry*e=&c->schedules[i];if(e->id<=0||e->start_hour<0||e->start_hour>23||e->end_hour<0||e->end_hour>23||!e->day_mask||(e->day_mask&~AI_DAY_MASK_ALL)||e->priority<-100||e->priority>100||e->activity<0||e->activity>=AI_SCHEDULE_ACTIVITY_MAX||e->destination<0||e->destination>=AI_DESTINATION_MAX||e->arrival_action<0||e->arrival_action>=AI_SCHEDULE_ACTION_MAX||e->departure_action<0||e->departure_action>=AI_SCHEDULE_ACTION_MAX||e->interruption_policy<0||e->interruption_policy>=AI_INTERRUPT_MAX||e->failure_policy<0||e->failure_policy>=AI_FAILURE_MAX||e->max_attempts<=0||e->max_travel_time<0||e->wait_duration<0)ai_preview_add(out,n,"ERROR: invalid schedule entry %d.\r\n",e->id);if(e->destination==AI_DEST_ROOM_VNUM&&real_room(e->destination_value)==NOWHERE)ai_preview_add(out,n,"ERROR: invalid direct destination in entry %d.\r\n",e->id);if(e->activity==AI_SCHEDULE_PATROL&&!ai_schedule_route((struct mob_ai_config*)c,e->route_id))ai_preview_add(out,n,"ERROR: missing route in entry %d.\r\n",e->id);for(j=i+1;j<c->schedule_count;j++)if(e->id==c->schedules[j].id)ai_preview_add(out,n,"ERROR: duplicate stable entry ID %d.\r\n",e->id);}ai_preview_add(out,n,"Schedule Warnings\r\n");for(i=0;i<c->schedule_count;i++)for(j=i+1;j<c->schedule_count;j++)if(c->schedules[i].priority==c->schedules[j].priority&&ai_schedule_entries_overlap(&c->schedules[i],&c->schedules[j]))ai_preview_add(out,n,"WARNING: equal-priority overlap %d/%d resolves by stored order.\r\n",c->schedules[i].id,c->schedules[j].id);ai_preview_add(out,n,"Patrol Errors\r\n");for(i=0;i<c->patrol_count;i++){const struct ai_patrol_route*r=&c->patrols[i];if(r->id<=0||r->loop_mode<0||r->loop_mode>=AI_PATROL_LOOP_MAX||r->failure_policy<0||r->failure_policy>=AI_FAILURE_MAX||(r->enabled&&!r->waypoint_count))ai_preview_add(out,n,"ERROR: invalid patrol route %d.\r\n",r->id);for(j=0;j<r->waypoint_count;j++){if(real_room(r->waypoints[j].room_vnum)==NOWHERE||r->waypoints[j].wait_duration<0||r->waypoints[j].arrival_action<0||r->waypoints[j].arrival_action>=AI_SCHEDULE_ACTION_MAX)ai_preview_add(out,n,"ERROR: invalid waypoint %d on route %d.\r\n",j+1,r->id);if(j&&!sched_adj(r->waypoints[j-1].room_vnum,r->waypoints[j].room_vnum))ai_preview_add(out,n,"ERROR: invalid adjacent transition on route %d.\r\n",r->id);}if(r->loop_mode==AI_PATROL_LOOP&&r->waypoint_count>1&&!sched_adj(r->waypoints[r->waypoint_count-1].room_vnum,r->waypoints[0].room_vnum))ai_preview_add(out,n,"ERROR: invalid Loop closure on route %d.\r\n",r->id);for(j=i+1;j<c->patrol_count;j++)if(r->id==c->patrols[j].id)ai_preview_add(out,n,"ERROR: duplicate stable route ID %d.\r\n",r->id);}ai_preview_add(out,n,"Patrol Warnings\r\nWARNING: closed exits may conditionally block authored adjacency.\r\nCross-System Errors\r\nINFO: mobile-flag conflicts require a live actor context.\r\nCross-System Warnings\r\n");if(c->social==AI_SOCIAL_SILENT)ai_preview_add(out,n,"WARNING: schedule arrival/departure speech may conflict with Silent style.\r\n");for(i=AI_DIALOGUE_WORK;i<AI_DIALOGUE_CATEGORIES;i++)if(!c->dialogue_count[i])ai_preview_add(out,n,"WARNING: schedule dialogue category %s is empty.\r\n",ai_dialogue_category_name(i));ai_preview_add(out,n,"INFO: combat interrupts schedule execution; major threat responses interrupt; movement yields while fighting.\r\nINFO: scheduled movement uses perform_move and preserves triggers. DG Script and special-procedure movement are not suppressed and may displace the actor.\r\nSummary\r\nINFO: validation is non-mutating; schedule dialogue is category-level.\r\n");}
+static int sched_days(int m) {
+  int i, n = 0;
+  for (i = 0; i < 7; i++)
+    n += (m >> i) & 1;
+  return n;
+}
+static void sched_room(char *b, size_t n, int v) {
+  room_rnum r;
+  if (!v)
+    snprintf(b, n, "None");
+  else {
+    r = real_room(v);
+    snprintf(b, n, "%d - %s", v, r == NOWHERE ? "INVALID" : world[r].name);
+  }
+}
+static int sched_adj(int a, int b) {
+  room_rnum x = real_room(a), y = real_room(b);
+  int d;
+  if (x == NOWHERE || y == NOWHERE)
+    return 0;
+  for (d = 0; d < DIR_COUNT; d++)
+    if (world[x].dir_option[d] && world[x].dir_option[d]->to_room == y)
+      return 1;
+  return 0;
+}
+void ai_actor_schedule_preview(const struct mob_ai_config *c, int d, int h,
+                               char *out, size_t n) {
+  int i, j, w;
+  char room[128];
+  if (!out || !n)
+    return;
+  out[0] = 0;
+  if (!c) {
+    ai_preview_add(
+        out, n,
+        "Compiled prototype preview\r\nERROR: no schedule configuration.\r\n");
+    return;
+  }
+  w = ai_schedule_select(c, d, h);
+  ai_preview_add(
+      out, n,
+      "Compiled prototype preview; live runtime suppression "
+      "unavailable.\r\nSchedule enabled: %s; resume: %s; default failure "
+      "policy: %d\r\nMovement boundary: adjacent destinations, one "
+      "perform_move(mob, direction, 1), no BFS.\r\nPreview day/hour: %d/%02d; "
+      "entries: %d; routes: %d\r\n",
+      c->schedule_enabled ? "Yes" : "No",
+      c->resume_after_interrupt ? "Yes" : "No", c->default_failure_policy, d, h,
+      c->schedule_count, c->patrol_count);
+  for (i = 0; i < 5; i++) {
+    sched_room(room, sizeof(room),
+               i == 0   ? c->home_room_vnum
+               : i == 1 ? c->work_room_vnum
+               : i == 2 ? c->sleep_room_vnum
+               : i == 3 ? c->guard_room_vnum
+                        : c->fallback_room_vnum);
+    ai_preview_add(out, n, "%s room: %s\r\n",
+                   i == 0   ? "Home"
+                   : i == 1 ? "Work"
+                   : i == 2 ? "Sleep"
+                   : i == 3 ? "Guard"
+                            : "Fallback",
+                   room);
+  }
+  for (i = 0; i < c->schedule_count; i++) {
+    const struct ai_schedule_entry *e = &c->schedules[i];
+    int active = e->enabled && ai_schedule_day_matches(e->day_mask, d) &&
+                 ai_schedule_time_matches(e->start_hour, e->end_hour, h);
+    ai_preview_add(
+        out, n,
+        "\r\nEntry position %d; stable ID %d; enabled %s; %02d-%02d%s; days "
+        "0x%02x; specificity %d; width %d; priority %d\r\nActivity %s; "
+        "destination type %d value %d; arrival %d; departure %d; interruption "
+        "%d; failure %d; travel timeout %d; attempts %d; retry/wait "
+        "%d\r\nValidation: %s; preview day: %s; preview hour: %s; live "
+        "suppression: unavailable; rank: %s\r\n",
+        i + 1, e->id, e->enabled ? "Yes" : "No", e->start_hour, e->end_hour,
+        e->start_hour > e->end_hour ? " overnight" : "", e->day_mask,
+        sched_days(e->day_mask), sched_width(e), e->priority,
+        sched_name(e->activity), e->destination, e->destination_value,
+        e->arrival_action, e->departure_action, e->interruption_policy,
+        e->failure_policy, e->max_travel_time, e->max_attempts,
+        e->wait_duration,
+        (e->id > 0 && e->day_mask && e->activity >= 0 &&
+         e->activity < AI_SCHEDULE_ACTIVITY_MAX)
+            ? "valid"
+            : "INVALID",
+        ai_schedule_day_matches(e->day_mask, d) ? "Yes" : "No",
+        ai_schedule_time_matches(e->start_hour, e->end_hour, h) ? "Yes" : "No",
+        i == w ? "WINNER" : "loser");
+    if (e->destination == AI_DEST_ROOM_VNUM) {
+      sched_room(room, sizeof(room), e->destination_value);
+      ai_preview_add(out, n, "Resolved room: %s\r\n", room);
+    }
+    if (i == w)
+      ai_preview_add(out, n,
+                     "Winner explanation: eligible; canonical selection "
+                     "compares higher priority, more-specific day rule, "
+                     "narrower window, then stored order. Wandering: %s.\r\n",
+                     (e->activity == AI_SCHEDULE_REMAIN ||
+                      e->activity == AI_SCHEDULE_IDLE_SOCIAL)
+                         ? "depends on runtime state"
+                         : "blocks generic wandering while active");
+    else if (active && w >= 0) {
+      const struct ai_schedule_entry *x = &c->schedules[w];
+      ai_preview_add(out, n, "Losing active candidate: %s.\r\n",
+                     e->priority < x->priority ? "Lower priority"
+                     : sched_days(e->day_mask) > sched_days(x->day_mask)
+                         ? "Less-specific day mask"
+                     : sched_width(e) > sched_width(x)
+                         ? "Wider time window"
+                         : "Later stored order; Resolved by stored order");
+    }
+  }
+  if (w < 0)
+    ai_preview_add(out, n,
+                   "Winner: none. Wandering: allows normal wandering.\r\n");
+  for (i = 0; i < c->patrol_count; i++) {
+    const struct ai_patrol_route *r = &c->patrols[i];
+    ai_preview_add(
+        out, n,
+        "\r\nPatrol position %d; stable route ID %d; label %s; enabled %s; "
+        "mode %d; failure %d; waypoints %d; movement boundary adjacent.\r\n",
+        i + 1, r->id, r->label, r->enabled ? "Yes" : "No", r->loop_mode,
+        r->failure_policy, r->waypoint_count);
+    for (j = 0; j < r->waypoint_count; j++) {
+      sched_room(room, sizeof(room), r->waypoints[j].room_vnum);
+      ai_preview_add(
+          out, n,
+          "Waypoint %d: %s; wait %d; arrival %d; forward adjacency %s\r\n",
+          j + 1, room, r->waypoints[j].wait_duration,
+          r->waypoints[j].arrival_action,
+          j + 1 < r->waypoint_count ? (sched_adj(r->waypoints[j].room_vnum,
+                                                 r->waypoints[j + 1].room_vnum)
+                                           ? "adjacent"
+                                           : "NOT ADJACENT")
+          : r->loop_mode == AI_PATROL_LOOP
+              ? (sched_adj(r->waypoints[j].room_vnum, r->waypoints[0].room_vnum)
+                     ? "loop closure adjacent"
+                     : "loop closure NOT ADJACENT")
+              : "terminal");
+    }
+    ai_preview_add(out, n, "Traversal: %s\r\n",
+                   r->loop_mode == AI_PATROL_LOOP ? "1 -> 2 -> 3 -> 1"
+                   : r->loop_mode == AI_PATROL_PINGPONG
+                       ? "1 -> 2 -> 3 -> 2 -> 1"
+                       : "1 -> 2 -> 3 -> Complete");
+  }
+}
+void ai_actor_schedule_validate(const struct mob_ai_config *c, char *out,
+                                size_t n) {
+  int i, j;
+  if (!out || !n)
+    return;
+  out[0] = 0;
+  ai_preview_add(out, n, "Schedule Errors\r\n");
+  if (!c) {
+    ai_preview_add(out, n, "ERROR: no schedule configuration.\r\n");
+    return;
+  }
+  if (c->schedule_enabled && !c->schedule_count)
+    ai_preview_add(out, n, "ERROR: schedule enabled with zero entries.\r\n");
+  for (i = 0; i < c->schedule_count; i++) {
+    const struct ai_schedule_entry *e = &c->schedules[i];
+    if (e->id <= 0 || e->start_hour < 0 || e->start_hour > 23 ||
+        e->end_hour < 0 || e->end_hour > 23 || !e->day_mask ||
+        (e->day_mask & ~AI_DAY_MASK_ALL) || e->priority < -100 ||
+        e->priority > 100 || e->activity < 0 ||
+        e->activity >= AI_SCHEDULE_ACTIVITY_MAX || e->destination < 0 ||
+        e->destination >= AI_DESTINATION_MAX || e->arrival_action < 0 ||
+        e->arrival_action >= AI_SCHEDULE_ACTION_MAX ||
+        e->departure_action < 0 ||
+        e->departure_action >= AI_SCHEDULE_ACTION_MAX ||
+        e->interruption_policy < 0 ||
+        e->interruption_policy >= AI_INTERRUPT_MAX || e->failure_policy < 0 ||
+        e->failure_policy >= AI_FAILURE_MAX || e->max_attempts <= 0 ||
+        e->max_travel_time < 0 || e->wait_duration < 0)
+      ai_preview_add(out, n, "ERROR: invalid schedule entry %d.\r\n", e->id);
+    if (e->destination == AI_DEST_ROOM_VNUM &&
+        real_room(e->destination_value) == NOWHERE)
+      ai_preview_add(
+          out, n, "ERROR: invalid direct destination in entry %d.\r\n", e->id);
+    if (e->activity == AI_SCHEDULE_PATROL &&
+        !ai_schedule_route((struct mob_ai_config *)c, e->route_id))
+      ai_preview_add(out, n, "ERROR: missing route in entry %d.\r\n", e->id);
+    for (j = i + 1; j < c->schedule_count; j++)
+      if (e->id == c->schedules[j].id)
+        ai_preview_add(out, n, "ERROR: duplicate stable entry ID %d.\r\n",
+                       e->id);
+  }
+  ai_preview_add(out, n, "Schedule Warnings\r\n");
+  for (i = 0; i < c->schedule_count; i++)
+    for (j = i + 1; j < c->schedule_count; j++)
+      if (c->schedules[i].priority == c->schedules[j].priority &&
+          ai_schedule_entries_overlap(&c->schedules[i], &c->schedules[j]))
+        ai_preview_add(out, n,
+                       "WARNING: equal-priority overlap %d/%d resolves by "
+                       "stored order.\r\n",
+                       c->schedules[i].id, c->schedules[j].id);
+  ai_preview_add(out, n, "Patrol Errors\r\n");
+  for (i = 0; i < c->patrol_count; i++) {
+    const struct ai_patrol_route *r = &c->patrols[i];
+    if (r->id <= 0 || r->loop_mode < 0 || r->loop_mode >= AI_PATROL_LOOP_MAX ||
+        r->failure_policy < 0 || r->failure_policy >= AI_FAILURE_MAX ||
+        (r->enabled && !r->waypoint_count))
+      ai_preview_add(out, n, "ERROR: invalid patrol route %d.\r\n", r->id);
+    for (j = 0; j < r->waypoint_count; j++) {
+      if (real_room(r->waypoints[j].room_vnum) == NOWHERE ||
+          r->waypoints[j].wait_duration < 0 ||
+          r->waypoints[j].arrival_action < 0 ||
+          r->waypoints[j].arrival_action >= AI_SCHEDULE_ACTION_MAX)
+        ai_preview_add(out, n, "ERROR: invalid waypoint %d on route %d.\r\n",
+                       j + 1, r->id);
+      if (j &&
+          !sched_adj(r->waypoints[j - 1].room_vnum, r->waypoints[j].room_vnum))
+        ai_preview_add(out, n,
+                       "ERROR: invalid adjacent transition on route %d.\r\n",
+                       r->id);
+    }
+    if (r->loop_mode == AI_PATROL_LOOP && r->waypoint_count > 1 &&
+        !sched_adj(r->waypoints[r->waypoint_count - 1].room_vnum,
+                   r->waypoints[0].room_vnum))
+      ai_preview_add(out, n, "ERROR: invalid Loop closure on route %d.\r\n",
+                     r->id);
+    for (j = i + 1; j < c->patrol_count; j++)
+      if (r->id == c->patrols[j].id)
+        ai_preview_add(out, n, "ERROR: duplicate stable route ID %d.\r\n",
+                       r->id);
+  }
+  ai_preview_add(
+      out, n,
+      "Patrol Warnings\r\nWARNING: closed exits may conditionally block "
+      "authored adjacency.\r\nCross-System Errors\r\nINFO: mobile-flag "
+      "conflicts require a live actor context.\r\nCross-System Warnings\r\n");
+  if (c->social == AI_SOCIAL_SILENT)
+    ai_preview_add(out, n,
+                   "WARNING: schedule arrival/departure speech may conflict "
+                   "with Silent style.\r\n");
+  for (i = AI_DIALOGUE_WORK; i < AI_DIALOGUE_CATEGORIES; i++)
+    if (!c->dialogue_count[i])
+      ai_preview_add(out, n,
+                     "WARNING: schedule dialogue category %s is empty.\r\n",
+                     ai_dialogue_category_name(i));
+  ai_preview_add(
+      out, n,
+      "INFO: combat interrupts schedule execution; major threat responses "
+      "interrupt; movement yields while fighting.\r\nINFO: scheduled movement "
+      "uses perform_move and preserves triggers. DG Script and "
+      "special-procedure movement are not suppressed and may displace the "
+      "actor.\r\nSummary\r\nINFO: validation is non-mutating; schedule "
+      "dialogue is category-level.\r\n");
+}
 
 static void ai_actor_sync_profile(struct char_data *mob)
 {
@@ -300,28 +553,193 @@ static void ai_preview_add(char *out, size_t size, const char *fmt, ...)
   va_start(ap,fmt); vsnprintf(out+used,size-used,fmt,ap); va_end(ap);
 }
 
-void ai_actor_combat_preview(const struct mob_ai_config *c, char *out, size_t size)
-{
-  static const char *styles[] = { "Passive", "Defensive", "Balanced", "Aggressive", "Protector", "Cowardly", "Fanatical", "Opportunist", "Controller", "Boss" };
+void ai_actor_combat_preview(const struct mob_ai_config *c, char *out,
+                             size_t size) {
+  static const char *styles[] = {
+      "Passive",  "Defensive", "Balanced",    "Aggressive", "Protector",
+      "Cowardly", "Fanatical", "Opportunist", "Controller", "Boss"};
   int i;
-  if(!out||!size)return; out[0]='\0'; if(!c){ai_preview_add(out,size,"Combat Profile: unavailable\r\n");return;}
-  ai_preview_add(out,size,"Combat Profile\r\nCombat Style: %s\r\nCombat Policy Enabled: %s\r\nEffective Initiation Policy: %s\r\nEffective Retaliation Policy: %s\r\nEffective Assistance Policy: %s\r\nEffective Call-Help Policy: %s\r\nEffective Flee Policy: %s\r\n",(c->combat_style>=0&&c->combat_style<AI_COMBAT_STYLE_MAX)?styles[c->combat_style]:"Unknown",c->combat_enabled?"Yes":"No",c->may_initiate?"Enabled":"Disabled",c->retaliate_self||c->retaliate_ally||c->retaliate_hostile?"Enabled":"Disabled",c->may_assist?"Enabled":"Disabled",c->may_call_help?"Enabled":"Disabled",c->may_flee?"Enabled":"Disabled");
-  ai_preview_add(out,size,"May Initiate:%s  May Assist:%s  May Call Help:%s  May Flee:%s\r\nRetaliate Self:%s Allies:%s Known Hostile:%s\r\nProtect Trusted:%s Group:%s Same Role:%s Same Prototype:%s  Avoid Incapacitated:%s  Avoid Civilians: Unavailable\r\nFlee HP:%d%% Assist Severity:%d Switch Threshold:%d Cooldown:%d Max Responders:%d Flee-attempt Cooldown:%d\r\n",c->may_initiate?"Yes":"No",c->may_assist?"Yes":"No",c->may_call_help?"Yes":"No",c->may_flee?"Yes":"No",c->retaliate_self?"Yes":"No",c->retaliate_ally?"Yes":"No",c->retaliate_hostile?"Yes":"No",c->protect_trusted?"Yes":"No",c->protect_group?"Yes":"No",c->protect_same_role?"Yes":"No",c->protect_same_prototype?"Yes":"No",c->avoid_incapacitated?"Yes":"No",c->flee_hp_percent,c->assist_severity,c->target_switch_threshold,c->combat_cooldown,c->max_responders,c->combat_cooldown);
-  ai_preview_add(out,size,"Style modifiers (derived): initiation 0; assist 0; flee %d; switch %d; target lock %d; current-attacker %d; protected-ally %d; known-hostile %d; health-target %d; threat-target %d\r\nTarget Weights:\r\n",c->combat_style==AI_COMBAT_COWARDLY?20:c->combat_style==AI_COMBAT_FANATICAL||c->combat_style==AI_COMBAT_BOSS?-30:0,c->combat_style==AI_COMBAT_PASSIVE?100:c->combat_style==AI_COMBAT_DEFENSIVE?20:c->combat_style==AI_COMBAT_AGGRESSIVE||c->combat_style==AI_COMBAT_CONTROLLER?-10:0,c->combat_style==AI_COMBAT_BOSS||c->combat_style==AI_COMBAT_FANATICAL?30:0,c->target_weight[0],c->target_weight[1]+c->target_weight[2],c->target_weight[3],c->target_weight[4],c->target_weight[3]);
-  for(i=0;i<AI_TARGET_WEIGHTS;i++) ai_preview_add(out,size,"  %s: %d\r\n",ai_actor_target_weight_name(i),c->target_weight[i]);
-  ai_preview_add(out,size,"Spellcaster: Unavailable; Healer: Unavailable; Ranged attacker: Unavailable; Criminal: Unavailable; Highest damage output: Unavailable\r\nCoordination: Group detection available; event-scoped responder budgeting active; maximum responders %d; help event expiry 30s; duplicate responder suppression active; recursive call-help suppression active; listener evaluation room-local; identity confidence and ally classification required.\r\nAlly reasons: Master; Follower; Group member; Trusted memory; Same role when enabled; Same prototype when enabled.\r\nLifecycle tracking: Combat start, Direct attack, Protected ally attack, Assistance, Target switch, Actor flee, Opponent flee, Opponent defeat, Actor defeat, Combat end, Help heard, Help answered.\r\nRescue: Unavailable; Surrender: Unavailable; Pursuit: Unavailable.\r\n",c->max_responders);
+  if (!out || !size)
+    return;
+  out[0] = '\0';
+  if (!c) {
+    ai_preview_add(out, size, "Combat Profile: unavailable\r\n");
+    return;
+  }
+  ai_preview_add(
+      out, size,
+      "Combat Profile\r\nCombat Style: %s\r\nCombat Policy Enabled: "
+      "%s\r\nEffective Initiation Policy: %s\r\nEffective Retaliation Policy: "
+      "%s\r\nEffective Assistance Policy: %s\r\nEffective Call-Help Policy: "
+      "%s\r\nEffective Flee Policy: %s\r\n",
+      (c->combat_style >= 0 && c->combat_style < AI_COMBAT_STYLE_MAX)
+          ? styles[c->combat_style]
+          : "Unknown",
+      c->combat_enabled ? "Yes" : "No",
+      c->may_initiate ? "Enabled" : "Disabled",
+      c->retaliate_self || c->retaliate_ally || c->retaliate_hostile
+          ? "Enabled"
+          : "Disabled",
+      c->may_assist ? "Enabled" : "Disabled",
+      c->may_call_help ? "Enabled" : "Disabled",
+      c->may_flee ? "Enabled" : "Disabled");
+  ai_preview_add(
+      out, size,
+      "May Initiate:%s  May Assist:%s  May Call Help:%s  May "
+      "Flee:%s\r\nRetaliate Self:%s Allies:%s Known Hostile:%s\r\nProtect "
+      "Trusted:%s Group:%s Same Role:%s Same Prototype:%s  Avoid "
+      "Incapacitated:%s  Avoid Civilians: Unavailable\r\nFlee HP:%d%% Assist "
+      "Severity:%d Switch Threshold:%d Cooldown:%d Max Responders:%d "
+      "Flee-attempt Cooldown:%d\r\n",
+      c->may_initiate ? "Yes" : "No", c->may_assist ? "Yes" : "No",
+      c->may_call_help ? "Yes" : "No", c->may_flee ? "Yes" : "No",
+      c->retaliate_self ? "Yes" : "No", c->retaliate_ally ? "Yes" : "No",
+      c->retaliate_hostile ? "Yes" : "No", c->protect_trusted ? "Yes" : "No",
+      c->protect_group ? "Yes" : "No", c->protect_same_role ? "Yes" : "No",
+      c->protect_same_prototype ? "Yes" : "No",
+      c->avoid_incapacitated ? "Yes" : "No", c->flee_hp_percent,
+      c->assist_severity, c->target_switch_threshold, c->combat_cooldown,
+      c->max_responders, c->combat_cooldown);
+  ai_preview_add(
+      out, size,
+      "Style modifiers (derived): initiation 0; assist 0; flee %d; switch %d; "
+      "target lock %d; current-attacker %d; protected-ally %d; known-hostile "
+      "%d; health-target %d; threat-target %d\r\nTarget Weights:\r\n",
+      c->combat_style == AI_COMBAT_COWARDLY ? 20
+      : c->combat_style == AI_COMBAT_FANATICAL ||
+              c->combat_style == AI_COMBAT_BOSS
+          ? -30
+          : 0,
+      c->combat_style == AI_COMBAT_PASSIVE     ? 100
+      : c->combat_style == AI_COMBAT_DEFENSIVE ? 20
+      : c->combat_style == AI_COMBAT_AGGRESSIVE ||
+              c->combat_style == AI_COMBAT_CONTROLLER
+          ? -10
+          : 0,
+      c->combat_style == AI_COMBAT_BOSS ||
+              c->combat_style == AI_COMBAT_FANATICAL
+          ? 30
+          : 0,
+      c->target_weight[0], c->target_weight[1] + c->target_weight[2],
+      c->target_weight[3], c->target_weight[4], c->target_weight[3]);
+  for (i = 0; i < AI_TARGET_WEIGHTS; i++)
+    ai_preview_add(out, size, "  %s: %d\r\n", ai_actor_target_weight_name(i),
+                   c->target_weight[i]);
+  ai_preview_add(
+      out, size,
+      "Spellcaster: Unavailable; Healer: Unavailable; Ranged attacker: "
+      "Unavailable; Criminal: Unavailable; Highest damage output: "
+      "Unavailable\r\nCoordination: Group detection available; event-scoped "
+      "responder budgeting active; maximum responders %d; help event expiry "
+      "30s; duplicate responder suppression active; recursive call-help "
+      "suppression active; listener evaluation room-local; identity confidence "
+      "and ally classification required.\r\nAlly reasons: Master; Follower; "
+      "Group member; Trusted memory; Same role when enabled; Same prototype "
+      "when enabled.\r\nLifecycle tracking: Combat start, Direct attack, "
+      "Protected ally attack, Assistance, Target switch, Actor flee, Opponent "
+      "flee, Opponent defeat, Actor defeat, Combat end, Help heard, Help "
+      "answered.\r\nRescue: Unavailable; Surrender: Unavailable; Pursuit: "
+      "Unavailable.\r\n",
+      c->max_responders);
 }
 
-void ai_actor_combat_validate(const struct mob_ai_config *c, char *out, size_t size)
-{
-  int i, all_negative=TRUE, hostile_zero=TRUE; if(!out||!size)return; out[0]='\0'; if(!c){ai_preview_add(out,size,"ERROR: no combat profile.\r\n");return;}
-#define CVERR(x) ai_preview_add(out,size,"ERROR: %s\r\n",x)
-#define CVWARN(x) ai_preview_add(out,size,"WARNING: %s\r\n",x)
-  if(c->combat_enabled&&!c->may_initiate&&!c->retaliate_self&&!c->retaliate_ally&&!c->retaliate_hostile&&!c->may_assist)CVERR("policy has no initiation, retaliation, or assistance path");
-  if(c->may_assist&&c->max_responders==0)CVERR("assist enabled with zero responders"); if(c->may_call_help&&!c->notice_speech)CVERR("call help lacks normal communication path"); if(c->may_call_help&&c->max_responders<0)CVERR("local event budgeting unavailable"); if(c->may_flee&&c->combat_cooldown<1)CVERR("flee lacks normal dispatch cooldown"); if(c->surrender_hp_percent>0)CVERR("surrender is unavailable"); if(c->hunt_enabled)CVERR("pursuit is unavailable"); if(c->switch_targets&&c->combat_cooldown==0&&c->target_switch_threshold==0)CVERR("target switching has zero cooldown and threshold"); if(c->max_responders<0||c->max_responders>10)CVERR("responder limit outside bounds"); if(c->flee_hp_percent<0||c->flee_hp_percent>100)CVERR("flee threshold outside bounds"); if(c->assist_severity<0||c->assist_severity>100)CVERR("assist severity outside bounds"); if(c->target_switch_threshold<0||c->target_switch_threshold>100)CVERR("switch threshold outside bounds"); if(c->combat_style<0||c->combat_style>=AI_COMBAT_STYLE_MAX)CVERR("unknown combat style");
-  for(i=0;i<c->threat_step_count;i++) if(c->threat_steps[i].type<0||c->threat_steps[i].type>=AI_THREAT_RESPONSE_MAX)CVERR("threat sequence contains invalid step"); else if(!ai_threat_response_available(c->threat_steps[i].type))CVERR("threat sequence references unavailable response"); else if(!c->threat_enabled[c->threat_steps[i].type])CVERR("threat sequence references disabled response");
-  if(c->combat_style==AI_COMBAT_PASSIVE&&c->may_initiate)CVWARN("Passive style with initiation enabled"); if((c->combat_style==AI_COMBAT_FANATICAL||c->combat_style==AI_COMBAT_BOSS)&&c->flee_hp_percent>50)CVWARN("Fanatical/Boss high flee threshold"); if(c->combat_style==AI_COMBAT_COWARDLY&&!c->may_flee)CVWARN("Cowardly style with fleeing disabled"); if(c->combat_style==AI_COMBAT_PROTECTOR&&!c->protect_trusted&&!c->protect_group&&!c->protect_same_role&&!c->protect_same_prototype)CVWARN("Protector without protection categories"); if(c->may_assist&&!c->protect_trusted&&!c->protect_group&&!c->protect_same_role&&!c->protect_same_prototype)CVWARN("Assist enabled with no ally category"); if(c->protect_group&&!c->notice_ally_attack)CVWARN("Protect Group lacks ally perception"); if(c->retaliate_ally&&!c->notice_ally_attack)CVWARN("ally retaliation lacks Notice Attacks on Allies"); if(c->retaliate_hostile&&!c->memory_enabled)CVWARN("known-hostile retaliation lacks memory"); if(c->protect_trusted&&(!c->memory_enabled||!c->remember_assistance))CVWARN("trusted protection lacks retained memory"); if(c->memory_enabled==FALSE)CVWARN("lifecycle memory disabled with general memory"); if(c->remember_assistance&&!c->may_assist)CVWARN("remember assistance while assistance disabled");
-  for(i=0;i<AI_TARGET_WEIGHTS;i++){if(c->target_weight[i]>=0)all_negative=FALSE;if(i<=AI_TARGET_KNOWN_HOSTILE&&c->target_weight[i]!=0)hostile_zero=FALSE;} if(all_negative)CVWARN("all supported target weights are negative"); if(hostile_zero)CVWARN("all supported hostile target weights are zero"); if((c->combat_style==AI_COMBAT_BOSS||c->combat_style==AI_COMBAT_FANATICAL)&&c->target_weight[AI_TARGET_PREVIOUS]>0)CVWARN("previous-target weight and target lock may prevent switching"); if(c->combat_style==AI_COMBAT_AGGRESSIVE&&!c->may_initiate&&!c->retaliate_self)CVWARN("Aggressive style has no initiation or retaliation"); if(c->may_call_help&&c->max_responders<=1)CVWARN("Call Help maximum responders is one or fewer"); if(c->combat_cooldown<=2&&c->target_switch_threshold<=5)CVWARN("very low cooldown with low switch threshold"); if(!*out)ai_preview_add(out,size,"Combat validation: no errors or warnings.\r\n");
+void ai_actor_combat_validate(const struct mob_ai_config *c, char *out,
+                              size_t size) {
+  int i, all_negative = TRUE, hostile_zero = TRUE;
+  if (!out || !size)
+    return;
+  out[0] = '\0';
+  if (!c) {
+    ai_preview_add(out, size, "ERROR: no combat profile.\r\n");
+    return;
+  }
+#define CVERR(x) ai_preview_add(out, size, "ERROR: %s\r\n", x)
+#define CVWARN(x) ai_preview_add(out, size, "WARNING: %s\r\n", x)
+  if (c->combat_enabled && !c->may_initiate && !c->retaliate_self &&
+      !c->retaliate_ally && !c->retaliate_hostile && !c->may_assist)
+    CVERR("policy has no initiation, retaliation, or assistance path");
+  if (c->may_assist && c->max_responders == 0)
+    CVERR("assist enabled with zero responders");
+  if (c->may_call_help && !c->notice_speech)
+    CVERR("call help lacks normal communication path");
+  if (c->may_call_help && c->max_responders < 0)
+    CVERR("local event budgeting unavailable");
+  if (c->may_flee && c->combat_cooldown < 1)
+    CVERR("flee lacks normal dispatch cooldown");
+  if (c->surrender_hp_percent > 0)
+    CVERR("surrender is unavailable");
+  if (c->hunt_enabled)
+    CVERR("pursuit is unavailable");
+  if (c->switch_targets && c->combat_cooldown == 0 &&
+      c->target_switch_threshold == 0)
+    CVERR("target switching has zero cooldown and threshold");
+  if (c->max_responders < 0 || c->max_responders > 10)
+    CVERR("responder limit outside bounds");
+  if (c->flee_hp_percent < 0 || c->flee_hp_percent > 100)
+    CVERR("flee threshold outside bounds");
+  if (c->assist_severity < 0 || c->assist_severity > 100)
+    CVERR("assist severity outside bounds");
+  if (c->target_switch_threshold < 0 || c->target_switch_threshold > 100)
+    CVERR("switch threshold outside bounds");
+  if (c->combat_style < 0 || c->combat_style >= AI_COMBAT_STYLE_MAX)
+    CVERR("unknown combat style");
+  for (i = 0; i < c->threat_step_count; i++)
+    if (c->threat_steps[i].type < 0 ||
+        c->threat_steps[i].type >= AI_THREAT_RESPONSE_MAX)
+      CVERR("threat sequence contains invalid step");
+    else if (!ai_threat_response_available(c->threat_steps[i].type))
+      CVERR("threat sequence references unavailable response");
+    else if (!c->threat_enabled[c->threat_steps[i].type])
+      CVERR("threat sequence references disabled response");
+  if (c->combat_style == AI_COMBAT_PASSIVE && c->may_initiate)
+    CVWARN("Passive style with initiation enabled");
+  if ((c->combat_style == AI_COMBAT_FANATICAL ||
+       c->combat_style == AI_COMBAT_BOSS) &&
+      c->flee_hp_percent > 50)
+    CVWARN("Fanatical/Boss high flee threshold");
+  if (c->combat_style == AI_COMBAT_COWARDLY && !c->may_flee)
+    CVWARN("Cowardly style with fleeing disabled");
+  if (c->combat_style == AI_COMBAT_PROTECTOR && !c->protect_trusted &&
+      !c->protect_group && !c->protect_same_role && !c->protect_same_prototype)
+    CVWARN("Protector without protection categories");
+  if (c->may_assist && !c->protect_trusted && !c->protect_group &&
+      !c->protect_same_role && !c->protect_same_prototype)
+    CVWARN("Assist enabled with no ally category");
+  if (c->protect_group && !c->notice_ally_attack)
+    CVWARN("Protect Group lacks ally perception");
+  if (c->retaliate_ally && !c->notice_ally_attack)
+    CVWARN("ally retaliation lacks Notice Attacks on Allies");
+  if (c->retaliate_hostile && !c->memory_enabled)
+    CVWARN("known-hostile retaliation lacks memory");
+  if (c->protect_trusted && (!c->memory_enabled || !c->remember_assistance))
+    CVWARN("trusted protection lacks retained memory");
+  if (c->memory_enabled == FALSE)
+    CVWARN("lifecycle memory disabled with general memory");
+  if (c->remember_assistance && !c->may_assist)
+    CVWARN("remember assistance while assistance disabled");
+  for (i = 0; i < AI_TARGET_WEIGHTS; i++) {
+    if (c->target_weight[i] >= 0)
+      all_negative = FALSE;
+    if (i <= AI_TARGET_KNOWN_HOSTILE && c->target_weight[i] != 0)
+      hostile_zero = FALSE;
+  }
+  if (all_negative)
+    CVWARN("all supported target weights are negative");
+  if (hostile_zero)
+    CVWARN("all supported hostile target weights are zero");
+  if ((c->combat_style == AI_COMBAT_BOSS ||
+       c->combat_style == AI_COMBAT_FANATICAL) &&
+      c->target_weight[AI_TARGET_PREVIOUS] > 0)
+    CVWARN("previous-target weight and target lock may prevent switching");
+  if (c->combat_style == AI_COMBAT_AGGRESSIVE && !c->may_initiate &&
+      !c->retaliate_self)
+    CVWARN("Aggressive style has no initiation or retaliation");
+  if (c->may_call_help && c->max_responders <= 1)
+    CVWARN("Call Help maximum responders is one or fewer");
+  if (c->combat_cooldown <= 2 && c->target_switch_threshold <= 5)
+    CVWARN("very low cooldown with low switch threshold");
+  if (!*out)
+    ai_preview_add(out, size, "Combat validation: no errors or warnings.\r\n");
 #undef CVERR
 #undef CVWARN
 }

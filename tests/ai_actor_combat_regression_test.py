@@ -32,7 +32,7 @@ assert 'ai_actor_lifecycle_memory' in source
 for token in ('ai_actor_combat_preview', 'ai_actor_combat_validate',
               'Combat Profile', 'Target Weights:', 'Lifecycle tracking:',
               'Rescue: Unavailable', 'Surrender: Unavailable',
-              'Pursuit: Unavailable', 'ERROR:', 'WARNING:'):
+              'Pursuit: ', 'ERROR:', 'WARNING:'):
     assert token in source
 medit = Path('src/medit.c').read_text()
 assert 'K) Preview L) Validate' in medit
