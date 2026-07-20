@@ -327,6 +327,10 @@ extern const char *nrm, *grn, *cyn, *yel;
 #define MEDIT_AI_PERCEPTION_VALUE         72
 #define MEDIT_AI_MEMORY                   73
 #define MEDIT_AI_MEMORY_VALUE             74
+#define MEDIT_AI_THREAT                   75
+#define MEDIT_AI_THREAT_VALUE             76
+#define MEDIT_AI_THREAT_SEQUENCE          77
+#define MEDIT_AI_THREAT_STEP              78
 
 /* Submodes of SEDIT connectedness. */
 #define SEDIT_MAIN_MENU              	0

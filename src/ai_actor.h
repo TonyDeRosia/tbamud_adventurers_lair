@@ -12,12 +12,13 @@
 #define AI_DIALOGUE_LINE_MAX 240
 #define AI_SOCIAL_COOLDOWN_MIN 1
 #define AI_SOCIAL_COOLDOWN_MAX 300
+#define AI_THREAT_STEP_MAX 10
 
 enum mob_ai_profile_mode { MOB_AI_INFERRED = 0, MOB_AI_CUSTOM, MOB_AI_INFERRED_OVERRIDES };
 enum mob_ai_personality { AI_TRAIT_AGGRESSION, AI_TRAIT_BRAVERY, AI_TRAIT_SOCIABILITY, AI_TRAIT_CURIOSITY, AI_TRAIT_DISCIPLINE, AI_TRAIT_HONESTY, AI_TRAIT_GREED, AI_TRAIT_COMPASSION, AI_TRAIT_LOYALTY, AI_TRAIT_PATIENCE, AI_TRAIT_SUSPICION, AI_TRAIT_PRIDE };
 enum ai_social_style { AI_SOCIAL_SILENT, AI_SOCIAL_RESERVED, AI_SOCIAL_POLITE, AI_SOCIAL_FRIENDLY, AI_SOCIAL_TALKATIVE, AI_SOCIAL_BOASTFUL, AI_SOCIAL_RUDE, AI_SOCIAL_HOSTILE, AI_SOCIAL_EXTORTING, AI_SOCIAL_PREACHER, AI_SOCIAL_GOSSIP };
-enum ai_dialogue_category { AI_DIALOGUE_GREETING, AI_DIALOGUE_FRIENDLY, AI_DIALOGUE_SUSPICIOUS, AI_DIALOGUE_HOSTILE, AI_DIALOGUE_AMBIENT_SPEECH, AI_DIALOGUE_AMBIENT_EMOTE, AI_DIALOGUE_FAREWELL };
-enum ai_threat_response { AI_THREAT_OBSERVE, AI_THREAT_WARN, AI_THREAT_CHALLENGE, AI_THREAT_CALL_HELP, AI_THREAT_ASSIST, AI_THREAT_FOLLOW, AI_THREAT_ARREST, AI_THREAT_ATTACK, AI_THREAT_FLEE, AI_THREAT_SURRENDER, AI_THREAT_RESPONSE_MAX };
+enum ai_dialogue_category { AI_DIALOGUE_GREETING, AI_DIALOGUE_FRIENDLY, AI_DIALOGUE_SUSPICIOUS, AI_DIALOGUE_HOSTILE, AI_DIALOGUE_AMBIENT_SPEECH, AI_DIALOGUE_AMBIENT_EMOTE, AI_DIALOGUE_FAREWELL, AI_DIALOGUE_WARNING, AI_DIALOGUE_CHALLENGE, AI_DIALOGUE_THREAT, AI_DIALOGUE_CALL_HELP, AI_DIALOGUE_FEAR };
+enum ai_threat_response { AI_THREAT_OBSERVE, AI_THREAT_WARN, AI_THREAT_CHALLENGE, AI_THREAT_CALL_HELP, AI_THREAT_ASSIST, AI_THREAT_FOLLOW, AI_THREAT_ARREST, AI_THREAT_ATTACK, AI_THREAT_FLEE, AI_THREAT_SURRENDER, AI_THREAT_IGNORE, AI_THREAT_RESPONSE_MAX };
 struct ai_threat_step { int type, minimum_severity, cooldown, max_repetitions, advance_on_failure; };
 enum mob_ai_config_movement { AI_MOVE_STATIONARY, AI_MOVE_RANDOM, AI_MOVE_PATROL, AI_MOVE_SCHEDULED, AI_MOVE_GUARD_ROOM, AI_MOVE_RETURN_HOME };
 struct mob_ai_config {
@@ -35,7 +36,7 @@ struct mob_ai_config {
   int hearing_sensitivity, observation_sensitivity, suspicion_threshold, recognition_confidence;
   int memory_enabled, memory_max_actors, memory_ordinary_duration, memory_important_duration, trust_gain, trust_loss, fear_gain, fear_decay, hostility_gain, hostility_decay, familiarity_gain, familiarity_decay, forgiveness;
   int remember_attacks, remember_assistance, remember_crimes, remember_gifts, remember_insults, remember_conversations, remember_threats, remember_last_room, remember_deaths;
-  int threat_enabled[AI_THREAT_RESPONSE_MAX], threat_cooldown, repeated_event_window, threat_step_count;
+  int threat_enabled[AI_THREAT_RESPONSE_MAX], threat_cooldown, calm_reset_time, repeated_event_window, threat_step_count;
   struct ai_threat_step threat_steps[10];
 };
 #define AI_OVERRIDE_ROLE (1UL << 0)
@@ -229,7 +230,7 @@ struct ai_actor_profile {
   int hearing_sensitivity, observation_sensitivity, suspicion_threshold, recognition_confidence;
   int memory_enabled, memory_max_actors, memory_ordinary_duration, memory_important_duration, trust_gain, trust_loss, fear_gain, fear_decay, hostility_gain, hostility_decay, familiarity_gain, familiarity_decay, forgiveness;
   int remember_attacks, remember_assistance, remember_crimes, remember_gifts, remember_insults, remember_conversations, remember_threats, remember_last_room, remember_deaths;
-  int threat_enabled[AI_THREAT_RESPONSE_MAX], threat_cooldown, repeated_event_window, threat_step_count;
+  int threat_enabled[AI_THREAT_RESPONSE_MAX], threat_cooldown, calm_reset_time, repeated_event_window, threat_step_count;
   struct ai_threat_step threat_steps[10];
 };
 
@@ -269,7 +270,8 @@ struct ai_actor_memory_entry {
   int familiarity;
   int identity_confidence, hostility_confidence, crime_confidence, room_confidence;
   int threat_step, threat_repetitions, threat_severity;
-  time_t threat_last_action;
+  time_t threat_last_action, threat_last_event, threat_last_warning, threat_last_challenge;
+  int threat_help_called;
 };
 
 struct ai_actor_state {
@@ -351,5 +353,11 @@ int mob_ai_dialogue_delete(struct mob_ai_config *config, int category, int index
 int mob_ai_dialogue_move(struct mob_ai_config *config, int category, int from, int to);
 /* Deterministic social response modifier; every personality trait contributes. */
 int ai_actor_personality_response_modifier(const int personality[AI_ACTOR_PERSONALITIES]);
+/* Pure threat-policy helpers, deliberately deterministic for regression tests. */
+int ai_threat_response_available(int type);
+int ai_threat_response_targeted(int type);
+int ai_threat_step_valid(const struct ai_threat_step *step, const int enabled[AI_THREAT_RESPONSE_MAX]);
+int ai_threat_severity(int event_base, const struct ai_actor_memory_entry *memory, const int personality[AI_ACTOR_PERSONALITIES], int confidence, int injured_nonhostile);
+int ai_threat_choose_step(const struct ai_actor_profile *profile, const struct ai_actor_memory_entry *memory, time_t now);
 
 #endif
