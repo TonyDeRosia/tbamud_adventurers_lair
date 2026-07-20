@@ -52,3 +52,14 @@ assert 's->resume_schedule_id' in s and 's->resume_waypoint' in s
 assert 'ai_schedule_mark_skip(s,e)' in s
 assert 'AI_PATROL_LOOP' in s and 'AI_PATROL_PINGPONG' in s and 'AI_PATROL_ONCE' in h
 print('AI actor schedule runtime policy regression checks passed')
+# Final schedule reporting/diagnostic integration guards.
+assert 'Compiled prototype preview; live runtime suppression unavailable' in s
+assert 'Schedule Errors' in s and 'Patrol Errors' in s and 'Cross-System Warnings' in s
+assert 'Winner explanation: eligible; canonical selection compares' in s
+assert 'Traversal: %s' in s and 'loop closure' in s
+assert 'void ai_actor_schedule_show_state' in s
+assert 'Schedule Diagnostics (read-only)' in s
+assert 'ai_actor_schedule_show_state(ch, mob)' in open('src/act.wizard.c').read()
+assert 'memset(it->ai_state, 0, sizeof(*it->ai_state))' in s
+assert 'AIConfigSchedule' in open('src/db.c').read()
+print('AI actor schedule reporting, diagnostics, persistence, and refresh guards passed')
