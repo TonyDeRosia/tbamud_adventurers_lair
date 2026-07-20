@@ -336,6 +336,12 @@ struct ai_actor_state {
   struct ai_actor_brain *brain;
   time_t last_combat_action, last_target_switch, last_flee_attempt;
   long last_selected_target_idnum, last_help_event_id;
+  /* Bounded combat-cycle bookkeeping: IDs, never live character pointers. */
+  unsigned long combat_event_id;
+  long combat_opponent_id, last_combat_opponent_id, last_switch_from_id, last_switch_to_id;
+  unsigned long last_assist_event_id, last_help_heard_event_id, last_help_answered_event_id;
+  int combat_active, combat_end_recorded, combat_end_reason;
+  time_t combat_started_at;
 };
 
 uint32_t ai_actor_compute_signature(struct char_data *mob);
@@ -363,6 +369,11 @@ void ai_actor_event_corpse(struct char_data *dead, room_rnum room);
 void ai_actor_event_drop(struct char_data *actor, struct obj_data *obj);
 void ai_actor_event_give(struct char_data *actor, struct char_data *to, struct obj_data *obj);
 void ai_actor_event_attack(struct char_data *attacker, struct char_data *victim, int damage);
+void ai_actor_event_combat_end(struct char_data *actor, struct char_data *opponent, int reason);
+void ai_actor_event_defeat(struct char_data *actor, struct char_data *opponent);
+void ai_actor_event_fled(struct char_data *actor, struct char_data *opponent, int actor_fled);
+void ai_actor_combat_preview(const struct mob_ai_config *config, char *out, size_t out_size);
+void ai_actor_combat_validate(const struct mob_ai_config *config, char *out, size_t out_size);
 int ai_actor_target_score(struct char_data *mob, struct char_data *candidate);
 int ai_actor_is_local_ally(struct char_data *mob, struct char_data *other, const char **reason);
 int ai_actor_should_flee(struct char_data *mob);
