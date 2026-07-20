@@ -31,10 +31,11 @@ enum ai_target_weight { AI_TARGET_CURRENT_ATTACKER, AI_TARGET_TRUSTED_ATTACKER, 
 struct ai_threat_step { int type, minimum_severity, cooldown, max_repetitions, advance_on_failure; };
 enum mob_ai_config_movement { AI_MOVE_STATIONARY, AI_MOVE_RANDOM, AI_MOVE_PATROL, AI_MOVE_SCHEDULED, AI_MOVE_GUARD_ROOM, AI_MOVE_RETURN_HOME };
 enum ai_schedule_activity { AI_SCHEDULE_REMAIN, AI_SCHEDULE_TRAVEL, AI_SCHEDULE_PATROL, AI_SCHEDULE_IDLE_SOCIAL, AI_SCHEDULE_GUARD, AI_SCHEDULE_WORK, AI_SCHEDULE_SLEEP, AI_SCHEDULE_REST, AI_SCHEDULE_RETURN_HOME, AI_SCHEDULE_ACTIVITY_MAX };
-enum ai_schedule_destination { AI_DEST_CURRENT_ROOM, AI_DEST_ROOM_VNUM, AI_DEST_HOME, AI_DEST_WORK, AI_DEST_GUARD, AI_DEST_PATROL, AI_DEST_SPAWN, AI_DESTINATION_MAX };
-enum ai_schedule_action { AI_SCHEDULE_ACTION_NONE, AI_SCHEDULE_ACTION_SIT, AI_SCHEDULE_ACTION_REST, AI_SCHEDULE_ACTION_SLEEP, AI_SCHEDULE_ACTION_STAND, AI_SCHEDULE_ACTION_WAKE, AI_SCHEDULE_ACTION_MAX };
+enum ai_schedule_destination { AI_DEST_CURRENT_ROOM, AI_DEST_ROOM_VNUM, AI_DEST_HOME, AI_DEST_WORK, AI_DEST_SLEEP, AI_DEST_GUARD, AI_DEST_FALLBACK, AI_DEST_PATROL, AI_DEST_SPAWN, AI_DESTINATION_MAX };
+enum ai_schedule_action { AI_SCHEDULE_ACTION_NONE, AI_SCHEDULE_ACTION_SPEAK, AI_SCHEDULE_ACTION_EMOTE, AI_SCHEDULE_ACTION_SIT, AI_SCHEDULE_ACTION_REST, AI_SCHEDULE_ACTION_SLEEP, AI_SCHEDULE_ACTION_STAND, AI_SCHEDULE_ACTION_WAKE, AI_SCHEDULE_ACTION_BEGIN_PATROL, AI_SCHEDULE_ACTION_GUARD, AI_SCHEDULE_ACTION_MAX };
 enum ai_schedule_interrupt { AI_INTERRUPT_IGNORE, AI_INTERRUPT_PAUSE_RESUME, AI_INTERRUPT_RESTART, AI_INTERRUPT_SKIP, AI_INTERRUPT_ABORT, AI_INTERRUPT_FALLBACK, AI_INTERRUPT_MAX };
-enum ai_schedule_failure { AI_FAILURE_WAIT_RETRY, AI_FAILURE_SKIP, AI_FAILURE_ABORT, AI_FAILURE_FALLBACK, AI_FAILURE_MAX };
+enum ai_schedule_failure { AI_FAILURE_WAIT_RETRY, AI_FAILURE_SKIP, AI_FAILURE_RESTART, AI_FAILURE_FALLBACK, AI_FAILURE_ABORT, AI_FAILURE_DISABLE_UNTIL_CHANGE, AI_FAILURE_MAX };
+enum ai_schedule_state { AI_SCHED_INACTIVE, AI_SCHED_SELECTED, AI_SCHED_PREPARING_DEPARTURE, AI_SCHED_TRAVELING, AI_SCHED_ARRIVED, AI_SCHED_ACTIVE, AI_SCHED_WAITING_WAYPOINT, AI_SCHED_INTERRUPTED, AI_SCHED_RESUMING, AI_SCHED_FAILED, AI_SCHED_COMPLETED, AI_SCHED_ABORTED };
 enum ai_patrol_loop { AI_PATROL_LOOP, AI_PATROL_PINGPONG, AI_PATROL_ONCE, AI_PATROL_RANDOM, AI_PATROL_LOOP_MAX };
 struct ai_schedule_entry { int id, enabled, start_hour, end_hour, day_mask, priority, activity, destination, destination_value, arrival_action, departure_action, interruption_policy, failure_policy, max_travel_time, max_attempts, wait_duration, route_id; };
 struct ai_patrol_waypoint { int room_vnum, wait_duration, arrival_action; };
@@ -358,8 +359,8 @@ struct ai_actor_state {
   unsigned long last_assist_event_id, last_help_heard_event_id, last_help_answered_event_id;
   int combat_active, combat_end_recorded, combat_end_reason;
   time_t combat_started_at;
-  int active_schedule_id, previous_schedule_id, schedule_destination_vnum, schedule_route_id, schedule_waypoint, patrol_direction, schedule_failures, schedule_interrupted, schedule_reason, expected_room_vnum;
-  time_t schedule_started_at, last_schedule_eval, last_schedule_move, schedule_wait_until;
+  int active_schedule_id, previous_schedule_id, schedule_destination_vnum, schedule_route_id, schedule_waypoint, patrol_direction, schedule_failures, schedule_attempts, schedule_interrupted, schedule_reason, expected_room_vnum, schedule_state, schedule_skipped_id, last_arrival_action, last_departure_action, schedule_wander_suppressed;
+  time_t schedule_started_at, last_schedule_eval, last_schedule_move, schedule_wait_until, schedule_retry_at;
 };
 
 uint32_t ai_actor_compute_signature(struct char_data *mob);
@@ -385,6 +386,8 @@ int ai_patrol_add(struct mob_ai_config *c, const struct ai_patrol_route *route);
 int ai_patrol_waypoint_move(struct ai_patrol_route *route, int from, int to);
 void ai_actor_schedule_preview(const struct mob_ai_config *c, int day, int hour, char *out, size_t size);
 void ai_actor_schedule_validate(const struct mob_ai_config *c, char *out, size_t size);
+void ai_actor_patrol_preview(const struct mob_ai_config *c, int route_id, char *out, size_t size);
+void ai_actor_schedule_interrupt(struct char_data *mob, int reason, long actor_id, time_t now);
 void ai_actor_record_damage(struct char_data *mob, struct char_data *actor, int dam);
 void ai_actor_record_help(struct char_data *mob, struct char_data *actor, int amount);
 void ai_actor_record_crime(struct char_data *mob, struct char_data *criminal, int flags);
