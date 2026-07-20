@@ -32,3 +32,23 @@ for token in ('Home Room', 'Work Room', 'Sleep Room', 'Guard Room', 'Fallback Ro
               'Referenced route cannot be deleted', 'Invalid room VNUM'):
     assert token in medit or token in oasis
 print('AI actor schedule Oasis editor regression checks passed')
+
+# Runtime policy engine guards: stable state, interruption, retry, and wandering helpers.
+for token in (
+    'AI_SCHED_RUNTIME_DISABLED', 'AI_SCHEDULE_INTERRUPT_COMBAT',
+    'AI_SCHEDULE_INTERRUPT_UNKNOWN_DISPLACEMENT', 'AI_SCHEDULE_RESUME_VALID',
+    'AI_SCHEDULE_ALLOW_WANDER', 'ai_schedule_set_state',
+    'ai_schedule_begin_entry', 'ai_schedule_complete_entry',
+    'ai_schedule_reset_transition_flags', 'ai_schedule_apply_interruption_policy',
+    'ai_schedule_apply_failure_policy', 'ai_schedule_resume_check',
+    'ai_schedule_interruption_is_minor', 'ai_schedule_entry_activation_signature',
+    'ai_schedule_entry_is_suppressed_for_window', 'ai_schedule_retry_ready',
+    'ai_schedule_travel_timed_out', 'ai_schedule_should_block_wandering'):
+    assert token in h or token in s, token
+assert 'perform_move(m,dir,1)' in s
+assert 's->schedule_attempts++;ai_schedule_failure' in s
+assert 's->schedule_failure_emitted' in s and 's->schedule_failure_applied' in s
+assert 's->resume_schedule_id' in s and 's->resume_waypoint' in s
+assert 'ai_schedule_mark_skip(s,e)' in s
+assert 'AI_PATROL_LOOP' in s and 'AI_PATROL_PINGPONG' in s and 'AI_PATROL_ONCE' in h
+print('AI actor schedule runtime policy regression checks passed')

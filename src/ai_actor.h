@@ -35,7 +35,10 @@ enum ai_schedule_destination { AI_DEST_CURRENT_ROOM, AI_DEST_ROOM_VNUM, AI_DEST_
 enum ai_schedule_action { AI_SCHEDULE_ACTION_NONE, AI_SCHEDULE_ACTION_SPEAK, AI_SCHEDULE_ACTION_EMOTE, AI_SCHEDULE_ACTION_SIT, AI_SCHEDULE_ACTION_REST, AI_SCHEDULE_ACTION_SLEEP, AI_SCHEDULE_ACTION_STAND, AI_SCHEDULE_ACTION_WAKE, AI_SCHEDULE_ACTION_BEGIN_PATROL, AI_SCHEDULE_ACTION_GUARD, AI_SCHEDULE_ACTION_MAX };
 enum ai_schedule_interrupt { AI_INTERRUPT_IGNORE, AI_INTERRUPT_PAUSE_RESUME, AI_INTERRUPT_RESTART, AI_INTERRUPT_SKIP, AI_INTERRUPT_ABORT, AI_INTERRUPT_FALLBACK, AI_INTERRUPT_MAX };
 enum ai_schedule_failure { AI_FAILURE_WAIT_RETRY, AI_FAILURE_SKIP, AI_FAILURE_RESTART, AI_FAILURE_FALLBACK, AI_FAILURE_ABORT, AI_FAILURE_DISABLE_UNTIL_CHANGE, AI_FAILURE_MAX };
-enum ai_schedule_state { AI_SCHED_INACTIVE, AI_SCHED_SELECTED, AI_SCHED_PREPARING_DEPARTURE, AI_SCHED_TRAVELING, AI_SCHED_ARRIVED, AI_SCHED_ACTIVE, AI_SCHED_WAITING_WAYPOINT, AI_SCHED_INTERRUPTED, AI_SCHED_RESUMING, AI_SCHED_FAILED, AI_SCHED_COMPLETED, AI_SCHED_ABORTED };
+enum ai_schedule_state { AI_SCHED_INACTIVE, AI_SCHED_SELECTED, AI_SCHED_PREPARING_DEPARTURE, AI_SCHED_TRAVELING, AI_SCHED_ARRIVED, AI_SCHED_ACTIVE, AI_SCHED_WAITING_WAYPOINT, AI_SCHED_INTERRUPTED, AI_SCHED_RESUMING, AI_SCHED_FAILED, AI_SCHED_COMPLETED, AI_SCHED_ABORTED, AI_SCHED_RUNTIME_DISABLED };
+enum ai_schedule_interrupt_reason { AI_SCHEDULE_INTERRUPT_NONE, AI_SCHEDULE_INTERRUPT_MINOR_EVENT, AI_SCHEDULE_INTERRUPT_MAJOR_THREAT, AI_SCHEDULE_INTERRUPT_COMBAT, AI_SCHEDULE_INTERRUPT_COMBAT_FLEE, AI_SCHEDULE_INTERRUPT_FORCED_MOVEMENT, AI_SCHEDULE_INTERRUPT_SCRIPTED_MOVEMENT, AI_SCHEDULE_INTERRUPT_FOLLOWER_MOVEMENT, AI_SCHEDULE_INTERRUPT_ADMIN_TRANSFER, AI_SCHEDULE_INTERRUPT_TELEPORT_SUMMON, AI_SCHEDULE_INTERRUPT_CHARM_CONTROL, AI_SCHEDULE_INTERRUPT_INCAPACITATED, AI_SCHEDULE_INTERRUPT_INVALID_DESTINATION, AI_SCHEDULE_INTERRUPT_INVALID_ROUTE, AI_SCHEDULE_INTERRUPT_MOVEMENT_FAILURE, AI_SCHEDULE_INTERRUPT_TRAVEL_TIMEOUT, AI_SCHEDULE_INTERRUPT_SCHEDULE_REPLACED, AI_SCHEDULE_INTERRUPT_UNKNOWN_DISPLACEMENT };
+enum ai_schedule_resume_result { AI_SCHEDULE_RESUME_VALID, AI_SCHEDULE_RESUME_ENTRY_EXPIRED, AI_SCHEDULE_RESUME_ENTRY_REPLACED, AI_SCHEDULE_RESUME_DESTINATION_INVALID, AI_SCHEDULE_RESUME_ROUTE_INVALID, AI_SCHEDULE_RESUME_POSITION_INVALID, AI_SCHEDULE_RESUME_CONTROL_CONFLICT, AI_SCHEDULE_RESUME_MOVEMENT_RESTRICTED };
+enum ai_schedule_result { AI_SCHEDULE_INACTIVE, AI_SCHEDULE_ALLOW_WANDER, AI_SCHEDULE_BLOCK_WANDER, AI_SCHEDULE_MAJOR_ACTION };
 enum ai_patrol_loop { AI_PATROL_LOOP, AI_PATROL_PINGPONG, AI_PATROL_ONCE, AI_PATROL_RANDOM, AI_PATROL_LOOP_MAX };
 struct ai_schedule_entry { int id, enabled, start_hour, end_hour, day_mask, priority, activity, destination, destination_value, arrival_action, departure_action, interruption_policy, failure_policy, max_travel_time, max_attempts, wait_duration, route_id; };
 struct ai_patrol_waypoint { int room_vnum, wait_duration, arrival_action; };
@@ -360,6 +363,8 @@ struct ai_actor_state {
   int combat_active, combat_end_recorded, combat_end_reason;
   time_t combat_started_at;
   int active_schedule_id, previous_schedule_id, schedule_destination_vnum, schedule_route_id, schedule_waypoint, patrol_direction, schedule_failures, schedule_attempts, schedule_interrupted, schedule_reason, expected_room_vnum, schedule_state, schedule_skipped_id, last_arrival_action, last_departure_action, schedule_wander_suppressed;
+  int schedule_departure_done, schedule_arrival_done, schedule_failure_emitted, schedule_failure_applied, schedule_disabled_id, schedule_activation_day, schedule_activation_start, schedule_activation_end;
+  int resume_schedule_id, resume_route_id, resume_waypoint, resume_direction, resume_state, resume_destination_vnum, resume_departure_done, resume_arrival_done;
   time_t schedule_started_at, last_schedule_eval, last_schedule_move, schedule_wait_until, schedule_retry_at;
 };
 
@@ -377,6 +382,12 @@ int ai_schedule_time_matches(int start, int end, int hour);
 int ai_schedule_day_matches(int mask, int day);
 int ai_schedule_select(const struct mob_ai_config *c, int day, int hour);
 int ai_schedule_entries_overlap(const struct ai_schedule_entry *a, const struct ai_schedule_entry *b);
+int ai_schedule_interruption_is_minor(int reason);
+int ai_schedule_entry_activation_signature(const struct ai_schedule_entry *e, int day);
+int ai_schedule_entry_is_suppressed_for_window(const struct ai_actor_state *s, const struct ai_schedule_entry *e, int day);
+int ai_schedule_retry_ready(const struct ai_actor_state *s, time_t now);
+int ai_schedule_travel_timed_out(const struct ai_actor_state *s, const struct ai_schedule_entry *e, time_t now);
+int ai_schedule_should_block_wandering(const struct ai_actor_state *s);
 int ai_patrol_advance(const struct ai_patrol_route *route, int index, int direction, int *next_direction);
 int ai_schedule_add(struct mob_ai_config *c, const struct ai_schedule_entry *entry);
 int ai_schedule_delete(struct mob_ai_config *c, int index);
