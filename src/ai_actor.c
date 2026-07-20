@@ -44,6 +44,26 @@ const char *ai_actor_config_movement_name(int movement)
     "Guard room", "Return home" };
   return movement >= AI_MOVE_STATIONARY && movement <= AI_MOVE_RETURN_HOME ? names[movement] : "Unknown";
 }
+const char *ai_actor_config_role_summary(int role)
+{
+  static const char *summaries[] = {
+    "No distinct role defaults.", "Uses guard-oriented inferred defaults.",
+    "Uses merchant-oriented inferred defaults.", "Uses bandit-oriented inferred defaults.",
+    "Uses beast-oriented inferred defaults.", "Uses undead-oriented inferred defaults.",
+    "Uses spirit-oriented inferred defaults.", "Uses cultist-oriented inferred defaults.",
+    "Uses civilian-oriented inferred defaults.", "Uses boss-oriented inferred defaults."
+  };
+  return role >= ROLE_UNKNOWN && role <= ROLE_BOSS ? summaries[role] : "Unknown or corrupted role value.";
+}
+const char *ai_actor_config_movement_summary(int movement)
+{
+  static const char *summaries[] = {
+    "Does not select AI movement.", "Uses the normal random mobile movement path.",
+    "Moves only through an authored patrol route.", "Schedule entries select travel and activities.",
+    "Uses the configured guard-room destination.", "Uses the configured home-room destination."
+  };
+  return movement >= AI_MOVE_STATIONARY && movement <= AI_MOVE_RETURN_HOME ? summaries[movement] : "Unknown or corrupted movement value.";
+}
 
 struct mob_ai_config *mob_ai_config_new(void)
 {

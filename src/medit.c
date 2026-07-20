@@ -77,6 +77,32 @@ static void medit_disp_mob_flags(struct descriptor_data *d);
 static void medit_disp_aff_flags(struct descriptor_data *d);
 static void medit_disp_menu(struct descriptor_data *d);
 static void medit_disp_ai_menu(struct descriptor_data *d);
+static void medit_disp_ai_mode(struct descriptor_data *d)
+{
+  struct mob_ai_config *c = OLC_MOB(d)->ai_config;
+  write_to_output(d, "\r\nAI Actor Profile Mode\r\n0) Inferred\r\n   Compilation derives profile values from prototype data.\r\n1) Custom\r\n   Compilation uses stored configuration values directly.\r\n2) Overrides\r\n   Compilation starts inferred and applies only fields in the override mask.\r\nCurrent mode: %s\r\nStored values are preserved when changing modes; Reset discards them.\r\nH) Help  Q) Return\r\nChoice: ", c->mode == MOB_AI_CUSTOM ? "Custom" : c->mode == MOB_AI_INFERRED_OVERRIDES ? "Overrides" : "Inferred");
+  OLC_MODE(d) = MEDIT_AI_MODE;
+}
+static void medit_disp_ai_role(struct descriptor_data *d)
+{
+  int i; struct mob_ai_config *c = OLC_MOB(d)->ai_config;
+  write_to_output(d, "\r\nAI Actor Role\r\n");
+  for (i = ROLE_UNKNOWN; i <= ROLE_BOSS; i++)
+    write_to_output(d, "%d) %s\r\n   %s\r\n", i, ai_actor_config_role_name(i), ai_actor_config_role_summary(i));
+  write_to_output(d, "Current role: %s\r\nH) Help  Q) Return\r\nChoice: ", ai_actor_config_role_name(c->role));
+  OLC_MODE(d) = MEDIT_AI_ROLE;
+}
+static void medit_disp_ai_movement(struct descriptor_data *d)
+{
+  int i; struct mob_ai_config *c = OLC_MOB(d)->ai_config;
+  write_to_output(d, "\r\nAI Actor Movement\r\n");
+  for (i = AI_MOVE_STATIONARY; i <= AI_MOVE_RETURN_HOME; i++)
+    write_to_output(d, "%d) %s\r\n   %s\r\n", i, ai_actor_config_movement_name(i), ai_actor_config_movement_summary(i));
+  if (MOB_FLAGGED(OLC_MOB(d), MOB_SENTINEL) && c->movement == AI_MOVE_RANDOM)
+    write_to_output(d, "Warning: SENTINEL prevents normal random movement.\r\n");
+  write_to_output(d, "Current movement: %s\r\nH) Help  Q) Return\r\nChoice: ", ai_actor_config_movement_name(c->movement));
+  OLC_MODE(d) = MEDIT_AI_MOVEMENT;
+}
 static int medit_parse_ai_integer(const char *arg, int minimum, int maximum, int *value);
 static int medit_parse_ai_boolean(const char *arg, int *value);
 static int medit_is_ai_mode(int mode);
@@ -723,10 +749,39 @@ static void medit_disp_loadout_menu(struct descriptor_data *d)
 }
 
 static const char *ai_trait_names[AI_ACTOR_PERSONALITIES] = { "Aggression", "Bravery", "Sociability", "Curiosity", "Discipline", "Honesty", "Greed", "Compassion", "Loyalty", "Patience", "Suspicion", "Pride" };
-static void medit_disp_ai_personality(struct descriptor_data *d) { struct mob_ai_config *c=OLC_MOB(d)->ai_config; int i; write_to_output(d,"\r\nAI Actor Personality\r\n"); for(i=0;i<12;i++) write_to_output(d,"%c) %-12s : %d\r\n",i<9?'1'+i:'A'+i-9,ai_trait_names[i],c->personality[i]); write_to_output(d,"P) Apply Preset  Q) Return\r\nChoice: "); OLC_MODE(d)=MEDIT_AI_PERSONALITY; }
-static void medit_disp_ai_social(struct descriptor_data *d) { struct mob_ai_config*c=OLC_MOB(d)->ai_config; write_to_output(d,"\r\nAI Actor Social Behavior\r\n1) Style: %s\r\n2) Greeting: %s\r\n3) Ambient speech: %s\r\n4) Ambient emotes: %s\r\n5) Whisper replies: %s\r\n6) Respond strangers: %s\r\n7) Respond trusted: %s\r\n8) Respond feared: %s\r\n9) Respond hostile: %s\r\nA) Speech cooldown: %d\r\nB) Room cooldown: %d\r\nC) Emote cooldown: %d\r\nQ) Return\r\nChoice: ",ai_social_style_name(c->social),c->greeting_enabled?"Yes":"No",c->ambient_speech_enabled?"Yes":"No",c->ambient_emotes_enabled?"Yes":"No",c->whisper_enabled?"Yes":"No",c->respond_strangers?"Yes":"No",c->respond_trusted?"Yes":"No",c->respond_feared?"Yes":"No",c->respond_hostile?"Yes":"No",c->speech_cooldown,c->room_speech_cooldown,c->emote_cooldown); OLC_MODE(d)=MEDIT_AI_SOCIAL; }
-static void medit_disp_ai_dialogue_lines(struct descriptor_data *d, int category) { struct mob_ai_config *c=OLC_MOB(d)->ai_config; int i; write_to_output(d,"\r\n%s dialogue (%d/%d)\r\n",ai_dialogue_category_name(category),c->dialogue_count[category],AI_DIALOGUE_MAX_LINES); for(i=0;i<c->dialogue_count[category];i++) write_to_output(d," %d) %s\r\n",i+1,c->dialogue[category][i]); write_to_output(d,"A) Add  E <line>) Edit  D <line>) Delete  U <line>) Move up  N <line>) Move down  Q) Categories\r\nChoice: "); OLC_MODE(d)=MEDIT_AI_DIALOGUE; }
-static void medit_disp_ai_dialogue(struct descriptor_data *d) { struct mob_ai_config*c=OLC_MOB(d)->ai_config; int i; write_to_output(d,"\r\nAI Actor Dialogue\r\n"); for(i=0;i<AI_DIALOGUE_CATEGORIES;i++) write_to_output(d,"%d) %s: %d/%d\r\n",i,ai_dialogue_category_name(i),c->dialogue_count[i],AI_DIALOGUE_MAX_LINES); write_to_output(d,"Select category; Q) Return\r\nChoice: "); OLC_MODE(d)=MEDIT_AI_DIALOGUE; }
+static const char *ai_trait_summaries[AI_ACTOR_PERSONALITIES] = {
+  "Stored trait; currently contributes to personality response calculations.",
+  "Stored trait; currently contributes to personality response calculations.",
+  "Stored trait; currently contributes to personality response calculations.",
+  "Stored trait; currently contributes to personality response calculations.",
+  "Stored trait; currently contributes to personality response calculations.",
+  "Stored trait; currently contributes to personality response calculations.",
+  "Stored trait; currently contributes to personality response calculations.",
+  "Stored trait; currently contributes to personality response calculations.",
+  "Stored trait; currently contributes to personality response calculations.",
+  "Stored trait; currently contributes to personality response calculations.",
+  "Stored trait; currently contributes to personality response calculations.",
+  "Stored trait; currently contributes to personality response calculations."
+};
+static void medit_disp_ai_personality(struct descriptor_data *d)
+{
+  struct mob_ai_config *c = OLC_MOB(d)->ai_config; int i;
+  write_to_output(d, "\r\nAI Actor Personality (stored scores, 0-100)\r\n");
+  for (i = 0; i < AI_ACTOR_PERSONALITIES; i++)
+    write_to_output(d, "%c) %-12s: %d\r\n   %s\r\n", i < 9 ? '1' + i : 'A' + i - 9,
+                    ai_trait_names[i], c->personality[i], ai_trait_summaries[i]);
+  write_to_output(d, "P) Apply Preset\r\nH) Help  Q) Return\r\nChoice: "); OLC_MODE(d)=MEDIT_AI_PERSONALITY;
+}
+static void medit_disp_ai_social(struct descriptor_data *d)
+{
+  struct mob_ai_config*c=OLC_MOB(d)->ai_config;
+  write_to_output(d, "\r\nAI Actor Social Behavior\r\n1) Style: %s\r\n   Selects the stored social style used by the social profile.\r\n2) Greeting: %s\r\n   Enables greeting responses when a runtime greeting is selected.\r\n3) Ambient speech: %s\r\n   Enables idle speech selections; requires authored ambient speech lines.\r\n4) Ambient emotes: %s\r\n   Enables idle emote selections; requires authored ambient emote lines.\r\n5) Whisper replies: %s\r\n   Enables social replies to whispers.\r\n6) Respond strangers: %s\r\n   Allows social responses for unknown actors.\r\n7) Respond trusted: %s\r\n   Allows social responses for trusted actors.\r\n8) Respond feared: %s\r\n   Allows social responses for feared actors.\r\n9) Respond hostile: %s\r\n   Allows social responses for hostile actors.\r\nA) Speech cooldown: %d\r\n   Minimum seconds between speech.\r\nB) Room cooldown: %d\r\n   Minimum seconds between room speech.\r\nC) Emote cooldown: %d\r\n   Minimum seconds between emotes.\r\nH) Help  Q) Return\r\nChoice: ",ai_social_style_name(c->social),c->greeting_enabled?"Yes":"No",c->ambient_speech_enabled?"Yes":"No",c->ambient_emotes_enabled?"Yes":"No",c->whisper_enabled?"Yes":"No",c->respond_strangers?"Yes":"No",c->respond_trusted?"Yes":"No",c->respond_feared?"Yes":"No",c->respond_hostile?"Yes":"No",c->speech_cooldown,c->room_speech_cooldown,c->emote_cooldown); OLC_MODE(d)=MEDIT_AI_SOCIAL;
+}
+static const char *ai_dialogue_summaries[AI_DIALOGUE_CATEGORIES] = {
+ "Entry greeting.", "Positive social response.", "Suspicious social response.", "Hostile social response.", "Idle spoken line.", "Idle descriptive action.", "Departure response.", "Warning response.", "Challenge response.", "Threat response.", "Call-for-help response.", "Fear response.", "Schedule departure line.", "Schedule arrival line.", "Schedule work line.", "Schedule guard line.", "Schedule patrol line.", "Schedule sleep line.", "Schedule wake line.", "Schedule failure line."
+};
+static void medit_disp_ai_dialogue_lines(struct descriptor_data *d, int category) { struct mob_ai_config *c=OLC_MOB(d)->ai_config; int i; write_to_output(d,"\r\n%s dialogue (%d/%d authored entries)\r\n%s\r\n",ai_dialogue_category_name(category),c->dialogue_count[category],AI_DIALOGUE_MAX_LINES,ai_dialogue_summaries[category]); for(i=0;i<c->dialogue_count[category];i++) write_to_output(d," %d) %s\r\n",i+1,c->dialogue[category][i]); write_to_output(d,"A) Add  E <line>) Edit  D <line>) Delete  U <line>) Move up  N <line>) Move down\r\nH) Help  Q) Categories\r\nChoice: "); OLC_MODE(d)=MEDIT_AI_DIALOGUE; }
+static void medit_disp_ai_dialogue(struct descriptor_data *d) { struct mob_ai_config*c=OLC_MOB(d)->ai_config; int i; write_to_output(d,"\r\nAI Actor Dialogue\r\nEach count is authored entries out of the maximum of %d; runtime chooses from a pool when that event is used.\r\n",AI_DIALOGUE_MAX_LINES); for(i=0;i<AI_DIALOGUE_CATEGORIES;i++) write_to_output(d,"%d) %s: %d/%d\r\n   %s\r\n",i,ai_dialogue_category_name(i),c->dialogue_count[i],AI_DIALOGUE_MAX_LINES,ai_dialogue_summaries[i]); write_to_output(d,"H) Help  Q) Return\r\nChoice: "); OLC_MODE(d)=MEDIT_AI_DIALOGUE; }
 
 
 static const char *medit_schedule_room_name(int vnum) { room_rnum r; if (!vnum) return "None"; r=real_room(vnum); return r==NOWHERE ? "INVALID" : world[r].name; }
@@ -826,9 +881,8 @@ static void medit_disp_ai_menu(struct descriptor_data *d)
   if (!c) OLC_MOB(d)->ai_config = c = mob_ai_config_new();
   write_to_output(d,
     "\r\nAI Actor Configuration\r\n"
-    "1) Profile mode: %s\r\n2) Role: %s (%d)\r\n3) Movement: %s (%d)\r\n4) Personality\r\n5) Social behavior\r\n6) Dialogue lines\r\n7) Perception\r\n8) Memory\r\n9) Threat response\r\n0) Combat reactions\r\nS) Schedules and patrol-safe routines\r\n"
-    "P) Preview compiled profile\r\nR) Reset to inferred defaults\r\nH) Help\r\nQ) Return\r\nChoice: ",
-    c->mode == MOB_AI_CUSTOM ? "Custom" : c->mode == MOB_AI_INFERRED_OVERRIDES ? "Inferred with overrides" : "Inferred", ai_actor_config_role_name(c->role), c->role, ai_actor_config_movement_name(c->movement), c->movement);
+    "1) Profile Mode: %s\r\n   Selects inferred, custom, or inferred-with-overrides storage.\r\n2) Role: %s (%d)\r\n   %s\r\n3) Movement: %s (%d)\r\n   %s\r\n4) Personality\r\n   Stored 0-100 traits used by profile response calculations.\r\n5) Social Behavior\r\n   Enables social replies, idle lines, and their cooldowns.\r\n6) Dialogue Lines\r\n   Authors event-specific speech and emote pools (up to eight each).\r\n7) Perception\r\n   Enables room-event notices and stored sensitivity scores.\r\n8) Memory\r\n   Configures per-live-NPC relationship memory and decay.\r\n9) Threat Response\r\n   Configures supported escalation steps and their timing.\r\n0) Combat Reactions\r\n   Configures runtime combat eligibility, assistance, and targeting.\r\nS) Schedules and Patrol Routines\r\n   Configures game-hour activities, routes, and travel failure policies.\r\nP) Preview Compiled Profile\r\n   Shows the effective runtime profile after compilation.\r\nR) Reset to Inferred Defaults\r\n   Discards stored configuration so it is rebuilt from prototype data.\r\nH) Help  Q) Return\r\nChoice: ",
+    c->mode == MOB_AI_CUSTOM ? "Custom" : c->mode == MOB_AI_INFERRED_OVERRIDES ? "Inferred with overrides" : "Inferred", ai_actor_config_role_name(c->role), c->role, ai_actor_config_role_summary(c->role), ai_actor_config_movement_name(c->movement), c->movement, ai_actor_config_movement_summary(c->movement));
   OLC_MODE(d) = MEDIT_AI_MENU;
 }
 
@@ -1362,9 +1416,9 @@ void medit_parse(struct descriptor_data *d, char *arg)
   case MEDIT_AI_MENU:
     switch (LOWER(*arg)) {
       case 'q': medit_disp_menu(d); return;
-      case '1': OLC_MODE(d) = MEDIT_AI_MODE; write_to_output(d, "\r\nAI Actor Profile Mode\r\n0) Inferred - generated from prototype data.\r\n1) Custom - use builder-authored values.\r\n2) Overrides - inferred values except marked fields.\r\nCurrent: %s\r\nQ) Return  H) Help\r\nChoice: ", OLC_MOB(d)->ai_config->mode == MOB_AI_CUSTOM ? "Custom" : OLC_MOB(d)->ai_config->mode == MOB_AI_INFERRED_OVERRIDES ? "Overrides" : "Inferred"); return;
-      case '2': OLC_MODE(d) = MEDIT_AI_ROLE; write_to_output(d, "\r\nAI Actor Role\r\n0) Unknown  1) Guard  2) Merchant  3) Bandit  4) Beast\r\n5) Undead  6) Spirit  7) Cultist  8) Civilian  9) Boss\r\nCurrent: %s\r\nQ) Return  H) Help\r\nChoice: ", ai_actor_config_role_name(OLC_MOB(d)->ai_config->role)); return;
-      case '3': OLC_MODE(d) = MEDIT_AI_MOVEMENT; write_to_output(d, "\r\nAI Actor Movement\r\n0) Stationary  1) Random  2) Patrol  3) Scheduled\r\n4) Guard room  5) Return home\r\nCurrent: %s\r\nQ) Return  H) Help\r\nChoice: ", ai_actor_config_movement_name(OLC_MOB(d)->ai_config->movement)); return;
+      case '1': medit_disp_ai_mode(d); return;
+      case '2': medit_disp_ai_role(d); return;
+      case '3': medit_disp_ai_movement(d); return;
       case '4': medit_disp_ai_personality(d); return;
       case '5': medit_disp_ai_social(d); return;
       case '6': medit_disp_ai_dialogue(d); return;
