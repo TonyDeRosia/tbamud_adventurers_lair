@@ -7,16 +7,27 @@
 #define AI_EVENT_RING_MAX 12
 #define AI_INTENT_KEYWORDS_MAX 192
 #define AI_ACTOR_PERSONALITIES 12
+#define AI_DIALOGUE_CATEGORIES 7
+#define AI_DIALOGUE_MAX_LINES 8
+#define AI_DIALOGUE_LINE_MAX 240
+#define AI_SOCIAL_COOLDOWN_MIN 1
+#define AI_SOCIAL_COOLDOWN_MAX 300
 
 enum mob_ai_profile_mode { MOB_AI_INFERRED = 0, MOB_AI_CUSTOM, MOB_AI_INFERRED_OVERRIDES };
 enum mob_ai_personality { AI_TRAIT_AGGRESSION, AI_TRAIT_BRAVERY, AI_TRAIT_SOCIABILITY, AI_TRAIT_CURIOSITY, AI_TRAIT_DISCIPLINE, AI_TRAIT_HONESTY, AI_TRAIT_GREED, AI_TRAIT_COMPASSION, AI_TRAIT_LOYALTY, AI_TRAIT_PATIENCE, AI_TRAIT_SUSPICION, AI_TRAIT_PRIDE };
+enum ai_social_style { AI_SOCIAL_SILENT, AI_SOCIAL_RESERVED, AI_SOCIAL_POLITE, AI_SOCIAL_FRIENDLY, AI_SOCIAL_TALKATIVE, AI_SOCIAL_BOASTFUL, AI_SOCIAL_RUDE, AI_SOCIAL_HOSTILE, AI_SOCIAL_EXTORTING, AI_SOCIAL_PREACHER, AI_SOCIAL_GOSSIP };
+enum ai_dialogue_category { AI_DIALOGUE_GREETING, AI_DIALOGUE_FRIENDLY, AI_DIALOGUE_SUSPICIOUS, AI_DIALOGUE_HOSTILE, AI_DIALOGUE_AMBIENT_SPEECH, AI_DIALOGUE_AMBIENT_EMOTE, AI_DIALOGUE_FAREWELL };
 enum mob_ai_config_movement { AI_MOVE_STATIONARY, AI_MOVE_RANDOM, AI_MOVE_PATROL, AI_MOVE_SCHEDULED, AI_MOVE_GUARD_ROOM, AI_MOVE_RETURN_HOME };
 struct mob_ai_config {
   int mode, role, movement, social;
   unsigned long override_mask;
   int personality[AI_ACTOR_PERSONALITIES];
   int home_room_vnum, work_room_vnum, guard_room_vnum, roam_radius, pursuit_distance, movement_delay;
-  int greeting_enabled, ambient_speech_enabled, ambient_emotes_enabled, speech_cooldown, emote_cooldown;
+  int greeting_enabled, ambient_speech_enabled, ambient_emotes_enabled, whisper_enabled;
+  int respond_strangers, respond_trusted, respond_feared, respond_hostile;
+  int speech_cooldown, room_speech_cooldown, emote_cooldown;
+  int dialogue_count[AI_DIALOGUE_CATEGORIES];
+  char *dialogue[AI_DIALOGUE_CATEGORIES][AI_DIALOGUE_MAX_LINES];
   int flee_hp_percent, surrender_hp_percent, assist_enabled, call_help_enabled, hunt_enabled, return_home, stay_zone;
 };
 #define AI_OVERRIDE_ROLE (1UL << 0)
@@ -181,6 +192,12 @@ struct ai_actor_profile {
   int movement;
   int aggression;
   int social;
+  int personality[AI_ACTOR_PERSONALITIES];
+  int greeting_enabled, ambient_speech_enabled, ambient_emotes_enabled, whisper_enabled;
+  int respond_strangers, respond_trusted, respond_feared, respond_hostile;
+  int emote_cooldown_secs;
+  int dialogue_count[AI_DIALOGUE_CATEGORIES];
+  char *dialogue[AI_DIALOGUE_CATEGORIES][AI_DIALOGUE_MAX_LINES];
   int morale;
   int home_room_vnum;
   int roam_radius;
@@ -191,7 +208,6 @@ struct ai_actor_profile {
   int hunt_enabled;
   int arrest_enabled;
   int trade_enabled;
-  int whisper_enabled;
   int assist_enabled;
   int call_help_enabled;
   int target_alignment_pref;
@@ -305,5 +321,8 @@ struct mob_ai_config *mob_ai_config_new(void);
 struct mob_ai_config *mob_ai_config_copy(const struct mob_ai_config *from);
 void mob_ai_config_free(struct mob_ai_config *config);
 void mob_ai_config_validate(struct mob_ai_config *config);
+const char *ai_social_style_name(int style);
+const char *ai_dialogue_category_name(int category);
+int mob_ai_dialogue_set(struct mob_ai_config *config, int category, int index, const char *line);
 
 #endif
