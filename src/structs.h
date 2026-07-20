@@ -1199,6 +1199,7 @@ struct room_effect_data
 
 struct ai_actor_profile;
 struct ai_actor_state;
+struct mob_ai_config;
 
 /** An affect structure. */
 struct affected_type
@@ -1238,6 +1239,7 @@ struct char_data
   struct mob_special_data mob_specials; /**< NPC specials		  */
   struct ai_actor_profile *ai_prof;     /**< AI actor derived profile */
   struct ai_actor_state *ai_state;      /**< AI actor runtime state */
+  struct mob_ai_config *ai_config;      /**< persistent AI actor prototype configuration */
 
   int pet_price; /**< Custom price for pet shop purchases (0 = default) */
 

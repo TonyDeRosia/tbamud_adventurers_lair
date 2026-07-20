@@ -74,6 +74,7 @@ static int  medit_get_mob_flag_by_number(int num);
 static void medit_disp_mob_flags(struct descriptor_data *d);
 static void medit_disp_aff_flags(struct descriptor_data *d);
 static void medit_disp_menu(struct descriptor_data *d);
+static void medit_disp_ai_menu(struct descriptor_data *d);
 static void medit_disp_loadout_menu(struct descriptor_data *d);
 static int medit_slot_required_wear_flag(int wear_pos);
 static int medit_object_can_equip_slot(struct obj_data *obj, int wear_pos);
@@ -751,6 +752,7 @@ static void medit_disp_menu(struct descriptor_data *d)
           "%sB%s) AFF Flags : %s%s\r\n"
           "%sP%s) Pet Price : %s%s\r\n"
           "%sR%s) Loadout / Loot\r\n"
+          "%sI%s) AI Actor Configuration: %s%s%s\r\n"
           "%sS%s) Script    : %s%s\r\n"
           "%sW%s) Copy mob\r\n"
           "%sX%s) Delete mob\r\n"
@@ -765,6 +767,7 @@ static void medit_disp_menu(struct descriptor_data *d)
           grn, nrm, cyn, flag2,
           grn, nrm, yel, price_buf,
           grn, nrm,
+          grn, nrm, yel, MOB_FLAGGED(mob, MOB_AI_ACTOR) ? (mob->ai_config ? "Configured" : "Inferred") : "disabled (enable AI_ACTOR flag first)", nrm,
           grn, nrm, cyn, OLC_SCRIPT(d) ?"Set.":"Not Set.",
           grn, nrm,
           grn, nrm,
@@ -772,6 +775,22 @@ static void medit_disp_menu(struct descriptor_data *d)
 	  );
 
   OLC_MODE(d) = MEDIT_MAIN_MENU;
+}
+
+static void medit_disp_ai_menu(struct descriptor_data *d)
+{
+  struct mob_ai_config *c = OLC_MOB(d)->ai_config;
+  if (!MOB_FLAGGED(OLC_MOB(d), MOB_AI_ACTOR)) {
+    write_to_output(d, "AI_ACTOR must be enabled in NPC Flags first.\r\n");
+    medit_disp_menu(d); return;
+  }
+  if (!c) OLC_MOB(d)->ai_config = c = mob_ai_config_new();
+  write_to_output(d,
+    "\r\nAI Actor Configuration\r\n"
+    "1) Profile mode: %s\r\n2) Role: %d\r\n3) Movement: %d\r\n"
+    "P) Preview compiled profile\r\nR) Reset to inferred defaults\r\nQ) Return\r\nChoice: ",
+    c->mode == MOB_AI_CUSTOM ? "Custom" : c->mode == MOB_AI_INFERRED_OVERRIDES ? "Inferred with overrides" : "Inferred", c->role, c->movement);
+  OLC_MODE(d) = MEDIT_AI_MENU;
 }
 
 /* Display main menu. */
@@ -905,7 +924,8 @@ void medit_parse(struct descriptor_data *d, char *arg)
              OLC_MODE(d) != MEDIT_LOADOUT_LOOT_CHANCE &&
              OLC_MODE(d) != MEDIT_LOADOUT_REMOVE_EQUIP &&
              OLC_MODE(d) != MEDIT_LOADOUT_REMOVE_INV &&
-             OLC_MODE(d) != MEDIT_LOADOUT_REMOVE_LOOT) {
+             OLC_MODE(d) != MEDIT_LOADOUT_REMOVE_LOOT &&
+             OLC_MODE(d) != MEDIT_AI_MENU) {
     char *endptr = NULL;
     long parsed;
 
@@ -1025,6 +1045,10 @@ void medit_parse(struct descriptor_data *d, char *arg)
     case 'r':
     case 'R':
       medit_disp_loadout_menu(d);
+      return;
+    case 'i':
+    case 'I':
+      medit_disp_ai_menu(d);
       return;
     case 'w':
     case 'W':
@@ -1251,6 +1275,25 @@ void medit_parse(struct descriptor_data *d, char *arg)
     }
     medit_disp_mob_flags(d);
     return;
+
+  case MEDIT_AI_MENU:
+    switch (LOWER(*arg)) {
+      case 'q': medit_disp_menu(d); return;
+      case '1': OLC_MODE(d) = MEDIT_AI_MODE; write_to_output(d, "Mode (0 Inferred, 1 Custom, 2 Overrides): "); return;
+      case '2': OLC_MODE(d) = MEDIT_AI_ROLE; write_to_output(d, "Role (0-9): "); return;
+      case '3': OLC_MODE(d) = MEDIT_AI_MOVEMENT; write_to_output(d, "Movement (0 Stationary, 1 Random, 2 Patrol, 3 Scheduled, 4 Guard, 5 Home): "); return;
+      case 'r': mob_ai_config_free(OLC_MOB(d)->ai_config); OLC_MOB(d)->ai_config = NULL; OLC_VAL(d) = 1; medit_disp_ai_menu(d); return;
+      case 'p': ai_actor_refresh_profile(OLC_MOB(d), TRUE); write_to_output(d, "Compiled role %d, movement %d, social %d.\r\n", OLC_MOB(d)->ai_prof->role, OLC_MOB(d)->ai_prof->movement, OLC_MOB(d)->ai_prof->social); medit_disp_ai_menu(d); return;
+      default: medit_disp_ai_menu(d); return;
+    }
+  case MEDIT_AI_MODE:
+  case MEDIT_AI_ROLE:
+  case MEDIT_AI_MOVEMENT:
+    if (!OLC_MOB(d)->ai_config) OLC_MOB(d)->ai_config = mob_ai_config_new();
+    if (OLC_MODE(d) == MEDIT_AI_MODE) OLC_MOB(d)->ai_config->mode = atoi(arg);
+    else if (OLC_MODE(d) == MEDIT_AI_ROLE) { OLC_MOB(d)->ai_config->role = atoi(arg); OLC_MOB(d)->ai_config->override_mask |= AI_OVERRIDE_ROLE; }
+    else { OLC_MOB(d)->ai_config->movement = atoi(arg); OLC_MOB(d)->ai_config->override_mask |= AI_OVERRIDE_MOVEMENT; }
+    mob_ai_config_validate(OLC_MOB(d)->ai_config); OLC_VAL(d) = 1; medit_disp_ai_menu(d); return;
 
   case MEDIT_AFF_FLAGS:
     if ((i = atoi(arg)) <= 0)

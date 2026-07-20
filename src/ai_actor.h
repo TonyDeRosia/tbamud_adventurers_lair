@@ -6,6 +6,23 @@
 #define AI_MEM_MAX 12
 #define AI_EVENT_RING_MAX 12
 #define AI_INTENT_KEYWORDS_MAX 192
+#define AI_ACTOR_PERSONALITIES 12
+
+enum mob_ai_profile_mode { MOB_AI_INFERRED = 0, MOB_AI_CUSTOM, MOB_AI_INFERRED_OVERRIDES };
+enum mob_ai_personality { AI_TRAIT_AGGRESSION, AI_TRAIT_BRAVERY, AI_TRAIT_SOCIABILITY, AI_TRAIT_CURIOSITY, AI_TRAIT_DISCIPLINE, AI_TRAIT_HONESTY, AI_TRAIT_GREED, AI_TRAIT_COMPASSION, AI_TRAIT_LOYALTY, AI_TRAIT_PATIENCE, AI_TRAIT_SUSPICION, AI_TRAIT_PRIDE };
+enum mob_ai_config_movement { AI_MOVE_STATIONARY, AI_MOVE_RANDOM, AI_MOVE_PATROL, AI_MOVE_SCHEDULED, AI_MOVE_GUARD_ROOM, AI_MOVE_RETURN_HOME };
+struct mob_ai_config {
+  int mode, role, movement, social;
+  unsigned long override_mask;
+  int personality[AI_ACTOR_PERSONALITIES];
+  int home_room_vnum, work_room_vnum, guard_room_vnum, roam_radius, pursuit_distance, movement_delay;
+  int greeting_enabled, ambient_speech_enabled, ambient_emotes_enabled, speech_cooldown, emote_cooldown;
+  int flee_hp_percent, surrender_hp_percent, assist_enabled, call_help_enabled, hunt_enabled, return_home, stay_zone;
+};
+#define AI_OVERRIDE_ROLE (1UL << 0)
+#define AI_OVERRIDE_MOVEMENT (1UL << 1)
+#define AI_OVERRIDE_SOCIAL (1UL << 2)
+#define AI_OVERRIDE_TRAITS (1UL << 3)
 
 #define AI_PROFILE_INCONSISTENT (1 << 0)
 
@@ -284,5 +301,9 @@ void ai_actor_event_corpse(struct char_data *dead, room_rnum room);
 void ai_actor_event_drop(struct char_data *actor, struct obj_data *obj);
 void ai_actor_event_give(struct char_data *actor, struct char_data *to, struct obj_data *obj);
 void ai_actor_schedule_reaction_speech(struct char_data *mob, struct char_data *target, const char *msg);
+struct mob_ai_config *mob_ai_config_new(void);
+struct mob_ai_config *mob_ai_config_copy(const struct mob_ai_config *from);
+void mob_ai_config_free(struct mob_ai_config *config);
+void mob_ai_config_validate(struct mob_ai_config *config);
 
 #endif
