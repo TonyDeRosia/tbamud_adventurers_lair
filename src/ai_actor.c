@@ -11,11 +11,13 @@
 #include "ai_actor_brain.h"
 #include "npc_social_ai.h"
 #include "fight.h"
+#include "act.h"
 
 ACMD(do_say);
 #define AI_CLAMP(value, low, high) ((value) < (low) ? (low) : ((value) > (high) ? (high) : (value)))
 
 static void ai_actor_threat_event(struct char_data *mob, struct char_data *actor, int base, int confidence, time_t now);
+static struct ai_actor_memory_entry *ai_threat_memory(struct char_data *mob, long id);
 
 static const char *social_names[] = { "Silent", "Reserved", "Polite", "Friendly", "Talkative", "Boastful", "Rude", "Hostile", "Extorting", "Preacher", "Gossip" };
 static const char *dialogue_names[] = { "Greeting", "Friendly response", "Suspicious response", "Hostile response", "Ambient speech", "Ambient emote", "Farewell", "Warning", "Challenge", "Threat", "Call for help", "Fear" };
@@ -36,6 +38,9 @@ struct mob_ai_config *mob_ai_config_new(void)
   c->remember_attacks=c->remember_assistance=c->remember_crimes=c->remember_gifts=c->remember_insults=c->remember_conversations=c->remember_threats=c->remember_last_room=c->remember_deaths=TRUE;
   c->threat_enabled[AI_THREAT_OBSERVE]=c->threat_enabled[AI_THREAT_WARN]=c->threat_enabled[AI_THREAT_CHALLENGE]=c->threat_enabled[AI_THREAT_CALL_HELP]=c->threat_enabled[AI_THREAT_ASSIST]=c->threat_enabled[AI_THREAT_ATTACK]=c->threat_enabled[AI_THREAT_FLEE]=TRUE;
   c->threat_cooldown=10; c->calm_reset_time=120; c->repeated_event_window=90;
+  c->combat_style=AI_COMBAT_BALANCED; c->combat_enabled=TRUE; c->may_initiate=TRUE; c->may_assist=TRUE; c->may_call_help=TRUE; c->may_flee=TRUE;
+  c->protect_trusted=c->protect_group=TRUE; c->avoid_incapacitated=c->retaliate_self=c->retaliate_ally=c->retaliate_hostile=c->switch_targets=TRUE;
+  c->assist_severity=60; c->target_switch_threshold=25; c->max_allies=4; c->max_responders=2; c->combat_cooldown=10;
   c->threat_step_count=5; { static const int defaults[5][3]={{AI_THREAT_OBSERVE,10,10},{AI_THREAT_WARN,25,30},{AI_THREAT_CHALLENGE,45,30},{AI_THREAT_CALL_HELP,60,60},{AI_THREAT_ATTACK,80,0}}; for(i=0;i<5;i++){c->threat_steps[i].type=defaults[i][0];c->threat_steps[i].minimum_severity=defaults[i][1];c->threat_steps[i].cooldown=defaults[i][2];c->threat_steps[i].max_repetitions=1;} }
   for (i = 0; i < AI_ACTOR_PERSONALITIES; i++) c->personality[i] = 50;
   return c;
@@ -58,7 +63,7 @@ int mob_ai_dialogue_move(struct mob_ai_config *c, int k, int from, int to)
 int ai_actor_personality_response_modifier(const int p[AI_ACTOR_PERSONALITIES])
 { static const int weight[AI_ACTOR_PERSONALITIES] = { -2, 1, 3, 1, -1, 1, -1, 2, 1, 1, -3, 2 }; int i, score=0; if (!p) return 0; for (i=0;i<AI_ACTOR_PERSONALITIES;i++) score += (p[i]-50)*weight[i]; return AI_CLAMP(score/10, -35, 35); }
 void mob_ai_config_validate(struct mob_ai_config *c)
-{ int i,k; if (!c) return; c->mode=AI_CLAMP(c->mode,MOB_AI_INFERRED,MOB_AI_INFERRED_OVERRIDES); c->role=AI_CLAMP(c->role,ROLE_UNKNOWN,ROLE_BOSS); c->movement=AI_CLAMP(c->movement,AI_MOVE_STATIONARY,AI_MOVE_RETURN_HOME); c->social=AI_CLAMP(c->social,AI_SOCIAL_SILENT,AI_SOCIAL_GOSSIP); c->roam_radius=AI_CLAMP(c->roam_radius,0,100); c->pursuit_distance=AI_CLAMP(c->pursuit_distance,0,100); c->movement_delay=AI_CLAMP(c->movement_delay,1,60); c->speech_cooldown=AI_CLAMP(c->speech_cooldown,AI_SOCIAL_COOLDOWN_MIN,AI_SOCIAL_COOLDOWN_MAX); c->room_speech_cooldown=AI_CLAMP(c->room_speech_cooldown,AI_SOCIAL_COOLDOWN_MIN,AI_SOCIAL_COOLDOWN_MAX); c->emote_cooldown=AI_CLAMP(c->emote_cooldown,AI_SOCIAL_COOLDOWN_MIN,AI_SOCIAL_COOLDOWN_MAX); c->flee_hp_percent=AI_CLAMP(c->flee_hp_percent,0,100); c->surrender_hp_percent=AI_CLAMP(c->surrender_hp_percent,0,100); for(i=0;i<AI_ACTOR_PERSONALITIES;i++) c->personality[i]=AI_CLAMP(c->personality[i],0,100); for(k=0;k<AI_DIALOGUE_CATEGORIES;k++) c->dialogue_count[k]=AI_CLAMP(c->dialogue_count[k],0,AI_DIALOGUE_MAX_LINES); c->hearing_sensitivity=AI_CLAMP(c->hearing_sensitivity,0,100); c->observation_sensitivity=AI_CLAMP(c->observation_sensitivity,0,100); c->suspicion_threshold=AI_CLAMP(c->suspicion_threshold,0,100); c->recognition_confidence=AI_CLAMP(c->recognition_confidence,0,100); c->memory_max_actors=AI_CLAMP(c->memory_max_actors,1,AI_MEM_MAX); c->memory_ordinary_duration=AI_CLAMP(c->memory_ordinary_duration,1,1440); c->memory_important_duration=AI_CLAMP(c->memory_important_duration,c->memory_ordinary_duration,10080); c->trust_gain=AI_CLAMP(c->trust_gain,0,200); c->trust_loss=AI_CLAMP(c->trust_loss,0,200); c->fear_gain=AI_CLAMP(c->fear_gain,0,200); c->hostility_gain=AI_CLAMP(c->hostility_gain,0,200); c->familiarity_gain=AI_CLAMP(c->familiarity_gain,0,200); c->fear_decay=AI_CLAMP(c->fear_decay,0,100); c->hostility_decay=AI_CLAMP(c->hostility_decay,0,100); c->familiarity_decay=AI_CLAMP(c->familiarity_decay,0,100); c->forgiveness=AI_CLAMP(c->forgiveness,0,100); c->threat_cooldown=AI_CLAMP(c->threat_cooldown,1,300); c->calm_reset_time=AI_CLAMP(c->calm_reset_time,1,3600); c->repeated_event_window=AI_CLAMP(c->repeated_event_window,1,600); c->threat_step_count=AI_CLAMP(c->threat_step_count,0,AI_THREAT_STEP_MAX); for(i=0;i<AI_THREAT_RESPONSE_MAX;i++) c->threat_enabled[i]=!!c->threat_enabled[i]; for(i=0;i<c->threat_step_count;i++){ c->threat_steps[i].minimum_severity=AI_CLAMP(c->threat_steps[i].minimum_severity,0,100); c->threat_steps[i].cooldown=AI_CLAMP(c->threat_steps[i].cooldown,0,300); c->threat_steps[i].max_repetitions=AI_CLAMP(c->threat_steps[i].max_repetitions,1,10); c->threat_steps[i].advance_on_failure=!!c->threat_steps[i].advance_on_failure; } }
+{ int i,k; if (!c) return; c->combat_style=AI_CLAMP(c->combat_style,AI_COMBAT_PASSIVE,AI_COMBAT_BOSS); c->assist_severity=AI_CLAMP(c->assist_severity,0,100); c->target_switch_threshold=AI_CLAMP(c->target_switch_threshold,0,100); c->max_allies=AI_CLAMP(c->max_allies,0,10); c->max_responders=AI_CLAMP(c->max_responders,0,10); c->combat_cooldown=AI_CLAMP(c->combat_cooldown,1,300); for(i=0;i<AI_TARGET_WEIGHTS;i++) c->target_weight[i]=AI_CLAMP(c->target_weight[i],-100,100); c->mode=AI_CLAMP(c->mode,MOB_AI_INFERRED,MOB_AI_INFERRED_OVERRIDES); c->role=AI_CLAMP(c->role,ROLE_UNKNOWN,ROLE_BOSS); c->movement=AI_CLAMP(c->movement,AI_MOVE_STATIONARY,AI_MOVE_RETURN_HOME); c->social=AI_CLAMP(c->social,AI_SOCIAL_SILENT,AI_SOCIAL_GOSSIP); c->roam_radius=AI_CLAMP(c->roam_radius,0,100); c->pursuit_distance=AI_CLAMP(c->pursuit_distance,0,100); c->movement_delay=AI_CLAMP(c->movement_delay,1,60); c->speech_cooldown=AI_CLAMP(c->speech_cooldown,AI_SOCIAL_COOLDOWN_MIN,AI_SOCIAL_COOLDOWN_MAX); c->room_speech_cooldown=AI_CLAMP(c->room_speech_cooldown,AI_SOCIAL_COOLDOWN_MIN,AI_SOCIAL_COOLDOWN_MAX); c->emote_cooldown=AI_CLAMP(c->emote_cooldown,AI_SOCIAL_COOLDOWN_MIN,AI_SOCIAL_COOLDOWN_MAX); c->flee_hp_percent=AI_CLAMP(c->flee_hp_percent,0,100); c->surrender_hp_percent=AI_CLAMP(c->surrender_hp_percent,0,100); for(i=0;i<AI_ACTOR_PERSONALITIES;i++) c->personality[i]=AI_CLAMP(c->personality[i],0,100); for(k=0;k<AI_DIALOGUE_CATEGORIES;k++) c->dialogue_count[k]=AI_CLAMP(c->dialogue_count[k],0,AI_DIALOGUE_MAX_LINES); c->hearing_sensitivity=AI_CLAMP(c->hearing_sensitivity,0,100); c->observation_sensitivity=AI_CLAMP(c->observation_sensitivity,0,100); c->suspicion_threshold=AI_CLAMP(c->suspicion_threshold,0,100); c->recognition_confidence=AI_CLAMP(c->recognition_confidence,0,100); c->memory_max_actors=AI_CLAMP(c->memory_max_actors,1,AI_MEM_MAX); c->memory_ordinary_duration=AI_CLAMP(c->memory_ordinary_duration,1,1440); c->memory_important_duration=AI_CLAMP(c->memory_important_duration,c->memory_ordinary_duration,10080); c->trust_gain=AI_CLAMP(c->trust_gain,0,200); c->trust_loss=AI_CLAMP(c->trust_loss,0,200); c->fear_gain=AI_CLAMP(c->fear_gain,0,200); c->hostility_gain=AI_CLAMP(c->hostility_gain,0,200); c->familiarity_gain=AI_CLAMP(c->familiarity_gain,0,200); c->fear_decay=AI_CLAMP(c->fear_decay,0,100); c->hostility_decay=AI_CLAMP(c->hostility_decay,0,100); c->familiarity_decay=AI_CLAMP(c->familiarity_decay,0,100); c->forgiveness=AI_CLAMP(c->forgiveness,0,100); c->threat_cooldown=AI_CLAMP(c->threat_cooldown,1,300); c->calm_reset_time=AI_CLAMP(c->calm_reset_time,1,3600); c->repeated_event_window=AI_CLAMP(c->repeated_event_window,1,600); c->threat_step_count=AI_CLAMP(c->threat_step_count,0,AI_THREAT_STEP_MAX); for(i=0;i<AI_THREAT_RESPONSE_MAX;i++) c->threat_enabled[i]=!!c->threat_enabled[i]; for(i=0;i<c->threat_step_count;i++){ c->threat_steps[i].minimum_severity=AI_CLAMP(c->threat_steps[i].minimum_severity,0,100); c->threat_steps[i].cooldown=AI_CLAMP(c->threat_steps[i].cooldown,0,300); c->threat_steps[i].max_repetitions=AI_CLAMP(c->threat_steps[i].max_repetitions,1,10); c->threat_steps[i].advance_on_failure=!!c->threat_steps[i].advance_on_failure; } }
 
 static void ai_actor_sync_profile(struct char_data *mob)
 {
@@ -96,8 +101,12 @@ static void ai_actor_sync_profile(struct char_data *mob)
     mob->ai_prof->talk_cooldown_secs = c->speech_cooldown; mob->ai_prof->room_talk_cooldown_secs=c->room_speech_cooldown; mob->ai_prof->emote_cooldown_secs=c->emote_cooldown;
     memcpy(mob->ai_prof->dialogue_count,c->dialogue_count,sizeof(c->dialogue_count));
     { int dk,di; for(dk=0;dk<AI_DIALOGUE_CATEGORIES;dk++) for(di=0;di<AI_DIALOGUE_MAX_LINES;di++) mob->ai_prof->dialogue[dk][di]=c->dialogue[dk][di]; }
-    mob->ai_prof->assist_enabled = c->assist_enabled;
-    mob->ai_prof->call_help_enabled = c->call_help_enabled;
+    mob->ai_prof->assist_enabled = c->may_assist;
+    mob->ai_prof->call_help_enabled = c->may_call_help;
+    mob->ai_prof->combat_style=c->combat_style; mob->ai_prof->combat_enabled=c->combat_enabled; mob->ai_prof->may_initiate=c->may_initiate; mob->ai_prof->may_assist=c->may_assist; mob->ai_prof->may_call_help=c->may_call_help; mob->ai_prof->may_flee=c->may_flee;
+    mob->ai_prof->protect_trusted=c->protect_trusted; mob->ai_prof->protect_group=c->protect_group; mob->ai_prof->protect_same_role=c->protect_same_role; mob->ai_prof->protect_same_prototype=c->protect_same_prototype;
+    mob->ai_prof->avoid_incapacitated=c->avoid_incapacitated; mob->ai_prof->retaliate_self=c->retaliate_self; mob->ai_prof->retaliate_ally=c->retaliate_ally; mob->ai_prof->retaliate_hostile=c->retaliate_hostile; mob->ai_prof->switch_targets=c->switch_targets;
+    mob->ai_prof->assist_severity=c->assist_severity; mob->ai_prof->target_switch_threshold=c->target_switch_threshold; mob->ai_prof->max_allies=c->max_allies; mob->ai_prof->max_responders=c->max_responders; mob->ai_prof->combat_cooldown=c->combat_cooldown; memcpy(mob->ai_prof->target_weight,c->target_weight,sizeof(c->target_weight));
     mob->ai_prof->hunt_enabled = c->hunt_enabled;
     memcpy(&mob->ai_prof->notice_entry, &c->notice_entry, sizeof(c->notice_entry));
     memcpy(&mob->ai_prof->memory_enabled, &c->memory_enabled, sizeof(c->memory_enabled));
@@ -180,6 +189,57 @@ static void ai_social_say(struct char_data *mob, int category, const char *fallb
 static void ai_social_emote(struct char_data *mob, time_t now)
 { const char *line=ai_pick_dialogue(mob,AI_DIALOGUE_AMBIENT_EMOTE,TRUE); char buf[MAX_STRING_LENGTH]; if(!line)return; snprintf(buf,sizeof(buf),"$n %s.",line); act(buf,TRUE,mob,0,0,TO_ROOM); mob->ai_state->last_emote_time=now; }
 
+int ai_actor_is_local_ally(struct char_data *mob, struct char_data *other, const char **reason)
+{
+  struct ai_actor_memory_entry *m;
+  if (reason) *reason = "unrelated";
+  if (!mob || !other || mob == other || IN_ROOM(mob) != IN_ROOM(other)) return FALSE;
+  if (mob->master == other || other->master == mob || (mob->master && mob->master == other->master)) { if(reason)*reason="master/follower"; return TRUE; }
+  if (mob->ai_prof && mob->ai_prof->protect_same_prototype && IS_NPC(mob) && IS_NPC(other) && GET_MOB_RNUM(mob) == GET_MOB_RNUM(other)) { if(reason)*reason="same prototype"; return TRUE; }
+  if (mob->ai_prof && mob->ai_prof->protect_same_role && other->ai_prof && mob->ai_prof->role == other->ai_prof->role) { if(reason)*reason="same role"; return TRUE; }
+  m=ai_threat_memory(mob, GET_IDNUM(other));
+  if (mob->ai_prof && mob->ai_prof->protect_trusted && m && ai_actor_relationship(m) == AI_REL_TRUSTED) { if(reason)*reason="trusted memory"; return TRUE; }
+  return FALSE;
+}
+
+int ai_actor_target_score(struct char_data *mob, struct char_data *candidate)
+{
+  struct ai_actor_memory_entry *m; int score=0, hp;
+  if (!mob || !candidate || mob == candidate || IN_ROOM(mob) == NOWHERE || IN_ROOM(mob) != IN_ROOM(candidate) || DEAD(candidate) || !CAN_SEE(mob,candidate) || ROOM_FLAGGED(IN_ROOM(mob), ROOM_PEACEFUL)) return -100000;
+  if (mob->ai_prof->avoid_incapacitated && GET_POS(candidate) < POS_FIGHTING) return -100000;
+  m=ai_threat_memory(mob,GET_IDNUM(candidate)); hp=GET_MAX_HIT(candidate) ? GET_HIT(candidate)*100/GET_MAX_HIT(candidate) : 100;
+  if (FIGHTING(candidate)==mob) score+=mob->ai_prof->target_weight[AI_TARGET_CURRENT_ATTACKER];
+  if (m && ai_actor_relationship(m)>=AI_REL_HOSTILE) score+=mob->ai_prof->target_weight[AI_TARGET_KNOWN_HOSTILE]+m->threat_severity;
+  score+=mob->ai_prof->target_weight[AI_TARGET_LOW_HEALTH]*(100-hp)/100;
+  score+=IS_NPC(candidate)?mob->ai_prof->target_weight[AI_TARGET_NPC]:mob->ai_prof->target_weight[AI_TARGET_PLAYER];
+  if (mob->ai_state && mob->ai_state->last_selected_target_idnum==GET_IDNUM(candidate)) score+=mob->ai_prof->target_weight[AI_TARGET_PREVIOUS];
+  if (mob->ai_prof->combat_style==AI_COMBAT_OPPORTUNIST) score+=(100-hp)/4;
+  return score;
+}
+
+int ai_actor_should_flee(struct char_data *mob)
+{
+  int hp, threshold;
+  if (!mob || !mob->ai_prof || !FIGHTING(mob) || !mob->ai_prof->may_flee || MOB_FLAGGED(mob,MOB_SENTINEL) || !GET_MAX_HIT(mob)) return FALSE;
+  threshold=mob->ai_prof->flee_hp_percent; if (!threshold) return FALSE;
+  if (mob->ai_prof->combat_style==AI_COMBAT_COWARDLY) threshold+=20;
+  if (mob->ai_prof->combat_style==AI_COMBAT_FANATICAL || mob->ai_prof->combat_style==AI_COMBAT_BOSS) threshold-=15;
+  threshold += (mob->ai_prof->personality[AI_TRAIT_SUSPICION]-mob->ai_prof->personality[AI_TRAIT_BRAVERY])/4;
+  hp=GET_HIT(mob)*100/GET_MAX_HIT(mob); return hp <= AI_CLAMP(threshold,0,100);
+}
+
+static int ai_actor_combat_tick(struct char_data *mob, time_t now)
+{
+  struct char_data *it,*best=NULL; int best_score=-100000, current_score, score;
+  if (!mob->ai_prof->combat_enabled || !FIGHTING(mob) || now-mob->ai_state->last_combat_action < mob->ai_prof->combat_cooldown) return FALSE;
+  if (ai_actor_should_flee(mob)) { do_flee(mob,"",0,0); mob->ai_state->last_combat_action=now; return TRUE; }
+  current_score=ai_actor_target_score(mob,FIGHTING(mob));
+  if (!mob->ai_prof->switch_targets) return FALSE;
+  for(it=world[IN_ROOM(mob)].people;it;it=it->next_in_room) { score=ai_actor_target_score(mob,it); if(score>best_score) { best_score=score; best=it; } }
+  if (best && best != FIGHTING(mob) && best_score >= current_score + mob->ai_prof->target_switch_threshold) { stop_fighting(mob); hit(mob,best,0); mob->ai_state->last_selected_target_idnum=GET_IDNUM(best); mob->ai_state->last_combat_action=mob->ai_state->last_target_switch=now; return TRUE; }
+  return FALSE;
+}
+
 int ai_actor_tick(struct char_data *mob, time_t now)
 {
   struct npc_social_profile p;
@@ -196,6 +256,7 @@ int ai_actor_tick(struct char_data *mob, time_t now)
   }
 
   npc_ai_build_profile(mob, &p);
+  if (ai_actor_combat_tick(mob, now)) return TRUE;
   if (mob->ai_prof->social == AI_SOCIAL_SILENT) return TRUE;
   if (mob->ai_prof->ambient_emotes_enabled && now - mob->ai_state->last_emote_time >= mob->ai_prof->emote_cooldown_secs && rand_number(1,100) <= 10 + mob->ai_prof->personality[AI_TRAIT_CURIOSITY] / 5 - mob->ai_prof->personality[AI_TRAIT_DISCIPLINE] / 10) { ai_social_emote(mob,now); return TRUE; }
   if (mob->ai_prof->ambient_speech_enabled && now - mob->ai_state->last_spoke >= mob->ai_prof->talk_cooldown_secs && now - mob->ai_state->last_room_spoke >= mob->ai_prof->room_talk_cooldown_secs && rand_number(1,100) <= 5 + mob->ai_prof->personality[AI_TRAIT_SOCIABILITY]/3 - mob->ai_prof->personality[AI_TRAIT_DISCIPLINE]/8) { ai_social_say(mob,AI_DIALOGUE_AMBIENT_SPEECH, mob->ai_prof->social == AI_SOCIAL_BOASTFUL ? "My work speaks for itself." : NULL,now); return TRUE; }
@@ -345,9 +406,18 @@ void ai_actor_event_combat_start(struct char_data *attacker, struct char_data *v
   room_rnum room;
   room = (attacker && IN_ROOM(attacker) != NOWHERE) ? IN_ROOM(attacker) : (victim ? IN_ROOM(victim) : NOWHERE);
   if (room == NOWHERE) return;
-  for (mob = world[room].people; mob; mob = mob->next_in_room)
+  for (mob = world[room].people; mob; mob = mob->next_in_room) {
+    const char *why;
     if (npc_ai_is_humanoid_social_candidate(mob) && mob->ai_prof && mob->ai_prof->notice_combat)
       npc_ai_handle_room_danger(mob, attacker, time(0));
+    if (mob != victim && mob->ai_prof && mob->ai_prof->combat_enabled && mob->ai_prof->may_assist && !FIGHTING(mob) &&
+        mob->ai_prof->notice_ally_attack && ai_actor_is_local_ally(mob, victim, &why) &&
+        !ROOM_FLAGGED(room, ROOM_PEACEFUL) && CAN_SEE(mob, attacker)) {
+      int responders=0; struct char_data *scan;
+      for(scan=world[room].people;scan;scan=scan->next_in_room) if(FIGHTING(scan)==attacker) responders++;
+      if (responders < mob->ai_prof->max_responders) hit(mob, attacker, 0); /* Standard combat entry preserves triggers and legality checks. */
+    }
+  }
 }
 
 void ai_actor_event_corpse(struct char_data *dead, room_rnum room)
