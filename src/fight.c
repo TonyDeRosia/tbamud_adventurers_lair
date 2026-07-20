@@ -723,6 +723,11 @@ void stop_fighting(struct char_data *ch)
 {
   struct char_data *temp;
 
+  /* Capture the opponent before the combat link is cleared.  The AI hook is
+   * transition-deduplicated and therefore safe for the many legacy callers. */
+  if (ch && FIGHTING(ch))
+    ai_actor_event_combat_end(ch, FIGHTING(ch), 0);
+
   if (ch == next_combat_list)
     next_combat_list = ch->next_fighting;
 
@@ -943,6 +948,11 @@ void death_cry(struct char_data *ch)
 void raw_kill(struct char_data * ch, struct char_data * killer)
 {
 struct char_data *i;
+
+  /* Must run before NPC extraction: no post-extraction AI writes. */
+  ai_actor_event_defeat(ch, killer);
+  if (killer)
+    ai_actor_event_defeat(killer, ch);
 
   if (FIGHTING(ch))
     stop_fighting(ch);

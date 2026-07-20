@@ -256,15 +256,49 @@ int ai_actor_should_flee(struct char_data *mob)
   hp=GET_HIT(mob)*100/GET_MAX_HIT(mob); return hp <= AI_CLAMP(threshold,0,100);
 }
 
+static void ai_preview_add(char *out, size_t size, const char *fmt, ...)
+{
+  va_list ap; size_t used;
+  if (!out || !size) return;
+  used=strlen(out); if (used>=size-1) return;
+  va_start(ap,fmt); vsnprintf(out+used,size-used,fmt,ap); va_end(ap);
+}
+
+void ai_actor_combat_preview(const struct mob_ai_config *c, char *out, size_t size)
+{
+  static const char *styles[] = { "Passive", "Defensive", "Balanced", "Aggressive", "Protector", "Cowardly", "Fanatical", "Opportunist", "Controller", "Boss" };
+  int i;
+  if(!out||!size)return; out[0]='\0'; if(!c){ai_preview_add(out,size,"Combat Profile: unavailable\r\n");return;}
+  ai_preview_add(out,size,"Combat Profile\r\nCombat Style: %s\r\nCombat Policy Enabled: %s\r\nEffective Initiation Policy: %s\r\nEffective Retaliation Policy: %s\r\nEffective Assistance Policy: %s\r\nEffective Call-Help Policy: %s\r\nEffective Flee Policy: %s\r\n",(c->combat_style>=0&&c->combat_style<AI_COMBAT_STYLE_MAX)?styles[c->combat_style]:"Unknown",c->combat_enabled?"Yes":"No",c->may_initiate?"Enabled":"Disabled",c->retaliate_self||c->retaliate_ally||c->retaliate_hostile?"Enabled":"Disabled",c->may_assist?"Enabled":"Disabled",c->may_call_help?"Enabled":"Disabled",c->may_flee?"Enabled":"Disabled");
+  ai_preview_add(out,size,"May Initiate:%s  May Assist:%s  May Call Help:%s  May Flee:%s\r\nRetaliate Self:%s Allies:%s Known Hostile:%s\r\nProtect Trusted:%s Group:%s Same Role:%s Same Prototype:%s  Avoid Incapacitated:%s  Avoid Civilians: Unavailable\r\nFlee HP:%d%% Assist Severity:%d Switch Threshold:%d Cooldown:%d Max Responders:%d Flee-attempt Cooldown:%d\r\n",c->may_initiate?"Yes":"No",c->may_assist?"Yes":"No",c->may_call_help?"Yes":"No",c->may_flee?"Yes":"No",c->retaliate_self?"Yes":"No",c->retaliate_ally?"Yes":"No",c->retaliate_hostile?"Yes":"No",c->protect_trusted?"Yes":"No",c->protect_group?"Yes":"No",c->protect_same_role?"Yes":"No",c->protect_same_prototype?"Yes":"No",c->avoid_incapacitated?"Yes":"No",c->flee_hp_percent,c->assist_severity,c->target_switch_threshold,c->combat_cooldown,c->max_responders,c->combat_cooldown);
+  ai_preview_add(out,size,"Style modifiers (derived): initiation 0; assist 0; flee %d; switch %d; target lock %d; current-attacker %d; protected-ally %d; known-hostile %d; health-target %d; threat-target %d\r\nTarget Weights:\r\n",c->combat_style==AI_COMBAT_COWARDLY?20:c->combat_style==AI_COMBAT_FANATICAL||c->combat_style==AI_COMBAT_BOSS?-30:0,c->combat_style==AI_COMBAT_PASSIVE?100:c->combat_style==AI_COMBAT_DEFENSIVE?20:c->combat_style==AI_COMBAT_AGGRESSIVE||c->combat_style==AI_COMBAT_CONTROLLER?-10:0,c->combat_style==AI_COMBAT_BOSS||c->combat_style==AI_COMBAT_FANATICAL?30:0,c->target_weight[0],c->target_weight[1]+c->target_weight[2],c->target_weight[3],c->target_weight[4],c->target_weight[3]);
+  for(i=0;i<AI_TARGET_WEIGHTS;i++) ai_preview_add(out,size,"  %s: %d\r\n",ai_actor_target_weight_name(i),c->target_weight[i]);
+  ai_preview_add(out,size,"Spellcaster: Unavailable; Healer: Unavailable; Ranged attacker: Unavailable; Criminal: Unavailable; Highest damage output: Unavailable\r\nCoordination: Group detection available; event-scoped responder budgeting active; maximum responders %d; help event expiry 30s; duplicate responder suppression active; recursive call-help suppression active; listener evaluation room-local; identity confidence and ally classification required.\r\nAlly reasons: Master; Follower; Group member; Trusted memory; Same role when enabled; Same prototype when enabled.\r\nLifecycle tracking: Combat start, Direct attack, Protected ally attack, Assistance, Target switch, Actor flee, Opponent flee, Opponent defeat, Actor defeat, Combat end, Help heard, Help answered.\r\nRescue: Unavailable; Surrender: Unavailable; Pursuit: Unavailable.\r\n",c->max_responders);
+}
+
+void ai_actor_combat_validate(const struct mob_ai_config *c, char *out, size_t size)
+{
+  int i, all_negative=TRUE, hostile_zero=TRUE; if(!out||!size)return; out[0]='\0'; if(!c){ai_preview_add(out,size,"ERROR: no combat profile.\r\n");return;}
+#define CVERR(x) ai_preview_add(out,size,"ERROR: %s\r\n",x)
+#define CVWARN(x) ai_preview_add(out,size,"WARNING: %s\r\n",x)
+  if(c->combat_enabled&&!c->may_initiate&&!c->retaliate_self&&!c->retaliate_ally&&!c->retaliate_hostile&&!c->may_assist)CVERR("policy has no initiation, retaliation, or assistance path");
+  if(c->may_assist&&c->max_responders==0)CVERR("assist enabled with zero responders"); if(c->may_call_help&&!c->notice_speech)CVERR("call help lacks normal communication path"); if(c->may_call_help&&c->max_responders<0)CVERR("local event budgeting unavailable"); if(c->may_flee&&c->combat_cooldown<1)CVERR("flee lacks normal dispatch cooldown"); if(c->surrender_hp_percent>0)CVERR("surrender is unavailable"); if(c->hunt_enabled)CVERR("pursuit is unavailable"); if(c->switch_targets&&c->combat_cooldown==0&&c->target_switch_threshold==0)CVERR("target switching has zero cooldown and threshold"); if(c->max_responders<0||c->max_responders>10)CVERR("responder limit outside bounds"); if(c->flee_hp_percent<0||c->flee_hp_percent>100)CVERR("flee threshold outside bounds"); if(c->assist_severity<0||c->assist_severity>100)CVERR("assist severity outside bounds"); if(c->target_switch_threshold<0||c->target_switch_threshold>100)CVERR("switch threshold outside bounds"); if(c->combat_style<0||c->combat_style>=AI_COMBAT_STYLE_MAX)CVERR("unknown combat style");
+  for(i=0;i<c->threat_step_count;i++) if(c->threat_steps[i].type<0||c->threat_steps[i].type>=AI_THREAT_RESPONSE_MAX)CVERR("threat sequence contains invalid step"); else if(!ai_threat_response_available(c->threat_steps[i].type))CVERR("threat sequence references unavailable response"); else if(!c->threat_enabled[c->threat_steps[i].type])CVERR("threat sequence references disabled response");
+  if(c->combat_style==AI_COMBAT_PASSIVE&&c->may_initiate)CVWARN("Passive style with initiation enabled"); if((c->combat_style==AI_COMBAT_FANATICAL||c->combat_style==AI_COMBAT_BOSS)&&c->flee_hp_percent>50)CVWARN("Fanatical/Boss high flee threshold"); if(c->combat_style==AI_COMBAT_COWARDLY&&!c->may_flee)CVWARN("Cowardly style with fleeing disabled"); if(c->combat_style==AI_COMBAT_PROTECTOR&&!c->protect_trusted&&!c->protect_group&&!c->protect_same_role&&!c->protect_same_prototype)CVWARN("Protector without protection categories"); if(c->may_assist&&!c->protect_trusted&&!c->protect_group&&!c->protect_same_role&&!c->protect_same_prototype)CVWARN("Assist enabled with no ally category"); if(c->protect_group&&!c->notice_ally_attack)CVWARN("Protect Group lacks ally perception"); if(c->retaliate_ally&&!c->notice_ally_attack)CVWARN("ally retaliation lacks Notice Attacks on Allies"); if(c->retaliate_hostile&&!c->memory_enabled)CVWARN("known-hostile retaliation lacks memory"); if(c->protect_trusted&&(!c->memory_enabled||!c->remember_assistance))CVWARN("trusted protection lacks retained memory"); if(c->memory_enabled==FALSE)CVWARN("lifecycle memory disabled with general memory"); if(c->remember_assistance&&!c->may_assist)CVWARN("remember assistance while assistance disabled");
+  for(i=0;i<AI_TARGET_WEIGHTS;i++){if(c->target_weight[i]>=0)all_negative=FALSE;if(i<=AI_TARGET_KNOWN_HOSTILE&&c->target_weight[i]!=0)hostile_zero=FALSE;} if(all_negative)CVWARN("all supported target weights are negative"); if(hostile_zero)CVWARN("all supported hostile target weights are zero"); if((c->combat_style==AI_COMBAT_BOSS||c->combat_style==AI_COMBAT_FANATICAL)&&c->target_weight[AI_TARGET_PREVIOUS]>0)CVWARN("previous-target weight and target lock may prevent switching"); if(c->combat_style==AI_COMBAT_AGGRESSIVE&&!c->may_initiate&&!c->retaliate_self)CVWARN("Aggressive style has no initiation or retaliation"); if(c->may_call_help&&c->max_responders<=1)CVWARN("Call Help maximum responders is one or fewer"); if(c->combat_cooldown<=2&&c->target_switch_threshold<=5)CVWARN("very low cooldown with low switch threshold"); if(!*out)ai_preview_add(out,size,"Combat validation: no errors or warnings.\r\n");
+#undef CVERR
+#undef CVWARN
+}
+
 static int ai_actor_combat_tick(struct char_data *mob, time_t now)
 {
   struct char_data *it,*best=NULL; int best_score=-100000, current_score, score;
   if (!mob->ai_prof->combat_enabled || !FIGHTING(mob) || now-mob->ai_state->last_combat_action < mob->ai_prof->combat_cooldown) return FALSE;
-  if (ai_actor_should_flee(mob) && now-mob->ai_state->last_flee_attempt >= mob->ai_prof->combat_cooldown) { mob->ai_state->last_flee_attempt=now; do_flee(mob,"",0,0); mob->ai_state->last_combat_action=now; return TRUE; }
+  if (ai_actor_should_flee(mob) && now-mob->ai_state->last_flee_attempt >= mob->ai_prof->combat_cooldown) { room_rnum before=IN_ROOM(mob); struct char_data *opponent=FIGHTING(mob); mob->ai_state->last_flee_attempt=now; do_flee(mob,"",0,0); if (IN_ROOM(mob)!=before || !FIGHTING(mob)) ai_actor_event_fled(mob,opponent,TRUE); mob->ai_state->last_combat_action=now; return TRUE; }
   current_score=ai_actor_target_score(mob,FIGHTING(mob));
   if (!mob->ai_prof->switch_targets) return FALSE;
   for(it=world[IN_ROOM(mob)].people;it;it=it->next_in_room) { score=ai_actor_target_score(mob,it); if(score>best_score) { best_score=score; best=it; } }
-  if (best && best != FIGHTING(mob) && best_score >= current_score + ai_style_switch_threshold(mob->ai_prof)) { stop_fighting(mob); hit(mob,best,0); mob->ai_state->last_selected_target_idnum=GET_IDNUM(best); mob->ai_state->last_combat_action=mob->ai_state->last_target_switch=now; return TRUE; }
+  if (best && best != FIGHTING(mob) && best_score >= current_score + ai_style_switch_threshold(mob->ai_prof)) { struct char_data *old=FIGHTING(mob); stop_fighting(mob); hit(mob,best,0); if (FIGHTING(mob)==best) { mob->ai_state->last_switch_from_id=GET_IDNUM(old); mob->ai_state->last_switch_to_id=GET_IDNUM(best); } mob->ai_state->last_selected_target_idnum=GET_IDNUM(best); mob->ai_state->last_combat_action=mob->ai_state->last_target_switch=now; return TRUE; }
   return FALSE;
 }
 
@@ -298,6 +332,45 @@ void ai_actor_record_damage(struct char_data *mob, struct char_data *actor, int 
   if (!npc_ai_is_humanoid_social_candidate(mob) || !actor || dam <= 0) return;
   npc_ai_update_memory(mob, actor, -2, 4, 8, time(0));
   ai_actor_threat_event(mob, actor, 90, 100, time(0));
+}
+
+/* Lifecycle facts are deliberately represented by the existing bounded memory
+ * entries.  State only remembers the current transition IDs, never characters. */
+static void ai_actor_lifecycle_memory(struct char_data *mob, struct char_data *other,
+                                      int trust, int hostility, int fear, time_t now)
+{
+  if (!mob || !other || !mob->ai_prof || !mob->ai_prof->memory_enabled)
+    return;
+  npc_ai_update_memory(mob, other, trust, hostility, fear, now);
+}
+
+void ai_actor_event_combat_end(struct char_data *actor, struct char_data *opponent, int reason)
+{
+  struct ai_actor_state *s;
+  if (!actor || !actor->ai_state || !actor->ai_prof) return;
+  s=actor->ai_state;
+  if (!s->combat_active || s->combat_end_recorded) return;
+  s->combat_end_recorded=TRUE; s->combat_end_reason=reason;
+  if (opponent && actor->ai_prof->memory_enabled && actor->ai_prof->remember_last_room)
+    ai_actor_lifecycle_memory(actor,opponent,0,0,0,time(0));
+  s->combat_active=FALSE; s->combat_opponent_id=0; s->last_switch_from_id=s->last_switch_to_id=0;
+}
+
+void ai_actor_event_fled(struct char_data *actor, struct char_data *opponent, int actor_fled)
+{
+  if (!actor || !actor->ai_state || !actor->ai_prof) return;
+  if (actor->ai_state->combat_end_recorded) return;
+  if (opponent && actor->ai_prof->remember_attacks)
+    ai_actor_lifecycle_memory(actor,opponent,0,actor_fled ? 1 : 2,actor_fled ? 3 : 0,time(0));
+  ai_actor_event_combat_end(actor,opponent,actor_fled ? 2 : 3);
+}
+
+void ai_actor_event_defeat(struct char_data *actor, struct char_data *opponent)
+{
+  if (!actor || !actor->ai_prof) return;
+  if (opponent && actor->ai_prof->remember_deaths)
+    ai_actor_lifecycle_memory(actor,opponent,0,4,8,time(0));
+  ai_actor_event_combat_end(actor,opponent,1);
 }
 
 void ai_actor_record_help(struct char_data *mob, struct char_data *actor, int amount)
@@ -428,9 +501,9 @@ void ai_actor_event_emote(struct char_data *actor, const char *msg)
   struct char_data *mob; if (!actor || IN_ROOM(actor)==NOWHERE) return; for(mob=world[IN_ROOM(actor)].people;mob;mob=mob->next_in_room) if (mob->ai_prof && mob->ai_prof->notice_emotes) ai_actor_on_room_event(mob, AI_EVENT_PLAYER_SAY, actor, msg);
 }
 
-static void ai_actor_dispatch_help(struct ai_help_event *e, struct char_data *caller, struct char_data *target, struct char_data *victim, int relayed, time_t now) { struct char_data *mob; const char *why; int severity; if(!e||!caller||IN_ROOM(caller)==NOWHERE)return; for(mob=world[IN_ROOM(caller)].people;mob;mob=mob->next_in_room) { if(mob==caller||!npc_ai_is_humanoid_social_candidate(mob)||!mob->ai_prof||!mob->ai_prof->combat_enabled||!mob->ai_prof->may_assist||FIGHTING(mob)||!mob->ai_prof->notice_ally_attack||!CAN_SEE(mob,caller))continue; if(!victim||!ai_actor_is_local_ally(mob,victim,&why))continue; if(!target||!CAN_SEE(mob,target)) { if(relayed||mob->ai_prof->recognition_confidence>50)continue; } severity=ai_threat_severity(70,ai_threat_memory(mob,target?GET_IDNUM(target):0),mob->ai_prof->personality,target&&CAN_SEE(mob,target)?100:45,FALSE); if(severity<mob->ai_prof->assist_severity)continue; if(mob->ai_prof->combat_style==AI_COMBAT_PASSIVE&&severity<90)continue; if(mob->ai_prof->combat_style==AI_COMBAT_COWARDLY&&strcmp(why,"trusted memory")&&strcmp(why,"master/follower")&&strcmp(why,"group member"))continue; if(!ai_help_event_admit(e,GET_IDNUM(mob),now))continue; mob->ai_state->last_help_event_id=e->id; if(target&&IN_ROOM(target)==IN_ROOM(mob)&&!ROOM_FLAGGED(IN_ROOM(mob),ROOM_PEACEFUL))hit(mob,target,0); } }
+static void ai_actor_dispatch_help(struct ai_help_event *e, struct char_data *caller, struct char_data *target, struct char_data *victim, int relayed, time_t now) { struct char_data *mob; const char *why; int severity; if(!e||!caller||IN_ROOM(caller)==NOWHERE)return; for(mob=world[IN_ROOM(caller)].people;mob;mob=mob->next_in_room) { if(mob==caller||!npc_ai_is_humanoid_social_candidate(mob)||!mob->ai_prof)continue; if(mob->ai_prof->notice_speech && mob->ai_prof->memory_enabled && mob->ai_state->last_help_heard_event_id!=e->id) { mob->ai_state->last_help_heard_event_id=e->id; if(mob->ai_prof->remember_conversations) ai_actor_lifecycle_memory(mob,caller,1,0,0,now); } if(!mob->ai_prof->combat_enabled||!mob->ai_prof->may_assist||FIGHTING(mob)||!mob->ai_prof->notice_ally_attack||!CAN_SEE(mob,caller))continue; if(!victim||!ai_actor_is_local_ally(mob,victim,&why))continue; if(!target||!CAN_SEE(mob,target)) { if(relayed||mob->ai_prof->recognition_confidence>50)continue; } severity=ai_threat_severity(70,ai_threat_memory(mob,target?GET_IDNUM(target):0),mob->ai_prof->personality,target&&CAN_SEE(mob,target)?100:45,FALSE); if(severity<mob->ai_prof->assist_severity)continue; if(mob->ai_prof->combat_style==AI_COMBAT_PASSIVE&&severity<90)continue; if(mob->ai_prof->combat_style==AI_COMBAT_COWARDLY&&strcmp(why,"trusted memory")&&strcmp(why,"master/follower")&&strcmp(why,"group member"))continue; if(!ai_help_event_admit(e,GET_IDNUM(mob),now))continue; mob->ai_state->last_help_event_id=e->id; if(target&&IN_ROOM(target)==IN_ROOM(mob)&&!ROOM_FLAGGED(IN_ROOM(mob),ROOM_PEACEFUL)) { hit(mob,target,0); if(FIGHTING(mob)==target && mob->ai_state->last_help_answered_event_id!=e->id) { mob->ai_state->last_help_answered_event_id=e->id; if(mob->ai_prof->remember_assistance) { ai_actor_lifecycle_memory(mob,victim,2,0,0,now); ai_actor_lifecycle_memory(mob,target,0,3,0,now); } } } } }
 
-void ai_actor_event_combat_start(struct char_data *attacker, struct char_data *victim) { struct char_data *mob; room_rnum room; room=(attacker&&IN_ROOM(attacker)!=NOWHERE)?IN_ROOM(attacker):(victim?IN_ROOM(victim):NOWHERE); if(room==NOWHERE)return; for(mob=world[room].people;mob;mob=mob->next_in_room) if(npc_ai_is_humanoid_social_candidate(mob)&&mob->ai_prof&&mob->ai_prof->notice_combat) npc_ai_handle_room_danger(mob,attacker,time(0)); { struct ai_help_event *event=ai_help_event_new(victim,attacker,victim,time(0)); ai_actor_dispatch_help(event,victim,attacker,victim,FALSE,time(0)); } }
+void ai_actor_event_combat_start(struct char_data *attacker, struct char_data *victim) { struct char_data *mob; room_rnum room; time_t now=time(0); room=(attacker&&IN_ROOM(attacker)!=NOWHERE)?IN_ROOM(attacker):(victim?IN_ROOM(victim):NOWHERE); if(room==NOWHERE)return; if(attacker&&attacker->ai_state&&!attacker->ai_state->combat_active) { attacker->ai_state->combat_active=TRUE; attacker->ai_state->combat_end_recorded=FALSE; attacker->ai_state->combat_event_id++; attacker->ai_state->combat_opponent_id=victim?GET_IDNUM(victim):0; attacker->ai_state->combat_started_at=now; if(victim&&attacker->ai_prof&&attacker->ai_prof->remember_attacks) ai_actor_lifecycle_memory(attacker,victim,0,1,0,now); } if(victim&&victim->ai_state&&!victim->ai_state->combat_active) { victim->ai_state->combat_active=TRUE; victim->ai_state->combat_end_recorded=FALSE; victim->ai_state->combat_event_id++; victim->ai_state->combat_opponent_id=attacker?GET_IDNUM(attacker):0; victim->ai_state->combat_started_at=now; } for(mob=world[room].people;mob;mob=mob->next_in_room) if(npc_ai_is_humanoid_social_candidate(mob)&&mob->ai_prof&&mob->ai_prof->notice_combat) npc_ai_handle_room_danger(mob,attacker,now); { struct ai_help_event *event=ai_help_event_new(victim,attacker,victim,now); ai_actor_dispatch_help(event,victim,attacker,victim,FALSE,now); } }
 
 void ai_actor_event_corpse(struct char_data *dead, room_rnum room)
 {
@@ -447,7 +520,7 @@ void ai_actor_event_give(struct char_data *actor, struct char_data *to, struct o
   (void)obj; if (!actor || !to || !npc_ai_is_humanoid_social_candidate(to) || !to->ai_prof || !to->ai_prof->notice_gifts || !to->ai_prof->memory_enabled || !to->ai_prof->remember_gifts) return; npc_ai_update_memory(to,actor,to->ai_prof->trust_gain/25,0,0,time(0));
 }
 
-void ai_actor_event_attack(struct char_data *attacker, struct char_data *victim, int damage) { if (!attacker || !victim || !npc_ai_is_humanoid_social_candidate(victim) || !victim->ai_prof || !victim->ai_prof->notice_self_attack || !victim->ai_prof->remember_attacks) return; ai_actor_record_damage(victim,attacker,damage); }
+void ai_actor_event_attack(struct char_data *attacker, struct char_data *victim, int damage) { struct char_data *mob; const char *why; if (!attacker || !victim) return; if (npc_ai_is_humanoid_social_candidate(victim) && victim->ai_prof && victim->ai_prof->notice_self_attack && victim->ai_prof->remember_attacks) ai_actor_record_damage(victim,attacker,damage); if(IN_ROOM(victim)==NOWHERE)return; for(mob=world[IN_ROOM(victim)].people;mob;mob=mob->next_in_room) if(mob!=victim&&npc_ai_is_humanoid_social_candidate(mob)&&mob->ai_prof&&mob->ai_prof->notice_ally_attack&&mob->ai_prof->remember_attacks&&ai_actor_is_local_ally(mob,victim,&why)&&CAN_SEE(mob,attacker)) ai_actor_lifecycle_memory(mob,attacker,0,3,2,time(0)); }
 void ai_actor_event_crime(struct char_data *criminal, int flags) { if(!criminal||IN_ROOM(criminal)==NOWHERE)return; { struct char_data *m; for(m=world[IN_ROOM(criminal)].people;m;m=m->next_in_room) if(npc_ai_is_humanoid_social_candidate(m)&&m->ai_prof&&m->ai_prof->notice_crimes&&m->ai_prof->remember_crimes) ai_actor_record_crime(m,criminal,flags); } }
 
 void ai_actor_schedule_reaction_speech(struct char_data *mob, struct char_data *target, const char *msg)
