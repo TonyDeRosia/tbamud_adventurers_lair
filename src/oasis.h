@@ -337,6 +337,30 @@ extern const char *nrm, *grn, *cyn, *yel;
 #define MEDIT_AI_TARGET_VALUE             82
 #define MEDIT_AI_SCHEDULE                 83
 #define MEDIT_AI_SCHEDULE_EDIT            84
+#define MEDIT_AI_SCHEDULE_ROOM            85
+#define MEDIT_AI_SCHEDULE_FAILURE         86
+#define MEDIT_AI_SCHEDULE_ENTRIES         87
+#define MEDIT_AI_SCHEDULE_ENTRY           88
+#define MEDIT_AI_SCHEDULE_ENTRY_VALUE     89
+#define MEDIT_AI_SCHEDULE_DAYS            90
+#define MEDIT_AI_SCHEDULE_ACTIVITY        91
+#define MEDIT_AI_SCHEDULE_DESTINATION     92
+#define MEDIT_AI_SCHEDULE_ROUTE           93
+#define MEDIT_AI_SCHEDULE_ACTION          94
+#define MEDIT_AI_SCHEDULE_INTERRUPT       95
+#define MEDIT_AI_SCHEDULE_DIALOGUE        96
+#define MEDIT_AI_SCHEDULE_DELETE          97
+#define MEDIT_AI_PATROL_ROUTES             98
+#define MEDIT_AI_PATROL_ROUTE              99
+#define MEDIT_AI_PATROL_LABEL             100
+#define MEDIT_AI_PATROL_MODE              101
+#define MEDIT_AI_PATROL_FAILURE           102
+#define MEDIT_AI_PATROL_DELETE            103
+#define MEDIT_AI_PATROL_WAYPOINTS         104
+#define MEDIT_AI_PATROL_WAYPOINT          105
+#define MEDIT_AI_PATROL_WAYPOINT_VALUE    106
+#define MEDIT_AI_PATROL_WAYPOINT_ACTION   107
+#define MEDIT_AI_PATROL_WAYPOINT_DELETE   108
 
 /* Submodes of SEDIT connectedness. */
 #define SEDIT_MAIN_MENU              	0
