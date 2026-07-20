@@ -964,6 +964,7 @@ void medit_parse(struct descriptor_data *d, char *arg)
              OLC_MODE(d) != MEDIT_LOADOUT_REMOVE_EQUIP &&
              OLC_MODE(d) != MEDIT_LOADOUT_REMOVE_INV &&
              OLC_MODE(d) != MEDIT_LOADOUT_REMOVE_LOOT &&
+             OLC_MODE(d) != MEDIT_AI_ENABLE_CONFIRM &&
              OLC_MODE(d) != MEDIT_AI_MENU && OLC_MODE(d) != MEDIT_AI_SCHEDULE && (OLC_MODE(d) < MEDIT_AI_SCHEDULE_ROOM || OLC_MODE(d) > MEDIT_AI_PATROL_WAYPOINT_DELETE) && OLC_MODE(d) != MEDIT_AI_PERSONALITY && OLC_MODE(d) != MEDIT_AI_SOCIAL && OLC_MODE(d) != MEDIT_AI_DIALOGUE && OLC_MODE(d) != MEDIT_AI_DIALOGUE_ADD) {
     char *endptr = NULL;
     long parsed;

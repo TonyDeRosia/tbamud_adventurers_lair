@@ -1731,7 +1731,9 @@ int effective_max_mana(const struct char_data *ch)
 {
   double bonus_pct = mana_bonus_percent(ch);
   double scaled = (double)GET_MAX_MANA(ch) * (1.0 + (bonus_pct / 100.0));
-  if (ch && GET_SKILL((struct char_data *)ch, SKILL_SHADOW_RESERVOIR) > 0)
+  /* Skills are PC-owned; mobiles use their own AI/runtime state. */
+  if (ch && !IS_NPC(ch) &&
+      GET_SKILL((struct char_data *)ch, SKILL_SHADOW_RESERVOIR) > 0)
     scaled *= 1.10;
 
   return (int) (scaled + 0.5);
