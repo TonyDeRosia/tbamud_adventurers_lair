@@ -14,6 +14,8 @@
 #define AI_SOCIAL_COOLDOWN_MAX 300
 #define AI_THREAT_STEP_MAX 10
 #define AI_TARGET_WEIGHTS 8
+#define AI_HELP_EVENT_MAX 16
+#define AI_HELP_EVENT_RESPONDERS 10
 
 enum mob_ai_profile_mode { MOB_AI_INFERRED = 0, MOB_AI_CUSTOM, MOB_AI_INFERRED_OVERRIDES };
 enum mob_ai_personality { AI_TRAIT_AGGRESSION, AI_TRAIT_BRAVERY, AI_TRAIT_SOCIABILITY, AI_TRAIT_CURIOSITY, AI_TRAIT_DISCIPLINE, AI_TRAIT_HONESTY, AI_TRAIT_GREED, AI_TRAIT_COMPASSION, AI_TRAIT_LOYALTY, AI_TRAIT_PATIENCE, AI_TRAIT_SUSPICION, AI_TRAIT_PRIDE };
@@ -247,6 +249,14 @@ struct ai_actor_profile {
   int target_weight[AI_TARGET_WEIGHTS];
 };
 
+struct ai_help_event {
+  unsigned long id;
+  long source_id, target_id, victim_id;
+  int room_vnum, maximum_responders, responder_count, call_help_emitted, relayed;
+  long responders[AI_HELP_EVENT_RESPONDERS];
+  time_t created_at, expires_at;
+};
+
 struct ai_actor_recent_event {
   int type;
   long actor_idnum;
@@ -324,8 +334,8 @@ struct ai_actor_state {
   int recent_emote_hashes[5];
   struct ai_actor_recent_event recent_events[AI_EVENT_RING_MAX];
   struct ai_actor_brain *brain;
-  time_t last_combat_action, last_target_switch;
-  long last_selected_target_idnum;
+  time_t last_combat_action, last_target_switch, last_flee_attempt;
+  long last_selected_target_idnum, last_help_event_id;
 };
 
 uint32_t ai_actor_compute_signature(struct char_data *mob);
@@ -356,6 +366,10 @@ void ai_actor_event_attack(struct char_data *attacker, struct char_data *victim,
 int ai_actor_target_score(struct char_data *mob, struct char_data *candidate);
 int ai_actor_is_local_ally(struct char_data *mob, struct char_data *other, const char **reason);
 int ai_actor_should_flee(struct char_data *mob);
+const char *ai_actor_target_weight_name(int index);
+int ai_threat_step_edit(struct mob_ai_config *config, int index, const struct ai_threat_step *step);
+int ai_threat_step_move(struct mob_ai_config *config, int from, int to);
+int ai_help_event_admit(struct ai_help_event *event, long responder_id, time_t now);
 void ai_actor_event_crime(struct char_data *criminal, int flags);
 enum ai_relationship { AI_REL_UNKNOWN, AI_REL_FAMILIAR, AI_REL_TRUSTED, AI_REL_FEARED, AI_REL_HOSTILE, AI_REL_TRUSTED_FEARED, AI_REL_HOSTILE_FEARED };
 enum ai_relationship ai_actor_relationship(const struct ai_actor_memory_entry *memory);
