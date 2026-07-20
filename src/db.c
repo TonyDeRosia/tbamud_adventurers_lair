@@ -1707,6 +1707,22 @@ static void interpret_espec(const char *keyword, const char *value, int i, int n
     else mob_ai_config_validate(c);
     return;
   }
+  if (value && !str_cmp(keyword, "AIConfigSocial")) {
+    struct mob_ai_config *c = mob_proto[i].ai_config;
+    if (!c || sscanf(value, "%d %d %d %d %d %d", &c->whisper_enabled, &c->respond_strangers, &c->respond_trusted, &c->respond_feared, &c->respond_hostile, &c->room_speech_cooldown) != 6)
+      log("SYSERR: Bad AIConfigSocial format in mob #%d", nr);
+    else mob_ai_config_validate(c);
+    return;
+  }
+  if (value && !str_cmp(keyword, "AIDialogue")) {
+    struct mob_ai_config *c = mob_proto[i].ai_config; int category; const char *line=value; char *end;
+    if (!c) { log("SYSERR: AIDialogue without AIConfig in mob #%d", nr); return; }
+    category=(int)strtol(line,&end,10); while (end && *end && isspace((unsigned char)*end)) end++;
+    if (category < 0 || category >= AI_DIALOGUE_CATEGORIES || !end || !*end || c->dialogue_count[category] >= AI_DIALOGUE_MAX_LINES || !mob_ai_dialogue_set(c,category,c->dialogue_count[category],end))
+      log("SYSERR: Bad AIDialogue record in mob #%d", nr);
+    return;
+  }
+
 
   CASE("BareHandAttack") {
     RANGE(0, NUM_ATTACK_TYPES - 1);

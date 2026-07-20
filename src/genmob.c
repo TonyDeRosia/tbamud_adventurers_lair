@@ -332,7 +332,7 @@ int save_mobiles(zone_rnum rznum)
 
 int write_mobile_espec(mob_vnum mvnum, struct char_data *mob, FILE *fd)
 {
-  int i;
+  int i, k;
 
   if (mob->ai_config) {
     struct mob_ai_config *c = mob->ai_config;
@@ -344,6 +344,8 @@ int write_mobile_espec(mob_vnum mvnum, struct char_data *mob, FILE *fd)
       c->flee_hp_percent, c->surrender_hp_percent, c->assist_enabled, c->call_help_enabled, c->hunt_enabled, c->return_home, c->stay_zone,
       c->personality[0], c->personality[1], c->personality[2], c->personality[3], c->personality[4]);
     fprintf(fd, "AIConfigTraits: %d %d %d %d %d %d %d\n", c->personality[5], c->personality[6], c->personality[7], c->personality[8], c->personality[9], c->personality[10], c->personality[11]);
+    fprintf(fd, "AIConfigSocial: %d %d %d %d %d %d %d %d %d\n", c->whisper_enabled, c->respond_strangers, c->respond_trusted, c->respond_feared, c->respond_hostile, c->room_speech_cooldown, c->dialogue_count[0], c->dialogue_count[1], c->dialogue_count[2]);
+    for (k=0;k<AI_DIALOGUE_CATEGORIES;k++) for (i=0;i<c->dialogue_count[k];i++) if (c->dialogue[k][i]) fprintf(fd, "AIDialogue: %d %s\n", k, c->dialogue[k][i]);
   }
 
   if (GET_ATTACK(mob) != 0)

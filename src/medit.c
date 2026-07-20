@@ -710,6 +710,10 @@ static void medit_disp_loadout_menu(struct descriptor_data *d)
   OLC_MODE(d) = MEDIT_LOADOUT_MENU;
 }
 
+static void medit_disp_ai_personality(struct descriptor_data *d) { struct mob_ai_config *c=OLC_MOB(d)->ai_config; static const char *n[]={"Aggression","Bravery","Sociability","Curiosity","Discipline","Honesty","Greed","Compassion","Loyalty","Patience","Suspicion","Pride"}; int i; write_to_output(d,"\r\nAI Actor Personality\r\n"); for(i=0;i<12;i++) write_to_output(d,"%c) %-12s : %d\r\n",i<9?'1'+i:'A'+i-9,n[i],c->personality[i]); write_to_output(d,"P) Apply Preset  Q) Return\r\nChoice: "); OLC_MODE(d)=MEDIT_AI_PERSONALITY; }
+static void medit_disp_ai_social(struct descriptor_data *d) { struct mob_ai_config*c=OLC_MOB(d)->ai_config; write_to_output(d,"\r\nAI Actor Social Behavior\r\n1) Style: %s\r\n2) Greeting: %s\r\n3) Ambient speech: %s\r\n4) Ambient emotes: %s\r\nA) Speech cooldown: %d\r\nB) Room cooldown: %d\r\nC) Emote cooldown: %d\r\nQ) Return\r\nChoice: ",ai_social_style_name(c->social),c->greeting_enabled?"Yes":"No",c->ambient_speech_enabled?"Yes":"No",c->ambient_emotes_enabled?"Yes":"No",c->speech_cooldown,c->room_speech_cooldown,c->emote_cooldown); OLC_MODE(d)=MEDIT_AI_SOCIAL; }
+static void medit_disp_ai_dialogue(struct descriptor_data *d) { struct mob_ai_config*c=OLC_MOB(d)->ai_config; int i; write_to_output(d,"\r\nAI Actor Dialogue\r\n"); for(i=0;i<AI_DIALOGUE_CATEGORIES;i++) write_to_output(d,"%d) %s: %d/%d\r\n",i,ai_dialogue_category_name(i),c->dialogue_count[i],AI_DIALOGUE_MAX_LINES); write_to_output(d,"Select category to add; Q) Return\r\nChoice: "); OLC_MODE(d)=MEDIT_AI_DIALOGUE; }
+
 /* Display main menu. */
 static void medit_disp_menu(struct descriptor_data *d)
 {
@@ -787,11 +791,12 @@ static void medit_disp_ai_menu(struct descriptor_data *d)
   if (!c) OLC_MOB(d)->ai_config = c = mob_ai_config_new();
   write_to_output(d,
     "\r\nAI Actor Configuration\r\n"
-    "1) Profile mode: %s\r\n2) Role: %d\r\n3) Movement: %d\r\n"
+    "1) Profile mode: %s\r\n2) Role: %d\r\n3) Movement: %d\r\n4) Personality\r\n5) Social behavior\r\n6) Dialogue lines\r\n"
     "P) Preview compiled profile\r\nR) Reset to inferred defaults\r\nQ) Return\r\nChoice: ",
     c->mode == MOB_AI_CUSTOM ? "Custom" : c->mode == MOB_AI_INFERRED_OVERRIDES ? "Inferred with overrides" : "Inferred", c->role, c->movement);
   OLC_MODE(d) = MEDIT_AI_MENU;
 }
+
 
 /* Display main menu. */
 static void medit_disp_stats_menu(struct descriptor_data *d)
@@ -925,7 +930,7 @@ void medit_parse(struct descriptor_data *d, char *arg)
              OLC_MODE(d) != MEDIT_LOADOUT_REMOVE_EQUIP &&
              OLC_MODE(d) != MEDIT_LOADOUT_REMOVE_INV &&
              OLC_MODE(d) != MEDIT_LOADOUT_REMOVE_LOOT &&
-             OLC_MODE(d) != MEDIT_AI_MENU) {
+             OLC_MODE(d) != MEDIT_AI_MENU && OLC_MODE(d) != MEDIT_AI_PERSONALITY && OLC_MODE(d) != MEDIT_AI_SOCIAL && OLC_MODE(d) != MEDIT_AI_DIALOGUE && OLC_MODE(d) != MEDIT_AI_DIALOGUE_ADD) {
     char *endptr = NULL;
     long parsed;
 
@@ -1281,11 +1286,24 @@ void medit_parse(struct descriptor_data *d, char *arg)
       case 'q': medit_disp_menu(d); return;
       case '1': OLC_MODE(d) = MEDIT_AI_MODE; write_to_output(d, "Mode (0 Inferred, 1 Custom, 2 Overrides): "); return;
       case '2': OLC_MODE(d) = MEDIT_AI_ROLE; write_to_output(d, "Role (0-9): "); return;
-      case '3': OLC_MODE(d) = MEDIT_AI_MOVEMENT; write_to_output(d, "Movement (0 Stationary, 1 Random, 2 Patrol, 3 Scheduled, 4 Guard, 5 Home): "); return;
+      case '3': OLC_MODE(d) = MEDIT_AI_MOVEMENT; write_to_output(d, "Movement (0-5): "); return;
+      case '4': medit_disp_ai_personality(d); return;
+      case '5': medit_disp_ai_social(d); return;
+      case '6': medit_disp_ai_dialogue(d); return;
       case 'r': mob_ai_config_free(OLC_MOB(d)->ai_config); OLC_MOB(d)->ai_config = NULL; OLC_VAL(d) = 1; medit_disp_ai_menu(d); return;
       case 'p': ai_actor_refresh_profile(OLC_MOB(d), TRUE); write_to_output(d, "Compiled role %d, movement %d, social %d.\r\n", OLC_MOB(d)->ai_prof->role, OLC_MOB(d)->ai_prof->movement, OLC_MOB(d)->ai_prof->social); medit_disp_ai_menu(d); return;
       default: medit_disp_ai_menu(d); return;
     }
+  case MEDIT_AI_PERSONALITY:
+    if (LOWER(*arg)=='q') { medit_disp_ai_menu(d); return; }
+    if (LOWER(*arg)=='p') { OLC_MODE(d)=MEDIT_AI_PRESET; write_to_output(d,"Preset (0 Neutral, 1 Stoic Guard, 2 Friendly Merchant, 3 Nervous Civilian, 4 Fanatical Cultist, 5 Greedy Official, 6 Territorial Beast, 7 Disciplined Soldier): "); return; }
+    i=(LOWER(*arg)>='a'&&LOWER(*arg)<='c')?9+LOWER(*arg)-'a':atoi(arg)-1; if(i<0||i>=12){medit_disp_ai_personality(d);return;} OLC_MODE(d)=MEDIT_AI_TRAIT; OLC_VAL(d)=i; write_to_output(d,"Value (0-100): "); return;
+  case MEDIT_AI_TRAIT: if(i<0||i>100){write_to_output(d,"Value must be 0-100: ");return;} if(OLC_MOB(d)->ai_config->personality[OLC_VAL(d)]!=i){OLC_MOB(d)->ai_config->personality[OLC_VAL(d)]=i;OLC_MOB(d)->ai_config->override_mask|=AI_OVERRIDE_TRAITS;OLC_VAL(d)=1;} medit_disp_ai_personality(d);return;
+  case MEDIT_AI_PRESET: if(i<0||i>7){medit_disp_ai_personality(d);return;} {static const int p[8][12]={{50,50,50,50,50,50,50,50,50,50,50,50},{25,70,30,20,90,75,10,55,85,65,45,40},{10,55,85,55,60,75,55,75,60,70,20,45},{15,20,30,65,35,55,20,65,40,25,75,20},{75,80,45,35,85,25,15,20,90,45,65,80},{35,55,55,30,75,45,95,20,75,55,60,70},{85,65,15,55,25,20,20,10,25,20,85,60},{45,75,45,25,95,70,20,55,90,80,45,50}};memcpy(OLC_MOB(d)->ai_config->personality,p[i],sizeof(p[i]));OLC_MOB(d)->ai_config->override_mask|=AI_OVERRIDE_TRAITS;OLC_VAL(d)=1;}medit_disp_ai_personality(d);return;
+  case MEDIT_AI_SOCIAL: if(LOWER(*arg)=='q'){medit_disp_ai_menu(d);return;} i=(LOWER(*arg)>='a'&&LOWER(*arg)<='c')?10+LOWER(*arg)-'a':atoi(arg); if(i<1||i>12){medit_disp_ai_social(d);return;} OLC_MODE(d)=MEDIT_AI_SOCIAL_VALUE;OLC_VAL(d)=i;write_to_output(d,"Value: ");return;
+  case MEDIT_AI_SOCIAL_VALUE: {struct mob_ai_config*c=OLC_MOB(d)->ai_config;int *v=OLC_VAL(d)==1?&c->social:OLC_VAL(d)==2?&c->greeting_enabled:OLC_VAL(d)==3?&c->ambient_speech_enabled:OLC_VAL(d)==4?&c->ambient_emotes_enabled:OLC_VAL(d)==10?&c->speech_cooldown:OLC_VAL(d)==11?&c->room_speech_cooldown:&c->emote_cooldown;if(i<0||(OLC_VAL(d)==1&&i>10)||(OLC_VAL(d)>1&&OLC_VAL(d)<10&&i>1)||(OLC_VAL(d)>=10&&(i<1||i>300))){write_to_output(d,"Invalid value: ");return;}if(*v!=i){*v=i;OLC_VAL(d)=1;}medit_disp_ai_social(d);return;}
+  case MEDIT_AI_DIALOGUE: if(LOWER(*arg)=='q'){medit_disp_ai_menu(d);return;}i=atoi(arg);if(i<0||i>=AI_DIALOGUE_CATEGORIES){medit_disp_ai_dialogue(d);return;}OLC_MODE(d)=MEDIT_AI_DIALOGUE_ADD;OLC_VAL(d)=i;write_to_output(d,"Line to add: ");return;
+  case MEDIT_AI_DIALOGUE_ADD: if(*arg&&mob_ai_dialogue_set(OLC_MOB(d)->ai_config,OLC_VAL(d),OLC_MOB(d)->ai_config->dialogue_count[OLC_VAL(d)],arg))OLC_VAL(d)=1;else write_to_output(d,"Line rejected or pool full.\r\n");medit_disp_ai_dialogue(d);return;
   case MEDIT_AI_MODE:
   case MEDIT_AI_ROLE:
   case MEDIT_AI_MOVEMENT:

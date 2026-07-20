@@ -312,6 +312,13 @@ extern const char *nrm, *grn, *cyn, *yel;
 #define MEDIT_AI_MODE                   57
 #define MEDIT_AI_ROLE                   58
 #define MEDIT_AI_MOVEMENT               59
+#define MEDIT_AI_PERSONALITY            60
+#define MEDIT_AI_TRAIT                  61
+#define MEDIT_AI_PRESET                 62
+#define MEDIT_AI_SOCIAL                 63
+#define MEDIT_AI_SOCIAL_VALUE           64
+#define MEDIT_AI_DIALOGUE                65
+#define MEDIT_AI_DIALOGUE_ADD            66
 
 /* Submodes of SEDIT connectedness. */
 #define SEDIT_MAIN_MENU              	0
