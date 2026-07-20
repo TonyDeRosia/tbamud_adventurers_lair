@@ -308,6 +308,10 @@ extern const char *nrm, *grn, *cyn, *yel;
 #define MEDIT_LOADOUT_REMOVE_EQUIP      53
 #define MEDIT_LOADOUT_REMOVE_INV        54
 #define MEDIT_LOADOUT_REMOVE_LOOT       55
+#define MEDIT_AI_MENU                   56
+#define MEDIT_AI_MODE                   57
+#define MEDIT_AI_ROLE                   58
+#define MEDIT_AI_MOVEMENT               59
 
 /* Submodes of SEDIT connectedness. */
 #define SEDIT_MAIN_MENU              	0

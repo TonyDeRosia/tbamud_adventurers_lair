@@ -618,6 +618,7 @@ void destroy_db(void)
 
     /* free script proto list */
     free_proto_script(&mob_proto[cnt], MOB_TRIGGER);
+    mob_ai_config_free(mob_proto[cnt].ai_config);
 
     while (mob_proto[cnt].affected)
       affect_remove(&mob_proto[cnt], mob_proto[cnt].affected);
@@ -1687,6 +1688,25 @@ static void interpret_espec(const char *keyword, const char *value, int i, int n
    * possible, we don't actually have any.  Feel free to make some. */
   if (value)
     num_arg = atoi(value);
+
+  if (value && !str_cmp(keyword, "AIConfig")) {
+    struct mob_ai_config *c = mob_ai_config_new();
+    int n;
+    unsigned long mask;
+    if (!c) return;
+    n = sscanf(value, "%d %lu %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d",
+      &c->mode, &mask, &c->role, &c->movement, &c->social, &c->home_room_vnum, &c->work_room_vnum, &c->guard_room_vnum, &c->roam_radius, &c->pursuit_distance, &c->movement_delay, &c->greeting_enabled, &c->ambient_speech_enabled, &c->ambient_emotes_enabled, &c->speech_cooldown, &c->emote_cooldown, &c->flee_hp_percent, &c->surrender_hp_percent, &c->assist_enabled, &c->call_help_enabled, &c->hunt_enabled, &c->return_home, &c->stay_zone, &c->personality[0], &c->personality[1], &c->personality[2], &c->personality[3], &c->personality[4]);
+    c->override_mask = mask;
+    if (n == 28) { mob_ai_config_free(mob_proto[i].ai_config); mob_ai_config_validate(c); mob_proto[i].ai_config = c; return; }
+    log("SYSERR: Bad AIConfig format in mob #%d", nr); mob_ai_config_free(c); return;
+  }
+  if (value && !str_cmp(keyword, "AIConfigTraits")) {
+    struct mob_ai_config *c = mob_proto[i].ai_config;
+    if (!c || sscanf(value, "%d %d %d %d %d %d %d", &c->personality[5], &c->personality[6], &c->personality[7], &c->personality[8], &c->personality[9], &c->personality[10], &c->personality[11]) != 7)
+      log("SYSERR: Bad AIConfigTraits format in mob #%d", nr);
+    else mob_ai_config_validate(c);
+    return;
+  }
 
   CASE("BareHandAttack") {
     RANGE(0, NUM_ATTACK_TYPES - 1);

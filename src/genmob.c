@@ -17,6 +17,7 @@
 #include "genzon.h"
 #include "dg_olc.h"
 #include "spells.h"
+#include "ai_actor.h"
 
 /* local functions */
 static void extract_mobile_all(mob_vnum vnum);
@@ -93,7 +94,9 @@ int add_mobile(struct char_data *mob, mob_vnum vnum)
 int copy_mobile(struct char_data *to, struct char_data *from)
 {
   free_mobile_strings(to);
+  mob_ai_config_free(to->ai_config);
   *to = *from;
+  to->ai_config = mob_ai_config_copy(from->ai_config);
   check_mobile_strings(from);
   copy_mobile_strings(to, from);
   return TRUE;
@@ -276,6 +279,7 @@ int free_mobile(struct char_data *mob)
   if (SCRIPT(mob))
     extract_script(mob, MOB_TRIGGER);
 
+  mob_ai_config_free(mob->ai_config);
   free(mob);
   return TRUE;
 }
@@ -329,6 +333,18 @@ int save_mobiles(zone_rnum rznum)
 int write_mobile_espec(mob_vnum mvnum, struct char_data *mob, FILE *fd)
 {
   int i;
+
+  if (mob->ai_config) {
+    struct mob_ai_config *c = mob->ai_config;
+    mob_ai_config_validate(c);
+    fprintf(fd, "AIConfig: %d %lu %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d\n",
+      c->mode, c->override_mask, c->role, c->movement, c->social,
+      c->home_room_vnum, c->work_room_vnum, c->guard_room_vnum, c->roam_radius, c->pursuit_distance, c->movement_delay,
+      c->greeting_enabled, c->ambient_speech_enabled, c->ambient_emotes_enabled, c->speech_cooldown, c->emote_cooldown,
+      c->flee_hp_percent, c->surrender_hp_percent, c->assist_enabled, c->call_help_enabled, c->hunt_enabled, c->return_home, c->stay_zone,
+      c->personality[0], c->personality[1], c->personality[2], c->personality[3], c->personality[4]);
+    fprintf(fd, "AIConfigTraits: %d %d %d %d %d %d %d\n", c->personality[5], c->personality[6], c->personality[7], c->personality[8], c->personality[9], c->personality[10], c->personality[11]);
+  }
 
   if (GET_ATTACK(mob) != 0)
     fprintf(fd, "BareHandAttack: %d\n", GET_ATTACK(mob));

@@ -12,6 +12,25 @@
 #include "npc_social_ai.h"
 
 ACMD(do_say);
+#define AI_CLAMP(value, low, high) ((value) < (low) ? (low) : ((value) > (high) ? (high) : (value)))
+
+struct mob_ai_config *mob_ai_config_new(void)
+{
+  struct mob_ai_config *c;
+  int i;
+  CREATE(c, struct mob_ai_config, 1);
+  if (!c) return NULL;
+  c->mode = MOB_AI_INFERRED; c->movement = AI_MOVE_STATIONARY;
+  c->speech_cooldown = 10; c->emote_cooldown = 15;
+  c->flee_hp_percent = 20; c->surrender_hp_percent = 10; c->movement_delay = 1;
+  for (i = 0; i < AI_ACTOR_PERSONALITIES; i++) c->personality[i] = 50;
+  return c;
+}
+struct mob_ai_config *mob_ai_config_copy(const struct mob_ai_config *from)
+{ struct mob_ai_config *c; if (!from) return NULL; CREATE(c, struct mob_ai_config, 1); if (c) *c = *from; return c; }
+void mob_ai_config_free(struct mob_ai_config *config) { if (config) free(config); }
+void mob_ai_config_validate(struct mob_ai_config *c)
+{ int i; if (!c) return; c->mode=AI_CLAMP(c->mode,MOB_AI_INFERRED,MOB_AI_INFERRED_OVERRIDES); c->role=AI_CLAMP(c->role,ROLE_UNKNOWN,ROLE_BOSS); c->movement=AI_CLAMP(c->movement,AI_MOVE_STATIONARY,AI_MOVE_RETURN_HOME); c->social=AI_CLAMP(c->social,SOC_SILENT,SOC_EXTORT); c->roam_radius=AI_CLAMP(c->roam_radius,0,100); c->pursuit_distance=AI_CLAMP(c->pursuit_distance,0,100); c->movement_delay=AI_CLAMP(c->movement_delay,1,60); c->speech_cooldown=AI_CLAMP(c->speech_cooldown,1,300); c->emote_cooldown=AI_CLAMP(c->emote_cooldown,1,300); c->flee_hp_percent=AI_CLAMP(c->flee_hp_percent,0,100); c->surrender_hp_percent=AI_CLAMP(c->surrender_hp_percent,0,100); for(i=0;i<AI_ACTOR_PERSONALITIES;i++) c->personality[i]=AI_CLAMP(c->personality[i],0,100); }
 
 static void ai_actor_sync_profile(struct char_data *mob)
 {
@@ -33,6 +52,21 @@ static void ai_actor_sync_profile(struct char_data *mob)
   mob->ai_prof->social = (p.social_style == NPC_SOCIAL_EXTROVERT) ? SOC_TALKATIVE :
                          (p.social_style == NPC_SOCIAL_INTROVERT ? SOC_SILENT : SOC_WARNING);
   mob->ai_prof->talk_cooldown_secs = 10;
+  if (mob->ai_config) {
+    struct mob_ai_config *c = mob->ai_config;
+    mob_ai_config_validate(c);
+    if (c->mode == MOB_AI_CUSTOM || (c->override_mask & AI_OVERRIDE_ROLE)) mob->ai_prof->role = c->role;
+    if (c->mode == MOB_AI_CUSTOM || (c->override_mask & AI_OVERRIDE_MOVEMENT)) mob->ai_prof->movement = c->movement;
+    if (c->mode == MOB_AI_CUSTOM || (c->override_mask & AI_OVERRIDE_SOCIAL)) mob->ai_prof->social = c->social;
+    mob->ai_prof->home_room_vnum = c->home_room_vnum;
+    mob->ai_prof->roam_radius = c->roam_radius;
+    mob->ai_prof->flee_hp_percent = c->flee_hp_percent;
+    mob->ai_prof->surrender_hp_percent = c->surrender_hp_percent;
+    mob->ai_prof->talk_cooldown_secs = c->speech_cooldown;
+    mob->ai_prof->assist_enabled = c->assist_enabled;
+    mob->ai_prof->call_help_enabled = c->call_help_enabled;
+    mob->ai_prof->hunt_enabled = c->hunt_enabled;
+  }
   mob->ai_prof->initialized = TRUE;
 }
 
@@ -58,8 +92,14 @@ void ai_actor_refresh_live_mobs_by_vnum(mob_vnum vnum)
 {
   struct char_data *it;
   for (it = character_list; it; it = it->next)
-    if (IS_NPC(it) && GET_MOB_VNUM(it) == vnum)
+    if (IS_NPC(it) && GET_MOB_VNUM(it) == vnum) {
+      mob_rnum rnum = GET_MOB_RNUM(it);
+      if (rnum != NOBODY) {
+        mob_ai_config_free(it->ai_config);
+        it->ai_config = mob_ai_config_copy(mob_proto[rnum].ai_config);
+      }
       ai_actor_sync_profile(it);
+    }
 }
 
 void ai_actor_init(struct char_data *mob)
@@ -75,13 +115,15 @@ void ai_actor_free(struct char_data *mob)
   if (!mob) return;
   if (mob->ai_prof) { free(mob->ai_prof); mob->ai_prof = NULL; }
   if (mob->ai_state) { free(mob->ai_state); mob->ai_state = NULL; }
+  mob_ai_config_free(mob->ai_config);
+  mob->ai_config = NULL;
 }
 
 int ai_actor_tick(struct char_data *mob, time_t now)
 {
   struct npc_social_profile p;
   enum npc_priority prio;
-  if (!mob || !IS_NPC(mob) || !CONFIG_AI_ACTOR_ENABLED || !ai_actor_brain_enabled()) return FALSE;
+  if (!mob || !IS_NPC(mob) || !MOB_FLAGGED(mob, MOB_AI_ACTOR) || !CONFIG_AI_ACTOR_ENABLED || !ai_actor_brain_enabled()) return FALSE;
   if (!npc_ai_is_humanoid_social_candidate(mob)) return FALSE;
   if (!mob->ai_state || !mob->ai_prof) ai_actor_init(mob);
 
