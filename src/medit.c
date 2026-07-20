@@ -710,9 +710,12 @@ static void medit_disp_loadout_menu(struct descriptor_data *d)
   OLC_MODE(d) = MEDIT_LOADOUT_MENU;
 }
 
-static void medit_disp_ai_personality(struct descriptor_data *d) { struct mob_ai_config *c=OLC_MOB(d)->ai_config; static const char *n[]={"Aggression","Bravery","Sociability","Curiosity","Discipline","Honesty","Greed","Compassion","Loyalty","Patience","Suspicion","Pride"}; int i; write_to_output(d,"\r\nAI Actor Personality\r\n"); for(i=0;i<12;i++) write_to_output(d,"%c) %-12s : %d\r\n",i<9?'1'+i:'A'+i-9,n[i],c->personality[i]); write_to_output(d,"P) Apply Preset  Q) Return\r\nChoice: "); OLC_MODE(d)=MEDIT_AI_PERSONALITY; }
-static void medit_disp_ai_social(struct descriptor_data *d) { struct mob_ai_config*c=OLC_MOB(d)->ai_config; write_to_output(d,"\r\nAI Actor Social Behavior\r\n1) Style: %s\r\n2) Greeting: %s\r\n3) Ambient speech: %s\r\n4) Ambient emotes: %s\r\nA) Speech cooldown: %d\r\nB) Room cooldown: %d\r\nC) Emote cooldown: %d\r\nQ) Return\r\nChoice: ",ai_social_style_name(c->social),c->greeting_enabled?"Yes":"No",c->ambient_speech_enabled?"Yes":"No",c->ambient_emotes_enabled?"Yes":"No",c->speech_cooldown,c->room_speech_cooldown,c->emote_cooldown); OLC_MODE(d)=MEDIT_AI_SOCIAL; }
-static void medit_disp_ai_dialogue(struct descriptor_data *d) { struct mob_ai_config*c=OLC_MOB(d)->ai_config; int i; write_to_output(d,"\r\nAI Actor Dialogue\r\n"); for(i=0;i<AI_DIALOGUE_CATEGORIES;i++) write_to_output(d,"%d) %s: %d/%d\r\n",i,ai_dialogue_category_name(i),c->dialogue_count[i],AI_DIALOGUE_MAX_LINES); write_to_output(d,"Select category to add; Q) Return\r\nChoice: "); OLC_MODE(d)=MEDIT_AI_DIALOGUE; }
+static const char *ai_trait_names[AI_ACTOR_PERSONALITIES] = { "Aggression", "Bravery", "Sociability", "Curiosity", "Discipline", "Honesty", "Greed", "Compassion", "Loyalty", "Patience", "Suspicion", "Pride" };
+static void medit_disp_ai_personality(struct descriptor_data *d) { struct mob_ai_config *c=OLC_MOB(d)->ai_config; int i; write_to_output(d,"\r\nAI Actor Personality\r\n"); for(i=0;i<12;i++) write_to_output(d,"%c) %-12s : %d\r\n",i<9?'1'+i:'A'+i-9,ai_trait_names[i],c->personality[i]); write_to_output(d,"P) Apply Preset  Q) Return\r\nChoice: "); OLC_MODE(d)=MEDIT_AI_PERSONALITY; }
+static void medit_disp_ai_social(struct descriptor_data *d) { struct mob_ai_config*c=OLC_MOB(d)->ai_config; write_to_output(d,"\r\nAI Actor Social Behavior\r\n1) Style: %s\r\n2) Greeting: %s\r\n3) Ambient speech: %s\r\n4) Ambient emotes: %s\r\n5) Whisper replies: %s\r\n6) Respond strangers: %s\r\n7) Respond trusted: %s\r\n8) Respond feared: %s\r\n9) Respond hostile: %s\r\nA) Speech cooldown: %d\r\nB) Room cooldown: %d\r\nC) Emote cooldown: %d\r\nQ) Return\r\nChoice: ",ai_social_style_name(c->social),c->greeting_enabled?"Yes":"No",c->ambient_speech_enabled?"Yes":"No",c->ambient_emotes_enabled?"Yes":"No",c->whisper_enabled?"Yes":"No",c->respond_strangers?"Yes":"No",c->respond_trusted?"Yes":"No",c->respond_feared?"Yes":"No",c->respond_hostile?"Yes":"No",c->speech_cooldown,c->room_speech_cooldown,c->emote_cooldown); OLC_MODE(d)=MEDIT_AI_SOCIAL; }
+static void medit_disp_ai_dialogue_lines(struct descriptor_data *d, int category) { struct mob_ai_config *c=OLC_MOB(d)->ai_config; int i; write_to_output(d,"\r\n%s dialogue (%d/%d)\r\n",ai_dialogue_category_name(category),c->dialogue_count[category],AI_DIALOGUE_MAX_LINES); for(i=0;i<c->dialogue_count[category];i++) write_to_output(d," %d) %s\r\n",i+1,c->dialogue[category][i]); write_to_output(d,"A) Add  E <line>) Edit  D <line>) Delete  U <line>) Move up  N <line>) Move down  Q) Categories\r\nChoice: "); OLC_MODE(d)=MEDIT_AI_DIALOGUE; }
+static void medit_disp_ai_dialogue(struct descriptor_data *d) { struct mob_ai_config*c=OLC_MOB(d)->ai_config; int i; write_to_output(d,"\r\nAI Actor Dialogue\r\n"); for(i=0;i<AI_DIALOGUE_CATEGORIES;i++) write_to_output(d,"%d) %s: %d/%d\r\n",i,ai_dialogue_category_name(i),c->dialogue_count[i],AI_DIALOGUE_MAX_LINES); write_to_output(d,"Select category; Q) Return\r\nChoice: "); OLC_MODE(d)=MEDIT_AI_DIALOGUE; }
+
 
 /* Display main menu. */
 static void medit_disp_menu(struct descriptor_data *d)
@@ -785,8 +788,8 @@ static void medit_disp_ai_menu(struct descriptor_data *d)
 {
   struct mob_ai_config *c = OLC_MOB(d)->ai_config;
   if (!MOB_FLAGGED(OLC_MOB(d), MOB_AI_ACTOR)) {
-    write_to_output(d, "AI_ACTOR must be enabled in NPC Flags first.\r\n");
-    medit_disp_menu(d); return;
+    write_to_output(d, "Enable AI_ACTOR for this mob? (Y/N): ");
+    OLC_MODE(d) = MEDIT_AI_ENABLE_CONFIRM; return;
   }
   if (!c) OLC_MOB(d)->ai_config = c = mob_ai_config_new();
   write_to_output(d,
@@ -1291,7 +1294,7 @@ void medit_parse(struct descriptor_data *d, char *arg)
       case '5': medit_disp_ai_social(d); return;
       case '6': medit_disp_ai_dialogue(d); return;
       case 'r': mob_ai_config_free(OLC_MOB(d)->ai_config); OLC_MOB(d)->ai_config = NULL; OLC_VAL(d) = 1; medit_disp_ai_menu(d); return;
-      case 'p': ai_actor_refresh_profile(OLC_MOB(d), TRUE); write_to_output(d, "Compiled role %d, movement %d, social %d.\r\n", OLC_MOB(d)->ai_prof->role, OLC_MOB(d)->ai_prof->movement, OLC_MOB(d)->ai_prof->social); medit_disp_ai_menu(d); return;
+      case 'p': { struct ai_actor_profile *p; int n; ai_actor_refresh_profile(OLC_MOB(d), TRUE); p=OLC_MOB(d)->ai_prof; write_to_output(d, "Compiled profile: role=%d movement=%d social=%s\r\nSpeech: greet=%s ambient=%s emotes=%s whisper=%s cooldowns=%d/%d/%d\r\nResponses: strangers=%s trusted=%s feared=%s hostile=%s; response modifier=%+d\r\nTraits:", p->role, p->movement, ai_social_style_name(p->social), p->greeting_enabled?"on":"off",p->ambient_speech_enabled?"on":"off",p->ambient_emotes_enabled?"on":"off",p->whisper_enabled?"on":"off",p->talk_cooldown_secs,p->room_talk_cooldown_secs,p->emote_cooldown_secs,p->respond_strangers?"on":"off",p->respond_trusted?"on":"off",p->respond_feared?"on":"off",p->respond_hostile?"on":"off",ai_actor_personality_response_modifier(p->personality)); for(n=0;n<AI_ACTOR_PERSONALITIES;n++) write_to_output(d," %s=%d",ai_trait_names[n],p->personality[n]); write_to_output(d,"\r\nDialogue pools:"); for(n=0;n<AI_DIALOGUE_CATEGORIES;n++) write_to_output(d," %s=%d",ai_dialogue_category_name(n),p->dialogue_count[n]); write_to_output(d,"\r\n"); medit_disp_ai_menu(d); return; }
       default: medit_disp_ai_menu(d); return;
     }
   case MEDIT_AI_PERSONALITY:
@@ -1301,9 +1304,22 @@ void medit_parse(struct descriptor_data *d, char *arg)
   case MEDIT_AI_TRAIT: if(i<0||i>100){write_to_output(d,"Value must be 0-100: ");return;} if(OLC_MOB(d)->ai_config->personality[OLC_VAL(d)]!=i){OLC_MOB(d)->ai_config->personality[OLC_VAL(d)]=i;OLC_MOB(d)->ai_config->override_mask|=AI_OVERRIDE_TRAITS;OLC_VAL(d)=1;} medit_disp_ai_personality(d);return;
   case MEDIT_AI_PRESET: if(i<0||i>7){medit_disp_ai_personality(d);return;} {static const int p[8][12]={{50,50,50,50,50,50,50,50,50,50,50,50},{25,70,30,20,90,75,10,55,85,65,45,40},{10,55,85,55,60,75,55,75,60,70,20,45},{15,20,30,65,35,55,20,65,40,25,75,20},{75,80,45,35,85,25,15,20,90,45,65,80},{35,55,55,30,75,45,95,20,75,55,60,70},{85,65,15,55,25,20,20,10,25,20,85,60},{45,75,45,25,95,70,20,55,90,80,45,50}};memcpy(OLC_MOB(d)->ai_config->personality,p[i],sizeof(p[i]));OLC_MOB(d)->ai_config->override_mask|=AI_OVERRIDE_TRAITS;OLC_VAL(d)=1;}medit_disp_ai_personality(d);return;
   case MEDIT_AI_SOCIAL: if(LOWER(*arg)=='q'){medit_disp_ai_menu(d);return;} i=(LOWER(*arg)>='a'&&LOWER(*arg)<='c')?10+LOWER(*arg)-'a':atoi(arg); if(i<1||i>12){medit_disp_ai_social(d);return;} OLC_MODE(d)=MEDIT_AI_SOCIAL_VALUE;OLC_VAL(d)=i;write_to_output(d,"Value: ");return;
-  case MEDIT_AI_SOCIAL_VALUE: {struct mob_ai_config*c=OLC_MOB(d)->ai_config;int *v=OLC_VAL(d)==1?&c->social:OLC_VAL(d)==2?&c->greeting_enabled:OLC_VAL(d)==3?&c->ambient_speech_enabled:OLC_VAL(d)==4?&c->ambient_emotes_enabled:OLC_VAL(d)==10?&c->speech_cooldown:OLC_VAL(d)==11?&c->room_speech_cooldown:&c->emote_cooldown;if(i<0||(OLC_VAL(d)==1&&i>10)||(OLC_VAL(d)>1&&OLC_VAL(d)<10&&i>1)||(OLC_VAL(d)>=10&&(i<1||i>300))){write_to_output(d,"Invalid value: ");return;}if(*v!=i){*v=i;OLC_VAL(d)=1;}medit_disp_ai_social(d);return;}
-  case MEDIT_AI_DIALOGUE: if(LOWER(*arg)=='q'){medit_disp_ai_menu(d);return;}i=atoi(arg);if(i<0||i>=AI_DIALOGUE_CATEGORIES){medit_disp_ai_dialogue(d);return;}OLC_MODE(d)=MEDIT_AI_DIALOGUE_ADD;OLC_VAL(d)=i;write_to_output(d,"Line to add: ");return;
-  case MEDIT_AI_DIALOGUE_ADD: if(*arg&&mob_ai_dialogue_set(OLC_MOB(d)->ai_config,OLC_VAL(d),OLC_MOB(d)->ai_config->dialogue_count[OLC_VAL(d)],arg))OLC_VAL(d)=1;else write_to_output(d,"Line rejected or pool full.\r\n");medit_disp_ai_dialogue(d);return;
+  case MEDIT_AI_SOCIAL_VALUE: {struct mob_ai_config*c=OLC_MOB(d)->ai_config;int *v; switch(OLC_VAL(d)){case 1:v=&c->social;break;case 2:v=&c->greeting_enabled;break;case 3:v=&c->ambient_speech_enabled;break;case 4:v=&c->ambient_emotes_enabled;break;case 5:v=&c->whisper_enabled;break;case 6:v=&c->respond_strangers;break;case 7:v=&c->respond_trusted;break;case 8:v=&c->respond_feared;break;case 9:v=&c->respond_hostile;break;case 10:v=&c->speech_cooldown;break;case 11:v=&c->room_speech_cooldown;break;default:v=&c->emote_cooldown;}if(i<0||(OLC_VAL(d)==1&&i>10)||(OLC_VAL(d)>1&&OLC_VAL(d)<10&&i>1)||(OLC_VAL(d)>=10&&(i<1||i>300))){write_to_output(d,"Invalid value: ");return;}if(*v!=i){*v=i;OLC_VAL(d)=1;}medit_disp_ai_social(d);return;}
+  case MEDIT_AI_DIALOGUE:
+    if (LOWER(*arg)=='q') { medit_disp_ai_menu(d); return; }
+    if (OLC_VAL(d) >= 0 && OLC_VAL(d) < AI_DIALOGUE_CATEGORIES && !isdigit((unsigned char)*arg)) {
+      int line = atoi(arg+1) - 1; int category = OLC_VAL(d);
+      if (LOWER(*arg)=='a') { OLC_MODE(d)=MEDIT_AI_DIALOGUE_ADD; write_to_output(d,"Line to add: "); return; }
+      if (LOWER(*arg)=='e' && line>=0 && line<OLC_MOB(d)->ai_config->dialogue_count[category]) { OLC_VAL(d)=category*AI_DIALOGUE_MAX_LINES+line; OLC_MODE(d)=MEDIT_AI_DIALOGUE_EDIT; write_to_output(d,"Replacement line: "); return; }
+      if (LOWER(*arg)=='d' && mob_ai_dialogue_delete(OLC_MOB(d)->ai_config,category,line)) { OLC_VAL(d)=1; medit_disp_ai_dialogue_lines(d,category); return; }
+      if (LOWER(*arg)=='u' && mob_ai_dialogue_move(OLC_MOB(d)->ai_config,category,line,line-1)) { OLC_VAL(d)=1; medit_disp_ai_dialogue_lines(d,category); return; }
+      if (LOWER(*arg)=='n' && mob_ai_dialogue_move(OLC_MOB(d)->ai_config,category,line,line+1)) { OLC_VAL(d)=1; medit_disp_ai_dialogue_lines(d,category); return; }
+      medit_disp_ai_dialogue_lines(d,category); return;
+    }
+    i=atoi(arg);if(i<0||i>=AI_DIALOGUE_CATEGORIES){medit_disp_ai_dialogue(d);return;} OLC_VAL(d)=i;medit_disp_ai_dialogue_lines(d,i);return;
+  case MEDIT_AI_DIALOGUE_ADD: if(*arg&&mob_ai_dialogue_set(OLC_MOB(d)->ai_config,OLC_VAL(d),OLC_MOB(d)->ai_config->dialogue_count[OLC_VAL(d)],arg))OLC_VAL(d)=1;else write_to_output(d,"Line rejected or pool full.\r\n");medit_disp_ai_dialogue_lines(d,OLC_VAL(d));return;
+  case MEDIT_AI_DIALOGUE_EDIT: { int category=OLC_VAL(d)/AI_DIALOGUE_MAX_LINES, line=OLC_VAL(d)%AI_DIALOGUE_MAX_LINES; if(*arg&&mob_ai_dialogue_set(OLC_MOB(d)->ai_config,category,line,arg))OLC_VAL(d)=1;else write_to_output(d,"Line rejected.\r\n");medit_disp_ai_dialogue_lines(d,category);return; }
+  case MEDIT_AI_ENABLE_CONFIRM: if (LOWER(*arg)=='y') { SET_BIT_AR(MOB_FLAGS(OLC_MOB(d)), MOB_AI_ACTOR); OLC_VAL(d)=1; medit_disp_ai_menu(d); return; } if (LOWER(*arg)=='n') { medit_disp_menu(d); return; } write_to_output(d,"Please answer Y or N: "); return;
   case MEDIT_AI_MODE:
   case MEDIT_AI_ROLE:
   case MEDIT_AI_MOVEMENT:
