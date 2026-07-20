@@ -75,6 +75,8 @@ static void medit_disp_mob_flags(struct descriptor_data *d);
 static void medit_disp_aff_flags(struct descriptor_data *d);
 static void medit_disp_menu(struct descriptor_data *d);
 static void medit_disp_ai_menu(struct descriptor_data *d);
+static void medit_disp_ai_perception(struct descriptor_data *d) { struct mob_ai_config*c=OLC_MOB(d)->ai_config; write_to_output(d,"\r\n                 AI Actor Perception\r\n1) Notice Entry: %s  2) Notice Departure: %s  3) Notice Speech: %s\r\n4) Notice Whispers: %s  5) Notice Emotes: %s  6) Notice Combat: %s\r\n7) Attacks Self: %s  8) Attacks Allies: %s  9) Corpses: %s\r\nA) Drops: %s  B) Gifts: %s  C) Crimes: %s\r\nD) Hearing: %d  E) Observation: %d  F) Suspicion: %d  G) Recognition: %d\r\nQ) Return\r\nChoice: ",c->notice_entry?"Yes":"No",c->notice_departure?"Yes":"No",c->notice_speech?"Yes":"No",c->notice_whispers?"Yes":"No",c->notice_emotes?"Yes":"No",c->notice_combat?"Yes":"No",c->notice_self_attack?"Yes":"No",c->notice_ally_attack?"Yes":"No",c->notice_corpses?"Yes":"No",c->notice_drops?"Yes":"No",c->notice_gifts?"Yes":"No",c->notice_crimes?"Yes":"No",c->hearing_sensitivity,c->observation_sensitivity,c->suspicion_threshold,c->recognition_confidence); OLC_MODE(d)=MEDIT_AI_PERCEPTION; }
+static void medit_disp_ai_memory(struct descriptor_data *d) { struct mob_ai_config*c=OLC_MOB(d)->ai_config; write_to_output(d,"\r\n                   AI Actor Memory\r\n1) Enabled: %s  2) Maximum Actors: %d  3) Ordinary Duration: %d  4) Important Duration: %d\r\n5) Trust Gain: %d%%  6) Trust Loss: %d%%  7) Fear Gain: %d%%  8) Fear Decay: %d\r\n9) Hostility Gain: %d%% A) Hostility Decay: %d B) Familiarity Gain: %d%% C) Familiarity Decay: %d D) Forgiveness: %d\r\nE) Attacks:%s F) Assistance:%s G) Crimes:%s H) Gifts:%s I) Insults:%s J) Conversations:%s K) Threats:%s L) Last room:%s M) Deaths:%s\r\nQ) Return\r\nChoice: ",c->memory_enabled?"Yes":"No",c->memory_max_actors,c->memory_ordinary_duration,c->memory_important_duration,c->trust_gain,c->trust_loss,c->fear_gain,c->fear_decay,c->hostility_gain,c->hostility_decay,c->familiarity_gain,c->familiarity_decay,c->forgiveness,c->remember_attacks?"Yes":"No",c->remember_assistance?"Yes":"No",c->remember_crimes?"Yes":"No",c->remember_gifts?"Yes":"No",c->remember_insults?"Yes":"No",c->remember_conversations?"Yes":"No",c->remember_threats?"Yes":"No",c->remember_last_room?"Yes":"No",c->remember_deaths?"Yes":"No"); OLC_MODE(d)=MEDIT_AI_MEMORY; }
 static void medit_disp_loadout_menu(struct descriptor_data *d);
 static int medit_slot_required_wear_flag(int wear_pos);
 static int medit_object_can_equip_slot(struct obj_data *obj, int wear_pos);
@@ -794,7 +796,7 @@ static void medit_disp_ai_menu(struct descriptor_data *d)
   if (!c) OLC_MOB(d)->ai_config = c = mob_ai_config_new();
   write_to_output(d,
     "\r\nAI Actor Configuration\r\n"
-    "1) Profile mode: %s\r\n2) Role: %d\r\n3) Movement: %d\r\n4) Personality\r\n5) Social behavior\r\n6) Dialogue lines\r\n"
+    "1) Profile mode: %s\r\n2) Role: %d\r\n3) Movement: %d\r\n4) Personality\r\n5) Social behavior\r\n6) Dialogue lines\r\n7) Perception\r\n8) Memory\r\n"
     "P) Preview compiled profile\r\nR) Reset to inferred defaults\r\nQ) Return\r\nChoice: ",
     c->mode == MOB_AI_CUSTOM ? "Custom" : c->mode == MOB_AI_INFERRED_OVERRIDES ? "Inferred with overrides" : "Inferred", c->role, c->movement);
   OLC_MODE(d) = MEDIT_AI_MENU;
@@ -1293,6 +1295,8 @@ void medit_parse(struct descriptor_data *d, char *arg)
       case '4': medit_disp_ai_personality(d); return;
       case '5': medit_disp_ai_social(d); return;
       case '6': medit_disp_ai_dialogue(d); return;
+      case '7': medit_disp_ai_perception(d); return;
+      case '8': medit_disp_ai_memory(d); return;
       case 'r': mob_ai_config_free(OLC_MOB(d)->ai_config); OLC_MOB(d)->ai_config = NULL; OLC_VAL(d) = 1; medit_disp_ai_menu(d); return;
       case 'p': { struct ai_actor_profile *p; int n; ai_actor_refresh_profile(OLC_MOB(d), TRUE); p=OLC_MOB(d)->ai_prof; write_to_output(d, "Compiled profile: role=%d movement=%d social=%s\r\nSpeech: greet=%s ambient=%s emotes=%s whisper=%s cooldowns=%d/%d/%d\r\nResponses: strangers=%s trusted=%s feared=%s hostile=%s; response modifier=%+d\r\nTraits:", p->role, p->movement, ai_social_style_name(p->social), p->greeting_enabled?"on":"off",p->ambient_speech_enabled?"on":"off",p->ambient_emotes_enabled?"on":"off",p->whisper_enabled?"on":"off",p->talk_cooldown_secs,p->room_talk_cooldown_secs,p->emote_cooldown_secs,p->respond_strangers?"on":"off",p->respond_trusted?"on":"off",p->respond_feared?"on":"off",p->respond_hostile?"on":"off",ai_actor_personality_response_modifier(p->personality)); for(n=0;n<AI_ACTOR_PERSONALITIES;n++) write_to_output(d," %s=%d",ai_trait_names[n],p->personality[n]); write_to_output(d,"\r\nDialogue pools:"); for(n=0;n<AI_DIALOGUE_CATEGORIES;n++) write_to_output(d," %s=%d",ai_dialogue_category_name(n),p->dialogue_count[n]); write_to_output(d,"\r\n"); medit_disp_ai_menu(d); return; }
       default: medit_disp_ai_menu(d); return;
@@ -1319,6 +1323,10 @@ void medit_parse(struct descriptor_data *d, char *arg)
     i=atoi(arg);if(i<0||i>=AI_DIALOGUE_CATEGORIES){medit_disp_ai_dialogue(d);return;} OLC_VAL(d)=i;medit_disp_ai_dialogue_lines(d,i);return;
   case MEDIT_AI_DIALOGUE_ADD: if(*arg&&mob_ai_dialogue_set(OLC_MOB(d)->ai_config,OLC_VAL(d),OLC_MOB(d)->ai_config->dialogue_count[OLC_VAL(d)],arg))OLC_VAL(d)=1;else write_to_output(d,"Line rejected or pool full.\r\n");medit_disp_ai_dialogue_lines(d,OLC_VAL(d));return;
   case MEDIT_AI_DIALOGUE_EDIT: { int category=OLC_VAL(d)/AI_DIALOGUE_MAX_LINES, line=OLC_VAL(d)%AI_DIALOGUE_MAX_LINES; if(*arg&&mob_ai_dialogue_set(OLC_MOB(d)->ai_config,category,line,arg))OLC_VAL(d)=1;else write_to_output(d,"Line rejected.\r\n");medit_disp_ai_dialogue_lines(d,category);return; }
+  case MEDIT_AI_PERCEPTION: if(LOWER(*arg)=='q'){medit_disp_ai_menu(d);return;} i=(LOWER(*arg)>='a'&&LOWER(*arg)<='g')?10+LOWER(*arg)-'a':atoi(arg); if(i<1||i>16){medit_disp_ai_perception(d);return;} OLC_VAL(d)=i; OLC_MODE(d)=MEDIT_AI_PERCEPTION_VALUE; write_to_output(d,"Value (0-100; toggles 0/1): ");return;
+  case MEDIT_AI_PERCEPTION_VALUE: { struct mob_ai_config*c=OLC_MOB(d)->ai_config; int *v=&c->notice_entry+OLC_VAL(d)-1; if(i<0||i>100||(OLC_VAL(d)<=12&&i>1)){write_to_output(d,"Invalid value: ");return;} if(*v!=i){*v=i;OLC_VAL(d)=1;} medit_disp_ai_perception(d);return; }
+  case MEDIT_AI_MEMORY: if(LOWER(*arg)=='q'){medit_disp_ai_menu(d);return;} i=(LOWER(*arg)>='a'&&LOWER(*arg)<='m')?10+LOWER(*arg)-'a':atoi(arg);if(i<1||i>22){medit_disp_ai_memory(d);return;}OLC_VAL(d)=i;OLC_MODE(d)=MEDIT_AI_MEMORY_VALUE;write_to_output(d,"Value: ");return;
+  case MEDIT_AI_MEMORY_VALUE: { struct mob_ai_config*c=OLC_MOB(d)->ai_config; int *v; if(OLC_VAL(d)<=13) v=&c->memory_enabled+OLC_VAL(d)-1; else v=&c->remember_attacks+OLC_VAL(d)-14; if(i<0||i>((OLC_VAL(d)==2)?AI_MEM_MAX:((OLC_VAL(d)>=5&&OLC_VAL(d)<=7||OLC_VAL(d)==9||OLC_VAL(d)==11)?200:((OLC_VAL(d)>=14)?1:100)))){write_to_output(d,"Invalid value: ");return;}if(*v!=i){*v=i;OLC_VAL(d)=1;}medit_disp_ai_memory(d);return; }
   case MEDIT_AI_ENABLE_CONFIRM: if (LOWER(*arg)=='y') { SET_BIT_AR(MOB_FLAGS(OLC_MOB(d)), MOB_AI_ACTOR); OLC_VAL(d)=1; medit_disp_ai_menu(d); return; } if (LOWER(*arg)=='n') { medit_disp_menu(d); return; } write_to_output(d,"Please answer Y or N: "); return;
   case MEDIT_AI_MODE:
   case MEDIT_AI_ROLE:

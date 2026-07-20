@@ -345,6 +345,11 @@ int write_mobile_espec(mob_vnum mvnum, struct char_data *mob, FILE *fd)
       c->personality[0], c->personality[1], c->personality[2], c->personality[3], c->personality[4]);
     fprintf(fd, "AIConfigTraits: %d %d %d %d %d %d %d\n", c->personality[5], c->personality[6], c->personality[7], c->personality[8], c->personality[9], c->personality[10], c->personality[11]);
     fprintf(fd, "AIConfigSocial: %d %d %d %d %d %d %d %d %d\n", c->whisper_enabled, c->respond_strangers, c->respond_trusted, c->respond_feared, c->respond_hostile, c->room_speech_cooldown, c->dialogue_count[0], c->dialogue_count[1], c->dialogue_count[2]);
+    fprintf(fd, "AIConfigPerception: %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d\n", c->notice_entry,c->notice_departure,c->notice_speech,c->notice_whispers,c->notice_emotes,c->notice_combat,c->notice_self_attack,c->notice_ally_attack,c->notice_corpses,c->notice_drops,c->notice_gifts,c->notice_crimes,c->hearing_sensitivity,c->observation_sensitivity,c->suspicion_threshold,c->recognition_confidence);
+    fprintf(fd, "AIConfigMemory: %d %d %d %d %d %d %d %d %d %d %d %d %d\n", c->memory_enabled,c->memory_max_actors,c->memory_ordinary_duration,c->memory_important_duration,c->trust_gain,c->trust_loss,c->fear_gain,c->fear_decay,c->hostility_gain,c->hostility_decay,c->familiarity_gain,c->familiarity_decay,c->forgiveness);
+    fprintf(fd, "AIConfigMemoryFlags: %d %d %d %d %d %d %d %d %d\n",c->remember_attacks,c->remember_assistance,c->remember_crimes,c->remember_gifts,c->remember_insults,c->remember_conversations,c->remember_threats,c->remember_last_room,c->remember_deaths);
+    fprintf(fd, "AIConfigThreat: %d %d %d %d %d %d %d %d %d %d %d %d\n",c->threat_enabled[0],c->threat_enabled[1],c->threat_enabled[2],c->threat_enabled[3],c->threat_enabled[4],c->threat_enabled[5],c->threat_enabled[6],c->threat_enabled[7],c->threat_enabled[8],c->threat_enabled[9],c->threat_cooldown,c->repeated_event_window);
+    for (i=0;i<c->threat_step_count;i++) fprintf(fd,"AIThreatStep: %d %d %d %d %d\n",c->threat_steps[i].type,c->threat_steps[i].minimum_severity,c->threat_steps[i].cooldown,c->threat_steps[i].max_repetitions,c->threat_steps[i].advance_on_failure);
     for (k=0;k<AI_DIALOGUE_CATEGORIES;k++) for (i=0;i<c->dialogue_count[k];i++) if (c->dialogue[k][i]) fprintf(fd, "AIDialogue: %d %s\n", k, c->dialogue[k][i]);
   }
 

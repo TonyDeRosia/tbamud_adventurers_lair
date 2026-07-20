@@ -323,6 +323,10 @@ extern const char *nrm, *grn, *cyn, *yel;
 #define MEDIT_AI_DIALOGUE_DELETE         68
 #define MEDIT_AI_DIALOGUE_REORDER        69
 #define MEDIT_AI_ENABLE_CONFIRM          70
+#define MEDIT_AI_PERCEPTION               71
+#define MEDIT_AI_PERCEPTION_VALUE         72
+#define MEDIT_AI_MEMORY                   73
+#define MEDIT_AI_MEMORY_VALUE             74
 
 /* Submodes of SEDIT connectedness. */
 #define SEDIT_MAIN_MENU              	0
