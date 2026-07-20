@@ -2716,6 +2716,9 @@ struct char_data *read_mobile(mob_vnum nr, int type) /* and mob_rnum */
   clear_char(mob);
  
   *mob = mob_proto[i];
+  /* The prototype owns its persisted AI configuration.  A live mobile must
+   * have its own copy because extraction releases the live configuration. */
+  mob->ai_config = mob_ai_config_copy(mob_proto[i].ai_config);
   if (GET_SEX(mob) == SEX_RANDOM)
     GET_SEX(mob) = rand_number(SEX_MALE, SEX_FEMALE);
   mob->next = character_list;
