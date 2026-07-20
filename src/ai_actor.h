@@ -405,6 +405,7 @@ void ai_actor_schedule_preview(const struct mob_ai_config *c, int day, int hour,
 void ai_actor_schedule_validate(const struct mob_ai_config *c, char *out, size_t size);
 void ai_actor_patrol_preview(const struct mob_ai_config *c, int route_id, char *out, size_t size);
 void ai_actor_schedule_interrupt(struct char_data *mob, int reason, long actor_id, time_t now);
+void ai_actor_schedule_show_state(struct char_data *viewer, const struct char_data *mob);
 void ai_actor_record_damage(struct char_data *mob, struct char_data *actor, int dam);
 void ai_actor_record_help(struct char_data *mob, struct char_data *actor, int amount);
 void ai_actor_record_crime(struct char_data *mob, struct char_data *criminal, int flags);

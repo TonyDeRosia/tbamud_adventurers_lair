@@ -8098,4 +8098,5 @@ ACMD(do_aistate)
     return;
   }
   ai_actor_brain_show_state(ch, mob);
+  ai_actor_schedule_show_state(ch, mob);
 }
