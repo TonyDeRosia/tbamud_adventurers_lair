@@ -138,13 +138,17 @@ static const char *pick_from_pool(struct char_data *ch, const struct npc_pool *p
 
 static struct ai_actor_memory_entry *npc_mem_get(struct char_data *ch, long idnum)
 {
-  int i;
+  int i, limit, evict = -1;
   if (!ch || !ch->ai_state || idnum <= 0) return NULL;
   for (i = 0; i < ch->ai_state->mem_count; i++)
     if (ch->ai_state->mem[i].idnum == idnum)
       return &ch->ai_state->mem[i];
-  if (ch->ai_state->mem_count >= AI_MEM_MAX) return NULL;
-  i = ch->ai_state->mem_count++;
+  limit = (ch->ai_prof && ch->ai_prof->memory_enabled) ? ch->ai_prof->memory_max_actors : AI_MEM_MAX;
+  if (ch->ai_state->mem_count >= limit) { /* Evict the least relevant relationship, never randomly. */
+    int score = 1000000;
+    for (i=0;i<ch->ai_state->mem_count;i++) { int s=abs(ch->ai_state->mem[i].trust)+ch->ai_state->mem[i].fear+ch->ai_state->mem[i].hostility; if(s<score){score=s;evict=i;} }
+    if (evict < 0) return NULL; i=evict;
+  } else i = ch->ai_state->mem_count++;
   memset(&ch->ai_state->mem[i], 0, sizeof(ch->ai_state->mem[i]));
   ch->ai_state->mem[i].idnum = idnum;
   return &ch->ai_state->mem[i];
@@ -1116,12 +1120,15 @@ void npc_ai_do_emote(struct char_data *ch, const struct npc_social_profile *prof
 void npc_ai_update_memory(struct char_data *ch, struct char_data *player, int trust_delta, int annoyance_delta, int fear_delta, time_t now)
 {
   struct ai_actor_memory_entry *m;
-  if (!ch || !player || IS_NPC(player)) return;
+  if (!ch || !player || IS_NPC(player) || !ch->ai_prof || !ch->ai_prof->memory_enabled) return;
   m = npc_mem_get(ch, GET_IDNUM(player));
   if (!m) return;
-  m->trust = CLAMP(m->trust + trust_delta, -100, 100);
-  m->attitude = CLAMP(m->attitude - annoyance_delta, -100, 100);
-  m->fear = CLAMP(m->fear + fear_delta, 0, 100);
+  m->trust = CLAMP(m->trust + trust_delta * (trust_delta >= 0 ? ch->ai_prof->trust_gain : ch->ai_prof->trust_loss) / 100, -100, 100);
+  m->attitude = CLAMP(m->attitude - annoyance_delta * ch->ai_prof->hostility_gain / 100, -100, 100);
+  m->hostility = CLAMP(m->hostility + annoyance_delta * ch->ai_prof->hostility_gain / 100, 0, 100);
+  m->fear = CLAMP(m->fear + fear_delta * ch->ai_prof->fear_gain / 100, 0, 100);
+  m->familiarity = CLAMP(m->familiarity + (trust_delta > 0 ? ch->ai_prof->familiarity_gain / 20 : 0), 0, 100);
+  m->identity_confidence = 85; m->belief_confidence = 85.0f;
   m->last_seen_time = now;
   m->last_interaction_time = now;
 }
