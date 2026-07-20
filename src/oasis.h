@@ -335,6 +335,8 @@ extern const char *nrm, *grn, *cyn, *yel;
 #define MEDIT_AI_COMBAT_VALUE             80
 #define MEDIT_AI_TARGETS                  81
 #define MEDIT_AI_TARGET_VALUE             82
+#define MEDIT_AI_SCHEDULE                 83
+#define MEDIT_AI_SCHEDULE_EDIT            84
 
 /* Submodes of SEDIT connectedness. */
 #define SEDIT_MAIN_MENU              	0
