@@ -310,6 +310,7 @@ void ai_actor_event_enter(struct char_data *actor, room_rnum room);
 enum ai_actor_persona get_actor_persona(struct char_data *ch);
 void ai_actor_event_leave(struct char_data *actor, room_rnum room);
 void ai_actor_event_say(struct char_data *actor, const char *msg);
+void ai_actor_event_whisper(struct char_data *actor, struct char_data *target, const char *msg);
 void ai_actor_event_emote(struct char_data *actor, const char *msg);
 void ai_actor_event_combat_start(struct char_data *attacker, struct char_data *victim);
 void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, struct char_data *actor, const char *text);
@@ -324,5 +325,9 @@ void mob_ai_config_validate(struct mob_ai_config *config);
 const char *ai_social_style_name(int style);
 const char *ai_dialogue_category_name(int category);
 int mob_ai_dialogue_set(struct mob_ai_config *config, int category, int index, const char *line);
+int mob_ai_dialogue_delete(struct mob_ai_config *config, int category, int index);
+int mob_ai_dialogue_move(struct mob_ai_config *config, int category, int from, int to);
+/* Deterministic social response modifier; every personality trait contributes. */
+int ai_actor_personality_response_modifier(const int personality[AI_ACTOR_PERSONALITIES]);
 
 #endif

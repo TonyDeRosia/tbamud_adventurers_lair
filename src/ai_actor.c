@@ -41,6 +41,12 @@ struct mob_ai_config *mob_ai_config_copy(const struct mob_ai_config *from)
 void mob_ai_config_free(struct mob_ai_config *c) { int k,i; if (!c) return; for(k=0;k<AI_DIALOGUE_CATEGORIES;k++) for(i=0;i<AI_DIALOGUE_MAX_LINES;i++) free(c->dialogue[k][i]); free(c); }
 int mob_ai_dialogue_set(struct mob_ai_config *c, int k, int i, const char *line)
 { char clean[AI_DIALOGUE_LINE_MAX], *p; if (!c || k<0 || k>=AI_DIALOGUE_CATEGORIES || i<0 || i>=AI_DIALOGUE_MAX_LINES || !line) return FALSE; strlcpy(clean,line,sizeof(clean)); for(p=clean;*p;p++) if(*p=='\r'||*p=='\n') *p=' '; skip_spaces(&p); if(!*p) return FALSE; free(c->dialogue[k][i]); c->dialogue[k][i]=strdup(p); if(i>=c->dialogue_count[k]) c->dialogue_count[k]=i+1; return TRUE; }
+int mob_ai_dialogue_delete(struct mob_ai_config *c, int k, int i)
+{ int n; if (!c || k < 0 || k >= AI_DIALOGUE_CATEGORIES || i < 0 || i >= c->dialogue_count[k]) return FALSE; free(c->dialogue[k][i]); for (n=i; n+1<c->dialogue_count[k]; n++) c->dialogue[k][n]=c->dialogue[k][n+1]; c->dialogue[k][--c->dialogue_count[k]]=NULL; return TRUE; }
+int mob_ai_dialogue_move(struct mob_ai_config *c, int k, int from, int to)
+{ char *line; if (!c || k < 0 || k >= AI_DIALOGUE_CATEGORIES || from < 0 || from >= c->dialogue_count[k] || to < 0 || to >= c->dialogue_count[k]) return FALSE; line=c->dialogue[k][from]; if(from<to) for(;from<to;from++) c->dialogue[k][from]=c->dialogue[k][from+1]; else for(;from>to;from--) c->dialogue[k][from]=c->dialogue[k][from-1]; c->dialogue[k][to]=line; return TRUE; }
+int ai_actor_personality_response_modifier(const int p[AI_ACTOR_PERSONALITIES])
+{ static const int weight[AI_ACTOR_PERSONALITIES] = { -2, 1, 3, 1, -1, 1, -1, 2, 1, 1, -3, 2 }; int i, score=0; if (!p) return 0; for (i=0;i<AI_ACTOR_PERSONALITIES;i++) score += (p[i]-50)*weight[i]; return AI_CLAMP(score/10, -35, 35); }
 void mob_ai_config_validate(struct mob_ai_config *c)
 { int i,k; if (!c) return; c->mode=AI_CLAMP(c->mode,MOB_AI_INFERRED,MOB_AI_INFERRED_OVERRIDES); c->role=AI_CLAMP(c->role,ROLE_UNKNOWN,ROLE_BOSS); c->movement=AI_CLAMP(c->movement,AI_MOVE_STATIONARY,AI_MOVE_RETURN_HOME); c->social=AI_CLAMP(c->social,AI_SOCIAL_SILENT,AI_SOCIAL_GOSSIP); c->roam_radius=AI_CLAMP(c->roam_radius,0,100); c->pursuit_distance=AI_CLAMP(c->pursuit_distance,0,100); c->movement_delay=AI_CLAMP(c->movement_delay,1,60); c->speech_cooldown=AI_CLAMP(c->speech_cooldown,AI_SOCIAL_COOLDOWN_MIN,AI_SOCIAL_COOLDOWN_MAX); c->room_speech_cooldown=AI_CLAMP(c->room_speech_cooldown,AI_SOCIAL_COOLDOWN_MIN,AI_SOCIAL_COOLDOWN_MAX); c->emote_cooldown=AI_CLAMP(c->emote_cooldown,AI_SOCIAL_COOLDOWN_MIN,AI_SOCIAL_COOLDOWN_MAX); c->flee_hp_percent=AI_CLAMP(c->flee_hp_percent,0,100); c->surrender_hp_percent=AI_CLAMP(c->surrender_hp_percent,0,100); for(i=0;i<AI_ACTOR_PERSONALITIES;i++) c->personality[i]=AI_CLAMP(c->personality[i],0,100); for(k=0;k<AI_DIALOGUE_CATEGORIES;k++) c->dialogue_count[k]=AI_CLAMP(c->dialogue_count[k],0,AI_DIALOGUE_MAX_LINES); }
 
@@ -207,14 +213,36 @@ enum ai_actor_persona get_actor_persona(struct char_data *ch)
   return AI_PERSONA_NEUTRAL;
 }
 
+static int ai_social_response_enabled(struct char_data *mob, struct char_data *actor)
+{
+  struct ai_actor_memory_entry *m = NULL;
+  int i;
+  if (!mob || !mob->ai_prof || !actor) return FALSE;
+  for (i = 0; mob->ai_state && i < mob->ai_state->mem_count; i++)
+    if (mob->ai_state->mem[i].idnum == GET_IDNUM(actor)) { m = &mob->ai_state->mem[i]; break; }
+  if (!m) return mob->ai_prof->respond_strangers;
+  if (m->hostility > 0 || m->attitude < -20) return mob->ai_prof->respond_hostile;
+  if (m->fear > 25) return mob->ai_prof->respond_feared;
+  if (m->trust > 15 || m->attitude > 15) return mob->ai_prof->respond_trusted;
+  return mob->ai_prof->respond_strangers;
+}
+
 void ai_actor_on_room_event(struct char_data *mob, enum ai_event_type type, struct char_data *actor, const char *text)
 {
   time_t now = time(0);
   if (!npc_ai_is_humanoid_social_candidate(mob) || !actor || IS_NPC(actor)) return;
   if (!mob->ai_state || !mob->ai_prof) ai_actor_init(mob);
   if (mob->ai_prof->social == AI_SOCIAL_SILENT) return;
-  if (type == AI_EVENT_PLAYER_ENTER && mob->ai_prof->greeting_enabled && now - mob->ai_state->last_spoke >= mob->ai_prof->talk_cooldown_secs && rand_number(1,100) <= 5 + mob->ai_prof->personality[AI_TRAIT_SOCIABILITY]/3) { ai_social_say(mob, AI_DIALOGUE_GREETING, mob->ai_prof->social == AI_SOCIAL_FRIENDLY ? "Welcome." : NULL, now); return; }
-  if (type == AI_EVENT_PLAYER_SAY && mob->ai_prof->respond_strangers && now - mob->ai_state->last_spoke >= mob->ai_prof->talk_cooldown_secs) { int category = mob->ai_prof->personality[AI_TRAIT_SUSPICION] > 60 ? AI_DIALOGUE_SUSPICIOUS : AI_DIALOGUE_FRIENDLY; if (mob->ai_prof->social == AI_SOCIAL_HOSTILE || mob->ai_prof->personality[AI_TRAIT_AGGRESSION] > 70) category=AI_DIALOGUE_HOSTILE; ai_social_say(mob,category, NULL,now); if (mob->ai_state->last_spoke == now) return; }
+  if (type == AI_EVENT_PLAYER_ENTER && mob->ai_prof->greeting_enabled && ai_social_response_enabled(mob, actor) && now - mob->ai_state->last_spoke >= mob->ai_prof->talk_cooldown_secs && rand_number(1,100) <= AI_CLAMP(30 + ai_actor_personality_response_modifier(mob->ai_prof->personality), 1, 95)) { ai_social_say(mob, AI_DIALOGUE_GREETING, mob->ai_prof->social == AI_SOCIAL_FRIENDLY ? "Welcome." : NULL, now); return; }
+  if (type == AI_EVENT_PLAYER_SAY) {
+    int category;
+    if (!ai_social_response_enabled(mob, actor)) return;
+    if (now - mob->ai_state->last_spoke < mob->ai_prof->talk_cooldown_secs) return;
+    category = mob->ai_prof->personality[AI_TRAIT_SUSPICION] > 60 ? AI_DIALOGUE_SUSPICIOUS : AI_DIALOGUE_FRIENDLY;
+    if (mob->ai_prof->social == AI_SOCIAL_HOSTILE || mob->ai_prof->personality[AI_TRAIT_AGGRESSION] > 70) category=AI_DIALOGUE_HOSTILE;
+    ai_social_say(mob,category, NULL,now);
+    return; /* Configured response toggles also gate the legacy responder. */
+  }
   switch (type) {
     case AI_EVENT_PLAYER_ENTER: npc_ai_handle_player_enter(mob, actor, now); break;
     case AI_EVENT_PLAYER_LEAVE: npc_ai_handle_player_leave(mob, actor, now); break;
@@ -246,6 +274,12 @@ void ai_actor_event_say(struct char_data *actor, const char *msg)
   if (!actor || IS_NPC(actor) || IN_ROOM(actor) == NOWHERE) return;
   for (mob = world[IN_ROOM(actor)].people; mob; mob = mob->next_in_room)
     ai_actor_on_room_event(mob, AI_EVENT_PLAYER_SAY, actor, msg);
+}
+
+void ai_actor_event_whisper(struct char_data *actor, struct char_data *target, const char *msg)
+{
+  if (!actor || !target || !target->ai_prof || !target->ai_prof->whisper_enabled) return;
+  ai_actor_on_room_event(target, AI_EVENT_PLAYER_SAY, actor, msg);
 }
 
 void ai_actor_event_emote(struct char_data *actor, const char *msg)
