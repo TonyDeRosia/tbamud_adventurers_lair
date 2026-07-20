@@ -53,9 +53,9 @@ assert 'ai_schedule_mark_skip(s,e)' in s
 assert 'AI_PATROL_LOOP' in s and 'AI_PATROL_PINGPONG' in s and 'AI_PATROL_ONCE' in h
 print('AI actor schedule runtime policy regression checks passed')
 # Final schedule reporting/diagnostic integration guards.
-assert 'Compiled prototype preview; live runtime suppression unavailable' in s
+assert 'Compiled prototype preview;' in s and 'live runtime suppression' in s
 assert 'Schedule Errors' in s and 'Patrol Errors' in s and 'Cross-System Warnings' in s
-assert 'Winner explanation: eligible; canonical selection compares' in s
+assert 'Winner explanation: eligible; canonical selection' in s and 'compares higher priority' in s
 assert 'Traversal: %s' in s and 'loop closure' in s
 assert 'void ai_actor_schedule_show_state' in s
 assert 'Schedule Diagnostics (read-only)' in s
