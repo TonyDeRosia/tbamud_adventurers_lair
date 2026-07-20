@@ -444,6 +444,8 @@ void mob_ai_config_free(struct mob_ai_config *config);
 void mob_ai_config_validate(struct mob_ai_config *config);
 const char *ai_social_style_name(int style);
 const char *ai_dialogue_category_name(int category);
+const char *ai_actor_config_role_name(int role);
+const char *ai_actor_config_movement_name(int movement);
 int mob_ai_dialogue_set(struct mob_ai_config *config, int category, int index, const char *line);
 int mob_ai_dialogue_delete(struct mob_ai_config *config, int category, int index);
 int mob_ai_dialogue_move(struct mob_ai_config *config, int category, int from, int to);

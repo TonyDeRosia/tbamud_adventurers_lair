@@ -32,6 +32,18 @@ static const char *social_names[] = { "Silent", "Reserved", "Polite", "Friendly"
 static const char *dialogue_names[] = { "Greeting", "Friendly response", "Suspicious response", "Hostile response", "Ambient speech", "Ambient emote", "Farewell", "Warning", "Challenge", "Threat", "Call for help", "Fear", "Schedule departure", "Schedule arrival", "Work", "Guard", "Patrol", "Sleep", "Wake", "Schedule failure" };
 const char *ai_social_style_name(int style) { return (style >= 0 && style <= AI_SOCIAL_GOSSIP) ? social_names[style] : "Reserved"; }
 const char *ai_dialogue_category_name(int category) { return (category >= 0 && category < AI_DIALOGUE_CATEGORIES) ? dialogue_names[category] : "Unknown"; }
+const char *ai_actor_config_role_name(int role)
+{
+  static const char *names[] = { "Unknown", "Guard", "Merchant", "Bandit",
+    "Beast", "Undead", "Spirit", "Cultist", "Civilian", "Boss" };
+  return role >= ROLE_UNKNOWN && role <= ROLE_BOSS ? names[role] : "Unknown";
+}
+const char *ai_actor_config_movement_name(int movement)
+{
+  static const char *names[] = { "Stationary", "Random", "Patrol", "Scheduled",
+    "Guard room", "Return home" };
+  return movement >= AI_MOVE_STATIONARY && movement <= AI_MOVE_RETURN_HOME ? names[movement] : "Unknown";
+}
 
 struct mob_ai_config *mob_ai_config_new(void)
 {
