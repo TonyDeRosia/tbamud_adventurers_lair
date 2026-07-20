@@ -13,12 +13,15 @@
 #define AI_SOCIAL_COOLDOWN_MIN 1
 #define AI_SOCIAL_COOLDOWN_MAX 300
 #define AI_THREAT_STEP_MAX 10
+#define AI_TARGET_WEIGHTS 8
 
 enum mob_ai_profile_mode { MOB_AI_INFERRED = 0, MOB_AI_CUSTOM, MOB_AI_INFERRED_OVERRIDES };
 enum mob_ai_personality { AI_TRAIT_AGGRESSION, AI_TRAIT_BRAVERY, AI_TRAIT_SOCIABILITY, AI_TRAIT_CURIOSITY, AI_TRAIT_DISCIPLINE, AI_TRAIT_HONESTY, AI_TRAIT_GREED, AI_TRAIT_COMPASSION, AI_TRAIT_LOYALTY, AI_TRAIT_PATIENCE, AI_TRAIT_SUSPICION, AI_TRAIT_PRIDE };
 enum ai_social_style { AI_SOCIAL_SILENT, AI_SOCIAL_RESERVED, AI_SOCIAL_POLITE, AI_SOCIAL_FRIENDLY, AI_SOCIAL_TALKATIVE, AI_SOCIAL_BOASTFUL, AI_SOCIAL_RUDE, AI_SOCIAL_HOSTILE, AI_SOCIAL_EXTORTING, AI_SOCIAL_PREACHER, AI_SOCIAL_GOSSIP };
 enum ai_dialogue_category { AI_DIALOGUE_GREETING, AI_DIALOGUE_FRIENDLY, AI_DIALOGUE_SUSPICIOUS, AI_DIALOGUE_HOSTILE, AI_DIALOGUE_AMBIENT_SPEECH, AI_DIALOGUE_AMBIENT_EMOTE, AI_DIALOGUE_FAREWELL, AI_DIALOGUE_WARNING, AI_DIALOGUE_CHALLENGE, AI_DIALOGUE_THREAT, AI_DIALOGUE_CALL_HELP, AI_DIALOGUE_FEAR };
 enum ai_threat_response { AI_THREAT_OBSERVE, AI_THREAT_WARN, AI_THREAT_CHALLENGE, AI_THREAT_CALL_HELP, AI_THREAT_ASSIST, AI_THREAT_FOLLOW, AI_THREAT_ARREST, AI_THREAT_ATTACK, AI_THREAT_FLEE, AI_THREAT_SURRENDER, AI_THREAT_IGNORE, AI_THREAT_RESPONSE_MAX };
+enum ai_combat_style { AI_COMBAT_PASSIVE, AI_COMBAT_DEFENSIVE, AI_COMBAT_BALANCED, AI_COMBAT_AGGRESSIVE, AI_COMBAT_PROTECTOR, AI_COMBAT_COWARDLY, AI_COMBAT_FANATICAL, AI_COMBAT_OPPORTUNIST, AI_COMBAT_CONTROLLER, AI_COMBAT_BOSS, AI_COMBAT_STYLE_MAX };
+enum ai_target_weight { AI_TARGET_CURRENT_ATTACKER, AI_TARGET_TRUSTED_ATTACKER, AI_TARGET_GROUP_ATTACKER, AI_TARGET_KNOWN_HOSTILE, AI_TARGET_LOW_HEALTH, AI_TARGET_PLAYER, AI_TARGET_NPC, AI_TARGET_PREVIOUS };
 struct ai_threat_step { int type, minimum_severity, cooldown, max_repetitions, advance_on_failure; };
 enum mob_ai_config_movement { AI_MOVE_STATIONARY, AI_MOVE_RANDOM, AI_MOVE_PATROL, AI_MOVE_SCHEDULED, AI_MOVE_GUARD_ROOM, AI_MOVE_RETURN_HOME };
 struct mob_ai_config {
@@ -38,6 +41,11 @@ struct mob_ai_config {
   int remember_attacks, remember_assistance, remember_crimes, remember_gifts, remember_insults, remember_conversations, remember_threats, remember_last_room, remember_deaths;
   int threat_enabled[AI_THREAT_RESPONSE_MAX], threat_cooldown, calm_reset_time, repeated_event_window, threat_step_count;
   struct ai_threat_step threat_steps[10];
+  int combat_style, combat_enabled, may_initiate, may_assist, may_call_help, may_flee;
+  int protect_trusted, protect_group, protect_same_role, protect_same_prototype;
+  int avoid_incapacitated, retaliate_self, retaliate_ally, retaliate_hostile, switch_targets;
+  int assist_severity, target_switch_threshold, max_allies, max_responders, combat_cooldown;
+  int target_weight[AI_TARGET_WEIGHTS];
 };
 #define AI_OVERRIDE_ROLE (1UL << 0)
 #define AI_OVERRIDE_MOVEMENT (1UL << 1)
@@ -232,6 +240,11 @@ struct ai_actor_profile {
   int remember_attacks, remember_assistance, remember_crimes, remember_gifts, remember_insults, remember_conversations, remember_threats, remember_last_room, remember_deaths;
   int threat_enabled[AI_THREAT_RESPONSE_MAX], threat_cooldown, calm_reset_time, repeated_event_window, threat_step_count;
   struct ai_threat_step threat_steps[10];
+  int combat_style, combat_enabled, may_initiate, may_assist, may_call_help, may_flee;
+  int protect_trusted, protect_group, protect_same_role, protect_same_prototype;
+  int avoid_incapacitated, retaliate_self, retaliate_ally, retaliate_hostile, switch_targets;
+  int assist_severity, target_switch_threshold, max_allies, max_responders, combat_cooldown;
+  int target_weight[AI_TARGET_WEIGHTS];
 };
 
 struct ai_actor_recent_event {
@@ -311,6 +324,8 @@ struct ai_actor_state {
   int recent_emote_hashes[5];
   struct ai_actor_recent_event recent_events[AI_EVENT_RING_MAX];
   struct ai_actor_brain *brain;
+  time_t last_combat_action, last_target_switch;
+  long last_selected_target_idnum;
 };
 
 uint32_t ai_actor_compute_signature(struct char_data *mob);
@@ -338,6 +353,9 @@ void ai_actor_event_corpse(struct char_data *dead, room_rnum room);
 void ai_actor_event_drop(struct char_data *actor, struct obj_data *obj);
 void ai_actor_event_give(struct char_data *actor, struct char_data *to, struct obj_data *obj);
 void ai_actor_event_attack(struct char_data *attacker, struct char_data *victim, int damage);
+int ai_actor_target_score(struct char_data *mob, struct char_data *candidate);
+int ai_actor_is_local_ally(struct char_data *mob, struct char_data *other, const char **reason);
+int ai_actor_should_flee(struct char_data *mob);
 void ai_actor_event_crime(struct char_data *criminal, int flags);
 enum ai_relationship { AI_REL_UNKNOWN, AI_REL_FAMILIAR, AI_REL_TRUSTED, AI_REL_FEARED, AI_REL_HOSTILE, AI_REL_TRUSTED_FEARED, AI_REL_HOSTILE_FEARED };
 enum ai_relationship ai_actor_relationship(const struct ai_actor_memory_entry *memory);
