@@ -77,6 +77,13 @@ static void medit_disp_mob_flags(struct descriptor_data *d);
 static void medit_disp_aff_flags(struct descriptor_data *d);
 static void medit_disp_menu(struct descriptor_data *d);
 static void medit_disp_ai_menu(struct descriptor_data *d);
+static void medit_disp_ai_compatibility(struct descriptor_data *d)
+{
+  char report[MAX_STRING_LENGTH];
+  ai_actor_compatibility_report(OLC_MOB(d), report, sizeof(report), TRUE);
+  write_to_output(d, "%s", report);
+  OLC_MODE(d) = MEDIT_AI_COMPATIBILITY;
+}
 static const char *medit_ai_state(struct descriptor_data *d, int enabled);
 static void medit_disp_ai_mode(struct descriptor_data *d)
 {
@@ -899,6 +906,7 @@ static void medit_disp_menu(struct descriptor_data *d)
   struct char_data *mob;
   char flags[MAX_STRING_LENGTH], flag2[MAX_STRING_LENGTH];
   char price_buf[MAX_INPUT_LENGTH];
+  char ai_status[96];
 
   mob = OLC_MOB(d);
   get_char_colors(d->character);
@@ -908,6 +916,11 @@ static void medit_disp_menu(struct descriptor_data *d)
     snprintf(price_buf, sizeof(price_buf), "%d", GET_PET_PRICE(mob));
   else
     strlcpy(price_buf, "(default)", sizeof(price_buf));
+  if (MOB_FLAGGED(mob, MOB_AI_ACTOR)) {
+    int warnings = ai_actor_compatibility_warning_count(mob);
+    snprintf(ai_status, sizeof(ai_status), "Enabled [%s]", warnings ? "compatibility warnings present" : "No compatibility warnings");
+    if (warnings) snprintf(ai_status, sizeof(ai_status), "Enabled [%d compatibility warnings]", warnings);
+  } else strlcpy(ai_status, "Disabled -- select I to enable AI Actor behavior", sizeof(ai_status));
 
   write_to_output(d,
   "-- Mob Number:  [%s%d%s]\r\n"
@@ -950,7 +963,7 @@ static void medit_disp_menu(struct descriptor_data *d)
           grn, nrm, cyn, flag2,
           grn, nrm, yel, price_buf,
           grn, nrm,
-          grn, nrm, yel, MOB_FLAGGED(mob, MOB_AI_ACTOR) ? (mob->ai_config ? "Enabled" : "Enabled (inferred)") : "Disabled -- select I to enable AI Actor behavior", nrm,
+          grn, nrm, yel, ai_status, nrm,
           grn, nrm, cyn, OLC_SCRIPT(d) ?"Set.":"Not Set.",
           grn, nrm,
           grn, nrm,
@@ -975,7 +988,7 @@ static void medit_disp_ai_menu(struct descriptor_data *d)
   if (!MOB_FLAGGED(OLC_MOB(d), MOB_AI_ACTOR)) { write_to_output(d, "Enable AI_ACTOR for this mob? (Y/N): "); OLC_MODE(d) = MEDIT_AI_ENABLE_CONFIRM; return; }
   if (!c) OLC_MOB(d)->ai_config = c = mob_ai_config_new();
   for (i = 0; i < AI_DIALOGUE_CATEGORIES; i++) lines += c->dialogue_count[i];
-  write_to_output(d, "\r\n%s                    AI Actor Configuration%s\r\n\r\n%sProfile%s\r\n  %s1)%s Profile Mode: %s%s%s\r\n  %s2)%s Role: %s%s%s\r\n  %s3)%s Movement: %s%s%s\r\n  %s4)%s Personality : %s%s%s\r\n\r\n%sInteraction%s\r\n  %s5)%s Social Behavior: %s%s%s; greeting %s; ambient %s/%s\r\n  %s6)%s Dialogue Lines: %s%d authored lines across %d event pools%s\r\n  %s7)%s Perception  : %sTracks entry, speech, combat, gifts, crimes, and whispers%s\r\n  %s8)%s Memory      : %s%s — stores relationships and familiarity%s\r\n  %s9)%s Threat Response: %sWarn → Challenge → Call Help → Attack%s\r\n  %s0)%s Combat Reactions: %sAssists allies; target switching %s%s\r\n\r\n%sWorld Behavior%s\r\n  %sS)%s Schedules and Patrol Routines: %s%s; %d entries; %d patrol routes%s\r\n\r\n%sTools%s\r\n  %sP)%s Preview Compiled Profile: Show effective compiled runtime profile\r\n  %sV)%s Validation Information: See available combat and schedule validators\r\n  %sR)%s Reset to Inferred Defaults: Rebuild from inferred defaults\r\n  %sH)%s Help   %sQ)%s Return\r\nChoice: %s", title,normal,title,normal,key,normal,value,c->mode == MOB_AI_CUSTOM ? "Custom" : c->mode == MOB_AI_INFERRED_OVERRIDES ? "Overrides" : "Inferred",normal,key,normal,value,ai_actor_config_role_name(c->role),normal,key,normal,value,ai_actor_config_movement_name(c->movement),normal,key,normal,value,medit_ai_personality_summary(c),normal,title,normal,key,normal,value,ai_social_style_name(c->social),normal,c->greeting_enabled ? "on" : "off",c->ambient_speech_enabled ? "on" : "off",c->ambient_emotes_enabled ? "on" : "off",key,normal,value,lines,AI_DIALOGUE_CATEGORIES,normal,key,normal,value,normal,key,normal,value,medit_ai_state(d,c->memory_enabled),normal,key,normal,value,normal,key,normal,value,c->switch_targets ? "enabled" : "disabled",normal,title,normal,key,normal,value,c->schedule_enabled ? "Enabled" : "Disabled",c->schedule_count,c->patrol_count,normal,title,normal,key,normal,key,normal,key,normal,key,normal,key,normal,normal);
+  write_to_output(d, "\r\n%s                    AI Actor Configuration%s\r\n\r\n%sProfile%s\r\n  %s1)%s Profile Mode: %s%s%s\r\n  %s2)%s Role: %s%s%s\r\n  %s3)%s Movement: %s%s%s\r\n  %s4)%s Personality : %s%s%s\r\n\r\n%sInteraction%s\r\n  %s5)%s Social Behavior: %s%s%s; greeting %s; ambient %s/%s\r\n  %s6)%s Dialogue Lines: %s%d authored lines across %d event pools%s\r\n  %s7)%s Perception  : %sTracks entry, speech, combat, gifts, crimes, and whispers%s\r\n  %s8)%s Memory      : %s%s — stores relationships and familiarity%s\r\n  %s9)%s Threat Response: %sWarn → Challenge → Call Help → Attack%s\r\n  %s0)%s Combat Reactions: %sAssists allies; target switching %s%s\r\n\r\n%sWorld Behavior%s\r\n  %sS)%s Schedules and Patrol Routines: %s%s; %d entries; %d patrol routes%s\r\n\r\n%sTools%s\r\n  %sC)%s Compatibility and Runtime Behavior: %s%d warnings; current runtime truth%s\r\n  %sP)%s Preview Compiled Profile: Show effective compiled runtime profile\r\n  %sV)%s Validation Information: Non-mutating compatibility information\r\n  %sR)%s Reset to Inferred Defaults: Rebuild from inferred defaults\r\n  %sH)%s Help   %sQ)%s Return\r\nChoice: %s", title,normal,title,normal,key,normal,value,c->mode == MOB_AI_CUSTOM ? "Custom" : c->mode == MOB_AI_INFERRED_OVERRIDES ? "Overrides" : "Inferred",normal,key,normal,value,ai_actor_config_role_name(c->role),normal,key,normal,value,ai_actor_config_movement_name(c->movement),normal,key,normal,value,medit_ai_personality_summary(c),normal,title,normal,key,normal,value,ai_social_style_name(c->social),normal,c->greeting_enabled ? "on" : "off",c->ambient_speech_enabled ? "on" : "off",c->ambient_emotes_enabled ? "on" : "off",key,normal,value,lines,AI_DIALOGUE_CATEGORIES,normal,key,normal,value,normal,key,normal,value,medit_ai_state(d,c->memory_enabled),normal,key,normal,value,normal,key,normal,value,c->switch_targets ? "enabled" : "disabled",normal,title,normal,key,normal,value,c->schedule_enabled ? "Enabled" : "Disabled",c->schedule_count,c->patrol_count,normal,title,normal,key,normal,value,ai_actor_compatibility_warning_count(OLC_MOB(d)),normal,key,normal,key,normal,key,normal,key,normal,key,normal,normal);
   OLC_MODE(d) = MEDIT_AI_MENU;
 }
 
@@ -983,7 +996,7 @@ static void medit_disp_ai_menu(struct descriptor_data *d)
  * pre-parser; individual modes below decide whether a value is numeric. */
 static int medit_is_ai_mode(int mode)
 {
-  return mode >= MEDIT_AI_MENU && mode <= MEDIT_AI_HELP;
+  return mode >= MEDIT_AI_MENU && mode <= MEDIT_AI_COMPATIBILITY;
 }
 
 static int medit_parse_ai_integer(const char *arg, int minimum, int maximum, int *value)
@@ -1511,11 +1524,16 @@ void medit_parse(struct descriptor_data *d, char *arg)
     return;
 
   case MEDIT_AI_HELP: medit_return_from_ai_help(d); return;
+  case MEDIT_AI_COMPATIBILITY:
+    if (LOWER(*arg) == 'q') { medit_disp_ai_menu(d); return; }
+    if (LOWER(*arg) == 'h') { medit_disp_ai_help(d, MEDIT_AI_COMPATIBILITY, "Compatibility and Runtime Behavior", "AI Actor ownership is pulse-based. A handled special procedure runs first; an eligible AI tick normally suppresses the legacy mobile tail, while event hooks can still react outside that pulse.", "This report is read-only: it explains current behavior and does not repair flags or routes.", "Legacy flags, profile modes, schedules, scripts, memory, and combat."); return; }
+    medit_disp_ai_compatibility(d); return;
   case MEDIT_AI_MENU:
     switch (LOWER(*arg)) {
       case 'q': medit_disp_menu(d); return;
       case 'h': medit_disp_ai_help(d, MEDIT_AI_MENU, "Configuration", "This menu organizes the actor profile, interaction, and world behavior.", "Choose a numbered section; use Preview to inspect compiled values.", "Combat and Schedule provide their own validators."); return;
-      case 'v': write_to_output(d, "Validation is available in the Combat and Schedule tools; no whole-profile validator is currently non-mutating.\r\n"); medit_disp_ai_menu(d); return;
+      case 'v': { char report[MAX_STRING_LENGTH]; ai_actor_compatibility_report(OLC_MOB(d), report, sizeof(report), FALSE); write_to_output(d, "\r\nAI Actor Validation Information\r\nConfiguration: stored AI configuration is present.\r\nSubsystem Validators: Combat and Schedule available. Whole-profile mutation-safe validator: Not implemented.\r\nCompatibility:%s", report); medit_disp_ai_menu(d); return; }
+      case 'c': medit_disp_ai_compatibility(d); return;
       case '1': medit_disp_ai_mode(d); return;
       case '2': medit_disp_ai_role(d); return;
       case '3': medit_disp_ai_movement(d); return;
@@ -1528,7 +1546,7 @@ void medit_parse(struct descriptor_data *d, char *arg)
       case '0': medit_disp_ai_combat(d); return;
       case 's': medit_disp_ai_schedule(d); return;
       case 'r': mob_ai_config_free(OLC_MOB(d)->ai_config); OLC_MOB(d)->ai_config = NULL; OLC_VAL(d) = 1; medit_disp_ai_menu(d); return;
-      case 'p': { struct ai_actor_profile *p; int n; ai_actor_refresh_profile(OLC_MOB(d), TRUE); p=OLC_MOB(d)->ai_prof; write_to_output(d, "Compiled profile: role=%d movement=%d social=%s\r\nSpeech: greet=%s ambient=%s emotes=%s whisper=%s cooldowns=%d/%d/%d\r\nResponses: strangers=%s trusted=%s feared=%s hostile=%s; response modifier=%+d\r\nTraits:", p->role, p->movement, ai_social_style_name(p->social), p->greeting_enabled?"on":"off",p->ambient_speech_enabled?"on":"off",p->ambient_emotes_enabled?"on":"off",p->whisper_enabled?"on":"off",p->talk_cooldown_secs,p->room_talk_cooldown_secs,p->emote_cooldown_secs,p->respond_strangers?"on":"off",p->respond_trusted?"on":"off",p->respond_feared?"on":"off",p->respond_hostile?"on":"off",ai_actor_personality_response_modifier(p->personality)); for(n=0;n<AI_ACTOR_PERSONALITIES;n++) write_to_output(d," %s=%d",ai_trait_names[n],p->personality[n]); write_to_output(d,"\r\nDialogue pools:"); for(n=0;n<AI_DIALOGUE_CATEGORIES;n++) write_to_output(d," %s=%d",ai_dialogue_category_name(n),p->dialogue_count[n]); write_to_output(d,"\r\n"); medit_disp_ai_menu(d); return; }
+      case 'p': { struct ai_actor_profile *p; int n; char report[MAX_STRING_LENGTH]; ai_actor_refresh_profile(OLC_MOB(d), TRUE); p=OLC_MOB(d)->ai_prof; write_to_output(d, "Compiled profile: role=%d movement=%d social=%s\r\nSpeech: greet=%s ambient=%s emotes=%s whisper=%s cooldowns=%d/%d/%d\r\nResponses: strangers=%s trusted=%s feared=%s hostile=%s; response modifier=%+d\r\nTraits:", p->role, p->movement, ai_social_style_name(p->social), p->greeting_enabled?"on":"off",p->ambient_speech_enabled?"on":"off",p->ambient_emotes_enabled?"on":"off",p->whisper_enabled?"on":"off",p->talk_cooldown_secs,p->room_talk_cooldown_secs,p->emote_cooldown_secs,p->respond_strangers?"on":"off",p->respond_trusted?"on":"off",p->respond_feared?"on":"off",p->respond_hostile?"on":"off",ai_actor_personality_response_modifier(p->personality)); for(n=0;n<AI_ACTOR_PERSONALITIES;n++) write_to_output(d," %s=%d",ai_trait_names[n],p->personality[n]); ai_actor_compatibility_report(OLC_MOB(d), report, sizeof(report), FALSE); write_to_output(d,"\r\nRuntime Notes:%s",report); medit_disp_ai_menu(d); return; }
       default: medit_disp_ai_menu(d); return;
     }
   case MEDIT_AI_PERSONALITY:
