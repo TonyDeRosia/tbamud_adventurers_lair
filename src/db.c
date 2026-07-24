@@ -1742,6 +1742,14 @@ static void interpret_espec(const char *keyword, const char *value, int i, int n
   }
 
 
+  if (value && !str_cmp(keyword, "AIVocalization")) {
+    struct mob_ai_config *c = mob_proto[i].ai_config;
+    if (!c || c->vocalization_count >= AI_VOCALIZATION_MAX_LINES ||
+        !mob_ai_vocalization_set(c, c->vocalization_count, value))
+      log("SYSERR: Bad AIVocalization record in mob #%d", nr);
+    return;
+  }
+
   CASE("BareHandAttack") {
     RANGE(0, NUM_ATTACK_TYPES - 1);
     mob_proto[i].mob_specials.attack_type = num_arg;

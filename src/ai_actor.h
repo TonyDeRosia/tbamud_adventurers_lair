@@ -10,6 +10,8 @@
 #define AI_DIALOGUE_CATEGORIES 20
 #define AI_DIALOGUE_MAX_LINES 8
 #define AI_DIALOGUE_LINE_MAX 240
+#define AI_VOCALIZATION_MAX_LINES 8
+#define AI_VOCALIZATION_LINE_MAX 240
 #define AI_SOCIAL_COOLDOWN_MIN 1
 #define AI_SOCIAL_COOLDOWN_MAX 300
 #define AI_THREAT_STEP_MAX 10
@@ -63,6 +65,9 @@ struct mob_ai_config {
   int speech_cooldown, room_speech_cooldown, emote_cooldown;
   int dialogue_count[AI_DIALOGUE_CATEGORIES];
   char *dialogue[AI_DIALOGUE_CATEGORIES][AI_DIALOGUE_MAX_LINES];
+  /* Full room sentences, deliberately separate from do_say dialogue. */
+  int vocalization_count;
+  char *vocalization[AI_VOCALIZATION_MAX_LINES];
   int flee_hp_percent, surrender_hp_percent, assist_enabled, call_help_enabled, hunt_enabled, return_home, stay_zone;
   int notice_entry, notice_departure, notice_speech, notice_whispers, notice_emotes, notice_combat, notice_self_attack, notice_ally_attack, notice_corpses, notice_drops, notice_gifts, notice_crimes;
   int hearing_sensitivity, observation_sensitivity, suspicion_threshold, recognition_confidence;
@@ -251,6 +256,9 @@ struct ai_actor_profile {
   int emote_cooldown_secs;
   int dialogue_count[AI_DIALOGUE_CATEGORIES];
   char *dialogue[AI_DIALOGUE_CATEGORIES][AI_DIALOGUE_MAX_LINES];
+  /* Full room sentences, deliberately separate from do_say dialogue. */
+  int vocalization_count;
+  char *vocalization[AI_VOCALIZATION_MAX_LINES];
   int morale;
   int home_room_vnum;
   int roam_radius;
@@ -381,7 +389,8 @@ struct ai_actor_state {
   int resume_schedule_id, resume_route_id, resume_waypoint, resume_direction, resume_state, resume_destination_vnum, resume_departure_done, resume_arrival_done;
   time_t schedule_started_at, last_schedule_eval, last_schedule_move, schedule_wait_until, schedule_retry_at;
   time_t next_random_move;
-  int last_tick_result, last_idle_action, last_move_result;
+  time_t last_vocalization, next_vocalization;
+  int last_tick_result, last_idle_action, last_move_result, last_vocalization_result;
   char last_blocked_reason[32];
 };
 
@@ -398,6 +407,9 @@ const char *ai_actor_archetype_name(int value);
 const char *ai_actor_communication_name(int value);
 const char *ai_actor_memory_style_name(int value);
 const char *ai_actor_assistance_style_name(int value);
+int mob_ai_vocalization_set(struct mob_ai_config *c, int index, const char *line);
+int mob_ai_vocalization_delete(struct mob_ai_config *c, int index);
+int mob_ai_vocalization_move(struct mob_ai_config *c, int from, int to);
 /* Pure schedule helpers use the canonical in-game time_info calendar. */
 int ai_schedule_time_matches(int start, int end, int hour);
 int ai_schedule_day_matches(int mask, int day);
