@@ -1038,8 +1038,19 @@ static int ai_routine_next_schedule(struct mob_ai_config *c, int day, int hour, 
   int i, d, best=-1, best_delta=999;
   for (i=0;i<c->schedule_count;i++) { struct ai_schedule_entry *e=&c->schedules[i];
     if (!e->enabled || e->destination!=AI_DEST_ROOM_VNUM || !e->destination_value || !e->day_mask) continue;
-    for (d=0; d<7; d++) if (e->day_mask&(1<<((day+d)%7))) { int delta=d*24+e->start_hour-hour;
-      if (delta<0) continue; if (delta<best_delta) { best_delta=delta; best=i; *days_ahead=d; } break;
+    for (d=0; d<7; d++) {
+      if (e->day_mask & (1 << ((day + d) % 7))) {
+        int delta = d * 24 + e->start_hour - hour;
+
+        if (delta < 0)
+          continue;
+        if (delta < best_delta) {
+          best_delta = delta;
+          best = i;
+          *days_ahead = d;
+        }
+        break;
+      }
     }
   }
   return best;
