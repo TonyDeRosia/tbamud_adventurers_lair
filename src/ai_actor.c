@@ -43,6 +43,9 @@ int ai_actor_compatibility_warning_count(const struct char_data *mob)
   c = mob->ai_config;
   if (!c) return 0;
   if (MOB_FLAGGED(mob, MOB_SCAVENGER)) warnings++;
+  if (MOB_FLAGGED(mob, MOB_MEMORY)) warnings++;
+  if (MOB_FLAGGED(mob, MOB_HELPER)) warnings++;
+  if (MOB_FLAGGED(mob, MOB_AGGRESSIVE) || MOB_FLAGGED(mob, MOB_AGGR_GOOD) || MOB_FLAGGED(mob, MOB_AGGR_EVIL) || MOB_FLAGGED(mob, MOB_AGGR_NEUTRAL)) warnings++;
   if (c->movement == AI_MOVE_RANDOM) warnings++;
   if (MOB_FLAGGED(mob, MOB_SENTINEL) && c->schedule_enabled) warnings++;
   if (MOB_FLAGGED(mob, MOB_SENTINEL) && MOB_FLAGGED(mob, MOB_WIMPY)) warnings++;
@@ -58,31 +61,72 @@ int ai_actor_compatibility_warning_count(const struct char_data *mob)
 void ai_actor_compatibility_report(const struct char_data *mob, char *out, size_t size, int detailed)
 {
   const struct mob_ai_config *c = mob ? mob->ai_config : NULL;
-  int i;
+  int i, warnings;
   if (!out || !size)
     return;
   out[0] = '\0';
-  ai_compat_add(out, size, "\r\n                    AI Actor Compatibility\r\n\r\nRuntime Ownership\r\n  IMPLEMENTED AI Actor pulse: eligible ticks normally claim the pulse, even idle.\r\n  INFO Legacy mobile tail: scavenging, wandering, aggression, MEMORY, rebellion, HELPER, and hunting do not run on a claimed pulse.\r\n  INFO Special procedure: runs before AI Actor; a handled procedure prevents both AI Actor and the legacy tail for that pulse.\r\n  INFO Scripts: may act through event/trigger paths outside the normal pulse.\r\n");
-  if (!mob || !MOB_FLAGGED(mob, MOB_AI_ACTOR)) { ai_compat_add(out,size,"\r\nINFO: AI_ACTOR is not enabled for this mobile.\r\n"); return; }
-  ai_compat_add(out,size,"\r\nProfile Mode Runtime Notes\r\n  %s: role, movement, and social use mode/override logic; not every field has identical override-mask coverage.\r\n", c ? (c->mode == MOB_AI_CUSTOM ? "Custom" : c->mode == MOB_AI_INFERRED_OVERRIDES ? "Overrides" : "Inferred") : "Inferred (no stored config)");
-  ai_compat_add(out,size,"  INFO Social eligibility currently checks NPC, AI_ACTOR, and a valid room; race, body type, intelligence, and speech capability are not checked. ai_brain_can_speak is always true.\r\n");
-  if (!c) { ai_compat_add(out,size,"\r\nINFO: Inferred configuration is used; no stored configuration is present.\r\n"); return; }
-  if (MOB_FLAGGED(mob,MOB_SENTINEL)) ai_compat_add(out,size,"\r\nHard Restriction\r\n  SENTINEL: blocks legacy wandering and causes AI schedule movement failure; it does not universally block scripts, specials, or forced movement.\r\n");
-  if (MOB_FLAGGED(mob,MOB_STAY_ZONE)) ai_compat_add(out,size,"  STAY_ZONE: restricts checked movement steps to the current zone; it does not provide route analysis.\r\n");
-  if (MOB_FLAGGED(mob,MOB_MEMORY)) ai_compat_add(out,size,"\r\nSeparate Legacy System\r\n  MEMORY: legacy attacker list, normally bypassed on AI-owned pulses; it is not synchronized with AI relationship memory.\r\n");
-  else if (c->memory_enabled) ai_compat_add(out,size,"\r\nINFO: AI Actor memory is enabled; the legacy MEMORY flag is not required.\r\n");
-  if (MOB_FLAGGED(mob,MOB_HELPER)) ai_compat_add(out,size,"  HELPER: legacy fight assistance, normally bypassed on AI-owned pulses; it does not enable AI assistance.\r\n");
-  if (MOB_FLAGGED(mob,MOB_SCAVENGER)) ai_compat_add(out,size,"  WARNING: SCAVENGER is legacy-only and normally bypassed; no AI Actor scavenging implementation was found.\r\n");
-  if (MOB_FLAGGED(mob,MOB_WIMPY)) ai_compat_add(out,size,"  WIMPY: inference input for combat/flee defaults; legacy flee remains separate.\r\n");
-  if (MOB_FLAGGED(mob,MOB_AGGRESSIVE)||MOB_FLAGGED(mob,MOB_AGGR_GOOD)||MOB_FLAGGED(mob,MOB_AGGR_EVIL)||MOB_FLAGGED(mob,MOB_AGGR_NEUTRAL)) ai_compat_add(out,size,"  AGGRESSIVE/AGGR_*: inference inputs; legacy immediate aggression is a separate tail behavior normally bypassed on AI-owned pulses.\r\n");
-  if (c->movement == AI_MOVE_RANDOM) ai_compat_add(out,size,"\r\nWARNING: Random movement is stored/configurable, but no active AI random movement tick was found.\r\n");
-  if (MOB_FLAGGED(mob,MOB_SENTINEL)&&c->schedule_enabled) ai_compat_add(out,size,"WARNING: SENTINEL causes AI schedule travel to fail.\r\n");
-  if (MOB_FLAGGED(mob,MOB_SENTINEL)&&MOB_FLAGGED(mob,MOB_WIMPY)) ai_compat_add(out,size,"WARNING: WIMPY favors flee behavior while SENTINEL constrains autonomous paths; current behavior is split across systems.\r\n");
-  if (c->hunt_enabled) ai_compat_add(out,size,"WARNING: hunt_enabled is compiled/stored, but no AI tick hunt path was found.\r\n");
-  if (AFF_FLAGGED(mob,AFF_NOTRACK)) ai_compat_add(out,size,"INFO: NO_TRACK has no audited AI movement consumer.\r\n");
-  if (c->mode==MOB_AI_INFERRED_OVERRIDES&&!c->override_mask) ai_compat_add(out,size,"WARNING: Overrides mode has no supported override bits active.\r\n");
-  for(i=0;i<c->patrol_count;i++) if(c->patrols[i].waypoint_count>1) ai_compat_add(out,size,"INFO: Patrol destinations are moved only when directly adjacent; no pathfinding is provided.\r\n");
-  if (detailed) ai_compat_add(out,size,"\r\nPARTIAL: ai_actor_brain_think/callbacks are stubbed or no-op. UNSUPPORTED: target weights retain their existing runtime limitations.\r\nH) Help  Q) Return\r\n");
+
+  if (detailed) {
+    ai_compat_add(out, size, "AI Actor Technical Reference\r\n\r\nPulse ownership\r\n  An eligible AI tick normally claims the pulse, even when idle. A handled special procedure runs first and prevents both AI Actor and the legacy mobile tail for that pulse. Scripts and event hooks can still act outside the normal pulse.\r\n\r\nLegacy systems\r\n  The legacy tail includes scavenging, wandering, immediate aggression, MEMORY retaliation, rebellion, HELPER assistance, and hunting. These normally do not run on an AI-owned pulse. AI relationship memory is separate from the legacy attacker list.\r\n\r\nProfile compilation\r\n  Inferred derives values from prototype data and flags. Custom uses stored values. Overrides applies supported override mask bits over inference; not every field has identical mask coverage. Some paths use compiled data while schedules and dialogue read stored configuration.\r\n\r\nMovement and social limits\r\n  Schedule and patrol travel only move to directly adjacent destinations; no pathfinding is provided. Random movement and hunting are stored/configurable but have no audited AI tick path. Social eligibility checks NPC, AI_ACTOR, and a valid room; it does not check race, body type, intelligence, or speech capability.\r\n");
+    return;
+  }
+
+  ai_compat_add(out, size, "\r\n                    NPC Behavior Diagnostics\r\n\r\nOverall Status\r\n--------------\r\n\r\nAI Actor\r\n  %s\r\n\r\nBuilder Warnings\r\n  %d\r\n\r\nConfiguration\r\n  %s\r\n\r\nBehavior Summary\r\n  %s\r\n",
+      mob && MOB_FLAGGED(mob, MOB_AI_ACTOR) ? "Enabled" : "Disabled",
+      ai_actor_compatibility_warning_count(mob), c ? "Complete" : "Using inferred defaults",
+      mob && MOB_FLAGGED(mob, MOB_AI_ACTOR) ? "AI controlled" : "Legacy behavior only");
+  if (!mob || !MOB_FLAGGED(mob, MOB_AI_ACTOR)) {
+    ai_compat_add(out, size, "\r\nHelp\r\n----\r\n\r\nH) Technical reference   Q) Return\r\n");
+    return;
+  }
+
+  ai_compat_add(out, size, "\r\nMovement\r\n--------\r\n\r\n%s %s\r\n", c && c->schedule_enabled ? "+" : "-", c && c->schedule_enabled ? "Schedule movement enabled" : "Schedule movement disabled");
+  ai_compat_add(out, size, "%s Patrol routes%s\r\n", c && c->patrol_count ? "+" : "-", c && c->patrol_count ? " configured" : " not configured");
+  if (c && c->movement == AI_MOVE_RANDOM)
+    ai_compat_add(out, size, "! Random AI movement is not implemented.\r\n");
+  else
+    ai_compat_add(out, size, "+ Movement style: %s\r\n", c ? ai_actor_config_movement_name(c->movement) : "Inferred");
+  if (MOB_FLAGGED(mob, MOB_SENTINEL)) ai_compat_add(out, size, "! SENTINEL restricts autonomous movement.\r\n");
+  if (MOB_FLAGGED(mob, MOB_STAY_ZONE)) ai_compat_add(out, size, "+ STAY_ZONE is active.\r\n");
+
+  ai_compat_add(out, size, "\r\nCombat\r\n------\r\n\r\n%s AI Combat\r\n%s Threat escalation\r\n%s Target switching\r\n",
+      c && c->combat_enabled ? "+" : "-", c && c->combat_enabled ? "+" : "-", c && c->switch_targets ? "+" : "-");
+  if (MOB_FLAGGED(mob,MOB_AGGRESSIVE)||MOB_FLAGGED(mob,MOB_AGGR_GOOD)||MOB_FLAGGED(mob,MOB_AGGR_EVIL)||MOB_FLAGGED(mob,MOB_AGGR_NEUTRAL))
+    ai_compat_add(out, size, "! Legacy AGGRESSIVE behavior normally will not run.\r\n");
+
+  ai_compat_add(out, size, "\r\nMemory\r\n------\r\n\r\n%s AI Memory %s\r\n", c && c->memory_enabled ? "+" : "-", c && c->memory_enabled ? "enabled" : "disabled");
+  if (MOB_FLAGGED(mob, MOB_MEMORY)) {
+    ai_compat_add(out, size, "! Legacy MEMORY flag is enabled.\r\n");
+    ai_compat_add(out, size, "%s\r\n", c && c->memory_enabled ? "  Legacy MEMORY normally will not be used while AI Actor controls this NPC." : "  This NPC may not remember attackers as expected.");
+  }
+
+  ai_compat_add(out, size, "\r\nHelping Allies\r\n--------------\r\n\r\n%s AI Assistance %s\r\n", c && c->may_assist ? "+" : "-", c && c->may_assist ? "enabled" : "disabled");
+  if (MOB_FLAGGED(mob, MOB_HELPER)) ai_compat_add(out, size, "! Legacy HELPER flag is enabled; it normally will not be used.\r\n");
+
+  ai_compat_add(out, size, "\r\nSpeech & Social\r\n---------------\r\n\r\n%s Dialogue %s\r\n%s Ambient speech %s\r\n", c && c->social != AI_SOCIAL_SILENT ? "+" : "-", c && c->social != AI_SOCIAL_SILENT ? "enabled" : "disabled", c && c->ambient_speech_enabled ? "+" : "-", c && c->ambient_speech_enabled ? "enabled" : "disabled");
+
+  ai_compat_add(out, size, "\r\nRestrictions\r\n------------\r\n\r\n");
+  if (!MOB_FLAGGED(mob, MOB_SENTINEL) && !MOB_FLAGGED(mob, MOB_STAY_ZONE)) ai_compat_add(out, size, "None\r\n");
+  else {
+    if (MOB_FLAGGED(mob, MOB_SENTINEL)) ai_compat_add(out, size, "+ SENTINEL\r\n");
+    if (MOB_FLAGGED(mob, MOB_STAY_ZONE)) ai_compat_add(out, size, "+ STAY_ZONE\r\n");
+  }
+
+  warnings = ai_actor_compatibility_warning_count(mob);
+  ai_compat_add(out, size, "\r\nBuilder Warnings\r\n----------------\r\n\r\n");
+  if (!warnings && !MOB_FLAGGED(mob, MOB_MEMORY) && !MOB_FLAGGED(mob, MOB_HELPER) && !MOB_FLAGGED(mob, MOB_AGGRESSIVE) && !MOB_FLAGGED(mob, MOB_AGGR_GOOD) && !MOB_FLAGGED(mob, MOB_AGGR_EVIL) && !MOB_FLAGGED(mob, MOB_AGGR_NEUTRAL)) ai_compat_add(out, size, "None\r\n");
+  if (c && c->movement == AI_MOVE_RANDOM) ai_compat_add(out, size, "WARNING  Random movement has no implementation.\r\n");
+  if (MOB_FLAGGED(mob, MOB_MEMORY)) ai_compat_add(out, size, "WARNING  Legacy MEMORY normally will not run.\r\n");
+  if (MOB_FLAGGED(mob, MOB_HELPER)) ai_compat_add(out, size, "WARNING  Legacy HELPER normally will not run.\r\n");
+  if (MOB_FLAGGED(mob, MOB_SCAVENGER)) ai_compat_add(out, size, "WARNING  Legacy scavenging normally will not run.\r\n");
+  if (MOB_FLAGGED(mob, MOB_AGGRESSIVE) || MOB_FLAGGED(mob, MOB_AGGR_GOOD) || MOB_FLAGGED(mob, MOB_AGGR_EVIL) || MOB_FLAGGED(mob, MOB_AGGR_NEUTRAL)) ai_compat_add(out, size, "WARNING  Legacy AGGRESSIVE behavior normally will not run.\r\n");
+  if (MOB_FLAGGED(mob, MOB_SENTINEL) && c && c->schedule_enabled) ai_compat_add(out, size, "WARNING  SENTINEL prevents schedule travel.\r\n");
+  if (MOB_FLAGGED(mob, MOB_SENTINEL) && MOB_FLAGGED(mob, MOB_WIMPY)) ai_compat_add(out, size, "WARNING  SENTINEL can restrict flee paths.\r\n");
+  if (c && c->hunt_enabled) ai_compat_add(out, size, "WARNING  Hunting has no AI implementation.\r\n");
+  if (c && c->mode == MOB_AI_INFERRED_OVERRIDES && !c->override_mask) ai_compat_add(out, size, "WARNING  Overrides mode has no active supported settings.\r\n");
+  for (i = 0; c && i < c->patrol_count; i++)
+    if (c->patrols[i].waypoint_count > 1) { ai_compat_add(out, size, "INFO  Patrol movement only works between adjacent rooms.\r\n"); break; }
+  ai_compat_add(out, size, "\r\nHelp\r\n----\r\n\r\nH) Technical reference   Q) Return\r\n");
 }
 
 static const char *social_names[] = { "Silent", "Reserved", "Polite", "Friendly", "Talkative", "Boastful", "Rude", "Hostile", "Extorting", "Preacher", "Gossip" };
