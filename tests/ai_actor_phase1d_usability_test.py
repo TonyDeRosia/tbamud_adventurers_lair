@@ -26,7 +26,7 @@ for token in ("Identity", "Communication", "Relationships", "Status: %s",
     assert token in medit, token
 
 # Normal preview is builder-facing; technical authored/inferred controls remain advanced.
-for token in ("Effective NPC Behavior", "Communication", "Intelligence", "Restrictions", "Warnings"):
+for token in ("This NPC...", "Communication", "Intelligence", "Restrictions", "Warnings"):
     assert token in medit, token
 
 # Diagnostics answer builder questions, including the next configuration direction.
