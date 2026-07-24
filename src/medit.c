@@ -149,7 +149,7 @@ static void medit_disp_ai_communication(struct descriptor_data *d)
   write_to_output(d, "\r\nCommunication\r\n-------------\r\n\r\nCurrent Style: %s\r\nCreature Sounds Authored: %d\r\nSpoken Dialogue: %s (%d lines)\r\n\r\n1) Silent\r\n2) Creature Sounds\r\n3) Speaks\r\n\r\n", medit_ai_communication_summary(c), c->vocalization_count,
     c->communication == AI_COMM_SPEAK ? "Enabled" : "Disabled", spoken);
   if (c->communication == AI_COMM_VOCALIZE)
-    write_to_output(d, "4) Edit Creature Sounds\r\n5) Preview Sounds\r\n");
+    write_to_output(d, "4) Edit Creature Sounds\r\n5) Presence Requirement\r\n6) Frequency\r\n7) Cooldown (%d-%d seconds)\r\n8) Per-room Limit (%d)\r\n9) Preview Sounds\r\n", c->vocal_cooldown_min, c->vocal_cooldown_max, c->vocal_room_limit);
   else if (c->communication == AI_COMM_SPEAK)
     write_to_output(d, "4) Edit Greetings\r\n5) Edit Ambient Speech\r\n6) Edit Replies\r\n7) Preview Conversation\r\n");
   write_to_output(d, "\r\nH) Help\r\nQ) Return\r\nChoice: ");
@@ -1127,7 +1127,7 @@ static void medit_disp_ai_menu(struct descriptor_data *d)
  * pre-parser; individual modes below decide whether a value is numeric. */
 static int medit_is_ai_mode(int mode)
 {
-  return mode >= MEDIT_AI_MENU && mode <= MEDIT_AI_DIAGNOSTICS;
+  return mode >= MEDIT_AI_MENU && mode <= MEDIT_AI_VOCAL_LIMIT;
 }
 
 static int medit_parse_ai_integer(const char *arg, int minimum, int maximum, int *value)
@@ -1683,7 +1683,11 @@ void medit_parse(struct descriptor_data *d, char *arg)
     if (LOWER(*arg) == 'q') { medit_disp_ai_menu(d); return; }
     if (LOWER(*arg) == 'h') { medit_disp_ai_help(d, MEDIT_AI_COMMUNICATION, "Communication", "Silent disables authored speech and sounds. Creature Sounds uses vocalizations. Speaks enables normal dialogue.", "Choose one practical communication style.", "Telepathy remains an advanced partial capability."); return; }
     if (LOWER(*arg) == '4' && c->communication == AI_COMM_VOCALIZE) { medit_disp_ai_vocalizations(d); return; }
-    if (LOWER(*arg) == '5' && c->communication == AI_COMM_VOCALIZE) { write_to_output(d, "\r\nCreature Sounds\r\n"); for (i=0; i<c->vocalization_count; i++) write_to_output(d, "  %s\r\n", c->vocalization[i]); medit_disp_ai_communication(d); return; }
+    if (LOWER(*arg) == '5' && c->communication == AI_COMM_VOCALIZE) { OLC_MODE(d)=MEDIT_AI_VOCAL_PRESENCE; write_to_output(d,"Presence: 1) None 2) Player 3) Awake player 4) Visible player 5) Any character\r\nChoice (Q cancels): "); return; }
+    if (LOWER(*arg) == '6' && c->communication == AI_COMM_VOCALIZE) { OLC_MODE(d)=MEDIT_AI_VOCAL_FREQUENCY; write_to_output(d,"Frequency: 1) Very Rare 2) Rare 3) Occasionally 4) Often 5) Very Often\r\nChoice (Q cancels): "); return; }
+    if (LOWER(*arg) == '7' && c->communication == AI_COMM_VOCALIZE) { OLC_MODE(d)=MEDIT_AI_VOCAL_COOLDOWN; write_to_output(d,"Cooldown minimum and maximum (5-3600), e.g. 30 90 (Q cancels): "); return; }
+    if (LOWER(*arg) == '8' && c->communication == AI_COMM_VOCALIZE) { OLC_MODE(d)=MEDIT_AI_VOCAL_LIMIT; write_to_output(d,"Sounds per room visit (0-10; Q cancels): "); return; }
+    if (LOWER(*arg) == '9' && c->communication == AI_COMM_VOCALIZE) { write_to_output(d, "\r\nCreature Sounds (full room sentences)\r\n"); for (i=0; i<c->vocalization_count; i++) write_to_output(d, "  %s%s\r\n", (c->vocal_disabled_mask&(1U<<i))?"[disabled] ":"", c->vocalization[i]); medit_disp_ai_communication(d); return; }
     if (c->communication == AI_COMM_SPEAK && LOWER(*arg) >= '4' && LOWER(*arg) <= '6') { static const int categories[] = { AI_DIALOGUE_GREETING, AI_DIALOGUE_AMBIENT_SPEECH, AI_DIALOGUE_FRIENDLY }; medit_disp_ai_dialogue_lines(d, categories[LOWER(*arg)-'4']); return; }
     if (LOWER(*arg) == '7' && c->communication == AI_COMM_SPEAK) { medit_disp_ai_preview(d); return; }
     if (!medit_parse_ai_integer(arg, 1, 3, &i)) { write_to_output(d, "Choose one of the displayed options.\r\n"); medit_disp_ai_communication(d); return; }
@@ -1736,6 +1740,10 @@ void medit_parse(struct descriptor_data *d, char *arg)
     }
     OLC_VAL(d)=1; medit_disp_ai_capabilities(d); return;
   }
+  case MEDIT_AI_VOCAL_PRESENCE: if(LOWER(*arg)=='q'||!*arg){medit_disp_ai_communication(d);return;}if(medit_parse_ai_integer(arg,1,5,&i)){OLC_MOB(d)->ai_config->vocal_presence=i-1;OLC_VAL(d)=1;}medit_disp_ai_communication(d);return;
+  case MEDIT_AI_VOCAL_FREQUENCY: if(LOWER(*arg)=='q'||!*arg){medit_disp_ai_communication(d);return;}if(medit_parse_ai_integer(arg,1,5,&i)){static const int mins[]={120,60,30,15,5},maxs[]={300,180,90,45,15};OLC_MOB(d)->ai_config->vocal_frequency=i;OLC_MOB(d)->ai_config->vocal_cooldown_min=mins[i-1];OLC_MOB(d)->ai_config->vocal_cooldown_max=maxs[i-1];OLC_VAL(d)=1;}medit_disp_ai_communication(d);return;
+  case MEDIT_AI_VOCAL_COOLDOWN: if(LOWER(*arg)=='q'||!*arg){medit_disp_ai_communication(d);return;}if(sscanf(arg,"%d %d",&i,&j)==2&&i>=5&&j>=i&&j<=3600){OLC_MOB(d)->ai_config->vocal_cooldown_min=i;OLC_MOB(d)->ai_config->vocal_cooldown_max=j;OLC_VAL(d)=1;}medit_disp_ai_communication(d);return;
+  case MEDIT_AI_VOCAL_LIMIT: if(LOWER(*arg)=='q'||!*arg){medit_disp_ai_communication(d);return;}if(medit_parse_ai_integer(arg,0,10,&i)){OLC_MOB(d)->ai_config->vocal_room_limit=i;OLC_VAL(d)=1;}medit_disp_ai_communication(d);return;
   case MEDIT_AI_VOCALIZATIONS: {
     struct mob_ai_config *c=OLC_MOB(d)->ai_config; char cmd=LOWER(*arg); int line=atoi(arg+1)-1;
     if(cmd=='q'){medit_disp_ai_communication(d);return;} if(cmd=='h'){medit_disp_ai_help(d,MEDIT_AI_VOCALIZATIONS,"Creature Vocalizations","Vocalizations are full-room act strings and never use normal say dialogue.","Use A/E/D/U/N plus a line number, for example E 2.","Communication=Vocalize delivers these lines; preview is read-only.");return;} if(cmd=='p'){write_to_output(d,"\r\nVocalization Preview\r\nCommunication effective: %s\r\n",ai_actor_communication_name(c->communication));for(i=0;i<c->vocalization_count;i++)write_to_output(d,"  %s\r\n",c->vocalization[i]);medit_disp_ai_vocalizations(d);return;} if(cmd=='a'){if(c->vocalization_count>=AI_VOCALIZATION_MAX_LINES){write_to_output(d,"Maximum reached.\r\n");medit_disp_ai_vocalizations(d);return;}OLC_MODE(d)=MEDIT_AI_VOCALIZATION_ADD;write_to_output(d,"Vocalization line: ");return;} if((cmd=='e'||cmd=='d'||cmd=='u'||cmd=='n')&&(line<0||line>=c->vocalization_count)){write_to_output(d,"Use %c <line number>.\r\n",cmd);medit_disp_ai_vocalizations(d);return;} if(cmd=='e'){OLC_VAL(d)=line;OLC_MODE(d)=MEDIT_AI_VOCALIZATION_EDIT;write_to_output(d,"Replacement vocalization: ");return;} if(cmd=='d'){mob_ai_vocalization_delete(c,line);OLC_VAL(d)=1;medit_disp_ai_vocalizations(d);return;} if(cmd=='u'||cmd=='n'){if(!mob_ai_vocalization_move(c,line,cmd=='u'?line-1:line+1))write_to_output(d,"That line cannot move further.\r\n");else OLC_VAL(d)=1;medit_disp_ai_vocalizations(d);return;}medit_disp_ai_vocalizations(d);return;
