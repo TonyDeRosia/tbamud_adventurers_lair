@@ -11,7 +11,8 @@
 #define AI_DIALOGUE_MAX_LINES 8
 #define AI_DIALOGUE_LINE_MAX 240
 #define AI_VOCALIZATION_MAX_LINES 8
-#define AI_VOCALIZATION_LINE_MAX 240
+/* Room messages are deliberately short enough to be safe in act() output. */
+#define AI_VOCALIZATION_LINE_MAX 201
 #define AI_SOCIAL_COOLDOWN_MIN 1
 #define AI_SOCIAL_COOLDOWN_MAX 300
 #define AI_THREAT_STEP_MAX 10
