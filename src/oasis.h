@@ -382,6 +382,10 @@ extern const char *nrm, *grn, *cyn, *yel;
 #define MEDIT_AI_OWNERSHIP                   134
 #define MEDIT_AI_OWNERSHIP_VALUE             135
 #define MEDIT_AI_OWNERSHIP_RESET             136
+#define MEDIT_BEHAVIOR_GENERAL                137
+#define MEDIT_BEHAVIOR_MOVEMENT               138
+#define MEDIT_BEHAVIOR_COMBAT                 139
+#define MEDIT_BEHAVIOR_OBJECTS                140
 
 /* Submodes of SEDIT connectedness. */
 #define SEDIT_MAIN_MENU              	0

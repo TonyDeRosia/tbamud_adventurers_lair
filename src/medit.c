@@ -78,6 +78,10 @@ static void medit_disp_mob_flags(struct descriptor_data *d);
 static void medit_disp_aff_flags(struct descriptor_data *d);
 static void medit_disp_menu(struct descriptor_data *d);
 static void medit_disp_ai_menu(struct descriptor_data *d);
+static void medit_disp_behavior_general(struct descriptor_data *d);
+static void medit_disp_behavior_movement(struct descriptor_data *d);
+static void medit_disp_behavior_combat(struct descriptor_data *d);
+static void medit_disp_behavior_objects(struct descriptor_data *d);
 static void medit_disp_ai_compatibility(struct descriptor_data *d)
 {
   char report[MAX_STRING_LENGTH];
@@ -89,13 +93,13 @@ static const char *medit_ai_state(struct descriptor_data *d, int enabled);
 static void medit_disp_ai_mode(struct descriptor_data *d)
 {
   struct mob_ai_config *c = OLC_MOB(d)->ai_config;
-  write_to_output(d, "\r\nAI Actor Profile Mode\r\n0) Inferred\r\n   Compilation derives profile values from prototype data.\r\n1) Custom\r\n   Compilation uses stored configuration values directly.\r\n2) Overrides\r\n   Compilation starts inferred and applies only fields in the override mask.\r\nCurrent mode: %s\r\nStored values are preserved when changing modes; Reset discards them.\r\nH) Help  Q) Return\r\nChoice: ", c->mode == MOB_AI_CUSTOM ? "Custom" : c->mode == MOB_AI_INFERRED_OVERRIDES ? "Overrides" : "Inferred");
+  write_to_output(d, "\r\nBehavior Profile Mode\r\n0) Inferred\r\n   Compilation derives profile values from prototype data.\r\n1) Custom\r\n   Compilation uses stored configuration values directly.\r\n2) Overrides\r\n   Compilation starts inferred and applies only fields in the override mask.\r\nCurrent mode: %s\r\nStored values are preserved when changing modes; Reset discards them.\r\nH) Help  Q) Return\r\nChoice: ", c->mode == MOB_AI_CUSTOM ? "Custom" : c->mode == MOB_AI_INFERRED_OVERRIDES ? "Overrides" : "Inferred");
   OLC_MODE(d) = MEDIT_AI_MODE;
 }
 static void medit_disp_ai_role(struct descriptor_data *d)
 {
   int i; struct mob_ai_config *c = OLC_MOB(d)->ai_config;
-  write_to_output(d, "\r\nAI Actor Role\r\n");
+  write_to_output(d, "\r\nNPC Role\r\n");
   for (i = ROLE_UNKNOWN; i <= ROLE_BOSS; i++)
     write_to_output(d, "%d) %s\r\n   %s\r\n", i, ai_actor_config_role_name(i), ai_actor_config_role_summary(i));
   write_to_output(d, "Current role: %s\r\nH) Help  Q) Return\r\nChoice: ", ai_actor_config_role_name(c->role));
@@ -104,7 +108,7 @@ static void medit_disp_ai_role(struct descriptor_data *d)
 static void medit_disp_ai_movement(struct descriptor_data *d)
 {
   int i; struct mob_ai_config *c = OLC_MOB(d)->ai_config;
-  write_to_output(d, "\r\nAI Actor Movement\r\n");
+  write_to_output(d, "\r\nMovement Style\r\n");
   for (i = AI_MOVE_STATIONARY; i <= AI_MOVE_RETURN_HOME; i++)
     write_to_output(d, "%d) %s\r\n   %s\r\n", i, ai_actor_config_movement_name(i), ai_actor_config_movement_summary(i));
   if (MOB_FLAGGED(OLC_MOB(d), MOB_SENTINEL) && c->movement == AI_MOVE_RANDOM)
@@ -176,21 +180,29 @@ static void medit_disp_ai_intelligence(struct descriptor_data *d)
 }
 static void medit_disp_ai_advanced(struct descriptor_data *d)
 {
-  write_to_output(d, "\r\nAdvanced AI Brain\r\n-----------------\r\n\r\n1) Personality and Social Style\r\n2) Perception and Awareness\r\n3) Memory Details\r\n4) Threat Response\r\n5) Combat Reactions\r\n6) Assistance Rules\r\n7) Capability Overrides\r\n8) Movement Internals\r\n9) Profile and Inference\r\nP) What this NPC will do (technical)\r\nV) Validation Information\r\nD) Technical Diagnostics\r\nR) Reset Inferred Defaults\r\n\r\nH) Help\r\nQ) Return\r\nChoice: ");
+  write_to_output(d, "\r\nAdvanced Behavior\r\n-----------------\r\n\r\n1) Personality and Social Style\r\n2) Perception and Awareness\r\n3) Memory Details\r\n4) Threat Response\r\n5) Combat Reactions\r\n6) Assistance Rules\r\n7) Capability Overrides\r\n8) Movement Internals\r\n9) Profile and Inference\r\nP) What this NPC will do (technical)\r\nV) Validation Information\r\nD) Technical Diagnostics\r\nR) Reset Inferred Defaults\r\n\r\nH) Help\r\nQ) Return\r\nChoice: ");
   OLC_MODE(d) = MEDIT_AI_ADVANCED;
 }
 static void medit_disp_ai_diagnostics(struct descriptor_data *d)
 {
   struct mob_ai_config *c = OLC_MOB(d)->ai_config;
+  char sources[MAX_STRING_LENGTH];
   int spoken = 0, i;
   for (i = 0; i < AI_DIALOGUE_CATEGORIES; i++) spoken += c->dialogue_count[i];
-  write_to_output(d, "\r\nDiagnostics\r\n-----------\r\n\r\n");
+  write_to_output(d, "\r\nDiagnostics & Sources\r\n---------------------\r\n\r\nBehavior Sources\r\n  Movement : %s%s\r\n  Routine  : %s\r\n  Combat   : %s%s\r\n  Memory   : %s%s\r\n  Objects  : %s\r\n  DG Scripts: %s\r\n  Unknown Special: %s\r\n\r\n",
+    MOB_FLAGGED(OLC_MOB(d),MOB_SENTINEL)?"NPC Flags; ":"",MOB_FLAGGED(OLC_MOB(d),MOB_AI_ACTOR)?"Behavior configuration":"mobile activity",
+    GET_MOB_SPEC(OLC_MOB(d))?(legacy_special_metadata(GET_MOB_SPEC(OLC_MOB(d)))?legacy_special_metadata(GET_MOB_SPEC(OLC_MOB(d)))->name:"custom special"):(c->schedule_count||c->patrol_count?"Behavior configuration":"None"),
+    MOB_FLAGGED(OLC_MOB(d),MOB_AGGRESSIVE)||MOB_FLAGGED(OLC_MOB(d),MOB_HELPER)?"NPC Flags; ":"",MOB_FLAGGED(OLC_MOB(d),MOB_AI_ACTOR)?"Behavior configuration":"mobile activity",
+    MOB_FLAGGED(OLC_MOB(d),MOB_MEMORY)?"NPC Flag; ":"",c->memory_enabled?"Relationship memory":"None",
+    MOB_FLAGGED(OLC_MOB(d),MOB_SCAVENGER)?"NPC Flag":"None",OLC_MOB(d)->proto_script?"Present":"None",GET_MOB_SPEC(OLC_MOB(d))&&!legacy_special_metadata(GET_MOB_SPEC(OLC_MOB(d)))?"Yes":"No");
   if (c->communication == AI_COMM_VOCALIZE && !c->vocalization_count) write_to_output(d, "INFO\r\nCommunication is set to Creature Sounds, but no creature sound lines exist.\r\n\r\n");
   if (c->communication == AI_COMM_NONE && (spoken || c->vocalization_count)) write_to_output(d, "WARNING\r\nCommunication is Silent, so authored dialogue and creature sounds will not run.\r\n\r\n");
   if (c->schedule_enabled && MOB_FLAGGED(OLC_MOB(d), MOB_SENTINEL)) write_to_output(d, "WARNING\r\nSENTINEL prevents the active schedule from moving this NPC.\r\n\r\n");
   if (!c->schedule_enabled) write_to_output(d, "INFO\r\nThis NPC has no active schedule and will use normal MEDIT movement behavior.\r\n\r\n");
   if (!ai_actor_compatibility_warning_count(OLC_MOB(d))) write_to_output(d, "Ready\r\nNo actionable configuration warnings.\r\n\r\n");
-  write_to_output(d, "P) Preview Effective Behavior\r\nD) Advanced Technical Diagnostics\r\nH) Help\r\nQ) Return\r\nChoice: ");
+  legacy_behavior_summary(OLC_MOB(d),sources,sizeof(sources),FALSE);
+  write_to_output(d,"Technical source detail\r\n%s\r\n",sources);
+  write_to_output(d, "Warnings: %d\r\n\r\nP) Preview Effective Behavior\r\nD) Advanced Technical Diagnostics\r\nH) Help\r\nQ) Return\r\nChoice: ",ai_actor_compatibility_warning_count(OLC_MOB(d)));
   OLC_MODE(d) = MEDIT_AI_DIAGNOSTICS;
 }
 static const char *medit_owner_domain_label(unsigned d)
@@ -202,7 +214,7 @@ static int medit_owner_reject(struct descriptor_data *d, unsigned domain, enum m
 {
   if (!mob_behavior_mayor_ai_ownership_supported(OLC_MOB(d), domain, why, why_size) && (owner == MOB_BEHAVIOR_OWNER_AI || owner == MOB_BEHAVIOR_OWNER_DISABLED)) return TRUE;
   if (GET_MOB_SPEC(OLC_MOB(d)) && !legacy_special_metadata(GET_MOB_SPEC(OLC_MOB(d))) && (owner == MOB_BEHAVIOR_OWNER_AI || owner == MOB_BEHAVIOR_OWNER_DISABLED)) { snprintf(why, why_size, "Ownership locked by unknown custom special."); return TRUE; }
-  if (owner == MOB_BEHAVIOR_OWNER_AI && (domain == LBD_SCAVENGING || domain == LBD_FLEE)) { snprintf(why, why_size, "AI ownership unavailable: AI Actor implementation for this domain is not complete."); return TRUE; }
+  if (owner == MOB_BEHAVIOR_OWNER_AI && (domain == LBD_SCAVENGING || domain == LBD_FLEE)) { snprintf(why, why_size, "AI ownership unavailable: NPC behavior implementation for this domain is not complete."); return TRUE; }
   return FALSE;
 }
 static void medit_disp_ai_ownership_value(struct descriptor_data *d)
@@ -233,7 +245,7 @@ static void medit_disp_ai_help(struct descriptor_data *d, int return_mode, const
   if (OLC_STORAGE(d)) free(OLC_STORAGE(d));
   CREATE(OLC_STORAGE(d), char, 24);
   snprintf(OLC_STORAGE(d), 24, "help %d", return_mode);
-  write_to_output(d, "\r\n------------------------------\r\nAI Actor %s Help\r\n------------------------------\r\n\r\n%s\r\n\r\nEditing tips: %s\r\nRelated systems: %s\r\n\r\nPress ENTER to return.\r\n", title, explanation, tips, related);
+  write_to_output(d, "\r\n------------------------------\r\nNPC Behavior %s Help\r\n------------------------------\r\n\r\n%s\r\n\r\nEditing tips: %s\r\nRelated systems: %s\r\n\r\nPress ENTER to return.\r\n", title, explanation, tips, related);
   OLC_MODE(d) = MEDIT_AI_HELP;
 }
 static void medit_return_from_ai_help(struct descriptor_data *d)
@@ -280,7 +292,7 @@ static const char *ai_memory_summary[] = {
 static void medit_disp_ai_perception(struct descriptor_data *d)
 {
   struct mob_ai_config *c=OLC_MOB(d)->ai_config; int i; int *v=&c->notice_entry;
-  write_to_output(d,"\r\nAI Actor Perception\r\n");
+  write_to_output(d,"\r\nAwareness & Senses\r\n");
   for(i=0;i<12;i++) write_to_output(d,"%c) %-18s: %s\r\n   %s\r\n",i<9?'1'+i:'A'+i-9,
     (const char *[]){"Notice Entry","Notice Departure","Notice Speech","Notice Whispers","Notice Emotes","Notice Combat","Attacks Self","Attacks Allies","Corpses","Drops","Gifts","Crimes","Hearing","Observation","Suspicion","Recognition"}[i],
     v[i]?"Enabled":"Disabled",ai_perception_summary[i]);
@@ -291,11 +303,11 @@ static void medit_disp_ai_perception(struct descriptor_data *d)
 }
 static const char *threat_name(int n) { static const char *x[]={"Observe","Warn","Challenge","Call Help","Assist (stored; no direct step consumer)","Follow (unsupported)","Arrest (unsupported)","Attack","Flee","Surrender (unsupported)","Ignore"}; return n>=0&&n<AI_THREAT_RESPONSE_MAX?x[n]:"Invalid"; }
 static void medit_disp_ai_threat(struct descriptor_data *d)
-{ struct mob_ai_config*c=OLC_MOB(d)->ai_config;int i;write_to_output(d,"\r\nAI Actor Threat Response\r\nEnabled responses gate escalation steps; Follow, Arrest, and Surrender are stored but unsupported.\r\n");for(i=0;i<10;i++)write_to_output(d,"%c) %s: %s\r\n   %s\r\n",i<9?'1'+i:'A',threat_name(i),c->threat_enabled[i]?"Enabled":"Disabled",i==0?"Observes severity before escalation.":i==3?"Dispatches eligible nearby allies.":i==7?"Starts combat when the step succeeds.":i==8?"Attempts configured combat flee behavior.":"Stored configuration; inspect runtime support before relying on it.");write_to_output(d,"B) Cooldown: %d seconds\r\nC) Calm reset: %d seconds\r\nD) Repeat window: %d seconds\r\nE) Escalation sequence\r\nH) Help  R) Reset  Q) Return\r\nChoice: ",c->threat_cooldown,c->calm_reset_time,c->repeated_event_window);OLC_MODE(d)=MEDIT_AI_THREAT; }
+{ struct mob_ai_config*c=OLC_MOB(d)->ai_config;int i;write_to_output(d,"\r\nThreat Response\r\nEnabled responses gate escalation steps; Follow, Arrest, and Surrender are stored but unsupported.\r\n");for(i=0;i<10;i++)write_to_output(d,"%c) %s: %s\r\n   %s\r\n",i<9?'1'+i:'A',threat_name(i),c->threat_enabled[i]?"Enabled":"Disabled",i==0?"Observes severity before escalation.":i==3?"Dispatches eligible nearby allies.":i==7?"Starts combat when the step succeeds.":i==8?"Attempts configured combat flee behavior.":"Stored configuration; inspect runtime support before relying on it.");write_to_output(d,"B) Cooldown: %d seconds\r\nC) Calm reset: %d seconds\r\nD) Repeat window: %d seconds\r\nE) Escalation sequence\r\nH) Help  R) Reset  Q) Return\r\nChoice: ",c->threat_cooldown,c->calm_reset_time,c->repeated_event_window);OLC_MODE(d)=MEDIT_AI_THREAT; }
 static void medit_disp_ai_threat_sequence(struct descriptor_data *d) { struct mob_ai_config*c=OLC_MOB(d)->ai_config;int i;write_to_output(d,"\r\nThreat Escalation Sequence\r\nEach step uses severity (0-100), cooldown seconds, and repetition limit.\r\n");for(i=0;i<c->threat_step_count;i++)write_to_output(d,"%d) %s Severity %d Cooldown %d seconds Repeats %d Advance %s\r\n",i+1,threat_name(c->threat_steps[i].type),c->threat_steps[i].minimum_severity,c->threat_steps[i].cooldown,c->threat_steps[i].max_repetitions,c->threat_steps[i].advance_on_failure?"Yes":"No");write_to_output(d,"A <type severity cooldown repeats advance>; E <line type severity cooldown repeats advance>; D/U/N <line>\r\nH) Help  Q) Return\r\nChoice: ");OLC_MODE(d)=MEDIT_AI_THREAT_SEQUENCE; }
-static void medit_disp_ai_combat(struct descriptor_data *d) { struct mob_ai_config*c=OLC_MOB(d)->ai_config; write_to_output(d,"\r\nAI Actor Combat Reactions\r\n1) Style: %d\r\n   Selects the compiled combat style.\r\n2) Combat Enabled: %s\r\n   Gates combat decision processing.\r\n3) Initiate: %s  4) Assist Allies: %s  5) Call Help: %s  6) Flee: %s\r\n   Eligibility gates; they do not assign priority.\r\n7) Protect Trusted: %s  8) Protect Group: %s  9) Same Role: %s  A) Same Prototype: %s\r\nB) Retaliate Self: %s  C) Retaliate Ally: %s  D) Retaliate Hostile: %s  E) Switch Targets: %s\r\nF) Flee Health Threshold: %d%% current hit points\r\nG) Assist Severity: %d (0-100 threat score)\r\nH) Switch Threshold: %d (0-100 threat score)\r\nI) Decision Cooldown: %d seconds\r\nJ) Target weights\r\nK) Preview L) Validate\r\nH) Help  Q) Return\r\nChoice: ",c->combat_style,c->combat_enabled?"Enabled":"Disabled",c->may_initiate?"Enabled":"Disabled",c->may_assist?"Enabled":"Disabled",c->may_call_help?"Enabled":"Disabled",c->may_flee?"Enabled":"Disabled",c->protect_trusted?"Enabled":"Disabled",c->protect_group?"Enabled":"Disabled",c->protect_same_role?"Enabled":"Disabled",c->protect_same_prototype?"Enabled":"Disabled",c->retaliate_self?"Enabled":"Disabled",c->retaliate_ally?"Enabled":"Disabled",c->retaliate_hostile?"Enabled":"Disabled",c->switch_targets?"Enabled":"Disabled",c->flee_hp_percent,c->assist_severity,c->target_switch_threshold,c->combat_cooldown); OLC_MODE(d)=MEDIT_AI_COMBAT; }
+static void medit_disp_ai_combat(struct descriptor_data *d) { struct mob_ai_config*c=OLC_MOB(d)->ai_config; write_to_output(d,"\r\nCombat Reactions\r\n1) Style: %d\r\n   Selects the compiled combat style.\r\n2) Combat Enabled: %s\r\n   Gates combat decision processing.\r\n3) Initiate: %s  4) Assist Allies: %s  5) Call Help: %s  6) Flee: %s\r\n   Eligibility gates; they do not assign priority.\r\n7) Protect Trusted: %s  8) Protect Group: %s  9) Same Role: %s  A) Same Prototype: %s\r\nB) Retaliate Self: %s  C) Retaliate Ally: %s  D) Retaliate Hostile: %s  E) Switch Targets: %s\r\nF) Flee Health Threshold: %d%% current hit points\r\nG) Assist Severity: %d (0-100 threat score)\r\nH) Switch Threshold: %d (0-100 threat score)\r\nI) Decision Cooldown: %d seconds\r\nJ) Target weights\r\nK) Preview L) Validate\r\nH) Help  Q) Return\r\nChoice: ",c->combat_style,c->combat_enabled?"Enabled":"Disabled",c->may_initiate?"Enabled":"Disabled",c->may_assist?"Enabled":"Disabled",c->may_call_help?"Enabled":"Disabled",c->may_flee?"Enabled":"Disabled",c->protect_trusted?"Enabled":"Disabled",c->protect_group?"Enabled":"Disabled",c->protect_same_role?"Enabled":"Disabled",c->protect_same_prototype?"Enabled":"Disabled",c->retaliate_self?"Enabled":"Disabled",c->retaliate_ally?"Enabled":"Disabled",c->retaliate_hostile?"Enabled":"Disabled",c->switch_targets?"Enabled":"Disabled",c->flee_hp_percent,c->assist_severity,c->target_switch_threshold,c->combat_cooldown); OLC_MODE(d)=MEDIT_AI_COMBAT; }
 static void medit_disp_ai_targets(struct descriptor_data *d) { static const char *names[] = { "Current attacker", "Attacker of trusted actor", "Attacker of group member", "Known hostile", "Lowest health", "Player character", "NPC", "Previous target" }; struct mob_ai_config*c=OLC_MOB(d)->ai_config; int i; write_to_output(d,"\r\nCombat Target Weights\r\nPositive weights make an eligible target more attractive; negative weights discourage it. This is scoring, not fixed ordering.\r\n"); for(i=0;i<AI_TARGET_WEIGHTS;i++) write_to_output(d,"%d) %s: %d (-100..100)\r\n   Eligibility/scoring input used by target selection.\r\n",i+1,names[i],c->target_weight[i]); write_to_output(d,"Unsupported by current runtime: spellcaster, healer, ranged attacker, criminal, feared actor, highest damage output.\r\nH) Help  Q) Return\r\nChoice: "); OLC_MODE(d)=MEDIT_AI_TARGETS; }
-static void medit_disp_ai_memory(struct descriptor_data *d) { struct mob_ai_config*c=OLC_MOB(d)->ai_config;int i;int *v=&c->memory_enabled;write_to_output(d,"\r\nAI Actor Memory\r\nMemory records live NPC instances only; prototype settings persist, records do not.\r\n");for(i=0;i<22;i++)write_to_output(d,"%c) %s: %d\r\n   %s\r\n",i<9?'1'+i:'A'+i-9,(const char *[]){"Memory Enabled","Capacity","Ordinary Duration","Important Duration","Trust Gain","Trust Loss","Fear Gain","Fear Decay","Hostility Gain","Hostility Decay","Familiarity Gain","Familiarity Decay","Forgiveness","Remember Attacks","Remember Assistance","Remember Crimes","Remember Gifts","Remember Insults","Remember Conversations","Remember Threats","Remember Last Room","Remember Deaths"}[i],v[i],ai_memory_summary[i]);write_to_output(d,"Durations are seconds; capacity is actors (maximum %d). Scores are stored modifiers, not percentages.\r\nH) Help  Q) Return\r\nChoice: ",AI_MEM_MAX);OLC_MODE(d)=MEDIT_AI_MEMORY; }
+static void medit_disp_ai_memory(struct descriptor_data *d) { struct mob_ai_config*c=OLC_MOB(d)->ai_config;int i;int *v=&c->memory_enabled;write_to_output(d,"\r\nMemory & Relationships\r\n----------------------\r\nRemember Attackers (compatibility): %s\r\nRelationship records live on NPC instances; prototype settings persist, records do not.\r\n",MOB_FLAGGED(OLC_MOB(d),MOB_MEMORY)?"Enabled":"Disabled");for(i=0;i<22;i++)write_to_output(d,"%c) %s: %d\r\n   %s\r\n",i<9?'1'+i:'A'+i-9,(const char *[]){"Relationship Memory","Capacity","Ordinary Duration","Important Duration","Trust Gain","Trust Loss","Fear Gain","Fear Decay","Hostility Gain","Hostility Decay","Familiarity Gain","Familiarity Decay","Forgiveness","Remember Attacks","Remember Assistance","Remember Crimes","Remember Gifts","Remember Insults","Remember Conversations","Remember Threats","Remember Last Room","Remember Deaths"}[i],v[i],ai_memory_summary[i]);write_to_output(d,"Durations are seconds; capacity is actors (maximum %d). Scores are stored modifiers, not percentages.\r\nX) Toggle Remember Attackers compatibility setting\r\nH) Help  Q) Return\r\nChoice: ",AI_MEM_MAX);OLC_MODE(d)=MEDIT_AI_MEMORY; }
 static void medit_disp_loadout_menu(struct descriptor_data *d);
 static int medit_slot_required_wear_flag(int wear_pos);
 static int medit_object_can_equip_slot(struct obj_data *obj, int wear_pos);
@@ -965,7 +977,7 @@ static const char *medit_ai_personality_summary(const struct mob_ai_config *c)
 static void medit_disp_ai_personality(struct descriptor_data *d)
 {
   struct mob_ai_config *c = OLC_MOB(d)->ai_config; int i;
-  write_to_output(d, "\r\nAI Actor Personality (0-100)\r\n%s\r\n", medit_ai_personality_summary(c));
+  write_to_output(d, "\r\nNPC behavior Personality (0-100)\r\n%s\r\n", medit_ai_personality_summary(c));
   for (i = 0; i < AI_ACTOR_PERSONALITIES; i++)
     write_to_output(d, "%c) %-12s: %d\r\n   %s\r\n", i < 9 ? '1' + i : 'A' + i - 9,
                     ai_trait_names[i], c->personality[i], ai_trait_summaries[i]);
@@ -974,7 +986,7 @@ static void medit_disp_ai_personality(struct descriptor_data *d)
 static void medit_disp_ai_social(struct descriptor_data *d)
 {
   struct mob_ai_config *c = OLC_MOB(d)->ai_config;
-  write_to_output(d, "\r\n%s                    AI Actor Social Behavior%s\r\n\r\n%sStyle%s\r\n  %s1)%s Social Style       : %s%s%s\r\n\r\n%sResponses%s\r\n  %s2)%s Greeting           : %s\r\n  %s5)%s Whisper Replies    : %s\r\n  %s6)%s Respond to Stranger: %s\r\n  %s7)%s Respond to Trusted : %s\r\n  %s8)%s Respond to Feared  : %s\r\n  %s9)%s Respond to Hostile : %s\r\n\r\n%sIdle Behavior%s\r\n  %s3)%s Ambient Speech     : %s%s\r\n  %s4)%s Ambient Emotes     : %s%s\r\n\r\n%sCooldowns%s\r\n  %sA)%s Speech Cooldown    : %s%d seconds%s\r\n  %sB)%s Room Cooldown      : %s%d seconds%s\r\n  %sC)%s Emote Cooldown     : %s%d seconds%s\r\n\r\n%sH)%s Help   %sQ)%s Return\r\nChoice: ", CCCYN(d->character,C_NRM),CCNRM(d->character,C_NRM),CCCYN(d->character,C_NRM),CCNRM(d->character,C_NRM),CCGRN(d->character,C_NRM),CCNRM(d->character,C_NRM),CCYEL(d->character,C_NRM),ai_social_style_name(c->social),CCNRM(d->character,C_NRM),CCCYN(d->character,C_NRM),CCNRM(d->character,C_NRM),CCGRN(d->character,C_NRM),CCNRM(d->character,C_NRM),medit_ai_state(d,c->greeting_enabled),CCGRN(d->character,C_NRM),CCNRM(d->character,C_NRM),medit_ai_state(d,c->whisper_enabled),CCGRN(d->character,C_NRM),CCNRM(d->character,C_NRM),medit_ai_state(d,c->respond_strangers),CCGRN(d->character,C_NRM),CCNRM(d->character,C_NRM),medit_ai_state(d,c->respond_trusted),CCGRN(d->character,C_NRM),CCNRM(d->character,C_NRM),medit_ai_state(d,c->respond_feared),CCGRN(d->character,C_NRM),CCNRM(d->character,C_NRM),medit_ai_state(d,c->respond_hostile),CCCYN(d->character,C_NRM),CCNRM(d->character,C_NRM),CCGRN(d->character,C_NRM),CCNRM(d->character,C_NRM),medit_ai_state(d,c->ambient_speech_enabled),c->ambient_speech_enabled && !c->dialogue_count[4] ? " [Warning: no ambient speech lines]" : "",CCGRN(d->character,C_NRM),CCNRM(d->character,C_NRM),medit_ai_state(d,c->ambient_emotes_enabled),c->ambient_emotes_enabled && !c->dialogue_count[5] ? " [Warning: no ambient emote lines]" : "",CCCYN(d->character,C_NRM),CCNRM(d->character,C_NRM),CCGRN(d->character,C_NRM),CCNRM(d->character,C_NRM),CCYEL(d->character,C_NRM),c->speech_cooldown,CCNRM(d->character,C_NRM),CCGRN(d->character,C_NRM),CCNRM(d->character,C_NRM),CCYEL(d->character,C_NRM),c->room_speech_cooldown,CCNRM(d->character,C_NRM),CCGRN(d->character,C_NRM),CCNRM(d->character,C_NRM),CCYEL(d->character,C_NRM),c->emote_cooldown,CCNRM(d->character,C_NRM),CCGRN(d->character,C_NRM),CCNRM(d->character,C_NRM),CCGRN(d->character,C_NRM),CCNRM(d->character,C_NRM));
+  write_to_output(d, "\r\n%s                    NPC behavior Social Behavior%s\r\n\r\n%sStyle%s\r\n  %s1)%s Social Style       : %s%s%s\r\n\r\n%sResponses%s\r\n  %s2)%s Greeting           : %s\r\n  %s5)%s Whisper Replies    : %s\r\n  %s6)%s Respond to Stranger: %s\r\n  %s7)%s Respond to Trusted : %s\r\n  %s8)%s Respond to Feared  : %s\r\n  %s9)%s Respond to Hostile : %s\r\n\r\n%sIdle Behavior%s\r\n  %s3)%s Ambient Speech     : %s%s\r\n  %s4)%s Ambient Emotes     : %s%s\r\n\r\n%sCooldowns%s\r\n  %sA)%s Speech Cooldown    : %s%d seconds%s\r\n  %sB)%s Room Cooldown      : %s%d seconds%s\r\n  %sC)%s Emote Cooldown     : %s%d seconds%s\r\n\r\n%sH)%s Help   %sQ)%s Return\r\nChoice: ", CCCYN(d->character,C_NRM),CCNRM(d->character,C_NRM),CCCYN(d->character,C_NRM),CCNRM(d->character,C_NRM),CCGRN(d->character,C_NRM),CCNRM(d->character,C_NRM),CCYEL(d->character,C_NRM),ai_social_style_name(c->social),CCNRM(d->character,C_NRM),CCCYN(d->character,C_NRM),CCNRM(d->character,C_NRM),CCGRN(d->character,C_NRM),CCNRM(d->character,C_NRM),medit_ai_state(d,c->greeting_enabled),CCGRN(d->character,C_NRM),CCNRM(d->character,C_NRM),medit_ai_state(d,c->whisper_enabled),CCGRN(d->character,C_NRM),CCNRM(d->character,C_NRM),medit_ai_state(d,c->respond_strangers),CCGRN(d->character,C_NRM),CCNRM(d->character,C_NRM),medit_ai_state(d,c->respond_trusted),CCGRN(d->character,C_NRM),CCNRM(d->character,C_NRM),medit_ai_state(d,c->respond_feared),CCGRN(d->character,C_NRM),CCNRM(d->character,C_NRM),medit_ai_state(d,c->respond_hostile),CCCYN(d->character,C_NRM),CCNRM(d->character,C_NRM),CCGRN(d->character,C_NRM),CCNRM(d->character,C_NRM),medit_ai_state(d,c->ambient_speech_enabled),c->ambient_speech_enabled && !c->dialogue_count[4] ? " [Warning: no ambient speech lines]" : "",CCGRN(d->character,C_NRM),CCNRM(d->character,C_NRM),medit_ai_state(d,c->ambient_emotes_enabled),c->ambient_emotes_enabled && !c->dialogue_count[5] ? " [Warning: no ambient emote lines]" : "",CCCYN(d->character,C_NRM),CCNRM(d->character,C_NRM),CCGRN(d->character,C_NRM),CCNRM(d->character,C_NRM),CCYEL(d->character,C_NRM),c->speech_cooldown,CCNRM(d->character,C_NRM),CCGRN(d->character,C_NRM),CCNRM(d->character,C_NRM),CCYEL(d->character,C_NRM),c->room_speech_cooldown,CCNRM(d->character,C_NRM),CCGRN(d->character,C_NRM),CCNRM(d->character,C_NRM),CCYEL(d->character,C_NRM),c->emote_cooldown,CCNRM(d->character,C_NRM),CCGRN(d->character,C_NRM),CCNRM(d->character,C_NRM),CCGRN(d->character,C_NRM),CCNRM(d->character,C_NRM));
   OLC_MODE(d)=MEDIT_AI_SOCIAL;
 }
 
@@ -1004,21 +1016,52 @@ static struct ai_patrol_route *medit_selected_route(struct descriptor_data *d) {
 static void medit_disp_ai_routine_random(struct descriptor_data *d) { struct mob_ai_config*c=OLC_MOB(d)->ai_config; int i; write_to_output(d,"\r\nRandom Destination Travel\r\n-------------------------\r\n\r\nDestinations:\r\n\r\n"); for(i=0;i<c->random_destination_count;i++){room_rnum r=real_room(c->random_destinations[i].room_vnum);write_to_output(d,"%d) [%s] %d - %s\r\n",i+1,c->random_destinations[i].enabled?"Enabled":"Disabled",c->random_destinations[i].room_vnum,r==NOWHERE?"INVALID":world[r].name);} if(c->routine_mode==AI_ROUTINE_NONE) write_to_output(d,"\r\nNote: destinations are inactive until a routine mode including Random Destination Travel is enabled.\r\n"); write_to_output(d,"\r\nWait After Arrival:\r\n    %d-%d seconds\r\n\r\nSelection:\r\n    Random\r\n\r\nA) Add Destination\r\nW) Change Wait Time\r\nP) Preview\r\nV) Validate All\r\nQ) Return\r\nChoice: ",c->random_wait_min,c->random_wait_max);OLC_MODE(d)=MEDIT_AI_ROUTINE_RANDOM; }
 static void medit_disp_ai_routine_random_entry(struct descriptor_data*d){struct mob_ai_config*c=OLC_MOB(d)->ai_config;int n=OLC_VAL(d),r;if(n<0||n>=c->random_destination_count){medit_disp_ai_routine_random(d);return;}r=real_room(c->random_destinations[n].room_vnum);write_to_output(d,"\r\nRandom Destination\r\n------------------\r\n\r\nRoom:\r\n    %d - %s\r\n\r\nStatus:\r\n    %s\r\n\r\n1) Change Room VNUM\r\n2) Enable/Disable\r\n5) Preview Path\r\n6) Validate\r\nD) Delete\r\nQ) Return\r\nChoice: ",c->random_destinations[n].room_vnum,r==NOWHERE?"INVALID":world[r].name,c->random_destinations[n].enabled?"Enabled":"Disabled");OLC_MODE(d)=MEDIT_AI_ROUTINE_RANDOM_ENTRY;}
 static void medit_disp_ai_schedule(struct descriptor_data *d) { struct mob_ai_config*c=OLC_MOB(d)->ai_config; const char *m[]={"No Routine","Random Destination Travel","Scheduled Destinations","Random + Scheduled","Advanced Patrol"}; int i, random_enabled=0, scheduled_enabled=0; for(i=0;i<c->random_destination_count;i++) random_enabled+=c->random_destinations[i].enabled; for(i=0;i<c->schedule_count;i++) scheduled_enabled+=c->schedules[i].enabled; write_to_output(d,"\r\nDaily Routine\r\n-------------\r\n\r\nMode:\r\n    %s\r\n\r\nRandom Destinations:\r\n    %d enabled (%d authored)\r\n\r\nScheduled Destinations:\r\n    %d enabled (%d authored)\r\n\r\nTravel Boundary:\r\n    %s\r\n\r\nWait After Random Arrival:\r\n    %d-%d seconds\r\n\r\n1) Change Routine Mode\r\n2) Random Destinations\r\n3) Scheduled Destinations\r\n4) Travel Settings\r\n5) Preview Routine\r\n6) Validate Routine\r\n\r\nA) Advanced Patrol Editor\r\nH) Help\r\nQ) Return\r\nChoice: ",m[MAX(0,MIN(c->routine_mode,4))],random_enabled,c->random_destination_count,scheduled_enabled,c->schedule_count,c->routine_boundary==AI_ROUTINE_CURRENT_ZONE?"Current Zone":"Allowed Zones",c->random_wait_min,c->random_wait_max); OLC_MODE(d)=MEDIT_AI_SCHEDULE; }
-static void medit_disp_ai_schedule_entries(struct descriptor_data *d) { struct mob_ai_config*c=OLC_MOB(d)->ai_config;int i;write_to_output(d,"\r\n%s                    AI Actor Schedule Entries%s\r\n\r\n #  State     Time       Days        Priority  Activity\r\n",CCCYN(d->character,C_NRM),CCNRM(d->character,C_NRM));for(i=0;i<c->schedule_count;i++){struct ai_schedule_entry*e=&c->schedules[i];write_to_output(d," %d  %-8s  %-9s %-11s %-9d %s\r\n",i+1,e->enabled?"Enabled":"Disabled",e->start_hour==0&&e->end_hour==0?"All Day":"game time",medit_sched_days(e->day_mask),e->priority,medit_sched_activity(e->activity));}write_to_output(d,"\r\nCommands\r\n  A) Add Entry  E) Edit Entry  D) Delete Entry  U) Move Entry Up\r\n  N) Move Entry Down  C) Duplicate Entry  T) Enable/Disable Entry\r\n  H) Help  Q) Return\r\nChoice: ");OLC_MODE(d)=MEDIT_AI_SCHEDULE_ENTRIES; }
+static void medit_disp_ai_schedule_entries(struct descriptor_data *d) { struct mob_ai_config*c=OLC_MOB(d)->ai_config;int i;write_to_output(d,"\r\n%s                    Scheduled Destinations%s\r\n\r\n #  State     Time       Days        Priority  Activity\r\n",CCCYN(d->character,C_NRM),CCNRM(d->character,C_NRM));for(i=0;i<c->schedule_count;i++){struct ai_schedule_entry*e=&c->schedules[i];write_to_output(d," %d  %-8s  %-9s %-11s %-9d %s\r\n",i+1,e->enabled?"Enabled":"Disabled",e->start_hour==0&&e->end_hour==0?"All Day":"game time",medit_sched_days(e->day_mask),e->priority,medit_sched_activity(e->activity));}write_to_output(d,"\r\nCommands\r\n  A) Add Entry  E) Edit Entry  D) Delete Entry  U) Move Entry Up\r\n  N) Move Entry Down  C) Duplicate Entry  T) Enable/Disable Entry\r\n  H) Help  Q) Return\r\nChoice: ");OLC_MODE(d)=MEDIT_AI_SCHEDULE_ENTRIES; }
 
-static void medit_disp_ai_schedule_entry(struct descriptor_data*d) { struct ai_schedule_entry*e=medit_selected_entry(d);room_rnum r;if(!e){write_to_output(d,"Invalid entry index.\r\n");medit_disp_ai_schedule_entries(d);return;}r=real_room(e->destination_value);write_to_output(d,"\r\n                 AI Actor Schedule Entry\r\n\r\n  Stable ID                  : %d\r\n\r\n  1) Enabled                : %s\r\n  2) Start Hour             : %02d\r\n  3) End Hour               : %02d\r\n  4) Day Mask               : %s\r\n  5) Priority               : %d\r\n  6) Activity               : %s\r\n  7) Destination Type       : %s\r\n  8) Destination Value      : %s\r\n  9) Patrol Route           : %d\r\n  A) Arrival Action         : %s\r\n  B) Departure Action       : %s\r\n  C) Interruption Policy    : %s\r\n  D) Failure Policy         : %s\r\n  E) Maximum Travel Time    : %d\r\n  F) Maximum Attempts       : %d\r\n  G) Wait/Retry Duration    : %d\r\n  H) Dialogue Category      : Schedule Arrival\r\n  V) Preview Entry  X) Validate Entry  Q) Return\r\nChoice: ",e->id,e->enabled?"Yes":"No",e->start_hour,e->end_hour,medit_sched_days(e->day_mask),e->priority,medit_sched_activity(e->activity),medit_sched_dest(e->destination),e->destination==AI_DEST_ROOM_VNUM?(r==NOWHERE?"INVALID":world[r].name):"Not Applicable",e->route_id,medit_sched_action(e->arrival_action),medit_sched_action(e->departure_action),medit_sched_interrupt(e->interruption_policy),medit_sched_failure(e->failure_policy),e->max_travel_time,e->max_attempts,e->wait_duration);OLC_MODE(d)=MEDIT_AI_SCHEDULE_ENTRY; }
-static void medit_disp_ai_patrol_routes(struct descriptor_data*d) {struct mob_ai_config*c=OLC_MOB(d)->ai_config;int i;write_to_output(d,"\r\n                   AI Actor Patrol Routes\r\n\r\n");for(i=0;i<c->patrol_count;i++){struct ai_patrol_route*r=&c->patrols[i];write_to_output(d,"  %d) [%s] ID %d  %-20s %-18s %d waypoints\r\n",i+1,r->enabled?"Enabled":"Disabled",r->id,r->label,medit_patrol_mode(r->loop_mode),r->waypoint_count);}write_to_output(d,"\r\n  A) Add Route  E) Edit Route  D) Delete Route  U) Move Route Up\r\n  N) Move Route Down  C) Duplicate Route  T) Toggle Enabled\r\n  H) Help  Q) Return\r\nChoice: ");OLC_MODE(d)=MEDIT_AI_PATROL_ROUTES;}
-static void medit_disp_ai_patrol_route(struct descriptor_data*d) {struct ai_patrol_route*r=medit_selected_route(d);if(!r){write_to_output(d,"Invalid route index.\r\n");medit_disp_ai_patrol_routes(d);return;}write_to_output(d,"\r\n                   AI Actor Patrol Route\r\n\r\n  Stable Route ID           : %d\r\n\r\n  1) Builder Label          : %s\r\n  2) Enabled                : %s\r\n  3) Route Mode             : %s\r\n  4) Failure Policy         : %s\r\n  5) Waypoints              : %d / %d\r\n  V) Preview Route  X) Validate Route  Q) Return\r\nChoice: ",r->id,r->label,r->enabled?"Yes":"No",medit_patrol_mode(r->loop_mode),medit_sched_failure(r->failure_policy),r->waypoint_count,AI_PATROL_WAYPOINT_MAX);OLC_MODE(d)=MEDIT_AI_PATROL_ROUTE;}
+static void medit_disp_ai_schedule_entry(struct descriptor_data*d) { struct ai_schedule_entry*e=medit_selected_entry(d);room_rnum r;if(!e){write_to_output(d,"Invalid entry index.\r\n");medit_disp_ai_schedule_entries(d);return;}r=real_room(e->destination_value);write_to_output(d,"\r\n                 Scheduled Destination\r\n\r\n  Stable ID                  : %d\r\n\r\n  1) Enabled                : %s\r\n  2) Start Hour             : %02d\r\n  3) End Hour               : %02d\r\n  4) Day Mask               : %s\r\n  5) Priority               : %d\r\n  6) Activity               : %s\r\n  7) Destination Type       : %s\r\n  8) Destination Value      : %s\r\n  9) Patrol Route           : %d\r\n  A) Arrival Action         : %s\r\n  B) Departure Action       : %s\r\n  C) Interruption Policy    : %s\r\n  D) Failure Policy         : %s\r\n  E) Maximum Travel Time    : %d\r\n  F) Maximum Attempts       : %d\r\n  G) Wait/Retry Duration    : %d\r\n  H) Dialogue Category      : Schedule Arrival\r\n  V) Preview Entry  X) Validate Entry  Q) Return\r\nChoice: ",e->id,e->enabled?"Yes":"No",e->start_hour,e->end_hour,medit_sched_days(e->day_mask),e->priority,medit_sched_activity(e->activity),medit_sched_dest(e->destination),e->destination==AI_DEST_ROOM_VNUM?(r==NOWHERE?"INVALID":world[r].name):"Not Applicable",e->route_id,medit_sched_action(e->arrival_action),medit_sched_action(e->departure_action),medit_sched_interrupt(e->interruption_policy),medit_sched_failure(e->failure_policy),e->max_travel_time,e->max_attempts,e->wait_duration);OLC_MODE(d)=MEDIT_AI_SCHEDULE_ENTRY; }
+static void medit_disp_ai_patrol_routes(struct descriptor_data*d) {struct mob_ai_config*c=OLC_MOB(d)->ai_config;int i;write_to_output(d,"\r\n                   Patrol Routes\r\n\r\n");for(i=0;i<c->patrol_count;i++){struct ai_patrol_route*r=&c->patrols[i];write_to_output(d,"  %d) [%s] ID %d  %-20s %-18s %d waypoints\r\n",i+1,r->enabled?"Enabled":"Disabled",r->id,r->label,medit_patrol_mode(r->loop_mode),r->waypoint_count);}write_to_output(d,"\r\n  A) Add Route  E) Edit Route  D) Delete Route  U) Move Route Up\r\n  N) Move Route Down  C) Duplicate Route  T) Toggle Enabled\r\n  H) Help  Q) Return\r\nChoice: ");OLC_MODE(d)=MEDIT_AI_PATROL_ROUTES;}
+static void medit_disp_ai_patrol_route(struct descriptor_data*d) {struct ai_patrol_route*r=medit_selected_route(d);if(!r){write_to_output(d,"Invalid route index.\r\n");medit_disp_ai_patrol_routes(d);return;}write_to_output(d,"\r\n                   Patrol Route\r\n\r\n  Stable Route ID           : %d\r\n\r\n  1) Builder Label          : %s\r\n  2) Enabled                : %s\r\n  3) Route Mode             : %s\r\n  4) Failure Policy         : %s\r\n  5) Waypoints              : %d / %d\r\n  V) Preview Route  X) Validate Route  Q) Return\r\nChoice: ",r->id,r->label,r->enabled?"Yes":"No",medit_patrol_mode(r->loop_mode),medit_sched_failure(r->failure_policy),r->waypoint_count,AI_PATROL_WAYPOINT_MAX);OLC_MODE(d)=MEDIT_AI_PATROL_ROUTE;}
 static void medit_disp_ai_patrol_waypoints(struct descriptor_data*d){struct ai_patrol_route*r=medit_selected_route(d);int i; if(!r){medit_disp_ai_patrol_routes(d);return;}write_to_output(d,"\r\n              Patrol Waypoints: %s\r\n\r\n",r->label);for(i=0;i<r->waypoint_count;i++)write_to_output(d,"  %d) Room %d - %s  Wait %d\r\n",i+1,r->waypoints[i].room_vnum,medit_schedule_room_name(r->waypoints[i].room_vnum),r->waypoints[i].wait_duration);write_to_output(d,"\r\n  A) Add Waypoint  E) Edit Waypoint  D) Delete Waypoint  U) Move Waypoint Up\r\n  N) Move Waypoint Down  C) Duplicate Waypoint\r\n  H) Help  Q) Return\r\nChoice: ");OLC_MODE(d)=MEDIT_AI_PATROL_WAYPOINTS;}
-static void medit_disp_ai_patrol_waypoint(struct descriptor_data*d){struct ai_patrol_route*r=medit_selected_route(d);int rid,e,w;if(!r){medit_disp_ai_patrol_routes(d);return;}medit_schedule_load(d,&rid,&e,&w);if(w<0||w>=r->waypoint_count){write_to_output(d,"Invalid waypoint index.\r\n");medit_disp_ai_patrol_waypoints(d);return;}write_to_output(d,"\r\n                 AI Actor Patrol Waypoint\r\n\r\n  1) Room                   : %d - %s\r\n  2) Wait Duration          : %d\r\n  3) Arrival Action         : %s\r\n  Q) Return\r\nChoice: ",r->waypoints[w].room_vnum,medit_schedule_room_name(r->waypoints[w].room_vnum),r->waypoints[w].wait_duration,medit_sched_action(r->waypoints[w].arrival_action));OLC_MODE(d)=MEDIT_AI_PATROL_WAYPOINT;}
+static void medit_disp_ai_patrol_waypoint(struct descriptor_data*d){struct ai_patrol_route*r=medit_selected_route(d);int rid,e,w;if(!r){medit_disp_ai_patrol_routes(d);return;}medit_schedule_load(d,&rid,&e,&w);if(w<0||w>=r->waypoint_count){write_to_output(d,"Invalid waypoint index.\r\n");medit_disp_ai_patrol_waypoints(d);return;}write_to_output(d,"\r\n                 NPC behavior Patrol Waypoint\r\n\r\n  1) Room                   : %d - %s\r\n  2) Wait Duration          : %d\r\n  3) Arrival Action         : %s\r\n  Q) Return\r\nChoice: ",r->waypoints[w].room_vnum,medit_schedule_room_name(r->waypoints[w].room_vnum),r->waypoints[w].wait_duration,medit_sched_action(r->waypoints[w].arrival_action));OLC_MODE(d)=MEDIT_AI_PATROL_WAYPOINT;}
 
 /* Display main menu. */
+static void medit_disp_behavior_general(struct descriptor_data *d)
+{
+  struct mob_ai_config *c=OLC_MOB(d)->ai_config;
+  write_to_output(d,"\r\nGeneral Behavior\r\n----------------\r\n1) Personality and temperament\r\n2) Intelligence: %s\r\n3) Role and purpose: %s\r\n4) Preview everything this NPC can do\r\nQ) Return\r\nChoice: ",medit_ai_intelligence_summary(c),ai_actor_config_role_name(c->role));
+  OLC_MODE(d)=MEDIT_BEHAVIOR_GENERAL;
+}
+
+static void medit_disp_behavior_movement(struct descriptor_data *d)
+{
+  struct char_data *m=OLC_MOB(d); struct mob_ai_config *c=m->ai_config;
+  const struct legacy_special_metadata *meta=legacy_special_metadata(GET_MOB_SPEC(m));
+  write_to_output(d,"\r\nMovement & Routine\r\n------------------\r\n1) Wandering              : %s\r\n2) Remain in spawn room   : %s\r\n3) Stay inside zone       : %s\r\n4) Daily routine          : %s\r\n5) Movement style         : %s\r\n6) Destination travel and patrol routes\r\n",
+    MOB_FLAGGED(m,MOB_SENTINEL)?"Prevented":"Allowed",MOB_FLAGGED(m,MOB_SENTINEL)?"Yes":"No",
+    MOB_FLAGGED(m,MOB_STAY_ZONE)?"Yes":"No",c->schedule_enabled?"Active":(c->schedule_count||c->patrol_count?"Authored, inactive":"None"),ai_actor_config_movement_name(c->movement));
+  if(meta && (meta->domains&(LBD_MOVEMENT|LBD_ROUTINE)))
+    write_to_output(d,"\r\nLocked routine\r\n  Current: %s route logic\r\n  Status: Locked\r\n  Reason: Uses hard-coded route logic.\r\n  Future: Editable after that special is migrated.\r\n",meta->name);
+  write_to_output(d,"\r\nQ) Return\r\nChoice: "); OLC_MODE(d)=MEDIT_BEHAVIOR_MOVEMENT;
+}
+
+static void medit_disp_behavior_combat(struct descriptor_data *d)
+{
+  struct char_data *m=OLC_MOB(d);
+  write_to_output(d,"\r\nCombat Behavior\r\n---------------\r\n1) Aggressive to anyone : %s\r\n2) Aggressive to evil   : %s\r\n3) Aggressive to good   : %s\r\n4) Aggressive to neutral: %s\r\n5) Helps allies         : %s\r\n6) Flees when hurt      : %s\r\n7) Combat reactions, style, spellcasting and target selection\r\n8) Threat escalation\r\n\r\nQ) Return\r\nChoice: ",MOB_FLAGGED(m,MOB_AGGRESSIVE)?"Yes":"No",MOB_FLAGGED(m,MOB_AGGR_EVIL)?"Yes":"No",MOB_FLAGGED(m,MOB_AGGR_GOOD)?"Yes":"No",MOB_FLAGGED(m,MOB_AGGR_NEUTRAL)?"Yes":"No",MOB_FLAGGED(m,MOB_HELPER)?"Yes":"No",MOB_FLAGGED(m,MOB_WIMPY)?"Yes":"No");
+  OLC_MODE(d)=MEDIT_BEHAVIOR_COMBAT;
+}
+
+static void medit_disp_behavior_objects(struct descriptor_data *d)
+{
+  write_to_output(d,"\r\nObject Interaction\r\n------------------\r\n1) Pick up valuable objects : %s\r\n2) Equipment, carried items and loot drops\r\n\r\nPickup, drop and future object interactions not supported by the current runtime are shown here as Locked rather than hidden.\r\n3) General pickup rules      : Locked (not implemented)\r\n4) Deliberate drop rules     : Locked (not implemented)\r\nQ) Return\r\nChoice: ",MOB_FLAGGED(OLC_MOB(d),MOB_SCAVENGER)?"Yes":"No");
+  OLC_MODE(d)=MEDIT_BEHAVIOR_OBJECTS;
+}
+
 static void medit_disp_menu(struct descriptor_data *d)
 {
   struct char_data *mob;
   char flags[MAX_STRING_LENGTH], flag2[MAX_STRING_LENGTH];
   char price_buf[MAX_INPUT_LENGTH];
-  char ai_status[96];
 
   mob = OLC_MOB(d);
   get_char_colors(d->character);
@@ -1028,17 +1071,6 @@ static void medit_disp_menu(struct descriptor_data *d)
     snprintf(price_buf, sizeof(price_buf), "%d", GET_PET_PRICE(mob));
   else
     strlcpy(price_buf, "(default)", sizeof(price_buf));
-  if (MOB_FLAGGED(mob, MOB_AI_ACTOR)) {
-    int warnings = ai_actor_compatibility_warning_count(mob);
-    snprintf(ai_status, sizeof(ai_status), "Enabled [%s]", warnings ? "compatibility warnings present" : "No compatibility warnings");
-    if (warnings) snprintf(ai_status, sizeof(ai_status), "Enabled [%d compatibility warnings]", warnings);
-  } else strlcpy(ai_status, "Disabled -- select I to enable AI Actor behavior", sizeof(ai_status));
-
-  {
-    char legacy[MAX_STRING_LENGTH];
-    legacy_behavior_summary(mob, legacy, sizeof(legacy), FALSE);
-    write_to_output(d, "\r\n%s\r\n", legacy);
-  }
 
   write_to_output(d,
   "-- Mob Number:  [%s%d%s]\r\n"
@@ -1066,7 +1098,7 @@ static void medit_disp_menu(struct descriptor_data *d)
           "%sB%s) AFF Flags : %s%s\r\n"
           "%sP%s) Pet Price : %s%s\r\n"
           "%sR%s) Loadout / Loot\r\n"
-          "%sI%s) AI Actor Configuration: %s%s%s\r\n"
+          "%sI%s) NPC Behavior\r\n"
           "%sS%s) DG Scripts: %s%s\r\n"
           "%sW%s) Copy mob\r\n"
           "%sX%s) Delete mob\r\n"
@@ -1081,7 +1113,7 @@ static void medit_disp_menu(struct descriptor_data *d)
           grn, nrm, cyn, flag2,
           grn, nrm, yel, price_buf,
           grn, nrm,
-          grn, nrm, yel, ai_status, nrm,
+          grn, nrm,
           grn, nrm, cyn, OLC_SCRIPT(d) ?"Set.":"Not Set.",
           grn, nrm,
           grn, nrm,
@@ -1130,7 +1162,7 @@ static void medit_disp_ai_capabilities(struct descriptor_data *d)
   p = OLC_MOB(d)->ai_prof;
   const char *delay_status = c->movement == AI_MOVE_RANDOM ? "Active — Random movement is enabled." : "Inactive — current movement mode is not Random.";
   write_to_output(d,
-      "\r\n                    AI Actor Capabilities\r\n\r\nIdentity\r\n  1) Archetype\r\n     Authored: %s\r\n     Effective: %s\r\n     Source: %s\r\n\r\nCommunication\r\n  2) Communication Type\r\n     Authored: %s\r\n     Effective: %s\r\n     Source: %s\r\n  B) Creature Vocalizations\r\n     Authored creature sounds used by Vocalize.\r\n\r\nMemory\r\n  3) Memory Style\r\n     Authored: %s\r\n     Effective: %s\r\n     Source: %s\r\n\r\nRelationships\r\n  4) Assistance\r\n     Authored: %s\r\n     Effective: %s\r\n     Source: %s\r\n\r\nMovement\r\n  5) Random Move Delay\r\n     %d seconds\r\n     Status: %s\r\n\r\nH) Help   Q) Return\r\nChoice: ",
+      "\r\n                    Behavior Capabilities\r\n\r\nIdentity\r\n  1) Archetype\r\n     Authored: %s\r\n     Effective: %s\r\n     Source: %s\r\n\r\nCommunication\r\n  2) Communication Type\r\n     Authored: %s\r\n     Effective: %s\r\n     Source: %s\r\n  B) Creature Vocalizations\r\n     Authored creature sounds used by Vocalize.\r\n\r\nMemory\r\n  3) Memory Style\r\n     Authored: %s\r\n     Effective: %s\r\n     Source: %s\r\n\r\nRelationships\r\n  4) Assistance\r\n     Authored: %s\r\n     Effective: %s\r\n     Source: %s\r\n\r\nMovement\r\n  5) Random Move Delay\r\n     %d seconds\r\n     Status: %s\r\n\r\nH) Help   Q) Return\r\nChoice: ",
       c->archetype < 0 ? "Inferred" : ai_actor_archetype_name(c->archetype), ai_actor_archetype_name(p->archetype), medit_ai_capability_source(c, 1),
       ai_actor_communication_name(c->communication), ai_actor_communication_name(p->communication), medit_ai_capability_source(c, 2),
       ai_actor_memory_style_name(c->memory_style), ai_actor_memory_style_name(p->memory_style), medit_ai_capability_source(c, 3),
@@ -1177,12 +1209,8 @@ static void medit_disp_ai_preview(struct descriptor_data *d)
 static void medit_disp_ai_menu(struct descriptor_data *d)
 {
   struct mob_ai_config *c = OLC_MOB(d)->ai_config;
-  if (!MOB_FLAGGED(OLC_MOB(d), MOB_AI_ACTOR)) { write_to_output(d, "Enable AI_ACTOR for this mob? (Y/N): "); OLC_MODE(d) = MEDIT_AI_ENABLE_CONFIRM; return; }
   if (!c) OLC_MOB(d)->ai_config = c = mob_ai_config_new();
-  write_to_output(d, "\r\n                         AI Actor\r\n\r\n1) Personality   : Shape how this NPC acts\r\n2) Communication : %s\r\n3) Daily Routine : %s\r\n4) Combat Behavior: Choose how it fights\r\n5) Preview NPC   : Read what this NPC will do\r\n6) Diagnostics   : %s\r\n7) Behavior Ownership: Legacy Preserving\r\n\r\nA) Advanced AI Brain\r\nH) Help\r\nQ) Return\r\nChoice: ",
-    medit_ai_communication_summary(c),
-    c->schedule_enabled ? "Active" : (c->schedule_count || c->patrol_count ? "Ready to activate" : "No routine"),
-    ai_actor_compatibility_warning_count(OLC_MOB(d)) ? "Warnings present" : "Ready");
+  write_to_output(d, "\r\n                         NPC Behavior\r\n\r\n1) General Behavior\r\n2) Movement & Routine\r\n3) Communication                  : %s\r\n4) Awareness & Senses\r\n5) Memory & Relationships\r\n6) Combat Behavior\r\n7) Object Interaction\r\n8) Creature Sounds\r\n9) Advanced Behavior\r\nD) Diagnostics & Sources          : %s\r\nP) Preview Everything This NPC Can Do\r\nQ) Return\r\nChoice: ",medit_ai_communication_summary(c),ai_actor_compatibility_warning_count(OLC_MOB(d))?"Warnings present":"Ready");
   OLC_MODE(d) = MEDIT_AI_MENU;
 }
 
@@ -1271,6 +1299,10 @@ static int medit_is_ai_mode(int mode)
   case MEDIT_AI_ROUTINE_WAIT:
   case MEDIT_AI_ROUTINE_MODE:
   case MEDIT_AI_ROUTINE_TIMING:
+  case MEDIT_BEHAVIOR_GENERAL:
+  case MEDIT_BEHAVIOR_MOVEMENT:
+  case MEDIT_BEHAVIOR_COMBAT:
+  case MEDIT_BEHAVIOR_OBJECTS:
     return TRUE;
   default:
     return FALSE;
@@ -1843,7 +1875,7 @@ void medit_parse(struct descriptor_data *d, char *arg)
     medit_disp_ai_compatibility(d); return;
   case MEDIT_AI_DIAGNOSTICS:
     if (LOWER(*arg) == 'q') { medit_disp_ai_menu(d); return; }
-    if (LOWER(*arg) == 'h') { medit_disp_ai_help(d, MEDIT_AI_DIAGNOSTICS, "Diagnostics", "Diagnostics lists only issues a builder can act on, such as inactive lines, schedules, and movement restrictions.", "Use Preview to understand effective behavior.", "Technical runtime detail is available only in Advanced AI Brain."); return; }
+    if (LOWER(*arg) == 'h') { medit_disp_ai_help(d, MEDIT_AI_DIAGNOSTICS, "Diagnostics", "Diagnostics lists only issues a builder can act on, such as inactive lines, schedules, and movement restrictions.", "Use Preview to understand effective behavior.", "Technical runtime detail is available only in Advanced Behavior."); return; }
     if (LOWER(*arg) == 'p') { medit_disp_ai_preview(d); return; }
     if (LOWER(*arg) == 'd') { medit_disp_ai_compatibility(d); return; }
     medit_disp_ai_diagnostics(d); return;
@@ -1869,16 +1901,33 @@ void medit_parse(struct descriptor_data *d, char *arg)
   case MEDIT_AI_MENU:
     switch (LOWER(*arg)) {
       case 'q': medit_disp_menu(d); return;
-      case 'h': medit_disp_ai_help(d, MEDIT_AI_MENU, "Builder Workflow", "1. Shape personality. 2. Choose communication and author its lines there. 3. Plan a daily routine if needed. 4. Choose combat behavior. 5. Preview the NPC story. 6. Resolve diagnostics warnings. Use Advanced AI Brain only for fine-tuning.", "Blank input redisplays this menu; Q always returns to MEDIT.", "Normal MEDIT owns flags and ordinary movement restrictions."); return;
-      case '1': medit_disp_ai_personality(d); return;
-      case '2': medit_disp_ai_communication(d); return;
-      case '3': medit_disp_ai_schedule(d); return;
-      case '4': medit_disp_ai_combat(d); return;
-      case '5': medit_disp_ai_preview(d); return;
-      case '6': medit_disp_ai_diagnostics(d); return; case '7': medit_disp_ai_ownership(d); return;
-      case 'a': medit_disp_ai_advanced(d); return;
+      case 'h': medit_disp_ai_help(d, MEDIT_AI_MENU, "Builder Workflow", "1. Shape personality. 2. Choose communication and author its lines there. 3. Plan a daily routine if needed. 4. Choose combat behavior. 5. Preview the NPC story. 6. Resolve diagnostics warnings. Use Advanced Behavior only for fine-tuning.", "Blank input redisplays this menu; Q always returns to MEDIT.", "Normal MEDIT owns flags and ordinary movement restrictions."); return;
+      case '1': medit_disp_behavior_general(d); return;
+      case '2': medit_disp_behavior_movement(d); return;
+      case '3': medit_disp_ai_communication(d); return;
+      case '4': medit_disp_ai_perception(d); return;
+      case '5': medit_disp_ai_memory(d); return;
+      case '6': medit_disp_behavior_combat(d); return;
+      case '7': medit_disp_behavior_objects(d); return;
+      case '8': medit_disp_ai_vocalizations(d); return;
+      case '9': medit_disp_ai_advanced(d); return;
+      case 'd': medit_disp_ai_diagnostics(d); return;
+      case 'p': medit_disp_ai_preview(d); return;
       default: medit_disp_ai_menu(d); return;
     }
+  case MEDIT_BEHAVIOR_GENERAL:
+    if(LOWER(*arg)=='q'){medit_disp_ai_menu(d);return;}
+    if(*arg=='1'){medit_disp_ai_personality(d);return;} if(*arg=='2'){medit_disp_ai_intelligence(d);return;} if(*arg=='3'){medit_disp_ai_role(d);return;} if(*arg=='4'){medit_disp_ai_preview(d);return;} medit_disp_behavior_general(d);return;
+  case MEDIT_BEHAVIOR_MOVEMENT:
+    if(LOWER(*arg)=='q'){medit_disp_ai_menu(d);return;}
+    if(*arg=='1'||*arg=='2'){TOGGLE_BIT_AR(MOB_FLAGS(OLC_MOB(d)),MOB_SENTINEL);OLC_VAL(d)=1;medit_disp_behavior_movement(d);return;}
+    if(*arg=='3'){TOGGLE_BIT_AR(MOB_FLAGS(OLC_MOB(d)),MOB_STAY_ZONE);OLC_VAL(d)=1;medit_disp_behavior_movement(d);return;}
+    if(*arg=='4'||*arg=='6'){medit_disp_ai_schedule(d);return;} if(*arg=='5'){medit_disp_ai_movement(d);return;} medit_disp_behavior_movement(d);return;
+  case MEDIT_BEHAVIOR_COMBAT: {
+    static const int flags[]={MOB_AGGRESSIVE,MOB_AGGR_EVIL,MOB_AGGR_GOOD,MOB_AGGR_NEUTRAL,MOB_HELPER,MOB_WIMPY};
+    if(LOWER(*arg)=='q'){medit_disp_ai_menu(d);return;} if(*arg>='1'&&*arg<='6'){TOGGLE_BIT_AR(MOB_FLAGS(OLC_MOB(d)),flags[*arg-'1']);OLC_VAL(d)=1;medit_disp_behavior_combat(d);return;} if(*arg=='7'){medit_disp_ai_combat(d);return;}if(*arg=='8'){medit_disp_ai_threat(d);return;}medit_disp_behavior_combat(d);return; }
+  case MEDIT_BEHAVIOR_OBJECTS:
+    if(LOWER(*arg)=='q'){medit_disp_ai_menu(d);return;} if(*arg=='1'){TOGGLE_BIT_AR(MOB_FLAGS(OLC_MOB(d)),MOB_SCAVENGER);OLC_VAL(d)=1;medit_disp_behavior_objects(d);return;}if(*arg=='2'){medit_disp_loadout_menu(d);return;}medit_disp_behavior_objects(d);return;
   case MEDIT_AI_COMMUNICATION:
     { struct mob_ai_config *c = OLC_MOB(d)->ai_config;
     if (LOWER(*arg) == 'q') { medit_disp_ai_menu(d); return; }
@@ -1906,7 +1955,7 @@ void medit_parse(struct descriptor_data *d, char *arg)
   }
   case MEDIT_AI_ADVANCED:
     switch (LOWER(*arg)) {
-      case 'q': medit_disp_ai_menu(d); return; case 'h': medit_disp_ai_help(d,MEDIT_AI_ADVANCED,"Advanced AI Brain","Fine-tune engine-level AI systems here. These controls preserve the normal builder workflow.","Q returns to AI Actor; each detailed editor retains its existing values.","Profile modes, capabilities, movement internals, technical preview, validation, and diagnostics."); return;
+      case 'q': medit_disp_ai_menu(d); return; case 'h': medit_disp_ai_help(d,MEDIT_AI_ADVANCED,"Advanced Behavior","Fine-tune engine-level AI systems here. These controls preserve the normal builder workflow.","Q returns to NPC behavior; each detailed editor retains its existing values.","Profile modes, capabilities, movement internals, technical preview, validation, and diagnostics."); return;
       case '1': medit_disp_ai_personality(d); return; case '2': medit_disp_ai_perception(d); return; case '3': medit_disp_ai_memory(d); return; case '4': medit_disp_ai_threat(d); return; case '5': medit_disp_ai_combat(d); return; case '6': medit_disp_ai_social(d); return; case '7': medit_disp_ai_capabilities(d); return; case '8': medit_disp_ai_movement(d); return; case '9': medit_disp_ai_mode(d); return;
       case 'p': medit_disp_ai_preview(d); return; case 'v': medit_disp_ai_compatibility(d); return; case 'd': medit_disp_ai_compatibility(d); return;
       case 'r': mob_ai_config_free(OLC_MOB(d)->ai_config); OLC_MOB(d)->ai_config=mob_ai_config_new(); OLC_VAL(d)=1; medit_disp_ai_advanced(d); return;
@@ -1999,7 +2048,7 @@ void medit_parse(struct descriptor_data *d, char *arg)
     if (OLC_VAL(d)<=12) { if (!medit_parse_ai_boolean(arg,&i)) { write_to_output(d,"Use Y) Enable, N) Disable, T) Toggle, H) Help, or Q) Cancel: "); return; } if (i == -1) i=!*v; }
     else if (!medit_parse_ai_integer(arg,0,100,&i)) { write_to_output(d,"Enter a whole number from 0 to 100: "); return; }
     if(*v!=i){*v=i;OLC_VAL(d)=1;} medit_disp_ai_perception(d);return; }
-  case MEDIT_AI_MEMORY: if(LOWER(*arg)=='q'){medit_disp_ai_menu(d);return;} if(LOWER(*arg)=='h'){medit_disp_ai_help(d, MEDIT_AI_MEMORY, "Memory", "Memory stores relationships and familiarity for live NPC instances.", "Durations are seconds; use toggles for remembered event types.", "Perception supplies memory events; Threat reads them.");return;} if(!medit_parse_ai_integer(arg,1,22,&i)){medit_disp_ai_memory(d);return;} OLC_VAL(d)=i;OLC_MODE(d)=MEDIT_AI_MEMORY_VALUE;write_to_output(d,"Memory field %d\r\nCurrent value: %d\r\nUse Y/N/T for a toggle, or enter the documented whole-number range. H) Help  Q) Cancel\r\nChoice: ",i,(i<=13?(&OLC_MOB(d)->ai_config->memory_enabled)[i-1]:(&OLC_MOB(d)->ai_config->remember_attacks)[i-14]));return;
+  case MEDIT_AI_MEMORY: if(LOWER(*arg)=='q'){medit_disp_ai_menu(d);return;} if(LOWER(*arg)=='x'){TOGGLE_BIT_AR(MOB_FLAGS(OLC_MOB(d)),MOB_MEMORY);OLC_VAL(d)=1;medit_disp_ai_memory(d);return;} if(LOWER(*arg)=='h'){medit_disp_ai_help(d, MEDIT_AI_MEMORY, "Memory", "Memory stores relationships and familiarity for live NPC instances.", "Durations are seconds; use toggles for remembered event types.", "Perception supplies memory events; Threat reads them.");return;} if(!medit_parse_ai_integer(arg,1,22,&i)){medit_disp_ai_memory(d);return;} OLC_VAL(d)=i;OLC_MODE(d)=MEDIT_AI_MEMORY_VALUE;write_to_output(d,"Memory field %d\r\nCurrent value: %d\r\nUse Y/N/T for a toggle, or enter the documented whole-number range. H) Help  Q) Cancel\r\nChoice: ",i,(i<=13?(&OLC_MOB(d)->ai_config->memory_enabled)[i-1]:(&OLC_MOB(d)->ai_config->remember_attacks)[i-14]));return;
   case MEDIT_AI_MEMORY_VALUE: { struct mob_ai_config*c=OLC_MOB(d)->ai_config; int *v; int maximum; if(LOWER(*arg)=='q'){medit_disp_ai_memory(d);return;} if(LOWER(*arg)=='h'){write_to_output(d,"Memory numeric fields use seconds, actor capacity, or score units as described in the menu; invalid input preserves the current value.\r\n");return;} if(OLC_VAL(d)<=13) v=&c->memory_enabled+OLC_VAL(d)-1; else v=&c->remember_attacks+OLC_VAL(d)-14; if(OLC_VAL(d)==1||OLC_VAL(d)>=14){if(!medit_parse_ai_boolean(arg,&i)){write_to_output(d,"Use Y) Enable, N) Disable, T) Toggle, H) Help, or Q) Cancel: ");return;}if(i==-1)i=!*v;}else {maximum=OLC_VAL(d)==2?AI_MEM_MAX:((OLC_VAL(d)>=5&&OLC_VAL(d)<=7)||OLC_VAL(d)==9||OLC_VAL(d)==11?200:10080);if(!medit_parse_ai_integer(arg,0,maximum,&i)){write_to_output(d,"Enter a whole number in the documented range: ");return;}} if(*v!=i){*v=i;OLC_VAL(d)=1;}medit_disp_ai_memory(d);return; }
   case MEDIT_AI_COMBAT: { struct mob_ai_config*c=OLC_MOB(d)->ai_config; char report[MAX_STRING_LENGTH]; if(LOWER(*arg)=='h'){medit_disp_ai_help(d, MEDIT_AI_COMBAT, "Combat", "Combat options select eligibility, reactions, and target scoring.", "Use Preview and Validate to inspect combat settings.", "Threat response can call combat actions.");return;} if(LOWER(*arg)=='q'){medit_disp_ai_menu(d);return;} if(LOWER(*arg)=='j'){medit_disp_ai_targets(d);return;} if(LOWER(*arg)=='k'){ai_actor_combat_preview(c,report,sizeof(report));write_to_output(d,"\r\n%s\r\n",report);medit_disp_ai_combat(d);return;} if(LOWER(*arg)=='l'){ai_actor_combat_validate(c,report,sizeof(report));write_to_output(d,"\r\n%s\r\n",report);medit_disp_ai_combat(d);return;} if(!medit_parse_ai_integer(arg,1,18,&i) && !(LOWER(*arg)>='a'&&LOWER(*arg)<='j')){medit_disp_ai_combat(d);return;} if(LOWER(*arg)>='a'&&LOWER(*arg)<='j')i=10+LOWER(*arg)-'a'; if(i>=2&&i<=14){int *v=&c->combat_enabled+i-2;OLC_VAL(d)=i;OLC_MODE(d)=MEDIT_AI_COMBAT_VALUE;write_to_output(d,"Current value: %s\r\nY) Enable N) Disable T) Toggle H) Help Q) Cancel\r\nChoice: ",*v?"Enabled":"Disabled");return;} if(i==1||(i>=15&&i<=18)){OLC_VAL(d)=i;OLC_MODE(d)=MEDIT_AI_COMBAT_VALUE;write_to_output(d,"Combat value %d: enter a whole number, H for help, or Q to cancel: ",i);return;}medit_disp_ai_combat(d);return;}
   case MEDIT_AI_COMBAT_VALUE: {struct mob_ai_config*c=OLC_MOB(d)->ai_config;int *v=OLC_VAL(d)==1?&c->combat_style:OLC_VAL(d)==15?&c->flee_hp_percent:OLC_VAL(d)==16?&c->assist_severity:OLC_VAL(d)==17?&c->target_switch_threshold:OLC_VAL(d)==18?&c->combat_cooldown:&c->combat_enabled+OLC_VAL(d)-2;int maximum=OLC_VAL(d)==1?AI_COMBAT_STYLE_MAX-1:OLC_VAL(d)==18?300:100;if(LOWER(*arg)=='q'){medit_disp_ai_combat(d);return;}if(LOWER(*arg)=='h'){write_to_output(d,"This editor rejects partial or out-of-range values and keeps the old value on error.\r\n");return;}if(OLC_VAL(d)>=2&&OLC_VAL(d)<=14){if(!medit_parse_ai_boolean(arg,&i)){write_to_output(d,"Use Y/N/T, H, or Q: ");return;}if(i==-1)i=!*v;}else if(!medit_parse_ai_integer(arg,0,maximum,&i)){write_to_output(d,"Enter a whole number in range: ");return;}if(*v!=i){*v=i;OLC_VAL(d)=1;}medit_disp_ai_combat(d);return;}
