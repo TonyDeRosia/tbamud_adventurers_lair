@@ -34,7 +34,7 @@ const char *ai_social_style_name(int style) { return (style >= 0 && style <= AI_
 const char *ai_dialogue_category_name(int category) { return (category >= 0 && category < AI_DIALOGUE_CATEGORIES) ? dialogue_names[category] : "Unknown"; }
 const char *ai_actor_config_role_name(int role)
 {
-  static const char *names[] = { "Unknown", "Guard", "Merchant", "Bandit",
+  static const char *names[] = { "Generic", "Guard", "Merchant", "Bandit",
     "Beast", "Undead", "Spirit", "Cultist", "Civilian", "Boss" };
   return role >= ROLE_UNKNOWN && role <= ROLE_BOSS ? names[role] : "Unknown";
 }
@@ -58,9 +58,9 @@ const char *ai_actor_config_role_summary(int role)
 const char *ai_actor_config_movement_summary(int movement)
 {
   static const char *summaries[] = {
-    "Does not select AI movement.", "Uses the normal random mobile movement path.",
-    "Moves only through an authored patrol route.", "Schedule entries select travel and activities.",
-    "Uses the configured guard-room destination.", "Uses the configured home-room destination."
+    "Remains in its room unless moved by combat, scripts, or schedules.", "Uses normal random mobile movement.",
+    "Follows an authored patrol route.", "Uses authored schedule entries to choose destinations and activities.",
+    "Returns to the configured guard room.", "Returns to the configured home room."
   };
   return movement >= AI_MOVE_STATIONARY && movement <= AI_MOVE_RETURN_HOME ? summaries[movement] : "Unknown or corrupted movement value.";
 }

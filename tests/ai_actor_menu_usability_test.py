@@ -31,7 +31,7 @@ assert "ai_dialogue_summaries[AI_DIALOGUE_CATEGORIES]" in medit
 assert "H) Help  Q) Return" in medit
 
 # Personality and social values include their meaning and range/cooldown units.
-assert "AI Actor Personality (stored scores, 0-100)" in medit
+assert "AI Actor Personality (0-100)" in medit
 assert "Minimum seconds between speech" in medit
 assert "requires authored ambient speech lines" in medit
 
