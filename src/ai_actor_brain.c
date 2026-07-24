@@ -4,6 +4,7 @@
 #include "structs.h"
 #include "utils.h"
 #include "comm.h"
+#include "db.h"
 #include "ai_actor_brain.h"
 #include "ai_actor.h"
 
@@ -42,7 +43,11 @@ void ai_actor_brain_set_enabled(int enabled) { g_ai_actor_brain_enabled = (enabl
 
 void ai_actor_brain_show_state(struct char_data *viewer, struct char_data *mob)
 {
+  const struct ai_actor_state *s;
   if (!viewer || !mob) return;
-  send_to_char(viewer, "AI brain uses bounded idle decisions.\\r\\n");
-  send_to_char(viewer, "Brain toggle: %s\\r\\n", ai_actor_brain_enabled() ? "ON" : "OFF");
+  /* AI brain uses bounded idle decisions; only current enum state is exposed. */
+  s = mob->ai_state;
+  send_to_char(viewer, "\r\nAI Actor State\r\n--------------\r\nIdentity\r\n  Mob vnum: %d  Current room: %d  Archetype: %s\r\nCapabilities\r\n  Communication: %s  Memory: %s  Assistance: %s\r\n", GET_MOB_VNUM(mob), IN_ROOM(mob) == NOWHERE ? 0 : world[IN_ROOM(mob)].number, mob->ai_prof ? ai_actor_archetype_name(mob->ai_prof->archetype) : "Unavailable", mob->ai_prof ? ai_actor_communication_name(mob->ai_prof->communication) : "Unavailable", mob->ai_prof ? ai_actor_memory_style_name(mob->ai_prof->memory_style) : "Unavailable", mob->ai_prof ? ai_actor_assistance_style_name(mob->ai_prof->assistance_style) : "Unavailable");
+  if (!s) { send_to_char(viewer, "Runtime state unavailable.\r\n"); return; }
+  send_to_char(viewer, "Decision\r\n  Last tick: %d  Last idle action: %d  Owner: %s\r\nMovement\r\n  Mode: %s  Cooldown remaining: %ld  Last result: %d  Blocked: %s\r\nCommunication\r\n  Vocalization lines: %d  Cooldown remaining: %ld  Last result: %s\r\nState\r\n  Fighting: %s  Brain toggle: %s\r\n", s->last_tick_result, s->last_idle_action, FIGHTING(mob) ? "Combat" : s->schedule_wander_suppressed ? "Schedule / Patrol" : "Idle", mob->ai_prof ? ai_actor_config_movement_name(mob->ai_prof->movement) : "Unavailable", (long)MAX(0, s->next_random_move - time(0)), s->last_move_result, s->last_blocked_reason[0] ? s->last_blocked_reason : "None", mob->ai_config ? mob->ai_config->vocalization_count : 0, (long)MAX(0, s->next_vocalization - time(0)), s->last_vocalization_result ? "Delivered" : "None / blocked", FIGHTING(mob) ? "Yes" : "No", ai_actor_brain_enabled() ? "ON" : "OFF");
 }

@@ -38,3 +38,20 @@ admin presentation.
 Schedules, patrols, threat/combat, DG scripts, specials, AI memory, and legacy MEMORY
 and HELPER remain separate.  This phase intentionally does not add language generation,
 pathfinding, social taxonomy, or telepathy delivery.
+
+## Phase 1B closure
+
+Creature vocalizations are an authored, ordered pool of at most eight full room
+sentences (`AIVocalization` records).  A line is delivered with `act()` exactly as
+authored, never through `do_say()`: builders should therefore author a complete
+room-visible sentence (for example, `The ooze bubbles wetly.`).  Old mobile files
+omit these records and load with an empty pool.  Empty pools stay silent.
+
+Communication is enforced at the delivery gateway. `None`, `Vocalize`, and
+`Telepathy` cannot use ordinary dialogue; only `Speak` reaches `do_say()`.  Vocalize
+actors use their distinct pool with a conservative cooldown. Telepathy remains
+stored but unsupported and has no ordinary-speech fallback.
+
+`aistate` now shows identity, compiled capabilities, current owner, bounded tick and
+idle results, movement cooldown/result/block reason, vocalization pool/cooldown/result,
+and combat state. No diagnostic history is persisted or allocated per tick.
