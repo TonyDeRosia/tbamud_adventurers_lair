@@ -10,6 +10,12 @@ enum legacy_behavior_domain {
   LBD_SCAVENGING = 1 << 7, LBD_DOORS = 1 << 8, LBD_SCRIPT = 1 << 9,
   LBD_MEMORY = 1 << 10, LBD_HELPER = 1 << 11, LBD_FLEE = 1 << 12
 };
+
+#ifndef MOB_BEHAVIOR_DOMAIN_COUNT
+#define MOB_BEHAVIOR_DOMAIN_COUNT 13
+#endif
+#define MOB_BEHAVIOR_EDITABLE_DOMAIN_COUNT 9
+
 enum legacy_assignment_origin {
   LAO_NONE, LAO_HARDCODED_VNUM, LAO_REGISTERED, LAO_DIRECT_CUSTOM,
   LAO_SHOP_DATA, LAO_QUEST_DATA, LAO_GUILD_FLAG, LAO_DG_PROTOTYPE, LAO_UNKNOWN
@@ -54,13 +60,13 @@ struct mob_behavior_pulse_context {
   struct char_data *mob;
   int compatibility_mode;
   int arbitration_enabled;
-  enum mob_behavior_owner configured_owner[13];
-  enum mob_behavior_owner effective_owner[13];
+  enum mob_behavior_owner configured_owner[MOB_BEHAVIOR_DOMAIN_COUNT];
+  enum mob_behavior_owner effective_owner[MOB_BEHAVIOR_DOMAIN_COUNT];
   MobBehaviorDomainMask legacy_special_domains, ai_configured_domains, legacy_tail_domains;
   MobBehaviorDomainMask unavailable_to_ai, unavailable_to_legacy_tail;
   MobBehaviorDomainMask unknown_special_locks;
   struct mob_behavior_action_result special_result, ai_result, legacy_tail_result;
-  char lock_reason[13][96];
+  char lock_reason[MOB_BEHAVIOR_DOMAIN_COUNT][96];
   char compatibility_short_circuit[96];
 };
 
@@ -68,6 +74,8 @@ struct mob_behavior_pulse_context {
 
 const char *mob_behavior_owner_name(int owner);
 const char *mob_behavior_domain_name(unsigned domain);
+const char *mob_behavior_domain_token(unsigned domain);
+unsigned mob_behavior_editable_domain(unsigned index);
 unsigned mob_behavior_domain_from_token(const char *token);
 int mob_behavior_owner_from_token(const char *token, enum mob_behavior_owner *owner);
 int mob_behavior_domain_index(unsigned domain);

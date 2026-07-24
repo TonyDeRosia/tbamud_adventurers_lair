@@ -1703,10 +1703,10 @@ static void interpret_espec(const char *keyword, const char *value, int i, int n
   }
   if (value && !str_cmp(keyword, "AIBehaviorOwner")) {
     struct mob_ai_config *c = mob_proto[i].ai_config;
-    char domain_token[64], owner_token[64];
+    char domain_token[64], owner_token[64], trailing;
     unsigned domain; int idx; enum mob_behavior_owner owner;
     if (!c) mob_proto[i].ai_config = c = mob_ai_config_new();
-    if (!c || sscanf(value, "%63s %63s", domain_token, owner_token) != 2) { log("SYSERR: Bad AIBehaviorOwner format in mob #%d", nr); return; }
+    if (!c || sscanf(value, " %63s %63s %c", domain_token, owner_token, &trailing) != 2) { log("SYSERR: Bad AIBehaviorOwner format in mob #%d", nr); return; }
     domain = mob_behavior_domain_from_token(domain_token);
     if (!domain) { log("SYSERR: Unknown AIBehaviorOwner domain '%s' in mob #%d", domain_token, nr); return; }
     idx = mob_behavior_domain_index(domain);

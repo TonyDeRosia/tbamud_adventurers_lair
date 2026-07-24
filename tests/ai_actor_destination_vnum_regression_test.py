@@ -9,10 +9,12 @@ actor = Path("src/ai_actor.c").read_text()
 
 # Mode 130 must bypass Oasis's legacy numeric pre-parser.
 assert "#define MEDIT_AI_ROUTINE_RANDOM_VNUM     130" in oasis
-assert "mode <= MEDIT_AI_ROUTINE_TIMING" in medit
+assert "switch (mode)" in medit
+assert "case MEDIT_AI_ROUTINE_TIMING:" in medit
+assert "mode <= MEDIT_AI_ROUTINE_TIMING" not in medit
 assert "if (medit_is_ai_mode(OLC_MODE(d)))" in medit
 
-random = medit.split("case MEDIT_AI_ROUTINE_RANDOM:", 1)[1].split("case MEDIT_AI_ROUTINE_WAIT:", 1)[0]
+random = medit[medit.index("void medit_parse("):].split("case MEDIT_AI_ROUTINE_RANDOM:", 1)[1].split("case MEDIT_AI_ROUTINE_WAIT:", 1)[0]
 assert "Add Random Destination" in random
 assert "The NPC will calculate its own route from its current live room." in random
 assert "Room VNUM (Q cancels):" in random
@@ -41,7 +43,7 @@ assert "random_destinations[n].room_vnum=real_room" not in random
 
 # Scheduled room authoring has the same strict parser, cancellation, validation,
 # and no-write-before-validation behavior.
-scheduled = medit.split("case MEDIT_AI_SCHEDULE_ENTRY_VALUE:", 1)[1].split("case MEDIT_AI_SCHEDULE_DAYS:", 1)[0]
+scheduled = medit[medit.index("void medit_parse("):].split("case MEDIT_AI_SCHEDULE_ENTRY_VALUE:", 1)[1].split("case MEDIT_AI_SCHEDULE_DAYS:", 1)[0]
 assert "Scheduled destination edit cancelled." in scheduled
 assert "medit_parse_ai_integer(arg,1,INT_MAX,&i)" in scheduled
 assert "medit_validate_routine_room(d,i,-1,e)" in scheduled
