@@ -28,6 +28,63 @@ static struct ai_help_event ai_help_events[AI_HELP_EVENT_MAX];
 static unsigned long ai_next_help_event_id = 1;
 static const char *ai_target_names[AI_TARGET_WEIGHTS] = { "Current attacker", "Attacker of trusted actor", "Attacker of group member", "Known hostile", "Lowest health / closest to death", "Player character", "NPC", "Previous target" };
 
+static void ai_compat_add(char *out, size_t size, const char *fmt, ...)
+{
+  va_list args; size_t used = strlen(out);
+  if (used >= size) return;
+  va_start(args, fmt); vsnprintf(out + used, size - used, fmt, args); va_end(args);
+}
+
+int ai_actor_compatibility_warning_count(const struct char_data *mob)
+{
+  const struct mob_ai_config *c;
+  int warnings = 0, i, j;
+  if (!mob || !MOB_FLAGGED(mob, MOB_AI_ACTOR)) return 0;
+  c = mob->ai_config;
+  if (!c) return 0;
+  if (MOB_FLAGGED(mob, MOB_SCAVENGER)) warnings++;
+  if (c->movement == AI_MOVE_RANDOM) warnings++;
+  if (MOB_FLAGGED(mob, MOB_SENTINEL) && c->schedule_enabled) warnings++;
+  if (MOB_FLAGGED(mob, MOB_SENTINEL) && MOB_FLAGGED(mob, MOB_WIMPY)) warnings++;
+  if (c->hunt_enabled) warnings++;
+  if (c->mode == MOB_AI_INFERRED_OVERRIDES && !c->override_mask) warnings++;
+  for (i = 0; i < c->patrol_count; i++)
+    for (j = 1; j < c->patrols[i].waypoint_count; j++)
+      if (real_room(c->patrols[i].waypoints[j - 1].room_vnum) != NOWHERE && real_room(c->patrols[i].waypoints[j].room_vnum) != NOWHERE &&
+          world[real_room(c->patrols[i].waypoints[j - 1].room_vnum)].zone != world[real_room(c->patrols[i].waypoints[j].room_vnum)].zone && MOB_FLAGGED(mob, MOB_STAY_ZONE)) warnings++;
+  return warnings;
+}
+
+void ai_actor_compatibility_report(const struct char_data *mob, char *out, size_t size, int detailed)
+{
+  const struct mob_ai_config *c = mob ? mob->ai_config : NULL;
+  int i;
+  if (!out || !size)
+    return;
+  out[0] = '\0';
+  ai_compat_add(out, size, "\r\n                    AI Actor Compatibility\r\n\r\nRuntime Ownership\r\n  IMPLEMENTED AI Actor pulse: eligible ticks normally claim the pulse, even idle.\r\n  INFO Legacy mobile tail: scavenging, wandering, aggression, MEMORY, rebellion, HELPER, and hunting do not run on a claimed pulse.\r\n  INFO Special procedure: runs before AI Actor; a handled procedure prevents both AI Actor and the legacy tail for that pulse.\r\n  INFO Scripts: may act through event/trigger paths outside the normal pulse.\r\n");
+  if (!mob || !MOB_FLAGGED(mob, MOB_AI_ACTOR)) { ai_compat_add(out,size,"\r\nINFO: AI_ACTOR is not enabled for this mobile.\r\n"); return; }
+  ai_compat_add(out,size,"\r\nProfile Mode Runtime Notes\r\n  %s: role, movement, and social use mode/override logic; not every field has identical override-mask coverage.\r\n", c ? (c->mode == MOB_AI_CUSTOM ? "Custom" : c->mode == MOB_AI_INFERRED_OVERRIDES ? "Overrides" : "Inferred") : "Inferred (no stored config)");
+  ai_compat_add(out,size,"  INFO Social eligibility currently checks NPC, AI_ACTOR, and a valid room; race, body type, intelligence, and speech capability are not checked. ai_brain_can_speak is always true.\r\n");
+  if (!c) { ai_compat_add(out,size,"\r\nINFO: Inferred configuration is used; no stored configuration is present.\r\n"); return; }
+  if (MOB_FLAGGED(mob,MOB_SENTINEL)) ai_compat_add(out,size,"\r\nHard Restriction\r\n  SENTINEL: blocks legacy wandering and causes AI schedule movement failure; it does not universally block scripts, specials, or forced movement.\r\n");
+  if (MOB_FLAGGED(mob,MOB_STAY_ZONE)) ai_compat_add(out,size,"  STAY_ZONE: restricts checked movement steps to the current zone; it does not provide route analysis.\r\n");
+  if (MOB_FLAGGED(mob,MOB_MEMORY)) ai_compat_add(out,size,"\r\nSeparate Legacy System\r\n  MEMORY: legacy attacker list, normally bypassed on AI-owned pulses; it is not synchronized with AI relationship memory.\r\n");
+  else if (c->memory_enabled) ai_compat_add(out,size,"\r\nINFO: AI Actor memory is enabled; the legacy MEMORY flag is not required.\r\n");
+  if (MOB_FLAGGED(mob,MOB_HELPER)) ai_compat_add(out,size,"  HELPER: legacy fight assistance, normally bypassed on AI-owned pulses; it does not enable AI assistance.\r\n");
+  if (MOB_FLAGGED(mob,MOB_SCAVENGER)) ai_compat_add(out,size,"  WARNING: SCAVENGER is legacy-only and normally bypassed; no AI Actor scavenging implementation was found.\r\n");
+  if (MOB_FLAGGED(mob,MOB_WIMPY)) ai_compat_add(out,size,"  WIMPY: inference input for combat/flee defaults; legacy flee remains separate.\r\n");
+  if (MOB_FLAGGED(mob,MOB_AGGRESSIVE)||MOB_FLAGGED(mob,MOB_AGGR_GOOD)||MOB_FLAGGED(mob,MOB_AGGR_EVIL)||MOB_FLAGGED(mob,MOB_AGGR_NEUTRAL)) ai_compat_add(out,size,"  AGGRESSIVE/AGGR_*: inference inputs; legacy immediate aggression is a separate tail behavior normally bypassed on AI-owned pulses.\r\n");
+  if (c->movement == AI_MOVE_RANDOM) ai_compat_add(out,size,"\r\nWARNING: Random movement is stored/configurable, but no active AI random movement tick was found.\r\n");
+  if (MOB_FLAGGED(mob,MOB_SENTINEL)&&c->schedule_enabled) ai_compat_add(out,size,"WARNING: SENTINEL causes AI schedule travel to fail.\r\n");
+  if (MOB_FLAGGED(mob,MOB_SENTINEL)&&MOB_FLAGGED(mob,MOB_WIMPY)) ai_compat_add(out,size,"WARNING: WIMPY favors flee behavior while SENTINEL constrains autonomous paths; current behavior is split across systems.\r\n");
+  if (c->hunt_enabled) ai_compat_add(out,size,"WARNING: hunt_enabled is compiled/stored, but no AI tick hunt path was found.\r\n");
+  if (AFF_FLAGGED(mob,AFF_NOTRACK)) ai_compat_add(out,size,"INFO: NO_TRACK has no audited AI movement consumer.\r\n");
+  if (c->mode==MOB_AI_INFERRED_OVERRIDES&&!c->override_mask) ai_compat_add(out,size,"WARNING: Overrides mode has no supported override bits active.\r\n");
+  for(i=0;i<c->patrol_count;i++) if(c->patrols[i].waypoint_count>1) ai_compat_add(out,size,"INFO: Patrol destinations are moved only when directly adjacent; no pathfinding is provided.\r\n");
+  if (detailed) ai_compat_add(out,size,"\r\nPARTIAL: ai_actor_brain_think/callbacks are stubbed or no-op. UNSUPPORTED: target weights retain their existing runtime limitations.\r\nH) Help  Q) Return\r\n");
+}
+
 static const char *social_names[] = { "Silent", "Reserved", "Polite", "Friendly", "Talkative", "Boastful", "Rude", "Hostile", "Extorting", "Preacher", "Gossip" };
 static const char *dialogue_names[] = { "Greeting", "Friendly response", "Suspicious response", "Hostile response", "Ambient speech", "Ambient emote", "Farewell", "Warning", "Challenge", "Threat", "Call for help", "Fear", "Schedule departure", "Schedule arrival", "Work", "Guard", "Patrol", "Sleep", "Wake", "Schedule failure" };
 const char *ai_social_style_name(int style) { return (style >= 0 && style <= AI_SOCIAL_GOSSIP) ? social_names[style] : "Reserved"; }

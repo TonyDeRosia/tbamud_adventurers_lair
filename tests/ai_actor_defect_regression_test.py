@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Source-level regression guards for AI Actor live-test defects."""
 from pathlib import Path
+import re
 
 medit = Path("src/medit.c").read_text()
 utils = Path("src/utils.c").read_text()
@@ -22,11 +23,12 @@ assert "Please answer Y or N:" in confirm_case
 # legacy numeric pre-parser.  This is the regression behind trapped Q/Y input.
 assert "medit_parse_ai_integer" in medit
 assert "medit_parse_ai_boolean" in medit
-perception = medit.split("case MEDIT_AI_PERCEPTION:", 1)[1].split(
+perception = medit.rsplit("case MEDIT_AI_PERCEPTION:", 1)[1].split(
     "case MEDIT_AI_MEMORY:", 1
 )[0]
-assert "LOWER(*arg)=='q'" in perception
-assert "LOWER(*arg)=='h'" in perception
+# Accept formatting changes while preserving Q/q and H/h navigation behavior.
+assert re.search(r"LOWER\(\*arg\)\s*==\s*'q'", perception)
+assert re.search(r"LOWER\(\*arg\)\s*==\s*'h'", perception)
 assert "Y) Enable  N) Disable  T) Toggle" in perception
 assert "Enter a whole number from 0 to 100" in perception
 

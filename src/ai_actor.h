@@ -69,6 +69,12 @@ struct mob_ai_config {
   int assist_severity, target_switch_threshold, max_allies, max_responders, combat_cooldown;
   int target_weight[AI_TARGET_WEIGHTS];
 };
+
+/* Builder-facing, read-only explanation of the currently audited runtime.
+ * The report is deliberately not a validator that repairs configuration. */
+int ai_actor_compatibility_warning_count(const struct char_data *mob);
+void ai_actor_compatibility_report(const struct char_data *mob, char *out, size_t size,
+                                   int detailed);
 #define AI_OVERRIDE_ROLE (1UL << 0)
 #define AI_OVERRIDE_MOVEMENT (1UL << 1)
 #define AI_OVERRIDE_SOCIAL (1UL << 2)

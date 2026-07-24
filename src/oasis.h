@@ -361,6 +361,7 @@ extern const char *nrm, *grn, *cyn, *yel;
 #define MEDIT_AI_DIALOGUE_INDEX           110
 #define MEDIT_AI_SCHEDULE_INDEX           111
 #define MEDIT_AI_HELP                     112
+#define MEDIT_AI_COMPATIBILITY            113
 #define MEDIT_AI_PATROL_WAYPOINT_VALUE    106
 #define MEDIT_AI_PATROL_WAYPOINT_ACTION   107
 #define MEDIT_AI_PATROL_WAYPOINT_DELETE   108
