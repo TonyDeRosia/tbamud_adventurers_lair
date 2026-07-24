@@ -39,6 +39,7 @@
 #include "screen.h"
 #include "accounts.h"
 #include "ai_actor.h"
+#include "legacy_behavior.h"
 #include "ai_actor_brain.h"
 
 /* local utility functions with file scope */
@@ -972,8 +973,13 @@ static void do_stat_character(struct char_data *ch, struct char_data *k)
 	  GET_NAME(k), IS_NPC(k) ? char_script_id(k) : GET_IDNUM(k), GET_ROOM_VNUM(IN_ROOM(k)), IS_NPC(k) ? NOWHERE : GET_LOADROOM(k));
 
   if (IS_MOB(k)) {
+    char legacy[MAX_STRING_LENGTH];
     send_to_char(ch, "Keyword: %s, VNum: [%5d], RNum: [%5d]\r\n", k->player.name, GET_MOB_VNUM(k), GET_MOB_RNUM(k));
     send_to_char(ch, "L-Des: %s", k->player.long_descr ? k->player.long_descr : "<None>\r\n");
+    legacy_behavior_summary(k, legacy, sizeof(legacy), TRUE);
+    send_to_char(ch, "%s", legacy);
+    send_to_char(ch, "  AI config: %s; runtime state: %s (per-instance)\r\n",
+                 k->ai_config ? "configured" : "none", k->ai_state ? "present" : "absent");
   }
 
   if (!IS_MOB(k))
