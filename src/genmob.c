@@ -18,6 +18,7 @@
 #include "dg_olc.h"
 #include "spells.h"
 #include "ai_actor.h"
+#include "legacy_behavior.h"
 
 /* local functions */
 static void extract_mobile_all(mob_vnum vnum);
@@ -343,6 +344,11 @@ int write_mobile_espec(mob_vnum mvnum, struct char_data *mob, FILE *fd)
       c->greeting_enabled, c->ambient_speech_enabled, c->ambient_emotes_enabled, c->speech_cooldown, c->emote_cooldown,
       c->flee_hp_percent, c->surrender_hp_percent, c->assist_enabled, c->call_help_enabled, c->hunt_enabled, c->return_home, c->stay_zone,
       c->personality[0], c->personality[1], c->personality[2], c->personality[3], c->personality[4]);
+    for (i = 0; i < 13; i++) {
+      unsigned domain = 1U << i;
+      if ((domain & MOB_BEHAVIOR_PHASE2A_DOMAINS) && c->behavior_owner[i] != MOB_BEHAVIOR_OWNER_COMPATIBILITY)
+        fprintf(fd, "AIBehaviorOwner: %s %s\n", mob_behavior_domain_name(domain), mob_behavior_owner_name(c->behavior_owner[i]));
+    }
     fprintf(fd, "AIConfigTraits: %d %d %d %d %d %d %d\n", c->personality[5], c->personality[6], c->personality[7], c->personality[8], c->personality[9], c->personality[10], c->personality[11]);
     fprintf(fd, "AIConfigSocial: %d %d %d %d %d %d %d %d %d\n", c->whisper_enabled, c->respond_strangers, c->respond_trusted, c->respond_feared, c->respond_hostile, c->room_speech_cooldown, c->dialogue_count[0], c->dialogue_count[1], c->dialogue_count[2]);
     fprintf(fd, "AIConfigCapabilities: %d %d %d %d\n", c->archetype, c->communication, c->memory_style, c->assistance_style);
