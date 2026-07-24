@@ -4214,6 +4214,7 @@ static void load_default_config( void )
   CONFIG_SCRIPT_PLAYERS         = script_players;
   CONFIG_DEBUG_MODE             = debug_mode;
   CONFIG_AI_ACTOR_ENABLED       = ai_actor_enabled;
+  CONFIG_AI_LEGACY_ARBITRATION_ENABLED = ai_legacy_arbitration_enabled;
 
   /* Rent / crashsave options. */
   CONFIG_FREE_RENT              = free_rent;
@@ -4290,6 +4291,8 @@ void load_config( void )
       case 'a':
         if (!str_cmp(tag, "ai_actor_enabled"))
           CONFIG_AI_ACTOR_ENABLED = num;
+        else if (!str_cmp(tag, "ai_legacy_arbitration_enabled"))
+          CONFIG_AI_LEGACY_ARBITRATION_ENABLED = num;
         else if (!str_cmp(tag, "auto_save"))
           CONFIG_AUTO_SAVE = num;
         else if (!str_cmp(tag, "autosave_time"))

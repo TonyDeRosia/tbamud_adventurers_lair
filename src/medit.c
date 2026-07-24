@@ -193,6 +193,16 @@ static void medit_disp_ai_diagnostics(struct descriptor_data *d)
   write_to_output(d, "P) Preview Effective Behavior\r\nD) Advanced Technical Diagnostics\r\nH) Help\r\nQ) Return\r\nChoice: ");
   OLC_MODE(d) = MEDIT_AI_DIAGNOSTICS;
 }
+static void medit_disp_ai_ownership(struct descriptor_data *d)
+{
+  char why[128] = "";
+  int mayor_locked = !mob_behavior_mayor_ai_ownership_supported(OLC_MOB(d), LBD_MOVEMENT, why, sizeof(why));
+  write_to_output(d, "\r\nBehavior Ownership\r\n\r\nCompatibility Mode:\r\n  Legacy Preserving\r\n\r\nDomain Ownership:\r\n  Movement: %s%s%s\r\n  Routine: Compatibility\r\n  Posture: Compatibility\r\n  Ambient Communication: Compatibility\r\n  Combat Initiation: Compatibility\r\n  Memory Retaliation: Compatibility\r\n  Helper/Coordination: Compatibility\r\n  Scavenging: Compatibility\r\n  Fleeing: Compatibility\r\n\r\nService Commands:\r\n  Legacy service, outside Phase 2A\r\n\r\nDG Scripts:\r\n  External behavior authority; not arbitrated in Phase 2A\r\n\r\n%s%s%sQ) Return\r\nChoice: ",
+      mayor_locked ? "Legacy locked by Mayor special" : "Compatibility", mayor_locked ? "\r\n  " : "", mayor_locked ? why : "",
+      mayor_locked ? "AI ownership unavailable: legacy Mayor special must be migrated first.\r\n\r\n" : "",
+      "Ownership persistence/editing is deferred to Phase 2B; current values are compatibility defaults.\r\n", "");
+  OLC_MODE(d) = MEDIT_AI_DIAGNOSTICS;
+}
 static void medit_disp_ai_help(struct descriptor_data *d, int return_mode, const char *title,
                                const char *explanation, const char *tips, const char *related)
 {
@@ -1144,7 +1154,7 @@ static void medit_disp_ai_menu(struct descriptor_data *d)
   struct mob_ai_config *c = OLC_MOB(d)->ai_config;
   if (!MOB_FLAGGED(OLC_MOB(d), MOB_AI_ACTOR)) { write_to_output(d, "Enable AI_ACTOR for this mob? (Y/N): "); OLC_MODE(d) = MEDIT_AI_ENABLE_CONFIRM; return; }
   if (!c) OLC_MOB(d)->ai_config = c = mob_ai_config_new();
-  write_to_output(d, "\r\n                         AI Actor\r\n\r\n1) Personality   : Shape how this NPC acts\r\n2) Communication : %s\r\n3) Daily Routine : %s\r\n4) Combat Behavior: Choose how it fights\r\n5) Preview NPC   : Read what this NPC will do\r\n6) Diagnostics   : %s\r\n\r\nA) Advanced AI Brain\r\nH) Help\r\nQ) Return\r\nChoice: ",
+  write_to_output(d, "\r\n                         AI Actor\r\n\r\n1) Personality   : Shape how this NPC acts\r\n2) Communication : %s\r\n3) Daily Routine : %s\r\n4) Combat Behavior: Choose how it fights\r\n5) Preview NPC   : Read what this NPC will do\r\n6) Diagnostics   : %s\r\n7) Behavior Ownership: Legacy Preserving\r\n\r\nA) Advanced AI Brain\r\nH) Help\r\nQ) Return\r\nChoice: ",
     medit_ai_communication_summary(c),
     c->schedule_enabled ? "Active" : (c->schedule_count || c->patrol_count ? "Ready to activate" : "No routine"),
     ai_actor_compatibility_warning_count(OLC_MOB(d)) ? "Warnings present" : "Ready");
@@ -1734,7 +1744,7 @@ void medit_parse(struct descriptor_data *d, char *arg)
       case '3': medit_disp_ai_schedule(d); return;
       case '4': medit_disp_ai_combat(d); return;
       case '5': medit_disp_ai_preview(d); return;
-      case '6': medit_disp_ai_diagnostics(d); return;
+      case '6': medit_disp_ai_diagnostics(d); return; case '7': medit_disp_ai_ownership(d); return;
       case 'a': medit_disp_ai_advanced(d); return;
       default: medit_disp_ai_menu(d); return;
     }

@@ -104,6 +104,9 @@ int no_mort_to_immort = YES;
 * If set to NO, then only the 6 directions n,e,s,w,u,d are allowed */
 int diagonal_dirs = NO;
 
+/* Phase 2A rollback seam: disabled preserves the original mobile_activity path. */
+int ai_legacy_arbitration_enabled = NO;
+
 /* RENT/CRASHSAVE OPTIONS */
 /* Should the MUD allow you to 'rent' for free?  (i.e. if you just quit, your
  * objects are saved at no cost). */
