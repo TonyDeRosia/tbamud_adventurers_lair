@@ -25,9 +25,8 @@ for token in ("Identity", "Communication", "Relationships", "Status: %s",
               "Inactive — current movement mode is not Random.", "Effective: %s", "Source: %s"):
     assert token in medit, token
 
-# Preview follows authored -> inferred -> effective runtime -> reason for each capability.
-for token in ("Preview Compiled Profile", "Authored:", "Inferred:",
-              "Effective Runtime:", "Reason:"):
+# Normal preview is builder-facing; technical authored/inferred controls remain advanced.
+for token in ("Effective NPC Behavior", "Communication", "Intelligence", "Restrictions", "Warnings"):
     assert token in medit, token
 
 # Diagnostics answer builder questions, including the next configuration direction.

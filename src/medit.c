@@ -125,6 +125,52 @@ static void medit_disp_ai_schedule(struct descriptor_data *d);
 static void medit_disp_ai_patrol_routes(struct descriptor_data *d);
 static void medit_disp_ai_capabilities(struct descriptor_data *d);
 static void medit_disp_ai_vocalizations(struct descriptor_data *d);
+static const char *medit_ai_communication_summary(const struct mob_ai_config *c)
+{
+  return c->communication == AI_COMM_SPEAK ? "Speaks" :
+         c->communication == AI_COMM_VOCALIZE ? "Creature sounds" : "Silent";
+}
+/* Older configurations have no separate preset field.  This deliberately derives
+ * a label from their existing compiled inputs without rewriting those inputs. */
+static const char *medit_ai_intelligence_summary(const struct mob_ai_config *c)
+{
+  if (c->archetype == AI_ARCH_MINDLESS || c->memory_style == AI_MEMORY_NONE) return "Mindless";
+  if (c->archetype == AI_ARCH_BEAST) return "Animal";
+  if (c->observation_sensitivity >= 80 || c->memory_style == AI_MEMORY_FULL_RELATIONSHIP) return "Brilliant";
+  if (c->observation_sensitivity >= 65 || c->memory_style == AI_MEMORY_SOCIAL) return "Clever";
+  if (c->observation_sensitivity >= 45 || c->memory_style == AI_MEMORY_BASIC_HOSTILE) return "Average";
+  return "Simple";
+}
+static void medit_disp_ai_communication(struct descriptor_data *d)
+{
+  struct mob_ai_config *c = OLC_MOB(d)->ai_config;
+  write_to_output(d, "\r\nCommunication\r\n-------------\r\n\r\n1) Silent\r\n   The NPC does not speak or make authored creature sounds.\r\n2) Creature Sounds\r\n   The NPC uses creature vocalization lines, not normal spoken dialogue.\r\n3) Speaks\r\n   The NPC may use dialogue, greetings, warnings, and replies.\r\n\r\nCurrent: %s\r\nH) Help  Q) Cancel\r\nChoice: ", medit_ai_communication_summary(c));
+  OLC_MODE(d) = MEDIT_AI_COMMUNICATION;
+}
+static void medit_disp_ai_intelligence(struct descriptor_data *d)
+{
+  write_to_output(d, "\r\nIntelligence\r\n------------\r\n\r\n1) Mindless  - immediate instinct and minimal reasoning\r\n2) Animal    - danger, territory, and kindred allies\r\n3) Simple    - basic decisions and common interactions\r\n4) Average   - ordinary perception, memory, and judgment\r\n5) Clever    - stronger recognition and tactical decisions\r\n6) Brilliant - strong perception, long memory, and planning\r\n\r\nCurrent effective level: %s\r\nSelecting a level updates only AI thinking defaults; dialogue and schedules are preserved.\r\nH) Help  Q) Cancel\r\nChoice: ", medit_ai_intelligence_summary(OLC_MOB(d)->ai_config));
+  OLC_MODE(d) = MEDIT_AI_INTELLIGENCE;
+}
+static void medit_disp_ai_advanced(struct descriptor_data *d)
+{
+  write_to_output(d, "\r\nAdvanced AI Brain\r\n-----------------\r\n\r\n1) Personality and Social Style\r\n2) Perception and Awareness\r\n3) Memory Details\r\n4) Threat Response\r\n5) Combat Reactions\r\n6) Assistance Rules\r\n7) Capability Overrides\r\n8) Movement Internals\r\n9) Profile and Inference\r\nP) Technical Compiled Profile\r\nV) Validation Information\r\nD) Technical Diagnostics\r\nR) Reset Inferred Defaults\r\n\r\nH) Help\r\nQ) Return\r\nChoice: ");
+  OLC_MODE(d) = MEDIT_AI_ADVANCED;
+}
+static void medit_disp_ai_diagnostics(struct descriptor_data *d)
+{
+  struct mob_ai_config *c = OLC_MOB(d)->ai_config;
+  int spoken = 0, i;
+  for (i = 0; i < AI_DIALOGUE_CATEGORIES; i++) spoken += c->dialogue_count[i];
+  write_to_output(d, "\r\nDiagnostics\r\n-----------\r\n\r\n");
+  if (c->communication == AI_COMM_VOCALIZE && !c->vocalization_count) write_to_output(d, "INFO\r\nCommunication is set to Creature Sounds, but no creature sound lines exist.\r\n\r\n");
+  if (c->communication == AI_COMM_NONE && (spoken || c->vocalization_count)) write_to_output(d, "WARNING\r\nCommunication is Silent, so authored dialogue and creature sounds will not run.\r\n\r\n");
+  if (c->schedule_enabled && MOB_FLAGGED(OLC_MOB(d), MOB_SENTINEL)) write_to_output(d, "WARNING\r\nSENTINEL prevents the active schedule from moving this NPC.\r\n\r\n");
+  if (!c->schedule_enabled) write_to_output(d, "INFO\r\nThis NPC has no active schedule and will use normal MEDIT movement behavior.\r\n\r\n");
+  if (!ai_actor_compatibility_warning_count(OLC_MOB(d))) write_to_output(d, "Ready\r\nNo actionable configuration warnings.\r\n\r\n");
+  write_to_output(d, "P) Preview Effective Behavior\r\nD) Advanced Technical Diagnostics\r\nH) Help\r\nQ) Return\r\nChoice: ");
+  OLC_MODE(d) = MEDIT_AI_DIAGNOSTICS;
+}
 static void medit_disp_ai_help(struct descriptor_data *d, int return_mode, const char *title,
                                const char *explanation, const char *tips, const char *related)
 {
@@ -146,6 +192,10 @@ static void medit_return_from_ai_help(struct descriptor_data *d)
     case MEDIT_AI_THREAT: medit_disp_ai_threat(d); break; case MEDIT_AI_COMBAT: medit_disp_ai_combat(d); break;
     case MEDIT_AI_SCHEDULE: medit_disp_ai_schedule(d); break; case MEDIT_AI_PATROL_ROUTES: medit_disp_ai_patrol_routes(d); break;
     case MEDIT_AI_CAPABILITIES: medit_disp_ai_capabilities(d); break; case MEDIT_AI_VOCALIZATIONS: medit_disp_ai_vocalizations(d); break;
+    case MEDIT_AI_COMMUNICATION: medit_disp_ai_communication(d); break;
+    case MEDIT_AI_INTELLIGENCE: medit_disp_ai_intelligence(d); break;
+    case MEDIT_AI_DIAGNOSTICS: medit_disp_ai_diagnostics(d); break;
+    case MEDIT_AI_ADVANCED: medit_disp_ai_advanced(d); break;
     default: medit_disp_ai_menu(d); break;
   }
 }
@@ -878,7 +928,7 @@ static const char *ai_dialogue_summaries[AI_DIALOGUE_CATEGORIES] = {
 };
 static void medit_disp_ai_dialogue_lines(struct descriptor_data *d, int category)
 { struct mob_ai_config *c=OLC_MOB(d)->ai_config; int i; write_to_output(d,"\r\n%s             %s Dialogue%s\r\n\r\n%s\r\nEntries: %d/%d\r\n\r\n",CCCYN(d->character,C_NRM),ai_dialogue_category_name(category),CCNRM(d->character,C_NRM),ai_dialogue_summaries[category],c->dialogue_count[category],AI_DIALOGUE_MAX_LINES); for(i=0;i<c->dialogue_count[category];i++) write_to_output(d,"  %d) %s\r\n",i+1,c->dialogue[category][i]); write_to_output(d,"\r\nCommands\r\n  A) Add a line  E) Edit a line  D) Delete a line\r\n  U) Move a line up  N) Move a line down\r\n  H) Help  Q) Return to categories\r\nChoice: "); OLC_MODE(d)=MEDIT_AI_DIALOGUE; }
-static void medit_disp_ai_dialogue(struct descriptor_data *d) { struct mob_ai_config*c=OLC_MOB(d)->ai_config; int i,total=0; write_to_output(d,"\r\n%s                    AI Actor Dialogue%s\r\n\r\n%sSocial%s\r\n",CCCYN(d->character,C_NRM),CCNRM(d->character,C_NRM),CCCYN(d->character,C_NRM),CCNRM(d->character,C_NRM)); for(i=0;i<12;i++){write_to_output(d," %2d) %-21s %d/%d%s",i,ai_dialogue_category_name(i),c->dialogue_count[i],AI_DIALOGUE_MAX_LINES,i%2?"\r\n":"    ");total+=c->dialogue_count[i];} write_to_output(d,"\r\n%sAmbient%s\r\n  4) %-21s %d/%d     5) %-21s %d/%d\r\n%sSchedule%s\r\n",CCCYN(d->character,C_NRM),CCNRM(d->character,C_NRM),ai_dialogue_category_name(4),c->dialogue_count[4],AI_DIALOGUE_MAX_LINES,ai_dialogue_category_name(5),c->dialogue_count[5],AI_DIALOGUE_MAX_LINES,CCCYN(d->character,C_NRM),CCNRM(d->character,C_NRM)); for(i=12;i<20;i++){write_to_output(d," %2d) %-21s %d/%d%s",i,ai_dialogue_category_name(i),c->dialogue_count[i],AI_DIALOGUE_MAX_LINES,i%2?"\r\n":"    ");total+=c->dialogue_count[i];} write_to_output(d,"\r\nTotal authored lines: %d\r\nEach category supports up to %d lines.\r\nH) Help  Q) Return\r\nChoice: ",total,AI_DIALOGUE_MAX_LINES); OLC_MODE(d)=MEDIT_AI_DIALOGUE; }
+static void medit_disp_ai_dialogue(struct descriptor_data *d) { struct mob_ai_config*c=OLC_MOB(d)->ai_config; int i,spoken=0; for(i=0;i<AI_DIALOGUE_CATEGORIES;i++) spoken+=c->dialogue_count[i]; write_to_output(d,"\r\nDialogue\r\n--------\r\n\r\nCommunication\r\n  %s\r\nSpoken Dialogue\r\n  %d authored lines%s\r\nCreature Sounds\r\n  %d authored lines%s\r\n\r\n1) Greetings\r\n2) Ambient Dialogue\r\n3) Replies and Questions\r\n4) Warnings and Threats\r\n5) Combat and Help Lines\r\n6) Farewells\r\n7) Creature Sounds\r\n8) Preview Dialogue\r\n\r\nH) Help\r\nQ) Return\r\nChoice: ",medit_ai_communication_summary(c),spoken,c->communication==AI_COMM_NONE?" (inactive)":"",c->vocalization_count,c->communication==AI_COMM_NONE?" (inactive)":""); OLC_MODE(d)=MEDIT_AI_DIALOGUE; }
 
 
 
@@ -894,7 +944,7 @@ static void medit_schedule_store(struct descriptor_data *d, int route, int entry
 static void medit_schedule_load(struct descriptor_data *d,int *route,int *entry,int *waypoint) { *route=*entry=*waypoint=-1; if(OLC_STORAGE(d)) sscanf(OLC_STORAGE(d),"%d %d %d",route,entry,waypoint); }
 static struct ai_schedule_entry *medit_selected_entry(struct descriptor_data *d) { int r,id,w,i; medit_schedule_load(d,&r,&id,&w); for(i=0;i<OLC_MOB(d)->ai_config->schedule_count;i++)if(OLC_MOB(d)->ai_config->schedules[i].id==id)return &OLC_MOB(d)->ai_config->schedules[i]; return NULL; }
 static struct ai_patrol_route *medit_selected_route(struct descriptor_data *d) { int id,e,w,i; medit_schedule_load(d,&id,&e,&w); for(i=0;i<OLC_MOB(d)->ai_config->patrol_count;i++)if(OLC_MOB(d)->ai_config->patrols[i].id==id)return &OLC_MOB(d)->ai_config->patrols[i]; return NULL; }
-static void medit_disp_ai_schedule(struct descriptor_data *d) { struct mob_ai_config*c=OLC_MOB(d)->ai_config; write_to_output(d,"\r\n%s                    AI Actor Schedule%s\r\n\r\n%sStatus%s\r\n  1) Schedule Enabled      : %s\r\n  2) Resume After Interrupt: %s\r\n  3) Failure Policy        : %s\r\n\r\n%sLocations%s\r\n  4) Home Room             : %s\r\n  5) Work Room             : %s\r\n  6) Sleep Room            : %s\r\n  7) Guard Room            : %s\r\n  8) Fallback Room         : %s\r\n\r\n%sContent%s\r\n  A) Schedule Entries      : %d/%d\r\n  B) Patrol Routes         : %d/%d\r\n\r\n%sTools%s\r\n  C) Preview               : Show the day's effective activity timeline\r\n  D) Validate              : Check rooms, times, routes, and conflicts\r\n\r\nH) Help   Q) Return\r\nChoice: ",CCCYN(d->character,C_NRM),CCNRM(d->character,C_NRM),CCCYN(d->character,C_NRM),CCNRM(d->character,C_NRM),medit_ai_state(d,c->schedule_enabled),medit_ai_state(d,c->resume_after_interrupt),medit_sched_failure(c->default_failure_policy),CCCYN(d->character,C_NRM),CCNRM(d->character,C_NRM),medit_schedule_room_name(c->home_room_vnum),medit_schedule_room_name(c->work_room_vnum),medit_schedule_room_name(c->sleep_room_vnum),medit_schedule_room_name(c->guard_room_vnum),medit_schedule_room_name(c->fallback_room_vnum),CCCYN(d->character,C_NRM),CCNRM(d->character,C_NRM),c->schedule_count,AI_SCHEDULE_MAX,c->patrol_count,AI_PATROL_MAX,CCCYN(d->character,C_NRM),CCNRM(d->character,C_NRM)); OLC_MODE(d)=MEDIT_AI_SCHEDULE; }
+static void medit_disp_ai_schedule(struct descriptor_data *d) { struct mob_ai_config*c=OLC_MOB(d)->ai_config; write_to_output(d,"\r\nSchedule\r\n--------\r\n\r\nStatus\r\n  %s\r\nEntries\r\n  %d\r\nPatrol Routes\r\n  %d\r\n\r\n1) Enable or Disable Schedule\r\n2) Edit Daily Schedule\r\n3) Edit Patrol Routes\r\n4) Preview Today's Routine\r\n5) Validate Destinations\r\n\r\nNormal MEDIT movement flags remain authoritative outside active routine entries.\r\nH) Help\r\nQ) Return\r\nChoice: ",c->schedule_enabled?"Enabled":"Disabled",c->schedule_count,c->patrol_count); OLC_MODE(d)=MEDIT_AI_SCHEDULE; }
 static void medit_disp_ai_schedule_entries(struct descriptor_data *d) { struct mob_ai_config*c=OLC_MOB(d)->ai_config;int i;write_to_output(d,"\r\n%s                    AI Actor Schedule Entries%s\r\n\r\n #  State     Time       Days        Priority  Activity\r\n",CCCYN(d->character,C_NRM),CCNRM(d->character,C_NRM));for(i=0;i<c->schedule_count;i++){struct ai_schedule_entry*e=&c->schedules[i];write_to_output(d," %d  %-8s  %-9s %-11s %-9d %s\r\n",i+1,e->enabled?"Enabled":"Disabled",e->start_hour==0&&e->end_hour==0?"All Day":"game time",medit_sched_days(e->day_mask),e->priority,medit_sched_activity(e->activity));}write_to_output(d,"\r\nCommands\r\n  A) Add Entry  E) Edit Entry  D) Delete Entry  U) Move Entry Up\r\n  N) Move Entry Down  C) Duplicate Entry  T) Enable/Disable Entry\r\n  H) Help  Q) Return\r\nChoice: ");OLC_MODE(d)=MEDIT_AI_SCHEDULE_ENTRIES; }
 
 static void medit_disp_ai_schedule_entry(struct descriptor_data*d) { struct ai_schedule_entry*e=medit_selected_entry(d);room_rnum r;if(!e){write_to_output(d,"Invalid entry index.\r\n");medit_disp_ai_schedule_entries(d);return;}r=real_room(e->destination_value);write_to_output(d,"\r\n                 AI Actor Schedule Entry\r\n\r\n  Stable ID                  : %d\r\n\r\n  1) Enabled                : %s\r\n  2) Start Hour             : %02d\r\n  3) End Hour               : %02d\r\n  4) Day Mask               : %s\r\n  5) Priority               : %d\r\n  6) Activity               : %s\r\n  7) Destination Type       : %s\r\n  8) Destination Value      : %s\r\n  9) Patrol Route           : %d\r\n  A) Arrival Action         : %s\r\n  B) Departure Action       : %s\r\n  C) Interruption Policy    : %s\r\n  D) Failure Policy         : %s\r\n  E) Maximum Travel Time    : %d\r\n  F) Maximum Attempts       : %d\r\n  G) Wait/Retry Duration    : %d\r\n  H) Dialogue Category      : Schedule Arrival\r\n  V) Preview Entry  X) Validate Entry  Q) Return\r\nChoice: ",e->id,e->enabled?"Yes":"No",e->start_hour,e->end_hour,medit_sched_days(e->day_mask),e->priority,medit_sched_activity(e->activity),medit_sched_dest(e->destination),e->destination==AI_DEST_ROOM_VNUM?(r==NOWHERE?"INVALID":world[r].name):"Not Applicable",e->route_id,medit_sched_action(e->arrival_action),medit_sched_action(e->departure_action),medit_sched_interrupt(e->interruption_policy),medit_sched_failure(e->failure_policy),e->max_travel_time,e->max_attempts,e->wait_duration);OLC_MODE(d)=MEDIT_AI_SCHEDULE_ENTRY; }
@@ -1037,30 +1087,34 @@ static void medit_disp_ai_vocalizations(struct descriptor_data *d)
 static void medit_disp_ai_preview(struct descriptor_data *d)
 {
   struct mob_ai_config *c = OLC_MOB(d)->ai_config;
-  struct ai_actor_profile *p;
-  const char *movement_reason;
-  ai_actor_refresh_profile(OLC_MOB(d), TRUE);
-  p = OLC_MOB(d)->ai_prof;
-  movement_reason = c->movement == AI_MOVE_RANDOM ? "Random movement uses this delay." : "Inactive because Movement is not Random.";
-  write_to_output(d,
-    "\r\n                    Preview Compiled " "Profile\r\n\r\nArchetype\r\n  Authored:  %s\r\n  Inferred:  role and NPC identity\r\n  Effective Runtime: %s\r\n  Reason: %s\r\n\r\nCommunication\r\n  Authored:  %s\r\n  Inferred:  derived from archetype\r\n  Effective Runtime: %s\r\n  Reason: %s\r\n\r\nMemory\r\n  Authored:  %s\r\n  Inferred:  derived from archetype\r\n  Effective Runtime: %s\r\n  Reason: %s\r\n\r\nAssistance\r\n  Authored:  %s\r\n  Inferred:  derived from archetype\r\n  Effective Runtime: %s\r\n  Reason: %s\r\n\r\nMovement\r\n  Authored:  %d seconds\r\n  Inferred:  1 second default\r\n  Effective Runtime: %d seconds\r\n  Reason: %s\r\n\r\n",
-    c->archetype < 0 ? "Inferred" : ai_actor_archetype_name(c->archetype), ai_actor_archetype_name(p->archetype), c->archetype < 0 ? "Inferred from role and identity." : "Builder selected this archetype.",
-    ai_actor_communication_name(c->communication), ai_actor_communication_name(p->communication), c->communication < 0 ? "Inferred from the effective archetype." : "Builder selected this communication type.",
-    ai_actor_memory_style_name(c->memory_style), ai_actor_memory_style_name(p->memory_style), c->memory_style < 0 ? "Inferred from the effective archetype." : "Builder selected this memory style.",
-    ai_actor_assistance_style_name(c->assistance_style), ai_actor_assistance_style_name(p->assistance_style), c->assistance_style < 0 ? "Inferred from the effective archetype." : "Builder selected this assistance style.",
-    c->movement_delay, c->movement_delay, movement_reason);
+  int spoken = 0, i;
+  for (i = 0; i < AI_DIALOGUE_CATEGORIES; i++) spoken += c->dialogue_count[i];
+  write_to_output(d, "\r\nEffective NPC Behavior\r\n----------------------\r\n\r\nCommunication\r\n  %s\r\n\r\nIntelligence\r\n  %s\r\n\r\nMemory\r\n  %s\r\n\r\nAssistance\r\n  %s\r\n\r\nMovement\r\n  Uses normal MEDIT movement rules%s\r\n\r\nSchedule\r\n  %s\r\n\r\nDialogue\r\n  %d spoken lines\r\n  %d creature sounds\r\n\r\nCombat\r\n  %s\r\n\r\nRestrictions\r\n  %s%s\r\n\r\nWarnings\r\n  %s\r\n\r\nPress ENTER to return. ",
+    medit_ai_communication_summary(c), medit_ai_intelligence_summary(c),
+    c->memory_enabled ? "Remembers attackers and familiar threats" : "No AI memory is enabled",
+    c->may_assist ? "Helps eligible allies" : "Defends itself without ally assistance",
+    c->schedule_enabled ? "; schedule overrides movement during active routine entries" : "",
+    c->schedule_enabled ? "Enabled" : "Disabled", spoken, c->vocalization_count,
+    c->combat_enabled ? "Defends itself and uses configured reactions" : "Combat reactions are disabled",
+    MOB_FLAGGED(OLC_MOB(d), MOB_SENTINEL) ? "SENTINEL active" : "No SENTINEL restriction", MOB_FLAGGED(OLC_MOB(d), MOB_STAY_ZONE) ? "; STAY_ZONE active" : "",
+    ai_actor_compatibility_warning_count(OLC_MOB(d)) ? "See Diagnostics for actionable warnings" : "None");
+  OLC_MODE(d) = MEDIT_AI_HELP;
+  if (OLC_STORAGE(d)) free(OLC_STORAGE(d));
+  CREATE(OLC_STORAGE(d), char, 24); snprintf(OLC_STORAGE(d), 24, "help %d", MEDIT_AI_MENU);
 }
 
 static void medit_disp_ai_menu(struct descriptor_data *d)
 {
   struct mob_ai_config *c = OLC_MOB(d)->ai_config;
-  int lines = 0, i;
-  /* Configures each category; detailed guidance is provided by H) Help. H) Help  Q) Return */
-  const char *title = CCCYN(d->character, C_NRM), *key = CCGRN(d->character, C_NRM), *value = CCYEL(d->character, C_NRM), *normal = CCNRM(d->character, C_NRM);
+  int spoken = 0, i;
   if (!MOB_FLAGGED(OLC_MOB(d), MOB_AI_ACTOR)) { write_to_output(d, "Enable AI_ACTOR for this mob? (Y/N): "); OLC_MODE(d) = MEDIT_AI_ENABLE_CONFIRM; return; }
   if (!c) OLC_MOB(d)->ai_config = c = mob_ai_config_new();
-  for (i = 0; i < AI_DIALOGUE_CATEGORIES; i++) lines += c->dialogue_count[i];
-  write_to_output(d, "\r\n%s                    AI Actor Configuration%s\r\n\r\n%sProfile%s\r\n  %s1)%s Profile Mode: %s%s%s\r\n  %s2)%s Role: %s%s%s\r\n  %s3)%s Movement: %s%s%s\r\n  %s4)%s Personality : %s%s%s\r\n  %sA)%s Capabilities: Archetype, communication, memory, assistance, and random movement delay\r\n\r\n%sInteraction%s\r\n  %s5)%s Social Behavior: %s%s%s; greeting %s; ambient %s/%s\r\n  %s6)%s Dialogue Lines: %s%d authored lines across %d event pools%s\r\n  %sB)%s Creature Vocalizations: %s%d authored lines%s\r\n  %s7)%s Perception  : %sTracks entry, speech, combat, gifts, crimes, and whispers%s\r\n  %s8)%s Memory      : %s%s — stores relationships and familiarity%s\r\n  %s9)%s Threat Response: %sWarn → Challenge → Call Help → Attack%s\r\n  %s0)%s Combat Reactions: %sAssists allies; target switching %s%s\r\n\r\n%sWorld Behavior%s\r\n  %sS)%s Schedules and Patrol Routines: %s%s; %d entries; %d patrol routes%s\r\n\r\n%sTools%s\r\n  %sC)%s Builder Diagnostics: %s%d warnings; NPC behavior summary%s\r\n  %sP)%s Preview Compiled Profile: Show effective compiled runtime profile\r\n  %sV)%s Validation Information: Non-mutating compatibility information\r\n  %sR)%s Reset to Inferred Defaults: Rebuild from inferred defaults\r\n  %sH)%s Help   %sQ)%s Return\r\nChoice: %s", title,normal,title,normal,key,normal,value,c->mode == MOB_AI_CUSTOM ? "Custom" : c->mode == MOB_AI_INFERRED_OVERRIDES ? "Overrides" : "Inferred",normal,key,normal,value,ai_actor_config_role_name(c->role),normal,key,normal,value,ai_actor_config_movement_name(c->movement),normal,key,normal,value,medit_ai_personality_summary(c),normal,key,normal,title,normal,key,normal,value,ai_social_style_name(c->social),normal,c->greeting_enabled ? "on" : "off",c->ambient_speech_enabled ? "on" : "off",c->ambient_emotes_enabled ? "on" : "off",key,normal,value,lines,AI_DIALOGUE_CATEGORIES,normal,key,normal,value,c->vocalization_count,normal,key,normal,value,normal,key,normal,value,medit_ai_state(d,c->memory_enabled),normal,key,normal,value,normal,key,normal,value,c->switch_targets ? "enabled" : "disabled",normal,title,normal,key,normal,value,c->schedule_enabled ? "Enabled" : "Disabled",c->schedule_count,c->patrol_count,normal,title,normal,key,normal,value,ai_actor_compatibility_warning_count(OLC_MOB(d)),normal,key,normal,key,normal,key,normal,key,normal,key,normal,normal);
+  for (i = 0; i < AI_DIALOGUE_CATEGORIES; i++) spoken += c->dialogue_count[i];
+  write_to_output(d, "\r\n                         AI Actor\r\n\r\n1) Communication : %s\r\n2) Intelligence  : %s\r\n3) Schedule      : %s\r\n4) Dialogue      : %s\r\n5) Preview       : Show effective NPC behavior\r\n6) Diagnostics   : %s\r\n\r\nA) Advanced AI Brain\r\nH) Help\r\nQ) Return\r\nChoice: ",
+    medit_ai_communication_summary(c), medit_ai_intelligence_summary(c),
+    c->schedule_enabled ? "Daily routine enabled" : (c->schedule_count || c->patrol_count ? "Configured, disabled" : "None"),
+    spoken || c->vocalization_count ? "authored dialogue available" : "No authored lines",
+    ai_actor_compatibility_warning_count(OLC_MOB(d)) ? "Warnings present" : "Ready");
   OLC_MODE(d) = MEDIT_AI_MENU;
 }
 
@@ -1068,7 +1122,7 @@ static void medit_disp_ai_menu(struct descriptor_data *d)
  * pre-parser; individual modes below decide whether a value is numeric. */
 static int medit_is_ai_mode(int mode)
 {
-  return mode >= MEDIT_AI_MENU && mode <= MEDIT_AI_COMPATIBILITY;
+  return mode >= MEDIT_AI_MENU && mode <= MEDIT_AI_DIAGNOSTICS;
 }
 
 static int medit_parse_ai_integer(const char *arg, int minimum, int maximum, int *value)
@@ -1600,28 +1654,48 @@ void medit_parse(struct descriptor_data *d, char *arg)
     if (LOWER(*arg) == 'q') { medit_disp_ai_menu(d); return; }
     if (LOWER(*arg) == 'h') { char report[MAX_STRING_LENGTH]; ai_actor_compatibility_report(OLC_MOB(d), report, sizeof(report), TRUE); medit_disp_ai_help(d, MEDIT_AI_COMPATIBILITY, "Diagnostics", report, "This reference is read-only; it does not repair flags or routes.", "Legacy flags, profile modes, schedules, scripts, memory, and combat."); return; }
     medit_disp_ai_compatibility(d); return;
+  case MEDIT_AI_DIAGNOSTICS:
+    if (LOWER(*arg) == 'q') { medit_disp_ai_menu(d); return; }
+    if (LOWER(*arg) == 'h') { medit_disp_ai_help(d, MEDIT_AI_DIAGNOSTICS, "Diagnostics", "Diagnostics lists only issues a builder can act on, such as inactive lines, schedules, and movement restrictions.", "Use Preview to understand effective behavior.", "Technical runtime detail is available only in Advanced AI Brain."); return; }
+    if (LOWER(*arg) == 'p') { medit_disp_ai_preview(d); return; }
+    if (LOWER(*arg) == 'd') { medit_disp_ai_compatibility(d); return; }
+    medit_disp_ai_diagnostics(d); return;
   case MEDIT_AI_MENU:
     switch (LOWER(*arg)) {
       case 'q': medit_disp_menu(d); return;
-      case 'h': medit_disp_ai_help(d, MEDIT_AI_MENU, "Configuration", "This menu organizes the actor profile, interaction, and world behavior.", "Choose a numbered section; use Preview to inspect compiled values.", "Combat and Schedule provide their own validators."); return;
-      case 'v': { char report[MAX_STRING_LENGTH]; ai_actor_compatibility_report(OLC_MOB(d), report, sizeof(report), FALSE); write_to_output(d, "\r\nAI Actor Validation Information\r\nConfiguration: stored AI configuration is present.\r\nSubsystem Validators: Combat and Schedule available. Whole-profile mutation-safe validator: Not implemented.\r\nCompatibility:%s", report); medit_disp_ai_menu(d); return; }
-      case 'c': medit_disp_ai_compatibility(d); return;
-      case '1': medit_disp_ai_mode(d); return;
-      case '2': medit_disp_ai_role(d); return;
-      case '3': medit_disp_ai_movement(d); return;
-      case '4': medit_disp_ai_personality(d); return;
-      case 'a': medit_disp_ai_capabilities(d); return;
-      case '5': medit_disp_ai_social(d); return;
-      case '6': medit_disp_ai_dialogue(d); return;
-      case 'b': medit_disp_ai_vocalizations(d); return;
-      case '7': medit_disp_ai_perception(d); return;
-      case '8': medit_disp_ai_memory(d); return;
-      case '9': medit_disp_ai_threat(d); return;
-      case '0': medit_disp_ai_combat(d); return;
-      case 's': medit_disp_ai_schedule(d); return;
-      case 'r': mob_ai_config_free(OLC_MOB(d)->ai_config); OLC_MOB(d)->ai_config = NULL; OLC_VAL(d) = 1; medit_disp_ai_menu(d); return;
-      case 'p': medit_disp_ai_preview(d); medit_disp_ai_menu(d); return;
+      case 'h': medit_disp_ai_help(d, MEDIT_AI_MENU, "Builder Workflow", "1. Choose Communication. 2. Choose Intelligence. 3. Add a Schedule if needed. 4. Add Dialogue or Creature Sounds. 5. Preview behavior. 6. Resolve Diagnostics warnings. 7. Use Advanced AI Brain only for fine-tuning.", "Blank input redisplays this menu; Q always returns to MEDIT.", "Normal MEDIT owns flags and ordinary movement restrictions."); return;
+      case '1': medit_disp_ai_communication(d); return;
+      case '2': medit_disp_ai_intelligence(d); return;
+      case '3': medit_disp_ai_schedule(d); return;
+      case '4': medit_disp_ai_dialogue(d); return;
+      case '5': medit_disp_ai_preview(d); return;
+      case '6': medit_disp_ai_diagnostics(d); return;
+      case 'a': medit_disp_ai_advanced(d); return;
       default: medit_disp_ai_menu(d); return;
+    }
+  case MEDIT_AI_COMMUNICATION:
+    if (LOWER(*arg) == 'q') { medit_disp_ai_menu(d); return; }
+    if (LOWER(*arg) == 'h') { medit_disp_ai_help(d, MEDIT_AI_COMMUNICATION, "Communication", "Silent disables authored speech and sounds. Creature Sounds uses vocalizations. Speaks enables normal dialogue.", "Choose one practical communication style.", "Telepathy remains an advanced partial capability."); return; }
+    if (!medit_parse_ai_integer(arg, 1, 3, &i)) { write_to_output(d, "Choose Silent, Creature Sounds, or Speaks.\r\n"); medit_disp_ai_communication(d); return; }
+    OLC_MOB(d)->ai_config->communication = i - 1; OLC_VAL(d) = 1; medit_disp_ai_menu(d); return;
+  case MEDIT_AI_INTELLIGENCE: {
+    struct mob_ai_config *c = OLC_MOB(d)->ai_config;
+    if (LOWER(*arg) == 'q') { medit_disp_ai_menu(d); return; }
+    if (LOWER(*arg) == 'h') { medit_disp_ai_help(d, MEDIT_AI_INTELLIGENCE, "Intelligence", "This applies documented defaults to existing perception, memory, assistance, and social fields. Advanced screens can fine-tune them afterwards.", "Selecting intelligence never changes dialogue, schedules, patrol routes, or combat authored data.", "Existing Advanced Configuration is derived until you choose a level."); return; }
+    if (!medit_parse_ai_integer(arg, 1, 6, &i)) { write_to_output(d, "Choose an intelligence level from 1 to 6.\r\n"); medit_disp_ai_intelligence(d); return; }
+    c->archetype = i == 1 ? AI_ARCH_MINDLESS : i == 2 ? AI_ARCH_BEAST : AI_ARCH_HUMANOID;
+    c->memory_style = i == 1 ? AI_MEMORY_NONE : i == 2 ? AI_MEMORY_BASIC_HOSTILE : i < 5 ? AI_MEMORY_SOCIAL : AI_MEMORY_FULL_RELATIONSHIP;
+    c->assistance_style = i < 2 ? AI_ASSIST_NONE : i == 2 ? AI_ASSIST_SAME_KIND : AI_ASSIST_FACTION;
+    c->memory_enabled = i > 1; c->observation_sensitivity = (int[]){15,30,40,55,70,85}[i-1]; c->hearing_sensitivity = c->observation_sensitivity;
+    c->recognition_confidence = c->observation_sensitivity; c->suspicion_threshold = 100 - c->observation_sensitivity; OLC_VAL(d)=1; medit_disp_ai_menu(d); return;
+  }
+  case MEDIT_AI_ADVANCED:
+    switch (LOWER(*arg)) {
+      case 'q': medit_disp_ai_menu(d); return; case 'h': medit_disp_ai_help(d,MEDIT_AI_ADVANCED,"Advanced AI Brain","Fine-tune engine-level AI systems here. These controls preserve the normal builder workflow.","Q returns to AI Actor; each detailed editor retains its existing values.","Profile modes, capabilities, movement internals, technical preview, validation, and diagnostics."); return;
+      case '1': medit_disp_ai_personality(d); return; case '2': medit_disp_ai_perception(d); return; case '3': medit_disp_ai_memory(d); return; case '4': medit_disp_ai_threat(d); return; case '5': medit_disp_ai_combat(d); return; case '6': medit_disp_ai_social(d); return; case '7': medit_disp_ai_capabilities(d); return; case '8': medit_disp_ai_movement(d); return; case '9': medit_disp_ai_mode(d); return;
+      case 'p': medit_disp_ai_preview(d); return; case 'v': medit_disp_ai_compatibility(d); return; case 'd': medit_disp_ai_compatibility(d); return;
+      case 'r': mob_ai_config_free(OLC_MOB(d)->ai_config); OLC_MOB(d)->ai_config=mob_ai_config_new(); OLC_VAL(d)=1; medit_disp_ai_advanced(d); return;
+      default: write_to_output(d,"Invalid advanced choice.\r\n"); medit_disp_ai_advanced(d); return;
     }
   case MEDIT_AI_PERSONALITY:
     if (LOWER(*arg)=='q') { medit_disp_ai_menu(d); return; }
@@ -1681,7 +1755,10 @@ void medit_parse(struct descriptor_data *d, char *arg)
       }
       write_to_output(d,"Invalid command. Enter H for help.\r\n"); medit_disp_ai_dialogue_lines(d,category); return;
     }
-    if (LOWER(*arg)=='h') { medit_disp_ai_help(d, MEDIT_AI_DIALOGUE, "Dialogue", "Dialogue lines are authored by event category.", "Choose a category, then add, edit, delete, or reorder lines.", "Social and Schedule select these categories."); return; }
+    if (LOWER(*arg)=='h') { medit_disp_ai_help(d, MEDIT_AI_DIALOGUE, "Dialogue", "Add greetings, ambient speech, replies, warnings, combat lines, farewells, and creature sounds here.", "Choose an area, then add, edit, delete, or reorder lines.", "Communication determines which authored lines can run."); return; }
+    if (LOWER(*arg)=='7') { medit_disp_ai_vocalizations(d); return; }
+    if (LOWER(*arg)=='8') { write_to_output(d,"\r\nDialogue Preview\r\nSpoken lines and creature sounds are listed in their editors.\r\n"); medit_disp_ai_dialogue(d); return; }
+    i=atoi(arg); if(i>=1&&i<=6) { static const int categories[]={AI_DIALOGUE_GREETING,AI_DIALOGUE_AMBIENT_SPEECH,AI_DIALOGUE_FRIENDLY,AI_DIALOGUE_WARNING,AI_DIALOGUE_CALL_HELP,AI_DIALOGUE_FAREWELL}; medit_disp_ai_dialogue_lines(d,categories[i-1]); return; }
     if (!medit_parse_ai_integer(arg,0,AI_DIALOGUE_CATEGORIES-1,&i)) { write_to_output(d,"Invalid category. Enter H for help.\r\n"); medit_disp_ai_dialogue(d); return; } OLC_VAL(d)=i;medit_disp_ai_dialogue_lines(d,i);return;
   case MEDIT_AI_DIALOGUE_INDEX: { int category=OLC_VAL(d)/10, operation=OLC_VAL(d)%10, line; if (LOWER(*arg)=='q') { OLC_VAL(d)=category; medit_disp_ai_dialogue_lines(d,category); return; } if (!medit_parse_ai_integer(arg,1,OLC_MOB(d)->ai_config->dialogue_count[category],&line)) { write_to_output(d,"Please enter a line number from 1 to %d, or Q to cancel: ",OLC_MOB(d)->ai_config->dialogue_count[category]); return; } line--; if(operation==1){OLC_VAL(d)=category*AI_DIALOGUE_MAX_LINES+line;OLC_MODE(d)=MEDIT_AI_DIALOGUE_EDIT;write_to_output(d,"Replacement line: ");return;} if(operation==2){mob_ai_dialogue_delete(OLC_MOB(d)->ai_config,category,line);write_to_output(d,"Dialogue line %d deleted.\r\n",line+1);} else if(operation==3&&line==0){write_to_output(d,"Dialogue line 1 cannot move up because it is already first.\r\n");} else if(operation==4&&line+1>=OLC_MOB(d)->ai_config->dialogue_count[category]){write_to_output(d,"Dialogue line %d cannot move down because it is already last.\r\n",line+1);} else {mob_ai_dialogue_move(OLC_MOB(d)->ai_config,category,line,operation==3?line-1:line+1);write_to_output(d,"Dialogue line %d moved %s.\r\n",line+1,operation==3?"up":"down");} OLC_VAL(d)=1;medit_disp_ai_dialogue_lines(d,category);return; }
 
@@ -1712,7 +1789,7 @@ void medit_parse(struct descriptor_data *d, char *arg)
     if(LOWER(*arg)=='q'){medit_disp_ai_menu(d);return;} if(LOWER(*arg)=='h'){medit_disp_ai_help(d, MEDIT_AI_THREAT, "Threat Response", "Threat response determines the escalation steps available to this actor.", "Cooldowns and windows are measured in seconds.", "Perception and Memory provide threat context.");return;} if(LOWER(*arg)=='e'){medit_disp_ai_threat_sequence(d);return;} if(LOWER(*arg)=='r'){mob_ai_config_free(OLC_MOB(d)->ai_config);OLC_MOB(d)->ai_config=mob_ai_config_new();OLC_VAL(d)=1;medit_disp_ai_threat(d);return;} i=(LOWER(*arg)>='a'&&LOWER(*arg)<='d')?10+LOWER(*arg)-'a':atoi(arg); if(i>=1&&i<=5){if(i==5){medit_disp_ai_threat(d);return;} OLC_MOB(d)->ai_config->threat_enabled[i-1]=!OLC_MOB(d)->ai_config->threat_enabled[i-1];OLC_VAL(d)=1;medit_disp_ai_threat(d);return;}if(i==8||i==9){OLC_MOB(d)->ai_config->threat_enabled[i-1]=!OLC_MOB(d)->ai_config->threat_enabled[i-1];OLC_VAL(d)=1;medit_disp_ai_threat(d);return;}if(i>=11&&i<=13){OLC_VAL(d)=i;OLC_MODE(d)=MEDIT_AI_THREAT_VALUE;write_to_output(d,"Value: ");return;}medit_disp_ai_threat(d);return;
   case MEDIT_AI_THREAT_VALUE: if(i<1||i>(OLC_VAL(d)==12?3600:600)){write_to_output(d,"Invalid value: ");return;} if(OLC_VAL(d)==11)OLC_MOB(d)->ai_config->threat_cooldown=i;else if(OLC_VAL(d)==12)OLC_MOB(d)->ai_config->calm_reset_time=i;else OLC_MOB(d)->ai_config->repeated_event_window=i;OLC_VAL(d)=1;medit_disp_ai_threat(d);return;
   case MEDIT_AI_THREAT_SEQUENCE: { struct mob_ai_config*c=OLC_MOB(d)->ai_config; int a,b,cc,e,f,n=atoi(arg)-1; if(LOWER(*arg)=='q'){medit_disp_ai_threat(d);return;} if(sscanf(arg,"a %d %d %d %d %d",&a,&b,&cc,&e,&f)==5&&c->threat_step_count<AI_THREAT_STEP_MAX){struct ai_threat_step z={a,AI_MEDIT_CLAMP(b,0,100),AI_MEDIT_CLAMP(cc,0,300),AI_MEDIT_CLAMP(e,1,10),!!f};if(ai_threat_step_valid(&z,c->threat_enabled)){c->threat_steps[c->threat_step_count++]=z;OLC_VAL(d)=1;}medit_disp_ai_threat_sequence(d);return;}if(sscanf(arg,"e %d %d %d %d %d %d",&n,&a,&b,&cc,&e,&f)==6){n--;if(n>=0&&n<c->threat_step_count){struct ai_threat_step z={a,AI_MEDIT_CLAMP(b,0,100),AI_MEDIT_CLAMP(cc,0,300),AI_MEDIT_CLAMP(e,1,10),!!f};if(ai_threat_step_valid(&z,c->threat_enabled)){c->threat_steps[n]=z;OLC_VAL(d)=1;}}medit_disp_ai_threat_sequence(d);return;}if(LOWER(*arg)=='d'&&n>=0&&n<c->threat_step_count){memmove(&c->threat_steps[n],&c->threat_steps[n+1],sizeof(c->threat_steps[0])*(c->threat_step_count-n-1));c->threat_step_count--;OLC_VAL(d)=1;}else if(LOWER(*arg)=='u'&&n>0&&n<c->threat_step_count){struct ai_threat_step z=c->threat_steps[n];c->threat_steps[n]=c->threat_steps[n-1];c->threat_steps[n-1]=z;OLC_VAL(d)=1;}else if(LOWER(*arg)=='n'&&n>=0&&n+1<c->threat_step_count){struct ai_threat_step z=c->threat_steps[n];c->threat_steps[n]=c->threat_steps[n+1];c->threat_steps[n+1]=z;OLC_VAL(d)=1;}medit_disp_ai_threat_sequence(d);return; }
-  case MEDIT_AI_SCHEDULE: { struct mob_ai_config*c=OLC_MOB(d)->ai_config; char cmd=LOWER(*arg), report[MAX_STRING_LENGTH]; if(cmd=='q'){medit_disp_ai_menu(d);return;} if(cmd=='h'){medit_disp_ai_help(d, MEDIT_AI_SCHEDULE, "Schedule", "Schedules operate on game hours and patrol routes are room waypoint lists.", "Preview and Validate do not modify the NPC.", "Movement and Dialogue supply schedule behavior.");return;} if(cmd=='1'){c->schedule_enabled=!c->schedule_enabled;OLC_VAL(d)=1;} else if(cmd=='2'){c->resume_after_interrupt=!c->resume_after_interrupt;OLC_VAL(d)=1;} else if(cmd=='3'){if(OLC_STORAGE(d)){free(OLC_STORAGE(d));OLC_STORAGE(d)=NULL;}OLC_MODE(d)=MEDIT_AI_SCHEDULE_FAILURE;write_to_output(d,"Failure policy (0-%d): ",AI_FAILURE_MAX-1);return;} else if(cmd>='4'&&cmd<='8'){OLC_VAL(d)=cmd-'4';OLC_MODE(d)=MEDIT_AI_SCHEDULE_ROOM;write_to_output(d,"Room VNUM (0 or none clears): ");return;} else if(cmd=='a'){medit_disp_ai_schedule_entries(d);return;} else if(cmd=='b'){medit_disp_ai_patrol_routes(d);return;} else if(cmd=='c'){ai_actor_schedule_preview(c,((35*time_info.month)+(time_info.day+1))%7,time_info.hours,report,sizeof(report));write_to_output(d,"%s",report);} else if(cmd=='d'){ai_actor_schedule_validate(c,report,sizeof(report));write_to_output(d,"%s",report);} else write_to_output(d,"Invalid schedule choice.\r\n");medit_disp_ai_schedule(d);return; }
+  case MEDIT_AI_SCHEDULE: { struct mob_ai_config*c=OLC_MOB(d)->ai_config; char cmd=LOWER(*arg), report[MAX_STRING_LENGTH]; if(cmd=='q'){medit_disp_ai_menu(d);return;} if(cmd=='h'){medit_disp_ai_help(d, MEDIT_AI_SCHEDULE, "Schedule", "Schedules describe routines; normal MEDIT flags remain the source of ordinary movement restrictions.", "Preview and validation do not modify the NPC. Preview: Show the day's effective activity timeline.", "Daily schedule and patrol route editors retain detailed activity settings.");return;} if(cmd=='1'){c->schedule_enabled=!c->schedule_enabled;OLC_VAL(d)=1;} else if(cmd=='2'){medit_disp_ai_schedule_entries(d);return;} else if(cmd=='3'){medit_disp_ai_patrol_routes(d);return;} else if(cmd=='4'){ai_actor_schedule_preview(c,((35*time_info.month)+(time_info.day+1))%7,time_info.hours,report,sizeof(report));write_to_output(d,"%s",report);} else if(cmd=='5'){ai_actor_schedule_validate(c,report,sizeof(report));write_to_output(d,"%s",report);} else write_to_output(d,"Invalid schedule choice.\r\n");medit_disp_ai_schedule(d);return; }
   case MEDIT_AI_SCHEDULE_ROOM: { int *v,candidate=0; if(!str_cmp(arg,"none")||!str_cmp(arg,"0"))candidate=0;else if(sscanf(arg,"%d",&candidate)!=1||candidate<=0||real_room(candidate)==NOWHERE){write_to_output(d,"Invalid room VNUM.\r\n");medit_disp_ai_schedule(d);return;}v=OLC_VAL(d)==0?&OLC_MOB(d)->ai_config->home_room_vnum:OLC_VAL(d)==1?&OLC_MOB(d)->ai_config->work_room_vnum:OLC_VAL(d)==2?&OLC_MOB(d)->ai_config->sleep_room_vnum:OLC_VAL(d)==3?&OLC_MOB(d)->ai_config->guard_room_vnum:&OLC_MOB(d)->ai_config->fallback_room_vnum;if(*v!=candidate){*v=candidate;OLC_VAL(d)=1;}medit_disp_ai_schedule(d);return; }
   case MEDIT_AI_SCHEDULE_FAILURE: { struct ai_schedule_entry *e=medit_selected_entry(d); i=atoi(arg);if(i<0||i>=AI_FAILURE_MAX)write_to_output(d,"Invalid policy.\r\n");else if(e){if(e->failure_policy!=i){e->failure_policy=i;OLC_VAL(d)=1;}medit_disp_ai_schedule_entry(d);return;}else if(OLC_MOB(d)->ai_config->default_failure_policy!=i){OLC_MOB(d)->ai_config->default_failure_policy=i;OLC_VAL(d)=1;}medit_disp_ai_schedule(d);return; }
   case MEDIT_AI_SCHEDULE_ENTRIES: {struct mob_ai_config*c=OLC_MOB(d)->ai_config;char cmd=LOWER(*arg);int n;if(cmd=='q'){medit_disp_ai_schedule(d);return;}if(cmd=='h'){write_to_output(d,"Entries use game time; All Day is 00:00-00:00. Priority selects among overlapping entries.\r\n");medit_disp_ai_schedule_entries(d);return;}if(cmd=='a'){struct ai_schedule_entry z;memset(&z,0,sizeof(z));z.enabled=TRUE;z.day_mask=AI_DAY_MASK_ALL;z.activity=AI_SCHEDULE_REMAIN;z.destination=AI_DEST_CURRENT_ROOM;z.max_attempts=3;if(ai_schedule_add(c,&z)){OLC_VAL(d)=1;write_to_output(d,"Schedule entry added as entry %d.\r\n",c->schedule_count);}else write_to_output(d,"Maximum entry count reached.\r\n");medit_disp_ai_schedule_entries(d);return;}if(cmd!='e'&&cmd!='d'&&cmd!='u'&&cmd!='n'&&cmd!='c'&&cmd!='t'){write_to_output(d,"Invalid command. Enter H for help.\r\n");medit_disp_ai_schedule_entries(d);return;}if(!c->schedule_count){write_to_output(d,"There are no schedule entries to %s.\r\n",cmd=='e'?"edit":cmd=='d'?"delete":"change");medit_disp_ai_schedule_entries(d);return;}if(!*(arg+1)){OLC_VAL(d)=cmd;OLC_MODE(d)=MEDIT_AI_SCHEDULE_INDEX;write_to_output(d,"Entry number to %s (1-%d, or Q to cancel): ",cmd=='e'?"edit":cmd=='d'?"delete":cmd=='u'?"move up":cmd=='n'?"move down":cmd=='c'?"duplicate":"toggle",c->schedule_count);return;}n=atoi(arg+1)-1;if(n<0||n>=c->schedule_count){write_to_output(d,"Entry %d does not exist. Valid entries: 1-%d.\r\n",n+1,c->schedule_count);medit_disp_ai_schedule_entries(d);return;}if(cmd=='e'){medit_schedule_store(d,-1,c->schedules[n].id,-1);medit_disp_ai_schedule_entry(d);return;}if(cmd=='d'){medit_schedule_store(d,-1,c->schedules[n].id,-1);OLC_MODE(d)=MEDIT_AI_SCHEDULE_DELETE;write_to_output(d,"Delete entry? (Y/N): ");return;}if(cmd=='u'&&n==0)write_to_output(d,"Entry 1 cannot move up because it is already first.\r\n");else if(cmd=='n'&&n+1==c->schedule_count)write_to_output(d,"Entry %d cannot move down because it is already last.\r\n",n+1);else if(cmd=='u'||cmd=='n'){ai_schedule_move(c,n,cmd=='u'?n-1:n+1);OLC_VAL(d)=1;write_to_output(d,"Schedule entry %d moved %s.\r\n",n+1,cmd=='u'?"up":"down");}else if(cmd=='c'){if(ai_schedule_duplicate(c,n)){OLC_VAL(d)=1;write_to_output(d,"Schedule entry duplicated.\r\n");}else write_to_output(d,"Maximum entry count reached.\r\n");}else{c->schedules[n].enabled=!c->schedules[n].enabled;OLC_VAL(d)=1;write_to_output(d,"Schedule entry %d %s.\r\n",n+1,c->schedules[n].enabled?"enabled":"disabled");}medit_disp_ai_schedule_entries(d);return;}
