@@ -123,6 +123,8 @@ static void medit_disp_ai_threat(struct descriptor_data *d);
 static void medit_disp_ai_combat(struct descriptor_data *d);
 static void medit_disp_ai_schedule(struct descriptor_data *d);
 static void medit_disp_ai_patrol_routes(struct descriptor_data *d);
+static void medit_disp_ai_capabilities(struct descriptor_data *d);
+static void medit_disp_ai_vocalizations(struct descriptor_data *d);
 static void medit_disp_ai_help(struct descriptor_data *d, int return_mode, const char *title,
                                const char *explanation, const char *tips, const char *related)
 {
@@ -139,10 +141,11 @@ static void medit_return_from_ai_help(struct descriptor_data *d)
   switch (mode) {
     case MEDIT_AI_MODE: medit_disp_ai_mode(d); break; case MEDIT_AI_ROLE: medit_disp_ai_role(d); break;
     case MEDIT_AI_MOVEMENT: medit_disp_ai_movement(d); break; case MEDIT_AI_PERSONALITY: medit_disp_ai_personality(d); break;
-    case MEDIT_AI_SOCIAL: medit_disp_ai_social(d); break; case MEDIT_AI_DIALOGUE: medit_disp_ai_dialogue(d); break;
+  case MEDIT_AI_SOCIAL: medit_disp_ai_social(d); break; case MEDIT_AI_DIALOGUE: medit_disp_ai_dialogue(d); break;
     case MEDIT_AI_PERCEPTION: medit_disp_ai_perception(d); break; case MEDIT_AI_MEMORY: medit_disp_ai_memory(d); break;
     case MEDIT_AI_THREAT: medit_disp_ai_threat(d); break; case MEDIT_AI_COMBAT: medit_disp_ai_combat(d); break;
     case MEDIT_AI_SCHEDULE: medit_disp_ai_schedule(d); break; case MEDIT_AI_PATROL_ROUTES: medit_disp_ai_patrol_routes(d); break;
+    case MEDIT_AI_CAPABILITIES: medit_disp_ai_capabilities(d); break; case MEDIT_AI_VOCALIZATIONS: medit_disp_ai_vocalizations(d); break;
     default: medit_disp_ai_menu(d); break;
   }
 }
@@ -979,6 +982,27 @@ static const char *medit_ai_state(struct descriptor_data *d, int enabled)
   return enabled ? "Enabled" : "Disabled";
 }
 
+static void medit_disp_ai_capabilities(struct descriptor_data *d)
+{
+  struct mob_ai_config *c = OLC_MOB(d)->ai_config;
+  write_to_output(d, "\r\nAI Actor Capabilities\r\n\r\n  1) Archetype     : %s\r\n  2) Communication : %s\r\n  3) Memory Style  : %s\r\n  4) Assistance    : %s\r\n  5) Random Move Delay: %d seconds\r\n\r\nValues set here explicitly override inference. Communication=None prevents all delivery; Vocalize uses authored creature lines.\r\nH) Help  Q) Return\r\nChoice: ",
+      c->archetype < 0 ? "Inferred" : ai_actor_archetype_name(c->archetype),
+      ai_actor_communication_name(c->communication), ai_actor_memory_style_name(c->memory_style),
+      ai_actor_assistance_style_name(c->assistance_style), c->movement_delay);
+  OLC_MODE(d) = MEDIT_AI_CAPABILITIES;
+}
+
+static void medit_disp_ai_vocalizations(struct descriptor_data *d)
+{
+  struct mob_ai_config *c = OLC_MOB(d)->ai_config;
+  int i;
+  write_to_output(d, "\r\nCreature Vocalizations (%d/%d)\r\n", c->vocalization_count, AI_VOCALIZATION_MAX_LINES);
+  for (i = 0; i < c->vocalization_count; i++)
+    write_to_output(d, "  %d) %s\r\n", i + 1, c->vocalization[i]);
+  write_to_output(d, "\r\nA) Add  E) Edit  D) Delete  U) Move up  N) Move down\r\nP) Preview  H) Help  Q) Return\r\nChoice: ");
+  OLC_MODE(d) = MEDIT_AI_VOCALIZATIONS;
+}
+
 static void medit_disp_ai_menu(struct descriptor_data *d)
 {
   struct mob_ai_config *c = OLC_MOB(d)->ai_config;
@@ -988,7 +1012,7 @@ static void medit_disp_ai_menu(struct descriptor_data *d)
   if (!MOB_FLAGGED(OLC_MOB(d), MOB_AI_ACTOR)) { write_to_output(d, "Enable AI_ACTOR for this mob? (Y/N): "); OLC_MODE(d) = MEDIT_AI_ENABLE_CONFIRM; return; }
   if (!c) OLC_MOB(d)->ai_config = c = mob_ai_config_new();
   for (i = 0; i < AI_DIALOGUE_CATEGORIES; i++) lines += c->dialogue_count[i];
-  write_to_output(d, "\r\n%s                    AI Actor Configuration%s\r\n\r\n%sProfile%s\r\n  %s1)%s Profile Mode: %s%s%s\r\n  %s2)%s Role: %s%s%s\r\n  %s3)%s Movement: %s%s%s\r\n  %s4)%s Personality : %s%s%s\r\n\r\n%sInteraction%s\r\n  %s5)%s Social Behavior: %s%s%s; greeting %s; ambient %s/%s\r\n  %s6)%s Dialogue Lines: %s%d authored lines across %d event pools%s\r\n  %s7)%s Perception  : %sTracks entry, speech, combat, gifts, crimes, and whispers%s\r\n  %s8)%s Memory      : %s%s — stores relationships and familiarity%s\r\n  %s9)%s Threat Response: %sWarn → Challenge → Call Help → Attack%s\r\n  %s0)%s Combat Reactions: %sAssists allies; target switching %s%s\r\n\r\n%sWorld Behavior%s\r\n  %sS)%s Schedules and Patrol Routines: %s%s; %d entries; %d patrol routes%s\r\n\r\n%sTools%s\r\n  %sC)%s Builder Diagnostics: %s%d warnings; NPC behavior summary%s\r\n  %sP)%s Preview Compiled Profile: Show effective compiled runtime profile\r\n  %sV)%s Validation Information: Non-mutating compatibility information\r\n  %sR)%s Reset to Inferred Defaults: Rebuild from inferred defaults\r\n  %sH)%s Help   %sQ)%s Return\r\nChoice: %s", title,normal,title,normal,key,normal,value,c->mode == MOB_AI_CUSTOM ? "Custom" : c->mode == MOB_AI_INFERRED_OVERRIDES ? "Overrides" : "Inferred",normal,key,normal,value,ai_actor_config_role_name(c->role),normal,key,normal,value,ai_actor_config_movement_name(c->movement),normal,key,normal,value,medit_ai_personality_summary(c),normal,title,normal,key,normal,value,ai_social_style_name(c->social),normal,c->greeting_enabled ? "on" : "off",c->ambient_speech_enabled ? "on" : "off",c->ambient_emotes_enabled ? "on" : "off",key,normal,value,lines,AI_DIALOGUE_CATEGORIES,normal,key,normal,value,normal,key,normal,value,medit_ai_state(d,c->memory_enabled),normal,key,normal,value,normal,key,normal,value,c->switch_targets ? "enabled" : "disabled",normal,title,normal,key,normal,value,c->schedule_enabled ? "Enabled" : "Disabled",c->schedule_count,c->patrol_count,normal,title,normal,key,normal,value,ai_actor_compatibility_warning_count(OLC_MOB(d)),normal,key,normal,key,normal,key,normal,key,normal,key,normal,normal);
+  write_to_output(d, "\r\n%s                    AI Actor Configuration%s\r\n\r\n%sProfile%s\r\n  %s1)%s Profile Mode: %s%s%s\r\n  %s2)%s Role: %s%s%s\r\n  %s3)%s Movement: %s%s%s\r\n  %s4)%s Personality : %s%s%s\r\n  %sA)%s Capabilities: Archetype, communication, memory, assistance, and random movement delay\r\n\r\n%sInteraction%s\r\n  %s5)%s Social Behavior: %s%s%s; greeting %s; ambient %s/%s\r\n  %s6)%s Dialogue Lines: %s%d authored lines across %d event pools%s\r\n  %sB)%s Creature Vocalizations: %s%d authored lines%s\r\n  %s7)%s Perception  : %sTracks entry, speech, combat, gifts, crimes, and whispers%s\r\n  %s8)%s Memory      : %s%s — stores relationships and familiarity%s\r\n  %s9)%s Threat Response: %sWarn → Challenge → Call Help → Attack%s\r\n  %s0)%s Combat Reactions: %sAssists allies; target switching %s%s\r\n\r\n%sWorld Behavior%s\r\n  %sS)%s Schedules and Patrol Routines: %s%s; %d entries; %d patrol routes%s\r\n\r\n%sTools%s\r\n  %sC)%s Builder Diagnostics: %s%d warnings; NPC behavior summary%s\r\n  %sP)%s Preview Compiled Profile: Show effective compiled runtime profile\r\n  %sV)%s Validation Information: Non-mutating compatibility information\r\n  %sR)%s Reset to Inferred Defaults: Rebuild from inferred defaults\r\n  %sH)%s Help   %sQ)%s Return\r\nChoice: %s", title,normal,title,normal,key,normal,value,c->mode == MOB_AI_CUSTOM ? "Custom" : c->mode == MOB_AI_INFERRED_OVERRIDES ? "Overrides" : "Inferred",normal,key,normal,value,ai_actor_config_role_name(c->role),normal,key,normal,value,ai_actor_config_movement_name(c->movement),normal,key,normal,value,medit_ai_personality_summary(c),normal,key,normal,title,normal,key,normal,value,ai_social_style_name(c->social),normal,c->greeting_enabled ? "on" : "off",c->ambient_speech_enabled ? "on" : "off",c->ambient_emotes_enabled ? "on" : "off",key,normal,value,lines,AI_DIALOGUE_CATEGORIES,normal,key,normal,value,c->vocalization_count,normal,key,normal,value,normal,key,normal,value,medit_ai_state(d,c->memory_enabled),normal,key,normal,value,normal,key,normal,value,c->switch_targets ? "enabled" : "disabled",normal,title,normal,key,normal,value,c->schedule_enabled ? "Enabled" : "Disabled",c->schedule_count,c->patrol_count,normal,title,normal,key,normal,value,ai_actor_compatibility_warning_count(OLC_MOB(d)),normal,key,normal,key,normal,key,normal,key,normal,key,normal,normal);
   OLC_MODE(d) = MEDIT_AI_MENU;
 }
 
@@ -1538,15 +1562,17 @@ void medit_parse(struct descriptor_data *d, char *arg)
       case '2': medit_disp_ai_role(d); return;
       case '3': medit_disp_ai_movement(d); return;
       case '4': medit_disp_ai_personality(d); return;
+      case 'a': medit_disp_ai_capabilities(d); return;
       case '5': medit_disp_ai_social(d); return;
       case '6': medit_disp_ai_dialogue(d); return;
+      case 'b': medit_disp_ai_vocalizations(d); return;
       case '7': medit_disp_ai_perception(d); return;
       case '8': medit_disp_ai_memory(d); return;
       case '9': medit_disp_ai_threat(d); return;
       case '0': medit_disp_ai_combat(d); return;
       case 's': medit_disp_ai_schedule(d); return;
       case 'r': mob_ai_config_free(OLC_MOB(d)->ai_config); OLC_MOB(d)->ai_config = NULL; OLC_VAL(d) = 1; medit_disp_ai_menu(d); return;
-      case 'p': { struct ai_actor_profile *p; int n; char report[MAX_STRING_LENGTH]; ai_actor_refresh_profile(OLC_MOB(d), TRUE); p=OLC_MOB(d)->ai_prof; write_to_output(d, "Compiled profile: role=%d movement=%d social=%s\r\nSpeech: greet=%s ambient=%s emotes=%s whisper=%s cooldowns=%d/%d/%d\r\nResponses: strangers=%s trusted=%s feared=%s hostile=%s; response modifier=%+d\r\nTraits:", p->role, p->movement, ai_social_style_name(p->social), p->greeting_enabled?"on":"off",p->ambient_speech_enabled?"on":"off",p->ambient_emotes_enabled?"on":"off",p->whisper_enabled?"on":"off",p->talk_cooldown_secs,p->room_talk_cooldown_secs,p->emote_cooldown_secs,p->respond_strangers?"on":"off",p->respond_trusted?"on":"off",p->respond_feared?"on":"off",p->respond_hostile?"on":"off",ai_actor_personality_response_modifier(p->personality)); for(n=0;n<AI_ACTOR_PERSONALITIES;n++) write_to_output(d," %s=%d",ai_trait_names[n],p->personality[n]); ai_actor_compatibility_report(OLC_MOB(d), report, sizeof(report), FALSE); write_to_output(d,"\r\nRuntime Notes:%s",report); medit_disp_ai_menu(d); return; }
+      case 'p': { struct ai_actor_profile *p; struct mob_ai_config *c=OLC_MOB(d)->ai_config; char report[MAX_STRING_LENGTH]; ai_actor_refresh_profile(OLC_MOB(d), TRUE); p=OLC_MOB(d)->ai_prof; write_to_output(d, "\r\nCompiled Capability Preview\r\nCapability                 Authored       Inferred       Effective       Source\r\nArchetype                  %s             %s             %s             %s\r\nCommunication              %s             %s             %s             %s\r\nMemory style                %s             %s             %s             %s\r\nAssistance style            %s             %s             %s             %s\r\nRandom movement delay       %d seconds      1 second       %d seconds      %s\r\n", c->archetype < 0 ? "Inferred" : ai_actor_archetype_name(c->archetype), "Role-derived", ai_actor_archetype_name(p->archetype), c->archetype < 0 ? "Inference" : "Authored", ai_actor_communication_name(c->communication), "Inferred", ai_actor_communication_name(p->communication), c->communication < 0 ? "Inference" : "Authored", ai_actor_memory_style_name(c->memory_style), "Inferred", ai_actor_memory_style_name(p->memory_style), c->memory_style < 0 ? "Inference" : "Authored", ai_actor_assistance_style_name(c->assistance_style), "Inferred", ai_actor_assistance_style_name(p->assistance_style), c->assistance_style < 0 ? "Inference" : "Authored", c->movement_delay, c->movement_delay, c->mode == MOB_AI_INFERRED ? "Default" : "Authored"); ai_actor_compatibility_report(OLC_MOB(d), report, sizeof(report), FALSE); write_to_output(d,"\r\nRuntime Notes:%s",report); medit_disp_ai_menu(d); return; }
       default: medit_disp_ai_menu(d); return;
     }
   case MEDIT_AI_PERSONALITY:
@@ -1556,6 +1582,25 @@ void medit_parse(struct descriptor_data *d, char *arg)
     i=(LOWER(*arg)>='a'&&LOWER(*arg)<='c')?9+LOWER(*arg)-'a':atoi(arg)-1; if(i<0||i>=12){medit_disp_ai_personality(d);return;} OLC_MODE(d)=MEDIT_AI_TRAIT; OLC_VAL(d)=i; write_to_output(d,"%s\r\nCurrent value: %d\r\nEnter new value (0-100): ", ai_trait_names[i], OLC_MOB(d)->ai_config->personality[i]); return;
   case MEDIT_AI_TRAIT: if(i<0||i>100){write_to_output(d,"Value must be 0-100: ");return;} if(OLC_MOB(d)->ai_config->personality[OLC_VAL(d)]!=i){OLC_MOB(d)->ai_config->personality[OLC_VAL(d)]=i;OLC_MOB(d)->ai_config->override_mask|=AI_OVERRIDE_TRAITS;OLC_VAL(d)=1;} medit_disp_ai_personality(d);return;
   case MEDIT_AI_PRESET: if(i<0||i>7){medit_disp_ai_personality(d);return;} {static const int p[8][12]={{50,50,50,50,50,50,50,50,50,50,50,50},{25,70,30,20,90,75,10,55,85,65,45,40},{10,55,85,55,60,75,55,75,60,70,20,45},{15,20,30,65,35,55,20,65,40,25,75,20},{75,80,45,35,85,25,15,20,90,45,65,80},{35,55,55,30,75,45,95,20,75,55,60,70},{85,65,15,55,25,20,20,10,25,20,85,60},{45,75,45,25,95,70,20,55,90,80,45,50}};memcpy(OLC_MOB(d)->ai_config->personality,p[i],sizeof(p[i]));OLC_MOB(d)->ai_config->override_mask|=AI_OVERRIDE_TRAITS;OLC_VAL(d)=1;}medit_disp_ai_personality(d);return;
+  case MEDIT_AI_CAPABILITIES:
+    if (LOWER(*arg) == 'q') { medit_disp_ai_menu(d); return; }
+    if (LOWER(*arg) == 'h') { medit_disp_ai_help(d, MEDIT_AI_CAPABILITIES, "Capabilities", "These values explicitly override inferred Phase 1 capabilities.", "Choose a numbered value; use -1 for inferred where offered.", "Creature Vocalizations author the full-room Vocalize output."); return; }
+    if (!medit_parse_ai_integer(arg, 1, 5, &i)) { medit_disp_ai_capabilities(d); return; }
+    OLC_VAL(d) = i; OLC_MODE(d) = MEDIT_AI_CAPABILITY_VALUE;
+    write_to_output(d, i == 1 ? "Archetype (-1 inferred, 0-7): " : i == 2 ? "Communication (-1 inferred, 0 None, 1 Vocalize, 2 Speak, 3 Telepathy): " : i == 3 ? "Memory style (-1 inferred, 0-4): " : i == 4 ? "Assistance style (-1 inferred, 0-4): " : "Random movement delay (1-60 seconds): "); return;
+  case MEDIT_AI_CAPABILITY_VALUE: {
+    struct mob_ai_config *c = OLC_MOB(d)->ai_config; int lo = OLC_VAL(d) == 5 ? 1 : -1, hi = OLC_VAL(d) == 1 ? AI_ARCH_SERVICE : OLC_VAL(d) == 2 ? AI_COMM_TELEPATHY : OLC_VAL(d) == 3 ? AI_MEMORY_FULL_RELATIONSHIP : OLC_VAL(d) == 4 ? AI_ASSIST_ANY_ALLY : 60;
+    if (LOWER(*arg) == 'q') { medit_disp_ai_capabilities(d); return; }
+    if (!medit_parse_ai_integer(arg, lo, hi, &i)) { write_to_output(d, "Invalid value. Try again or Q to cancel: "); return; }
+    if (OLC_VAL(d) == 1) c->archetype=i; else if (OLC_VAL(d) == 2) c->communication=i; else if (OLC_VAL(d) == 3) c->memory_style=i; else if (OLC_VAL(d) == 4) c->assistance_style=i; else c->movement_delay=i;
+    OLC_VAL(d)=1; medit_disp_ai_capabilities(d); return;
+  }
+  case MEDIT_AI_VOCALIZATIONS: {
+    struct mob_ai_config *c=OLC_MOB(d)->ai_config; char cmd=LOWER(*arg); int line=atoi(arg+1)-1;
+    if(cmd=='q'){medit_disp_ai_menu(d);return;} if(cmd=='h'){medit_disp_ai_help(d,MEDIT_AI_VOCALIZATIONS,"Creature Vocalizations","Vocalizations are full-room act strings and never use normal say dialogue.","Use A/E/D/U/N plus a line number, for example E 2.","Communication=Vocalize delivers these lines; preview is read-only.");return;} if(cmd=='p'){write_to_output(d,"\r\nVocalization Preview\r\nCommunication effective: %s\r\n",ai_actor_communication_name(c->communication));for(i=0;i<c->vocalization_count;i++)write_to_output(d,"  %s\r\n",c->vocalization[i]);medit_disp_ai_vocalizations(d);return;} if(cmd=='a'){if(c->vocalization_count>=AI_VOCALIZATION_MAX_LINES){write_to_output(d,"Maximum reached.\r\n");medit_disp_ai_vocalizations(d);return;}OLC_MODE(d)=MEDIT_AI_VOCALIZATION_ADD;write_to_output(d,"Vocalization line: ");return;} if((cmd=='e'||cmd=='d'||cmd=='u'||cmd=='n')&&(line<0||line>=c->vocalization_count)){write_to_output(d,"Use %c <line number>.\r\n",cmd);medit_disp_ai_vocalizations(d);return;} if(cmd=='e'){OLC_VAL(d)=line;OLC_MODE(d)=MEDIT_AI_VOCALIZATION_EDIT;write_to_output(d,"Replacement vocalization: ");return;} if(cmd=='d'){mob_ai_vocalization_delete(c,line);OLC_VAL(d)=1;medit_disp_ai_vocalizations(d);return;} if(cmd=='u'||cmd=='n'){if(!mob_ai_vocalization_move(c,line,cmd=='u'?line-1:line+1))write_to_output(d,"That line cannot move further.\r\n");else OLC_VAL(d)=1;medit_disp_ai_vocalizations(d);return;}medit_disp_ai_vocalizations(d);return;
+  }
+  case MEDIT_AI_VOCALIZATION_ADD: if(!*arg||strlen(arg)>=AI_VOCALIZATION_LINE_MAX||!mob_ai_vocalization_set(OLC_MOB(d)->ai_config,OLC_MOB(d)->ai_config->vocalization_count,arg))write_to_output(d,"Invalid or too-long vocalization.\r\n");else OLC_VAL(d)=1;medit_disp_ai_vocalizations(d);return;
+  case MEDIT_AI_VOCALIZATION_EDIT: if(!*arg||strlen(arg)>=AI_VOCALIZATION_LINE_MAX||!mob_ai_vocalization_set(OLC_MOB(d)->ai_config,OLC_VAL(d),arg))write_to_output(d,"Invalid or too-long vocalization.\r\n");else OLC_VAL(d)=1;medit_disp_ai_vocalizations(d);return;
   case MEDIT_AI_SOCIAL: if(LOWER(*arg)=='q'){medit_disp_ai_menu(d);return;} if(LOWER(*arg)=='h'){medit_disp_ai_help(d, MEDIT_AI_SOCIAL, "Social Behavior", "Social settings control greetings, replies, and ambient behavior.", "Cooldowns are in seconds; toggles enable individual responses.", "Dialogue provides authored lines for these events.");return;} i=(LOWER(*arg)>='a'&&LOWER(*arg)<='c')?10+LOWER(*arg)-'a':atoi(arg); if(i<1||i>12){medit_disp_ai_social(d);return;} OLC_MODE(d)=MEDIT_AI_SOCIAL_VALUE;OLC_VAL(d)=i;write_to_output(d,"Current value: %d\r\nEnter new value: ", *(&OLC_MOB(d)->ai_config->social+i-1));return;
   case MEDIT_AI_SOCIAL_VALUE: {struct mob_ai_config*c=OLC_MOB(d)->ai_config;int *v; switch(OLC_VAL(d)){case 1:v=&c->social;break;case 2:v=&c->greeting_enabled;break;case 3:v=&c->ambient_speech_enabled;break;case 4:v=&c->ambient_emotes_enabled;break;case 5:v=&c->whisper_enabled;break;case 6:v=&c->respond_strangers;break;case 7:v=&c->respond_trusted;break;case 8:v=&c->respond_feared;break;case 9:v=&c->respond_hostile;break;case 10:v=&c->speech_cooldown;break;case 11:v=&c->room_speech_cooldown;break;default:v=&c->emote_cooldown;}if(i<0||(OLC_VAL(d)==1&&i>10)||(OLC_VAL(d)>1&&OLC_VAL(d)<10&&i>1)||(OLC_VAL(d)>=10&&(i<1||i>300))){write_to_output(d,"Invalid value: ");return;}if(*v!=i){*v=i;OLC_VAL(d)=1;}medit_disp_ai_social(d);return;}
   case MEDIT_AI_DIALOGUE:
