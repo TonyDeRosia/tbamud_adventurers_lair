@@ -213,7 +213,7 @@ const char *clan_display_name_by_id(int clan_id)
   struct clan_data *c = clan_by_id(clan_id);
   if (!c)
     return "None";
-  if (c->display_name && *c->display_name)
+  if (c->display_name[0] != '\0')
     return c->display_name;
   return c->name;
 }

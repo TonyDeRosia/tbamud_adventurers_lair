@@ -3055,6 +3055,7 @@ ACMD(do_equipment)
   static const int eq_order[] = {
     WEAR_HEAD,
     WEAR_NECK_1,
+    WEAR_NECK_2,
     WEAR_ABOUT,     /* Back */
     WEAR_BODY,
     WEAR_ARMS,
@@ -3075,6 +3076,7 @@ ACMD(do_equipment)
   static const char *eq_labels[] = {
     "Head",
     "Neck",
+    "Neck 2",
     "Back",
     "Body",
     "Arms",

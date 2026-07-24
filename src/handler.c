@@ -429,6 +429,20 @@ void affect_from_char(struct char_data *ch, int type)
 
 /* Return TRUE if a char is affected by a spell (SPELL_XXX), FALSE indicates
  * not affected. */
+bool has_any_affect_flags(const struct char_data *ch)
+{
+  int i;
+
+  if (ch == NULL)
+    return FALSE;
+
+  for (i = 0; i < AF_ARRAY_MAX; i++)
+    if (AFF_FLAGS(ch)[i] != 0)
+      return TRUE;
+
+  return FALSE;
+}
+
 bool affected_by_spell(struct char_data *ch, int type)
 {
   struct affected_type *hjp;
