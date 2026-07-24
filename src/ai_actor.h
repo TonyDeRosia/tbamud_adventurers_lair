@@ -22,6 +22,8 @@
 #define AI_PATROL_MAX 8
 #define AI_PATROL_WAYPOINT_MAX 16
 #define AI_DAY_MASK_ALL 0x7f
+#define AI_ROUTINE_DEST_MAX 16
+#define AI_ROUTINE_ROUTE_MAX 128 /* bounded BFS: never scans the whole world */
 
 /* Creature-sound policy is authored data; timers remain on each live actor. */
 enum ai_vocal_presence { AI_VOCAL_PRESENCE_NONE, AI_VOCAL_PRESENCE_PLAYER, AI_VOCAL_PRESENCE_AWAKE_PLAYER, AI_VOCAL_PRESENCE_VISIBLE_PLAYER, AI_VOCAL_PRESENCE_CHARACTER };
@@ -51,7 +53,12 @@ enum ai_schedule_interrupt_reason { AI_SCHEDULE_INTERRUPT_NONE, AI_SCHEDULE_INTE
 enum ai_schedule_resume_result { AI_SCHEDULE_RESUME_VALID, AI_SCHEDULE_RESUME_ENTRY_EXPIRED, AI_SCHEDULE_RESUME_ENTRY_REPLACED, AI_SCHEDULE_RESUME_DESTINATION_INVALID, AI_SCHEDULE_RESUME_ROUTE_INVALID, AI_SCHEDULE_RESUME_POSITION_INVALID, AI_SCHEDULE_RESUME_CONTROL_CONFLICT, AI_SCHEDULE_RESUME_MOVEMENT_RESTRICTED };
 enum ai_schedule_result { AI_SCHEDULE_INACTIVE, AI_SCHEDULE_ALLOW_WANDER, AI_SCHEDULE_BLOCK_WANDER, AI_SCHEDULE_MAJOR_ACTION };
 enum ai_patrol_loop { AI_PATROL_LOOP, AI_PATROL_PINGPONG, AI_PATROL_ONCE, AI_PATROL_RANDOM, AI_PATROL_LOOP_MAX };
-struct ai_schedule_entry { int id, enabled, start_hour, end_hour, day_mask, priority, activity, destination, destination_value, arrival_action, departure_action, interruption_policy, failure_policy, max_travel_time, max_attempts, wait_duration, route_id; };
+enum ai_routine_mode { AI_ROUTINE_NONE, AI_ROUTINE_RANDOM, AI_ROUTINE_SCHEDULED, AI_ROUTINE_RANDOM_SCHEDULED, AI_ROUTINE_ADVANCED_PATROL };
+enum ai_routine_timing { AI_ROUTINE_ARRIVE_BY, AI_ROUTINE_START_AT, AI_ROUTINE_ARRIVE_AROUND };
+enum ai_routine_boundary { AI_ROUTINE_CURRENT_ZONE, AI_ROUTINE_ALLOWED_ZONES };
+enum ai_routine_failure { AI_ROUTINE_RETRY, AI_ROUTINE_SKIP, AI_ROUTINE_OTHER_RANDOM, AI_ROUTINE_REMAIN };
+struct ai_routine_destination { int room_vnum, enabled, weight; char label[32]; };
+struct ai_schedule_entry { int id, enabled, start_hour, end_hour, day_mask, priority, activity, destination, destination_value, arrival_action, departure_action, interruption_policy, failure_policy, max_travel_time, max_attempts, wait_duration, route_id; int timing_policy; };
 struct ai_patrol_waypoint { int room_vnum, wait_duration, arrival_action; };
 struct ai_patrol_route { int id, enabled, loop_mode, failure_policy, waypoint_count; char label[32]; struct ai_patrol_waypoint waypoints[AI_PATROL_WAYPOINT_MAX]; };
 struct mob_ai_config {
@@ -61,6 +68,9 @@ struct mob_ai_config {
   int home_room_vnum, work_room_vnum, guard_room_vnum, sleep_room_vnum, fallback_room_vnum, schedule_enabled, resume_after_interrupt, default_failure_policy, schedule_count, patrol_count, next_schedule_id, next_patrol_id;
   struct ai_schedule_entry schedules[AI_SCHEDULE_MAX];
   struct ai_patrol_route patrols[AI_PATROL_MAX];
+  /* Destination travel is authored as rooms, never as a spawn-relative path. */
+  int routine_mode, routine_boundary, routine_failure, random_wait_min, random_wait_max, random_destination_count;
+  struct ai_routine_destination random_destinations[AI_ROUTINE_DEST_MAX];
   int roam_radius, pursuit_distance, movement_delay;
   int archetype, communication, memory_style, assistance_style;
   int greeting_enabled, ambient_speech_enabled, ambient_emotes_enabled, whisper_enabled;
@@ -394,6 +404,10 @@ struct ai_actor_state {
   int resume_schedule_id, resume_route_id, resume_waypoint, resume_direction, resume_state, resume_destination_vnum, resume_departure_done, resume_arrival_done;
   time_t schedule_started_at, last_schedule_eval, last_schedule_move, schedule_wait_until, schedule_retry_at;
   time_t next_random_move;
+  /* Transient route ownership: directions are per live NPC and are never saved. */
+  int routine_target_vnum, routine_route[AI_ROUTINE_ROUTE_MAX], routine_route_len, routine_route_pos;
+  int routine_last_destination, routine_purpose, routine_late;
+  time_t routine_next_move, routine_wait_until, routine_retry_at, routine_planned_departure;
   time_t last_vocalization, next_vocalization;
   int vocal_room_count, vocal_room_vnum, last_vocalization_index;
   int last_tick_result, last_idle_action, last_move_result, last_vocalization_result;
