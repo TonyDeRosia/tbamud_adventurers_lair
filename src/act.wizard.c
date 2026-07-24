@@ -978,6 +978,8 @@ static void do_stat_character(struct char_data *ch, struct char_data *k)
     send_to_char(ch, "L-Des: %s", k->player.long_descr ? k->player.long_descr : "<None>\r\n");
     legacy_behavior_summary(k, legacy, sizeof(legacy), TRUE);
     send_to_char(ch, "%s", legacy);
+    mob_behavior_recent_pulse_report(k, legacy, sizeof(legacy));
+    send_to_char(ch, "%s", legacy);
     send_to_char(ch, "  AI config: %s; runtime state: %s (per-instance)\r\n",
                  k->ai_config ? "configured" : "none", k->ai_state ? "present" : "absent");
   }
@@ -8105,4 +8107,9 @@ ACMD(do_aistate)
   }
   ai_actor_brain_show_state(ch, mob);
   ai_actor_schedule_show_state(ch, mob);
+  {
+    char legacy[MAX_STRING_LENGTH];
+    mob_behavior_recent_pulse_report(mob, legacy, sizeof(legacy));
+    send_to_char(ch, "%s", legacy);
+  }
 }

@@ -424,6 +424,8 @@ void ai_actor_refresh_live_mobs_by_vnum(mob_vnum vnum);
 
 void ai_actor_init(struct char_data *mob);
 void ai_actor_free(struct char_data *mob);
+struct mob_behavior_pulse_context;
+int ai_actor_tick_with_context(struct char_data *mob, time_t now, struct mob_behavior_pulse_context *ctx);
 int ai_actor_tick(struct char_data *mob, time_t now);
 const char *ai_actor_archetype_name(int value);
 const char *ai_actor_communication_name(int value);

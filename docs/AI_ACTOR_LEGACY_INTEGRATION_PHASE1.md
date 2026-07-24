@@ -23,3 +23,5 @@ because zone resets and runtime equipment are not safely attributable here.
 domain mask returned by `legacy_ai_domains()` and the metadata registry: a future
 arbitrator may consume those values at an explicitly designed ownership boundary,
 without changing this discovery layer.
+
+See also: [Phase 2A conservative mobile-pulse arbitration](AI_ACTOR_LEGACY_INTEGRATION_PHASE2A.md).

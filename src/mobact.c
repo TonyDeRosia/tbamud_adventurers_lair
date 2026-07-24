@@ -22,12 +22,25 @@
 #include "graph.h"
 #include "fight.h"
 #include "ai_actor.h"
+#include "legacy_behavior.h"
 
 
 /* local file scope only function prototypes */
 static bool aggressive_mob_on_a_leash(struct char_data *slave, struct char_data *master, struct char_data *attack);
 
+static void mobile_activity_legacy_preserving(void);
+static void mobile_activity_arbitrated(void);
+
 void mobile_activity(void)
+{
+  if (!CONFIG_AI_LEGACY_ARBITRATION_ENABLED) {
+    mobile_activity_legacy_preserving();
+    return;
+  }
+  mobile_activity_arbitrated();
+}
+
+static void mobile_activity_legacy_preserving(void)
 {
   struct char_data *ch, *next_ch, *vict;
   struct obj_data *obj, *best_obj;
@@ -178,6 +191,16 @@ void mobile_activity(void)
     /* Add new mobile actions here */
 
   }				/* end for() */
+}
+
+
+static void mobile_activity_arbitrated(void)
+{
+  /* Phase 2A provides the rollback seam and shared arbitration model.  Because
+   * no persistent ownership editor is introduced in this conservative phase,
+   * all live mobiles remain compatibility-owned and the exact legacy-preserving
+   * mobile pulse is delegated to the original implementation. */
+  mobile_activity_legacy_preserving();
 }
 
 /* Mob Memory Routines */

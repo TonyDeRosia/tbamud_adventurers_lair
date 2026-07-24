@@ -1604,6 +1604,7 @@ struct game_operation
   int special_in_comm; /**< Enable use of a special character in communication channels ? */
   int debug_mode; /**< Current Debug Mode */
   int ai_actor_enabled; /**< Enable AI actor runtime control loop ? */
+  int ai_legacy_arbitration_enabled; /**< Enable conservative AI/legacy mobile-pulse domain arbitration ? */
 };
 
 /** The Autowizard options. */
