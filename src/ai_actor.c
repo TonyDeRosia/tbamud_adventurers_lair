@@ -28,6 +28,23 @@ static struct ai_help_event ai_help_events[AI_HELP_EVENT_MAX];
 static unsigned long ai_next_help_event_id = 1;
 static const char *ai_target_names[AI_TARGET_WEIGHTS] = { "Current attacker", "Attacker of trusted actor", "Attacker of group member", "Known hostile", "Lowest health / closest to death", "Player character", "NPC", "Previous target" };
 
+const char *ai_actor_archetype_name(int v) { static const char *n[]={"Unknown","Humanoid","Beast","Monster","Mindless","Construct","Undead","Service NPC"}; return v >= AI_ARCH_UNKNOWN && v <= AI_ARCH_SERVICE ? n[v] : "Unknown"; }
+const char *ai_actor_communication_name(int v) { static const char *n[]={"None","Vocalize","Speak","Telepathy"}; return v >= AI_COMM_NONE && v <= AI_COMM_TELEPATHY ? n[v] : "Inferred"; }
+const char *ai_actor_memory_style_name(int v) { static const char *n[]={"None","Basic hostile","Social","Full relationship"}; return v >= AI_MEMORY_NONE && v <= AI_MEMORY_FULL_RELATIONSHIP ? n[v] : "Inferred"; }
+const char *ai_actor_assistance_style_name(int v) { static const char *n[]={"None","Same kind","Faction","Any ally"}; return v >= AI_ASSIST_NONE && v <= AI_ASSIST_ANY_ALLY ? n[v] : "Inferred"; }
+
+/* This is deliberately conservative: it runs only while compiling a profile,
+ * never in the mobile pulse.  Explicit builder values always win. */
+static int ai_infer_archetype(const struct char_data *mob, int role) {
+  const char *name = mob ? GET_NAME((struct char_data *)mob) : "";
+  if (role == ROLE_GUARD || role == ROLE_MERCHANT || role == ROLE_CIVILIAN) return AI_ARCH_SERVICE;
+  if (role == ROLE_BEAST) return AI_ARCH_BEAST;
+  if (role == ROLE_UNDEAD) return AI_ARCH_UNDEAD;
+  if (name && (strstr(name, "ooze") || strstr(name, "gelatin") || strstr(name, "slime") || strstr(name, "blob"))) return AI_ARCH_MINDLESS;
+  if (name && (strstr(name, "construct") || strstr(name, "golem"))) return AI_ARCH_CONSTRUCT;
+  return AI_ARCH_HUMANOID; /* compatibility default for existing generic actors */
+}
+
 static void ai_compat_add(char *out, size_t size, const char *fmt, ...)
 {
   va_list args; size_t used = strlen(out);
@@ -46,7 +63,6 @@ int ai_actor_compatibility_warning_count(const struct char_data *mob)
   if (MOB_FLAGGED(mob, MOB_MEMORY)) warnings++;
   if (MOB_FLAGGED(mob, MOB_HELPER)) warnings++;
   if (MOB_FLAGGED(mob, MOB_AGGRESSIVE) || MOB_FLAGGED(mob, MOB_AGGR_GOOD) || MOB_FLAGGED(mob, MOB_AGGR_EVIL) || MOB_FLAGGED(mob, MOB_AGGR_NEUTRAL)) warnings++;
-  if (c->movement == AI_MOVE_RANDOM) warnings++;
   if (MOB_FLAGGED(mob, MOB_SENTINEL) && c->schedule_enabled) warnings++;
   if (MOB_FLAGGED(mob, MOB_SENTINEL) && MOB_FLAGGED(mob, MOB_WIMPY)) warnings++;
   if (c->hunt_enabled) warnings++;
@@ -67,7 +83,7 @@ void ai_actor_compatibility_report(const struct char_data *mob, char *out, size_
   out[0] = '\0';
 
   if (detailed) {
-    ai_compat_add(out, size, "AI Actor Technical Reference\r\n\r\nPulse ownership\r\n  An eligible AI tick normally claims the pulse, even when idle. A handled special procedure runs first and prevents both AI Actor and the legacy mobile tail for that pulse. Scripts and event hooks can still act outside the normal pulse.\r\n\r\nLegacy systems\r\n  The legacy tail includes scavenging, wandering, immediate aggression, MEMORY retaliation, rebellion, HELPER assistance, and hunting. These normally do not run on an AI-owned pulse. AI relationship memory is separate from the legacy attacker list.\r\n\r\nProfile compilation\r\n  Inferred derives values from prototype data and flags. Custom uses stored values. Overrides applies supported override mask bits over inference; not every field has identical mask coverage. Some paths use compiled data while schedules and dialogue read stored configuration.\r\n\r\nMovement and social limits\r\n  Schedule and patrol travel only move to directly adjacent destinations; no pathfinding is provided. Random movement and hunting are stored/configurable but have no audited AI tick path. Social eligibility checks NPC, AI_ACTOR, and a valid room; it does not check race, body type, intelligence, or speech capability.\r\n");
+    ai_compat_add(out, size, "AI Actor Technical Reference\r\n\r\nPulse ownership\r\n  An eligible AI tick normally claims the pulse, even when idle. A handled special procedure runs first and prevents both AI Actor and the legacy mobile tail for that pulse.\r\n\r\nMovement and social limits\r\n  Random movement uses one adjacent normal perform_move() attempt after combat, threat, schedules, and patrols. It never paths globally. Communication is capability-gated. Inferred profiles may be selectively changed by the stored override mask.\r\n");
     return;
   }
 
@@ -83,13 +99,14 @@ void ai_actor_compatibility_report(const struct char_data *mob, char *out, size_
   ai_compat_add(out, size, "\r\nMovement\r\n--------\r\n\r\n%s %s\r\n", c && c->schedule_enabled ? "+" : "-", c && c->schedule_enabled ? "Schedule movement enabled" : "Schedule movement disabled");
   ai_compat_add(out, size, "%s Patrol routes%s\r\n", c && c->patrol_count ? "+" : "-", c && c->patrol_count ? " configured" : " not configured");
   if (c && c->movement == AI_MOVE_RANDOM)
-    ai_compat_add(out, size, "! Random AI movement is not implemented.\r\n");
+    ai_compat_add(out, size, "+ Random local movement enabled (cooldown %d seconds).\r\n", c->movement_delay);
   else
     ai_compat_add(out, size, "+ Movement style: %s\r\n", c ? ai_actor_config_movement_name(c->movement) : "Inferred");
   if (MOB_FLAGGED(mob, MOB_SENTINEL)) ai_compat_add(out, size, "! SENTINEL restricts autonomous movement.\r\n");
   if (MOB_FLAGGED(mob, MOB_STAY_ZONE)) ai_compat_add(out, size, "+ STAY_ZONE is active.\r\n");
 
-  ai_compat_add(out, size, "\r\nCombat\r\n------\r\n\r\n%s AI Combat\r\n%s Threat escalation\r\n%s Target switching\r\n",
+  ai_compat_add(out, size, "\r\nEffective Behavior\r\n------------------\r\n\r\nArchetype\r\n  %s\r\nCommunication\r\n  %s\r\nMemory\r\n  %s\r\nHelping\r\n  %s\r\n\r\nCombat\r\n------\r\n\r\n%s AI Combat\r\n%s Threat escalation\r\n%s Target switching\r\n",
+      mob->ai_prof ? ai_actor_archetype_name(mob->ai_prof->archetype) : "Inferred", mob->ai_prof ? ai_actor_communication_name(mob->ai_prof->communication) : "Inferred", mob->ai_prof ? ai_actor_memory_style_name(mob->ai_prof->memory_style) : "Inferred", mob->ai_prof ? ai_actor_assistance_style_name(mob->ai_prof->assistance_style) : "Inferred",
       c && c->combat_enabled ? "+" : "-", c && c->combat_enabled ? "+" : "-", c && c->switch_targets ? "+" : "-");
   if (MOB_FLAGGED(mob,MOB_AGGRESSIVE)||MOB_FLAGGED(mob,MOB_AGGR_GOOD)||MOB_FLAGGED(mob,MOB_AGGR_EVIL)||MOB_FLAGGED(mob,MOB_AGGR_NEUTRAL))
     ai_compat_add(out, size, "! Legacy AGGRESSIVE behavior normally will not run.\r\n");
@@ -115,7 +132,6 @@ void ai_actor_compatibility_report(const struct char_data *mob, char *out, size_
   warnings = ai_actor_compatibility_warning_count(mob);
   ai_compat_add(out, size, "\r\nBuilder Warnings\r\n----------------\r\n\r\n");
   if (!warnings && !MOB_FLAGGED(mob, MOB_MEMORY) && !MOB_FLAGGED(mob, MOB_HELPER) && !MOB_FLAGGED(mob, MOB_AGGRESSIVE) && !MOB_FLAGGED(mob, MOB_AGGR_GOOD) && !MOB_FLAGGED(mob, MOB_AGGR_EVIL) && !MOB_FLAGGED(mob, MOB_AGGR_NEUTRAL)) ai_compat_add(out, size, "None\r\n");
-  if (c && c->movement == AI_MOVE_RANDOM) ai_compat_add(out, size, "WARNING  Random movement has no implementation.\r\n");
   if (MOB_FLAGGED(mob, MOB_MEMORY)) ai_compat_add(out, size, "WARNING  Legacy MEMORY normally will not run.\r\n");
   if (MOB_FLAGGED(mob, MOB_HELPER)) ai_compat_add(out, size, "WARNING  Legacy HELPER normally will not run.\r\n");
   if (MOB_FLAGGED(mob, MOB_SCAVENGER)) ai_compat_add(out, size, "WARNING  Legacy scavenging normally will not run.\r\n");
@@ -171,6 +187,7 @@ struct mob_ai_config *mob_ai_config_new(void)
   struct mob_ai_config *c; int i;
   CREATE(c, struct mob_ai_config, 1); if (!c) return NULL;
   c->mode = MOB_AI_INFERRED; c->movement = AI_MOVE_STATIONARY; c->social = AI_SOCIAL_RESERVED;
+  c->archetype = c->communication = c->memory_style = c->assistance_style = -1;
   c->greeting_enabled = c->respond_strangers = c->respond_trusted = c->respond_feared = c->respond_hostile = TRUE;
   c->speech_cooldown = 10; c->room_speech_cooldown = 10; c->emote_cooldown = 15;
   c->schedule_enabled=FALSE; c->resume_after_interrupt=TRUE; c->default_failure_policy=AI_FAILURE_WAIT_RETRY; c->next_schedule_id=c->next_patrol_id=1;
@@ -213,7 +230,7 @@ int mob_ai_dialogue_move(struct mob_ai_config *c, int k, int from, int to)
 int ai_actor_personality_response_modifier(const int p[AI_ACTOR_PERSONALITIES])
 { static const int weight[AI_ACTOR_PERSONALITIES] = { -2, 1, 3, 1, -1, 1, -1, 2, 1, 1, -3, 2 }; int i, score=0; if (!p) return 0; for (i=0;i<AI_ACTOR_PERSONALITIES;i++) score += (p[i]-50)*weight[i]; return AI_CLAMP(score/10, -35, 35); }
 void mob_ai_config_validate(struct mob_ai_config *c)
-{ int i,k; if (!c) return; c->combat_style=AI_CLAMP(c->combat_style,AI_COMBAT_PASSIVE,AI_COMBAT_BOSS); c->assist_severity=AI_CLAMP(c->assist_severity,0,100); c->target_switch_threshold=AI_CLAMP(c->target_switch_threshold,0,100); c->max_allies=AI_CLAMP(c->max_allies,0,10); c->max_responders=AI_CLAMP(c->max_responders,0,10); c->combat_cooldown=AI_CLAMP(c->combat_cooldown,1,300); for(i=0;i<AI_TARGET_WEIGHTS;i++) c->target_weight[i]=AI_CLAMP(c->target_weight[i],-100,100); c->mode=AI_CLAMP(c->mode,MOB_AI_INFERRED,MOB_AI_INFERRED_OVERRIDES); c->role=AI_CLAMP(c->role,ROLE_UNKNOWN,ROLE_BOSS); c->movement=AI_CLAMP(c->movement,AI_MOVE_STATIONARY,AI_MOVE_RETURN_HOME); c->social=AI_CLAMP(c->social,AI_SOCIAL_SILENT,AI_SOCIAL_GOSSIP); c->roam_radius=AI_CLAMP(c->roam_radius,0,100); c->pursuit_distance=AI_CLAMP(c->pursuit_distance,0,100); c->movement_delay=AI_CLAMP(c->movement_delay,1,60); c->speech_cooldown=AI_CLAMP(c->speech_cooldown,AI_SOCIAL_COOLDOWN_MIN,AI_SOCIAL_COOLDOWN_MAX); c->room_speech_cooldown=AI_CLAMP(c->room_speech_cooldown,AI_SOCIAL_COOLDOWN_MIN,AI_SOCIAL_COOLDOWN_MAX); c->emote_cooldown=AI_CLAMP(c->emote_cooldown,AI_SOCIAL_COOLDOWN_MIN,AI_SOCIAL_COOLDOWN_MAX); c->flee_hp_percent=AI_CLAMP(c->flee_hp_percent,0,100); c->surrender_hp_percent=AI_CLAMP(c->surrender_hp_percent,0,100); for(i=0;i<AI_ACTOR_PERSONALITIES;i++) c->personality[i]=AI_CLAMP(c->personality[i],0,100); for(k=0;k<AI_DIALOGUE_CATEGORIES;k++) c->dialogue_count[k]=AI_CLAMP(c->dialogue_count[k],0,AI_DIALOGUE_MAX_LINES); c->hearing_sensitivity=AI_CLAMP(c->hearing_sensitivity,0,100); c->observation_sensitivity=AI_CLAMP(c->observation_sensitivity,0,100); c->suspicion_threshold=AI_CLAMP(c->suspicion_threshold,0,100); c->recognition_confidence=AI_CLAMP(c->recognition_confidence,0,100); c->memory_max_actors=AI_CLAMP(c->memory_max_actors,1,AI_MEM_MAX); c->memory_ordinary_duration=AI_CLAMP(c->memory_ordinary_duration,1,1440); c->memory_important_duration=AI_CLAMP(c->memory_important_duration,c->memory_ordinary_duration,10080); c->trust_gain=AI_CLAMP(c->trust_gain,0,200); c->trust_loss=AI_CLAMP(c->trust_loss,0,200); c->fear_gain=AI_CLAMP(c->fear_gain,0,200); c->hostility_gain=AI_CLAMP(c->hostility_gain,0,200); c->familiarity_gain=AI_CLAMP(c->familiarity_gain,0,200); c->fear_decay=AI_CLAMP(c->fear_decay,0,100); c->hostility_decay=AI_CLAMP(c->hostility_decay,0,100); c->familiarity_decay=AI_CLAMP(c->familiarity_decay,0,100); c->forgiveness=AI_CLAMP(c->forgiveness,0,100); c->threat_cooldown=AI_CLAMP(c->threat_cooldown,1,300); c->calm_reset_time=AI_CLAMP(c->calm_reset_time,1,3600); c->repeated_event_window=AI_CLAMP(c->repeated_event_window,1,600); c->threat_step_count=AI_CLAMP(c->threat_step_count,0,AI_THREAT_STEP_MAX); for(i=0;i<AI_THREAT_RESPONSE_MAX;i++) c->threat_enabled[i]=!!c->threat_enabled[i]; for(i=0;i<c->threat_step_count;i++){ c->threat_steps[i].minimum_severity=AI_CLAMP(c->threat_steps[i].minimum_severity,0,100); c->threat_steps[i].cooldown=AI_CLAMP(c->threat_steps[i].cooldown,0,300); c->threat_steps[i].max_repetitions=AI_CLAMP(c->threat_steps[i].max_repetitions,1,10); c->threat_steps[i].advance_on_failure=!!c->threat_steps[i].advance_on_failure; } }
+{ int i,k; if (!c) return; c->archetype=AI_CLAMP(c->archetype,AI_ARCH_UNKNOWN,AI_ARCH_SERVICE); c->communication=AI_CLAMP(c->communication,AI_COMM_INFERRED,AI_COMM_TELEPATHY); c->memory_style=AI_CLAMP(c->memory_style,AI_MEMORY_INFERRED,AI_MEMORY_FULL_RELATIONSHIP); c->assistance_style=AI_CLAMP(c->assistance_style,AI_ASSIST_INFERRED,AI_ASSIST_ANY_ALLY); c->combat_style=AI_CLAMP(c->combat_style,AI_COMBAT_PASSIVE,AI_COMBAT_BOSS); c->assist_severity=AI_CLAMP(c->assist_severity,0,100); c->target_switch_threshold=AI_CLAMP(c->target_switch_threshold,0,100); c->max_allies=AI_CLAMP(c->max_allies,0,10); c->max_responders=AI_CLAMP(c->max_responders,0,10); c->combat_cooldown=AI_CLAMP(c->combat_cooldown,1,300); for(i=0;i<AI_TARGET_WEIGHTS;i++) c->target_weight[i]=AI_CLAMP(c->target_weight[i],-100,100); c->mode=AI_CLAMP(c->mode,MOB_AI_INFERRED,MOB_AI_INFERRED_OVERRIDES); c->role=AI_CLAMP(c->role,ROLE_UNKNOWN,ROLE_BOSS); c->movement=AI_CLAMP(c->movement,AI_MOVE_STATIONARY,AI_MOVE_RETURN_HOME); c->social=AI_CLAMP(c->social,AI_SOCIAL_SILENT,AI_SOCIAL_GOSSIP); c->roam_radius=AI_CLAMP(c->roam_radius,0,100); c->pursuit_distance=AI_CLAMP(c->pursuit_distance,0,100); c->movement_delay=AI_CLAMP(c->movement_delay,1,60); c->speech_cooldown=AI_CLAMP(c->speech_cooldown,AI_SOCIAL_COOLDOWN_MIN,AI_SOCIAL_COOLDOWN_MAX); c->room_speech_cooldown=AI_CLAMP(c->room_speech_cooldown,AI_SOCIAL_COOLDOWN_MIN,AI_SOCIAL_COOLDOWN_MAX); c->emote_cooldown=AI_CLAMP(c->emote_cooldown,AI_SOCIAL_COOLDOWN_MIN,AI_SOCIAL_COOLDOWN_MAX); c->flee_hp_percent=AI_CLAMP(c->flee_hp_percent,0,100); c->surrender_hp_percent=AI_CLAMP(c->surrender_hp_percent,0,100); for(i=0;i<AI_ACTOR_PERSONALITIES;i++) c->personality[i]=AI_CLAMP(c->personality[i],0,100); for(k=0;k<AI_DIALOGUE_CATEGORIES;k++) c->dialogue_count[k]=AI_CLAMP(c->dialogue_count[k],0,AI_DIALOGUE_MAX_LINES); c->hearing_sensitivity=AI_CLAMP(c->hearing_sensitivity,0,100); c->observation_sensitivity=AI_CLAMP(c->observation_sensitivity,0,100); c->suspicion_threshold=AI_CLAMP(c->suspicion_threshold,0,100); c->recognition_confidence=AI_CLAMP(c->recognition_confidence,0,100); c->memory_max_actors=AI_CLAMP(c->memory_max_actors,1,AI_MEM_MAX); c->memory_ordinary_duration=AI_CLAMP(c->memory_ordinary_duration,1,1440); c->memory_important_duration=AI_CLAMP(c->memory_important_duration,c->memory_ordinary_duration,10080); c->trust_gain=AI_CLAMP(c->trust_gain,0,200); c->trust_loss=AI_CLAMP(c->trust_loss,0,200); c->fear_gain=AI_CLAMP(c->fear_gain,0,200); c->hostility_gain=AI_CLAMP(c->hostility_gain,0,200); c->familiarity_gain=AI_CLAMP(c->familiarity_gain,0,200); c->fear_decay=AI_CLAMP(c->fear_decay,0,100); c->hostility_decay=AI_CLAMP(c->hostility_decay,0,100); c->familiarity_decay=AI_CLAMP(c->familiarity_decay,0,100); c->forgiveness=AI_CLAMP(c->forgiveness,0,100); c->threat_cooldown=AI_CLAMP(c->threat_cooldown,1,300); c->calm_reset_time=AI_CLAMP(c->calm_reset_time,1,3600); c->repeated_event_window=AI_CLAMP(c->repeated_event_window,1,600); c->threat_step_count=AI_CLAMP(c->threat_step_count,0,AI_THREAT_STEP_MAX); for(i=0;i<AI_THREAT_RESPONSE_MAX;i++) c->threat_enabled[i]=!!c->threat_enabled[i]; for(i=0;i<c->threat_step_count;i++){ c->threat_steps[i].minimum_severity=AI_CLAMP(c->threat_steps[i].minimum_severity,0,100); c->threat_steps[i].cooldown=AI_CLAMP(c->threat_steps[i].cooldown,0,300); c->threat_steps[i].max_repetitions=AI_CLAMP(c->threat_steps[i].max_repetitions,1,10); c->threat_steps[i].advance_on_failure=!!c->threat_steps[i].advance_on_failure; } }
 
 /* Fewer matching days is a more-specific calendar rule. */
 static int ai_schedule_specificity(int mask) { int n=0; while(mask){ n+=mask&1; mask>>=1; } return 7-n; }
@@ -509,12 +526,21 @@ static void ai_actor_sync_profile(struct char_data *mob)
   mob->ai_prof->social = (p.social_style == NPC_SOCIAL_EXTROVERT) ? SOC_TALKATIVE :
                          (p.social_style == NPC_SOCIAL_INTROVERT ? SOC_SILENT : SOC_WARNING);
   mob->ai_prof->talk_cooldown_secs = 10;
+  mob->ai_prof->archetype = ai_infer_archetype(mob, mob->ai_prof->role);
+  mob->ai_prof->communication = (mob->ai_prof->archetype == AI_ARCH_MINDLESS) ? AI_COMM_VOCALIZE :
+                                (mob->ai_prof->archetype == AI_ARCH_BEAST || mob->ai_prof->archetype == AI_ARCH_UNDEAD || mob->ai_prof->archetype == AI_ARCH_CONSTRUCT) ? AI_COMM_VOCALIZE : AI_COMM_SPEAK;
+  mob->ai_prof->memory_style = (mob->ai_prof->archetype == AI_ARCH_MINDLESS || mob->ai_prof->archetype == AI_ARCH_BEAST) ? AI_MEMORY_BASIC_HOSTILE : AI_MEMORY_SOCIAL;
+  mob->ai_prof->assistance_style = (mob->ai_prof->archetype == AI_ARCH_MINDLESS || mob->ai_prof->archetype == AI_ARCH_BEAST) ? AI_ASSIST_NONE : AI_ASSIST_ANY_ALLY;
   if (mob->ai_config) {
     struct mob_ai_config *c = mob->ai_config;
     mob_ai_config_validate(c);
     if (c->mode == MOB_AI_CUSTOM || (c->override_mask & AI_OVERRIDE_ROLE)) mob->ai_prof->role = c->role;
     if (c->mode == MOB_AI_CUSTOM || (c->override_mask & AI_OVERRIDE_MOVEMENT)) mob->ai_prof->movement = c->movement;
     if (c->mode == MOB_AI_CUSTOM || (c->override_mask & AI_OVERRIDE_SOCIAL)) mob->ai_prof->social = c->social;
+    if (c->archetype >= AI_ARCH_UNKNOWN) mob->ai_prof->archetype = c->archetype;
+    if (c->communication >= AI_COMM_NONE) mob->ai_prof->communication = c->communication;
+    if (c->memory_style >= AI_MEMORY_NONE) mob->ai_prof->memory_style = c->memory_style;
+    if (c->assistance_style >= AI_ASSIST_NONE) mob->ai_prof->assistance_style = c->assistance_style;
     mob->ai_prof->home_room_vnum = c->home_room_vnum;
     mob->ai_prof->roam_radius = c->roam_radius;
     mob->ai_prof->flee_hp_percent = c->flee_hp_percent;
@@ -537,6 +563,26 @@ static void ai_actor_sync_profile(struct char_data *mob)
     memcpy(mob->ai_prof->threat_enabled, c->threat_enabled, sizeof(c->threat_enabled)); mob->ai_prof->threat_cooldown=c->threat_cooldown; mob->ai_prof->calm_reset_time=c->calm_reset_time; mob->ai_prof->repeated_event_window=c->repeated_event_window; mob->ai_prof->threat_step_count=c->threat_step_count; memcpy(mob->ai_prof->threat_steps,c->threat_steps,sizeof(c->threat_steps));
   }
   mob->ai_prof->initialized = TRUE;
+}
+
+static int ai_actor_random_move(struct char_data *mob, time_t now)
+{
+  int dirs[DIR_COUNT], count = 0, dir, from;
+  struct ai_actor_state *s = mob->ai_state;
+  if (mob->ai_prof->movement != AI_MOVE_RANDOM || now < s->next_random_move) return FALSE;
+  s->next_random_move = now + MAX(1, mob->ai_config ? mob->ai_config->movement_delay : 10);
+  if (MOB_FLAGGED(mob, MOB_SENTINEL)) { strlcpy(s->last_blocked_reason, "SENTINEL", sizeof(s->last_blocked_reason)); return FALSE; }
+  if (mob->master || IN_ROOM(mob) == NOWHERE || GET_POS(mob) < POS_STANDING || FIGHTING(mob)) { strlcpy(s->last_blocked_reason, "controlled or unable", sizeof(s->last_blocked_reason)); return FALSE; }
+  from = IN_ROOM(mob);
+  for (dir=0; dir<DIR_COUNT; dir++) if (EXIT(mob,dir) && EXIT(mob,dir)->to_room != NOWHERE &&
+      !EXIT_FLAGGED(EXIT(mob,dir), EX_CLOSED) && !ROOM_FLAGGED(EXIT(mob,dir)->to_room, ROOM_NOMOB) &&
+      !ROOM_FLAGGED(EXIT(mob,dir)->to_room, ROOM_DEATH) &&
+      (!MOB_FLAGGED(mob,MOB_STAY_ZONE) || world[EXIT(mob,dir)->to_room].zone == world[from].zone)) dirs[count++]=dir;
+  if (!count) { strlcpy(s->last_blocked_reason, "no valid exit", sizeof(s->last_blocked_reason)); return FALSE; }
+  dir=dirs[rand_number(0,count-1)];
+  s->expected_room_vnum=world[EXIT(mob,dir)->to_room].number;
+  if (perform_move(mob,dir,1) && IN_ROOM(mob) != from) { s->last_move_result=TRUE; s->last_blocked_reason[0]='\0'; return TRUE; }
+  s->last_move_result=FALSE; strlcpy(s->last_blocked_reason, "movement trigger blocked", sizeof(s->last_blocked_reason)); return FALSE;
 }
 
 int ai_threat_response_available(int type) { return type >= AI_THREAT_OBSERVE && type <= AI_THREAT_FLEE && type != AI_THREAT_ASSIST && type != AI_THREAT_FOLLOW && type != AI_THREAT_ARREST; }
@@ -924,7 +970,6 @@ int ai_actor_tick(struct char_data *mob, time_t now)
   enum npc_priority prio;
   int mi;
   if (!mob || !IS_NPC(mob) || !MOB_FLAGGED(mob, MOB_AI_ACTOR) || !CONFIG_AI_ACTOR_ENABLED || !ai_actor_brain_enabled()) return FALSE;
-  if (!npc_ai_is_humanoid_social_candidate(mob)) return FALSE;
   if (!mob->ai_state || !mob->ai_prof) ai_actor_init(mob);
 
   /* Per-actor maintenance: no global scan and no persistent player pointers. */
@@ -934,14 +979,16 @@ int ai_actor_tick(struct char_data *mob, time_t now)
   }
 
   npc_ai_build_profile(mob, &p);
-  if (ai_actor_combat_tick(mob, now)) return TRUE;
-  if (ai_actor_schedule_tick(mob, now)) return TRUE;
-  if (mob->ai_prof->social == AI_SOCIAL_SILENT) return TRUE;
+  if (ai_actor_combat_tick(mob, now)) { mob->ai_state->last_tick_result=AI_TICK_EXCLUSIVE; return TRUE; }
+  if (ai_actor_schedule_tick(mob, now)) { mob->ai_state->last_tick_result=AI_TICK_EXCLUSIVE; return TRUE; }
+  mob->ai_state->last_idle_action=ai_actor_brain_think(mob, now);
+  if (ai_actor_random_move(mob, now)) { mob->ai_state->last_idle_action=AI_IDLE_MOVE_RANDOM; mob->ai_state->last_tick_result=AI_TICK_ACTED; return TRUE; }
+  if (mob->ai_prof->social == AI_SOCIAL_SILENT || mob->ai_prof->communication == AI_COMM_NONE) { mob->ai_state->last_tick_result=AI_TICK_IDLE; return TRUE; }
   if (mob->ai_prof->ambient_emotes_enabled && now - mob->ai_state->last_emote_time >= mob->ai_prof->emote_cooldown_secs && rand_number(1,100) <= 10 + mob->ai_prof->personality[AI_TRAIT_CURIOSITY] / 5 - mob->ai_prof->personality[AI_TRAIT_DISCIPLINE] / 10) { ai_social_emote(mob,now); return TRUE; }
-  if (mob->ai_prof->ambient_speech_enabled && now - mob->ai_state->last_spoke >= mob->ai_prof->talk_cooldown_secs && now - mob->ai_state->last_room_spoke >= mob->ai_prof->room_talk_cooldown_secs && rand_number(1,100) <= 5 + mob->ai_prof->personality[AI_TRAIT_SOCIABILITY]/3 - mob->ai_prof->personality[AI_TRAIT_DISCIPLINE]/8) { ai_social_say(mob,AI_DIALOGUE_AMBIENT_SPEECH, mob->ai_prof->social == AI_SOCIAL_BOASTFUL ? "My work speaks for itself." : NULL,now); return TRUE; }
+  if (mob->ai_prof->communication == AI_COMM_SPEAK && mob->ai_prof->ambient_speech_enabled && now - mob->ai_state->last_spoke >= mob->ai_prof->talk_cooldown_secs && now - mob->ai_state->last_room_spoke >= mob->ai_prof->room_talk_cooldown_secs && rand_number(1,100) <= 5 + mob->ai_prof->personality[AI_TRAIT_SOCIABILITY]/3 - mob->ai_prof->personality[AI_TRAIT_DISCIPLINE]/8) { ai_social_say(mob,AI_DIALOGUE_AMBIENT_SPEECH, mob->ai_prof->social == AI_SOCIAL_BOASTFUL ? "My work speaks for itself." : NULL,now); mob->ai_state->last_idle_action=AI_IDLE_SPEAK; mob->ai_state->last_tick_result=AI_TICK_ACTED; return TRUE; }
   prio = npc_ai_choose_priority(mob, &p, now);
   if (prio == NPC_PRIO_ENGAGE || prio == NPC_PRIO_WARN) npc_ai_handle_room_danger(mob, FIGHTING(mob), now);
-  return TRUE;
+  mob->ai_state->last_idle_action=AI_IDLE_OBSERVE; mob->ai_state->last_tick_result=AI_TICK_IDLE; return TRUE;
 }
 
 void ai_actor_record_damage(struct char_data *mob, struct char_data *actor, int dam)
