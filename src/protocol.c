@@ -679,7 +679,7 @@ const char *ProtocolOutput( descriptor_t *apDescriptor, const char *apData, int 
             case '[':
                if ( tolower(apData[++j]) == 'u' )
                {
-                  char Buffer[8] = {'\0'}, BugString[256];
+                  char Buffer[8] = { 0 }, BugString[256];
                   int Index = 0;
                   int Number = 0;
                   bool_t bDone = false, bValid = true;
@@ -730,7 +730,7 @@ const char *ProtocolOutput( descriptor_t *apDescriptor, const char *apData, int 
                }
                else if ( tolower(apData[j]) == 'f' || tolower(apData[j]) == 'b' )
                {
-                  char Buffer[8] = {'\0'}, BugString[256];
+                  char Buffer[8] = { 0 }, BugString[256];
                   int Index = 0;
                   bool_t bDone = false, bValid = true;
 
@@ -766,7 +766,7 @@ const char *ProtocolOutput( descriptor_t *apDescriptor, const char *apData, int 
                }
                else if ( tolower(apData[j]) == 'x' )
                {
-                  char Buffer[8] = {'\0'}, BugString[256];
+                  char Buffer[8] = { 0 }, BugString[256];
                   int Index = 0;
                   bool_t bDone = false, bValid = true;
 

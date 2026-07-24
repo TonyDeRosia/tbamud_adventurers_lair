@@ -176,6 +176,7 @@ static void auto_equip(struct char_data *ch, struct obj_data *obj, int location)
         location = LOC_INVENTORY;
       break;
     case WEAR_NECK_1:
+    case WEAR_NECK_2:
       if (!CAN_WEAR(obj, ITEM_WEAR_NECK))
         location = LOC_INVENTORY;
       break;
@@ -1094,7 +1095,6 @@ static int Crash_load_objs(struct char_data *ch) {
   char line[READ_SIZE];
   char buf[MAX_STRING_LENGTH];
   int i, orig_rent_code, num_objs=0;
-  int legacy_two_neck_slots = FALSE;
   struct obj_data *cont_row[MAX_BAG_ROWS];
   int rentcode = RENT_UNDEF;
   int timed=0,netcost=0,gold,account,nitems;
@@ -1154,26 +1154,8 @@ static int Crash_load_objs(struct char_data *ch) {
   }
 
 	loaded = objsave_parse_objects(fl);
-	for (current = loaded; current != NULL; current = current->next) {
-	  if (current->locate == 18) {
-	    legacy_two_neck_slots = TRUE;
-	    break;
-	  }
-	  if (current->locate == 5 && CAN_WEAR(current->obj, ITEM_WEAR_NECK) &&
-	      !CAN_WEAR(current->obj, ITEM_WEAR_BODY)) {
-	    legacy_two_neck_slots = TRUE;
-	    break;
-	  }
-	}
 	for (current = loaded; current != NULL; current=current->next)
-	  {
-	    int locate = current->locate;
-
-	    if (legacy_two_neck_slots && locate >= 5)
-	      locate--;
-
-	    num_objs += handle_obj(current->obj, ch, locate, cont_row);
-	  }
+	  num_objs += handle_obj(current->obj, ch, current->locate, cont_row);
 
 	/* now it's safe to free the obj_save_data list - all members of it
 	 * have been put in the correct lists by handle_obj() */

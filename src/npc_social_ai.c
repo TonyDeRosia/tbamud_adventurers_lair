@@ -147,7 +147,9 @@ static struct ai_actor_memory_entry *npc_mem_get(struct char_data *ch, long idnu
   if (ch->ai_state->mem_count >= limit) { /* Evict the least relevant relationship, never randomly. */
     int score = 1000000;
     for (i=0;i<ch->ai_state->mem_count;i++) { int s=abs(ch->ai_state->mem[i].trust)+ch->ai_state->mem[i].fear+ch->ai_state->mem[i].hostility; if(s<score){score=s;evict=i;} }
-    if (evict < 0) return NULL; i=evict;
+    if (evict < 0)
+      return NULL;
+    i = evict;
   } else i = ch->ai_state->mem_count++;
   memset(&ch->ai_state->mem[i], 0, sizeof(ch->ai_state->mem[i]));
   ch->ai_state->mem[i].idnum = idnum;

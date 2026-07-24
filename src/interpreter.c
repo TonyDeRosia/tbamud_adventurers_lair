@@ -2426,7 +2426,7 @@ break;
     /* Defensive: avoid RMOTD disconnect if last-login logging hits NULL data */
     if (d->character) {
       if (!GET_HOST(d->character))
-        GET_HOST(d->character) = strdup(d->host ? d->host : "unknown");
+        GET_HOST(d->character) = strdup(d->host[0] != '\0' ? d->host : "unknown");
       add_llog_entry(d->character, LAST_CONNECT);
     }
     STATE(d) = CON_MENU;

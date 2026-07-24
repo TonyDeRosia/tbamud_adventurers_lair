@@ -20,7 +20,7 @@
 #define MAX_TITLE_LENGTH	80  /* Used in char_file_u *DO*NOT*CHANGE* */
 #define HOST_LENGTH		40  /* Used in char_file_u *DO*NOT*CHANGE* */
 #define MAX_TONGUE		3   /* Used in char_file_u *DO*NOT*CHANGE* */
-#define MAX_SKILLS		200 /* Used in char_file_u *DO*NOT*CHANGE* */
+#define PLRTOASCII_LEGACY_MAX_SKILLS 200 /* Used in char_file_u *DO*NOT*CHANGE* */
 #define MAX_AFFECT		32  /* Used in char_file_u *DO*NOT*CHANGE* */
 
 /* Char's abilities.  Used in char_file_u *DO*NOT*CHANGE* */
@@ -73,7 +73,7 @@ struct char_special_data_saved_plrtoascii {
 };
 
 struct player_special_data_saved_plrtoascii {
-   byte skills[MAX_SKILLS+1];	/* array of skills plus skill 0		*/
+   byte skills[PLRTOASCII_LEGACY_MAX_SKILLS + 1];	/* array of skills plus skill 0		*/
    byte PADDING0;		/* used to be spells_to_learn		*/
    bool talks[MAX_TONGUE];	/* PC s Tongues 0 for NPC		*/
    int	wimp_level;		/* Below this # of hit points, flee!	*/
@@ -243,7 +243,7 @@ void convert(char *filename)
     psds = &(player.player_specials_saved);
     if (player.level < LVL_IMMORT) {
       fprintf(outfile, "Skil:\n");
-      for (i = 1; i <= MAX_SKILLS; i++) {
+      for (i = 1; i <= PLRTOASCII_LEGACY_MAX_SKILLS; i++) {
 	if (psds->skills[i])
 	  fprintf(outfile, "%d %d\n", i, (int)psds->skills[i]);
       }
