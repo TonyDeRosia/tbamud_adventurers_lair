@@ -982,13 +982,44 @@ static const char *medit_ai_state(struct descriptor_data *d, int enabled)
   return enabled ? "Enabled" : "Disabled";
 }
 
+static const char *medit_ai_capability_source(const struct mob_ai_config *c, int which)
+{
+  int value = which == 1 ? c->archetype : which == 2 ? c->communication :
+              which == 3 ? c->memory_style : c->assistance_style;
+  return value < 0 ? "Inferred from the NPC profile" : "Builder selection";
+}
+
+static void medit_disp_ai_capability_picker(struct descriptor_data *d, int which)
+{
+  static const char *archetype[] = { "Humanoid — ordinary speaking person.", "Beast — animal-like creature.", "Monster — large hostile creature.", "Mindless — instinct only; no social relationships.", "Construct — artificial and predictable.", "Undead — dead creature with creature-like speech.", "Service NPC — guard, merchant, or other service role." };
+  static const char *communication[] = { "None — never communicates.", "Vocalize — uses authored creature sounds instead of speech.", "Speak — uses ordinary dialogue.", "Telepathy — selected profile; delivery is not available." };
+  static const char *memory[] = { "None — forgets everyone.", "Basic Hostile Memory — remembers threats only.", "Social Memory — remembers relationships.", "Full Relationship Memory — preserves the richest relationship detail." };
+  static const char *assistance[] = { "None — never helps allies.", "Same Kind — helps matching creatures.", "Faction — helps faction allies.", "Any Ally — helps eligible nearby allies." };
+  const char **choices = which == 1 ? archetype : which == 2 ? communication : which == 3 ? memory : assistance;
+  const char *title = which == 1 ? "Archetype" : which == 2 ? "Communication" : which == 3 ? "Memory Style" : "Assistance";
+  int count = which == 1 ? 7 : 4, i;
+
+  write_to_output(d, "\r\n----------------------------------\r\nChoose %s\r\n\r\n1) Inferred\r\n   Let the NPC's role and identity choose this value.\r\n", title);
+  for (i = 0; i < count; i++)
+    write_to_output(d, "%d) %s\r\n", i + 2, choices[i]);
+  write_to_output(d, "\r\nQ) Cancel\r\n----------------------------------\r\nChoice: ");
+  OLC_VAL(d) = which;
+  OLC_MODE(d) = MEDIT_AI_CAPABILITY_VALUE;
+}
+
 static void medit_disp_ai_capabilities(struct descriptor_data *d)
 {
   struct mob_ai_config *c = OLC_MOB(d)->ai_config;
-  write_to_output(d, "\r\nAI Actor Capabilities\r\n\r\n  1) Archetype     : %s\r\n  2) Communication : %s\r\n  3) Memory Style  : %s\r\n  4) Assistance    : %s\r\n  5) Random Move Delay: %d seconds\r\n\r\nValues set here explicitly override inference. Communication=None prevents all delivery; Vocalize uses authored creature lines.\r\nH) Help  Q) Return\r\nChoice: ",
-      c->archetype < 0 ? "Inferred" : ai_actor_archetype_name(c->archetype),
-      ai_actor_communication_name(c->communication), ai_actor_memory_style_name(c->memory_style),
-      ai_actor_assistance_style_name(c->assistance_style), c->movement_delay);
+  struct ai_actor_profile *p;
+  ai_actor_refresh_profile(OLC_MOB(d), TRUE);
+  p = OLC_MOB(d)->ai_prof;
+  const char *delay_status = c->movement == AI_MOVE_RANDOM ? "Active — Random movement is enabled." : "Inactive — current movement mode is not Random.";
+  write_to_output(d,
+      "\r\n                    AI Actor Capabilities\r\n\r\nIdentity\r\n  1) Archetype\r\n     Authored: %s\r\n     Effective: %s\r\n     Source: %s\r\n\r\nCommunication\r\n  2) Communication Type\r\n     Authored: %s\r\n     Effective: %s\r\n     Source: %s\r\n  B) Creature Vocalizations\r\n     Authored creature sounds used by Vocalize.\r\n\r\nMemory\r\n  3) Memory Style\r\n     Authored: %s\r\n     Effective: %s\r\n     Source: %s\r\n\r\nRelationships\r\n  4) Assistance\r\n     Authored: %s\r\n     Effective: %s\r\n     Source: %s\r\n\r\nMovement\r\n  5) Random Move Delay\r\n     %d seconds\r\n     Status: %s\r\n\r\nH) Help   Q) Return\r\nChoice: ",
+      c->archetype < 0 ? "Inferred" : ai_actor_archetype_name(c->archetype), ai_actor_archetype_name(p->archetype), medit_ai_capability_source(c, 1),
+      ai_actor_communication_name(c->communication), ai_actor_communication_name(p->communication), medit_ai_capability_source(c, 2),
+      ai_actor_memory_style_name(c->memory_style), ai_actor_memory_style_name(p->memory_style), medit_ai_capability_source(c, 3),
+      ai_actor_assistance_style_name(c->assistance_style), ai_actor_assistance_style_name(p->assistance_style), medit_ai_capability_source(c, 4), c->movement_delay, delay_status);
   OLC_MODE(d) = MEDIT_AI_CAPABILITIES;
 }
 
@@ -1001,6 +1032,23 @@ static void medit_disp_ai_vocalizations(struct descriptor_data *d)
     write_to_output(d, "  %d) %s\r\n", i + 1, c->vocalization[i]);
   write_to_output(d, "\r\nA) Add  E) Edit  D) Delete  U) Move up  N) Move down\r\nP) Preview  H) Help  Q) Return\r\nChoice: ");
   OLC_MODE(d) = MEDIT_AI_VOCALIZATIONS;
+}
+
+static void medit_disp_ai_preview(struct descriptor_data *d)
+{
+  struct mob_ai_config *c = OLC_MOB(d)->ai_config;
+  struct ai_actor_profile *p;
+  const char *movement_reason;
+  ai_actor_refresh_profile(OLC_MOB(d), TRUE);
+  p = OLC_MOB(d)->ai_prof;
+  movement_reason = c->movement == AI_MOVE_RANDOM ? "Random movement uses this delay." : "Inactive because Movement is not Random.";
+  write_to_output(d,
+    "\r\n                    Preview Compiled " "Profile\r\n\r\nArchetype\r\n  Authored:  %s\r\n  Inferred:  role and NPC identity\r\n  Effective Runtime: %s\r\n  Reason: %s\r\n\r\nCommunication\r\n  Authored:  %s\r\n  Inferred:  derived from archetype\r\n  Effective Runtime: %s\r\n  Reason: %s\r\n\r\nMemory\r\n  Authored:  %s\r\n  Inferred:  derived from archetype\r\n  Effective Runtime: %s\r\n  Reason: %s\r\n\r\nAssistance\r\n  Authored:  %s\r\n  Inferred:  derived from archetype\r\n  Effective Runtime: %s\r\n  Reason: %s\r\n\r\nMovement\r\n  Authored:  %d seconds\r\n  Inferred:  1 second default\r\n  Effective Runtime: %d seconds\r\n  Reason: %s\r\n\r\n",
+    c->archetype < 0 ? "Inferred" : ai_actor_archetype_name(c->archetype), ai_actor_archetype_name(p->archetype), c->archetype < 0 ? "Inferred from role and identity." : "Builder selected this archetype.",
+    ai_actor_communication_name(c->communication), ai_actor_communication_name(p->communication), c->communication < 0 ? "Inferred from the effective archetype." : "Builder selected this communication type.",
+    ai_actor_memory_style_name(c->memory_style), ai_actor_memory_style_name(p->memory_style), c->memory_style < 0 ? "Inferred from the effective archetype." : "Builder selected this memory style.",
+    ai_actor_assistance_style_name(c->assistance_style), ai_actor_assistance_style_name(p->assistance_style), c->assistance_style < 0 ? "Inferred from the effective archetype." : "Builder selected this assistance style.",
+    c->movement_delay, c->movement_delay, movement_reason);
 }
 
 static void medit_disp_ai_menu(struct descriptor_data *d)
@@ -1572,7 +1620,7 @@ void medit_parse(struct descriptor_data *d, char *arg)
       case '0': medit_disp_ai_combat(d); return;
       case 's': medit_disp_ai_schedule(d); return;
       case 'r': mob_ai_config_free(OLC_MOB(d)->ai_config); OLC_MOB(d)->ai_config = NULL; OLC_VAL(d) = 1; medit_disp_ai_menu(d); return;
-      case 'p': { struct ai_actor_profile *p; struct mob_ai_config *c=OLC_MOB(d)->ai_config; char report[MAX_STRING_LENGTH]; ai_actor_refresh_profile(OLC_MOB(d), TRUE); p=OLC_MOB(d)->ai_prof; write_to_output(d, "\r\nCompiled Capability Preview\r\nCapability                 Authored       Inferred       Effective       Source\r\nArchetype                  %s             %s             %s             %s\r\nCommunication              %s             %s             %s             %s\r\nMemory style                %s             %s             %s             %s\r\nAssistance style            %s             %s             %s             %s\r\nRandom movement delay       %d seconds      1 second       %d seconds      %s\r\n", c->archetype < 0 ? "Inferred" : ai_actor_archetype_name(c->archetype), "Role-derived", ai_actor_archetype_name(p->archetype), c->archetype < 0 ? "Inference" : "Authored", ai_actor_communication_name(c->communication), "Inferred", ai_actor_communication_name(p->communication), c->communication < 0 ? "Inference" : "Authored", ai_actor_memory_style_name(c->memory_style), "Inferred", ai_actor_memory_style_name(p->memory_style), c->memory_style < 0 ? "Inference" : "Authored", ai_actor_assistance_style_name(c->assistance_style), "Inferred", ai_actor_assistance_style_name(p->assistance_style), c->assistance_style < 0 ? "Inference" : "Authored", c->movement_delay, c->movement_delay, c->mode == MOB_AI_INFERRED ? "Default" : "Authored"); ai_actor_compatibility_report(OLC_MOB(d), report, sizeof(report), FALSE); write_to_output(d,"\r\nRuntime Notes:%s",report); medit_disp_ai_menu(d); return; }
+      case 'p': medit_disp_ai_preview(d); medit_disp_ai_menu(d); return;
       default: medit_disp_ai_menu(d); return;
     }
   case MEDIT_AI_PERSONALITY:
@@ -1584,15 +1632,24 @@ void medit_parse(struct descriptor_data *d, char *arg)
   case MEDIT_AI_PRESET: if(i<0||i>7){medit_disp_ai_personality(d);return;} {static const int p[8][12]={{50,50,50,50,50,50,50,50,50,50,50,50},{25,70,30,20,90,75,10,55,85,65,45,40},{10,55,85,55,60,75,55,75,60,70,20,45},{15,20,30,65,35,55,20,65,40,25,75,20},{75,80,45,35,85,25,15,20,90,45,65,80},{35,55,55,30,75,45,95,20,75,55,60,70},{85,65,15,55,25,20,20,10,25,20,85,60},{45,75,45,25,95,70,20,55,90,80,45,50}};memcpy(OLC_MOB(d)->ai_config->personality,p[i],sizeof(p[i]));OLC_MOB(d)->ai_config->override_mask|=AI_OVERRIDE_TRAITS;OLC_VAL(d)=1;}medit_disp_ai_personality(d);return;
   case MEDIT_AI_CAPABILITIES:
     if (LOWER(*arg) == 'q') { medit_disp_ai_menu(d); return; }
-    if (LOWER(*arg) == 'h') { medit_disp_ai_help(d, MEDIT_AI_CAPABILITIES, "Capabilities", "These values explicitly override inferred Phase 1 capabilities.", "Choose a numbered value; use -1 for inferred where offered.", "Creature Vocalizations author the full-room Vocalize output."); return; }
+    if (LOWER(*arg) == 'h') { medit_disp_ai_help(d, MEDIT_AI_CAPABILITIES, "Capabilities", "Choose clear behavior labels instead of engine enum values. Inferred values follow the NPC's role and identity.", "Select a category, then choose its named option. Q always leaves a picker without changing anything.", "Creature Vocalizations supplies the sounds used by Vocalize; Random Move Delay is active only in Random movement mode."); return; }
     if (!medit_parse_ai_integer(arg, 1, 5, &i)) { medit_disp_ai_capabilities(d); return; }
-    OLC_VAL(d) = i; OLC_MODE(d) = MEDIT_AI_CAPABILITY_VALUE;
-    write_to_output(d, i == 1 ? "Archetype (-1 inferred, 0-7): " : i == 2 ? "Communication (-1 inferred, 0 None, 1 Vocalize, 2 Speak, 3 Telepathy): " : i == 3 ? "Memory style (-1 inferred, 0-4): " : i == 4 ? "Assistance style (-1 inferred, 0-4): " : "Random movement delay (1-60 seconds): "); return;
+    if (i < 5) { medit_disp_ai_capability_picker(d, i); return; }
+    OLC_VAL(d) = 5; OLC_MODE(d) = MEDIT_AI_CAPABILITY_VALUE;
+    write_to_output(d, "Random Move Delay (1-60 seconds; Q to cancel): "); return;
   case MEDIT_AI_CAPABILITY_VALUE: {
-    struct mob_ai_config *c = OLC_MOB(d)->ai_config; int lo = OLC_VAL(d) == 5 ? 1 : -1, hi = OLC_VAL(d) == 1 ? AI_ARCH_SERVICE : OLC_VAL(d) == 2 ? AI_COMM_TELEPATHY : OLC_VAL(d) == 3 ? AI_MEMORY_FULL_RELATIONSHIP : OLC_VAL(d) == 4 ? AI_ASSIST_ANY_ALLY : 60;
+    struct mob_ai_config *c = OLC_MOB(d)->ai_config;
+    int which = OLC_VAL(d), count = which == 1 ? 7 : 4;
     if (LOWER(*arg) == 'q') { medit_disp_ai_capabilities(d); return; }
-    if (!medit_parse_ai_integer(arg, lo, hi, &i)) { write_to_output(d, "Invalid value. Try again or Q to cancel: "); return; }
-    if (OLC_VAL(d) == 1) c->archetype=i; else if (OLC_VAL(d) == 2) c->communication=i; else if (OLC_VAL(d) == 3) c->memory_style=i; else if (OLC_VAL(d) == 4) c->assistance_style=i; else c->movement_delay=i;
+    if (!*arg) { which == 5 ? write_to_output(d, "Random Move Delay (1-60 seconds; Q to cancel): ") : medit_disp_ai_capability_picker(d, which); return; }
+    if (which == 5) {
+      if (!medit_parse_ai_integer(arg, 1, 60, &i)) { write_to_output(d, "Choose a delay from 1 to 60 seconds, or Q to cancel: "); return; }
+      c->movement_delay=i;
+    } else {
+      if (!medit_parse_ai_integer(arg, 1, count + 1, &i)) { medit_disp_ai_capability_picker(d, which); return; }
+      i = i == 1 ? -1 : i - 2;
+      if (which == 1) c->archetype=i; else if (which == 2) c->communication=i; else if (which == 3) c->memory_style=i; else c->assistance_style=i;
+    }
     OLC_VAL(d)=1; medit_disp_ai_capabilities(d); return;
   }
   case MEDIT_AI_VOCALIZATIONS: {

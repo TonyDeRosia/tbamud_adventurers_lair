@@ -120,7 +120,7 @@ void ai_actor_compatibility_report(const struct char_data *mob, char *out, size_
   ai_compat_add(out, size, "\r\nHelping Allies\r\n--------------\r\n\r\n%s AI Assistance %s\r\n", c && c->may_assist ? "+" : "-", c && c->may_assist ? "enabled" : "disabled");
   if (MOB_FLAGGED(mob, MOB_HELPER)) ai_compat_add(out, size, "! Legacy HELPER flag is enabled; it normally will not be used.\r\n");
 
-  ai_compat_add(out, size, "\r\nSpeech & Social\r\n---------------\r\n\r\n%s Dialogue %s\r\n%s Ambient speech %s\r\n", c && c->social != AI_SOCIAL_SILENT ? "+" : "-", c && c->social != AI_SOCIAL_SILENT ? "enabled" : "disabled", c && c->ambient_speech_enabled ? "+" : "-", c && c->ambient_speech_enabled ? "enabled" : "disabled");
+  ai_compat_add(out, size, "\r\nSpeech & Social\r\n---------------\r\n\r\n%s Dialogue %s\r\n%s Ambient speech %s\r\n\r\nWhat to configure next\r\n----------------------\r\n\r\n%s\r\n", c && c->social != AI_SOCIAL_SILENT ? "+" : "-", c && c->social != AI_SOCIAL_SILENT ? "enabled" : "disabled", c && c->ambient_speech_enabled ? "+" : "-", c && c->ambient_speech_enabled ? "enabled" : "disabled", c && c->movement == AI_MOVE_RANDOM ? "Add creature vocalizations or dialogue lines that match the effective communication type." : "Choose Random movement if this NPC should wander; otherwise review communication and memory.");
 
   ai_compat_add(out, size, "\r\nRestrictions\r\n------------\r\n\r\n");
   if (!MOB_FLAGGED(mob, MOB_SENTINEL) && !MOB_FLAGGED(mob, MOB_STAY_ZONE)) ai_compat_add(out, size, "None\r\n");
