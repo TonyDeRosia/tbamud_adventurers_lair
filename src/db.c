@@ -1714,6 +1714,13 @@ static void interpret_espec(const char *keyword, const char *value, int i, int n
     else mob_ai_config_validate(c);
     return;
   }
+  if (value && !str_cmp(keyword, "AIConfigCapabilities")) {
+    struct mob_ai_config *c = mob_proto[i].ai_config;
+    if (!c || sscanf(value, "%d %d %d %d", &c->archetype, &c->communication, &c->memory_style, &c->assistance_style) != 4)
+      log("SYSERR: Bad AIConfigCapabilities format in mob #%d", nr);
+    else mob_ai_config_validate(c);
+    return;
+  }
   if (value && !str_cmp(keyword, "AIConfigCombat")) { struct mob_ai_config *c=mob_proto[i].ai_config; if(!c || sscanf(value,"%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d",&c->combat_style,&c->combat_enabled,&c->may_initiate,&c->may_assist,&c->may_call_help,&c->may_flee,&c->protect_trusted,&c->protect_group,&c->protect_same_role,&c->protect_same_prototype,&c->avoid_incapacitated,&c->retaliate_self,&c->retaliate_ally,&c->retaliate_hostile,&c->switch_targets,&c->assist_severity,&c->target_switch_threshold,&c->max_allies,&c->max_responders,&c->combat_cooldown)!=20) log("SYSERR: Bad AIConfigCombat format in mob #%d",nr); else mob_ai_config_validate(c); return; }
   if (value && !str_cmp(keyword, "AIConfigTargetWeight")) { struct mob_ai_config *c=mob_proto[i].ai_config; if(!c || sscanf(value,"%d %d %d %d %d %d %d %d",&c->target_weight[0],&c->target_weight[1],&c->target_weight[2],&c->target_weight[3],&c->target_weight[4],&c->target_weight[5],&c->target_weight[6],&c->target_weight[7])!=8) log("SYSERR: Bad AIConfigTargetWeight format in mob #%d",nr); else mob_ai_config_validate(c); return; }
   if (value && !str_cmp(keyword, "AIConfigPerception")) { struct mob_ai_config *c=mob_proto[i].ai_config; if(!c || sscanf(value,"%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d",&c->notice_entry,&c->notice_departure,&c->notice_speech,&c->notice_whispers,&c->notice_emotes,&c->notice_combat,&c->notice_self_attack,&c->notice_ally_attack,&c->notice_corpses,&c->notice_drops,&c->notice_gifts,&c->notice_crimes,&c->hearing_sensitivity,&c->observation_sensitivity,&c->suspicion_threshold,&c->recognition_confidence)!=16) log("SYSERR: Bad AIConfigPerception format in mob #%d",nr); else mob_ai_config_validate(c); return; }

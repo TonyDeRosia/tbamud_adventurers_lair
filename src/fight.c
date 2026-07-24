@@ -1806,12 +1806,12 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
     affect_from_char(ch, SKILL_CHAIN_ASSASSAULT);
   }
 
-  if (dam > 0 && ch && victim &&
+  if (dam > 0 && ch && !IS_NPC(ch) && victim &&
       GET_SKILL(ch, SKILL_OVERLORD_PRESENCE) > 0 &&
       IS_NPC(victim) && GET_LEVEL(ch) >= GET_LEVEL(victim) + 10)
     dam += 2;
 
-  if (dam > 0 && ch && IS_NPC(ch) && ch->master && is_shadow_servant_for(ch->master, ch)) {
+  if (dam > 0 && ch && IS_NPC(ch) && ch->master && !IS_NPC(ch->master) && is_shadow_servant_for(ch->master, ch)) {
     if (GET_SKILL(ch->master, SKILL_SHADOW_COMMANDER) > 0)
       dam = (dam * 110) / 100;
     if (affected_by_spell(ch->master, SPELL_DOMINION_OF_SHADOWS))
@@ -1822,7 +1822,7 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
         count_shadow_servants_for(ch->master) >= 3)
       dam = (dam * 105) / 100;
   }
-  if (dam > 0 && ch && IS_NPC(ch) && ch->master &&
+  if (dam > 0 && ch && IS_NPC(ch) && ch->master && !IS_NPC(ch->master) &&
       GET_SKILL(ch->master, SKILL_UNDEAD_COMMAND) > 0 &&
       GET_CLASS(ch) == CLASS_UNDEAD) {
     dam = (dam * 110) / 100;
@@ -2500,7 +2500,7 @@ static void process_round_effects(void)
       affect_join(i, &af, FALSE, FALSE, FALSE, FALSE);
     }
 
-    if (IS_NPC(i) && i->master && is_shadow_servant_for(i->master, i) &&
+    if (IS_NPC(i) && i->master && !IS_NPC(i->master) && is_shadow_servant_for(i->master, i) &&
         GET_SKILL(i->master, SKILL_SHADOW_COMMANDER) > 0) {
       struct affected_type af;
       new_affect(&af);
@@ -2518,7 +2518,7 @@ static void process_round_effects(void)
       GET_HIT(i) = MIN(GET_MAX_HIT(i), GET_HIT(i) + MAX(1, GET_MAX_HIT(i) / 10));
     }
 
-    if (IS_NPC(i) && i->master && GET_SKILL(i->master, SKILL_LEGION_MASTERY) > 0 &&
+    if (IS_NPC(i) && i->master && !IS_NPC(i->master) && GET_SKILL(i->master, SKILL_LEGION_MASTERY) > 0 &&
         count_shadow_servants_for(i->master) >= 3 && AFF_FLAGGED(i, AFF_CHARM)) {
       struct affected_type af;
       new_affect(&af);

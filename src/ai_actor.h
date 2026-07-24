@@ -30,6 +30,12 @@ enum ai_combat_style { AI_COMBAT_PASSIVE, AI_COMBAT_DEFENSIVE, AI_COMBAT_BALANCE
 enum ai_target_weight { AI_TARGET_CURRENT_ATTACKER, AI_TARGET_TRUSTED_ATTACKER, AI_TARGET_GROUP_ATTACKER, AI_TARGET_KNOWN_HOSTILE, AI_TARGET_LOW_HEALTH, AI_TARGET_PLAYER, AI_TARGET_NPC, AI_TARGET_PREVIOUS };
 struct ai_threat_step { int type, minimum_severity, cooldown, max_repetitions, advance_on_failure; };
 enum mob_ai_config_movement { AI_MOVE_STATIONARY, AI_MOVE_RANDOM, AI_MOVE_PATROL, AI_MOVE_SCHEDULED, AI_MOVE_GUARD_ROOM, AI_MOVE_RETURN_HOME };
+enum ai_actor_archetype { AI_ARCH_UNKNOWN, AI_ARCH_HUMANOID, AI_ARCH_BEAST, AI_ARCH_MONSTER, AI_ARCH_MINDLESS, AI_ARCH_CONSTRUCT, AI_ARCH_UNDEAD, AI_ARCH_SERVICE };
+enum ai_communication { AI_COMM_INFERRED = -1, AI_COMM_NONE, AI_COMM_VOCALIZE, AI_COMM_SPEAK, AI_COMM_TELEPATHY };
+enum ai_memory_style { AI_MEMORY_INFERRED = -1, AI_MEMORY_NONE, AI_MEMORY_BASIC_HOSTILE, AI_MEMORY_SOCIAL, AI_MEMORY_FULL_RELATIONSHIP };
+enum ai_assistance_style { AI_ASSIST_INFERRED = -1, AI_ASSIST_NONE, AI_ASSIST_SAME_KIND, AI_ASSIST_FACTION, AI_ASSIST_ANY_ALLY };
+enum ai_actor_tick_result { AI_TICK_INELIGIBLE, AI_TICK_IDLE, AI_TICK_ACTED, AI_TICK_BLOCKED, AI_TICK_EXCLUSIVE };
+enum ai_idle_action { AI_IDLE_NONE, AI_IDLE_OBSERVE, AI_IDLE_EMOTE, AI_IDLE_SPEAK, AI_IDLE_VOCALIZE, AI_IDLE_MOVE_RANDOM };
 enum ai_schedule_activity { AI_SCHEDULE_REMAIN, AI_SCHEDULE_TRAVEL, AI_SCHEDULE_PATROL, AI_SCHEDULE_IDLE_SOCIAL, AI_SCHEDULE_GUARD, AI_SCHEDULE_WORK, AI_SCHEDULE_SLEEP, AI_SCHEDULE_REST, AI_SCHEDULE_RETURN_HOME, AI_SCHEDULE_ACTIVITY_MAX };
 enum ai_schedule_destination { AI_DEST_CURRENT_ROOM, AI_DEST_ROOM_VNUM, AI_DEST_HOME, AI_DEST_WORK, AI_DEST_SLEEP, AI_DEST_GUARD, AI_DEST_FALLBACK, AI_DEST_PATROL, AI_DEST_SPAWN, AI_DESTINATION_MAX };
 enum ai_schedule_action { AI_SCHEDULE_ACTION_NONE, AI_SCHEDULE_ACTION_SPEAK, AI_SCHEDULE_ACTION_EMOTE, AI_SCHEDULE_ACTION_SIT, AI_SCHEDULE_ACTION_REST, AI_SCHEDULE_ACTION_SLEEP, AI_SCHEDULE_ACTION_STAND, AI_SCHEDULE_ACTION_WAKE, AI_SCHEDULE_ACTION_BEGIN_PATROL, AI_SCHEDULE_ACTION_GUARD, AI_SCHEDULE_ACTION_MAX };
@@ -51,6 +57,7 @@ struct mob_ai_config {
   struct ai_schedule_entry schedules[AI_SCHEDULE_MAX];
   struct ai_patrol_route patrols[AI_PATROL_MAX];
   int roam_radius, pursuit_distance, movement_delay;
+  int archetype, communication, memory_style, assistance_style;
   int greeting_enabled, ambient_speech_enabled, ambient_emotes_enabled, whisper_enabled;
   int respond_strangers, respond_trusted, respond_feared, respond_hostile;
   int speech_cooldown, room_speech_cooldown, emote_cooldown;
@@ -235,6 +242,7 @@ struct ai_actor_profile {
   int role;
   int mode;
   int movement;
+  int archetype, communication, memory_style, assistance_style;
   int aggression;
   int social;
   int personality[AI_ACTOR_PERSONALITIES];
@@ -372,6 +380,9 @@ struct ai_actor_state {
   int schedule_departure_done, schedule_arrival_done, schedule_failure_emitted, schedule_failure_applied, schedule_disabled_id, schedule_activation_day, schedule_activation_start, schedule_activation_end;
   int resume_schedule_id, resume_route_id, resume_waypoint, resume_direction, resume_state, resume_destination_vnum, resume_departure_done, resume_arrival_done;
   time_t schedule_started_at, last_schedule_eval, last_schedule_move, schedule_wait_until, schedule_retry_at;
+  time_t next_random_move;
+  int last_tick_result, last_idle_action, last_move_result;
+  char last_blocked_reason[32];
 };
 
 uint32_t ai_actor_compute_signature(struct char_data *mob);
@@ -383,6 +394,10 @@ void ai_actor_refresh_live_mobs_by_vnum(mob_vnum vnum);
 void ai_actor_init(struct char_data *mob);
 void ai_actor_free(struct char_data *mob);
 int ai_actor_tick(struct char_data *mob, time_t now);
+const char *ai_actor_archetype_name(int value);
+const char *ai_actor_communication_name(int value);
+const char *ai_actor_memory_style_name(int value);
+const char *ai_actor_assistance_style_name(int value);
 /* Pure schedule helpers use the canonical in-game time_info calendar. */
 int ai_schedule_time_matches(int start, int end, int hour);
 int ai_schedule_day_matches(int mask, int day);
