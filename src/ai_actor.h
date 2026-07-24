@@ -96,6 +96,7 @@ struct mob_ai_config {
   int avoid_incapacitated, retaliate_self, retaliate_ally, retaliate_hostile, switch_targets;
   int assist_severity, target_switch_threshold, max_allies, max_responders, combat_cooldown;
   int target_weight[AI_TARGET_WEIGHTS];
+  int behavior_owner[13];
 };
 
 /* Builder-facing, read-only explanation of the currently audited runtime.

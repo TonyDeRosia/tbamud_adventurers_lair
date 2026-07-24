@@ -64,3 +64,7 @@ Rollback is code-level: keep `AI_LEGACY_ARBITRATION_ENABLED` false to execute th
 ## Tests and next phases
 
 Focused tests cover the feature flag, compatibility defaults, owner names, domain gates, Mayor AI-ownership rejection, unknown-special conservative locking, diagnostics strings, and absence of persistence mutations.  Phase 2B should add a backward-compatible ownership persistence/editor contract.  Phase 3 can migrate selected known specials, starting with safe non-service specials rather than Mayor.
+
+## Phase 2B status
+
+Phase 2B adds editable, persistent MEDIT Behavior Ownership records; see `docs/AI_ACTOR_LEGACY_INTEGRATION_PHASE2B.md`.

@@ -68,6 +68,9 @@ struct mob_behavior_pulse_context {
 
 const char *mob_behavior_owner_name(int owner);
 const char *mob_behavior_domain_name(unsigned domain);
+unsigned mob_behavior_domain_from_token(const char *token);
+int mob_behavior_owner_from_token(const char *token, enum mob_behavior_owner *owner);
+int mob_behavior_domain_index(unsigned domain);
 void mob_behavior_context_init(struct mob_behavior_pulse_context *ctx, struct char_data *mob, int enabled);
 int mob_behavior_context_has_explicit_owner(const struct mob_behavior_pulse_context *ctx);
 int mob_behavior_domain_available_to_ai(const struct mob_behavior_pulse_context *ctx, unsigned domain);

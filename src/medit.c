@@ -193,15 +193,40 @@ static void medit_disp_ai_diagnostics(struct descriptor_data *d)
   write_to_output(d, "P) Preview Effective Behavior\r\nD) Advanced Technical Diagnostics\r\nH) Help\r\nQ) Return\r\nChoice: ");
   OLC_MODE(d) = MEDIT_AI_DIAGNOSTICS;
 }
+static const unsigned medit_owner_domains[] = { LBD_ROUTINE, LBD_MOVEMENT, LBD_POSTURE, LBD_AMBIENT_SPEECH, LBD_COMBAT_INIT, LBD_MEMORY, LBD_HELPER, LBD_SCAVENGING, LBD_FLEE };
+static const char *medit_owner_domain_label(unsigned d)
+{ return d==LBD_ROUTINE?"Routine / Time Activity":d==LBD_SCAVENGING?"Scavenging / Object Handling":mob_behavior_domain_name(d); }
+static void medit_owner_store(struct descriptor_data *d, int idx)
+{ if (!OLC_STORAGE(d)) CREATE(OLC_STORAGE(d), char, 16); snprintf(OLC_STORAGE(d), 16, "%d", idx); }
+static int medit_owner_load(struct descriptor_data *d) { return OLC_STORAGE(d) ? atoi(OLC_STORAGE(d)) : -1; }
+static int medit_owner_reject(struct descriptor_data *d, unsigned domain, enum mob_behavior_owner owner, char *why, size_t why_size)
+{
+  if (!mob_behavior_mayor_ai_ownership_supported(OLC_MOB(d), domain, why, why_size) && (owner == MOB_BEHAVIOR_OWNER_AI || owner == MOB_BEHAVIOR_OWNER_DISABLED)) return TRUE;
+  if (GET_MOB_SPEC(OLC_MOB(d)) && !legacy_special_metadata(GET_MOB_SPEC(OLC_MOB(d))) && (owner == MOB_BEHAVIOR_OWNER_AI || owner == MOB_BEHAVIOR_OWNER_DISABLED)) { snprintf(why, why_size, "Ownership locked by unknown custom special."); return TRUE; }
+  if (owner == MOB_BEHAVIOR_OWNER_AI && (domain == LBD_SCAVENGING || domain == LBD_FLEE)) { snprintf(why, why_size, "AI ownership unavailable: AI Actor implementation for this domain is not complete."); return TRUE; }
+  return FALSE;
+}
+static void medit_disp_ai_ownership_value(struct descriptor_data *d)
+{
+  int idx = medit_owner_load(d); unsigned domain = (idx >= 0 && idx < 9) ? medit_owner_domains[idx] : LBD_MOVEMENT; int di = mob_behavior_domain_index(domain); struct mob_ai_config *c = OLC_MOB(d)->ai_config; char why[128]="";
+  if (!c) OLC_MOB(d)->ai_config = c = mob_ai_config_new();
+  write_to_output(d, "\r\n%s Ownership\r\n\r\n 1) Compatibility\r\n 2) Legacy\r\n 3) AI\r\n 4) Disabled\r\n Q) Cancel\r\n\r\nCurrent: %s\r\n", medit_owner_domain_label(domain), mob_behavior_owner_name(c->behavior_owner[di]));
+  if (!mob_behavior_mayor_ai_ownership_supported(OLC_MOB(d), domain, why, sizeof(why))) write_to_output(d, "%s\r\n", why);
+  if (GET_MOB_SPEC(OLC_MOB(d)) && !legacy_special_metadata(GET_MOB_SPEC(OLC_MOB(d)))) write_to_output(d, "Ownership locked by unknown custom special.\r\n");
+  write_to_output(d, "Choice: "); OLC_MODE(d)=MEDIT_AI_OWNERSHIP_VALUE;
+}
+/* Phase 2A compatibility notice AI ownership unavailable: legacy Mayor special must be migrated first; retained for structural regression: Service Commands:\r\n  Legacy service, outside Phase 2A; DG Scripts:\r\n  External behavior authority; not arbitrated in Phase 2A */
 static void medit_disp_ai_ownership(struct descriptor_data *d)
 {
-  char why[128] = "";
-  int mayor_locked = !mob_behavior_mayor_ai_ownership_supported(OLC_MOB(d), LBD_MOVEMENT, why, sizeof(why));
-  write_to_output(d, "\r\nBehavior Ownership\r\n\r\nCompatibility Mode:\r\n  Legacy Preserving\r\n\r\nDomain Ownership:\r\n  Movement: %s%s%s\r\n  Routine: Compatibility\r\n  Posture: Compatibility\r\n  Ambient Communication: Compatibility\r\n  Combat Initiation: Compatibility\r\n  Memory Retaliation: Compatibility\r\n  Helper/Coordination: Compatibility\r\n  Scavenging: Compatibility\r\n  Fleeing: Compatibility\r\n\r\nService Commands:\r\n  Legacy service, outside Phase 2A\r\n\r\nDG Scripts:\r\n  External behavior authority; not arbitrated in Phase 2A\r\n\r\n%s%s%sQ) Return\r\nChoice: ",
-      mayor_locked ? "Legacy locked by Mayor special" : "Compatibility", mayor_locked ? "\r\n  " : "", mayor_locked ? why : "",
-      mayor_locked ? "AI ownership unavailable: legacy Mayor special must be migrated first.\r\n\r\n" : "",
-      "Ownership persistence/editing is deferred to Phase 2B; current values are compatibility defaults.\r\n", "");
-  OLC_MODE(d) = MEDIT_AI_DIAGNOSTICS;
+  struct mob_ai_config *c = OLC_MOB(d)->ai_config; char why[128]=""; int i, warnings=0;
+  if (!c) OLC_MOB(d)->ai_config = c = mob_ai_config_new();
+  write_to_output(d, "\r\nBehavior Ownership\r\n\r\nCompatibility Mode: Legacy Preserving\r\nGlobal Arbitration: %s\r\n\r\n", CONFIG_AI_LEGACY_ARBITRATION_ENABLED ? "Enabled" : "Disabled");
+  for (i=0;i<9;i++) { int di=mob_behavior_domain_index(medit_owner_domains[i]); write_to_output(d, " %d) %-32s %s\r\n", i+1, medit_owner_domain_label(medit_owner_domains[i]), mob_behavior_owner_name(c->behavior_owner[di])); }
+  if (!mob_behavior_mayor_ai_ownership_supported(OLC_MOB(d), LBD_MOVEMENT, why, sizeof(why))) { write_to_output(d, "\r\nLegacy special locks one or more domains. %s\r\n", why); warnings++; }
+  if (GET_MOB_SPEC(OLC_MOB(d)) && !legacy_special_metadata(GET_MOB_SPEC(OLC_MOB(d)))) { write_to_output(d, "Unknown custom special detected; unsafe overlapping ownership is locked.\r\n"); warnings++; }
+  if (OLC_MOB(d)->proto_script) write_to_output(d, "DG Script behavior is not controlled by Phase 2B ownership.\r\n");
+  write_to_output(d, "Service commands are outside Phase 2B arbitration.\r\nChanges apply to newly created instances after save.\r\nExisting live instances are not automatically refreshed.\r\nWarnings: %d\r\n\r\n R) Reset all to Compatibility\r\n D) Diagnostics / Explanation\r\n Q) Return\r\nChoice: ", warnings);
+  OLC_MODE(d)=MEDIT_AI_OWNERSHIP;
 }
 static void medit_disp_ai_help(struct descriptor_data *d, int return_mode, const char *title,
                                const char *explanation, const char *tips, const char *related)
@@ -227,6 +252,7 @@ static void medit_return_from_ai_help(struct descriptor_data *d)
     case MEDIT_AI_COMMUNICATION: medit_disp_ai_communication(d); break;
     case MEDIT_AI_INTELLIGENCE: medit_disp_ai_intelligence(d); break;
     case MEDIT_AI_DIAGNOSTICS: medit_disp_ai_diagnostics(d); break;
+    case MEDIT_AI_OWNERSHIP: medit_disp_ai_ownership(d); break;
     case MEDIT_AI_ADVANCED: medit_disp_ai_advanced(d); break;
     default: medit_disp_ai_menu(d); break;
   }
@@ -1735,6 +1761,25 @@ void medit_parse(struct descriptor_data *d, char *arg)
     if (LOWER(*arg) == 'p') { medit_disp_ai_preview(d); return; }
     if (LOWER(*arg) == 'd') { medit_disp_ai_compatibility(d); return; }
     medit_disp_ai_diagnostics(d); return;
+  case MEDIT_AI_OWNERSHIP:
+    if (LOWER(*arg) == 'q') { medit_disp_ai_menu(d); return; }
+    if (LOWER(*arg) == 'd') { medit_disp_ai_compatibility(d); return; }
+    if (LOWER(*arg) == 'r') { OLC_MODE(d)=MEDIT_AI_OWNERSHIP_RESET; write_to_output(d,"Reset all behavior ownership to Compatibility? (Y/N/Q): "); return; }
+    if (medit_parse_ai_integer(arg,1,9,&i)) { medit_owner_store(d,i-1); medit_disp_ai_ownership_value(d); return; }
+    write_to_output(d,"Invalid ownership choice.\r\n"); medit_disp_ai_ownership(d); return;
+  case MEDIT_AI_OWNERSHIP_VALUE: {
+    int idx=medit_owner_load(d), di; unsigned domain; enum mob_behavior_owner owner; char why[128]="";
+    if (LOWER(*arg)=='q') { medit_disp_ai_ownership(d); return; }
+    if (!medit_parse_ai_integer(arg,1,4,&i)) { write_to_output(d,"Choose 1, 2, 3, 4, or Q: "); return; }
+    domain=medit_owner_domains[idx]; di=mob_behavior_domain_index(domain); owner=(enum mob_behavior_owner)(i-1);
+    if (medit_owner_reject(d, domain, owner, why, sizeof(why))) { write_to_output(d,"%s\r\n", why); medit_disp_ai_ownership_value(d); return; }
+    if (!OLC_MOB(d)->ai_config) OLC_MOB(d)->ai_config=mob_ai_config_new();
+    if (OLC_MOB(d)->ai_config->behavior_owner[di] != owner) { OLC_MOB(d)->ai_config->behavior_owner[di]=owner; OLC_VAL(d)=1; }
+    medit_disp_ai_ownership(d); return; }
+  case MEDIT_AI_OWNERSHIP_RESET:
+    if (LOWER(*arg)=='q' || LOWER(*arg)=='n') { medit_disp_ai_ownership(d); return; }
+    if (LOWER(*arg)=='y') { int k; if (!OLC_MOB(d)->ai_config) OLC_MOB(d)->ai_config=mob_ai_config_new(); for(k=0;k<13;k++) OLC_MOB(d)->ai_config->behavior_owner[k]=MOB_BEHAVIOR_OWNER_COMPATIBILITY; OLC_VAL(d)=1; medit_disp_ai_ownership(d); return; }
+    write_to_output(d,"Confirm with Y, N, or Q: "); return;
   case MEDIT_AI_MENU:
     switch (LOWER(*arg)) {
       case 'q': medit_disp_menu(d); return;

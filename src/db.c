@@ -23,6 +23,7 @@
 #include "oasis.h"
 #include "dg_scripts.h"
 #include "ai_actor.h"
+#include "legacy_behavior.h"
 #include "dg_event.h"
 #include "act.h"
 #include "ban.h"
@@ -1699,6 +1700,19 @@ static void interpret_espec(const char *keyword, const char *value, int i, int n
     c->override_mask = mask;
     if (n == 28) { mob_ai_config_free(mob_proto[i].ai_config); mob_ai_config_validate(c); mob_proto[i].ai_config = c; return; }
     log("SYSERR: Bad AIConfig format in mob #%d", nr); mob_ai_config_free(c); return;
+  }
+  if (value && !str_cmp(keyword, "AIBehaviorOwner")) {
+    struct mob_ai_config *c = mob_proto[i].ai_config;
+    char domain_token[64], owner_token[64];
+    unsigned domain; int idx; enum mob_behavior_owner owner;
+    if (!c) mob_proto[i].ai_config = c = mob_ai_config_new();
+    if (!c || sscanf(value, "%63s %63s", domain_token, owner_token) != 2) { log("SYSERR: Bad AIBehaviorOwner format in mob #%d", nr); return; }
+    domain = mob_behavior_domain_from_token(domain_token);
+    if (!domain) { log("SYSERR: Unknown AIBehaviorOwner domain '%s' in mob #%d", domain_token, nr); return; }
+    idx = mob_behavior_domain_index(domain);
+    if (!mob_behavior_owner_from_token(owner_token, &owner)) { log("SYSERR: Unknown AIBehaviorOwner owner '%s' in mob #%d; using Compatibility", owner_token, nr); owner = MOB_BEHAVIOR_OWNER_COMPATIBILITY; }
+    if (idx >= 0) c->behavior_owner[idx] = owner;
+    return;
   }
   if (value && !str_cmp(keyword, "AIConfigTraits")) {
     struct mob_ai_config *c = mob_proto[i].ai_config;

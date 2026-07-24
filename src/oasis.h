@@ -379,6 +379,9 @@ extern const char *nrm, *grn, *cyn, *yel;
 #define MEDIT_AI_VOCAL_FREQUENCY             125
 #define MEDIT_AI_VOCAL_COOLDOWN              126
 #define MEDIT_AI_VOCAL_LIMIT                 127
+#define MEDIT_AI_OWNERSHIP                   134
+#define MEDIT_AI_OWNERSHIP_VALUE             135
+#define MEDIT_AI_OWNERSHIP_RESET             136
 
 /* Submodes of SEDIT connectedness. */
 #define SEDIT_MAIN_MENU              	0

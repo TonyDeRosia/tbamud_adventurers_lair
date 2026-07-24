@@ -70,7 +70,7 @@ const char *mob_behavior_domain_name(unsigned domain)
   }
 }
 
-static int domain_index(unsigned domain)
+int mob_behavior_domain_index(unsigned domain)
 {
   int i;
   for (i = 0; i < 13; i++)
@@ -93,6 +93,8 @@ void mob_behavior_context_init(struct mob_behavior_pulse_context *ctx, struct ch
     ctx->configured_owner[i] = ctx->effective_owner[i] = MOB_BEHAVIOR_OWNER_COMPATIBILITY;
   if (!mob)
     return;
+  if (mob->ai_config) for (i = 0; i < 13; i++)
+    ctx->configured_owner[i] = ctx->effective_owner[i] = mob->ai_config->behavior_owner[i];
   meta = legacy_special_metadata(GET_MOB_SPEC(mob));
   if (meta)
     ctx->legacy_special_domains = meta->domains;
@@ -111,7 +113,7 @@ void mob_behavior_context_init(struct mob_behavior_pulse_context *ctx, struct ch
     }
   }
   if (MOB_FLAGGED(mob, MOB_NOSLEEP) && mob->ai_config && mob->ai_config->schedule_enabled) {
-    i = domain_index(LBD_POSTURE);
+    i = mob_behavior_domain_index(LBD_POSTURE);
     snprintf(ctx->lock_reason[i], sizeof(ctx->lock_reason[i]), "NO_SLEEP conflict diagnosed; compatibility preserving");
   }
 }
@@ -126,9 +128,44 @@ int mob_behavior_context_has_explicit_owner(const struct mob_behavior_pulse_cont
   return FALSE;
 }
 
+
+unsigned mob_behavior_domain_from_token(const char *token)
+{
+  char buf[64]; int i, j=0;
+  if (!token) return 0;
+  for (i=0; token[i] && j < (int)sizeof(buf)-1; i++)
+    if (isalnum((unsigned char)token[i])) buf[j++] = LOWER(token[i]);
+  buf[j]=0;
+  if (!str_cmp(buf, "routine") || !str_cmp(buf, "time") || !str_cmp(buf, "timeactivity")) return LBD_ROUTINE;
+  if (!str_cmp(buf, "movement")) return LBD_MOVEMENT;
+  if (!str_cmp(buf, "posture")) return LBD_POSTURE;
+  if (!str_cmp(buf, "ambient") || !str_cmp(buf, "ambientcommunication") || !str_cmp(buf, "ambientspeech")) return LBD_AMBIENT_SPEECH;
+  if (!str_cmp(buf, "combat") || !str_cmp(buf, "combatinitiation")) return LBD_COMBAT_INIT;
+  if (!str_cmp(buf, "memory") || !str_cmp(buf, "memoryretaliation")) return LBD_MEMORY;
+  if (!str_cmp(buf, "helper") || !str_cmp(buf, "coordination") || !str_cmp(buf, "helpercoordination")) return LBD_HELPER;
+  if (!str_cmp(buf, "scavenging") || !str_cmp(buf, "object") || !str_cmp(buf, "objectinteraction") || !str_cmp(buf, "objecthandling")) return LBD_SCAVENGING;
+  if (!str_cmp(buf, "fleeing") || !str_cmp(buf, "flee")) return LBD_FLEE;
+  return 0;
+}
+
+int mob_behavior_owner_from_token(const char *token, enum mob_behavior_owner *owner)
+{
+  char buf[32]; int i, j=0;
+  if (!token || !owner) return FALSE;
+  for (i=0; token[i] && j < (int)sizeof(buf)-1; i++)
+    if (isalnum((unsigned char)token[i])) buf[j++] = LOWER(token[i]);
+  buf[j]=0;
+  if (!str_cmp(buf, "compatibility") || !str_cmp(buf, "compat")) *owner = MOB_BEHAVIOR_OWNER_COMPATIBILITY;
+  else if (!str_cmp(buf, "legacy")) *owner = MOB_BEHAVIOR_OWNER_LEGACY;
+  else if (!str_cmp(buf, "ai")) *owner = MOB_BEHAVIOR_OWNER_AI;
+  else if (!str_cmp(buf, "disabled") || !str_cmp(buf, "disable")) *owner = MOB_BEHAVIOR_OWNER_DISABLED;
+  else return FALSE;
+  return TRUE;
+}
+
 static int domain_available(const struct mob_behavior_pulse_context *ctx, unsigned domain, int ai)
 {
-  int i = domain_index(domain);
+  int i = mob_behavior_domain_index(domain);
   enum mob_behavior_owner owner;
   if (!ctx || !ctx->arbitration_enabled || i < 0) return TRUE;
   owner = ctx->effective_owner[i];
