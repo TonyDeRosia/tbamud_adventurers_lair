@@ -375,6 +375,10 @@ extern const char *nrm, *grn, *cyn, *yel;
 #define MEDIT_AI_COMMUNICATION             121
 #define MEDIT_AI_INTELLIGENCE               122
 #define MEDIT_AI_DIAGNOSTICS                 123
+#define MEDIT_AI_VOCAL_PRESENCE              124
+#define MEDIT_AI_VOCAL_FREQUENCY             125
+#define MEDIT_AI_VOCAL_COOLDOWN              126
+#define MEDIT_AI_VOCAL_LIMIT                 127
 
 /* Submodes of SEDIT connectedness. */
 #define SEDIT_MAIN_MENU              	0

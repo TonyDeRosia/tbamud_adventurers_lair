@@ -23,6 +23,9 @@
 #define AI_PATROL_WAYPOINT_MAX 16
 #define AI_DAY_MASK_ALL 0x7f
 
+/* Creature-sound policy is authored data; timers remain on each live actor. */
+enum ai_vocal_presence { AI_VOCAL_PRESENCE_NONE, AI_VOCAL_PRESENCE_PLAYER, AI_VOCAL_PRESENCE_AWAKE_PLAYER, AI_VOCAL_PRESENCE_VISIBLE_PLAYER, AI_VOCAL_PRESENCE_CHARACTER };
+
 enum mob_ai_profile_mode { MOB_AI_INFERRED = 0, MOB_AI_CUSTOM, MOB_AI_INFERRED_OVERRIDES };
 enum mob_ai_personality { AI_TRAIT_AGGRESSION, AI_TRAIT_BRAVERY, AI_TRAIT_SOCIABILITY, AI_TRAIT_CURIOSITY, AI_TRAIT_DISCIPLINE, AI_TRAIT_HONESTY, AI_TRAIT_GREED, AI_TRAIT_COMPASSION, AI_TRAIT_LOYALTY, AI_TRAIT_PATIENCE, AI_TRAIT_SUSPICION, AI_TRAIT_PRIDE };
 enum ai_social_style { AI_SOCIAL_SILENT, AI_SOCIAL_RESERVED, AI_SOCIAL_POLITE, AI_SOCIAL_FRIENDLY, AI_SOCIAL_TALKATIVE, AI_SOCIAL_BOASTFUL, AI_SOCIAL_RUDE, AI_SOCIAL_HOSTILE, AI_SOCIAL_EXTORTING, AI_SOCIAL_PREACHER, AI_SOCIAL_GOSSIP };
@@ -68,6 +71,8 @@ struct mob_ai_config {
   /* Full room sentences, deliberately separate from do_say dialogue. */
   int vocalization_count;
   char *vocalization[AI_VOCALIZATION_MAX_LINES];
+  int vocal_presence, vocal_frequency, vocal_cooldown_min, vocal_cooldown_max, vocal_room_limit;
+  unsigned int vocal_disabled_mask;
   int flee_hp_percent, surrender_hp_percent, assist_enabled, call_help_enabled, hunt_enabled, return_home, stay_zone;
   int notice_entry, notice_departure, notice_speech, notice_whispers, notice_emotes, notice_combat, notice_self_attack, notice_ally_attack, notice_corpses, notice_drops, notice_gifts, notice_crimes;
   int hearing_sensitivity, observation_sensitivity, suspicion_threshold, recognition_confidence;
@@ -390,6 +395,7 @@ struct ai_actor_state {
   time_t schedule_started_at, last_schedule_eval, last_schedule_move, schedule_wait_until, schedule_retry_at;
   time_t next_random_move;
   time_t last_vocalization, next_vocalization;
+  int vocal_room_count, vocal_room_vnum, last_vocalization_index;
   int last_tick_result, last_idle_action, last_move_result, last_vocalization_result;
   char last_blocked_reason[32];
 };
