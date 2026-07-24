@@ -8,6 +8,7 @@
 #include "handler.h"
 #include "interpreter.h"
 #include "ai_actor.h"
+#include "legacy_behavior.h"
 #include "ai_actor_brain.h"
 #include "npc_social_ai.h"
 #include "fight.h"
@@ -75,7 +76,7 @@ int ai_actor_compatibility_warning_count(const struct char_data *mob)
     for (j = 1; j < c->patrols[i].waypoint_count; j++)
       if (real_room(c->patrols[i].waypoints[j - 1].room_vnum) != NOWHERE && real_room(c->patrols[i].waypoints[j].room_vnum) != NOWHERE &&
           world[real_room(c->patrols[i].waypoints[j - 1].room_vnum)].zone != world[real_room(c->patrols[i].waypoints[j].room_vnum)].zone && MOB_FLAGGED(mob, MOB_STAY_ZONE)) warnings++;
-  return warnings;
+  return warnings + legacy_behavior_warning_count(mob);
 }
 
 void ai_actor_compatibility_report(const struct char_data *mob, char *out, size_t size, int detailed)
@@ -135,6 +136,9 @@ void ai_actor_compatibility_report(const struct char_data *mob, char *out, size_
 
   warnings = ai_actor_compatibility_warning_count(mob);
   ai_compat_add(out, size, "\r\nBuilder Warnings\r\n----------------\r\n\r\n");
+  ai_compat_add(out, size, "LEGACY INTEGRATION\r\n------------------\r\n");
+  legacy_behavior_summary(mob, out + strlen(out), size - strlen(out), TRUE);
+  ai_compat_add(out, size, "\r\n");
   if (!warnings && !MOB_FLAGGED(mob, MOB_MEMORY) && !MOB_FLAGGED(mob, MOB_HELPER) && !MOB_FLAGGED(mob, MOB_AGGRESSIVE) && !MOB_FLAGGED(mob, MOB_AGGR_GOOD) && !MOB_FLAGGED(mob, MOB_AGGR_EVIL) && !MOB_FLAGGED(mob, MOB_AGGR_NEUTRAL)) ai_compat_add(out, size, "None\r\n");
   if (MOB_FLAGGED(mob, MOB_MEMORY)) ai_compat_add(out, size, "WARNING  Legacy MEMORY normally will not run.\r\n");
   if (MOB_FLAGGED(mob, MOB_HELPER)) ai_compat_add(out, size, "WARNING  Legacy HELPER normally will not run.\r\n");

@@ -31,6 +31,7 @@ SPECIAL(guild);
 #include "fight.h"
 #include "modify.h"      /* for smash_tilde */
 #include "ai_actor.h"
+#include "legacy_behavior.h"
 
 #define AI_MEDIT_CLAMP(v, lo, hi) ((v) < (lo) ? (lo) : ((v) > (hi) ? (hi) : (v)))
 
@@ -998,6 +999,12 @@ static void medit_disp_menu(struct descriptor_data *d)
     if (warnings) snprintf(ai_status, sizeof(ai_status), "Enabled [%d compatibility warnings]", warnings);
   } else strlcpy(ai_status, "Disabled -- select I to enable AI Actor behavior", sizeof(ai_status));
 
+  {
+    char legacy[MAX_STRING_LENGTH];
+    legacy_behavior_summary(mob, legacy, sizeof(legacy), FALSE);
+    write_to_output(d, "\r\n%s\r\n", legacy);
+  }
+
   write_to_output(d,
   "-- Mob Number:  [%s%d%s]\r\n"
   "%s1%s) Sex: %s%-7.7s%s	         %s2%s) Keywords: %s%s\r\n"
@@ -1025,7 +1032,7 @@ static void medit_disp_menu(struct descriptor_data *d)
           "%sP%s) Pet Price : %s%s\r\n"
           "%sR%s) Loadout / Loot\r\n"
           "%sI%s) AI Actor Configuration: %s%s%s\r\n"
-          "%sS%s) Script    : %s%s\r\n"
+          "%sS%s) DG Scripts: %s%s\r\n"
           "%sW%s) Copy mob\r\n"
           "%sX%s) Delete mob\r\n"
 	  "%sQ%s) Quit\r\n"
