@@ -371,6 +371,10 @@ extern const char *nrm, *grn, *cyn, *yel;
 #define MEDIT_AI_PATROL_WAYPOINT_VALUE    106
 #define MEDIT_AI_PATROL_WAYPOINT_ACTION   107
 #define MEDIT_AI_PATROL_WAYPOINT_DELETE   108
+#define MEDIT_AI_ADVANCED                  120
+#define MEDIT_AI_COMMUNICATION             121
+#define MEDIT_AI_INTELLIGENCE               122
+#define MEDIT_AI_DIAGNOSTICS                 123
 
 /* Submodes of SEDIT connectedness. */
 #define SEDIT_MAIN_MENU              	0
