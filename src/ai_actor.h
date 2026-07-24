@@ -407,7 +407,8 @@ struct ai_actor_state {
   /* Transient route ownership: directions are per live NPC and are never saved. */
   int routine_target_vnum, routine_route[AI_ROUTINE_ROUTE_MAX], routine_route_len, routine_route_pos;
   int routine_last_destination, routine_purpose, routine_late;
-  time_t routine_next_move, routine_wait_until, routine_retry_at, routine_planned_departure;
+  time_t routine_next_move, routine_wait_until, routine_retry_at, routine_planned_departure, routine_estimated_arrival;
+  int routine_schedule_id, routine_timing_policy, routine_arrival_done;
   time_t last_vocalization, next_vocalization;
   int vocal_room_count, vocal_room_vnum, last_vocalization_index;
   int last_tick_result, last_idle_action, last_move_result, last_vocalization_result;

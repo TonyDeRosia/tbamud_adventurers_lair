@@ -569,4 +569,11 @@ void print_zone(struct char_data *ch, zone_rnum rnum);
 ACMD(do_oasis_links);
 ACMD(do_oasis_list);
 
+#define MEDIT_AI_ROUTINE_RANDOM          128
+#define MEDIT_AI_ROUTINE_RANDOM_ENTRY    129
+#define MEDIT_AI_ROUTINE_RANDOM_VNUM     130
+#define MEDIT_AI_ROUTINE_WAIT             131
+#define MEDIT_AI_ROUTINE_MODE             132
+#define MEDIT_AI_ROUTINE_TIMING           133
+
 #endif /* _OASIS_H_ */
