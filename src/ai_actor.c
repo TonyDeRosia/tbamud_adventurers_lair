@@ -66,6 +66,10 @@ int ai_actor_compatibility_warning_count(const struct char_data *mob)
   if (MOB_FLAGGED(mob, MOB_SENTINEL) && c->schedule_enabled) warnings++;
   if (MOB_FLAGGED(mob, MOB_SENTINEL) && MOB_FLAGGED(mob, MOB_WIMPY)) warnings++;
   if (c->hunt_enabled) warnings++;
+  if (c->movement == AI_MOVE_RANDOM && MOB_FLAGGED(mob, MOB_SENTINEL)) warnings++;
+  if (mob->ai_prof && mob->ai_prof->communication == AI_COMM_NONE) { for (i = 0; i < AI_DIALOGUE_CATEGORIES; i++) if (c->dialogue_count[i]) { warnings++; break; } }
+  if (mob->ai_prof && mob->ai_prof->communication == AI_COMM_VOCALIZE) { for (i = 0; i < AI_DIALOGUE_CATEGORIES; i++) if (c->dialogue_count[i]) { warnings++; break; } }
+  if (mob->ai_prof && mob->ai_prof->communication == AI_COMM_TELEPATHY) warnings++;
   if (c->mode == MOB_AI_INFERRED_OVERRIDES && !c->override_mask) warnings++;
   for (i = 0; i < c->patrol_count; i++)
     for (j = 1; j < c->patrols[i].waypoint_count; j++)
@@ -142,12 +146,17 @@ void ai_actor_compatibility_report(const struct char_data *mob, char *out, size_
   if (mob->ai_prof && mob->ai_prof->communication == AI_COMM_VOCALIZE && (!c || !c->vocalization_count)) ai_compat_add(out, size, "INFO  Vocalize is effective but no creature vocalization lines are authored.\r\n");
   if (mob->ai_prof && mob->ai_prof->communication == AI_COMM_NONE) { int lines=0; for (i=0;c && i<AI_DIALOGUE_CATEGORIES;i++) lines += c->dialogue_count[i]; if (lines) ai_compat_add(out, size, "WARNING  Dialogue lines are configured but Communication=None blocks delivery.\r\n"); }
   if (mob->ai_prof && mob->ai_prof->communication == AI_COMM_VOCALIZE) { int lines=0; for (i=0;c && i<AI_DIALOGUE_CATEGORIES;i++) lines += c->dialogue_count[i]; if (lines) ai_compat_add(out, size, "WARNING  Normal dialogue lines are not used by Vocalize actors.\r\n"); }
-  if (mob->ai_prof && mob->ai_prof->communication == AI_COMM_TELEPATHY) ai_compat_add(out, size, "UNSUPPORTED  Telepathy delivery is not implemented; ordinary speech is blocked.\r\n");
+  if (mob->ai_prof && mob->ai_prof->communication == AI_COMM_TELEPATHY) ai_compat_add(out, size, "WARNING  Telepathy delivery is not implemented; ordinary speech is blocked.\r\n");
   if (c && c->movement == AI_MOVE_RANDOM && MOB_FLAGGED(mob,MOB_SENTINEL)) ai_compat_add(out, size, "WARNING  SENTINEL blocks Random local movement.\r\n");
 
   if (c && c->mode == MOB_AI_INFERRED_OVERRIDES && !c->override_mask) ai_compat_add(out, size, "WARNING  Overrides mode has no active supported settings.\r\n");
-  for (i = 0; c && i < c->patrol_count; i++)
+  for (i = 0; c && i < c->patrol_count; i++) {
+    int j;
+    for (j = 1; j < c->patrols[i].waypoint_count; j++)
+      if (real_room(c->patrols[i].waypoints[j - 1].room_vnum) != NOWHERE && real_room(c->patrols[i].waypoints[j].room_vnum) != NOWHERE && world[real_room(c->patrols[i].waypoints[j - 1].room_vnum)].zone != world[real_room(c->patrols[i].waypoints[j].room_vnum)].zone && MOB_FLAGGED(mob, MOB_STAY_ZONE))
+        ai_compat_add(out, size, "WARNING  STAY_ZONE blocks patrol route %d across zone boundaries.\r\n", c->patrols[i].id);
     if (c->patrols[i].waypoint_count > 1) { ai_compat_add(out, size, "INFO  Patrol movement only works between adjacent rooms.\r\n"); break; }
+  }
   ai_compat_add(out, size, "\r\nHelp\r\n----\r\n\r\nH) Technical reference   Q) Return\r\n");
 }
 
