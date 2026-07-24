@@ -52,28 +52,30 @@ const char *mob_behavior_owner_name(int owner)
   return owner >= MOB_BEHAVIOR_OWNER_COMPATIBILITY && owner <= MOB_BEHAVIOR_OWNER_DISABLED ? names[owner] : "Compatibility";
 }
 
-const char *mob_behavior_domain_name(unsigned domain)
-{
-  switch (domain) {
-  case LBD_ROUTINE: return "Routine";
-  case LBD_MOVEMENT: return "Movement";
-  case LBD_POSTURE: return "Posture";
-  case LBD_AMBIENT_SPEECH: return "Ambient Communication";
-  case LBD_COMBAT_INIT: return "Combat Initiation";
-  case LBD_MEMORY: return "Memory Retaliation";
-  case LBD_HELPER: return "Helper/Coordination";
-  case LBD_SCAVENGING: return "Scavenging";
-  case LBD_FLEE: return "Fleeing";
-  case LBD_SERVICE: return "Service Commands";
-  case LBD_SCRIPT: return "DG Scripts";
-  default: return "Unknown";
-  }
-}
+struct behavior_domain_definition { unsigned mask; const char *display; const char *token; int editable; };
+static const struct behavior_domain_definition behavior_domains[MOB_BEHAVIOR_DOMAIN_COUNT] = {
+ {LBD_SERVICE,"Service Commands","Service",FALSE}, {LBD_ROUTINE,"Routine","Routine",TRUE},
+ {LBD_MOVEMENT,"Movement","Movement",TRUE}, {LBD_POSTURE,"Posture","Posture",TRUE},
+ {LBD_AMBIENT_SPEECH,"Ambient Communication","AmbientCommunication",TRUE},
+ {LBD_COMBAT_INIT,"Combat Initiation","CombatInitiation",TRUE},
+ {LBD_COMBAT_TACTICS,"Combat Tactics","CombatTactics",FALSE},
+ {LBD_SCAVENGING,"Scavenging","Scavenging",TRUE}, {LBD_DOORS,"Door Interaction","Doors",FALSE},
+ {LBD_SCRIPT,"DG Scripts","DGScript",FALSE}, {LBD_MEMORY,"Memory Retaliation","MemoryRetaliation",TRUE},
+ {LBD_HELPER,"Helper/Coordination","HelperCoordination",TRUE}, {LBD_FLEE,"Fleeing","Fleeing",TRUE}
+};
+static const unsigned editable_domains[MOB_BEHAVIOR_EDITABLE_DOMAIN_COUNT] = {
+ LBD_ROUTINE,LBD_MOVEMENT,LBD_POSTURE,LBD_AMBIENT_SPEECH,LBD_COMBAT_INIT,LBD_MEMORY,LBD_HELPER,LBD_SCAVENGING,LBD_FLEE
+};
+_Static_assert(sizeof(behavior_domains)/sizeof(behavior_domains[0]) == MOB_BEHAVIOR_DOMAIN_COUNT, "domain table/count mismatch");
+_Static_assert(sizeof(editable_domains)/sizeof(editable_domains[0]) == MOB_BEHAVIOR_EDITABLE_DOMAIN_COUNT, "editable table/count mismatch");
+const char *mob_behavior_domain_name(unsigned domain) { int i=mob_behavior_domain_index(domain); return i>=0?behavior_domains[i].display:"Unknown"; }
+const char *mob_behavior_domain_token(unsigned domain) { int i=mob_behavior_domain_index(domain); return i>=0?behavior_domains[i].token:NULL; }
+unsigned mob_behavior_editable_domain(unsigned index) { return index<MOB_BEHAVIOR_EDITABLE_DOMAIN_COUNT?editable_domains[index]:0; }
 
 int mob_behavior_domain_index(unsigned domain)
 {
   int i;
-  for (i = 0; i < 13; i++)
+  for (i = 0; i < MOB_BEHAVIOR_DOMAIN_COUNT; i++)
     if (domain == (1U << i))
       return i;
   return -1;
@@ -89,11 +91,11 @@ void mob_behavior_context_init(struct mob_behavior_pulse_context *ctx, struct ch
   ctx->mob = mob;
   ctx->compatibility_mode = MOB_BEHAVIOR_COMPAT_LEGACY_PRESERVING;
   ctx->arbitration_enabled = enabled;
-  for (i = 0; i < 13; i++)
+  for (i = 0; i < MOB_BEHAVIOR_DOMAIN_COUNT; i++)
     ctx->configured_owner[i] = ctx->effective_owner[i] = MOB_BEHAVIOR_OWNER_COMPATIBILITY;
   if (!mob)
     return;
-  if (mob->ai_config) for (i = 0; i < 13; i++)
+  if (mob->ai_config) for (i = 0; i < MOB_BEHAVIOR_DOMAIN_COUNT; i++)
     ctx->configured_owner[i] = ctx->effective_owner[i] = mob->ai_config->behavior_owner[i];
   meta = legacy_special_metadata(GET_MOB_SPEC(mob));
   if (meta)
@@ -107,7 +109,7 @@ void mob_behavior_context_init(struct mob_behavior_pulse_context *ctx, struct ch
   if (MOB_FLAGGED(mob, MOB_WIMPY)) ctx->legacy_tail_domains |= LBD_FLEE;
   if (GET_MOB_SPEC(mob) && !meta && enabled) {
     ctx->unknown_special_locks = MOB_BEHAVIOR_PHASE2A_DOMAINS;
-    for (i = 0; i < 13; i++) if (ctx->unknown_special_locks & (1U << i)) {
+    for (i = 0; i < MOB_BEHAVIOR_DOMAIN_COUNT; i++) if (ctx->unknown_special_locks & (1U << i)) {
       ctx->effective_owner[i] = MOB_BEHAVIOR_OWNER_LEGACY;
       snprintf(ctx->lock_reason[i], sizeof(ctx->lock_reason[i]), "Unknown custom special: conservative legacy lock");
     }
@@ -122,7 +124,7 @@ int mob_behavior_context_has_explicit_owner(const struct mob_behavior_pulse_cont
 {
   int i;
   if (!ctx) return FALSE;
-  for (i = 0; i < 13; i++)
+  for (i = 0; i < MOB_BEHAVIOR_DOMAIN_COUNT; i++)
     if (ctx->configured_owner[i] != MOB_BEHAVIOR_OWNER_COMPATIBILITY)
       return TRUE;
   return FALSE;
@@ -132,19 +134,17 @@ int mob_behavior_context_has_explicit_owner(const struct mob_behavior_pulse_cont
 unsigned mob_behavior_domain_from_token(const char *token)
 {
   char buf[64]; int i, j=0;
-  if (!token) return 0;
+  if (!token || !*token) return 0;
   for (i=0; token[i] && j < (int)sizeof(buf)-1; i++)
     if (isalnum((unsigned char)token[i])) buf[j++] = LOWER(token[i]);
+  if (token[i]) return 0;
   buf[j]=0;
-  if (!str_cmp(buf, "routine") || !str_cmp(buf, "time") || !str_cmp(buf, "timeactivity")) return LBD_ROUTINE;
-  if (!str_cmp(buf, "movement")) return LBD_MOVEMENT;
-  if (!str_cmp(buf, "posture")) return LBD_POSTURE;
-  if (!str_cmp(buf, "ambient") || !str_cmp(buf, "ambientcommunication") || !str_cmp(buf, "ambientspeech")) return LBD_AMBIENT_SPEECH;
-  if (!str_cmp(buf, "combat") || !str_cmp(buf, "combatinitiation")) return LBD_COMBAT_INIT;
-  if (!str_cmp(buf, "memory") || !str_cmp(buf, "memoryretaliation")) return LBD_MEMORY;
-  if (!str_cmp(buf, "helper") || !str_cmp(buf, "coordination") || !str_cmp(buf, "helpercoordination")) return LBD_HELPER;
-  if (!str_cmp(buf, "scavenging") || !str_cmp(buf, "object") || !str_cmp(buf, "objectinteraction") || !str_cmp(buf, "objecthandling")) return LBD_SCAVENGING;
-  if (!str_cmp(buf, "fleeing") || !str_cmp(buf, "flee")) return LBD_FLEE;
+  for (i=0; i<MOB_BEHAVIOR_DOMAIN_COUNT; i++) {
+    char canonical[64]; int k, n=0;
+    for (k=0; behavior_domains[i].token[k]; k++) canonical[n++]=LOWER(behavior_domains[i].token[k]);
+    canonical[n]=0;
+    if (!str_cmp(buf,canonical)) return behavior_domains[i].mask;
+  }
   return 0;
 }
 

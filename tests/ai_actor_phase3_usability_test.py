@@ -12,7 +12,8 @@ for token in ('Notice Entry', 'Recognition', 'Memory Enabled', 'Remember Attacks
     assert token in m, token
 # Refactored audited editors use strict conversion helpers, not atoi.
 for mode in ('MEDIT_AI_MEMORY_VALUE', 'MEDIT_AI_COMBAT_VALUE', 'MEDIT_AI_PERCEPTION_VALUE'):
-    section = m[m.index('case ' + mode):]
+    parser = m[m.index('void medit_parse('):]
+    section = parser[parser.index('case ' + mode):]
     assert 'medit_parse_ai_integer' in section[:2500]
 assert 'strtol(arg, &end, 10)' in m
 assert 'ai_actor_schedule_validate' in r

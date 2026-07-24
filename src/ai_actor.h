@@ -1,4 +1,7 @@
 #ifndef _AI_ACTOR_H_
+#ifndef MOB_BEHAVIOR_DOMAIN_COUNT
+#define MOB_BEHAVIOR_DOMAIN_COUNT 13
+#endif
 #define _AI_ACTOR_H_
 
 #include <stdint.h>
@@ -96,7 +99,7 @@ struct mob_ai_config {
   int avoid_incapacitated, retaliate_self, retaliate_ally, retaliate_hostile, switch_targets;
   int assist_severity, target_switch_threshold, max_allies, max_responders, combat_cooldown;
   int target_weight[AI_TARGET_WEIGHTS];
-  int behavior_owner[13];
+  int behavior_owner[MOB_BEHAVIOR_DOMAIN_COUNT];
 };
 
 /* Builder-facing, read-only explanation of the currently audited runtime.

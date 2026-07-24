@@ -2,7 +2,7 @@ from pathlib import Path
 root = Path(__file__).resolve().parents[1]
 read = lambda p: (root / p).read_text()
 h = read('src/ai_actor.h'); lb = read('src/legacy_behavior.c'); db = read('src/db.c'); gen = read('src/genmob.c'); medit = read('src/medit.c'); oasis = read('src/oasis.h'); mobact = read('src/mobact.c')
-assert 'behavior_owner[13]' in h
+assert 'behavior_owner[MOB_BEHAVIOR_DOMAIN_COUNT]' in h
 assert 'AIBehaviorOwner' in db and 'AIBehaviorOwner' in gen
 assert 'mob_behavior_domain_from_token' in lb and 'mob_behavior_owner_from_token' in lb
 assert 'MEDIT_AI_OWNERSHIP' in oasis and 'MEDIT_AI_OWNERSHIP_VALUE' in oasis and 'MEDIT_AI_OWNERSHIP_RESET' in oasis
