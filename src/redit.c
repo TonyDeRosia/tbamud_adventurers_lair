@@ -934,7 +934,8 @@ void redit_parse(struct descriptor_data *d, char *arg)
 
   case OLC_SCRIPT_EDIT:
     if (dg_script_edit_parse(d, arg)) return;
-    break;
+    redit_disp_menu(d);
+    return;
 
   case REDIT_NAME:
     if (!genolc_checkstring(d, arg))

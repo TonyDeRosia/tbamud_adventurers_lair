@@ -78,6 +78,10 @@ static void medit_disp_mob_flags(struct descriptor_data *d);
 static void medit_disp_aff_flags(struct descriptor_data *d);
 static void medit_disp_menu(struct descriptor_data *d);
 static void medit_disp_ai_menu(struct descriptor_data *d);
+static void medit_disp_legacy_menu(struct descriptor_data *d);
+static void medit_disp_legacy_special(struct descriptor_data *d);
+static void medit_disp_legacy_preview(struct descriptor_data *d);
+static void medit_disp_legacy_diagnostics(struct descriptor_data *d);
 static void medit_disp_behavior_general(struct descriptor_data *d);
 static void medit_disp_behavior_movement(struct descriptor_data *d);
 static void medit_disp_behavior_combat(struct descriptor_data *d);
@@ -1034,11 +1038,11 @@ static void medit_disp_behavior_general(struct descriptor_data *d)
 
 static void medit_disp_behavior_movement(struct descriptor_data *d)
 {
-  struct char_data *m=OLC_MOB(d); struct mob_ai_config *c=m->ai_config;
+  struct char_data *m=OLC_MOB(d);
   const struct legacy_special_metadata *meta=legacy_special_metadata(GET_MOB_SPEC(m));
-  write_to_output(d,"\r\nMovement & Routine\r\n------------------\r\n1) Wandering              : %s\r\n2) Remain in spawn room   : %s\r\n3) Stay inside zone       : %s\r\n4) Daily routine          : %s\r\n5) Movement style         : %s\r\n6) Destination travel and patrol routes\r\n",
+  write_to_output(d,"\r\nLegacy Movement and Wandering\r\n-----------------------------\r\n1) Wandering (SENTINEL)   : %s\r\n2) Remain in spawn room   : %s\r\n3) Stay inside zone       : %s\r\n\r\nmobile_activity() and these canonical NPC flags are authoritative.\r\n",
     MOB_FLAGGED(m,MOB_SENTINEL)?"Prevented":"Allowed",MOB_FLAGGED(m,MOB_SENTINEL)?"Yes":"No",
-    MOB_FLAGGED(m,MOB_STAY_ZONE)?"Yes":"No",c->schedule_enabled?"Active":(c->schedule_count||c->patrol_count?"Authored, inactive":"None"),ai_actor_config_movement_name(c->movement));
+    MOB_FLAGGED(m,MOB_STAY_ZONE)?"Yes":"No");
   if(meta && (meta->domains&(LBD_MOVEMENT|LBD_ROUTINE)))
     write_to_output(d,"\r\nLocked routine\r\n  Current: %s route logic\r\n  Status: Locked\r\n  Reason: Uses hard-coded route logic.\r\n  Future: Editable after that special is migrated.\r\n",meta->name);
   write_to_output(d,"\r\nQ) Return\r\nChoice: "); OLC_MODE(d)=MEDIT_BEHAVIOR_MOVEMENT;
@@ -1047,7 +1051,7 @@ static void medit_disp_behavior_movement(struct descriptor_data *d)
 static void medit_disp_behavior_combat(struct descriptor_data *d)
 {
   struct char_data *m=OLC_MOB(d);
-  write_to_output(d,"\r\nCombat Behavior\r\n---------------\r\n1) Aggressive to anyone : %s\r\n2) Aggressive to evil   : %s\r\n3) Aggressive to good   : %s\r\n4) Aggressive to neutral: %s\r\n5) Helps allies         : %s\r\n6) Flees when hurt      : %s\r\n7) Combat reactions, style, spellcasting and target selection\r\n8) Threat escalation\r\n\r\nQ) Return\r\nChoice: ",MOB_FLAGGED(m,MOB_AGGRESSIVE)?"Yes":"No",MOB_FLAGGED(m,MOB_AGGR_EVIL)?"Yes":"No",MOB_FLAGGED(m,MOB_AGGR_GOOD)?"Yes":"No",MOB_FLAGGED(m,MOB_AGGR_NEUTRAL)?"Yes":"No",MOB_FLAGGED(m,MOB_HELPER)?"Yes":"No",MOB_FLAGGED(m,MOB_WIMPY)?"Yes":"No");
+  write_to_output(d,"\r\nLegacy Combat Behavior\r\n----------------------\r\n1) Aggressive to anyone : %s\r\n2) Aggressive to evil   : %s\r\n3) Aggressive to good   : %s\r\n4) Aggressive to neutral: %s\r\n5) Helps allies         : %s\r\n6) Flees when hurt      : %s\r\n\r\nThese choices edit the canonical NPC flag bits used by mobile_activity().\r\n\r\nQ) Return\r\nChoice: ",MOB_FLAGGED(m,MOB_AGGRESSIVE)?"Yes":"No",MOB_FLAGGED(m,MOB_AGGR_EVIL)?"Yes":"No",MOB_FLAGGED(m,MOB_AGGR_GOOD)?"Yes":"No",MOB_FLAGGED(m,MOB_AGGR_NEUTRAL)?"Yes":"No",MOB_FLAGGED(m,MOB_HELPER)?"Yes":"No",MOB_FLAGGED(m,MOB_WIMPY)?"Yes":"No");
   OLC_MODE(d)=MEDIT_BEHAVIOR_COMBAT;
 }
 
@@ -1098,8 +1102,9 @@ static void medit_disp_menu(struct descriptor_data *d)
           "%sB%s) AFF Flags : %s%s\r\n"
           "%sP%s) Pet Price : %s%s\r\n"
           "%sR%s) Loadout / Loot\r\n"
-          "%sI%s) NPC Behavior\r\n"
           "%sS%s) DG Scripts: %s%s\r\n"
+          "%sL%s) Legacy Behavior\r\n"
+          "%sI%s) AI Actor Extensions (optional)\r\n"
           "%sW%s) Copy mob\r\n"
           "%sX%s) Delete mob\r\n"
 	  "%sQ%s) Quit\r\n"
@@ -1113,8 +1118,9 @@ static void medit_disp_menu(struct descriptor_data *d)
           grn, nrm, cyn, flag2,
           grn, nrm, yel, price_buf,
           grn, nrm,
-          grn, nrm,
           grn, nrm, cyn, OLC_SCRIPT(d) ?"Set.":"Not Set.",
+          grn, nrm,
+          grn, nrm,
           grn, nrm,
           grn, nrm,
 	  grn, nrm
@@ -1189,18 +1195,9 @@ static void medit_disp_ai_vocalization_entry(struct descriptor_data *d)
 
 static void medit_disp_ai_preview(struct descriptor_data *d)
 {
-  struct mob_ai_config *c = OLC_MOB(d)->ai_config;
-  int spoken = 0, i;
-  for (i = 0; i < AI_DIALOGUE_CATEGORIES; i++) spoken += c->dialogue_count[i];
-  write_to_output(d, "\r\nThis NPC...\r\n-----------\r\n\r\nCommunicates: %s\r\n\r\nThinks: %s\r\n\r\nMemory: %s\r\n\r\nAllies: %s\r\n\r\nMovement\r\n  Uses normal MEDIT movement rules%s\r\n\r\nDaily routine: %s\r\n\r\nDialogue\r\n  %d spoken lines\r\n  %d creature sounds\r\n\r\nCombat\r\n  %s\r\n\r\nRestrictions\r\n  %s%s\r\n\r\nWarnings\r\n  %s\r\n\r\nPress ENTER to return. ",
-    medit_ai_communication_summary(c), medit_ai_intelligence_summary(c),
-    c->memory_enabled ? "Remembers attackers and familiar threats" : "No AI memory is enabled",
-    c->may_assist ? "Helps eligible allies" : "Defends itself without ally assistance",
-    c->schedule_enabled ? "; schedule overrides movement during active routine entries" : "",
-    c->schedule_enabled ? "Enabled" : "Disabled", spoken, c->vocalization_count,
-    c->combat_enabled ? "Defends itself and uses configured reactions" : "Combat reactions are disabled",
-    MOB_FLAGGED(OLC_MOB(d), MOB_SENTINEL) ? "SENTINEL active" : "No SENTINEL restriction", MOB_FLAGGED(OLC_MOB(d), MOB_STAY_ZONE) ? "; STAY_ZONE active" : "",
-    ai_actor_compatibility_warning_count(OLC_MOB(d)) ? "See Diagnostics for actionable warnings" : "None");
+  char preview[MAX_STRING_LENGTH];
+  legacy_behavior_effective_preview(OLC_MOB(d),preview,sizeof(preview));
+  write_to_output(d,"\r\n%s\r\nAI extension detail is intentionally subordinate to the effective legacy sources above.\r\nPress ENTER to return. ",preview);
   OLC_MODE(d) = MEDIT_AI_HELP;
   if (OLC_STORAGE(d)) free(OLC_STORAGE(d));
   CREATE(OLC_STORAGE(d), char, 24); snprintf(OLC_STORAGE(d), 24, "help %d", MEDIT_AI_MENU);
@@ -1208,11 +1205,54 @@ static void medit_disp_ai_preview(struct descriptor_data *d)
 
 static void medit_disp_ai_menu(struct descriptor_data *d)
 {
-  struct mob_ai_config *c = OLC_MOB(d)->ai_config;
-  if (!c) OLC_MOB(d)->ai_config = c = mob_ai_config_new();
-  write_to_output(d, "\r\n                         NPC Behavior\r\n\r\n1) General Behavior\r\n2) Movement & Routine\r\n3) Communication                  : %s\r\n4) Awareness & Senses\r\n5) Memory & Relationships\r\n6) Combat Behavior\r\n7) Object Interaction\r\n8) Creature Sounds\r\n9) Advanced Behavior\r\nD) Diagnostics & Sources          : %s\r\nP) Preview Everything This NPC Can Do\r\nQ) Return\r\nChoice: ",medit_ai_communication_summary(c),ai_actor_compatibility_warning_count(OLC_MOB(d))?"Warnings present":"Ready");
+  const struct legacy_special_metadata *meta;
+  int scripts;
+  if (!OLC_MOB(d)->ai_config) OLC_MOB(d)->ai_config = mob_ai_config_new();
+  meta=legacy_special_metadata(GET_MOB_SPEC(OLC_MOB(d)));
+  scripts=legacy_behavior_script_count(OLC_MOB(d));
+  write_to_output(d, "\r\nAI Actor Extensions\r\n-------------------\r\n\r\nOptional additions only; NPC flags, specials, shops, and DG Scripts remain authoritative.\r\n\r\n1) Personality                 : Available\r\n2) Identity / Role             : Available\r\n3) Advanced Perception         : Available\r\n\r\nMovement Schedule              : %s\r\nTimed Speech                   : %s\r\nDynamic Dialogue               : %s\r\nDoor Interaction               : %s\r\nCombat Targeting               : %s\r\nScavenging                     : %s\r\nMemory                         : %s\r\nAssistance                     : Unavailable - HELPER flag authoritative\r\nFleeing                        : Unavailable - WIMPY flag authoritative\r\n\r\nD) Diagnostics & Sources       : %s\r\nP) Preview AI Extensions\r\nQ) Return\r\nChoice: ",
+    (meta&&(meta->domains&(LBD_MOVEMENT|LBD_ROUTINE)))?"Unavailable - owned by special":"Unavailable - legacy flags/mobile_activity() authoritative",
+    (meta&&(meta->domains&LBD_AMBIENT_SPEECH))?"Unavailable - owned by special":(scripts?"Unavailable - owned by DG Scripts":"Available"),
+    (scripts||(meta&&(meta->domains&LBD_AMBIENT_SPEECH)))?"Unavailable - owned by legacy source":"Available only through audited future extension",
+    (meta&&(meta->domains&LBD_DOORS))?"Unavailable - owned by special":"Unavailable - no additive editor",
+    (meta&&(meta->domains&(LBD_COMBAT_INIT|LBD_COMBAT_TACTICS)))?"Unavailable - owned by special":"Unavailable - legacy flags authoritative",
+    (meta&&(meta->domains&LBD_SCAVENGING))?"Unavailable - owned by special":"Unavailable - SCAVENGER flag authoritative",
+    MOB_FLAGGED(OLC_MOB(d),MOB_MEMORY)?"Extended only; NPC MEMORY flag is base":"Relationship nuance only",
+    ai_actor_compatibility_warning_count(OLC_MOB(d))?"Warnings present":"Ready");
   OLC_MODE(d) = MEDIT_AI_MENU;
 }
+
+static void medit_disp_legacy_menu(struct descriptor_data *d)
+{
+  struct char_data *m=OLC_MOB(d); const struct legacy_special_metadata *meta=legacy_special_metadata(GET_MOB_SPEC(m));
+  int scripts=legacy_behavior_script_count(m);
+  write_to_output(d,"\r\nLegacy Behavior\r\n---------------\r\n\r\nSpecial Procedure : %s\r\nMobile Activity   : Active\r\nDG Scripts        : %s",
+    GET_MOB_SPEC(m)?(meta?meta->name:"Unknown custom function"):"None",scripts?"Attached":"None");
+  if(scripts)write_to_output(d," (%d)",scripts);
+  write_to_output(d,"\r\n\r\nFlag-Backed Behavior\r\n  Wandering       : %s\r\n  Stay In Zone    : %s\r\n  Memory          : %s\r\n  Aggression      : %s\r\n  Helper          : %s\r\n  Fleeing         : %s\r\n  Scavenging      : %s\r\n",
+    MOB_FLAGGED(m,MOB_SENTINEL)?"Disabled by SENTINEL":"Enabled by mobile_activity()",MOB_FLAGGED(m,MOB_STAY_ZONE)?"Yes":"No",
+    MOB_FLAGGED(m,MOB_MEMORY)?"Enabled (NPC MEMORY flag)":"Disabled",
+    (MOB_FLAGGED(m,MOB_AGGRESSIVE)||MOB_FLAGGED(m,MOB_AGGR_EVIL)||MOB_FLAGGED(m,MOB_AGGR_GOOD)||MOB_FLAGGED(m,MOB_AGGR_NEUTRAL))?"Enabled by NPC flags":"None",
+    MOB_FLAGGED(m,MOB_HELPER)?"Yes":"No",MOB_FLAGGED(m,MOB_WIMPY)?"Yes":"No",MOB_FLAGGED(m,MOB_SCAVENGER)?"Yes":"No");
+  if(!GET_MOB_SPEC(m) && GET_SDESC(m) && str_str(GET_SDESC(m),"mayor"))
+    write_to_output(d,"\r\nNotice: This mob is named Mayor, but no Mayor special procedure is assigned.\r\nIt has no legacy Mayor route, timed speeches, gate actions, or wake/sleep routine.\r\n");
+  write_to_output(d,"\r\n1) View Assigned Special\r\n2) Movement and Wandering (NPC Flags)\r\n3) Combat Behavior (NPC Flags)\r\n4) Toggle Memory and Retaliation (MEMORY)\r\n5) Toggle Helper Behavior (HELPER)\r\n6) Toggle Fleeing (WIMPY)\r\n7) Toggle Scavenging (SCAVENGER)\r\n8) DG Script Summary\r\nP) Preview Effective Legacy Behavior\r\nD) Diagnostics and Sources\r\nQ) Return\r\nChoice: ");
+  OLC_MODE(d)=MEDIT_LEGACY_MENU;
+}
+
+static void medit_disp_legacy_special(struct descriptor_data *d)
+{
+  const struct legacy_special_metadata *meta=legacy_special_metadata(GET_MOB_SPEC(OLC_MOB(d))); char domains[256];
+  write_to_output(d,"\r\nAssigned Legacy Special\r\n-----------------------\r\n\r\nSpecial Procedure : %s\r\nStatus            : %s\r\nSource            : %s\r\nEditable          : %s\r\n",
+    GET_MOB_SPEC(OLC_MOB(d))?(meta?meta->name:"Unknown custom function"):"None",GET_MOB_SPEC(OLC_MOB(d))?"Active":"Not assigned",
+    GET_MOB_SPEC(OLC_MOB(d))?"Legacy C special procedure":"None",meta&&meta->builder_editable?"Yes":"Read-only");
+  if(meta)write_to_output(d,"Purpose           : %s\r\nOwned Domains     : %s\r\nSafe with AI      : %s\r\n\r\nCapabilities:\r\n  %s\r\n",meta->purpose,legacy_behavior_domain_list(meta->domains,domains,sizeof(domains)),meta->coexistence_known==1?"Only outside owned domains":meta->coexistence_known==2?"Review owned domains":"No; owned domains are locked",meta->capabilities);
+  if(meta&&!str_cmp(meta->name,"Mayor"))write_to_output(d,"\r\nMayor Read-Only Views\r\n  1) Schedule: timed daily state sequence\r\n  2) Route: fixed Midgaard room path\r\n  3) Speech Lines: timed public announcements\r\n  4) Door Actions: opens and closes city gates\r\n  5) State Sequence: wake, posture, travel, waits, and sleep\r\n\r\nThese views describe the active C special; they do not create an AI copy.\r\n");
+  write_to_output(d,"\r\nQ) Return\r\nChoice: "); OLC_MODE(d)=MEDIT_LEGACY_SPECIAL;
+}
+
+static void medit_disp_legacy_preview(struct descriptor_data *d){char out[MAX_STRING_LENGTH];legacy_behavior_effective_preview(OLC_MOB(d),out,sizeof(out));write_to_output(d,"\r\n%s\r\nPress ENTER to return. ",out);OLC_MODE(d)=MEDIT_LEGACY_PREVIEW;}
+static void medit_disp_legacy_diagnostics(struct descriptor_data *d){char out[MAX_STRING_LENGTH];legacy_behavior_summary(OLC_MOB(d),out,sizeof(out),TRUE);write_to_output(d,"\r\nDiagnostics and Sources\r\n-----------------------\r\n%s\r\nPrototype changes require save and newly loaded/respawned instances.\r\nQ) Return\r\nChoice: ",out);OLC_MODE(d)=MEDIT_LEGACY_DIAGNOSTICS;}
 
 /* AI modes accept textual commands.  Keep them out of Oasis's legacy numeric
  * pre-parser; individual modes below decide whether a value is numeric. */
@@ -1303,6 +1343,10 @@ static int medit_is_ai_mode(int mode)
   case MEDIT_BEHAVIOR_MOVEMENT:
   case MEDIT_BEHAVIOR_COMBAT:
   case MEDIT_BEHAVIOR_OBJECTS:
+  case MEDIT_LEGACY_MENU:
+  case MEDIT_LEGACY_SPECIAL:
+  case MEDIT_LEGACY_PREVIEW:
+  case MEDIT_LEGACY_DIAGNOSTICS:
     return TRUE;
   default:
     return FALSE;
@@ -1642,6 +1686,10 @@ void medit_parse(struct descriptor_data *d, char *arg)
     case 'I':
       medit_disp_ai_menu(d);
       return;
+    case 'l':
+    case 'L':
+      medit_disp_legacy_menu(d);
+      return;
     case 'w':
     case 'W':
       write_to_output(d, "Copy what mob? ");
@@ -1817,7 +1865,8 @@ void medit_parse(struct descriptor_data *d, char *arg)
 
   case OLC_SCRIPT_EDIT:
     if (dg_script_edit_parse(d, arg)) return;
-    break;
+    medit_disp_menu(d);
+    return;
 
   case MEDIT_KEYWORD:
     smash_tilde(arg);
@@ -1901,31 +1950,46 @@ void medit_parse(struct descriptor_data *d, char *arg)
   case MEDIT_AI_MENU:
     switch (LOWER(*arg)) {
       case 'q': medit_disp_menu(d); return;
-      case 'h': medit_disp_ai_help(d, MEDIT_AI_MENU, "Builder Workflow", "1. Shape personality. 2. Choose communication and author its lines there. 3. Plan a daily routine if needed. 4. Choose combat behavior. 5. Preview the NPC story. 6. Resolve diagnostics warnings. Use Advanced Behavior only for fine-tuning.", "Blank input redisplays this menu; Q always returns to MEDIT.", "Normal MEDIT owns flags and ordinary movement restrictions."); return;
-      case '1': medit_disp_behavior_general(d); return;
-      case '2': medit_disp_behavior_movement(d); return;
-      case '3': medit_disp_ai_communication(d); return;
-      case '4': medit_disp_ai_perception(d); return;
-      case '5': medit_disp_ai_memory(d); return;
-      case '6': medit_disp_behavior_combat(d); return;
-      case '7': medit_disp_behavior_objects(d); return;
-      case '8': medit_disp_ai_vocalizations(d); return;
-      case '9': medit_disp_ai_advanced(d); return;
+      case 'h': medit_disp_ai_help(d, MEDIT_AI_MENU, "Extension Workflow", "AI Actor is optional and may only add behavior not already owned by NPC flags, specials, shops, or DG Scripts.", "Use Legacy Behavior first; locked domains deliberately have no editor here.", "Canonical flags and legacy sources remain authoritative."); return;
+      case '1': medit_disp_ai_personality(d); return;
+      case '2': medit_disp_ai_role(d); return;
+      case '3': medit_disp_ai_perception(d); return;
       case 'd': medit_disp_ai_diagnostics(d); return;
       case 'p': medit_disp_ai_preview(d); return;
       default: medit_disp_ai_menu(d); return;
     }
+  case MEDIT_LEGACY_MENU:
+    switch(LOWER(*arg)){
+      case 'q':medit_disp_menu(d);return;
+      case '1':medit_disp_legacy_special(d);return;
+      case '2':medit_disp_behavior_movement(d);return;
+      case '3':medit_disp_behavior_combat(d);return;
+      case '4':TOGGLE_BIT_AR(MOB_FLAGS(OLC_MOB(d)),MOB_MEMORY);OLC_VAL(d)=1;medit_disp_legacy_menu(d);return;
+      case '5':TOGGLE_BIT_AR(MOB_FLAGS(OLC_MOB(d)),MOB_HELPER);OLC_VAL(d)=1;medit_disp_legacy_menu(d);return;
+      case '6':TOGGLE_BIT_AR(MOB_FLAGS(OLC_MOB(d)),MOB_WIMPY);OLC_VAL(d)=1;medit_disp_legacy_menu(d);return;
+      case '7':TOGGLE_BIT_AR(MOB_FLAGS(OLC_MOB(d)),MOB_SCAVENGER);OLC_VAL(d)=1;medit_disp_legacy_menu(d);return;
+      case '8':write_to_output(d,"\r\nDG Script Summary\r\n-----------------\r\n%d trigger%s attached. DG Scripts are an external legacy authority; use S from the main menu to edit them.\r\n",legacy_behavior_script_count(OLC_MOB(d)),legacy_behavior_script_count(OLC_MOB(d))==1?"":"s");medit_disp_legacy_menu(d);return;
+      case 'p':medit_disp_legacy_preview(d);return;
+      case 'd':medit_disp_legacy_diagnostics(d);return;
+      default:medit_disp_legacy_menu(d);return;
+    }
+  case MEDIT_LEGACY_SPECIAL:
+    if(LOWER(*arg)=='q'){medit_disp_legacy_menu(d);return;}medit_disp_legacy_special(d);return;
+  case MEDIT_LEGACY_PREVIEW:
+    medit_disp_legacy_menu(d);return;
+  case MEDIT_LEGACY_DIAGNOSTICS:
+    if(LOWER(*arg)=='q'||!*arg){medit_disp_legacy_menu(d);return;}medit_disp_legacy_diagnostics(d);return;
   case MEDIT_BEHAVIOR_GENERAL:
     if(LOWER(*arg)=='q'){medit_disp_ai_menu(d);return;}
     if(*arg=='1'){medit_disp_ai_personality(d);return;} if(*arg=='2'){medit_disp_ai_intelligence(d);return;} if(*arg=='3'){medit_disp_ai_role(d);return;} if(*arg=='4'){medit_disp_ai_preview(d);return;} medit_disp_behavior_general(d);return;
   case MEDIT_BEHAVIOR_MOVEMENT:
-    if(LOWER(*arg)=='q'){medit_disp_ai_menu(d);return;}
+    if(LOWER(*arg)=='q'){medit_disp_legacy_menu(d);return;}
     if(*arg=='1'||*arg=='2'){TOGGLE_BIT_AR(MOB_FLAGS(OLC_MOB(d)),MOB_SENTINEL);OLC_VAL(d)=1;medit_disp_behavior_movement(d);return;}
     if(*arg=='3'){TOGGLE_BIT_AR(MOB_FLAGS(OLC_MOB(d)),MOB_STAY_ZONE);OLC_VAL(d)=1;medit_disp_behavior_movement(d);return;}
-    if(*arg=='4'||*arg=='6'){medit_disp_ai_schedule(d);return;} if(*arg=='5'){medit_disp_ai_movement(d);return;} medit_disp_behavior_movement(d);return;
+    medit_disp_behavior_movement(d);return;
   case MEDIT_BEHAVIOR_COMBAT: {
     static const int flags[]={MOB_AGGRESSIVE,MOB_AGGR_EVIL,MOB_AGGR_GOOD,MOB_AGGR_NEUTRAL,MOB_HELPER,MOB_WIMPY};
-    if(LOWER(*arg)=='q'){medit_disp_ai_menu(d);return;} if(*arg>='1'&&*arg<='6'){TOGGLE_BIT_AR(MOB_FLAGS(OLC_MOB(d)),flags[*arg-'1']);OLC_VAL(d)=1;medit_disp_behavior_combat(d);return;} if(*arg=='7'){medit_disp_ai_combat(d);return;}if(*arg=='8'){medit_disp_ai_threat(d);return;}medit_disp_behavior_combat(d);return; }
+    if(LOWER(*arg)=='q'){medit_disp_legacy_menu(d);return;} if(*arg>='1'&&*arg<='6'){TOGGLE_BIT_AR(MOB_FLAGS(OLC_MOB(d)),flags[*arg-'1']);OLC_VAL(d)=1;medit_disp_behavior_combat(d);return;}medit_disp_behavior_combat(d);return; }
   case MEDIT_BEHAVIOR_OBJECTS:
     if(LOWER(*arg)=='q'){medit_disp_ai_menu(d);return;} if(*arg=='1'){TOGGLE_BIT_AR(MOB_FLAGS(OLC_MOB(d)),MOB_SCAVENGER);OLC_VAL(d)=1;medit_disp_behavior_objects(d);return;}if(*arg=='2'){medit_disp_loadout_menu(d);return;}medit_disp_behavior_objects(d);return;
   case MEDIT_AI_COMMUNICATION:

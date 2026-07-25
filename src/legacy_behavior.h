@@ -23,9 +23,14 @@ enum legacy_assignment_origin {
 struct legacy_special_metadata {
   const char *name; SPECIAL(*func); unsigned domains;
   int service, periodic, intercepts_commands, combat_pulse, coexistence_known;
+  const char *purpose, *capabilities;
+  int builder_editable;
 };
 const struct legacy_special_metadata *legacy_special_metadata(SPECIAL(*func));
 const char *legacy_assignment_origin_name(int origin);
+const char *legacy_behavior_domain_list(unsigned domains, char *out, size_t size);
+int legacy_behavior_script_count(const struct char_data *mob);
+void legacy_behavior_effective_preview(const struct char_data *mob, char *out, size_t size);
 unsigned legacy_ai_domains(const struct char_data *mob);
 int legacy_behavior_warning_count(const struct char_data *mob);
 void legacy_behavior_summary(const struct char_data *mob, char *out, size_t size, int detailed);

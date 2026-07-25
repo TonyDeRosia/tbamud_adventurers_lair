@@ -386,6 +386,10 @@ extern const char *nrm, *grn, *cyn, *yel;
 #define MEDIT_BEHAVIOR_MOVEMENT               138
 #define MEDIT_BEHAVIOR_COMBAT                 139
 #define MEDIT_BEHAVIOR_OBJECTS                140
+#define MEDIT_LEGACY_MENU                     141
+#define MEDIT_LEGACY_SPECIAL                  142
+#define MEDIT_LEGACY_PREVIEW                  143
+#define MEDIT_LEGACY_DIAGNOSTICS              144
 
 /* Submodes of SEDIT connectedness. */
 #define SEDIT_MAIN_MENU              	0
