@@ -21,6 +21,7 @@
 #include "genzon.h"      /* for real_zone_by_thing */
 #include "constants.h"   /* for the *trig_types */
 #include "modify.h"      /* for smash_tilde */
+#include "builder_refs.h"
 
 
 /* local functions */
@@ -216,6 +217,7 @@ static void trigedit_disp_menu(struct descriptor_data *d)
   "%s5)%s Arguments    : %s%s\r\n"
   "%s6)%s Commands:\r\n%s%s\r\n"
   "%sW%s) Copy Trigger\r\n"
+  "%sY%s) References (read-only)\r\n"
   "%sQ)%s Quit\r\n"
   "Enter Choice :",
 
@@ -226,7 +228,7 @@ static void trigedit_disp_menu(struct descriptor_data *d)
   grn, nrm, yel, trig->narg,			/* numeric arg            */
   grn, nrm, yel, trig->arglist?trig->arglist:"",/* strict arg             */
   grn, nrm, cyn, OLC_STORAGE(d),		/* the command list       */
-  grn, nrm, grn, nrm);                          /* quit colors            */
+  grn, nrm, grn, nrm, grn, nrm);                          /* quit colors            */
 
   OLC_MODE(d) = TRIGEDIT_MAIN_MENU;
 }
@@ -540,6 +542,10 @@ void trigedit_parse(struct descriptor_data *d, char *arg)
          OLC_VAL(d) = 1;
 
          break;
+       case 'y':
+         builder_refs_display(d, BREF_TRIGGER, OLC_NUM(d), "Trigger");
+         OLC_MODE(d) = TRIGEDIT_REFERENCES;
+         return;
        case 'w':
        case 'W':
          write_to_output(d, "Copy what trigger? ");
@@ -550,6 +556,10 @@ void trigedit_parse(struct descriptor_data *d, char *arg)
          return;
      }
      return;
+
+    case TRIGEDIT_REFERENCES:
+      trigedit_disp_menu(d);
+      return;
 
     case TRIGEDIT_CONFIRM_SAVESTRING:
       switch(tolower(*arg)) {
@@ -624,6 +634,7 @@ void trigedit_parse(struct descriptor_data *d, char *arg)
 /* save the zone's triggers to internal memory and to disk */
 void trigedit_save(struct descriptor_data *d)
 {
+  builder_refs_invalidate();
   int i;
   trig_rnum rnum;
   int found = 0;

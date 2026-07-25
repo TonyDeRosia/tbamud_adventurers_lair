@@ -24,6 +24,7 @@
 #include "dg_olc.h"
 #include "fight.h"
 #include "modify.h"
+#include "builder_refs.h"
 
 /* local functions */
 static void oedit_setup_new(struct descriptor_data *d);
@@ -235,6 +236,8 @@ void oedit_save_internally(struct descriptor_data *d)
     log("oedit_save_internally: add_object failed.");
     return;
   }
+  builder_refs_invalidate();
+
 
   /* Update triggers and free old proto list  */
   if (obj_proto[robj_num].proto_script &&
@@ -687,6 +690,7 @@ static void oedit_disp_menu(struct descriptor_data *d)
           "%sM%s) Min Level   : %s%d\r\n"
           "%sP%s) Perm Affects: %s%s\r\n"
 	  "%sS%s) Script      : %s%s\r\n"
+          "%sY%s) References (read-only)\r\n"
           "%sW%s) Copy object\r\n"
           "%sX%s) Delete object\r\n"
 	  "%sQ%s) Quit\r\n"
@@ -707,6 +711,7 @@ static void oedit_disp_menu(struct descriptor_data *d)
           grn, nrm, cyn, GET_OBJ_LEVEL(obj),
           grn, nrm, cyn, buf2,
           grn, nrm, cyn, OLC_SCRIPT(d) ? "Set." : "Not Set.",
+          grn, nrm,
 	  grn, nrm,
 	  grn, nrm,
           grn, nrm
@@ -721,6 +726,10 @@ void oedit_parse(struct descriptor_data *d, char *arg)
   char *oldtext = NULL;
 
   switch (OLC_MODE(d)) {
+
+  case OEDIT_REFERENCES:
+    oedit_disp_menu(d);
+    return;
 
   case OEDIT_CONFIRM_SAVESTRING:
     switch (*arg) {
@@ -865,6 +874,11 @@ void oedit_parse(struct descriptor_data *d, char *arg)
     case 'S':
       OLC_SCRIPT_EDIT_MODE(d) = SCRIPT_MAIN_MENU;
       dg_script_menu(d);
+      return;
+    case 'y':
+    case 'Y':
+      builder_refs_display(d, BREF_OBJECT, OLC_NUM(d), "Object");
+      OLC_MODE(d) = OEDIT_REFERENCES;
       return;
     case 'w':
     case 'W':
