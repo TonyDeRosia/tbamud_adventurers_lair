@@ -30,6 +30,7 @@
 #define TRIGEDIT_ARGUMENT		8
 #define TRIGEDIT_COPY                   9
 #define TRIGEDIT_REFERENCES             10
+#define TRIGEDIT_HELP                   11
 
 #define OLC_SCRIPT_EDIT		    82766  /* arbitrary > highest possible room number */
 #define SCRIPT_MAIN_MENU		0

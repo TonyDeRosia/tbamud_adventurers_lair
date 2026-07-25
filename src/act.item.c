@@ -859,6 +859,12 @@ static void perform_give_currency(struct char_data *ch, struct char_data *vict, 
     increase_money_gold(ch, -gold);
 
   increase_money_gold(vict, gold);
+
+  /* DG bribe triggers are defined in coins, so premium-currency gifts do not
+   * dispatch them.  Run after the successful transfer so scripts observe the
+   * same balances as the players do. */
+  if (IS_NPC(vict))
+    bribe_mtrigger(vict, ch, amount);
 }
 
 /* utility function for give */
