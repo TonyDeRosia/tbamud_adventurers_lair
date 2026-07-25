@@ -826,6 +826,7 @@ static void script_stat (char_data *ch, struct script_data *sc)
   char name[MAX_INPUT_LENGTH];
   char namebuf[512];
   char buf1[MAX_STRING_LENGTH];
+  int attachment_position = 0;
 
   send_to_char(ch, "Global Variables: %s\r\n", sc->global_vars ? "" : "None");
   send_to_char(ch, "Global context: %ld\r\n", sc->context);
@@ -840,7 +841,8 @@ static void script_stat (char_data *ch, struct script_data *sc)
   }
 
   for (t = TRIGGERS(sc); t; t = t->next) {
-    send_to_char(ch, "\r\n  Trigger: %s%s%s, VNum: [%s%5d%s], RNum: [%5d]\r\n",
+    send_to_char(ch, "\r\n  Attachment %d: %s%s%s, VNum: [%s%5d%s], RNum: [%5d]\r\n",
+            ++attachment_position,
             CCYEL(ch, C_NRM), GET_TRIG_NAME(t), CCNRM(ch, C_NRM),
             CCGRN(ch, C_NRM), GET_TRIG_VNUM(t), CCNRM(ch, C_NRM),
             GET_TRIG_RNUM(t));

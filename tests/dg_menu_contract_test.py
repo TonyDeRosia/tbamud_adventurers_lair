@@ -7,9 +7,10 @@ dg = (root / 'src/dg_olc.c').read_text()
 menu = dg[dg.index('void dg_script_menu'):dg.index('int dg_script_edit_parse')]
 parser = dg[dg.index('int dg_script_edit_parse'):dg.index('void trigedit_string_cleanup')]
 
-for shown, accepted in (('%sN%s)', "case 'n':"), ('%sX%s)', "case 'x':"),
-                        ('%sQ%s)', "case 'q':")):
+for shown, accepted in (('%sN%s)', "case 'n':"), ('%sD%s)', "case 'd':"),
+                        ('%sX%s)', "case 'x':")):
     assert shown in menu and accepted in parser
+assert "case 'q':" in parser  # undisplayed additive exit alias
 assert 'switch(tolower(*arg))' in parser  # lower and upper case share one route
 assert 'strtol(arg, &end, 10)' in parser and "*end == '\\0'" in parser
 assert 'SCRIPT_INSPECT_TRIGGER' in parser
@@ -28,8 +29,8 @@ for editor, parent in (('medit.c', 'medit_disp_menu(d);'),
 
 # The main parser documents exactly these letters; selection numbers are the
 # only other main-menu grammar and are range-checked against the attached list.
-main = parser[parser.index('case SCRIPT_MAIN_MENU:'):parser.index('case SCRIPT_INSPECT_TRIGGER:')]
-assert set(re.findall(r"case '([a-z])':", main)) == {'n', 'x', 'q'}
+main = parser[parser.index('case SCRIPT_MAIN_MENU:'):parser.index('case SCRIPT_INFO_RETURN:')]
+assert set(re.findall(r"case '([a-z])':", main)) == {'n', 'd', 'i', 'e', 'r', 'h', 'x', 'q'}
 assert 'while (currtrig && --pos > 0)' in main and 'currtrig && pos == 0' in main
 assert parser.count('OLC_VAL(d)++;') >= 2
 attach = parser[parser.index('case SCRIPT_NEW_TRIGGER:'):parser.index('case SCRIPT_DEL_TRIGGER:')]
