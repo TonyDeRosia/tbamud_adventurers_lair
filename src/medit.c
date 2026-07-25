@@ -32,6 +32,7 @@ SPECIAL(guild);
 #include "modify.h"      /* for smash_tilde */
 #include "ai_actor.h"
 #include "legacy_behavior.h"
+#include "builder_refs.h"
 
 #define AI_MEDIT_CLAMP(v, lo, hi) ((v) < (lo) ? (lo) : ((v) > (hi) ? (hi) : (v)))
 
@@ -561,6 +562,8 @@ void medit_save_internally(struct descriptor_data *d)
     log("medit_save_internally: add_mobile failed.");
     return;
   }
+  builder_refs_invalidate();
+
 
 
   /* Auto-sync GUILD_MASTER flag with the guild spec-proc. */
@@ -1112,6 +1115,7 @@ static void medit_disp_menu(struct descriptor_data *d)
           "%sC%s) Special Procedure: %s\r\n"
           "%sI%s) AI Actor Extensions (optional)\r\n"
           "%sV%s) Effective Behavior Preview\r\n"
+          "%sY%s) References (read-only)\r\n"
           "%sW%s) Copy mob\r\n"
           "%sX%s) Delete mob\r\n"
 	  "%sQ%s) Quit\r\n"
@@ -1127,6 +1131,7 @@ static void medit_disp_menu(struct descriptor_data *d)
           grn, nrm,
           grn, nrm, cyn, OLC_SCRIPT(d) ?"Set.":"Not Set.",
           grn, nrm, GET_MOB_SPEC(mob) ? (legacy_special_metadata(GET_MOB_SPEC(mob)) ? legacy_special_metadata(GET_MOB_SPEC(mob))->name : "Unknown custom function") : "None",
+          grn, nrm,
           grn, nrm,
           grn, nrm,
           grn, nrm,
@@ -1705,6 +1710,11 @@ void medit_parse(struct descriptor_data *d, char *arg)
     case 'V':
       medit_disp_legacy_preview(d);
       return;
+    case 'y':
+    case 'Y':
+      builder_refs_display(d, BREF_MOB, OLC_NUM(d), "Mobile");
+      OLC_MODE(d) = MEDIT_REFERENCES;
+      return;
     case 'w':
     case 'W':
       write_to_output(d, "Copy what mob? ");
@@ -1732,6 +1742,10 @@ void medit_parse(struct descriptor_data *d, char *arg)
       write_to_output(d, "\r\nEnter new text :\r\n] ");
     else
       write_to_output(d, "Oops...\r\n");
+    return;
+
+  case MEDIT_REFERENCES:
+    medit_disp_menu(d);
     return;
 
   case MEDIT_STATS_MENU:

@@ -17,6 +17,7 @@
 #include "genzon.h"
 #include "oasis.h"
 #include "dg_scripts.h"
+#include "builder_refs.h"
 
 /* Nasty internal macros to clean up the code. */
 #define MYCMD		(OLC_ZONE(d)->cmd[subcmd])
@@ -334,6 +335,8 @@ static void zedit_save_internally(struct descriptor_data *d)
 	subcmd, i;
   room_rnum room_num = real_room(OLC_NUM(d));
 
+  builder_refs_invalidate();
+
   if (room_num == NOWHERE) {
     log("SYSERR: zedit_save_internally: OLC_NUM(d) room %d not found.", OLC_NUM(d));
     return;
@@ -583,8 +586,9 @@ static void zedit_disp_menu(struct descriptor_data *d)
 	  "%sN%s) Insert new command.\r\n"
 	  "%sE%s) Edit a command.\r\n"
 	  "%sD%s) Delete a command.\r\n"
+	  "%sY%s) References (read-only)\r\n"
 	  "%sQ%s) Quit\r\nEnter your choice : ",
-	  nrm, counter, grn, nrm, grn, nrm, grn, nrm, grn, nrm
+	  nrm, counter, grn, nrm, grn, nrm, grn, nrm, grn, nrm, grn, nrm
 	  );
 
   OLC_MODE(d) = ZEDIT_MAIN_MENU;
@@ -809,6 +813,11 @@ void zedit_parse(struct descriptor_data *d, char *arg)
       write_to_output(d, "What number in the list should the new command be? : ");
       OLC_MODE(d) = ZEDIT_NEW_ENTRY;
       break;
+    case 'y':
+    case 'Y':
+      builder_refs_display(d, BREF_ZONE, zone_table[OLC_ZNUM(d)].number, "Zone");
+      OLC_MODE(d) = ZEDIT_REFERENCES;
+      break;
     case 'e':
     case 'E':
       /* Change an entry. */
@@ -881,6 +890,9 @@ void zedit_parse(struct descriptor_data *d, char *arg)
       zedit_disp_menu(d);
       break;
     }
+    break;
+  case ZEDIT_REFERENCES:
+    zedit_disp_menu(d);
     break;
     /* End of ZEDIT_MAIN_MENU */
 

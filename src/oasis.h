@@ -201,6 +201,7 @@ extern const char *nrm, *grn, *cyn, *yel;
 #define OEDIT_DELETE                    27
 #define OEDIT_COPY                      28
 #define OEDIT_REGEN_MULT                29
+#define OEDIT_REFERENCES                30
 
 /* Submodes of REDIT connectedness. */
 #define REDIT_MAIN_MENU 		1
@@ -225,6 +226,7 @@ extern const char *nrm, *grn, *cyn, *yel;
 #define REDIT_RESETS_ADD_MOB           20
 #define REDIT_RESETS_ADD_OBJ           21
 #define REDIT_RESETS_DELETE            22
+#define REDIT_REFERENCES               23
 
 /* Submodes of ZEDIT connectedness. */
 #define ZEDIT_MAIN_MENU              	0
@@ -250,6 +252,7 @@ extern const char *nrm, *grn, *cyn, *yel;
 #define ZEDIT_LEV_MIN           24
 #define ZEDIT_LEV_MAX           25
 #define ZEDIT_ZONE_CLAIM        26
+#define ZEDIT_REFERENCES        27
 
 /* Submodes of MEDIT connectedness. */
 #define MEDIT_MAIN_MENU            	0
@@ -391,6 +394,7 @@ extern const char *nrm, *grn, *cyn, *yel;
 #define MEDIT_LEGACY_SPECIAL                  142
 #define MEDIT_LEGACY_PREVIEW                  143
 #define MEDIT_LEGACY_DIAGNOSTICS              144
+#define MEDIT_REFERENCES                      145
 
 /* Submodes of SEDIT connectedness. */
 #define SEDIT_MAIN_MENU              	0

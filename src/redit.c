@@ -22,6 +22,7 @@
 #include "dg_scripts.h"
 #include "constants.h"
 #include "modify.h"
+#include "builder_refs.h"
 
 /* local functions */
 static void redit_setup_new(struct descriptor_data *d);
@@ -241,6 +242,7 @@ void redit_setup_existing(struct descriptor_data *d, int real_num)
 
 void redit_save_internally(struct descriptor_data *d)
 {
+  builder_refs_invalidate();
   int j, room_num, new_room = FALSE;
   struct descriptor_data *dsc;
 
@@ -516,6 +518,7 @@ static void redit_disp_menu(struct descriptor_data *d)
       "%sF%s) Extra descriptions menu\r\n"
       "%sR%s) Room Resets\r\n"
       "%sS%s) Script      : %s%s\r\n"
+      "%sY%s) References (read-only)\r\n"
        "%sW%s) Copy Room\r\n"
       "%sX%s) Delete Room\r\n"
       "%sQ%s) Quit\r\n"
@@ -529,6 +532,7 @@ static void redit_disp_menu(struct descriptor_data *d)
       grn, nrm,
       grn, nrm,
           grn, nrm, cyn, OLC_SCRIPT(d) ? "Set." : "Not Set.",
+          grn, nrm,
           grn, nrm,
       grn, nrm,
       grn, nrm
@@ -767,6 +771,9 @@ void redit_parse(struct descriptor_data *d, char *arg)
   char *oldtext = NULL;
 
   switch (OLC_MODE(d)) {
+  case REDIT_REFERENCES:
+    redit_disp_menu(d);
+    return;
   case REDIT_CONFIRM_SAVESTRING:
     switch (*arg) {
     case 'y':
@@ -903,6 +910,11 @@ void redit_parse(struct descriptor_data *d, char *arg)
       OLC_DESC(d) = OLC_ROOM(d)->ex_description;
       redit_disp_extradesc_menu(d);
       break;
+    case 'y':
+    case 'Y':
+      builder_refs_display(d, BREF_ROOM, OLC_NUM(d), "Room");
+      OLC_MODE(d) = REDIT_REFERENCES;
+      return;
     case 'w':
     case 'W':
       write_to_output(d, "Copy what room? ");
