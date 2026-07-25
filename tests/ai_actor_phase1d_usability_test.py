@@ -1,36 +1,39 @@
 #!/usr/bin/env python3
-"""Source-level regression coverage for Phase 1D AI Actor MEDIT usability."""
+"""Contract coverage for the surviving additive AI Actor MEDIT controls."""
 from pathlib import Path
 
-medit = Path("src/medit.c").read_text()
-actor = Path("src/ai_actor.c").read_text()
 
-# Capability choices are named, described, and never expose raw enum entry prompts.
-for token in ("Choose %s", "Humanoid — ordinary speaking person.",
-              "Mindless — instinct only; no social relationships.",
-              "Vocalize — uses authored creature sounds instead of speech.",
-              "Basic Hostile Memory", "Same Kind — helps matching creatures.",
-              "Q) Cancel"):
-    assert token in medit, token
-assert "Archetype (-1 inferred" not in medit
-assert "Memory style (-1 inferred" not in medit
+def ai_root_sections():
+    medit = Path("src/medit.c").read_text()
+    menu_start = medit.rindex("static void medit_disp_ai_menu(struct descriptor_data *d)\n{")
+    menu = medit[menu_start:medit.index("static void medit_disp_legacy_menu", menu_start)]
+    parser_start = medit.index("case MEDIT_AI_MENU:", medit.index("void medit_parse("))
+    parser = medit[parser_start:medit.index("case MEDIT_LEGACY_MENU:", parser_start)]
+    return menu, parser
 
-# Cancelling or blank input is clean and returns/redisplays the appropriate screen.
-assert "if (LOWER(*arg) == 'q') { medit_disp_ai_capabilities(d); return; }" in medit
-assert "if (!*arg)" in medit
-assert "Choose a delay from 1 to 60 seconds, or Q to cancel" in medit
 
-# The screen groups capabilities and makes movement delay applicability explicit.
-for token in ("Identity", "Communication", "Relationships", "Status: %s",
-              "Inactive — current movement mode is not Random.", "Effective: %s", "Source: %s"):
-    assert token in medit, token
+def test_primary_menu_is_additive_only():
+    menu, parser = ai_root_sections()
+    for label in ("1) Personality", "2) Identity / Role", "3) Advanced Perception"):
+        assert label in menu
+    for obsolete in ("Communication", "Daily Routine", "Combat Behavior", "Advanced AI Brain"):
+        assert f") {obsolete}" not in menu
+    for target in ("medit_disp_ai_communication", "medit_disp_ai_schedule",
+                   "medit_disp_ai_combat", "medit_disp_ai_social"):
+        assert target not in parser
 
-# Normal preview is builder-facing; technical authored/inferred controls remain advanced.
-for token in ("This NPC...", "Communication", "Intelligence", "Restrictions", "Warnings"):
-    assert token in medit, token
 
-# Diagnostics answer builder questions, including the next configuration direction.
-for token in ("NPC Behavior Diagnostics", "Speech & Social", "Helping Allies", "What to configure next"):
-    assert token in actor, token
+def test_capability_data_remains_compatible_but_hidden():
+    """Historical fields/modes remain loadable; the root has no transition to them."""
+    header = Path("src/ai_actor.h").read_text()
+    oasis = Path("src/oasis.h").read_text()
+    for field in ("communication", "memory_style", "assistance_style"):
+        assert field in header
+    for mode in ("MEDIT_AI_CAPABILITIES", "MEDIT_AI_SOCIAL", "MEDIT_AI_DIALOGUE"):
+        assert mode in oasis
 
-print("AI Actor Phase 1D usability regression checks passed")
+
+if __name__ == "__main__":
+    test_primary_menu_is_additive_only()
+    test_capability_data_remains_compatible_but_hidden()
+    print("AI Actor Phase 1D legacy-first contract checks passed")

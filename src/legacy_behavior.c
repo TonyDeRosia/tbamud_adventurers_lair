@@ -58,18 +58,29 @@ void legacy_behavior_summary(const struct char_data*m,char*o,size_t z,int detail
 void legacy_behavior_effective_preview(const struct char_data*m,char*o,size_t z)
 {
   const struct legacy_special_metadata*x; int scripts;
-  if(!o||!z)return;o[0]=0;if(!m){add(o,z,"Effective Mob Behavior: unavailable\r\n");return;}
+  if (!o || !z) return;
+  o[0] = 0;
+  if (!m) { add(o,z,"Effective Mob Behavior: unavailable\r\n"); return; }
   x=legacy_special_metadata(GET_MOB_SPEC(m));scripts=legacy_behavior_script_count(m);
   add(o,z,"Effective Mob Behavior\r\n----------------------\r\n\r\nLegacy Sources\r\n\r\nNPC Flags:\r\n");
-  if(MOB_FLAGGED(m,MOB_SENTINEL))add(o,z,"  SENTINEL\r\n");if(MOB_FLAGGED(m,MOB_STAY_ZONE))add(o,z,"  STAY_ZONE\r\n");
-  if(MOB_FLAGGED(m,MOB_MEMORY))add(o,z,"  MEMORY\r\n");if(MOB_FLAGGED(m,MOB_HELPER))add(o,z,"  HELPER\r\n");
-  if(MOB_FLAGGED(m,MOB_WIMPY))add(o,z,"  WIMPY\r\n");if(MOB_FLAGGED(m,MOB_SCAVENGER))add(o,z,"  SCAVENGER\r\n");
-  if(MOB_FLAGGED(m,MOB_NOCHARM))add(o,z,"  NO_CHARM\r\n");if(MOB_FLAGGED(m,MOB_NOSUMMON))add(o,z,"  NO_SUMMN\r\n");
+  if(MOB_FLAGGED(m,MOB_SENTINEL))add(o,z,"  SENTINEL\r\n");
+  if(MOB_FLAGGED(m,MOB_STAY_ZONE))add(o,z,"  STAY_ZONE\r\n");
+  if(MOB_FLAGGED(m,MOB_MEMORY))add(o,z,"  MEMORY\r\n");
+  if(MOB_FLAGGED(m,MOB_HELPER))add(o,z,"  HELPER\r\n");
+  if(MOB_FLAGGED(m,MOB_WIMPY))add(o,z,"  WIMPY\r\n");
+  if(MOB_FLAGGED(m,MOB_SCAVENGER))add(o,z,"  SCAVENGER\r\n");
+  if(MOB_FLAGGED(m,MOB_NOCHARM))add(o,z,"  NO_CHARM\r\n");
+  if(MOB_FLAGGED(m,MOB_NOSUMMON))add(o,z,"  NO_SUMMN\r\n");
   add(o,z,"\r\nSpecial Procedure:\r\n  %s\r\n\r\nDG Scripts:\r\n  %s",GET_MOB_SPEC(m)?(x?x->name:"Unknown custom function"):"None",scripts?"Attached":"None");
-  if(scripts)add(o,z," (%d)",scripts);add(o,z,"\r\n\r\nEffective Capabilities:\r\n  %s\r\n",MOB_FLAGGED(m,MOB_SENTINEL)?"Does not wander randomly":"May wander through legacy mobile activity");
-  if(MOB_FLAGGED(m,MOB_MEMORY))add(o,z,"  Remembers attackers through the NPC MEMORY flag\r\n");if(MOB_FLAGGED(m,MOB_HELPER))add(o,z,"  Helps allies through the NPC HELPER flag\r\n");
-  if(MOB_FLAGGED(m,MOB_WIMPY))add(o,z,"  May flee through the NPC WIMPY flag\r\n");if(MOB_FLAGGED(m,MOB_SCAVENGER))add(o,z,"  Scavenges through the NPC SCAVENGER flag\r\n");
-  if(x)add(o,z,"  %s\r\n",x->capabilities);if(MOB_FLAGGED(m,MOB_NOCHARM))add(o,z,"  Cannot be charmed\r\n");if(MOB_FLAGGED(m,MOB_NOSUMMON))add(o,z,"  Cannot be summoned\r\n");
+  if(scripts)add(o,z," (%d)",scripts);
+  add(o,z,"\r\n\r\nEffective Capabilities:\r\n  %s\r\n",MOB_FLAGGED(m,MOB_SENTINEL)?"Does not wander randomly":"May wander through legacy mobile activity");
+  if(MOB_FLAGGED(m,MOB_MEMORY))add(o,z,"  Remembers attackers through the NPC MEMORY flag\r\n");
+  if(MOB_FLAGGED(m,MOB_HELPER))add(o,z,"  Helps allies through the NPC HELPER flag\r\n");
+  if(MOB_FLAGGED(m,MOB_WIMPY))add(o,z,"  May flee through the NPC WIMPY flag\r\n");
+  if(MOB_FLAGGED(m,MOB_SCAVENGER))add(o,z,"  Scavenges through the NPC SCAVENGER flag\r\n");
+  if(x)add(o,z,"  %s\r\n",x->capabilities);
+  if(MOB_FLAGGED(m,MOB_NOCHARM))add(o,z,"  Cannot be charmed\r\n");
+  if(MOB_FLAGGED(m,MOB_NOSUMMON))add(o,z,"  Cannot be summoned\r\n");
   add(o,z,"\r\nAI Actor Extensions:\r\n  %s\r\n\r\nWarnings:\r\n  %s\r\n",MOB_FLAGGED(m,MOB_AI_ACTOR)?"Enabled (legacy-owned domains remain authoritative)":"Disabled",legacy_behavior_warning_count(m)?"See Diagnostics and Sources":"None");
 }
 
