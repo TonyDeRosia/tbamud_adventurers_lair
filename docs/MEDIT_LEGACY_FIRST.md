@@ -31,3 +31,27 @@ The shared nested DG menu routes commands case-insensitively in MEDIT, OEDIT, an
 REDIT: `n/N` attaches, `x/X` detaches, `q/Q` restores the parent, and a displayed
 number inspects that trigger. Merely opening or inspecting the menu does not dirty
 a record; only successful attachment or detachment does.
+
+## Official TBA MUD Baseline
+
+Official TBA MUD `master` is the behavioral and structural baseline for Oasis
+MEDIT and its shared DG editor.  Adventurer's Lair preserves that numbered and
+lettered workflow where practical and extends it with small additive entries
+rather than replacing it with a dashboard or wizard.  Pet Price, Loadout/Loot,
+Special Procedure inspection, AI Actor Extensions, and Effective Behavior Preview
+sit beside the classic fields.
+
+Legacy NPC flags, actual assigned special-function pointers, services, and DG
+Scripts remain authoritative.  AI Actor does not replace those systems.  The
+special, effective behavior, and trigger inspection screens are custom read-only
+quality-of-life additions and do not dirty a prototype.
+
+Older broad-AI tests were changed because they confused **data compatibility**
+with **menu reachability**.  Historical schedule, patrol, combat, dialogue,
+memory, and social structures remain compiled and are still copied, loaded,
+validated, and available to runtime arbitration for saved mobs.  Preserving those
+fields prevents data loss; it does not promise a builder-facing editor.  The
+current root exposes only additive personality, identity/role, and perception.
+Primary-parser contract tests enumerate those transitions, reject stale submenu
+links and malformed fallthrough, and prove that undocumented input redraws the
+same menu.  This prevents duplicate paths without deleting compatibility data.

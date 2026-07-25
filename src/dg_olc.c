@@ -971,9 +971,9 @@ void dg_script_menu(struct descriptor_data *d)
           types, proto->attach_type == MOB_TRIGGER ? "Mobile" :
                  proto->attach_type == OBJ_TRIGGER ? "Object" : "Room",
           GET_TRIG_NARG(proto), GET_TRIG_ARG(proto) ? GET_TRIG_ARG(proto) : "<none>",
-          editscript->vnum == 3011 ? "Available" : "Not authored");
+          editscript->vnum == 3011 ? "Available (verified from trigger commands)" : "Not authored");
       if (editscript->vnum == 3011)
-        write_to_output(d, "         Purpose: Stock janitor object interaction\r\n");
+        write_to_output(d, "         Purpose: Picks up non-fountain room objects costing 15 gold or less\r\n");
     }
 
     editscript = editscript->next;
@@ -997,17 +997,34 @@ int dg_script_edit_parse(struct descriptor_data *d, char *arg)
   switch(OLC_SCRIPT_EDIT_MODE(d)) {
     case SCRIPT_MAIN_MENU:
       if (isdigit((unsigned char)*arg)) {
-        pos = atoi(arg);
+        char *end = NULL;
+        long selection = strtol(arg, &end, 10);
+        while (end && *end && isspace((unsigned char)*end))
+          end++;
+        pos = end && *end == '\0' && selection <= INT_MAX ? (int)selection : 0;
         currtrig = OLC_SCRIPT(d);
         while (currtrig && --pos > 0) currtrig = currtrig->next;
         if (currtrig && pos == 0) {
           trig_rnum rnum = real_trigger(currtrig->vnum);
           struct trig_data *proto = rnum == NOTHING ? NULL : trig_index[rnum]->proto;
           write_to_output(d, "\r\nTrigger Inspection\r\n------------------\r\n\r\n"
-                             "VNUM: %d\r\nName: %s\r\nSource: DG Script\r\n\r\n",
+                             "VNUM: %d\r\nName: %s\r\nSource: DG Script\r\n",
               currtrig->vnum, proto && proto->name ? proto->name : "<missing trigger prototype>");
+          if (proto) {
+            char types[MAX_INPUT_LENGTH];
+            const char **names = proto->attach_type == OBJ_TRIGGER ? otrig_types :
+                                 proto->attach_type == WLD_TRIGGER ? wtrig_types : trig_types;
+            sprintbit(GET_TRIG_TYPE(proto), names, types, sizeof(types));
+            write_to_output(d, "Trigger type: %s\r\nAttach type: %s\r\n"
+                               "Numeric argument: %d\r\nArgument phrase: %s\r\n",
+                types, proto->attach_type == MOB_TRIGGER ? "Mobile" :
+                       proto->attach_type == OBJ_TRIGGER ? "Object" : "Room",
+                GET_TRIG_NARG(proto), GET_TRIG_ARG(proto) ? GET_TRIG_ARG(proto) : "<none>");
+          }
+          write_to_output(d, "Metadata availability: %s\r\n\r\n",
+              currtrig->vnum == 3011 ? "Available (verified from trigger commands)" : "Not authored");
           if (currtrig->vnum == 3011)
-            write_to_output(d, "Known behavior:\r\n  Janitor-style object interaction\r\n\r\n"
+            write_to_output(d, "Known behavior:\r\n  Iterates over room contents and picks up non-fountain objects costing 15 gold or less.\r\n\r\n"
                                "Owned domains:\r\n  Object interaction\r\n\r\n"
                                "AI coexistence:\r\n  Do not configure duplicate object pickup.\r\n");
           else
@@ -1053,7 +1070,10 @@ int dg_script_edit_parse(struct descriptor_data *d, char *arg)
 
     case SCRIPT_INSPECT_TRIGGER:
       /* Inspection is read-only: never touch OLC_VAL here. */
-      dg_script_menu(d);
+      if (tolower((unsigned char)*arg) == 'q')
+        dg_script_menu(d);
+      else
+        write_to_output(d, "Enter Q to return to attached triggers: ");
       return 1;
 
     case SCRIPT_NEW_TRIGGER:

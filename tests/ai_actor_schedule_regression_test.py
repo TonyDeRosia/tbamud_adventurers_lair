@@ -1,4 +1,4 @@
-"""Deterministic source-level regression guard for bounded AI schedules."""
+"""Separate historical schedule data, runtime, and builder reachability guards."""
 from pathlib import Path
 h = Path('src/ai_actor.h').read_text()
 s = Path('src/ai_actor.c').read_text()
@@ -16,22 +16,42 @@ for record in ('AIConfigSchedule:', 'AISchedule:', 'AIPatrol:', 'AIPatrolWaypoin
 for record in ('AIConfigSchedule', 'AISchedule', 'AIPatrol', 'AIPatrolWaypoint'):
     assert record in db
 assert 'MOB_AI_ACTOR' in s and 'FIGHTING(m)' in s
-print('AI actor schedule regression checks passed')
+print('AI actor schedule data compatibility checks passed')
 medit = Path('src/medit.c').read_text()
 oasis = Path('src/oasis.h').read_text()
 for name in ('medit_disp_ai_schedule_entries', 'medit_disp_ai_schedule_entry',
              'medit_disp_ai_patrol_routes', 'medit_disp_ai_patrol_route',
              'medit_disp_ai_patrol_waypoints', 'medit_disp_ai_patrol_waypoint'):
     assert name in medit
-for token in ('Home Room', 'Work Room', 'Sleep Room', 'Guard Room', 'Fallback Room',
-              'Schedule Entries', 'Patrol Routes', 'MEDIT_AI_SCHEDULE_ROOM',
+for token in ('MEDIT_AI_SCHEDULE_ROOM',
               'MEDIT_AI_SCHEDULE_ENTRIES', 'MEDIT_AI_PATROL_ROUTES',
               'ai_patrol_delete', 'ai_patrol_move', 'ai_patrol_duplicate',
               'ai_patrol_waypoint_add', 'ai_patrol_waypoint_delete',
               'ai_patrol_waypoint_duplicate', 'ai_patrol_waypoint_move',
               'Referenced route cannot be deleted', 'Invalid room VNUM'):
     assert token in medit or token in oasis
-print('AI actor schedule Oasis editor regression checks passed')
+print('AI actor hidden schedule compatibility code checks passed')
+
+# Historical fields and modes remain loadable, but primary menu input cannot
+# transition to the old schedule, patrol, movement, or broad behavior pages.
+menu_start = medit.rindex('static void medit_disp_ai_menu(struct descriptor_data *d)')
+root_menu = medit[menu_start:medit.index('static void medit_disp_legacy_menu', menu_start)]
+parse_start = medit.index('case MEDIT_AI_MENU:', medit.index('void medit_parse('))
+root_parse = medit[parse_start:medit.index('case MEDIT_LEGACY_MENU:', parse_start)]
+assert 'medit_disp_ai_schedule' not in root_parse
+assert 'medit_disp_ai_patrol' not in root_parse
+assert 'medit_disp_ai_movement' not in root_parse
+assert 'default: medit_disp_ai_menu(d); return;' in root_parse
+for obsolete in ('Daily Routine', 'Patrol Routes', 'Home Room', 'Work Room'):
+    assert obsolete not in root_menu
+
+# Copy/save paths preserve the entire AI configuration; merely displaying MEDIT
+# has no schedule mutator and cannot erase dormant records.
+genmob = Path('src/genmob.c').read_text()
+assert 'copy_ai_config' in gen or 'mob_ai_config_copy' in gen
+assert 'AIConfigSchedule:' in genmob and 'AISchedule:' in genmob
+assert 'schedule_count' not in root_menu
+print('AI actor builder reachability and preservation checks passed')
 
 # Runtime policy engine guards: stable state, interruption, retry, and wandering helpers.
 for token in (
