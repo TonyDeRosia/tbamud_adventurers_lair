@@ -5018,7 +5018,10 @@ static void trg_checkload(struct char_data *ch, trig_vnum tvnum)
     } /*for cmd_no......*/
   }  /*for zone...*/
 
-  for (i = 0; i < top_of_mobt; i++) {
+  /* top_of_* is the highest valid rnum for world/mobile/object tables (unlike
+   * top_of_trigt, which is a count).  Include the final prototype so builder
+   * inspection remains truthful when an attachment lives on the last entry. */
+  for (i = 0; i <= top_of_mobt; i++) {
     if (!mob_proto[i].proto_script)
       continue;
 
@@ -5031,7 +5034,7 @@ static void trg_checkload(struct char_data *ch, trig_vnum tvnum)
       }
   }
 
-  for (j = 0; j < top_of_objt; j++) {
+  for (j = 0; j <= top_of_objt; j++) {
     if (!obj_proto[j].proto_script)
       continue;
 
@@ -5044,7 +5047,7 @@ static void trg_checkload(struct char_data *ch, trig_vnum tvnum)
       }
   }
 
-  for (k = 0;k < top_of_world; k++) {
+  for (k = 0; k <= top_of_world; k++) {
     if (!world[k].proto_script)
       continue;
 
