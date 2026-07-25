@@ -218,6 +218,7 @@ static void trigedit_disp_menu(struct descriptor_data *d)
   "%s6)%s Commands:\r\n%s%s\r\n"
   "%sW%s) Copy Trigger\r\n"
   "%sY%s) References (read-only)\r\n"
+  "%sH%s) Trigger field help\r\n"
   "%sQ)%s Quit\r\n"
   "Enter Choice :",
 
@@ -228,9 +229,28 @@ static void trigedit_disp_menu(struct descriptor_data *d)
   grn, nrm, yel, trig->narg,			/* numeric arg            */
   grn, nrm, yel, trig->arglist?trig->arglist:"",/* strict arg             */
   grn, nrm, cyn, OLC_STORAGE(d),		/* the command list       */
-  grn, nrm, grn, nrm, grn, nrm);                          /* quit colors            */
+  grn, nrm, grn, nrm, grn, nrm, grn, nrm);                /* menu colors            */
 
   OLC_MODE(d) = TRIGEDIT_MAIN_MENU;
+}
+
+/* Keep this deliberately structural.  Per-type semantics are maintained in
+ * docs/DG_TRIGGER_CAPABILITY_MATRIX.md and must be traced to runtime code. */
+static void trigedit_disp_help(struct descriptor_data *d)
+{
+  write_to_output(d,
+    "\r\nDG trigger fields\r\n"
+    "-----------------\r\n"
+    "Intended for selects the only entity family that may attach this prototype.\r\n"
+    "Trigger types is a bit set; UNUSED entries cannot be selected.\r\n"
+    "Numeric Arg is event-specific (commonly chance, threshold, amount, or hour).\r\n"
+    "Arguments is event-specific (commonly a command, phrase, or pattern).\r\n"
+    "Commands are executed in stored order by the DG script driver.\r\n"
+    "Changing the intended family clears selected flags, with a warning, because\r\n"
+    "the same bit positions have different meanings in each family.\r\n"
+    "See docs/DG_TRIGGER_CAPABILITY_MATRIX.md for verified semantics and scope.\r\n"
+    "\r\nPress return to resume: ");
+  OLC_MODE(d) = TRIGEDIT_HELP;
 }
 
 static void trigedit_disp_types(struct descriptor_data *d)
@@ -257,6 +277,8 @@ static void trigedit_disp_types(struct descriptor_data *d)
   clear_screen(d);
 
   for (i = 0; i < NUM_TRIG_TYPE_FLAGS; i++) {
+    if (!strncmp(types[i], "UNUSED", 6))
+      continue;
     write_to_output(d, "%s%2d%s) %-20.20s  %s", grn, i + 1, nrm, types[i],
               !(++columns % 2) ? "\r\n" : "");
   }
@@ -542,6 +564,9 @@ void trigedit_parse(struct descriptor_data *d, char *arg)
          OLC_VAL(d) = 1;
 
          break;
+       case 'h':
+         trigedit_disp_help(d);
+         return;
        case 'y':
          builder_refs_display(d, BREF_TRIGGER, OLC_NUM(d), "Trigger");
          OLC_MODE(d) = TRIGEDIT_REFERENCES;
@@ -558,6 +583,7 @@ void trigedit_parse(struct descriptor_data *d, char *arg)
      return;
 
     case TRIGEDIT_REFERENCES:
+    case TRIGEDIT_HELP:
       trigedit_disp_menu(d);
       return;
 
@@ -590,14 +616,35 @@ void trigedit_parse(struct descriptor_data *d, char *arg)
       break;
 
     case TRIGEDIT_INTENDED:
-      if ((atoi(arg)>=MOB_TRIGGER) || (atoi(arg)<=WLD_TRIGGER))
-        OLC_TRIG(d)->attach_type = atoi(arg);
-      OLC_VAL(d)++;
+      {
+        char *end = NULL;
+        long intended = strtol(arg, &end, 10);
+        while (end && *end && isspace((unsigned char)*end)) end++;
+        if (!arg || !*arg || !end || *end || intended < MOB_TRIGGER || intended > WLD_TRIGGER) {
+          write_to_output(d, "Invalid attach type. Enter 0, 1, or 2: ");
+          return;
+        }
+        if (OLC_TRIG(d)->attach_type != intended && GET_TRIG_TYPE(OLC_TRIG(d))) {
+          GET_TRIG_TYPE(OLC_TRIG(d)) = 0;
+          write_to_output(d, "Trigger flags cleared: bit meanings change between attach families.\r\n");
+        }
+        OLC_TRIG(d)->attach_type = intended;
+        OLC_VAL(d)++;
+      }
       break;
 
     case TRIGEDIT_NARG:
-      OLC_TRIG(d)->narg = LIMIT(atoi(arg), 0, 100);
-      OLC_VAL(d)++;
+      {
+        char *end = NULL;
+        long value = strtol(arg, &end, 10);
+        while (end && *end && isspace((unsigned char)*end)) end++;
+        if (!arg || !*arg || !end || *end || value < 0 || value > INT_MAX) {
+          write_to_output(d, "Numeric argument must be a whole number from 0 to %d: ", INT_MAX);
+          return;
+        }
+        OLC_TRIG(d)->narg = (int)value;
+        OLC_VAL(d)++;
+      }
       break;
 
     case TRIGEDIT_ARGUMENT:
@@ -609,8 +656,16 @@ void trigedit_parse(struct descriptor_data *d, char *arg)
     case TRIGEDIT_TYPES:
       if ((i = atoi(arg)) == 0)
         break;
-      else if (!((i < 0) || (i > NUM_TRIG_TYPE_FLAGS)))
+      else if (!((i < 0) || (i > NUM_TRIG_TYPE_FLAGS))) {
+        const char **types = OLC_TRIG(d)->attach_type == OBJ_TRIGGER ? otrig_types :
+                             OLC_TRIG(d)->attach_type == WLD_TRIGGER ? wtrig_types : trig_types;
+        if (!strncmp(types[i - 1], "UNUSED", 6)) {
+          write_to_output(d, "That bit is reserved and cannot be selected for this attach type.\r\n");
+          trigedit_disp_types(d);
+          return;
+        }
         TOGGLE_BIT((GET_TRIG_TYPE(OLC_TRIG(d))), 1 << (i - 1));
+      }
       OLC_VAL(d)++;
       trigedit_disp_types(d);
       return;
