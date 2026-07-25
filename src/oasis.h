@@ -104,6 +104,7 @@ struct oasis_olc_data {
   struct message_list *msg;
   struct message_type *m_type;
   int script_mode;
+  int script_selected;          /* selected attachment slot in DG OLC */
   int trigger_position;
   int item_type;
   struct trig_proto_list *script; /* for assigning triggers in [r|o|m]edit*/

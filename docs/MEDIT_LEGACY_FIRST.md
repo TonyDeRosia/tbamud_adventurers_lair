@@ -55,3 +55,22 @@ current root exposes only additive personality, identity/role, and perception.
 Primary-parser contract tests enumerate those transitions, reject stale submenu
 links and malformed fallthrough, and prove that undocumented input redraws the
 same menu.  This prevents duplicate paths without deleting compatibility data.
+
+## DG Trigger Prototype vs Attachment
+
+DG trigger prototypes are edited only with the authoritative `trigedit <vnum>`
+command (`do_oasis_trigedit`, which enters `CON_TRIGEDIT` and uses
+`trigedit_setup_existing`/`trigedit_setup_new`). MEDIT, OEDIT, and REDIT only
+manage references to those prototypes. Their selected-trigger inspection is
+read-only; editing a prototype affects every entity that attaches it, while
+detaching removes only that entity's reference and never deletes the prototype.
+The parent editor becomes dirty only after a successful attachment or confirmed
+detachment.
+
+Oasis stores one OLC structure per descriptor, so nesting TRIGEDIT inside an
+active parent editor is unsafe. The attachment action therefore provides a safe
+handoff: return to the parent, save or discard it explicitly, and then run the
+shown `trigedit <vnum>` command. The normal command enforces builder level,
+`CON_PLAYING`, zone ownership, VNUM validity, and concurrent editing checks;
+trigger saves continue through `trigedit_save` and the existing zone trigger
+file/index writer.
