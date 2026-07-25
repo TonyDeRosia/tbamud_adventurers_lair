@@ -40,3 +40,30 @@
    the modified flag, and add source-level regression coverage.
 6. Build, run focused and existing regression tests, inspect representative world
    prototypes/assignments, and document remaining metadata and ownership limits.
+
+## Focused correction audit (2026-07-25, before implementation)
+
+Manual testing of `medit 3068` found that the displayed DG command `N) Attach
+trigger` rejected lowercase `n` with `Try again :`.  The shared DG parser itself
+normalizes `N`, `X`, and `Q` with `tolower()`, but MEDIT's generic numeric
+pre-parser runs first for `OLC_SCRIPT_EDIT`; consequently **both displayed N/n
+and X/x commands disagree with actual MEDIT routing** and never reach the shared
+parser.  Q/q happened to work only because an earlier isolated exception/path
+masked the larger routing problem.  OEDIT and REDIT do reach the shared parser,
+but their displayed numeric rows have no inspection route: numeric input merely
+redisplays the menu.  Across all three editors the displayed numeric trigger
+choices therefore disagree with parser behavior.
+
+The primary menu also exposes `L) Legacy Behavior`, whose numbered movement,
+combat, memory, helper, fleeing, and scavenging controls duplicate the
+canonical NPC Flags editor.  The reachable AI implementation retains broad
+historical editors, but its current top-level menu only links additive entries;
+this correction will remove the legacy abstraction entry and route direct,
+read-only special and effective-preview views from classic MEDIT instead.
+
+Implementation will (1) exempt the complete shared DG mode from MEDIT's numeric
+pre-parser, (2) make every displayed DG command and numeric row work through the
+shared parser without dirtying on inspection, (3) restore each editor parent on
+Q/q, (4) add conservative trigger metadata, (5) add contextual canonical-flag
+help without changing bit storage, and (6) expose actual-pointer special
+inspection and a read-only effective preview directly from classic MEDIT.

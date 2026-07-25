@@ -701,6 +701,12 @@ static void medit_disp_mob_flags(struct descriptor_data *d)
 
   sprintbitarray(MOB_FLAGS(OLC_MOB(d)), action_bits_olc, AF_ARRAY_MAX, flags);
   write_to_output(d, "\r\nCurrent flags : %s%s%s\r\nEnter mob flags (0 to quit) : ", cyn, flags, nrm);
+  if (MOB_FLAGGED(OLC_MOB(d), MOB_MEMORY))
+    write_to_output(d, "\r\nMEMORY: Remembers attackers for legacy retaliation. Authority: NPC flag/mobile activity; AI may add relationship nuance only.\r\n");
+  if (MOB_FLAGGED(OLC_MOB(d), MOB_SCAVENGER))
+    write_to_output(d, "SCAVENGER: Picks up eligible objects through legacy mobile activity. AI object pickup is unavailable while selected.\r\n");
+  if (MOB_FLAGGED(OLC_MOB(d), MOB_SENTINEL))
+    write_to_output(d, "SENTINEL: Prevents normal random wandering; specials or DG Scripts may still move intentionally.\r\n");
 }
 
 /* Display affection flags menu. */
@@ -1103,8 +1109,9 @@ static void medit_disp_menu(struct descriptor_data *d)
           "%sP%s) Pet Price : %s%s\r\n"
           "%sR%s) Loadout / Loot\r\n"
           "%sS%s) DG Scripts: %s%s\r\n"
-          "%sL%s) Legacy Behavior\r\n"
+          "%sC%s) Special Procedure: %s\r\n"
           "%sI%s) AI Actor Extensions (optional)\r\n"
+          "%sV%s) Effective Behavior Preview\r\n"
           "%sW%s) Copy mob\r\n"
           "%sX%s) Delete mob\r\n"
 	  "%sQ%s) Quit\r\n"
@@ -1119,6 +1126,7 @@ static void medit_disp_menu(struct descriptor_data *d)
           grn, nrm, yel, price_buf,
           grn, nrm,
           grn, nrm, cyn, OLC_SCRIPT(d) ?"Set.":"Not Set.",
+          grn, nrm, GET_MOB_SPEC(mob) ? (legacy_special_metadata(GET_MOB_SPEC(mob)) ? legacy_special_metadata(GET_MOB_SPEC(mob))->name : "Unknown custom function") : "None",
           grn, nrm,
           grn, nrm,
           grn, nrm,
@@ -1243,11 +1251,13 @@ static void medit_disp_legacy_menu(struct descriptor_data *d)
 static void medit_disp_legacy_special(struct descriptor_data *d)
 {
   const struct legacy_special_metadata *meta=legacy_special_metadata(GET_MOB_SPEC(OLC_MOB(d))); char domains[256];
-  write_to_output(d,"\r\nAssigned Legacy Special\r\n-----------------------\r\n\r\nSpecial Procedure : %s\r\nStatus            : %s\r\nSource            : %s\r\nEditable          : %s\r\n",
+  write_to_output(d,"\r\nSpecial Procedure\r\n-----------------\r\n\r\nAssigned Special: %s\r\nStatus: %s\r\nSource: %s\r\nEditing: %s\r\n",
     GET_MOB_SPEC(OLC_MOB(d))?(meta?meta->name:"Unknown custom function"):"None",GET_MOB_SPEC(OLC_MOB(d))?"Active":"Not assigned",
     GET_MOB_SPEC(OLC_MOB(d))?"Legacy C special procedure":"None",meta&&meta->builder_editable?"Yes":"Read-only");
   if(meta)write_to_output(d,"Purpose           : %s\r\nOwned Domains     : %s\r\nSafe with AI      : %s\r\n\r\nCapabilities:\r\n  %s\r\n",meta->purpose,legacy_behavior_domain_list(meta->domains,domains,sizeof(domains)),meta->coexistence_known==1?"Only outside owned domains":meta->coexistence_known==2?"Review owned domains":"No; owned domains are locked",meta->capabilities);
   if(meta&&!str_cmp(meta->name,"Mayor"))write_to_output(d,"\r\nMayor Read-Only Views\r\n  1) Schedule: timed daily state sequence\r\n  2) Route: fixed Midgaard room path\r\n  3) Speech Lines: timed public announcements\r\n  4) Door Actions: opens and closes city gates\r\n  5) State Sequence: wake, posture, travel, waits, and sleep\r\n\r\nThese views describe the active C special; they do not create an AI copy.\r\n");
+  if(!GET_MOB_SPEC(OLC_MOB(d)) && GET_SDESC(OLC_MOB(d)) && str_str(GET_SDESC(OLC_MOB(d)),"mayor"))
+    write_to_output(d,"\r\nNotice:\r\nThis mob is named \"Mayor,\" but the legacy Mayor special is not assigned.\r\n\r\nIt does not receive the hard-coded Mayor route, timed speeches, gate actions,\r\nwake/sleep cycle, posture changes, or waits.\r\n");
   write_to_output(d,"\r\nQ) Return\r\nChoice: "); OLC_MODE(d)=MEDIT_LEGACY_SPECIAL;
 }
 
@@ -1556,6 +1566,7 @@ void medit_parse(struct descriptor_data *d, char *arg)
              OLC_MODE(d) != MEDIT_LOADOUT_REMOVE_EQUIP &&
              OLC_MODE(d) != MEDIT_LOADOUT_REMOVE_INV &&
              OLC_MODE(d) != MEDIT_LOADOUT_REMOVE_LOOT &&
+             OLC_MODE(d) != OLC_SCRIPT_EDIT &&
              OLC_MODE(d) != MEDIT_AI_ENABLE_CONFIRM &&
              OLC_MODE(d) != MEDIT_AI_MENU && OLC_MODE(d) != MEDIT_AI_SCHEDULE && (OLC_MODE(d) < MEDIT_AI_SCHEDULE_ROOM || OLC_MODE(d) > MEDIT_AI_PATROL_WAYPOINT_DELETE) && OLC_MODE(d) != MEDIT_AI_PERSONALITY && OLC_MODE(d) != MEDIT_AI_SOCIAL && OLC_MODE(d) != MEDIT_AI_DIALOGUE && OLC_MODE(d) != MEDIT_AI_DIALOGUE_ADD) {
     char *endptr = NULL;
@@ -1686,9 +1697,13 @@ void medit_parse(struct descriptor_data *d, char *arg)
     case 'I':
       medit_disp_ai_menu(d);
       return;
-    case 'l':
-    case 'L':
-      medit_disp_legacy_menu(d);
+    case 'c':
+    case 'C':
+      medit_disp_legacy_special(d);
+      return;
+    case 'v':
+    case 'V':
+      medit_disp_legacy_preview(d);
       return;
     case 'w':
     case 'W':
@@ -1974,9 +1989,15 @@ void medit_parse(struct descriptor_data *d, char *arg)
       default:medit_disp_legacy_menu(d);return;
     }
   case MEDIT_LEGACY_SPECIAL:
-    if(LOWER(*arg)=='q'){medit_disp_legacy_menu(d);return;}medit_disp_legacy_special(d);return;
+    if(LOWER(*arg)=='q'){medit_disp_menu(d);return;}
+    if(GET_MOB_SPEC(OLC_MOB(d)) && legacy_special_metadata(GET_MOB_SPEC(OLC_MOB(d))) &&
+       !str_cmp(legacy_special_metadata(GET_MOB_SPEC(OLC_MOB(d)))->name,"Mayor") && *arg>='1' && *arg<='5') {
+      static const char *views[]={"Schedule: timed wake/sleep and daily stages.","Route: fixed Midgaard route.","Speech Lines: hard-coded public announcements.","Door Actions: opens and closes gates.","State Sequence: wake, posture, route stages, waits, and sleep."};
+      write_to_output(d,"\r\n%s\r\n\r\nRead-only legacy C special information.\r\n",views[*arg-'1']);
+    }
+    medit_disp_legacy_special(d);return;
   case MEDIT_LEGACY_PREVIEW:
-    medit_disp_legacy_menu(d);return;
+    medit_disp_menu(d);return;
   case MEDIT_LEGACY_DIAGNOSTICS:
     if(LOWER(*arg)=='q'||!*arg){medit_disp_legacy_menu(d);return;}medit_disp_legacy_diagnostics(d);return;
   case MEDIT_BEHAVIOR_GENERAL:
