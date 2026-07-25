@@ -67,3 +67,28 @@ shared parser without dirtying on inspection, (3) restore each editor parent on
 Q/q, (4) add conservative trigger metadata, (5) add contextual canonical-flag
 help without changing bit storage, and (6) expose actual-pointer special
 inspection and a read-only effective preview directly from classic MEDIT.
+
+## DG attachment workflow audit (2026-07-25)
+
+- The authoritative DG prototype command is `trigedit`, registered at
+  `LVL_BUILDER`/`POS_DEAD` and dispatched to `do_oasis_trigedit`. `tedit` is a
+  separate god-level text-file editor and is not the DG trigger editor.
+- The command handler requires a player with a descriptor in `CON_PLAYING`, a
+  numeric in-range VNUM, no concurrent `CON_TRIGEDIT` session for that VNUM, a
+  resolvable zone, and `can_edit_zone` ownership. The interpreter provides the
+  builder-level command gate.
+- Entry allocates the descriptor's sole `oasis_olc_data`, calls
+  `trigedit_setup_existing` (or `trigedit_setup_new` for a new VNUM), and enters
+  `CON_TRIGEDIT`. Saves use `trigedit_save`, then the existing zone `.trg`
+  writer/index path.
+- Nested OLC is not safe: `do_oasis_trigedit` finds an existing `d->olc`, logs
+  an error, and frees it before allocating the trigger editor state. That would
+  destroy an active MEDIT/OEDIT/REDIT working copy. The selected attachment
+  screen therefore uses a safe, explicit handoff that shows
+  `trigedit <vnum>` and requires the builder to save/discard and leave the
+  parent first. Running that command normally preserves all permission, zone,
+  state, and concurrency checks; merely viewing the handoff does not dirty the
+  parent.
+- Attachment duplicates remain allowed, matching the pre-existing linked-list
+  policy. The new prompt states this explicitly. Validation now completes
+  before linked-list mutation, and detachment mutates only after confirmation.

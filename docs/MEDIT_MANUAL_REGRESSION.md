@@ -54,3 +54,44 @@ For each parent verify `n`/`N`, `x`/`X` (cancel deletion with `0`), `q`/`Q`, and
 displayed numeric trigger inspection.  Q from inspection returns to the trigger
 list; Q from that list returns to the correct object or room menu.  Opening and
 inspection must not cause a save prompt; a successful attach/detach must.
+
+## DG attachment workflow live regression
+
+Use disposable mob, object, room, and matching trigger prototypes for mutations.
+
+### Test A — inspect trigger
+
+Run `medit 3068`, then `s`, then `1`, then `1`. Verify the selected-trigger and
+read-only inspection screens identify trigger 3011; return with both `q` and `Q`
+and verify the parent is not dirty.
+
+### Test B — edit trigger prototype
+
+Select trigger 3011 and choose **Edit Trigger Prototype**. Verify the safe
+handoff names `trigedit 3011`, does not start a duplicate/nested editor, and does
+not change the attachment or dirty state. Leave the parent explicitly and run
+the command; verify normal level, zone, and concurrent-editor checks apply.
+
+### Test C — safe attach
+
+Run `medit 3068`, `s`, `n`, then enter `1`. It must be rejected as incomplete
+without attaching or dirtying. Return/cancel, choose `n`, and enter `2, 3011`.
+The legacy policy allows duplicate attachments, so this succeeds when slot,
+type, existence, and trigger-zone permission checks pass. Do real mutation
+checks only on a disposable mob and trigger. Also check `2 3011`, incomplete
+commas, suffix text, invalid slots, negative VNUMs, missing prototypes, and
+wrong attach types.
+
+### Test D — safe detach
+
+Select a disposable attachment and choose detach. Verify the confirmation names
+its slot, VNUM, name, and parent. Cancel once with `n` and verify no dirty state;
+repeat and confirm with `y`. Only the attachment must disappear, the parent must
+be dirty, and `tstat <vnum>` must show the prototype still exists.
+
+### Test E — OEDIT and REDIT
+
+Repeat inspect, handoff, attach, cancel-detach, and confirmed-detach using
+`oedit` and `redit` with disposable compatible prototypes. Verify the labels say
+Object and Room respectively, mismatched attach types are rejected, case is
+accepted for documented letters, and returning restores the correct parent.

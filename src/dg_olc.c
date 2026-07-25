@@ -28,6 +28,10 @@ static void trigedit_disp_menu(struct descriptor_data *d);
 static void trigedit_disp_types(struct descriptor_data *d);
 static void trigedit_create_index(int znum, char *type);
 static void trigedit_setup_new(struct descriptor_data *d);
+static struct trig_proto_list *dg_attachment_at(struct descriptor_data *d, int slot);
+static void dg_trigger_action_menu(struct descriptor_data *d);
+static void dg_trigger_inspect(struct descriptor_data *d);
+static const char *dg_parent_noun(struct descriptor_data *d);
 
 
 /* Trigedit */
@@ -936,6 +940,100 @@ void dg_olc_script_copy(struct descriptor_data *d)
       OLC_SCRIPT(d) = NULL;
 }
 
+static struct trig_proto_list *dg_attachment_at(struct descriptor_data *d, int slot)
+{
+  struct trig_proto_list *trigger = OLC_SCRIPT(d);
+  while (trigger && --slot > 0)
+    trigger = trigger->next;
+  return slot == 0 ? trigger : NULL;
+}
+
+static const char *dg_parent_noun(struct descriptor_data *d)
+{
+  return OLC_ITEM_TYPE(d) == MOB_TRIGGER ? "Mob" :
+         OLC_ITEM_TYPE(d) == OBJ_TRIGGER ? "Object" : "Room";
+}
+
+static void dg_trigger_action_menu(struct descriptor_data *d)
+{
+  struct trig_proto_list *attached = dg_attachment_at(d, OLC(d)->script_selected);
+  trig_rnum rnum = attached ? real_trigger(attached->vnum) : NOTHING;
+  struct trig_data *proto = rnum == NOTHING ? NULL : trig_index[rnum]->proto;
+  char types[MAX_INPUT_LENGTH] = "Unknown";
+
+  if (!attached) {
+    dg_script_menu(d);
+    return;
+  }
+  if (proto) {
+    const char **names = proto->attach_type == OBJ_TRIGGER ? otrig_types :
+                         proto->attach_type == WLD_TRIGGER ? wtrig_types : trig_types;
+    sprintbit(GET_TRIG_TYPE(proto), names, types, sizeof(types));
+  }
+  clear_screen(d);
+  write_to_output(d, "Attached Trigger\r\n----------------\r\n\r\n"
+      "Attachment slot : %d\r\nTrigger VNUM    : %d\r\nName            : %s\r\n"
+      "Type            : %s\r\nAttach Type     : %s\r\n"
+      "Numeric Argument: %d\r\nArgument        : %s\r\n\r\n"
+      "Behavior metadata:\r\n  %s\r\n\r\n"
+      "1) Inspect Trigger\r\n2) Edit Trigger Prototype\r\n"
+      "3) Detach From This %s\r\nQ) Return\r\n\r\nChoice: ",
+      OLC(d)->script_selected, attached->vnum,
+      proto && proto->name ? proto->name : "<missing trigger prototype>", types,
+      proto ? (proto->attach_type == MOB_TRIGGER ? "Mobile" :
+               proto->attach_type == OBJ_TRIGGER ? "Object" : "Room") : "Unknown",
+      proto ? GET_TRIG_NARG(proto) : 0,
+      proto && GET_TRIG_ARG(proto) ? GET_TRIG_ARG(proto) : "<none>",
+      attached->vnum == 3011 ?
+        "Picks up non-fountain room objects costing 15 gold or less." :
+        "Unknown / arbitrary DG Script (no authored metadata).",
+      dg_parent_noun(d));
+  OLC_SCRIPT_EDIT_MODE(d) = SCRIPT_TRIGGER_ACTION;
+}
+
+static void dg_trigger_inspect(struct descriptor_data *d)
+{
+  struct trig_proto_list *attached = dg_attachment_at(d, OLC(d)->script_selected);
+  trig_rnum rnum = attached ? real_trigger(attached->vnum) : NOTHING;
+  struct trig_data *proto = rnum == NOTHING ? NULL : trig_index[rnum]->proto;
+  struct cmdlist_element *command;
+  char types[MAX_INPUT_LENGTH] = "Unknown";
+
+  if (!attached) {
+    dg_script_menu(d);
+    return;
+  }
+  if (proto) {
+    const char **names = proto->attach_type == OBJ_TRIGGER ? otrig_types :
+                         proto->attach_type == WLD_TRIGGER ? wtrig_types : trig_types;
+    sprintbit(GET_TRIG_TYPE(proto), names, types, sizeof(types));
+  }
+  clear_screen(d);
+  write_to_output(d, "Trigger Inspection (read-only)\r\n------------------------------\r\n\r\n"
+      "VNUM: %d\r\nName: %s\r\nTrigger type: %s\r\nAttach type: %s\r\n"
+      "Numeric argument: %d\r\nArgument phrase: %s\r\nMetadata availability: %s\r\n",
+      attached->vnum, proto && proto->name ? proto->name : "<missing trigger prototype>",
+      types, proto ? (proto->attach_type == MOB_TRIGGER ? "Mobile" :
+                      proto->attach_type == OBJ_TRIGGER ? "Object" : "Room") : "Unknown",
+      proto ? GET_TRIG_NARG(proto) : 0,
+      proto && GET_TRIG_ARG(proto) ? GET_TRIG_ARG(proto) : "<none>",
+      attached->vnum == 3011 ? "Available (verified from trigger commands)" : "Not authored");
+  if (attached->vnum == 3011)
+    write_to_output(d, "Known behavior: Picks up non-fountain room objects costing 15 gold or less.\r\n");
+  else
+    write_to_output(d, "Behavior classification: Unknown / arbitrary DG Script.\r\n");
+
+  if (proto && (GET_LEVEL(d->character) >= LVL_IMPL ||
+      can_edit_zone(d->character, real_zone_by_thing(attached->vnum)))) {
+    write_to_output(d, "\r\nCommands:\r\n");
+    for (command = proto->cmdlist; command; command = command->next)
+      write_to_output(d, "  %s\r\n", command->cmd);
+  } else
+    write_to_output(d, "\r\nCommands: unavailable (zone permission required).\r\n");
+  write_to_output(d, "\r\nQ) Return to selected trigger\r\nChoice: ");
+  OLC_SCRIPT_EDIT_MODE(d) = SCRIPT_INSPECT_TRIGGER;
+}
+
 void dg_script_menu(struct descriptor_data *d)
 {
   struct trig_proto_list *editscript;
@@ -965,15 +1063,14 @@ void dg_script_menu(struct descriptor_data *d)
       const char **names = proto->attach_type == OBJ_TRIGGER ? otrig_types :
                            proto->attach_type == WLD_TRIGGER ? wtrig_types : trig_types;
       sprintbit(GET_TRIG_TYPE(proto), names, types, sizeof(types));
-      write_to_output(d, "         Type: %s\r\n         Attach: %s\r\n"
-                         "         Numeric argument: %d\r\n         Argument: %s\r\n"
-                         "         Behavior metadata: %s\r\n",
+      write_to_output(d, "         %s %s trigger; numeric argument: %d\r\n",
           types, proto->attach_type == MOB_TRIGGER ? "Mobile" :
                  proto->attach_type == OBJ_TRIGGER ? "Object" : "Room",
-          GET_TRIG_NARG(proto), GET_TRIG_ARG(proto) ? GET_TRIG_ARG(proto) : "<none>",
-          editscript->vnum == 3011 ? "Available (verified from trigger commands)" : "Not authored");
+          GET_TRIG_NARG(proto));
       if (editscript->vnum == 3011)
-        write_to_output(d, "         Purpose: Picks up non-fountain room objects costing 15 gold or less\r\n");
+        write_to_output(d, "         Picks up non-fountain room objects costing 15 gold or less\r\n");
+      else
+        write_to_output(d, "         Behavior: Unknown / arbitrary DG Script\r\n");
     }
 
     editscript = editscript->next;
@@ -982,9 +1079,10 @@ void dg_script_menu(struct descriptor_data *d)
     write_to_output(d, "     <none>\r\n");
 
   write_to_output(d,  "\r\n"
-    " %sN%s)  Attach trigger\r\n"
-    " %sX%s)  Detach trigger\r\n"
-    " %sQ%s)  Quit\r\n\r\n"
+    " %sN%s)  Attach existing trigger\r\n"
+    " %sX%s)  Detach an attachment\r\n"
+    " Select a number to inspect, edit, or detach\r\n"
+    " %sQ%s)  Return\r\n\r\n"
     "     Enter choice :",
     grn, nrm, grn, nrm, grn, nrm);
 }
@@ -1005,33 +1103,8 @@ int dg_script_edit_parse(struct descriptor_data *d, char *arg)
         currtrig = OLC_SCRIPT(d);
         while (currtrig && --pos > 0) currtrig = currtrig->next;
         if (currtrig && pos == 0) {
-          trig_rnum rnum = real_trigger(currtrig->vnum);
-          struct trig_data *proto = rnum == NOTHING ? NULL : trig_index[rnum]->proto;
-          write_to_output(d, "\r\nTrigger Inspection\r\n------------------\r\n\r\n"
-                             "VNUM: %d\r\nName: %s\r\nSource: DG Script\r\n",
-              currtrig->vnum, proto && proto->name ? proto->name : "<missing trigger prototype>");
-          if (proto) {
-            char types[MAX_INPUT_LENGTH];
-            const char **names = proto->attach_type == OBJ_TRIGGER ? otrig_types :
-                                 proto->attach_type == WLD_TRIGGER ? wtrig_types : trig_types;
-            sprintbit(GET_TRIG_TYPE(proto), names, types, sizeof(types));
-            write_to_output(d, "Trigger type: %s\r\nAttach type: %s\r\n"
-                               "Numeric argument: %d\r\nArgument phrase: %s\r\n",
-                types, proto->attach_type == MOB_TRIGGER ? "Mobile" :
-                       proto->attach_type == OBJ_TRIGGER ? "Object" : "Room",
-                GET_TRIG_NARG(proto), GET_TRIG_ARG(proto) ? GET_TRIG_ARG(proto) : "<none>");
-          }
-          write_to_output(d, "Metadata availability: %s\r\n\r\n",
-              currtrig->vnum == 3011 ? "Available (verified from trigger commands)" : "Not authored");
-          if (currtrig->vnum == 3011)
-            write_to_output(d, "Known behavior:\r\n  Iterates over room contents and picks up non-fountain objects costing 15 gold or less.\r\n\r\n"
-                               "Owned domains:\r\n  Object interaction\r\n\r\n"
-                               "AI coexistence:\r\n  Do not configure duplicate object pickup.\r\n");
-          else
-            write_to_output(d, "Behavior classification:\r\n  Unknown / arbitrary DG Script\r\n\r\n"
-                               "No behavior domains are inferred without authored metadata.\r\n");
-          write_to_output(d, "\r\nQ) Return to attached triggers\r\nChoice: ");
-          OLC_SCRIPT_EDIT_MODE(d) = SCRIPT_INSPECT_TRIGGER;
+          OLC(d)->script_selected = (int)selection;
+          dg_trigger_action_menu(d);
           return 1;
         }
       }
@@ -1055,11 +1128,18 @@ int dg_script_edit_parse(struct descriptor_data *d, char *arg)
 	   * free()'d, and the prototype not touched. */
           return 0;
         case 'n':
-          write_to_output(d, "\r\nPlease enter position, vnum   (ex: 1, 200):");
+          for (count = 0, trig = OLC_SCRIPT(d); trig; trig = trig->next) count++;
+          write_to_output(d, "\r\nEnter insertion slot and trigger VNUM.\r\n"
+              "Example: 2, 3011\r\n\r\nCurrent attached triggers: %d\r\n"
+              "Valid insertion slots: 1 through %d\r\nUse slot %d to append.\r\n"
+              "Duplicate attachments are allowed by the legacy DG policy.\r\n\r\n"
+              "Enter slot, VNUM or Q to cancel: ", count, count + 1, count + 1);
           OLC_SCRIPT_EDIT_MODE(d) = SCRIPT_NEW_TRIGGER;
           break;
         case 'x':
-          write_to_output(d, "     Which entry should be deleted?  0 to abort :");
+          for (count = 0, trig = OLC_SCRIPT(d); trig; trig = trig->next) count++;
+          write_to_output(d, "Detach which attachment slot?\r\n"
+              "Enter 1 through %d, or 0/Q to cancel: ", count);
           OLC_SCRIPT_EDIT_MODE(d) = SCRIPT_DEL_TRIGGER;
           break;
         default:
@@ -1071,26 +1151,104 @@ int dg_script_edit_parse(struct descriptor_data *d, char *arg)
     case SCRIPT_INSPECT_TRIGGER:
       /* Inspection is read-only: never touch OLC_VAL here. */
       if (tolower((unsigned char)*arg) == 'q')
-        dg_script_menu(d);
+        dg_trigger_action_menu(d);
       else
-        write_to_output(d, "Enter Q to return to attached triggers: ");
+        write_to_output(d, "Enter Q to return to the selected trigger: ");
+      return 1;
+
+    case SCRIPT_TRIGGER_ACTION:
+      switch (tolower((unsigned char)*arg)) {
+        case '1':
+          dg_trigger_inspect(d);
+          break;
+        case '2':
+          currtrig = dg_attachment_at(d, OLC(d)->script_selected);
+          if (!currtrig || real_trigger(currtrig->vnum) == NOTHING) {
+            write_to_output(d, "That trigger prototype no longer exists.\r\n");
+          } else {
+            write_to_output(d, "\r\nEdit Trigger Prototype\r\n----------------------\r\n\r\n"
+                "Trigger %d is edited by the authoritative trigger editor.\r\n\r\n"
+                "Nested Oasis OLC is not safe because all editors share one descriptor OLC structure.\r\n"
+                "Return to and save or discard this parent editor, then enter:\r\n  trigedit %d\r\n\r\n"
+                "The trigedit command will enforce builder level, zone ownership, descriptor state,\r\n"
+                "and concurrent-editor checks. No parent attachment has been changed.\r\n\r\n"
+                "Q) Return to selected trigger\r\nChoice: ", currtrig->vnum, currtrig->vnum);
+            OLC_SCRIPT_EDIT_MODE(d) = SCRIPT_INSPECT_TRIGGER;
+            return 1;
+          }
+          dg_trigger_action_menu(d);
+          break;
+        case '3':
+          currtrig = dg_attachment_at(d, OLC(d)->script_selected);
+          if (!currtrig) {
+            dg_script_menu(d);
+            break;
+          }
+          {
+            trig_rnum rnum = real_trigger(currtrig->vnum);
+            struct trig_data *proto = rnum == NOTHING ? NULL : trig_index[rnum]->proto;
+            write_to_output(d, "\r\nDetach attachment slot %d: trigger [%d] %s from this %s?\r\n"
+                "This removes only the attachment; it does not delete the trigger prototype.\r\nY/N: ",
+                OLC(d)->script_selected, currtrig->vnum,
+                proto && proto->name ? proto->name : "<missing trigger prototype>",
+                dg_parent_noun(d));
+          }
+          OLC_SCRIPT_EDIT_MODE(d) = SCRIPT_DETACH_CONFIRM;
+          break;
+        case 'q':
+          dg_script_menu(d);
+          break;
+        default:
+          dg_trigger_action_menu(d);
+      }
       return 1;
 
     case SCRIPT_NEW_TRIGGER:
-      vnum = -1;
-      count = sscanf(arg,"%d, %d",&pos,&vnum);
-      if (count==1) {
-        vnum = pos;
-        pos = 999;
+      {
+        char *cursor = arg, *end;
+        long parsed_pos, parsed_vnum;
+        while (isspace((unsigned char)*cursor)) cursor++;
+        if (tolower((unsigned char)*cursor) == 'q' && cursor[1] == '\0') break;
+        parsed_pos = strtol(cursor, &end, 10);
+        if (end == cursor) goto incomplete_attach;
+        cursor = end;
+        while (isspace((unsigned char)*cursor)) cursor++;
+        if (*cursor == ',') {
+          cursor++;
+          while (isspace((unsigned char)*cursor)) cursor++;
+        } else if (cursor == end || !isspace((unsigned char)end[-1])) {
+          goto incomplete_attach;
+        }
+        parsed_vnum = strtol(cursor, &end, 10);
+        if (end == cursor) goto incomplete_attach;
+        while (isspace((unsigned char)*end)) end++;
+        if (*end || parsed_pos > INT_MAX || parsed_vnum > INT_MAX ||
+            parsed_pos < INT_MIN || parsed_vnum < INT_MIN) goto incomplete_attach;
+        pos = (int)parsed_pos;
+        vnum = (int)parsed_vnum;
       }
 
-      if (pos<=0) break; /* this aborts a new trigger entry */
-
-      if (vnum==0) break; /* this aborts a new trigger entry */
-
-      if (real_trigger(vnum) == NOTHING) {
-        write_to_output(d, "Invalid Trigger VNUM!\r\n"
-                           "Please enter position, vnum   (ex: 1, 200):");
+      for (count = 0, trig = OLC_SCRIPT(d); trig; trig = trig->next) count++;
+      if (pos < 1 || pos > count + 1) {
+        write_to_output(d, "Insertion slot %d is invalid. Valid slots are 1 through %d.\r\n"
+                           "Enter slot, VNUM or Q to cancel: ", pos, count + 1);
+        return 1;
+      }
+      if (vnum < IDXTYPE_MIN || vnum > IDXTYPE_MAX || real_trigger(vnum) == NOTHING) {
+        write_to_output(d, "Trigger %d does not exist.\r\nEnter slot, VNUM or Q to cancel: ", vnum);
+        return 1;
+      }
+      if (trig_index[real_trigger(vnum)]->proto->attach_type != OLC_ITEM_TYPE(d)) {
+        write_to_output(d, "Trigger %d is a %s trigger and cannot be attached to a %s.\r\n"
+                           "Enter slot, VNUM or Q to cancel: ", vnum,
+            trig_index[real_trigger(vnum)]->proto->attach_type == MOB_TRIGGER ? "mobile" :
+            trig_index[real_trigger(vnum)]->proto->attach_type == OBJ_TRIGGER ? "object" : "room",
+            dg_parent_noun(d));
+        return 1;
+      }
+      if (!can_edit_zone(d->character, real_zone_by_thing(vnum))) {
+        write_to_output(d, "You do not have permission to use trigger %d.\r\n"
+                           "Enter slot, VNUM or Q to cancel: ", vnum);
         return 1;
       }
 
@@ -1112,29 +1270,48 @@ int dg_script_edit_parse(struct descriptor_data *d, char *arg)
       OLC_VAL(d)++;
       break;
 
+incomplete_attach:
+      write_to_output(d, "Enter both an insertion slot and trigger VNUM (for example: 1, 3011),"
+                         " or Q to cancel: ");
+      return 1;
+
     case SCRIPT_DEL_TRIGGER:
+      if (tolower((unsigned char)*arg) == 'q') break;
       pos = atoi(arg);
       if (pos<=0) break;
+      if (!dg_attachment_at(d, pos)) {
+        write_to_output(d, "That attachment slot does not exist. Enter another slot, or 0/Q to cancel: ");
+        return 1;
+      }
+      OLC(d)->script_selected = pos;
+      dg_trigger_action_menu(d);
+      /* Reuse the selected-trigger confirmation path. */
+      return dg_script_edit_parse(d, "3");
 
-      if (pos==1 && OLC_SCRIPT(d)) {
-        OLC_VAL(d)++;
-        currtrig = OLC_SCRIPT(d);
-        OLC_SCRIPT(d) = currtrig->next;
-        free(currtrig);
+    case SCRIPT_DETACH_CONFIRM:
+      if (tolower((unsigned char)*arg) == 'y') {
+        pos = OLC(d)->script_selected;
+        if (pos == 1) {
+          trig = OLC_SCRIPT(d);
+          if (trig) OLC_SCRIPT(d) = trig->next;
+        } else {
+          currtrig = OLC_SCRIPT(d);
+          while (currtrig && --pos > 1) currtrig = currtrig->next;
+          trig = currtrig ? currtrig->next : NULL;
+          if (trig) currtrig->next = trig->next;
+        }
+        if (trig) {
+          free(trig);
+          OLC_VAL(d)++;
+        }
         break;
       }
-
-      pos--;
-      currtrig = OLC_SCRIPT(d);
-      while (--pos && currtrig) currtrig = currtrig->next;
-      /* now curtrig points one before the target */
-      if (currtrig && currtrig->next) {
-        OLC_VAL(d)++;
-        trig = currtrig->next;
-        currtrig->next = trig->next;
-        free(trig);
+      if (tolower((unsigned char)*arg) == 'n' || tolower((unsigned char)*arg) == 'q') {
+        dg_trigger_action_menu(d);
+        return 1;
       }
-      break;
+      write_to_output(d, "Enter Y to detach only this attachment, or N to cancel: ");
+      return 1;
   }
 
   dg_script_menu(d);
