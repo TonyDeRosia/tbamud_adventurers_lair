@@ -25,7 +25,7 @@ assert 'Dynamic Dialogue' in medit and 'Unavailable - owned by legacy source' in
 assert 'SCAVENGER flag authoritative' in medit
 assert '#define MEDIT_LEGACY_MENU' in oasis  # retained only for saved/source compatibility
 assert 'switch(tolower(*arg))' in dg
-for command in ("case 'q':", "case 'n':", "case 'x':"):
+for command in ("case 'q':", "case 'n':", "case 'd':", "case 'x':"):
     assert command in dg
 assert 'SCRIPT_INSPECT_TRIGGER' in dg
 assert 'Unknown / arbitrary DG Script' in dg
@@ -40,7 +40,8 @@ print('MEDIT legacy-first regression checks passed')
 # Shared DG routing reaches the parser before MEDIT's numeric-only validation.
 assert 'OLC_MODE(d) != OLC_SCRIPT_EDIT' in medit
 assert "case 'n':" in dg and 'SCRIPT_NEW_TRIGGER' in dg
-assert "case 'x':" in dg and 'SCRIPT_DEL_TRIGGER' in dg
+assert "case 'd':" in dg and 'SCRIPT_DEL_TRIGGER' in dg
+assert "case 'x':" in dg and "return 0;" in dg
 assert 'if (isdigit((unsigned char)*arg))' in dg
 assert '/* Inspection is read-only: never touch OLC_VAL here. */' in dg
 assert dg.count('OLC_VAL(d)++;') >= 2  # successful attach/detach dirty the parent

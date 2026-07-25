@@ -1110,7 +1110,7 @@ void dg_script_menu(struct descriptor_data *d)
   OLC_SCRIPT_EDIT_MODE(d) = SCRIPT_MAIN_MENU;
 
   clear_screen(d);
-  write_to_output(d, "     Triggers Attached:\r\n");
+  write_to_output(d, "     Script Editor\r\n\r\n     Trigger List:\r\n");
 
   editscript = OLC_SCRIPT(d);
 
@@ -1145,12 +1145,17 @@ void dg_script_menu(struct descriptor_data *d)
     write_to_output(d, "     <none>\r\n");
 
   write_to_output(d,  "\r\n"
-    " %sN%s)  Attach existing trigger\r\n"
-    " %sX%s)  Detach an attachment\r\n"
-    " Select a number to inspect, edit, or detach\r\n"
-    " %sQ%s)  Return\r\n\r\n"
+    " %sN%s)  New trigger for this script\r\n"
+    " %sD%s)  Delete a trigger in this script\r\n"
+    " %sI%s)  Inspect attached trigger\r\n"
+    " %sE%s)  Edit trigger prototype (safe handoff)\r\n"
+    " %sR%s)  References / usage\r\n"
+    " %sH%s)  Help\r\n"
+    " %sX%s)  Exit Script Editor\r\n"
+    " Select a number for attachment actions\r\n\r\n"
     "     Enter choice :",
-    grn, nrm, grn, nrm, grn, nrm);
+    grn, nrm, grn, nrm, grn, nrm, grn, nrm, grn, nrm, grn, nrm,
+    grn, nrm);
 }
 
 int dg_script_edit_parse(struct descriptor_data *d, char *arg)
@@ -1175,7 +1180,8 @@ int dg_script_edit_parse(struct descriptor_data *d, char *arg)
         }
       }
       switch(tolower(*arg)) {
-        case 'q':
+        case 'q': /* Additive alias retained for builders used to newer menus. */
+        case 'x':
           /* This was buggy. First we created a copy of a thing, but maintained
 	   * pointers to scripts, then if we altered the scripts, we freed the 
 	   * pointers and added new ones to the OLC_THING. If we then choose NOT
@@ -1195,23 +1201,72 @@ int dg_script_edit_parse(struct descriptor_data *d, char *arg)
           return 0;
         case 'n':
           for (count = 0, trig = OLC_SCRIPT(d); trig; trig = trig->next) count++;
-          write_to_output(d, "\r\nEnter insertion slot and trigger VNUM.\r\n"
-              "Example: 2, 3011\r\n\r\nCurrent attached triggers: %d\r\n"
+          write_to_output(d, "\r\nPlease enter position, vnum   (ex: 1, 200):\r\n"
+              "Current attached triggers: %d\r\n"
               "Valid insertion slots: 1 through %d\r\nUse slot %d to append.\r\n"
               "Duplicate attachments are allowed by the legacy DG policy.\r\n\r\n"
               "Enter slot, VNUM or Q to cancel: ", count, count + 1, count + 1);
           OLC_SCRIPT_EDIT_MODE(d) = SCRIPT_NEW_TRIGGER;
           break;
-        case 'x':
+        case 'd':
           for (count = 0, trig = OLC_SCRIPT(d); trig; trig = trig->next) count++;
+          if (!count) {
+            write_to_output(d, "There are no trigger attachments to delete.\r\n");
+            dg_script_menu(d);
+            break;
+          }
           write_to_output(d, "Detach which attachment slot?\r\n"
               "Enter 1 through %d, or 0/Q to cancel: ", count);
           OLC_SCRIPT_EDIT_MODE(d) = SCRIPT_DEL_TRIGGER;
+          break;
+        case 'i':
+          write_to_output(d, "Inspect which attachment position (or Q to cancel)? ");
+          OLC_SCRIPT_EDIT_MODE(d) = SCRIPT_INSPECT_SELECT;
+          break;
+        case 'e':
+          write_to_output(d, "\r\nTrigger prototypes are edited separately.\r\n"
+              "Select an attachment to learn its VNUM, save or discard this parent, then enter:\r\n"
+              "  trigedit <vnum>\r\n\r\nQ) Return to Script Editor: ");
+          OLC_SCRIPT_EDIT_MODE(d) = SCRIPT_INFO_RETURN;
+          break;
+        case 'r':
+          write_to_output(d, "\r\nReferences are available through the separate builder reference tools.\r\n"
+              "No potentially expensive world scan is run from this menu.\r\n\r\n"
+              "Q) Return to Script Editor: ");
+          OLC_SCRIPT_EDIT_MODE(d) = SCRIPT_INFO_RETURN;
+          break;
+        case 'h':
+          write_to_output(d, "\r\nScript attachment help\r\n----------------------\r\n"
+              "N attaches an existing Mobile/Object/Room trigger to the matching parent.\r\n"
+              "Enter position, vnum (for example: 1, 200); attachment order is preserved.\r\n"
+              "D removes one attachment by its numbered position; it does not delete the trigger.\r\n"
+              "X returns to the parent editor. Attachments become permanent only when it is saved.\r\n"
+              "Attaching a trigger does not edit its prototype. MEDIT accepts only Mobile triggers.\r\n\r\n");
+          write_to_output(d, "Q) Return to Script Editor: ");
+          OLC_SCRIPT_EDIT_MODE(d) = SCRIPT_INFO_RETURN;
           break;
         default:
           dg_script_menu(d);
           break;
       }
+      return 1;
+
+    case SCRIPT_INFO_RETURN:
+      if (tolower((unsigned char)*arg) == 'q')
+        break;
+      write_to_output(d, "Enter Q to return to the Script Editor: ");
+      return 1;
+
+    case SCRIPT_INSPECT_SELECT:
+      if (tolower((unsigned char)*arg) == 'q')
+        break;
+      pos = atoi(arg);
+      if (!dg_attachment_at(d, pos)) {
+        write_to_output(d, "That attachment position does not exist. Enter a listed position, or Q: ");
+        return 1;
+      }
+      OLC(d)->script_selected = pos;
+      dg_trigger_inspect(d);
       return 1;
 
     case SCRIPT_INSPECT_TRIGGER:
@@ -1327,7 +1382,7 @@ int dg_script_edit_parse(struct descriptor_data *d, char *arg)
         trig->next = OLC_SCRIPT(d);
         OLC_SCRIPT(d) = trig;
       } else {
-        while (currtrig->next && --pos) {
+        while (currtrig->next && --pos > 1) {
           currtrig = currtrig->next;
         }
         trig->next = currtrig->next;

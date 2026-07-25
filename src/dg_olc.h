@@ -39,6 +39,8 @@
 #define SCRIPT_INSPECT_TRIGGER		3
 #define SCRIPT_TRIGGER_ACTION           4
 #define SCRIPT_DETACH_CONFIRM           5
+#define SCRIPT_INSPECT_SELECT           6
+#define SCRIPT_INFO_RETURN              7
 
 #define OLC_SCRIPT_EDIT_MODE(d)	(OLC(d)->script_mode)	/* parse input mode */
 #define OLC_SCRIPT(d)           (OLC(d)->script)	/* script editing   */
