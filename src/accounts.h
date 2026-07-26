@@ -39,6 +39,8 @@ void account_remove_character(struct account_data *acct, const char *name);
 int account_find_character_on_roster(const struct account_data *acct, const char *slot_or_name,
                                      int *out_index, char *out_name, size_t out_name_len);
 int account_character_is_in_use(const char *name);
+struct descriptor_data *account_character_in_use_elsewhere(
+    const char *name, const struct descriptor_data *current_desc);
 int account_delete_character_data(const char *name);
 
 #endif

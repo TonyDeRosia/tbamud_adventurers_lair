@@ -2101,10 +2101,27 @@ case CON_GET_NAME:             /* wait for input of name */
           return;
       }
       if ((player_i = load_char(tmp_name, d->character)) > -1) {
+        struct descriptor_data *conflicting_desc = NULL;
+        char conflicting_desc_number[32] = "none";
+        char conflicting_state[32] = "none";
+
+        if (d->acct_roster_load_only) {
+          conflicting_desc = account_character_in_use_elsewhere(tmp_name, d);
+          if (conflicting_desc) {
+            snprintf(conflicting_desc_number, sizeof(conflicting_desc_number), "%d",
+                     conflicting_desc->desc_num);
+            snprintf(conflicting_state, sizeof(conflicting_state), "%d", STATE(conflicting_desc));
+          }
+        }
+        if (d->acct_roster_load_only) {
+          mudlog(CMP, LVL_IMPL, TRUE,
+                 "Account roster load validation for %s: load-result=%d, expected-account=%ld, loaded-account=%ld, in-use-elsewhere=%d, conflicting-descriptor=%s, conflicting-state=%s, self-descriptor-excluded=yes",
+                 tmp_name, player_i, d->acct_id, GET_ACCOUNT_ID(d->character),
+                 conflicting_desc != NULL,
+                 conflicting_desc_number, conflicting_state);
+        }
         if (d->acct_roster_load_only &&
-            (GET_ACCOUNT_ID(d->character) != d->acct_id || account_character_is_in_use(tmp_name))) {
-          mudlog(CMP, LVL_IMPL, TRUE, "Account roster load rejected for %s: expected account %ld, loaded %ld, in-use=%d",
-                 tmp_name, d->acct_id, GET_ACCOUNT_ID(d->character), account_character_is_in_use(tmp_name));
+            (GET_ACCOUNT_ID(d->character) != d->acct_id || conflicting_desc)) {
           d->acct_roster_load_only = 0;
           free_char(d->character);
           d->character = NULL;
@@ -2175,8 +2192,9 @@ if (PLR_FLAGGED(d->character, PLR_DELETED)) {
         }
       } else {
         if (d->acct_roster_load_only) {
-          mudlog(CMP, LVL_IMPL, TRUE, "Account roster load failed for %s: index position %ld, expected account %ld",
-                 tmp_name, get_ptable_by_name(tmp_name), d->acct_id);
+          mudlog(CMP, LVL_IMPL, TRUE,
+                 "Account roster load failed for %s: load-result=%d, index-position=%ld, expected-account=%ld, loaded-account=none, in-use-elsewhere=0, conflicting-descriptor=none, conflicting-state=none, self-descriptor-excluded=yes",
+                 tmp_name, player_i, get_ptable_by_name(tmp_name), d->acct_id);
           d->acct_roster_load_only = 0;
           free_char(d->character);
           d->character = NULL;
