@@ -61,9 +61,6 @@ ACMD(do_clanedit);
 ACMD(do_clist);
 
 ACMD(do_affremove);
-ACMD(do_smartspawn);
-ACMD(do_aistate);
-ACMD(do_aictl);
 ACMD(do_shadow);
 ACMD(do_areatemplate);
 ACMD(do_roomtemplate);
@@ -389,10 +386,6 @@ cpp_extern const struct command_info cmd_info[] = {
   { "slist"    , "slist"   , POS_SLEEPING, do_oasis_list, LVL_BUILDER, SCMD_OASIS_SLIST },
   { "sneak"    , "sneak"   , POS_STANDING, do_sneak    , 1, 0 },
   { "snoop"    , "snoop"   , POS_DEAD    , do_snoop    , LVL_GOD, 0 },
-  { "smartsp"   , "smartsp"  , POS_DEAD    , do_smartspawn, LVL_IMMORT, 0 },
-  { "aictl"    , "aictl"    , POS_DEAD    , do_aictl    , LVL_IMMORT, 0 },
-  { "aistate"  , "aistate"  , POS_DEAD    , do_aistate  , LVL_IMMORT, 0 },
-  { "smartspawn", "smartspawn", POS_DEAD    , do_smartspawn, LVL_IMMORT, 0 },
   { "socials"  , "socials" , POS_DEAD    , do_commands , 0, SCMD_SOCIALS },
   { "split"    , "split"   , POS_SITTING , do_split    , 1, 0 },
   { "stand"    , "st"      , POS_RESTING , do_stand    , 0, 0 },
@@ -638,10 +631,7 @@ void command_interpreter(struct char_data *ch, char *argument)
   for (length = strlen(arg), cmd = 0; *complete_cmd_info[cmd].command != '\n'; cmd++)
     if(complete_cmd_info[cmd].command_pointer != do_action &&
        !strncmp(complete_cmd_info[cmd].command, arg, length))
-      if (GET_LEVEL(ch) >= complete_cmd_info[cmd].minimum_level ||
-          (complete_cmd_info[cmd].command_pointer == do_smartspawn &&
-           IS_NPC(ch) && ch->desc && ch->desc->original &&
-           GET_LEVEL(ch->desc->original) >= complete_cmd_info[cmd].minimum_level))
+      if (GET_LEVEL(ch) >= complete_cmd_info[cmd].minimum_level)
         break;
 
   /* it's not a 'real' command, so it's a social */
@@ -679,8 +669,7 @@ void command_interpreter(struct char_data *ch, char *argument)
     send_to_char(ch, "You try, but the mind-numbing cold prevents you...\r\n");
   else if (complete_cmd_info[cmd].command_pointer == NULL)
     send_to_char(ch, "Sorry, that command hasn't been implemented yet.\r\n");
-  else if (IS_NPC(ch) && complete_cmd_info[cmd].minimum_level >= LVL_IMMORT &&
-           complete_cmd_info[cmd].command_pointer != do_smartspawn)
+  else if (IS_NPC(ch) && complete_cmd_info[cmd].minimum_level >= LVL_IMMORT)
     send_to_char(ch, "You can't use immortal commands while switched.\r\n");
   else if (GET_POS(ch) < complete_cmd_info[cmd].minimum_position)
     switch (GET_POS(ch)) {

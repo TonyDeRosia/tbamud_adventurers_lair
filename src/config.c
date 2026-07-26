@@ -105,7 +105,6 @@ int no_mort_to_immort = YES;
 int diagonal_dirs = NO;
 
 /* Phase 2A rollback seam: disabled preserves the original mobile_activity path. */
-int ai_legacy_arbitration_enabled = NO;
 
 /* RENT/CRASHSAVE OPTIONS */
 /* Should the MUD allow you to 'rent' for free?  (i.e. if you just quit, your
@@ -320,6 +319,3 @@ int special_in_comm = YES;
 
 /* Current Debug Mode */
 int debug_mode = OFF;
-
-/* Global runtime toggle for AI_ACTOR tick behavior. */
-int ai_actor_enabled = YES;

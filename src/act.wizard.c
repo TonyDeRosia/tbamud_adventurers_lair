@@ -38,9 +38,6 @@
 #include "ban.h"
 #include "screen.h"
 #include "accounts.h"
-#include "ai_actor.h"
-#include "legacy_behavior.h"
-#include "ai_actor_brain.h"
 
 /* local utility functions with file scope */
 static int perform_set(struct char_data *ch, struct char_data *vict, int mode, char *val_arg);
@@ -271,9 +268,6 @@ ACMD(do_echo)
       mudlog(CMP, MAX(LVL_BUILDER, GET_INVIS_LEV(ch)), TRUE, "(GC) %s echoed: %s", GET_NAME(ch), buf);
       }
     act(buf, FALSE, ch, 0, 0, TO_ROOM);
-    if (subcmd == SCMD_EMOTE)
-      ai_actor_event_emote(ch, argument);
-
     if (!IS_NPC(ch) && PRF_FLAGGED(ch, PRF_NOREPEAT))
       send_to_char(ch, "%s", CONFIG_OK);
     else
@@ -993,16 +987,6 @@ static void do_stat_mobile_prototype(struct char_data *ch, mob_rnum rnum)
   send_to_char(ch, "NPC flags: %s\r\n", buf);
   sprintbitarray(AFF_FLAGS(mob), affected_bits, AF_ARRAY_MAX, buf);
   send_to_char(ch, "Affect flags: %s\r\n", buf);
-  if (mob->ai_config)
-    send_to_char(ch, "Authored AI configuration: configured; mode=%d, role=%s, movement=%s, "
-                 "social=%d, roam=%d, pursuit=%d, schedules=%d, patrols=%d\r\n",
-                 mob->ai_config->mode, ai_actor_config_role_name(mob->ai_config->role),
-                 ai_actor_config_movement_name(mob->ai_config->movement), mob->ai_config->social,
-                 mob->ai_config->roam_radius, mob->ai_config->pursuit_distance,
-                 mob->ai_config->schedule_count, mob->ai_config->patrol_count);
-  else
-    send_to_char(ch, "Authored AI configuration: none\r\n");
-  send_to_char(ch, "Runtime AI state: none\r\n");
   stat_prototype_triggers(ch, mob->proto_script);
 }
 
@@ -1038,62 +1022,6 @@ static bool invalid_signed_stat_vnum(const char *argument)
   return argument && argument[0] == '-' && stat_vnum_token(argument + 1);
 }
 
-static const char *ai_actor_role_name(int role)
-{
-  switch (role) {
-    case ROLE_GUARD: return "guard";
-    case ROLE_MERCHANT: return "merchant";
-    case ROLE_BANDIT: return "bandit";
-    case ROLE_BEAST: return "beast";
-    case ROLE_UNDEAD: return "undead";
-    case ROLE_SPIRIT: return "spirit";
-    case ROLE_CULTIST: return "cultist";
-    case ROLE_CIVILIAN: return "civilian";
-    case ROLE_BOSS: return "boss";
-    default: return "unknown";
-  }
-}
-
-static const char *ai_actor_temperament_name(int aggression)
-{
-  switch (aggression) {
-    case AGG_PEACEFUL: return "peaceful";
-    case AGG_RETALIATE: return "retaliate";
-    case AGG_TERRITORIAL: return "territorial";
-    case AGG_OPPORTUNISTIC: return "opportunistic";
-    case AGG_CRIME_HUNTER: return "crime_hunter";
-    case AGG_AMBUSH: return "ambush";
-    default: return "unknown";
-  }
-}
-
-static const char *ai_actor_theme_name(int social)
-{
-  switch (social) {
-    case SOC_SILENT: return "silent";
-    case SOC_WARNING: return "warning";
-    case SOC_TALKATIVE: return "talkative";
-    case SOC_EXTORT: return "extort";
-    default: return "unknown";
-  }
-}
-
-static const char *ai_actor_control_mode_name(void)
-{
-  return CONFIG_AI_ACTOR_ENABLED ? "ai_actor" : "legacy";
-}
-
-static int ai_actor_has_override_tag(const struct char_data *mob)
-{
-  const char *desc;
-
-  if (!mob)
-    return FALSE;
-
-  desc = mob->player.description;
-  return (desc && strstr(desc, "[AI_"));
-}
-
 static void do_stat_character(struct char_data *ch, struct char_data *k)
 {
   char buf[MAX_STRING_LENGTH];
@@ -1108,15 +1036,8 @@ static void do_stat_character(struct char_data *ch, struct char_data *k)
 	  GET_NAME(k), IS_NPC(k) ? char_script_id(k) : GET_IDNUM(k), GET_ROOM_VNUM(IN_ROOM(k)), IS_NPC(k) ? NOWHERE : GET_LOADROOM(k));
 
   if (IS_MOB(k)) {
-    char legacy[MAX_STRING_LENGTH];
     send_to_char(ch, "Keyword: %s, VNum: [%5d], RNum: [%5d]\r\n", k->player.name, GET_MOB_VNUM(k), GET_MOB_RNUM(k));
     send_to_char(ch, "L-Des: %s", k->player.long_descr ? k->player.long_descr : "<None>\r\n");
-    legacy_behavior_summary(k, legacy, sizeof(legacy), TRUE);
-    send_to_char(ch, "%s", legacy);
-    mob_behavior_recent_pulse_report(k, legacy, sizeof(legacy));
-    send_to_char(ch, "%s", legacy);
-    send_to_char(ch, "  AI config: %s; runtime state: %s (per-instance)\r\n",
-                 k->ai_config ? "configured" : "none", k->ai_state ? "present" : "absent");
   }
 
   if (!IS_MOB(k))
@@ -1219,44 +1140,6 @@ static void do_stat_character(struct char_data *ch, struct char_data *k)
     send_to_char(ch, "Mob Spec-Proc: %s, NPC Bare Hand Dam: %dd%d\r\n",
         (mob_index[GET_MOB_RNUM(k)].func ? get_spec_func_name(mob_index[GET_MOB_RNUM(k)].func) : "None"),
 	    k->mob_specials.damnodice, k->mob_specials.damsizedice);
-
-  if (IS_MOB(k) && MOB_FLAGGED(k, MOB_AI_ACTOR) && k->ai_prof) {
-    long last_said = 0;
-    long last_action = 0;
-    int disp_count = 0;
-    int i_mem;
-    int talk_cd_left = 0;
-    if (k->ai_state && k->ai_state->last_spoke > 0)
-      last_said = (long)(time(0) - k->ai_state->last_spoke);
-    if (k->ai_state && k->ai_state->last_action_time > 0)
-      last_action = (long)(time(0) - k->ai_state->last_action_time);
-    if (k->ai_state) {
-      talk_cd_left = k->ai_state->talk_cooldown_pulses / PASSES_PER_SEC;
-      for (i_mem = 0; i_mem < k->ai_state->mem_count; i_mem++)
-        if (k->ai_state->mem[i_mem].idnum > 0)
-          disp_count++;
-    }
-    send_to_char(ch, "AI_ACTOR: role=%s temperament=%s roam=%d greet=%s talk_cd=%ds override_tag=%s\r\n",
-                 ai_actor_role_name(k->ai_prof->role),
-                 ai_actor_temperament_name(k->ai_prof->aggression),
-                 k->ai_prof->roam_radius,
-                 ai_actor_theme_name(k->ai_prof->social),
-                 k->ai_prof->talk_cooldown_secs,
-                 ai_actor_has_override_tag(k) ? "yes" : "no");
-    send_to_char(ch, "AI_ACTOR: mode=%d morale=%d last_said=%ld last_action=%ld talk_cd_left=%ds dispositions=%d\r\n",
-                 k->ai_prof->mode,
-                 k->ai_prof->morale,
-                 (last_said < 0 ? 0L : last_said),
-                 (last_action < 0 ? 0L : last_action),
-                 talk_cd_left,
-                 disp_count);
-    send_to_char(ch, "AI_ACTOR: keywords='%s'%s\r\n",
-                 k->ai_prof->matched_keywords[0] ? k->ai_prof->matched_keywords : "-",
-                 (k->ai_prof->profile_flags & AI_PROFILE_INCONSISTENT) ? " PROFILE_INCONSISTENT" : "");
-    send_to_char(ch, "AI control mode: %s, AI signature hash: %08X\r\n",
-                 ai_actor_control_mode_name(),
-                 (unsigned int)k->ai_prof->signature);
-  }
 
   for (i = 0, j = k->carrying; j; j = j->next_content, i++);
   send_to_char(ch, "Carried: weight: %d, items: %d; Items in: inventory: %d, ", IS_CARRYING_W(k), IS_CARRYING_N(k), i);
@@ -5877,108 +5760,7 @@ ACMD(do_acctsetpass)
 }
 
 
-ACMD(do_smartspawn)
-{
-  /* Reserved smartspawn AI actor test mob prototype block: 19500-19509. */
-  static const mob_vnum smartspawn_base_vnum = 19500;
-  static const int smartspawn_max_count = 10;
-  char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH], arg3[MAX_INPUT_LENGTH], arg4[MAX_INPUT_LENGTH];
-  int count = 1, minlevel = 1, maxlevel = 10;
-  int i;
-  struct char_data *cmd_ch = ch;
 
-  if (ch && ch->desc && ch->desc->original)
-    cmd_ch = ch->desc->original;
-
-  if (!cmd_ch || GET_LEVEL(cmd_ch) < LVL_IMMORT) {
-    send_to_char(ch, "Huh?\r\n");
-    return;
-  }
-
-  if (IN_ROOM(ch) == NOWHERE || IN_ROOM(ch) > top_of_world) {
-    send_to_char(ch, "You are not in a valid room.\r\n");
-    return;
-  }
-
-  *arg1 = *arg2 = *arg3 = *arg4 = '\0';
-  argument = one_argument(argument, arg1);
-  argument = one_argument(argument, arg2);
-  argument = one_argument(argument, arg3);
-  one_argument(argument, arg4);
-
-  if (!*arg1) {
-    send_to_char(ch,
-      "Usage: smartspawn <count 1-10> [min level] [max level]\r\n"
-      "   or: smartspawn <count 1-10> [min-max]\r\n"
-      "Example: smartspawn 3 90 110\r\n"
-      "Example: smartspawn 3 90-110\r\n");
-    return;
-  }
-
-  if (!is_number(arg1)) {
-    send_to_char(ch, "Usage: smartspawn <count 1-10> [min level] [max level]\r\n");
-    return;
-  }
-
-  count = atoi(arg1);
-  count = MAX(1, MIN(smartspawn_max_count, count));
-
-  if (*arg2 && *arg3 && !*arg4 && is_number(arg2) && is_number(arg3)) {
-    minlevel = atoi(arg2);
-    maxlevel = atoi(arg3);
-  } else if (*arg2 && !*arg3 && !*arg4) {
-    int parsed_min = 0, parsed_max = 0;
-
-    if (sscanf(arg2, "%d-%d", &parsed_min, &parsed_max) == 2) {
-      minlevel = parsed_min;
-      maxlevel = parsed_max;
-    } else if (is_number(arg2)) {
-      minlevel = atoi(arg2);
-      maxlevel = minlevel;
-    } else {
-      send_to_char(ch, "Usage: smartspawn <count 1-10> [min level] [max level]\r\n");
-      return;
-    }
-  } else if (*arg2 || *arg3 || *arg4) {
-    send_to_char(ch, "Usage: smartspawn <count 1-10> [min level] [max level]\r\n");
-    return;
-  }
-
-  minlevel = MAX(1, minlevel);
-  maxlevel = MAX(1, maxlevel);
-  if (minlevel > maxlevel) {
-    int tmp = minlevel;
-    minlevel = maxlevel;
-    maxlevel = tmp;
-  }
-
-  for (i = 0; i < count; i++) {
-    mob_vnum vnum = smartspawn_base_vnum + i;
-    mob_rnum rnum = real_mobile(vnum);
-    int level = rand_number(minlevel, maxlevel);
-    struct char_data *mob;
-
-    if (rnum == NOBODY || rnum < 0) {
-      send_to_char(ch,
-        "smartspawn: missing test mob vnum %d. Did you add lib/world/mob/ai_actor_test.mob and index entries?\r\n",
-        vnum);
-      return;
-    }
-
-    mob = read_mobile(rnum, REAL);
-    if (!mob) {
-      send_to_char(ch, "smartspawn: failed to load test mob vnum %d.\r\n", vnum);
-      return;
-    }
-
-    GET_LEVEL(mob) = level;
-    char_to_room(mob, IN_ROOM(ch));
-    SET_BIT_AR(MOB_FLAGS(mob), MOB_AI_ACTOR);
-    send_to_char(ch, "smartspawn: spawned vnum %d rnum %d at level %d.\r\n", vnum, rnum, level);
-  }
-
-  send_to_char(ch, "Spawned %d AI actor test mobs (levels %d-%d).\r\n", count, minlevel, maxlevel);
-}
 
 ACMD(do_wizupdate)
 {
@@ -8263,52 +8045,3 @@ ACMD(do_affremove)
   #undef CLEAR_ALL_AFFECTS
 }
 /* AFFREMOVE COMMAND END */
-
-
-ACMD(do_aictl)
-{
-  char arg[MAX_INPUT_LENGTH];
-  one_argument(argument, arg);
-
-  if (!*arg) {
-    send_to_char(ch, "AI actor reactions are currently %s.\r\n", ai_actor_brain_enabled() ? "ON" : "OFF");
-    return;
-  }
-
-  if (!str_cmp(arg, "on")) {
-    ai_actor_brain_set_enabled(TRUE);
-    send_to_char(ch, "AI actor reactions enabled.\r\n");
-  } else if (!str_cmp(arg, "off")) {
-    ai_actor_brain_set_enabled(FALSE);
-    send_to_char(ch, "AI actor reactions disabled.\r\n");
-  } else
-    send_to_char(ch, "Usage: aictl <on|off>\r\n");
-}
-
-ACMD(do_aistate)
-{
-  char arg[MAX_INPUT_LENGTH];
-  struct char_data *mob;
-
-  one_argument(argument, arg);
-  if (!*arg) {
-    send_to_char(ch, "Usage: aistate <mob>\r\n");
-    return;
-  }
-
-  if (!(mob = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM))) {
-    send_to_char(ch, "%s", CONFIG_NOPERSON);
-    return;
-  }
-  if (!IS_NPC(mob) || !MOB_FLAGGED(mob, MOB_AI_ACTOR)) {
-    send_to_char(ch, "That target is not an AI actor mob.\r\n");
-    return;
-  }
-  ai_actor_brain_show_state(ch, mob);
-  ai_actor_schedule_show_state(ch, mob);
-  {
-    char legacy[MAX_STRING_LENGTH];
-    mob_behavior_recent_pulse_report(mob, legacy, sizeof(legacy));
-    send_to_char(ch, "%s", legacy);
-  }
-}

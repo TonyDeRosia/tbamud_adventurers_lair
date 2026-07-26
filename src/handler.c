@@ -14,7 +14,6 @@
 #include "utils.h"
 #include "comm.h"
 #include "db.h"
-#include "ai_actor.h"
 #include "handler.h"
 #include "screen.h"
 #include "interpreter.h"
@@ -499,9 +498,6 @@ void char_from_room(struct char_data *ch)
       if (GET_OBJ_VAL(GET_EQ(ch, WEAR_LIGHT), 2))	/* Light is ON */
 	world[IN_ROOM(ch)].light--;
 
-  if (!IS_NPC(ch))
-    ai_actor_event_leave(ch, IN_ROOM(ch));
-
   REMOVE_FROM_LIST(ch, world[IN_ROOM(ch)].people, next_in_room);
   IN_ROOM(ch) = NOWHERE;
   ch->next_in_room = NULL;
@@ -525,9 +521,6 @@ void char_to_room(struct char_data *ch, room_rnum room)
       if (GET_OBJ_TYPE(GET_EQ(ch, WEAR_LIGHT)) == ITEM_LIGHT)
 	if (GET_OBJ_VAL(GET_EQ(ch, WEAR_LIGHT), 2))	/* Light ON */
 	  world[room].light++;
-
-    if (!IS_NPC(ch))
-      ai_actor_event_enter(ch, room);
 
     /* Stop fighting now, if we left. */
     if (FIGHTING(ch) && IN_ROOM(ch) != IN_ROOM(FIGHTING(ch))) {

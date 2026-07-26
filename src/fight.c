@@ -23,7 +23,6 @@
 #include "act.h"
 #include "class.h"
 #include "fight.h"
-#include "ai_actor.h"
 #include "shop.h"
 #include "quest.h"
 #include "criticalhits.h"
@@ -712,7 +711,6 @@ void set_fighting(struct char_data *ch, struct char_data *vict)
   FIGHTING(ch) = vict;
   GET_POS(ch) = POS_FIGHTING;
 
-  ai_actor_event_combat_start(ch, vict);
 
   if (!CONFIG_PK_ALLOWED)
     check_killer(ch, vict);
@@ -726,7 +724,6 @@ void stop_fighting(struct char_data *ch)
   /* Capture the opponent before the combat link is cleared.  The AI hook is
    * transition-deduplicated and therefore safe for the many legacy callers. */
   if (ch && FIGHTING(ch))
-    ai_actor_event_combat_end(ch, FIGHTING(ch), 0);
 
   if (ch == next_combat_list)
     next_combat_list = ch->next_fighting;
@@ -950,9 +947,7 @@ void raw_kill(struct char_data * ch, struct char_data * killer)
 struct char_data *i;
 
   /* Must run before NPC extraction: no post-extraction AI writes. */
-  ai_actor_event_defeat(ch, killer);
   if (killer)
-    ai_actor_event_defeat(killer, ch);
 
   if (FIGHTING(ch))
     stop_fighting(ch);
@@ -992,7 +987,6 @@ struct char_data *i;
   update_pos(ch);
 
   make_corpse(ch);
-  ai_actor_event_corpse(ch, IN_ROOM(ch));
 
   /* NPCs: original behavior. PCs: do NOT extract (extraction puts them into the menu).
      Instead, respawn them at the mortal start room and keep the descriptor playing. */
@@ -1726,7 +1720,6 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
   }
 
   if (!IS_NPC(ch) && ch != victim)
-    ai_actor_record_room_crime(NULL, ch, MEM_WANTED);
 
   if (victim != ch) {
     /* Start the attacker fighting the victim */
@@ -1738,8 +1731,6 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
       set_fighting(victim, ch);
       if (MOB_FLAGGED(victim, MOB_MEMORY) && !IS_NPC(ch))
 	remember(victim, ch);
-      if (!IS_NPC(ch))
-        ai_actor_record_damage(victim, ch, dam);
     }
   }
 

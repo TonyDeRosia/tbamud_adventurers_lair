@@ -22,8 +22,6 @@
 #include "constants.h"
 #include "oasis.h"
 #include "dg_scripts.h"
-#include "ai_actor.h"
-#include "legacy_behavior.h"
 #include "dg_event.h"
 #include "act.h"
 #include "ban.h"
@@ -619,7 +617,6 @@ void destroy_db(void)
 
     /* free script proto list */
     free_proto_script(&mob_proto[cnt], MOB_TRIGGER);
-    mob_ai_config_free(mob_proto[cnt].ai_config);
 
     while (mob_proto[cnt].affected)
       affect_remove(&mob_proto[cnt], mob_proto[cnt].affected);
@@ -1690,84 +1687,6 @@ static void interpret_espec(const char *keyword, const char *value, int i, int n
   if (value)
     num_arg = atoi(value);
 
-  if (value && !str_cmp(keyword, "AIConfig")) {
-    struct mob_ai_config *c = mob_ai_config_new();
-    int n;
-    unsigned long mask;
-    if (!c) return;
-    n = sscanf(value, "%d %lu %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d",
-      &c->mode, &mask, &c->role, &c->movement, &c->social, &c->home_room_vnum, &c->work_room_vnum, &c->guard_room_vnum, &c->roam_radius, &c->pursuit_distance, &c->movement_delay, &c->greeting_enabled, &c->ambient_speech_enabled, &c->ambient_emotes_enabled, &c->speech_cooldown, &c->emote_cooldown, &c->flee_hp_percent, &c->surrender_hp_percent, &c->assist_enabled, &c->call_help_enabled, &c->hunt_enabled, &c->return_home, &c->stay_zone, &c->personality[0], &c->personality[1], &c->personality[2], &c->personality[3], &c->personality[4]);
-    c->override_mask = mask;
-    if (n == 28) { mob_ai_config_free(mob_proto[i].ai_config); mob_ai_config_validate(c); mob_proto[i].ai_config = c; return; }
-    log("SYSERR: Bad AIConfig format in mob #%d", nr); mob_ai_config_free(c); return;
-  }
-  if (value && !str_cmp(keyword, "AIBehaviorOwner")) {
-    struct mob_ai_config *c = mob_proto[i].ai_config;
-    char domain_token[64], owner_token[64], trailing;
-    unsigned domain; int idx; enum mob_behavior_owner owner;
-    if (!c) mob_proto[i].ai_config = c = mob_ai_config_new();
-    if (!c || sscanf(value, " %63s %63s %c", domain_token, owner_token, &trailing) != 2) { log("SYSERR: Bad AIBehaviorOwner format in mob #%d", nr); return; }
-    domain = mob_behavior_domain_from_token(domain_token);
-    if (!domain) { log("SYSERR: Unknown AIBehaviorOwner domain '%s' in mob #%d", domain_token, nr); return; }
-    idx = mob_behavior_domain_index(domain);
-    if (!mob_behavior_owner_from_token(owner_token, &owner)) { log("SYSERR: Unknown AIBehaviorOwner owner '%s' in mob #%d; using Compatibility", owner_token, nr); owner = MOB_BEHAVIOR_OWNER_COMPATIBILITY; }
-    if (idx >= 0) c->behavior_owner[idx] = owner;
-    return;
-  }
-  if (value && !str_cmp(keyword, "AIConfigTraits")) {
-    struct mob_ai_config *c = mob_proto[i].ai_config;
-    if (!c || sscanf(value, "%d %d %d %d %d %d %d", &c->personality[5], &c->personality[6], &c->personality[7], &c->personality[8], &c->personality[9], &c->personality[10], &c->personality[11]) != 7)
-      log("SYSERR: Bad AIConfigTraits format in mob #%d", nr);
-    else mob_ai_config_validate(c);
-    return;
-  }
-  if (value && !str_cmp(keyword, "AIConfigSocial")) {
-    struct mob_ai_config *c = mob_proto[i].ai_config;
-    if (!c || sscanf(value, "%d %d %d %d %d %d", &c->whisper_enabled, &c->respond_strangers, &c->respond_trusted, &c->respond_feared, &c->respond_hostile, &c->room_speech_cooldown) != 6)
-      log("SYSERR: Bad AIConfigSocial format in mob #%d", nr);
-    else mob_ai_config_validate(c);
-    return;
-  }
-  if (value && !str_cmp(keyword, "AIConfigCapabilities")) {
-    struct mob_ai_config *c = mob_proto[i].ai_config;
-    if (!c || sscanf(value, "%d %d %d %d", &c->archetype, &c->communication, &c->memory_style, &c->assistance_style) != 4)
-      log("SYSERR: Bad AIConfigCapabilities format in mob #%d", nr);
-    else mob_ai_config_validate(c);
-    return;
-  }
-  if (value && !str_cmp(keyword, "AIConfigCombat")) { struct mob_ai_config *c=mob_proto[i].ai_config; if(!c || sscanf(value,"%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d",&c->combat_style,&c->combat_enabled,&c->may_initiate,&c->may_assist,&c->may_call_help,&c->may_flee,&c->protect_trusted,&c->protect_group,&c->protect_same_role,&c->protect_same_prototype,&c->avoid_incapacitated,&c->retaliate_self,&c->retaliate_ally,&c->retaliate_hostile,&c->switch_targets,&c->assist_severity,&c->target_switch_threshold,&c->max_allies,&c->max_responders,&c->combat_cooldown)!=20) log("SYSERR: Bad AIConfigCombat format in mob #%d",nr); else mob_ai_config_validate(c); return; }
-  if (value && !str_cmp(keyword, "AIConfigTargetWeight")) { struct mob_ai_config *c=mob_proto[i].ai_config; if(!c || sscanf(value,"%d %d %d %d %d %d %d %d",&c->target_weight[0],&c->target_weight[1],&c->target_weight[2],&c->target_weight[3],&c->target_weight[4],&c->target_weight[5],&c->target_weight[6],&c->target_weight[7])!=8) log("SYSERR: Bad AIConfigTargetWeight format in mob #%d",nr); else mob_ai_config_validate(c); return; }
-  if (value && !str_cmp(keyword, "AIConfigPerception")) { struct mob_ai_config *c=mob_proto[i].ai_config; if(!c || sscanf(value,"%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d",&c->notice_entry,&c->notice_departure,&c->notice_speech,&c->notice_whispers,&c->notice_emotes,&c->notice_combat,&c->notice_self_attack,&c->notice_ally_attack,&c->notice_corpses,&c->notice_drops,&c->notice_gifts,&c->notice_crimes,&c->hearing_sensitivity,&c->observation_sensitivity,&c->suspicion_threshold,&c->recognition_confidence)!=16) log("SYSERR: Bad AIConfigPerception format in mob #%d",nr); else mob_ai_config_validate(c); return; }
-  if (value && !str_cmp(keyword, "AIConfigMemory")) { struct mob_ai_config *c=mob_proto[i].ai_config; if(!c || sscanf(value,"%d %d %d %d %d %d %d %d %d %d %d %d %d",&c->memory_enabled,&c->memory_max_actors,&c->memory_ordinary_duration,&c->memory_important_duration,&c->trust_gain,&c->trust_loss,&c->fear_gain,&c->fear_decay,&c->hostility_gain,&c->hostility_decay,&c->familiarity_gain,&c->familiarity_decay,&c->forgiveness)!=13) log("SYSERR: Bad AIConfigMemory format in mob #%d",nr); else mob_ai_config_validate(c); return; }
-  if (value && !str_cmp(keyword, "AIConfigMemoryFlags")) { struct mob_ai_config *c=mob_proto[i].ai_config; if(!c || sscanf(value,"%d %d %d %d %d %d %d %d %d",&c->remember_attacks,&c->remember_assistance,&c->remember_crimes,&c->remember_gifts,&c->remember_insults,&c->remember_conversations,&c->remember_threats,&c->remember_last_room,&c->remember_deaths)!=9) log("SYSERR: Bad AIConfigMemoryFlags format in mob #%d",nr); else mob_ai_config_validate(c); return; }
-  if (value && !str_cmp(keyword, "AIConfigThreat")) { struct mob_ai_config *c=mob_proto[i].ai_config; if(!c || sscanf(value,"%d %d %d %d %d %d %d %d %d %d %d %d %d",&c->threat_enabled[0],&c->threat_enabled[1],&c->threat_enabled[2],&c->threat_enabled[3],&c->threat_enabled[4],&c->threat_enabled[5],&c->threat_enabled[6],&c->threat_enabled[7],&c->threat_enabled[8],&c->threat_enabled[9],&c->threat_cooldown,&c->calm_reset_time,&c->repeated_event_window)<12) log("SYSERR: Bad AIConfigThreat format in mob #%d",nr); else mob_ai_config_validate(c); return; }
-  if (value && !str_cmp(keyword, "AIThreatStep")) { struct mob_ai_config *c=mob_proto[i].ai_config; struct ai_threat_step *s; if(!c || c->threat_step_count>=10) return; s=&c->threat_steps[c->threat_step_count]; if(sscanf(value,"%d %d %d %d %d",&s->type,&s->minimum_severity,&s->cooldown,&s->max_repetitions,&s->advance_on_failure)!=5 || s->type<0 || s->type>=AI_THREAT_RESPONSE_MAX) log("SYSERR: Bad AIThreatStep format in mob #%d",nr); else c->threat_step_count++; return; }
-  if (value && !str_cmp(keyword, "AIConfigSchedule")) { struct mob_ai_config*c=mob_proto[i].ai_config; if(!c||sscanf(value,"%d %d %d %d %d %d %d",&c->schedule_enabled,&c->resume_after_interrupt,&c->sleep_room_vnum,&c->fallback_room_vnum,&c->default_failure_policy,&c->next_schedule_id,&c->next_patrol_id)!=7) log("SYSERR: Bad AIConfigSchedule format in mob #%d",nr); return; }
-  if (value && !str_cmp(keyword, "AIRoutine")) { struct mob_ai_config*c=mob_proto[i].ai_config; if(!c||sscanf(value,"%d %d %d %d %d %d",&c->routine_mode,&c->routine_boundary,&c->routine_failure,&c->random_wait_min,&c->random_wait_max,&c->random_destination_count)!=6) log("SYSERR: Bad AIRoutine format in mob #%d",nr); else mob_ai_config_validate(c); return; }
-  if (value && !str_cmp(keyword, "AIRoutineDestination")) { struct mob_ai_config*c=mob_proto[i].ai_config; struct ai_routine_destination*d; if(!c||c->random_destination_count>=AI_ROUTINE_DEST_MAX)return; d=&c->random_destinations[c->random_destination_count++]; memset(d,0,sizeof(*d)); if(sscanf(value,"%d %d %d %31[^\n]",&d->room_vnum,&d->enabled,&d->weight,d->label)<3)c->random_destination_count--; return; }
-  if (value && !str_cmp(keyword, "AIConfigVocal")) { struct mob_ai_config*c=mob_proto[i].ai_config; unsigned int disabled; if(!c||sscanf(value,"%d %d %d %d %d %u",&c->vocal_presence,&c->vocal_frequency,&c->vocal_cooldown_min,&c->vocal_cooldown_max,&c->vocal_room_limit,&disabled)!=6) log("SYSERR: Bad AIConfigVocal format in mob #%d",nr); else {c->vocal_disabled_mask=disabled;mob_ai_config_validate(c);} return; }
-  if (value && !str_cmp(keyword, "AISchedule")) { struct mob_ai_config*c=mob_proto[i].ai_config; struct ai_schedule_entry e; if(!c||c->schedule_count>=AI_SCHEDULE_MAX||sscanf(value,"%d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d",&e.id,&e.enabled,&e.start_hour,&e.end_hour,&e.day_mask,&e.priority,&e.activity,&e.destination,&e.destination_value,&e.arrival_action,&e.departure_action,&e.interruption_policy,&e.failure_policy,&e.max_travel_time,&e.max_attempts,&e.wait_duration,&e.route_id)!=17||!ai_schedule_add(c,&e)) log("SYSERR: Bad AISchedule format in mob #%d",nr); return; }
-  if (value && !str_cmp(keyword, "AIScheduleTiming")) { struct mob_ai_config*c=mob_proto[i].ai_config; int id, timing, x; if(!c||sscanf(value,"%d %d",&id,&timing)!=2) return; for(x=0;x<c->schedule_count;x++) if(c->schedules[x].id==id) { c->schedules[x].timing_policy=MAX(AI_ROUTINE_ARRIVE_BY,MIN(timing,AI_ROUTINE_ARRIVE_AROUND)); break; } return; }
-  if (value && !str_cmp(keyword, "AIPatrol")) { struct mob_ai_config*c=mob_proto[i].ai_config; struct ai_patrol_route r; char label[32]={0}; memset(&r,0,sizeof(r)); if(!c||c->patrol_count>=AI_PATROL_MAX||sscanf(value,"%d %d %d %d %d %31[^\n]",&r.id,&r.enabled,&r.loop_mode,&r.failure_policy,&r.waypoint_count,label)<5) log("SYSERR: Bad AIPatrol format in mob #%d",nr); else {strlcpy(r.label,label,sizeof(r.label));r.waypoint_count=0;ai_patrol_add(c,&r);} return; }
-  if (value && !str_cmp(keyword, "AIPatrolWaypoint")) { struct mob_ai_config*c=mob_proto[i].ai_config;int id,room,wait,action,x; if(!c||sscanf(value,"%d %d %d %d",&id,&room,&wait,&action)!=4) return; for(x=0;x<c->patrol_count;x++)if(c->patrols[x].id==id&&c->patrols[x].waypoint_count<AI_PATROL_WAYPOINT_MAX){struct ai_patrol_waypoint*w=&c->patrols[x].waypoints[c->patrols[x].waypoint_count++];w->room_vnum=room;w->wait_duration=wait;w->arrival_action=action;break;} return; }
-  if (value && !str_cmp(keyword, "AIDialogue")) {
-    struct mob_ai_config *c = mob_proto[i].ai_config; int category; const char *line=value; char *end;
-    if (!c) { log("SYSERR: AIDialogue without AIConfig in mob #%d", nr); return; }
-    category=(int)strtol(line,&end,10); while (end && *end && isspace((unsigned char)*end)) end++;
-    if (category < 0 || category >= AI_DIALOGUE_CATEGORIES || !end || !*end || c->dialogue_count[category] >= AI_DIALOGUE_MAX_LINES || !mob_ai_dialogue_set(c,category,c->dialogue_count[category],end))
-      log("SYSERR: Bad AIDialogue record in mob #%d", nr);
-    return;
-  }
-
-
-  if (value && !str_cmp(keyword, "AIVocalization")) {
-    struct mob_ai_config *c = mob_proto[i].ai_config;
-    if (!c || c->vocalization_count >= AI_VOCALIZATION_MAX_LINES ||
-        !mob_ai_vocalization_set(c, c->vocalization_count, value))
-      log("SYSERR: Bad AIVocalization record in mob #%d", nr);
-    return;
-  }
-
   CASE("BareHandAttack") {
     RANGE(0, NUM_ATTACK_TYPES - 1);
     mob_proto[i].mob_specials.attack_type = num_arg;
@@ -2778,7 +2697,6 @@ struct char_data *read_mobile(mob_vnum nr, int type) /* and mob_rnum */
   *mob = mob_proto[i];
   /* The prototype owns its persisted AI configuration.  A live mobile must
    * have its own copy because extraction releases the live configuration. */
-  mob->ai_config = mob_ai_config_copy(mob_proto[i].ai_config);
   if (GET_SEX(mob) == SEX_RANDOM)
     GET_SEX(mob) = rand_number(SEX_MALE, SEX_FEMALE);
   mob->next = character_list;
@@ -2807,9 +2725,6 @@ struct char_data *read_mobile(mob_vnum nr, int type) /* and mob_rnum */
   copy_proto_script(&mob_proto[i], mob, MOB_TRIGGER);
   assign_triggers(mob, MOB_TRIGGER);
   apply_mob_loadout(mob);
-
-  if (MOB_FLAGGED(mob, MOB_AI_ACTOR))
-    ai_actor_refresh_profile(mob, TRUE);
 
   return (mob);
 }
@@ -3630,7 +3545,6 @@ void free_char(struct char_data *ch)
     if (ch->proto_script && ch->proto_script != mob_proto[i].proto_script)
       free_proto_script(ch, MOB_TRIGGER);
   }
-  ai_actor_free(ch);
 
   while (ch->affected)
     affect_remove(ch, ch->affected);
@@ -4229,8 +4143,6 @@ static void load_default_config( void )
   CONFIG_MINIMAP_SIZE           = default_minimap_size;
   CONFIG_SCRIPT_PLAYERS         = script_players;
   CONFIG_DEBUG_MODE             = debug_mode;
-  CONFIG_AI_ACTOR_ENABLED       = ai_actor_enabled;
-  CONFIG_AI_LEGACY_ARBITRATION_ENABLED = ai_legacy_arbitration_enabled;
 
   /* Rent / crashsave options. */
   CONFIG_FREE_RENT              = free_rent;
@@ -4305,11 +4217,7 @@ void load_config( void )
 
     switch (LOWER(*tag)) {
       case 'a':
-        if (!str_cmp(tag, "ai_actor_enabled"))
-          CONFIG_AI_ACTOR_ENABLED = num;
-        else if (!str_cmp(tag, "ai_legacy_arbitration_enabled"))
-          CONFIG_AI_LEGACY_ARBITRATION_ENABLED = num;
-        else if (!str_cmp(tag, "auto_save"))
+        if (!str_cmp(tag, "auto_save"))
           CONFIG_AUTO_SAVE = num;
         else if (!str_cmp(tag, "autosave_time"))
           CONFIG_AUTOSAVE_TIME = num;

@@ -238,9 +238,8 @@ void clanedit_parse(struct descriptor_data *d, char *arg);
 #define MOB_NOKILL         18   /**< Mob can't be attacked */
 #define MOB_GUILD_MASTER   19   /**< Mob is a guildmaster */
 #define MOB_NOTDEADYET     20   /**< (R) Mob being extracted */
-#define MOB_AI_ACTOR       21   /**< Mob uses inferred AI actor behavior */
 
-#define NUM_MOB_FLAGS      22
+#define NUM_MOB_FLAGS      21
 
 /* Preference flags: used by char_data.player_specials.pref */
 #define PRF_BRIEF         0   /**< Room descs won't normally be shown */
@@ -1198,9 +1197,6 @@ struct room_effect_data
   struct room_effect_data *next;
 };
 
-struct ai_actor_profile;
-struct ai_actor_state;
-struct mob_ai_config;
 
 /** An affect structure. */
 struct affected_type
@@ -1238,9 +1234,6 @@ struct char_data
   struct char_special_data char_specials; /**< PC/NPC specials	  */
   struct player_special_data *player_specials; /**< PC specials		  */
   struct mob_special_data mob_specials; /**< NPC specials		  */
-  struct ai_actor_profile *ai_prof;     /**< AI actor derived profile */
-  struct ai_actor_state *ai_state;      /**< AI actor runtime state */
-  struct mob_ai_config *ai_config;      /**< persistent AI actor prototype configuration */
 
   int pet_price; /**< Custom price for pet shop purchases (0 = default) */
 
@@ -1604,8 +1597,6 @@ struct game_operation
   int protocol_negotiation; /**< Enable the protocol negotiation system ? */
   int special_in_comm; /**< Enable use of a special character in communication channels ? */
   int debug_mode; /**< Current Debug Mode */
-  int ai_actor_enabled; /**< Enable AI actor runtime control loop ? */
-  int ai_legacy_arbitration_enabled; /**< Enable conservative AI/legacy mobile-pulse domain arbitration ? */
 };
 
 /** The Autowizard options. */

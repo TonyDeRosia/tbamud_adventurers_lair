@@ -21,26 +21,12 @@
 #include "act.h"
 #include "graph.h"
 #include "fight.h"
-#include "ai_actor.h"
-#include "legacy_behavior.h"
 
 
 /* local file scope only function prototypes */
 static bool aggressive_mob_on_a_leash(struct char_data *slave, struct char_data *master, struct char_data *attack);
 
-static void mobile_activity_legacy_preserving(void);
-static void mobile_activity_arbitrated(void);
-
 void mobile_activity(void)
-{
-  if (!CONFIG_AI_LEGACY_ARBITRATION_ENABLED) {
-    mobile_activity_legacy_preserving();
-    return;
-  }
-  mobile_activity_arbitrated();
-}
-
-static void mobile_activity_legacy_preserving(void)
 {
   struct char_data *ch, *next_ch, *vict;
   struct obj_data *obj, *best_obj;
@@ -66,11 +52,6 @@ static void mobile_activity_legacy_preserving(void)
 	if ((mob_index[GET_MOB_RNUM(ch)].func) (ch, ch, 0, actbuf))
 	  continue;		/* go to next char */
       }
-    }
-
-    if (MOB_FLAGGED(ch, MOB_AI_ACTOR) && CONFIG_AI_ACTOR_ENABLED) {
-      if (ai_actor_tick(ch, time(0)))
-        continue;
     }
 
     /* If the mob has no specproc, do the default actions */
@@ -193,44 +174,6 @@ static void mobile_activity_legacy_preserving(void)
   }				/* end for() */
 }
 
-
-static void mobile_activity_arbitrated(void)
-{
-  struct char_data *ch, *next_ch, *vict;
-  struct obj_data *obj, *best_obj;
-  int door, found, max;
-  memory_rec *names;
-  struct mob_behavior_pulse_context ctx;
-
-  for (ch = character_list; ch; ch = next_ch) {
-    next_ch = ch->next;
-    if (!IS_MOB(ch) || DEAD(ch)) continue;
-    mob_behavior_context_init(&ctx, ch, TRUE);
-    if (MOB_FLAGGED(ch, MOB_SPEC) && !no_specials) {
-      if (mob_index[GET_MOB_RNUM(ch)].func == NULL) { log("SYSERR: %s (#%d): Attempting to call non-existing mob function.", GET_NAME(ch), GET_MOB_VNUM(ch)); REMOVE_BIT_AR(MOB_FLAGS(ch), MOB_SPEC); }
-      else { char actbuf[MAX_INPUT_LENGTH] = ""; if ((mob_index[GET_MOB_RNUM(ch)].func)(ch, ch, 0, actbuf)) { ctx.special_result.returned_true=TRUE; mob_behavior_record_recent_pulse(ch,&ctx); continue; } }
-    }
-    if (MOB_FLAGGED(ch, MOB_AI_ACTOR) && CONFIG_AI_ACTOR_ENABLED && ai_actor_tick_with_context(ch, time(0), &ctx)) { mob_behavior_record_recent_pulse(ch,&ctx); continue; }
-    if (FIGHTING(ch) || !AWAKE(ch)) { mob_behavior_record_recent_pulse(ch,&ctx); continue; }
-    hunt_victim(ch);
-    if (MOB_FLAGGED(ch, MOB_SCAVENGER) && mob_behavior_domain_available_to_legacy_tail(&ctx,LBD_SCAVENGING) && world[IN_ROOM(ch)].contents && !rand_number(0,10)) {
-      max=1; best_obj=NULL; for (obj=world[IN_ROOM(ch)].contents; obj; obj=obj->next_content) if (CAN_GET_OBJ(ch,obj) && GET_OBJ_COST(obj)>max) { best_obj=obj; max=GET_OBJ_COST(obj); }
-      if (best_obj) { obj_from_room(best_obj); obj_to_char(best_obj,ch); act("$n gets $p.", FALSE, ch, best_obj, 0, TO_ROOM); mob_behavior_mark_action(&ctx.legacy_tail_result,LBD_SCAVENGING); }
-    }
-    if (mob_behavior_domain_available_to_legacy_tail(&ctx,LBD_MOVEMENT) && !MOB_FLAGGED(ch,MOB_SENTINEL) && GET_POS(ch)==POS_STANDING && ((door=rand_number(0,18))<DIR_COUNT) && CAN_GO(ch,door) && !ROOM_FLAGGED(EXIT(ch,door)->to_room,ROOM_NOMOB) && !ROOM_FLAGGED(EXIT(ch,door)->to_room,ROOM_DEATH) && (!MOB_FLAGGED(ch,MOB_STAY_ZONE) || world[EXIT(ch,door)->to_room].zone==world[IN_ROOM(ch)].zone)) { if (ch->master==NULL && perform_move(ch,door,1)) mob_behavior_mark_action(&ctx.legacy_tail_result,LBD_MOVEMENT); }
-    if (mob_behavior_domain_available_to_legacy_tail(&ctx,LBD_COMBAT_INIT) && !MOB_FLAGGED(ch,MOB_HELPER) && (!AFF_FLAGGED(ch,AFF_BLIND) || !AFF_FLAGGED(ch,AFF_CHARM))) {
-      found=FALSE; for (vict=world[IN_ROOM(ch)].people; vict && !found; vict=vict->next_in_room) { if (IS_NPC(vict)||!CAN_SEE(ch,vict)||PRF_FLAGGED(vict,PRF_NOHASSLE)) continue; if (MOB_FLAGGED(ch,MOB_WIMPY)&&AWAKE(vict)) continue; if (MOB_FLAGGED(ch,MOB_AGGRESSIVE)||(MOB_FLAGGED(ch,MOB_AGGR_EVIL)&&IS_EVIL(vict))||(MOB_FLAGGED(ch,MOB_AGGR_NEUTRAL)&&IS_NEUTRAL(vict))||(MOB_FLAGGED(ch,MOB_AGGR_GOOD)&&IS_GOOD(vict))) { if (aggressive_mob_on_a_leash(ch,ch->master,vict)) continue; hit(ch,vict,TYPE_UNDEFINED); mob_behavior_mark_action(&ctx.legacy_tail_result,LBD_COMBAT_INIT); found=TRUE; } }
-    }
-    if (mob_behavior_domain_available_to_legacy_tail(&ctx,LBD_MEMORY) && mob_behavior_domain_available_to_legacy_tail(&ctx,LBD_COMBAT_INIT) && MOB_FLAGGED(ch,MOB_MEMORY) && MEMORY(ch)) {
-      found=FALSE; for (vict=world[IN_ROOM(ch)].people; vict && !found; vict=vict->next_in_room) { if (IS_NPC(vict)||!CAN_SEE(ch,vict)||PRF_FLAGGED(vict,PRF_NOHASSLE)) continue; for (names=MEMORY(ch); names && !found; names=names->next) { if (names->id!=GET_IDNUM(vict)) continue; if (aggressive_mob_on_a_leash(ch,ch->master,vict)) continue; found=TRUE; act("'Hey!  You're the fiend that attacked me!!!', exclaims $n.", FALSE, ch, 0, 0, TO_ROOM); hit(ch,vict,TYPE_UNDEFINED); mob_behavior_mark_action(&ctx.legacy_tail_result,LBD_MEMORY|LBD_COMBAT_INIT); } }
-    }
-    if (AFF_FLAGGED(ch,AFF_CHARM) && ch->master && num_followers_charmed(ch->master) > (GET_CHA(ch->master)-2)/3) { if (!aggressive_mob_on_a_leash(ch,ch->master,ch->master)) { if (CAN_SEE(ch,ch->master)&&!PRF_FLAGGED(ch->master,PRF_NOHASSLE)) hit(ch,ch->master,TYPE_UNDEFINED); stop_follower(ch); } }
-    if (mob_behavior_domain_available_to_legacy_tail(&ctx,LBD_HELPER) && mob_behavior_domain_available_to_legacy_tail(&ctx,LBD_COMBAT_INIT) && MOB_FLAGGED(ch,MOB_HELPER) && (!AFF_FLAGGED(ch,AFF_BLIND) || !AFF_FLAGGED(ch,AFF_CHARM))) {
-      found=FALSE; for (vict=world[IN_ROOM(ch)].people; vict && !found; vict=vict->next_in_room) { if (ch==vict || !IS_NPC(vict) || !FIGHTING(vict)) continue; if (GROUP(vict) && GROUP(vict)==GROUP(ch)) continue; if (IS_NPC(FIGHTING(vict)) || ch==FIGHTING(vict)) continue; act("$n jumps to the aid of $N!", FALSE, ch, 0, vict, TO_ROOM); hit(ch,FIGHTING(vict),TYPE_UNDEFINED); mob_behavior_mark_action(&ctx.legacy_tail_result,LBD_HELPER|LBD_COMBAT_INIT); found=TRUE; }
-    }
-    mob_behavior_record_recent_pulse(ch,&ctx);
-  }
-}
 
 /* Mob Memory Routines */
 /* make ch remember victim */
