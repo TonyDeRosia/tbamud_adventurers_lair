@@ -757,7 +757,7 @@ static void list_zones(struct char_data *ch, zone_rnum rnum, zone_vnum vmin, zon
   size_t len = 0, tmp_len = 0;
   zone_rnum i;
   zone_vnum bottom, top;
-  char buf[MAX_STRING_LENGTH];
+  char buf[MAX_STRING_LENGTH], room_range[32];
   bool use_name=FALSE;
 
   bottom = vmin;
@@ -776,8 +776,8 @@ static void list_zones(struct char_data *ch, zone_rnum rnum, zone_vnum vmin, zon
   }
 
   len = snprintf(buf, sizeof(buf),
-  "VNum  Zone Name                      Builder(s)\r\n"
-  "----- ------------------------------ --------------------------------------\r\n");
+  "Zone  Room Range     Zone Name                      Builder(s)\r\n"
+  "----  -------------  ------------------------------ --------------------------------------\r\n");
 
   if (!top_of_zone_table)
     return;
@@ -787,8 +787,10 @@ static void list_zones(struct char_data *ch, zone_rnum rnum, zone_vnum vmin, zon
       if ((!use_name) || (is_name(name, zone_table[i].builders))) {
         counter++;
 
-        tmp_len = snprintf(buf+len, sizeof(buf)-len, "[%s%3d%s] %s%-*s %s%-1s%s\r\n",
-            QGRN, zone_table[i].number, QNRM, QCYN, count_color_chars(zone_table[i].name)+30, zone_table[i].name,
+        snprintf(room_range, sizeof(room_range), "%d-%d", zone_table[i].bot, zone_table[i].top);
+        tmp_len = snprintf(buf+len, sizeof(buf)-len, "%s%-4d%s  %s%-13s%s  %s%-*s %s%s%s\r\n",
+            QGRN, zone_table[i].number, QNRM, QGRN, room_range, QNRM,
+            QCYN, count_color_chars(zone_table[i].name)+30, zone_table[i].name,
             QYEL, zone_table[i].builders ? zone_table[i].builders : "None.", QNRM);
         len += tmp_len;
         if (len > sizeof(buf))
