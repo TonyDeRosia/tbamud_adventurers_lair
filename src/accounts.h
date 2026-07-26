@@ -28,10 +28,10 @@ int account_id_by_name(const char *acct_name, long *out_id);
 int account_set_force_pw(long acct_id, int force);
 int account_set_password(long acct_id, const char *passwd, int force_pw_change);
 int account_foreach_index(int (*cb)(long id, const char *name, void *arg), void *arg);
-void account_save_any(const struct account_data *acct);
+int account_save_any(const struct account_data *acct);
 
 void account_init_for_char(struct char_data *ch);
-void account_attach_char(struct char_data *ch);
+int account_attach_char(struct char_data *ch);
 void account_storage_report(void);
 
 void acct_show_character_menu(struct descriptor_data *d);

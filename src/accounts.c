@@ -320,23 +320,23 @@ int account_load_any(long acct_id, struct account_data *acct)
   return 1;
 }
 
-void account_save_any(const struct account_data *acct)
+int account_save_any(const struct account_data *acct)
 {
   char fname[256];
   FILE *fp;
   char path[PATH_MAX];
 
-  if (!acct) return;
+  if (!acct) return 0;
 
   if (!ensure_account_dirs())
-    return;
+    return 0;
 
   get_account_filename(fname, sizeof(fname), acct->account_id);
   account_resolve_path(path, sizeof(path), fname);
   fp = fopen(path, "w");
   if (!fp) {
     mudlog(CMP, LVL_IMPL, TRUE, "SYSERR: Unable to write account file %s: %s", path, strerror(errno));
-    return;
+    return 0;
   }
 
   fprintf(fp, "V3\n");
@@ -350,7 +350,16 @@ void account_save_any(const struct account_data *acct)
   for (int i = 0; i < acct->num_chars && i < MAX_CHARS_PER_ACCOUNT; i++)
     fprintf(fp, "%ld %s\n", acct->chars[i].char_id, acct->chars[i].name);
 
-  fclose(fp);
+  int write_ok = (fflush(fp) == 0);
+  if (write_ok && fsync(fileno(fp)) != 0)
+    write_ok = 0;
+  if (fclose(fp) != 0)
+    write_ok = 0;
+  if (!write_ok) {
+    mudlog(CMP, LVL_IMPL, TRUE, "SYSERR: Unable to durably write account file %s: %s", path, strerror(errno));
+    return 0;
+  }
+  return 1;
 }
 
 int account_authenticate(const char *acct_name, const char *passwd, long *out_id,
@@ -485,11 +494,11 @@ void account_init_for_char(struct char_data *ch)
     GET_ACCOUNT_ID(ch) = GET_IDNUM(ch);
 }
 
-void account_attach_char(struct char_data *ch)
+int account_attach_char(struct char_data *ch)
 {
   struct account_data acct;
 
-  if (!ch) return;
+  if (!ch) return 0;
 
   account_init_for_char(ch);
 
@@ -500,17 +509,17 @@ void account_attach_char(struct char_data *ch)
 
   for (int i = 0; i < acct.num_chars; i++)
     if (acct.chars[i].char_id == GET_IDNUM(ch))
-      return;
+      return 1;
 
   if (acct.num_chars >= MAX_CHARS_PER_ACCOUNT)
-    return;
+    return 0;
 
   acct.chars[acct.num_chars].char_id = GET_IDNUM(ch);
   strlcpy(acct.chars[acct.num_chars].name, GET_NAME(ch),
           sizeof(acct.chars[acct.num_chars].name));
   acct.num_chars++;
 
-  account_save_any(&acct);
+  return account_save_any(&acct);
 }
 
 

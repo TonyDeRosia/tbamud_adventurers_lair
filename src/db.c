@@ -3858,8 +3858,10 @@ void init_char(struct char_data *ch)
   if (ch->player_specials == NULL)
     CREATE(ch->player_specials, struct player_special_data, 1);
 
-  /* If this is our first player make him IMPL. */
-  if (top_of_p_table == 0) {
+  /* top_of_p_table is the last occupied zero-based slot: -1 is empty, while
+   * 0 already means one record.  create_entry() has just inserted the first
+   * character at slot zero, so only that slot is eligible for implementor. */
+  if (first_player_record_is_new(GET_PFILEPOS(ch))) {
     GET_LEVEL(ch) = LVL_IMPL;
     GET_EXP(ch) = 7000000;
 

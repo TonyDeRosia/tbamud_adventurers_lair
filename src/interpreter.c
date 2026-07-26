@@ -1972,6 +1972,7 @@ void nanny(struct descriptor_data *d, char *arg)
         }
 
         d->acct_prompted_menu = 0;
+        d->acct_roster_load_only = 1;
         STATE(d) = CON_GET_NAME;
         nanny(d, acct.chars[choice - 1].name);
         return;
@@ -1981,6 +1982,7 @@ void nanny(struct descriptor_data *d, char *arg)
         if (!acct.chars[i].name[0]) continue;
         if (!str_cmp(arg, acct.chars[i].name)) {
           d->acct_prompted_menu = 0;
+          d->acct_roster_load_only = 1;
           STATE(d) = CON_GET_NAME;
           nanny(d, acct.chars[i].name);
           return;
@@ -2099,6 +2101,19 @@ case CON_GET_NAME:             /* wait for input of name */
           return;
       }
       if ((player_i = load_char(tmp_name, d->character)) > -1) {
+        if (d->acct_roster_load_only &&
+            (GET_ACCOUNT_ID(d->character) != d->acct_id || account_character_is_in_use(tmp_name))) {
+          mudlog(CMP, LVL_IMPL, TRUE, "Account roster load rejected for %s: expected account %ld, loaded %ld, in-use=%d",
+                 tmp_name, d->acct_id, GET_ACCOUNT_ID(d->character), account_character_is_in_use(tmp_name));
+          d->acct_roster_load_only = 0;
+          free_char(d->character);
+          d->character = NULL;
+          write_to_output(d, "\r\nCharacter data for %s could not be loaded. The account entry has been preserved. Contact an administrator.\r\n", tmp_name);
+          STATE(d) = CON_ACCT_MENU;
+          acct_show_character_menu(d);
+          return;
+        }
+        d->acct_roster_load_only = 0;
         /* Account migration: bind legacy characters to authenticated account */
         if (d->acct_authed && d->acct_id > 0 && GET_ACCOUNT_ID(d->character) <= 0) {
           GET_ACCOUNT_ID(d->character) = d->acct_id;
@@ -2159,6 +2174,17 @@ if (PLR_FLAGGED(d->character, PLR_DELETED)) {
           STATE(d) = CON_PASSWORD;
         }
       } else {
+        if (d->acct_roster_load_only) {
+          mudlog(CMP, LVL_IMPL, TRUE, "Account roster load failed for %s: index position %ld, expected account %ld",
+                 tmp_name, get_ptable_by_name(tmp_name), d->acct_id);
+          d->acct_roster_load_only = 0;
+          free_char(d->character);
+          d->character = NULL;
+          write_to_output(d, "\r\nCharacter data for %s could not be loaded. The account entry has been preserved. Contact an administrator.\r\n", tmp_name);
+          STATE(d) = CON_ACCT_MENU;
+          acct_show_character_menu(d);
+          return;
+        }
         /* player unknown -- make new character */
 
         /* Check for multiple creations of a character. */
@@ -2392,8 +2418,20 @@ break;
 
         /* Finalize base stats after point spend (racial bonuses are applied at runtime). */
         clamp_base_stats(d->character);
-        save_char(d->character);
-        save_player_index();
+        if (!save_char(d->character) || !save_player_index()) {
+          mudlog(CMP, LVL_IMPL, TRUE, "SYSERR: New character %s was not durably saved; account roster was not modified",
+                 GET_NAME(d->character));
+          write_to_output(d, "\r\nYour character could not be saved. It has not been attached to the account. Contact an administrator.\r\n");
+          STATE(d) = CON_CLOSE;
+          return;
+        }
+        if (!account_attach_char(d->character)) {
+          mudlog(CMP, LVL_IMPL, TRUE, "SYSERR: Saved new character %s but could not attach it to account %ld; player file retained for recovery",
+                 GET_NAME(d->character), d->acct_id);
+          write_to_output(d, "\r\nYour character was saved, but the account roster could not be updated. Contact an administrator.\r\n");
+          STATE(d) = CON_CLOSE;
+          return;
+        }
         write_to_output(d, "%s\r\n*** PRESS RETURN: ", motd);
         STATE(d) = CON_RMOTD;
 
