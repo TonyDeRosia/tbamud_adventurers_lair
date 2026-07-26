@@ -1301,6 +1301,7 @@ struct descriptor_data
   int acct_authed;
   char acct_tmp_pass[128];
   char acct_pending_delete[64];
+  int acct_roster_load_only; /**< CON_GET_NAME came from an existing roster entry. */
 
   socket_t descriptor;      /**< file descriptor for socket */
   char host[HOST_LENGTH+1]; /**< hostname */

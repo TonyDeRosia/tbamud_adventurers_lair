@@ -13,6 +13,7 @@
 #include "sysdep.h"
 #include <ctype.h>
 #include <limits.h>
+#include <dirent.h>
 #include "structs.h"
 #include "utils.h"
 #include "db.h"
@@ -59,6 +60,20 @@ static void load_HMVS(struct char_data *ch, const char *line, int mode);
 static void write_aliases_ascii(FILE *file, struct char_data *ch);
 static void read_aliases_ascii(FILE *file, struct char_data *ch, int count);
 
+static int ensure_player_storage(void)
+{
+  static const char *dirs[] = { LIB_PLRFILES, LIB_PLRFILES "A-E", LIB_PLRFILES "F-J",
+    LIB_PLRFILES "K-O", LIB_PLRFILES "P-T", LIB_PLRFILES "U-Z", LIB_PLRFILES "ZZZ" };
+  size_t i;
+
+  for (i = 0; i < sizeof(dirs) / sizeof(dirs[0]); i++)
+    if (mkdir(dirs[i], 0755) == -1 && errno != EEXIST) {
+      log("SYSERR: player storage: mkdir %s failed: %s", dirs[i], strerror(errno));
+      return FALSE;
+    }
+  return TRUE;
+}
+
 /* New version to build player index for ASCII Player Files. Generate index
  * table for the player file. */
 void build_player_index(void)
@@ -68,7 +83,12 @@ void build_player_index(void)
   char index_name[40], line[256], bits[64];
   char arg2[80];
 
-  sprintf(index_name, "%s%s", LIB_PLRFILES, INDEX_FILE);
+  if (!ensure_player_storage()) {
+    top_of_p_table = -1;
+    return;
+  }
+  snprintf(index_name, sizeof(index_name), "%s%s", LIB_PLRFILES, INDEX_FILE);
+  log("Player persistence: loading index %s (player root %s)", index_name, LIB_PLRFILES);
   if (!(plr_index = fopen(index_name, "r"))) {
     top_of_p_table = -1;
     log("No player index file!  First new char will be IMP!");
@@ -99,6 +119,7 @@ void build_player_index(void)
 
   fclose(plr_index);
   top_of_p_file = top_of_p_table = i - 1;
+  log("Player persistence: loaded %d player index record%s", i, i == 1 ? "" : "s");
 }
 
 /* Create a new entry in the in-memory index table for the player file. If the
@@ -128,6 +149,35 @@ int create_entry(char *name)
   player_table[pos].flags = 0;
 
   return (pos);
+}
+
+/* Called after create_entry().  Slot zero alone is ambiguous: it means one
+ * record, not an empty table.  Also refuse elevation if an orphaned .plr file
+ * proves that a broken/missing index hid an existing real character. */
+int first_player_record_is_new(int pfilepos)
+{
+  static const char *buckets[] = { "A-E", "F-J", "K-O", "P-T", "U-Z", "ZZZ" };
+  DIR *dir;
+  struct dirent *entry;
+  char path[PATH_MAX];
+  size_t i, len;
+
+  if (top_of_p_table != 0 || pfilepos != 0)
+    return FALSE;
+  for (i = 0; i < sizeof(buckets) / sizeof(buckets[0]); i++) {
+    snprintf(path, sizeof(path), "%s%s", LIB_PLRFILES, buckets[i]);
+    if (!(dir = opendir(path)))
+      continue;
+    while ((entry = readdir(dir))) {
+      len = strlen(entry->d_name);
+      if (len > 4 && !strcmp(entry->d_name + len - 4, "." SUF_PLR)) {
+        closedir(dir);
+        return FALSE;
+      }
+    }
+    closedir(dir);
+  }
+  return TRUE;
 }
 
 
@@ -166,16 +216,18 @@ static void remove_player_from_index(int pos)
 }
 
 /* This function necessary to save a seperate ASCII player index */
-void save_player_index(void)
+int save_player_index(void)
 {
   int i;
   char index_name[50], bits[64];
   FILE *index_file;
 
-  sprintf(index_name, "%s%s", LIB_PLRFILES, INDEX_FILE);
+  if (!ensure_player_storage())
+    return FALSE;
+  snprintf(index_name, sizeof(index_name), "%s%s", LIB_PLRFILES, INDEX_FILE);
   if (!(index_file = fopen(index_name, "w"))) {
-    log("SYSERR: Could not write player index file");
-    return;
+    log("SYSERR: Could not write player index file %s: %s", index_name, strerror(errno));
+    return FALSE;
   }
 
   for (i = 0; i <= top_of_p_table; i++)
@@ -187,7 +239,16 @@ void save_player_index(void)
     }
   fprintf(index_file, "~\n");
 
-  fclose(index_file);
+  i = fflush(index_file);
+  if (i == 0 && fsync(fileno(index_file)) != 0)
+    i = -1;
+  if (fclose(index_file) != 0)
+    i = -1;
+  if (i != 0) {
+    log("SYSERR: Could not durably write player index %s: %s", index_name, strerror(errno));
+    return FALSE;
+  }
+  return TRUE;
 }
 
 void free_player_index(void)
@@ -203,7 +264,7 @@ void free_player_index(void)
 
   free(player_table);
   player_table = NULL;
-  top_of_p_table = 0;
+  top_of_p_table = -1;
 }
 
 long get_ptable_by_name(const char *name)
@@ -807,17 +868,17 @@ int load_char(const char *name, struct char_data *ch)
 
 /* Write the vital data of a player to the player file. */
 /* This is the ASCII Player Files save routine. */
-void save_char(struct char_data * ch)
+int save_char(struct char_data * ch)
 {
   FILE *fl;
   char filename[40], buf[MAX_STRING_LENGTH], bits[127], bits2[127], bits3[127], bits4[127];
-  int i, j, id, save_index = FALSE;
+  int i, j, id, save_index = FALSE, write_ok = TRUE;
   struct affected_type *aff, tmp_aff[MAX_AFFECT];
   struct obj_data *char_eq[NUM_WEARS];
   trig_data *t;
 
   if (IS_NPC(ch) || GET_PFILEPOS(ch) < 0)
-    return;
+    return FALSE;
 
   /* If ch->desc is not null, then update session data before saving. */
   if (ch->desc) {
@@ -837,11 +898,13 @@ void save_char(struct char_data * ch)
     }
   }
 
-  if (!get_filename(filename, sizeof(filename), PLR_FILE, GET_NAME(ch)))
-    return;
+  if (!ensure_player_storage() || !get_filename(filename, sizeof(filename), PLR_FILE, GET_NAME(ch)))
+    return FALSE;
+  log("Player persistence: saving %s to %s", GET_NAME(ch), filename);
   if (!(fl = fopen(filename, "w"))) {
     mudlog(NRM, LVL_GOD, TRUE, "SYSERR: Couldn't open player file %s for write", filename);
-    return;
+    mudlog(NRM, LVL_GOD, TRUE, "SYSERR: player save error: %s", strerror(errno));
+    return FALSE;
   }
 
   /* Unaffect everything a character can be affected by. */
@@ -1118,7 +1181,15 @@ void save_char(struct char_data * ch)
   write_aliases_ascii(fl, ch);
   save_char_vars_ascii(fl, ch);
 
-  fclose(fl);
+  write_ok = (fflush(fl) == 0);
+  if (write_ok && fsync(fileno(fl)) != 0)
+    write_ok = FALSE;
+  if (fclose(fl) != 0)
+    write_ok = FALSE;
+  if (!write_ok) {
+    mudlog(NRM, LVL_GOD, TRUE, "SYSERR: Could not durably save player file %s: %s", filename, strerror(errno));
+    write_ok = FALSE;
+  }
 
   /* More char_to_store code to add spell and eq affections back in. */
   for (i = 0; i < MAX_AFFECT; i++) {
@@ -1143,8 +1214,11 @@ void save_char(struct char_data * ch)
    * retains racial bonuses and other modifiers after saving. */
   affect_total(ch);
 
+  if (!write_ok)
+    return FALSE;
+
   if ((id = get_ptable_by_name(GET_NAME(ch))) < 0)
-    return;
+    return FALSE;
 
   /* update the player in the player index */
   if (player_table[id].level != GET_LEVEL(ch)) {
@@ -1171,7 +1245,9 @@ void save_char(struct char_data * ch)
     REMOVE_BIT(player_table[id].flags, PINDEX_NOWIZLIST);
 
   if (player_table[id].flags != i || save_index)
-    save_player_index();
+    if (!save_player_index())
+      return FALSE;
+  return TRUE;
 }
 
 /* Separate an id tag from the data it precedes */
