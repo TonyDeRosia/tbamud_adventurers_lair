@@ -630,23 +630,33 @@ int account_find_character_on_roster(const struct account_data *acct, const char
   return 0;
 }
 
-int account_character_is_in_use(const char *name)
+struct descriptor_data *account_character_in_use_elsewhere(
+    const char *name, const struct descriptor_data *current_desc)
 {
   struct descriptor_data *d;
 
   if (!name || !*name)
-    return 0;
+    return NULL;
 
   for (d = descriptor_list; d; d = d->next) {
-    if (!d->character || !GET_NAME(d->character))
+    if (d == current_desc)
       continue;
-    if (STATE(d) == CON_CLOSE)
+    if (STATE(d) == CON_CLOSE || STATE(d) == CON_DISCONNECT)
       continue;
-    if (!str_cmp(GET_NAME(d->character), name))
-      return 1;
+    if (d->character && GET_NAME(d->character) &&
+        !str_cmp(GET_NAME(d->character), name))
+      return d;
+    if (d->original && GET_NAME(d->original) &&
+        !str_cmp(GET_NAME(d->original), name))
+      return d;
   }
 
-  return 0;
+  return NULL;
+}
+
+int account_character_is_in_use(const char *name)
+{
+  return account_character_in_use_elsewhere(name, NULL) != NULL;
 }
 
 int account_delete_character_data(const char *name)
