@@ -49,6 +49,8 @@ static void list_zone_commands_room(struct char_data *ch, room_vnum rvnum);
 static void do_stat_room(struct char_data *ch, struct room_data *rm);
 static void do_stat_object(struct char_data *ch, struct obj_data *j);
 static void do_stat_character(struct char_data *ch, struct char_data *k);
+static void do_stat_object_prototype(struct char_data *ch, obj_rnum rnum);
+static void do_stat_mobile_prototype(struct char_data *ch, mob_rnum rnum);
 static void stop_snooping(struct char_data *ch);
 static size_t print_zone_to_buf(char *bufptr, size_t left, zone_rnum zone, int listall);
 static struct char_data *is_in_game(long idnum);
@@ -903,6 +905,139 @@ static void do_stat_object(struct char_data *ch, struct obj_data *j)
   do_sstat_object(ch, j);
 }
 
+static void stat_prototype_triggers(struct char_data *ch, struct trig_proto_list *scripts)
+{
+  struct trig_proto_list *script;
+
+  send_to_char(ch, "Prototype triggers:");
+  for (script = scripts; script; script = script->next)
+    send_to_char(ch, " %d", script->vnum);
+  send_to_char(ch, "%s\r\n", scripts ? "" : " None");
+}
+
+static void do_stat_object_prototype(struct char_data *ch, obj_rnum rnum)
+{
+  struct obj_data *obj = &obj_proto[rnum];
+  struct extra_descr_data *desc;
+  char buf[MAX_STRING_LENGTH];
+  int i, found = FALSE;
+
+  send_to_char(ch, "Object prototype [%d] (RNum: %d)\r\n", obj_index[rnum].vnum, rnum);
+  send_to_char(ch, "Live instance: none; displaying prototype data\r\n");
+  send_to_char(ch, "Name: '%s', Keywords: %s\r\n",
+               obj->short_description ? obj->short_description : "<None>",
+               obj->name ? obj->name : "<None>");
+  send_to_char(ch, "Room description: '%s'\r\nAction description: '%s'\r\n",
+               obj->description ? obj->description : "<None>",
+               obj->action_description ? obj->action_description : "<None>");
+  sprinttype(GET_OBJ_TYPE(obj), item_types, buf, sizeof(buf));
+  send_to_char(ch, "Type: %s, SpecProc: %s\r\n", buf,
+               obj_index[rnum].func ? get_spec_func_name(obj_index[rnum].func) : "None");
+  sprintbitarray(GET_OBJ_WEAR(obj), wear_bits, TW_ARRAY_MAX, buf);
+  send_to_char(ch, "Wear flags: %s\r\n", buf);
+  sprintbitarray(GET_OBJ_AFFECT(obj), affected_bits, AF_ARRAY_MAX, buf);
+  send_to_char(ch, "Affect flags: %s\r\n", buf);
+  sprintbitarray(GET_OBJ_EXTRA(obj), extra_bits, EF_ARRAY_MAX, buf);
+  send_to_char(ch, "Extra flags: %s\r\n", buf);
+  send_to_char(ch, "Values 0-3: [%d] [%d] [%d] [%d]\r\n",
+               GET_OBJ_VAL(obj, 0), GET_OBJ_VAL(obj, 1), GET_OBJ_VAL(obj, 2), GET_OBJ_VAL(obj, 3));
+  send_to_char(ch, "Weight: %d, Cost: %d, Rent/day: %d, Timer: %d, Min level: %d\r\n",
+               GET_OBJ_WEIGHT(obj), GET_OBJ_COST(obj), GET_OBJ_RENT(obj), GET_OBJ_TIMER(obj), GET_OBJ_LEVEL(obj));
+  if (obj->ex_description) {
+    send_to_char(ch, "Extra descs:");
+    for (desc = obj->ex_description; desc; desc = desc->next)
+      send_to_char(ch, " [%s]", desc->keyword ? desc->keyword : "<None>");
+    send_to_char(ch, "\r\n");
+  }
+  send_to_char(ch, "Applies:");
+  for (i = 0; i < MAX_OBJ_AFFECT; i++) {
+    if (!obj->affected[i].modifier)
+      continue;
+    sprinttype(obj->affected[i].location, apply_types, buf, sizeof(buf));
+    send_to_char(ch, "%s %+d to %s", found++ ? "," : "", obj->affected[i].modifier, buf);
+  }
+  send_to_char(ch, "%s\r\n", found ? "" : " None");
+  stat_prototype_triggers(ch, obj->proto_script);
+}
+
+static void do_stat_mobile_prototype(struct char_data *ch, mob_rnum rnum)
+{
+  struct char_data *mob = &mob_proto[rnum];
+  char buf[MAX_STRING_LENGTH];
+
+  send_to_char(ch, "Mobile prototype [%d] (RNum: %d)\r\n", mob_index[rnum].vnum, rnum);
+  send_to_char(ch, "Live instance: none; displaying prototype data\r\n");
+  send_to_char(ch, "Keywords: %s\r\nShort description: %s\r\nLong description: %s",
+               mob->player.name ? mob->player.name : "<None>",
+               mob->player.short_descr ? mob->player.short_descr : "<None>",
+               mob->player.long_descr ? mob->player.long_descr : "<None>\r\n");
+  send_to_char(ch, "Detailed description: %s", mob->player.description ? mob->player.description : "<None>\r\n");
+  sprinttype(GET_SEX(mob), genders, buf, sizeof(buf));
+  send_to_char(ch, "Level: %d, Alignment: %d, Sex: %s\r\n", GET_LEVEL(mob), GET_ALIGNMENT(mob), buf);
+  send_to_char(ch, "Stats: Str %d/%d, Int %d, Wis %d, Dex %d, Con %d, Cha %d\r\n",
+               GET_STR(mob), GET_ADD(mob), GET_INT(mob), GET_WIS(mob), GET_DEX(mob), GET_CON(mob), GET_CHA(mob));
+  send_to_char(ch, "Prototype resources: Hit %d, Mana %d, Move %d\r\n",
+               GET_MAX_HIT(mob), GET_MAX_MANA(mob), GET_MAX_MOVE(mob));
+  send_to_char(ch, "Gold: %lld, Experience: %d, Armor: %d, Hitroll: %d, Damroll: %d\r\n",
+               GET_GOLD(mob), GET_EXP(mob), mob->points.armor, mob->points.hitroll, mob->points.damroll);
+  send_to_char(ch, "Saving throws: [%d/%d/%d/%d/%d]\r\n", GET_SAVE(mob, 0), GET_SAVE(mob, 1),
+               GET_SAVE(mob, 2), GET_SAVE(mob, 3), GET_SAVE(mob, 4));
+  send_to_char(ch, "Attack type: %s, Bare-hand damage: %dd%d\r\n",
+               mob->mob_specials.attack_type < NUM_ATTACK_TYPES ?
+                 attack_hit_text[(int)mob->mob_specials.attack_type].singular : "<invalid>",
+               mob->mob_specials.damnodice, mob->mob_specials.damsizedice);
+  sprinttype(mob->mob_specials.default_pos, position_types, buf, sizeof(buf));
+  send_to_char(ch, "Default position: %s, SpecProc: %s\r\n", buf,
+               mob_index[rnum].func ? get_spec_func_name(mob_index[rnum].func) : "None");
+  sprintbitarray(MOB_FLAGS(mob), action_bits, PM_ARRAY_MAX, buf);
+  send_to_char(ch, "NPC flags: %s\r\n", buf);
+  sprintbitarray(AFF_FLAGS(mob), affected_bits, AF_ARRAY_MAX, buf);
+  send_to_char(ch, "Affect flags: %s\r\n", buf);
+  if (mob->ai_config)
+    send_to_char(ch, "Authored AI configuration: configured; mode=%d, role=%s, movement=%s, "
+                 "social=%d, roam=%d, pursuit=%d, schedules=%d, patrols=%d\r\n",
+                 mob->ai_config->mode, ai_actor_config_role_name(mob->ai_config->role),
+                 ai_actor_config_movement_name(mob->ai_config->movement), mob->ai_config->social,
+                 mob->ai_config->roam_radius, mob->ai_config->pursuit_distance,
+                 mob->ai_config->schedule_count, mob->ai_config->patrol_count);
+  else
+    send_to_char(ch, "Authored AI configuration: none\r\n");
+  send_to_char(ch, "Runtime AI state: none\r\n");
+  stat_prototype_triggers(ch, mob->proto_script);
+}
+
+static bool parse_stat_vnum(const char *argument, int *vnum)
+{
+  char *end;
+  long value;
+
+  if (!argument || !*argument || !isdigit((unsigned char)*argument))
+    return FALSE;
+  errno = 0;
+  value = strtol(argument, &end, 10);
+  if (errno == ERANGE || *end != '\0' || value > INT_MAX)
+    return FALSE;
+  *vnum = (int)value;
+  return TRUE;
+}
+
+static bool stat_vnum_token(const char *argument)
+{
+  const unsigned char *p = (const unsigned char *)argument;
+
+  if (!p || !*p)
+    return FALSE;
+  for (; *p; p++)
+    if (!isdigit(*p))
+      return FALSE;
+  return TRUE;
+}
+
+static bool invalid_signed_stat_vnum(const char *argument)
+{
+  return argument && argument[0] == '-' && stat_vnum_token(argument + 1);
+}
+
 static const char *ai_actor_role_name(int role)
 {
   switch (role) {
@@ -1232,6 +1367,7 @@ ACMD(do_stat)
   struct char_data *victim;
   struct obj_data *object;
   struct room_data *room;
+  int vnum;
 
   half_chop(argument, buf1, buf2);
 
@@ -1250,10 +1386,20 @@ ACMD(do_stat)
       room = &world[rnum];
     }
     do_stat_room(ch, room);
-  } else if (is_abbrev(buf1, "mob")) {
+  } else if (is_abbrev(buf1, "mob") || !strcmp(buf1, "mobile")) {
     if (!*buf2)
       send_to_char(ch, "Stats on which mobile?\r\n");
-    else {
+    else if (stat_vnum_token(buf2) || invalid_signed_stat_vnum(buf2)) {
+      if (!parse_stat_vnum(buf2, &vnum))
+        send_to_char(ch, "That is not a valid mobile prototype VNUM.\r\n");
+      else {
+        mob_rnum rnum = real_mobile(vnum);
+        if (rnum == NOBODY)
+          send_to_char(ch, "No mobile prototype exists with VNUM %d.\r\n", vnum);
+        else
+          do_stat_mobile_prototype(ch, rnum);
+      }
+    } else {
       if ((victim = get_char_vis(ch, buf2, NULL, FIND_CHAR_WORLD)) != NULL)
 	do_stat_character(ch, victim);
       else
@@ -1293,7 +1439,17 @@ ACMD(do_stat)
   } else if (is_abbrev(buf1, "object")) {
     if (!*buf2)
       send_to_char(ch, "Stats on which object?\r\n");
-    else {
+    else if (stat_vnum_token(buf2) || invalid_signed_stat_vnum(buf2)) {
+      if (!parse_stat_vnum(buf2, &vnum))
+        send_to_char(ch, "That is not a valid object prototype VNUM.\r\n");
+      else {
+        obj_rnum rnum = real_object(vnum);
+        if (rnum == NOTHING)
+          send_to_char(ch, "No object prototype exists with VNUM %d.\r\n", vnum);
+        else
+          do_stat_object_prototype(ch, rnum);
+      }
+    } else {
       if ((object = get_obj_vis(ch, buf2, NULL)) != NULL)
 	do_stat_object(ch, object);
       else
