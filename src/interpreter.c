@@ -42,6 +42,7 @@
 ACMD(do_saudit);
 ACMD(do_shopdisc);
 ACMD(do_pull);
+ACMD(do_push);
 ACMD(do_unpull);
 
 ACMD(do_offhand);
@@ -317,6 +318,7 @@ cpp_extern const struct command_info cmd_info[] = {
   { "prefedit" , "pre"     , POS_DEAD    , do_oasis_prefedit , 0, 0 },
   { "purge"    , "purge"   , POS_DEAD    , do_purge    , LVL_BUILDER, 0 },
   { "pull"     , "pull"    , POS_DEAD    , do_pull     , LVL_GRGOD, 0 },
+  { "push"     , "push"    , POS_DEAD    , do_push     , LVL_GRGOD, 0 },
 
   { "qedit"    , "qedit"   , POS_DEAD    , do_oasis_qedit, LVL_BUILDER, 0 },
   { "qlist"    , "qlist"   , POS_DEAD    , do_oasis_list, LVL_BUILDER, SCMD_OASIS_QLIST },

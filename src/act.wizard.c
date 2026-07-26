@@ -8042,38 +8042,78 @@ ACMD(do_pull)
          GET_NAME(vict), GET_ROOM_VNUM(IN_ROOM(ch)));
 }
 
-ACMD(do_unpull)
+static void perform_push(struct char_data *ch, char *argument, const char *command)
 {
   char arg[MAX_INPUT_LENGTH];
-  struct char_data *vict;
+  struct char_data *iter, *vict = NULL;
+  int matches = 0;
 
   one_argument(argument, arg);
 
   if (!*arg) {
-    send_to_char(ch, "Usage: unpull <playername>\r\n");
+    send_to_char(ch, "Usage: %s <playername>\r\n", command);
     return;
   }
 
-  if (!(vict = get_player_vis(ch, arg, NULL, FIND_CHAR_WORLD)) || IS_NPC(vict)) {
+  /* Prefer an exact player name, but reject ambiguous abbreviations instead of
+   * allowing a destructive command to select whichever match happens to be
+   * first in character_list. */
+  for (iter = character_list; iter; iter = iter->next) {
+    if (IS_NPC(iter) || !CAN_SEE(ch, iter) || !is_abbrev(arg, GET_NAME(iter)))
+      continue;
+    if (!str_cmp(arg, GET_NAME(iter))) {
+      vict = iter;
+      matches = 1;
+      break;
+    }
+    vict = iter;
+    matches++;
+  }
+
+  if (matches > 1) {
+    send_to_char(ch, "That player name is ambiguous.\r\n");
+    return;
+  }
+
+  if (!vict) {
     send_to_char(ch, "You do not see that player here.\r\n");
     return;
   }
 
+  if (vict == ch) {
+    send_to_char(ch, "You cannot push yourself out of the world.\r\n");
+    return;
+  }
+
   if (vict->desc) {
-    send_to_char(ch, "They are currently connected; unpull aborted.\r\n");
+    send_to_char(ch, "That player is currently connected and cannot be pushed.\r\n");
     return;
   }
 
   GET_LOADROOM(vict) = GET_ROOM_VNUM(IN_ROOM(vict));
-  Crash_rentsave(vict, 0);
-  save_char(vict);
+  if (!save_char(vict)) {
+    send_to_char(ch, "Unable to save that player; push aborted.\r\n");
+    return;
+  }
+  Crash_rentsave(vict, 0); /* Persist and detach equipment/inventory before extraction. */
 
-  mudlog(NRM, MAX(LVL_GOD, GET_LEVEL(ch)), TRUE, "%s unpulled %s from room %d", GET_NAME(ch),
+  mudlog(NRM, MAX(LVL_GOD, GET_LEVEL(ch)), TRUE, "%s pushed %s from room %d", GET_NAME(ch),
          GET_NAME(vict), GET_ROOM_VNUM(IN_ROOM(vict)));
 
-  act("$n vanishes in a swirl of magic.", FALSE, vict, 0, 0, TO_ROOM);
-  send_to_char(ch, "You unpull %s.\r\n", GET_NAME(vict));
+  act("$n disappears in a swirl of magic.", FALSE, vict, 0, 0, TO_ROOM);
+  send_to_char(ch, "You push %s out of the world.\r\n", GET_NAME(vict));
   extract_char(vict);
+}
+
+ACMD(do_push)
+{
+  perform_push(ch, argument, "push");
+}
+
+/* Retain the existing administrative spelling as a compatibility alias. */
+ACMD(do_unpull)
+{
+  perform_push(ch, argument, "unpull");
 }
 
 /* AFFREMOVE COMMAND BEGIN */
