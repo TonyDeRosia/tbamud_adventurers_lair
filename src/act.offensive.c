@@ -20,7 +20,6 @@
 #include "act.h"
 #include "fight.h"
 #include "mud_event.h"
-#include "ai_actor.h"
 #include "race.h"
 
 static const char *appraise_level_band(const struct char_data *ch, const struct char_data *vict)
@@ -163,7 +162,6 @@ ACMD(do_assist)
       act("$N assists you!", 0, helpee, 0, ch, TO_CHAR);
       act("$n assists $N.", FALSE, ch, 0, helpee, TO_NOTVICT);
       if (IS_NPC(helpee) && !IS_NPC(ch))
-        ai_actor_record_help(helpee, ch, 5);
       hit(ch, opponent, TYPE_UNDEFINED);
     }
   }

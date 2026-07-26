@@ -71,8 +71,6 @@ extern int display_closed_doors;
 extern int protocol_negotiation;
 extern int special_in_comm;
 extern int debug_mode;
-extern int ai_actor_enabled;
-extern int ai_legacy_arbitration_enabled;
 /* Automap and map options */
 extern int map_option;
 extern int default_map_size;

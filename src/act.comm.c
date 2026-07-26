@@ -14,7 +14,6 @@
 #include "utils.h"
 #include "comm.h"
 #include "interpreter.h"
-#include "ai_actor.h"
 #include "handler.h"
 #include "db.h"
 #include "screen.h"
@@ -22,7 +21,6 @@
 #include "dg_scripts.h"
 #include "act.h"
 #include "modify.h"
-#include "ai_actor.h"
 
 static bool legal_communication(char * arg);
 
@@ -69,7 +67,6 @@ ACMD(do_say)
   }
 
   /* Trigger check. */
-  ai_actor_event_say(ch, argument);
 
   speech_mtrigger(ch, argument);
   speech_wtrigger(ch, argument);
@@ -246,8 +243,6 @@ ACMD(do_spec_comm)
     else
       send_to_char(ch, "You %s %s, '%s'\r\n", action_sing, GET_NAME(vict), buf2);
     act(action_others, FALSE, ch, 0, vict, TO_NOTVICT);
-    if (subcmd == SCMD_WHISPER)
-      ai_actor_event_whisper(ch, vict, buf2);
   }
 }
 

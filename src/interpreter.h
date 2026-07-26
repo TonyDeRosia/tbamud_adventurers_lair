@@ -127,9 +127,6 @@ extern const struct command_info cmd_info[];
 
 ACMD(do_worth);
 ACMD(do_balance);
-ACMD(do_smartspawn);
-ACMD(do_aistate);
-ACMD(do_aictl);
 ACMD(do_heel);
 ACMD(do_areatemplate);
 ACMD(do_roomtemplate);

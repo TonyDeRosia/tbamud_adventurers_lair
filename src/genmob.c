@@ -17,8 +17,6 @@
 #include "genzon.h"
 #include "dg_olc.h"
 #include "spells.h"
-#include "ai_actor.h"
-#include "legacy_behavior.h"
 
 /* local functions */
 static void extract_mobile_all(mob_vnum vnum);
@@ -95,9 +93,7 @@ int add_mobile(struct char_data *mob, mob_vnum vnum)
 int copy_mobile(struct char_data *to, struct char_data *from)
 {
   free_mobile_strings(to);
-  mob_ai_config_free(to->ai_config);
   *to = *from;
-  to->ai_config = mob_ai_config_copy(from->ai_config);
   check_mobile_strings(from);
   copy_mobile_strings(to, from);
   return TRUE;
@@ -280,7 +276,6 @@ int free_mobile(struct char_data *mob)
   if (SCRIPT(mob))
     extract_script(mob, MOB_TRIGGER);
 
-  mob_ai_config_free(mob->ai_config);
   free(mob);
   return TRUE;
 }
@@ -333,41 +328,9 @@ int save_mobiles(zone_rnum rznum)
 
 int write_mobile_espec(mob_vnum mvnum, struct char_data *mob, FILE *fd)
 {
-  int i, k;
+  int i;
 
-  if (mob->ai_config) {
-    struct mob_ai_config *c = mob->ai_config;
-    mob_ai_config_validate(c);
-    fprintf(fd, "AIConfig: %d %lu %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d\n",
-      c->mode, c->override_mask, c->role, c->movement, c->social,
-      c->home_room_vnum, c->work_room_vnum, c->guard_room_vnum, c->roam_radius, c->pursuit_distance, c->movement_delay,
-      c->greeting_enabled, c->ambient_speech_enabled, c->ambient_emotes_enabled, c->speech_cooldown, c->emote_cooldown,
-      c->flee_hp_percent, c->surrender_hp_percent, c->assist_enabled, c->call_help_enabled, c->hunt_enabled, c->return_home, c->stay_zone,
-      c->personality[0], c->personality[1], c->personality[2], c->personality[3], c->personality[4]);
-    for (i = 0; i < MOB_BEHAVIOR_DOMAIN_COUNT; i++) {
-      unsigned domain = 1U << i;
-      if ((domain & MOB_BEHAVIOR_PHASE2A_DOMAINS) && c->behavior_owner[i] != MOB_BEHAVIOR_OWNER_COMPATIBILITY)
-        fprintf(fd, "AIBehaviorOwner: %s %s\n", mob_behavior_domain_token(domain), mob_behavior_owner_name(c->behavior_owner[i]));
-    }
-    fprintf(fd, "AIConfigTraits: %d %d %d %d %d %d %d\n", c->personality[5], c->personality[6], c->personality[7], c->personality[8], c->personality[9], c->personality[10], c->personality[11]);
-    fprintf(fd, "AIConfigSocial: %d %d %d %d %d %d %d %d %d\n", c->whisper_enabled, c->respond_strangers, c->respond_trusted, c->respond_feared, c->respond_hostile, c->room_speech_cooldown, c->dialogue_count[0], c->dialogue_count[1], c->dialogue_count[2]);
-    fprintf(fd, "AIConfigCapabilities: %d %d %d %d\n", c->archetype, c->communication, c->memory_style, c->assistance_style);
-    fprintf(fd, "AIConfigCombat: %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d\n",c->combat_style,c->combat_enabled,c->may_initiate,c->may_assist,c->may_call_help,c->may_flee,c->protect_trusted,c->protect_group,c->protect_same_role,c->protect_same_prototype,c->avoid_incapacitated,c->retaliate_self,c->retaliate_ally,c->retaliate_hostile,c->switch_targets,c->assist_severity,c->target_switch_threshold,c->max_allies,c->max_responders,c->combat_cooldown);
-    fprintf(fd, "AIConfigTargetWeight: %d %d %d %d %d %d %d %d\n",c->target_weight[0],c->target_weight[1],c->target_weight[2],c->target_weight[3],c->target_weight[4],c->target_weight[5],c->target_weight[6],c->target_weight[7]);
-    fprintf(fd, "AIConfigPerception: %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d\n", c->notice_entry,c->notice_departure,c->notice_speech,c->notice_whispers,c->notice_emotes,c->notice_combat,c->notice_self_attack,c->notice_ally_attack,c->notice_corpses,c->notice_drops,c->notice_gifts,c->notice_crimes,c->hearing_sensitivity,c->observation_sensitivity,c->suspicion_threshold,c->recognition_confidence);
-    fprintf(fd, "AIConfigMemory: %d %d %d %d %d %d %d %d %d %d %d %d %d\n", c->memory_enabled,c->memory_max_actors,c->memory_ordinary_duration,c->memory_important_duration,c->trust_gain,c->trust_loss,c->fear_gain,c->fear_decay,c->hostility_gain,c->hostility_decay,c->familiarity_gain,c->familiarity_decay,c->forgiveness);
-    fprintf(fd, "AIConfigMemoryFlags: %d %d %d %d %d %d %d %d %d\n",c->remember_attacks,c->remember_assistance,c->remember_crimes,c->remember_gifts,c->remember_insults,c->remember_conversations,c->remember_threats,c->remember_last_room,c->remember_deaths);
-    fprintf(fd, "AIConfigThreat: %d %d %d %d %d %d %d %d %d %d %d %d %d\n",c->threat_enabled[0],c->threat_enabled[1],c->threat_enabled[2],c->threat_enabled[3],c->threat_enabled[4],c->threat_enabled[5],c->threat_enabled[6],c->threat_enabled[7],c->threat_enabled[8],c->threat_enabled[9],c->threat_cooldown,c->calm_reset_time,c->repeated_event_window);
-    for (i=0;i<c->threat_step_count;i++) fprintf(fd,"AIThreatStep: %d %d %d %d %d\n",c->threat_steps[i].type,c->threat_steps[i].minimum_severity,c->threat_steps[i].cooldown,c->threat_steps[i].max_repetitions,c->threat_steps[i].advance_on_failure);
-    for (k=0;k<AI_DIALOGUE_CATEGORIES;k++) for (i=0;i<c->dialogue_count[k];i++) if (c->dialogue[k][i]) fprintf(fd, "AIDialogue: %d %s\n", k, c->dialogue[k][i]);
-    for (i=0;i<c->vocalization_count;i++) if (c->vocalization[i]) fprintf(fd, "AIVocalization: %s\n", c->vocalization[i]);
-    fprintf(fd,"AIConfigVocal: %d %d %d %d %d %u\n",c->vocal_presence,c->vocal_frequency,c->vocal_cooldown_min,c->vocal_cooldown_max,c->vocal_room_limit,c->vocal_disabled_mask);
-    fprintf(fd,"AIConfigSchedule: %d %d %d %d %d %d %d\n",c->schedule_enabled,c->resume_after_interrupt,c->sleep_room_vnum,c->fallback_room_vnum,c->default_failure_policy,c->next_schedule_id,c->next_patrol_id);
-    fprintf(fd,"AIRoutine: %d %d %d %d %d %d\n",c->routine_mode,c->routine_boundary,c->routine_failure,c->random_wait_min,c->random_wait_max,c->random_destination_count);
-    for (i=0;i<c->random_destination_count;i++) fprintf(fd,"AIRoutineDestination: %d %d %d %s\n",c->random_destinations[i].room_vnum,c->random_destinations[i].enabled,c->random_destinations[i].weight,c->random_destinations[i].label);
-    for(i=0;i<c->schedule_count;i++){struct ai_schedule_entry *e=&c->schedules[i];fprintf(fd,"AISchedule: %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d %d\n",e->id,e->enabled,e->start_hour,e->end_hour,e->day_mask,e->priority,e->activity,e->destination,e->destination_value,e->arrival_action,e->departure_action,e->interruption_policy,e->failure_policy,e->max_travel_time,e->max_attempts,e->wait_duration,e->route_id);fprintf(fd,"AIScheduleTiming: %d %d\n",e->id,e->timing_policy);}
-    for(i=0;i<c->patrol_count;i++){struct ai_patrol_route*r=&c->patrols[i];fprintf(fd,"AIPatrol: %d %d %d %d %d %s\n",r->id,r->enabled,r->loop_mode,r->failure_policy,r->waypoint_count,r->label);for(k=0;k<r->waypoint_count;k++)fprintf(fd,"AIPatrolWaypoint: %d %d %d %d\n",r->id,r->waypoints[k].room_vnum,r->waypoints[k].wait_duration,r->waypoints[k].arrival_action);}
-  }
+
 
   if (GET_ATTACK(mob) != 0)
     fprintf(fd, "BareHandAttack: %d\n", GET_ATTACK(mob));
