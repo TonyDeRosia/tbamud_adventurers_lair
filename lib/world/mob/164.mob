@@ -6,7 +6,7 @@ An adorable little field mouse is here.
 This adorable little field mouse scurries around the plains, just trying to survive day to day.
 ~
 200 0 0 0 2048 0 0 0 0 E
-10 19 25 1d4+50 1d2+0
+10 19 0 1d4+50 1d2+0
 0 7
 8 8 3
 BareHandAttack: 4
@@ -21,5 +21,27 @@ Evasion: 3
 GoldMin: 10
 GoldMax: 20
 LootItem: 16400 30
+E
+#16401
+field mouse burrow sentinel~
+a watchful rabbit~
+A watchful rabbit is loafing around.
+~
+Warm brown fur lies sleek against this small rabbits body, broken by a pale belly and fine whiskers 
+that tremble at every movement. Its bright eyes cautiously eye it's surroundings.
+~
+8 0 0 0 0 0 0 0 0 E
+4 20 24 1d4+20 1d2+0
+0 0
+8 8 0
+SavingPara: 1
+SavingRod: 1
+SavingPetri: 1
+SavingBreath: 1
+SavingSpell: 1
+Wimpy: 2
+Evasion: 1
+GoldMin: 4
+GoldMax: 8
 E
 $

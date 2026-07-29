@@ -2,6 +2,8 @@
 admin~
 Verdant Plains~
 16400 16498 30 2 d 0 0 0 5 15
-M 0 16400 5 16400 	(a field mouse.)
+M 0 16401 2 16483 	(a watchful burrow mouse)
+O 0 16401 1 16483 	(a small cache of grass seed)
+M 0 16400 5 16400 	(a field mouse)
 S
 $

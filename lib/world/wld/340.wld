@@ -1,0 +1,141 @@
+#34000
+The Prismatic Threshold~
+A dark arch opens into a chamber of angled crystal. Thin bands of color travel across the floor as unseen light shifts beyond the walls, while a steady amber glow to the east offers the first reliable point of orientation.
+~
+340 0 0 0 0 0
+D1
+~
+~
+0 0 34001
+S
+#34001
+The Refraction Gallery~
+Tall facets divide a single white beam into ordered ribbons that cross the gallery floor. Scratches interrupt several bands where earlier travelers tested false turns, but the broad amber path continues toward a brighter junction.
+~
+340 0 0 0 0 0
+D1
+~
+~
+0 0 34002
+D3
+~
+~
+0 0 34000
+S
+#34002
+The Amber Junction~
+Warm amber light gathers beneath a many-sided ceiling, making this crossing visible from every adjoining passage. A crimson stair rises north, a cobalt ramp descends south, and a pale direct passage waits to the east.
+~
+340 0 0 0 0 0
+D0
+~
+~
+0 0 34003
+D1
+~
+~
+0 0 34007
+D2
+~
+~
+0 0 34004
+D3
+~
+~
+0 0 34001
+S
+#34003
+The Crimson Traverse~
+Red light pulses through hairline fractures in the walls, lending each step the rhythm of a slow heartbeat. The passage bends east toward reflected brightness while the amber junction remains accessible to the south.
+~
+340 0 0 0 0 0
+D1
+~
+~
+0 0 34005
+D2
+~
+~
+0 0 34002
+S
+#34004
+The Cobalt Descent~
+Cool blue facets draw heat from the air along a shallow descending ramp. Scuffed crystal shows where cautious travelers turned back, yet a narrow eastern way continues toward deeper violet shadow.
+~
+340 0 0 0 0 0
+D0
+~
+~
+0 0 34002
+D1
+~
+~
+0 0 34006
+S
+#34005
+The Mirrorwell~
+A circular shaft of mirrored crystal catches the crimson route and throws it downward in a clean white column. The cobalt branch can be regained through the violet chambers to the south, while a secluded facet opens north.
+~
+340 0 0 0 0 0
+D2
+~
+~
+0 0 34006
+D3
+~
+~
+0 0 34003
+S
+#34006
+The Violet Turn~
+Purple shadow blunts the sharpest reflections in this quiet bend. Passages north and west complete the longer circuit between cobalt and the mirrorwell, and fine marks in the eastern wall suggest an optional recess.
+~
+340 0 0 0 0 0
+D0
+~
+~
+0 0 34005
+D1
+~
+~
+0 0 34009
+D3
+~
+~
+0 0 34004
+S
+#34007
+The Colorless Interval~
+Every hue drains from this broad, matte chamber. The visual silence makes distance easy to judge and offers a deliberate pause between the amber junction to the west and the mounting brilliance to the east.
+~
+340 0 0 0 0 0
+D1
+~
+~
+0 0 34008
+D3
+~
+~
+0 0 34002
+S
+#34008
+The Heart Prism~
+A suspended prism turns within a cage of fractured light, drawing every surrounding color into its overbright core. Stable footing circles the mechanism, but the converging beams leave nowhere to mistake this chamber for anything except the maze's culmination.
+~
+340 0 0 0 0 0
+D3
+~
+~
+0 0 34007
+S
+#34009
+The Violet Blind~
+A narrow recess ends before a pane of opaque violet crystal. Tiny movable facets along its frame reward close observation, and the quiet dead end provides a discovery without pretending to be another route.
+~
+340 0 0 0 0 0
+D3
+~
+~
+0 0 34006
+S
+$~
