@@ -1,0 +1,103 @@
+#34000
+crystal sentinel chromatic~
+a chromatic sentinel~
+A chromatic sentinel turns slowly across the passage.
+~
+A chromatic sentinel is formed from articulated crystal facets that catch and redirect the chamber's light. Its deliberate movements mark it as part of the maze rather than a wandering outsider.
+~
+8 0 0 0 0 0 0 0 0 E
+16 18 36 2d4+80 2d2+1
+0 0
+8 8 0
+SavingPara: 4
+SavingRod: 4
+SavingPetri: 4
+SavingBreath: 4
+SavingSpell: 4
+Wimpy: 8
+Evasion: 5
+GoldMin: 16
+GoldMax: 32
+E
+#34001
+glasswing scavenger~
+a glasswing scavenger~
+A glasswing scavenger picks across the fractured light.
+~
+A glasswing scavenger is formed from articulated crystal facets that catch and redirect the chamber's light. Its deliberate movements mark it as part of the maze rather than a wandering outsider.
+~
+8 0 0 0 0 0 0 0 0 E
+19 18 39 3d5+95 2d2+1
+0 0
+8 8 0
+Str: 12
+Dex: 12
+Int: 12
+Wis: 12
+Con: 12
+Cha: 12
+SavingPara: 4
+SavingRod: 4
+SavingPetri: 4
+SavingBreath: 4
+SavingSpell: 4
+Wimpy: 9
+Evasion: 6
+GoldMin: 19
+GoldMax: 38
+E
+#34002
+faceted custodian~
+the faceted custodian~
+The faceted custodian adjusts the maze's mirrored surfaces.
+~
+The faceted custodian is formed from articulated crystal facets that catch and redirect the chamber's light. Its deliberate movements mark it as part of the maze rather than a wandering outsider.
+~
+8 0 0 0 0 0 0 0 0 E
+21 18 41 3d5+105 3d3+1
+0 0
+8 8 0
+Str: 14
+Dex: 14
+Int: 14
+Wis: 14
+Con: 14
+Cha: 14
+SavingPara: 5
+SavingRod: 5
+SavingPetri: 5
+SavingBreath: 5
+SavingSpell: 5
+Wimpy: 10
+Evasion: 7
+GoldMin: 21
+GoldMax: 42
+E
+#34003
+heart prism warden~
+the heart-prism warden~
+The heart-prism warden stands within the converging beams.
+~
+The heart-prism warden is formed from articulated crystal facets that catch and redirect the chamber's light. Its deliberate movements mark it as part of the maze rather than a wandering outsider.
+~
+8 0 0 0 0 0 0 0 0 E
+25 17 45 4d6+125 3d3+2
+0 0
+8 8 0
+Str: 16
+Dex: 16
+Int: 16
+Wis: 16
+Con: 16
+Cha: 16
+SavingPara: 6
+SavingRod: 6
+SavingPetri: 6
+SavingBreath: 6
+SavingSpell: 6
+Wimpy: 12
+Evasion: 8
+GoldMin: 25
+GoldMax: 50
+E
+$
