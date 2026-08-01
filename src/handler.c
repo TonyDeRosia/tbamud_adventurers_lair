@@ -574,6 +574,16 @@ int invalid_align(struct char_data *ch, struct obj_data *obj)
   return FALSE;
 }
 
+int character_is_using_two_hander(const struct char_data *ch)
+{
+  const struct obj_data *weapon;
+
+  if (!ch || !(weapon = GET_EQ(ch, WEAR_WIELD)))
+    return FALSE;
+
+  return (GET_OBJ_TYPE(weapon) == ITEM_WEAPON && OBJ_FLAGGED(weapon, ITEM_TWO_HANDER));
+}
+
 void equip_char(struct char_data *ch, struct obj_data *obj, int pos)
 {
   int j;
@@ -594,6 +604,21 @@ void equip_char(struct char_data *ch, struct obj_data *obj, int pos)
   }
   if (IN_ROOM(obj) != NOWHERE) {
     log("SYSERR: EQUIP: Obj is in_room when equip.");
+    return;
+  }
+  if ((pos == WEAR_HOLD || pos == WEAR_SHIELD) && character_is_using_two_hander(ch)) {
+    mudlog(BRF, MAX(LVL_IMMORT, GET_INVIS_LEV(ch)), TRUE,
+           "SYSERR: equip_char preserved %s by moving it to %s's inventory; a two-handed weapon blocks position %d.",
+           obj->short_description, GET_NAME(ch), pos);
+    obj_to_char(obj, ch);
+    return;
+  }
+  if (pos == WEAR_WIELD && GET_OBJ_TYPE(obj) == ITEM_WEAPON && OBJ_FLAGGED(obj, ITEM_TWO_HANDER) &&
+      (GET_EQ(ch, WEAR_HOLD) || GET_EQ(ch, WEAR_SHIELD))) {
+    mudlog(BRF, MAX(LVL_IMMORT, GET_INVIS_LEV(ch)), TRUE,
+           "SYSERR: equip_char preserved %s in %s's inventory; occupied secondary hand blocks two-handed equip.",
+           obj->short_description, GET_NAME(ch));
+    obj_to_char(obj, ch);
     return;
   }
   if (invalid_align(ch, obj) || invalid_class(ch, obj)) {

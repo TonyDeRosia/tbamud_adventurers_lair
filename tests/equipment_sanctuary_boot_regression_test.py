@@ -18,27 +18,28 @@ def test_wear_all_uses_two_pass_hand_equipping_and_shared_rules():
     wear = function_body(ITEM, "ACMD(do_wear)", "ACMD(do_wield)")
     assert "ITEM_TWO_HANDED" not in ITEM
     assert "is_offhand_weapon(obj)" in wear
-    assert "perform_wear(ch, obj, WEAR_WIELD);" in wear
-    assert "perform_wear(ch, obj, WEAR_HOLD);" in wear
-    assert wear.index("perform_wear(ch, obj, WEAR_WIELD);") < wear.index(
-        "perform_wear(ch, obj, WEAR_HOLD);"
+    assert "perform_wear(ch, obj, WEAR_WIELD)" in wear
+    assert "perform_wear(ch, obj, WEAR_HOLD)" in wear
+    assert wear.index("perform_wear(ch, obj, WEAR_WIELD)") < wear.index(
+        "perform_wear(ch, obj, WEAR_HOLD)"
     )
-    assert "if (obj->worn_by == ch)" in wear
+    assert "if (perform_wear(ch, obj, WEAR_HOLD))" in wear
     assert "items_worn++;\n          \n" not in wear
 
 
 def test_explicit_and_automatic_wield_share_strength_validation():
     wear = function_body(ITEM, "ACMD(do_wear)", "ACMD(do_wield)")
-    wield = function_body(ITEM, "ACMD(do_wield)", "ACMD(do_offhand)")
-    assert "can_wield_by_weight(ch, obj, TRUE)" in wear
-    assert "can_wield_by_weight(ch, obj, TRUE)" in wield
+    validator = function_body(ITEM, "static int can_equip_weapon", "static int perform_wear")
+    assert "can_wield_by_weight(ch, obj, show_message)" in validator
+    assert "perform_wear(ch, obj, WEAR_WIELD)" in wear
+    assert "weapon_wear_position(obj)" in function_body(ITEM, "ACMD(do_wield)", "ACMD(do_offhand)")
 
 
 def test_perform_wear_remains_the_single_compatibility_gate():
-    perform = function_body(ITEM, "static void perform_wear", "int find_eq_pos")
+    perform = function_body(ITEM, "static int can_equip_weapon", "int find_eq_pos")
     for contract in (
         "GET_SKILL(ch, SKILL_DUAL_WIELD)",
-        "is_two_hander(prim)",
+        "character_is_using_two_hander(ch)",
         "is_offhand_weapon(obj)",
         "GET_OBJ_WEIGHT(obj) > GET_OBJ_WEIGHT(prim)",
         "if (GET_EQ(ch, where))",

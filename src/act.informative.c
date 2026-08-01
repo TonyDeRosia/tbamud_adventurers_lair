@@ -3104,12 +3104,20 @@ ACMD(do_equipment)
     struct obj_data *obj = GET_EQ(ch, pos);
 
     const char *label = eq_labels[i];
+    if (pos == WEAR_WIELD && character_is_using_two_hander(ch))
+      label = "Two-Handed";
     if (pos == WEAR_HOLD && obj && GET_OBJ_TYPE(obj) == ITEM_WEAPON && OBJ_FLAGGED(obj, ITEM_OFFHAND) && GET_SKILL(ch, SKILL_DUAL_WIELD))
       label = "Offhand";
 
     /* Slot labels bright yellow */
     send_to_char(ch, "%s%-14s%s ",
       CBYEL(ch, C_NRM), label, CCNRM(ch, C_NRM));
+
+    if (!obj && pos == WEAR_HOLD && character_is_using_two_hander(ch)) {
+      send_to_char(ch, "%s[UNAVAILABLE - TWO-HANDED]%s\r\n",
+        CBWHT(ch, C_NRM), CCNRM(ch, C_NRM));
+      continue;
+    }
 
     if (!obj) {
       /* [NOTHING] bright white */

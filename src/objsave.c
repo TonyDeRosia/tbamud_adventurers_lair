@@ -1157,6 +1157,18 @@ static int Crash_load_objs(struct char_data *ch) {
 	for (current = loaded; current != NULL; current=current->next)
 	  num_objs += handle_obj(current->obj, ch, current->locate, cont_row);
 
+  if (character_is_using_two_hander(ch)) {
+    for (i = WEAR_SHIELD; i <= WEAR_HOLD; i += (WEAR_HOLD - WEAR_SHIELD)) {
+      struct obj_data *conflict = GET_EQ(ch, i);
+      if (!conflict)
+        continue;
+      mudlog(BRF, MAX(LVL_IMMORT, GET_INVIS_LEV(ch)), TRUE,
+             "SYSERR: autoeq repaired %s's two-handed conflict in position %d; object preserved in inventory.",
+             GET_NAME(ch), i);
+      obj_to_char(unequip_char(ch, i), ch);
+    }
+  }
+
 	/* now it's safe to free the obj_save_data list - all members of it
 	 * have been put in the correct lists by handle_obj() */
 	while (loaded != NULL) {

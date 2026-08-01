@@ -73,6 +73,7 @@ int              get_obj_pos_in_equip_vis(struct char_data *ch, char *arg, int *
 
 /* find all dots */
 int	find_all_dots(char *arg);
+int character_is_using_two_hander(const struct char_data *ch);
 
 #define FIND_INDIV	0
 #define FIND_ALL	1
