@@ -248,6 +248,54 @@ static int remove_flagged_affects(struct char_data *victim, int aff_flag)
   return removed;
 }
 
+/* Immortal cleanse removes temporary hostile effects, but deliberately leaves
+ * permanent/baseline effects (including equipment affects) and timed buffs
+ * alone.  A violent source catches stat-only debuffs, while the flag checks
+ * cover harmful effects whose spell metadata is not marked violent. */
+static int immortal_cleanse_is_timed_debuff(const struct affected_type *af)
+{
+  static const int harmful_flags[] = {
+    AFF_BLIND, AFF_CURSE, AFF_POISON, AFF_SLEEP, AFF_NOTRACK, AFF_CHARM,
+    AFF_WEBBED, AFF_SILENCED, AFF_MARKED, AFF_ARCANE_LEAK, AFF_TIME_SNARE,
+    AFF_SPELLLOCK, AFF_CORRODED, AFF_FEARFUL, AFF_STATIC, AFF_BURNING,
+    AFF_FROZEN, AFF_ROOTED, AFF_STUNNED, AFF_BLINDED_MAGICAL, AFF_HEXED
+  };
+  size_t i;
+
+  if (!af || af->duration < 0)
+    return FALSE;
+
+  if (af->spell > 0 && af->spell <= TOP_SPELL_DEFINE &&
+      spell_info[af->spell].violent)
+    return TRUE;
+
+  for (i = 0; i < sizeof(harmful_flags) / sizeof(harmful_flags[0]); i++) {
+    if (IS_SET_AR(af->bitvector, harmful_flags[i]))
+      return TRUE;
+  }
+
+  return FALSE;
+}
+
+static int immortal_cleanse_timed_debuffs(struct char_data *victim)
+{
+  struct affected_type *af, *next;
+  int removed = 0;
+
+  if (!victim)
+    return 0;
+
+  for (af = victim->affected; af; af = next) {
+    next = af->next;
+    if (immortal_cleanse_is_timed_debuff(af)) {
+      affect_remove(victim, af);
+      removed++;
+    }
+  }
+
+  return removed;
+}
+
 static int remove_spell_affect_if_present(struct char_data *victim, int spellnum)
 {
   if (!victim || spellnum <= 0)
@@ -1978,8 +2026,26 @@ ASPELL(spell_greater_heal)
 
 ASPELL(spell_cleanse)
 {
+  int removed;
+
   if (victim == NULL || ch == NULL)
     return;
+
+  if (GET_LEVEL(ch) >= LVL_IMMORT) {
+    removed = immortal_cleanse_timed_debuffs(victim);
+    if (removed > 0) {
+      act("Immortal radiance scours every temporary affliction from $N!", FALSE,
+          ch, 0, victim, TO_CHAR);
+      act("Immortal radiance scours every temporary affliction from you!", FALSE,
+          ch, 0, victim, TO_VICT);
+      act("Immortal radiance scours every temporary affliction from $N!", FALSE,
+          ch, 0, victim, TO_NOTVICT);
+    } else {
+      act("$N has no temporary afflictions to cleanse.", FALSE, ch, 0, victim,
+          TO_CHAR);
+    }
+    return;
+  }
 
   if (affected_by_spell(victim, SPELL_POISON))
     affect_from_char(victim, SPELL_POISON);

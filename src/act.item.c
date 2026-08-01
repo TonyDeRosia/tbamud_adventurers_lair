@@ -34,6 +34,16 @@ static int is_offhand_weapon(const struct obj_data *obj)
   return (obj && GET_OBJ_TYPE(obj) == ITEM_WEAPON && OBJ_FLAGGED(obj, ITEM_OFFHAND));
 }
 
+static int can_wield_by_weight(struct char_data *ch, struct obj_data *obj, int show_message)
+{
+  if (GET_OBJ_WEIGHT(obj) <= str_app[STRENGTH_APPLY_INDEX(ch)].wield_w)
+    return TRUE;
+
+  if (show_message)
+    send_to_char(ch, "It's too heavy for you to use.\r\n");
+  return FALSE;
+}
+
 
 
 /* local function prototypes */
@@ -1626,18 +1636,55 @@ ACMD(do_wear)
     send_to_char(ch, "You can't specify the same body location for more than one item!\r\n");
     return;
   }
+
   if (dotmode == FIND_ALL) {
+    /* Equip ordinary wearables and the first eligible primary weapon.  Offhand
+     * weapons are handled in a second pass so inventory order cannot make one
+     * run before its required primary weapon. */
     for (obj = ch->carrying; obj; obj = next_obj) {
       next_obj = obj->next_content;
-      if (CAN_SEE_OBJ(ch, obj) && (where = find_eq_pos(ch, obj, 0)) >= 0) {
-        if (GET_LEVEL(ch) < GET_OBJ_LEVEL(obj))
-          send_to_char(ch, "You are not experienced enough to use that.\r\n");
-        else {
+      if (!CAN_SEE_OBJ(ch, obj))
+        continue;
+      if (GET_LEVEL(ch) < GET_OBJ_LEVEL(obj)) {
+        send_to_char(ch, "You are not experienced enough to use that.\r\n");
+        continue;
+      }
+
+      if (GET_OBJ_TYPE(obj) == ITEM_WEAPON && CAN_WEAR(obj, ITEM_WEAR_WIELD) &&
+          !is_offhand_weapon(obj)) {
+        if (!GET_EQ(ch, WEAR_WIELD) && can_wield_by_weight(ch, obj, TRUE)) {
+          perform_wear(ch, obj, WEAR_WIELD);
+          if (obj->worn_by == ch)
+            items_worn++;
+        }
+        continue;
+      }
+
+      where = find_eq_pos(ch, obj, 0);
+      if (where >= 0) {
+        perform_wear(ch, obj, where);
+        if (obj->worn_by == ch)
           items_worn++;
-	  perform_wear(ch, obj, where);
-	}
       }
     }
+
+    if (GET_EQ(ch, WEAR_WIELD) && !GET_EQ(ch, WEAR_HOLD)) {
+      for (obj = ch->carrying; obj; obj = next_obj) {
+        next_obj = obj->next_content;
+        if (!CAN_SEE_OBJ(ch, obj) || !is_offhand_weapon(obj))
+          continue;
+        if (GET_LEVEL(ch) < GET_OBJ_LEVEL(obj)) {
+          send_to_char(ch, "You are not experienced enough to use that.\r\n");
+          continue;
+        }
+        perform_wear(ch, obj, WEAR_HOLD);
+        if (obj->worn_by == ch) {
+          items_worn++;
+          break;
+        }
+      }
+    }
+
     if (!items_worn)
       send_to_char(ch, "You don't seem to have anything wearable.\r\n");
   } else if (dotmode == FIND_ALLDOT) {
@@ -1686,8 +1733,8 @@ ACMD(do_wield)
   else {
     if (!CAN_WEAR(obj, ITEM_WEAR_WIELD))
       send_to_char(ch, "You can't wield that.\r\n");
-    else if (GET_OBJ_WEIGHT(obj) > str_app[STRENGTH_APPLY_INDEX(ch)].wield_w)
-      send_to_char(ch, "It's too heavy for you to use.\r\n");
+    else if (!can_wield_by_weight(ch, obj, TRUE))
+      return;
     else if (GET_LEVEL(ch) < GET_OBJ_LEVEL(obj))
       send_to_char(ch, "You are not experienced enough to use that.\r\n");
     else {

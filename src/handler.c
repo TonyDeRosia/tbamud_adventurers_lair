@@ -260,27 +260,6 @@ void affect_total(struct char_data *ch)
   for (i = 0; i < AF_ARRAY_MAX; i++)
     AFF_FLAGS(ch)[i] = ch->char_specials.saved.affected_by[i];
 
-  /* SCRUB_CORRUPT_SAVED_SANCT
-   * If Sanctuary got accidentally written into the saved baseline flags,
-   * it will persist forever. This heals corrupted characters by removing
-   * baseline Sanctuary when they are not actually under a real Sanctuary spell
-   * and not using furniture.
-   */
-  if (!SITTING(ch)
-      && IS_SET_AR(ch->char_specials.saved.affected_by, AFF_SANCTUARY)
-      && !affected_by_spell(ch, SPELL_SANCTUARY)) {
-    REMOVE_BIT_AR(ch->char_specials.saved.affected_by, AFF_SANCTUARY);
-    REMOVE_BIT_AR(AFF_FLAGS(ch), AFF_SANCTUARY);
-    mudlog(CMP, LVL_IMMORT, TRUE,
-      "[SANCT-SCRUB] Removed baseline Sanctuary corruption for %s", GET_NAME(ch));
-  }
-
-  /* DBG: detect baseline corruption of sanctuary while not using furniture */
-  if (!SITTING(ch) && IS_SET_AR(ch->char_specials.saved.affected_by, AFF_SANCTUARY)) {
-    mudlog(CMP, LVL_IMMORT, TRUE,
-      "[DBG] %s has AFF_SANCTUARY in saved baseline while SITTING=NULL", GET_NAME(ch));
-  }
-
   /* Remove equipment modifiers and bits. */
   for (i = 0; i < NUM_WEARS; i++) {
     if (GET_EQ(ch, i))
