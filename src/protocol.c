@@ -551,6 +551,7 @@ const char *ProtocolOutput( descriptor_t *apDescriptor, const char *apData, int 
       if ( apData[j] == '\t' )
       {
          const char *pCopyFrom = NULL;
+         char UnicodeSubstitute[8] = { 0 };
 
          switch ( apData[++j] )
          {
@@ -679,7 +680,7 @@ const char *ProtocolOutput( descriptor_t *apDescriptor, const char *apData, int 
             case '[':
                if ( tolower(apData[++j]) == 'u' )
                {
-                  char Buffer[8] = { 0 }, BugString[256];
+                  char BugString[256];
                   int Index = 0;
                   int Number = 0;
                   bool_t bDone = false, bValid = true;
@@ -698,7 +699,7 @@ const char *ProtocolOutput( descriptor_t *apDescriptor, const char *apData, int 
                      if ( apData[j] == ']' )
                         bDone = true;
                      else if ( Index < 7 )
-                        Buffer[Index++] = apData[j++];
+                        UnicodeSubstitute[Index++] = apData[j++];
                      else /* It's too long, so ignore the rest and note the problem */
                      {
                         j++;
@@ -708,12 +709,12 @@ const char *ProtocolOutput( descriptor_t *apDescriptor, const char *apData, int 
 
                   if ( !bDone )
                   {
-                     sprintf( BugString, "BUG: Unicode substitute '%s' wasn't terminated with ']'.\n", Buffer );
+                     sprintf( BugString, "BUG: Unicode substitute '%s' wasn't terminated with ']'.\n", UnicodeSubstitute );
                      ReportBug( BugString );
                   }
                   else if ( !bValid )
                   {
-                     sprintf( BugString, "BUG: Unicode substitute '%s' truncated.  Missing ']'?\n", Buffer );
+                     sprintf( BugString, "BUG: Unicode substitute '%s' truncated.  Missing ']'?\n", UnicodeSubstitute );
                      ReportBug( BugString );
                   }
                   else if ( pProtocol->pVariables[eMSDP_UTF_8]->ValueInt )
@@ -722,7 +723,7 @@ const char *ProtocolOutput( descriptor_t *apDescriptor, const char *apData, int 
                   }
                   else /* Display the substitute string */
                   {
-                     pCopyFrom = Buffer;
+                     pCopyFrom = UnicodeSubstitute;
                   }
 
                   /* Terminate if we've reached the end of the string */

@@ -42,6 +42,9 @@ static void oedit_disp_val4_menu(struct descriptor_data *d);
 static void oedit_disp_type_menu(struct descriptor_data *d);
 static void oedit_disp_extra_menu(struct descriptor_data *d);
 static void oedit_disp_wear_menu(struct descriptor_data *d);
+static void oedit_format_extra_flags(struct obj_data *obj, char *bits, size_t bits_size);
+static void oedit_format_wear_flags(struct obj_data *obj, char *bits, size_t bits_size);
+static int oedit_extra_flag_from_menu_choice(int choice);
 static void oedit_disp_menu(struct descriptor_data *d);
 static void oedit_disp_perm_menu(struct descriptor_data *d);
 static void oedit_save_to_disk(int zone_num);
@@ -575,19 +578,54 @@ static void oedit_disp_type_menu(struct descriptor_data *d)
 }
 
 /* Object extra flags. */
+static void oedit_format_extra_flags(struct obj_data *obj, char *bits, size_t bits_size)
+{
+  int display_flags[EF_ARRAY_MAX];
+
+  memcpy(display_flags, GET_OBJ_EXTRA(obj), sizeof(display_flags));
+  REMOVE_BIT_AR(display_flags, ITEM_OFFHAND);
+  REMOVE_BIT_AR(display_flags, ITEM_TWO_HANDER);
+  sprintbitarray(display_flags, extra_bits, EF_ARRAY_MAX, bits);
+  bits[bits_size - 1] = '\0';
+}
+
+static void oedit_format_wear_flags(struct obj_data *obj, char *bits, size_t bits_size)
+{
+  sprintbitarray(GET_OBJ_WEAR(obj), wear_bits, TW_ARRAY_MAX, bits);
+  if (OBJ_FLAGGED(obj, ITEM_OFFHAND))
+    strlcat(bits, " OFFHAND", bits_size);
+  if (OBJ_FLAGGED(obj, ITEM_TWO_HANDER))
+    strlcat(bits, " TWO-HANDED", bits_size);
+}
+
+static int oedit_extra_flag_from_menu_choice(int choice)
+{
+  int flag, visible_choice = 0;
+
+  for (flag = 0; flag < NUM_ITEM_FLAGS; flag++) {
+    if (flag == ITEM_OFFHAND || flag == ITEM_TWO_HANDER)
+      continue;
+    if (++visible_choice == choice)
+      return flag;
+  }
+  return -1;
+}
+
 static void oedit_disp_extra_menu(struct descriptor_data *d)
 {
   char bits[MAX_STRING_LENGTH];
-  int counter, columns = 0;
+  int counter, columns = 0, choice = 0;
 
   get_char_colors(d->character);
   clear_screen(d);
 
   for (counter = 0; counter < NUM_ITEM_FLAGS; counter++) {
-    write_to_output(d, "%s%2d%s) %-20.20s %s", grn, counter + 1, nrm,
+    if (counter == ITEM_OFFHAND || counter == ITEM_TWO_HANDER)
+      continue;
+    write_to_output(d, "%s%2d%s) %-20.20s %s", grn, ++choice, nrm,
 		extra_bits[counter], !(++columns % 2) ? "\r\n" : "");
   }
-  sprintbitarray(GET_OBJ_EXTRA(OLC_OBJ(d)), extra_bits, EF_ARRAY_MAX, bits);
+  oedit_format_extra_flags(OLC_OBJ(d), bits, sizeof(bits));
   write_to_output(d, "\r\nObject flags: %s%s%s\r\n"
 	  "Enter object extra flag (0 to quit) : ",
 	  cyn, bits, nrm);
@@ -623,7 +661,9 @@ static void oedit_disp_wear_menu(struct descriptor_data *d)
     write_to_output(d, "%s%2d%s) %-20.20s %s", grn, counter + 1, nrm,
 		wear_bits[counter], !(++columns % 2) ? "\r\n" : "");
   }
-  sprintbitarray(GET_OBJ_WEAR(OLC_OBJ(d)), wear_bits, TW_ARRAY_MAX, bits);
+  write_to_output(d, "%s16%s) %-20.20s %s", grn, nrm, "OFFHAND", !(++columns % 2) ? "\r\n" : "");
+  write_to_output(d, "%s17%s) %-20.20s %s", grn, nrm, "TWO-HANDED", !(++columns % 2) ? "\r\n" : "");
+  oedit_format_wear_flags(OLC_OBJ(d), bits, sizeof(bits));
   write_to_output(d, "\r\nWear flags: %s%s%s\r\n"
 	  "Enter wear flag, 0 to quit : ", cyn, bits, nrm);
 }
@@ -653,7 +693,7 @@ static void oedit_disp_menu(struct descriptor_data *d)
 
   /* Build buffers for first part of menu. */
   sprinttype(GET_OBJ_TYPE(obj), item_types, buf1, sizeof(buf1));
-  sprintbitarray(GET_OBJ_EXTRA(obj), extra_bits, EF_ARRAY_MAX, buf2);
+  oedit_format_extra_flags(obj, buf2, sizeof(buf2));
 
   /* Build first half of menu. */
   write_to_output(d,
@@ -674,7 +714,7 @@ static void oedit_disp_menu(struct descriptor_data *d)
 	  grn, nrm, cyn, buf2
 	  );
   /* Send first half then build second half of menu. */
-  sprintbitarray(GET_OBJ_WEAR(OLC_OBJ(d)), wear_bits, EF_ARRAY_MAX, buf1);
+  oedit_format_wear_flags(OLC_OBJ(d), buf1, sizeof(buf1));
   sprintbitarray(GET_OBJ_AFFECT(OLC_OBJ(d)), affected_bits, EF_ARRAY_MAX, buf2);
 
   write_to_output(d,
@@ -939,27 +979,32 @@ void oedit_parse(struct descriptor_data *d, char *arg)
 
   case OEDIT_EXTRAS:
     number = atoi(arg);
-    if ((number < 0) || (number > NUM_ITEM_FLAGS)) {
+    if (number < 0 || (number > 0 && oedit_extra_flag_from_menu_choice(number) < 0)) {
       oedit_disp_extra_menu(d);
       return;
     } else if (number == 0)
       break;
     else {
-      TOGGLE_BIT_AR(GET_OBJ_EXTRA(OLC_OBJ(d)), (number - 1));
+      TOGGLE_BIT_AR(GET_OBJ_EXTRA(OLC_OBJ(d)), oedit_extra_flag_from_menu_choice(number));
       oedit_disp_extra_menu(d);
       return;
     }
 
   case OEDIT_WEAR:
     number = atoi(arg);
-    if ((number < 0) || (number > NUM_ITEM_WEARS)) {
+    if ((number < 0) || (number > NUM_ITEM_WEARS + 2)) {
       write_to_output(d, "That's not a valid choice!\r\n");
       oedit_disp_wear_menu(d);
       return;
     } else if (number == 0)	/* Quit. */
       break;
     else {
-      TOGGLE_BIT_AR(GET_OBJ_WEAR(OLC_OBJ(d)), (number - 1));
+      if (number == NUM_ITEM_WEARS + 1)
+        TOGGLE_BIT_AR(GET_OBJ_EXTRA(OLC_OBJ(d)), ITEM_OFFHAND);
+      else if (number == NUM_ITEM_WEARS + 2)
+        TOGGLE_BIT_AR(GET_OBJ_EXTRA(OLC_OBJ(d)), ITEM_TWO_HANDER);
+      else
+        TOGGLE_BIT_AR(GET_OBJ_WEAR(OLC_OBJ(d)), (number - 1));
       oedit_disp_wear_menu(d);
       return;
     }
