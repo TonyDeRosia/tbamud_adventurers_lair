@@ -41,6 +41,13 @@ def test_wear_parser_toggles_existing_extra_bits():
     assert "GET_OBJ_WEAR" in parser
 
 
+def test_wear_parser_prevents_incompatible_hand_flags():
+    parser = section("case OEDIT_WEAR:", "case OEDIT_WEIGHT:")
+    assert "REMOVE_BIT_AR(GET_OBJ_EXTRA(OLC_OBJ(d)), ITEM_TWO_HANDER)" in parser
+    assert "REMOVE_BIT_AR(GET_OBJ_EXTRA(OLC_OBJ(d)), ITEM_OFFHAND)" in parser
+    assert "OFFHAND weapons must be one-handed" in parser
+
+
 def test_main_menu_formats_aliases_as_wear_flags_only():
     menu = section("/* Display main menu. */", "/* main loop (of sorts)..")
     assert "oedit_format_extra_flags(obj" in menu

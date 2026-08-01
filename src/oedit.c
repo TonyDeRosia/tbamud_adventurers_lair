@@ -999,10 +999,19 @@ void oedit_parse(struct descriptor_data *d, char *arg)
     } else if (number == 0)	/* Quit. */
       break;
     else {
-      if (number == NUM_ITEM_WEARS + 1)
+      if (number == NUM_ITEM_WEARS + 1) {
+        if (!OBJ_FLAGGED(OLC_OBJ(d), ITEM_OFFHAND) && OBJ_FLAGGED(OLC_OBJ(d), ITEM_TWO_HANDER)) {
+          REMOVE_BIT_AR(GET_OBJ_EXTRA(OLC_OBJ(d)), ITEM_TWO_HANDER);
+          write_to_output(d, "TWO-HANDED cleared: OFFHAND weapons must be one-handed.\r\n");
+        }
         TOGGLE_BIT_AR(GET_OBJ_EXTRA(OLC_OBJ(d)), ITEM_OFFHAND);
-      else if (number == NUM_ITEM_WEARS + 2)
+      } else if (number == NUM_ITEM_WEARS + 2) {
+        if (!OBJ_FLAGGED(OLC_OBJ(d), ITEM_TWO_HANDER) && OBJ_FLAGGED(OLC_OBJ(d), ITEM_OFFHAND)) {
+          REMOVE_BIT_AR(GET_OBJ_EXTRA(OLC_OBJ(d)), ITEM_OFFHAND);
+          write_to_output(d, "OFFHAND cleared: TWO-HANDED weapons require both hands.\r\n");
+        }
         TOGGLE_BIT_AR(GET_OBJ_EXTRA(OLC_OBJ(d)), ITEM_TWO_HANDER);
+      }
       else
         TOGGLE_BIT_AR(GET_OBJ_WEAR(OLC_OBJ(d)), (number - 1));
       oedit_disp_wear_menu(d);

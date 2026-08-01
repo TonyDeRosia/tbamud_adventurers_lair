@@ -222,7 +222,8 @@ static void auto_equip(struct char_data *ch, struct obj_data *obj, int location)
         location = LOC_INVENTORY;
       break;
     case WEAR_WIELD:
-      if (!CAN_WEAR(obj, ITEM_WEAR_WIELD))
+      if (!CAN_WEAR(obj, ITEM_WEAR_WIELD) ||
+          (GET_OBJ_TYPE(obj) == ITEM_WEAPON && OBJ_FLAGGED(obj, ITEM_TWO_HANDER) && OBJ_FLAGGED(obj, ITEM_OFFHAND)))
         location = LOC_INVENTORY;
       break;
     case WEAR_HOLD:
@@ -235,7 +236,8 @@ static void auto_equip(struct char_data *ch, struct obj_data *obj, int location)
         break;
 
       /* Offhand system: allow OFFHAND weapons to load into WEAR_HOLD */
-      if (GET_OBJ_TYPE(obj) == ITEM_WEAPON && OBJ_FLAGGED(obj, ITEM_OFFHAND) && CAN_WEAR(obj, ITEM_WEAR_WIELD))
+      if (GET_OBJ_TYPE(obj) == ITEM_WEAPON && OBJ_FLAGGED(obj, ITEM_OFFHAND) &&
+          !OBJ_FLAGGED(obj, ITEM_TWO_HANDER) && CAN_WEAR(obj, ITEM_WEAR_WIELD))
         break;
 
       location = LOC_INVENTORY;

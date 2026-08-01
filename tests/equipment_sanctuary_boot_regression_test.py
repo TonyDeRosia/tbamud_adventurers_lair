@@ -32,7 +32,8 @@ def test_explicit_and_automatic_wield_share_strength_validation():
     validator = function_body(ITEM, "static int can_equip_weapon", "static int perform_wear")
     assert "can_wield_by_weight(ch, obj, show_message)" in validator
     assert "perform_wear(ch, obj, WEAR_WIELD)" in wear
-    assert "weapon_wear_position(obj)" in function_body(ITEM, "ACMD(do_wield)", "ACMD(do_offhand)")
+    wield = function_body(ITEM, "ACMD(do_wield)", "ACMD(do_offhand)")
+    assert "perform_wear(ch, obj, WEAR_WIELD)" in wield
 
 
 def test_perform_wear_remains_the_single_compatibility_gate():

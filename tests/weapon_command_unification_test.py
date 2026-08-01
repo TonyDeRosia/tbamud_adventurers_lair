@@ -49,10 +49,11 @@ for required in (
     assert required in validator, f"shared validator lacks {required}"
 assert "can_equip_weapon(ch, obj, where, TRUE)" in perform
 
-# The three general commands intelligently route every weapon; wield never
-# removes an existing primary weapon as a side effect.
-for body, command in ((wear, "wear"), (wield, "wield"), (grab, "hold")):
-    assert "weapon_wear_position(obj)" in body, f"{command} does not use shared slot selection"
+# Wear and hold choose primary first and offhand second.  Wield is always an
+# explicit primary-slot command and never removes an existing weapon.
+for body, command in ((wear, "wear"), (grab, "hold")):
+    assert "weapon_wear_position(ch, obj)" in body, f"{command} does not use shared slot selection"
+assert "perform_wear(ch, obj, WEAR_WIELD)" in wield
 assert "perform_remove" not in wield
 
 # Both offhand spellings reach the same implementation, and the two-word form
@@ -65,7 +66,7 @@ assert "perform_wear(ch, obj, WEAR_HOLD)" in offhand
 # Nonweapon hold/light behavior and two-pass automatic wear remain present.
 for item_type in ("ITEM_LIGHT", "ITEM_WAND", "ITEM_STAFF", "ITEM_SCROLL", "ITEM_POTION"):
     assert item_type in grab
-assert "second pass" in wear
+assert "Offhand-capable weapons are deferred" in wear
 assert "wear_attempted" in wear
 assert "if (!items_worn && !wear_attempted)" in wear
 

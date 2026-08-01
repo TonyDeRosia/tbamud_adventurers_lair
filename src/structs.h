@@ -504,7 +504,7 @@ void clanedit_parse(struct descriptor_data *d, char *arg);
 #define ITEM_QUEST            17   /**< Item is a quest item         */
 /** Total number of item flags */
 #define ITEM_TWO_HANDER 18  /**< Weapon requires two hands */
-#define ITEM_OFFHAND   19  /**< Weapon allowed in offhand */
+#define ITEM_OFFHAND   19  /**< One-handed weapon may also be used in offhand */
 #define ITEM_KEPT      20  /**< Player-marked keep protection */
 #define NUM_ITEM_FLAGS 21
 

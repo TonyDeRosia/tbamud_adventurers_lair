@@ -67,7 +67,7 @@ static void perform_put(struct char_data *ch, struct obj_data *obj, struct obj_d
 static void perform_remove(struct char_data *ch, int pos);
 /* do_wear utility functions */
 static int perform_wear(struct char_data *ch, struct obj_data *obj, int where);
-static int weapon_wear_position(const struct obj_data *obj);
+static int weapon_wear_position(struct char_data *ch, const struct obj_data *obj);
 static int can_equip_weapon(struct char_data *ch, struct obj_data *obj, int where, int show_message);
 static void wear_message(struct char_data *ch, struct obj_data *obj, int where);
 static int is_kept_item_for(struct char_data *ch, struct obj_data *obj);
@@ -1432,14 +1432,17 @@ static void wear_message(struct char_data *ch, struct obj_data *obj, int where)
   act(wear_messages[where][1], FALSE, ch, obj, 0, TO_CHAR);
 }
 
-static int weapon_wear_position(const struct obj_data *obj)
+static int weapon_wear_position(struct char_data *ch, const struct obj_data *obj)
 {
-  return is_offhand_weapon(obj) ? WEAR_HOLD : WEAR_WIELD;
+  if (GET_EQ(ch, WEAR_WIELD) && is_offhand_weapon(obj) && !is_two_hander(obj))
+    return WEAR_HOLD;
+  return WEAR_WIELD;
 }
 
 static int can_equip_weapon(struct char_data *ch, struct obj_data *obj, int where, int show_message)
 {
   struct obj_data *prim = GET_EQ(ch, WEAR_WIELD);
+  int dual_level;
 
 #define WEAPON_REJECT(message) do { if (show_message) send_to_char(ch, message); return FALSE; } while (0)
 
@@ -1447,6 +1450,8 @@ static int can_equip_weapon(struct char_data *ch, struct obj_data *obj, int wher
     WEAPON_REJECT("You can only wield weapons.\r\n");
   if (!CAN_WEAR(obj, ITEM_WEAR_WIELD))
     WEAPON_REJECT("You can't wield that.\r\n");
+  if (is_two_hander(obj) && is_offhand_weapon(obj))
+    WEAPON_REJECT("That weapon has incompatible two-handed and offhand properties.\r\n");
   if (GET_LEVEL(ch) < GET_OBJ_LEVEL(obj))
     WEAPON_REJECT("You are not experienced enough to use that.\r\n");
   if (invalid_align(ch, obj) || invalid_class(ch, obj)) {
@@ -1458,8 +1463,6 @@ static int can_equip_weapon(struct char_data *ch, struct obj_data *obj, int wher
     return FALSE;
 
   if (where == WEAR_WIELD) {
-    if (is_offhand_weapon(obj))
-      WEAPON_REJECT("That weapon is designed for offhand use.\r\n");
     if (GET_EQ(ch, WEAR_WIELD))
       WEAPON_REJECT("You're already wielding a weapon.\r\n");
     if (is_two_hander(obj) && (GET_EQ(ch, WEAR_SHIELD) || GET_EQ(ch, WEAR_HOLD)))
@@ -1471,8 +1474,15 @@ static int can_equip_weapon(struct char_data *ch, struct obj_data *obj, int wher
       WEAPON_REJECT("That weapon is not balanced for offhand use.\r\n");
     if (is_two_hander(obj))
       WEAPON_REJECT("A two-handed weapon cannot be used in your offhand.\r\n");
-    if (!GET_SKILL(ch, SKILL_DUAL_WIELD))
-      WEAPON_REJECT("You do not know how to dual wield.\r\n");
+    if (!IS_NPC(ch)) {
+      dual_level = spell_info[SKILL_DUAL_WIELD].min_level[(int)GET_CLASS(ch)];
+      if (dual_level >= LVL_IMMORT && GET_LEVEL(ch) < LVL_IMMORT)
+        WEAPON_REJECT("Your class cannot learn Dual Wield.\r\n");
+      if (GET_LEVEL(ch) < dual_level)
+        WEAPON_REJECT("You have not reached the level required to learn Dual Wield.\r\n");
+      if (GET_SKILL(ch, SKILL_DUAL_WIELD) <= 0)
+        WEAPON_REJECT("Dual Wield is available to you, but you have not learned it; your current skill is insufficient.\r\n");
+    }
     if (!prim || GET_OBJ_TYPE(prim) != ITEM_WEAPON)
       WEAPON_REJECT("You need a primary weapon wielded first.\r\n");
     if (character_is_using_two_hander(ch))
@@ -1679,9 +1689,9 @@ ACMD(do_wear)
   }
 
   if (dotmode == FIND_ALL) {
-    /* Equip ordinary wearables and the first eligible primary weapon.  Offhand
-     * weapons are handled in a second pass so inventory order cannot make one
-     * run before its required primary weapon. */
+    /* Equip ordinary wearables and prefer a normal or two-handed primary.
+     * Offhand-capable weapons are deferred so a normal primary wins regardless
+     * of inventory order. */
     for (obj = ch->carrying; obj; obj = next_obj) {
       next_obj = obj->next_content;
       if (!CAN_SEE_OBJ(ch, obj))
@@ -1707,13 +1717,20 @@ ACMD(do_wear)
       }
     }
 
-    if (!GET_EQ(ch, WEAR_HOLD) && !character_is_using_two_hander(ch)) {
+    if (!character_is_using_two_hander(ch)) {
       first_offhand = NULL;
       for (obj = ch->carrying; obj; obj = next_obj) {
         next_obj = obj->next_content;
         if (!CAN_SEE_OBJ(ch, obj) || !is_offhand_weapon(obj))
           continue;
         wear_attempted = 1;
+        if (!GET_EQ(ch, WEAR_WIELD)) {
+          if (perform_wear(ch, obj, WEAR_WIELD))
+            items_worn++;
+          continue;
+        }
+        if (GET_EQ(ch, WEAR_HOLD))
+          break;
         if (!first_offhand)
           first_offhand = obj;
         if (can_equip_weapon(ch, obj, WEAR_HOLD, FALSE)) {
@@ -1742,7 +1759,7 @@ ACMD(do_wear)
       while (obj) {
 	next_obj = get_obj_in_list_vis(ch, arg1, NULL, obj->next_content);
 	if (GET_OBJ_TYPE(obj) == ITEM_WEAPON)
-	  perform_wear(ch, obj, weapon_wear_position(obj));
+	  perform_wear(ch, obj, weapon_wear_position(ch, obj));
 	else if ((where = find_eq_pos(ch, obj, 0)) >= 0)
 	  perform_wear(ch, obj, where);
 	else
@@ -1757,7 +1774,7 @@ ACMD(do_wear)
     else {
 
       if (GET_OBJ_TYPE(obj) == ITEM_WEAPON)
-	perform_wear(ch, obj, weapon_wear_position(obj));
+	perform_wear(ch, obj, weapon_wear_position(ch, obj));
       else if ((where = find_eq_pos(ch, obj, arg2)) >= 0)
 	perform_wear(ch, obj, where);
       else if (!*arg2)
@@ -1781,7 +1798,7 @@ ACMD(do_wield)
     if (GET_OBJ_TYPE(obj) != ITEM_WEAPON)
       send_to_char(ch, "You can only wield weapons.\r\n");
     else
-      perform_wear(ch, obj, weapon_wear_position(obj));
+      perform_wear(ch, obj, WEAR_WIELD);
   }
 }
 
@@ -1834,7 +1851,7 @@ ACMD(do_grab)
     if (GET_OBJ_TYPE(obj) == ITEM_LIGHT)
       perform_wear(ch, obj, WEAR_LIGHT);
     else if (GET_OBJ_TYPE(obj) == ITEM_WEAPON)
-      perform_wear(ch, obj, weapon_wear_position(obj));
+      perform_wear(ch, obj, weapon_wear_position(ch, obj));
     else {
       if (!CAN_WEAR(obj, ITEM_WEAR_HOLD) && GET_OBJ_TYPE(obj) != ITEM_WAND &&
       GET_OBJ_TYPE(obj) != ITEM_STAFF && GET_OBJ_TYPE(obj) != ITEM_SCROLL &&

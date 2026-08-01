@@ -1552,9 +1552,17 @@ int skill_message(int dam, struct char_data *ch, struct char_data *vict,
  *	> 0	How much damage done. */
 
 /* dual wield offhand system */
-#define OFFHAND_DAMAGE_PCT 60
-
 static int g_offhand_attack = 0;
+
+static int offhand_attack_chance(int skill)
+{
+  return MIN(95, 25 + (MAX(0, skill) * 3 / 4));
+}
+
+static int offhand_damage_percent(int skill)
+{
+  return 40 + (MAX(0, skill) / 2);
+}
 
 static int can_offhand_attack(struct char_data *ch)
 {
@@ -1562,6 +1570,9 @@ static int can_offhand_attack(struct char_data *ch)
   struct obj_data *off  = GET_EQ(ch, WEAR_HOLD);
 
   if (!ch) return 0;
+  /* NPC offhand equipment is cosmetic until an explicit NPC proficiency
+   * policy is designed.  Never access player skill storage for mobiles. */
+  if (IS_NPC(ch)) return 0;
   if (!prim || !off) return 0;
   if (GET_OBJ_TYPE(prim) != ITEM_WEAPON) return 0;
   if (GET_OBJ_TYPE(off)  != ITEM_WEAPON) return 0;
@@ -1620,6 +1631,8 @@ static void do_offhand_attack(struct char_data *ch, struct char_data *victim)
 
   if (!can_offhand_attack(ch)) return;
   if (!victim) return;
+  if (rand_number(1, 100) > offhand_attack_chance(GET_SKILL(ch, SKILL_DUAL_WIELD)))
+    return;
 
   ch->equipment[WEAR_WIELD] = off;
   g_offhand_attack = 1;
@@ -1632,7 +1645,7 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
 {
   /* OFFHAND DAMAGE SCALE */
   if (g_offhand_attack) {
-    dam = (dam * OFFHAND_DAMAGE_PCT) / 100;
+    dam = (dam * offhand_damage_percent(GET_SKILL(ch, SKILL_DUAL_WIELD))) / 100;
   }
 
   int damage_type = take_next_damage_type();

@@ -7707,19 +7707,36 @@ Type: Skill
 Category: Passive Skill
 
 Description:
-Trains off-hand weapon integration for sustained martial output.
+Allows a trained combatant to fight with a compatible weapon in each hand.
+
+Class Availability:
+  Warrior: level 15
+  Thief:   level 20
+  Mystic:  level 30
+  Other mortal classes cannot learn Dual Wield.
 
 Effect:
-Passively enables/strengthens dual-weapon combat efficiency.
+The skill must be learned above 0% to equip or attack with a secondary weapon.
+Each combat round, the offhand attack chance is:
+
+  minimum of 95% or (25 + skill * 3 / 4)%
+
+Offhand attacks use the normal hit calculation.  Their damage is:
+
+  (40 + skill / 2)% of normal damage
 
 Usage:
 Always on once learned.
 
 Tactical Notes:
-Foundational for dual-weapon melee builds.
+Higher proficiency makes offhand attacks more frequent and more damaging.
+An OFFHAND-capable weapon may still be used as a primary weapon without this
+skill.
 
 Limitations:
-Requires compatible equipment and learned proficiency.
+Requires a primary one-handed weapon and a different OFFHAND-capable,
+one-handed secondary weapon.  The secondary weapon cannot be heavier than the
+primary.  Two-handed weapons and shields prevent dual wielding.
 
 See also: SPELLS SKILLS
 #0

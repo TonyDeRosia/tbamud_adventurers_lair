@@ -2614,7 +2614,8 @@ static int mob_object_can_equip_slot(struct obj_data *obj, int wear_pos)
   if (!obj || wear_pos < 0 || wear_pos >= NUM_WEARS)
     return FALSE;
 
-  if (wear_pos == WEAR_HOLD && GET_OBJ_TYPE(obj) == ITEM_WEAPON && OBJ_FLAGGED(obj, ITEM_OFFHAND))
+  if (wear_pos == WEAR_HOLD && GET_OBJ_TYPE(obj) == ITEM_WEAPON && OBJ_FLAGGED(obj, ITEM_OFFHAND) &&
+      !OBJ_FLAGGED(obj, ITEM_TWO_HANDER))
     return TRUE;
 
   return CAN_WEAR(obj, mob_slot_required_wear_flag(wear_pos));

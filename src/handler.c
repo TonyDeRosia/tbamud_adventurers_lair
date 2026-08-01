@@ -606,6 +606,14 @@ void equip_char(struct char_data *ch, struct obj_data *obj, int pos)
     log("SYSERR: EQUIP: Obj is in_room when equip.");
     return;
   }
+  if (GET_OBJ_TYPE(obj) == ITEM_WEAPON && OBJ_FLAGGED(obj, ITEM_TWO_HANDER) &&
+      OBJ_FLAGGED(obj, ITEM_OFFHAND)) {
+    mudlog(BRF, MAX(LVL_IMMORT, GET_INVIS_LEV(ch)), TRUE,
+           "SYSERR: equip_char preserved %s in %s's inventory; weapon has incompatible TWO_HANDER and OFFHAND flags.",
+           obj->short_description, GET_NAME(ch));
+    obj_to_char(obj, ch);
+    return;
+  }
   if ((pos == WEAR_HOLD || pos == WEAR_SHIELD) && character_is_using_two_hander(ch)) {
     mudlog(BRF, MAX(LVL_IMMORT, GET_INVIS_LEV(ch)), TRUE,
            "SYSERR: equip_char preserved %s by moving it to %s's inventory; a two-handed weapon blocks position %d.",
