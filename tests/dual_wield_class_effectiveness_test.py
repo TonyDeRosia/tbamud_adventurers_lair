@@ -35,7 +35,8 @@ assert "40 + (MAX(0, skill) / 2)" in FIGHT
 assert "rand_number(1, 100) > offhand_attack_chance" in FIGHT
 assert "dam * offhand_damage_percent" in FIGHT
 
-npc_guard = FIGHT[FIGHT.index("static int can_offhand_attack"):FIGHT.index("static int find_affect_modifier")]
+npc_start = FIGHT.index("static int can_offhand_attack")
+npc_guard = FIGHT[npc_start:FIGHT.index("static int find_affect_modifier", npc_start)]
 assert npc_guard.index("if (IS_NPC(ch)) return 0") < npc_guard.index("GET_SKILL(ch, SKILL_DUAL_WIELD)")
 assert "NPC offhand equipment is cosmetic" in npc_guard
 

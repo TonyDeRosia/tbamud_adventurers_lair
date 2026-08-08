@@ -30,8 +30,8 @@ assert "return WEAR_WIELD" in slot
 assert "designed for offhand use" not in validator
 
 # Wield remains primary-only; explicit aliases remain offhand-only.
-assert "perform_wear(ch, obj, WEAR_WIELD)" in wield
-assert "perform_wear(ch, obj, WEAR_HOLD)" in offhand
+assert "perform_weapon_swap(ch, obj, WEAR_WIELD)" in wield
+assert "perform_weapon_swap(ch, obj, WEAR_HOLD)" in offhand
 
 # Wear-all defers offhand-capable weapons, then uses the first as primary when
 # needed and a distinct carried object for offhand.

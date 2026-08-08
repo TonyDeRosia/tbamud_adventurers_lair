@@ -47,13 +47,13 @@ for required in (
     "GET_OBJ_WEIGHT(obj) > GET_OBJ_WEIGHT(prim)",
 ):
     assert required in validator, f"shared validator lacks {required}"
-assert "can_equip_weapon(ch, obj, where, TRUE)" in perform
+assert "can_equip_weapon(ch, obj, where, TRUE, FALSE)" in perform
 
 # Wear and hold choose primary first and offhand second.  Wield is always an
 # explicit primary-slot command and never removes an existing weapon.
 for body, command in ((wear, "wear"), (grab, "hold")):
     assert "weapon_wear_position(ch, obj)" in body, f"{command} does not use shared slot selection"
-assert "perform_wear(ch, obj, WEAR_WIELD)" in wield
+assert "perform_weapon_swap(ch, obj, WEAR_WIELD)" in wield
 assert "perform_remove" not in wield
 
 # Both offhand spellings reach the same implementation, and the two-word form
@@ -61,7 +61,7 @@ assert "perform_remove" not in wield
 assert re.search(r'\{\s*"offhand"[^\n]*do_offhand', INTERPRETER)
 assert re.search(r'\{\s*"dual"[^\n]*do_offhand', INTERPRETER)
 assert 'strn_cmp(argument, "wield", 5)' in offhand
-assert "perform_wear(ch, obj, WEAR_HOLD)" in offhand
+assert "perform_weapon_swap(ch, obj, WEAR_HOLD)" in offhand
 
 # Nonweapon hold/light behavior and two-pass automatic wear remain present.
 for item_type in ("ITEM_LIGHT", "ITEM_WAND", "ITEM_STAFF", "ITEM_SCROLL", "ITEM_POTION"):

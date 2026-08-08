@@ -67,8 +67,9 @@ static void perform_put(struct char_data *ch, struct obj_data *obj, struct obj_d
 static void perform_remove(struct char_data *ch, int pos);
 /* do_wear utility functions */
 static int perform_wear(struct char_data *ch, struct obj_data *obj, int where);
+static int perform_weapon_swap(struct char_data *ch, struct obj_data *obj, int where);
 static int weapon_wear_position(struct char_data *ch, const struct obj_data *obj);
-static int can_equip_weapon(struct char_data *ch, struct obj_data *obj, int where, int show_message);
+static int can_equip_weapon(struct char_data *ch, struct obj_data *obj, int where, int show_message, int allow_replace);
 static void wear_message(struct char_data *ch, struct obj_data *obj, int where);
 static int is_kept_item_for(struct char_data *ch, struct obj_data *obj);
 static int reject_kept_item_action(struct char_data *ch, struct obj_data *obj);
@@ -1439,7 +1440,7 @@ static int weapon_wear_position(struct char_data *ch, const struct obj_data *obj
   return WEAR_WIELD;
 }
 
-static int can_equip_weapon(struct char_data *ch, struct obj_data *obj, int where, int show_message)
+static int can_equip_weapon(struct char_data *ch, struct obj_data *obj, int where, int show_message, int allow_replace)
 {
   struct obj_data *prim = GET_EQ(ch, WEAR_WIELD);
   int dual_level;
@@ -1463,12 +1464,15 @@ static int can_equip_weapon(struct char_data *ch, struct obj_data *obj, int wher
     return FALSE;
 
   if (where == WEAR_WIELD) {
-    if (GET_EQ(ch, WEAR_WIELD))
+    if (GET_EQ(ch, WEAR_WIELD) && !allow_replace)
       WEAPON_REJECT("You're already wielding a weapon.\r\n");
     if (is_two_hander(obj) && (GET_EQ(ch, WEAR_SHIELD) || GET_EQ(ch, WEAR_HOLD)))
       WEAPON_REJECT("That weapon requires two hands. Remove your shield and held item first.\r\n");
     if (GET_EQ(ch, WEAR_SHIELD) && GET_EQ(ch, WEAR_HOLD))
       WEAPON_REJECT("You cannot wield a weapon while using both a shield and a held item.\r\n");
+    if (GET_EQ(ch, WEAR_HOLD) && GET_OBJ_TYPE(GET_EQ(ch, WEAR_HOLD)) == ITEM_WEAPON &&
+        GET_OBJ_WEIGHT(GET_EQ(ch, WEAR_HOLD)) > GET_OBJ_WEIGHT(obj))
+      WEAPON_REJECT("Your offhand weapon must be the same weight or lighter than your primary weapon.\r\n");
   } else if (where == WEAR_HOLD) {
     if (!is_offhand_weapon(obj))
       WEAPON_REJECT("That weapon is not balanced for offhand use.\r\n");
@@ -1489,7 +1493,7 @@ static int can_equip_weapon(struct char_data *ch, struct obj_data *obj, int wher
       WEAPON_REJECT("Your weapon requires both hands.\r\n");
     if (GET_EQ(ch, WEAR_SHIELD))
       WEAPON_REJECT("You cannot dual wield while using a shield.\r\n");
-    if (GET_EQ(ch, WEAR_HOLD))
+    if (GET_EQ(ch, WEAR_HOLD) && !allow_replace)
       WEAPON_REJECT("You're already holding something.\r\n");
     if (GET_OBJ_WEIGHT(obj) > GET_OBJ_WEIGHT(prim))
       WEAPON_REJECT("Your offhand weapon must be the same weight or lighter than your primary weapon.\r\n");
@@ -1503,7 +1507,7 @@ static int can_equip_weapon(struct char_data *ch, struct obj_data *obj, int wher
 static int perform_wear(struct char_data *ch, struct obj_data *obj, int where)
 {
   if (GET_OBJ_TYPE(obj) == ITEM_WEAPON && (where == WEAR_WIELD || where == WEAR_HOLD) &&
-      !can_equip_weapon(ch, obj, where, TRUE))
+      !can_equip_weapon(ch, obj, where, TRUE, FALSE))
     return FALSE;
 
   /* dual wield + two hander rules begin */
@@ -1623,6 +1627,50 @@ static int perform_wear(struct char_data *ch, struct obj_data *obj, int where)
   return (obj->worn_by == ch);
 }
 
+/* Explicit weapon commands may replace one occupied hand slot.  Validate and
+ * run both triggers before moving either object so every ordinary rejection is
+ * atomic.  Numbered lookup has already selected obj from carried inventory. */
+static int perform_weapon_swap(struct char_data *ch, struct obj_data *obj, int where)
+{
+  struct obj_data *old = GET_EQ(ch, where);
+
+  if (!old)
+    return perform_wear(ch, obj, where);
+
+  if (!can_equip_weapon(ch, obj, where, TRUE, TRUE))
+    return FALSE;
+
+  if (OBJ_FLAGGED(old, ITEM_NODROP) && !PRF_FLAGGED(ch, PRF_NOHASSLE)) {
+    act("You can't remove $p, it must be CURSED!", FALSE, ch, old, 0, TO_CHAR);
+    return FALSE;
+  }
+
+  if (!wear_otrigger(obj, ch, where) || obj->carried_by != ch || GET_EQ(ch, where) != old)
+    return FALSE;
+  if (!remove_otrigger(old, ch) || GET_EQ(ch, where) != old || obj->carried_by != ch)
+    return FALSE;
+
+  old = unequip_char(ch, where);
+  obj_from_char(obj);
+  obj_to_char(old, ch);
+  equip_char(ch, obj, where);
+
+  if (obj->worn_by != ch) {
+    if (obj->carried_by != ch)
+      obj_to_char(obj, ch);
+    if (old->carried_by == ch) {
+      obj_from_char(old);
+      equip_char(ch, old, where);
+    }
+    return FALSE;
+  }
+
+  act("You stop using $p.", FALSE, ch, old, 0, TO_CHAR);
+  act("$n stops using $p.", TRUE, ch, old, 0, TO_ROOM);
+  wear_message(ch, obj, where);
+  return TRUE;
+}
+
 int find_eq_pos(struct char_data *ch, struct obj_data *obj, char *arg)
 {
   int where = -1;
@@ -1733,7 +1781,7 @@ ACMD(do_wear)
           break;
         if (!first_offhand)
           first_offhand = obj;
-        if (can_equip_weapon(ch, obj, WEAR_HOLD, FALSE)) {
+        if (can_equip_weapon(ch, obj, WEAR_HOLD, FALSE, FALSE)) {
           first_offhand = NULL;
           if (perform_wear(ch, obj, WEAR_HOLD))
             items_worn++;
@@ -1774,7 +1822,7 @@ ACMD(do_wear)
     else {
 
       if (GET_OBJ_TYPE(obj) == ITEM_WEAPON)
-	perform_wear(ch, obj, weapon_wear_position(ch, obj));
+	perform_weapon_swap(ch, obj, weapon_wear_position(ch, obj));
       else if ((where = find_eq_pos(ch, obj, arg2)) >= 0)
 	perform_wear(ch, obj, where);
       else if (!*arg2)
@@ -1798,7 +1846,7 @@ ACMD(do_wield)
     if (GET_OBJ_TYPE(obj) != ITEM_WEAPON)
       send_to_char(ch, "You can only wield weapons.\r\n");
     else
-      perform_wear(ch, obj, WEAR_WIELD);
+      perform_weapon_swap(ch, obj, WEAR_WIELD);
   }
 }
 
@@ -1830,7 +1878,7 @@ ACMD(do_offhand)
     return;
   }
 
-  perform_wear(ch, obj, WEAR_HOLD);
+  perform_weapon_swap(ch, obj, WEAR_HOLD);
 }
 
 
@@ -1851,7 +1899,7 @@ ACMD(do_grab)
     if (GET_OBJ_TYPE(obj) == ITEM_LIGHT)
       perform_wear(ch, obj, WEAR_LIGHT);
     else if (GET_OBJ_TYPE(obj) == ITEM_WEAPON)
-      perform_wear(ch, obj, weapon_wear_position(ch, obj));
+      perform_weapon_swap(ch, obj, weapon_wear_position(ch, obj));
     else {
       if (!CAN_WEAR(obj, ITEM_WEAR_HOLD) && GET_OBJ_TYPE(obj) != ITEM_WAND &&
       GET_OBJ_TYPE(obj) != ITEM_STAFF && GET_OBJ_TYPE(obj) != ITEM_SCROLL &&
