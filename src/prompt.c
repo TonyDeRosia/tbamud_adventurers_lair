@@ -434,7 +434,7 @@ void queue_prompt(struct descriptor_data *d)
   if (STATE(d) != CON_PLAYING)
     return;
 
-  write_to_output(d, "%s", make_prompt(d));
+  write_to_output(d, "\r\n%s", make_prompt(d));
 }
 
 ACMD(do_prompt)
