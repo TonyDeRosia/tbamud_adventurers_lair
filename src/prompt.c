@@ -351,15 +351,8 @@ static void build_custom_prompt(char *prompt, struct descriptor_data *d)
   if (tpl == NULL || *tpl == '\0')
     tpl = default_prompt_template;
 
-  /* Debug: log what we're translating */
-  /*log("DEBUG: Original template: %s", tpl);*/
-  
   /* First pass: translate escape sequences and color codes in the template */
   translate_prompt_escapes(tpl, processed_tpl, sizeof(processed_tpl));
-  
-  /* Debug: log what we got after translation */
-  /*log("DEBUG: After translation: %s", processed_tpl);*/
-  
   tpl = processed_tpl;
 
   /* Second pass: expand prompt tokens (%, %h, %m, etc.) */
@@ -435,8 +428,11 @@ void queue_prompt(struct descriptor_data *d)
   if (STATE(d) != CON_PLAYING)
     return;
 
-  /* Adding a space between \r\n forces the Telnet buffer to treat */
-  /* it as printable output and prevents newline collapsing.       */
+  /* 
+   * \r\n - Flushes and terminates whatever room output precedes the prompt.
+   * \r\n - Forces a blank line space above the prompt.
+   * %s   - The formatted player prompt itself.
+   */
   write_to_output(d, "\r\n \r\n%s", make_prompt(d));
 }
 
