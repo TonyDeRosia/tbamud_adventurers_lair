@@ -19,7 +19,8 @@ extern room_rnum top_of_world;
 /* External functions */
 int compute_armor_class(struct char_data *ch);
 
-static const char *default_prompt_template = "\n{W}[{R}%h{D}/{r}%HHP{n} {B}%m{D}/{b}%MMA{n} {M}%v{D}/{m}%VMV{n} {C}%k{c}QT{n} {Y}%X{y}TNL{n}{W}]{X} ";
+/* Default prompt string (cleaned of static newline formatting) */
+static const char *default_prompt_template = "{W}[{R}%h{D}/{r}%HHP{n} {B}%m{D}/{b}%MMA{n} {M}%v{D}/{m}%VMV{n} {C}%k{c}QT{n} {Y}%X{y}TNL{n}{W}]{X} ";
 
 static const char *translate_color_brace(char code)
 {
@@ -419,7 +420,7 @@ char *make_prompt(struct descriptor_data *d)
       "[ Return to continue, (q)uit, (r)efresh, (b)ack, or page number (%d/%d) ]",
       d->showstr_page, d->showstr_count);
   else if (d->str)
-    strcpy(prompt, "] ");       /* strcpy: OK (for 'MAX_PROMPT_LENGTH >= 3') */
+    strcpy(prompt, "] ");        /* strcpy: OK (for 'MAX_PROMPT_LENGTH >= 3') */
   else if (STATE(d) == CON_PLAYING && d->character)
     build_custom_prompt(prompt, d);
 
@@ -434,7 +435,8 @@ void queue_prompt(struct descriptor_data *d)
   if (STATE(d) != CON_PLAYING)
     return;
 
-  write_to_output(d, "\r\n%s", make_prompt(d));
+  /* \r\n\r\n enforces a static blank line before rendering the prompt */
+  write_to_output(d, "\r\n\r\n%s", make_prompt(d));
 }
 
 ACMD(do_prompt)
