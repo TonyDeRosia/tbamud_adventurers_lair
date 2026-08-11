@@ -352,13 +352,13 @@ static void build_custom_prompt(char *prompt, struct descriptor_data *d)
     tpl = default_prompt_template;
 
   /* Debug: log what we're translating */
-  log("DEBUG: Original template: %s", tpl);
+  /*log("DEBUG: Original template: %s", tpl);*/
   
   /* First pass: translate escape sequences and color codes in the template */
   translate_prompt_escapes(tpl, processed_tpl, sizeof(processed_tpl));
   
   /* Debug: log what we got after translation */
-  log("DEBUG: After translation: %s", processed_tpl);
+  /*log("DEBUG: After translation: %s", processed_tpl);*/
   
   tpl = processed_tpl;
 
