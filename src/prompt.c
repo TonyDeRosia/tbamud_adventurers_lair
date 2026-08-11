@@ -435,8 +435,9 @@ void queue_prompt(struct descriptor_data *d)
   if (STATE(d) != CON_PLAYING)
     return;
 
-  /* \r\n\r\n enforces a static blank line before rendering the prompt */
-  write_to_output(d, "\r\n\r\n%s", make_prompt(d));
+  /* Adding a space between \r\n forces the Telnet buffer to treat */
+  /* it as printable output and prevents newline collapsing.       */
+  write_to_output(d, "\r\n \r\n%s", make_prompt(d));
 }
 
 ACMD(do_prompt)
