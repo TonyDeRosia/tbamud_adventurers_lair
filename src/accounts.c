@@ -12,6 +12,9 @@
 #define ACCT_INDEX_FILE (LIB_ACCTFILES "index.txt")
 
 static int ensure_account_dirs(void);
+static int ensure_account_index(void);
+static int rebuild_account_index(void);
+static int account_write_replace(const char *path, int (*writer)(FILE *fp, const struct account_data *acct), const struct account_data *acct);
 static void account_debug_log(const char *format, ...);
 static void account_resolve_path(char *out, size_t len, const char *relative);
 static int account_verify_password(const char *password, const char *stored_hash, const char *acct_name);
@@ -93,12 +96,188 @@ static int ensure_account_dirs(void)
   return ensure_dir_exists(plr_dir) && ensure_dir_exists(acct_dir);
 }
 
+static int ensure_account_index(void)
+{
+  char path[PATH_MAX];
+  struct stat st;
+
+  if (!ensure_account_dirs())
+    return 0;
+
+  account_resolve_path(path, sizeof(path), ACCT_INDEX_FILE);
+  if (stat(path, &st) == 0)
+    return 1;
+
+  if (errno != ENOENT) {
+    mudlog(CMP, LVL_IMPL, TRUE, "SYSERR: Unable to stat account index %s: %s", path, strerror(errno));
+    return 0;
+  }
+
+  return rebuild_account_index();
+}
+
+static int account_write_replace(const char *path, int (*writer)(FILE *fp, const struct account_data *acct), const struct account_data *acct)
+{
+  char tmp_path[PATH_MAX];
+  FILE *fp;
+  int write_ok = 1;
+
+  if (strlen(path) + 4 >= sizeof(tmp_path)) {
+    mudlog(CMP, LVL_IMPL, TRUE, "SYSERR: Account path too long for temporary write: %s", path);
+    return 0;
+  }
+  snprintf(tmp_path, sizeof(tmp_path), "%s.tmp", path);
+  fp = fopen(tmp_path, "w");
+  if (!fp) {
+    mudlog(CMP, LVL_IMPL, TRUE, "SYSERR: Unable to write temporary account file %s: %s", tmp_path, strerror(errno));
+    return 0;
+  }
+
+  if (!writer(fp, acct))
+    write_ok = 0;
+  if (write_ok && fflush(fp) != 0)
+    write_ok = 0;
+  if (write_ok && fsync(fileno(fp)) != 0)
+    write_ok = 0;
+  if (fclose(fp) != 0)
+    write_ok = 0;
+
+  if (!write_ok) {
+    mudlog(CMP, LVL_IMPL, TRUE, "SYSERR: Unable to durably write temporary account file %s: %s", tmp_path, strerror(errno));
+    unlink(tmp_path);
+    return 0;
+  }
+
+  if (rename(tmp_path, path) != 0) {
+    if (errno == EEXIST || errno == EACCES) {
+      unlink(path);
+      if (rename(tmp_path, path) == 0)
+        return 1;
+    }
+    mudlog(CMP, LVL_IMPL, TRUE, "SYSERR: Unable to replace account file %s: %s", path, strerror(errno));
+    unlink(tmp_path);
+    return 0;
+  }
+
+  return 1;
+}
+
 static void get_account_filename(char *out, size_t len, long account_id)
 {
   char relative[256];
 
   snprintf(relative, sizeof(relative), "%s%ld.%s", LIB_ACCTFILES, account_id, SUF_ACCT);
   account_resolve_path(out, len, relative);
+}
+
+static int account_file_id_from_name(const char *filename, long *out_id)
+{
+  char *endp;
+  long id;
+  const char *dot;
+
+  if (out_id)
+    *out_id = 0;
+  if (!filename || !*filename)
+    return 0;
+
+  dot = strrchr(filename, '.');
+  if (!dot || strcasecmp(dot + 1, SUF_ACCT))
+    return 0;
+
+  errno = 0;
+  id = strtol(filename, &endp, 10);
+  if (errno || endp != dot || id <= 0)
+    return 0;
+
+  if (out_id)
+    *out_id = id;
+  return 1;
+}
+
+static int rebuild_account_index(void)
+{
+  char acct_dir[PATH_MAX], index_path[PATH_MAX];
+  DIR *dirp;
+  struct dirent *dp;
+  FILE *fp;
+  char tmp_path[PATH_MAX];
+  int count = 0, write_ok = 1;
+
+  if (!ensure_account_dirs())
+    return 0;
+
+  account_resolve_path(acct_dir, sizeof(acct_dir), LIB_ACCTFILES);
+  account_resolve_path(index_path, sizeof(index_path), ACCT_INDEX_FILE);
+  if (strlen(acct_dir) > 1 && acct_dir[strlen(acct_dir) - 1] == '/')
+    acct_dir[strlen(acct_dir) - 1] = '\0';
+
+  dirp = opendir(acct_dir);
+  if (!dirp) {
+    mudlog(CMP, LVL_IMPL, TRUE, "SYSERR: Unable to scan account directory %s: %s", acct_dir, strerror(errno));
+    return 0;
+  }
+
+  if (strlen(index_path) + 4 >= sizeof(tmp_path)) {
+    closedir(dirp);
+    mudlog(CMP, LVL_IMPL, TRUE, "SYSERR: Account index path too long for temporary rebuild: %s", index_path);
+    return 0;
+  }
+  snprintf(tmp_path, sizeof(tmp_path), "%s.tmp", index_path);
+  fp = fopen(tmp_path, "w");
+  if (!fp) {
+    closedir(dirp);
+    mudlog(CMP, LVL_IMPL, TRUE, "SYSERR: Unable to rebuild account index %s: %s", index_path, strerror(errno));
+    return 0;
+  }
+
+  while ((dp = readdir(dirp)) != NULL) {
+    long id = 0;
+    struct account_data acct;
+
+    if (!account_file_id_from_name(dp->d_name, &id))
+      continue;
+    if (!account_load_any(id, &acct) || !acct.acct_name[0])
+      continue;
+    if (fprintf(fp, "%ld %s\n", id, acct.acct_name) < 0) {
+      write_ok = 0;
+      break;
+    }
+    count++;
+  }
+
+  closedir(dirp);
+  if (write_ok && fflush(fp) != 0)
+    write_ok = 0;
+  if (write_ok && fsync(fileno(fp)) != 0)
+    write_ok = 0;
+  if (fclose(fp) != 0)
+    write_ok = 0;
+
+  if (!write_ok) {
+    mudlog(CMP, LVL_IMPL, TRUE, "SYSERR: Unable to durably rebuild account index %s: %s", index_path, strerror(errno));
+    unlink(tmp_path);
+    return 0;
+  }
+
+  if (rename(tmp_path, index_path) != 0) {
+    if (errno == EEXIST || errno == EACCES) {
+      unlink(index_path);
+      if (rename(tmp_path, index_path) == 0) {
+        mudlog(CMP, LVL_IMPL, TRUE, "Account index rebuilt from %d account file%s.", count, count == 1 ? "" : "s");
+        return 1;
+      }
+    }
+    mudlog(CMP, LVL_IMPL, TRUE, "SYSERR: Unable to replace rebuilt account index %s: %s", index_path, strerror(errno));
+    unlink(tmp_path);
+    return 0;
+  }
+
+  if (count == 0)
+    mudlog(CMP, LVL_IMPL, TRUE, "Account index initialized at %s.", index_path);
+  else
+    mudlog(CMP, LVL_IMPL, TRUE, "Account index rebuilt from %d account file%s.", count, count == 1 ? "" : "s");
+  return 1;
 }
 
 static int index_find(const char *acct_name, long *out_id)
@@ -112,6 +291,9 @@ static int index_find(const char *acct_name, long *out_id)
   if (!out_id) return 0;
   *out_id = 0;
 
+  if (!ensure_account_index())
+    return 0;
+
   account_resolve_path(path, sizeof(path), ACCT_INDEX_FILE);
 
   fp = fopen(path, "r");
@@ -120,7 +302,6 @@ static int index_find(const char *acct_name, long *out_id)
       mudlog(CMP, LVL_IMPL, TRUE, "SYSERR: Unable to open account index %s: %s", path, strerror(errno));
       warned = 1;
     }
-    ensure_account_dirs();
     return 0;
   }
 
@@ -143,6 +324,9 @@ static long index_next_id(void)
   char name[128];
   char path[PATH_MAX];
 
+  if (!ensure_account_index())
+    return 1;
+
   account_resolve_path(path, sizeof(path), ACCT_INDEX_FILE);
 
   fp = fopen(path, "r");
@@ -162,7 +346,7 @@ static int index_add(long id, const char *acct_name)
 
   if (!acct_name || !*acct_name) return 0;
 
-  if (!ensure_account_dirs())
+  if (!ensure_account_index())
     return 0;
 
   account_resolve_path(path, sizeof(path), ACCT_INDEX_FILE);
@@ -172,8 +356,16 @@ static int index_add(long id, const char *acct_name)
     return 0;
   }
 
-  fprintf(fp, "%ld %s\n", id, acct_name);
-  fclose(fp);
+  if (fprintf(fp, "%ld %s\n", id, acct_name) < 0) {
+    mudlog(CMP, LVL_IMPL, TRUE, "SYSERR: Unable to append account index %s: %s", path, strerror(errno));
+    fclose(fp);
+    return 0;
+  }
+  if (fflush(fp) != 0 || fsync(fileno(fp)) != 0 || fclose(fp) != 0) {
+    mudlog(CMP, LVL_IMPL, TRUE, "SYSERR: Unable to durably append account index %s: %s", path, strerror(errno));
+    return 0;
+  }
+  mudlog(CMP, LVL_IMPL, TRUE, "Account index updated for %s.", acct_name);
   return 1;
 }
 
@@ -186,6 +378,9 @@ int account_foreach_index(int (*cb)(long id, const char *name, void *arg), void 
   int count = 0;
 
   if (!cb)
+    return 0;
+
+  if (!ensure_account_index())
     return 0;
 
   account_resolve_path(path, sizeof(path), ACCT_INDEX_FILE);
@@ -216,6 +411,48 @@ static int account_password_is_valid(const char *passwd)
 
   if (!*passwd || strlen(passwd) > MAX_PWD_LENGTH)
     return 0;
+
+  return 1;
+}
+
+static int account_v3_is_valid(const struct account_data *acct, int actual_chars, const char *path)
+{
+  int i, j;
+
+  if (!acct || acct->account_id <= 0) {
+    mudlog(CMP, LVL_IMPL, TRUE, "SYSERR: Malformed account record %s: invalid account id.", path ? path : "<unknown>");
+    return 0;
+  }
+  if (!acct->acct_name[0]) {
+    mudlog(CMP, LVL_IMPL, TRUE, "SYSERR: Malformed account record %s: missing account name.", path ? path : "<unknown>");
+    return 0;
+  }
+  if (acct->num_chars < 0 || acct->num_chars > MAX_CHARS_PER_ACCOUNT) {
+    mudlog(CMP, LVL_IMPL, TRUE, "SYSERR: Malformed account record %s: invalid character count %d.",
+           path ? path : "<unknown>", acct->num_chars);
+    return 0;
+  }
+  if (actual_chars != acct->num_chars) {
+    mudlog(CMP, LVL_IMPL, TRUE, "SYSERR: Malformed account record %s: declared %d characters but read %d.",
+           path ? path : "<unknown>", acct->num_chars, actual_chars);
+    return 0;
+  }
+
+  for (i = 0; i < acct->num_chars; i++) {
+    if (acct->chars[i].char_id <= 0 || !acct->chars[i].name[0]) {
+      mudlog(CMP, LVL_IMPL, TRUE, "SYSERR: Malformed account record %s: invalid character roster entry.",
+             path ? path : "<unknown>");
+      return 0;
+    }
+    for (j = i + 1; j < acct->num_chars; j++) {
+      if (acct->chars[i].char_id == acct->chars[j].char_id ||
+          !str_cmp(acct->chars[i].name, acct->chars[j].name)) {
+        mudlog(CMP, LVL_IMPL, TRUE, "SYSERR: Malformed account record %s: duplicate character roster entry.",
+               path ? path : "<unknown>");
+        return 0;
+      }
+    }
+  }
 
   return 1;
 }
@@ -253,6 +490,10 @@ int account_load_any(long acct_id, struct account_data *acct)
   char path[PATH_MAX];
 
   if (!acct) return 0;
+  if (acct_id <= 0) {
+    mudlog(CMP, LVL_IMPL, TRUE, "SYSERR: Refusing to load invalid account id %ld.", acct_id);
+    return 0;
+  }
 
   memset(acct, 0, sizeof(*acct));
   acct->account_id = acct_id;
@@ -297,15 +538,29 @@ int account_load_any(long acct_id, struct account_data *acct)
       }
     }
 
-    for (int i = 0; i < acct->num_chars && i < MAX_CHARS_PER_ACCOUNT; i++) {
+    int actual_chars = 0;
+
+    if (acct->num_chars < 0 || acct->num_chars > MAX_CHARS_PER_ACCOUNT) {
+      fclose(fp);
+      return account_v3_is_valid(acct, 0, path);
+    }
+
+    for (int i = 0; i < acct->num_chars; i++) {
       long cid = 0;
       char cname[64] = "";
-      if (fscanf(fp, "%ld %63s", &cid, cname) != 2) break;
+      if (fscanf(fp, "%ld %63s", &cid, cname) != 2)
+        break;
       acct->chars[i].char_id = cid;
       strlcpy(acct->chars[i].name, cname, sizeof(acct->chars[i].name));
+      actual_chars++;
     }
 
     fclose(fp);
+    if (!account_v3_is_valid(acct, actual_chars, path))
+      return 0;
+
+    mudlog(CMP, LVL_IMPL, TRUE, "Account loaded: id=%ld name=%s chars=%d.",
+           acct->account_id, acct->acct_name, acct->num_chars);
     return 1;
   }
 
@@ -320,45 +575,55 @@ int account_load_any(long acct_id, struct account_data *acct)
   return 1;
 }
 
+static int account_file_writer(FILE *fp, const struct account_data *acct)
+{
+  int i;
+
+  if (!fp || !acct)
+    return 0;
+
+  if (fprintf(fp, "V3\n") < 0) return 0;
+  if (fprintf(fp, "Name: %s\n", acct->acct_name[0] ? acct->acct_name : "") < 0) return 0;
+  if (fprintf(fp, "Pass: %s\n", acct->passwd_hash[0] ? acct->passwd_hash : "") < 0) return 0;
+  if (fprintf(fp, "ForcePW: %d\n", acct->force_pw_change ? 1 : 0) < 0) return 0;
+  if (acct->temp_passwd_hash[0] && fprintf(fp, "TempPW: %s\n", acct->temp_passwd_hash) < 0) return 0;
+  if (fprintf(fp, "Chars: %d\n", acct->num_chars) < 0) return 0;
+
+  for (i = 0; i < acct->num_chars && i < MAX_CHARS_PER_ACCOUNT; i++)
+    if (fprintf(fp, "%ld %s\n", acct->chars[i].char_id, acct->chars[i].name) < 0)
+      return 0;
+
+  return 1;
+}
+
 int account_save_any(const struct account_data *acct)
 {
   char fname[256];
-  FILE *fp;
   char path[PATH_MAX];
 
   if (!acct) return 0;
+  if (acct->account_id <= 0) {
+    mudlog(CMP, LVL_IMPL, TRUE, "SYSERR: Refusing to save account with invalid id %ld.", acct->account_id);
+    return 0;
+  }
+  if (acct->num_chars < 0 || acct->num_chars > MAX_CHARS_PER_ACCOUNT) {
+    mudlog(CMP, LVL_IMPL, TRUE, "SYSERR: Refusing to save malformed account %ld: invalid character count %d.",
+           acct->account_id, acct->num_chars);
+    return 0;
+  }
 
   if (!ensure_account_dirs())
     return 0;
 
   get_account_filename(fname, sizeof(fname), acct->account_id);
   account_resolve_path(path, sizeof(path), fname);
-  fp = fopen(path, "w");
-  if (!fp) {
-    mudlog(CMP, LVL_IMPL, TRUE, "SYSERR: Unable to write account file %s: %s", path, strerror(errno));
+  if (!account_write_replace(path, account_file_writer, acct)) {
+    mudlog(CMP, LVL_IMPL, TRUE, "SYSERR: Account save failed for account id %ld.", acct->account_id);
     return 0;
   }
 
-  fprintf(fp, "V3\n");
-  fprintf(fp, "Name: %s\n", acct->acct_name[0] ? acct->acct_name : "");
-  fprintf(fp, "Pass: %s\n", acct->passwd_hash[0] ? acct->passwd_hash : "");
-  fprintf(fp, "ForcePW: %d\n", acct->force_pw_change ? 1 : 0);
-  if (acct->temp_passwd_hash[0])
-    fprintf(fp, "TempPW: %s\n", acct->temp_passwd_hash);
-  fprintf(fp, "Chars: %d\n", acct->num_chars);
-
-  for (int i = 0; i < acct->num_chars && i < MAX_CHARS_PER_ACCOUNT; i++)
-    fprintf(fp, "%ld %s\n", acct->chars[i].char_id, acct->chars[i].name);
-
-  int write_ok = (fflush(fp) == 0);
-  if (write_ok && fsync(fileno(fp)) != 0)
-    write_ok = 0;
-  if (fclose(fp) != 0)
-    write_ok = 0;
-  if (!write_ok) {
-    mudlog(CMP, LVL_IMPL, TRUE, "SYSERR: Unable to durably write account file %s: %s", path, strerror(errno));
-    return 0;
-  }
+  mudlog(CMP, LVL_IMPL, TRUE, "Account saved: id=%ld name=%s chars=%d.", acct->account_id,
+         acct->acct_name[0] ? acct->acct_name : "<legacy>", acct->num_chars);
   return 1;
 }
 
@@ -398,7 +663,8 @@ int account_authenticate(const char *acct_name, const char *passwd, long *out_id
     if (acct.temp_passwd_hash[0] && account_verify_password(clean_pass, acct.temp_passwd_hash, acct.acct_name)) {
       temp_used = 1;
       acct.temp_passwd_hash[0] = '\0';
-      account_save_any(&acct);
+      if (!account_save_any(&acct))
+        return 0;
     } else {
       return 0;
     }
@@ -416,6 +682,7 @@ int account_create(const char *acct_name, const char *passwd, long *out_id)
   struct account_data acct;
   char hash[128];
   char clean_pass[MAX_PWD_LENGTH + 1];
+  char fname[256], path[PATH_MAX];
 
   if (out_id) *out_id = 0;
   if (!acct_name || !*acct_name) return 0;
@@ -440,10 +707,17 @@ int account_create(const char *acct_name, const char *passwd, long *out_id)
   strlcpy(acct.acct_name, acct_name, sizeof(acct.acct_name));
   acct_hash_password(hash, sizeof(hash), clean_pass);
   strlcpy(acct.passwd_hash, hash, sizeof(acct.passwd_hash));
+  get_account_filename(fname, sizeof(fname), id);
+  account_resolve_path(path, sizeof(path), fname);
 
-  account_save_any(&acct);
-  index_add(id, acct_name);
+  if (!account_save_any(&acct))
+    return 0;
+  if (!index_add(id, acct_name)) {
+    unlink(path);
+    return 0;
+  }
 
+  mudlog(CMP, LVL_IMPL, TRUE, "Account created: id=%ld name=%s.", id, acct_name);
   if (out_id) *out_id = id;
   return 1;
 }
@@ -464,8 +738,7 @@ int account_set_force_pw(long acct_id, int force)
   if (!acct.force_pw_change)
     acct.temp_passwd_hash[0] = '\0';
 
-  account_save_any(&acct);
-  return 1;
+  return account_save_any(&acct);
 }
 
 int account_set_password(long acct_id, const char *passwd, int force_pw_change)
@@ -484,8 +757,7 @@ int account_set_password(long acct_id, const char *passwd, int force_pw_change)
   acct.force_pw_change = force_pw_change ? 1 : 0;
   acct.temp_passwd_hash[0] = '\0';
 
-  account_save_any(&acct);
-  return 1;
+  return account_save_any(&acct);
 }
 
 void account_init_for_char(struct char_data *ch)

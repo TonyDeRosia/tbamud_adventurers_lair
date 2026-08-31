@@ -101,3 +101,65 @@ def test_free_player_index_restores_empty_sentinel_for_restart_tests():
 def test_save_and_load_share_get_filename_player_path():
     assert PLAYERS.count("get_filename(filename, sizeof(filename), PLR_FILE") >= 2
     assert 'suffix = SUF_PLR' in (ROOT / "src/utils.c").read_text()
+
+
+
+def test_account_first_run_initializes_directory_and_index_without_sys_err():
+    assert "static int ensure_account_dirs(void);" in ACCOUNTS
+    assert "static int ensure_account_index(void);" in ACCOUNTS
+    assert "return rebuild_account_index();" in ACCOUNTS
+    assert '"Account index initialized at %s."' in ACCOUNTS
+    old = 'SYSERR: Unable to open account index %s: %s", path, strerror(errno));\n      warned = 1;\n    }\n    ensure_account_dirs();'
+    assert old not in ACCOUNTS
+
+
+def test_account_creation_reports_success_only_after_required_writes():
+    create = ACCOUNTS[ACCOUNTS.index("int account_create("):ACCOUNTS.index("int account_id_by_name")]
+    assert "if (!account_save_any(&acct))" in create
+    assert "if (!index_add(id, acct_name))" in create
+    assert "unlink(path);" in create
+    assert '"Account created: id=%ld name=%s."' in create
+    assert "account_save_any(&acct);\n  index_add(id, acct_name);" not in create
+
+
+def test_account_updates_propagate_save_failures():
+    force = ACCOUNTS[ACCOUNTS.index("int account_set_force_pw"):ACCOUNTS.index("int account_set_password")]
+    passwd = ACCOUNTS[ACCOUNTS.index("int account_set_password"):ACCOUNTS.index("void account_init_for_char")]
+    assert "return account_save_any(&acct);" in force
+    assert "return account_save_any(&acct);" in passwd
+
+
+def test_account_saves_use_temp_file_and_durable_replace():
+    assert "static int account_write_replace" in ACCOUNTS
+    assert 'snprintf(tmp_path, sizeof(tmp_path), "%s.tmp", path)' in ACCOUNTS
+    assert "fsync(fileno(fp))" in ACCOUNTS
+    assert "rename(tmp_path, path)" in ACCOUNTS
+    save = ACCOUNTS[ACCOUNTS.index("int account_save_any"):ACCOUNTS.index("int account_authenticate")]
+    assert "account_write_replace(path, account_file_writer, acct)" in save
+    assert "fopen(path, \"w\")" not in save
+
+
+def test_missing_account_index_can_rebuild_from_account_files():
+    rebuild = ACCOUNTS[ACCOUNTS.index("static int rebuild_account_index"):ACCOUNTS.index("static int index_find")]
+    assert "opendir(acct_dir)" in rebuild
+    assert "account_file_id_from_name" in rebuild
+    assert "account_load_any(id, &acct)" in rebuild
+    assert '"Account index rebuilt from %d account file%s."' in rebuild
+
+
+def test_v3_account_load_validates_roster_shape():
+    assert "static int account_v3_is_valid" in ACCOUNTS
+    start = ACCOUNTS.index("static int account_v3_is_valid")
+    end = ACCOUNTS.index("static int account_verify_password", start)
+    validate = ACCOUNTS[start:end]
+    for needle in (
+        "invalid account id",
+        "missing account name",
+        "invalid character count",
+        "declared %d characters but read %d",
+        "duplicate character roster entry",
+    ):
+        assert needle in validate
+    load = ACCOUNTS[ACCOUNTS.index("int account_load_any"):ACCOUNTS.index("static int account_file_writer")]
+    assert "if (acct_id <= 0)" in load
+    assert "account_v3_is_valid(acct, actual_chars, path)" in load
