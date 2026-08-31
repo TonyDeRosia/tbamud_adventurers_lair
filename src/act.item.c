@@ -1603,7 +1603,9 @@ static int perform_wear(struct char_data *ch, struct obj_data *obj, int where)
   };
 
   /* first, make sure that the wear position is valid. */
-  if (!CAN_WEAR(obj, wear_bitvectors[where]) && !(where == WEAR_HOLD && GET_OBJ_TYPE(obj) == ITEM_WEAPON && OBJ_FLAGGED(obj, ITEM_OFFHAND))) {
+  if (!CAN_WEAR(obj, wear_bitvectors[where]) &&
+      !(where == WEAR_HOLD && GET_OBJ_TYPE(obj) == ITEM_WEAPON && OBJ_FLAGGED(obj, ITEM_OFFHAND)) &&
+      !(where == WEAR_WIELD && GET_OBJ_TYPE(obj) == ITEM_WAND)) {
     act("You can't wear $p there.", FALSE, ch, obj, 0, TO_CHAR);
     return FALSE;
   }

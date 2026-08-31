@@ -2100,7 +2100,7 @@ int call_magic(struct char_data *caster, struct char_data *cvict,
  * DikuMUD format did not specify staff and wand levels in the world files */
 void mag_objectmagic(struct char_data *ch, struct obj_data *obj, char *argument) {
   char arg[MAX_INPUT_LENGTH];
-  int i, k;
+  int i, k, result;
   struct char_data *tch = NULL, *next_tch;
   struct obj_data *tobj = NULL;
 
@@ -2144,6 +2144,15 @@ void mag_objectmagic(struct char_data *ch, struct obj_data *obj, char *argument)
     }
     break;
   case ITEM_WAND:
+    if (GET_OBJ_VAL(obj, 3) < 1 || GET_OBJ_VAL(obj, 3) > TOP_SPELL_DEFINE ||
+        !spell_info[GET_OBJ_VAL(obj, 3)].name) {
+      send_to_char(ch, "The wand's magic is malformed and cannot be invoked.\r\n");
+      return;
+    }
+    if (GET_OBJ_VAL(obj, 2) <= 0) {
+      send_to_char(ch, "It seems powerless.\r\n");
+      return;
+    }
     if (k == FIND_CHAR_ROOM) {
       if (tch == ch) {
         act("You point $p at yourself.", FALSE, ch, obj, 0, TO_CHAR);
@@ -2171,19 +2180,14 @@ void mag_objectmagic(struct char_data *ch, struct obj_data *obj, char *argument)
       return;
     }
 
-    if (GET_OBJ_VAL(obj, 2) <= 0) {
-      send_to_char(ch, "It seems powerless.\r\n");
-      act("Nothing seems to happen.", FALSE, ch, obj, 0, TO_ROOM);
-      return;
-    }
-    GET_OBJ_VAL(obj, 2)--;
-    WAIT_STATE(ch, PULSE_VIOLENCE);
     if (GET_OBJ_VAL(obj, 0))
-      call_magic(ch, tch, tobj, GET_OBJ_VAL(obj, 3), GET_OBJ_VAL(obj, 0),
-          CAST_WAND);
+      result = call_magic(ch, tch, tobj, GET_OBJ_VAL(obj, 3), GET_OBJ_VAL(obj, 0), CAST_WAND);
     else
-      call_magic(ch, tch, tobj, GET_OBJ_VAL(obj, 3),
-      DEFAULT_WAND_LVL, CAST_WAND);
+      result = call_magic(ch, tch, tobj, GET_OBJ_VAL(obj, 3), DEFAULT_WAND_LVL, CAST_WAND);
+    if (result > 0) {
+      GET_OBJ_VAL(obj, 2)--;
+      WAIT_STATE(ch, PULSE_VIOLENCE);
+    }
     break;
   case ITEM_SCROLL:
     if (*arg) {
@@ -2338,6 +2342,19 @@ ACMD(do_spellup)
 
   if (IS_NPC(ch))
     return;
+
+  if (!CAN_BYPASS_ENVIRONMENT(ch) &&
+      (ROOM_FLAGGED(IN_ROOM(ch), ROOM_NOMAGIC) ||
+       room_has_effect(&world[IN_ROOM(ch)], ROOM_EFFECT_NULL_FIELD))) {
+    send_to_char(ch, "The room suppresses your magic; spellup cannot begin.\r\n");
+    return;
+  }
+  if (!CAN_BYPASS_ENVIRONMENT(ch) &&
+      room_has_effect(&world[IN_ROOM(ch)], ROOM_EFFECT_SILENCE_FIELD) &&
+      !affected_by_spell(ch, SPELL_SILENT_MAGIC)) {
+    send_to_char(ch, "The room's silence prevents spellup from beginning.\r\n");
+    return;
+  }
 
   one_argument(argument, arg);
 

@@ -1595,10 +1595,11 @@ ACMD(do_load)
     return;
   }
 
-  if (atoi(buf3) > 0  && atoi(buf3) <= 100) {
-    n = atoi(buf3);
-  } else {
-    n = 1;
+  if (*buf3) {
+    if (!is_number(buf3) || (n = atoi(buf3)) < 1 || n > 100) {
+      send_to_char(ch, "Count must be a whole number from 1 to 100.\r\n");
+      return;
+    }
   }
 
   if (is_abbrev(buf, "mob")) {
@@ -1623,6 +1624,9 @@ ACMD(do_load)
       act("You create $N.", FALSE, ch, 0, mob, TO_CHAR);
       load_mtrigger(mob);
     }
+    mudlog(BRF, MAX(LVL_IMMORT, GET_INVIS_LEV(ch)), TRUE,
+           "(GC) %s loaded %d mob%s [%s].", GET_NAME(ch), n,
+           n == 1 ? "" : "s", buf2);
   } else if (is_abbrev(buf, "obj")) {
     struct obj_data *obj;
     obj_rnum r_num;
@@ -1647,6 +1651,9 @@ ACMD(do_load)
       act("You create $p.", FALSE, ch, obj, 0, TO_CHAR);
       load_otrigger(obj);
     }
+    mudlog(BRF, MAX(LVL_IMMORT, GET_INVIS_LEV(ch)), TRUE,
+           "(GC) %s loaded %d object%s [%s].", GET_NAME(ch), n,
+           n == 1 ? "" : "s", buf2);
   } else
     send_to_char(ch, "That'll have to be either 'obj' or 'mob'.\r\n");
 }
@@ -1681,9 +1688,10 @@ static int room_reset_cmd_room(const struct reset_com *cmd)
   switch (cmd->command) {
     case 'M':
     case 'O':
+      return cmd->arg3;
     case 'T':
     case 'V':
-      return cmd->arg3;
+      return cmd->arg1 == WLD_TRIGGER ? cmd->arg3 : NOWHERE;
     case 'D':
     case 'R':
       return cmd->arg1;
@@ -2042,6 +2050,22 @@ static void show_room_resets(struct char_data *ch, room_rnum room_num)
             (cmd[j].arg1 >= 0 && cmd[j].arg1 <= top_of_objt) ? obj_proto[cmd[j].arg1].short_description : "<invalid object>",
             (cmd[j].arg3 >= 0 && cmd[j].arg3 <= top_of_objt) ? obj_index[cmd[j].arg3].vnum : -1,
             cmd[j].arg2);
+        } else if (cmd[j].command == 'T') {
+          if (cmd[j].arg2 >= 0 && cmd[j].arg2 <= top_of_trigt && trig_index[cmd[j].arg2])
+            send_to_char(ch, "%2d) Trigger [%d] %-30.30s attach to %s\r\n",
+              index++, trig_index[cmd[j].arg2]->vnum,
+              trig_index[cmd[j].arg2]->proto && trig_index[cmd[j].arg2]->proto->name ?
+                trig_index[cmd[j].arg2]->proto->name : "<unnamed trigger>",
+              cmd[j].arg1 == MOB_TRIGGER ? "mob" :
+              (cmd[j].arg1 == OBJ_TRIGGER ? "object" : "room"));
+          else
+            send_to_char(ch, "%2d) INVALID TRIGGER rnum %d\r\n", index++, cmd[j].arg2);
+        } else if (cmd[j].command == 'V') {
+          send_to_char(ch, "%2d) Var %s:%d = %s (%s)\r\n",
+            index++, cmd[j].sarg1 ? cmd[j].sarg1 : "<none>", cmd[j].arg2,
+            cmd[j].sarg2 ? cmd[j].sarg2 : "<none>",
+            cmd[j].arg1 == MOB_TRIGGER ? "mob" :
+            (cmd[j].arg1 == OBJ_TRIGGER ? "object" : "room"));
         }
         j++;
       }
@@ -2064,11 +2088,15 @@ static void show_room_resets(struct char_data *ch, room_rnum room_num)
         dirs[cmd[i].arg2],
         (cmd[i].arg3 == 2) ? "locked" : ((cmd[i].arg3 == 1) ? "closed" : "open"));
     } else if (cmd[i].command == 'T') {
-      send_to_char(ch, "%2d) Trigger [%d] attach to %s\r\n",
-        index++,
-        trig_index[cmd[i].arg2]->vnum,
-        cmd[i].arg1 == MOB_TRIGGER ? "mob" :
-        (cmd[i].arg1 == OBJ_TRIGGER ? "object" : "room"));
+      if (cmd[i].arg2 >= 0 && cmd[i].arg2 <= top_of_trigt && trig_index[cmd[i].arg2])
+        send_to_char(ch, "%2d) Trigger [%d] %-30.30s attach to %s\r\n",
+          index++, trig_index[cmd[i].arg2]->vnum,
+          trig_index[cmd[i].arg2]->proto && trig_index[cmd[i].arg2]->proto->name ?
+            trig_index[cmd[i].arg2]->proto->name : "<unnamed trigger>",
+          cmd[i].arg1 == MOB_TRIGGER ? "mob" :
+          (cmd[i].arg1 == OBJ_TRIGGER ? "object" : "room"));
+      else
+        send_to_char(ch, "%2d) INVALID TRIGGER rnum %d\r\n", index++, cmd[i].arg2);
     } else if (cmd[i].command == 'V') {
       send_to_char(ch, "%2d) Var %s:%d = %s (%s)\r\n",
         index++,
@@ -4246,7 +4274,13 @@ static void show_set_help(struct char_data *ch)
   char buf[MAX_STRING_LENGTH];
   int i, len=0, add_len=0;
 
-  len = snprintf(buf, sizeof(buf), "%sCommand             Lvl    Who?  Type%s\r\n", CCCYN(ch, C_NRM), CCNRM(ch, C_NRM));
+  len = snprintf(buf, sizeof(buf),
+      "Syntax: set <target> <field> <value>  OR  set <field> <target> <value>\r\n"
+      "Aliases: health/hp (current + max), maxhealth/maxhp, mp/maxmp, "
+      "mv/moves/maxmv, xp/experience, armor, full stat names, qp, money.\r\n"
+      "Exact field names in the first position select field-first syntax.\r\n\r\n"
+      "%sCommand             Lvl    Who?  Type%s\r\n",
+      CCCYN(ch, C_NRM), CCNRM(ch, C_NRM));
   for (i = 0; *(set_fields[i].cmd) != '\n'; i++) {
 	if (set_fields[i].level <= GET_LEVEL(ch)) {
       add_len = snprintf(buf+len, sizeof(buf)-len, "%-20s%-5s  %-4s  %-6s\r\n", set_fields[i].cmd,
@@ -4291,6 +4325,16 @@ static bool is_set_field_name(const char *field)
     if (!str_cmp(canonical, set_fields[i].cmd))
       return TRUE;
   return FALSE;
+}
+
+static bool set_field_rejects_negative(const char *field)
+{
+  return !str_cmp(field, "bank") || !str_cmp(field, "exp") ||
+         !str_cmp(field, "gold") || !str_cmp(field, "mana") ||
+         !str_cmp(field, "maxhit") || !str_cmp(field, "maxmana") ||
+         !str_cmp(field, "maxmove") || !str_cmp(field, "move") ||
+         !str_cmp(field, "practices") || !str_cmp(field, "questpoints") ||
+         !str_cmp(field, "diamond") || !str_cmp(field, "diamonds");
 }
 
 ACMD(do_set)
@@ -4391,15 +4435,18 @@ ACMD(do_set)
 
     if (!strcmp(field, "diamond") || !strcmp(field, "diamonds")) {
     char *endp = NULL;
-    long long req = strtoll(buf, &endp, 10);
+    long long req;
 
-    if (endp == buf) {
-      send_to_char(ch, "Value must be a number.\r\n");
+    errno = 0;
+    req = strtoll(buf, &endp, 10);
+    while (endp && *endp && isspace((unsigned char)*endp))
+      endp++;
+    if (errno == ERANGE || endp == buf || (endp && *endp) || req < 0) {
+      send_to_char(ch, "Value must be a non-negative whole number.\r\n");
       retval = 0;
       goto do_set_save_and_cleanup;
     }
 
-    if (req < 0) req = 0;
     if (req > 2147483647LL) req = 2147483647LL;
 
     GET_DIAMONDS(vict) = (int)req;
@@ -4424,14 +4471,16 @@ ACMD(do_set)
         goto do_set_save_and_cleanup;
       }
 
+      errno = 0;
       amount = strtoll(valp, &endp, 10);
-      if (endp == valp) {
-        send_to_char(ch, "Value must be a number.\r\n");
+      while (endp && *endp && isspace((unsigned char)*endp))
+        endp++;
+      if (errno == ERANGE || endp == valp || (endp && *endp) || amount < 0) {
+        send_to_char(ch, "Value must be a non-negative whole number.\r\n");
         retval = 0;
         goto do_set_save_and_cleanup;
       }
 
-      if (amount < 0) amount = 0;
       if (amount > MAX_MONEY) amount = MAX_MONEY;
 
       GET_MONEY(vict) = amount;
@@ -4445,15 +4494,18 @@ ACMD(do_set)
 
   if (!strcmp(field, "glory")) {
     char *endp = NULL;
-    long long req = strtoll(buf, &endp, 10);
+    long long req;
 
-    if (endp == buf) {
-      send_to_char(ch, "Value must be a number.\r\n");
+    errno = 0;
+    req = strtoll(buf, &endp, 10);
+    while (endp && *endp && isspace((unsigned char)*endp))
+      endp++;
+    if (errno == ERANGE || endp == buf || (endp && *endp) || req < 0) {
+      send_to_char(ch, "Value must be a non-negative whole number.\r\n");
       retval = 0;
       goto do_set_save_and_cleanup;
     }
 
-    if (req < 0) req = 0;
     if (req > 2147483647LL) req = 2147483647LL;
 
     GET_GLORY(vict) = (int)req;
@@ -4464,46 +4516,6 @@ ACMD(do_set)
     retval = 1;
     goto do_set_save_and_cleanup;
   }
-
-  /* Diamonds are a separate currency field (additive, clamped). */
-  if (!strcmp(field, "diamond") || !strcmp(field, "diamonds")) {
-    long long req = 0;
-    long long before = (long long)GET_DIAMONDS(vict);
-    long long after = 0;
-    char *endp = NULL;
-    char *valp = buf;
-
-    skip_spaces(&valp);
-    if (!*valp) {
-      send_to_char(ch, "Usage: set <victim> <diamond|diamonds> <number>\r\n");
-      retval = 0;
-      goto do_set_save_and_cleanup;
-    }
-
-    req = strtoll(valp, &endp, 10);
-    if (endp == valp) {
-      send_to_char(ch, "Amount must be a number.\r\n");
-      retval = 0;
-      goto do_set_save_and_cleanup;
-    }
-
-    after = before + req;
-    if (after < 0)
-      after = 0;
-    if (after > 2147483647LL)
-      after = 2147483647LL;
-
-    GET_DIAMONDS(vict) = (int)after;
-
-    send_to_char(ch,
-      "%s adjusted %s's diamonds by %lld.\r\n"
-      "Diamonds: %lld -> %lld.\r\n",
-      GET_NAME(ch), GET_NAME(vict), req, before, after);
-
-    retval = 1;
-    goto do_set_save_and_cleanup;
-  }
-
 
   /* find the command in the list */
   len = strlen(field);
@@ -4517,12 +4529,18 @@ ACMD(do_set)
   } else {
     if (set_fields[mode].type == NUMBER) {
       char *end = NULL;
+      long parsed;
       errno = 0;
-      (void)strtol(buf, &end, 10);
+      parsed = strtol(buf, &end, 10);
       while (end && *end && isspace((unsigned char)*end))
         end++;
-      if (errno == ERANGE || end == buf || (end && *end)) {
+      if (errno == ERANGE || parsed < INT_MIN || parsed > INT_MAX ||
+          end == buf || (end && *end)) {
         send_to_char(ch, "Value must be a valid whole number.\r\n");
+        goto do_set_save_and_cleanup;
+      }
+      if (parsed < 0 && set_field_rejects_negative(field)) {
+        send_to_char(ch, "That field does not accept negative values.\r\n");
         goto do_set_save_and_cleanup;
       }
     }

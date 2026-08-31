@@ -34,10 +34,15 @@ def test_cleanse_removes_timed_affect_entries_and_rebuilds():
 
 def test_zap_prefers_held_then_wielded_and_validates_spell():
     other = source("act.other.c")
+    parser = source("spell_parser.c")
+    item = source("act.item.c")
     assert "GET_EQ(ch, WEAR_HOLD)" in other
     assert "wand = GET_EQ(ch, WEAR_WIELD)" in other
     assert "TOP_SPELL_DEFINE" in other
     assert "mag_objectmagic(ch, wand, argument)" in other
+    assert "if (result > 0)" in parser
+    assert "GET_OBJ_VAL(obj, 2)--" in parser
+    assert "where == WEAR_WIELD && GET_OBJ_TYPE(obj) == ITEM_WAND" in item
 
 
 def test_set_dual_order_aliases_and_strict_numeric_input():
@@ -47,6 +52,11 @@ def test_set_dual_order_aliases_and_strict_numeric_input():
     assert '"health", "hp"' not in wizard  # handled as explicit convenience names
     assert "value_long > 999999" in wizard
     assert "errno == ERANGE" in wizard
+    assert "parsed < INT_MIN || parsed > INT_MAX" in wizard
+    do_set = wizard.index("ACMD(do_set)")
+    target = wizard.index("/* find the target */", do_set)
+    health = wizard.index('if (!str_cmp(field, "health")', do_set)
+    assert target < health
 
 
 def test_rreset_list_is_read_only_and_compare_has_no_score():
@@ -57,6 +67,7 @@ def test_rreset_list_is_read_only_and_compare_has_no_score():
     assert "show_room_resets" in list_block
     assert "save_zone" not in list_block
     assert "add_to_save_list" not in list_block
+    assert "INVALID TRIGGER" in wizard
     assert "This is a factual comparison, not an overall item score" in informative
 
 

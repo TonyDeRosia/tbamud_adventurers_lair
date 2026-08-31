@@ -3053,7 +3053,10 @@ ACMD(do_compare)
   }
 
   slot = find_eq_pos(ch, candidate, NULL);
-  if (GET_OBJ_TYPE(candidate) == ITEM_WEAPON || GET_OBJ_TYPE(candidate) == ITEM_WAND)
+  if (GET_OBJ_TYPE(candidate) == ITEM_WEAPON && OBJ_FLAGGED(candidate, ITEM_OFFHAND) &&
+      GET_EQ(ch, WEAR_WIELD))
+    slot = WEAR_HOLD;
+  else if (GET_OBJ_TYPE(candidate) == ITEM_WEAPON || GET_OBJ_TYPE(candidate) == ITEM_WAND)
     slot = WEAR_WIELD;
   if (slot < 0 || slot >= NUM_WEARS) {
     send_to_char(ch, "%s has no logical equipment slot to compare.\r\n",
@@ -3076,7 +3079,9 @@ ACMD(do_compare)
     send_to_char(ch, "  Damage: %dd%d (equipped: %dd%d)\r\n",
                  GET_OBJ_VAL(candidate, 1), GET_OBJ_VAL(candidate, 2), old_num, old_size);
     if (OBJ_FLAGGED(candidate, ITEM_TWO_HANDER))
-      send_to_char(ch, "  Conflict: two-handed; replaces or blocks both hand slots.\r\n");
+      send_to_char(ch, "  Conflict: two-handed; primary=%s, offhand/hold=%s.\r\n",
+                   GET_EQ(ch, WEAR_WIELD) ? GET_OBJ_SHORT(GET_EQ(ch, WEAR_WIELD)) : "empty",
+                   GET_EQ(ch, WEAR_HOLD) ? GET_OBJ_SHORT(GET_EQ(ch, WEAR_HOLD)) : "empty");
     else if (OBJ_FLAGGED(candidate, ITEM_OFFHAND))
       send_to_char(ch, "  Hand use: offhand-capable; comparison shown against primary by default.\r\n");
   } else if (GET_OBJ_TYPE(candidate) == ITEM_WAND) {
@@ -3101,6 +3106,31 @@ ACMD(do_compare)
                  apply_types[candidate->affected[i].location],
                  candidate->affected[i].modifier, oldmod,
                  candidate->affected[i].modifier - oldmod);
+  }
+  if (equipped) {
+    for (i = 0; i < MAX_OBJ_AFFECT; i++) {
+      int j;
+      bool retained = FALSE;
+      if (!equipped->affected[i].location || !equipped->affected[i].modifier)
+        continue;
+      for (j = 0; j < MAX_OBJ_AFFECT; j++)
+        if (candidate->affected[j].location == equipped->affected[i].location)
+          retained = TRUE;
+      if (!retained)
+        send_to_char(ch, "  Lost %s: %+d\r\n",
+                     apply_types[equipped->affected[i].location],
+                     equipped->affected[i].modifier);
+    }
+  }
+  {
+    char candidate_flags[MAX_STRING_LENGTH], equipped_flags[MAX_STRING_LENGTH];
+    sprintbitarray(GET_OBJ_AFFECT(candidate), affected_bits, AF_ARRAY_MAX, candidate_flags);
+    if (equipped)
+      sprintbitarray(GET_OBJ_AFFECT(equipped), affected_bits, AF_ARRAY_MAX, equipped_flags);
+    else
+      strlcpy(equipped_flags, "NOBITS", sizeof(equipped_flags));
+    send_to_char(ch, "  Affect flags: %s (equipped: %s)\r\n",
+                 candidate_flags, equipped_flags);
   }
   send_to_char(ch, "This is a factual comparison, not an overall item score.\r\n");
 }
