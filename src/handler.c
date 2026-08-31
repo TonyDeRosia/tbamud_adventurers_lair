@@ -493,6 +493,9 @@ void char_to_room(struct char_data *ch, room_rnum room)
     world[room].people = ch;
     IN_ROOM(ch) = room;
 
+    if (IS_NPC(ch))
+      apply_mob_loadout_after_placement(ch);
+
     autoquest_trigger_check(ch, 0, 0, AQ_ROOM_FIND);
     autoquest_trigger_check(ch, 0, 0, AQ_MOB_FIND);
 

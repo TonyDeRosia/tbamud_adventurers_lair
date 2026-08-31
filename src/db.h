@@ -291,6 +291,7 @@ int    save_char(struct char_data *ch);
 void   init_char(struct char_data *ch);
 struct char_data* create_char(void);
 struct char_data *read_mobile(mob_vnum nr, int type);
+void apply_mob_loadout_after_placement(struct char_data *mob);
 int    vnum_mobile(char *searchname, struct char_data *ch);
 void   clear_char(struct char_data *ch);
 void   reset_char(struct char_data *ch);

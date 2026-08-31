@@ -2676,6 +2676,23 @@ static void apply_mob_loadout(struct char_data *mob)
   }
 }
 
+/* Apply prototype-defined MEDIT equipment/inventory only after the live mob
+ * has a real room.  The counts are cleared on the live copy afterward so
+ * later movement through char_to_room() cannot duplicate the loadout. */
+void apply_mob_loadout_after_placement(struct char_data *mob)
+{
+  if (!mob || !IS_NPC(mob) || IN_ROOM(mob) == NOWHERE)
+    return;
+
+  if (mob->mob_specials.equip_loadout_count <= 0 &&
+      mob->mob_specials.inventory_loadout_count <= 0)
+    return;
+
+  apply_mob_loadout(mob);
+  mob->mob_specials.equip_loadout_count = 0;
+  mob->mob_specials.inventory_loadout_count = 0;
+}
+
 
 /* create a new mobile from a prototype */
 struct char_data *read_mobile(mob_vnum nr, int type) /* and mob_rnum */
@@ -2724,7 +2741,6 @@ struct char_data *read_mobile(mob_vnum nr, int type) /* and mob_rnum */
 
   copy_proto_script(&mob_proto[i], mob, MOB_TRIGGER);
   assign_triggers(mob, MOB_TRIGGER);
-  apply_mob_loadout(mob);
 
   return (mob);
 }
