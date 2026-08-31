@@ -87,6 +87,7 @@ ACMD(do_areas);
 ACMD(do_zonemap);
 ACMD(do_affects);
 ACMD(do_consider);
+ACMD(do_compare);
 ACMD(do_cooldown);
 ACMD(do_diagnose);
 ACMD(do_equipment);
@@ -255,6 +256,7 @@ ACMD(do_quit);
 #define SCMD_QUIT 1
 /* do_use */
 ACMD(do_use);
+ACMD(do_zap);
 #define SCMD_USE  0
 #define SCMD_QUAFF  1
 #define SCMD_RECITE 2
@@ -352,6 +354,7 @@ ACMD(do_goto);
 ACMD(do_invis);
 ACMD(do_links);
 ACMD(do_load);
+ACMD(do_cleanse_admin);
 ACMD(do_mload_admin);
 ACMD(do_mob);
 ACMD(do_mreset);

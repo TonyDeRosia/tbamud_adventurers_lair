@@ -1843,8 +1843,10 @@ ACMD(do_wield)
   else if (!(obj = get_obj_in_list_vis(ch, arg, NULL, ch->carrying)))
     send_to_char(ch, "You don't seem to have %s %s.\r\n", AN(arg), arg);
   else {
-    if (GET_OBJ_TYPE(obj) != ITEM_WEAPON)
-      send_to_char(ch, "You can only wield weapons.\r\n");
+    if (GET_OBJ_TYPE(obj) == ITEM_WAND)
+      perform_wear(ch, obj, WEAR_WIELD);
+    else if (GET_OBJ_TYPE(obj) != ITEM_WEAPON)
+      send_to_char(ch, "You can only wield weapons or wands.\r\n");
     else
       perform_weapon_swap(ch, obj, WEAR_WIELD);
   }

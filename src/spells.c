@@ -248,36 +248,14 @@ static int remove_flagged_affects(struct char_data *victim, int aff_flag)
   return removed;
 }
 
-/* Immortal cleanse removes temporary hostile effects, but deliberately leaves
- * permanent/baseline effects (including equipment affects) and timed buffs
- * alone.  A violent source catches stat-only debuffs, while the flag checks
- * cover harmful effects whose spell metadata is not marked violent. */
-static int immortal_cleanse_is_timed_debuff(const struct affected_type *af)
+/* Immortal cleanse removes every timed dynamic affect while leaving permanent
+ * prototype, equipment, racial, and intrinsic sources intact. */
+static int immortal_cleanse_is_timed_affect(const struct affected_type *af)
 {
-  static const int harmful_flags[] = {
-    AFF_BLIND, AFF_CURSE, AFF_POISON, AFF_SLEEP, AFF_NOTRACK, AFF_CHARM,
-    AFF_WEBBED, AFF_SILENCED, AFF_MARKED, AFF_ARCANE_LEAK, AFF_TIME_SNARE,
-    AFF_SPELLLOCK, AFF_CORRODED, AFF_FEARFUL, AFF_STATIC, AFF_BURNING,
-    AFF_FROZEN, AFF_ROOTED, AFF_STUNNED, AFF_BLINDED_MAGICAL, AFF_HEXED
-  };
-  size_t i;
-
-  if (!af || af->duration < 0)
-    return FALSE;
-
-  if (af->spell > 0 && af->spell <= TOP_SPELL_DEFINE &&
-      spell_info[af->spell].violent)
-    return TRUE;
-
-  for (i = 0; i < sizeof(harmful_flags) / sizeof(harmful_flags[0]); i++) {
-    if (IS_SET_AR(af->bitvector, harmful_flags[i]))
-      return TRUE;
-  }
-
-  return FALSE;
+  return af && af->duration >= 0;
 }
 
-static int immortal_cleanse_timed_debuffs(struct char_data *victim)
+int immortal_cleanse_timed_affects(struct char_data *victim)
 {
   struct affected_type *af, *next;
   int removed = 0;
@@ -287,12 +265,17 @@ static int immortal_cleanse_timed_debuffs(struct char_data *victim)
 
   for (af = victim->affected; af; af = next) {
     next = af->next;
-    if (immortal_cleanse_is_timed_debuff(af)) {
+    if (immortal_cleanse_is_timed_affect(af)) {
       affect_remove(victim, af);
       removed++;
     }
   }
 
+  affect_total(victim);
+  GET_HIT(victim) = MIN(GET_HIT(victim), GET_MAX_HIT(victim));
+  GET_MANA(victim) = MIN(GET_MANA(victim), GET_MAX_MANA(victim));
+  GET_MOVE(victim) = MIN(GET_MOVE(victim), GET_MAX_MOVE(victim));
+  update_pos(victim);
   return removed;
 }
 
@@ -1619,7 +1602,7 @@ ASPELL(spell_summon)
     }
   }
 
-  if (MOB_FLAGGED(victim, MOB_NOSUMMON) ||
+  if ((MOB_FLAGGED(victim, MOB_NOSUMMON) && !CAN_BYPASS_ENVIRONMENT(ch)) ||
       (IS_NPC(victim) && mag_savingthrow(victim, SAVING_SPELL, 0))) {
     send_to_char(ch, "%s", SUMMON_FAIL);
     return;
@@ -2032,7 +2015,7 @@ ASPELL(spell_cleanse)
     return;
 
   if (GET_LEVEL(ch) >= LVL_IMMORT) {
-    removed = immortal_cleanse_timed_debuffs(victim);
+    removed = immortal_cleanse_timed_affects(victim);
     if (removed > 0) {
       act("Immortal radiance scours every temporary affliction from $N!", FALSE,
           ch, 0, victim, TO_CHAR);
@@ -2382,7 +2365,8 @@ ASPELL(spell_portal)
     return;
   target_room = IN_ROOM(victim);
   if (target_room == NOWHERE || ROOM_FLAGGED(target_room, ROOM_PRIVATE) ||
-      ROOM_FLAGGED(target_room, ROOM_DEATH) || ROOM_FLAGGED(target_room, ROOM_NOMAGIC)) {
+      ROOM_FLAGGED(target_room, ROOM_DEATH) ||
+      (ROOM_FLAGGED(target_room, ROOM_NOMAGIC) && !CAN_BYPASS_ENVIRONMENT(ch))) {
     send_to_char(ch, "Your portal cannot anchor there.\r\n");
     return;
   }

@@ -7735,6 +7735,29 @@ Example: @RTSTAT 3008, 12000, 6100, 6300, 41004@n
  
 See also: TRIGEDIT-MOB-DEATH, ROOMFLAGS, GROUP, SCORE
 #31
+DELDIR DIRDEL
+
+DELDIR
+Syntax:
+  deldir <direction>
+  dirdel <direction>
+
+Builder command that disconnects the current room in the selected direction.
+If the destination room has the matching opposite exit back to the current
+room, that return exit is removed as well.
+
+Directions may be abbreviated.  For example:
+
+  deldir down
+  deldir d
+
+DELDIR never removes an unrelated reverse exit.  If the matching return exit
+is in another zone, you must have permission to edit that zone or nothing is
+changed.  Both affected zones are marked for saving.
+
+See also: DIG REDIT
+#0
+
 DUAL-WIELD
 
 Dual Wield
@@ -22100,6 +22123,46 @@ See also:
 Minimum level:
   LVL_BUILDER
 #0
+
+OLOAD MLOAD
+
+Usage:
+  oload <object vnum> [count]
+  mload <mobile vnum> [count]
+
+Immortal aliases for LOAD OBJ and LOAD MOB. Counts default to one and are
+limited by the same validation, zone permissions, creation path, triggers,
+messages, and logging as LOAD.
+#101
+
+ZAP
+
+Usage:
+  zap [target]
+
+Activates an equipped wand. A held wand has priority over a wielded wand.
+The wand's spell determines whether a character, object, or no target is
+valid. Successful activation uses the normal wand spell and charge rules.
+#1
+
+COMPARE
+
+Usage:
+  compare <carried item>
+
+Shows factual differences between an item and equipment in its logical slot,
+including armor, weapon dice, modifiers, requirements, hand conflicts, or
+wand configuration where applicable. It does not assign an overall score.
+#1
+
+RRESET LIST
+
+Usage:
+  rreset list [zone number]
+
+Lists room reset chains without executing, changing, or saving resets.
+Builders may inspect only zones they have permission to edit.
+#101
 
 $
 #0

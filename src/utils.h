@@ -782,9 +782,13 @@ do                                                              \
 #define CAN_CARRY_N(ch) (5 + (GET_DEX(ch) >> 1) + (GET_LEVEL(ch) >> 1))
 /** Return whether or not ch is awake. */
 #define AWAKE(ch) (GET_POS(ch) > POS_SLEEPING)
+/** Level 101+ administrators may bypass environmental gameplay restrictions. */
+#define CAN_BYPASS_ENVIRONMENT(ch) \
+  ((ch) && !IS_NPC(ch) && GET_LEVEL(ch) >= LVL_IMMORT)
 /** Defines if ch can see in general in the dark. */
 #define CAN_SEE_IN_DARK(ch) \
-   (AFF_FLAGGED(ch, AFF_INFRAVISION) || (!IS_NPC(ch) && PRF_FLAGGED(ch, PRF_HOLYLIGHT)))
+   (AFF_FLAGGED(ch, AFF_INFRAVISION) || CAN_BYPASS_ENVIRONMENT(ch) || \
+    (!IS_NPC(ch) && PRF_FLAGGED(ch, PRF_HOLYLIGHT)))
 
 /** Defines if ch is good. */
 #define IS_GOOD(ch)    (GET_ALIGNMENT(ch) >= 350)
@@ -896,9 +900,9 @@ do                                                              \
 /* Various macros building up to CAN_SEE */
 
 /** Defines if there is enough light for sub to see in. */
-#define LIGHT_OK(sub)	(!AFF_FLAGGED(sub, AFF_BLIND) && \
+#define LIGHT_OK(sub)	(CAN_BYPASS_ENVIRONMENT(sub) || (!AFF_FLAGGED(sub, AFF_BLIND) && \
    (IS_LIGHT(IN_ROOM(sub)) || AFF_FLAGGED((sub), AFF_INFRAVISION) || \
-   GET_LEVEL(sub) >= LVL_IMMORT))
+   GET_LEVEL(sub) >= LVL_IMMORT)))
 
 /** Defines if sub character can see the invisible obj character. */
 #define INVIS_OK(sub, obj) \
@@ -912,7 +916,8 @@ do                                                              \
 /** Defines if sub character can see obj character, assuming immortal
  * and mortal settings. */
 #define IMM_CAN_SEE(sub, obj) \
-   (MORT_CAN_SEE(sub, obj) || (!IS_NPC(sub) && PRF_FLAGGED(sub, PRF_HOLYLIGHT)))
+   (MORT_CAN_SEE(sub, obj) || CAN_BYPASS_ENVIRONMENT(sub) || \
+    (!IS_NPC(sub) && PRF_FLAGGED(sub, PRF_HOLYLIGHT)))
 
 /** Is obj character the same as sub character? */
 #define SELF(sub, obj)  ((sub) == (obj))
@@ -938,7 +943,8 @@ do                                                              \
 
 /** Can sub character see the obj, using mortal and immortal checks? */
 #define CAN_SEE_OBJ(sub, obj) \
-   (MORT_CAN_SEE_OBJ(sub, obj) || (!IS_NPC(sub) && PRF_FLAGGED((sub), PRF_HOLYLIGHT)))
+   (MORT_CAN_SEE_OBJ(sub, obj) || CAN_BYPASS_ENVIRONMENT(sub) || \
+    (!IS_NPC(sub) && PRF_FLAGGED((sub), PRF_HOLYLIGHT)))
 
 /** Can ch carry obj? */
 #define CAN_CARRY_OBJ(ch,obj)  \

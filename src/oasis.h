@@ -500,6 +500,7 @@ void msgedit_parse(struct descriptor_data *d, char *arg);
 /* public functions from oasis_copy.c */
 int buildwalk(struct char_data *ch, int dir);
 ACMD(do_dig);
+ACMD(do_deldir);
 ACMD(do_oasis_copy);
 
 /* public functions from oasis_delete.c */

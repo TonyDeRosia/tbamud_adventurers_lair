@@ -149,6 +149,20 @@ ACMD(do_oasis_copy)
 }
 
 /* Commands */
+static void free_room_exit(room_rnum room, int dir)
+{
+  struct room_direction_data *exit;
+
+  if (room == NOWHERE || dir < 0 || dir >= NUM_OF_DIRS ||
+      (exit = W_EXIT(room, dir)) == NULL)
+    return;
+
+  free(exit->general_description);
+  free(exit->keyword);
+  free(exit);
+  W_EXIT(room, dir) = NULL;
+}
+
 ACMD(do_dig)
 {
   char sdir[MAX_INPUT_LENGTH], sroom[MAX_INPUT_LENGTH], *new_room_name;
@@ -196,13 +210,7 @@ ACMD(do_dig)
   /* Target room == -1 removes the exit. */
   if (rvnum == NOTHING) {
     if (W_EXIT(IN_ROOM(ch), dir)) {
-      /* free the old pointers, if any */
-      if (W_EXIT(IN_ROOM(ch), dir)->general_description)
-        free(W_EXIT(IN_ROOM(ch), dir)->general_description);
-      if (W_EXIT(IN_ROOM(ch), dir)->keyword)
-        free(W_EXIT(IN_ROOM(ch), dir)->keyword);
-      free(W_EXIT(IN_ROOM(ch), dir));
-      W_EXIT(IN_ROOM(ch), dir) = NULL;
+      free_room_exit(IN_ROOM(ch), dir);
       add_to_save_list(zone_table[world[IN_ROOM(ch)].zone].number, SL_WLD);
       send_to_char(ch, "You remove the exit to the %s.\r\n", dirs[dir]);
       return;
@@ -285,6 +293,97 @@ ACMD(do_dig)
     W_EXIT(rrnum, rev_dir[dir])->to_room = IN_ROOM(ch);
     add_to_save_list(zone_table[world[rrnum].zone].number, SL_WLD);
   }
+}
+
+ACMD(do_deldir)
+{
+  char sdir[MAX_INPUT_LENGTH];
+  struct room_direction_data *source_exit, *reverse_exit = NULL;
+  room_rnum source_room, target_room;
+  zone_rnum source_zone, target_zone = NOWHERE;
+  int dir, reverse_removed = FALSE;
+
+  one_argument(argument, sdir);
+  if (!*sdir) {
+    send_to_char(ch,
+      "Usage: deldir <direction>\r\n"
+      "       dirdel <direction>\r\n"
+      "Removes the exit in that direction and its matching return exit.\r\n"
+      "Directions: north, east, south, west, up, down, northwest, northeast, southeast, southwest.\r\n"
+      "Direction abbreviations such as 'deldir d' are accepted.\r\n");
+    return;
+  }
+
+  dir = search_block(sdir, dirs, FALSE);
+  if (dir < 0 || dir >= NUM_OF_DIRS) {
+    send_to_char(ch, "'%s' is not a valid direction. Type DELDIR with no argument for help.\r\n",
+                 sdir);
+    return;
+  }
+
+  source_room = IN_ROOM(ch);
+  if (source_room == NOWHERE) {
+    send_to_char(ch, "You are not in a valid room.\r\n");
+    return;
+  }
+
+  source_zone = world[source_room].zone;
+  if (source_zone == NOWHERE || !can_edit_zone(ch, source_zone)) {
+    send_to_char(ch, "You do not have permission to edit this zone.\r\n");
+    return;
+  }
+
+  source_exit = W_EXIT(source_room, dir);
+  if (!source_exit) {
+    send_to_char(ch, "There is no exit %s from room %d. Nothing was changed.\r\n",
+                 dirs[dir], GET_ROOM_VNUM(source_room));
+    return;
+  }
+
+  target_room = source_exit->to_room;
+  if (target_room < 0 || target_room > top_of_world)
+    target_room = NOWHERE;
+  if (target_room != NOWHERE) {
+    target_zone = world[target_room].zone;
+    reverse_exit = W_EXIT(target_room, rev_dir[dir]);
+
+    if (reverse_exit && reverse_exit->to_room == source_room &&
+        (target_zone == NOWHERE || !can_edit_zone(ch, target_zone))) {
+      send_to_char(ch,
+        "The matching %s exit is in room %d, which you do not have permission to edit. Nothing was changed.\r\n",
+        dirs[rev_dir[dir]], GET_ROOM_VNUM(target_room));
+      return;
+    }
+  }
+
+  free_room_exit(source_room, dir);
+  add_to_save_list(zone_table[source_zone].number, SL_WLD);
+
+  if (target_room != NOWHERE && reverse_exit && reverse_exit->to_room == source_room) {
+    free_room_exit(target_room, rev_dir[dir]);
+    add_to_save_list(zone_table[target_zone].number, SL_WLD);
+    reverse_removed = TRUE;
+  }
+
+  if (target_room == NOWHERE) {
+    send_to_char(ch,
+      "Removed the dangling %s exit from room %d; it had no destination room.\r\n",
+      dirs[dir], GET_ROOM_VNUM(source_room));
+  } else if (reverse_removed) {
+    send_to_char(ch,
+      "Disconnected room %d %s from room %d and removed the matching %s exit.\r\n",
+      GET_ROOM_VNUM(source_room), dirs[dir], GET_ROOM_VNUM(target_room),
+      dirs[rev_dir[dir]]);
+  } else {
+    send_to_char(ch,
+      "Removed the %s exit from room %d to room %d. No matching return exit pointed back, so no other exit was removed.\r\n",
+      dirs[dir], GET_ROOM_VNUM(source_room), GET_ROOM_VNUM(target_room));
+  }
+
+  mudlog(BRF, LVL_IMMORT, TRUE,
+    "%s used DELDIR in room %d: removed %s exit%s.",
+    GET_NAME(ch), GET_ROOM_VNUM(source_room), dirs[dir],
+    reverse_removed ? " and matching return exit" : "");
 }
 
 /* BuildWalk - OasisOLC Extension by D. Tyler Barnes. */

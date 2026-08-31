@@ -1576,7 +1576,15 @@ ACMD(do_load)
   char buf[MAX_INPUT_LENGTH], buf2[MAX_INPUT_LENGTH], buf3[MAX_INPUT_LENGTH];
   int i=0, n=1;
 
-  one_argument(two_arguments(argument, buf, buf2), buf3);
+  if (subcmd == 1) {
+    strlcpy(buf, "obj", sizeof(buf));
+    one_argument(two_arguments(argument, buf2, buf3), argument);
+  } else if (subcmd == 2) {
+    strlcpy(buf, "mob", sizeof(buf));
+    one_argument(two_arguments(argument, buf2, buf3), argument);
+  } else {
+    one_argument(two_arguments(argument, buf, buf2), buf3);
+  }
 
   if (!*buf || !*buf2 || !isdigit(*buf2)) {
     send_to_char(ch, "Usage: load < obj | mob > <vnum> <number>\r\n");
@@ -1641,6 +1649,31 @@ ACMD(do_load)
     }
   } else
     send_to_char(ch, "That'll have to be either 'obj' or 'mob'.\r\n");
+}
+
+ACMD(do_cleanse_admin)
+{
+  struct char_data *vict = ch;
+  char arg[MAX_INPUT_LENGTH];
+  int number = 1, removed;
+
+  one_argument(argument, arg);
+  if (*arg && (vict = get_char_vis(ch, arg, &number, FIND_CHAR_ROOM)) == NULL) {
+    send_to_char(ch, "You do not see that person here. Usage: cleanse [target]\r\n");
+    return;
+  }
+  if (!IS_NPC(vict) && vict != ch && GET_LEVEL(vict) >= GET_LEVEL(ch)) {
+    send_to_char(ch, "You may not cleanse an immortal of equal or higher level.\r\n");
+    return;
+  }
+  removed = immortal_cleanse_timed_affects(vict);
+  send_to_char(ch, "Removed %d temporary affect%s from %s.\r\n",
+               removed, removed == 1 ? "" : "s", vict == ch ? "yourself" : GET_NAME(vict));
+  if (vict != ch)
+    send_to_char(vict, "%s cleanses your temporary affects.\r\n", GET_NAME(ch));
+  mudlog(BRF, MAX(LVL_IMMORT, GET_INVIS_LEV(ch)), TRUE,
+         "(GC) %s cleansed %s (%d temporary affects).",
+         GET_NAME(ch), GET_NAME(vict), removed);
 }
 
 static int room_reset_cmd_room(const struct reset_com *cmd)
@@ -2145,6 +2178,41 @@ ACMD(do_rreset)
 
   half_chop(argument, subcmd_arg, argument);
 
+  if (!str_cmp(subcmd_arg, "list")) {
+    char zone_arg[MAX_INPUT_LENGTH];
+    zone_rnum zone_num;
+    room_rnum room_num;
+    bool found = FALSE;
+
+    one_argument(argument, zone_arg);
+    if (!*zone_arg)
+      zone_num = world[IN_ROOM(ch)].zone;
+    else if (!is_number(zone_arg) || (zone_num = real_zone(atoi(zone_arg))) == NOWHERE) {
+      send_to_char(ch, "Usage: rreset list [zone number]\r\n");
+      return;
+    }
+    if (!can_edit_zone(ch, zone_num)) {
+      send_to_char(ch, "You don't have permission to view that zone's resets.\r\n");
+      return;
+    }
+    for (room_num = 0; room_num <= top_of_world; room_num++) {
+      int i, total;
+      if (world[room_num].zone != zone_num)
+        continue;
+      total = count_commands(zone_table[zone_num].cmd);
+      for (i = 0; i < total; i++) {
+        if (room_reset_cmd_room(&zone_table[zone_num].cmd[i]) == room_num) {
+          show_room_resets(ch, room_num);
+          found = TRUE;
+          break;
+        }
+      }
+    }
+    if (!found)
+      send_to_char(ch, "No room resets found in zone %d.\r\n", zone_table[zone_num].number);
+    return;
+  }
+
   if (is_abbrev(subcmd_arg, "del")) {
     half_chop(argument, type_arg, argument);
     half_chop(argument, thing_arg, room_arg);
@@ -2168,7 +2236,8 @@ ACMD(do_rreset)
   half_chop(argument, room_arg, count_arg);
 
   if (!*type_arg || !*thing_arg || !*room_arg || !*count_arg || !is_number(thing_arg)) {
-    send_to_char(ch, "Usage: rreset <mob|obj> <vnum> <room vnum|here> <count>\r\n");
+    send_to_char(ch, "Usage: rreset list [zone number]\r\n");
+    send_to_char(ch, "       rreset <mob|obj> <vnum> <room vnum|here> <count>\r\n");
     send_to_char(ch, "       rreset del <mob|obj> <vnum> [room vnum|here]\r\n");
     return;
   }
@@ -3953,16 +4022,19 @@ static int perform_set(struct char_data *ch, struct char_data *vict, int mode, c
       affect_total(vict);
       break;
     case 28: /* maxhit */
-      vict->points.max_hit = RANGE(1, 5000);
+      vict->points.max_hit = RANGE(1, 999999);
       affect_total(vict);
+      GET_HIT(vict) = MIN(GET_HIT(vict), GET_MAX_HIT(vict));
       break;
     case 29: /* maxmana */
-      vict->points.max_mana = RANGE(1, 5000);
+      vict->points.max_mana = RANGE(1, 999999);
       affect_total(vict);
+      GET_MANA(vict) = MIN(GET_MANA(vict), GET_MAX_MANA(vict));
       break;
     case 30: /* maxmove */
-      vict->points.max_move = RANGE(1, 5000);
+      vict->points.max_move = RANGE(1, 999999);
       affect_total(vict);
+      GET_MOVE(vict) = MIN(GET_MOVE(vict), GET_MAX_MOVE(vict));
       break;
     case 31: /* move */
       vict->points.move = RANGE(0, vict->points.max_move);
@@ -4187,16 +4259,58 @@ static void show_set_help(struct char_data *ch)
   page_string(ch->desc, buf, TRUE);
 }
 
+static const char *canonical_set_field(const char *field)
+{
+  static const struct { const char *alias, *field; } aliases[] = {
+    { "armor", "ac" }, { "strength", "str" }, { "dexterity", "dex" },
+    { "constitution", "con" }, { "intelligence", "int" },
+    { "wisdom", "wis" }, { "charisma", "cha" },
+    { "xp", "exp" }, { "experience", "exp" },
+    { "mp", "mana" }, { "maxmp", "maxmana" },
+    { "mv", "move" }, { "moves", "move" }, { "maxmv", "maxmove" },
+    { "maxhealth", "maxhit" }, { "maxhp", "maxhit" },
+    { "qp", "questpoints" }, { "money", "gold" },
+    { NULL, NULL }
+  };
+  int i;
+
+  for (i = 0; aliases[i].alias; i++)
+    if (!str_cmp(field, aliases[i].alias))
+      return aliases[i].field;
+  return field;
+}
+
+static bool is_set_field_name(const char *field)
+{
+  const char *canonical = canonical_set_field(field);
+  int i;
+
+  if (!str_cmp(field, "health") || !str_cmp(field, "hp"))
+    return TRUE;
+  for (i = 0; *(set_fields[i].cmd) != '\n'; i++)
+    if (!str_cmp(canonical, set_fields[i].cmd))
+      return TRUE;
+  return FALSE;
+}
+
 ACMD(do_set)
 {
   struct char_data *vict = NULL, *cbuf = NULL;
   char field[MAX_INPUT_LENGTH], name[MAX_INPUT_LENGTH], buf[MAX_INPUT_LENGTH];
   int mode, len, player_i = 0, retval = 0;
-  char is_file = 0, is_player = 0;
+  char is_file = 0, is_player = 0, field_first = 0;
 
   half_chop(argument, name, buf);
 
-  if (!strcmp(name, "file")) {
+  /* Exact field names take precedence in field-first form. This avoids
+   * ambiguous abbreviation/name collisions while preserving target-first. */
+  if (is_set_field_name(name)) {
+    strlcpy(field, name, sizeof(field));
+    half_chop(buf, name, buf);
+    field_first = 1;
+  }
+
+  if (!field_first && !strcmp(name, "file")) {
     is_file = 1;
     half_chop(buf, name, buf);
   } else if (!str_cmp(name, "help")) {
@@ -4208,13 +4322,17 @@ ACMD(do_set)
   } else if (!str_cmp(name, "mob"))
     half_chop(buf, name, buf);
 
-  half_chop(buf, field, buf);
+  if (!field_first)
+    half_chop(buf, field, buf);
 
-  if (!*name || !*field) {
+  if (!*name || !*field || !*buf) {
     send_to_char(ch, "Usage: set <victim> <field> <value>\r\n");
+    send_to_char(ch, "       set <field> <victim> <value>\r\n");
     send_to_char(ch, "       %sset help%s will display valid fields\r\n", CCYEL(ch, C_NRM), CCNRM(ch, C_NRM));
     return;
   }
+
+  strlcpy(field, canonical_set_field(field), sizeof(field));
 
   /* find the target */
   if (!is_file) {
@@ -4247,6 +4365,28 @@ ACMD(do_set)
       send_to_char(ch, "There is no such player.\r\n");
       return;
     }
+  }
+
+  if (!str_cmp(field, "health") || !str_cmp(field, "hp")) {
+    char *end = NULL;
+    long value_long;
+    errno = 0;
+    value_long = strtol(buf, &end, 10);
+    while (end && *end && isspace((unsigned char)*end))
+      end++;
+    if (errno == ERANGE || end == buf || (end && *end) ||
+        value_long < 1 || value_long > 999999) {
+      send_to_char(ch, "Health must be a whole number from 1 to 999999.\r\n");
+      goto do_set_save_and_cleanup;
+    }
+    vict->points.max_hit = (int)value_long;
+    vict->points.hit = (int)value_long;
+    affect_total(vict);
+    vict->points.hit = MIN((int)value_long, GET_MAX_HIT(vict));
+    send_to_char(ch, "%s's health set to %d/%d.\r\n",
+                 GET_NAME(vict), GET_HIT(vict), GET_MAX_HIT(vict));
+    retval = 1;
+    goto do_set_save_and_cleanup;
   }
 
     if (!strcmp(field, "diamond") || !strcmp(field, "diamonds")) {
@@ -4375,6 +4515,17 @@ ACMD(do_set)
     retval = 0; /* skips saving below */
     send_to_char(ch, "Can't set that!\r\n");
   } else {
+    if (set_fields[mode].type == NUMBER) {
+      char *end = NULL;
+      errno = 0;
+      (void)strtol(buf, &end, 10);
+      while (end && *end && isspace((unsigned char)*end))
+        end++;
+      if (errno == ERANGE || end == buf || (end && *end)) {
+        send_to_char(ch, "Value must be a valid whole number.\r\n");
+        goto do_set_save_and_cleanup;
+      }
+    }
     /* perform the set */
     retval = perform_set(ch, vict, mode, buf);
   }

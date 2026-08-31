@@ -2582,6 +2582,24 @@ ACMD(do_use)
   mag_objectmagic(ch, mag_item, buf);
 }
 
+ACMD(do_zap)
+{
+  struct obj_data *wand = GET_EQ(ch, WEAR_HOLD);
+
+  if (!wand || GET_OBJ_TYPE(wand) != ITEM_WAND)
+    wand = GET_EQ(ch, WEAR_WIELD);
+  if (!wand || GET_OBJ_TYPE(wand) != ITEM_WAND) {
+    send_to_char(ch, "You must hold or wield a wand to zap it.\r\n");
+    return;
+  }
+  if (GET_OBJ_VAL(wand, 3) < 1 || GET_OBJ_VAL(wand, 3) > TOP_SPELL_DEFINE ||
+      !spell_info[GET_OBJ_VAL(wand, 3)].name) {
+    send_to_char(ch, "That wand is malformed and cannot be activated.\r\n");
+    return;
+  }
+  mag_objectmagic(ch, wand, argument);
+}
+
 #define TOG_OFF 0
 #define TOG_ON  1
 ACMD(do_gen_tog)

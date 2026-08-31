@@ -3036,6 +3036,75 @@ ACMD(do_inventory)
   list_obj_to_char(ch->carrying, ch, SHOW_OBJ_SHORT, TRUE);
 }
 
+ACMD(do_compare)
+{
+  char arg[MAX_INPUT_LENGTH];
+  struct obj_data *candidate, *equipped = NULL;
+  int slot, i;
+
+  one_argument(argument, arg);
+  if (!*arg) {
+    send_to_char(ch, "Compare which carried item?\r\n");
+    return;
+  }
+  if (!(candidate = get_obj_in_list_vis(ch, arg, NULL, ch->carrying))) {
+    send_to_char(ch, "You do not have that item.\r\n");
+    return;
+  }
+
+  slot = find_eq_pos(ch, candidate, NULL);
+  if (GET_OBJ_TYPE(candidate) == ITEM_WEAPON || GET_OBJ_TYPE(candidate) == ITEM_WAND)
+    slot = WEAR_WIELD;
+  if (slot < 0 || slot >= NUM_WEARS) {
+    send_to_char(ch, "%s has no logical equipment slot to compare.\r\n",
+                 CAP(GET_OBJ_SHORT(candidate)));
+    return;
+  }
+  equipped = GET_EQ(ch, slot);
+  send_to_char(ch, "Comparing %s against %s in %s:\r\n",
+               GET_OBJ_SHORT(candidate),
+               equipped ? GET_OBJ_SHORT(equipped) : "nothing",
+               equipment_types[slot]);
+  send_to_char(ch, "  Level: %d%s\r\n", GET_OBJ_LEVEL(candidate),
+               GET_LEVEL(ch) < GET_OBJ_LEVEL(candidate) ? " (too high)" : "");
+  send_to_char(ch, "  Weight: %d%s\r\n", GET_OBJ_WEIGHT(candidate),
+               equipped ? "" : " (no equipped comparison)");
+
+  if (GET_OBJ_TYPE(candidate) == ITEM_WEAPON) {
+    int old_num = equipped && GET_OBJ_TYPE(equipped) == ITEM_WEAPON ? GET_OBJ_VAL(equipped, 1) : 0;
+    int old_size = equipped && GET_OBJ_TYPE(equipped) == ITEM_WEAPON ? GET_OBJ_VAL(equipped, 2) : 0;
+    send_to_char(ch, "  Damage: %dd%d (equipped: %dd%d)\r\n",
+                 GET_OBJ_VAL(candidate, 1), GET_OBJ_VAL(candidate, 2), old_num, old_size);
+    if (OBJ_FLAGGED(candidate, ITEM_TWO_HANDER))
+      send_to_char(ch, "  Conflict: two-handed; replaces or blocks both hand slots.\r\n");
+    else if (OBJ_FLAGGED(candidate, ITEM_OFFHAND))
+      send_to_char(ch, "  Hand use: offhand-capable; comparison shown against primary by default.\r\n");
+  } else if (GET_OBJ_TYPE(candidate) == ITEM_WAND) {
+    send_to_char(ch, "  Wand: %s, spell level %d, charges %d/%d.\r\n",
+                 (GET_OBJ_VAL(candidate, 3) > 0 && GET_OBJ_VAL(candidate, 3) <= TOP_SPELL_DEFINE) ?
+                   skill_name(GET_OBJ_VAL(candidate, 3)) : "<invalid spell>",
+                 GET_OBJ_VAL(candidate, 0), GET_OBJ_VAL(candidate, 2), GET_OBJ_VAL(candidate, 1));
+  } else if (GET_OBJ_TYPE(candidate) == ITEM_ARMOR) {
+    int old_ac = equipped && GET_OBJ_TYPE(equipped) == ITEM_ARMOR ? GET_OBJ_VAL(equipped, 0) : 0;
+    send_to_char(ch, "  Armor contribution: %d (equipped: %d, difference: %+d)\r\n",
+                 GET_OBJ_VAL(candidate, 0), old_ac, GET_OBJ_VAL(candidate, 0) - old_ac);
+  }
+  for (i = 0; i < MAX_OBJ_AFFECT; i++) {
+    int oldmod = 0, j;
+    if (!candidate->affected[i].location || !candidate->affected[i].modifier)
+      continue;
+    if (equipped)
+      for (j = 0; j < MAX_OBJ_AFFECT; j++)
+        if (equipped->affected[j].location == candidate->affected[i].location)
+          oldmod += equipped->affected[j].modifier;
+    send_to_char(ch, "  %s: %+d (equipped: %+d, difference: %+d)\r\n",
+                 apply_types[candidate->affected[i].location],
+                 candidate->affected[i].modifier, oldmod,
+                 candidate->affected[i].modifier - oldmod);
+  }
+  send_to_char(ch, "This is a factual comparison, not an overall item score.\r\n");
+}
+
 ACMD(do_equipment)
 {
   /* Custom EQ display: always show all slots in a fixed order. */

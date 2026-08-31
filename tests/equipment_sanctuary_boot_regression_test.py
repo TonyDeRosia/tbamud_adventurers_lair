@@ -68,13 +68,12 @@ def test_obsolete_mob_19500_boot_probe_is_absent():
     assert "AI test mob 19500" not in DB
 
 
-def test_immortal_cleanse_still_excludes_permanent_affects():
+def test_immortal_cleanse_removes_only_timed_dynamic_affects():
     spells = (ROOT / "src/spells.c").read_text()
     cleanse = function_body(
-        spells, "static int immortal_cleanse_is_timed_debuff", "static int remove_spell_affect_if_present"
+        spells, "static int immortal_cleanse_is_timed_affect", "static int remove_spell_affect_if_present"
     )
-    assert "af->duration < 0" in cleanse
-    assert "spell_info[af->spell].violent" in cleanse
+    assert "af && af->duration >= 0" in cleanse
 
 
 if __name__ == "__main__":

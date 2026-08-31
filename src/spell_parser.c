@@ -1677,19 +1677,21 @@ int call_magic(struct char_data *caster, struct char_data *cvict,
   if (!cast_mtrigger(caster, cvict, spellnum))
     return 0;
 
-  if (ROOM_FLAGGED(IN_ROOM(caster), ROOM_NOMAGIC) && spellnum != SPELL_IDENTIFY) {
+  if (ROOM_FLAGGED(IN_ROOM(caster), ROOM_NOMAGIC) && spellnum != SPELL_IDENTIFY &&
+      !CAN_BYPASS_ENVIRONMENT(caster)) {
     send_to_char(caster, "Your magic fizzles out and dies.\r\n");
     act("$n's magic fizzles out and dies.", FALSE, caster, 0, 0, TO_ROOM);
     return (0);
   }
   if (room_has_effect(&world[IN_ROOM(caster)], ROOM_EFFECT_NULL_FIELD) &&
-      spellnum != SPELL_NULL_FIELD) {
+      spellnum != SPELL_NULL_FIELD && !CAN_BYPASS_ENVIRONMENT(caster)) {
     send_to_char(caster, "The null field suppresses your spell completely!\r\n");
     act("$n's spell collapses against the null field.", FALSE, caster, 0, 0, TO_ROOM);
     return (0);
   }
   if (room_has_effect(&world[IN_ROOM(caster)], ROOM_EFFECT_SILENCE_FIELD) &&
-      spellnum != SPELL_SILENCE_FIELD && !affected_by_spell(caster, SPELL_SILENT_MAGIC)) {
+      spellnum != SPELL_SILENCE_FIELD && !affected_by_spell(caster, SPELL_SILENT_MAGIC) &&
+      !CAN_BYPASS_ENVIRONMENT(caster)) {
     send_to_char(caster, "The silence field swallows your incantation.\r\n");
     act("$n mouths arcane words, but the silence field devours them.", FALSE, caster, 0, 0, TO_ROOM);
     return (0);
@@ -1707,12 +1709,15 @@ int call_magic(struct char_data *caster, struct char_data *cvict,
       break;
   }
   if (is_displacement_spell &&
-      room_has_effect(&world[IN_ROOM(caster)], ROOM_EFFECT_DIMENSIONAL_LOCK)) {
+      room_has_effect(&world[IN_ROOM(caster)], ROOM_EFFECT_DIMENSIONAL_LOCK) &&
+      !CAN_BYPASS_ENVIRONMENT(caster)) {
     send_to_char(caster, "Dimensional lock prevents any displacement magic here.\r\n");
     act("$n's displacement magic collapses against the dimensional lock.", FALSE, caster, 0, 0, TO_ROOM);
     return (0);
   }
-  if (ROOM_FLAGGED(IN_ROOM(caster), ROOM_PEACEFUL) && (SINFO.violent || IS_SET(SINFO.routines, MAG_DAMAGE))) {
+  if (ROOM_FLAGGED(IN_ROOM(caster), ROOM_PEACEFUL) &&
+      (SINFO.violent || IS_SET(SINFO.routines, MAG_DAMAGE)) &&
+      !CAN_BYPASS_ENVIRONMENT(caster)) {
     send_to_char(caster, "A flash of white light fills the room, dispelling your violent magic!\r\n");
     act("White light from no particular source suddenly fills the room, then vanishes.", FALSE, caster, 0, 0, TO_ROOM);
     return (0);

@@ -2001,7 +2001,7 @@ void mag_rooms(int level, struct char_data *ch, int spellnum)
   
   rnum = IN_ROOM(ch);
   
-  if (ROOM_FLAGGED(rnum, ROOM_NOMAGIC))
+  if (ROOM_FLAGGED(rnum, ROOM_NOMAGIC) && !CAN_BYPASS_ENVIRONMENT(ch))
     failure = TRUE;
   
   switch (spellnum) {
