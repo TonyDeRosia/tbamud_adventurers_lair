@@ -812,11 +812,17 @@ static int Crash_offer_rent(struct char_data *ch, struct char_data *recep,
 static int gen_receptionist(struct char_data *ch, struct char_data *recep, int cmd,
     char *arg, int mode)
 {
-  const char *action_table[] = { "smile", "dance", "sigh", "blush", "burp",
-	  "cough", "fart", "twiddle", "yawn" };
+  /*
+   * Keep ordinary receptionists lightly animated, but do not make the
+   * cryogenicist/dreamwarden fire stock comedy socials such as burp, fart,
+   * dance, or cough.  Zone 30 uses the cryogenicist special for its
+   * high-fantasy Hall of Quiet Dreams.
+   */
+  const char *action_table[] = { "smile", "sigh" };
 
   if (!cmd && !rand_number(0, 5)) {
-    do_action(recep, NULL, find_command(action_table[rand_number(0, 8)]), 0);
+    if (mode == RENT_FACTOR)
+      do_action(recep, NULL, find_command(action_table[rand_number(0, 1)]), 0);
     return (FALSE);
   }
 
@@ -845,17 +851,21 @@ static int gen_receptionist(struct char_data *ch, struct char_data *recep, int c
       Crash_rentsave(ch, 0);
       mudlog(NRM, MAX(LVL_IMMORT, GET_INVIS_LEV(ch)), TRUE, "%s has saved inventory via receptionist (no fee).",
 		GET_NAME(ch));
-    } else {			/* cryo */
-      act("$n stores your belongings and helps you into your private chamber.\r\n"
-	  "A white mist appears in the room, chilling you to the bone...\r\n"
-	  "You begin to lose consciousness...",
+    } else {			/* cryo / dreamwarded rest */
+      act("$n secures your belongings, then guides you toward a rune-lit resting alcove.\r\n"
+	  "Silver wards brighten around the crystal as a quiet stillness settles over you...\r\n"
+	  "Your senses gently fade beneath the protection of the dreaming runes.",
 	  FALSE, recep, 0, ch, TO_VICT);
       Crash_cryosave(ch, 0);
       mudlog(NRM, MAX(LVL_IMMORT, GET_INVIS_LEV(ch)), TRUE, "%s has cryo-saved inventory (no fee).", GET_NAME(ch));
       SET_BIT_AR(PLR_FLAGS(ch), PLR_CRYO);
     }
 
-    act("$n helps $N into $S private chamber.", FALSE, recep, 0, ch, TO_NOTVICT);
+    if (mode == RENT_FACTOR)
+      act("$n helps $N into $S private chamber.", FALSE, recep, 0, ch, TO_NOTVICT);
+    else
+      act("$n guides $N into a crystal resting alcove as silver wards flare softly.",
+          FALSE, recep, 0, ch, TO_NOTVICT);
 
     GET_LOADROOM(ch) = GET_ROOM_VNUM(IN_ROOM(ch));
     extract_char(ch);	/* It saves. */
