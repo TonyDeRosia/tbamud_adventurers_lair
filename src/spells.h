@@ -302,6 +302,7 @@
 #define SKILL_LEGION_MASTERY        258
 #define SKILL_APPRAISE_ENEMY        259
 #define SKILL_STUDY                 260
+#define SKILL_UNARMED               261
 /* New skills may be added here up to MAX_SKILLS (see structs.h). */
 
 /* NON-PLAYER AND OBJECT SPELLS AND SKILLS: The practice levels for the spells

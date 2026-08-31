@@ -1885,6 +1885,8 @@ void init_spell_levels(void)
   }
   for (i = 0; i < num_pc_classes(); i++)
     spell_level(SKILL_RECALL, i, 1);
+  for (i = 0; i < num_pc_classes(); i++)
+    spell_level(SKILL_UNARMED, i, 1);
   spell_level(SKILL_STUDY, CLASS_ADVENTURER, 1);
   spell_level(SPELL_MAGIC_MISSILE, CLASS_ADVENTURER, 1);
 

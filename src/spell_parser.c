@@ -3428,4 +3428,5 @@ void mag_assign_spells(void) {
   skillo_cost(SKILL_LEGION_MASTERY, "legion mastery", 0);
   skillo_cost(SKILL_APPRAISE_ENEMY, "appraise enemy", 8);
   skillo_cost(SKILL_STUDY, "study", 0);
+  skillo_cost(SKILL_UNARMED, "unarmed", 5);
 }

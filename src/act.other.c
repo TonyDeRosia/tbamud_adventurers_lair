@@ -566,6 +566,8 @@ static void display_group_list(struct char_data * ch);
 
 ACMD(do_quit)
 {
+  struct descriptor_data *desc;
+
   if (IS_NPC(ch) || !ch->desc)
     return;
 
@@ -577,6 +579,7 @@ ACMD(do_quit)
     send_to_char(ch, "You die before your time...\r\n");
     die(ch, NULL);
   } else {
+    desc = ch->desc;
     act("$n has left the game.", TRUE, ch, 0, 0, TO_ROOM);
     mudlog(NRM, MAX(LVL_IMMORT, GET_INVIS_LEV(ch)), TRUE, "%s has quit the game.", GET_NAME(ch));
 
@@ -602,6 +605,9 @@ ACMD(do_quit)
     }
 
     extract_char(ch);		/* Char is saved before extracting. */
+    /* Close the socket without freeing the character before deferred extraction
+     * finishes.  CON_DISCONNECT is the descriptor-safe extraction state. */
+    STATE(desc) = CON_DISCONNECT;
   }
 }
 
@@ -2434,9 +2440,16 @@ ACMD(do_opet)
 ACMD(do_report)
 {
   struct group_data *group;
+  char report[MAX_STRING_LENGTH];
 
   if ((group = GROUP(ch)) == NULL) {
-    send_to_char(ch, "But you are not a member of any group!\r\n");
+    snprintf(report, sizeof(report), "$n reports: %d/%d HP, %d/%d Mana, %d/%d Move.",
+             GET_HIT(ch), GET_MAX_HIT(ch), GET_MANA(ch), effective_max_mana(ch),
+             GET_MOVE(ch), effective_max_move(ch));
+    act(report, FALSE, ch, NULL, NULL, TO_ROOM);
+    send_to_char(ch, "%s reports: %d/%d HP, %d/%d Mana, %d/%d Move.\r\n",
+                 GET_NAME(ch), GET_HIT(ch), GET_MAX_HIT(ch), GET_MANA(ch),
+                 effective_max_mana(ch), GET_MOVE(ch), effective_max_move(ch));
     return;
   }
 

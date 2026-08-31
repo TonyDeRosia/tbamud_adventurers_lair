@@ -661,6 +661,47 @@ int compute_hit_chance_from_values(int offensive_hit, int target_evasion)
   return MAX(5, MIN(95, hit_chance));
 }
 
+void get_player_unarmed_profile(int level, int *dice_num, int *dice_size, int *level_bonus)
+{
+  level = MAX(1, level);
+  if (dice_num)
+    *dice_num = MIN(4, 1 + (level / 30));
+  if (dice_size)
+    *dice_size = MIN(7, 2 + (level / 20));
+  if (level_bonus)
+    *level_bonus = MAX(0, level / 30);
+}
+
+int unarmed_proficiency_bonus(int unarmed_component, int skill)
+{
+  int scaled, bonus, remainder;
+
+  if (unarmed_component <= 0 || skill <= 0)
+    return 0;
+
+  skill = MIN(100, skill);
+  /* Expected bonus is component * skill / 800: 12.5% at mastery.
+   * Stochastic rounding preserves that modest ratio for low-level dice instead
+   * of turning every small hit into a disproportionate flat +1. */
+  scaled = unarmed_component * skill;
+  bonus = scaled / 800;
+  remainder = scaled % 800;
+  if (remainder > 0 && rand_number(1, 800) <= remainder)
+    bonus++;
+  return bonus;
+}
+
+int unarmed_expected_average_x100(int level, int skill)
+{
+  int dice_num, dice_size, level_bonus;
+  int base_average_x100;
+
+  get_player_unarmed_profile(level, &dice_num, &dice_size, &level_bonus);
+  skill = MAX(0, MIN(100, skill));
+  base_average_x100 = dice_num * (dice_size + 1) * 50 + level_bonus * 100;
+  return base_average_x100 + (base_average_x100 * skill) / 800;
+}
+
 void update_pos(struct char_data *victim)
 {
   if ((GET_HIT(victim) > 0) && (GET_POS(victim) > POS_STUNNED))
@@ -2325,6 +2366,8 @@ void hit(struct char_data *ch, struct char_data *victim, int type)
     {
     int unarmed_base_roll = 0;
     int unarmed_level_scaling_bonus = 0;
+    int unarmed_skill = 0;
+    int unarmed_skill_bonus = 0;
     int level_gap_damage_bonus = 0;
 
     /* Maybe holding arrow? */
@@ -2337,10 +2380,17 @@ void hit(struct char_data *ch, struct char_data *victim, int type)
         unarmed_base_roll = dice(ch->mob_specials.damnodice, ch->mob_specials.damsizedice);
         dam += unarmed_base_roll;
       } else {
-        unarmed_base_roll = dice(MIN(4, 1 + (GET_LEVEL(ch) / 30)),
-                                 MIN(7, 2 + (GET_LEVEL(ch) / 20)));
-        unarmed_level_scaling_bonus = MAX(0, GET_LEVEL(ch) / 30);
-        dam += unarmed_base_roll + unarmed_level_scaling_bonus;
+        int unarmed_num, unarmed_size;
+        int unarmed_component;
+
+        get_player_unarmed_profile(GET_LEVEL(ch), &unarmed_num, &unarmed_size,
+                                   &unarmed_level_scaling_bonus);
+        unarmed_base_roll = dice(unarmed_num, unarmed_size);
+        unarmed_component = unarmed_base_roll + unarmed_level_scaling_bonus;
+        unarmed_skill = GET_SKILL(ch, SKILL_UNARMED);
+        unarmed_skill_bonus = unarmed_proficiency_bonus(unarmed_component, unarmed_skill);
+        dam += unarmed_component + unarmed_skill_bonus;
+        improve_ability_from_use(ch, SKILL_UNARMED, TRUE);
       }
     }
 
@@ -2358,8 +2408,11 @@ void hit(struct char_data *ch, struct char_data *victim, int type)
         "   \t2Melee Level Bonus:\t3%d\r\n"
         "   \t2Unarmed Base Damage Roll:\t3%d\r\n"
         "   \t2Unarmed Level Scaling Bonus:\t3%d\r\n"
+        "   \t2Unarmed Proficiency:\t3%d%%\r\n"
+        "   \t2Unarmed Skill Bonus:\t3%d\r\n"
         "   \t2Level-gap Damage Bonus:\t3%d\tn\r\n",
-        melee_level_bonus, unarmed_base_roll, unarmed_level_scaling_bonus, level_gap_damage_bonus);
+        melee_level_bonus, unarmed_base_roll, unarmed_level_scaling_bonus,
+        unarmed_skill, unarmed_skill_bonus, level_gap_damage_bonus);
     }
 
     /* Include a damage multiplier if victim isn't ready to fight:

@@ -240,13 +240,14 @@ static void show_obj_to_char(struct obj_data *obj, struct char_data *ch, int mod
       return;
 
     if (!IS_NPC(ch) && PRF_FLAGGED(ch, PRF_SHOWVNUMS)) {
-      send_to_char(ch, "[%d] ", GET_OBJ_VNUM(obj));
+      send_to_char(ch, "%s[%d] ", CCYEL(ch, C_NRM), GET_OBJ_VNUM(obj));
       if (SCRIPT(obj)) {
         if (!TRIGGERS(SCRIPT(obj))->next)
           send_to_char(ch, "[T%d] ", GET_TRIG_VNUM(TRIGGERS(SCRIPT(obj))));
         else
           send_to_char(ch, "[TRIGS] ");
       }
+      send_to_char(ch, "%s", CCNRM(ch, C_NRM));
     }
     build_obj_aura_tags(obj, ch, obj_tags, sizeof(obj_tags), TRUE);
     send_to_char(ch, "%s%s", obj_tags, obj->description);
@@ -255,13 +256,14 @@ static void show_obj_to_char(struct obj_data *obj, struct char_data *ch, int mod
 
   case SHOW_OBJ_SHORT:
     if (!IS_NPC(ch) && PRF_FLAGGED(ch, PRF_SHOWVNUMS)) {
-      send_to_char(ch, "[%d] ", GET_OBJ_VNUM(obj));
+      send_to_char(ch, "%s[%d] ", CCYEL(ch, C_NRM), GET_OBJ_VNUM(obj));
       if (SCRIPT(obj)) {
         if (!TRIGGERS(SCRIPT(obj))->next)
           send_to_char(ch, "[T%d] ", GET_TRIG_VNUM(TRIGGERS(SCRIPT(obj))));
         else
           send_to_char(ch, "[TRIGS] ");
       }
+      send_to_char(ch, "%s", CCNRM(ch, C_NRM));
     }
     if (!IS_NPC(ch) && (obj->carried_by == ch || obj->worn_by == ch))
       build_player_kept_marker(obj, ch, obj_tags, sizeof(obj_tags));
@@ -493,6 +495,8 @@ static void list_one_char(struct char_data *i, struct char_data *ch)
   };
 
   if (!IS_NPC(ch) && PRF_FLAGGED(ch, PRF_SHOWVNUMS)) {
+    if (IS_NPC(i) || (SCRIPT(i) && TRIGGERS(SCRIPT(i))))
+      send_to_char(ch, "%s", CCYEL(ch, C_NRM));
     if (IS_NPC(i))
       send_to_char(ch, "[%d] ", GET_MOB_VNUM(i));
     if (SCRIPT(i) && TRIGGERS(SCRIPT(i))) {
@@ -501,6 +505,8 @@ static void list_one_char(struct char_data *i, struct char_data *ch)
       else
         send_to_char(ch, "[TRIGS] ");
     }
+    if (IS_NPC(i) || (SCRIPT(i) && TRIGGERS(SCRIPT(i))))
+      send_to_char(ch, "%s", CCNRM(ch, C_NRM));
   }
 
   if (GROUP(i)) {
@@ -587,7 +593,6 @@ static void list_char_to_char(struct char_data *list, struct char_data *ch)
       if (!IS_NPC(ch) && !PRF_FLAGGED(ch, PRF_HOLYLIGHT) &&
              IS_NPC(i) && i->player.long_descr && *i->player.long_descr == '.')
         continue;
-      send_to_char(ch, "%s", CCYEL(ch, C_NRM));
       if (CAN_SEE(ch, i))
         list_one_char(i, ch);
       else if (IS_DARK(IN_ROOM(ch)) && !CAN_SEE_IN_DARK(ch) &&
@@ -1259,6 +1264,7 @@ void look_at_room(struct char_data *ch, int ignore_brief)
   /*now list characters &objects */
   list_obj_to_char(world[IN_ROOM(ch)].contents, ch, SHOW_OBJ_LONG, FALSE);
   list_char_to_char(world[IN_ROOM(ch)].people, ch);
+  send_to_char(ch, "\r\n");
 }
 
 static void look_in_direction(struct char_data *ch, int dir)
@@ -1971,12 +1977,16 @@ ACMD(do_score)
     len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
 
     if (!(wielded && GET_OBJ_TYPE(wielded) == ITEM_WEAPON)) {
-      int unarmed_num = MIN(4, 1 + (GET_LEVEL(ch) / 30));
-      int unarmed_size = MIN(7, 2 + (GET_LEVEL(ch) / 20));
-      int unarmed_avg = (unarmed_num * (unarmed_size + 1)) / 2 + MAX(0, GET_LEVEL(ch) / 30);
+      int unarmed_num, unarmed_size, unarmed_level_bonus;
+      int unarmed_skill = GET_SKILL(ch, SKILL_UNARMED);
+      int unarmed_avg_x100 = unarmed_expected_average_x100(GET_LEVEL(ch), unarmed_skill);
+
+      get_player_unarmed_profile(GET_LEVEL(ch), &unarmed_num, &unarmed_size,
+                                 &unarmed_level_bonus);
       snprintf(line, sizeof(line),
-        "%sUnarmed Dice:%s %dd%d + %d  (Avg %d per hit, before bonuses)",
-        C, R, unarmed_num, unarmed_size, MAX(0, GET_LEVEL(ch) / 30), unarmed_avg);
+        "%sUnarmed:%s %dd%d + %d  Skill %d%%  (Avg ~%d.%02d before other bonuses)",
+        C, R, unarmed_num, unarmed_size, unarmed_level_bonus, unarmed_skill,
+        unarmed_avg_x100 / 100, unarmed_avg_x100 % 100);
       len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
     }
   }
@@ -2354,32 +2364,9 @@ static void show_currency_only(struct char_data *ch)
   long long diamonds = (long long)GET_DIAMONDS(ch);
   long long glory = (long long)GET_GLORY(ch);
 
-  if (gold <= 0 && bank <= 0 && diamonds <= 0 && glory <= 0) {
-    send_to_char(ch, "You have no currency.\r\n");
-    return;
-  }
-
   send_to_char(ch, "Currencies\r\n");
-
-  {
-    char out[256];
-    size_t len = 0;
-    out[0] = '\0';
-
-    if (gold > 0)
-      len += (size_t)snprintf(out + len, sizeof(out) - len, "Gold: %lld  ", gold);
-    if (bank > 0)
-      len += (size_t)snprintf(out + len, sizeof(out) - len, "Banked Gold: %lld  ", bank);
-    if (diamonds > 0)
-      len += (size_t)snprintf(out + len, sizeof(out) - len, "Diamonds: %lld  ", diamonds);
-    if (glory > 0)
-      len += (size_t)snprintf(out + len, sizeof(out) - len, "Glory: %lld  ", glory);
-
-    while (len > 0 && out[len - 1] == ' ')
-      out[--len] = '\0';
-
-    send_to_char(ch, "%s\r\n", out);
-  }
+  send_to_char(ch, "Gold: %lld  Diamonds: %lld  Glory: %lld  Bank: %lld\r\n",
+               gold, diamonds, glory, bank);
 }
 
 ACMD(do_worth)

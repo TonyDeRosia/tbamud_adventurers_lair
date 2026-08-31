@@ -191,19 +191,19 @@ static int run_dir_from_token(const char *token, int *consumed)
 {
   if (!token || !*token) return -1;
 
-  if (tolower((unsigned char)token[0]) == 'n') { *consumed = 1; return NORTH; }
-  if (tolower((unsigned char)token[0]) == 'e') { *consumed = 1; return EAST; }
-  if (tolower((unsigned char)token[0]) == 's') { *consumed = 1; return SOUTH; }
-  if (tolower((unsigned char)token[0]) == 'w') { *consumed = 1; return WEST; }
-  if (tolower((unsigned char)token[0]) == 'u') { *consumed = 1; return UP; }
-  if (tolower((unsigned char)token[0]) == 'd') { *consumed = 1; return DOWN; }
-
   if (!strncasecmp(token, "north", 5)) { *consumed = 5; return NORTH; }
   if (!strncasecmp(token, "east", 4))  { *consumed = 4; return EAST; }
   if (!strncasecmp(token, "south", 5)) { *consumed = 5; return SOUTH; }
   if (!strncasecmp(token, "west", 4))  { *consumed = 4; return WEST; }
   if (!strncasecmp(token, "up", 2))    { *consumed = 2; return UP; }
   if (!strncasecmp(token, "down", 4))  { *consumed = 4; return DOWN; }
+
+  if (tolower((unsigned char)token[0]) == 'n') { *consumed = 1; return NORTH; }
+  if (tolower((unsigned char)token[0]) == 'e') { *consumed = 1; return EAST; }
+  if (tolower((unsigned char)token[0]) == 's') { *consumed = 1; return SOUTH; }
+  if (tolower((unsigned char)token[0]) == 'w') { *consumed = 1; return WEST; }
+  if (tolower((unsigned char)token[0]) == 'u') { *consumed = 1; return UP; }
+  if (tolower((unsigned char)token[0]) == 'd') { *consumed = 1; return DOWN; }
 
   return -1;
 }
