@@ -9,6 +9,8 @@ CLASS = (ROOT / "src/class.c").read_text(encoding="utf-8")
 FIGHT = (ROOT / "src/fight.c").read_text(encoding="utf-8")
 SCORE = (ROOT / "src/act.informative.c").read_text(encoding="utf-8")
 PLAYERS = (ROOT / "src/players.c").read_text(encoding="utf-8")
+PRACTICE = (ROOT / "src/spec_procs.c").read_text(encoding="utf-8")
+UTILS = (ROOT / "src/utils.c").read_text(encoding="utf-8")
 
 LEVELS = (1, 5, 10, 20, 30, 50, 75, 100)
 SKILLS = (0, 25, 50, 75, 100)
@@ -39,6 +41,15 @@ def test_every_registered_player_class_gets_level_one_access():
     assert assignment in CLASS
     assert "const int start_prof = 1;" in CLASS
     assert "ensure_class_abilities(ch);" in PLAYERS
+
+
+def test_unarmed_uses_normal_practice_then_improve_by_use_progression():
+    assert "can_character_practice_ability(ch, skill_num)" in PRACTICE
+    assert "spell_info[ability_id].min_level[(int) GET_CLASS(ch)]" in PRACTICE
+    assert "SET_SKILL(ch, skill_num, MIN(LEARNED(ch), percent));" in PRACTICE
+    assert "if (cur < 75 || cur >= 100)" in UTILS
+    assert "SET_SKILL(ch, ability, cur + 1);" in UTILS
+    assert "improve_ability_from_use(ch, SKILL_UNARMED, TRUE);" in FIGHT
 
 
 def test_damage_bonus_is_player_only_and_weapon_gated():

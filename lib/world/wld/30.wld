@@ -1,9 +1,6 @@
 #3000
-The Reading Room~
-   You are in a small, simple room which is mostly empty, save a few
-wooden desks and benches.  To the east you hear the bustle of the Temple
-of Midgaard, a sharp contrast to the relative quiet of this peaceful
-room.
+The Wayfarers' Registry~
+A quiet registry hall welcomes travelers arriving in northern Midgaard. Shelves of city maps, copied notices, and old route ledgers line the walls beside simple benches for weary newcomers. A wayfarer's rune-stone rests here for those traveling farther afield, while the great temple lies just to the east.
 ~
 30 156 0 0 0 0
 D1
@@ -17,15 +14,8 @@ credits info~
 ~
 S
 #3001
-The Temple Of Midgaard~
-   You are in the southern end of the temple hall in the Temple of Midgaard.
-The temple has been constructed from giant marble blocks, eternal in
-appearance, and most of the walls are covered by ancient wall paintings
-picturing Gods, giants and peasants.
-   Large steps lead down through the grand temple gate, descending the huge
-mound upon which the temple is built and ends on the temple square below.
-To the west, you see the Reading Room.  The donation room is in a small
-alcove to your east.
+The High Temple of Midgaard~
+Pale stone columns rise through the broad nave of Midgaard's high temple. Painted histories of saints, heroes, rulers, and common folk cover the walls beneath hanging lamps. The temple square lies below to the south, a small chamber for charitable aid opens east, and quieter halls continue north toward the great altar.
 ~
 30 28 0 0 0 0
 D0
@@ -62,11 +52,8 @@ surreal quality that tugs at the mind to become lost in their depth and detail.
 S
 T 3017
 #3002
-The Clerics' Inner Sanctum~
-   This is the inner sanctum.  A picture of the mighty Thor, is hanging on
-the wall, just above the altar which is set against the western wall.  A well
-in the middle of the floor leads down into darkness.  Vile smells waft from
-the depths.
+The Shrine Chamber~
+A secluded shrine chamber rests behind the public portions of the temple. Low braziers cast warm light over carved stone icons and a deep old well set into the floor. Priests and pilgrims come here for quiet counsel before returning east toward the temple refectory.
 ~
 30 12 0 0 0 0
 D1
@@ -82,9 +69,8 @@ impossible to climb back up.
 0 -1 7026
 S
 #3003
-The Bar Of Divination~
-   The bar is one of the finest in the land, lucky it is members only.  Fine
-furniture is set all around the room.  A small sign is hanging on the wall.
+The Pilgrims' Refectory~
+Long oak tables and well-used benches fill this modest temple refectory. Travelers, clergy, and city folk share simple food and drink beneath painted beams while an adventurers' notice board gathers news from beyond the walls. The temple cloister lies south and the shrine chamber west.
 ~
 30 140 0 0 0 0
 D2
@@ -107,10 +93,8 @@ Free instructions provided by the waiter:
 ~
 S
 #3004
-The Entrance To The Clerics' Guild~
-   The entrance hall is a small modest room, reflecting the true nature of
-the Clerics.  The exit leads east to the temple square.  A small entrance to
-the bar is in the northern wall.
+The Temple Cloister~
+A vaulted cloister links the temple square with the quieter chambers of the high temple. Stone benches line the walls beneath narrow windows, and temple wardens keep watch over those seeking sanctuary, instruction, or aid. The refectory lies north while the square opens east.
 ~
 30 8 0 0 0 0
 D0
@@ -125,11 +109,8 @@ You see the Temple Square.
 0 -1 3005
 S
 #3005
-The Temple Square~
-   You are standing on the temple square.  Huge marble steps lead up to the
-temple gate.  The entrance to the Clerics' Guild is to the west, and the old
-Grunting Boar Inn, is to the east.  Just south of here you see the market
-square, the center of Midgaard.
+Temple Square~
+Broad marble steps descend from the High Temple into a busy stone square filled with pilgrims, messengers, and merchants. The Grunting Boar Inn stands to the east, the temple cloister opens west, and the great market can be heard to the south.
 ~
 30 0 0 0 0 1
 D0
@@ -154,15 +135,12 @@ You see the entrance to the Clerics' Guild.
 0 -1 3004
 S
 #3006
-The Entrance Hall Of The Grunting Boar Inn~
-   You are standing in the entrance hall of the Grunting Boar Inn.  The hall
-has been wisely decorated with simple, functional furniture.  The heavy smell
-of dust and aging paper drifts in from the Post Office to the north.  A small
-staircase leads up to the reception and the bar is to the east.
+The Grunting Boar Entrance Hall~
+Warm lamplight and the smell of hearth smoke fill the entrance hall of the Grunting Boar Inn. The tavern lies east, stairs climb toward reception, and the Midgaard Courier Hall opens to the north where sealed letters and dispatch riders come and go throughout the day.
 ~
 30 8 0 0 0 0
 D0
-You see the Midgaard Post Office.
+The Midgaard Courier Hall opens to the north beneath a carved wooden sign bearing the city's sealed-letter emblem.
 ~
 ~
 0 -1 3062
@@ -183,12 +161,8 @@ You see the reception.
 0 -1 3008
 S
 #3007
-The Grunting Boar~
-   You are standing in the bar.  The bar is set against the northern wall, old
-archaic writing, carvings and symbols cover its top.  A fireplace is built into
-the western wall, and through the southeastern windows you can see the temple
-square.  This place makes you feel like home.
-A small sign with big letters is fastened to the bar.
+The Grunting Boar Tavern~
+A broad hearth burns against the western wall of this crowded old tavern. Scarred tables, carved beams, and generations of scratched initials give the Grunting Boar the comfortable weight of history. Travelers trade rumors over ale while the entrance hall lies west.
 ~
 30 136 0 0 0 0
 D3
@@ -211,8 +185,8 @@ Free instructions provided by the Grunting Boar Inn.
 ~
 S
 #3008
-The Reception~
-Warm lamplight fills the upper reception of the Grunting Boar Inn. A polished oak counter faces the stairway down to the entrance hall, its surface crowded with brass keys, thick ledgers, and a small hand bell. To the north, a pale rune-carved archway opens into the Hall of Quiet Dreams, where travelers may entrust themselves to enchanted rest.
+The Grunting Boar Reception~
+Warm lamplight fills the upper reception of the Grunting Boar Inn. A polished oak counter faces the stairway down to the entrance hall, its surface crowded with brass keys, thick ledgers, and a small hand bell. To the north, a pale rune-carved archway opens into the Hall of Quiet Dreams.
 ~
 30 8 0 0 0 0
 D0
@@ -240,8 +214,8 @@ sign~
 ~
 S
 #3009
-The Bakery~
-Warmth from the ovens fills this small bakery, carrying the scent of fresh bread, honey, and sweet pastry into the street. Loaves cool on wooden racks behind the counter while glazed pastries are arranged beneath linen cloths. A small sign rests beside the till.
+The Hearthstone Bakery~
+Heat from brick ovens fills the bakery with the scent of fresh bread, honey, and browned pastry. Loaves cool on wooden racks behind the counter while glazed sweets and travel bread are arranged beneath clean linen cloths. Market Street lies to the south.
 ~
 30 136 0 0 0 0
 D2
@@ -266,10 +240,8 @@ makes your mouth water and your soul sing.
 ~
 S
 #3010
-The General Store~
-   You are inside the general store.  All sorts of items are stacked on shelves
-behind the counter, safely out of your reach.
-A small note hangs on the wall.
+The Wayfarer's General Store~
+Shelves and hanging racks crowd this practical general store with lanterns, packs, rope, containers, and other necessities for travel. A sturdy counter keeps the more valuable goods safely under the grocer's watch. East Market Street lies outside to the south.
 ~
 30 136 0 0 0 0
 D2
@@ -288,10 +260,8 @@ note~
 ~
 S
 #3011
-The Weapon Shop~
-   The smell of worked metals and various quenching oils fills the room.  Every
-available space in the room including the ceiling is loaded with various
-equipment and weaponry.  There is a small note on the counter.
+The Ironmark Weaponsmith~
+The ringing memory of hammer on steel seems to linger in this weapons shop. Finished blades, hammers, clubs, and polearms hang in orderly ranks while whetstones and quenching oils sit behind the counter. Guild Way lies immediately to the south.
 ~
 30 136 0 0 0 0
 D2
@@ -310,11 +280,8 @@ note~
 ~
 S
 #3012
-Main Street~
-   You are at the end of the main street of Midgaard.  South of here is the
-entrance to the Guild of Magic Users.  The street continues east towards the
-market square.  The magic shop is to the north and to the west is the city
-gate.
+West Market Street~
+The western stretch of Market Street runs between the west gate and the heart of Midgaard. The Arcane Hall stands to the south, an arcane emporium opens north, and the road continues east toward the central market.
 ~
 30 0 0 0 0 1
 D0
@@ -339,10 +306,8 @@ You see the city gate.
 0 -1 3040
 S
 #3013
-Main Street~
-   You are on the main street passing through the City of Midgaard.  South of
-here is the entrance to the Armory, and the bakery is to the north.  East of
-here is the market square.
+Market Street~
+Stone-fronted shops press close along this busy stretch of Market Street. The Hearthstone Bakery opens to the north and the armorer's workshop to the south, while the noise and color of the Grand Market Square rises just to the east.
 ~
 30 0 0 0 0 1
 D0
@@ -367,11 +332,8 @@ You see the main street.
 0 -1 3012
 S
 #3014
-Market Square~
-   You are standing on the market square, the famous Square of Midgaard.
-A large, peculiar looking statue is standing in the middle of the square.
-Roads lead in every direction, north to the temple square, south to the
-common square, east and westbound is the main street.
+Grand Market Square~
+Midgaard's great market opens around a broad stone plaza crowded with awnings, carts, shouting merchants, and passing adventurers. Roads spread toward the temple, the commons, and both city gates. A weathered civic monument rises near the center of the square as an old landmark for travelers.
 ~
 30 0 0 0 0 1
 D0
@@ -400,10 +362,8 @@ statue~
 ~
 S
 #3015
-Main Street~
-   You are on the main street crossing through town.  To the north is the
-general store, and the main street continues east.  To the west you see and
-hear the market place, to the south a small door leads into the Pet Shop.
+East Market Street~
+East Market Street carries the flow of shoppers between the Grand Market and Guild Way. The general store stands north, the beastkeeper's shop opens south, and the road continues east beneath hanging signs and guild banners.
 ~
 30 0 0 0 0 1
 D0
@@ -428,10 +388,8 @@ You see the market square.
 0 -1 3014
 S
 #3016
-Main Street~
-   The main street, to the north is the weapon shop and to the south is the
-Guild of Swordsmen.  To the east you leave town and to the west the street
-leads to the market square.
+Guild Way~
+Guild Way forms the eastern approach to the Adventurer's Guild. The Ironmark Weaponsmith stands to the north, while a broad stone arch to the south bears the crossed-road emblem of the guild. The east gate lies ahead and Market Street returns west.
 ~
 30 0 0 0 0 1
 D0
@@ -456,8 +414,8 @@ You see the main street leading to the market square.
 0 -1 3015
 S
 #3017
-The Entrance To The Mages' Guild~
-   The entrance hall to this guild is a small, poor lighted room.
+The Arcane Hall~
+A tall, narrow hall serves Midgaard's scholars of spellcraft without belonging to any single class or order. Rune-marked shelves, warded cabinets, and demonstration circles fill the chamber beneath suspended lights. The arcane commons lie south and West Market Street north.
 ~
 30 8 0 0 0 0
 D0
@@ -472,9 +430,8 @@ You see your favorite place, the Mages' Bar.
 0 -1 3018
 S
 #3018
-The Mages' Bar~
-   The bar is one of the weirdest in the land.  Mystical images float around
-the air.  Illusions of fine furniture appear all around the room.
+The Arcane Commons~
+Softly glowing sigils drift above tables where hedge mages, scholars, and adventurers compare notes over food and drink. The atmosphere is scholarly without being formal, and an adventurers' notice board carries requests involving curses, relics, ruins, and magical disturbances.
 ~
 30 140 0 0 0 0
 D0
@@ -489,12 +446,8 @@ You see the laboratory.
 0 -1 3019
 S
 #3019
-The Mages' Laboratory~
-   This is the Magical Experiments Laboratory.  Dark smoke-stained stones arch
-over numerous huge oaken tables, most of these cluttered with strange- looking
-pipes and flasks.  The floor is covered with half-erased pentagrams and even
-weirder symbols, and a blackboard in a dark corner has only been partially
-cleaned, some painful-looking letters faintly visible.
+The Arcane Workshop~
+Smoke-darkened stone arches over a practical workshop of alchemical benches, spell circles, locked cabinets, and rune-cut testing slabs. This is a place for controlled experimentation rather than formal training, with the Arcane Commons immediately west.
 ~
 30 12 0 0 0 0
 D3
@@ -504,10 +457,8 @@ You see the bar.
 0 -1 3018
 S
 #3020
-The Armory~
-   The armory has a wide assortment of armor displayed on the walls and in the
-windows. Helmets, shields, and suits of armor are for sale. To the north is
-the main street. On the wall is a small note.
+The Ironward Armory~
+Armor of leather, mail, scale, and plate fills the walls of this well-kept armory. Fitting stands and repair benches occupy one side of the shop while finished shields and helms wait behind the counter. Market Street lies directly north.
 ~
 30 136 0 0 0 0
 D0
@@ -527,10 +478,8 @@ note~
 ~
 S
 #3021
-The Entrance Hall To The Guild Of Swordsmen~
-   The entrance hall to the Guild of Swordsmen.  A place where one has to be
-careful not to say something wrong (or right).  To the east is the bar and to
-the north is the main street.
+The Adventurer's Guild~
+A broad stone arch opens into the official Adventurer's Guild of Midgaard. Guild banners hang above a registration desk where newcomers, veterans, and mercenary companies record their names and seek work. A banking coffer provides basic services near the wall, the Guild Commons lies east, and Guild Way opens north.
 ~
 30 8 0 0 0 0
 D0
@@ -545,10 +494,8 @@ You see the swordsmen's bar, many noises comes from there.
 0 -1 3022
 S
 #3022
-The Bar Of Swordsmen~
-   The bar of swordsmen, once upon a time beautifully furnished.  But now the
-furniture is all around you in small pieces.  To the south is the yard, and
-to the west is the entrance hall.
+The Guild Commons~
+The heart of the Adventurer's Guild is a lively commons filled with long tables, trophy cases, maps, and travelers preparing for expeditions. A guild steward serves food and drink while the adventurers' notice board carries contracts, bounties, expedition calls, and public requests. The training yard lies south.
 ~
 30 140 0 0 0 0
 D2
@@ -563,11 +510,10 @@ You see the entrance hall to the warriors' guild.
 0 -1 3021
 S
 #3023
-The Tournament And Practice Yard~
-   This is the practice yard of the fighters.  To the north is the bar.
-A well leads down into darkness.
+The Guild Training Yard~
+A large enclosed yard is dedicated to the advancement of every recognized adventuring path. Weapon racks, padded posts, casting circles, climbing frames, and marked practice lanes provide space for martial drills, spellwork, and specialized techniques. The guild instructor oversees both training and practice here.
 ~
-30 12 0 0 0 0
+30 8 0 0 0 0
 D0
 You see the bar.
 ~
@@ -581,9 +527,8 @@ impossible to climb back up.
 0 -1 7048
 S
 #3024
-The Eastern End Of Poor Alley~
-   You are at the poor alley.  South of here is the Grubby Inn and to the
-east you see common square.  The alley continues further west.
+Lantern Alley~
+Lantern Alley bends through one of Midgaard's poorer quarters where narrow homes lean over patched stonework. The Grubby Inn lies south, the Commons Square opens east, and the alley continues west beneath strings of old lanterns.
 ~
 30 0 0 0 0 1
 D1
@@ -603,10 +548,8 @@ You see the poor alley.
 0 -1 3044
 S
 #3025
-The Common Square~
-   The common square, people pass you, talking to each other.  To the west is
-the poor alley and to the east is the dark alley.  To the north, this square
-is connected to the market square.  From the south you notice a nasty smell.
+Commons Square~
+The Commons Square is less grand than the market but far more familiar to ordinary citizens. Laborers, messengers, beggars, and passing adventurers cross between Lantern Alley to the west, Gloam Alley to the east, the Grand Market to the north, and the refuse yard to the south.
 ~
 30 0 0 0 0 1
 D0
@@ -631,9 +574,8 @@ You see Poor Alley.
 0 -1 3024
 S
 #3026
-The Dark Alley~
-   The dark alley, to the west is the common square and to the south is the
-Guild of Thieves.  The alley continues east.
+Gloam Alley~
+Tall buildings keep this narrow alley in shadow for much of the day. Hired blades and bounty hunters often wait beneath the eaves, watching the flow from Commons Square. A discreet guild annex lies south while the alley continues east toward the levee district.
 ~
 30 0 0 0 0 1
 D1
@@ -657,10 +599,8 @@ guild~
 ~
 S
 #3027
-The Entrance Hall To The Guild Of Thieves~
-   The entrance hall to the thieves' and assassins' guild.  A place where you
-can lose both your life and your money, if you are not careful.  To the north
-is the dark alley and to the east is the thieves' bar.
+The Guild Contract Annex~
+A smaller office of the Adventurer's Guild handles sensitive contracts, bounty notices, recovery work, and requests best discussed away from the crowded commons. A guild warden keeps order near the entrance while clerks sort sealed postings for registered adventurers.
 ~
 30 8 0 0 0 0
 D0
@@ -675,11 +615,8 @@ You see the thieves bar, where everything disappears.
 0 -1 3028
 S
 #3028
-The Thieves' Bar~
-   The bar of the thieves.  Once upon a time this place was beautifully
-furnished, but now it seems almost empty.  To the south is the yard, and to
-the west is the entrance hall.
-   (Maybe the furniture has been stolen?!)
+The Lantern Room~
+This quiet guild-side taproom serves scouts, couriers, bounty hunters, and others who prefer conversation away from the main commons. The furnishings are simple and durable, and an adventurers' notice board carries smaller jobs and local rumors. A secluded courtyard lies south.
 ~
 30 140 0 0 0 0
 D2
@@ -698,9 +635,8 @@ furniture~
 ~
 S
 #3029
-The Secret Yard~
-   The secret practice yard of thieves and assassins.  To the north is the
-bar.  A well leads down into darkness.
+The Quiet Courtyard~
+High walls shelter this private courtyard from the noise of the surrounding district. Guild scouts and specialists use the space for observation drills, quiet meetings, and exercises that require more subtlety than the main training yard. The Lantern Room lies north.
 ~
 30 12 0 0 0 0
 D0
@@ -716,10 +652,8 @@ impossible to climb back up.
 0 -1 7043
 S
 #3030
-The Dump~
-   The dump, where the people from the city drop their garbage.  Through the
-garbage you can see a large junction of pipes, looks like the entrance to the
-sewer system.  North of here you see the common square.
+The Refuse Yard~
+Midgaard's refuse yard occupies a low stretch of ground south of the Commons Square. Broken crates, ash, spoiled straw, and household waste are sorted into rough piles before scavengers and city workers haul away what can be reused. An old iron grate gives access to the sewer works below.
 ~
 30 4 0 0 0 2
 D0
@@ -735,9 +669,8 @@ grate~
 S
 T 3004
 #3031
-The Pet Shop~
-   The Pet Shop is a small crowded store, full of cages and animals of
-various sizes.  There is a sign on the wall.
+The Beastkeeper's Shop~
+Warm straw, animal musk, and the occasional bark fill this crowded little shop. Leads, feed sacks, grooming brushes, and sturdy cages line the walls while the kennelmaster helps travelers choose and care for animal companions. East Market Street lies north.
 ~
 30 140 0 0 0 0
 D0
@@ -761,14 +694,13 @@ sign~
 S
 #3032
 The Beastkeeper's Holding Pens~
-Rows of sturdy wooden pens line this private holding room behind the beastkeeper's shop. Clean straw covers the floor, water bowls sit within easy reach, and iron latches keep the young animals safely separated until they are chosen by new companions. The room is reserved for the kennelmaster and the creatures under his care.
+Rows of sturdy wooden pens line this private holding room behind the beastkeeper's shop. Clean straw covers the floor, water bowls sit within easy reach, and iron latches keep the young animals safely separated until they are chosen by new companions.
 ~
 30 1536 0 0 0 0
 S
 #3033
-The Magic Shop~
-   Behind the counter you see various items, neatly placed in racks,
-presumably most of them are magic.
+The Arcane Emporium~
+Glass-fronted cabinets and rune-locked cases display scrolls, potions, wands, and other minor enchanted goods. The wizard behind the counter keeps the more dangerous pieces well out of casual reach. West Market Street lies just to the south.
 ~
 30 136 0 0 0 0
 D2
@@ -778,10 +710,8 @@ You see the main street.
 0 -1 3012
 S
 #3040
-Inside The West Gate Of Midgaard~
-   You are by two small towers that have been built into the city wall and
-connected with a footbridge across the heavy wooden gate.  Main Street leads
-east and Wall Road leads south from here.
+Inside the West Gate~
+Two squat watchtowers flank the heavy western gate where Main Street enters Midgaard. Guards watch the traffic beneath a timber footbridge connecting the towers, while Wall Road runs south along the inner fortifications.
 ~
 30 0 0 0 0 1
 D1
@@ -823,10 +753,8 @@ from one tower to the other.
 ~
 S
 #3041
-Inside The East Gate Of Midgaard~
-   You are by two small towers that have been built into the city wall and
-connected with a footbridge across the heavy wooden gate.  Main Street leads
-west from here.  To the south you see the Water Shop.
+Inside the East Gate~
+The eastern gatehouse stands between two stone towers linked by a timber bridge above the road. Guild Way runs west into the city, the water merchant works just south, and beyond the gate the road opens toward the eastern plains.
 ~
 30 0 0 0 0 1
 D1
@@ -867,9 +795,8 @@ from one tower to the other.
 ~
 S
 #3042
-Wall Road~
-   You are walking next to the western city wall.  The road continues further
-south and the city gate is just north of here.
+West Wall Road~
+A narrow road follows the inside of Midgaard's western wall beneath crenelated stonework and timber walkways. The west gate lies north, while the road continues south toward poorer neighborhoods and the river bridge.
 ~
 30 0 0 0 0 1
 D0
@@ -889,10 +816,8 @@ some kind of mortar.  It is far too high to climb.
 ~
 S
 #3043
-Wall Road~
-   You are walking next to the western city wall.  Wall Road continues further
-north and south.  A small, poor alley leads east.
-Some letters have been written on the wall here.
+West Wall Crossing~
+Wall Road widens briefly where a narrow lane branches east into the poorer quarter. Old chalk marks and faded notices cover portions of the stone wall, while the road continues north and south beneath the watchtowers.
 ~
 30 0 0 0 0 1
 D0
@@ -921,9 +846,8 @@ wall writing letters~
 ~
 S
 #3044
-Poor Alley~
-   You are on Poor Alley, which continues further east.  You see the
-city wall to the west.
+Lowmarket Alley~
+Lowmarket Alley runs between cramped homes, repair sheds, and makeshift stalls built close to the western wall. The district is poor but busy, and a few beggars watch the traffic moving between Wall Road and Lantern Alley.
 ~
 30 0 0 0 0 1
 D1
@@ -938,9 +862,8 @@ The alley leads west.
 0 -1 3043
 S
 #3045
-The Dark Alley At The Levee~
-   You are standing in the alley which continues east and west.  South of
-here you see the levee.
+Levee Alley~
+The alley descends toward the river levee between warehouses and aging tenements. Damp air carries the smell of river mud and tarred rope from the south, while the lane continues west toward Gloam Alley and east toward the warehouse district.
 ~
 30 0 0 0 0 1
 D1
@@ -960,10 +883,8 @@ The alley leads west.
 0 -1 3026
 S
 #3046
-The Eastern End Of The Alley~
-   You are standing at the eastern end of the alley, the city wall is just
-east, blocking any further movement.  A small warehouse is directly south of
-here.
+Warehouse Lane~
+The eastern end of the alley opens beside a weathered warehouse and a gap in the city's older outer works. Traffic from distant fields occasionally reaches the lane from the east, while the levee district lies west.
 ~
 30 0 0 0 0 1
 D1
@@ -982,9 +903,8 @@ You see the alley.
 0 -1 3045
 S
 #3047
-Wall Road~
-   You are standing on the road next to the western city wall, which
-continues north.  South of here is a bridge across the river.
+River Wall Road~
+The western wall road approaches a stone bridge spanning the river channel below. Moss grows between the lower stones where river mist reaches the fortifications, and the roadway continues north toward the city gate.
 ~
 30 0 0 0 0 1
 D0
@@ -1004,9 +924,8 @@ some kind of mortar.  It is far too high to climb.
 ~
 S
 #3048
-Grubby Inn~
-   You are inside the old Grubby Inn.  This place has not been cleaned for
-several decades; vile smells make you dizzy.
+The Bent Copper Inn~
+The Bent Copper is a rough but inexpensive inn serving laborers, mercenaries, and travelers who cannot afford the cleaner rooms near Temple Square. Smoke stains the rafters, patched tables crowd the common room, and the alley lies just outside to the north.
 ~
 30 136 0 0 0 0
 D0
@@ -1016,9 +935,8 @@ You see the alley.
 0 -1 3024
 S
 #3049
-The Levee~
-   You are at the levee.  South of here you see the river gently flowing west.
-The river bank is very low making it possible to enter the river.
+The River Levee~
+A packed-earth levee follows the river where small craft are dragged ashore and tied to heavy posts. Captain Stolar deals in simple boats here while warehouse workers move cargo between the water and nearby lanes.
 ~
 30 128 0 0 0 1
 D0
@@ -1033,9 +951,8 @@ You see the river flowing west.
 0 -1 3203
 S
 #3050
-The Deserted Warehouse~
-   You are inside the warehouse.  The room is decorated with various old
-items from ships.
+The Old River Warehouse~
+Heavy beams support a warehouse filled with coils of rope, cracked oars, old sails, and other remnants of river trade. The building has seen better years, but a sailor still keeps watch over what remains useful.
 ~
 30 8 0 0 0 0
 D0
@@ -1045,10 +962,8 @@ You see the alley.
 0 -1 3046
 S
 #3051
-On The Bridge~
-   You are standing on the stone bridge crosses the river.  The bridge is
-built out from the western city wall and the river flows west through an
-opening in the wall ten feet below the bridge.
+The South Bridge~
+A sturdy stone bridge carries the road across the river south of northern Midgaard. The city wall rises behind you to the north while the road continues toward the southern districts beyond the water.
 ~
 30 0 0 0 0 1
 D0
@@ -1077,10 +992,8 @@ some kind of mortar, just like the wall.
 ~
 S
 #3052
-Outside The West Gate Of Midgaard~
-   You are by two small towers that have been built into the city wall and
-connected with a footbridge across the heavy wooden gate.  To the west you
-can see the edge of a big forest.
+Outside the West Gate~
+The western gate of Midgaard stands between two squat towers and a high curtain wall. Wagon ruts spread into the road beyond the gate, leading toward the forest edge while guards watch arrivals from the battlements.
 ~
 30 0 0 0 0 1
 D1
@@ -1116,10 +1029,8 @@ from one tower to the other.
 ~
 S
 #3053
-Outside The East Gate Of Midgaard~
-   You are by two small towers that have been built into the city wall and
-connected with a footbridge across the heavy wooden gate.  To the east the
-plains stretch out in the distance.
+Outside the East Gate~
+The eastern gate opens onto a broad road overlooking the plains. Farm carts and mounted travelers pass beneath the watchtowers, and beyond the walls the road stretches toward the open countryside.
 ~
 30 0 0 0 0 1
 D1
@@ -1155,12 +1066,8 @@ from one tower to the other.
 ~
 S
 #3054
-By The Temple Altar~
-   You are by the temple altar in the northern end of the Temple of Midgaard.
-A huge altar made from white polished marble dominates this part of the temple.
-Towering behind the altar is a ten foot tall sitting statue of Odin, the King of
-the Gods. To the north, steps lead out the back of the temple towards the
-countryside.
+The Great Temple Altar~
+The northern end of the High Temple rises around a massive polished-stone altar beneath a towering seated figure of an ancient guardian king. Lamps burn in deep wall niches while steps lead north toward the countryside and south into the main nave.
 ~
 30 8 0 0 0 0
 D0
@@ -1187,10 +1094,8 @@ single block of white virgin marble.
 ~
 S
 #3058
-Ye Olde Water Shoppe~
-   You are standing in the center of a small wooden shop whose walls are
-covered with racks upon racks of water jugs.  Several large barrels with
-spigots are stacked in the corner.
+The Springwater Merchant~
+Racks of clay jugs, leather waterskins, and sealed travel bottles cover the walls of this small shop near the east gate. Several cool barrels stand behind the counter where Wally the Watermaster proudly sells clean spring water to travelers.
 ~
 30 136 0 0 0 0
 D0
@@ -1200,10 +1105,8 @@ You see the East Gate.
 0 -1 3041
 S
 #3059
-Behind The Temple Altar~
-   You are on a dirt path leading away from the Temple Altar which is south
-of here.  To the north, the path continues through the lush contryside of
-Midgaard towards the Dragonhelm Mountains far off to the north.
+The North Temple Path~
+A dirt path leaves the rear of the High Temple and climbs gently into the green countryside. The city roofs fall away to the south while the road continues north through open fields toward distant mountains.
 ~
 30 0 0 0 0 1
 D0
@@ -1218,17 +1121,8 @@ You see the Temple Altar.
 0 -1 3054
 S
 #3060
-The Great Field Of Midgaard~
-   You are walking on a wide dirt path through the lush, green, fresh
-Midgaard countryside.  You can see to the horizon to the north, east,
-and west; the busy city of Midgaard lies to the south.  All around you
-is healthy green grass and an occasional large oak tree.  The sun feels
-wonderful on your face and a pleasant wind blows through your hair.  Birds
-chirp quietly to themselves and you can smell the faint scent of flowers
-and freshly cut grass.  You feel like you could lie down in the grass and
-stay here forever, surrounded by powerful beauty in all directions.
-   The path you are on continues north through the field and south back
-to Midgaard.
+The Midgaard Greenway~
+A broad dirt road crosses open fields immediately north of Midgaard. Scattered oaks break the grassland and the city walls remain visible behind you, while the road continues north toward a rural crossroads.
 ~
 30 0 0 0 0 1
 D0
@@ -1243,8 +1137,8 @@ You see the path which goes back to Midgaard.
 0 -1 3059
 S
 #3061
-The Great Field Of Midgaard~
-A broad dirt path crosses the green countryside north of Midgaard. Oak trees stand scattered across the fields while birds wheel over the grass. The city lies to the south and the Dragonhelm Mountains rise faintly on the northern horizon. To the east, a weathered stone structure stands at the edge of the trail, while a narrower path branches west toward an old iron gate.
+The Northern Crossroads~
+The greenway reaches a rural crossroads north of Midgaard. The main road continues north and south, a weathered stone road branches east toward an old frontier site, and a narrower track turns west through the fields toward an iron-bound gate.
 ~
 30 4 0 0 0 1
 D0
@@ -1254,7 +1148,7 @@ Mountains.
 ~
 0 -1 3065
 D1
-There is a strange structure to the east on the edge of the trail.
+A weathered stone road branches east toward an old frontier structure beyond the fields.
 ~
 ~
 0 -1 18600
@@ -1264,14 +1158,14 @@ You see more of the Field.
 ~
 0 -1 3060
 D3
-There is a strange path leading towards a rusty gate to the west.
+A narrow track turns west through the grass toward an iron-bound gate set in a weathered arch.
 ~
 ~
 0 -1 3066
 S
 #3062
 The Midgaard Courier Hall~
-Shelves of tied letters, wax-sealed parcels, and leather dispatch satchels fill Midgaard's courier hall. A long oak counter separates visitors from a maze of pigeonholes marked with districts, guilds, and distant settlements. Couriers come and go throughout the day, carrying messages beneath the city's seal. The entrance hall of the Grunting Boar Inn lies to the south.
+Shelves of tied letters, wax-sealed parcels, route ledgers, and leather dispatch satchels fill Midgaard's courier hall. A long oak counter separates visitors from pigeonholes marked with districts and distant settlements while couriers come and go beneath the city's seal.
 ~
 30 8 0 0 0 1
 D2
@@ -1323,10 +1217,8 @@ sign~
 ~
 S
 #3063
-The Midgaard Donation Room~
-   You are in a small, undecorated room just off of the main temple.  There
-are a couple of small wooden benches here where people occasionally sit
-while they wait for items to appear.  The temple is to the west.
+The Temple Charity Hall~
+A quiet charity hall stands just off the High Temple for travelers who have fallen on hard times. Shelves hold donated clothing and basic supplies, while simple benches provide a place to rest and speak with those assigned to help newcomers.
 ~
 30 28 0 0 0 1
 D3
@@ -1337,7 +1229,7 @@ The busy temple is back west.
 S
 #3064
 The Hall of Quiet Dreams~
-Cool, still air fills this chamber of pale stone. Crystal resting alcoves line the walls beneath slowly turning silver runes, each one veiled by a faint blue-white shimmer that preserves sleeping travelers and their belongings until they choose to wake. The warmer lamplight of the inn's reception lies to the south.
+Cool, still air fills this chamber of pale stone. Crystal resting alcoves line the walls beneath slowly turning silver runes, each veiled by a faint blue-white shimmer that preserves sleeping travelers and their belongings until they choose to wake.
 ~
 30 8 0 0 0 1
 D2
@@ -1347,19 +1239,17 @@ The Reception is to the south.
 0 -1 3008
 S
 #3065
-The Northern Reach of the Great Field~
-The dirt road dwindles into the northern reach of Midgaard's great field. Beyond this point, fallen standing stones and a dense wall of ancient thornbriar swallow the remains of the old road, leaving no safe passage farther north. Wind moves through the high grass while the distant Dragonhelm Mountains loom beyond the overgrown boundary. The open path back toward Midgaard continues south.
+The Thornbriar Boundary~
+The northern road fades into old standing stones swallowed by dense thornbriar and wind-bent brush. No maintained road continues beyond this point, leaving the distant mountains visible but unreachable across the overgrown boundary. The open greenway returns south.
 ~
 30 0 0 0 0 2
 D0
-Unfortunately the way north is blocked by a large plot device and there
-does not seem to be any way around it.
+Dense thornbriar and fallen standing stones have swallowed the old road, leaving no safe passage farther north.
 ~
 ~
 0 -1 -1
 D2
-The path continues through the field to the south past an odd structure
-on the eastern side of the path.
+The maintained road returns south toward the crossroads and Midgaard beyond.
 ~
 ~
 0 -1 3061
@@ -1370,8 +1260,8 @@ reasons beyond your comprehension.
 ~
 S
 #3066
-The Dirt Path~
-A narrow dirt path winds west through the fields away from the main road. Wild grass crowds its edges and an old iron-bound gate stands within a weathered stone arch ahead, its masonry darkened by rain and age. Eastward, the path returns to the broader road leading toward Midgaard.
+The Old Gate Track~
+A narrow dirt track winds west from the crossroads through tall grass toward an iron-bound gate set into a weathered stone arch. The masonry is old but sound, and the broader road back toward Midgaard lies to the east.
 ~
 30 0 0 0 0 2
 D1
@@ -1380,7 +1270,7 @@ The path meets up with a larger path just to the east.
 ~
 0 -1 3061
 D3
-There is a large rusty gate just to the west.
+An iron-bound gate set in an old stone arch stands at the western end of the track.
 ~
 ~
 0 -1 3600

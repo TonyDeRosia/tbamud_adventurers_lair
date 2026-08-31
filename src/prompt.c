@@ -428,12 +428,9 @@ void queue_prompt(struct descriptor_data *d)
   if (STATE(d) != CON_PLAYING)
     return;
 
-  /* 
-   * \r\n - Flushes and terminates whatever room output precedes the prompt.
-   * \r\n - Forces a blank line space above the prompt.
-   * %s   - The formatted player prompt itself.
-   */
-  write_to_output(d, "\r\n \r\n%s", make_prompt(d));
+  /* Tick refreshes only need to terminate the prompt already on screen.
+   * Room-to-prompt spacing belongs to look_at_room(), not this generic path. */
+  write_to_output(d, "\r\n%s", make_prompt(d));
 }
 
 ACMD(do_prompt)

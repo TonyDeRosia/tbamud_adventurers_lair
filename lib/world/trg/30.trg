@@ -1,58 +1,30 @@
 #3000
-Mage Guildguard - 3024~
+Former Mage Guildguard Compatibility~
 0 q 100
 ~
-* Check the direction the player must go to enter the guild.
-if %direction% == south
-  * Stop them if they are not the appropriate class.
-  if %actor.class% != Magic User
-    return 0
-    %send% %actor% The guard humiliates you, and blocks your way.
-    %echoaround% %actor% The guard humiliates %actor.name%, and blocks %actor.hisher% way.
-  end
-end
+* Legacy class-guild gate removed by the Adventurer's Guild redesign.
+return 0
 ~
 #3001
-Cleric Guildguard - 3025~
+Former Cleric Guildguard Compatibility~
 0 q 100
 ~
-* Check the direction the player must go to enter the guild.
-if %direction% == north
-  * Stop them if they are not the appropriate class.
-  if %actor.class% != Cleric
-    return 0
-    %send% %actor% The guard humiliates you, and blocks your way.
-    %echoaround% %actor% The guard humiliates %actor.name%, and blocks %actor.hisher% way.
-  end
-end
+* Legacy class-guild gate removed by the Adventurer's Guild redesign.
+return 0
 ~
 #3002
-Thief Guildguard - 3026~
+Former Thief Guildguard Compatibility~
 0 q 100
 ~
-* Check the direction the player must go to enter the guild.
-if %direction% == east
-  * Stop them if they are not the appropriate class.
-  if %actor.class% != Thief
-    return 0
-    %send% %actor% The guard humiliates you, and blocks your way.
-    %echoaround% %actor% The guard humiliates %actor.name%, and blocks %actor.hisher% way.
-  end
-end
+* Legacy class-guild gate removed by the Adventurer's Guild redesign.
+return 0
 ~
 #3003
-Warrior Guildguard - 3027~
+Former Warrior Guildguard Compatibility~
 0 q 100
 ~
-* Check the direction the player must go to enter the guild.
-if %direction% == east
-  * Stop them if they are not the appropriate class.
-  if %actor.class% != Warrior
-    return 0
-    %send% %actor% The guard humiliates you, and blocks your way.
-    %echoaround% %actor% The guard humiliates %actor.name%, and blocks %actor.hisher% way.
-  end
-end
+* Legacy class-guild gate removed by the Adventurer's Guild redesign.
+return 0
 ~
 #3004
 Dump - 3030~
@@ -229,9 +201,9 @@ done
 Newcomer's City Guide~
 0 e 0
 has entered the game.~
-* Optional newcomer welcome behavior for the city guide.
+* Newcomer guidance for redesigned Northern Midgaard.
 if %actor.is_pc%
-  say Welcome to Midgaard, %actor.name%. If you are new to the city, tell me 'guide help' and I will point you toward the guilds, market, inn, and city gates.
+  say Welcome to Midgaard, %actor.name%. For training, practice, contracts, and adventuring work, visit the Adventurer's Guild on Guild Way east of the market.
 end
 ~
 #3013
