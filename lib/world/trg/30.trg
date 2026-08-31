@@ -169,26 +169,24 @@ set stunned %actor.hitp%
 %send% %actor% The Gods must favor you this day.
 ~
 #3009
-Stock Cityguard - 3059, 60, 67~
+Midgaard City Watch~
 0 b 50
 ~
+* Midgaard city watch response
 if !%self.fighting%
   set actor %random.char%
   if %actor%
     if %actor.is_killer%
-      emote screams 'HEY!!!  You're one of those PLAYER KILLERS!!!!!!'
+      emote points at %actor.name% and shouts, 'Murderer! In the name of Midgaard, stand down!'
       kill %actor.name%
     elseif %actor.is_thief%
-      emote screams 'HEY!!!  You're one of those PLAYER THIEVES!!!!!!'
+      emote points at %actor.name% and shouts, 'Thief! You will answer to the city watch!'
       kill %actor.name%
-    elseif %actor.cha% < 6
-      %send% %actor% %self.name% spits in your face.
-      %echoaround% %actor% %self.name% spits in %actor.name%'s face.
     end
     if %actor.fighting%
       eval victim %actor.fighting%
       if %actor.align% < %victim.align% && %victim.align% >= 0
-        emote screams 'PROTECT THE INNOCENT!  BANZAI!  CHARGE!  ARARARAGGGHH!'
+        emote draws steel and shouts, 'Break it up! The city watch will have order here!'
         kill %actor.name%
       end
     end
@@ -196,50 +194,48 @@ if !%self.fighting%
 end
 ~
 #3010
-Stock Fido - 3062, 3066~
+Stray Hound Scavenging~
 0 b 100
 ~
+* Stray hounds clean up corpses left in the streets.
 set inroom %self.room%
 set item %inroom.contents%
 while %item%
-  * Target the next item in room. In case it is devoured.
   set next_item %item.next_in_list%
-  * Check for a corpse. Corpse on TBA is vnum 65535. Stock is -1.
   if %item.vnum(65535)%
-    emote savagely devours a corpse.
+    emote tears hungrily at a discarded corpse.
     %purge% %item%
     halt
   end
   set item %next_item%
-  * Loop back
 done
 ~
 #3011
-Stock Janitor - 3061, 3068~
+Street Scavenger Cleanup~
 0 b 100
 ~
+* Street scavengers clean up cheap debris left around Midgaard.
 eval inroom %self.room%
 eval item %inroom.contents%
 while %item%
-  * Target the next item in room. In case it is picked up.
   set next_item %item.next_in_list%
-* TODO: if %item.wearflag(take)%
-  * Check for fountains and expensive items.
   if %item.type% != FOUNTAIN && %item.cost% <= 15
     take %item.name%
   end
   set item %next_item%
-  * Loop back
 done
 ~
 #3012
-Newbie Tour Guide~
+Newcomer's City Guide~
 0 e 0
 has entered the game.~
-%echo% This trigger commandlist is not complete!
+* Optional newcomer welcome behavior for the city guide.
+if %actor.is_pc%
+  say Welcome to Midgaard, %actor.name%. If you are new to the city, tell me 'guide help' and I will point you toward the guilds, market, inn, and city gates.
+end
 ~
 #3013
-Newbie Tour Guide Loader~
+Newcomer's Guide Welcome~
 0 e 0
 has entered the game.~
 * By Rumble of The Builder Academy    tbamud.com 9091
@@ -250,12 +246,12 @@ eval inroom %self.room%
 %zoneecho% %inroom.vnum% %self.name% shouts, 'Welcome, %actor.name%!'
 ~
 #3014
-Teleporter~
+Wayfarer's Rune Passage~
 1 c 3
 teleport~
 * By Rumble and Jamie Nelson of The Builder Academy    tbamud.com 9091
-%send% %actor% You attempt to manipulate space and time.
-%echoaround% %actor% %actor.name% attempts to manipulate space and time.
+%send% %actor% The rune-stone warms beneath your fingers as its sigils search for a distant path.
+%echoaround% %actor% Pale runes awaken across the stone beneath %actor.name%'s hand.
 wait 1 sec
 set sanctus 100
 set jade 400
@@ -399,40 +395,40 @@ else
   end
 end
 if %fail%
-  %send% %actor% You fail.
-  %echoaround% %actor% %actor.name% fails.
+  %send% %actor% The runes flare once, then fade. No attuned path answers that name.
+  %echoaround% %actor% The runes beneath %actor.name%'s hand flicker and go dark.
   halt
 end
-%echoaround% %actor% %actor.name% seems successful as %actor.heshe% steps into another realm.
+%echoaround% %actor% Silver runes blaze as %actor.name% dissolves into a veil of light.
 %teleport% %actor% %loc%
 %force% %actor% look
-%echoaround% %actor% %actor.name% steps out of space and time.
+%echoaround% %actor% Silver light gathers and %actor.name% steps from a fading circle of runes.
 ~
 #3015
-Teleporter Recall and Return~
+Wayfarer's Rune Recall and Return~
 1 c 7
 re~
 * By Rumble of The Builder Academy    tbamud.com 9091
 if %cmd% == recall
-  eval teleporter_return_room %actor.room.vnum%
-  remote  teleporter_return_room %actor.id%
-  %send% %actor% You recall to safety.
-  %echoaround% %actor% %actor.name% recalls.
+  eval waystone_return_room %actor.room.vnum%
+  remote waystone_return_room %actor.id%
+  %send% %actor% You invoke the rune-stone's homeward sigil.
+  %echoaround% %actor% A ring of pale runes rises around %actor.name%.
   %teleport% %actor% 3001
   %force% %actor% look
-  %echoaround% %actor% %actor.name% appears in the room.
+  %echoaround% %actor% A circle of silver runes fades as %actor.name% steps into view.
 elseif %cmd% == return
-  %send% %actor% You return to your previous location.
-  %echoaround% %actor% %actor.name% teleports out of the room.
-  %teleport% %actor% %actor.teleporter_return_room%
+  %send% %actor% You invoke the rune-stone's returning sigil.
+  %echoaround% %actor% Silver runes rise around %actor.name% and fold inward.
+  %teleport% %actor% %actor.waystone_return_room%
   %force% %actor% look
-  %echoaround% %actor% %actor.name% appears in the room.
+  %echoaround% %actor% A circle of silver runes fades as %actor.name% steps into view.
 else
   return 0
 end
 ~
 #3016
-Kind Soul Gives Newbie Equipment~
+Kind Soul Gives Newcomer Equipment~
 0 g 100
 ~
 * By Rumble of The Builder Academy    tbamud.com 9091

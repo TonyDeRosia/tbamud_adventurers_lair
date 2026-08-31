@@ -47,9 +47,9 @@ A key made of a dull metal is lying on the ground here.~
 0 0 0 0
 1 1000 0 0 0
 #3006
-teleporter~
-the teleporter~
-A strange device labeled "teleporter" was left here.~
+wayfarer rune runestone waystone stone teleporter~
+a wayfarer's rune-stone~
+A palm-sized rune-stone glimmers with pale blue light here.~
 ~
 12 0 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
@@ -57,14 +57,8 @@ A strange device labeled "teleporter" was left here.~
 T 3014
 T 3015
 E
-teleporter~
-This teleporter is used to transfer players between zones.  Accessible zones
-are listed under HELP ZONES by being CAPITALIZED.  For example to teleport to:
-  74 Newbie GRAVEyard                   -- Jojen                       3- 5
-type: teleport grave
-   The teleporter may also be used to recall back to Midgaard at any time.
-
-Uncapitalized zones are linked through a capitalized zone.
+wayfarer rune runestone waystone teleporter travel recall return~
+Fine silver sigils cover the smooth stone, shifting subtly when touched. The rune-stone is attuned to distant realms listed in HELP ZONES. Speak the command 'TELEPORT <destination>' to seek an attuned path, such as 'TELEPORT GRAVE'. While carried, the stone also answers 'RECALL' to draw its bearer home to Midgaard and 'RETURN' to retrace the path from the most recent recall.
 ~
 #3007
 pool of radiance~
@@ -104,33 +98,33 @@ A loaf of bread has been left here.~
 12 0 0 0
 1 2 10 0 0
 #3011
-danish pastry~
-a danish pastry~
-A nice looking delicious danish pastry has been placed here.~
+honey glazed pastry sweet~
+a honey-glazed pastry~
+A flaky pastry glazed with honey rests here.~
 ~
 19 0 0 0 0 a 0 0 0 0 0 0 0
 100 0 10 0
 1 1 5 0 0
 #3012
-taco mexican~
-a Mexican taco~
-A tasty looking Mexican taco has been dropped here.~
+spiced meat hand pie turnover~
+a spiced meat hand pie~
+A warm hand pie filled with spiced meat rests here.~
 ~
 19 0 0 0 0 a 0 0 0 0 0 0 0
 15 0 0 0
 1 15000 15 0 0
 #3013
-burrito hot~
-a spicy hot burrito~
-A spicy looking burrito has been set here.~
+herb wrapped meat roll bread~
+an herb-wrapped meat roll~
+A savory meat roll wrapped in soft herb bread rests here.~
 ~
 19 0 0 0 0 a 0 0 0 0 0 0 0
 10 0 0 0
 1 10000 10 0 0
 #3014
-nachos nacho~
-some nachos with cheese~
-Some nachos have been left here.~
+toasted cheese flatbread wedges~
+some toasted cheese flatbread~
+Several wedges of toasted flatbread covered in melted cheese rest here.~
 ~
 19 0 0 0 0 a 0 0 0 0 0 0 0
 5 0 0 0
@@ -172,16 +166,16 @@ A small sword lies here.~
 5 e 0 0 0 an 0 0 0 0 0 0 0
 0 1 6 11
 3 4 10 0 0
-A
-18 1
-E
-inscription~
-   It says: 'May this sword be a good companion.  '
-~
 E
 sword small~
    The small sword seems to have an inscription of some sort.
 ~
+E
+inscription~
+   It says: 'May this sword be a good companion.  '
+~
+A
+18 1
 #3022
 sword long~
 a long sword~
@@ -251,20 +245,16 @@ A small box is here.~
 10 0 0 0
 5 3 10 0 0
 #3034
-atm teller banks machine~
-an automatic teller machine~
-An automatic teller machine has been installed in the wall here.~
+banking coffer coinward bank balance withdraw deposit atm teller machine~
+an enchanted banking coffer~
+A brass-bound banking coffer is set into the wall here, its runes glowing softly.~
 ~
 12 cdeg 0 0 0 0 0 0 0 0 0 0 0
 0 0 0 0
 0 0 0 0 0
 E
-atm teller bank machine~
-   There is a small note on the machine which says:
-
-To use, type 'BALANCE', 'WITHDRAW <amount>', or 'DEPOSIT <amount>'.
-Please report any strange occurrences to the bank manager.
-
+banking coffer coinward bank balance withdraw deposit atm teller machine~
+Silver runes across the coffer's lockplate are bound to Midgaard's counting house. The enchantment responds to 'BALANCE', 'WITHDRAW <amount>', and 'DEPOSIT <amount>', moving coin between the bearer and the account recorded by the warded ledger.
 ~
 #3035
 fountain water~
@@ -276,26 +266,19 @@ A large fountain carved from blue-streaked marble is here, bubbling merrily.~
 505 0 0 0 0
 E
 marble blue streaked fountain~
-   It is a well crafted fountain, carved from a single piece of very beautiful
-white marble shot through with electric blue streaks that look almost like
-lightning dancing along the sides of the fountain.  It seems to be enchanted in
-some manner, as the water level seems to never lower.
+It is a well-crafted fountain carved from a single piece of beautiful white marble shot through with vivid blue streaks that resemble lightning dancing along the stone. A quiet enchantment keeps the water clear and full no matter how many travelers drink from it.
 ~
 #3036
-cashcard card atm banks~
-a cashcard~
-A handy dandy cashcard is sitting on the ground here.~
+banker sigil seal token bank cashcard card atm~
+a banker's sigil~
+A small bronze banker's sigil lies here, stamped with the seal of Midgaard.~
 ~
 12 cdeg 0 0 0 ao 0 0 0 0 0 0 0
 0 0 0 0
 1 9999 10 0 0
 E
-cashcard card atm~
-   There is some writing on the back of the card which reads:
-
-To use, type 'BALANCE', 'WITHDRAW <amount>', or 'DEPOSIT <amount>'.
-Please report any strange occurrences to the bank manager.
-
+banker sigil seal token bank cashcard card~
+The bronze seal bears the mark of Midgaard's counting house and is bound to its warded ledgers. While carried, the sigil responds to 'BALANCE', 'WITHDRAW <amount>', and 'DEPOSIT <amount>' as though its bearer stood before a banking coffer.
 ~
 #3037
 candle~
@@ -653,20 +636,20 @@ supportive.  It is laced with some leather string to loosen and tighten to
 almost any size.
 ~
 #3096
-boards social bulletin gen_boards~
-a social bulletin board~
-A large, sociable bulletin board is mounted on a wall here.~
+boards adventurers notice board social bulletin gen_boards~
+an adventurers' notice board~
+A broad wooden notice board covered in pinned notes hangs on the wall here.~
 ~
 12 0 0 0 0 0 0 0 0 0 0 0 0
 0 0 0 0
 0 0 0 0 0
 E
-social bulletin~
-   Use 'look board' to read the board.
+adventurers notice board social bulletin~
+Pinned notices carry news, requests, warnings, and messages left by travelers from across the realm. Use 'look board' to read what has been posted.
 ~
 E
-board~
-   If you can read this, the board is not working.
+social bulletin~
+   Use 'look board' to read the board.
 ~
 #3097
 boards frozen bulletin gen_boards~
@@ -677,12 +660,12 @@ A large bulletin board is here, carved from a block of ice.~
 0 0 0 0
 0 0 0 0 0
 E
-freeze bulletin~
-   Use 'look board' to read the board.
-~
-E
 board~
    If you can read this, the board is not working.
+~
+E
+freeze bulletin~
+   Use 'look board' to read the board.
 ~
 #3098
 boards holy bulletin gen_boards~
@@ -693,12 +676,12 @@ A large bulletin board is mounted on a wall here.  It glows with a faint aura.~
 0 0 0 0
 0 0 0 0 0
 E
-holy bulletin~
-   Use 'look board' to read the board.
-~
-E
 board~
    If you can read this, the board is not working.
+~
+E
+holy bulletin~
+   Use 'look board' to read the board.
 ~
 #3099
 boards bulletin gen_boards~
@@ -709,11 +692,11 @@ A large bulletin board is mounted on a wall here.~
 0 0 0 0
 0 0 0 0 0
 E
-bulletin~
-   Use 'look board' to read the board.
-~
-E
 board~
    If you can read this, the board is not working.
+~
+E
+bulletin~
+   Use 'look board' to read the board.
 ~
 $~

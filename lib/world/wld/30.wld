@@ -197,6 +197,11 @@ You see the exit to the entrance hall.
 ~
 0 -1 3006
 E
+writing carving carvings symbols symbol~
+   Although it is very hard to understand, you think it looks a lot like beer,
+poems about beer, and small beer-mugs.
+~
+E
 sign~
    The sign reads:
 Free instructions provided by the Grunting Boar Inn.
@@ -204,21 +209,14 @@ Free instructions provided by the Grunting Boar Inn.
    List - The bartender will show you all the different drinks and
           specialties, and tell the price of each.
 ~
-E
-writing carving carvings symbols symbol~
-   Although it is very hard to understand, you think it looks a lot like beer,
-poems about beer, and small beer-mugs.
-~
 S
 #3008
 The Reception~
-   You are standing in the reception.  The staircase leads down to the
-entrance hall.  An exit to the north leads to the Cryogenic Center.
-There is a small sign on the counter.
+Warm lamplight fills the upper reception of the Grunting Boar Inn. A polished oak counter faces the stairway down to the entrance hall, its surface crowded with brass keys, thick ledgers, and a small hand bell. To the north, a pale rune-carved archway opens into the Hall of Quiet Dreams, where travelers may entrust themselves to enchanted rest.
 ~
 30 8 0 0 0 0
 D0
-You see the Cryogenic Center.
+A pale rune-carved archway opens into the Hall of Quiet Dreams.
 ~
 ~
 0 -1 3064
@@ -243,10 +241,7 @@ sign~
 S
 #3009
 The Bakery~
-   You are standing inside the small bakery.  A sweet scent of danish and
-fine bread fills the room.  The bread and Danish are arranged in fine order
-on the shelves, and seem to be of the finest quality.
-A small sign is on the counter.
+Warmth from the ovens fills this small bakery, carrying the scent of fresh bread, honey, and sweet pastry into the street. Loaves cool on wooden racks behind the counter while glazed pastries are arranged beneath linen cloths. A small sign rests beside the till.
 ~
 30 136 0 0 0 0
 D2
@@ -255,19 +250,19 @@ You see the main street.
 ~
 0 -1 3013
 E
+sign~
+   Free instructions provided by the store:
+   Buy  - Will buy you some bread or pastry.
+   List - The baker will kindly tell you the price and sort of the bread in
+          his bakery.
+~
+E
 danish pastry~
    You see that this is truly delicious pastry.  Must be made by a Dane from
 Denmark (which surely is not the capital of Sweden!  ).  Former ruler of
 Scandinavia, England, Northern Germany, Northern France, Russia, Greenland,
 Iceland, Estonia etc.  Etc.  The sight of those large, wholesome chokoladeboller
 makes your mouth water and your soul sing.
-~
-E
-sign~
-   Free instructions provided by the store:
-   Buy  - Will buy you some bread or pastry.
-   List - The baker will kindly tell you the price and sort of the bread in
-          his bakery.
 ~
 S
 #3010
@@ -765,15 +760,8 @@ sign~
 ~
 S
 #3032
-PETSHOP STOREROOM~
-   Make two rooms and some pets.  The rooms MUST be sequential.  If the first
-room is 315 then the second must be 316.  The second room is known as the
-storeroom.  All that is required in the storeroom is to load one of each mob you
-wish to be a pet.  This room can not have any exits and will never be used by
-mortals.  Although a pet shopkeeper is not required it is recommended.  After
-all of this is done ask your coder to implement the petshop.  It will not work
-until the code is changed and the MUD is rebooted.  The cost of pets is 300
-times their level.
+The Beastkeeper's Holding Pens~
+Rows of sturdy wooden pens line this private holding room behind the beastkeeper's shop. Clean straw covers the floor, water bowls sit within easy reach, and iron latches keep the young animals safely separated until they are chosen by new companions. The room is reserved for the kennelmaster and the creatures under his care.
 ~
 30 1536 0 0 0 0
 S
@@ -813,9 +801,14 @@ The city gate is to the west.
 gate~
 1 3112 3052
 E
-bridge footbridge~
-   It is too high up to reach but it looks as if one easily could walk across it
-from one tower to the other.
+wall~
+   It is built from large gray rocks that have been fastened to each other with
+some kind of mortar.  It is far too high to climb.
+~
+E
+tower towers~
+   Both of the towers are built from large gray rocks that have been fastened to
+each other with some kind of mortar, just like the city wall.
 ~
 E
 gate~
@@ -824,14 +817,9 @@ reinforced with large iron bands to make them even more sturdy.  One of the
 doors is equipped with a very big lock.
 ~
 E
-tower towers~
-   Both of the towers are built from large gray rocks that have been fastened to
-each other with some kind of mortar, just like the city wall.
-~
-E
-wall~
-   It is built from large gray rocks that have been fastened to each other with
-some kind of mortar.  It is far too high to climb.
+bridge footbridge~
+   It is too high up to reach but it looks as if one easily could walk across it
+from one tower to the other.
 ~
 S
 #3041
@@ -857,9 +845,14 @@ You see Main Street.
 ~
 0 -1 3016
 E
-bridge footbridge~
-   It is too high up to reach but it looks as if one easily could walk across it
-from one tower to the other.
+wall~
+   It is built from large gray rocks that have been fastened to each other with
+some kind of mortar.  It is far too high to climb.
+~
+E
+tower towers~
+   Both of the towers are built from large gray rocks that have been fastened to
+each other with some kind of mortar, just like the city wall.
 ~
 E
 gate~
@@ -868,14 +861,9 @@ reinforced with large iron bands to make them even more sturdy.  One of the
 doors is equipped with a very big lock.
 ~
 E
-tower towers~
-   Both of the towers are built from large gray rocks that have been fastened to
-each other with some kind of mortar, just like the city wall.
-~
-E
-wall~
-   It is built from large gray rocks that have been fastened to each other with
-some kind of mortar.  It is far too high to climb.
+bridge footbridge~
+   It is too high up to reach but it looks as if one easily could walk across it
+from one tower to the other.
 ~
 S
 #3042
@@ -923,13 +911,13 @@ The road continues further south.
 ~
 0 -1 3047
 E
-wall writing letters~
-   It says 'Who watches the watchmen?  '
-~
-E
 wall~
    It is built from large gray rocks that have been fastened to each other with
 some kind of mortar.  It is far too high to climb.
+~
+E
+wall writing letters~
+   It says 'Who watches the watchmen?  '
 ~
 S
 #3044
@@ -1074,18 +1062,18 @@ You see the Concourse.
 ~
 0 -1 3100
 E
-bridge~
+wall~
    It is built from large gray rocks that have been fastened to each other with
-some kind of mortar, just like the wall.
+some kind of mortar.  It is far too high to climb.
 ~
 E
 opening~
    You cannot really see it from here as it is somewhere beneath your feet.
 ~
 E
-wall~
+bridge~
    It is built from large gray rocks that have been fastened to each other with
-some kind of mortar.  It is far too high to climb.
+some kind of mortar, just like the wall.
 ~
 S
 #3052
@@ -1106,9 +1094,14 @@ The forest edge is to the west.
 ~
 0 -1 6092
 E
-bridge footbridge~
-   It is too high up to reach but it looks as if one easily could walk across it
-from one tower to the other.
+wall~
+   It is built from large gray rocks that have been fastened to each other with
+some kind of mortar.  It is far too high to climb.
+~
+E
+tower towers~
+   Both of the towers are built from large gray rocks that have been fastened to
+each other with some kind of mortar, just like the city wall.
 ~
 E
 gate~
@@ -1117,14 +1110,9 @@ reinforced with large iron bands to make them even more sturdy.  One of the
 doors is equipped with a very big lock.
 ~
 E
-tower towers~
-   Both of the towers are built from large gray rocks that have been fastened to
-each other with some kind of mortar, just like the city wall.
-~
-E
-wall~
-   It is built from large gray rocks that have been fastened to each other with
-some kind of mortar.  It is far too high to climb.
+bridge footbridge~
+   It is too high up to reach but it looks as if one easily could walk across it
+from one tower to the other.
 ~
 S
 #3053
@@ -1145,9 +1133,14 @@ You see the city gate.
 gate~
 1 3112 3041
 E
-bridge footbridge~
-   It is too high up to reach but it looks as if one easily could walk across it
-from one tower to the other.
+wall~
+   It is built from large gray rocks that have been fastened to each other with
+some kind of mortar.  It is far too high to climb.
+~
+E
+tower towers~
+   Both of the towers are built from large gray rocks that have been fastened to
+each other with some kind of mortar, just like the city wall.
 ~
 E
 gate~
@@ -1156,14 +1149,9 @@ reinforced with large iron bands to make them even more sturdy.  One of the
 doors is equipped with a very big lock.
 ~
 E
-tower towers~
-   Both of the towers are built from large gray rocks that have been fastened to
-each other with some kind of mortar, just like the city wall.
-~
-E
-wall~
-   It is built from large gray rocks that have been fastened to each other with
-some kind of mortar.  It is far too high to climb.
+bridge footbridge~
+   It is too high up to reach but it looks as if one easily could walk across it
+from one tower to the other.
 ~
 S
 #3054
@@ -1186,16 +1174,16 @@ You see the southern end of the temple.
 ~
 0 -1 3001
 E
-altar~
-   Even though the altar is more than ten feet long it appears to be made from a
-single block of white virgin marble.
-~
-E
 statue odin king god~
    The statue represents the one-eyed Odin sitting on a his throne.  He has
 long, gray hair and beard and a strict look on his face.  On top of the throne,
 just above his shoulders, his two ravens Hugin and Munin are sitting and at his
 feet are his wolves Gere and Freke.
+~
+E
+altar~
+   Even though the altar is more than ten feet long it appears to be made from a
+single block of white virgin marble.
 ~
 S
 #3058
@@ -1256,16 +1244,7 @@ You see the path which goes back to Midgaard.
 S
 #3061
 The Great Field Of Midgaard~
-   You are walking on a wide dirt path through the lush, green, fresh
-Midgaard countryside.  You can see to the horizon to the north, east,
-and west; the busy city of Midgaard lies to the south.  All around you
-is healthy green grass and an occasional large oak tree.  The sun feels
-wonderful on your face and a pleasant wind blows through your hair.  Birds
-chirp quietly to themselves and you can smell the faint scent of flowers
-and freshly cut grass.  You feel like you could lie down in the grass and
-stay here forever, surrounded by powerful beauty in all directions.
-   There is a strange structure on the eastern side of the path.  A small
-dirt path splits off of the main path and leads off to the west.
+A broad dirt path crosses the green countryside north of Midgaard. Oak trees stand scattered across the fields while birds wheel over the grass. The city lies to the south and the Dragonhelm Mountains rise faintly on the northern horizon. To the east, a weathered stone structure stands at the edge of the trail, while a narrower path branches west toward an old iron gate.
 ~
 30 4 0 0 0 1
 D0
@@ -1291,12 +1270,8 @@ There is a strange path leading towards a rusty gate to the west.
 0 -1 3066
 S
 #3062
-The Post Office~
-   You are in the central post office for Midgaard.  Piles of assorted mail
-lay untouched in the corners, collecting cobwebs.  Several large crates have
-been pried open by curious customs agents, and are now stacked along the west
-wall, hiding plenty of 'WANTED' posters.
-There is a sign posted on the wall here.
+The Midgaard Courier Hall~
+Shelves of tied letters, wax-sealed parcels, and leather dispatch satchels fill Midgaard's courier hall. A long oak counter separates visitors from a maze of pigeonholes marked with districts, guilds, and distant settlements. Couriers come and go throughout the day, carrying messages beneath the city's seal. The entrance hall of the Grunting Boar Inn lies to the south.
 ~
 30 8 0 0 0 1
 D2
@@ -1304,6 +1279,29 @@ You see the entrance to the Grunting Boar Inn and Tavern.
 ~
 ~
 0 -1 3006
+E
+WANTED posters poster wall~
+   Faces of various known Killers and Thieves can barely be seen behind the
+crates on the west wall.  Some of them look quite familar, sorta like that guy
+who you saw in the Reception a minute ago...  But then again, they are rather
+hard to see past the crates.
+~
+E
+crates opened large~
+   As you know, it is illegal to send contraband items through the Midgaard
+Mail.  The customs agents use this as a great excuse to seize liquor, rare
+spices, and just about anything they might find useful or profitable.
+~
+E
+cobwebs~
+   They seem to cover everything here, even the Postmaster himself.
+~
+E
+letters envelopes assorted~
+   Envelopes of all sizes are heaped into hugh piles around the room.  As you
+look closer, you see a letter that you had posted a full week ago, laying
+unnoticed and slightly rat-chewed towards the bottom of the pile.
+~
 E
 sign~
    **********************************************************
@@ -1323,29 +1321,6 @@ sign~
    *         Type 'HELP MAIL' for more info                 *
    **********************************************************
 ~
-E
-letters envelopes assorted~
-   Envelopes of all sizes are heaped into hugh piles around the room.  As you
-look closer, you see a letter that you had posted a full week ago, laying
-unnoticed and slightly rat-chewed towards the bottom of the pile.
-~
-E
-cobwebs~
-   They seem to cover everything here, even the Postmaster himself.
-~
-E
-crates opened large~
-   As you know, it is illegal to send contraband items through the Midgaard
-Mail.  The customs agents use this as a great excuse to seize liquor, rare
-spices, and just about anything they might find useful or profitable.
-~
-E
-WANTED posters poster wall~
-   Faces of various known Killers and Thieves can barely be seen behind the
-crates on the west wall.  Some of them look quite familar, sorta like that guy
-who you saw in the Reception a minute ago...  But then again, they are rather
-hard to see past the crates.
-~
 S
 #3063
 The Midgaard Donation Room~
@@ -1361,10 +1336,8 @@ The busy temple is back west.
 0 -1 3001
 S
 #3064
-The Cryogenic Center~
-   You are standing in an impossibly white sterile room with cylindrical
-body-length canisters lined up against the walls.  The Reception is to the
-south.
+The Hall of Quiet Dreams~
+Cool, still air fills this chamber of pale stone. Crystal resting alcoves line the walls beneath slowly turning silver runes, each one veiled by a faint blue-white shimmer that preserves sleeping travelers and their belongings until they choose to wake. The warmer lamplight of the inn's reception lies to the south.
 ~
 30 8 0 0 0 1
 D2
@@ -1374,17 +1347,8 @@ The Reception is to the south.
 0 -1 3008
 S
 #3065
-The Great Field Of Midgaard~
-   You are walking on a wide dirt path through the lush, green, fresh
-Midgaard countryside.  You can see to the horizon to the north, east,
-and west; the busy city of Midgaard lies to the south.  All around you
-is healthy green grass and an occasional large oak tree.  The sun feels
-wonderful on your face and a pleasant wind blows through your hair.  Birds
-chirp quietly to themselves and you can smell the faint scent of flowers
-and freshly cut grass.  You feel like you could lie down in the grass and
-stay here forever, surrounded by powerful beauty in all directions.
-   The way north appears to be blocked by a large plot device and you cannot
-see any way around it.
+The Northern Reach of the Great Field~
+The dirt road dwindles into the northern reach of Midgaard's great field. Beyond this point, fallen standing stones and a dense wall of ancient thornbriar swallow the remains of the old road, leaving no safe passage farther north. Wind moves through the high grass while the distant Dragonhelm Mountains loom beyond the overgrown boundary. The open path back toward Midgaard continues south.
 ~
 30 0 0 0 0 2
 D0
@@ -1407,17 +1371,7 @@ reasons beyond your comprehension.
 S
 #3066
 The Dirt Path~
-   You are walking along a narrow dirt path through the lush, green,
-fresh Midgaard countryside.  You can see to the horizon to the north
-and east; the busy city of Midgaard lies to the south.  All around
-you is healthy green grass and an occasional large oak tree.  The sun
-feels wonderful on your face and a pleasant wind blows through your
-hair.  Birds chirp quietly to themselves and you can smell the faint
-scent of flowers and freshly cut grass.  You feel like you could lie
-down in the grass and stay here forever, surrounded by powerful beauty
-in all directions.
-   There is a large rusty gate sitting in a stone archway just to the
-west.
+A narrow dirt path winds west through the fields away from the main road. Wild grass crowds its edges and an old iron-bound gate stands within a weathered stone arch ahead, its masonry darkened by rain and age. Eastward, the path returns to the broader road leading toward Midgaard.
 ~
 30 0 0 0 0 2
 D1
