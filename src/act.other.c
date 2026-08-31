@@ -37,15 +37,9 @@
 #include "pfdefaults.h"
 
 /* ABILITY LIST FORMATTER v4 */
-#ifndef ABIL_COL_WIDTH
-#define ABIL_COL_WIDTH 27
-#endif
 #define LEVEL_LABEL_PADDING 10
 #define SPELL_ROW_GAP 2
 #define SPELL_TERM_WIDTH 78
-#define SPELL_LEFT_MIN_WIDTH 24
-#define SPELL_LEFT_MAX_WIDTH 40
-#define SPELL_LEFT_COL_WIDTH 36
 
 struct abil_row {
   int id;
@@ -345,13 +339,6 @@ void show_ability_table_aligned(struct char_data *ch, int show_spells, int show_
 {
   int i;
   int cls = GET_CLASS(ch);
-  int col = 0;
-  int last_lvl = -1;
-  int col_width = ABIL_COL_WIDTH;
-  int name_width = 17;
-
-  /* "Level 99: " is 10 chars; padding below matches practice output. */
-
   struct abil_row rows[TOP_SPELL_DEFINE + 1];
   int n = 0;
 
@@ -401,7 +388,9 @@ void show_ability_table_aligned(struct char_data *ch, int show_spells, int show_
 
   qsort(rows, (size_t)n, sizeof(rows[0]), abil_row_cmp);
 
-  if (show_spells) {
+  /* Both sections use the same renderer.  A pair only shares a row when its
+   * complete names and percentage cells fit the normal terminal width. */
+  {
     int idx = 0;
     int global_left_name_len = 0;
     int global_right_name_len = 0;
@@ -498,44 +487,6 @@ void show_ability_table_aligned(struct char_data *ch, int show_spells, int show_
     return;
   }
 
-  /* Print */
-  for (i = 0; i < n; i++) {
-    char cell[256];
-
-    if (rows[i].lvl != last_lvl) {
-      if (col != 0) {
-        send_to_char(ch, "\r\n");
-        col = 0;
-      }
-      send_to_char(ch, "%sLevel %-2d%s:%s ",
-                   CCCYN(ch, C_NRM),
-                   rows[i].lvl,
-                   CCWHT(ch, C_NRM),
-                   CCNRM(ch, C_NRM));
-      last_lvl = rows[i].lvl;
-    } else if (col == 0) {
-      send_to_char(ch, "\r\n%*s", LEVEL_LABEL_PADDING, "");
-    } else {
-      send_to_char(ch, "  ");
-    }
-
-    if (rows[i].pct < 0)
-      snprintf(cell, sizeof(cell), "%-*.*s [ -- ]",
-               name_width, name_width, rows[i].name);
-    else
-      snprintf(cell, sizeof(cell), "%-*.*s [%3d%%]",
-               name_width, name_width, rows[i].name, rows[i].pct);
-    send_to_char(ch, "%-*s", col_width + count_color_chars(cell), cell);
-
-    col++;
-    if (col >= 2) {
-      send_to_char(ch, "\r\n");
-      col = 0;
-    }
-  }
-
-  if (col != 0)
-    send_to_char(ch, "\r\n");
 }
 
 static void show_adventurer_study_catalog(struct char_data *ch, int show_spells, const char *filter)
