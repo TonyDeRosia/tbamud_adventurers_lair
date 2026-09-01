@@ -21,6 +21,201 @@
 #include "spells.h"
 #include "constants.h"
 #include "fight.h"
+#include "act.h"
+
+#define DG_COOLDOWN_MAX_SECONDS (7 * 24 * 60 * 60)
+
+static void dg_set_result(struct script_data *sc, trig_data *trig,
+                          const char *name, const char *value)
+{
+  add_var(&GET_TRIG_VARS(trig), name, value, sc ? sc->context : 0);
+}
+
+static struct char_data *dg_mob_actor(void *go, trig_data *trig, int type,
+                                      const char *command)
+{
+  if (type != MOB_TRIGGER || !go || !IS_NPC((struct char_data *)go)) {
+    script_log("Trigger: %s, VNum %d. %s is valid only for mob triggers.",
+      GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), command);
+    return NULL;
+  }
+  return (struct char_data *)go;
+}
+
+static int dg_normalize_cooldown_key(const char *input, char *key)
+{
+  size_t i, len;
+
+  if (!input || !(len = strlen(input)) || len > DG_COOLDOWN_KEY_MAX)
+    return FALSE;
+  for (i = 0; i < len; i++) {
+    if (!(isalnum((unsigned char)input[i]) || input[i] == '_'))
+      return FALSE;
+    key[i] = LOWER(input[i]);
+  }
+  key[len] = '\0';
+  return TRUE;
+}
+
+static void dg_purge_cooldowns(struct char_data *mob, time_t now)
+{
+  struct dg_cooldown_entry **entry, *old;
+
+  for (entry = &mob->mob_specials.dg_cooldowns; *entry; ) {
+    if ((*entry)->expires_at <= now) {
+      old = *entry;
+      *entry = old->next;
+      free(old);
+    } else
+      entry = &(*entry)->next;
+  }
+}
+
+void dg_cooldowns_free(struct char_data *mob)
+{
+  struct dg_cooldown_entry *entry, *next;
+
+  if (!mob)
+    return;
+  for (entry = mob->mob_specials.dg_cooldowns; entry; entry = next) {
+    next = entry->next;
+    free(entry);
+  }
+  mob->mob_specials.dg_cooldowns = NULL;
+}
+
+static struct dg_cooldown_entry *dg_find_cooldown(struct char_data *mob,
+    long player_id, const char *key, int *count)
+{
+  struct dg_cooldown_entry *entry;
+
+  *count = 0;
+  for (entry = mob->mob_specials.dg_cooldowns; entry; entry = entry->next) {
+    (*count)++;
+    if (entry->player_id == player_id && !str_cmp(entry->key, key))
+      return entry;
+  }
+  return NULL;
+}
+
+static struct char_data *dg_cooldown_target(const char *target, trig_data *trig,
+                                             const char *command)
+{
+  struct char_data *player = get_char((char *)target);
+
+  if (!player || IS_NPC(player)) {
+    script_log("Trigger: %s, VNum %d. %s requires a valid player target.",
+      GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), command);
+    return NULL;
+  }
+  return player;
+}
+
+/* dg_cooldown_check <player> <key>; result: dg_cooldown_result = READY/BLOCKED/ERROR */
+void do_dg_cooldown_check(void *go, struct script_data *sc, trig_data *trig,
+                          int type, char *cmd)
+{
+  char ignored[MAX_INPUT_LENGTH], target[MAX_INPUT_LENGTH], raw_key[MAX_INPUT_LENGTH];
+  char key[DG_COOLDOWN_KEY_MAX + 1];
+  struct char_data *mob, *player;
+  struct dg_cooldown_entry *entry;
+  int count;
+
+  dg_set_result(sc, trig, "dg_cooldown_result", "ERROR");
+  mob = dg_mob_actor(go, trig, type, "dg_cooldown_check");
+  half_chop(cmd, ignored, cmd);
+  half_chop(cmd, target, raw_key);
+  if (!mob || !*target || !dg_normalize_cooldown_key(raw_key, key)) {
+    script_log("Trigger: %s, VNum %d. dg_cooldown_check usage: <player> <key> (key: 1-%d letters, digits, underscores).",
+      GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), DG_COOLDOWN_KEY_MAX);
+    return;
+  }
+  if (!(player = dg_cooldown_target(target, trig, "dg_cooldown_check")))
+    return;
+  dg_purge_cooldowns(mob, time(NULL));
+  entry = dg_find_cooldown(mob, GET_IDNUM(player), key, &count);
+  dg_set_result(sc, trig, "dg_cooldown_result", entry ? "BLOCKED" : "READY");
+}
+
+/* dg_cooldown_set <player> <key> <seconds>; result: dg_cooldown_result = SET/ERROR */
+void do_dg_cooldown_set(void *go, struct script_data *sc, trig_data *trig,
+                        int type, char *cmd)
+{
+  char ignored[MAX_INPUT_LENGTH], target[MAX_INPUT_LENGTH], raw_key[MAX_INPUT_LENGTH], raw_seconds[MAX_INPUT_LENGTH];
+  char key[DG_COOLDOWN_KEY_MAX + 1], *end;
+  struct char_data *mob, *player;
+  struct dg_cooldown_entry *entry;
+  long seconds;
+  time_t now;
+  int count;
+
+  dg_set_result(sc, trig, "dg_cooldown_result", "ERROR");
+  mob = dg_mob_actor(go, trig, type, "dg_cooldown_set");
+  half_chop(cmd, ignored, cmd);
+  half_chop(cmd, target, cmd);
+  half_chop(cmd, raw_key, raw_seconds);
+  errno = 0;
+  seconds = strtol(raw_seconds, &end, 10);
+  if (!mob || !*target || !dg_normalize_cooldown_key(raw_key, key) || !*raw_seconds ||
+      *end || errno == ERANGE || seconds <= 0 || seconds > DG_COOLDOWN_MAX_SECONDS) {
+    script_log("Trigger: %s, VNum %d. dg_cooldown_set usage: <player> <key> <seconds>; seconds must be 1-%d.",
+      GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), DG_COOLDOWN_MAX_SECONDS);
+    return;
+  }
+  if (!(player = dg_cooldown_target(target, trig, "dg_cooldown_set")))
+    return;
+  now = time(NULL);
+  if ((long long)now > LLONG_MAX - seconds) {
+    script_log("Trigger: %s, VNum %d. dg_cooldown_set expiration overflows time_t.",
+      GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig));
+    return;
+  }
+  dg_purge_cooldowns(mob, now);
+  entry = dg_find_cooldown(mob, GET_IDNUM(player), key, &count);
+  if (!entry) {
+    if (count >= DG_COOLDOWN_MAX_ENTRIES) {
+      script_log("Trigger: %s, VNum %d. dg_cooldown_set: mob cooldown entry limit (%d) reached.",
+        GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), DG_COOLDOWN_MAX_ENTRIES);
+      return;
+    }
+    CREATE(entry, struct dg_cooldown_entry, 1);
+    if (!entry)
+      return;
+    entry->player_id = GET_IDNUM(player);
+    strlcpy(entry->key, key, sizeof(entry->key));
+    entry->next = mob->mob_specials.dg_cooldowns;
+    mob->mob_specials.dg_cooldowns = entry;
+  }
+  entry->expires_at = now + (time_t)seconds;
+  dg_set_result(sc, trig, "dg_cooldown_result", "SET");
+}
+
+/* dg_skill <backstab|bash|kick> <target>; result: dg_skill_result = ATTEMPTED/NOT_ATTEMPTED */
+void do_dg_skill(void *go, struct script_data *sc, trig_data *trig,
+                 int type, char *cmd)
+{
+  char ignored[MAX_INPUT_LENGTH], skill[MAX_INPUT_LENGTH], target[MAX_INPUT_LENGTH];
+  struct char_data *mob, *vict;
+
+  dg_set_result(sc, trig, "dg_skill_result", "NOT_ATTEMPTED");
+  mob = dg_mob_actor(go, trig, type, "dg_skill");
+  half_chop(cmd, ignored, cmd);
+  half_chop(cmd, skill, target);
+  if (!mob || !*skill || !*target ||
+      (str_cmp(skill, "backstab") && str_cmp(skill, "bash") && str_cmp(skill, "kick"))) {
+    script_log("Trigger: %s, VNum %d. dg_skill usage: <backstab|bash|kick> <target>.",
+      GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig));
+    return;
+  }
+  vict = get_char(target);
+  if (!vict || IN_ROOM(vict) != IN_ROOM(mob)) {
+    script_log("Trigger: %s, VNum %d. dg_skill target is absent or not in the mob's room.",
+      GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig));
+    return;
+  }
+  if (dg_execute_skill(mob, vict, skill))
+    dg_set_result(sc, trig, "dg_skill_result", "ATTEMPTED");
+}
 
 
 /* copied from spell_parser.c: */

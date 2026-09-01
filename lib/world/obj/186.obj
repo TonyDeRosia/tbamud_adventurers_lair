@@ -5,7 +5,7 @@ A blunted Academia training sword has been left here.~
 ~
 5 0 0 0 0 an 0 0 0 0 0 0 0
 0 1 4 5
-4 10 0 1 0
+4 2 0 1 0
 A
 19 1
 #18602
@@ -15,7 +15,7 @@ A padded blue-and-silver novice vest rests here.~
 ~
 9 0 0 0 0 ad 0 0 0 0 0 0 0
 1 0 0 0
-3 8 0 1 0
+3 1 0 1 0
 #18603
 practice helm academy novice~
 an Academia practice helm~
@@ -23,7 +23,7 @@ A simple padded practice helm rests here.~
 ~
 9 0 0 0 0 ae 0 0 0 0 0 0 0
 1 0 0 0
-2 6 0 1 0
+2 1 0 1 0
 A
 5 1
 #18604
@@ -33,7 +33,7 @@ A durable novice field cloak has been folded here.~
 ~
 9 0 0 0 0 ak 0 0 0 0 0 0 0
 1 0 0 0
-2 10 0 1 0
+2 2 0 1 0
 A
 17 -3
 A
@@ -45,7 +45,7 @@ A plain silver Academia signet ring lies here.~
 ~
 9 g 0 0 0 ab 0 0 0 0 0 0 0
 1 0 0 0
-1 5 0 1 0
+1 1 0 1 0
 A
 17 -2
 #18606
@@ -55,7 +55,7 @@ A blunted Academia training dagger lies here.~
 ~
 5 0 0 0 0 ano 0 0 0 0 0 0 0
 0 1 4 11
-1 8 0 1 0
+1 2 0 1 0
 A
 19 1
 #18607
@@ -65,7 +65,7 @@ A reinforced collar bearing the Academia crest lies here.~
 ~
 9 g 0 0 0 ac 0 0 0 0 0 0 0
 1 0 0 0
-1 5 0 1 0
+1 1 0 1 0
 A
 18 1
 A
@@ -85,7 +85,7 @@ A hooded Academia practice lantern gives off a steady glow.~
 ~
 1 ag 0 0 0 a 0 0 0 0 0 0 0
 0 0 -1 0
-2 8 0 1 0
+2 1 0 1 0
 A
 24 -1
 #18610
@@ -95,7 +95,7 @@ A pair of heavy padded horn guards lies here.~
 ~
 9 0 0 0 0 ae 0 0 0 0 0 0 0
 2 0 0 0
-2 12 0 3 0
+2 2 0 3 0
 A
 1 1
 #18611
@@ -105,7 +105,7 @@ A reinforced hide used in practical drills lies here.~
 ~
 11 0 0 0 0 adk 0 0 0 0 0 0 0
 0 0 0 0
-4 14 0 3 0
+4 2 0 3 0
 A
 17 -6
 A
@@ -117,7 +117,7 @@ A pair of sturdy novice leggings has been left here.~
 ~
 9 0 0 0 0 af 0 0 0 0 0 0 0
 1 0 0 0
-3 10 0 1 0
+3 1 0 1 0
 #18613
 novice sleeves academy~
 a pair of novice sleeves~
@@ -125,7 +125,7 @@ A pair of padded novice sleeves rests here.~
 ~
 9 0 0 0 0 ai 0 0 0 0 0 0 0
 1 0 0 0
-2 10 0 1 0
+2 1 0 1 0
 A
 3 1
 #18614
@@ -135,7 +135,7 @@ A blunted Academia training mace rests here.~
 ~
 5 0 0 0 0 an 0 0 0 0 0 0 0
 0 1 5 5
-5 12 0 2 0
+5 2 0 2 0
 A
 17 -2
 $~

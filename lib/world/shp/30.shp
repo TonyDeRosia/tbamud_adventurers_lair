@@ -6,8 +6,8 @@ CircleMUD v3.0 Shop File~
 3053
 3054
 -1
-1.15
-0.15
+1.20
+0.50
 2
 3
 4
@@ -35,8 +35,8 @@ CircleMUD v3.0 Shop File~
 3010
 3011
 -1
-1.40
-0.90
+1.20
+0.50
 -1
 %s Haven't got that on storage - try list!~
 %s I don't buy!~
@@ -62,8 +62,8 @@ CircleMUD v3.0 Shop File~
 3033
 3036
 -1
-1.50
-0.40
+1.20
+0.50
 1
 8
 15
@@ -93,8 +93,8 @@ CircleMUD v3.0 Shop File~
 3024
 3025
 -1
-1.30
-0.40
+1.20
+0.50
 5
 -1
 %s I haven't got that kind of a weapon!~
@@ -156,7 +156,7 @@ CircleMUD v3.0 Shop File~
 3006
 -1
 1.20
-0.90
+0.50
 -1
 %s Sorry, I don't stock that item.~
 %s You don't seem to have that.~
@@ -180,7 +180,7 @@ CircleMUD v3.0 Shop File~
 3061
 -1
 1.20
-0.90
+0.50
 22
 -1
 %s Sorry pal, I have not got that kind of ship.~
@@ -202,7 +202,7 @@ CircleMUD v3.0 Shop File~
 0
 #3007~
 -1
-2.00
+1.20
 0.50
 -1
 %s Sorry, you aren't on my list of people I can sell to.~
@@ -228,7 +228,7 @@ CircleMUD v3.0 Shop File~
 3104
 -1
 1.20
-0.80
+0.50
 -1
 %s Sorry, I don't have that -- try list!~
 %s Sorry, I don't buy waters from outsiders.~
@@ -254,8 +254,8 @@ CircleMUD v3.0 Shop File~
 3003
 3004
 -1
-1.10
-0.90
+1.20
+0.50
 -1
 %s It's very noisy in here, what did you say you wanted to buy?~
 %s I don't buy!~
@@ -279,7 +279,7 @@ CircleMUD v3.0 Shop File~
 3003
 -1
 1.20
-0.80
+0.50
 -1
 %s Haven't got that on storage - try list!~
 %s I don't buy!~
@@ -302,8 +302,8 @@ CircleMUD v3.0 Shop File~
 3002
 3004
 -1
-1.10
-0.90
+1.20
+0.50
 -1
 %s Haven't got that on storage - try list!~
 %s I don't buy!~
@@ -326,8 +326,8 @@ CircleMUD v3.0 Shop File~
 3003
 3004
 -1
-1.70
-0.80
+1.20
+0.50
 -1
 %s Haven't got that on storage - try list!~
 %s I don't buy!~
@@ -351,8 +351,8 @@ CircleMUD v3.0 Shop File~
 3003
 3004
 -1
-1.50
-0.75
+1.20
+0.50
 -1
 %s Haven't got that on storage - try list!~
 %s I don't buy!~
@@ -375,8 +375,8 @@ CircleMUD v3.0 Shop File~
 3004
 3003
 -1
-1.30
-0.70
+1.20
+0.50
 -1
 %s It's very noisy in here, what did you say you wanted to buy?~
 %s I don't buy!~

@@ -1164,6 +1164,17 @@ struct player_special_data
   int hp_last_round;     /**< HP snapshot from previous combat round for chrono effects. */
 };
 
+/* Runtime-only DG cooldown state.  Entries belong to a live mob instance and
+ * are deliberately neither prototype data nor player-save data. */
+#define DG_COOLDOWN_KEY_MAX 32
+#define DG_COOLDOWN_MAX_ENTRIES 256
+struct dg_cooldown_entry {
+  long player_id;
+  char key[DG_COOLDOWN_KEY_MAX + 1];
+  time_t expires_at;
+  struct dg_cooldown_entry *next;
+};
+
 /** Special data used by NPCs, not PCs */
 struct mob_special_data
 {
@@ -1194,6 +1205,7 @@ struct mob_special_data
   long long gold_min; /* min roll on death */
   long long gold_max; /* max roll on death */
   int summon_timer;   /**< Violence-pulse countdown for temporary summons (<=0 means permanent). */
+  struct dg_cooldown_entry *dg_cooldowns; /**< Runtime DG per-player cooldowns. */
 };
 
 struct room_effect_data

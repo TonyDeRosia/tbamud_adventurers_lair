@@ -1,3 +1,33 @@
+#18670
+DG Foundation - Cooldown Test~
+0 d 1
+dgtest~
+if %actor.is_pc%
+  dg_cooldown_check %actor% foundation_test
+  msend %actor% CHECK1=%dg_cooldown_result%
+  dg_cooldown_set %actor% foundation_test 10
+  msend %actor% SET=%dg_cooldown_result%
+  dg_cooldown_check %actor% foundation_test
+  msend %actor% CHECK2=%dg_cooldown_result%
+end
+~
+#18671
+DG Foundation - Kick Test~
+0 k 100
+~
+if %actor.is_pc%
+  dg_cooldown_check %actor% foundation_kick
+  msend %actor% KICKCHECK=%dg_cooldown_result%
+  if %dg_cooldown_result% == READY
+    dg_skill kick %actor%
+    msend %actor% SKILL=%dg_skill_result%
+    if %dg_skill_result% == ATTEMPTED
+      dg_cooldown_set %actor% foundation_kick 8
+      msend %actor% KICKSET=%dg_cooldown_result%
+    end
+  end
+end
+~
 #18680
 Academia - Elowen Orientation~
 0 g 100

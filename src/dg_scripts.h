@@ -361,6 +361,13 @@ void do_dg_cast(void *go, struct script_data *sc, trig_data *trig,
     int type, char *cmd);
 void do_dg_affect(void *go, struct script_data *sc, trig_data *trig,
     int type, char *cmd);
+void do_dg_skill(void *go, struct script_data *sc, trig_data *trig,
+    int type, char *cmd);
+void do_dg_cooldown_check(void *go, struct script_data *sc, trig_data *trig,
+    int type, char *cmd);
+void do_dg_cooldown_set(void *go, struct script_data *sc, trig_data *trig,
+    int type, char *cmd);
+void dg_cooldowns_free(struct char_data *mob);
 void send_char_pos(struct char_data *ch, int dam);
 int valid_dg_target(char_data *ch, int bitvector);
 void script_damage(char_data *vict, int dam);

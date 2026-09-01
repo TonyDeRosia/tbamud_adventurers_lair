@@ -6,7 +6,7 @@ A broad-backed Academia practice beast paws at the sand.
 This heavily built creature has been bred and trained for controlled combat drills. Thick hide, blunted horn caps, and a leather handler's mark identify it as dangerous enough to teach respect without being intended as a slaughter animal.
 ~
 10 0 0 0 0 0 0 0 -750 E
-5 20 25 1d4+25 1d2+0
+5 16 25 2d6+173 1d2+0
 50 0
 8 8 0
 SavingPara: 1
@@ -16,8 +16,6 @@ SavingBreath: 1
 SavingSpell: 1
 Wimpy: 2
 Evasion: 1
-GoldMin: 0
-GoldMax: 1
 E
 T 18687
 T 18697
@@ -29,7 +27,7 @@ An animated training dummy waits in a ready stance.
 Wood, leather, straw, and simple enchantment give this humanoid practice construct a convincing fighting posture. Its joints are reinforced to survive repeated drills, and painted target marks show where students are expected to place controlled blows.
 ~
 72 0 0 0 0 0 0 0 0 E
-2 20 22 1d4+10 1d2+0
+2 17 25 2d6+38 1d2+0
 20 0
 8 8 1
 Wimpy: 1
@@ -42,7 +40,7 @@ A young Academia drake watches the room with bright, curious eyes.
 This small drake is one of several creatures raised under careful supervision by Academia handlers. Leather identification bands mark it as trained, though the sharp claws and faint heat in its breath remind students that even familiar creatures deserve caution.
 ~
 72 0 0 0 0 0 0 0 100 E
-4 20 24 1d4+20 1d2+0
+4 17 25 2d6+73 1d3+0
 40 0
 8 8 1
 SavingPara: 1
@@ -52,8 +50,6 @@ SavingBreath: 1
 SavingSpell: 1
 Wimpy: 2
 Evasion: 1
-GoldMin: 0
-GoldMax: 1
 E
 T 18688
 #18604
@@ -64,7 +60,7 @@ Warden Halric keeps a patient watch over the practical halls.
 Halric is a weathered human veteran in a dark blue Academia surcoat. A ring of practice keys hangs from his belt, and old scars across his knuckles suggest he has opened more dangerous doors than the training examples surrounding him.
 ~
 10 0 0 0 0 0 0 0 0 E
-3 20 23 1d4+15 1d2+0
+3 20 25 2d6+63 1d2+0
 30 0
 8 8 1
 Wimpy: 1
@@ -81,7 +77,7 @@ Master Alchemist Seraphine measures a reagent with practiced care.
 Seraphine wears a leather apron over layered scholar's robes, with small pouches and stoppered vials arranged by touch rather than appearance. Her calm manner and exacting habits make it clear that she teaches students to respect useful substances before trusting them.
 ~
 10 0 0 0 0 0 0 0 0 E
-5 20 25 1d4+25 1d2+0
+5 20 25 2d6+93 1d2+0
 50 0
 8 8 2
 SavingPara: 1
@@ -102,7 +98,7 @@ A small clockwork crawler skitters across the floor.
 Brass legs carry a low wooden-and-metal body fitted with padded striking nubs instead of blades. The simple mechanism is designed to teach inexperienced adventurers how moving opponents behave without exposing them to a truly lethal creature.
 ~
 72 0 0 0 0 0 0 0 -250 E
-1 20 21 1d4+5 1d2+0
+1 18 25 2d6+18 1d2+0
 10 0
 8 8 0
 Wimpy: 1
@@ -115,7 +111,7 @@ An animated training husk advances with a blunted practice weapon.
 Layered cloth, wicker, leather, and minor animation magic form a sturdier opponent than the simple training dummy. Its movements imitate an inexperienced humanoid fighter, giving students a safer way to practice against something that attacks back.
 ~
 104 0 0 0 0 0 0 0 -500 E
-4 20 24 1d4+20 1d2+0
+4 17 25 2d6+83 1d3+1
 40 0
 8 8 0
 SavingPara: 1
@@ -125,8 +121,6 @@ SavingBreath: 1
 SavingSpell: 1
 Wimpy: 2
 Evasion: 1
-GoldMin: 0
-GoldMax: 1
 E
 #18608
 practice imp summoned imp academy~
@@ -136,13 +130,11 @@ A bound practice imp flits impatiently within the examination course.
 A small winged imp has been bound under strict Academia wards for supervised exercises. Glowing sigils around its wrists prevent it from leaving the grounds, though its quick movements and malicious grin make it an effective lesson in dealing with magical creatures.
 ~
 232 0 0 0 0 0 0 0 -800 E
-3 20 23 1d4+15 1d2+0
+3 17 25 2d6+53 1d3+0
 30 0
 8 8 1
 Wimpy: 1
 Evasion: 1
-GoldMin: 0
-GoldMax: 1
 E
 #18609
 trial minotaur minotaur academy~
@@ -152,7 +144,7 @@ The Trial Minotaur lowers its padded horns and watches for a challenger.
 This enormous minotaur serves as one of the Academia's most demanding controlled opponents. Heavy leather guards cover its horns and joints, while a handler's sigil marks it as trained to break pursuit when a student yields or escapes.
 ~
 72 0 0 0 0 0 0 0 -1000 E
-7 20 27 1d4+35 1d2+0
+7 15 25 2d6+193 1d5+2
 70 0
 8 8 1
 SavingPara: 1
@@ -162,8 +154,6 @@ SavingBreath: 1
 SavingSpell: 1
 Wimpy: 3
 Evasion: 2
-GoldMin: 1
-GoldMax: 3
 E
 #18610
 spectral examiner examiner spirit academy~
@@ -173,7 +163,7 @@ A spectral examiner observes the chamber in solemn silence.
 The translucent figure wears the old field cloak of an Academia examiner from generations past. Rather than haunting the halls in anger, the spirit remains by ancient agreement, watching students with the patient severity of someone who has seen every careless mistake before.
 ~
 2122 0 0 0 1048596 0 0 0 -850 E
-6 20 26 1d4+30 1d2+0
+6 16 25 2d6+143 1d4+1
 60 0
 8 8 0
 SavingPara: 1
@@ -183,8 +173,6 @@ SavingBreath: 1
 SavingSpell: 1
 Wimpy: 3
 Evasion: 2
-GoldMin: 0
-GoldMax: 1
 E
 T 18689
 T 18698
@@ -196,7 +184,7 @@ Instructor Vael checks a student's pack against a worn field list.
 Vael is a lean half-elf dressed for travel rather than ceremony. Rope, chalk, a compass, and a weather-stained cloak hang from practical straps, and every piece of equipment appears to have been repaired more than once.
 ~
 72 0 0 0 0 0 0 0 -500 E
-2 20 22 1d4+10 1d2+0
+2 20 25 2d6+43 1d2+0
 20 0
 8 8 1
 Wimpy: 1
@@ -211,7 +199,7 @@ Registrar Elowen stands ready to guide newly arrived students.
 Elowen is a composed human woman in the deep blue and silver of the Academia. She carries enrollment ledgers beneath one arm and has the practiced expression of someone accustomed to answering simple questions without making the asker feel foolish.
 ~
 72 0 0 0 0 0 0 0 0 E
-1 20 21 1d4+5 1d2+0
+1 20 25 2d6+18 1d2+0
 10 0
 8 8 2
 Wimpy: 1
@@ -226,7 +214,7 @@ Lecturer Miriel studies a map covered in careful annotations.
 Miriel is an elven lecturer whose robes are stitched with tiny road, star, and rune motifs. She teaches communication, lore, and the habit of asking useful questions before an expedition leaves civilization behind.
 ~
 72 0 0 0 0 0 0 0 100 E
-3 20 23 1d4+15 1d2+0
+3 20 25 2d6+63 1d2+0
 30 0
 8 8 2
 Wimpy: 1
@@ -242,7 +230,7 @@ Scoutmaster Corren quietly studies the flow of students through the halls.
 Corren wears a weathered green cloak over light field armor and carries no unnecessary ornament. His sharp eyes constantly note exits, distances, and movement, making even an ordinary corridor seem like part of a navigation exercise.
 ~
 72 0 0 0 0 0 0 0 300 E
-4 20 24 1d4+20 1d2+0
+4 20 25 2d6+83 1d2+0
 40 0
 8 8 1
 SavingPara: 1
@@ -263,7 +251,7 @@ Provost Aldren oversees the Academia with calm authority.
 Aldren is an older adventurer whose formal coat cannot completely hide the posture of a veteran accustomed to armor and long roads. A silver lantern badge marks his office, while scars and faded expedition tattoos suggest his lessons were learned far beyond any classroom.
 ~
 72 0 0 0 0 0 0 0 500 E
-5 20 25 1d4+25 1d2+0
+5 20 25 2d6+113 1d2+0
 50 0
 8 8 1
 SavingPara: 1

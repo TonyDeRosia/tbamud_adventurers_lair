@@ -11,8 +11,6 @@ bracelets.
 33 9 25 6d6+330 5d5+5
 330 108900
 8 8 1
-GoldMin: 330
-GoldMax: 330
 E
 #3001
 baker~
@@ -26,23 +24,18 @@ body.
 33 9 25 6d6+330 5d5+5
 330 108900
 8 8 1
-GoldMin: 330
-GoldMax: 330
 E
 #3002
-grocer~
-the grocer~
-A grocer stands at the counter, with a slightly impatient look on his face.
+shop clerk~
+the shop clerk~
+A shop clerk stands at the counter, with a slightly impatient look on his face.
 ~
-   A tall grocer, who moves two 200 pounds bag of flour around on his shoulders.
-
+A tall shop clerk, who moves two 200 pound bags of flour around on his shoulders.
 ~
 26635 0 0 0 16 0 0 0 900 E
 33 9 25 6d6+330 5d5+5
 330 108900
 8 8 1
-GoldMin: 330
-GoldMax: 330
 E
 #3003
 weaponsmith~
@@ -56,8 +49,6 @@ to sell you his latest implements of carnage and destruction.
 33 9 25 6d6+330 5d5+5
 330 108900
 8 8 1
-GoldMin: 330
-GoldMax: 330
 E
 #3004
 armorer~
@@ -71,8 +62,6 @@ life than you have ever seen.
 33 9 25 6d6+330 5d5+5
 330 108900
 8 8 1
-GoldMin: 330
-GoldMax: 330
 E
 #3005
 inn steward receptionist keeper~
@@ -85,8 +74,6 @@ A middle-aged woman in a neat woolen dress keeps the inn's ledgers and room keys
 33 9 25 6d6+330 5d5+5
 330 108900
 8 8 2
-GoldMin: 330
-GoldMax: 330
 E
 #3006
 captain stolar~
@@ -99,8 +86,6 @@ A retired captain stands here, selling boats.
 33 9 25 6d6+330 5d5+5
 330 108900
 8 8 1
-GoldMin: 330
-GoldMax: 330
 E
 #3007
 sailor~
@@ -113,8 +98,6 @@ A sailor stands here, waiting to help you.
 33 9 25 6d6+330 5d5+5
 330 108900
 8 8 1
-GoldMin: 330
-GoldMax: 330
 E
 #3008
 uncle juan cook innkeeper~
@@ -127,8 +110,6 @@ A broad-shouldered tavern cook in a flour-dusted apron watches the room with an 
 33 9 25 6d6+330 5d5+5
 330 108900
 8 8 1
-GoldMin: 330
-GoldMax: 330
 E
 #3009
 wally watermaster~
@@ -143,8 +124,6 @@ fine collection of contemporary waters.
 33 9 25 6d6+330 5d5+5
 330 108900
 8 8 1
-GoldMin: 330
-GoldMax: 330
 E
 #3010
 master courier postmaster courier~
@@ -157,8 +136,6 @@ An older man in a dark blue tabard moves between rows of pigeonholes with practi
 33 9 25 6d6+330 5d5+5
 330 108900
 8 8 1
-GoldMin: 330
-GoldMax: 330
 E
 #3011
 travelling peddler woman merchant saleswoman~
@@ -171,8 +148,6 @@ Road dust clings to the peddler's layered cloak, and dozens of little bundles ha
 30 10 25 6d6+300 5d5+5
 300 90000
 8 8 2
-GoldMin: 300
-GoldMax: 300
 E
 #3012
 kind soul~
@@ -187,8 +162,6 @@ hard times and need a little boost.
 30 10 25 6d6+300 5d5+5
 300 90000
 8 8 2
-GoldMin: 300
-GoldMax: 300
 E
 T 3016
 #3013
@@ -199,7 +172,7 @@ A cheerful city guide waits here to help newcomers. Tell guide help for assistan
 A young woman in Midgaard's colors carries a well-used walking staff and a leather folio of hand-drawn maps. She seems genuinely pleased to point new arrivals toward the city's guilds, markets, inns, and gates.
 ~
 10 0 0 0 2128 0 0 0 0 E
-10 17 25 2d2+100 1d2+1
+10 17 25 2d6+243 1d2+1
 100 10000
 8 8 2
 SavingPara: 2
@@ -207,8 +180,6 @@ SavingRod: 2
 SavingPetri: 2
 SavingBreath: 2
 SavingSpell: 2
-GoldMin: 100
-GoldMax: 100
 E
 #3019
 veteran guild instructor trainer adventurer guildmaster~
@@ -235,8 +206,6 @@ you notice that she is surrounded by a blue shimmering aura.
 34 9 25 6d6+340 5d5+5
 340 115600
 8 8 2
-GoldMin: 340
-GoldMax: 340
 E
 #3021
 guildmasters master priest~
@@ -250,8 +219,6 @@ a peaceful, loving look.  You notice that he is surrounded by a white aura.
 34 9 25 6d6+340 5d5+5
 340 115600
 8 8 1
-GoldMin: 340
-GoldMax: 340
 E
 #3022
 guildmasters master beggar thief~
@@ -266,8 +233,6 @@ appearance of a beggar.
 34 9 25 6d6+340 5d5+5
 340 115600
 8 8 2
-GoldMin: 340
-GoldMax: 340
 E
 #3023
 guildmasters master~
@@ -280,8 +245,6 @@ This is the guildmaster of the Adventurer's Guild. A seasoned veteran of countle
 34 9 25 6d6+340 5d5+5
 340 115600
 8 8 1
-GoldMin: 340
-GoldMax: 340
 E
 #3024
 arcane warden sorcerer guildguard~
@@ -294,8 +257,6 @@ Layered robes and a rune-marked wand identify this veteran spellcaster as one of
 33 9 25 6d6+330 5d5+5
 330 108900
 8 8 1
-GoldMin: 330
-GoldMax: 330
 EquipItem: 3053 17
 E
 #3025
@@ -309,8 +270,6 @@ A disciplined temple warden in polished mail keeps watch over the cloister. The 
 33 9 25 6d6+330 5d5+5
 330 108900
 8 8 1
-GoldMin: 330
-GoldMax: 330
 EquipItem: 3024 16
 E
 #3026
@@ -324,8 +283,6 @@ A dark-cloaked veteran leans near the contract annex with the stillness of someo
 33 9 25 6d6+330 5d5+5
 330 108900
 8 8 1
-GoldMin: 330
-GoldMax: 330
 EquipItem: 3020 16
 E
 #3027
@@ -339,8 +296,6 @@ A broad-shouldered veteran in practical armor stands beside the guild registry. 
 33 9 25 6d6+330 5d5+5
 330 108900
 8 8 1
-GoldMin: 330
-GoldMax: 330
 EquipItem: 3022 16
 E
 #3040
@@ -354,8 +309,6 @@ A bartender watches you calmly, while he skillfully mixes a drink.
 24 12 25 4d4+240 4d4+4
 240 57600
 8 8 1
-GoldMin: 240
-GoldMax: 240
 E
 #3041
 waiter~
@@ -368,8 +321,6 @@ A waiter is going around from one place to another.
 23 13 25 4d4+230 3d3+3
 230 52900
 8 8 1
-GoldMin: 230
-GoldMax: 230
 E
 #3042
 waiter~
@@ -383,8 +334,6 @@ recognize his face.
 23 13 25 4d4+230 3d3+3
 230 52900
 8 8 1
-GoldMin: 230
-GoldMax: 230
 E
 #3043
 waiter~
@@ -398,8 +347,6 @@ begin to worship your God.  Naaah.
 23 13 25 4d4+230 3d3+3
 230 52900
 8 8 1
-GoldMin: 230
-GoldMax: 230
 E
 #3044
 waiter~
@@ -412,8 +359,6 @@ A waiter who knows where all his customers keep their money is standing here.
 23 13 25 4d4+230 3d3+3
 230 52900
 8 8 1
-GoldMin: 230
-GoldMax: 230
 E
 #3045
 guild steward waiter barkeep~
@@ -426,8 +371,6 @@ A capable steward moves between the commons tables with mugs, meals, and a remar
 23 13 25 4d4+230 3d3+3
 230 52900
 8 8 1
-GoldMin: 230
-GoldMax: 230
 E
 #3046
 filthy~
@@ -441,8 +384,6 @@ not mess with him or else he'll get upset.
 33 9 25 6d6+330 5d5+5
 330 108900
 8 8 1
-GoldMin: 330
-GoldMax: 330
 E
 #3059
 keeper peacekeeper~
@@ -456,8 +397,6 @@ A Peacekeeper is standing here, ready to jump in at the first sign of trouble.
 170 28900
 8 8 1
 BareHandAttack: 10
-GoldMin: 170
-GoldMax: 170
 E
 T 3009
 #3060
@@ -468,11 +407,9 @@ A cityguard stands here.
    A big, strong, helpful, trustworthy guard.
 ~
 6216 0 0 0 16 0 0 0 1000 E
-10 17 25 2d2+100 1d2+1
+10 15 25 2d6+293 1d6+3
 100 10000
 8 8 1
-GoldMin: 100
-GoldMax: 100
 EquipItem: 3022 16
 E
 T 3009
@@ -484,11 +421,9 @@ A city street sweeper works patiently along the roadside.
 Dressed in patched work clothes bearing a small Midgaard badge, the sweeper keeps the streets clear of refuse left by careless travelers. A battered handcart and stiff-bristled broom are never far from reach.
 ~
 2120 0 0 0 0 0 0 0 800 E
-1 20 0 0d0+10 1d2+0
+1 20 0 2d6+13 1d2+0
 10 100
 8 8 1
-GoldMin: 10
-GoldMax: 10
 E
 T 3011
 #3062
@@ -499,12 +434,12 @@ A hungry stray hound noses through the refuse for scraps.
 This lean, rough-coated hound has learned to survive on the edges of Midgaard's streets. Its ribs show beneath dirty fur, but its eyes remain alert and clever whenever the scent of food reaches its nose.
 ~
 202 0 0 0 65536 0 0 0 -200 E
-1 20 0 0d0+10 1d2+0
+1 18 0 2d6+11 1d2+0
 11 100
 8 8 1
 BareHandAttack: 4
-GoldMin: 5
-GoldMax: 15
+GoldMin: 1
+GoldMax: 1
 E
 T 3010
 #3063
@@ -515,11 +450,11 @@ A mercenary is waiting for a job here.
    He looks pretty mean, and you imagine he'd do anything for money.
 ~
 2058 0 0 0 0 0 0 0 -330 E
-5 19 13 1d1+50 1d2+0
+5 17 25 2d6+103 1d4+1
 50 2500
 8 8 1
-GoldMin: 50
-GoldMax: 50
+GoldMin: 3
+GoldMax: 5
 E
 #3064
 drunk~
@@ -529,11 +464,9 @@ A singing, happy Drunk.
    A drunk who seems to be too happy, and to carry too much money.
 ~
 10 0 0 0 0 0 0 0 400 E
-2 20 0 0d0+20 1d2+0
+2 20 0 2d6+23 1d2+0
 20 400
 8 8 1
-GoldMin: 20
-GoldMax: 20
 E
 #3065
 beggar~
@@ -543,11 +476,9 @@ A beggar is here, asking for a few coins.
    The beggar looks like she is fed up with life.
 ~
 10 0 0 0 0 0 0 0 400 E
-1 20 0 0d0+10 1d2+0
+1 20 0 2d6+13 1d2+0
 10 100
 8 8 2
-GoldMin: 10
-GoldMax: 10
 E
 #3066
 scarred stray hound dog~
@@ -557,12 +488,12 @@ A scarred stray hound prowls here with its hackles raised.
 Older and meaner than most street dogs, this scarred hound watches every movement with hungry suspicion. Torn ears and a patchwork of old wounds suggest years spent fighting over scraps in Midgaard's alleys.
 ~
 65768 0 0 0 65536 0 0 0 -200 E
-1 20 0 0d0+10 1d2+0
+1 17 0 2d6+18 1d2+0
 10 100
 8 8 1
 BareHandAttack: 4
-GoldMin: 10
-GoldMax: 10
+GoldMin: 1
+GoldMax: 2
 E
 T 3010
 #3067
@@ -573,11 +504,9 @@ A cityguard is here, guarding the gate.
    A big, strong, helpful, trustworthy guard.
 ~
 6218 0 0 0 0 0 0 0 1000 E
-10 17 25 2d2+100 1d2+1
+10 15 25 2d6+293 1d6+3
 100 10000
 8 8 1
-GoldMin: 100
-GoldMax: 100
 EquipItem: 3022 16
 E
 T 3009
@@ -593,8 +522,8 @@ A wobbling mass of translucent green-brown slime creeps along the stones, trappi
 200 40000
 8 8 0
 BareHandAttack: 6
-GoldMin: 200
-GoldMax: 200
+GoldMin: 15
+GoldMax: 22
 E
 T 3011
 #3089
@@ -605,11 +534,9 @@ The kennelmaster tends the animals with calm, practiced care.
 A broad-handed animal keeper in a leather apron moves easily among cages and pens. Scratches cover his forearms, but every animal nearby seems to know his voice. A pouch of feed and several braided leads hang from his belt.
 ~
 26634 0 0 0 0 0 0 0 1000 E
-10 17 25 2d2+100 1d2+1
+10 17 25 2d6+243 1d2+1
 100 10000
 8 8 1
-GoldMin: 100
-GoldMax: 100
 InvItem: 3015 1
 E
 #3090
@@ -620,13 +547,11 @@ A small loyal kitten is here.
    The kitten looks like a cute, little, fierce fighter.
 ~
 16398 0 0 0 0 0 0 0 0 E
-1 20 0 0d0+10 1d2+0
+1 20 0 2d6+5 1d2+0
 10 100
 8 8 0
 BareHandAttack: 8
 PetPrice: 10
-GoldMin: 10
-GoldMax: 10
 E
 #3091
 puppy pets~
@@ -636,13 +561,11 @@ A small loyal puppy is here.
    The puppy looks like a cute, little, fierce fighter.
 ~
 16398 0 0 0 0 0 0 0 0 E
-1 20 0 0d0+10 1d2+0
+1 20 0 2d6+8 1d2+0
 10 100
 8 8 0
 BareHandAttack: 8
 PetPrice: 10
-GoldMin: 10
-GoldMax: 10
 E
 #3092
 beagle pets~
@@ -652,13 +575,11 @@ A small, quick, loyal beagle is here.
    The beagle looks like a fierce fighter.
 ~
 16398 0 0 0 0 0 0 0 0 E
-2 20 0 0d0+20 1d2+0
+2 18 0 2d6+18 1d3+0
 20 400
 8 8 0
 BareHandAttack: 4
 PetPrice: 50
-GoldMin: 20
-GoldMax: 20
 E
 #3093
 rottweiler pets~
@@ -668,13 +589,11 @@ A large, loyal rottweiler is here.
    The rottweiler looks like a strong, fierce fighter.
 ~
 16398 0 0 0 0 0 0 0 0 E
-3 19 0 0d0+30 1d2+0
+3 17 0 2d6+43 1d3+1
 30 900
 8 8 0
 BareHandAttack: 4
 PetPrice: 80
-GoldMin: 30
-GoldMax: 30
 E
 #3094
 wolf pets~
@@ -684,13 +603,13 @@ A large, trained wolf is here.
    The wolf looks like a strong, fearless fighter.
 ~
 16398 0 0 0 0 0 0 0 0 E
-4 19 13 0d0+40 1d2+0
+4 17 25 2d6+63 1d4+1
 40 1600
 8 8 0
 BareHandAttack: 4
 PetPrice: 110
-GoldMin: 1
-GoldMax: 10
+GoldMin: 2
+GoldMax: 4
 E
 #3095
 dreamwarden warden keeper cryogenicist cryo~
@@ -703,7 +622,5 @@ A pale-robed woman moves quietly among the crystal alcoves, checking silver rune
 33 9 25 6d6+330 5d5+5
 330 108900
 8 8 2
-GoldMin: 330
-GoldMax: 330
 E
 $

@@ -6,7 +6,7 @@ An adorable little field mouse is here.
 This adorable little field mouse scurries around the plains, just trying to survive day to day.
 ~
 200 0 0 0 2048 0 0 0 0 E
-5 20 22 1d4+16 1d2+0
+5 20 25 2d6+43 1d2+0
 0 0
 8 8 3
 BareHandAttack: 4
@@ -23,8 +23,6 @@ SavingBreath: 1
 SavingSpell: 1
 Wimpy: 6
 Evasion: 3
-GoldMin: 0
-GoldMax: 1
 E
 #16401
 watchful rabbit brown rabbit~
@@ -34,7 +32,7 @@ A watchful rabbit is loafing among the grass.
 Warm brown fur lies sleek against this small rabbit's body, broken by a pale belly and fine whiskers that tremble at every movement. Its bright eyes cautiously watch its surroundings.
 ~
 200 0 0 0 0 0 0 0 0 E
-5 20 21 1d4+18 1d2+0
+5 20 25 2d6+43 1d2+0
 0 0
 8 8 0
 BareHandAttack: 4
@@ -51,8 +49,6 @@ SavingBreath: 1
 SavingSpell: 1
 Wimpy: 7
 Evasion: 4
-GoldMin: 0
-GoldMax: 1
 E
 #16402
 meadowlark meadow lark bird~
@@ -62,7 +58,7 @@ A bright meadowlark perches on a tall grass stem here.
 Golden color flashes across this small plains bird whenever it shifts among the grass. Its breast is warm yellow marked with darker patterns, and its sharp eyes constantly search the ground for seeds and insects. Every so often it lifts its head and releases a clear, carrying song across the open field.
 ~
 200 0 0 0 131072 0 0 0 0 E
-5 20 20 1d4+14 1d2+0
+5 20 25 2d6+43 1d2+0
 0 0
 8 8 0
 BareHandAttack: 11
@@ -89,7 +85,7 @@ A painted butterfly drifts lazily between the wildflowers here.
 Broad wings patterned in warm orange, black, and pale cream carry this delicate insect from bloom to bloom. It seems almost weightless in flight, rising whenever the grass moves and settling again as soon as the wind eases. Fine dust clings to its wings and catches faintly in the light.
 ~
 200 0 0 0 131072 0 0 0 50 E
-5 20 18 1d2+8 1d1+0
+5 20 25 2d6+28 1d1+0
 0 0
 8 8 0
 BareHandAttack: 1
@@ -116,7 +112,7 @@ A lean plains fox watches the grass with sharp, patient eyes.
 This lean fox wears a coat of dusty red broken by darker legs and a pale throat. Its large ears turn toward the smallest rustle in the grass, and its narrow muzzle stays low as it searches for hidden prey. It moves with measured silence, never wasting a step.
 ~
 200 0 0 0 0 0 0 0 0 E
-7 19 25 1d4+32 1d3+0
+7 16 25 2d6+133 1d5+2
 0 0
 8 8 0
 BareHandAttack: 4
@@ -131,6 +127,8 @@ SavingBreath: 1
 SavingSpell: 1
 Wimpy: 8
 Evasion: 4
+GoldMin: 4
+GoldMax: 7
 LootItem: 16407 40
 LootItem: 16426 3
 E
@@ -142,7 +140,7 @@ A graceful deer grazes quietly among the tall grass.
 Long-legged and wary, this plains deer feeds in short bursts before lifting its head to study the horizon. Its brown coat blends easily into dry grass and shadow, while a pale tail flicks at insects along its flanks. Even while feeding it never seems completely at ease.
 ~
 200 0 0 0 0 0 0 0 50 E
-7 20 27 1d4+38 1d3+0
+7 20 25 2d6+133 1d3+0
 0 0
 8 8 0
 BareHandAttack: 7
@@ -159,6 +157,8 @@ SavingBreath: 1
 SavingSpell: 1
 Wimpy: 10
 Evasion: 3
+GoldMin: 3
+GoldMax: 6
 LootItem: 16408 45
 LootItem: 16409 15
 E
@@ -170,7 +170,7 @@ A broad striped badger digs stubbornly at the earth here.
 Powerful forelegs and heavy claws make this low-built animal look as though it belongs half beneath the ground. Pale stripes run along its darker head, framing small eyes that regard the world with stubborn suspicion. Loose soil gathers behind it as it digs for roots, grubs, and anything else worth eating.
 ~
 72 0 0 0 0 0 0 0 0 E
-8 19 30 1d4+48 1d4+0
+8 16 25 2d6+163 1d5+2
 0 0
 8 8 0
 BareHandAttack: 8
@@ -185,6 +185,8 @@ SavingPetri: 2
 SavingBreath: 2
 SavingSpell: 2
 Evasion: 2
+GoldMin: 5
+GoldMax: 8
 LootItem: 16410 45
 LootItem: 16429 3
 E
@@ -196,7 +198,7 @@ A marsh harrier circles low over the plains here.
 Long wings carry this lean hunting bird just above the grass tops, where it rides the slightest shifts in air without seeming to work. Its head turns constantly as it searches the ground below. When something moves beneath the reeds or grass, the harrier folds into a sudden, precise descent.
 ~
 200 0 0 0 131072 0 0 0 0 E
-8 19 23 1d4+36 1d3+0
+8 16 25 2d6+143 1d5+2
 0 0
 8 8 0
 BareHandAttack: 8
@@ -213,6 +215,8 @@ SavingBreath: 2
 SavingSpell: 2
 Wimpy: 7
 Evasion: 6
+GoldMin: 4
+GoldMax: 7
 LootItem: 16411 45
 E
 #16408
@@ -223,7 +227,7 @@ A plains garter snake lies coiled in a patch of warm earth.
 Three pale stripes run the length of this slender snake's dark body. Its head rests slightly raised above the coil while a narrow tongue repeatedly tests the air. The snake relies more on camouflage and stillness than aggression, slipping quickly into cover when disturbed.
 ~
 200 0 0 0 0 0 0 0 0 E
-6 19 24 1d4+24 1d2+0
+6 16 25 2d6+103 1d4+2
 0 0
 8 8 0
 BareHandAttack: 4
@@ -240,6 +244,8 @@ SavingBreath: 1
 SavingSpell: 1
 Wimpy: 6
 Evasion: 3
+GoldMin: 4
+GoldMax: 6
 LootItem: 16412 40
 E
 #16409
@@ -250,7 +256,7 @@ A heavy groundhog grazes near the mouth of a hidden burrow.
 Thick-bodied and powerfully built for digging, this groundhog crops grass with unhurried confidence. Its claws are dark with soil, and it never strays far from a burrow entrance concealed beneath the surrounding growth. At unfamiliar movement it rises briefly to look before deciding whether to flee.
 ~
 200 0 0 0 0 0 0 0 0 E
-6 20 26 1d4+28 1d2+0
+6 20 25 2d6+73 1d2+0
 0 0
 8 8 0
 BareHandAttack: 4
@@ -267,6 +273,8 @@ SavingBreath: 1
 SavingSpell: 1
 Wimpy: 6
 Evasion: 1
+GoldMin: 2
+GoldMax: 4
 LootItem: 16413 40
 E
 #16410
@@ -277,7 +285,7 @@ A pale, drifting light bobs gently above the grass tops.
 This soft glow drifts without any clear purpose, rising and falling slightly as though breathing. It casts barely enough light to notice from a distance and seems to dim when approached directly, retreating just fast enough to stay at the edge of easy reach. Whether it is aware of those who follow it is impossible to say.
 ~
 24776 0 0 0 131072 0 0 0 0 E
-8 18 20 1d4+32 1d3+0
+8 15 25 2d6+173 1d5+2
 0 5
 8 8 0
 BareHandAttack: 12
@@ -294,6 +302,8 @@ SavingBreath: 3
 SavingSpell: 4
 Wimpy: 8
 Evasion: 8
+GoldMin: 6
+GoldMax: 9
 LootItem: 16414 55
 LootItem: 16450 8
 LootItem: 16435 2
@@ -307,7 +317,7 @@ A small, luminous figure darts between the grass stems here.
 This tiny fey creature is barely the height of a hand, its form vaguely humanoid but wrapped in something that shifts between leaf and light depending on the angle. It moves in quick, unpredictable patterns and seems to find the open grassland genuinely delightful, pausing to examine seeds and insects with equal curiosity.
 ~
 24776 0 0 0 131072 0 0 0 150 E
-8 18 20 1d4+30 1d2+0
+8 15 25 2d6+163 1d5+2
 0 5
 8 8 0
 BareHandAttack: 12
@@ -324,6 +334,8 @@ SavingBreath: 3
 SavingSpell: 4
 Wimpy: 8
 Evasion: 8
+GoldMin: 6
+GoldMax: 9
 LootItem: 16415 50
 LootItem: 16448 5
 LootItem: 16441 1
@@ -336,7 +348,7 @@ A slender, translucent figure moves with the swaying grass.
 This air spirit takes a form barely distinguishable from the movement of grass in wind, its body shifting and reforming with each gust. It seems more curious than threatening, turning its featureless face toward anything that moves through its territory. When the wind dies completely it grows still and almost invisible, only the faint shimmer of its outline giving it away.
 ~
 24776 0 0 0 196608 0 0 0 100 E
-9 18 21 1d4+38 1d3+0
+9 15 25 2d6+223 1d6+2
 0 8
 8 8 0
 BareHandAttack: 12
@@ -353,6 +365,8 @@ SavingBreath: 4
 SavingSpell: 4
 Wimpy: 8
 Evasion: 9
+GoldMin: 8
+GoldMax: 12
 LootItem: 16416 50
 LootItem: 16449 7
 E
@@ -365,7 +379,7 @@ A great verdant stag stands silently among the green growth.
 This majestic stag is unmistakably more than an ordinary animal. Fine green shoots twist through the dark velvet of its antlers, and tiny leaves open wherever the branching crown catches the light. Its deep brown coat carries a faint mossy sheen, and every slow breath smells of rain, crushed grass, and living earth.
 ~
 24648 0 0 0 65600 0 0 0 250 E
-10 19 32 2d4+55 1d4+1
+10 15 25 2d6+273 1d6+3
 0 10
 8 8 0
 BareHandAttack: 9
@@ -381,6 +395,8 @@ SavingPetri: 2
 SavingBreath: 3
 SavingSpell: 4
 Evasion: 4
+GoldMin: 8
+GoldMax: 12
 LootItem: 16417 50
 LootItem: 16442 3
 LootItem: 16432 3
@@ -393,7 +409,7 @@ A lean wolf woven with thorny briars stalks through the grass.
 At a distance this creature resembles a rangy plains wolf, but thorned vines twist through its fur and disappear beneath its hide as though they are part of the beast itself. Its eyes glow a muted green beneath a crown of tangled stems. Each careful step leaves bent grass slowly curling upright behind it.
 ~
 24696 0 0 0 2048 0 0 0 -100 E
-11 18 32 2d4+60 2d3+1
+11 14 25 2d6+323 2d4+2
 0 15
 8 8 0
 BareHandAttack: 4
@@ -409,6 +425,8 @@ SavingPetri: 2
 SavingBreath: 3
 SavingSpell: 3
 Evasion: 5
+GoldMin: 10
+GoldMax: 14
 LootItem: 16418 50
 LootItem: 16451 2
 E
@@ -421,7 +439,7 @@ A massive thornhide boar roots through the soil here.
 Bristles like stiff brown thorns cover this broad-backed boar from shoulder to rump. Patches of barklike hide protect its flanks, and curved tusks push from a muzzle stained with dark earth. Small vines cling stubbornly between the plates of its hide, growing as naturally there as they would across a fallen log.
 ~
 24680 0 0 0 0 0 0 0 -50 E
-12 19 40 2d5+70 2d3+1
+12 14 25 2d6+373 2d4+3
 0 20
 8 8 0
 BareHandAttack: 9
@@ -437,6 +455,8 @@ SavingPetri: 3
 SavingBreath: 3
 SavingSpell: 3
 Evasion: 2
+GoldMin: 11
+GoldMax: 15
 LootItem: 16419 55
 LootItem: 16446 7
 LootItem: 16433 3
@@ -450,7 +470,7 @@ A rootbound dryad stands quietly among the tall grass here.
 This spirit rises from the living plains themselves, its form woven from green grasses, flowering stems, and deep-running roots instead of bark and leaf. Its limbs are slender and graceful, trailing faint tendrils into the soil beneath it as though it never fully leaves the earth. It watches over the lush land in still silence, calm in posture but clearly bound to defend the life growing around it.
 ~
 57432 0 0 0 64 0 0 0 200 E
-12 19 38 2d5+65 2d3+1
+12 14 25 2d6+413 2d4+3
 0 18
 8 8 0
 BareHandAttack: 8
@@ -466,6 +486,8 @@ SavingPetri: 4
 SavingBreath: 3
 SavingSpell: 5
 Evasion: 3
+GoldMin: 12
+GoldMax: 16
 LootItem: 16420 55
 LootItem: 16446 8
 LootItem: 16438 4
@@ -479,7 +501,7 @@ A bloom warden lingers near the wildflowers here.
 Soft color gathers around this spirit like petals carried on a warm plains breeze, shaping a luminous guardian of living growth. Wherever it drifts, the grass seems greener and the flowers a little brighter, as though the land itself flourishes in its presence. Its manner is serene, but there is quiet strength in the way it watches over every blossom and blade around it.
 ~
 57416 0 0 0 64 0 0 0 300 E
-12 19 34 2d4+60 2d2+1
+12 13 25 2d6+443 2d4+3
 0 18
 8 8 0
 BareHandAttack: 12
@@ -495,6 +517,8 @@ SavingPetri: 4
 SavingBreath: 3
 SavingSpell: 5
 Evasion: 4
+GoldMin: 14
+GoldMax: 18
 LootItem: 16421 55
 LootItem: 16445 10
 LootItem: 16438 3
@@ -508,7 +532,7 @@ A thornbound dryad watches from within a knot of coarse brush.
 Unlike the gentler spirits of flower and grass, this dryad wears the harsher face of the plains. Dark roots form its limbs, wrapped in thorny vines and dry seed husks that rasp softly whenever it moves. Its gaze is steady and severe, the expression of a guardian accustomed to meeting axes, fire, and careless destruction with equal hostility.
 ~
 57464 0 0 0 2048 0 0 0 -200 E
-13 18 41 2d5+75 2d4+1
+13 13 25 2d6+493 2d5+3
 0 25
 8 8 0
 BareHandAttack: 8
@@ -524,6 +548,8 @@ SavingPetri: 4
 SavingBreath: 4
 SavingSpell: 5
 Evasion: 3
+GoldMin: 15
+GoldMax: 20
 LootItem: 16422 55
 LootItem: 16447 7
 LootItem: 16437 3
@@ -537,7 +563,7 @@ A wildflower nymph wanders barefoot through the blossoms here.
 Petals of many colors are caught throughout this fey spirit's flowing hair, yet none appear wilted or broken. Her skin carries the warm tone of sunlit earth, and tiny flowering vines trail around her wrists and ankles. She moves through the plains without bending a stem, pausing often to tend injured plants with a touch.
 ~
 24776 0 0 0 65600 0 0 0 350 E
-10 19 25 1d4+45 1d3+0
+10 15 25 2d6+253 1d6+3
 0 10
 8 8 0
 BareHandAttack: 12
@@ -553,6 +579,8 @@ SavingBreath: 3
 SavingSpell: 4
 Wimpy: 8
 Evasion: 7
+GoldMin: 8
+GoldMax: 11
 LootItem: 16423 55
 LootItem: 16448 8
 LootItem: 16441 2
@@ -565,7 +593,7 @@ A hulking mossback guardian stands motionless among the old stones.
 Broad shoulders of packed earth and weathered stone give this guardian the shape of a massive humanoid, though no flesh lies beneath its layered surface. Moss covers much of its back and arms, rooted into cracks between slabs of stone. When it moves, soil sifts from its joints and nearby grass bends toward it as though recognizing an ancient protector.
 ~
 123002 0 0 0 64 0 0 0 150 E
-14 19 50 3d5+85 2d5+2
+14 13 25 2d6+593 2d5+4
 0 35
 8 8 0
 BareHandAttack: 6
@@ -581,6 +609,8 @@ SavingPetri: 6
 SavingBreath: 4
 SavingSpell: 5
 Evasion: 1
+GoldMin: 18
+GoldMax: 24
 LootItem: 16424 60
 LootItem: 16436 5
 LootItem: 16437 4
@@ -594,7 +624,7 @@ A wandering druid walks slowly through the open grassland.
 Sun and weather have faded this traveler's layered green and brown robes nearly to the colors of the plains themselves. Bundles of herbs, seed pods, and small wooden charms hang from a worn belt. The druid moves without hurry, studying tracks and plants with the familiarity of someone who has spent years learning the moods of this land.
 ~
 24648 0 0 0 0 0 0 0 200 E
-11 19 27 2d4+50 1d3+0
+11 14 25 2d6+333 2d4+2
 0 10
 8 8 0
 BareHandAttack: 5
@@ -609,8 +639,8 @@ SavingPetri: 3
 SavingBreath: 3
 SavingSpell: 5
 Evasion: 3
-GoldMin: 8
-GoldMax: 18
+GoldMin: 9
+GoldMax: 13
 EquipItem: 16431 16
 EquipItem: 16425 12
 InvItem: 16403 2
@@ -626,7 +656,7 @@ A druidic herbalist kneels among the useful plants here.
 Several small pouches hang from this druid's belt, each marked with a different leaf, root, or flower. Stained fingertips carefully separate useful growth from ordinary grass while leaving enough untouched for the plants to recover. The herbalist treats the plains less like a resource to harvest and more like a patient garden without fences.
 ~
 24776 0 0 0 0 0 0 0 300 E
-10 20 25 1d4+48 1d2+0
+10 20 25 2d6+243 1d2+0
 0 8
 8 8 0
 BareHandAttack: 5
@@ -643,8 +673,6 @@ SavingBreath: 3
 SavingSpell: 5
 Wimpy: 8
 Evasion: 3
-GoldMin: 6
-GoldMax: 14
 EquipItem: 16430 13
 InvItem: 16403 2
 InvItem: 16402 1
@@ -660,7 +688,7 @@ A cloaked warden surveys the plains beneath the open sky.
 A long cloak the color of storm-dark grass shifts continuously around this watcher's shoulders. Feathers, carved bone, and small bronze disks hang from a staff polished smooth by years of use. The warden's attention is rarely fixed on one place for long, moving from the horizon to the birds overhead and finally to anything unfamiliar crossing the plains.
 ~
 24922 0 0 0 0 0 0 0 150 E
-13 18 30 2d5+65 1d3+1
+13 13 25 2d6+513 2d5+3
 0 25
 8 8 0
 BareHandAttack: 11
@@ -676,8 +704,8 @@ SavingPetri: 4
 SavingBreath: 6
 SavingSpell: 5
 Evasion: 5
-GoldMin: 15
-GoldMax: 30
+GoldMin: 16
+GoldMax: 21
 EquipItem: 16439 16
 EquipItem: 16440 12
 InvItem: 16445 1
@@ -694,7 +722,7 @@ A solemn keeper stands near the weathered stones here.
 This quiet guardian wears simple earth-toned garments beneath a mantle worked with small stone beads. A weathered staff rests in one hand, its surface carved with lines resembling roots and winding paths. The keeper watches over the scattered stones of the plains as carefully as any druid watches a sacred grove, suggesting their forgotten arrangement still matters.
 ~
 57690 0 0 0 64 0 0 0 250 E
-14 19 35 2d5+72 1d3+1
+14 13 25 2d6+593 2d5+4
 0 30
 8 8 0
 BareHandAttack: 5
@@ -710,7 +738,7 @@ SavingBreath: 4
 SavingSpell: 6
 Evasion: 2
 GoldMin: 18
-GoldMax: 36
+GoldMax: 24
 EquipItem: 16443 16
 InvItem: 16424 1
 LootItem: 16436 12
@@ -725,7 +753,7 @@ An elder bloom warden radiates quiet power over the living plains.
 Layers of luminous petals, grass, and flowering vines gather into the tall shape of this ancient guardian. Unlike younger bloom wardens, its form is dense and clearly defined, with roots of pale light trailing briefly into the ground at every step. The air around it carries the scent of rain and spring growth, and even damaged plants seem to straighten in its presence.
 ~
 254074 0 0 0 96 0 0 0 500 E
-15 18 45 3d6+105 2d5+2
+15 12 25 2d6+743 2d6+4
 0 50
 8 8 0
 BareHandAttack: 12
@@ -741,8 +769,8 @@ SavingPetri: 6
 SavingBreath: 5
 SavingSpell: 7
 Evasion: 4
-GoldMin: 25
-GoldMax: 50
+GoldMin: 22
+GoldMax: 30
 LootItem: 16421 70
 LootItem: 16444 12
 LootItem: 16441 8

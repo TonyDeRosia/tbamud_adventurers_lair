@@ -813,6 +813,77 @@ ACMD(do_kick)
   WAIT_STATE(ch, PULSE_VIOLENCE * 3);
 }
 
+/* DG is intentionally limited to this entry point.  It uses the same combat
+ * primitives as the player commands, but NPCs have no player skill table:
+ * proficiency is min(90, 30 + level).  NPCs do not learn or improve skills. */
+int dg_execute_skill(struct char_data *ch, struct char_data *vict,
+                     const char *skill_name)
+{
+  int percent, prob;
+
+  if (!ch || !vict || !IS_NPC(ch) || IN_ROOM(ch) == NOWHERE ||
+      IN_ROOM(ch) != IN_ROOM(vict) || GET_POS(ch) < POS_STANDING ||
+      GET_WAIT_STATE(ch) > 0 || ROOM_FLAGGED(IN_ROOM(ch), ROOM_PEACEFUL))
+    return FALSE;
+
+  prob = MIN(90, 30 + GET_LEVEL(ch));
+  if (!str_cmp(skill_name, "backstab")) {
+    if (vict == ch || is_owned_follower_target(ch, vict) || !GET_EQ(ch, WEAR_WIELD) ||
+        GET_OBJ_VAL(GET_EQ(ch, WEAR_WIELD), 3) != TYPE_PIERCE - TYPE_HIT || FIGHTING(vict))
+      return FALSE;
+    if (MOB_FLAGGED(vict, MOB_AWARE) && AWAKE(vict)) {
+      act("You notice $N lunging at you!", FALSE, vict, 0, ch, TO_CHAR);
+      act("$e notices you lunging at $m!", FALSE, vict, 0, ch, TO_VICT);
+      act("$n notices $N lunging at $m!", FALSE, vict, 0, ch, TO_NOTVICT);
+      hit(vict, ch, TYPE_UNDEFINED);
+      return TRUE;
+    }
+    percent = rand_number(1, 101);
+    if (AWAKE(vict) && percent > prob)
+      damage(ch, vict, 0, SKILL_BACKSTAB);
+    else
+      hit(ch, vict, SKILL_BACKSTAB);
+    WAIT_STATE(ch, 2 * PULSE_VIOLENCE);
+    return TRUE;
+  }
+
+  if (!str_cmp(skill_name, "bash")) {
+    if (AFF_FLAGGED(ch, AFF_STUNNED) || GET_POS(ch) < POS_FIGHTING || GET_MOVE(ch) < 15 ||
+        vict == ch || is_owned_follower_target(ch, vict) || MOB_FLAGGED(vict, MOB_NOKILL) ||
+        !GET_EQ(ch, WEAR_WIELD))
+      return FALSE;
+    GET_MOVE(ch) = MAX(0, GET_MOVE(ch) - 15);
+    percent = rand_number(1, 101);
+    if (MOB_FLAGGED(vict, MOB_NOBASH))
+      percent = 101;
+    if (percent > prob) {
+      damage(ch, vict, 0, SKILL_BASH);
+      GET_POS(ch) = POS_SITTING;
+    } else if (damage(ch, vict, 1, SKILL_BASH) > 0) {
+      WAIT_STATE(vict, PULSE_VIOLENCE);
+      if (IN_ROOM(ch) == IN_ROOM(vict))
+        GET_POS(vict) = POS_SITTING;
+    }
+    WAIT_STATE(ch, PULSE_VIOLENCE * 2);
+    return TRUE;
+  }
+
+  if (!str_cmp(skill_name, "kick")) {
+    if (AFF_FLAGGED(ch, AFF_STUNNED) || GET_POS(ch) < POS_FIGHTING || GET_MOVE(ch) < 10 ||
+        vict == ch || is_owned_follower_target(ch, vict))
+      return FALSE;
+    GET_MOVE(ch) = MAX(0, GET_MOVE(ch) - 10);
+    percent = ((compute_armor(vict) / 10) * 2) + rand_number(1, 101);
+    if (percent > prob)
+      damage(ch, vict, 0, SKILL_KICK);
+    else
+      damage(ch, vict, GET_LEVEL(ch) / 2, SKILL_KICK);
+    WAIT_STATE(ch, PULSE_VIOLENCE * 3);
+    return TRUE;
+  }
+  return FALSE;
+}
+
 ACMD(do_appraise_enemy)
 {
   char arg[MAX_INPUT_LENGTH];

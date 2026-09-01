@@ -199,6 +199,9 @@ ACMD(do_bash);
 ACMD(do_backstab);
 ACMD(do_flee);
 ACMD(do_kick);
+/* Controlled DG access to the shared backstab/bash/kick mechanics. */
+int dg_execute_skill(struct char_data *ch, struct char_data *vict,
+    const char *skill_name);
 ACMD(do_kill);
 ACMD(do_order);
 ACMD(do_opet);

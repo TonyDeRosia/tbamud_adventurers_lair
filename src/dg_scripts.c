@@ -2649,6 +2649,15 @@ int script_driver(void *go_adress, trig_data *trig, int type, int mode)
       else if (!strn_cmp(cmd, "dg_affect ", 10))
         do_dg_affect(go, sc, trig, type, cmd);
 
+      else if (!strn_cmp(cmd, "dg_skill ", 9))
+        do_dg_skill(go, sc, trig, type, cmd);
+
+      else if (!strn_cmp(cmd, "dg_cooldown_check ", 18))
+        do_dg_cooldown_check(go, sc, trig, type, cmd);
+
+      else if (!strn_cmp(cmd, "dg_cooldown_set ", 16))
+        do_dg_cooldown_set(go, sc, trig, type, cmd);
+
       else if (!strn_cmp(cmd, "global ", 7))
         process_global(sc, trig, cmd, sc->context);
 

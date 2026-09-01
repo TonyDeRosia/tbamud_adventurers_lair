@@ -6,7 +6,7 @@ A hulking siltborn guardian pulls itself slowly from the damp stone.
 Mud, mineral crust, and broken fragments of ancient masonry have gathered into a vaguely humanoid shape. Pale light glimmers deep within the creature's hollow face as it drags itself through the ruins, animated by whatever old power still lingers beneath Midgaard.
 ~
 196680 0 0 0 524288 0 0 0 -250 E
-8 19 28 1d4+40 1d2+0
+8 15 25 2d6+213 1d5+2
 120 0
 6 8 0
 SavingPara: 2
@@ -16,8 +16,8 @@ SavingBreath: 2
 SavingSpell: 2
 Wimpy: 4
 Evasion: 2
-GoldMin: 0
-GoldMax: 3
+GoldMin: 8
+GoldMax: 12
 E
 #7001
 cave bat small fierce bat~
@@ -27,10 +27,12 @@ A small cave bat hangs from the stone overhead.
 This dark-furred bat has adapted to the buried halls of the Old Delve. It is little more than a nuisance alone, but disturbed colonies can become surprisingly aggressive in the close tunnels.
 ~
 131176 0 0 0 524288 0 0 0 -500 E
-1 20 21 1d4+5 1d2+0
+1 18 25 2d6+8 1d2+0
 10 0
 4 8 0
 Wimpy: 1
+GoldMin: 1
+GoldMax: 1
 E
 #7002
 delve rat rat sewer~
@@ -40,13 +42,13 @@ A large delve rat watches you from beside the wall.
 The rat is broad-bodied and scarred from life beneath the city. Damp gray fur clings to its sides, and its black eyes follow every movement with the wary hunger of a creature used to surviving on anything it can find.
 ~
 104 0 0 0 0 0 0 0 -1000 E
-3 20 23 1d4+15 1d2+0
+3 17 25 2d6+33 1d3+1
 50 0
 8 8 0
 Wimpy: 1
 Evasion: 1
-GoldMin: 0
-GoldMax: 1
+GoldMin: 2
+GoldMax: 3
 E
 #7003
 cellar spider spider small hairy~
@@ -56,10 +58,12 @@ A hairy cellar spider works at a web between the stones.
 This hand-sized spider has spun a thick web across cracks in the ancient masonry. Its mottled legs blend into the stone until it moves, revealing a quick and territorial little predator.
 ~
 104 0 0 0 524288 0 0 0 -700 E
-1 20 21 1d4+5 1d2+0
+1 18 25 2d6+8 1d2+0
 10 0
 8 8 0
 Wimpy: 1
+GoldMin: 1
+GoldMax: 1
 E
 #7004
 stoneback beetle beetle giant earth~
@@ -69,7 +73,7 @@ A heavy stoneback beetle scrapes across the floor.
 Plates of dark shell cover this oversized beetle like fitted armor. Dust and mineral flakes cling to its back, making it nearly indistinguishable from rubble until its hooked legs begin to move.
 ~
 72 0 0 0 0 0 0 0 -300 E
-5 20 25 1d4+25 1d2+0
+5 17 25 2d6+83 1d4+1
 80 0
 4 8 0
 SavingPara: 1
@@ -79,8 +83,8 @@ SavingBreath: 1
 SavingSpell: 1
 Wimpy: 2
 Evasion: 1
-GoldMin: 0
-GoldMax: 1
+GoldMin: 3
+GoldMax: 5
 E
 #7005
 grave grub maggot giant~
@@ -90,10 +94,12 @@ A pale grave grub writhes among the damp debris.
 The bloated larva feeds on fungus, rot, and whatever else washes into the buried complex. Its translucent hide pulses around a dark digestive tract, and it curls toward warmth with unsettling persistence.
 ~
 196680 0 0 0 0 0 0 0 300 E
-2 20 22 1d4+10 1d2+0
+2 18 25 2d6+18 1d3+0
 30 0
 8 8 0
 Wimpy: 1
+GoldMin: 1
+GoldMax: 2
 E
 #7006
 blackstripe viper snake~
@@ -103,13 +109,13 @@ A blackstripe viper coils low across the stones.
 Near-black scales cover this slender viper, broken by pale diamond markings along its head and thin green stripes down its flanks. It keeps its head low and tracks movement with patient, venomous attention.
 ~
 72 0 0 0 0 0 0 0 -500 E
-3 20 23 1d4+15 1d2+0
+3 17 25 2d6+43 1d3+1
 40 0
 8 8 0
 Wimpy: 1
 Evasion: 1
-GoldMin: 0
-GoldMax: 1
+GoldMin: 2
+GoldMax: 4
 E
 T 7000
 #7007
@@ -120,7 +126,7 @@ A gaunt lost delver watches the passages with hollow eyes.
 A torn gray cloak hangs from this exhausted adventurer. Old Guild trail marks have been copied onto scraps of leather tied around one wrist, but the delver's unfocused stare suggests too many days spent wandering the dark have taken their toll.
 ~
 204 0 0 0 64 0 0 0 -1000 E
-6 20 26 1d4+30 1d2+0
+6 16 25 2d6+113 1d4+2
 100 0
 8 8 1
 SavingPara: 1
@@ -130,8 +136,8 @@ SavingBreath: 1
 SavingSpell: 1
 Wimpy: 3
 Evasion: 2
-GoldMin: 0
-GoldMax: 2
+GoldMin: 4
+GoldMax: 6
 E
 #7008
 malformed homunculus creature~
@@ -141,7 +147,7 @@ A malformed homunculus clings to the ruined stonework.
 No taller than a small child, this artificial creature has green-gray skin, leathery wings, and an oversized mouth crowded with sharp teeth. Faint sigils have been burned into its flesh, evidence of some forgotten experiment carried out in the buried halls.
 ~
 57416 0 0 0 80 0 0 0 -780 E
-7 20 27 1d4+35 1d2+0
+7 16 25 2d6+138 1d5+2
 110 0
 8 8 0
 SavingPara: 1
@@ -151,8 +157,8 @@ SavingBreath: 1
 SavingSpell: 1
 Wimpy: 3
 Evasion: 2
-GoldMin: 0
-GoldMax: 2
+GoldMin: 5
+GoldMax: 7
 E
 #7009
 shadow morkoth morkoth shadowy~
@@ -162,7 +168,7 @@ A shadow morkoth waits just beyond the edge of the light.
 This hunched creature blends humanoid and ratlike features beneath a skin of shifting shadow. Its breathing is slow and deliberate, and faint sparks gather around its claws when it senses prey. Whatever magic shaped it still answers its instincts.
 ~
 200 0 0 0 64 0 0 0 -900 E
-7 20 27 1d4+35 1d2+0
+7 15 25 2d6+183 1d5+2
 100 0
 8 8 0
 SavingPara: 1
@@ -172,8 +178,8 @@ SavingBreath: 1
 SavingSpell: 1
 Wimpy: 3
 Evasion: 2
-GoldMin: 0
-GoldMax: 2
+GoldMin: 7
+GoldMax: 10
 E
 T 7200
 #7010
@@ -184,7 +190,7 @@ A copper-eyed crawler creeps along the wall.
 Copper-colored plates cover the upper body of this strange subterranean creature, framing two luminous yellow eyes. Its lower body fades into burnt orange hide, and hooked limbs let it move across broken masonry with disturbing ease.
 ~
 204 0 0 0 524304 0 0 0 -830 E
-8 19 28 1d4+40 1d2+0
+8 15 25 2d6+193 1d5+2
 120 0
 8 8 0
 SavingPara: 2
@@ -194,8 +200,8 @@ SavingBreath: 2
 SavingSpell: 2
 Wimpy: 4
 Evasion: 2
-GoldMin: 0
-GoldMax: 3
+GoldMin: 7
+GoldMax: 10
 E
 #7040
 ember drake dragon red~
@@ -205,7 +211,7 @@ An old ember drake guards the deepest chamber of the upper Delve.
 This scarred red-scaled drake is smaller than the great dragons of legend but still enormous within the confines of the dungeon. Heat shimmers around its jaws, and blackened claw marks score the surrounding stone. It has clearly claimed this portion of the Old Delve as its lair.
 ~
 90170 0 0 0 65552 0 0 0 -1000 E
-10 19 30 1d4+50 1d2+0
+10 14 25 2d6+313 1d6+3
 190 0
 8 8 0
 SavingPara: 2
@@ -215,8 +221,8 @@ SavingBreath: 2
 SavingSpell: 2
 Wimpy: 5
 Evasion: 3
-GoldMin: 5
-GoldMax: 10
+GoldMin: 12
+GoldMax: 16
 E
 #7041
 drowned hag sea hag~
@@ -226,7 +232,7 @@ A drowned hag moves through the cold water with terrible grace.
 Long limbs and slick gray-green skin mark this creature as something that has lived in darkness for far too long. Yellow eyes shine above a mouth of needlelike teeth, and strands of wet hair cling to the small horns along its skull.
 ~
 104 0 0 0 0 0 0 0 -800 E
-9 19 29 1d4+45 1d2+0
+9 15 25 2d6+253 1d6+2
 140 0
 8 8 2
 SavingPara: 2
@@ -236,8 +242,8 @@ SavingBreath: 2
 SavingSpell: 2
 Wimpy: 4
 Evasion: 3
-GoldMin: 0
-GoldMax: 3
+GoldMin: 8
+GoldMax: 12
 E
 #7042
 guardian naga naga~
@@ -247,7 +253,7 @@ A guardian naga keeps watch over the old passage.
 Green-gold scales cover the naga's serpentine body, patterned with silver triangles along her back. Her golden eyes are alert rather than hostile. The ancient markings around her resting place suggest she may have guarded these halls long before Midgaard rose above them.
 ~
 10 0 0 0 0 0 0 0 700 E
-8 19 28 1d4+40 1d2+0
+8 15 25 2d6+213 1d5+2
 120 0
 8 8 2
 SavingPara: 2
@@ -257,8 +263,8 @@ SavingBreath: 2
 SavingSpell: 2
 Wimpy: 4
 Evasion: 2
-GoldMin: 0
-GoldMax: 3
+GoldMin: 7
+GoldMax: 10
 E
 #7043
 vault basilisk basilisk scaled~
@@ -268,7 +274,7 @@ A heavy vault basilisk crawls through the ruins.
 Eight powerful legs support a low reptilian body covered in dull brown scales. Its pale green eyes gleam beneath a ridged brow, and the stone around its claws is scored by years of territorial pacing.
 ~
 76 0 0 0 80 0 0 0 -250 E
-9 19 29 1d4+45 1d2+0
+9 15 25 2d6+253 1d6+2
 130 0
 8 8 0
 SavingPara: 2
@@ -278,8 +284,8 @@ SavingBreath: 2
 SavingSpell: 2
 Wimpy: 4
 Evasion: 3
-GoldMin: 0
-GoldMax: 3
+GoldMin: 8
+GoldMax: 12
 E
 #7044
 mindburned husk lemure blob~
@@ -289,7 +295,7 @@ A mindburned husk lurches toward anything that moves.
 The vaguely humanoid creature looks as though its body was softened and remade by hostile magic. Its empty black-yellow eyes show no recognition or fear, only the automatic violence of a mind long ago burned away.
 ~
 73832 0 0 0 0 0 0 0 -500 E
-4 20 24 1d4+20 1d2+0
+4 17 25 2d6+63 1d4+1
 50 0
 8 8 0
 SavingPara: 1
@@ -299,8 +305,8 @@ SavingBreath: 1
 SavingSpell: 1
 Wimpy: 2
 Evasion: 1
-GoldMin: 0
-GoldMax: 1
+GoldMin: 2
+GoldMax: 4
 E
 #7045
 grunn two headed brute ettin cruncher jones~
@@ -310,7 +316,7 @@ Grunn, a two-headed delve brute, blocks the passage.
 Two scarred heads rise above Grunn's massive shoulders, arguing constantly in low growls while the body grips a crude length of timber. Layers of stitched hide and scavenged straps suggest the brute has made a home among the Old Delve's abandoned chambers.
 ~
 76 0 0 0 0 0 0 0 -480 E
-9 19 29 1d4+45 1d2+0
+9 14 25 2d6+333 2d4+2
 100 0
 5 5 1
 SavingPara: 2
@@ -320,8 +326,8 @@ SavingBreath: 2
 SavingSpell: 2
 Wimpy: 4
 Evasion: 3
-GoldMin: 1
-GoldMax: 3
+GoldMin: 12
+GoldMax: 16
 E
 #7046
 merrik two headed runt ettin herald mouse killer~
@@ -331,7 +337,7 @@ Merrik, a smaller two-headed brute, lurks among the ruins.
 Merrik is undersized for an ettin, with one head noticeably weaker than the other. Rope, patched hides, and bits of scavenged metal make up the creature's poor equipment, while small bones tied at the waist serve as crude trophies.
 ~
 76 0 0 0 0 0 0 0 200 E
-5 20 25 1d4+25 1d2+0
+5 16 25 2d6+123 1d4+1
 60 0
 5 5 1
 SavingPara: 1
@@ -341,7 +347,7 @@ SavingBreath: 1
 SavingSpell: 1
 Wimpy: 2
 Evasion: 1
-GoldMin: 0
-GoldMax: 2
+GoldMin: 5
+GoldMax: 7
 E
 $
