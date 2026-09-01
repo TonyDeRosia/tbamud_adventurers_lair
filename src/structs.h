@@ -210,7 +210,7 @@ void clanedit_parse(struct descriptor_data *d, char *arg);
 #define PLR_NOWIZLIST    12   /**< Player shouldn't be on wizlist */
 #define PLR_NODELETE     13   /**< Player shouldn't be deleted */
 #define PLR_INVSTART     14   /**< Player should enter game wizinvis */
-#define PLR_CRYO         15   /**< Player is cryo-saved (purge prog) */
+#define PLR_RESERVED_15  15   /**< Reserved legacy player-flag slot */
 #define PLR_NOTDEADYET   16   /**< (R) Player being extracted */
 #define PLR_BUG          17   /**< Player is writing a bug */
 #define PLR_IDEA         18   /**< Player is writing an idea */
@@ -597,7 +597,7 @@ void clanedit_parse(struct descriptor_data *d, char *arg);
 #define RENT_UNDEF      0 /**< Character inv save status = undefined */
 #define RENT_CRASH      1 /**< Character inv save status = game crash */
 #define RENT_RENTED     2 /**< Character inv save status = rented */
-#define RENT_CRYO       3 /**< Character inv save status = cryogenics */
+#define RENT_RESERVED_3  3 /**< Reserved legacy rent-code slot */
 #define RENT_FORCED     4 /**< Character inv save status = forced rent */
 #define RENT_TIMEDOUT   5 /**< Character inv save status = timed out */
 

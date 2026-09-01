@@ -463,7 +463,6 @@ void copyover_recover()
       if (!PLR_FLAGGED(d->character, PLR_DELETED)) {
         REMOVE_BIT_AR(PLR_FLAGS(d->character), PLR_WRITING);
         REMOVE_BIT_AR(PLR_FLAGS(d->character), PLR_MAILING);
-        REMOVE_BIT_AR(PLR_FLAGS(d->character), PLR_CRYO);
       } else
         fOld = FALSE;
     } else

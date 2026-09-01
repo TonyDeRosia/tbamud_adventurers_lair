@@ -25,8 +25,6 @@
 
 /* these factors should be unique integers */
 #define RENT_FACTOR    1
-#define CRYO_FACTOR    4
-
 #define LOC_INVENTORY  0
 #define MAX_BAG_ROWS   5
 
@@ -37,12 +35,11 @@ static void auto_equip(struct char_data *ch, struct obj_data *obj, int location)
 static int Crash_offer_rent(struct char_data *ch, struct char_data *receptionist, int display, int factor);
 static int Crash_report_unrentables(struct char_data *ch, struct char_data *recep, struct obj_data *obj);
 static void Crash_report_rent(struct char_data *ch, struct char_data *recep, struct obj_data *obj, long *cost, long *nitems, int display, int factor);
-static int gen_receptionist(struct char_data *ch, struct char_data *recep, int cmd, char *arg, int mode);
+static int gen_receptionist(struct char_data *ch, struct char_data *recep, int cmd, char *arg);
 static void Crash_restore_weight(struct obj_data *obj);
 static void Crash_extract_objs(struct obj_data *obj);
 static int Crash_is_unrentable(struct obj_data *obj);
 static void Crash_extract_norents(struct obj_data *obj);
-static void Crash_cryosave(struct char_data *ch, int cost);
 static int Crash_load_objs(struct char_data *ch);
 static int handle_obj(struct obj_data *obj, struct char_data *ch, int locate, struct obj_data **cont_rows);
 static int objsave_write_rentcode(FILE *fl, int rentcode, int cost_per_day, struct char_data *ch);
@@ -418,9 +415,6 @@ void Crash_listrent(struct char_data *ch, char *name)
   case RENT_CRASH:
     len += snprintf(buf+len, sizeof(buf)-len,"Crash\r\n");
     break;
-  case RENT_CRYO:
-    len += snprintf(buf+len, sizeof(buf)-len, "Cryo\r\n");
-    break;
   case RENT_TIMEDOUT:
   case RENT_FORCED:
     len += snprintf(buf+len, sizeof(buf)-len, "TimedOut\r\n");
@@ -688,49 +682,6 @@ static int objsave_write_rentcode(FILE *fl, int rentcode, int cost_per_day, stru
 
 }
 
-static void Crash_cryosave(struct char_data *ch, int cost)
-{
-  char buf[MAX_INPUT_LENGTH];
-  int j;
-  FILE *fp;
-
-  if (IS_NPC(ch))
-    return;
-
-  if (!get_filename(buf, sizeof(buf), CRASH_FILE, GET_NAME(ch)))
-    return;
-
-  if (!(fp = fopen(buf, "w")))
-    return;
-
-  Crash_extract_norent_eq(ch);
-  Crash_extract_norents(ch->carrying);
-
-  (void)cost;
-
-  if (!objsave_write_rentcode(fp, RENT_CRYO, 0, ch))
-  	return;
-
-  for (j = 0; j < NUM_WEARS; j++)
-    if (GET_EQ(ch, j)) {
-      if (!Crash_save(GET_EQ(ch, j), fp, j + 1)) {
-        fclose(fp);
-        return;
-      }
-      Crash_restore_weight(GET_EQ(ch, j));
-      Crash_extract_objs(GET_EQ(ch, j));
-    }
-  if (!Crash_save(ch->carrying, fp, 0)) {
-    fclose(fp);
-    return;
-  }
-  fprintf(fp, "$~\n");
-  fclose(fp);
-
-  Crash_extract_objs(ch->carrying);
-  SET_BIT_AR(PLR_FLAGS(ch), PLR_CRYO);
-}
-
 /* Routines used for the receptionist. */
 
 static int Crash_report_unrentables(struct char_data *ch, struct char_data *recep,
@@ -810,19 +761,12 @@ static int Crash_offer_rent(struct char_data *ch, struct char_data *recep,
 }
 
 static int gen_receptionist(struct char_data *ch, struct char_data *recep, int cmd,
-    char *arg, int mode)
+    char *arg)
 {
-  /*
-   * Keep ordinary receptionists lightly animated, but do not make the
-   * cryogenicist/dreamwarden fire stock comedy socials such as burp, fart,
-   * dance, or cough.  Zone 30 uses the cryogenicist special for its
-   * high-fantasy Hall of Quiet Dreams.
-   */
   const char *action_table[] = { "smile", "sigh" };
 
   if (!cmd && !rand_number(0, 5)) {
-    if (mode == RENT_FACTOR)
-      do_action(recep, NULL, find_command(action_table[rand_number(0, 1)]), 0);
+    do_action(recep, NULL, find_command(action_table[rand_number(0, 1)]), 0);
     return (FALSE);
   }
 
@@ -843,47 +787,34 @@ static int gen_receptionist(struct char_data *ch, struct char_data *recep, int c
   }
 
   if (CMD_IS("rent")) {
-    if (!Crash_offer_rent(ch, recep, FALSE, mode))
+    if (!Crash_offer_rent(ch, recep, FALSE, RENT_FACTOR))
       return (TRUE);
 
-    if (mode == RENT_FACTOR) {
-      act("$n stores your belongings. There is no storage fee.", FALSE, recep, 0, ch, TO_VICT);
-      Crash_rentsave(ch, 0);
-      mudlog(NRM, MAX(LVL_IMMORT, GET_INVIS_LEV(ch)), TRUE, "%s has saved inventory via receptionist (no fee).",
-		GET_NAME(ch));
-    } else {			/* cryo / dreamwarded rest */
-      act("$n secures your belongings, then guides you toward a rune-lit resting alcove.\r\n"
-	  "Silver wards brighten around the crystal as a quiet stillness settles over you...\r\n"
-	  "Your senses gently fade beneath the protection of the dreaming runes.",
-	  FALSE, recep, 0, ch, TO_VICT);
-      Crash_cryosave(ch, 0);
-      mudlog(NRM, MAX(LVL_IMMORT, GET_INVIS_LEV(ch)), TRUE, "%s has cryo-saved inventory (no fee).", GET_NAME(ch));
-      SET_BIT_AR(PLR_FLAGS(ch), PLR_CRYO);
-    }
+    act("$n stores your belongings. There is no storage fee.",
+        FALSE, recep, 0, ch, TO_VICT);
 
-    if (mode == RENT_FACTOR)
-      act("$n helps $N into $S private chamber.", FALSE, recep, 0, ch, TO_NOTVICT);
-    else
-      act("$n guides $N into a crystal resting alcove as silver wards flare softly.",
-          FALSE, recep, 0, ch, TO_NOTVICT);
+    Crash_rentsave(ch, 0);
+
+    mudlog(NRM, MAX(LVL_IMMORT, GET_INVIS_LEV(ch)), TRUE,
+           "%s has saved inventory via receptionist (no fee).", GET_NAME(ch));
+
+    act("$n helps $N into $S private chamber.",
+        FALSE, recep, 0, ch, TO_NOTVICT);
 
     GET_LOADROOM(ch) = GET_ROOM_VNUM(IN_ROOM(ch));
-    extract_char(ch);	/* It saves. */
+    extract_char(ch); /* It saves. */
   } else {
-    Crash_offer_rent(ch, recep, TRUE, mode);
-    act("$N explains that item storage is free here.", FALSE, ch, 0, recep, TO_ROOM);
+    Crash_offer_rent(ch, recep, TRUE, RENT_FACTOR);
+    act("$N explains that item storage is free here.",
+        FALSE, ch, 0, recep, TO_ROOM);
   }
+
   return (TRUE);
 }
 
 SPECIAL(receptionist)
 {
-  return (gen_receptionist(ch, (struct char_data *)me, cmd, argument, RENT_FACTOR));
-}
-
-SPECIAL(cryogenicist)
-{
-  return (gen_receptionist(ch, (struct char_data *)me, cmd, argument, CRYO_FACTOR));
+  return (gen_receptionist(ch, (struct char_data *)me, cmd, argument));
 }
 
 void Crash_save_all(void)
@@ -1150,10 +1081,6 @@ static int Crash_load_objs(struct char_data *ch) {
     mudlog(NRM, MAX(LVL_IMMORT, GET_INVIS_LEV(ch)), TRUE,
            "%s retrieving crash-saved items and entering game.", GET_NAME(ch));
     break;
-  case RENT_CRYO:
-    mudlog(NRM, MAX(LVL_IMMORT, GET_INVIS_LEV(ch)), TRUE,
-           "%s loading cryo-saved inventory and entering game.", GET_NAME(ch));
-    break;
   case RENT_FORCED:
   case RENT_TIMEDOUT:
     mudlog(NRM, MAX(LVL_IMMORT, GET_INVIS_LEV(ch)), TRUE,
@@ -1195,7 +1122,7 @@ static int Crash_load_objs(struct char_data *ch) {
 
   fclose(fl);
 
-  if ((orig_rent_code == RENT_RENTED) || (orig_rent_code == RENT_CRYO))
+  if (orig_rent_code == RENT_RENTED)
     return 0;
   else
     return 1;

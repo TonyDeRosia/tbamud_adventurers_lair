@@ -282,8 +282,6 @@ obj_save_data *objsave_parse_objects(FILE *fl);
 int objsave_save_obj_record(struct obj_data *obj, FILE *fl, int location);
 /* Special functions */
 SPECIAL(receptionist);
-SPECIAL(cryogenicist);
-
 /* Functions from players.c */
 void   tag_argument(char *argument, char *tag, size_t taglen);
 int    load_char(const char *name, struct char_data *ch);

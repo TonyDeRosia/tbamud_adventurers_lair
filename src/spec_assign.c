@@ -19,7 +19,7 @@
 #include "boards.h"
 #include "mail.h"
 
-SPECIAL(questmaster); 
+SPECIAL(questmaster);
 SPECIAL(shop_keeper);
 
 /* local (file scope only) functions */
@@ -58,15 +58,16 @@ static void ASSIGNROOM(room_vnum room, SPECIAL(fname))
     log("SYSERR: Attempt to assign spec to non-existant room #%d", room);
 }
 
-/* Assignments */
-/* assign special procedures to mobiles. Guildguards, snake, thief, magic user,
- * puff, fido, janitor, and cityguards are now implemented via triggers. */
+/*
+ * Assign engine-level mobile services only.
+ *
+ * Ordinary NPC/world behavior belongs in DG Scripts and should not be
+ * automatically attached here. Legacy behavioral specials such as mayor,
+ * snake, thief, magic_user, puff, fido, janitor, cityguard, cryogenicist,
+ * and the old King's Castle behavior are intentionally not auto-assigned.
+ */
 void assign_mobiles(void)
 {
-  assign_kings_castle();
-
-  ASSIGNMOB(3095, cryogenicist);
-
   ASSIGNMOB(120, guild);
   ASSIGNMOB(121, guild);
   ASSIGNMOB(122, guild);
@@ -107,8 +108,9 @@ void assign_mobiles(void)
   ASSIGNMOB(31639, guild);
   ASSIGNMOB(31641, guild);
 
-  /* Auto-assign guild spec from MOB_GUILD_MASTER flag.
-   * This lets builders add more trainers by flagging mobs, without editing lists here.
+  /*
+   * Auto-assign guild spec from MOB_GUILD_MASTER flag.
+   * Builders can add trainers by flagging mobs without editing this list.
    */
   {
     mob_rnum i;
@@ -126,7 +128,6 @@ void assign_mobiles(void)
       }
     }
   }
-
 
   ASSIGNMOB(110, postmaster);
   ASSIGNMOB(1201, postmaster);
@@ -151,14 +152,14 @@ void assign_objects(void)
   ASSIGNOBJ(1226, gen_board);   /* builder's board */
   ASSIGNOBJ(1227, gen_board);   /* staff board */
   ASSIGNOBJ(1228, gen_board);   /* advertising board */
-  ASSIGNOBJ(3096, gen_board);	/* social board */
-  ASSIGNOBJ(3097, gen_board);	/* freeze board */
-  ASSIGNOBJ(3098, gen_board);	/* immortal board */
-  ASSIGNOBJ(3099, gen_board);	/* mortal board */
+  ASSIGNOBJ(3096, gen_board);   /* social board */
+  ASSIGNOBJ(3097, gen_board);   /* freeze board */
+  ASSIGNOBJ(3098, gen_board);   /* immortal board */
+  ASSIGNOBJ(3099, gen_board);   /* mortal board */
 
   ASSIGNOBJ(115, bank);
-  ASSIGNOBJ(334, bank);	        /* atm */
-  ASSIGNOBJ(336, bank);	        /* cashcard */
+  ASSIGNOBJ(334, bank);         /* atm */
+  ASSIGNOBJ(336, bank);         /* cashcard */
   ASSIGNOBJ(3034, bank);        /* atm */
   ASSIGNOBJ(3036, bank);        /* cashcard */
   ASSIGNOBJ(3907, bank);
@@ -183,43 +184,51 @@ void assign_rooms(void)
   if (CONFIG_DTS_ARE_DUMPS)
     for (i = 0; i <= top_of_world; i++)
       if (ROOM_FLAGGED(i, ROOM_DEATH))
-	world[i].func = dump;
+        world[i].func = dump;
 }
 
-struct spec_func_data { 
-   char *name; 
-   SPECIAL(*func); 
-}; 
+/*
+ * Known special procedure names.
+ *
+ * Legacy behavior entries remain here for diagnostics and compatibility with
+ * code that needs to identify an already-attached function pointer. Their
+ * presence here does not auto-assign them to any mob.
+ */
+struct spec_func_data {
+  char *name;
+  SPECIAL(*func);
+};
 
-static struct spec_func_data spec_func_list[] = { 
-  {"Mayor",          mayor }, 
-  {"Snake",          snake }, 
-  {"Thief",          thief }, 
-  {"Magic User",     magic_user }, 
-  {"Puff",           puff }, 
-  {"Fido",           fido }, 
-  {"Janitor",        janitor }, 
-  {"Cityguard",      cityguard }, 
-  {"Postmaster",     postmaster }, 
-  {"Receptionist",   receptionist }, 
-  {"Cryogenicist",   cryogenicist}, 
-  {"Bulletin Board", gen_board }, 
-  {"Bank",           bank }, 
-  {"Pet Shop",       pet_shops }, 
-  {"Dump",           dump }, 
-  {"Guildmaster",    guild }, 
-  {"Guild Guard",    guild_guard }, 
-  {"Questmaster",    questmaster }, 
-  {"Shopkeeper",     shop_keeper }, 
-  {"\n", NULL} 
-}; 
+static struct spec_func_data spec_func_list[] = {
+  {"Mayor",          mayor },
+  {"Snake",          snake },
+  {"Thief",          thief },
+  {"Magic User",     magic_user },
+  {"Puff",           puff },
+  {"Fido",           fido },
+  {"Janitor",        janitor },
+  {"Cityguard",      cityguard },
+  {"Postmaster",     postmaster },
+  {"Receptionist",   receptionist },
+  {"Bulletin Board", gen_board },
+  {"Bank",           bank },
+  {"Pet Shop",       pet_shops },
+  {"Dump",           dump },
+  {"Guildmaster",    guild },
+  {"Guild Guard",    guild_guard },
+  {"Questmaster",    questmaster },
+  {"Shopkeeper",     shop_keeper },
+  {"\n", NULL}
+};
 
-const char *get_spec_func_name(SPECIAL(*func)) 
-{ 
-  int i; 
-  for (i=0; *(spec_func_list[i].name) != '\n'; i++) { 
-    if (func == spec_func_list[i].func) return (spec_func_list[i].name); 
-  } 
-  return NULL; 
-} 
+const char *get_spec_func_name(SPECIAL(*func))
+{
+  int i;
 
+  for (i = 0; *(spec_func_list[i].name) != '\n'; i++) {
+    if (func == spec_func_list[i].func)
+      return spec_func_list[i].name;
+  }
+
+  return NULL;
+}

@@ -1240,7 +1240,7 @@ int save_char(struct char_data * ch)
     SET_BIT(player_table[id].flags, PINDEX_DELETED);
   else
     REMOVE_BIT(player_table[id].flags, PINDEX_DELETED);
-  if (PLR_FLAGGED(ch, PLR_NODELETE) || PLR_FLAGGED(ch, PLR_CRYO))
+  if (PLR_FLAGGED(ch, PLR_NODELETE))
     SET_BIT(player_table[id].flags, PINDEX_NODELETE);
   else
     REMOVE_BIT(player_table[id].flags, PINDEX_NODELETE);

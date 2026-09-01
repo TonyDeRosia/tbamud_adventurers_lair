@@ -29,6 +29,17 @@
 #include "modify.h"
 #include "classtrack.h"
 
+/*
+ * Legacy NPC special-procedure policy:
+ *
+ * Core reusable services remain implemented here, including guild practice,
+ * dump rooms, pet shops, and banks.
+ *
+ * Stock NPC personality, combat AI, schedules, patrols, reactions, guard
+ * behavior, scavenging, theft, spellcasting, and similar world behavior are
+ * retired from C and belong in DG Scripts/world data.
+ */
+
 #define PRACTICE_CAP 75
 
 
@@ -39,7 +50,6 @@ static void format_price_gsc(char *out, size_t outsz, long long total_gold)
 }
 /* locally defined functions of local (file) scope */
 static int compare_spells(const void *x, const void *y);
-static void npc_steal(struct char_data *ch, struct char_data *victim);
 static void show_known_abilities(struct char_data *ch, bool include_spells, bool include_skills);
 
 /* Special procedures for mobiles. */
@@ -222,393 +232,131 @@ SPECIAL(dump)
 
 SPECIAL(mayor)
 {
-  char actbuf[MAX_INPUT_LENGTH];
-
-  static const char open_path[] =
-	"W3a3003b33000c111d0d111Oe333333Oe22c222112212111a1S.";
-  static const char close_path[] =
-	"W3a3003b33000c111d0d111CE333333CE22c222112212111a1S.";
-
-  static const char *path = NULL;
-  static int path_index;
-  static bool move = FALSE;
-
-  if (!move) {
-    if (time_info.hours == 6) {
-      move = TRUE;
-      path = open_path;
-      path_index = 0;
-    } else if (time_info.hours == 20) {
-      move = TRUE;
-      path = close_path;
-      path_index = 0;
-    }
-  }
-  if (cmd || !move || (GET_POS(ch) < POS_SLEEPING) ||
-      (GET_POS(ch) == POS_FIGHTING))
-    return (FALSE);
-
-  switch (path[path_index]) {
-  case '0':
-  case '1':
-  case '2':
-  case '3':
-    perform_move(ch, path[path_index] - '0', 1);
-    break;
-
-  case 'W':
-    GET_POS(ch) = POS_STANDING;
-    act("$n awakens and groans loudly.", FALSE, ch, 0, 0, TO_ROOM);
-    break;
-
-  case 'S':
-    GET_POS(ch) = POS_SLEEPING;
-    act("$n lies down and instantly falls asleep.", FALSE, ch, 0, 0, TO_ROOM);
-    break;
-
-  case 'a':
-    act("$n says 'Hello Honey!'", FALSE, ch, 0, 0, TO_ROOM);
-    act("$n smirks.", FALSE, ch, 0, 0, TO_ROOM);
-    break;
-
-  case 'b':
-    act("$n says 'What a view!  I must get something done about that dump!'",
-	FALSE, ch, 0, 0, TO_ROOM);
-    break;
-
-  case 'c':
-    act("$n says 'Vandals!  Youngsters nowadays have no respect for anything!'",
-	FALSE, ch, 0, 0, TO_ROOM);
-    break;
-
-  case 'd':
-    act("$n says 'Good day, citizens!'", FALSE, ch, 0, 0, TO_ROOM);
-    break;
-
-  case 'e':
-    act("$n says 'I hereby declare the bazaar open!'", FALSE, ch, 0, 0, TO_ROOM);
-    break;
-
-  case 'E':
-    act("$n says 'I hereby declare Midgaard closed!'", FALSE, ch, 0, 0, TO_ROOM);
-    break;
-
-  case 'O':
-    do_gen_door(ch, strcpy(actbuf, "gate"), 0, SCMD_UNLOCK);	/* strcpy: OK */
-    do_gen_door(ch, strcpy(actbuf, "gate"), 0, SCMD_OPEN);	/* strcpy: OK */
-    break;
-
-  case 'C':
-    do_gen_door(ch, strcpy(actbuf, "gate"), 0, SCMD_CLOSE);	/* strcpy: OK */
-    do_gen_door(ch, strcpy(actbuf, "gate"), 0, SCMD_LOCK);	/* strcpy: OK */
-    break;
-
-  case '.':
-    move = FALSE;
-    break;
-
-  }
-
-  path_index++;
+  /*
+   * Legacy stock NPC behavior retired.
+   *
+   * Area-specific behavior belongs in DG Scripts and world data so builders
+   * can create and change it in-game without modifying the C source.
+   *
+   * Keep this compatibility symbol temporarily so old references do not
+   * break the build. It intentionally performs no behavior.
+   */
   return (FALSE);
 }
 
 /* General special procedures for mobiles. */
 
-static void npc_steal(struct char_data *ch, struct char_data *victim)
-{
-  int gold;
-
-  if (IS_NPC(victim))
-    return;
-  if (GET_LEVEL(victim) >= LVL_IMMORT)
-    return;
-  if (!CAN_SEE(ch, victim))
-    return;
-
-  if (AWAKE(victim) && (rand_number(0, GET_LEVEL(ch)) == 0)) {
-    act("You discover that $n has $s hands in your wallet.", FALSE, ch, 0, victim, TO_VICT);
-    act("$n tries to steal gold from $N.", TRUE, ch, 0, victim, TO_NOTVICT);
-  } else {
-    /* Steal some gold coins */
-    gold = (GET_GOLD(victim) * rand_number(1, 10)) / 100;
-    if (gold > 0) {
-      increase_gold(ch, gold);
-	  decrease_gold(victim, gold);
-    }
-  }
-}
-
 /* Quite lethal to low-level characters. */
 SPECIAL(snake)
 {
-  if (cmd || GET_POS(ch) != POS_FIGHTING || !FIGHTING(ch))
-    return (FALSE);
-
-  if (IN_ROOM(FIGHTING(ch)) != IN_ROOM(ch) || rand_number(0, GET_LEVEL(ch)) != 0)
-    return (FALSE);
-
-  act("$n bites $N!", 1, ch, 0, FIGHTING(ch), TO_NOTVICT);
-  act("$n bites you!", 1, ch, 0, FIGHTING(ch), TO_VICT);
-  call_magic(ch, FIGHTING(ch), 0, SPELL_POISON, GET_LEVEL(ch), CAST_SPELL);
-  return (TRUE);
+  /*
+   * Legacy stock NPC behavior retired.
+   *
+   * Area-specific behavior belongs in DG Scripts and world data so builders
+   * can create and change it in-game without modifying the C source.
+   *
+   * Keep this compatibility symbol temporarily so old references do not
+   * break the build. It intentionally performs no behavior.
+   */
+  return (FALSE);
 }
 
 SPECIAL(thief)
 {
-  struct char_data *cons;
-
-  if (cmd || GET_POS(ch) != POS_STANDING)
-    return (FALSE);
-
-  for (cons = world[IN_ROOM(ch)].people; cons; cons = cons->next_in_room)
-    if (!IS_NPC(cons) && GET_LEVEL(cons) < LVL_IMMORT && !rand_number(0, 4)) {
-      npc_steal(ch, cons);
-      return (TRUE);
-    }
-
+  /*
+   * Legacy stock NPC behavior retired.
+   *
+   * Area-specific behavior belongs in DG Scripts and world data so builders
+   * can create and change it in-game without modifying the C source.
+   *
+   * Keep this compatibility symbol temporarily so old references do not
+   * break the build. It intentionally performs no behavior.
+   */
   return (FALSE);
 }
 
 SPECIAL(magic_user)
 {
-  struct char_data *vict;
-
-  if (cmd || GET_POS(ch) != POS_FIGHTING)
-    return (FALSE);
-
-  /* pseudo-randomly choose someone in the room who is fighting me */
-  for (vict = world[IN_ROOM(ch)].people; vict; vict = vict->next_in_room)
-    if (FIGHTING(vict) == ch && !rand_number(0, 4))
-      break;
-
-  /* if I didn't pick any of those, then just slam the guy I'm fighting */
-  if (vict == NULL && IN_ROOM(FIGHTING(ch)) == IN_ROOM(ch))
-    vict = FIGHTING(ch);
-
-  /* Hm...didn't pick anyone...I'll wait a round. */
-  if (vict == NULL)
-    return (TRUE);
-
-  if (GET_LEVEL(ch) > 13 && rand_number(0, 10) == 0)
-    cast_spell(ch, vict, NULL, SPELL_POISON);
-
-  if (GET_LEVEL(ch) > 7 && rand_number(0, 8) == 0)
-    cast_spell(ch, vict, NULL, SPELL_BLINDNESS);
-
-  if (GET_LEVEL(ch) > 12 && rand_number(0, 12) == 0) {
-    if (IS_EVIL(ch))
-      cast_spell(ch, vict, NULL, SPELL_ENERGY_DRAIN);
-    else if (IS_GOOD(ch))
-      cast_spell(ch, vict, NULL, SPELL_DISPEL_EVIL);
-  }
-
-  if (rand_number(0, 4))
-    return (TRUE);
-
-  switch (GET_LEVEL(ch)) {
-    case 4:
-    case 5:
-      cast_spell(ch, vict, NULL, SPELL_MAGIC_MISSILE);
-      break;
-    case 6:
-    case 7:
-      cast_spell(ch, vict, NULL, SPELL_CHILL_TOUCH);
-      break;
-    case 8:
-    case 9:
-      cast_spell(ch, vict, NULL, SPELL_BURNING_HANDS);
-      break;
-    case 10:
-    case 11:
-      cast_spell(ch, vict, NULL, SPELL_SHOCKING_GRASP);
-      break;
-    case 12:
-    case 13:
-      cast_spell(ch, vict, NULL, SPELL_LIGHTNING_BOLT);
-      break;
-    case 14:
-    case 15:
-    case 16:
-    case 17:
-      cast_spell(ch, vict, NULL, SPELL_COLOR_SPRAY);
-      break;
-    default:
-      cast_spell(ch, vict, NULL, SPELL_FIREBALL);
-      break;
-  }
-  return (TRUE);
+  /*
+   * Legacy stock NPC behavior retired.
+   *
+   * Area-specific behavior belongs in DG Scripts and world data so builders
+   * can create and change it in-game without modifying the C source.
+   *
+   * Keep this compatibility symbol temporarily so old references do not
+   * break the build. It intentionally performs no behavior.
+   */
+  return (FALSE);
 }
 
 /* Special procedures for mobiles. */
-SPECIAL(guild_guard) 
-{ 
-  int i, direction; 
-  struct char_data *guard = (struct char_data *)me; 
-  const char *buf = "The guard humiliates you, and blocks your way.\r\n"; 
-  const char *buf2 = "The guard humiliates $n, and blocks $s way."; 
-
-  if (!IS_MOVE(cmd) || AFF_FLAGGED(guard, AFF_BLIND)) 
-    return (FALSE); 
-     
-  if (GET_LEVEL(ch) >= LVL_IMMORT) 
-    return (FALSE); 
-   
-  /* find out what direction they are trying to go */ 
-  for (direction = 0; direction < NUM_OF_DIRS; direction++)
-    if (!strcmp(cmd_info[cmd].command, dirs[direction]))
-      for (direction = 0; direction < DIR_COUNT; direction++)
-		if (!strcmp(cmd_info[cmd].command, dirs[direction]) ||
-			!strcmp(cmd_info[cmd].command, autoexits[direction]))
-	      break; 
-
-  for (i = 0; guild_info[i].guild_room != NOWHERE; i++) { 
-    /* Wrong guild. */ 
-    if (GET_ROOM_VNUM(IN_ROOM(ch)) != guild_info[i].guild_room) 
-      continue; 
-
-    /* Wrong direction. */ 
-    if (direction != guild_info[i].direction) 
-      continue; 
-
-    /* Allow the people of the guild through. */ 
-    if (!IS_NPC(ch) && GET_CLASS(ch) == guild_info[i].pc_class) 
-      continue; 
-
-    send_to_char(ch, "%s", buf); 
-    act(buf2, FALSE, ch, 0, 0, TO_ROOM); 
-    return (TRUE); 
-  } 
-  return (FALSE); 
+SPECIAL(guild_guard)
+{
+  /*
+   * Legacy stock NPC behavior retired.
+   *
+   * Area-specific behavior belongs in DG Scripts and world data so builders
+   * can create and change it in-game without modifying the C source.
+   *
+   * Keep this compatibility symbol temporarily so old references do not
+   * break the build. It intentionally performs no behavior.
+   */
+  return (FALSE);
 } 
 
 SPECIAL(puff)
 {
-  char actbuf[MAX_INPUT_LENGTH];
-
-  if (cmd)
-    return (FALSE);
-
-  switch (rand_number(0, 60)) {
-    case 0:
-      do_say(ch, strcpy(actbuf, "My god!  It's full of stars!"), 0, 0);	/* strcpy: OK */
-      return (TRUE);
-    case 1:
-      do_say(ch, strcpy(actbuf, "How'd all those fish get up here?"), 0, 0);	/* strcpy: OK */
-      return (TRUE);
-    case 2:
-      do_say(ch, strcpy(actbuf, "I'm a very female dragon."), 0, 0);	/* strcpy: OK */
-      return (TRUE);
-    case 3:
-      do_say(ch, strcpy(actbuf, "I've got a peaceful, easy feeling."), 0, 0);	/* strcpy: OK */
-      return (TRUE);
-    default:
-      return (FALSE);
-  }
+  /*
+   * Legacy stock NPC behavior retired.
+   *
+   * Area-specific behavior belongs in DG Scripts and world data so builders
+   * can create and change it in-game without modifying the C source.
+   *
+   * Keep this compatibility symbol temporarily so old references do not
+   * break the build. It intentionally performs no behavior.
+   */
+  return (FALSE);
 }
 
 SPECIAL(fido)
 {
-  struct obj_data *i, *temp, *next_obj;
-
-  if (cmd || !AWAKE(ch))
-    return (FALSE);
-
-  for (i = world[IN_ROOM(ch)].contents; i; i = i->next_content) {
-    if (!IS_CORPSE(i))
-      continue;
-
-    act("$n savagely devours a corpse.", FALSE, ch, 0, 0, TO_ROOM);
-    for (temp = i->contains; temp; temp = next_obj) {
-      next_obj = temp->next_content;
-      obj_from_obj(temp);
-      obj_to_room(temp, IN_ROOM(ch));
-    }
-    extract_obj(i);
-    return (TRUE);
-  }
+  /*
+   * Legacy stock NPC behavior retired.
+   *
+   * Area-specific behavior belongs in DG Scripts and world data so builders
+   * can create and change it in-game without modifying the C source.
+   *
+   * Keep this compatibility symbol temporarily so old references do not
+   * break the build. It intentionally performs no behavior.
+   */
   return (FALSE);
 }
 
 SPECIAL(janitor)
 {
-  struct obj_data *i;
-
-  if (cmd || !AWAKE(ch))
-    return (FALSE);
-
-  for (i = world[IN_ROOM(ch)].contents; i; i = i->next_content) {
-    if (!CAN_WEAR(i, ITEM_WEAR_TAKE))
-      continue;
-    if (GET_OBJ_TYPE(i) != ITEM_DRINKCON && GET_OBJ_COST(i) >= 15)
-      continue;
-    act("$n picks up some trash.", FALSE, ch, 0, 0, TO_ROOM);
-    obj_from_room(i);
-    obj_to_char(i, ch);
-    return (TRUE);
-  }
+  /*
+   * Legacy stock NPC behavior retired.
+   *
+   * Area-specific behavior belongs in DG Scripts and world data so builders
+   * can create and change it in-game without modifying the C source.
+   *
+   * Keep this compatibility symbol temporarily so old references do not
+   * break the build. It intentionally performs no behavior.
+   */
   return (FALSE);
 }
 
 SPECIAL(cityguard)
 {
-  struct char_data *tch, *evil, *spittle;
-  int max_evil, min_cha;
-
-  if (cmd || !AWAKE(ch) || FIGHTING(ch))
-    return (FALSE);
-
-  max_evil = 1000;
-  min_cha = 6;
-  spittle = evil = NULL;
-
-  for (tch = world[IN_ROOM(ch)].people; tch; tch = tch->next_in_room) {
-    if (!CAN_SEE(ch, tch))
-      continue;
-    if (!IS_NPC(tch) && PLR_FLAGGED(tch, PLR_KILLER)) {
-      act("$n screams 'HEY!!!  You're one of those PLAYER KILLERS!!!!!!'", FALSE, ch, 0, 0, TO_ROOM);
-      hit(ch, tch, TYPE_UNDEFINED);
-      return (TRUE);
-    }
-
-    if (!IS_NPC(tch) && PLR_FLAGGED(tch, PLR_THIEF)) {
-      act("$n screams 'HEY!!!  You're one of those PLAYER THIEVES!!!!!!'", FALSE, ch, 0, 0, TO_ROOM);
-      hit(ch, tch, TYPE_UNDEFINED);
-      return (TRUE);
-    }
-
-    if (FIGHTING(tch) && GET_ALIGNMENT(tch) < max_evil && (IS_NPC(tch) || IS_NPC(FIGHTING(tch)))) {
-      max_evil = GET_ALIGNMENT(tch);
-      evil = tch;
-    }
-
-    if (GET_CHA(tch) < min_cha) {
-      spittle = tch;
-      min_cha = GET_CHA(tch);
-    }
-  }
-
-  if (evil && GET_ALIGNMENT(FIGHTING(evil)) >= 0) {
-    act("$n screams 'PROTECT THE INNOCENT!  BANZAI!  CHARGE!  ARARARAGGGHH!'", FALSE, ch, 0, 0, TO_ROOM);
-    hit(ch, evil, TYPE_UNDEFINED);
-    return (TRUE);
-  }
-
-  /* Reward the socially inept. */
-  if (spittle && !rand_number(0, 9)) {
-    static int spit_social;
-
-    if (!spit_social)
-      spit_social = find_command("spit");
-
-    if (spit_social > 0) {
-      char spitbuf[MAX_NAME_LENGTH + 1];
-      strncpy(spitbuf, GET_NAME(spittle), sizeof(spitbuf));	/* strncpy: OK */
-      spitbuf[sizeof(spitbuf) - 1] = '\0';
-      do_action(ch, spitbuf, spit_social, 0);
-      return (TRUE);
-    }
-  }
+  /*
+   * Legacy stock NPC behavior retired.
+   *
+   * Area-specific behavior belongs in DG Scripts and world data so builders
+   * can create and change it in-game without modifying the C source.
+   *
+   * Keep this compatibility symbol temporarily so old references do not
+   * break the build. It intentionally performs no behavior.
+   */
   return (FALSE);
 }
 

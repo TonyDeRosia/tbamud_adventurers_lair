@@ -2181,7 +2181,6 @@ if (PLR_FLAGGED(d->character, PLR_DELETED)) {
           /* undo it just in case they are set */
           REMOVE_BIT_AR(PLR_FLAGS(d->character), PLR_WRITING);
           REMOVE_BIT_AR(PLR_FLAGS(d->character), PLR_MAILING);
-          REMOVE_BIT_AR(PLR_FLAGS(d->character), PLR_CRYO);
           d->character->player.time.logon = time(0);
           d->idle_tics = 0;
           if (d->acct_authed && d->acct_id > 0 && GET_ACCOUNT_ID(d->character) == d->acct_id) {
