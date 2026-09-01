@@ -679,6 +679,7 @@ bool is_sanctuary_spell(int spellnum);
 /* from spell_parser.c */
 ACMD(do_cast);
 ACMD(do_spellup);
+ACMD(do_buff);
 void unused_spell(int spl);
 void mag_assign_spells(void);
 

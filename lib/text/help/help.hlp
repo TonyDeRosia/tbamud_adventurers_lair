@@ -22155,6 +22155,17 @@ including armor, weapon dice, modifiers, requirements, hand conflicts, or
 wand configuration where applicable. It does not assign an overall score.
 #1
 
+BUFF
+
+Usage:
+  buff <target>
+
+Casts the beneficial persistent spells you know that can legally affect the
+visible character named in your current room. Normal mana, casting failure,
+cooldown, silence, combat, and anti-magic restrictions apply. Effects already
+active on the target are skipped. Use SPELLUP to buff yourself.
+#1
+
 RRESET LIST
 
 Usage:

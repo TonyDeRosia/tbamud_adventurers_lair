@@ -37,7 +37,7 @@ static void spello(int spl, const char *name, int max_mana, int min_mana,
     int mana_change, int minpos, int targets, int violent, int routines,
     const char *wearoff);
 static int mag_manacost(struct char_data *ch, int spellnum);
-static bool is_spellup_beneficial_spell(int spellnum);
+static bool is_persistent_beneficial_spell(int spellnum);
 static int find_ability_by_tokens(const char *name, char *ambig_buf,
     size_t ambig_len, int *matched_tokens, bool allow_partial_name,
     bool allow_extra_input);
@@ -1262,11 +1262,10 @@ static bool is_spellup_manual_persistent_buff(int spellnum)
   }
 }
 
-static bool is_spellup_beneficial_spell(int spellnum)
+static bool is_persistent_beneficial_spell(int spellnum)
 {
   bool affects_or_manual_buff;
   bool char_targeted;
-  bool self_castable;
 
   if (!is_available_spell(spellnum))
     return FALSE;
@@ -1275,15 +1274,12 @@ static bool is_spellup_beneficial_spell(int spellnum)
       (IS_SET(SINFO.routines, MAG_MANUAL) &&
       is_spellup_manual_persistent_buff(spellnum));
   char_targeted = IS_SET(SINFO.targets,
-      TAR_CHAR_ROOM | TAR_CHAR_WORLD | TAR_SELF_ONLY | TAR_FIGHT_SELF);
-  self_castable = IS_SET(SINFO.targets, TAR_SELF_ONLY | TAR_FIGHT_SELF) ||
-      (!IS_SET(SINFO.targets, TAR_NOT_SELF) &&
-      IS_SET(SINFO.targets, TAR_CHAR_ROOM | TAR_CHAR_WORLD));
+      TAR_CHAR_ROOM | TAR_CHAR_WORLD | TAR_SELF_ONLY | TAR_FIGHT_SELF | TAR_FIGHT_VICT);
 
   /* Spellup gate: non-violent persistent buffs that can target the caster. */
   if (SINFO.violent || !affects_or_manual_buff)
     return FALSE;
-  if (!char_targeted || !self_castable)
+  if (!char_targeted)
     return FALSE;
   if (IS_SET(SINFO.targets, TAR_IGNORE))
     return FALSE;
@@ -1308,6 +1304,24 @@ static bool is_spellup_beneficial_spell(int spellnum)
   }
 
   return TRUE;
+}
+
+static bool is_spellup_eligible_spell(int spellnum)
+{
+  if (!is_persistent_beneficial_spell(spellnum))
+    return FALSE;
+  return IS_SET(SINFO.targets, TAR_SELF_ONLY | TAR_FIGHT_SELF) ||
+      (!IS_SET(SINFO.targets, TAR_NOT_SELF) &&
+      IS_SET(SINFO.targets, TAR_CHAR_ROOM | TAR_CHAR_WORLD));
+}
+
+static bool is_buff_target_eligible_spell(int spellnum)
+{
+  if (!is_persistent_beneficial_spell(spellnum))
+    return FALSE;
+  if (IS_SET(SINFO.targets, TAR_SELF_ONLY))
+    return FALSE;
+  return IS_SET(SINFO.targets, TAR_CHAR_ROOM | TAR_CHAR_WORLD);
 }
 
 static void normalize_ability_input(const char *input, char *output,
@@ -2329,87 +2343,74 @@ int cast_spell(struct char_data *ch, struct char_data *tch,
   }
 }
 
-ACMD(do_spellup)
+static void perform_automatic_buff_sequence(struct char_data *ch,
+    struct char_data *tch, bool other_target)
 {
-  struct char_data *tch = NULL;
-  char arg[MAX_INPUT_LENGTH];
-  int spellnum;
-  int mana;
+  int spellnum, mana;
   room_rnum start_room;
-  bool any_eligible = FALSE;
-  bool any_attempted = FALSE;
-  int cast_count = 0, skipped_active = 0, skipped_mana = 0, skipped_combat = 0;
+  bool any_eligible = FALSE, any_attempted = FALSE;
+  int cast_count = 0, skipped_active = 0, skipped_mana = 0;
+  int skipped_combat = 0, skipped_unavailable = 0;
+  char target_name[MAX_NAME_LENGTH + 1];
+  const char *command_name = other_target ? "buff" : "spellup";
 
-  if (IS_NPC(ch))
+  if (!ch || !tch || IS_NPC(ch) || IN_ROOM(ch) == NOWHERE ||
+      IN_ROOM(ch) != IN_ROOM(tch))
     return;
+  strlcpy(target_name, GET_NAME(tch), sizeof(target_name));
 
   if (!CAN_BYPASS_ENVIRONMENT(ch) &&
       (ROOM_FLAGGED(IN_ROOM(ch), ROOM_NOMAGIC) ||
        room_has_effect(&world[IN_ROOM(ch)], ROOM_EFFECT_NULL_FIELD))) {
-    send_to_char(ch, "The room suppresses your magic; spellup cannot begin.\r\n");
+    send_to_char(ch, "The room suppresses your magic; %s cannot begin.\r\n", command_name);
     return;
   }
   if (!CAN_BYPASS_ENVIRONMENT(ch) &&
       room_has_effect(&world[IN_ROOM(ch)], ROOM_EFFECT_SILENCE_FIELD) &&
       !affected_by_spell(ch, SPELL_SILENT_MAGIC)) {
-    send_to_char(ch, "The room's silence prevents spellup from beginning.\r\n");
+    send_to_char(ch, "The room's silence prevents %s from beginning.\r\n", command_name);
     return;
   }
-
-  one_argument(argument, arg);
-
-  if (*arg) {
-    char *argp = arg;
-    int number = get_number(&argp);
-    if ((tch = get_char_vis(ch, arg, &number, FIND_CHAR_ROOM)) == NULL) {
-      send_to_char(ch, "You don't see that person here.\r\n");
-      return;
-    }
-  } else {
-    tch = ch;
-  }
-
-  if (FIGHTING(ch) && tch != ch) {
+  if (FIGHTING(ch) && other_target) {
     send_to_char(ch, "You are too busy fighting to buff someone else right now.\r\n");
     return;
   }
 
   start_room = IN_ROOM(ch);
-
   for (spellnum = 1; spellnum <= MAX_SPELLS; spellnum++) {
-    if (!is_spellup_beneficial_spell(spellnum))
+    if (DEAD(ch) || DEAD(tch) || IN_ROOM(ch) != start_room ||
+        IN_ROOM(tch) != start_room)
+      break;
+    if (other_target) {
+      if (!is_buff_target_eligible_spell(spellnum))
+        continue;
+    } else if (!is_spellup_eligible_spell(spellnum))
       continue;
     if (!can_character_cast_known_spell(ch, spellnum))
       continue;
-    if (tch != ch && IS_SET(SINFO.targets, TAR_SELF_ONLY))
-      continue;
-    if (tch == ch && IS_SET(SINFO.targets, TAR_NOT_SELF))
-      continue;
-    if (FIGHTING(ch) && (SINFO.min_position > POS_FIGHTING || !IS_SET(SINFO.targets, TAR_FIGHT_SELF))) {
+    if (FIGHTING(ch) &&
+        (SINFO.min_position > POS_FIGHTING || !IS_SET(SINFO.targets, TAR_FIGHT_SELF))) {
       skipped_combat++;
-      continue;
-    }
-    if (is_spellup_buff_active(tch, spellnum)) {
-      skipped_active++;
       continue;
     }
 
     any_eligible = TRUE;
-    if (AFF_FLAGGED(ch, AFF_SILENCED) && !affected_by_spell(ch, SPELL_SILENT_MAGIC)) {
+    if (is_spellup_buff_active(tch, spellnum)) {
+      skipped_active++;
+      continue;
+    }
+    if (AFF_FLAGGED(ch, AFF_SILENCED) &&
+        !affected_by_spell(ch, SPELL_SILENT_MAGIC)) {
       send_to_char(ch, "You open your mouth but no words come out!\r\n");
+      skipped_unavailable++;
       continue;
     }
     if (spell_on_cooldown(ch, spellnum)) {
-      if (spellnum == SPELL_GRASP_HEART)
-        send_to_char(ch, "You have not yet recovered enough to grasp another heart.\r\n");
-      else if (spellnum == SPELL_TRIPLE_MAXIMIZE_MAGIC)
-        send_to_char(ch, "Triple maximize magic is still on cooldown.\r\n");
-      else
-        send_to_char(ch, "That spell is still recovering.\r\n");
+      skipped_unavailable++;
       continue;
     }
     mana = mag_manacost(ch, spellnum);
-    if ((mana > 0) && (GET_MANA(ch) < mana) && (GET_LEVEL(ch) < LVL_IMMORT)) {
+    if (mana > 0 && GET_MANA(ch) < mana && GET_LEVEL(ch) < LVL_IMMORT) {
       skipped_mana++;
       continue;
     }
@@ -2420,43 +2421,84 @@ ACMD(do_spellup)
       WAIT_STATE(ch, PULSE_VIOLENCE);
       if (mana > 0)
         GET_MANA(ch) = MAX(0, MIN(effective_max_mana(ch), GET_MANA(ch) - mana));
-      continue;
-    }
-    if (rand_number(0, 101) > GET_SKILL(ch, spellnum)) {
+    } else if (rand_number(0, 101) > GET_SKILL(ch, spellnum)) {
       WAIT_STATE(ch, PULSE_VIOLENCE);
-      if (!tch || !skill_message(0, ch, tch, spellnum))
+      if (!skill_message(0, ch, tch, spellnum))
         send_to_char(ch, "You lost your concentration!\r\n");
       if (mana > 0)
         GET_MANA(ch) = MAX(0, MIN(effective_max_mana(ch), GET_MANA(ch) - (mana / 2)));
-      if (SINFO.violent && tch && IS_NPC(tch))
-        hit(tch, ch, TYPE_UNDEFINED);
       improve_ability_from_use(ch, spellnum, 0);
-    } else {
-      if (cast_spell(ch, tch, NULL, spellnum)) {
-        if (IN_ROOM(ch) != start_room) {
-          send_to_char(ch, "Spellup halted: your location changed.\r\n");
-          break;
-        }
-        improve_ability_from_use(ch, spellnum, 1);
-        WAIT_STATE(ch, PULSE_VIOLENCE);
-        if (mana > 0)
-          GET_MANA(ch) = MAX(0, MIN(effective_max_mana(ch), GET_MANA(ch) - mana));
-        cast_count++;
-      }
+    } else if (cast_spell(ch, tch, NULL, spellnum)) {
+      improve_ability_from_use(ch, spellnum, 1);
+      WAIT_STATE(ch, PULSE_VIOLENCE);
+      if (mana > 0)
+        GET_MANA(ch) = MAX(0, MIN(effective_max_mana(ch), GET_MANA(ch) - mana));
+      cast_count++;
     }
   }
 
-  if (!any_eligible) {
-    if (tch == ch)
-      send_to_char(ch, "You don't know any buff spells to cast.\r\n");
+  if (other_target) {
+    if (!any_eligible)
+      send_to_char(ch, "You don't know any persistent buffs that can affect %s.\r\n", target_name);
     else
-      send_to_char(ch, "You don't know any buff spells to cast on them.\r\n");
+      send_to_char(ch,
+          "Buff complete on %s: %d cast, %d already active, %d low mana, %d unavailable.\r\n",
+          target_name, cast_count, skipped_active, skipped_mana,
+          skipped_unavailable + skipped_combat);
+  } else if (!any_eligible) {
+    send_to_char(ch, "You don't know any buff spells to cast.\r\n");
   } else if (!any_attempted) {
     send_to_char(ch, "You don't have the energy to cast any buffs right now.\r\n");
   } else {
-    send_to_char(ch, "Spellup complete: %d cast, %d already active, %d low mana, %d blocked in combat.\r\n",
-                 cast_count, skipped_active, skipped_mana, skipped_combat);
+    send_to_char(ch,
+        "Spellup complete: %d cast, %d already active, %d low mana, %d blocked in combat.\r\n",
+        cast_count, skipped_active, skipped_mana, skipped_combat);
   }
+}
+
+ACMD(do_spellup)
+{
+  struct char_data *tch = ch;
+  char arg[MAX_INPUT_LENGTH];
+
+  if (IS_NPC(ch))
+    return;
+  one_argument(argument, arg);
+  if (*arg) {
+    char *argp = arg;
+    int number = get_number(&argp);
+    if ((tch = get_char_vis(ch, argp, &number, FIND_CHAR_ROOM)) == NULL) {
+      send_to_char(ch, "You don't see that person here.\r\n");
+      return;
+    }
+  }
+  perform_automatic_buff_sequence(ch, tch, tch != ch);
+}
+
+ACMD(do_buff)
+{
+  struct char_data *tch;
+  char arg[MAX_INPUT_LENGTH], *argp;
+  int number;
+
+  if (IS_NPC(ch))
+    return;
+  one_argument(argument, arg);
+  if (!*arg) {
+    send_to_char(ch, "Buff whom?\r\n");
+    return;
+  }
+  argp = arg;
+  number = get_number(&argp);
+  if (!(tch = get_char_vis(ch, argp, &number, FIND_CHAR_ROOM))) {
+    send_to_char(ch, "You don't see that person here.\r\n");
+    return;
+  }
+  if (tch == ch) {
+    send_to_char(ch, "Use SPELLUP to buff yourself.\r\n");
+    return;
+  }
+  perform_automatic_buff_sequence(ch, tch, TRUE);
 }
 
 /* do_cast is the entry point for PC-casted spells.  It parses the arguments,
