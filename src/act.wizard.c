@@ -836,7 +836,11 @@ static void do_stat_object(struct char_data *ch, struct obj_data *j)
     break;
   case ITEM_DRINKCON:
   case ITEM_FOUNTAIN:
-    sprinttype(GET_OBJ_VAL(j, 2), drinks, buf, sizeof(buf));
+    if (GET_OBJ_VAL(j, 1) <= 0)
+      strlcpy(buf, "none", sizeof(buf));
+    else
+      sprinttype(GET_OBJ_VAL(j, 2), drinks, buf, sizeof(buf));
+
     send_to_char(ch, "Capacity: %d, Contains: %d, Poisoned: %s, Liquid: %s\r\n",
 	    GET_OBJ_VAL(j, 0), GET_OBJ_VAL(j, 1), YESNO(GET_OBJ_VAL(j, 3)), buf);
     break;
