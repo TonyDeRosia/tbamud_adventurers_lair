@@ -75,9 +75,8 @@ static int take_next_damage_type(void)
 /* local file scope utility functions */
 static void perform_group_gain(struct char_data *ch, struct char_data *victim, int base_override);
 static int mob_kill_base_xp(struct char_data *ch, struct char_data *victim);
-static int count_live_mobs_by_vnum(mob_vnum vnum);
-static int rare_kill_bonus_for_count(int live_count, int base_xp);
 static int rare_kill_bonus_for_victim(struct char_data *victim, int base_xp);
+static int npc_kill_raw_xp(struct char_data *victim, int base_xp);
 static struct char_data *resolve_reward_killer(struct char_data *killer);
 static void dam_message(int dam, struct char_data *ch, struct char_data *victim, int w_type);
 static void make_corpse(struct char_data *ch);
@@ -1168,39 +1167,27 @@ void die(struct char_data * ch, struct char_data * killer)
 
 static void perform_group_gain(struct char_data *ch, struct char_data *victim, int base_override)
 {
-  int share, hap_share, rare_bonus, bonus_xp;
+  int share, rare_bonus = 0, final_gain;
 
   share = (base_override >= 0) ? base_override : mob_kill_base_xp(ch, victim);
 
   if (IS_NPC(victim)) {
-    /* Builder-controlled additive bonus XP from mob exp field. */
-    bonus_xp = GET_EXP(victim);
-    share = MAX(0, share + bonus_xp);
-    share = MIN(CONFIG_MAX_EXP_GAIN, share);
+    rare_bonus = rare_kill_bonus_for_victim(victim, share);
+    share = npc_kill_raw_xp(victim, share);
   } else {
     share = MIN(CONFIG_MAX_EXP_GAIN, MAX(1, share));
   }
 
-  if ((IS_HAPPYHOUR) && (IS_HAPPYEXP))
-  {
-    /* This only reports the correct amount - the calc is done in gain_exp */
-    hap_share = share + (int)((float)share * ((float)HAPPY_EXP / (float)(100)));
-    if (IS_NPC(victim))
-      share = MIN(CONFIG_MAX_EXP_GAIN, MAX(0, hap_share));
-    else
-      share = MIN(CONFIG_MAX_EXP_GAIN, MAX(1, hap_share));
-  }
-  if (share > 1)
-    send_to_char(ch, "You receive your share of \tCexperience\tn -- \ty%d\tn points.\r\n", share);
-  else if (share == 1)
+  final_gain = final_positive_xp_gain(share);
+  if (final_gain > 1)
+    send_to_char(ch, "You receive your share of \tCexperience\tn -- \ty%d\tn points.\r\n", final_gain);
+  else if (final_gain == 1)
     send_to_char(ch, "You receive your share of experience -- one measly little point!\r\n");
   else
     send_to_char(ch, "You receive your share of experience, but gain no points.\r\n");
 
-  rare_bonus = rare_kill_bonus_for_victim(victim, share);
   if (rare_bonus > 0) {
-    share += rare_bonus;
-    send_to_char(ch, "You receive \ty%d\tn '\tcRare Kill\tn' \tCexperience\tn bonus.\r\n", rare_bonus);
+    send_to_char(ch, "This was a \tcRare Kill\tn.\r\n");
   }
 
   gain_exp(ch, share);
@@ -1235,14 +1222,12 @@ static void group_gain(struct char_data *ch, struct char_data *victim)
 
 static void solo_gain(struct char_data *ch, struct char_data *victim)
 {
-  int exp, happy_exp, rare_bonus, bonus_xp;
+  int exp, rare_bonus = 0, final_gain;
 
   if (IS_NPC(victim)) {
     exp = mob_kill_base_xp(ch, victim);
-    /* Builder-controlled additive bonus XP from mob exp field. */
-    bonus_xp = GET_EXP(victim);
-    exp = MAX(0, exp + bonus_xp);
-    exp = MIN(CONFIG_MAX_EXP_GAIN, exp);
+    rare_bonus = rare_kill_bonus_for_victim(victim, exp);
+    exp = npc_kill_raw_xp(victim, exp);
   } else {
     exp = MIN(CONFIG_MAX_EXP_GAIN, GET_EXP(victim) / 3);
 
@@ -1254,49 +1239,21 @@ static void solo_gain(struct char_data *ch, struct char_data *victim)
     exp = MAX(exp, 1);
   }
 
-  if (IS_HAPPYHOUR && IS_HAPPYEXP) {
-    happy_exp = exp + (int)((float)exp * ((float)HAPPY_EXP / (float)(100)));
-    if (IS_NPC(victim))
-      exp = MAX(happy_exp, 0);
-    else
-      exp = MAX(happy_exp, 1);
-  }
-
-  if (exp > 1)
-    send_to_char(ch, "You receive \ty%d\tn \tCexperience\tn points.\r\n", exp);
-  else if (exp == 1)
+  final_gain = final_positive_xp_gain(exp);
+  if (final_gain > 1)
+    send_to_char(ch, "You receive \ty%d\tn \tCexperience\tn points.\r\n", final_gain);
+  else if (final_gain == 1)
     send_to_char(ch, "You receive one lousy experience point.\r\n");
   else
     send_to_char(ch, "You receive no experience points.\r\n");
 
-  rare_bonus = rare_kill_bonus_for_victim(victim, exp);
   if (rare_bonus > 0) {
-    exp += rare_bonus;
-    send_to_char(ch, "You receive \ty%d\tn '\tcRare Kill\tn' \tCexperience\tn bonus.\r\n", rare_bonus);
+    send_to_char(ch, "This was a \tcRare Kill\tn.\r\n");
   }
 
   gain_exp(ch, exp);
 
     change_alignment(ch, victim);
-}
-
-static int count_live_mobs_by_vnum(mob_vnum vnum)
-{
-  int count = 0;
-  struct char_data *mob;
-
-  if (vnum == NOBODY)
-    return 0;
-
-  for (mob = character_list; mob; mob = mob->next) {
-    if (!IS_NPC(mob) || MOB_FLAGGED(mob, MOB_NOTDEADYET))
-      continue;
-
-    if (GET_MOB_VNUM(mob) == vnum)
-      count++;
-  }
-
-  return count;
 }
 
 static int mob_kill_base_xp(struct char_data *ch, struct char_data *victim)
@@ -1329,20 +1286,22 @@ int mob_kill_base_xp_for_levels(int attacker_level, int victim_level)
   return 350;
 }
 
-static int rare_kill_bonus_for_count(int live_count, int base_xp)
-{
-  if (live_count <= 0 || live_count > RARE_KILL_MAX_COUNT)
-    return 0;
-
-  return MAX(1, base_xp / 4);
-}
-
 static int rare_kill_bonus_for_victim(struct char_data *victim, int base_xp)
 {
   if (!victim || !IS_NPC(victim))
     return 0;
 
-  return rare_kill_bonus_for_count(count_live_mobs_by_vnum(GET_MOB_VNUM(victim)), base_xp);
+  return MOB_FLAGGED(victim, MOB_RARE) ? MAX(1, base_xp / 4) : 0;
+}
+
+/* Raw NPC reward: base + additive builder bonus + explicit rare bonus.
+ * Happy Hour and the cap belong solely to gain_exp(). */
+static int npc_kill_raw_xp(struct char_data *victim, int base_xp)
+{
+  long long raw = MAX(0, base_xp);
+  raw += MAX(0, GET_EXP(victim));
+  raw += rare_kill_bonus_for_victim(victim, base_xp);
+  return (int)MIN((long long)INT_MAX, raw);
 }
 
 static struct char_data *resolve_reward_killer(struct char_data *killer)

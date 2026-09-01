@@ -2730,6 +2730,9 @@ struct char_data *read_mobile(mob_vnum nr, int type) /* and mob_rnum */
   mob->points.hit = mob->points.max_hit;
   mob->points.mana = mob->points.max_mana;
   mob->points.move = mob->points.max_move;
+  GET_BASE_MAX_HIT(mob) = GET_MAX_HIT(mob);
+  GET_BASE_MAX_MANA(mob) = GET_MAX_MANA(mob);
+  GET_BASE_MAX_MOVE(mob) = GET_MAX_MOVE(mob);
 
   mob->player.time.birth = time(0);
   mob->player.time.played = 0;
@@ -3767,6 +3770,9 @@ void clear_char(struct char_data *ch)
   GET_EVASION(ch) = 0;
   if (ch->points.max_mana < 100)
     ch->points.max_mana = 100;
+  GET_BASE_MAX_HIT(ch) = GET_MAX_HIT(ch);
+  GET_BASE_MAX_MANA(ch) = GET_MAX_MANA(ch);
+  GET_BASE_MAX_MOVE(ch) = GET_MAX_MOVE(ch);
 }
 
 void clear_object(struct obj_data *obj)
@@ -3799,6 +3805,9 @@ void init_char(struct char_data *ch)
     GET_MAX_HIT(ch) = 500;
     GET_MAX_MANA(ch) = 100;
     GET_MAX_MOVE(ch) = 82;
+    GET_BASE_MAX_HIT(ch) = GET_MAX_HIT(ch);
+    GET_BASE_MAX_MANA(ch) = GET_MAX_MANA(ch);
+    GET_BASE_MAX_MOVE(ch) = GET_MAX_MOVE(ch);
     GET_HIT(ch) = GET_MAX_HIT(ch);
     GET_MANA(ch) = effective_max_mana(ch);
     GET_MOVE(ch) = GET_MAX_MOVE(ch);

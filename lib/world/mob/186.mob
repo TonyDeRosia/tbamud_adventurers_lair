@@ -1,205 +1,279 @@
 #18601
-pitbeast beast~
-the pit beast~
-The big, ugly pit-beast is standing here sizing you up.
+practice beast beast academy~
+an Academia practice beast~
+A broad-backed Academia practice beast paws at the sand.
 ~
-   Ick...  What a disgusting creature!  It is black and green and slimy and it
-is drooling everywhere...  Looks mean too.
+This heavily built creature has been bred and trained for controlled combat drills. Thick hide, blunted horn caps, and a leather handler's mark identify it as dangerous enough to teach respect without being intended as a slaughter animal.
 ~
-14 0 0 0 0 0 0 0 -750 E
-5 19 7 1d1+50 1d2+0
-50 2500
+10 0 0 0 0 0 0 0 -750 E
+5 20 25 1d4+25 1d2+0
+50 0
 8 8 0
+SavingPara: 1
+SavingRod: 1
+SavingPetri: 1
+SavingBreath: 1
+SavingSpell: 1
+Wimpy: 2
+Evasion: 1
+GoldMin: 0
+GoldMax: 1
 E
+T 18687
+T 18697
 #18602
-newbie monster~
-the newbie monster~
-The newbie monster stands here looking confused.  Kill him!  Kill him!
+training dummy construct animated academy~
+an animated training dummy~
+An animated training dummy waits in a ready stance.
 ~
-   What an odd looking little beast.  He looks harmless, but you never can tell.
-He is only about 4 feet tall, but he pretty muscular looking...  Maybe you
-should ask if he needs help?  Nah...  Kill him.
+Wood, leather, straw, and simple enchantment give this humanoid practice construct a convincing fighting posture. Its joints are reinforced to survive repeated drills, and painted target marks show where students are expected to place controlled blows.
 ~
-76 0 0 0 0 0 0 0 0 E
-2 20 8 0d0+20 1d2+0
-20 400
+72 0 0 0 0 0 0 0 0 E
+2 20 22 1d4+10 1d2+0
+20 0
 8 8 1
+Wimpy: 1
 E
 #18603
-pet dragon baby newbie~
-the baby dragon~
-Someone's little pet dragon has gotten loose, and is sniffing about here.
+academy drake young training dragon~
+a young Academia drake~
+A young Academia drake watches the room with bright, curious eyes.
 ~
-   Awwww...  How cute!  A little baby dragon.  He's about 3 feet long and you
-just want to cuddle him to death...  No, you really want to kill him to tell the
-truth.  But, remember, even a little dragon can be a big problem.
+This small drake is one of several creatures raised under careful supervision by Academia handlers. Leather identification bands mark it as trained, though the sharp claws and faint heat in its breath remind students that even familiar creatures deserve caution.
 ~
 72 0 0 0 0 0 0 0 100 E
-4 19 7 0d0+40 1d2+0
-40 1600
+4 20 24 1d4+20 1d2+0
+40 0
 8 8 1
+SavingPara: 1
+SavingRod: 1
+SavingPetri: 1
+SavingBreath: 1
+SavingSpell: 1
+Wimpy: 2
+Evasion: 1
+GoldMin: 0
+GoldMax: 1
 E
+T 18688
 #18604
-keeper guard monster newbie~
-the Newbie Guard~
-The Newbie Guard is here wondering where that dragon went.
+warden halric academy gate instructor~
+Warden Halric~
+Warden Halric keeps a patient watch over the practical halls.
 ~
-   The Guard also had the job of taking care of the Alchemist's pet dragon, but
-he doesn't seem to be doing a good job of it.  He looks at you and says, 'Have
-you seen that dragon?  Master will have my head if I don't find him.  '
+Halric is a weathered human veteran in a dark blue Academia surcoat. A ring of practice keys hangs from his belt, and old scars across his knuckles suggest he has opened more dangerous doors than the training examples surrounding him.
 ~
 10 0 0 0 0 0 0 0 0 E
-3 19 8 0d0+30 1d2+0
-30 900
+3 20 23 1d4+15 1d2+0
+30 0
 8 8 1
+Wimpy: 1
+Evasion: 1
 E
+T 18681
+T 18691
+T 18692
 #18605
-alchemist newbie~
-the Newbie Alchemist~
-The Newbie Alchemist is here trying to make something.
+master alchemist seraphine instructor academy~
+Master Alchemist Seraphine~
+Master Alchemist Seraphine measures a reagent with practiced care.
 ~
-   He is a funny looking, furry little dude.  He looks really busy trying to mix
-up a batch of something or other.
+Seraphine wears a leather apron over layered scholar's robes, with small pouches and stoppered vials arranged by touch rather than appearance. Her calm manner and exacting habits make it clear that she teaches students to respect useful substances before trusting them.
 ~
 10 0 0 0 0 0 0 0 0 E
-5 19 7 1d1+50 1d2+0
-50 2500
-8 8 1
+5 20 25 1d4+25 1d2+0
+50 0
+8 8 2
+SavingPara: 1
+SavingRod: 1
+SavingPetri: 1
+SavingBreath: 1
+SavingSpell: 1
+Wimpy: 2
+Evasion: 1
 E
+T 18682
+T 18694
 #18606
-crawler creepy bug thing newbie~
-the creepy crawler~
-A creepy little crawling thing is scuttling along the floor at your feet.
+practice crawler clockwork crawler academy~
+a clockwork practice crawler~
+A small clockwork crawler skitters across the floor.
 ~
-   Yuck!  If they'd ever clean this place maybe it wouldn't attract vermin like
-this disgusting, little, six-legged, brown bug.
+Brass legs carry a low wooden-and-metal body fitted with padded striking nubs instead of blades. The simple mechanism is designed to teach inexperienced adventurers how moving opponents behave without exposing them to a truly lethal creature.
 ~
 72 0 0 0 0 0 0 0 -250 E
-1 20 9 0d0+10 1d2+0
-10 100
+1 20 21 1d4+5 1d2+0
+10 0
 8 8 0
+Wimpy: 1
 E
 #18607
-newbie zombie~
-the zombiefied newbie~
-A VERY gaunt looking newbie... it looks like a zombie!
+training husk animated construct academy~
+an animated training husk~
+An animated training husk advances with a blunted practice weapon.
 ~
-   This guy has been lost in here too long...  It is more zombie than man now.
-You would feel sorry for it, but it is moving in to attack!
+Layered cloth, wicker, leather, and minor animation magic form a sturdier opponent than the simple training dummy. Its movements imitate an inexperienced humanoid fighter, giving students a safer way to practice against something that attacks back.
 ~
-108 0 0 0 0 0 0 0 -500 E
-4 19 7 0d0+40 1d2+0
-40 1600
+104 0 0 0 0 0 0 0 -500 E
+4 20 24 1d4+20 1d2+0
+40 0
 8 8 0
+SavingPara: 1
+SavingRod: 1
+SavingPetri: 1
+SavingBreath: 1
+SavingSpell: 1
+Wimpy: 2
+Evasion: 1
+GoldMin: 0
+GoldMax: 1
 E
 #18608
-quasit imp thing~
-the quasit~
-A funny little imp-like thing (a quasit perhaps?) is sneaking about here.
+practice imp summoned imp academy~
+a summoned practice imp~
+A bound practice imp flits impatiently within the examination course.
 ~
-   Little green, vaguely humanoid shaped creature, with a long pointed tail.
-It is hard to say because before you ever get a good look at it, it darts back
-into the shadows.
+A small winged imp has been bound under strict Academia wards for supervised exercises. Glowing sigils around its wrists prevent it from leaving the grounds, though its quick movements and malicious grin make it an effective lesson in dealing with magical creatures.
 ~
-236 0 0 0 0 0 0 0 -800 E
-3 19 8 0d0+30 1d2+0
-30 900
+232 0 0 0 0 0 0 0 -800 E
+3 20 23 1d4+15 1d2+0
+30 0
 8 8 1
+Wimpy: 1
+Evasion: 1
+GoldMin: 0
+GoldMax: 1
 E
 #18609
-minotaur~
-the massive Minotaur~
-The Great Minotaur is wondering just what you'll taste like.
+trial minotaur minotaur academy~
+the Trial Minotaur~
+The Trial Minotaur lowers its padded horns and watches for a challenger.
 ~
-   A massive man, with the head of a bull.  He looks as strong as bull too, but
-not nearly as smart.  Actually, now that you consider it...  He looks a heck of
-a lot meaner than any bull you have ever seen...  And he is coming this way!
+This enormous minotaur serves as one of the Academia's most demanding controlled opponents. Heavy leather guards cover its horns and joints, while a handler's sigil marks it as trained to break pursuit when a student yields or escapes.
 ~
-1608 0 0 0 0 0 0 0 -1000 E
-7 18 5 1d1+70 1d2+1
-70 4900
+72 0 0 0 0 0 0 0 -1000 E
+7 20 27 1d4+35 1d2+0
+70 0
 8 8 1
+SavingPara: 1
+SavingRod: 1
+SavingPetri: 1
+SavingBreath: 1
+SavingSpell: 1
+Wimpy: 3
+Evasion: 2
+GoldMin: 1
+GoldMax: 3
 E
 #18610
-spectre ghost~
-the dark spectre~
-The dark spectre is lurking in the shadows.
+spectral examiner examiner spirit academy~
+the spectral examiner~
+A spectral examiner observes the chamber in solemn silence.
 ~
-   The soul of a long since passed on adventurer...  It lurks here waiting for a
-chance to bring death to any who cross its path.
+The translucent figure wears the old field cloak of an Academia examiner from generations past. Rather than haunting the halls in anger, the spirit remains by ancient agreement, watching students with the patient severity of someone who has seen every careless mistake before.
 ~
 2122 0 0 0 1048596 0 0 0 -850 E
-6 18 6 1d1+60 1d2+1
-60 3600
+6 20 26 1d4+30 1d2+0
+60 0
 8 8 0
+SavingPara: 1
+SavingRod: 1
+SavingPetri: 1
+SavingBreath: 1
+SavingSpell: 1
+Wimpy: 3
+Evasion: 2
+GoldMin: 0
+GoldMax: 1
 E
+T 18689
+T 18698
 #18611
-newbie annoying jerk~
-the annoying newbie~
-A newbie is here annoying the hell out of you.
+instructor vael fieldcraft tutor academy~
+Instructor Vael~
+Instructor Vael checks a student's pack against a worn field list.
 ~
-   What a jerk!  He won't shut up, and he keeps making the most irritating
-comments about everything.  Better silence him with cold, tempered steel
-MUHAHAHAHAHAHAHAHAHAHA!
+Vael is a lean half-elf dressed for travel rather than ceremony. Rope, chalk, a compass, and a weather-stained cloak hang from practical straps, and every piece of equipment appears to have been repaired more than once.
 ~
-76 0 0 0 0 0 0 0 -500 E
-2 20 8 0d0+20 1d2+0
-20 400
+72 0 0 0 0 0 0 0 -500 E
+2 20 22 1d4+10 1d2+0
+20 0
 8 8 1
+Wimpy: 1
 E
+T 18683
+T 18693
 #18612
-newbie clueless moron~
-the clueless newbie~
-A newbie is here looking terribly confused.
+registrar elowen registrar academy~
+Registrar Elowen~
+Registrar Elowen stands ready to guide newly arrived students.
 ~
-   What a moron!  Every question that is answered in the help files, he will ask
-and he will probably ask 2 or 3 times too.  This guy just doesn't get it, best
-put him out of his misery.
+Elowen is a composed human woman in the deep blue and silver of the Academia. She carries enrollment ledgers beneath one arm and has the practiced expression of someone accustomed to answering simple questions without making the asker feel foolish.
 ~
-76 0 0 0 0 0 0 0 0 E
-1 20 9 0d0+10 1d2+0
-10 100
-8 8 1
+72 0 0 0 0 0 0 0 0 E
+1 20 21 1d4+5 1d2+0
+10 0
+8 8 2
+Wimpy: 1
 E
+T 18680
+T 18690
 #18613
-newbie talkative~
-the talkative newbie~
-A newbie is here talking a lot.
+lecturer miriel lore tutor academy~
+Lecturer Miriel~
+Lecturer Miriel studies a map covered in careful annotations.
 ~
-   Well, at least this gal seems pretty cool.  Talks a lot, but she's a
-friendly, interesting sort.  Seems to have a clue what she's doing also, unlike
-some others you might see.
+Miriel is an elven lecturer whose robes are stitched with tiny road, star, and rune motifs. She teaches communication, lore, and the habit of asking useful questions before an expedition leaves civilization behind.
 ~
 72 0 0 0 0 0 0 0 100 E
-3 19 8 0d0+30 1d2+0
-30 900
+3 20 23 1d4+15 1d2+0
+30 0
 8 8 2
+Wimpy: 1
+Evasion: 1
 E
+T 18684
+T 18695
 #18614
-newbie lost~
-the lost newbie~
-A newbie is here wandering about aimlessly.
+scoutmaster corren scout navigation instructor academy~
+Scoutmaster Corren~
+Scoutmaster Corren quietly studies the flow of students through the halls.
 ~
-   Hmmm...  Looks like he has been around a while, but he wandered a little too
-far from home this time.  Don't think he knows quite where he is, maybe you
-should help him out?
+Corren wears a weathered green cloak over light field armor and carries no unnecessary ornament. His sharp eyes constantly note exits, distances, and movement, making even an ordinary corridor seem like part of a navigation exercise.
 ~
 72 0 0 0 0 0 0 0 300 E
-4 19 7 0d0+40 1d2+0
-40 1600
+4 20 24 1d4+20 1d2+0
+40 0
 8 8 1
+SavingPara: 1
+SavingRod: 1
+SavingPetri: 1
+SavingBreath: 1
+SavingSpell: 1
+Wimpy: 2
+Evasion: 1
 E
+T 18685
+T 18696
 #18615
-newbie smart~
-the smart newbie~
-A newbie is here, and he looks quite sure of himself.
+provost aldren provost dean academy~
+Provost Aldren~
+Provost Aldren oversees the Academia with calm authority.
 ~
-   Here is a guy who has it all together.  Nice equipment too, must have read
-the help files, Eh?
+Aldren is an older adventurer whose formal coat cannot completely hide the posture of a veteran accustomed to armor and long roads. A silver lantern badge marks his office, while scars and faded expedition tattoos suggest his lessons were learned far beyond any classroom.
 ~
-76 0 0 0 0 0 0 0 500 E
-5 19 7 1d1+50 1d2+0
-50 2500
+72 0 0 0 0 0 0 0 500 E
+5 20 25 1d4+25 1d2+0
+50 0
 8 8 1
+SavingPara: 1
+SavingRod: 1
+SavingPetri: 1
+SavingBreath: 1
+SavingSpell: 1
+Wimpy: 2
+Evasion: 1
 E
+T 18686
+T 18699
 $

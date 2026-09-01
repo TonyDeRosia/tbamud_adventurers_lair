@@ -135,6 +135,7 @@ int	perform_move(struct char_data *ch, int dir, int following);
 int	mana_gain(struct char_data *ch);
 int	mana_bonus_percent(const struct char_data *ch);
 int	effective_max_mana(const struct char_data *ch);
+int	effective_max_hit(const struct char_data *ch);
 void	clamp_mana_to_effective_max(struct char_data *ch);
 int	move_bonus_percent(const struct char_data *ch);
 int	effective_max_move(const struct char_data *ch);
@@ -143,6 +144,7 @@ int	hit_gain(struct char_data *ch);
 int	move_gain(struct char_data *ch);
 void	set_title(struct char_data *ch, char *title);
 void	gain_exp(struct char_data *ch, int gain);
+int	final_positive_xp_gain(int raw_gain);
 void	gain_exp_regardless(struct char_data *ch, int gain, int max_level);
 void	gain_condition(struct char_data *ch, int condition, int value);
 void	point_update(void);
@@ -548,14 +550,17 @@ do                                                              \
 #define GET_HIT(ch)	  ((ch)->points.hit)
 /** Maximum hit points of ch. */
 #define GET_MAX_HIT(ch)	  ((ch)->points.max_hit)
+#define GET_BASE_MAX_HIT(ch) ((ch)->points.base_max_hit)
 /** Current move points (stamina) of ch. */
 #define GET_MOVE(ch)	  ((ch)->points.move)
 /** Maximum move points (stamina) of ch. */
 #define GET_MAX_MOVE(ch)  ((ch)->points.max_move)
+#define GET_BASE_MAX_MOVE(ch) ((ch)->points.base_max_move)
 /** Current mana points (magic) of ch. */
 #define GET_MANA(ch)	  ((ch)->points.mana)
 /** Maximum mana points (magic) of ch. */
 #define GET_MAX_MANA(ch)  ((ch)->points.max_mana)
+#define GET_BASE_MAX_MANA(ch) ((ch)->points.base_max_mana)
 
 /* Mana bonus tuning constants. */
 #define MANA_BONUS_BASELINE      30   /* Stat sum where bonus begins. */

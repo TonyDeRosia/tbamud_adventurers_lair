@@ -238,8 +238,9 @@ void clanedit_parse(struct descriptor_data *d, char *arg);
 #define MOB_NOKILL         18   /**< Mob can't be attacked */
 #define MOB_GUILD_MASTER   19   /**< Mob is a guildmaster */
 #define MOB_NOTDEADYET     20   /**< (R) Mob being extracted */
+#define MOB_RARE           21   /**< Explicit builder-controlled rare mob */
 
-#define NUM_MOB_FLAGS      21
+#define NUM_MOB_FLAGS      22
 
 /* Preference flags: used by char_data.player_specials.pref */
 #define PRF_BRIEF         0   /**< Room descs won't normally be shown */
@@ -989,12 +990,18 @@ struct char_ability_data
 /** Character 'points', or health statistics. */
 struct char_point_data
 {
-  sh_int mana;     /**< Current mana level  */
-  sh_int max_mana; /**< Max mana level */
-  sh_int hit;      /**< Curent hit point, or health, level */
-  sh_int max_hit;  /**< Max hit point, or health, level */
-  sh_int move;     /**< Current move point, or stamina, level */
-  sh_int max_move; /**< Max move point, or stamina, level */
+  /* Active runtime values are deliberately wider than the legacy binary
+   * playerfile representation. Modern player persistence is ASCII. */
+  int mana;     /**< Current mana level  */
+  int max_mana; /**< Max mana level */
+  int hit;      /**< Current hit point, or health, level */
+  int max_hit;  /**< Max hit point, or health, level */
+  int move;     /**< Current move point, or stamina, level */
+  int max_move; /**< Max move point, or stamina, level */
+  /* Persistent maxima before temporary equipment and spell modifiers. */
+  int base_max_mana;
+  int base_max_hit;
+  int base_max_move;
 
   /** Base Armor value before stat-derived bonuses. Higher is better. */
   sh_int armor;

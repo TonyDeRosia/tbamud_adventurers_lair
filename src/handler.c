@@ -243,7 +243,12 @@ static void affect_modify_ar(struct char_data * ch, byte loc, sbyte mod, int bit
       for(j = 0; j < 32; j++)
         if(IS_SET_AR(bitv, (i*32)+j))
           REMOVE_BIT_AR(AFF_FLAGS(ch), (i*32)+j);
-    mod = -mod;
+    /* Resource maxima are rebuilt from persistent bases by affect_total().
+     * Do not subtract a modifier from a freshly restored base. */
+    if (loc == APPLY_MANA || loc == APPLY_HIT || loc == APPLY_MOVE)
+      mod = 0;
+    else
+      mod = -mod;
   }
 
   aff_apply_modify(ch, loc, mod, "affect_modify_ar");
@@ -259,6 +264,11 @@ void affect_total(struct char_data *ch)
   /* Rebuild affected flags from the saved baseline every time. */
   for (i = 0; i < AF_ARRAY_MAX; i++)
     AFF_FLAGS(ch)[i] = ch->char_specials.saved.affected_by[i];
+
+  /* Effective maxima are derived from persistent base maxima. */
+  GET_MAX_HIT(ch) = GET_BASE_MAX_HIT(ch);
+  GET_MAX_MANA(ch) = GET_BASE_MAX_MANA(ch);
+  GET_MAX_MOVE(ch) = GET_BASE_MAX_MOVE(ch);
 
   /* Remove equipment modifiers and bits. */
   for (i = 0; i < NUM_WEARS; i++) {
@@ -341,6 +351,8 @@ void affect_total(struct char_data *ch)
 
   clamp_mana_to_effective_max(ch);
   clamp_move_to_effective_max(ch);
+  if (GET_HIT(ch) > GET_MAX_HIT(ch))
+    GET_HIT(ch) = GET_MAX_HIT(ch);
 }
 
 /* Insert an affect_type in a char_data structure. Automatically sets

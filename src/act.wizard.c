@@ -4050,19 +4050,19 @@ static int perform_set(struct char_data *ch, struct char_data *vict, int mode, c
       affect_total(vict);
       break;
     case 28: /* maxhit */
-      vict->points.max_hit = RANGE(1, 999999);
+      GET_BASE_MAX_HIT(vict) = RANGE(1, 999999);
       affect_total(vict);
       GET_HIT(vict) = MIN(GET_HIT(vict), GET_MAX_HIT(vict));
       break;
     case 29: /* maxmana */
-      vict->points.max_mana = RANGE(1, 999999);
+      GET_BASE_MAX_MANA(vict) = RANGE(1, 999999);
       affect_total(vict);
-      GET_MANA(vict) = MIN(GET_MANA(vict), GET_MAX_MANA(vict));
+      GET_MANA(vict) = MIN(GET_MANA(vict), effective_max_mana(vict));
       break;
     case 30: /* maxmove */
-      vict->points.max_move = RANGE(1, 999999);
+      GET_BASE_MAX_MOVE(vict) = RANGE(1, 999999);
       affect_total(vict);
-      GET_MOVE(vict) = MIN(GET_MOVE(vict), GET_MAX_MOVE(vict));
+      GET_MOVE(vict) = MIN(GET_MOVE(vict), effective_max_move(vict));
       break;
     case 31: /* move */
       vict->points.move = RANGE(0, vict->points.max_move);
@@ -4411,24 +4411,41 @@ ACMD(do_set)
     }
   }
 
-  if (!str_cmp(field, "health") || !str_cmp(field, "hp")) {
+  if (!str_cmp(field, "health") || !str_cmp(field, "hp") ||
+      !str_cmp(field, "mana") || !str_cmp(field, "move")) {
     char *end = NULL;
     long value_long;
+    const char *resource;
     errno = 0;
     value_long = strtol(buf, &end, 10);
     while (end && *end && isspace((unsigned char)*end))
       end++;
     if (errno == ERANGE || end == buf || (end && *end) ||
         value_long < 1 || value_long > 999999) {
-      send_to_char(ch, "Health must be a whole number from 1 to 999999.\r\n");
+      send_to_char(ch, "Resource maximum must be a whole number from 1 to 999999.\r\n");
       goto do_set_save_and_cleanup;
     }
-    vict->points.max_hit = (int)value_long;
-    vict->points.hit = (int)value_long;
-    affect_total(vict);
-    vict->points.hit = MIN((int)value_long, GET_MAX_HIT(vict));
-    send_to_char(ch, "%s's health set to %d/%d.\r\n",
-                 GET_NAME(vict), GET_HIT(vict), GET_MAX_HIT(vict));
+    if (!str_cmp(field, "mana")) {
+      GET_BASE_MAX_MANA(vict) = (int)value_long;
+      affect_total(vict);
+      GET_MANA(vict) = effective_max_mana(vict);
+      resource = "mana";
+      send_to_char(ch, "%s's %s set to %d/%d.\r\n", GET_NAME(vict), resource,
+                   GET_MANA(vict), effective_max_mana(vict));
+    } else if (!str_cmp(field, "move")) {
+      GET_BASE_MAX_MOVE(vict) = (int)value_long;
+      affect_total(vict);
+      GET_MOVE(vict) = effective_max_move(vict);
+      resource = "move";
+      send_to_char(ch, "%s's %s set to %d/%d.\r\n", GET_NAME(vict), resource,
+                   GET_MOVE(vict), effective_max_move(vict));
+    } else {
+      GET_BASE_MAX_HIT(vict) = (int)value_long;
+      affect_total(vict);
+      GET_HIT(vict) = GET_MAX_HIT(vict);
+      send_to_char(ch, "%s's health set to %d/%d.\r\n",
+                   GET_NAME(vict), GET_HIT(vict), GET_MAX_HIT(vict));
+    }
     retval = 1;
     goto do_set_save_and_cleanup;
   }
@@ -6634,6 +6651,9 @@ static bool mobtemplate_create_one(mob_vnum vnum, const char *base_name, int num
   GET_MANA(&mob) = 1;
   GET_MAX_MANA(&mob) = 100;
   GET_MAX_MOVE(&mob) = 100;
+  GET_BASE_MAX_HIT(&mob) = GET_MAX_HIT(&mob);
+  GET_BASE_MAX_MANA(&mob) = GET_MAX_MANA(&mob);
+  GET_BASE_MAX_MOVE(&mob) = GET_MAX_MOVE(&mob);
   GET_NDD(&mob) = 1;
   GET_SDD(&mob) = 1;
   GET_WEIGHT(&mob) = 200;

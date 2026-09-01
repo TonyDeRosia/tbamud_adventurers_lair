@@ -18,12 +18,14 @@ expected = {
 for delta, value in expected.items():
     assert audit.base_xp(50, 50 + delta) == value
 
-assert "bonus_xp = GET_EXP(victim);" in FIGHT
-assert "exp = MAX(0, exp + bonus_xp);" in FIGHT
-assert "share = MAX(0, share + bonus_xp);" in FIGHT
-assert "return MAX(1, base_xp / 4);" in FIGHT
-assert "live_count > RARE_KILL_MAX_COUNT" in FIGHT
-assert "gain = MIN(CONFIG_MAX_EXP_GAIN, gain);" in LIMITS
+assert "npc_kill_raw_xp" in FIGHT
+assert "raw += MAX(0, GET_EXP(victim));" in FIGHT
+assert "MOB_FLAGGED(victim, MOB_RARE) ? MAX(1, base_xp / 4) : 0" in FIGHT
+assert "count_live_mobs_by_vnum" not in FIGHT
+assert "final_gain = final_positive_xp_gain" in FIGHT
+assert "final_positive_xp_gain" in LIMITS
+assert "modified += (modified * HAPPY_EXP) / 100" in LIMITS
+assert "gain = final_positive_xp_gain(gain);" in LIMITS
 assert "gain = MAX(-CONFIG_MAX_EXP_LOSS, gain);" in LIMITS
 assert "Bonus XP is added on top of live kill XP." in MEDIT
 

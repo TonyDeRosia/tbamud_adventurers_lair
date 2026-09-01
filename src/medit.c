@@ -58,6 +58,7 @@ static const char *action_bits_olc[] = {
   "NO_KILL",
   "GUILD_MASTER",
   "RESERVED",
+  "RARE",
   "\n"
 };
 
@@ -289,6 +290,9 @@ static void init_mobile(struct char_data *mob)
 
   GET_HIT(mob) = GET_MANA(mob) = 1;
   GET_MAX_MANA(mob) = GET_MAX_MOVE(mob) = 100;
+  GET_BASE_MAX_MANA(mob) = GET_MAX_MANA(mob);
+  GET_BASE_MAX_MOVE(mob) = GET_MAX_MOVE(mob);
+  GET_BASE_MAX_HIT(mob) = GET_MAX_HIT(mob);
   GET_NDD(mob) = GET_SDD(mob) = 1;
   GET_WEIGHT(mob) = 200;
   GET_HEIGHT(mob) = 198;
@@ -839,7 +843,7 @@ static void medit_disp_stats_menu(struct descriptor_data *d)
   "    Base XP Preview:           %s[%s%5d%s]%s\r\n"
   "    Total XP Preview:          %s[%s%5d%s]%s\r\n"
   "    Note: Bonus XP is added on top of live kill XP.\r\n"
-  "    Note: Rare Kill bonus may add extra XP when few live copies exist.\r\n"
+  "    Note: RARE is an explicit mob flag; its bonus is based on calculated base XP.\r\n"
   "-------------------------------------------------------------------------------\r\n"
   "ATTRIBUTES\r\n"
   "(%sH%s) Str: %s[%s%2d/%3d%s]%s   (%sI%s) Int: %s[%s%2d%s]%s   (%sJ%s) Wis: %s[%s%2d%s]%s\r\n"

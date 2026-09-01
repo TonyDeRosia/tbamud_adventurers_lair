@@ -1,253 +1,347 @@
 #7000
-mudmonster mud monster~
-the horrifying Mudmonster~
-A horrifying Mudmonster is slowly evolving from the mud...
+siltborn guardian mudmonster mud monster~
+the siltborn guardian~
+A hulking siltborn guardian pulls itself slowly from the damp stone.
 ~
-   It sure looks like something out of a horror movie.  It strongly resembles a
-huge figure made up from mud alone, and it sure looks like it had human flesh
-for breakfast and is strongly intent on having the same for dinner - Perhaps
-you?
+Mud, mineral crust, and broken fragments of ancient masonry have gathered into a vaguely humanoid shape. Pale light glimmers deep within the creature's hollow face as it drags itself through the ruins, animated by whatever old power still lingers beneath Midgaard.
 ~
 196680 0 0 0 524288 0 0 0 -250 E
-12 16 2 2d2+120 2d2+2
-120 14400
+8 19 28 1d4+40 1d2+0
+120 0
 6 8 0
+SavingPara: 2
+SavingRod: 2
+SavingPetri: 2
+SavingBreath: 2
+SavingSpell: 2
+Wimpy: 4
+Evasion: 2
+GoldMin: 0
+GoldMax: 3
 E
 #7001
-bat small fierce~
-the small bat~
-The small fierce-looking bat is hanging from the ceiling, obviously sleeping.
+cave bat small fierce bat~
+the cave bat~
+A small cave bat hangs from the stone overhead.
 ~
-   You have never in your entire life seen such a mean looking small creature,
-though it looks rather peaceful, hanging there, sleeping.  The thought of
-arousing this cruel creature doesn't sit well in your bones.
+This dark-furred bat has adapted to the buried halls of the Old Delve. It is little more than a nuisance alone, but disturbed colonies can become surprisingly aggressive in the close tunnels.
 ~
 131176 0 0 0 524288 0 0 0 -500 E
-1 20 9 0d0+10 1d2+0
-10 100
+1 20 21 1d4+5 1d2+0
+10 0
 4 8 0
+Wimpy: 1
 E
 #7002
-rat sewer~
-the sewer rat~
-The huge hungry-looking sewer rat sits here.
+delve rat rat sewer~
+the delve rat~
+A large delve rat watches you from beside the wall.
 ~
-   This creature is fairly large for a rat, but not so big that it could be
-called a giant rat.  Sewer water drips off of its gray fur as it looks at you
-with black glistening eyes.
+The rat is broad-bodied and scarred from life beneath the city. Damp gray fur clings to its sides, and its black eyes follow every movement with the wary hunger of a creature used to surviving on anything it can find.
 ~
 104 0 0 0 0 0 0 0 -1000 E
-5 19 7 1d1+50 1d2+0
-50 2500
+3 20 23 1d4+15 1d2+0
+50 0
 8 8 0
+Wimpy: 1
+Evasion: 1
+GoldMin: 0
+GoldMax: 1
 E
 #7003
-spider small hairy~
-the small Spider~
-The small hairy Spider is here, busy with its web.
+cellar spider spider small hairy~
+the cellar spider~
+A hairy cellar spider works at a web between the stones.
 ~
-   This small spider seems to pay you no attention at all as it builds its
-intricately designed web.
+This hand-sized spider has spun a thick web across cracks in the ancient masonry. Its mottled legs blend into the stone until it moves, revealing a quick and territorial little predator.
 ~
 104 0 0 0 524288 0 0 0 -700 E
-1 20 9 0d0+10 1d2+0
-10 100
+1 20 21 1d4+5 1d2+0
+10 0
 8 8 0
+Wimpy: 1
 E
 #7004
-beetle giant earth~
-the giant earth beetle~
-The giant, mean-looking earth beetle is here.
+stoneback beetle beetle giant earth~
+the stoneback beetle~
+A heavy stoneback beetle scrapes across the floor.
 ~
-   Now, you've seen beetles, but this one is enormous.  It stretches perhaps two
-feet from head to tail.  As it notices you, it waves its six legs about and
-makes some strange skittering noises at you.
+Plates of dark shell cover this oversized beetle like fitted armor. Dust and mineral flakes cling to its back, making it nearly indistinguishable from rubble until its hooked legs begin to move.
 ~
 72 0 0 0 0 0 0 0 -300 E
-8 18 5 1d1+80 1d2+1
-80 6400
+5 20 25 1d4+25 1d2+0
+80 0
 4 8 0
+SavingPara: 1
+SavingRod: 1
+SavingPetri: 1
+SavingBreath: 1
+SavingSpell: 1
+Wimpy: 2
+Evasion: 1
+GoldMin: 0
+GoldMax: 1
 E
 #7005
-maggot giant~
-the maggot~
-The giant maggot is here, simply existing.
+grave grub maggot giant~
+the grave grub~
+A pale grave grub writhes among the damp debris.
 ~
-   This large mound of grotesque flesh is just lying here quivering, almost as
-if it can sense your warm blood nearby.
+The bloated larva feeds on fungus, rot, and whatever else washes into the buried complex. Its translucent hide pulses around a dark digestive tract, and it curls toward warmth with unsettling persistence.
 ~
 196680 0 0 0 0 0 0 0 300 E
-3 19 8 0d0+30 1d2+0
-30 900
+2 20 22 1d4+10 1d2+0
+30 0
 8 8 0
+Wimpy: 1
 E
 #7006
-snake~
-the snake~
-The snake slithers towards you. It looks very mean.
+blackstripe viper snake~
+the blackstripe viper~
+A blackstripe viper coils low across the stones.
 ~
-   This snake is of a variety that you do not recall seeing recently.  It has
-near black skin with small white diamond shaped spots all over its head and
-upper body.  A thin green stripe stretches along each side of its body.
+Near-black scales cover this slender viper, broken by pale diamond markings along its head and thin green stripes down its flanks. It keeps its head low and tracks movement with patient, venomous attention.
 ~
 72 0 0 0 0 0 0 0 -500 E
-4 19 7 0d0+40 1d2+0
-40 1600
+3 20 23 1d4+15 1d2+0
+40 0
 8 8 0
+Wimpy: 1
+Evasion: 1
+GoldMin: 0
+GoldMax: 1
 E
 T 7000
 #7007
-wanderer evil~
-the evil wanderer~
-The evil wanderer stares at you with a piercing gaze.
+lost delver wanderer adventurer~
+the lost delver~
+A gaunt lost delver watches the passages with hollow eyes.
 ~
-   The evil wanderer is very thin.  He is dressed in a gray cloak.  He doesn't
-look like he'd be your first choice as a travelling companion.
+A torn gray cloak hangs from this exhausted adventurer. Old Guild trail marks have been copied onto scraps of leather tied around one wrist, but the delver's unfocused stare suggests too many days spent wandering the dark have taken their toll.
 ~
 204 0 0 0 64 0 0 0 -1000 E
-10 17 4 2d2+100 1d2+1
-100 10000
+6 20 26 1d4+30 1d2+0
+100 0
 8 8 1
+SavingPara: 1
+SavingRod: 1
+SavingPetri: 1
+SavingBreath: 1
+SavingSpell: 1
+Wimpy: 3
+Evasion: 2
+GoldMin: 0
+GoldMax: 2
 E
 #7008
-homunculus creature~
-the creature homunculus~
-The creature homunculus is here, looking at you with an evil look.
+malformed homunculus creature~
+the malformed homunculus~
+A malformed homunculus clings to the ruined stonework.
 ~
-   The homunculus appears in a man-like form, about eighteen inches tall, has a
-greenish, reptilian skin, leathery wings, and a bat-like mouth, with teeth
-dripping with a greenish sludge.
+No taller than a small child, this artificial creature has green-gray skin, leathery wings, and an oversized mouth crowded with sharp teeth. Faint sigils have been burned into its flesh, evidence of some forgotten experiment carried out in the buried halls.
 ~
 57416 0 0 0 80 0 0 0 -780 E
-11 17 3 2d2+110 1d2+1
-110 12100
+7 20 27 1d4+35 1d2+0
+110 0
 8 8 0
+SavingPara: 1
+SavingRod: 1
+SavingPetri: 1
+SavingBreath: 1
+SavingSpell: 1
+Wimpy: 3
+Evasion: 2
+GoldMin: 0
+GoldMax: 2
 E
 #7009
-morkoth shadowy~
-the shadowy morkoth~
-The morkoth are standing here, waiting for someone to KILL!
+shadow morkoth morkoth shadowy~
+the shadow morkoth~
+A shadow morkoth waits just beyond the edge of the light.
 ~
-   It is a five foot tall, shadow monster.  This has the shape between a human
-and a rat.  It breaths very heavily while staring at you.
+This hunched creature blends humanoid and ratlike features beneath a skin of shifting shadow. Its breathing is slow and deliberate, and faint sparks gather around its claws when it senses prey. Whatever magic shaped it still answers its instincts.
 ~
 200 0 0 0 64 0 0 0 -900 E
-10 17 4 2d2+100 1d2+1
-100 10000
+7 20 27 1d4+35 1d2+0
+100 0
 8 8 0
+SavingPara: 1
+SavingRod: 1
+SavingPetri: 1
+SavingBreath: 1
+SavingSpell: 1
+Wimpy: 3
+Evasion: 2
+GoldMin: 0
+GoldMax: 2
 E
 T 7200
 #7010
-chr-eff'n chreffn~
-the evil chr-eff'n~
-The chr-eff'n are crawling here, looking around with its yellow eyes.
+copper eyed crawler chreffn chr-eff'n~
+the copper-eyed crawler~
+A copper-eyed crawler creeps along the wall.
 ~
-   The head and torso of a chr-eff'n is copper-covered, with yellow, glowing
-eyes.  The lower body is in an orange shading.
+Copper-colored plates cover the upper body of this strange subterranean creature, framing two luminous yellow eyes. Its lower body fades into burnt orange hide, and hooked limbs let it move across broken masonry with disturbing ease.
 ~
 204 0 0 0 524304 0 0 0 -830 E
-12 16 2 2d2+120 2d2+2
-120 14400
+8 19 28 1d4+40 1d2+0
+120 0
 8 8 0
+SavingPara: 2
+SavingRod: 2
+SavingPetri: 2
+SavingBreath: 2
+SavingSpell: 2
+Wimpy: 4
+Evasion: 2
+GoldMin: 0
+GoldMax: 3
 E
 #7040
-dragon red~
-the red dragon~
-The fierce-looking red dragon stares at you angrily.
+ember drake dragon red~
+the ember drake~
+An old ember drake guards the deepest chamber of the upper Delve.
 ~
-   The red dragon stares at you, angrily, as it wakes when you arrive.  It says
-'Oh, human YOU woke me up...  Hsssss', while it moves closer, 'Can one NEVER
-sleep in peace...  Hssss...  '
+This scarred red-scaled drake is smaller than the great dragons of legend but still enormous within the confines of the dungeon. Heat shimmers around its jaws, and blackened claw marks score the surrounding stone. It has clearly claimed this portion of the Old Delve as its lair.
 ~
 90170 0 0 0 65552 0 0 0 -1000 E
-19 14 -1 3d3+190 3d3+3
-190 36100
+10 19 30 1d4+50 1d2+0
+190 0
 8 8 0
+SavingPara: 2
+SavingRod: 2
+SavingPetri: 2
+SavingBreath: 2
+SavingSpell: 2
+Wimpy: 5
+Evasion: 3
+GoldMin: 5
+GoldMax: 10
 E
 #7041
-hag sea~
-the sea hag~
-A sea hag is here, swimming around.
+drowned hag sea hag~
+the drowned hag~
+A drowned hag moves through the cold water with terrible grace.
 ~
-   The sea hag is so ghastly looking that you feel the deepest fear: Big yellow
-eyes and sharp teeth.  Its ears are very big, and it has small sharp horns.
-This beast is obviously a hater of beauty.
+Long limbs and slick gray-green skin mark this creature as something that has lived in darkness for far too long. Yellow eyes shine above a mouth of needlelike teeth, and strands of wet hair cling to the small horns along its skull.
 ~
 104 0 0 0 0 0 0 0 -800 E
-14 16 1 2d2+140 2d2+2
-140 19600
+9 19 29 1d4+45 1d2+0
+140 0
 8 8 2
+SavingPara: 2
+SavingRod: 2
+SavingPetri: 2
+SavingBreath: 2
+SavingSpell: 2
+Wimpy: 4
+Evasion: 3
+GoldMin: 0
+GoldMax: 3
 E
 #7042
-naga guardian~
+guardian naga naga~
 the guardian naga~
-The guardian naga looks kindly at you.
+A guardian naga keeps watch over the old passage.
 ~
-   The naga are a snake-liked creature.  She is covered in green-gold scales
-with silvery triangles along her back.  Her eyes are golden.  She notices that
-you are staring at her, and she says 'Watch out.  This way leads to some evil
-creatures.  '
+Green-gold scales cover the naga's serpentine body, patterned with silver triangles along her back. Her golden eyes are alert rather than hostile. The ancient markings around her resting place suggest she may have guarded these halls long before Midgaard rose above them.
 ~
 10 0 0 0 0 0 0 0 700 E
-12 16 2 2d2+120 2d2+2
-120 14400
+8 19 28 1d4+40 1d2+0
+120 0
 8 8 2
+SavingPara: 2
+SavingRod: 2
+SavingPetri: 2
+SavingBreath: 2
+SavingSpell: 2
+Wimpy: 4
+Evasion: 2
+GoldMin: 0
+GoldMax: 3
 E
 #7043
-basilisk scaled~
-the scaled basilisk~
-The scaled basilisk crawls towards you slowly.
+vault basilisk basilisk scaled~
+the vault basilisk~
+A heavy vault basilisk crawls through the ruins.
 ~
-   The basilisk is a reptilian monster.  It has eight legs, and a strong, toothy
-jaws.  It is dull brown with yellowish underbelly.  Its eyes are glowing pale
-green.
+Eight powerful legs support a low reptilian body covered in dull brown scales. Its pale green eyes gleam beneath a ridged brow, and the stone around its claws is scored by years of territorial pacing.
 ~
 76 0 0 0 80 0 0 0 -250 E
-13 16 2 2d2+130 2d2+2
-130 16900
+9 19 29 1d4+45 1d2+0
+130 0
 8 8 0
+SavingPara: 2
+SavingRod: 2
+SavingPetri: 2
+SavingBreath: 2
+SavingSpell: 2
+Wimpy: 4
+Evasion: 3
+GoldMin: 0
+GoldMax: 3
 E
 #7044
-lemure blob~
-the lemure~
-The lemure blob slithers towards you for an attack!
+mindburned husk lemure blob~
+the mindburned husk~
+A mindburned husk lurches toward anything that moves.
 ~
-   This looks like a vaguely human blob.  Big black yellow eyes, and a mouth
-going a little bit out from the face.  The lemure does not look interested in
-you at all, but it attacks anyway.  It looks like its mind has been burned out.
-
+The vaguely humanoid creature looks as though its body was softened and remade by hostile magic. Its empty black-yellow eyes show no recognition or fear, only the automatic violence of a mind long ago burned away.
 ~
 73832 0 0 0 0 0 0 0 -500 E
-5 19 7 1d1+50 1d2+0
-50 2500
+4 20 24 1d4+20 1d2+0
+50 0
 8 8 0
+SavingPara: 1
+SavingRod: 1
+SavingPetri: 1
+SavingBreath: 1
+SavingSpell: 1
+Wimpy: 2
+Evasion: 1
+GoldMin: 0
+GoldMax: 1
 E
 #7045
-jones cruncher ettin~
-Jones 'cruncher' ettin~
-Jones is standing here glaring at you.
+grunn two headed brute ettin cruncher jones~
+Grunn, the two-headed brute~
+Grunn, a two-headed delve brute, blocks the passage.
 ~
-   At the first sight you thought Jones was an Orc, but when he came closer you
-see his second head.  He wears an animal skin dress, filthy and moth eaten.
-Jones really stinks...
+Two scarred heads rise above Grunn's massive shoulders, arguing constantly in low growls while the body grips a crude length of timber. Layers of stitched hide and scavenged straps suggest the brute has made a home among the Old Delve's abandoned chambers.
 ~
 76 0 0 0 0 0 0 0 -480 E
-10 17 4 2d2+100 1d2+1
-100 10000
+9 19 29 1d4+45 1d2+0
+100 0
 5 5 1
+SavingPara: 2
+SavingRod: 2
+SavingPetri: 2
+SavingBreath: 2
+SavingSpell: 2
+Wimpy: 4
+Evasion: 3
+GoldMin: 1
+GoldMax: 3
 E
 #7046
-herald mouse killer ettin~
-Herald 'the mouse-killer' ettin~
-Herald is standing here looking confused at you.
+merrik two headed runt ettin herald mouse killer~
+Merrik, the two-headed runt~
+Merrik, a smaller two-headed brute, lurks among the ruins.
 ~
-   When you look at Herald, you feel pity.  His clothes are really poor, and one
-of his heads hangs down.  At the rope around his stomach hangs dead mice and
-rats.  He does not smell good.
+Merrik is undersized for an ettin, with one head noticeably weaker than the other. Rope, patched hides, and bits of scavenged metal make up the creature's poor equipment, while small bones tied at the waist serve as crude trophies.
 ~
 76 0 0 0 0 0 0 0 200 E
-6 18 6 1d1+60 1d2+1
-60 3600
+5 20 25 1d4+25 1d2+0
+60 0
 5 5 1
+SavingPara: 1
+SavingRod: 1
+SavingPetri: 1
+SavingBreath: 1
+SavingSpell: 1
+Wimpy: 2
+Evasion: 1
+GoldMin: 0
+GoldMax: 2
 E
 $

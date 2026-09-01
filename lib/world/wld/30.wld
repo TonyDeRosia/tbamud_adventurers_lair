@@ -53,17 +53,16 @@ S
 T 3017
 #3002
 The Shrine Chamber~
-A secluded shrine chamber rests behind the public portions of the temple. Low braziers cast warm light over carved stone icons and a deep old well set into the floor. Priests and pilgrims come here for quiet counsel before returning east toward the temple refectory.
+A secluded shrine chamber rests behind the public portions of the High Temple. Low braziers cast warm light over carved stone icons and an ancient well-ring worked into the floor. Temple records claim the stonework predates Midgaard itself. A narrow stair descends through the old foundations into the upper reaches of the Old Delve, while the refectory lies east.
 ~
 30 12 0 0 0 0
 D1
-You see your favorite place, the bar of divination.
+The doorway opens east into the Pilgrims' Refectory.
 ~
 ~
 0 -1 3003
 D5
-You can't see what is down there, it is too dark.  Looks like it would be
-impossible to climb back up.
+A narrow stair descends through the temple foundations to the Temple Descent of the Old Delve.
 ~
 ~
 0 -1 7026
@@ -98,7 +97,7 @@ A vaulted cloister links the temple square with the quieter chambers of the high
 ~
 30 8 0 0 0 0
 D0
-You see the bar, richly decorated with really stylish furniture.
+The vaulted cloister opens north into the Pilgrims' Refectory.
 ~
 ~
 0 -1 3003
@@ -129,7 +128,7 @@ You see the Market Square.
 ~
 0 -1 3014
 D3
-You see the entrance to the Clerics' Guild.
+The Temple Cloister lies just west of the square.
 ~
 ~
 0 -1 3004
@@ -171,17 +170,17 @@ You see the exit to the entrance hall.
 ~
 0 -1 3006
 E
-writing carving carvings symbols symbol~
-   Although it is very hard to understand, you think it looks a lot like beer,
-poems about beer, and small beer-mugs.
-~
-E
 sign~
    The sign reads:
 Free instructions provided by the Grunting Boar Inn.
    Buy  - Buy something (drinkable) from the bartender.
    List - The bartender will show you all the different drinks and
           specialties, and tell the price of each.
+~
+E
+writing carving carvings symbols symbol~
+   Although it is very hard to understand, you think it looks a lot like beer,
+poems about beer, and small beer-mugs.
 ~
 S
 #3008
@@ -229,14 +228,6 @@ sign~
    Buy  - Will buy you some bread or pastry.
    List - The baker will kindly tell you the price and sort of the bread in
           his bakery.
-~
-E
-danish pastry~
-   You see that this is truly delicious pastry.  Must be made by a Dane from
-Denmark (which surely is not the capital of Sweden!  ).  Former ruler of
-Scandinavia, England, Northern Germany, Northern France, Russia, Greenland,
-Iceland, Estonia etc.  Etc.  The sight of those large, wholesome chokoladeboller
-makes your mouth water and your soul sing.
 ~
 S
 #3010
@@ -295,7 +286,7 @@ You see the main street.
 ~
 0 -1 3013
 D2
-You see the entrance to the Guild of Magic Users.
+The entrance to the Arcane Hall stands to the south.
 ~
 ~
 0 -1 3017
@@ -403,7 +394,7 @@ You see the city gate.
 ~
 0 -1 3041
 D2
-You see the swordsmen's guild.
+The broad stone arch of the Adventurer's Guild opens to the south.
 ~
 ~
 0 -1 3021
@@ -424,7 +415,7 @@ You see the main street.
 ~
 0 -1 3012
 D2
-You see your favorite place, the Mages' Bar.
+The Arcane Commons lies immediately to the south.
 ~
 ~
 0 -1 3018
@@ -435,12 +426,12 @@ Softly glowing sigils drift above tables where hedge mages, scholars, and advent
 ~
 30 140 0 0 0 0
 D0
-You see the lobby.
+The Arcane Hall lies north beyond the commons.
 ~
 ~
 0 -1 3017
 D1
-You see the laboratory.
+The Arcane Workshop lies through the eastern doorway.
 ~
 ~
 0 -1 3019
@@ -451,7 +442,7 @@ Smoke-darkened stone arches over a practical workshop of alchemical benches, spe
 ~
 30 12 0 0 0 0
 D3
-You see the bar.
+The western doorway returns to the Arcane Commons.
 ~
 ~
 0 -1 3018
@@ -488,7 +479,7 @@ You see the main street.
 ~
 0 -1 3016
 D1
-You see the swordsmen's bar, many noises comes from there.
+The lively Guild Commons opens to the east.
 ~
 ~
 0 -1 3022
@@ -499,29 +490,28 @@ The heart of the Adventurer's Guild is a lively commons filled with long tables,
 ~
 30 140 0 0 0 0
 D2
-You see the practice yard.
+The Guild Training Yard lies to the south.
 ~
 ~
 0 -1 3023
 D3
-You see the entrance hall to the warriors' guild.
+The western arch returns to the Adventurer's Guild entrance hall.
 ~
 ~
 0 -1 3021
 S
 #3023
 The Guild Training Yard~
-A large enclosed yard is dedicated to the advancement of every recognized adventuring path. Weapon racks, padded posts, casting circles, climbing frames, and marked practice lanes provide space for martial drills, spellwork, and specialized techniques. The guild instructor oversees both training and practice here.
+A large enclosed yard is dedicated to the advancement of every recognized adventuring path. Weapon racks, padded posts, casting circles, climbing frames, and marked practice lanes provide space for drills of every kind. Near the southern wall, a reinforced stair descends to the Adventurer's Guild's official entrance into the Old Delve, where new delvers can test themselves beneath the city.
 ~
 30 8 0 0 0 0
 D0
-You see the bar.
+The northern doorway returns to the Guild Commons.
 ~
 ~
 0 -1 3022
 D5
-You can't see what is down there, it is too dark.  Looks like it would be
-impossible to climb back up.
+A broad reinforced stair descends to the Guild Descent, the Adventurer's Guild's official entrance to the Old Delve.
 ~
 ~
 0 -1 7048
@@ -584,7 +574,7 @@ The alley continues east.
 ~
 0 -1 3045
 D2
-You see the entrance to the thieves' guild.
+A discreet doorway to the south leads into the Guild Contract Annex.
 ~
 ~
 0 -1 3027
@@ -604,12 +594,12 @@ A smaller office of the Adventurer's Guild handles sensitive contracts, bounty n
 ~
 30 8 0 0 0 0
 D0
-You see the alley.
+The northern doorway returns to Gloam Alley.
 ~
 ~
 0 -1 3026
 D1
-You see the thieves bar, where everything disappears.
+The eastern doorway opens into the Lantern Room.
 ~
 ~
 0 -1 3028
@@ -620,12 +610,12 @@ This quiet guild-side taproom serves scouts, couriers, bounty hunters, and other
 ~
 30 140 0 0 0 0
 D2
-You see the secret yard.
+A quiet doorway leads south into the secluded courtyard.
 ~
 ~
 0 -1 3029
 D3
-You see the entrance hall to the thieves' guild.
+The western doorway returns to the Guild Contract Annex.
 ~
 ~
 0 -1 3027
@@ -636,24 +626,23 @@ furniture~
 S
 #3029
 The Quiet Courtyard~
-High walls shelter this private courtyard from the noise of the surrounding district. Guild scouts and specialists use the space for observation drills, quiet meetings, and exercises that require more subtlety than the main training yard. The Lantern Room lies north.
+High walls shelter this private courtyard from the noise of the surrounding district. Guild scouts and specialists use the space for observation drills and quiet meetings. Beneath a stone hatch at the edge of the courtyard, an older stair descends into a less-traveled approach to the Old Delve, favored by scouts who prefer to avoid the main Guild entrance.
 ~
 30 12 0 0 0 0
 D0
-You see the bar.
+The northern doorway returns to the Lantern Room.
 ~
 ~
 0 -1 3028
 D5
-You can't see what is down there, it is too dark.  Looks like it would be
-impossible to climb back up.
+A concealed stair descends to the Scout's Descent in the Old Delve.
 ~
 ~
 0 -1 7043
 S
 #3030
 The Refuse Yard~
-Midgaard's refuse yard occupies a low stretch of ground south of the Commons Square. Broken crates, ash, spoiled straw, and household waste are sorted into rough piles before scavengers and city workers haul away what can be reused. An old iron grate gives access to the sewer works below.
+Midgaard's refuse yard occupies a low stretch of ground south of Commons Square. Broken crates, ash, spoiled straw, and household waste are sorted into rough piles before city workers haul away what can be reused. An iron-bound service gate in the old retaining wall opens onto a forgotten descent into the Old Delve beneath the city.
 ~
 30 4 0 0 0 2
 D0
@@ -662,7 +651,7 @@ You see the common square.
 ~
 0 -1 3025
 D5
-You see the sewers.
+The iron-bound service gate descends to the Refuse Gate in the Old Delve.
 ~
 grate~
 2 3005 7030
@@ -731,14 +720,9 @@ The city gate is to the west.
 gate~
 1 3112 3052
 E
-wall~
-   It is built from large gray rocks that have been fastened to each other with
-some kind of mortar.  It is far too high to climb.
-~
-E
-tower towers~
-   Both of the towers are built from large gray rocks that have been fastened to
-each other with some kind of mortar, just like the city wall.
+bridge footbridge~
+   It is too high up to reach but it looks as if one easily could walk across it
+from one tower to the other.
 ~
 E
 gate~
@@ -747,9 +731,14 @@ reinforced with large iron bands to make them even more sturdy.  One of the
 doors is equipped with a very big lock.
 ~
 E
-bridge footbridge~
-   It is too high up to reach but it looks as if one easily could walk across it
-from one tower to the other.
+tower towers~
+   Both of the towers are built from large gray rocks that have been fastened to
+each other with some kind of mortar, just like the city wall.
+~
+E
+wall~
+   It is built from large gray rocks that have been fastened to each other with
+some kind of mortar.  It is far too high to climb.
 ~
 S
 #3041
@@ -773,14 +762,9 @@ You see Main Street.
 ~
 0 -1 3016
 E
-wall~
-   It is built from large gray rocks that have been fastened to each other with
-some kind of mortar.  It is far too high to climb.
-~
-E
-tower towers~
-   Both of the towers are built from large gray rocks that have been fastened to
-each other with some kind of mortar, just like the city wall.
+bridge footbridge~
+   It is too high up to reach but it looks as if one easily could walk across it
+from one tower to the other.
 ~
 E
 gate~
@@ -789,9 +773,14 @@ reinforced with large iron bands to make them even more sturdy.  One of the
 doors is equipped with a very big lock.
 ~
 E
-bridge footbridge~
-   It is too high up to reach but it looks as if one easily could walk across it
-from one tower to the other.
+tower towers~
+   Both of the towers are built from large gray rocks that have been fastened to
+each other with some kind of mortar, just like the city wall.
+~
+E
+wall~
+   It is built from large gray rocks that have been fastened to each other with
+some kind of mortar.  It is far too high to climb.
 ~
 S
 #3042
@@ -836,13 +825,13 @@ The road continues further south.
 ~
 0 -1 3047
 E
+wall writing letters~
+   It says 'Who watches the watchmen?  '
+~
+E
 wall~
    It is built from large gray rocks that have been fastened to each other with
 some kind of mortar.  It is far too high to climb.
-~
-E
-wall writing letters~
-   It says 'Who watches the watchmen?  '
 ~
 S
 #3044
@@ -977,18 +966,18 @@ You see the Concourse.
 ~
 0 -1 3100
 E
-wall~
+bridge~
    It is built from large gray rocks that have been fastened to each other with
-some kind of mortar.  It is far too high to climb.
+some kind of mortar, just like the wall.
 ~
 E
 opening~
    You cannot really see it from here as it is somewhere beneath your feet.
 ~
 E
-bridge~
+wall~
    It is built from large gray rocks that have been fastened to each other with
-some kind of mortar, just like the wall.
+some kind of mortar.  It is far too high to climb.
 ~
 S
 #3052
@@ -1007,14 +996,9 @@ The forest edge is to the west.
 ~
 0 -1 6092
 E
-wall~
-   It is built from large gray rocks that have been fastened to each other with
-some kind of mortar.  It is far too high to climb.
-~
-E
-tower towers~
-   Both of the towers are built from large gray rocks that have been fastened to
-each other with some kind of mortar, just like the city wall.
+bridge footbridge~
+   It is too high up to reach but it looks as if one easily could walk across it
+from one tower to the other.
 ~
 E
 gate~
@@ -1023,9 +1007,14 @@ reinforced with large iron bands to make them even more sturdy.  One of the
 doors is equipped with a very big lock.
 ~
 E
-bridge footbridge~
-   It is too high up to reach but it looks as if one easily could walk across it
-from one tower to the other.
+tower towers~
+   Both of the towers are built from large gray rocks that have been fastened to
+each other with some kind of mortar, just like the city wall.
+~
+E
+wall~
+   It is built from large gray rocks that have been fastened to each other with
+some kind of mortar.  It is far too high to climb.
 ~
 S
 #3053
@@ -1044,14 +1033,9 @@ You see the city gate.
 gate~
 1 3112 3041
 E
-wall~
-   It is built from large gray rocks that have been fastened to each other with
-some kind of mortar.  It is far too high to climb.
-~
-E
-tower towers~
-   Both of the towers are built from large gray rocks that have been fastened to
-each other with some kind of mortar, just like the city wall.
+bridge footbridge~
+   It is too high up to reach but it looks as if one easily could walk across it
+from one tower to the other.
 ~
 E
 gate~
@@ -1060,9 +1044,14 @@ reinforced with large iron bands to make them even more sturdy.  One of the
 doors is equipped with a very big lock.
 ~
 E
-bridge footbridge~
-   It is too high up to reach but it looks as if one easily could walk across it
-from one tower to the other.
+tower towers~
+   Both of the towers are built from large gray rocks that have been fastened to
+each other with some kind of mortar, just like the city wall.
+~
+E
+wall~
+   It is built from large gray rocks that have been fastened to each other with
+some kind of mortar.  It is far too high to climb.
 ~
 S
 #3054
@@ -1081,16 +1070,16 @@ You see the southern end of the temple.
 ~
 0 -1 3001
 E
+altar~
+   Even though the altar is more than ten feet long it appears to be made from a
+single block of white virgin marble.
+~
+E
 statue odin king god~
    The statue represents the one-eyed Odin sitting on a his throne.  He has
 long, gray hair and beard and a strict look on his face.  On top of the throne,
 just above his shoulders, his two ravens Hugin and Munin are sitting and at his
 feet are his wolves Gere and Freke.
-~
-E
-altar~
-   Even though the altar is more than ten feet long it appears to be made from a
-single block of white virgin marble.
 ~
 S
 #3058
@@ -1174,29 +1163,6 @@ You see the entrance to the Grunting Boar Inn and Tavern.
 ~
 0 -1 3006
 E
-WANTED posters poster wall~
-   Faces of various known Killers and Thieves can barely be seen behind the
-crates on the west wall.  Some of them look quite familar, sorta like that guy
-who you saw in the Reception a minute ago...  But then again, they are rather
-hard to see past the crates.
-~
-E
-crates opened large~
-   As you know, it is illegal to send contraband items through the Midgaard
-Mail.  The customs agents use this as a great excuse to seize liquor, rare
-spices, and just about anything they might find useful or profitable.
-~
-E
-cobwebs~
-   They seem to cover everything here, even the Postmaster himself.
-~
-E
-letters envelopes assorted~
-   Envelopes of all sizes are heaped into hugh piles around the room.  As you
-look closer, you see a letter that you had posted a full week ago, laying
-unnoticed and slightly rat-chewed towards the bottom of the pile.
-~
-E
 sign~
    **********************************************************
    *                                                        *
@@ -1214,6 +1180,12 @@ sign~
    *         Stamps cost 150 coins per letter               *
    *         Type 'HELP MAIL' for more info                 *
    **********************************************************
+~
+E
+letters envelopes assorted~
+   Envelopes of all sizes are heaped into hugh piles around the room.  As you
+look closer, you see a letter that you had posted a full week ago, laying
+unnoticed and slightly rat-chewed towards the bottom of the pile.
 ~
 S
 #3063
@@ -1253,11 +1225,6 @@ The maintained road returns south toward the crossroads and Midgaard beyond.
 ~
 ~
 0 -1 3061
-E
-plot device~
-   What more is a plot device than something to block a certain direction for
-reasons beyond your comprehension.
-~
 S
 #3066
 The Old Gate Track~

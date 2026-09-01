@@ -1,353 +1,251 @@
 #7000
-The Fissure Under The Ledge~
-   This is a small fissure in the solid rock.  Under you lies the deep dark
-pool.  The water trickles quietly down from the ledge above you.  The water
-smells like the water in a sewer.
+The Fissure of Falling Water~
+A narrow fissure splits the ancient stone beneath a high ledge. Cold water spills down the rock face and vanishes into darkness below, its echo carrying through the cavern. The worked passages of the Old Delve lie above, while a deeper opening descends toward ruins far beneath this upper level.
 ~
 70 13 0 0 0 5
 D4
+A narrow climb rises toward the Eastern Pool Ledge above the underground pool.
 ~
 ~
 0 -1 7070
 D5
-The water's edge.
+Cold spray disappears into the shaft leading toward the deeper Old Delve.
 ~
 ~
 0 -1 7100
 S
 #7001
-The Muddy Sewer~
-   You are standing in mud to your knees.  This is not the kind of place
-for a picnic.  The muddy sewer stretches further into the south.
+The Silted Approach~
+An old stone passage slopes through damp earth where centuries of runoff have left a heavy layer of silt across the floor. Chisel marks still show beneath the grime, proof that this was once a deliberate approach into the buried complex. The passage continues south toward branching ruins.
 ~
 70 9 0 0 0 5
 D2
-You see the muddy sewer continuing into the darkness to the south.
+The silted passage continues south toward the Broken Waystone Junction.
 ~
 ~
 0 -1 7002
-E
-mud~
-   It is as dark as tar and looks like something out of a toilet, on top of
-that, the smell is absolutely overwhelming.
-~
 S
 #7002
-The Muddy Sewer Junction~
-   The muddy sewer stretches into the dark to the south.  It looks as if
-no person has ever put his foot here before.  It is too muddy for that
-anyway.  The sewer leads north, south and east from here.
+The Broken Waystone Junction~
+Three passages meet around the broken base of an ancient waystone. Most of its inscriptions have been worn smooth, but a few directional marks remain beneath moss and mineral stains. The northern route climbs toward the silted approach, while older galleries continue east and south.
 ~
 70 9 0 0 0 5
 D0
-The muddy sewer stretches into the dark to the north.
+The northern arch returns toward the Silted Approach.
 ~
 ~
 0 -1 7001
 D1
-East.  The muddy sewer leads into a bend that goes south.
+The eastern passage leads toward The Westward Bend.
 ~
 ~
 0 -1 7007
 D2
-South.  The muddy sewer ends in a mudhole that way.
+The southern passage leads toward The Sunken Drain.
 ~
 ~
 0 -1 7003
-E
-mud~
-   It is as dark as tar and looks like something out of a toilet, on top of
-that, the smell is absolutely overwhelming.
-~
 S
 #7003
-The Mudhole~
-   You stand in mud all the way up to your thighs and it is not too
-comfortable since you are used to a somewhat different environment.
-The sewer leads to the north of here.  In the middle you can just
-make out an enormous drainpipe leading down.
+The Sunken Drain~
+The floor drops into a broad basin filled with cold mud and rainwater draining from the city above. An enormous stone culvert plunges deeper through the buried foundations, its sides fitted with worn handholds. The safer route back into the upper galleries lies north.
 ~
 70 13 0 0 0 5
 D0
-North.  The muddy junction lies in that direction.
+The basin rises north toward the Broken Waystone Junction.
 ~
 ~
 0 -1 7002
 D5
-The muddy drainpipe leads down through the mud, otherwise it is utterly dark.
+A broad stone culvert descends into the deeper ruins below.
 ~
 ~
 0 -1 7101
-E
-mud~
-   It is as dark as tar and looks like something out of a toilet, on top of
-that, the smell is absolutely overwhelming.
-~
 S
 #7004
-The Dark Pit~
-   You are standing by the edge of a dark pit that leads down into even
-deeper darkness.  >BWWAAADDRR< - The smell from down there is unbearable.
-The sewer stretches into the darkness to the east.
+The Blackwell Descent~
+A circular shaft yawns beside a narrow gallery, swallowing light only a few feet below its rim. Iron rungs hammered into the stone descend toward the deeper ruins. Faint scratches around the edge suggest generations of explorers have used this route despite the stale air rising from below.
 ~
 70 9 0 0 0 0
 D1
-East.  The sewer leads into the sewer junction.
+The eastern passage leads toward The Upper Delve Crossroads.
 ~
 ~
 0 -1 7009
 D5
-The Dark Pit leads down and down and down... well you can't see the
-bottom anyway.  There are bars that could function as a ladder on
-the side.
+Iron rungs descend through the Blackwell shaft toward the deeper Old Delve.
 ~
 ~
 0 -1 7102
 S
 #7005
-The Muddy Sewer~
-   You are standing in the middle of a bend of the sewer pipe.  It is very
-dark around here and the mud is sticking to your legs, not very pleasant.
-The pipe leads east and south from here.
+The Root-Choked Passage~
+Thick roots have forced their way between the fitted stones of this old passage, twisting across the walls like frozen serpents. Damp earth has pushed through the cracks and softened the floor. The gallery bends between the eastern ruins and the older passages to the south.
 ~
 70 9 0 0 0 4
 D1
-East.  The mud stretches on into the darkness.
+The root-choked gallery continues east toward the Silted Concourse.
 ~
 ~
 0 -1 7011
 D2
-South.  There is even more mud in that direction than where you are now.
-Incredible.
+The southern passage leads toward The Serpent's Turn.
 ~
 ~
 0 -1 7006
-E
-mud~
-   It is as dark as tar and looks like something out of a toilet, on top of
-that, the smell is absolutely overwhelming.
-~
 S
 #7006
-The Muddy Sewer~
-   You are standing in something that reminds you very much of porridge,
-this has the advantage that it is not hot, it is rather cold actually.
-The pipe bends to the north and east.
+The Serpent's Turn~
+The passage narrows where broken masonry has collapsed inward from both sides. Damp stone and patches of pale fungus make the footing treacherous, and small animal trails vanish into cracks along the wall. The gallery bends north and east around the obstruction.
 ~
 70 9 0 0 0 5
 D0
-The muddy sewer pipe leads into a bend that goes east.
+The passage bends north toward the Root-Choked Passage.
 ~
 ~
 0 -1 7005
 D1
-The pipe leads into a bend that goes south.  Interesting, there is mud on
-the ground there as well.
+The eastern passage leads toward The Mossbound Turn.
 ~
 ~
 0 -1 7012
-E
-mud~
-   It is as dark as tar and looks like something out of a toilet, on top of
-that, the smell is absolutely overwhelming.
-~
 S
 #7007
-The Muddy Sewer Bend~
-   This isn't your idea of a place to stay too long.  You're in up to
-your knees in something that resembles mud, but you're not quite sure.
-The bend in which you stand leads west and south.
+The Westward Bend~
+A shallow arch curves through old foundation stone, its blocks blackened by age rather than fire. Carved drainage grooves follow the walls, carrying thin threads of water toward lower chambers. The route turns west toward the waystone junction and south toward a larger crossing.
 ~
 70 9 0 0 0 5
 D2
-The pipe leads into a intersection that goes south and east.  The floor here
-is still covered in mud.
+The old foundation passage continues south toward the Three-Way Gallery.
 ~
 ~
 0 -1 7008
 D3
-The pipe (still filled with mud) leads into a intersection that goes north
-and south.  Interesting.
+The western passage leads toward The Broken Waystone Junction.
 ~
 ~
 0 -1 7002
-E
-mud~
-   It is as dark as tar and looks like something out of a toilet, on top of
-that, the smell is absolutely overwhelming.
-~
 S
 #7008
-A Muddy Intersection~
-   You have both your feet safely stuck in mud.  It isn't the mud that is
-wrong it is the smell, the sounds, the total darkness that surrounds you.
-Everything here is so depressing.  The pipe leads on with a trail of thick
-mud to the north, east and south.
+The Three-Way Gallery~
+Three ancient galleries meet beneath a cracked vaulted ceiling. Fragments of faded geometric carving survive above the arches, each pattern different enough to serve as a useful landmark. Passages continue north, east, and south through the upper ruins.
 ~
 70 9 0 0 0 4
 D0
-North.  The pipe goes into a bend with a load of mud all the way up the walls.
-The bend leads west.
+The northern gallery bends back toward the Westward Bend.
 ~
 ~
 0 -1 7007
 D1
-East.  This way looks like a place for the annual mud festival, although the
-stench wouldn't allow any happiness at all.  The pipe leads into a bend that
-leads north.
+The eastern passage leads toward The Flooded Bend.
 ~
 ~
 0 -1 7014
 D2
-South.  There is much less mud in that direction.  Your light doesn't
-uncover enough space for you to see much more than that it leads into
-some sort of junction.
+The southern passage leads toward The Upper Delve Crossroads.
 ~
 ~
 0 -1 7009
-E
-mud~
-   It is as dark as tar and looks like something out of a toilet, on top of
-that, the smell is absolutely overwhelming.
-~
 S
 #7009
-The Sewer Junction~
-   You stand in the middle of a huge junction of sewer pipes right under
-what you'd think was an air shaft.  The sewer pipes lead to the north,
-south, east and west.  It look quite impossible to force your way up.
+The Upper Delve Crossroads~
+This broad crossing is one of the clearest landmarks in the upper Old Delve. Four arched passages meet beneath a tall ventilation shaft sealed by stonework far above. Faded expedition marks, old chalk arrows, and newer Guild scratches show that countless adventurers have paused here to choose a route.
 ~
 70 9 0 0 0 3
 D0
-North.  Mud is the floor basis in that direction.  Yummy.
+The northern passage returns toward the Three-Way Gallery.
 ~
 ~
 0 -1 7008
 D1
-YYEEUUCH!  BOOH!  THAT looks like a nice place for creepy crawlies.
+The eastern passage leads toward The Lanternless Junction.
 ~
 ~
 0 -1 7017
 D2
-South.  This direction looks quite nice actually.  The pipe leads into
-a bend that goes east.
+The southern passage leads toward The Carved Stone Bend.
 ~
 ~
 0 -1 7010
 D3
-A few yards ahead - away from this junction - there is a pit leading down,
-but the smell from there...>PHEWW<.
+The western passage leads toward The Blackwell Descent.
 ~
 ~
 0 -1 7004
-E
-mud~
-   It is as dark as tar and looks like something out of a toilet, on top of
-that, the smell is absolutely overwhelming.
-~
 S
 #7010
-A Bend In The Sewer Pipe~
-   You are in a bend in the sewer pipe.  A strong smell seeps in from the
-north.  The sewer goes north and east.
+The Carved Stone Bend~
+The passage bends around a wall covered in shallow reliefs of robed figures carrying lamps into the earth. Time has erased their faces, but not the sense that this complex once served a purpose greater than simple drainage. The corridor links the crossroads with the eastern concourse.
 ~
 70 9 0 0 0 2
 D0
-North.  You are staring into a huge junction with exits in all directions.
+The carved passage turns north toward the Upper Delve Crossroads.
 ~
 ~
 0 -1 7009
 D1
-East.  The Pipe leads into utter darkness that way.
+The carved corridor continues east toward the Eastern Concourse.
 ~
 ~
 0 -1 7018
 S
 #7011
-The Muddy Sewer Pipe~
-   You have entered a kind of tube intersection that leads south, west
-and east.  Your legs are covered in mud up to the knees.  REAL yucky!
+The Silted Concourse~
+A wider corridor crosses through a section of the ruins where damp silt has gathered in long ridges. Three passages break away from the chamber, their archways carved with simple bands that still catch the light. The western way returns toward the root-choked approach.
 ~
 70 9 0 0 0 5
 D1
-East.  There is less mud in that direction, or that's your impression.
+Cleaner fitted stone appears along the eastern route toward the Mason's Crossing.
 ~
 ~
 0 -1 7024
 D2
-That way is lost in darkness, though you sense less mud in that direction,
-perhaps even a complete end to this sludge that surrounds you.
+The southern passage leads toward The Resting Junction.
 ~
 ~
 0 -1 7021
 D3
-West.  The mud reaches that way too, all the way up the walls.
+The western passage leads toward The Root-Choked Passage.
 ~
 ~
 0 -1 7005
-E
-mud~
-   It is as dark as tar and looks like something out of a toilet, on top of
-that, the smell is absolutely overwhelming.
-~
 S
 #7012
-The Bend In The Muddy Sewer~
-   This is not your idea of a holiday.  You stand in mud up to your knees.
-It is absolutely inconceivable how all this mud could have been placed
-here.  The pipe leads to the west and south.
+The Mossbound Turn~
+Green-black moss blankets the lower stones of this curving gallery. Water beads along the ceiling and drips in a slow rhythm that carries farther than expected through the ruins. The passage turns between the serpent's route and the old aqueduct junction.
 ~
 70 9 0 0 0 5
 D2
-South.  There is even more mud that way, incredible!  Although it looks
-like an intersection in the sewer system that leads east and south.
+The mossbound gallery turns south toward the Old Aqueduct Junction.
 ~
 ~
 0 -1 7013
 D3
-West.  All you can see, is that the pipe leads into a bend that goes
-north.  But there is less mud in that direction, however odd that sounds.
+The western passage leads toward The Serpent's Turn.
 ~
 ~
 0 -1 7006
-E
-mud~
-   It is as dark as tar and looks like something out of a toilet, on top of
-that, the smell is absolutely overwhelming.
-~
 S
 #7013
-A Muddy Intersection~
-   You wouldn't want to know the true feeling of standing in this mud up to
-your hips.  >BWAADR<.  All that fills your mind right now is the dream of
-a hot bath.  This is NOT very clean mud you know, remember you're in the
-sewer!  The pipes leads north, south and east.
+The Old Aqueduct Junction~
+The walls here change from rough foundation blocks to carefully fitted aqueduct stone. Narrow channels once carried clean water through the complex, though most are now clogged with mineral crust and sediment. Paths lead north, east, and south through the buried works.
 ~
 70 9 0 0 0 5
 D0
-North.  Sludge and sediment fills this corridor of the sewer that leads
-into a bend going west.
+The old aqueduct stone continues north toward the Mossbound Turn.
 ~
 ~
 0 -1 7012
 D1
-East.  You can see absolutely nothing of interest in that direction (Maybe
-that is why it is so damn interesting...)  There is no mud in that direction
-either, GREAT!
+The eastern passage leads toward The Temple Descent.
 ~
 ~
 0 -1 7026
 D2
-South.  All you can see is more mud!  Although the pipe goes into a bend
-leading west.
+The southern passage leads toward The Flooded Bend.
 ~
 ~
 0 -1 7014
-E
-mud~
-   It is as dark as tar and looks like something out of a toilet, on top of
-that, the smell is absolutely overwhelming.
-~
 E
 sediment~
    It is NOT the kind of matter that would concern you too much, normally, but
@@ -356,48 +254,33 @@ YUCKY!
 ~
 S
 #7014
-The Muddy Sewer~
-   You stand in a bend of the pipe system of the sewer with mud up to your
-thighs.  Contemplating a higher level of existence here would be utterly
-inappropriate, as the smell would keep any intelligent creature from even
-thinking of anything but getting away from this foul end of the WORLD.
-The bend goes from north to west.
+The Flooded Bend~
+A shallow sheet of water follows the curve of this old aqueduct passage. Broken tiles show where a lined channel once ran along the wall before age and settling split it apart. The bend connects the aqueduct junction with the western gallery.
 ~
 70 9 0 0 0 5
 D0
-North.  Filled with mud, that place looks like an impassable intersection
-with pipes leading north and east.
+The broken aqueduct turns north toward the Old Aqueduct Junction.
 ~
 ~
 0 -1 7013
 D3
-West.  There is less mud that way, maybe you're on your way out of this foul
-place.
+The western passage leads toward The Three-Way Gallery.
 ~
 ~
 0 -1 7008
-E
-mud~
-   It is as dark as tar and looks like something out of a toilet, on top of
-that, the smell is absolutely overwhelming.
-~
 S
 #7015
-The Old Well~
-   You are standing by an old and worn well from before this century.  The
-sewer leads to the east from here and the well leads down into darkness.
-Metal bars implanted in the side of the well lead down as a ladder.
+The Ancient Well~
+A circular well shaft pierces the floor beside an older stretch of worked stone. Iron handholds disappear into darkness below, polished smooth by use. The masonry is far older than the streets above Midgaard and appears to connect this upper tier with deeper portions of the buried complex.
 ~
 70 9 0 0 0 3
 D1
-East.  You see, because of the utter darkness that surround you, absolutely
-nothing.  Your light isn't of much use for that kind of distance.
+The passage leaves the ancient well and continues east toward the Wellward Junction.
 ~
 ~
 0 -1 7028
 D5
-Down the well there is even less light than up here, so... sorry, you can't
-see a thing.  There are metal bars in the side leading down into the darkness.
+Worn iron handholds descend through the Ancient Well toward the lower ruins.
 ~
 ~
 0 -1 7105
@@ -408,263 +291,232 @@ enough for you to climb down, WITH both hands on them.
 ~
 S
 #7016
-The Ordinary Bend~
-   You are in the middle of a bend in the pipe system of the sewer system,
-WHAT a place!!!  The pipe leads to the south and the east.
+The Quiet Gallery~
+This stretch of the Old Delve is unusually still. Dust lies thick between the stones and the air carries little of the damp found elsewhere. The passage bends between the western junctions and a quieter crossing to the east.
 ~
 70 9 0 0 0 1
 D1
-East.  What a quiet place you've found there.  It is an intersection that has
-pipeways going north and east.
+The quiet gallery opens east onto the dry shelf of the Resting Junction.
 ~
 ~
 0 -1 7021
 D2
-South.  You see nothing at all in that direction it is too dark anyway.
+Empty lantern brackets mark the southern way toward the Lanternless Junction.
 ~
 ~
 0 -1 7017
 S
 #7017
-The Sewer Junction~
-   You are in a junction that leads north, west and south.
+The Lanternless Junction~
+Three passages meet beneath empty iron brackets where lanterns once hung. Their rusted remains suggest this crossing was regularly traveled long after the original builders vanished. The corridors lead north, south, and west.
 ~
 70 9 0 0 0 1
 D0
-North.  You see a bend.
+The northern passage bends back toward the Quiet Gallery.
 ~
 ~
 0 -1 7016
 D2
-South.  It looks like a pipe junction just like this one.  Only that one
-leads east and west.
+The lanternless passage continues south into the Eastern Concourse.
 ~
 ~
 0 -1 7018
 D3
-West.  There is a junction with four pipelines in that direction.
+The western passage leads toward The Upper Delve Crossroads.
 ~
 ~
 0 -1 7009
 S
 #7018
-The Ordinary Junction~
-   This looks like an ordinary junction, actually it seems very quiet
-here.  The pipelines lead west, east and north.
+The Eastern Concourse~
+A broad stone concourse runs through the eastern side of the upper ruins. Old traffic has worn a shallow path down its center, while sealed alcoves line the walls. Routes open north, east, and west toward several major junctions.
 ~
 70 13 0 0 0 1
 D0
-To the north you can see a junction like this one, leading north and west.
+The northern arch returns toward the Lanternless Junction.
 ~
 ~
 0 -1 7017
 D1
-To the east there is nothing of particular interest, though there is a
-junction with pipelines leading north and east.
+The eastern passage leads toward The Central Delve.
 ~
 ~
 0 -1 7031
 D3
-There is a bend to the west leading north.
+The western passage leads toward The Carved Stone Bend.
 ~
 ~
 0 -1 7010
 S
 #7021
-A Quiet Pipe Junction~
-   This is the kind of place to rest, though the smell could be a LOT
-better than this.  The sewer goes east, north and west from here.
+The Resting Junction~
+A dry shelf of fitted stone makes this three-way junction one of the better places to catch a breath. Someone has scratched a small Adventurer's Guild trail mark beside the eastern arch, while older symbols point north and west. Nothing here is truly safe, but the room feels less hostile than the flooded galleries.
 ~
 70 13 0 0 0 1
 D0
-In that direction, you can't see anything.  It is just too dark.
+The northern route climbs back toward the Silted Concourse.
 ~
 ~
 0 -1 7011
 D1
-There is an ordinary junction in the pipe system to the east.
+The eastern passage leads toward The Four-Road Approach.
 ~
 ~
 0 -1 7029
 D3
-West.  There is an ordinary bend leading south into the sewer system in
-that direction.
+The western passage leads toward The Quiet Gallery.
 ~
 ~
 0 -1 7016
 S
 #7022
-The Odd Room With Smooth Walls~
-   As you enter you hear a loud click from one of the walls... and you fall
-and fall and fall...
-.
-.
-.
-.
-... And come to an abrupt end.  THIS is strange indeed.  There is an arched
-entryway leading down.
+The Falling Chamber~
+The floor of this smooth-walled chamber slopes toward a deep arched opening. Ancient grooves in the stone suggest some forgotten mechanism once moved through the room, though only broken sockets remain. The opening descends into a lower tier of the Old Delve, where the architecture continues into darkness.
 ~
 70 9 0 0 0 5
 D5
-Down.  It is utterly dark that way, though you can make out an intersection
-of sewer pipes leading west, north and east.
+The smooth-walled opening descends into a deeper tier of the Old Delve.
 ~
 ~
 0 -1 7112
 S
 #7024
-The Sewer~
-   You are standing in mud up to your ankles.  This is an intersection with
-sewer pipes leading east, south and west.
+The Mason's Crossing~
+Three corridors meet beneath unusually clean stonework. Tool marks remain visible on several blocks, and a mason's symbol has been cut into the eastern arch. The western gallery returns toward the silted concourse while the other routes lead deeper into the upper works.
 ~
 70 13 0 0 0 1
 D1
-To the east there is a peculiar looking round room.
+The mason-marked eastern arch opens into the circular Turning Chamber.
 ~
 ~
 0 -1 7037
 D2
-To the south there is another intersection with pipes going south and east.
+The southern passage leads toward The Bat-Roost Junction.
 ~
 ~
 0 -1 7025
 D3
-To the west there is another intersection like this one, with sewer pipes
-leading south and west.
+The western passage leads toward The Silted Concourse.
 ~
 ~
 0 -1 7011
 S
 #7025
-Another Intersection~
-   You have never seen anything so BORING... This is an intersection with
-pipes leading north, south and east.
+The Bat-Roost Junction~
+A broad intersection lies beneath a cracked ceiling crowded with narrow crevices. Small bats nest in the darkness overhead, their wings stirring dust whenever noise carries through the chamber. Passages continue north, east, and south.
 ~
 70 9 0 0 0 1
 D0
-To the north there is an intersection, where the pipes are leading west and
-east.  You notice that the floor to the west is covered in mud.
+The northern passage leads toward The Mason's Crossing.
 ~
 ~
 0 -1 7024
 D1
-East.  You see nothing of interest in that direction, just another
-intersection.  This one leads east and south.
+The eastern passage leads toward The Watch Hall Junction.
 ~
 ~
 0 -1 7038
 D2
-Another intersection lies to the south.  It leads west and south.
+The southern passage leads toward The Temple Descent.
 ~
 ~
 0 -1 7026
 S
 #7026
-A Junction~
-   This one seems interesting, a big difference from all the other junctions.
-It seems cleaner than the rest of them.  Weird.  Something that looks like
-an air shaft leads upwards, but it looks far too slippery to climb.
-The pipes lead to the south, west and north.
+The Temple Descent~
+Pale temple stone has been fitted over much older masonry here, forming a reinforced landing beneath the High Temple. A stair now climbs safely back to the Shrine Chamber above. Guild chalk marks identify this as one of Midgaard's recognized entrances to the Old Delve, while older corridors continue north, south, and west.
 ~
 70 13 0 0 0 0
 D0
-North.  You see an intersection there, leading north and east.
+The northern passage returns toward the Bat-Roost Junction.
 ~
 ~
 0 -1 7025
 D2
-To the south there is ANOTHER junction leading west and east.
+The southern passage leads toward The Wellward Junction.
 ~
 ~
 0 -1 7028
 D3
-To the west you see a load of mud and sediment in the sewer.  That should
-be an intersection there but you're not quite sure.
+The western passage leads toward The Old Aqueduct Junction.
 ~
 ~
 0 -1 7013
-E
-mud~
-   It is as dark as tar and looks like something out of a toilet, on top of
-that, the smell is absolutely overwhelming.
+D4
+A reinforced stair climbs to the Shrine Chamber beneath Midgaard's High Temple.
 ~
+~
+0 0 3002
 S
 #7028
-The Sewer Junction~
-   You stand in a junction of sewer pipes leading north, east and west.
+The Wellward Junction~
+Three passages meet near the ancient well route. The western arch is damp with mineral stains, while the eastern and northern corridors show heavier signs of travel. Old carved arrows have been joined by newer Guild marks to help delvers orient themselves.
 ~
 70 9 0 0 0 1
 D0
+The northern passage leads toward the temple stone of the Temple Descent.
 ~
 ~
 0 -1 7026
 D1
-To the east you can see a bend in the pipe going south.
+The eastern passage leads toward The Stonework Bend.
 ~
 ~
 0 -1 7034
 D3
-To the west you can just make out an old well.
+The western passage leads toward The Ancient Well.
 ~
 ~
 0 -1 7015
 S
 #7029
-The Triple Junction~
-   You stand in the middle of a huge junction of concrete sewer pipes.  The
-pipes lead into three different directions: east, south and west.
+The Four-Road Approach~
+A broad approach chamber links several major routes through the Old Delve. The stone floor has been worn nearly smooth where generations of travelers crossed between the western galleries, the central ruins, and the cityward descent to the south.
 ~
 70 9 0 0 0 1
 D1
-East.  You can see a bend in the sewer pipe leading north.
+The eastern route narrows toward the Broken Mason's Turn.
 ~
 ~
 0 -1 7035
 D2
-To the south there is an ENORMOUS quadruple sewer junction, all lit up by
-an odd light.
+The southern passage leads toward The Refuse Gate.
 ~
 ~
 0 -1 7030
 D3
-To the west you can just make out another junction similar to the one
-you are standing in.
+The western passage leads toward The Resting Junction.
 ~
 ~
 0 -1 7021
 S
 #7030
-The Quadruple Junction Under The Dump~
-   You are standing in something that reminds you of an entry to an ant hive.
-There are enormous concrete pipes leading north, south, east and west.
-There is also a metal ladder built into the concrete wall leading up through
-a layer of garbage.
+The Refuse Gate~
+A massive old service junction lies beneath Midgaard's refuse yard. Four stone passages meet around an iron-bound ladder shaft that climbs toward the city above. The gate overhead is still secured by Midgaard's old lockwork, making this a useful but less convenient entrance to the Old Delve.
 ~
 70 13 0 0 0 1
 D0
-To the north you can see a huge triple junction with sewer pipes leading
-west and east.
+The northern route returns toward the Four-Road Approach.
 ~
 ~
 0 -1 7029
 D1
-East.  You can see a pit in the floor.
+The eastern passage leads toward The Ladder Pit.
 ~
 ~
 0 -1 7036
 D2
-To the south there is a huge junction with pipes leading east and west.
+The southern passage leads toward The Central Delve.
 ~
 ~
 0 -1 7031
 D3
-To the west there is an odd looking room with totally smooth walls.
+The western passage leads toward The Falling Chamber.
 ~
 ~
 0 -1 7022
 D4
-Up through the garbage you can just make out what looks like the dump in
-Midgaard.
+The iron-bound service stair climbs to Midgaard's Refuse Yard.
 ~
 ~
 2 3005 3030
@@ -676,142 +528,129 @@ into the concrete wall.
 ~
 S
 #7031
-A Triple Junction~
-   You stand in a junction with pipes leading west, north and east.
+The Central Delve~
+This large three-way chamber feels like the heart of the upper ruins. Broken stone benches line the walls beneath a weathered frieze of explorers carrying lamps and tools into the deep. Paths run west toward the older works, north toward the cityward gate, and east toward the watch halls.
 ~
 70 9 0 0 0 1
 D0
-To the north there is an ENORMOUS quadruple sewer junction, all lit up by
-an odd light.
+The northern passage returns toward the Refuse Gate.
 ~
 ~
 0 -1 7030
 D1
-East.  You can just make out a triple junction leading north and east.
+The eastern passage leads toward The Eastern Junction.
 ~
 ~
 0 -1 7044
 D3
-West.  You can just make out a triple junction leading north and west.
+The western passage returns along the broad Eastern Concourse.
 ~
 ~
 0 -1 7018
 S
 #7034
-A Bend In The Sewer Pipe~
-   You can look in two directions where the pipe leads: south and west.
+The Stonework Bend~
+The corridor turns sharply through a section where the blocks have been repaired many times. Newer mortar sits beside ancient fitted stone, evidence that different generations tried to keep this route usable. The passage links the wellward junction with the next bend south.
 ~
 70 9 0 0 0 2
 D2
-To the south you can see another bend leading west.
+The repaired corridor turns south toward the Broken Mason's Turn.
 ~
 ~
 0 -1 7035
 D3
-West.  You can just make out a triple junction leading north and west.
+The western passage leads toward The Wellward Junction.
 ~
 ~
 0 -1 7028
 S
 #7035
-The Sewer Pipe Bend~
-   You can look in two different directions where the pipe goes: west and
-north.
+The Broken Mason's Turn~
+A collapsed wall has narrowed this bend to a tight passage between cracked blocks. Someone long ago stacked the fallen stones into a rough support, leaving just enough room to pass. The route turns north and west.
 ~
 70 9 0 0 0 2
 D0
-North.  You see another bend leading west.
+The narrow passage turns north toward the repaired stonework of the Stonework Bend.
 ~
 ~
 0 -1 7034
 D3
-You can see another junction although this one is a triple one with pipes
-going south and west.
+The western passage leads toward The Four-Road Approach.
 ~
 ~
 0 -1 7029
 S
 #7036
-The Pit~
-   You stand in a section of a pipe that leads to a dead end.  In the floor
-there is a pit leading down.  There are bars set in the side of the pit
-wall functioning as a ladder.
+The Ladder Pit~
+A circular pit interrupts the eastern side of the Refuse Gate. Iron rungs descend through layers of much older stone, and a cold draft rises from the lower level. The western passage returns to the central upper works, while the shaft offers another route deeper into the Old Delve.
 ~
 70 9 0 0 0 5
 D3
-West.  You can see a dimly lit quadruple junction with an exit up.
+The western passage returns to the iron-bound Refuse Gate.
 ~
 ~
 0 -1 7030
 D5
-Down the pit it is so utterly dark that you can't see a thing.
+Iron rungs descend through the Ladder Pit into the lower Old Delve.
 ~
 ~
 0 -1 7122
 S
 #7037
-The Round Room~
-   As you enter the room it starts rotating - at first slowly, then faster
-and faster - You get totally confused as to where up and down is, but
-you are certain that the doorway is in the opposite direction of what
-it was when you entered.  It now leads east.  There is only this one
-exit.
+The Turning Chamber~
+This perfectly round chamber is ringed by an ancient stone track. The inner floor bears concentric runes and seems subtly misaligned with the surrounding passages, as though the room once rotated to redirect travelers. Whatever powered it is gone, but the unsettling geometry remains.
 ~
 70 9 0 0 0 1
 D1
-You can just make out a smaller room with a chair.
+The eastern opening leads into the small chamber dominated by a bolted chair.
 ~
 ~
 0 -1 7050
 S
 #7038
-The Three Way Junction~
-   You are standing in a junction of pipes that lead west, east and south.
+The Watch Hall Junction~
+A three-way junction opens beside the remains of a fortified interior post. Empty weapon niches and cracked observation slits overlook the western approach, while a smaller doorway leads south toward abandoned stores. A more substantial hall lies to the east.
 ~
 70 9 0 0 0 1
 D1
-East.  You can make out a dimly lit Guard Room.
+The eastern hall enters the fortified stonework of the Old Watchroom.
 ~
 ~
 0 -1 7045
 D2
-To the south you can see what looks like a store room.
+The southern passage leads toward The Abandoned Stores.
 ~
 ~
 0 -1 7039
 D3
-West.  You see another junction similar to this one leading north and south.
+The western passage leads toward The Bat-Roost Junction.
 ~
 ~
 0 -1 7025
 S
 #7039
-The Sewer Store Room~
-   You stand in a small room lit by a single torch set in the wall.  The only
-way out of here is to the north.
+The Abandoned Stores~
+Rotting shelving and shattered clay jars fill this old storeroom. Most valuables were removed long ago, but scraps of expedition gear and broken containers show that later delvers reused the chamber as a supply cache. The only open route returns north to the watch hall.
 ~
 70 8 0 0 0 1
 D0
-To the north you see a pipe junction.
+The only open doorway returns north to the Watch Hall Junction.
 ~
 ~
 0 -1 7038
 S
 #7041
-The Shaft~
-   You are standing by the edge of a deep, dark shaft leading down.  A single
-ladder is your tool to work your way down if you so wish.  The sewer pipe
-leads south from here.
+The Deep Shaft~
+A deep vertical shaft opens at the end of the northern passage. A sturdy but ancient ladder descends along one wall into darkness, with occasional landings barely visible below. The route south returns toward the upper complex; the shaft leads to deeper ruins.
 ~
 70 9 0 0 0 1
 D2
-To the south you can see the pipe leading further south into darkness.
+The southern passage leads toward The Scout's Descent.
 ~
 ~
 0 -1 7043
 D5
-Down and utter darkness.  There is absolutely nothing to be seen in that
-direction.
+The ancient ladder descends through the Deep Shaft into the lower ruins.
 ~
 ~
 0 -1 7123
@@ -822,219 +661,213 @@ estimate.
 ~
 S
 #7043
-The Sewer Entrance~
-   You stand in the middle of a pipe that leads from north to south.  Above
-you an air shaft leads up into sunlight.  It seems totally impossible to go
-up that way.
+The Scout's Descent~
+A narrow stair of old stone rises through a reinforced shaft to the Quiet Courtyard above. Guild scouts have marked the landing with discreet symbols rather than bright paint, preserving the entrance's low profile. The passage continues north and south through the upper Old Delve.
 ~
 70 9 0 0 0 1
 D0
-To the north you can just make out a huge shaft leading down.
+The northern passage approaches the yawning Deep Shaft.
 ~
 ~
 0 -1 7041
 D2
-To the south you can see a triple junction leading west and east.
+The southern passage leads toward The Eastern Junction.
 ~
 ~
 0 -1 7044
+D4
+A narrow scout stair climbs to the Quiet Courtyard beside the Adventurer's Guild.
+~
+~
+0 0 3029
 S
 #7044
-The Junction Going Three Ways~
-   You are in a passageway in the pipes of the sewer system leading north,
-east and west.
+The Eastern Junction~
+Three worked passages meet at a square stone junction. The western route leads back toward the Central Delve, the northern way approaches the scout entrance, and the eastern arch opens toward the old watch halls and deeper eastern ruins.
 ~
 70 9 0 0 0 1
 D0
-You see a sewer pipe leading north.
+The northern passage leads toward The Scout's Descent.
 ~
 ~
 0 -1 7043
 D1
+The eastern passage leads toward The Eastern Delve Junction.
 ~
 ~
 0 -1 7049
 D3
-West.  You see another junction very similar to this one that leads north
-and west.
+The western passage leads toward The Central Delve.
 ~
 ~
 0 -1 7031
 S
 #7045
-The Sewer Room~
-   You are standing in a large room with chairs set in the walls.  You have
-the feeling of being watched.  To the south there is an entrance to a
-larger room.  The room is lit by five torches, also set in the walls.  To
-the west there is a doorway leading out to the sewers.
+The Old Watchroom~
+Stone benches, empty spear sockets, and narrow viewing slits identify this as an ancient guard post. Five iron sconces still cling to the walls, though only newer Guild lantern hooks see regular use. A doorway leads south into the gilded halls, while the western door returns to the junction.
 ~
 70 8 0 0 0 1
 D2
-You can see an even larger room than this one, filled with light.
+The southern passage leads toward The Gilded Hall.
 ~
 ~
 0 -1 7046
 D3
-To the west you can see the sewers.
+The pickproof western door opens back toward the Watch Hall Junction.
 ~
 ~
 2 -1 7038
 S
 #7046
-The Sewer Room~
-   This is a Room with walls that glitters like gold though not quite like
-it. This is strange as it looks as if the glitter lights the whole room.
-It looks very bright.  To the south the floor is covered with yucky water.
-The north leads to a sort of a guard room.
+The Gilded Hall~
+Mineral veins glitter through the pale stone of this chamber, reflecting even weak light in warm gold flashes. The effect once made the room seem richly decorated, though the walls are natural stone beneath the polish. The watchroom lies north and a sunken chamber opens south.
 ~
 70 8 0 0 0 1
 D0
-To the north you can see the guard room.
+The northern doorway returns to the ancient Old Watchroom.
 ~
 ~
 0 -1 7045
 D2
-To the south there is nothing but water and an exit leads east from there.
+The southern passage leads toward The Sunken Antechamber.
 ~
 ~
 0 -1 7047
 S
 #7047
-The Pool In The Sewer~
-   You stand in water to your waist.  To the north is the entrance to this
-room.  A single door leads east.
+The Sunken Antechamber~
+Cold water covers the lower half of this old antechamber. A sealed door stands in the eastern wall while the northern steps climb back toward the gilded hall. Faded reliefs above the waterline depict armored figures descending beneath a stylized city.
 ~
 70 8 0 0 0 1
 D0
-To the north you see the entrance to this room.
+The northern passage leads toward The Gilded Hall.
 ~
 ~
 0 -1 7046
 D1
-You can see an enormous hall through the doorway.
+The eastern door opens toward the broad Flooded South Hall.
 ~
 door~
 1 -1 7053
 S
 #7048
-The Sewers~
-   You stand in a dead end of the sewer.  The only way out is south.
-You can see a shaft leading up but it looks too difficult to go up
-that way.
+The Guild Descent~
+A broad reinforced stair climbs directly to the Adventurer's Guild Training Yard above. Fresh lantern brackets, rope anchors, and clear trail marks make this the safest and most official entrance into the Old Delve. The older passage continues south into the dungeon proper.
 ~
 70 9 0 0 0 1
 D2
+The older passage continues south toward the Eastern Delve Junction.
 ~
 ~
 0 -1 7049
+D4
+A broad reinforced stair climbs directly to the Adventurer's Guild Training Yard.
+~
+~
+0 0 3023
 S
 #7049
-The Junction~
-   You stand in a junction leading north, west and east.
+The Eastern Delve Junction~
+Three passages meet on the eastern side of the upper complex. Guild route marks point north toward the official descent and west toward the Central Delve, while an older corridor disappears east beneath darker stonework.
 ~
 70 9 0 0 0 1
 D0
+Clear Guild route marks point north toward the reinforced Guild Descent.
 ~
 ~
 0 -1 7048
 D1
-Darkness has closed in on that part of the sewer system, you can't see
-a thing in that direction.
+The eastern passage leads toward The Lower Junction.
 ~
 ~
 0 -1 7060
 D3
-West.  You see another junction very similar to this one that leads north
-and west.
+The western passage leads toward The Eastern Junction.
 ~
 ~
 0 -1 7044
 S
 #7050
-The Small Room~
-   The only thing in this room of interest is a chair, and that appears
-to have been bolted to the rock floor.  A doorway leads south and another
-leads east into darkness.
+The Bolted Chair Chamber~
+A single heavy chair is bolted to the stone floor at the center of this small chamber. Rusted rings in the arms and a pattern of scratched runes around its base suggest it once served some grim ritual or interrogation. Doorways lead east and south, leaving the room's original purpose unanswered.
 ~
 70 9 0 0 0 1
 D1
-Utter darkness...
+A low eastern doorway opens toward the Waterline Chamber.
 ~
 ~
 0 -1 7055
 D2
-You can see a room with a lot of light in it.  You can't make out any details.
+The southern passage leads toward The Gallery of Lamps.
 ~
 ~
 0 -1 7051
 S
 #7051
-The Sewer Pipe~
-   You are in what reminds you of a foul sewer, as if you liked being here!
-You can see two exits leading either north or south.
+The Gallery of Lamps~
+Rows of shallow lamp niches line this north-south gallery. Most are empty, but soot marks show that the hall remained in use for centuries after the surrounding chambers were abandoned. A warmer glow gathers farther south.
 ~
 70 8 0 0 0 1
 D0
+The northern passage leads toward The Bolted Chair Chamber.
 ~
 ~
 0 -1 7050
 D2
-To the south you can see a strange light flowing from there.
+The southern passage leads toward The Grand Delve Hall.
 ~
 ~
 0 -1 7052
 S
 #7052
-The Grand Sewer~
-   You are in a grand sewer pipe.  This stretches toward the south.  It is
-large indeed!  A doorway leads to the east from here.
+The Grand Delve Hall~
+The passage opens into a vast vaulted hall large enough to dwarf the surrounding ruins. Massive stone ribs support the ceiling, and faded murals depict an ancient company descending through successive layers of the earth. Routes lead north, east, and south from this unmistakable landmark.
 ~
 70 8 0 0 0 1
 D0
-To the north you can see a doorway.
+The northern passage leads toward The Gallery of Lamps.
 ~
 ~
 0 -1 7051
 D1
-You can't see anything in that darkness.
+The eastern passage leads toward The Shadow Gallery.
 ~
 ~
 0 -1 7056
 D2
-In the south end of the pipe the "floor" is completely covered with water.
+The southern passage leads toward The Flooded South Hall.
 ~
 ~
 0 -1 7053
 S
 #7053
-The South End Of The Grand Pipe~
-   You stand in water to your knees.  A doorway leads west from here.  The
-pipe stretches north.
+The Flooded South Hall~
+Water reaches the lower steps of this southern hall, reflecting fragments of the murals from the Grand Delve. A heavy door in the western wall leads back toward the sunken antechamber, while the main hall stretches north.
 ~
 70 8 0 0 0 1
 D0
-You see a lot of pictures decorating the walls.
+The flooded hall rises north beneath the murals of the Grand Delve Hall.
 ~
 ~
 0 -1 7052
 D3
+The western door returns to the Sunken Antechamber.
 ~
 door~
 1 -1 7047
 S
 #7055
-The Edge Of The Water Sewer~
-   You stand in a room where half of the floor is covered in water.  The
-water leads east and a doorway leads west.
+The Waterline Chamber~
+The floor slopes gradually into a broad channel of clear, cold water. Mineral deposits mark old flood levels on the walls, and the eastern route follows the channel deeper into the ruins. The bolted-chair chamber lies back to the west.
 ~
 70 9 0 0 0 3
 D1
-You can hardly make out much more than that the next place is in a pipe
-with more water.
+The eastern passage leads toward The Flooded Turn.
 ~
 ~
 0 -1 7061
 D3
+The western passage leads toward The Bolted Chair Chamber.
 ~
 ~
 0 -1 7050
@@ -1044,101 +877,96 @@ water~
 ~
 S
 #7056
-The Dark Hallway~
-   You can't see much of this, even with a light.  The hallway goes into a
-passageway to the south.  A doorway leads west.
+The Shadow Gallery~
+A narrow gallery leaves the Grand Delve and enters darker, rougher stone. Broken lamp niches and scattered chunks of ceiling mark the beginning of a damaged section of the complex. The passage continues south toward a ruined colonnade.
 ~
 70 9 0 0 0 1
 D2
-You can see nothing at all because it is completely dark in that direction.
+Broken lamp niches lead south into the ruined Broken Colonnade.
 ~
 ~
 0 -1 7057
 D3
-You see a lot of light, bright as daylight, but nothing of interest.
+The western passage leads toward The Grand Delve Hall.
 ~
 ~
 0 -1 7052
 S
 #7057
-The Dark Passageway~
-   You can't see anything but the ground where you put your feet.  The
-passageway seems to continue south and north.
+The Broken Colonnade~
+Fragments of square pillars divide this damaged hall into several narrow lanes. The original north-south route continues through the rubble, while a breached wall to the east opens onto a flooded gallery, creating a useful cross-route through the dungeon.
 ~
 70 9 0 0 0 1
 D0
-You can't see anything in that direction and your light isn't enough to light
-that far.
+The damaged colonnade narrows north into the Shadow Gallery.
 ~
 ~
 0 -1 7056
+D1
+The eastern passage leads toward The Drowned Gallery.
+~
+~
+0 0 7062
 D2
-You can't see anything in that direction and your light isn't enough to light
-that far.
+The southern passage leads toward The Fallen Archive.
 ~
 ~
 0 -1 7058
 S
 #7058
-The Dark Passageway~
-   You can't see anything but the ground where you put your feet.  The
-passageway seems to continue south and north.
+The Fallen Archive~
+Collapsed shelves and stone document niches line this ruined chamber. Damp scraps of parchment have long since become unreadable, but carved map-lines remain on one wall beneath centuries of grime. The main route continues north and south.
 ~
 70 9 0 0 0 1
 D0
-You can't see anything in that direction and your light isn't enough to light
-that far.
+The ruined archive opens north toward the broken pillars of the Broken Colonnade.
 ~
 ~
 0 -1 7057
 D2
-You can't see anything in that direction and your light isn't enough to light
-that far.
+The southern passage leads toward The Rune Crossing.
 ~
 ~
 0 -1 7059
 S
 #7059
-The Dark Passageway~
-   You can't see anything but the ground where you put your feet.  The
-passageway seems to continue south and north.
+The Rune Crossing~
+Faded runes cover the floor where two old routes once met. The north-south gallery remains open, and a recently cleared breach to the east reconnects the passage with the flooded crossing beyond. Guild marks warn that the eastern way is wetter and more dangerous.
 ~
 70 9 0 0 0 1
 D0
-You can't see anything in that direction and your light isn't enough to light
-that far.
+The rune-marked gallery continues north toward the Fallen Archive.
 ~
 ~
 0 -1 7058
+D1
+The eastern passage leads toward The Sunken Crossing.
+~
+~
+0 0 7064
 D2
-You can't see anything in that direction and your light isn't enough to light
-that far.
+The southern passage leads toward The Lower Junction.
 ~
 ~
 0 -1 7060
 S
 #7060
-The Dark Passageway~
-   You can't see anything but the ground where you put your feet.
-The passageway seems to continue west and north.  To the east there
-is water covering the floor and that leads through an arched entry
-to a watery sewer.
+The Lower Junction~
+The shadowed galleries open into a three-way junction near the lowest part of this upper tier. The western route leads back toward the eastern delve, the northern path climbs through the damaged halls, and an arched eastern passage enters the flooded works.
 ~
 70 9 0 0 0 1
 D0
-You can't see anything in that direction and your light isn't enough to light
-that far.
+The northern gallery returns toward the faded runes of the Rune Crossing.
 ~
 ~
 0 -1 7059
 D1
-You can't see anything in that direction and your light isn't enough to light
-that far.
+The eastern passage leads toward The Waterfall Bend.
 ~
 ~
 0 -1 7068
 D3
-You can just make out a triple junction leading north and west.
+The western passage leads toward The Eastern Delve Junction.
 ~
 ~
 0 -1 7049
@@ -1148,20 +976,17 @@ water~
 ~
 S
 #7061
-The Watery Sewer Bend~
-   You can't see anything but the water you're in up to your hips.  The sewer
-seems to bend and lead south and west.
+The Flooded Turn~
+Cold water rises around the lower stones where an old channel bends between the Waterline Chamber and the deeper flooded galleries. Pale mineral deposits shimmer beneath the surface, and the sound of falling water echoes from farther east.
 ~
 70 9 0 0 0 5
 D2
-You can't see anything in that direction and your light isn't enough to light
-that far.
+The flooded channel bends south into the long Drowned Gallery.
 ~
 ~
 0 -1 7062
 D3
-You can't see anything in that direction and your light isn't enough to light
-that far.
+The western passage leads toward The Waterline Chamber.
 ~
 ~
 0 -1 7055
@@ -1171,43 +996,42 @@ water~
 ~
 S
 #7062
-The Watery Sewer~
-   You can't see anything but the water you're in up to your hips.  The sewer
-seems to lead south and north.
+The Drowned Gallery~
+A long flooded gallery stretches north and south, its floor hidden beneath dark water. A broken section of western wall now provides a dry-side shortcut into the ruined colonnade, preventing this branch from becoming an isolated corridor.
 ~
 70 9 0 0 0 5
 D0
-You can't see anything in that direction and your light isn't enough to light
-that far.
+The dark water continues north toward the Flooded Turn.
 ~
 ~
 0 -1 7061
 D2
-You can't see anything in that direction and your light isn't enough to light
-that far.
+The southern passage leads toward The Drowned Passage.
 ~
 ~
 0 -1 7063
+D3
+The western passage leads toward The Broken Colonnade.
+~
+~
+0 0 7057
 E
 water~
    It looks dark and murky, and emanates a foul stench.
 ~
 S
 #7063
-The Watery Sewer~
-   You can't see anything but the water you're in up to your hips.  The sewer
-seems to lead south and north.
+The Drowned Passage~
+The flooded route narrows between leaning stone supports. Water moves slowly south toward a larger crossing, carrying leaves and grit from cracks somewhere far above. The gallery continues north and south.
 ~
 70 9 0 0 0 5
 D0
-You can't see anything in that direction and your light isn't enough to light
-that far.
+The narrow flooded route continues north into the Drowned Gallery.
 ~
 ~
 0 -1 7062
 D2
-You can't see anything in that direction and your light isn't enough to light
-that far.
+The southern passage leads toward The Sunken Crossing.
 ~
 ~
 0 -1 7064
@@ -1217,49 +1041,47 @@ water~
 ~
 S
 #7064
-The Watery Sewer Junction~
-   You can't see anything but the water you're in up to your hips.  The sewer
-seems to lead into a junction going south, north and east.
+The Sunken Crossing~
+Three flooded routes meet in a broad chamber where a fourth, newly cleared breach opens west toward the Rune Crossing. The added route makes this chamber an important navigation point between the wet and dry halves of the upper dungeon.
 ~
 70 9 0 0 0 5
 D0
-You can't see anything in that direction and your light isn't enough to light
-that far.
+The northern flooded route narrows into the Drowned Passage.
 ~
 ~
 0 -1 7063
 D1
-You can't see anything in that direction and your light isn't enough to light
-that far.
+The eastern passage leads toward The Western Pool Ledge.
 ~
 ~
 0 -1 7069
 D2
-You can't see anything in that direction and your light isn't enough to light
-that far.
+The southern passage leads toward The Deepwater Passage.
 ~
 ~
 0 -1 7065
+D3
+The western passage leads toward The Rune Crossing.
+~
+~
+0 0 7059
 E
 water~
    It looks dark and murky, and emanates a foul stench.
 ~
 S
 #7065
-The Watery Sewer~
-   You can't see anything but the water you're in up to your hips.  The sewer
-seems to lead south and north.
+The Deepwater Passage~
+The water deepens along this north-south stretch, forcing travelers close to the raised stones along one wall. Old iron rings suggest ropes were once strung here during floods. The route continues toward another junction to the south.
 ~
 70 9 0 0 0 5
 D0
-You can't see anything in that direction and your light isn't enough to light
-that far.
+The northern passage leads toward The Sunken Crossing.
 ~
 ~
 0 -1 7064
 D2
-You can't see anything in that direction and your light isn't enough to light
-that far.
+The southern passage leads toward The Poolward Junction.
 ~
 ~
 0 -1 7066
@@ -1269,26 +1091,22 @@ water~
 ~
 S
 #7066
-The Watery Sewer Junction~
-   You can't see anything but the water you're in up to your hips.  The sewer
-seems to lead into a junction that goes north, south and east.
+The Poolward Junction~
+A three-way flooded junction lies within earshot of a great underground pool. Water flows east toward the ledges and south through a narrow channel, while the northern route returns toward the Sunken Crossing.
 ~
 70 9 0 0 0 5
 D0
-You can't see anything in that direction and your light isn't enough to light
-that far.
+The northern channel returns toward the deeper water of the Deepwater Passage.
 ~
 ~
 0 -1 7065
 D1
-You can't see anything in that direction and your light isn't enough to light
-that far.
+The eastern passage leads toward The Eastern Pool Ledge.
 ~
 ~
 0 -1 7070
 D2
-You can't see anything in that direction and your light isn't enough to light
-that far.
+The southern passage leads toward The Cascading Gallery.
 ~
 ~
 0 -1 7067
@@ -1298,20 +1116,17 @@ water~
 ~
 S
 #7067
-The Watery Sewer~
-   You can't see anything but the water you're in up to your hips.  The sewer
-seems to lead south and north.
+The Cascading Gallery~
+Water races along a steeper section of gallery, spilling over broken steps in a series of shallow cascades. The passage runs between the poolward junction to the north and a hard western turn to the south.
 ~
 70 9 0 0 0 5
 D0
-You can't see anything in that direction and your light isn't enough to light
-that far.
+The broken steps climb north toward the Poolward Junction.
 ~
 ~
 0 -1 7066
 D2
-You can't see anything in that direction and your light isn't enough to light
-that far.
+The southern passage leads toward The Waterfall Bend.
 ~
 ~
 0 -1 7068
@@ -1321,20 +1136,17 @@ water~
 ~
 S
 #7068
-The Watery Sewer Bend~
-   You can't see anything but the water you're in up to your hips.  The sewer
-seems to bend and lead west and north.
+The Waterfall Bend~
+The flooded gallery turns sharply west where the current gathers speed. Spray hangs in the air and the distant roar of falling water becomes much louder. The northern route climbs toward the cascades while the western way returns to the Lower Junction.
 ~
 70 9 0 0 0 5
 D0
-You can't see anything in that direction and your light isn't enough to light
-that far.
+The wet passage climbs north through the shallow cascades of the Cascading Gallery.
 ~
 ~
 0 -1 7067
 D3
-You can't see anything in that direction and your light isn't enough to light
-that far.
+The western passage leads toward The Lower Junction.
 ~
 ~
 0 -1 7060
@@ -1344,21 +1156,17 @@ water~
 ~
 S
 #7069
-A Ledge By A Dark Pool~
-   You can't see much here but the echo tells you that there is quite a drop
-down.  You can just make out a huge dark pool out there in the darkness,
-mostly because of the trickling of water.  The water from the sewer actually
-washes over this ledge and makes it quite slippery.  From here it drops,
-like a waterfall, into the pool far down.
+The Western Pool Ledge~
+A narrow ledge overlooks a vast black pool far below. Water from the flooded works spills over the edge in a silver ribbon before vanishing into the darkness. The ledge continues south toward a second overlook and west back toward the flooded junction.
 ~
 70 9 0 0 0 5
 D2
-You can't see a thing.  It is too dark.
+The narrow ledge continues south toward the broader Eastern Pool Ledge.
 ~
 ~
 0 -1 7070
 D3
-You can't see a thing.  It is too dark.
+The western passage leads toward The Sunken Crossing.
 ~
 ~
 0 -1 7064
@@ -1368,26 +1176,22 @@ water~
 ~
 S
 #7070
-A Ledge By A Dark Pool~
-   You can't see much here but the echo tells you that there is quite a drop
-down.  You can just make out a huge dark pool out there in the darkness,
-mostly because of the trickling of water.  The water from the sewer actually
-washes over this ledge and makes it quite slippery.  From here it drops,
-like a waterfall, into the pool far down.  Under you there is a small fissure
-in the rock.  It seems big enough to contain a few people.
+The Eastern Pool Ledge~
+The ledge widens above the underground pool, offering a clearer view of water disappearing into the cavern below. A narrow fissure descends through the rock beneath the ledge, connecting back into the upper-to-lower transition. Paths return north and west.
 ~
 70 9 0 0 0 5
 D0
-You can't see a thing.  It is too dark.
+The northern passage leads toward The Western Pool Ledge.
 ~
 ~
 0 -1 7069
 D3
-You can't see a thing.  It is too dark.
+The western passage leads toward The Poolward Junction.
 ~
 ~
 0 -1 7066
 D5
+The descent leads toward The Fissure of Falling Water.
 ~
 ~
 0 -1 7000

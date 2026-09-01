@@ -1739,6 +1739,13 @@ int effective_max_mana(const struct char_data *ch)
   return (int) (scaled + 0.5);
 }
 
+/* HP has no percentage-based effective-max modifier.  This helper gives
+ * displays and administrative code the same explicit vocabulary as mana/move. */
+int effective_max_hit(const struct char_data *ch)
+{
+  return GET_MAX_HIT(ch);
+}
+
 void clamp_mana_to_effective_max(struct char_data *ch)
 {
   int max_mana = effective_max_mana(ch);

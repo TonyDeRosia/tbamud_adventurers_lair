@@ -1,141 +1,141 @@
 #18601
-sword newbie~
-a shiny newbie sword~
-A shiny newbie sword is lying here waiting to be possessed.~
+training sword academy practice~
+an Academia training sword~
+A blunted Academia training sword has been left here.~
 ~
-5 ag 0 0 0 an 0 0 0 0 0 0 0
-0 1 5 3
-4 1000 0 0
+5 0 0 0 0 an 0 0 0 0 0 0 0
+0 1 4 5
+4 10 0 1 0
 A
 19 1
 #18602
-vest newbie~
-a bright green newbie vest~
-A bright green newbie vest is lying here looking for a body to hug.~
+padded novice vest academy~
+a padded novice vest~
+A padded blue-and-silver novice vest rests here.~
 ~
 9 0 0 0 0 ad 0 0 0 0 0 0 0
-4 0 0 0
-4 1000 0 0
+1 0 0 0
+3 8 0 1 0
 #18603
-helm helmet newbie~
-a bright newbie helm~
-A bright newbie helm is hoping a loose head will wander by.~
+practice helm academy novice~
+an Academia practice helm~
+A simple padded practice helm rests here.~
 ~
-9 ag 0 0 0 ae 0 0 0 0 0 0 0
-3 0 0 0
-4 1000 0 0
+9 0 0 0 0 ae 0 0 0 0 0 0 0
+1 0 0 0
+2 6 0 1 0
 A
 5 1
 #18604
-cloak dark newbie~
-a dark newbie cloak~
-A dark newbie cloak is lying here hoping to smother you.~
+novice field cloak academy~
+a novice field cloak~
+A durable novice field cloak has been folded here.~
 ~
-9 ag 0 0 0 ak 0 0 0 0 0 0 0
-0 0 0 0
-2 100000 0 0
+9 0 0 0 0 ak 0 0 0 0 0 0 0
+1 0 0 0
+2 10 0 1 0
 A
 17 -3
 A
 4 1
 #18605
-ring signet newbie~
-a newbie signet ring~
-A newbie signet ring is lying in the dust here.~
+academia signet ring novice~
+an Academia signet ring~
+A plain silver Academia signet ring lies here.~
 ~
-9 fg 0 0 0 ab 0 0 0 0 0 0 0
-0 0 0 0
-1 500000 0 0
+9 g 0 0 0 ab 0 0 0 0 0 0 0
+1 0 0 0
+1 5 0 1 0
 A
 17 -2
 #18606
-dagger newbie~
-a shiny newbie dagger~
-A shiny newbie dagger is lying here looking for a back to stab.~
+training dagger academy practice~
+an Academia training dagger~
+A blunted Academia training dagger lies here.~
 ~
-5 ag 0 0 0 ano 0 0 0 0 0 0 0
+5 0 0 0 0 ano 0 0 0 0 0 0 0
 0 1 4 11
-1 1000 0 0
+1 8 0 1 0
 A
 19 1
 #18607
-collar dragon~
-a pet dragon collar~
-Someone's pet dragon has escaped and left his collar here.~
+drake handler collar academy~
+an Academia drake collar~
+A reinforced collar bearing the Academia crest lies here.~
 ~
 9 g 0 0 0 ac 0 0 0 0 0 0 0
-0 0 0 0
-1 1000 0 0
+1 0 0 0
+1 5 0 1 0
 A
 18 1
 A
 17 -1
 #18608
-key newbie~
-a wee little key~
-A key with the newbie crest on it is here.~
+brass practice key academy~
+a brass Academia practice key~
+A brass practice key stamped with the Academia crest lies here.~
 ~
 18 c 0 0 0 a 0 0 0 0 0 0 0
 1 0 0 0
-1 1000 0 0
+1 0 0 0 0
 #18609
-light jar~
-a brightly glowing jar~
-A jar of glowing fluid wants to brighten your day.~
+academia lantern practice light~
+an Academia practice lantern~
+A hooded Academia practice lantern gives off a steady glow.~
 ~
 1 ag 0 0 0 a 0 0 0 0 0 0 0
 0 0 -1 0
-2 1000 0 0
+2 8 0 1 0
 A
 24 -1
 #18610
-horns horn~
-the horns of the Minotaur~
-The horns of the great Minotaur lie here.~
+padded horn guards minotaur trial~
+a pair of padded horn guards~
+A pair of heavy padded horn guards lies here.~
 ~
-9 n 0 0 0 ae 0 0 0 0 0 0 0
+9 0 0 0 0 ae 0 0 0 0 0 0 0
 2 0 0 0
-8 100000 0 0
+2 12 0 3 0
 A
 1 1
 #18611
-hide skin~
-the smelly hide of the Minotaur~
-The hide of the great Minotaur is lying here.~
+reinforced training hide academy~
+a reinforced training hide~
+A reinforced hide used in practical drills lies here.~
 ~
-11 n 0 0 0 adk 0 0 0 0 0 0 0
+11 0 0 0 0 adk 0 0 0 0 0 0 0
 0 0 0 0
-6 100000 0 0
+4 14 0 3 0
 A
 17 -6
 A
 13 15
 #18612
-leggings newbie~
-some cool newbie leggings~
-A pair of neat looking leggings are here.~
+novice leggings academy~
+a pair of novice leggings~
+A pair of sturdy novice leggings has been left here.~
 ~
 9 0 0 0 0 af 0 0 0 0 0 0 0
-4 0 0 0
-4 200000 0 0
+1 0 0 0
+3 10 0 1 0
 #18613
-sleeves newbie~
-some cool newbie sleeves~
-A set of nifty sleeves is here.~
+novice sleeves academy~
+a pair of novice sleeves~
+A pair of padded novice sleeves rests here.~
 ~
 9 0 0 0 0 ai 0 0 0 0 0 0 0
-4 0 0 0
-3 400000 0 0
+1 0 0 0
+2 10 0 1 0
 A
 3 1
 #18614
-mace newbie~
-a glowing newbie mace~
-A finely crafted newbie mace is waiting for a worthy owner.~
+training mace academy practice~
+an Academia training mace~
+A blunted Academia training mace rests here.~
 ~
-5 ag 0 0 0 an 0 0 0 0 0 0 0
-0 2 6 7
-8 300000 0 0
+5 0 0 0 0 an 0 0 0 0 0 0 0
+0 1 5 5
+5 12 0 2 0
 A
 17 -2
 $~

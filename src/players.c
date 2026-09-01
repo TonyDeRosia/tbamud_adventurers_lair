@@ -435,10 +435,13 @@ int load_char(const char *name, struct char_data *ch)
     ch->real_abils.cha = PFDEF_CHA;
     GET_HIT(ch) = PFDEF_HIT;
     GET_MAX_HIT(ch) = PFDEF_MAXHIT;
+    GET_BASE_MAX_HIT(ch) = PFDEF_MAXHIT;
     GET_MANA(ch) = PFDEF_MANA;
     GET_MAX_MANA(ch) = PFDEF_MAXMANA;
+    GET_BASE_MAX_MANA(ch) = PFDEF_MAXMANA;
     GET_MOVE(ch) = PFDEF_MOVE;
     GET_MAX_MOVE(ch) = PFDEF_MAXMOVE;
+    GET_BASE_MAX_MOVE(ch) = PFDEF_MAXMOVE;
     GET_OLC_ZONE(ch) = PFDEF_OLC;
     GET_PAGE_LENGTH(ch) = PFDEF_PAGELENGTH;
     GET_SCREEN_WIDTH(ch) = PFDEF_SCREENWIDTH;
@@ -1016,9 +1019,9 @@ int save_char(struct char_data * ch)
   if (GET_COND(ch, THIRST) != PFDEF_THIRST && GET_LEVEL(ch) < LVL_IMMORT) fprintf(fl, "Thir: %d\n", GET_COND(ch, THIRST));
   if (GET_COND(ch, DRUNK)  != PFDEF_DRUNK  && GET_LEVEL(ch) < LVL_IMMORT) fprintf(fl, "Drnk: %d\n", GET_COND(ch, DRUNK));
 
-  if (GET_HIT(ch)	   != PFDEF_HIT  || GET_MAX_HIT(ch)  != PFDEF_MAXHIT)  fprintf(fl, "Hit : %d/%d\n", GET_HIT(ch),  GET_MAX_HIT(ch));
-  if (GET_MANA(ch)	   != PFDEF_MANA || GET_MAX_MANA(ch) != PFDEF_MAXMANA) fprintf(fl, "Mana: %d/%d\n", GET_MANA(ch), GET_MAX_MANA(ch));
-  if (GET_MOVE(ch)	   != PFDEF_MOVE || GET_MAX_MOVE(ch) != PFDEF_MAXMOVE) fprintf(fl, "Move: %d/%d\n", GET_MOVE(ch), GET_MAX_MOVE(ch));
+  if (GET_HIT(ch)	   != PFDEF_HIT  || GET_BASE_MAX_HIT(ch)  != PFDEF_MAXHIT)  fprintf(fl, "Hit : %d/%d\n", GET_HIT(ch),  GET_BASE_MAX_HIT(ch));
+  if (GET_MANA(ch)	   != PFDEF_MANA || GET_BASE_MAX_MANA(ch) != PFDEF_MAXMANA) fprintf(fl, "Mana: %d/%d\n", GET_MANA(ch), GET_BASE_MAX_MANA(ch));
+  if (GET_MOVE(ch)	   != PFDEF_MOVE || GET_BASE_MAX_MOVE(ch) != PFDEF_MAXMOVE) fprintf(fl, "Move: %d/%d\n", GET_MOVE(ch), GET_BASE_MAX_MOVE(ch));
 
   if (GET_STR(ch)	   != PFDEF_STR  || GET_ADD(ch)      != PFDEF_STRADD)  fprintf(fl, "Str : %d/%d\n", GET_STR(ch),  GET_ADD(ch));
 
@@ -1488,16 +1491,19 @@ static void load_HMVS(struct char_data *ch, const char *line, int mode)
   case LOAD_HIT:
     GET_HIT(ch) = num;
     GET_MAX_HIT(ch) = num2;
+    GET_BASE_MAX_HIT(ch) = num2;
     break;
 
   case LOAD_MANA:
     GET_MANA(ch) = num;
     GET_MAX_MANA(ch) = num2;
+    GET_BASE_MAX_MANA(ch) = num2;
     break;
 
   case LOAD_MOVE:
     GET_MOVE(ch) = num;
     GET_MAX_MOVE(ch) = num2;
+    GET_BASE_MAX_MOVE(ch) = num2;
     break;
 
   case LOAD_STRENGTH:

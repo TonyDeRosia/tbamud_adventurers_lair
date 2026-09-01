@@ -21,6 +21,7 @@
 #include "db.h"
 #include "spells.h"
 #include "interpreter.h"
+#include "handler.h"
 #include "race.h"
 #include "constants.h"
 #include "act.h"
@@ -1707,9 +1708,10 @@ void do_start(struct char_data *ch)
 
   set_title(ch, NULL);
   /* Stats are now set during character creation (point allocation). */
-  GET_MAX_HIT(ch)  = 10;
-  GET_MAX_MANA(ch) = 100;
-  GET_MAX_MOVE(ch) = 82;
+  /* advance_level() owns the complete, deterministic level-one baseline. */
+  GET_BASE_MAX_HIT(ch) = GET_MAX_HIT(ch)  = 0;
+  GET_BASE_MAX_MANA(ch) = GET_MAX_MANA(ch) = 0;
+  GET_BASE_MAX_MOVE(ch) = GET_MAX_MOVE(ch) = 0;
 
   switch (GET_CLASS(ch)) {
 
@@ -1772,45 +1774,30 @@ static void grant_new_abilities_one_percent(struct char_data *ch)
 
 void advance_level(struct char_data *ch)
 {
-  int add_hp, add_mana = 0, add_move = 0, i;
+  struct resource_gain { int hit, mana, move; };
+  static const struct resource_gain gains[NUM_CLASSES] = {
+    [CLASS_MAGIC_USER] = { 18, 18, 8 }, [CLASS_CLERIC] = { 23, 15, 9 },
+    [CLASS_THIEF] = { 28, 7, 14 }, [CLASS_WARRIOR] = { 34, 5, 11 },
+    [CLASS_PALADIN] = { 29, 12, 10 }, [CLASS_BARD] = { 22, 13, 13 },
+    [CLASS_WARLOCK] = { 20, 18, 9 }, [CLASS_DRUID] = { 24, 16, 11 },
+    [CLASS_MYSTIC] = { 26, 14, 12 }, [CLASS_ADVENTURER] = { 24, 12, 11 }
+  };
+  const struct resource_gain *gain;
+  int add_hp, add_mana, add_move, i;
+  int con, intel, wis, dex;
 
-  add_hp = con_app[GET_CON(ch)].hitp;
+  /* Level growth uses permanent abilities, not temporary affects. */
+  con = ch->real_abils.con; intel = ch->real_abils.intel;
+  wis = ch->real_abils.wis; dex = ch->real_abils.dex;
+  gain = (GET_CLASS(ch) >= 0 && GET_CLASS(ch) < NUM_CLASSES) ? &gains[GET_CLASS(ch)] : &gains[CLASS_ADVENTURER];
+  add_hp = gain->hit + MAX(0, (con - 8) / 2);
+  add_mana = gain->mana + MAX(0, (intel + wis - 16) / 3);
+  add_move = gain->move + MAX(0, (con + dex - 16) / 4);
 
-  switch (GET_CLASS(ch)) {
-
-  case CLASS_MAGIC_USER:
-  case CLASS_ADVENTURER:
-    add_hp += rand_number(3, 8);
-    add_mana = rand_number(GET_LEVEL(ch), (int)(1.5 * GET_LEVEL(ch)));
-    add_mana = MIN(add_mana, 10);
-    add_move = rand_number(0, 2);
-    break;
-
-  case CLASS_CLERIC:
-    add_hp += rand_number(5, 10);
-    add_mana = rand_number(GET_LEVEL(ch), (int)(1.5 * GET_LEVEL(ch)));
-    add_mana = MIN(add_mana, 10);
-    add_move = rand_number(0, 2);
-    break;
-
-  case CLASS_THIEF:
-    add_hp += rand_number(7, 13);
-    add_mana = 0;
-    add_move = rand_number(1, 3);
-    break;
-
-  case CLASS_WARRIOR:
-    add_hp += rand_number(10, 15);
-    add_mana = 0;
-    add_move = rand_number(1, 3);
-    break;
-  }
-
-  ch->points.max_hit += MAX(1, add_hp);
-  ch->points.max_move += MAX(1, add_move);
-
-  if (GET_LEVEL(ch) > 1)
-    ch->points.max_mana += add_mana;
+  GET_BASE_MAX_HIT(ch) += MAX(1, add_hp);
+  GET_BASE_MAX_MOVE(ch) += MAX(1, add_move);
+  GET_BASE_MAX_MANA(ch) += MAX(1, add_mana);
+  affect_total(ch);
 
   if (IS_MAGIC_USER(ch) || IS_CLERIC(ch) || GET_CLASS(ch) == CLASS_ADVENTURER)
     GET_PRACTICES(ch) += MAX(2, wis_app[GET_WIS(ch)].bonus);

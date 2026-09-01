@@ -868,21 +868,24 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig,
           else if (!str_cmp(field, "maxhitp")) {
             if (subfield && *subfield) {
               int addition = atoi(subfield);
-              GET_MAX_HIT(c) = MAX(GET_MAX_HIT(c) + addition, 1);
+              GET_BASE_MAX_HIT(c) = MAX(GET_BASE_MAX_HIT(c) + addition, 1);
+              affect_total(c);
             }
             snprintf(str, slen, "%d", GET_MAX_HIT(c));
           }
           else if (!str_cmp(field, "maxmana")) {
             if (subfield && *subfield) {
               int addition = atoi(subfield);
-              GET_MAX_MANA(c) = MAX(GET_MAX_MANA(c) + addition, 1);
+              GET_BASE_MAX_MANA(c) = MAX(GET_BASE_MAX_MANA(c) + addition, 1);
+              affect_total(c);
             }
             snprintf(str, slen, "%d", GET_MAX_MANA(c));
           }
           else if (!str_cmp(field, "maxmove")) {
             if (subfield && *subfield) {
               int addition = atoi(subfield);
-              GET_MAX_MOVE(c) = MAX(GET_MAX_MOVE(c) + addition, 1);
+              GET_BASE_MAX_MOVE(c) = MAX(GET_BASE_MAX_MOVE(c) + addition, 1);
+              affect_total(c);
             }
             snprintf(str, slen, "%d", GET_MAX_MOVE(c));
           }

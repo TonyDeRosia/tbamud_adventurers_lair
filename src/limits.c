@@ -24,7 +24,6 @@
 #include "mud_event.h"
 
 /* local file scope function prototypes */
-static int graf(int grafage, int p0, int p1, int p2, int p3, int p4, int p5, int p6);
 static void check_idling(struct char_data *ch);
 static struct affected_type *find_affect(struct char_data *ch, int spellnum);
 static int best_regen_multiplier(struct char_data *ch);
@@ -61,29 +60,6 @@ enum condition_penalty_stage {
 #define DEHYDRATED_MANA_DRAIN_MIN 1
 #define DEHYDRATED_MANA_DRAIN_MAX 2
 
-
-/* When age < 15 return the value p0
-   When age is 15..29 calculate the line between p1 & p2
-   When age is 30..44 calculate the line between p2 & p3
-   When age is 45..59 calculate the line between p3 & p4
-   When age is 60..79 calculate the line between p4 & p5
-   When age >= 80 return the value p6 */
-static int graf(int grafage, int p0, int p1, int p2, int p3, int p4, int p5, int p6)
-{
-
-  if (grafage < 15)
-    return (p0);					/* < 15   */
-  else if (grafage <= 29)
-    return (p1 + (((grafage - 15) * (p2 - p1)) / 15));	/* 15..29 */
-  else if (grafage <= 44)
-    return (p2 + (((grafage - 30) * (p3 - p2)) / 15));	/* 30..44 */
-  else if (grafage <= 59)
-    return (p3 + (((grafage - 45) * (p4 - p3)) / 15));	/* 45..59 */
-  else if (grafage <= 79)
-    return (p4 + (((grafage - 60) * (p5 - p4)) / 20));	/* 60..79 */
-  else
-    return (p6);					/* >= 80 */
-}
 
 static struct affected_type *find_affect(struct char_data *ch, int spellnum)
 {
@@ -299,7 +275,10 @@ int mana_gain(struct char_data *ch)
     /* Neat and fast */
     gain = GET_LEVEL(ch);
   } else {
-    gain = graf(age(ch)->year, 4, 8, 12, 16, 12, 10, 8);
+    /* Pool scaling keeps the larger level-100 pools practical to recover;
+     * affected stats intentionally improve only temporary regeneration. */
+    gain = MAX(1, GET_MAX_MANA(ch) / 40) +
+           MAX(0, (GET_INT(ch) + GET_WIS(ch) - 16) / 3);
 
     /* Class calculations */
 
@@ -348,7 +327,8 @@ int hit_gain(struct char_data *ch)
     gain = GET_LEVEL(ch);
   } else {
 
-    gain = graf(age(ch)->year, 8, 12, 20, 32, 16, 10, 4);
+    gain = MAX(1, GET_MAX_HIT(ch) / 50) +
+           MAX(0, (GET_CON(ch) - 8) / 2);
 
     /* Class/Level calculations */
     /* Skill/Spell calculations */
@@ -392,7 +372,8 @@ int move_gain(struct char_data *ch)
     /* Neat and fast */
     gain = GET_LEVEL(ch);
   } else {
-    gain = graf(age(ch)->year, 16, 20, 24, 20, 16, 12, 10);
+    gain = MAX(1, GET_MAX_MOVE(ch) / 40) +
+           MAX(0, (GET_CON(ch) + GET_DEX(ch) - 16) / 4);
 
     /* Class/Level calculations */
     /* Skill/Spell calculations */
@@ -474,6 +455,17 @@ void run_autowiz(void)
 #endif /* CIRCLE_UNIX || CIRCLE_WINDOWS */
 }
 
+int final_positive_xp_gain(int raw_gain)
+{
+  long long modified = raw_gain;
+
+  if (modified <= 0)
+    return 0;
+  if (IS_HAPPYHOUR && IS_HAPPYEXP)
+    modified += (modified * HAPPY_EXP) / 100;
+  return (int)MIN((long long)CONFIG_MAX_EXP_GAIN, modified);
+}
+
 void gain_exp(struct char_data *ch, int gain)
 {
   int is_altered = FALSE;
@@ -490,10 +482,7 @@ void gain_exp(struct char_data *ch, int gain)
     return;
   }
   if (gain > 0) {
-    if ((IS_HAPPYHOUR) && (IS_HAPPYEXP))
-      gain += (int)((float)gain * ((float)HAPPY_EXP / (float)(100)));
-
-    gain = MIN(CONFIG_MAX_EXP_GAIN, gain);      /* put a cap on the max gain per kill */
+    gain = final_positive_xp_gain(gain);
     GET_EXP(ch) += gain;
     while (GET_LEVEL(ch) < max_mortal_level &&
         GET_EXP(ch) >= level_exp(GET_CLASS(ch), GET_LEVEL(ch) + 1)) {
