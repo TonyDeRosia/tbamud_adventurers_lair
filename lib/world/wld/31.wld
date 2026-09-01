@@ -1,8 +1,9 @@
 #3100
-The Northwest End Of The Concourse~
-   You are at the concourse, the city wall is just west.  A small promenade
-goes east, and the bridge is just north of here.  The concourse continues
-south along the city wall.
+@CThe Riverward Concourse@n~
+The northern wall of Midgaard rises close to the west while the broad southern concourse
+opens toward the riverward district. Pale paving stones bear the wear of carts, patrol
+boots, and generations of travelers passing between the city's halves. Iron lantern
+brackets and carved civic markers give the street an orderly, well-kept character.
 ~
 31 0 0 0 0 1
 D0
@@ -22,10 +23,11 @@ The promenade continues far south.
 0 -1 3127
 S
 #3101
-The Promenade~
-   The river gently flows westwards just north of here.  The promenade
-continues further east and to the west you see the city wall.  Park Road
-leads south from here.
+The Riverward Promenade~
+A broad promenade follows the river behind a low stone parapet. Old shade trees stand at
+measured intervals between benches, and bargemen can be heard calling across the water
+beyond the wall. The city feels less crowded here, with room for walkers, vendors, and
+off-duty guards to linger.
 ~
 31 0 0 0 0 1
 D1
@@ -45,10 +47,10 @@ You see the Concourse.
 0 -1 3100
 S
 #3102
-The Promenade~
-   The river gently flows westwards just north of here.  The promenade
-continues both east and west.  South of here you see the entrance to
-the park, and a small building seems to be just west of the entrance.
+The Riverward Promenade~
+The promenade widens beside the main entrance to Midgaard's southern commons. River air
+moves through the branches overhead while worn benches face the water. Southward,
+clipped hedges and an arched stone entry mark the beginning of the park.
 ~
 31 0 0 0 0 1
 D1
@@ -68,10 +70,10 @@ You see the promenade.
 0 -1 3101
 S
 #3103
-The Promenade~
-   The river gently flows westwards just north of here.  The promenade
-continues both east and west.  A small path leads south.  Looking across
-the river you see the levee.
+The Riverward Promenade~
+Smooth flagstones continue along the riverfront beneath a line of mature elms. The noise
+of the central city fades behind the steady murmur of water and the occasional creak of
+mooring rope. Citizens favor this stretch for quiet walks and conversation.
 ~
 31 0 0 0 0 1
 D1
@@ -91,11 +93,10 @@ You see the promenade.
 0 -1 3102
 S
 #3104
-The Northeast End Of The Concourse~
-   You are at the Concourse.  The city wall is just east and a small
-promenade goes west.  Looking across the river you see a building that
-resembles a warehouse.  The Concourse continues south along the city
-wall.
+The East Riverward Concourse~
+The promenade meets the eastern end of the southern concourse here. Stonework along the
+river wall carries old mason marks, while narrow streets turn back toward the civic
+quarter. The district remains busy without the crush of the northern markets.
 ~
 31 0 0 0 0 1
 D2
@@ -115,10 +116,10 @@ some kind of mortar.  It is far too high to climb.
 ~
 S
 #3105
-The Park Entrance~
-   You are standing just inside the small park of Midgaard.  To the north is
-the promenade and a small path leads south into the park.  To your east is
-the famous Park Cafe.
+@gThe Gate of Midgaard Commons@n~
+Two weathered stone pillars flank the entrance to the city's great southern green. Their
+faces are carved with leaves, river reeds, and the crowned bridge of Midgaard. Beyond
+them, gravel paths divide around lawns, shade trees, and a pond bright with waterfowl.
 ~
 31 4 0 0 0 1
 D0
@@ -138,10 +139,11 @@ You see the park.
 0 -1 3108
 S
 #3106
-Park Cafe~
-   You are inside Park Cafe, a very cozy place with many tables and
-seats where you can relax and enjoy the view.  To the east you can
-see the entrance to the park.
+@g-=< @WThe Willow Cup @g>=-@n~
+A timber-framed pavilion rests beneath the spreading limbs of an ancient willow. Copper
+kettles steam behind a polished counter while shelves hold cups, herbs, roasted beans,
+and jars of honey. @gWillow leaves@n brush the open shutters, carrying the quiet sounds
+of the commons into this warm little refuge.
 ~
 31 136 0 0 0 0
 D3
@@ -151,9 +153,10 @@ You see the park entrance.
 0 -1 3105
 S
 #3107
-A Small Path In The Park~
-   You are walking along a small path through the park.  The path continues
-south and east.
+A Shaded Commons Path~
+A narrow gravel path curves beneath elm and chestnut branches. Moss softens the edges of
+old stone borders, and birds hop fearlessly between patches of grass. The deeper commons
+lies beyond the trees, screened from the surrounding streets by living green.
 ~
 31 0 0 0 0 1
 D1
@@ -166,10 +169,10 @@ D2
 0 -1 3113
 S
 #3108
-A Small Path In The Park~
-   You are standing on a small path inside the park.  The park entrance is
-just north of here, and Park Cafe is just east of the entrance.  The path
-leads further east and west.
+A Shaded Commons Path~
+The path winds through a cool pocket of shade where branches knit together overhead.
+Small beds of rosemary and lavender have been planted beside the walk, filling the air
+with a clean herbal scent when the breeze stirs them.
 ~
 31 0 0 0 0 1
 D0
@@ -187,9 +190,10 @@ D3
 0 -1 3107
 S
 #3109
-A Small Path In The Park~
-   You are on a small path running through the park.  It continues west and
-south and just north of here you see the southern wall of Park Cafe.
+A Shaded Commons Path~
+Here the park path passes between open lawn and a stand of old trees. Citizens have worn
+several informal tracks through the grass, though the gravel way remains the easiest
+route through the commons. Waterfowl occasionally wander this far from the pond.
 ~
 31 0 0 0 0 1
 D2
@@ -202,8 +206,11 @@ D3
 0 -1 3108
 S
 #3110
-Cityguard HeadQuarters~
-   You are inside a tidy office.
+@B==[ @WSouthwatch Barracks @B]==@n~
+Heavy oak tables, weapon racks, duty boards, and locked record chests fill the
+headquarters of Midgaard's southern watch. Blue-and-silver tabards hang beside polished
+shields bearing the city bridge. A barred office to one side secures patrol records,
+reserve keys, and confiscated valuables under the watch commander's eye.
 ~
 31 8 0 0 0 0
 D1
@@ -213,9 +220,10 @@ door~
 1 3105 3111
 S
 #3111
-Park Road~
-   The road continues north and south.  A building is just west of here, you
-notice a sign on the door.  The park entrance is to the east.
+Southwatch Road~
+A sturdy civic building stands immediately west, its reinforced door marked with the
+blue-and-silver shield of the Southwatch. Patrols come and go at regular intervals while
+the road continues along the western edge of Midgaard Commons.
 ~
 31 0 0 0 0 1
 D0
@@ -246,9 +254,10 @@ building door sign~
 ~
 S
 #3112
-The Western Park Entrance~
-   You are standing at the western end of the park.  A small path leads east
-into the park and going west through the entrance you will reach Park Road.
+The West Commons Gate~
+Low stone pillars open onto Midgaard Commons from the western road. An ironwork arch
+between them is worked into curling leaves and tiny bridge motifs. Paths disappear
+eastward beneath the trees while the barracks road remains close behind.
 ~
 31 4 0 0 0 1
 D1
@@ -261,9 +270,10 @@ D3
 0 -1 3111
 S
 #3113
-A Path In The Park~
-   You are in the park.  The paths lead north and west.  Westward is the
-park entrance and to the east you see a small pond.
+The Pond Walk~
+The path slopes gently toward the park pond through cropped grass and clusters of reeds.
+Ducks patrol the banks with practiced confidence, and flat stones near the water show
+where generations of citizens have sat to watch them.
 ~
 31 0 0 0 0 1
 D0
@@ -282,9 +292,11 @@ You see the western park entrance.
 0 -1 3112
 S
 #3114
-The Pond~
-   You are swimming around in the pond, feeling rather stupid.  You can get
-back on the path from the eastern and western end of the pond.
+@cMirrorwater Pond@n~
+Clear water fills a broad, stone-edged pond at the heart of the commons. Reeds and water
+lilies gather along the quieter banks while swans and ducks leave silver wakes across
+the surface. A small @cwhite-stone fountain@n feeds the pond with a constant musical
+trickle.
 ~
 31 0 0 0 0 6
 D1
@@ -297,9 +309,10 @@ D3
 0 -1 3113
 S
 #3115
-A Path In The Park~
-   You are in the park.  The paths lead north and east.  Eastward is the
-park entrance and to the west you see a small pond.
+The Pond Walk~
+A gravel path follows the eastern side of the pond beneath leaning willow branches. The
+water glimmers through the leaves while the roofs of the civic quarter rise beyond the
+park. Small birds pick at crumbs left along the benches.
 ~
 31 0 0 0 0 1
 D0
@@ -316,10 +329,10 @@ D3
 0 -1 3114
 S
 #3116
-The Eastern Park Entrance~
-   You are standing at the eastern end of the park.  A small path leads west
-into the park.  Going east through the entrance you will reach Emerald
-Avenue.
+The East Commons Gate~
+The eastern gate of Midgaard Commons opens between two moss-softened stone pillars.
+Beyond the arch, the ordered paving of Emerald Avenue replaces the park's gravel paths
+and grass. The scent of water and leaves lingers behind.
 ~
 31 4 0 0 0 1
 D1
@@ -333,9 +346,10 @@ D3
 S
 #3117
 Emerald Avenue~
-   You are standing on the north end of Emerald Avenue.  To the north is the
-promenade and to the west is the park entrance.  To the east is the not very
-big Town Hall of Midgaard.
+Well-laid green-gray stones give this avenue its name, polished smooth by years of
+traffic. Tall townhouses and civic buildings stand behind narrow garden walls, their
+doors marked by brass lamps and family crests. The commons remains visible through the
+trees to the west.
 ~
 31 0 0 0 0 1
 D0
@@ -356,8 +370,10 @@ D3
 0 -1 3116
 S
 #3118
-Park Road~
-   You are on Park Road which leads north and south.
+Southwatch Road~
+The road runs beside the western wall of Midgaard Commons, close enough that branches
+hang over the paving in places. Guard patrols use this route between the barracks and
+southern gate, sharing it with tradesfolk and residents heading toward the concourse.
 ~
 31 0 0 0 0 1
 D0
@@ -371,8 +387,9 @@ D2
 S
 #3119
 Emerald Avenue~
-   You are standing at a bend on Emerald Avenue.  The road leads north and
-west.
+Emerald Avenue passes a row of dignified stone houses with slate roofs and small walled
+gardens. Carved lintels and old family marks suggest that several generations have lived
+behind these doors. The street remains quieter than the commercial wards to the north.
 ~
 31 0 0 0 0 1
 D0
@@ -385,12 +402,11 @@ D3
 0 -1 3133
 S
 #3120
-The Road Crossing~
-   You are in the middle of the road cross.  Roads lead in all directions.
-A huge black iron chain as thick as a tree trunk is fastened into the ground
-at the center of the road cross.  Its other end leads directly upwards towards
-the sky.
-A road sign is here.
+@C--< @WThe Skychain Crossing @C>--@n~
+Five roads meet around an ancient iron anchor set deep into the paving. From it rises a
+@Ccolossal black chain@n, each link broad as a shield, climbing impossibly into the
+clouds. Old runes cut around the anchor flare faintly in bad weather, and locals give
+the relic a respectful distance even as daily traffic flows around it.
 ~
 31 0 0 0 0 1
 D0
@@ -415,6 +431,11 @@ The chain disappears in the clouds.
 ~
 0 -1 7914
 E
+chain~
+   The chain reaches the clouds high above you.  It must take some really
+powerful magic to hold such a chain in place.
+~
+E
 sign~
    The sign points in all directions:
    North - Emerald Avenue.
@@ -424,16 +445,12 @@ sign~
 Someone has added the following with red paint:
    Up    - Redferne's Flying Citadel.
 ~
-E
-chain~
-   The chain reaches the clouds high above you.  It must take some really
-powerful magic to hold such a chain in place.
-~
 S
 #3121
 Emerald Avenue~
-   You are standing at a bend on Emerald Avenue.  The road leads south and
-east.
+The avenue bends through the southern civic quarter beneath balconies hung with herbs
+and late-blooming flowers. Here the paving is older and more irregular, but the
+green-gray stone still catches a soft sheen after rain.
 ~
 31 0 0 0 0 1
 D1
@@ -446,9 +463,10 @@ D2
 0 -1 3125
 S
 #3122
-Park Road~
-   You are on Park Road which leads south and north.  Elm Street is east of
-here.
+Southwatch Road~
+This stretch of road carries the regular rhythm of booted patrols, delivery carts, and
+residents walking between the commons and southern wards. The park wall is low enough to
+reveal branches and open lawn beyond it.
 ~
 31 0 0 0 0 1
 D0
@@ -466,8 +484,9 @@ D2
 S
 #3123
 Elm Street~
-   You are on Elm street.  Park Road is to the west and Elm Street continues
-in eastward direction.
+A quieter residential street branches away beneath the crowns of several enormous elms.
+Their roots have lifted sections of paving into gentle ridges, and small homes stand
+close together behind painted doors and window boxes.
 ~
 31 0 0 0 0 1
 D1
@@ -480,8 +499,10 @@ D3
 0 -1 3122
 S
 #3124
-The End Of Elm Street~
-   You are at the end of Elm Street.
+The End of Elm Street~
+Elm Street narrows into a sheltered court surrounded by modest homes and old garden
+walls. A broad elm dominates the center, its roots curling around an ancient stone
+basin. The place feels removed from the traffic only a few streets away.
 ~
 31 0 0 0 0 1
 D3
@@ -491,8 +512,9 @@ D3
 S
 #3125
 Emerald Avenue~
-   You are on Emerald Avenue which continues north.  The Concourse is south
-of here.
+The avenue runs past formal facades of pale stone and dark timber. Brass plaques
+identify guild advocates, scribes, and minor civic offices, while servants and
+messengers pass between doorways carrying sealed folios.
 ~
 31 0 0 0 0 1
 D0
@@ -505,9 +527,10 @@ D2
 0 -1 3128
 S
 #3126
-Park Road~
-   You are on Park Road which continues north.  The Concourse is south of
-here.
+Southwatch Road~
+The park road approaches the southern concourse through a district of workshops and
+narrow homes. Wagon ruts mark the paving, but regular watch patrols keep the route
+orderly and clear.
 ~
 31 0 0 0 0 1
 D0
@@ -520,9 +543,11 @@ D2
 0 -1 3129
 S
 #3127
-On The Concourse~
-   You are at the southwest corner of the city wall.  The Concourse leads
-both north and east.
+The Southern Concourse~
+The broad concourse carries travelers along Midgaard's southern edge. Stone markers
+point toward the river promenade, civic quarter, graveyard, and the roads beyond the
+city. The northern districts lie behind while the route continues toward the southern
+gate.
 ~
 31 0 0 0 0 1
 D0
@@ -540,9 +565,10 @@ Through the South Gate you can see a small path leading southwards.
 0 -1 3504
 S
 #3128
-On The Concourse~
-   The Concourse continues both east and west.  Emerald Avenue is north of
-here.
+The Southern Concourse~
+The concourse stretches east and west in a wide band of fitted stone. Emerald Avenue
+joins from the north, bringing clerks, messengers, and well-dressed citizens down from
+the civic quarter. South-facing buildings grow older toward the graveyard wall.
 ~
 31 0 0 0 0 1
 D0
@@ -559,9 +585,10 @@ D3
 0 -1 3127
 S
 #3129
-On The Concourse~
-   The Concourse continues both east and west.  Park Road is north of here
-and an iron grate leads south to the graveyard.
+The Southern Concourse~
+An old iron graveyard gate interrupts the southern wall here, its bars worked into
+simple lantern and vine shapes. Beyond it stand weathered stones and dark yews. The busy
+concourse continues past the solemn entrance without quite drowning out the chapel bell.
 ~
 31 0 0 0 0 1
 D0
@@ -583,9 +610,10 @@ D3
 0 -1 3128
 S
 #3130
-On The Concourse~
-   You are at the southeast corner of the city wall.  The Concourse leads
-both north and west.
+The Southern Concourse~
+The eastern reach of the concourse passes workshops, stables, and narrow merchants'
+houses before turning toward the outer districts. The paving is scarred by wagon wheels,
+yet the road remains one of southern Midgaard's main arteries.
 ~
 31 0 0 0 0 1
 D0
@@ -598,8 +626,10 @@ D3
 0 -1 3129
 S
 #3131
-Park Road~
-   You are at Park Road which continues north and south.
+Southwatch Road~
+This northern stretch of Southwatch Road meets the river promenade beneath a line of
+shade trees. The barracks lies farther south, and patrols often pause here to watch
+traffic entering the riverward district.
 ~
 31 0 0 0 0 1
 D0
@@ -613,8 +643,9 @@ D2
 S
 #3132
 Emerald Avenue~
-   You are at Emerald Avenue which continues north and south.  Penny Lane leads
-east from here.
+Emerald Avenue passes the heart of the civic quarter. Scribes hurry between offices with
+wax-sealed folios while minor officials exchange greetings beneath carved stone arches.
+Pennycress Lane opens away between older residential buildings.
 ~
 31 0 0 0 0 1
 D0
@@ -632,8 +663,9 @@ D2
 S
 #3133
 Emerald Avenue~
-   You are standing at a bend on Emerald Avenue.  To the east the road goes on
-and to the south is the Road Crossing.
+The avenue broadens as it approaches the Skychain Crossing. From here the impossible
+chain can be seen rising beyond the rooftops, a dark line against the sky. Civic
+buildings give way to inns, homes, and small counting houses.
 ~
 31 0 0 0 0 1
 D1
@@ -647,8 +679,9 @@ D2
 S
 #3134
 Emerald Avenue~
-   You are standing at a bend on Emerald Avenue.  To the west the road goes on
-and to the north is the Road Crossing.
+At this bend the elegant avenue turns toward the Skychain Crossing. Green-gray paving
+stones meet older blocks worn pale by centuries, and iron lanterns hang from carved
+brackets at every corner.
 ~
 31 0 0 0 0 1
 D0
@@ -661,9 +694,10 @@ D3
 0 -1 3121
 S
 #3135
-Park Road~
-   You are at a bend on Park Road.  To the north the road goes on and to the
-east is the Road Crossing.
+Southwatch Road~
+Southwatch Road bends east toward the great crossing while continuing north beside the
+commons. A watch post built into a stone wall gives patrols a sheltered place to observe
+traffic moving between the civic and riverward districts.
 ~
 31 0 0 0 0 1
 D0
@@ -676,9 +710,10 @@ D1
 0 -1 3120
 S
 #3136
-Park Road~
-   You are at a bend on Park Road.  To the south the road goes on and to the
-west is the Road Crossing.
+Lantern Road~
+A narrower road leads east from the Skychain Crossing beneath closely spaced iron
+lanterns. Their glass panes bear tiny etched bridge symbols, a civic tradition meant to
+guide travelers safely home after dark.
 ~
 31 0 0 0 0 1
 D2
@@ -691,10 +726,11 @@ D3
 0 -1 3120
 S
 #3137
-The Waiting Room~
-   You are standing in the waiting room at the town hall.  Wooden chairs stand
-along the walls and a long desk with a typewriter is placed in the middle of
-the room.
+@YThe Civic Hall Antechamber@n~
+Benches line the paneled walls of Midgaard's civic antechamber. Petitioners wait beneath
+painted shields representing the city's wards while a long oak clerk's desk occupies the
+center of the room. Ledgers, quills, sand shakers, and stacks of wax-sealed petitions
+replace the noise of the streets outside.
 ~
 31 8 0 0 0 0
 D1
@@ -708,8 +744,10 @@ The exit west leads to Emerald Avenue.
 ~
 0 -1 3117
 E
-chair chairs~
-   Not the very least comfortable.
+typewriter~
+   It is an ancient Quifatronic T-1000 mk I.  These machines are known for their
+incredible durability, and for their even more incredible weight.  They make a
+Cray II look like a laptop.
 ~
 E
 desk~
@@ -717,18 +755,16 @@ desk~
 Everything can be stored on its top.
 ~
 E
-typewriter~
-   It is an ancient Quifatronic T-1000 mk I.  These machines are known for their
-incredible durability, and for their even more incredible weight.  They make a
-Cray II look like a laptop.
+chair chairs~
+   Not the very least comfortable.
 ~
 S
 #3138
-The Mayor's Office~
-   You are in the not very big office of the Mayor of Midgaard.  A large and
-polished but completely empty desk is standing in front of an armchair that
-looks so comfortable that it most of all resembles a bed with the head end
-raised slightly.
+@Y==[ @WThe Lord Mayor's Chamber @Y]==@n~
+Tall windows admit measured light across maps, ledgers, and a broad oak council table.
+The crowned bridge of Midgaard hangs behind the mayor's chair, flanked by banners of the
+northern and southern wards. Nothing here is ostentatious, but every detail speaks of a
+city accustomed to surviving trouble.
 ~
 31 8 0 0 0 0
 D3
@@ -737,21 +773,22 @@ The waiting room is to the west.
 ~
 0 -1 3137
 E
-desk~
-   This desk is obviously very old.  Nevertheless it looks as if has never been
-used.
-~
-E
 chair armchair~
    This chair is really a masterpiece.  A chair where one can sit as comfortably
 as in a bed.  All auditoriums should be equipped with these things.  A shame
 that there wouldn't be room for the students too, though.
 ~
+E
+desk~
+   This desk is obviously very old.  Nevertheless it looks as if has never been
+used.
+~
 S
 #3139
-Penny Lane~
-   You are on Penny Lane.  Emerald Avenue is to the west and Penny Lane
-continues in eastward direction.
+Pennycress Lane~
+A narrow lane leaves Emerald Avenue between old brick and timber houses. Pennycress
+grows in cracks along the walls, giving the street its local name. Children, servants,
+and tradesfolk use the lane as a quieter route through the civic quarter.
 ~
 31 0 0 0 0 1
 D1
@@ -764,8 +801,10 @@ D3
 0 -1 3132
 S
 #3140
-Penny Lane~
-   You are on Penny Lane.  The narrow road continues north and west.
+Pennycress Lane~
+The lane turns between closely built homes whose upper stories nearly meet above the
+road. Small shrines, hanging baskets, and carved door charms make each threshold
+distinct despite the cramped stonework.
 ~
 31 0 0 0 0 1
 D0
@@ -778,8 +817,10 @@ D3
 0 -1 3139
 S
 #3141
-The End Of Penny Lane~
-   You are at the end of Penny Lane.  The only exit appears to be south.
+Pennycress Court~
+Pennycress Lane ends in a small residential court centered on an old rain cistern.
+Laundry lines, herb boxes, and worn stools suggest a close neighborhood where doors
+remain open during daylight and everyone knows who belongs.
 ~
 31 0 0 0 0 1
 D2
@@ -788,10 +829,10 @@ D2
 0 -1 3140
 S
 #3150
-A Gravel Road In The Graveyard~
-   You are on a well-kept gravel road that leads north-south through the
-graveyard.  On both sides of the road grow dark evergreen trees.  An iron
-grate is to the north.
+@wThe Gate of Last Lantern Rest@n~
+Beyond the iron gate, city noise falls away among leaning grave markers and dark yews. A
+gravel road winds through the burial ground toward a small stone chapel. Simple lantern
+emblems appear on many stones, the old Midgaard symbol for a soul guided safely beyond.
 ~
 31 0 0 0 0 2
 D0
@@ -806,9 +847,10 @@ The gravel road continues southward.
 0 -1 3151
 S
 #3151
-A Gravel Road In The Graveyard~
-   You are on a well-kept gravel road that leads north-south through the
-graveyard.  On both sides of the road grow dark evergreen trees.
+A Gravel Way Through Last Lantern Rest~
+Pale gravel crunches between rows of weathered stones. Some graves bear fresh flowers
+while others have sunk almost level with the earth. Yew branches knit overhead,
+filtering daylight into quiet patches.
 ~
 31 0 0 0 0 2
 D0
@@ -823,9 +865,10 @@ The gravel road continues southward.
 0 -1 3152
 S
 #3152
-A Gravel Road In The Graveyard~
-   You are on a well-kept gravel road that leads north-south through the
-graveyard.  On both sides of the road grow dark evergreen trees.
+A Gravel Way Through Last Lantern Rest~
+The graveyard road curves past older family plots enclosed by low iron rails. Moss
+covers many names, though small votive lamps show that the forgotten dead are not
+entirely without visitors.
 ~
 31 0 0 0 0 2
 D0
@@ -840,9 +883,10 @@ The gravel road continues southward.
 0 -1 3153
 S
 #3153
-A Gravel Road In The Graveyard~
-   You are on a well-kept gravel road that leads north-south through the
-graveyard.  On both sides of the road grow dark evergreen trees.
+A Gravel Way Through Last Lantern Rest~
+The chapel rises ahead beyond a final row of graves, its narrow bell tower dark against
+the sky. The gravel path is swept clean here, and a few simple benches offer mourners a
+place to sit beneath the yews.
 ~
 31 0 0 0 0 1
 D0
@@ -858,9 +902,10 @@ building.
 0 -1 3154
 S
 #3154
-In Front Of The Chapel~
-   You are on an open space before a small chapel.  A gravel road leads north
-through the graveyard and the chapel entrance is to the south.
+@w-=< @WChapel of the Last Lantern @w>=-@n~
+A modest stone chapel stands among the oldest graves of southern Midgaard. Its arched
+doorway is carved with a single lantern surrounded by seven stars. Melted candle wax
+marks the steps where citizens have left lights for the dead before entering.
 ~
 31 0 0 0 0 2
 D0
@@ -875,10 +920,11 @@ door~
 1 -1 3155
 S
 #3155
-Inside The Chapel~
-   You are in a small, dark chapel.  The dark brown glass in the tiny windows
-do not let much light through.  A few rows of worn wooden benches stand here
-and an ancient altar sits in the middle of the floor.
+@wInside the Chapel of the Last Lantern@n~
+Rows of dark wooden pews face a simple stone altar where a silver lantern burns behind
+clear glass. Names of the city's dead are recorded in heavy memorial books along one
+wall. The air smells of beeswax, old stone, and faint incense, and even whispered words
+seem to settle gently here.
 ~
 31 9 0 0 0 0
 D0
@@ -887,8 +933,8 @@ The chapel door is made of dark wood.
 door~
 1 -1 3154
 E
-glass windows~
-   The windows must be meant to be dark.  At least they are completely clean.
+benches rows~
+   The benches are not of the comfortable kind.
 ~
 E
 altar~
@@ -897,8 +943,8 @@ notice that it seems less dusty than the rest of the room...  Someone must clean
 here regularly...  Maybe that old guy in Park Cafe, he looked like that sort...
 ~
 E
-benches rows~
-   The benches are not of the comfortable kind.
+glass windows~
+   The windows must be meant to be dark.  At least they are completely clean.
 ~
 S
 $~

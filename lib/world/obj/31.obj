@@ -1,31 +1,31 @@
 #3100
-cup tea~
-a cup~
-A cup has been set here.~
+cup willow tea herbal~
+@ga cup of Willow Cup herbal tea@n~
+@gA steaming cup of fragrant herbal tea rests here.@n~
 ~
 17 0 0 0 0 a 0 0 0 0 0 0 0
 8 8 11 0
-13 5000 1 0 0
+13 3 1 0 0
 E
 cup~
    It is a small simple cup.
 ~
 #3101
-cup coffee~
-a cup~
-A cup has been set here.~
+cup willow coffee roasted~
+a cup of dark roasted brew~
+A warm cup of dark roasted brew has been left here.~
 ~
 17 0 0 0 0 a 0 0 0 0 0 0 0
 8 8 12 0
-13 7000 1 0 0
+13 4 1 0 0
 E
 cup~
    It is a small simple cup.
 ~
 #3102
-cup water~
-a cup~
-A cup has been set here.~
+cup water riverward clear~
+a cup of clear spring water~
+A clean clay cup holds cool spring water here.~
 ~
 17 0 0 0 0 a 0 0 0 0 0 0 0
 12 12 15 0
@@ -35,27 +35,27 @@ cup~
    It is a large simple cup.
 ~
 #3103
-bottle water~
-a bottle~
-A bottle of Evian natural spring water is here.~
+bottle water spring sealed~
+a stoppered bottle of spring water~
+A stoppered glass bottle of clear spring water lies here.~
 ~
 17 0 0 0 0 a 0 0 0 0 0 0 0
 24 24 15 0
 29 5 6 0 0
-E
-bottle~
-   It is a large, clean bottle.  There is a large label pasted on the side.
-~
 E
 label~
    You've been ripped off!  It says here at the bottom of the label, in really
 really small letters, 'Bottled in the Midgaard branch of Evian Inc.  This water
 is from the natural, mostly clean River of Midgaard.  '
 ~
+E
+bottle~
+   It is a large, clean bottle.  There is a large label pasted on the side.
+~
 #3104
-canteen water~
-a canteen~
-A canteen has been set on the ground here.~
+canteen water leather travel~
+a leather-bound water canteen~
+A sturdy leather-bound canteen has been set down here.~
 ~
 17 0 0 0 0 a 0 0 0 0 0 0 0
 80 80 15 0
@@ -65,74 +65,74 @@ canteen~
    It is a fairly big canteen.  Looks like it can hold a lot of liquid.
 ~
 #3105
-key iron~
-an iron key~
-An iron key has been left here.~
+key iron southwatch barracks~
+an iron Southwatch key~
+A heavy iron key stamped with the Southwatch shield lies here.~
 ~
 18 c 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-1 1000 10 0 0
+1 0 10 0 0
 E
 key iron~
    The iron key is not special.  In fact, it is quite boring.
 ~
 #3106
-key rusty~
-a rusty key~
-A rusty key has been left here.~
+key rusty graveyard gate lantern rest~
+a weathered graveyard key~
+A weathered iron key darkened by age has been left here.~
 ~
 18 c 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-1 1000 10 0 0
+1 0 10 0 0
 E
 key rusty~
    The key is a fairly large rusty key.  You notice a lot of dirt it.
 ~
 #3107
-key wooden~
-a wooden key~
-A wooden key has been left here.~
+key wooden desk southwatch~
+a carved wooden desk key~
+A small wooden-handled key lies here.~
 ~
 18 c 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-1 1000 10 0 0
+1 0 10 0 0
 E
 key wooden~
    The wooden key is not special.  In fact it is just about the most boring key
 you've ever seen in your life.
 ~
 #3108
-key brass~
-a brass key~
-A brass key has been left here.~
+key brass safe southwatch~
+a brass strongbox key~
+A small brass key with a squared bow lies here.~
 ~
 18 c 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-1 1000 10 0 0
+1 0 10 0 0
 E
 key brass~
    The brass key is small and looks like it fits a very complicated lock.
 ~
 #3109
-desk drawer~
-the desk~
-A desk is set against the western wall.~
+desk oak southwatch records~
+the Southwatch duty desk~
+A scarred oak duty desk stands against the wall.~
 ~
 15 0 0 0 0 0 0 0 0 0 0 0 0
 34 15 3107 0
 0 0 0 0 0
 E
-drawer~
-   You notice a keyhole in the drawer.
-~
-E
 desk~
    The desk looks very sparse, there is a drawer in the left side.
 ~
+E
+drawer~
+   You notice a keyhole in the drawer.
+~
 #3110
-safe~
-the safe~
-A safe is placed in a dark corner of the room.~
+safe strongbox southwatch iron~
+the Southwatch iron strongbox~
+A squat iron strongbox occupies a guarded corner.~
 ~
 15 0 0 0 0 0 0 0 0 0 0 0 0
 34 15 3108 0
@@ -142,9 +142,9 @@ safe~
    The safe is very heavy and has a keyhole.
 ~
 #3111
-bench~
-the Bench~
-A white-painted wooden bench is standing here.~
+bench riverward stone wood~
+a riverward bench~
+A sturdy wooden bench faces the river.~
 ~
 12 0 0 0 0 0 0 0 0 0 0 0 0
 0 0 0 0
@@ -156,13 +156,13 @@ towards the river so you can sit and watch the river and the houses on the other
 side.
 ~
 #3112
-key city~
-the City Key~
-The very big City Key is lying here.~
+key city great ceremonial midgaard~
+@Ythe great key of Midgaard@n~
+@YA massive ceremonial city key rests here, chased with old brass.@n~
 ~
 18 c 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-30 1000000 50 0 0
+30 0 50 0 0
 E
 key city~
    It is probably the biggest key you have seen in your life.  It is made from
@@ -170,9 +170,9 @@ polished gold and has various patterns on it along with the Midgaard Coat of
 Arms.
 ~
 #3113
-fountain water~
-a fountain~
-A small white fountain is standing here, gurgling happily.~
+fountain mirrorwater stone water~
+@ca white-stone fountain@n~
+@cA white-stone fountain sends clear water into the pond.@n~
 ~
 23 0 0 0 0 0 0 0 0 0 0 0 0
 999 999 15 0
@@ -182,38 +182,38 @@ fountain water~
    It is very nice.  Made from fine white marble.
 ~
 #3114
-coins gold~
-a small pile of gold coins~
-A small pile of gold coins lies here.~
+coins gold purse civic~
+a small purse of civic coin~
+A small purse of stamped Midgaard coins lies here.~
 ~
 20 0 0 0 0 a 0 0 0 0 0 0 0
 37 0 0 0
-1 1000 0 0 0
+1 0 0 0 0
 #3115
-gold coins~
-the gold~
-A lot of gold is here.~
+gold coins reserve treasury southwatch~
+the Southwatch reserve coin~
+A secured reserve of Midgaard coin has been gathered here.~
 ~
 20 0 0 0 0 a 0 0 0 0 0 0 0
 1000 0 0 0
-1 1000000 0 0 0
+1 0 0 0 0
 #3116
-candlestick candle stick pewter~
-a candlestick~
-A pewter candlestick is standing here.~
+candlestick candle lantern chapel silvered~
+@Wa silvered chapel candlestick@n~
+@WA silvered candlestick casts a steady devotional light here.@n~
 ~
 1 0 0 0 0 ao 0 0 0 0 0 0 0
 0 0 24 0
-5 150000 10 0 0
+5 20 10 0 0
 E
 candlestick~
    It is a rather old-looking three-armed candlestick made from pewter.  Its
 candles are a yellowish white color.
 ~
 #3117
-tree elm~
-an elm tree~
-An old elm tree grows here.~
+elm tree old commons shade~
+an old commons elm~
+An old elm spreads a broad canopy of shade overhead.~
 ~
 13 0 0 0 0 0 0 0 0 0 0 0 0
 0 0 0 0

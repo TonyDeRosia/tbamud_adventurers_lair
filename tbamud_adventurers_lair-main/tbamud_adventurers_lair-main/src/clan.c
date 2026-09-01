@@ -1,0 +1,286 @@
+#include "conf.h"
+#include "sysdep.h"
+
+#include "structs.h"
+#include "utils.h"
+#include "comm.h"
+#include "db.h"
+#include "clan.h"
+#include "modify.h"
+static struct clan_data *clan_list = NULL;
+
+
+static int normalize_pvp_type(int v)
+{
+  if (v == CLAN_PVP_ALWAYS) return CLAN_PVP_ALWAYS;
+  if (v == CLAN_PVP_TOGGLE) return CLAN_PVP_TOGGLE;
+  return CLAN_PVP_NO_PVP;
+}
+
+static void clan_free_all(void)
+{
+  struct clan_data *c, *n;
+  for (c = clan_list; c; c = n) {
+    n = c->next;
+    free(c);
+  }
+  clan_list = NULL;
+}
+
+static struct clan_data *clan_by_id(int clan_id)
+{
+  struct clan_data *c;
+  if (clan_id <= 0)
+    return NULL;
+
+  for (c = clan_list; c; c = c->next)
+    if (c->id == clan_id)
+      return c;
+
+  return NULL;
+}
+
+int clan_save_all(void)
+{
+  FILE *fl;
+  struct clan_data *c;
+  char name_save[CLAN_NAME_LEN];
+  char display_save[CLAN_DISPLAY_LEN];
+
+  fl = fopen("misc/clans.dat", "w");
+  if (!fl)
+    return 0;
+
+  for (c = clan_list; c; c = c->next) {
+    strlcpy(name_save, c->name, sizeof(name_save));
+    strlcpy(display_save, c->display_name, sizeof(display_save));
+
+    /* Store clan strings using @ codes to avoid raw tabs interfering with
+     * the tab-delimited save format. */
+    parse_tab(name_save);
+    parse_tab(display_save);
+
+        fprintf(fl, "%d\t%ld\t%s\t%s\t%d\n", c->id, c->leader_idnum, name_save, display_save, c->pvp_type);
+
+  }
+
+  fclose(fl);
+  return 1;
+}
+
+static void clan_add(int id, long leader_idnum, const char *name, const char *display_name, int pvp_type){
+  struct clan_data *c = calloc(1, sizeof(*c));
+  if (!c)
+    return;
+
+  c->id = id;
+  c->leader_idnum = leader_idnum;
+  c->pvp_type = normalize_pvp_type(pvp_type);
+  strlcpy(c->name, name ? name : "Unnamed", sizeof(c->name));
+  if (display_name && *display_name)
+    strlcpy(c->display_name, display_name, sizeof(c->display_name));
+  else
+    strlcpy(c->display_name, c->name, sizeof(c->display_name));
+  c->next = clan_list;
+  clan_list = c;
+}
+
+void clan_boot(void)
+{
+  FILE *fl;
+  char line[256];
+  int id = 0;
+  long leader = 0;
+  int pvp_type = CLAN_PVP_NO_PVP;
+  char name[128];
+  char display_name[128];
+
+  clan_free_all();
+
+  fl = fopen("misc/clans.dat", "r");
+  if (!fl) {
+    mudlog(NRM, LVL_GOD, TRUE, "SYSERR: clan_boot: could not open misc/clans.dat");
+    return;
+  }
+
+  while (fgets(line, sizeof(line), fl)) {
+    if (!*line || line[0] == '#')
+      continue;
+
+        name[0] = '\0';
+    display_name[0] = '\0';
+    pvp_type = CLAN_PVP_NO_PVP;
+
+    /* Format: id<TAB>leader<TAB>name<TAB>display_name<TAB>pvp_type
+       Older files may omit pvp_type; default is NO_PVP. */
+    if (sscanf(line, "%d\t%ld\t%127[^\t]\t%127[^\t]\t%d", &id, &leader, name, display_name, &pvp_type) >= 4 ||
+        sscanf(line, "%d\t%ld\t%127[^\t]\t%127[^\r\n]", &id, &leader, name, display_name) >= 3 ||
+        sscanf(line, "%d %ld %127s %127s %d", &id, &leader, name, display_name, &pvp_type) >= 4 ||
+        sscanf(line, "%d %ld %127s %127s", &id, &leader, name, display_name) >= 3) {
+      parse_at(name);
+      parse_at(display_name);
+
+      if (id > 0 && *name)
+        clan_add(id, leader, name, *display_name ? display_name : NULL, pvp_type);
+    }
+}
+
+  fclose(fl);
+  mudlog(NRM, LVL_GOD, TRUE, "Clan system: loaded clans");
+}
+
+void clan_shutdown(void)
+{
+  clan_save_all();
+  clan_free_all();
+}
+
+static void strip_clan_colors(char *dest, size_t destlen, const char *src)
+{
+  size_t di = 0;
+
+  if (!dest || destlen == 0)
+    return;
+
+  if (!src) {
+    *dest = '\0';
+    return;
+  }
+
+  for (size_t si = 0; src[si] && di + 1 < destlen; si++) {
+    /* Treat both the @X and \tX patterns as color codes and skip them. */
+    if (src[si] == '@') {
+      if (src[si + 1] == '@') {
+        dest[di++] = '@';
+        si++;
+      } else if (src[si + 1]) {
+        si++;
+      }
+      continue;
+    }
+
+    if (src[si] == '\t') {
+      if (src[si + 1])
+        si++;
+      continue;
+    }
+
+    dest[di++] = src[si];
+  }
+
+  dest[di] = '\0';
+}
+
+int clan_exists(int clan_id)
+{
+  return clan_by_id(clan_id) != NULL;
+}
+
+int clan_id_by_name(const char *name)
+{
+  struct clan_data *c;
+  char search_plain[CLAN_DISPLAY_LEN];
+
+  if (!name || !*name)
+    return 0;
+
+  strip_clan_colors(search_plain, sizeof(search_plain), name);
+
+  for (c = clan_list; c; c = c->next) {
+    if (!str_cmp(c->name, name) || !str_cmp(c->name, search_plain))
+      return c->id;
+
+    char display_plain[CLAN_DISPLAY_LEN];
+    strip_clan_colors(display_plain, sizeof(display_plain), c->display_name);
+
+    if (!str_cmp(display_plain, search_plain))
+      return c->id;
+  }
+
+  return 0;
+}
+
+const char *clan_name_by_id(int clan_id)
+{
+  struct clan_data *c = clan_by_id(clan_id);
+  if (!c)
+    return "None";
+  return c->name;
+}
+
+const char *clan_display_name_by_id(int clan_id)
+{
+  struct clan_data *c = clan_by_id(clan_id);
+  if (!c)
+    return "None";
+  if (c->display_name[0] != '\0')
+    return c->display_name;
+  return c->name;
+}
+
+int clan_next_id(void)
+{
+  int max_id = 0;
+  struct clan_data *c;
+  for (c = clan_list; c; c = c->next)
+    if (c->id > max_id)
+      max_id = c->id;
+  return max_id + 1;
+}
+
+int clan_create_and_save(int new_id, long leader_idnum, const char *name)
+{
+  if (new_id <= 0 || !name || !*name)
+    return 0;
+
+  clan_add(new_id, leader_idnum, name, name, CLAN_PVP_NO_PVP);
+  return clan_save_all();
+}
+
+int clan_set_name_and_save(int clan_id, const char *name)
+{
+  struct clan_data *c;
+
+  c = clan_by_id(clan_id);
+  if (!c || !name || !*name)
+    return 0;
+
+  strlcpy(c->name, name, sizeof(c->name));
+  return clan_save_all();
+}
+
+int clan_set_display_name_and_save(int clan_id, const char *display_name)
+{
+  struct clan_data *c;
+
+  c = clan_by_id(clan_id);
+  if (!c || !display_name || !*display_name)
+    return 0;
+
+  strlcpy(c->display_name, display_name, sizeof(c->display_name));
+  return clan_save_all();
+}
+
+const char *clan_pvp_type_name(int pvp_type)
+{
+  switch (normalize_pvp_type(pvp_type)) {
+    case CLAN_PVP_ALWAYS: return "Always PvP";
+    case CLAN_PVP_TOGGLE: return "Toggle PvP";
+    default: return "No PvP";
+  }
+}
+
+int clan_pvp_type_by_id(int clan_id)
+{
+  struct clan_data *c = clan_by_id(clan_id);
+  if (!c) return CLAN_PVP_NO_PVP;
+  return normalize_pvp_type(c->pvp_type);
+}
+
+int clan_set_pvp_type_and_save(int clan_id, int pvp_type)
+{
+  struct clan_data *c = clan_by_id(clan_id);
+  if (!c) return 0;
+  c->pvp_type = normalize_pvp_type(pvp_type);
+  return clan_save_all();
+}

@@ -5,15 +5,15 @@ CircleMUD v3.0 Shop File~
 3102
 -1
 1.10
-0.90
+0.35
 -1
-%s I haven't got such a drink.~
-%s I see no such thing.~
-%s I do not buy, would you like a drink?~
-%s BUG, Please report.~
-%s You can't afford such a fine drink, try the Grubby Inn.~
-%s Fine, that'll be %d gold pieces.~
-%s Bug, please report (%d).~
+%s Mara checks the shelves and says, 'I'm afraid we're out of that just now.'~
+%s Mara glances over and says, 'You don't seem to have that with you.'~
+%s Mara shakes her head. 'I serve drinks and provisions here, not secondhand goods.'~
+%s Mara closes the coin box and says, 'I cannot make that purchase today.'~
+%s Mara smiles apologetically. 'You'll need a few more coins for that.'~
+%s Mara sets your order down carefully. 'That comes to %d gold pieces.'~
+%s Mara counts out %d gold pieces and slides them across the counter.~
 0
 6
 3100
