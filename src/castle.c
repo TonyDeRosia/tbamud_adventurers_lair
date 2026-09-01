@@ -1,26 +1,14 @@
 /**************************************************************************
 *  File: castle.c                                          Part of tbaMUD *
-*  Usage: Retired King's Castle special-procedure compatibility stub.     *
+*  Usage: Retired legacy King's Castle module.                            *
 *                                                                         *
-*  All rights reserved. See license for complete information.             *
-*                                                                         *
-*  CircleMUD is based on DikuMUD, Copyright (C) 1990, 1991.               *
+*  Area-specific NPC behavior is implemented with DG Scripts/world data.  *
 **************************************************************************/
 
-#include "conf.h"
-#include "sysdep.h"
-#include "structs.h"
-#include "spec_procs.h"
-
 /*
- * King's Castle legacy C behavior has been retired.
+ * Intentionally empty.
  *
- * Area-specific NPC behavior should be implemented with DG Scripts rather
- * than hardcoded SPECIAL() procedures. This function remains as a no-op
- * compatibility symbol so older declarations or build files that still
- * reference assign_kings_castle() do not cause linker failures.
+ * This translation unit remains only because the existing build system
+ * still compiles castle.c. The former King's Castle hardcoded SPECIAL()
+ * behavior has been removed.
  */
-void assign_kings_castle(void)
-{
-  /* Intentionally empty. */
-}

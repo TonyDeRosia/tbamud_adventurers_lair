@@ -221,10 +221,7 @@ static int is_service_or_protected_mob(struct char_data *mob)
     return TRUE;
 
   spec = GET_MOB_SPEC(mob);
-  if (spec == questmaster || spec == shop_keeper || spec == bank ||
-      spec == guild || spec == guild_guard || spec == cityguard ||
-      spec == pet_shops || spec == postmaster || spec == receptionist ||
-      spec == mayor) {
+  if (spec == questmaster || spec == shop_keeper || spec == guild || spec == postmaster || spec == receptionist ) {
     return TRUE;
   }
 

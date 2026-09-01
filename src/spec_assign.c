@@ -200,14 +200,6 @@ struct spec_func_data {
 };
 
 static struct spec_func_data spec_func_list[] = {
-  {"Mayor",          mayor },
-  {"Snake",          snake },
-  {"Thief",          thief },
-  {"Magic User",     magic_user },
-  {"Puff",           puff },
-  {"Fido",           fido },
-  {"Janitor",        janitor },
-  {"Cityguard",      cityguard },
   {"Postmaster",     postmaster },
   {"Receptionist",   receptionist },
   {"Bulletin Board", gen_board },
@@ -215,7 +207,6 @@ static struct spec_func_data spec_func_list[] = {
   {"Pet Shop",       pet_shops },
   {"Dump",           dump },
   {"Guildmaster",    guild },
-  {"Guild Guard",    guild_guard },
   {"Questmaster",    questmaster },
   {"Shopkeeper",     shop_keeper },
   {"\n", NULL}
