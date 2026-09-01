@@ -77,36 +77,210 @@ end
 Cindervale - Greenblood Forest Ambient~
 0 b 9
 ~
-emote crouches to study a footprint, then scratches a warning mark into the bark.
+if !%self.fighting%
+  switch %random.8%
+    case 1
+      emote crouches to study a footprint, then scratches a warning mark into the bark.
+    break
+    case 2
+      emote freezes at a distant sound and slowly lowers one hand toward a crude blade.
+    break
+    case 3
+      emote checks a strip of cloth tied around a low branch and quietly changes direction.
+    break
+    case 4
+      say Big tracks again. Too big. Always too big lately.
+    break
+    case 5
+      emote sniffs the wind, grimaces, and spits into the leaves.
+    break
+    case 6
+      say Keep low. Loud feet get eaten first.
+    break
+    case 7
+      emote peers through the brush, then gestures sharply for silence.
+    break
+    case 8
+      say Roads are for folk who want to be seen.
+    break
+  done
+end
 ~
 #3507
 Cindervale - Emberfang Reaver Ambient~
 0 b 8
 ~
-emote rolls one broad shoulder and tests the edge of the jagged cleaver with a claw.
+if !%self.fighting%
+  switch %random.8%
+    case 1
+      emote rolls one broad shoulder and tests the edge of the jagged cleaver with a claw.
+    break
+    case 2
+      emote bares yellow teeth in a humorless grin at something only he can hear.
+    break
+    case 3
+      emote kicks aside a broken branch and deliberately leaves the trail scarred behind him.
+    break
+    case 4
+      say Weak things hide. Strong things take.
+    break
+    case 5
+      emote snorts and pounds one fist against his scarred chest.
+    break
+    case 6
+      say This trail belongs to whoever can keep it.
+    break
+    case 7
+      emote drags the cleaver edge across a stone with a harsh scrape.
+    break
+    case 8
+      say If something wants this ground, let it come argue.
+    break
+  done
+end
 ~
 #3508
 Cindervale - Emberfang Hunter Ambient~
 0 b 10
 ~
-emote lowers his muzzle to the earth, following a scent across the trail before looking up sharply.
+if !%self.fighting%
+  switch %random.9%
+    case 1
+      emote lowers his muzzle to the earth, following a scent across the trail before looking up sharply.
+    break
+    case 2
+      emote touches two claw marks on a tree and studies how fresh the sap still looks.
+    break
+    case 3
+      emote pauses with one ear turned toward the deeper woods.
+    break
+    case 4
+      emote tests the wind and quietly circles downwind.
+    break
+    case 5
+      say Something wounded passed here.
+    break
+    case 6
+      emote checks a bone hook at his belt and disappears briefly into the brush.
+    break
+    case 7
+      say The forest tells you plenty if you stop making noise.
+    break
+    case 8
+      emote studies a snapped twig as carefully as another hunter might study a map.
+    break
+    case 9
+      say Fresh scent. Not far.
+    break
+  done
+end
 ~
 #3509
 Cindervale - Bristlehide Feral Ambient~
 0 b 9
 ~
-emote tears a strip of bark from a fire-scarred trunk and grinds it beneath one heavy hoof.
+if !%self.fighting%
+  switch %random.8%
+    case 1
+      emote tears a strip of bark from a fire-scarred trunk and grinds it beneath one heavy hoof.
+    break
+    case 2
+      emote roots angrily through the undergrowth, scattering stones and dead leaves.
+    break
+    case 3
+      emote scrapes one chipped tusk against a tree trunk.
+    break
+    case 4
+      emote snorts hard enough to send dust puffing from the trail.
+    break
+    case 5
+      say Move or be moved.
+    break
+    case 6
+      emote shoulders through a thorn bush without seeming to notice it.
+    break
+    case 7
+      emote stamps once and glares at the nearest movement.
+    break
+    case 8
+      say Too much talking. Not enough moving.
+    break
+  done
+end
 ~
 #3510
 Cindervale - Carrionwing Scavenger Ambient~
 0 b 12
 ~
-emote cocks its feathered head and quickly palms some tiny glittering scrap from the ground.
+if !%self.fighting%
+  switch %random.10%
+    case 1
+      emote cocks its feathered head and quickly palms some tiny glittering scrap from the ground.
+    break
+    case 2
+      emote turns a bent copper bit over between two clawed fingers.
+    break
+    case 3
+      emote watches the nearest pack with open professional interest.
+    break
+    case 4
+      emote hops onto a stump for a better view of the trail.
+    break
+    case 5
+      say Shiny things belong to whoever sees them first.
+    break
+    case 6
+      emote tucks a colored shard of glass somewhere beneath its ragged mantle.
+    break
+    case 7
+      say Dead folk rarely complain about missing buttons.
+    break
+    case 8
+      emote clicks its beak twice while considering something in the dirt.
+    break
+    case 9
+      say If you dropped it, clearly you did not need it.
+    break
+    case 10
+      emote glances from one traveler to another as if silently estimating resale value.
+    break
+  done
+end
 ~
 #3511
 Cindervale - Cinder Wyvern Predator Ambient~
 0 b 8
 ~
-emote spreads its soot-dark wings and lashes its hooked tail, black venom glistening on the spurs.
+if !%self.fighting%
+  switch %random.9%
+    case 1
+      emote spreads its soot-dark wings and lashes its hooked tail, black venom glistening on the spurs.
+    break
+    case 2
+      emote lowers its horned head and tastes the air with a forked tongue.
+    break
+    case 3
+      emote gives a dry rasping hiss and flexes its talons against the earth.
+    break
+    case 4
+      emote snaps its jaws at a drifting leaf and shreds it without effort.
+    break
+    case 5
+      emote suddenly looks skyward, muscles tightening beneath rust-red scales.
+    break
+    case 6
+      emote drags one venom spur across a stone, leaving a dark wet line.
+    break
+    case 7
+      emote circles restlessly, watching every nearby movement like prey.
+    break
+    case 8
+      emote folds its wings tightly and crouches with predatory patience.
+    break
+    case 9
+      emote releases a low clicking growl from deep in its throat.
+    break
+  done
+end
 ~
 $~

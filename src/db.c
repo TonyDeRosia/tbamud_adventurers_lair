@@ -763,6 +763,30 @@ void boot_db(void)
     assign_rooms();
     log("   Questmasters.");
     assign_the_quests();
+
+    /*
+     * Adventurer's Lair:
+     * Old world files can retain MOB_SPEC after a legacy hardcoded special
+     * procedure has been retired.  Once all legitimate special assignments
+     * are complete, clear MOB_SPEC only on prototypes that have no callable
+     * function.  This prevents every reset/load from creating mobs that try
+     * to invoke a non-existent special while preserving real specials.
+     */
+    {
+      mob_rnum i;
+      int cleared_stale_specs = 0;
+
+      for (i = 0; i <= top_of_mobt; i++) {
+        if (MOB_FLAGGED(&mob_proto[i], MOB_SPEC) && mob_index[i].func == NULL) {
+          REMOVE_BIT_AR(MOB_FLAGS(&mob_proto[i]), MOB_SPEC);
+          cleared_stale_specs++;
+        }
+      }
+
+      if (cleared_stale_specs > 0)
+        log("   Cleared stale MOB_SPEC flag from %d mob prototype%s.",
+            cleared_stale_specs, cleared_stale_specs == 1 ? "" : "s");
+    }
   }
 
   log("Assigning spell and skill levels.");
@@ -4018,21 +4042,24 @@ static int check_object(struct obj_data *obj)
 
   switch (GET_OBJ_TYPE(obj)) {
   case ITEM_DRINKCON:
-  {
-    char onealias[MAX_INPUT_LENGTH], *space = strrchr(obj->name, ' ');
-
-    strlcpy(onealias, space ? space + 1 : obj->name, sizeof(onealias));
-    if (search_block(onealias, drinknames, TRUE) < 0 && (error = TRUE))
-      log("SYSERR: Object #%d (%s) doesn't have drink type as last keyword. (%s)",
-		GET_OBJ_VNUM(obj), obj->short_description, obj->name);
-  }
-  /* Fall through. */
   case ITEM_FOUNTAIN:
-    if ((GET_OBJ_VAL(obj,0) > 0) && (GET_OBJ_VAL(obj, 1) > GET_OBJ_VAL(obj, 0)
-        && (error = TRUE)))
+    /*
+     * Adventurer's Lair:
+     * Liquid identity is stored in value 2. Object keywords are builder-facing
+     * aliases only and no longer need to contain the liquid name in any
+     * particular position.
+     */
+    if ((GET_OBJ_VAL(obj, 2) < 0 || GET_OBJ_VAL(obj, 2) >= NUM_LIQ_TYPES)
+        && (error = TRUE))
+      log("SYSERR: Object #%d (%s) has invalid liquid type %d.",
+          GET_OBJ_VNUM(obj), obj->short_description, GET_OBJ_VAL(obj, 2));
+
+    if ((GET_OBJ_VAL(obj, 0) > 0) &&
+        (GET_OBJ_VAL(obj, 1) > GET_OBJ_VAL(obj, 0)) &&
+        (error = TRUE))
       log("SYSERR: Object #%d (%s) contains (%d) more than maximum (%d).",
-		GET_OBJ_VNUM(obj), obj->short_description,
-		GET_OBJ_VAL(obj, 1), GET_OBJ_VAL(obj, 0));
+          GET_OBJ_VNUM(obj), obj->short_description,
+          GET_OBJ_VAL(obj, 1), GET_OBJ_VAL(obj, 0));
     break;
   case ITEM_SCROLL:
   case ITEM_POTION:

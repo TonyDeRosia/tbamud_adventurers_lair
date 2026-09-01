@@ -986,40 +986,23 @@ void weight_change_object(struct obj_data *obj, int weight)
 
 void name_from_drinkcon(struct obj_data *obj)
 {
-  const char *liqname;
-  char *new_name;
-
-  if (!obj || (GET_OBJ_TYPE(obj) != ITEM_DRINKCON && GET_OBJ_TYPE(obj) != ITEM_FOUNTAIN))
-    return;
-
-  if (obj->name == obj_proto[GET_OBJ_RNUM(obj)].name)
-    obj->name = strdup(obj_proto[GET_OBJ_RNUM(obj)].name);
-
-  liqname = drinknames[GET_OBJ_VAL(obj, 2)];
- 
-  remove_from_string(obj->name, liqname);
-  new_name = right_trim_whitespace(obj->name);
-  free(obj->name);
-  obj->name = new_name;
- 
+  /*
+   * Adventurer's Lair:
+   * Liquid type lives in GET_OBJ_VAL(obj, 2). Emptying a container must not
+   * rewrite builder-authored object aliases.
+   */
+  (void)obj;
 }
-
 void name_to_drinkcon(struct obj_data *obj, int type)
 {
-  char *new_name;
-
-  if (!obj || (GET_OBJ_TYPE(obj) != ITEM_DRINKCON && GET_OBJ_TYPE(obj) != ITEM_FOUNTAIN))
-    return;
-
-  CREATE(new_name, char, strlen(obj->name) + strlen(drinknames[type]) + 2);
-  sprintf(new_name, "%s %s", obj->name, drinknames[type]); /* sprintf: OK */
-
-  if (GET_OBJ_RNUM(obj) == NOTHING || obj->name != obj_proto[GET_OBJ_RNUM(obj)].name)
-    free(obj->name);
-
-  obj->name = new_name;
+  /*
+   * Adventurer's Lair:
+   * Filling a container must not append the liquid name to its keyword list.
+   * Drink/fill/pour behavior uses the object's numeric liquid type instead.
+   */
+  (void)obj;
+  (void)type;
 }
-
 ACMD(do_drink)
 {
   char arg[MAX_INPUT_LENGTH];

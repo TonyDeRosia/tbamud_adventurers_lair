@@ -45,7 +45,7 @@ Zone31 Captain Dain Southwatch Ambient~
 0 b 5
 ~
 if !%self.fighting%
-  switch %random.4%
+  switch %random.10%
     case 1
       emote runs a finger down the patrol roster and makes a short notation.
     break
@@ -53,10 +53,28 @@ if !%self.fighting%
       emote checks the ring of secured keys at his belt.
     break
     case 3
-      say Keep the commons quiet, keep the southern gate watched, and keep your eyes open.
+      emote studies the duty board before glancing toward the barracks door.
     break
     case 4
-      emote studies the duty board before glancing toward the barracks door.
+      emote quietly reviews a stack of incident reports.
+    break
+    case 5
+      emote pauses over a report, frowns, and adds a short note in the margin.
+    break
+    case 6
+      say A good watch prevents trouble before steel ever leaves the sheath.
+    break
+    case 7
+      say Discipline first. Courage is much easier after that.
+    break
+    case 8
+      say Quiet streets do not stay quiet by accident.
+    break
+    case 9
+      emote listens to the street outside for several seconds before returning to the roster.
+    break
+    case 10
+      say A patrol that stops paying attention is just a group of people taking a walk.
     break
   done
 end
@@ -66,21 +84,54 @@ Zone31 Southwatch Guardsman Ambient~
 0 b 2
 ~
 if !%self.fighting%
-  switch %random.5%
+  switch %random.16%
     case 1
       emote checks the strap of a well-used patrol shield.
     break
     case 2
-      emote exchanges a quiet word with another watchman about the next patrol.
+      emote scans the street, lingering on doorways and narrow alleys.
     break
     case 3
-      emote scans the doorway and nearby windows with practiced attention.
-    break
-    case 4
       emote adjusts the blue-and-silver tabard over serviceable mail.
     break
+    case 4
+      emote taps a gloved thumb against the pommel of a short blade.
+    break
     case 5
-      say Southwatch road is clear. Keep it that way.
+      emote checks the oil level in a small patrol lantern.
+    break
+    case 6
+      emote rubs one stiff shoulder and mutters something about another long watch.
+    break
+    case 7
+      emote checks the paving for wagon damage before looking back up the road.
+    break
+    case 8
+      emote shifts position to get a clearer view of the street.
+    break
+    case 9
+      say Keep the road clear and we will get along just fine.
+    break
+    case 10
+      say Behave yourself and the watch will have no reason to remember your face.
+    break
+    case 11
+      say Keep the peace. The dungeon is a miserable place to spend the night.
+    break
+    case 12
+      say Travelers are welcome. Trouble is not.
+    break
+    case 13
+      say Save the brawling for somewhere outside the city walls.
+    break
+    case 14
+      say Keep your hands to yourself and your weapon in its sheath.
+    break
+    case 15
+      emote watches a passerby for a moment, then returns to scanning the street.
+    break
+    case 16
+      say Make my watch boring and we will both have a better day.
     break
   done
 end
@@ -260,6 +311,298 @@ switch %random.5%
   case 5
     %echo% Somewhere far above, one enormous chain link knocks softly against another with a distant bell-like tone.
   break
+done
+~
+#3112
+Zone31 Southwatch Law Response~
+0 b 100
+~
+if %self.fighting%
+  halt
+end
+set here %self.room.people%
+while %here%
+  set next %here.next_in_room%
+  if %here.is_pc%
+    if %here.is_killer%
+      switch %random.16%
+        case 1
+          say STOP! MURDERER!
+        break
+        case 2
+          say You will not get away, murderer!
+        break
+        case 3
+          say Throw down your weapon and surrender!
+        break
+        case 4
+          say Watch! Murderer on the street!
+        break
+        case 5
+          say Stand down! You will answer for those deaths!
+        break
+        case 6
+          say Not another step! Surrender now!
+        break
+        case 7
+          say Bloodshed ends here. Drop the weapon!
+        break
+        case 8
+          say You are under arrest! Do not make this worse!
+        break
+        case 9
+          say The watch has you now! Stand down!
+        break
+        case 10
+          say Run if you like. You will still answer to the law!
+        break
+        case 11
+          say Murderer! On your knees!
+        break
+        case 12
+          say Enough running. Face the law!
+        break
+        case 13
+          say Stand down before someone else gets hurt!
+        break
+        case 14
+          say You have spilled enough blood!
+        break
+        case 15
+          say Watch to me! We have a murderer!
+        break
+        case 16
+          say This ends here. Surrender!
+        break
+      done
+      kill %here.name%
+      halt
+    elseif %here.is_thief%
+      switch %random.18%
+        case 1
+          say STOP! THIEF!
+        break
+        case 2
+          say Hold there! City watch!
+        break
+        case 3
+          say You! Hands where I can see them!
+        break
+        case 4
+          say Not another step, thief!
+        break
+        case 5
+          say You picked the wrong street to steal on!
+        break
+        case 6
+          say Drop what you took and surrender!
+        break
+        case 7
+          say Watch! Thief on the street!
+        break
+        case 8
+          say You will not outrun the watch!
+        break
+        case 9
+          say Easy now. Give yourself up before this gets worse.
+        break
+        case 10
+          say Theft earns chains. Surrender!
+        break
+        case 11
+          say Stop where you are and answer to the law!
+        break
+        case 12
+          say Last warning! Stand down!
+        break
+        case 13
+          say I saw that! Stop!
+        break
+        case 14
+          say Running only adds another bad decision to the first one!
+        break
+        case 15
+          say Thief! Do not make me chase you!
+        break
+        case 16
+          say Hands off the goods and hands where I can see them!
+        break
+        case 17
+          say The dungeon has room for thieves. Surrender!
+        break
+        case 18
+          say You are caught. Stop now!
+        break
+      done
+      kill %here.name%
+      halt
+    end
+  end
+  if %here.vnum% == 3103 && %here.fighting%
+    switch %random.10%
+      case 1
+        say Watch! To arms!
+      break
+      case 2
+        say Hold fast! I am with you!
+      break
+      case 3
+        say Southwatch! Together!
+      break
+      case 4
+        say Keep your footing! I have your side!
+      break
+      case 5
+        say On them! Do not let the line break!
+      break
+      case 6
+        say I am coming!
+      break
+      case 7
+        say Stay with it! Help is here!
+      break
+      case 8
+        say Watch, close in!
+      break
+      case 9
+        say Do not give them room!
+      break
+      case 10
+        say I have your flank!
+      break
+    done
+    assist %here.name%
+    halt
+  end
+  set here %next%
+done
+~
+#3113
+Zone31 Southwatch Commander Law Response~
+0 b 100
+~
+if %self.fighting%
+  halt
+end
+set here %self.room.people%
+while %here%
+  set next %here.next_in_room%
+  if %here.is_pc%
+    if %here.is_killer%
+      switch %random.12%
+        case 1
+          say Put the weapon down. This is your only warning.
+        break
+        case 2
+          say Enough. You are under arrest.
+        break
+        case 3
+          say Stand down. No one else needs to bleed today.
+        break
+        case 4
+          say You were given every opportunity to behave.
+        break
+        case 5
+          say Surrender now and face the law on your feet.
+        break
+        case 6
+          say The killing ends here.
+        break
+        case 7
+          say Watch, contain this one. No unnecessary bloodshed.
+        break
+        case 8
+          say Drop your weapon. I will not ask twice.
+        break
+        case 9
+          say Stand down. You have made enough mistakes for one day.
+        break
+        case 10
+          say Surrender. The magistrates can hear whatever excuse remains.
+        break
+        case 11
+          say Enough blood. Submit to the watch.
+        break
+        case 12
+          say Do not test whether I mean it. Surrender.
+        break
+      done
+      kill %here.name%
+      halt
+    elseif %here.is_thief%
+      switch %random.12%
+        case 1
+          say Stop. Return what you took and surrender.
+        break
+        case 2
+          say Do not run. You will only make the charge worse.
+        break
+        case 3
+          say Theft was foolish. Resisting the watch would be worse.
+        break
+        case 4
+          say Hands where I can see them. Now.
+        break
+        case 5
+          say You have been caught. Accept it with some dignity.
+        break
+        case 6
+          say Stand down and answer for the theft.
+        break
+        case 7
+          say Enough games. Surrender.
+        break
+        case 8
+          say The watch has seen you. Running will not change that.
+        break
+        case 9
+          say Put it back, surrender, and stop making this worse.
+        break
+        case 10
+          say You can explain yourself to the magistrates.
+        break
+        case 11
+          say Stop there. This ends without blood if you let it.
+        break
+        case 12
+          say Surrender now. I prefer paperwork to funerals.
+        break
+      done
+      kill %here.name%
+      halt
+    end
+  end
+  if %here.vnum% == 3103 && %here.fighting%
+    switch %random.8%
+      case 1
+        say Hold the line. I am with you.
+      break
+      case 2
+        say Keep your guard up.
+      break
+      case 3
+        say Watch, together now.
+      break
+      case 4
+        say Do not let them break past you.
+      break
+      case 5
+        say Steady. Finish this cleanly.
+      break
+      case 6
+        say Keep them contained.
+      break
+      case 7
+        say Stay disciplined. I have you.
+      break
+      case 8
+        say Watch your flank. Moving in.
+      break
+    done
+    assist %here.name%
+    halt
+  end
+  set here %next%
 done
 ~
 $~

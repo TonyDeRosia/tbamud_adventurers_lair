@@ -167,12 +167,12 @@ A small sword lies here.~
 0 1 6 11
 3 25 10 0 0
 E
-inscription~
-   It says: 'May this sword be a good companion.  '
-~
-E
 sword small~
    The small sword seems to have an inscription of some sort.
+~
+E
+inscription~
+   It says: 'May this sword be a good companion.  '
 ~
 A
 18 1
@@ -644,59 +644,11 @@ A broad wooden notice board covered in pinned notes hangs on the wall here.~
 0 0 0 0
 0 0 0 0 0
 E
-social bulletin~
-   Use 'look board' to read the board.
-~
-E
 adventurers notice board social bulletin~
 Pinned notices carry news, requests, warnings, and messages left by travelers from across the realm. Use 'look board' to read what has been posted.
 ~
-#3097
-boards frozen bulletin gen_boards~
-a frozen bulletin board~
-A large bulletin board is here, carved from a block of ice.~
-~
-13 0 0 0 0 0 0 0 0 0 0 0 0
-0 0 0 0
-0 0 0 0 0
 E
-freeze bulletin~
+social bulletin~
    Use 'look board' to read the board.
-~
-E
-board~
-   If you can read this, the board is not working.
-~
-#3098
-boards holy bulletin gen_boards~
-a holy bulletin board~
-A large bulletin board is mounted on a wall here.  It glows with a faint aura.~
-~
-13 0 0 0 0 0 0 0 0 0 0 0 0
-0 0 0 0
-0 0 0 0 0
-E
-holy bulletin~
-   Use 'look board' to read the board.
-~
-E
-board~
-   If you can read this, the board is not working.
-~
-#3099
-boards bulletin gen_boards~
-a bulletin board~
-A large bulletin board is mounted on a wall here.~
-~
-13 0 0 0 0 0 0 0 0 0 0 0 0
-0 0 0 0
-0 0 0 0 0
-E
-bulletin~
-   Use 'look board' to read the board.
-~
-E
-board~
-   If you can read this, the board is not working.
 ~
 $~
