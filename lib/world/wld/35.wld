@@ -1,417 +1,435 @@
 #3500
-The Plains~
-   You are standing on the plains.  This is a vast desolate place where
-the wind can howl undisturbed since nothing but you bars its way.  However
-you are not the first to wander here.  Before you somebody has left a small
-path.  The path looks rather bewildered and is not the kind of path to lead
-to anywhere significant or important but it seems to have made up its mind
-to enter the hills far away north.  A narrow trail scars its way off to the
-east as it leads up towards a hillside.
+@YThe Cindervale Crossroads@n~
+Old roads meet across a broad sweep of weathered grass and ash-gray soil. A
+stone marker leans at the center of the crossing, its carved arrows softened
+by rain and age. North and east the roads continue toward distant lands, while
+the southern way descends beneath the first fire-scarred trees of Cindervale.
 ~
 35 0 0 0 0 1
 D0
+The northern road climbs away from Cindervale toward the distant lands beyond the vale.
 ~
 ~
 0 -1 4000
 D1
+The eastern road follows the old crossroads toward the lands beyond Cindervale.
 ~
 ~
 0 -1 3300
 D2
+The southern road descends beneath fire-scarred trees toward the Old Cinder Road.
 ~
 ~
 0 -1 3501
 S
 #3501
-The Lane~
-   You are strolling along a pleasant, shady lane.  The road is lined on both
-sides by tall, stately trees which lend the scene with a sense of quiet
-serenity.
-   You can follow the road north or south.
+@yThe Old Cinder Road@n~
+An old road passes between tall trees whose trunks bear black scars beneath
+layers of fresh bark and moss. Wagon ruts have hardened into the earth, and
+new green growth crowds the shoulders where travelers once kept the brush cut
+back. The road continues north and south through the quiet border country.
 ~
 35 0 0 0 0 1
 D0
+The road north returns to the broad Cindervale Crossroads.
 ~
 ~
 0 -1 3500
 D2
+The weathered road continues south toward the Fourways of Cindervale.
 ~
 ~
 0 -1 3502
 S
 #3502
-The Laneway~
-   The trees stand close here, and the tall, bushy undergrowth prevents you
-from seeing far in any direction save east, where a broad lane continues off
-into the distance; and west, where the same lane continues towards what looks
-like a fairly large city.  The muted sounds of city commotion reach your ears
-from a distance; stray dogs barking, children crying, and street salesmen
-shouting.
-   A steep path leads down from here to the northeast towards the Dwarven
-Village, and a small trail leads through the trees towards the hills to the
-north.
+@YThe Fourways of Cindervale@n~
+Several ancient routes converge beneath a ring of broad-limbed trees. Worn
+milestones point toward Midgaard, the distant castle road, and the dwarven
+lands below the ridge, while another lane runs north through Cindervale.
+Bootprints, hoofmarks, and wagon tracks overlap across the packed earth.
 ~
 35 0 0 0 0 1
 D0
+The northern lane follows old wagon ruts back along the Old Cinder Road.
 ~
 ~
 0 -1 3501
 D1
-You see a fairly large road leading towards a grand castle in the distance.
+A broad eastern road runs toward the distant castle country beyond Cindervale.
 ~
 ~
 0 -1 15000
 D3
+The western road leads toward Midgaard's eastern approach.
 ~
 ~
 0 -1 3503
 D5
-The well trodden path leads down to the northeast towards a small bustling
-village.
+A worn descending way leaves the ridge toward the dwarven lands below.
 ~
 ~
 0 -1 6500
 S
 #3503
-The City Entrance~
-   You stand on the outskirts of a large city - Midgaard; the capital of
-this land.  The road leads east into the peace and quiet - and dangers -
-of the forest; and to the west it becomes the main street of the town;
-surrounded by a confusion of shops, bars, and market places.
+@YMidgaard's Eastern Approach@n~
+The road broadens as it nears Midgaard, with drainage ditches, old boundary
+stones, and clipped hedges showing the return of regular settlement. The city
+lies to the west, while the quieter road east leads back toward the wooded
+crossroads and the wild country beyond.
 ~
 35 4 0 0 0 1
 D1
+The quieter road east returns to the Fourways of Cindervale.
 ~
 ~
 0 -1 3502
 D3
+The western road passes beneath Midgaard's walls and into the city.
 ~
 ~
 0 -1 3053
 S
 #3504
-The South Gate~
-   You are standing on a small, dusty path leading away from the south
-gate of Midgaard, to the forest of Miden'Nir (Goblinic for 'Green Blood').
-You can still see the city to the east, but if you go south, there is
-fresh air and greenery.
+@gThe Southroad Boundary@n~
+Midgaard's southern road narrows beyond the last city stones and enters the
+green edge of Cindervale. A weathered boundary marker stands beside the path,
+its base wrapped in ivy. To the east the city remains close at hand, while
+the road south slips beneath older trees and into the vale.
 ~
 35 0 0 0 0 3
 D1
-You can see the walls of the South Gate.
+Midgaard's South Gate and stone walls stand close by to the east.
 ~
 ~
 0 -1 3127
 D2
-If you go south, you will enter the Miden'Nir.
+The southern road slips beneath older trees and enters Cindervale's Greenward.
 ~
 ~
 0 -1 3505
 S
 #3505
-The Trail To Miden'Nir~
-   You are in a light forest.  A path leads south, but the passage to
-the east is easy enough.  To the west, smoke can be seen rising above
-the treetops.  The sprawl of Midgaard lies north of here.
+@gThe Greenward Fork@n~
+A well-used trail divides beneath a canopy of oak and ash. North leads back
+toward Midgaard, while darker woodland stretches east and south. Westward,
+woodsmoke rises from a clearing where the Woodsman's Hearth stands among the
+trees, the last dependable refuge before the deeper paths.
 ~
 35 4 0 0 0 3
 D0
-To the north, you see the South Gate of Midgaard.
+The trail north climbs back toward Midgaard's Southroad Boundary.
 ~
 ~
 0 -1 3504
 D1
-More light forest.
+A shaded trail runs east beneath the broken face of Embercrag.
 ~
 ~
 0 -1 3506
 D2
-This path cuts through the darkness of the Miden'Nir.
+The southern path winds deeper beneath the ash and oak canopy.
 ~
 ~
 0 -1 3507
 D3
-The Woodsman's Inn can be seen a short distance to the west, it appears
-to be the source of the smoke.
+Woodsmoke and warm lamplight mark the Woodsman's Hearth to the west.
 ~
 ~
 0 -1 3570
 S
 #3506
-The Miden'nir~
-   You are in a dark forest.  To the east, mountains block passage.  From
-here, only the lighter forest to the west or south offer a way to travel.
+@gBeneath the Embercrag Ridge@n~
+The forest presses against the broken feet of the eastern ridge. Gray-red
+stone rises through roots and fern beds, and loose pebbles occasionally tick
+down the slope from somewhere above. The woods lighten to the west, but the
+paths south and east draw closer to the mountains.
 ~
 35 0 0 0 0 3
 D1
-The mountains can be seen jutting up to the east.
+The path east climbs over loose stone toward the foot of Embercrag.
 ~
 ~
 0 -1 3550
 D2
-The forest is darker to the south.
+The forest thickens southward beneath old fire-scarred trees.
 ~
 ~
 0 -1 3509
 D3
-The forest gets lighter as you go west.
+The woods lighten to the west toward the Greenward Fork and the inn road.
 ~
 ~
 0 -1 3505
 S
 #3507
-The Miden'nir~
-   The forest is deep here and the wind blows through the trees and
-through your hair.  To the north, the forest gets lighter.  However,
-the southern and western paths place you even deeper in the wood.
+@gThe Ashbark Trail@n~
+A narrow path winds between old trees whose bark carries long-healed burns.
+Fresh shoots and moss have grown over much of the damage, though black wood
+still shows in the deepest cracks. Broken twigs and shallow footprints suggest
+that more than game has been using the trail.
 ~
 35 0 0 0 0 3
 D0
-The forest is lighter in this direction.
+The northern path returns toward the Greenward Fork and the safer road.
 ~
 ~
 0 -1 3505
 D2
-More and darker woods.
+The trail south passes beneath denser branches toward Three-Path Crossing.
 ~
 ~
 0 -1 3510
 D3
-There is a small path leading west.
+A narrow side path slips west between split trunks and thorn.
 ~
 ~
 0 -1 3508
 S
 #3508
-On a Small Path~
-   A path is here, leading east and south through the dark woods of
-Miden'nir.  Mountains slash the scenery to the west of here.
+@gThe Split-Oak Path@n~
+A massive oak stands beside the path, its trunk split by some ancient strike
+and blackened deep within the wound. Crude cuts mark the surviving bark at
+different heights, while the earth nearby is trampled by small boots, clawed
+feet, and the lighter marks of scavengers. The trail continues through the
+trees to the east and south.
 ~
 35 0 0 0 0 3
 D1
-Wind-swept forest.
+The narrow path rejoins the Ashbark Trail to the east.
 ~
 ~
 0 -1 3507
 D2
-To the south, the trail continues.
+A rough track continues south toward the ridgeward woods.
 ~
 ~
 0 -1 3511
 S
 #3509
-The Miden'nir~
-   The trees of Miden'nir are lush and green, hiding the evil that lurks
-in these woods.  The trees become too thick to the west, but you may go
-north, south or travel toward the mountains that lie east of here.
+@gThe Greenward Thickets@n~
+Thick hazel and thorn crowd this part of the Greenward, yet narrow lanes have
+been hacked through the brush with surprising purpose. The cuts are rough but
+recent, forming routes between the northern woods, the mountain side, and the
+deeper forest to the south. Small bootprints mingle with heavier clawed tracks
+and deep hoof marks along the softer ground.
 ~
 35 0 0 0 0 3
 D0
-The trees lighten up a bit this way.
+The trail north climbs toward the broken feet of Embercrag.
 ~
 ~
 0 -1 3506
 D1
-Huge gray mountains lie in this direction.
+A trampled route east bears old goblin marks and newer gnoll tracks.
 ~
 ~
 0 -1 3512
 D2
-The forest continues.
+The thick woodland opens south toward Blackroot Crossing.
 ~
 ~
 0 -1 3514
 S
 #3510
-A Crossroads~
-   Here footworn paths meet leading north, south and east.  The trees
-seem to be closing in on you at this point, and you can barely see
-the sky through the thick branches above your head.
+@gThree-Path Crossing@n~
+Three forest paths meet beneath interlocking branches that leave only scraps
+of sky overhead. The ground is worn by repeated passage, with small bootprints,
+clawed tracks, hoof marks, and older traveler trails crossing one another in
+the packed earth. North, east, and south all lead farther into Cindervale by
+very different routes.
 ~
 35 0 0 0 0 3
 D0
-Trees as far as the eye can see.
+The northern path winds back beneath the ashbark trees.
 ~
 ~
 0 -1 3507
 D1
-There is an especially dark part of the forest this way.
+The eastern trail heads toward the broad crossing beneath black-rooted trees.
 ~
 ~
 0 -1 3514
 D2
-There is an especially dark section of forest this way.
+The southern path grows damp and uneven toward Mirefoot Crossing.
 ~
 ~
 0 -1 3516
 S
 #3511
-The Trail~
-   You are on a north-south trail through the woods.  To the west,
-impassable mountains glare at you, and the thick woods and undergrowth
-prevent any movement westward.
+@gThe Ridgeward Track@n~
+The path narrows along rough ground beneath the western shoulder of the ridge.
+Roots twist through the soil and thorny growth hems the way, forcing travelers
+to follow the old track north or south. The mountains loom through the trees
+like a dark wall beyond the undergrowth.
 ~
 35 0 0 0 0 3
 D0
-The trail bends to the north.
+The track north returns toward the Split-Oak Path.
 ~
 ~
 0 -1 3508
 D2
-To the south, the path re-enters the forest.
+The ridgeward trail runs south toward a brighter break in the canopy.
 ~
 ~
 0 -1 3515
 S
 #3512
-The Miden'nir~
-   The trees of Miden'nir are lush and green, hiding the evil that lurks
-in these woods.  You can go north toward the mountains, or west to the
-forest, but the steep mountains prevent any movement east.
+@rThe Raider Run@n~
+A hard-beaten trail cuts between the Greenward and the mountain foot. Brush
+has been slashed away at different heights, and the ground is crowded with
+small bootprints, heavier clawed tracks, and the marks of scavengers moving
+between them. Once a Greenblood route, the run is now used by any raider bold
+enough to travel beneath Embercrag.
 ~
 35 0 0 0 0 3
 D0
-The mountains can be seen to the north.
+The rough northern track climbs onto the lower shelves of Embercrag.
 ~
 ~
 0 -1 3550
 D2
-A light section of forest.
+The raider trail bends south into quieter woodland.
 ~
 ~
 0 -1 3513
 D3
-The forest continues here.
+The path west returns through the Greenward Thickets.
 ~
 ~
 0 -1 3509
 S
 #3513
-The Miden'nir~
-   The forest is dark, and becomes even darker west.  You sense
-that there is something evil hidden in these woods.  The forest
-gets lighter to the north.  The wind kicks up as you ponder your
-options.
+@gWhisperleaf Bend@n~
+Long leaves whisper against one another where the forest path bends beneath
+slender trees. The air is cooler here, and for a few moments the woodland
+seems almost peaceful. Then the birds fall silent without warning, leaving
+only the restless movement of leaves and distant branches.
 ~
 35 0 0 0 0 3
 D0
-There is a small clearing to the north.
+The trail north returns toward the old raider route beneath Embercrag.
 ~
 ~
 0 -1 3512
 D3
-It gets darker and thicker this way.
+The western path curves back toward Blackroot Crossing.
 ~
 ~
 0 -1 3514
 S
 #3514
-The Deep Forest~
-   It is quite dark here, forest surrounds you.  With each step, the
-forest seems to close around you, and get darker and more foreboding.
-It might just be time to head back to somewhere safe.
+@gBlackroot Crossing@n~
+Great roots twist across the forest floor, many of them dark as charcoal where
+old fire scars still show beneath their bark. Paths thread between them toward
+every side of the crossing. Broken brush, discarded cord, and overlapping
+boot, claw, and hoof marks show that several raiding bands use this central
+stretch of the Greenward.
 ~
 35 0 0 0 0 3
 D0
-More forest.
+The northern trail leads into the deeper Greenward thickets.
 ~
 ~
 0 -1 3509
 D1
-Lighter forest and mountains in the distance.
+A quieter path bends east toward Whisperleaf Bend.
 ~
 ~
 0 -1 3513
 D2
-More trees.
+The southern way approaches the stony verge of Embercrag.
 ~
 ~
 0 -1 3517
 D3
-The forest continues.
+The western trail returns toward Three-Path Crossing.
 ~
 ~
 0 -1 3510
 S
 #3515
-The Light Forest~
-   The forest is light here and you can easily pick your way through the
-trail.  To the east, the forest becomes thick and darker.  South, the
-trail continues.
+@GSunbreak Trail@n~
+The canopy opens enough for broad shafts of sunlight to reach the forest floor.
+Grass and small flowers grow between the trees, and the old trail is easy to
+follow here. North lies the ridgeward track, while east and south the woodland
+thickens again and the light begins to fade.
 ~
 35 0 0 0 0 3
 D0
-A trail leading north-south.
+The shaded track north returns along the ridgeward woods.
 ~
 ~
 0 -1 3511
 D1
-The trees get thicker as you go east.
+The eastern path drops toward damp ground at Mirefoot Crossing.
 ~
 ~
 0 -1 3516
 D2
-More trees and some small hills.
+The southern trail narrows until it nearly vanishes beneath new growth.
 ~
 ~
 0 -1 3518
 S
 #3516
-Some Muddy Ground~
-   The ground is quite muddy here and puddles are all around.  Your
-boots make a disgusting SQUISH as you walk here.  You can go in any
-of the four cardinal directions from here.  Hopefully, it will be
-dryer.
+@gMirefoot Crossing@n~
+Rainwater gathers in shallow pools where four forest paths cross over dark,
+soft earth. Every traveler leaves a record here: boots, small raider prints,
+heavy clawed feet, hooves, and animal pads overlap in the mud. Among them are
+several deep three-toed impressions far larger than those of any ordinary bird.
 ~
 35 0 0 0 0 3
 D0
-The Miden'nir continues.
+The path north climbs back toward Three-Path Crossing.
 ~
 ~
 0 -1 3510
 D1
-More trees.
+The eastern trail skirts the stony verge below Embercrag.
 ~
 ~
 0 -1 3517
 D2
-The trees get VERY thick to the south.  You can barely see...
+The southern way darkens toward the mouth of Dreary Hollow.
 ~
 ~
 0 -1 3519
 D3
-Some light trees and daylight.
+The western path rises toward the brighter Sunbreak Trail.
 ~
 ~
 0 -1 3515
 S
 #3517
-Near The Mountains~
-   The most prominent feature here is the mountains that lie to the
-east.  You can only go north and west from here as the rocks stop all
-other movement.
+@yThe Embercrag Verge@n~
+The trees thin against broken mountain stone at the eastern edge of the vale.
+Fresh chips lie beneath several exposed faces of rock, and long scratches score
+one slab well above a man's reach. The forest continues north and west while
+the ridge blocks easier travel in the other directions.
 ~
 35 0 0 0 0 3
 D0
-Many trees to the north.
+The path north returns toward Blackroot Crossing.
 ~
 ~
 0 -1 3514
 D3
-There is a bit of a slope downward to the west.
+The western trail leaves the ridge and returns toward Mirefoot Crossing.
 ~
 ~
 0 -1 3516
 S
 #3518
-The Fading Trail~
-   The trail becomes nearly unpassable here.  You can go north
-as the forest is relatively light.  To the south, you can see a
-path.
+@gThe Vanishing Track@n~
+The maintained trail dwindles into weeds and tangled roots until only traces
+of old passage remain. Dense trunks wall off the east, while the forest to the
+south grows darker and noticeably still. Northward, sunlight can still be seen
+between the trees along the safer trail.
 ~
 35 0 0 0 0 3
 D0
-You can see a trail this way.
+The faint track north becomes clearer beneath the Sunbreak trees.
 ~
 ~
 0 -1 3515
@@ -421,30 +439,31 @@ The trees are nearly trunk-to-trunk this way.
 ~
 0 -1 -1
 D2
-Dark forests.
+The barely visible southern path descends toward the carrion-stained woods.
 ~
 ~
 0 -1 3522
 S
 #3519
-The Dark Path~
-   You are hemmed in by trees on either side of you.  The path
-continues north and south, and while is much to thick to explore
-west, you can head off into the woods to the west.
+@wThe Mouth of Dreary Hollow@n~
+The forest changes abruptly here. Branches knit together overhead, the ground
+sinks beneath deep leaf mold, and the ordinary buzz of insects fades away.
+A faint coppery smell drifts from the south while the eastern path disappears
+between close-packed trunks. Dreary Hollow begins beyond this point.
 ~
 35 0 0 0 0 3
 D0
-The forest gets lighter this way.
+The path north returns toward the lighter Greenward.
 ~
 ~
 0 -1 3516
 D1
-The forest continues.
+A dim path enters the Sunless Grove to the east.
 ~
 ~
 0 -1 3520
 D2
-There is a strong stench coming from this direction.
+The coppery reek of blood grows stronger toward the clearing to the south.
 ~
 ~
 0 -1 3521
@@ -455,475 +474,503 @@ The trees are nearly trunk-to-trunk this way.
 0 0 -1
 S
 #3520
-The Dark Forest~
-   You stomp your way through the underbrush.  The dark forest of
-Miden'nir get pretty thick here, and the branches high above your
-head are so thick that they block out all direct sunlight.  While
-it is much too thick to go further east, you might be able to make
-your way though the forest to the south and west.
+@wThe Sunless Grove@n~
+Old trees crowd so tightly together that daylight reaches the ground only as
+a dim green haze. Fallen branches rot untouched beneath mats of moss, and even
+the air seems reluctant to move. Paths survive south and west through the
+claustrophobic grove, though neither looks welcoming.
 ~
 35 0 0 0 0 3
 D2
-The thick forest continues.
+A cramped path pushes south through the sunless trees toward Clawmarked Wood.
 ~
 ~
 0 -1 3523
 D3
-The thick forest continues.
+The forest thins slightly westward toward the mouth of Dreary Hollow.
 ~
 ~
 0 -1 3519
 S
 #3521
-The Carnage~
-   Here, you see a gruesome sight.  Blood is everywhere... on the trees and
-soaked into the ground.  Two carcasses lie in front of you, seeming to look
-up at you.  The forest is impassible to the south, but the other directions
-look ok.
+@RThe Bloodleaf Clearing@n~
+The trees open around a clearing soaked in old and fresh blood. Torn packs,
+broken shafts, and churned earth show that travelers fought raiders here before
+something far larger descended upon them. Leaves cling darkly to the ground,
+and blade cuts, claw marks, bootprints, and deep punctures overlap throughout
+the ruin.
 ~
 35 1 0 0 0 3
 D0
-Darkness...
+The northern path escapes the blood-soaked clearing toward lighter forest.
 ~
 ~
 0 -1 3519
 D1
-Your light does not extend that far.
+The eastern path disappears beneath claw-marked trunks and heavy shadow.
 ~
 ~
 0 -1 3523
 D3
-More dark forest.
+The western path follows the carrion stink toward a narrow woodland track.
 ~
 ~
 0 -1 3522
 E
-carcass body corpse carcasses bodies corpses~
-   The corpses looked as if they have been pierced by a large, jagged spear.
-The damage these people sustained is simply amazing.  Worse, the lips on the
-bodies are a light shade of blue, hinting at poison in their systems.
+carcass body corpse carcasses bodies corpses remains victim victims~
+Some of the dead bear cuts from crude raider blades while others show cleaner
+human steel wounds and heavy boot marks nearby. Several bodies have been torn
+open by talons or pierced by something far larger, and blue-stained lips and
+fingertips suggest venom. The evidence tells of several attackers and a battle
+that became a slaughter when another predator arrived.
 ~
 S
 #3522
-Deep In The Forest Of Miden'nir~
-   There is a sickening stench here.  It smells of blood and death.
-To the north, you catch glimpses of daylight.  To the east, you
-simply cannot see.  The trees are close and stifling.
+@rCarrion Path@n~
+A sickly trail of feathers, blood-dark leaves, and dragged remains leads east
+through the trees. The smell of carrion thickens with every step, while north
+the forest gradually brightens toward the fading trail. Whatever happened
+nearby was violent enough to scatter signs of it far into the woods.
 ~
 35 0 0 0 0 3
 D0
-You see daylight and a trail to follow.
+A faint path north climbs toward the Vanishing Track and brighter woods.
 ~
 ~
 0 -1 3518
 D1
-The stench seems to becoming from this direction.
+The stench of blood and carrion thickens eastward toward Bloodleaf Clearing.
 ~
 ~
 0 -1 3521
 S
 #3523
-The Dark Forest~
-   The branches above you block out all direct sunlight, making the forest
-in this area rather dark.  The forest continues east, where it meets the
-mountains.  The air is still and stuffy - a stench comes from the west and
-an ugly feeling causes the hair to rise on the back of your neck!
+@wThe Clawmarked Wood@n~
+Deep gouges score several trunks from shoulder height to far above the ground,
+too long and widely spaced to have been made by axes or knives. The forest
+continues west toward the smell of blood, while the eastern path climbs toward
+the shadow of Embercrag and a darker opening near the mountain.
 ~
 35 0 0 0 0 3
 D0
-It appears to get much darker that direction.
+The northern path vanishes beneath the close canopy of the Sunless Grove.
 ~
 ~
 0 -1 3520
 D1
-The forest appears to get much darker in this direction.
+The eastern trail climbs toward a concealed opening beneath Embercrag.
 ~
 ~
 0 -1 3551
 D3
-The sky becomes lighter in this direction.
+The western path returns toward the blood-stained clearing.
 ~
 ~
 0 -1 3521
 S
 #3550
-At The Foot Of The Mountains~
-   You find yourself at the foot of the mountains, where it is much
-to steep to continue north or east.  You see the lush, green forest
-of Miden'nir to the south and west.
+@yThe Foot of Embercrag@n~
+Broken slopes rise sharply from the forest floor where Cindervale meets the
+Embercrag ridge. Scrub pine clings to shelves of gray-red stone, and small
+lookout perches have been cleared among the rocks. The Greenward spreads south
+and west below the mountain face.
 ~
 35 0 0 0 0 5
 D2
-The forest of Miden'nir spreads out before you.
+The slope descends south into the Greenward along the old raider trail.
 ~
 ~
 0 -1 3512
 D3
-The forest of Miden'nir spreads out before you.
+The western path drops from the rocks into the forest beneath Embercrag Ridge.
 ~
 ~
 0 -1 3506
 S
 #3551
-Deep In The Forest Of Miden'nir~
-   The branches above you block out all direct sunlight, making
-the forest in this area very dark.  The forest continues west,
-but mountains block further exploration in all other directions,
-except south, where you notice a small tunnel dug into the
-mountainside.
+@rThe Hidden Warren Mouth@n~
+Thorn brush and stacked deadfall conceal a low opening beneath Embercrag.
+Sharpened stakes and crude warning charms make the entrance difficult to mistake
+once discovered. The forest lies west, while a guarded tunnel descends south
+into old Greenblood warrens now watched by Emberfang gnolls.
 ~
 35 1 0 0 0 3
 D2
-The tunnel leads into the mountainside.
+A guarded tunnel descends south into the warrens beneath Embercrag.
 ~
 ~
 0 -1 3552
 D3
-The forest continues, but appears to be getting lighter.
+The concealed path west returns to the claw-marked forest of Dreary Hollow.
 ~
 ~
 0 -1 3523
 S
 #3552
-A Tunnel In The Mountains~
-   The walls of this tunnel were carved out many years ago by the goblins
-of this forest.  The floor is well worn, and continues south, into the
-mountain, or back north out into the forest.
+@wThe Embercrag Passage@n~
+The tunnel walls bear old tool marks polished by generations of passing hands
+and shoulders. Soot stains shallow niches where small lamps once burned, and
+fungus glimmers faintly in damp cracks. The passage runs between the forest
+entrance to the north and the deeper warrens to the south.
 ~
 35 1 0 0 0 1
 D0
-Outside, you see the forest of Miden'nir.
+The passage north climbs toward the hidden warren mouth and open forest.
 ~
 ~
 0 -1 3551
 D2
-The tunnel continues to the south.
+The narrow stone passage descends south toward the warren junction.
 ~
 ~
 0 -1 3553
 S
 #3553
-A Tunnel In The Mountains~
-   The tunnel gets lighter to the north, presumably leading out, while to
-the south the passage gets smaller and smaller.  A small alcove has been
-carved into the east wall.
+@wThe Warren Junction@n~
+The tunnel widens where a side alcove has been cut into the eastern wall.
+Scratched symbols, tally marks, and crude route lines cover patches of stone,
+some old and goblin-small, others newly gouged by broader claws. Weapon racks
+built from lashed branches line the junction while the main passage continues
+north and south through the contested old warren.
 ~
 35 1 0 0 0 1
 D0
-The tunnel gets wider in this direction.
+The northern tunnel rises toward the warren entrance.
 ~
 ~
 0 -1 3552
 D1
-You see a small alcove.
+A cramped side passage opens east into an officer's alcove.
 ~
 ~
 0 -1 3554
 D2
-The tunnel gets smaller in this direction.
+The main tunnel narrows south into a defensible choke point.
 ~
 ~
 0 -1 3555
 S
 #3554
-A Small Alcove~
-   A small alcove has been carved out here.  There are a bunch of twigs
-and leaves thrown into a pile here, probably serving as a bed.
+@rThe Pack-Captain's Alcove@n~
+This cramped chamber has been claimed by one of Emberfang's pack-captains. A
+raised bed of hides and woven branches occupies the back wall, with scavenged
+gear stacked in disciplined piles nearby. Older goblin fittings remain beneath
+newer trophies and gnoll-made bindings, evidence that the room changed hands
+without ever being rebuilt.
 ~
 35 1 0 0 0 1
 D3
-You see the main passageway.
+The short passage west returns to the central warren junction.
 ~
 ~
 0 -1 3553
 E
-twigs leaves bead~
-   The twigs and leaves have all been piled together as a makeshift bed for some
-small humanoid.
+bedding hides branches bed map maps charcoal markings~
+The bedding is made from woven branches, hides, and dry grass arranged with
+military care. Nearby, charcoal lines on a hide sketch the roads and paths of
+Cindervale. Older Greenblood symbols remain around several trails, but broad
+Emberfang fang-marks have been drawn across them and added beside routes toward
+Midgaard and the Greenward.
 ~
 S
 #3555
-A Tunnel In The Mountains~
-   As you explore further into the mountainside, the tunnel gets smaller
-and smaller to the south.  You almost have to hunch over to make your way
-through this area.  A small archway to the south leads into a large chamber.
+@wThe Choke Tunnel@n~
+The passage narrows until larger travelers must turn their shoulders to pass.
+Scrapes and old blood mark the stone where this bottleneck has been defended
+before. Ahead, a low arch opens into a broader chamber, while the tunnel north
+returns toward the outer warrens.
 ~
 35 1 0 0 0 1
 D0
-The tunnel continues north.
+The tunnel north widens toward the warren junction.
 ~
 ~
 0 -1 3553
 D2
-You see a small cavern.
+The passage south opens into the Emberfang war den.
 ~
 ~
 0 -1 3556
 S
 #3556
-The Goblin HeadQuarters~
-   The tunnel widens into a large (well, large for goblins) cavern that
-serves as the living quarters for the goblins of Miden'nir.  The bones of
-numbers woodland creatures are strewn about the room, the remanents of a
-recent meal.
+@RThe Embercrag War Den@n~
+The tunnel opens into a broad war chamber crowded with rough tables, weapon
+racks, bedding, and stolen supplies. Charcoal maps of Cindervale cover one wall,
+marked with roads, hunting grounds, and Midgaard approaches. Emberfang yips and
+deep snarls dominate the chamber now, while Greenblood goblins work at the edges
+of the old den under Vargash Ember-Maw's watch.
 ~
 35 1 0 0 0 1
 D0
-The tunnel heads north.
+The northern tunnel squeezes back through the choke point toward the upper warrens.
 ~
 ~
 0 -1 3555
 S
 #3570
-The Front Of The Inn~
-   You are standing on a well-worn path which opens into a clearing.
-An old, wooden building is here with smoke billowing from its
-chimney.  A painted sign is visible on the porch to the west.  You
-could go north or south around the building or leave this place and
-return to the forest.
+@Y-=< @WThe Woodsman's Hearth @Y>=-@n~
+A broad clearing surrounds a weathered timber inn beneath tall protective trees.
+Warm smoke curls from the chimney, hitching rails line the porch, and split
+firewood is stacked beneath the eaves. The forest path lies east, while narrow
+ways circle the building to the north and south.
 ~
 35 0 0 0 0 3
 D0
-You can go north around the Inn.
+A worn path circles north into the Hearthwood yard.
 ~
 ~
 0 -1 3571
 D1
-Back through the trees to the Miden'nir.
+The forest path east returns to the Greenward Fork.
 ~
 ~
 0 -1 3505
 D2
-You can go south around the Inn.
+The inn's quieter southern yard lies beyond the porch.
 ~
 ~
 0 -1 3572
 D3
-The front door of the Inn beckons.
+The front door opens west into the warm common room of the Woodsman's Hearth.
 ~
 ~
 0 -1 3574
 E
-sign~
-   The sign reads: The Woodsman
+sign hearth woodsman inn painted~
+A weathered painted sign hangs from an iron bracket above the porch. It shows
+a woodsman's axe laid beside a bright hearthfire beneath the words 'THE
+WOODSMAN'S HEARTH.' Fresh paint has been worked into older lettering, proof
+that someone still cares how the old inn greets the road.
 ~
 S
 #3571
-North Of The Inn~
-   You are standing north of the Inn.  Things don't look much different
-from this angle.  The air here is filled with smells of smoke and cooking.
-South, the front porch is waiting for you... or you can see if there is
-a back door.
+@yThe Hearthwood Yard@n~
+Stacks of split oak and ash stand beneath lean-to roofs on the north side of
+the inn. A scarred chopping block and old handcart sit near the wall, evidence
+of the constant work required to keep the hearth burning. The path returns
+south toward the inn's front clearing.
 ~
 35 0 0 0 0 3
 D2
-You see the front of the Inn.
+The yard path turns south toward the front of the Woodsman's Hearth.
 ~
 ~
 0 -1 3570
 S
 #3572
-South Of The Inn~
-   You are standing south of the Inn.  You could easily go north and enter
-through the front door, or west and to the rear of the establishment.  You
-here some muffled cries from a tiny trail leading south of here.
+@yThe South Yard@n~
+The southern side of the inn is quieter, bordered by brush and a narrow footpath.
+Freshly broken branches and disturbed earth draw attention to the trail leading
+south, where signs of a recent struggle disappear among the trees. Westward,
+a service path runs behind the building.
 ~
 35 0 0 0 0 3
 D0
-This way leads to the front of the Inn.
+The path north returns to the inn's front porch and road.
 ~
 ~
 0 -1 3570
 D2
-The trail heads south.
+A disturbed footpath leads south toward the broken cart trail.
 ~
 ~
 0 -1 3575
 D3
-This way leads to the back of the Inn.
+A narrow way circles west behind the inn.
 ~
 ~
 0 -1 3573
 S
 #3573
-Behind The Inn~
-   You now stand behind the Inn.  The smell here is not so pleasant as the
-keeper and his help throw a good deal of garbage here.  A couple of piles of
-rubbish are to the west, but you will smell the worse for meddling there.  As a
-clean alternative, you can go east around the Inn.
+@yBehind the Woodsman's Hearth@n~
+Rain barrels, stacked crates, a small kitchen garden, and an ash pit fill the
+working yard behind the inn. The place smells of woodsmoke, damp earth, and
+cooking herbs rather than the forest beyond. A rough path west leads toward
+the refuse ground while the cleaner way circles east.
 ~
 35 0 0 0 0 3
 D1
-You can go around the Inn this way.
+The path east returns to the inn's south yard.
 ~
 ~
 0 -1 3572
 D3
-Only rats and fool adventurers play in garbage.
+The rear path leads west toward the ash and refuse yard.
 ~
 ~
 0 -1 3578
 S
 #3574
-The Woodsman Inn~
-   You are in the common room of the Woodsman Inn.  A thin haze of smoke
-sits in the air here.  The Inn is often empty, as the forest has become
-overrun by goblins as of late, and it is no longer safe in these parts.
-The bar is just north of here.  If you'd rather have your own table, one
-is empty to the south.
+@YThe Common Room@n~
+Firelight warms a common room built for hunters, caravan hands, and travelers.
+Old antlers and trail maps hang above worn tables, though many seats now stand
+empty. The bar lies north, a quieter alcove south, and a shadowed table to the
+west where a lone bard often keeps his own company.
 ~
 35 12 0 0 0 1
 D0
-The bar is here, manned by the Innkeeper.
+The bar and Harlan's watchful station lie to the north.
 ~
 ~
 0 -1 3576
 D1
-You can leave now and return to fresher air.
+The eastern door opens onto the inn's porch and the forest road.
 ~
 ~
 0 -1 3570
 D2
-An empty table is a rare commodity.
+A quieter alcove for wayfarers lies to the south.
 ~
 ~
 0 -1 3579
 D3
-There is a table to the south occupied by a heavy drinker.
+A shadowed corner for music and stories lies to the west.
 ~
 ~
 0 -1 3577
 S
 #3575
-The Ambush Point~
-   This is a overgrown foot-trail south of the Inn.  It leads west, but you
-would be hard pressed to follow it far.  A number of bushes are trampled on
-and some medium sized branches have been knocked down.  Obviously there has
-been a battle here rather recently.
+@RThe Broken Cart Trail@n~
+An overgrown trail has been torn apart by a recent ambush. Wheel ruts end beside
+trampled brush, snapped branches, and dark spots in the soil where blood has
+dried. Hoofprints lead west from the wreckage while the safer path north returns
+toward the Woodsman's Hearth.
 ~
 35 0 0 0 0 3
 D0
-The Inn lies to the north.
+The path north returns toward the south yard of the Woodsman's Hearth.
 ~
 ~
 0 -1 3572
 D3
-A trail through the woods.
+Fresh hoofprints lead west onto the Blackbriar Trail.
 ~
 ~
 0 -1 3581
 S
 #3576
-The Bar~
-   This is where people use to come and enjoy the food, drink and
-hospitality of the Innkeeper, but as of late, he only serves the
-few adventurers that manage to survive a trip through the forest.
-You can leave south and return to the common room.
+@YHearthkeeper's Bar@n~
+A polished but heavily scarred counter runs along the back of this small taproom.
+Bottles, clay cups, and simple provisions fill the shelves behind it, and a
+loaded crossbow rests close enough for the keeper to reach without leaving
+his post. The common room waits to the south.
 ~
 35 40 0 0 0 1
 D2
-You may retreat south back to the common room.
+The common room opens south beyond the bar.
 ~
 ~
 0 -1 3574
 S
 #3577
-The Bard's Table~
-   You are in a darker corner in the Inn.  A large round table with a few
-wooden chairs sits here.  There is a large stain on the table, the remnants
-of a spilled drink.
+@yThe Bard's Corner@n~
+A round table occupies a dim corner away from the common-room fire. Empty cups,
+scratched notes, and a battered instrument case surround the chair usually
+claimed by the inn's sullen bard. From here the main room remains visible to
+the east, though conversation seldom carries clearly into the corner.
 ~
 35 8 0 0 0 1
 D1
-You see the main floor of the Inn to the east.
+The common room and hearth lie just east of the bard's corner.
 ~
 ~
 0 -1 3574
 S
 #3578
-The Garbage Dump~
-   You stand knee deep in garbage.  YECCH!!!  It smells terrible and who knows
-what vermin live in these piles of filth...
+@yThe Ash and Refuse Yard@n~
+Beyond the working yard lies a shallow pit used for cold hearth ash, spoiled
+scraps, broken crockery, and other refuse from the inn. The keeper has tried
+to keep the mess contained beneath a crude fence, though crows and small
+scavengers have scattered bits of it through the surrounding brush.
 ~
 35 0 0 0 0 3
 D1
-You can return to cleaner lands this way.
+The rear path east returns behind the Woodsman's Hearth.
 ~
 ~
 0 -1 3573
 S
 #3579
-A Quieter Section Of The Inn~
-   There seems to be no one in this end of the Woodsman, probably a safe place
-to rest and lick your wounds...
+@YThe Wayfarers' Alcove@n~
+A quieter end of the inn has been set aside for travelers who need space away
+from the common-room noise. Benches line the walls beside a few small tables,
+and a folded blanket rests near the hearthstone for anyone nursing wounds or
+exhaustion. The main room lies north.
 ~
 35 8 0 0 0 0
 D0
-You see the common room.
+The common room opens north from the wayfarers' alcove.
 ~
 ~
 0 -1 3574
 S
 #3581
-On The Trail Of The Horsemen~
-   The path continues east and west of here.  You notice fresh tracks in
-the soft ground that show the horsemen fled to the west.
+@rThe Blackbriar Trail@n~
+Deep hoofprints leave the ambush site and cut west along a narrow trail beneath
+black-thorned briars. Several branches have been snapped at rider height, as
+though mounted men passed here quickly and without concern for concealment.
+The tracks remain fresh in the softer ground.
 ~
 35 0 0 0 0 3
 D1
-Back to ambush point.
+The trail east returns toward the broken cart and the inn grounds.
 ~
 ~
 0 -1 3575
 D3
-The trail continues.
+Hoofprints and broken thorn lead west toward the riders' turn.
 ~
 ~
 0 -1 3582
 S
 #3582
-On The Trail Of The Horsemen~
-   The path continues east and south.  You notice fresh tracks in the
-soft ground that show the horsemen turned, and fled south.
+@rThe Riders' Turn@n~
+The hoofprints swing sharply south where the trail bends around a dense wall
+of thorn. A bent horseshoe nail and a strip of dark cloth lie pressed into the
+mud near the turn. East leads back toward the ambush, while the riders' trail
+continues south beneath the trees.
 ~
 35 0 0 0 0 3
 D1
-The trail continues.
+The trail east heads back toward the broken cart road.
 ~
 ~
 0 -1 3581
 D2
-The tracks lead south.
+The riders' tracks swing south beneath a dense roof of black briars.
 ~
 ~
 0 -1 3583
 S
 #3583
-On The Trail Of The Horsemen~
-   The trail of the horsemen continues east and north along this path
-through the forest.  The tracks are still fresh, so they must be near.
+@rBeneath the Black Briars@n~
+Arching briars make a low tunnel over the trail, hiding it from anyone passing
+through the wider forest. Hoofprints and bootmarks multiply here, and ashes
+from a recently stamped-out watchfire stain the ground. The concealed path
+continues north and west.
 ~
 35 0 0 0 0 3
 D0
-The trail continues.
+The trail north returns toward the sharp riders' turn.
 ~
 ~
 0 -1 3582
 D3
-The tracks lead east.
+The hoof-marked path pushes west toward the hidden Blackbriar camp.
 ~
 ~
 0 -1 3584
 S
 #3584
-A Dead End Trail~
-   The path comes to an abrupt end here, as the trees close around you and
-make any further exploration impossible.  Fresh tracks cover the ground, and
-end right here.  The horsemen must be nearby.
+@RThe Blackbriar Camp@n~
+The hidden trail ends in a cramped camp screened by thorn and timber. Bedrolls,
+saddles, stolen packs, and a tether line reveal the riders' use of the clearing,
+while discarded merchant seals and cut purse strings show how they earn their
+living. The only clear escape lies back to the east.
 ~
 35 0 0 0 0 3
 D1
-Back to along the trail.
+The only clear path leads east beneath the briars toward the riders' trail.
 ~
 ~
 0 -1 3583

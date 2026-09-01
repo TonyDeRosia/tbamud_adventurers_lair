@@ -1,8 +1,9 @@
 #3200
-Under The Bridge~
-   The arch under the bridge is covered by seaweed about a foot above the
-surface of the river.  The water gently flows through an opening in the lower
-part of the city wall.
+@CUnder the Riverward Bridge@n~
+The Midgaard River slides beneath a broad stone bridge and through a low arch in the
+western city wall. Water-dark masonry rises on either side, its lower courses slick
+with moss and riverweed. Above, the muted rumble of carts and boots crosses the bridge
+while the current carries leaves and driftwood eastward through the city.
 ~
 32 0 0 0 0 7
 D1
@@ -14,16 +15,19 @@ D3
 ~
 0 -1 900
 E
-wall~
-   It is built from large gray rocks that have been fastened to each other with
-some kind of mortar.  Looks pretty solid.
+wall masonry stones mortar bridge~
+Massive gray stones form the riverward wall and the bridge abutment above it. The
+blocks are fitted tightly and sealed with pale mortar, with centuries of damp staining
+the lowest courses. The work is heavy, practical, and clearly meant to withstand both
+floodwater and siege.
 ~
 S
 #3201
-On The River~
-   North of here you see the miserable buildings of Poor Alley.  The
-river flows west towards the bridge.  The riverbanks are too steep to
-climb.
+@BThe Midgaard River, Western Reach@n~
+The river broadens slightly beyond the western bridge, running between steep banks
+reinforced with old stone and timber. To the north rise the crowded backs of Riverward
+buildings, their upper stories leaning toward the water above narrow service yards.
+The steady current carries the sounds of the city along the channel.
 ~
 32 0 0 0 0 7
 D1
@@ -36,9 +40,11 @@ D3
 0 -1 3200
 S
 #3202
-On The River~
-   North of here you see the dump.  The river flows from east to west.  The
-riverbanks are too steep to climb.
+@BThe Midgaard River, Below Riverward@n~
+Midgaard's river runs east to west through a deep-cut channel beneath the city. Stone
+retaining walls and steep muddy banks make climbing out nearly impossible from the
+water. Northward, service lanes and refuse yards sit above the embankment while the
+current presses steadily toward the western bridge.
 ~
 32 0 0 0 0 7
 D1
@@ -51,9 +57,11 @@ D3
 0 -1 3201
 S
 #3203
-On The River~
-   The levee is directly north of here.  The river flows in an east west
-direction.
+@CThe River at the Levee Steps@n~
+A break in the northern embankment has been reinforced with broad stone steps leading
+up from the river toward the city levee. Iron rings are set into the masonry for tying
+small workboats, and worn grooves show where ropes and cargo have been hauled over the
+years. East and west, the Midgaard River continues through its walled channel.
 ~
 32 0 0 0 0 7
 D0
@@ -70,9 +78,11 @@ D3
 0 -1 3202
 S
 #3204
-On The River~
-   You see the warehouse on the northern riverbank.  East of here you see the
-city wall.  The river flows west towards the levee.
+@BThe Midgaard River, Warehouse Reach@n~
+The river narrows between high stone banks as it passes the warehouse quarter. Timber
+loading platforms and shuttered storehouses rise along the northern side, their
+foundations darkened by years of spray and floodwater. Farther east, the city wall
+closes around the channel where the river enters Midgaard from beneath the hills.
 ~
 32 0 0 0 0 7
 D1
@@ -85,9 +95,11 @@ D3
 0 -1 3203
 S
 #3205
-On The River~
-   The river enters from a hole in the eastern city wall.  The hole has been
-blocked by several vertically positioned iron bars set into the wall.
+@CThe Eastern River Gate@n~
+The Midgaard River enters the city through a broad opening cut low in the eastern wall.
+Heavy iron bars descend from the arch into the water, spaced widely enough for the
+current but close enough to block boats and large creatures. Beyond them, the river
+disappears into a shadowed passage beneath the rising land to the east.
 ~
 32 0 0 0 0 7
 D1
@@ -101,5 +113,12 @@ D3
 ~
 ~
 0 -1 3204
+E
+bars iron gate grate river eastern wall~
+Thick iron bars have been driven deep into the stonework above and below the waterline.
+Their surfaces are scarred by rust, flood debris, and years of maintenance, but the
+grate remains formidable. Through the gaps, the river can be seen continuing into
+darkness beneath the eastern hills.
+~
 S
 $~
