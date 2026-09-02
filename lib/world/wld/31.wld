@@ -240,17 +240,13 @@ D2
 ~
 0 -1 3118
 D3
-You see the Cityguard HeadQuarters.
+The reinforced west door leads into the @bSo@Cut@Wh@bwa@Ctc@Wh@n Barracks.
 ~
 door~
 1 3105 3110
 E
-building door sign~
-   The sign on the door says:
-
-                 Cityguard HeadQuarters
-
-           WARNING: Authorized Personnel Only!
+building door sign southwatch barracks headquarters shield~
+The reinforced oak door bears the blue-and-silver shield of the @bSo@Cut@Wh@bwa@Ctc@Wh@n. A clean brass plate reads 'SOUTHWATCH BARRACKS - AUTHORIZED PERSONNEL ONLY.'
 ~
 S
 #3112
@@ -431,6 +427,11 @@ The chain disappears in the clouds.
 ~
 0 -1 7914
 E
+chain~
+   The chain reaches the clouds high above you.  It must take some really
+powerful magic to hold such a chain in place.
+~
+E
 sign~
    The sign points in all directions:
    North - Emerald Avenue.
@@ -439,11 +440,6 @@ sign~
    West  - Park Road.
 Someone has added the following with red paint:
    Up    - Redferne's Flying Citadel.
-~
-E
-chain~
-   The chain reaches the clouds high above you.  It must take some really
-powerful magic to hold such a chain in place.
 ~
 S
 T 3111
@@ -745,10 +741,10 @@ The exit west leads to Emerald Avenue.
 ~
 0 -1 3117
 E
-scribe records petitions folios desk~
-Ledgers, sealed petitions, bundles of correspondence, and carefully sorted folios cover the
-clerk's work space. Quills rest beside sand shakers and wax tablets, while colored cords mark
-which requests are awaiting review and which have already been carried to the mayor's chamber.
+ward shields banners civic emblems~
+Painted shields representing Midgaard's wards hang in measured rows along the paneled wall.
+Each bears the crowned bridge worked into a different field of color, with narrow civic banners
+hanging between them to mark the offices and neighborhoods represented in the hall.
 ~
 E
 desk~
@@ -756,10 +752,10 @@ desk~
 Everything can be stored on its top.
 ~
 E
-ward shields banners civic emblems~
-Painted shields representing Midgaard's wards hang in measured rows along the paneled wall.
-Each bears the crowned bridge worked into a different field of color, with narrow civic banners
-hanging between them to mark the offices and neighborhoods represented in the hall.
+scribe records petitions folios desk~
+Ledgers, sealed petitions, bundles of correspondence, and carefully sorted folios cover the
+clerk's work space. Quills rest beside sand shakers and wax tablets, while colored cords mark
+which requests are awaiting review and which have already been carried to the mayor's chamber.
 ~
 S
 #3138
@@ -776,15 +772,15 @@ The waiting room is to the west.
 ~
 0 -1 3137
 E
-desk~
-   This desk is obviously very old.  Nevertheless it looks as if has never been
-used.
-~
-E
 chair armchair~
    This chair is really a masterpiece.  A chair where one can sit as comfortably
 as in a bed.  All auditoriums should be equipped with these things.  A shame
 that there wouldn't be room for the students too, though.
+~
+E
+desk~
+   This desk is obviously very old.  Nevertheless it looks as if has never been
+used.
 ~
 S
 #3139
@@ -936,8 +932,8 @@ The chapel door is made of dark wood.
 door~
 1 -1 3154
 E
-glass windows~
-   The windows must be meant to be dark.  At least they are completely clean.
+benches rows~
+   The benches are not of the comfortable kind.
 ~
 E
 altar~
@@ -946,8 +942,8 @@ notice that it seems less dusty than the rest of the room...  Someone must clean
 here regularly...  Maybe that old guy in Park Cafe, he looked like that sort...
 ~
 E
-benches rows~
-   The benches are not of the comfortable kind.
+glass windows~
+   The windows must be meant to be dark.  At least they are completely clean.
 ~
 S
 $~

@@ -9,11 +9,12 @@ remembers regular customers by name, and has the unnerving ability to notice an 
 cup from across the room.
 ~
 26635 0 0 0 16 0 0 0 1000 E
-33 9 25 6d6+330 5d5+5
+33 9 0 6d6+330 5d5+5
 330 0
 8 8 2
 GoldMin: 330
 GoldMax: 330
+InvItem: 3152 1
 E
 T 3100
 #3101
@@ -27,11 +28,13 @@ speaks softly around mourners and treats every grave, rich or poor, with the sam
 patient care.
 ~
 10 0 0 0 0 0 0 0 800 E
-3 19 0 0d0+30 1d2+0
+3 19 25 0d0+30 1d2+0
 30 0
 6 6 1
 GoldMin: 30
 GoldMax: 30
+EquipItem: 3140 16
+InvItem: 3141 1
 E
 T 3101
 #3102
@@ -45,29 +48,37 @@ secured by a short chain. He has the composed manner of a commander who expects
 discipline without needing to shout.
 ~
 10 0 0 0 16 0 0 0 800 E
-17 15 25 3d3+170 2d2+2
+17 15 0 3d3+170 2d2+2
 170 0
 8 8 1
 GoldMin: 170
 GoldMax: 170
+EquipItem: 3154 5
+InvItem: 3145 1
 E
 T 3102
 #3103
-southwatch guardsman guard cityguard upset~
+southwatch guardsman guard patrol watchman~
 a @bSo@Cut@Wh@bwa@Ctc@Wh@n guardsman~
 A @bSo@Cut@Wh@bwa@Ctc@Wh@n guardsman stands ready for the next patrol.
 ~
-This city guard wears a blue tabard over serviceable mail, with the crowned bridge of
+This Southwatch guard wears a blue tabard over serviceable mail, with the crowned bridge of
 Midgaard stitched at the shoulder. A baton, short blade, whistle, and small lantern
 complete the patrol kit. The guard watches doors and strangers with professional caution
 rather than open hostility.
 ~
 10 0 0 0 0 0 0 0 1000 E
-10 17 25 2d2+100 1d2+1
+10 17 0 2d2+100 1d2+1
 100 0
 8 8 1
 GoldMin: 100
 GoldMax: 100
+EquipItem: 3146 5
+EquipItem: 3147 16
+EquipItem: 3150 11
+EquipItem: 3151 0
+InvItem: 3148 1
+InvItem: 3149 1
 E
 T 3103
 #3104
@@ -80,7 +91,7 @@ of office. She moves through ledgers with formidable speed, tying finished petit
 with colored cord before passing them onward to the mayor's chamber.
 ~
 10 0 0 0 0 0 0 0 900 E
-12 16 25 2d2+120 2d2+2
+12 16 0 2d2+120 2d2+2
 120 0
 8 8 2
 GoldMin: 120
@@ -98,7 +109,7 @@ decoration. He listens more than he speaks, marking notes in the margins of peti
 before issuing short, practical decisions.
 ~
 26634 0 0 0 16 0 0 0 1000 E
-24 12 25 4d4+240 4d4+4
+24 12 0 4d4+240 4d4+4
 240 0
 8 8 1
 GoldMin: 240
@@ -115,11 +126,15 @@ city. Between announcements, the crier checks wax-sealed notices against a handw
 schedule and watches for a clear moment to make the next proclamation.
 ~
 200 0 0 0 0 0 0 0 900 E
-1 20 0 0d0+10 1d2+0
+1 20 25 0d0+10 1d2+0
 10 0
 8 8 1
 GoldMin: 10
 GoldMax: 10
+EquipItem: 3153 5
+EquipItem: 3142 17
+InvItem: 3143 1
+InvItem: 3144 1
 E
 T 3106
 #3120
@@ -132,7 +147,7 @@ gray around the swan's neck. It watches nearby visitors with the imperious confi
 a creature that has been fed by generations of park-goers.
 ~
 10 0 0 0 0 0 0 0 1000 E
-1 20 0 0d0+10 1d2+0
+1 20 25 0d0+10 1d2+0
 10 0
 8 8 0
 GoldMin: 10
@@ -149,7 +164,7 @@ It peeps at every passing shadow and quickly returns to the safety of the reeds 
 something seems too large or too sudden.
 ~
 10 0 0 0 0 0 0 0 1000 E
-1 20 0 0d0+10 1d2+0
+1 20 25 0d0+10 1d2+0
 10 0
 8 8 0
 GoldMin: 10
@@ -166,7 +181,7 @@ exactly how close it can approach people before darting away, and it seems convi
 that every bench conceals something edible.
 ~
 200 0 0 0 0 0 0 0 1000 E
-1 20 0 0d0+10 1d2+0
+1 20 25 0d0+10 1d2+0
 10 0
 8 8 0
 GoldMin: 10
@@ -183,7 +198,7 @@ It regards strangers mostly as possible sources of bread and has little respect 
 personal space when food is involved.
 ~
 72 0 0 0 0 0 0 0 1000 E
-1 20 0 0d0+10 1d2+0
+1 20 25 0d0+10 1d2+0
 10 0
 8 8 0
 GoldMin: 10

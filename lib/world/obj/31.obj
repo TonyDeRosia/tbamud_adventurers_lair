@@ -43,14 +43,14 @@ A stoppered glass bottle of clear spring water lies here.~
 24 24 15 0
 29 5 6 0 0
 E
-bottle~
-   It is a large, clean bottle.  There is a large label pasted on the side.
-~
-E
 label~
    You've been ripped off!  It says here at the bottom of the label, in really
 really small letters, 'Bottled in the Midgaard branch of Evian Inc.  This water
 is from the natural, mostly clean River of Midgaard.  '
+~
+E
+bottle~
+   It is a large, clean bottle.  There is a large label pasted on the side.
 ~
 #3104
 canteen water leather travel~
@@ -122,12 +122,12 @@ A scarred oak @bSo@Cut@Wh@bwa@Ctc@Wh@n duty desk stands against the wall.~
 34 15 3107 0
 0 0 0 0 0
 E
-drawer~
-   You notice a keyhole in the drawer.
-~
-E
 desk~
    The desk looks very sparse, there is a drawer in the left side.
+~
+E
+drawer~
+   You notice a keyhole in the drawer.
 ~
 #3110
 safe strongbox southwatch iron~
@@ -306,4 +306,190 @@ E
 roster reports incident patrol papers southwatch records~
 The patrol roster lists guards by watch and route, while the incident reports record disturbances, arrests, damaged property, suspicious activity, and other matters requiring follow-up. Fresh notes and corrections show that the records are actively maintained.
 ~
+#3137
+kettle copper willow cup steaming~
+a @Oco@Ypp@Oer @yke@Ott@yle@n~
+A broad @Oco@Ypp@Oer @yke@Ott@yle@n steams behind the Willow Cup counter.~
+~
+12 0 0 0 0 0 0 0 0 0 0 0 0
+0 0 0 0
+250 0 0 0 0
+E
+table council oak mayor chamber broad~
+The council table is built from dark, heavy oak and broad enough to hold several maps at once. Its surface bears shallow scratches, ink stains, and the faint rings left by years of hurried meetings. The table is clearly meant for work rather than ceremony.
+~
+#3138
+herbs jars willow cup rosemary mint honey~
+a working row of @Ghe@grb @yja@Ors@n~
+A working row of @Ghe@grb @yja@Ors@n, honey pots, and tea bundles lines the pavilion shelves.~
+~
+12 0 0 0 0 0 0 0 0 0 0 0 0
+0 0 0 0
+12 0 0 0 0
+E
+petitions ledgers papers mayoral civic records~
+The mayor's working papers include bound ledgers, wax-sealed petitions, correspondence, and short memoranda awaiting review. Several documents carry brief notes in the margins, while others have been sorted into neat stacks for later decisions.
+~
+#3139
+counter willow cup polished serving oak~
+the @gWi@Gll@gow @GCu@Gp@n serving counter~
+The polished @gWi@Gll@gow @GCu@Gp@n serving counter anchors the pavilion.~
+~
+12 0 0 0 0 0 0 0 0 0 0 0 0
+0 0 0 0
+250 0 0 0 0
+E
+table council oak mayor chamber broad~
+The council table is built from dark, heavy oak and broad enough to hold several maps at once. Its surface bears shallow scratches, ink stains, and the faint rings left by years of hurried meetings. The table is clearly meant for work rather than ceremony.
+~
+#3140
+spade oren sexton groundskeeper chapel~
+Brother Oren's @Dgr@Wou@Dnd@Wsk@Dee@Dpe@Wr @ysp@Oad@ye@n~
+A well-kept @ysp@Oad@ye@n used by the chapel groundskeeper rests here.~
+~
+5 0 0 0 0 an 0 0 0 0 0 0 0
+0 1 3 7
+3 10 10 0 0
+A
+19 1
+#3141
+token badge lantern silver chapel oren~
+a @Wsi@Dlv@Wer @Yla@Wnt@Yer@Yn@n token~
+A small @Wsi@Dlv@Wer @Yla@Wnt@Yer@Yn@n token of the chapel lies here.~
+~
+12 cdeg 0 0 0 ao 0 0 0 0 0 0 0
+0 0 0 0
+1 0 10 0 0
+E
+banker sigil seal token bank cashcard card~
+The bronze seal bears the mark of Midgaard's counting house and is bound to its warded ledgers. While carried, the sigil responds to 'BALANCE', 'WITHDRAW <amount>', and 'DEPOSIT <amount>' as though its bearer stood before a banking coffer.
+~
+#3142
+bell handbell brass crier herald town~
+a @Ybr@Oas@Ys @Wha@Ynd@Obe@Yll@n~
+A polished @Ybr@Oas@Ys @Wha@Ynd@Obe@Yll@n used by Midgaard's town crier lies here.~
+~
+12 cdeg 0 0 0 ao 0 0 0 0 0 0 0
+0 0 0 0
+1 0 10 0 0
+E
+banker sigil seal token bank cashcard card~
+The bronze seal bears the mark of Midgaard's counting house and is bound to its warded ledgers. While carried, the sigil responds to 'BALANCE', 'WITHDRAW <amount>', and 'DEPOSIT <amount>' as though its bearer stood before a banking coffer.
+~
+#3143
+folio leather herald crier notices schedule~
+a @yle@Oat@yhe@Or @Yhe@Wra@Yld's @Ofo@Yli@Wo@n~
+A weathered @yle@Oat@yhe@Or @Yhe@Wra@Yld's @Ofo@Yli@Wo@n rests here.~
+~
+15 0 0 0 0 ao 0 0 0 0 0 0 0
+50 0 0 0
+2 8 10 0 0
+#3144
+notices papers civic wax sealed proclamations crier~
+a bundle of @Ywa@Ox-@Yse@Wal@Yed @Wci@Yvi@Oc @Wno@Yti@Oce@Ws@n~
+A bundle of @Ywa@Ox-@Yse@Wal@Yed @Wci@Yvi@Oc @Wno@Yti@Oce@Ws@n has been set down here.~
+~
+12 cdeg 0 0 0 ao 0 0 0 0 0 0 0
+0 0 0 0
+1 0 10 0 0
+E
+banker sigil seal token bank cashcard card~
+The bronze seal bears the mark of Midgaard's counting house and is bound to its warded ledgers. While carried, the sigil responds to 'BALANCE', 'WITHDRAW <amount>', and 'DEPOSIT <amount>' as though its bearer stood before a banking coffer.
+~
+#3145
+keyring keys dain captain chain secured~
+Captain Dain's @Dse@Wcu@Dre@Wd @Yke@Oy @Dri@Wng@n~
+Captain Dain's @Dse@Wcu@Dre@Wd @Yke@Oy @Dri@Wng@n rests here.~
+~
+12 cdeg 0 0 0 ao 0 0 0 0 0 0 0
+0 0 0 0
+1 0 10 0 0
+E
+banker sigil seal token bank cashcard card~
+The bronze seal bears the mark of Midgaard's counting house and is bound to its warded ledgers. While carried, the sigil responds to 'BALANCE', 'WITHDRAW <amount>', and 'DEPOSIT <amount>' as though its bearer stood before a banking coffer.
+~
+#3146
+mail tabard southwatch blue silver patrol armor~
+a @bSo@Cut@Wh@bwa@Ctc@Wh@n mail-and-tabard~
+A blue-and-silver @bSo@Cut@Wh@bwa@Ctc@Wh@n mail-and-tabard lies here.~
+~
+9 0 0 0 0 ad 0 0 0 0 0 0 0
+5 0 0 0
+50 220 5 0 0
+#3147
+baton southwatch patrol oak guard~
+a @bSo@Cut@Wh@bwa@Ctc@Wh@n @yba@Oto@yn@n~
+A sturdy @bSo@Cut@Wh@bwa@Ctc@Wh@n @yba@Oto@yn@n lies here.~
+~
+5 0 0 0 0 an 0 0 0 0 0 0 0
+0 1 3 7
+3 10 10 0 0
+A
+19 1
+#3148
+blade short sword southwatch patrol guard~
+a @bSo@Cut@Wh@bwa@Ctc@Wh@n @Dsh@Wor@Dt @Dbl@Wad@De@n~
+A practical @bSo@Cut@Wh@bwa@Ctc@Wh@n @Dsh@Wor@Dt @Dbl@Wad@De@n lies here.~
+~
+5 n 0 0 0 an 0 0 0 0 0 0 0
+0 1 4 11
+1 15 10 0 0
+A
+18 1
+#3149
+whistle signal southwatch patrol guard~
+a @bSo@Cut@Wh@bwa@Ctc@Wh@n @Wsi@Dgn@Wal @Ywh@Wis@Ytl@We@n~
+A small @bSo@Cut@Wh@bwa@Ctc@Wh@n @Wsi@Dgn@Wal @Ywh@Wis@Ytl@We@n lies here.~
+~
+12 cdeg 0 0 0 ao 0 0 0 0 0 0 0
+0 0 0 0
+1 0 10 0 0
+E
+banker sigil seal token bank cashcard card~
+The bronze seal bears the mark of Midgaard's counting house and is bound to its warded ledgers. While carried, the sigil responds to 'BALANCE', 'WITHDRAW <amount>', and 'DEPOSIT <amount>' as though its bearer stood before a banking coffer.
+~
+#3150
+shield southwatch patrol crowned bridge guard~
+a @bSo@Cut@Wh@bwa@Ctc@Wh@n @Bpa@Ctr@Wol @Dsh@Wie@Dld@n~
+A blue-and-silver @bSo@Cut@Wh@bwa@Ctc@Wh@n @Bpa@Ctr@Wol @Dsh@Wie@Dld@n rests here.~
+~
+9 0 0 0 0 aj 0 0 0 0 0 0 0
+2 0 0 0
+3 90 10 0 0
+#3151
+lantern southwatch patrol hooded guard~
+a @bSo@Cut@Wh@bwa@Ctc@Wh@n @Ypa@Otr@Yol @Wla@Ynt@Yer@Yn@n~
+A hooded @bSo@Cut@Wh@bwa@Ctc@Wh@n @Ypa@Otr@Yol @Wla@Ynt@Yer@Yn@n casts a steady light here.~
+~
+1 0 0 0 0 ao 0 0 0 0 0 0 0
+0 0 96 0
+1 12 10 0 0
+#3152
+keys ring cupboard mara willow cup~
+Mara's @Ycu@Wpb@Yoa@Ord @Oke@Yy @Wri@Yng@n~
+Mara's @Ycu@Wpb@Yoa@Ord @Oke@Yy @Wri@Yng@n lies here.~
+~
+12 cdeg 0 0 0 ao 0 0 0 0 0 0 0
+0 0 0 0
+1 0 10 0 0
+E
+banker sigil seal token bank cashcard card~
+The bronze seal bears the mark of Midgaard's counting house and is bound to its warded ledgers. While carried, the sigil responds to 'BALANCE', 'WITHDRAW <amount>', and 'DEPOSIT <amount>' as though its bearer stood before a banking coffer.
+~
+#3153
+tabard herald town crier bright midgaard~
+a @YMi@Wd@Yga@War@Yd @Ohe@Yra@Wld @Yta@Oba@Yrd@n~
+A bright @YMi@Wd@Yga@War@Yd @Ohe@Yra@Wld @Yta@Oba@Yrd@n lies here.~
+~
+9 0 0 0 0 ad 0 0 0 0 0 0 0
+2 0 0 0
+10 50 10 0 0
+#3154
+surcoat captain dain southwatch command blue silver~
+Captain Dain's @bSo@Cut@Wh@bwa@Ctc@Wh@n command surcoat~
+Captain Dain's blue-and-silver @bSo@Cut@Wh@bwa@Ctc@Wh@n command surcoat lies here.~
+~
+9 0 0 0 0 ad 0 0 0 0 0 0 0
+5 0 0 0
+50 220 5 0 0
 $~
