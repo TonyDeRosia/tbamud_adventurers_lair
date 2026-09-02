@@ -1,7 +1,7 @@
 #3100
 mara willow cup steward hostess keeper~
-@gMara, steward of the Willow Cup@n~
-@gMara@n moves between the Willow Cup's kettles and tables with practiced ease.
+@gMa@Gra@n, steward of the @GWi@gll@Gow @gCu@Gp@n~
+@gMa@Gra@n moves between the @GWi@gll@Gow @gCu@Gp@n's kettles and tables with practiced ease.
 ~
 Mara is a capable middle-aged woman in a green wool dress and clean linen apron, with a
 ring of cupboard keys at her belt. She runs the park pavilion with calm authority,
@@ -9,15 +9,17 @@ remembers regular customers by name, and has the unnerving ability to notice an 
 cup from across the room.
 ~
 26635 0 0 0 16 0 0 0 1000 E
-33 9 0 6d6+330 5d5+5
+33 9 25 6d6+330 5d5+5
 330 0
 8 8 2
+GoldMin: 330
+GoldMax: 330
 E
 T 3100
 #3101
 brother oren sexton chapel gravedigger groundskeeper~
-Brother Oren, the chapel sexton~
-Brother Oren rests his spade nearby while tending to the grounds.
+@WBr@Yot@Whe@Yr @WOre@Yn@n, the @Dch@Wap@Del @Yse@Wxt@Yon@n~
+@WBr@Yot@Whe@Yr @WOre@Yn@n rests his spade nearby while tending to the grounds.
 ~
 Oren is a lean, weathered man in a plain gray coat marked with the silver lantern of the
 chapel. Soil stains his boots and hands, but his tools are meticulously maintained. He
@@ -25,15 +27,17 @@ speaks softly around mourners and treats every grave, rich or poor, with the sam
 patient care.
 ~
 10 0 0 0 0 0 0 0 800 E
-3 19 13 0d0+30 1d2+0
+3 19 0 0d0+30 1d2+0
 30 0
 6 6 1
+GoldMin: 30
+GoldMax: 30
 E
 T 3101
 #3102
 captain dain southwatch commander chief guard~
-@BCaptain Dain, commander of the Southwatch@n~
-@BCaptain Dain@n reviews the watch roster with a stern, attentive eye.
+@BCa@Cpt@Wai@Bn @CDa@Win@n, commander of the @bSo@Cut@Wh@bwa@Ctc@Wh@n~
+@BCa@Cpt@Wai@Bn @CDa@Win@n reviews the watch roster with a stern, attentive eye.
 ~
 Dain wears a reinforced blue-and-silver surcoat over practical mail, its edges polished
 smooth by years of service. A scar crosses one brow, and the keys at his belt are
@@ -41,15 +45,17 @@ secured by a short chain. He has the composed manner of a commander who expects
 discipline without needing to shout.
 ~
 10 0 0 0 16 0 0 0 800 E
-17 15 0 3d3+170 2d2+2
+17 15 25 3d3+170 2d2+2
 170 0
 8 8 1
+GoldMin: 170
+GoldMax: 170
 E
 T 3102
 #3103
 southwatch guardsman guard cityguard upset~
-a Southwatch guardsman~
-A Southwatch guardsman stands ready for the next patrol.
+a @bSo@Cut@Wh@bwa@Ctc@Wh@n guardsman~
+A @bSo@Cut@Wh@bwa@Ctc@Wh@n guardsman stands ready for the next patrol.
 ~
 This city guard wears a blue tabard over serviceable mail, with the crowned bridge of
 Midgaard stitched at the shoulder. A baton, short blade, whistle, and small lantern
@@ -57,30 +63,34 @@ complete the patrol kit. The guard watches doors and strangers with professional
 rather than open hostility.
 ~
 10 0 0 0 0 0 0 0 1000 E
-10 17 0 2d2+100 1d2+1
+10 17 25 2d2+100 1d2+1
 100 0
 8 8 1
+GoldMin: 100
+GoldMax: 100
 E
 T 3103
 #3104
 meriel clerk civic secretary scribe~
-Clerk Meriel~
-Clerk Meriel sorts petitions and sealed civic records behind an oak desk.
+@YCl@Wer@Yk @WMe@Ori@Yel@n~
+@YCl@Wer@Yk @WMe@Ori@Yel@n sorts petitions and sealed civic records behind an oak desk.
 ~
 Meriel is a precise woman in dark civic robes with ink-stained fingers and a brass badge
 of office. She moves through ledgers with formidable speed, tying finished petitions
 with colored cord before passing them onward to the mayor's chamber.
 ~
 10 0 0 0 0 0 0 0 900 E
-12 16 0 2d2+120 2d2+2
+12 16 25 2d2+120 2d2+2
 120 0
 8 8 2
+GoldMin: 120
+GoldMax: 120
 E
 T 3104
 #3105
 edric vale lord mayor mayor magistrate~
-@YLord Mayor Edric Vale@n~
-@YLord Mayor Edric Vale@n studies a map of Midgaard spread across the council table.
+@YLo@Wrd @OMa@Yyo@Wr @YEd@Wri@Oc @YVa@Wle@n~
+@YLo@Wrd @OMa@Yyo@Wr @YEd@Wri@Oc @YVa@Wle@n studies a map of Midgaard spread across the council table.
 ~
 Edric Vale is an older man with silver at his temples and the steady posture of a former
 soldier. His formal coat bears only a small crowned-bridge clasp rather than jeweled
@@ -88,39 +98,45 @@ decoration. He listens more than he speaks, marking notes in the margins of peti
 before issuing short, practical decisions.
 ~
 26634 0 0 0 16 0 0 0 1000 E
-24 12 0 4d4+240 4d4+4
+24 12 25 4d4+240 4d4+4
 240 0
 8 8 1
+GoldMin: 240
+GoldMax: 240
 E
 T 3105
 #3106
 town crier herald midgaard crier~
-the Midgaard town crier~
-The Midgaard town crier calls the latest notices in a carrying voice.
+the @YMi@Wd@Yga@War@Yd @Oto@Ywn @Wcr@Yie@Or@n~
+The @YMi@Wd@Yga@War@Yd @Oto@Ywn @Wcr@Yie@Or@n calls the latest notices in a carrying voice.
 ~
 A bright tabard, brass handbell, and leather folio identify this young herald of the
 city. Between announcements, the crier checks wax-sealed notices against a handwritten
 schedule and watches for a clear moment to make the next proclamation.
 ~
 200 0 0 0 0 0 0 0 900 E
-1 20 18 0d0+10 1d2+0
+1 20 0 0d0+10 1d2+0
 10 0
 8 8 1
+GoldMin: 10
+GoldMax: 10
 E
 T 3106
 #3120
 silver necked swan park swan~
-@Wa silver-necked swan@n~
-@WA silver-necked swan@n glides across the water with regal calm.
+a @Wsi@Dlv@Wer-@Dne@Wck@Ded @Wsw@Dan@n~
+A @Wsi@Dlv@Wer-@Dne@Wck@Ded @Wsw@Dan@n glides across the water with regal calm.
 ~
 White feathers lie smooth over a long graceful body, broken only by a narrow band of
 gray around the swan's neck. It watches nearby visitors with the imperious confidence of
 a creature that has been fed by generations of park-goers.
 ~
 10 0 0 0 0 0 0 0 1000 E
-1 20 18 0d0+10 1d2+0
+1 20 0 0d0+10 1d2+0
 10 0
 8 8 0
+GoldMin: 10
+GoldMax: 10
 E
 T 3107
 #3121
@@ -133,9 +149,11 @@ It peeps at every passing shadow and quickly returns to the safety of the reeds 
 something seems too large or too sudden.
 ~
 10 0 0 0 0 0 0 0 1000 E
-1 20 18 0d0+10 1d2+0
+1 20 0 0d0+10 1d2+0
 10 0
 8 8 0
+GoldMin: 10
+GoldMax: 10
 E
 T 3108
 #3122
@@ -148,9 +166,11 @@ exactly how close it can approach people before darting away, and it seems convi
 that every bench conceals something edible.
 ~
 200 0 0 0 0 0 0 0 1000 E
-1 20 18 0d0+10 1d2+0
+1 20 0 0d0+10 1d2+0
 10 0
 8 8 0
+GoldMin: 10
+GoldMax: 10
 E
 T 3109
 #3123
@@ -163,9 +183,11 @@ It regards strangers mostly as possible sources of bread and has little respect 
 personal space when food is involved.
 ~
 72 0 0 0 0 0 0 0 1000 E
-1 20 18 0d0+10 1d2+0
+1 20 0 0d0+10 1d2+0
 10 0
 8 8 0
+GoldMin: 10
+GoldMax: 10
 E
 T 3110
 $

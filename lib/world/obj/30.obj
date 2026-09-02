@@ -48,8 +48,8 @@ A key made of a dull metal is lying on the ground here.~
 1 0 0 0 0
 #3006
 wayfarer rune runestone waystone stone teleporter~
-a wayfarer's rune-stone~
-A palm-sized rune-stone glimmers with pale blue light here.~
+a @Cwa@Byf@Car@Wer@C's @Bru@Cne-@Bst@Cone@n~
+A palm-sized @Cwa@Byf@Car@Wer@C's @Bru@Cne-@Bst@Cone@n glimmers with pale blue light here.~
 ~
 12 0 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
@@ -62,24 +62,24 @@ Fine silver sigils cover the smooth stone, shifting subtly when touched. The run
 ~
 #3007
 pool of radiance~
-Pool of Radiance~
-A giant @Cpool@n of @Yh@Ge@Ya@Gl@Yi@Gn@Yg@n power @Ys@Wh@Yi@Wn@Ye@Ws@n with a @Yg@yo@Yl@yd@Ye@yn@n @Yr@ya@Yd@yi@Ya@yn@Yc@ye@n before you.~
+@CPo@Yol @Gof @YRa@Wdi@Yan@Gce@n~
+A giant @Cpo@Yol@n of @Yh@Ge@Ya@Gl@Yi@Gn@Yg@n power @Ys@Wh@Yi@Wn@Ye@Ws@n with a @Yg@yo@Yl@yd@Ye@yn@n @Yr@ya@Yd@yi@Ya@yn@Yc@ye@n before you.~
 ~
 6 ceq 0 0 0 0 0 0 0 0 0 0 0
 10 0 0 0
 999999 0 0 0 0
 #3008
 bedroll bed sleeping~
-a @Pbedroll@n~
-@WAn exquisite @Pbedroll@n with restorative powers is here.@n~
+a @Pbe@Mdr@Pol@Ml@n~
+An exquisite @Pbe@Mdr@Pol@Ml@n with restorative powers is here.~
 ~
 6 0 0 0 0 a 0 0 0 i 0 0 0
 5 1 0 0
 2 10 0 0 0
 #3009
 waybread bread~
-a waybread~
-Some waybread has been put here.~
+a @Ywa@Gy@Ybr@Gea@Yd@n~
+Some @Ywa@Gy@Ybr@Gea@Yd@n has been put here.~
 ~
 19 0 0 0 0 a 0 0 0 0 0 0 0
 24 0 0 0
@@ -91,7 +91,7 @@ lembas.  It is said to refresh the weary traveler greatly.
 ~
 #3010
 bread loaf~
-a bread~
+a @Ybr@Oea@Yd@n~
 A loaf of bread has been left here.~
 ~
 19 0 0 0 0 a 0 0 0 0 0 0 0
@@ -99,7 +99,7 @@ A loaf of bread has been left here.~
 1 2 10 0 0
 #3011
 honey glazed pastry sweet~
-a honey-glazed pastry~
+a @Yho@One@Yy-@Ogl@Yaz@Oed @Ypa@Ost@Yry@n~
 A flaky pastry glazed with honey rests here.~
 ~
 19 0 0 0 0 a 0 0 0 0 0 0 0
@@ -107,7 +107,7 @@ A flaky pastry glazed with honey rests here.~
 1 5 5 0 0
 #3012
 spiced meat hand pie turnover~
-a spiced meat hand pie~
+a @Rsp@Oic@Red @Yme@Oat @Yha@Ond @Ypi@Oe@n~
 A warm hand pie filled with spiced meat rests here.~
 ~
 19 0 0 0 0 a 0 0 0 0 0 0 0
@@ -115,7 +115,7 @@ A warm hand pie filled with spiced meat rests here.~
 1 5 15 0 0
 #3013
 herb wrapped meat roll bread~
-an herb-wrapped meat roll~
+an @Ghe@grb-@Gwr@gap@Gpe@gd @Rme@Oat @Rro@Oll@n~
 A savory meat roll wrapped in soft herb bread rests here.~
 ~
 19 0 0 0 0 a 0 0 0 0 0 0 0
@@ -123,7 +123,7 @@ A savory meat roll wrapped in soft herb bread rests here.~
 1 4 10 0 0
 #3014
 toasted cheese flatbread wedges~
-some toasted cheese flatbread~
+some @Oto@Yas@Ote@Yd @Ych@Oee@Yse @Ofl@Yat@Obr@Yea@Od@n~
 Several wedges of toasted flatbread covered in melted cheese rest here.~
 ~
 19 0 0 0 0 a 0 0 0 0 0 0 0
@@ -150,7 +150,7 @@ wonder...
 ~
 #3020
 dagger~
-a dagger~
+a @Dda@Wgg@Der@n~
 A dagger with a long thin blade is here.~
 ~
 5 n 0 0 0 an 0 0 0 0 0 0 0
@@ -160,25 +160,25 @@ A
 18 1
 #3021
 sword small~
-a small sword~
+a @Dsm@Wal@Dl @Wsw@Dor@Wd@n~
 A small sword lies here.~
 ~
 5 e 0 0 0 an 0 0 0 0 0 0 0
 0 1 6 11
 3 25 10 0 0
 E
-sword small~
-   The small sword seems to have an inscription of some sort.
-~
-E
 inscription~
    It says: 'May this sword be a good companion.  '
+~
+E
+sword small~
+   The small sword seems to have an inscription of some sort.
 ~
 A
 18 1
 #3022
 sword long~
-a long sword~
+a @Dlo@Wng @Dsw@Wor@Dd@n~
 A long sword has been left here.~
 ~
 5 n 0 0 0 an 0 0 0 0 0 0 0
@@ -186,7 +186,7 @@ A long sword has been left here.~
 8 45 10 0 0
 #3023
 club wooden~
-a wooden club~
+a @ywo@Ood@yen @Dcl@Wub@n~
 A simple looking wooden club is here.~
 ~
 5 0 0 0 0 an 0 0 0 0 0 0 0
@@ -196,7 +196,7 @@ A
 19 1
 #3024
 warhammer hammer~
-a warhammer~
+a @Dwa@Wrh@Dam@Wme@Dr@n~
 A medium sized warhammer is here.~
 ~
 5 0 0 0 0 an 0 0 0 0 0 0 0
@@ -206,7 +206,7 @@ A
 19 1
 #3025
 flail large~
-a flail~
+a @Dfl@Wai@Dl@n~
 A large flail is here.~
 ~
 5 0 0 0 0 an 0 0 0 0 0 0 0
@@ -214,7 +214,7 @@ A large flail is here.~
 6 65 10 0 0
 #3030
 torch~
-a torch~
+a @Yto@Orc@Yh@n~
 A large torch.~
 ~
 1 0 0 0 0 ao 0 0 0 0 0 0 0
@@ -222,7 +222,7 @@ A large torch.~
 1 3 0 0 0
 #3031
 lantern brass~
-a lantern~
+a @Yla@Ont@Yer@n~
 A brass lantern is here.~
 ~
 1 0 0 0 0 ao 0 0 0 0 0 0 0
@@ -230,7 +230,7 @@ A brass lantern is here.~
 1 12 10 0 0
 #3032
 bag~
-a bag~
+a @yba@Og@n~
 A small bag is here.~
 ~
 15 0 0 0 0 ao 0 0 0 0 0 0 0
@@ -238,7 +238,7 @@ A small bag is here.~
 2 8 10 0 0
 #3033
 box~
-a box~
+a @ybo@Ox@n~
 A small box is here.~
 ~
 15 0 0 0 0 ao 0 0 0 0 0 0 0
@@ -246,8 +246,8 @@ A small box is here.~
 5 5 10 0 0
 #3034
 banking coffer coinward bank balance withdraw deposit atm teller machine~
-an enchanted banking coffer~
-A brass-bound banking coffer is set into the wall here, its runes glowing softly.~
+an @Yen@Cch@Ban@Yte@Cd @Wba@Ynk@Cin@Wg @Oco@Yff@Oer@n~
+A brass-bound @Yen@Cch@Ban@Yte@Cd @Wba@Ynk@Cin@Wg @Oco@Yff@Oer@n is set into the wall here, its runes glowing softly.~
 ~
 12 cdeg 0 0 0 0 0 0 0 0 0 0 0
 0 0 0 0
@@ -258,8 +258,8 @@ Silver runes across the coffer's lockplate are bound to Midgaard's counting hous
 ~
 #3035
 fountain water~
-the large fountain~
-A large fountain carved from blue-streaked marble is here, bubbling merrily.~
+the @Bla@Crg@We @Bfo@Cun@Wta@Bin@n~
+A @Bla@Crg@We @Bfo@Cun@Wta@Bin@n carved from blue-streaked marble is here, bubbling merrily.~
 ~
 23 cdeg 0 0 0 0 0 0 0 0 0 0 0
 500 500 15 0
@@ -270,8 +270,8 @@ It is a well-crafted fountain carved from a single piece of beautiful white marb
 ~
 #3036
 banker sigil seal token bank cashcard card atm~
-a banker's sigil~
-A small bronze banker's sigil lies here, stamped with the seal of Midgaard.~
+a @Yba@Wnk@Oer@Y's @Wsi@Ygi@Ol@n~
+A small bronze @Yba@Wnk@Oer@Y's @Wsi@Ygi@Ol@n lies here, stamped with the seal of Midgaard.~
 ~
 12 cdeg 0 0 0 ao 0 0 0 0 0 0 0
 0 0 0 0
@@ -282,7 +282,7 @@ The bronze seal bears the mark of Midgaard's counting house and is bound to its 
 ~
 #3037
 candle~
-a candle~
+a @Yca@Ond@Yle@n~
 A candle lies here, unlit.~
 ~
 1 0 0 0 0 ao 0 0 0 0 0 0 0
@@ -306,7 +306,7 @@ nail~
 ~
 #3039
 pot~
-a pot~
+a @Dpo@Wt@n~
 A cast-iron pot sits on the ground.~
 ~
 15 0 0 0 0 a 0 0 0 0 0 0 0
@@ -318,7 +318,7 @@ pot~
 ~
 #3040
 plate breast~
-a breast plate~
+a @Dbr@Wea@Dst @Dpl@Wat@De@n~
 A breast plate is lying on the ground.~
 ~
 9 0 0 0 0 ad 0 0 0 0 0 0 0
@@ -326,7 +326,7 @@ A breast plate is lying on the ground.~
 50 180 15 0 0
 #3041
 shirt chain mail~
-a chain mail shirt~
+a @Dch@Wai@Dn @Dma@Wil @Dsh@Wir@Dt@n~
 A chain mail shirt is lying on the ground.~
 ~
 9 0 0 0 0 ad 0 0 0 0 0 0 0
@@ -334,7 +334,7 @@ A chain mail shirt is lying on the ground.~
 50 220 5 0 0
 #3042
 shield wooden~
-a shield~
+a @Dsh@Wie@Dld@n~
 A small wooden shield is lying on the ground.~
 ~
 9 0 0 0 0 aj 0 0 0 0 0 0 0
@@ -342,7 +342,7 @@ A small wooden shield is lying on the ground.~
 3 90 10 0 0
 #3043
 jacket soft leather~
-a leather jacket~
+a @yle@Oat@yhe@Or @yja@Ock@yet@n~
 A soft leather jacket is lying on the ground.~
 ~
 9 0 0 0 0 ad 0 0 0 0 0 0 0
@@ -350,7 +350,7 @@ A soft leather jacket is lying on the ground.~
 10 50 10 0 0
 #3044
 jacket studded leather~
-a studded leather jacket~
+a @Dst@Wud@Dde@Wd @yle@Oat@yhe@Or @yja@Ock@yet@n~
 A studded leather jacket is lying on the ground.~
 ~
 9 0 0 0 0 ad 0 0 0 0 0 0 0
@@ -358,7 +358,7 @@ A studded leather jacket is lying on the ground.~
 20 90 10 0 0
 #3045
 jacket scale mail~
-a scale mail jacket~
+a @Dsc@Wal@De @Dma@Wil @yja@Ock@yet@n~
 A scale mail jacket is lying on the ground.~
 ~
 9 0 0 0 0 ad 0 0 0 0 0 0 0
@@ -366,16 +366,16 @@ A scale mail jacket is lying on the ground.~
 40 150 10 0 0
 #3046
 plate bronze breast~
-a bronze breast plate~
-A bronze breast plate is lying on the ground.~
+a @Obr@Yon@Oze @Wbr@Oea@Yst @Opl@Wat@Ye@n~
+A @Obr@Yon@Oze @Wbr@Oea@Yst @Opl@Wat@Ye@n is lying on the ground.~
 ~
 9 0 0 0 0 ad 0 0 0 0 0 0 0
 6 0 0 0
 50 260 10 0 0
 #3050
 scroll identify~
-a scroll of identify~
-A scroll has carelessly been left here.~
+a @Wsc@Cro@Wll @Cof @Wid@Cen@Wti@Cfy@n~
+A @Wsc@Cro@Wll @Cof @Wid@Cen@Wti@Cfy@n has carelessly been left here.~
 ~
 2 g 0 0 0 ao 0 0 0 0 0 0 0
 1 52 -1 -1
@@ -394,8 +394,8 @@ scroll identify~
 ~
 #3051
 potion yellow~
-a yellow potion of see invisible~
-A small yellow potion has carelessly been left here.~
+a @Yye@Wll@Yow @Cpo@Bti@Con @Yof @Wse@Ce @Bin@Cvi@Bsi@Cbl@Be@n~
+A small @Yye@Wll@Yow @Cpo@Bti@Con@n has carelessly been left here.~
 ~
 10 g 0 0 0 ao 0 0 0 0 0 0 0
 12 19 -1 -1
@@ -406,8 +406,8 @@ potion yellow~
 ~
 #3052
 scroll recall~
-a scroll of recall~
-A scroll has carelessly been left here.~
+a @Wsc@Cro@Wll @Mof @Wre@Mca@Wll@n~
+A @Wsc@Cro@Wll @Mof @Wre@Mca@Wll@n has carelessly been left here.~
 ~
 2 g 0 0 0 ao 0 0 0 0 0 0 0
 12 42 -1 -1
@@ -418,8 +418,8 @@ scroll recall~
 ~
 #3053
 wand gray~
-a gray wand of invisibility~
-A gray wand has carelessly been left here.~
+a @Dgr@Way @Mwa@Cnd @Dof @Min@Cvi@Msi@Cbi@Mli@Cty@n~
+A @Dgr@Way @Mwa@Cnd @Dof @Min@Cvi@Msi@Cbi@Mli@Cty@n lies here.~
 ~
 3 g 0 0 0 ao 0 0 0 0 0 0 0
 12 2 2 29
@@ -434,8 +434,8 @@ at the base of the wand.  It looks like this:
 ~
 #3054
 staff gnarled~
-a gnarled staff of magic missiles.~
-A gnarled staff has carelessly been left here.~
+a @Dgn@War@Dle@Wd @Mst@Caf@Mf @Wof @Rma@Mgi@Cc @Rmi@Mss@Cil@Res@n~
+A @Dgn@War@Dle@Wd @Mst@Caf@Mf @Wof @Rma@Mgi@Cc @Rmi@Mss@Cil@Res@n has been left here.~
 ~
 4 g 0 0 0 ao 0 0 0 0 0 0 0
 5 10 10 32
@@ -455,7 +455,7 @@ base of the staff, it looks like:
 ~
 #3055
 staff metal~
-a metal staff~
+a @Dme@Wta@Dl @Dst@Waf@Df@n~
 A metal staff has carelessly been left here.~
 ~
 4 g 0 0 0 ao 0 0 0 0 0 0 0
@@ -467,7 +467,7 @@ staff metal~
 ~
 #3060
 raft~
-a raft~
+a @yra@Oft@n~
 A raft has been left here.~
 ~
 22 0 0 0 0 a 0 0 0 0 0 0 0
@@ -479,7 +479,7 @@ raft~
 ~
 #3061
 canoe~
-a canoe~
+a @yca@Ono@ye@n~
 A canoe has been left here.~
 ~
 22 0 0 0 0 a 0 0 0 0 0 0 0
@@ -491,15 +491,15 @@ canoe~
 ~
 #3070
 gauntlets bronze~
-a pair of bronze gauntlets~
-A pair of bronze gauntlets is lying on the ground.~
+a pair of @Obr@Yon@Oze @Wga@Oun@Ytl@Oet@Ws@n~
+A pair of @Obr@Yon@Oze @Wga@Oun@Ytl@Oet@Ws@n lies here.~
 ~
 9 0 0 0 0 ah 0 0 0 0 0 0 0
 6 0 0 0
 8 90 10 0 0
 #3071
 gloves leather~
-a pair of leather gloves~
+a pair of @yle@Oat@yhe@Or @ygl@Oov@yes@n~
 A pair of leather gloves is lying on the ground.~
 ~
 9 0 0 0 0 ah 0 0 0 0 0 0 0
@@ -507,15 +507,15 @@ A pair of leather gloves is lying on the ground.~
 3 35 10 0 0
 #3075
 helmet bronze~
-a bronze helmet~
-A bronze helmet is lying on the ground.~
+a @Obr@Yon@Oze @Whe@Olm@Yet@n~
+A @Obr@Yon@Oze @Whe@Olm@Yet@n lies here.~
 ~
 9 0 0 0 0 ae 0 0 0 0 0 0 0
 6 0 0 0
 8 100 10 0 0
 #3076
 cap leather~
-a leather cap~
+a @yle@Oat@yhe@Or @yca@Op@n~
 A leather cap is lying on the ground.~
 ~
 9 0 0 0 0 ae 0 0 0 0 0 0 0
@@ -523,15 +523,15 @@ A leather cap is lying on the ground.~
 3 30 10 0 0
 #3080
 leggings bronze~
-a pair of bronze leggings~
-A pair of bronze leggings is lying on the ground.~
+a pair of @Obr@Yon@Oze @Wle@Ogg@Yin@Ogs@n~
+A pair of @Obr@Yon@Oze @Wle@Ogg@Yin@Ogs@n lies here.~
 ~
 9 0 0 0 0 af 0 0 0 0 0 0 0
 6 0 0 0
 8 110 10 0 0
 #3081
 pants leather~
-a pair of leather pants~
+a pair of @yle@Oat@yhe@Or @ypa@Ont@ys@n~
 A pair of leather pants is lying on the ground.~
 ~
 9 0 0 0 0 af 0 0 0 0 0 0 0
@@ -539,7 +539,7 @@ A pair of leather pants is lying on the ground.~
 8 45 10 0 0
 #3082
 leather gorget neck guard~
-a leather gorget~
+a @yle@Oat@yhe@Or @ygo@Org@yet@n~
 A leather neck guard has been left here~
 ~
 9 0 0 0 0 ac 0 0 0 0 0 0 0
@@ -551,7 +551,7 @@ leather gorget neck guard~
 ~
 #3083
 copper ring~
-a copper ring~
+a @Oco@Ypp@Oer @Yri@Ong@n~
 A copper ring with strange symbols lies here.~
 ~
 11 0 0 0 0 ab 0 0 0 0 0 0 0
@@ -564,7 +564,7 @@ has become so worn with time and use that it is unreadable.
 ~
 #3084
 leather boots~
-a pair of leather boots~
+a pair of @yle@Oat@yhe@Or @ybo@Oot@ys@n~
 A pair of leather boots is lying here.~
 ~
 11 0 0 0 0 ag 0 0 0 0 0 0 0
@@ -577,15 +577,15 @@ useable.
 ~
 #3085
 sleeves bronze~
-a pair of bronze sleeves~
-A pair of bronze sleeves is lying on the ground.~
+a pair of @Obr@Yon@Oze @Wsl@Oee@Yve@Os@n~
+A pair of @Obr@Yon@Oze @Wsl@Oee@Yve@Os@n lies here.~
 ~
 9 0 0 0 0 ai 0 0 0 0 0 0 0
 6 0 0 0
 8 95 10 0 0
 #3086
 sleeves leather~
-a pair of leather sleeves~
+a pair of @yle@Oat@yhe@Or @ysl@Oee@yve@Os@n~
 A pair of leather sleeves is lying on the ground.~
 ~
 9 0 0 0 0 ai 0 0 0 0 0 0 0
@@ -593,7 +593,7 @@ A pair of leather sleeves is lying on the ground.~
 4 40 10 0 0
 #3087
 brown leather cape~
-a brown leather cape~
+a @ybr@Oow@yn @yle@Oat@yhe@Or @yca@Ope@n~
 A brown leather cape was abandoned on the floor~
 ~
 9 0 0 0 0 ak 0 0 0 0 0 0 0
@@ -607,7 +607,7 @@ A
 1 1
 #3088
 leather old belt~
-an old leather belt~
+an @Dol@Wd @yle@Oat@yhe@Or @ybe@Olt@n~
 A belt made of leather was left here.~
 ~
 9 e 0 0 0 al 0 0 0 0 0 0 0
@@ -623,7 +623,7 @@ A
 1 1
 #3089
 leather wristguard~
-a leather wristguard~
+a @yle@Oat@yhe@Or @ywr@Ois@ytg@Oua@yrd@n~
 A leather wristguard lies in the dirt.~
 ~
 9 0 0 0 0 am 0 0 0 0 0 0 0
@@ -637,18 +637,18 @@ almost any size.
 ~
 #3096
 boards adventurers notice board social bulletin gen_boards~
-an adventurers' notice board~
-A broad wooden notice board covered in pinned notes hangs on the wall here.~
+an @Yad@Wve@Ynt@Cur@Wers' @Yno@Wti@Cce @Ybo@War@Yd@n~
+An @Yad@Wve@Ynt@Cur@Wers' @Yno@Wti@Cce @Ybo@War@Yd@n is mounted here.~
 ~
 12 0 0 0 0 0 0 0 0 0 0 0 0
 0 0 0 0
 0 0 0 0 0
 E
-adventurers notice board social bulletin~
-Pinned notices carry news, requests, warnings, and messages left by travelers from across the realm. Use 'look board' to read what has been posted.
-~
-E
 social bulletin~
    Use 'look board' to read the board.
+~
+E
+adventurers notice board social bulletin~
+Pinned notices carry news, requests, warnings, and messages left by travelers from across the realm. Use 'look board' to read what has been posted.
 ~
 $~

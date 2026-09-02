@@ -1,7 +1,7 @@
 #3100
 cup willow tea herbal~
-@ga cup of Willow Cup herbal tea@n~
-@gA steaming cup of fragrant herbal tea rests here.@n~
+a cup of @gWi@Gll@gow @GCu@Gp@n herbal tea~
+A steaming cup of fragrant @gWi@Gll@gow @GCu@Gp@n herbal tea rests here.~
 ~
 17 0 0 0 0 a 0 0 0 0 0 0 0
 8 8 11 0
@@ -66,8 +66,8 @@ canteen~
 ~
 #3105
 key iron southwatch barracks~
-an iron Southwatch key~
-A heavy iron key stamped with the Southwatch shield lies here.~
+an iron @bSo@Cut@Wh@bwa@Ctc@Wh@n key~
+A heavy iron key stamped with the @bSo@Cut@Wh@bwa@Ctc@Wh@n shield lies here.~
 ~
 18 c 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
@@ -115,8 +115,8 @@ key brass~
 ~
 #3109
 desk oak southwatch records~
-the Southwatch duty desk~
-A scarred oak duty desk stands against the wall.~
+the @bSo@Cut@Wh@bwa@Ctc@Wh@n duty desk~
+A scarred oak @bSo@Cut@Wh@bwa@Ctc@Wh@n duty desk stands against the wall.~
 ~
 15 0 0 0 0 0 0 0 0 0 0 0 0
 34 15 3107 0
@@ -131,8 +131,8 @@ desk~
 ~
 #3110
 safe strongbox southwatch iron~
-the Southwatch iron strongbox~
-A squat iron strongbox occupies a guarded corner.~
+the @bSo@Cut@Wh@bwa@Ctc@Wh@n iron strongbox~
+A squat @bSo@Cut@Wh@bwa@Ctc@Wh@n iron strongbox occupies a guarded corner.~
 ~
 15 0 0 0 0 0 0 0 0 0 0 0 0
 34 15 3108 0
@@ -157,8 +157,8 @@ side.
 ~
 #3112
 key city great ceremonial midgaard~
-@Ythe great key of Midgaard@n~
-@YA massive ceremonial city key rests here, chased with old brass.@n~
+the @Ygr@Wea@Yt @Oke@Wy @Yof @WMi@Ydg@Oaa@Wrd@n~
+A massive ceremonial @Ygr@Wea@Yt @Oke@Wy @Yof @WMi@Ydg@Oaa@Wrd@n rests here, chased with old brass.~
 ~
 18 c 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
@@ -199,8 +199,8 @@ A secured reserve of Midgaard coin has been gathered here.~
 1 0 0 0 0
 #3116
 candlestick candle lantern chapel silvered~
-@Wa silvered chapel candlestick@n~
-@WA silvered candlestick casts a steady devotional light here.@n~
+a @Wsi@Dlv@Wer@Ded @Ych@Wap@Yel @Wca@Ynd@Wle@Yst@Wic@Yk@n~
+A @Wsi@Dlv@Wer@Ded @Ych@Wap@Yel @Wca@Ynd@Wle@Yst@Wic@Yk@n casts a steady devotional light here.~
 ~
 1 0 0 0 0 ao 0 0 0 0 0 0 0
 0 0 24 0
@@ -221,5 +221,89 @@ An old elm spreads a broad canopy of shade overhead.~
 E
 elm tree~
    The fresh young leaves of the elm tree wave gently in the wind.
+~
+#3130
+table council oak mayor chamber broad~
+a @Ybr@Ooa@Yd @Woa@Ok @Yco@Wun@Oci@Yl @Wta@Ybl@Oe@n~
+A @Ybr@Ooa@Yd @Woa@Ok @Yco@Wun@Oci@Yl @Wta@Ybl@Oe@n stands beneath the ward banners.~
+~
+12 0 0 0 0 0 0 0 0 0 0 0 0
+0 0 0 0
+250 0 0 0 0
+E
+table council oak mayor chamber broad~
+The council table is built from dark, heavy oak and broad enough to hold several maps at once. Its surface bears shallow scratches, ink stains, and the faint rings left by years of hurried meetings. The table is clearly meant for work rather than ceremony.
+~
+#3131
+map midgaard city wards detailed council~
+a @Yde@Wta@Yil@Oed @Wma@Yp @Oof @YMi@Wdg@Oaa@Yrd@n~
+A @Yde@Wta@Yil@Oed @Wma@Yp @Oof @YMi@Wdg@Oaa@Yrd@n lies spread across the council table.~
+~
+12 0 0 0 0 0 0 0 0 0 0 0 0
+0 0 0 0
+2 0 0 0 0
+E
+map midgaard city wards detailed council~
+The map shows Midgaard in careful detail, from the riverward streets and commons to the gates, civic quarter, and surrounding roads. Small movable markers indicate patrol routes, trouble spots, and areas under current review.
+~
+#3132
+petitions ledgers papers mayoral civic records~
+a stack of @Yma@Wyo@Ora@Yl @Wpe@Yti@Oti@Wons@n and @Yle@Wdg@Oers@n~
+@YMa@Wyo@Ora@Yl @Wpe@Yti@Oti@Wons@n, ledgers, and sealed civic papers are arranged for review.~
+~
+12 0 0 0 0 0 0 0 0 0 0 0 0
+0 0 0 0
+12 0 0 0 0
+E
+petitions ledgers papers mayoral civic records~
+The mayor's working papers include bound ledgers, wax-sealed petitions, correspondence, and short memoranda awaiting review. Several documents carry brief notes in the margins, while others have been sorted into neat stacks for later decisions.
+~
+#3133
+desk clerk oak civic meriel long~
+a @Ylo@Wng @Ooa@Yk @Wcl@Yer@Ok's @Yde@Wsk@n~
+A @Ylo@Wng @Ooa@Yk @Wcl@Yer@Ok's @Yde@Wsk@n anchors the center of the antechamber.~
+~
+12 0 0 0 0 0 0 0 0 0 0 0 0
+0 0 0 0
+220 0 0 0 0
+E
+desk clerk oak civic meriel long~
+The clerk's desk is a long, well-used oak worktable built to handle a constant flow of civic paperwork. Its surface is worn smooth at the edges, with enough room for ledgers, petitions, quills, sealing wax, and sorted folios.
+~
+#3134
+petitions ledgers folios seals papers civic clerk~
+a working stack of @Yci@Wvi@Oc @Ype@Wti@Oti@Yons@n and @Wle@Ydg@Oers@n~
+@YCi@Wvi@Oc @Ype@Wti@Oti@Yons@n, bound ledgers, sealed folios, and writing supplies cover part of the desk.~
+~
+12 0 0 0 0 0 0 0 0 0 0 0 0
+0 0 0 0
+15 0 0 0 0
+E
+petitions ledgers folios seals papers civic clerk~
+These are the working records of Civic Hall: petitions from citizens, bound ledgers, sealed folios, wax tablets, correspondence, and bundles tied with colored cord. The arrangement is orderly enough that an experienced clerk could find a particular request quickly.
+~
+#3135
+board duty southwatch patrol notices roster~
+the @bSo@Cut@Wh@bwa@Ctc@Wh@n @Bdu@Cty @Wbo@Bar@Cd@n~
+The @bSo@Cut@Wh@bwa@Ctc@Wh@n @Bdu@Cty @Wbo@Bar@Cd@n displays patrol assignments and watch notices.~
+~
+12 0 0 0 0 0 0 0 0 0 0 0 0
+0 0 0 0
+40 0 0 0 0
+E
+board duty southwatch patrol notices assignments~
+The Southwatch duty board is covered with patrol assignments, watch rotations, gate duties, and short notices for the current shift. Names and routes have been marked in a firm hand, with recent changes pinned over older instructions.
+~
+#3136
+roster reports incident patrol papers southwatch records~
+the @bSo@Cut@Wh@bwa@Ctc@Wh@n @Bpa@Ctr@Wol @Bro@Cst@Wer@n and @Win@Cci@Bde@Cnt @Wre@Cpo@Brt@Ws@n~
+A @Bpa@Ctr@Wol @Bro@Cst@Wer@n and a tidy stack of @Win@Cci@Bde@Cnt @Wre@Cpo@Brt@Ws@n rest near the duty desk.~
+~
+12 0 0 0 0 0 0 0 0 0 0 0 0
+0 0 0 0
+10 0 0 0 0
+E
+roster reports incident patrol papers southwatch records~
+The patrol roster lists guards by watch and route, while the incident reports record disturbances, arrests, damaged property, suspicious activity, and other matters requiring follow-up. Fresh notes and corrections show that the records are actively maintained.
 ~
 $~

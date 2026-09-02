@@ -1543,6 +1543,770 @@ if !%self.fighting%
   done
 end
 ~
+#3043
+Zone30 Watch Reactive Speech~
+0 d 1
+*~
+if %self.fighting%
+  halt
+end
+if !%actor.is_pc%
+  halt
+end
+if %actor.varexists(z30_social_lock)%
+  halt
+end
+if %actor.is_killer% || %actor.is_thief%
+  set z30_social_lock 1
+  remote z30_social_lock %actor.id%
+  say This is not the time for conversation. Stand down and answer to the law.
+  wait 3 sec
+  rdelete z30_social_lock %actor.id%
+  halt
+elseif %speech.contains(hello)% || %speech.contains(hail)% || %speech.contains(greetings)% || %speech.contains(morning)% || %speech.contains(evening)%
+  set z30_social_lock 1
+  remote z30_social_lock %actor.id%
+  switch %random.4%
+    case 1
+      say Good day. Keep your business peaceful.
+    break
+    case 2
+      emote gives %actor.name% a brief professional nod.
+    break
+    case 3
+      say Welcome to Midgaard. Mind the crowds and you will do fine.
+    break
+    case 4
+      say Evening. Need directions, or just passing through?
+    break
+  done
+  wait 3 sec
+  rdelete z30_social_lock %actor.id%
+  halt
+elseif %speech.contains(help)% || %speech.contains(lost)% || %speech.contains(where)% || %speech.contains(direction)%
+  set z30_social_lock 1
+  remote z30_social_lock %actor.id%
+  switch %random.4%
+    case 1
+      say Temple Square is north of the market. The Adventurer's Guild lies east along Guild Way.
+    break
+    case 2
+      say For rooms and food, ask at one of the inns. For training and contracts, head for the Adventurer's Guild.
+    break
+    case 3
+      say If you are lost, find the Grand Market first. Most major streets connect back to it.
+    break
+    case 4
+      say Tell me what landmark you are looking for and I may be able to point you the right way.
+    break
+  done
+  wait 3 sec
+  rdelete z30_social_lock %actor.id%
+  halt
+elseif %speech.contains(temple)% || %speech.contains(heal)% || %speech.contains(healer)% || %speech.contains(priest)%
+  set z30_social_lock 1
+  remote z30_social_lock %actor.id%
+  say The High Temple is north of Temple Square. If you are hurt, that is where I would go.
+  wait 3 sec
+  rdelete z30_social_lock %actor.id%
+  halt
+elseif %speech.contains(guild)% || %speech.contains(train)% || %speech.contains(practice)% || %speech.contains(contract)% || %speech.contains(quest)%
+  set z30_social_lock 1
+  remote z30_social_lock %actor.id%
+  say The Adventurer's Guild handles training, practice, and contracts. Follow Guild Way east from the market.
+  wait 3 sec
+  rdelete z30_social_lock %actor.id%
+  halt
+elseif %speech.contains(inn)% || %speech.contains(tavern)% || %speech.contains(sleep)% || %speech.contains(room)% || %speech.contains(rest)%
+  set z30_social_lock 1
+  remote z30_social_lock %actor.id%
+  say Midgaard has several places to sleep and eat. Ask the city guide if you want the closest one.
+  wait 3 sec
+  rdelete z30_social_lock %actor.id%
+  halt
+elseif %speech.contains(shop)% || %speech.contains(weapon)% || %speech.contains(armor)% || %speech.contains(food)% || %speech.contains(water)%
+  set z30_social_lock 1
+  remote z30_social_lock %actor.id%
+  say The market district has most essentials. Weapons, armor, provisions, and water are all sold nearby.
+  wait 3 sec
+  rdelete z30_social_lock %actor.id%
+  halt
+elseif %speech.contains(law)% || %speech.contains(rule)% || %speech.contains(crime)% || %speech.contains(thief)% || %speech.contains(murder)%
+  set z30_social_lock 1
+  remote z30_social_lock %actor.id%
+  say Keep your hands off what is not yours, keep your weapon sheathed unless you need it, and do not start fights in the streets.
+  wait 3 sec
+  rdelete z30_social_lock %actor.id%
+  halt
+elseif %speech.contains(cindervale)% || %speech.contains(south gate)% || %speech.contains(road)%
+  set z30_social_lock 1
+  remote z30_social_lock %actor.id%
+  say Travelers heading beyond the southern districts should carry water and pay attention to the road. Cindervale is not city ground.
+  wait 3 sec
+  rdelete z30_social_lock %actor.id%
+  halt
+elseif %speech.contains(thank)%
+  set z30_social_lock 1
+  remote z30_social_lock %actor.id%
+  switch %random.3%
+    case 1
+      say You are welcome.
+    break
+    case 2
+      emote nods once to %actor.name%.
+    break
+    case 3
+      say Safe travels.
+    break
+  done
+  wait 3 sec
+  rdelete z30_social_lock %actor.id%
+  halt
+end
+~
+#3044
+Zone30 Watch Courtesy Act~
+0 e 1
+waves bows nods salutes smiles~
+if %self.fighting%
+  halt
+end
+if !%actor.is_pc%
+  halt
+end
+if %actor.varexists(z30_social_lock)%
+  halt
+end
+set z30_social_lock 1
+remote z30_social_lock %actor.id%
+switch %random.4%
+  case 1
+    emote returns %actor.name%'s gesture with a restrained nod.
+  break
+  case 2
+    say Good day.
+  break
+  case 3
+    emote acknowledges %actor.name% without taking attention off the street.
+  break
+  case 4
+    emote offers %actor.name% a brief, professional salute.
+  break
+done
+wait 3 sec
+rdelete z30_social_lock %actor.id%
+~
+#3045
+Zone30 Watch Hostility Act~
+0 e 1
+glares spits kicks punches slaps threatens~
+if %self.fighting%
+  halt
+end
+if !%actor.is_pc%
+  halt
+end
+if %actor.varexists(z30_social_lock)%
+  halt
+end
+set z30_social_lock 1
+remote z30_social_lock %actor.id%
+switch %random.5%
+  case 1
+    say Easy. Keep this peaceful.
+  break
+  case 2
+    emote squares up slightly and fixes %actor.name% with a warning look.
+  break
+  case 3
+    say Whatever point you are making, make it without starting a fight.
+  break
+  case 4
+    say That is your warning. Settle down.
+  break
+  case 5
+    emote rests one hand near the baton at the belt.
+  break
+done
+wait 3 sec
+rdelete z30_social_lock %actor.id%
+~
+#3046
+Zone30 Watch Distress Act~
+0 e 1
+cries sobs collapses faints groans staggers~
+if %self.fighting%
+  halt
+end
+if !%actor.is_pc%
+  halt
+end
+if %actor.varexists(z30_social_lock)%
+  halt
+end
+set z30_social_lock 1
+remote z30_social_lock %actor.id%
+switch %random.4%
+  case 1
+    say Are you hurt? The temple is north if you need a healer.
+  break
+  case 2
+    emote studies %actor.name% more closely, checking for obvious injury.
+  break
+  case 3
+    say If you need help, say what happened.
+  break
+  case 4
+    say Sit down before you fall down. Then tell me what you need.
+  break
+done
+wait 3 sec
+rdelete z30_social_lock %actor.id%
+~
+#3047
+Zone30 City Guide Reactive Speech~
+0 d 1
+*~
+if %self.fighting%
+  halt
+end
+if !%actor.is_pc%
+  halt
+end
+if %actor.varexists(z30_social_lock)%
+  halt
+end
+if %speech.contains(help)% || %speech.contains(lost)% || %speech.contains(new)% || %speech.contains(start)% || %speech.contains(what do i do)%
+  set z30_social_lock 1
+  remote z30_social_lock %actor.id%
+  say Start with three things: learn your skills, get basic supplies, and ask the Adventurer's Guild about work.
+  say If you tell me what you need, I can narrow that down.
+  wait 3 sec
+  rdelete z30_social_lock %actor.id%
+  halt
+elseif %speech.contains(guild)% || %speech.contains(train)% || %speech.contains(practice)% || %speech.contains(skill)% || %speech.contains(class)%
+  set z30_social_lock 1
+  remote z30_social_lock %actor.id%
+  say The Adventurer's Guild is the best first stop. Its instructor handles both training and practice for adventurers of every path.
+  wait 3 sec
+  rdelete z30_social_lock %actor.id%
+  halt
+elseif %speech.contains(quest)% || %speech.contains(contract)% || %speech.contains(work)% || %speech.contains(job)% || %speech.contains(money)% || %speech.contains(gold)%
+  set z30_social_lock 1
+  remote z30_social_lock %actor.id%
+  say Check the Adventurer's Guild for contracts. Merchants and civic workers may also know of smaller opportunities.
+  wait 3 sec
+  rdelete z30_social_lock %actor.id%
+  halt
+elseif %speech.contains(temple)% || %speech.contains(heal)% || %speech.contains(hurt)% || %speech.contains(wounded)% || %speech.contains(pray)%
+  set z30_social_lock 1
+  remote z30_social_lock %actor.id%
+  say The High Temple stands north of Temple Square. If you are badly hurt, do not wander around looking for a cheaper answer.
+  wait 3 sec
+  rdelete z30_social_lock %actor.id%
+  halt
+elseif %speech.contains(inn)% || %speech.contains(tavern)% || %speech.contains(room)% || %speech.contains(sleep)% || %speech.contains(rest)%
+  set z30_social_lock 1
+  remote z30_social_lock %actor.id%
+  say There are inns around the central districts. The Grunting Boar is easy to find from Temple Square, while cheaper rooms can be found farther into the poorer streets.
+  wait 3 sec
+  rdelete z30_social_lock %actor.id%
+  halt
+elseif %speech.contains(weapon)% || %speech.contains(armor)% || %speech.contains(equipment)% || %speech.contains(gear)%
+  set z30_social_lock 1
+  remote z30_social_lock %actor.id%
+  say The market has dedicated weapons and armor shops. Buy what you can actually use before spending coin on something impressive.
+  wait 3 sec
+  rdelete z30_social_lock %actor.id%
+  halt
+elseif %speech.contains(food)% || %speech.contains(bread)% || %speech.contains(water)% || %speech.contains(drink)% || %speech.contains(supply)%
+  set z30_social_lock 1
+  remote z30_social_lock %actor.id%
+  say Food, water, and travel supplies are sold around the market. Wally handles water, and the baker is difficult to miss once you smell the ovens.
+  wait 3 sec
+  rdelete z30_social_lock %actor.id%
+  halt
+elseif %speech.contains(cindervale)% || %speech.contains(south)% || %speech.contains(outside)% || %speech.contains(wilderness)%
+  set z30_social_lock 1
+  remote z30_social_lock %actor.id%
+  say Cindervale lies beyond the southern districts. Do not treat the road outside the walls like another city street.
+  wait 3 sec
+  rdelete z30_social_lock %actor.id%
+  halt
+elseif %speech.contains(hello)% || %speech.contains(hail)% || %speech.contains(greetings)% || %speech.contains(thank)%
+  set z30_social_lock 1
+  remote z30_social_lock %actor.id%
+  switch %random.3%
+    case 1
+      say Glad to help. Midgaard makes more sense once you know its main roads.
+    break
+    case 2
+      emote smiles and adjusts the folio of hand-drawn maps under one arm.
+    break
+    case 3
+      say Ask as many questions as you need. Better that than getting lost outside the walls.
+    break
+  done
+  wait 3 sec
+  rdelete z30_social_lock %actor.id%
+  halt
+end
+~
+#3048
+Zone30 Merchant Reactive Speech~
+0 d 1
+*~
+if %self.fighting%
+  halt
+end
+if !%actor.is_pc%
+  halt
+end
+if %actor.varexists(z30_social_lock)%
+  halt
+end
+if %speech.contains(hello)% || %speech.contains(hail)% || %speech.contains(greetings)%
+  set z30_social_lock 1
+  remote z30_social_lock %actor.id%
+  switch %random.3%
+    case 1
+      say Welcome. Have a look around.
+    break
+    case 2
+      emote gives %actor.name% the practiced nod of a merchant sizing up a customer.
+    break
+    case 3
+      say If you need something specific, ask.
+    break
+  done
+  wait 3 sec
+  rdelete z30_social_lock %actor.id%
+  halt
+elseif %speech.contains(buy)% || %speech.contains(sell)% || %speech.contains(price)% || %speech.contains(cost)% || %speech.contains(shop)% || %speech.contains(wares)%
+  set z30_social_lock 1
+  remote z30_social_lock %actor.id%
+  say Ask about what I actually stock and I will deal with you plainly. For something outside my trade, another market stall is likely a better choice.
+  wait 3 sec
+  rdelete z30_social_lock %actor.id%
+  halt
+elseif %speech.contains(cheap)% || %speech.contains(expensive)% || %speech.contains(bargain)% || %speech.contains(discount)%
+  set z30_social_lock 1
+  remote z30_social_lock %actor.id%
+  switch %random.3%
+    case 1
+      say Good goods cost coin. Bad goods cost more once they fail.
+    break
+    case 2
+      say You can ask for a bargain. That does not mean you will get one.
+    break
+    case 3
+      emote folds both arms and looks thoroughly unconvinced by the attempted bargaining.
+    break
+  done
+  wait 3 sec
+  rdelete z30_social_lock %actor.id%
+  halt
+elseif %speech.contains(guild)% || %speech.contains(train)% || %speech.contains(contract)%
+  set z30_social_lock 1
+  remote z30_social_lock %actor.id%
+  say Adventuring business belongs at the guild. Shopping belongs here. Best not to confuse the two.
+  wait 3 sec
+  rdelete z30_social_lock %actor.id%
+  halt
+elseif %speech.contains(temple)% || %speech.contains(heal)%
+  set z30_social_lock 1
+  remote z30_social_lock %actor.id%
+  say Temple Square is north of the market. If you are bleeding, go there before worrying about shopping.
+  wait 3 sec
+  rdelete z30_social_lock %actor.id%
+  halt
+elseif %speech.contains(thank)%
+  set z30_social_lock 1
+  remote z30_social_lock %actor.id%
+  say Fair travels, and mind your coin purse in a crowd.
+  wait 3 sec
+  rdelete z30_social_lock %actor.id%
+  halt
+end
+~
+#3049
+Zone30 Hospitality Reactive Speech~
+0 d 1
+*~
+if %self.fighting%
+  halt
+end
+if !%actor.is_pc%
+  halt
+end
+if %actor.varexists(z30_social_lock)%
+  halt
+end
+if %speech.contains(hello)% || %speech.contains(hail)% || %speech.contains(evening)% || %speech.contains(morning)%
+  set z30_social_lock 1
+  remote z30_social_lock %actor.id%
+  switch %random.3%
+    case 1
+      say Welcome. Find yourself a place and settle in.
+    break
+    case 2
+      emote acknowledges %actor.name% with a brief nod while continuing to work.
+    break
+    case 3
+      say Come in. Roads are hard enough without standing in doorways.
+    break
+  done
+  wait 3 sec
+  rdelete z30_social_lock %actor.id%
+  halt
+elseif %speech.contains(room)% || %speech.contains(sleep)% || %speech.contains(bed)% || %speech.contains(rest)% || %speech.contains(inn)%
+  set z30_social_lock 1
+  remote z30_social_lock %actor.id%
+  say If you need a proper room, ask the inn steward. If you only need to sit, eat, or get out of the street, you are already in the right sort of place.
+  wait 3 sec
+  rdelete z30_social_lock %actor.id%
+  halt
+elseif %speech.contains(food)% || %speech.contains(hungry)% || %speech.contains(eat)% || %speech.contains(meal)%
+  set z30_social_lock 1
+  remote z30_social_lock %actor.id%
+  say Sit down and ask for something sensible. Nobody thinks clearly on an empty stomach.
+  wait 3 sec
+  rdelete z30_social_lock %actor.id%
+  halt
+elseif %speech.contains(drink)% || %speech.contains(thirst)% || %speech.contains(ale)% || %speech.contains(water)%
+  set z30_social_lock 1
+  remote z30_social_lock %actor.id%
+  say Drinks are easy. Trouble after too many of them is the expensive part.
+  wait 3 sec
+  rdelete z30_social_lock %actor.id%
+  halt
+elseif %speech.contains(rumor)% || %speech.contains(news)% || %speech.contains(heard)% || %speech.contains(trouble)%
+  set z30_social_lock 1
+  remote z30_social_lock %actor.id%
+  switch %random.3%
+    case 1
+      say Travelers talk. Most of it grows in the telling.
+    break
+    case 2
+      say Ask about a road or district and I may have heard something useful.
+    break
+    case 3
+      say The watch hears official trouble. Inns hear everything else.
+    break
+  done
+  wait 3 sec
+  rdelete z30_social_lock %actor.id%
+  halt
+elseif %speech.contains(fight)% || %speech.contains(brawl)% || %speech.contains(kill)% || %speech.contains(threat)%
+  set z30_social_lock 1
+  remote z30_social_lock %actor.id%
+  say Take that sort of talk outside, and preferably beyond my door entirely.
+  wait 3 sec
+  rdelete z30_social_lock %actor.id%
+  halt
+elseif %speech.contains(thank)%
+  set z30_social_lock 1
+  remote z30_social_lock %actor.id%
+  say You are welcome. Leave the place no worse than you found it.
+  wait 3 sec
+  rdelete z30_social_lock %actor.id%
+  halt
+end
+~
+#3050
+Zone30 Guild Reactive Speech~
+0 d 1
+*~
+if %self.fighting%
+  halt
+end
+if !%actor.is_pc%
+  halt
+end
+if %actor.varexists(z30_social_lock)%
+  halt
+end
+if %speech.contains(train)% || %speech.contains(training)% || %speech.contains(practice)% || %speech.contains(skill)%
+  set z30_social_lock 1
+  remote z30_social_lock %actor.id%
+  say The guild instructor handles training and practice. Learn what your path actually needs before spending every point you have.
+  wait 3 sec
+  rdelete z30_social_lock %actor.id%
+  halt
+elseif %speech.contains(contract)% || %speech.contains(quest)% || %speech.contains(job)% || %speech.contains(work)% || %speech.contains(bounty)%
+  set z30_social_lock 1
+  remote z30_social_lock %actor.id%
+  say Read contracts carefully. A short description on a board can hide a very long walk and a very dangerous problem.
+  wait 3 sec
+  rdelete z30_social_lock %actor.id%
+  halt
+elseif %speech.contains(new)% || %speech.contains(beginner)% || %speech.contains(start)% || %speech.contains(help)%
+  set z30_social_lock 1
+  remote z30_social_lock %actor.id%
+  say New adventurers should train, carry water, keep a light source, and learn the city before chasing distant contracts.
+  wait 3 sec
+  rdelete z30_social_lock %actor.id%
+  halt
+elseif %speech.contains(group)% || %speech.contains(party)% || %speech.contains(team)%
+  set z30_social_lock 1
+  remote z30_social_lock %actor.id%
+  say A reliable companion is worth more than another piece of shiny equipment. Know who can hold a line, heal, scout, or get you out alive.
+  wait 3 sec
+  rdelete z30_social_lock %actor.id%
+  halt
+elseif %speech.contains(cindervale)% || %speech.contains(wilderness)% || %speech.contains(road)%
+  set z30_social_lock 1
+  remote z30_social_lock %actor.id%
+  say Cindervale rewards preparation and punishes assumptions. Track what is around you, and do not chase enemies into ground you have not studied.
+  wait 3 sec
+  rdelete z30_social_lock %actor.id%
+  halt
+elseif %speech.contains(hello)% || %speech.contains(hail)% || %speech.contains(thank)%
+  set z30_social_lock 1
+  remote z30_social_lock %actor.id%
+  switch %random.3%
+    case 1
+      say Welcome to the guild.
+    break
+    case 2
+      emote gives %actor.name% an appraising nod.
+    break
+    case 3
+      say Keep learning. Experience is only useful if you survive long enough to use it.
+    break
+  done
+  wait 3 sec
+  rdelete z30_social_lock %actor.id%
+  halt
+end
+~
+#3051
+Zone30 Temple Reactive Speech~
+0 d 1
+*~
+if %self.fighting%
+  halt
+end
+if !%actor.is_pc%
+  halt
+end
+if %actor.varexists(z30_social_lock)%
+  halt
+end
+if %speech.contains(heal)% || %speech.contains(hurt)% || %speech.contains(wound)% || %speech.contains(dying)% || %speech.contains(injured)%
+  set z30_social_lock 1
+  remote z30_social_lock %actor.id%
+  say If you are injured, seek the temple's healing services first. Pride has killed more travelers than monsters ever needed to.
+  wait 3 sec
+  rdelete z30_social_lock %actor.id%
+  halt
+elseif %speech.contains(pray)% || %speech.contains(prayer)% || %speech.contains(god)% || %speech.contains(gods)% || %speech.contains(bless)% || %speech.contains(faith)%
+  set z30_social_lock 1
+  remote z30_social_lock %actor.id%
+  say Prayer is welcome here. So are questions, provided they are asked with a little patience.
+  wait 3 sec
+  rdelete z30_social_lock %actor.id%
+  halt
+elseif %speech.contains(death)% || %speech.contains(dead)% || %speech.contains(die)% || %speech.contains(grave)%
+  set z30_social_lock 1
+  remote z30_social_lock %actor.id%
+  say Every life ends. The useful question is what you do before that hour arrives.
+  wait 3 sec
+  rdelete z30_social_lock %actor.id%
+  halt
+elseif %speech.contains(help)% || %speech.contains(lost)% || %speech.contains(temple)%
+  set z30_social_lock 1
+  remote z30_social_lock %actor.id%
+  say You are already near the city's spiritual center. For adventuring work, seek the guild. For ordinary supplies, return toward the market.
+  wait 3 sec
+  rdelete z30_social_lock %actor.id%
+  halt
+elseif %speech.contains(hello)% || %speech.contains(hail)% || %speech.contains(thank)%
+  set z30_social_lock 1
+  remote z30_social_lock %actor.id%
+  switch %random.3%
+    case 1
+      say Peace to you.
+    break
+    case 2
+      emote inclines the head respectfully toward %actor.name%.
+    break
+    case 3
+      say May your road be longer than your list of regrets.
+    break
+  done
+  wait 3 sec
+  rdelete z30_social_lock %actor.id%
+  halt
+end
+~
+#3052
+Zone30 Courier River Reactive Speech~
+0 d 1
+*~
+if %self.fighting%
+  halt
+end
+if !%actor.is_pc%
+  halt
+end
+if %actor.varexists(z30_social_lock)%
+  halt
+end
+if %speech.contains(mail)% || %speech.contains(letter)% || %speech.contains(message)% || %speech.contains(courier)% || %speech.contains(post)%
+  set z30_social_lock 1
+  remote z30_social_lock %actor.id%
+  say Letters and dispatches move through the courier service. Give a clear destination and do not seal nonsense in an official packet.
+  wait 3 sec
+  rdelete z30_social_lock %actor.id%
+  halt
+elseif %speech.contains(river)% || %speech.contains(boat)% || %speech.contains(ship)% || %speech.contains(dock)% || %speech.contains(warehouse)%
+  set z30_social_lock 1
+  remote z30_social_lock %actor.id%
+  say River work is slower than adventurers think and more dangerous than merchants admit. Mind ropes, current, and weather.
+  wait 3 sec
+  rdelete z30_social_lock %actor.id%
+  halt
+elseif %speech.contains(road)% || %speech.contains(travel)% || %speech.contains(direction)% || %speech.contains(where)%
+  set z30_social_lock 1
+  remote z30_social_lock %actor.id%
+  say Roads tell you where people intended to go. Couriers learn where those roads actually lead when bridges wash out and gates close.
+  wait 3 sec
+  rdelete z30_social_lock %actor.id%
+  halt
+elseif %speech.contains(news)% || %speech.contains(rumor)%
+  set z30_social_lock 1
+  remote z30_social_lock %actor.id%
+  say Couriers hear plenty. Most of it belongs to somebody else, and that is where it stays.
+  wait 3 sec
+  rdelete z30_social_lock %actor.id%
+  halt
+elseif %speech.contains(hello)% || %speech.contains(hail)% || %speech.contains(thank)%
+  set z30_social_lock 1
+  remote z30_social_lock %actor.id%
+  say Good roads and fair weather to you.
+  wait 3 sec
+  rdelete z30_social_lock %actor.id%
+  halt
+end
+~
+#3053
+Zone30 Kind Soul Reactive Speech~
+0 d 1
+*~
+if %self.fighting%
+  halt
+end
+if !%actor.is_pc%
+  halt
+end
+if %actor.varexists(z30_social_lock)%
+  halt
+end
+if %speech.contains(help)% || %speech.contains(lost)% || %speech.contains(new)% || %speech.contains(need)%
+  set z30_social_lock 1
+  remote z30_social_lock %actor.id%
+  say Tell me what you are missing. If I cannot help directly, I can at least point you toward someone who can.
+  wait 3 sec
+  rdelete z30_social_lock %actor.id%
+  halt
+elseif %speech.contains(hurt)% || %speech.contains(wounded)% || %speech.contains(heal)% || %speech.contains(dying)%
+  set z30_social_lock 1
+  remote z30_social_lock %actor.id%
+  say Oh, look at you. The temple is where you need to be, and sooner rather than later.
+  wait 3 sec
+  rdelete z30_social_lock %actor.id%
+  halt
+elseif %speech.contains(food)% || %speech.contains(hungry)% || %speech.contains(water)% || %speech.contains(thirst)%
+  set z30_social_lock 1
+  remote z30_social_lock %actor.id%
+  say The market has food and water close by. Do not wait until you are desperate before thinking about supplies.
+  wait 3 sec
+  rdelete z30_social_lock %actor.id%
+  halt
+elseif %speech.contains(hello)% || %speech.contains(hail)% || %speech.contains(thank)%
+  set z30_social_lock 1
+  remote z30_social_lock %actor.id%
+  switch %random.3%
+    case 1
+      say There you are. Taking care of yourself, I hope?
+    break
+    case 2
+      emote smiles warmly at %actor.name%.
+    break
+    case 3
+      say You are very welcome, dear.
+    break
+  done
+  wait 3 sec
+  rdelete z30_social_lock %actor.id%
+  halt
+end
+~
+#3054
+Zone30 Civilian Courtesy Act~
+0 e 1
+waves bows nods smiles~
+if %self.fighting%
+  halt
+end
+if !%actor.is_pc%
+  halt
+end
+if %actor.varexists(z30_social_lock)%
+  halt
+end
+set z30_social_lock 1
+remote z30_social_lock %actor.id%
+switch %random.4%
+  case 1
+    emote smiles briefly at %actor.name%.
+  break
+  case 2
+    emote returns %actor.name%'s nod.
+  break
+  case 3
+    say Good day to you.
+  break
+  case 4
+    emote acknowledges %actor.name% before returning to work.
+  break
+done
+wait 3 sec
+rdelete z30_social_lock %actor.id%
+~
+#3055
+Zone30 Civilian Distress Act~
+0 e 1
+cries sobs collapses faints groans staggers~
+if %self.fighting%
+  halt
+end
+if !%actor.is_pc%
+  halt
+end
+if %actor.varexists(z30_social_lock)%
+  halt
+end
+set z30_social_lock 1
+remote z30_social_lock %actor.id%
+switch %random.4%
+  case 1
+    say Are you all right?
+  break
+  case 2
+    emote pauses and watches %actor.name% with concern.
+  break
+  case 3
+    say If you are hurt, the temple is the safest place to go.
+  break
+  case 4
+    emote looks around as though deciding whether to call for help.
+  break
+done
+wait 3 sec
+rdelete z30_social_lock %actor.id%
+~
 #3099
 RETIRED Test Trigger~
 2 b 1
