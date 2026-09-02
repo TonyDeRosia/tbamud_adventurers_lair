@@ -1,1 +1,95 @@
-$~
+#3200
+river rat vermin water rat riverward~
+a @yRi@Yve@yr @Dra@Wt@n~
+A @yRi@Yve@yr @Dra@Wt@n noses through debris along the river wall.
+~
+This lean brown rat has learned to live where the city meets the water. Its coat is
+dark with river spray, and its narrow paws find purchase on slick masonry that would
+send a larger creature tumbling into the current.
+~
+200 0 0 0 0 0 0 0 0 E
+2 20 22 1d4+10 1d2+0
+0 0
+8 8 0
+BareHandAttack: 4
+Wimpy: 1
+E
+#3201
+mudback crab river crab mud shell~
+a @yMu@Odd@yba@Ock @Dcr@Wab@n~
+A @yMu@Odd@yba@Ock @Dcr@Wab@n picks its way across the river stones.
+~
+A broad shell the color of wet clay protects this river crab. One claw is heavier than
+the other, scarred from forcing apart mussels and scraps caught along the embankment.
+It reacts to nearby movement by raising both claws and refusing to surrender ground.
+~
+10 0 0 0 0 0 0 0 0 E
+3 20 23 1d4+15 1d2+0
+0 0
+8 8 0
+BareHandAttack: 8
+Wimpy: 1
+Evasion: 1
+E
+#3202
+silverfin river eel fish eel silver~
+a @Csi@Wlv@Cer@Wfi@Cn @bri@Cve@Wr @bee@Cl@n~
+A @Csi@Wlv@Cer@Wfi@Cn @bri@Cve@Wr @bee@Cl@n twists through the dark current.
+~
+Silver along the fins flashes whenever this long river eel turns beneath the surface.
+Its back is slate-dark and difficult to follow in shadowed water. Small hooked teeth
+show when it opens its narrow mouth to test anything drifting close enough.
+~
+200 0 0 0 0 0 0 0 0 E
+4 20 24 1d4+20 1d2+0
+0 0
+8 8 0
+BareHandAttack: 4
+SavingPara: 1
+SavingRod: 1
+SavingPetri: 1
+SavingBreath: 1
+SavingSpell: 1
+Wimpy: 2
+Evasion: 1
+E
+#3203
+river heron bird gray levee fisher~
+a @Wri@Dve@Wr @Che@Wro@Cn@n~
+A @Wri@Dve@Wr @Che@Wro@Cn@n stands motionless near the levee steps.
+~
+This tall gray heron watches the shallows with unnerving patience. Its long legs are
+built for wading between submerged stones, and its spear-like beak snaps forward with
+startling speed whenever a fish or insect breaks the surface.
+~
+10 0 0 0 0 0 0 0 0 E
+3 20 23 1d4+15 1d2+0
+0 0
+8 8 0
+BareHandAttack: 11
+Wimpy: 1
+Evasion: 1
+E
+#3204
+mossback river turtle turtle moss shell~
+a @gmo@Gss@gba@Gck @yri@Ove@Yr @gtu@Grt@gle@n~
+A @gmo@Gss@gba@Gck @yri@Ove@Yr @gtu@Grt@gle@n drifts beside the warehouse pilings.
+~
+Age and river growth have roughened this turtle's heavy shell until moss clings between
+its plates. It moves with deceptive slowness, surfacing beside old pilings to feed on
+weed, shellfish, and whatever scraps the warehouse quarter loses to the river.
+~
+72 0 0 0 0 0 0 0 0 E
+5 20 25 1d4+25 1d2+0
+0 0
+8 8 0
+BareHandAttack: 4
+SavingPara: 1
+SavingRod: 1
+SavingPetri: 1
+SavingBreath: 1
+SavingSpell: 1
+Wimpy: 2
+Evasion: 1
+E
+$

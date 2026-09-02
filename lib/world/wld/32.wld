@@ -1,5 +1,5 @@
 #3200
-@CUnder the Riverward Bridge@n~
+@bUn@Cde@Wr @bth@Ce @WRi@bve@Crw@War@bd @CBr@Wid@bge@n~
 The Midgaard River slides beneath a broad stone bridge and through a low arch in the
 western city wall. Water-dark masonry rises on either side, its lower courses slick
 with moss and riverweed. Above, the muted rumble of carts and boots crosses the bridge
@@ -22,6 +22,7 @@ the lowest courses. The work is heavy, practical, and clearly meant to withstand
 floodwater and siege.
 ~
 S
+T 3200
 #3201
 @BThe Midgaard River, Western Reach@n~
 The river broadens slightly beyond the western bridge, running between steep banks
@@ -39,6 +40,7 @@ D3
 ~
 0 -1 3200
 S
+T 3200
 #3202
 @BThe Midgaard River, Below Riverward@n~
 Midgaard's river runs east to west through a deep-cut channel beneath the city. Stone
@@ -56,8 +58,9 @@ D3
 ~
 0 -1 3201
 S
+T 3200
 #3203
-@CThe River at the Levee Steps@n~
+@CThe @bRi@Cve@Wr @bat @Cth@We @bLe@Cve@We @bSt@Cep@Ws@n~
 A break in the northern embankment has been reinforced with broad stone steps leading
 up from the river toward the city levee. Iron rings are set into the masonry for tying
 small workboats, and worn grooves show where ropes and cargo have been hauled over the
@@ -77,6 +80,7 @@ D3
 ~
 0 -1 3202
 S
+T 3201
 #3204
 @BThe Midgaard River, Warehouse Reach@n~
 The river narrows between high stone banks as it passes the warehouse quarter. Timber
@@ -94,8 +98,9 @@ D3
 ~
 0 -1 3203
 S
+T 3202
 #3205
-@CThe Eastern River Gate@n~
+@CThe @bEa@Cst@Wer@bn @WRi@bve@Cr @WGa@bte@n~
 The Midgaard River enters the city through a broad opening cut low in the eastern wall.
 Heavy iron bars descend from the arch into the water, spaced widely enough for the
 current but close enough to block boats and large creatures. Beyond them, the river
@@ -121,4 +126,5 @@ grate remains formidable. Through the gaps, the river can be seen continuing int
 darkness beneath the eastern hills.
 ~
 S
+T 3202
 $~
