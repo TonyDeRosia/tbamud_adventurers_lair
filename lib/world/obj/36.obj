@@ -1,177 +1,353 @@
 #3600
-armor black pawn~
-some Black Pawn Armor~
-A pile of black armor is here.~
+obsidian pawn plate armor chess~
+@DOb@bsi@Bdi@can @Dpa@bwn @Bpl@cat@De@n~
+A set of @DOb@bsi@Bdi@can @Dpa@bwn @Bpl@cat@De@n lies here, its rune-seams gone dark.~
 ~
-9 j 0 0 0 ad 0 0 0 0 0 0 0
+9 0 0 0 0 ad 0 0 0 0 0 0 0
 1 0 0 0
-13 300000 1 0 0
+13 250 0 6 0
 #3601
-armor white pawn~
-some White Pawn Armor~
-A pile of white armor is here.~
+ivory pawn plate armor chess~
+@WIv@wor@Yy @Wpa@wwn @Ypl@Wat@we@n~
+A set of @WIv@wor@Yy @Wpa@wwn @Ypl@Wat@we@n rests here in pale broken sections.~
 ~
-9 k 0 0 0 ad 0 0 0 0 0 0 0
+9 0 0 0 0 ad 0 0 0 0 0 0 0
 1 0 0 0
-13 300000 1 0 0
+13 250 0 6 0
 #3602
-sword black pawn~
-a Black Pawn's Sword~
-The sword of a Black Pawn lies here.~
+obsidian pawn sword blade chess~
+an @DOb@bsi@Bdi@can @Dpa@bwn's @Bsw@cor@Dd@n~
+An @DOb@bsi@Bdi@can @Dpa@bwn's @Bsw@cor@Dd@n lies across the marble.~
 ~
-5 j 0 0 0 an 0 0 0 0 0 0 0
+5 0 0 0 0 an 0 0 0 0 0 0 0
 0 3 4 3
-10 100000 1 0 0
+10 180 0 6 0
 #3603
-sword white pawn~
-a White Pawn's Sword~
-The sword of a White Pawn lies here.~
+ivory pawn sword blade chess~
+an @WIv@wor@Yy @Wpa@wwn's @Ysw@Wor@wd@n~
+An @WIv@wor@Yy @Wpa@wwn's @Ysw@Wor@wd@n glints faintly here.~
 ~
-5 k 0 0 0 an 0 0 0 0 0 0 0
+5 0 0 0 0 an 0 0 0 0 0 0 0
 0 3 4 3
-10 100000 1 0 0
+10 180 0 6 0
 #3604
-armor black rook~
-some Black Rook Armor~
-Some armor made from the remains of a black rook lies heaped on the floor.~
+obsidian rook armor bulwark fortress chess~
+an @DOb@bsi@Bdi@can @Cro@Bok @Dbul@bwa@Brk@n~
+An @DOb@bsi@Bdi@can @Cro@Bok @Dbul@bwa@Brk@n sits like a broken section of fortress wall.~
 ~
-9 aj 0 0 0 ad 0 0 0 0 0 0 0
+9 a 0 0 0 ad 0 0 0 0 0 0 0
 2 0 0 0
-50 170000 5 0 0
+50 1800 0 27 0
 A
 17 2
 A
 5 1
 #3605
-armor white rook~
-some White Rook Armor~
-Some armor made from the remains of a white rook lies heaped on the floor.~
+ivory rook armor bulwark fortress chess~
+an @WIv@wor@Yy @Yro@Wok @wbul@Ywa@Wrk@n~
+An @WIv@wor@Yy @Yro@Wok @wbul@Ywa@Wrk@n rests heavily on the marble.~
 ~
-9 agk 0 0 0 ad 0 0 0 0 0 0 0
+9 ag 0 0 0 ad 0 0 0 0 0 0 0
 2 0 0 0
-50 170000 5 0 0
+50 1800 0 27 0
 A
 17 2
 A
 5 1
 #3606
-lance black knight~
-the Lance of the Black Knight~
-The Lance of the Black Knight lies here, waiting to rust.~
+obsidian knight lance cavalry chess~
+the @DOb@bsi@Bdi@can @Ckn@Big@cht's @Dla@bnc@Be@n~
+The @DOb@bsi@Bdi@can @Ckn@Big@cht's @Dla@bnc@Be@n lies here like a fallen black spear.~
 ~
-5 bgj 0 0 0 an 0 0 0 0 0 0 0
+5 bg 0 0 0 an 0 0 0 0 0 0 0
 0 3 6 6
-18 100000 3 0 0
+18 900 0 18 0
 A
 19 2
 A
 23 2
 #3607
-lance white knight~
-the Lance of the White Knight~
-The Lance of the White Knight lies here, waiting to rust.~
+ivory knight lance cavalry chess~
+the @WIv@wor@Yy @Ykn@Wig@wht's @Yla@Wnc@we@n~
+The @WIv@wor@Yy @Ykn@Wig@wht's @Yla@Wnc@we@n rests across the square.~
 ~
-5 bgk 0 0 0 an 0 0 0 0 0 0 0
+5 bg 0 0 0 an 0 0 0 0 0 0 0
 0 3 6 6
-18 100000 3 0 0
+18 900 0 18 0
 A
 19 2
 A
 23 2
 #3608
-staff black bishop~
-the Staff of the Black Bishop~
-The Black Bishop's Staff is lying here.~
+obsidian bishop staff oracle chess~
+the @DOb@bsi@Bdi@can @Mbi@Bsh@cop's @Dst@baf@Bf@n~
+The @DOb@bsi@Bdi@can @Mbi@Bsh@cop's @Dst@baf@Bf@n hums faintly on the ground.~
 ~
-4 agj 0 0 0 ao 0 0 0 0 0 0 0
+4 ag 0 0 0 ao 0 0 0 0 0 0 0
 20 5 5 36
-3 200000 6 0 0
+3 1800 0 24 0
 #3609
-staff white bishop~
-the Staff of the White Bishop~
-The White Bishop's Staff is lying here.~
+ivory bishop staff oracle chess~
+the @WIv@wor@Yy @Cbi@Wsh@yop's @Yst@Waf@wf@n~
+The @WIv@wor@Yy @Cbi@Wsh@yop's @Yst@Waf@wf@n gives off a thin golden glow.~
 ~
-4 agk 0 0 0 ao 0 0 0 0 0 0 0
+4 ag 0 0 0 ao 0 0 0 0 0 0 0
 20 5 5 36
-3 200000 6 0 0
+3 1800 0 24 0
 #3610
-crown black queen~
-the Crown of the Black Queen~
-The Crown of the Black Queen lies here, looking neglected.~
+obsidian queen crown crystal chess~
+the @DOb@bsi@Bdi@can @MQu@Bee@cn's @Dcr@bys@Bta@cl @Mcr@Dow@cn@n~
+The @DOb@bsi@Bdi@can @MQu@Bee@cn's @Dcr@bys@Bta@cl @Mcr@Dow@cn@n lies here, dark facets catching stray light.~
 ~
-9 bgj 0 0 0 ae 0 0 0 0 0 0 0
+9 bg 0 0 0 ae 0 0 0 0 0 0 0
 2 0 0 0
-4 300000 5 0 0
+4 3000 0 29 0
 A
 3 1
 A
 4 1
 #3611
-crown white queen~
-the Crown of the White Queen~
-The Crown of the White Queen lies here, looking neglected.~
+ivory queen crown crystal chess~
+the @WIv@wor@Yy @MQu@Wee@Yn's @Ycr@Wys@wta@Yl @Wcr@wow@Yn@n~
+The @WIv@wor@Yy @MQu@Wee@Yn's @Ycr@Wys@wta@Yl @Wcr@wow@Yn@n rests here like frozen sunlight.~
 ~
-9 bgk 0 0 0 ae 0 0 0 0 0 0 0
+9 bg 0 0 0 ae 0 0 0 0 0 0 0
 2 0 0 0
-4 300000 5 0 0
+4 3000 0 29 0
 A
 3 1
 A
 4 1
 #3612
-sceptre black king~
-the Black King's Sceptre~
-The Sceptre of the Black King lies here, collecting dust.~
+obsidian king sceptre scepter royal chess~
+the @DOb@bsi@Bdi@can @RKi@Bng's @Dsc@bep@Btr@ce@n~
+The @DOb@bsi@Bdi@can @RKi@Bng's @Dsc@bep@Btr@ce@n lies here, heavy with dormant warding magic.~
 ~
 8 bfgj 0 0 0 ao 0 0 0 0 0 0 0
 0 0 0 0
-50 850000 1 0 0
+50 3500 0 30 0
 A
 1 1
 A
 18 1
 #3613
-sceptre white king~
-the White King's Sceptre~
-The Sceptre of the White King lies here, collecting dust.~
+ivory king sceptre scepter royal chess~
+the @WIv@wor@Yy @YKi@Wng's @Ysc@Wep@wtr@Ye@n~
+The @WIv@wor@Yy @YKi@Wng's @Ysc@Wep@wtr@Ye@n shines softly against the marble.~
 ~
 8 bfgk 0 0 0 ao 0 0 0 0 0 0 0
 0 0 0 0
-50 850000 10 0 0
+50 3500 0 30 0
 A
 1 1
 A
 18 1
 #3614
-key black treasury~
-the Key to the Black Treasury~
-There is a sinister black key lying here.~
+obsidian treasury key black court chess~
+an @DOb@bsi@Bdi@can @Ctr@Bea@csu@Dry @Bke@cy@n~
+An @DOb@bsi@Bdi@can @Ctr@Bea@csu@Dry @Bke@cy@n lies here, cut from a single dark crystal.~
 ~
 18 cdfq 0 0 0 ao 0 0 0 0 0 0 0
 3614 0 0 0
-1 1000000 300 0 0
+1 1 0 0 0
 #3615
-key white treasury~
-the Key to the White Treasury~
-There is a bright white key lying here.~
+ivory treasury key white court chess~
+an @WIv@wor@Yy @Ytr@Wea@wsu@Yry @Wke@yy@n~
+An @WIv@wor@Yy @Ytr@Wea@wsu@Yry @Wke@yy@n glimmers here.~
 ~
 18 cdfq 0 0 0 ao 0 0 0 0 0 0 0
 3615 0 0 0
-1 1000000 300 0 0
+1 1 0 0 0
 #3616
-coins gold black royal treasure~
-the Black Royal Treasure~
-There are a LOT of coins here.~
+obsidian royal hoard treasure treasury chess~
+the @DHo@bar@Bd o@cf t@Dhe @bOb@Bsi@cdi@Dan @bCr@Bow@cn@n~
+The @DHo@bar@Bd o@cf t@Dhe @bOb@Bsi@cdi@Dan @bCr@Bow@cn@n has been gathered here in a sealed royal cache.~
 ~
 20 0 0 0 0 a 0 0 0 0 0 0 0
 1000 0 0 0
-10 1000000 0 0 0
+10 1000 0 0 0
 #3617
-coins gold white royal treasure~
-the White Royal Treasure~
-There are a LOT of coins here.~
+ivory royal hoard treasure treasury chess~
+the @WHo@war@Yd o@Wf t@whe @YIv@Wor@wy @YCr@Wow@wn@n~
+The @WHo@war@Yd o@Wf t@whe @YIv@Wor@wy @YCr@Wow@wn@n gleams from an ancient royal cache.~
 ~
 20 0 0 0 0 a 0 0 0 0 0 0 0
 1000 0 0 0
-10 1000000 0 0 0
+10 1000 0 0 0
+#3618
+obsidian pawn guard shield chess~
+an @DOb@bsi@Bdi@can @Dpa@bwn @Bgu@car@Dd@n~
+An @DOb@bsi@Bdi@can @Dpa@bwn @Bgu@car@Dd@n rests against the marble.~
+~
+9 0 0 0 0 aj 0 0 0 0 0 0 0
+1 0 0 0
+8 220 0 6 0
+#3619
+ivory pawn guard shield chess~
+an @WIv@wor@Yy @Wpa@wwn @Ygu@War@wd@n~
+An @WIv@wor@Yy @Wpa@wwn @Ygu@War@wd@n rests against the marble.~
+~
+9 0 0 0 0 aj 0 0 0 0 0 0 0
+1 0 0 0
+8 220 0 6 0
+#3620
+blackstone knight spur obsidian chess~
+a @Dbl@bac@Bks@cto@Dne @Ckn@Big@cht @Dsp@bur@n~
+A @Dbl@bac@Bks@cto@Dne @Ckn@Big@cht @Dsp@bur@n has been torn from a shattered cavalry construct.~
+~
+9 0 0 0 0 ag 0 0 0 0 0 0 0
+1 0 0 0
+2 650 0 14 0
+#3621
+ivory knight spur pale chess~
+an @WIv@wor@Yy @Ykn@Wig@wht @Wsp@yur@n~
+An @WIv@wor@Yy @Ykn@Wig@wht @Wsp@yur@n gleams among chips of pale marble.~
+~
+9 0 0 0 0 ag 0 0 0 0 0 0 0
+1 0 0 0
+2 650 0 14 0
+#3622
+obsidian diagonal sigil bishop pendant chess~
+an @DOb@bsi@Bdi@can @Mdi@Bag@con@Dal @Msi@bgi@Bl@n~
+An @DOb@bsi@Bdi@can @Mdi@Bag@con@Dal @Msi@bgi@Bl@n turns slowly on a dark chain.~
+~
+9 0 0 0 0 ac 0 0 0 0 0 0 0
+1 0 0 0
+1 900 0 18 0
+#3623
+ivory diagonal sigil bishop pendant chess~
+an @WIv@wor@Yy @Cdi@Wag@yon@Yal @Csi@Wgi@yl@n~
+An @WIv@wor@Yy @Cdi@Wag@yon@Yal @Csi@Wgi@yl@n glows faintly on a pale chain.~
+~
+9 0 0 0 0 ac 0 0 0 0 0 0 0
+1 0 0 0
+1 900 0 18 0
+#3624
+obsidian queen mantle royal chess~
+the @DOb@bsi@Bdi@can @MQu@Bee@cn's @Dsh@bad@Bow @Mma@Dnt@Ble@n~
+The @DOb@bsi@Bdi@can @MQu@Bee@cn's @Dsh@bad@Bow @Mma@Dnt@Ble@n lies folded like heavy black silk.~
+~
+9 0 0 0 0 ak 0 0 0 0 0 0 0
+2 0 0 0
+6 2800 0 24 0
+#3625
+ivory queen mantle royal chess~
+the @WIv@wor@Yy @MQu@Wee@Yn's @Ysu@Wnl@wit @Cma@Wnt@Yle@n~
+The @WIv@wor@Yy @MQu@Wee@Yn's @Ysu@Wnl@wit @Cma@Wnt@Yle@n rests here like woven light.~
+~
+9 0 0 0 0 ak 0 0 0 0 0 0 0
+2 0 0 0
+6 2800 0 24 0
+#3626
+crownward ring obsidian king chess~
+an @DOb@bsi@Bdi@can @Rcr@Bow@cnw@Dar@Bd @Cri@bng@n~
+An @DOb@bsi@Bdi@can @Rcr@Bow@cnw@Dar@Bd @Cri@bng@n sits here inside a tiny circle of blue wards.~
+~
+9 0 0 0 0 ab 0 0 0 0 0 0 0
+1 0 0 0
+1 3200 0 26 0
+#3627
+chessmaster signet ivory king chess~
+the @YCh@Wes@wsm@Yas@Wte@wr's @Ysi@Wgn@wet@n~
+The @YCh@Wes@wsm@Yas@Wte@wr's @Ysi@Wgn@wet@n gleams with a tiny engraved board.~
+~
+9 0 0 0 0 ab 0 0 0 0 0 0 0
+1 0 0 0
+1 3200 0 26 0
+#3628
+shard eternal board rune marble chess~
+a @Csh@War@Cd o@Bf t@Che @DEt@ber@Bna@cl @CBo@War@Cd@n~
+A @Csh@War@Cd o@Bf t@Che @DEt@ber@Bna@cl @CBo@War@Cd@n pulses faintly between two cracked tiles.~
+~
+12 0 0 0 0 a 0 0 0 0 0 0 0
+0 0 0 0
+1 350 0 1 0
+#3629
+ancient move tablet chess notation stone~
+an @YAn@Wci@wen@Yt @Cmo@Bve @Wta@Dbl@Wet@n~
+An @YAn@Wci@wen@Yt @Cmo@Bve @Wta@Dbl@Wet@n lies half-buried in a damaged square.~
+~
+8 0 0 0 0 a 0 0 0 0 0 0 0
+0 0 0 0
+3 500 0 1 0
+#3630
+black crownstone shard obsidian royal~
+a @Dbl@bac@Bk @Mcr@Dow@cns@Dto@Bne @Dsh@bar@Bd@n~
+A @Dbl@bac@Bk @Mcr@Dow@cns@Dto@Bne @Dsh@bar@Bd@n catches violet light in its fractured facets.~
+~
+8 0 0 0 0 a 0 0 0 0 0 0 0
+0 0 0 0
+1 750 0 1 0
+#3631
+pale crownstone shard ivory royal~
+a @Wpa@Yle @Ccr@Wow@yns@Yto@Wne @Ysh@War@wd@n~
+A @Wpa@Yle @Ccr@Wow@yns@Yto@Wne @Ysh@War@wd@n gleams like a chip of frozen dawn.~
+~
+8 0 0 0 0 a 0 0 0 0 0 0 0
+0 0 0 0
+1 750 0 1 0
+#3632
+construct rune core fallen piece chess~
+a @Cru@Bne-@Dco@bre @Cof @Wa @Dfa@Bll@cen @Cpi@Bec@De@n~
+A @Cru@Bne-@Dco@bre @Cof @Wa @Dfa@Bll@cen @Cpi@Bec@De@n throbs with fading geometric light.~
+~
+12 0 0 0 0 a 0 0 0 0 0 0 0
+0 0 0 0
+4 600 0 1 0
+#3633
+obsidian court standard banner chess~
+the @DSt@ban@Bda@crd @Dof @bth@Be @DOb@bsi@Bdi@can @bCr@Bow@cn@n~
+The @DSt@ban@Bda@crd @Dof @bth@Be @DOb@bsi@Bdi@can @bCr@Bow@cn@n hangs from a cracked black spear.~
+~
+8 0 0 0 0 a 0 0 0 0 0 0 0
+0 0 0 0
+5 1200 0 1 0
+#3634
+ivory court standard banner chess~
+the @YSt@Wan@wda@Yrd @Wof @wth@Ye @YIv@Wor@wy @YCr@Wow@wn@n~
+The @YSt@Wan@wda@Yrd @Wof @wth@Ye @YIv@Wor@wy @YCr@Wow@wn@n rests on a pale ceremonial pole.~
+~
+8 0 0 0 0 a 0 0 0 0 0 0 0
+0 0 0 0
+5 1200 0 1 0
+#3635
+arbiter seal eternal game chess~
+the @CAr@Wbi@Bte@Dr's @CSe@Wal@n~
+The @CAr@Wbi@Bte@Dr's @CSe@Wal@n lies here, engraved with a board divided by a single unbroken line.~
+~
+8 0 0 0 0 a 0 0 0 0 0 0 0
+0 0 0 0
+1 1800 0 1 0
+#3636
+arbiter measure blade sword chess~
+the @CAr@Wbi@Bte@Dr's @YMe@Was@wur@Ye@n~
+The @CAr@Wbi@Bte@Dr's @YMe@Was@wur@Ye@n lies perfectly aligned with the edge of a square.~
+~
+5 0 0 0 0 an 0 0 0 0 0 0 0
+0 3 5 6
+7 3400 0 22 0
+#3637
+broken moveblade sword fallen champion chess~
+a @RBr@Ook@ren @CMo@Bve@cbl@Dad@Be@n~
+A @RBr@Ook@ren @CMo@Bve@cbl@Dad@Be@n lies here, its edge interrupted by glowing fracture-lines.~
+~
+5 0 0 0 0 an 0 0 0 0 0 0 0
+0 2 6 6
+6 2200 0 18 0
+#3638
+obsidian victory token chess court~
+an @DOb@bsi@Bdi@can @Yvi@Wct@yor@Yy @Dto@Bke@cn@n~
+An @DOb@bsi@Bdi@can @Yvi@Wct@yor@Yy @Dto@Bke@cn@n lies stamped with a crowned black rook.~
+~
+8 0 0 0 0 a 0 0 0 0 0 0 0
+0 0 0 0
+1 450 0 1 0
+#3639
+ivory victory token chess court~
+an @WIv@wor@Yy @Yvi@Wct@yor@Yy @Yto@Wke@wn@n~
+An @WIv@wor@Yy @Yvi@Wct@yor@Yy @Yto@Wke@wn@n lies stamped with a crowned pale rook.~
+~
+8 0 0 0 0 a 0 0 0 0 0 0 0
+0 0 0 0
+1 450 0 1 0
 $~
