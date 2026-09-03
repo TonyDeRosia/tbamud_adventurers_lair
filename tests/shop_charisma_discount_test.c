@@ -50,22 +50,31 @@ int main(void)
 
   failures += expect_float_close("baseline discount", 1.0f, shop_charisma_discount(&buyer, GET_CHA(&keeper)), 0.0001f);
 
-  init_character(&buyer, 18, 1, FALSE);
+  init_character(&buyer, 14, 1, FALSE);
   init_character(&keeper, 11, 1, TRUE);
-  failures += expect_float_close("player discount applied", 0.9000f, shop_charisma_discount(&buyer, GET_CHA(&keeper)), 0.0001f);
+  failures += expect_float_close("CHA 14 discount", 0.9833333f, shop_charisma_discount(&buyer, GET_CHA(&keeper)), 0.0001f);
+
+  init_character(&buyer, 18, 1, FALSE);
+  failures += expect_float_close("CHA 18 discount", 0.9166667f, shop_charisma_discount(&buyer, GET_CHA(&keeper)), 0.0001f);
+
+  init_character(&buyer, 20, 1, FALSE);
+  failures += expect_float_close("CHA 20 discount", 0.8833333f, shop_charisma_discount(&buyer, GET_CHA(&keeper)), 0.0001f);
+
+  init_character(&buyer, 25, 1, FALSE);
+  failures += expect_float_close("CHA 25 discount cap", 0.8000f, shop_charisma_discount(&buyer, GET_CHA(&keeper)), 0.0001f);
 
   init_character(&buyer, 30, LVL_IMMORT, FALSE);
   failures += expect_float_close("immortal has no discount", 1.0f, shop_charisma_discount(&buyer, GET_CHA(&keeper)), 0.0001f);
 
   init_character(&buyer, 18, 1, FALSE);
-  long price = shop_calculate_buy_price(1000, 1.0f, GET_CHA(&keeper), &buyer);
-  failures += expect_long_eq("charisma-adjusted price", 900, price);
+  long price = shop_calculate_buy_price(SHOP_PRICE_SCALE_DIV * 1000L, 1.0f, GET_CHA(&keeper), &buyer);
+  failures += expect_long_eq("charisma-adjusted price", 917, price);
 
-  long undiscounted = shop_calculate_buy_price(1000, 1.0f, GET_CHA(&keeper), NULL);
+  long undiscounted = shop_calculate_buy_price(SHOP_PRICE_SCALE_DIV * 1000L, 1.0f, GET_CHA(&keeper), NULL);
   failures += expect_long_eq("no buyer leaves price unchanged", 1000, undiscounted);
 
   init_character(&buyer, 25, 1, FALSE);
-  long high_cha_price = shop_calculate_buy_price(1000, 1.0f, GET_CHA(&keeper), &buyer);
+  long high_cha_price = shop_calculate_buy_price(SHOP_PRICE_SCALE_DIV * 1000L, 1.0f, GET_CHA(&keeper), &buyer);
   failures += expect_long_eq("higher charisma decreases price", 800, high_cha_price);
 
   return failures;

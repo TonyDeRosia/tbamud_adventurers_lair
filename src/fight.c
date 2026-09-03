@@ -1946,6 +1946,11 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
     affect_from_char(ch, SPELL_TRIPLE_MAXIMIZE_MAGIC);
   }
 
+  /* Every direct offensive spell shares the displayed spell-critical roll.
+   * Self-inflicted ticks and environmental/script damage never reach this path. */
+  if (dam > 0 && ch && ch != victim && IS_SPELL(attacktype))
+    crit_apply_spell(ch, victim, &dam);
+
   if (dam > 0 && IS_WEAPON(attacktype) && victim != ch && AFF_FLAGGED(victim, AFF_PHASE) && rand_number(1, 100) <= 30) {
     act("$N phases out of alignment and your attack passes through harmlessly!", FALSE, ch, 0, victim, TO_CHAR);
     act("$n's attack passes through you as you phase out of alignment!", FALSE, ch, 0, victim, TO_VICT);
@@ -2143,9 +2148,12 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
   }
 
 
-  /* Melee crits (only weapon attacks) */
-  if (dam > 0 && ch && victim && ch != victim && IS_WEAPON(attacktype)) {
-    if (GET_SKILL(ch, SKILL_CHAIN_ASSASSAULT) > 0) {
+  /* Weapon attacks and registered physical skills share the displayed melee
+   * critical roll.  This includes Backstab, Circle, and direct skill damage. */
+  if (dam > 0 && ch && victim && ch != victim &&
+      (IS_WEAPON(attacktype) ||
+       (attacktype >= FIRST_SKILL && attacktype <= MAX_SKILLS))) {
+    if (IS_WEAPON(attacktype) && GET_SKILL(ch, SKILL_CHAIN_ASSASSAULT) > 0) {
       struct affected_type af;
       new_affect(&af);
       af.spell = SKILL_CHAIN_ASSASSAULT;
@@ -2154,11 +2162,7 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
       af.modifier = 1;
       affect_join(ch, &af, FALSE, FALSE, FALSE, FALSE);
     }
-    int mult = 200;
-    if (crit_check_melee(ch, &mult)) {
-      dam = (dam * mult) / 100;
-      crit_show_banner(ch, victim, mult);
-    }
+    crit_apply_melee(ch, victim, &dam);
   }
 
   /* Check for PK if this is not a PK MUD */

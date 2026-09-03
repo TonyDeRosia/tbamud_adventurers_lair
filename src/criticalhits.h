@@ -30,4 +30,11 @@ int crit_check_melee(struct char_data *ch, int *mult);
 int crit_check_spell(struct char_data *ch, int *mult);
 int crit_check_heal(struct char_data *ch, int *mult);
 
+/* Apply the displayed critical chance through one shared path. */
+int crit_apply_melee(struct char_data *ch, struct char_data *victim, int *damage);
+int crit_apply_spell(struct char_data *ch, struct char_data *victim, int *damage);
+int crit_apply_heal(struct char_data *ch, struct char_data *victim, int *healing);
+void crit_suppress_spell_push(void);
+void crit_suppress_spell_pop(void);
+
 #endif

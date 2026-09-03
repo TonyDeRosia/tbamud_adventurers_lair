@@ -6,6 +6,8 @@
 #include "criticalhits.h"
 #include "comm.h"
 
+static int spell_crit_suppression = 0;
+
 /*
  * Crit banner formatting
  * mult is percent: 200=2x, 300=3x, 400=4x
@@ -176,5 +178,58 @@ int crit_check_heal(struct char_data *ch, int *mult)
     return 0;
 
   *mult = crit_mult_heal(ch);
+  return 1;
+}
+
+int crit_apply_melee(struct char_data *ch, struct char_data *victim, int *damage)
+{
+  int mult = 200;
+
+  if (!ch || !victim || ch == victim || !damage || *damage <= 0)
+    return 0;
+  if (!crit_check_melee(ch, &mult))
+    return 0;
+
+  *damage = (*damage * mult) / 100;
+  crit_show_banner(ch, victim, mult);
+  return 1;
+}
+
+int crit_apply_spell(struct char_data *ch, struct char_data *victim, int *damage)
+{
+  int mult = 200;
+
+  if (spell_crit_suppression || !ch || !victim || ch == victim || !damage || *damage <= 0)
+    return 0;
+  if (!crit_check_spell(ch, &mult))
+    return 0;
+
+  *damage = (*damage * mult) / 100;
+  crit_show_banner(ch, victim, mult);
+  return 1;
+}
+
+void crit_suppress_spell_push(void)
+{
+  spell_crit_suppression++;
+}
+
+void crit_suppress_spell_pop(void)
+{
+  if (spell_crit_suppression > 0)
+    spell_crit_suppression--;
+}
+
+int crit_apply_heal(struct char_data *ch, struct char_data *victim, int *healing)
+{
+  int mult = 200;
+
+  if (!ch || !victim || !healing || *healing <= 0)
+    return 0;
+  if (!crit_check_heal(ch, &mult))
+    return 0;
+
+  *healing = (*healing * mult) / 100;
+  crit_show_banner(ch, victim, mult);
   return 1;
 }

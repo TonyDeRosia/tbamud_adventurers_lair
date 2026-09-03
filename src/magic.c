@@ -522,15 +522,6 @@ int mag_damage(int level, struct char_data *ch, struct char_data *victim,
 
   /* and finally, inflict the damage */
 
-  /* Spell crits (mag_damage) */
-  if (dam > 0 && ch && victim) {
-    int mult = 200;
-    if (crit_check_spell(ch, &mult)) {
-      dam = (dam * mult) / 100;
-      crit_show_banner(ch, victim, mult);
-    }
-  }
-
   if (dam > 0)
     dam = reduce_disrupted_spell_value(ch, dam);
 
@@ -1832,14 +1823,8 @@ void mag_points(int level, struct char_data *ch, struct char_data *victim,
     break;
   }
   
-  /* Heal crits (mag_points), even out of combat */
-  if (healing > 0 && ch && victim) {
-    int mult = 200;
-    if (crit_check_heal(ch, &mult)) {
-      healing = (healing * mult) / 100;
-      crit_show_banner(ch, victim, mult);
-    }
-  }
+  /* Heal crits, even out of combat. */
+  crit_apply_heal(ch, victim, &healing);
 
   if (healing > 0)
     healing = reduce_disrupted_spell_value(ch, healing);

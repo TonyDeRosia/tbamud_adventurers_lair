@@ -55,7 +55,7 @@ def test_shared_validation_covers_room_position_self_and_peaceful():
 def test_backstab_preserves_weapon_roll_damage_and_lag():
     body = section(OFF, "enum combat_skill_result perform_backstab", "ACMD(do_backstab)")
     for contract in ("WEAR_WIELD", "TYPE_PIERCE", "FIGHTING(vict)", "MOB_AWARE",
-                     "rand_number(1, 101)", "hit(ch, vict, SKILL_BACKSTAB)",
+                     "rand_number(1, 101)", "dual_skill_attack(ch, vict, SKILL_BACKSTAB)",
                      "damage(ch, vict, 0, SKILL_BACKSTAB)", "2 * PULSE_VIOLENCE"):
         assert contract in body
 

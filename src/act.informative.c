@@ -1957,7 +1957,7 @@ ACMD(do_score)
     int m_cha = ch->aff_abils.cha - b_cha;
 
     snprintf(line, sizeof(line),
-      "%sBase Stats:%s  Str %d (%+d)  Dex %d (%+d)  Con %d (%+d)",
+      "%sAttributes:%s  Str %d (%+d)  Dex %d (%+d)  Con %d (%+d)",
       C, R,
       b_str, m_str,
       b_dex, m_dex,
@@ -1974,7 +1974,7 @@ ACMD(do_score)
     len = append_box_line(buf, len, sizeof(buf), B, R, "", W);
 
     snprintf(line, sizeof(line),
-      "%sArmor:%s %-8d   %sEvasion:%s %-5d   %sSpell Saves:%s %-6d",
+      "%sArmor:%s %-8d   %sBase Evasion:%s %-5d   %sSave vs. Spell:%s %-6d",
       C, R, shown_armor,
       C, R, shown_evasion,
       C, R, spell_save);
@@ -1982,7 +1982,7 @@ ACMD(do_score)
     len = append_box_line(buf, len, sizeof(buf), B, R, "", W);
 
     snprintf(line, sizeof(line),
-      "%sOffense:%s  Hitroll %+d  Damroll %+d  Accuracy: %d%%",
+      "%sOffense:%s  Hitroll %+d  Damroll %+d  Hit Chance: %d%%",
       C, R,
       GET_HITROLL(ch), GET_DAMROLL(ch), accuracy_pct);
     len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
@@ -2004,7 +2004,7 @@ ACMD(do_score)
   len = append_box_line(buf, len, sizeof(buf), B, R, "", W);
   /* Crit chances */
   snprintf(line, sizeof(line),
-           "%sCritical hit:%s %d   %sCritical Spell:%s %d   %sCritical Heal:%s %d",
+           "%sCritical Hit:%s %d   %sCritical Spell:%s %d   %sCritical Heal:%s %d",
            C, R, crit_total_melee(ch),
            C, R, crit_total_spell(ch),
            C, R, crit_total_heal(ch));
@@ -2019,9 +2019,13 @@ ACMD(do_score)
   len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
 
   snprintf(line, sizeof(line),
-    "%sGold:%s %8lld   %sDiamonds:%s %6d   %sGlory:%s %6d   %sBank:%s %8lld",
+    "%sGold:%s %-22lld  %sDiamonds:%s %d",
     C, R, (long long)GET_GOLD(ch),
-    C, R, GET_DIAMONDS(ch),
+    C, R, GET_DIAMONDS(ch));
+  len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
+
+  snprintf(line, sizeof(line),
+    "%sGlory:%s %-21d  %sBank:%s %lld",
     C, R, GET_GLORY(ch),
     C, R, (long long)GET_BANK_GOLD(ch));
   len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
@@ -2033,15 +2037,9 @@ ACMD(do_score)
   /* Quest Information */
   {
     char left_part[128];
-    char right_part[128];
-    int spacer;
-
-    snprintf(left_part, sizeof(left_part), "%sQuests completed:%s %d", C, R, GET_NUM_QUESTS(ch));
-    snprintf(right_part, sizeof(right_part), "%sQuest Points:%s %d", M, R, GET_QUESTPOINTS(ch));
-    spacer = (int)W - (int)visible_strlen_mud(left_part) - (int)visible_strlen_mud(right_part);
-    if (spacer < 2)
-      spacer = 2;
-    snprintf(line, sizeof(line), "%s%*s%s", left_part, spacer, "", right_part);
+    snprintf(left_part, sizeof(left_part), "%sQuests completed:%s %-12d  %sQuest Points:%s %d",
+      C, R, GET_NUM_QUESTS(ch), M, R, GET_QUESTPOINTS(ch));
+    snprintf(line, sizeof(line), "%s", left_part);
   }
   len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
 

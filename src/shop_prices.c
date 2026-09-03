@@ -24,10 +24,10 @@ float shop_charisma_discount(const struct char_data *buyer, int keeper_cha)
   if (cha > 25)
     cha = 25;
 
-  /* CHA 13 -> 1.00, CHA 25 -> 0.85 (max 15 percent off) */
+  /* CHA 13 -> 1.00, CHA 25 -> 0.80 (maximum 20 percent discount). */
   {
     float t = (float)(cha - 13) / (float)(25 - 13);
-    return 1.0f - (0.40f * t);
+    return 1.0f - (0.20f * t);
   }
 }
 

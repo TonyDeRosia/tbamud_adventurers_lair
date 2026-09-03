@@ -1843,7 +1843,6 @@ ASPELL(spell_plague_bolt)
   struct affected_type af;
   int power;
   int dam;
-  int mult = 200;
   int pen;
   int dur_ticks;
   int stat_bonus;
@@ -1862,11 +1861,6 @@ ASPELL(spell_plague_bolt)
   dam = dice(3, 6) + 3 + stat_bonus + lvl_bonus;
   if (mag_savingthrow(victim, SAVING_SPELL, 0))
     dam = (dam * 75) / 100;
-
-  if (crit_check_spell(ch, &mult)) {
-    dam = (dam * mult) / 100;
-    crit_show_banner(ch, victim, mult);
-  }
 
   if (dam < 1)
     dam = 1;
@@ -2016,6 +2010,7 @@ ASPELL(spell_devour_soul)
 
   healed = (dam * 60) / 100;
   mana_restored = MIN(50, dam / 4);
+  crit_apply_heal(ch, ch, &healed);
   if (healed > 0)
     GET_HIT(ch) = MIN(GET_MAX_HIT(ch), GET_HIT(ch) + healed);
   if (mana_restored > 0)
@@ -2040,6 +2035,7 @@ ASPELL(spell_vampiric_touch)
     return;
 
   healed = (dam * 40) / 100;
+  crit_apply_heal(ch, ch, &healed);
   if (healed > 0)
     GET_HIT(ch) = MIN(GET_MAX_HIT(ch), GET_HIT(ch) + healed);
 }
@@ -2052,6 +2048,7 @@ ASPELL(spell_greater_heal)
     return;
 
   healing = (level * 5) + dice(6, MAX(1, level));
+  crit_apply_heal(ch, victim, &healing);
   GET_HIT(victim) = MIN(GET_MAX_HIT(victim), GET_HIT(victim) + healing);
   update_pos(victim);
 
@@ -3142,7 +3139,9 @@ ASPELL(spell_negative_burst)
       set_next_damage_type(DAM_NECROTIC);
       damage(ch, tch, dam, SPELL_NEGATIVE_BURST);
     } else if ((AFF_FLAGGED(tch, AFF_CHARM) && tch->master == ch) || spell_is_undead(tch)) {
-      GET_HIT(tch) = MIN(GET_MAX_HIT(tch), GET_HIT(tch) + spell_dmg_low_manual(level));
+      int healing = spell_dmg_low_manual(level);
+      crit_apply_heal(ch, tch, &healing);
+      GET_HIT(tch) = MIN(GET_MAX_HIT(tch), GET_HIT(tch) + healing);
     }
   }
 }

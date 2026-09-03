@@ -23,6 +23,7 @@
 #include "db.h"
 #include "dg_scripts.h"
 #include "fight.h"  /* for hit() */
+#include "criticalhits.h"
 #include "tome.h"
 
 #define SINFO spell_info[spellnum]
@@ -1770,7 +1771,9 @@ int call_magic(struct char_data *caster, struct char_data *cvict,
     act("Your reflective ward flares and redirects $n's spell!", FALSE, caster, 0, cvict, TO_VICT);
     act("$N's reflective ward flares and redirects $n's spell!", FALSE, caster, 0, cvict, TO_NOTVICT);
     reflect_suppressed++;
+    crit_suppress_spell_push();
     call_magic(cvict, caster, NULL, spellnum, level, casttype);
+    crit_suppress_spell_pop();
     reflect_suppressed--;
     return 0;
   }
