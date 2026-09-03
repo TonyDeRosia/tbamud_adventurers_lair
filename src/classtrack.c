@@ -10,6 +10,8 @@
 #include "db.h"
 #include "screen.h"
 
+extern const char *class_name(int class_id);
+
 #define CT_SOFT_MIN_SCORE 10
 #define CT_SOFT_TOTAL_SCORE_MIN 24
 #define CT_SOFT_WEAK_DOMINANCE_MARGIN 8
@@ -504,15 +506,18 @@ int classtrack_can_study_archetype(struct char_data *ch, int target_archetype,
 const char *classtrack_display_class_name(struct char_data *ch)
 {
   if (!ch || IS_NPC(ch))
-    return "Adventurer";
+    return "Unknown";
 
-  if (!GET_CLASS_LOCKED(ch))
-    return "Adventurer";
-
-  if (*GET_SOFT_CLASS_TITLE(ch))
+  /*
+   * The real selected class is authoritative.
+   * Only a finalized/locked class-track identity may replace it.
+   */
+  if (GET_CLASS_LOCKED(ch) &&
+      *GET_SOFT_CLASS_TITLE(ch) &&
+      str_cmp(GET_SOFT_CLASS_TITLE(ch), "Adventurer"))
     return GET_SOFT_CLASS_TITLE(ch);
 
-  return "Adventurer";
+  return class_name(GET_CLASS(ch));
 }
 
 const char *classtrack_display_class_abbrev(struct char_data *ch)

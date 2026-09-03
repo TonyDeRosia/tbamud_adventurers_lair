@@ -2386,35 +2386,10 @@ if (PLR_FLAGGED(d->character, PLR_DELETED)) {
     }
 
     GET_RACE(d->character) = race;
-    write_to_output(d, "\r\nYou begin as an Adventurer. Your class will develop based on how you play.\r\n");
 
-  if (d->olc) {
-    free(d->olc);
-    d->olc = NULL;
-  }
-  if (GET_PFILEPOS(d->character) < 0)
-    GET_PFILEPOS(d->character) = create_entry(GET_PC_NAME(d->character));
-
-/* Now GET_NAME() will work properly. */
-init_char(d->character);
-
-       /* Stat allocation baseline (pre racial bonuses, pre allocation). */
-       d->character->real_abils.str = 10;
-       d->character->real_abils.dex = 10;
-       d->character->real_abils.con = 10;
-       d->character->real_abils.intel = 10;
-       d->character->real_abils.wis = 10;
-       d->character->real_abils.cha = 10;
-       affect_total(d->character);
-
-
-        /* Apply one-time racial perks (non-stat) before allocation. */
-        apply_racial_perks_once(d->character);
-        stat_alloc_snapshot_base(d);
-
-	STATE(d) = CON_QSTATS;
-	stat_alloc_show(d);
-	return;
+    STATE(d) = CON_QCLASS;
+    write_to_output(d, "%s", class_menu());
+    return;
 /* make sure the last log is updated correctly. */
 GET_PREF(d->character)= rand_number(1, 128000);
 GET_HOST(d->character)= strdup(d->host);
@@ -2429,12 +2404,53 @@ if (AddRecentPlayer(GET_NAME(d->character), d->host, TRUE, FALSE) == FALSE)
 }
 break;
   }
+  case CON_QCLASS: {
+    int chclass;
 
-  case CON_QCLASS:
-    write_to_output(d, "\r\nClass selection is disabled. You begin as an Adventurer.\r\n");
-    STATE(d) = CON_QRACE;
-    write_to_output(d, "%s", race_menu);
+    if (!*arg) {
+      write_to_output(d, "%s", class_menu());
+      return;
+    }
+
+    chclass = parse_class(*arg);
+
+    if (chclass == CLASS_UNDEFINED ||
+        !is_valid_class(chclass) ||
+        !pc_classes[chclass].selectable) {
+      write_to_output(d, "\r\nThat is not a valid class choice.\r\n");
+      write_to_output(d, "%s", class_menu());
+      return;
+    }
+
+    GET_CLASS(d->character) = chclass;
+
+    if (d->olc) {
+      free(d->olc);
+      d->olc = NULL;
+    }
+
+    if (GET_PFILEPOS(d->character) < 0)
+      GET_PFILEPOS(d->character) = create_entry(GET_PC_NAME(d->character));
+
+    /* init_char() expects the class to have already been selected. */
+    init_char(d->character);
+
+    /* Stat allocation baseline, before racial bonuses/allocation. */
+    d->character->real_abils.str   = 10;
+    d->character->real_abils.dex   = 10;
+    d->character->real_abils.con   = 10;
+    d->character->real_abils.intel = 10;
+    d->character->real_abils.wis   = 10;
+    d->character->real_abils.cha   = 10;
+    affect_total(d->character);
+
+    apply_racial_perks_once(d->character);
+    stat_alloc_snapshot_base(d);
+
+    STATE(d) = CON_QSTATS;
+    stat_alloc_show(d);
     return;
+  }
 
   case CON_QSTATS: {
     int choice = atoi(arg);

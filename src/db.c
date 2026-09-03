@@ -3871,7 +3871,6 @@ void init_char(struct char_data *ch)
   for (i = 0; i < MAX_IDENTIFIED_ITEMS; i++)
     ch->player_specials->saved.identified_item_vnums[i] = NOTHING;
   GET_QUEST(ch) = NOTHING;
-  GET_CLASS(ch) = CLASS_ADVENTURER;
 
   ch->player.time.birth = time(0);
   ch->player.time.logon = time(0);
