@@ -17,6 +17,7 @@
 #include "handler.h"
 #include "screen.h"
 #include "interpreter.h"
+#include "control.h"
 #include "spells.h"
 #include "dg_scripts.h"
 #include "act.h"
@@ -361,6 +362,8 @@ void affect_to_char(struct char_data *ch, struct affected_type *af)
 {
   struct affected_type *cur;
   struct affected_type *affected_alloc;
+
+  if (IS_SET_AR(af->bitvector, AFF_CHARM)) end_character_control(ch);
 
   /* Guard against exact duplicate entries. If all affect fields match except
    * duration, refresh the existing entry instead of stacking another copy. */
@@ -1007,6 +1010,7 @@ void extract_char_final(struct char_data *ch)
   struct obj_data *obj;
   int i;
 
+  end_character_control(ch);
   if (IN_ROOM(ch) == NOWHERE) {
     log("SYSERR: NOWHERE extracting char %s. (%s, extract_char_final)",
         GET_NAME(ch), __FILE__);
@@ -1125,6 +1129,7 @@ void extract_char_final(struct char_data *ch)
  */
 void extract_char(struct char_data *ch)
 {
+  end_character_control(ch);
   char_from_furniture(ch);
   clear_char_event_list(ch);
 

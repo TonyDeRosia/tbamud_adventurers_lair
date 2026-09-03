@@ -14,6 +14,7 @@
 #include "utils.h"
 #include "comm.h"
 #include "interpreter.h"
+#include "control.h"
 #include "accounts.h"
 #include "race.h"
 #include "db.h"
@@ -145,6 +146,7 @@ cpp_extern const struct command_info cmd_info[] = {
   { "bandage"  , "band"    , POS_RESTING , do_bandage  , 1, 0 },
 
   { "bash"     , "bas"     , POS_FIGHTING, do_bash     , 1, 0 },
+  { "beseech" , "beseech" , POS_RESTING , do_beseech  , 1, 0 },
   { "brief"    , "br"      , POS_DEAD    , do_gen_tog  , 0, SCMD_BRIEF },
   { "buff"     , "buff"    , POS_SITTING , do_buff     , 1, 0 },
   { "bid"      , "bid"     , POS_SLEEPING, do_bid      , 0, 0 },
@@ -320,6 +322,7 @@ cpp_extern const struct command_info cmd_info[] = {
   { "pour"     , "pour"    , POS_STANDING, do_pour     , 0, SCMD_POUR },
 //   { "prompt"   , "pro"     , POS_DEAD    , do_display  , 0, 0 },
   { "prefedit" , "pre"     , POS_DEAD    , do_oasis_prefedit , 0, 0 },
+  { "puppet", "puppet", POS_DEAD, do_puppet, LVL_IMMORT, 0 },
   { "purge"    , "purge"   , POS_DEAD    , do_purge    , LVL_BUILDER, 0 },
   { "pull"     , "pull"    , POS_DEAD    , do_pull     , LVL_GRGOD, 0 },
   { "push"     , "push"    , POS_DEAD    , do_push     , LVL_GRGOD, 0 },
@@ -394,6 +397,7 @@ cpp_extern const struct command_info cmd_info[] = {
   { "sneak"    , "sneak"   , POS_STANDING, do_sneak    , 1, 0 },
   { "snoop"    , "snoop"   , POS_DEAD    , do_snoop    , LVL_GOD, 0 },
   { "socials"  , "socials" , POS_DEAD    , do_commands , 0, SCMD_SOCIALS },
+  { "socket", "socket", POS_DEAD, do_socket, LVL_IMPL, 0 },
   { "split"    , "split"   , POS_SITTING , do_split    , 1, 0 },
   { "stand"    , "st"      , POS_RESTING , do_stand    , 0, 0 },
   { "stat"     , "stat"    , POS_DEAD    , do_stat     , LVL_IMMORT, 0 },
@@ -424,6 +428,7 @@ cpp_extern const struct command_info cmd_info[] = {
   { "unkeep"   , "unkeep"  , POS_RESTING , do_iunlock  , 0, 0 },
   { "unpull"   , "unpull"  , POS_DEAD    , do_unpull   , LVL_GRGOD, 0 },
   { "unfollow" , "unf"     , POS_RESTING , do_unfollow , 0, 0 },
+  { "unpuppet", "unpuppet", POS_DEAD, do_unpuppet, 0, 0 },
   { "uptime"   , "uptime"  , POS_DEAD    , do_date     , LVL_GOD, SCMD_UPTIME },
   { "use"      , "use"     , POS_SITTING , do_use      , 1, SCMD_USE },
   { "users"    , "users"   , POS_DEAD    , do_users    , LVL_GOD, 0 },
@@ -620,18 +625,24 @@ void command_interpreter(struct char_data *ch, char *argument)
     line = any_one_arg(argument, arg);
 
 
+  if (!control_command_allowed(ch, arg)) {
+    send_to_char(ch, "That action cannot be compelled.\r\n");
+    return;
+  }
+
   /* Since all command triggers check for valid_dg_target before acting, the levelcheck
    * here has been removed. Otherwise, find the command. */
   {
     int cont;                                            /* continue the command checks */
-    cont = command_wtrigger(ch, arg, line);              /* any world triggers ? */
-    if (!cont) cont = command_mtrigger(ch, arg, line);   /* any mobile triggers ? */
-    if (!cont) cont = command_otrigger(ch, arg, line);   /* any object triggers ? */
+    if (ch->control && ch->control->target == ch) cont = 0;
+    else cont = command_wtrigger(ch, arg, line);              /* any world triggers ? */
+    if (!cont && !(ch->control && ch->control->target == ch)) cont = command_mtrigger(ch, arg, line);   /* any mobile triggers ? */
+    if (!cont && !(ch->control && ch->control->target == ch)) cont = command_otrigger(ch, arg, line);   /* any object triggers ? */
     if (cont) return;                                    /* yes, command trigger took over */
   }
 
   /* Allow IMPLs to switch into mobs to test the commands. */
-   if (IS_NPC(ch) && ch->desc && GET_LEVEL(ch->desc->original) >= LVL_IMPL) {
+   if (!ch->control && IS_NPC(ch) && ch->desc && ch->desc->original && GET_LEVEL(ch->desc->original) >= LVL_IMPL) {
      if (script_command_interpreter(ch, argument))
        return;
    }
@@ -703,7 +714,7 @@ void command_interpreter(struct char_data *ch, char *argument)
     case POS_FIGHTING:
       send_to_char(ch, "No way!  You're fighting for your life!\r\n");
       break;
-  } else if (no_specials || !special(ch, cmd, line)) {
+  } else if ((ch->control && ch->control->target == ch) || no_specials || !special(ch, cmd, line)) {
     ((*complete_cmd_info[cmd].command_pointer) (ch, line, cmd, complete_cmd_info[cmd].subcmd));
   }
 }
@@ -1170,6 +1181,11 @@ static int perform_dupe_check(struct descriptor_data *d)
 
     if (k == d)
       continue;
+
+    /* Restore both descriptor owners before the legacy reconnect machinery. */
+    if ((k->original && GET_IDNUM(k->original) == id) ||
+        (k->character && GET_IDNUM(k->character) == id))
+      end_descriptor_control(k);
 
     if (k->original && (GET_IDNUM(k->original) == id)) {
       /* Original descriptor was switched, booting it and restoring normal body control. */

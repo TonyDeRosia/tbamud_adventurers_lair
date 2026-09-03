@@ -22175,5 +22175,64 @@ Lists room reset chains without executing, changing, or saving resets.
 Builders may inspect only zones they have permission to edit.
 #101
 
+PUPPET UNPUPPET
+
+cast 'puppet' <target>
+Your consciousness enters another body while your own remains vulnerable.
+At mastery, control lasts up to 60 seconds for creatures and 30 for players.
+Strong or protected minds resist. Player targets require the world's player
+combat rules and summon consent. Damage to your own body breaks possession.
+Death, departure, or loss of either connection ends control. Use UNPUPPET
+(or RETURN while possessing) to return early.
+
+A possessed player stays connected, sees their body's surroundings, and cannot
+act independently until released. Compelled actions are limited to movement,
+speech, socials, inspection, and basic combat. Casting, item transfers, account
+changes, and administration cannot be compelled. Queued input is cleared when
+control begins and ends.
+
+Immortals may use PUPPET <creature> to inhabit a visible NPC anywhere in the
+world, subject to switch room restrictions. This administrative command has
+no mana cost, resistance roll, or time limit. Your original body stays behind.
+#0
+
+MIND CONTROL
+
+cast 'mind control' <target>
+order <target> <command>
+
+Bind another's will while remaining in your own body. Give targeted orders
+while the creature is in your room. Strong or protected minds resist.
+At mastery the binding lasts up to 90 seconds for creatures and 30 for players.
+Player targets require the world's player combat rules and summon consent.
+Orders have the same restrictions as the Puppet spell. A bound player keeps
+receiving their body's output but cannot act independently until released.
+Death, extraction, loss of either connection, or expiry ends the binding.
+UNPUPPET also releases your bound target. Damage alone does not break this spell.
+#0
+
+SOCKET
+
+socket [player|descriptor-id] [full]
+
+Implementors in their own bodies may inspect current connections, including
+login sessions and control relationships. Network addresses are redacted unless
+FULL is explicitly requested. No passwords, secrets, or pointer addresses are
+shown. The ID is the connection number used by USERS.
+#104
+
+BESEECH
+
+Usage: beseech <message>
+Example: beseech I need an immortal's assistance.
+
+Privately appeal to connected immortals from anywhere in the world. Other
+mortals cannot hear your appeal. You must be level 1 or higher and at least
+resting. Staff mutes, frozen status, silence, and soundproof rooms can prevent
+sending. Personal channel preferences and ignores do not block this channel.
+There is no BESEECH history. NOREPEAT replaces your echo with the usual OK.
+Please use this for assistance and do not spam. Staff may answer with TELL.
+#1
+
 $
 #0

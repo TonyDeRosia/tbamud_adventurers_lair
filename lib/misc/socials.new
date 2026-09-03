@@ -3133,6 +3133,21 @@ $n looks at your $t and goes hrmph.
 You look at $p and go hrmph.
 $n looks at $p and goes hrmph.
 
+~hello hello 0 5 0 0
+You wave hello.
+$n waves hello.
+You wave hello to $N.
+$n waves hello to $N.
+$n waves hello to you.
+I don't see anything by that name here.
+You wave hello to yourself.
+$n waves hello to $mself.
+#
+#
+#
+#
+#
+
 ~hug hug 0 5 0 0
 Hug who?
 $n is looking for someone to hug.

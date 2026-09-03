@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Focused static contracts for the read-only XP/reward audit."""
 from pathlib import Path
+import re
 import sys
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -30,6 +31,14 @@ assert "gain = MAX(-CONFIG_MAX_EXP_LOSS, gain);" in LIMITS
 assert "Bonus XP is added on top of live kill XP." in MEDIT
 
 records = audit.parse_mobs()
-assert len(records) == 3736
+expected_vnums = {
+    int(match.group(1))
+    for path in (ROOT / "lib" / "world" / "mob").glob("*.mob")
+    for match in re.finditer(r"^#(\d+)\s*$", path.read_text(encoding="utf-8", errors="replace"), re.MULTILINE)
+}
+parsed_vnums = {int(record["vnum"]) for record in records}
+assert expected_vnums
+assert parsed_vnums == expected_vnums
+assert len(records) == len(parsed_vnums)
 assert next(r for r in records if r["vnum"] == 16400)["bonus_xp"] == 0
 print("xp reward audit calculation and source-contract checks passed")

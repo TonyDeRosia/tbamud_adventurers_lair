@@ -17,6 +17,7 @@
 #include "db.h"
 #include "handler.h"
 #include "interpreter.h"
+#include "control.h"
 #include "dg_scripts.h"
 #include "screen.h"
 #include "class.h"
@@ -615,6 +616,7 @@ void gain_condition(struct char_data *ch, int condition, int value)
 
 static void check_idling(struct char_data *ch)
 {
+  if (ch->control) { ch->char_specials.timer = 0; return; }
   if (ch->char_specials.timer > CONFIG_IDLE_VOID) {
     if (GET_WAS_IN(ch) == NOWHERE && IN_ROOM(ch) != NOWHERE) {
       GET_WAS_IN(ch) = IN_ROOM(ch);

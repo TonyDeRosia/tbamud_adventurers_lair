@@ -74,4 +74,8 @@ extern ush_int port;
 extern socket_t mother_desc;
 extern int next_tick;
 
+
+/* Private connection output: no possession mirror; normal staff snoop remains. */
+size_t write_to_connection(struct descriptor_data *d, const char *format, ...) __attribute__ ((format (printf, 2, 3)));
+
 #endif /* _COMM_H_ */

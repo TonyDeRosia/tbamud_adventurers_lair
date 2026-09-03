@@ -264,8 +264,10 @@
 #define SPELL_TOTAL_OCCULTATION      223
 #define SPELL_DOMAIN_BREAK           224
 #define SPELL_HUNTERS_INSTINCT       225
+#define SPELL_PUPPET                 226
+#define SPELL_MIND_CONTROL           227
 /** Total Number of defined spells */
-#define NUM_SPELLS                   225
+#define NUM_SPELLS                   227
 
 /* Insert new spells here, up to MAX_SPELLS */
 #define MAX_SPELLS		    230

@@ -14,6 +14,7 @@
 #include "utils.h"
 #include "comm.h"
 #include "interpreter.h"
+#include "control.h"
 #include "handler.h"
 #include "db.h"
 #include "spells.h"
@@ -186,7 +187,9 @@ ACMD(do_hit)
   else if (vict == ch) {
     send_to_char(ch, "You hit yourself...OUCH!.\r\n");
     act("$n hits $mself, and says OUCH!", FALSE, ch, 0, vict, TO_ROOM);
-  } else if (is_owned_follower_target(ch, vict))
+  } else if (!control_attack_allowed(ch, vict))
+    send_to_char(ch, "You cannot compel that attack.\r\n");
+  else if (is_owned_follower_target(ch, vict))
     send_to_char(ch, "You cannot attack one of your own followers.\r\n");
   else if (AFF_FLAGGED(ch, AFF_CHARM) && (ch->master == vict))
     act("$N is just such a good friend, you simply can't hit $M.", FALSE, ch, 0, vict, TO_CHAR);
@@ -240,7 +243,7 @@ ACMD(do_kill)
 
 static int physical_skill_target_ok(struct char_data *ch, struct char_data *vict)
 {
-  return ch && vict && ch != vict && IN_ROOM(ch) != NOWHERE &&
+  return ch && vict && ch != vict && control_attack_allowed(ch, vict) && IN_ROOM(ch) != NOWHERE &&
     IN_ROOM(ch) == IN_ROOM(vict) && GET_POS(ch) >= POS_FIGHTING &&
     !ROOM_FLAGGED(IN_ROOM(ch), ROOM_PEACEFUL);
 }
@@ -385,6 +388,7 @@ ACMD(do_order)
   struct char_data *vict = NULL;
   struct follow_type *k;
 
+  if (control_order(ch, argument)) return;
   half_chop(argument, name, message);
   ordered_attack = is_ordered_attack_command(message, command_verb, target);
 

@@ -14,6 +14,7 @@
 #include "utils.h"
 #include "comm.h"
 #include "interpreter.h"
+#include "control.h"
 #include "handler.h"
 #include "db.h"
 #include "spells.h"
@@ -1488,6 +1489,14 @@ ACMD(do_snoop)
   }
 }
 
+void switch_to_char(struct char_data *ch, struct char_data *victim)
+{
+  ch->desc->character = victim;
+  ch->desc->original = ch;
+  victim->desc = ch->desc;
+  ch->desc = NULL;
+}
+
 ACMD(do_switch)
 {
   char arg[MAX_INPUT_LENGTH];
@@ -1495,15 +1504,16 @@ ACMD(do_switch)
 
   one_argument(argument, arg);
 
-  if (ch->desc->original)
-    send_to_char(ch, "You're already switched.\r\n");
+  if (!ch->desc) return;
+  if (ch->control || ch->desc->original)
+    send_to_char(ch, "You're already switched or controlling a body.\r\n");
   else if (!*arg)
     send_to_char(ch, "Switch with who?\r\n");
   else if (!(victim = get_char_vis(ch, arg, NULL, FIND_CHAR_WORLD)))
     send_to_char(ch, "No such character.\r\n");
   else if (ch == victim)
     send_to_char(ch, "Hee hee... we are jolly funny today, eh?\r\n");
-  else if (victim->desc)
+  else if (victim->desc || victim->control)
     send_to_char(ch, "You can't do that, the body is already in use!\r\n");
   else if ((GET_LEVEL(ch) < LVL_IMPL) && !IS_NPC(victim))
     send_to_char(ch, "You are not holy enough to use their body.\r\n");
@@ -1515,11 +1525,7 @@ ACMD(do_switch)
   else {
     send_to_char(ch, "%s", CONFIG_OK);
     mudlog(CMP, MAX(LVL_GOD, GET_INVIS_LEV(ch)), TRUE, "(GC) %s Switched into: %s", GET_NAME(ch), GET_NAME(victim));
-    ch->desc->character = victim;
-    ch->desc->original = ch;
-
-    victim->desc = ch->desc;
-    ch->desc = NULL;
+    switch_to_char(ch, victim);
   }
 }
 
@@ -1539,6 +1545,8 @@ static void do_cheat(struct char_data *ch)
 
 void return_to_char(struct char_data * ch)
 {
+  if (ch && ch->control) { end_character_control(ch); return; }
+  if (!ch || !ch->desc || !ch->desc->original) return;
   /* If someone switched into your original body, disconnect them. - JE
   * Zmey: here we put someone switched in our body to disconnect state but
   * we must also NULL his pointer to our character, otherwise close_socket()
@@ -1560,6 +1568,8 @@ void return_to_char(struct char_data * ch)
 
 ACMD(do_return)
 {
+  if (ch->control) { do_unpuppet(ch, argument, cmd, subcmd); return; }
+  if (!ch->desc) return;
   if (!IS_NPC(ch) && !ch->desc->original) {
     int level, newlevel;
     level = GET_LEVEL(ch);
@@ -5336,6 +5346,8 @@ ACMD(do_copyover)
 
    sprintf (buf, "\n\r *** COPYOVER by %s - please remain seated!\n\r", GET_NAME(ch));
 
+   end_all_control();
+
    /* write boot_time as first line in file */
    fprintf(fp, "%ld\n", (long)boot_time);
 
@@ -5346,6 +5358,7 @@ ACMD(do_copyover)
    /* If d is currently in someone else's body, return them. */  
    if (och && d->original)
      return_to_char(och);
+   och = d->character; /* return changed the active body */
         
    /* We delete from the list , so need to save this */
      d_next = d->next;

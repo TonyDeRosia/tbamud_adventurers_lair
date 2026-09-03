@@ -26,6 +26,7 @@
 /* functions with subcommands */
 /* do_gen_comm */
 ACMD(do_gen_comm);
+ACMD(do_beseech);
 #define SCMD_HOLLER   0
 #define SCMD_SHOUT    1
 #define SCMD_GOSSIP   2

@@ -13,6 +13,7 @@
 #include "structs.h"
 #include "utils.h"
 #include "interpreter.h"
+#include "control.h"
 #include "spells.h"
 #include "class.h"
 #include "classtrack.h"
@@ -1808,6 +1809,10 @@ int call_magic(struct char_data *caster, struct char_data *cvict,
 
   if (IS_SET(SINFO.routines, MAG_MANUAL))
     switch (spellnum) {
+    case SPELL_PUPPET:
+    case SPELL_MIND_CONTROL:
+      cast_control(caster, cvict, spellnum);
+      break;
     case SPELL_CHARM:
       MANUAL_SPELL(spell_charm)
       ;
@@ -2909,6 +2914,10 @@ void mag_assign_spells(void) {
   spello(SPELL_CALL_LIGHTNING, "call lightning", 40, 25, 3, POS_FIGHTING,
   TAR_CHAR_ROOM | TAR_FIGHT_VICT, TRUE, MAG_DAMAGE, NULL);
 
+  spello(SPELL_PUPPET, "puppet", 90, 60, 2, POS_STANDING,
+      TAR_CHAR_ROOM | TAR_NOT_SELF, TRUE, MAG_MANUAL, NULL);
+  spello(SPELL_MIND_CONTROL, "mind control", 75, 50, 2, POS_STANDING,
+      TAR_CHAR_ROOM | TAR_NOT_SELF, TRUE, MAG_MANUAL, NULL);
   spello(SPELL_CHARM, "charm person", 75, 50, 2, POS_FIGHTING,
   TAR_CHAR_ROOM | TAR_NOT_SELF, TRUE, MAG_MANUAL,
       "You feel more self-confident.");

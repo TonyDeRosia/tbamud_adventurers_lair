@@ -15,6 +15,7 @@
 #include "comm.h"
 #include "handler.h"
 #include "interpreter.h"
+#include "control.h"
 #include "db.h"
 #include "spells.h"
 #include "screen.h"
@@ -1009,6 +1010,7 @@ void death_cry(struct char_data *ch)
 
 void raw_kill(struct char_data * ch, struct char_data * killer)
 {
+  end_character_control(ch);
 struct char_data *i;
 
   /* Must run before NPC extraction: no post-extraction AI writes. */
@@ -1099,6 +1101,7 @@ struct char_data *i;
 
 void die(struct char_data * ch, struct char_data * killer)
 {
+  end_character_control(ch);
   if (return_extracted_shadow_to_storage(ch))
     return;
 
@@ -1668,6 +1671,7 @@ static void do_offhand_attack(struct char_data *ch, struct char_data *victim)
 
 int damage(struct char_data *ch, struct char_data *victim, int dam, int attacktype)
 {
+  if (!control_attack_allowed(ch, victim)) return 0;
   /* OFFHAND DAMAGE SCALE */
   if (g_offhand_attack) {
     dam = (dam * offhand_damage_percent(GET_SKILL(ch, SKILL_DUAL_WIELD))) / 100;
@@ -2006,6 +2010,8 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
 
   old_hit = GET_HIT(victim);
   old_band = victim_condition_band(victim);
+  if (dam > 0 && control_body_abandoned(victim) &&
+      victim->control->mode == CONTROL_SPELL_PUPPET) end_character_control(victim);
   GET_HIT(victim) -= dam;
 
   /* Gain exp for the hit */
@@ -2246,6 +2252,7 @@ static int compute_thaco(struct char_data *ch, struct char_data *victim)
 
 void hit(struct char_data *ch, struct char_data *victim, int type)
 {
+  if (!control_attack_allowed(ch, victim)) return;
   struct obj_data *wielded = GET_EQ(ch, WEAR_WIELD);
   int w_type, attacker_hit, defender_evasion, hit_chance, dam;
   int thaco_legacy, victim_ac_legacy, diceroll_legacy;
@@ -2657,6 +2664,7 @@ void perform_violence(void)
 
   for (ch = combat_list; ch; ch = next_combat_list) {
     next_combat_list = ch->next_fighting;
+    if (control_body_abandoned(ch)) continue;
 
     if (FIGHTING(ch) == NULL || IN_ROOM(ch) != IN_ROOM(FIGHTING(ch))) {
       stop_fighting(ch);

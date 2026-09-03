@@ -62,6 +62,7 @@
 #include "utils.h"
 #include "comm.h"
 #include "interpreter.h"
+#include "control.h"
 #include "handler.h"
 #include "db.h"
 #include "house.h"
@@ -534,6 +535,7 @@ static void init_game(ush_int local_port)
 
   game_loop(mother_desc);
 
+  end_all_control();
   Crash_save_all();
 
   log("Closing all sockets.");
@@ -856,6 +858,21 @@ void game_loop(socket_t local_mother_desc)
     for (d = descriptor_list; d; d = next_d) {
       next_d = d->next;
 
+      /* A bound PC's observer must not decrement the controlled body's wait
+       * a second time or run aliases/editor input. Socket input still works. */
+      if (d->character && d->character->control &&
+          d->character->control->observer == d) {
+        if (d->character->control->mode == CONTROL_MIND_CONTROL)
+          GET_WAIT_STATE(d->character) -= (GET_WAIT_STATE(d->character) > 0);
+        if (get_from_q(&d->input, comm, &aliased)) control_input(d, comm);
+        continue;
+      }
+
+      if (d->original && d->original->control) {
+        GET_WAIT_STATE(d->original) -= (GET_WAIT_STATE(d->original) > 0);
+        if (GET_WAIT_STATE(d->original)) continue;
+      }
+
       /* Not combined to retain --(d->wait) behavior. -gg 2/20/98 If no wait
        * state, no subtraction.  If there is a wait state then 1 is subtracted.
        * Therefore we don't go less than 0 ever and don't require an 'if'
@@ -882,7 +899,8 @@ void game_loop(socket_t local_mother_desc)
 	}
         GET_WAIT_STATE(d->character) = 1;
       }
-      if (d->showstr_count) /* Reading something w/ pager */
+      if (control_input(d, comm)) { /* possession handles input before aliases */ }
+      else if (d->showstr_count) /* Reading something w/ pager */
         show_string(d, comm);
       else if (d->str)          /* Writing boards, mail, etc. */
         string_add(d, comm);
@@ -1182,6 +1200,19 @@ static void flush_queues(struct descriptor_data *d)
   }
 }
 
+static size_t vwrite_connection_output(struct descriptor_data *t, const char *format, va_list args, bool mirror);
+
+/* Connection-private output still uses normal buffering, protocol and staff snoop. */
+size_t write_to_connection(struct descriptor_data *t, const char *format, ...)
+{
+  va_list args;
+  size_t left;
+  va_start(args, format);
+  left = vwrite_connection_output(t, format, args, FALSE);
+  va_end(args);
+  return left;
+}
+
 /* Add a new string to a player's output queue. For outside use. */
 size_t write_to_output(struct descriptor_data *t, const char *txt, ...)
 {
@@ -1198,10 +1229,25 @@ size_t write_to_output(struct descriptor_data *t, const char *txt, ...)
 /* Add a new string to a player's output queue. */
 size_t vwrite_to_output(struct descriptor_data *t, const char *format, va_list args)
 {
+  return vwrite_connection_output(t, format, args, TRUE);
+}
+
+static size_t vwrite_connection_output(struct descriptor_data *t, const char *format, va_list args, bool mirror)
+{
   const char *text_overflow = "\r\nOVERFLOW\r\n";
   static char txt[MAX_STRING_LENGTH];
   size_t wantsize;
   int size;
+
+  /* Mirror only body output, before each connection's protocol encoding.
+   * The observer's account/login input never enters this path while bound. */
+  struct descriptor_data *peer = mirror ? control_output_peer(t) : NULL;
+  if (peer) {
+    va_list copy;
+    va_copy(copy, args);
+    vwrite_to_output(peer, format, copy);
+    va_end(copy);
+  }
 
   /* if we're in the overflow state already, ignore this new output */
   if (t->bufspace == 0)
@@ -1938,6 +1984,7 @@ void close_socket(struct descriptor_data *d)
 {
   struct descriptor_data *temp;
 
+  end_descriptor_control(d);
   REMOVE_FROM_LIST(d, descriptor_list, next);
   CLOSE_SOCKET(d->descriptor);
   flush_queues(d);

@@ -15,6 +15,7 @@
 #include "db.h"
 #include "comm.h"
 #include "interpreter.h"
+#include "control.h"
 #include "handler.h"
 #include "spells.h"
 #include "constants.h"
@@ -36,6 +37,7 @@ void mobile_activity(void)
   for (ch = character_list; ch; ch = next_ch) {
     next_ch = ch->next;
 
+    if (ch->control) continue;
     if (!IS_MOB(ch))
       continue;
     if (DEAD(ch))

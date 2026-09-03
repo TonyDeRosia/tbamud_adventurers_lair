@@ -361,6 +361,50 @@ ACMD(do_page)
   }
 }
 
+/* A private appeal, deliberately absent from every channel history. */
+ACMD(do_beseech)
+{
+  struct descriptor_data *d;
+  if (IS_NPC(ch)) {
+    send_to_char(ch, "Only players may beseech the immortals.\r\n");
+    return;
+  }
+  if (PLR_FLAGGED(ch, PLR_NOSHOUT) ||
+      (PLR_FLAGGED(ch, PLR_FROZEN) && GET_LEVEL(ch) < LVL_IMPL)) {
+    send_to_char(ch, "You cannot beseech the immortals.\r\n");
+    return;
+  }
+  if (AFF_FLAGGED(ch, AFF_SILENCED)) {
+    send_to_char(ch, "You cannot speak while silenced.\r\n");
+    return;
+  }
+  if (ROOM_FLAGGED(IN_ROOM(ch), ROOM_SOUNDPROOF) && GET_LEVEL(ch) < LVL_GOD) {
+    send_to_char(ch, "The walls seem to absorb your words.\r\n");
+    return;
+  }
+  skip_spaces(&argument);
+  if (!*argument) {
+    send_to_char(ch, "Beseech what?\r\n");
+    return;
+  }
+  if (ch->desc) {
+    if (PRF_FLAGGED(ch, PRF_NOREPEAT))
+      write_to_connection(ch->desc, "%s", CONFIG_OK);
+    else
+      write_to_connection(ch->desc, "You beseech the immortals, '%s'\r\n", argument);
+  }
+  /* Authorize the connection owner, including switched staff. Never route via
+   * a body's descriptor, room act(), public channel, or possession mirror.
+   * Personal channel preferences and ignores do not suppress staff appeals. */
+  for (d = descriptor_list; d; d = d->next) {
+    struct char_data *owner = d->original ? d->original : d->character;
+    if (STATE(d) != CON_PLAYING || !d->character || d == ch->desc ||
+        !owner || IS_NPC(owner) || GET_LEVEL(owner) < LVL_IMMORT)
+      continue;
+    write_to_connection(d, "[Beseech] %s beseeches: '%s'\r\n", GET_NAME(ch), argument);
+  }
+}
+
 /* Generalized communication function by Fred C. Merkel (Torg). */
 ACMD(do_gen_comm)
 {

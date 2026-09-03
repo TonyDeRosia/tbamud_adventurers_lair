@@ -298,6 +298,16 @@ hiccup 0 0
 $n hiccups.
 #
 
+hello 0 0
+You wave hello.
+$n waves hello.
+You wave hello to $N.
+$n waves hello to $N.
+$n waves hello to you.
+I don't see anything by that name here.
+You wave hello to yourself.
+$n waves hello to $mself.
+
 hug 1 5
 Hug who?
 #

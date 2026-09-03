@@ -396,6 +396,9 @@ struct guild_info_type guild_info[] = {
  * not forget to change extern declaration in magic.c if you add to this. */
 byte saving_throws(int class_num, int type, int level)
 {
+  /* Legacy class tables share tiers 0..40. Preserve their final tier for
+   * the expanded level range instead of logging and falling through. */
+  level = MIN(40, MAX(0, level));
   class_num = get_class_archetype(class_num);
 
   if (!is_valid_class(class_num))
@@ -1899,6 +1902,8 @@ void init_spell_levels(void)
   spell_level(SPELL_ENCHANT_WEAPON, CLASS_MAGIC_USER, 48);
   spell_level(SPELL_INFRAVISION, CLASS_MAGIC_USER, 50);
   spell_level(SPELL_CHARM, CLASS_MAGIC_USER, 53);
+  spell_level(SPELL_PUPPET, CLASS_MAGIC_USER, 60);
+  spell_level(SPELL_MIND_CONTROL, CLASS_MAGIC_USER, 55);
   spell_level(SPELL_VENTRILOQUATE, CLASS_MAGIC_USER, 56);
   spell_level(SPELL_CONTROL_WEATHER, CLASS_MAGIC_USER, 58);
   spell_level(SPELL_TELEPORT, CLASS_MAGIC_USER, 60);
@@ -1999,6 +2004,8 @@ void init_spell_levels(void)
   spell_level(SKILL_BANDAGE, CLASS_WARLOCK, 20);
   spell_level(SPELL_SLEEP, CLASS_WARLOCK, 20);
   spell_level(SPELL_CHARM, CLASS_WARLOCK, 25);
+  spell_level(SPELL_PUPPET, CLASS_WARLOCK, 55);
+  spell_level(SPELL_MIND_CONTROL, CLASS_WARLOCK, 45);
   spell_level(SPELL_DARKNESS, CLASS_WARLOCK, 30);
   spell_level(SPELL_ENERGY_DRAIN, CLASS_WARLOCK, 35);
   spell_level(SPELL_DISPEL_GOOD, CLASS_WARLOCK, 40);
@@ -2177,6 +2184,8 @@ void init_spell_levels(void)
   spell_level(SPELL_FLY, CLASS_MYSTIC, 45);
   spell_level(SPELL_TELEPORT, CLASS_MYSTIC, 50);
   spell_level(SPELL_CHARM, CLASS_MYSTIC, 55);
+  spell_level(SPELL_PUPPET, CLASS_MYSTIC, 65);
+  spell_level(SPELL_MIND_CONTROL, CLASS_MYSTIC, 60);
   spell_level(SPELL_SUMMON, CLASS_MYSTIC, 60);
   spell_level(SPELL_DRAGON_SPIRIT, CLASS_MYSTIC, 70);
   spell_level(SPELL_CONTROL_WEATHER, CLASS_MYSTIC, 70);

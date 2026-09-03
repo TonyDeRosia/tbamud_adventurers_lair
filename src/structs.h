@@ -1241,6 +1241,7 @@ struct follow_type
 /** Master structure for PCs and NPCs. */
 struct char_data
 {
+  struct control_session *control; /**< Runtime only; owned by control.c. */
   int pfilepos; /**< PC playerfile pos and id number */
   mob_rnum nr;  /**< NPC real instance number */
   room_rnum in_room;     /**< Current location (real room number) */

@@ -18,6 +18,7 @@
 #include "spells.h"
 #include "mail.h"
 #include "interpreter.h"
+#include "control.h"
 #include "house.h"
 #include "constants.h"
 #include "oasis.h"
@@ -3534,6 +3535,7 @@ void free_char(struct char_data *ch)
   int i;
   struct alias_data *a;
 
+  end_character_control(ch);
   if (IS_NPC(ch))
     dg_cooldowns_free(ch);
 

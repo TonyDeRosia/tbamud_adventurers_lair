@@ -18,6 +18,7 @@
 #include "db.h"
 #include "constants.h"
 #include "interpreter.h"
+#include "control.h"
 #include "dg_scripts.h"
 #include "act.h"
 #include "fight.h"
@@ -1711,6 +1712,11 @@ ASPELL(spell_charm)
 
   if (victim == NULL || ch == NULL)
     return;
+
+  if (ch->control || victim->control) {
+    send_to_char(ch, "That mind is already bound.\r\n");
+    return;
+  }
 
   if (victim == ch)
     send_to_char(ch, "You like yourself even better!\r\n");
