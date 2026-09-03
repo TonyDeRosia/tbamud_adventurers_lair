@@ -1,230 +1,288 @@
 #3800
-Gareth's Zone Description Room~
-Zone 38 will be used to expand the sewer system started in zone 37.
-Builder: Gareth
-Zone: 38
-Name: Sewer Catacombs
-Theme: Deep, dark catacombs.
-Plot: Players navigate the catacombs to find items, riches, and other suprises...
-Size: No more than 50. Probably 40 or 30.
-Align: Evil with neutral.
-Level: 15-35
-See room 3700 for more detail.
-Zone 38 is linked to the following zones:
-37 Capital Sewer System           at  3801 (up   ) --->  3717
-~
-38 512 0 0 0 0
-S
-#3801
-In the Northern Drainhole~
-   You are in the bottom of the northern drainhole.  The slimy walls around you
-make it almost impossible to climb the ladder that leads out of the hole.  A
-steady waterfall of sewage flows into the drain and down into a large circular
-grate that seems to make the majority of the bottom of the draninhole.  The
-drainhole is only about 20' deep, but you still wouldn't be able to climb out
-easily without the ladder.
+The Sluicekeeper's Niche~
+A low side chamber has been cut into the dry stone beside the sluice
+shaft. A waist-high ledge serves as a worktable, while empty iron pegs
+and shallow tool scars mark the wall above it. Old tally cuts record
+water levels and gate inspections in a hand long since forgotten. Damp
+air enters from the east, carrying the steady rush of the lower drains.
 ~
 38 9 0 0 0 0
+D1
+A low arch opens east onto the wet shelf of the lower sluice shaft.
+~
+~
+0 -1 3801
+S
+#3801
+The Lower Sluice Shaft~
+The iron ladder from the upper underworks ends on a narrow stone shelf
+above a circular sluice chamber. Water pours down the walls and
+vanishes through a heavy grate set into the floor. The fitted masonry
+is older than the brickwork above and blackened by centuries of mineral
+stain. Deep claw marks score the grate, and a broad nest of rope, rags,
+and broken tools has been dragged into one corner.
+~
+38 9 0 0 0 0
+D3
+A low arch in the western wall leads into an abandoned sluicekeeper's niche.
+~
+~
+0 -1 3800
 D4
-   As you glance upward you see a cateract of slime flowing in from the
-northern pipe of the capital sewer system above.
+The iron ladder climbs toward the busier upper underworks and the sound of newer channels.
 ~
 ~
-0 0 3717
+0 -1 3717
 D5
-   Below a large grate, you see that there is a big pipe, just enough that a
-small group could easily travel in it.  Sewage is constantsly flowing down into
-it.
+A heavy iron sluice grate covers the shaft descending into the drowned collector.
 ~
 grate down~
 1 3804 3802
 E
-red grate~
-   It is a large, circular grate.  It seems to be made out of iron, but it is
-too icky to tell.  It also seems that it was once painted red, but the paint
-eroded away with the sewage that constantly barrages it.
+ladder iron rungs~
+Thick iron rungs are mortared directly into the shaft wall. Mineral
+scale roughens the lower bars, and newer scrape marks show that
+sluicekeepers still descend this far when the lower gates demand
+attention.
 ~
 E
-ladder~
-   The ladder is simply some iron bars the bend out towards the center of the
-drainhole.  They are dripping with ooze and sewage.  You feel reluctant to
-touch them, but you eventually build up the courage.  The bars are slick in
-some parts and sticky in others.  Gross!
+grate iron sluice~
+The heavy iron grate fills most of the shaft floor. Centuries of
+water have polished the center bars nearly black, while rust blooms
+around a deep lock housing at the rim. A city-works keyway survives
+inside the corroded plate.
 ~
 S
 #3802
-A Big Pipe~
-   You are in a big pipe where all the sewage from many parts of the sewers
-joins together to flow into wherever it goes.  Sewage is flowing down from
-above.  The slime is so deep here that you are being soaked up to your knees.
-What seems like a tunnel is at the end of this pipe to the north.  The sewage
-nearly makes you slip as it flows continually towards the tunnel.
+The Drowned Collector~
+Below the grate, several streams converge inside a broad stone
+collector. Cold runoff reaches nearly to the knee before spilling
+north through an ancient arched conduit. The walls are massive dressed
+blocks rather than brick, their joints packed with black mineral crust.
+Old bronze direction marks point toward districts whose names have
+vanished from common use.
 ~
 38 9 0 0 0 0
 D0
-   You see the big pipe continuing towards a large tunnel.
+The drowned collector narrows north into an ancient ruptured conduit.
 ~
 ~
-0 0 3803
+0 -1 3803
 D4
-   You see the northern drainhold beyond a red grate.
+The locked sluice grate overhead leads back toward the ladder shaft.
 ~
 grate up~
 1 3804 3801
 E
-red grate~
-   It appears to be a red grate, but the color is very faded.
+grate iron sluice~
+Seen from below, the sluice grate is a heavy lattice of old iron
+seated into dressed stone. Rust blooms around the lock housing, but
+the bars remain thick enough to hold back anything too large to
+squeeze between them.
 ~
 S
 #3803
-A Big Pipe~
-   The big pipe continues to the north and to the south.  The sewage, which is
-already knee-deep, is constantly being added upon by pipes to the east and to
-the west.  The walls of the pipe seem to be very unkept, probably because no
-dignified person would ever spend more time then he needed to down here.  To
-the north there is a tunnel with a river of sewage, what could be down there?
-
+The Ruptured Stone Conduit~
+The collector narrows into an immense arched conduit bound at intervals
+with old iron hoops. Smaller feeder channels have broken through the
+walls at uneven heights, spilling thin curtains of cold water into the
+main flow. Scratches, gnawed bones, and greasy nesting fiber gather on
+the higher ledges. Northward, a collapsed section opens into a chamber
+far larger than the surrounding waterworks.
 ~
 38 9 0 0 0 0
 D0
-   You see where the big pipe ends.  It is a giant opening.
+The ruptured conduit opens north into the broad chamber of the great confluence.
 ~
 ~
-0 0 3804
+0 -1 3804
 D2
-   You see that the pipe continues to the south.
+Cold runoff follows the stone conduit south toward the drowned collector.
 ~
 ~
-0 0 3802
+0 -1 3802
 E
-pipes~
-   There are small pipes to the east and west of you.  Sewage is flowing out of
-them and flows with the rest of the slime to the north.  The pipe is too small
-to climb in, not that you would want to.
+conduits feeder channels runoff~
+Several narrow feeder channels pierce the main passage at uneven
+heights. Most are cracked or broken, spilling cold runoff over
+mineral crust and leaving greasy nesting fiber packed into the
+drier gaps behind them.
 ~
 S
 #3804
-The Opening in the Big Pipe~
-   You are at the great opening of a big pipe.  The horrid smell of a hundreds
-of cities' crap fills the place to the point where no man could stand for long
-without severe brain damage.  The sewage finishes its journey to the main
-tunnel of the sewers, only to make another one to who knows where?  The iron
-walls have been reduced to rust and rubbage from centuries of constant siege of
-refuse.
+The Great Confluence~
+Several ages of Midgaard's buried construction meet here. The southern
+stone conduit empties into a broad chamber while a deeper channel
+continues north beneath carved funerary arches. High overhead, a patch
+of false masonry hides a narrow opening that does not belong to the
+waterworks. The current has worn the floor smooth around fragments of
+carved burial stone washed in from somewhere ahead.
 ~
 38 9 0 0 0 0
 D0
+A broad funerary arch carries the deeper channel north into the ossuary spillway.
 ~
 ~
-0 0 3807
+0 -1 3807
 D2
-   You see the big pipe continuing to the south.
+The ruptured stone conduit runs south toward the drowned collector and sluice shaft.
 ~
 ~
-0 0 3803
+0 -1 3803
 D4
-   It is the top of the pipe.  There is an arch supporting the opening of the
-pipe.  You see what appears to be a crack in the roof...
+A carefully disguised seam in the overhead masonry conceals a narrow passage climbing upward.
 ~
-secret up~
-1 0 3805
+false masonry stones opening up~
+3 -1 3805
 E
-Sewage~
-   The disgusting sewage flows on its smelly way.
+fragments funerary burial stone~
+Broken pieces of carved funerary stone lie along the smoothed floor.
+Robed figures, lamp motifs, and fragments of worn burial script
+survive on a few pieces, all battered from being washed out of
+chambers farther north.
 ~
 E
-sign~
-   It is a big, silver sign that says "Poisonous Sewage: KEEP OUT!  "
+channel runoff water~
+The central channel carries cold, mineral-stained runoff north
+beneath the old arches. Bone chips and grit gather in shallow
+eddies, showing where later waterworks cut directly through the
+older burial complex.
 ~
 S
 #3805
-A Secret Passage~
-   You seem to be in a secret passage that connects to the pipe below via a
-trap door.  The walls seem to have been crudely dug away by animal hands.  You
-fell cluastophobic in this tiny passage.  YOu should either move up towards the
-light or down to the pipe.
+The Burrow Behind the Masonry~
+A hidden break above the confluence leads into a cramped passage chipped
+through old foundation stone by patient hands and crude tools. The
+tunnel twists upward between buried walls, reinforced with stolen boards
+and pieces of iron scavenged from the drains. Candle soot stains shallow
+niches along the route. Whoever made this passage knew exactly where the
+city watch and sluicekeepers were least likely to look.
 ~
 38 268 0 0 0 0
 D4
-You see a secret chamber.
+The thief-cut passage climbs toward a concealed chamber above the old foundations.
 ~
 ~
-0 0 3806
+0 -1 3806
 D5
-   You see that the passage continues down to a big pipe.
+A fitted panel of false masonry conceals the descent back into the great confluence.
 ~
-secret passage down~
-1 0 3804
+false masonry stones panel down~
+3 -1 3804
 S
 #3806
-The Lair of Slaive~
-   This is the ancient hideout of Slaive, the legendary thief master.  This
-hidout was where he evaded the city guards for most of his life.  The chamber is
-somewhat spacious and comfortable.  The walls are not covered, nevertheless,
-they are carved away well.  There must be a light somewhere, but you can't seem
-to find it.  There is clutter trashed about.  For a thief, there doesn't seem to
-be that many riches around.  There must be gold somewhere...
+Slaive's Forgotten Refuge~
+The cramped burrow opens into a surprisingly deliberate refuge. A narrow
+bed alcove, stone worktable, shelves cut into the wall, and a concealed
+iron safe show that someone lived here for years. Old maps of Midgaard
+curl beside coded tallies and faded theft schedules. One shelving recess
+is suspiciously deep, its back formed from a single fitted slab. At the
+center of the chamber lies Slaive, the knifemaster who vanished beneath
+the city and never returned to the streets above.
 ~
 38 8 0 0 0 0
+D3
+Behind the deepest shelf, a fitted stone panel conceals a passage into an older survey vault.
+~
+shelf stone panel west~
+3 -1 3899
 D5
-   The chamber passage is below.
+The narrow escape passage descends toward the thief-cut burrow and the sewers below.
 ~
 ~
-0 0 3805
+0 -1 3805
 E
-metal box secret safe~
-   It's a secret safe!  It seems to be encased in black diamond, the strongest
-of all diamonds.  Its metal knob seems to have rusted off, rendering the safe
-useless.  That means the contents could still be inside...
+maps tallies shelves clutter~
+The refuge's clutter is deliberate rather than abandoned refuse.
+Rotting maps, coded tally marks, candle stubs, sharpened quills, and
+fragments of old theft schedules fill the shelves and worktable,
+preserving the habits of someone who planned every escape.
 ~
 E
-clutter trash~
-   You see much trash strewn about, covering the floor in filth.  You see
-rusted helmets, bones, rotting backpacks, and other unusable items.  It seems
-to reflect the last fight of some unfortunate people.  You see what appears to
-be a metal box in the ins
+safe iron concealed~
+The safe is built into a squared recess and hidden behind false
+masonry on a simple iron hinge. Its corroded lock has failed, but
+scratches around the frame and polished wear on the inner lip show
+years of repeated use.
 ~
 S
+T 3806
 #3807
-The Sewer Main~
-You are in an unfinished room.
+The Ossuary Spillway~
+Beyond the confluence, the drains enter a much older vaulted spillway.
+Dry ledges flank a dark central channel where fragments of bone turn
+slowly in the current. Recesses in the walls resemble burial niches
+more than work alcoves, though several were broken open when later
+masons cut the watercourse through this place. The eastern arch leads
+deeper into architecture that predates the city's newer drains.
 ~
-38 1 0 0 0 7
+38 9 0 0 0 0
 D1
+The ossuary spillway continues east beneath worn funerary arches.
 ~
 ~
-0 0 3808
+0 -1 3808
 D2
+The dark channel returns south through the funerary arch to the great confluence.
 ~
 ~
-0 0 3804
+0 -1 3804
 S
+T 3803
 #3808
-Sewer Main~
-You are in an unfinished room.
+The Processional Drain~
+The passage east was once something other than a drain. Narrow gutters
+were cut later through a stone floor worn smooth by countless footsteps,
+and shallow funerary niches line both walls behind the newer stonework.
+Broken reliefs show robed figures carrying lamps toward a doorway farther
+east. Water whispers through the added channels while the old procession
+seems to continue in stone.
 ~
-38 0 0 0 0 0
+38 9 0 0 0 0
 D1
+The old processional way continues east toward a monumental sealed threshold.
 ~
 ~
-0 0 3809
+0 -1 3809
+D3
+The funerary passage returns west toward the dark water of the ossuary spillway.
+~
+~
+0 -1 3807
 S
 #3809
-Sewer Main~
-You are in an unfinished room.
+The Sealed Catacomb Threshold~
+The drainage passage ends before a monumental stone threshold buried
+beneath later construction. Its eastern doorway has been sealed with
+fitted blocks, iron cramps, and pale mortar unlike anything used in the
+surrounding drains. Weathered burial script circles the frame, while
+newer marks warn workmen not to breach it. Cold air seeps through
+hairline cracks in the seal. Whatever lies beyond belongs to an older
+Midgaard that someone took great care to leave buried.
 ~
-38 0 0 0 0 0
+38 9 0 0 0 0
+D3
+The only open way leads west along the old processional drain.
+~
+~
+0 -1 3808
 S
+T 3805
 #3899
-An Eternal Airplane to Nowhere~
-   Time is of no essence as you sit in the leather seat of the cabin.  Looking
-out from the window seat, you see the great tufts of clouds flow by below you,
-and the thin wisps of clouds above you.  The great arch of solid nothing
-creates a funnel to heaven as you look deep into the shaded light.  Lightning,
-quiet and small twinkles far below, along with your responsibilities and cares.
-All you hear is the gentle hum of the airline, and the draining of your
-thoughts.  Clear and precise you can think about what inspires.  Think
+The Silent Survey Vault~
+Beyond the hidden panel lies a dry stone chamber untouched by the rushing
+water outside. A narrow table is carved directly from one wall, and
+faded measuring marks cover the surrounding blocks. Brittle scraps of
+parchment cling beneath a stone weight, showing fragments of foundation
+lines and forgotten drains beneath Midgaard. Slaive's later charcoal
+notations cross several of the older measurements, revealing that he
+found and used this forgotten survey vault as part of his refuge.
 ~
 38 312 0 0 0 0
+D1
+A fitted stone panel in the eastern wall opens back into Slaive's refuge.
+~
+stone panel shelf east~
+3 -1 3806
 S
 $~

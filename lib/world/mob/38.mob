@@ -1,50 +1,172 @@
 #3800
-black rat~
-the black rat~
-A large, scrabby-looking black rat is clawing the ground around here.
+sluice maw rat iron grate~
+a sluice-maw rat~
+A huge scarred rat worries at the ironwork around the sluice grate.
 ~
-   It is an oversized black rat.  It is different than the rats of the capital
-sewers.  It has shaggy black fur that seems to be slicked down from the sewage
-that it lives in.  Its long, gray tail flicks about as it claws the ground with
-its large, ugly talons.  It stops clawing just enough to see you and bare its
-hideous teeth in a screeching hiss.
+This broad sewer rat has grown heavy on the richer refuse washed down
+from the upper city. One side of its muzzle is scarred white, several
+incisors are worn flat from chewing iron, and its shoulders are thick
+enough to make the creature look almost boar-like. A corroded key has
+become tangled in cord and wire around its neck.
 ~
-14 0 0 0 0 0 0 0 0 E
-10 17 4 2d2+100 1d2+1
-100 10000
+238 0 0 0 0 0 0 0 0 E
+8 19 28 1d4+40 1d2+0
+100 0
 8 8 0
-BareHandAttack: 2
+BareHandAttack: 4
+SavingPara: 2
+SavingRod: 2
+SavingPetri: 2
+SavingBreath: 2
+SavingSpell: 2
+Wimpy: 4
+Evasion: 2
 E
 T 3800
 #3801
-slaive~
-the corpse of Slaive~
-A strange corpse lies here, filling the room with its stench.
+slaive restless knifemaster revenant thief~
+Slaive, the Restless Knifemaster~
+The still form of Slaive lies beside a narrow black-bladed knife.
 ~
-   It appears to be the corpse of some unfortunate soul whose body was never
-found.  The bones seem misshapen in places, and the carcass gives off a nasty
-odor.  The corpse seems to be human, but the head has been horribly bashed in.
-
+Slaive was once one of Midgaard's most elusive thieves, and death has
+done little to make him less dangerous. His flesh has dried tightly
+over the bones, old leather armor hangs in strips from his frame, and
+one ruined eye remains fixed on the room as if waiting for a mistake.
+Nightneedle rests close to one hand. The corpse is too carefully
+positioned to feel truly dead.
 ~
-26 0 0 0 65536 0 0 0 -100 E
-14 16 1 2d2+140 2d2+2
-140 19600
+58 0 0 0 65536 0 0 0 -100 E
+14 19 34 2d4+70 2d2+1
+140 0
 8 8 1
+BareHandAttack: 3
+SavingPara: 3
+SavingRod: 3
+SavingPetri: 3
+SavingBreath: 3
+SavingSpell: 3
+Wimpy: 7
+Evasion: 4
 E
 T 3804
 #3802
-ugly black rat~
-the black rat~
-An ugly black rat scurries about, trying to find something to eat.
+bone fed sewer rat pale rat~
+a bone-fed sewer rat~
+A lean pale rat noses among fragments of old bone.
 ~
-   The hideous rodent is pattering around on its gross claws.  Its black fur is
-the most disgusting hair you've ever seen, with deathly looking lice running
-through the small pricks of hair.  It has a bald, gray head with a long, white
-tail.
+This lower-underworks rat is smaller than the sluice-maw above but
+quicker and far less cautious. Its fur has faded to a dirty gray, and
+tiny chips of bone cling around its muzzle. The creature has learned
+that the breached burial passages provide easier food than fighting
+the stronger rats of the upper sewer.
 ~
-72 0 0 0 0 0 0 0 0 E
-7 18 5 1d1+70 1d2+1
-70 4900
+232 0 0 0 0 0 0 0 0 E
+7 20 27 1d4+35 1d2+0
+70 0
 8 8 0
+BareHandAttack: 4
+SavingPara: 1
+SavingRod: 1
+SavingPetri: 1
+SavingBreath: 1
+SavingSpell: 1
+Wimpy: 3
+Evasion: 2
 E
+#3803
+gravewater lurker leech crawler~
+a gravewater lurker~
+A slick gravewater lurker clings to the edge of the dark channel.
+~
+The creature resembles an enormous segmented leech with short gripping
+limbs along its underside. Its translucent skin shows dark fluid
+pulsing through the body, and a circular mouth flexes whenever
+something warm approaches the water. It thrives where old burial
+runoff mixes with the sewer current.
+~
+104 0 0 0 0 0 0 0 0 E
+8 19 28 1d4+40 1d2+0
+0 0
+8 8 0
+BareHandAttack: 4
+SavingPara: 2
+SavingRod: 2
+SavingPetri: 2
+SavingBreath: 2
+SavingSpell: 2
+Wimpy: 4
+Evasion: 2
+E
+#3804
+drowned ossuary crawler corpse crawler~
+a drowned ossuary crawler~
+A waterlogged crawler drags itself from a broken burial niche.
+~
+This hunched corpse was trapped when the old burial works flooded.
+Mineral deposits crust its limbs, scraps of funerary cloth cling to
+its torso, and its fingers have worn to exposed bone from clawing
+through stone and silt. It moves without breath or hesitation, drawn
+toward noise in the violated catacomb passages.
+~
+120 0 0 0 0 0 0 0 0 E
+9 19 29 1d4+45 1d2+0
+0 0
+8 8 0
+BareHandAttack: 8
+SavingPara: 2
+SavingRod: 2
+SavingPetri: 2
+SavingBreath: 2
+SavingSpell: 2
+Wimpy: 4
+Evasion: 3
+E
+#3805
+ossuary sentinel ancient guardian~
+an ossuary sentinel~
+An ancient ossuary sentinel stands rigid among the burial niches.
+~
+Bronze plates and rotted ceremonial wrappings cover a desiccated
+guardian corpse. A funerary mask hides the face, but dim light burns
+behind its eye slits whenever someone approaches the sealed catacomb.
+The sentinel was placed here long before the sewer cut through the
+burial complex and still follows an order no living citizen remembers.
+~
+58 0 0 0 0 0 0 0 0 E
+11 19 31 1d4+55 1d2+0
+0 0
+8 8 0
+SavingPara: 2
+SavingRod: 2
+SavingPetri: 2
+SavingBreath: 2
+SavingSpell: 2
+Wimpy: 5
+Evasion: 3
+E
+#3806
+pale undertaker keeper catacomb~
+the Pale Undertaker~
+The Pale Undertaker waits before the sealed threshold.
+~
+Tall and unnaturally thin, the Pale Undertaker wears the remains of
+layered burial robes beneath a mantle of gray dust. Its hands are
+wrapped in old linen and hold no visible weapon. A smooth funerary
+mask bears no mouth, yet the creature turns toward every sound in the
+chamber. It seems less like a wandering corpse than the final
+custodian of a place deliberately sealed away.
+~
+58 0 0 0 0 0 0 0 0 E
+12 19 32 2d4+60 2d2+1
+0 0
+8 8 0
+SavingPara: 3
+SavingRod: 3
+SavingPetri: 3
+SavingBreath: 3
+SavingSpell: 3
+Wimpy: 6
+Evasion: 4
+E
+T 3807
 $

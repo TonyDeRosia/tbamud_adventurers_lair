@@ -1,95 +1,108 @@
 #3800
-rat tail~
-a rat tail~
-A disgusting, fat tail is slowly rotting away here.~
+sluice hook barbed iron hook~
+a barbed sluice-hook~
+A barbed iron sluice-hook has been abandoned beside the channel.~
+The long iron tool ends in a heavy hooked point once used to clear
+debris from drainage grates. Its haft has been wrapped for use as an
+improvised weapon, and old impact marks show that someone tested it on
+more than refuse.
 ~
 5 0 0 0 0 an 0 0 0 0 0 0 0
 7 1 10 2
-3 15000 1 0
+3 500 1 7 0
 E
-rat tail~
-   The apparant tail of what seems to be an unusually large rat.  Though it
-seems to give you quivers of sickness, it must be a fierce weapon.
+sluice hook barbed iron~
+The iron hook was made for dragging refuse clear of deep grates.
+Its point is blunt from years of striking stone, but the wrapped haft
+and deliberately filed inner barb make it serviceable as a brutal
+improvised weapon.
 ~
-A
-6 -2
 #3801
-secret safe~
-a secret safe~
-.A hidden safe.~
+slaive iron safe hidden safe~
+Slaive's concealed iron safe~
+A concealed iron safe is set into the refuge wall.~
+The squat safe is built directly into a cut recess in the stone. False
+masonry and a hinged panel once hid it from casual inspection. The
+lock has long since failed, but scratches around the frame suggest
+Slaive opened it often.
 ~
 15 0 0 0 0 0 0 0 0 0 0 0 0
 100 5 -1 0
-0 0 0 0
+0 0 0 0 0
 T 3801
 E
-secret safe~
-   It is a titanium safe that is implanted into the wall.  It has a industrial
-strength lock that only not even the craftiest thief could pick.  Otherwise, it
-could easily go unnoticed.
+safe iron concealed~
+The squat iron safe was built into the refuge wall and hidden behind
+false masonry. Its lock has seized open with age. No exotic metal or
+impossible mechanism protects it; Slaive relied on concealment,
+careful placement, and secrecy.
 ~
 #3802
-Backstabber~
-Backstabber~
-The legendary Backstabber has been left here.~
+nightneedle slaive knife dagger backstabber~
+Nightneedle, Slaive's last knife~
+Nightneedle rests here, its narrow edge drinking the available light.~
+Slaive's favored knife is long, narrow, and almost completely
+blackened by age and use. The balance is excellent, the point brutally
+fine, and the wrapped grip has been shaped by years in the same hand.
+A tiny silver line along the spine is the only ornament.
 ~
 5 bc 0 0 0 an 0 0 0 0 0 0 0
 5 2 6 11
-5 250000 25 0
+5 900 25 12 0
 T 3802
 E
-Backstabber~
-   This is the legendary Backstabber.  It is the ultimate symbol of all that
-thieves believe in.  The bronze blade is of Roman design and is reinforced with
-iron and what appears to be gold.  Legend has it that it was the same dagger
-that commited the first backstabbing, done on Julius Ceasar.  It has black
-runes on it, the ancient code of the thieves.  Just holding makes you feel like
-you feel not just like a million dollars, but that you could steal a million
-dollars.
+nightneedle knife blade~
+Nightneedle is a narrow blackened knife with exceptional balance and
+a brutally fine point. A thin silver line follows the spine, while
+the grip has been worn smooth by years in Slaive's hand. The blade
+feels colder than the surrounding air.
 ~
-A
-14 -3
-A
-17 3
-A
-3 2
 #3803
-pile riches~
-huge pile of stolen riches~
-A huge pile of stolen riches lies here!~
+old silver purse stolen coin cache~
+a purse of Slaive's stolen silver~
+A heavy purse of old Midgaard silver has been hidden here.~
+The coins span several old mintings and district issues, proof that
+the purse was assembled over years rather than stolen in a single
+robbery. Many are clipped or worn, but enough remain recognizable to
+spend.
 ~
 20 0 0 0 0 a 0 0 0 0 0 0 0
-1000 0 0 0
-1 1000000 0 0
+250 0 0 0
+1 0 0 0 0
 E
-pile riches~
-   A huge pile of riches.  There must be thousands of coins here!  The gold and
-platinum pile up!
+purse silver coins~
+The purse holds old Midgaard silver from several mintings and
+districts. Many coins are clipped or worn, but the variety suggests
+a cache assembled through years of small thefts rather than one
+impossible hoard.
 ~
 #3804
-smelly key~
-a red smelly key~
-A smelly key with flaking red paint is lying on the floor.~
+corroded sluice key iron key~
+a corroded sluice key~
+A heavy corroded sluice key lies here.~
+This thick iron key bears the same old municipal mark stamped into the
+lower sluice grate. Corrosion has eaten at the bow, but the teeth
+remain intact.
 ~
 18 c 0 0 0 ao 0 0 0 0 0 0 0
 0 0 0 0
-2 100000 10 0
+2 0 10 0 0
 E
-smelly red key~
-   It is an iron key.  It seems to have flakes of red paint that give the key a
-red look.  It is slightly heavy, but you hardly care.  What seems to matter is
-that it is extremely smelly, probably from years in the sewers.
+key iron sluice~
+The thick iron key bears an old municipal drainage mark matching the
+lower sluice grate. Corrosion has roughened the bow and darkened the
+metal, but the heavy teeth remain usable.
 ~
-A
-17 2
-A
-1 -1
 #3805
-crap pile~
-a stinking pile of crap~
-A stinking pile of crap is lying here, filling the whole place with a nasty stink!~
+gravecap fungus pale bitter mushroom~
+a bitter gravecap fungus~
+A pale bitter gravecap fungus grows from the damp mortar.~
+The pallid fungus thrives where mineral water seeps through old burial
+stone. Its flesh smells sharply medicinal and leaves a numbing residue
+on the fingers. Sewer scavengers know better than to eat it without
+preparation.
 ~
 19 d 0 0 0 a 0 0 0 0 0 0 0
 24 0 0 1
-10 1000 0 0
+10 5 0 0 0
 $~

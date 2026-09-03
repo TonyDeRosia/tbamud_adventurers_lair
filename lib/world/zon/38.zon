@@ -1,16 +1,28 @@
 #38
-Welcor~
-Capital Sewer System II~
+kokudar~
+The Lower Underworks~
 3800 3899 15 2 d 0 0 0 7 14
-D 0 3801 5 2 	(In the Northern Drainhole)
-M 0 3800 1 3801 	(the black rat)
-G 1 3804 10 -1 	(a red smelly key)
-E 1 3800 100 16 	(a rat tail)
-M 0 3801 1 3806 	(the corpse of Slaive)
-E 1 3802 100 16 	(Backstabber)
-O 0 3801 1 3806 	(a secret safe)
-D 0 3805 5 2 	(A Secret Passage)
-D 0 3802 4 2 	(A Big Pipe)
-D 0 3804 4 2 	(The Opening in the Big Pipe)
+D 0 3899 1 1 	(The Silent Survey Vault)
+M 0 3801 1 3806 	(Slaive, the Restless Knifemaster)
+E 1 3802 100 16 	(Nightneedle, Slaive's last knife)
+O 0 3801 1 3806 	(Slaive's concealed iron safe)
+O 0 3803 1 3806 	(a purse of Slaive's stolen silver)
+D 0 3806 3 1 	(Slaive's Forgotten Refuge)
+D 0 3805 5 1 	(The Burrow Behind the Masonry)
+M 0 3802 4 3804 	(a bone-fed sewer rat)
+O 0 3800 1 3804 	(a barbed sluice-hook)
+D 0 3804 4 1 	(The Great Confluence)
+M 0 3805 2 3809 	(an ossuary sentinel)
+M 0 3806 1 3809 	(the Pale Undertaker)
+M 0 3804 3 3808 	(a drowned ossuary crawler)
+M 0 3805 2 3808 	(an ossuary sentinel)
+O 0 3805 2 3808 	(a bitter gravecap fungus)
+M 0 3803 3 3807 	(a gravewater lurker)
+M 0 3804 3 3807 	(a drowned ossuary crawler)
+M 0 3802 4 3803 	(a bone-fed sewer rat)
+D 0 3801 5 2 	(The Lower Sluice Shaft)
+M 0 3800 1 3801 	(a sluice-maw rat)
+G 1 3804 10 -1 	(a corroded sluice key)
+D 0 3802 4 2 	(The Drowned Collector)
 S
 $
