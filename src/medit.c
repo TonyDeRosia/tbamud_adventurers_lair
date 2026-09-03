@@ -725,6 +725,7 @@ static void medit_disp_menu(struct descriptor_data *d)
   struct char_data *mob;
   char flags[MAX_STRING_LENGTH], flag2[MAX_STRING_LENGTH];
   char price_buf[MAX_INPUT_LENGTH];
+  char profile_buf[MAX_INPUT_LENGTH];
 
   mob = OLC_MOB(d);
   get_char_colors(d->character);
@@ -734,6 +735,11 @@ static void medit_disp_menu(struct descriptor_data *d)
     snprintf(price_buf, sizeof(price_buf), "%d", GET_PET_PRICE(mob));
   else
     strlcpy(price_buf, "(default)", sizeof(price_buf));
+  if (MOB_BODY_PROFILE_SET(mob))
+    strlcpy(profile_buf, body_profile_name(GET_MOB_BODY_PROFILE(mob)), sizeof(profile_buf));
+  else
+    snprintf(profile_buf, sizeof(profile_buf), "Automatic (%s)",
+             body_profile_name(resolve_body_profile(mob)));
 
   write_to_output(d,
   "-- Mob Number:  [%s%d%s]\r\n"
@@ -760,6 +766,7 @@ static void medit_disp_menu(struct descriptor_data *d)
           "%sA%s) NPC Flags : %s%s\r\n"
           "%sB%s) AFF Flags : %s%s\r\n"
           "%sP%s) Pet Price : %s%s\r\n"
+          "%sH%s) Body Profile : %s%s\r\n"
           "%sR%s) Loadout / Loot\r\n"
           "%sS%s) DG Scripts: %s%s\r\n"
           "%sY%s) References (read-only)\r\n"
@@ -775,6 +782,7 @@ static void medit_disp_menu(struct descriptor_data *d)
           grn, nrm, cyn, flags,
           grn, nrm, cyn, flag2,
           grn, nrm, yel, price_buf,
+          grn, nrm, yel, profile_buf,
           grn, nrm,
           grn, nrm, cyn, OLC_SCRIPT(d) ?"Set.":"Not Set.",
           grn, nrm,
@@ -1033,6 +1041,14 @@ void medit_parse(struct descriptor_data *d, char *arg)
     case 'P':
       OLC_MODE(d) = MEDIT_PET_PRICE;
       write_to_output(d, "Enter pet price in gold (0 = automatic): ");
+      return;
+    case 'h':
+    case 'H':
+      OLC_MODE(d) = MEDIT_BODY_PROFILE;
+      write_to_output(d,
+        "Body profile: 0) None  1) Humanoid  2) Quadruped  3) Serpent\r\n"
+        "              4) Avian  5) Arachnid  6) Dragon  7) Horned Humanoid\r\n"
+        "              8) Tailed Humanoid\r\nEnter profile number: ");
       return;
     case 'r':
     case 'R':
@@ -1831,6 +1847,17 @@ void medit_parse(struct descriptor_data *d, char *arg)
     medit_disp_menu(d);
     return;
   }
+
+  case MEDIT_BODY_PROFILE:
+    if (i < BODY_PROFILE_NONE || i >= NUM_BODY_PROFILES) {
+      write_to_output(d, "Choose a profile number from 0 to %d: ", NUM_BODY_PROFILES - 1);
+      return;
+    }
+    GET_MOB_BODY_PROFILE(OLC_MOB(d)) = i;
+    MOB_BODY_PROFILE_SET(OLC_MOB(d)) = 1;
+    OLC_VAL(d) = TRUE;
+    medit_disp_menu(d);
+    return;
 
   case MEDIT_STR:
     GET_STR(OLC_MOB(d)) = LIMIT(i, 3, 25);

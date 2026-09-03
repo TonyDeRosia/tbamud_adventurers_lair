@@ -30,6 +30,7 @@
 #include "shop.h"
 #include "quest.h"
 #include "criticalhits.h"
+#include "tome.h"
 
 #define GLORY_PRACTICE_COST 250
 #define GLORY_TRAIN_COST 600
@@ -626,24 +627,29 @@ ACMD(do_sneak)
 {
   struct affected_type af;
   byte percent;
+  int skill = subcmd == SKILL_SKULK ? SKILL_SKULK : SKILL_SNEAK;
 
-  if (IS_NPC(ch) || !GET_SKILL(ch, SKILL_SNEAK)) {
+  if (IS_NPC(ch) || !GET_SKILL(ch, skill)) {
     send_to_char(ch, "You have no idea how to do that.\r\n");
     return;
   }
-  send_to_char(ch, "Okay, you'll try to move silently for a while.\r\n");
+  send_to_char(ch, subcmd == SKILL_SKULK ?
+      "Okay, you begin to skulk through the shadows.\r\n" :
+      "Okay, you'll try to move silently for a while.\r\n");
   if (AFF_FLAGGED(ch, AFF_SNEAK))
     affect_from_char(ch, SKILL_SNEAK);
+  if (AFF_FLAGGED(ch, AFF_SKULK))
+    affect_from_char(ch, SKILL_SKULK);
 
   percent = rand_number(1, 101);	/* 101% is a complete failure */
 
-  if (percent > GET_SKILL(ch, SKILL_SNEAK) + dex_app_skill[GET_DEX(ch)].sneak)
+  if (percent > GET_SKILL(ch, skill) + dex_app_skill[GET_DEX(ch)].sneak)
     return;
 
   new_affect(&af);
-  af.spell = SKILL_SNEAK;
-  af.duration = GET_LEVEL(ch);
-  SET_BIT_AR(af.bitvector, AFF_SNEAK);
+  af.spell = skill;
+  af.duration = GET_LEVEL(ch) + (subcmd == SKILL_SKULK ? GET_LEVEL(ch) / 2 : 0);
+  SET_BIT_AR(af.bitvector, subcmd == SKILL_SKULK ? AFF_SKULK : AFF_SNEAK);
   affect_to_char(ch, &af);
 }
 
@@ -674,7 +680,7 @@ ACMD(do_steal)
   struct char_data *vict;
   struct obj_data *obj;
   char vict_name[MAX_INPUT_LENGTH], obj_name[MAX_INPUT_LENGTH];
-  int percent, gold, eq_pos, pcsteal = 0, ohoh = 0;
+  int chance, roll, gold, pcsteal = 0, ohoh = 0;
 
   if (IS_NPC(ch) || !GET_SKILL(ch, SKILL_STEAL)) {
     send_to_char(ch, "You have no idea how to do that.\r\n");
@@ -685,66 +691,60 @@ ACMD(do_steal)
     return;
   }
 
-  two_arguments(argument, obj_name, vict_name);
+  two_arguments(argument, vict_name, obj_name);
+  if (CMD_IS("steal")) {
+    char swap[MAX_INPUT_LENGTH];
+    strlcpy(swap, vict_name, sizeof(swap));
+    strlcpy(vict_name, obj_name, sizeof(vict_name));
+    strlcpy(obj_name, swap, sizeof(obj_name));
+  }
 
   if (!(vict = get_char_vis(ch, vict_name, NULL, FIND_CHAR_ROOM))) {
-    send_to_char(ch, "Steal what from who?\r\n");
+    send_to_char(ch, "Pickpocket whom for what?\r\n");
     return;
   } else if (vict == ch) {
     send_to_char(ch, "Come on now, that's rather stupid!\r\n");
     return;
   }
 
-  /* 101% is a complete failure */
-  percent = rand_number(1, 101) - dex_app_skill[GET_DEX(ch)].p_pocket;
-
-  if (GET_POS(vict) < POS_SLEEPING)
-    percent = -1;		/* ALWAYS SUCCESS, unless heavy object. */
-
   if (!CONFIG_PT_ALLOWED && !IS_NPC(vict))
     pcsteal = 1;
 
-  if (!AWAKE(vict))	/* Easier to steal from sleeping people. */
-    percent -= 50;
-
   /* No stealing if not allowed. If it is no stealing from Imm's or Shopkeepers. */
-  if (GET_LEVEL(vict) >= LVL_IMMORT || pcsteal || GET_MOB_SPEC(vict) == shop_keeper)
-    percent = 101;		/* Failure */
+  if (GET_LEVEL(vict) >= LVL_IMMORT || pcsteal || GET_MOB_SPEC(vict) == shop_keeper) {
+    send_to_char(ch, "You cannot pickpocket that target.\r\n");
+    return;
+  }
+
+  /* This is the common, bounded Pickpocket chance.  Item weight and value
+   * are applied below only when an actual carried item is selected. */
+  chance = GET_SKILL(ch, SKILL_STEAL) + dex_app_skill[GET_DEX(ch)].p_pocket;
+  chance += (GET_LEVEL(ch) - GET_LEVEL(vict)) * 2;
+  chance -= MAX(0, GET_DEX(vict) - 10);
+  chance -= MAX(0, GET_WIS(vict) - 10) / 2;
+  if (!AWAKE(vict))
+    chance += 30;
 
   if (str_cmp(obj_name, "coins") && str_cmp(obj_name, "gold")) {
 
     if (!(obj = get_obj_in_list_vis(ch, obj_name, NULL, vict->carrying))) {
+      act("$E is not carrying that item.", FALSE, ch, 0, vict, TO_CHAR);
+      return;
+    } else {			/* obj found in carried inventory only */
 
-      for (eq_pos = 0; eq_pos < NUM_WEARS; eq_pos++)
-	if (GET_EQ(vict, eq_pos) &&
-	    (isname(obj_name, GET_EQ(vict, eq_pos)->name)) &&
-	    CAN_SEE_OBJ(ch, GET_EQ(vict, eq_pos))) {
-	  obj = GET_EQ(vict, eq_pos);
-	  break;
-	}
-      if (!obj) {
-	act("$E hasn't got that item.", FALSE, ch, 0, vict, TO_CHAR);
-	return;
-      } else {			/* It is equipment */
-	if ((GET_POS(vict) > POS_STUNNED)) {
-	  send_to_char(ch, "Steal the equipment now?  Impossible!\r\n");
-	  return;
-	} else {
-          if (!give_otrigger(obj, vict, ch) ||
-              !receive_mtrigger(ch, vict, obj) ) {
-            send_to_char(ch, "Impossible!\r\n");
-            return;
-          }
-	  act("You unequip $p and steal it.", FALSE, ch, obj, 0, TO_CHAR);
-	  act("$n steals $p from $N.", FALSE, ch, obj, vict, TO_NOTVICT);
-	  obj_to_char(unequip_char(vict, eq_pos), ch);
-	}
+      if (OBJ_FLAGGED(obj, ITEM_NODROP) || OBJ_FLAGGED(obj, ITEM_NODONATE) ||
+          OBJ_FLAGGED(obj, ITEM_QUEST)) {
+        send_to_char(ch, "You cannot safely take that item.\r\n");
+        return;
       }
-    } else {			/* obj found in inventory */
 
-      percent += GET_OBJ_WEIGHT(obj);	/* Make heavy harder */
+      chance -= GET_OBJ_WEIGHT(obj) * 2;
+      chance -= MIN(20, MAX(0, GET_OBJ_COST(obj)) / 1000);
+      chance = MAX(5, MIN(95, chance));
+      roll = rand_number(1, 100);
 
-      if (percent > GET_SKILL(ch, SKILL_STEAL)) {
+
+      if (roll > chance) {
 	ohoh = TRUE;
 	send_to_char(ch, "Oops..\r\n");
 	act("$n tried to steal something from you!", FALSE, ch, 0, vict, TO_VICT);
@@ -766,7 +766,9 @@ ACMD(do_steal)
       }
     }
   } else {			/* Steal some coins */
-    if (AWAKE(vict) && (percent > GET_SKILL(ch, SKILL_STEAL))) {
+    chance = MAX(5, MIN(95, chance));
+    roll = rand_number(1, 100);
+    if (roll > chance) {
       ohoh = TRUE;
       send_to_char(ch, "Oops..\r\n");
       act("You discover that $n has $s hands in your wallet.", FALSE, ch, 0, vict, TO_VICT);
@@ -1349,9 +1351,27 @@ ACMD(do_study)
   if (IS_NPC(ch))
     return;
 
+  if (!str_cmp(argument, "status")) {
+    do_tome(ch, "status", 0, 0);
+    return;
+  }
+
   if (!*argument) {
     send_to_char(ch, "Usage: study <spell, skill, or magical item>\r\n");
     return;
+  }
+
+  {
+    char tome_lookup[MAX_INPUT_LENGTH], *tome_name;
+    int tome_number;
+    strlcpy(tome_lookup, argument, sizeof(tome_lookup));
+    tome_name = tome_lookup;
+    tome_number = get_number(&tome_name);
+    struct obj_data *tome_obj = get_obj_in_list_vis(ch, tome_name, &tome_number, ch->carrying);
+    if (tome_obj && GET_OBJ_TYPE(tome_obj) == ITEM_TOME) {
+      tome_study_object(ch, tome_obj);
+      return;
+    }
   }
 
   if (study_is_on_cooldown(ch, now)) {

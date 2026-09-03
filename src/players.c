@@ -30,6 +30,7 @@
 #include "config.h" /* for pclean_criteria[] */
 #include "dg_scripts.h" /* To enable saving of player variables to disk */
 #include "quest.h"
+#include "spells.h"
 
 #include "race.h"
 
@@ -53,6 +54,7 @@
 static void load_affects(FILE *fl, struct char_data *ch);
 static void load_skills(FILE *fl, struct char_data *ch);
 static void load_study_levels(FILE *fl, struct char_data *ch);
+static void load_tome_abilities(FILE *fl, struct char_data *ch);
 static void load_identified_items(FILE *fl, struct char_data *ch);
 static void load_quests(FILE *fl, struct char_data *ch);
 static int upgrade_legacy_immortal_levels(struct char_data *ch);
@@ -793,6 +795,10 @@ int load_char(const char *name, struct char_data *ch)
 	break;
 
       case 'T':
+	     if (!strcmp(tag, "TmCd")) GET_TOME_STUDY_EXPIRES_AT(ch) = (time_t)atol(line);
+	else if (!strcmp(tag, "TmAb")) load_tome_abilities(fl, ch);
+	else
+	{
 	     if (!strcmp(tag, "Thir"))	GET_COND(ch, THIRST)	= atoi(line);
 	else if (!strcmp(tag, "Thr1"))	GET_SAVE(ch, 0)		= atoi(line);
 	else if (!strcmp(tag, "Thr2"))	GET_SAVE(ch, 1)		= atoi(line);
@@ -810,6 +816,7 @@ int load_char(const char *name, struct char_data *ch)
           }
          }
 	break;
+	}
 
       case 'V':
 	     if (!strcmp(tag, "Vars"))	read_saved_vars_ascii(fl, ch, atoi(line));
@@ -1164,6 +1171,13 @@ int save_char(struct char_data * ch)
   }
   fprintf(fl, "0 0\n");
 
+  if (GET_TOME_STUDY_EXPIRES_AT(ch) > 0)
+    fprintf(fl, "TmCd: %ld\n", (long)GET_TOME_STUDY_EXPIRES_AT(ch));
+  fprintf(fl, "TmAb:\n");
+  for (i = 1; i <= MAX_SKILLS; i++)
+    if (HAS_TOME_ABILITY(ch, i)) fprintf(fl, "%d\n", i);
+  fprintf(fl, "0\n");
+
   fprintf(fl, "IdKn:\n");
   for (i = 0; i < ch->player_specials->saved.identified_item_count &&
               i < MAX_IDENTIFIED_ITEMS; i++) {
@@ -1424,6 +1438,21 @@ static void load_study_levels(FILE *fl, struct char_data *ch)
       SET_STUDY_LEARN_LEVEL(ch, num, num2);
     }
   } while (num != 0);
+}
+
+static void load_tome_abilities(FILE *fl, struct char_data *ch)
+{
+  int ability = 0;
+  char line[MAX_INPUT_LENGTH + 1];
+  do {
+    get_line(fl, line);
+    ability = atoi(line);
+    if (ability && ability > 0 && ability <= TOP_SPELL_DEFINE && spell_info[ability].name &&
+        str_cmp(spell_info[ability].name, unused_spellname))
+      SET_TOME_ABILITY(ch, ability);
+    else if (ability)
+      log("SYSERR: Invalid Tome ability id %d in pfile (%s)", ability, GET_NAME(ch));
+  } while (ability != 0);
 }
 
 static void load_identified_items(FILE *fl, struct char_data *ch)

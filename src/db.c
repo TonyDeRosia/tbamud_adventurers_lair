@@ -1716,6 +1716,12 @@ static void interpret_espec(const char *keyword, const char *value, int i, int n
     mob_proto[i].mob_specials.attack_type = num_arg;
   }
 
+  CASE("BodyProfile") {
+    RANGE(BODY_PROFILE_NONE, NUM_BODY_PROFILES - 1);
+    mob_proto[i].mob_specials.body_profile = num_arg;
+    mob_proto[i].mob_specials.body_profile_set = 1;
+  }
+
   CASE("Str") {
     RANGE(3, 25);
     mob_proto[i].real_abils.str = num_arg;
@@ -2238,6 +2244,17 @@ char *parse_object(FILE *obj_f, int nr)
       obj_proto[i].affected[j].location = t[0];
       obj_proto[i].affected[j].modifier = t[1];
       j++;
+      break;
+    case 'C': /* Tome study cooldown, separate from the object timer. */
+      if (!get_line(obj_f, line) || sscanf(line, "%d", &t[0]) != 1) {
+        log("SYSERR: Format error in Tome cooldown for %s", buf2);
+        exit(1);
+      }
+      if (GET_OBJ_TYPE(obj_proto + i) != ITEM_TOME || t[0] < 0) {
+        log("SYSERR: Invalid Tome cooldown in %s", buf2);
+        exit(1);
+      }
+      obj_proto[i].tome_cooldown_seconds = t[0];
       break;
     case 'T':  /* DG triggers */
       dg_obj_trigger(line, &obj_proto[i]);
@@ -3650,6 +3667,7 @@ void free_obj(struct obj_data *obj)
     remove_from_lookup_table(obj->script_id);
   }
 
+  free(obj->remains_source_name);
   free(obj);
 }
 
@@ -4097,6 +4115,22 @@ static int check_object(struct obj_data *obj)
       log("SYSERR: Object #%d (%s) contains (%d) more than maximum (%d).",
           GET_OBJ_VNUM(obj), obj->short_description, GET_OBJ_VAL(obj, 1),
 	  GET_OBJ_VAL(obj, 0));
+    break;
+  case ITEM_TOME:
+    for (y = 0; y < 4; y++) {
+      int ability = GET_OBJ_VAL(obj, y), z;
+      if (!ability) continue;
+      if (ability < 1 || ability > TOP_SPELL_DEFINE || !spell_info[ability].name ||
+          !str_cmp(spell_info[ability].name, unused_spellname)) {
+        log("SYSERR: Object #%d (%s) has invalid Tome ability #%d.", GET_OBJ_VNUM(obj), obj->short_description, ability);
+        error = TRUE;
+      }
+      for (z = 0; z < y; z++) if (ability == GET_OBJ_VAL(obj, z)) {
+        log("SYSERR: Object #%d (%s) has duplicate Tome ability #%d.", GET_OBJ_VNUM(obj), obj->short_description, ability);
+        error = TRUE;
+      }
+    }
+    if (obj->tome_cooldown_seconds < 0) error = TRUE;
     break;
   }
 

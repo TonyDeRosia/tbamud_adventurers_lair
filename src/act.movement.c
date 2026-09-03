@@ -646,6 +646,8 @@ int do_simple_move(struct char_data *ch, int dir, int need_specials_check)
   /* move points needed is avg. move loss for src and destination sect type */
   need_movement = (movement_loss[SECT(was_in)] +
 		   movement_loss[SECT(going_to)]) / 2;
+  if (AFF_FLAGGED(ch, AFF_SKULK))
+    need_movement *= 2;
 
   /* Move Point Requirement Check */
   if (mount) {
@@ -676,7 +678,7 @@ int do_simple_move(struct char_data *ch, int dir, int need_specials_check)
     GET_MOVE(ch) -= need_movement;
 
   /* Generate the leave message and display to others in the was_in room. */
-  if (!AFF_FLAGGED(ch, AFF_SNEAK))
+  if (!AFF_FLAGGED(ch, AFF_SNEAK) && !AFF_FLAGGED(ch, AFF_SKULK))
   {
     snprintf(leave_message, sizeof(leave_message), "$n leaves %s.", dirs[dir]);
     act(leave_message, TRUE, ch, 0, 0, TO_ROOM);
@@ -701,12 +703,15 @@ int do_simple_move(struct char_data *ch, int dir, int need_specials_check)
   }
 
   /* Display arrival information to anyone in the destination room... */
-  if (!AFF_FLAGGED(ch, AFF_SNEAK))
+  if (!AFF_FLAGGED(ch, AFF_SNEAK) && !AFF_FLAGGED(ch, AFF_SKULK))
     act("$n has arrived.", TRUE, ch, 0, 0, TO_ROOM);
 
   /* ... and the room description to the character. */
   if (ch->desc != NULL)
     look_at_room(ch, 0);
+
+  if (AFF_FLAGGED(ch, AFF_SKULK))
+    WAIT_STATE(ch, PULSE_VIOLENCE);
 
   /* ... and Kill the player if the room is a death trap. */
   if (ROOM_FLAGGED(going_to, ROOM_DEATH) && GET_LEVEL(ch) < LVL_IMMORT)
@@ -750,7 +755,9 @@ int perform_move(struct char_data *ch, int dir, int need_specials_check)
     send_to_char(ch, "Alas, you cannot go that way...\r\n");
   else if ((!EXIT(ch, dir) && !buildwalk(ch, dir)) || EXIT(ch, dir)->to_room == NOWHERE)
     send_to_char(ch, "Alas, you cannot go that way...\r\n");
-  else if (EXIT_FLAGGED(EXIT(ch, dir), EX_CLOSED) && (GET_LEVEL(ch) < LVL_IMMORT || (!IS_NPC(ch) && !PRF_FLAGGED(ch, PRF_NOHASSLE)))) {
+  else if (EXIT_FLAGGED(EXIT(ch, dir), EX_CLOSED) &&
+      !(AFF_FLAGGED(ch, AFF_PASS_DOOR) && EXIT_FLAGGED(EXIT(ch, dir), EX_ISDOOR)) &&
+      (GET_LEVEL(ch) < LVL_IMMORT || (!IS_NPC(ch) && !PRF_FLAGGED(ch, PRF_NOHASSLE)))) {
     if (EXIT(ch, dir)->keyword)
       send_to_char(ch, "The %s seems to be closed.\r\n", fname(EXIT(ch, dir)->keyword));
     else

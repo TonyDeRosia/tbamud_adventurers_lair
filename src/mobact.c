@@ -99,6 +99,9 @@ void mobile_activity(void)
       for (vict = world[IN_ROOM(ch)].people; vict && !found; vict = vict->next_in_room) {
 	if (IS_NPC(vict) || !CAN_SEE(ch, vict) || PRF_FLAGGED(vict, PRF_NOHASSLE))
 	  continue;
+	/* Memory and scripted retaliation are handled in their own paths below. */
+	if (AFF_FLAGGED(vict, AFF_DETER))
+	  continue;
 
 	if (MOB_FLAGGED(ch, MOB_WIMPY) && AWAKE(vict))
 	  continue;

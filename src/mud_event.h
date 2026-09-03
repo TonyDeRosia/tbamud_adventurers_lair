@@ -28,6 +28,8 @@ typedef enum {
     eWHIRLWIND, /* The Whirlwind Attack */
     eSPL_DARKNESS, /* Darkness Spell */
     eSPL_ENFEEBLEMENT, /* Enfeeblement Spell */
+    eSPL_DETER, /* Deter Spell */
+    eSKL_NERVE_DISRUPTION, /* Nerve Pinch disruption */
 } event_id;
 
 struct mud_event_list {

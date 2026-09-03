@@ -202,6 +202,9 @@ extern const char *nrm, *grn, *cyn, *yel;
 #define OEDIT_COPY                      28
 #define OEDIT_REGEN_MULT                29
 #define OEDIT_REFERENCES                30
+#define OEDIT_TOME_MENU                  31
+#define OEDIT_TOME_ABILITY               32
+#define OEDIT_TOME_COOLDOWN              33
 
 /* Submodes of REDIT connectedness. */
 #define REDIT_MAIN_MENU 		1
@@ -312,6 +315,7 @@ extern const char *nrm, *grn, *cyn, *yel;
 #define MEDIT_LOADOUT_REMOVE_EQUIP      53
 #define MEDIT_LOADOUT_REMOVE_INV        54
 #define MEDIT_LOADOUT_REMOVE_LOOT       55
+#define MEDIT_BODY_PROFILE              56
 #define MEDIT_BEHAVIOR_GENERAL                137
 #define MEDIT_BEHAVIOR_MOVEMENT               138
 #define MEDIT_BEHAVIOR_COMBAT                 139

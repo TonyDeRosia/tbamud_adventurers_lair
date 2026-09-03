@@ -1998,6 +1998,7 @@ void init_spell_levels(void)
   spell_level(SPELL_PLAGUE_BOLT, CLASS_WARLOCK, 8);
   spell_level(SPELL_CURSE, CLASS_WARLOCK, 8);
   spell_level(SPELL_MEMENTO_MORI, CLASS_WARLOCK, 10);
+  spell_level(SKILL_EMBALM, CLASS_WARLOCK, 12);
   spell_level(SPELL_BLINDNESS, CLASS_WARLOCK, 12);
   spell_level(SPELL_ENFEEBLEMENT, CLASS_WARLOCK, 15);
   spell_level(SPELL_POISON, CLASS_WARLOCK, 16);
@@ -2014,6 +2015,11 @@ void init_spell_levels(void)
   spell_level(SPELL_DARK_AEGIS, CLASS_WARLOCK, 50);
   spell_level(SPELL_CONTROL_WEATHER, CLASS_WARLOCK, 60);
   spell_level(SPELL_TELEPORT, CLASS_WARLOCK, 70);
+  /* Utility spells are deliberately easy to rebalance while ability groups
+   * are being designed; their implementation is not class-specific. */
+  spell_level(SPELL_PASS_DOOR, CLASS_WARLOCK, 35);
+  spell_level(SPELL_SHIMMER, CLASS_WARLOCK, 45);
+  spell_level(SPELL_DETER, CLASS_WARLOCK, 30);
   spell_level(SPELL_ANIMATE_DEAD, CLASS_WARLOCK, 80);
   spell_level(SPELL_HELLFIRE, CLASS_WARLOCK, 24);
   spell_level(SPELL_DEATH_KNELL, CLASS_WARLOCK, 22);
@@ -2090,6 +2096,10 @@ void init_spell_levels(void)
   spell_level(SKILL_PICK_LOCK, CLASS_THIEF, 2);
   spell_level(SKILL_BACKSTAB, CLASS_THIEF, 3);
   spell_level(SKILL_STEAL, CLASS_THIEF, 4);
+  spell_level(SKILL_CIRCLE, CLASS_THIEF, 8);
+  spell_level(SKILL_PEEK, CLASS_THIEF, 10);
+  spell_level(SKILL_VANISH, CLASS_THIEF, 18);
+  spell_level(SKILL_SKULK, CLASS_THIEF, 22);
   spell_level(SKILL_HIDE, CLASS_THIEF, 6);
   spell_level(SKILL_TRACK, CLASS_THIEF, 10);
   spell_level(SKILL_BANDAGE, CLASS_THIEF, 15);
@@ -2109,6 +2119,7 @@ void init_spell_levels(void)
   spell_level(SKILL_RESCUE, CLASS_WARRIOR, 3);
   spell_level(SPELL_STRENGTH, CLASS_WARRIOR, 10);
   spell_level(SKILL_BASH, CLASS_WARRIOR, 12);
+  spell_level(SKILL_DECAPITATE, CLASS_WARRIOR, 15);
   spell_level(SKILL_DUAL_WIELD, CLASS_WARRIOR, 15);
   spell_level(SKILL_BANDAGE, CLASS_WARRIOR, 20);
   spell_level(SKILL_WHIRLWIND, CLASS_WARRIOR, 25);
@@ -2178,6 +2189,8 @@ void init_spell_levels(void)
   spell_level(SPELL_TIGER_SPIRIT, CLASS_MYSTIC, 30);
   spell_level(SPELL_IDENTIFY, CLASS_MYSTIC, 30);
   spell_level(SKILL_DUAL_WIELD, CLASS_MYSTIC, 30);
+  spell_level(SKILL_CIRCLE, CLASS_MYSTIC, 12);
+  spell_level(SKILL_NERVE_PINCH, CLASS_MYSTIC, 25);
   spell_level(SPELL_LOCATE_OBJECT, CLASS_MYSTIC, 35);
   spell_level(SPELL_INFRAVISION, CLASS_MYSTIC, 40);
   spell_level(SPELL_EAGLE_SPIRIT, CLASS_MYSTIC, 45);

@@ -327,6 +327,10 @@ const char *affected_bits[] =
   "ADRENALINE",
   "CLARITY",
   "INFUSED",
+  "SKULK",
+  "PASS-DOOR",
+  "DETER",
+  "NERVE-DISRUPTION",
   "\n"
 };
 
@@ -446,7 +450,8 @@ const char *item_types[] = {
   "MONEY",
   "PEN",
   "BOAT",
-  "FOUNTAIN",
+    "FOUNTAIN",
+    "TOME",
   "\n"
 };
 

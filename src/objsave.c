@@ -80,6 +80,14 @@ int objsave_save_obj_record(struct obj_data *obj, FILE *fp, int locate)
              GET_OBJ_VAL(obj, 2),
              GET_OBJ_VAL(obj, 3)
              );
+  if (REMAINS_ANATOMY_INITIALIZED(obj) || REMAINS_PART(obj) ||
+      CORPSE_REMAINING_PARTS(obj) || CORPSE_SOURCE_VNUM(obj) != 0)
+    fprintf(fp, "Remn: %d %d %d %d %d %d\n",
+            REMAINS_ANATOMY_INITIALIZED(obj), REMAINS_PART(obj),
+            CORPSE_REMAINING_PARTS(obj), REMAINS_PROFILE(obj),
+            REMAINS_SOURCE_IS_PLAYER(obj), CORPSE_SOURCE_VNUM(obj));
+  if (obj->remains_source_name)
+    fprintf(fp, "Rsrc: %s\n", obj->remains_source_name);
   if (GET_OBJ_EXTRA(obj) != GET_OBJ_EXTRA(temp))
     fprintf(fp, "Flag: %d %d %d %d\n", GET_OBJ_EXTRA(obj)[0], GET_OBJ_EXTRA(obj)[1], GET_OBJ_EXTRA(obj)[2], GET_OBJ_EXTRA(obj)[3]);
 
@@ -109,6 +117,9 @@ int objsave_save_obj_record(struct obj_data *obj, FILE *fp, int locate)
     fprintf(fp, "Cost: %d\n", GET_OBJ_COST(obj));
   if (TEST_OBJN(cost_per_day))
     fprintf(fp, "Rent: %d\n", GET_OBJ_RENT(obj));
+  /* An embalmed dynamic corpse uses -1 as its durable no-decay marker. */
+  if (GET_OBJ_TIMER(obj) != GET_OBJ_TIMER(temp))
+    fprintf(fp, "Time: %d\n", GET_OBJ_TIMER(obj));
   if (TEST_OBJN(bitvector))
     fprintf(fp, "Perm: %d %d %d %d\n", GET_OBJ_AFFECT(obj)[0], GET_OBJ_AFFECT(obj)[1], GET_OBJ_AFFECT(obj)[2], GET_OBJ_AFFECT(obj)[3]);
   if (TEST_OBJN(wear_flags))
@@ -516,7 +527,8 @@ static int Crash_is_unrentable(struct obj_data *obj)
 
   if (OBJ_FLAGGED(obj, ITEM_NORENT) ||
       GET_OBJ_RENT(obj) < 0 ||
-      GET_OBJ_RNUM(obj) == NOTHING ||
+      (GET_OBJ_RNUM(obj) == NOTHING &&
+       !((IS_CORPSE(obj) || IS_GENUINE_REMAINS(obj)) && GET_OBJ_TIMER(obj) < 0)) ||
       GET_OBJ_TYPE(obj) == ITEM_KEY) {
  log("Crash_is_unrentable: removing object %s", obj->short_description);
     return TRUE;
@@ -995,8 +1007,15 @@ obj_save_data *objsave_parse_objects(FILE *fl)
       }
       break;
     case 'R':
-      if (!strcmp(tag, "Rent"))
+      if (!strcmp(tag, "Remn")) {
+        sscanf(line, "%d %d %d %d %d %d",
+               &temp->remains_anatomy_initialized, &temp->remains_part,
+               &temp->corpse_remaining_parts, &temp->remains_body_profile,
+               &temp->remains_source_is_player, &temp->corpse_source_vnum);
+      } else if (!strcmp(tag, "Rent"))
         GET_OBJ_RENT(temp) = num;
+      else if (!strcmp(tag, "Rsrc"))
+        temp->remains_source_name = strdup(line);
       break;
     case 'S':
       if (!strcmp(tag, "Shrt"))
@@ -1005,6 +1024,8 @@ obj_save_data *objsave_parse_objects(FILE *fl)
     case 'T':
       if (!strcmp(tag, "Type"))
         GET_OBJ_TYPE(temp) = num;
+      else if (!strcmp(tag, "Time"))
+        GET_OBJ_TIMER(temp) = num;
       break;
     case 'W':
       if (!strcmp(tag, "Wear")) {

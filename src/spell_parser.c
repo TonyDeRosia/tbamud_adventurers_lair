@@ -23,6 +23,7 @@
 #include "db.h"
 #include "dg_scripts.h"
 #include "fight.h"  /* for hit() */
+#include "tome.h"
 
 #define SINFO spell_info[spellnum]
 
@@ -44,6 +45,18 @@ static int find_ability_by_tokens(const char *name, char *ambig_buf,
     bool allow_extra_input);
 static int reflect_suppressed = 0;
 
+static int nerve_disruption_failure_chance(struct char_data *ch)
+{
+  struct affected_type *af;
+
+  if (!ch || !AFF_FLAGGED(ch, AFF_NERVE_DISRUPTION))
+    return 0;
+  for (af = ch->affected; af; af = af->next)
+    if (IS_SET_AR(af->bitvector, AFF_NERVE_DISRUPTION))
+      return MAX(25, MIN(65, af->modifier));
+  return 25;
+}
+
 static int can_character_cast_known_spell(struct char_data *ch, int spellnum)
 {
   int learned_at;
@@ -58,6 +71,9 @@ static int can_character_cast_known_spell(struct char_data *ch, int spellnum)
 
   if (GET_SKILL(ch, spellnum) <= 0)
     return FALSE;
+
+  if (has_tome_ability(ch, spellnum))
+    return TRUE;
 
   learned_at = GET_STUDY_LEARN_LEVEL(ch, spellnum);
   is_reactive_identity = (GET_CLASS(ch) == CLASS_ADVENTURER) || (learned_at > 0);
@@ -1720,6 +1736,7 @@ int call_magic(struct char_data *caster, struct char_data *cvict,
     case SPELL_ASTRAL_PROJECTION:
     case SPELL_ETHEREAL_JAUNT:
     case SPELL_GREATER_TELEPORTATION:
+    case SPELL_SHIMMER:
       is_displacement_spell = TRUE;
       break;
   }
@@ -1813,6 +1830,9 @@ int call_magic(struct char_data *caster, struct char_data *cvict,
     case SPELL_MIND_CONTROL:
       cast_control(caster, cvict, spellnum);
       break;
+    case SPELL_PASS_DOOR: MANUAL_SPELL(spell_pass_door); break;
+    case SPELL_DETER: MANUAL_SPELL(spell_deter); break;
+    case SPELL_SHIMMER: MANUAL_SPELL(spell_shimmer); break;
     case SPELL_CHARM:
       MANUAL_SPELL(spell_charm)
       ;
@@ -2758,17 +2778,34 @@ ACMD(do_cast) {
       send_to_char(ch, "That spell is still recovering.\r\n");
     return;
   }
+  if (spellnum == SPELL_SHIMMER && !IS_NPC(ch) &&
+      GET_SHIMMER_COOLDOWN_UNTIL(ch) > time(NULL)) {
+    send_to_char(ch, "Your form has not yet settled enough to shimmer again.\r\n");
+    return;
+  }
   mana = mag_manacost(ch, spellnum);
   if ((mana > 0) && (GET_MANA(ch) < mana) && (GET_LEVEL(ch) < LVL_IMMORT)) {
     send_to_char(ch, "You haven't the energy to cast that spell!\r\n");
     return;
   }
+  if (spellnum == SPELL_SHIMMER && !IS_NPC(ch))
+    GET_SHIMMER_COOLDOWN_UNTIL(ch) = time(NULL) + 60;
 
   if (AFF_FLAGGED(ch, AFF_SPELLLOCK) && rand_number(1, 100) <= 40) {
     send_to_char(ch, "Your concentration shatters and the spell fizzles!\r\n");
     WAIT_STATE(ch, PULSE_VIOLENCE);
     if (mana > 0)
       GET_MANA(ch) = MAX(0, MIN(effective_max_mana(ch), GET_MANA(ch) - mana));
+    return;
+  }
+
+  if (nerve_disruption_failure_chance(ch) > 0 &&
+      rand_number(1, 100) <= nerve_disruption_failure_chance(ch)) {
+    send_to_char(ch, "Your disrupted nerves spoil the spell.\r\n");
+    WAIT_STATE(ch, PULSE_VIOLENCE);
+    if (mana > 0)
+      GET_MANA(ch) = MAX(0, MIN(effective_max_mana(ch), GET_MANA(ch) - mana));
+    improve_ability_from_use(ch, spellnum, 0);
     return;
   }
 
@@ -2918,6 +2955,16 @@ void mag_assign_spells(void) {
       TAR_CHAR_ROOM | TAR_NOT_SELF, TRUE, MAG_MANUAL, NULL);
   spello(SPELL_MIND_CONTROL, "mind control", 75, 50, 2, POS_STANDING,
       TAR_CHAR_ROOM | TAR_NOT_SELF, TRUE, MAG_MANUAL, NULL);
+  /* Temporary progression assignments for the new utility spells live in
+   * class.c.  Their mechanics remain class-neutral. */
+  spello(SPELL_PASS_DOOR, "pass door", 35, 15, 2, POS_STANDING,
+      TAR_CHAR_ROOM | TAR_SELF_ONLY, FALSE, MAG_MANUAL,
+      "Your body becomes solid again.");
+  spello(SPELL_SHIMMER, "shimmer", 0, 0, 0, POS_STANDING,
+      TAR_CHAR_WORLD | TAR_NOT_SELF, FALSE, MAG_MANUAL, NULL);
+  spello(SPELL_DETER, "deter", 30, 15, 2, POS_STANDING,
+      TAR_CHAR_ROOM | TAR_SELF_ONLY, FALSE, MAG_MANUAL,
+      "Your deterrent presence fades.");
   spello(SPELL_CHARM, "charm person", 75, 50, 2, POS_FIGHTING,
   TAR_CHAR_ROOM | TAR_NOT_SELF, TRUE, MAG_MANUAL,
       "You feel more self-confident.");
@@ -3477,7 +3524,7 @@ void mag_assign_spells(void) {
   skillo_cost(SKILL_PICK_LOCK, "pick lock", 5);
   skillo_cost(SKILL_RESCUE, "rescue", 10);
   skillo_cost(SKILL_SNEAK, "sneak", 5);
-  skillo_cost(SKILL_STEAL, "steal", 5);
+  skillo_cost(SKILL_STEAL, "pickpocket", 5);
   skillo_cost(SKILL_TRACK, "track", 5);
   skillo_cost(SKILL_WHIRLWIND, "whirlwind", 20);
   skillo_cost(SKILL_BANDAGE, "bandage", 8);
@@ -3502,4 +3549,11 @@ void mag_assign_spells(void) {
   skillo_cost(SKILL_APPRAISE_ENEMY, "appraise enemy", 8);
   skillo_cost(SKILL_STUDY, "study", 0);
   skillo_cost(SKILL_UNARMED, "unarmed", 5);
+  skillo_cost(SKILL_CIRCLE, "circle", 15);
+  skillo_cost(SKILL_PEEK, "peek", 0);
+  skillo_cost(SKILL_VANISH, "vanish", 15);
+  skillo_cost(SKILL_SKULK, "skulk", 10);
+  skillo_cost(SKILL_EMBALM, "embalm", 10);
+  skillo_cost(SKILL_NERVE_PINCH, "nerve pinch", 15);
+  skillo_cost(SKILL_DECAPITATE, "decapitate", 0);
 }

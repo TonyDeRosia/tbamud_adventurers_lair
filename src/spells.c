@@ -46,6 +46,8 @@ static int spell_dmg_high_manual(int level);
 static int spell_dmg_extreme_manual(int level);
 static int spell_dmg_ultra_manual(int level);
 static struct char_data *summon_temp_follower(struct char_data *ch, mob_vnum vnum, int level, int rounds, const char *identity_name, int silent_follow);
+static int dimensional_lock_blocks_room(room_rnum room);
+static int magical_teleport_destination_ok(room_rnum room);
 
 static void remove_follower_link_silently(struct char_data *master, struct char_data *follower)
 {
@@ -1441,6 +1443,58 @@ static int bfs_within_range(room_rnum src, room_rnum target, int max_depth, int 
 }
 
 /* Special spells appear below. */
+ASPELL(spell_pass_door)
+{
+  struct affected_type af;
+  if (!ch) return;
+  affect_from_char(ch, SPELL_PASS_DOOR);
+  new_affect(&af);
+  af.spell = SPELL_PASS_DOOR;
+  af.duration = MAX(1, level / 10);
+  SET_BIT_AR(af.bitvector, AFF_PASS_DOOR);
+  affect_to_char(ch, &af);
+  send_to_char(ch, "Your form becomes translucent.\r\n");
+}
+
+ASPELL(spell_deter)
+{
+  struct affected_type af;
+  struct mud_event_data *event;
+  if (!ch) return;
+  affect_from_char(ch, SPELL_DETER);
+  event = char_has_mud_event(ch, eSPL_DETER);
+  if (event && event->pEvent)
+    event_cancel(event->pEvent);
+  new_affect(&af);
+  af.spell = SPELL_DETER;
+  af.duration = -1; /* Real-time event below controls expiration. */
+  SET_BIT_AR(af.bitvector, AFF_DETER);
+  affect_to_char(ch, &af);
+  NEW_EVENT(eSPL_DETER, ch, NULL, 900 * PASSES_PER_SEC);
+  send_to_char(ch, "A wary aura settles around you.\r\n");
+}
+
+ASPELL(spell_shimmer)
+{
+  int chance, gap, destination;
+  if (!ch || !victim) return;
+  gap = GET_LEVEL(ch) - GET_LEVEL(victim);
+  chance = gap <= 0 ? 25 : MIN(90, 25 + gap * 5);
+  if (rand_number(1, 100) > chance) {
+    send_to_char(ch, "Your form shimmers, but the path slips away.\r\n");
+    return;
+  }
+  destination = IN_ROOM(victim);
+  if (!magical_teleport_destination_ok(destination)) {
+    send_to_char(ch, "A warded barrier prevents your shimmer.\r\n");
+    return;
+  }
+  act("$n shimmers and vanishes.", TRUE, ch, 0, 0, TO_ROOM);
+  char_from_room(ch);
+  char_to_room(ch, destination);
+  act("$n shimmers into view.", TRUE, ch, 0, 0, TO_ROOM);
+  look_at_room(ch, 0);
+}
 ASPELL(spell_create_water)
 {
   int water;
@@ -2613,6 +2667,18 @@ static int dimensional_lock_blocks_room(room_rnum room)
   return room_has_effect(&world[room], ROOM_EFFECT_DIMENSIONAL_LOCK);
 }
 
+/* Shared by targeted magical relocation.  Keep this aligned with the
+ * established greater-teleport restrictions. */
+static int magical_teleport_destination_ok(room_rnum room)
+{
+  return room != NOWHERE && VALID_ROOM_RNUM(room) &&
+      !ROOM_FLAGGED(room, ROOM_PRIVATE) && !ROOM_FLAGGED(room, ROOM_DEATH) &&
+      !ROOM_FLAGGED(room, ROOM_GODROOM) &&
+      !ZONE_FLAGGED(GET_ROOM_ZONE(room), ZONE_CLOSED) &&
+      !ZONE_FLAGGED(GET_ROOM_ZONE(room), ZONE_NOASTRAL) &&
+      !dimensional_lock_blocks_room(room);
+}
+
 static int spell_instant_kill(struct char_data *ch, struct char_data *victim, int spellnum, enum damage_type dtype)
 {
   int kill_dam;
@@ -3168,9 +3234,7 @@ ASPELL(spell_greater_teleportation)
     return;
   }
   to_room = IN_ROOM(victim);
-  if (ROOM_FLAGGED(to_room, ROOM_PRIVATE) || ROOM_FLAGGED(to_room, ROOM_DEATH) ||
-      ROOM_FLAGGED(to_room, ROOM_GODROOM) || ZONE_FLAGGED(GET_ROOM_ZONE(to_room), ZONE_CLOSED) ||
-      ZONE_FLAGGED(GET_ROOM_ZONE(to_room), ZONE_NOASTRAL) || dimensional_lock_blocks_room(to_room)) {
+  if (!magical_teleport_destination_ok(to_room)) {
     send_to_char(ch, "That destination resists your greater teleportation.\r\n");
     return;
   }

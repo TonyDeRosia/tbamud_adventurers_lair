@@ -260,6 +260,9 @@ int save_objects(zone_rnum zone_num)
           GET_OBJ_RENT(obj), GET_OBJ_LEVEL(obj), GET_OBJ_TIMER(obj)
       );
 
+      if (GET_OBJ_TYPE(obj) == ITEM_TOME)
+        fprintf(fp, "C\n%d\n", obj->tome_cooldown_seconds);
+
       /* Do we have script(s) attached? */
       script_save_to_disk(fp, obj, OBJ_TRIGGER);
 

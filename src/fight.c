@@ -23,6 +23,7 @@
 #include "dg_scripts.h"
 #include "act.h"
 #include "class.h"
+#include "race.h"
 #include "fight.h"
 #include "shop.h"
 #include "quest.h"
@@ -32,6 +33,7 @@
 #define PVP_GLORY_COOLDOWN 600 /* seconds */
 
 #define RARE_KILL_MAX_COUNT 10
+#define BODY_PART_DECAY_TIME 3
 
 
 /* locally defined global variables, used externally */
@@ -98,6 +100,191 @@ static void change_alignment(struct char_data *ch, struct char_data *victim);
 static void group_gain(struct char_data *ch, struct char_data *victim);
 static void mark_combat_prompt_participant(struct char_data *ch, unsigned long round);
 static void queue_combat_round_prompts(unsigned long round);
+
+struct body_part_drop {
+  int part;
+  int chance;
+};
+
+static const struct body_part_drop body_part_drops[] = {
+  { BODY_PART_HEAD,          15 },
+  { BODY_PART_TORSO,          3 },
+  { BODY_PART_ARM_LEFT,       7 },
+  { BODY_PART_ARM_RIGHT,      7 },
+  { BODY_PART_LEG_LEFT,       7 },
+  { BODY_PART_LEG_RIGHT,      7 },
+  { BODY_PART_FORELEG_LEFT,   7 },
+  { BODY_PART_FORELEG_RIGHT,  7 },
+  { BODY_PART_HINDLEG_LEFT,   7 },
+  { BODY_PART_HINDLEG_RIGHT,  7 },
+  { BODY_PART_TAIL,          15 },
+  { BODY_PART_WING_LEFT,      7 },
+  { BODY_PART_WING_RIGHT,     7 },
+  { BODY_PART_HORN,           7 },
+  { BODY_PART_TENTACLE_1,     7 },
+  { BODY_PART_TENTACLE_2,     7 }
+};
+
+const char *body_profile_name(int profile)
+{
+  switch (profile) {
+  case BODY_PROFILE_NONE: return "None";
+  case BODY_PROFILE_HUMANOID: return "Humanoid";
+  case BODY_PROFILE_QUADRUPED: return "Quadruped";
+  case BODY_PROFILE_SERPENT: return "Serpent";
+  case BODY_PROFILE_AVIAN: return "Avian";
+  case BODY_PROFILE_ARACHNID: return "Arachnid";
+  case BODY_PROFILE_DRAGON: return "Dragon";
+  case BODY_PROFILE_HORNED_HUMANOID: return "Horned Humanoid";
+  case BODY_PROFILE_TAILED_HUMANOID: return "Tailed Humanoid";
+  default: return "None";
+  }
+}
+
+static int body_profile_parts(int profile)
+{
+  switch (profile) {
+  case BODY_PROFILE_HUMANOID:
+    return BODY_PART_HEAD | BODY_PART_TORSO | BODY_PART_ARM_LEFT |
+      BODY_PART_ARM_RIGHT | BODY_PART_LEG_LEFT | BODY_PART_LEG_RIGHT;
+  case BODY_PROFILE_QUADRUPED:
+    return BODY_PART_HEAD | BODY_PART_TORSO | BODY_PART_FORELEG_LEFT |
+      BODY_PART_FORELEG_RIGHT | BODY_PART_HINDLEG_LEFT |
+      BODY_PART_HINDLEG_RIGHT | BODY_PART_TAIL;
+  case BODY_PROFILE_SERPENT:
+    return BODY_PART_HEAD | BODY_PART_TORSO | BODY_PART_TAIL;
+  case BODY_PROFILE_AVIAN:
+    return BODY_PART_HEAD | BODY_PART_TORSO | BODY_PART_LEG_LEFT |
+      BODY_PART_LEG_RIGHT | BODY_PART_WING_LEFT | BODY_PART_WING_RIGHT;
+  case BODY_PROFILE_ARACHNID:
+    return BODY_PART_HEAD | BODY_PART_TORSO | BODY_PART_FORELEG_LEFT |
+      BODY_PART_FORELEG_RIGHT | BODY_PART_HINDLEG_LEFT |
+      BODY_PART_HINDLEG_RIGHT | BODY_PART_TENTACLE_1 | BODY_PART_TENTACLE_2;
+  case BODY_PROFILE_DRAGON:
+    return BODY_PART_HEAD | BODY_PART_TORSO | BODY_PART_FORELEG_LEFT |
+      BODY_PART_FORELEG_RIGHT | BODY_PART_HINDLEG_LEFT |
+      BODY_PART_HINDLEG_RIGHT | BODY_PART_TAIL | BODY_PART_WING_LEFT |
+      BODY_PART_WING_RIGHT | BODY_PART_HORN;
+  case BODY_PROFILE_HORNED_HUMANOID:
+    return body_profile_parts(BODY_PROFILE_HUMANOID) | BODY_PART_HORN;
+  case BODY_PROFILE_TAILED_HUMANOID:
+    return body_profile_parts(BODY_PROFILE_HUMANOID) | BODY_PART_TAIL;
+  default:
+    return 0;
+  }
+}
+
+int resolve_body_profile(const struct char_data *ch)
+{
+  if (!ch)
+    return BODY_PROFILE_NONE;
+
+  if (!IS_NPC(ch)) {
+    if (GET_RACE(ch) == RACE_MINOTAUR)
+      return BODY_PROFILE_HORNED_HUMANOID;
+    if (GET_RACE(ch) == RACE_WEREWOLF)
+      return BODY_PROFILE_TAILED_HUMANOID;
+    return BODY_PROFILE_HUMANOID;
+  }
+
+  if (MOB_BODY_PROFILE_SET(ch))
+    return GET_MOB_BODY_PROFILE(ch);
+
+  switch (GET_CLASS(ch)) {
+  case CLASS_ANIMAL:
+    return BODY_PROFILE_QUADRUPED;
+  case CLASS_DRAGON:
+    return BODY_PROFILE_DRAGON;
+  case CLASS_HUMANOID:
+  case CLASS_GIANT:
+    return BODY_PROFILE_HUMANOID;
+  case CLASS_OTHER:
+  case CLASS_UNDEAD:
+  default:
+    return BODY_PROFILE_NONE;
+  }
+}
+
+static const char *body_part_presentation(int part)
+{
+  switch (part) {
+  case BODY_PART_HEAD: return "severed head";
+  case BODY_PART_TORSO: return "mutilated torso";
+  case BODY_PART_ARM_LEFT: return "severed left arm";
+  case BODY_PART_ARM_RIGHT: return "severed right arm";
+  case BODY_PART_LEG_LEFT: return "severed left leg";
+  case BODY_PART_LEG_RIGHT: return "severed right leg";
+  case BODY_PART_FORELEG_LEFT: return "severed left foreleg";
+  case BODY_PART_FORELEG_RIGHT: return "severed right foreleg";
+  case BODY_PART_HINDLEG_LEFT: return "severed left hind leg";
+  case BODY_PART_HINDLEG_RIGHT: return "severed right hind leg";
+  case BODY_PART_TAIL: return "severed tail";
+  case BODY_PART_WING_LEFT: return "torn left wing";
+  case BODY_PART_WING_RIGHT: return "torn right wing";
+  case BODY_PART_HORN: return "severed horn";
+  case BODY_PART_TENTACLE_1:
+  case BODY_PART_TENTACLE_2: return "severed tentacle";
+  default: return "mutilated remains";
+  }
+}
+
+bool corpse_has_remaining_part(const struct obj_data *corpse, int part)
+{
+  return corpse && IS_CORPSE(corpse) && REMAINS_ANATOMY_INITIALIZED(corpse) &&
+    (CORPSE_REMAINING_PARTS(corpse) & part);
+}
+
+struct obj_data *sever_corpse_part(struct obj_data *corpse, int part)
+{
+  struct obj_data *remains;
+  char buf[MAX_STRING_LENGTH];
+  const char *source;
+  const char *presentation;
+
+  if (!corpse_has_remaining_part(corpse, part))
+    return NULL;
+
+  remains = create_obj();
+  remains->item_number = NOTHING;
+  source = corpse->remains_source_name ? corpse->remains_source_name : "an unknown creature";
+  presentation = body_part_presentation(part);
+  snprintf(buf, sizeof(buf), "remains %s %s", presentation, source);
+  remains->name = strdup(buf);
+  snprintf(buf, sizeof(buf), "the %s of %s", presentation, source);
+  remains->short_description = strdup(buf);
+  snprintf(buf, sizeof(buf), "The %s of %s is lying here.", presentation, source);
+  remains->description = strdup(buf);
+  GET_OBJ_TYPE(remains) = ITEM_OTHER;
+  SET_BIT_AR(GET_OBJ_WEAR(remains), ITEM_WEAR_TAKE);
+  SET_BIT_AR(GET_OBJ_EXTRA(remains), ITEM_NODONATE);
+  GET_OBJ_WEIGHT(remains) = MAX(1, GET_OBJ_WEIGHT(corpse) / 12);
+  GET_OBJ_TIMER(remains) = BODY_PART_DECAY_TIME;
+  REMAINS_PART(remains) = part;
+  REMAINS_PROFILE(remains) = REMAINS_PROFILE(corpse);
+  REMAINS_SOURCE_IS_PLAYER(remains) = REMAINS_SOURCE_IS_PLAYER(corpse);
+  REMAINS_ANATOMY_INITIALIZED(remains) = 1;
+  CORPSE_SOURCE_VNUM(remains) = CORPSE_SOURCE_VNUM(corpse);
+  remains->remains_source_name = strdup(source);
+  CORPSE_REMAINING_PARTS(corpse) &= ~part;
+  return remains;
+}
+
+static void release_corpse_parts(struct obj_data *corpse, room_rnum room)
+{
+  size_t i;
+  struct obj_data *remains;
+
+  if (!corpse || !IS_CORPSE(corpse) || !REMAINS_ANATOMY_INITIALIZED(corpse))
+    return;
+
+  for (i = 0; i < sizeof(body_part_drops) / sizeof(body_part_drops[0]); i++) {
+    if (!corpse_has_remaining_part(corpse, body_part_drops[i].part) ||
+        rand_number(1, 100) > body_part_drops[i].chance)
+      continue;
+    if ((remains = sever_corpse_part(corpse, body_part_drops[i].part)) != NULL)
+      obj_to_room(remains, room);
+  }
+}
 
 /* A descriptor is stable for the synchronous duration of perform_violence().
  * Store only a marker on it so extraction or combat teardown cannot leave a
@@ -838,6 +1025,11 @@ static void make_corpse(struct char_data *ch)
   CORPSE_SOURCE_VNUM(corpse) = IS_NPC(ch) ? GET_MOB_VNUM(ch) : NOBODY; /* source mob vnum for shadow extraction */
   CORPSE_SHADOW_ATTEMPTS(corpse) = 3; /* shadow extraction attempts remaining */
   CORPSE_SHADOW_ATTEMPTS_INIT(corpse) = 1; /* shadow extraction fields initialized */
+  REMAINS_PROFILE(corpse) = resolve_body_profile(ch);
+  CORPSE_REMAINING_PARTS(corpse) = body_profile_parts(REMAINS_PROFILE(corpse));
+  REMAINS_SOURCE_IS_PLAYER(corpse) = !IS_NPC(ch);
+  REMAINS_ANATOMY_INITIALIZED(corpse) = 1;
+  corpse->remains_source_name = strdup(GET_NAME(ch));
   GET_OBJ_WEIGHT(corpse) = GET_WEIGHT(ch) + IS_CARRYING_W(ch);
   GET_OBJ_RENT(corpse) = 100000;
   if (IS_NPC(ch))
@@ -896,6 +1088,7 @@ ch->carrying = NULL;
   IS_CARRYING_W(ch) = 0;
 
   obj_to_room(corpse, IN_ROOM(ch));
+  release_corpse_parts(corpse, IN_ROOM(ch));
 }
 
 static void apply_mob_loot_table(struct char_data *ch, struct obj_data *corpse)
@@ -1665,6 +1858,26 @@ static void do_offhand_attack(struct char_data *ch, struct char_data *victim)
   ch->equipment[WEAR_WIELD] = off;
   g_offhand_attack = 1;
   hit(ch, victim, TYPE_UNDEFINED);
+  g_offhand_attack = 0;
+  ch->equipment[WEAR_WIELD] = prim;
+}
+
+/* Deliberate paired attacks used by positional skills.  Unlike the normal
+ * round attack, a qualifying offhand weapon is always included. */
+void dual_skill_attack(struct char_data *ch, struct char_data *victim, int type)
+{
+  struct obj_data *prim, *off;
+
+  if (!ch || !victim)
+    return;
+  prim = GET_EQ(ch, WEAR_WIELD);
+  off = GET_EQ(ch, WEAR_HOLD);
+  hit(ch, victim, type);
+  if (!can_offhand_attack(ch) || !off || IN_ROOM(ch) != IN_ROOM(victim))
+    return;
+  ch->equipment[WEAR_WIELD] = off;
+  g_offhand_attack = 1;
+  hit(ch, victim, type);
   g_offhand_attack = 0;
   ch->equipment[WEAR_WIELD] = prim;
 }

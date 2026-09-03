@@ -248,6 +248,34 @@ static int physical_skill_target_ok(struct char_data *ch, struct char_data *vict
     !ROOM_FLAGGED(IN_ROOM(ch), ROOM_PEACEFUL);
 }
 
+/* Generated parts carry structured provenance.  Never infer remains identity
+ * from display text, since builders may create ordinary decorative objects. */
+static int is_embalmable_remains(const struct obj_data *obj)
+{
+  int valid_part_mask = BODY_PART_HEAD | BODY_PART_TORSO |
+    BODY_PART_ARM_LEFT | BODY_PART_ARM_RIGHT | BODY_PART_LEG_LEFT |
+    BODY_PART_LEG_RIGHT | BODY_PART_FORELEG_LEFT | BODY_PART_FORELEG_RIGHT |
+    BODY_PART_HINDLEG_LEFT | BODY_PART_HINDLEG_RIGHT | BODY_PART_TAIL |
+    BODY_PART_WING_LEFT | BODY_PART_WING_RIGHT | BODY_PART_HORN |
+    BODY_PART_TENTACLE_1 | BODY_PART_TENTACLE_2;
+
+  if (!obj)
+    return FALSE;
+  if (IS_CORPSE(obj))
+    return TRUE;
+  if (!IS_GENUINE_REMAINS(obj) || !REMAINS_ANATOMY_INITIALIZED(obj) ||
+      REMAINS_PROFILE(obj) < BODY_PROFILE_NONE ||
+      REMAINS_PROFILE(obj) >= NUM_BODY_PROFILES ||
+      !obj->remains_source_name || !*obj->remains_source_name)
+    return FALSE;
+  if (!REMAINS_SOURCE_IS_PLAYER(obj) && CORPSE_SOURCE_VNUM(obj) == NOBODY)
+    return FALSE;
+  if ((REMAINS_PART(obj) & valid_part_mask) != REMAINS_PART(obj) ||
+      (REMAINS_PART(obj) & (REMAINS_PART(obj) - 1)) != 0)
+    return FALSE;
+  return REMAINS_SOURCE_IS_PLAYER(obj) == 0 || REMAINS_SOURCE_IS_PLAYER(obj) == 1;
+}
+
 enum combat_skill_result perform_backstab(struct char_data *ch,
     struct char_data *vict, int proficiency, int improve)
 {
@@ -268,7 +296,7 @@ enum combat_skill_result perform_backstab(struct char_data *ch,
   percent = rand_number(1, 101);
   success = !AWAKE(vict) || percent <= proficiency;
   if (success)
-    hit(ch, vict, SKILL_BACKSTAB);
+    dual_skill_attack(ch, vict, SKILL_BACKSTAB);
   else
     damage(ch, vict, 0, SKILL_BACKSTAB);
   if (improve)
@@ -307,11 +335,291 @@ ACMD(do_backstab)
     send_to_char(ch, "Only piercing weapons can be used for backstabbing.\r\n");
     return;
   }
+  if (FIGHTING(ch)) {
+    send_to_char(ch, "You cannot backstab while fighting.\r\n");
+    return;
+  }
   if (FIGHTING(vict)) {
     send_to_char(ch, "You can't backstab a fighting person -- they're too alert!\r\n");
     return;
   }
   perform_backstab(ch, vict, GET_SKILL(ch, SKILL_BACKSTAB), TRUE);
+}
+
+ACMD(do_circle)
+{
+  char arg[MAX_INPUT_LENGTH];
+  struct char_data *vict;
+  int success;
+
+  if (IS_NPC(ch) || !GET_SKILL(ch, SKILL_CIRCLE)) {
+    send_to_char(ch, "You have no idea how to do that.\r\n");
+    return;
+  }
+  if (spell_on_cooldown(ch, SKILL_CIRCLE)) {
+    send_to_char(ch, "You need a moment to regain your footing.\r\n");
+    return;
+  }
+  one_argument(argument, arg);
+  vict = FIGHTING(ch);
+  if (!vict) {
+    send_to_char(ch, "You can only circle an opponent you are fighting.\r\n");
+    return;
+  }
+  if (*arg && !(vict = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM))) {
+    send_to_char(ch, "Circle whom?\r\n");
+    return;
+  }
+  if (vict != FIGHTING(ch)) {
+    send_to_char(ch, "You must circle the opponent you are fighting.\r\n");
+    return;
+  }
+  success = rand_number(1, 100) <= GET_SKILL(ch, SKILL_CIRCLE);
+  set_spell_cooldown(ch, SKILL_CIRCLE, 2);
+  WAIT_STATE(ch, PULSE_VIOLENCE);
+  if (!success) {
+    act("You fail to find an opening around $N.", FALSE, ch, 0, vict, TO_CHAR);
+    damage(ch, vict, 0, SKILL_CIRCLE);
+  } else {
+    act("You circle behind $N and strike!", FALSE, ch, 0, vict, TO_CHAR);
+    if (GET_EQ(ch, WEAR_WIELD) && GET_EQ(ch, WEAR_HOLD))
+      dual_skill_attack(ch, vict, SKILL_CIRCLE);
+    else if (GET_EQ(ch, WEAR_WIELD))
+      hit(ch, vict, SKILL_CIRCLE);
+    else {
+      /* A Mystic's unarmed Circle is intentionally a pair of hand strikes. */
+      hit(ch, vict, TYPE_UNDEFINED);
+      if (IN_ROOM(ch) == IN_ROOM(vict))
+        hit(ch, vict, TYPE_UNDEFINED);
+    }
+  }
+  improve_ability_from_use(ch, SKILL_CIRCLE, success);
+}
+
+ACMD(do_vanish)
+{
+  struct char_data *vict;
+  struct affected_type af;
+  int success;
+
+  if (IS_NPC(ch) || !GET_SKILL(ch, SKILL_VANISH)) {
+    send_to_char(ch, "You have no idea how to do that.\r\n");
+    return;
+  }
+  if (!(vict = FIGHTING(ch))) {
+    send_to_char(ch, "You are not fighting anyone.\r\n");
+    return;
+  }
+  if (spell_on_cooldown(ch, SKILL_VANISH)) {
+    send_to_char(ch, "You cannot vanish again so soon.\r\n");
+    return;
+  }
+  set_spell_cooldown(ch, SKILL_VANISH, 3);
+  success = rand_number(1, 100) <= GET_SKILL(ch, SKILL_VANISH) +
+      (GET_DEX(ch) - GET_DEX(vict));
+  WAIT_STATE(ch, PULSE_VIOLENCE);
+  if (!success) {
+    act("You fail to vanish from $N's sight.", FALSE, ch, 0, vict, TO_CHAR);
+    improve_ability_from_use(ch, SKILL_VANISH, FALSE);
+    return;
+  }
+  {
+    struct char_data *fighter, *next_fighter;
+    for (fighter = combat_list; fighter; fighter = next_fighter) {
+      next_fighter = fighter->next_fighting;
+      if (FIGHTING(fighter) == ch)
+        stop_fighting(fighter);
+    }
+  }
+  stop_fighting(ch);
+  if (AFF_FLAGGED(ch, AFF_SKULK))
+    affect_from_char(ch, SKILL_SKULK);
+  if (AFF_FLAGGED(ch, AFF_SNEAK))
+    affect_from_char(ch, SKILL_SNEAK);
+  new_affect(&af);
+  af.spell = SKILL_SNEAK;
+  af.duration = GET_LEVEL(ch);
+  SET_BIT_AR(af.bitvector, AFF_SNEAK);
+  affect_to_char(ch, &af);
+  act("You vanish from $N's attention and slip into the shadows.", FALSE, ch, 0, vict, TO_CHAR);
+  act("$n slips from $N's attention and vanishes into the shadows.", FALSE, ch, 0, vict, TO_NOTVICT);
+  improve_ability_from_use(ch, SKILL_VANISH, TRUE);
+}
+
+ACMD(do_nerve_pinch)
+{
+  char arg[MAX_INPUT_LENGTH];
+  struct char_data *vict;
+  struct affected_type af;
+  int success, duration, cooldown, damage_amount, failure_chance, attack_score, defense_score;
+  struct mud_event_data *event;
+
+  if (IS_NPC(ch) || !GET_SKILL(ch, SKILL_NERVE_PINCH)) {
+    send_to_char(ch, "You have no idea how to do that.\r\n");
+    return;
+  }
+  if (spell_on_cooldown(ch, SKILL_NERVE_PINCH)) {
+    send_to_char(ch, "Your hands have not yet recovered for another nerve pinch.\r\n");
+    return;
+  }
+  one_argument(argument, arg);
+  vict = FIGHTING(ch);
+  if (*arg && !(vict = get_char_vis(ch, arg, NULL, FIND_CHAR_ROOM))) {
+    send_to_char(ch, "Nerve pinch whom?\r\n");
+    return;
+  }
+  if (!vict || vict != FIGHTING(ch)) {
+    send_to_char(ch, "You must use nerve pinch on the opponent you are fighting.\r\n");
+    return;
+  }
+  cooldown = GET_SKILL(ch, SKILL_NERVE_PINCH) >= 75 ? 3 :
+      (GET_SKILL(ch, SKILL_NERVE_PINCH) >= 40 ? 4 : 5);
+  set_spell_cooldown(ch, SKILL_NERVE_PINCH, cooldown);
+  attack_score = GET_SKILL(ch, SKILL_NERVE_PINCH) + (GET_DEX(ch) - 10) +
+      (GET_WIS(ch) - 10) + (GET_INT(ch) - 10) / 2 + GET_LEVEL(ch) / 5;
+  defense_score = (GET_DEX(vict) - 10) + (GET_CON(vict) - 10) +
+      (GET_WIS(vict) - 10) / 2 + (GET_INT(vict) - 10) / 2 + GET_LEVEL(vict) / 5;
+  success = rand_number(1, 100) <= MAX(15, MIN(90, attack_score - defense_score + 50));
+  WAIT_STATE(ch, PULSE_VIOLENCE);
+  if (!success) {
+    act("You miss $N's nerve cluster.", FALSE, ch, 0, vict, TO_CHAR);
+    damage(ch, vict, 0, SKILL_NERVE_PINCH);
+    improve_ability_from_use(ch, SKILL_NERVE_PINCH, FALSE);
+    return;
+  }
+  damage_amount = MAX(1, GET_LEVEL(ch) / 2 + GET_SKILL(ch, SKILL_NERVE_PINCH) / 8);
+  damage(ch, vict, damage_amount, SKILL_NERVE_PINCH);
+  duration = 5 + GET_SKILL(ch, SKILL_NERVE_PINCH) / 10 +
+      (GET_DEX(ch) - 10) / 4 + (GET_WIS(ch) - 10) / 4 + (GET_INT(ch) - 10) / 6 -
+      GET_LEVEL(vict) / 10 - (GET_CON(vict) - 10) / 4 -
+      (GET_WIS(vict) - 10) / 6 - (GET_INT(vict) - 10) / 6;
+  duration = MAX(5, MIN(20, duration));
+  failure_chance = 25 + GET_SKILL(ch, SKILL_NERVE_PINCH) / 2 +
+      (GET_WIS(ch) - 10) / 3 + (GET_INT(ch) - 10) / 4 - GET_LEVEL(vict) / 8 -
+      (GET_CON(vict) - 10) / 4 - (GET_WIS(vict) - 10) / 6;
+  failure_chance = MAX(25, MIN(65, failure_chance));
+  affect_from_char(vict, SKILL_NERVE_PINCH);
+  event = char_has_mud_event(vict, eSKL_NERVE_DISRUPTION);
+  if (event && event->pEvent)
+    event_cancel(event->pEvent);
+  new_affect(&af);
+  af.spell = SKILL_NERVE_PINCH;
+  af.duration = -1;
+  af.modifier = failure_chance;
+  SET_BIT_AR(af.bitvector, AFF_NERVE_DISRUPTION);
+  affect_to_char(vict, &af);
+  NEW_EVENT(eSKL_NERVE_DISRUPTION, vict, NULL, duration * PASSES_PER_SEC);
+  act("You strike $N's nerves, disrupting $S concentration!", FALSE, ch, 0, vict, TO_CHAR);
+  act("$n strikes your nerves; your concentration wavers!", FALSE, ch, 0, vict, TO_VICT);
+  improve_ability_from_use(ch, SKILL_NERVE_PINCH, TRUE);
+}
+
+ACMD(do_embalm)
+{
+  char arg[MAX_INPUT_LENGTH], remainder[MAX_INPUT_LENGTH], custom[MAX_INPUT_LENGTH];
+  struct obj_data *obj;
+
+  if (IS_NPC(ch) || !GET_SKILL(ch, SKILL_EMBALM)) {
+    send_to_char(ch, "You have no idea how to do that.\r\n");
+    return;
+  }
+  half_chop(argument, arg, remainder);
+  if (!*arg) {
+    send_to_char(ch, "Embalm what?\r\n");
+    return;
+  }
+  obj = get_obj_in_list_vis(ch, arg, NULL, ch->carrying);
+  if (!obj)
+    obj = get_obj_in_list_vis(ch, arg, NULL, world[IN_ROOM(ch)].contents);
+  if (!is_embalmable_remains(obj)) {
+    send_to_char(ch, "You can only embalm a corpse or corpse-derived trophy.\r\n");
+    return;
+  }
+  if (GET_OBJ_TIMER(obj) < 0) {
+    send_to_char(ch, "That trophy has already been embalmed.\r\n");
+    return;
+  }
+  if (*remainder) {
+    half_chop(remainder, arg, custom);
+    if (!is_abbrev(arg, "as")) {
+      send_to_char(ch, "To name it, use: embalm <corpse> as <presentation>.\r\n");
+      return;
+    }
+    delete_doubledollar(custom);
+    if (!*custom || strlen(custom) > 80 || strpbrk(custom, "\r\n\033")) {
+      send_to_char(ch, "Use a single, plain presentation name of at most 80 characters.\r\n");
+      return;
+    }
+    /* Player corpses are dynamic objects.  Their short description is owned
+     * by this instance, so replacing it does not edit an object prototype. */
+    free(obj->short_description);
+    obj->short_description = strdup(custom);
+  }
+  /* Corpse decay only runs for positive timers; -1 is a durable internal
+   * embalmed marker and does not alter its contents, values, or flags. */
+  GET_OBJ_TIMER(obj) = -1;
+  act("You embalm $p, preserving it as a lasting trophy.", FALSE, ch, obj, 0, TO_CHAR);
+  act("$n carefully embalms $p.", FALSE, ch, obj, 0, TO_ROOM);
+  improve_ability_from_use(ch, SKILL_EMBALM, TRUE);
+}
+
+ACMD(do_decapitate)
+{
+  char arg[MAX_INPUT_LENGTH];
+  struct obj_data *corpse, *head;
+  int chance;
+
+  if (IS_NPC(ch) || !GET_SKILL(ch, SKILL_DECAPITATE)) {
+    send_to_char(ch, "You have no idea how to do that.\r\n");
+    return;
+  }
+  if (spell_on_cooldown(ch, SKILL_DECAPITATE)) {
+    send_to_char(ch, "You need a moment before attempting another decapitation.\r\n");
+    return;
+  }
+  one_argument(argument, arg);
+  if (!*arg) {
+    send_to_char(ch, "Decapitate what?\r\n");
+    return;
+  }
+  corpse = get_obj_in_list_vis(ch, arg, NULL, world[IN_ROOM(ch)].contents);
+  if (!corpse || !IS_CORPSE(corpse)) {
+    send_to_char(ch, "You can only decapitate a genuine corpse.\r\n");
+    return;
+  }
+  if (!REMAINS_ANATOMY_INITIALIZED(corpse)) {
+    send_to_char(ch, "That old corpse has no reliable anatomy to harvest.\r\n");
+    return;
+  }
+  if (!corpse_has_remaining_part(corpse, BODY_PART_HEAD)) {
+    if (REMAINS_PROFILE(corpse) == BODY_PROFILE_NONE)
+      send_to_char(ch, "That creature has no severable head.\r\n");
+    else
+      send_to_char(ch, "That corpse no longer has a head to take.\r\n");
+    return;
+  }
+
+  chance = GET_SKILL(ch, SKILL_DECAPITATE) + (GET_DEX(ch) - 10) * 2 +
+      (GET_STR(ch) - 10) - GET_OBJ_VAL(corpse, 2) / 2;
+  chance = MAX(15, MIN(90, chance));
+  set_spell_cooldown(ch, SKILL_DECAPITATE, 2);
+  WAIT_STATE(ch, PULSE_VIOLENCE);
+  if (rand_number(1, 100) > chance) {
+    act("You fail to find a clean cut on $p.", FALSE, ch, corpse, 0, TO_CHAR);
+    act("$n fails to find a clean cut on $p.", FALSE, ch, corpse, 0, TO_ROOM);
+    improve_ability_from_use(ch, SKILL_DECAPITATE, FALSE);
+    return;
+  }
+
+  head = sever_corpse_part(corpse, BODY_PART_HEAD);
+  if (!head) {
+    send_to_char(ch, "The corpse yields no head.\r\n");
+    return;
+  }
+  obj_to_room(head, IN_ROOM(ch));
+  act("You decapitate $p.", FALSE, ch, corpse, 0, TO_CHAR);
+  act("$n decapitates $p.", FALSE, ch, corpse, 0, TO_ROOM);
+  improve_ability_from_use(ch, SKILL_DECAPITATE, TRUE);
 }
 
 static int is_ordered_attack_command(const char *message, char *verb, char *target)

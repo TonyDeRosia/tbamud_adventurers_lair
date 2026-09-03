@@ -20,6 +20,7 @@
 #include "genobj.h"
 #include "genzon.h"
 #include "oasis.h"
+#include "tome.h"
 #include "improved-edit.h"
 #include "dg_olc.h"
 #include "fight.h"
@@ -46,6 +47,20 @@ static void oedit_format_extra_flags(struct obj_data *obj, char *bits, size_t bi
 static void oedit_format_wear_flags(struct obj_data *obj, char *bits, size_t bits_size);
 static int oedit_extra_flag_from_menu_choice(int choice);
 static void oedit_disp_menu(struct descriptor_data *d);
+static void oedit_disp_tome_menu(struct descriptor_data *d)
+{
+  int i; char why[MAX_INPUT_LENGTH];
+  write_to_output(d, "\r\nTome Properties\r\n");
+  for (i = 0; i < TOME_ABILITY_SLOTS; i++) {
+    int ability = GET_OBJ_VAL(OLC_OBJ(d), i);
+    write_to_output(d, "%d) Ability Slot %d : %s\r\n", i + 1, i + 1,
+      ability && tome_valid_ability(ability) ? spell_info[ability].name : "Not Set");
+  }
+  write_to_output(d, "C) Study cooldown: %d seconds\r\nV) Validate: %s\r\nQ) Quit\r\nEnter choice: ",
+    OLC_OBJ(d)->tome_cooldown_seconds,
+    tome_validate(OLC_OBJ(d), why, sizeof(why)) ? "VALID" : why);
+  OLC_MODE(d) = OEDIT_TOME_MENU;
+}
 static void oedit_disp_perm_menu(struct descriptor_data *d);
 static void oedit_save_to_disk(int zone_num);
 static int oedit_type_supports_regen_mult(int obj_type);
@@ -725,6 +740,7 @@ static void oedit_disp_menu(struct descriptor_data *d)
           "%sB%s) Timer       : %s%d\r\n"
           "%s"
           "%sC%s) Values      : %s%d %d %d %d%s\r\n"
+          "%sN%s) Tome properties: %s%s\r\n"
           "%sD%s) Applies menu\r\n"
           "%sE%s) Extra descriptions menu: %s%s%s\r\n"
           "%sM%s) Min Level   : %s%d\r\n"
@@ -745,8 +761,10 @@ static void oedit_disp_menu(struct descriptor_data *d)
           grn, nrm, cyn, GET_OBJ_VAL(obj, 0),
           GET_OBJ_VAL(obj, 1),
           GET_OBJ_VAL(obj, 2),
-	  GET_OBJ_VAL(obj, 3),
+          GET_OBJ_VAL(obj, 3),
           GET_OBJ_TYPE(obj) == ITEM_FOOD ? " (hunger thirst sated poison)" : "",
+          grn, nrm, cyn,
+          GET_OBJ_TYPE(obj) == ITEM_TOME ? "Configured" : "Not a tome",
 	  grn, nrm, grn, nrm, cyn, obj->ex_description ? "Set." : "Not Set.", grn,
           grn, nrm, cyn, GET_OBJ_LEVEL(obj),
           grn, nrm, cyn, buf2,
@@ -886,6 +904,13 @@ void oedit_parse(struct descriptor_data *d, char *arg)
       OLC_VAL(d) = 1;
       oedit_disp_val1_menu(d);
       break;
+    case 'n':
+    case 'N':
+      if (GET_OBJ_TYPE(OLC_OBJ(d)) != ITEM_TOME) {
+        write_to_output(d, "Tome properties are available only for ITEM_TOME.\r\n");
+        oedit_disp_menu(d);
+      } else oedit_disp_tome_menu(d);
+      return;
     case 'd':
     case 'D':
       oedit_disp_prompt_apply_menu(d);
@@ -1183,6 +1208,39 @@ void oedit_parse(struct descriptor_data *d, char *arg)
     }
     GET_OBJ_VAL(OLC_OBJ(d), 3) = LIMIT(number, min_val, max_val);
     break;
+
+  case OEDIT_TOME_MENU:
+    switch (LOWER(*arg)) {
+      case 'q': oedit_disp_menu(d); return;
+      case 'v': {
+        char why[MAX_INPUT_LENGTH];
+        write_to_output(d, "Tome Configuration: %s\r\n", tome_validate(OLC_OBJ(d), why, sizeof(why)) ? "VALID" : why);
+        oedit_disp_tome_menu(d); return;
+      }
+      case 'c': write_to_output(d, "Study cooldown in real seconds (0 permits immediate next study): "); OLC_MODE(d) = OEDIT_TOME_COOLDOWN; return;
+      case '1': case '2': case '3': case '4': OLC_VAL(d) = *arg - '1'; write_to_output(d, "Enter ability name or ID (0 clears): "); OLC_MODE(d) = OEDIT_TOME_ABILITY; return;
+      default: oedit_disp_tome_menu(d); return;
+    }
+
+  case OEDIT_TOME_COOLDOWN:
+    if (atoi(arg) < 0) write_to_output(d, "Cooldown must be zero or greater.\r\n");
+    else { OLC_OBJ(d)->tome_cooldown_seconds = atoi(arg); OLC_VAL(d) = 1; }
+    oedit_disp_tome_menu(d); return;
+
+  case OEDIT_TOME_ABILITY:
+    {
+      char ambiguity[MAX_STRING_LENGTH]; int ability, i;
+      if (!strcmp(arg, "0")) ability = 0;
+      else if (isdigit((unsigned char)*arg)) ability = atoi(arg);
+      else ability = find_skill_num_with_ambig(arg, ambiguity, sizeof(ambiguity));
+      if (ability == -2) write_to_output(d, "Ambiguous ability. Did you mean: %s?\r\n", ambiguity);
+      else if (ability && !tome_valid_ability(ability)) write_to_output(d, "That is not a valid registered ability.\r\n");
+      else {
+        for (i=0;i<TOME_ABILITY_SLOTS;i++) if (i != OLC_VAL(d) && ability && GET_OBJ_VAL(OLC_OBJ(d),i)==ability) { write_to_output(d, "A tome cannot contain an ability twice.\r\n"); ability=-1; break; }
+        if (ability >= 0) { GET_OBJ_VAL(OLC_OBJ(d), OLC_VAL(d)) = ability; OLC_VAL(d)=1; }
+      }
+      oedit_disp_tome_menu(d); return;
+    }
 
   case OEDIT_PROMPT_APPLY:
     if ((number = atoi(arg)) == 0)

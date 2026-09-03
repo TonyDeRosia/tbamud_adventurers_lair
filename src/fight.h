@@ -38,6 +38,7 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
 void death_cry(struct char_data *ch);
 void die(struct char_data * ch, struct char_data * killer);
 void hit(struct char_data *ch, struct char_data *victim, int type);
+void dual_skill_attack(struct char_data *ch, struct char_data *victim, int type);
 void perform_violence(void);
 void set_next_damage_type(int damage_type);
 void raw_kill(struct char_data * ch, struct char_data * killer);
@@ -45,6 +46,10 @@ void  set_fighting(struct char_data *ch, struct char_data *victim);
 int skill_message(int dam, struct char_data *ch, struct char_data *vict,
           int attacktype);
 void  stop_fighting(struct char_data *ch);
+bool corpse_has_remaining_part(const struct obj_data *corpse, int part);
+struct obj_data *sever_corpse_part(struct obj_data *corpse, int part);
+const char *body_profile_name(int profile);
+int resolve_body_profile(const struct char_data *ch);
 
 
 /* Global variables */

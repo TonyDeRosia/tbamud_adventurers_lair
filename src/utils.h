@@ -731,6 +731,9 @@ do                                                              \
 #define GET_SKILL(ch, i)	CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.skills[i]))
 /** Copy the current skill level i of ch to pct. */
 #define SET_SKILL(ch, i, pct)	do { CHECK_PLAYER_SPECIAL((ch), (ch)->player_specials->saved.skills[i]) = pct; } while(0)
+#define HAS_TOME_ABILITY(ch, i) CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.tome_abilities[i]))
+#define SET_TOME_ABILITY(ch, i) do { CHECK_PLAYER_SPECIAL((ch), (ch)->player_specials->saved.tome_abilities[i]) = 1; } while(0)
+#define GET_TOME_STUDY_EXPIRES_AT(ch) CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.tome_study_expires_at))
 /** Reactive study learned-at level for ability i (0 means unknown/not tracked). */
 #define GET_STUDY_LEARN_LEVEL(ch, i) CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->saved.study_learned_level[i]))
 /** Set reactive study learned-at level for ability i. */
@@ -756,8 +759,11 @@ do                                                              \
 #define MEMORY(ch)		((ch)->mob_specials.memory)
 #define GET_SUMMON_TIMER(ch)      ((ch)->mob_specials.summon_timer)
 #define GET_MOB_WIMP_LEV(ch)      ((ch)->mob_specials.wimpy_threshold)
+#define GET_MOB_BODY_PROFILE(ch)  ((ch)->mob_specials.body_profile)
+#define MOB_BODY_PROFILE_SET(ch)  ((ch)->mob_specials.body_profile_set)
 #define GET_SPELL_COOLDOWN(ch, sp) CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->spell_cooldowns[(sp)]))
 #define GET_STUDY_COOLDOWN_UNTIL(ch) CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->study_cooldown_until))
+#define GET_SHIMMER_COOLDOWN_UNTIL(ch) CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->shimmer_cooldown_until))
 #define GET_HP_LAST_ROUND(ch) CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->hp_last_round))
 
 /** Return the equivalent strength of ch if ch has level 18 strength. */
@@ -864,6 +870,13 @@ do                                                              \
 #define CORPSE_SHADOW_ATTEMPTS(obj)	((obj)->shadow_extract_attempts)
 /** Whether a corpse's shadow attempts were initialized. */
 #define CORPSE_SHADOW_ATTEMPTS_INIT(obj)	((obj)->shadow_extract_initialized)
+/** Anatomy state on genuine corpses and dynamically generated remains. */
+#define CORPSE_REMAINING_PARTS(obj)	((obj)->corpse_remaining_parts)
+#define REMAINS_PART(obj)		((obj)->remains_part)
+#define REMAINS_PROFILE(obj)		((obj)->remains_body_profile)
+#define REMAINS_SOURCE_IS_PLAYER(obj)	((obj)->remains_source_is_player)
+#define REMAINS_ANATOMY_INITIALIZED(obj) ((obj)->remains_anatomy_initialized)
+#define IS_GENUINE_REMAINS(obj)	((obj) && (REMAINS_PART(obj) != 0))
 
 /** Can the obj be worn on body part? */
 #define CAN_WEAR(obj, part)	OBJWEAR_FLAGGED((obj), (part))

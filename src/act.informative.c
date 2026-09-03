@@ -410,6 +410,8 @@ static void diag_char_to_char(struct char_data *i, struct char_data *ch)
 
 static void look_at_char(struct char_data *i, struct char_data *ch)
 {
+  struct obj_data *obj;
+  int revealed;
   if (!ch->desc)
     return;
 
@@ -424,10 +426,17 @@ static void look_at_char(struct char_data *i, struct char_data *ch)
 
     if (ch != i && can_view_mob_inventory(ch, i)) {
       act("\r\nYou size up what $n is carrying:", FALSE, i, 0, ch, TO_VICT);
-      if (i->carrying)
-        list_obj_to_char(i->carrying, ch, SHOW_OBJ_SHORT, TRUE);
-      else
+      revealed = GET_LEVEL(ch) >= LVL_IMMORT ? 999 : MAX(1, GET_SKILL(ch, SKILL_PEEK) / 20);
+      if (!i->carrying)
         send_to_char(ch, " Nothing.\r\n");
+      else {
+        for (obj = i->carrying; obj && revealed > 0; obj = obj->next_content) {
+          if (!CAN_SEE_OBJ(ch, obj))
+            continue;
+          show_obj_to_char(obj, ch, SHOW_OBJ_SHORT);
+          revealed--;
+        }
+      }
     }
   }
 }
@@ -440,13 +449,15 @@ static int can_view_mob_inventory(struct char_data *viewer, struct char_data *ta
   if (GET_LEVEL(viewer) >= LVL_IMMORT)
     return TRUE;
 
-  if (IS_THIEF(viewer))
-    return TRUE;
+  if (!GET_SKILL(viewer, SKILL_PEEK))
+    return FALSE;
 
-  if (AFF_FLAGGED(viewer, AFF_TRUESIGHT))
-    return TRUE;
-
-  return FALSE;
+  if (rand_number(1, 100) > GET_SKILL(viewer, SKILL_PEEK)) {
+    improve_ability_from_use(viewer, SKILL_PEEK, FALSE);
+    return FALSE;
+  }
+  improve_ability_from_use(viewer, SKILL_PEEK, TRUE);
+  return TRUE;
 }
 
 static void show_mob_equipment_to_char(struct char_data *viewer, struct char_data *target)

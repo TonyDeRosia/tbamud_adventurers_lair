@@ -173,6 +173,36 @@ void clanedit_parse(struct descriptor_data *d, char *arg);
 #define CLASS_DRAGON      4    /**< NPC Class Dragon */
 #define CLASS_GIANT       5    /**< NPC Class Giant */
 
+/* Reusable anatomy profiles for corpse-derived remains. */
+#define BODY_PROFILE_NONE       0
+#define BODY_PROFILE_HUMANOID   1
+#define BODY_PROFILE_QUADRUPED  2
+#define BODY_PROFILE_SERPENT    3
+#define BODY_PROFILE_AVIAN      4
+#define BODY_PROFILE_ARACHNID   5
+#define BODY_PROFILE_DRAGON     6
+#define BODY_PROFILE_HORNED_HUMANOID 7
+#define BODY_PROFILE_TAILED_HUMANOID 8
+#define NUM_BODY_PROFILES      9
+
+/* Bits stored on a corpse to record parts still attached and available. */
+#define BODY_PART_HEAD          (1 << 0)
+#define BODY_PART_TORSO         (1 << 1)
+#define BODY_PART_ARM_LEFT      (1 << 2)
+#define BODY_PART_ARM_RIGHT     (1 << 3)
+#define BODY_PART_LEG_LEFT      (1 << 4)
+#define BODY_PART_LEG_RIGHT     (1 << 5)
+#define BODY_PART_FORELEG_LEFT  (1 << 6)
+#define BODY_PART_FORELEG_RIGHT (1 << 7)
+#define BODY_PART_HINDLEG_LEFT  (1 << 8)
+#define BODY_PART_HINDLEG_RIGHT (1 << 9)
+#define BODY_PART_TAIL          (1 << 10)
+#define BODY_PART_WING_LEFT     (1 << 11)
+#define BODY_PART_WING_RIGHT    (1 << 12)
+#define BODY_PART_HORN          (1 << 13)
+#define BODY_PART_TENTACLE_1    (1 << 14)
+#define BODY_PART_TENTACLE_2    (1 << 15)
+
 /* Sex */
 #define SEX_NEUTRAL   0   /**< Neutral Sex (Hermaphrodite) */
 #define SEX_MALE      1   /**< Male Sex (XY Chromosome) */
@@ -346,8 +376,12 @@ void clanedit_parse(struct descriptor_data *d, char *arg);
 #define AFF_ADRENALINE     58
 #define AFF_CLARITY        59
 #define AFF_INFUSED        60
+#define AFF_SKULK          61  /**< Char is moving with heightened stealth */
+#define AFF_PASS_DOOR      62  /**< Char may pass ordinary physical doors */
+#define AFF_DETER          63  /**< Ordinary aggressive mobs hesitate */
+#define AFF_NERVE_DISRUPTION 64 /**< Casting is temporarily disrupted */
 /** Total number of affect flags */
-#define NUM_AFF_FLAGS   61
+#define NUM_AFF_FLAGS   65
 
 /* Modes of connectedness: used by descriptor_data.state                */
 #define CON_PLAYING       0 /**< Playing - Nominal state                */
@@ -463,7 +497,8 @@ void clanedit_parse(struct descriptor_data *d, char *arg);
 #define ITEM_BOAT      22		/**< Item is a boat		*/
 #define ITEM_FOUNTAIN  23		/**< Item is a fountain		*/
 /** Total number of item types.*/
-#define NUM_ITEM_TYPES    24
+#define ITEM_TOME      24   /**< Builder-configured ability tome */
+#define NUM_ITEM_TYPES    25
 
 /* Take/Wear flags: used by obj_data.obj_flags.wear_flags */
 #define ITEM_WEAR_TAKE      0   /**< Item can be taken */
@@ -691,7 +726,7 @@ void clanedit_parse(struct descriptor_data *d, char *arg);
 #define MAX_TITLE_LENGTH      80     /**< Max PC title length */
 #define HOST_LENGTH           40     /**< Max hostname resolution length */
 #define PLR_DESC_LENGTH       4096   /**< Max length for PC description */
-#define MAX_SKILLS            261    /**< Max number of skills/spells */
+#define MAX_SKILLS            268    /**< Max number of skills/spells */
 #define MAX_AFFECT            32     /**< Max number of player affections */
 #define MAX_OBJ_AFFECT        6      /**< Max object affects */
 #define MAX_NOTE_LENGTH       4000   /**< Max length of text on a note obj */
@@ -824,6 +859,13 @@ struct obj_data
   int corpse_source_vnum;         /**< Source mob vnum snapshot for corpse-derived effects */
   int shadow_extract_attempts;    /**< Remaining shadow extraction attempts for corpses */
   int shadow_extract_initialized; /**< Whether shadow extraction attempts were initialized */
+  int corpse_remaining_parts;     /**< Attached anatomy still available on a genuine corpse */
+  int remains_part;               /**< Body-part bit for a generated remains object */
+  int remains_body_profile;       /**< Body profile captured from the source creature */
+  int remains_source_is_player;   /**< Source distinction preserved for corpse-derived remains */
+  int remains_anatomy_initialized;/**< Distinguishes initialized corpses from legacy objects */
+  char *remains_source_name;      /**< Source creature identity for corpse-derived remains */
+  int tome_cooldown_seconds; /**< Builder-configured study cooldown; never object timer. */
   
   struct list_data *events;      /**< Used for object events */
 };
@@ -1061,6 +1103,8 @@ struct char_special_data
 struct player_special_data_saved
 {
   byte skills[MAX_SKILLS+1]; /**< Character skills. */
+  byte tome_abilities[MAX_SKILLS+1]; /**< Permanent authorization acquired from tomes. */
+  time_t tome_study_expires_at; /**< Real-world Tome study expiration. */
   byte study_learned_level[MAX_SKILLS+1]; /**< Reactive Study learned-at level per ability (0 = unknown/not tracked). */
   int wimp_level;         /**< Below this # of hit points, flee! */
   byte freeze_level;      /**< Level of god who froze char, if any */
@@ -1162,6 +1206,7 @@ struct player_special_data
   int buildwalk_sector;  /**< Default sector type for buildwalk */
   int spell_cooldowns[MAX_SKILLS + 1]; /**< Per-spell round cooldown timers (runtime only). */
   time_t study_cooldown_until; /**< Real-time study throttle (runtime only). */
+  time_t shimmer_cooldown_until; /**< Real-time Shimmer throttle (runtime only). */
   int hp_last_round;     /**< HP snapshot from previous combat round for chrono effects. */
 };
 
@@ -1206,6 +1251,8 @@ struct mob_special_data
   long long gold_min; /* min roll on death */
   long long gold_max; /* max roll on death */
   int summon_timer;   /**< Violence-pulse countdown for temporary summons (<=0 means permanent). */
+  int body_profile;   /**< Explicit BODY_PROFILE_* selection for this mobile. */
+  int body_profile_set; /**< Whether body_profile was explicitly selected by a builder. */
   struct dg_cooldown_entry *dg_cooldowns; /**< Runtime DG per-player cooldowns. */
 };
 

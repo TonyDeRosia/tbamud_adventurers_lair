@@ -27,7 +27,9 @@ struct mud_event_list mud_event_index[] = {
   { "Protocol"     , get_protocols  , EVENT_DESC  },  /* ePROTOCOLS */
   { "Whirlwind"    , event_whirlwind, EVENT_CHAR  },  /* eWHIRLWIND */
   { "Spell:Darkness",event_countdown, EVENT_ROOM  },  /* eSPL_DARKNESS */
-  { "Spell:Enfeeblement", event_countdown, EVENT_CHAR }   /* eSPL_ENFEEBLEMENT */
+  { "Spell:Enfeeblement", event_countdown, EVENT_CHAR },  /* eSPL_ENFEEBLEMENT */
+  { "Spell:Deter", event_countdown, EVENT_CHAR },          /* eSPL_DETER */
+  { "Skill:Nerve Disruption", event_countdown, EVENT_CHAR } /* eSKL_NERVE_DISRUPTION */
 };
 
 /* init_events() is the ideal function for starting global events. This
@@ -84,6 +86,18 @@ EVENTFUNC(event_countdown)
       if (tch && affected_by_spell(tch, SPELL_ENFEEBLEMENT)) {
         affect_from_char(tch, SPELL_ENFEEBLEMENT);
         send_to_char(tch, "Your strength and agility return.\tn\r\n");
+      }
+      break;
+    case eSPL_DETER:
+      if (tch && affected_by_spell(tch, SPELL_DETER)) {
+        affect_from_char(tch, SPELL_DETER);
+        send_to_char(tch, "Your deterrent presence fades.\r\n");
+      }
+      break;
+    case eSKL_NERVE_DISRUPTION:
+      if (tch && affected_by_spell(tch, SKILL_NERVE_PINCH)) {
+        affect_from_char(tch, SKILL_NERVE_PINCH);
+        send_to_char(tch, "Your nerves settle and your concentration returns.\r\n");
       }
       break;
     case ePROTOCOLS:

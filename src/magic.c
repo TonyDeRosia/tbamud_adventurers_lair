@@ -46,6 +46,42 @@ static int spell_dmg_medium(int level) { return (level * 3) + dice(3, MAX(1, lev
 static int spell_dmg_high(int level) { return (level * 4) + dice(4, MAX(1, level / 2)); }
 static int spell_dmg_extreme(int level) { return (level * 5) + dice(5, MAX(1, level / 2)); }
 
+/* Nerve Pinch stores its spell-failure chance on the disruption affect.
+ * Derive the successful-spell reduction from that same bounded value so it
+ * remains stable for the lifetime of the effect. */
+static int nerve_disruption_reduction_pct(struct char_data *ch)
+{
+  struct affected_type *af;
+  int failure_chance;
+
+  if (!ch || !AFF_FLAGGED(ch, AFF_NERVE_DISRUPTION))
+    return 0;
+
+  for (af = ch->affected; af; af = af->next) {
+    if (!IS_SET_AR(af->bitvector, AFF_NERVE_DISRUPTION))
+      continue;
+
+    failure_chance = MAX(25, MIN(65, af->modifier));
+    return 25 + ((failure_chance - 25) * 25) / 40;
+  }
+
+  return 25;
+}
+
+static int reduce_disrupted_spell_value(struct char_data *ch, int value)
+{
+  int reduction = nerve_disruption_reduction_pct(ch);
+  int reduced;
+
+  if (reduction <= 0 || value == 0)
+    return value;
+
+  reduced = (value * (100 - reduction)) / 100;
+  if (reduced == 0)
+    return value > 0 ? 1 : -1;
+  return reduced;
+}
+
 void set_spell_damage_type(enum damage_type type)
 {
   current_spell_damage_type = type;
@@ -494,6 +530,9 @@ int mag_damage(int level, struct char_data *ch, struct char_data *victim,
       crit_show_banner(ch, victim, mult);
     }
   }
+
+  if (dam > 0)
+    dam = reduce_disrupted_spell_value(ch, dam);
 
   set_next_damage_type(local_damage_type);
   return (damage(ch, victim, dam, spellnum));
@@ -1193,6 +1232,13 @@ void mag_affects(int level, struct char_data *ch, struct char_data *victim,
     return;
   }
 
+  for (i = 0; i < MAX_SPELL_AFFECTS; i++) {
+    if (af[i].duration > 0)
+      af[i].duration = reduce_disrupted_spell_value(ch, af[i].duration);
+    if (af[i].location != APPLY_NONE && af[i].modifier != 0)
+      af[i].modifier = reduce_disrupted_spell_value(ch, af[i].modifier);
+  }
+
   for (i = 0; i < MAX_SPELL_AFFECTS; i++)
     if (af[i].bitvector[0] || af[i].bitvector[1] ||
         af[i].bitvector[2] || af[i].bitvector[3] ||
@@ -1794,6 +1840,9 @@ void mag_points(int level, struct char_data *ch, struct char_data *victim,
       crit_show_banner(ch, victim, mult);
     }
   }
+
+  if (healing > 0)
+    healing = reduce_disrupted_spell_value(ch, healing);
 
 GET_HIT(victim) = MIN(GET_MAX_HIT(victim), GET_HIT(victim) + healing);
   GET_MOVE(victim) = MIN(GET_MAX_MOVE(victim), GET_MOVE(victim) + move);

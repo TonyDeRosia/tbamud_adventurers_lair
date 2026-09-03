@@ -266,8 +266,11 @@
 #define SPELL_HUNTERS_INSTINCT       225
 #define SPELL_PUPPET                 226
 #define SPELL_MIND_CONTROL           227
+#define SPELL_PASS_DOOR              228
+#define SPELL_SHIMMER                229
+#define SPELL_DETER                  230
 /** Total Number of defined spells */
-#define NUM_SPELLS                   227
+#define NUM_SPELLS                   230
 
 /* Insert new spells here, up to MAX_SPELLS */
 #define MAX_SPELLS		    230
@@ -305,6 +308,13 @@
 #define SKILL_APPRAISE_ENEMY        259
 #define SKILL_STUDY                 260
 #define SKILL_UNARMED               261
+#define SKILL_CIRCLE                262
+#define SKILL_PEEK                  263
+#define SKILL_VANISH                264
+#define SKILL_SKULK                 265
+#define SKILL_EMBALM                266
+#define SKILL_NERVE_PINCH           267
+#define SKILL_DECAPITATE             268
 /* New skills may be added here up to MAX_SKILLS (see structs.h). */
 
 /* NON-PLAYER AND OBJECT SPELLS AND SKILLS: The practice levels for the spells
@@ -601,6 +611,9 @@ bool shadow_can_summon_more(struct char_data *ch, char *reason, size_t reason_sz
 ASPELL(spell_total_occultation);
 ASPELL(spell_domain_break);
 ASPELL(spell_hunters_instinct);
+ASPELL(spell_pass_door);
+ASPELL(spell_deter);
+ASPELL(spell_shimmer);
 void show_identify_item(struct char_data *ch, struct obj_data *obj, enum identify_detail_level detail);
 
 /* basic magic calling functions */
