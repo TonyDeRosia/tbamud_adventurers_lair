@@ -1388,7 +1388,25 @@ int enter_player_game (struct descriptor_data *d)
   /* We have to place the character in a room before equipping them
    * or equip_char() will gripe about the person in NOWHERE. */
   load_room = NOWHERE;
-  if (PLR_FLAGGED(d->character, PLR_LOADROOM) &&
+
+  /*
+   * Brand-new characters enter through the Adventurer's Academia.
+   * do_start() changes them from level 0 to level 1 immediately after
+   * their first entry, so subsequent logins use the normal room logic.
+   */
+  if (GET_LEVEL(d->character) == 0) {
+    load_room = real_room(newbie_start_room);
+
+    if (load_room == NOWHERE) {
+      mudlog(BRF, LVL_IMPL, TRUE,
+             "SYSERR: Newbie start room %d does not exist; using mortal start room.",
+             newbie_start_room);
+      load_room = r_mortal_start_room;
+    }
+  }
+
+  if (load_room == NOWHERE &&
+      PLR_FLAGGED(d->character, PLR_LOADROOM) &&
       GET_LOADROOM(d->character) != NOWHERE)
     load_room = real_room(GET_LOADROOM(d->character));
 

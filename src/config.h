@@ -45,6 +45,7 @@ extern int crash_file_timeout;
 extern int rent_file_timeout;
 /* Room Numbers */
 extern room_vnum mortal_start_room;
+extern room_vnum newbie_start_room;
 extern room_vnum immort_start_room;
 extern room_vnum frozen_start_room;
 extern room_vnum donation_room_1;

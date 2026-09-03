@@ -174,6 +174,9 @@ int selfdelete_fastwipe = YES;
 /* Virtual number of room that mortals should enter at. */
 room_vnum mortal_start_room = 3001;
 
+/* Virtual number of room brand-new players enter on their first login. */
+room_vnum newbie_start_room = 18600;
+
 /* Virtual number of room that immorts should enter at by default. */
 room_vnum immort_start_room = 1204;
 

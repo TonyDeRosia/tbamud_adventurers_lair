@@ -11,6 +11,7 @@
 #include "screen.h"
 
 extern const char *class_name(int class_id);
+extern const char *class_abbrev(int class_id);
 
 #define CT_SOFT_MIN_SCORE 10
 #define CT_SOFT_TOTAL_SCORE_MIN 24
@@ -522,27 +523,13 @@ const char *classtrack_display_class_name(struct char_data *ch)
 
 const char *classtrack_display_class_abbrev(struct char_data *ch)
 {
-  static char abbrev[4];
-  const char *name;
-  int i, j;
+  if (!ch)
+    return "???";
 
-  if (!ch || IS_NPC(ch))
-    return "Adv";
+  if (IS_NPC(ch))
+    return "Mob";
 
-  if (!GET_CLASS_LOCKED(ch))
-    return "Adv";
-
-  name = classtrack_display_class_name(ch);
-  for (i = 0, j = 0; name[i] != '\0' && j < 3; i++) {
-    if (isalpha((unsigned char)name[i]))
-      abbrev[j++] = UPPER(name[i]);
-  }
-
-  if (j == 0)
-    return "Adv";
-
-  abbrev[j] = '\0';
-  return abbrev;
+  return class_abbrev(GET_CLASS(ch));
 }
 
 int classtrack_get_ability_archetype(int ability_id)

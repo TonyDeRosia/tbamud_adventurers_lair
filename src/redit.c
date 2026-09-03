@@ -1368,6 +1368,16 @@ void redit_parse(struct descriptor_data *d, char *arg)
 
 void redit_string_cleanup(struct descriptor_data *d, int terminator)
 {
+  /*
+   * Multiline REDIT text accepts the builder-friendly @ color syntax.
+   * Convert it to the internal protocol tab codes when the editor saves,
+   * just as fread_string() does when world files are loaded at boot.
+   *
+   * This is safe if /t was already used: parse_at() leaves existing
+   * protocol tab codes unchanged.
+   */
+  if (terminator == STRINGADD_SAVE && d->str && *d->str)
+    parse_at(*d->str);
   switch (OLC_MODE(d)) {
   case REDIT_DESC:
     redit_disp_menu(d);
