@@ -1,57 +1,79 @@
 #1200
-The Meeting Room Of The Gods~
-   The meeting room is plain and very simple.  A circular table sits in the
-middle of the room, lit by some unseen light source.  There are many chairs
-around the table, all empty.  The Immortal Board Room is to the north.
+@WThe @BHa@Cll @Wof @RSe@Wrv@Bic@Ce@n~
+This circular chamber serves as the formal heart of the immortal staff.
+A broad oak table fills the center beneath suspended witchlights, with
+high-backed chairs reserved for those entrusted with the care of the
+realm. Brass plaques record standing duties rather than titles of
+vanity: stewardship, building, player assistance, justice, and world
+maintenance. Subtle red, white, and blue enamel borders the old service
+standard behind the chair of the presiding immortal. Nothing here
+suggests that immortality is a reward without obligation. It is a
+privilege granted to those trusted to work for the MUD.
 ~
 12 8 0 0 0 0
 D0
-   A frosted glass door with huge silver hinges and silver fixtures are here
-marking the main meeting room with the TBA company Logo upon the door.  The door
-is open.
+Beyond the closed service door lies the formal corridor linking this
+hall with the wider immortal complex.
 ~
 door~
 1 -1 34310
 S
 #1201
-The Inn Of The Gods~
-   The Inn of the Gods is a small room, holding only a shelf with many small
-precious stones on it.  When a God comes to rent his belongings, his essence is
-stored in the stones.  The north foyer is to the east.
+@WThe @CSt@Bew@War@Cd's @BRe@Wgi@Cst@Bry@n~
+Shelves of rune-marked account stones and bound ledgers line this quiet
+registry. The Immortal Steward maintains records of stored belongings
+and the practical business of coming and going from duty. A polished
+counter bears a simple inscription in brass: @WSE@BRV@CIC@WE
+@BBE@CFO@WRE @BSTA@CTU@WS@n. The northern complex lies beyond the
+eastern passage.
 ~
 12 8 0 0 0 0
 D1
+An orderly passage leads east toward the northern staff corridor.
 ~
 ~
 0 0 34307
 S
 #1202
-The Ice Box Of The Gods~
-   The Ice Box is for little boys and girls that cannot play nice. Be good
-and maybe someone will come and get you.
+@DThe @RCh@Oam@Rbe@Dr o@Rf @WCe@Rns@Our@De@n~
+Cold gray stone and muted warding sigils make this chamber deliberately
+uncomfortable without turning it into a spectacle. It exists for the
+rare occasion when an immortal must be removed from active duty while
+conduct is reviewed. The room is peaceful, soundproof, and stripped of
+unnecessary magic. A carved reminder above the wall reads:
+@RAU@WTH@BOR@CIT@WY @RRE@WQU@BIR@CES @RRE@WST@BRA@CIN@WT@n.
 ~
 12 184 0 0 0 0
 S
 #1203
-The Gods' Mortal Board Room~
-   Here the Gods have magically created an exact copy of the mortal board room.
-Any God can easily post and read messages from the mortal board room without
-being seen by any mortals.  The eastern foyer is to the north.
+@WThe @CMo@Brt@Cal @WAf@Bfa@Cir@Cs @WAr@Bch@Civ@We@n~
+Copies of notices, player-facing discussions, and public records are
+gathered here so immortals can remain aware of the mortal side of the
+realm without intruding unnecessarily. The room is arranged as an
+archive rather than a throne room: long reading tables, labeled shelves,
+and a quiet place to understand what players are seeing before staff act
+on their behalf. The eastern staff complex lies to the north.
 ~
 12 8 0 0 0 0
 D0
+The archive opens north into the eastern staff corridor.
 ~
 ~
 0 0 34308
 S
 #1204
-The Immortal Board Room~
-   The main hang out of the Gods, the Immortal Board Room is the place to be.
-Gods exchange messages here most every day.  The eastern foyer is to the south.
+@WThe @BIm@Cmo@Wrt@Bal @CCo@Wmm@Bon@Cs@n~
+This is the working commons of the immortal staff, a place to confer
+between duties, leave messages, review active concerns, and ask for a
+second opinion before making a consequential change. Comfortable chairs
+and a long hearth soften the otherwise practical chamber. New immortals
+are expected to use this room for questions rather than guessing when a
+command could affect players or live world data.
 ~
 12 8 0 0 0 0
 D2
-The Gods' Meeting Room is located to the south.
+The southern passage returns toward the central immortal meeting
+chambers.
 ~
 ~
 0 -1 34308
@@ -65,92 +87,121 @@ you spot a small staircase leading upwards.
 ~
 S
 #1205
-The Post Office Of The Gods~
-   The Post Office Of The Gods is the same as most Post Offices except that it
-is not as slow.  Even the Postal service knows not to anger the Gods.  Piles of
-junk mail line the walls.  I guess even Gods get on mailing lists.  The northern
-foyer is to the west.
+@WThe @CKe@Bep@Wer@C's @BDi@Wsp@Cat@Cch@n~
+Bound message tubes, sealed correspondence boxes, and orderly shelves
+fill this compact dispatch office. The Keeper of Dispatch handles staff
+mail with the same seriousness given to any other record of duty. The
+room is intentionally mundane: reliable communication is part of
+maintaining the world, not a magical privilege to be taken for granted.
+The northern complex lies west.
 ~
 12 8 0 0 0 0
 D3
+The dispatch office opens west into the northern staff corridor.
 ~
 ~
 0 0 34307
 S
 #1206
-Advertising/Business Center~
-   This is the advertising room.  It is a very large room with several tables
-and chairs lining the room that have computers on them and a lone printer in the
-corner.  It is a business center of the Gods.  It also has what appears to be
-several bulletin boards for notices.  The only exit is west through an arch into
-the southern foyer.
+@WThe @BSt@Caf@Wf @BWo@Crk@Wro@Bom@n~
+Heavy writing tables, map cases, reference shelves, wax tablets, and
+pinned duty notices turn this chamber into a practical workroom for the
+immortal staff. Builders can compare notes before touching a live zone,
+administrators can leave operational guidance, and new immortals can
+review current procedures. Nothing here replaces HELP, STAT, REFERENCES,
+or the Builder Academy. It exists to remind staff to inspect first,
+understand second, and change only what they intend.
 ~
 12 8 0 0 0 0
 D3
+A broad arch leads west toward the southern staff corridor and adjoining
+offices.
 ~
 ~
 0 0 34309
 S
 #1290
-The Immortal Board Hall~
-   You are standing in a large hall, exits lead off to the board rooms of the
-immortals.  You can enter the hall of builders to the north, to the south are
-the halls of justice, while to the west you can find the immortal board room.
+@WThe @BHa@Cll @Wof @BDu@Cti@Wes@n~
+A broad junction hall divides the most common staff responsibilities
+into clear paths. Builder guidance lies north, conduct and justice
+south, and the immortal commons west. Carved into the floor in
+alternating white, blue, and red stone is the staff maxim: @WKN@BOW
+@CYO@WUR @BAU@CTH@WOR@CIT@WY@n, @WVE@BRI@CFY @WYO@BUR @CTA@WRG@BET@n,
+@WSA@BVE @CON@WLY @BWH@CAT @WYO@CU @BME@CAN @CTO @WCH@BAN@CGE@n. This
+hall is intended to orient a newly appointed immortal before active work
+begins.
 ~
 12 8 0 0 0 0
 D0
+North lies the Builder's Briefing Room and its current work notices.
 ~
 ~
 0 0 1291
 D2
+South lies the Hall of Justice and Conduct.
 ~
 ~
 0 0 1293
 D3
+West lies the Immortal Commons.
 ~
 ~
 0 0 1204
 S
 #1291
-The Builders' Board Room~
-   The Builder Academy zone begins in room 3.  @RGOTO 3@n to begin your
-training or if you need a refresher.  TBA zone should be able to teach anyone,
-no matter how new, the basics of building.  The southern foyer is to the east.
+@WThe @CBu@Bil@Wde@Cr's @BBri@Wef@Cin@Wg @CRo@Bom@n~
+Maps, reset diagrams, sample room plans, and blank design slates cover
+the walls of this briefing room. The Builder Academy remains the proper
+place to learn OLC fundamentals, but this chamber explains the staff
+expectation behind those tools: inspect existing content, work inside
+assigned authority, preserve cross-zone dependencies, test changes, and
+use explicit staging when committing world data. Builders who need a
+refresher should visit the Builder Academy rather than experimenting
+blindly in a live area.
 ~
 12 8 0 0 0 0
 D1
+The briefing room opens east toward the southern staff corridor.
 ~
 ~
 0 0 34309
 S
 #1292
-The Immortals' Mortal Board Room~
-   Here the Gods have magically created an exact copy of the mortal board room.
-Any God can easily post and read messages from the mortal board room without
-being seen by any mortals.  The Immortal Board Hall is to the west.
+@WThe @CMo@Brt@Cal @WPe@Brs@Cpe@Wct@Biv@Ce@n~
+This quiet gallery is maintained to keep staff perspective anchored on
+the people who actually inhabit and play the world. Public concerns,
+recurring questions, and player-facing information can be reviewed here
+without treating mortals as abstractions. The purpose is simple:
+immortals have greater authority because they have greater
+responsibility, not because ordinary players matter less.
 ~
 12 0 0 0 0 0
 D3
+West returns to the Hall of Duties.
 ~
 ~
 0 0 1290
 S
 #1293
-The Halls Of Justice~
-   You are standing in a magnificent marble hall, the only exit is back to the
-north.  Statues of Karileena the goddess of Honor and Justice, are lining the
-walls.  You realize this is where the exalted gods meet to discuss what course of
-action to take against offenders in the realms.
+@WThe @BHa@Cll @Wof @RJu@Wst@Bic@Ce @Wand @RCo@Wnd@Buc@Ct@n~
+Pale marble columns support a solemn hall used for staff conduct reviews
+and difficult administrative decisions. Reliefs along the walls depict
+scales, an open hand, a guarded gate, and a shield turned outward in
+defense of the realm. The symbolism is intentionally civic rather than
+divine. Immortals who act here are expected to document what happened,
+separate evidence from assumption, use the least authority necessary,
+and remember that trust in the staff is part of the world they are
+responsible for protecting.
 ~
 12 8 0 0 0 0
 D2
-   A frosted glass door with huge silver hinges and silver fixtures are here
-marking the Hall of Justice with the Rune of Justice etched in the glass in the
-exact center of it.
+The closed southern door leads toward the greater immortal meeting
+complex.
 ~
 door~
 1 -1 34310
 D4
+A stair rises toward restricted upper chambers of the immortal complex.
 ~
 ~
 0 0 34399

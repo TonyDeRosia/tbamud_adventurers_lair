@@ -1,0 +1,1607 @@
+﻿"File","Line","Function","Kind","Text","EndsWithNewline","Evidence"
+"src\act.clan.c","734","clanedit_parse","CALL","save_char(ch);",,"   732: 
+   733:     /* Save if available in your codebase; harmless if you remove it later. */
+   734:     save_char(ch);
+   735:     return;
+   736:   }
+   737: 
+   738:   if (!str_cmp(arg1, ""quit"")) {"
+"src\act.clan.c","746","clanedit_parse","CALL","save_char(ch);",,"   744:     SET_CLAN_ID(ch, 0);
+   745:     SET_CLAN_RANK(ch, 0);
+   746:     save_char(ch);
+   747:     return;
+   748:   }
+   749: 
+   750:   actor_rank = GET_CLAN_RANK(ch);"
+"src\act.clan.c","791","clanedit_parse","CALL","save_char(vict);",,"   789:     SET_CLAN_ID(vict, GET_CLAN_ID(ch));
+   790:     SET_CLAN_RANK(vict, CLAN_RANK_MEMBER);
+   791:     save_char(vict);
+   792: 
+   793:     send_to_char(ch, ""You invite %s into %s.\r\n"", GET_NAME(vict), clan_display_name_by_id(GET_CLAN_ID(ch)));
+   794:     send_to_char(vict, ""%s invites you into %s.\r\n"", GET_NAME(ch), clan_display_name_by_id(GET_CLAN_ID(ch)));
+   795:     send_to_clan(GET_CLAN_ID(ch), ""A new member has joined the clan."", NULL);"
+"src\act.clan.c","862","clanedit_parse","CALL","save_char(vict);",,"   860: 
+   861:     SET_CLAN_RANK(vict, new_rank);
+   862:     save_char(vict);
+   863: 
+   864:     send_to_char(ch, ""You %s %s to clan rank %d.\r\n"",
+   865:       (delta > 0) ? ""promote"" : ""demote"", GET_NAME(vict), new_rank);
+   866:     send_to_char(vict, ""%s %ss you to clan rank %d.\r\n"","
+"src\act.clan.c","946","clan_wrap","CALL","save_char(ch);",,"   944:     SET_CLAN_ID(ch, new_id);
+   945:     SET_CLAN_RANK(ch, 10); /* leader rank for now */
+   946:     save_char(ch);
+   947: 
+   948:     send_to_char(ch, ""Clan created.\r\n"");
+   949:   }
+   950: }"
+"src\act.informative.c","2346","parse_bounty_amount","CALL","save_char(ch);",,"  2344:   SET_BOUNTY(vict, GET_BOUNTY(vict) + amount);
+  2345: 
+  2346:   save_char(ch);
+  2347:   save_char(vict);
+  2348: 
+  2349:   format_gold_as_currency(bounty_buf, sizeof(bounty_buf), amount);
+  2350: "
+"src\act.informative.c","2347","parse_bounty_amount","CALL","save_char(vict);",,"  2345: 
+  2346:   save_char(ch);
+  2347:   save_char(vict);
+  2348: 
+  2349:   format_gold_as_currency(bounty_buf, sizeof(bounty_buf), amount);
+  2350: 
+  2351:   send_to_char(ch, ""You place a bounty of %s on %s.\r\n"", bounty_buf, GET_NAME(vict));"
+"src\act.other.c","573","show_ability_filter_help","CALL","save_char(ch);",,"   571: 
+   572:   send_to_char(ch, ""Saving %s.\r\n"", GET_NAME(ch));
+   573:   save_char(ch);
+   574:   Crash_crashsave(ch);
+   575:   if (ROOM_FLAGGED(IN_ROOM(ch), ROOM_HOUSE_CRASH))
+   576:     House_crashsave(GET_ROOM_VNUM(IN_ROOM(ch)));
+   577: }"
+"src\act.other.c","1787","study_apply_cooldown","CALL","save_char(ch);",,"  1785:     set_title(ch, argument);
+  1786:     send_to_char(ch, ""Okay, you're now %s%s%s.\r\n"", GET_NAME(ch), *GET_TITLE(ch) ? "" "" : """", GET_TITLE(ch));
+  1787:     save_char(ch);
+  1788:   }
+  1789: }
+  1790: 
+  1791: static void print_group(struct char_data *ch)"
+"src\act.other.c","2201","detach_charmed_follower","CALL","save_char(ch);",,"  2199:     act(""$n calls forth $T from $s shadow storage."", FALSE, ch, NULL, display_name, TO_ROOM);
+  2200:     send_to_char(ch, ""You expend %d mana.\r\n"", mana_cost);
+  2201:     save_char(ch);
+  2202:     return;
+  2203:   }
+  2204: 
+  2205:   if (is_abbrev(shadow_subcmd, ""store"")) {"
+"src\act.other.c","2219","detach_charmed_follower","CALL","save_char(ch);",,"  2217:       send_to_char(ch, ""That shadow is not currently summoned.\r\n"");
+  2218:       SHADOW_SLOT_ACTIVE(ch, slot) = 0;
+  2219:       save_char(ch);
+  2220:       return;
+  2221:     }
+  2222:     strlcpy(display_name, shadow_slot_display_name(ch, slot), sizeof(display_name));
+  2223:     SHADOW_SLOT_ACTIVE(ch, slot) = 0;"
+"src\act.other.c","2228","detach_charmed_follower","CALL","save_char(ch);",,"  2226:     extract_char(mob);
+  2227:     send_to_char(ch, ""You return %s to your shadow storage.\r\n"", display_name);
+  2228:     save_char(ch);
+  2229:     return;
+  2230:   }
+  2231: 
+  2232:   if (is_abbrev(shadow_subcmd, ""release"")) {"
+"src\act.other.c","2269","detach_charmed_follower","CALL","save_char(ch);",,"  2267:     SHADOW_SLOT_CHA(ch, slot) = 0;
+  2268:     SHADOW_SLOT_NAME(ch, slot)[0] = '\0';
+  2269:     save_char(ch);
+  2270:     return;
+  2271:   }
+  2272: 
+  2273:   if (is_abbrev(shadow_subcmd, ""rename"")) {"
+"src\act.other.c","2302","detach_charmed_follower","CALL","save_char(ch);",,"  2300:       apply_shadow_identity_to_mob(ch, mob, slot);
+  2301:     send_to_char(ch, ""You rename the shadow to %s.\r\n"", safe_name);
+  2302:     save_char(ch);
+  2303:     return;
+  2304:   }
+  2305: 
+  2306:   send_to_char(ch, ""Usage: shadow <list|storage|summon|store|release|rename>\r\n"");"
+"src\act.wizard.c","95","","CALL","static bool save_roomtemplate_zone(struct char_data *ch, zone_rnum rznum, char *errmsg, size_t errmsg_sz);",,"    93:                                     int *ew_links, int *ns_links, int *skipped_neighbors);
+    94: static void free_areatemplate_room_strings(struct room_data *room);
+    95: static bool save_roomtemplate_zone(struct char_data *ch, zone_rnum rznum, char *errmsg, size_t errmsg_sz);
+    96: static int template_compute_level(int min_level, int max_level, int count, int index);
+    97: static char *template_alloc_printf(const char *fmt, ...);
+    98: static int mobtemplate_compute_level(int min_level, int max_level, int mob_count, int index);
+    99: static bool parse_mobtemplate_args(char *argument, mob_vnum *start_vnum_out, int *min_level_out,"
+"src\act.wizard.c","111","","CALL","static bool mobtemplate_save_affected_zones(struct char_data *ch, mob_vnum start, int mob_count,",,"   109: static bool mobtemplate_create_one(mob_vnum vnum, const char *base_name, int number, int level,
+   110:                                    char *errmsg, size_t errmsg_sz);
+   111: static bool mobtemplate_save_affected_zones(struct char_data *ch, mob_vnum start, int mob_count,
+   112:                                             char *errmsg, size_t errmsg_sz);
+   113: static bool parse_objtemplate_args(char *argument, obj_vnum *start_vnum_out, int *min_level_out,
+   114:                                    int *max_level_out, int *obj_count_out,
+   115:                                    char *base_name_out, size_t base_name_sz,"
+"src\act.wizard.c","139","","CALL","static bool objtemplate_save_affected_zones(struct char_data *ch, obj_vnum start, int obj_count,",,"   137: static bool objtemplate_create_one(obj_vnum vnum, const char *base_name, int number, int level,
+   138:                                    const char *type_name, char *errmsg, size_t errmsg_sz);
+   139: static bool objtemplate_save_affected_zones(struct char_data *ch, obj_vnum start, int obj_count,
+   140:                                             char *errmsg, size_t errmsg_sz);
+   141: 
+   142: /* Local Globals */
+   143: static struct recent_player *recent_list = NULL;  /** Global list of recent players */"
+"src\act.wizard.c","1537","do_cheat","CALL","save_char(ch);",,"  1535:   }
+  1536:   send_to_char(ch, ""Your level has been restored, for now!\r\n"");
+  1537:   save_char(ch);
+  1538: }
+  1539: 
+  1540: void return_to_char(struct char_data * ch)
+  1541: {"
+"src\act.wizard.c","1889","perform_room_reset","CALL","if (!save_zone(zone_rnum_value)) {",,"  1887: 
+  1888:   add_to_save_list(zone_table[zone_rnum_value].number, SL_ZON);
+  1889:   if (!save_zone(zone_rnum_value)) {
+  1890:     send_to_char(ch, ""Unable to save zone data.\r\n"");
+  1891:     return;
+  1892:   }
+  1893: "
+"src\act.wizard.c","1975","perform_room_reset_delete","CALL","if (!save_zone(zone_rnum_value)) {",,"  1973: 
+  1974:   add_to_save_list(zone_table[zone_rnum_value].number, SL_ZON);
+  1975:   if (!save_zone(zone_rnum_value)) {
+  1976:     send_to_char(ch, ""Unable to save zone data.\r\n"");
+  1977:     return;
+  1978:   }
+  1979: "
+"src\act.wizard.c","2517","show_room_resets","CALL","save_char(victim);",,"  2515: 
+  2516:   gain_exp_regardless(victim, level_exp(GET_CLASS(victim), newlevel) - GET_EXP(victim), GET_LEVEL(ch));
+  2517:   save_char(victim);
+  2518: }
+  2519: 
+  2520: ACMD(do_restore)
+  2521: {"
+"src\act.wizard.c","3367","list_llog_entries","CALL","save_char(vict);",,"  3365:       break;
+  3366:     }
+  3367:     save_char(vict);
+  3368:   }
+  3369: }
+  3370: 
+  3371: /* single zone printing fn used by ""show zone"" so it's not repeated in the"
+"src\act.wizard.c","4576","set_field_rejects_negative","CALL","save_char(vict);",,"  4574:   if (retval) {
+  4575:     if (!is_file && !IS_NPC(vict))
+  4576:       save_char(vict);
+  4577:     if (is_file) {
+  4578:       GET_PFILEPOS(cbuf) = player_i;
+  4579:       save_char(cbuf);
+  4580:       send_to_char(ch, ""Saved in file.\r\n"");"
+"src\act.wizard.c","4579","set_field_rejects_negative","CALL","save_char(cbuf);",,"  4577:     if (is_file) {
+  4578:       GET_PFILEPOS(cbuf) = player_i;
+  4579:       save_char(cbuf);
+  4580:       send_to_char(ch, ""Saved in file.\r\n"");
+  4581:     }
+  4582:   }
+  4583: "
+"src\act.wizard.c","4595","set_field_rejects_negative","CALL","save_all();",,"  4593:     send_to_char (ch, ""You are not holy enough to use this privelege.\n\r"");
+  4594:  else {
+  4595:     save_all();
+  4596:     House_save_all();
+  4597:     send_to_char(ch, ""World and house files saved.\n\r"");
+  4598:  }
+  4599: }"
+"src\act.wizard.c","5362","trg_checkload","CALL","save_char(och);",,"  5360:       GET_LOADROOM(och) = GET_ROOM_VNUM(IN_ROOM(och));
+  5361:       Crash_rentsave(och,0);
+  5362:       save_char(och);
+  5363:       write_to_descriptor (d->descriptor, buf);
+  5364:     }
+  5365:   }
+  5366: "
+"src\act.wizard.c","6042","change_player_name","CALL","save_player_index();",,"  6040: 
+  6041:   /* Save the changed player index - the pfile is saved by perform_set */
+  6042:   save_player_index();
+  6043: 
+  6044:   mudlog(BRF, LVL_IMMORT, TRUE, ""(GC) %s changed the name of %s to %s"", GET_NAME(ch), old_name, new_name);
+  6045: 
+  6046:   if (vict->desc)  /* Descriptor is set if the victim is logged in */"
+"src\act.wizard.c","6082","change_player_name","CALL","if (save_zone(zn)) {",,"  6080:           counter++;
+  6081:           SET_BIT_AR(ZONE_FLAGS(zn), ZONE_NOBUILD);
+  6082:           if (save_zone(zn)) {
+  6083:             log(""(GC) %s has locked zone %d"", GET_NAME(ch), zone_table[zn].number);
+  6084:           } else {
+  6085:             fail = TRUE;
+  6086:           }"
+"src\act.wizard.c","6094","change_player_name","CALL","if (save_zone(zn)) {",,"  6092:           counter++;
+  6093:           SET_BIT_AR(ZONE_FLAGS(zn), ZONE_NOBUILD);
+  6094:           if (save_zone(zn)) {
+  6095:             log(""(GC) %s has locked zone %d"", GET_NAME(ch), zone_table[zn].number);
+  6096:           } else {
+  6097:             fail = TRUE;
+  6098:           }"
+"src\act.wizard.c","6153","change_player_name","CALL","if (save_zone(zn)) {",,"  6151:   }
+  6152:   SET_BIT_AR(ZONE_FLAGS(zn), ZONE_NOBUILD);
+  6153:   if (save_zone(zn)) {
+  6154:     mudlog(NRM, MAX(LVL_GRGOD, GET_INVIS_LEV(ch)), TRUE, ""(GC) %s has locked zone %d"", GET_NAME(ch), znvnum);
+  6155:   }
+  6156:   else
+  6157:   {"
+"src\act.wizard.c","6501","free_areatemplate_room_strings","CALL","static bool save_roomtemplate_zone(struct char_data *ch, zone_rnum rznum, char *errmsg, size_t errmsg_sz)",,"  6499: }
+  6500: 
+  6501: static bool save_roomtemplate_zone(struct char_data *ch, zone_rnum rznum, char *errmsg, size_t errmsg_sz)
+  6502: {
+  6503:   add_to_save_list(zone_table[rznum].number, SL_WLD);
+  6504:   if (!save_rooms(rznum)) {
+  6505:     snprintf(errmsg, errmsg_sz, ""Room data could not be saved to disk.\r\n"");"
+"src\act.wizard.c","6504","save_roomtemplate_zone","CALL","if (!save_rooms(rznum)) {",,"  6502: {
+  6503:   add_to_save_list(zone_table[rznum].number, SL_WLD);
+  6504:   if (!save_rooms(rznum)) {
+  6505:     snprintf(errmsg, errmsg_sz, ""Room data could not be saved to disk.\r\n"");
+  6506:     return FALSE;
+  6507:   }
+  6508: "
+"src\act.wizard.c","6505","save_roomtemplate_zone","MESSAGE","Room data could not be saved to disk.\r\n","True","  6504:   if (!save_rooms(rznum)) {
+  6505:     snprintf(errmsg, errmsg_sz, ""Room data could not be saved to disk.\r\n"");
+  6506:     return FALSE;
+  6507:   }
+  6508: 
+  6509:   mudlog(CMP, MAX(LVL_BUILDER, GET_INVIS_LEV(ch)), TRUE,"
+"src\act.wizard.c","6722","mobtemplate_range_is_clear","CALL","static bool mobtemplate_save_affected_zones(struct char_data *ch, mob_vnum start, int mob_count,",,"  6720: }
+  6721: 
+  6722: static bool mobtemplate_save_affected_zones(struct char_data *ch, mob_vnum start, int mob_count,
+  6723:                                             char *errmsg, size_t errmsg_sz)
+  6724: {
+  6725:   bool *saved;
+  6726:   int i;"
+"src\act.wizard.c","6745","mobtemplate_range_is_clear","CALL","if (!save_mobiles(rznum)) {",,"  6743:       continue;
+  6744: 
+  6745:     if (!save_mobiles(rznum)) {
+  6746:       free(saved);
+  6747:       snprintf(errmsg, errmsg_sz, ""Failed saving mobile data for zone %d.\r\n"",
+  6748:                zone_table[rznum].number);
+  6749:       return FALSE;"
+"src\act.wizard.c","6854","mobtemplate_range_is_clear","CALL","if (!mobtemplate_save_affected_zones(ch, start_vnum, mob_count, errmsg, sizeof(errmsg))) {",,"  6852:   }
+  6853: 
+  6854:   if (!mobtemplate_save_affected_zones(ch, start_vnum, mob_count, errmsg, sizeof(errmsg))) {
+  6855:     send_to_char(ch, ""%s"", errmsg);
+  6856:     return;
+  6857:   }
+  6858: "
+"src\act.wizard.c","7187","mobtemplate_range_is_clear","CALL","if (!save_rooms(new_zone_rnum)) {",,"  7185:   add_to_save_list(zone_table[new_zone_rnum].number, SL_ZON);
+  7186: 
+  7187:   if (!save_rooms(new_zone_rnum)) {
+  7188:     send_to_char(ch, ""Room data could not be saved to disk.\r\n"");
+  7189:     return;
+  7190:   }
+  7191:   if (!save_zone(new_zone_rnum)) {"
+"src\act.wizard.c","7188","mobtemplate_range_is_clear","MESSAGE","Room data could not be saved to disk.\r\n","True","  7187:   if (!save_rooms(new_zone_rnum)) {
+  7188:     send_to_char(ch, ""Room data could not be saved to disk.\r\n"");
+  7189:     return;
+  7190:   }
+  7191:   if (!save_zone(new_zone_rnum)) {
+  7192:     send_to_char(ch, ""Zone data could not be saved to disk.\r\n"");"
+"src\act.wizard.c","7191","mobtemplate_range_is_clear","CALL","if (!save_zone(new_zone_rnum)) {",,"  7189:     return;
+  7190:   }
+  7191:   if (!save_zone(new_zone_rnum)) {
+  7192:     send_to_char(ch, ""Zone data could not be saved to disk.\r\n"");
+  7193:     return;
+  7194:   }
+  7195: "
+"src\act.wizard.c","7192","mobtemplate_range_is_clear","MESSAGE","Zone data could not be saved to disk.\r\n","True","  7191:   if (!save_zone(new_zone_rnum)) {
+  7192:     send_to_char(ch, ""Zone data could not be saved to disk.\r\n"");
+  7193:     return;
+  7194:   }
+  7195: 
+  7196:   send_to_char(ch,"
+"src\act.wizard.c","7280","mobtemplate_range_is_clear","CALL","if (!save_roomtemplate_zone(ch, owning_zone, errmsg, sizeof(errmsg))) {",,"  7278:   link_areatemplate_rooms(start_room_vnum, room_count, width,
+  7279:                           &ew_links, &ns_links, &skipped_neighbors);
+  7280:   if (!save_roomtemplate_zone(ch, owning_zone, errmsg, sizeof(errmsg))) {
+  7281:     send_to_char(ch, ""%s"", errmsg);
+  7282:     return;
+  7283:   }
+  7284: "
+"src\act.wizard.c","7522","objtemplate_apply_defaults","CALL","static bool objtemplate_save_affected_zones(struct char_data *ch, obj_vnum start, int obj_count,",,"  7520: }
+  7521: 
+  7522: static bool objtemplate_save_affected_zones(struct char_data *ch, obj_vnum start, int obj_count,
+  7523:                                             char *errmsg, size_t errmsg_sz)
+  7524: {
+  7525:   bool *saved;
+  7526:   int i;"
+"src\act.wizard.c","7542","objtemplate_apply_defaults","CALL","if (!save_objects(rznum)) {",,"  7540:     if (saved[rznum])
+  7541:       continue;
+  7542:     if (!save_objects(rznum)) {
+  7543:       free(saved);
+  7544:       snprintf(errmsg, errmsg_sz, ""Failed saving object data for zone %d.\r\n"", zone_table[rznum].number);
+  7545:       return FALSE;
+  7546:     }"
+"src\act.wizard.c","7646","objtemplate_apply_defaults","CALL","if (!objtemplate_save_affected_zones(ch, start_vnum, obj_count, errmsg, sizeof(errmsg))) {",,"  7644:   }
+  7645: 
+  7646:   if (!objtemplate_save_affected_zones(ch, start_vnum, obj_count, errmsg, sizeof(errmsg))) {
+  7647:     send_to_char(ch, ""%s"", errmsg);
+  7648:     return;
+  7649:   }
+  7650: "
+"src\act.wizard.c","7692","objtemplate_apply_defaults","CALL","if (save_zone(zn)) {",,"  7690:         counter++;
+  7691:         REMOVE_BIT_AR(ZONE_FLAGS(zn), ZONE_NOBUILD);
+  7692:         if (save_zone(zn)) {
+  7693:           log(""(GC) %s has unlocked zone %d"", GET_NAME(ch), zone_table[zn].number);
+  7694:         } else {
+  7695:           fail = TRUE;
+  7696:         }"
+"src\act.wizard.c","7750","objtemplate_apply_defaults","CALL","if (save_zone(zn)) {",,"  7748:   }
+  7749:   REMOVE_BIT_AR(ZONE_FLAGS(zn), ZONE_NOBUILD);
+  7750:   if (save_zone(zn)) {
+  7751:     mudlog(NRM, MAX(LVL_GRGOD, GET_INVIS_LEV(ch)), TRUE, ""(GC) %s has unlocked zone %d"", GET_NAME(ch), znvnum);
+  7752:   }
+  7753:   else
+  7754:   {"
+"src\act.wizard.c","8069","perform_push","CALL","if (!save_char(vict)) {",,"  8067: 
+  8068:   GET_LOADROOM(vict) = GET_ROOM_VNUM(IN_ROOM(vict));
+  8069:   if (!save_char(vict)) {
+  8070:     send_to_char(ch, ""Unable to save that player; push aborted.\r\n"");
+  8071:     return;
+  8072:   }
+  8073:   Crash_rentsave(vict, 0); /* Persist and detach equipment/inventory before extraction. */"
+"src\aedit.c","26","","CALL","static void aedit_save_to_disk(struct descriptor_data *d);",,"    24: static int aedit_find_command(const char *txt);
+    25: static void aedit_disp_menu(struct descriptor_data * d);
+    26: static void aedit_save_to_disk(struct descriptor_data *d);
+    27: /* used in aedit parse */
+    28: static void aedit_setup_new(struct descriptor_data *d);
+    29: static void aedit_setup_existing(struct descriptor_data *d, int real_num);
+    30: static void aedit_save_internally(struct descriptor_data *d);"
+"src\aedit.c","73","","CALL","aedit_save_to_disk(d);",,"    71:     mudlog(CMP, MAX(LVL_BUILDER, GET_INVIS_LEV(ch)), TRUE, ""OLC: %s saves socials."", GET_NAME(ch));
+    72:     send_to_char(ch, ""Writing social file.\r\n"");
+    73:     aedit_save_to_disk(d);
+    74:     send_to_char(ch, ""Done.\r\n"");
+    75:     return;
+    76:   }
+    77: "
+"src\aedit.c","200","aedit_save_internally","CALL","aedit_save_to_disk(d); /* autosave by Rumble */",,"   198: 
+   199:    add_to_save_list(AEDIT_PERMISSION, SL_ACT);
+   200:    aedit_save_to_disk(d); /* autosave by Rumble */
+   201: }
+   202: 
+   203: static void aedit_save_to_disk(struct descriptor_data *d) {
+   204:    FILE *fp;"
+"src\aedit.c","203","aedit_save_to_disk","CALL","static void aedit_save_to_disk(struct descriptor_data *d) {",,"   201: }
+   202: 
+   203: static void aedit_save_to_disk(struct descriptor_data *d) {
+   204:    FILE *fp;
+   205:    int i;
+   206:    char buf[MAX_STRING_LENGTH];
+   207:    if (!(fp = fopen(SOCMESS_FILE_NEW, ""w+"")))  {"
+"src\aedit.c","338","aedit_parse","MESSAGE","Action saved to disk.\r\n","True","   337:          cleanup_olc(d, CLEANUP_STRUCTS);
+   338:          write_to_output(d, ""Action saved to disk.\r\n"");
+   339:          break;
+   340:        case 'n': case 'N':
+   341:          /* free everything up, including strings etc */
+   342:          cleanup_olc(d, CLEANUP_ALL);"
+"src\aedit.c","345","aedit_parse","MESSAGE","Invalid choice!\r\nDo you wish to save your changes? : ","False","   344:        default:
+   345:          write_to_output(d, ""Invalid choice!\r\n""
+   346:                             ""Do you wish to save your changes? : "");
+   347:          break;
+   348:       }
+   349:       return; /* end of AEDIT_CONFIRM_SAVESTRING */"
+"src\aedit.c","407","aedit_parse","MESSAGE","Do you wish to save your changes? : ","False","   406:          if (OLC_VAL(d))  { /* Something was modified */
+   407:             write_to_output(d, ""Do you wish to save your changes? : "");
+   408:             OLC_MODE(d) = AEDIT_CONFIRM_SAVESTRING;
+   409:          }
+   410:          else cleanup_olc(d, CLEANUP_ALL);
+   411:          break;"
+"src\cedit.c","72","","CALL","cedit_save_to_disk();",,"    70:     ""OLC: %s saves the game configuration."", GET_NAME(ch));
+    71: 
+    72:   cedit_save_to_disk();
+    73: }
+    74: 
+    75: static void cedit_setup(struct descriptor_data *d)
+    76: {"
+"src\cedit.c","311","cedit_save_internally","CALL","void cedit_save_to_disk( void )",,"   309: }
+   310: 
+   311: void cedit_save_to_disk( void )
+   312: {
+   313:   /* Just call save_config and get it over with. */
+   314:   save_config( NOWHERE );
+   315: }"
+"src\cedit.c","314","cedit_save_to_disk","CALL","save_config( NOWHERE );",,"   312: {
+   313:   /* Just call save_config and get it over with. */
+   314:   save_config( NOWHERE );
+   315: }
+   316: 
+   317: int save_config( IDXTYPE nowhere )
+   318: {"
+"src\cedit.c","317","cedit_save_to_disk","CALL","int save_config( IDXTYPE nowhere )",,"   315: }
+   316: 
+   317: int save_config( IDXTYPE nowhere )
+   318: {
+   319:   FILE *fl;
+   320:   char buf[MAX_STRING_LENGTH];
+   321: "
+"src\cedit.c","822","cedit_parse","CALL","cedit_save_to_disk();",,"   820:           cleanup_olc(d, CLEANUP_CONFIG);
+   821: 	  if (CONFIG_AUTO_SAVE) {
+   822: 	    cedit_save_to_disk();
+   823: 	    write_to_output(d, ""Game configuration saved to disk.\r\n"");
+   824: 	  } else
+   825:             write_to_output(d, ""Game configuration saved to memory.\r\n"");
+   826:           return;"
+"src\cedit.c","823","cedit_parse","MESSAGE","Game configuration saved to disk.\r\n","True","   822: 	    cedit_save_to_disk();
+   823: 	    write_to_output(d, ""Game configuration saved to disk.\r\n"");
+   824: 	  } else
+   825:             write_to_output(d, ""Game configuration saved to memory.\r\n"");
+   826:           return;
+   827:         case 'n':"
+"src\cedit.c","834","cedit_parse","MESSAGE","Do you wish to save your changes? : ","False","   833:           write_to_output(d, ""\r\nThat is an invalid choice!\r\n"");
+   834:           write_to_output(d, ""Do you wish to save your changes? : "");
+   835:           return;
+   836:       }
+   837: 
+   838:     case CEDIT_MAIN_MENU:"
+"src\cedit.c","872","cedit_parse","MESSAGE","Do you wish to save your changes? : ","False","   871:         case 'Q':
+   872:           write_to_output(d, ""Do you wish to save your changes? : "");
+   873:           OLC_MODE(d) = CEDIT_CONFIRM_SAVESTRING;
+   874:           break;
+   875: 
+   876:         default:"
+"src\comm.c","546","init_game","CALL","save_all();",,"   544: 
+   545:   if (circle_reboot != 2)
+   546:     save_all();
+   547: 
+   548:   log(""Saving current MUD time."");
+   549:   save_mud_time(&time_info);
+   550: "
+"src\comm.c","549","init_game","CALL","save_mud_time(&time_info);",,"   547: 
+   548:   log(""Saving current MUD time."");
+   549:   save_mud_time(&time_info);
+   550: 
+   551:   if (circle_reboot) {
+   552:     log(""Rebooting."");
+   553:     exit(52);			/* what's so great about HHGTTG, anyhow? */"
+"src\comm.c","1033","heartbeat","CALL","save_mud_time(&time_info);",,"  1031: 
+  1032:   if (!(heart_pulse % PULSE_TIMESAVE))
+  1033:   save_mud_time(&time_info);
+  1034: 
+  1035:   /* Every pulse! Don't want them to stink the place up... */
+  1036:   extract_pending_chars();
+  1037: }"
+"src\comm.c","1976","close_socket","CALL","save_char(link_challenged);",,"  1974:       /* We are guaranteed to have a person. */
+  1975:       act(""$n has lost $s link."", TRUE, link_challenged, 0, 0, TO_ROOM);
+  1976:       save_char(link_challenged);
+  1977:       mudlog(NRM, MAX(LVL_IMMORT, GET_INVIS_LEV(link_challenged)), TRUE, ""Closing link to: %s."", GET_NAME(link_challenged));
+  1978:     } else {
+  1979:       mudlog(CMP, LVL_IMMORT, TRUE, ""Losing player: %s."", GET_NAME(d->character) ? GET_NAME(d->character) : ""<null>"");
+  1980:       free_char(d->character);"
+"src\db.c","491","boot_world","CALL","save_all();",,"   489:   if(converting) {
+   490:     log(""Saving 128bit world files to disk."");
+   491:     save_all();
+   492:   }
+   493: 
+   494:   if (!no_specials) {
+   495:     log(""Loading shops."");"
+"src\db.c","916","reset_time","CALL","void save_mud_time(struct time_info_data *when)",,"   914: 
+   915: /* Write the time in 'when' to the MUD-time file. */
+   916: void save_mud_time(struct time_info_data *when)
+   917: {
+   918:   FILE *bgtime;
+   919: 
+   920:   if ((bgtime = fopen(TIME_FILE, ""w"")) == NULL)"
+"src\db.h","258","","CALL","void  save_mud_time(struct time_info_data *when);",,"   256: long  get_id_by_name(const char *name);
+   257: char  *get_name_by_id(long id);
+   258: void  save_mud_time(struct time_info_data *when);
+   259: void  free_text_files(void);
+   260: void  free_help_table(void);
+   261: void  free_player_index(void);
+   262: void  load_help(FILE *fl, char *name);"
+"src\db.h","281","","CALL","obj_save_data *objsave_parse_objects(FILE *fl);",,"   279: void update_obj_file(void);
+   280: void Crash_rentsave(struct char_data *ch, int cost);
+   281: obj_save_data *objsave_parse_objects(FILE *fl);
+   282: int objsave_save_obj_record(struct obj_data *obj, FILE *fl, int location);
+   283: /* Special functions */
+   284: SPECIAL(receptionist);
+   285: /* Functions from players.c */"
+"src\db.h","282","","CALL","int objsave_save_obj_record(struct obj_data *obj, FILE *fl, int location);",,"   280: void Crash_rentsave(struct char_data *ch, int cost);
+   281: obj_save_data *objsave_parse_objects(FILE *fl);
+   282: int objsave_save_obj_record(struct obj_data *obj, FILE *fl, int location);
+   283: /* Special functions */
+   284: SPECIAL(receptionist);
+   285: /* Functions from players.c */
+   286: void   tag_argument(char *argument, char *tag, size_t taglen);"
+"src\db.h","288","","CALL","int    save_char(struct char_data *ch);",,"   286: void   tag_argument(char *argument, char *tag, size_t taglen);
+   287: int    load_char(const char *name, struct char_data *ch);
+   288: int    save_char(struct char_data *ch);
+   289: void   init_char(struct char_data *ch);
+   290: struct char_data* create_char(void);
+   291: struct char_data *read_mobile(mob_vnum nr, int type);
+   292: void apply_mob_loadout_after_placement(struct char_data *mob);"
+"src\db.h","297","","CALL","int    save_player_index(void);",,"   295: void   reset_char(struct char_data *ch);
+   296: void   free_char(struct char_data *ch);
+   297: int    save_player_index(void);
+   298: long   get_ptable_by_name(const char *name);
+   299: void   remove_player(int pfilepos);
+   300: void   clean_pfiles(void);
+   301: void   build_player_index(void);"
+"src\dg_olc.c","118","","CALL","void script_save_to_disk(FILE *fp, void *item, int type)",,"   116: /* Called when a mob or object is being saved to disk, so its script can be 
+   117:  * saved. */
+   118: void script_save_to_disk(FILE *fp, void *item, int type)
+   119: {
+   120:   struct trig_proto_list *t;
+   121: 
+   122:   if (type==MOB_TRIGGER)"
+"src\dg_olc.c","129","script_save_to_disk","CALL","log(""SYSERR: Invalid type passed to script_save_to_disk()"");",,"   127:     t = ((struct room_data *)item)->proto_script;
+   128:   else {
+   129:     log(""SYSERR: Invalid type passed to script_save_to_disk()"");
+   130:     return;
+   131:   }
+   132: 
+   133:   while (t)"
+"src\dg_olc.c","530","trigedit_parse","MESSAGE","Do you wish to save your changes? : ","False","   529:            }
+   530:            write_to_output(d, ""Do you wish to save your changes? : "");
+   531:            OLC_MODE(d) = TRIGEDIT_CONFIRM_SAVESTRING;
+   532:          } else
+   533:            cleanup_olc(d, CLEANUP_ALL);
+   534:          return;"
+"src\dg_olc.c","608","trigedit_parse","MESSAGE","Do you wish to save your changes? : ","False","   607:           write_to_output(d, ""Invalid choice!\r\n"");
+   608:           write_to_output(d, ""Do you wish to save your changes? : "");
+   609:           return;
+   610:       }
+   611:       break;
+   612: "
+"src\dg_olc.c","936","trigedit_save","MESSAGE","Trigger saved to disk.\r\n","True","   935: 
+   936:   write_to_output(d, ""Trigger saved to disk.\r\n"");
+   937:   trigedit_create_index(zone, ""trg"");
+   938: }
+   939: 
+   940: static void trigedit_create_index(int znum, char *type)"
+"src\dg_olc.h","50","","CALL","void script_save_to_disk(FILE *fp, void *item, int type);",,"    48: 
+    49: /* prototype exported functions from dg_olc.c */
+    50: void script_save_to_disk(FILE *fp, void *item, int type);
+    51: void dg_olc_script_copy(struct descriptor_data *d);
+    52: void dg_script_menu(struct descriptor_data *d);
+    53: int dg_script_edit_parse(struct descriptor_data *d, char *arg);
+    54: "
+"src\dg_scripts.c","2882","read_saved_vars","CALL","void save_char_vars(struct char_data *ch)",,"  2880: 
+  2881: /* save a characters variables out to disk */
+  2882: void save_char_vars(struct char_data *ch)
+  2883: {
+  2884:   FILE *file;
+  2885:   char fn[127];
+  2886:   struct trig_var_data *vars;"
+"src\dg_scripts.c","2956","read_saved_vars_ascii","CALL","void save_char_vars_ascii(FILE *file, struct char_data *ch)",,"  2954: 
+  2955: /* save a characters variables out to an ASCII pfile */
+  2956: void save_char_vars_ascii(FILE *file, struct char_data *ch)
+  2957: {
+  2958:   struct trig_var_data *vars;
+  2959:   int count = 0;
+  2960:   /* Immediate return if no script (and therefore no variables) structure has "
+"src\dg_scripts.h","305","","CALL","void save_char_vars_ascii(FILE *file, struct char_data *ch);",,"   303: bool check_flags_by_name_ar(int *array, int numflags, char *search, const char *namelist[]);
+   304: void read_saved_vars_ascii(FILE *file, struct char_data *ch, int count);
+   305: void save_char_vars_ascii(FILE *file, struct char_data *ch);
+   306: int perform_set_dg_var(struct char_data *ch, struct char_data *vict, char *val_arg);
+   307: int trig_is_attached(struct script_data *sc, int trig_num);
+   308: 
+   309: /* To maintain strict-aliasing we'll have to do this trick with a union */"
+"src\dg_scripts.h","316","","CALL","void save_char_vars(struct char_data *ch);",,"   314:                  int type, char *cmd);
+   315: void read_saved_vars(struct char_data *ch);
+   316: void save_char_vars(struct char_data *ch);
+   317: void init_lookup_table(void);
+   318: void add_to_lookup_table(long uid, void *c);
+   319: void remove_from_lookup_table(long uid);
+   320: "
+"src\fight.c","368","return_extracted_shadow_to_storage","CALL","save_char(owner);",,"   366:   prepare_shadow_servant_for_removal(mob);
+   367:   extract_char(mob);
+   368:   save_char(owner);
+   369:   return TRUE;
+   370: }
+   371: 
+   372: static const char *severity_verb_third(int tier)"
+"src\fight.c","1112","die","CALL","save_char(ch);",,"  1110:     SET_BOUNTY(ch, 0);
+  1111:     increase_money_gold(killer, reward);
+  1112:     save_char(ch);
+  1113:     save_char(killer);
+  1114:     send_to_char(killer, ""You claim %s for the bounty on %s.\r\n"", reward_buf, GET_NAME(ch));
+  1115:   }
+  1116:     /* Death penalty: lose 1-10% of TNL on a level-based curve. */"
+"src\fight.c","1113","die","CALL","save_char(killer);",,"  1111:     increase_money_gold(killer, reward);
+  1112:     save_char(ch);
+  1113:     save_char(killer);
+  1114:     send_to_char(killer, ""You claim %s for the bounty on %s.\r\n"", reward_buf, GET_NAME(ch));
+  1115:   }
+  1116:     /* Death penalty: lose 1-10% of TNL on a level-based curve. */
+  1117:   if (!IS_NPC(ch) && GET_LEVEL(ch) < LVL_IMMORT) {"
+"src\fight.c","2629","process_round_effects","CALL","save_char(owner);",,"  2627:             SHADOW_SLOT_OCCUPIED(owner, slot)) {
+  2628:           SHADOW_SLOT_ACTIVE(owner, slot) = 0;
+  2629:           save_char(owner);
+  2630:         }
+  2631:         act(""$n flickers and vanishes as the summoning fades."", FALSE, i, 0, 0, TO_ROOM);
+  2632:         prepare_shadow_servant_for_removal(i);
+  2633:         extract_char(i);"
+"src\genmob.c","193","delete_mobile","CALL","save_mobiles(real_zone_by_thing(vnum));",,"   191:       SHOP_KEEPER(counter) -= (SHOP_KEEPER(counter) >= refpt);
+   192: 
+   193:   save_mobiles(real_zone_by_thing(vnum));
+   194: 
+   195:   return refpt;
+   196: }
+   197: "
+"src\genmob.c","283","free_mobile","CALL","int save_mobiles(zone_rnum rznum)",,"   281: }
+   282: 
+   283: int save_mobiles(zone_rnum rznum)
+   284: {
+   285:   zone_vnum vznum;
+   286:   FILE *mobfd;
+   287:   room_vnum i;"
+"src\genmob.c","435","write_mobile_record","CALL","script_save_to_disk(fd, mob, MOB_TRIGGER);",,"   433:       log(""SYSERR: GenOLC: Error writing E-specs for mobile #%d."", mvnum);
+   434:   
+   435:     script_save_to_disk(fd, mob, MOB_TRIGGER);
+   436:   
+   437:   
+   438:   #if CONFIG_GENOLC_MOBPROG
+   439:     if (write_mobile_mobprog(mvnum, mob, fd) < 0)"
+"src\genmob.h","21","","CALL","int save_mobiles(zone_rnum rznum);",,"    19: int free_mob_strings(struct char_data *);
+    20: int free_mobile(struct char_data *mob);
+    21: int save_mobiles(zone_rnum rznum);
+    22: int update_mobile_strings(struct char_data *t, struct char_data *f);
+    23: void check_mobile_strings(struct char_data *mob);
+    24: void check_mobile_string(mob_vnum i, char **string, const char *desc);
+    25: int write_mobile_record(mob_vnum mvnum, struct char_data *mob, FILE *fd);"
+"src\genobj.c","179","index_object","CALL","int save_objects(zone_rnum zone_num)",,"   177: }
+   178: 
+   179: int save_objects(zone_rnum zone_num)
+   180: {
+   181:   char filename[128], buf[MAX_STRING_LENGTH], buf2[MAX_STRING_LENGTH];
+   182:   char ebuf1[MAX_STRING_LENGTH], ebuf2[MAX_STRING_LENGTH], ebuf3[MAX_STRING_LENGTH], ebuf4[MAX_STRING_LENGTH];
+   183:   char wbuf1[MAX_STRING_LENGTH], wbuf2[MAX_STRING_LENGTH], wbuf3[MAX_STRING_LENGTH], wbuf4[MAX_STRING_LENGTH];"
+"src\genobj.c","264","save_objects","CALL","script_save_to_disk(fp, obj, OBJ_TRIGGER);",,"   262: 
+   263:       /* Do we have script(s) attached? */
+   264:       script_save_to_disk(fp, obj, OBJ_TRIGGER);
+   265: 
+   266:       /* Do we have extra descriptions? */
+   267:       if (obj->ex_description) {	/* Yes, save them too. */
+   268: 	for (ex_desc = obj->ex_description; ex_desc; ex_desc = ex_desc->next) {"
+"src\genobj.c","485","delete_object","CALL","save_objects(zrnum);",,"   483:   }
+   484: 
+   485:   save_objects(zrnum);
+   486: 
+   487:   return rnum;
+   488: }
+   489: "
+"src\genolc.c","57","","CALL","static int export_save_shops(zone_rnum zrnum);",,"    55: /* Local (file scope) functions */
+    56: /* Zone export functions */
+    57: static int export_save_shops(zone_rnum zrnum);
+    58: static int export_save_mobiles(zone_rnum rznum);
+    59: static int export_save_zone(zone_rnum zrnum);
+    60: static int export_save_objects(zone_rnum zrnum);
+    61: static int export_save_rooms(zone_rnum zrnum);"
+"src\genolc.c","58","","CALL","static int export_save_mobiles(zone_rnum rznum);",,"    56: /* Zone export functions */
+    57: static int export_save_shops(zone_rnum zrnum);
+    58: static int export_save_mobiles(zone_rnum rznum);
+    59: static int export_save_zone(zone_rnum zrnum);
+    60: static int export_save_objects(zone_rnum zrnum);
+    61: static int export_save_rooms(zone_rnum zrnum);
+    62: static int export_save_triggers(zone_rnum zrnum);"
+"src\genolc.c","59","","CALL","static int export_save_zone(zone_rnum zrnum);",,"    57: static int export_save_shops(zone_rnum zrnum);
+    58: static int export_save_mobiles(zone_rnum rznum);
+    59: static int export_save_zone(zone_rnum zrnum);
+    60: static int export_save_objects(zone_rnum zrnum);
+    61: static int export_save_rooms(zone_rnum zrnum);
+    62: static int export_save_triggers(zone_rnum zrnum);
+    63: static int export_mobile_record(mob_vnum mvnum, struct char_data *mob, FILE *fd);"
+"src\genolc.c","60","","CALL","static int export_save_objects(zone_rnum zrnum);",,"    58: static int export_save_mobiles(zone_rnum rznum);
+    59: static int export_save_zone(zone_rnum zrnum);
+    60: static int export_save_objects(zone_rnum zrnum);
+    61: static int export_save_rooms(zone_rnum zrnum);
+    62: static int export_save_triggers(zone_rnum zrnum);
+    63: static int export_mobile_record(mob_vnum mvnum, struct char_data *mob, FILE *fd);
+    64: static void export_script_save_to_disk(FILE *fp, void *item, int type);"
+"src\genolc.c","61","","CALL","static int export_save_rooms(zone_rnum zrnum);",,"    59: static int export_save_zone(zone_rnum zrnum);
+    60: static int export_save_objects(zone_rnum zrnum);
+    61: static int export_save_rooms(zone_rnum zrnum);
+    62: static int export_save_triggers(zone_rnum zrnum);
+    63: static int export_mobile_record(mob_vnum mvnum, struct char_data *mob, FILE *fd);
+    64: static void export_script_save_to_disk(FILE *fp, void *item, int type);
+    65: static int export_info_file(zone_rnum zrnum);"
+"src\genolc.c","62","","CALL","static int export_save_triggers(zone_rnum zrnum);",,"    60: static int export_save_objects(zone_rnum zrnum);
+    61: static int export_save_rooms(zone_rnum zrnum);
+    62: static int export_save_triggers(zone_rnum zrnum);
+    63: static int export_mobile_record(mob_vnum mvnum, struct char_data *mob, FILE *fd);
+    64: static void export_script_save_to_disk(FILE *fp, void *item, int type);
+    65: static int export_info_file(zone_rnum zrnum);
+    66: "
+"src\genolc.c","64","","CALL","static void export_script_save_to_disk(FILE *fp, void *item, int type);",,"    62: static int export_save_triggers(zone_rnum zrnum);
+    63: static int export_mobile_record(mob_vnum mvnum, struct char_data *mob, FILE *fd);
+    64: static void export_script_save_to_disk(FILE *fp, void *item, int type);
+    65: static int export_info_file(zone_rnum zrnum);
+    66: 
+    67: int genolc_checkstring(struct descriptor_data *d, char *arg)
+    68: {"
+"src\genolc.c","96","genolc_checkstring","CALL","int save_all(void)",,"    94: 
+    95: /* Original use: to be called at shutdown time. */
+    96: int save_all(void)
+    97: {
+    98:   while (save_list) {
+    99:     if (save_list->type < 0 || save_list->type > SL_MAX) {
+   100:       switch (save_list->type) {"
+"src\genolc.c","355","fix_filename","CALL","if (!(success = export_save_shops(zrnum)))",,"   353:   if (!(success = export_info_file(zrnum))) 
+   354:     send_to_char(ch, ""Info file not saved!\r\n""); 
+   355:   if (!(success = export_save_shops(zrnum))) 
+   356:     send_to_char(ch, ""Shops not saved!\r\n""); 
+   357:   if (!(success = export_save_mobiles(zrnum))) 
+   358:     send_to_char(ch, ""Mobiles not saved!\r\n""); 
+   359:   if (!(success = export_save_objects(zrnum))) "
+"src\genolc.c","357","fix_filename","CALL","if (!(success = export_save_mobiles(zrnum)))",,"   355:   if (!(success = export_save_shops(zrnum))) 
+   356:     send_to_char(ch, ""Shops not saved!\r\n""); 
+   357:   if (!(success = export_save_mobiles(zrnum))) 
+   358:     send_to_char(ch, ""Mobiles not saved!\r\n""); 
+   359:   if (!(success = export_save_objects(zrnum))) 
+   360:     send_to_char(ch, ""Objects not saved!\r\n""); 
+   361:   if (!(success = export_save_zone(zrnum))) "
+"src\genolc.c","359","fix_filename","CALL","if (!(success = export_save_objects(zrnum)))",,"   357:   if (!(success = export_save_mobiles(zrnum))) 
+   358:     send_to_char(ch, ""Mobiles not saved!\r\n""); 
+   359:   if (!(success = export_save_objects(zrnum))) 
+   360:     send_to_char(ch, ""Objects not saved!\r\n""); 
+   361:   if (!(success = export_save_zone(zrnum))) 
+   362:     send_to_char(ch, ""Zone info not saved!\r\n""); 
+   363:   if (!(success = export_save_rooms(zrnum))) "
+"src\genolc.c","361","fix_filename","CALL","if (!(success = export_save_zone(zrnum)))",,"   359:   if (!(success = export_save_objects(zrnum))) 
+   360:     send_to_char(ch, ""Objects not saved!\r\n""); 
+   361:   if (!(success = export_save_zone(zrnum))) 
+   362:     send_to_char(ch, ""Zone info not saved!\r\n""); 
+   363:   if (!(success = export_save_rooms(zrnum))) 
+   364:     send_to_char(ch, ""Rooms not saved!\r\n""); 
+   365:   if (!(success = export_save_triggers(zrnum))) "
+"src\genolc.c","363","fix_filename","CALL","if (!(success = export_save_rooms(zrnum)))",,"   361:   if (!(success = export_save_zone(zrnum))) 
+   362:     send_to_char(ch, ""Zone info not saved!\r\n""); 
+   363:   if (!(success = export_save_rooms(zrnum))) 
+   364:     send_to_char(ch, ""Rooms not saved!\r\n""); 
+   365:   if (!(success = export_save_triggers(zrnum))) 
+   366:     send_to_char(ch, ""Triggers not saved!\r\n""); 
+   367: "
+"src\genolc.c","365","fix_filename","CALL","if (!(success = export_save_triggers(zrnum)))",,"   363:   if (!(success = export_save_rooms(zrnum))) 
+   364:     send_to_char(ch, ""Rooms not saved!\r\n""); 
+   365:   if (!(success = export_save_triggers(zrnum))) 
+   366:     send_to_char(ch, ""Triggers not saved!\r\n""); 
+   367: 
+   368:   /* If anything went wrong, don't try to tar the files. */ 
+   369:   if (success) { "
+"src\genolc.c","479","export_info_file","CALL","static int export_save_shops(zone_rnum zrnum)",,"   477: }
+   478: 
+   479: static int export_save_shops(zone_rnum zrnum)
+   480: {
+   481:   int i, j, rshop;
+   482:   FILE *shop_file;
+   483:   struct shop_data *shop;"
+"src\genolc.c","569","export_save_shops","CALL","static int export_save_mobiles(zone_rnum rznum)",,"   567: }
+   568: 
+   569: static int export_save_mobiles(zone_rnum rznum)
+   570: {
+   571:   FILE *mob_file;
+   572:   mob_vnum i;
+   573:   mob_rnum rmob;"
+"src\genolc.c","636","export_mobile_record","CALL","export_script_save_to_disk(fd, mob, MOB_TRIGGER);",,"   634:     log(""SYSERR: GenOLC: Error writing E-specs for mobile #%d."", mvnum);
+   635: 
+   636:   export_script_save_to_disk(fd, mob, MOB_TRIGGER);
+   637: 
+   638:   return TRUE;
+   639: }
+   640: "
+"src\genolc.c","641","export_mobile_record","CALL","static int export_save_zone(zone_rnum zrnum)",,"   639: }
+   640: 
+   641: static int export_save_zone(zone_rnum zrnum)
+   642: {
+   643:   int subcmd;
+   644:   FILE *zone_file;
+   645: "
+"src\genolc.c","758","export_save_zone","CALL","mudlog(BRF, LVL_BUILDER, TRUE, ""SYSERR: export_save_zone(): Unknown cmd '%c' - NOT saving"", ZCMD(zrnum, subcmd).command);",,"   756:       continue;
+   757:     default:
+   758:       mudlog(BRF, LVL_BUILDER, TRUE, ""SYSERR: export_save_zone(): Unknown cmd '%c' - NOT saving"", ZCMD(zrnum, subcmd).command);
+   759:       continue;
+   760:     }
+   761:   }
+   762:   fputs(""S\n$\n"", zone_file);"
+"src\genolc.c","768","export_save_zone","CALL","static int export_save_objects(zone_rnum zrnum)",,"   766: }
+   767: 
+   768: static int export_save_objects(zone_rnum zrnum)
+   769: {
+   770:   char buf[MAX_STRING_LENGTH];
+   771:   char ebuf1[MAX_STRING_LENGTH], ebuf2[MAX_STRING_LENGTH], ebuf3[MAX_STRING_LENGTH], ebuf4[MAX_STRING_LENGTH];
+   772:   char wbuf1[MAX_STRING_LENGTH], wbuf2[MAX_STRING_LENGTH], wbuf3[MAX_STRING_LENGTH], wbuf4[MAX_STRING_LENGTH];"
+"src\genolc.c","845","export_save_objects","CALL","export_script_save_to_disk(obj_file, obj, OBJ_TRIGGER);",,"   843: 
+   844:       /* Do we have script(s) attached? */
+   845:       export_script_save_to_disk(obj_file, obj, OBJ_TRIGGER);
+   846: 
+   847:       /* Do we have extra descriptions? */
+   848:       if (obj->ex_description) {	/* Yes, save them too. */
+   849: 	for (ex_desc = obj->ex_description; ex_desc; ex_desc = ex_desc->next) {"
+"src\genolc.c","879","export_save_objects","CALL","static int export_save_rooms(zone_rnum zrnum)",,"   877: }
+   878: 
+   879: static int export_save_rooms(zone_rnum zrnum)
+   880: {
+   881:   int i;
+   882:   struct room_data *room;
+   883:   FILE *room_file;"
+"src\genolc.c","984","export_save_rooms","CALL","export_script_save_to_disk(room_file, room, WLD_TRIGGER);",,"   982:       }
+   983:       fprintf(room_file, ""S\n"");
+   984:       export_script_save_to_disk(room_file, room, WLD_TRIGGER);
+   985:     }
+   986:   }
+   987: 
+   988:   /* Write the final line and close it. */"
+"src\genolc.c","995","export_save_rooms","CALL","static void export_script_save_to_disk(FILE *fp, void *item, int type)",,"   993: }
+   994: 
+   995: static void export_script_save_to_disk(FILE *fp, void *item, int type)
+   996: {
+   997:   struct trig_proto_list *t;
+   998: 
+   999:   if (type==MOB_TRIGGER)"
+"src\genolc.c","1006","export_script_save_to_disk","CALL","log(""SYSERR: Invalid type passed to export_script_save_to_disk()"");",,"  1004:     t = ((struct room_data *)item)->proto_script;
+  1005:   else {
+  1006:     log(""SYSERR: Invalid type passed to export_script_save_to_disk()"");
+  1007:     return;
+  1008:   }
+  1009: 
+  1010:   while (t)"
+"src\genolc.c","1018","export_script_save_to_disk","CALL","static int export_save_triggers(zone_rnum zrnum)",,"  1016: 
+  1017: /* save the zone's triggers to internal memory and to disk */
+  1018: static int export_save_triggers(zone_rnum zrnum)
+  1019: {
+  1020:   int i;
+  1021:   trig_data *trig;
+  1022:   struct cmdlist_element *cmd;"
+"src\genolc.h","23","","CALL","int save_all(void);",,"    21: int in_save_list(zone_vnum, int type);
+    22: void strip_cr(char *);
+    23: int save_all(void);
+    24: char *str_udup(const char *);
+    25: char *str_udupnl(const char *);
+    26: void copy_ex_descriptions(struct extra_descr_data **to, struct extra_descr_data *from);
+    27: void free_ex_descriptions(struct extra_descr_data *head);"
+"src\genqst.c","176","delete_quest","CALL","int save_quests(zone_rnum zone_num)",,"   174: /*-------------------------------------------------------------------*/
+   175: 
+   176: int save_quests(zone_rnum zone_num)
+   177: {
+   178:   FILE *sf;
+   179:   char filename[128], oldname[128], quest_flags[MAX_STRING_LENGTH];
+   180:   char quest_desc[MAX_STRING_LENGTH], quest_info[MAX_STRING_LENGTH];"
+"src\genshp.c","344","add_shop","CALL","int save_shops(zone_rnum zone_num)",,"   342: }
+   343: 
+   344: int save_shops(zone_rnum zone_num)
+   345: {
+   346:   int i, j, rshop, num_shops = 0;
+   347:   FILE *shop_file;
+   348:   char fname[128], oldname[128], buf[MAX_STRING_LENGTH];"
+"src\genwld.c","264","delete_room","CALL","int save_rooms(zone_rnum rzone)",,"   262: }
+   263: 
+   264: int save_rooms(zone_rnum rzone)
+   265: {
+   266:   int i;
+   267:   struct room_data *room;
+   268:   FILE *sf;"
+"src\genwld.c","377","save_rooms","CALL","script_save_to_disk(sf, room, WLD_TRIGGER);",,"   375:       }
+   376:       fprintf(sf, ""S\n"");
+   377:       script_save_to_disk(sf, room, WLD_TRIGGER);
+   378:     }
+   379:   }
+   380: 
+   381:   /* Write the final line and close it. */"
+"src\genzon.c","328","remove_room_zone_commands","CALL","int save_zone(zone_rnum zone_num)",,"   326:  * simple comments in the form of (<name>) to each record.  A header for each
+   327:  * field is also there. */
+   328: int save_zone(zone_rnum zone_num)
+   329: {
+   330:   int subcmd, arg1 = -1, arg2 = -1, arg3 = -1, flag_tot=0, i;
+   331:   char fname[128], oldname[128];
+   332:   const char *comment = NULL;"
+"src\genzon.c","473","save_zone","CALL","mudlog(BRF, LVL_BUILDER, TRUE, ""SYSERR: OLC: z_save_to_disk(): Unknown cmd '%c' - NOT saving"", ZCMD(zone_num, subcmd).command);",,"   471:       continue;
+   472:     default:
+   473:       mudlog(BRF, LVL_BUILDER, TRUE, ""SYSERR: OLC: z_save_to_disk(): Unknown cmd '%c' - NOT saving"", ZCMD(zone_num, subcmd).command);
+   474:       continue;
+   475:     }
+   476:     if (ZCMD(zone_num, subcmd).command != 'V')
+   477:       fprintf(zfile, ""%c %d %d %d %d \t(%s)\n"","
+"src\handler.c","1107","extract_char_final","CALL","save_char(ch);",,"  1105:       extract_script_mem(SCRIPT_MEM(ch));
+  1106:   } else {
+  1107:     save_char(ch);
+  1108:     Crash_delete_crashfile(ch);
+  1109:   }
+  1110: 
+  1111:   /* If there's a descriptor, they're in the menu now. */"
+"src\hedit.c","32","","CALL","static void hedit_save_to_disk(struct descriptor_data *);",,"    30: static void hedit_setup_new(struct descriptor_data *);
+    31: static void hedit_setup_existing(struct descriptor_data *, int);
+    32: static void hedit_save_to_disk(struct descriptor_data *);
+    33: static void hedit_save_internally(struct descriptor_data *);
+    34: static void hedit_collect_keywords_for_entry(int rnum, char *out, size_t outsz);
+    35: static void hedit_append_bounded(char *dst, size_t dstsz, const char *src);
+    36: "
+"src\hedit.c","72","","CALL","hedit_save_to_disk(d);",,"    70:     mudlog(CMP, MAX(LVL_BUILDER, GET_INVIS_LEV(ch)), TRUE, ""OLC: %s saves help files."",
+    71:            GET_NAME(ch));
+    72:     hedit_save_to_disk(d);
+    73:     send_to_char(ch, ""Saving help files.\r\n"");
+    74:     return;
+    75:   }
+    76: "
+"src\hedit.c","159","hedit_save_internally","CALL","hedit_save_to_disk(d);",,"   157: 
+   158:   add_to_save_list(HEDIT_PERMISSION, SL_HLP);
+   159:   hedit_save_to_disk(d);
+   160: }
+   161: 
+   162: static void hedit_save_to_disk(struct descriptor_data *d)
+   163: {"
+"src\hedit.c","162","hedit_save_internally","CALL","static void hedit_save_to_disk(struct descriptor_data *d)",,"   160: }
+   161: 
+   162: static void hedit_save_to_disk(struct descriptor_data *d)
+   163: {
+   164:   FILE *fp;
+   165:   char buf1[MAX_STRING_LENGTH], keywords[MAX_HELP_KEYWORDS + 1], index_name[READ_SIZE];
+   166:   int i, j;"
+"src\hedit.c","279","hedit_parse","MESSAGE","Help saved to disk.\r\n","True","   278:       mudlog(TRUE, MAX(LVL_BUILDER, GET_INVIS_LEV(d->character)), CMP, ""%s"", buf);
+   279:       write_to_output(d, ""Help saved to disk.\r\n"");
+   280:       hedit_save_internally(d);
+   281: 
+   282:       /* Do not free strings, just the help structure. */
+   283:       cleanup_olc(d, CLEANUP_STRUCTS);"
+"src\hedit.c","291","hedit_parse","MESSAGE","Invalid choice!\r\nDo you wish to save your changes? : \r\n","True","   290:     default:
+   291:       write_to_output(d, ""Invalid choice!\r\nDo you wish to save your changes? : \r\n"");
+   292:       break;
+   293:     }
+   294:     return;
+   295: "
+"src\hedit.c","352","hedit_parse","MESSAGE","Do you wish to save your changes? : ","False","   351:         /* Something has been modified. */
+   352:         write_to_output(d, ""Do you wish to save your changes? : "");
+   353:         OLC_MODE(d) = HEDIT_CONFIRM_SAVESTRING;
+   354:       } else {
+   355:         write_to_output(d, ""No changes made.\r\n"");
+   356:         cleanup_olc(d, CLEANUP_ALL);"
+"src\ibt.c","291","load_ibt_file","CALL","void save_ibt_file(int mode)",,"   289: }
+   290: 
+   291: void save_ibt_file(int mode)
+   292: {
+   293:    IBT_DATA *ibtData, *first_ibt;
+   294:    FILE *fp;
+   295:    char filename[256];"
+"src\ibt.c","712","is_ibt_logger","CALL","save_ibt_file(subcmd);",,"   710:         SET_BIT_AR(IBT_FLAGS(ibtData), IBT_RESOLVED);
+   711:         if (CONFIG_IBT_AUTOSAVE) {
+   712: 		  save_ibt_file(subcmd);
+   713: 		}
+   714:       }
+   715:     }
+   716:     return;"
+"src\ibt.c","736","is_ibt_logger","CALL","save_ibt_file(subcmd);",,"   734:         send_to_char(ch,""%s%s Number %d removed.%s\r\n"", QCYN, ibt_types[subcmd], ano, QNRM);
+   735:         if (CONFIG_IBT_AUTOSAVE) {
+   736: 		  save_ibt_file(subcmd);
+   737: 		}
+   738:       } else {
+   739:         send_to_char(ch,""%sUnable to remove %s %d!%s\r\n"", QRED, CMD_NAME, ano, QNRM);
+   740:       }"
+"src\ibt.c","748","is_ibt_logger","CALL","save_ibt_file(subcmd);",,"   746:       return;
+   747:     }
+   748:     save_ibt_file(subcmd);
+   749:     send_to_char(ch,""%s list saved.\r\n"", ibt_types[subcmd]);
+   750:   } else if (is_abbrev(arg,""edit"")) {
+   751:     if (GET_LEVEL(ch) < LVL_GRGOD){
+   752:       send_to_char(ch, ""%s what?\r\n"", ibt_types[subcmd]);"
+"src\ibt.c","918","ibtedit_save","CALL","save_ibt_file(OLC_VAL(d));",,"   916:   }
+   917: 
+   918:   save_ibt_file(OLC_VAL(d));
+   919: }
+   920: 
+   921: void free_olc_ibt(IBT_DATA *toFree) {
+   922: 	"
+"src\ibt.c","1020","ibtedit_parse","MESSAGE","Do you wish to save your changes? : ","False","  1019:         write_to_output(d, ""Invalid choice!\r\n"");
+  1020:         write_to_output(d, ""Do you wish to save your changes? : "");
+  1021:         return;
+  1022:       }
+  1023: 
+  1024:     case IBTEDIT_MAIN_MENU:"
+"src\ibt.c","1029","ibtedit_parse","MESSAGE","Do you wish to save your changes? : ","False","  1028:           if (OLC_ZNUM(d)) {	/* Anything been changed? */
+  1029:             write_to_output(d, ""Do you wish to save your changes? : "");
+  1030:             OLC_MODE(d) = IBTEDIT_CONFIRM_SAVESTRING;
+  1031:           } else
+  1032:             cleanup_olc(d, CLEANUP_ALL);
+  1033:           return;"
+"src\ibt.h","97","","CALL","void save_ibt_file(int mode);",,"    95: ACMD(do_ibt);
+    96: ACMD(do_oasis_ibtedit);
+    97: void save_ibt_file(int mode);
+    98: void load_ibt_file(int mode);
+    99: void ibtedit_parse(struct descriptor_data *d, char *arg);
+   100: void ibtedit_string_cleanup(struct descriptor_data *d, int terminator);
+   101: void free_ibt_lists(void);"
+"src\interpreter.c","783","free_alias","CALL","save_char(ch);",,"   781:       a->next = GET_ALIASES(ch);
+   782:       GET_ALIASES(ch) = a;
+   783:       save_char(ch);
+   784:       send_to_char(ch, ""Alias ready.\r\n"");
+   785:     }
+   786:   }
+   787: }"
+"src\interpreter.c","1402","enter_player_game","CALL","save_char(d->character);",,"  1400:   
+  1401:   /* Save the character and their object file */
+  1402:   save_char(d->character);
+  1403:   Crash_crashsave(d->character);
+  1404: 
+  1405:   /* Check for a login trigger in the players' start room */
+  1406:   login_wtrigger(&world[IN_ROOM(d->character)], d->character);"
+"src\interpreter.c","2142","nanny","CALL","save_char(d->character);",,"  2140:           GET_ACCOUNT_ID(d->character) = d->acct_id;
+  2141:           account_attach_char(d->character);
+  2142:           save_char(d->character);
+  2143:         }
+  2144:         GET_PFILEPOS(d->character) = player_i;
+  2145: 
+  2146:       account_init_for_char(d->character);"
+"src\interpreter.c","2279","nanny","CALL","save_char(d->character);",,"  2277: 	mudlog(BRF, LVL_GOD, TRUE, ""Bad PW: %s [%s]"", GET_NAME(d->character), d->host);
+  2278: 	GET_BAD_PWS(d->character)++;
+  2279: 	save_char(d->character);
+  2280: 	if (++(d->bad_pws) >= CONFIG_MAX_BAD_PWS) {	/* 3 strikes and you're out. */
+  2281: 	  write_to_output(d, ""Wrong password... disconnecting.\r\n"");
+  2282: 	  STATE(d) = CON_CLOSE;
+  2283: 	} else {"
+"src\interpreter.c","2329","nanny","CALL","save_char(d->character);",,"  2327:       STATE(d) = CON_QSEX;
+  2328:     } else {
+  2329:       save_char(d->character);
+  2330:       write_to_output(d, ""\r\nDone.\r\n%s"", CONFIG_MENU);
+  2331:       STATE(d) = CON_MENU;
+  2332:     }
+  2333:     break;"
+"src\interpreter.c","2442","nanny","CALL","if (!save_char(d->character) || !save_player_index()) {",,"  2440:         /* Finalize base stats after point spend (racial bonuses are applied at runtime). */
+  2441:         clamp_base_stats(d->character);
+  2442:         if (!save_char(d->character) || !save_player_index()) {
+  2443:           mudlog(CMP, LVL_IMPL, TRUE, ""SYSERR: New character %s was not durably saved; account roster was not modified"",
+  2444:                  GET_NAME(d->character));
+  2445:           write_to_output(d, ""\r\nYour character could not be saved. It has not been attached to the account. Contact an administrator.\r\n"");
+  2446:           STATE(d) = CON_CLOSE;"
+"src\interpreter.c","2511","nanny","CALL","save_char(d->character);",,"  2509:         GET_LOADROOM(d->character) = NOWHERE;
+  2510:               account_attach_char(d->character);
+  2511: save_char(d->character);
+  2512: 
+  2513:       greet_mtrigger(d->character, -1);
+  2514:       greet_memory_mtrigger(d->character);
+  2515: "
+"src\interpreter.c","2534","nanny","CALL","save_char(d->character);",,"  2532:     case '2':
+  2533:       write_to_output(d, ""\r\nReturning to your account to select a character.\r\n"");
+  2534:       save_char(d->character);
+  2535:       free_char(d->character);
+  2536:       d->character = NULL;
+  2537:       d->acct_prompted_menu = 0;
+  2538:       STATE(d) = CON_ACCT_MENU;"
+"src\interpreter.c","2614","nanny","CALL","save_char(d->character);",,"  2612:       if (GET_LEVEL(d->character) < LVL_GRGOD)
+  2613: 	SET_BIT_AR(PLR_FLAGS(d->character), PLR_DELETED);
+  2614:       save_char(d->character);
+  2615:       Crash_delete_file(GET_NAME(d->character));
+  2616:       /* If the selfdelete_fastwipe flag is set (in config.c), remove all the
+  2617:        * player's immediately. */
+  2618:       if (selfdelete_fastwipe)"
+"src\medit.c","68","","CALL","static void medit_save_to_disk(zone_vnum zone_num);",,"    66: static void medit_setup_new(struct descriptor_data *d);
+    67: static void init_mobile(struct char_data *mob);
+    68: static void medit_save_to_disk(zone_vnum zone_num);
+    69: static void medit_disp_positions(struct descriptor_data *d);
+    70: static void medit_disp_sex(struct descriptor_data *d);
+    71: static void medit_disp_attack_types(struct descriptor_data *d);
+    72: static bool medit_illegal_mob_flag(int fl);"
+"src\medit.c","208","","CALL","save_mobiles(OLC_ZNUM(d));",,"   206: 
+   207:     /* Save the mobiles. */
+   208:     save_mobiles(OLC_ZNUM(d));
+   209: 
+   210:     /* Free the olc structure stored in the descriptor. */
+   211:     free(d->olc);
+   212:     d->olc = NULL;"
+"src\medit.c","237","","CALL","static void medit_save_to_disk(zone_vnum foo)",,"   235: }
+   236: 
+   237: static void medit_save_to_disk(zone_vnum foo)
+   238: {
+   239:   save_mobiles(real_zone(foo));
+   240: }
+   241: "
+"src\medit.c","239","medit_save_to_disk","CALL","save_mobiles(real_zone(foo));",,"   237: static void medit_save_to_disk(zone_vnum foo)
+   238: {
+   239:   save_mobiles(real_zone(foo));
+   240: }
+   241: 
+   242: static void medit_setup_new(struct descriptor_data *d)
+   243: {"
+"src\medit.c","948","medit_parse","CALL","medit_save_to_disk(zone_table[real_zone_by_thing(OLC_NUM(d))].number);",,"   946:       mudlog(CMP, MAX(LVL_BUILDER, GET_INVIS_LEV(d->character)), TRUE, ""OLC: %s edits mob %d"", GET_NAME(d->character), OLC_NUM(d));
+   947:       if (CONFIG_OLC_SAVE) {
+   948:         medit_save_to_disk(zone_table[real_zone_by_thing(OLC_NUM(d))].number);
+   949:         write_to_output(d, ""Mobile saved to disk.\r\n"");
+   950:       } else
+   951:         write_to_output(d, ""Mobile saved to memory.\r\n"");
+   952:       cleanup_olc(d, CLEANUP_ALL);"
+"src\medit.c","949","medit_parse","MESSAGE","Mobile saved to disk.\r\n","True","   948:         medit_save_to_disk(zone_table[real_zone_by_thing(OLC_NUM(d))].number);
+   949:         write_to_output(d, ""Mobile saved to disk.\r\n"");
+   950:       } else
+   951:         write_to_output(d, ""Mobile saved to memory.\r\n"");
+   952:       cleanup_olc(d, CLEANUP_ALL);
+   953:       return;"
+"src\medit.c","964","medit_parse","MESSAGE","Do you wish to save your changes? : ","False","   963:       write_to_output(d, ""Invalid choice!\r\n"");
+   964:       write_to_output(d, ""Do you wish to save your changes? : "");
+   965:       return;
+   966:     }
+   967: 
+   968:   case MEDIT_MAIN_MENU:"
+"src\medit.c","974","medit_parse","MESSAGE","Do you wish to save your changes? : ","False","   973:       if (OLC_VAL(d)) {	/* Anything been changed? */
+   974: 	      write_to_output(d, ""Do you wish to save your changes? : "");
+   975: 	      OLC_MODE(d) = MEDIT_CONFIRM_SAVESTRING;
+   976:       } else
+   977: 	cleanup_olc(d, CLEANUP_ALL);
+   978:       return;"
+"src\modify.c","273","playing_string_cleanup","CALL","save_ibt_file(SCMD_IDEA);",,"   271:     if (action == STRINGADD_SAVE && *d->str){
+   272:       write_to_output(d, ""Idea saved!\r\n"");
+   273:       save_ibt_file(SCMD_IDEA);
+   274:     } else {
+   275:       write_to_output(d, ""Idea aborted!\r\n"");
+   276:       clean_ibt_list(SCMD_IDEA);
+   277:     }"
+"src\modify.c","282","playing_string_cleanup","CALL","save_ibt_file(SCMD_BUG);",,"   280:     if (action == STRINGADD_SAVE && *d->str){
+   281:       write_to_output(d, ""Bug saved!\r\n"");
+   282:       save_ibt_file(SCMD_BUG);
+   283:     } else {
+   284:       write_to_output(d, ""Bug aborted!\r\n"");
+   285:       clean_ibt_list(SCMD_BUG);
+   286:     }"
+"src\modify.c","291","playing_string_cleanup","CALL","save_ibt_file(SCMD_TYPO);",,"   289:     if (action == STRINGADD_SAVE && *d->str){
+   290:       write_to_output(d, ""Typo saved!\r\n"");
+   291:       save_ibt_file(SCMD_TYPO);
+   292:     } else {
+   293:       write_to_output(d, ""Typo aborted!\r\n"");
+   294:       clean_ibt_list(SCMD_TYPO);
+   295:     }"
+"src\msgedit.c","211","write_message_line","CALL","void save_messages_to_disk(void)",,"   209: }
+   210: 
+   211: void save_messages_to_disk(void)
+   212: {
+   213:   FILE *fp;
+   214:   int i;
+   215:   struct message_type *msg;"
+"src\msgedit.c","549","msgedit_parse","MESSAGE","Do you wish to save? Y/N : ","False","   548:         case 's':
+   549:           write_to_output(d, ""Do you wish to save? Y/N : "");
+   550:           OLC_MODE(d) = MSGEDIT_CONFIRM_SAVE;
+   551:         return;
+   552:         case 'Q':
+   553:         case 'q':"
+"src\msgedit.c","557","msgedit_parse","MESSAGE","Do you wish to save? Y/N : ","False","   556:             quit = TRUE;
+   557:             write_to_output(d, ""Do you wish to save? Y/N : "");
+   558:             return;
+   559:           }
+   560:           write_to_output(d, ""Exiting message editor.\r\n"");
+   561:           cleanup_olc(d, CLEANUP_ALL);"
+"src\msgedit.c","568","msgedit_parse","CALL","save_messages_to_disk();",,"   566:       if (*arg && (*arg == 'Y' || *arg == 'y')) {
+   567:         copy_message_list(&fight_messages[OLC_NUM(d)], OLC_MSG_LIST(d));
+   568:         save_messages_to_disk();
+   569:         OLC_VAL(d) = 0;
+   570:         write_to_output(d, ""Messages saved.\r\n"");
+   571:       } else
+   572:         write_to_output(d, ""Save aborted.\r\n"");"
+"src\msgedit.h","24","","CALL","void save_messages_to_disk(void);",,"    22: void load_messages(void);
+    23: void free_messages(void);
+    24: void save_messages_to_disk(void);
+    25: void free_message_list(struct message_list * mlist);
+    26: 
+    27: /* Defines */
+    28: #define MSGEDIT_MAIN_MENU     1"
+"src\oasis.h","427","","CALL","int  save_config( IDXTYPE nowhere );",,"   425: #define HEDIT_MIN_LEVEL                 6
+   426: 
+   427: int  save_config( IDXTYPE nowhere );
+   428: 
+   429: /* Prototypes to keep. */
+   430: void clear_screen(struct descriptor_data *);
+   431: int can_edit_zone(struct char_data *ch, zone_rnum rnum);"
+"src\oasis.h","453","","CALL","void redit_save_to_disk(zone_vnum zone_num);",,"   451: void redit_string_cleanup(struct descriptor_data *d, int terminator);
+   452: void redit_save_internally(struct descriptor_data *d);
+   453: void redit_save_to_disk(zone_vnum zone_num);
+   454: void redit_parse(struct descriptor_data *d, char *arg);
+   455: void free_room(struct room_data *room);
+   456: ACMD(do_oasis_redit);
+   457: "
+"src\oasis.h","469","","CALL","void cedit_save_to_disk( void );",,"   467: 
+   468: /* public functions from cedit.c */
+   469: void cedit_save_to_disk( void );
+   470: void cedit_parse(struct descriptor_data *d, char *arg);
+   471: void cedit_string_cleanup(struct descriptor_data *d, int terminator);
+   472: ACMD(do_oasis_cedit);
+   473: "
+"src\oedit.c","50","","CALL","static void oedit_save_to_disk(int zone_num);",,"    48: static void oedit_disp_menu(struct descriptor_data *d);
+    49: static void oedit_disp_perm_menu(struct descriptor_data *d);
+    50: static void oedit_save_to_disk(int zone_num);
+    51: static int oedit_type_supports_regen_mult(int obj_type);
+    52: 
+    53: /* handy macro */
+    54: #define S_PRODUCT(s, i) ((s)->producing[(i)])"
+"src\oedit.c","166","oedit_type_supports_regen_mult","CALL","save_objects(OLC_ZNUM(d));",,"   164: 
+   165:     /* Save the objects in this zone. */
+   166:     save_objects(OLC_ZNUM(d));
+   167: 
+   168:     /* Free the descriptor's OLC structure. */
+   169:     free(d->olc);
+   170:     d->olc = NULL;"
+"src\oedit.c","298","oedit_save_internally","CALL","static void oedit_save_to_disk(int zone_num)",,"   296: }
+   297: 
+   298: static void oedit_save_to_disk(int zone_num)
+   299: {
+   300:   save_objects(zone_num);
+   301: }
+   302: "
+"src\oedit.c","300","oedit_save_to_disk","CALL","save_objects(zone_num);",,"   298: static void oedit_save_to_disk(int zone_num)
+   299: {
+   300:   save_objects(zone_num);
+   301: }
+   302: 
+   303: /* Menu functions */
+   304: /* For container flags. */"
+"src\oedit.c","782","oedit_parse","CALL","oedit_save_to_disk(real_zone_by_thing(OLC_NUM(d)));",,"   780:               ""OLC: %s edits obj %d"", GET_NAME(d->character), OLC_NUM(d));
+   781:       if (CONFIG_OLC_SAVE) {
+   782:         oedit_save_to_disk(real_zone_by_thing(OLC_NUM(d)));
+   783:         write_to_output(d, ""Object saved to disk.\r\n"");
+   784:       } else
+   785:         write_to_output(d, ""Object saved to memory.\r\n"");
+   786:       cleanup_olc(d, CLEANUP_ALL);"
+"src\oedit.c","783","oedit_parse","MESSAGE","Object saved to disk.\r\n","True","   782:         oedit_save_to_disk(real_zone_by_thing(OLC_NUM(d)));
+   783:         write_to_output(d, ""Object saved to disk.\r\n"");
+   784:       } else
+   785:         write_to_output(d, ""Object saved to memory.\r\n"");
+   786:       cleanup_olc(d, CLEANUP_ALL);
+   787:       return;"
+"src\oedit.c","801","oedit_parse","MESSAGE","Do you wish to save your changes? : \r\n","True","   800:       write_to_output(d, ""Invalid choice!\r\n"");
+   801:       write_to_output(d, ""Do you wish to save your changes? : \r\n"");
+   802:       return;
+   803:     }
+   804: 
+   805:   case OEDIT_MAIN_MENU:"
+"src\oedit.c","811","oedit_parse","MESSAGE","Do you wish to save your changes? : ","False","   810:       if (OLC_VAL(d)) {	/* Something has been modified. */
+   811: 	write_to_output(d, ""Do you wish to save your changes? : "");
+   812: 	OLC_MODE(d) = OEDIT_CONFIRM_SAVESTRING;
+   813:       } else
+   814: 	cleanup_olc(d, CLEANUP_ALL);
+   815:       return;"
+"src\players.c","219","remove_player_from_index","CALL","int save_player_index(void)",,"   217: 
+   218: /* This function necessary to save a seperate ASCII player index */
+   219: int save_player_index(void)
+   220: {
+   221:   int i;
+   222:   char index_name[50], bits[64];
+   223:   FILE *index_file;"
+"src\players.c","876","load_char","CALL","int save_char(struct char_data * ch)",,"   874: /* Write the vital data of a player to the player file. */
+   875: /* This is the ASCII Player Files save routine. */
+   876: int save_char(struct char_data * ch)
+   877: {
+   878:   FILE *fl;
+   879:   char filename[40], buf[MAX_STRING_LENGTH], bits[127], bits2[127], bits3[127], bits4[127];
+   880:   int i, j, id, save_index = FALSE, write_ok = TRUE;"
+"src\players.c","1188","save_char","CALL","save_char_vars_ascii(fl, ch);",,"  1186: 
+  1187:   write_aliases_ascii(fl, ch);
+  1188:   save_char_vars_ascii(fl, ch);
+  1189: 
+  1190:   write_ok = (fflush(fl) == 0);
+  1191:   if (write_ok && fsync(fileno(fl)) != 0)
+  1192:     write_ok = FALSE;"
+"src\players.c","1254","save_char","CALL","if (!save_player_index())",,"  1252: 
+  1253:   if (player_table[id].flags != i || save_index)
+  1254:     if (!save_player_index())
+  1255:       return FALSE;
+  1256:   return TRUE;
+  1257: }
+  1258: "
+"src\players.c","1310","remove_player","CALL","save_player_index();",,"  1308:   remove_player_from_index(pfilepos);
+  1309: 
+  1310:   save_player_index();
+  1311: }
+  1312: 
+  1313: void clean_pfiles(void)
+  1314: {"
+"src\prefedit.c","76","prefedit_save_to_char","CALL","save_char(vict);",,"    74:     GET_SCREEN_WIDTH(vict) = OLC_PREFS(d)->screen_width;
+    75: 
+    76:     save_char(vict);
+    77:   }
+    78:   else
+    79:   {
+    80:   if (!vict) {"
+"src\prefedit.c","349","prefedit_parse","MESSAGE","Do you wish to save these toggle settings? : ","False","   348:       send_to_char(d->character, ""Invalid choice!\r\n"");
+   349:       send_to_char(d->character, ""Do you wish to save these toggle settings? : "");
+   350:       break;
+   351:     }
+   352:     return;
+   353: "
+"src\prefedit.c","360","prefedit_parse","MESSAGE","Do you wish to save these toggle settings? : ","False","   359:       { /*. Something has been modified .*/
+   360:         send_to_char(d->character, ""Do you wish to save these toggle settings? : "");
+   361:         OLC_MODE(d) = PREFEDIT_CONFIRM_SAVE;
+   362:       } else
+   363:         cleanup_olc(d, CLEANUP_ALL);
+   364:       return;"
+"src\qedit.c","35","","CALL","static void qedit_save_to_disk(int num);",,"    33: static void qedit_disp_menu(struct descriptor_data *d);
+    34: static void qedit_save_internally(struct descriptor_data *d);
+    35: static void qedit_save_to_disk(int num);
+    36: 
+    37: /*-------------------------------------------------------------------*/
+    38: 
+    39: static void qedit_save_internally(struct descriptor_data *d)"
+"src\qedit.c","44","qedit_save_internally","CALL","static void qedit_save_to_disk(int num)",,"    42: }
+    43: 
+    44: static void qedit_save_to_disk(int num)
+    45: {
+    46:   save_quests(num);
+    47: }
+    48: "
+"src\qedit.c","46","qedit_save_to_disk","CALL","save_quests(num);",,"    44: static void qedit_save_to_disk(int num)
+    45: {
+    46:   save_quests(num);
+    47: }
+    48: 
+    49: /*-------------------------------------------------------------------*\
+    50:   utility functions"
+"src\qedit.c","168","qedit_save_to_disk","CALL","qedit_save_to_disk(OLC_ZNUM(d));",,"   166:     /** Save the quest to the quest file.                                    **/
+   167:     /**************************************************************************/
+   168:     qedit_save_to_disk(OLC_ZNUM(d));
+   169: 
+   170:     /**************************************************************************/
+   171:     /** Free the OLC structure.                                              **/
+   172:     /**************************************************************************/"
+"src\qedit.c","394","qedit_parse","CALL","qedit_save_to_disk(real_zone_by_thing(OLC_NUM(d)));",,"   392:      ""OLC: %s edits quest %d"", GET_NAME(d->character), OLC_NUM(d));
+   393:           if (CONFIG_OLC_SAVE) {
+   394:             qedit_save_to_disk(real_zone_by_thing(OLC_NUM(d)));
+   395:             write_to_output(d, ""Quest %d saved to disk.\r\n"", OLC_NUM(d));
+   396:           } else
+   397:             write_to_output(d, ""Quest %d saved to memory.\r\n"", OLC_NUM(d));
+   398:           cleanup_olc(d, CLEANUP_STRUCTS);"
+"src\qedit.c","395","qedit_parse","MESSAGE","Quest %d saved to disk.\r\n","True","   394:             qedit_save_to_disk(real_zone_by_thing(OLC_NUM(d)));
+   395:             write_to_output(d, ""Quest %d saved to disk.\r\n"", OLC_NUM(d));
+   396:           } else
+   397:             write_to_output(d, ""Quest %d saved to memory.\r\n"", OLC_NUM(d));
+   398:           cleanup_olc(d, CLEANUP_STRUCTS);
+   399:    return;"
+"src\qedit.c","405","qedit_parse","MESSAGE","Invalid choice!\r\nDo you wish to save the quest? : ","False","   404:         default:
+   405:           write_to_output(d,
+   406:             ""Invalid choice!\r\nDo you wish to save the quest? : "");
+   407:           return;
+   408:       }
+   409:     /*-------------------------------------------------------------------*/"
+"src\qedit.c","419","qedit_parse","CALL","qedit_save_to_disk(real_zone_by_thing(OLC_NUM(d)));",,"   417:             write_to_output(d, ""Couldn't delete the quest!\r\n"");
+   418:           if (CONFIG_OLC_SAVE) {
+   419:             qedit_save_to_disk(real_zone_by_thing(OLC_NUM(d)));
+   420:             write_to_output(d, ""Quest file saved to disk.\r\n"");
+   421:           } else
+   422:             write_to_output(d, ""Quest file saved to memory.\r\n"");
+   423:           cleanup_olc(d, CLEANUP_ALL);"
+"src\qedit.c","420","qedit_parse","MESSAGE","Quest file saved to disk.\r\n","True","   419:             qedit_save_to_disk(real_zone_by_thing(OLC_NUM(d)));
+   420:             write_to_output(d, ""Quest file saved to disk.\r\n"");
+   421:           } else
+   422:             write_to_output(d, ""Quest file saved to memory.\r\n"");
+   423:           cleanup_olc(d, CLEANUP_ALL);
+   424:    return;"
+"src\qedit.c","441","qedit_parse","MESSAGE","Do you wish to save the changes to the Quest? (y/n) : ","False","   440:    if (OLC_VAL(d)) {   /*. Anything been changed? . */
+   441:             write_to_output(d,
+   442:               ""Do you wish to save the changes to the Quest? (y/n) : "");
+   443:             OLC_MODE(d) = QEDIT_CONFIRM_SAVESTRING;
+   444:           } else
+   445:             cleanup_olc(d, CLEANUP_ALL);"
+"src\quest.c","186","notify_quest_cooldown_ready_if_needed","CALL","save_char(ch);",,"   184:   send_to_char(ch, ""%sQUEST: You may now quest again.%s\r\n"", QRED, QNRM);
+   185:   GET_KQUEST_COOLDOWN_NOTIFIED(ch) = 1;
+   186:   save_char(ch);
+   187: }
+   188: 
+   189: static void expire_kill_quest_if_needed(struct char_data *ch, bool notify)
+   190: {"
+"src\quest.c","198","expire_kill_quest_if_needed","CALL","save_char(ch);",,"   196:   if (notify)
+   197:     send_to_char(ch, ""Your quest has expired. You have failed to complete it in time.\r\n"");
+   198:   save_char(ch);
+   199: }
+   200: 
+   201: static struct char_data *find_present_questmaster(struct char_data *ch)
+   202: {"
+"src\quest.c","430","expire_campaign_if_needed","CALL","save_char(ch);",,"   428:   if (notify)
+   429:     send_to_char(ch, ""%sYour campaign has expired. The contract has been revoked.%s\r\n"", QRED, QNRM);
+   430:   save_char(ch);
+   431: }
+   432: 
+   433: struct campaign_candidate_data {
+   434:   mob_vnum vnum;"
+"src\quest.c","606","quest_request_kill","CALL","save_char(ch);",,"   604:   send_to_char(ch, ""%s tells you, 'Good luck, %s. Return safely!'\r\n"", GET_NAME(qm), GET_NAME(ch));
+   605:   send_to_char(ch, ""You have 60 minutes to complete your quest.\r\n"");
+   606:   save_char(ch);
+   607: }
+   608: 
+   609: static void quest_info_kill(struct char_data *ch)
+   610: {"
+"src\quest.c","683","quest_complete_kill","CALL","save_char(ch);",,"   681:   clear_kill_quest(ch);
+   682:   start_kill_quest_cooldown(ch);
+   683:   save_char(ch);
+   684: }
+   685: 
+   686: static void campaign_show_header(struct char_data *ch)
+   687: {"
+"src\quest.c","731","campaign_request","CALL","save_char(ch);",,"   729:   send_to_char(ch, ""Use %s'campaign info'%s for full details, %s'cp check'%s for remaining targets.\r\n"",
+   730:                QYEL, QNRM, QYEL, QNRM);
+   731:   save_char(ch);
+   732: }
+   733: 
+   734: static void campaign_info(struct char_data *ch)
+   735: {"
+"src\quest.c","842","campaign_quit","CALL","save_char(ch);",,"   840:   clear_campaign(ch);
+   841:   send_to_char(ch, ""%sYou abandon your campaign and forfeit all rewards.%s\r\n"", QRED, QNRM);
+   842:   save_char(ch);
+   843: }
+   844: 
+   845: /*--------------------------------------------------------------------------*/
+   846: /* Utility Functions                                                        */"
+"src\quest.c","1149","generic_complete_quest","CALL","save_char(ch);",,"  1147:     }
+  1148:   }
+  1149:   save_char(ch);
+  1150: }
+  1151: 
+  1152: void autoquest_trigger_check(struct char_data *ch, struct char_data *vict,
+  1153:                 struct obj_data *object, int type)"
+"src\quest.c","1259","quest_kill_trigger_check","CALL","save_char(ch);",,"  1257:   send_to_char(ch, ""\tYQUEST: You have almost completed your QUEST!\tn\r\n"");
+  1258:   send_to_char(ch, ""\tYReturn to the questmaster before your time runs out.\tn\r\n"");
+  1259:   save_char(ch);
+  1260: }
+  1261: 
+  1262: void campaign_kill_trigger_check(struct char_data *ch, struct char_data *vict)
+  1263: {"
+"src\quest.c","1305","campaign_kill_trigger_check","CALL","save_char(ch);",,"  1303:       clear_campaign(ch);
+  1304:     }
+  1305:     save_char(ch);
+  1306:     return;
+  1307:   }
+  1308: }
+  1309: "
+"src\quest.c","1430","quest_join","CALL","save_char(ch);",,"  1428:   }
+  1429:   do_tell(qm, buf, cmd_tell, 0);
+  1430:   save_char(ch);
+  1431: }
+  1432: 
+  1433: void quest_list(struct char_data *ch, struct char_data *qm, char argument[MAX_INPUT_LENGTH])
+  1434: {"
+"src\quest.c","1468","quest_quit","CALL","save_char(ch);",,"  1466:     clear_quest(ch);
+  1467:     send_to_char(ch, ""You are now no longer part of the quest.\r\n"");
+  1468:     save_char(ch);
+  1469:   } else {
+  1470:     clear_quest(ch);
+  1471:     if (QST_QUIT(rnum) && (str_cmp(QST_QUIT(rnum), ""undefined"") != 0))
+  1472:       send_to_char(ch, ""%s"", QST_QUIT(rnum));"
+"src\quest.c","1481","quest_quit","CALL","save_char(ch);",,"  1479:         QST_PENALTY(rnum));
+  1480:     }
+  1481:     save_char(ch);
+  1482:   }
+  1483: }
+  1484: 
+  1485: static void quest_progress(struct char_data *ch)"
+"src\quest.h","126","","CALL","int save_quests(zone_rnum zone_num);",,"   124: int add_quest(struct aq_data *nqst);
+   125: int delete_quest(qst_rnum rnum);
+   126: int save_quests(zone_rnum zone_num);
+   127: 
+   128: /* Qedit Connectedness ************************************************ */
+   129: #define QEDIT_MAIN_MENU                 0
+   130: #define QEDIT_CONFIRM_SAVESTRING        1"
+"src\redit.c","140","","CALL","save_rooms(OLC_ZNUM(d));",,"   138: 
+   139:     /* Save the rooms. */
+   140:     save_rooms(OLC_ZNUM(d));
+   141: 
+   142:     /* Free the olc data from the descriptor. */
+   143:     free(d->olc);
+   144:     d->olc = NULL;"
+"src\redit.c","318","redit_save_resets","CALL","void redit_save_to_disk(zone_vnum zone_num)",,"   316: }
+   317: 
+   318: void redit_save_to_disk(zone_vnum zone_num)
+   319: {
+   320:   save_rooms(zone_num);		/* :) */
+   321: }
+   322: "
+"src\redit.c","320","redit_save_to_disk","CALL","save_rooms(zone_num);		/* :) */",,"   318: void redit_save_to_disk(zone_vnum zone_num)
+   319: {
+   320:   save_rooms(zone_num);		/* :) */
+   321: }
+   322: 
+   323: void free_room(struct room_data *room)
+   324: {"
+"src\redit.c","785","redit_parse","CALL","redit_save_to_disk(real_zone_by_thing(OLC_NUM(d)));",,"   783:       mudlog(CMP, MAX(LVL_BUILDER, GET_INVIS_LEV(d->character)), TRUE, ""OLC: %s edits room %d."", GET_NAME(d->character), OLC_NUM(d));
+   784:       if (CONFIG_OLC_SAVE) {
+   785:         redit_save_to_disk(real_zone_by_thing(OLC_NUM(d)));
+   786:         save_zone(OLC_ZNUM(d));
+   787:         write_to_output(d, ""Room saved to disk.\r\n"");
+   788:       } else
+   789:         write_to_output(d, ""Room saved to memory.\r\n"");"
+"src\redit.c","786","redit_parse","CALL","save_zone(OLC_ZNUM(d));",,"   784:       if (CONFIG_OLC_SAVE) {
+   785:         redit_save_to_disk(real_zone_by_thing(OLC_NUM(d)));
+   786:         save_zone(OLC_ZNUM(d));
+   787:         write_to_output(d, ""Room saved to disk.\r\n"");
+   788:       } else
+   789:         write_to_output(d, ""Room saved to memory.\r\n"");
+   790:       /* Free everything. */"
+"src\redit.c","787","redit_parse","MESSAGE","Room saved to disk.\r\n","True","   786:         save_zone(OLC_ZNUM(d));
+   787:         write_to_output(d, ""Room saved to disk.\r\n"");
+   788:       } else
+   789:         write_to_output(d, ""Room saved to memory.\r\n"");
+   790:       /* Free everything. */
+   791:       cleanup_olc(d, CLEANUP_ALL);"
+"src\redit.c","802","redit_parse","MESSAGE","Invalid choice!\r\nDo you wish to save your changes ? : ","False","   801:     default:
+   802:       write_to_output(d, ""Invalid choice!\r\nDo you wish to save your changes ? : "");
+   803:       break;
+   804:     }
+   805:     return;
+   806: "
+"src\redit.c","812","redit_parse","MESSAGE","Do you wish to save your changes? : ","False","   811:       if (OLC_VAL(d)) { /* Something has been modified. */
+   812:         write_to_output(d, ""Do you wish to save your changes? : "");
+   813:         OLC_MODE(d) = REDIT_CONFIRM_SAVESTRING;
+   814:       } else
+   815:         cleanup_olc(d, CLEANUP_ALL);
+   816:       return;"
+"src\sedit.c","25","","CALL","static void sedit_save_to_disk(int zone_num);",,"    23: /* local functions */
+    24: static void sedit_setup_new(struct descriptor_data *d);
+    25: static void sedit_save_to_disk(int zone_num);
+    26: static void sedit_products_menu(struct descriptor_data *d);
+    27: static void sedit_compact_rooms_menu(struct descriptor_data *d);
+    28: static void sedit_rooms_menu(struct descriptor_data *d);
+    29: static void sedit_namelist_menu(struct descriptor_data *d);"
+"src\sedit.c","42","sedit_save_internally","CALL","static void sedit_save_to_disk(int num)",,"    40: }
+    41: 
+    42: static void sedit_save_to_disk(int num)
+    43: {
+    44:   save_shops(num);
+    45: }
+    46: "
+"src\sedit.c","44","sedit_save_to_disk","CALL","save_shops(num);",,"    42: static void sedit_save_to_disk(int num)
+    43: {
+    44:   save_shops(num);
+    45: }
+    46: 
+    47: /* utility functions */
+    48: ACMD(do_oasis_sedit)"
+"src\sedit.c","149","sedit_save_to_disk","CALL","save_shops(OLC_ZNUM(d));",,"   147: 
+   148:     /* Save the shops to the shop file. */
+   149:     save_shops(OLC_ZNUM(d));
+   150: 
+   151:     /* Free the OLC structure. */
+   152:     free(d->olc);
+   153:     d->olc = NULL;"
+"src\sedit.c","454","sedit_parse","CALL","sedit_save_to_disk(real_zone_by_thing(OLC_NUM(d)));",,"   452:              OLC_NUM(d));
+   453:       if (CONFIG_OLC_SAVE) {
+   454:         sedit_save_to_disk(real_zone_by_thing(OLC_NUM(d)));
+   455:         write_to_output(d, ""Shop saved to disk.\r\n"");
+   456:       } else
+   457:         write_to_output(d, ""Shop saved to memory.\r\n"");
+   458: "
+"src\sedit.c","455","sedit_parse","MESSAGE","Shop saved to disk.\r\n","True","   454:         sedit_save_to_disk(real_zone_by_thing(OLC_NUM(d)));
+   455:         write_to_output(d, ""Shop saved to disk.\r\n"");
+   456:       } else
+   457:         write_to_output(d, ""Shop saved to memory.\r\n"");
+   458: 
+   459:       cleanup_olc(d, CLEANUP_STRUCTS);"
+"src\sedit.c","466","sedit_parse","MESSAGE","Invalid choice!\r\nDo you wish to save your changes? : ","False","   465:     default:
+   466:      write_to_output(d, ""Invalid choice!\r\nDo you wish to save your changes? : "");
+   467:       return;
+   468:     }
+   469: 
+   470:   case SEDIT_MAIN_MENU:"
+"src\sedit.c","481","sedit_parse","MESSAGE","Do you wish to save your changes? : ","False","   480:       if (OLC_VAL(d)) {		/* Anything been changed? */
+   481: 	write_to_output(d, ""Do you wish to save your changes? : "");
+   482: 	OLC_MODE(d) = SEDIT_CONFIRM_SAVESTRING;
+   483:       } else
+   484: 	cleanup_olc(d, CLEANUP_ALL);
+   485:       return;"
+"src\zedit.c","32","","CALL","static void zedit_save_to_disk(int zone_num);",,"    30: static void zedit_new_zone(struct char_data *ch, zone_vnum vzone_num, room_vnum bottom, room_vnum top);
+    31: static void zedit_save_internally(struct descriptor_data *d);
+    32: static void zedit_save_to_disk(int zone_num);
+    33: static void zedit_disp_menu(struct descriptor_data *d);
+    34: static void zedit_disp_comtype(struct descriptor_data *d);
+    35: static void zedit_disp_arg1(struct descriptor_data *d);
+    36: static void zedit_disp_arg2(struct descriptor_data *d);"
+"src\zedit.c","204","","CALL","save_zone(OLC_ZNUM(d));",,"   202: 
+   203:     /* Save the zone information to the zone file. */
+   204:     save_zone(OLC_ZNUM(d));
+   205: 
+   206:     /* Free the descriptor's OLC structure. */
+   207:     free(d->olc);
+   208:     d->olc = NULL;"
+"src\zedit.c","323","zedit_new_zone","CALL","zedit_save_to_disk(result); /* save to disk .. */",,"   321:   }
+   322: 
+   323:   zedit_save_to_disk(result); /* save to disk .. */
+   324: 
+   325:   mudlog(BRF, MAX(LVL_BUILDER, GET_INVIS_LEV(ch)), TRUE, ""OLC: %s creates new zone #%d"", GET_NAME(ch), vzone_num);
+   326:   write_to_output(ch->desc, ""Zone created successfully.\r\n"");
+   327: }"
+"src\zedit.c","402","zedit_save_internally","CALL","static void zedit_save_to_disk(int zone)",,"   400: }
+   401: 
+   402: static void zedit_save_to_disk(int zone)
+   403: {
+   404:   save_zone(zone);
+   405: }
+   406: "
+"src\zedit.c","404","zedit_save_to_disk","CALL","save_zone(zone);",,"   402: static void zedit_save_to_disk(int zone)
+   403: {
+   404:   save_zone(zone);
+   405: }
+   406: 
+   407: /* Error check user input and then setup change */
+   408: static int start_change_command(struct descriptor_data *d, int pos)"
+"src\zedit.c","772","zedit_parse","CALL","zedit_save_to_disk(OLC_ZNUM(d));",,"   770:       if (CONFIG_OLC_SAVE) {
+   771:         write_to_output(d, ""Saving zone info to disk.\r\n"");
+   772:         zedit_save_to_disk(OLC_ZNUM(d));
+   773:       } else
+   774:         write_to_output(d, ""Saving zone info in memory.\r\n"");
+   775: 
+   776:       mudlog(CMP, MAX(LVL_BUILDER, GET_INVIS_LEV(d->character)), TRUE, ""OLC: %s edits zone info for room %d."", GET_NAME(d->character), OLC_NUM(d));"
+"src\zedit.c","784","zedit_parse","MESSAGE","Do you wish to save your changes? : ","False","   783:       write_to_output(d, ""Invalid choice!\r\n"");
+   784:       write_to_output(d, ""Do you wish to save your changes? : "");
+   785:       break;
+   786:     }
+   787:     break;
+   788:    /* End of ZEDIT_CONFIRM_SAVESTRING */"
+"src\zedit.c","795","zedit_parse","MESSAGE","Do you wish to save your changes? : ","False","   794:       if (OLC_ZONE(d)->age || OLC_ZONE(d)->number) {
+   795: 	write_to_output(d, ""Do you wish to save your changes? : "");
+   796: 	OLC_MODE(d) = ZEDIT_CONFIRM_SAVESTRING;
+   797:       } else {
+   798: 	write_to_output(d, ""No changes made.\r\n"");
+   799: 	cleanup_olc(d, CLEANUP_ALL);"

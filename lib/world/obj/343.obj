@@ -1,11 +1,34 @@
 #34300
-fountain~
-a granite fountain~
-A granite fountain is gurgling here.~
+granite fountain water basin~
+a @Wgr@Can@Bit@We @Cfo@Bun@Wta@Cin@n~
+A polished granite fountain murmurs quietly in the staff commons.~
+Cool water spills from a carved stone spout into a broad granite basin.
+The fountain is decorative but fully functional, kept clean for staff
+use.
 ~
 23 a 0 0 0 0 0 0 0 0 0 0 0
 -1 2 15 0
 0 0 0 0 0
+E
+fountain basin~
+   The fountain is made of black granite and the water in it looks and inviting
+to drink.  In the center is a 'SPADE' shaped centerstone that seems to have
+writing all over it.
+~
+E
+spade~
+   The spade seems to be the headstone of the center of the fountain here.  It
+is made of black stone and is an obelisk in shape.  It has 'Directory' on the
+side of it and it also has a 'MAP' on the side of it as well.
+~
+E
+Map~
+Nth: God Hall - Nth, Inn, Post Office, Coffee Alcove
+Sth: God Hall - Sth, Bus. Ctr, Bldr Brd Rm, God Hall, Ext
+Est: God Hall - Est, Imm/Mrtl Brd Rm, Upr Imm Hall, Grd Lvl, God Hl - Ext
+Wst: God Hall - Wst, H.O.Jst/Chpl, Mtn Rm, Upr Imm Hall, Grd Lvl, God Hl - Ext
+Dwn: Midguaard
+~
 E
 Directory~
 ---------------------------------------------------------
@@ -35,30 +58,12 @@ Niamh ----------- 34351 ----------- God Hall, Southeast
 Fade ----------- 34337 ------------ God Hall, West
 Angela -------- 34636 --------God Hall, South Extension
 ~
-E
-Map~
-Nth: God Hall - Nth, Inn, Post Office, Coffee Alcove
-Sth: God Hall - Sth, Bus. Ctr, Bldr Brd Rm, God Hall, Ext
-Est: God Hall - Est, Imm/Mrtl Brd Rm, Upr Imm Hall, Grd Lvl, God Hl - Ext
-Wst: God Hall - Wst, H.O.Jst/Chpl, Mtn Rm, Upr Imm Hall, Grd Lvl, God Hl - Ext
-Dwn: Midguaard
-~
-E
-spade~
-   The spade seems to be the headstone of the center of the fountain here.  It
-is made of black stone and is an obelisk in shape.  It has 'Directory' on the
-side of it and it also has a 'MAP' on the side of it as well.
-~
-E
-fountain basin~
-   The fountain is made of black granite and the water in it looks and inviting
-to drink.  In the center is a 'SPADE' shaped centerstone that seems to have
-writing all over it.
-~
 #34301
-fouton~
-a Fouton(tm) ~
-A Fouton(tm) is sitting here in the corner~
+cushioned divan couch furniture~
+a @Ocu@Wsh@Bio@Cne@Wd @Bdi@Wva@Cn@n~
+A cushioned divan rests against the wall.~
+A sturdy wooden divan is layered with deep cushions suitable for a long
+meeting or a short rest between duties.
 ~
 6 0 0 0 0 0 0 0 0 0 0 0 0
 6 0 0 0
@@ -69,9 +74,11 @@ fouton~
 doubles as a bed when it is flattened to sleep two.
 ~
 #34302
-Beertap~
-a beertap~
-A beertap is here to dispense beer.~
+ale tap keg tap fountain drink~
+an @Oal@We @Bta@Cp@n~
+A small ale tap is mounted behind the refreshment counter.~
+A simple wooden tap draws ale from a sealed cask below the counter. It
+is ordinary tavern equipment rather than a modern machine.
 ~
 23 0 0 0 0 0 0 0 0 0 0 0 0
 -1 2 1 0
@@ -83,9 +90,11 @@ a wooden handle that serves as a valve to allow the beer
 to flow. On the handle are the words SAM ADAMS.
 ~
 #34303
-coffee dispenser~
-a coffee dispenser~
-A coffee dispenser is here.~
+coffee urn dispenser hot drink fountain~
+a @Oco@Wff@Bee @Cur@Wn@n~
+A brass coffee urn keeps a dark brew hot.~
+A brass urn stands over a low warming rune, keeping a strong pot of
+coffee ready for staff on long duty.
 ~
 23 0 0 0 0 0 0 0 0 0 0 0 0
 -1 2 12 0
@@ -96,9 +105,11 @@ dispenser~
 with a button.  The dispenser is made of chrome and wood.
 ~
 #34304
-mug beer~
-an empty beer mug~
-An empty beer mug is here ready for use.~
+mug tankard empty drink container~
+an empty @Ota@Wnk@Bar@Cd@n~
+An empty tankard waits beside the refreshment counter.~
+A plain handled tankard is clean, sturdy, and sized for ordinary ale or
+water.
 ~
 17 0 0 0 0 ao 0 0 0 0 0 0 0
 2 0 1 0
@@ -109,9 +120,11 @@ beermug mug~
 placed out for use by the patrons.
 ~
 #34305
-coffee cup coffee~
-a large coffee cup~
-A large empty coffee cup is here ready for use.~
+coffee cup mug ceramic drink container~
+a large @Wce@Cra@Bmi@Wc @Cmu@Bg@n~
+A large ceramic mug rests on the shelf.~
+A thick ceramic mug is glazed in dark blue and white, made to hold hot
+tea or coffee without burning the hands.
 ~
 17 0 0 0 0 ao 0 0 0 0 0 0 0
 2 0 12 0
@@ -122,9 +135,10 @@ coffeecup cup~
 coffee to be drank from it.
 ~
 #34306
-Watertap~
-a water tap~
-A water tap is here dripping into the sink.~
+water tap spigot fountain drink~
+a @Cwa@Wte@Br @Csp@Wig@Bot@n~
+A brass water spigot is set above a stone basin.~
+A polished brass spigot draws clean water into the refreshment basin.
 ~
 23 0 0 0 0 0 0 0 0 0 0 0 0
 -1 2 15 0
@@ -135,9 +149,11 @@ watertap~
 moved left or right.
 ~
 #34307
-countrytime fountain~
-a Lemonaid fountain machine~
-A Countrytime(tm) Lemonaid fountain drink machine is here.~
+lemonade cordial fountain citrus drink~
+a @Yci@Wtr@Cus @Bco@Crd@Wia@Bl @Yfo@Wun@Cta@Win@n~
+A citrus cordial fountain stands behind the counter.~
+A glazed ceramic vessel dispenses a tart citrus cordial kept cool by a
+simple enchantment.
 ~
 23 0 0 0 0 0 0 0 0 0 0 0 0
 -1 2 6 0
@@ -148,9 +164,11 @@ Lemonaid Fountain~
 front of a five gallon jug of the yellow delicious liquid.
 ~
 #34308
-juice glass juice~
-a tall frosty glass~
-An empty tall frost-covered glass is here ready for use.~
+frosted glass tumbler drink container~
+a tall @Cfr@Wos@Bte@Cd @Wgl@Bas@Cs@n~
+A tall frosted glass stands ready on the shelf.~
+A tall glass remains pleasantly cool to the touch, ideal for water or
+cordial.
 ~
 17 0 0 0 0 ao 0 0 0 0 0 0 0
 2 0 10 0
@@ -162,9 +180,11 @@ either water, beer, lemonaid.  It is frost-covered of course, kept on ice before
 it is used by the patrons.
 ~
 #34309
-cabinet storage~
-a large storage cabinet~
-A large storage cabinet is attached to the wall behind the counter.~
+storage cabinet cupboard supplies container~
+a large @Ost@Wor@Bag@Ce @Oca@Wbi@Bne@Ct@n~
+A large storage cabinet stands against the wall.~
+Heavy oak doors conceal shelves for cups, sealed provisions, cleaning
+cloths, and other staff supplies.
 ~
 15 0 0 0 0 0 0 0 0 0 0 0 0
 -1 5 -1 0
@@ -176,9 +196,11 @@ to allow acess to the inside.  It is white colored to match the sterile color
 and green that make up the coffee bar.
 ~
 #34310
-tea brewer~
-a Lipton Tea (tm) Brew Dispenser~
-A Lipton Tea(tm) tea barrel is here with a dispenser.~
+tea urn brewer dispenser hot drink fountain~
+a @Ote@Wa @Bbr@Cew@Win@Og @Bur@Wn@n~
+A tea-brewing urn gives off a gentle curl of steam.~
+A brass and ceramic urn keeps hot water and loose tea ready without any
+merchant branding.
 ~
 23 0 0 0 0 0 0 0 0 0 0 0 0
 -1 2 11 0
@@ -189,9 +211,11 @@ Brewer brewer tea~
 platform where you place your glass.  It has a red button to dispense the tea.
 ~
 #34311
-milk~
-a milk dispensing machine~
-A milk dispensing machine is here.~
+milk crock dispenser fountain drink~
+a chilled @Wmi@Clk @Bcr@Woc@Ck@n~
+A chilled milk crock rests in a stone cradle.~
+A glazed crock sits in a rune-cooled stone cradle with a small serving
+spout.
 ~
 23 0 0 0 0 0 0 0 0 0 0 0 0
 -1 2 10 0
@@ -202,9 +226,11 @@ winebox~
 glass.  There is a trigger to push glass against to make it dispense.
 ~
 #34312
-wine glass wine~
-a crystal wine glass~
-A crystal wine glass is here ready for use.~
+crystal goblet glass drink container~
+a @Ccr@Wys@Bta@Cl @Wgo@Bbl@Cet@n~
+A clear crystal goblet rests on the shelf.~
+A simple crystal goblet catches the lamplight without unnecessary
+ornament.
 ~
 17 0 0 0 0 ao 0 0 0 0 0 0 0
 2 0 2 0
@@ -215,9 +241,11 @@ wineglass wine~
 the light.
 ~
 #34313
-shelf wooden~
-a wooden shelf~
-A wooden shelf is attached to the wall.~
+wooden shelf rack container~
+a sturdy @Owo@Wod@Ben @Csh@Wel@Bf@n~
+A sturdy wooden shelf is fixed to the wall.~
+Thick oak shelves hold bottles, cups, ledgers, and ordinary refreshment
+supplies.
 ~
 15 0 0 0 0 0 0 0 0 0 0 0 0
 -1 0 -1 0
@@ -228,9 +256,11 @@ shelf wooden~
 the wall below, It makes for perfect storage.
 ~
 #34314
-whisky bottle whisky~
-a bottle of whisky~
-A bottle of whisky is here.~
+whisky bottle spirits liquor drink container~
+a bottle of @Osm@Wok@Bed @Cwh@Wis@Bky@n~
+A bottle of smoked whisky rests on the shelf.~
+A sealed glass bottle contains a dark, smoky whisky suitable for a
+medieval staff refreshment alcove.
 ~
 17 0 0 0 0 ao 0 0 0 0 0 0 0
 5 1 5 0
@@ -240,9 +270,11 @@ bottle whiskey~
    The bottle is brown and it has a white and red label marked "Wild Turkey"
 ~
 #34315
-ale shotglass ale~
-a short shotglass~
-A short shotglass is here ready for use.~
+shotglass small glass drink container~
+a small @Csp@Wir@Bit@W g@Cla@Bss@n~
+A small spirit glass stands beside the bottle shelf.~
+A thick-bottomed little glass is intended for measured servings of
+strong spirits.
 ~
 17 0 0 0 0 ao 0 0 0 0 0 0 0
 2 0 5 0
@@ -253,9 +285,11 @@ firebreather~
 made of glass.
 ~
 #34316
-whiskytap~
-a whisky dispenser~
-A whisky dispenser is here giving shots.~
+whisky cask tap spirits fountain~
+a @Owh@Wis@Bky @Cca@Wsk @Ota@Bp@n~
+A whisky cask tap is built into the lower counter.~
+A small oak cask lies secured beneath the counter with a simple brass
+tap.
 ~
 23 0 0 0 0 0 0 0 0 0 0 0 0
 -1 2 5 0
@@ -266,19 +300,21 @@ whiskytap~
 the metal tigger and it will dispense a perfect shot of whiskey.
 ~
 #34317
-barrier construction~
-a construction barrier~
-A construction barrier is here on its metal spidery legs.~
-   The orange and white stripped barrier has two lights on the top of it that
-blink yellow and it sits on long spidery looking legs.
+work barrier notice construction sign~
+a @Ywo@Wrk @Oba@Wrr@Bie@Cr@n~
+A work barrier marks an area reserved for maintenance.~
+A folding timber barrier can be placed across a corridor when builders
+need to mark temporary maintenance.
 ~
 16 0 0 0 0 ao 0 0 0 0 0 0 0
 0 0 0 0
 200 2000000 0 31 0
 #34318
-couch~
-a plush couch~
-A plush couch is here in front of a coffee table.~
+plush couch sofa furniture~
+a @Opl@Wus@Bh @Cco@Wuc@Bh@n~
+A plush couch offers comfortable staff seating.~
+A broad couch with deep cushions gives staff somewhere to sit during
+informal discussion.
 ~
 6 0 0 0 0 0 0 0 0 0 0 0 0
 5 0 0 0
@@ -289,9 +325,11 @@ couch~
 happens to be a Futon (tm).
 ~
 #34319
-LazyBoy recliner~
-a LazyBoy(tm) recliner~
-A LazyBoy(tm) recliner is here.~
+highback recliner chair furniture~
+a @Ohi@Wgh@B-b@Cac@Wk @Ore@Bcl@Win@Cer@n~
+A high-backed reclining chair sits near the hearth.~
+A sturdy reclining chair provides comfortable seating without any modern
+merchant branding.
 ~
 6 0 0 0 0 0 0 0 0 0 0 0 0
 1 0 0 0
@@ -302,37 +340,31 @@ LazyBoy recliner~
 leather is light brown trimmed in black.
 ~
 #34320
-sign~
-a construction sign~
-A construction sign is here nailed to a 2x4~
-This area is currenty under construction. Please enter at OWN RISK
-------------------- HARD-HAT AREA -----------------
-
-Witt's End Construction Company
-Making for a Better Tomorrow
+work notice construction sign maintenance~
+a @Yma@Win@Bte@Cna@Wnc@Oe @Bno@Wti@Cce@n~
+A maintenance notice has been posted here.~
+A reusable wooden sign marks rooms or passages undergoing active staff
+work.
 ~
 16 a 0 0 0 0 0 0 0 0 0 0 0
 0 0 0 0
 0 0 0 0 0
 #34321
-bigscreen TV~
-a bigscreen TV 51"~
-A big screen 51" TV is here playing the local sports channel highlights.~
-   The Big Screen 51" has a huge, flat screen, perfect sound, and color.  It
-sits on a black pedistal with a swivel, and has a keypad on one side, on front
-to change the channels.  Sounds of Lively Action is on the SCREEN right now.
-
-   The split screen is engaged and on it the NY Yankees (tm) vs the SF Giants
-(tm) for MLB.  The other split screen shows a round of Soccer being played,
-Mexico vs Brazil.  Exciting games!
+scrying panel display notice crystal~
+a @Bsc@Cry@Win@Bg @Cpa@Wne@Bl@n~
+A broad scrying panel is mounted on the wall.~
+A dark crystal panel can display maps, notices, and distant views
+through controlled enchantment. It replaces an obsolete modern
+entertainment device.
 ~
 16 0 0 0 0 0 0 0 0 0 0 0 0
 0 0 0 0
 0 0 0 0 0
 #34322
-stool barstool~
-a barstool~
-A barstool is here next to the counter wanting to be sat on~
+barstool stool seat furniture~
+a tall @Oco@Wun@Bte@Cr @Ost@Woo@Bl@n~
+A tall counter stool stands beside the refreshment bar.~
+A tall wooden stool has a broad seat and iron foot ring.
 ~
 6 0 0 0 0 0 0 0 0 0 0 0 0
 1 0 0 0
@@ -342,9 +374,11 @@ stool barstool~
    The stood has a green top of padded foam and the legs are made of metal.
 ~
 #34323
-hardhat construction~
-a yellow hardhat~
-A yellow construction hardhat is here on the desk.~
+builder helm hardhat work helmet armor~
+a @Ybu@Wil@Bde@Cr's @Owo@Wrk @Yhe@Blm@n~
+A builder's work helm hangs from a peg.~
+A reinforced leather-and-brass work helm is meant for hazardous
+construction testing rather than battle.
 ~
 9 0 0 0 0 aeo 0 0 0 0 0 0 0
 -20 0 0 0
@@ -362,26 +396,21 @@ A
 A
 24 2
 #34324
-sign~
-a small freestanding sign~
-A small freestanding sign is here on a rod and pedistal.~
-   The sign is in the shape of two arrows, on pointing up and the other pointing
-downward, There is a MESSAGE written in the center of either of the arrows.
-
-
-The arrow up has the message: For all Lead Offices, use upper stairs to
-Garden Level
-
-The arrow down has the message: Higher Immortal Hallway, North Extension(s)
-Section(s) A-B (coming soon C)
+direction sign freestanding staff notice~
+a small @Wdi@Cre@Bct@Wio@Cna@Bl @Osi@Wgn@n~
+A small directional sign points through the complex.~
+A freestanding wooden sign can be turned to mark temporary routes,
+meetings, or restricted work.
 ~
 16 0 0 0 0 0 0 0 0 0 0 0 0
 0 0 0 0
 0 0 0 31 0
 #34325
-neck guard~
-a titanium neckguard~
-A titanium necckguard is here.~
+runesteel neckguard armor neck guard~
+a @Bru@Wne@C-s@Bte@Wel @Cne@Bck@Wgu@Car@Bd@n~
+A rune-steel neckguard rests on the equipment rack.~
+A reinforced neckguard of dark rune-steel protects the throat during
+dangerous testing.
 ~
 9 0 0 0 0 ac 0 0 0 0 0 0 0
 -20 0 0 0
@@ -396,9 +425,11 @@ A
 A
 19 5
 #34326
-smock~
-a builder's smock~
-A builders smock is here in a heap.~
+builder smock apron work armor~
+a @Obu@Wil@Bde@Cr's @Wwo@Crk @Osm@Boc@Wk@n~
+A builder's work smock hangs neatly from a peg.~
+A heavy canvas smock is reinforced at the chest and pockets for tools,
+chalk, and measuring cord.
 ~
 9 0 0 0 0 ad 0 0 0 0 0 0 0
 -40 0 0 0
@@ -413,9 +444,11 @@ A
 A
 19 5
 #34327
-elbow~
-elbow guards~
-Protetive elbow guards are here hanging from the straps~
+elbow guards bracers work armor~
+a pair of @Owo@Wrk @Bel@Cbo@Ww @Ogu@Bar@Cds@n~
+A pair of work elbow guards rests on the rack.~
+Reinforced leather guards protect the elbows during climbing,
+construction, and physical testing.
 ~
 9 0 0 0 0 ai 0 0 0 0 0 0 0
 -10 0 0 0
@@ -430,9 +463,11 @@ A
 A
 19 5
 #34328
-jeans~
-501 Levi (tm) Jeans~
-A pair of Levi (tm) 501 jeans is here in a heap.~
+work trousers canvas pants armor~
+a pair of @Ohe@Wav@By @Cca@Wnv@Bas @Otr@Bou@Wse@Crs@n~
+A pair of heavy canvas trousers is folded on the shelf.~
+Thick canvas trousers are reinforced at the knees and seams for building
+work.
 ~
 9 0 0 0 0 af 0 0 0 0 0 0 0
 -20 0 0 0
@@ -449,9 +484,11 @@ A
 A
 14 40
 #34329
-gloves~
-a pair of calf hide gloves~
-A pair of thick calf hide gloves~
+calf hide gloves work armor~
+a pair of @Oca@Wlf@B-h@Cid@We @Ogl@Bov@Wes@n~
+A pair of calf-hide work gloves rests on the rack.~
+Soft but durable leather gloves protect the hands without sacrificing
+dexterity.
 ~
 9 0 0 0 0 ah 0 0 0 0 0 0 0
 -10 0 0 0
@@ -467,9 +504,11 @@ A
 A
 19 5
 #34330
-Rebock's Sneakers~
-Rebock's Hightop Sneakers~
-Rebock's Hightop Sneakers are sitting here as a pair.~
+high boots builder work footwear armor~
+a pair of @Ohi@Wgh @Bbu@Cil@Wde@Or's @Bbo@Wot@Cs@n~
+A pair of high builder's boots stands below the rack.~
+Sturdy leather boots have reinforced toes, strong laces, and soles meant
+for unfinished rooms and rough terrain.
 ~
 9 0 0 0 0 ag 0 0 0 0 0 0 0
 -5 0 0 0
@@ -484,9 +523,11 @@ A
 A
 19 5
 #34331
-labcoat~
-an OFFICIAL TBAMUD Labcoat~
-An official TBAMUD Labcoat hangs here from a hook.~
+builder overcoat work coat armor~
+an @Wof@Cfi@Bci@Wal @Obu@Wil@Bde@Cr's @Wov@Cer@Bco@Cat@n~
+An official builder's overcoat hangs from a brass hook.~
+A long practical coat carries reinforced pockets for notes, tools,
+chalk, and measuring cord.
 ~
 9 0 0 0 0 ak 0 0 0 0 0 0 0
 -20 0 0 0
@@ -501,9 +542,10 @@ A
 A
 19 5
 #34332
-belt~
-a leather belt~
-A leather belt with a gold clasp is here.~
+leather belt work armor~
+a broad @Ole@Wat@Bhe@Cr @Cbe@Wlt@n~
+A broad leather belt rests on the equipment shelf.~
+A thick leather belt can support pouches, tools, and a small key ring.
 ~
 9 0 0 0 0 al 0 0 0 0 0 0 0
 -10 0 0 0
@@ -517,9 +559,11 @@ A
 A
 19 5
 #34333
-rolex~
-a gold and silver Rolex Watch~
-WOW! A real gold and silver Rolex Watch is laying here!~
+service bracelet gold silver armor wrist~
+a @Ygo@Wld@B-a@Cnd @Wsi@Blv@Cer @Yse@Wrv@Bic@Ce @Wbr@Cac@Bel@Wet@n~
+A gold-and-silver service bracelet rests in a velvet tray.~
+A restrained bracelet of braided gold and silver marks long service
+without imitating modern luxury jewelry.
 ~
 9 0 0 0 0 am 0 0 0 defgs 0 0 0
 -5 0 0 0
@@ -534,9 +578,11 @@ A
 A
 19 5
 #34334
-gold chain~
-a gold chain~
-A decorative gold chain~
+gold chain necklace armor~
+a simple @Ygo@Wld @Cch@Wai@Bn@n~
+A simple gold chain lies coiled in a small box.~
+A plain gold chain is finely made but carries no title, rank, or
+religious significance.
 ~
 9 0 0 0 0 am 0 0 0 0 0 0 0
 -5 0 0 0
@@ -552,9 +598,11 @@ A
 A
 19 5
 #34335
-hammer~
-a TBAMUD Builder's Hammer~
-A TBAMUD Builder's Hammer is here laying head down.~
+builder hammer tool weapon~
+a @Obu@Wil@Bde@Cr's @Wha@Bmm@Cer@n~
+A builder's hammer rests across a workbench.~
+A balanced steel hammer bears measurement marks along its haft and is as
+useful for practical construction as it is symbolic of building work.
 ~
 5 0 0 0 0 an 0 0 0 i 0 0 0
 10 6 6 5
@@ -569,9 +617,11 @@ A
 A
 19 5
 #34336
-ring class~
-a TBAMUD Builder's Ring~
-A TBA Builder's Ring is here laying in the dust.~
+builder ring signet armor~
+a @Bbu@Wil@Cde@Br's @Wsi@Cgn@Bet @Bri@Wng@n~
+A builder's signet ring rests in a small case.~
+A simple signet ring bears the crossed-tools emblem used for authorized
+building work.
 ~
 9 0 0 0 0 ab 0 0 0 hno 0 0 0
 -10 0 0 0
@@ -586,9 +636,11 @@ A
 A
 19 5
 #34337
-skirt~
-a pleated 503 Levi (tm) skirt~
-A pleasted 503 Levi (tm) skirt is here in a heap.~
+pleated work skirt canvas armor~
+a @Opl@Wea@Bte@Cd @Cca@Wnv@Bas @Owo@Brk @Wsk@Cir@Bt@n~
+A pleated canvas work skirt is folded on the shelf.~
+A durable pleated garment is reinforced for movement and practical work,
+replacing an obsolete branded item.
 ~
 9 0 0 0 0 af 0 0 0 0 0 0 0
 -10 0 0 0
@@ -604,9 +656,11 @@ A
 A
 19 5
 #34338
-shield~
-a powerful titanium shield~
-A powerful titanium shield sits tipped against the wall.~
+runesteel shield powerful armor~
+a powerful @Bru@Wne@C-s@Bte@Wel @Csh@Bie@Wld@n~
+A rune-steel shield leans against the wall.~
+A heavy dark shield is etched with simple warding lines for controlled
+defensive testing.
 ~
 9 0 0 0 0 aj 0 0 0 ino 0 0 0
 -10 0 0 0
@@ -621,9 +675,11 @@ A
 A
 19 5
 #34339
-bench loveseat~
-a comfy looking French loveseat~
-A comfy looking French loveseat is here.~
+carved loveseat cushioned bench furniture~
+a carved @Otw@Wo-@Bse@Cat @Cse@Wtt@Bee@n~
+A carved two-seat settee rests near the wall.~
+A compact carved settee provides comfortable seating without the old
+foreign luxury styling.
 ~
 6 0 0 0 0 0 0 0 0 0 0 0 0
 2 0 0 0
@@ -635,9 +691,11 @@ plush cushions on the back and bottom that are blue with orange, yellow, white,
 and green stripes on one corner of the pillow.
 ~
 #34340
-key golden~
-a stumpy golden key~
-A stumpy golden key glistens in the light~
+golden key brass key~
+a short @Ybr@Was@Bs @Cke@Wy@n~
+A short brass key rests on a labeled hook.~
+A stout brass key is cut for one of the older office locks in the
+complex.
 ~
 18 a 0 0 0 ao 0 0 0 0 0 0 0
 0 0 0 0
@@ -648,9 +706,11 @@ key golden~
 key.
 ~
 #34341
-tablet~
-a purple tablet~
-A purple tablet is here blinking and chirping. ~
+violet rune slate wand tablet~
+a @Mvi@Bol@Cet @Wru@Bne@C-s@Wla@Bte@n~
+A violet rune-slate lies on the desk.~
+A thin enchanted slate stores notes and simple magical functions through
+etched runes, fitting the high-fantasy staff environment.
 ~
 3 0 0 0 0 an 0 0 0 0 0 0 0
 10 500 20 30
@@ -661,9 +721,11 @@ tablet purple~
 shell back, It seems to blink and flash when she touches the face of it.
 ~
 #34342
-hotttub~
-a steaming corner hottub~
-A steaming corner hottub is here bubbling ominously.~
+conversation hearth circular furniture seat~
+a circular @Oco@Wnv@Ber@Csa@Wti@Bon @Ohe@Car@Wth@n~
+A circular conversation hearth anchors the seating area.~
+A low stone hearth is surrounded by a broad warm rim designed for
+sitting, warming hands, and informal discussion.
 ~
 6 b 0 0 0 0 0 0 0 0 0 0 0
 10 0 0 0
@@ -674,64 +736,71 @@ hotttub~
 bubbles and churns, looking very inviting.
 ~
 #34343
-toilet~
-a toilet~
-A toilet is here made of porclein.~
+privy seat latrine furniture~
+a stone @Wpr@Civ@By @Wse@Cat@n~
+A clean stone privy occupies a screened alcove.~
+A properly vented stone privy is kept clean as part of the staff
+washroom.
 ~
 6 0 0 0 0 0 0 0 0 0 0 0 0
 1 0 0 0
 0 0 0 0 0
+E
+sign~
+   Be sure to Flush!
+~
 E
 toilet toidy throne~
    The toilet is made of white porcelien and it stands with a tank near the
 wall.  It has a wooden seat that is made of carved walnut and it has gold
 fixtures all around, which include the handles.
 ~
-E
-sign~
-   Be sure to Flush!
-~
 #34344
-sink~
-a sink and granite counter~
-A sink and long granite counter is here.~
+washbasin stone basin sink counter~
+a stone @Cwa@Wsh@Bba@Csi@Wn@n~
+A stone washbasin is set into a broad counter.~
+A polished basin and brass pitcher provide clean water for washing.
 ~
 12 0 0 0 0 0 0 0 0 0 0 0 0
 0 0 0 0
 0 0 0 0 0
 E
-sink~
-   The sink is clean and white, with a shiny chrome faucet system and drain in
-the bottom.
-~
-E
 counter~
    The counters are made of granite and are immaculately carved with such
 precision into a smooth flowing shape and designs all over them.
 ~
+E
+sink~
+   The sink is clean and white, with a shiny chrome faucet system and drain in
+the bottom.
+~
 #34345
-tub clawtub~
-an old fashioned claw tub and shower~
-An old fashioned claw tub and shower is here.~
+copper bathing tub wash furniture~
+a @Oco@Wpp@Ber @Cba@Wth@Bin@Og @Otu@Wb@n~
+A copper bathing tub stands behind a privacy screen.~
+A deep copper tub can be filled from the nearby washbasin and warmed
+with heated stones.
 ~
 6 0 0 0 0 0 0 0 0 0 0 0 0
 3 0 0 0
 0 0 0 0 0
-E
-tub~
-   The tub is made of iron and porcelin and it has claw feet in which it sits.
-It is quite large and deep holding several meters of water.
-~
 E
 shower~
    The shower is a gold tube and a nozzle that is located on one side of the tub
 and the water pours down over the person or persons.  The valve is located just
 above the fixture on the bottom of the tub that fills it.
 ~
+E
+tub~
+   The tub is made of iron and porcelin and it has claw feet in which it sits.
+It is quite large and deep holding several meters of water.
+~
 #34346
-bench~
-a short teak bench~
-A short teak bench is here sitting on its legs.~
+teak bench garden seat furniture~
+a short @Ote@Wak @Bbe@Cnc@Wh@n~
+A short teak bench rests beside the garden path.~
+A weathered teak bench provides a dry place to sit beneath the garden
+lanterns.
 ~
 6 0 0 0 0 0 0 0 0 0 0 0 0
 3 0 0 0
@@ -742,38 +811,36 @@ bench~
 type design.
 ~
 #34347
-spring~
-a gurgling spring~
-A gurgling spring is here splashing into a golden basin.~
+gurgling spring water fountain~
+a @Cgu@Wrg@Bli@Cng @Wsp@Bri@Cng@n~
+A clear spring gurgles between smooth stones.~
+Fresh water bubbles from a small stone-lined spring among ferns and
+moss.
 ~
 23 0 0 0 0 0 0 0 0 0 0 0 0
 -1 2 15 0
 0 0 0 0 0
-E
-spring~
-   The spring is just a free flowing stream of water that flows from the ground
-with a murmuring, gurgling sound.
-~
 E
 basin~
    The basin is made of gold and it holds the water as it splashes out from the
 spring from the ground.  When full it runs into what appears to be a channel
 leading to the lagoon.
 ~
-#34348
-statue~
-a guardian statue of Rumble~
-A guardian statue of Rumble is here next to a pedistal.~
-~
-12 abi 0 0 0 0 0 0 0 0 0 0 0
-0 0 0 0
-0 0 0 31 0
 E
-pedistal~
-   The pedistal is made of rounded carved marble and it has unique designs,
-portraying extreme power.  The top of the pedistal is empty, but it seems that
-something should go there.
+spring~
+   The spring is just a free flowing stream of water that flows from the ground
+with a murmuring, gurgling sound.
 ~
+#34348
+service memorial statue founder stone~
+a @Wse@Crv@Bic@We @Ome@Wmo@Bri@Cal @Cst@Wat@Bue@n~
+A service memorial statue stands on a low plinth.~
+A stone figure commemorates earlier staff service to the MUD without
+elevating any immortal beyond that history.
+~
+12 0 0 0 0 0 0 0 0 0 0 0 0
+0 0 0 0
+0 0 0 0 0
 E
 statue Rumble rumble guardian~
    The statue is a guardian to this shrine, it depicts one of the immortals of
@@ -782,19 +849,22 @@ Battle Mage, in flowing robes and carries a staff.  His hair is long and flowing
 as he seems to be raising the staff in battle.  You seem to feel at ease by this
 statue.
 ~
-#34349
-Opie~
-a guardian statue of Opie~
-A guardian statue of Opie is here.~
-~
-12 abg 0 0 0 0 0 0 0 tu 0 0 0
-0 0 0 0
-0 0 0 31 0
 E
-nametag~
-   The nametag reads Opie the Cunning and that is carved at the base of the
-statue near the foot of his statue.
+pedistal~
+   The pedistal is made of rounded carved marble and it has unique designs,
+portraying extreme power.  The top of the pedistal is empty, but it seems that
+something should go there.
 ~
+#34349
+service memorial statue founder stone~
+a @Wse@Crv@Bic@We @Ome@Wmo@Bri@Cal @Cst@Wat@Bue@n~
+A service memorial statue stands on a low plinth.~
+A weathered staff memorial honors past work and institutional memory
+rather than personal grandeur.
+~
+12 0 0 0 0 0 0 0 0 0 0 0 0
+0 0 0 0
+0 0 0 0 0
 E
 Opie Guardian~
    The statue is a guardian to this shine, it depicts one of the immortals of
@@ -803,19 +873,21 @@ clad in carved battle armor of leather, a loose flowing shirt and a sash about
 his waist.  In his hand he carries a dagger that is thrust outward in a backstab
 motion.  You feel a strange surge of adventure looking at this statue.
 ~
-#34350
-Welcor~
-a guardian statue of Welcor~
-A guardian statue of Welcor is here.~
-~
-12 ab 0 0 0 0 0 0 0 ior 0 0 0
-0 0 0 0
-0 0 0 31 0
 E
 nametag~
-   The nametag reads Welcor the Bishop and that is carved at the base of the
-statue near the foot of it.
+   The nametag reads Opie the Cunning and that is carved at the base of the
+statue near the foot of his statue.
 ~
+#34350
+service memorial statue founder stone~
+a @Wse@Crv@Bic@We @Ome@Wmo@Bri@Cal @Cst@Wat@Bue@n~
+A service memorial statue stands on a low plinth.~
+A restrained stone memorial records long service to the world and its
+players.
+~
+12 0 0 0 0 0 0 0 0 0 0 0 0
+0 0 0 0
+0 0 0 0 0
 E
 Welcor guardian~
    The statue is a guardian to this shine, it depicts one of the immortals of
@@ -823,5 +895,10 @@ TBA and the influence of Justice to all who worship here.  He/She stands clad in
 a long flowing set of robes and he/she carries a warhammer in their hand.  The
 feeling of peace overwhelms the senses when you look at the statue that seems to
 be floating and glowing brightly.
+~
+E
+nametag~
+   The nametag reads Welcor the Bishop and that is carved at the base of the
+statue near the foot of it.
 ~
 $~

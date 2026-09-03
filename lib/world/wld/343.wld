@@ -1,6 +1,9 @@
 #34300
-Empty Office HIH EXT~
-You are in an unfinished room.
+Reserved Staff Office~
+A quiet staff office sits at the edge of the adjoining annex. The room
+is fully finished now, with an oak desk, map cabinet, reference shelf,
+and blank duty plaque. Its eastern door continues into the connected
+operations wing.
 ~
 343 28 0 0 0 0
 D1
@@ -10,12 +13,11 @@ door~
 1 0 34612
 S
 #34301
-Garden Path~
-   The path is a norh-south path which narrows here as it crosses a small foot
-bridge on its way to the main garden to the north and an alcove to the south.
-It is quite pleasant here, as a refreshing breeze whips through the trees and
-the plants that are placed here.  The path itself is gravel and has a brick
-border. An empty Pagoda office is to the east.
+Western Garden Path~
+A gravel path crosses a narrow footbridge beneath hanging lanterns.
+Trimmed hedges and flowering shrubs soften the stonework while the path
+links the western garden alcove with the larger garden to the north. A
+small planning office stands to the east.
 ~
 343 16 0 0 0 1
 D0
@@ -23,23 +25,22 @@ D0
 ~
 0 0 34383
 D1
-   Teak and rice paper doors with brush paintings upon its surface make up the
-door.  Gold Fixtures hold it in place and there are golden handles.
+A fitted oak-and-glass garden door opens east into the Garden Planning
+Office.
 ~
 door~
 1 0 34393
 D2
 ~
-undefined~
+path~
 0 0 34381
 S
 #34302
-Garden Path~
-   The path is a norh-south path which narrows here as it crosses a small foot
-bridge on its way to the main garden to the north and an alcove to the south.
-It is quite pleasant here, as a refreshing breeze whips through the trees and
-the plants that are placed here.  The path itself is gravel and has a brick
-border.  An empty Pagoda Office is to the east.
+Eastern Garden Path~
+A gravel path passes beneath old shade trees and over a shallow channel
+of clear water. Lantern hooks mark the route between the eastern garden
+alcove and the larger garden to the north, while a garden office lies
+east.
 ~
 343 16 0 0 0 1
 D0
@@ -47,8 +48,7 @@ D0
 ~
 0 0 34386
 D1
-   Teak and rice paper doors with brush paintings upon its surface make up the
-door.  Gold Fixtures hold it in place and there are golden handles.
+A fitted oak garden door opens east into the Garden Records Office.
 ~
 door~
 1 0 34304
@@ -58,8 +58,11 @@ D2
 0 0 34382
 S
 #34303
-Empty Office HIH Ext.~
-You are in an unfinished room.
+Reserved Staff Office~
+A reserved staff office occupies the edge of the connected annex.
+Practical furnishings and a blank duty plaque leave it ready for a
+future assignment, while the western door leads into the neighboring
+operations wing.
 ~
 343 28 0 0 0 0
 D3
@@ -69,31 +72,29 @@ door~
 1 0 34613
 S
 #34304
-Empty Pagoda Office~
-This unfinished room was created by Whiteknight.
+Garden Records Office~
+Garden maps, planting records, maintenance tools, and lantern schedules
+fill this compact office. It gives the garden staff a practical
+workspace without turning the pavilion into a personal retreat.
 ~
 343 28 0 0 0 0
 D3
-   Teak and rice paper doors with brush paintings upon its surface make up the
-door.  Gold Fixtures hold it in place and there are golden handles.
+A fitted oak garden door opens west onto the Eastern Garden Path.
 ~
 door~
 1 0 34302
 S
 #34305
-Narrow Gravel Path~
-   The path goes north and south and it is the same gravel type as the others.
-This path leads through a thicker part of the garden, however, to what appears o
-be a Pagoda that is set back a ways from the others and the main part of the
-garden.  Thick growth of planets, trees and bushes surround the building and
-this path, The path itself is lined with bricks marking it easily to find your
-way and lanterns hang from hooks every so many feet to light the way.
+Lantern Garden Path~
+A narrow gravel path winds through dense greenery toward the council
+pavilion. Low brick borders keep the route clear, and shielded lanterns
+hang at regular intervals so staff can cross the garden safely after
+dark.
 ~
 343 0 0 0 0 1
 D0
-   The door is made of Teak, rice paper and silver fixtures.  And it slides to
-the side as in traditional design of any pagoda of 14th century.  On the rice
-paper there is the design of a dragon with its wings spread
+A broad timber door with brass fittings opens north into the Senior
+Staff Council Pavilion.
 ~
 door~
 1 0 34397
@@ -103,12 +104,13 @@ D2
 0 0 34384
 S
 #34306
-The Social Gathering Room~
-   This is the Main Social Gathering Room of the Immortals.  It is circular in
-design, and it connects four foyers in all directions to the north, south, east,
-and west.  The room is quite plush with many fountains, couches, and carpeted
-areas, also with a few planters filled with thick green bushes and trees.  The
-fountain seems to be glowing.
+The Central Staff Commons~
+A broad circular commons forms the social and operational center of the
+immortal complex. Comfortable seating surrounds a low conversation
+hearth beneath restrained banners and service emblems. The four main
+foyers open north, east, south, and west, while the route down returns
+toward Midgaard. Staff are welcome to rest here, but the room remains a
+workplace built around service rather than status.
 ~
 343 28 0 0 0 0
 D0
@@ -133,11 +135,12 @@ D5
 0 0 3000
 S
 #34307
-Northern Foyer~
-      This is the Northern End of the Gathering Hall. This foyer continues to
-the north into what appears to be a hallway and south into a circular
-central room. Several pillars line the room here. Archways west and east
-lead into the Post Office and the Immortal Inn.
+Northern Service Foyer~
+Pillars frame the northern entrance to the central commons. The
+Steward's Registry and Keeper's Dispatch connect west and east through
+the Service Hall, while the main northern corridor continues ahead.
+Seating along the walls gives staff a place to confer without blocking
+the junction.
 ~
 343 24 0 0 0 0
 D0
@@ -158,16 +161,17 @@ D3
 0 0 1201
 S
 #34308
-Eastern Foyer~
-   You are in the Eastern End of the Gathering Hall.  Several pillars line this
-room.  The foyer continues east into what looks like a hallway and west into a
-circular central room.  Archways north and south lead into the Immortal Board
-Room and the Mortal Board Room.
+Eastern Service Foyer~
+The eastern foyer links the central commons with the Immortal Commons
+and Mortal Affairs Archive in the Service Hall. The eastern staff
+corridor continues beyond a line of pillars and wall lamps. This
+junction is designed to keep routine staff movement obvious to newly
+appointed immortals.
 ~
 343 24 0 0 0 0
 D0
 ~
-undefined~
+archway~
 0 -1 1204
 D1
 ~
@@ -183,11 +187,11 @@ D3
 0 0 34306
 S
 #34309
-Southern Foyer~
-     This is the Southern End of the Gathering Hall. This foyer continues
-to the south into what appears to be a hallway and north into a circular
-central room.  Several pillars line the room here. Archways west ane east
-lead into the Builders Hall and the Advertising/Business Center.
+Southern Service Foyer~
+The southern foyer connects the central commons with the Staff Workroom
+and Builder's Briefing Room. The southern staff corridor continues ahead
+into the larger operations complex. Duty markers and simple directional
+plaques replace the old clutter of glowing signs.
 ~
 343 24 0 0 0 0
 D0
@@ -208,17 +212,17 @@ D3
 0 0 1291
 S
 #34310
-Western Foyer~
-   This is the Western End of the Gathering Hall.  This foyer continues to the
-west into what appears to be a hallway and east into a circular central room.
-Several pillars line the room here.  Archways north and south lead to the Hall
-of Justice/Chapel and the Meeting Room of the Immortals.
+Western Service Foyer~
+The western foyer joins the central commons to the Hall of Service and
+Hall of Justice and Conduct. Closed service doors mark those formal
+rooms, while the western staff corridor continues into the operations
+complex. The layout makes the boundary between ordinary work, conduct
+review, and general gathering clear.
 ~
 343 24 0 0 0 0
 D0
-   A frosted glass door with huge silver hinges and silver fixtures are here
-marking the Hall of Justice with the Rune of Justice etched in the glass in the
-exact center of it.
+A frosted glass service door opens north into the Hall of Justice and
+Conduct.
 ~
 door~
 1 0 1293
@@ -227,9 +231,7 @@ D1
 ~
 0 0 34306
 D2
-   A frosted glass door with huge silver hinges and silver fixtures are here
-marking the main meeting room with the TBA company Logo upon the door.  The door
-is open.
+A broad oak service door opens south into the Hall of Service.
 ~
 door~
 1 0 1200
@@ -239,15 +241,12 @@ D3
 0 0 34313
 S
 #34311
-God Hall, North~
-     The beginning and ending of the God Hall, North is here.
-It seems to go on to the east and west with many doors that
-line the hallways leading into the many offices that are
-located here.
-
-An archway leads south into a foyer and north the hallway
-seems to bend inward to what appears to be a coffee alcove.
-The smell of coffee is very strong in this part of the hall.
+Northern Staff Hall~
+The northern staff hall branches east and west between a sequence of
+secure offices. To the south lies the northern foyer; to the north, the
+refreshment alcove provides a practical pause between duties. Dark wood
+trim and brass lamps keep the corridor formal without becoming
+ostentatious.
 ~
 343 24 0 0 0 0
 D0
@@ -268,13 +267,11 @@ D3
 0 0 34315
 S
 #34312
-God Hall, South~
-   The beginning and ending of the God Hall, South is here.  It seems to go on
-to the east and west with many doors that line the hallways leading into the
-many offices that are located here.  An archway leads into the Foyer to the
-north.
-   Another passageway crosses the hall into what appears to be a very simple
-looking extension to the main God Hall.
+Southern Staff Hall~
+The southern staff hall runs east and west past secure workrooms and
+continues south into the adjoining operations wing. The northern arch
+returns to the southern foyer. Maps and modest duty plaques identify
+functions rather than celebrating individual occupants.
 ~
 343 24 0 0 0 0
 D0
@@ -295,13 +292,11 @@ D3
 0 0 34321
 S
 #34313
-God Hall, West~
-   This is a simple hallway that leads to the north and south.  There is a tiled
-floor and open beamed ceilings here.  On either side doors line the hallway.
-An archway to the east enters a plush foyer.  A staircase leads up to a very
-plush hallway above.
-   Another passageway crosses the hall into what appears to be a very simple
-looking extension to the main God Hall.
+Western Staff Hall~
+The western staff hall runs north and south with office doors set into
+paneled stone walls. An arch to the east returns to the western foyer, a
+stair rises to the upper service gallery, and a western passage joins
+the adjoining annex.
 ~
 343 24 0 0 0 0
 D0
@@ -326,13 +321,11 @@ D4
 0 0 34327
 S
 #34314
-God Hall, East~
-   This is a simple hallway that leads to the north and south.  There is a tiled
-floor and open beamed ceilings here.  On either side doors line the hallway.
-An archway to the west enters a plush foyer.  A staircase leads up to a very
-plush hallway above.
-   Another passageway crosses the hall into what appears to be a very simple
-looking extension to the main God Hall.
+Eastern Staff Hall~
+The eastern staff hall runs north and south past secure workrooms. The
+western arch returns to the eastern foyer, a stair climbs to the upper
+service gallery, and the eastern passage continues into the connected
+annex.
 ~
 343 24 0 0 0 0
 D0
@@ -345,7 +338,7 @@ D1
 0 0 34663
 D2
 ~
-0~
+corridor~
 0 0 34323
 D3
 ~
@@ -357,11 +350,11 @@ D4
 0 0 34331
 S
 #34315
-God Hall, North~
-     This is a simple hallway that leads to the east and west.
-There is a tiled floor and open beamed ceilings here. On
-either side doors line the hallway.
-Jamdog's Office is to the North.
+Northwest Staff Corridor~
+This northwest corridor links the northern staff hall with offices on
+both sides. The space is kept deliberately simple: stone floor, dark
+timber beams, brass lamps, and small duty plaques that can be changed as
+assignments change.
 ~
 343 24 0 0 0 0
 D0
@@ -385,11 +378,10 @@ D3
 0 0 34326
 S
 #34316
-God Hall, North~
-      This is a simple hallway that leads to the east and west.
-There is a tiled floor and open beamed ceilings here. On
-either side doors line the hallway.
-Axanon's Office is to the north.
+Northeast Staff Corridor~
+This northeast corridor continues the northern staff hall past secure
+staff workrooms. Clean stone, timber beams, and practical wall lamps
+replace the old personal-office atmosphere.
 ~
 343 24 0 0 0 0
 D0
@@ -412,10 +404,10 @@ D3
 0 0 34311
 S
 #34317
-God Hall, Northeast~
-     This is a simple hallway, which curves to the west and south.
-There is a tiled floor and open beamed ceilings here. There are
-offices on the corners. Elaseth's Office is to the east.
+Northeastern Corner Gallery~
+The northeastern corner gallery bends between the north and east
+corridors. Secure office doors occupy the inner walls, and a wider
+turning space allows staff to gather briefly without blocking passage.
 ~
 343 24 0 0 0 0
 D0
@@ -438,10 +430,10 @@ D3
 0 0 34316
 S
 #34318
-God Hall, West~
-     This is a simple hallway that leads to the north and south.
-There is a tiled floor and open beamed ceilings here. On
-either side doors line the hallway.
+Upper Western Staff Corridor~
+The upper western corridor links the west hall with several staff
+offices. The passage is quiet and well lit, with restrained paneling,
+runner carpets, and lockable doors suited to records and focused work.
 ~
 343 24 0 0 0 0
 D0
@@ -464,11 +456,10 @@ door~
 1 0 34336
 S
 #34319
-God Hall, West~
-     This is a simple hallway that leads to the north and south.
-There is a tiled floor and open beamed ceilings here. On
-either side doors line the hallway.
-Aich's Office is to the west.
+Lower Western Staff Corridor~
+The lower western corridor continues between the west and south halls.
+Staff offices line both sides, and simple brass plaques identify current
+functions rather than permanent personal claims.
 ~
 343 24 0 0 0 0
 D0
@@ -491,11 +482,10 @@ door~
 1 0 34334
 S
 #34320
-God Hall, South~
-     This is a simple hallway that leads to the east and west.
-There is a tiled floor and open beamed ceilings here. On
-either side doors line the hallway.
-Perra's Office is to the south.
+Eastern South Staff Corridor~
+The eastern half of the southern corridor connects the south hall with
+the southeastern corner gallery. Secure workrooms lie to either side
+behind matching walnut doors.
 ~
 343 24 0 0 0 0
 D0
@@ -518,11 +508,10 @@ D3
 0 0 34312
 S
 #34321
-God Hall, South~
-     This is a simple hallway that leads to the east and west.
-There is a tiled floor and open beamed ceilings here. On
-either side doors line the hallway.
-Vatiken's Office is north and Tink's Office is south.
+Western South Staff Corridor~
+The western half of the southern corridor connects the south hall with
+the southwestern corner gallery. Duty offices on both sides are arranged
+for practical staff work and easy reassignment.
 ~
 343 24 0 0 0 0
 D0
@@ -545,10 +534,10 @@ D3
 0 0 34325
 S
 #34322
-God Hall, East~
-      This is a simple hallway that leads to the north and south.
-There is a tiled floor and open beamed ceilings here. On
-either side doors line the hallway.
+Upper Eastern Staff Corridor~
+The upper eastern corridor links the east hall with the northeastern
+corner gallery. Matching office doors, stone floors, and shielded lamps
+give the passage a coherent institutional character.
 ~
 343 24 0 0 0 0
 D0
@@ -571,11 +560,10 @@ door~
 1 0 34347
 S
 #34323
-God Hall, East~
-     This is a simple hallway that leads to the north and south.
-There is a tiled floor and open beamed ceilings here. On
-either side doors line the hallway.
-Kyle's Office is to the East.
+Lower Eastern Staff Corridor~
+The lower eastern corridor links the east hall with the southeastern
+corner gallery. Staff offices line the passage, each identified by
+function instead of long-departed occupants.
 ~
 343 24 0 0 0 0
 D0
@@ -598,10 +586,10 @@ door~
 1 0 34349
 S
 #34324
-God Hall, Southeast~
-     This is a simple hallway, which curves to the west and north.
-There is a tiled floor and open beamed ceilings here. There are
-offices on the corners.
+Southeastern Corner Gallery~
+The southeastern corner gallery turns between the east and south
+corridors. Two secure offices face the junction, and a broad wall map
+helps staff orient themselves within the complex.
 ~
 343 24 0 0 0 0
 D0
@@ -624,10 +612,10 @@ D3
 0 0 34320
 S
 #34325
-God Hall, Southwest~
-   This is a simple hallway, which curves to the east and north.  There is a
-tiled floor and open beamed ceilings here.  There are offices on the corners.
-West is Detta's Office.
+Southwestern Corner Gallery~
+The southwestern corner gallery turns between the west and south
+corridors. Secure offices occupy the outer walls, while a small duty
+board records which staff functions currently use them.
 ~
 343 24 0 0 0 0
 D0
@@ -636,7 +624,7 @@ D0
 0 0 34319
 D1
 ~
-0~
+corridor~
 0 0 34321
 D2
 a walnut door is here with huge gold hinges.
@@ -650,11 +638,10 @@ door~
 1 0 34333
 S
 #34326
-God Hall, Northwest~
-     This is a simple hallway, which curves to the east and south.
-There is a tiled floor and open beamed ceilings here. There are
-offices on the corners. Vatiken's Office is to the north.
-Proca's Office is to the west.
+Northwestern Corner Gallery~
+The northwestern corner gallery links the west and north corridors. A
+pair of staff offices open from the junction, and the corridor's
+restrained fittings match the rest of the operations complex.
 ~
 343 24 0 0 0 0
 D0
@@ -677,13 +664,11 @@ door~
 1 0 34338
 S
 #34327
-Upper Immortal Hall, West~
-   Standing at the end-beginning of the hallway west, this hallway is lined with
-wooden paneling and thick marooon shag carpet.  The hallway is lit by bronze
-lanterns that burn brightly here.  It continues on to the east and office door
-line the walls. There is also a corner office to the west and Whiteknight's
-Office is to the north. There is a staircase that descends into a hallway
-below.
+Upper Service Gallery, West~
+The western end of the upper service gallery overlooks the lower halls
+through narrow interior windows. Offices line the passage, while a stair
+descends to the western staff hall. Thick runners and bronze lamps
+soften the otherwise practical stonework.
 ~
 343 24 0 0 0 0
 D0
@@ -711,11 +696,10 @@ D5
 0 0 34313
 S
 #34328
-Upper Immortal Hall, West~
-   This is the midway down the hallway west, this hallway is lined with wood
-paneling and thick maroon, shag carpeting.  The hallway is lit by bronze
-lanterns that burn brightly here.  It continues on to the east and west.
-Office doors line the walls.  Elona's Office is to the north.
+Upper Service Gallery, West~
+The upper western gallery continues toward the central overlook. Secure
+offices line both sides, with map rails and small benches placed where
+staff can compare notes without entering a private workroom.
 ~
 343 24 0 0 0 0
 D0
@@ -738,14 +722,12 @@ D3
 0 0 34327
 S
 #34329
-Higher Imm Hall, Observation Port~
-   Standing in the center if the Higher Immortal Hall this is an observation
-port that looks out over the Social Gathering Room down below.  It is more
-rounded here with an open glass section and paneling and more lanterns to light
-this section of the hall.  The hall itself continues to the west and east.  A
-circular stairwell leads up to the Indoor Garden Level where the Leader Imp
-Offices are located and a step down to the north leads into what appears to be
-an north extension to the Higher Immortal Hallway.
+The Operations Overlook~
+A broad interior overlook stands above the central staff commons. From
+here senior staff can observe traffic through the complex and reach the
+upper galleries, northern extension, or quiet reflection pavilion. A low
+rail, wall maps, and a service standard emphasize oversight and
+responsibility rather than ceremony.
 ~
 343 24 0 0 0 0
 D1
@@ -754,7 +736,7 @@ D1
 0 0 34330
 D3
 ~
-0~
+gallery~
 0 0 34328
 D4
 ~
@@ -766,11 +748,10 @@ D5
 0 0 34395
 S
 #34330
-Upper Immortal Hall, East~
-   This is the midway down the hallway east, this hallway is lined with wood
-paneling and thick maroon, shag carpeting.  The hallway is lit by bronze
-lanterns that burn brightly here.  It continues on to the east and west.
-Office doors line the walls.
+Upper Service Gallery, East~
+The upper eastern gallery runs between the operations overlook and the
+far eastern stair. Office doors and reference alcoves line the corridor
+beneath warm bronze lamps.
 ~
 343 24 0 0 0 0
 D0
@@ -788,13 +769,10 @@ D3
 0 0 34329
 S
 #34331
-Upper Immortal Hall, East~
-   Standing at the end-beginning of the hallway east, this hallway is lined with
-wooden paneling and thick marooon shag carpet.  The hallway is lit by bronze
-lanterns that burn brightly here.  It continues on to the west and office doors
-line the walls.  There are also corner offices to the east.  Fizbin's Office is
-north, Rhade's Office is east and Shama's Office is south, A staircase leads
-down to a hallway below.
+Upper Service Gallery, East~
+The eastern end of the upper service gallery provides access to several
+specialized offices and a stair back down to the eastern staff hall. The
+space is orderly, quiet, and intended for focused work.
 ~
 343 24 0 0 0 0
 D0
@@ -822,8 +800,11 @@ D5
 0 0 34314
 S
 #34332
-Empty Office~
-Unfinished.
+Reserved Staff Office~
+A compact office stands ready for an assigned immortal whose duties
+require a private place to work. A sturdy desk, locked records cabinet,
+map shelf, and writing stand provide everything necessary without
+turning the room into a monument to its occupant.
 ~
 343 28 0 0 0 0
 D0
@@ -833,8 +814,11 @@ door~
 1 0 34325
 S
 #34333
-Detta's Office~
-You are in an unfinished room.
+World Continuity Office~
+Maps, continuity ledgers, timeline notes, and cross-zone references fill
+this office. Staff use it to keep changes consistent with established
+geography, lore, exits, and long-running world systems before those
+changes reach players.
 ~
 343 28 0 0 0 0
 D1
@@ -844,8 +828,11 @@ door~
 1 0 34325
 S
 #34334
-Aich's Office~
-You are in an unfinished room.
+Builder Review Office~
+Sample room plans, object drafts, mobile notes, and review slates cover
+the tables here. Builders bring proposed work to this office for a
+second set of eyes before substantial changes are committed to the live
+world.
 ~
 343 28 0 0 0 0
 D1
@@ -855,8 +842,11 @@ door~
 1 0 34319
 S
 #34335
-Empty Office~
-You are in an unfinished room.
+Player Assistance Office~
+Player reports, help notes, common questions, and escalation records are
+organized here. The office exists to keep staff assistance practical,
+documented, and focused on solving problems without using more authority
+than necessary.
 ~
 343 28 0 0 0 0
 D3
@@ -866,8 +856,10 @@ door~
 1 0 34319
 S
 #34336
-Empty Office~
-You are in an unfinished room.
+Reset Planning Office~
+Reset diagrams and numbered command sheets cover a broad planning table.
+Staff use this office to reason through load order, dependencies,
+limits, doors, and equipment before touching a live zone reset.
 ~
 343 28 0 0 0 0
 D1
@@ -877,8 +869,11 @@ door~
 1 0 34318
 S
 #34337
-Fade's Office~
-You are in an unfinished room.
+Quest Coordination Office~
+Quest notes, objective maps, reward checks, and state diagrams are
+stored in labeled folios. This office is intended for coordinating quest
+work without scattering undocumented behavior across unrelated rooms and
+scripts.
 ~
 343 28 0 0 0 0
 D3
@@ -888,8 +883,10 @@ door~
 1 0 34318
 S
 #34338
-Proca's Office~
-You are in an unfinished room.
+DG Script Review Office~
+DG examples, trigger references, event notes, and testing checklists
+fill this workroom. Scripts are expected to be readable, scoped, and
+tested here before they are attached to important live content.
 ~
 343 28 0 0 0 0
 D1
@@ -899,8 +896,11 @@ door~
 1 0 34326
 S
 #34339
-Vatiken's Office~
-no desc
+Area Records Office~
+Bound zone records and dated change ledgers line the shelves. This
+office keeps the operational history of the complex so staff can
+determine what changed, why it changed, and what dependencies may still
+matter.
 ~
 343 28 0 0 0 0
 D2
@@ -910,8 +910,10 @@ door~
 1 0 34326
 S
 #34340
-Jamdog's Office~
-You are in an unfinished room.
+Staff Scheduling Office~
+Duty rosters, handoff notes, maintenance windows, and staff assignments
+are posted on a large slate. The room emphasizes coordination and
+accountability rather than rank or ceremony.
 ~
 343 28 0 0 0 0
 D2
@@ -921,8 +923,10 @@ door~
 1 0 34315
 S
 #34341
-Empty Office~
-You are in an unfinished room.
+Reserved Staff Office~
+This clean office remains unassigned. A desk, secure cabinet, reading
+lamp, and blank duty plaque wait for a future staff function without
+preserving an obsolete personal office.
 ~
 343 28 0 0 0 0
 D0
@@ -932,8 +936,10 @@ door~
 1 0 34315
 S
 #34342
-Axanon's Office~
-You are in an unfinished room.
+Mobile Design Office~
+Mobile design notes, behavior examples, stat references, and loadout
+sketches cover several drafting stands. Staff use this office to build
+NPCs that fit their area, purpose, and current game systems.
 ~
 343 28 0 0 0 0
 D2
@@ -943,8 +949,10 @@ door~
 1 0 34316
 S
 #34343
-Empty Office~
-You are in an unfinished room.
+Object Design Office~
+Shelves of sample materials, value references, wear-slot diagrams, and
+object prototypes fill this office. It supports deliberate object design
+rather than copying old equipment without understanding its effects.
 ~
 343 28 0 0 0 0
 D0
@@ -954,8 +962,11 @@ door~
 1 0 34316
 S
 #34344
-Empty Office~
-You are in an unfinished room.
+Room Design Office~
+Room maps, sector references, exit sketches, and description drafts are
+arranged around a wide table. Builders use this office to check
+navigation, physical consistency, and readable presentation before
+saving changes.
 ~
 343 28 0 0 0 0
 D2
@@ -965,8 +976,11 @@ door~
 1 0 34317
 S
 #34345
-Elaseth's Office~
-You are in an unfinished room.
+Trigger Review Office~
+Trigger flowcharts and event diagrams cover the walls beside a locked
+testing cabinet. This office is for reviewing scripted behavior,
+especially anything capable of loading, purging, moving, damaging, or
+altering players.
 ~
 343 24 0 0 0 0
 D3
@@ -976,8 +990,10 @@ door~
 1 0 34317
 S
 #34346
-Empty Office~
-You are in an unfinished room.
+Cross-Zone Coordination Office~
+A large wall map marks the borders between connected zones and important
+cross-zone exits. Staff use this room to verify that work in one area
+does not quietly break another area that depends on it.
 ~
 343 28 0 0 0 0
 D3
@@ -987,8 +1003,11 @@ door~
 1 0 34322
 S
 #34347
-Empty Office~
-You are in an unfinished room.
+Balance Review Office~
+Combat references, reward notes, item comparisons, and test results are
+stored here. The room supports balance review without pretending that
+every staff or training entity needs to follow ordinary adventure-zone
+formulas.
 ~
 343 28 0 0 0 0
 D1
@@ -998,8 +1017,11 @@ door~
 1 0 34322
 S
 #34348
-Kyle's Office~
-You are in an unfinished room.
+New Immortal Mentoring Office~
+A welcoming office provides reference shelves, a small meeting table,
+and clear onboarding checklists. Experienced immortals can walk newly
+appointed staff through safe habits, authority boundaries, and where to
+ask questions.
 ~
 343 28 0 0 0 0
 D3
@@ -1009,8 +1031,10 @@ door~
 1 0 34323
 S
 #34349
-Empty Office~
-You are in an unfinished room.
+Reserved Staff Office~
+This office is deliberately reserved for future needs. Its furnishings
+are practical and neutral so a later staff assignment can take it over
+without inheriting someone else's abandoned personal theme.
 ~
 343 28 0 0 0 0
 D1
@@ -1020,8 +1044,10 @@ door~
 1 0 34323
 S
 #34350
-Empty Office~
-You are in an unfinished room.
+Reserved Staff Office~
+This office is deliberately reserved for future needs. A plain desk,
+locked cabinet, map rack, and writing stand leave the room useful
+without assigning status merely for possessing an office.
 ~
 343 28 0 0 0 0
 D3
@@ -1031,8 +1057,10 @@ door~
 1 0 34324
 S
 #34351
-Niamh's Office~
-You are in an unfinished room.
+Player Conduct Records Office~
+Conduct reports, incident notes, evidence logs, and review procedures
+are kept under lock here. The room supports careful staff handling of
+player issues, with emphasis on documentation and proportionate action.
 ~
 343 28 0 0 0 0
 D0
@@ -1042,8 +1070,10 @@ door~
 1 0 34324
 S
 #34352
-Empty Office~
-This unfinished room was created by Whiteknight.
+Service Hall Liaison Office~
+Message ledgers and route maps connect this office administratively with
+the Immortal Service Hall. It exists to keep Zone 12 onboarding and the
+wider operations complex working as one staff system.
 ~
 343 28 0 0 0 0
 D1
@@ -1057,8 +1087,10 @@ door~
 1 0 34320
 S
 #34353
-Parna's Office~
-You are in an unfinished room.
+Builder Assignment Office~
+Area ownership notes, builder assignments, review status, and
+outstanding tasks are tracked here. The room helps prevent two people
+from unknowingly changing the same live material at once.
 ~
 343 28 0 0 0 0
 D0
@@ -1068,8 +1100,10 @@ door~
 1 0 34320
 S
 #34354
-Vatiken's Office~
-You are in an unfinished room.
+Operations Records Office~
+Operational records, maintenance notes, reboot considerations, and
+completed work logs fill these shelves. The office supports continuity
+between staff shifts and long-running maintenance efforts.
 ~
 343 28 0 0 0 0
 D2
@@ -1079,8 +1113,11 @@ door~
 1 0 34321
 S
 #34355
-Tink's Office~
-You are in an unfinished room.
+Seasonal Content Office~
+Boxes of seasonal decorations, event plans, and dated activation notes
+are catalogued here. Seasonal material is treated as optional world
+content that should be deliberate, reversible, and kept out of the way
+when not in use.
 ~
 343 28 0 0 0 0
 D0
@@ -1090,8 +1127,10 @@ door~
 1 0 34321
 S
 #34356
-Empty Office~
-You are in an unfinished room.
+Reserved Staff Office~
+This room remains available for a future staff assignment. It is fully
+finished but intentionally generic, with no personal monument, obsolete
+joke, or inherited theme dictating how it must be used.
 ~
 343 28 0 0 0 0
 D1
@@ -1101,12 +1140,11 @@ door~
 1 0 34327
 S
 #34357
-Whiteknight's Office~
-Inside a very Spartan and plushly furnished
-office that belongs to Whiteknight.  There is a desk in the center of the room
-and a bay window behind with shudders overlooking what appears to be a beach and
-ocean thundering up on the sand.  The only exit is south into the Plush Higher
-Immortal Hall
+Senior Staff Office~
+A larger but restrained office serves senior staff who need privacy for
+difficult coordination. A broad table, secure records cabinet, and
+overlooking window support planning and review without turning
+responsibility into personal grandeur.
 ~
 343 540 0 0 0 0
 D2
@@ -1116,8 +1154,10 @@ door~
 1 0 34327
 S
 #34358
-Empty Office~
-You are in an unfinished room.
+Reserved Staff Office~
+A finished but unassigned office waits behind a walnut door. The room is
+maintained for future operational use and carries no old personal
+decorations or claims of ownership.
 ~
 343 28 0 0 0 0
 D0
@@ -1127,8 +1167,10 @@ door~
 1 0 34327
 S
 #34359
-Elona's Office~
-You are in an unfinished room.
+Community Liaison Office~
+Public-facing concerns, community notes, recurring player feedback, and
+outreach plans are gathered here. The office helps staff remain aware of
+how administrative decisions are experienced by ordinary players.
 ~
 343 24 0 0 0 0
 D2
@@ -1138,8 +1180,10 @@ door~
 1 0 34328
 S
 #34360
-Empty Office~
-You are in an unfinished room.
+Reserved Staff Office~
+This reserved office contains only practical furnishings and a blank
+duty plaque. It can be assigned when a genuine staff function needs
+space rather than simply because an immortal wants a private room.
 ~
 343 28 0 0 0 0
 D0
@@ -1149,46 +1193,37 @@ door~
 1 0 34328
 S
 #34361
-Rumbles Office~
-Inside Rumble's Office. It is a sealed pagoda, which is setup as an
-office than a shrine.  It has a desk in the center of the room with several
-filing cabinets along the wall on one side.  A fold out ship's bunk is here to
-sleep on setup along the wall.  It is done in a typical 14th Century Oriental
-design in the way of plush fineries.  The only way out is a sliding door leading
-to the south.
+Lead Builder Office~
+The lead builder's office contains master maps, review ledgers,
+construction priorities, and reference copies of current building
+standards. Its purpose is coordination of world work, not elevation of
+the person using the desk.
 ~
 343 28 0 0 0 0
 D2
-   Teak and rice paper doors with brush paintings upon its surface make up the
-door.  Gold Fixtures hold it in place and there are golden handles.
+A paneled garden door opens south toward the Western Lantern Garden.
 ~
 door~
 1 0 34383
 S
 #34362
-Opie's Office~
-   You are standing on an immense, gray stone floor that stretches as far as you
-can see in all directions.  Rough winds plunging from the dark, starless sky
-tear savagely at your fragile body.  The stone floor is the same shade of gray
-the sky and is completely plain and unscratched.  It is probably too hard for
-anything to leave as much as a scratch on it.  Cold winds plunge ceaselessly at
-you from the dark, cloudless sky.  An icy chill fills your blood, as you hear
-an echoing guttural laugh.  "In the darkness there is light...  It's just
-hiding...  Let me show you...  It is the mind that is erotic, the heart that
-gives it life, the soul that makes it whole.", a voice whispers.  You jump
-back with a shriek.  Nothing more but the beating of your heart.
+Systems Review Office~
+System diagrams, edge-case notes, command references, and test reports
+cover the work tables. Staff use this room when an area problem may
+involve engine behavior rather than ordinary world data.
 ~
 343 28 0 0 0 0
 D2
-   Teak and rice paper doors with brush paintings upon its surface make up the
-door.  Gold Fixtures hold it in place and there are golden handles.
+A paneled garden door opens south toward the Far Lantern Garden.
 ~
 door~
 1 0 34386
 S
 #34363
-Empty Office~
-You are in an unfinished room.
+Reserved Staff Office~
+A neutral office is kept ready for future operational needs. The room is
+finished, secure, and intentionally free of abandoned personal
+decoration.
 ~
 343 28 0 0 0 0
 D2
@@ -1198,8 +1233,11 @@ door~
 1 0 34330
 S
 #34364
-Wyld's Office~
-You are in an unfinished room.
+World Lore Office~
+Lore indexes, faction notes, place-name references, and historical
+summaries fill the shelves. Staff use this office to keep new world
+content consistent with the setting instead of accumulating disconnected
+ideas.
 ~
 343 28 0 0 0 0
 D3
@@ -1208,8 +1246,10 @@ D3
 0 0 34386
 S
 #34365
-Fizbin's Office~
-You are in an unfinished room.
+Technical Review Office~
+Technical notes, reproducible bug reports, source references, and test
+checklists are organized here. The room is intended for careful review
+before a problem is blamed on world data or engine code.
 ~
 343 28 0 0 0 0
 D2
@@ -1219,8 +1259,10 @@ door~
 1 0 34331
 S
 #34366
-Shama's Office~
-You are in an unfinished room.
+Staff Training Office~
+Training references, command checklists, safe test examples, and
+orientation notes fill this office. It supports continuing staff
+education after the initial onboarding provided in the Service Hall.
 ~
 343 28 0 0 0 0
 D0
@@ -1230,13 +1272,11 @@ door~
 1 0 34331
 S
 #34367
-Rhade's Office~
-   The office here is plain and simple with a center desk, a cot to the side and
-several filing cabinets scattered throughout.  It has tiled floors, white walls,
-but not without very fine and fancy artwork and tapestries on the walls.  There
-is a single bay window here as well, that lets in the bright sunlight and
-overlooks the land of Midguaard far below.  The only exit is west into a
-hallway.
+Area Steward Office~
+The area steward's office contains zone maps, maintenance lists,
+dependency notes, and a current work ledger. It represents
+responsibility for an assigned area rather than personal ownership of
+that part of the world.
 ~
 343 28 0 0 0 0
 D3
@@ -1246,10 +1286,11 @@ door~
 1 0 34331
 S
 #34368
-Higher Imm Hall, Extension Sct. A~
-   This is the midway along the main hallway east-west.  It has plush carpets
-panel clad walls and office doors lining the wall every so far down the hall
-itself.
+Upper Service Annex, West~
+The western end of the upper service annex connects to the neighboring
+operations wing. Offices open north and south, while the corridor
+continues east toward the central annex. Wall maps mark the relationship
+between the connected zones.
 ~
 343 24 0 0 0 0
 D0
@@ -1274,10 +1315,11 @@ D3
 0 0 34612
 S
 #34369
-Higher Imm Hall, Extension Sct. A~
-   The hallway begin ends here with doors lining the walls on either side of
-thepanel covered walls and maroon covered carpeting.  It continues to the east
-and west.
+Upper Service Annex, Center~
+The center of the upper service annex forms a simple east-west corridor
+with reserved offices to north and south. Seating and reference shelves
+provide a practical staging area for staff working across multiple
+wings.
 ~
 343 24 0 0 0 0
 D0
@@ -1302,10 +1344,10 @@ D3
 0 0 34395
 S
 #34370
-Higher Imm Hall, Extension Sct. A~
-   This is the midway along the main hallway east-west.  It has plush carpets
-panel clad walls and office doors lining the wall every so far down the hall
-itself.
+Upper Service Annex, East~
+The eastern end of the upper service annex continues toward the
+adjoining operations wing. Reserved offices line both sides, and a clear
+wall map marks the route back toward the main complex.
 ~
 343 24 0 0 0 0
 D0
@@ -1330,8 +1372,11 @@ D3
 0 0 34369
 S
 #34371
-Empty Offfice New Ext~
-You are in an unfinished room.
+Reserved Annex Office~
+A fully finished annex office waits for an actual staff need. A desk,
+cabinet, reference shelf, and blank duty plaque keep it useful while
+avoiding the abandoned-personal-office problem that once filled these
+halls.
 ~
 343 28 0 0 0 0
 D2
@@ -1341,8 +1386,10 @@ door~
 1 0 34368
 S
 #34372
-Empty Office New Ext~
-You are in an unfinished room.
+Reserved Annex Office~
+This annex office is maintained as flexible staff space. Its restrained
+furnishings can support building, records, mentoring, or operations work
+without requiring another permanent personal suite.
 ~
 343 28 0 0 0 0
 D0
@@ -1353,8 +1400,10 @@ door~
 1 0 34368
 S
 #34373
-Empty Office New Ext.~
-You are in an unfinished room.
+Reserved Annex Office~
+A reserved annex office stands ready behind a walnut door. The room is
+intentionally generic so future staff can assign it according to real
+duties rather than status.
 ~
 343 28 0 0 0 0
 D2
@@ -1365,8 +1414,10 @@ door~
 1 0 34396
 S
 #34374
-Empty Office New Ext.~
-You are in an unfinished room.
+Reserved Annex Office~
+A compact annex office contains a writing desk, secure cabinet, and wall
+map. It remains unassigned until the operations complex has a practical
+reason to use it.
 ~
 343 28 0 0 0 0
 D0
@@ -1377,8 +1428,10 @@ door~
 1 0 34396
 S
 #34375
-Empty Office New Ext~
-You are in an unfinished room.
+Reserved Annex Office~
+This finished annex office is kept available for future staff work. A
+blank brass plaque beside the door emphasizes assignment by duty rather
+than personal claim.
 ~
 343 28 0 0 0 0
 D2
@@ -1389,8 +1442,9 @@ door~
 1 0 34369
 S
 #34376
-Empty Office New Ext.~
-You are in an unfinished room.
+Reserved Annex Office~
+A quiet annex office waits in good repair, supplied with a desk, map
+rack, and records cabinet. It carries no abandoned personal theme.
 ~
 343 28 0 0 0 0
 D0
@@ -1401,8 +1455,10 @@ door~
 1 0 34369
 S
 #34377
-Empty Office New Ext.~
-You are in an unfinished room.
+Reserved Annex Office~
+A reserved office occupies this side of the annex. Neutral furnishings
+and a blank duty board make it suitable for whatever operational
+function is actually needed later.
 ~
 343 28 0 0 0 0
 D2
@@ -1413,8 +1469,10 @@ door~
 1 0 34370
 S
 #34378
-Empty Office New Ext.~
-You are in an unfinished room.
+Reserved Annex Office~
+This annex office remains open for future assignment. It is
+intentionally complete but undecorated, avoiding another corridor of
+obsolete personal rooms.
 ~
 343 28 0 0 0 0
 D0
@@ -1425,12 +1483,11 @@ door~
 1 0 34370
 S
 #34379
-Public Restroom~
-   Inside a very large, very plush bathroom.  It has a claw tub on one side of
-it and a toilet that sits just adjacent to it.  There is a large sink on the
-south wall.  And above it are very bright gold fixtures that consist of a huge
-chandlier overhead and lanterns that hang near the sink and tub.  The only exit
-is west into the Coffee Alcove.
+The Staff Washroom~
+A clean staff washroom provides a stone privy, washbasin, and copper
+bathing tub behind privacy screens. It is functional rather than
+luxurious, maintained as part of a workplace where immortals may spend
+long stretches handling world duties.
 ~
 343 28 0 0 0 0
 D3
@@ -1440,12 +1497,10 @@ door~
 1 0 34398
 S
 #34380
-Higher Immortal Hall, North Extension~
-   This is the main hallway of the extension.  It runs to the north and south
-but has fingers leading east and west to the actual offices.  It has plush
-carpeting, panel clad walls, bronze lanterns that hang overhead to light it.
-There are a few pieces of artwork here that hang on the wall and what
-appear to be statuettes on pedistals sitting here to decorate it.
+Northern Operations Gallery~
+The northern operations gallery runs between the main complex and the
+connected northern wing. Stone wardens stand watch near the junction
+while maps and sealed notices identify restricted work areas.
 ~
 343 24 0 0 0 0
 D0
@@ -1458,12 +1513,10 @@ D2
 0 0 34395
 S
 #34381
-A Garden Alcove~
-   This is a simple alcove where the path ends at the wild of many bushes, trees
-undergrowth and greenery all around.  There is a cememt trimmed walkway with
-what appears to be hand-carved stoned marking the path and the path itself is
-mostly gravel.  The path returns to the north into the main part of the garden.
-The garden path is lit by lanterns hanging from hooks brightening the way.
+Western Garden Alcove~
+A sheltered garden alcove rests at the end of the western path. A teak
+bench faces a small spring among ferns and flowering shrubs, offering
+staff a quiet place to think before returning north.
 ~
 343 16 0 0 0 1
 D0
@@ -1472,12 +1525,10 @@ D0
 0 0 34301
 S
 #34382
-A Garden Alcove~
-   This is a simple alcove where the path ends at the wild of many bushes, trees
-undergrowth and greenery all around.  There is a cememt trimmed walkway with
-what appears to be hand-carved stoned marking the path and the path itself is
-mostly gravel.  The path returns to the north into the main part of the garden.
-The garden path is lit by lanterns hanging from hooks brightening the way.
+Eastern Garden Alcove~
+A sheltered garden alcove rests at the end of the eastern path. A small
+spring and teak bench sit beneath layered greenery, providing a quiet
+pause away from the busier operations halls.
 ~
 343 16 0 0 0 1
 D0
@@ -1486,44 +1537,37 @@ D0
 0 0 34302
 S
 #34383
-Inside a Garden~
-   A Garden is here with thick trees, cool waterways, plants, shrubs grass,
-flowers and even a lagoon in the center of it.  A path goes east through the
-garden and south into what appears into an alcove.  There seems to be finished
-pagodas here that makes up Rumbles Office to the north, Welcor's Office to the
-west.  The garden is lit by lanterns hanging from hooks that brighten the way
-here.
+The Western Lantern Garden~
+The western lantern garden surrounds a clear watercourse with flowering
+shrubs, shade trees, and carefully kept paths. Offices and garden
+workspaces stand beyond sliding doors while the main path continues
+east.
 ~
 343 16 0 0 0 1
 D0
-   Teak and rice paper doors with brush paintings upon its surface make up the
-door.  Gold Fixtures hold it in place and there are golden handles.
+A paneled garden door opens north into the Lead Builder Office.
 ~
 door~
 1 0 34361
 D1
 ~
--1~
+garden path~
 0 0 34384
 D2
 ~
 ~
 0 0 34301
 D3
-   Teak and rice paper doors with brush paintings upon its surface make up the
-door.  Gold Fixtures hold it in place and there are golden handles.
+A paneled garden door opens west into the Garden Steward's Office.
 ~
 door~
 1 0 34387
 S
 #34384
-In a Garden~
-   A Garden is here with thick trees, cool waterways, plants, shrubs grass,
-flowers and even a lagoon in the center of it.  A path goes east and west
-through the garden.  A bridge connects this garden to the south to a large
-pagoda that ominously stands in the center of the lagoon.  A medium sized pagoda
-is to the north making up a meeting area.  The garden is lit by lanterns hanging
-from hooks brightening the way here.
+The Central Lantern Garden~
+The central lantern garden opens around a broad lagoon crossed by a teak
+bridge. Paths run east and west through layered trees and flowers, while
+the council pavilion rises beyond the water to the south.
 ~
 343 16 0 0 0 1
 D0
@@ -1540,20 +1584,18 @@ D2
 0 0 34390
 D3
 ~
--1~
+garden path~
 0 0 34383
 S
 #34385
-In a Garden~
-   A Garden is here with thick trees, cool waterways, plants, shrubs grass,
-flowers and even a lagoon in the center of it.  A path goes east and west
-through it.  A large finished Pagoda makes up an office to the north.  The
-garden path is lit by lanterns hanging from hooks brightening the way.
+The Eastern Lantern Garden~
+The eastern lantern garden follows the lagoon beneath hanging lanterns
+and old shade trees. A garden office lies to the north, and the main
+path continues east and west.
 ~
 343 16 0 0 0 1
 D0
-   Teak and rice paper doors with brush paintings upon its surface make up the
-door.  Gold Fixtures hold it in place and there are golden handles.
+A paneled garden door opens north into the Garden Records Office.
 ~
 door~
 1 0 34389
@@ -1563,21 +1605,18 @@ D1
 0 0 34386
 D3
 ~
--1~
+garden path~
 0 0 34384
 S
 #34386
-Inside a Garden~
-   A Garden is here with thick trees, cool waterways, plants, shrubs grass,
-flowers and even a lagoon in the center of it.  A path goes east and west
-through it. There seems to be finished pagodas here that make up Opie's
-office to the north, and Wyld's office to the east.  The garden path is lit
-by lanterns hanging from hooks brightening then way.
+The Far Lantern Garden~
+The far lantern garden marks the eastern edge of the landscaped grounds.
+Dense greenery surrounds staff offices to the north and east, while
+paths return west and south toward the rest of the complex.
 ~
 343 16 0 0 0 1
 D0
-   Teak and rice paper doors with brush paintings upon its surface make up the
-door.  Gold Fixtures hold it in place and there are golden handles.
+A paneled garden door opens north into the Systems Review Office.
 ~
 door~
 1 0 34362
@@ -1595,25 +1634,24 @@ D3
 0 0 34385
 S
 #34387
-Welcor's Office~
-   The leader's office is a simple and plush Oriental Design with a large dsk
-sitting in the corner, many filing cabinets on the south wall.  It is quite
-plush with many tapestries, rugs, and also some arms on display such as a
-samurai sword that sits on a pedistal in another corner.  There are lanterns
-that hang above brightening the whole room and the only exit is east through a
-sliding door made of teak wood and rice paper.
+Garden Steward's Office~
+Planting maps, tool racks, water schedules, and maintenance ledgers fill
+the garden steward's office. Its eastern door opens directly into the
+lantern garden so practical upkeep remains close to the grounds it
+supports.
 ~
 343 28 0 0 0 0
 D1
-   Teak and rice paper doors with brush paintings upon its surface make up the
-door.  Gold Fixtures hold it in place and there are golden handles.
+A paneled garden door opens east into the Western Lantern Garden.
 ~
 door~
 1 0 34383
 S
 #34388
-Empty Office New Ext~
-no desc
+Reserved Staff Office~
+A finished but unassigned staff office stands beside the northern
+operations gallery. Neutral furnishings and a blank duty plaque leave it
+ready for future use.
 ~
 343 28 0 0 0 0
 D2
@@ -1623,25 +1661,23 @@ door~
 1 0 34395
 S
 #34389
-New Office~
-You are in an unfinished room.
+Garden Records Office~
+Seed records, garden inventories, lantern schedules, and maintenance
+notes are stored in this small office overlooking the eastern grounds.
 ~
 343 28 0 0 0 0
 D2
-   Teak and rice paper doors with brush paintings upon its surface make up the
-door.  Gold Fixtures hold it in place and there are golden handles.
+A paneled garden door opens south into the Eastern Lantern Garden.
 ~
 door~
 1 0 34385
 S
 #34390
-On Bridge in Garden~
-   You stand in the center of an ancient teak bridge that is made up of a 14th
-Century Oriental design.  It crosses a large lagoon that sits in the center of
-the garden to the north.  It is lighted by two lanterns on either end as ie the
-garden itself, lighting the way.  A large pagoda sits to the south in the middle
-of the lagoon in which this bridge ends right up at the door.  It seems to be
-that of a temple of worship and the entry point to the garden.
+The Lantern Garden Bridge~
+A graceful teak bridge crosses the central lagoon beneath paired
+lanterns. The garden spreads north while the quiet reflection pavilion
+lies south across the water. The bridge is decorative, but its solid
+rails and broad planks are built for ordinary staff traffic.
 ~
 343 16 0 0 0 1
 D0
@@ -1649,18 +1685,17 @@ D0
 ~
 0 0 34384
 D2
-   Teak and rice paper doors with brush paintings upon its surface make up the
-door.  Gold Fixtures hold it in place and there are golden handles.
+A broad timber door opens south into the Quiet Reflection Pavilion.
 ~
 door~
 1 0 34394
 S
 #34391
-Builder Board Room~
-   The Builder Academy Zone begins in Roon 3, Goto 3 to begin your training or
-if you need a refresher, TBA Zone should be able to teach anyone, no matter how
-new, the basics of building.  The only exit is east through an archway into the
-Southern Foyer.
+Builder Coordination Room~
+Large tables, zone maps, reset diagrams, and project boards fill this
+coordination room. Builders can meet here to divide work, compare
+dependencies, and review changes before anyone touches the same live
+area twice.
 ~
 343 28 0 0 0 0
 D1
@@ -1669,10 +1704,11 @@ D1
 0 0 34309
 S
 #34392
-God Hall, West Extension Jct~
-   The hallway stops here to the west and splits in a 'T' Shape to the north and
-south.  It has carnival colored tiled floors and white sterile walls above that.
-Office doors line the walls down each hallway.
+Western Annex Junction~
+This western annex junction ties the main staff corridors to several
+connected passages in the adjoining operations wing. Directional plaques
+and a large wall map make the otherwise complex intersection easy to
+read.
 ~
 343 24 0 0 0 0
 D0
@@ -1689,30 +1725,28 @@ D2
 0 0 34600
 S
 #34393
-Empty Pagoda Office~
-This unfinished room was created by Whiteknight.
+Garden Planning Office~
+Garden layouts, water-channel plans, planting notes, and maintenance
+schedules fill this modest planning office beside the western path.
 ~
 343 28 0 0 0 0
 D3
-   Teak and rice paper doors with brush paintings upon its surface make up the
-door.  Gold Fixtures hold it in place and there are golden handles.
+A fitted oak-and-glass garden door opens west onto the Western Garden
+Path.
 ~
 door~
 1 0 34301
 S
 #34394
-Inside Pagoda Shrine~
-   The pagoda is very large but empty with exception to a large shrine that
-makes up most of the West and South Wall.  It has many lanterns, candles and
-incense burning to honor the great gods, Rumble, Welcor, and Opie which are
-being worshipped here.  A circular staircase leads down into a plush hallway below
-and a sliding door north exits the Pagoda Shrine into a great garden beyond to the
-north.
+The Quiet Reflection Pavilion~
+A quiet timber pavilion stands above the lagoon as a place for private
+thought, difficult conversations, and a moment away from active
+administration. There are no rites or claims of sacred authority here,
+only benches, lantern light, and a view across the garden.
 ~
 343 28 0 0 0 0
 D0
-   Teak and rice paper doors with brush paintings upon its surface make up the
-door.  Gold Fixtures hold it in place and there are golden handles.
+A broad timber door opens north onto the Lantern Garden Bridge.
 ~
 door~
 1 0 34390
@@ -1722,13 +1756,10 @@ D5
 0 0 34329
 S
 #34395
-Higher Immortal Hall, North Extension~
-   This is a small alcove that steps down from the main observation port and
-runs parallel with the Higher Immortal Hall.  It is circular like the
-observation portal, with large skylights above to allow the sunlight to spill
-into the paneled, carpeted, very exquisite hallway.  It abruptly turns to the
-west, east and north.  A step up leads into the main hallway of the main Higher
-Immortal Hallway.
+Northern Operations Gallery~
+The northern operations gallery links the upper service levels with the
+garden and the neighboring northern wing. Offices and annex corridors
+branch away from this central route beneath orderly wall lamps.
 ~
 343 24 0 0 0 0
 D0
@@ -1749,10 +1780,10 @@ D4
 0 0 34329
 S
 #34396
-Higher Immortal Hall, Extension Sct. A~
-   The hallway begin ends here with doors lining the walls on either side of
-thepanel covered walls and maroon covered carpeting.  It continues to the east
-and west.
+Upper Service Annex~
+The upper service annex crosses between the main complex and reserved
+offices to the north and south. Practical maps and duty plaques keep the
+route clear for staff moving between connected wings.
 ~
 343 24 0 0 0 0
 D0
@@ -1777,31 +1808,27 @@ D3
 0 0 34368
 S
 #34397
-Exective Meeting Pagoda.~
-   The Meeting room is for the upper immortals.  It is unlike the other regular
-one.  It has paneled walls and thick, red, shag carpet and a huge circular table
-that sits in the center of the room, surrounded by wooden high-backed chairs.
-On the walls there are many pictures of the zones here, but also of fallen
-hero's of the TBA and staff who were lost or retired.  The only exit is south
-into the garden through a sliding panel door of oriental design.
+Senior Staff Council Pavilion~
+A large council pavilion provides a formal meeting space for senior
+staff when coordination requires privacy and a full table. Maps, sealed
+records cabinets, and a central planning table dominate the room;
+authority here is treated as responsibility for the MUD, not personal
+prestige.
 ~
 343 1756 0 0 0 0
 D2
-   The door is made of Teak, rice paper and silver fixtures.  And it slides to
-the side as in traditional design of any pagoda of 14th century.  On the rice
-paper there is the design of a dragon with its wings spread
+A broad timber door with brass fittings opens south onto the Lantern
+Garden Path.
 ~
 door~
 1 0 34305
 S
 #34398
-Coffee Alcove~
-   A small alcove is here and it seems to appear to be that of a coffee alcove
-that serves drinks and food to the Immortals and open for any visiting mortals.
-It has long counters here, colored green and white walls and cabinets that are
-attached to the walls on all sides around a sink and faucet on one end of the
-counter.  An exit south leads into the main hallway or east into what appears to
-be a public restroom.
+The Refreshment Alcove~
+A warm refreshment alcove provides hot tea, coffee, water, bread, and
+simple provisions for staff working long sessions. Shelves and cabinets
+keep cups and supplies organized while the northern staff hall opens
+nearby.
 ~
 343 28 0 0 0 0
 D0
@@ -1819,12 +1846,12 @@ D2
 0 0 34311
 S
 #34399
-Hall of Justice Podium/Altar~
-     You stand on a very large, white and gold trimmed altar
-made of granite. It has many candles and incense burning
-here, as well as lanterns that light the interior room
-from the ceiling. The only exit is down the stairs to
-the main audiece chamber.
+The Justice Review Dais~
+A raised granite dais stands at the end of the Hall of Justice and
+Conduct. It is a place for presenting records, reviewing evidence, and
+making difficult staff decisions in an orderly way. Lamps and an open
+service ledger replace the old ceremonial trappings; the stair descends
+directly to the conduct hall below.
 ~
 343 12 0 0 0 0
 D5

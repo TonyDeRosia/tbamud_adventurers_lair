@@ -1,1 +1,661 @@
-$~
+#34600
+elyria first lady citadel nightfallen~
+@ME@Wly@Mri@Wa @DNi@Wgh@Mtf@Wall@Me@Wn@n, @MFirst Lady of the Citadel@n~
+@ME@Wly@Mri@Wa @DNi@Wgh@Mtf@Wall@Me@Wn@n stands here with effortless command.
+~
+Elyria's elegance never softens the certainty that she is one of the
+most dangerous people in the Crimson Citadel. As First Lady she
+controls household access, senior guests, internal discipline, and the
+Veiled Blades with polished efficiency and a tongue sharp enough to
+make most visitors reconsider their wording. Her patience for
+strangers is limited and her courtesy often carries an unmistakably
+cutting edge. Around Kokudar, however, that armor changes. Warmth
+enters her expression, private humor replaces formality, and the
+fierce devotion beneath her command becomes impossible to miss. She is
+still perfectly capable of teasing him, arguing with him, or refusing
+to indulge his ego, but the affection is genuine, chosen, and openly
+hers.
+~
+8 0 0 0 0 0 0 0 0 E
+50 14 70 8d10+250 6d5+4
+0 0
+8 8 2
+Str: 18
+Dex: 18
+Int: 18
+Wis: 18
+Con: 18
+Cha: 18
+SavingPara: 12
+SavingRod: 12
+SavingPetri: 12
+SavingBreath: 12
+SavingSpell: 12
+Wimpy: 25
+Evasion: 16
+E
+T 34600
+T 34612
+T 34613
+T 34631
+T 34633
+T 34635
+T 34636
+T 34637
+T 34638
+T 34639
+#34601
+vaelreth first hand citadel executor~
+@DVa@Mel@Wre@Dth@n, @MFirst Hand of the Citadel@n~
+@DVa@Mel@Wre@Dth@n studies a stack of active reports.
+~
+Vaelreth is composed, analytical, and relentlessly useful. He
+translates Kokudar's broad instructions into concrete tasks, follows
+problems personally when necessary, and treats wasted time as a
+correctable defect.
+~
+8 0 0 0 0 0 0 0 0 E
+48 14 68 8d10+240 6d5+4
+0 0
+8 8 1
+Str: 18
+Dex: 18
+Int: 18
+Wis: 18
+Con: 18
+Cha: 18
+SavingPara: 12
+SavingRod: 12
+SavingPetri: 12
+SavingBreath: 12
+SavingSpell: 12
+Wimpy: 24
+Evasion: 16
+E
+T 34601
+T 34614
+T 34615
+T 34631
+#34602
+kaelen captain guard citadel~
+@WKa@Cel@Wen@n, @DCaptain of the Citadel Guard@n~
+@WKa@Cel@Wen@n watches the hall with a commander's stillness.
+~
+Kaelen runs guard rotations, drills, escorts, and physical defense.
+His equipment is immaculate, his questions are brief, and his patience
+for sloppy security is famously short.
+~
+8 0 0 0 0 0 0 0 0 E
+45 15 65 7d9+225 6d5+3
+0 0
+8 8 1
+Str: 18
+Dex: 18
+Int: 18
+Wis: 18
+Con: 18
+Cha: 18
+SavingPara: 11
+SavingRod: 11
+SavingPetri: 11
+SavingBreath: 11
+SavingSpell: 11
+Wimpy: 22
+Evasion: 15
+E
+T 34602
+T 34616
+T 34617
+T 34611
+T 34631
+#34603
+xylia mistress veiled arts ritualist~
+@MXy@Wli@Ma@n, @DMistress of the Veiled Arts@n~
+@MXy@Wli@Ma@n traces violet runes across a slate.
+~
+Xylia oversees dangerous rituals, portals, containment, and
+experimental magic. Her devotion is expressed through competence
+rather than worship, and she is most comfortable when every magical
+catastrophe has at least three prepared answers.
+~
+8 0 0 0 0 0 0 0 0 E
+47 15 67 7d9+235 6d5+3
+0 0
+8 8 2
+Str: 18
+Dex: 18
+Int: 18
+Wis: 18
+Con: 18
+Cha: 18
+SavingPara: 11
+SavingRod: 11
+SavingPetri: 11
+SavingBreath: 11
+SavingSpell: 11
+Wimpy: 23
+Evasion: 15
+E
+T 34603
+T 34631
+#34604
+malphas master whispers intelligence~
+@DMal@Mph@Was@n, @WMaster of Whispers@n~
+@DMal@Mph@Was@n is present with unsettling quiet.
+~
+Malphas handles intelligence, counterintelligence, interrogation, and
+difficult visitors. He rarely raises his voice and almost never
+answers a question without learning something in return.
+~
+8 0 0 0 0 0 0 0 0 E
+44 15 64 7d9+220 6d5+3
+0 0
+8 8 1
+Str: 18
+Dex: 18
+Int: 18
+Wis: 18
+Con: 18
+Cha: 18
+SavingPara: 11
+SavingRod: 11
+SavingPetri: 11
+SavingBreath: 11
+SavingSpell: 11
+Wimpy: 22
+Evasion: 14
+E
+T 34604
+T 34631
+#34605
+seraphine first battlemaid veiled blades~
+@WSe@Mra@Wph@Mine@n, @DFirst of the Veiled Blades@n~
+@WSe@Mra@Wph@Mine@n reviews the battlemaids' duty slate.
+~
+Seraphine commands the battlemaids beneath Elyria. She is a flawless
+household officer, a precise swordswoman, and the person most likely
+to know where every member of the citadel is supposed to be.
+~
+8 0 0 0 0 0 0 0 0 E
+42 15 62 7d9+210 5d5+3
+0 0
+8 8 2
+Str: 18
+Dex: 18
+Int: 18
+Wis: 18
+Con: 18
+Cha: 18
+SavingPara: 10
+SavingRod: 10
+SavingPetri: 10
+SavingBreath: 10
+SavingSpell: 10
+Wimpy: 21
+Evasion: 14
+E
+T 34605
+T 34606
+T 34618
+T 34619
+T 34631
+#34606
+mirelle battlemaid duelist veiled blade~
+@CMi@Wre@Cll@We@n of the @DVeiled Blades@n~
+@CMi@Wre@Cll@We@n balances a polished dueling blade across one palm.
+~
+Mirelle is quick, competitive, and painfully precise. She can serve a
+formal table without a mistake and then spend an hour proving exactly
+why the household silver should never be mistaken for her preferred
+weapons.
+~
+8 0 0 0 0 0 0 0 0 E
+38 16 58 6d8+190 5d4+3
+0 0
+8 8 2
+Str: 18
+Dex: 18
+Int: 18
+Wis: 18
+Con: 18
+Cha: 18
+SavingPara: 9
+SavingRod: 9
+SavingPetri: 9
+SavingBreath: 9
+SavingSpell: 9
+Wimpy: 19
+Evasion: 12
+E
+T 34606
+T 34620
+T 34631
+T 34632
+#34607
+nyxara battlemaid shadow veiled blade~
+@DNy@Mxa@Wra@n of the @DVeiled Blades@n~
+@DNy@Mxa@Wra@n seems to have appeared without using the obvious door.
+~
+Nyxara handles night patrols, hidden routes, discreet security, and
+tasks that are easier when no one notices they were performed.
+~
+8 0 0 0 0 0 0 0 0 E
+40 15 60 6d8+200 5d4+3
+0 0
+8 8 2
+Str: 18
+Dex: 18
+Int: 18
+Wis: 18
+Con: 18
+Cha: 18
+SavingPara: 10
+SavingRod: 10
+SavingPetri: 10
+SavingBreath: 10
+SavingSpell: 10
+Wimpy: 20
+Evasion: 13
+E
+T 34606
+T 34621
+T 34631
+T 34632
+#34608
+thalia battlemaid healer veiled blade~
+@GTh@Wali@Ga@n of the @DVeiled Blades@n~
+@GTh@Wali@Ga@n checks a healer's satchel with practiced speed.
+~
+Thalia divides her time between household duty, battlefield medicine,
+and preventing the other battlemaids from treating avoidable injuries
+as a competition.
+~
+8 0 0 0 0 0 0 0 0 E
+39 16 59 6d8+195 5d4+3
+0 0
+8 8 2
+Str: 18
+Dex: 18
+Int: 18
+Wis: 18
+Con: 18
+Cha: 18
+SavingPara: 9
+SavingRod: 9
+SavingPetri: 9
+SavingBreath: 9
+SavingSpell: 9
+Wimpy: 19
+Evasion: 13
+E
+T 34606
+T 34622
+T 34631
+T 34632
+#34609
+vespera battlemaid arcane veiled blade~
+@MVes@Wpe@Mra@n of the @DVeiled Blades@n~
+@MVes@Wpe@Mra@n watches a line of violet ward-light crawl over her glove.
+~
+Vespera supports Xylia's ward work while remaining a full member of
+the battlemaid order. She has a habit of testing enchantments on
+cleaning tools simply because no rule explicitly forbids it.
+~
+8 0 0 0 0 0 0 0 0 E
+41 15 61 6d8+205 5d5+3
+0 0
+8 8 2
+Str: 18
+Dex: 18
+Int: 18
+Wis: 18
+Con: 18
+Cha: 18
+SavingPara: 10
+SavingRod: 10
+SavingPetri: 10
+SavingBreath: 10
+SavingSpell: 10
+Wimpy: 20
+Evasion: 13
+E
+T 34606
+T 34623
+T 34631
+T 34632
+#34610
+brienne battlemaid heavy veiled blade~
+@RBr@Wie@Rnn@We@n of the @DVeiled Blades@n~
+@RBr@Wie@Rnn@We@n stands beside a weapon that should probably require two people.
+~
+Brienne handles heavy combat, kitchen assistance, furniture moving,
+and any household problem that becomes simpler when enormous strength
+is applied carefully.
+~
+8 0 0 0 0 0 0 0 0 E
+43 15 63 7d9+215 5d5+3
+0 0
+8 8 2
+Str: 18
+Dex: 18
+Int: 18
+Wis: 18
+Con: 18
+Cha: 18
+SavingPara: 10
+SavingRod: 10
+SavingPetri: 10
+SavingBreath: 10
+SavingSpell: 10
+Wimpy: 21
+Evasion: 14
+E
+T 34606
+T 34624
+T 34631
+T 34632
+#34611
+orinth grand archivist citadel~
+@WOr@Cin@Wth@n, @DGrand Archivist@n~
+@WOr@Cin@Wth@n is comparing two nearly identical catalogue entries.
+~
+Orinth runs the citadel's archives with scholarly severity. He can
+locate a campaign note from decades ago in moments and will then
+complain for considerably longer about whoever filed it incorrectly.
+~
+8 0 0 0 0 0 0 0 0 E
+35 16 55 5d7+175 4d4+2
+0 0
+8 8 1
+Str: 18
+Dex: 18
+Int: 18
+Wis: 18
+Con: 18
+Cha: 18
+SavingPara: 8
+SavingRod: 8
+SavingPetri: 8
+SavingBreath: 8
+SavingSpell: 8
+Wimpy: 17
+Evasion: 11
+E
+T 34608
+T 34625
+T 34631
+T 34632
+#34612
+durn master runeforger artificer~
+Master Durn, Runeforger~
+Master Durn examines a rune plate through a smoky lens.
+~
+Durn maintains enchanted tools, seals, constructs, and damaged
+artifacts. The forge has permanently stained his red leather gloves
+with heat and scale, while improving his opinion of very few people.
+~
+8 0 0 0 0 0 0 0 0 E
+38 16 58 6d8+190 5d4+3
+0 0
+8 8 1
+Str: 18
+Dex: 18
+Int: 18
+Wis: 18
+Con: 18
+Cha: 18
+SavingPara: 9
+SavingRod: 9
+SavingPetri: 9
+SavingBreath: 9
+SavingSpell: 9
+Wimpy: 19
+Evasion: 12
+E
+T 34607
+T 34631
+T 34632
+#34613
+elaris keeper doors portals~
+Elaris, Keeper of Doors~
+Elaris checks a ring of portal keys and destination seals.
+~
+Elaris maintains portals, teleportation circles, dimensional locks,
+and guest permissions. She treats an unlabeled portal like a loaded
+crossbow pointed at the household.
+~
+8 0 0 0 0 0 0 0 0 E
+37 16 57 6d8+185 5d4+3
+0 0
+8 8 2
+Str: 18
+Dex: 18
+Int: 18
+Wis: 18
+Con: 18
+Cha: 18
+SavingPara: 9
+SavingRod: 9
+SavingPetri: 9
+SavingBreath: 9
+SavingSpell: 9
+Wimpy: 18
+Evasion: 12
+E
+T 34607
+T 34631
+T 34632
+#34614
+garrick citadel chef kitchen master~
+Garrick, Master of the Citadel Kitchens~
+Garrick is already annoyed about something missing from the pantry.
+~
+Garrick runs the kitchens with the authority of a battlefield
+quartermaster. He is one of the few residents willing to tell Kokudar
+directly that magic does not make a burnt dinner less burnt.
+~
+8 0 0 0 0 0 0 0 0 E
+30 17 50 5d7+150 4d3+2
+0 0
+8 8 1
+Str: 18
+Dex: 18
+Int: 18
+Wis: 18
+Con: 18
+Cha: 18
+SavingPara: 7
+SavingRod: 7
+SavingPetri: 7
+SavingBreath: 7
+SavingSpell: 7
+Wimpy: 15
+Evasion: 10
+E
+T 34609
+T 34626
+T 34631
+T 34632
+#34615
+ysmera keeper beasts menagerie~
+Ysmera, Keeper of Beasts~
+Ysmera smells faintly of hay, herbs, and something draconic.
+~
+Ysmera manages familiars, mounts, summoned creatures awaiting
+classification, and every living thing Kokudar has ever brought home
+while saying that he intended to keep it temporarily.
+~
+8 0 0 0 0 0 0 0 0 E
+34 16 54 5d7+170 4d4+2
+0 0
+8 8 2
+Str: 18
+Dex: 18
+Int: 18
+Wis: 18
+Con: 18
+Cha: 18
+SavingPara: 8
+SavingRod: 8
+SavingPetri: 8
+SavingBreath: 8
+SavingSpell: 8
+Wimpy: 17
+Evasion: 11
+E
+T 34607
+T 34631
+T 34632
+#34616
+tovren steward household citadel~
+Tovren, Citadel Steward~
+Tovren carries three ledgers and looks prepared to acquire a fourth.
+~
+Tovren handles supplies, rooms, linen, household inventories, guest
+preparation, and all the mundane systems that allow the spectacular
+parts of the citadel to function.
+~
+8 0 0 0 0 0 0 0 0 E
+32 16 52 5d7+160 4d4+2
+0 0
+8 8 1
+Str: 18
+Dex: 18
+Int: 18
+Wis: 18
+Con: 18
+Cha: 18
+SavingPara: 8
+SavingRod: 8
+SavingPetri: 8
+SavingBreath: 8
+SavingSpell: 8
+Wimpy: 16
+Evasion: 10
+E
+T 34607
+T 34631
+T 34632
+#34617
+pale librarian spectral archive~
+the @WP@Dale @MLi@Wbr@Maria@n~
+The @WP@Dale @MLi@Wbr@Maria@n turns a translucent page.
+~
+The spectral librarian remembers records that predate several versions
+of the archive. It rarely speaks above a whisper and has strong
+opinions about fire, ink quality, and visitors who fold page corners.
+~
+8 0 0 0 0 0 0 0 0 E
+40 15 60 6d8+200 5d4+3
+0 0
+8 8 0
+Str: 18
+Dex: 18
+Int: 18
+Wis: 18
+Con: 18
+Cha: 18
+SavingPara: 10
+SavingRod: 10
+SavingPetri: 10
+SavingBreath: 10
+SavingSpell: 10
+Wimpy: 20
+Evasion: 13
+E
+T 34628
+T 34631
+T 34632
+#34618
+clockkeeper brass temporal construct~
+the @OCl@Woc@Okk@Wee@Oper@n~
+The @OCl@Woc@Okk@Wee@Oper@n's brass rings turn with quiet clicks.
+~
+The Clockkeeper is a complicated construct assigned to chronomancy and
+temporal accounting. It frequently reports correct information in the
+wrong tense.
+~
+8 0 0 0 0 0 0 0 0 E
+45 15 65 7d9+225 6d5+3
+0 0
+8 8 0
+Str: 18
+Dex: 18
+Int: 18
+Wis: 18
+Con: 18
+Cha: 18
+SavingPara: 11
+SavingRod: 11
+SavingPetri: 11
+SavingBreath: 11
+SavingSpell: 11
+Wimpy: 22
+Evasion: 15
+E
+T 34629
+T 34631
+T 34632
+#34619
+vault warden crimson construct~
+the @DVa@Wul@Dt @MWa@Wrden@n~
+The @DVa@Wul@Dt @MWa@Wrden@n stands motionless before the sealed approach.
+~
+The massive crimson-steel construct is intelligent, literal, and
+utterly devoted to procedure. Silver ward-lines cross its red armor
+plates like a ledger written in metal. It considers authorization a
+sacred concept only in the bureaucratic sense.
+~
+8 0 0 0 0 0 0 0 0 E
+50 14 70 8d10+250 6d5+4
+0 0
+8 8 0
+Str: 18
+Dex: 18
+Int: 18
+Wis: 18
+Con: 18
+Cha: 18
+SavingPara: 12
+SavingRod: 12
+SavingPetri: 12
+SavingBreath: 12
+SavingSpell: 12
+Wimpy: 25
+Evasion: 16
+E
+T 34630
+T 34631
+T 34632
+#34620
+groundskeeper giant gentle gardener~
+the @GCi@Wta@Gdel @DGroundskeeper@n~
+A towering @GCi@Wta@Gdel @DGroundskeeper@n tends the citadel's living spaces with extraordinary care.
+~
+The groundskeeper is enormous enough to terrify an unprepared visitor
+and gentle enough to spend an hour repairing a damaged flower bed by
+hand. The battlemaids trust him with both gardens and injured animals.
+~
+8 0 0 0 0 0 0 0 0 E
+36 16 56 6d8+180 5d4+3
+0 0
+8 8 1
+Str: 18
+Dex: 18
+Int: 18
+Wis: 18
+Con: 18
+Cha: 18
+SavingPara: 9
+SavingRod: 9
+SavingPetri: 9
+SavingBreath: 9
+SavingSpell: 9
+Wimpy: 18
+Evasion: 12
+E
+T 34610
+T 34627
+T 34631
+T 34632
+$

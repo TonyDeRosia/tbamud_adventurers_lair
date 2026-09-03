@@ -25,6 +25,7 @@
 #include "act.h"
 #include "spec_procs.h"
 #include "class.h"
+#include "tome.h"
 #include "fight.h"
 #include "modify.h"
 #include "classtrack.h"
@@ -130,6 +131,8 @@ static int can_character_practice_ability(struct char_data *ch, int ability_id)
   is_reactive_identity = (GET_CLASS(ch) == CLASS_ADVENTURER) || (learned_at > 0);
 
   if (GET_SKILL(ch, ability_id) > 0) {
+    if (has_tome_ability(ch, ability_id))
+      return TRUE;
     if (is_reactive_identity) {
       required_level = classtrack_get_study_display_level(ch, ability_id, 1);
       return (GET_LEVEL(ch) >= required_level);

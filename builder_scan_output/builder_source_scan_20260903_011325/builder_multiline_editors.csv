@@ -1,0 +1,208 @@
+﻿"File","Line","Function","Call","Evidence"
+"src\act.comm.c","324","is_tell_ok","string_write(ch->desc, &paper->action_description, MAX_NOTE_LENGTH, 0, backstr);","   321:     /* We can write. */
+   322:     act(""$n begins to jot down a note."", TRUE, ch, 0, 0, TO_ROOM);
+   323:     send_editor_help(ch->desc);
+   324:     string_write(ch->desc, &paper->action_description, MAX_NOTE_LENGTH, 0, backstr);
+   325:   }
+   326: }
+   327: 
+   328: ACMD(do_page)
+   329: {"
+"src\boards.c","210","board_write_message","string_write(ch->desc, &(msg_storage[NEW_MSG_INDEX(board_type).slot_num]), MAX_MESSAGE_LENGTH, board_type + BOARD_MAGIC, NULL);","   207:   send_editor_help(ch->desc);
+   208:   act(""$n starts to write a message."", TRUE, ch, 0, 0, TO_ROOM);
+   209: 
+   210:   string_write(ch->desc, &(msg_storage[NEW_MSG_INDEX(board_type).slot_num]),
+   211: 		MAX_MESSAGE_LENGTH, board_type + BOARD_MAGIC, NULL);
+   212: 
+   213:   num_of_msgs[board_type]++;
+   214:   return (1);
+   215: }"
+"src\cedit.c","1218","cedit_parse","string_write(d, &OLC_CONFIG(d)->operation.MENU, MAX_INPUT_LENGTH, 0, oldtext);","  1215:              oldtext = strdup(OLC_CONFIG(d)->operation.MENU);
+  1216:            }
+  1217: 
+  1218:            string_write(d, &OLC_CONFIG(d)->operation.MENU, MAX_INPUT_LENGTH, 0, oldtext);
+  1219:            return;
+  1220: 
+  1221:          case 'm':
+  1222:          case 'M':
+  1223:            OLC_MODE(d) = CEDIT_WELC_MESSG;"
+"src\cedit.c","1233","cedit_parse","string_write(d, &OLC_CONFIG(d)->operation.WELC_MESSG, MAX_INPUT_LENGTH, 0, oldtext);","  1230:              oldtext = str_udup(OLC_CONFIG(d)->operation.WELC_MESSG);
+  1231:            }
+  1232: 
+  1233:            string_write(d, &OLC_CONFIG(d)->operation.WELC_MESSG, MAX_INPUT_LENGTH, 0, oldtext);
+  1234:            return;
+  1235: 
+  1236:          case 'n':
+  1237:          case 'N':
+  1238:            OLC_MODE(d) = CEDIT_START_MESSG;"
+"src\cedit.c","1248","cedit_parse","string_write(d, &OLC_CONFIG(d)->operation.START_MESSG, MAX_INPUT_LENGTH, 0, oldtext);","  1245:              oldtext = strdup(OLC_CONFIG(d)->operation.START_MESSG);
+  1246:            }
+  1247: 
+  1248:            string_write(d, &OLC_CONFIG(d)->operation.START_MESSG, MAX_INPUT_LENGTH, 0, oldtext);
+  1249:            return;
+  1250: 
+  1251:          case 'o':
+  1252:          case 'O':
+  1253:            TOGGLE_VAR(OLC_CONFIG(d)->operation.medit_advanced);"
+"src\hedit.c","372","hedit_parse","string_write(d, &OLC_HELP(d)->entry, MAX_MESSAGE_LENGTH, 0, oldtext);","   369:         write_to_output(d, ""%s"", OLC_HELP(d)->entry);
+   370:         oldtext = strdup(OLC_HELP(d)->entry);
+   371:       }
+   372:       string_write(d, &OLC_HELP(d)->entry, MAX_MESSAGE_LENGTH, 0, oldtext);
+   373:       OLC_VAL(d) = 1;
+   374:       break;
+   375:     case '3':
+   376:       write_to_output(d, ""Enter min level : "");
+   377:       OLC_MODE(d) = HEDIT_MIN_LEVEL;"
+"src\ibt.c","668","is_ibt_logger","string_write(ch->desc, &(ibtData->body),MAX_IBT_LENGTH, 0, NULL);","   665:     sprintf(buf, ""$n starts to give %s %s."", TANA(CMD_NAME), CMD_NAME);
+   666:     act(buf, TRUE, ch, 0, 0, TO_ROOM);
+   667: 
+   668:     string_write(ch->desc, &(ibtData->body),MAX_IBT_LENGTH, 0, NULL);
+   669: 
+   670:     ibtData->room   = GET_ROOM_VNUM(IN_ROOM(ch));
+   671:     ibtData->level  = GET_LEVEL(ch);
+   672:     ibtData->text   = STRALLOC(arg_text);
+   673:     ibtData->name   = STRALLOC(GET_NAME(ch));"
+"src\ibt.c","1063","ibtedit_parse","string_write(d, &OLC_IBT(d)->body, MAX_IBT_LENGTH, 0, oldtext);","  1060:             if (oldtext) STRFREE(oldtext);
+  1061:             oldtext = STRALLOC(OLC_IBT(d)->body);
+  1062:           }
+  1063:           string_write(d, &OLC_IBT(d)->body, MAX_IBT_LENGTH, 0, oldtext);
+  1064:           OLC_ZNUM(d) = 1;
+  1065:           return;
+  1066: 
+  1067:         case '6':
+  1068:           OLC_MODE(d) = IBTEDIT_NOTES;"
+"src\ibt.c","1076","ibtedit_parse","string_write(d, &OLC_IBT(d)->notes, MAX_IBT_LENGTH, 0, oldtext);","  1073:             if (oldtext) STRFREE(oldtext);
+  1074:             oldtext = STRALLOC(OLC_IBT(d)->notes);
+  1075:           }
+  1076:           string_write(d, &OLC_IBT(d)->notes, MAX_IBT_LENGTH, 0, oldtext);
+  1077:           OLC_ZNUM(d) = 1;
+  1078:           return;
+  1079: 
+  1080:         default:
+  1081:           ibtedit_disp_main_menu(d);"
+"src\mail.c","312","store_mail","SET_BIT_AR(PLR_FLAGS(ch), PLR_MAILING); /* string_write() sets writing. */","   309: 
+   310:   act(""$n tells you, 'Write your message. (/s saves /h for help).'"", FALSE, mailman, 0, ch, TO_VICT);
+   311: 
+   312:   SET_BIT_AR(PLR_FLAGS(ch), PLR_MAILING);	/* string_write() sets writing. */
+   313: 
+   314:   /* Start writing! */
+   315:   CREATE(mailwrite, char *, 1);
+   316:   string_write(ch->desc, mailwrite, MAX_MAIL_SIZE, recipient, NULL);
+   317: }"
+"src\mail.c","316","store_mail","string_write(ch->desc, mailwrite, MAX_MAIL_SIZE, recipient, NULL);","   313: 
+   314:   /* Start writing! */
+   315:   CREATE(mailwrite, char *, 1);
+   316:   string_write(ch->desc, mailwrite, MAX_MAIL_SIZE, recipient, NULL);
+   317: }
+   318: 
+   319: static void postmaster_check_mail(struct char_data *ch, struct char_data *mailman,
+   320: 			  int cmd, char *arg)
+   321: {"
+"src\medit.c","1003","medit_parse","string_write(d, &OLC_MOB(d)->player.description, MAX_MOB_DESC, 0, oldtext);","  1000: 	      write_to_output(d, ""%s"", OLC_MOB(d)->player.description);
+  1001: 	      oldtext = strdup(OLC_MOB(d)->player.description);
+  1002:       }
+  1003:       string_write(d, &OLC_MOB(d)->player.description, MAX_MOB_DESC, 0, oldtext);
+  1004:       OLC_VAL(d) = 1;
+  1005:       return;
+  1006:     case '6':
+  1007:       OLC_MODE(d) = MEDIT_POS;
+  1008:       medit_disp_positions(d);"
+"src\modify.c","110","parse_tab","void string_write(struct descriptor_data *d, char **writeto, size_t len, long mailto, void *data) { if (d->character && !IS_NPC(d->character)) SET_BIT_AR(PLR_FLAGS(d->character), PLR_WRITING);","   107:  * can use it to pass whatever else you may want through it.  The improved
+   108:  * editor patch when updated could use it to pass the old text buffer, for
+   109:  * instance. */
+   110: void string_write(struct descriptor_data *d, char **writeto, size_t len, long mailto, void *data)
+   111: {
+   112:   if (d->character && !IS_NPC(d->character))
+   113:     SET_BIT_AR(PLR_FLAGS(d->character), PLR_WRITING);
+   114: 
+   115:   if (using_improved_editor)"
+"src\modify.h","31","","void string_write(struct descriptor_data *d, char **txt, size_t len, long mailto, void *data);","    28: /** @todo should this really be in modify.c? */
+    29: ACMD(do_skillset);
+    30: /* Following function prototypes moved here from comm.h */
+    31: void  string_write(struct descriptor_data *d, char **txt, size_t len, long mailto, void *data);
+    32: void  string_add(struct descriptor_data *d, char *str);
+    33: void  page_string(struct descriptor_data *d, char *str, int keep_internal);
+    34: /* page string function & defines */
+    35: #define PAGE_LENGTH 60
+    36: #define PAGE_WIDTH  80"
+"src\oedit.c","836","oedit_parse","string_write(d, &OLC_OBJ(d)->action_description, MAX_MESSAGE_LENGTH, 0, oldtext);","   833: 	write_to_output(d, ""%s"", OLC_OBJ(d)->action_description);
+   834: 	oldtext = strdup(OLC_OBJ(d)->action_description);
+   835:       }
+   836:       string_write(d, &OLC_OBJ(d)->action_description, MAX_MESSAGE_LENGTH, 0, oldtext);
+   837:       OLC_VAL(d) = 1;
+   838:       break;
+   839:     case '5':
+   840:       oedit_disp_type_menu(d);
+   841:       OLC_MODE(d) = OEDIT_TYPE;"
+"src\oedit.c","1270","oedit_parse","string_write(d, &OLC_DESC(d)->description, MAX_MESSAGE_LENGTH, 0, oldtext);","  1267: 	write_to_output(d, ""%s"", OLC_DESC(d)->description);
+  1268: 	oldtext = strdup(OLC_DESC(d)->description);
+  1269:       }
+  1270:       string_write(d, &OLC_DESC(d)->description, MAX_MESSAGE_LENGTH, 0, oldtext);
+  1271:       OLC_VAL(d) = 1;
+  1272:       return;
+  1273: 
+  1274:     case 3:
+  1275:       /* Only go to the next description if this one is finished. */"
+"src\qedit.c","470","qedit_parse","string_write(d, &OLC_QUEST(d)->info, MAX_QUEST_MSG, 0, oldtext);","   467:             write_to_output(d, ""%s"", OLC_QUEST(d)->info);
+   468:             oldtext = strdup(OLC_QUEST(d)->info);
+   469:           }
+   470:           string_write(d, &OLC_QUEST(d)->info, MAX_QUEST_MSG, 0, oldtext);
+   471:           OLC_VAL(d) = 1;
+   472:           break;
+   473:         case '4':
+   474:           OLC_MODE(d) = QEDIT_COMPLETE;
+   475:           clear_screen(d);"
+"src\qedit.c","483","qedit_parse","string_write(d, &OLC_QUEST(d)->done, MAX_QUEST_MSG, 0, oldtext);","   480:             write_to_output(d, ""%s"", OLC_QUEST(d)->done);
+   481:             oldtext = strdup(OLC_QUEST(d)->done);
+   482:           }
+   483:           string_write(d, &OLC_QUEST(d)->done, MAX_QUEST_MSG, 0, oldtext);
+   484:           OLC_VAL(d) = 1;
+   485:           break;
+   486:         case '5':
+   487:           OLC_MODE(d) = QEDIT_ABANDON;
+   488:           clear_screen(d);"
+"src\qedit.c","496","qedit_parse","string_write(d, &OLC_QUEST(d)->quit, MAX_QUEST_MSG, 0, oldtext);","   493:             write_to_output(d, ""%s"", OLC_QUEST(d)->quit);
+   494:             oldtext = strdup(OLC_QUEST(d)->quit);
+   495:           }
+   496:           string_write(d, &OLC_QUEST(d)->quit, MAX_QUEST_MSG, 0, oldtext);
+   497:           OLC_VAL(d) = 1;
+   498:           break;
+   499:         case '6':
+   500:           OLC_MODE(d) = QEDIT_FLAGS;
+   501:           qedit_disp_flag_menu(d);"
+"src\redit.c","831","redit_parse","string_write(d, &OLC_ROOM(d)->description, MAX_ROOM_DESC, 0, oldtext);","   828: 	write_to_output(d, ""%s"", OLC_ROOM(d)->description);
+   829: 	oldtext = strdup(OLC_ROOM(d)->description);
+   830:       }
+   831:       string_write(d, &OLC_ROOM(d)->description, MAX_ROOM_DESC, 0, oldtext);
+   832:       OLC_VAL(d) = 1;
+   833:       break;
+   834:     case '3':
+   835:       redit_disp_flag_menu(d);
+   836:       break;"
+"src\redit.c","1011","redit_parse","string_write(d, &OLC_EXIT(d)->general_description, MAX_EXIT_DESC, 0, oldtext);","  1008: 	write_to_output(d, ""%s"", OLC_EXIT(d)->general_description);
+  1009: 	oldtext = strdup(OLC_EXIT(d)->general_description);
+  1010:       }
+  1011:       string_write(d, &OLC_EXIT(d)->general_description, MAX_EXIT_DESC, 0, oldtext);
+  1012:       return;
+  1013:     case '3':
+  1014:       OLC_MODE(d) = REDIT_EXIT_KEYWORD;
+  1015:       write_to_output(d, ""Enter keywords : "");
+  1016:       return;"
+"src\redit.c","1130","redit_parse","string_write(d, &OLC_DESC(d)->description, MAX_MESSAGE_LENGTH, 0, oldtext);","  1127: 	write_to_output(d, ""%s"", OLC_DESC(d)->description);
+  1128: 	oldtext = strdup(OLC_DESC(d)->description);
+  1129:       }
+  1130:       string_write(d, &OLC_DESC(d)->description, MAX_MESSAGE_LENGTH, 0, oldtext);
+  1131:       return;
+  1132:     case 3:
+  1133:       if (OLC_DESC(d)->keyword == NULL || OLC_DESC(d)->description == NULL) {
+  1134: 	write_to_output(d, ""You can't edit the next extra description without completing this one.\r\n"");
+  1135: 	redit_disp_extradesc_menu(d);"
+"src\tedit.c","144","tedit_string_cleanup","string_write(ch->desc, (char **)fields[l].buffer, fields[l].size, 0, backstr);","   141:   }
+   142: 
+   143:   OLC_STORAGE(ch->desc) = strdup(fields[l].filename);
+   144:   string_write(ch->desc, (char **)fields[l].buffer, fields[l].size, 0, backstr);
+   145: 
+   146:   act(""$n begins editing a scroll."", TRUE, ch, 0, 0, TO_ROOM);
+   147:   SET_BIT_AR(PLR_FLAGS(ch), PLR_WRITING);
+   148:   STATE(ch->desc) = CON_TEDIT;
+   149: }"

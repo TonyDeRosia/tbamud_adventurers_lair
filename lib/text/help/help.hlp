@@ -22234,5 +22234,20 @@ There is no BESEECH history. NOREPEAT replaces your echo with the usual OK.
 Please use this for assistance and do not spam. Staff may answer with TELL.
 #1
 
+TOME STUDY
+
+Usage: study <tome>
+       study status
+       tome status
+       tome list
+
+A Tome permanently teaches each valid spell or skill written within it.  You
+must carry it to study it.  Abilities begin at 1 percent and use their normal
+mana, movement, target, position, and combat rules.  A Tome can teach abilities
+outside your class or normal level progression.  If every ability is already
+known, the Tome is not consumed.  Each Tome has a builder-set real-time study
+cooldown; logging out does not pause it.  Immortals bypass only that cooldown.
+#1
+
 $
 #0

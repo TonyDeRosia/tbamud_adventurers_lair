@@ -1,199 +1,299 @@
 #3700
-rat big~
-the big rat~
-A large rat is scurrying about here, squeaking as you approach.
+sewer rat gnawer~
+a sewer gnawer~
+A lean sewer rat noses through the runoff here.
 ~
-   As you look closer you see flecks of blood on the teeth of the rat.  It's so
-obvious because the rat is just about ready to sink those teeth into your warm
-human flesh.
+This rat is large enough to make ordinary vermin look harmless. Its wet
+brown fur is patchy, its incisors are chipped from masonry, and its
+narrow body is built for slipping through the drains. It is aggressive
+when cornered but still more scavenger than monster.
 ~
 232 0 0 0 0 0 0 0 -150 E
-3 19 8 0d0+30 1d2+0
-30 900
+3 20 23 1d4+15 1d2+0
+30 0
 8 8 0
 BareHandAttack: 4
+Wimpy: 1
+Evasion: 1
 E
+T 3705
 #3701
-rat big~
-the big rat~
-A large rat is here, searching for food.
+plague scarred sewer rat~
+a plague-scarred sewer rat~
+A scarred sewer rat prowls the brick ledge.
 ~
-   This rat doesn't look very menacing, but if you press it hard it'll certainly
-fight back.
+Old sores and pale scars cross this heavy rat's muzzle and shoulders. It
+has survived traps, disease, floods, and fights with its own kind,
+leaving it wary and mean. The animal watches hands and feet with equal
+interest, ready to bite whatever looks weakest.
 ~
 232 0 0 0 0 0 0 0 100 E
-3 19 8 0d0+30 1d2+0
-30 900
+4 20 24 1d4+20 1d2+0
+30 0
 8 8 0
 BareHandAttack: 4
+SavingPara: 1
+SavingRod: 1
+SavingPetri: 1
+SavingBreath: 1
+SavingSpell: 1
+Wimpy: 2
+Evasion: 1
 E
+T 3705
 #3702
-rat protector guard~
-the protector rat~
-A huge rat is here, growling as you get nearer. Careful - it bites!
+scarred nest guard rat~
+a scarred nest-guard~
+A massive nest-guard blocks the way into the warrens.
 ~
-   This battle-scarred rat is not going anywhere.  You, however are going to go
-right into its belly, after it's killed you.  Better get out of here.
+This broad-shouldered rat bears the scars of repeated fights around the
+colony. One ear is split and several teeth jut at crooked angles, but it
+holds its ground with deliberate aggression. Unlike the scavengers
+outside, this creature is defending territory.
 ~
 4202 0 0 0 0 0 0 0 -350 E
-3 19 8 0d0+30 1d2+0
-30 900
+5 20 25 1d4+25 1d2+0
+30 0
 8 8 0
 BareHandAttack: 4
+SavingPara: 1
+SavingRod: 1
+SavingPetri: 1
+SavingBreath: 1
+SavingSpell: 1
+Wimpy: 2
+Evasion: 1
 E
+T 3705
 #3703
-rat king~
-the king rat~
-A gigantic rat is here standing on top of a pile of glittering stones.
+gristlefang king below rat~
+Gristlefang, the King Below~
+@RA monstrous scarred rat crouches over a heap of stolen tribute.@n
 ~
-   The King rat is so large, magic is the only possible explanation.  There has
-long been rumors about the magic-users using sewer animals in their experiments.
-This is the final proof.  As you study the rat closer you notice what looks like
-a small gleam of intelligence in its eyes.
+Gristlefang is enormous even by the standards of the underworks colony.
+Old trap scars ring one foreleg, one eye is clouded, and a broken brass
+circlet has become tangled permanently in the fur behind his ears.
+Smaller rats defer to him instinctively. Whatever magic or brutal
+selection made him this large, he has ruled the warrens long enough to
+become part beast, part local legend.
 ~
 4174 0 0 0 0 0 0 0 -350 E
-7 18 5 1d1+70 1d2+1
-70 4900
+7 20 27 1d4+35 1d2+0
+70 0
 5 5 0
 BareHandAttack: 4
+SavingPara: 1
+SavingRod: 1
+SavingPetri: 1
+SavingBreath: 1
+SavingSpell: 1
+Wimpy: 3
+Evasion: 2
 E
+T 3707
 #3704
-bat small~
-the bat~
-A bat is hanging from the ceiling here.
+pipe bat small~
+a pipe bat~
+A small pipe bat clings to the damp brick overhead.
 ~
-   A small bat, getting a good days sleep.
+This soot-gray bat is little more than wings, ears, and needle teeth. It
+sleeps through much of the day in cracks between the sewer bricks and
+becomes a frantic hunter when insects gather over the runoff.
 ~
 4330 0 0 0 0 0 0 0 0 E
-3 19 8 0d0+30 1d2+0
-30 900
+3 20 23 1d4+15 1d2+0
+30 0
 4 4 0
 BareHandAttack: 4
+Wimpy: 1
+Evasion: 1
 E
+T 3706
 #3705
-bat small~
-the bat~
-A bat is here, flying quickly about.
+duskwing bat~
+a duskwing bat~
+A broad-winged bat circles restlessly through the tunnel.
 ~
-   A small bat, getting ready to go out of the cave, to get something to eat.
+The duskwing is larger and darker than the common pipe bats. Its long
+wings let it turn sharply in confined passages, and its pale ears
+constantly twitch toward tiny sounds. It is bold enough to dive at
+anything that disturbs the roost.
 ~
 4328 0 0 0 0 0 0 0 0 E
-3 19 8 0d0+30 1d2+0
-30 900
+4 20 24 1d4+20 1d2+0
+30 0
 8 8 0
 BareHandAttack: 4
+SavingPara: 1
+SavingRod: 1
+SavingPetri: 1
+SavingBreath: 1
+SavingSpell: 1
+Wimpy: 2
+Evasion: 1
 E
+T 3706
 #3706
-bat giant~
-the giant bat~
-A huge bat is here, considering you for meal.
+cavern shrieker giant bat~
+a cavern shrieker~
+A huge bat hangs above, giving an ear-splitting shriek.
 ~
-   This giant bat makes you shiver.  Even if it just flies around you, it still
-gives you the creeps.
+This bat has grown to the size of a hunting hound. The skin of its wings
+is scarred from stone and iron, and its oversized ears make every sudden
+sound an irritation. When threatened it releases a piercing shriek
+before plunging teeth-first at the source.
 ~
 4328 0 0 0 0 0 0 0 0 E
-3 19 8 0d0+30 1d2+0
-30 900
+5 20 25 1d4+25 1d2+0
+30 0
 8 8 0
 BareHandAttack: 4
+SavingPara: 1
+SavingRod: 1
+SavingPetri: 1
+SavingBreath: 1
+SavingSpell: 1
+Wimpy: 2
+Evasion: 1
 E
+T 3706
 #3707
-bat vampire~
-the vampire bat~
-A huge bat is here. You see fresh blood on its face.
+bloodwing bat vampire~
+a bloodwing bat~
+A red-muzzled bloodwing bat watches from the darkness.
 ~
-   This giant bat makes you shiver.  You realize that soon your blood will be
-tasted too.
+The bloodwing is a heavy cave bat with reddish membrane along the inner
+wings and fresh stains around its muzzle. It feeds on wounded animals
+and anything too slow to escape the roost. Its eyes track exposed skin
+with unsettling focus.
 ~
 4202 0 0 0 0 0 0 0 -500 E
-3 19 8 0d0+30 1d2+0
-30 900
+6 20 26 1d4+30 1d2+0
+30 0
 8 8 0
 BareHandAttack: 4
+SavingPara: 1
+SavingRod: 1
+SavingPetri: 1
+SavingBreath: 1
+SavingSpell: 1
+Wimpy: 3
+Evasion: 2
 E
+T 3706
 #3708
-trout fish~
-the trout~
-A trout is swimming happily about here.
+silverfin trout fish~
+a silverfin trout~
+A silverfin trout flashes beneath the reservoir water.
 ~
-   The underground lake must be connected to the outside rivers.  This fish
-looks healthy and fresh.
+This healthy trout has found its way into the underworks through natural
+waterways connected to the river. Its silver scales catch even the
+faintest light as it searches the reservoir shallows for insects and
+drifting scraps.
 ~
 106522 0 0 0 589952 0 0 0 0 E
-3 19 8 0d0+30 1d2+0
-30 900
+3 20 23 1d4+15 1d2+0
+30 0
 8 8 0
 BareHandAttack: 4
+Wimpy: 1
+Evasion: 1
 E
 #3709
-blind fish~
-the blind fish~
-A blind fish is here, all white.
+eyeless cavefish blind fish~
+an eyeless cavefish~
+An eyeless white cavefish drifts through the dark water.
 ~
-   Having spent it's entire life in this cave, the fish has never used its eyes.
-Your torch' presence has made it blind.
+Generations in darkness have left this pale fish without useful eyes. It
+navigates by current and vibration, moving calmly through water that
+would hide it completely from surface predators.
 ~
 106522 0 0 0 589954 0 0 0 0 E
-3 19 8 0d0+30 1d2+0
-30 900
+3 20 23 1d4+15 1d2+0
+30 0
 8 8 0
 BareHandAttack: 4
+Wimpy: 1
+Evasion: 1
 E
 #3710
-oyster fish~
-the giant oyster~
-A giant oyster sits on the bottom here.
+giant river mussel oyster~
+a giant river mussel~
+A giant pale mussel rests on the reservoir floor.
 ~
-   You come very close to the oyster, but suddenly it snaps shut, preventing you
-from seeing inside.
+This ancient freshwater shellfish has grown far beyond ordinary size in
+the mineral-rich reservoir. Its ridged shell is thick enough to turn
+blades, and it snaps shut with surprising force when disturbed. The
+oldest specimens sometimes hide valuable pearls.
 ~
 254026 0 0 0 128 0 0 0 0 E
-3 19 8 0d0+30 1d2+0
-30 900
+4 20 24 1d4+20 1d2+0
+30 0
 6 6 0
 BareHandAttack: 4
+SavingPara: 1
+SavingRod: 1
+SavingPetri: 1
+SavingBreath: 1
+SavingSpell: 1
+Wimpy: 2
+Evasion: 1
 E
 #3711
-rabbit~
-a small rabbit~
-A small rabbit is nibbling on some grass here.
+gutter hare rabbit~
+a gutter hare~
+A lean brown hare picks through scrub near the old works.
 ~
-   You've seen them before..  And hunted them down like rats, when you were a
-kid..  They're small, furry and generate extreme amounts of small black pearls
-wherever they go...
+This wary hare lives among the rocks and weeds outside Midgaard's walls,
+feeding on whatever survives around the drainage slopes. It freezes at
+unfamiliar sounds before bolting for the nearest cover.
 ~
 72 0 0 0 0 0 0 0 1000 E
-3 19 8 0d0+30 1d2+0
-30 900
+3 20 23 1d4+15 1d2+0
+30 0
 8 8 0
 BareHandAttack: 4
+Wimpy: 1
+Evasion: 1
 E
 #3712
-cat~
-a small cat~
-A small gray and black striped cat is waiting for a bird to catch..
+underworks mouser alley cat~
+a scarred underworks mouser~
+A lean striped cat watches the sewer vent with professional interest.
 ~
-   It's extremely nice and sweet.  If you reach out your hand to caress it, it
-only bites and scratches so HALF your fingers are missing afterwards..
+This half-feral cat has learned that the forgotten vent provides an
+endless supply of rats, bats, and insects. Several small scars cross its
+nose, but its yellow eyes remain bright and calculating. It tolerates
+people only when they do not interfere with the hunt.
 ~
 72 0 0 0 524288 0 0 0 -50 E
-3 19 8 0d0+30 1d2+0
-30 900
+3 20 23 1d4+15 1d2+0
+30 0
 8 8 0
 BareHandAttack: 8
+Wimpy: 1
+Evasion: 1
 E
 #3713
-fox~
-the fox~
-A small fox is here, prowling.
+red fox service path~
+a red fox~
+A red fox pads quietly along the old service path.
 ~
-   A red, not so large canine, with pointy ears and nose - and teeth, for that
-matter..
+A healthy fox patrols the low hills outside the city, hunting rabbits
+and rodents drawn to the drainage works. Its coat is dusty from the
+rocks, and it keeps a careful distance from anything larger than itself.
 ~
 72 0 0 0 0 0 0 0 300 E
-3 19 8 0d0+30 1d2+0
-30 900
+4 20 24 1d4+20 1d2+0
+30 0
 8 8 0
 BareHandAttack: 4
+SavingPara: 1
+SavingRod: 1
+SavingPetri: 1
+SavingBreath: 1
+SavingSpell: 1
+Wimpy: 2
+Evasion: 1
 E
 $

@@ -1,10 +1,13 @@
 #34600
-fountain~
-a large corner fountain~
-A large corner fountain is here~
+veiled fountain black stone violet water~
+the Veiled Fountain~
+The Veiled Fountain murmurs quietly against a wall of black stone.~
+Black stone curls around a basin of clear water. Violet light moves
+beneath the surface in slow threads, turning the fountain into a calm
+landmark rather than an object of worship.
 ~
-23 0 0 0 0 0 0 0 0 0 0 0 0
--1 2 15 0
+6 0 0 0 0 0 0 0 0 0 0 0 0
+0 0 0 0
 0 0 0 0 0
 E
 statue~
@@ -26,12 +29,15 @@ a spigot from the wall.  The water flows into the basin below with a quiet
 splashing.
 ~
 #34601
-shrine~
-a shrine made of teak and gold~
-A shrine made of teak and gold is here.~
+elyria crescent settee black velvet~
+Elyria's crescent settee~
+Elyria's black velvet crescent settee rests beside the wall.~
+The crescent-shaped settee is upholstered in black velvet with silver
+stitching. It is elegant, comfortable, and positioned where Elyria can
+receive reports without surrendering the room to ceremony.
 ~
 6 0 0 0 0 0 0 0 0 0 0 0 0
-1 0 0 0
+0 0 0 0
 0 0 0 0 0
 E
 shrine~
@@ -41,12 +47,15 @@ appears to be a poem, but it is written in a foreign language which you do not
 understand.
 ~
 #34602
-lantern~
-a shining bronze lantern~
-A shining bronze lantern is here.~
+violet bronze citadel lantern~
+a violet bronze citadel lantern~
+A violet bronze lantern casts steady light here.~
+Bronze ribs protect panes of violet glass around a steady magical
+flame. The light is bright enough for work but soft enough to leave
+the citadel's darker stonework intact.
 ~
 1 0 0 0 0 0 0 0 0 0 0 0 0
-0 0 -1 0
+0 0 0 0
 0 0 0 0 0
 E
 lantern~
@@ -54,9 +63,13 @@ lantern~
 glass and wire, giving off a warm glow.
 ~
 #34603
-statuehead~
-a statuehead on a pedistal~
-A statuehead on a pedistal stands here.~
+crimson marble bust kokudar nightfallen~
+a crimson-marble bust of Kokudar~
+A crimson-marble bust of Kokudar watches over the gallery.~
+The bust is deliberately restrained: Kokudar in travel-worn armor,
+carved from deep red marble veined with pale silver. A small plaque
+records only his name and the founding of this incarnation of the
+citadel.
 ~
 12 0 0 0 0 0 0 0 0 0 0 0 0
 0 0 0 0
@@ -76,12 +89,15 @@ of the many builders who work here.  It is made of a hi-tech material that it
 allows holograms to be placed over the plaster mold that it covers.
 ~
 #34604
-couch~
-a plush couch~
-A plush couch is sitting here against the wall.~
+crimson velvet citadel divan couch~
+a crimson velvet citadel divan~
+A broad crimson velvet divan offers a place to sit.~
+A durable hardwood frame supports deep crimson cushions edged in
+violet thread. The piece is comfortable enough for long conversations
+and sturdy enough to survive a fortress full of armed retainers.
 ~
 6 0 0 0 0 0 0 0 0 0 0 0 0
-5 0 0 0
+0 0 0 0
 0 0 0 0 0
 E
 couch~
@@ -90,12 +106,15 @@ comfortable.  It appears to be used as a waiting place for mortals looking to
 meet with the immortals.
 ~
 #34605
-altar~
-a prayer altar~
-A prayer altar is here.~
+crimsonstone strategy plinth command table~
+a crimsonstone strategy plinth~
+A waist-high crimsonstone strategy plinth stands ready for maps.~
+The low planning surface is cut from dense crimson stone. Brass
+grooves hold map weights, markers, chalk, and message slips for quick
+briefings.
 ~
 6 ai 0 0 0 0 0 0 0 0 0 0 0
-1 0 0 0
+0 0 0 0
 0 0 0 0 0
 E
 altar~
@@ -105,12 +124,15 @@ side of it.  There are candles and incense burners incorperated in the design
 and they smolder gently.
 ~
 #34606
-shrine~
-a small shrine made of marble~
-A small shrine made of marble is here~
+memory dais marble low seat~
+a marble memory dais~
+A low marble memory dais rests beneath the archive lamps.~
+The marble platform is engraved with names, dates, and terse notes
+from earlier campaigns and strongholds. It is a place to remember
+decisions and losses, not an altar.
 ~
 6 0 0 0 0 0 0 0 0 0 0 0 0
-1 0 0 0
+0 0 0 0
 0 0 0 0 0
 E
 incense~
@@ -124,9 +146,12 @@ ornamental oak wood.  It has cubbies where small candles burn and incense burns
 honoring the god or goddess here.
 ~
 #34607
-painting~
-a large oil painting of the Last Judgement~
-An oil painting of the Last Judgement hangs here.~
+painting citadel crimson storm campaign~
+a painting of a crimson citadel beneath a violet storm~
+A vast painting shows a crimson citadel beneath a violet storm.~
+The painting captures crimson towers under a violent violet sky while
+defenders hold the walls against shapes lost in rain and distance. No
+inscription explains which campaign inspired it.
 ~
 12 0 0 0 0 0 0 0 0 0 0 0 0
 0 0 0 0
@@ -139,9 +164,12 @@ upon the souls that stand before him.  It has a lot of floaty representation wit
 background color and flowing design.  It is uplifting.
 ~
 #34608
-oil painting~
-an oil painting of the Last Supper~
-An oil painting of the Last Supper hangs here.~
+painting inner circle long table~
+a painting of the inner circle at supper~
+A warm painting shows the inner circle gathered around a long table.~
+The scene is intentionally informal. Armor has been set aside,
+arguments appear to be in progress, and someone at the far end is
+clearly stealing food from another plate.
 ~
 12 0 0 0 0 0 0 0 0 0 0 0 0
 0 0 0 0
@@ -154,9 +182,12 @@ crucifixion.  It is absolutely stunning, the design and painting representation
 that is here.
 ~
 #34609
-exit arrow~
-a glowing exit arrow~
-A glowing exit arrow is here, hanging from the ceiling.~
+west sigil brass direction marker~
+a brass western way-sigil~
+A brass way-sigil marks the western routes of the citadel.~
+A physical brass plaque is etched with compact symbols for the
+household, guard, and western gate routes. It glows only enough to
+remain readable in darkness.
 ~
 12 a 0 0 0 0 0 0 0 0 0 0 0
 0 0 0 0
@@ -168,9 +199,12 @@ which happens to be south, over the step up into the Main Upper Imm Hall.  On
 the surface, in red letters, on the green glass is the word 'EXIT:'
 ~
 #34610
-exit arrow~
-a glowing exit arrow~
-A glowing exit arrow is here, hanging from the ceiling.~
+east sigil brass direction marker~
+a brass eastern way-sigil~
+A brass way-sigil marks the eastern routes of the citadel.~
+A physical brass plaque is etched with compact symbols for the
+laboratories, archives, and eastern gate. Its violet enamel catches
+lanternlight without floating or pointing like an artificial arrow.
 ~
 12 a 0 0 0 0 0 0 0 0 0 0 0
 0 0 0 0
@@ -182,9 +216,12 @@ the room.  It has the words 'EXIT' written in red letters on the green glass
 lens and an arrow ->.
 ~
 #34611
-american flag~
-an American Flag~
-An American Flag hangs from the wall in honor for the 9/11 Victims.~
+american flag memorial banner~
+an @WAmerican @Rflag@n~
+An @WAmerican @Rflag@n is displayed with deliberate care.~
+The flag is kept as a personal memorial and reminder of Kokudar's life
+beyond the citadel. It is displayed respectfully, without being turned
+into a faction emblem or an object of worship.
 ~
 12 0 0 0 0 0 0 0 0 0 0 0 0
 0 0 0 0
@@ -197,4 +234,335 @@ Rumble, returns from his service in Iraq. May his courage and strength keep him
 safe, and let the great banner of our great nation always watch over him.
 Return home my friend.
 ~
+#34612
+war table campaign relief~
+the @Dcitadel @Rwar @Wtable@n~
+A massive @Dcitadel @Rwar @Wtable@n dominates the chamber.~
+Interlocking terrain tiles, colored markers, wax tablets, and
+pin-mounted banners cover the table. Entire regions can be rearranged
+in minutes for planning or after-action review.
+~
+6 0 0 0 0 a 0 0 0 0 0 0 0
+0 0 0 0
+0 0 0 0 0
+#34613
+elyria writing desk silver inlay~
+Elyria's writing desk~
+A silver-inlaid writing desk stands beneath a violet lamp.~
+Letters, household ledgers, sealed invitations, and disciplinary notes
+are kept in separate trays with almost intimidating precision.
+~
+6 0 0 0 0 a 0 0 0 0 0 0 0
+0 0 0 0
+0 0 0 0 0
+#34614
+vaelreth dispatch desk crimsonwood~
+Vaelreth's crimsonwood-edged dispatch desk~
+A crimsonwood-edged dispatch desk is covered in active reports.~
+The desk has slots for security, household, archive, laboratory, and
+external reports. Its wine-red hardwood edging is the only concession
+to decoration; every document is positioned to be reached without
+wasted motion.
+~
+6 0 0 0 0 a 0 0 0 0 0 0 0
+0 0 0 0
+0 0 0 0 0
+#34615
+kaelen weapon rack guard~
+Kaelen's inspection rack~
+A disciplined inspection rack holds guard equipment.~
+Training blades, spare belts, signal horns, and inspection tags are
+arranged in exact order for Kaelen's daily guard checks.
+~
+6 0 0 0 0 a 0 0 0 0 0 0 0
+0 0 0 0
+0 0 0 0 0
+#34616
+battlemaid tea service silver~
+the Veiled Blades' silver tea service~
+A polished silver tea service waits on a wheeled stand.~
+The service is genuinely used for hospitality, though several pieces
+are weighted heavily enough that Brienne has demonstrated their combat
+potential more than once.
+~
+12 0 0 0 0 a 0 0 0 0 0 0 0
+0 0 0 0
+0 0 0 0 0
+#34617
+battlemaid duty board slate~
+the battlemaid duty slate~
+A large slate lists the Veiled Blades' current assignments.~
+Names, times, patrol routes, household duties, training blocks, and
+special instructions cover the slate. Older entries have been wiped
+clean but never quite completely.
+~
+12 0 0 0 0 a 0 0 0 0 0 0 0
+0 0 0 0
+0 0 0 0 0
+#34618
+archive lectern ironwood~
+an ironwood archive lectern~
+An ironwood lectern supports a chained catalogue.~
+The catalogue indexes several wings of the archive and contains more
+cross-references than ordinary readers would consider reasonable.
+~
+6 0 0 0 0 a 0 0 0 0 0 0 0
+0 0 0 0
+0 0 0 0 0
+#34619
+portal control obelisk violet~
+the @Mportal @Wcontrol @Dobelisk@n~
+A waist-high @Mportal @Wcontrol @Dobelisk@n hums quietly.~
+Inset crystals track portal stability, destination locks, and
+emergency shutdown seals. Elaris insists that touching unlabeled
+facets is grounds for immediate removal from the room.
+~
+12 0 0 0 0 a 0 0 0 0 0 0 0
+0 0 0 0
+0 0 0 0 0
+#34620
+chronometer brass impossible clocks~
+the @Ocitadel @Wchronometer@n~
+The @Ocitadel @Wchronometer@n turns through several incompatible measures of time.~
+Concentric rings display local hour, ritual intervals, portal drift,
+and a few measures that the Clockkeeper refuses to explain in the past
+tense.
+~
+12 0 0 0 0 a 0 0 0 0 0 0 0
+0 0 0 0
+0 0 0 0 0
+#34621
+runeforge anvil crimson iron~
+the crimson-iron runeforge anvil~
+A rune-cut crimson-iron anvil anchors the forge.~
+The dark red alloy bears old hammer scars, silver rune channels, and
+at least one impact no one will admit happened indoors.
+~
+6 0 0 0 0 a 0 0 0 0 0 0 0
+0 0 0 0
+0 0 0 0 0
+#34622
+containment crystal warning cage~
+a @Mwarded @Ccontainment @Wcrystal@n~
+A @Mwarded @Ccontainment @Wcrystal@n pulses behind a brass warning rail.~
+Layered runes isolate whatever magical residue is being studied
+inside. A practical sign reads: IF IT SPEAKS YOUR NAME, FETCH XYLIA.
+~
+12 0 0 0 0 a 0 0 0 0 0 0 0
+0 0 0 0
+0 0 0 0 0
+#34623
+bestiary case specimen notes~
+a bestiary specimen case~
+A sealed specimen case is surrounded by notes.~
+Claws, scales, shed feathers, fragments of shell, and magically inert
+samples are catalogued for comparison rather than displayed as
+trophies.
+~
+12 0 0 0 0 a 0 0 0 0 0 0 0
+0 0 0 0
+0 0 0 0 0
+#34624
+artifact registry cabinet brass~
+the artifact registry cabinet~
+A brass-bound registry cabinet stands locked.~
+Each shallow drawer holds an identification card for one stored
+artifact, including known hazards, prior owners, and the reason
+Kokudar decided to keep it.
+~
+6 0 0 0 0 a 0 0 0 0 0 0 0
+0 0 0 0
+0 0 0 0 0
+#34625
+kitchen hearth crimsonstone~
+the great crimsonstone hearth~
+A broad crimsonstone hearth radiates steady heat.~
+Multiple ovens, hooks, kettles, warming shelves, and a magically
+regulated flue make this crimsonstone hearth the center of Garrick's
+kitchen rather than a decorative fireplace.
+~
+6 0 0 0 0 a 0 0 0 0 0 0 0
+0 0 0 0
+0 0 0 0 0
+#34626
+infirmary medicine cabinet~
+the infirmary medicine cabinet~
+A labeled medicine cabinet fills one wall.~
+Bandages, tonics, splints, salves, antidotes, and emergency scroll
+cases are arranged so Thalia can reach them without searching.
+~
+6 0 0 0 0 a 0 0 0 0 0 0 0
+0 0 0 0
+0 0 0 0 0
+#34627
+signal bell citadel bronze~
+the citadel signal bell~
+A bronze signal bell hangs beside a coded striker rack.~
+Different striker patterns carry different meanings through the
+fortress: visitor, drill, fire, containment failure, lockdown, and the
+rarely used command for everyone to stop improvising.
+~
+12 0 0 0 0 a 0 0 0 0 0 0 0
+0 0 0 0
+0 0 0 0 0
+#34628
+crimson vault ledger chain~
+the Crimson Vault ledger~
+A chained crimson leather ledger rests on a narrow stand.~
+Entries are written in several hands, but every removal line requires
+Kokudar or the Vault Warden to countersign it.
+~
+12 0 0 0 0 a 0 0 0 0 0 0 0
+0 0 0 0
+0 0 0 0 0
+#34629
+groundskeeper pruning staff~
+the groundskeeper's pruning staff~
+A huge ironwood pruning staff leans against the wall.~
+The tool is sized for someone enormous. One end carries a pruning
+hook; the other is capped in smooth stone from years of use as a
+walking staff.
+~
+12 0 0 0 0 a 0 0 0 0 0 0 0
+0 0 0 0
+0 0 0 0 0
+#34630
+elyria crimsonsteel glaive~
+Elyria's crimsonsteel glaive~
+Elyria's crimsonsteel glaive rests within easy reach.~
+A long crimsonsteel blade curves from a silver-veined haft. It is
+elegant enough for formal guard and unquestionably built for real
+battle.
+~
+5 t 0 0 0 a 0 0 0 0 0 0 0
+0 0 0 0
+0 0 0 0 0
+#34631
+vaelreth cane blade crimsonsteel~
+Vaelreth's crimsonsteel cane-blade~
+Vaelreth's crimsonsteel cane-blade has been set carefully aside.~
+The polished cane conceals a narrow crimsonsteel blade and several
+less obvious mechanisms. Vaelreth considers questions about them
+inefficient.
+~
+5 t 0 0 0 a 0 0 0 0 0 0 0
+0 0 0 0
+0 0 0 0 0
+#34632
+kaelen citadel longsword~
+@WKa@Cel@Wen's @Dcitadel longsword@n~
+@WKa@Cel@Wen's @Dcitadel longsword@n hangs from a disciplined rack.~
+The weapon is practical, balanced, and maintained to a standard that
+makes ornament unnecessary.
+~
+5 t 0 0 0 a 0 0 0 0 0 0 0
+0 0 0 0
+0 0 0 0 0
+#34633
+xylia violet focus staff~
+@MXy@Wli@Ma's @Dviolet focus staff@n~
+@MXy@Wli@Ma's @Dviolet focus staff@n hums beside the ritual table.~
+Violet crystal veins run through dark wood around a core of silver
+wire. The staff is both a spell focus and an emergency weapon.
+~
+5 t 0 0 0 a 0 0 0 0 0 0 0
+0 0 0 0
+0 0 0 0 0
+#34634
+malphas whisper dagger crimson~
+Malphas's crimson whisper dagger~
+A narrow crimson-edged dagger seems easy to overlook.~
+A deep red line runs along the blade's edge and vanishes when the
+weapon turns away from the light. Malphas claims it is merely a tool,
+which has never reassured anyone.
+~
+5 t 0 0 0 a 0 0 0 0 0 0 0
+0 0 0 0
+0 0 0 0 0
+#34635
+seraphine silver saber~
+@WSe@Mra@Wph@Mine's @Dsilver saber@n~
+@WSe@Mra@Wph@Mine's @Dsilver saber@n rests beside a folded uniform.~
+The saber combines an officer's elegance with the balance of a weapon
+used every week in real drills.
+~
+5 t 0 0 0 a 0 0 0 0 0 0 0
+0 0 0 0
+0 0 0 0 0
+#34636
+mirelle dueling blade~
+@CMi@Wre@Cll@We's @Ddueling blade@n~
+@CMi@Wre@Cll@We's @Ddueling blade@n lies across a practice towel.~
+A narrow guard and flexible blade favor speed, precision, and the sort
+of argument Mirelle prefers to settle at sword's length.
+~
+5 t 0 0 0 a 0 0 0 0 0 0 0
+0 0 0 0
+0 0 0 0 0
+#34637
+nyxara shadowknife~
+@DNy@Mxa@Wra's @Dshadowknife@n~
+@DNy@Mxa@Wra's @Dshadowknife@n is visible only because someone left it in the light.~
+The matte blade and wrapped grip make no sound against cloth or
+leather. Its owner denies ever misplacing it.
+~
+5 t 0 0 0 a 0 0 0 0 0 0 0
+0 0 0 0
+0 0 0 0 0
+#34638
+thalia healer mace~
+@GTh@Wali@Ga's @Dhealer's mace@n~
+@GTh@Wali@Ga's @Dhealer's mace@n hangs beside her medical satchel.~
+The mace is short enough to carry through crowded infirmary spaces and
+heavy enough to discourage anyone from creating additional patients.
+~
+5 t 0 0 0 a 0 0 0 0 0 0 0
+0 0 0 0
+0 0 0 0 0
+#34639
+brienne great maul~
+@RBr@Wie@Rnn@We's @Dgreat maul@n~
+@RBr@Wie@Rnn@We's @Dgreat maul@n rests against a reinforced wall bracket.~
+The maul is absurdly large, impeccably maintained, and has a small
+ribbon tied around the haft by someone with a dangerous sense of
+humor.
+~
+5 t 0 0 0 a 0 0 0 0 0 0 0
+0 0 0 0
+0 0 0 0 0
+#34640
+crimson throne kokudar veiled citadel~
+the Crimson Throne of the Veiled Citadel~
+The Crimson Throne of the Veiled Citadel commands the raised dais.~
+The throne is built from dark crimson heartwood reinforced with
+red-veined stone and silver. Its high back carries the Nightfallen
+crest in restrained relief, and its broad arms are worn smooth enough
+to prove that it is used for decisions rather than display.
+~
+6 0 0 0 0 a 0 0 0 0 0 0 0
+0 0 0 0
+0 0 0 0 0
+#34641
+elyria ceremonial chair crimson silver~
+Elyria's crimson ceremonial chair~
+Elyria's crimson ceremonial chair stands at the right of the throne.~
+A high-backed chair of crimson heartwood and silver filigree stands
+beside Kokudar's dais. It is formal without pretending to be a second
+throne, marking Elyria's place as First Lady and the highest household
+authority beneath Kokudar.
+~
+6 0 0 0 0 a 0 0 0 0 0 0 0
+0 0 0 0
+0 0 0 0 0
+#34642
+inner council crescent bench crimson~
+the inner council's crimson crescent bench~
+A crimson crescent bench faces the throne dais.~
+The broad curved bench gives Vaelreth, Kaelen, Xylia, Malphas,
+Seraphine, and other summoned councilors a practical place during long
+audiences and planning sessions.
+~
+6 0 0 0 0 a 0 0 0 0 0 0 0
+0 0 0 0
+0 0 0 0 0
 $~

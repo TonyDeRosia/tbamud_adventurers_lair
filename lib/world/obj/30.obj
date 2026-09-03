@@ -167,12 +167,12 @@ A small sword lies here.~
 0 1 6 11
 3 25 10 0 0
 E
-inscription~
-   It says: 'May this sword be a good companion.  '
-~
-E
 sword small~
    The small sword seems to have an inscription of some sort.
+~
+E
+inscription~
+   It says: 'May this sword be a good companion.  '
 ~
 A
 18 1
@@ -222,12 +222,12 @@ A large torch.~
 1 3 0 0 0
 #3031
 lantern brass~
-a @Yla@Ont@Yer@n~
-A brass lantern is here.~
+a @yLa@Ont@Yern@n~
+A lantern has been left here.~
 ~
 1 0 0 0 0 ao 0 0 0 0 0 0 0
 0 0 96 0
-1 12 10 0 0
+1 12 0 0 0
 #3032
 bag~
 a @yba@Og@n~
@@ -644,11 +644,11 @@ An @Yad@Wve@Ynt@Cur@Wers' @Yno@Wti@Cce @Ybo@War@Yd@n is mounted here.~
 0 0 0 0
 0 0 0 0 0
 E
-social bulletin~
-   Use 'look board' to read the board.
-~
-E
 adventurers notice board social bulletin~
 Pinned notices carry news, requests, warnings, and messages left by travelers from across the realm. Use 'look board' to read what has been posted.
+~
+E
+social bulletin~
+   Use 'look board' to read the board.
 ~
 $~

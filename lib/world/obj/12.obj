@@ -1,7 +1,7 @@
 #1200
-email list staff~
-a list of the staff's emails~
-A list of the staff's emails has been left here.~
+staff directory ledger emails email list records test~
+a @WSt@Baf@Cf @WDi@Bre@Cct@Wor@By @CLed@Wge@Br@n~
+A @WSt@Baf@Cf @WDi@Bre@Cct@Wor@By @CLed@Wge@Br@n rests open beside a stack of sealed records.~
 ~
 12 0 0 0 0 ao 0 0 0 0 0 0 0
 0 0 0 0
@@ -9,12 +9,12 @@ A list of the staff's emails has been left here.~
 T 1205
 E
 list email staff~
-   @RHELP CONTACT@n for the most recent listing or:
+   	RHELP CONTACT	n for the most recent listing or:
 ~
 #1201
-pamphlet trigedit~
-a pamphlet advertising the wonderful world of triggers~
-A small pamphlet advertising the wonderful world of Trigedit.~
+dg script field manual pamphlet trigedit triggers training guide~
+a @CDG @WSc@Bri@Cpt @WFi@Bel@Cd @BMa@Wnu@Cal@n~
+A @CDG @WSc@Bri@Cpt @WFi@Bel@Cd @BMa@Wnu@Cal@n lies ready for immortal training.~
 ~
 12 0 0 0 0 an 0 0 0 0 0 0 0
 0 0 0 0
@@ -29,61 +29,65 @@ for optimal results, Use the pages in conjuction with TSTAT.  Have fun with the
 power of (minor)coding!
 ~
 #1202
-scroll~
-a scroll~
-A scroll.~
+training scroll spell scroll demonstration magic~
+a @Wtr@Bai@Cni@Wng @Bsp@Cel@Wl @Csc@Bro@Wll@n~
+A @Wtr@Bai@Cni@Wng @Bsp@Cel@Wl @Csc@Bro@Wll@n has been set aside for controlled spell testing.~
 ~
 2 0 0 0 0 a 0 0 0 0 0 0 0
 1 31 -1 -1
 1 7000 0 0 0
 #1203
-color test object~
-a color test object~
-This is a @Rred@n test object~
+chromatic test lantern color light object ansi display~
+a @Rch@Oro@Yma@Wti@Cc @Bte@Cst @Wla@Bnt@Cer@Wn@n~
+A @Rch@Oro@Yma@Wti@Cc @Bte@Cst @Wla@Bnt@Cer@Wn@n cycles through short irregular bands of color.~
 ~
 1 0 0 0 0 a 0 0 0 0 0 0 0
 0 0 23 0
 1 1000 0 0 0
 #1204
-wand~
-the wand~
-A test wand~
+scripted test wand wand deck shuffle training~
+a @Msc@Cri@Wpt@Bed @Cte@Wst @Bwa@Cnd@n~
+A @Msc@Cri@Wpt@Bed @Cte@Wst @Bwa@Cnd@n rests on a marked experimentation tray.~
 ~
 3 0 0 0 0 a 0 0 0 0 0 0 0
 1 1 1 31
 1 1000 0 0 0
 T 1284
 #1205
-staff~
-staff~
-Staff~
+spellcraft test staff staff training magic~
+a @Bsp@Cel@Wlc@Cra@Bft @Cte@Wst @Bst@Caf@Wf@n~
+A @Bsp@Cel@Wlc@Cra@Bft @Cte@Wst @Bst@Caf@Wf@n leans against the training rack.~
 ~
 4 0 0 0 0 a 0 0 0 0 0 0 0
 1 3 3 31
 1 1000 0 0 0
 #1207
-neon sign~
-a neon sign~
-A neon sign is here blinking an important message!~
-   The sign is lighted and surrounded in brillant, flashing, multi-color bulbs.
-The sign itself has a message written on it using the stick on Velcro(tm)
-letters.
-
-   Please be aware that the God Hall has changed, and all operations are
-available using the new zone, (343) Offices are also posted at this new
-location.  Look at fountain for the Directory and Map (34306) to
-assist you if this applies.
-
-Whiteknight, The Just Cleric
-Billeting Officer, Zone(s) 343/346
+service notice plaque neon sign god hall zone 343 directory~
+a @Wbr@Cas@Bs @CSe@Wrv@Bic@Ce @CNo@Wti@Bce @WPl@Caq@Bue@n~
+A @Wbr@Cas@Bs @CSe@Wrv@Bic@Ce @CNo@Wti@Bce @WPl@Caq@Bue@n is mounted where an old glowing notice once hung.~
+This brass plaque replaces an obsolete relocation notice from an earlier
+incarnation of the immortal halls. Its engraved lettering explains that
+the Service Hall is one working wing of a larger immortal complex. Staff
+offices, meeting chambers, and restricted passages continue through the
+adjoining halls. For exact destinations, immortals are directed to
+current staff maps and duty boards rather than old relocation
+instructions.
 ~
 16 0 0 0 0 0 0 0 0 0 0 0 0
 0 0 0 0
 0 0 0 0 0
+#1208
+Ability Tome~
+Teaches a spell or skill.~
+This will teach a spell or skill.~
+~
+0 0 0 0 0 a 0 0 0 0 0 0 0
+0 0 0 0
+0 0 0 0 0
 #1209
-squishy armchair chair~
-a squishy armchair~
-A large squishy armchair sits in front of the fireplace.~
+commons hearthchair armchair chair squishy taylor sleep furniture~
+a @OCo@Wmm@Bon@Cs @RHe@War@Cth@Bch@Wai@Cr@n~
+A deep @OCo@Wmm@Bon@Cs @RHe@War@Cth@Bch@Wai@Cr@n waits beside the hearth for off-duty staff.~
 ~
 6 0 0 0 0 0 0 0 0 0 0 0 0
 1 0 0 0
@@ -98,25 +102,25 @@ material as the rest of the chair, and they seem to be stuffed to a point where
 they look to be almost exploding.
 ~
 #1210
-Straight Jacket~
-a straight jacket~
-You can't see it...it isn't here.~
+censure restraint tabard jacket straight jacket armor training~
+a @DCe@Rns@Our@De @Wre@Bst@Cra@Win@Bt @Cta@Wba@Brd@n~
+A folded @DCe@Rns@Our@De @Wre@Bst@Cra@Win@Bt @Cta@Wba@Brd@n rests in a sealed evidence alcove.~
 ~
 9 0 0 0 0 ad 0 0 0 0 0 0 0
 0 0 0 0
 1 1000 0 0 0
 #1211
-neon sign~
-a @Rn@Ge@Yo@Wn @Bs@Ci@Mg@Rn@n~
-@WA @Rn@Ge@Yo@Wn @Bs@Ci@Mg@Rn@W has been placed here, and is POINTING to the message board!@n~
+staff duty marker notice plaque neon sign board~
+a @WSt@Baf@Cf @BDu@Cty @WMa@Brk@Cer@n~
+A @WSt@Baf@Cf @BDu@Cty @WMa@Brk@Cer@n points toward the current staff notice board.~
 ~
 16 0 0 0 0 0 0 0 0 0 0 0 0
 0 0 0 0
 0 0 0 0 0
 #1212
-game console~
-a game console~
-A game console sits in one corner of the room.~
+animal chase demonstration board game console training dg~
+the @OAn@Wim@Cal @BCh@Cas@Ce @WDe@Bmo@Cns@Wtr@Bat@Cio@Wn@n @BBo@Car@Wd@n~
+The @OAn@Wim@Cal @BCh@Cas@Ce @WDe@Bmo@Cns@Wtr@Bat@Cio@Wn@n @BBo@Car@Wd@n is arranged for an interactive DG exercise.~
 ~
 12 0 0 0 0 0 0 0 0 0 0 0 0
 0 0 0 0
@@ -132,9 +136,9 @@ You must collect the prizes and avoid the animal to obtain maximum points.
 Each prize is worth 500 * game_level in experience.
 ~
 #1218
-spring fountain water well~
-a spring well~
-A mountain spring bubbles up fresh water here.~
+service spring well fountain water fresh basin~
+the @CSe@Wrv@Bic@Ce @CSp@Wri@Bng@n~
+Clear water bubbles from the @CSe@Wrv@Bic@Ce @CSp@Wri@Bng@n into a polished stone basin.~
 ~
 23 0 0 0 0 0 0 0 0 0 0 0 0
 500 500 15 0
@@ -144,9 +148,9 @@ spring fountain water~
    Bubbles up fresh spring water that can quench your thirst
 ~
 #1221
-near-transparent small garmet~
-the near-transparent, small garmet~
-A pile of sheer silk is here, almost transparent.~
+visibility test veil sheer silk garment garmet transparent worn~
+a @DVi@Wsi@Cbi@Bli@Wty-@CTe@Bst @WVe@Cil@n~
+A nearly weightless @DVi@Wsi@Cbi@Bli@Wty-@CTe@Bst @WVe@Cil@n hangs from a labeled testing hook.~
 ~
 11 0 0 0 0 ad 0 0 0 0 0 0 0
 0 0 0 0
@@ -161,33 +165,33 @@ A
 A
 2 1
 #1226
-boards builder's bulletin gen_boards~
-a builder's bulletin board~
-A builder's bulletin board is floating here.~
+boards builder builders bulletin gen_boards notice~
+the @CBu@Bil@Wde@Cr's @BNo@Wti@Cce @BBo@War@Cd@n~
+The @CBu@Bil@Wde@Cr's @BNo@Wti@Cce @BBo@War@Cd@n is mounted here for active building notes.~
 ~
 13 0 0 0 0 0 0 0 0 0 0 0 0
 0 0 0 0
 0 0 0 0 0
 #1227
-staff bulletin boards gen_boards~
-a staff bulletin board~
-A staff only board is floating here.~
+staff duty bulletin boards notices gen_boards~
+the @WSt@Baf@Cf @WDu@Bty @CBo@War@Bd@n~
+The @WSt@Baf@Cf @WDu@Bty @CBo@War@Bd@n holds staff-only notices and operational discussion.~
 ~
 13 0 0 0 0 0 0 0 0 0 0 0 0
 0 0 0 0
 0 0 0 0 0
 #1228
-advertising bulletin boards gen_boards~
-an advertising bulletin board~
-An advertising board is hovering here.~
+staff operations advertising bulletin boards gen_boards procedures~
+the @BOp@Cer@Wat@Bio@Bns @CBo@War@Bd@n~
+The @BOp@Cer@Wat@Bio@Bns @CBo@War@Bd@n carries current staff procedures and work notices.~
 ~
 13 0 0 0 0 0 0 0 0 0 0 0 0
 0 0 0 0
 0 0 0 0 0
 #1229
-Couch~
-Smaug's Couch~
-Smaug's Couch is standing here.~
+restoration couch sofa furniture smaug training rest~
+the @WRe@Bst@Cor@Wat@Bio@Wn @CCo@Buc@Wh@n~
+The broad @WRe@Bst@Cor@Wat@Bio@Wn @CCo@Buc@Wh@n offers a place for staff to recover between duties.~
 ~
 6 0 0 0 0 0 0 0 0 0 0 0 0
 6 0 0 0
@@ -200,33 +204,33 @@ couschons, the arms of the couch are made from a ferret's pelt.  The legs are in
 the shape of dragons, and are also made from dragon's skin.
 ~
 #1230
-test scroll~
-a torn scroll~
-It looks like a half finished spell~
+incomplete spell scroll torn test magic unfinished~
+an @Win@Bco@Cmpl@Wet@Be @Csp@Wel@Bl @Wsc@Bro@Wll@n~
+An @Win@Bco@Cmpl@Wet@Be @Csp@Wel@Bl @Wsc@Bro@Wll@n bears a deliberately unfinished magical formula.~
 ~
 2 g 0 0 0 ao 0 0 0 0 0 0 0
 12 51 -1 -1
 1 250000 10 0 0
 #1231
-test object~
-the test object~
-A test object.~
+reset test strongbox container object training box~
+a @WRe@Bse@Ct-@WTe@Bst @CSt@Wro@Bng@Cbo@Wx@n~
+A @WRe@Bse@Ct-@WTe@Bst @CSt@Wro@Bng@Cbo@Wx@n sits inside a chalked loading circle.~
 ~
 15 0 0 0 0 a 0 0 0 0 0 0 0
 1 0 0 0
 1 1000 0 0 0
 #1233
-weapon level 34~
-a level 34 weapon~
-A level 34 weapon is used to test level restrictions.~
+minimum level testblade level 34 weapon sword training test~
+the @WMi@Bni@Cmu@Wm-@BLe@Cve@Wl @RTe@Wst@Bbl@Cad@We@n~
+The @WMi@Bni@Cmu@Wm-@BLe@Cve@Wl @RTe@Wst@Bbl@Cad@We@n rests beneath a plaque explaining level restrictions.~
 ~
 5 0 0 0 0 ano 0 0 0 0 0 0 0
 11 2 2 0
 1 1000 0 34 0
 #1266
-Black Staff of Immortality~
-the black staff of immortality~
-A Gigantic Black Staff rests here.~
+steward staff office immortality black ceremonial staff~
+the @DSt@Bew@Car@Wd's @WSt@Baf@Cf @Wof @COf@Bfi@Wce@n~
+The @DSt@Bew@Car@Wd's @WSt@Baf@Cf @Wof @COf@Bfi@Wce@n stands in a ceremonial rack.~
 ~
 4 b 0 0 0 ao 0 0 0 0 0 0 0
 1 10 10 23
@@ -236,9 +240,9 @@ staff black~
    A Huge staff sits here eminating a tremendous power.
 ~
 #1269
-switch~
-a switch from a willow tree~
-A magical switch from a willow tree has carelessly been discarded here.~
+trigger test switch willow switch weapon training wear~
+a @Otr@Wig@Bge@Cr-@Wte@Bst @Cwi@Wll@Bow @Bsw@Cit@Wch@n~
+A @Otr@Wig@Bge@Cr-@Wte@Bst @Cwi@Wll@Bow @Bsw@Cit@Wch@n has been tagged for scripted wear experiments.~
 ~
 5 b 0 0 0 an 0 0 0 0 0 0 0
 7 10 5 2
@@ -249,33 +253,33 @@ switch willow~
    It's a stick.  It's magical.  It also hurts when you beat people with it.
 ~
 #1275
-uniform~
-a Builder Academy uniform~
-A Builder Academy uniform has been left here.~
+builder work tabard uniform academy worn training~
+a @CBu@Bil@Wde@Cr's @BWo@Crk @WTa@Bba@Crd@n~
+A @CBu@Bil@Wde@Cr's @BWo@Crk @WTa@Bba@Crd@n hangs beside the construction reference shelves.~
 ~
 11 0 0 0 0 ad 0 0 0 0 0 0 0
 0 0 0 0
 1 1000 0 0 0
 #1290
-fountain poisoned~
-poisoned fountain~
-A poisoned fountain is here.~
+affect test basin poisoned fountain poison training water~
+the @RAf@Wfe@Bct-@CTe@Wst @RBa@Wsi@Bn @Rof @CPo@Wis@Bon@n~
+The @RAf@Wfe@Bct-@CTe@Wst @RBa@Wsi@Bn@n is clearly marked @RPO@WIS@BON@n for controlled testing.~
 ~
 23 0 0 0 0 0 0 0 0 0 0 0 0
 500 500 0 1
 505 0 0 0 0
 #1291
-fountain unpoisoned~
-an unpoisoned fountain~
-An unpoisoned fountain is here.~
+control basin unpoisoned fountain clean water affect test training~
+the @CAf@Wfe@Bct-@CTe@Wst @CCo@Wnt@Bro@Wl @CBa@Wsi@Bn@n~
+The @CAf@Wfe@Bct-@CTe@Wst @CCo@Wnt@Bro@Wl @CBa@Wsi@Bn@n provides clean water for comparison tests.~
 ~
 23 0 0 0 0 0 0 0 0 0 0 0 0
 500 500 0 0
 505 0 0 0 0
 #1292
-american flag~
-an American flag~
-An American flag waves proudly in the wind, marking wishes for the safe return of Rumble from the foreign lands.~
+american flag stars stripes service standard united states usa patriotic~
+an @BA@Wme@Rri@Bca@Wn @Rfl@Wag@n~
+An @BA@Wme@Rri@Bca@Wn @Rfl@Wag@n hangs with quiet dignity among the hall's old service standards.~
 ~
 12 0 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
@@ -289,33 +293,33 @@ safe, and let the great banner of our great nation always watch over him.
 Return home my friend.
 ~
 #1295
-notebook notes book~
-Elaseth's notebook~
-@nA book entitled "@YElaseth's Notes: A Madwoman's Account@n" lies here.~
+builder field notebook elaseth notebook records armor training~
+a @CBu@Bil@Wde@Cr's @BFi@Wel@Cd @WNo@Bte@Cbo@Wok@n~
+A worn @CBu@Bil@Wde@Cr's @BFi@Wel@Cd @WNo@Bte@Cbo@Wok@n lies open to pages of experimental notes.~
 ~
 9 0 0 0 0 ao 0 0 0 0 0 0 0
 0 0 0 0
 1 1000 0 0 0
 #1296
-lamp hanukah~
-a hanukah lamp~
-A Hanukah lamp lies here on the floor, all eight candles lit up.~
+hanukkah lamp menorah ceremonial holiday seasonal light~
+a @BCe@Wre@Cmo@Bni@Wal @CHa@Wnu@Bkk@Cah @WLa@Bmp@n~
+A carefully stored @BCe@Wre@Cmo@Bni@Wal @CHa@Wnu@Bkk@Cah @WLa@Bmp@n is kept with the hall's seasonal observances.~
 ~
 12 0 0 0 0 0 0 0 0 0 0 0 0
 0 0 0 0
 0 0 0 0 0
 #1297
-Desk~
-Large desk~
-A large blackened desk~
+records desk container large desk worktable storage training~
+a @Whe@Bav@Cy @Wre@Bco@Crd@Ws @Bde@Csk@n~
+A @Whe@Bav@Cy @Wre@Bco@Crd@Ws @Bde@Csk@n stands beneath shelves of staff ledgers.~
 ~
 15 0 0 0 0 0 0 0 0 0 0 0 0
 20000 3 0 0
 0 0 0 0 0
 #1298
-firework new year piece~
-a piece of fireworks~
-A piece of fireworks is planted in a champagne bottle.~
+ceremonial fireworks firework signal flare celebration test trigger~
+a @Rce@Ore@Ymo@Wni@Cal @Rfi@Ore@Ywo@Wrk@n~
+A carefully sealed @Rce@Ore@Ymo@Wni@Cal @Rfi@Ore@Ywo@Wrk@n is stored for approved celebrations and trigger tests.~
 ~
 12 0 0 0 0 0 0 0 0 0 0 0 0
 0 0 0 0
@@ -331,9 +335,9 @@ bottle champagne~
 has obviously drunk the champagne first.
 ~
 #1299
-christmas tree~
-a christmas tree~
-A festive christmas tree is covered in various ornaments and lights.~
+christmas tree evergreen ceremonial holiday seasonal tree~
+a @Gce@Wre@Rmo@Gni@Wal @WCh@Rri@Wst@Gma@Ws @Rtr@Gee@n~
+A @Gce@Wre@Rmo@Gni@Wal @WCh@Rri@Wst@Gma@Ws @Rtr@Gee@n is kept among the hall's seasonal decorations.~
 ~
 12 0 0 0 0 0 0 0 0 0 0 0 0
 0 0 0 0

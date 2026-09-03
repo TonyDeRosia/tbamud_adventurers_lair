@@ -1,21 +1,20 @@
 #12
 CircleMUD~
-God Complex Merged with 343~
+The Immortal Service Hall~
 1200 1299 15 2
-R 0 1206 1228 -1 	(an advertising bulletin board)
-O 0 1228 99 1206 	(an advertising bulletin board)
-M 0 1212 1 1200 	(the scoreboard mob)
-O 0 1212 1 1200 	(a game console)
-D 0 1200 0 1 	(The Meeting Room Of The Gods)
-M 0 34300 1 1202 	(Barney the Dinosaur)
-R 0 1293 1227 -1 	(a staff bulletin board)
-O 0 1227 99 1293 	(a staff bulletin board)
-D 0 1293 2 1 	(The Halls Of Justice)
-M 0 1201 1 1205 	(the Immortal Postmaster)
-R 0 1291 1226 -1 	(a builder's bulletin board)
-O 0 1226 99 1291 	(a builder's bulletin board)
-R 0 1290 3096 -1 	(a social bulletin board)
-O 0 3096 99 1290 	(a social bulletin board)
-M 0 1200 1 1201 	(the Immortal Innkeeper)
+M 0 1212 1 1200 	(the 	Ctr	Bai	Wni	Cng 	Bre	Wco	Crd	Wer	n)
+O 0 1212 1 1200 	(the 	OAn	Wim	Cal 	BCh	Cas	Ce 	WDe	Bmo	Cns	Wtr	Bat	Cio	Wn	n 	BBo	Car	Wd	n)
+D 0 1200 0 1 	(	WThe 	BHa	Cll 	Wof 	RSe	Wrv	Bic	Ce	n)
+R 0 1206 1228 -1 	(the 	BOp	Cer	Wat	Bio	Bns 	CBo	War	Bd	n)
+O 0 1228 99 1206 	(the 	BOp	Cer	Wat	Bio	Bns 	CBo	War	Bd	n)
+R 0 1293 1227 -1 	(the 	WSt	Baf	Cf 	WDu	Bty 	CBo	War	Bd	n)
+O 0 1227 99 1293 	(the 	WSt	Baf	Cf 	WDu	Bty 	CBo	War	Bd	n)
+D 0 1293 2 1 	(	WThe 	BHa	Cll 	Wof 	RJu	Wst	Bic	Ce 	Wand 	RCo	Wnd	Buc	Ct	n)
+M 0 1201 1 1205 	(the 	CKe	Bep	Wer 	Wof 	BDi	Csp	Wat	Bch	n)
+R 0 1291 1226 -1 	(the 	CBu	Bil	Wde	Cr's 	BNo	Wti	Cce 	BBo	War	Cd	n)
+O 0 1226 99 1291 	(the 	CBu	Bil	Wde	Cr's 	BNo	Wti	Cce 	BBo	War	Cd	n)
+R 0 1290 3096 -1 	(an 	Yad	Wve	Ynt	Cur	Wers' 	Yno	Wti	Cce 	Ybo	War	Yd	n)
+O 0 3096 99 1290 	(an 	Yad	Wve	Ynt	Cur	Wers' 	Yno	Wti	Cce 	Ybo	War	Yd	n)
+M 0 1200 1 1201 	(the 	WIm	Bmo	Crt	Wal 	CSt	Bew	War	Cd	n)
 S
 $

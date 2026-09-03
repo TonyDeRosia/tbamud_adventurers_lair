@@ -1,249 +1,247 @@
 #3700
-Zone Description Room for Capital Sewer System~
-   Capital Sewer System by Welcor
-Player Level : 1-10
-Rooms        : 46
-Objects      : 11
-Mobs         : 14
-Triggers     : 1 (prevents mobs from filling a room they cannot get out of)
-Theme        : The zone is currently the top level of the sewer system
-               It's populated by rats, bats and some blind fish.
-Began        : Quite some time ago.
-Finished     : The top level is finished. See below.
-Notes        : The zone will eventually consist of three levels. The top level,
-               which is finished, a catacomb level and another level of old
-               sewers - populated by undeads and swamp things.
-
-Zone 37 is linked to the following zones:
-38 Capital Sewer System           at  3717 (down ) --->  3801
-
-Links: 02u, 17d, 28w
+Zone Notes: The Midgaard Underworks~
+The Midgaard Underworks, Zone 37. Builder pass: kokudar, preserving
+Welcor's original topology. Player level range: 3-7. This is the upper
+civic drainage layer beneath Midgaard. The area now emphasizes working
+sluices, rat warrens, bat quarantine galleries, abandoned maintenance
+spaces, a smuggler cache, and the underground reservoir. The descent at
+3717 remains the handoff into Zone 38, which should become the older and
+more dangerous lower underworks.
 ~
 37 513 0 0 0 0
 S
 #3701
-Entering the sewers~
-   As you descend into this stinking, mud-filled swamp, at the very bottom of
-the city, you can't help noticing how much waste, so many people create.  And
-it's all here under your feet - and in your boots!  You see water filled with
-all kinds of bad things coming from east and west, drifting north from here.
+The Main Sluice Junction~
+Three brick-lined drains meet beneath a low vaulted ceiling blackened by
+generations of lamp smoke. Brown runoff slides through shallow channels
+cut into the floor while iron rings, old chalk marks, and a cracked
+inspection plaque show that city workers once maintained this place
+regularly. Rat tracks cross the damp silt in every direction. The
+northern collector carries water deeper below Midgaard, while older
+conduits branch east and west.
 ~
 37 32777 0 0 0 0
 D0
-A pipe leads north. It's filled with muck.
+A broad collector pipe carries runoff north beneath iron-green ribs.
 ~
 ~
 0 -1 3716
 D1
-A pipe is here.
-
+A brick-lined conduit bends east toward the rat-scratched drains.
 ~
 ~
 0 -1 3703
 D2
-Under the manhole.
+The drain slopes south toward the old city access beneath the street.
 ~
 ~
 0 -1 3702
 D3
-A tunnel intersection.
+A wider runoff gallery branches west into the older civic sluices.
 ~
 ~
 0 -1 3718
 S
+T 3701
 #3702
-Under the Drainpipe~
-   You are standing at the end of a huge drainpipe, which leads upward in a
-gentle slope, a gentle stream of sewage slowly runs north, deeper into what must
-be the sewers of what ever city is at the end of that pipe.  Few options present
-themselves to you in this mess, knee deep in sewage you have but two choices,
-either venture north and deeper in to the sewers, and meet what ever creatures
-might dwell in this filthy place, or attempt to go up through that pipe, with a
-chance of getting out of this dark and gloomy place.
+Beneath the City Drain~
+The broad drainpipe slopes down from somewhere above the city and
+empties into ankle-deep runoff. Every sound from the streets is reduced
+to a distant murmur through layers of stone. A rusted ladder bracket and
+worn boot scrapes show where maintenance crews once descended, but the
+place now belongs to insects, rats, and whatever survives on what
+Midgaard throws away. The main junction lies north.
 ~
 37 32777 0 0 0 0
 D0
-You see the entrance to the sewers.
+The broad drain rises north toward the main sluice junction.
 ~
 ~
 0 -1 3701
 S
 #3703
-Pipe turning north and west~
-   You are in a pipe, leading north and west.  The pipe is big enough for you to
-stand upright, and just dry enough at this point to be able to walk without
-getting your feet wet.  Still, sewage is trickling through the pipe and you come
-to the conclusion, that you're happy you chose to come here in the dry season.
+The Eastward Brick Conduit~
+A barrel-vaulted brick conduit bends north from the main junction. The
+center channel is slick with runoff, but narrow maintenance ledges
+remain passable along either wall. Pale mineral streaks mark old flood
+levels far above the present waterline. Small claw marks become more
+numerous toward the north, where something has been chewing at the
+mortar.
 ~
 37 32777 0 0 0 0
 D0
-The pipe continues north, as far as your light extends.
+The brick conduit continues north where claw marks thicken along the
+mortar.
 ~
 ~
 0 -1 3704
 D3
-You can see the sewer entrance.
+The conduit opens west into the main sluice junction.
 ~
 ~
 0 -1 3701
 S
 #3704
-A pipe deep underground.~
-   You are walking through a larger than man-sized pipe, in the capitals sewers.
-From the north you hear some scratching and the sound of small animals.  You've
-seen rat tracks earlier, and they were a bit too large for your taste.
+The Rat-Scratched Conduit~
+The masonry here is scarred by thousands of claws. Several bricks have
+been gnawed loose around the drainage channel, leaving dark gaps just
+large enough for rats to vanish through. A sour animal smell has begun
+to overpower the ordinary sewer stink. Northward, the scratching grows
+louder and more deliberate.
 ~
 37 32777 0 0 0 0
 D0
-The pipe continues.
+Gnawed brickwork leads north toward the colony's claimed passages.
 ~
 ~
 0 -1 3705
 D2
-A turn in the pipe.
+The conduit returns south toward cleaner, less-damaged masonry.
 ~
 ~
 0 -1 3703
 S
 #3705
-A pipe deep underground~
-   The sounds of rats can no longer be ignored.  The big pipe has recent
-markings of claws and fangs.  It is clear, that whatever lives here is too big
-to be ordinary rats.  North of here you can barely make out a crossing, and
-south the pipe continues.
+The Gnawing Run~
+This length of conduit has been claimed by the rat colony. Old wooden
+braces are chewed almost smooth, scraps of cloth have been pulled into
+wall cracks, and tiny bones lie between the bricks. The passage opens
+into a damaged junction to the north. Behind you, the cleaner geometry
+of the city sewer feels surprisingly civilized.
 ~
 37 32777 0 0 0 0
 D0
-A three-way crossing.
+The chewed conduit opens north into a broken three-way junction.
 ~
 ~
 0 -1 3707
 D2
-The pipe extends further than your light.
+The rat-scarred passage runs south toward the outer sewer lines.
 ~
 ~
 0 -1 3704
 S
 #3707
-A three-way intersection~
-   You are standing in what was once a north/east turn in the pipe.  To the
-west, however, there is a large hole in the pipe which makes it possible to go
-that way too.  As you examine the hole, you notice that it's not man-made.
-Some quite large, toothmarks along the perimeter suggest it was done by some of
-the rodents inhabiting the sewers.  The sound of rats moving about is strong
-from both the east and the west.
+The Broken Conduit Junction~
+A major section of brickwork has been gnawed through on the western
+wall, exposing a cramped earth tunnel beneath the foundations. The
+original conduit continues east while the southern line returns toward
+the city drain. The breach is not a collapse. Tooth grooves, packed
+nesting fiber, and clawed earth make it clear that the rats built their
+own road through Midgaard's masonry.
 ~
 37 32777 0 0 0 0
 D1
-The tunnel continues and turns north.
+The original brick conduit continues east toward a rusted quarantine
+grate.
 ~
 ~
 0 -1 3708
 D2
-The pipe heads south from here.
+The sewer line runs south toward the gnawing run.
 ~
 ~
 0 -1 3705
 D3
-A hole has been dug through the wall here.
-Behind it you see dirt walls.
+A ragged breach in the masonry opens west into a cramped earth burrow.
 ~
 ~
 0 -1 3714
-E
-bite marks bitemarks~
-   The bitemarks are deep, and approximately 8" wide.
-~
 E
 hole~
    The hole is about 3 feet high, and must've been dug out by big rats.  It's
 full of marks of teeth.
 ~
+E
+bite marks bitemarks~
+   The bitemarks are deep, and approximately 8" wide.
+~
 S
 #3708
-A bend in the tunnel~
-   The pipe turns north and west.  To the north there is a grating which blocks
-the pipe.  It seems noone has been down here for ages to clean the grate, so it
-is stuck in it's current position.  It's hopeless getting past it.  Behind it
-you hear the sound of animals.  Again you think of rats, but they sound so BIG!.
+The Rusted Quarantine Grate~
+A heavy iron grate divides the conduit here. Its bars are furred with
+rust, old grease, and dried sludge, and a faded municipal stamp can
+still be made out beneath the grime. Beyond it lies a section of sewer
+long abandoned to the rat colony. The city clearly meant this barrier to
+stay shut, though time has done as much damage to it as any intruder.
 ~
 37 32777 0 0 0 0
 D0
-The grate obviously has rusted in the hinges, and is covered in muck.
+A rusted iron grate bars the northward conduit, stiff but still
+movable.
 ~
 grate~
-2 -1 3709
+1 -1 3709
 D3
-The three-way junction is here.
+The conduit bends west toward the broken junction.
 ~
 ~
 0 -1 3707
 S
 #3709
-North of a grate~
-   You are on the north side of a very mucky grate, and around you are every
-evidence of absence of people you'll ever need - knee-high muck, green slime
-dropping from the walls, a profound smell of rats, fungus growing on the
-ceiling.  You feel very dirty just being here.  Also you can't help hearing lots
-of noises from the north-west.  Sounds like something's having a feast.
+Beyond the Quarantine Grate~
+The air beyond the grate is warmer and rank with nesting musk. Luminous
+fungus clings to wet mortar, painting the passage in a sick green glow.
+Gnawed bones have been pushed into little piles along the edges of the
+flow channel. The sound ahead is not random scurrying but the busy
+movement of an established colony.
 ~
 37 32777 0 0 0 0
 D0
-A bend in the pipe is here.
+The warm, musk-heavy conduit bends north toward the colony's deeper
+runs.
 ~
 ~
 0 -1 3710
 D2
-A very mucky and rusty grate is here, stuck in position.
+The rusted quarantine grate stands south between this passage and the
+outer sewer.
 ~
 grate~
-2 -1 3708
+1 -1 3708
 S
 #3710
-Near the northern drainhole~
-   The pipe bends here, going south and west.  West you see a drainhole and
-around your ankles you feel the water flowing towards it.  The fungus on the
-walls are luminous, so you have every chance to study the dirty ceiling, the
-green slime, and the big rats.  From the west you hear the sounds of big
-creatures eating - or is it many small?
+The Northern Sluice Bend~
+The conduit turns toward an old circular drain chamber where water
+gathers before spilling deeper into the system. Green-white fungus gives
+enough light to see the broad rat tracks crossing the wet stone. From
+the west comes the sound of gnawing and quarrelling. From farther in,
+something larger occasionally answers with a low, throaty hiss.
 ~
 37 32776 0 0 0 0
 D2
-The pipe continues south.
+The conduit returns south toward the quarantine grate.
 ~
 ~
 0 -1 3709
 D3
-A drainhole is here.
-
+A low drain opening leads west into the rat warrens.
 ~
 ~
 0 -1 3711
 S
 #3711
-The northern drainhole~
-   You are in a domed room with a drainhole in the middle.  Originally this room
-was intended as the end of the pipe from the east, but it seems that the rats
-disagree.  They have made a nest south of here, and a tunnel to the west.  The
-room is very dirty and you deduct that no civil servant would ever go all the
-way inhere, even if it was originally so intended.  The ceiling is overgrown
-with luminous fungus, making the room bright as day.  You can hear the sounds of
-creatures eating, bones being crushed.  The source seems to be south of here.
+The Rat Warrens' Threshold~
+A domed maintenance chamber has become the outer court of the rat
+warrens. The original drain basin is almost hidden beneath shredded
+cloth, splintered wood, bones, and stolen rubbish. Tunnels have been
+chewed west and south through the old masonry. Larger rats linger here
+like guards rather than scavengers, watching every movement toward the
+deeper nest.
 ~
 37 32776 0 0 0 0
 D1
-The pipe extends east.
+The sewer conduit lies east beyond the outer edge of the warrens.
 ~
 ~
 0 -1 3710
 D2
-You see the rats' lair.
-It's a bit unclear from here.
+A broad, filthy opening leads south into Gristlefang's inner court.
 ~
 lair nest~
 0 -1 3715
 D3
-A hole has been grinded by many teeth, leading to a dirt tunnel.
+A tooth-gnawed breach leads west into a cramped packed-earth burrow.
 ~
 ~
 0 -1 3712
@@ -254,80 +252,77 @@ of the Capital straight to the river.  Downstream, of course.
 ~
 S
 #3712
-A dirt tunnel~
-   This low tunnel has been dug by many claws, making the walls if not smooth,
-then at least soft to the touch, and you do not feel very safe here.  You are
-worried if the tunnel can take a full grown person, crawling as you are.  East
-of here you see a domed chamber, nothing like the dirt you're crawling in, but
-south you just see more and more of it.  You are also aware of a loud sound from
-your east - almost like chewing.
+A Burrow Under the Masonry~
+The rat-made tunnel is too low to stand in comfortably. Packed earth
+presses close on every side, reinforced in places with stolen sticks,
+strips of leather, and fragments of broken lath. The smell of damp soil
+is almost a relief after the sewer, but the constant rustle of bodies
+moving through unseen side burrows makes the crawl no safer.
 ~
 37 32777 0 0 0 0
 D1
-The northern drainhole.
+The burrow widens east toward the warrens' outer chamber.
 ~
 ~
 0 -1 3711
 D2
-The dirt tunnel continues.
+The packed-earth crawl twists south beneath the city foundations.
 ~
 ~
 0 -1 3713
 S
 #3713
-In a dirt tunnel~
-   As far as you can see live couldn't get much worse - You're crawling through
-dirt on your hands and knees with no obvious relief within eyesight.  Around you
-the markings of claws suggest large amounts of rats of dog-like proportions in
-your immediate vicinity.  And to top that off, you are hearing strange sounds
-from the north.
+The Packed-Earth Crawl~
+This cramped burrow twists through soil beneath the city foundations.
+Smooth fur-polished walls show that hundreds of animals use it each day.
+Roots hang from the ceiling like thin fingers, and every few yards a
+side hole disappears into darkness. The tunnel is large enough for a
+person only because the colony's largest rats have made it so.
 ~
 37 32777 0 0 0 0
 D0
-The dirt tunnel continues.
+The cramped burrow winds north toward the warrens' threshold.
 ~
 ~
 0 -1 3712
 D2
-The dirt tunnel continues.
+The fur-polished tunnel continues south toward broken sewer masonry.
 ~
 ~
 0 -1 3714
 S
 #3714
-A dirt tunnel~
-   This tunnel is not very big.  You can only fit in, if you crawl on your hands
-and knees, making it hard for you to get an overview of the situation.
-However, you have no doubt that the tunnel leads somewhere, as it's obviously
-being used often, judging from the marks on the walls.  You can crawl on north,
-or make your way to the intersection to the east.
+The Gnawed Return Tunnel~
+The burrow widens near a ragged break in the sewer wall to the east.
+Bits of brick and lime have been dragged back into the earth and worked
+into the tunnel like crude reinforcement. Northward lies the heart of
+the colony, where the ground is churned by heavy paws and littered with
+the remains of things brought down from the city.
 ~
 37 32777 0 0 0 0
 D0
-The dirt tunnel continues.
-
+The rat-made tunnel crawls north through packed earth.
 ~
 ~
 0 -1 3713
 D1
-A three-way intersection.
+A ragged hole opens east back into the broken brick conduit.
 ~
 ~
 0 -1 3707
 S
 #3715
-The Lair of the King Rat.~
-   You are in a cave, dug in the wall.  In the far corner a lot of debris is
-huddled up, in the makings of a nest, while closer to the exit, a mound of old
-bones make out a trash pile.  Or at least that's your guess - hard to tell
-exactly, actually.  The room is the lair of a gigantic rat, bigger than the rest
-of them, which seems to have at least some intelligence.  Glittering objects,
-reflecting the dim light from the luminous fungus, litter the nest.  It seems
-the Rat King has gathered what others has dropped.
+@RThe Court of Gristlefang@W@n~
+The deepest nest has become a grotesque little court. A mound of torn
+bedding, stolen purses, bent cutlery, bones, buttons, and bright
+fragments rises against the far wall. Smaller rats keep to the edges,
+leaving the center clear for Gristlefang, the immense scarred beast that
+rules this warren. Nothing here suggests human intelligence, but the
+arrangement of tribute around the nest is uncomfortably close to ritual.
 ~
 37 32776 0 0 0 0
 D0
-The northern drainhole.
+The only clear way out leads north to the warrens' threshold.
 ~
 ~
 0 -1 3711
@@ -337,77 +332,94 @@ gems glitter~
 ~
 S
 #3716
-The Northern Pipe~
-   Standing in a large pipe, you feel the muck around your ankles drifting
-northward.  You are able to stand tall in this room, and as far as you can tell,
-there is a large drainhole to your north.
+The North Collector~
+A broad collector pipe carries several shallow streams toward a domed
+chamber to the north. The brickwork is older here and strengthened with
+iron ribs green from corrosion. Rats use the dry ledges as a highway,
+but their tracks thin near the northern chamber. A cold draft rises from
+somewhere below.
 ~
 37 32777 0 0 0 0
 D0
-You see a domed chamber with a drainhole.
+The collector runs north toward a domed shaft where cold air rises
+from below.
 ~
 ~
 0 -1 3717
 D2
-You see the entrance to the sewers.
+The broad pipe returns south to the main sluice junction.
 ~
 ~
 0 -1 3701
 S
 #3717
-At the edge of a pit~
-   You find yourself in a large domed chamber, at the edge of a 2' wide hole in
-the floor of the room.  Muck is dripping over the edge, and the smell is
-horrible.  As you go closer to the edge and take a peek, you realize there is a
-drop of about 20', before the bottom is reached.  Not caring to try if you can
-climb down, you also notice a ladder carved into the wall of the hole.  As you
-examine the hole closer you see a grate further down.
+@CThe Deepworks Drop@W@n~
+The collector ends at a circular shaft where the floor falls away around
+an iron ladder. Water spills over the rim and vanishes into darkness
+twenty feet below. Old maintenance marks warn of deeper flood channels,
+unstable masonry, and sealed works beneath this level. The ladder
+descends toward the older underworks of Zone 38, where Midgaard's newer
+sewers were built over structures nobody now maintains.
 ~
 37 32777 0 0 0 0
 D2
-A large pipe leads southwards.
+The collector pipe leads south toward the upper underworks.
 ~
 ~
 0 -1 3716
 D5
+An iron ladder descends beside falling water into the older lower
+underworks.
 ~
 ~
-0 0 3801
+0 -1 3801
 S
+T 3702
 #3718
-The western junction.~
-   Entering the chamber, you see tunnels leading west, north and east of here.
-This chamber in itself is but a mere junction of pipes.  Stinking water comes
-drifting from the west and north, flowing out to your east.  The smell inhere is
-torture to your nose, but luckily you are starting to get used to it.
+The Western Sluice Junction~
+Three western drainage lines meet in a broad brick chamber. Water from
+the north and west joins the eastern flow, carrying tannery scum,
+kitchen grease, dye, ash, and street filth toward the main collector. A
+faded series of painted arrows once directed work crews through the
+maze. Someone has scratched newer symbols beside them, less official and
+much more recent.
 ~
 37 32777 0 0 0 0
 D0
+A feeder-lined runoff gallery stretches north toward the bat
+quarantine.
 ~
 ~
 0 -1 3719
 D1
+The western sluices drain east toward the main junction.
 ~
 ~
 0 -1 3701
 D3
+A sluggish waste channel leads west toward older stonework and hidden
+breaches.
 ~
 ~
 0 -1 3729
 S
 #3719
-North/south Pipe~
-   A large tube is what this is.  Leading from a junction to the south and
-straight north, a lot of small pipes - too small to be entered - join in from
-the sides, randomly spilling sewage in your path.  The pipe leads north as far
-as your light lets you see.
+The Runoff Gallery~
+Small feeder pipes pierce both walls of this long gallery, coughing
+intermittent streams into the central channel. Broken ceramic tags still
+identify several districts above. Bootprints occasionally interrupt the
+tracks of rats, proof that people other than city workers still travel
+this route. The air ahead grows sharp with bat guano.
 ~
 37 32777 0 0 0 0
 D0
+The gallery continues north toward a stout quarantine grate and the
+bat roosts beyond.
 ~
 ~
 0 -1 3720
 D2
+The runoff gallery returns south to the western sluice junction.
 ~
 ~
 0 -1 3718
@@ -418,58 +430,72 @@ the larger pipes here.
 ~
 S
 #3720
-North/south Pipe~
-   A large tube is what this is.  Leading south and north, a lot of small pipes
-- too small to be entered - join in from the sides, randomly spilling sewage in
-your path.  It seems this pipe has been blocked by a very strong grate with
-small holes in it.  Through the small holes you see a lot of bats.  It seems the
-grating was put here for a reason.
+The Bat Quarantine Gate~
+A stout grate seals the northern pipe. Unlike the rat barrier, this one
+was maintained long enough to remain functional. Its bars are scratched
+and white-stained, and the flutter of countless wings trembles through
+the iron. The city once tried to keep the bat colony confined beyond
+this point. Judging by the guano underfoot, that policy was only partly
+successful.
 ~
 37 32777 0 0 0 0
 D0
+A stout iron grate closes off the guano-streaked bat galleries to the
+north.
 ~
 grate~
 1 -1 3721
 D2
+The feeder-pipe gallery runs south toward the western sluices.
 ~
 ~
 0 -1 3719
 S
 #3721
-North of the grate.~
-   You immediately notice the change in smell.  Guano.  The bats have seized
-this part of the sewers for themselves.  Obviously the grate to your south is
-there to stop the bats from infecting the whole sewer system.  You can see the
-pipe through it.  You can also enter the bats' territory by going west or north.
+The Guano Gallery~
+The smell changes immediately beyond the grate. Thick layers of guano
+coat ledges, pipes, and broken masonry while hundreds of small bats
+cling to the ceiling. The gallery branches north and west into the old
+roosts. Most of the colony ignores intruders until sudden movement or
+loud noise sends ripples through the mass overhead.
 ~
 37 32777 0 0 0 0
 D0
+The guano-coated gallery continues north toward an abandoned works
+depot.
 ~
 ~
 0 -1 3722
 D2
+The quarantine grate stands south between the roosts and the runoff
+gallery.
 ~
 grate~
 1 -1 3720
 D3
+A narrow bat-filled passage branches west into the darker roosts.
 ~
 ~
 0 -1 3724
 S
 #3722
-A domed cave~
-   You're in a large domed room.  You realized this was once where the builders
-of the sewers lived and had their things stored.  This makes it easier to
-understand the fresh air you're smelling from the north.  It also helps explain
-the millions of bats you see on the ceiling, ignoring you totally.  You can
-continue north through a jagged opening, and south to the pipes.
+The Abandoned Works Depot~
+This domed chamber once served as a depot for sewer crews. Empty peg
+rows, a rotted tool rack, iron hooks, and the remains of an old desk
+survive beneath decades of bat droppings. A cracked ventilation opening
+to the north admits faint fresh air. Someone has searched the desk more
+recently than the rest of the room, leaving cleaner handprints in the
+dust.
 ~
 37 32777 0 0 0 0
 D0
+A cracked ventilation route leads north toward an old shaft and faint
+fresh air.
 ~
 ~
 0 -1 3723
 D2
+The depot opens south into the guano gallery.
 ~
 ~
 0 -1 3721
@@ -480,117 +506,140 @@ actually bats sitting side by side all across the ceiling.
 ~
 S
 #3723
-Near the outside~
-   From here you can see the outside through a hole high up on the northern
-wall.  There is an old wooden ladder set under it so it can be traversed by
-foot.  Through the hole bats are swarming in and out.  As far as you can tell
-going up would take you out of the capital.  You can also go south to a large
-chamber.
+The Broken Vent Shaft~
+A jagged breach high in the wall opens into an old ventilation shaft.
+A weathered ladder gives access to the rocky ground outside the city.
+Bats stream through the opening at dusk, using the same route
+generations of maintenance workers once climbed for fresh air. The
+sewer depot lies below and south.
 ~
 37 32776 0 0 0 0
 D2
+The weathered ladder and broken shaft descend south toward the
+abandoned works depot.
 ~
 ~
 0 -1 3722
 D4
+A weathered ladder climbs toward the rocky vent shelf outside the
+city.
 ~
 ~
 0 -1 3743
 S
+T 3708
 #3724
-A side tunnel~
-   This tunnel is filled with bats.  Some fly and seem to know their way around,
-while others merely cling to the ceiling as you pass.  You come to think of the
-stories you have heard of bats sucking the blood of their victims, and a shiver
-runs down your spine.  You can leave this side tunnel to your east, and it
-continues north.
+The Duskwing Passage~
+This narrow branch tunnel is alive with wings. Duskwing bats cling in
+dense clusters between the brick ribs while larger shapes shift deeper
+in the passage. Guano makes the footing treacherous, and every shout
+returns as a hundred tiny echoes. The quarantine gallery remains east.
 ~
 37 32777 0 0 0 0
 D0
+The narrow roost passage continues north beneath denser clusters of
+bats.
 ~
 ~
 0 -1 3725
 D1
+The passage returns east to the main guano gallery.
 ~
 ~
 0 -1 3721
 S
 #3725
-A side tunnel~
-   The side tunnel continues.  Still, bats are everywhere.  You almost have to
-duck not to scrape your head against the bats clinging to the ceiling, and no
-matter where you look there seem to be more bats.  These bats however does not
-try to harm you - at the moment.  The tunnel continues north and south of here.
+The Hanging Roost~
+Nearly every handspan of ceiling supports a sleeping or restless bat.
+The colony hangs in overlapping layers, some no larger than a fist and
+others broad enough to shadow a person when they spread their wings. The
+tunnel continues through the roost, though brushing the walls risks
+waking more of its inhabitants.
 ~
 37 32777 0 0 0 0
 D0
+The bat-packed tunnel bends north toward the shriekers' territory.
 ~
 ~
 0 -1 3726
 D2
+The roost thins south toward the duskwing passage.
 ~
 ~
 0 -1 3724
 S
 #3726
-Turn in a side tunnel~
-   You see still more of the bats, crawling and climbing on each other to get a
-place on the ceiling.  Some seem a little hostile to your presence.  The tunnel
-turns here, going west and south.
+The Shrieker Bend~
+The passage turns sharply around a bulge of old foundation stone. Here
+the bats are larger and less tolerant. High, piercing cries bounce
+between the bricks whenever something moves below them. Gouges in the
+mortar suggest that the biggest specimens land with enough force to
+damage the wall.
 ~
-37 32777 0 0 0 0
+37 9 0 0 0 0
 D2
+The passage turns south toward the hanging roost.
 ~
 ~
 0 -1 3725
 D3
+The shrieker-scarred bend opens west into the bloodwing gallery.
 ~
 ~
 0 -1 3727
 S
 #3727
-The west tunnel~
-   The tunnel seems to go on forever.  From small holes in the walls ooze is
-dripping onto the floor, and bats are everywhere, almost driving you crazy.
-The tunnel stretches west to east.
+The Bloodwing Gallery~
+Dark stains mark the floor and lower walls of this westward gallery. The
+bats here are heavier, red-eyed, and bold enough to circle close before
+choosing whether to strike. Torn feathers and drained vermin litter the
+ledges. Farther west, the colony disappears into an old vault where the
+ceiling rises beyond easy sight.
 ~
 37 32777 0 0 0 0
 D1
+The gallery narrows east toward the shrieker bend.
 ~
 ~
 0 -1 3726
 D3
+The blood-stained passage continues west into the old roosting vault.
 ~
 ~
 0 -1 3728
 S
 #3728
-The west tunnel~
-   The tunnel seems to go on forever.  From small holes in the walls ooze is
-dripping onto the floor, and bats are everywhere, almost driving you crazy.
-The tunnel stretches west to east.
+The Old Roosting Vault~
+The western tunnel ends in a tall brick vault once used to equalize
+storm pressure. Its upper darkness is packed with bats. Old iron
+inspection rungs vanish into the ceiling but have rusted through in
+several places. The floor is strangely clear, as if the colony
+deliberately leaves the center open for whatever descends from above.
 ~
 37 32777 0 0 0 0
 D1
+The only clear passage leaves east through the bloodwing gallery.
 ~
 ~
 0 -1 3727
 S
 #3729
-A turn in the western pipe~
-   The water is knee-deep here, floating in from the north.  The smell of sewage
-is almost unbearable to your nostrils, and the water is so dirty, you wouldn't
-be surprised to be able to walk on it.  Unfortunately it doesn't keep you up,
-just leaks into your boots.  High on the western wall you notice a small hole,
-seemingly shut with a couple of nailed-in boards.  However it is too high for
-you to reach.  The pipe continues north and a junction is to the east.
+The Western Waste Channel~
+Knee-deep runoff moves sluggishly through this old channel. The eastern
+junction is fouler, but the current from the north carries slightly
+cleaner water. High on one wall, boards cover a maintenance breach that
+can only be reached from the hidden ledge beyond. Recent pry marks on
+the timber suggest smugglers have not entirely abandoned the route.
 ~
 37 32777 0 0 0 0
 D0
+The old waste channel carries a cooler current north toward the
+tannery runoff.
 ~
 ~
 0 -1 3730
 D1
+The sluggish channel returns east to the western sluice junction.
 ~
 ~
 0 -1 3718
@@ -600,316 +649,372 @@ hole boards~
 ~
 S
 #3730
-A boring pipe~
-   The water is knee-deep here, floating in from the north.  The smell of sewage
-is almost unbearable to your nostrils, and the water is so dirty, you wouldn't
-be surprised to be able to walk on it.  Unfortunately it doesn't keep you up,
-just leaks into your boots.  Nothing much of interest here.  The pipe continues
-north and south.
+The Tannery Runoff~
+The water here carries a bitter chemical stink from workshops somewhere
+above. Dark dye clings to the brick, and pale scum collects where the
+current slows. The channel itself is structurally sound but unpleasant
+even by sewer standards. Northward, the water begins to lose some of its
+color.
 ~
 37 32777 0 0 0 0
 D0
+The stained channel runs north where the water begins to clear.
 ~
 ~
 0 -1 3731
 D2
+The bitter runoff flows south toward the western waste channel.
 ~
 ~
 0 -1 3729
 S
 #3731
-A turn in a boring pipe~
-   The water is knee-deep here, floating in from the west.  The smell of sewage
-is almost unbearable to your nostrils, and the water is so dirty, you wouldn't
-be surprised to be able to walk on it.  Unfortunately it doesn't keep you up,
-just leaks into your boots.  Small pipes coming out of the walls leak ooze into
-the sewage around you.  To your west the water seem cleaner.  South the boring
-pipe continues.
+The Cleaner Current~
+The channel bends west where a stronger flow joins from deeper
+stonework. The water remains unfit to drink, but the worst city waste is
+diluted here. Mineral crusts replace greasy residue on the walls, and
+the air carries the cool smell of natural groundwater beneath the sewer
+stink.
 ~
 37 32777 0 0 0 0
 D2
+The current runs south toward the darker tannery-stained water.
 ~
 ~
 0 -1 3730
 D3
+Colder water enters from an older masonry channel to the west.
 ~
 ~
 0 -1 3732
 S
 #3732
-A boring pipe~
-   The water is knee-deep here, floating in from the north.  The smell of sewage
-is almost unbearable to your nostrils, however the water is a little less
-polluted than it is east of here.  Unfortunately it still doesn't keep you up,
-just leaks into your boots.  Small pipes coming out of the walls leak ooze into
-the sewage around you.  Both to your west and east you see turns in the pipe.
+The Old Mason's Channel~
+This stretch of conduit predates much of the visible sewer. Larger stone
+blocks sit behind a later skin of brick, and several mason's marks
+repeat at regular intervals. The water comes from the west, clearer and
+colder than the runoff behind you. Tool scratches around old inspection
+seams hint at repairs made generations apart.
 ~
 37 32777 0 0 0 0
 D1
+The old stone-lined channel returns east toward the cleaner runoff.
 ~
 ~
 0 -1 3731
 D3
+The older masonry continues west toward a natural spring-fed turn.
 ~
 ~
 0 -1 3733
 S
 #3733
-A turn in a boring pipe~
-   The water is knee-deep here, floating in from the south.  The smell of sewage
-is not as strong here, and the water seems a little clearer than east of here.
-It IS still polluted though.  Small pipes coming out of the walls leak ooze into
-the sewage around you.  To your south the water seems even clearer yet.  East
-the boring pipe continues.
+The Springwater Turn~
+Cold water enters from the south and bends east through the old channel.
+The brickwork gives way in places to natural stone, suggesting the sewer
+builders intercepted an underground spring. The air is cooler, the smell
+lighter, and thin strands of white fungus trail in the current.
 ~
 37 32777 0 0 0 0
 D1
+The old channel bends east toward the mason-marked conduit.
 ~
 ~
 0 -1 3732
 D2
+Cold springwater flows south toward a clearer flushing channel.
 ~
 ~
 0 -1 3734
 S
 #3734
-A boring pipe~
-   The water is knee-deep here, floating in from the south.  The smell of sewage
-is not very strong here, and the water seems a little clearer than north of
-here.  It IS still a little polluted though.  A few small pipes coming out of
-the walls leak ooze into the water around you.  To the south the water seems
-even clearer.  North is a turn in the pipe.
+The Clearflow Conduit~
+The southward current is almost clear enough to see the stones beneath
+it. Old lime deposits coat the lower walls in pale shelves. The city
+once used this cleaner flow to flush the western drains, but rusted
+valve fittings show the system has not been properly controlled in
+years. A natural chamber opens ahead.
 ~
 37 32777 0 0 0 0
 D0
+The clearflow channel runs north toward the intercepted underground
+spring.
 ~
 ~
 0 -1 3733
 D2
+The conduit opens south into a natural chamber around the smugglers'
+sluice.
 ~
 ~
 0 -1 3735
 S
 #3735
-A strange halt~
-   The tunnel comes abruptly to an end.  The room you're standing in has not
-been formed by humanoid hands.  It is a work of nature, carved by running water.
-Obviously the persons digging the sewers suddenly opened up to this chamber and
-found no way of closing again.  On the eastern wall clear water is running from
-a natural cavern of some sort, through a hole too small to fit in, and most of
-the water then continues to the east of here through a larger hole.  To your
-south however, a metal door, with a heavy padlock blocks your passage.  Through
-some bars in the door you see still water, and a moored boat.  Some of the water
-also runs through the pipe to your north, creating a natural flow.
+@YThe Smugglers' Sluice Door@W@n~
+The engineered conduit breaks into a natural spring chamber. Water
+enters through a narrow cleft and splits between the sewer and a larger
+opening to the east. To the south, a heavy steel door with an old
+municipal lock bars access to a quiet underground reservoir. Fresh
+scratches around the lock, wax drippings, and boot marks reveal that
+smugglers once used this forgotten sluice as a private route.
 ~
 37 32777 0 0 0 0
 D0
+The engineered conduit runs north toward the old clearflow channel.
 ~
 ~
-0 3710 3734
+0 -1 3734
 D1
+A natural opening leads east toward the hidden cache ledge.
 ~
 ~
 0 -1 3736
 D2
-A heavy steel door, padlocked to keep you out.
+A heavy steel door and old municipal padlock guard the reservoir to
+the south.
 ~
 door padlock~
 1 3710 3737
 S
 #3736
-By the hole~
-   You enter a small room, with a ledge along the walls.  Near the middle of the
-room a large hole has been eroded by the running water.  You realize that
-however long you would hold your breath, that hole would most definitely kill
-you by sheer pressure from the water.  Also you notice several chests obviously
-hidden by someone who thought this a safe place.  You can't fight the water
-without risking to fall into the hole, so you can only get out through a little
-hole high up on the eastern wall.
+The Hidden Cache Ledge~
+A narrow stone ledge circles a violent drainage hole where springwater
+plunges into unseen depths. The current makes the center impossible to
+cross safely. Against the dry wall sits an ironbound cache hidden behind
+old boards and mineral-stained canvas. Whoever used this place trusted
+the water, the awkward entrance, and the sealed door nearby to protect
+their goods.
 ~
 37 32777 0 0 0 0
 D1
+Loose planks conceal a narrow opening east toward the western waste
+channel.
 ~
 hole planks~
 1 -1 3729
 S
 T 3700
+T 3703
 #3737
-By an underground fishing pond~
-   You're standing by a still underground pool.  This is almost an underground
-lake.  There are moorings for a boats here, and you see fish swimming in the
-water.  They're attracted to your light.
+@BThe Drowned Mooring@W@n~
+A small underground reservoir opens beyond the sluice door. Old iron
+rings and timber posts form a cramped mooring where maintenance skiffs
+once tied up. The water is dark but surprisingly clean compared with the
+sewer. Pale fish gather near any light, and old chalk numbers on the
+wall record water levels from floods long forgotten.
 ~
 37 9 0 0 0 0
 D0
+The old steel sluice door leads north back into the spring chamber.
 ~
 steel door padlock~
 1 3710 3735
 D2
-~
-~
-0 3710 3738
-D3
-~
-~
-0 -1 3742
-S
-#3738
-The pool.~
-   An underground lake, with fish ready for the taking.  East of here the cliff
-rise above the water, blocking your way.  South and west the pool continues and
-north you see the mooring.
-~
-37 9 0 0 0 6
-D0
-~
-~
-0 -1 3737
-D2
-~
-~
-0 -1 3739
-D3
-~
-~
-0 -1 3741
-S
-#3739
-The pool~
-   An underground lake, with fish ready for the taking.  South and east of here
-the cliff rise above the water, blocking your way.  North and west the pool
-continues and east you see the mooring.
-~
-37 9 0 0 0 6
-D0
+Dark reservoir water opens south across a shallow lanternlit shelf.
 ~
 ~
 0 -1 3738
 D3
+The reservoir bends west toward a narrow limestone channel.
+~
+~
+0 -1 3742
+S
+T 3704
+#3738
+The Lanternwater Shelf~
+The reservoir shallows over a broad stone shelf where light reaches deep
+enough to reveal silver fish below. Mineral deposits glitter beneath the
+surface like scattered glass. The drowned mooring lies north while
+deeper water spreads south and west. Every movement sends reflections
+wandering across the low cavern roof.
+~
+37 9 0 0 0 6
+D0
+The stone shelf rises north toward the drowned mooring.
+~
+~
+0 -1 3737
+D2
+The reservoir deepens south into colder water.
+~
+~
+0 -1 3739
+D3
+Dark water spreads west toward the deep oyster bed.
+~
+~
+0 -1 3741
+S
+T 3704
+#3739
+The Southern Reservoir~
+The shelf drops into colder water along the southern edge of the
+reservoir. The surrounding stone is natural rather than worked, though
+old iron bolts show where engineers once tried to tame the cavern. Blind
+fish drift near the bottom, disturbed only by the wake of passing
+swimmers or boats.
+~
+37 9 0 0 0 6
+D0
+The reservoir shallows north toward the lanternwater shelf.
+~
+~
+0 -1 3738
+D3
+A pale underground current draws west through deeper water.
 ~
 ~
 0 -1 3740
 S
+T 3704
 #3740
-The pool~
-   An underground lake, with fish ready for the taking.  South and west of here
-the cliff rise above the water, blocking your way.  North and east the pool
-continues.
+The Pale Current~
+A faint underground current moves through this part of the reservoir,
+carrying fine white silt in slow ribbons. The water is deep enough to
+hide the bottom in places. Small cavefish follow the current while
+larger shapes occasionally stir beneath them and vanish before they can
+be identified.
 ~
 37 9 0 0 0 6
 D0
+The current drifts north toward the submerged oyster shelves.
 ~
 ~
 0 -1 3741
 D1
+The pale current opens east into the southern reservoir.
 ~
 ~
 0 -1 3739
 S
+T 3704
 #3741
-The pool~
-   An underground lake, with fish ready for the taking.  West of here the cliff
-rise above the water, blocking your way.  To the north, east and south the pool
-continues.  The water looks quite deep here.
+@CThe Deep Oyster Bed@W@n~
+The reservoir floor falls away beneath dark water. Great pale river
+mussels cling to shelves of submerged stone, their shells opening only
+when the water is still. Pearls sometimes form within the oldest
+specimens, which explains the pry marks on nearby rock and the dangerous
+lengths to which past scavengers were willing to go.
 ~
 37 9 0 0 0 7
 D0
+The submerged shelves rise north toward the reservoir narrows.
 ~
 ~
 0 -1 3742
 D1
+The dark water shallows east toward the lanternwater shelf.
 ~
 ~
 0 -1 3738
 D2
+The oyster bed drops south toward the pale current.
 ~
 ~
 0 -1 3740
 S
+T 3704
 #3742
-The pool~
-   An underground lake, with fish ready for the taking.  North and west of here
-the cliff rise above the water, blocking your way, south the pool continues and
-east you see the mooring.
+The Reservoir Narrows~
+The northern side of the reservoir narrows between wet stone walls
+before bending back toward the drowned mooring. The current is gentle
+here and carries the smell of clean limestone. Fish vanish into cracks
+along the cliff while drops from the ceiling strike the surface with
+slow, hollow notes.
 ~
 37 9 0 0 0 6
 D1
+The limestone channel opens east toward the drowned mooring.
 ~
 ~
 0 -1 3737
 D2
+The narrow waterway deepens south toward the oyster bed.
 ~
 ~
 0 -1 3741
 S
+T 3704
 #3743
-Through the hole~
-   Standing on the edge of the hole, you see things on the outside.  Looking
-down you see a jagged opening, which you might enter by an old wooden ladder.
-Swarms of bats fly around you, almost making you panic.
+The Vent Above the Roost~
+The old ventilation shaft opens onto a narrow rocky shelf. Below, a
+ladder descends toward the bat-infested depot while bats stream past
+through the opening. Fresh air feels almost startling after the
+underworks. A rough path leads north away from the vent and around the
+outer slope.
 ~
 37 32776 0 0 0 0
 D0
-Well, you see the outside, of course..
+A rough rocky path leads north around the slope toward the open vent
+mouth.
 ~
 ~
 0 -1 3744
 D5
+The old ventilation ladder descends into the bat-infested works depot
+below.
 ~
 ~
 0 -1 3723
 S
+T 3709
 #3744
-Outside the cave~
-   You are standing outside a gloomy cave, from which an occasional bat flies
-out around you.  You may enter the cave by going south, but can head back toward
-the city by going west from here.
+The Rocky Vent Mouth~
+A gloomy opening in the hillside marks the forgotten sewer vent. Bats
+occasionally wheel out over the rocks before disappearing toward the
+evening sky. Scrub grass grows between stones around the entrance, and
+an old service path heads west toward lower ground outside Midgaard's
+walls.
 ~
 37 32768 0 0 0 5
 D2
-The cave opening looks inviting - kind of like a mouth, waiting to feed..
+The rocky opening leads south into the old ventilation shaft above the
+roost.
 ~
 ~
-0 0 3743
+0 -1 3743
 D3
-A gravelled path leads towards the city..
+A gravel service path follows the foothills west toward the old
+drainage route.
 ~
 ~
-0 0 3745
+0 -1 3745
 S
 #3745
-Outside the capital~
-   Who would have thought the world could be so barren just outside the capital
-itself.  You're standing in some low foothils near some rocky ground to your
-east.  South of here a gravelled path leads towards the western highway.
+The Underworks Service Path~
+A gravel service path follows the low foothills outside Midgaard. Rusted
+survey stakes and half-buried drainage stones show that the route once
+belonged to municipal workers. The sewer vent lies east among the rocks.
+Southward, the path approaches an abandoned spur where an older road
+connection has collapsed.
 ~
 37 32768 0 0 0 2
 D1
-The gravelled path ends and the ground becomes rocky.
+The gravel path climbs east toward the rocky sewer vent.
 ~
 ~
-0 0 3744
+0 -1 3744
 D2
-The gravelled path continues southward.
+The abandoned service path continues south toward a collapsed highway
+spur.
 ~
 ~
-0 0 3746
+0 -1 3746
 S
 #3746
-On a gravelled path~
-   You are walking along a gravelled path.  North of here the gravel path
-continues, while to the south you enter the bustle of the western highway.
+The Collapsed Highway Spur~
+The service path ends at a broken embankment. A landslip has carried
+away the old southern connection, leaving cracked paving stones and a
+view toward the distant western highway below. The route is no longer
+passable from here. Northward, the gravel path returns toward the
+forgotten sewer vent.
 ~
 37 0 0 0 0 2
 D0
-The gravelled path continues...
+The surviving gravel path leads north toward the underworks vent.
 ~
 ~
-0 0 3745
-D2
-You are just north of the western highway, just outside the West gate.
-~
-~
-0 0 -1
+0 -1 3745
 S
 $~

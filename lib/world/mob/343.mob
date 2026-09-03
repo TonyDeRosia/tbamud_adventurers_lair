@@ -1,15 +1,16 @@
 #34300
-Barney~
-Barney the Dinosaur~
-Barney the Dinosaur is here singing (Off-key).
+censure sentinel hall watcher restraint custodian~
+the Censure Sentinel~
+The Censure Sentinel stands silently at attention.
 ~
-     Here he is, large, purple, green with a goofy grin, big nose
-and big gleaming black eyes. He stands towering here acting
-all goofy as usual.
+A tall warded construct of dark stone and pale brass has been assigned
+to the conduct wing. It exists as a controlled staff sentinel, not a
+punishment mascot. Its smooth face bears only a narrow blue-white line
+of light, and its posture is patient rather than threatening.
 ~
 520282 0 0 0 2424 0 0 0 1000 E
-34 9 -10 6d6+340 5d5+5
-340 115600
+34 9 50 6d6+340 5d5+5
+340 0
 8 8 0
 Str: 18
 Dex: 18
@@ -25,20 +26,18 @@ SavingSpell: 10
 E
 T 34300
 #34301
-Kenny~
-Kenny the attendant~
-Kenny the attendant is here looking after the coffee bar.
+refreshment steward attendant keeper coffee hall~
+the Refreshment Steward~
+The Refreshment Steward checks the supplies behind the counter.
 ~
-   Kenny is a young man, a typical teenager who works at this Coffee Alcove.
-He has blue sagging pants to show off his gaudy Sponge-Bob Boxers, white
-sneakers, a red long sleeved shirt with the logo of the service company on its
-breast, and a red matching hat to his shirt.  He has dirty blond hair, blue
-eyes, big nose, giant ears, freckles among the zits on his face and green teeth
-under the braces he wears in his mouth, EEEW..
+A neatly dressed attendant keeps cups, hot drinks, water, and simple
+provisions organized in the refreshment alcove. His role is practical
+hospitality for staff on duty, and his manner is helpful without the old
+jokes and crude theatrics.
 ~
 516186 0 0 0 2424 0 0 0 325 E
-25 12 -5 5d5+250 4d4+4
-250 62500
+25 12 38 5d5+250 4d4+4
+250 0
 8 8 1
 Str: 16
 Dex: 16
@@ -54,18 +53,18 @@ SavingSpell: 6
 E
 T 34301
 #34302
-Assistant~
-a bikini clad Executive Assistant~
-an bikini clad Executive Assistant is here holding a tablet.
+senior scribe assistant records staff~
+the Senior Scribe~
+The Senior Scribe reviews a violet rune-slate beside the records desk.
 ~
-   The Executive Assistant is tall, slender, and has a fantastic body with
-curves in all the right places.  She wear a skimpy orange and white bikini two
-piece over those curves.  She still holds her purple tablet to help Whiteknight
-with business affairs of the office.
+A professional staff scribe in a dark blue service coat carries a violet
+rune-slate and a ring of archive keys. She tracks correspondence,
+meeting notes, and action items for senior staff without being treated
+as decoration.
 ~
 520282 0 0 0 0 0 0 0 0 E
-31 10 -8 6d6+310 5d5+5
-310 96100
+31 10 45 6d6+310 5d5+5
+310 0
 8 8 2
 Str: 18
 Dex: 18
@@ -80,18 +79,18 @@ SavingBreath: 7
 SavingSpell: 7
 E
 #34303
-Chandra Bishop~
-Bishop Chandra~
-Bishop Chandra, the Holy Father is here.
+conduct mediator justice staff healer aide~
+the Conduct Mediator~
+The Conduct Mediator reviews a sealed case ledger.
 ~
-     Bishop Chandra is an older man, with white hair, a full beard and a wrinkled
-face. His blue eyes twinkle brightly though as-if he were a young man ready
-to go out and face adventures. He wears a simple white and blue trimmed robe
-that has the designs of the Holy Church emblazoned on it in gold.
+A composed mediator in white and deep blue robes keeps evidence ledgers
+and procedural notes for difficult conduct reviews. His authority is
+administrative and limited by policy, documentation, and the expectation
+that staff use restraint.
 ~
 258120 0 0 0 2168 0 0 0 0 E
-31 10 -8 6d6+310 5d5+5
-310 96100
+31 10 45 6d6+310 5d5+5
+310 0
 8 8 1
 Str: 18
 Dex: 18
@@ -107,19 +106,18 @@ SavingSpell: 7
 E
 T 34399
 #34304
-being amorphous spirit drunk wandering~
-a drunk amorphous spirit~
-a drunk amorphous spirit is here nursing its drink.
+service spirit custodian hall cleaner ward~
+a service spirit~
+A quiet service spirit tends the halls.
 ~
-   This spirit, having lived out its days in the mortal world, now works off its
-final sins by doing menial labor in this realm's purgatory.  In this case,
-those chores seem to be cleaning up after the immortals of the land.  Obviously
-this one does not exactly like his job in this world and looks a little bit pink
-from the booze. It also appears very depressed and down on its luck.
+A translucent household spirit moves through the complex carrying a
+cloth, small brush, and ring of maintenance tags. It serves by old
+agreement and cheerful habit, not punishment or debt, and quietly
+handles the ordinary upkeep that keeps the halls usable.
 ~
 516170 0 0 0 589840 0 0 0 0 E
-14 16 1 2d2+140 2d2+2
-140 19600
+14 16 23 2d2+140 2d2+2
+140 0
 8 8 0
 SavingPara: 3
 SavingRod: 3
@@ -128,17 +126,18 @@ SavingBreath: 3
 SavingSpell: 3
 E
 #34305
-gardener~
-a gardener~
-a gardener is working here.
+garden keeper gardener groundskeeper lantern~
+the Garden Keeper~
+The Garden Keeper tends the lantern garden.
 ~
-   The gardener is clad in a two piece kimono with what appears to cast 'beacon'
-a dragon on the back and wears sandals.  Although she is not oriental, she has
-black hair, deep brown eyes and a narrow trim figure.
+A practical groundskeeper in green and brown work clothes carries
+pruning shears, cord, and a small lantern. She tends paths, water
+channels, trees, and flowering beds that give staff a place to think
+away from administrative rooms.
 ~
 520204 0 0 0 0 0 0 0 350 E
-14 16 1 2d2+140 2d2+2
-140 19600
+14 16 23 2d2+140 2d2+2
+140 0
 8 8 2
 Str: 16
 Dex: 17
@@ -153,17 +152,18 @@ SavingBreath: 3
 SavingSpell: 3
 E
 #34306
-golem~
-a stone golem~
-a stone golem is on guard duty here.
+stone warden staff guardian sentinel golem~
+a stone warden~
+A stone warden keeps watch over the operations gallery.
 ~
-   The stone golem looks rather solid, very buff with huge powerful legs, arms
-chest and able to tear the victim in half with its bare hands.  It has an
-expressionless look on its face despite its red glowing eyes.
+A broad stone construct bears simple service runes across its shoulders.
+It is stationed at major staff junctions to discourage misuse of
+restricted areas and to remind visitors that access is based on assigned
+responsibility.
 ~
 520266 0 0 0 2424 0 0 0 0 E
-25 12 -5 5d5+250 4d4+4
-250 62500
+25 12 38 5d5+250 4d4+4
+250 0
 8 8 0
 Str: 16
 Dex: 16
@@ -179,17 +179,17 @@ SavingSpell: 6
 E
 T 34303
 #34307
-golem~
-an air golem~
-an air golem is here on guard duty.
+air warden staff guardian sentinel golem~
+an air warden~
+An air warden circles quietly beneath the rafters.
 ~
-   The air golem is that if a displacement of air and a cloud-like shape with
-wispy arms and legs and a huge center body.  It has yellow glowing eyes and a
-bluish electrical glow about it.
+A translucent warden of bound air and pale runes patrols upper passages.
+Its task is observation and access control rather than intimidation, and
+it reacts only when restricted staff spaces are misused.
 ~
 520266 0 0 0 133500 0 0 0 0 E
-25 12 -5 5d5+250 4d4+4
-250 62500
+25 12 38 5d5+250 4d4+4
+250 0
 8 8 0
 Str: 16
 Dex: 16

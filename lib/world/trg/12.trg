@@ -1,5 +1,5 @@
 #1200
-General trigger keeper. Only for use in room 0.~
+UTILITY - Trigger Keeper~
 2 a 100
 ~
 * Not used for anything but variable storage. No Script!
@@ -7,7 +7,7 @@ General trigger keeper. Only for use in room 0.~
 * Trying to access Global var list of void. Apparently this has not been set up!
 ~
 #1201
-Calculator By Mordecai~
+TRAINING - Speech Calculator~
 2 d 100
 *~
 * By Mordecai
@@ -18,7 +18,7 @@ if %actor.is_pc%
   eval test %test1.strlen%
   eval che %sum%/1
   if %che% == %sum%
-    %echo% @WComputing results...@n
+    %echo% 	WComputing results...	n
     if (%speech%/===)
       if (%sum%==1)
         set sum Yes
@@ -44,102 +44,50 @@ if %actor.is_pc%
     end
     eval opt1 8 + %test%
     eval opt2 (2*%wid1.strlen%)+%sumslen.strlen%+5
-    %echo% @WWizzzzzzzzzz....@n
+    %echo% 	WWizzzzzzzzzz....	n
     if (%opt1%-2) == (%opt2%)
-      %echo% @c...%y%...@n
-      %echo% @c:@C..%y%..@c:@n
-      %echo% @c:@C:@G   %speech% @C  :@c:@n
-      %echo% @c:@C:.%y%.:@c:@n
-      %echo% @c:@C: %wid1%@G %sum% @C%wid1% :@c:@n
-      %echo% @c:@C:.%y%.:@c:@n
-      %echo% @c:..%y%..:@n
+      %echo% 	c...%y%...	n
+      %echo% 	c:	C..%y%..	c:	n
+      %echo% 	c:	C:	G   %speech% 	C  :	c:	n
+      %echo% 	c:	C:.%y%.:	c:	n
+      %echo% 	c:	C: %wid1%	G %sum% 	C%wid1% :	c:	n
+      %echo% 	c:	C:.%y%.:	c:	n
+      %echo% 	c:..%y%..:	n
     else
-      %echo% @r....%y%...@n
-      %echo% @r:@R...%y%..@r:@n
-      %echo% @r:@R:@G    %speech% @R  :@r:@n
-      %echo% @r:@R:..%y%.:@r:@n
-      %echo% @r:@R: %wid1%@G %sum% @R%wid1% :@r:@n
-      %echo% @r:@R:..%y%.:@r:@n
-      %echo% @r:...%y%..:@n
+      %echo% 	r....%y%...	n
+      %echo% 	r:	R...%y%..	r:	n
+      %echo% 	r:	R:	G    %speech% 	R  :	r:	n
+      %echo% 	r:	R:..%y%.:	r:	n
+      %echo% 	r:	R: %wid1%	G %sum% 	R%wid1% :	r:	n
+      %echo% 	r:	R:..%y%.:	r:	n
+      %echo% 	r:...%y%..:	n
     end
   end
 end
 ~
 #1202
-Object Wear or Wield Example~
+TRAINING - Safe Wear Wield Event~
 1 j 100
 ~
-* test trigger
-%echo% actor : %actor%
-wait 10
-if %actor.level% < 34
-   %send% %actor% The sword whispers: I will not serve you!
-   wait 2
-   %echoaround% %actor% The sword exclaims: 'I will not serve those without honor.'
-   %damage% %actor% 100
-   %purge% self
-else
-   %send% %actor% The sword whispers: I was made to serve, great one!
-   wait 2
-   %echoaround% %actor% The sword exclaims: 'I will serve you honorable one..'
-end
+* TRAINING: safe wear/wield event demonstration.
+* This example intentionally causes no damage and never purges the object.
+%send% %actor% The training item gives a brief pulse as its wear trigger fires.
+%echoaround% %actor% %actor.name% tests a scripted training item.
 ~
 #1203
-Mynah Bird~
+RETIRED - Legacy Speech Joke Demo~
 0 d 100
 *~
-if %actor.is_pc%
-  if %c%<20
-    eval c 20
-    global c
-  end
-  if !%speech.contains(!)%
-    eval c (%c%)+1
-    global c
-    set %c% %speech%
-    global %c%
-    set 1 Hello
-    set 2 Yes
-    set 3 Killed him
-    set 4 Food?
-    set 5 Dig dig dig.
-    set 6 Freddy says hi.
-    set 7 Inconceivable.
-    set 8 Stop mimicking me.
-    set 9 I love you.
-    set 10 Do you like me?
-    set 11 Freak.
-    set 12 You are not funny.
-    set 13 Don't you ever shut up?.
-    set 14 Eat my shorts.
-    set 15 I'm pretty. Pretty bird.
-    set 16 Let's tango.
-    set 17 Doh.
-    set 18 Who rang that bell??
-    set 19 Beam me up.
-    set 20 Shut up and get me a drink.
-    eval count %%random.%c%%%
-    eval ans %%%count%%%
-    wait %random.5%
-    say %ans%
-  end
-end
+* RETIRED legacy speech-joke trigger. Intentionally inert in Adventurer's Lair.
 ~
 #1204
-Portal-Main Chamber~
+RETIRED - Obsolete Portal Demo~
 1 c 100
 en~
-if %cmd.mudcommand% == enter && portal /= %arg%
-  wait 1
-  %send% %actor% A whirl of white light falls into your eyes, you fall into a huge water fall.
-  %echoaround% %actor% A whirl of white light falls into %actor.name% eyes, and %actor.heshe% falls into a huge water fall that appears under %actor.hisher% feet.
-  %teleport% %actor% 3001
-  wait 1
-  %force% %actor% look
-end
+* RETIRED obsolete portal demonstration. Intentionally inert; old R3001 teleport removed.
 ~
 #1205
-Object Affects Example~
+TRAINING - Inspect Object Affects~
 1 n 100
 ~
 * By Rumble of The Builder Academy    tbamud.com 9091
@@ -211,61 +159,58 @@ if %self.affects(CHARM)%
 end
 ~
 #1206
-(1207) Capturing~
+RETIRED - Legacy Capture Logger~
 2 c 0
 *~
-return 0
-if %actor.name% != Heiach
-  %echoaround% %actor% %cmd% %arg% (%actor.name%)
-end
+* RETIRED legacy capture/debug logger. Intentionally inert.
 ~
 #1207
-(1207) Heiach's Random Forest Sound Script~
+LAB - Random Ambient Sound Pattern~
 2 b 2
 ~
 eval forest_sounds %random.25%
 switch %forest_sounds%
   case 1
-    %echo% @gThe gently chirping of crickets peacefully resonate across the forest.@n
+    %echo% 	gThe gently chirping of crickets peacefully resonate across the forest.	n
   break
   case 2
-    %echo% A haze of @yfir@Wefl@yies@n dart in between some ancient cedars.
+    %echo% A haze of 	yfir	Wefl	yies	n dart in between some ancient cedars.
   break
   case 3
-    %echo% @DA thick fog drifts in, dampening the moss.@n
+    %echo% 	DA thick fog drifts in, dampening the moss.	n
   break
   case 4
-    %echo% @DThe area is surrounded by a visually impeneratable mist.@n
+    %echo% 	DThe area is surrounded by a visually impeneratable mist.	n
   break
   case 5
-    %echo% @DThe gray haze starts to glow a dim silvery shade as the moonlight strikes it.@n
+    %echo% 	DThe gray haze starts to glow a dim silvery shade as the moonlight strikes it.	n
   break
   case 6
-    %echo% @DThe damp fallen clouds swirl slightly in an eddying wind.@n
+    %echo% 	DThe damp fallen clouds swirl slightly in an eddying wind.	n
   break
   case 7
-    %echo% @DThe thick brume shifts and ebbs away slightly.@n
+    %echo% 	DThe thick brume shifts and ebbs away slightly.	n
   break
   case 8
-    %echo% A hushed whispering sound seems to emanate from the patch of @rt@wo@ra@wd@rs@wt@ro@wo@rl@ws@n.
+    %echo% A hushed whispering sound seems to emanate from the patch of 	rt	wo	ra	wd	rs	wt	ro	wo	rl	ws	n.
   break
   case 9
-    %echo% The largest @rt@wo@ra@wd@rs@wt@ro@wo@rl@n yawns openly and mumbles something to one of its friends.
+    %echo% The largest 	rt	wo	ra	wd	rs	wt	ro	wo	rl	n yawns openly and mumbles something to one of its friends.
   break
   case 10
-    %echo% Like a diminutive choir, the patch of @rt@wo@ra@wd@rs@wt@ro@wo@rl@ws@n let loose a high-pitched song of peace.
+    %echo% Like a diminutive choir, the patch of 	rt	wo	ra	wd	rs	wt	ro	wo	rl	ws	n let loose a high-pitched song of peace.
   break
   case 11
     %echo% From the east, tiny voices talk amongst themselves in their own plant-like language.
   break
   case 12
-    %echo% The patch of @rt@wo@ra@wd@rs@wt@ro@wo@rl@ws@n sway synchronisingly in the silver moonlight.
+    %echo% The patch of 	rt	wo	ra	wd	rs	wt	ro	wo	rl	ws	n sway synchronisingly in the silver moonlight.
   break
   case 13
     %echo% The peaceful chirping of bird-song floats down from above.
   break
   case 14
-    %echo% @gA piping little note sings down to you from above.@n
+    %echo% 	gA piping little note sings down to you from above.	n
   break
   case 15
     %echo% The tweeting of a newly born bird calling to its mother echoes around the forest.
@@ -277,16 +222,16 @@ switch %forest_sounds%
     %echo% The sound of ruffling and the snapping of small twigs reaches your ears.
   break
   case 18
-    %echo% @gA rapid chattering drifts down from the giant trees to the northeast.@n
+    %echo% 	gA rapid chattering drifts down from the giant trees to the northeast.	n
   break
   case 19
     %echo% With inequable grace, a snowy white owl ghosts in on silent wings.
   break
   case 20
-    %echo% A @dblack @Dbat@n flutters across the forest, high above.
+    %echo% A 	dblack 	Dbat	n flutters across the forest, high above.
   break
   case 21
-    %echo% @gA relaxed nattering can be heard in the top of a tree to the south.@n
+    %echo% 	gA relaxed nattering can be heard in the top of a tree to the south.	n
   break
   case 22
     %echo% A hedgehog slowly wanders in between some trees and out of view.
@@ -295,48 +240,36 @@ switch %forest_sounds%
     %echo% A faint wind breathes in from all directions, steeping the mists.
   break
   case 24
-    %echo% A @rr@ya@bi@gn@cb@mo@rw@n-colored butterfly floats across the clearing.
+    %echo% A 	rr	ya	bi	gn	cb	mo	rw	n-colored butterfly floats across the clearing.
   break
   case 25
-    %echo% A strange @Yglowing @wluminescence@n drifts off to the north, fading into the damp fog.
+    %echo% A strange 	Yglowing 	wluminescence	n drifts off to the north, fading into the damp fog.
   break
   default
   break
 done
 ~
 #1208
-Welcor test trigger~
+RETIRED - Legacy Variable Debug~
 2 d 100
 *~
-%echo% self.var  is %self.var%.
-wait 10 s
-%echo% actor.eq(hold) is %actor.eq(hold)%
-%echo% testvar is %testvar%
-eval testvar %actor.eq(hold)%
-%echo% testvar is %testvar%
-%echo% testvar.id is %testvar.id% (%testvar.name%)
-%echo% test is %.id% (%.name%)
-%echo% sends the text $$2 to the room.
+* RETIRED legacy variable-debug trigger. Intentionally inert.
 ~
 #1209
-(1209) Taylors Chair Script~
+KEEP - Commons Hearthchair Sit~
 1 c 100
 si~
+* KEEP: generic Commons Hearthchair sit behavior.
 if %cmd.mudcommand% == sit && chair /= %arg%
-  if (%actor.id% == 4891)
-    %echoaround% %actor% %actor.name% rest himself in the armchair.
-    %send% %actor% You rest yourself comfortably in the armchair.
-    %force% %actor% sit
-  else
-    if %cmd.mudcommand% == sit && chair /= %arg%
-      %echoaround% %actor% %actor.name% tries to sit in the chair but a magical force prevents him.
-      %send% %actor% You try to sit in the chair but a magical force prevents you.
-    end
-  end
+%echoaround% %actor% %actor.name% settles into the hearthchair.
+%send% %actor% You settle comfortably into the hearthchair.
+%force% %actor% sit
+else
+return 0
 end
 ~
 #1210
-Actor Pref Checking~
+TRAINING - Actor Preference Checks~
 2 q 100
 ~
 if %actor.pref(BRIEF)%
@@ -428,18 +361,18 @@ if %actor.pref(AUTOASSIST)%
 end
 ~
 #1211
-Questpoints Test~
+LAB - Questpoint Variable Example~
 2 b 100
 ~
+* LAB: questpoint variable ACCESS example.
+* Production training version is read-only and never changes questpoints.
 set actor %random.char%
-%echo% QP: %actor.questpoints%
-nop %actor.questpoints(2)%
-%echo% QP+2: %actor.questpoints%
-nop %actor.questpoints(-1)%
-%echo% QP-1: %actor.questpoints%
+if %actor%
+%echo% Questpoints on selected actor: %actor.questpoints%
+end
 ~
 #1212
-Animal Chase Board Game - O1212~
+KEEP - Animal Chase Movement~
 1 c 4
 go~
 if %cmd% == go
@@ -473,7 +406,7 @@ if %cmd% == go
     set p_dir %arg%
     extract px 1 %playerco%
     extract py 2 %playerco%
-    set [%py%][%px%] @g\*@n
+    set [%py%][%px%] 	g\*	n
     switch %p_dir%
       case right
         if %px%!=10
@@ -522,7 +455,7 @@ if %cmd% == go
     eval holech %%[%py%][%px%]%%
     if %holech%/=@@
       if !(%chase%>0)
-        set alert @MYou fall into a bottomless pit!@n
+        set alert 	MYou fall into a bottomless pit!	n
         unset points
         set nextlev 0
         global nextlev
@@ -543,14 +476,14 @@ if %cmd% == go
       global points
       eval exo (%nextlev%*950)
       nop %actor.exp(%exo%)%
-      set [%py%][%px%] @c.@n
+      set [%py%][%px%] 	c.	n
       global [%py%][%px%]
       eval prize_count (%prize_count%)+1
       set winner [%prize_count%]
       if %prize_count%>=%numofprizes%
         eval nextlev (%nextlev%)+1
         global nextlev
-        set winner @YYou Win!!!@n Moving to level %nextlev%.
+        set winner 	YYou Win!!!	n Moving to level %nextlev%.
         set px 10
         set py 10
         set ax 1
@@ -577,22 +510,22 @@ if %cmd% == go
         eval spec_prize [%random.10%][%random.10%]
         global spec_prize
       else
-        set %spec_prize% @yY@n
+        set %spec_prize% 	yY	n
         eval spec_prize
         global spec_prize
       end
     end
     if %sizem%
-      set [%py%][%px%] @GO@n
+      set [%py%][%px%] 	GO	n
       unset sizem
     else
-      set [%py%][%px%] @Go@n
+      set [%py%][%px%] 	Go	n
       set sizem 1
       global sizem
     end
     extract ax 1 %animal%
     extract ay 2 %animal%
-    set [%ay%][%ax%] @r\*@n
+    set [%ay%][%ax%] 	r\*	n
     if !%dir_chosen%
       set dir_chosen 1
       if %px%>%ax%
@@ -665,7 +598,7 @@ if %cmd% == go
       set animal %ax% %ay%
       global animal
     end
-    eval [%ay%][%ax%] @Ra@n
+    eval [%ay%][%ax%] 	Ra	n
     eval ch_3 %%[%py%][%px%]%%
     set ch_3 %ch_3%
     if %ch_3.contains(a)%
@@ -685,7 +618,7 @@ if %cmd% == go
         set py 10
         %force% %actor% createnewgame
       else
-        set alert You have been eaten by the @Ranimal@n.
+        set alert You have been eaten by the 	Ranimal	n.
         set points 0
         global points
         set nextlev 0
@@ -731,26 +664,26 @@ if %cmd% == go
     if %cht%>0
       set chy You can FLY and chase the animal %cht% more times.
     end
-    set snd %send% %actor% @n
+    set snd %send% %actor% 	n
     %force% %actor% cls
     %snd%                    )       \\   /      (
     %snd%                   /\|\\      )\\_/(     /\|\\
     %snd% \*                / \| \\    (/\\\|/\\)   / \| \\         \*
     %snd% \|\`._____________/__\|__o____\\\`\|'/___o__\|__\\______.'\|
     %snd% \|                    '\^\` \|  \\\|/   '\^\`             \|
-    %snd% \|                        \|   V   level: %levlev%      \| Dir: @C %arg%@n
-    %snd% \|   %printrow10%  \| @M@@@n = Bottomless Pit     \| Points: @Y%points%@n
-    %snd% \|   %printrow9%  \| @yY@n = Power Up           \| Exp: @C%exx%@n
-    %snd% \|   %printrow8%  \| @Wp@n = Prize              \| AMU: %dedu%
-    %snd% \|   %printrow7%  \| @Go@n = You                \|
-    %snd% \|   %printrow6%  \| @Ra@n = Animal             \|
-    %snd% \|   %printrow5%  \| @cTo Move Type:@n          \|
-    %snd% \|   %printrow4%  \| @Cgo <up\|down\|left\|right>@n\|
+    %snd% \|                        \|   V   level: %levlev%      \| Dir: 	C %arg%	n
+    %snd% \|   %printrow10%  \| 	M@@	n = Bottomless Pit     \| Points: 	Y%points%	n
+    %snd% \|   %printrow9%  \| 	yY	n = Power Up           \| Exp: 	C%exx%	n
+    %snd% \|   %printrow8%  \| 	Wp	n = Prize              \| AMU: %dedu%
+    %snd% \|   %printrow7%  \| 	Go	n = You                \|
+    %snd% \|   %printrow6%  \| 	Ra	n = Animal             \|
+    %snd% \|   %printrow5%  \| 	cTo Move Type:	n          \|
+    %snd% \|   %printrow4%  \| 	Cgo <up\|down\|left\|right>	n\|
     %snd% \|   %printrow3%  \|                        \|
-    %snd% \|   %printrow2%  \| @BCost of AMU exp per MV@n \|
-    %snd% \|   %printrow1%  \|    @BIf you have exp.@n    \|
+    %snd% \|   %printrow2%  \| 	BCost of AMU exp per MV	n \|
+    %snd% \|   %printrow1%  \|    	BIf you have exp.	n    \|
     %snd% \|                        \|                        \|
-    %snd% \|                        \|  NEEDED: @R%numop%@n HAVE: @G%przc%@n   \|
+    %snd% \|                        \|  NEEDED: 	R%numop%	n HAVE: 	G%przc%	n   \|
     %snd% \| .______________________\|______________________. \|
     %snd% \|'         l    /\\ /     \\\\            \\ /\\    l \`\|
     %snd% \*          l  /   V       ))             V  \\  l  \*
@@ -765,7 +698,7 @@ else
 end
 ~
 #1213
-Animal Chase Board - Newgame - O1212~
+KEEP - Animal Chase New Game~
 1 c 100
 newgame~
 * By Mordecai
@@ -807,8 +740,8 @@ eval animal 1 1
 global animal
 eval playerco 10 10
 global playerco
-set [1][1] @ra@n
-set [10][10] @Go@n
+set [1][1] 	ra	n
+set [10][10] 	Go	n
 global [1][1]
 global [10][10]
 eval numofprizes 0
@@ -823,25 +756,25 @@ while (%ww%>1)
   eval n %ww%
   eval row %random.10%
   eval r_col (%random.3%-1)
-  set [%n%][1] @c.@n
+  set [%n%][1] 	c.	n
   global [%n%][1]
-  set [%n%][2] @c.@n
+  set [%n%][2] 	c.	n
   global [%n%][2]
-  set [%n%][3] @c.@n
+  set [%n%][3] 	c.	n
   global [%n%][3]
-  set [%n%][4] @c.@n
+  set [%n%][4] 	c.	n
   global [%n%][4]
-  set [%n%][5] @c.@n
+  set [%n%][5] 	c.	n
   global [%n%][5]
-  set [%n%][6] @c.@n
+  set [%n%][6] 	c.	n
   global [%n%][6]
-  set [%n%][7] @c.@n
+  set [%n%][7] 	c.	n
   global [%n%][7]
-  set [%n%][8] @c.@n
+  set [%n%][8] 	c.	n
   global [%n%][8]
-  set [%n%][9] @c.@n
+  set [%n%][9] 	c.	n
   global [%n%][9]
-  set [%n%][10] @c.@n
+  set [%n%][10] 	c.	n
   global [%n%][10]
   if (%r_col%)
     while (%r_col%<3)
@@ -850,7 +783,7 @@ while (%ww%>1)
       if !(%posis%/=[%n%][%jj%])
         eval numofprizes %numofprizes%+1
         global numofprizes
-        eval [%n%][%jj%] @Wp@n
+        eval [%n%][%jj%] 	Wp	n
         global [%n%][%jj%]
         set posis %posis% [%n%][%jj%]
       end
@@ -866,18 +799,18 @@ if (%r_ttt%>0)
     eval j9 %random.10%
     eval cer %%[%j9%][%j8%]%%
     if !(%cer%/=p)
-      eval [%j9%][%j8%] @M\@@@n
+      eval [%j9%][%j8%] 	M\@@	n
       global [%j9%][%j8%]
     end
   done
 end
 if !(%[10][10]%/=p)
-  set [10][10] @c.@n
+  set [10][10] 	c.	n
   global [10][10]
 end
 ~
 #1214
-Scoreboard Mob~
+KEEP - Animal Chase Scoreboard~
 0 d 100
 score scores~
 * By Mordecai
@@ -894,7 +827,7 @@ while %self.varexists(%j%)%
   done
   eval j %j%+1
 done
-%echo% @yO===============SCORE======BOARD=====================O@n
+%echo% 	yO===============SCORE======BOARD=====================O	n
 wait 1
 %echo% O=#==NAME============\|=Level=\|=Points==\|=EXP=========O
 set i 1
@@ -932,13 +865,13 @@ while %self.varexists(%j%)%
   if %d%<9
     set d 0%j%
   end
-  %echo% \|@g%d%@n: @w%nam%@n %sp%\| @c%ll%@n \| @y%points%@n \| @W%exp%@n
+  %echo% \|	g%d%	n: 	w%nam%	n %sp%\| 	c%ll%	n \| 	y%points%	n \| 	W%exp%	n
   eval j %j%+1
 done
 %echo% O=#==================================================O
 ~
 #1215
-Hunger, Thirst, Drunk Test Trigger~
+TRAINING - Hunger Thirst Drunk Check~
 2 g 100
 ~
 wait 1
@@ -968,23 +901,19 @@ while %actor.drunk% >= 0
 done
 ~
 #1216
-Crash Test Trigger~
+RETIRED - Legacy Crash Get Test~
 1 g 100
 ~
-wait 1
-%force% %random.char% get %self.shortdesc%
-return 0
+* RETIRED legacy crash-test trigger. Intentionally inert.
 ~
 #1217
-Test stuff~
+RETIRED - Unclassified Legacy Enter Test~
 2 g 100
 ~
-return 0
-wait 1 sec
-%send% %actor% sending stuff that might %corr%upt%.
+* RETIRED unclassified legacy enter test. Intentionally inert.
 ~
 #1218
-Multiple Command Example Trig~
+TRAINING - Multi Command Parsing~
 2 c 100
 t~
 if %cmd% == test
@@ -1003,7 +932,7 @@ if %cmd% == test
 end
 ~
 #1220
-Roomflag Test Trigger~
+LAB - Room Flag Inspection~
 2 g 100
 ~
 if %self.roomflag(DARK)%
@@ -1047,57 +976,25 @@ if %self.roomflag(ATRIUM)%
 end
 ~
 #1221
-Test Trigger~
+RETIRED - Unclassified Command Test~
 2 c 100
 *~
-set plr %self.people%
-set plr2 0
-*
-while %plr%
-  set next %plr.next_in_room%
-  if %plr% != %actor% && %plr.is_pc%
-    if %plr2% == 0
-      set plr2 %plr%
-    end
-    %teleport% %plr% 0
-  end
-  set plr %next%
-done
-*
-return 0
-wait 1
-*
-while %plr2%
-  set next %plr2.next_in_room%
-  if %plr2.is_pc%
-    %teleport% %plr2% %self.vnum%
-  end
-  set plr2 %next%
-done
+* RETIRED unclassified legacy command test. Intentionally inert.
 ~
 #1222
-new trigger~
+RETIRED - Abandoned Random Object Test~
 1 b 100
 ~
-* Unfinished
+* RETIRED abandoned random-object test. Intentionally inert.
 ~
 #1233
-Rumble's Test Trigger~
+RETIRED - Personal Leave Test~
 2 q 100
 ~
-if %direction% == east
-  %send% %actor% The door slides open, you enter, and it quickly slides shut behind you.
-  wait 1
-  %echoaround% %actor% The door slides open, %actor.name% walks in, and the door slides shut.
-  wait 1
-elseif %direction% == west
-  wait 1
-  %send% %actor% The door slides open, you leave, and it quickly slides shut behind you.
-  %echoaround% %actor% The door slides open, %actor.name% walks out, and the door slides shut.
-end
+* RETIRED personal legacy leave test. Intentionally inert.
 ~
 #1267
-secret drawer magic~
+LAB - Secret Drawer Command~
 1 c 4
 look~
 if %arg% == drawer
@@ -1111,128 +1008,43 @@ else
 end
 ~
 #1268
-autolook for (rm 1269) Elaseth's Oubliette~
+RETIRED - Obsolete Personal Autolook~
 2 g 100
 ~
-%echo%  @n
-%echo%  @n
-%echo% @DWelcome to hell. Next time heed the gods, they don't play games.@n
+* RETIRED obsolete personal-room autolook. Intentionally inert.
 ~
 #1269
-harp~
+RETIRED - Personal Harp Speech~
 0 d 100
 play~
-%echo% Hello Mister Sam.  Tu joues comme un fou!
+* RETIRED personal harp-response trigger. Intentionally inert.
 ~
 #1270
-switch~
+TRAINING - Safe Wear Trigger Switch~
 1 j 100
 ~
-wait 5
-if (%actor.name% != windwillow)
-  %send% %actor% The switch says, 'Geez.'
-  %purge% self
-  %damage% %actor% 2020
-else
-  %send% %actor% The switch says, 'Fine... fine.'
-end
+* TRAINING: safe object Wear trigger example.
+* Legacy version purged the item and dealt 2020 damage; both were removed.
+wait 1
+%send% %actor% The training switch clicks softly as its wear trigger fires.
+%echoaround% %actor% The training switch carried by %actor.name% gives a quiet click.
 ~
 #1271
-crash test~
+RETIRED - Transform Crash Test~
 0 g 100
 ~
-Trigger Intended Assignment: Mobiles
-Trigger Type: Random , Numeric Arg: 100, Arg list: None
-Commands:
-%echo% %self.name% transforms into a new mob!
-%transform% -1
+* RETIRED transform/crash test. Intentionally inert; transform removed.
 ~
 #1280
-Mob Raid~
+RETIRED - Dangerous City Raid Demo~
 2 b 100
 ~
-if %num% < 13292
-  * random scripts fire every 13 seconds, 24 hours a day * 60 minutes an hour * 60
-  * seconds a day: ((24 * 60 * 60 * 2) / 13) = 13292
-  eval num %num% + 1
-  *increment this value until it reaches 13292 at which time it is two days after
-  *the start of the previous raid
-  global num
-  *update the incremented value on the room
-else
-  *the raid has begun
-  unset num
-  *start the counter till the next raid over
-  set mob %random.5%
-  *set %mob% to a random value between 1 and 5
-  switch %mob%
-    *let's determine the type of mob that raids the city randomly so we can have
-    *multiple types of raid, ie. perhaps sometimes avian flue, other times
-    *hobgoblins or ogres attack the city
-    case 1
-      *what happens if %mob% is equal to 1
-      set vnum 500
-      *mob with vnum 500 will raid the town
-      set name orcs
-      *mob's name is orcs, used for the warning message later on
-    break
-    *every case must be ended with a break
-    case 2
-      set vnum 501
-      set name goblins
-    break
-    case 3
-      set vnum 502
-      set name ogres
-    break
-    case 4
-      set vnum 503
-      set name birds
-    break
-    case5
-      set vnum 504
-      set name dinosaurs
-    break
-  done
-  set low 3000
-  *this is the bottom vnum of the zone to be invaded
-  set NumberOfRooms 100
-  *this is the number of rooms in the zone that is being invaded: this
-  *script will need some editing if there are over 100 rooms in the
-  *zone due to while loops being limited to 100 loops
-  set mobs 100
-  *this is how many mobs will be loaded in the zone
-  set i 0
-  *at the bottom of each loop this will be the number of mobs that has been loaded
-  *so far
-  while %i% < %mobs%
-    eval randroom ((%%random.%NumberOfRooms%%% - 1) + %low%)
-    *determine the room to load the mobile in
-    %at% %randroom% %load% mob %vnum%
-    *load mob with vnum of %vnum% (determined in the switch case above) in the
-    *random room determined a few lines ago
-    eval i %i% + 1
-    *increment i to keep track of how many mobs have been loaded so far
-  done
-  *all the mobs have been loaded
-  *now lets make the players aware that they're there
-  %load% mob 3050
-  *load a mob, have it named something that makes sense to warn players
-  *perhaps a police, or a guard depending on the genre of the mud
-  %force% %self.people% gossip Help, the city is under attack by a large number of %name%.
-  *%self.people% is the first mob or player listed in the room that the script is attached
-  *to, the first listed is always the most recent to enter the room, therefore the mob we
-  * just loaded.
-  *remember where we created %name% earlier on to be the name of the invading mob, this
-  *is why
-  eval randroom ((%%random.%NumberOfRooms%%% - 1) + %low%)
-  *for kicks let's pick a random room in the zone
-  %teleport% %self.people% %randroom%
-  *and send the mob that warned the players to it
-end
+* RETIRED dangerous city-raid demonstration.
+* Legacy body could load roughly 100 mobs across Midgaard and force global gossip.
+* Preserved as an inert VNUM so old references remain resolvable.
 ~
 #1282
-Teleport room enter test~
+LAB - Teleport Enter Pattern~
 2 g 100
 ~
 %echo% %self.name% squints at ~%actor.name%  asdf'
@@ -1240,7 +1052,7 @@ Teleport room enter test~
 %teleport% %actor% 3
 ~
 #1283
-Deal a single card from a deck~
+TRAINING - Deal Single Card~
 1 c 7
 deal~
 switch %random.4%
@@ -1294,7 +1106,7 @@ if %thecard% == 1
 end
 ~
 #1284
-Shuffle Deck~
+TRAINING - Shuffle Deck State~
 1 c 7
 *~
 if %cmd% == shuffle
@@ -1474,74 +1286,67 @@ else
 end
 ~
 #1285
-Damage trigger~
+TRAINING - Safe Damage Math~
 2 g 100
 ~
+* TRAINING: safe damage-math example.
+* Computes a random amount up to half current HP but DOES NOT apply damage.
 eval num_hitp %actor.hitp%/2
-%echo% half hitp = %num_hitp%
+if %num_hitp% > 0
 eval rx %%random.%num_hitp%%%
-%echo% rx %rx%
-%damage% %actor% %rx%
-~
-#1286
-Sleep chair~
-1 c 100
-sl~
-if (%actor.id% == 4891)
-  %echoaround% %actor% %actor.name% falls asleep in the comfort of the chair.
-  %send% %actor% You drift into a calm slumber.
-  %force% %actor% sleep
-else
-  %force% %actor% sleep
+%send% %actor% Training calculation: a live damage trigger could have selected %rx% damage here.
 end
 ~
+#1286
+KEEP - Commons Hearthchair Sleep~
+1 c 100
+sl~
+* KEEP: generic Commons Hearthchair sleep behavior.
+%echoaround% %actor% %actor.name% settles into the hearthchair and drifts toward sleep.
+%send% %actor% The warmth of the hearthchair makes it easy to rest.
+%force% %actor% sleep
+~
 #1287
-new trigger~
+RETIRED - Legacy Speech Global Debug~
 0 d 100
 test~
-%echo% speech: %speech%
-eval spech %speech.car%
-%echo% spech: %spech% (%speech.car%)
-%echo% spech.room.vnum %spech.room.vnum%
-%echo% spech.vnum %spech.vnum%
-remote spech %world_global.id%
-%echo% spech on world: %world_global.spech%
+* RETIRED legacy speech/global debug trigger. Intentionally inert.
 ~
 #1288
-(1209) Taylors fire trig~
+TRAINING - Delayed Hearth Ambience~
 2 b 100
 ~
 set fire %random.900%
 wait %fire% sec
-%echo% @bThe fire crackles softly in the fireplace.@n
+%echo% 	bThe fire crackles softly in the fireplace.	n
 ~
 #1289
-(1209) Taylors Random Office Noises~
+TRAINING - Random Room Ambience~
 2 b 1
 ~
 set office_noises %random.5%
 switch %office_noises%
   case 1
-    %echo% @bLoud footsteps can be heard coming from the hall outside.@n
+    %echo% 	bLoud footsteps can be heard coming from the hall outside.	n
   break
   case 2
-    %echo% @bThe sound of thunder echoes in from outside.@n
+    %echo% 	bThe sound of thunder echoes in from outside.	n
   break
   case 3
-    %echo% @bA large book falls off the desk, hitting the floor with a loud thud.@n
+    %echo% 	bA large book falls off the desk, hitting the floor with a loud thud.	n
   break
   case 4
-    %echo% @bTalking can be heard coming from outside the door.@n
+    %echo% 	bTalking can be heard coming from outside the door.	n
   break
   case 5
-    %echo% @bThe sound of chirping birds flows in though the window.@n
+    %echo% 	bThe sound of chirping birds flows in though the window.	n
   break
   default
   break
 done
 ~
 #1290
-actor.eq(*) test~
+TRAINING - Actor Equipment Lookup~
 0 g 100
 ~
 if !%actor.eq(*)%
@@ -1551,74 +1356,32 @@ else
 end
 ~
 #1291
-test trigger (booleans)~
+TRAINING - Boolean Conditions~
 0 j 100
 ~
 say you're %actor.name%!
 say your vnum is %actor.vnum%
 ~
 #1292
-crash test find done~
+RETIRED - Legacy Find Crash Test~
 2 g 100
 ~
-%echo% My trigger commandlist is not complete!
-while %people%
-  %echo% while fired without a done.
-while
+* RETIRED legacy find/crash test. Intentionally inert.
 ~
 #1293
-crash test dummy~
+RETIRED - Legacy Bribe Crash Dummy~
 0 m 100
 ~
-switch %random.3%
-  case 1
-    %echo% You wind up your arm and narrowly miss the target!
-    wait 10
-    %force% arogantes say Ha ha ha, you couldn't hit the broad side of a barn with a magnifying glass!
-  break
-  case 2
-    %echo% You wind up your arm and miss the target entirely, almost hitting Arogantes in the process!
-    wait 10
-    %force% arogantes say Why you little good for nothing son of a rat! Watch where you aim that thing with your stubby little arms!
-  break
-  case 3
-    %echo% You wind your arm up and NAIL the target, Dunking Arogantes into the freezing waters
-    wait 5
-    %force% arogantes shout AAAAHHHHHGGGGG *GURGLE*
-    wait 5
-    %echo% Gloria helps Arogantes out of the water and sets him back on the lever.
-    wait 5
-    %echo% Arogantes does a little shiver then continues his ranting
-  break
-  default
-    %echo% This trigger is not working properly, please contact an immortal
-  break
-done
+* RETIRED legacy bribe crash dummy. Intentionally inert.
 ~
 #1294
-test trigger~
+RETIRED - Unclassified Speech Test~
 0 d 100
 heh~
-if %actor.inventory(14911)%
-  set num %random.12%
-  if %num% < 12
-    %echoaround% %actor% %actor.name% rolled a %num%. The magic on the dice is dispelled.
-    %send% %actor% You rolled a %num%. The magic on the dice is dispelled.
-  else
-    %echoaround% %actor% %actor.name% rolled a 12. The dice begin to go glow, and rattle chaotically...
-    %send% %actor% You rolled a 12. The dice begin to go glow, and rattle chaotically...
-    set room_var %actor.room%
-    set target_char %room_var.people%
-    while %target_char%
-      set tmp_target %target_char.next_in_room%
-      %damage% %target_char% 9999
-      set target_char %tmp_target%
-    done
-  end
-end
+* RETIRED unclassified legacy speech test. Intentionally inert.
 ~
 #1295
-Login Christmas~
+LAB - Seasonal Login Example~
 2 s 100
 ~
 * By Rumble of The Builder Academy    tbamud.com 9091
@@ -1629,7 +1392,7 @@ if !%actor.has_item(222)%
 end
 ~
 #1296
-Random eq example~
+TRAINING - Random Equipment Example~
 0 n 100
 ~
 switch %random.5%
@@ -1659,7 +1422,7 @@ switch %random.5%
 done
 ~
 #1297
-Piano~
+LAB - Persistent Music State Example~
 1 c 1
 *~
 *Originally written by someone, later rewritten by Fizban
@@ -1719,16 +1482,14 @@ switch %cmd%
 done
 ~
 #1298
-Quest object loader~
+TRAINING - Receive Object Loader~
 0 j 100
 ~
 context %actor.id%
 say object vnum: %object.vnum%
-
 set answer_yes say Yes, I want that object :)
 set answer_no say I already have that object !
 set answer_reward say There you go. Here's an object for you. Thanks!
-
 if (%object.vnum% == 1301)
   if (%zone_12_object1%)
     %answer_no%
@@ -1769,17 +1530,14 @@ else
   say I do not want that object!
   return 0
 end
-
 if (%zone_12_object1% && %zone_12_object2% && %zone_12_object3% && %zone_12_object4%)
   %answer_reward%
   eval zone_12_reward_number %actor.zone_12_reward_number%+1
-
   * cap this to a max of 12 rewards.
   if %zone_12_reward_number%>12
     set zone_12_reward_number 12
   end
   remote zone_12_reward_number %actor.id%
-
   *  make sure all objects from 3016 and upwards have 'reward' as an alias
   eval loadnum 3015+%zone_12_reward_number%
   %load% o %loadnum%
@@ -1792,7 +1550,7 @@ end
 test
 ~
 #1299
-Cease Piano~
+LAB - Stop Persistent Music State~
 2 c 100
 StopMusic~
 *Works with Script 1297

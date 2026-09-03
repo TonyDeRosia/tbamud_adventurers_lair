@@ -1,11 +1,14 @@
 #3700
-glitter pile~
-a pile of glitter~
-A pile of glittering objects has been gathered here.~
+coin coins scavenged hoard pile~
+a scatter of scavenged coin~
+A scatter of scavenged coin glints among the refuse.~
+Bent coppers, clipped silvers, buttons, bits of brass, and a few genuine
+coins make up this small hoard. Gristlefang's colony appears to value
+anything that catches the light.
 ~
 20 0 0 0 0 a 0 0 0 0 0 0 0
 10 7 3 0
-2 200000 0 0 0
+2 40 0 0 0
 E
 pile glitter~
    The king rat seem to like shining objects.  This pile is filed with small
@@ -13,33 +16,43 @@ pieces of glass, broken mirrors, nice pebbles and the occasional lost gold
 piece.
 ~
 #3701
-trout fillet~
-a trout fillet~
-A trout fillet has been left here. wonder who wasn't hungry..~
+trout fillet silverfin~
+a silverfin trout fillet~
+A clean silverfin trout fillet has been wrapped in broad leaves.~
+The fresh reservoir trout has been cleaned and cut into a simple meal.
+It smells far better than anything else found in the upper sewer.
 ~
 19 c 0 0 0 a 0 0 0 0 0 0 0
 8 0 0 0
-1 10000 5 0 0
+1 20 5 0 0
 #3702
-fish fillet~
-a fish fillet~
-The fillet of some strange fish is here.~
+cavefish fillet pale fish~
+a pale cavefish fillet~
+A pale cavefish fillet rests on a scrap of clean cloth.~
+The flesh is soft, white, and nearly flavorless, but perfectly edible
+once removed from the underworks water and properly cleaned.
 ~
 19 c 0 0 0 a 0 0 0 0 0 0 0
 4 0 0 0
-1 10000 5 0 0
+1 12 5 0 0
 #3703
-pearl~
-a pearl~
-A large shining pearl has been left here.~
+pearl reservoir river~
+a pale reservoir pearl~
+A pale reservoir pearl catches the available light.~
+This smooth pearl formed inside one of the oldest giant river mussels in
+the underground reservoir. Its color is a cool cream with a faint blue
+sheen.
 ~
 8 ac 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-1 500000 50 0 0
+1 300 50 0 0
 #3704
-chest~
-an ironbound chest~
-A chest is here, protecting whatever is hidden in it.~
+chest cache smuggler ironbound~
+a smuggler's ironbound cache~
+A low ironbound cache sits against the dry stone.~
+Thick oak planks, iron straps, and a municipal-style lock protect this
+old smuggler cache. The outside is stained by minerals and hidden
+beneath remnants of rotted canvas.
 ~
 15 0 0 0 0 0 0 0 0 0 0 0 0
 400 13 3710 0
@@ -50,13 +63,17 @@ iron ironbound chest~
 Lucky for you the lock is a simple one.
 ~
 #3705
-chain chainmail mail~
-a fine looking chainmail~
-A very nice chainmail has been thrown on the ground here.~
+chain shirt mail sluicewarden armor~
+a ward-etched sluicewarden's chain shirt~
+A rust-red chain shirt lies folded here.~
+The mail is old but carefully made, with small warding marks stamped
+into several links around the collar. Rust-red staining covers parts of
+the surface without weakening the rings. It was probably hidden by
+someone who expected trouble underground.
 ~
 9 gm 0 0 0 ad 0 0 0 0 0 0 0
 7 0 0 0
-8 850000 150 0 0
+8 650 150 0 0
 E
 chain mail chainmail~
    The chains connected in this chainmail is of a fine quality, making a very
@@ -67,46 +84,58 @@ A
 A
 1 3
 #3706
-dagger long~
-a long dagger~
-A long dagger, ready for action is here.~
+dagger knife gutterfang hooked~
+a hooked gutterfang knife~
+A hooked fighting knife has been left here.~
+This long single-edged knife has a hooked point suited to cutting rope,
+leather, and anything caught in close quarters. The grip is wrapped in
+dark cord, and an old smuggler's mark has been scratched near the guard.
 ~
 5 g 0 0 0 an 0 0 0 0 0 0 0
 5 1 4 11
-1 210000 23 0 0
+1 550 23 0 0
 A
 18 1
 A
 19 1
 #3707
-boat~
-a fishing boat~
-A small fishing boat has been moored here.~
+boat skiff maintenance flat bottom~
+a flat-bottomed maintenance skiff~
+A flat-bottomed maintenance skiff is tied at the mooring.~
+The little boat is broad, ugly, and stable, built to carry workers and
+tools through underground reservoirs rather than impress anyone. Several
+patched boards show long service.
 ~
 22 0 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-32 160000 16 0 0
+32 250 16 0 0
 E
 boat~
    The boat is made from a very light sort of wood, making it extremely easy to
 carry around.
 ~
 #3708
-fungus~
-a piece of fungus~
-Fungus is hanging from the ceiling.~
+fungus glowcap luminous~
+a cluster of luminous glowcap fungus~
+A cluster of pale glowcap fungus clings to the damp stone.~
+The fungus gives off a faint green-white light after feeding on
+mineral-rich moisture. Sewer workers once used patches like this as
+crude landmarks.
 ~
 13 0 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-5 25000 2 0 0
+1 5 2 0 0
 E
 fungus~
    Green fungus growing on spiderwebs - YUCK!
 ~
 #3709
-desk~
-an old desk~
-An old desk is here, covered in guano.~
+desk surveyor sluicekeeper old~
+an abandoned sluicekeeper's desk~
+An abandoned sluicekeeper's desk sags beneath years of damp.~
+The desk contains ruined forms, broken charcoal sticks, water-level
+notes, and the rusted remains of a measuring chain. Someone searched it
+long after the city workers left.
 ~
 15 0 0 0 0 0 0 0 0 0 0 0 0
 100 0 -1 0
@@ -118,13 +147,16 @@ constructors of the sewers.  If there was anything of interest on it earlier, it
 has been covered in several tons of guano from the bats on the ceiling above.
 ~
 #3710
-key~
-a dirty key~
-An extremely dirty key is lying here.~
+key sluice tarnished dirty~
+a tarnished sluice key~
+A tarnished iron sluice key lies here.~
+The heavy key bears a worn municipal mark and enough surviving teeth to
+fit an old service lock. Grease and mineral scale have darkened the iron
+almost black.
 ~
 18 c 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-1 50000 5 0 0
+1 0 5 0 0
 E
 key~
    An old and very dirty key.  It looks as you'd imagine a padlock key looks,
