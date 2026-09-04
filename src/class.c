@@ -35,6 +35,11 @@
 #define SPELL   0
 #define SKILL   1
 
+/* A level-one character needs enough stamina to leave town, explore, and
+ * actually reach content before resting. Class/stat progression is still
+ * added by advance_level() on top of this starter reserve. */
+#define STARTING_MOVE_BASE 100
+
 const struct pc_class_definition pc_classes[] = {
   [CLASS_MAGIC_USER] = {
     .name = "Mage",
@@ -1710,11 +1715,13 @@ void do_start(struct char_data *ch)
   GET_EXP(ch) = 1;
 
   set_title(ch, NULL);
-  /* Stats are now set during character creation (point allocation). */
-  /* advance_level() owns the complete, deterministic level-one baseline. */
+  /* Stats are now set during character creation (point allocation).
+   * HP and mana begin from the deterministic class/stat level gain below.
+   * Movement also receives a practical starter reserve so new characters
+   * are not exhausted after only a handful of rooms. */
   GET_BASE_MAX_HIT(ch) = GET_MAX_HIT(ch)  = 0;
   GET_BASE_MAX_MANA(ch) = GET_MAX_MANA(ch) = 0;
-  GET_BASE_MAX_MOVE(ch) = GET_MAX_MOVE(ch) = 0;
+  GET_BASE_MAX_MOVE(ch) = GET_MAX_MOVE(ch) = STARTING_MOVE_BASE;
 
   switch (GET_CLASS(ch)) {
 

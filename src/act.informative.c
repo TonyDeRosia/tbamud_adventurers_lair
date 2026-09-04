@@ -716,10 +716,12 @@ static void list_char_to_char(struct char_data *list, struct char_data *ch)
       if (!IS_NPC(ch) && !PRF_FLAGGED(ch, PRF_HOLYLIGHT) &&
              IS_NPC(i) && i->player.long_descr && *i->player.long_descr == '.')
         continue;
-      if (CAN_SEE(ch, i))
+      if (perceive_character(ch, i, PERCEIVE_ROOM_LIST) == PERCEPTION_IDENTIFIED)
         list_one_char(i, ch);
       else if (IS_DARK(IN_ROOM(ch)) && !CAN_SEE_IN_DARK(ch) &&
-           AFF_FLAGGED(i, AFF_INFRAVISION))
+           AFF_FLAGGED(i, AFF_INFRAVISION) &&
+           passes_administrative_visibility(ch, i) &&
+           !AFF_FLAGGED(i, AFF_HIDE) && !AFF_FLAGGED(i, AFF_INVISIBLE))
         send_to_char(ch, "You see a pair of glowing red eyes looking your way.\r\n");
       send_to_char(ch, "%s", CCNRM(ch, C_NRM));
     }
@@ -5495,7 +5497,7 @@ static int count_scanned_group_visible(struct char_data *list, struct char_data 
   int shown = 0;
 
   for (i = list; i; i = i->next_in_room)
-    if (CAN_SEE(ch, i))
+    if (perceive_character(ch, i, PERCEIVE_SCAN) == PERCEPTION_IDENTIFIED)
       shown++;
 
   return shown;
@@ -5509,7 +5511,7 @@ static int list_scanned_group(struct char_data *list, struct char_data *ch)
   for (i = list; i; i = i->next_in_room) {
     char tags[256];
 
-    if (!CAN_SEE(ch, i))
+    if (perceive_character(ch, i, PERCEIVE_SCAN) != PERCEPTION_IDENTIFIED)
       continue;
 
     build_scan_target_tags(ch, i, tags, sizeof(tags));
@@ -5540,7 +5542,7 @@ ACMD(do_scan)
       send_scan_section_header(ch, NORTH, 0);
       for (i = world[IN_ROOM(ch)].people; i; i = i->next_in_room) {
         char tags[256];
-        if (!CAN_SEE(ch, i))
+        if (perceive_character(ch, i, PERCEIVE_SCAN) != PERCEPTION_IDENTIFIED)
           continue;
         build_scan_target_tags(ch, i, tags, sizeof(tags));
         send_to_char(ch, "     - %s%s\r\n", tags, PERS(i, ch));

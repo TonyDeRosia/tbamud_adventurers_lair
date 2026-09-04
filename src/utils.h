@@ -904,7 +904,34 @@ do                                                              \
 /** "an" or "a" for text (lowercased) */
 #define TANA(obj) (strchr("aeiouAEIOU", *(obj)) ? "an" : "a")
 
-/* Various macros building up to CAN_SEE */
+/* Character perception is layered: administration, environment, magical
+ * concealment, then contextual mundane concealment. */
+enum perception_context {
+  PERCEIVE_ROOM_LIST, PERCEIVE_DIRECT_TARGET, PERCEIVE_SCAN,
+  PERCEIVE_MOVEMENT, PERCEIVE_AGGRESSION, PERCEIVE_SOCIAL,
+  PERCEIVE_SPELL_TARGET, PERCEIVE_TRACK, PERCEIVE_THEFT,
+  PERCEIVE_COMBAT, PERCEIVE_SCRIPT
+};
+
+enum perception_result {
+  PERCEPTION_NONE, PERCEPTION_PRESENCE, PERCEPTION_IDENTIFIED
+};
+
+#define CONCEAL_HIDE  (1 << 0)
+#define CONCEAL_INVIS (1 << 1)
+#define CONCEAL_SNEAK (1 << 2)
+#define CONCEAL_SKULK (1 << 3)
+
+int can_perceive_environment(struct char_data *observer);
+int passes_administrative_visibility(struct char_data *observer, struct char_data *target);
+int get_concealment_score(struct char_data *target, enum perception_context context);
+int get_detection_score(struct char_data *observer, struct char_data *target,
+                        enum perception_context context);
+enum perception_result perceive_character(struct char_data *observer,
+    struct char_data *target, enum perception_context context);
+void break_concealment(struct char_data *ch, int mask, const char *reason);
+
+/* Various compatibility macros building up to CAN_SEE. */
 
 /** Defines if there is enough light for sub to see in. */
 #define LIGHT_OK(sub)	(CAN_BYPASS_ENVIRONMENT(sub) || (!AFF_FLAGGED(sub, AFF_BLIND) && \
@@ -930,9 +957,9 @@ do                                                              \
 #define SELF(sub, obj)  ((sub) == (obj))
 
 /** Can sub character see obj character? */
-#define CAN_SEE(sub, obj) (SELF(sub, obj) || \
-   ((GET_REAL_LEVEL(sub) >= (IS_NPC(obj) ? 0 : GET_INVIS_LEV(obj))) && \
-   IMM_CAN_SEE(sub, obj)))
+#define CAN_SEE(sub, obj) (perceive_character((struct char_data *)(sub), \
+   (struct char_data *)(obj), \
+   PERCEIVE_DIRECT_TARGET) == PERCEPTION_IDENTIFIED)
 /* End of CAN_SEE */
 
 /** Can the sub character see the obj if it is invisible? */

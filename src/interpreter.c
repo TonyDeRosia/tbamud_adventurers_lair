@@ -142,7 +142,6 @@ cpp_extern const struct command_info cmd_info[] = {
   { "autosplit", "autospl" , POS_DEAD    , do_gen_tog , 0, SCMD_AUTOSPLIT },
 
   { "backstab" , "ba"      , POS_STANDING, do_backstab , 1, 0 },
-  { "circle"   , "ci"      , POS_FIGHTING, do_circle   , 1, 0 },
   { "ban"      , "ban"     , POS_DEAD    , do_ban      , LVL_GRGOD, 0 },
   { "bandage"  , "band"    , POS_RESTING , do_bandage  , 1, 0 },
 
@@ -158,6 +157,7 @@ cpp_extern const struct command_info cmd_info[] = {
   { "bug"      , "bug"     , POS_DEAD    , do_ibt      , 0, SCMD_BUG },
 
   { "cast"     , "c"       , POS_SITTING , do_cast     , 1, 0 },
+  { "circle"   , "ci"      , POS_FIGHTING, do_circle   , 1, 0 },
   { "cleanse"  , "cleanse" , POS_DEAD    , do_cleanse_admin, LVL_IMMORT, 0 },
   { "campaign" , "camp"    , POS_DEAD    , do_campaign , 0, 0 },
   { "cd"       , "cd"      , POS_DEAD    , do_cooldown , 0, 0 },

@@ -1650,3 +1650,146 @@ void join_group(struct char_data *ch, struct group_data *group)
     send_to_group(NULL, group, "%s joins the group.\r\n", GET_NAME(ch));		
 
 }
+/* Shared perception constants.  Attribute points deliberately matter more
+ * than small level gaps; MOB_AWARE is a strong mundane bonus, never a magical
+ * counter.  Persistent Hide uses a stored activation potency, so look spam
+ * cannot reroll it. */
+#define PERCEPTION_BASE_DETECTION 35
+#define PERCEPTION_LEVEL_WEIGHT   1
+#define PERCEPTION_WIS_WEIGHT     2
+#define PERCEPTION_DEX_WEIGHT     1
+#define PERCEPTION_AWARE_BONUS   20
+#define PERCEPTION_SENSE_BONUS   15
+#define PERCEPTION_HIDE_BASE     35
+#define PERCEPTION_SNEAK_BONUS   10
+#define PERCEPTION_SKULK_BONUS   25
+
+int can_perceive_environment(struct char_data *observer)
+{
+  if (!observer || IN_ROOM(observer) == NOWHERE)
+    return FALSE;
+  return LIGHT_OK(observer);
+}
+
+int passes_administrative_visibility(struct char_data *observer,
+                                     struct char_data *target)
+{
+  if (!observer || !target)
+    return FALSE;
+  return GET_REAL_LEVEL(observer) >= (IS_NPC(target) ? 0 : GET_INVIS_LEV(target));
+}
+
+static int stored_hide_potency(struct char_data *target)
+{
+  struct affected_type *af;
+
+  for (af = target ? target->affected : NULL; af; af = af->next)
+    if (af->spell == SKILL_HIDE && AFF_FLAGGED(target, AFF_HIDE))
+      return af->modifier > 0 ? af->modifier : PERCEPTION_HIDE_BASE;
+
+  /* Old player files and legacy direct flag setters have no affect payload. */
+  return PERCEPTION_HIDE_BASE + (target ? GET_LEVEL(target) / 2 : 0);
+}
+
+int get_concealment_score(struct char_data *target,
+                          enum perception_context context)
+{
+  int score = 0;
+
+  if (!target)
+    return 0;
+  if (AFF_FLAGGED(target, AFF_HIDE))
+    score = stored_hide_potency(target);
+  if (context == PERCEIVE_MOVEMENT || context == PERCEIVE_AGGRESSION ||
+      context == PERCEIVE_THEFT) {
+    if (AFF_FLAGGED(target, AFF_SKULK))
+      score += PERCEPTION_SKULK_BONUS + GET_SKILL(target, SKILL_SKULK) / 2;
+    else if (AFF_FLAGGED(target, AFF_SNEAK))
+      score += PERCEPTION_SNEAK_BONUS + GET_SKILL(target, SKILL_SNEAK) / 3;
+  }
+  return score;
+}
+
+int get_detection_score(struct char_data *observer, struct char_data *target,
+                        enum perception_context context)
+{
+  int score;
+
+  if (!observer)
+    return 0;
+  score = PERCEPTION_BASE_DETECTION + GET_LEVEL(observer) * PERCEPTION_LEVEL_WEIGHT;
+  score += MAX(0, GET_WIS(observer) - 10) * PERCEPTION_WIS_WEIGHT;
+  score += MAX(0, GET_DEX(observer) - 10) * PERCEPTION_DEX_WEIGHT;
+  if (target)
+    score -= GET_LEVEL(target) / 2;
+  if (IS_NPC(observer) && MOB_FLAGGED(observer, MOB_AWARE) &&
+      (context == PERCEIVE_MOVEMENT || context == PERCEIVE_AGGRESSION ||
+       context == PERCEIVE_THEFT))
+    score += PERCEPTION_AWARE_BONUS;
+  if (AFF_FLAGGED(observer, AFF_SENSE_LIFE) &&
+      (context == PERCEIVE_MOVEMENT || context == PERCEIVE_AGGRESSION))
+    score += PERCEPTION_SENSE_BONUS;
+  return score;
+}
+
+enum perception_result perceive_character(struct char_data *observer,
+    struct char_data *target, enum perception_context context)
+{
+  int detection, concealment;
+
+  if (!observer || !target)
+    return PERCEPTION_NONE;
+  if (observer == target)
+    return PERCEPTION_IDENTIFIED;
+  if (!passes_administrative_visibility(observer, target))
+    return PERCEPTION_NONE;
+  if (!can_perceive_environment(observer))
+    return PERCEPTION_NONE;
+
+  /* Holylight/immortal bypass is administrative; truesight supplies both
+   * relevant hard counters without bypassing blindness or darkness. */
+  if (CAN_BYPASS_ENVIRONMENT(observer) ||
+      (!IS_NPC(observer) && PRF_FLAGGED(observer, PRF_HOLYLIGHT)))
+    return PERCEPTION_IDENTIFIED;
+  if (AFF_FLAGGED(target, AFF_INVISIBLE) &&
+      !AFF_FLAGGED(observer, AFF_DETECT_INVIS) &&
+      !AFF_FLAGGED(observer, AFF_TRUESIGHT))
+    return (context == PERCEIVE_MOVEMENT || context == PERCEIVE_COMBAT) ?
+        PERCEPTION_PRESENCE : PERCEPTION_NONE;
+  if (AFF_FLAGGED(target, AFF_HIDE) &&
+      !AFF_FLAGGED(observer, AFF_SENSE_LIFE) &&
+      !AFF_FLAGGED(observer, AFF_TRUESIGHT)) {
+    detection = get_detection_score(observer, target, context);
+    concealment = get_concealment_score(target, context);
+    if (context == PERCEIVE_MOVEMENT)
+      detection += rand_number(-10, 10); /* one roll per movement event */
+    if (detection < concealment)
+      return context == PERCEIVE_MOVEMENT ? PERCEPTION_PRESENCE : PERCEPTION_NONE;
+  }
+  if ((context == PERCEIVE_MOVEMENT || context == PERCEIVE_AGGRESSION) &&
+      (AFF_FLAGGED(target, AFF_SNEAK) || AFF_FLAGGED(target, AFF_SKULK)) &&
+      get_detection_score(observer, target, context) +
+          (context == PERCEIVE_MOVEMENT ? rand_number(-10, 10) : 0) <
+          get_concealment_score(target, context))
+    return PERCEPTION_PRESENCE;
+  return PERCEPTION_IDENTIFIED;
+}
+
+void break_concealment(struct char_data *ch, int mask, const char *reason)
+{
+  (void)reason;
+  if (!ch)
+    return;
+  if ((mask & CONCEAL_HIDE) && affected_by_spell(ch, SKILL_HIDE))
+    affect_from_char(ch, SKILL_HIDE);
+  if ((mask & CONCEAL_SNEAK) && affected_by_spell(ch, SKILL_SNEAK))
+    affect_from_char(ch, SKILL_SNEAK);
+  if ((mask & CONCEAL_SKULK) && affected_by_spell(ch, SKILL_SKULK))
+    affect_from_char(ch, SKILL_SKULK);
+  if ((mask & CONCEAL_INVIS) && affected_by_spell(ch, SPELL_INVISIBLE))
+    affect_from_char(ch, SPELL_INVISIBLE);
+  if (mask & CONCEAL_HIDE) REMOVE_BIT_AR(AFF_FLAGS(ch), AFF_HIDE);
+  if (mask & CONCEAL_SNEAK) REMOVE_BIT_AR(AFF_FLAGS(ch), AFF_SNEAK);
+  if (mask & CONCEAL_SKULK) REMOVE_BIT_AR(AFF_FLAGS(ch), AFF_SKULK);
+  if (mask & CONCEAL_INVIS) REMOVE_BIT_AR(AFF_FLAGS(ch), AFF_INVISIBLE);
+}

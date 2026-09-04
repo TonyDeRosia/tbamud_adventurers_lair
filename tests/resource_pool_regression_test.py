@@ -62,6 +62,14 @@ def test_progression_is_deterministic_and_uses_real_abilities():
     assert "rand_number" not in block
 
 
+def test_level_one_has_practical_starting_move_reserve():
+    classes = source("class.c")
+    assert "#define STARTING_MOVE_BASE 100" in classes
+    start = classes.index("void do_start")
+    block = classes[start:classes.index("void advance_level", start)]
+    assert "GET_BASE_MAX_MOVE(ch) = GET_MAX_MOVE(ch) = STARTING_MOVE_BASE;" in block
+
+
 def test_regen_scales_with_pool_and_preserves_condition_hooks():
     limits = source("limits.c")
     assert "GET_MAX_MANA(ch) / 40" in limits

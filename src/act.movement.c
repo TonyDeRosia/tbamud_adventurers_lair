@@ -677,11 +677,14 @@ int do_simple_move(struct char_data *ch, int dir, int need_specials_check)
   else if (GET_LEVEL(ch) < LVL_IMMORT && !IS_NPC(ch))
     GET_MOVE(ch) -= need_movement;
 
-  /* Generate the leave message and display to others in the was_in room. */
-  if (!AFF_FLAGGED(ch, AFF_SNEAK) && !AFF_FLAGGED(ch, AFF_SKULK))
+  /* Hide is stationary; mobile concealment is tested per observer/event. */
+  break_concealment(ch, CONCEAL_HIDE, "movement");
+  snprintf(leave_message, sizeof(leave_message), "$n leaves %s.", dirs[dir]);
   {
-    snprintf(leave_message, sizeof(leave_message), "$n leaves %s.", dirs[dir]);
-    act(leave_message, TRUE, ch, 0, 0, TO_ROOM);
+    struct char_data *observer;
+    for (observer = world[was_in].people; observer; observer = observer->next_in_room)
+      if (observer != ch && perceive_character(observer, ch, PERCEIVE_MOVEMENT) == PERCEPTION_IDENTIFIED)
+        act(leave_message, TRUE, ch, 0, observer, TO_VICT);
   }
 
   char_from_room(ch);
@@ -703,8 +706,12 @@ int do_simple_move(struct char_data *ch, int dir, int need_specials_check)
   }
 
   /* Display arrival information to anyone in the destination room... */
-  if (!AFF_FLAGGED(ch, AFF_SNEAK) && !AFF_FLAGGED(ch, AFF_SKULK))
-    act("$n has arrived.", TRUE, ch, 0, 0, TO_ROOM);
+  {
+    struct char_data *observer;
+    for (observer = world[going_to].people; observer; observer = observer->next_in_room)
+      if (observer != ch && perceive_character(observer, ch, PERCEIVE_MOVEMENT) == PERCEPTION_IDENTIFIED)
+        act("$n has arrived.", TRUE, ch, 0, observer, TO_VICT);
+  }
 
   /* ... and the room description to the character. */
   if (ch->desc != NULL)

@@ -140,7 +140,7 @@ int graph_find_first_step(room_rnum src, room_rnum target)
 ACMD(do_track)
 {
   char arg[MAX_INPUT_LENGTH];
-  struct char_data *vict;
+  struct char_data *vict, *candidate;
   int dir;
 
   /* The character must have the track skill. */
@@ -153,8 +153,15 @@ ACMD(do_track)
     send_to_char(ch, "Whom are you trying to track?\r\n");
     return;
   }
-  /* The person can't see the victim. */
-  if (!(vict = get_char_vis(ch, arg, NULL, FIND_CHAR_WORLD))) {
+  /* Tracking follows a named trail, not remote visual identification. */
+  vict = NULL;
+  for (candidate = character_list; candidate; candidate = candidate->next)
+    if (isname(arg, candidate->player.name) &&
+        passes_administrative_visibility(ch, candidate)) {
+      vict = candidate;
+      break;
+    }
+  if (!vict) {
     send_to_char(ch, "No one is around by that name.\r\n");
     return;
   }

@@ -97,7 +97,7 @@ void mobile_activity(void)
      if (!MOB_FLAGGED(ch, MOB_HELPER) && (!AFF_FLAGGED(ch, AFF_BLIND) || !AFF_FLAGGED(ch, AFF_CHARM))) {
       found = FALSE;
       for (vict = world[IN_ROOM(ch)].people; vict && !found; vict = vict->next_in_room) {
-	if (IS_NPC(vict) || !CAN_SEE(ch, vict) || PRF_FLAGGED(vict, PRF_NOHASSLE))
+	if (IS_NPC(vict) || perceive_character(ch, vict, PERCEIVE_AGGRESSION) != PERCEPTION_IDENTIFIED || PRF_FLAGGED(vict, PRF_NOHASSLE))
 	  continue;
 	/* Memory and scripted retaliation are handled in their own paths below. */
 	if (AFF_FLAGGED(vict, AFF_DETER))
@@ -125,7 +125,7 @@ void mobile_activity(void)
     if (MOB_FLAGGED(ch, MOB_MEMORY) && MEMORY(ch)) {
       found = FALSE;
       for (vict = world[IN_ROOM(ch)].people; vict && !found; vict = vict->next_in_room) {
-	if (IS_NPC(vict) || !CAN_SEE(ch, vict) || PRF_FLAGGED(vict, PRF_NOHASSLE))
+	if (IS_NPC(vict) || perceive_character(ch, vict, PERCEIVE_AGGRESSION) != PERCEPTION_IDENTIFIED || PRF_FLAGGED(vict, PRF_NOHASSLE))
 	  continue;
 
 	for (names = MEMORY(ch); names && !found; names = names->next) {

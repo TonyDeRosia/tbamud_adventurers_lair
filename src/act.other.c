@@ -684,6 +684,7 @@ ACMD(do_sneak)
 }
 ACMD(do_hide)
 {
+  struct affected_type af;
   byte percent;
 
   if (IS_NPC(ch) || !GET_SKILL(ch, SKILL_HIDE)) {
@@ -694,14 +695,22 @@ ACMD(do_hide)
   send_to_char(ch, "You attempt to hide yourself.\r\n");
 
   if (AFF_FLAGGED(ch, AFF_HIDE))
-    REMOVE_BIT_AR(AFF_FLAGS(ch), AFF_HIDE);
+    break_concealment(ch, CONCEAL_HIDE, "rehide");
 
   percent = rand_number(1, 101);	/* 101% is a complete failure */
 
   if (percent > GET_SKILL(ch, SKILL_HIDE) + dex_app_skill[GET_DEX(ch)].hide)
     return;
 
-  SET_BIT_AR(AFF_FLAGS(ch), AFF_HIDE);
+  new_affect(&af);
+  af.spell = SKILL_HIDE;
+  af.duration = GET_LEVEL(ch);
+  af.location = APPLY_NONE;
+  /* Stable 1..100 potency includes one activation-time random component. */
+  af.modifier = MAX(1, MIN(100, 25 + GET_SKILL(ch, SKILL_HIDE) / 2 +
+      MAX(0, GET_DEX(ch) - 10) + GET_LEVEL(ch) / 4 + rand_number(-5, 5)));
+  SET_BIT_AR(af.bitvector, AFF_HIDE);
+  affect_to_char(ch, &af);
 }
 
 static int theft_object_is_protected(struct obj_data *obj)
@@ -725,20 +734,8 @@ static int pickpocket_has_concealment(struct char_data *ch)
 
 static void break_pickpocket_concealment(struct char_data *ch)
 {
-  if (!ch)
-    return;
-
-  if (affected_by_spell(ch, SKILL_SKULK))
-    affect_from_char(ch, SKILL_SKULK);
-  if (affected_by_spell(ch, SKILL_SNEAK))
-    affect_from_char(ch, SKILL_SNEAK);
-  if (affected_by_spell(ch, SPELL_INVISIBLE))
-    affect_from_char(ch, SPELL_INVISIBLE);
-
-  REMOVE_BIT_AR(AFF_FLAGS(ch), AFF_SKULK);
-  REMOVE_BIT_AR(AFF_FLAGS(ch), AFF_SNEAK);
-  REMOVE_BIT_AR(AFF_FLAGS(ch), AFF_INVISIBLE);
-  REMOVE_BIT_AR(AFF_FLAGS(ch), AFF_HIDE);
+  break_concealment(ch, CONCEAL_HIDE | CONCEAL_INVIS |
+      CONCEAL_SNEAK | CONCEAL_SKULK, "pickpocket");
 }
 
 static int pickpocket_detection_chance(struct char_data *ch,

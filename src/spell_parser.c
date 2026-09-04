@@ -1539,7 +1539,8 @@ static struct char_data *find_char_prefix(struct char_data *ch,
   if (number < 1)
     number = 1;
 
-  if (include_fighting && FIGHTING(ch) && CAN_SEE(ch, FIGHTING(ch))
+  if (include_fighting && FIGHTING(ch) &&
+      perceive_character(ch, FIGHTING(ch), PERCEIVE_COMBAT) != PERCEPTION_NONE
       && is_abbrev(name, GET_NAME(FIGHTING(ch)))) {
     append_match(ambig_buf, ambig_len, GET_NAME(FIGHTING(ch)), &count);
     if (count == number)
@@ -1547,7 +1548,7 @@ static struct char_data *find_char_prefix(struct char_data *ch,
   }
 
   for (i = world[IN_ROOM(ch)].people; i; i = i->next_in_room) {
-    if (!CAN_SEE(ch, i))
+    if (perceive_character(ch, i, PERCEIVE_SPELL_TARGET) != PERCEPTION_IDENTIFIED)
       continue;
     if (include_fighting && i == FIGHTING(ch))
       continue;

@@ -831,16 +831,12 @@ static int concealment_hit_modifier(struct char_data *ch, struct char_data *vict
   if (!ch || !victim)
     return 0;
 
-  if (!(AFF_FLAGGED(victim, AFF_INVISIBLE) || AFF_FLAGGED(victim, AFF_HIDE)))
-    return 0;
-
-  if (AFF_FLAGGED(ch, AFF_TRUESIGHT))
-    return 6;
-
-  if (AFF_FLAGGED(ch, AFF_DETECT_INVIS) || AFF_FLAGGED(ch, AFF_SENSE_LIFE))
-    return 3;
-
-  return -12;
+  if (AFF_FLAGGED(victim, AFF_INVISIBLE))
+    return (AFF_FLAGGED(ch, AFF_DETECT_INVIS) || AFF_FLAGGED(ch, AFF_TRUESIGHT)) ? 3 : -12;
+  if (AFF_FLAGGED(victim, AFF_HIDE))
+    return (AFF_FLAGGED(ch, AFF_SENSE_LIFE) || AFF_FLAGGED(ch, AFF_TRUESIGHT) ||
+        perceive_character(ch, victim, PERCEIVE_COMBAT) == PERCEPTION_IDENTIFIED) ? 3 : -12;
+  return 0;
 }
 
 int compute_offensive_hit_value(struct char_data *ch, struct char_data *victim)
@@ -957,6 +953,7 @@ void set_fighting(struct char_data *ch, struct char_data *vict)
     affect_from_char(ch, SKILL_SNEAK);
   if (AFF_FLAGGED(ch, AFF_SKULK))
     affect_from_char(ch, SKILL_SKULK);
+  break_concealment(ch, CONCEAL_HIDE, "combat");
 
   if (FIGHTING(ch)) {
     core_dump();
@@ -981,10 +978,6 @@ void set_fighting(struct char_data *ch, struct char_data *vict)
 void stop_fighting(struct char_data *ch)
 {
   struct char_data *temp;
-
-  /* Capture the opponent before the combat link is cleared.  The AI hook is
-   * transition-deduplicated and therefore safe for the many legacy callers. */
-  if (ch && FIGHTING(ch))
 
   if (ch == next_combat_list)
     next_combat_list = ch->next_fighting;
@@ -1213,9 +1206,6 @@ void raw_kill(struct char_data * ch, struct char_data * killer)
 {
   end_character_control(ch);
 struct char_data *i;
-
-  /* Must run before NPC extraction: no post-extraction AI writes. */
-  if (killer)
 
   if (FIGHTING(ch))
     stop_fighting(ch);
@@ -1986,8 +1976,6 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
     act("$N slips past your opening strike with terrifying reflexes!", FALSE, ch, 0, victim, TO_CHAR);
     dam = 0;
   }
-
-  if (!IS_NPC(ch) && ch != victim)
 
   if (victim != ch) {
     /* Start the attacker fighting the victim */
