@@ -34,6 +34,9 @@
 
 #define GLORY_PRACTICE_COST 250
 #define GLORY_TRAIN_COST 600
+#define PRACTICES_PER_CONVERTED_TRAIN 10
+#define LEVELS_PER_CONVERTED_TRAIN 10
+#define MAX_LIFETIME_CONVERTED_TRAINS 10
 #include "modify.h"
 #include "pfdefaults.h"
 
@@ -2066,6 +2069,76 @@ ACMD(do_buypractice)
   GET_PRACTICES(ch) += 1;
   send_to_char(ch, "You spend %d Glory to buy a practice session. Practices: %d. Glory left: %d.\r\n",
                GLORY_PRACTICE_COST, GET_PRACTICES(ch), GET_GLORY(ch));
+}
+
+ACMD(do_gain)
+{
+  char arg[MAX_INPUT_LENGTH];
+  int allowance, next_level;
+
+  if (IS_NPC(ch))
+    return;
+
+  one_argument(argument, arg);
+
+  if (!can_use_practice_trainer(ch)) {
+    send_to_char(ch, "You can only convert practices at your guild.\r\n");
+    return;
+  }
+
+  allowance = MIN(MAX_LIFETIME_CONVERTED_TRAINS,
+                  GET_LEVEL(ch) / LEVELS_PER_CONVERTED_TRAIN);
+
+  if (!*arg) {
+    send_to_char(ch,
+                 "Usage: gain convert\r\n"
+                 "  Converts %d practice sessions into 1 training session.\r\n"
+                 "  Lifetime conversions at your level: %d/%d.\r\n",
+                 PRACTICES_PER_CONVERTED_TRAIN,
+                 GET_CONVERTED_TRAINS(ch), allowance);
+    return;
+  }
+
+  if (str_cmp(arg, "convert")) {
+    send_to_char(ch, "Usage: gain convert\r\n");
+    return;
+  }
+
+  if (GET_CONVERTED_TRAINS(ch) >= allowance) {
+    if (GET_CONVERTED_TRAINS(ch) >= MAX_LIFETIME_CONVERTED_TRAINS) {
+      send_to_char(ch,
+                   "You have already used all %d lifetime practice-to-train conversions.\r\n",
+                   MAX_LIFETIME_CONVERTED_TRAINS);
+    } else {
+      next_level = (GET_CONVERTED_TRAINS(ch) + 1) * LEVELS_PER_CONVERTED_TRAIN;
+      send_to_char(ch,
+                   "You have used all practice-to-train conversions currently available to you.\r\n"
+                   "Your next conversion unlocks at level %d.\r\n",
+                   next_level);
+    }
+    return;
+  }
+
+  if (GET_PRACTICES(ch) < PRACTICES_PER_CONVERTED_TRAIN) {
+    send_to_char(ch,
+                 "You need %d practice sessions to gain a training session; you currently have %d.\r\n",
+                 PRACTICES_PER_CONVERTED_TRAIN, GET_PRACTICES(ch));
+    return;
+  }
+
+  GET_PRACTICES(ch) -= PRACTICES_PER_CONVERTED_TRAIN;
+  GET_TRAINS(ch) += 1;
+  GET_CONVERTED_TRAINS(ch) += 1;
+
+  send_to_char(ch,
+               "You convert %d practice sessions into 1 training session.\r\n"
+               "Practices: %d. Training sessions: %d.\r\n"
+               "Lifetime conversions: %d/%d available at your level.\r\n",
+               PRACTICES_PER_CONVERTED_TRAIN,
+               GET_PRACTICES(ch), GET_TRAINS(ch),
+               GET_CONVERTED_TRAINS(ch), allowance);
+
+  save_char(ch);
 }
 
 ACMD(do_train)

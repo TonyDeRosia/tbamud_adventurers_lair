@@ -415,6 +415,7 @@ int load_char(const char *name, struct char_data *ch)
     GET_BAD_PWS(ch) = PFDEF_BADPWS;
     GET_PRACTICES(ch) = PFDEF_PRACTICES;
     GET_TRAINS(ch) = PFDEF_TRAINS;
+    GET_CONVERTED_TRAINS(ch) = 0;
     SET_GOLD(ch, PFDEF_GOLD);
     GET_DIAMONDS(ch) = 0;
     SET_BANK_GOLD(ch, PFDEF_BANK);
@@ -599,6 +600,7 @@ int load_char(const char *name, struct char_data *ch)
 	else if (!strcmp(tag, "Clan"))	GET_CLAN_ID(ch)		= atoi(line);
 	else if (!strcmp(tag, "Clrk"))	GET_CLAN_RANK(ch)	= atoi(line);
         else if (!strcmp(tag, "ClLo")) GET_CLASS_LOCKED(ch) = atoi(line);
+        else if (!strcmp(tag, "CvTr")) GET_CONVERTED_TRAINS(ch) = MAX(0, atoi(line));
         else {
           int idx;
           if (!strcmp(tag, "CpAc")) GET_CAMPAIGN_ACTIVE(ch) = atoi(line);
@@ -1024,6 +1026,7 @@ int save_char(struct char_data * ch)
   if (GET_BAD_PWS(ch)	   != PFDEF_BADPWS)	fprintf(fl, "Badp: %d\n", GET_BAD_PWS(ch));
   if (GET_PRACTICES(ch)	   != PFDEF_PRACTICES)	fprintf(fl, "Lern: %d\n", GET_PRACTICES(ch));
   if (GET_TRAINS(ch)       != PFDEF_TRAINS)     fprintf(fl, "Trns: %d\n", GET_TRAINS(ch));
+  if (GET_CONVERTED_TRAINS(ch) != 0)             fprintf(fl, "CvTr: %d\n", GET_CONVERTED_TRAINS(ch));
 
   if (GET_COND(ch, HUNGER)   != PFDEF_HUNGER && GET_LEVEL(ch) < LVL_IMMORT) fprintf(fl, "Hung: %d\n", GET_COND(ch, HUNGER));
   if (GET_COND(ch, THIRST) != PFDEF_THIRST && GET_LEVEL(ch) < LVL_IMMORT) fprintf(fl, "Thir: %d\n", GET_COND(ch, THIRST));
