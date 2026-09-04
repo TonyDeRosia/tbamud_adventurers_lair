@@ -894,6 +894,14 @@ int save_char(struct char_data * ch)
   if (IS_NPC(ch) || GET_PFILEPOS(ch) < 0)
     return FALSE;
 
+  /* Keep ordinary location persistence separate from the administrator-set
+   * load room. Saves made while a player is actually in the world refresh
+   * this value; offline edits and extraction-time saves retain the last valid
+   * value. An unflagged room 0 is the historical Void/default accident. */
+  if (IN_ROOM(ch) != NOWHERE && VALID_ROOM_RNUM(IN_ROOM(ch)) &&
+      GET_ROOM_VNUM(IN_ROOM(ch)) != 0)
+    GET_LAST_ROOM(ch) = GET_ROOM_VNUM(IN_ROOM(ch));
+
   /* If ch->desc is not null, then update session data before saving. */
   if (ch->desc) {
     if (*ch->desc->host) {

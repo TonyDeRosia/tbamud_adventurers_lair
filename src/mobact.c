@@ -27,6 +27,117 @@
 /* local file scope only function prototypes */
 static bool aggressive_mob_on_a_leash(struct char_data *slave, struct char_data *master, struct char_data *attack);
 
+/*
+ * Runtime combat memory for players who successfully flee from an NPC.
+ * It persists while the player remains in the same zone. Once the player
+ * leaves that zone, the record expires after five real minutes.
+ */
+#define FLEE_MEMORY_AWAY_SECONDS (5 * 60)
+
+static struct char_data *find_remembered_player(long id)
+{
+  struct char_data *vict;
+
+  for (vict = character_list; vict; vict = vict->next)
+    if (!IS_NPC(vict) && GET_IDNUM(vict) == id)
+      return vict;
+
+  return NULL;
+}
+
+static bool mob_has_temporary_flee_memory(struct char_data *ch)
+{
+  memory_rec *rec;
+
+  for (rec = MEMORY(ch); rec; rec = rec->next)
+    if (rec->temporary_flee_memory)
+      return TRUE;
+
+  return FALSE;
+}
+
+static void prune_temporary_flee_memory(struct char_data *ch)
+{
+  memory_rec *curr, *prev = NULL, *next;
+  time_t now = time(0);
+
+  for (curr = MEMORY(ch); curr; curr = next) {
+    struct char_data *vict;
+    bool in_combat_zone = FALSE;
+
+    next = curr->next;
+
+    if (!curr->temporary_flee_memory) {
+      prev = curr;
+      continue;
+    }
+
+    vict = find_remembered_player(curr->id);
+
+    if (vict && IN_ROOM(vict) != NOWHERE && VALID_ROOM_RNUM(IN_ROOM(vict)) &&
+        zone_table[world[IN_ROOM(vict)].zone].number == curr->combat_zone)
+      in_combat_zone = TRUE;
+
+    if (in_combat_zone) {
+      curr->away_since = 0;
+      prev = curr;
+      continue;
+    }
+
+    if (curr->away_since == 0) {
+      curr->away_since = now;
+      prev = curr;
+      continue;
+    }
+
+    if ((now - curr->away_since) < FLEE_MEMORY_AWAY_SECONDS) {
+      prev = curr;
+      continue;
+    }
+
+    if (prev)
+      prev->next = next;
+    else
+      MEMORY(ch) = next;
+
+    free(curr);
+  }
+}
+
+void remember_fleeing_opponent(struct char_data *ch, struct char_data *victim)
+{
+  memory_rec *tmp;
+  int zone_vnum;
+
+  if (!IS_NPC(ch) || !victim || IS_NPC(victim) ||
+      PRF_FLAGGED(victim, PRF_NOHASSLE) ||
+      IN_ROOM(ch) == NOWHERE || !VALID_ROOM_RNUM(IN_ROOM(ch)))
+    return;
+
+  zone_vnum = zone_table[world[IN_ROOM(ch)].zone].number;
+
+  for (tmp = MEMORY(ch); tmp; tmp = tmp->next) {
+    if (tmp->id != GET_IDNUM(victim))
+      continue;
+
+    /* Traditional MOB_MEMORY hostility stays permanent. */
+    if (!tmp->temporary_flee_memory)
+      return;
+
+    tmp->combat_zone = zone_vnum;
+    tmp->away_since = 0;
+    return;
+  }
+
+  CREATE(tmp, memory_rec, 1);
+  tmp->next = MEMORY(ch);
+  tmp->id = GET_IDNUM(victim);
+  tmp->combat_zone = zone_vnum;
+  tmp->away_since = 0;
+  tmp->temporary_flee_memory = TRUE;
+  MEMORY(ch) = tmp;
+}
+
 void mobile_activity(void)
 {
   struct char_data *ch, *next_ch, *vict;
@@ -42,6 +153,9 @@ void mobile_activity(void)
       continue;
     if (DEAD(ch))
       continue;
+
+    if (MEMORY(ch))
+      prune_temporary_flee_memory(ch);
 
     /* Examine call for special procedure */
     if (MOB_FLAGGED(ch, MOB_SPEC) && !no_specials) {
@@ -122,7 +236,7 @@ void mobile_activity(void)
     }
 
     /* Mob Memory */
-    if (MOB_FLAGGED(ch, MOB_MEMORY) && MEMORY(ch)) {
+    if (MEMORY(ch) && (MOB_FLAGGED(ch, MOB_MEMORY) || mob_has_temporary_flee_memory(ch))) {
       found = FALSE;
       for (vict = world[IN_ROOM(ch)].people; vict && !found; vict = vict->next_in_room) {
 	if (IS_NPC(vict) || perceive_character(ch, vict, PERCEIVE_AGGRESSION) != PERCEPTION_IDENTIFIED || PRF_FLAGGED(vict, PRF_NOHASSLE))
@@ -130,6 +244,8 @@ void mobile_activity(void)
 
 	for (names = MEMORY(ch); names && !found; names = names->next) {
 	  if (names->id != GET_IDNUM(vict))
+            continue;
+          if (!MOB_FLAGGED(ch, MOB_MEMORY) && !names->temporary_flee_memory)
             continue;
 
           /* Can a master successfully control the charmed monster? */
@@ -198,6 +314,9 @@ void remember(struct char_data *ch, struct char_data *victim)
     CREATE(tmp, memory_rec, 1);
     tmp->next = MEMORY(ch);
     tmp->id = GET_IDNUM(victim);
+    tmp->combat_zone = NOWHERE;
+    tmp->away_since = 0;
+    tmp->temporary_flee_memory = FALSE;
     MEMORY(ch) = tmp;
   }
 }

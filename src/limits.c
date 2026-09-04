@@ -684,11 +684,13 @@ void point_update(void)
           continue;     /* Oops, they died. -gg 6/24/98 */
       corruption = find_affect(i, SPELL_CORRUPTION);
       if (corruption) {
-        send_to_char(i, "Corrupting energy gnaws at you.\\r\\n");
+        send_to_char(i, "\tMCorrupting energy tears through you from within!\tn\r\n");
+        act("\tMCorrupting energy pulses through $n, eating away at $s life.\tn",
+            TRUE, i, 0, 0, TO_ROOM);
+        set_next_damage_type(DAM_NECROTIC);
         if (damage(i, i, (corruption->modifier < 1 ? 1 : corruption->modifier), SPELL_CORRUPTION) == -1)
           continue;
-      }
-      if (GET_POS(i) <= POS_STUNNED)
+      }if (GET_POS(i) <= POS_STUNNED)
         update_pos(i);
     } else if (GET_POS(i) == POS_INCAP) {
       if (damage(i, i, 1, TYPE_SUFFERING) == -1)

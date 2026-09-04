@@ -265,6 +265,52 @@ static void grant_reward(struct char_data *ch,
   }
 }
 
+static int reward_selector_matches(const struct quest_reward_entry *r, const char *selector)
+{
+  if (!r || !selector || !*selector)
+    return FALSE;
+
+  if (!str_cmp(selector, r->id) || is_abbrev(selector, r->id))
+    return TRUE;
+
+  if (!str_cmp(selector, r->name) || isname(selector, r->name))
+    return TRUE;
+
+  return FALSE;
+}
+
+static int reward_is_bulk_scalar(const struct quest_reward_entry *r)
+{
+  return !str_cmp(r->type, "DIAMOND") ||
+         !str_cmp(r->type, "TRAIN") ||
+         !str_cmp(r->type, "PRACTICE") ||
+         !str_cmp(r->type, "GLORY");
+}
+
+static void grant_bulk_scalar_reward(struct char_data *ch,
+                                     const struct quest_reward_entry *r,
+                                     int quantity)
+{
+  long long amount = (long long)r->arg1 * (long long)quantity;
+
+  if (!str_cmp(r->type, "DIAMOND")) {
+    GET_DIAMONDS(ch) += (int)amount;
+    send_to_char(ch, "You receive %lld diamond%s.\r\n",
+                 amount, amount == 1 ? "" : "s");
+  } else if (!str_cmp(r->type, "TRAIN")) {
+    GET_TRAINS(ch) += (int)amount;
+    send_to_char(ch, "You receive %lld training session%s.\r\n",
+                 amount, amount == 1 ? "" : "s");
+  } else if (!str_cmp(r->type, "PRACTICE")) {
+    GET_PRACTICES(ch) += (int)amount;
+    send_to_char(ch, "You receive %lld practice session%s.\r\n",
+                 amount, amount == 1 ? "" : "s");
+  } else if (!str_cmp(r->type, "GLORY")) {
+    GET_GLORY(ch) += (int)amount;
+    send_to_char(ch, "You receive %lld Glory.\r\n", amount);
+  }
+}
+
 void quest_rewards_list(struct char_data *ch)
 {
   struct quest_reward_entry rewards[QUEST_REWARD_MAX];
@@ -301,10 +347,16 @@ void quest_rewards_list(struct char_data *ch)
                  shown, rewards[i].name, rewards[i].cost);
   }
 
-  if (!shown)
+  if (!shown) {
     send_to_char(ch, "No Quest Point rewards are currently configured.\r\n");
-  else
-    send_to_char(ch, "\r\nPurchase with 'quest buy <number>'.\r\n");
+  } else {
+    send_to_char(ch,
+      "\r\nBuy by number or name:\r\n"
+      "  quest buy <reward>\r\n"
+      "  quest buy <quantity> <reward>\r\n"
+      "  quest buy <quantity>*<reward>\r\n"
+      "Shortcut: qb, for example 'qb 100 diamond'.\r\n");
+  }
 }
 
 void quest_rewards_buy(struct char_data *ch, char *argument)
@@ -314,9 +366,13 @@ void quest_rewards_buy(struct char_data *ch, char *argument)
   struct obj_data *prepared_obj = NULL;
   sbyte *stat_field = NULL;
   const char *stat_label = NULL;
-  char arg[MAX_INPUT_LENGTH], *end = NULL;
-  long choice;
-  int count, i, shown = 0;
+  char input[MAX_INPUT_LENGTH];
+  char first[MAX_INPUT_LENGTH];
+  char selector[MAX_INPUT_LENGTH];
+  char *rest, *star, *end = NULL;
+  long quantity = 1, numeric_choice = 0;
+  long long total_cost, total_amount;
+  int count, i, shown = 0, matches = 0;
 
   if (!present_questmaster(ch)) {
     send_to_char(ch,
@@ -324,17 +380,59 @@ void quest_rewards_buy(struct char_data *ch, char *argument)
     return;
   }
 
-  one_argument(argument, arg);
-  if (!*arg) {
-    send_to_char(ch, "Usage: quest buy <number>\r\n");
+  snprintf(input, sizeof(input), "%s", argument ? argument : "");
+  rest = trim_ws(input);
+
+  if (!*rest) {
+    quest_rewards_list(ch);
     return;
   }
 
-  errno = 0;
-  choice = strtol(arg, &end, 10);
-  if (errno || !end || *end || choice <= 0 || choice > INT_MAX) {
-    send_to_char(ch, "Choose a reward number from 'quest list'.\r\n");
-    return;
+  selector[0] = '\0';
+
+  /* Accept compact syntax such as 100*diamond. */
+  star = strchr(rest, '*');
+  if (star) {
+    *star = '\0';
+    errno = 0;
+    quantity = strtol(trim_ws(rest), &end, 10);
+    if (errno || !end || *trim_ws(end) || quantity <= 0 || quantity > INT_MAX) {
+      send_to_char(ch, "Quantity must be a positive whole number.\r\n");
+      return;
+    }
+    snprintf(selector, sizeof(selector), "%s", trim_ws(star + 1));
+    if (!*selector) {
+      send_to_char(ch, "Specify the reward you want to buy.\r\n");
+      return;
+    }
+  } else {
+    /* Accept spaced syntax such as 100 diamond. A lone number remains the
+     * catalog entry number for backward compatibility. */
+    rest = any_one_arg(rest, first);
+    rest = trim_ws(rest);
+
+    errno = 0;
+    numeric_choice = strtol(first, &end, 10);
+
+    if (!errno && end && !*end && numeric_choice > 0 && *rest) {
+      quantity = numeric_choice;
+      if (quantity > INT_MAX) {
+        send_to_char(ch, "Quantity is too large.\r\n");
+        return;
+      }
+      snprintf(selector, sizeof(selector), "%s", rest);
+      numeric_choice = 0;
+    } else {
+      snprintf(selector, sizeof(selector), "%s", first);
+      if (*rest) {
+        size_t used = strlen(selector);
+        snprintf(selector + used, sizeof(selector) - used, " %s", rest);
+      }
+      errno = 0;
+      numeric_choice = strtol(selector, &end, 10);
+      if (errno || !end || *trim_ws(end) || numeric_choice <= 0)
+        numeric_choice = 0;
+    }
   }
 
   count = load_quest_rewards(rewards, QUEST_REWARD_MAX);
@@ -344,41 +442,110 @@ void quest_rewards_buy(struct char_data *ch, char *argument)
     return;
   }
 
-  for (i = 0; i < count; i++) {
-    if (!reward_type_supported(&rewards[i]))
-      continue;
+  if (numeric_choice > 0) {
+    for (i = 0; i < count; i++) {
+      if (!reward_type_supported(&rewards[i]))
+        continue;
+      shown++;
+      if (shown == numeric_choice) {
+        selected = &rewards[i];
+        break;
+      }
+    }
 
-    shown++;
-    if (shown == choice) {
+    if (!selected) {
+      send_to_char(ch, "There is no reward numbered %ld. Use 'quest list'.\r\n",
+                   numeric_choice);
+      return;
+    }
+  } else {
+    for (i = 0; i < count; i++) {
+      if (!reward_type_supported(&rewards[i]))
+        continue;
+      if (!reward_selector_matches(&rewards[i], selector))
+        continue;
       selected = &rewards[i];
-      break;
+      matches++;
+    }
+
+    if (matches == 0) {
+      send_to_char(ch,
+        "No Guild reward matches '%s'. Use 'quest list' to view the catalog.\r\n",
+        selector);
+      return;
+    }
+
+    if (matches > 1) {
+      send_to_char(ch,
+        "More than one Guild reward matches '%s'. Please be more specific:\r\n",
+        selector);
+      shown = 0;
+      for (i = 0; i < count; i++) {
+        if (!reward_type_supported(&rewards[i]))
+          continue;
+        shown++;
+        if (reward_selector_matches(&rewards[i], selector))
+          send_to_char(ch, "  %2d) %s\r\n", shown, rewards[i].name);
+      }
+      return;
     }
   }
 
-  if (!selected) {
-    send_to_char(ch, "There is no reward numbered %ld. Use 'quest list'.\r\n",
-                 choice);
-    return;
-  }
-
-  if (GET_QUESTPOINTS(ch) < selected->cost) {
+  if (quantity > 1 && !reward_is_bulk_scalar(selected)) {
     send_to_char(ch,
-      "That reward costs %d QP, but you only have %d QP.\r\n",
-      selected->cost, GET_QUESTPOINTS(ch));
+      "That reward must currently be purchased one at a time.\r\n");
     return;
   }
 
-  if (!can_grant_reward(ch, selected, &prepared_obj, &stat_field, &stat_label)) {
-    if (prepared_obj)
-      extract_obj(prepared_obj);
+  total_cost = (long long)selected->cost * (long long)quantity;
+  if (total_cost <= 0 || total_cost > INT_MAX) {
+    send_to_char(ch, "That bulk purchase is too large.\r\n");
     return;
   }
 
-  GET_QUESTPOINTS(ch) -= selected->cost;
-  grant_reward(ch, selected, prepared_obj, stat_field, stat_label);
+  if ((long long)GET_QUESTPOINTS(ch) < total_cost) {
+    send_to_char(ch,
+      "%ld purchase%s of %s cost%s %lld QP, but you only have %d QP.\r\n",
+      quantity, quantity == 1 ? "" : "s", selected->name,
+      quantity == 1 ? "s" : "", total_cost, GET_QUESTPOINTS(ch));
+    return;
+  }
 
-  send_to_char(ch, "You spend %d Quest Point%s. You have %d QP remaining.\r\n",
-               selected->cost, selected->cost == 1 ? "" : "s",
-               GET_QUESTPOINTS(ch));
+  if (reward_is_bulk_scalar(selected)) {
+    total_amount = (long long)selected->arg1 * (long long)quantity;
+    if (total_amount <= 0 || total_amount > INT_MAX) {
+      send_to_char(ch, "That bulk reward amount is too large.\r\n");
+      return;
+    }
+
+    if ((!str_cmp(selected->type, "DIAMOND") &&
+         GET_DIAMONDS(ch) > INT_MAX - (int)total_amount) ||
+        (!str_cmp(selected->type, "TRAIN") &&
+         GET_TRAINS(ch) > INT_MAX - (int)total_amount) ||
+        (!str_cmp(selected->type, "PRACTICE") &&
+         GET_PRACTICES(ch) > INT_MAX - (int)total_amount) ||
+        (!str_cmp(selected->type, "GLORY") &&
+         GET_GLORY(ch) > INT_MAX - (int)total_amount)) {
+      send_to_char(ch, "You cannot hold that much of this reward.\r\n");
+      return;
+    }
+  } else {
+    if (!can_grant_reward(ch, selected, &prepared_obj, &stat_field, &stat_label)) {
+      if (prepared_obj)
+        extract_obj(prepared_obj);
+      return;
+    }
+  }
+
+  GET_QUESTPOINTS(ch) -= (int)total_cost;
+
+  if (reward_is_bulk_scalar(selected))
+    grant_bulk_scalar_reward(ch, selected, (int)quantity);
+  else
+    grant_reward(ch, selected, prepared_obj, stat_field, stat_label);
+
+  send_to_char(ch,
+    "You spend %lld Quest Point%s. You have %d QP remaining.\r\n",
+    total_cost, total_cost == 1 ? "" : "s", GET_QUESTPOINTS(ch));
   save_char(ch);
 }

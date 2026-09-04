@@ -477,7 +477,7 @@ void copyover_recover()
       write_to_descriptor (desc, "\n\rCopyover recovery complete.\n\r");
       GET_PREF(d->character) = pref;
     
-      enter_player_game(d);
+      enter_player_game_copyover(d);
 
       /* Clear their load room if it's not persistant. */
       if (!PLR_FLAGGED(d->character, PLR_LOADROOM))

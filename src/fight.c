@@ -321,14 +321,14 @@ static int damage_severity_tier(int dam, struct char_data *victim)
 
   pct = (dam * 100) / MAX(1, GET_MAX_HIT(victim));
 
-  if (pct <= 4)        return 1;
-  else if (pct <= 9)   return 2;
-  else if (pct <= 19)  return 3;
-  else if (pct <= 29)  return 4;
-  else if (pct <= 44)  return 5;
-  else if (pct <= 59)  return 6;
-  else if (pct <= 74)  return 7;
-  else if (pct <= 89)  return 8;
+  if (pct <= 2)        return 1;
+  else if (pct <= 6)   return 2;
+  else if (pct <= 14)  return 3;
+  else if (pct <= 24)  return 4;
+  else if (pct <= 39)  return 5;
+  else if (pct <= 54)  return 6;
+  else if (pct <= 69)  return 7;
+  else if (pct <= 84)  return 8;
   else                 return 9;
 }
 
@@ -350,14 +350,14 @@ static const char *severity_verb_base(int tier)
 {
   switch (tier) {
     case 1: return "graze";
-    case 2: return "glance";
+    case 2: return "wound";
     case 3: return "hit";
-    case 4: return "strike";
-    case 5: return "slam";
-    case 6: return "crush";
-    case 7: return "blast";
-    case 8: return "shred";
-    case 9: return "pulverize";
+    case 4: return "injure";
+    case 5: return "ravage";
+    case 6: return "overwhelm";
+    case 7: return "devastate";
+    case 8: return "obliterate";
+    case 9: return "CENSORED";
     default: return "hit";
   }
 }
@@ -561,14 +561,14 @@ static const char *severity_verb_third(int tier)
 {
   switch (tier) {
     case 1: return "grazes";
-    case 2: return "glances";
+    case 2: return "wounds";
     case 3: return "hits";
-    case 4: return "strikes";
-    case 5: return "slams";
-    case 6: return "crushes";
-    case 7: return "blasts";
-    case 8: return "shreds";
-    case 9: return "pulverizes";
+    case 4: return "injures";
+    case 5: return "ravages";
+    case 6: return "overwhelms";
+    case 7: return "devastates";
+    case 8: return "obliterates";
+    case 9: return "CENSORED";
     default: return "hits";
   }
 }
@@ -593,6 +593,33 @@ static const char *severity_impact_wrap_close(int tier)
   }
 }
 
+static void format_severity_verb(char *out, size_t outsz, int tier, int third_person)
+{
+  const char *verb;
+
+  if (!out || outsz == 0)
+    return;
+
+  tier = MAX(0, MIN(9, tier));
+
+  /*
+   * The top damage tier deliberately replaces the verb with a censored impact.
+   * Keep this exact pattern centralized so weapons, spells, skills, procs,
+   * and DoTs all display the same signature critical hit.
+   */
+  if (tier == 9) {
+    snprintf(out, outsz, "\tD#\tw#\tDC\twE\tDN\twS\twO\tDR\twE\tDD\tw#\tD#\tn");
+    return;
+  }
+
+  verb = third_person ? severity_verb_third(tier) : severity_verb_base(tier);
+
+  snprintf(out, outsz, "%s%s%s%s\tn",
+           severity_color(tier),
+           severity_impact_wrap_open(tier),
+           verb,
+           severity_impact_wrap_close(tier));
+}
 static int victim_condition_band(const struct char_data *victim)
 {
   int pct;
@@ -1574,117 +1601,204 @@ static char *replace_string(const char *str, const char *weapon_singular, const 
 static void dam_message(int dam, struct char_data *ch, struct char_data *victim,
 		      int w_type)
 {
-  char *buf;
   int msgnum;
+  int attack_index;
+  const char *punct;
+  char verb_base[128];
+  char verb_third[128];
+  char to_room[256];
+  char to_char[256];
+  char to_victim[256];
 
-  int pct = 0;
-  static struct dam_weapon_type {
-    const char *to_room;
-    const char *to_char;
-    const char *to_victim;
-  } dam_weapons[] = {
+  attack_index = w_type - TYPE_HIT;
 
-    /* #w is weapon singular text (used as a noun here: "with your slash"). */
-
-    {
-      "$n tries to use $s #w on $N, but misses.",
-      "You try to use your #w on $N, but miss.",
-      "$n tries to use $s #w on you, but misses."
-    },
-
-    {
-      "$n 	Ggrazes	n $N with $s #w.",
-      "You 	Ggraze	n $N with your #w.",
-      "$n 	Ggrazes	n you with $s #w."
-    },
-
-    {
-      "$n 	Gglances	n $N with $s #w.",
-      "You 	Gglance	n $N with your #w.",
-      "$n 	Gglances	n you with $s #w."
-    },
-
-    {
-      "$n 	Whits	n $N with $s #w.",
-      "You 	Whit	n $N with your #w.",
-      "$n 	Whits	n you with $s #w."
-    },
-
-    {
-      "$n 	Wstrikes	n $N with $s #w.",
-      "You 	Wstrike	n $N with your #w.",
-      "$n 	Wstrikes	n you with $s #w."
-    },
-
-    {
-      "$n 	yslams	n $N with $s #w.",
-      "You 	yslam	n $N with your #w.",
-      "$n 	yslams	n you with $s #w."
-    },
-
-    {
-      "$n 	Ycrushes	n $N with $s #w.",
-      "You 	Ycrush	n $N with your #w.",
-      "$n 	Ycrushes	n you with $s #w."
-    },
-
-    {
-      "$n \tR- blasts -\tn $N with $s #w!",
-      "You \tR- blast -\tn $N with your #w!",
-      "$n \tR- blasts -\tn you with $s #w!"
-    },
-
-    {
-      "$n \tM** shreds **\tn $N with $s #w!",
-      "You \tM** shred **\tn $N with your #w!",
-      "$n \tM** shreds **\tn you with $s #w!"
-    },
-
-    {
-      "$n \tR***** pulverizes *****\tn $N with $s #w!!",
-      "You \tR***** pulverize *****\tn $N with your #w!!",
-      "$n \tR***** pulverizes *****\tn you with $s #w!!"
-    }
-  };
-
-  w_type -= TYPE_HIT;		/* Change to base of table with text */
   if (dam <= 0) {
-    msgnum = 0;
-  } else {
-    pct = (dam * 100) / MAX(1, GET_MAX_HIT(victim));
+    snprintf(to_room, sizeof(to_room), "$n tries to use $s %s on $N, but misses.",
+             attack_hit_text[attack_index].singular);
+    snprintf(to_char, sizeof(to_char), "You try to use your %s on $N, but miss.",
+             attack_hit_text[attack_index].singular);
+    snprintf(to_victim, sizeof(to_victim), "$n tries to use $s %s on you, but misses.",
+             attack_hit_text[attack_index].singular);
 
-    if (pct <= 2)        msgnum = 1;
-    else if (pct <= 6)   msgnum = 2;
-    else if (pct <= 14)  msgnum = 3;
-    else if (pct <= 24)  msgnum = 4;
-    else if (pct <= 39)  msgnum = 5;
-    else if (pct <= 54)  msgnum = 6;
-    else if (pct <= 69)  msgnum = 7;
-    else if (pct <= 84)  msgnum = 8;
-    else                 msgnum = 9;
+    act(to_room, FALSE, ch, NULL, victim, TO_NOTVICT);
+    act(to_char, FALSE, ch, NULL, victim, TO_CHAR);
+    act(to_victim, FALSE, ch, NULL, victim, TO_VICT | TO_SLEEP);
+    return;
   }
-/* damage message to onlookers */
-  buf = replace_string(dam_weapons[msgnum].to_room,
-	  attack_hit_text[w_type].singular, attack_hit_text[w_type].plural);
-  act(buf, FALSE, ch, NULL, victim, TO_NOTVICT);
 
-  /* damage message to damager */
+  msgnum = damage_severity_tier(dam, victim);
+  msgnum = MAX(1, MIN(9, msgnum));
+  punct = (msgnum >= 9) ? "!!" : ((msgnum >= 7) ? "!" : ".");
+
+  format_severity_verb(verb_base, sizeof(verb_base), msgnum, FALSE);
+  format_severity_verb(verb_third, sizeof(verb_third), msgnum, TRUE);
+
+  snprintf(to_room, sizeof(to_room), "$n %s $N with $s %s%s",
+           verb_third, attack_hit_text[attack_index].singular, punct);
+  snprintf(to_char, sizeof(to_char), "You %s $N with your %s%s",
+           verb_base, attack_hit_text[attack_index].singular, punct);
+  snprintf(to_victim, sizeof(to_victim), "$n %s you with $s %s%s",
+           verb_third, attack_hit_text[attack_index].singular, punct);
+
   if (GET_LEVEL(ch) >= LVL_IMMORT)
-	send_to_char(ch, "(%d) ", dam);
-  buf = replace_string(dam_weapons[msgnum].to_char,
-	  attack_hit_text[w_type].singular, attack_hit_text[w_type].plural);
-  act(buf, FALSE, ch, NULL, victim, TO_CHAR);
+    send_to_char(ch, "(%d) ", dam);
+
+  act(to_room, FALSE, ch, NULL, victim, TO_NOTVICT);
+  act(to_char, FALSE, ch, NULL, victim, TO_CHAR);
   send_to_char(ch, CCNRM(ch, C_CMP));
 
-  /* damage message to damagee */
   if (GET_LEVEL(victim) >= LVL_IMMORT)
     send_to_char(victim, "\tR(%d)", dam);
-  buf = replace_string(dam_weapons[msgnum].to_victim,
-	  attack_hit_text[w_type].singular, attack_hit_text[w_type].plural);
-  act(buf, FALSE, ch, NULL, victim, TO_VICT | TO_SLEEP);
+
+  act(to_victim, FALSE, ch, NULL, victim, TO_VICT | TO_SLEEP);
   send_to_char(victim, CCNRM(victim, C_CMP));
 }
 
+static const char *damage_ability_name(int attacktype)
+{
+  const char *name;
+
+  if (attacktype <= 0 || attacktype > MAX_SKILLS)
+    return NULL;
+
+  name = skill_name(attacktype);
+  if (!name || !*name || !str_cmp(name, "UNDEFINED"))
+    return NULL;
+
+  return name;
+}
+
+/*
+ * Every successful non-weapon damage source uses the same severity verb table
+ * as melee.  Spell/skill message entries still own misses and death flavor,
+ * but they no longer override the actual damage-impact wording.
+ */
+static void nonweapon_damage_message(int dam, struct char_data *ch,
+                                     struct char_data *victim, int attacktype)
+{
+  int tier;
+  int physical_skill;
+  const char *ability;
+  const char *punct;
+  char verb_base[128];
+  char verb_third[128];
+
+  if (dam <= 0 || !victim || IN_ROOM(victim) == NOWHERE)
+    return;
+
+  tier = damage_severity_tier(dam, victim);
+  tier = MAX(1, MIN(9, tier));
+
+  physical_skill = (attacktype > MAX_SPELLS && attacktype <= MAX_SKILLS);
+  ability = damage_ability_name(attacktype);
+  punct = (tier >= 9) ? "!!" : ((tier >= 7) ? "!" : ".");
+
+  format_severity_verb(verb_base, sizeof(verb_base), tier, FALSE);
+  format_severity_verb(verb_third, sizeof(verb_third), tier, TRUE);
+
+  if (ch && ch != victim) {
+    char to_char[256];
+    char to_vict[256];
+    char to_room[256];
+
+    if (ability) {
+      snprintf(to_char, sizeof(to_char),
+               "You %s $N with your %s%s",
+               verb_base, ability, punct);
+      snprintf(to_vict, sizeof(to_vict),
+               "$n %s you with $s %s%s",
+               verb_third, ability, punct);
+      snprintf(to_room, sizeof(to_room),
+               "$n %s $N with $s %s%s",
+               verb_third, ability, punct);
+    } else if (physical_skill) {
+      snprintf(to_char, sizeof(to_char),
+               "You %s $N with your attack%s",
+               verb_base, punct);
+      snprintf(to_vict, sizeof(to_vict),
+               "$n %s you with $s attack%s",
+               verb_third, punct);
+      snprintf(to_room, sizeof(to_room),
+               "$n %s $N with $s attack%s",
+               verb_third, punct);
+    } else {
+      snprintf(to_char, sizeof(to_char),
+               "You %s $N with your magic%s",
+               verb_base, punct);
+      snprintf(to_vict, sizeof(to_vict),
+               "$n %s you with $s magic%s",
+               verb_third, punct);
+      snprintf(to_room, sizeof(to_room),
+               "$n %s $N with $s magic%s",
+               verb_third, punct);
+    }
+
+    act(to_room, FALSE, ch, NULL, victim, TO_NOTVICT);
+    act(to_char, FALSE, ch, NULL, victim, TO_CHAR);
+    act(to_vict, FALSE, ch, NULL, victim, TO_VICT | TO_SLEEP);
+    return;
+  }
+
+  /*
+   * Periodic effects commonly use the victim as the technical attacker.
+   * Do not print duplicate attacker/victim lines in that case.
+   */
+  if (ability) {
+    send_to_char(victim, "The %s %s you%s\r\n",
+                 ability, verb_third, punct);
+    {
+      char roommsg[256];
+      snprintf(roommsg, sizeof(roommsg),
+               "The %s %s $n%s",
+               ability, verb_third, punct);
+      act(roommsg, TRUE, victim, 0, 0, TO_ROOM);
+    }
+  } else {
+    send_to_char(victim, "Lingering damage %s you%s\r\n",
+                 verb_third, punct);
+    {
+      char roommsg[256];
+      snprintf(roommsg, sizeof(roommsg),
+               "Lingering damage %s $n%s",
+               verb_third, punct);
+      act(roommsg, TRUE, victim, 0, 0, TO_ROOM);
+    }
+  }
+}
+static void nonweapon_miss_message(struct char_data *ch,
+                                   struct char_data *victim, int attacktype)
+{
+  const char *ability;
+  int physical_skill;
+
+  if (!ch || !victim || ch == victim)
+    return;
+
+  ability = damage_ability_name(attacktype);
+  physical_skill = (attacktype > MAX_SPELLS && attacktype <= MAX_SKILLS);
+
+  if (ability) {
+    char to_char[192];
+    char to_vict[192];
+    char to_room[192];
+
+    snprintf(to_char, sizeof(to_char), "Your %s misses $N.", ability);
+    snprintf(to_vict, sizeof(to_vict), "$n's %s misses you.", ability);
+    snprintf(to_room, sizeof(to_room), "$n's %s misses $N.", ability);
+
+    act(to_room, FALSE, ch, NULL, victim, TO_NOTVICT);
+    act(to_char, FALSE, ch, NULL, victim, TO_CHAR);
+    act(to_vict, FALSE, ch, NULL, victim, TO_VICT | TO_SLEEP);
+  } else if (physical_skill) {
+    act("Your attack misses $N.", FALSE, ch, NULL, victim, TO_CHAR);
+    act("$n's attack misses you.", FALSE, ch, NULL, victim, TO_VICT | TO_SLEEP);
+    act("$n's attack misses $N.", FALSE, ch, NULL, victim, TO_NOTVICT);
+  } else {
+    act("Your magic misses $N.", FALSE, ch, NULL, victim, TO_CHAR);
+    act("$n's magic misses you.", FALSE, ch, NULL, victim, TO_VICT | TO_SLEEP);
+    act("$n's magic misses $N.", FALSE, ch, NULL, victim, TO_NOTVICT);
+  }
+}
 
 /*  message for doing damage with a spell or skill. Also used for weapon
  *  damage on miss and death blows. */
@@ -2242,57 +2356,20 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
    * death blow, send a skill_message if one exists; if not, default to a
    * dam_message. Otherwise, always send a dam_message. */
   if (!IS_WEAPON(attacktype)) {
-    /* Always add a short severity verb line for spells, skills, DoTs. */
-    int shown = skill_message(dam, ch, victim, attacktype);
-    int physical_skill = (attacktype > MAX_SPELLS && attacktype <= MAX_SKILLS);
-    if (!shown && dam > 0 && IN_ROOM(victim) != NOWHERE) {
-      static const char *const v3[] = {
-        "misses", "grazes", "glances", "hits", "strikes", "slams", "crushes", "blasts", "shreds", "pulverizes"
-      };
-      static const char *const v3_past[] = {
-        "missed", "grazed", "glanced", "hit", "struck", "slammed", "crushed", "blasted", "shredded", "pulverized"
-      };
-      int tier = damage_severity_tier(dam, victim);
-      const char *col = severity_color(tier);
-      const char *pre = severity_impact_wrap_open(tier);
-      const char *post = severity_impact_wrap_close(tier);
-      if (tier < 0) tier = 0;
-      if (tier > 9) tier = 9;
-      if (ch) {
-        char to_char[160], to_vict[160], to_room[160];
-        snprintf(to_char, sizeof(to_char), physical_skill ? "Your strike %s%s%s%s\tn $N." : "Your magic %s%s%s%s\tn $N.", col, pre, v3[tier], post);
-        snprintf(to_vict, sizeof(to_vict), physical_skill ? "$n's strike %s%s%s%s\tn you." : "$n's magic %s%s%s%s\tn you.", col, pre, v3[tier], post);
-        snprintf(to_room, sizeof(to_room), physical_skill ? "$n's strike %s%s%s%s\tn $N." : "$n's magic %s%s%s%s\tn $N.", col, pre, v3[tier], post);
-        act(to_room, FALSE, ch, NULL, victim, TO_NOTVICT);
-        act(to_char, FALSE, ch, NULL, victim, TO_CHAR);
-        act(to_vict, FALSE, ch, NULL, victim, TO_VICT | TO_SLEEP);
-      } else {
-        send_to_char(victim, "Lingering magic %s%s%s%s\tn you.\r\n", col, pre, v3[tier], post);
-        {
-          char roommsg[160];
-          snprintf(roommsg, sizeof(roommsg), "$n is %s%s%s%s\tn by lingering magic.", col, pre, v3_past[tier], post);
-          act(roommsg, TRUE, victim, 0, 0, TO_ROOM);
-        }
-      }
-    } else if (!shown) {
-      /* If a spell has no messages and did 0 damage, still show something. */
-      if (ch) {
-        if (physical_skill) {
-          act("Your strike misses $N.", FALSE, ch, NULL, victim, TO_CHAR);
-          act("$n's strike misses you.", FALSE, ch, NULL, victim, TO_VICT | TO_SLEEP);
-          act("$n's strike misses $N.", FALSE, ch, NULL, victim, TO_NOTVICT);
-        } else {
-          act("Your magic misses $N.", FALSE, ch, NULL, victim, TO_CHAR);
-          act("$n's magic misses you.", FALSE, ch, NULL, victim, TO_VICT | TO_SLEEP);
-          act("$n's magic misses $N.", FALSE, ch, NULL, victim, TO_NOTVICT);
-        }
-      } else {
-        send_to_char(victim, "You suffer.\r\n");
-        act("$n suffers.", TRUE, victim, 0, 0, TO_ROOM);
-      }
+    if (dam > 0) {
+      nonweapon_damage_message(dam, ch, victim, attacktype);
+
+      /*
+       * Keep spell/skill-specific death flavor after the universal severity
+       * line. Normal successful hit_msg entries are intentionally bypassed.
+       */
+      if (GET_POS(victim) == POS_DEAD && ch && ch != victim)
+        skill_message(dam, ch, victim, attacktype);
+    } else if (ch && ch != victim) {
+      if (!skill_message(0, ch, victim, attacktype))
+        nonweapon_miss_message(ch, victim, attacktype);
     }
-  } else {
-    if (GET_POS(victim) == POS_DEAD || dam == 0) {
+  } else {    if (GET_POS(victim) == POS_DEAD || dam == 0) {
       if (!skill_message(dam, ch, victim, attacktype))
 	dam_message(dam, ch, victim, attacktype);
     } else {
@@ -2562,6 +2639,11 @@ void hit(struct char_data *ch, struct char_data *victim, int type)
 
   dam = (!AWAKE(victim) || final_hit_roll <= hit_chance);
 
+  /* Reaching the attack roll is a genuine unarmed attempt whether it hits or
+   * misses.  Merely remaining on the combat list does not reach this point. */
+  if (!IS_NPC(ch) && (!wielded || GET_OBJ_TYPE(wielded) != ITEM_WEAPON))
+    improve_ability_from_use(ch, SKILL_UNARMED, dam);
+
   if (!dam)
     /* the attacker missed the victim */
     damage(ch, victim, 0, type == SKILL_BACKSTAB ? SKILL_BACKSTAB : w_type);
@@ -2601,7 +2683,6 @@ void hit(struct char_data *ch, struct char_data *victim, int type)
         unarmed_skill = GET_SKILL(ch, SKILL_UNARMED);
         unarmed_skill_bonus = unarmed_proficiency_bonus(unarmed_component, unarmed_skill);
         dam += unarmed_component + unarmed_skill_bonus;
-        improve_ability_from_use(ch, SKILL_UNARMED, TRUE);
       }
     }
 

@@ -22249,5 +22249,56 @@ known, the Tome is not consumed.  Each Tome has a builder-set real-time study
 cooldown; logging out does not pause it.  Immortals bypass only that cooldown.
 #1
 
+
+CAMPAIGN CAMPAIGNS
+
+Campaigns are long-form Adventurer's Guild contracts for characters who want
+a larger assignment than a normal one-target quest. A campaign gives you a
+list of level-appropriate enemies spread across the world and six real-world
+days to defeat them.
+
+Usage:
+  campaign request
+    Accept a new campaign.
+
+  campaign info
+    Show the full campaign, deadline, rewards, and complete target list.
+
+  campaign check
+  cp check
+    Show only the campaign targets you still need to defeat.
+
+  campaign brief
+    Show a shortened list of your remaining targets.
+
+  campaign today
+    Show a compact campaign status and time-remaining summary.
+
+  campaign quit
+    Abandon your active campaign and forfeit its rewards.
+
+How campaigns work:
+  - A campaign contains multiple kill targets. The exact number can vary.
+  - Targets are chosen for your level from reachable areas of the world.
+  - Your campaign lasts six real-world days from the moment it is accepted.
+  - Progress is saved, so logging out does not cancel your campaign.
+  - Each matching kill removes that target from your remaining list.
+  - When the final target is defeated, the campaign completes automatically.
+  - Campaign rewards can include experience, gold, quest points, trains, and
+    practice sessions.
+  - You may use CAMPAIGN CHECK at any time to review unfinished targets.
+  - CAMPAIGN QUIT immediately abandons the campaign and forfeits all rewards.
+
+Normal Guild quests and campaigns are separate activities. Use QUEST for the
+Guild's shorter contracts and CAMPAIGN for the larger multi-target assignments.
+
+Examples:
+  campaign request
+  campaign info
+  campaign check
+  campaign brief
+
+See also: QUEST QUESTS PRACTICE TRAIN
+#0
 $
 #0

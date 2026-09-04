@@ -59,7 +59,7 @@ static const char *quest_mort_usage =
   "Quest Commands:\r\n"
   "  quest request   - Request a new Guild contract.\r\n"
   "  quest list      - View the Quest Point reward catalog.\r\n"
-  "  quest buy <#>   - Purchase a reward from the catalog.\r\n"
+  "  quest buy ...   - Buy rewards by number/name, with optional quantity.\r\n"
   "  quest progress  - Check your current contract status.\r\n"
   "  quest drop      - Abandon your current contract.\r\n"
   "  quest info      - Review your current contract details.\r\n"
@@ -69,7 +69,7 @@ static const char *quest_imm_usage =
   "Quest Commands:\r\n"
   "  quest request   - Request a new Guild contract.\r\n"
   "  quest list      - View the Quest Point reward catalog.\r\n"
-  "  quest buy <#>   - Purchase a reward from the catalog.\r\n"
+  "  quest buy ...   - Buy rewards by number/name, with optional quantity.\r\n"
   "  quest progress  - Check your current contract status.\r\n"
   "  quest drop      - Abandon your current contract.\r\n"
   "  quest info      - Review your current contract details.\r\n"
@@ -612,6 +612,56 @@ static void expire_campaign_if_needed(struct char_data *ch, bool notify)
   save_char(ch);
 }
 
+/*
+ * Dynamic Guild hunt targets must have a stable, renewable local reset.
+ *
+ * tbaMUD M-reset maximums are global per mobile prototype. Some stock zones
+ * import a prototype owned by another zone, which can make an advertised
+ * target disappear because another zone consumes the same global population
+ * limit. Reject those cross-zone imports for both regular quests and campaigns.
+ */
+static bool mob_has_reliable_local_quest_reset(struct char_data *mob)
+{
+  room_rnum room;
+  mob_rnum mr;
+  mob_vnum vnum;
+  zone_rnum zone;
+  int cmd_no;
+
+  if (!mob || !IS_NPC(mob) || IN_ROOM(mob) == NOWHERE)
+    return FALSE;
+
+  room = IN_ROOM(mob);
+  if (!VALID_ROOM_RNUM(room))
+    return FALSE;
+
+  vnum = GET_MOB_VNUM(mob);
+  mr = real_mobile(vnum);
+  if (mr == NOBODY)
+    return FALSE;
+
+  zone = world[room].zone;
+  if (zone < 0 || zone > top_of_zone_table || !zone_table[zone].cmd)
+    return FALSE;
+
+  /* The mob prototype must belong to the same zone as the advertised room. */
+  if (vnum < zone_table[zone].bot || vnum > zone_table[zone].top)
+    return FALSE;
+
+  for (cmd_no = 0; zone_table[zone].cmd[cmd_no].command != 'S'; cmd_no++) {
+    struct reset_com *cmd = &zone_table[zone].cmd[cmd_no];
+
+    if (cmd->command != 'M' || cmd->if_flag)
+      continue;
+
+    /* Zone commands are renumbered to runtime rnums after world boot. */
+    if (cmd->arg1 == mr && cmd->arg3 == room && cmd->arg2 > 0)
+      return TRUE;
+  }
+
+  return FALSE;
+}
+
 struct campaign_candidate_data {
   mob_vnum vnum;
   room_vnum room_vnum;
@@ -650,6 +700,8 @@ static int select_campaign_targets(struct char_data *ch, struct campaign_candida
     if (room_is_quest_safe(in_room))
       continue;
     if (!reachable[in_room] || !returnable[in_room])
+      continue;
+    if (!mob_has_reliable_local_quest_reset(mob))
       continue;
 
     mob_level = GET_LEVEL(mob);
@@ -740,6 +792,8 @@ static struct char_data *select_kill_quest_target(struct char_data *ch)
     if (room_is_quest_safe(IN_ROOM(mob)))
       continue;
     if (!reachable[IN_ROOM(mob)] || !returnable[IN_ROOM(mob)])
+      continue;
+    if (!mob_has_reliable_local_quest_reset(mob))
       continue;
     if (is_service_or_protected_mob(mob))
       continue;
@@ -836,6 +890,8 @@ static const char *qvalidate_base_reason(struct char_data *mob, byte *reachable,
     return "no route from here";
   if (!returnable[room])
     return "no return route";
+  if (!mob_has_reliable_local_quest_reset(mob))
+    return "no reliable local reset";
   return NULL;
 }
 
@@ -1141,8 +1197,8 @@ static void quest_complete_kill(struct char_data *ch)
                GET_NAME(qm), GET_NAME(ch));
   send_to_char(ch, "%s tells you, 'As a reward, I am giving you %d quest points and %d gold.'\r\n",
                GET_NAME(qm), qp_reward, gold_reward);
-  send_to_char(ch, "%s tells you, 'Give campaigns a try %s, see %sHELP CAMPAIGNS%s.'\r\n",
-               GET_NAME(qm), GET_NAME(ch), QYEL, QNRM);
+  send_to_char(ch, "%s tells you, 'For larger assignments, try %sCAMPAIGN REQUEST%s. See %sHELP CAMPAIGNS%s for details.'\r\n",
+               GET_NAME(qm), QYEL, QNRM, QYEL, QNRM);
   send_to_char(ch, "You receive %d experience.\r\n", exp_reward);
 
   clear_kill_quest(ch);
@@ -1999,6 +2055,10 @@ ACMD(do_quest)
   }
 }
 
+ACMD(do_questbuy)
+{
+  quest_rewards_buy(ch, argument);
+}
 ACMD(do_campaign)
 {
   char arg1[MAX_INPUT_LENGTH];

@@ -40,6 +40,7 @@ int special(struct char_data *ch, int cmd, char *arg);
 void free_alias(struct alias_data *a);
 int perform_alias(struct descriptor_data *d, char *orig, size_t maxlen);
 int enter_player_game (struct descriptor_data *d);
+int enter_player_game_copyover(struct descriptor_data *d);
 /* ACMDs available through interpreter.c */
 ACMD(do_alias);
 

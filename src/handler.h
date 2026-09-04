@@ -100,6 +100,7 @@ int	generic_find(char *arg, bitvector_t bitvector, struct char_data *ch,
 /* prototypes from mobact.c */
 void forget(struct char_data *ch, struct char_data *victim);
 void remember(struct char_data *ch, struct char_data *victim);
+void remember_fleeing_opponent(struct char_data *ch, struct char_data *victim);
 void mobile_activity(void);
 void clearMemory(struct char_data *ch);
 

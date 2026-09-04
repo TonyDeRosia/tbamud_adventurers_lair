@@ -335,6 +335,7 @@ cpp_extern const struct command_info cmd_info[] = {
   { "qlist"    , "qlist"   , POS_DEAD    , do_oasis_list, LVL_BUILDER, SCMD_OASIS_QLIST },
   { "quaff"    , "qua"     , POS_RESTING , do_use      , 0, SCMD_QUAFF },
   { "qecho"    , "qec"     , POS_DEAD    , do_qcomm    , LVL_GOD, SCMD_QECHO },
+  { "qb"       , "qb"      , POS_DEAD    , do_questbuy , 0, 0 },
   { "quest"    , "que"     , POS_DEAD    , do_quest    , 0, 0 },
   { "qvalidate", "qvalidate", POS_DEAD    , do_qvalidate, LVL_IMMORT, 0 },
   { "qui"      , "qui"     , POS_DEAD    , do_quit     , 0, 0 },
@@ -1389,7 +1390,7 @@ static bool perform_new_char_dupe_check(struct descriptor_data *d)
 }
 
 /* load the player, put them in the right room - used by copyover_recover too */
-int enter_player_game (struct descriptor_data *d)
+static int enter_player_game_internal(struct descriptor_data *d, bool copyover)
 {
   int load_result;
   room_vnum load_room;
@@ -1420,12 +1421,21 @@ int enter_player_game (struct descriptor_data *d)
     }
   }
 
+  /* Copyover resumes the live session room saved immediately before exec.
+   * It must not consume or overwrite a persistent staff-assigned load room. */
+  if (copyover && load_room == NOWHERE &&
+      GET_LAST_ROOM(d->character) != NOWHERE &&
+      GET_LAST_ROOM(d->character) != 0)
+    load_room = real_room(GET_LAST_ROOM(d->character));
+
   if (load_room == NOWHERE &&
       PLR_FLAGGED(d->character, PLR_LOADROOM) &&
       GET_LOADROOM(d->character) != NOWHERE)
     load_room = real_room(GET_LOADROOM(d->character));
 
-  if (load_room == NOWHERE && GET_LAST_ROOM(d->character) != NOWHERE)
+  if (load_room == NOWHERE &&
+      GET_LAST_ROOM(d->character) != NOWHERE &&
+      GET_LAST_ROOM(d->character) != 0)
     load_room = real_room(GET_LAST_ROOM(d->character));
 
   /* If char was saved with NOWHERE, or real_room above failed... */
@@ -1463,6 +1473,16 @@ int enter_player_game (struct descriptor_data *d)
   login_wtrigger(&world[IN_ROOM(d->character)], d->character);
 
   return load_result;
+}
+
+int enter_player_game(struct descriptor_data *d)
+{
+  return enter_player_game_internal(d, FALSE);
+}
+
+int enter_player_game_copyover(struct descriptor_data *d)
+{
+  return enter_player_game_internal(d, TRUE);
 }
 
 EVENTFUNC(get_protocols)

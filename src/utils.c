@@ -70,7 +70,7 @@ int dice(int num, int size)
 
 void improve_ability_from_use(struct char_data *ch, int ability, int success)
 {
-  int cur, chance, stat;
+  int cur, chance, stat, stat_modifier;
 
   if (!ch || IS_NPC(ch))
     return;
@@ -80,8 +80,15 @@ void improve_ability_from_use(struct char_data *ch, int ability, int success)
 
   cur = GET_SKILL(ch, ability);
 
-  /* Practice is capped at 75. Use based improvement is only for 75+..99. */
-  if (cur < 75 || cur >= 100)
+  /* A zero proficiency is unknown, so it cannot be learned by attempted use. */
+  if (cur <= 0)
+    return;
+
+  /* Callers invoke this only after a genuine attempt.  Class tracking records
+   * that use independently of whether the proficiency roll improves. */
+  classtrack_record_ability_use(ch, ability, (ability <= MAX_SPELLS));
+
+  if (cur >= 100)
     return;
 
   /* Spells: int+wis. Skills: dex+int (simple, stable default). */
@@ -90,20 +97,33 @@ void improve_ability_from_use(struct char_data *ch, int ability, int success)
   else
     stat = (GET_DEX(ch) + GET_INT(ch)) / 2;
 
-  /* Slow curve as you approach 100. */
-  chance = 1 + (stat / 12) + ((100 - cur) / 20);
-  /* Genuine failures should teach more than routine success. */
+  if (cur <= 24)
+    chance = 20;
+  else if (cur <= 49)
+    chance = 12;
+  else if (cur <= 74)
+    chance = 7;
+  else if (cur <= 89)
+    chance = 4;
+  else if (cur <= 94)
+    chance = 2;
+  else
+    chance = 1;
+
+  /* Average attributes near 13 are neutral; exceptional or poor attributes
+   * can shift the base chance by at most three percentage points. */
+  stat_modifier = MAX(-3, MIN(3, (stat - 13) / 4));
+  chance = MAX(1, chance + stat_modifier);
+
+  /* Genuine failures receive approximately 1.5x the normal learning chance. */
   if (!success)
-    chance *= 4;
+    chance = (chance * 3 + 1) / 2;
 
   if (chance < 1) chance = 1;
-  if (chance > 15) chance = 15;
+  if (chance > 35) chance = 35;
 
   if (rand_number(1, 100) <= chance)
-    SET_SKILL(ch, ability, cur + 1);
-
-  if (success)
-    classtrack_record_ability_use(ch, ability, (ability <= MAX_SPELLS));
+    SET_SKILL(ch, ability, MIN(100, cur + 1));
 }
 
 int MIN(int a, int b)

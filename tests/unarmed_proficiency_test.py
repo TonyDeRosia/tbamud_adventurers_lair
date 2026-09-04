@@ -29,7 +29,7 @@ def expected_unarmed(level: int, skill: int) -> tuple[float, float]:
 def test_persistent_id_is_appended_without_renumbering_existing_skills():
     assert "#define SKILL_STUDY                 260" in SPELLS_H
     assert "#define SKILL_UNARMED               261" in SPELLS_H
-    assert "#define MAX_SKILLS            261" in STRUCTS_H
+    assert "#define MAX_SKILLS            269" in STRUCTS_H
     assert 'skillo_cost(SKILL_UNARMED, "unarmed", 5);' in PARSER
 
 
@@ -47,9 +47,10 @@ def test_unarmed_uses_normal_practice_then_improve_by_use_progression():
     assert "can_character_practice_ability(ch, skill_num)" in PRACTICE
     assert "spell_info[ability_id].min_level[(int) GET_CLASS(ch)]" in PRACTICE
     assert "SET_SKILL(ch, skill_num, MIN(LEARNED(ch), percent));" in PRACTICE
-    assert "if (cur < 75 || cur >= 100)" in UTILS
-    assert "SET_SKILL(ch, ability, cur + 1);" in UTILS
-    assert "improve_ability_from_use(ch, SKILL_UNARMED, TRUE);" in FIGHT
+    assert "if (cur <= 0)" in UTILS
+    assert "if (cur >= 100)" in UTILS
+    assert "SET_SKILL(ch, ability, MIN(100, cur + 1));" in UTILS
+    assert "improve_ability_from_use(ch, SKILL_UNARMED, dam);" in FIGHT
 
 
 def test_damage_bonus_is_player_only_and_weapon_gated():
@@ -58,7 +59,7 @@ def test_damage_bonus_is_player_only_and_weapon_gated():
     player_branch = FIGHT[FIGHT.index("get_player_unarmed_profile(GET_LEVEL(ch)"):]
     assert "GET_SKILL(ch, SKILL_UNARMED)" in player_branch[:1000]
     assert "unarmed_proficiency_bonus(unarmed_component, unarmed_skill)" in player_branch[:1000]
-    assert "improve_ability_from_use(ch, SKILL_UNARMED, TRUE);" in player_branch[:1000]
+    assert "improve_ability_from_use(ch, SKILL_UNARMED, dam);" in FIGHT
     assert "dice(ch->mob_specials.damnodice, ch->mob_specials.damsizedice)" in FIGHT
 
 

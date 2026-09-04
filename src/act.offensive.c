@@ -802,7 +802,7 @@ ACMD(do_flee)
 {
   int i, attempt, loss;
   int web_penalty = 0;
-  struct char_data *was_fighting;
+  struct char_data *was_fighting, *opponent, *next_opponent;
   struct affected_type *af;
 
   if (AFF_FLAGGED(ch, AFF_ROOTED)) {
@@ -842,6 +842,20 @@ ACMD(do_flee)
 	  loss = GET_MAX_HIT(was_fighting) - GET_HIT(was_fighting);
 	  loss *= GET_LEVEL(was_fighting);
 	  gain_exp(ch, -loss);
+          /*
+           * Capture all NPCs that were actually fighting this PC before
+           * stop_fighting() tears down the combat links.
+           */
+          if (IS_NPC(was_fighting))
+            remember_fleeing_opponent(was_fighting, ch);
+
+          for (opponent = combat_list; opponent; opponent = next_opponent) {
+            next_opponent = opponent->next_fighting;
+
+            if (opponent != was_fighting && IS_NPC(opponent) &&
+                FIGHTING(opponent) == ch)
+              remember_fleeing_opponent(opponent, ch);
+          }
         }
       if (FIGHTING(ch)) 
         stop_fighting(ch); 

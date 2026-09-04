@@ -901,7 +901,7 @@ static int gen_receptionist(struct char_data *ch, struct char_data *recep, int c
     act("$n helps $N into $S private chamber.",
         FALSE, recep, 0, ch, TO_NOTVICT);
 
-    GET_LOADROOM(ch) = GET_ROOM_VNUM(IN_ROOM(ch));
+    GET_LAST_ROOM(ch) = GET_ROOM_VNUM(IN_ROOM(ch));
     extract_char(ch); /* It saves. */
   } else {
     Crash_offer_rent(ch, recep, TRUE, RENT_FACTOR);

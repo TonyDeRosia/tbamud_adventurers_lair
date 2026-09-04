@@ -2451,6 +2451,7 @@ static void perform_automatic_buff_sequence(struct char_data *ch,
       WAIT_STATE(ch, PULSE_VIOLENCE);
       if (mana > 0)
         GET_MANA(ch) = MAX(0, MIN(effective_max_mana(ch), GET_MANA(ch) - mana));
+      improve_ability_from_use(ch, spellnum, FALSE);
     } else if (rand_number(0, 101) > GET_SKILL(ch, spellnum)) {
       WAIT_STATE(ch, PULSE_VIOLENCE);
       if (!skill_message(0, ch, tch, spellnum))
@@ -2802,6 +2803,7 @@ ACMD(do_cast) {
     WAIT_STATE(ch, PULSE_VIOLENCE);
     if (mana > 0)
       GET_MANA(ch) = MAX(0, MIN(effective_max_mana(ch), GET_MANA(ch) - mana));
+    improve_ability_from_use(ch, spellnum, FALSE);
     return;
   }
 

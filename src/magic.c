@@ -353,14 +353,22 @@ int mag_damage(int level, struct char_data *ch, struct char_data *victim,
   switch (spellnum) {
     /* Mostly mages */
   case SPELL_MAGIC_MISSILE:
-  case SPELL_CHILL_TOUCH:	/* chill touch also has an affect */
     if (IS_MAGIC_USER(ch))
       dam = dice(1, 8) + 1;
     else
       dam = dice(1, 6) + 1;
     dam += MAX(0, level / 12);
     break;
-  case SPELL_BURNING_HANDS:
+
+  case SPELL_CHILL_TOUCH:       /* cold damage plus a Strength-draining affect */
+    if (local_damage_type == DAM_NONE)
+      local_damage_type = DAM_COLD;
+    if (IS_MAGIC_USER(ch))
+      dam = dice(2, 8) + MAX(1, level / 2);
+    else
+      dam = dice(2, 6) + MAX(1, level / 2);
+    break;
+case SPELL_BURNING_HANDS:
     if (local_damage_type == DAM_NONE) local_damage_type = DAM_FIRE;
     if (IS_MAGIC_USER(ch))
       dam = dice(3, 8) + 3;

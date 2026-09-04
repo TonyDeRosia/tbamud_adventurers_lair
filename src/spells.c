@@ -716,7 +716,7 @@ static int corruption_duration(int level)
 
 static int corruption_damage_per_tick(int level)
 {
-  int damage = 1 + (level / 10);
+  int damage = 2 + (level / 12);
 
   return MIN(damage, 12);
 }
@@ -1831,14 +1831,15 @@ ASPELL(spell_corruption)
   affect_join(victim, &af, FALSE, FALSE, FALSE, FALSE);
 
   act("You envelop $N in a wave of corrupting energy.", FALSE, ch, 0, victim, TO_CHAR);
-  act("$n envelopes $N in a wave of corrupting energy.", TRUE, ch, 0, victim, TO_ROOM);
+  act("$n envelops $N in a wave of corrupting energy.", TRUE, ch, 0, victim, TO_ROOM);
 
-  if (ch != victim)
-  /* 0 damage prints like a miss. Make the initial hit at least 1. */
-  damage(ch, victim, (af.modifier < 1 ? 1 : af.modifier), SPELL_CORRUPTION);
+  if (ch != victim) {
+    int initial_damage = dice(1, 6) + MAX(1, caster_level);
 
+    set_next_damage_type(DAM_NECROTIC);
+    damage(ch, victim, initial_damage, SPELL_CORRUPTION);
+  }
 }
-
 ASPELL(spell_plague_bolt)
 {
   struct affected_type af;

@@ -5369,8 +5369,11 @@ ACMD(do_copyover)
      close_socket (d); /* throw'em out */
    } else {
       fprintf (fp, "%d %ld %s %s %s\n", d->descriptor, GET_PREF(och), GET_NAME(och), d->host, CopyoverGet(d));
-      /* save och */
-      GET_LOADROOM(och) = GET_ROOM_VNUM(IN_ROOM(och));
+      /* Save the live session room without changing the persistent staff
+       * load-room assignment. */
+      if (IN_ROOM(och) != NOWHERE && VALID_ROOM_RNUM(IN_ROOM(och)) &&
+          GET_ROOM_VNUM(IN_ROOM(och)) != 0)
+        GET_LAST_ROOM(och) = GET_ROOM_VNUM(IN_ROOM(och));
       Crash_rentsave(och,0);
       save_char(och);
       write_to_descriptor (d->descriptor, buf);
@@ -8078,7 +8081,7 @@ static void perform_push(struct char_data *ch, char *argument, const char *comma
     return;
   }
 
-  GET_LOADROOM(vict) = GET_ROOM_VNUM(IN_ROOM(vict));
+  GET_LAST_ROOM(vict) = GET_ROOM_VNUM(IN_ROOM(vict));
   if (!save_char(vict)) {
     send_to_char(ch, "Unable to save that player; push aborted.\r\n");
     return;

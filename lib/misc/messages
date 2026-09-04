@@ -34,19 +34,34 @@ $n's lightning disappears as $N makes a simple gesture.
 * chill touch 8
 M
 8
-You chill $N, remember to put flowers on $S grave...
-The killing cold of $n's touch stills your heart.
-$n touches $N who slumps to the ground as a dead lump, rather chilly isn't it?
-The atmosphere turns chilly as you miss $N!
-You dodge $n and $s chill touch!
-$n tries unsuccessfully to chill $N!
-You chill $N!
-You feel your life flowing away as $n chills you!
-$n chills $N who suddenly seem less lively!
-$N shrugs off your chilling touch.
-You resist the killing cold of $n's touch.
-$N starts to laugh as $n turns chilly!
+Your freezing touch stills $N's heart in a final sheath of frost!
+A killing cold floods through you as $n's touch claims your life!
+Frost races over $N as $n's chill touch turns deadly!
+Your chill touch passes just wide of $N.
+You twist away before $n's freezing fingers can find you.
+$n reaches for $N with a frost-wreathed hand, but misses.
+Your freezing touch bites deep into $N!
+Deadly cold surges through you as $n's freezing touch lands!
+Frost blooms across $N where $n's chill touch strikes!
+$N shrugs off the worst of your chill touch.
+You resist the worst of $n's freezing touch.
+$N withstands the worst of $n's chill touch.
 
+* corruption 55
+M
+55
+Your corruption consumes $N in a final surge of necrotic power!
+Corrupting energy devours you from within as $n's spell claims your life!
+$N collapses as $n's corruption consumes what remains of $M!
+Your corrupting wave breaks harmlessly around $N.
+You resist the corrupting wave cast by $n.
+$n's corrupting energy washes over $N without taking hold.
+Your corrupting energy tears into $N!
+Necrotic corruption rips through you as $n's spell takes hold!
+$N recoils as $n's corrupting energy tears through $M!
+$N resists the worst of your corruption.
+You resist the worst of $n's corruption.
+$N withstands the worst of $n's corrupting power.
 * color spray 10
 M
 10

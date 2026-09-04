@@ -112,6 +112,7 @@ bool is_on_quest_cooldown(struct char_data *ch);
 bool is_questmaster_mob(struct char_data *mob);
 SPECIAL(questmaster);
 ACMD(do_quest);
+ACMD(do_questbuy);
 ACMD(do_campaign);
 ACMD(do_qvalidate);
 /* Implemented in qedit.c  */

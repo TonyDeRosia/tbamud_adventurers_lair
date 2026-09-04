@@ -958,6 +958,9 @@ struct room_data
 struct memory_rec_struct
 {
   long id;  /**< The PC id to remember. */
+  int combat_zone; /**< Zone vnum where temporary combat memory began. */
+  time_t away_since; /**< When the remembered PC first remained outside combat_zone. */
+  bool temporary_flee_memory; /**< TRUE only for flee-created combat memory. */
   struct memory_rec_struct *next; /**< Next PC to remember */
 };
 
