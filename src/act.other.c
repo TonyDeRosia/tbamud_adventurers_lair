@@ -628,20 +628,47 @@ ACMD(do_sneak)
   struct affected_type af;
   byte percent;
   int skill = subcmd == SKILL_SKULK ? SKILL_SKULK : SKILL_SNEAK;
+  int move_cost;
 
   if (IS_NPC(ch) || !GET_SKILL(ch, skill)) {
     send_to_char(ch, "You have no idea how to do that.\r\n");
     return;
   }
+
+  if (subcmd == SKILL_SKULK && AFF_FLAGGED(ch, AFF_SKULK)) {
+    send_to_char(ch, "You are already skulking through the shadows.\r\n");
+    return;
+  }
+
+  if (subcmd != SKILL_SKULK && AFF_FLAGGED(ch, AFF_SNEAK)) {
+    send_to_char(ch, "You are already moving silently.\r\n");
+    return;
+  }
+
+  /* skillo_cost() stores physical skill costs in spell_info[].mana_*.
+   * Stealth skills pay that configured cost from MOVE, never mana. */
+  move_cost = MAX(0, spell_info[skill].mana_min);
+
+  if (GET_LEVEL(ch) < LVL_IMMORT && GET_MOVE(ch) < move_cost) {
+    send_to_char(ch, "You are too exhausted to move with that kind of stealth.\r\n");
+    return;
+  }
+
+  if (GET_LEVEL(ch) < LVL_IMMORT && move_cost > 0)
+    GET_MOVE(ch) = MAX(0, GET_MOVE(ch) - move_cost);
+
   send_to_char(ch, subcmd == SKILL_SKULK ?
       "Okay, you begin to skulk through the shadows.\r\n" :
       "Okay, you'll try to move silently for a while.\r\n");
-  if (AFF_FLAGGED(ch, AFF_SNEAK))
+
+  /* Sneak and Skulk remain mutually exclusive. Reissuing the active
+   * mode no longer removes it; VISIBLE is the voluntary cancel command. */
+  if (subcmd == SKILL_SKULK && AFF_FLAGGED(ch, AFF_SNEAK))
     affect_from_char(ch, SKILL_SNEAK);
-  if (AFF_FLAGGED(ch, AFF_SKULK))
+  else if (subcmd != SKILL_SKULK && AFF_FLAGGED(ch, AFF_SKULK))
     affect_from_char(ch, SKILL_SKULK);
 
-  percent = rand_number(1, 101);	/* 101% is a complete failure */
+  percent = rand_number(1, 101); /* 101% is a complete failure */
 
   if (percent > GET_SKILL(ch, skill) + dex_app_skill[GET_DEX(ch)].sneak)
     return;
@@ -652,7 +679,6 @@ ACMD(do_sneak)
   SET_BIT_AR(af.bitvector, subcmd == SKILL_SKULK ? AFF_SKULK : AFF_SNEAK);
   affect_to_char(ch, &af);
 }
-
 ACMD(do_hide)
 {
   byte percent;
@@ -675,34 +701,160 @@ ACMD(do_hide)
   SET_BIT_AR(AFF_FLAGS(ch), AFF_HIDE);
 }
 
-ACMD(do_steal)
+static int theft_object_is_protected(struct obj_data *obj)
+{
+  return (!obj ||
+          OBJ_FLAGGED(obj, ITEM_NODROP) ||
+          OBJ_FLAGGED(obj, ITEM_NODONATE) ||
+          OBJ_FLAGGED(obj, ITEM_QUEST));
+}
+
+static int pickpocket_has_concealment(struct char_data *ch)
+{
+  if (!ch)
+    return FALSE;
+
+  return (AFF_FLAGGED(ch, AFF_SNEAK) ||
+          AFF_FLAGGED(ch, AFF_HIDE) ||
+          AFF_FLAGGED(ch, AFF_INVISIBLE) ||
+          AFF_FLAGGED(ch, AFF_SKULK));
+}
+
+static void break_pickpocket_concealment(struct char_data *ch)
+{
+  if (!ch)
+    return;
+
+  if (affected_by_spell(ch, SKILL_SKULK))
+    affect_from_char(ch, SKILL_SKULK);
+  if (affected_by_spell(ch, SKILL_SNEAK))
+    affect_from_char(ch, SKILL_SNEAK);
+  if (affected_by_spell(ch, SPELL_INVISIBLE))
+    affect_from_char(ch, SPELL_INVISIBLE);
+
+  REMOVE_BIT_AR(AFF_FLAGS(ch), AFF_SKULK);
+  REMOVE_BIT_AR(AFF_FLAGS(ch), AFF_SNEAK);
+  REMOVE_BIT_AR(AFF_FLAGS(ch), AFF_INVISIBLE);
+  REMOVE_BIT_AR(AFF_FLAGS(ch), AFF_HIDE);
+}
+
+static int pickpocket_detection_chance(struct char_data *ch,
+                                       struct char_data *vict)
+{
+  int chance = 45;
+
+  if (!ch || !vict)
+    return 100;
+
+  chance += (GET_LEVEL(vict) - GET_LEVEL(ch)) * 2;
+  chance += MAX(0, GET_WIS(vict) - 10) * 2;
+  chance += MAX(0, GET_DEX(vict) - 10);
+
+  chance -= GET_SKILL(ch, SKILL_PICKPOCKET) / 5;
+  chance -= MAX(0, GET_DEX(ch) - 10);
+
+  if (AFF_FLAGGED(ch, AFF_SKULK))
+    chance -= 15;
+  if (AFF_FLAGGED(ch, AFF_HIDE))
+    chance -= 10;
+  if (AFF_FLAGGED(ch, AFF_INVISIBLE))
+    chance -= 10;
+  if (AFF_FLAGGED(ch, AFF_SNEAK))
+    chance -= 5;
+
+  if (IS_NPC(vict) && MOB_FLAGGED(vict, MOB_AWARE))
+    chance += 15;
+  if (!AWAKE(vict))
+    chance -= 25;
+
+  return MAX(5, MIN(75, chance));
+}
+
+/*
+ * Requested currency is deliberately harder to lift in large quantities.
+ * Gold is common and comparatively easy; diamonds are compact but precious
+ * enough that taking several at once is much riskier.
+ */
+static int pickpocket_currency_penalty(long long amount, int diamonds)
+{
+  if (amount <= 0)
+    return 0;
+
+  if (diamonds) {
+    if (amount <= 1)  return 5;
+    if (amount <= 3)  return 10;
+    if (amount <= 5)  return 15;
+    if (amount <= 10) return 20;
+    if (amount <= 20) return 30;
+    return 40;
+  }
+
+  if (amount <= 10)      return 0;
+  if (amount <= 100)     return 5;
+  if (amount <= 1000)    return 10;
+  if (amount <= 10000)   return 20;
+  if (amount <= 100000)  return 30;
+  return 40;
+}
+
+/*
+ * Pickpocket is precise theft:
+ *
+ *   pickpocket <target> <item>
+ *   pickpocket <target> <amount> gold
+ *   pickpocket <target> <amount> coins
+ *   pickpocket <target> <amount> diamond(s)
+ *
+ * Items may only come from carried inventory, never worn equipment.
+ * Theft success and detection remain completely independent rolls.
+ */
+ACMD(do_pickpocket)
 {
   struct char_data *vict;
-  struct obj_data *obj;
-  char vict_name[MAX_INPUT_LENGTH], obj_name[MAX_INPUT_LENGTH];
-  int chance, roll, gold, pcsteal = 0, ohoh = 0;
+  struct obj_data *obj = NULL;
+  char vict_name[MAX_INPUT_LENGTH];
+  char first[MAX_INPUT_LENGTH];
+  char denom[MAX_INPUT_LENGTH];
+  char extra[MAX_INPUT_LENGTH];
+  char *rest;
+  int chance, roll, pcsteal = 0;
+  int detect_chance, detected;
+  int currency_kind = 0; /* 0=item, 1=gold, 2=diamonds */
+  int theft_succeeded = FALSE;
+  long long amount = 0;
 
-  if (IS_NPC(ch) || !GET_SKILL(ch, SKILL_STEAL)) {
+  if (IS_NPC(ch) || !GET_SKILL(ch, SKILL_PICKPOCKET)) {
     send_to_char(ch, "You have no idea how to do that.\r\n");
     return;
   }
+
   if (ROOM_FLAGGED(IN_ROOM(ch), ROOM_PEACEFUL)) {
     send_to_char(ch, "This room just has such a peaceful, easy feeling...\r\n");
     return;
   }
 
-  two_arguments(argument, vict_name, obj_name);
-  if (CMD_IS("steal")) {
-    char swap[MAX_INPUT_LENGTH];
-    strlcpy(swap, vict_name, sizeof(swap));
-    strlcpy(vict_name, obj_name, sizeof(vict_name));
-    strlcpy(obj_name, swap, sizeof(obj_name));
+  if (!pickpocket_has_concealment(ch)) {
+    send_to_char(ch,
+      "You need to be concealed before attempting to pickpocket someone.\r\n");
+    return;
+  }
+
+  rest = one_argument(argument, vict_name);
+  rest = one_argument(rest, first);
+
+  if (!*vict_name || !*first) {
+    send_to_char(ch,
+      "Usage: pickpocket <target> <item>\r\n"
+      "       pickpocket <target> <amount> <gold|coins|diamond(s)>\r\n");
+    return;
   }
 
   if (!(vict = get_char_vis(ch, vict_name, NULL, FIND_CHAR_ROOM))) {
-    send_to_char(ch, "Pickpocket whom for what?\r\n");
+    send_to_char(ch, "Pickpocket whom?\r\n");
     return;
-  } else if (vict == ch) {
+  }
+
+  if (vict == ch) {
     send_to_char(ch, "Come on now, that's rather stupid!\r\n");
     return;
   }
@@ -710,90 +862,451 @@ ACMD(do_steal)
   if (!CONFIG_PT_ALLOWED && !IS_NPC(vict))
     pcsteal = 1;
 
-  /* No stealing if not allowed. If it is no stealing from Imm's or Shopkeepers. */
-  if (GET_LEVEL(vict) >= LVL_IMMORT || pcsteal || GET_MOB_SPEC(vict) == shop_keeper) {
+  if (GET_LEVEL(vict) >= LVL_IMMORT ||
+      pcsteal ||
+      GET_MOB_SPEC(vict) == shop_keeper) {
     send_to_char(ch, "You cannot pickpocket that target.\r\n");
     return;
   }
 
-  /* This is the common, bounded Pickpocket chance.  Item weight and value
-   * are applied below only when an actual carried item is selected. */
-  chance = GET_SKILL(ch, SKILL_STEAL) + dex_app_skill[GET_DEX(ch)].p_pocket;
+  /*
+   * Parse either a single carried-item selector or an exact currency amount.
+   * Bare "gold"/"coins"/"diamonds" is intentionally not accepted: Pickpocket
+   * is the precision skill, so currency theft requires an amount.
+   */
+  if (is_number(first)) {
+    amount = strtoll(first, NULL, 10);
+    rest = one_argument(rest, denom);
+    rest = one_argument(rest, extra);
+
+    if (amount <= 0 || !*denom || *extra) {
+      send_to_char(ch,
+        "Usage: pickpocket <target> <amount> <gold|coins|diamond(s)>\r\n");
+      return;
+    }
+
+    if (!str_cmp(denom, "gold") ||
+        !str_cmp(denom, "coin") ||
+        !str_cmp(denom, "coins")) {
+      currency_kind = 1;
+    } else if (!str_cmp(denom, "diamond") ||
+               !str_cmp(denom, "diamonds")) {
+      if (amount > 2000000000LL) {
+        send_to_char(ch, "That is far too many diamonds to attempt at once.\r\n");
+        return;
+      }
+      currency_kind = 2;
+    } else {
+      send_to_char(ch,
+        "You can precisely pickpocket gold, coins, diamonds, or a carried item.\r\n");
+      return;
+    }
+  } else {
+    rest = one_argument(rest, extra);
+    if (*extra) {
+      send_to_char(ch,
+        "For an item, use one normal object keyword: pickpocket <target> <item>.\r\n");
+      return;
+    }
+
+    if (!str_cmp(first, "gold") ||
+        !str_cmp(first, "coin") ||
+        !str_cmp(first, "coins") ||
+        !str_cmp(first, "diamond") ||
+        !str_cmp(first, "diamonds")) {
+      send_to_char(ch,
+        "Specify exactly how much currency you want to take.\r\n");
+      return;
+    }
+  }
+
+  /*
+   * Level difference matters strongly.  A vastly superior thief should not
+   * repeatedly fail against a trivial target, while equal-level targets still
+   * care about proficiency and Dexterity.
+   */
+  chance = 20 + ((GET_SKILL(ch, SKILL_PICKPOCKET) * 3) / 4);
+  chance += dex_app_skill[GET_DEX(ch)].p_pocket;
   chance += (GET_LEVEL(ch) - GET_LEVEL(vict)) * 2;
   chance -= MAX(0, GET_DEX(vict) - 10);
   chance -= MAX(0, GET_WIS(vict) - 10) / 2;
+
   if (!AWAKE(vict))
-    chance += 30;
+    chance += 20;
 
-  if (str_cmp(obj_name, "coins") && str_cmp(obj_name, "gold")) {
+  if (currency_kind == 0) {
+    obj = get_obj_in_list_vis(ch, first, NULL, vict->carrying);
 
-    if (!(obj = get_obj_in_list_vis(ch, obj_name, NULL, vict->carrying))) {
-      act("$E is not carrying that item.", FALSE, ch, 0, vict, TO_CHAR);
+    /*
+     * A blind guess is allowed even without Peek, but it should not expose a
+     * complete inventory listing.  Missing the guessed object is still a real
+     * attempt and therefore still gets a detection roll below.
+     */
+    if (!obj) {
+      send_to_char(ch, "Your fingers find nothing matching that description.\r\n");
+    } else if (theft_object_is_protected(obj)) {
+      send_to_char(ch, "You cannot safely take that item.\r\n");
       return;
-    } else {			/* obj found in carried inventory only */
-
-      if (OBJ_FLAGGED(obj, ITEM_NODROP) || OBJ_FLAGGED(obj, ITEM_NODONATE) ||
-          OBJ_FLAGGED(obj, ITEM_QUEST)) {
-        send_to_char(ch, "You cannot safely take that item.\r\n");
-        return;
-      }
-
+    } else {
       chance -= GET_OBJ_WEIGHT(obj) * 2;
       chance -= MIN(20, MAX(0, GET_OBJ_COST(obj)) / 1000);
       chance = MAX(5, MIN(95, chance));
       roll = rand_number(1, 100);
 
-
       if (roll > chance) {
-	ohoh = TRUE;
-	send_to_char(ch, "Oops..\r\n");
-	act("$n tried to steal something from you!", FALSE, ch, 0, vict, TO_VICT);
-	act("$n tries to steal something from $N.", TRUE, ch, 0, vict, TO_NOTVICT);
-      } else {			/* Steal the item */
-	if (IS_CARRYING_N(ch) + 1 < CAN_CARRY_N(ch)) {
-          if (!give_otrigger(obj, vict, ch) ||
-              !receive_mtrigger(ch, vict, obj) ) {
-            send_to_char(ch, "Impossible!\r\n");
-            return;
-          }
-	  if (IS_CARRYING_W(ch) + GET_OBJ_WEIGHT(obj) < CAN_CARRY_W(ch)) {
-	    obj_from_char(obj);
-	    obj_to_char(obj, ch);
-	    send_to_char(ch, "Got it!\r\n");
-	  }
-	} else
-	  send_to_char(ch, "You cannot carry that much.\r\n");
+        send_to_char(ch, "Your fingers miss their mark.\r\n");
+      } else if (IS_CARRYING_N(ch) >= CAN_CARRY_N(ch) ||
+                 IS_CARRYING_W(ch) + GET_OBJ_WEIGHT(obj) > CAN_CARRY_W(ch)) {
+        send_to_char(ch, "You get hold of it, but cannot carry it away.\r\n");
+      } else if (!give_otrigger(obj, vict, ch) ||
+                 !receive_mtrigger(ch, vict, obj)) {
+        send_to_char(ch, "Something prevents you from taking it.\r\n");
+      } else {
+        obj_from_char(obj);
+        obj_to_char(obj, ch);
+        theft_succeeded = TRUE;
+        act("You quietly lift $p from $N.", FALSE, ch, obj, vict, TO_CHAR);
       }
     }
-  } else {			/* Steal some coins */
+  } else {
+    chance -= pickpocket_currency_penalty(amount, currency_kind == 2);
     chance = MAX(5, MIN(95, chance));
     roll = rand_number(1, 100);
+
     if (roll > chance) {
-      ohoh = TRUE;
-      send_to_char(ch, "Oops..\r\n");
-      act("You discover that $n has $s hands in your wallet.", FALSE, ch, 0, vict, TO_VICT);
-      act("$n tries to steal gold from $N.", TRUE, ch, 0, vict, TO_NOTVICT);
-    } else {
-      /* Steal some gold coins */
-      gold = (GET_GOLD(vict) * rand_number(1, 10)) / 100;
-      gold = MIN(1782, gold);
-      if (gold > 0) {
-		increase_gold(ch, gold);
-		decrease_gold(vict, gold);
-        if (gold > 1)
-	  send_to_char(ch, "Bingo!  You got %d gold coins.\r\n", gold);
-	else
-	  send_to_char(ch, "You manage to swipe a solitary gold coin.\r\n");
+      send_to_char(ch, "Your fingers miss the opening you were waiting for.\r\n");
+    } else if (currency_kind == 1) {
+      if (GET_GOLD(vict) < amount) {
+        send_to_char(ch,
+          "You cannot secure the amount of gold you reached for.\r\n");
       } else {
-	send_to_char(ch, "You couldn't get any gold...\r\n");
+        increase_money_gold(vict, -amount);
+        increase_money_gold(ch, amount);
+        theft_succeeded = TRUE;
+        send_to_char(ch, "You quietly lift %lld gold coin%s.\r\n",
+                     amount, amount == 1 ? "" : "s");
+      }
+    } else {
+      if ((long long)GET_DIAMONDS(vict) < amount) {
+        send_to_char(ch,
+          "You cannot secure the number of diamonds you reached for.\r\n");
+      } else {
+        decrease_diamonds(vict, (int)amount);
+        increase_diamonds(ch, (int)amount);
+        theft_succeeded = TRUE;
+        send_to_char(ch, "You quietly lift %lld diamond%s.\r\n",
+                     amount, amount == 1 ? "" : "s");
       }
     }
   }
 
-  if (!IS_NPC(ch) && vict && vict != ch)
+  /*
+   * Detection is independent of theft success.  This deliberately permits:
+   * success/unnoticed, success/caught, failure/unnoticed, and failure/caught.
+   */
+  detect_chance = pickpocket_detection_chance(ch, vict);
+  detected = (rand_number(1, 100) <= detect_chance);
 
-  if (ohoh && IS_NPC(vict) && AWAKE(vict))
+  if (!detected) {
+    if (theft_succeeded)
+      send_to_char(ch, "Your movements go unnoticed.\r\n");
+    else
+      send_to_char(ch, "Your failed attempt still goes unnoticed.\r\n");
+    return;
+  }
+
+  break_pickpocket_concealment(ch);
+
+  send_to_char(ch,
+               "A sudden reaction gives you away -- you've been caught!\r\n");
+  act("You catch $n trying to pick your pocket!",
+      FALSE, ch, 0, vict, TO_VICT);
+  act("$N catches $n with $s hand where it does not belong!",
+      TRUE, ch, 0, vict, TO_NOTVICT);
+
+  if (IS_NPC(vict) && !MOB_FLAGGED(vict, MOB_NOKILL)) {
+    if (GET_POS(vict) == POS_SLEEPING)
+      GET_POS(vict) = POS_STANDING;
+
+    /* A detected Pickpocket attempt is a hostile act.  Put both sides into
+     * the normal combat loop before the victim takes the immediate swing. */
+    if (!FIGHTING(vict) && GET_POS(vict) > POS_STUNNED)
+      set_fighting(vict, ch);
+    if (!FIGHTING(ch) && GET_POS(ch) > POS_STUNNED)
+      set_fighting(ch, vict);
+
     hit(vict, ch, TYPE_UNDEFINED);
+  } else if (IS_NPC(vict)) {
+    act("$N catches you, but is protected from retaliatory combat.",
+        FALSE, ch, 0, vict, TO_CHAR);
+  }
+}
+
+/*
+ * Steal is reckless, generic theft:
+ *
+ *   steal <target>
+ *
+ * The thief chooses only the victim.  One eligible possession is selected
+ * uniformly from carried inventory, equipped gear, carried gold, and carried
+ * diamonds.  The player has no control over what the grab lands on.
+ *
+ * Every legitimate attempt starts a five-round Steal cooldown.  NPC victims
+ * retaliate whether the attempt succeeds or fails.
+ */
+ACMD(do_steal)
+{
+  enum {
+    STEAL_OBJECT = 0,
+    STEAL_GOLD,
+    STEAL_DIAMONDS
+  };
+
+  struct char_data *vict;
+  struct obj_data *obj = NULL, *candidate;
+  char vict_name[MAX_INPUT_LENGTH], extra[MAX_INPUT_LENGTH];
+  int chance, roll;
+  int level_diff;
+  int eq_pos = -1;
+  int selected_eq_pos = -1;
+  int selected_kind = STEAL_OBJECT;
+  int eligible_count = 0;
+  int diamond_amount = 0;
+  int i;
+  long long gold_amount = 0;
+  long long max_gold_take;
+
+  if (IS_NPC(ch) || !GET_SKILL(ch, SKILL_STEAL)) {
+    send_to_char(ch, "You have no idea how to do that.\r\n");
+    return;
+  }
+
+  if (ROOM_FLAGGED(IN_ROOM(ch), ROOM_PEACEFUL)) {
+    send_to_char(ch, "This room just has such a peaceful, easy feeling...\r\n");
+    return;
+  }
+
+  two_arguments(argument, vict_name, extra);
+
+  if (!*vict_name || *extra) {
+    send_to_char(ch, "Usage: steal <target>\r\n");
+    return;
+  }
+
+  if (!(vict = get_char_vis(ch, vict_name, NULL, FIND_CHAR_ROOM))) {
+    send_to_char(ch, "Steal from whom?\r\n");
+    return;
+  }
+
+  if (vict == ch) {
+    send_to_char(ch, "Stealing from yourself would accomplish very little.\r\n");
+    return;
+  }
+
+  if (GET_LEVEL(vict) >= LVL_IMMORT) {
+    send_to_char(ch, "You cannot steal from that target.\r\n");
+    return;
+  }
+
+  if (!CONFIG_PT_ALLOWED && !IS_NPC(vict)) {
+    send_to_char(ch, "Player theft is not permitted here.\r\n");
+    return;
+  }
+
+  if (IS_NPC(vict) && MOB_FLAGGED(vict, MOB_NOKILL)) {
+    send_to_char(ch, "That target is protected from hostile actions.\r\n");
+    return;
+  }
+
+  if (spell_on_cooldown(ch, SKILL_STEAL)) {
+    send_to_char(ch,
+                 "You are not ready to attempt another reckless theft yet.\r\n");
+    return;
+  }
+
+  set_spell_cooldown(ch, SKILL_STEAL, 5);
+
+  /*
+   * Reservoir sampling keeps every eligible object and each physical currency
+   * pool as one equally selectable theft target without a fixed temporary
+   * array.
+   */
+  for (candidate = vict->carrying;
+       candidate;
+       candidate = candidate->next_content) {
+    if (theft_object_is_protected(candidate))
+      continue;
+
+    eligible_count++;
+    if (rand_number(1, eligible_count) == 1) {
+      selected_kind = STEAL_OBJECT;
+      obj = candidate;
+      selected_eq_pos = -1;
+    }
+  }
+
+  for (i = 0; i < NUM_WEARS; i++) {
+    candidate = GET_EQ(vict, i);
+
+    if (!candidate || theft_object_is_protected(candidate))
+      continue;
+
+    eligible_count++;
+    if (rand_number(1, eligible_count) == 1) {
+      selected_kind = STEAL_OBJECT;
+      obj = candidate;
+      selected_eq_pos = i;
+    }
+  }
+
+  if (GET_GOLD(vict) > 0) {
+    eligible_count++;
+    if (rand_number(1, eligible_count) == 1) {
+      selected_kind = STEAL_GOLD;
+      obj = NULL;
+      selected_eq_pos = -1;
+    }
+  }
+
+  if (GET_DIAMONDS(vict) > 0) {
+    eligible_count++;
+    if (rand_number(1, eligible_count) == 1) {
+      selected_kind = STEAL_DIAMONDS;
+      obj = NULL;
+      selected_eq_pos = -1;
+    }
+  }
+
+  level_diff = GET_LEVEL(ch) - GET_LEVEL(vict);
+
+  /*
+   * Reckless Steal is harder than Pickpocket, but no longer uses an artificial
+   * 40% equal-level ceiling or a 75% universal ceiling.  Level superiority is
+   * intentionally meaningful; comparable opponents simply impose a penalty.
+   */
+  chance = 25 + (GET_SKILL(ch, SKILL_STEAL) / 2);
+  chance += dex_app_skill[GET_DEX(ch)].p_pocket;
+  chance += level_diff * 2;
+  chance -= MAX(0, GET_DEX(vict) - 10);
+  chance -= MAX(0, GET_WIS(vict) - 10) / 2;
+
+  if (!AWAKE(vict))
+    chance += 15;
+
+  if (IS_NPC(vict) && level_diff >= -10 && level_diff <= 10)
+    chance -= 10;
+
+  chance = MAX(5, MIN(95, chance));
+  roll = rand_number(1, 100);
+
+  if (eligible_count <= 0) {
+    send_to_char(ch,
+                 "You make a reckless grab, but find nothing you can take.\r\n");
+    act("$n makes a reckless grab at $N but comes away empty-handed.",
+        TRUE, ch, 0, vict, TO_NOTVICT);
+  } else if (roll > chance) {
+    send_to_char(ch,
+                 "You make a reckless grab, but fail to steal anything.\r\n");
+    act("$n makes a brazen grab at you!",
+        FALSE, ch, 0, vict, TO_VICT);
+    act("$n makes a brazen grab at $N but fails.",
+        TRUE, ch, 0, vict, TO_NOTVICT);
+  } else if (selected_kind == STEAL_GOLD) {
+    max_gold_take = MIN(GET_GOLD(vict), 1782LL);
+
+    if (max_gold_take <= 0) {
+      send_to_char(ch,
+                   "Your reckless grab closes on an empty coin purse.\r\n");
+    } else {
+      gold_amount = (max_gold_take == 1)
+        ? 1
+        : (long long)rand_number(1, (int)max_gold_take);
+
+      increase_money_gold(vict, -gold_amount);
+      increase_money_gold(ch, gold_amount);
+
+      send_to_char(ch, "You snatch %lld gold coin%s from %s!\r\n",
+                   gold_amount,
+                   gold_amount == 1 ? "" : "s",
+                   GET_NAME(vict));
+      act("$n snatches coins from you!",
+          FALSE, ch, 0, vict, TO_VICT);
+      act("$n snatches coins from $N!",
+          TRUE, ch, 0, vict, TO_NOTVICT);
+    }
+  } else if (selected_kind == STEAL_DIAMONDS) {
+    diamond_amount = MIN(GET_DIAMONDS(vict), 10);
+
+    if (diamond_amount <= 0) {
+      send_to_char(ch,
+                   "Your reckless grab closes on an empty gem pouch.\r\n");
+    } else {
+      diamond_amount = rand_number(1, diamond_amount);
+      decrease_diamonds(vict, diamond_amount);
+      increase_diamonds(ch, diamond_amount);
+
+      send_to_char(ch, "You snatch %d diamond%s from %s!\r\n",
+                   diamond_amount,
+                   diamond_amount == 1 ? "" : "s",
+                   GET_NAME(vict));
+      act("$n snatches diamonds from you!",
+          FALSE, ch, 0, vict, TO_VICT);
+      act("$n snatches diamonds from $N!",
+          TRUE, ch, 0, vict, TO_NOTVICT);
+    }
+  } else if (IS_CARRYING_N(ch) >= CAN_CARRY_N(ch) ||
+             IS_CARRYING_W(ch) + GET_OBJ_WEIGHT(obj) > CAN_CARRY_W(ch)) {
+    send_to_char(ch,
+                 "You get hold of something, but cannot carry it away.\r\n");
+  } else if (!give_otrigger(obj, vict, ch) ||
+             !receive_mtrigger(ch, vict, obj)) {
+    send_to_char(ch,
+                 "Something prevents you from taking it.\r\n");
+  } else {
+    eq_pos = selected_eq_pos;
+
+    if (eq_pos >= 0)
+      obj = unequip_char(vict, eq_pos);
+    else
+      obj_from_char(obj);
+
+    if (obj) {
+      obj_to_char(obj, ch);
+
+      if (eq_pos >= 0) {
+        act("You wrench $p away from $N!",
+            FALSE, ch, obj, vict, TO_CHAR);
+        act("$n wrenches $p away from you!",
+            FALSE, ch, obj, vict, TO_VICT);
+        act("$n wrenches $p away from $N!",
+            TRUE, ch, obj, vict, TO_NOTVICT);
+      } else {
+        act("You snatch $p from $N!",
+            FALSE, ch, obj, vict, TO_CHAR);
+        act("$n snatches $p from you!",
+            FALSE, ch, obj, vict, TO_VICT);
+        act("$n snatches $p from $N!",
+            TRUE, ch, obj, vict, TO_NOTVICT);
+      }
+    }
+  }
+
+  /*
+   * Reckless theft always provokes an NPC victim, even if the thief failed or
+   * grabbed nothing.
+   */
+  if (IS_NPC(vict)) {
+    if (GET_POS(vict) == POS_SLEEPING)
+      GET_POS(vict) = POS_STANDING;
+
+    /* Reckless Steal always becomes a real fight, not a one-off free swing. */
+    if (!FIGHTING(vict) && GET_POS(vict) > POS_STUNNED)
+      set_fighting(vict, ch);
+    if (!FIGHTING(ch) && GET_POS(ch) > POS_STUNNED)
+      set_fighting(ch, vict);
+
+    hit(vict, ch, TYPE_UNDEFINED);
+  }
 }
 ACMD(do_skills)
 {
@@ -1775,18 +2288,33 @@ ACMD(do_buytrain)
 
 ACMD(do_visible)
 {
+  int changed = FALSE;
+
   if (GET_LEVEL(ch) >= LVL_IMMORT) {
     perform_immort_vis(ch);
     return;
   }
 
-  if AFF_FLAGGED(ch, AFF_INVISIBLE) {
+  if (AFF_FLAGGED(ch, AFF_INVISIBLE) || AFF_FLAGGED(ch, AFF_HIDE)) {
     appear(ch);
-    send_to_char(ch, "You break the spell of invisibility.\r\n");
-  } else
+    changed = TRUE;
+  }
+
+  if (AFF_FLAGGED(ch, AFF_SNEAK)) {
+    affect_from_char(ch, SKILL_SNEAK);
+    changed = TRUE;
+  }
+
+  if (AFF_FLAGGED(ch, AFF_SKULK)) {
+    affect_from_char(ch, SKILL_SKULK);
+    changed = TRUE;
+  }
+
+  if (changed)
+    send_to_char(ch, "You stop concealing yourself and become fully visible.\r\n");
+  else
     send_to_char(ch, "You are already visible.\r\n");
 }
-
 ACMD(do_title)
 {
   skip_spaces(&argument);

@@ -1807,7 +1807,8 @@ void advance_level(struct char_data *ch)
   else
     GET_PRACTICES(ch) += MIN(2, MAX(1, wis_app[GET_WIS(ch)].bonus));
 
-  GET_TRAINS(ch) += 1;
+  if ((GET_LEVEL(ch) % 10) == 0)
+    GET_TRAINS(ch) += 1;
 
 
   grant_new_abilities_one_percent(ch);
@@ -2095,9 +2096,10 @@ void init_spell_levels(void)
   spell_level(SKILL_SNEAK, CLASS_THIEF, 1);
   spell_level(SKILL_PICK_LOCK, CLASS_THIEF, 2);
   spell_level(SKILL_BACKSTAB, CLASS_THIEF, 3);
-  spell_level(SKILL_STEAL, CLASS_THIEF, 4);
+  spell_level(SKILL_STEAL, CLASS_THIEF, 20);
+  spell_level(SKILL_PICKPOCKET, CLASS_THIEF, 30);
   spell_level(SKILL_CIRCLE, CLASS_THIEF, 8);
-  spell_level(SKILL_PEEK, CLASS_THIEF, 10);
+  spell_level(SKILL_PEEK, CLASS_THIEF, 20);
   spell_level(SKILL_VANISH, CLASS_THIEF, 18);
   spell_level(SKILL_SKULK, CLASS_THIEF, 22);
   spell_level(SKILL_HIDE, CLASS_THIEF, 6);

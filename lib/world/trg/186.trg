@@ -200,6 +200,7 @@ if %actor.is_pc%
     end
   end
 end
+return 0
 ~
 #18691
 Academia - Halric Practice Key~
@@ -278,6 +279,7 @@ if %actor.is_pc%
     end
   end
 end
+return 0
 ~
 #18694
 Academia - Seraphine Recovery Practice~
@@ -303,6 +305,7 @@ if %actor.is_pc%
     end
   end
 end
+return 0
 ~
 #18695
 Academia - Miriel Communication Practice~
@@ -330,6 +333,7 @@ if %actor.is_pc%
     end
   end
 end
+return 0
 ~
 #18696
 Academia - Corren Navigation Start~
@@ -372,6 +376,7 @@ if %actor.is_pc% && %cmd% == score
     msend %actor% The spectral examiner says, 'You reached the chamber, but some lessons remain unfinished. Revisit the instructors above and practice what they asked of you.'
   end
 end
+return 0
 ~
 #18699
 Academia - Aldren Graduation Reward~

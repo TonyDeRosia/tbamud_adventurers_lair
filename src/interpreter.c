@@ -307,7 +307,7 @@ cpp_extern const struct command_info cmd_info[] = {
   { "put"      , "p"       , POS_RESTING , do_put      , 0, 0 },
   { "peace"    , "pe"      , POS_DEAD    , do_peace    , LVL_BUILDER, 0 },
   { "pick"     , "pi"      , POS_STANDING, do_gen_door , 1, SCMD_PICK },
-  { "pickpocket", "pickp"  , POS_STANDING, do_steal    , 1, 0 },
+  { "pickpocket", "pickp"  , POS_STANDING, do_pickpocket, 1, 0 },
   { "buypractice", "buyprac", POS_RESTING , do_buypractice , 0, 0 },
   { "buytrain" , "buytr"   , POS_RESTING , do_buytrain , 0, 0 },
   { "practice" , "pr"      , POS_RESTING , do_practice , 1, 0 },
@@ -409,7 +409,7 @@ cpp_extern const struct command_info cmd_info[] = {
   { "split"    , "split"   , POS_SITTING , do_split    , 1, 0 },
   { "stand"    , "st"      , POS_RESTING , do_stand    , 0, 0 },
   { "stat"     , "stat"    , POS_DEAD    , do_stat     , LVL_IMMORT, 0 },
-  { "steal"    , "ste"     , POS_STANDING, do_steal    , 1, 0 },
+  { "steal"    , "ste"     , POS_FIGHTING, do_steal    , 1, 0 },
   { "switch"   , "switch"  , POS_DEAD    , do_switch   , LVL_GOD, 0 },
 
   { "tell"     , "t"       , POS_DEAD    , do_tell     , 0, 0 },
@@ -615,8 +615,20 @@ void command_interpreter(struct char_data *ch, char *argument)
   char *line;
   char arg[MAX_INPUT_LENGTH];
 
-  REMOVE_BIT_AR(AFF_FLAGS(ch), AFF_HIDE);
+  /*
+   * Most commands break ordinary Hide immediately. Pickpocket is the one
+   * deliberate exception so do_pickpocket() can use Hide as concealment.
+   */
+  {
+    char hide_cmd[MAX_INPUT_LENGTH];
+    char *hide_arg = argument;
 
+    skip_spaces(&hide_arg);
+    one_argument(hide_arg, hide_cmd);
+
+    if (strlen(hide_cmd) < 5 || !is_abbrev(hide_cmd, "pickpocket"))
+      REMOVE_BIT_AR(AFF_FLAGS(ch), AFF_HIDE);
+  }
   /* just drop to next line for hitting CR */
   skip_spaces(&argument);
   if (!*argument)

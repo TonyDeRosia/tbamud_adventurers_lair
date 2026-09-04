@@ -178,7 +178,8 @@ static void do_auto_exits(struct char_data *ch);
 static void list_char_to_char(struct char_data *list, struct char_data *ch);
 static void list_one_char(struct char_data *i, struct char_data *ch);
 static void look_at_char(struct char_data *i, struct char_data *ch);
-static int can_view_mob_inventory(struct char_data *viewer, struct char_data *target);
+static int can_view_target_inventory(struct char_data *viewer, struct char_data *target);
+static void show_peeked_currency_to_char(struct char_data *viewer, struct char_data *target);
 static void show_mob_equipment_to_char(struct char_data *viewer, struct char_data *target);
 static void look_at_target(struct char_data *ch, char *arg);
 static void look_in_direction(struct char_data *ch, int dir);
@@ -388,10 +389,10 @@ static void diag_char_to_char(struct char_data *i, struct char_data *ch)
     {  90, "has a few scratches."            },
     {  75, "has some small wounds and bruises."        },
     {  50, "has quite a few wounds."            },
-    {  30, "has some big nasty wounds and scratches."    },
-    {  15, "looks pretty hurt."                },
-    {   0, "is in awful condition."            },
-    {  -1, "is bleeding awfully from big wounds."    },
+    {  30, "is badly wounded."    },
+    {  15, "is gravely wounded."                },
+    {   0, "is barely holding on."            },
+    {  -1, "is bleeding heavily and near death."    },
   };
   int percent, ar_index;
   const char *pers = PERS(i, ch);
@@ -412,54 +413,165 @@ static void look_at_char(struct char_data *i, struct char_data *ch)
 {
   struct obj_data *obj;
   int revealed;
+
   if (!ch->desc)
     return;
 
-   if (i->player.description)
+  if (i->player.description)
     send_to_char(ch, "%s", i->player.description);
   else
     act("You see nothing special about $m.", FALSE, i, 0, ch, TO_VICT);
 
   diag_char_to_char(i, ch);
-  if (IS_NPC(i)) {
+
+  /*
+   * Obvious worn equipment remains visible on NPCs exactly as before.
+   * Hidden carried inventory and currencies require Peek.
+   */
+  if (IS_NPC(i))
     show_mob_equipment_to_char(ch, i);
 
-    if (ch != i && can_view_mob_inventory(ch, i)) {
-      act("\r\nYou size up what $n is carrying:", FALSE, i, 0, ch, TO_VICT);
-      revealed = GET_LEVEL(ch) >= LVL_IMMORT ? 999 : MAX(1, GET_SKILL(ch, SKILL_PEEK) / 20);
-      if (!i->carrying)
-        send_to_char(ch, " Nothing.\r\n");
-      else {
-        for (obj = i->carrying; obj && revealed > 0; obj = obj->next_content) {
-          if (!CAN_SEE_OBJ(ch, obj))
-            continue;
-          show_obj_to_char(obj, ch, SHOW_OBJ_SHORT);
-          revealed--;
-        }
+  if (ch != i && can_view_target_inventory(ch, i)) {
+    act("\r\nYou discreetly size up what $n is carrying:",
+        FALSE, i, 0, ch, TO_VICT);
+
+    revealed = GET_LEVEL(ch) >= LVL_IMMORT
+      ? 999
+      : MAX(1, GET_SKILL(ch, SKILL_PEEK) / 20);
+
+    if (!i->carrying) {
+      send_to_char(ch, " Nothing.\r\n");
+    } else {
+      int shown = 0;
+
+      for (obj = i->carrying; obj && revealed > 0; obj = obj->next_content) {
+        if (!CAN_SEE_OBJ(ch, obj))
+          continue;
+
+        show_obj_to_char(obj, ch, SHOW_OBJ_SHORT);
+        revealed--;
+        shown++;
       }
+
+      if (!shown)
+        send_to_char(ch, " Nothing you can make out clearly.\r\n");
     }
+
+    show_peeked_currency_to_char(ch, i);
   }
 }
 
-static int can_view_mob_inventory(struct char_data *viewer, struct char_data *target)
+static int can_view_target_inventory(struct char_data *viewer,
+                                     struct char_data *target)
 {
-  if (!viewer || !target || !IS_NPC(target))
+  int chance;
+
+  if (!viewer || !target || viewer == target)
+    return FALSE;
+
+  /*
+   * Even immortals must possess Peek to use the Peek display.  Immortals
+   * normally have all skills, but this keeps the information gate explicit.
+   */
+  if (!GET_SKILL(viewer, SKILL_PEEK))
     return FALSE;
 
   if (GET_LEVEL(viewer) >= LVL_IMMORT)
     return TRUE;
 
-  if (!GET_SKILL(viewer, SKILL_PEEK))
-    return FALSE;
+  chance = 20 + ((GET_SKILL(viewer, SKILL_PEEK) * 3) / 4);
+  chance += dex_app_skill[GET_DEX(viewer)].p_pocket;
+  chance += GET_LEVEL(viewer) - GET_LEVEL(target);
+  chance -= MAX(0, GET_WIS(target) - 10);
 
-  if (rand_number(1, 100) > GET_SKILL(viewer, SKILL_PEEK)) {
+  if (!AWAKE(target))
+    chance += 20;
+
+  chance = MAX(5, MIN(95, chance));
+
+  if (rand_number(1, 100) > chance) {
     improve_ability_from_use(viewer, SKILL_PEEK, FALSE);
     return FALSE;
   }
+
   improve_ability_from_use(viewer, SKILL_PEEK, TRUE);
   return TRUE;
 }
 
+static void show_peeked_currency_to_char(struct char_data *viewer,
+                                         struct char_data *target)
+{
+  int skill;
+  int diamonds;
+  long long gold;
+  long long approx_gold;
+
+  if (!viewer || !target)
+    return;
+
+  skill = GET_LEVEL(viewer) >= LVL_IMMORT
+    ? 100
+    : GET_SKILL(viewer, SKILL_PEEK);
+
+  gold = GET_GOLD(target);
+  diamonds = GET_DIAMONDS(target);
+
+  send_to_char(viewer, "\r\nPurse and valuables:\r\n");
+
+  if (skill >= 80) {
+    send_to_char(viewer, "  Gold: %lld\r\n", gold);
+    send_to_char(viewer, "  Diamonds: %d\r\n", diamonds);
+    return;
+  }
+
+  if (skill >= 60) {
+    approx_gold = (gold / 10LL) * 10LL;
+    send_to_char(viewer, "  Gold: about %lld\r\n", approx_gold);
+
+    if (diamonds <= 0)
+      send_to_char(viewer, "  Diamonds: none that you can discern\r\n");
+    else if (diamonds == 1)
+      send_to_char(viewer, "  Diamonds: about one\r\n");
+    else if (diamonds <= 3)
+      send_to_char(viewer, "  Diamonds: a couple\r\n");
+    else if (diamonds <= 7)
+      send_to_char(viewer, "  Diamonds: a few\r\n");
+    else
+      send_to_char(viewer, "  Diamonds: several\r\n");
+
+    return;
+  }
+
+  if (skill >= 40) {
+    approx_gold = (gold / 50LL) * 50LL;
+
+    if (gold <= 0)
+      send_to_char(viewer, "  Gold: none that you can discern\r\n");
+    else if (approx_gold <= 0)
+      send_to_char(viewer, "  Gold: fewer than 50\r\n");
+    else
+      send_to_char(viewer, "  Gold: roughly %lld or more\r\n", approx_gold);
+
+    if (diamonds <= 0)
+      send_to_char(viewer, "  Diamonds: no obvious sign\r\n");
+    else
+      send_to_char(viewer, "  Diamonds: at least some\r\n");
+
+    return;
+  }
+
+  if (gold <= 0)
+    send_to_char(viewer, "  Coin purse: sounds nearly empty\r\n");
+  else if (gold < 25)
+    send_to_char(viewer, "  Coin purse: lightly weighted\r\n");
+  else if (gold < 250)
+    send_to_char(viewer, "  Coin purse: modestly weighted\r\n");
+  else
+    send_to_char(viewer, "  Coin purse: heavily weighted\r\n");
+
+  send_to_char(viewer,
+               "  Diamonds: you cannot judge their presence reliably\r\n");
+}
 static void show_mob_equipment_to_char(struct char_data *viewer, struct char_data *target)
 {
   int j, found = FALSE;

@@ -293,6 +293,7 @@ ACMD(do_save);
 ACMD(do_sneak);
 ACMD(do_split);
 ACMD(do_steal);
+ACMD(do_pickpocket);
 ACMD(do_embalm);
 ACMD(do_title);
 ACMD(do_visible);

@@ -726,7 +726,7 @@ void clanedit_parse(struct descriptor_data *d, char *arg);
 #define MAX_TITLE_LENGTH      80     /**< Max PC title length */
 #define HOST_LENGTH           40     /**< Max hostname resolution length */
 #define PLR_DESC_LENGTH       4096   /**< Max length for PC description */
-#define MAX_SKILLS            268    /**< Max number of skills/spells */
+#define MAX_SKILLS            269    /**< Max number of skills/spells */
 #define MAX_AFFECT            32     /**< Max number of player affections */
 #define MAX_OBJ_AFFECT        6      /**< Max object affects */
 #define MAX_NOTE_LENGTH       4000   /**< Max length of text on a note obj */

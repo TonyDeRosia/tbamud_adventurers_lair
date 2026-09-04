@@ -279,18 +279,48 @@ static int is_embalmable_remains(const struct obj_data *obj)
 enum combat_skill_result perform_backstab(struct char_data *ch,
     struct char_data *vict, int proficiency, int improve)
 {
-  int percent, success;
+  int percent, success, move_cost;
 
   if (!physical_skill_target_ok(ch, vict) || GET_POS(ch) < POS_STANDING ||
       !GET_EQ(ch, WEAR_WIELD) ||
       GET_OBJ_VAL(GET_EQ(ch, WEAR_WIELD), 3) != TYPE_PIERCE - TYPE_HIT ||
       FIGHTING(vict) || is_owned_follower_target(ch, vict))
     return COMBAT_SKILL_NOT_ATTEMPTED;
+
+  /* Player Backstab attempts pay the configured physical-skill cost from MOVE.
+   * DG-scripted NPC backstabs call this helper with improve == FALSE and keep
+   * their existing resource behavior. */
+  move_cost = MAX(0, spell_info[SKILL_BACKSTAB].mana_min);
+  if (improve && GET_LEVEL(ch) < LVL_IMMORT && GET_MOVE(ch) < move_cost) {
+    send_to_char(ch, "You are too exhausted to attempt a backstab.\r\n");
+    return COMBAT_SKILL_NOT_ATTEMPTED;
+  }
+  if (improve && GET_LEVEL(ch) < LVL_IMMORT && move_cost > 0)
+    GET_MOVE(ch) = MAX(0, GET_MOVE(ch) - move_cost);
+
+  /* Backstab is an aggressive action and breaks voluntary concealment. */
+  if (AFF_FLAGGED(ch, AFF_INVISIBLE) || AFF_FLAGGED(ch, AFF_HIDE))
+    appear(ch);
+  if (AFF_FLAGGED(ch, AFF_SNEAK))
+    affect_from_char(ch, SKILL_SNEAK);
+  if (AFF_FLAGGED(ch, AFF_SKULK))
+    affect_from_char(ch, SKILL_SKULK);
   if (MOB_FLAGGED(vict, MOB_AWARE) && AWAKE(vict)) {
     act("You notice $N lunging at you!", FALSE, vict, 0, ch, TO_CHAR);
     act("$e notices you lunging at $m!", FALSE, vict, 0, ch, TO_VICT);
     act("$n notices $N lunging at $m!", FALSE, vict, 0, ch, TO_NOTVICT);
+
+    /* Spotting the ambush turns it into a real fight, not a one-off swing. */
+    if (!FIGHTING(vict) && GET_POS(vict) > POS_STUNNED)
+      set_fighting(vict, ch);
+    if (!FIGHTING(ch) && GET_POS(ch) > POS_STUNNED)
+      set_fighting(ch, vict);
+
     hit(vict, ch, TYPE_UNDEFINED);
+
+    if (improve)
+      improve_ability_from_use(ch, SKILL_BACKSTAB, FALSE);
+    WAIT_STATE(ch, 2 * PULSE_VIOLENCE);
     return COMBAT_SKILL_ATTEMPTED;
   }
   percent = rand_number(1, 101);

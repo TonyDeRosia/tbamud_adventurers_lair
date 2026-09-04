@@ -461,8 +461,8 @@ void send_char_pos(struct char_data *ch, int dam)
       send_to_char(ch, "You're stunned, but will probably regain consciousness again.\r\n");
       break;
     case POS_DEAD:
-      act("$n is dead!  R.I.P.", FALSE, ch, 0, 0, TO_ROOM);
-      send_to_char(ch, "You are dead!  Sorry...\r\n");
+      act("$n falls lifeless.", FALSE, ch, 0, 0, TO_ROOM);
+      send_to_char(ch, "You have been slain.\r\n");
       break;
     default:                        /* >= POSITION SLEEPING */
       if (dam > (GET_MAX_HIT(ch) >> 2))

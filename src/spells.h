@@ -315,6 +315,7 @@
 #define SKILL_EMBALM                266
 #define SKILL_NERVE_PINCH           267
 #define SKILL_DECAPITATE             268
+#define SKILL_PICKPOCKET             269
 /* New skills may be added here up to MAX_SKILLS (see structs.h). */
 
 /* NON-PLAYER AND OBJECT SPELLS AND SKILLS: The practice levels for the spells

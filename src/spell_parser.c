@@ -23,6 +23,7 @@
 #include "db.h"
 #include "dg_scripts.h"
 #include "fight.h"  /* for hit() */
+#include "act.h"
 #include "criticalhits.h"
 #include "tome.h"
 
@@ -2477,10 +2478,6 @@ static void perform_automatic_buff_sequence(struct char_data *ch,
     send_to_char(ch, "You don't know any buff spells to cast.\r\n");
   } else if (!any_attempted) {
     send_to_char(ch, "You don't have the energy to cast any buffs right now.\r\n");
-  } else {
-    send_to_char(ch,
-        "Spellup complete: %d cast, %d already active, %d low mana, %d blocked in combat.\r\n",
-        cast_count, skipped_active, skipped_mana, skipped_combat);
   }
 }
 
@@ -2500,6 +2497,11 @@ ACMD(do_spellup)
       return;
     }
   }
+  if (tch == ch &&
+      GET_SKILL(ch, SKILL_SNEAK) > 0 &&
+      !AFF_FLAGGED(ch, AFF_SNEAK) &&
+      !AFF_FLAGGED(ch, AFF_SKULK))
+    do_sneak(ch, "", 0, SKILL_SNEAK);
   perform_automatic_buff_sequence(ch, tch, tch != ch);
 }
 
@@ -3527,7 +3529,8 @@ void mag_assign_spells(void) {
   skillo_cost(SKILL_PICK_LOCK, "pick lock", 5);
   skillo_cost(SKILL_RESCUE, "rescue", 10);
   skillo_cost(SKILL_SNEAK, "sneak", 5);
-  skillo_cost(SKILL_STEAL, "pickpocket", 5);
+  skillo_cost(SKILL_STEAL, "steal", 5);
+  skillo_cost(SKILL_PICKPOCKET, "pickpocket", 5);
   skillo_cost(SKILL_TRACK, "track", 5);
   skillo_cost(SKILL_WHIRLWIND, "whirlwind", 20);
   skillo_cost(SKILL_BANDAGE, "bandage", 8);

@@ -618,9 +618,9 @@ static const char *victim_condition_text(int band)
     case 1: return "has a few scratches.";
     case 2: return "has some small wounds and bruises.";
     case 3: return "has quite a few wounds.";
-    case 4: return "has some big nasty wounds and scratches.";
+    case 4: return "is badly wounded.";
     case 5: return "is gravely injured.";
-    default: return "needs a hospital.";
+    default: return "is barely clinging to life.";
   }
 }
 
@@ -949,6 +949,14 @@ void set_fighting(struct char_data *ch, struct char_data *vict)
 {
   if (ch == vict)
     return;
+  /* Entering real combat breaks mobile concealment.  This is centralized here
+   * so ordinary attacks, theft retaliation, assists, and scripted combat all
+   * obey the same Sneak/Skulk rule.  Vanish still works because it stops combat
+   * first and applies Sneak afterward. */
+  if (AFF_FLAGGED(ch, AFF_SNEAK))
+    affect_from_char(ch, SKILL_SNEAK);
+  if (AFF_FLAGGED(ch, AFF_SKULK))
+    affect_from_char(ch, SKILL_SKULK);
 
   if (FIGHTING(ch)) {
     core_dump();
@@ -1464,7 +1472,7 @@ static void solo_gain(struct char_data *ch, struct char_data *victim)
   if (final_gain > 1)
     send_to_char(ch, "You receive \ty%d\tn \tCexperience\tn points.\r\n", final_gain);
   else if (final_gain == 1)
-    send_to_char(ch, "You receive one lousy experience point.\r\n");
+    send_to_char(ch, "You receive \ty1\tn \tCexperience\tn point.\r\n");
   else
     send_to_char(ch, "You receive no experience points.\r\n");
 
@@ -2248,6 +2256,7 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
   if (!IS_WEAPON(attacktype)) {
     /* Always add a short severity verb line for spells, skills, DoTs. */
     int shown = skill_message(dam, ch, victim, attacktype);
+    int physical_skill = (attacktype > MAX_SPELLS && attacktype <= MAX_SKILLS);
     if (!shown && dam > 0 && IN_ROOM(victim) != NOWHERE) {
       static const char *const v3[] = {
         "misses", "grazes", "glances", "hits", "strikes", "slams", "crushes", "blasts", "shreds", "pulverizes"
@@ -2263,9 +2272,9 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
       if (tier > 9) tier = 9;
       if (ch) {
         char to_char[160], to_vict[160], to_room[160];
-        snprintf(to_char, sizeof(to_char), "Your magic %s%s%s%s\tn $N.", col, pre, v3[tier], post);
-        snprintf(to_vict, sizeof(to_vict), "$n's magic %s%s%s%s\tn you.", col, pre, v3[tier], post);
-        snprintf(to_room, sizeof(to_room), "$n's magic %s%s%s%s\tn $N.", col, pre, v3[tier], post);
+        snprintf(to_char, sizeof(to_char), physical_skill ? "Your strike %s%s%s%s\tn $N." : "Your magic %s%s%s%s\tn $N.", col, pre, v3[tier], post);
+        snprintf(to_vict, sizeof(to_vict), physical_skill ? "$n's strike %s%s%s%s\tn you." : "$n's magic %s%s%s%s\tn you.", col, pre, v3[tier], post);
+        snprintf(to_room, sizeof(to_room), physical_skill ? "$n's strike %s%s%s%s\tn $N." : "$n's magic %s%s%s%s\tn $N.", col, pre, v3[tier], post);
         act(to_room, FALSE, ch, NULL, victim, TO_NOTVICT);
         act(to_char, FALSE, ch, NULL, victim, TO_CHAR);
         act(to_vict, FALSE, ch, NULL, victim, TO_VICT | TO_SLEEP);
@@ -2280,9 +2289,15 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
     } else if (!shown) {
       /* If a spell has no messages and did 0 damage, still show something. */
       if (ch) {
-        act("Your magic misses $N.", FALSE, ch, NULL, victim, TO_CHAR);
-        act("$n's magic misses you.", FALSE, ch, NULL, victim, TO_VICT | TO_SLEEP);
-        act("$n's magic misses $N.", FALSE, ch, NULL, victim, TO_NOTVICT);
+        if (physical_skill) {
+          act("Your strike misses $N.", FALSE, ch, NULL, victim, TO_CHAR);
+          act("$n's strike misses you.", FALSE, ch, NULL, victim, TO_VICT | TO_SLEEP);
+          act("$n's strike misses $N.", FALSE, ch, NULL, victim, TO_NOTVICT);
+        } else {
+          act("Your magic misses $N.", FALSE, ch, NULL, victim, TO_CHAR);
+          act("$n's magic misses you.", FALSE, ch, NULL, victim, TO_VICT | TO_SLEEP);
+          act("$n's magic misses $N.", FALSE, ch, NULL, victim, TO_NOTVICT);
+        }
       } else {
         send_to_char(victim, "You suffer.\r\n");
         act("$n suffers.", TRUE, victim, 0, 0, TO_ROOM);
@@ -2325,8 +2340,8 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
     send_to_char(victim, "You're stunned, but will probably regain consciousness again.\r\n");
     break;
   case POS_DEAD:
-    act("$n is dead!  \tYR.I.P.\tn", FALSE, victim, 0, 0, TO_ROOM);
-    send_to_char(victim, "You are dead!  Sorry...\r\n");
+    act("$n falls lifeless.", FALSE, victim, 0, 0, TO_ROOM);
+    send_to_char(victim, "You have been slain.\r\n");
     break;
 
   default:			/* >= POSITION SLEEPING */
