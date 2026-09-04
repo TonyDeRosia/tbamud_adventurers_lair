@@ -70,6 +70,21 @@ def test_pickpocket_probabilities_and_combat_contracts_remain():
     assert "Entering real combat breaks mobile concealment" in FIGHT
 
 
+def test_npc_stealth_never_reads_player_skill_storage():
+    helper_start = HANDLER.index("static int concealment_skill_proficiency")
+    score_start = HANDLER.index("int get_concealment_score", helper_start)
+    score_end = HANDLER.index("int get_detection_score", score_start)
+    helper = HANDLER[helper_start:score_start]
+    scoring = HANDLER[score_start:score_end]
+
+    assert "IS_NPC(target)" in helper
+    assert "GET_LEVEL(target)" in helper
+    assert "GET_SKILL(target, skill)" in helper
+    assert "GET_SKILL(target, SKILL_SNEAK)" not in scoring
+    assert "GET_SKILL(target, SKILL_SKULK)" not in scoring
+    assert "concealment_skill_proficiency(target, SKILL_SNEAK)" in scoring
+    assert "concealment_skill_proficiency(target, SKILL_SKULK)" in scoring
+
 if __name__ == "__main__":
     tests = [value for name, value in sorted(globals().items())
              if name.startswith("test_") and callable(value)]

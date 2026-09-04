@@ -1691,6 +1691,23 @@ static int stored_hide_potency(struct char_data *target)
   return PERCEPTION_HIDE_BASE + (target ? GET_LEVEL(target) / 2 : 0);
 }
 
+static int concealment_skill_proficiency(struct char_data *target, int skill)
+{
+  if (!target)
+    return 0;
+
+  /*
+   * GET_SKILL() is backed by player_specials and must never be used on NPCs.
+   * Mobs can still legitimately carry AFF_SNEAK/AFF_SKULK from prototypes,
+   * scripts, or other systems, so give them a bounded level-derived
+   * proficiency equivalent instead of touching player-only storage.
+   */
+  if (IS_NPC(target))
+    return MAX(0, MIN(100, GET_LEVEL(target)));
+
+  return MAX(0, MIN(100, GET_SKILL(target, skill)));
+}
+
 int get_concealment_score(struct char_data *target,
                           enum perception_context context)
 {
@@ -1703,9 +1720,11 @@ int get_concealment_score(struct char_data *target,
   if (context == PERCEIVE_MOVEMENT || context == PERCEIVE_AGGRESSION ||
       context == PERCEIVE_THEFT) {
     if (AFF_FLAGGED(target, AFF_SKULK))
-      score += PERCEPTION_SKULK_BONUS + GET_SKILL(target, SKILL_SKULK) / 2;
+      score += PERCEPTION_SKULK_BONUS +
+          concealment_skill_proficiency(target, SKILL_SKULK) / 2;
     else if (AFF_FLAGGED(target, AFF_SNEAK))
-      score += PERCEPTION_SNEAK_BONUS + GET_SKILL(target, SKILL_SNEAK) / 3;
+      score += PERCEPTION_SNEAK_BONUS +
+          concealment_skill_proficiency(target, SKILL_SNEAK) / 3;
   }
   return score;
 }
