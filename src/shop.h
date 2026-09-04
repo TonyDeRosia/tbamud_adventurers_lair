@@ -14,6 +14,7 @@
 
 /* Public function prototypes */
 SPECIAL(shop_keeper);
+void list_quest_point_shop(struct char_data *ch, struct char_data *keeper);
 void boot_the_shops(FILE *shop_f, char *filename, int rec_count);
 void assign_the_shopkeepers(void);
 void show_shops(struct char_data *ch, char *arg);

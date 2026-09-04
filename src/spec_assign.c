@@ -124,7 +124,6 @@ void assign_mobiles(void)
       }
     }
   }
-
   ASSIGNMOB(110, postmaster);
   ASSIGNMOB(1201, postmaster);
   ASSIGNMOB(3010, postmaster);

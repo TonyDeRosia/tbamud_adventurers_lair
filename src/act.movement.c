@@ -402,7 +402,7 @@ ACMD(do_runto)
         continue;
       if (!CAN_SEE(ch, mob))
         continue;
-      if (GET_MOB_SPEC(mob) != questmaster)
+      if (!is_questmaster_mob(mob))
         continue;
       if (GET_KQUEST_GIVER(ch) != NOBODY && GET_MOB_VNUM(mob) != GET_KQUEST_GIVER(ch))
         continue;

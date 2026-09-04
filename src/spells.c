@@ -1129,6 +1129,7 @@ static void clear_shadow_servant_role_flags(struct char_data *mob)
   REMOVE_BIT_AR(MOB_FLAGS(mob), MOB_NOBLIND);
   REMOVE_BIT_AR(MOB_FLAGS(mob), MOB_NOKILL);
   REMOVE_BIT_AR(MOB_FLAGS(mob), MOB_GUILD_MASTER);
+  REMOVE_BIT_AR(MOB_FLAGS(mob), MOB_QUEST_MASTER);
 }
 
 static void init_shadow_servant_base(struct char_data *mob, struct char_data *owner, int rounds, int silent_follow)

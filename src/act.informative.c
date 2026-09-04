@@ -959,7 +959,7 @@ static bool room_has_quest_or_spec(room_rnum rnum)
     if (!IS_MOB(mob))
       continue;
 
-    if (GET_MOB_SPEC(mob) == questmaster)
+    if (is_questmaster_mob(mob))
       return TRUE;
   }
 

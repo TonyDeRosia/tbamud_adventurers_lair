@@ -59,6 +59,7 @@ static const char *action_bits_olc[] = {
   "GUILD_MASTER",
   "RESERVED",
   "RARE",
+  "QUEST_MASTER",
   "\n"
 };
 

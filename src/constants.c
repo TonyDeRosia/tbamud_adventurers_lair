@@ -214,6 +214,7 @@ const char *action_bits[] = {
   "GUILD_MASTER",
   "NOTDEADYET",
   "RARE",
+  "QUEST_MASTER",
   "DEAD",    /* You should never see this. */
   "\n"
 };

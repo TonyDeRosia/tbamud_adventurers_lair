@@ -25,15 +25,14 @@
 #define MAX_QUEST_DESC     75   /* Length of quest description          */
 #define MAX_QUEST_MSG    2048   /* Length of quest message strings      */
 
-#define SCMD_QUEST_LIST     0   /* List quests available at questmaster */
-#define SCMD_QUEST_HISTORY  1   /* Show history of completed quests     */
-#define SCMD_QUEST_JOIN     2   /* Join a quest at a questmaster        */
-#define SCMD_QUEST_LEAVE    3   /* Leave a quest                        */
-#define SCMD_QUEST_PROGRESS 4   /* Show progress of current quest       */
-#define SCMD_QUEST_STATUS   5   /* Show complete details of a quest     */
-#define SCMD_QUEST_REQUEST  6   /* Request dynamic kill quest           */
-#define SCMD_QUEST_INFO     7   /* Show dynamic quest target info       */
-#define SCMD_QUEST_COMPLETE 8   /* Turn in dynamic quest                */
+#define SCMD_QUEST_REQUEST  0   /* Request dynamic Guild contract       */
+#define SCMD_QUEST_LIST     1   /* List Quest Point reward catalog      */
+#define SCMD_QUEST_BUY      2   /* Purchase from Quest Point catalog    */
+#define SCMD_QUEST_PROGRESS 3   /* Show dynamic contract progress       */
+#define SCMD_QUEST_DROP     4   /* Drop dynamic Guild contract          */
+#define SCMD_QUEST_INFO     5   /* Show dynamic quest target info       */
+#define SCMD_QUEST_COMPLETE 6   /* Turn in dynamic quest                */
+#define SCMD_QUEST_STATUS   7   /* Immortal legacy quest inspection     */
 /* AQ Flags (much room for expansion) ********************************* */
 #define AQ_REPEATABLE (1 << 0)  /* Quest can be repeated                */
 #define NUM_AQ_FLAGS        1
@@ -110,9 +109,11 @@ bool is_on_quest(struct char_data *ch);
 bool is_quest_ready(struct char_data *ch);
 bool is_quest_expired(struct char_data *ch);
 bool is_on_quest_cooldown(struct char_data *ch);
+bool is_questmaster_mob(struct char_data *mob);
 SPECIAL(questmaster);
 ACMD(do_quest);
 ACMD(do_campaign);
+ACMD(do_qvalidate);
 /* Implemented in qedit.c  */
 void qedit_parse(struct descriptor_data *d, char *arg);
 void qedit_string_cleanup(struct descriptor_data *d, int terminator);

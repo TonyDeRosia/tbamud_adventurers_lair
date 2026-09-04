@@ -270,7 +270,9 @@ void clanedit_parse(struct descriptor_data *d, char *arg);
 #define MOB_NOTDEADYET     20   /**< (R) Mob being extracted */
 #define MOB_RARE           21   /**< Explicit builder-controlled rare mob */
 
-#define NUM_MOB_FLAGS      22
+#define MOB_QUEST_MASTER   22   /**< Builder-controlled shared questmaster service */
+
+#define NUM_MOB_FLAGS      23
 
 /* Preference flags: used by char_data.player_specials.pref */
 #define PRF_BRIEF         0   /**< Room descs won't normally be shown */

@@ -153,14 +153,9 @@ static int is_ok_char(struct char_data *keeper, struct char_data *ch, int shop_n
   if (IS_NPC(ch))
     return (TRUE);
 
-  if ((IS_MAGIC_USER(ch) && NOTRADE_MAGIC_USER(shop_nr)) ||
-      (IS_CLERIC(ch) && NOTRADE_CLERIC(shop_nr)) ||
-      (IS_THIEF(ch) && NOTRADE_THIEF(shop_nr)) ||
-      (IS_WARRIOR(ch) && NOTRADE_WARRIOR(shop_nr))) {
-    snprintf(buf, sizeof(buf), "%s %s", GET_NAME(ch), MSG_NO_SELL_CLASS);
-    do_tell(keeper, buf, cmd_tell, 0);
-    return (FALSE);
-  }
+  /* Adventurer's Lair: shops never refuse service based solely on class.
+   * Legacy class no-trade bits remain loadable for old shop-file
+   * compatibility, but they are intentionally ignored at runtime. */
   return (TRUE);
 }
 
@@ -1071,6 +1066,64 @@ static int ok_shop_room(int shop_nr, room_vnum room)
     if (SHOP_ROOM(shop_nr, mindex) == room)
       return (TRUE);
   return (FALSE);
+}
+
+void list_quest_point_shop(struct char_data *ch, struct char_data *keeper)
+{
+  struct obj_data *obj, *last_obj = NULL;
+  int shop_nr, index = 0, found = FALSE;
+
+  if (!ch || !keeper || !IS_NPC(keeper))
+    return;
+
+  for (shop_nr = 0; shop_nr <= top_shop; shop_nr++)
+    if (SHOP_KEEPER(shop_nr) == keeper->nr)
+      break;
+
+  if (shop_nr > top_shop || !ok_shop_room(shop_nr, GET_ROOM_VNUM(IN_ROOM(ch)))) {
+    send_to_char(ch, "%s does not offer Quest Point rewards here.\r\n",
+                 GET_NAME(keeper));
+    return;
+  }
+
+  if (!AWAKE(keeper)) {
+    send_to_char(ch, "%s is currently unavailable.\r\n", GET_NAME(keeper));
+    return;
+  }
+
+  if (SHOP_SORT(shop_nr) < IS_CARRYING_N(keeper))
+    sort_keeper_objs(keeper, shop_nr);
+
+  send_to_char(ch, "Quest Point Rewards - You currently have %d QP\r\n",
+               GET_QUESTPOINTS(ch));
+  send_to_char(ch,
+      "----------------------------------------------------------------------------\r\n");
+  send_to_char(ch,
+      " ##   Reward                                                     Cost\r\n");
+  send_to_char(ch,
+      "----------------------------------------------------------------------------\r\n");
+
+  for (obj = keeper->carrying; obj; obj = obj->next_content) {
+    if (!CAN_SEE_OBJ(ch, obj) || GET_OBJ_COST(obj) <= 0 ||
+        !OBJ_FLAGGED(obj, ITEM_QUEST))
+      continue;
+
+    if (last_obj && same_obj(last_obj, obj))
+      continue;
+
+    last_obj = obj;
+    found = TRUE;
+    index++;
+    send_to_char(ch, " %2d)  %-56.56s %6d QP\r\n",
+                 index,
+                 GET_OBJ_SHORT(obj) ? GET_OBJ_SHORT(obj) : "an unnamed reward",
+                 GET_OBJ_COST(obj));
+  }
+
+  if (!found)
+    send_to_char(ch, "No Quest Point rewards are currently stocked here.\r\n");
+  else
+    send_to_char(ch, "\r\nPurchase a reward with 'buy <item name>'.\r\n");
 }
 
 SPECIAL(shop_keeper)

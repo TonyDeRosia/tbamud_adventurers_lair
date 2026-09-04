@@ -336,6 +336,7 @@ cpp_extern const struct command_info cmd_info[] = {
   { "quaff"    , "qua"     , POS_RESTING , do_use      , 0, SCMD_QUAFF },
   { "qecho"    , "qec"     , POS_DEAD    , do_qcomm    , LVL_GOD, SCMD_QECHO },
   { "quest"    , "que"     , POS_DEAD    , do_quest    , 0, 0 },
+  { "qvalidate", "qvalidate", POS_DEAD    , do_qvalidate, LVL_IMMORT, 0 },
   { "qui"      , "qui"     , POS_DEAD    , do_quit     , 0, 0 },
   { "quit"     , "quit"    , POS_DEAD    , do_quit     , 0, SCMD_QUIT },
   { "qsay"     , "qsay"    , POS_RESTING , do_qcomm    , 0, SCMD_QSAY },

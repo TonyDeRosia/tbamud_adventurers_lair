@@ -20,6 +20,7 @@
 #include "screen.h"
 #include "dg_scripts.h"
 #include "quest.h"
+#include "quest_rewards.h"
 #include "act.h" /* for do_tell */
 #include "class.h"
 #include "shop.h"
@@ -52,17 +53,31 @@ const char *aq_flags[] = {
 static int cmd_tell;
 
 static const char *quest_cmd[] = {
-  "list", "history", "join", "leave", "progress", "status",
-  "request", "info", "complete", "\n"};
+  "request", "list", "buy", "progress", "drop", "info", "complete", "status", "\n"};
 
 static const char *quest_mort_usage =
-  "Usage: quest list | history | progress | join <nn> | leave | request | info | complete";
+  "Quest Commands:\r\n"
+  "  quest request   - Request a new Guild contract.\r\n"
+  "  quest list      - View the Quest Point reward catalog.\r\n"
+  "  quest buy <#>   - Purchase a reward from the catalog.\r\n"
+  "  quest progress  - Check your current contract status.\r\n"
+  "  quest drop      - Abandon your current contract.\r\n"
+  "  quest info      - Review your current contract details.\r\n"
+  "  quest complete  - Turn in a completed contract.";
 
 static const char *quest_imm_usage =
-  "Usage: quest list | history | progress | join <nn> | leave | status <vnum> | request | info | complete";
+  "Quest Commands:\r\n"
+  "  quest request   - Request a new Guild contract.\r\n"
+  "  quest list      - View the Quest Point reward catalog.\r\n"
+  "  quest buy <#>   - Purchase a reward from the catalog.\r\n"
+  "  quest progress  - Check your current contract status.\r\n"
+  "  quest drop      - Abandon your current contract.\r\n"
+  "  quest info      - Review your current contract details.\r\n"
+  "  quest complete  - Turn in a completed contract.\r\n"
+  "  quest status <vnum> - Immortal legacy quest inspection.";
 
 #define KQUEST_DURATION_SECS (60 * 60)
-#define KQUEST_COOLDOWN_SECS (30 * 60)
+#define KQUEST_COOLDOWN_SECS (5 * 60)
 #define CAMPAIGN_DURATION_SECS (6 * 24 * 60 * 60)
 #define CAMPAIGN_MIN_TARGETS 8
 #define CAMPAIGN_SMALL_TARGETS 9
@@ -198,12 +213,22 @@ static void expire_kill_quest_if_needed(struct char_data *ch, bool notify)
   save_char(ch);
 }
 
+bool is_questmaster_mob(struct char_data *mob)
+{
+  if (!mob || !IS_NPC(mob))
+    return FALSE;
+
+  /* Builder flag is primary; legacy special remains compatibility fallback. */
+  return MOB_FLAGGED(mob, MOB_QUEST_MASTER) ||
+         GET_MOB_SPEC(mob) == questmaster;
+}
+
 static struct char_data *find_present_questmaster(struct char_data *ch)
 {
   struct char_data *mob;
 
   for (mob = world[IN_ROOM(ch)].people; mob; mob = mob->next_in_room) {
-    if (IS_NPC(mob) && GET_MOB_SPEC(mob) == questmaster && CAN_SEE(ch, mob))
+    if (is_questmaster_mob(mob) && CAN_SEE(ch, mob))
       return mob;
   }
 
@@ -217,7 +242,9 @@ static int is_service_or_protected_mob(struct char_data *mob)
   if (!mob || !IS_NPC(mob))
     return TRUE;
 
-  if (MOB_FLAGGED(mob, MOB_NOKILL) || MOB_FLAGGED(mob, MOB_GUILD_MASTER))
+  if (MOB_FLAGGED(mob, MOB_NOKILL) ||
+      MOB_FLAGGED(mob, MOB_GUILD_MASTER) ||
+      MOB_FLAGGED(mob, MOB_QUEST_MASTER))
     return TRUE;
 
   spec = GET_MOB_SPEC(mob);
@@ -237,6 +264,161 @@ static int room_is_quest_safe(room_rnum room)
          ROOM_FLAGGED(room, ROOM_GODROOM) ||
          ROOM_FLAGGED(room, ROOM_DEATH) ||
          ROOM_FLAGGED(room, ROOM_NOMOB);
+}
+
+/*
+ * Build a map of rooms a normal quest route can reach from start.
+ *
+ * Normal closed-but-unlocked doors are considered traversable because a player
+ * can open them. Locked exits are excluded because the quest system cannot
+ * assume the player owns, can obtain, or can pick the required key/lock.
+ *
+ * Peaceful and NOMOB rooms may be crossed as ordinary travel space, but
+ * GODROOM and DEATH rooms are never used as quest-route transit.
+ */
+static int quest_route_room_blocked(room_rnum room)
+{
+  if (!VALID_ROOM_RNUM(room))
+    return TRUE;
+
+  return ROOM_FLAGGED(room, ROOM_GODROOM) ||
+         ROOM_FLAGGED(room, ROOM_DEATH);
+}
+
+static int quest_route_edge_traversable(room_rnum room, int dir)
+{
+  struct room_direction_data *exit;
+
+  if (!VALID_ROOM_RNUM(room) || dir < 0 || dir >= DIR_COUNT)
+    return FALSE;
+
+  exit = world[room].dir_option[dir];
+  if (!exit || exit->to_room == NOWHERE || !VALID_ROOM_RNUM(exit->to_room))
+    return FALSE;
+
+  if (EXIT_FLAGGED(exit, EX_LOCKED))
+    return FALSE;
+
+  if (quest_route_room_blocked(exit->to_room))
+    return FALSE;
+
+  return TRUE;
+}
+
+static int quest_build_reachable_map(room_rnum start, byte *reachable)
+{
+  room_rnum *queue;
+  room_rnum room;
+  int head = 0, tail = 0, dir;
+  size_t count;
+
+  if (!reachable || !VALID_ROOM_RNUM(start) || quest_route_room_blocked(start))
+    return 0;
+
+  count = (size_t)top_of_world + 1;
+  memset(reachable, 0, count * sizeof(*reachable));
+  CREATE(queue, room_rnum, count);
+
+  reachable[start] = TRUE;
+  queue[tail++] = start;
+
+  while (head < tail) {
+    room = queue[head++];
+
+    for (dir = 0; dir < DIR_COUNT; dir++) {
+      room_rnum to_room;
+
+      if (!quest_route_edge_traversable(room, dir))
+        continue;
+
+      to_room = world[room].dir_option[dir]->to_room;
+      if (reachable[to_room])
+        continue;
+
+      reachable[to_room] = TRUE;
+      queue[tail++] = to_room;
+    }
+  }
+
+  free(queue);
+  return tail;
+}
+
+/*
+ * Build a reverse reachability map for a destination room.
+ *
+ * A marked room can reach destination by ordinary quest-route edges. Combined
+ * with quest_build_reachable_map(), this lets quest selection require a true
+ * round trip rather than merely a one-way route to the target.
+ */
+static int quest_build_returnable_map(room_rnum destination, byte *returnable)
+{
+  room_rnum *queue;
+  room_rnum *incoming_from;
+  int *incoming_head;
+  int *incoming_next;
+  room_rnum room;
+  size_t count, max_edges;
+  int edge_count = 0;
+  int head = 0, tail = 0;
+  int dir, i;
+
+  if (!returnable || !VALID_ROOM_RNUM(destination) ||
+      quest_route_room_blocked(destination))
+    return 0;
+
+  count = (size_t)top_of_world + 1;
+  max_edges = count * DIR_COUNT;
+
+  memset(returnable, 0, count * sizeof(*returnable));
+  CREATE(queue, room_rnum, count);
+  CREATE(incoming_head, int, count);
+  CREATE(incoming_next, int, max_edges);
+  CREATE(incoming_from, room_rnum, max_edges);
+
+  for (i = 0; i <= top_of_world; i++)
+    incoming_head[i] = -1;
+
+  for (room = 0; room <= top_of_world; room++) {
+    if (quest_route_room_blocked(room))
+      continue;
+
+    for (dir = 0; dir < DIR_COUNT; dir++) {
+      room_rnum to_room;
+
+      if (!quest_route_edge_traversable(room, dir))
+        continue;
+
+      to_room = world[room].dir_option[dir]->to_room;
+      incoming_from[edge_count] = room;
+      incoming_next[edge_count] = incoming_head[to_room];
+      incoming_head[to_room] = edge_count;
+      edge_count++;
+    }
+  }
+
+  returnable[destination] = TRUE;
+  queue[tail++] = destination;
+
+  while (head < tail) {
+    room = queue[head++];
+
+    for (i = incoming_head[room]; i != -1; i = incoming_next[i]) {
+      room_rnum from_room = incoming_from[i];
+
+      if (returnable[from_room])
+        continue;
+
+      returnable[from_room] = TRUE;
+      queue[tail++] = from_room;
+    }
+  }
+
+  free(incoming_from);
+  free(incoming_next);
+  free(incoming_head);
+  free(queue);
+  return tail;
 }
 
 static int campaign_size_step(int target_count)
@@ -440,9 +622,18 @@ static int select_campaign_targets(struct char_data *ch, struct campaign_candida
 {
   struct char_data *mob;
   struct campaign_candidate_data pool[2000];
+  byte *reachable, *returnable;
   int pool_count = 0, i, j, need, max_targets;
   int level_window_low = GET_LEVEL(ch) - 5;
   int level_window_high = GET_LEVEL(ch) + 2;
+
+  if (!ch || IN_ROOM(ch) == NOWHERE)
+    return 0;
+
+  CREATE(reachable, byte, (size_t)top_of_world + 1);
+  CREATE(returnable, byte, (size_t)top_of_world + 1);
+  quest_build_reachable_map(IN_ROOM(ch), reachable);
+  quest_build_returnable_map(IN_ROOM(ch), returnable);
 
   for (mob = character_list; mob; mob = mob->next) {
     room_rnum in_room;
@@ -458,6 +649,8 @@ static int select_campaign_targets(struct char_data *ch, struct campaign_candida
     in_room = IN_ROOM(mob);
     if (room_is_quest_safe(in_room))
       continue;
+    if (!reachable[in_room] || !returnable[in_room])
+      continue;
 
     mob_level = GET_LEVEL(mob);
     if (mob_level < level_window_low || mob_level > level_window_high)
@@ -472,9 +665,14 @@ static int select_campaign_targets(struct char_data *ch, struct campaign_candida
     pool_count++;
   }
 
-  if (pool_count < CAMPAIGN_MIN_TARGETS)
+  if (pool_count < CAMPAIGN_MIN_TARGETS) {
+    free(returnable);
+    free(reachable);
     return 0;
+  }
 
+  free(returnable);
+  free(reachable);
   max_targets = MIN(MAX_CAMPAIGN_TARGETS, pool_count);
   need = rand_number(CAMPAIGN_MIN_TARGETS, max_targets);
   *selected_count = 0;
@@ -524,13 +722,24 @@ static int select_campaign_targets(struct char_data *ch, struct campaign_candida
 static struct char_data *select_kill_quest_target(struct char_data *ch)
 {
   struct char_data *mob, *choice = NULL;
+  byte *reachable, *returnable;
   int weight, total = 0;
   int level_diff;
+
+  if (!ch || IN_ROOM(ch) == NOWHERE)
+    return NULL;
+
+  CREATE(reachable, byte, (size_t)top_of_world + 1);
+  CREATE(returnable, byte, (size_t)top_of_world + 1);
+  quest_build_reachable_map(IN_ROOM(ch), reachable);
+  quest_build_returnable_map(IN_ROOM(ch), returnable);
 
   for (mob = character_list; mob; mob = mob->next) {
     if (!IS_NPC(mob) || IN_ROOM(mob) == NOWHERE)
       continue;
     if (room_is_quest_safe(IN_ROOM(mob)))
+      continue;
+    if (!reachable[IN_ROOM(mob)] || !returnable[IN_ROOM(mob)])
       continue;
     if (is_service_or_protected_mob(mob))
       continue;
@@ -553,6 +762,8 @@ static struct char_data *select_kill_quest_target(struct char_data *ch)
       choice = mob;
   }
 
+  free(returnable);
+  free(reachable);
   return choice;
 }
 
@@ -592,17 +803,228 @@ static void quest_request_kill(struct char_data *ch)
   GET_KQUEST_GIVER(ch) = GET_MOB_VNUM(qm);
   GET_KQUEST_TIME(ch) = 60;
   GET_KQUEST_EXPIRES_AT(ch) = time(0) + KQUEST_DURATION_SECS;
-  GET_KQUEST_TARGET_ID(ch) = char_script_id(target);
+  GET_KQUEST_TARGET_ID(ch) = 0; /* Dynamic kill quests are VNUM-based, not instance-based. */
   GET_KQUEST_COOLDOWN_NOTIFIED(ch) = 1;
 
   send_to_char(ch, "You ask %s for a quest.\r\n", GET_NAME(qm));
   send_to_char(ch, "%s tells you, 'Thank you, brave %s!'\r\n", GET_NAME(qm), GET_NAME(ch));
-  send_to_char(ch, "%s tells you, 'An enemy of mine, %s, is making vile threats against Ayla!'\r\n",
+  send_to_char(ch, "%s tells you, 'An enemy of the Guild, %s, has been causing trouble on the roads!'\r\n",
       GET_NAME(qm), GET_NAME(target));
   send_to_char(ch, "%s tells you, 'Seek %s out somewhere near %s in the area of %s.'\r\n",
       GET_NAME(qm), GET_NAME(target), world[tr].name, zone_table[world[tr].zone].name);
   send_to_char(ch, "%s tells you, 'Good luck, %s. Return safely!'\r\n", GET_NAME(qm), GET_NAME(ch));
   send_to_char(ch, "You have 60 minutes to complete your quest.\r\n");
+  save_char(ch);
+}
+
+static const char *qvalidate_base_reason(struct char_data *mob, byte *reachable, byte *returnable)
+{
+  room_rnum room;
+
+  if (!mob || !IS_NPC(mob))
+    return "not an NPC";
+  if (IN_ROOM(mob) == NOWHERE)
+    return "not in a room";
+  if (is_service_or_protected_mob(mob))
+    return "service/protected mob";
+  if (MOB_FLAGGED(mob, MOB_NOTDEADYET))
+    return "NOTDEADYET";
+  room = IN_ROOM(mob);
+  if (room_is_quest_safe(room))
+    return "quest-safe target room";
+  if (!reachable[room])
+    return "no route from here";
+  if (!returnable[room])
+    return "no return route";
+  return NULL;
+}
+
+static int qvalidate_kill_level_ok(struct char_data *ch, struct char_data *mob)
+{
+  int level_diff = GET_LEVEL(ch) - GET_LEVEL(mob);
+  return level_diff >= -3 && level_diff <= 8;
+}
+
+static int qvalidate_campaign_level_ok(struct char_data *ch, struct char_data *mob)
+{
+  int mob_level = GET_LEVEL(mob);
+  return mob_level >= GET_LEVEL(ch) - 5 && mob_level <= GET_LEVEL(ch) + 2;
+}
+
+static void qvalidate_print_mob(struct char_data *ch, struct char_data *mob,
+                                byte *reachable, byte *returnable)
+{
+  const char *reason = qvalidate_base_reason(mob, reachable, returnable);
+  room_rnum room = IN_ROOM(mob);
+  int kill_ok = FALSE, campaign_ok = FALSE;
+
+  if (!reason) {
+    kill_ok = qvalidate_kill_level_ok(ch, mob);
+    campaign_ok = qvalidate_campaign_level_ok(ch, mob);
+  }
+
+  send_to_char(ch, "Mob %d: %s\r\n", GET_MOB_VNUM(mob), GET_NAME(mob));
+  send_to_char(ch, "  Level: %d\r\n", GET_LEVEL(mob));
+
+  if (VALID_ROOM_RNUM(room)) {
+    send_to_char(ch, "  Room: %d (%s)\r\n",
+                 GET_ROOM_VNUM(room), world[room].name);
+    send_to_char(ch, "  Area: %d (%s)\r\n",
+                 zone_table[world[room].zone].number,
+                 zone_table[world[room].zone].name);
+    send_to_char(ch, "  Route from current room: %s\r\n",
+                 reachable[room] ? "YES" : "NO");
+    send_to_char(ch, "  Return route: %s\r\n",
+                 returnable[room] ? "YES" : "NO");
+  }
+
+  if (reason) {
+    send_to_char(ch, "  Dynamic quest eligible: NO (%s)\r\n", reason);
+    send_to_char(ch, "  Campaign eligible: NO (%s)\r\n", reason);
+  } else {
+    send_to_char(ch, "  Dynamic quest eligible: %s%s\r\n",
+                 kill_ok ? "YES" : "NO",
+                 kill_ok ? "" : " (outside kill-quest level range)");
+    send_to_char(ch, "  Campaign eligible: %s%s\r\n",
+                 campaign_ok ? "YES" : "NO",
+                 campaign_ok ? "" : " (outside campaign level range)");
+  }
+}
+
+ACMD(do_qvalidate)
+{
+  char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
+  struct char_data *mob;
+  byte *reachable, *returnable;
+  int found = 0;
+
+  if (IS_NPC(ch) || IN_ROOM(ch) == NOWHERE)
+    return;
+
+  two_arguments(argument, arg1, arg2);
+
+  if (!*arg1) {
+    send_to_char(ch,
+      "Usage:\r\n"
+      "  qvalidate mob <vnum>\r\n"
+      "  qvalidate area <zone>\r\n"
+      "\r\nValidation is performed from your current room using the same round-trip\r\n"
+      "route rules used by dynamic quests and campaigns.\r\n");
+    return;
+  }
+
+  CREATE(reachable, byte, (size_t)top_of_world + 1);
+  CREATE(returnable, byte, (size_t)top_of_world + 1);
+  quest_build_reachable_map(IN_ROOM(ch), reachable);
+  quest_build_returnable_map(IN_ROOM(ch), returnable);
+
+  if (is_abbrev(arg1, "mob")) {
+    mob_vnum vnum;
+
+    if (!*arg2 || (vnum = atoi(arg2)) <= 0) {
+      send_to_char(ch, "Usage: qvalidate mob <vnum>\r\n");
+      free(returnable);
+      free(reachable);
+      return;
+    }
+
+    send_to_char(ch, "Quest validation from room %d for mob %d:\r\n",
+                 GET_ROOM_VNUM(IN_ROOM(ch)), vnum);
+
+    for (mob = character_list; mob; mob = mob->next) {
+      if (!IS_NPC(mob) || GET_MOB_VNUM(mob) != vnum)
+        continue;
+      found++;
+      qvalidate_print_mob(ch, mob, reachable, returnable);
+    }
+
+    if (!found)
+      send_to_char(ch,
+        "No live instance of mob %d is currently loaded. The current dynamic\r\n"
+        "quest selectors also cannot choose an unloaded mob instance.\r\n", vnum);
+  } else if (is_abbrev(arg1, "area") || is_abbrev(arg1, "zone")) {
+    int zone_vnum, total = 0, route_ok = 0, kill_ok = 0, campaign_ok = 0;
+    int shown = 0;
+
+    if (!*arg2 || (zone_vnum = atoi(arg2)) < 0) {
+      send_to_char(ch, "Usage: qvalidate area <zone>\r\n");
+      free(returnable);
+      free(reachable);
+      return;
+    }
+
+    send_to_char(ch, "Quest validation from room %d for area %d:\r\n",
+                 GET_ROOM_VNUM(IN_ROOM(ch)), zone_vnum);
+
+    for (mob = character_list; mob; mob = mob->next) {
+      const char *reason;
+      room_rnum room;
+
+      if (!IS_NPC(mob) || IN_ROOM(mob) == NOWHERE)
+        continue;
+
+      room = IN_ROOM(mob);
+      if (zone_table[world[room].zone].number != zone_vnum)
+        continue;
+
+      total++;
+      reason = qvalidate_base_reason(mob, reachable, returnable);
+      if (!reason) {
+        route_ok++;
+        if (qvalidate_kill_level_ok(ch, mob))
+          kill_ok++;
+        if (qvalidate_campaign_level_ok(ch, mob))
+          campaign_ok++;
+      }
+
+      if (shown < 40) {
+        send_to_char(ch, "  [%5d] L%-3d %-28s  Q:%s C:%s%s%s\r\n",
+                     GET_MOB_VNUM(mob), GET_LEVEL(mob), GET_NAME(mob),
+                     (!reason && qvalidate_kill_level_ok(ch, mob)) ? "YES" : "NO ",
+                     (!reason && qvalidate_campaign_level_ok(ch, mob)) ? "YES" : "NO ",
+                     reason ? "  (" : "",
+                     reason ? reason : "");
+        if (reason)
+          send_to_char(ch, ")\r\n");
+        shown++;
+      }
+    }
+
+    if (!total) {
+      send_to_char(ch, "No live NPC instances are currently loaded in area %d.\r\n",
+                   zone_vnum);
+    } else {
+      if (total > shown)
+        send_to_char(ch, "... %d additional loaded NPC instance%s omitted.\r\n",
+                     total - shown, (total - shown) == 1 ? "" : "s");
+      send_to_char(ch,
+        "\r\nSummary: loaded=%d  route-valid=%d  dynamic-quest=%d  campaign=%d\r\n",
+        total, route_ok, kill_ok, campaign_ok);
+    }
+  } else {
+    send_to_char(ch,
+      "Usage: qvalidate mob <vnum> | qvalidate area <zone>\r\n");
+  }
+
+  free(returnable);
+  free(reachable);
+}
+
+static void quest_drop_kill(struct char_data *ch)
+{
+  expire_kill_quest_if_needed(ch, TRUE);
+
+  if (!is_on_quest(ch)) {
+    send_to_char(ch, "You do not currently have a Guild contract to drop.\r\n");
+    return;
+  }
+
+  clear_kill_quest(ch);
+  start_kill_quest_cooldown(ch);
+  send_to_char(ch,
+      "You abandon your current Guild contract. You may request another in %d minute%s.\r\n",
+      get_quest_cooldown_minutes_remaining(ch),
+      get_quest_cooldown_minutes_remaining(ch) == 1 ? "" : "s");
   save_char(ch);
 }
 
@@ -639,6 +1061,51 @@ static void quest_info_kill(struct char_data *ch)
   send_to_char(ch, "Time remaining: %d minute%s.\r\n",
                get_quest_minutes_remaining(ch),
                get_quest_minutes_remaining(ch) == 1 ? "" : "s");
+}
+
+static void quest_list_rewards(struct char_data *ch)
+{
+  struct char_data *qm = find_present_questmaster(ch);
+
+  if (!qm) {
+    send_to_char(ch,
+        "You must be with a questmaster to view the Guild's Quest Point rewards.\r\n");
+    return;
+  }
+
+  quest_rewards_list(ch);
+}
+
+static void quest_buy_reward(struct char_data *ch, char *argument)
+{
+  quest_rewards_buy(ch, argument);
+}
+
+static void quest_progress_kill(struct char_data *ch)
+{
+  expire_kill_quest_if_needed(ch, TRUE);
+
+  if (!is_on_quest(ch)) {
+    if (is_on_quest_cooldown(ch))
+      send_to_char(ch,
+          "No active contract. You may request another in %d minute%s.\r\n",
+          get_quest_cooldown_minutes_remaining(ch),
+          get_quest_cooldown_minutes_remaining(ch) == 1 ? "" : "s");
+    else
+      send_to_char(ch, "You do not currently have an active Guild contract.\r\n");
+    return;
+  }
+
+  send_to_char(ch, "Guild Contract: %s\r\n",
+               is_quest_ready(ch) ? "TARGET SLAIN - READY TO TURN IN" : "IN PROGRESS");
+  send_to_char(ch, "Time remaining: %d minute%s.\r\n",
+               get_quest_minutes_remaining(ch),
+               get_quest_minutes_remaining(ch) == 1 ? "" : "s");
+
+  if (is_quest_ready(ch))
+    send_to_char(ch, "Return to any questmaster and use 'quest complete'.\r\n");
+  else
+    send_to_char(ch, "Use 'quest info' to review your target and location.\r\n");
 }
 
 static void quest_complete_kill(struct char_data *ch)
@@ -1249,8 +1716,6 @@ void quest_kill_trigger_check(struct char_data *ch, struct char_data *vict)
     return;
   if (GET_KQUEST_TARGET(ch) != GET_MOB_VNUM(vict))
     return;
-  if (GET_KQUEST_TARGET_ID(ch) > 0 && GET_KQUEST_TARGET_ID(ch) != char_script_id(vict))
-    return;
 
   GET_KQUEST_COMPLETE(ch) = 1;
   send_to_char(ch, "\tRQuest Target Slain!\tn\r\n");
@@ -1640,22 +2105,20 @@ ACMD(do_quest)
                      quest_mort_usage : quest_imm_usage);
   else {
     switch (tp) {
-      case SCMD_QUEST_LIST:
-      case SCMD_QUEST_JOIN:
-        /* list, join should hve been handled by questmaster spec proc */
-        send_to_char(ch, "Sorry, but you cannot do that here!\r\n");
-        break;
-      case SCMD_QUEST_HISTORY:
-        quest_hist(ch);
-        break;
-      case SCMD_QUEST_LEAVE:
-        quest_quit(ch);
-        break;
-      case SCMD_QUEST_PROGRESS:
- quest_progress(ch);
- break;
       case SCMD_QUEST_REQUEST:
         quest_request_kill(ch);
+        break;
+      case SCMD_QUEST_LIST:
+        quest_list_rewards(ch);
+        break;
+      case SCMD_QUEST_BUY:
+        quest_buy_reward(ch, arg2);
+        break;
+      case SCMD_QUEST_PROGRESS:
+        quest_progress_kill(ch);
+        break;
+      case SCMD_QUEST_DROP:
+        quest_drop_kill(ch);
         break;
       case SCMD_QUEST_INFO:
         quest_info_kill(ch);
@@ -1669,10 +2132,10 @@ ACMD(do_quest)
         else
           quest_stat(ch, arg2);
         break;
-      default: /* Whe should never get here, but... */
-        send_to_char(ch, "%s\r\n", GET_LEVEL(ch) < LVL_IMMORT ?
-                     quest_mort_usage : quest_imm_usage);
- break;
+      default:
+        send_to_char(ch, "%s\r\n",
+                     GET_LEVEL(ch) < LVL_IMMORT ? quest_mort_usage : quest_imm_usage);
+        break;
     } /* switch on subcmd number */
   }
 }
@@ -1710,40 +2173,19 @@ ACMD(do_campaign)
 SPECIAL(questmaster)
 {
   qst_rnum rnum;
-  char arg1[MAX_INPUT_LENGTH], arg2[MAX_INPUT_LENGTH];
-  int  tp;
   struct char_data *qm = (struct char_data *)me;
 
-  /* check that qm mob has quests assigned */
+  /* Keep legacy authored questmasters alive as compatibility wrappers.
+   * Their saved secondary special proc still gets first chance to handle
+   * unrelated commands, but player quest commands now belong to do_quest. */
   for (rnum = 0; (rnum < total_quests &&
-      QST_MASTER(rnum) != GET_MOB_VNUM(qm)) ; rnum ++);
+       QST_MASTER(rnum) != GET_MOB_VNUM(qm)); rnum++);
+
   if (rnum >= total_quests)
-    return FALSE; /* No quests for this mob */
-  else if (QST_FUNC(rnum) && (QST_FUNC(rnum) (ch, me, cmd, argument)))
-    return TRUE;  /* The secondary spec proc handled this command */
-  else if (CMD_IS("quest")) {
-    two_arguments(argument, arg1, arg2);
-    if (!*arg1)
-      return FALSE;
-    else if (((tp = search_block(arg1, quest_cmd, FALSE)) == -1))
-      return FALSE;
-    else {
-      switch (tp) {
-      case SCMD_QUEST_LIST:
-        if (!*arg2)
-          quest_show(ch, GET_MOB_VNUM(qm));
-        else
-   quest_list(ch, qm, arg2);
-        break;
-      case SCMD_QUEST_JOIN:
-        quest_join(ch, qm, arg2);
-        break;
-      default:
- return FALSE; /* fall through to the do_quest command processor */
-      } /* switch on subcmd number */
-      return TRUE;
-    }
-  } else {
-    return FALSE; /* not a questmaster command */
-  }
+    return FALSE;
+
+  if (QST_FUNC(rnum) && (QST_FUNC(rnum)(ch, me, cmd, argument)))
+    return TRUE;
+
+  return FALSE;
 }
