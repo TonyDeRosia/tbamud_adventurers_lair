@@ -153,7 +153,7 @@ dagger~
 a @Dda@Wgg@Der@n~
 A dagger with a long thin blade is here.~
 ~
-5 n 0 0 0 an 0 0 0 0 0 0 0
+5 nt 0 0 0 an 0 0 0 0 0 0 0
 0 1 4 11
 1 15 10 0 0
 A
@@ -167,12 +167,12 @@ A small sword lies here.~
 0 1 6 11
 3 25 10 0 0
 E
-sword small~
-   The small sword seems to have an inscription of some sort.
-~
-E
 inscription~
    It says: 'May this sword be a good companion.  '
+~
+E
+sword small~
+   The small sword seems to have an inscription of some sort.
 ~
 A
 18 1
@@ -644,11 +644,11 @@ An @Yad@Wve@Ynt@Cur@Wers' @Yno@Wti@Cce @Ybo@War@Yd@n is mounted here.~
 0 0 0 0
 0 0 0 0 0
 E
-adventurers notice board social bulletin~
-Pinned notices carry news, requests, warnings, and messages left by travelers from across the realm. Use 'look board' to read what has been posted.
-~
-E
 social bulletin~
    Use 'look board' to read the board.
+~
+E
+adventurers notice board social bulletin~
+Pinned notices carry news, requests, warnings, and messages left by travelers from across the realm. Use 'look board' to read what has been posted.
 ~
 $~

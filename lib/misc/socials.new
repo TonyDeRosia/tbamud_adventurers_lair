@@ -305,13 +305,13 @@ You babble at $M in a meaningless manner.
 $n is babbling at $N in a confused way.
 $n is babbling something utterly meaningless at you.
 You babble like a brook that only you can hear.
-You babble to yourself like the total idiot that you are.
+You babble to yourself until even you lose the thread.
 $n babbles to $mself like the fool $e really is.
 You look at $S $t and start babbling incoherently.
 $n looks at $N's $t and babbles incoherently.
 $n looks at your $t and babbles unintellig.
 You look at $p and begin babbling at it.
-$n looks at $p and begins babbling like an idiot.
+$n looks at $p and begins babbling incoherently.
 
 ~backclap backclap 0 8 8 0
 You clap everyone on the back... good job!
@@ -435,12 +435,12 @@ $n looks at $p and beckons it closer.
 
 ~beer beer 0 5 0 0
 Aaaaaaaah! Better now...
-$n opens up a bottle of beer and drinks it in less than 0 seconds!!!
+$n opens a bottle of beer and drains it in a single long draught.
 Dang! You spilled the beer all over $N!
 $n, sloppy as always, spills $s beer over $N!
 $n spills $s beer all over you!
-They're not here, you'll have to drink it yourself, darn it?
-You spill it all over yourself! GAAAhhhhhh!
+They're not here; you'll have to drink it yourself.
+You spill the beer all over yourself!
 $n is so drunk that $e spills the beer over $mself.
 You spill beer on $S $t.
 $n spills beer on $N's $t, what a sloppy drunk.
@@ -635,7 +635,7 @@ You boastfully tell $M about yourself.
 $n boasts to $N.
 $n boastfully tells you about $mself.
 Your boasts seem generally ignored.
-You boast to yourself and fill your head with silly thoughts.
+You boast to yourself until vanity drowns out good sense.
 $n boasts to $mself, how conceited.
 You boast about $S $t.
 $n boasts about $N's $t.
@@ -672,7 +672,6 @@ $n boinks $N's $t.
 $n boinks your $t.
 You boink $p.
 $n boinks $p.
-
 ~bonk bonk 0 5 0 0
 Whom do you wish to bonk on the head?
 $n is looking for someone to bonk, RUN!
@@ -687,6 +686,7 @@ $n bonks $N's $t.
 $n bonks your $t.
 You bonk $p.
 $n bonk $p.
+
 
 ~boo boo 0 5 0 0
 'BOO!' you're a frightening person, aren't ya?
@@ -717,7 +717,6 @@ $n wipes a booger on $N's $t.
 $n wipes a booger on your $t.
 You wipes a booger on $p.
 $n wipes a booger $p.
-
 ~bop bop 0 5 0 0
 Bop who?
 $n bops around like a teenager!
@@ -732,6 +731,7 @@ $n bops $N's $t.
 $n bops your $t.
 You bop $p.
 $n bop $p.
+
 
 ~bored bored 0 5 0 0
 You're bored out of your mind!
@@ -965,8 +965,8 @@ You challenge $N to a fight until DEATH!
 $n challenges $N to fight $m until DEATH!
 $n challenges you to fight $m until DEATH!
 Challenge who?!?
-Challenge yourself to mortal combat?? - stupid!
-$n looks real stupid, walking in circles around $mself shadowfighting!
+You consider challenging yourself, then think better of it.
+$n squares off against $mself, then lowers $s guard in confusion.
 You challenge $S $t to a duel.
 $n challenges $N's $t to a duel.
 $n challenges your $t to a duel.
@@ -994,9 +994,9 @@ $n charges into the fray!
 You charge headlong into $M!
 $n charges headlong into $N.
 $n charges right into you!
-Will that be VISA, MasterCard, or AmEx?
+You lower your shoulder, ready to charge whatever stands before you.
 Charge yourself? How?
-$n looks real stupid, trying to charge at $mself!
+$n tries to charge at $mself, then stumbles to an awkward halt.
 You charge $S $t.
 $n charges $N's $t.
 $n charges your $t.
@@ -1124,14 +1124,14 @@ You clap at $p.
 $n claps at $p.
 
 ~clobber clobber 0 5 0 0
-Clobber the air?  Sure, go ahead, fine by me...
-$n starts shadow-boxing.
-You clobber $M right in the face!  Yuck, the BLOOD!
+You swing once at empty air, then lower your guard.
+$n practices a few measured strikes against an unseen foe.
+You clobber $M squarely across the face!
 $n swings weakly at $N, missing by miles.
-$n tries to clobber you but misses by a good quarter-mile...
+$n swings at you, but the blow passes wide.
 Clobber who?
 You clobber yourself in the face resulting in your own nose being bloodied.
-$n clobbers $mself in the face, looking kind of stupid.
+$n clobbers $mself in the face and recoils from the mistake.
 You clobber $M in the $t!
 $n clobbers $N in the $t!
 $n clobbers you in the $t!
@@ -1530,7 +1530,7 @@ $n curls and goes to sleep.
 
 ~curse curse 0 5 0 0
 You swear loudly for a long time.
-$n swears: @*"*&^$$%@*&!!!!!!
+$n unleashes a stream of blistering curses.
 You curse $M and all $S ancestors and descendants.
 $n calls doubt on $N's parentage.
 $n curses you, what a moron!
@@ -1557,21 +1557,6 @@ $n curtseys at $N's $t.
 $n curtseys at your $t.
 You curtsey at $p.
 $n curtseys at $p.
-
-~custard custard 0 5 0 0
-You pull out a large custard pie and begin munching on it.
-$n pulls out a large custard pie and eats it face-first.
-You whip out a custard pie and slam it into $N's face, laughing all the while.
-$n whips out a custard pie and slams it into $N's face!  Whipped cream everywhere!
-$n slams a custard pie into your face, which permanently dents your forehead.
-You can't throw a pie at someone when they aren't here.  *reality check*
-You pull out a custard pie and slam it into your face.  YUMMY.
-$n pulls out a custard pie and slams it into $s face.  YUM.
-You toss a pie straight at $S $t.
-$n tosses a custard pie straight at $N's $t, what a mess.
-$n tosses a custard pie straight at your $t, what a mess, cherry you think.
-You toss a custard pie onto $p.
-$n tosses a custard pie onto $p.
 
 ~dance dance 0 5 8 0
 You dance around happily.
@@ -2247,7 +2232,6 @@ $n flails $s arms at $N's $t.
 $n flails $s arms at your $t.
 You flail your arms at $p.
 $n flails $s arms at $p.
-
 ~flame flame 0 5 0 0
 Kids, don't try this at home...
 $n is using a flamethrower to light small fires in the corners.
@@ -2262,6 +2246,7 @@ $n points a flamethrower at $N's $t and starts to barbecue.
 $n points a flamethrower at your $t and starts to barbecue.
 You point the flamethrower at $p and starts to barbecue.
 $n points a flamethrower at $p and starts to barbecue.
+
 
 ~flare flare 0 5 0 0
 You flare your nostrils.
@@ -2358,9 +2343,9 @@ You flirt outrageously.
 $n flirts outrageously.
 You flirt outrageously with $N.
 $n flirts outrageously with $N.
-$n walks up to you and says, 'Hey baby, can I buy you a drink?'
+$n approaches you with an outrageous smile and an overly courtly bow.
 Sorry, your dearly beloved is not around.
-You flirt with yourself.  Must look stupid.
+You practice a charming smile on yourself.
 $n thinks $e is the most wonderful person in the world.
 You flirt with $S $t.
 $n flirts with $N's $t.
@@ -2562,7 +2547,6 @@ $n makes a fuss about $N's $t.
 $n makes a fuss about your $t.
 You make a fuss about $p.
 $n makes a fuss about $p.
-
 ~fwap fwap 0 5 0 0
 Backhand to the left cheek. Shoots.  Scores!
 $n backhands a pesky fly.
@@ -2577,6 +2561,7 @@ $n fwaps $mself in the face.  Ouch, that really HURT.
 #
 #
 #
+
 
 ~gag gag 0 5 0 0
 Gag who??
@@ -2659,7 +2644,7 @@ $n giggles.
 You look at $N and break into a fit of giggling.
 $n points at $N and begins to giggle uncontrollably.
 $n looks at you and giggles, wonder what $e finds so funny.
-Well you may see something funny but I don't.
+No one by that name is here.
 You seem to find yourself very amusing.
 $n giggles at $mself.
 You giggle at $S $t.
@@ -2825,7 +2810,7 @@ You grovel before $M
 $n grovels in the dirt before $N.
 $n grovels in the dirt before you.
 Who do you want to grovel in the dirt for?
-That seems a little silly to me.. But, okay!
+You grovel before yourself, though the gesture feels rather strange.
 $n grovels in the dirt at $mself.
 You grovel in the dirt before $S $t.
 $n grovels in the dirt before $N's $t.
@@ -2982,7 +2967,6 @@ $n rubs $s aching temples, indicating that $N's $t is giving $m a headache.
 $n rubs $s aching temples, indicating that your $t is giving $m a headache.
 You rub your aching temples, indicating that $p is giving you a headache.
 $n rubs $s aching temples, indicating that $p is giving $m a headache.
-
 ~heh heh 0 5 0 0
 You heh. Heh, heh, heh.
 $n hehs. Heh, heh, heh!
@@ -2997,6 +2981,7 @@ $n hehs at $N's $t. Heh, heh!
 $n hehs at your $t. Heh heh!
 You heh at $p. Heh, heh!
 $n hehs at $p. Heh, heh!
+
 
 ~hiccup hiccup 0 5 0 0
 *HIC*
@@ -3109,7 +3094,7 @@ $n howls at the moon.
 You howl at $M.
 $n howls at $N.
 $n howls at you.
-Full moon tonight, eh?
+No one answers you.
 You howl at yourself.
 $n howls at $mself!
 You howl at $S $t.
@@ -3559,7 +3544,7 @@ $n laughs.
 You laugh wholeheartedly with $M.
 $n laughs wholeheartedly with $N.
 $n laughs wholeheartedly with you!
-Well you may see something funny but I don't.
+No one by that name is here.
 You seem to find yourself very amusing.
 $n starts laughing at $s own joke.
 You laugh at $S $t.
@@ -3604,7 +3589,7 @@ $n listens carefully.
 You listen carefully to what $N has to say.
 $n pays close attention to $N.
 $n listens to what you have to say.
-Who you tryin' to listen to stupid? The air???
+There is no one there to listen to.
 You listen to yourself talk and start to wonder...
 $n listens to $mself talk.
 You listen to $S $t.
@@ -3612,7 +3597,20 @@ $n listens to $N's $t.
 $n listens to your $t.
 You listen to $p.
 $n listens to $p.
-
+~lol lol 0 5 5 0
+You laugh out loud.
+$n laughs out loud.
+You laugh out loud at $M.
+$n laughs out loud at $N.
+$n laughs out loud at you.
+You can't laugh at someone who isn't even here!
+You laugh out loud at yourself.
+$n laughs out loud at $mself.
+#
+#
+#
+#
+#
 ~lofr lofr 0 5 5 0
 You laugh on the floor, rolling.
 $n laughs on the floor, rolling.
@@ -3628,20 +3626,7 @@ $n laughs on the floor, rolling because $e knows $e's silly.
 #
 #
 
-~lol lol 0 5 5 0
-You laugh out loud.
-$n laughs out loud.
-You laugh out loud at $M.
-$n laughs out loud at $N.
-$n laughs out loud at you.
-You can't laugh at someone who isn't even here!
-You laugh out loud at yourself.
-$n laughs out loud at $mself.
-#
-#
-#
-#
-#
+
 
 ~lost lost 0 5 0 0
 You gaze at your surroundings, trying to make out where you are.
@@ -3717,7 +3702,6 @@ $n maces $N's $t.
 $n maces your $t.
 You mace $p.
 $n maces $p.
-
 ~madgiggle madgiggle 0 8 8 0
 You giggle madly.
 $n giggles madly...
@@ -3732,6 +3716,7 @@ $nn is giggling madly at $mself. How strange...
 #
 #
 #
+
 
 ~makeout makeout 0 5 0 0
 Who are you trying to makeout with?
@@ -3799,7 +3784,7 @@ $n meows.
 You meow at $M.
 $n meows at $N.
 $n meows at you.
-Full moon tonight, eh?
+No one answers you.
 You meow at yourself.
 $n meows at $mself!
 You meow at $S $t.
@@ -3889,7 +3874,7 @@ $n moos like a cow.
 You moo at $M like a cow.
 $n moos at $N like a cow.
 $n moos at you like a cow.
-Full moon tonight, eh?
+No one answers you.
 You moo at yourself.
 $n moos at $mself!
 You moo at $S $t like a cow.
@@ -3912,7 +3897,6 @@ $n tries to mooch off of $N's $t.
 $n tries to mooch off of your $t.
 You trie to mooch off of $p.
 $n tries to mooch off of $p.
-
 ~moon moon 0 5 0 0
 You moon the whole world.
 $n moons everyone in sight.
@@ -3927,6 +3911,7 @@ $n moons $N's $t.
 $n moons your $t.
 You moon $p.
 $n moons $p.
+
 
 ~mortals mortals 0 5 0 51
 Aaagh!! I can't stand mortals!!!
@@ -4152,7 +4137,6 @@ $n reminds $mself to say no to drugs.
 #
 #
 #
-
 ~noogie noogie 0 5 0 0
 Whom do you wish to noogie?
 Run! $n is looking for someone to Noogie.
@@ -4167,6 +4151,7 @@ $n gives $N's $t a noogie.
 $n gives your $t a noogie.
 You give $p a noogie.
 $n gives $p a noogie.
+
 
 ~nudge nudge 0 5 0 0
 Nudge?  Nudge???  The HELL you say!!!!
@@ -4197,21 +4182,6 @@ $n nuzzles $N's $t.
 $n nuzzles your $t.
 You nuzzle $p.
 $n nuzzles $p.
-
-~nyuk nyuk 0 5 0 0
-Nyuk, nyuk, nyuk!
-$n goes 'Nyuk, nyuk, nyuk!'
-You poke at $S eyes and go 'nyuk, nyuk, nyuk!'
-$n pokes at $N's eyes and goes 'nyuk, nyuk, nyuk!
-$n pokes at your eyes and goes 'nyuk, nyuk, nyuk!
-Oh? A wise guy, huh?
-You look at yourself and go 'Nyuk, nyuk, nyuk!'
-$n looks at $mself and goes 'Nyuk, nyuk, nyuk!'
-You look at $S $t and go 'Nyuk, nyuk, nyuk!'
-$n looks atat $N's $t and goes 'Nyuk, nyuk, nyuk!'
-$n looks at your $t and goes 'Nyuk, nyuk, nyuk!'
-You look at $p and go 'Nyuk, nyuk, nyuk!'
-$n looks at $p and goes 'Nyuk, nyuk, nyuk!'
 
 ~ogle ogle 0 5 0 0
 At whom do you wish to ogle?
@@ -4385,8 +4355,8 @@ You look at $S and begin to perspire.
 $n looks at $N and begins to perspire.
 $n looks at you and begins to perspire.
 You begin to perspire.
-You perspire like a pig and begin to smell like one.
-$n is perspiring and is beginning to smell funny.
+You perspire heavily and begin to smell rather ripe.
+$n is perspiring heavily and beginning to smell rather ripe.
 You perspire on $S $t.
 $n perspires on $N's $t.
 $n perspires on your $t.
@@ -4452,7 +4422,6 @@ $n picks $s nose, looking around making sure noone notices.
 #
 #
 #
-
 ~pie pie 0 5 0 0
 You get hold of a new, fresh slimy pie and look around for someone who seems hungry...
 $n gets hold of a new, fresh slimy pie and looks around for someone who seems hungry...
@@ -4467,7 +4436,6 @@ $n tosses a pie straight at $N's $t, what a mess.
 $n tosses a pie straight at your $t, what a mess, cherry you think.
 You toss a pie onto $p.
 $n tosses a pie onto $p.
-
 ~pillow pillow 1 5 5 0
 You yell, 'PILLOW FIGHT!' and wait for the feathers to fly.
 $n yells, 'PILLOW FIGHT!'
@@ -4482,6 +4450,8 @@ $n smacks $mself with a pillow... okayyy...
 #
 #
 #
+
+
 
 ~pindrop pin 0 8 8 0
 You test the silence by dropping a pin
@@ -4572,7 +4542,6 @@ $n ponders over $N's $t.
 $n ponders over your $t.
 You ponder over $p.
 $n ponders over $p.
-
 ~pooh pooh 0 5 0 0
 You fold your arms, tap your temple and utter, 'think, think, think....'
 $n folds $s arms, taps $s temple and utters, 'think, think, think....'
@@ -4587,6 +4556,7 @@ $n folds $s arms and taps $s temple, deep in thought about $N's $t.
 $n folds $s arms and taps $s temple, deep in thought about your $t.
 #
 #
+
 
 ~pop pop 0 8 8 0
 You mischievously get out a pin... POP!
@@ -4653,7 +4623,7 @@ You pound your fist into the wall! You are so mad!
 $n pounds $s fist into the wall! Ouch! $e looks mad!
 You pound $N into the ground!
 $n pounds $N into the ground!
-$n pounds you into the ground! Are you gonna take that??
+$n pounds you into the ground with a brutal blow!
 You swing your fist as you pound the air.
 You pound yourself.
 You watch $N pound $mself in the face.
@@ -4716,7 +4686,7 @@ $n kneels before $N vowing $s eternal love and devotion.
 $n kneels before you proclaiming $s love for you saying, "Will you marry me?"
 Who are you proposing to? 
 Proposing to yourself now? Are you a little desperate?
-$n kneels down, gets a funny look on $s face as $e proclaims selflove!
+$n kneels and solemnly proposes to $mself.
 You propose to $S $t.
 $n proposes to $N's $t, I hope $E doesn't need that.
 $n proposes to your $t, I hope you didn't need that.
@@ -4904,14 +4874,14 @@ You gotta blow a raspberry at someone ELSE!
 #
 
 ~rebuke rebuke 0 5 0 0
-Who's demon spirits do you wish to rebuke? You rebuke everything.
-$n rebukes everything in the this god forsaken realm.
-You wave your hands at $N and rebuke $S demonic spirits!
-$n waves $s hands like an idiot, rebuking demons which are clearly not there...
-$n slaps you on the head, screaming 'Demonic pumpkin, I rebuke thee!'
-That person's demon spirits must have gone somewhere else.
-You rebuke your own inner demons!
-$n waves $s hands at $mself and screams 'Out, out, Demonic Raisins, I rebuke thee!'
+Whose dark influence do you wish to rebuke? You rebuke everything around you.
+$n raises $s voice in a sweeping rebuke against the darkness around $m.
+You raise a warding hand toward $N and rebuke the darkness clinging to $M!
+$n raises a warding hand toward $N and speaks a stern rebuke.
+$n points toward you and cries, 'Begone, foul influence!'
+That person is not here to receive your rebuke.
+You steel your will and rebuke your own darker impulses.
+$n steels $s will and speaks a solemn rebuke over $mself.
 You rebuke $S $t.
 $n rebukes $N's $t.
 $n rebukes $t.
@@ -4977,7 +4947,6 @@ $n sniffs $mself and says: "Sttteeenky!!!"
 #
 #
 #
-
 ~revolve revolve 0 8 8 0
 Who do you want to give the item to?
 $n looks silly trying to pawn things off on people who are not there.
@@ -4993,6 +4962,7 @@ $n hands you a revolving door.
 #
 #
 
+
 ~roar roar 0 5 0 0
 You ROAR like a triumphant lion!
 $n ROARS like a triumphant lion!
@@ -5007,7 +4977,6 @@ $n ROARS and beats $s chest aggressively!
 #
 #
 #
-
 ~rofl rofl 0 5 0 0
 You roll around on the floor, laughing.
 $n rolls around on the floor, laughing.
@@ -5022,6 +4991,7 @@ $n collapses on the floor laughing at $N's $t.
 $n collapses on the floor laughing at your $t.
 You collapse on the floor laughing at $p.
 $n collapses on the floor laughing at $p.
+
 
 ~roll roll 0 5 0 0
 You roll your eyes in disgust.
@@ -5383,21 +5353,6 @@ $n grabs your $t and releases all of $s amassed static electricity into it.
 You touch $p and release a bolt of energy right through it.
 $n touches $p and makes a bolt of electricity dance around and through it.
 
-~shootout shootout 0 8 8 0
-You can't have a shootout by yourself, pardner.
-$n looks around for someone to hold a shoot out with.
-This town ain't big enough for you and $N!
-$n wiggles $s fingers, holds $s hands near $s holsters, and sizes up $N.
-$n wiggles $s fingers, holds $s hands near $s holsters, and sizes you up.
-That there person ain't here.
-You can't have a shootout with yourself, pardner.
-$n seems to think about having a shoot out with $mself. $e decides against it.
-You look at $N's $t and get ready to draw.
-$n looks at $N's $t and gets ready to draw $s guns.
-$n looks at your $t and gets ready to draw $s guns.
-You look over $p and get ready to draw.
-$n looks over $p and gets ready to draw $s guns.
-
 ~shrugs shrugs 0 5 0 0
 You shrug.
 $n shrugs helplessly.
@@ -5510,8 +5465,8 @@ You slap $N.
 $n slaps $N.
 $n slaps you. Ow!
 How about slapping someone in the same room as you??
-You slap yourself, silly you.
-$n slaps $mself, really strange...
+You slap yourself, then reconsider the wisdom of it.
+$n slaps $mself and immediately looks regretful.
 You slap $S $t.
 $n slaps $N's $t.
 $n slaps your $t.
@@ -5583,30 +5538,30 @@ Pick someone to smack!
 $n swings wildly at the air, trying to swat a fly or something.
 You smack $N.  $N reels from the blow.
 $n gives $N a good smack, sending $M reeling.
-$n smacks you!  Idiot!
-Nyuk Nyuk.. you miss and smack yourself instead.
+$n smacks you hard across the face!
+You miss badly and smack yourself instead.
 You smack yourself.
 $n smacks $mself?
 You give $N a good smack in the $t.
 $n smacks $N, right in the $t.
-$n gives you a good smacking in the $t!  You Idiot!
+$n gives you a hard smack in the $t!
 You smack $p.
 $n smacks $p.
 
 ~smash smash 0 5 0 0
-WHO DO YOU WANNA SMASH?
-$n thinks $e smashing air.
-You smash the $N into the ground!
-$n smashes $N 0 feet into the ground!
-$n SMASHES you into the ground about Ten Feet!
-Ummmmmmmm "mental note: i must be retarded"
-Ouch, you smashed your own skull, stupid, stupid.
-stupid ass $n Smashed $mself into the ground, OUCH!!!
-You totaly MUTILATE $N's $t.
-$n MUTILATES $N's $t.
-$n has...Lets say Dismantled your $t.
-YOU SMASH THE HELL OUT OF $p.
-$n mutters"work dammnit WORK" as $e SMASHES $p.
+Whom do you want to smash?
+$n clenches $s fists and glares at the empty air.
+You smash $N into the ground!
+$n smashes $N hard into the ground!
+$n smashes you brutally into the ground!
+There is no one there to smash.
+You swing wildly and nearly smash yourself instead.
+$n swings wildly and crashes into the ground.
+You smash into $N's $t with savage force.
+$n smashes into $N's $t with savage force.
+$n smashes your $t with brutal force.
+You smash $p with all your strength.
+$n growls with effort as $e smashes $p.
 
 ~smirks smir 0 5 0 0
 You smirk.
@@ -5907,7 +5862,6 @@ You don't see them here.
 #
 #
 #
-
 ~spank spank 0 5 0 0
 You spank WHO?  Eh?  How?  Naaah, you'd never.
 $n spanks the thin air with a flat hand.
@@ -5922,6 +5876,7 @@ $n spanks $N's $t.
 $n spanks your $t.
 You spank $p.
 $n spanks $p.
+
 
 ~spew spew 0 5 0 0
 SPEW!!!!!
@@ -6089,14 +6044,14 @@ You fume and rage at $p.
 $n fumes and rages at $p.
 
 ~stomp stomp 0 5 0 0
-You stomp around like a little child.
+You stomp heavily, making your displeasure known.
 $n stomps around in an irate manner.
 You stomp on $N's toes! CRUNCH!
 $n stomps on $N's toes! CRUNCH!
 $n stomps on your toes! CRUNCH!
-You go to stomp on them then stop short, realizing they're not here.
-You stomp on your toes, way to go klutz!
-$n stomps on $s own toes, don't they look stupid?
+You halt mid-stomp when you realize they are not here.
+You misstep and stomp painfully on your own toes.
+$n missteps and stomps painfully on $s own toes.
 You stomp on $S $t.
 $n stomps on $N's $t.
 $n stomps on your $t.
@@ -6300,10 +6255,10 @@ $n sways with the rhythm.
 
 ~swear swear 0 5 0 0
 You swear loudly for a long time.
-$n swears: @*"*&^$$%@*&!!!!!!
+$n unleashes a stream of blistering curses.
 You swear $M and all $S ancestors and descendants.
 $n swears at $N's profanely.
-$n swears at you profanely, what a jerk!
+$n swears at you with venomous intensity.
 Your swearing echo's emptily.
 You swear at yourself profanely.
 $n swears under $s breath.
@@ -6320,8 +6275,8 @@ You look at $S and break out into a sweat.
 $n looks at $N and breaks out in a sweat.
 $n looks at you and starts sweating.
 You break out in a sweat.
-You sweat like a pig and begin to smell like one.
-$n is sweating freely and is beginning to smell funny.
+You sweat heavily and begin to smell rather ripe.
+$n is sweating freely and beginning to smell rather ripe.
 You sweat on $S $t.
 $n sweats on $N's $t.
 $n sweats on your $t.
@@ -6417,7 +6372,6 @@ $n tags $N's $t.
 $n tags your $t.
 You tag $p.
 $n tags $p.
-
 ~tango tango 0 5 0 0
 With whom would you like to tango?
 $n puts a rose between $s teeth, but takes it out since no one joins $m.
@@ -6432,6 +6386,7 @@ $n tangos with $N's $t.
 $n tangos with your $t.
 You tango with $p.
 $n tangos with $p.
+
 
 ~tantrum tantrum 0 8 8 0
 You flop to the floor having a tantrum.
@@ -6582,7 +6537,6 @@ $n threatens $N's $t.
 $n threatens your $t.
 You threaten $p.
 $n threatens $p.
-
 ~thumbsup thumbsup 0 5 0 0
 You seem very happy today.
 $n gives everyone a big thumbs up.
@@ -6597,6 +6551,7 @@ $n gives $mself a big thumbs up.  How silly.
 #
 #
 #
+
 
 ~thwap thwap 0 5 0 0
 Thwap?? THWAP?! Thwap WHO?!
@@ -6620,7 +6575,7 @@ You tickle $N.
 $n tickles $N.
 $n tickles you - hee hee hee.
 Who is that??
-You tickle yourself, how funny!
+You manage, somehow, to tickle yourself.
 $n tickles $mself.
 You tickle $S $t.
 $n tickles $N's $t.
@@ -6650,7 +6605,7 @@ You tip your hat to $M.
 $n gallantly tips $s hat to $N.
 $n gallantly tips $s hat to you.
 Who?
-That's silly. You tip your hat to yourself.
+You tip your hat to yourself with exaggerated courtesy.
 $n tips $s hat to $mself.
 You tip your hat at $S $t.
 $n tips $s hat at $N's $t.
@@ -6770,7 +6725,7 @@ You tug on $N to try and get $S attention.
 $n tugs on $N to try and get $S attention.
 $n tugs on you to try and get your attention.
 What are you trying to tug on?  Air?
-That's silly. You tug on yourself.
+You tug absently at your own sleeve.
 $n tugs on $mself.
 You tug on $S $t.
 $n tugs on $N's $t.
@@ -6837,7 +6792,6 @@ $n twitches at the thought of $N's $i.
 $n twitches at the thought of your $i.
 You twitch at the thought of $p.
 $n twitches at the thought of $p.
-
 ~type type 0 5 0 0
 You thro up yor handz in dizgust at yur lousy tiping skils.
 $n couldn't type a period if there was only one key on the keyboard!
@@ -6852,6 +6806,7 @@ $n declares that $N's $t is inept at typing.
 $n declares your $t to be inept at typing.
 You blame $p on all your typing mistakes.
 $n blames $p on all $s typing mistakes.
+
 
 ~understand understand 0 8 8 0
 You nod in understanding.
@@ -7017,7 +6972,6 @@ $n welcomes $N's $t back.
 $n welcomes your $t back.
 You welcome $p back.
 $n welcomes $p back.
-
 ~wedgie wedgie 0 8 8 0
 Who do you want to give a wedgie to?
 $n is looking for someone to give a wedgie to.
@@ -7032,6 +6986,7 @@ $n wants to give $N's $t a wedgie, but doesn't know how.
 $n wants to give your $t a wedgie, but doesn't know how.
 You want to give $p a wedgie, but you think better of it.
 $n wants to give $p a wedgie, but thinks better of it.
+
 
 ~weep weep 0 5 0 0
 You shed tears everywhere, what a mess!
@@ -7098,7 +7053,7 @@ You whine pitifully.
 $n whines pitifully about the whole situation.
 You whine at $M.
 $n starts whining at $N.
-$n whines at you. How pathetic.
+$n whines at you until the complaint grates on your ears.
 You can whine, but no one will care.
 You whine to yourself -- poor you.
 $n whines piteously about the whole situation.
@@ -7339,7 +7294,7 @@ $n starts a yodelling session that goes right to the bone.
 You yodel at $N.
 $n yodels in $N's ear. Yodelayheehoo!
 $n yodels in your ear -- Yodelayheehoo!
-Heh heh, your victim seems to have fled -- very wise.
+Your intended audience has already departed.
 Yodelayheehoo!
 $n yodels quietly to $mself.
 You yodel to $S $t.
