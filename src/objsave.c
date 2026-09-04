@@ -43,6 +43,84 @@ static void Crash_extract_norents(struct obj_data *obj);
 static int Crash_load_objs(struct char_data *ch);
 static int handle_obj(struct obj_data *obj, struct char_data *ch, int locate, struct obj_data **cont_rows);
 static int objsave_write_rentcode(FILE *fl, int rentcode, int cost_per_day, struct char_data *ch);
+static int objsave_encode_colored_short(const char *src, char *dst, size_t dstsz);
+static int objsave_decode_colored_short(const char *src, char *dst, size_t dstsz);
+
+/*
+ * Object records are parsed with tag_argument(), which strips whitespace
+ * after "Tag:". Internal color markup uses a literal tab prefix, so a
+ * colored short description beginning with "\tR" cannot safely be written
+ * directly as "Shrt: \tR...".
+ *
+ * RShr is a persistence-only representation for colored short descriptions:
+ *   internal tab -> %09
+ *   literal %    -> %25
+ */
+static int objsave_encode_colored_short(const char *src, char *dst, size_t dstsz)
+{
+  size_t used = 0;
+
+  if (!src || !dst || dstsz == 0)
+    return FALSE;
+
+  while (*src) {
+    const char *encoded = NULL;
+
+    if (*src == '\t')
+      encoded = "%09";
+    else if (*src == '%')
+      encoded = "%25";
+
+    if (encoded) {
+      if (used + 3 >= dstsz)
+        return FALSE;
+      memcpy(dst + used, encoded, 3);
+      used += 3;
+      src++;
+      continue;
+    }
+
+    if (used + 1 >= dstsz)
+      return FALSE;
+
+    dst[used++] = *src++;
+  }
+
+  dst[used] = '\0';
+  return TRUE;
+}
+
+static int objsave_decode_colored_short(const char *src, char *dst, size_t dstsz)
+{
+  size_t used = 0;
+
+  if (!src || !dst || dstsz == 0)
+    return FALSE;
+
+  while (*src) {
+    char decoded;
+    size_t consumed = 1;
+
+    if (!strncmp(src, "%09", 3)) {
+      decoded = '\t';
+      consumed = 3;
+    } else if (!strncmp(src, "%25", 3)) {
+      decoded = '%';
+      consumed = 3;
+    } else {
+      decoded = *src;
+    }
+
+    if (used + 1 >= dstsz)
+      return FALSE;
+
+    dst[used++] = decoded;
+    src += consumed;
+  }
+
+  dst[used] = '\0';
+  return TRUE;
+}
 
 /* Writes one object record to FILE.  Old name: Obj_to_store() */
 int objsave_save_obj_record(struct obj_data *obj, FILE *fp, int locate)
@@ -50,6 +128,7 @@ int objsave_save_obj_record(struct obj_data *obj, FILE *fp, int locate)
   int counter2;
   struct extra_descr_data *ex_desc;
   char buf1[MAX_STRING_LENGTH +1];
+  char shortbuf[MAX_STRING_LENGTH + 1];
   struct obj_data *temp = NULL;
 
   if (GET_OBJ_VNUM(obj) != NOTHING)
@@ -97,8 +176,17 @@ int objsave_save_obj_record(struct obj_data *obj, FILE *fp, int locate)
 
   if (TEST_OBJS(obj, temp, name))
     fprintf(fp, "Name: %s\n", obj->name ? obj->name : "Undefined");
-  if (TEST_OBJS(obj, temp, short_description))
-    fprintf(fp, "Shrt: %s\n", obj->short_description ? obj->short_description : "Undefined");
+  if (TEST_OBJS(obj, temp, short_description)) {
+    if (obj->short_description && strchr(obj->short_description, '\t')) {
+      if (!objsave_encode_colored_short(obj->short_description, shortbuf, sizeof(shortbuf))) {
+        log("SYSERR: Unable to encode colored short description for object #%d.",
+            GET_OBJ_VNUM(obj));
+        return 0;
+      }
+      fprintf(fp, "RShr: %s\n", shortbuf);
+    } else
+      fprintf(fp, "Shrt: %s\n", obj->short_description ? obj->short_description : "Undefined");
+  }
 
   /* These two could be a pain on the read... we'll see... */
   if (TEST_OBJS(obj, temp, description))
@@ -1016,6 +1104,15 @@ obj_save_data *objsave_parse_objects(FILE *fl)
         GET_OBJ_RENT(temp) = num;
       else if (!strcmp(tag, "Rsrc"))
         temp->remains_source_name = strdup(line);
+      else if (!strcmp(tag, "RShr")) {
+        char decoded_short[READ_SIZE];
+
+        if (!objsave_decode_colored_short(line, decoded_short, sizeof(decoded_short))) {
+          log("SYSERR: Unable to decode colored short description for object #%d.",
+              GET_OBJ_VNUM(temp));
+        } else
+          temp->short_description = strdup(decoded_short);
+      }
       break;
     case 'S':
       if (!strcmp(tag, "Shrt"))

@@ -5470,7 +5470,7 @@ static void build_visible_target_tags(struct char_data *viewer, struct char_data
     append_char_aura_tag(viewer, out, outsz, AURA_WOUNDED, "(Wounded)", NULL, shortflags);
 
   if (is_player_quest_target(viewer, target))
-    out_append(out, outsz, "[QUEST] ");
+    out_append(out, outsz, "\tR[QUEST]\tn ");
 }
 
 static void build_scan_target_tags(struct char_data *viewer, struct char_data *target,

@@ -355,6 +355,7 @@ cpp_extern const struct command_info cmd_info[] = {
   { "dismiss"  , "nofollow", POS_RESTING , do_pet_release, 0, 0 },
   { "nofollow" , "nofollow", POS_RESTING , do_pet_release, 0, 0 },
   { "rent"     , "rent"    , POS_STANDING, do_not_here , 1, 0 },
+  { "restring" , "restr"   , POS_RESTING , do_restring , 0, 0 },
   { "report"   , "repo"    , POS_RESTING , do_report   , 0, 0 },
   { "reroll"   , "rero"    , POS_DEAD    , do_wizutil  , LVL_GRGOD, SCMD_REROLL },
   { "rescue"   , "resc"    , POS_FIGHTING, do_rescue   , 1, 0 },

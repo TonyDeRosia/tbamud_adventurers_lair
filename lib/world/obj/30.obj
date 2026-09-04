@@ -167,12 +167,12 @@ A small sword lies here.~
 0 1 6 11
 3 25 10 0 0
 E
-inscription~
-   It says: 'May this sword be a good companion.  '
-~
-E
 sword small~
    The small sword seems to have an inscription of some sort.
+~
+E
+inscription~
+   It says: 'May this sword be a good companion.  '
 ~
 A
 18 1
@@ -635,6 +635,14 @@ leather wristguard~
 supportive.  It is laced with some leather string to loosen and tighten to
 almost any size.
 ~
+#3090
+restring token~
+@YA @PRes@Ytr@Ping @PTo@Yk@Pen@n~
+@YA @PRes@Ytr@Ping @PTo@Yk@Pen@n is lying here.~
+~
+0 agv 0 0 0 a 0 0 0 0 0 0 0
+0 0 0 0
+1 10000 0 0 0
 #3096
 boards adventurers notice board social bulletin gen_boards~
 an @Yad@Wve@Ynt@Cur@Wers' @Yno@Wti@Cce @Ybo@War@Yd@n~
@@ -644,11 +652,11 @@ An @Yad@Wve@Ynt@Cur@Wers' @Yno@Wti@Cce @Ybo@War@Yd@n is mounted here.~
 0 0 0 0
 0 0 0 0 0
 E
-social bulletin~
-   Use 'look board' to read the board.
-~
-E
 adventurers notice board social bulletin~
 Pinned notices carry news, requests, warnings, and messages left by travelers from across the realm. Use 'look board' to read what has been posted.
+~
+E
+social bulletin~
+   Use 'look board' to read the board.
 ~
 $~

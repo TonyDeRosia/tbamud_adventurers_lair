@@ -149,6 +149,7 @@ ACMD(do_ilock);
 ACMD(do_iunlock);
 ACMD(do_put);
 ACMD(do_remove);
+ACMD(do_restring);
 ACMD(do_sac);
 ACMD(do_wear);
 ACMD(do_wield);

@@ -1964,6 +1964,306 @@ ACMD(do_remove)
   }
 }
 
+#define RESTRING_VISIBLE_MAX 80
+
+static int restring_valid_color_code(char code)
+{
+  switch (code) {
+  case 'n': case 'N': case 'x': case 'X':
+  case 'd': case 'D': case 'a': case 'A':
+  case 'r': case 'R': case 'g': case 'G':
+  case 'y': case 'Y': case 'b': case 'B':
+  case 'm': case 'M': case 'c': case 'C':
+  case 'w': case 'W': case 'o': case 'O':
+  case 'p': case 'P':
+    return TRUE;
+  default:
+    return FALSE;
+  }
+}
+
+static int restring_translate_name(const char *src, char *dst, size_t dstsz,
+                                   int *visible_len)
+{
+  size_t out = 0;
+  int visible = 0;
+
+  if (!src || !dst || dstsz < 4)
+    return FALSE;
+
+  while (*src) {
+    unsigned char c = (unsigned char)*src;
+
+    if ((c == '\r') || (c == '\n') || (c < 32 && c != '\t'))
+      return FALSE;
+
+    /* Match the MUD's documented player ANSI convention: @R, @G, @n, etc.
+     * @@ produces a literal @. */
+    if (src[0] == '@' && src[1]) {
+      if (src[1] == '@') {
+        if (out + 1 >= dstsz)
+          return FALSE;
+        dst[out++] = '@';
+        src += 2;
+        visible++;
+        if (visible > RESTRING_VISIBLE_MAX)
+          return FALSE;
+        continue;
+      }
+
+      if (restring_valid_color_code(src[1])) {
+        if (out + 2 >= dstsz)
+          return FALSE;
+        dst[out++] = '\t';
+        dst[out++] = src[1];
+        src += 2;
+        continue;
+      }
+    }
+
+    if (src[0] == '{' && src[1] && src[2] == '}' &&
+        restring_valid_color_code(src[1])) {
+      if (out + 2 >= dstsz)
+        return FALSE;
+      dst[out++] = '\t';
+      dst[out++] = src[1];
+      src += 3;
+      continue;
+    }
+
+    if (src[0] == '\\' && src[1] == 't' && src[2] &&
+        restring_valid_color_code(src[2])) {
+      if (out + 2 >= dstsz)
+        return FALSE;
+      dst[out++] = '\t';
+      dst[out++] = src[2];
+      src += 3;
+      continue;
+    }
+
+    if (c == '\t')
+      return FALSE;
+
+    if (out + 1 >= dstsz)
+      return FALSE;
+
+    dst[out++] = *src++;
+    visible++;
+
+    if (visible > RESTRING_VISIBLE_MAX)
+      return FALSE;
+  }
+
+  if (visible < 1)
+    return FALSE;
+
+  if (out + 2 >= dstsz)
+    return FALSE;
+  dst[out++] = '\t';
+  dst[out++] = 'n';
+  dst[out] = '\0';
+
+  if (visible_len)
+    *visible_len = visible;
+
+  return TRUE;
+}
+
+static struct obj_data *find_restring_token(struct char_data *ch)
+{
+  struct obj_data *obj;
+
+  if (!ch)
+    return NULL;
+
+  for (obj = ch->carrying; obj; obj = obj->next_content)
+    if (OBJ_FLAGGED(obj, ITEM_RESTRING))
+      return obj;
+
+  return NULL;
+}
+
+static void replace_obj_short_description(struct obj_data *obj, const char *new_short)
+{
+  char *old_short;
+  obj_rnum rnum;
+
+  if (!obj || !new_short)
+    return;
+
+  old_short = obj->short_description;
+  rnum = GET_OBJ_RNUM(obj);
+
+  obj->short_description = strdup(new_short);
+
+  if (old_short) {
+    if (rnum == NOTHING || old_short != obj_proto[rnum].short_description)
+      free(old_short);
+  }
+}
+
+static int restring_keyword_exists(char *keywords, const char *word)
+{
+  char existing[MAX_INPUT_LENGTH];
+  char *scan;
+
+  if (!keywords || !word || !*word)
+    return FALSE;
+
+  scan = keywords;
+  while (*scan) {
+    scan = one_argument(scan, existing);
+    if (!*existing)
+      break;
+    if (!strcasecmp(existing, word))
+      return TRUE;
+  }
+
+  return FALSE;
+}
+
+/* Preserve every existing object keyword and add useful aliases derived from
+ * the new visible short description. Internal color codes and punctuation are
+ * not stored as keywords. Example: "@RWHACKAMOLE@n" adds "whackamole" while
+ * the original "dagger" keyword remains valid. */
+static int restring_add_name_keywords(struct obj_data *obj, char *colored_short)
+{
+  char plain[MAX_INPUT_LENGTH];
+  char merged[MAX_STRING_LENGTH];
+  char word[MAX_INPUT_LENGTH];
+  char *src;
+  char *dst;
+  size_t remain;
+  int added = 0;
+  char *old_name;
+  obj_rnum rnum;
+
+  if (!obj || !colored_short || !obj->name)
+    return FALSE;
+
+  dst = plain;
+  remain = sizeof(plain);
+  src = colored_short;
+
+  /* Convert the colored short description to keyword-safe plain text. */
+  while (*src && remain > 1) {
+    unsigned char c = (unsigned char)*src;
+
+    if (c == '\t' && src[1]) {
+      src += 2;
+      continue;
+    }
+
+    if (isalnum(c)) {
+      *dst++ = (char)tolower(c);
+      remain--;
+    } else if (dst > plain && dst[-1] != ' ') {
+      *dst++ = ' ';
+      remain--;
+    }
+    src++;
+  }
+  *dst = '\0';
+
+  snprintf(merged, sizeof(merged), "%s", obj->name);
+  src = plain;
+
+  while (*src) {
+    src = one_argument(src, word);
+    if (!*word)
+      break;
+
+    if (!restring_keyword_exists(merged, word)) {
+      size_t used = strlen(merged);
+      size_t need = strlen(word) + (used ? 1 : 0);
+
+      if (used + need >= sizeof(merged))
+        break;
+
+      if (used)
+        strcat(merged, " ");
+      strcat(merged, word);
+      added++;
+    }
+  }
+
+  if (!added)
+    return TRUE;
+
+  old_name = obj->name;
+  rnum = GET_OBJ_RNUM(obj);
+  obj->name = strdup(merged);
+
+  if (old_name) {
+    if (rnum == NOTHING || old_name != obj_proto[rnum].name)
+      free(old_name);
+  }
+
+  return TRUE;
+}
+
+ACMD(do_restring)
+{
+  char target_arg[MAX_INPUT_LENGTH];
+  char translated[MAX_INPUT_LENGTH * 2];
+  char *new_name;
+  struct obj_data *target = NULL;
+  struct obj_data *token = NULL;
+  struct char_data *tmp_char = NULL;
+  int visible_len = 0;
+
+  new_name = one_argument(argument, target_arg);
+  skip_spaces(&new_name);
+
+  if (!*target_arg || !*new_name) {
+    send_to_char(ch,
+        "Usage: restring <item> <new name>\r\n"
+        "Color example: restring sword @RBloodfang@n, Blade of the Fallen\r\n");
+    return;
+  }
+
+  generic_find(target_arg, FIND_OBJ_INV | FIND_OBJ_EQUIP, ch, &tmp_char, &target);
+  if (!target) {
+    send_to_char(ch, "You don't seem to own that item.\r\n");
+    return;
+  }
+
+  if (OBJ_FLAGGED(target, ITEM_RESTRING)) {
+    send_to_char(ch, "Restring Tokens cannot themselves be restrung.\r\n");
+    return;
+  }
+
+  token = find_restring_token(ch);
+  if (!token) {
+    send_to_char(ch, "You need a Restring Token in your inventory to do that.\r\n");
+    return;
+  }
+
+  if (!restring_translate_name(new_name, translated, sizeof(translated), &visible_len)) {
+    send_to_char(ch,
+        "That name is invalid or too long. Keep the visible name to %d characters or fewer.\r\n"
+        "Supported color markup uses the MUD's ANSI codes such as @R, @G, @B, and @n.\r\n",
+        RESTRING_VISIBLE_MAX);
+    return;
+  }
+
+  if (!restring_add_name_keywords(target, translated)) {
+    send_to_char(ch, "Unable to update that item's keywords safely. The token was not consumed.\r\n");
+    return;
+  }
+
+  replace_obj_short_description(target, translated);
+
+  act("$p flashes brightly and vanishes as its magic settles over your item.",
+      FALSE, ch, token, NULL, TO_CHAR);
+  extract_obj(token);
+
+  act("Your item is now known as $p.", FALSE, ch, target, NULL, TO_CHAR);
+
+  Crash_crashsave(ch);
+  save_char(ch);
+}
+
 ACMD(do_ilock)
 {
   char arg[MAX_INPUT_LENGTH];
