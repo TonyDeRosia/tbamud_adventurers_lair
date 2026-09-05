@@ -443,6 +443,8 @@ do                                                              \
 #define OBJWEAR_FLAGGED(obj, flag) (IS_SET_AR(GET_OBJ_WEAR(obj), (flag)))
 /** 1 if flag is set in the extra bits of obj, 0 if not. */
 #define OBJ_FLAGGED(obj, flag) (IS_SET_AR(GET_OBJ_EXTRA(obj), (flag)))
+/** True when an object may not leave its holder by normal transfer/drop. */
+#define OBJ_CANT_DROP(obj) (OBJ_FLAGGED((obj), ITEM_NODROP) || OBJ_FLAGGED((obj), ITEM_CURSED))
 
 /** 1 if spl has a flag set in routines, 0 if not. */
 #define HAS_SPELL_ROUTINE(spl, flag) (IS_SET(SPELL_ROUTINES(spl), (flag)))

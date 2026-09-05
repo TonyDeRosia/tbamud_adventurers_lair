@@ -504,6 +504,7 @@ const char *extra_bits[] = {
   "OFFHAND",
   "KEPT",
   "RESTRING",
+  "CURSED",
   "\n"
 };
 

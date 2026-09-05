@@ -529,7 +529,7 @@ void clanedit_parse(struct descriptor_data *d, char *arg);
 #define ITEM_NOINVIS           4   /**< Item cannot be made invis	*/
 #define ITEM_INVISIBLE         5   /**< Item is invisible */
 #define ITEM_MAGIC             6   /**< Item is magical */
-#define ITEM_NODROP            7   /**< Item is cursed: can't drop */
+#define ITEM_NODROP            7   /**< Item cannot be dropped */
 #define ITEM_BLESS             8   /**< Item is blessed */
 #define ITEM_ANTI_GOOD         9   /**< Not usable by good people	*/
 #define ITEM_ANTI_EVIL        10   /**< Not usable by evil people	*/
@@ -545,7 +545,8 @@ void clanedit_parse(struct descriptor_data *d, char *arg);
 #define ITEM_OFFHAND   19  /**< One-handed weapon may also be used in offhand */
 #define ITEM_KEPT      20  /**< Player-marked keep protection */
 #define ITEM_RESTRING  21  /**< Consumable token used by the restring system */
-#define NUM_ITEM_FLAGS 22
+#define ITEM_CURSED    22  /**< Magical curse state; separate from NO_DROP */
+#define NUM_ITEM_FLAGS 23
 
 /* Modifier constants used with obj affects ('A' fields) */
 #define APPLY_NONE              0	/**< No effect			*/

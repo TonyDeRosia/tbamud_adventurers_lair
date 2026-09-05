@@ -100,6 +100,24 @@ static int reject_kept_item_action(struct char_data *ch, struct obj_data *obj)
   return TRUE;
 }
 
+/* CURSED_NODROP_CONTAINER_CONTENTS_GUARD:
+ * A container does not inherit CURSED or NO_DROP from its contents.  Instead,
+ * transfer operations inspect contents recursively so protection lasts only
+ * while the protected object is actually inside. */
+static int obj_contents_cant_leave(struct obj_data *obj)
+{
+  struct obj_data *inside;
+
+  if (!obj)
+    return FALSE;
+
+  for (inside = obj->contains; inside; inside = inside->next_content) {
+    if (OBJ_CANT_DROP(inside) || obj_contents_cant_leave(inside))
+      return TRUE;
+  }
+
+  return FALSE;
+}
 static void perform_put(struct char_data *ch, struct obj_data *obj, struct obj_data *cont)
 {
   long object_id = obj_script_id(obj);
@@ -116,21 +134,16 @@ static void perform_put(struct char_data *ch, struct obj_data *obj, struct obj_d
   if ((GET_OBJ_VAL(cont, 0) > 0) &&
       (GET_OBJ_WEIGHT(cont) + GET_OBJ_WEIGHT(obj) > GET_OBJ_VAL(cont, 0)))
     act("$p won't fit in $P.", FALSE, ch, obj, cont, TO_CHAR);
-  else if (OBJ_FLAGGED(obj, ITEM_NODROP) && IN_ROOM(cont) != NOWHERE)
+  else if (OBJ_CANT_DROP(obj) && IN_ROOM(cont) != NOWHERE)
     act("You can't get $p out of your hand.", FALSE, ch, obj, NULL, TO_CHAR);
+  else if (obj_contents_cant_leave(obj) && IN_ROOM(cont) != NOWHERE)
+    act("You can't put $p there while it contains a cursed or no-drop item.", FALSE, ch, obj, NULL, TO_CHAR);
   else {
     obj_from_char(obj);
     obj_to_obj(obj, cont);
 
     act("$n puts $p in $P.", TRUE, ch, obj, cont, TO_ROOM);
-
-    /* Yes, I realize this is strange until we have auto-equip on rent. -gg */
-    if (OBJ_FLAGGED(obj, ITEM_NODROP) && !OBJ_FLAGGED(cont, ITEM_NODROP)) {
-      SET_BIT_AR(GET_OBJ_EXTRA(cont), ITEM_NODROP);
-      act("You get a strange feeling as you put $p in $P.", FALSE,
-                ch, obj, cont, TO_CHAR);
-    } else
-      act("You put $p in $P.", FALSE, ch, obj, cont, TO_CHAR);
+    act("You put $p in $P.", FALSE, ch, obj, cont, TO_CHAR);
   }
 }
 
@@ -516,8 +529,18 @@ static int perform_drop(struct char_data *ch, struct obj_data *obj,
   if (!has_obj_by_uid_in_lookup_table(object_id))
     return 0; // item was extracted by script
 
+  if (OBJ_FLAGGED(obj, ITEM_CURSED) && !PRF_FLAGGED(ch, PRF_NOHASSLE)) {
+    snprintf(buf, sizeof(buf), "You can't %s $p, it is CURSED!", sname);
+    act(buf, FALSE, ch, obj, 0, TO_CHAR);
+    return (0);
+  }
   if (OBJ_FLAGGED(obj, ITEM_NODROP) && !PRF_FLAGGED(ch, PRF_NOHASSLE)) {
-    snprintf(buf, sizeof(buf), "You can't %s $p, it must be CURSED!", sname);
+    snprintf(buf, sizeof(buf), "You can't %s $p; it is marked NO-DROP.", sname);
+    act(buf, FALSE, ch, obj, 0, TO_CHAR);
+    return (0);
+  }
+  if (obj_contents_cant_leave(obj) && !PRF_FLAGGED(ch, PRF_NOHASSLE)) {
+    snprintf(buf, sizeof(buf), "You can't %s $p while it contains a cursed or no-drop item.", sname);
     act(buf, FALSE, ch, obj, 0, TO_CHAR);
     return (0);
   }
@@ -751,8 +774,16 @@ static void perform_give(struct char_data *ch, struct char_data *vict,
   if (!receive_mtrigger(vict, ch, obj))
     return;
 
+  if (OBJ_FLAGGED(obj, ITEM_CURSED) && !PRF_FLAGGED(ch, PRF_NOHASSLE)) {
+    act("You can't let go of $p; it is CURSED!", FALSE, ch, obj, 0, TO_CHAR);
+    return;
+  }
   if (OBJ_FLAGGED(obj, ITEM_NODROP) && !PRF_FLAGGED(ch, PRF_NOHASSLE)) {
-    act("You can't let go of $p!!  Yeech!", FALSE, ch, obj, 0, TO_CHAR);
+    act("You can't give $p away; it is marked NO-DROP.", FALSE, ch, obj, 0, TO_CHAR);
+    return;
+  }
+  if (obj_contents_cant_leave(obj) && !PRF_FLAGGED(ch, PRF_NOHASSLE)) {
+    act("You can't give $p away while it contains a cursed or no-drop item.", FALSE, ch, obj, 0, TO_CHAR);
     return;
   }
   if (reject_kept_item_action(ch, obj))
@@ -1627,7 +1658,7 @@ static int perform_weapon_swap(struct char_data *ch, struct obj_data *obj, int w
   if (!can_equip_weapon(ch, obj, where, TRUE, TRUE))
     return FALSE;
 
-  if (OBJ_FLAGGED(old, ITEM_NODROP) && !PRF_FLAGGED(ch, PRF_NOHASSLE)) {
+  if (OBJ_FLAGGED(old, ITEM_CURSED) && !PRF_FLAGGED(ch, PRF_NOHASSLE)) {
     act("You can't remove $p, it must be CURSED!", FALSE, ch, old, 0, TO_CHAR);
     return FALSE;
   }
@@ -1908,7 +1939,7 @@ static void perform_remove(struct char_data *ch, int pos)
     log("SYSERR: perform_remove: bad pos %d passed.", pos);
     /*  This error occurs when perform_remove() is passed a bad 'pos'
      *  (location) to remove an object from. */
-  else if (OBJ_FLAGGED(obj, ITEM_NODROP) && GET_LEVEL(ch) < LVL_IMMORT && !PRF_FLAGGED(ch, PRF_NOHASSLE))
+  else if (OBJ_FLAGGED(obj, ITEM_CURSED) && GET_LEVEL(ch) < LVL_IMMORT && !PRF_FLAGGED(ch, PRF_NOHASSLE))
     act("You can't remove $p, it must be CURSED!", FALSE, ch, obj, 0, TO_CHAR);
   else if (IS_CARRYING_N(ch) >= CAN_CARRY_N(ch) && GET_LEVEL(ch) < LVL_IMMORT && !PRF_FLAGGED(ch, PRF_NOHASSLE))
     act("$p: you can't carry that many items!", FALSE, ch, obj, 0, TO_CHAR);
@@ -2434,8 +2465,10 @@ static const char *auction_item_display_name(struct obj_data *obj)
     auction_namebuf_append(namebuf, sizeof(namebuf), "(Hum) ");
   if (OBJ_FLAGGED(obj, ITEM_INVISIBLE))
     auction_namebuf_append(namebuf, sizeof(namebuf), "(Invis) ");
+  if (OBJ_FLAGGED(obj, ITEM_CURSED))
+    auction_namebuf_append(namebuf, sizeof(namebuf), "(Cursed) ");
   if (OBJ_FLAGGED(obj, ITEM_NODROP))
-    auction_namebuf_append(namebuf, sizeof(namebuf), "(K) ");
+    auction_namebuf_append(namebuf, sizeof(namebuf), "(No-Drop) ");
   if (OBJ_FLAGGED(obj, ITEM_MAGIC))
     auction_namebuf_append(namebuf, sizeof(namebuf), "(Magic) ");
   if (OBJ_FLAGGED(obj, ITEM_ANTI_GOOD))
@@ -2683,7 +2716,7 @@ ACMD(do_auction)
     send_to_char(ch, "You don't seem to have that item.\r\n");
     return;
   }
-  if (OBJ_FLAGGED(obj, ITEM_NODROP)) {
+  if (OBJ_CANT_DROP(obj) || obj_contents_cant_leave(obj)) {
     send_to_char(ch, "You cannot auction that item.\r\n");
     return;
   }

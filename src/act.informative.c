@@ -1147,13 +1147,22 @@ static void build_obj_aura_tags(struct obj_data *obj, struct char_data *ch, char
   if (OBJ_FLAGGED(obj, ITEM_INVISIBLE))
     append_colored_aura_tag(ch, out, outsz, AURA_INVIS_OBJ, shortflags ? "(I)" : "(Invisible)");
 
-  if (OBJ_FLAGGED(obj, ITEM_NODROP)) {
+  if (OBJ_FLAGGED(obj, ITEM_CURSED)) {
     if (shortflags)
-      append_colored_aura_tag(ch, out, outsz, AURA_KEEP_OBJ, "(K)");
+      append_colored_aura_tag(ch, out, outsz, AURA_CURSED_OBJ, "(C)");
     else if (clr(ch, C_NRM))
       out_append(out, outsz, "\tD(C\twu\tDrs\twe\tDd)\tn ");
     else
       out_append(out, outsz, "(Cursed) ");
+  }
+
+  if (OBJ_FLAGGED(obj, ITEM_NODROP)) {
+    if (shortflags)
+      append_colored_aura_tag(ch, out, outsz, AURA_KEEP_OBJ, "(N)");
+    else if (clr(ch, C_NRM))
+      out_append(out, outsz, "\tR(\trN\tRo\tr-\tRD\trr\tRo\trp\tR)\tn ");
+    else
+      out_append(out, outsz, "(No-Drop) ");
   }
 
   if (OBJ_FLAGGED(obj, ITEM_ANTI_GOOD))

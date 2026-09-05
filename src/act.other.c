@@ -715,7 +715,7 @@ ACMD(do_hide)
 static int theft_object_is_protected(struct obj_data *obj)
 {
   return (!obj ||
-          OBJ_FLAGGED(obj, ITEM_NODROP) ||
+          OBJ_CANT_DROP(obj) ||
           OBJ_FLAGGED(obj, ITEM_NODONATE) ||
           OBJ_FLAGGED(obj, ITEM_QUEST));
 }

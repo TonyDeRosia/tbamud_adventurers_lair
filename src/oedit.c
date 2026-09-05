@@ -1015,10 +1015,11 @@ void oedit_parse(struct descriptor_data *d, char *arg)
       TOGGLE_BIT_AR(GET_OBJ_EXTRA(OLC_OBJ(d)), extra_flag);
 
       /* OBJECT_BLESS_CURSE_OEDIT_EXCLUSIVE:
-       * Bless and Curse are opposing object states and may not coexist. */
+       * Bless and magical Curse are opposing states and may not coexist.
+       * NO_DROP is an independent mechanical flag. */
       if (extra_flag == ITEM_BLESS && OBJ_FLAGGED(OLC_OBJ(d), ITEM_BLESS))
-        REMOVE_BIT_AR(GET_OBJ_EXTRA(OLC_OBJ(d)), ITEM_NODROP);
-      else if (extra_flag == ITEM_NODROP && OBJ_FLAGGED(OLC_OBJ(d), ITEM_NODROP))
+        REMOVE_BIT_AR(GET_OBJ_EXTRA(OLC_OBJ(d)), ITEM_CURSED);
+      else if (extra_flag == ITEM_CURSED && OBJ_FLAGGED(OLC_OBJ(d), ITEM_CURSED))
         REMOVE_BIT_AR(GET_OBJ_EXTRA(OLC_OBJ(d)), ITEM_BLESS);
 
       oedit_disp_extra_menu(d);
