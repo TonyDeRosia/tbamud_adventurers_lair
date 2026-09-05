@@ -25,6 +25,7 @@ sweat running down the bridge of his nose.
 25 12 -5 5d5+250 4d4+4
 250 62500
 8 8 1
+BodyProfile: 1
 E
 #30902
 serf worker~
@@ -39,6 +40,7 @@ road, trying to dry up the areas of the road that are muddiest.
 25 12 -5 5d5+250 4d4+4
 250 62500
 8 8 0
+BodyProfile: 1
 E
 #30903
 muddy little boy~
@@ -53,6 +55,7 @@ his front door?
 25 12 -5 5d5+250 4d4+4
 250 62500
 8 8 1
+BodyProfile: 1
 E
 #30904
 sad little girl~
@@ -67,6 +70,7 @@ indoors all day.
 25 12 -5 5d5+250 4d4+4
 250 62500
 8 8 2
+BodyProfile: 1
 E
 #30905
 serf man~
@@ -80,6 +84,7 @@ skin rather than a covering of extra mess.
 26 12 -5 5d5+260 4d4+4
 260 67600
 8 8 1
+BodyProfile: 1
 E
 #30906
 wizened old woman~
@@ -93,6 +98,7 @@ she watches the children at play.
 26 12 -5 5d5+260 4d4+4
 260 67600
 8 8 2
+BodyProfile: 1
 E
 #30907
 young child~
@@ -106,6 +112,7 @@ to do nothing but labor for others.
 26 12 -5 5d5+260 4d4+4
 260 67600
 8 8 1
+BodyProfile: 1
 E
 #30908
 gilsby innkeep man servant~
@@ -121,6 +128,7 @@ surrounding area.
 27 11 -6 5d5+270 4d4+4
 270 72900
 8 8 1
+BodyProfile: 1
 E
 #30909
 tired man~
@@ -134,6 +142,7 @@ over with all his weight on those elbows.
 27 11 -6 5d5+270 4d4+4
 270 72900
 8 8 1
+BodyProfile: 1
 E
 #30910
 man beady eyes secretive~
@@ -148,6 +157,7 @@ red of Baron Westlawn.
 30 10 -8 6d6+300 5d5+5
 300 90000
 8 8 1
+BodyProfile: 1
 E
 #30911
 woman servant serf~
@@ -161,6 +171,7 @@ she presents upon first look.
 28 11 -6 5d5+280 4d4+4
 280 78400
 8 8 2
+BodyProfile: 1
 E
 #30912
 little boy playing~
@@ -174,6 +185,7 @@ once in a while to assure himself that he is truly ascending.
 25 12 -5 5d5+250 4d4+4
 250 62500
 8 8 1
+BodyProfile: 1
 E
 #30913
 little girl~
@@ -189,6 +201,7 @@ her eyes of the boy and there is a slight smile at the corners of her mouth.
 25 12 -5 5d5+250 4d4+4
 250 62500
 8 8 2
+BodyProfile: 1
 E
 #30914
 cow old~
@@ -202,6 +215,7 @@ An old cow with sagging udders lazily wanders the field.
 25 12 -5 5d5+250 4d4+4
 250 62500
 8 8 0
+BodyProfile: 2
 E
 #30915
 nag mare old~
@@ -242,6 +256,7 @@ obviously heavy and awkward.
 26 12 -5 5d5+260 4d4+4
 260 67600
 8 8 2
+BodyProfile: 1
 E
 #30918
 man keg~
@@ -255,6 +270,7 @@ sure that the dining and kitchen area is always well-stocked with ale.
 27 11 -6 5d5+270 4d4+4
 270 72900
 8 8 1
+BodyProfile: 1
 E
 #30919
 watchman soldier~
@@ -269,6 +285,7 @@ die.
 28 11 -6 5d5+280 4d4+4
 280 78400
 8 8 1
+BodyProfile: 1
 E
 #30920
 soldier man~
@@ -282,6 +299,7 @@ in formation even when there is no formation.
 28 11 -6 5d5+280 4d4+4
 280 78400
 8 8 1
+BodyProfile: 1
 E
 #30921
 soldier guard finest~
@@ -296,6 +314,7 @@ to be masters, respected as the best in nearly every fight.
 29 11 -7 5d5+290 4d4+4
 290 84100
 8 8 1
+BodyProfile: 1
 E
 #30922
 jerrod swordsman elite captain~
@@ -313,6 +332,7 @@ passes.
 30 10 -8 6d6+300 5d5+5
 300 90000
 8 8 1
+BodyProfile: 1
 E
 #30923
 raggedy commoner~
@@ -339,6 +359,7 @@ and filth from head to toe.
 29 11 -7 5d5+290 4d4+4
 290 84100
 8 8 1
+BodyProfile: 1
 E
 #30925
 donld smithy~
@@ -367,6 +388,7 @@ with a strong dignity.
 30 10 -8 6d6+300 5d5+5
 300 90000
 8 8 1
+BodyProfile: 1
 E
 #30927
 serving wench~
@@ -394,6 +416,7 @@ the many juices and fluids of the food he prepares.
 26 12 -5 5d5+260 4d4+4
 260 67600
 8 8 1
+BodyProfile: 1
 E
 #30929
 cook~
@@ -407,6 +430,7 @@ sweat and grime.  But she is smiling.  Who can understand women?
 26 12 -5 5d5+260 4d4+4
 260 67600
 8 8 2
+BodyProfile: 1
 E
 #30930
 salida chief cook~
@@ -421,6 +445,7 @@ kitchen with great food.
 29 11 -7 5d5+290 4d4+4
 290 84100
 8 8 2
+BodyProfile: 1
 E
 #30931
 pig stray~
@@ -434,6 +459,7 @@ and twists about in the mud.
 26 12 -5 5d5+260 4d4+4
 260 67600
 8 8 0
+BodyProfile: 2
 E
 #30932
 old man serf~
@@ -447,6 +473,7 @@ you let him alone.
 26 12 -5 5d5+260 4d4+4
 260 67600
 8 8 1
+BodyProfile: 1
 E
 #30933
 stableman man servant~
@@ -462,6 +489,7 @@ fights at the Baron's side.
 27 11 -6 5d5+270 4d4+4
 270 72900
 8 8 1
+BodyProfile: 1
 E
 #30934
 roscoe chief stablemaster  horse breaker~
@@ -475,6 +503,7 @@ newest of the steeds trot about the field.
 28 11 -6 5d5+280 4d4+4
 280 78400
 8 8 1
+BodyProfile: 1
 E
 #30935
 lounging soldier~
@@ -488,6 +517,7 @@ all.
 28 11 -6 5d5+280 4d4+4
 280 78400
 8 8 1
+BodyProfile: 1
 E
 #30936
 child mischievous~
@@ -501,6 +531,7 @@ dodging around piles of pots and pans.
 25 12 -5 5d5+250 4d4+4
 250 62500
 8 8 2
+BodyProfile: 1
 E
 #30937
 noble man conniving~
@@ -514,6 +545,7 @@ great import and groundbreaking news.
 29 11 -7 5d5+290 4d4+4
 290 84100
 8 8 1
+BodyProfile: 1
 E
 #30938
 young noble~
@@ -527,6 +559,7 @@ listens raptly, nodding every now and again to what is being said.
 28 11 -6 5d5+280 4d4+4
 280 78400
 8 8 1
+BodyProfile: 1
 E
 #30939
 haughty noble~
@@ -540,6 +573,7 @@ disagree more or be more bored - but he doesn't leave.
 29 11 -7 5d5+290 4d4+4
 290 84100
 8 8 1
+BodyProfile: 1
 E
 #30940
 bold noblewoman~
@@ -566,6 +600,7 @@ must be stashed away somewhere in one of the guest rooms.
 27 11 -6 5d5+270 4d4+4
 270 72900
 8 8 1
+BodyProfile: 1
 E
 #30942
 bud alemaster~

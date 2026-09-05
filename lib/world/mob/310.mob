@@ -23,6 +23,7 @@ like rabbit.
 13 16 2 2d2+130 2d2+2
 130 16900
 8 8 0
+BodyProfile: 2
 E
 #31003
 rabbit brown~
@@ -36,6 +37,7 @@ There goes lunch!
 14 16 1 2d2+140 2d2+2
 140 19600
 8 8 0
+BodyProfile: 2
 E
 #31004
 tomal woodsman~
@@ -62,6 +64,7 @@ determined to rip your guts out.
 25 12 -5 5d5+250 4d4+4
 250 62500
 8 8 0
+BodyProfile: 1
 E
 #31006
 guard graye guardsman~
@@ -114,6 +117,7 @@ demons.
 15 15 1 3d3+150 2d2+2
 150 22500
 8 8 1
+BodyProfile: 1
 E
 #31010
 citizen gray woman~
@@ -127,6 +131,7 @@ demons.
 15 15 1 3d3+150 2d2+2
 150 22500
 8 8 2
+BodyProfile: 1
 E
 #31011
 demon major~
@@ -152,6 +157,7 @@ A shadow wraith drifts into your way.
 24 12 -4 4d4+240 4d4+4
 240 57600
 8 8 0
+BodyProfile: 1
 E
 #31013
 guard jail~
@@ -166,6 +172,7 @@ weapon, prisoner!  '
 20 14 -2 4d4+200 3d3+3
 200 40000
 8 8 1
+BodyProfile: 1
 E
 #31014
 rymat~
@@ -221,5 +228,6 @@ is so prosperous and happy.
 30 10 -8 6d6+300 5d5+5
 300 90000
 8 8 1
+BodyProfile: 1
 E
 $

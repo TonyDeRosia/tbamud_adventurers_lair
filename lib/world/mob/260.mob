@@ -11,6 +11,7 @@ with his face painted in light brown hues, this man looks quite fearsome.
 200 40000
 8 8 1
 BareHandAttack: 1
+BodyProfile: 1
 E
 #26001
 warrior rahn~
@@ -24,6 +25,7 @@ around her, rendering her nearly invisible.
 21 13 -2 4d4+210 3d3+3
 210 44100
 8 8 2
+BodyProfile: 1
 E
 #26002
 hunter rahn~
@@ -37,6 +39,7 @@ for fear one may sneak into their room!
 22 13 -3 4d4+220 3d3+3
 220 48400
 8 8 1
+BodyProfile: 1
 E
 #26003
 huntress rahn~
@@ -49,6 +52,7 @@ A Rahn huntress decides you are fair game since you have invaded her territory!
 23 13 -3 4d4+230 3d3+3
 230 52900
 8 8 2
+BodyProfile: 1
 E
 #26004
 rahn hidesman~

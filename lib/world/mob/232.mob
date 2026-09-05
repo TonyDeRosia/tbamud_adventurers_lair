@@ -11,6 +11,7 @@ his eyes.  His hat makes him look very comical.
 220 48400
 8 8 1
 BareHandAttack: 12
+BodyProfile: 1
 E
 #23201
 Baker lady woman~
@@ -24,6 +25,7 @@ her nose.  She is very attractive and has a friendly attitude.
 21 13 -2 4d4+210 3d3+3
 210 44100
 8 8 2
+BodyProfile: 1
 E
 #23202
 man shopkeeper merchant Zorg~
@@ -38,6 +40,7 @@ out and exercise a LOT!
 22 13 -3 4d4+220 3d3+3
 220 48400
 8 8 1
+BodyProfile: 1
 E
 #23203
 Lora Croft~
@@ -80,6 +83,7 @@ you suspiciously, growling at you as you try to approach.
 220 48400
 8 8 0
 BareHandAttack: 4
+BodyProfile: 2
 E
 #23206
 anaconda pets~
@@ -109,5 +113,6 @@ to see you.
 220 48400
 8 8 1
 BareHandAttack: 7
+BodyProfile: 1
 E
 $

@@ -11,6 +11,7 @@ with intelligent eyes.
 200 40000
 8 8 0
 BareHandAttack: 4
+BodyProfile: 19
 E
 #25201
 gypsy zigeuner~
@@ -24,6 +25,7 @@ expected.
 30 10 -8 6d6+300 5d5+5
 300 90000
 8 8 1
+BodyProfile: 1
 E
 #25202
 gypsy cigano~
@@ -36,6 +38,7 @@ A Cigano Gypsy spots you and turns away at a quick pace.
 23 13 -3 4d4+230 3d3+3
 230 52900
 8 8 1
+BodyProfile: 1
 E
 #25203
 gypsy tsigani~
@@ -50,6 +53,7 @@ deathwish...
 200 40000
 8 8 1
 BareHandAttack: 3
+BodyProfile: 1
 E
 #25204
 vampire greater~
@@ -64,6 +68,7 @@ attacking you!
 300 90000
 8 8 1
 BareHandAttack: 4
+BodyProfile: 1
 E
 #25205
 vampire lesser~
@@ -77,6 +82,7 @@ A Lesser Vampire attacks with a power that only a vampire could possess.
 300 90000
 8 8 1
 BareHandAttack: 8
+BodyProfile: 1
 E
 #25206
 Lord vampire~
@@ -90,5 +96,6 @@ A huge, terrifying man-like thing is about to bite your neck.
 300 90000
 8 8 1
 BareHandAttack: 4
+BodyProfile: 1
 E
 $

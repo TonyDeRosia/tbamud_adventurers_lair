@@ -11,6 +11,7 @@ of Midgaard.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 1
+BodyProfile: 1
 E
 #24201
 mayor~
@@ -23,6 +24,7 @@ The Mayor is walking around here, inspecting the city.
 7 18 5 1d1+70 1d2+1
 70 4900
 4 4 1
+BodyProfile: 1
 E
 #24202
 bank manager~
@@ -89,6 +91,7 @@ talking.  Oh well.
 5 19 7 1d1+50 1d2+0
 50 2500
 8 8 1
+BodyProfile: 1
 E
 #24206
 clothing salesman~
@@ -102,6 +105,7 @@ expensive suit, and his hair is slicked back.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 1
+BodyProfile: 1
 E
 #24207
 waitress~
@@ -116,6 +120,7 @@ patrons.
 5 19 7 1d1+50 1d2+0
 50 2500
 8 8 2
+BodyProfile: 1
 E
 #24208
 stagehand stage hand~
@@ -195,5 +200,6 @@ patrons.
 6 18 6 1d1+60 1d2+1
 60 3600
 8 8 2
+BodyProfile: 1
 E
 $

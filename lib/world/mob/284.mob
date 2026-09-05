@@ -36,6 +36,7 @@ hair is wild and unkempt, and she is dressed in tattered rags.
 30 10 -8 6d6+300 5d5+5
 300 90000
 8 8 2
+BodyProfile: 0
 E
 #28403
 ghenna argos~
@@ -101,6 +102,7 @@ A large plant that reeks of carrion stands here stinking up the place.
 30 10 -8 6d6+300 5d5+5
 300 90000
 8 8 0
+BodyProfile: 14
 E
 #28408
 ghenna gorgimera~
@@ -128,6 +130,7 @@ shriveled rotting flesh, chillingly returns your gaze.
 31 10 -8 6d6+310 5d5+5
 310 96100
 8 8 1
+BodyProfile: 1
 E
 #28410
 ghenna deep dragon~
@@ -142,6 +145,7 @@ would do best to exit its lair immediately.
 32 10 -9 6d6+320 5d5+5
 320 102400
 8 8 0
+BodyProfile: 6
 E
 #28411
 ghenna derro~
@@ -168,6 +172,7 @@ pale complexion.  Though small, he appears to be very lithe and agile.
 30 10 -8 6d6+300 5d5+5
 300 90000
 8 8 1
+BodyProfile: 1
 E
 #28413
 ghenna efreeti genie~
@@ -194,6 +199,7 @@ ugly.  But I guess you are about to see HOW ugly.
 30 10 -8 6d6+300 5d5+5
 300 90000
 8 8 2
+BodyProfile: 1
 E
 #28415
 ghenna stupid orc~
@@ -206,6 +212,7 @@ A big, stupid Orc is lumbering through here.
 30 10 -8 6d6+300 5d5+5
 300 90000
 8 8 1
+BodyProfile: 1
 E
 #28416
 ghenna barkeep~
@@ -219,6 +226,7 @@ over his face...  He even has safety pins through his eyelids.
 30 10 -8 6d6+300 5d5+5
 300 90000
 8 8 1
+BodyProfile: 1
 E
 #28417
 ghenna citizen~
@@ -232,6 +240,7 @@ city.
 30 10 -8 6d6+300 5d5+5
 300 90000
 8 8 1
+BodyProfile: 1
 E
 #28418
 ghenna avon lady~
@@ -246,6 +255,7 @@ carries a heart shaped box made of crepe paper.
 30 10 -8 6d6+300 5d5+5
 300 90000
 8 8 2
+BodyProfile: 1
 E
 #28423
 ghenna swordmaster~
@@ -260,6 +270,7 @@ stunning beauty, which sings through the air as he attacks you.
 31 10 -8 6d6+310 5d5+5
 310 96100
 8 8 1
+BodyProfile: 1
 E
 #28431
 ghenna wall foot~
@@ -296,6 +307,7 @@ feet tall, casting a long shadow over you.
 31 10 -8 6d6+310 5d5+5
 310 96100
 8 8 0
+BodyProfile: 11
 E
 #28458
 ghenna dominatrix woman~
@@ -310,6 +322,7 @@ waist disappears into her crotch, which hasn't been waxed in a millenia.
 30 10 -8 6d6+300 5d5+5
 300 90000
 8 8 2
+BodyProfile: 1
 E
 #28464
 ghenna doll golem~
@@ -323,6 +336,7 @@ looks like it is made of plastic.
 30 10 -8 6d6+300 5d5+5
 300 90000
 8 8 0
+BodyProfile: 11
 E
 #28471
 ghenna woman prostitute~
@@ -336,6 +350,7 @@ this.  She notices your gaze, and gives you a cloying look.
 30 10 -8 6d6+300 5d5+5
 300 90000
 8 8 2
+BodyProfile: 1
 E
 #28472
 ghenna lester molester~
@@ -374,6 +389,7 @@ A dwarf is lying here, stunned.
 30 10 -8 6d6+300 5d5+5
 300 90000
 6 6 1
+BodyProfile: 1
 E
 #28485
 ghenna maedar~
@@ -425,6 +441,7 @@ What a pansy he is too!
 30 10 -8 6d6+300 5d5+5
 300 90000
 8 8 1
+BodyProfile: 6
 E
 #28494
 ghenna cockroach~
@@ -437,6 +454,7 @@ The biggest cockroach you have ever seen is standing here, looking down at you.
 30 10 -8 6d6+300 5d5+5
 300 90000
 8 8 0
+BodyProfile: 9
 E
 #28497
 ghenna deepspawn~

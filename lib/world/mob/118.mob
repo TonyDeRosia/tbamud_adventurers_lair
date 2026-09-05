@@ -12,6 +12,7 @@ serenely closed as though she is deep in some dream state.
 10 17 4 2d2+100 1d2+1
 0 10000
 6 6 2
+BodyProfile: 1
 E
 T 11804
 #11801
@@ -48,6 +49,7 @@ hands.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 2
+BodyProfile: 1
 E
 T 11814
 T 11818
@@ -67,6 +69,7 @@ a flickering shadow.
 5 19 7 1d1+50 1d2+0
 50 2500
 8 8 1
+BodyProfile: 1
 E
 T 11815
 #11804
@@ -83,6 +86,7 @@ fingers are blistered from constant coloring or writing.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 2
+BodyProfile: 1
 E
 T 11807
 T 11815
@@ -100,6 +104,7 @@ feathers continuing down its body.
 5 19 7 1d1+50 1d2+0
 0 2500
 8 8 0
+BodyProfile: 4
 E
 T 11816
 T 11896
@@ -118,6 +123,7 @@ been carefully made up, eyes sparkling as she prepares food for the family.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 2
+BodyProfile: 1
 E
 T 11815
 #11807
@@ -136,6 +142,7 @@ trumpet where there should be five.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 1
+BodyProfile: 1
 E
 T 11815
 #11808
@@ -154,6 +161,7 @@ and the next transparent and fading, a shadow-gray hue darkening her features.
 8 18 5 1d1+80 1d2+1
 80 6400
 8 8 2
+BodyProfile: 1
 E
 T 11815
 #11809
@@ -171,6 +179,7 @@ plaits, long blue ribbons trailing down her back.
 5 19 7 1d1+50 1d2+0
 50 2500
 8 8 2
+BodyProfile: 1
 E
 T 11820
 T 11821
@@ -187,6 +196,7 @@ it stalks its potential prey, an unnatural chill clouding the air around it.
 10 17 4 2d2+100 1d2+1
 0 10000
 8 8 0
+BodyProfile: 5
 E
 T 11816
 #11811
@@ -203,6 +213,7 @@ intensely focused blue eyes far too old for the rest of her face.
 8 18 5 1d1+80 1d2+1
 80 6400
 8 8 2
+BodyProfile: 1
 E
 T 11827
 T 11828
@@ -222,6 +233,7 @@ strange magic his hands are creating.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 1
+BodyProfile: 1
 E
 T 11833
 #11814
@@ -238,6 +250,7 @@ his head.
 5 19 7 1d1+50 1d2+0
 50 2500
 8 8 1
+BodyProfile: 1
 E
 T 11815
 #11815
@@ -254,6 +267,7 @@ to suck at her bottle.
 5 19 7 1d1+50 1d2+0
 50 2500
 8 8 2
+BodyProfile: 1
 E
 T 11815
 #11816
@@ -270,6 +284,7 @@ claps her hands to the rhythm of the nursery rhyme.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 2
+BodyProfile: 1
 E
 T 11815
 T 11825
@@ -288,6 +303,7 @@ gaps where his adult teeth are beginning to grow in.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 1
+BodyProfile: 1
 E
 T 11815
 T 11824
@@ -306,6 +322,7 @@ roses, crushing the thorny dead ones, his hands scarlet-stained with blood.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 1
+BodyProfile: 1
 E
 T 11815
 #11819
@@ -322,6 +339,7 @@ and there with pats of flour.
 8 18 5 1d1+80 1d2+1
 80 6400
 8 8 2
+BodyProfile: 1
 E
 T 11815
 #11820
@@ -339,6 +357,7 @@ flowers dancing there.
 8 18 5 1d1+80 1d2+1
 80 6400
 8 8 2
+BodyProfile: 1
 E
 T 11815
 #11821
@@ -355,6 +374,7 @@ its back, several wiry black legs curled cautiously close to its abdomen.
 0 10000
 8 8 0
 BareHandAttack: 4
+BodyProfile: 9
 E
 T 11816
 T 11829
@@ -391,6 +411,7 @@ intently focused on what she is doing as if she pursues a goal that eludes her.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 2
+BodyProfile: 1
 E
 T 11835
 T 11836
@@ -409,6 +430,7 @@ unnaturally and chillingly dark.
 8 18 5 1d1+80 1d2+1
 80 6400
 8 8 2
+BodyProfile: 1
 E
 T 11846
 T 11850
@@ -426,6 +448,7 @@ where her eyes should be.
 8 18 5 1d1+80 1d2+1
 80 6400
 8 8 2
+BodyProfile: 1
 E
 T 11850
 T 11851
@@ -445,6 +468,7 @@ three-fingered right hand.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 1
+BodyProfile: 1
 E
 T 11815
 #11827
@@ -462,6 +486,7 @@ shards.
 8 18 5 1d1+80 1d2+1
 80 6400
 8 8 2
+BodyProfile: 1
 E
 T 11860
 #11828
@@ -495,6 +520,7 @@ arms, red blood spilling over her skin like crimson tears.
 8 18 5 1d1+80 1d2+1
 80 6400
 8 8 2
+BodyProfile: 1
 E
 T 11862
 T 11852
@@ -512,6 +538,7 @@ object instead of an actual fish.
 6 18 6 1d1+60 1d2+1
 0 3600
 8 8 0
+BodyProfile: 13
 E
 T 11816
 T 11864
@@ -529,6 +556,7 @@ innocently about as the dove coos quietly to itself.
 6 18 6 1d1+60 1d2+1
 0 3600
 8 8 0
+BodyProfile: 4
 E
 T 11816
 T 11864
@@ -546,6 +574,7 @@ that it is not quite what it seems.
 6 18 6 1d1+60 1d2+1
 0 3600
 8 8 0
+BodyProfile: 2
 E
 T 11816
 T 11864
@@ -562,6 +591,7 @@ glancing constantly outward as though waiting for someone to come.
 8 18 5 1d1+80 1d2+1
 80 6400
 8 8 2
+BodyProfile: 1
 E
 T 11863
 #11834
@@ -580,6 +610,7 @@ away.
 0 6400
 8 8 2
 BareHandAttack: 4
+BodyProfile: 1
 E
 T 11870
 T 11872
@@ -600,6 +631,7 @@ of blade to 'cut' them.
 8 18 5 1d1+80 1d2+1
 0 6400
 8 8 2
+BodyProfile: 1
 E
 T 11874
 T 11875
@@ -617,6 +649,7 @@ clenching and unclenching as she bares her teeth like an animal about to bite.
 8 18 5 1d1+100 1d2+1
 0 6400
 8 8 2
+BodyProfile: 1
 E
 T 11878
 T 11877
@@ -636,6 +669,7 @@ tongue flickering out in a gentle hiss.
 0 6400
 8 8 0
 BareHandAttack: 4
+BodyProfile: 3
 E
 T 11879
 #11838
@@ -654,6 +688,7 @@ glazed.
 8 18 5 1d1+80 1d2+1
 0 6400
 8 8 2
+BodyProfile: 1
 E
 T 11884
 #11839
@@ -670,6 +705,7 @@ blue eyes dulled with time and the loss of innocence without the loss of youth.
 8 18 5 1d1+80 1d2+1
 0 6400
 8 8 2
+BodyProfile: 1
 E
 T 11864
 T 11811
@@ -687,6 +723,7 @@ examining everything curiously.
 14 16 1 2d2+140 2d2+2
 140 19600
 8 8 2
+BodyProfile: 1
 E
 T 11893
 T 11895
@@ -704,6 +741,7 @@ to fall asleep, and her body slumped dejectedly as she lies resting.
 8 18 5 1d1+80 1d2+1
 80 6400
 8 8 2
+BodyProfile: 1
 E
 T 11815
 #11842
@@ -720,6 +758,7 @@ heaving of her shoulders with slow breaths and the occasional fidget.
 8 18 5 1d1+80 1d2+1
 80 6400
 8 8 2
+BodyProfile: 1
 E
 T 11815
 #11843
@@ -736,6 +775,7 @@ slightly in the stirring air.
 8 18 5 1d1+80 1d2+1
 80 6400
 8 8 1
+BodyProfile: 1
 E
 T 11815
 #11844
@@ -752,6 +792,7 @@ yet focused expression.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 2
+BodyProfile: 1
 E
 T 11815
 #11845
@@ -768,6 +809,7 @@ and shimmering like liquid as she moves.
 6 18 6 1d1+60 1d2+1
 60 3600
 8 8 2
+BodyProfile: 1
 E
 T 11815
 #11846
@@ -784,6 +826,7 @@ had just crawled out of bed.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 1
+BodyProfile: 1
 E
 T 11815
 #11847
@@ -799,6 +842,7 @@ television she is watching, lighting up with the sparks of some imagination.
 6 18 6 1d1+60 1d2+1
 60 3600
 8 8 2
+BodyProfile: 1
 E
 T 11815
 #11848
@@ -815,6 +859,7 @@ of her face as she plays.
 5 19 7 1d1+50 1d2+0
 50 2500
 8 8 2
+BodyProfile: 1
 E
 T 11815
 #11849
@@ -830,6 +875,7 @@ herself, stumbling rather ungracefully about the room as she attempts to dance.
 5 19 7 1d1+50 1d2+0
 50 2500
 8 8 2
+BodyProfile: 1
 SavingPara: 1
 SavingRod: 1
 SavingPetri: 1

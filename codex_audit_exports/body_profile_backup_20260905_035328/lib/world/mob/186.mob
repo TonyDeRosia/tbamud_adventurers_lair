@@ -1,0 +1,297 @@
+#18601
+practice beast beast academy~
+an @BAc@Cad@Bem@Cia@n @Wpr@Bac@Cti@Wce @Dbe@Was@Dt@n~
+A broad-backed @BAc@Cad@Bem@Cia@n @Wpr@Bac@Cti@Wce @Dbe@Was@Dt@n paws at the sand.
+~
+This heavily built creature has been bred and trained for controlled combat drills. Thick hide, blunted horn caps, and a leather handler's mark identify it as dangerous enough to teach respect without being intended as a slaughter animal.
+~
+10 0 0 0 0 0 0 0 -750 E
+5 16 0 2d6+173 1d2+0
+50 0
+8 8 0
+SavingPara: 1
+SavingRod: 1
+SavingPetri: 1
+SavingBreath: 1
+SavingSpell: 1
+Wimpy: 2
+Evasion: 1
+GoldMin: 50
+GoldMax: 50
+E
+T 18687
+T 18697
+#18602
+training dummy construct animated academy~
+an @Man@Cim@Mat@Ced @Wtr@Bai@Cni@Wng @Ddu@Wmm@Dy@n~
+An @Man@Cim@Mat@Ced @Wtr@Bai@Cni@Wng @Ddu@Wmm@Dy@n waits in a ready stance.
+~
+Wood, leather, straw, and simple enchantment give this humanoid practice construct a convincing fighting posture. Its joints are reinforced to survive repeated drills, and painted target marks show where students are expected to place controlled blows.
+~
+72 0 0 0 0 0 0 0 0 E
+2 17 0 2d6+38 1d2+0
+20 0
+8 8 1
+Wimpy: 1
+GoldMin: 20
+GoldMax: 20
+E
+#18603
+academy drake young training dragon~
+a @Yyo@Oun@Yg @BAc@Cad@Bem@Cia@n @rdr@Rak@Oe@n~
+A @Yyo@Oun@Yg @BAc@Cad@Bem@Cia@n @rdr@Rak@Oe@n watches the room with bright, curious eyes.
+~
+This small drake is one of several creatures raised under careful supervision by Academia handlers. Leather identification bands mark it as trained, though the sharp claws and faint heat in its breath remind students that even familiar creatures deserve caution.
+~
+72 0 0 0 0 0 0 0 100 E
+4 17 0 2d6+73 1d3+0
+40 0
+8 8 1
+SavingPara: 1
+SavingRod: 1
+SavingPetri: 1
+SavingBreath: 1
+SavingSpell: 1
+Wimpy: 2
+Evasion: 1
+GoldMin: 40
+GoldMax: 40
+E
+T 18688
+#18604
+warden halric academy gate instructor~
+@BWa@Crd@Wen @BHa@Clr@Wic@n~
+@BWa@Crd@Wen @BHa@Clr@Wic@n keeps a patient watch over the practical halls.
+~
+Halric is a weathered human veteran in a dark blue Academia surcoat. A ring of practice keys hangs from his belt, and old scars across his knuckles suggest he has opened more dangerous doors than the training examples surrounding him.
+~
+10 0 0 0 0 0 0 0 0 E
+3 20 0 2d6+63 1d2+0
+30 0
+8 8 1
+Wimpy: 1
+Evasion: 1
+GoldMin: 30
+GoldMax: 30
+E
+T 18681
+T 18691
+T 18692
+#18605
+master alchemist seraphine instructor academy~
+@MMa@Cst@Mer @YAl@Och@Yem@Wis@Yt @MSe@Cra@Mph@Cin@Me@n~
+@MMa@Cst@Mer @YAl@Och@Yem@Wis@Yt @MSe@Cra@Mph@Cin@Me@n measures a reagent with practiced care.
+~
+Seraphine wears a leather apron over layered scholar's robes, with small pouches and stoppered vials arranged by touch rather than appearance. Her calm manner and exacting habits make it clear that she teaches students to respect useful substances before trusting them.
+~
+10 0 0 0 0 0 0 0 0 E
+5 20 0 2d6+93 1d2+0
+50 0
+8 8 2
+SavingPara: 1
+SavingRod: 1
+SavingPetri: 1
+SavingBreath: 1
+SavingSpell: 1
+Wimpy: 2
+Evasion: 1
+GoldMin: 50
+GoldMax: 50
+E
+T 18682
+T 18694
+#18606
+practice crawler clockwork crawler academy~
+a @Ocl@Yoc@Okw@Yor@Ok @Wpr@Bac@Cti@Wce @Dcr@Waw@Dle@Wr@n~
+A small @Ocl@Yoc@Okw@Yor@Ok @Dcr@Waw@Dle@Wr@n skitters across the floor.
+~
+Brass legs carry a low wooden-and-metal body fitted with padded striking nubs instead of blades. The simple mechanism is designed to teach inexperienced adventurers how moving opponents behave without exposing them to a truly lethal creature.
+~
+72 0 0 0 0 0 0 0 -250 E
+1 18 0 2d6+18 1d2+0
+10 0
+8 8 0
+Wimpy: 1
+GoldMin: 10
+GoldMax: 10
+E
+#18607
+training husk animated construct academy~
+an @Man@Cim@Mat@Ced @Wtr@Bai@Cni@Wng @Dhu@Wsk@n~
+An @Man@Cim@Mat@Ced @Wtr@Bai@Cni@Wng @Dhu@Wsk@n advances with a blunted practice weapon.
+~
+Layered cloth, wicker, leather, and minor animation magic form a sturdier opponent than the simple training dummy. Its movements imitate an inexperienced humanoid fighter, giving students a safer way to practice against something that attacks back.
+~
+104 0 0 0 0 0 0 0 -500 E
+4 17 0 2d6+83 1d3+1
+40 0
+8 8 0
+SavingPara: 1
+SavingRod: 1
+SavingPetri: 1
+SavingBreath: 1
+SavingSpell: 1
+Wimpy: 2
+Evasion: 1
+GoldMin: 40
+GoldMax: 40
+E
+#18608
+practice imp summoned imp academy~
+a @Msu@Cmm@Mon@Ced @Wpr@Bac@Cti@Wce @rim@Rp@n~
+A @Mbo@Cun@Md@n @Wpr@Bac@Cti@Wce @rim@Rp@n flits impatiently within the examination course.
+~
+A small winged imp has been bound under strict Academia wards for supervised exercises. Glowing sigils around its wrists prevent it from leaving the grounds, though its quick movements and malicious grin make it an effective lesson in dealing with magical creatures.
+~
+232 0 0 0 0 0 0 0 -800 E
+3 17 0 2d6+53 1d3+0
+30 0
+8 8 1
+Wimpy: 1
+Evasion: 1
+GoldMin: 30
+GoldMax: 30
+E
+#18609
+trial minotaur minotaur academy~
+the @RTr@Oia@Rl @DMin@Rot@Oau@Rr@n~
+The @RTr@Oia@Rl @DMin@Rot@Oau@Rr@n lowers its padded horns and watches for a challenger.
+~
+This enormous minotaur serves as one of the Academia's most demanding controlled opponents. Heavy leather guards cover its horns and joints, while a handler's sigil marks it as trained to break pursuit when a student yields or escapes.
+~
+72 0 0 0 0 0 0 0 -1000 E
+7 15 0 2d6+193 1d5+2
+70 0
+8 8 1
+SavingPara: 1
+SavingRod: 1
+SavingPetri: 1
+SavingBreath: 1
+SavingSpell: 1
+Wimpy: 3
+Evasion: 2
+GoldMin: 70
+GoldMax: 70
+E
+#18610
+spectral examiner examiner spirit academy~
+the @Csp@Wec@Ctr@Bal @Mex@Cam@Min@Cer@n~
+A @Csp@Wec@Ctr@Bal @Mex@Cam@Min@Cer@n observes the chamber in solemn silence.
+~
+The translucent figure wears the old field cloak of an Academia examiner from generations past. Rather than haunting the halls in anger, the spirit remains by ancient agreement, watching students with the patient severity of someone who has seen every careless mistake before.
+~
+2122 0 0 0 1048596 0 0 0 -850 E
+6 16 0 2d6+143 1d4+1
+60 0
+8 8 0
+SavingPara: 1
+SavingRod: 1
+SavingPetri: 1
+SavingBreath: 1
+SavingSpell: 1
+Wimpy: 3
+Evasion: 2
+GoldMin: 60
+GoldMax: 60
+E
+T 18689
+T 18698
+#18611
+instructor vael fieldcraft tutor academy~
+@BIn@Cst@Wru@Bct@Cor @MVa@Cel@n~
+@BIn@Cst@Wru@Bct@Cor @MVa@Cel@n checks a student's pack against a worn field list.
+~
+Vael is a lean half-elf dressed for travel rather than ceremony. Rope, chalk, a compass, and a weather-stained cloak hang from practical straps, and every piece of equipment appears to have been repaired more than once.
+~
+72 0 0 0 0 0 0 0 -500 E
+2 20 0 2d6+43 1d2+0
+20 0
+8 8 1
+Wimpy: 1
+GoldMin: 20
+GoldMax: 20
+E
+T 18683
+T 18693
+#18612
+registrar elowen registrar academy~
+@YRe@Wgi@Yst@Ora@Wr @GEl@Cow@Gen@n~
+@YRe@Wgi@Yst@Ora@Wr @GEl@Cow@Gen@n stands ready to guide newly arrived students.
+~
+Elowen is a composed human woman in the deep blue and silver of the Academia. She carries enrollment ledgers beneath one arm and has the practiced expression of someone accustomed to answering simple questions without making the asker feel foolish.
+~
+74 0 0 0 0 0 0 0 0 E
+1 20 0 2d6+18 1d2+0
+10 0
+8 8 2
+Wimpy: 1
+GoldMin: 10
+GoldMax: 10
+E
+T 18680
+T 18690
+#18613
+lecturer miriel lore tutor academy~
+@MLec@Ctu@Mre@Cr @YMi@Wri@Yel@n~
+@MLec@Ctu@Mre@Cr @YMi@Wri@Yel@n studies a map covered in careful annotations.
+~
+Miriel is an elven lecturer whose robes are stitched with tiny road, star, and rune motifs. She teaches communication, lore, and the habit of asking useful questions before an expedition leaves civilization behind.
+~
+72 0 0 0 0 0 0 0 100 E
+3 20 0 2d6+63 1d2+0
+30 0
+8 8 2
+Wimpy: 1
+Evasion: 1
+GoldMin: 30
+GoldMax: 30
+E
+T 18684
+T 18695
+#18614
+scoutmaster corren scout navigation instructor academy~
+@GSc@You@Gtm@Yas@Gte@Wr @CCo@Brr@Cen@n~
+@GSc@You@Gtm@Yas@Gte@Wr @CCo@Brr@Cen@n quietly studies the flow of students through the halls.
+~
+Corren wears a weathered green cloak over light field armor and carries no unnecessary ornament. His sharp eyes constantly note exits, distances, and movement, making even an ordinary corridor seem like part of a navigation exercise.
+~
+72 0 0 0 0 0 0 0 300 E
+4 20 0 2d6+83 1d2+0
+40 0
+8 8 1
+SavingPara: 1
+SavingRod: 1
+SavingPetri: 1
+SavingBreath: 1
+SavingSpell: 1
+Wimpy: 2
+Evasion: 1
+GoldMin: 40
+GoldMax: 40
+E
+T 18685
+T 18696
+#18615
+provost aldren provost dean academy~
+@BPr@Cov@Wos@Bt @YAl@Wdr@Yen@n~
+@BPr@Cov@Wos@Bt @YAl@Wdr@Yen@n oversees the Academia with calm authority.
+~
+Aldren is an older adventurer whose formal coat cannot completely hide the posture of a veteran accustomed to armor and long roads. A silver lantern badge marks his office, while scars and faded expedition tattoos suggest his lessons were learned far beyond any classroom.
+~
+72 0 0 0 0 0 0 0 500 E
+5 20 0 2d6+113 1d2+0
+50 0
+8 8 1
+SavingPara: 1
+SavingRod: 1
+SavingPetri: 1
+SavingBreath: 1
+SavingSpell: 1
+Wimpy: 2
+Evasion: 1
+GoldMin: 50
+GoldMax: 50
+E
+T 18686
+T 18699
+$

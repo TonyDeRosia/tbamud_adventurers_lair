@@ -10,6 +10,7 @@ and powerful enough to blast anyone or thing to smithereens.
 26 12 -5 5d5+260 4d4+4
 260 67600
 8 8 1
+BodyProfile: 1
 E
 #32301
 man pale~
@@ -24,6 +25,7 @@ his eyes a dark charcoal black.  He has no hair upon his head.
 30 10 -8 6d6+300 5d5+5
 300 90000
 8 8 1
+BodyProfile: 1
 E
 #32302
 aboleth mother~
@@ -37,6 +39,7 @@ length, its skin blue-green with splotches of gray.
 25 12 -5 5d5+250 4d4+4
 250 62500
 8 8 2
+BodyProfile: 1
 E
 #32303
 aboleth baby~
@@ -50,6 +53,7 @@ of gray.
 24 12 -4 4d4+240 4d4+4
 240 57600
 8 8 0
+BodyProfile: 1
 E
 #32304
 large bat~
@@ -63,6 +67,7 @@ attack.
 20 14 -2 4d4+200 3d3+3
 200 40000
 8 8 0
+BodyProfile: 19
 E
 #32305
 rot grub~
@@ -76,6 +81,7 @@ knows to consume.
 21 13 -2 4d4+210 3d3+3
 210 44100
 8 8 0
+BodyProfile: 3
 E
 #32306
 carrion crawler~
@@ -115,6 +121,7 @@ hasty departure might be in order...
 28 11 -6 5d5+280 4d4+4
 280 78400
 8 8 0
+BodyProfile: 1
 E
 #32309
 bugbear leader~
@@ -211,6 +218,7 @@ threat, however you never know.
 21 13 -2 4d4+210 3d3+3
 210 44100
 8 8 1
+BodyProfile: 1
 E
 #32316
 gorgon~
@@ -282,6 +290,7 @@ particular strength.  He does appear to know his way around a spear, though.
 23 13 -3 4d4+230 3d3+3
 230 52900
 8 8 1
+BodyProfile: 1
 E
 #32321
 bugbear clansman~
@@ -295,6 +304,7 @@ eyes lending him both a sad and sinister look at the same time.
 22 13 -3 4d4+220 3d3+3
 220 48400
 8 8 1
+BodyProfile: 1
 E
 #32322
 deep dragon~
@@ -310,5 +320,6 @@ there.
 300 90000
 8 8 2
 BareHandAttack: 12
+BodyProfile: 6
 E
 $

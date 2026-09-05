@@ -10,6 +10,7 @@ An official is trying to look important here.
 120 14400
 8 8 1
 BareHandAttack: 13
+BodyProfile: 1
 E
 #2001
 priest~
@@ -22,6 +23,7 @@ A priest is praying for his favorite gladiator to win.
 15 15 1 3d3+150 2d2+2
 150 22500
 8 8 1
+BodyProfile: 1
 E
 #2002
 augur~
@@ -76,6 +78,7 @@ is unavoidable.
 160 25600
 8 8 1
 BareHandAttack: 12
+BodyProfile: 1
 E
 #2006
 thracian warrior~
@@ -90,6 +93,7 @@ training for years.
 180 32400
 8 8 1
 BareHandAttack: 9
+BodyProfile: 1
 E
 #2007
 slave~
@@ -105,6 +109,7 @@ wild animals will feed on him for the entertainment of the populace.
 11 17 3 2d2+110 1d2+1
 110 12100
 8 8 1
+BodyProfile: 1
 E
 #2008
 ostrich bird~
@@ -119,6 +124,7 @@ emperor brings in to amuse his people.
 100 10000
 8 8 1
 BareHandAttack: 4
+BodyProfile: 4
 E
 #2009
 horse giraffe~
@@ -133,6 +139,7 @@ happy by slaughtering them in the arena.  What sort of strange name is 'giraffe'
 130 16900
 8 8 1
 BareHandAttack: 4
+BodyProfile: 2
 E
 #2010
 elephant~
@@ -148,6 +155,7 @@ placed over the regular ivory ones and look very sharp.
 200 40000
 8 8 1
 BareHandAttack: 11
+BodyProfile: 2
 E
 #2011
 retiarius warrior~
@@ -162,6 +170,7 @@ trident and a weighted net.
 190 36100
 8 8 1
 BareHandAttack: 3
+BodyProfile: 1
 E
 #2012
 murmillo gladiator~
@@ -177,6 +186,7 @@ swings a shortsword with ease and familiarity.
 170 28900
 8 8 1
 BareHandAttack: 3
+BodyProfile: 1
 E
 #2013
 lion~
@@ -191,6 +201,7 @@ unarmed slaves.
 160 25600
 8 8 1
 BareHandAttack: 8
+BodyProfile: 2
 E
 #2014
 tiger~
@@ -206,6 +217,7 @@ in a long time.
 150 22500
 8 8 1
 BareHandAttack: 8
+BodyProfile: 2
 E
 #2015
 Gladiator~
@@ -219,6 +231,7 @@ veteran of combat of all kinds.
 20 14 -2 4d4+200 3d3+3
 200 40000
 8 8 1
+BodyProfile: 1
 E
 #2016
 Gaul~
@@ -245,6 +258,7 @@ games to distract the ignorant masses.  He is very good at it.
 200 40000
 8 8 1
 BareHandAttack: 10
+BodyProfile: 1
 E
 #2018
 knight~
@@ -258,6 +272,7 @@ This gladiator is dressed up like a knight.  He looks ridiculous.
 150 22500
 8 8 1
 BareHandAttack: 10
+BodyProfile: 1
 E
 #2019
 soldier~
@@ -271,6 +286,7 @@ A soldier stands here catching his breath before the next battle.
 130 16900
 8 8 1
 BareHandAttack: 5
+BodyProfile: 1
 E
 #2020
 civilian~

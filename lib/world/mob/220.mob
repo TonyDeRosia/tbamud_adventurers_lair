@@ -29,6 +29,7 @@ have fallen out.
 200 40000
 8 8 1
 BareHandAttack: 8
+BodyProfile: 2
 E
 T 22001
 T 22002
@@ -47,6 +48,7 @@ collar around her neck.@n
 200 36100
 5 8 2
 BareHandAttack: 8
+BodyProfile: 2
 E
 #22003
 icemonster~
@@ -79,6 +81,7 @@ green-and-brown blob that absolutely @Greeks@c.@n
 100 22500
 8 8 0
 BareHandAttack: 4
+BodyProfile: 12
 E
 #22005
 kitchen pixie~
@@ -130,6 +133,7 @@ occasionally.@n
 200 40000
 5 5 0
 BareHandAttack: 12
+BodyProfile: 4
 E
 T 22003
 $

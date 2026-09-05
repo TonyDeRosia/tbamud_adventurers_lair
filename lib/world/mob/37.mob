@@ -13,6 +13,7 @@ when cornered but still more scavenger than monster.
 30 0
 8 8 0
 BareHandAttack: 4
+BodyProfile: 2
 Wimpy: 1
 Evasion: 1
 E
@@ -32,6 +33,7 @@ interest, ready to bite whatever looks weakest.
 30 0
 8 8 0
 BareHandAttack: 4
+BodyProfile: 2
 SavingPara: 1
 SavingRod: 1
 SavingPetri: 1
@@ -56,6 +58,7 @@ outside, this creature is defending territory.
 30 0
 8 8 0
 BareHandAttack: 4
+BodyProfile: 2
 SavingPara: 1
 SavingRod: 1
 SavingPetri: 1
@@ -82,6 +85,7 @@ become part beast, part local legend.
 70 0
 5 5 0
 BareHandAttack: 4
+BodyProfile: 2
 SavingPara: 1
 SavingRod: 1
 SavingPetri: 1
@@ -105,6 +109,7 @@ becomes a frantic hunter when insects gather over the runoff.
 30 0
 4 4 0
 BareHandAttack: 4
+BodyProfile: 19
 Wimpy: 1
 Evasion: 1
 E
@@ -124,6 +129,7 @@ anything that disturbs the roost.
 30 0
 8 8 0
 BareHandAttack: 4
+BodyProfile: 19
 SavingPara: 1
 SavingRod: 1
 SavingPetri: 1
@@ -148,6 +154,7 @@ before plunging teeth-first at the source.
 30 0
 8 8 0
 BareHandAttack: 4
+BodyProfile: 19
 SavingPara: 1
 SavingRod: 1
 SavingPetri: 1
@@ -172,6 +179,7 @@ with unsettling focus.
 30 0
 8 8 0
 BareHandAttack: 4
+BodyProfile: 19
 SavingPara: 1
 SavingRod: 1
 SavingPetri: 1
@@ -196,6 +204,7 @@ drifting scraps.
 30 0
 8 8 0
 BareHandAttack: 4
+BodyProfile: 13
 Wimpy: 1
 Evasion: 1
 E
@@ -213,6 +222,7 @@ would hide it completely from surface predators.
 30 0
 8 8 0
 BareHandAttack: 4
+BodyProfile: 13
 Wimpy: 1
 Evasion: 1
 E
@@ -231,6 +241,7 @@ oldest specimens sometimes hide valuable pearls.
 30 0
 6 6 0
 BareHandAttack: 4
+BodyProfile: 1
 SavingPara: 1
 SavingRod: 1
 SavingPetri: 1
@@ -253,6 +264,7 @@ unfamiliar sounds before bolting for the nearest cover.
 30 0
 8 8 0
 BareHandAttack: 4
+BodyProfile: 2
 Wimpy: 1
 Evasion: 1
 E
@@ -271,6 +283,7 @@ people only when they do not interfere with the hunt.
 30 0
 8 8 0
 BareHandAttack: 8
+BodyProfile: 2
 Wimpy: 1
 Evasion: 1
 E
@@ -288,6 +301,7 @@ rocks, and it keeps a careful distance from anything larger than itself.
 30 0
 8 8 0
 BareHandAttack: 4
+BodyProfile: 2
 SavingPara: 1
 SavingRod: 1
 SavingPetri: 1

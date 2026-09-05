@@ -12,6 +12,7 @@ from the females.
 140 19600
 8 8 1
 BareHandAttack: 3
+BodyProfile: 4
 Str: 8
 Dex: 16
 Int: 9
@@ -31,6 +32,7 @@ parents are never too far away from it if ever.
 140 19600
 8 8 1
 BareHandAttack: 8
+BodyProfile: 4
 Str: 3
 Dex: 18
 Int: 3
@@ -50,6 +52,7 @@ seen.  On his head sits a crown of ice and in his hand a scepter of great power.
 18 14 0 3d3+180 3d3+3
 180 32400
 6 8 1
+BodyProfile: 4
 Str: 16
 Int: 13
 Wis: 8
@@ -68,6 +71,7 @@ feel his eyes looking you over.  Should you be here?
 180 32400
 8 8 1
 BareHandAttack: 10
+BodyProfile: 4
 Str: 17
 Dex: 12
 Int: 9
@@ -86,6 +90,7 @@ It's cute little eyes and fluffy self...  Snap out of it!  Muahahahaha!
 140 19600
 8 8 2
 BareHandAttack: 8
+BodyProfile: 4
 Str: 9
 Int: 12
 Wis: 10
@@ -103,6 +108,7 @@ up.  That has not got to be fun.
 140 19600
 8 8 2
 BareHandAttack: 3
+BodyProfile: 4
 Dex: 15
 Int: 14
 Wis: 13
@@ -120,6 +126,7 @@ exhausted.
 140 19600
 8 8 1
 BareHandAttack: 3
+BodyProfile: 4
 Str: 14
 Dex: 7
 Int: 9
@@ -155,6 +162,7 @@ kinds hanging from the walls.  He turns toward you as you enter, ready to serve.
 14 16 1 2d2+140 2d2+2
 140 19600
 8 8 1
+BodyProfile: 1
 E
 T 4301
 #4310
@@ -200,6 +208,7 @@ bones.  He looks very fierce with that large butchers knife in his hand.
 140 19600
 8 8 1
 BareHandAttack: 3
+BodyProfile: 1
 E
 T 4303
 $

@@ -12,6 +12,7 @@ cup from across the room.
 33 9 0 6d6+330 5d5+5
 330 0
 8 8 2
+BodyProfile: 1
 GoldMin: 330
 GoldMax: 330
 InvItem: 3152 1
@@ -51,6 +52,7 @@ discipline without needing to shout.
 17 15 0 3d3+170 2d2+2
 170 0
 8 8 1
+BodyProfile: 1
 GoldMin: 170
 GoldMax: 170
 EquipItem: 3154 5
@@ -71,6 +73,7 @@ rather than open hostility.
 10 17 0 2d2+100 1d2+1
 100 0
 8 8 1
+BodyProfile: 1
 GoldMin: 100
 GoldMax: 100
 EquipItem: 3146 5
@@ -94,6 +97,7 @@ with colored cord before passing them onward to the mayor's chamber.
 12 16 0 2d2+120 2d2+2
 120 0
 8 8 2
+BodyProfile: 1
 GoldMin: 120
 GoldMax: 120
 E
@@ -112,6 +116,7 @@ before issuing short, practical decisions.
 24 12 0 4d4+240 4d4+4
 240 0
 8 8 1
+BodyProfile: 1
 GoldMin: 240
 GoldMax: 240
 E
@@ -129,6 +134,7 @@ schedule and watches for a clear moment to make the next proclamation.
 1 20 25 0d0+10 1d2+0
 10 0
 8 8 1
+BodyProfile: 1
 GoldMin: 10
 GoldMax: 10
 EquipItem: 3153 5
@@ -150,6 +156,7 @@ a creature that has been fed by generations of park-goers.
 1 20 25 0d0+10 1d2+0
 10 0
 8 8 0
+BodyProfile: 4
 GoldMin: 10
 GoldMax: 10
 E
@@ -184,6 +191,7 @@ that every bench conceals something edible.
 1 20 25 0d0+10 1d2+0
 10 0
 8 8 0
+BodyProfile: 4
 GoldMin: 10
 GoldMax: 10
 E
@@ -201,6 +209,7 @@ personal space when food is involved.
 1 20 25 0d0+10 1d2+0
 10 0
 8 8 0
+BodyProfile: 4
 GoldMin: 10
 GoldMax: 10
 E

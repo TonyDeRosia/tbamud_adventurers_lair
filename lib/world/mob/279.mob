@@ -13,6 +13,7 @@ fresh prey.
 100 10000
 4 8 0
 BareHandAttack: 4
+BodyProfile: 19
 E
 #27904
 poor citizen~
@@ -28,6 +29,7 @@ him leaves no doubt that he is in the very desperate depths of poverty.
 120 14400
 6 8 1
 BareHandAttack: 13
+BodyProfile: 1
 E
 #27911
 Tintoreto priest~
@@ -43,6 +45,7 @@ already half passed from this world into the next.
 120 14400
 6 8 1
 BareHandAttack: 13
+BodyProfile: 1
 E
 #27916
 believer man~
@@ -58,6 +61,7 @@ here.
 11 17 3 2d2+110 1d2+1
 110 12100
 8 8 1
+BodyProfile: 1
 E
 #27921
 boy choirboy~
@@ -87,6 +91,7 @@ who value their riches, her garb wealthy and well-adorned with gold.
 10 17 4 2d2+100 1d2+1
 100 10000
 6 8 2
+BodyProfile: 1
 E
 #27924
 Richelieu cardinal~
@@ -117,6 +122,7 @@ ever alert for some predator.
 100 10000
 8 8 0
 BareHandAttack: 4
+BodyProfile: 4
 E
 #27926
 man hunchback~
@@ -132,6 +138,7 @@ strength no doubt more powerful because of his anger.
 15 15 1 3d3+150 2d2+2
 150 22500
 8 8 1
+BodyProfile: 1
 E
 #27930
 monk Jean~
@@ -147,6 +154,7 @@ troublemaker than a man of God.
 14 16 1 2d2+140 2d2+2
 140 19600
 8 8 1
+BodyProfile: 1
 E
 #27934
 monster horrible statue gargoyle stone~
@@ -179,6 +187,7 @@ his demeanor almost too confident for one so young.
 130 16900
 8 8 1
 BareHandAttack: 3
+BodyProfile: 1
 E
 #27940
 citizen Lyon~
@@ -193,6 +202,7 @@ hard, no energy left for protest or conflict.
 11 17 3 2d2+110 1d2+1
 110 12100
 8 8 1
+BodyProfile: 1
 E
 #27941
 white poodle~
@@ -237,6 +247,7 @@ it is a daily struggle just to bring money in for basic living.
 12 16 2 2d2+120 2d2+2
 120 14400
 8 8 1
+BodyProfile: 1
 E
 #27947
 French woman~
@@ -252,6 +263,7 @@ brown eyes.
 12 16 2 2d2+120 2d2+2
 120 14400
 5 8 2
+BodyProfile: 1
 E
 #27948
 black rat~
@@ -268,6 +280,7 @@ the look out for prey.
 100 10000
 8 8 0
 BareHandAttack: 4
+BodyProfile: 2
 E
 #27949
 Renoir thief~
@@ -284,6 +297,7 @@ must use it often.
 150 22500
 6 8 1
 BareHandAttack: 3
+BodyProfile: 1
 E
 #27951
 hermit degas~
@@ -300,6 +314,7 @@ seen glancing furtively at the pockets of passing citizens.
 130 16900
 8 8 1
 BareHandAttack: 13
+BodyProfile: 1
 E
 #27955
 brown squirrel~
@@ -315,6 +330,7 @@ its little whiskers twitching nervously as it stands up and peers around.
 100 10000
 8 8 0
 BareHandAttack: 4
+BodyProfile: 2
 E
 #27957
 Esmerelda woman mysterious gypsy ~
@@ -331,6 +347,7 @@ enjoyment of life.
 150 22500
 8 8 2
 BareHandAttack: 3
+BodyProfile: 1
 E
 #27963
 citizen Paris~
@@ -346,6 +363,7 @@ glances around as though expecting trouble at any moment.
 120 14400
 8 8 1
 BareHandAttack: 13
+BodyProfile: 1
 E
 #27967
 Robespierre revolutionary~
@@ -378,6 +396,7 @@ fight for.
 140 19600
 4 8 1
 BareHandAttack: 3
+BodyProfile: 1
 E
 #27971
 Monet chef cook~
@@ -393,6 +412,7 @@ flurry of busy preparation.
 13 16 2 2d2+130 2d2+2
 130 16900
 8 8 1
+BodyProfile: 1
 E
 #27972
 Porthos~
@@ -454,6 +474,7 @@ the grass with its hooves.
 100 10000
 8 8 0
 BareHandAttack: 4
+BodyProfile: 2
 E
 #27988
 French woman receptionist~
@@ -469,6 +490,7 @@ flushing her lips.
 12 16 2 2d2+120 2d2+2
 120 14400
 6 8 2
+BodyProfile: 1
 E
 #27989
 Musketeer royal~
@@ -499,6 +521,7 @@ importance.
 15 15 1 3d3+150 2d2+2
 150 22500
 8 8 1
+BodyProfile: 1
 E
 T 27994
 #27992
@@ -532,6 +555,7 @@ kill.
 150 22500
 8 8 1
 BareHandAttack: 10
+BodyProfile: 1
 E
 #27995
 sentinel~
@@ -547,6 +571,7 @@ of amusement.
 13 16 2 2d2+130 2d2+2
 130 16900
 8 8 1
+BodyProfile: 1
 E
 #27996
 guardian~
@@ -564,6 +589,7 @@ is a force to be reckoned with.
 150 22500
 8 8 1
 BareHandAttack: 6
+BodyProfile: 1
 E
 #27998
 Toulouse~
@@ -593,5 +619,6 @@ despite the circulating rumors that he is not even really the king.
 15 15 1 3d3+150 2d2+2
 150 22500
 6 8 1
+BodyProfile: 1
 E
 $

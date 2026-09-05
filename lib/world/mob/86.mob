@@ -10,6 +10,7 @@ A rat is chewing on an moldy piece of bread here.
 70 4900
 6 8 0
 BareHandAttack: 4
+BodyProfile: 2
 E
 #8602
 moth~
@@ -23,6 +24,7 @@ looking for more curtains to chew upon.
 3 19 8 0d0+30 1d2+0
 30 900
 8 8 0
+BodyProfile: 10
 E
 #8603
 rat black~
@@ -36,6 +38,7 @@ odor about him.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 0
+BodyProfile: 2
 E
 #8604
 rat~
@@ -50,6 +53,7 @@ His eyes are shiny black and his coat is of a dark brown color.
 70 4900
 8 8 0
 BareHandAttack: 4
+BodyProfile: 2
 E
 #8605
 bandit~
@@ -65,6 +69,7 @@ over his face.  The bandits clothing is ripped and riddled with lice and food.
 100 10000
 5 8 1
 BareHandAttack: 11
+BodyProfile: 1
 E
 #8606
 female bandit~
@@ -80,6 +85,7 @@ young woman is rummaging through her closet for a better one.
 100 10000
 8 8 2
 BareHandAttack: 8
+BodyProfile: 1
 E
 #8607
 bat~
@@ -92,6 +98,7 @@ A bat is flapping about here.
 3 19 8 0d0+30 1d2+0
 30 900
 8 8 2
+BodyProfile: 19
 E
 #8608
 mouse small gray~
@@ -105,6 +112,7 @@ twitch quickly and it blinks rapidly.
 3 19 8 0d0+30 1d2+0
 30 900
 8 8 0
+BodyProfile: 2
 E
 #8609
 stone guardian~
@@ -121,6 +129,7 @@ something to protect...
 140 19600
 8 8 0
 BareHandAttack: 5
+BodyProfile: 1
 E
 #8610
 Grand Duke Kalithorn~
@@ -136,6 +145,7 @@ the bandits who took his wife.
 140 19600
 6 8 1
 BareHandAttack: 3
+BodyProfile: 1
 E
 #8611
 bandit man~
@@ -150,6 +160,7 @@ broadly as he stares off into the distance.
 100 10000
 8 8 1
 BareHandAttack: 3
+BodyProfile: 1
 E
 #8613
 dirty man bandit~
@@ -164,6 +175,7 @@ could kill.
 140 19600
 8 8 1
 BareHandAttack: 13
+BodyProfile: 1
 E
 #8614
 bandit man leader~
@@ -179,6 +191,7 @@ writing something down in a notebook.
 140 19600
 8 8 1
 BareHandAttack: 2
+BodyProfile: 1
 E
 #8615
 young bandit~
@@ -193,5 +206,6 @@ hands prove that he knows his way around a sword.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 1
+BodyProfile: 1
 E
 $

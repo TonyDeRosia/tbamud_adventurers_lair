@@ -20,6 +20,7 @@ hers.
 50 14 70 8d10+250 6d5+4
 0 0
 8 8 2
+BodyProfile: 1
 Str: 18
 Dex: 18
 Int: 18
@@ -89,6 +90,7 @@ for sloppy security is famously short.
 45 15 65 7d9+225 6d5+3
 0 0
 8 8 1
+BodyProfile: 1
 Str: 18
 Dex: 18
 Int: 18
@@ -274,6 +276,7 @@ as a competition.
 39 16 59 6d8+195 5d4+3
 0 0
 8 8 2
+BodyProfile: 1
 Str: 18
 Dex: 18
 Int: 18
@@ -367,6 +370,7 @@ complain for considerably longer about whoever filed it incorrectly.
 35 16 55 5d7+175 4d4+2
 0 0
 8 8 1
+BodyProfile: 1
 Str: 18
 Dex: 18
 Int: 18
@@ -458,6 +462,7 @@ directly that magic does not make a burnt dinner less burnt.
 30 17 50 5d7+150 4d3+2
 0 0
 8 8 1
+BodyProfile: 1
 Str: 18
 Dex: 18
 Int: 18
@@ -519,6 +524,7 @@ parts of the citadel to function.
 32 16 52 5d7+160 4d4+2
 0 0
 8 8 1
+BodyProfile: 1
 Str: 18
 Dex: 18
 Int: 18
@@ -549,6 +555,7 @@ opinions about fire, ink quality, and visitors who fold page corners.
 40 15 60 6d8+200 5d4+3
 0 0
 8 8 0
+BodyProfile: 1
 Str: 18
 Dex: 18
 Int: 18
@@ -579,6 +586,7 @@ wrong tense.
 45 15 65 7d9+225 6d5+3
 0 0
 8 8 0
+BodyProfile: 11
 Str: 18
 Dex: 18
 Int: 18
@@ -610,6 +618,7 @@ sacred concept only in the bureaucratic sense.
 50 14 70 8d10+250 6d5+4
 0 0
 8 8 0
+BodyProfile: 11
 Str: 18
 Dex: 18
 Int: 18

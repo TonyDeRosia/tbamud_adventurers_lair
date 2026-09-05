@@ -11,6 +11,7 @@ the place where he himself perished.
 20 14 -2 4d4+200 3d3+3
 200 40000
 8 8 1
+BodyProfile: 1
 E
 #31901
 squid giant~
@@ -24,6 +25,7 @@ decide to make a meal of you.
 21 13 -2 4d4+210 3d3+3
 210 44100
 8 8 0
+BodyProfile: 18
 E
 #31902
 dragon turtle~
@@ -51,6 +53,7 @@ morsel to eat.
 230 52900
 8 8 0
 BareHandAttack: 4
+BodyProfile: 4
 E
 #31904
 whale killer~
@@ -79,6 +82,7 @@ a shark, it is probably best left alone.
 250 62500
 8 8 0
 BareHandAttack: 4
+BodyProfile: 13
 E
 #31906
 sea elf~
@@ -92,6 +96,7 @@ sea.
 26 12 -5 5d5+260 4d4+4
 260 67600
 8 8 2
+BodyProfile: 1
 E
 #31907
 crab red~
@@ -105,6 +110,7 @@ seems like it might be looking at you, even smiling...
 27 11 -6 5d5+270 4d4+4
 270 72900
 8 8 0
+BodyProfile: 16
 E
 #31908
 jellyfish fish mass gooey~
@@ -182,6 +188,7 @@ A water elemental swirls in with a rush of water and wind.
 33 9 -9 6d6+330 5d5+5
 330 108900
 8 8 0
+BodyProfile: 0
 E
 #31914
 demon sea~

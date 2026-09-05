@@ -25,6 +25,7 @@ he waits for the ripe apples to fall from the breeze.
 3 19 8 0d0+30 1d2+0
 30 900
 8 8 1
+BodyProfile: 1
 E
 T 503
 #502
@@ -40,6 +41,7 @@ hurt terribly if he bit you.
 10 100
 8 8 1
 BareHandAttack: 4
+BodyProfile: 2
 E
 T 502
 #503
@@ -54,6 +56,7 @@ hay.
 3 19 8 0d0+30 1d2+0
 30 900
 8 8 1
+BodyProfile: 1
 E
 #504
 rooster~
@@ -68,6 +71,7 @@ half of his feathers and has a large scar over his left eye.
 20 400
 8 8 1
 BareHandAttack: 8
+BodyProfile: 4
 E
 T 504
 #507
@@ -83,6 +87,7 @@ The hair on the rat is matted down, probably from some sewer water.
 20 400
 8 8 1
 BareHandAttack: 4
+BodyProfile: 2
 E
 #508
 weasel~
@@ -96,6 +101,7 @@ A sly looking weasel is here.
 20 400
 8 8 2
 BareHandAttack: 9
+BodyProfile: 2
 E
 #510
 goose~
@@ -109,6 +115,7 @@ A goose is here, walking along the trail.
 10 100
 8 8 2
 BareHandAttack: 4
+BodyProfile: 4
 E
 #511
 chick~
@@ -122,6 +129,7 @@ A furry little chick is here.
 30 900
 8 8 2
 BareHandAttack: 4
+BodyProfile: 4
 E
 #514
 hen~
@@ -150,6 +158,7 @@ him alone.
 50 2500
 8 8 1
 BareHandAttack: 4
+BodyProfile: 2
 E
 #520
 farmer pete~
@@ -164,6 +173,7 @@ reflects in the sunlight.
 100 10000
 8 8 1
 BareHandAttack: 7
+BodyProfile: 1
 E
 T 520
 #522
@@ -178,6 +188,7 @@ A cow is here.
 40 1600
 8 8 2
 BareHandAttack: 4
+BodyProfile: 2
 E
 #523
 barn cat~
@@ -192,6 +203,7 @@ with stripes of brown.
 50 2500
 8 8 1
 BareHandAttack: 8
+BodyProfile: 2
 E
 #524
 crow~
@@ -206,6 +218,7 @@ blood on his beak.
 10 100
 8 8 1
 BareHandAttack: 4
+BodyProfile: 4
 E
 #526
 farmers wife Helen~
@@ -220,6 +233,7 @@ must be younger than the farmer.
 80 6400
 8 8 2
 BareHandAttack: 13
+BodyProfile: 1
 E
 T 526
 #527
@@ -234,6 +248,7 @@ A sheep is here.
 40 1600
 8 8 2
 BareHandAttack: 4
+BodyProfile: 2
 E
 #529
 calf~
@@ -248,6 +263,7 @@ her?
 20 400
 8 8 2
 BareHandAttack: 9
+BodyProfile: 2
 E
 #536
 farm boy Jonathan~
@@ -262,6 +278,7 @@ His face is boney and looks like it's been caved in.  How gross!
 70 4900
 8 8 1
 BareHandAttack: 9
+BodyProfile: 1
 E
 #542
 owl~
@@ -276,6 +293,7 @@ freshly fallen snow.
 10 100
 8 8 2
 BareHandAttack: 8
+BodyProfile: 4
 E
 #543
 sheepdog~
@@ -316,6 +334,7 @@ you.
 90 8100
 8 8 2
 BareHandAttack: 4
+BodyProfile: 4
 E
 #546
 wolf~
@@ -330,6 +349,7 @@ Maybe you should just leave him alone.
 60 3600
 8 8 1
 BareHandAttack: 9
+BodyProfile: 2
 E
 #547
 squirrel~
@@ -344,6 +364,7 @@ provoked him.
 30 900
 8 8 1
 BareHandAttack: 3
+BodyProfile: 2
 E
 #548
 gopher~
@@ -371,6 +392,7 @@ black holes.  They remind you of death.
 90 8100
 8 8 1
 BareHandAttack: 8
+BodyProfile: 19
 E
 T 555
 #563
@@ -385,6 +407,7 @@ A fiery colt is here.
 70 4900
 8 8 1
 BareHandAttack: 10
+BodyProfile: 2
 E
 #565
 mare~
@@ -398,6 +421,7 @@ A mare is here.
 50 2500
 8 8 2
 BareHandAttack: 4
+BodyProfile: 2
 E
 #566
 horse~
@@ -412,6 +436,7 @@ legs.
 40 1600
 8 8 2
 BareHandAttack: 4
+BodyProfile: 2
 E
 #568
 stallion~
@@ -426,6 +451,7 @@ leave.
 80 6400
 8 8 1
 BareHandAttack: 4
+BodyProfile: 2
 E
 #580
 turkey~
@@ -440,6 +466,7 @@ in them.  Maybe he can't see as well as he used to.
 30 900
 8 8 1
 BareHandAttack: 4
+BodyProfile: 4
 E
 #582
 butterfly~
@@ -454,6 +481,7 @@ creature you have ever seen.
 100 10000
 8 8 1
 BareHandAttack: 9
+BodyProfile: 10
 E
 #584
 arthur man~
@@ -483,6 +511,7 @@ tear you open.
 100 10000
 8 8 1
 BareHandAttack: 8
+BodyProfile: 2
 E
 #587
 hawk~
@@ -497,6 +526,7 @@ enabling her to fly faster.
 70 4900
 8 8 2
 BareHandAttack: 8
+BodyProfile: 4
 E
 #591
 roach~
@@ -524,5 +554,6 @@ A small sparrow is here.
 70 4900
 8 8 2
 BareHandAttack: 4
+BodyProfile: 4
 E
 $

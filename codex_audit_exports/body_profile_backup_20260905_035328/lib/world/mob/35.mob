@@ -1,0 +1,265 @@
+#3500
+wyvern cinder venom spurred cindervale~
+a @rve@Rno@om-@rsp@Our@Rred @rci@Ond@Rer @rwy@Ove@Rrn@n~
+A @rve@Rno@om-@rsp@Our@Rred @rci@Ond@Rer @rwy@Ove@Rrn@n circles low above the trees.
+~
+Broad soot-dark wings carry this lean predator through the canopy with terrifying
+ease. Rust-red scales armor its chest and shoulders, while a hooked tail ends in
+black venom spurs. Its jaws and talons are stained from recent feeding, and a bitter
+chemical reek clings to every hiss of breath.
+~
+67690 0 0 0 0 0 0 0 -650 E
+8 16 0 2d10+100 2d4+2
+80 40
+8 8 0
+BareHandAttack: 4
+Str: 16
+Dex: 15
+Int: 6
+Wis: 10
+Con: 15
+Cha: 6
+Evasion: 2
+GoldMin: 80
+GoldMax: 80
+LootItem: 3513 45
+E
+T 3511
+#3501
+goblin greenblood raider scout embercrag~
+a @gGr@Gee@Ynb@glo@God@n goblin raider~
+A @gGr@Gee@Ynb@glo@God@n goblin raider prowls the trail with a scavenger's caution.
+~
+Lean even for a goblin, this raider wears patched hides beneath scraps of stolen
+cloth and leather. Ash-green paint marks his cheeks in the sign of the Greenblood
+band. He watches the brush more often than the road, moving with the nervous
+discipline of someone expecting larger predators to appear without warning.
+~
+6248 0 0 0 0 0 0 0 -250 E
+4 19 8 1d4+35 1d3+0
+40 0
+8 8 1
+BareHandAttack: 11
+Str: 10
+Dex: 14
+Int: 10
+Wis: 9
+Con: 10
+Cha: 8
+Wimpy: 10
+Evasion: 2
+GoldMin: 40
+GoldMax: 40
+LootItem: 3509 25
+E
+T 3506
+#3502
+gnoll emberfang reaver warrior hyena beastfolk~
+an @rEm@Rbe@Or@rFa@Rng@n gnoll reaver~
+An @rEm@Rbe@Or@rFa@Rng@n gnoll reaver prowls here with a jagged cleaver in hand.
+~
+This hyena-headed warrior stands nearly a head taller than the goblins that haunt
+Cindervale. Soot-red war paint streaks his muzzle, and scars cross a powerful frame
+wrapped in hide and scavenged iron. He carries himself with the confidence of a
+predator accustomed to driving weaker creatures from whatever territory he wants.
+~
+6248 0 0 0 16 0 0 0 -500 E
+7 17 0 2d6+75 2d3+1
+70 0
+8 8 1
+BareHandAttack: 9
+Str: 15
+Dex: 13
+Int: 8
+Wis: 9
+Con: 14
+Cha: 8
+Evasion: 1
+GoldMin: 70
+GoldMax: 70
+LootItem: 3510 35
+E
+T 3507
+#3503
+vargash ember-maw ember maw packlord gnoll emberfang chief beastlord~
+@rVa@Rrg@Oas@rh @REm@Obe@rr-@RMa@Ow@n, packlord of @rEm@Rbe@Or@rcr@Rag@n~
+@rVa@Rrg@Oas@rh @REm@Obe@rr-@RMa@Ow@n looms over a charcoal map of Cindervale.
+~
+Vargash is a massive old gnoll whose dark mane has been braided with iron rings,
+goblin teeth, and scorched bits of bone. One side of his muzzle is permanently
+blackened by an old burn, exposing a yellow canine when he snarls. He studies the
+vale like a hunter studying wounded prey, patient enough to let others bleed first.
+~
+71786 0 0 0 16 0 0 0 -800 E
+9 15 0 3d10+120 2d5+3
+90 90
+8 8 1
+BareHandAttack: 9
+Str: 17
+Dex: 14
+Wis: 12
+Con: 17
+Cha: 13
+Evasion: 2
+GoldMin: 90
+GoldMax: 90
+LootItem: 3510 100
+E
+T 3504
+#3504
+tomas fen boy wounded woodcutter son survivor~
+@WT@Yom@Was @OF@Yen@n, a @Rwou@rnd@Red @Owo@Yod@Wcu@Ytt@Oer@n's son~
+@WT@Yom@Was @OF@Yen@n sits beside the broken trail, trying hard not to cry.
+~
+Tomas cannot be more than ten or eleven years old. His sleeves are torn, his face
+is streaked with dirt, and shallow cuts cover his hands and knees. He clutches a
+small carved charm with both hands and keeps glancing toward the western trail,
+as though he expects the riders who attacked his party to return at any moment.
+~
+262282 0 0 0 0 0 0 0 500 E
+4 19 5 0d0+40 1d2+0
+40 0
+5 5 1
+GoldMin: 40
+GoldMax: 40
+E
+T 3501
+#3505
+harlan vey keeper innkeeper woodsman hearth~
+@YHa@Orl@Yan @WV@Yey@n, keeper of the @oWo@Ood@ysm@oan@O's @YHe@Oar@Yth@n~
+@YHa@Orl@Yan @WV@Yey@n tends the bar while keeping one eye on the door.
+~
+Harlan is a broad-shouldered man with iron-gray hair, rolled sleeves, and the
+scarred hands of someone who worked timber long before he poured ale. He speaks
+quietly but watches every traveler closely. A loaded crossbow behind the bar and
+an axe scar across one forearm show how dangerous innkeeping in Cindervale has become.
+~
+268362 0 0 0 0 0 0 0 400 E
+10 17 0 2d2+100 1d2+1
+100 0
+8 8 1
+GoldMin: 100
+GoldMax: 100
+E
+T 3502
+#3506
+corren vale bard minstrel traveler road worn~
+@CCo@Brr@Wen @CVa@Ble@n, a @Dro@Wad-@Dwo@Wrn @Cba@Brd@n~
+@CCo@Brr@Wen @CVa@Ble@n sits over an untouched cup, staring into the fire.
+~
+Once-bright traveling clothes have faded beneath road dust, rain, and too many
+nights spent in the same chair. Corren's instrument case is battered but carefully
+maintained. His hands occasionally tremble when raised from the table, and whenever
+someone mentions Dreary Hollow his attention sharpens despite the drink before him.
+~
+268362 0 0 0 16 0 0 0 600 E
+8 18 0 1d1+80 1d2+1
+80 0
+6 6 1
+GoldMin: 80
+GoldMax: 80
+E
+T 3503
+#3507
+blackbriar rider brigand horseman outlaw mounted~
+a @DBl@Wac@rk@Dbr@riar@n rider~
+A @DBl@Wac@rk@Dbr@riar@n rider waits in the shadows beside a restless black horse.
+~
+Dark riding leathers and a soot-colored scarf hide most distinguishing features
+of this mounted brigand. His gear is chosen for speed, concealment, and ambush.
+A thorn-shaped brand has been burned into one shoulder guard, marking him as part
+of the Blackbriar riders who prey on the weakened roads through Cindervale.
+~
+6376 0 0 0 589824 0 0 0 -450 E
+8 16 0 2d6+80 2d3+2
+80 0
+8 8 1
+BareHandAttack: 3
+Str: 13
+Dex: 16
+Wis: 10
+Con: 13
+Cha: 10
+Wimpy: 20
+Evasion: 3
+GoldMin: 80
+GoldMax: 80
+EquipItem: 3501 16
+LootItem: 3514 45
+E
+T 3505
+#3508
+gnoll emberfang hunter stalker hyena beastfolk~
+an @rEm@Rbe@Or@rFa@Rng@n gnoll hunter~
+An @rEm@Rbe@Or@rFa@Rng@n gnoll hunter pads between the trees, testing the air.
+~
+Lean and long-limbed, this gnoll wears a patchwork mantle of fox, wolf, and goblin
+hide. Bone hooks and lengths of black cord hang from his belt for snares and traps.
+His ears turn constantly toward distant sounds, and his nostrils flare as he follows
+scents that would be meaningless to a human tracker.
+~
+6248 0 0 0 0 0 0 0 -400 E
+6 17 0 1d8+60 1d5+1
+0 0
+8 8 1
+BareHandAttack: 4
+Str: 13
+Dex: 16
+Int: 9
+Wis: 10
+Con: 12
+Cha: 8
+Evasion: 2
+LootItem: 3510 30
+E
+T 3508
+#3509
+bristlehide boarfolk marauder beastman beastfolk tusked~
+a @oBr@Ois@ytl@oeh@Oid@ye@n boarfolk marauder~
+A tusked @oBr@Ois@ytl@oeh@Oid@ye@n marauder shoulders through the undergrowth.
+~
+Coarse brown-black bristles cover this broad beastman's neck, shoulders, and heavy
+arms. Two chipped tusks jut from a scarred boar-like muzzle above a necklace of
+knotted cord and teeth. He smells of wet hide, smoke, and churned earth, and seems
+far more interested in force than stealth.
+~
+6248 0 0 0 0 0 0 0 -300 E
+5 18 0 2d5+50 1d5+1
+0 0
+8 8 1
+BareHandAttack: 6
+Str: 16
+Dex: 10
+Int: 7
+Wis: 9
+Con: 15
+Cha: 7
+LootItem: 3511 35
+E
+T 3509
+#3510
+carrionwing ravenfolk scavenger crow beastfolk feral~
+a @DCa@Wrr@Ci@Don@Wwi@Cng@n ravenfolk scavenger~
+A @DCa@Wrr@Ci@Don@Wwi@Cng@n scavenger watches from beneath a ragged mantle of black feathers.
+~
+Black feathers cover the head and forearms of this wiry birdlike humanoid, fading
+to leathery gray skin across the torso. Bright eyes dart from pack to corpse to
+weapon with restless calculation. Bits of copper wire, bone, and colored glass
+decorate a ragged mantle assembled from whatever others failed to guard.
+~
+2284 0 0 0 0 0 0 0 -150 E
+5 18 3 1d6+45 1d4+1
+0 0
+8 8 0
+BareHandAttack: 8
+Str: 9
+Dex: 16
+Int: 12
+Con: 10
+Cha: 9
+Wimpy: 15
+Evasion: 3
+LootItem: 3512 40
+E
+T 3510
+$

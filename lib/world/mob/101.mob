@@ -10,6 +10,7 @@ aged him beyond his years.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 1
+BodyProfile: 1
 E
 #10101
 lost cow~
@@ -24,6 +25,7 @@ out roaming around.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 2
+BodyProfile: 2
 E
 #10102
 reddish brown weasel~
@@ -37,6 +39,7 @@ very intelligent and resourceful.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 0
+BodyProfile: 2
 E
 #10103
 cow calf~
@@ -50,6 +53,7 @@ you, looking for its mother.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 0
+BodyProfile: 2
 E
 #10104
 heifer ~
@@ -62,6 +66,7 @@ A heifer looks up at you.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 2
+BodyProfile: 2
 E
 #10105
 fisherman~
@@ -75,6 +80,7 @@ A fisherman walks between the cities to sell his latest catch.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 1
+BodyProfile: 1
 E
 #10106
 bandit pillaging~
@@ -88,6 +94,7 @@ have just made a killing.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 1
+BodyProfile: 1
 E
 #10107
 merchant robbed~
@@ -102,6 +109,7 @@ instant.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 1
+BodyProfile: 1
 E
 #10108
 clairvoyant gypsy~
@@ -115,6 +123,7 @@ a minimal fee I can tell you of yer future.'
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 0
+BodyProfile: 1
 E
 #10109
 trader greedy~
@@ -127,6 +136,7 @@ A greedy trader has been mugged recently and has nothing of value.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 1
+BodyProfile: 1
 E
 #10110
 groundhog~
@@ -140,6 +150,7 @@ of a small dog.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 0
+BodyProfile: 2
 E
 #10111
 wanderer~

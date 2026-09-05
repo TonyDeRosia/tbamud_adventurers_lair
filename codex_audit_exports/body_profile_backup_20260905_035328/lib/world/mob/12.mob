@@ -1,0 +1,268 @@
+#1200
+immortal steward registrar innkeeper keeper registry~
+the @WIm@Bmo@Crt@Wal @CSt@Bew@War@Cd@n~
+The @WIm@Bmo@Crt@Wal @CSt@Bew@War@Cd@n reviews ledgers behind the registry counter.
+~
+A composed woman in a dark blue service coat works through rune-marked
+ledgers with practiced care. Silver clasps at her shoulders bear a small
+red, white, and blue enamel device rather than any symbol of rank. Her
+manner is respectful but direct, the look of someone who expects
+immortals to treat recordkeeping as part of their duty.
+~
+188426 0 0 0 65536 0 0 0 0 E
+14 16 23 2d2+140 2d2+2
+140 0
+8 8 2
+E
+#1201
+immortal dispatch keeper postmaster courier records~
+the @CKe@Bep@Wer @Wof @BDi@Csp@Wat@Bch@n~
+The @CKe@Bep@Wer @Wof @BDi@Csp@Wat@Bch@n sorts sealed staff correspondence.
+~
+The dispatch keeper wears practical gray robes trimmed in blue and white
+thread. A red wax seal hangs from a chain at her belt, ready for urgent
+staff correspondence. She has the alert, unhurried manner of someone who
+knows that reliable communication prevents mistakes before they become
+emergencies.
+~
+10 0 0 0 65536 0 0 0 0 E
+14 16 23 2d2+140 2d2+2
+140 0
+8 8 2
+E
+#1202
+hall warden spirit custodian service watcher~
+the @DHa@Cll @WWa@Brd@Cen@n~
+The @DHa@Cll @WWa@Brd@Cen@n glides silently through the staff halls.
+~
+This translucent custodian spirit bears the faint outline of an old
+service tabard. Rather than suffering through some theatrical purgatory,
+it now tends the immortal halls by choice and old oath. It gathers
+discarded clutter, watches for disorder, and pauses whenever staff
+business becomes serious.
+~
+254028 0 0 0 589840 0 0 0 0 E
+14 16 23 2d2+140 2d2+2
+140 0
+8 8 0
+E
+T 3011
+#1203
+records clerk archivist custodian mortal affairs~
+the @WRe@Cco@Brd@Ws @BCl@Cer@Ck@n~
+The @WRe@Cco@Brd@Ws @BCl@Cer@Ck@n carries a stack of labeled archive folios.
+~
+A middle-aged records clerk in a plain brown coat moves carefully
+between archive tables. Nothing about him is grand or mystical. His duty
+is to keep staff records legible, dated, and findable, and he treats
+that responsibility with more pride than any title.
+~
+172108 0 0 0 0 0 0 0 0 E
+3 19 5 0d0+30 1d2+0
+30 0
+8 8 1
+BareHandAttack: 13
+E
+#1204
+training imp familiar test sprite laboratory~
+a @Rtr@Oai@Yni@Wng @Rim@Op@n~
+A @Rtr@Oai@Yni@Wng @Rim@Op@n waits nearby for controlled staff testing.
+~
+This small crimson familiar is bound to the service hall as a harmless
+training subject. Brass tags on its collar identify it clearly as a TEST
+ENTITY. Its purpose is to give immortals something disposable to
+inspect, stat, script against, and experiment with without pretending
+that a random live player or important world mob is an acceptable test
+target.
+~
+256092 0 0 0 20 0 0 0 -1000 E
+3 19 5 0d0+30 1d2+0
+30 0
+8 8 0
+E
+#1205
+bug glitch mote error test creature~
+a @Rru@On@We-@Bgl@Cit@Wch@n~
+A @Rru@On@We-@Bgl@Cit@Wch@n skitters along the floor, shedding flickers of broken color.
+~
+This intentionally unstable little construct resembles a beetle
+assembled from fragments of failed runes. It exists as a visible
+reminder that bugs belong in controlled testing, documented reports, and
+reproducible examples. When it twitches, tiny glyphs misalign across its
+shell before snapping back into place.
+~
+122952 0 0 0 65536 0 0 0 -1000 E
+3 19 5 0d0+30 1d2+0
+30 0
+8 8 0
+BareHandAttack: 1
+E
+#1206
+frost sprite service familiar ice cube construct~
+a @Cfr@Wos@Btb@Cou@Wnd @Wse@Crv@Bic@Ce @Cspr@Wit@Be@n~
+A @Cfr@Wos@Btb@Cou@Wnd @Wse@Crv@Bic@Ce @Cspr@Wit@Be@n chills a basin of drinking water.
+~
+A palm-sized ice familiar waddles on tiny crystalline feet, leaving no
+puddle behind. Its old enchantment has been repurposed for the hall:
+cooling drinks, carrying sealed notes, and providing a safe magical test
+subject when an immortal needs to verify detection or affect behavior.
+~
+253978 0 0 0 65656 0 0 0 1000 E
+26 12 38 5d5+260 4d4+4
+260 0
+8 8 0
+E
+#1207
+faeries wardlights service sprites sanctuary~
+a @Mcl@Cus@Wte@Br @Cof @Mwa@Brd@Wli@Cgh@Bts@n~
+A @Mcl@Cus@Wte@Br @Cof @Mwa@Brd@Wli@Cgh@Bts@n drifts beneath the rafters.
+~
+A loose cluster of tiny faerie lights patrols the upper reaches of the
+hall. Their colors shift through white, blue, violet, and occasional
+warm red sparks. They are not guards in any military sense, but old
+ward-spirits that react to forbidden passage, broken enchantments, and
+staff who have forgotten that restricted spaces exist for a reason.
+~
+200 0 0 0 0 0 0 0 0 E
+3 19 5 0d0+30 1d2+0
+30 0
+8 8 0
+E
+#1209
+service aide clerk assistant immortal hall~
+the @Wse@Brv@Cic@We @Bai@Cde@n~
+The @Wse@Brv@Cic@We @Bai@Cde@n checks a wax tablet against the day's notices.
+~
+A neatly dressed service aide carries a wax tablet, charcoal stylus, and
+a ring of labeled keys. Her role is administrative rather than
+decorative. She keeps meeting notes, tracks posted work, and points
+newly appointed immortals toward the correct office instead of letting
+them wander through restricted halls guessing.
+~
+256026 0 0 0 120 0 0 0 0 E
+1 20 3 0d0+10 1d2+0
+10 0
+8 8 2
+E
+#1210
+oathbound dragon sentinel guardian immortal hall~
+the @Roa@Oth@Wbo@Bund @Bdr@Cag@Won@n~
+The @Roa@Oth@Wbo@Bund @Bdr@Cag@Won@n rests like a living monument beside the staff halls.
+~
+This ancient dragon serves the immortal complex by oath rather than
+captivity. Deep blue scales darken toward black along the spine while
+pale horn ridges frame watchful eyes. A ceremonial band of red, white,
+and blue enamel circles one foreleg, a restrained mark of the hall's old
+civic tradition. The dragon's presence is a warning that staff authority
+exists to protect the realm, not indulge itself.
+~
+81992 0 0 0 16 0 0 0 0 E
+31 10 45 6d6+310 5d5+5
+310 0
+8 8 1
+BareHandAttack: 4
+Str: 25
+Dex: 25
+Int: 25
+Wis: 25
+E
+#1211
+quartermaster aide supply keeper seasonal stores~
+the @Rqu@War@Bte@Crm@Was@Bte@Cr@n~
+The @Rqu@War@Bte@Crm@Was@Bte@Cr@n inventories sealed seasonal stores.
+~
+A practical quartermaster in a red service coat checks crates,
+ceremonial supplies, and seasonal decorations against a written
+inventory. Old holiday stock is still maintained when useful, but
+nothing is allowed to clutter the working halls without purpose. She has
+the unmistakable expression of someone who knows exactly who failed to
+return the last borrowed item.
+~
+90126 0 0 0 65552 0 0 0 0 E
+30 10 45 6d6+300 5d5+5
+300 0
+8 8 2
+E
+#1212
+training recorder scoreboard clerk demonstration~
+the @Ctr@Bai@Wni@Cng @Bre@Wco@Crd@Wer@n~
+The @Ctr@Bai@Wni@Cng @Bre@Wco@Crd@Wer@n keeps chalk marks beside a demonstration table.
+~
+A patient training recorder stands beside the old demonstration game
+apparatus with chalkboard and ledger in hand. The original exercise has
+been preserved because interactive DG examples can still be useful, but
+it is now clearly treated as training material rather than the
+centerpiece of the immortal meeting hall.
+~
+10 0 0 0 0 0 0 0 0 E
+1 20 3 0d0+10 1d2+0
+10 0
+8 8 2
+E
+T 1214
+#1217
+hall hound puppy dog mascot peishu~
+the @Wha@Bll @Cho@Wun@Bd@n~
+The @Wha@Bll @Cho@Wun@Bd@n naps near the edge of the staff commons.
+~
+A small long-haired hound has somehow become a permanent fixture of the
+immortal hall. A blue-and-white service ribbon is tied loosely around
+his collar, along with a tiny red tag stamped HALL HOUND. He is
+friendly, harmless, and entirely uninterested in the administrative
+significance others seem determined to assign him.
+~
+188506 0 0 0 80 0 0 0 0 E
+30 10 45 6d6+300 5d5+5
+300 0
+8 8 1
+BareHandAttack: 4
+E
+#1233
+hidden test subject invisible training entity~
+the @Dhi@Cdd@Wen @Bte@Cst @Wsu@Bbj@Cec@Wt@n~
+The @Dhi@Cdd@Wen @Bte@Cst @Wsu@Bbj@Cec@Wt@n waits here for controlled visibility testing.
+~
+This intentionally unobtrusive test entity exists for controlled
+visibility, detection, and scripting checks. Its plain construction and
+deliberately minimal presence make it useful when an immortal needs to
+verify whether a system is revealing something that should remain
+unseen.
+~
+10 0 0 0 0 0 0 0 0 E
+1 20 3 0d0+10 1d2+0
+10 0
+8 8 0
+E
+#1267
+color test mob ansi chromatic training~
+the @Rch@Oro@Yma@Wti@Cc @Bte@Cst @Wmo@Bb@n~
+The @Rch@Oro@Yma@Wti@Cc @Bte@Cst @Wmo@Bb@n cycles through carefully controlled colors.
+~
+This featureless training construct exists specifically for ANSI and
+display testing. Bands of red, yellow, white, blue, cyan, and violet
+light move across its surface in short irregular patterns, making it
+easy to test reset behavior, name rendering, and color parser edge cases
+without risking a real world prototype.
+~
+72 0 0 0 0 0 0 0 0 E
+3 19 5 0d0+30 1d2+0
+30 0
+8 8 0
+E
+#1299
+general test mob training helper laboratory~
+the @Wge@Bne@Cra@Wl @Bte@Cst @Wmo@Bb@n~
+The @Wge@Bne@Cra@Wl @Bte@Cst @Wmo@Bb@n waits for a controlled staff exercise.
+~
+This deliberately generic construct is the immortal hall's catch-all
+test subject. It is not lore, treasure, or a challenge. It exists so
+staff can safely test flags, movement, scripting, affects, loading, and
+other administrative behavior without improvising against important
+content elsewhere in the world.
+~
+61454 0 0 0 983040 0 0 0 0 E
+3 19 5 0d0+30 1d2+0
+30 0
+8 8 0
+E
+$

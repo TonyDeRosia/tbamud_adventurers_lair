@@ -12,6 +12,7 @@ formidable impression of strength.
 180 32400
 8 8 1
 BareHandAttack: 12
+BodyProfile: 1
 Int: 18
 Wis: 18
 E
@@ -28,6 +29,7 @@ discounting the tentacles, and it looks hungry.  Not to mention dangerous.
 180 32400
 8 8 0
 BareHandAttack: 1
+BodyProfile: 18
 E
 T 17500
 #17502
@@ -44,6 +46,7 @@ of all eight limbs.
 180 32400
 8 8 0
 BareHandAttack: 14
+BodyProfile: 18
 E
 T 17500
 #17503
@@ -59,6 +62,7 @@ end of each tentacle.
 180 32400
 8 8 0
 BareHandAttack: 1
+BodyProfile: 18
 E
 T 17500
 #17504
@@ -76,6 +80,7 @@ anticipation.
 180 32400
 8 8 0
 BareHandAttack: 6
+BodyProfile: 18
 E
 T 17500
 #17505
@@ -90,6 +95,7 @@ be liquid, but it looks tough.
 18 14 0 3d3+180 3d3+3
 180 32400
 8 8 0
+BodyProfile: 0
 E
 T 17501
 #17506
@@ -107,6 +113,7 @@ electric blue.
 180 32400
 8 8 2
 BareHandAttack: 12
+BodyProfile: 1
 Int: 15
 Wis: 15
 E
@@ -123,6 +130,7 @@ a formidable foe.
 180 32400
 8 8 1
 BareHandAttack: 3
+BodyProfile: 1
 Str: 18
 Dex: 18
 Int: 5
@@ -140,6 +148,7 @@ becomes an effort not to fall over.
 18 14 0 3d3+180 3d3+3
 180 32400
 8 8 1
+BodyProfile: 1
 Str: 18
 Dex: 18
 Int: 5
@@ -158,6 +167,7 @@ the background through the Spectre's form.
 180 32400
 8 8 1
 BareHandAttack: 12
+BodyProfile: 0
 E
 T 17504
 #17510
@@ -173,6 +183,7 @@ at least this eternal limbo.
 18 14 0 3d3+180 3d3+3
 180 32400
 8 8 1
+BodyProfile: 0
 E
 T 17511
 #17511
@@ -190,6 +201,7 @@ someone to be trifled with.
 220 48400
 8 8 1
 BareHandAttack: 12
+BodyProfile: 1
 Str: 18
 Dex: 18
 Int: 18
@@ -212,6 +224,7 @@ eyes.
 180 32400
 8 8 0
 BareHandAttack: 8
+BodyProfile: 2
 E
 T 17514
 $

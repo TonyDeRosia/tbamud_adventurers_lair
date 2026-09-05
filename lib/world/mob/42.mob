@@ -11,6 +11,7 @@ toward you, breathing a small cloud of smoke.
 220 48400
 8 8 1
 BareHandAttack: 8
+BodyProfile: 6
 E
 #4201
 king dragons~
@@ -26,6 +27,7 @@ cough and take a step backwards.
 300 90000
 8 8 1
 BareHandAttack: 8
+BodyProfile: 1
 Str: 25
 Dex: 20
 Int: 25
@@ -44,6 +46,7 @@ A dragon hatchling is lying here curled up into a ball
 220 48400
 8 8 1
 BareHandAttack: 4
+BodyProfile: 6
 E
 #4203
 troll~
@@ -56,6 +59,7 @@ A large, hulking troll is standing here.
 22 13 -3 4d4+220 3d3+3
 220 48400
 8 8 1
+BodyProfile: 1
 E
 #4204
 dragon guard~
@@ -69,6 +73,7 @@ A dragon is here, blocking your way
 260 67600
 8 8 1
 BareHandAttack: 8
+BodyProfile: 6
 E
 #4205
 elf slave enslaved servant~
@@ -83,6 +88,7 @@ by the dragons long ago.
 220 48400
 8 8 2
 BareHandAttack: 7
+BodyProfile: 1
 E
 #4206
 dragon green~
@@ -97,6 +103,7 @@ already seen you, so there is no good in running.
 220 48400
 8 8 1
 BareHandAttack: 8
+BodyProfile: 6
 E
 #4207
 dragon king ~
@@ -111,6 +118,7 @@ cough and take a step backwards.
 26 12 -5 5d5+260 4d4+4
 260 67600
 8 8 0
+BodyProfile: 1
 Str: 20
 Dex: 20
 Int: 20
@@ -141,5 +149,6 @@ Guldane's Shopkeeper stands here
 3 19 8 0d0+30 1d2+0
 30 900
 6 6 1
+BodyProfile: 1
 E
 $

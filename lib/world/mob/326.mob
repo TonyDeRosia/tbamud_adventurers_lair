@@ -24,6 +24,7 @@ complaint.  Must be what the army would call 'Gung Ho'.
 19 14 -1 3d3+190 3d3+3
 190 36100
 8 8 1
+BodyProfile: 1
 E
 #32602
 footman man soldier~
@@ -51,6 +52,7 @@ he has attained within the Army's Ranks.
 21 13 -2 4d4+210 3d3+3
 210 44100
 8 8 1
+BodyProfile: 1
 E
 #32604
 patrolman man soldier~
@@ -65,6 +67,7 @@ walks with a slow, deliberate gait that suggests readiness and watchfulness.
 16 15 0 3d3+160 2d2+2
 160 25600
 8 8 1
+BodyProfile: 1
 E
 #32605
 guard post gate soldier~
@@ -78,6 +81,7 @@ clothing may pass without authorization forms from a higher power.
 23 13 -3 4d4+230 3d3+3
 230 52900
 8 8 1
+BodyProfile: 1
 E
 #32606
 lookout out watchman man soldier~
@@ -106,6 +110,7 @@ he is watching, he does not notice that you have entered into his small space.
 29 11 -7 5d5+290 4d4+4
 290 84100
 8 8 1
+BodyProfile: 1
 E
 #32608
 lookout out watchman man soldier~
@@ -132,6 +137,7 @@ make friends with this one...
 22 13 -3 4d4+220 3d3+3
 220 48400
 8 8 1
+BodyProfile: 1
 E
 #32610
 logger army soldier man~
@@ -145,6 +151,7 @@ strength.
 22 13 -3 4d4+220 3d3+3
 220 48400
 8 8 1
+BodyProfile: 1
 E
 #32611
 logger army soldier man~
@@ -158,6 +165,7 @@ axes, then this man has my respect and admiration!
 20 14 -2 4d4+200 3d3+3
 200 40000
 4 4 1
+BodyProfile: 1
 E
 #32612
 logger army soldier man chief~
@@ -171,6 +179,7 @@ competition with a dozen axes pounding at trees?  This guy is special...
 27 11 -6 5d5+270 4d4+4
 270 72900
 8 8 1
+BodyProfile: 1
 E
 #32613
 dryad faerie wood nymph~
@@ -199,6 +208,7 @@ A real trooper.  No pun intended.
 22 13 -3 4d4+220 3d3+3
 220 48400
 8 8 1
+BodyProfile: 1
 E
 #32615
 soldier marching man army~
@@ -212,6 +222,7 @@ A soldier marches past you, intent on his rhythm.
 21 13 -2 4d4+210 3d3+3
 210 44100
 8 8 1
+BodyProfile: 1
 E
 #32616
 wagon driver man soldier~
@@ -237,6 +248,7 @@ its nose at you.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 0
+BodyProfile: 2
 E
 #32618
 bird small~
@@ -249,6 +261,7 @@ A small bird hops about on the forest floor, looking for worms or bits of seed.
 8 18 5 1d1+80 1d2+1
 80 6400
 8 8 0
+BodyProfile: 4
 E
 #32619
 rabbit little~
@@ -262,6 +275,7 @@ A little rabbit sprints across the path just ahead of you.
 11 17 3 2d2+110 1d2+1
 110 12100
 8 8 0
+BodyProfile: 2
 E
 #32620
 sergeant drill soldier man 823487~
@@ -276,5 +290,6 @@ core.
 30 10 -8 6d6+300 5d5+5
 300 90000
 8 8 1
+BodyProfile: 1
 E
 $

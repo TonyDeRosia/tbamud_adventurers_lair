@@ -11,6 +11,7 @@ with his duties now and carries an arrogant smirk.
 15 15 1 3d3+150 2d2+2
 300 25000
 8 8 1
+BodyProfile: 1
 E
 T 11703
 #11701
@@ -27,6 +28,7 @@ Torres.
 15 15 1 3d3+150 2d2+2
 325 24000
 8 8 1
+BodyProfile: 1
 E
 T 11704
 #11702
@@ -42,6 +44,7 @@ purse, counts her money and checks for her ID cards.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 2
+BodyProfile: 1
 E
 #11703
 hired assassin~
@@ -57,6 +60,7 @@ are planning to attack them.
 13 16 2 2d2+130 2d2+2
 200 18000
 8 8 1
+BodyProfile: 1
 E
 #11704
 zulthan waiter~
@@ -72,6 +76,7 @@ seem to care.
 30 10 -8 6d6+300 5d5+5
 300 90000
 8 8 1
+BodyProfile: 1
 E
 T 11700
 #11705
@@ -121,6 +126,7 @@ and a black shirt.
 0 0
 8 8 1
 BareHandAttack: 13
+BodyProfile: 1
 E
 T 11707
 #11708
@@ -138,6 +144,7 @@ government.
 14 16 1 3d2+140 2d4+2
 450 21000
 8 8 2
+BodyProfile: 1
 E
 #11709
 assassin chieftain~
@@ -154,6 +161,7 @@ tall and skinny figure and she stands with her hand on her hip.
 17 15 0 3d3+170 2d2+2
 1000 29500
 8 8 2
+BodyProfile: 1
 E
 T 11714
 #11710
@@ -187,6 +195,7 @@ disrespected him before.
 17 15 0 3d3+170 2d2+2
 170 28900
 8 8 1
+BodyProfile: 1
 E
 #11712
 government official miranda~
@@ -300,6 +309,7 @@ bald head and is also wearing a pair of black sunglasses.
 250 62500
 8 8 1
 BareHandAttack: 6
+BodyProfile: 1
 E
 T 11719
 T 11720
@@ -320,6 +330,7 @@ sky blue colored eyes.  Her lips are the scarlet of her robe.
 340 115600
 8 8 2
 BareHandAttack: 8
+BodyProfile: 1
 E
 T 11731
 #11720
@@ -334,6 +345,7 @@ disgust trying to think of ideas for his next masterpiece.
 11 17 3 2d2+110 1d2+1
 110 12100
 8 8 1
+BodyProfile: 1
 E
 #11721
 journalist~
@@ -348,6 +360,7 @@ with the government, though most people seem unwilling to answer them.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 1
+BodyProfile: 1
 E
 #11722
 fat chef~
@@ -362,6 +375,7 @@ big white apron that somehow manages to fit around his grandiose waist.
 13 16 2 2d2+130 2d2+2
 130 16900
 8 8 1
+BodyProfile: 1
 E
 #11723
 crying man~
@@ -375,6 +389,7 @@ repeatedly for some reason, making all the citizens nearby uncomfortable.
 11 17 3 2d2+110 1d2+1
 110 12100
 8 8 1
+BodyProfile: 1
 E
 T 11727
 #11724
@@ -402,6 +417,7 @@ care about anything else.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 2
+BodyProfile: 1
 E
 #11726
 karate instructor~
@@ -418,6 +434,7 @@ about what he is doing.
 150 23500
 8 8 1
 BareHandAttack: 13
+BodyProfile: 1
 E
 #11727
 librarian~
@@ -433,6 +450,7 @@ feather duster.
 12 16 2 2d2+120 2d2+2
 120 14400
 8 8 2
+BodyProfile: 1
 E
 #11728
 little alex~
@@ -475,6 +493,7 @@ had made when they left.
 12 16 2 2d2+120 2d2+2
 120 14400
 8 8 2
+BodyProfile: 1
 E
 #11731
 janitor~
@@ -490,5 +509,6 @@ clean up the messes that people make on the walls.
 110 12100
 8 8 1
 BareHandAttack: 13
+BodyProfile: 1
 E
 $

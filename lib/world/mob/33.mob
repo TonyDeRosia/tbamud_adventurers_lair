@@ -10,6 +10,7 @@ the most boring people on earth.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 1
+BodyProfile: 1
 E
 #3301
 storekeeper~
@@ -50,6 +51,7 @@ you want to give it a carrot.
 50 2500
 8 8 1
 BareHandAttack: 4
+BodyProfile: 2
 E
 #3304
 farmer's wife~
@@ -63,6 +65,7 @@ She looks bored, though.
 20 14 -2 4d4+200 3d3+3
 200 40000
 8 8 2
+BodyProfile: 1
 E
 #3305
 aglandiir dragon~
@@ -77,6 +80,7 @@ letting people steal from his horde!
 300 90000
 8 8 1
 BareHandAttack: 8
+BodyProfile: 6
 Str: 25
 Dex: 25
 Int: 25
@@ -109,6 +113,7 @@ seemingly to show great intelligence.  Her mouth twitches into a sneer...
 15 15 1 3d3+150 2d2+2
 150 22500
 8 8 2
+BodyProfile: 1
 E
 #3308
 duwick man~
@@ -124,6 +129,7 @@ of a silvered dagger sticking out...  A tiny weapon for such a large man!
 22 13 -3 4d4+220 3d3+3
 220 48400
 8 8 1
+BodyProfile: 1
 E
 #3309
 receptionist~
@@ -152,6 +158,7 @@ doesn't seem too terribly startled.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 1
+BodyProfile: 1
 E
 #3311
 hunter~
@@ -166,6 +173,7 @@ dark.  Others are standing out of his way as he walks on by.
 11 17 3 2d2+110 1d2+1
 110 12100
 8 8 1
+BodyProfile: 1
 E
 #3312
 waiter~
@@ -180,6 +188,7 @@ he passes by.
 5 19 7 1d1+50 1d2+0
 50 2500
 8 8 1
+BodyProfile: 1
 E
 #3313
 waitress~
@@ -194,6 +203,7 @@ glance as she passes by.
 5 19 7 1d1+50 1d2+0
 50 2500
 8 8 2
+BodyProfile: 1
 E
 #3314
 bartender~
@@ -208,6 +218,7 @@ but he polishes it anyway.  Go figure.
 15 15 1 3d3+150 2d2+2
 150 22500
 8 8 1
+BodyProfile: 1
 E
 #3315
 bandit~
@@ -222,6 +233,7 @@ and cleaned though...
 16 15 0 3d3+160 2d2+2
 160 25600
 8 8 1
+BodyProfile: 1
 E
 #3316
 bandit guard~
@@ -236,6 +248,7 @@ DIRTY!!!  )
 18 14 0 3d3+180 3d3+3
 180 32400
 8 8 1
+BodyProfile: 1
 E
 #3317
 miner worker slave~
@@ -250,6 +263,7 @@ and if you even can.
 6 18 6 1d1+60 1d2+1
 60 3600
 8 8 1
+BodyProfile: 1
 E
 #3318
 farmer~
@@ -263,6 +277,7 @@ the most boring people on earth.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 1
+BodyProfile: 1
 E
 #3319
 hunter~
@@ -277,5 +292,6 @@ dark.  Others are standing out of his way as he walks on by.
 11 17 3 2d2+110 1d2+1
 110 12100
 8 8 1
+BodyProfile: 1
 E
 $

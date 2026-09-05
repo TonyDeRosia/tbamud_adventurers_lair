@@ -10,6 +10,7 @@ jacket and rubber boots.
 5 19 7 1d1+50 1d2+0
 50 2500
 8 8 1
+BodyProfile: 1
 E
 #26301
 sandy wife~
@@ -22,6 +23,7 @@ Ernie's wife, Sandy, stands proudly with her husband.
 5 19 7 1d1+50 1d2+0
 50 2500
 8 8 2
+BodyProfile: 1
 E
 #26302
 patty daughter~
@@ -34,6 +36,7 @@ Ernie's daughter, Patty, is here milking a cow.
 5 19 7 1d1+50 1d2+0
 50 2500
 6 6 2
+BodyProfile: 1
 E
 #26303
 tramp man~
@@ -47,6 +50,7 @@ loser.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 1
+BodyProfile: 1
 E
 #26304
 cow~
@@ -60,6 +64,7 @@ A cow patiently waits to be milked here.
 30 900
 8 8 0
 BareHandAttack: 6
+BodyProfile: 2
 E
 #26305
 girschwyn farmer~
@@ -122,6 +127,7 @@ His face is leathered and wrinkly from the sun.
 6 18 6 1d1+60 1d2+1
 60 3600
 8 8 1
+BodyProfile: 1
 E
 #26310
 erik son fisherman~
@@ -135,6 +141,7 @@ fishing and not doing his chores.
 5 19 7 1d1+50 1d2+0
 50 2500
 6 6 1
+BodyProfile: 1
 E
 #26311
 frog~
@@ -147,6 +154,7 @@ A frog is here, relaxing in the sun and water.
 3 19 8 0d0+30 1d2+0
 30 900
 8 8 0
+BodyProfile: 2
 E
 #26313
 deer~
@@ -160,6 +168,7 @@ it's stunning perfection.
 4 19 7 0d0+40 1d2+0
 40 1600
 8 8 0
+BodyProfile: 2
 E
 #26314
 suzarre woman~
@@ -172,6 +181,7 @@ Suzarre the Pig Woman stands here... she looks a LOT like Kathy Bates.
 6 18 6 1d1+60 1d2+1
 60 3600
 8 8 2
+BodyProfile: 2
 E
 #26315
 pig~
@@ -184,6 +194,7 @@ A pig is here, stinking and dirty.
 4 19 7 0d0+40 1d2+0
 40 1600
 8 8 0
+BodyProfile: 2
 E
 #26316
 chicken~
@@ -196,6 +207,7 @@ A chicken struts around the yard, hoping for some seeds.
 3 19 8 0d0+30 1d2+0
 30 900
 8 8 0
+BodyProfile: 4
 E
 #26317
 slopper man~
@@ -208,6 +220,7 @@ A man is here, sloppin' the pigs.
 6 18 6 1d1+60 1d2+1
 60 3600
 8 8 1
+BodyProfile: 1
 E
 #26318
 feeder man~
@@ -221,5 +234,6 @@ A man is here, feeding the chickens.
 6 18 6 1d1+60 1d2+1
 60 3600
 8 8 1
+BodyProfile: 1
 E
 $

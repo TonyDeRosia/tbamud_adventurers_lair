@@ -11,6 +11,7 @@ nerves.
 27 11 -6 5d5+270 4d4+4
 270 72900
 8 8 1
+BodyProfile: 1
 E
 #30701
 lady castle~
@@ -25,6 +26,7 @@ walking your way.
 25 12 -5 5d5+250 4d4+4
 250 62500
 8 8 2
+BodyProfile: 1
 E
 #30702
 maiden handmaiden~
@@ -39,6 +41,7 @@ enough to never overstep her bounds.
 24 12 -4 4d4+240 4d4+4
 240 57600
 8 8 2
+BodyProfile: 1
 E
 #30703
 servant manservant~
@@ -52,6 +55,7 @@ within them.  His only desire seems to be to serve his Lord.
 24 12 -4 4d4+240 4d4+4
 240 57600
 8 8 1
+BodyProfile: 1
 E
 #30704
 brother drunk~
@@ -67,6 +71,7 @@ sister, he has it made.
 22 13 -3 4d4+220 3d3+3
 220 48400
 8 8 1
+BodyProfile: 1
 E
 #30705
 brother knight lord~
@@ -80,6 +85,7 @@ his time in the field, doing whatever it is that knights do best.
 26 12 -5 5d5+260 4d4+4
 260 67600
 8 8 1
+BodyProfile: 1
 E
 #30706
 contingent member knight lesser soldier~
@@ -93,6 +99,7 @@ be out in this barn rather than indoors where it is much more festive.
 22 13 -3 4d4+220 3d3+3
 220 48400
 8 8 1
+BodyProfile: 1
 E
 #30707
 impatient soldier~
@@ -106,6 +113,7 @@ ready to get back out into action.
 24 12 -4 4d4+240 4d4+4
 240 57600
 8 8 1
+BodyProfile: 1
 E
 #30708
 soldier bored~
@@ -119,6 +127,7 @@ him.
 23 13 -3 4d4+230 3d3+3
 230 52900
 8 8 1
+BodyProfile: 1
 E
 #30709
 lady in waiting~
@@ -132,6 +141,7 @@ when she finds the slightest smudge of dirt anywhere.
 22 13 -3 4d4+220 3d3+3
 220 48400
 8 8 2
+BodyProfile: 1
 E
 #30710
 lady in waiting~
@@ -145,6 +155,7 @@ A lady-in-waiting wanders about the keep, searching for her Lady.
 21 13 -2 4d4+210 3d3+3
 210 44100
 8 8 2
+BodyProfile: 1
 E
 #30711
 scholar visiting~
@@ -158,6 +169,7 @@ the Lord and Lady possess for drinking and carousing.
 23 13 -3 4d4+230 3d3+3
 230 52900
 8 8 1
+BodyProfile: 1
 E
 #30712
 whore~
@@ -184,6 +196,7 @@ every time he gets going really well into an overture.
 21 13 -2 4d4+210 3d3+3
 210 44100
 8 8 1
+BodyProfile: 1
 E
 #30714
 cook~
@@ -197,6 +210,7 @@ they are for the Lord and Lady.  They must be well paid.
 22 13 -3 4d4+220 3d3+3
 220 48400
 8 8 1
+BodyProfile: 1
 E
 #30715
 stable boy~
@@ -210,6 +224,7 @@ sort of annoying.
 21 13 -2 4d4+210 3d3+3
 210 44100
 8 8 1
+BodyProfile: 1
 E
 #30716
 salesman ale~
@@ -223,6 +238,7 @@ and now has to sleep it off.
 22 13 -3 4d4+220 3d3+3
 220 48400
 8 8 1
+BodyProfile: 1
 E
 #30717
 alanis sorceress~
@@ -236,6 +252,7 @@ join the staff permanently - unbeknownst to the Lord.
 24 12 -4 4d4+240 4d4+4
 240 57600
 8 8 2
+BodyProfile: 1
 E
 #30718
 felice healer~
@@ -249,5 +266,6 @@ Felice, the castle healer, relaxes on the bed, reading a thick book.
 24 12 -4 4d4+240 4d4+4
 240 57600
 8 8 1
+BodyProfile: 1
 E
 $

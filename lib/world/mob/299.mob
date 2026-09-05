@@ -26,6 +26,7 @@ little white movements underneath it.
 30 10 -8 6d6+300 5d5+5
 300 90000
 8 8 0
+BodyProfile: 1
 E
 #29902
 ghoul being~
@@ -40,6 +41,7 @@ little white movements underneath it.
 31 10 -8 6d6+310 5d5+5
 310 96100
 8 8 0
+BodyProfile: 1
 E
 #29903
 esmerelda priestess woman~
@@ -56,6 +58,7 @@ ever so slowly, maybe you can try to save her!
 32 10 -9 6d6+320 5d5+5
 320 102400
 8 8 2
+BodyProfile: 1
 E
 #29904
 priest man~
@@ -70,6 +73,7 @@ him.
 30 10 -8 6d6+300 5d5+5
 300 90000
 8 8 1
+BodyProfile: 1
 E
 #29905
 wyrenthoth dracolich dragon undead~
@@ -89,6 +93,7 @@ dracolich.
 34 9 -10 6d6+340 5d5+5
 340 115600
 8 8 0
+BodyProfile: 6
 E
 #29906
 vampire erich man~
@@ -104,6 +109,7 @@ control of all of the evil undead which infest this cathedral.
 33 9 -9 6d6+330 5d5+5
 330 108900
 8 8 1
+BodyProfile: 1
 E
 #29907
 giant zombie~
@@ -118,6 +124,7 @@ put it bluntly, really bad.
 33 9 -9 6d6+330 5d5+5
 330 108900
 8 8 0
+BodyProfile: 1
 E
 #29908
 skeleton human~
@@ -132,6 +139,7 @@ seems to be looking for someone in particular.
 32 10 -9 6d6+320 5d5+5
 320 102400
 8 8 0
+BodyProfile: 1
 E
 #29909
 zombie~
@@ -147,6 +155,7 @@ any more than that).
 31 10 -8 6d6+310 5d5+5
 310 96100
 8 8 0
+BodyProfile: 1
 E
 #29910
 shadow~
@@ -189,6 +198,7 @@ but rather seems to be made of a strange electricity in the air.
 33 9 -9 6d6+330 5d5+5
 330 108900
 8 8 0
+BodyProfile: 0
 E
 #29913
 banshee form humanoid mother superior~
@@ -204,6 +214,7 @@ be the soul of the cathedral's Mother Superior.
 33 9 -9 6d6+330 5d5+5
 330 108900
 8 8 2
+BodyProfile: 0
 E
 #29914
 ghost abbott~
@@ -219,5 +230,6 @@ sadly, and then continues his song.
 34 9 -10 6d6+340 5d5+5
 340 115600
 8 8 1
+BodyProfile: 0
 E
 $

@@ -12,6 +12,7 @@ of light, and its posture is patient rather than threatening.
 34 9 50 6d6+340 5d5+5
 340 0
 8 8 0
+BodyProfile: 1
 Str: 18
 Dex: 18
 Int: 18
@@ -39,6 +40,7 @@ jokes and crude theatrics.
 25 12 38 5d5+250 4d4+4
 250 0
 8 8 1
+BodyProfile: 1
 Str: 16
 Dex: 16
 Int: 14
@@ -66,6 +68,7 @@ as decoration.
 31 10 45 6d6+310 5d5+5
 310 0
 8 8 2
+BodyProfile: 1
 Str: 18
 Dex: 18
 Int: 18
@@ -165,6 +168,7 @@ responsibility.
 25 12 38 5d5+250 4d4+4
 250 0
 8 8 0
+BodyProfile: 11
 Str: 16
 Dex: 16
 Int: 16
@@ -191,6 +195,7 @@ it reacts only when restricted staff spaces are misused.
 25 12 38 5d5+250 4d4+4
 250 0
 8 8 0
+BodyProfile: 1
 Str: 16
 Dex: 16
 Int: 16

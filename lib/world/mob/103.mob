@@ -12,6 +12,7 @@ front.
 1 20 9 0d0+10 1d2+0
 10 100
 8 8 0
+BodyProfile: 1
 E
 T 10304
 #10305
@@ -26,6 +27,7 @@ his green skin, antenna, and namekian cloths.
 1 20 9 0d0+10 1d2+0
 10 100
 8 8 0
+BodyProfile: 1
 E
 T 10305
 #10306
@@ -55,6 +57,7 @@ A large wolf stands here growling.
 20 400
 8 8 2
 BareHandAttack: 4
+BodyProfile: 2
 E
 #10316
 Matilda~
@@ -141,6 +144,7 @@ right places.
 1 20 9 0d0+10 1d2+0
 10 100
 8 8 2
+BodyProfile: 1
 E
 T 10345
 #10346
@@ -180,6 +184,7 @@ A Dragon Statue sits here.
 1 20 9 0d0+10 1d2+0
 10 100
 8 8 0
+BodyProfile: 6
 E
 #10368
 large bird~
@@ -192,6 +197,7 @@ A large bird flies around here.
 27 11 10 5d5+270 4d4+4
 270 72900
 8 8 0
+BodyProfile: 4
 E
 #10378
 Rabbit~
@@ -204,6 +210,7 @@ A brown rabbit hops around happily.
 13 16 2 2d2+130 2d2+2
 130 16900
 8 8 2
+BodyProfile: 2
 E
 #10379
 Rabbit~
@@ -216,6 +223,7 @@ A white rabbit hops around happily.
 13 16 2 2d2+130 2d2+2
 130 16900
 8 8 1
+BodyProfile: 2
 E
 #10398
 Gambler~
@@ -229,6 +237,7 @@ his head.
 30 10 -8 6d6+300 5d5+5
 300 90000
 8 8 1
+BodyProfile: 1
 E
 #10399
 Biker~
@@ -241,5 +250,6 @@ A Biker stands here swinging a chain around.
 34 9 -10 6d6+340 5d5+5
 340 115600
 8 8 1
+BodyProfile: 1
 E
 $

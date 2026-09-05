@@ -12,6 +12,7 @@ you want to <Buy ship>
 23 13 -3 4d4+230 3d3+3
 230 52900
 8 8 1
+BodyProfile: 1
 E
 #27801
 sea serpent seaserpent~
@@ -26,6 +27,7 @@ probably make great armor on you too.
 22 13 -3 4d4+220 3d3+3
 220 48400
 8 8 0
+BodyProfile: 3
 E
 T 27800
 #27802
@@ -40,6 +42,7 @@ His sharp, huge teeth show just how unhappy he is as they clamp into you.
 21 13 -2 4d4+210 3d3+3
 210 44100
 8 8 0
+BodyProfile: 13
 E
 #27803
 leviathan~

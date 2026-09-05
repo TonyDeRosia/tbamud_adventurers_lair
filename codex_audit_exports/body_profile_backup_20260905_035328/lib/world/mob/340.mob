@@ -1,0 +1,630 @@
+#34000
+crystal sentinel chromatic guardian~
+a @Cch@Wro@Cma@Wti@Cc @Wsentinel@n~
+A @Cch@Wro@Cma@Wti@Cc @Wsentinel@n turns slowly across the crystal path.
+~
+This guardian resembles a broad-shouldered figure grown rather than
+carved from interlocking crystal plates. Threads of blue, gold, and
+violet light travel beneath its translucent shell, flaring whenever
+movement disturbs the grotto. Its blunt hands and heavy stance suggest
+a creature made to hold ground rather than pursue prey.
+~
+8 0 0 0 0 0 0 0 0 E
+16 18 25 2d4+80 2d2+1
+0 40
+8 8 0
+BareHandAttack: 7
+BodyProfile: 1
+SavingPara: 4
+SavingRod: 4
+SavingPetri: 4
+SavingBreath: 4
+SavingSpell: 4
+Wimpy: 8
+Evasion: 5
+GoldMin: 16
+GoldMax: 32
+LootItem: 34018 15
+E
+#34001
+glasswing scavenger insect crystal~
+a @Wgl@ca@Wss@cw@Wi@cn@Wg @cscavenger@n~
+A @Wgl@ca@Wss@cw@Wi@cn@Wg @cscavenger@n picks delicately through the fractured crystal.
+~
+This insectile scavenger balances on six needle-thin legs beneath a
+narrow body of smoky quartz. Two broad wings, clear as freshly cut
+glass, tremble above its back and scatter tiny rainbows across nearby
+stone. Its hooked mouthparts scrape loose mineral growths and magical
+residue from cracks in the grotto.
+~
+8 0 0 0 0 0 0 0 0 E
+19 18 25 3d5+95 2d2+1
+0 100
+8 8 0
+BareHandAttack: 4
+BodyProfile: 0
+Str: 12
+Dex: 12
+Int: 12
+Wis: 12
+Con: 12
+Cha: 12
+SavingPara: 4
+SavingRod: 4
+SavingPetri: 4
+SavingBreath: 4
+SavingSpell: 4
+Wimpy: 9
+Evasion: 6
+GoldMin: 19
+GoldMax: 38
+LootItem: 34018 25
+LootItem: 34014 12
+E
+#34002
+faceted custodian crystal keeper~
+the @Cfa@Wce@Cted @Wcustodian@n~
+The @Cfa@Wce@Cted @Wcustodian@n patiently adjusts a wall of mirrored crystal.
+~
+Taller and more intricate than the common sentinels, this ancient
+keeper is built from dozens of precisely fitted crystal facets. Four
+slender hands test angles, clear mineral dust, and nudge loose growths
+back into alignment with tireless care. Light bends around its torso
+in disciplined bands, making its true outline difficult to judge.
+~
+8 0 0 0 0 0 0 0 0 E
+21 18 25 3d5+105 3d3+1
+0 180
+8 8 0
+BareHandAttack: 6
+BodyProfile: 1
+Str: 14
+Dex: 14
+Int: 14
+Wis: 14
+Con: 14
+Cha: 14
+SavingPara: 5
+SavingRod: 5
+SavingPetri: 5
+SavingBreath: 5
+SavingSpell: 5
+Wimpy: 10
+Evasion: 7
+GoldMin: 21
+GoldMax: 42
+LootItem: 34010 6
+E
+#34003
+heart prism warden crystal guardian~
+the @Mheart@W-@Cprism @Wwarden@n~
+The @Mheart@W-@Cprism @Wwarden@n stands within the converging beams.
+~
+A towering guardian of dark crystal stands between intruders and the
+Heart Prism. A smaller living prism turns inside its chest, throwing
+hard bands of crimson, cobalt, and violet through joints that should
+be opaque. One arm narrows into a flawless blade-like edge, while the
+other ends in a heavy faceted hand capable of crushing stone.
+~
+8 0 0 0 0 0 0 0 0 E
+25 17 25 4d6+125 3d3+2
+0 360
+8 8 0
+BareHandAttack: 3
+BodyProfile: 1
+Str: 16
+Dex: 16
+Int: 16
+Wis: 16
+Con: 16
+Cha: 16
+SavingPara: 6
+SavingRod: 6
+SavingPetri: 6
+SavingBreath: 6
+SavingSpell: 6
+Wimpy: 12
+Evasion: 8
+GoldMin: 25
+GoldMax: 50
+LootItem: 34019 8
+E
+T 34000
+#34004
+prismwing moth crystal insect~
+a @Mpr@Wis@Mm@Ww@Min@Wg @Mmoth@n~
+A @Mpr@Wis@Mm@Ww@Min@Wg @Mmoth@n drifts between the crystal reeds.
+~
+The moth is the size of a small hound, with four translucent wings
+dusted in shifting bands of violet and blue. Its soft body is protected
+by overlapping crystal scales, and a coiled feeding tube probes glowing
+mineral blooms for nectar.
+~
+8 0 0 0 0 0 0 0 0 E
+15 19 35 2d4+75 2d2+1
+0 0
+8 8 0
+BareHandAttack: 4
+BodyProfile: 0
+SavingPara: 3
+SavingRod: 3
+SavingPetri: 3
+SavingBreath: 3
+SavingSpell: 3
+Wimpy: 7
+Evasion: 5
+GoldMin: 15
+GoldMax: 30
+LootItem: 34018 32
+LootItem: 34014 18
+E
+#34005
+crystalback beetle prismatic insect~
+a @Ccrystal@Wback @Cbeetle@n~
+A @Ccrystal@Wback @Cbeetle@n grinds mineral fragments beneath its shell.
+~
+A broad beetle nearly reaches a warrior's knee, its back covered by
+overlapping plates of cloudy blue crystal. Powerful mandibles crack
+loose mineral growths for food, while the heavy shell turns aside
+glancing blows with a sound like struck glass.
+~
+8 0 0 0 0 0 0 0 0 E
+17 18 37 2d4+85 2d2+1
+0 0
+8 8 0
+BareHandAttack: 6
+BodyProfile: 0
+SavingPara: 4
+SavingRod: 4
+SavingPetri: 4
+SavingBreath: 4
+SavingSpell: 4
+Wimpy: 8
+Evasion: 5
+GoldMin: 17
+GoldMax: 34
+LootItem: 34004 14
+LootItem: 34018 20
+E
+#34006
+amberglass wasp needlewing insect~
+an @Ya@Wm@Yb@We@Yr@Wg@Yl@Wa@Yss @Wwasp@n~
+An @Ya@Wm@Yb@We@Yr@Wg@Yl@Wa@Yss @Wwasp@n hangs in the air on needle-thin wings.
+~
+This predatory wasp is built from dark chitin and translucent amber
+plates. Its four narrow wings beat too quickly to follow, and a long
+crystal stinger folds beneath the abdomen like a dagger waiting to be
+drawn.
+~
+8 0 0 0 0 0 0 0 0 E
+18 18 38 3d5+90 2d2+1
+0 0
+8 8 0
+BareHandAttack: 1
+BodyProfile: 0
+Str: 12
+Dex: 12
+Int: 12
+Wis: 12
+Con: 12
+Cha: 12
+SavingPara: 4
+SavingRod: 4
+SavingPetri: 4
+SavingBreath: 4
+SavingSpell: 4
+Wimpy: 9
+Evasion: 6
+GoldMin: 18
+GoldMax: 36
+LootItem: 34005 10
+LootItem: 34014 22
+E
+#34007
+lumen slug crystal grazer~
+a @Clu@Wmen @Cslug@n~
+A @Clu@Wmen @Cslug@n leaves a ribbon of silver light across the wet stone.
+~
+The slow grazer is nearly three feet long and translucent enough to see
+luminous organs pulsing beneath its skin. It rasps glowing mineral film
+from damp crystal with a ring of tiny teeth, leaving a bright trail that
+fades over several minutes.
+~
+8 0 0 0 0 0 0 0 0 E
+16 18 36 2d4+80 2d2+1
+0 0
+8 8 0
+BareHandAttack: 4
+BodyProfile: 3
+SavingPara: 4
+SavingRod: 4
+SavingPetri: 4
+SavingBreath: 4
+SavingSpell: 4
+Wimpy: 8
+Evasion: 5
+GoldMin: 16
+GoldMax: 32
+LootItem: 34014 40
+E
+#34008
+shardmantis crystal predator mantis~
+a @Wsh@Car@Wdm@Can@Wti@Cs @Wpredator@n~
+A @Wsh@Car@Wdm@Can@Wti@Cs @Wpredator@n waits perfectly still among the razor facets.
+~
+This tall insect folds two immense crystal forelimbs against its narrow
+chest until they resemble harmless quartz blades. Its faceted eyes
+mirror the surrounding cavern, and every joint is arranged for a sudden
+explosive strike.
+~
+8 0 0 0 0 0 0 0 0 E
+20 18 40 3d5+100 3d2+1
+0 0
+8 8 0
+BareHandAttack: 3
+BodyProfile: 0
+Str: 13
+Dex: 13
+Int: 13
+Wis: 13
+Con: 13
+Cha: 13
+SavingPara: 5
+SavingRod: 5
+SavingPetri: 5
+SavingBreath: 5
+SavingSpell: 5
+Wimpy: 10
+Evasion: 6
+GoldMin: 20
+GoldMax: 40
+LootItem: 34012 14
+LootItem: 34018 18
+E
+#34009
+mirrorweb spider crystal predator~
+a @Wmir@cro@Wrew@ceb @Wspider@n~
+A @Wmir@cro@Wrew@ceb @Wspider@n crouches behind a curtain of false reflections.
+~
+Eight long legs support a flattened body plated in mirror-bright
+crystal. The spider's web reflects whatever lies behind it, hiding both
+strands and hunter until prey is already entangled. Its fangs are dark,
+polished, and completely free of reflection.
+~
+8 0 0 0 0 0 0 0 0 E
+21 18 41 3d5+105 3d3+1
+0 0
+8 8 0
+BareHandAttack: 4
+BodyProfile: 5
+Str: 14
+Dex: 14
+Int: 14
+Wis: 14
+Con: 14
+Cha: 14
+SavingPara: 5
+SavingRod: 5
+SavingPetri: 5
+SavingBreath: 5
+SavingSpell: 5
+Wimpy: 10
+Evasion: 7
+GoldMin: 21
+GoldMax: 42
+LootItem: 34009 12
+LootItem: 34018 20
+E
+#34010
+gemjaw crawler crystal beast~
+a @Cgem@Wjaw @Ccrawler@n~
+A @Cgem@Wjaw @Ccrawler@n bites chunks directly from the cavern wall.
+~
+Low, broad, and heavily muscled, the crawler is armored in dull gray
+scales except for a jaw lined with brilliant blue crystal teeth. Those
+teeth can crush quartz like bread crust, and fresh mineral dust coats
+its powerful forelimbs.
+~
+8 0 0 0 0 0 0 0 0 E
+22 18 42 3d5+110 3d3+1
+0 0
+8 8 0
+BareHandAttack: 6
+BodyProfile: 2
+Str: 14
+Dex: 14
+Int: 14
+Wis: 14
+Con: 14
+Cha: 14
+SavingPara: 5
+SavingRod: 5
+SavingPetri: 5
+SavingBreath: 5
+SavingSpell: 5
+Wimpy: 11
+Evasion: 7
+GoldMin: 22
+GoldMax: 44
+LootItem: 34008 10
+LootItem: 34017 8
+E
+#34011
+prism stag antlered crystal beast~
+a @Rpr@Yi@Cs@Mm @Wstag@n~
+A @Rpr@Yi@Cs@Mm @Wstag@n watches through a crown of many-colored antlers.
+~
+The stag's lean body appears carved from pale stone until it moves with
+unmistakable living grace. A magnificent rack of translucent antlers
+branches above its head, each tine holding a different color. Its hooves
+strike sparks from bare crystal.
+~
+8 0 0 0 0 0 0 0 0 E
+23 18 43 3d5+115 3d3+1
+0 0
+8 8 0
+BareHandAttack: 9
+BodyProfile: 2
+Str: 15
+Dex: 15
+Int: 15
+Wis: 15
+Con: 15
+Cha: 15
+SavingPara: 5
+SavingRod: 5
+SavingPetri: 5
+SavingBreath: 5
+SavingSpell: 5
+Wimpy: 11
+Evasion: 7
+GoldMin: 23
+GoldMax: 46
+LootItem: 34016 22
+LootItem: 34010 7
+E
+#34012
+hollow facet mimic crystal ambusher~
+a @Dhollow@W-@Cfacet @Wmimic@n~
+A @Dhollow@W-@Cfacet @Wmimic@n unfolds from what looked like an empty geode.
+~
+At rest the creature is almost indistinguishable from a split geode.
+When disturbed, mirrored plates open into hooked limbs around a dark
+hollow core. Reflections inside that emptiness continue moving even when
+everything outside has gone still.
+~
+8 0 0 0 0 0 0 0 0 E
+24 17 44 4d6+120 3d3+2
+0 0
+8 8 0
+BareHandAttack: 8
+BodyProfile: 0
+Str: 16
+Dex: 16
+Int: 16
+Wis: 16
+Con: 16
+Cha: 16
+SavingPara: 6
+SavingRod: 6
+SavingPetri: 6
+SavingBreath: 6
+SavingSpell: 6
+Wimpy: 12
+Evasion: 8
+GoldMin: 24
+GoldMax: 48
+LootItem: 34011 10
+LootItem: 34017 9
+E
+#34013
+spectrum broodmother queen crystal insect~
+the @RS@Yp@Ce@Mc@Rt@Yr@Cu@Mm @WBroodmother@n~
+The @RS@Yp@Ce@Mc@Rt@Yr@Cu@Mm @WBroodmother@n towers over a nest of luminous crystal eggs.
+~
+The enormous insect queen fills the heart of the geode nest. Layered
+plates of crimson, cobalt, amber, and violet crystal protect a long
+segmented body, while six heavy legs end in hooked mineral claws. Her
+wings are too small for flight but beat hard enough to fill the chamber
+with cutting shards of reflected light.
+~
+8 0 0 0 0 0 0 0 0 E
+25 17 45 4d6+125 3d3+2
+0 0
+8 8 0
+BareHandAttack: 1
+BodyProfile: 0
+Str: 16
+Dex: 16
+Int: 16
+Wis: 16
+Con: 16
+Cha: 16
+SavingPara: 6
+SavingRod: 6
+SavingPetri: 6
+SavingBreath: 6
+SavingSpell: 6
+Wimpy: 12
+Evasion: 8
+GoldMin: 25
+GoldMax: 50
+LootItem: 34015 100
+LootItem: 34013 18
+LootItem: 34019 12
+E
+#34014
+glass shell larva crystal insect~
+a @Wgl@ca@Wss@c-@Wsh@ce@Wll @clarva@n~
+A @Wgl@ca@Wss@c-@Wsh@ce@Wll @clarva@n gnaws quietly at a soft mineral bloom.
+~
+The pale larva is as long as a forearm and protected by a translucent
+shell that has not yet hardened into adult crystal. Its many tiny legs
+cling easily to steep stone, while blunt mouthparts scrape mineral film
+from the grotto walls.
+~
+8 0 0 0 0 0 0 0 0 E
+15 19 35 2d4+75 2d2+1
+0 0
+8 8 0
+BareHandAttack: 4
+BodyProfile: 3
+SavingPara: 3
+SavingRod: 3
+SavingPetri: 3
+SavingBreath: 3
+SavingSpell: 3
+Wimpy: 7
+Evasion: 5
+E
+#34015
+prism cicada crystal insect~
+a @Cpr@Wis@Cm @Wcicada@n~
+A @Cpr@Wis@Cm @Wcicada@n vibrates against the crystal with a chiming buzz.
+~
+Broad glassy wings cover a squat insect body of pale blue crystal.
+Instead of an ordinary drone, the cicada produces a layered ringing note
+that resonates through nearby mineral formations and returns in
+different colors of sound.
+~
+8 0 0 0 0 0 0 0 0 E
+16 18 36 2d4+80 2d2+1
+0 0
+8 8 0
+BareHandAttack: 1
+BodyProfile: 0
+SavingPara: 4
+SavingRod: 4
+SavingPetri: 4
+SavingBreath: 4
+SavingSpell: 4
+Wimpy: 8
+Evasion: 5
+LootItem: 34027 30
+E
+#34016
+quad beetle horned crystal insect~
+a @YQ@Wu@Ya@Wd @YB@We@Ye@Wt@Yl@We@n~
+A @YQ@Wu@Ya@Wd @YB@We@Ye@Wt@Yl@We@n lowers its massive horn and scrapes eight armored legs across the stone.
+~
+This enormous beetle is built like a living siege engine. Four pairs of
+thick armored legs support a low body protected by amber-black crystal
+plates, while a huge forward-curving horn dominates its head. When
+angered it digs every foot into the ground and launches itself with
+terrifying force.
+~
+40 0 0 0 0 0 0 0 0 E
+22 18 42 3d5+110 3d3+1
+0 0
+8 8 0
+BareHandAttack: 6
+BodyProfile: 0
+Str: 14
+Dex: 14
+Int: 14
+Wis: 14
+Con: 14
+Cha: 14
+SavingPara: 5
+SavingRod: 5
+SavingPetri: 5
+SavingBreath: 5
+SavingSpell: 5
+Wimpy: 11
+Evasion: 7
+LootItem: 34020 14
+LootItem: 34021 9
+LootItem: 34025 32
+E
+#34017
+clown spider boss painted prismatic~
+The @RC@Wl@Ro@Ww@Rn @RSp@Wid@Rer@n~
+The @RC@Wl@Ro@Ww@Rn @RSp@Wid@Rer@n watches from its painted web with a terrible crystalline grin.
+~
+The enormous spider is nearly as broad as the chamber itself. Its
+polished white shell is slashed with vivid red, yellow, and blue
+markings that resemble festive paint, while eight black crystal legs
+move with grotesque delicacy. A natural grin-like pattern spans the
+front of its crown above clustered jewel-bright eyes.
+~
+42 0 0 0 0 0 0 0 0 E
+25 17 45 4d6+125 3d3+2
+0 0
+8 8 0
+BareHandAttack: 4
+BodyProfile: 5
+Str: 16
+Dex: 16
+Int: 16
+Wis: 16
+Con: 16
+Cha: 16
+SavingPara: 6
+SavingRod: 6
+SavingPetri: 6
+SavingBreath: 6
+SavingSpell: 6
+Wimpy: 12
+Evasion: 8
+LootItem: 34026 100
+LootItem: 34022 22
+LootItem: 34023 16
+LootItem: 34024 10
+LootItem: 34028 1
+E
+#34018
+painted spiderling clown spider brood~
+a @Rp@Wa@Ri@Wn@Rt@We@Rd @Wspiderling@n~
+A @Rp@Wa@Ri@Wn@Rt@We@Rd @Wspiderling@n scuttles across a stripe of bright webbing.
+~
+This young spider already bears the bright painted markings of the
+greater Clown Spider, though its body is only the size of a large
+shield. Thin crystal legs let it move almost silently across web and
+stone alike.
+~
+40 0 0 0 0 0 0 0 0 E
+19 18 39 3d5+95 2d2+1
+0 0
+8 8 0
+BareHandAttack: 4
+BodyProfile: 5
+Str: 12
+Dex: 12
+Int: 12
+Wis: 12
+Con: 12
+Cha: 12
+SavingPara: 4
+SavingRod: 4
+SavingPetri: 4
+SavingBreath: 4
+SavingSpell: 4
+Wimpy: 9
+Evasion: 6
+LootItem: 34026 24
+E
+#34019
+chromatic mite swarm crystal insects~
+a swarm of @Rc@Yh@Cr@Mo@Rm@Ya@Ct@Mi@Rc @Wmites@n~
+A swarm of @Rc@Yh@Cr@Mo@Rm@Ya@Ct@Mi@Rc @Wmites@n glitters across the cracks between crystals.
+~
+Hundreds of pinhead-sized crystal mites move as a glittering carpet,
+feeding on mineral dust and anything organic left behind by larger
+creatures. Individually harmless, they become a painful biting cloud
+when disturbed.
+~
+8 0 0 0 0 0 0 0 0 E
+15 19 35 2d4+75 2d2+1
+0 0
+8 8 0
+BareHandAttack: 1
+BodyProfile: 5
+SavingPara: 3
+SavingRod: 3
+SavingPetri: 3
+SavingBreath: 3
+SavingSpell: 3
+Wimpy: 7
+Evasion: 5
+E
+$

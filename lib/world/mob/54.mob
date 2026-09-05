@@ -9,6 +9,7 @@ Your guildmaster stands here.
 16 15 0 3d3+160 2d2+2
 160 25600
 8 8 1
+BodyProfile: 1
 E
 #5401
 cleric guildmasters~
@@ -21,6 +22,7 @@ Your guildmaster stands here.
 16 15 0 3d3+160 2d2+2
 160 25600
 8 8 1
+BodyProfile: 1
 E
 #5402
 warrior guildmasters~
@@ -33,6 +35,7 @@ Your guildmaster stands here.
 16 15 0 3d3+160 2d2+2
 160 25600
 8 8 1
+BodyProfile: 1
 E
 #5403
 thief guildmasters~
@@ -47,6 +50,7 @@ will now begin', is all he says.
 16 15 0 3d3+160 2d2+2
 160 25600
 8 8 1
+BodyProfile: 1
 E
 #5404
 receptionist woman~
@@ -61,6 +65,7 @@ birthmark on her left cheek.
 10 17 4 2d2+100 1d2+1
 100 10000
 6 6 2
+BodyProfile: 1
 E
 #5405
 bartender man mage old~
@@ -73,6 +78,7 @@ An old withered man leans against the bar.
 30 10 -8 6d6+300 5d5+5
 300 90000
 8 8 1
+BodyProfile: 1
 E
 #5406
 john brother singer lead~
@@ -122,6 +128,7 @@ A grubby beggar sits here in the filth.
 1 20 9 0d0+10 1d2+0
 10 100
 8 8 1
+BodyProfile: 1
 E
 #5410
 baker~
@@ -134,6 +141,7 @@ The baker stands here playing solitaire.
 30 10 -8 6d6+300 5d5+5
 300 90000
 8 8 1
+BodyProfile: 1
 E
 #5411
 shopkeeper~
@@ -146,6 +154,7 @@ The shopkeeper stands here.
 30 10 -8 6d6+300 5d5+5
 300 90000
 8 8 1
+BodyProfile: 1
 E
 #5412
 banker~
@@ -158,6 +167,7 @@ A banker stands here waiting to help you.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 1
+BodyProfile: 1
 E
 #5413
 ahkeem tailor~
@@ -184,6 +194,7 @@ Vera the veggie lady beams as you look over her stand.
 30 10 -8 6d6+300 5d5+5
 300 90000
 8 8 2
+BodyProfile: 1
 E
 #5415
 butch~
@@ -210,6 +221,7 @@ cold stare and place your order.
 30 10 -8 6d6+300 5d5+5
 300 90000
 8 8 1
+BodyProfile: 1
 E
 #5417
 igor weaponsmith~
@@ -222,6 +234,7 @@ Igor stands here doing... something.
 30 10 -8 6d6+300 5d5+5
 300 90000
 8 8 1
+BodyProfile: 1
 E
 #5418
 cassandra~
@@ -249,6 +262,7 @@ looking at his watch.
 15 15 1 3d3+150 2d2+2
 150 22500
 8 8 1
+BodyProfile: 1
 E
 #5420
 construction worker~
@@ -261,6 +275,7 @@ A construction worker steadily works here.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 1
+BodyProfile: 1
 E
 #5421
 statue brahman~
@@ -383,6 +398,7 @@ Aziz the Human Canon stands here.
 11 17 3 2d2+110 1d2+1
 110 12100
 8 8 1
+BodyProfile: 1
 E
 #5430
 mustafah human robber~
@@ -395,6 +411,7 @@ Mustafah the Human Robber stands here.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 1
+BodyProfile: 1
 E
 #5431
 fatima elf invoker~
@@ -408,6 +425,7 @@ very often on elves.
 9 17 4 1d1+90 1d2+1
 90 8100
 8 8 2
+BodyProfile: 1
 E
 #5432
 kareem dwarf mercenary~
@@ -420,6 +438,7 @@ Kareem the Dwarven Mercenary stands here.
 12 16 2 2d2+120 2d2+2
 120 14400
 8 8 1
+BodyProfile: 1
 E
 #5433
 nomad merchant~
@@ -433,6 +452,7 @@ you not to trust him very far.
 30 10 -8 6d6+300 5d5+5
 300 90000
 8 8 1
+BodyProfile: 1
 E
 #5434
 bodyguard guard~
@@ -445,6 +465,7 @@ A bodyguard sizes you up.
 12 16 2 2d2+120 2d2+2
 120 14400
 8 8 1
+BodyProfile: 1
 E
 T 5405
 #5435
@@ -458,6 +479,7 @@ A skinny kid wanders around.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 1
+BodyProfile: 1
 E
 #5436
 dockworker~
@@ -484,6 +506,7 @@ for living in his grand city.
 5 19 7 1d1+50 1d2+0
 50 2500
 8 8 1
+BodyProfile: 1
 E
 #5438
 gord~
@@ -510,6 +533,7 @@ you quizzically.
 15 15 1 3d3+150 2d2+2
 150 22500
 8 8 1
+BodyProfile: 1
 E
 #5440
 daghdha~
@@ -549,6 +573,7 @@ to stand on corners and accost passers-by with his doomsday preaching.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 1
+BodyProfile: 1
 E
 #5443
 alley cat~
@@ -561,6 +586,7 @@ A small harmless feline searches for food.
 2 20 8 0d0+20 1d2+0
 20 400
 8 8 1
+BodyProfile: 2
 E
 #5444
 vulture~
@@ -573,6 +599,7 @@ A vulture circles above you.
 2 20 8 0d0+20 1d2+0
 20 400
 8 8 1
+BodyProfile: 4
 E
 #5445
 old man~
@@ -585,6 +612,7 @@ An old man sits here playing chess.
 4 19 7 0d0+40 1d2+0
 40 1600
 6 6 1
+BodyProfile: 1
 E
 #5446
 lugh librarian~
@@ -597,6 +625,7 @@ Lugh the Librarian sits behind a desk.
 10 17 4 2d2+100 1d2+1
 100 10000
 6 6 1
+BodyProfile: 1
 E
 #5447
 dirt dust devil~
@@ -660,6 +689,7 @@ blue veil.  Her loyalty to the Sultan is unwavering.
 3 19 8 0d0+30 1d2+0
 30 900
 8 8 2
+BodyProfile: 1
 E
 #5452
 jailer~
@@ -673,6 +703,7 @@ fallen out of grace with the Sultan.
 18 14 0 3d3+180 3d3+3
 180 32400
 4 4 1
+BodyProfile: 1
 E
 #5453
 eunuch~
@@ -699,6 +730,7 @@ bad she is about to kill you.
 10 17 4 2d2+100 1d2+1
 100 10000
 5 5 2
+BodyProfile: 1
 E
 #5455
 allah~
@@ -724,6 +756,7 @@ The Guard for the Guild of Mages stand here.
 8 18 5 1d1+80 1d2+1
 80 6400
 8 8 1
+BodyProfile: 1
 E
 T 5401
 #5457
@@ -737,6 +770,7 @@ The Guard for the Guild of Clerics stands here.
 8 18 5 1d1+80 1d2+1
 80 6400
 8 8 1
+BodyProfile: 1
 E
 T 5402
 #5458
@@ -750,6 +784,7 @@ The Guard for the Guild of Warriors stands here.
 8 18 5 1d1+80 1d2+1
 80 6400
 8 8 1
+BodyProfile: 1
 E
 T 5403
 #5459
@@ -764,6 +799,7 @@ steps to bar your way.  You notice his hands resting on two sheathes.
 8 18 5 1d1+80 1d2+1
 80 6400
 8 8 1
+BodyProfile: 1
 E
 T 5400
 #5460
@@ -777,6 +813,7 @@ A servant boy is here running errands.
 2 20 8 0d0+20 1d2+0
 20 400
 8 8 1
+BodyProfile: 1
 E
 #5461
 sultans guard~
@@ -789,6 +826,7 @@ A guard stands here, protecting the innocent.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 1
+BodyProfile: 1
 E
 T 5405
 #5462
@@ -802,6 +840,7 @@ A guard stands here, watching the gate.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 1
+BodyProfile: 1
 E
 T 5405
 #5463
@@ -815,6 +854,7 @@ The Chief of the Sultan's Guard stands here.
 15 15 1 3d3+150 2d2+2
 150 22500
 8 8 1
+BodyProfile: 1
 E
 T 5405
 #5464
@@ -828,6 +868,7 @@ A mercenary stands here waiting for a job.
 5 19 7 1d1+50 1d2+0
 50 2500
 8 8 1
+BodyProfile: 1
 E
 #5465
 shipwright captain~
@@ -841,6 +882,7 @@ beams a smile at you through his beard as you walk in.
 30 10 -8 6d6+300 5d5+5
 300 90000
 8 8 1
+BodyProfile: 1
 E
 #5466
 blacksmith~
@@ -854,6 +896,7 @@ break from his sweltering work to bid you welcome.
 30 10 -8 6d6+300 5d5+5
 300 90000
 8 8 1
+BodyProfile: 1
 E
 #5467
 horse~
@@ -866,6 +909,7 @@ A horse stands here.
 4 19 7 0d0+40 1d2+0
 40 1600
 8 8 1
+BodyProfile: 2
 E
 #5468
 tourist~
@@ -915,6 +959,7 @@ the minotaur lizard stands here.
 8 18 5 1d1+80 1d2+1
 80 6400
 8 8 1
+BodyProfile: 7
 E
 #5472
 dog death~
@@ -927,6 +972,7 @@ The death dog stands here.
 4 19 7 0d0+40 1d2+0
 40 1600
 8 8 0
+BodyProfile: 2
 E
 #5473
 lion spotted~
@@ -939,6 +985,7 @@ The spotted lion stands here.
 5 19 7 1d1+50 1d2+0
 50 2500
 8 8 1
+BodyProfile: 2
 E
 #5474
 behir~
@@ -990,6 +1037,7 @@ The giant hornet hovers here.
 5 19 7 1d1+50 1d2+0
 50 2500
 8 8 0
+BodyProfile: 10
 E
 #5478
 pegasus~
@@ -1003,6 +1051,7 @@ thoroughbreds you have seen in stables.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 0
+BodyProfile: 17
 E
 #5479
 elriva~
@@ -1040,6 +1089,7 @@ The high priest rests here meditating, well he WAS meditating.
 8 18 5 1d1+80 1d2+1
 80 6400
 8 8 1
+BodyProfile: 1
 E
 T 5406
 #5482
@@ -1054,6 +1104,7 @@ some heavy training.
 15 15 1 3d3+150 2d2+2
 150 22500
 8 8 1
+BodyProfile: 1
 E
 T 5405
 #5483
@@ -1068,6 +1119,7 @@ another.
 30 10 -8 6d6+300 5d5+5
 300 90000
 8 8 1
+BodyProfile: 1
 E
 #5484
 stitch~
@@ -1094,6 +1146,7 @@ garden.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 1
+BodyProfile: 1
 E
 #5486
 nightmare demon horse~
@@ -1107,6 +1160,7 @@ shoulder it breathes flame from his nostrils and leaps to attack you.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 0
+BodyProfile: 2
 E
 #5487
 wolverine wolf~
@@ -1120,6 +1174,7 @@ on it.
 15 15 1 3d3+150 2d2+2
 150 22500
 8 8 0
+BodyProfile: 2
 E
 #5488
 mimic painting~
@@ -1144,6 +1199,7 @@ The Mayor of New Thalos stands here.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 1
+BodyProfile: 2
 E
 #5490
 chef~
@@ -1156,5 +1212,6 @@ The chef stands here making dinner.
 14 16 1 2d2+140 2d2+2
 140 19600
 8 8 1
+BodyProfile: 1
 E
 $

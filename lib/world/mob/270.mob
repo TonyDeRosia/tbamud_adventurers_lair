@@ -9,6 +9,7 @@ A giant vulture is here.
 12 16 2 2d2+120 2d2+2
 120 14400
 8 8 1
+BodyProfile: 4
 E
 #27001
 demon horse~
@@ -21,6 +22,7 @@ A demon horse is here.
 15 15 1 3d3+150 2d2+2
 150 22500
 8 8 1
+BodyProfile: 2
 E
 #27002
 rabid fox~
@@ -33,6 +35,7 @@ A rabid fox is here, drooling heavily.
 13 16 2 2d2+130 2d2+2
 130 16900
 8 8 0
+BodyProfile: 2
 E
 #27003
 earth demon~
@@ -57,6 +60,7 @@ An evil bird is here.
 14 16 1 2d2+140 2d2+2
 140 19600
 8 8 0
+BodyProfile: 4
 E
 #27005
 iodocentipedus~
@@ -94,6 +98,7 @@ An hill ghoul walks and walks and walks here.
 13 16 2 2d2+130 2d2+2
 130 16900
 8 8 0
+BodyProfile: 1
 E
 #27008
 stone ogre~
@@ -106,6 +111,7 @@ A stone ogre tramples around.
 14 16 1 2d2+140 2d2+2
 140 19600
 8 8 1
+BodyProfile: 1
 E
 #27009
 ice troll~
@@ -119,6 +125,7 @@ battle.
 15 15 1 3d3+150 2d2+2
 150 22500
 8 8 1
+BodyProfile: 1
 E
 #27010
 lithophiliac~
@@ -146,6 +153,7 @@ looks.
 15 15 1 3d3+150 2d2+2
 150 22500
 8 8 1
+BodyProfile: 1
 E
 #27012
 stormbringer~

@@ -22,6 +22,7 @@ if he is a Hare Krishna.
 8 18 5 1d1+80 1d2+1
 80 6400
 8 8 1
+BodyProfile: 2
 E
 #27502
 wally wizard~
@@ -36,6 +37,7 @@ there.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 1
+BodyProfile: 1
 E
 #27503
 policeman police man~
@@ -154,6 +156,7 @@ have ties with the mob kingpin -- Lucifer.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 1
+BodyProfile: 1
 E
 #27512
 rebecca howe~
@@ -232,6 +235,7 @@ for food.
 1 20 9 0d0+10 1d2+0
 10 100
 8 8 1
+BodyProfile: 2
 E
 #27518
 pee wee peewee~
@@ -257,6 +261,7 @@ bucks.
 6 18 6 1d1+60 1d2+1
 60 3600
 8 8 1
+BodyProfile: 1
 E
 #27520
 skinhead head skin~
@@ -305,6 +310,7 @@ The Bishop is here, looking for a crime to solve.
 8 18 5 1d1+80 1d2+1
 80 6400
 8 8 1
+BodyProfile: 1
 E
 #27524
 dockworker worker~
@@ -359,6 +365,7 @@ outstanding abilities.
 8 18 5 1d1+80 1d2+1
 80 6400
 8 8 1
+BodyProfile: 1
 E
 #27528
 human lineman warrior~
@@ -372,6 +379,7 @@ outstanding abilities.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 1
+BodyProfile: 1
 E
 #27529
 orc raider receiver~
@@ -385,6 +393,7 @@ powerful.
 6 18 6 1d1+60 1d2+1
 60 3600
 8 8 1
+BodyProfile: 1
 E
 #27530
 human warrior receiver~
@@ -398,6 +407,7 @@ powerful.
 6 18 6 1d1+60 1d2+1
 60 3600
 8 8 1
+BodyProfile: 1
 E
 #27531
 orc blocker raider~
@@ -412,6 +422,7 @@ him.
 8 18 5 1d1+80 1d2+1
 80 6400
 8 8 1
+BodyProfile: 1
 E
 #27532
 human blocker warrior~
@@ -426,6 +437,7 @@ him.
 8 18 5 1d1+80 1d2+1
 80 6400
 8 8 1
+BodyProfile: 1
 E
 #27533
 orc thrower raider~
@@ -439,6 +451,7 @@ for an arm.  He can also hold his own when hitting with the big boys.
 9 17 4 1d1+90 1d2+1
 90 8100
 8 8 1
+BodyProfile: 1
 E
 #27534
 human thrower warrior~
@@ -452,6 +465,7 @@ for an arm.  He can also hold his own when hitting with the big boys.
 9 17 4 1d1+90 1d2+1
 90 8100
 8 8 1
+BodyProfile: 1
 E
 #27535
 orc blitzer raider~
@@ -465,6 +479,7 @@ player on the bloodbowl field.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 1
+BodyProfile: 1
 E
 #27536
 human blitzer warrior~
@@ -478,6 +493,7 @@ player on the bloodbowl field.
 8 18 5 1d1+80 1d2+1
 80 6400
 8 8 1
+BodyProfile: 1
 E
 #27537
 spectator loyal fan~
@@ -502,6 +518,7 @@ A child is here, wandering around.
 1 20 9 0d0+10 1d2+0
 10 100
 8 8 0
+BodyProfile: 1
 E
 #27539
 vendor salesman~
@@ -514,6 +531,7 @@ A vendor is here peddling his goods.
 4 19 7 0d0+40 1d2+0
 40 1600
 8 8 1
+BodyProfile: 1
 E
 #27540
 construction worker~
@@ -526,6 +544,7 @@ A construction worker is here on his break.
 6 18 6 1d1+60 1d2+1
 60 3600
 8 8 1
+BodyProfile: 1
 E
 #27541
 rowdy fan drunk~
@@ -538,6 +557,7 @@ A drunk, rowdy fan is here, making an ass of himself.
 4 19 7 0d0+40 1d2+0
 40 1600
 8 8 1
+BodyProfile: 1
 E
 #27542
 security guard~
@@ -550,6 +570,7 @@ A Security Guard is here, attempting to maintain order.
 8 18 5 1d1+80 1d2+1
 80 6400
 8 8 1
+BodyProfile: 1
 E
 #27544
 fire marshall bob~
@@ -702,6 +723,7 @@ actually looks up to the job now!  Looks like he has finally gotten a clue.
 6 18 6 1d1+60 1d2+1
 60 3600
 6 6 1
+BodyProfile: 1
 E
 #27555
 warden~
@@ -714,6 +736,7 @@ The Warden is here guarding the jail.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 1
+BodyProfile: 1
 E
 #27556
 maid~
@@ -727,6 +750,7 @@ mankind as slobs.
 1 20 9 0d0+10 1d2+0
 10 100
 8 8 2
+BodyProfile: 1
 E
 #27557
 esprit~
@@ -753,6 +777,7 @@ somewhere else, but needs the money for tuition.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 2
+BodyProfile: 1
 E
 #27559
 cop~
@@ -807,6 +832,7 @@ like one.
 6 18 6 1d1+60 1d2+1
 60 3600
 8 8 1
+BodyProfile: 1
 E
 #27563
 arms dealer~
@@ -846,6 +872,7 @@ looking at this horrible thing!
 5 19 7 1d1+50 1d2+0
 50 2500
 8 8 1
+BodyProfile: 4
 E
 #27566
 bimbo bleached blonde~
@@ -886,6 +913,7 @@ well as defensive spells make him a deadly opponent.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 1
+BodyProfile: 1
 E
 T 27500
 #27569
@@ -902,6 +930,7 @@ deadly opponent.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 1
+BodyProfile: 1
 E
 T 27501
 #27570
@@ -918,6 +947,7 @@ opponent.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 1
+BodyProfile: 1
 E
 T 27502
 #27571
@@ -934,6 +964,7 @@ opponent.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 1
+BodyProfile: 1
 E
 T 27503
 #27572
@@ -949,6 +980,7 @@ and you notice that she is surrounded by a blue shimmering aura.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 2
+BodyProfile: 1
 E
 #27573
 guildmaster master~
@@ -962,6 +994,7 @@ a peaceful, loving look.  You notice that he is surrounded by a white aura.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 1
+BodyProfile: 1
 E
 #27574
 guildmaster master~
@@ -976,6 +1009,7 @@ appearance of a beggar.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 2
+BodyProfile: 1
 E
 #27575
 guildmaster master~
@@ -990,6 +1024,7 @@ calm look on his face.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 1
+BodyProfile: 1
 E
 #27576
 captain~
@@ -1002,6 +1037,7 @@ A retired Captain stands here, selling boats.
 9 17 4 1d1+90 1d2+1
 90 8100
 8 8 1
+BodyProfile: 1
 E
 #27577
 armorer~
@@ -1015,6 +1051,7 @@ you have ever seen.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 1
+BodyProfile: 1
 E
 #27578
 receptionist~
@@ -1040,6 +1077,7 @@ A waiter is going around from one place to another.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 1
+BodyProfile: 1
 E
 #27580
 waiter~
@@ -1053,6 +1091,7 @@ peaceful life as a waiter.
 5 19 7 1d1+50 1d2+0
 50 2500
 8 8 1
+BodyProfile: 1
 E
 #27581
 waiter~
@@ -1065,6 +1104,7 @@ A waiter is going around from one place to another.
 4 19 7 0d0+40 1d2+0
 40 1600
 8 8 1
+BodyProfile: 1
 E
 #27582
 waiter~
@@ -1077,6 +1117,7 @@ A waiter is going around from one place to another.
 4 19 7 0d0+40 1d2+0
 40 1600
 8 8 1
+BodyProfile: 1
 E
 #27583
 waiter~
@@ -1090,6 +1131,7 @@ few firebreathers.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 1
+BodyProfile: 1
 E
 #27584
 janitor~
@@ -1102,6 +1144,7 @@ A janitor is walking around, cleaning up.
 1 20 9 0d0+10 1d2+0
 10 100
 8 8 1
+BodyProfile: 1
 E
 #27585
 fido beastly~
@@ -1127,6 +1170,7 @@ A singing, happy drunk.
 2 20 8 0d0+20 1d2+0
 20 400
 8 8 1
+BodyProfile: 1
 E
 #27587
 kitten pets~
@@ -1139,6 +1183,7 @@ A small loyal kitten is here.
 1 20 9 0d0+10 1d2+0
 10 100
 8 8 0
+BodyProfile: 2
 E
 #27588
 puppy pets~
@@ -1151,6 +1196,7 @@ A small loyal puppy is here.
 1 20 9 0d0+10 1d2+0
 10 100
 8 8 0
+BodyProfile: 2
 E
 #27589
 beagle pets~
@@ -1187,5 +1233,6 @@ A large, trained wolf is here.
 4 19 7 0d0+40 1d2+0
 40 1600
 8 8 0
+BodyProfile: 2
 E
 $

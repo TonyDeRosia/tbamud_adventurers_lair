@@ -11,6 +11,7 @@ innocent.
 26 12 -5 5d5+260 4d4+4
 260 67600
 8 8 1
+BodyProfile: 1
 E
 T 7901
 #7901
@@ -26,6 +27,7 @@ chewed open foodstuffs lying about the room.
 12 16 2 2d2+120 2d2+2
 120 14400
 8 8 0
+BodyProfile: 2
 E
 #7902
 cleaver~

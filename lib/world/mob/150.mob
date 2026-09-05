@@ -10,6 +10,7 @@ uniform.  He seems very well trained, and moves like an experienced fighter.
 11 17 3 2d2+110 1d2+1
 110 12100
 8 8 1
+BodyProfile: 1
 E
 #15001
 king welmar~
@@ -25,6 +26,7 @@ wise and just ruler.
 33 9 -9 6d6+330 5d5+5
 330 108900
 6 8 1
+BodyProfile: 1
 E
 #15002
 ghost horrible~
@@ -37,6 +39,7 @@ You hear a frightening wail, and see a horrible ghost approaching.
 15 15 1 3d3+150 2d2+2
 150 22500
 8 8 0
+BodyProfile: 0
 E
 #15003
 jim guard royal~
@@ -50,6 +53,7 @@ uniform.  He seems very well trained, and moves like an experienced fighter.
 11 17 3 2d2+110 1d2+1
 110 12100
 8 8 1
+BodyProfile: 1
 E
 #15004
 brian guard royal~
@@ -63,6 +67,7 @@ uniform.  He seems very well trained, and moves like an experienced fighter.
 11 17 3 2d2+110 1d2+1
 110 12100
 8 8 1
+BodyProfile: 1
 E
 #15005
 mick guard royal~
@@ -76,6 +81,7 @@ uniform.  He seems very well trained, and moves like an experienced fighter.
 11 17 3 2d2+110 1d2+1
 110 12100
 8 8 1
+BodyProfile: 1
 E
 #15006
 matt guard royal~
@@ -89,6 +95,7 @@ uniform.  He seems very well trained, and moves like an experienced fighter.
 11 17 3 2d2+110 1d2+1
 110 12100
 8 8 1
+BodyProfile: 1
 E
 #15007
 jochem guard royal~
@@ -103,6 +110,7 @@ than one battle, and longs to see the next!
 13 16 2 2d2+130 2d2+2
 130 16900
 6 6 1
+BodyProfile: 1
 E
 #15008
 anne guard royal~
@@ -117,6 +125,7 @@ more than one battle, and longs to see the next!
 13 16 2 2d2+130 2d2+2
 130 16900
 8 8 2
+BodyProfile: 1
 E
 #15009
 andrew guard royal~
@@ -131,6 +140,7 @@ than one battle, and longs to see the next!
 13 16 2 2d2+130 2d2+2
 130 16900
 8 8 1
+BodyProfile: 1
 E
 #15010
 bertram bert guard royal~
@@ -145,6 +155,7 @@ guy seems tough...
 15 15 1 3d3+150 2d2+2
 150 22500
 8 8 1
+BodyProfile: 1
 E
 #15011
 jeanette guard royal~
@@ -159,6 +170,7 @@ This girl could be nasty if she wanted to...
 15 15 1 3d3+150 2d2+2
 150 22500
 8 8 2
+BodyProfile: 1
 E
 #15012
 peter captain guard royal~
@@ -176,6 +188,7 @@ attention as you see him.
 19 14 -1 3d3+190 3d3+3
 190 36100
 8 8 1
+BodyProfile: 1
 E
 #15013
 master trainingmaster~
@@ -202,6 +215,7 @@ Royal Announcements.
 18 14 0 3d3+180 3d3+3
 180 32400
 8 8 1
+BodyProfile: 1
 E
 #15015
 ergan murderer~
@@ -217,6 +231,7 @@ great warrior he once was, but still to be reckoned with.
 13 16 2 2d2+130 2d2+2
 130 16900
 6 6 1
+BodyProfile: 1
 E
 T 15000
 #15016
@@ -231,6 +246,7 @@ impressive belly.
 8 18 5 1d1+80 1d2+1
 80 6400
 8 8 1
+BodyProfile: 1
 E
 #15017
 woman cleaning~
@@ -243,6 +259,7 @@ There is a Cleaning Woman here, trying not be noticed.
 1 20 9 0d0+10 1d2+0
 10 100
 8 8 2
+BodyProfile: 1
 E
 #15018
 cockroach roach~
@@ -255,6 +272,7 @@ A large cockroach is crawling by the wall.
 4 19 7 0d0+40 1d2+0
 40 1600
 8 8 0
+BodyProfile: 9
 E
 #15019
 astrologer~
@@ -269,6 +287,7 @@ capable of seeing the future.
 23 13 -3 4d4+230 3d3+3
 230 52900
 6 6 1
+BodyProfile: 1
 E
 #15020
 tim guard lifeguard~
@@ -282,6 +301,7 @@ is completely prepared to give his life for the King, if necessary.
 17 15 0 3d3+170 2d2+2
 170 28900
 8 8 1
+BodyProfile: 1
 E
 #15021
 tom guard lifeguard~
@@ -295,6 +315,7 @@ is completely prepared to give his life for the King, if necessary.
 17 15 0 3d3+170 2d2+2
 170 28900
 8 8 1
+BodyProfile: 1
 E
 #15022
 chef cook~
@@ -308,6 +329,7 @@ in other words, a bit fat.
 19 14 -1 3d3+190 3d3+3
 190 36100
 8 8 1
+BodyProfile: 1
 E
 #15023
 cook~
@@ -320,6 +342,7 @@ There is a cook here, making himself busy with a pot.
 4 19 7 0d0+40 1d2+0
 40 1600
 8 8 1
+BodyProfile: 1
 E
 #15024
 david man guard~
@@ -333,6 +356,7 @@ attempt to get past him.
 19 14 -1 3d3+190 3d3+3
 190 36100
 8 8 1
+BodyProfile: 1
 E
 #15025
 dick man guard~
@@ -346,6 +370,7 @@ attempt to get past him.
 19 14 -1 3d3+190 3d3+3
 190 36100
 8 8 1
+BodyProfile: 1
 E
 #15026
 jerry guard royal~
@@ -359,6 +384,7 @@ uniform.  He seems very well trained, and moves like an experienced fighter.
 11 17 3 2d2+110 1d2+1
 110 12100
 5 5 1
+BodyProfile: 1
 E
 #15027
 michael guard royal~
@@ -372,6 +398,7 @@ uniform.  He seems very well trained, and moves like an experienced fighter.
 11 17 3 2d2+110 1d2+1
 110 12100
 5 5 1
+BodyProfile: 1
 E
 #15028
 hans guard royal~
@@ -386,6 +413,7 @@ than one battle, and longs to see the next!
 13 16 2 2d2+130 2d2+2
 130 16900
 8 8 1
+BodyProfile: 1
 E
 #15029
 boris guard royal~
@@ -400,6 +428,7 @@ guy seems tough...
 15 15 1 3d3+150 2d2+2
 150 22500
 8 8 1
+BodyProfile: 1
 E
 #15030
 zombie villager~
@@ -414,6 +443,7 @@ revenge.
 11 17 3 2d2+110 1d2+1
 110 12100
 8 8 0
+BodyProfile: 1
 E
 #15031
 skeleton villager~
@@ -428,6 +458,7 @@ revenge.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 0
+BodyProfile: 1
 E
 #15032
 pit fiend demon~

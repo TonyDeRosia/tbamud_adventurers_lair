@@ -107,22 +107,31 @@ struct body_part_drop {
 };
 
 static const struct body_part_drop body_part_drops[] = {
-  { BODY_PART_HEAD,          15 },
-  { BODY_PART_TORSO,          3 },
-  { BODY_PART_ARM_LEFT,       7 },
-  { BODY_PART_ARM_RIGHT,      7 },
-  { BODY_PART_LEG_LEFT,       7 },
-  { BODY_PART_LEG_RIGHT,      7 },
-  { BODY_PART_FORELEG_LEFT,   7 },
-  { BODY_PART_FORELEG_RIGHT,  7 },
-  { BODY_PART_HINDLEG_LEFT,   7 },
-  { BODY_PART_HINDLEG_RIGHT,  7 },
+  { BODY_PART_HEAD,          10 },
+  { BODY_PART_ARM_LEFT,       10 },
+  { BODY_PART_ARM_RIGHT,      10 },
+  { BODY_PART_LEG_LEFT,       10 },
+  { BODY_PART_LEG_RIGHT,      10 },
+  { BODY_PART_FORELEG_LEFT,   10 },
+  { BODY_PART_FORELEG_RIGHT,  10 },
+  { BODY_PART_HINDLEG_LEFT,   10 },
+  { BODY_PART_HINDLEG_RIGHT,  10 },
   { BODY_PART_TAIL,          15 },
-  { BODY_PART_WING_LEFT,      7 },
-  { BODY_PART_WING_RIGHT,     7 },
-  { BODY_PART_HORN,           7 },
-  { BODY_PART_TENTACLE_1,     7 },
-  { BODY_PART_TENTACLE_2,     7 }
+  { BODY_PART_WING_LEFT,      10 },
+  { BODY_PART_WING_RIGHT,     10 },
+  { BODY_PART_HORN,           10 },
+  { BODY_PART_TENTACLE_1,     10 },
+  { BODY_PART_TENTACLE_2,     10 },
+  { BODY_PART_MIDLEG_LEFT, 10 },
+  { BODY_PART_MIDLEG_RIGHT, 10 },
+  { BODY_PART_REARLEG_LEFT, 10 },
+  { BODY_PART_REARLEG_RIGHT, 10 },
+  { BODY_PART_FIN_LEFT, 10 },
+  { BODY_PART_FIN_RIGHT, 10 },
+  { BODY_PART_BRANCH, 10 },
+  { BODY_PART_ROOT, 10 },
+  { BODY_PART_CLAW_LEFT, 10 },
+  { BODY_PART_CLAW_RIGHT, 10 }
 };
 
 const char *body_profile_name(int profile)
@@ -137,11 +146,22 @@ const char *body_profile_name(int profile)
   case BODY_PROFILE_DRAGON: return "Dragon";
   case BODY_PROFILE_HORNED_HUMANOID: return "Horned Humanoid";
   case BODY_PROFILE_TAILED_HUMANOID: return "Tailed Humanoid";
+  case BODY_PROFILE_INSECTOID: return "Insectoid";
+  case BODY_PROFILE_WINGED_INSECTOID: return "Winged Insectoid";
+  case BODY_PROFILE_CONSTRUCT: return "Construct";
+  case BODY_PROFILE_AMORPHOUS: return "Amorphous";
+  case BODY_PROFILE_FISH: return "Fish";
+  case BODY_PROFILE_PLANT: return "Plant";
+  case BODY_PROFILE_CENTAUROID: return "Centauroid";
+  case BODY_PROFILE_CRUSTACEAN: return "Crustacean";
+  case BODY_PROFILE_WINGED_QUADRUPED: return "Winged Quadruped";
+  case BODY_PROFILE_TENTACLED: return "Tentacled";
+  case BODY_PROFILE_BAT: return "Bat";
   default: return "None";
   }
 }
 
-static int body_profile_parts(int profile)
+int body_profile_parts(int profile)
 {
   switch (profile) {
   case BODY_PROFILE_HUMANOID:
@@ -159,7 +179,8 @@ static int body_profile_parts(int profile)
   case BODY_PROFILE_ARACHNID:
     return BODY_PART_HEAD | BODY_PART_TORSO | BODY_PART_FORELEG_LEFT |
       BODY_PART_FORELEG_RIGHT | BODY_PART_HINDLEG_LEFT |
-      BODY_PART_HINDLEG_RIGHT | BODY_PART_TENTACLE_1 | BODY_PART_TENTACLE_2;
+      BODY_PART_HINDLEG_RIGHT | BODY_PART_MIDLEG_LEFT | BODY_PART_MIDLEG_RIGHT |
+      BODY_PART_REARLEG_LEFT | BODY_PART_REARLEG_RIGHT;
   case BODY_PROFILE_DRAGON:
     return BODY_PART_HEAD | BODY_PART_TORSO | BODY_PART_FORELEG_LEFT |
       BODY_PART_FORELEG_RIGHT | BODY_PART_HINDLEG_LEFT |
@@ -169,6 +190,31 @@ static int body_profile_parts(int profile)
     return body_profile_parts(BODY_PROFILE_HUMANOID) | BODY_PART_HORN;
   case BODY_PROFILE_TAILED_HUMANOID:
     return body_profile_parts(BODY_PROFILE_HUMANOID) | BODY_PART_TAIL;
+  case BODY_PROFILE_INSECTOID:
+    return BODY_PART_HEAD | BODY_PART_TORSO | BODY_PART_FORELEG_LEFT |
+      BODY_PART_FORELEG_RIGHT | BODY_PART_MIDLEG_LEFT | BODY_PART_MIDLEG_RIGHT |
+      BODY_PART_HINDLEG_LEFT | BODY_PART_HINDLEG_RIGHT;
+  case BODY_PROFILE_WINGED_INSECTOID:
+    return body_profile_parts(BODY_PROFILE_INSECTOID) | BODY_PART_WING_LEFT | BODY_PART_WING_RIGHT;
+  case BODY_PROFILE_CONSTRUCT:
+  case BODY_PROFILE_AMORPHOUS:
+    /* No standardized organic trophies; the ordinary loot-bearing corpse remains. */
+    return 0;
+  case BODY_PROFILE_FISH:
+    return BODY_PART_HEAD | BODY_PART_TORSO | BODY_PART_TAIL | BODY_PART_FIN_LEFT | BODY_PART_FIN_RIGHT;
+  case BODY_PROFILE_PLANT:
+    return BODY_PART_BRANCH | BODY_PART_ROOT;
+  case BODY_PROFILE_CENTAUROID:
+    return body_profile_parts(BODY_PROFILE_QUADRUPED) | BODY_PART_ARM_LEFT | BODY_PART_ARM_RIGHT;
+  case BODY_PROFILE_CRUSTACEAN:
+    return body_profile_parts(BODY_PROFILE_ARACHNID) | BODY_PART_CLAW_LEFT | BODY_PART_CLAW_RIGHT;
+  case BODY_PROFILE_WINGED_QUADRUPED:
+    return body_profile_parts(BODY_PROFILE_QUADRUPED) | BODY_PART_WING_LEFT | BODY_PART_WING_RIGHT;
+  case BODY_PROFILE_TENTACLED:
+    /* Harvestable representative tentacles, not a complete limb census. */
+    return BODY_PART_HEAD | BODY_PART_TORSO | BODY_PART_TENTACLE_1 | BODY_PART_TENTACLE_2;
+  case BODY_PROFILE_BAT:
+    return body_profile_parts(BODY_PROFILE_AVIAN) | BODY_PART_TAIL;
   default:
     return 0;
   }
@@ -224,6 +270,16 @@ static const char *body_part_presentation(int part)
   case BODY_PART_HORN: return "severed horn";
   case BODY_PART_TENTACLE_1:
   case BODY_PART_TENTACLE_2: return "severed tentacle";
+  case BODY_PART_MIDLEG_LEFT: return "severed left middle leg";
+  case BODY_PART_MIDLEG_RIGHT: return "severed right middle leg";
+  case BODY_PART_REARLEG_LEFT: return "severed left rear leg";
+  case BODY_PART_REARLEG_RIGHT: return "severed right rear leg";
+  case BODY_PART_FIN_LEFT: return "torn left fin";
+  case BODY_PART_FIN_RIGHT: return "torn right fin";
+  case BODY_PART_BRANCH: return "broken branch";
+  case BODY_PART_ROOT: return "torn root";
+  case BODY_PART_CLAW_LEFT: return "severed left claw";
+  case BODY_PART_CLAW_RIGHT: return "severed right claw";
   default: return "mutilated remains";
   }
 }
@@ -653,17 +709,23 @@ static const char *victim_condition_text(int band)
 
 static void apply_severity_verb(char *out, size_t outsz, const char *in, int tier)
 {
-  const char *col = severity_color(tier);
-  const char *vb  = severity_verb_base(tier);
-  const char *vt  = severity_verb_third(tier);
-  const char *pre = severity_impact_wrap_open(tier);
-  const char *post = severity_impact_wrap_close(tier);
+  char verb_base[128];
+  char verb_third[128];
   char *pos;
 
   if (!in || !*in) {
-    if (outsz) out[0] = '\0';
+    if (outsz)
+      out[0] = '\0';
     return;
   }
+
+  /*
+   * Reuse the same authoritative severity formatter used by the normal
+   * damage paths.  This keeps the top-tier presentation in one place
+   * instead of independently rebuilding another CENSORED wrapper here.
+   */
+  format_severity_verb(verb_base, sizeof(verb_base), tier, FALSE);
+  format_severity_verb(verb_third, sizeof(verb_third), tier, TRUE);
 
   snprintf(out, outsz, "%s", in);
 
@@ -671,14 +733,15 @@ static void apply_severity_verb(char *out, size_t outsz, const char *in, int tie
   if ((pos = strstr(out, " hit "))) {
     char tmp[MAX_STRING_LENGTH];
     *pos = '\0';
-    snprintf(tmp, sizeof(tmp), "%s %s%s%s%s\tn %s", out, col, pre, vb, post, pos + 5);
+    snprintf(tmp, sizeof(tmp), "%s %s %s", out, verb_base, pos + 5);
     snprintf(out, outsz, "%s", tmp);
     return;
   }
+
   if ((pos = strstr(out, " hit!"))) {
     char tmp[MAX_STRING_LENGTH];
     *pos = '\0';
-    snprintf(tmp, sizeof(tmp), "%s %s%s%s%s\tn!%s", out, col, pre, vb, post, pos + 5);
+    snprintf(tmp, sizeof(tmp), "%s %s!%s", out, verb_base, pos + 5);
     snprintf(out, outsz, "%s", tmp);
     return;
   }
@@ -687,19 +750,20 @@ static void apply_severity_verb(char *out, size_t outsz, const char *in, int tie
   if ((pos = strstr(out, " hits "))) {
     char tmp[MAX_STRING_LENGTH];
     *pos = '\0';
-    snprintf(tmp, sizeof(tmp), "%s %s%s%s%s\tn %s", out, col, pre, vt, post, pos + 6);
-    snprintf(out, outsz, "%s", tmp);
-    return;
-  }
-  if ((pos = strstr(out, " hits!"))) {
-    char tmp[MAX_STRING_LENGTH];
-    *pos = '\0';
-    snprintf(tmp, sizeof(tmp), "%s %s%s%s%s\tn!%s", out, col, pre, vt, post, pos + 6);
+    snprintf(tmp, sizeof(tmp), "%s %s %s", out, verb_third, pos + 6);
     snprintf(out, outsz, "%s", tmp);
     return;
   }
 
-  /* If we cannot find a generic verb, leave as is. */
+  if ((pos = strstr(out, " hits!"))) {
+    char tmp[MAX_STRING_LENGTH];
+    *pos = '\0';
+    snprintf(tmp, sizeof(tmp), "%s %s!%s", out, verb_third, pos + 6);
+    snprintf(out, outsz, "%s", tmp);
+    return;
+  }
+
+  /* If we cannot find a generic verb, leave the authored message as-is. */
 }
 
 static int compute_thaco(struct char_data *ch, struct char_data *vict);
@@ -1029,6 +1093,7 @@ static void make_corpse(struct char_data *ch)
   int inv_dropped = 0;
   long long dropped_gold = 0;
   char buf2[MAX_NAME_LENGTH + 64];
+  char corpse_keywords[MAX_INPUT_LENGTH];
   struct obj_data *corpse, *o;
   struct obj_data *money;
   int i, x, y;
@@ -1037,7 +1102,9 @@ static void make_corpse(struct char_data *ch)
 
   corpse->item_number = NOTHING;
   IN_ROOM(corpse) = NOWHERE;
-  corpse->name = strdup("corpse");
+  snprintf(corpse_keywords, sizeof(corpse_keywords), "corpse %s",
+      ch->player.name && *ch->player.name ? ch->player.name : GET_NAME(ch));
+  corpse->name = strdup(corpse_keywords);
 
   snprintf(buf2, sizeof(buf2), "The corpse of %s is lying here.", GET_NAME(ch));
   corpse->description = strdup(buf2);

@@ -12,6 +12,7 @@ still and stares, waiting for you to make a move.
 70 4900
 8 8 0
 BareHandAttack: 8
+BodyProfile: 2
 E
 #9602
 bird sparrow~
@@ -25,6 +26,7 @@ nest.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 0
+BodyProfile: 4
 E
 #9603
 wizard mad insane~
@@ -40,6 +42,7 @@ robes.
 100 10000
 8 8 1
 BareHandAttack: 12
+BodyProfile: 1
 E
 T 9603
 T 9604
@@ -55,6 +58,7 @@ his nose a few times, then resumes staring at the sky.
 7 18 5 1d1+70 1d2+1
 70 4900
 6 6 1
+BodyProfile: 2
 E
 #9617
 rabbit lanky white~
@@ -70,6 +74,7 @@ bounds around you, eluding your grasp.
 100 10000
 8 8 1
 BareHandAttack: 10
+BodyProfile: 2
 E
 #9618
 fox red wily~
@@ -85,6 +90,7 @@ rabbits.
 100 10000
 8 8 1
 BareHandAttack: 4
+BodyProfile: 2
 E
 #9626
 demon bear~
@@ -99,6 +105,7 @@ pulsate eerily, and it raises a blunt claw, making ready to swipe at you.
 100 10000
 8 8 1
 BareHandAttack: 8
+BodyProfile: 2
 E
 #9634
 rat~
@@ -112,6 +119,7 @@ A black rat scurries about.
 70 4900
 8 8 0
 BareHandAttack: 4
+BodyProfile: 2
 E
 #9642
 rat queen~
@@ -127,6 +135,7 @@ in a mad frenzy, it looks ready to kill.
 100 10000
 8 8 2
 BareHandAttack: 4
+BodyProfile: 2
 E
 #9647
 knight old~
@@ -141,6 +150,7 @@ he still finds the strength to wield his sword and armor.  What a valiant man.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 1
+BodyProfile: 1
 Str: 18
 E
 T 9647
@@ -173,6 +183,7 @@ penetrate into one's very soul.
 100 10000
 8 8 1
 BareHandAttack: 3
+BodyProfile: 1
 E
 T 9654
 T 9666

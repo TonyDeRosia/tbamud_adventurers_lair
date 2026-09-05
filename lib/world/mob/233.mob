@@ -11,6 +11,7 @@ several scars on this creature.
 150 22500
 8 8 0
 BareHandAttack: 3
+BodyProfile: 3
 E
 #23304
 huge vulture bird~
@@ -26,6 +27,7 @@ enemies.
 160 25600
 8 8 2
 BareHandAttack: 11
+BodyProfile: 4
 E
 #23307
 roach~
@@ -55,6 +57,7 @@ lost it in combat, but that doesn't make him any less strong.
 150 22500
 8 8 1
 BareHandAttack: 4
+BodyProfile: 9
 E
 #23311
 sand dragon~
@@ -70,6 +73,7 @@ with saliva.
 150 22500
 8 8 2
 BareHandAttack: 3
+BodyProfile: 6
 E
 #23313
 snake~
@@ -84,6 +88,7 @@ like it has.  It watches you with its deadly eyes, ready to attack.
 150 22500
 8 8 0
 BareHandAttack: 11
+BodyProfile: 3
 E
 #23316
 butterfly~
@@ -98,6 +103,7 @@ A beautiful butterfly is flying around your head.
 150 22500
 8 8 2
 BareHandAttack: 1
+BodyProfile: 10
 E
 #23318
 apparition~
@@ -112,6 +118,7 @@ imagination?
 160 25600
 8 8 0
 BareHandAttack: 12
+BodyProfile: 0
 E
 #23323
 giant spider~
@@ -127,6 +134,7 @@ It almost looks to have been made out of metal.  It chitters evilly at you.
 160 25600
 8 8 0
 BareHandAttack: 4
+BodyProfile: 5
 E
 #23325
 spider mutant~
@@ -141,6 +149,7 @@ Maybe you should think twice before attacking him.
 170 28900
 8 8 2
 BareHandAttack: 5
+BodyProfile: 5
 E
 #23329
 giant bat~
@@ -155,6 +164,7 @@ feel rather small.
 170 28900
 8 8 2
 BareHandAttack: 4
+BodyProfile: 19
 E
 #23331
 ladybug~
@@ -182,6 +192,7 @@ you should still keep your distance.
 150 22500
 8 8 1
 BareHandAttack: 3
+BodyProfile: 1
 E
 #23340
 red dragon~
@@ -196,6 +207,7 @@ could easily rip you apart.
 150 22500
 8 8 2
 BareHandAttack: 11
+BodyProfile: 6
 E
 #23341
 blue dragon~
@@ -209,6 +221,7 @@ A large blue dragon stands here, blocking your way.
 170 28900
 8 8 0
 BareHandAttack: 6
+BodyProfile: 6
 E
 #23345
 cat~
@@ -223,6 +236,7 @@ making it look rather unattractive.
 170 28900
 8 8 0
 BareHandAttack: 8
+BodyProfile: 2
 E
 #23351
 dragonfly~
@@ -237,6 +251,7 @@ face.  She looks rather tough.
 160 25600
 8 8 2
 BareHandAttack: 1
+BodyProfile: 10
 E
 #23356
 yellow dragon~
@@ -252,6 +267,7 @@ and notice it has puss oozing from its eyes.  It will probably go blind soon.
 170 28900
 8 8 0
 BareHandAttack: 5
+BodyProfile: 6
 E
 #23362
 dragon child kid~
@@ -266,6 +282,7 @@ far away.
 150 22500
 8 8 1
 BareHandAttack: 8
+BodyProfile: 6
 E
 #23366
 lost adventurer~
@@ -279,6 +296,7 @@ how lost and how much trouble he is in.
 15 15 1 3d3+150 2d2+2
 150 22500
 8 8 1
+BodyProfile: 1
 E
 #23370
 hawk~
@@ -293,6 +311,7 @@ probably kill you easily.
 160 25600
 8 8 1
 BareHandAttack: 6
+BodyProfile: 4
 E
 #23376
 dragon~
@@ -307,6 +326,7 @@ It could still more than likely kill you.
 170 28900
 8 8 2
 BareHandAttack: 12
+BodyProfile: 6
 E
 #23380
 dragon queen~
@@ -321,6 +341,7 @@ help you could take her out.
 170 28900
 8 8 2
 BareHandAttack: 5
+BodyProfile: 6
 E
 #23391
 green dragon~
@@ -335,5 +356,6 @@ fear.
 170 28900
 8 8 1
 BareHandAttack: 8
+BodyProfile: 6
 E
 $

@@ -33,6 +33,7 @@ old chips where the construct has been destroyed and restored before.
 6 20 26 1d4+30 1d2+0
 60 0
 8 8 1
+BodyProfile: 11
 SavingPara: 1
 SavingRod: 1
 SavingPetri: 1
@@ -111,6 +112,7 @@ around the hooves whenever the piece prepares one of its sudden rule-bound leaps
 18 18 38 3d5+90 2d2+1
 180 0
 8 8 0
+BodyProfile: 11
 Str: 12
 Dex: 12
 Int: 12
@@ -139,6 +141,7 @@ until it moves, at which point ordinary distance stops mattering.
 18 18 38 3d5+90 2d2+1
 180 0
 8 8 0
+BodyProfile: 2
 Str: 12
 Dex: 12
 Int: 12
@@ -167,6 +170,7 @@ sigils along its staff always align with distant diagonal squares.
 24 17 44 4d6+120 3d3+2
 240 0
 8 8 0
+BodyProfile: 1
 Str: 16
 Dex: 16
 Int: 16
@@ -195,6 +199,7 @@ those runes snap into perfectly straight diagonal patterns.
 24 17 44 4d6+120 3d3+2
 240 0
 8 8 0
+BodyProfile: 11
 Str: 16
 Dex: 16
 Int: 16
@@ -223,6 +228,7 @@ about her stance suggests weight, distance, or ordinary limitation.
 29 17 49 4d6+145 4d3+2
 290 0
 8 8 0
+BodyProfile: 1
 Str: 18
 Dex: 18
 Int: 18
@@ -251,6 +257,7 @@ than kind, carrying the certainty of a piece able to answer threats from nearly 
 29 17 49 4d6+145 4d3+2
 290 0
 8 8 0
+BodyProfile: 1
 Str: 18
 Dex: 18
 Int: 18
@@ -279,6 +286,7 @@ air around him. The entire Game seems built to prevent this one piece from falli
 30 17 50 5d7+150 4d3+2
 300 0
 8 8 0
+BodyProfile: 11
 Str: 18
 Dex: 18
 Int: 18
@@ -307,6 +315,7 @@ geometric paths. The magic protecting him feels older than Midgaard's walls.
 30 17 50 5d7+150 4d3+2
 300 0
 8 8 0
+BodyProfile: 1
 Str: 18
 Dex: 18
 Int: 18
@@ -409,6 +418,7 @@ loose enchantment, cracking damaged chess pieces apart to pry glowing rune-cores
 0 0
 8 8 0
 BareHandAttack: 8
+BodyProfile: 11
 SavingPara: 3
 SavingRod: 3
 SavingPetri: 3

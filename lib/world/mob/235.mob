@@ -10,6 +10,7 @@ A dwarven knight is standing here, guarding his post.
 100 10000
 8 8 1
 BareHandAttack: 3
+BodyProfile: 1
 E
 T 23500
 #23503
@@ -25,6 +26,7 @@ clothes are ratty looking.  She must work here in the caves.
 110 12100
 8 8 2
 BareHandAttack: 7
+BodyProfile: 1
 E
 T 23503
 #23508
@@ -40,6 +42,7 @@ notice she has an extra arm and only one eye.  How gross!
 140 19600
 8 8 2
 BareHandAttack: 7
+BodyProfile: 1
 E
 #23510
 scout~
@@ -54,6 +57,7 @@ sweat.  He could use a bath.
 100 10000
 8 8 1
 BareHandAttack: 3
+BodyProfile: 1
 E
 #23517
 soldier~
@@ -68,6 +72,7 @@ enemies.
 130 16900
 8 8 1
 BareHandAttack: 11
+BodyProfile: 1
 E
 #23520
 dwarven dwarf child~
@@ -82,6 +87,7 @@ use a good meal.
 120 14400
 8 8 2
 BareHandAttack: 7
+BodyProfile: 1
 E
 #23523
 Dwarf Dwarven worker~
@@ -96,6 +102,7 @@ dust and could use a bath.
 110 12100
 8 8 1
 BareHandAttack: 9
+BodyProfile: 1
 E
 #23534
 ranger~
@@ -110,6 +117,7 @@ She is taller than the rest of the dwarves and appears to be much cleaner.
 140 19600
 8 8 2
 BareHandAttack: 6
+BodyProfile: 1
 E
 #23547
 elderly dwarf~
@@ -125,6 +133,7 @@ stuck down here all of her life?
 120 14400
 8 8 2
 BareHandAttack: 9
+BodyProfile: 1
 E
 #23549
 turtle~
@@ -139,6 +148,7 @@ shouldn't have come this way.
 130 16900
 8 8 1
 BareHandAttack: 4
+BodyProfile: 2
 E
 #23551
 water snake~
@@ -153,6 +163,7 @@ probably crush you.
 110 12100
 8 8 2
 BareHandAttack: 4
+BodyProfile: 3
 E
 #23558
 scout leader~
@@ -167,5 +178,6 @@ scars covering his face.  How gross!
 140 19600
 8 8 1
 BareHandAttack: 6
+BodyProfile: 1
 E
 $

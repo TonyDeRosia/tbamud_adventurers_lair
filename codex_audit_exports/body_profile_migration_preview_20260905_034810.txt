@@ -1,0 +1,40 @@
+Adventurer's Lair BodyProfile Migration
+Generated: 2026-09-05 03:48:10
+Mode: Preview
+Repo: C:\Users\antho\Desktop\TBAMUD\TBAMUD UPDATED
+Classification: C:\Users\antho\Desktop\TBAMUD\TBAMUD UPDATED\tbamud_adventurers_lair-main\tbamud_adventurers_lair-main\mob_classified.json
+
+========================================================================================
+SOURCE PROFILE CONTRACT
+========================================================================================
+OK  BODY_PROFILE_NONE                  0
+OK  BODY_PROFILE_HUMANOID              1
+OK  BODY_PROFILE_QUADRUPED             2
+OK  BODY_PROFILE_SERPENT               3
+OK  BODY_PROFILE_AVIAN                 4
+OK  BODY_PROFILE_ARACHNID              5
+OK  BODY_PROFILE_DRAGON                6
+OK  BODY_PROFILE_HORNED_HUMANOID       7
+OK  BODY_PROFILE_TAILED_HUMANOID       8
+OK  BODY_PROFILE_INSECTOID             9
+OK  BODY_PROFILE_WINGED_INSECTOID      10
+OK  BODY_PROFILE_CONSTRUCT             11
+OK  BODY_PROFILE_AMORPHOUS             12
+OK  BODY_PROFILE_FISH                  13
+OK  BODY_PROFILE_PLANT                 14
+OK  BODY_PROFILE_CENTAUROID            15
+OK  BODY_PROFILE_CRUSTACEAN            16
+OK  BODY_PROFILE_WINGED_QUADRUPED      17
+OK  BODY_PROFILE_TENTACLED             18
+OK  BODY_PROFILE_BAT                   19
+OK  NUM_BODY_PROFILES                  20
+
+========================================================================================
+CLASSIFIER INPUT
+========================================================================================
+
+========================================================================================
+ABORTED
+========================================================================================
+Classification entry is missing required property 'vnum'.
+No world files were intentionally modified by this run.

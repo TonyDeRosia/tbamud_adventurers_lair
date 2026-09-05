@@ -12,6 +12,7 @@ mask of pain and anguish, is contorted and crazed.
 200 40000
 8 8 2
 BareHandAttack: 9
+BodyProfile: 0
 E
 #24501
 knight death~
@@ -26,6 +27,7 @@ is well over six feet in height, weighing more than three hundred pounds.
 200 40000
 8 8 0
 BareHandAttack: 12
+BodyProfile: 1
 E
 #24502
 dragon shadow~
@@ -40,6 +42,7 @@ insubstantial, especially here within the Maw.
 200 40000
 8 8 2
 BareHandAttack: 8
+BodyProfile: 6
 E
 #24503
 nereid water female girl~
@@ -69,6 +72,7 @@ upon the flesh of corpses.
 200 40000
 8 8 0
 BareHandAttack: 7
+BodyProfile: 1
 E
 #24505
 heucuva skeleton~
@@ -84,6 +88,7 @@ by the black magic of the Nether and transformed into what you see before you.
 200 40000
 8 8 0
 BareHandAttack: 9
+BodyProfile: 1
 E
 #24506
 ixitxachitl manta ray~
@@ -113,6 +118,7 @@ in a frenzy of attack.
 200 40000
 8 8 0
 BareHandAttack: 1
+BodyProfile: 3
 E
 #24508
 peryton eagle stag thing~
@@ -155,6 +161,7 @@ and east later types.  His malevolent eyes scorch you with their hatred.
 200 40000
 8 8 1
 BareHandAttack: 6
+BodyProfile: 1
 E
 #24511
 troglodyte~
@@ -184,6 +191,7 @@ as a razor.
 200 40000
 8 8 0
 BareHandAttack: 10
+BodyProfile: 1
 E
 #24513
 matron mother woman hideous~
@@ -199,6 +207,7 @@ hisses and shrieks.
 200 40000
 8 8 2
 BareHandAttack: 8
+BodyProfile: 1
 E
 #24514
 shade fawning~
@@ -228,6 +237,7 @@ this is most certainly not one of those times.
 200 40000
 8 8 0
 BareHandAttack: 6
+BodyProfile: 1
 E
 #24516
 death tyrant~

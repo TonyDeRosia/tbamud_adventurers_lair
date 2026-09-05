@@ -10,6 +10,7 @@ A dirty serf shuffles along here.
 70 4900
 8 8 2
 BareHandAttack: 8
+BodyProfile: 1
 E
 #1601
 squire~
@@ -24,6 +25,7 @@ clothes and aspires to some day earning the right to be knighted.
 100 10000
 8 8 1
 BareHandAttack: 11
+BodyProfile: 1
 E
 #1602
 benlad~
@@ -66,6 +68,7 @@ many colors.  He anxiously awaits an opportunity to help a damsel in distress.
 100 10000
 8 8 0
 BareHandAttack: 13
+BodyProfile: 1
 E
 #1605
 Garlon~
@@ -128,6 +131,7 @@ middle age, though he is still a stout fighter.
 140 19600
 8 8 1
 BareHandAttack: 13
+BodyProfile: 1
 E
 #1609
 tristram~
@@ -156,6 +160,7 @@ and his unholy spear.
 140 19600
 8 8 1
 BareHandAttack: 11
+BodyProfile: 1
 E
 #1611
 knight barant~
@@ -171,6 +176,7 @@ at you.
 140 19600
 8 8 1
 BareHandAttack: 5
+BodyProfile: 1
 E
 #1612
 fool dagonet~
@@ -186,6 +192,7 @@ handle himself well in a fight.
 100 10000
 8 8 1
 BareHandAttack: 12
+BodyProfile: 1
 E
 #1613
 Knight turquine~
@@ -200,6 +207,7 @@ a man, and his eyes dart left and right.
 140 19600
 8 8 1
 BareHandAttack: 7
+BodyProfile: 1
 E
 #1614
 Perimones knight~
@@ -214,6 +222,7 @@ silken red favor of Galenvine on his sleeve.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 1
+BodyProfile: 1
 E
 #1615
 nobleman~
@@ -243,6 +252,7 @@ A brightly clothed merchant hawks his goods to you!
 100 10000
 8 8 1
 BareHandAttack: 10
+BodyProfile: 1
 E
 #1617
 servant~
@@ -256,6 +266,7 @@ A servant is rushing by.
 100 10000
 8 8 1
 BareHandAttack: 13
+BodyProfile: 1
 E
 #1618
 demon~
@@ -356,6 +367,7 @@ intelligence.
 100 10000
 8 8 0
 BareHandAttack: 8
+BodyProfile: 4
 E
 #1625
 toad~
@@ -369,6 +381,7 @@ large.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 0
+BodyProfile: 2
 E
 #1626
 cat~
@@ -383,6 +396,7 @@ dangerous.  It is the largest cat you have ever seen.
 70 4900
 8 8 0
 BareHandAttack: 8
+BodyProfile: 2
 E
 #1627
 master bleise~
@@ -409,6 +423,7 @@ A fat cook is walking around with a spoons tasting all the food.
 100 10000
 8 8 2
 BareHandAttack: 8
+BodyProfile: 1
 E
 #1629
 guard~
@@ -422,6 +437,7 @@ A guard is standing a sharp watch.
 140 19600
 8 8 1
 BareHandAttack: 6
+BodyProfile: 1
 E
 #1630
 archer~
@@ -435,6 +451,7 @@ An archer is dying here.
 100 10000
 8 8 1
 BareHandAttack: 12
+BodyProfile: 1
 E
 #1631
 infantryman~
@@ -448,6 +465,7 @@ An infantryman is dying here.
 100 10000
 8 8 1
 BareHandAttack: 7
+BodyProfile: 1
 E
 #1632
 knight~
@@ -462,6 +480,7 @@ he'll last much longer.
 100 10000
 8 8 1
 BareHandAttack: 13
+BodyProfile: 1
 E
 #1633
 wolf~
@@ -476,6 +495,7 @@ hungry.
 100 10000
 8 8 0
 BareHandAttack: 4
+BodyProfile: 2
 E
 #1634
 creature beast lion~
@@ -489,6 +509,7 @@ A long necked, lion pawed, spotted creature is here gnawing on a femur.
 140 19600
 8 8 1
 BareHandAttack: 4
+BodyProfile: 2
 E
 #1635
 damsel~
@@ -503,5 +524,6 @@ tied with her hands behind her back.  Her courtly gown is soiled and tattered.
 100 10000
 8 8 2
 BareHandAttack: 4
+BodyProfile: 1
 E
 $

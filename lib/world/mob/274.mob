@@ -11,6 +11,7 @@ north.
 34 9 -10 6d6+340 5d5+5
 340 115600
 8 8 1
+BodyProfile: 1
 Str: 18
 Dex: 18
 Int: 18
@@ -67,6 +68,7 @@ watch it.
 34 20 10 1d1+0 1d1+0
 0 0
 8 8 1
+BodyProfile: 1
 Str: 20
 Dex: 17
 Int: 12
@@ -143,6 +145,7 @@ a just and fair man when it comes to his skills to appraisal.
 34 9 -10 6d6+340 5d5+5
 340 115600
 8 8 1
+BodyProfile: 1
 Str: 20
 Dex: 17
 Int: 13
@@ -404,6 +407,7 @@ Brigid who works the fields.
 4 20 8 0d0+20 1d2+0
 20 400
 8 8 1
+BodyProfile: 1
 Str: 12
 Dex: 15
 Int: 13
@@ -539,6 +543,7 @@ a brown tunic top and a loose skirt, and what appears to be soft shoes.
 5 20 8 0d0+20 1d2+0
 20 400
 8 8 2
+BodyProfile: 1
 Str: 13
 Dex: 17
 Int: 14
@@ -560,6 +565,7 @@ Brigid who works the fields.
 5 20 8 0d0+20 1d2+0
 20 400
 8 8 1
+BodyProfile: 1
 Str: 12
 Dex: 15
 Int: 13
@@ -580,6 +586,7 @@ the floor oblivious to the carnage that is to come.
 3 20 8 0d0+20 1d2+0
 20 400
 8 8 0
+BodyProfile: 1
 Str: 14
 Dex: 13
 Int: 14
@@ -602,6 +609,7 @@ who works the fields.
 4 20 8 0d0+20 1d2+0
 20 400
 8 8 2
+BodyProfile: 1
 Str: 12
 Dex: 15
 Int: 13
@@ -624,6 +632,7 @@ volunteered to take the post to protect the village.
 10 18 4 2d2+100 1d2+1
 100 10000
 8 8 1
+BodyProfile: 1
 Str: 17
 Dex: 13
 Int: 13
@@ -649,6 +658,7 @@ has long blond hair, blue eyes and a delicate, angelic appearance.
 9 17 4 1d1+90 1d2+1
 90 8100
 8 8 2
+BodyProfile: 1
 Str: 15
 Dex: 16
 Wis: 12
@@ -748,6 +758,7 @@ snoozes on the floor in a drunken stupor with a glass mug still in hand.
 9 17 4 1d1+90 1d2+1
 90 8100
 4 4 1
+BodyProfile: 1
 Str: 15
 Dex: 16
 Wis: 12
@@ -794,6 +805,7 @@ slender attractive, but muscular figure.
 5 20 8 0d0+20 1d2+0
 20 400
 8 8 2
+BodyProfile: 1
 Str: 13
 Dex: 17
 Int: 14
@@ -814,6 +826,7 @@ hair, dark eyes and a lean muscular body.  He looks dangerous to be around.
 5 20 8 0d0+20 1d2+0
 20 400
 8 8 1
+BodyProfile: 1
 Str: 12
 Dex: 15
 Int: 13

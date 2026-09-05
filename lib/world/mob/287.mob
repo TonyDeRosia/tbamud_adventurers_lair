@@ -13,6 +13,7 @@ of Scotch whiskey, probably not the single-malt variety.
 300 90000
 8 8 1
 BareHandAttack: 13
+BodyProfile: 1
 Str: 18
 StrAdd: 100
 E
@@ -29,6 +30,7 @@ took holy orders, and still carries a sturdy club.
 15 15 1 3d3+150 2d2+2
 150 22500
 8 8 1
+BodyProfile: 1
 E
 #28702
 sheriff zeb~
@@ -56,6 +58,7 @@ invincible.
 30 10 -8 6d6+300 5d5+5
 300 90000
 8 8 1
+BodyProfile: 1
 E
 #28704
 carpenter joel~
@@ -69,6 +72,7 @@ is intended for wood, but for flesh and bone, particularly of goblin-kind.
 30 10 -8 6d6+300 5d5+5
 300 90000
 8 8 1
+BodyProfile: 1
 E
 #28705
 maxtrum halfling shopkeeper~
@@ -83,6 +87,7 @@ their pockets lighter after leaving his store, though they bought nothing.
 30 10 -8 6d6+300 5d5+5
 300 90000
 8 8 1
+BodyProfile: 1
 E
 #28706
 churt elf elven alchemist~
@@ -98,6 +103,7 @@ mind that one.
 30 10 -8 6d6+300 5d5+5
 300 90000
 8 8 1
+BodyProfile: 1
 E
 #28707
 dek ranger elf elven leatherworker~
@@ -111,6 +117,7 @@ alike!  You ought to be scared, too, you shrimp.
 30 10 -8 6d6+300 5d5+5
 300 90000
 8 8 1
+BodyProfile: 1
 E
 #28708
 marya woman baker~
@@ -126,6 +133,7 @@ seeds.
 30 10 -8 6d6+300 5d5+5
 300 90000
 8 8 1
+BodyProfile: 1
 E
 #28709
 serathana priestess librarian~
@@ -141,6 +149,7 @@ instantly reach it.
 30 10 -8 6d6+300 5d5+5
 300 90000
 8 8 1
+BodyProfile: 1
 E
 #28710
 kelek guard captain~
@@ -153,6 +162,7 @@ Passing guards raise their visors in salute to Sir Kelek, their captain.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 1
+BodyProfile: 1
 E
 #28711
 king korbor~
@@ -166,6 +176,7 @@ drive off the goblins which threaten his realm.
 15 15 1 3d3+150 2d2+2
 150 22500
 8 8 1
+BodyProfile: 1
 E
 #28712
 tim thief boy~
@@ -178,6 +189,7 @@ A small boy sneaks silently through the shadows.
 8 18 5 1d1+80 1d2+1
 80 6400
 8 8 1
+BodyProfile: 1
 E
 T 28700
 #28713
@@ -203,6 +215,7 @@ A guard of Ofintinia patrolls his town.
 6 18 6 1d1+60 1d2+1
 60 3600
 8 8 1
+BodyProfile: 1
 E
 #28715
 guard~
@@ -215,6 +228,7 @@ An Ofintine guard watches the gate.
 6 18 6 1d1+60 1d2+1
 60 3600
 8 8 1
+BodyProfile: 1
 E
 #28716
 volunteer~
@@ -251,6 +265,7 @@ A man of Ofingia stands here.
 2 20 8 0d0+20 1d2+0
 20 400
 8 8 1
+BodyProfile: 1
 E
 #28719
 woman~
@@ -263,6 +278,7 @@ An Lonoyan woman walks through town.
 2 20 8 0d0+20 1d2+0
 20 400
 8 8 2
+BodyProfile: 1
 E
 #28720
 boy~
@@ -275,6 +291,7 @@ A small boy runs around shouting at unseen foes.
 1 20 9 0d0+10 1d2+0
 10 100
 8 8 1
+BodyProfile: 1
 E
 #28721
 girl~
@@ -287,6 +304,7 @@ A Lonoyan girl stands here.
 1 20 9 0d0+10 1d2+0
 10 100
 8 8 2
+BodyProfile: 1
 E
 #28722
 big dog~
@@ -300,6 +318,7 @@ A huge dog runs about, tongue lolling out of his mouth in a silly way.
 10 100
 8 8 1
 BareHandAttack: 4
+BodyProfile: 2
 E
 #28723
 dog~
@@ -312,6 +331,7 @@ You cringe in fear when a small black dog growls menacingly.
 6 18 6 1d1+60 1d2+1
 60 3600
 8 8 1
+BodyProfile: 2
 E
 #28724
 farmer man~
@@ -326,6 +346,7 @@ recognition, changing to anger.  Perhaps you left his gate open on the way here.
 2 20 8 0d0+20 1d2+0
 20 400
 8 8 1
+BodyProfile: 1
 E
 #28725
 dwarf~
@@ -339,6 +360,7 @@ must have had enough to stun a giant.
 2 20 8 0d0+20 1d2+0
 20 400
 8 8 1
+BodyProfile: 1
 E
 #28726
 hobbit~
@@ -352,6 +374,7 @@ visitor from the Shire.
 2 20 8 0d0+20 1d2+0
 20 400
 8 8 1
+BodyProfile: 1
 E
 #28727
 woman barmaid maid~
@@ -365,6 +388,7 @@ dagger ready for anyone who gets `fresh'.
 2 20 8 0d0+20 1d2+0
 20 400
 8 8 2
+BodyProfile: 1
 E
 #28728
 man~
@@ -381,6 +405,7 @@ themselves.
 2 20 8 0d0+20 1d2+0
 20 400
 8 8 1
+BodyProfile: 1
 E
 #28729
 goblin~
@@ -394,6 +419,7 @@ talking and see you.  Goblins hate strangers, especially if they are armed.
 4 19 7 0d0+40 1d2+0
 40 1600
 8 8 1
+BodyProfile: 1
 E
 #28730
 goblin raider~
@@ -406,6 +432,7 @@ A goblin raider prowls Lonoya, looking for travellers to rob.
 5 19 7 1d1+50 1d2+0
 50 2500
 8 8 1
+BodyProfile: 1
 E
 #28731
 goblin~
@@ -418,6 +445,7 @@ A goblin crouches in ambush here.
 5 19 7 1d1+50 1d2+0
 50 2500
 8 8 1
+BodyProfile: 1
 E
 #28732
 goblin~
@@ -430,6 +458,7 @@ A goblin stands watch here.
 5 19 7 1d1+50 1d2+0
 50 2500
 4 8 1
+BodyProfile: 1
 E
 #28733
 serpent~
@@ -444,6 +473,7 @@ of those killed by these goblins.
 5 19 7 1d1+50 1d2+0
 50 2500
 8 8 0
+BodyProfile: 3
 E
 #28734
 gnome~
@@ -456,6 +486,7 @@ A stone-gnome is far from home.
 2 20 8 0d0+20 1d2+0
 20 400
 8 8 1
+BodyProfile: 1
 E
 #28735
 goblin~
@@ -468,6 +499,7 @@ A goblin stands here alert, vigilant for intruders.
 5 19 7 1d1+50 1d2+0
 50 2500
 8 8 1
+BodyProfile: 1
 E
 #28736
 goblin~
@@ -480,6 +512,7 @@ A green-skinned goblin warrior stands here, clutching a bloody scimitar.
 6 18 6 1d1+60 1d2+1
 60 3600
 8 8 1
+BodyProfile: 1
 E
 #28737
 goblin~
@@ -492,6 +525,7 @@ A goblin warrior glares at you, angry at having been awakened.
 6 18 6 1d1+60 1d2+1
 60 3600
 4 8 1
+BodyProfile: 1
 E
 #28738
 hobgoblin goblin~
@@ -506,6 +540,7 @@ for any knight.
 8 18 5 1d1+80 1d2+1
 80 6400
 8 8 1
+BodyProfile: 1
 E
 #28739
 toadstool goblin chieftain~
@@ -520,6 +555,7 @@ Toadstool is orcish or half-orcish.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 1
+BodyProfile: 1
 E
 #28740
 goblin~
@@ -532,6 +568,7 @@ A goblin gnaws a bone here.
 4 19 7 0d0+40 1d2+0
 40 1600
 8 8 1
+BodyProfile: 1
 E
 #28741
 groff troll cook~
@@ -547,6 +584,7 @@ stayed still, you idiot.
 12 16 2 2d2+120 2d2+2
 120 14400
 8 8 1
+BodyProfile: 1
 E
 #28742
 mimic barrel~
@@ -599,6 +637,7 @@ A drunken goblin staggers around.
 4 19 7 0d0+40 1d2+0
 40 1600
 8 8 1
+BodyProfile: 1
 E
 #28746
 warg~
@@ -642,6 +681,7 @@ An Orc guards the caves here.
 6 18 6 1d1+60 1d2+1
 60 3600
 4 8 1
+BodyProfile: 1
 E
 #28749
 goblin~
@@ -654,6 +694,7 @@ A goblin miner chips away at the mountains' stony innards.
 5 19 7 1d1+50 1d2+0
 50 2500
 8 8 1
+BodyProfile: 1
 E
 #28750
 stalker~
@@ -691,6 +732,7 @@ A goblin miner rests here, out of his master's sight.
 5 19 7 1d1+50 1d2+0
 50 2500
 5 5 1
+BodyProfile: 1
 E
 #28753
 mimic boulder~
@@ -717,6 +759,7 @@ tunnels.
 80 6400
 8 8 1
 BareHandAttack: 2
+BodyProfile: 1
 E
 #28755
 slave~
@@ -730,6 +773,7 @@ mines.
 2 20 8 0d0+20 1d2+0
 20 400
 8 8 1
+BodyProfile: 1
 E
 #28756
 slave~
@@ -743,6 +787,7 @@ mines.
 2 20 8 0d0+20 1d2+0
 20 400
 8 8 2
+BodyProfile: 1
 E
 #28757
 goblin blacksmith~
@@ -755,6 +800,7 @@ Wielding two great hammers, the goblin smith toils at his forge.
 8 18 5 1d1+80 1d2+1
 80 6400
 8 8 1
+BodyProfile: 1
 E
 #28758
 goblin~
@@ -768,6 +814,7 @@ goblins' iron furnace white-hot.
 5 19 7 1d1+50 1d2+0
 50 2500
 8 8 1
+BodyProfile: 1
 E
 #28759
 kobold slave~
@@ -780,6 +827,7 @@ A kobold shuffles quickly about, carrying iron ore and lime.
 4 19 7 0d0+40 1d2+0
 40 1600
 8 8 0
+BodyProfile: 1
 E
 #28760
 giant overseer~
@@ -793,6 +841,7 @@ you stay much longer.  Like any evil giant, he loves causing pain.
 12 16 2 2d2+120 2d2+2
 120 14400
 8 8 1
+BodyProfile: 1
 E
 #28761
 mimic pig iron~
@@ -805,6 +854,7 @@ A glowing iron pig cools in the sand, away from the others.
 14 16 1 2d2+140 2d2+2
 140 19600
 8 8 0
+BodyProfile: 2
 E
 #28762
 ogre~
@@ -817,6 +867,7 @@ A large ogre trudges about, pushing boulders that must weigh tons.
 12 16 2 2d2+120 2d2+2
 120 14400
 8 8 1
+BodyProfile: 1
 E
 #28763
 elf elven~
@@ -830,6 +881,7 @@ is doing a good job of it, so why not let him continue?
 6 18 6 1d1+60 1d2+1
 60 3600
 4 8 1
+BodyProfile: 1
 E
 #28764
 dragon~
@@ -843,6 +895,7 @@ A large red dragon stands here, angry that you disturbed his rest.
 20 14 -2 4d4+200 3d3+3
 200 40000
 4 8 0
+BodyProfile: 6
 E
 #28765
 troll guard~
@@ -856,6 +909,7 @@ A huge troll of the Olog-Hai stands guard here.
 120 14400
 8 8 1
 BareHandAttack: 13
+BodyProfile: 1
 Str: 24
 Int: 3
 Wis: 3
@@ -873,6 +927,7 @@ You probably look like a tasty meal.
 8 18 5 1d1+80 1d2+1
 80 6400
 8 8 1
+BodyProfile: 1
 E
 #28767
 wall~
@@ -910,6 +965,7 @@ Moragd the Goblin stands here.
 12 16 2 2d2+120 2d2+2
 120 14400
 8 8 1
+BodyProfile: 1
 E
 #28770
 goblin gorgh~
@@ -923,6 +979,7 @@ world.
 12 16 2 2d2+120 2d2+2
 120 14400
 8 8 1
+BodyProfile: 1
 E
 #28771
 goblin Khos~
@@ -935,6 +992,7 @@ Khos the Greatnosed stands here.
 12 16 2 2d2+120 2d2+2
 120 14400
 8 8 1
+BodyProfile: 1
 E
 #28772
 goblin~
@@ -947,6 +1005,7 @@ A goblin warrior stands here.
 6 18 6 1d1+60 1d2+1
 60 3600
 8 8 1
+BodyProfile: 1
 E
 #28773
 ogre guard Thrash~
@@ -962,6 +1021,7 @@ as a bodyguard.
 270 72900
 8 8 1
 BareHandAttack: 10
+BodyProfile: 1
 E
 #28774
 giant guard Throm~
@@ -977,6 +1037,7 @@ giant to guard his person.
 230 52900
 8 8 1
 BareHandAttack: 13
+BodyProfile: 1
 Str: 25
 Int: 3
 Wis: 3
@@ -993,6 +1054,7 @@ human is one of the Great Goblin's bodyguards.
 23 13 -3 4d4+230 3d3+3
 230 52900
 8 8 1
+BodyProfile: 1
 E
 #28776
 great goblin~
@@ -1007,5 +1069,6 @@ around him.  Kill him, and King Korbor will repay you handsomely.
 17 15 0 3d3+170 2d2+2
 170 28900
 8 8 1
+BodyProfile: 1
 E
 $

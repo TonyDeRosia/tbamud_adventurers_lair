@@ -40,6 +40,7 @@ discipline of someone expecting larger predators to appear without warning.
 40 0
 8 8 1
 BareHandAttack: 11
+BodyProfile: 1
 Str: 10
 Dex: 14
 Int: 10
@@ -68,6 +69,7 @@ predator accustomed to driving weaker creatures from whatever territory he wants
 70 0
 8 8 1
 BareHandAttack: 9
+BodyProfile: 1
 Str: 15
 Dex: 13
 Int: 8
@@ -95,6 +97,7 @@ vale like a hunter studying wounded prey, patient enough to let others bleed fir
 90 90
 8 8 1
 BareHandAttack: 9
+BodyProfile: 1
 Str: 17
 Dex: 14
 Wis: 12
@@ -120,6 +123,7 @@ as though he expects the riders who attacked his party to return at any moment.
 4 19 5 0d0+40 1d2+0
 40 0
 5 5 1
+BodyProfile: 1
 GoldMin: 40
 GoldMax: 40
 E
@@ -138,6 +142,7 @@ an axe scar across one forearm show how dangerous innkeeping in Cindervale has b
 10 17 0 2d2+100 1d2+1
 100 0
 8 8 1
+BodyProfile: 1
 GoldMin: 100
 GoldMax: 100
 E
@@ -156,6 +161,7 @@ someone mentions Dreary Hollow his attention sharpens despite the drink before h
 8 18 0 1d1+80 1d2+1
 80 0
 6 6 1
+BodyProfile: 1
 GoldMin: 80
 GoldMax: 80
 E
@@ -175,6 +181,7 @@ of the Blackbriar riders who prey on the weakened roads through Cindervale.
 80 0
 8 8 1
 BareHandAttack: 3
+BodyProfile: 1
 Str: 13
 Dex: 16
 Wis: 10
@@ -203,6 +210,7 @@ scents that would be meaningless to a human tracker.
 0 0
 8 8 1
 BareHandAttack: 4
+BodyProfile: 1
 Str: 13
 Dex: 16
 Int: 9

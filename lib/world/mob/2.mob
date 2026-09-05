@@ -11,6 +11,7 @@ He stands a good six feet tall, all skin and bones.
 13 16 2 2d2+130 2d2+2
 130 16900
 8 8 1
+BodyProfile: 1
 E
 T 78
 #201
@@ -27,6 +28,7 @@ emotoinal aid they give.
 20 14 -2 4d4+200 3d3+3
 200 40000
 8 8 1
+BodyProfile: 1
 E
 T 146
 #202
@@ -40,6 +42,7 @@ A beautiful horse shakes his mane and swishes his tail.
 5 19 7 1d1+50 1d2+0
 50 2500
 8 8 1
+BodyProfile: 2
 E
 #203
 stablemasters petshops~
@@ -69,6 +72,7 @@ though her build shows promise of endurance.
 6 18 6 1d1+60 1d2+1
 60 3600
 8 8 2
+BodyProfile: 2
 E
 #205
 horse pets stallion~
@@ -82,6 +86,7 @@ wonder why this animal is even standing here.  The animal looks wild.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 1
+BodyProfile: 2
 E
 #206
 chunky philosopher man old~
@@ -97,6 +102,7 @@ than his have already questioned.
 3 19 8 0d0+30 1d2+0
 30 900
 8 8 1
+BodyProfile: 1
 E
 T 200
 #207
@@ -113,6 +119,7 @@ appears to be beggin for some treats.
 30 900
 8 8 2
 BareHandAttack: 4
+BodyProfile: 2
 E
 T 152
 T 153
@@ -146,6 +153,7 @@ achondroplastic dwarf.  His torso is normal while his limbs are extremely short.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 1
+BodyProfile: 1
 E
 #210
 questmaster shopkeeper~
@@ -160,6 +168,7 @@ questors can afford to pay her.
 30 10 -8 6d6+300 5d5+5
 300 90000
 8 8 2
+BodyProfile: 1
 E
 T 167
 #211
@@ -189,6 +198,7 @@ inspection the parrot has a wooden leg and an eye patch!
 5 19 7 1d1+50 1d2+0
 50 2500
 8 8 1
+BodyProfile: 4
 E
 T 204
 #213
@@ -208,6 +218,7 @@ Dec.  24 and 25.
 34 9 -10 6d6+340 5d5+5
 340 115600
 8 8 1
+BodyProfile: 1
 E
 T 215
 #214
@@ -224,6 +235,7 @@ group of magi dedicated to protecting the Orb of Sanctum.
 5 19 7 1d1+50 1d2+0
 50 2500
 8 8 1
+BodyProfile: 1
 E
 T 61
 #215
@@ -240,6 +252,7 @@ few who have the necessary skills to protect this most valuable of treasures.
 30 10 -8 6d6+300 5d5+5
 300 90000
 8 8 2
+BodyProfile: 1
 E
 T 62
 #216
@@ -270,6 +283,7 @@ right breast is labeled "interior designer."
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 2
+BodyProfile: 1
 SavingPara: 2
 SavingRod: 2
 SavingPetri: 2

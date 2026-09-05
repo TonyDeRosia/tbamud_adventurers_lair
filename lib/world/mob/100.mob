@@ -12,6 +12,7 @@ and determined to survive out here on his own.
 30 900
 8 8 1
 BareHandAttack: 13
+BodyProfile: 1
 E
 #10001
 bobcat~
@@ -28,6 +29,7 @@ it first hand.
 30 900
 8 8 2
 BareHandAttack: 8
+BodyProfile: 2
 E
 #10002
 chipmunk~
@@ -44,6 +46,7 @@ the way down to its tail.
 30 900
 8 8 1
 BareHandAttack: 4
+BodyProfile: 2
 E
 #10003
 fox~
@@ -60,6 +63,7 @@ very scared.
 30 900
 8 8 1
 BareHandAttack: 4
+BodyProfile: 2
 E
 #10004
 coyote~
@@ -76,6 +80,7 @@ take down a stray cow.
 30 900
 8 8 1
 BareHandAttack: 4
+BodyProfile: 2
 E
 #10005
 doe~
@@ -91,6 +96,7 @@ of you and could run at any second.
 30 900
 8 8 2
 BareHandAttack: 4
+BodyProfile: 2
 E
 #10006
 buck~
@@ -106,6 +112,7 @@ Maybe you're about to find out.
 30 900
 8 8 1
 BareHandAttack: 10
+BodyProfile: 2
 E
 #10007
 merchant~
@@ -121,6 +128,7 @@ himself being out in the wilderness like this.
 3 19 8 0d0+30 1d2+0
 30 900
 8 8 1
+BodyProfile: 1
 E
 #10008
 peddler~
@@ -135,6 +143,7 @@ your purse a little tighter as you walk by.
 3 19 8 0d0+30 1d2+0
 30 900
 8 8 1
+BodyProfile: 1
 E
 #10009
 possum~
@@ -149,6 +158,7 @@ It's about 2 feet long including a hairless tail.  It looks stupid and slow.
 30 900
 8 8 1
 BareHandAttack: 4
+BodyProfile: 2
 E
 #10010
 alligator~
@@ -164,6 +174,7 @@ that thick hide.
 70 4900
 8 8 1
 BareHandAttack: 4
+BodyProfile: 2
 E
 #10011
 raccoon~
@@ -179,6 +190,7 @@ the trees.  It is gray and black with the unforgettable mask around its eyes.
 30 900
 8 8 1
 BareHandAttack: 8
+BodyProfile: 2
 E
 #10012
 skunk~
@@ -194,6 +206,7 @@ since only an idiot would attack it and chance being skunked.
 30 900
 8 8 2
 BareHandAttack: 8
+BodyProfile: 2
 E
 #10013
 bobcat baby~
@@ -209,6 +222,7 @@ ahead and pet the cute little fella.
 30 900
 8 8 1
 BareHandAttack: 8
+BodyProfile: 2
 E
 #10014
 lynx~
@@ -225,6 +239,7 @@ purpose.
 30 900
 8 8 1
 BareHandAttack: 8
+BodyProfile: 2
 E
 #10015
 hunter~
@@ -238,6 +253,7 @@ his prey silently, waiting for the opportunity to strike.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 1
+BodyProfile: 1
 E
 #10016
 huntress~
@@ -251,5 +267,6 @@ and adept.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 2
+BodyProfile: 1
 E
 $

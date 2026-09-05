@@ -10,6 +10,7 @@ like he hasn't bathed in over a month.
 21 13 -2 4d4+210 3d3+3
 210 44100
 8 8 1
+BodyProfile: 1
 E
 T 6501
 #6501
@@ -23,6 +24,7 @@ A dwarven mining worker is here.
 13 16 2 2d2+130 2d2+2
 130 16900
 8 8 1
+BodyProfile: 1
 E
 #6502
 wraith~
@@ -35,6 +37,7 @@ A wraith is awaiting your first move here.
 25 12 -5 5d5+250 4d4+4
 250 62500
 8 8 1
+BodyProfile: 0
 E
 T 6500
 #6503
@@ -60,6 +63,7 @@ Granite Head, the baker, is waiting for a customer here.
 33 9 -9 6d6+330 5d5+5
 330 108900
 8 8 1
+BodyProfile: 1
 E
 #6505
 lizard giant~
@@ -73,6 +77,7 @@ He looks very powerful.
 21 13 -2 4d4+210 3d3+3
 210 44100
 8 8 1
+BodyProfile: 2
 E
 #6506
 giant~
@@ -86,6 +91,7 @@ physical condition.
 19 14 -1 3d3+190 3d3+3
 190 36100
 8 8 1
+BodyProfile: 1
 E
 #6507
 mineworker dwarven dwarf miner worker~
@@ -98,6 +104,7 @@ A dwarven mineworker is here.
 4 19 7 0d0+40 1d2+0
 40 1600
 8 8 1
+BodyProfile: 1
 E
 #6508
 mineleader dwarven dwarf mine leader~
@@ -111,6 +118,7 @@ also, to have gotten this job.
 19 14 -1 3d3+190 3d3+3
 190 36100
 8 8 1
+BodyProfile: 1
 E
 #6509
 doctor dwarven healer~
@@ -123,6 +131,7 @@ The dwarven doctor is here, aiding the sick of his people.
 22 13 -3 4d4+220 3d3+3
 220 48400
 8 8 1
+BodyProfile: 1
 E
 T 6500
 #6510
@@ -137,6 +146,7 @@ awaiting orders.
 3 19 8 0d0+30 1d2+0
 30 900
 8 8 1
+BodyProfile: 1
 E
 #6511
 dwarf~
@@ -149,6 +159,7 @@ A dwarf is here.
 6 18 6 1d1+60 1d2+1
 60 3600
 8 8 1
+BodyProfile: 1
 E
 #6514
 guard barrack~
@@ -161,6 +172,7 @@ A barrack guard is here, lounging around while off duty.
 14 16 1 2d2+140 2d2+2
 140 19600
 8 8 1
+BodyProfile: 1
 E
 #6516
 mazekeeper keeper~
@@ -188,5 +200,6 @@ surrounding terrain.
 33 9 -9 6d6+330 5d5+5
 330 108900
 8 8 1
+BodyProfile: 3
 E
 $

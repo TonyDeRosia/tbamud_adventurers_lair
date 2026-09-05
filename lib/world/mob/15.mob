@@ -94,6 +94,7 @@ at you and takes another drink.
 13 16 2 2d2+130 2d2+2
 130 16900
 6 6 1
+BodyProfile: 1
 E
 #1507
 jinn sprite~
@@ -123,6 +124,7 @@ and shakes.
 26 12 -5 5d5+260 4d4+4
 260 67600
 8 8 1
+BodyProfile: 1
 E
 #1509
 caliph hakim al-hakim~
@@ -285,6 +287,7 @@ yawn.
 22 13 -3 4d4+220 3d3+3
 220 48400
 4 4 1
+BodyProfile: 1
 E
 #1521
 boy teenage~
@@ -299,6 +302,7 @@ his gaze and notice that he is gazing in wonderment at the fullness of the moon.
 24 12 -4 4d4+240 4d4+4
 240 57600
 8 8 1
+BodyProfile: 1
 E
 #1522
 man~
@@ -312,6 +316,7 @@ is the image of perfect contentment.
 26 12 -5 5d5+260 4d4+4
 260 67600
 5 5 1
+BodyProfile: 1
 E
 #1523
 soul~

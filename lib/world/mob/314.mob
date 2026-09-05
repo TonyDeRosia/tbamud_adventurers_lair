@@ -38,6 +38,7 @@ obviously must have as he is trying to speak to you.
 17 15 0 3d3+170 2d2+2
 170 28900
 1 1 1
+BodyProfile: 1
 E
 #31403
 elf retching~
@@ -51,6 +52,7 @@ you to help him, somehow help him.
 15 15 1 3d3+150 2d2+2
 150 22500
 6 6 1
+BodyProfile: 1
 E
 #31404
 woman~
@@ -64,6 +66,7 @@ afraid of prying eyes.  It is certainly a gesture of fear or discomfort.
 16 15 0 3d3+160 2d2+2
 160 25600
 8 8 2
+BodyProfile: 1
 E
 #31405
 squatter man~
@@ -77,6 +80,7 @@ talk about the smell.
 19 14 -1 3d3+190 3d3+3
 190 36100
 8 8 1
+BodyProfile: 1
 E
 #31406
 child terrified~
@@ -90,6 +94,7 @@ bruises.  He couldn't be much more than ten or eleven years old.
 12 16 2 2d2+120 2d2+2
 120 14400
 6 6 1
+BodyProfile: 1
 E
 #31407
 man weeping~
@@ -104,6 +109,7 @@ son's body, stroking the blood matted hair back from the cold, lifeless ears.
 18 14 0 3d3+180 3d3+3
 180 32400
 8 8 1
+BodyProfile: 1
 E
 #31408
 rat scurrying~
@@ -116,6 +122,7 @@ A rat scurries past, its feet clicking on the stone floor.
 8 18 5 1d1+80 1d2+1
 80 6400
 8 8 0
+BodyProfile: 2
 E
 #31409
 gunter~
@@ -143,6 +150,7 @@ and uncrosses his arms, readying his whip.
 24 12 -4 4d4+240 4d4+4
 240 57600
 8 8 1
+BodyProfile: 1
 E
 #31411
 man grubby~
@@ -157,6 +165,7 @@ face and hands.
 14 16 1 2d2+140 2d2+2
 140 19600
 8 8 1
+BodyProfile: 1
 E
 #31412
 man seeker hooded~
@@ -171,6 +180,7 @@ regainment of full mental faculties.
 22 13 -3 4d4+220 3d3+3
 220 48400
 8 8 1
+BodyProfile: 1
 E
 #31413
 believer hidden~
@@ -198,6 +208,7 @@ matter, just aim for the blackish-brown blur.
 130 16900
 8 8 0
 BareHandAttack: 4
+BodyProfile: 19
 E
 #31415
 spider dirty hairy~
@@ -212,6 +223,7 @@ it is a spider, nonetheless, and is disgusting and wrong.
 70 4900
 8 8 0
 BareHandAttack: 4
+BodyProfile: 5
 E
 #31416
 deathknight knight dazed~
@@ -238,6 +250,7 @@ A man in warrior's traveling garb lies upon the floor, looking very surprised to
 32 10 -9 6d6+320 5d5+5
 320 102400
 8 8 1
+BodyProfile: 1
 E
 #31418
 wight blood scavenger humanoid~
@@ -252,6 +265,7 @@ you.  It goes back to its feast without another glance.
 270 72900
 8 8 0
 BareHandAttack: 8
+BodyProfile: 1
 E
 #31419
 believer unrobed slobbering~
@@ -278,5 +292,6 @@ across the boy's back are many and deep.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 1
+BodyProfile: 1
 E
 $

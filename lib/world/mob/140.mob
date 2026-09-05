@@ -15,6 +15,7 @@ time.
 180 32400
 8 8 1
 BareHandAttack: 8
+BodyProfile: 1
 E
 #14001
 Dust Devil wyv~
@@ -45,6 +46,7 @@ those pincers.
 70 4900
 8 8 1
 BareHandAttack: 9
+BodyProfile: 16
 E
 #14003
 Heat Monster wyv~
@@ -79,6 +81,7 @@ long if it is sleeping..  You might be able to get passed it.  What a guardian!
 260 67600
 8 8 2
 BareHandAttack: 4
+BodyProfile: 6
 E
 #14005
 wyvern citizen wyv~
@@ -93,6 +96,7 @@ you and dismisses you as soon as it does.  How pathetic you are.
 30 900
 8 8 2
 BareHandAttack: 8
+BodyProfile: 1
 E
 #14006
 Hatchling Wyvern wyv~
@@ -124,6 +128,7 @@ the voices of those of his lighter brethren.  A deadly opponent.
 70 4900
 8 8 1
 BareHandAttack: 4
+BodyProfile: 1
 E
 #14008
 wyvern sentry wyv~
@@ -141,6 +146,7 @@ the air.
 100 10000
 8 8 2
 BareHandAttack: 8
+BodyProfile: 1
 E
 #14009
 wyvern royal attendant wyv~
@@ -174,6 +180,7 @@ room.  You represent no threat to such a creature.
 220 48400
 8 8 1
 BareHandAttack: 8
+BodyProfile: 1
 E
 #14011
 Wyvern wyv wizard~
@@ -189,6 +196,7 @@ shop.
 220 48400
 8 8 1
 BareHandAttack: 12
+BodyProfile: 1
 E
 #14012
 wyvern water worker wyv~
@@ -204,6 +212,7 @@ business?
 220 48400
 8 8 2
 BareHandAttack: 8
+BodyProfile: 1
 E
 #14013
 Wyvern wyv trader~
@@ -218,6 +227,7 @@ There is a shrewd look in his eye.  Looks like he drives a hard bargain.
 30 900
 8 8 1
 BareHandAttack: 8
+BodyProfile: 1
 E
 #14014
 wyvern weapon master wyv~
@@ -260,6 +270,7 @@ other hand maybe he's had a few too many of his customers.
 220 48400
 8 8 1
 BareHandAttack: 8
+BodyProfile: 1
 E
 #14017
 wyvern healer wyv~
@@ -275,5 +286,6 @@ that a smile on his face?  Or is he just thinking of how much he can charge you?
 220 48400
 8 8 1
 BareHandAttack: 4
+BodyProfile: 1
 E
 $

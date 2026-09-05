@@ -24,6 +24,7 @@ about.  It seems pretty serious about guarding this wagon...
 3 19 8 0d0+30 1d2+0
 30 900
 8 8 0
+BodyProfile: 1
 E
 #29602
 worker floor factory~
@@ -38,6 +39,7 @@ life, but not his dignity.
 1 20 9 0d0+10 1d2+0
 10 100
 8 8 1
+BodyProfile: 1
 E
 #29603
 turtle~
@@ -52,6 +54,7 @@ Poor thing!
 2 20 8 0d0+20 1d2+0
 20 400
 8 8 1
+BodyProfile: 2
 E
 #29604
 vending machine~
@@ -94,6 +97,7 @@ now is as good a time as any to goof off.
 1 20 9 0d0+10 1d2+0
 10 100
 8 8 1
+BodyProfile: 1
 E
 #29607
 secretary~
@@ -148,6 +152,7 @@ You feel for it, probably because of the fate that was intended for it...
 3 19 8 0d0+30 1d2+0
 30 900
 8 8 0
+BodyProfile: 0
 E
 #29611
 worker dock~
@@ -160,6 +165,7 @@ A Dock Worker moves big crates about here.
 2 20 8 0d0+20 1d2+0
 20 400
 8 8 1
+BodyProfile: 1
 E
 #29612
 worker maintenance~
@@ -173,5 +179,6 @@ absently.  Not a real rocket scientist here.
 3 19 8 0d0+30 1d2+0
 30 900
 8 8 1
+BodyProfile: 1
 E
 $

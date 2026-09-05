@@ -35,6 +35,7 @@ and black.
 4 19 7 0d0+40 1d2+0
 40 1600
 8 8 0
+BodyProfile: 3
 E
 #5003
 scorpion small~
@@ -47,6 +48,7 @@ A small, red scorpion scuttles away at your approach.
 3 19 8 0d0+30 1d2+0
 30 900
 8 8 0
+BodyProfile: 5
 E
 #5004
 worm giant purple~
@@ -59,6 +61,7 @@ A giant, purple sand worm thrusts up out of the sand and attacks!
 21 13 -2 4d4+210 3d3+3
 210 44100
 8 8 0
+BodyProfile: 3
 E
 T 5001
 #5005
@@ -72,6 +75,7 @@ A very large brass dragon steps out of the darkness and says 'Hello.'
 20 14 -2 4d4+200 3d3+3
 200 40000
 8 8 2
+BodyProfile: 6
 E
 T 5002
 #5006
@@ -86,6 +90,7 @@ engraved cutlass.  He has an especially haughty air about him.
 14 16 1 2d2+140 2d2+2
 140 19600
 6 6 1
+BodyProfile: 1
 E
 #5007
 nomad commander~
@@ -99,6 +104,7 @@ of silk and gold thread.  A nasty cutlass hangs at his side.
 12 16 2 2d2+120 2d2+2
 120 14400
 8 8 1
+BodyProfile: 1
 E
 #5008
 nomad warrior~
@@ -111,6 +117,7 @@ A proud nomad warrior stands here.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 1
+BodyProfile: 1
 E
 #5009
 slave young~
@@ -123,6 +130,7 @@ A young slave sits here staring at you with pleading eyes.
 3 19 8 0d0+30 1d2+0
 30 900
 5 5 2
+BodyProfile: 1
 E
 #5010
 dracolich lich~
@@ -162,6 +170,7 @@ A duergar is here mining precious stones with his pick.
 5 19 7 1d1+50 1d2+0
 50 2500
 8 8 1
+BodyProfile: 1
 E
 #5013
 myconoid~
@@ -214,5 +223,6 @@ many a horror story about experiences with camels.  Bad experiences.
 5 19 7 1d1+50 1d2+0
 50 2500
 8 8 0
+BodyProfile: 2
 E
 $

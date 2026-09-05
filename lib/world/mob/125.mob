@@ -10,6 +10,7 @@ there appears to be a hole in the trunk, possibly a nest of sorts.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 0
+BodyProfile: 14
 E
 #12501
 soldier hannah~
@@ -24,6 +25,7 @@ trouble and keeps an eye peeled to his surroundings, waiting for another attack.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 1
+BodyProfile: 1
 E
 #12502
 city guard~
@@ -38,6 +40,7 @@ taken refuge in the temple.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 1
+BodyProfile: 1
 Str: 25
 Dex: 20
 Int: 12
@@ -55,6 +58,7 @@ snout.  He roams the streets looking for something to pillage or rape.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 0
+BodyProfile: 1
 Str: 18
 Dex: 18
 Int: 25
@@ -72,6 +76,7 @@ large sack of goodies.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 1
+BodyProfile: 1
 Str: 25
 Dex: 25
 Int: 25
@@ -105,6 +110,7 @@ He tries to ignore you and get back to his work.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 2
+BodyProfile: 1
 E
 #12507
 troll crazed~
@@ -117,6 +123,7 @@ A crazed troll charges anything that moves.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 1
+BodyProfile: 1
 E
 #12508
 goblin smelly~
@@ -130,6 +137,7 @@ drools from its mouth.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 2
+BodyProfile: 1
 E
 #12509
 girl crying~
@@ -143,6 +151,7 @@ She looks up at you pitifully.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 2
+BodyProfile: 1
 E
 #12510
 homeless woman~
@@ -156,6 +165,7 @@ home and husband.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 2
+BodyProfile: 1
 E
 #12511
 broken man~
@@ -169,6 +179,7 @@ He just wants to know why.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 1
+BodyProfile: 1
 E
 #12512
 stray dog~
@@ -182,6 +193,7 @@ now.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 0
+BodyProfile: 2
 E
 #12513
 lost boy~
@@ -194,6 +206,7 @@ A boy is lost, from his family and friends.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 1
+BodyProfile: 1
 E
 #12562
 atropos~
@@ -234,6 +247,7 @@ of meat.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 1
+BodyProfile: 1
 E
 #12569
 ascepleptous~
@@ -260,6 +274,7 @@ herself.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 2
+BodyProfile: 1
 Str: 25
 Dex: 25
 Int: 25
@@ -277,6 +292,7 @@ the temple and slaughtering the entire city.  They are very respected.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 1
+BodyProfile: 1
 Str: 25
 Dex: 25
 Int: 12

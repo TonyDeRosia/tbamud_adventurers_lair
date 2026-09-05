@@ -9,6 +9,7 @@ It looks unfinished.
 0 20 10 1d1+0 1d1+0
 0 0
 8 8 0
+BodyProfile: 0
 E
 #1
 Puff dragon fractal~
@@ -23,6 +24,7 @@ calculus that she seems to be made out of?
 340 115600
 8 8 2
 BareHandAttack: 12
+BodyProfile: 6
 E
 #2
 cleric healer~
@@ -38,6 +40,7 @@ offers.
 34 9 -10 6d6+340 5d5+5
 340 115600
 8 8 2
+BodyProfile: 1
 E
 #3
 questmaster~
@@ -53,6 +56,7 @@ and says, 'Help autoquest should show you all you need to know'.
 34 9 -10 6d6+340 5d5+5
 340 115600
 8 8 1
+BodyProfile: 1
 E
 T 138
 T 139
@@ -71,6 +75,7 @@ offers.  Type 'heal <spell>' to buy one of her spells.
 34 9 -10 6d6+340 5d5+5
 340 115600
 8 8 2
+BodyProfile: 1
 E
 #5
 jack russell~
@@ -88,6 +93,7 @@ strain of terrier's notability and the name of our terrier today.
 3 19 8 0d0+30 1d2+0
 30 900
 8 8 1
+BodyProfile: 1
 E
 #6
 john russell~
@@ -104,6 +110,7 @@ terrier enthusiasts in England for more than 100 years.
 1 20 9 0d0+10 1d2+0
 10 100
 8 8 1
+BodyProfile: 1
 E
 #7
 jack russell terrier~
@@ -122,6 +129,7 @@ breed since.
 34 9 -10 6d6+340 5d5+5
 340 115600
 8 8 1
+BodyProfile: 2
 E
 #8
 wishbone~
@@ -138,6 +146,7 @@ books and plush toys.
 1 20 9 0d0+10 1d2+0
 10 100
 8 8 1
+BodyProfile: 2
 E
 #9
 sick looking dog~
@@ -151,6 +160,7 @@ very well.
 1 20 9 0d0+10 1d2+0
 10 100
 8 8 1
+BodyProfile: 2
 E
 T 95
 #10
@@ -178,6 +188,7 @@ walking corpse!  It must be a zombie or something of the sort.
 10 100
 8 8 0
 BareHandAttack: 7
+BodyProfile: 1
 E
 #12
 moose eddie~
@@ -194,6 +205,7 @@ sons, Enzo and Moosie.
 1 20 9 0d0+10 1d2+0
 10 100
 8 8 1
+BodyProfile: 2
 E
 #13
 kind soul~
@@ -224,6 +236,7 @@ and says, 'Are you up for a challenge? '
 30 10 -8 6d6+300 5d5+5
 300 90000
 8 8 2
+BodyProfile: 1
 E
 T 3
 T 1
@@ -255,6 +268,7 @@ trying to fly away.
 1 20 10 0d0+10 0d0+0
 10 100
 8 8 1
+BodyProfile: 1
 E
 T 2
 #17
@@ -303,6 +317,7 @@ of a cloud-like humanoid.
 1 20 9 0d0+10 1d2+0
 10 100
 8 8 0
+BodyProfile: 0
 E
 #20
 elemental~
@@ -316,6 +331,7 @@ patiently for something to occur.
 1 20 9 0d0+10 1d2+0
 10 100
 8 8 0
+BodyProfile: 0
 E
 #21
 Plato~
@@ -379,6 +395,7 @@ A simple bribe of about 10 gold is all it takes to get past them.
 34 9 -10 6d6+340 5d5+5
 340 115600
 8 8 1
+BodyProfile: 1
 E
 T 4
 T 5
@@ -396,6 +413,7 @@ or not you have done his quest. This way you can only do this quest once.
 1 20 9 0d0+10 1d2+0
 10 100
 8 8 1
+BodyProfile: 1
 E
 T 192
 T 191
@@ -437,6 +455,7 @@ longer attempted to use him.  He received the Medal of Honor for his actions.
 34 9 -10 6d6+340 5d5+5
 340 115600
 8 8 1
+BodyProfile: 1
 E
 T 187
 #28
@@ -472,6 +491,7 @@ emperor Domitian sometime between 89 and 95.
 34 9 -10 6d6+340 5d5+5
 340 115600
 8 8 1
+BodyProfile: 1
 E
 T 181
 #30
@@ -487,6 +507,7 @@ that do manage to come back are often damaged both physically and mentally.
 6 18 6 1d1+60 1d2+1
 60 3600
 8 8 2
+BodyProfile: 1
 E
 T 174
 #31
@@ -501,6 +522,7 @@ responsible for all interrogation and the propaganda it produces.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 1
+BodyProfile: 1
 E
 T 173
 T 72
@@ -562,6 +584,7 @@ hard day laying bricks and writing triggers.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 2
+BodyProfile: 1
 SavingPara: 2
 SavingRod: 2
 SavingPetri: 2
@@ -581,6 +604,7 @@ on a rare occasion does she sell anything useful.
 30 10 -8 6d6+300 5d5+5
 300 90000
 8 8 2
+BodyProfile: 1
 E
 T 98
 #99

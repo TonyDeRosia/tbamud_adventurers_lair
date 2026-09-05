@@ -10,6 +10,7 @@ poison bite of this snake has felled many a mighty pharaoh.
 5 19 7 1d1+50 1d2+0
 50 2500
 8 8 0
+BodyProfile: 3
 E
 T 5301
 #5301
@@ -25,6 +26,7 @@ strike.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 0
+BodyProfile: 3
 E
 T 5301
 #5302
@@ -65,6 +67,7 @@ A sneaky tomb thief moves about in search of treasure.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 1
+BodyProfile: 1
 E
 T 5303
 #5305
@@ -81,6 +84,7 @@ Someday he might get caught, but not today...
 18 14 0 3d3+180 3d3+3
 180 32400
 8 8 1
+BodyProfile: 1
 E
 T 5303
 #5306
@@ -109,6 +113,7 @@ animated by the distempered spirit of a long-deceased person.
 12 16 2 2d2+120 2d2+2
 120 14400
 8 8 0
+BodyProfile: 1
 E
 #5308
 sand man sandman~
@@ -261,6 +266,7 @@ chest not even moving to breathe.
 30 10 -8 6d6+300 5d5+5
 300 90000
 8 8 1
+BodyProfile: 1
 E
 T 5302
 $

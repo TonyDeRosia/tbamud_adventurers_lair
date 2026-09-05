@@ -12,6 +12,7 @@ friendly.
 300 90000
 8 8 1
 BareHandAttack: 13
+BodyProfile: 1
 Str: 16
 Dex: 16
 Int: 16
@@ -31,6 +32,7 @@ friendly.
 300 90000
 8 8 1
 BareHandAttack: 13
+BodyProfile: 1
 Str: 16
 Dex: 16
 Int: 16

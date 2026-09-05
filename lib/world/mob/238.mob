@@ -10,6 +10,7 @@ A large fish swims here.
 220 48400
 8 8 0
 BareHandAttack: 4
+BodyProfile: 13
 E
 #23833
 swordfish fish~
@@ -24,6 +25,7 @@ you.
 220 48400
 8 8 0
 BareHandAttack: 14
+BodyProfile: 13
 E
 #23841
 Monster~
@@ -60,6 +62,7 @@ energy and appears to have been running in circles for hours.
 220 48400
 8 8 0
 BareHandAttack: 8
+BodyProfile: 2
 Str: 3
 Dex: 4
 Int: 4
@@ -97,6 +100,7 @@ add you.
 240 57600
 8 8 0
 BareHandAttack: 4
+BodyProfile: 5
 E
 #23855
 man~
@@ -113,6 +117,7 @@ makes you wonder can this guy be serious.
 260 67600
 8 8 1
 BareHandAttack: 11
+BodyProfile: 1
 Str: 5
 Dex: 14
 Int: 20
@@ -130,6 +135,7 @@ A large troll with markings of some king of clan stands here.
 260 67600
 8 8 1
 BareHandAttack: 13
+BodyProfile: 1
 Str: 20
 Dex: 10
 Int: 20
@@ -156,6 +162,7 @@ intrusion rather seems glad you came.
 260 67600
 8 8 2
 BareHandAttack: 12
+BodyProfile: 1
 E
 #23875
 dragon~
@@ -171,6 +178,7 @@ made of crystal.
 260 67600
 5 5 1
 BareHandAttack: 8
+BodyProfile: 6
 Str: 18
 Dex: 3
 Int: 13
@@ -188,6 +196,7 @@ are slightly glowing.  The fish swims here unaware of your entrance.
 25 12 -5 5d5+250 4d4+4
 250 62500
 8 8 0
+BodyProfile: 13
 E
 #23877
 bird~
@@ -201,6 +210,7 @@ flying around very fast making it hard for you to keep up with.
 22 13 -3 4d4+220 3d3+3
 220 48400
 8 8 2
+BodyProfile: 4
 Str: 3
 Dex: 20
 Int: 3
@@ -220,6 +230,7 @@ to have been eaten.
 220 48400
 8 8 0
 BareHandAttack: 1
+BodyProfile: 16
 E
 #23879
 duck~
@@ -234,6 +245,7 @@ the duck seems to be cleaner than the rest.
 24 12 -4 4d4+240 4d4+4
 240 57600
 8 8 0
+BodyProfile: 4
 E
 #23880
 swallow~

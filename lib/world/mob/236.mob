@@ -11,6 +11,7 @@ because he's expendable - the stonewright wasn't...
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 1
+BodyProfile: 1
 E
 #23602
 weaponsmith assistant trader~
@@ -26,6 +27,7 @@ worth a dime a dozen.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 1
+BodyProfile: 1
 E
 #23603
 armorsmith assistant trader~
@@ -44,6 +46,7 @@ the armor in your size too.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 1
+BodyProfile: 1
 E
 #23604
 trade guard~
@@ -58,6 +61,7 @@ trouble with the likes of you.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 1
+BodyProfile: 1
 E
 #23605
 guard trade~
@@ -72,6 +76,7 @@ if needed.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 1
+BodyProfile: 1
 E
 #23606
 guard trade sergeant dwarf~
@@ -88,6 +93,7 @@ going.  He still keeps his poor men busy, though.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 1
+BodyProfile: 1
 E
 #23607
 gateguard guard dwarven~
@@ -102,6 +108,7 @@ tried to walk by him, but just throw you back from where you came.
 14 16 1 2d2+140 2d2+2
 140 19600
 8 8 1
+BodyProfile: 1
 E
 #23608
 gateguard lieutenant dwarven guard leader~
@@ -118,6 +125,7 @@ interested.
 14 16 1 2d2+140 2d2+2
 140 19600
 8 8 1
+BodyProfile: 1
 E
 T 23612
 T 23613
@@ -137,6 +145,7 @@ masters of forgery, Torg himself.
 14 16 1 2d2+140 2d2+2
 140 19600
 8 8 1
+BodyProfile: 1
 E
 #23610
 ralf armorsmith dwarven~
@@ -154,6 +163,7 @@ rather than weaken it.
 14 16 1 2d2+140 2d2+2
 140 19600
 8 8 1
+BodyProfile: 1
 E
 #23611
 stonewright dwarven~
@@ -169,6 +179,7 @@ nothing is removed from his workshop.
 14 16 1 2d2+140 2d2+2
 140 19600
 8 8 1
+BodyProfile: 1
 E
 #23612
 foreman dwarf miner~
@@ -182,6 +193,7 @@ away !'
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 1
+BodyProfile: 1
 E
 #23613
 spider small~
@@ -196,6 +208,7 @@ baby spider.
 30 900
 8 8 0
 BareHandAttack: 1
+BodyProfile: 5
 E
 #23614
 spider large~
@@ -209,6 +222,7 @@ A large spider has decided that your middle name is 'lunch'.
 100 10000
 8 8 0
 BareHandAttack: 1
+BodyProfile: 5
 E
 #23615
 guard dwarf~
@@ -223,6 +237,7 @@ just like a log...
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 1
+BodyProfile: 1
 E
 #23616
 guard sergeant dwarf~
@@ -237,6 +252,7 @@ would be such a good idea.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 1
+BodyProfile: 1
 E
 #23617
 guard lieutenant dwarf~
@@ -253,6 +269,7 @@ promotion.
 14 16 1 2d2+140 2d2+2
 140 19600
 8 8 1
+BodyProfile: 1
 E
 #23618
 captain guard dwarf~
@@ -267,6 +284,7 @@ arms suggest he is ready for combat, should it be necessary.
 14 16 1 2d2+140 2d2+2
 140 19600
 8 8 1
+BodyProfile: 1
 E
 #23619
 prince dwarf~
@@ -281,6 +299,7 @@ beat the living crap out of you.
 14 16 1 2d2+140 2d2+2
 140 19600
 4 4 1
+BodyProfile: 1
 E
 #23620
 trade minister dwarf~
@@ -295,6 +314,7 @@ price, while selling his own goods more and more expensively.
 14 16 1 2d2+140 2d2+2
 140 19600
 6 6 1
+BodyProfile: 1
 E
 #23621
 dwarf cleric~
@@ -310,6 +330,7 @@ younger...  '
 14 16 1 2d2+140 2d2+2
 140 19600
 8 8 1
+BodyProfile: 1
 E
 T 23600
 #23622
@@ -327,6 +348,7 @@ intentions, force him to understand yours.
 14 16 1 2d2+140 2d2+2
 140 19600
 6 6 1
+BodyProfile: 1
 E
 #23623
 dwarf male~
@@ -340,6 +362,7 @@ saw one.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 1
+BodyProfile: 1
 E
 T 23604
 #23624
@@ -355,6 +378,7 @@ there.  Obviously a dwarf.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 2
+BodyProfile: 1
 E
 T 23604
 #23625
@@ -370,6 +394,7 @@ not had all the training his father has.  He can strike you back, though.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 1
+BodyProfile: 1
 E
 #23626
 dwarf miner aggressive~
@@ -384,6 +409,7 @@ lately.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 2
+BodyProfile: 1
 E
 #23627
 dwarf miner~
@@ -397,6 +423,7 @@ walking around in the mines he almost needs no light.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 1
+BodyProfile: 1
 E
 T 23608
 #23628
@@ -414,6 +441,7 @@ him...
 100 10000
 8 8 1
 BareHandAttack: 13
+BodyProfile: 1
 E
 T 23605
 $

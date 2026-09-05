@@ -12,6 +12,7 @@ thin lines on the sides of his head.
 34 9 -10 6d6+340 5d5+5
 340 115600
 8 8 1
+BodyProfile: 1
 E
 #30801
 melinna cailvah's wife baroness~
@@ -27,6 +28,7 @@ continue his studies without significant interruption.
 34 9 -10 6d6+340 5d5+5
 340 115600
 8 8 2
+BodyProfile: 1
 E
 #30802
 gilzaan son eldest~
@@ -42,6 +44,7 @@ men of the area that he can.
 34 9 -10 6d6+340 5d5+5
 340 115600
 8 8 1
+BodyProfile: 1
 E
 #30803
 necromocis son younger~
@@ -57,6 +60,7 @@ certainly go on even after his father has passed on.
 33 9 -9 6d6+330 5d5+5
 330 108900
 8 8 1
+BodyProfile: 1
 E
 #30804
 astronomer court~
@@ -84,6 +88,7 @@ brush the back of his coat.
 25 12 -5 5d5+250 4d4+4
 250 62500
 8 8 1
+BodyProfile: 1
 E
 #30806
 man robed~
@@ -98,6 +103,7 @@ radiates a very mysterious aura.
 33 9 -9 6d6+330 5d5+5
 330 108900
 8 8 1
+BodyProfile: 1
 E
 #30807
 petitioner humble~
@@ -138,6 +144,7 @@ nervous anticipation.
 28 11 -6 5d5+280 4d4+4
 280 78400
 8 8 1
+BodyProfile: 1
 E
 #30810
 assistant lab~
@@ -164,6 +171,7 @@ certainly seems to take his job very seriously.
 32 10 -9 6d6+320 5d5+5
 320 102400
 8 8 1
+BodyProfile: 1
 E
 #30812
 maid chamber~
@@ -177,6 +185,7 @@ great deal.  She apparent hasn't noticed your entry into the room.
 31 10 -8 6d6+310 5d5+5
 310 96100
 8 8 2
+BodyProfile: 1
 E
 #30813
 cousin visiting~
@@ -218,6 +227,7 @@ fat cow chewing grass.
 25 12 -5 5d5+250 4d4+4
 250 62500
 8 8 0
+BodyProfile: 2
 E
 #30816
 wife housewife busy~
@@ -243,6 +253,7 @@ clothing that smells of cow.
 28 11 -6 5d5+280 4d4+4
 280 78400
 8 8 1
+BodyProfile: 1
 E
 #30818
 woodsman lounging~
@@ -269,6 +280,7 @@ there, mouth half open and quiet.
 26 12 -5 5d5+260 4d4+4
 260 67600
 8 8 1
+BodyProfile: 1
 E
 #30820
 housewife wife quiet~
@@ -294,6 +306,7 @@ his face.
 27 11 -6 5d5+270 4d4+4
 270 72900
 8 8 1
+BodyProfile: 1
 E
 #30822
 marm school~
@@ -320,6 +333,7 @@ down, relax a while and enjoy a fine meal.
 31 10 -8 6d6+310 5d5+5
 310 96100
 8 8 1
+BodyProfile: 1
 E
 #30824
 man storyteller expansive~
@@ -334,6 +348,7 @@ tale in itself, but it matters little - the stories are all good.
 30 10 -8 6d6+300 5d5+5
 300 90000
 8 8 1
+BodyProfile: 1
 E
 #30825
 man lounging~
@@ -347,6 +362,7 @@ Hall's finest after a long day's work.
 30 10 -8 6d6+300 5d5+5
 300 90000
 8 8 1
+BodyProfile: 1
 E
 #30826
 man gentleman well dressed~
@@ -360,6 +376,7 @@ anyone.  He is obviously not a local.
 33 9 -9 6d6+330 5d5+5
 330 108900
 8 8 1
+BodyProfile: 1
 E
 #30827
 woman flirtatious~
@@ -373,6 +390,7 @@ as much of her bosom as she might be able to.
 32 10 -9 6d6+320 5d5+5
 320 102400
 8 8 2
+BodyProfile: 1
 E
 #30828
 Calintra herbalist~
@@ -387,6 +405,7 @@ grinds the herbs, causing her to brush it back with her fingers every so often.
 27 11 -6 5d5+270 4d4+4
 270 72900
 8 8 2
+BodyProfile: 1
 E
 #30829
 salaylia kind woman~
@@ -400,6 +419,7 @@ toward an empty table.
 25 12 -5 5d5+250 4d4+4
 250 62500
 8 8 2
+BodyProfile: 1
 E
 #30830
 smithy man~
@@ -414,6 +434,7 @@ it.
 30 10 -8 6d6+300 5d5+5
 300 90000
 8 8 1
+BodyProfile: 1
 E
 #30831
 apothecary master~
@@ -482,6 +503,7 @@ vigor.
 27 11 -6 5d5+270 4d4+4
 270 72900
 8 8 1
+BodyProfile: 1
 E
 #30836
 young lass~

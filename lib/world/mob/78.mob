@@ -10,6 +10,7 @@ quietly to herself.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 2
+BodyProfile: 1
 E
 #7802
 Stamnell Baker~
@@ -23,6 +24,7 @@ of flour in it, but he doesn't seem to mind.
 14 16 1 2d2+140 2d2+2
 140 19600
 8 8 1
+BodyProfile: 1
 E
 #7803
 Vhispera shopkeeper~
@@ -36,6 +38,7 @@ plain to look at but she smiles at you warmly.
 14 16 1 2d2+140 2d2+2
 140 19600
 8 8 2
+BodyProfile: 1
 E
 #7804
 human boy~
@@ -51,6 +54,7 @@ better days.
 70 4900
 8 8 1
 BareHandAttack: 13
+BodyProfile: 1
 E
 T 7804
 T 7805
@@ -68,6 +72,7 @@ profession.  His eyes are darting about on constant watch for trouble.
 70 4900
 8 8 1
 BareHandAttack: 7
+BodyProfile: 1
 E
 #7806
 village fool~
@@ -83,6 +88,7 @@ way.
 70 4900
 8 8 1
 BareHandAttack: 7
+BodyProfile: 1
 E
 #7807
 elven gardner~
@@ -97,6 +103,7 @@ his way.
 70 4900
 8 8 1
 BareHandAttack: 13
+BodyProfile: 1
 E
 #7808
 human servant~
@@ -109,6 +116,7 @@ A human servant stands here.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 2
+BodyProfile: 1
 E
 #7809
 husky hunter~
@@ -123,6 +131,7 @@ blood from his constant hunting.
 70 4900
 8 8 1
 BareHandAttack: 7
+BodyProfile: 1
 E
 #7810
 elven healer~
@@ -136,5 +145,6 @@ Maybe she will have enough time to teach you.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 2
+BodyProfile: 1
 E
 $

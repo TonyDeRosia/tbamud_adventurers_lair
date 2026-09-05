@@ -9,6 +9,7 @@ Mud, mineral crust, and broken fragments of ancient masonry have gathered into a
 8 15 0 2d6+213 1d5+2
 120 0
 6 8 0
+BodyProfile: 1
 SavingPara: 2
 SavingRod: 2
 SavingPetri: 2
@@ -30,6 +31,7 @@ This dark-furred bat has adapted to the buried halls of the Old Delve. It is lit
 1 18 0 2d6+8 1d2+0
 10 0
 4 8 0
+BodyProfile: 19
 Wimpy: 1
 GoldMin: 1
 GoldMax: 1
@@ -45,6 +47,7 @@ The rat is broad-bodied and scarred from life beneath the city. Damp gray fur cl
 3 17 0 2d6+33 1d3+1
 50 0
 8 8 0
+BodyProfile: 2
 Wimpy: 1
 Evasion: 1
 GoldMin: 2
@@ -61,6 +64,7 @@ This hand-sized spider has spun a thick web across cracks in the ancient masonry
 1 18 0 2d6+8 1d2+0
 10 0
 8 8 0
+BodyProfile: 5
 Wimpy: 1
 GoldMin: 1
 GoldMax: 1
@@ -76,6 +80,7 @@ Plates of dark shell cover this oversized beetle like fitted armor. Dust and min
 5 17 0 2d6+83 1d4+1
 80 0
 4 8 0
+BodyProfile: 9
 SavingPara: 1
 SavingRod: 1
 SavingPetri: 1
@@ -97,6 +102,7 @@ The bloated larva feeds on fungus, rot, and whatever else washes into the buried
 2 18 0 2d6+18 1d3+0
 30 0
 8 8 0
+BodyProfile: 3
 Wimpy: 1
 GoldMin: 1
 GoldMax: 2
@@ -129,6 +135,7 @@ A torn gray cloak hangs from this exhausted adventurer. Old Guild trail marks ha
 6 16 0 2d6+113 1d4+2
 100 0
 8 8 1
+BodyProfile: 1
 SavingPara: 1
 SavingRod: 1
 SavingPetri: 1
@@ -214,6 +221,7 @@ This scarred red-scaled drake is smaller than the great dragons of legend but st
 10 14 0 2d6+313 1d6+3
 190 0
 8 8 0
+BodyProfile: 6
 SavingPara: 2
 SavingRod: 2
 SavingPetri: 2
@@ -256,6 +264,7 @@ Green-gold scales cover the naga's serpentine body, patterned with silver triang
 8 15 0 2d6+213 1d5+2
 120 0
 8 8 2
+BodyProfile: 1
 SavingPara: 2
 SavingRod: 2
 SavingPetri: 2

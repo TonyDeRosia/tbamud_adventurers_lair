@@ -10,6 +10,7 @@ A butler walks up to you and states, 'please follow me, sir.'
 200 40000
 8 8 1
 BareHandAttack: 10
+BodyProfile: 1
 E
 #26101
 five headed demon~
@@ -36,6 +37,7 @@ A man sits here, chatting happily with a handsome older woman.
 14 16 1 2d2+140 2d2+2
 140 19600
 6 6 1
+BodyProfile: 1
 E
 #26103
 woman~
@@ -48,6 +50,7 @@ A woman sits here, chatting with a young man.
 18 14 0 3d3+180 3d3+3
 180 32400
 6 6 2
+BodyProfile: 1
 E
 #26104
 man balding~
@@ -60,6 +63,7 @@ A balding man sits in a recliner, feet up, before the fire.
 19 14 -1 3d3+190 3d3+3
 190 36100
 6 6 1
+BodyProfile: 1
 E
 #26105
 servant~
@@ -72,6 +76,7 @@ A servant walks by, stiff backed and formal.
 18 14 0 3d3+180 3d3+3
 180 32400
 8 8 1
+BodyProfile: 1
 E
 #26106
 maid~
@@ -84,6 +89,7 @@ A maid walks by, ignoring you and all others as she goes about her business.
 18 14 0 3d3+180 3d3+3
 180 32400
 8 8 2
+BodyProfile: 1
 E
 #26107
 cook~
@@ -99,6 +105,7 @@ were decorations from battles past.
 190 36100
 8 8 2
 BareHandAttack: 5
+BodyProfile: 1
 E
 #26108
 maid fat~
@@ -112,6 +119,7 @@ her time.
 1 20 9 0d0+10 1d2+0
 10 100
 8 8 2
+BodyProfile: 1
 E
 #26109
 thing~
@@ -151,6 +159,7 @@ thing isn't what it seems?
 50 2500
 8 8 1
 BareHandAttack: 4
+BodyProfile: 2
 E
 #26113
 man naked~
@@ -163,6 +172,7 @@ The man jumps up from the bed and although he has not a stitch on him, attacks!
 20 14 -2 4d4+200 3d3+3
 200 40000
 8 8 1
+BodyProfile: 1
 E
 #26114
 woman cowering~
@@ -175,6 +185,7 @@ The woman simply tries to cover herself under the blankets.
 6 18 6 1d1+60 1d2+1
 60 3600
 6 6 2
+BodyProfile: 1
 E
 #26115
 vampiress~
@@ -240,6 +251,7 @@ whoop your ass.
 300 90000
 8 8 0
 BareHandAttack: 8
+BodyProfile: 6
 E
 #26120
 martin~

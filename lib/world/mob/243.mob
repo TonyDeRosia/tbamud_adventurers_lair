@@ -30,6 +30,7 @@ another skull has grown out of his shoulder.  Scary!
 70 4900
 8 8 1
 BareHandAttack: 6
+BodyProfile: 1
 Str: 12
 Dex: 12
 Int: 12
@@ -104,6 +105,7 @@ and beards, and they're fairly fat too.  Your typical grandmother character.
 9 17 4 1d1+90 1d2+1
 90 8100
 8 8 1
+BodyProfile: 1
 Str: 20
 Dex: 20
 Int: 20
@@ -121,6 +123,7 @@ pair of skis, he's blabbing on his cell phone with another customer.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 1
+BodyProfile: 1
 E
 #24307
 yeti~
@@ -154,5 +157,6 @@ hard life.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 1
+BodyProfile: 1
 E
 $

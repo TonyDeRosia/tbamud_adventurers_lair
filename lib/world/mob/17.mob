@@ -12,6 +12,7 @@ squire.
 100 10000
 8 8 1
 BareHandAttack: 11
+BodyProfile: 1
 E
 #1701
 knight quality~
@@ -25,6 +26,7 @@ A knight of quality looks down upon you from his mount.
 100 10000
 8 8 1
 BareHandAttack: 11
+BodyProfile: 1
 E
 #1702
 king arthur~
@@ -40,6 +42,7 @@ strange looking sheath.
 140 19600
 8 8 1
 BareHandAttack: 3
+BodyProfile: 1
 E
 #1703
 serf~
@@ -54,6 +57,7 @@ A dirty serf shuffles along here.
 100 10000
 8 8 2
 BareHandAttack: 13
+BodyProfile: 1
 E
 #1704
 squire~
@@ -67,6 +71,7 @@ A squire is here on an errand from his lord.
 100 10000
 8 8 1
 BareHandAttack: 11
+BodyProfile: 1
 E
 #1705
 black knight~
@@ -81,6 +86,7 @@ two handed sword.
 140 19600
 8 8 1
 BareHandAttack: 10
+BodyProfile: 1
 E
 #1706
 lamorak knight~
@@ -96,6 +102,7 @@ mounted.
 100 10000
 8 8 1
 BareHandAttack: 3
+BodyProfile: 1
 E
 #1707
 lancelot~
@@ -125,6 +132,7 @@ and twisted body.
 140 19600
 8 8 2
 BareHandAttack: 5
+BodyProfile: 1
 E
 #1709
 lady~
@@ -140,6 +148,7 @@ in her hair.
 100 10000
 8 8 2
 BareHandAttack: 8
+BodyProfile: 1
 E
 #1710
 queen guinevere~
@@ -153,6 +162,7 @@ A raven haired queen winks at you from behind her fan.
 140 19600
 8 8 2
 BareHandAttack: 8
+BodyProfile: 1
 E
 #1711
 nobleman~
@@ -182,6 +192,7 @@ A brightly clothed merchant hawks his goods to you!
 100 10000
 8 8 1
 BareHandAttack: 5
+BodyProfile: 1
 E
 #1713
 monk~
@@ -196,6 +207,7 @@ piece of rope.  The top of his head is shaved in the Fransician fashion.
 100 10000
 8 8 1
 BareHandAttack: 7
+BodyProfile: 1
 E
 #1714
 troubadour~
@@ -209,6 +221,7 @@ A troubadour is here, strumming a merry tune.
 100 10000
 8 8 2
 BareHandAttack: 5
+BodyProfile: 1
 E
 #1715
 bard~
@@ -223,6 +236,7 @@ shirt.
 140 19600
 8 8 1
 BareHandAttack: 12
+BodyProfile: 1
 E
 #1716
 entertainer~
@@ -237,6 +251,7 @@ progression.
 100 10000
 8 8 1
 BareHandAttack: 8
+BodyProfile: 1
 E
 #1717
 servant~
@@ -250,6 +265,7 @@ A servant is rushing by
 100 10000
 8 8 1
 BareHandAttack: 13
+BodyProfile: 1
 E
 #1718
 stablehand~
@@ -264,6 +280,7 @@ has a piece of straw between his teeth.
 140 19600
 8 8 1
 BareHandAttack: 13
+BodyProfile: 1
 E
 #1719
 stirrup~
@@ -291,6 +308,7 @@ speed.
 100 10000
 8 8 0
 BareHandAttack: 4
+BodyProfile: 2
 E
 #1721
 horse warhorse~
@@ -305,6 +323,7 @@ trained and waits patiently to be taken out of its stall.
 140 19600
 8 8 0
 BareHandAttack: 4
+BodyProfile: 2
 E
 #1722
 horse warhorse~
@@ -318,6 +337,7 @@ A heavy warhorse paws the ground and snorts in preparation for battle!
 140 19600
 8 8 0
 BareHandAttack: 10
+BodyProfile: 2
 E
 #1723
 slave~
@@ -331,6 +351,7 @@ station and bearing.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 2
+BodyProfile: 1
 E
 #1724
 scot clan chief~
@@ -347,6 +368,7 @@ barrel of ale and still have his whiskey.  He looks...
 140 19600
 8 8 1
 BareHandAttack: 9
+BodyProfile: 1
 E
 #1725
 scottish clansmen~
@@ -362,6 +384,7 @@ about four feet long.
 100 10000
 8 8 1
 BareHandAttack: 3
+BodyProfile: 1
 E
 #1726
 spectator~
@@ -377,6 +400,7 @@ very much into the game and seems to have the hots for one of the jousters.
 100 10000
 8 8 2
 BareHandAttack: 13
+BodyProfile: 1
 E
 #1727
 sheep~
@@ -391,6 +415,7 @@ A sheep is grazing here.
 100 10000
 8 8 0
 BareHandAttack: 4
+BodyProfile: 2
 E
 #1728
 ram~
@@ -404,6 +429,7 @@ A ram is guarding his flock.
 100 10000
 8 8 1
 BareHandAttack: 9
+BodyProfile: 2
 E
 #1729
 ox~
@@ -418,6 +444,7 @@ day.
 140 19600
 8 8 0
 BareHandAttack: 6
+BodyProfile: 2
 E
 #1730
 archbishop bishop~
@@ -432,6 +459,7 @@ him most of his life.
 140 19600
 8 8 0
 BareHandAttack: 10
+BodyProfile: 1
 E
 #1731
 goat~
@@ -445,6 +473,7 @@ A goat with some wicked looking horns is about to charge.
 100 10000
 8 8 0
 BareHandAttack: 4
+BodyProfile: 2
 E
 #1732
 mule~
@@ -458,6 +487,7 @@ A stubborn mule is standing in your way.
 100 10000
 8 8 0
 BareHandAttack: 4
+BodyProfile: 2
 E
 #1733
 cow~
@@ -472,6 +502,7 @@ are everywhere.  You try to keep your distance.
 100 10000
 8 8 0
 BareHandAttack: 4
+BodyProfile: 2
 E
 #1734
 shepherd~
@@ -498,6 +529,7 @@ A sheep dog barks at you playfully.
 100 10000
 8 8 0
 BareHandAttack: 4
+BodyProfile: 2
 E
 #1736
 farmer~
@@ -512,6 +544,7 @@ little money.
 100 10000
 8 8 1
 BareHandAttack: 13
+BodyProfile: 1
 E
 #1737
 guard~
@@ -524,5 +557,6 @@ A guard is protecting the city.
 14 16 1 2d2+140 2d2+2
 140 19600
 8 8 1
+BodyProfile: 1
 E
 $

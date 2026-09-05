@@ -11,6 +11,7 @@ meat on her!  And look at them tits!
 150 22500
 8 8 2
 BareHandAttack: 6
+BodyProfile: 2
 E
 #32401
 bull~
@@ -25,6 +26,7 @@ never get in front of one.  So where does that leave?
 170 28900
 8 8 1
 BareHandAttack: 9
+BodyProfile: 2
 E
 #32402
 horse war~
@@ -39,6 +41,7 @@ him.  Beware his kicking hooves!
 160 25600
 8 8 1
 BareHandAttack: 6
+BodyProfile: 2
 E
 #32403
 horse work~
@@ -52,6 +55,7 @@ A sturdy work horse grazes the tall grass.
 130 16900
 8 8 2
 BareHandAttack: 5
+BodyProfile: 2
 E
 #32404
 forge master smith~
@@ -103,6 +107,7 @@ his work a bit.
 18 14 0 3d3+180 3d3+3
 180 32400
 8 8 1
+BodyProfile: 1
 E
 #32408
 soldier sweating grunting~
@@ -116,6 +121,7 @@ is enjoying his labors.
 16 15 0 3d3+160 2d2+2
 160 25600
 8 8 1
+BodyProfile: 1
 E
 #32409
 soldier brander~
@@ -129,6 +135,7 @@ bit too much.
 19 14 -1 3d3+190 3d3+3
 190 36100
 8 8 1
+BodyProfile: 1
 E
 #32410
 soldier rustler~
@@ -141,6 +148,7 @@ A soldier rustles a cow into a prone position so that the brander might place hi
 20 14 -2 4d4+200 3d3+3
 200 40000
 8 8 1
+BodyProfile: 1
 E
 #32411
 soldier footman~
@@ -166,6 +174,7 @@ a soldier might go to to obtain his approval.
 25 12 -5 5d5+250 4d4+4
 250 62500
 8 8 1
+BodyProfile: 1
 E
 #32413
 soldier patrolman~
@@ -179,6 +188,7 @@ his rounds.
 21 13 -2 4d4+210 3d3+3
 210 44100
 8 8 1
+BodyProfile: 1
 E
 #32414
 soldier scout~
@@ -192,6 +202,7 @@ forest.
 23 13 -3 4d4+230 3d3+3
 230 52900
 8 8 1
+BodyProfile: 1
 E
 #32415
 surgeon soldier~
@@ -205,6 +216,7 @@ surgeons.
 17 15 0 3d3+170 2d2+2
 170 28900
 8 8 1
+BodyProfile: 1
 E
 #32416
 medic soldier~
@@ -243,6 +255,7 @@ A wounded soldier limps past.
 13 16 2 2d2+130 2d2+2
 130 16900
 8 8 1
+BodyProfile: 1
 E
 #32419
 officer soldier cavalry~
@@ -256,6 +269,7 @@ saddle than on his feet.
 23 13 -3 4d4+230 3d3+3
 230 52900
 8 8 1
+BodyProfile: 1
 E
 #32420
 soldier~
@@ -269,6 +283,7 @@ Army's ranks are very unfair.
 12 16 2 2d2+120 2d2+2
 120 14400
 8 8 1
+BodyProfile: 1
 E
 #32421
 soldier squatting~
@@ -282,5 +297,6 @@ would intrude on one in such a place!
 16 15 0 3d3+160 2d2+2
 160 25600
 8 8 1
+BodyProfile: 1
 E
 $

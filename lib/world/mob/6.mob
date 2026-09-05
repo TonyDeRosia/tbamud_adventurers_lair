@@ -39,6 +39,7 @@ is quite ugly, and could easily scare her enemies away.
 110 12100
 8 8 2
 BareHandAttack: 4
+BodyProfile: 10
 E
 #611
 crab~
@@ -53,6 +54,7 @@ provoked him.  His eyes are small and black, almost like death.
 110 12100
 8 8 1
 BareHandAttack: 8
+BodyProfile: 16
 E
 #612
 seagull bird~
@@ -66,6 +68,7 @@ dirt.
 12 16 2 2d2+120 2d2+2
 120 14400
 8 8 2
+BodyProfile: 4
 E
 #613
 water snake~
@@ -80,6 +83,7 @@ harmless, but looks can be deceiving.
 130 16900
 8 8 1
 BareHandAttack: 5
+BodyProfile: 3
 E
 #619
 mosquito~
@@ -94,6 +98,7 @@ How revolting!
 140 19600
 8 8 0
 BareHandAttack: 4
+BodyProfile: 10
 E
 #622
 parrot bird polly~
@@ -108,6 +113,7 @@ such a beautiful bird would be on such a small island like this.
 150 22500
 8 8 1
 BareHandAttack: 8
+BodyProfile: 4
 E
 T 600
 T 601
@@ -124,6 +130,7 @@ small, but can move quite fast.
 140 19600
 8 8 2
 BareHandAttack: 10
+BodyProfile: 16
 E
 #627
 lobster~
@@ -137,6 +144,7 @@ A mean looking lobster is here.
 130 16900
 8 8 1
 BareHandAttack: 4
+BodyProfile: 16
 E
 #632
 sparrow bird~
@@ -151,6 +159,7 @@ glistening in the sunlight.
 130 16900
 8 8 2
 BareHandAttack: 8
+BodyProfile: 4
 E
 #634
 waitress~
@@ -165,6 +174,7 @@ most friendliest smile you have ever seen.
 250 62500
 8 8 2
 BareHandAttack: 12
+BodyProfile: 1
 E
 #635
 herman~
@@ -194,6 +204,7 @@ condition.
 150 22500
 8 8 2
 BareHandAttack: 4
+BodyProfile: 5
 E
 #643
 snake rattlesnake~
@@ -208,6 +219,7 @@ Maybe you should just leave it alone.
 150 22500
 8 8 1
 BareHandAttack: 9
+BodyProfile: 3
 E
 #644
 wasp~
@@ -222,6 +234,7 @@ dive into your skin!
 130 16900
 8 8 0
 BareHandAttack: 1
+BodyProfile: 10
 E
 #648
 scorpion~
@@ -236,6 +249,7 @@ should be the least of your worries.
 130 16900
 8 8 2
 BareHandAttack: 1
+BodyProfile: 5
 E
 #649
 scorpion queen~
@@ -250,6 +264,7 @@ instead of one!  Maybe you should stay away.
 140 19600
 8 8 2
 BareHandAttack: 1
+BodyProfile: 5
 E
 #650
 scorpion leader~
@@ -264,6 +279,7 @@ run through you.  Maybe you shouldn't have come here.
 150 22500
 8 8 1
 BareHandAttack: 1
+BodyProfile: 5
 E
 #664
 dragon earth~
@@ -278,6 +294,7 @@ feel like someone's lunch.
 150 22500
 8 8 0
 BareHandAttack: 8
+BodyProfile: 6
 E
 #665
 purple dragon~
@@ -292,6 +309,7 @@ Purple dragon is here.
 150 22500
 8 8 0
 BareHandAttack: 11
+BodyProfile: 6
 E
 #671
 dragon ice~
@@ -306,6 +324,7 @@ ice hanging off her scales.
 140 19600
 8 8 2
 BareHandAttack: 4
+BodyProfile: 6
 E
 #678
 polar bear~
@@ -320,6 +339,7 @@ stained with blood.
 130 16900
 8 8 1
 BareHandAttack: 8
+BodyProfile: 2
 E
 #679
 penguin~
@@ -334,6 +354,7 @@ A cute penguin is here.
 120 14400
 8 8 0
 BareHandAttack: 4
+BodyProfile: 4
 E
 #683
 bear~
@@ -347,6 +368,7 @@ A bear is standing in front of you.
 140 19600
 8 8 1
 BareHandAttack: 9
+BodyProfile: 2
 E
 #684
 fox~
@@ -361,5 +383,6 @@ notice a large scar down the side of its stomach.
 110 12100
 8 8 1
 BareHandAttack: 8
+BodyProfile: 2
 E
 $

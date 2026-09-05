@@ -29,6 +29,7 @@ killer.
 7 18 6 10d7+70 2d5+1
 100 3000
 8 8 0
+BodyProfile: 0
 E
 #34502
 doctor man red~
@@ -45,6 +46,7 @@ white lab coat that is now almost red wit the stains of blood.
 100 10000
 8 8 1
 BareHandAttack: 14
+BodyProfile: 1
 E
 T 34504
 T 34505

@@ -10,6 +10,7 @@ An Elven Guardian is standing here guarding the portal.
 16 15 0 3d3+160 2d2+2
 160 25600
 8 8 1
+BodyProfile: 1
 E
 #24802
 Elf Soldier guard elven~
@@ -23,6 +24,7 @@ guard the path from any intruder not wanted here.
 16 15 0 3d3+160 2d2+2
 160 25600
 8 8 1
+BodyProfile: 1
 E
 #24803
 Elf Soldier guard elven~
@@ -36,6 +38,7 @@ guard the village from unwanted intruders.
 15 15 1 3d3+150 2d2+2
 150 22500
 8 8 2
+BodyProfile: 1
 E
 #24804
 Elf weaponsmith smith elven~
@@ -48,6 +51,7 @@ A Large Elven weaponsmith is walking behind the counter.
 17 15 0 3d3+170 2d2+2
 170 28900
 8 8 1
+BodyProfile: 1
 E
 #24805
 Elf armorsmith smith elven~
@@ -60,6 +64,7 @@ A Large Elven armorsmith is walking around behind the counter.
 17 15 0 3d3+170 2d2+2
 170 28900
 8 8 1
+BodyProfile: 1
 E
 #24806
 Elf mage elven~
@@ -72,6 +77,7 @@ A Tiny Elven mage is floating behind the counter.
 16 15 0 3d3+160 2d2+2
 160 25600
 8 8 1
+BodyProfile: 1
 E
 #24807
 Elf Quintor grocer~
@@ -84,6 +90,7 @@ An Elf named Quintor is here counting money behind the counter.
 15 15 1 3d3+150 2d2+2
 150 22500
 8 8 1
+BodyProfile: 1
 E
 #24808
 elf bartender elven~
@@ -96,6 +103,7 @@ A fat Elf is standing behind the bar taking orders.
 17 15 0 3d3+170 2d2+2
 170 28900
 8 8 1
+BodyProfile: 1
 E
 #24809
 elf receptionist elven~
@@ -108,6 +116,7 @@ A nice-looking Elf is standing in the reception.
 17 15 0 3d3+170 2d2+2
 170 28900
 8 8 2
+BodyProfile: 1
 E
 #24810
 elf chief elven guard~
@@ -123,5 +132,6 @@ obviously been in battle in his days.
 17 15 0 3d3+170 2d2+2
 170 28900
 4 4 1
+BodyProfile: 1
 E
 $

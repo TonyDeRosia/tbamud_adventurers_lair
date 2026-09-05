@@ -9,6 +9,7 @@ A shadow guardian screams a challenge and attacks.
 9 17 4 1d1+90 1d2+1
 90 8100
 8 8 0
+BodyProfile: 1
 E
 #2501
 adventurer~
@@ -22,6 +23,7 @@ time.
 8 18 5 1d1+80 1d2+1
 80 6400
 6 8 1
+BodyProfile: 1
 E
 T 2503
 #2502
@@ -49,6 +51,7 @@ A huge diamond golem is standing guard here.
 23 13 -3 4d4+230 3d3+3
 230 52900
 8 8 0
+BodyProfile: 11
 E
 #2504
 mage young~
@@ -62,6 +65,7 @@ Then again, he may just have a headache.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 1
+BodyProfile: 1
 E
 T 2501
 #2505
@@ -75,6 +79,7 @@ Strick is here levitating drinks to his customers.
 25 12 -5 5d5+250 4d4+4
 250 62500
 8 8 1
+BodyProfile: 1
 E
 #2506
 tatorious wizard~
@@ -87,6 +92,7 @@ Tatorious the wizard is here counting his earnings.
 25 12 -5 5d5+250 4d4+4
 250 62500
 8 8 1
+BodyProfile: 1
 E
 #2507
 ezmerelda cook~
@@ -100,6 +106,7 @@ certainly fits what you would expect in a tower fulls of mages.
 20 14 -2 4d4+200 3d3+3
 200 40000
 8 8 2
+BodyProfile: 1
 E
 T 2501
 #2508
@@ -113,6 +120,7 @@ The cook's assistant is here assisting the cook.
 11 17 3 2d2+110 1d2+1
 110 12100
 8 8 1
+BodyProfile: 1
 E
 T 2501
 #2509
@@ -129,6 +137,7 @@ cannot tell.  He looks quite mad, no doubt he has been mistreated horribly.
 16 15 0 3d3+160 2d2+2
 160 25600
 8 8 1
+BodyProfile: 1
 E
 #2510
 jailor mage~
@@ -191,6 +200,7 @@ A visiting mage is here snoring away in peaceful slumber.
 12 16 2 2d2+120 2d2+2
 120 14400
 4 4 1
+BodyProfile: 1
 E
 T 2501
 #2515
@@ -204,6 +214,7 @@ A young apprentice magic user is here doing magical studies.
 7 18 5 1d1+70 1d2+1
 70 4900
 6 6 2
+BodyProfile: 1
 E
 T 2501
 #2516
@@ -217,6 +228,7 @@ A young apprentice is here mumbling words of magic to himself.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 1
+BodyProfile: 1
 E
 T 2501
 #2517
@@ -230,6 +242,7 @@ A young apprentice is sleeping here.
 7 18 5 1d1+70 1d2+1
 70 4900
 4 4 1
+BodyProfile: 1
 E
 T 2501
 #2518
@@ -243,6 +256,7 @@ A young apprentice is here teasing a cornered kitten.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 1
+BodyProfile: 1
 E
 T 2501
 #2519
@@ -257,6 +271,7 @@ mark its mottled coat.
 1 20 9 0d0+10 1d2+0
 10 100
 8 8 2
+BodyProfile: 2
 E
 #2520
 student~
@@ -269,6 +284,7 @@ A student of spells is here looking quite bored.
 8 18 5 1d1+80 1d2+1
 80 6400
 6 6 1
+BodyProfile: 1
 E
 T 2501
 #2521
@@ -282,6 +298,7 @@ The instructor screams at your interruption and attacks you.
 14 16 1 2d2+140 2d2+2
 140 19600
 8 8 1
+BodyProfile: 1
 E
 T 2501
 #2522
@@ -295,6 +312,7 @@ A student of spells is here trying to master invisibility.
 8 18 5 1d1+80 1d2+1
 80 6400
 8 8 1
+BodyProfile: 1
 E
 T 2501
 #2523
@@ -308,6 +326,7 @@ A spell teacher screams at your interruption and attacks.
 15 15 1 3d3+150 2d2+2
 150 22500
 8 8 1
+BodyProfile: 1
 E
 T 2501
 #2524
@@ -321,6 +340,7 @@ A student of spells has fallen asleep at her desk here.
 9 17 4 1d1+90 1d2+1
 90 8100
 4 4 2
+BodyProfile: 1
 E
 T 2501
 #2525
@@ -337,6 +357,7 @@ as you.
 18 14 0 3d3+180 3d3+3
 180 32400
 8 8 1
+BodyProfile: 1
 E
 T 2501
 #2526
@@ -351,6 +372,7 @@ A young mage is here learning hand to hand combat.
 9 17 4 1d1+90 1d2+1
 90 8100
 8 8 1
+BodyProfile: 1
 E
 T 2501
 #2527
@@ -379,6 +401,7 @@ spells, and inattentive students.
 15 15 1 3d3+150 2d2+2
 150 22500
 5 5 1
+BodyProfile: 1
 E
 T 2501
 #2529
@@ -393,6 +416,7 @@ better not wake him up.
 20 14 -2 4d4+200 3d3+3
 200 40000
 4 8 1
+BodyProfile: 1
 E
 T 2501
 #2530
@@ -407,6 +431,7 @@ A scribe is here working on some manuscripts.
 14 16 1 2d2+140 2d2+2
 140 19600
 8 8 1
+BodyProfile: 1
 E
 T 2501
 #2531
@@ -421,6 +446,7 @@ she is translating.
 15 15 1 3d3+150 2d2+2
 150 22500
 8 8 2
+BodyProfile: 1
 E
 T 2501
 #2532
@@ -435,6 +461,7 @@ master scribe screams 'How dare you interrupt my important work???  '
 22 13 -3 4d4+220 3d3+3
 220 48400
 8 8 1
+BodyProfile: 1
 E
 T 2501
 #2533
@@ -449,6 +476,7 @@ those ones are rolled and sealed with wax.
 16 15 0 3d3+160 2d2+2
 160 25600
 8 8 1
+BodyProfile: 1
 E
 T 2501
 #2534
@@ -490,6 +518,7 @@ cackles with insane glee!
 24 12 -4 4d4+240 4d4+4
 240 57600
 8 8 1
+BodyProfile: 1
 E
 T 2501
 #2537
@@ -531,6 +560,7 @@ A wooden golem stands a silent vigil here, guarding the stairs.
 16 15 0 3d3+160 2d2+2
 160 25600
 8 8 0
+BodyProfile: 11
 E
 #2540
 master spellbinder~
@@ -557,6 +587,7 @@ of fussing over it.
 21 13 -2 4d4+210 3d3+3
 210 44100
 8 8 1
+BodyProfile: 11
 E
 T 2501
 #2542
@@ -570,6 +601,7 @@ A granite golem stands here waiting to do its master's bidding.
 20 14 -2 4d4+200 3d3+3
 200 40000
 8 8 0
+BodyProfile: 11
 E
 #2543
 golem bronze~
@@ -582,6 +614,7 @@ A bronze golem stands here shining in the light.
 18 14 0 3d3+180 3d3+3
 180 32400
 8 8 0
+BodyProfile: 11
 E
 #2544
 golem flesh~
@@ -595,6 +628,7 @@ resemble anything human.
 12 16 2 2d2+120 2d2+2
 120 14400
 8 8 0
+BodyProfile: 1
 E
 #2545
 golem cloth~
@@ -607,6 +641,7 @@ A cloth golem wanders around here.
 8 18 5 1d1+80 1d2+1
 80 6400
 8 8 0
+BodyProfile: 11
 E
 #2546
 golem adamantite~
@@ -620,6 +655,7 @@ somewhat un-intelligent.
 25 12 -5 5d5+250 4d4+4
 250 62500
 8 8 0
+BodyProfile: 11
 E
 #2547
 golem clay~
@@ -632,6 +668,7 @@ A clay golem stands guard here.
 15 15 1 3d3+150 2d2+2
 150 22500
 8 8 0
+BodyProfile: 11
 E
 #2548
 master illusionist mage dragon~
@@ -645,6 +682,7 @@ stands a small harmless looking old man.
 21 13 -2 4d4+210 3d3+3
 210 44100
 8 8 1
+BodyProfile: 6
 E
 T 2501
 #2549
@@ -674,6 +712,7 @@ An animated skeleton screams silently and attacks.
 15 15 1 3d3+150 2d2+2
 150 22500
 8 8 0
+BodyProfile: 1
 E
 #2551
 undead giant~
@@ -687,6 +726,7 @@ zombie.
 18 14 0 3d3+180 3d3+3
 180 32400
 8 8 0
+BodyProfile: 1
 E
 #2552
 witch hag~
@@ -701,6 +741,7 @@ crawl with revulsion.
 20 14 -2 4d4+200 3d3+3
 200 40000
 8 8 2
+BodyProfile: 1
 E
 T 2501
 #2553
@@ -714,6 +755,7 @@ The Librarian has fallen asleep at his desk here.
 23 13 -3 4d4+230 3d3+3
 230 52900
 4 8 1
+BodyProfile: 1
 E
 T 2501
 #2554
@@ -729,6 +771,7 @@ Master in hopes of gleaning secrets one could never hope to uncover alone.
 24 12 -4 4d4+240 4d4+4
 240 57600
 8 8 1
+BodyProfile: 1
 E
 T 2501
 #2555
@@ -744,6 +787,7 @@ contentedly.  It looks rather harmless, until you notice its very large claws.
 15 15 1 3d3+150 2d2+2
 150 22500
 8 8 2
+BodyProfile: 2
 E
 #2556
 master guildmaster gray~
@@ -771,6 +815,7 @@ permanent scowl make her looks quite fearsome.
 20 14 -2 4d4+200 3d3+3
 200 40000
 8 8 2
+BodyProfile: 1
 E
 T 2501
 #2558
@@ -785,6 +830,7 @@ question.
 16 15 0 3d3+160 2d2+2
 160 25600
 8 8 0
+BodyProfile: 2
 E
 #2559
 master guildmaster black~
@@ -811,6 +857,7 @@ unworthy of this honor!  '
 20 14 -2 4d4+200 3d3+3
 200 40000
 8 8 1
+BodyProfile: 1
 E
 T 2501
 #2561
@@ -824,6 +871,7 @@ A white cat is here preening its fur.
 15 15 1 3d3+150 2d2+2
 150 22500
 8 8 0
+BodyProfile: 2
 E
 #2562
 master guildmaster white~
@@ -850,6 +898,7 @@ beautiful jewel encrusted collar about its neck is its only adornment.
 25 12 -5 5d5+250 4d4+4
 250 62500
 8 8 0
+BodyProfile: 2
 E
 #2564
 guildmaster grand mistress~

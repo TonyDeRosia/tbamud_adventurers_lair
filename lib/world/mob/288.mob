@@ -72,6 +72,7 @@ But somehow he manages to escape.  Though tiny, it can take a lot of hits!
 31 10 -8 6d6+310 5d5+5
 310 96100
 8 8 1
+BodyProfile: 1
 E
 #28807
 horsehead nebula~
@@ -124,6 +125,7 @@ The wild pegasus is grazing peacefully.
 32 10 -9 6d6+320 5d5+5
 320 102400
 8 8 0
+BodyProfile: 17
 E
 #28811
 orion~
@@ -138,6 +140,7 @@ on one side of the sky and the other the other side so they will never meet.
 30 10 -8 6d6+300 5d5+5
 300 90000
 8 8 1
+BodyProfile: 1
 E
 #28812
 pleiades~
@@ -180,6 +183,7 @@ on now?
 29 11 -7 5d5+290 4d4+4
 290 84100
 8 8 0
+BodyProfile: 1
 E
 T 28803
 #28815
@@ -381,6 +385,7 @@ So he becomes jealous of any living thing which is more handsome than him.
 32 10 -9 6d6+320 5d5+5
 320 102400
 8 8 1
+BodyProfile: 13
 E
 T 28800
 #28829
@@ -395,6 +400,7 @@ better turn back.  At least you have got a chance of survival.
 30 10 -8 6d6+300 5d5+5
 300 90000
 8 8 0
+BodyProfile: 2
 E
 T 28800
 #28830
@@ -408,6 +414,7 @@ Cassiopeia, the queen of the Universe, is sitting on her throne.
 30 10 -8 6d6+300 5d5+5
 300 90000
 6 8 2
+BodyProfile: 1
 E
 T 28801
 #28831
@@ -422,6 +429,7 @@ weak and useless in front of him.
 30 10 -8 6d6+300 5d5+5
 300 90000
 6 8 1
+BodyProfile: 1
 E
 T 28801
 #28832

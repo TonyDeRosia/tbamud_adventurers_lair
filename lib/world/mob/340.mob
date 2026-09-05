@@ -14,7 +14,7 @@ a creature made to hold ground rather than pursue prey.
 0 40
 8 8 0
 BareHandAttack: 7
-BodyProfile: 1
+BodyProfile: 11
 SavingPara: 4
 SavingRod: 4
 SavingPetri: 4
@@ -42,7 +42,7 @@ residue from cracks in the grotto.
 0 100
 8 8 0
 BareHandAttack: 4
-BodyProfile: 0
+BodyProfile: 10
 Str: 12
 Dex: 12
 Int: 12
@@ -77,7 +77,7 @@ in disciplined bands, making its true outline difficult to judge.
 0 180
 8 8 0
 BareHandAttack: 6
-BodyProfile: 1
+BodyProfile: 11
 Str: 14
 Dex: 14
 Int: 14
@@ -111,7 +111,7 @@ other ends in a heavy faceted hand capable of crushing stone.
 0 360
 8 8 0
 BareHandAttack: 3
-BodyProfile: 1
+BodyProfile: 11
 Str: 16
 Dex: 16
 Int: 16
@@ -145,7 +145,7 @@ mineral blooms for nectar.
 0 0
 8 8 0
 BareHandAttack: 4
-BodyProfile: 0
+BodyProfile: 10
 SavingPara: 3
 SavingRod: 3
 SavingPetri: 3
@@ -173,7 +173,7 @@ glancing blows with a sound like struck glass.
 0 0
 8 8 0
 BareHandAttack: 6
-BodyProfile: 0
+BodyProfile: 9
 SavingPara: 4
 SavingRod: 4
 SavingPetri: 4
@@ -201,7 +201,7 @@ drawn.
 0 0
 8 8 0
 BareHandAttack: 1
-BodyProfile: 0
+BodyProfile: 10
 Str: 12
 Dex: 12
 Int: 12
@@ -262,7 +262,7 @@ explosive strike.
 0 0
 8 8 0
 BareHandAttack: 3
-BodyProfile: 0
+BodyProfile: 9
 Str: 13
 Dex: 13
 Int: 13
@@ -433,7 +433,7 @@ with cutting shards of reflected light.
 0 0
 8 8 0
 BareHandAttack: 1
-BodyProfile: 0
+BodyProfile: 10
 Str: 16
 Dex: 16
 Int: 16
@@ -492,7 +492,7 @@ different colors of sound.
 0 0
 8 8 0
 BareHandAttack: 1
-BodyProfile: 0
+BodyProfile: 10
 SavingPara: 4
 SavingRod: 4
 SavingPetri: 4
@@ -618,7 +618,7 @@ when disturbed.
 0 0
 8 8 0
 BareHandAttack: 1
-BodyProfile: 5
+BodyProfile: 0
 SavingPara: 3
 SavingRod: 3
 SavingPetri: 3

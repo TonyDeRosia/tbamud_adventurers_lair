@@ -26,6 +26,7 @@ in search for someone or something.
 26 12 -5 5d5+260 4d4+4
 260 67600
 8 8 2
+BodyProfile: 0
 E
 #25902
 web spiderweb~
@@ -54,6 +55,7 @@ obviously intent on your destruction.
 290 84100
 8 8 1
 BareHandAttack: 12
+BodyProfile: 0
 E
 #25904
 churel woman moaning~
@@ -67,6 +69,7 @@ ankles, and the constant moaning is enough to drive a crazy man sane.
 30 10 -8 6d6+300 5d5+5
 300 90000
 8 8 2
+BodyProfile: 1
 E
 #25905
 spider~
@@ -80,6 +83,7 @@ A large black spider crawls along the floor just ahead of you.
 250 62500
 8 8 0
 BareHandAttack: 4
+BodyProfile: 5
 E
 #25906
 phantom howling~
@@ -95,6 +99,7 @@ robe cloak all about it.
 300 90000
 8 8 0
 BareHandAttack: 9
+BodyProfile: 0
 E
 #25907
 apparition angry screeching~
@@ -109,6 +114,7 @@ and shot through with streaks of reddish-orange flames.
 300 90000
 8 8 0
 BareHandAttack: 12
+BodyProfile: 0
 E
 #25908
 rat scurrying~
@@ -124,5 +130,6 @@ out - better kill it.
 250 62500
 8 8 0
 BareHandAttack: 8
+BodyProfile: 2
 E
 $

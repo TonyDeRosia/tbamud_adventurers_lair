@@ -11,6 +11,7 @@ himself.
 50 2500
 8 8 1
 BareHandAttack: 10
+BodyProfile: 1
 E
 T 25300
 T 25301
@@ -44,6 +45,7 @@ An MoS soldier is here, looking at you in some confusion.
 6 18 6 1d1+60 1d2+1
 60 3600
 8 8 1
+BodyProfile: 1
 E
 T 25309
 #25303
@@ -73,6 +75,7 @@ wearing one.
 15 15 1 3d3+150 2d2+2
 150 22500
 8 8 1
+BodyProfile: 1
 E
 #25305
 lieutenant MoS~
@@ -86,6 +89,7 @@ moment of silence he says, "Hey.  Why are you in my room?  "
 15 15 1 3d3+150 2d2+2
 150 22500
 8 8 1
+BodyProfile: 1
 E
 #25306
 sergeant MoS~
@@ -98,6 +102,7 @@ The MoS Sergeant stands here, nothing to do.
 16 15 0 3d3+160 2d2+2
 160 25600
 8 8 1
+BodyProfile: 1
 E
 #25307
 general MoS~
@@ -110,6 +115,7 @@ The MoS General is here, practicing his hate speeches.
 17 15 0 3d3+170 2d2+2
 170 28900
 8 8 1
+BodyProfile: 1
 E
 #25308
 grand knight~
@@ -122,6 +128,7 @@ The Grand Knight stands here.
 17 15 0 3d3+170 2d2+2
 170 28900
 8 8 1
+BodyProfile: 1
 E
 #25309
 Bob MoS guard~
@@ -135,6 +142,7 @@ A guard in MoS uniform with the name 'Bob' stenciled across his chest waits here
 5 19 7 1d1+50 1d2+0
 50 2500
 8 8 1
+BodyProfile: 1
 E
 T 25303
 T 25304
@@ -150,6 +158,7 @@ hey," he says, "are you sposed to be here?
 6 18 6 1d1+60 1d2+1
 60 3600
 8 8 1
+BodyProfile: 1
 E
 T 25310
 $

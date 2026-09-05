@@ -9,6 +9,7 @@ A huge, black doglike thing blasts from behind trees, attacking you!
 25 12 -5 5d5+250 4d4+4
 250 62500
 8 8 0
+BodyProfile: 2
 E
 #26601
 candle~
@@ -48,6 +49,7 @@ dead souls that he may claim as his own.
 34 9 -10 6d6+340 5d5+5
 340 115600
 8 8 1
+BodyProfile: 1
 E
 #26604
 spectre ghostly~
@@ -61,6 +63,7 @@ man or woman or if it ever was alive at all.
 30 10 -8 6d6+300 5d5+5
 300 90000
 8 8 0
+BodyProfile: 0
 E
 #26605
 man hunter vampire~
@@ -74,6 +77,7 @@ He raises one side of his upper lip in a snarl and attacks.
 26 12 -5 5d5+260 4d4+4
 260 67600
 8 8 1
+BodyProfile: 1
 E
 #26606
 buzzard~

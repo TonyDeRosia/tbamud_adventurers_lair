@@ -10,6 +10,7 @@ steady pace.  He looks your way and gives a wink.
 6 18 6 1d1+60 1d2+1
 60 3600
 8 8 1
+BodyProfile: 1
 E
 #32501
 juggler woman~
@@ -38,6 +39,7 @@ brighter.
 17 15 0 3d3+170 2d2+2
 170 28900
 8 8 1
+BodyProfile: 1
 E
 #32503
 wandering minstrel~
@@ -51,6 +53,7 @@ feeling and power.
 15 15 1 3d3+150 2d2+2
 150 22500
 8 8 2
+BodyProfile: 1
 E
 #32504
 peddler tonic man traveler garb~
@@ -65,6 +68,7 @@ his dreams to fall immediately in love with him.
 21 13 -2 4d4+210 3d3+3
 210 44100
 8 8 1
+BodyProfile: 1
 E
 #32505
 Milissin story teller~
@@ -79,6 +83,7 @@ storyteller.
 22 13 -3 4d4+220 3d3+3
 220 48400
 8 8 2
+BodyProfile: 1
 E
 #32506
 monkey~
@@ -105,6 +110,7 @@ one can get a lid on.
 11 17 3 2d2+110 1d2+1
 110 12100
 8 8 1
+BodyProfile: 1
 E
 #32508
 old crone zayla madame~
@@ -132,6 +138,7 @@ important in the way they lay on the ground.
 26 12 -5 5d5+260 4d4+4
 260 67600
 8 8 2
+BodyProfile: 1
 E
 #32510
 gypsy dancer~
@@ -145,6 +152,7 @@ sensuous moves - but then, it is just as hard to look away.
 15 15 1 3d3+150 2d2+2
 150 22500
 8 8 2
+BodyProfile: 1
 E
 #32511
 gypsy dancer man~
@@ -158,6 +166,7 @@ to watch than he is .
 14 16 1 2d2+140 2d2+2
 140 19600
 8 8 1
+BodyProfile: 1
 E
 #32512
 gypsy food vendor man~
@@ -171,6 +180,7 @@ other place in Dibrova that he would rather be.
 22 13 -3 4d4+220 3d3+3
 220 48400
 8 8 1
+BodyProfile: 1
 E
 #32513
 jimmy pickpocket kid hand~
@@ -184,6 +194,7 @@ Best to try and ask him what his intentions were.
 14 16 1 2d2+140 2d2+2
 140 19600
 8 8 1
+BodyProfile: 1
 E
 #32514
 woman~
@@ -197,6 +208,7 @@ A woman sits upon the grass, watching the performance on the stage.
 11 17 3 2d2+110 1d2+1
 110 12100
 8 8 2
+BodyProfile: 1
 E
 #32515
 vendor woman gypsy~
@@ -210,6 +222,7 @@ she still has it - only a few left and going quick.
 22 13 -3 4d4+220 3d3+3
 220 48400
 8 8 2
+BodyProfile: 1
 E
 #32516
 rootless homeless man vagabond~
@@ -224,6 +237,7 @@ along minding his own business.
 25 12 -5 5d5+250 4d4+4
 250 62500
 8 8 1
+BodyProfile: 1
 E
 #32517
 bard stump strumming~
@@ -238,6 +252,7 @@ with one's inner self.
 19 14 -1 3d3+190 3d3+3
 190 36100
 8 8 1
+BodyProfile: 1
 E
 #32518
 woman bard flute player~
@@ -252,6 +267,7 @@ listen to her song.
 17 15 0 3d3+170 2d2+2
 170 28900
 8 8 2
+BodyProfile: 1
 E
 #32519
 woman cat actress~
@@ -265,6 +281,7 @@ most stoic of onlookers grin.  She plays her part well.
 15 15 1 3d3+150 2d2+2
 150 22500
 8 8 2
+BodyProfile: 2
 E
 #32520
 actor man mushroom~
@@ -278,6 +295,7 @@ mushroom, however the man recites his line with precision and clarity.
 14 16 1 2d2+140 2d2+2
 140 19600
 8 8 1
+BodyProfile: 1
 E
 #32521
 gypsy woman clean~
@@ -291,6 +309,7 @@ pleased to be cleaning clothes in a river.
 17 15 0 3d3+170 2d2+2
 170 28900
 8 8 2
+BodyProfile: 1
 E
 #32522
 man fixing wagon repair burly~
@@ -304,6 +323,7 @@ pouring from his body.  Maybe you ought to help the poor fella?
 14 16 1 2d2+140 2d2+2
 140 19600
 8 8 1
+BodyProfile: 1
 E
 #32523
 man shoer~
@@ -317,6 +337,7 @@ are heavily muscled and tanned.
 12 16 2 2d2+120 2d2+2
 120 14400
 8 8 1
+BodyProfile: 1
 E
 #32524
 mime~
@@ -344,6 +365,7 @@ laughing in delight.
 26 12 -5 5d5+260 4d4+4
 260 67600
 8 8 2
+BodyProfile: 1
 E
 #32526
 man resting performer~
@@ -369,6 +391,7 @@ A woman lies on her back, catching her breath after a tiring show.
 16 15 0 3d3+160 2d2+2
 160 25600
 8 8 2
+BodyProfile: 1
 E
 #32528
 townsman man~
@@ -382,6 +405,7 @@ gypsies, however his open eyes and twisting neck give him away.
 29 11 -7 5d5+290 4d4+4
 290 84100
 8 8 1
+BodyProfile: 1
 E
 #32529
 countryman man~
@@ -409,6 +433,7 @@ Most of them pay her no heed at all.
 15 15 1 3d3+150 2d2+2
 150 22500
 8 8 2
+BodyProfile: 1
 E
 #32531
 elven male wanderer~
@@ -423,6 +448,7 @@ show up.
 24 12 -4 4d4+240 4d4+4
 240 57600
 8 8 1
+BodyProfile: 1
 E
 #32532
 stout countryman's wife~
@@ -436,6 +462,7 @@ thing, she must not get out very much.
 17 15 0 3d3+170 2d2+2
 170 28900
 8 8 2
+BodyProfile: 1
 E
 #32533
 farmer man~
@@ -449,6 +476,7 @@ fine life or wandering.  All of this is almost too much.
 19 14 -1 3d3+190 3d3+3
 190 36100
 8 8 1
+BodyProfile: 1
 E
 #32534
 farmer's wife woman~
@@ -461,6 +489,7 @@ A woman in a simple spun dress looks around in joy and wonder.
 12 16 2 2d2+120 2d2+2
 120 14400
 8 8 2
+BodyProfile: 1
 E
 #32535
 midget~
@@ -487,6 +516,7 @@ stumbles or rests for any period of time.
 17 15 0 3d3+170 2d2+2
 170 28900
 8 8 1
+BodyProfile: 1
 E
 #32537
 lounging gypsy~
@@ -501,6 +531,7 @@ rising and falling in rhythmic sleeping patterns.
 30 10 -8 6d6+300 5d5+5
 300 90000
 8 8 1
+BodyProfile: 1
 E
 #32538
 sword juggler silver~
@@ -514,6 +545,7 @@ his partner in red who does just the same right back.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 1
+BodyProfile: 1
 E
 #32539
 sword juggler red~
@@ -528,6 +560,7 @@ talks animatedly with the crowd, urging them to throw a coin or two their way.
 11 17 3 2d2+110 1d2+1
 110 12100
 8 8 1
+BodyProfile: 1
 E
 #32540
 animal caretaker~
@@ -541,6 +574,7 @@ children who pet them.  And that is exactly what she does.
 24 12 -4 4d4+240 4d4+4
 240 57600
 8 8 2
+BodyProfile: 1
 E
 #32541
 child face painted lion~
@@ -553,6 +587,7 @@ A child runs past, his face painted like a lion.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 1
+BodyProfile: 2
 E
 #32542
 preparing performer man~
@@ -566,6 +601,7 @@ saying are the proper lines, psyching himself for his time on stage.
 17 15 0 3d3+170 2d2+2
 170 28900
 8 8 1
+BodyProfile: 1
 E
 #32543
 preparing performer woman~
@@ -579,6 +615,7 @@ and dance, giving herself confidence for her time on stage.
 18 14 0 3d3+180 3d3+3
 180 32400
 8 8 2
+BodyProfile: 1
 E
 #32544
 child face paint kitty cat~
@@ -592,6 +629,7 @@ A child pushes past, her face painted up like a kitty-cat.
 12 16 2 2d2+120 2d2+2
 120 14400
 8 8 2
+BodyProfile: 2
 E
 #32545
 child face paint skeleton~
@@ -605,6 +643,7 @@ A child with a painted-on skeleton face looks somberly up at you.
 12 16 2 2d2+120 2d2+2
 120 14400
 8 8 1
+BodyProfile: 1
 E
 #32546
 man gypsy artifact~
@@ -619,6 +658,7 @@ them.
 22 13 -3 4d4+220 3d3+3
 220 48400
 8 8 1
+BodyProfile: 1
 E
 #32547
 clothing woman gypsy~
@@ -632,6 +672,7 @@ outer fringes of the world and beyond.
 22 13 -3 4d4+220 3d3+3
 220 48400
 8 8 2
+BodyProfile: 1
 E
 #32548
 woman costume jewelry~
@@ -645,6 +686,7 @@ made specially for you - but only today, right now!
 22 13 -3 4d4+220 3d3+3
 220 48400
 8 8 2
+BodyProfile: 1
 E
 #32549
 puppet master~
@@ -671,6 +713,7 @@ than that, it just stands there looking bored.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 0
+BodyProfile: 2
 E
 #32551
 man gypsy grin sloppy~
@@ -684,6 +727,7 @@ have taken a couple swills himself...
 22 13 -3 4d4+220 3d3+3
 220 48400
 8 8 1
+BodyProfile: 1
 E
 #32552
 man beer swilling~
@@ -696,6 +740,7 @@ A man is here throwing back the beers.
 14 16 1 2d2+140 2d2+2
 140 19600
 8 8 1
+BodyProfile: 1
 E
 #32553
 man beer drinker~
@@ -709,6 +754,7 @@ on his mug.  Maybe he is afraid the misses will take it away...
 15 15 1 3d3+150 2d2+2
 150 22500
 8 8 1
+BodyProfile: 1
 E
 #32554
 man ale drinker local drunk~
@@ -722,6 +768,7 @@ has a story for just about everything.
 16 15 0 3d3+160 2d2+2
 160 25600
 8 8 1
+BodyProfile: 1
 E
 #32555
 man spectator farmhand~
@@ -734,6 +781,7 @@ A farmhand watches starry-eyed as the gypsy dancer moves her hips.
 14 16 1 2d2+140 2d2+2
 140 19600
 8 8 1
+BodyProfile: 1
 E
 #32556
 man spectator~
@@ -746,6 +794,7 @@ A young lad of the city blushes as he watches the gypsy dancer move.
 15 15 1 3d3+150 2d2+2
 150 22500
 8 8 1
+BodyProfile: 1
 E
 #32557
 older woman~
@@ -759,6 +808,7 @@ front of male gypsy dancer for the last hour and a half.
 16 15 0 3d3+160 2d2+2
 160 25600
 8 8 2
+BodyProfile: 1
 E
 #32558
 gypsy onlooker~
@@ -771,6 +821,7 @@ A gypsy watches his fellow brethren as they go about their dance.
 14 16 1 2d2+140 2d2+2
 140 19600
 8 8 1
+BodyProfile: 1
 E
 #32559
 young country girl~
@@ -784,6 +835,7 @@ gypsy band.
 15 15 1 3d3+150 2d2+2
 150 22500
 8 8 2
+BodyProfile: 1
 E
 #32560
 gypsy cook~
@@ -797,6 +849,7 @@ the same.
 22 13 -3 4d4+220 3d3+3
 220 48400
 8 8 2
+BodyProfile: 1
 E
 #32561
 child waiting face paint~
@@ -810,6 +863,7 @@ anticipation in his eyes.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 1
+BodyProfile: 1
 E
 #32562
 wide eyed child~
@@ -824,6 +878,7 @@ notice it.  He stares up in awe at the storyteller as the relates the story.
 11 17 3 2d2+110 1d2+1
 110 12100
 8 8 1
+BodyProfile: 1
 E
 #32563
 little girl~
@@ -837,6 +892,7 @@ listening with every part of her being.
 12 16 2 2d2+120 2d2+2
 120 14400
 8 8 2
+BodyProfile: 1
 E
 #32564
 young lad~
@@ -865,5 +921,6 @@ upright like a englishman should.
 30 10 -8 6d6+300 5d5+5
 300 90000
 8 8 0
+BodyProfile: 1
 E
 $

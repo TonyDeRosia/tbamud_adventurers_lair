@@ -29,6 +29,7 @@ of concealed desperation.
 15 19 4 3d2+165 0d6+3
 225 22500
 8 8 1
+BodyProfile: 1
 E
 T 2702
 #2702
@@ -45,6 +46,7 @@ harmless looking until several sharp teeth glint in the subdued light.
 100 10000
 8 8 0
 BareHandAttack: 4
+BodyProfile: 19
 E
 #2703
 weary memlin~
@@ -95,6 +97,7 @@ very well indeed.
 240 25600
 8 8 1
 BareHandAttack: 3
+BodyProfile: 1
 E
 T 2705
 T 2706
@@ -112,6 +115,7 @@ workings of the world around her and draws shyly away on approach.
 1 20 9 0d0+10 1d2+0
 10 100
 8 8 2
+BodyProfile: 1
 E
 T 2713
 T 2714
@@ -131,6 +135,7 @@ eggshell blue and light purple fanning out into its tail.
 8 18 5 1d1+80 1d2+1
 0 6400
 8 8 0
+BodyProfile: 4
 E
 T 2774
 #2708
@@ -283,6 +288,7 @@ apparently continues its scavenges for anything edible.
 0 10000
 8 8 0
 BareHandAttack: 4
+BodyProfile: 2
 E
 T 2778
 #2717
@@ -300,6 +306,7 @@ black armor.
 50 2500
 8 8 0
 BareHandAttack: 4
+BodyProfile: 9
 E
 #2718
 jewelled green serpent~
@@ -316,6 +323,7 @@ of its body.
 170 28900
 8 8 0
 BareHandAttack: 4
+BodyProfile: 3
 E
 #2719
 female memlin~
@@ -348,6 +356,7 @@ expression is one of almost meditative calm.
 10 19 4 2d2+100 1d2+1
 100 10000
 8 8 1
+BodyProfile: 1
 E
 T 2757
 T 2797
@@ -369,6 +378,7 @@ charcoal black.
 33 9 -9 6d6+330 5d5+5
 330 108900
 8 8 0
+BodyProfile: 6
 E
 T 2760
 T 2761
@@ -389,6 +399,7 @@ some strange force pulses through them.
 33 9 -9 6d6+330 5d5+5
 330 108900
 8 8 2
+BodyProfile: 1
 E
 T 2762
 #2723
@@ -407,6 +418,7 @@ he gives an air of formidable confidence and proud fearlessness.
 20 14 -2 4d4+200 3d3+3
 200 40000
 8 8 0
+BodyProfile: 1
 E
 #2724
 Dynar youth~
@@ -469,6 +481,7 @@ happily on the abundant grass, constantly sniffing as it hops about.
 8 18 5 1d1+80 1d2+1
 0 6400
 8 8 0
+BodyProfile: 2
 E
 #2728
 young memlin~
@@ -508,6 +521,7 @@ skin as dark and glossy as slick oil.
 25 12 -5 5d5+700 4d4+4
 500 62500
 8 8 2
+BodyProfile: 1
 E
 T 2720
 T 2790
@@ -526,5 +540,6 @@ gleaming eyes peer suspiciously about, the color of deep emerald green.
 23 13 -3 4d4+230 3d3+3
 0 52900
 8 8 0
+BodyProfile: 4
 E
 $

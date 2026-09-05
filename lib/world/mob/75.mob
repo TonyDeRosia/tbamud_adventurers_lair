@@ -10,6 +10,7 @@ hangs from an old wound on its side.
 14 16 1 2d2+140 2d2+2
 140 19600
 8 8 2
+BodyProfile: 2
 Str: 12
 Dex: 18
 Int: 9
@@ -28,6 +29,7 @@ its eyes shine red.
 14 16 1 2d2+140 2d2+2
 140 19600
 8 8 0
+BodyProfile: 2
 E
 T 7505
 #7508
@@ -43,6 +45,7 @@ tree.  Its black wings are wrapped around its body like a cozy blanket.
 180 32400
 4 4 1
 BareHandAttack: 3
+BodyProfile: 19
 Dex: 14
 Int: 8
 Wis: 8
@@ -63,6 +66,7 @@ around his waist.
 140 19600
 8 8 1
 BareHandAttack: 3
+BodyProfile: 1
 Str: 14
 Dex: 12
 Int: 10
@@ -79,6 +83,7 @@ A black kitten is lying here sleeping.
 140 19600
 4 4 1
 BareHandAttack: 8
+BodyProfile: 2
 E
 #7514
 large fat man~
@@ -93,6 +98,7 @@ oily, he smells horrible.
 14 16 1 2d2+140 2d2+2
 140 19600
 6 6 1
+BodyProfile: 1
 Dex: 8
 E
 #7515
@@ -109,6 +115,7 @@ around the neck and waist.
 140 19600
 8 8 2
 BareHandAttack: 4
+BodyProfile: 1
 Str: 8
 Dex: 20
 Int: 10
@@ -125,6 +132,7 @@ She is barefoot and wears only a white dress tied at one shoulder.
 14 16 1 2d2+140 2d2+2
 140 19600
 8 8 2
+BodyProfile: 1
 Str: 13
 Dex: 15
 E
@@ -142,6 +150,7 @@ at for target practice.
 140 19600
 8 8 1
 BareHandAttack: 12
+BodyProfile: 1
 E
 #7522
 barkeeper woman~
@@ -155,6 +164,7 @@ smiles at you revealing several gaps where she is missing teeth.
 30 10 -8 6d6+300 5d5+5
 300 90000
 8 8 2
+BodyProfile: 1
 E
 T 7522
 #7523
@@ -172,6 +182,7 @@ of this strange reptile.
 140 19600
 8 8 0
 BareHandAttack: 2
+BodyProfile: 2
 Str: 8
 Int: 7
 Wis: 7
@@ -189,6 +200,7 @@ brightly colored dress.  Her black hair is held back with a pearl hair piece.
 140 19600
 6 8 2
 BareHandAttack: 8
+BodyProfile: 1
 E
 #7525
 man fisherman ~
@@ -203,6 +215,7 @@ around his waist.
 14 16 1 2d2+140 2d2+2
 140 19600
 6 6 1
+BodyProfile: 1
 Str: 14
 Dex: 14
 Wis: 12
@@ -239,6 +252,7 @@ green base with small yellow leaves.
 140 19600
 8 8 0
 BareHandAttack: 10
+BodyProfile: 14
 Str: 15
 Dex: 9
 Int: 9
@@ -257,6 +271,7 @@ only leaving his long white beard visible.
 14 16 1 2d2+140 2d2+2
 140 19600
 8 8 1
+BodyProfile: 1
 Str: 12
 Dex: 13
 Int: 15
@@ -278,6 +293,7 @@ within the flower.
 140 19600
 8 8 0
 BareHandAttack: 10
+BodyProfile: 14
 Str: 15
 Dex: 12
 E
@@ -295,6 +311,7 @@ very long front teeth on both the top and bottom of its mouth.
 140 19600
 8 8 0
 BareHandAttack: 4
+BodyProfile: 2
 E
 #7539
 man witch doctor~
@@ -310,6 +327,7 @@ black powder into a large pewter bowl set in the center of the pentagram.
 180 32400
 8 8 1
 BareHandAttack: 12
+BodyProfile: 1
 Str: 15
 Dex: 13
 Int: 15
@@ -330,6 +348,7 @@ size dinner.
 140 19600
 8 8 0
 BareHandAttack: 8
+BodyProfile: 4
 Str: 15
 Dex: 16
 Wis: 10
@@ -348,6 +367,7 @@ doesn't look quite right.
 140 19600
 8 8 1
 BareHandAttack: 12
+BodyProfile: 1
 Dex: 20
 E
 T 7552
@@ -364,6 +384,7 @@ the temples.
 14 16 1 2d2+140 2d2+2
 140 19600
 8 8 1
+BodyProfile: 1
 Str: 15
 Dex: 15
 Int: 19
@@ -381,6 +402,7 @@ pearls and strands of gold.  She wears a long, flowing, white gown.
 14 16 1 2d2+140 2d2+2
 140 19600
 8 8 2
+BodyProfile: 1
 Str: 10
 Dex: 15
 Int: 13
@@ -398,6 +420,7 @@ her.  Her black hair is pulled back and covered with a large scarf.
 14 16 1 2d2+140 2d2+2
 140 19600
 8 8 2
+BodyProfile: 1
 E
 #7567
 voodoo doll~
@@ -425,6 +448,7 @@ The guard stands here in front of the door.
 140 19600
 8 8 1
 BareHandAttack: 13
+BodyProfile: 1
 Str: 15
 Dex: 10
 Int: 12
@@ -443,6 +467,7 @@ green eyes shine out from under is sleek, black fur.
 140 19600
 8 8 2
 BareHandAttack: 4
+BodyProfile: 2
 Str: 12
 Dex: 14
 E
@@ -459,6 +484,7 @@ cloth tied around her head to hold back her long black hair.
 14 16 1 2d2+140 2d2+2
 140 19600
 8 8 2
+BodyProfile: 1
 E
 #7573
 kiona woman empress~
@@ -473,6 +499,7 @@ a elegant hair comb holding her black hair up.
 18 14 0 3d3+180 3d3+3
 180 32400
 6 6 2
+BodyProfile: 1
 Dex: 9
 Int: 9
 Wis: 9
@@ -491,6 +518,7 @@ sits here in the sand it uses its back legs to dig into the sand.
 140 19600
 8 8 0
 BareHandAttack: 4
+BodyProfile: 2
 E
 #7585
 native woman girl~
@@ -504,6 +532,7 @@ then continues running in and out of the water.
 14 16 1 2d2+140 2d2+2
 140 19600
 8 8 2
+BodyProfile: 1
 E
 #7588
 old man~
@@ -516,6 +545,7 @@ An old man is standing here.
 30 10 -8 6d6+300 5d5+5
 300 90000
 8 8 1
+BodyProfile: 1
 E
 T 7588
 #7589
@@ -530,6 +560,7 @@ at.
 30 10 -8 6d6+300 5d5+5
 300 90000
 8 8 1
+BodyProfile: 1
 E
 T 7589
 #7590
@@ -545,6 +576,7 @@ growing from the top of his head to the bottom of his chin.
 30 10 -8 6d6+300 5d5+5
 300 90000
 8 8 1
+BodyProfile: 1
 Str: 12
 Dex: 8
 Int: 18
@@ -565,6 +597,7 @@ as it bares its teeth.
 140 19600
 8 8 0
 BareHandAttack: 4
+BodyProfile: 2
 Str: 13
 Dex: 13
 Int: 10

@@ -1,0 +1,751 @@
+#3000
+arcane merchant wizard enchanter proprietor~
+the @Mar@Cca@Bne @Mme@Crch@Bant@n~
+An @Mar@Cca@Bne @Mme@Crch@Bant@n tends the rune-locked cases behind the counter.
+~
+Silver-streaked hair frames the measured face of an experienced dealer in minor
+enchantments. Ink stains mark his fingers, warding rings circle both wrists, and
+his careful gaze follows every hand that strays too near the locked cabinets.
+~
+26635 0 0 0 16 0 0 0 900 E
+33 9 25 6d6+330 5d5+5
+330 0
+8 8 1
+GoldMin: 330
+GoldMax: 330
+E
+T 3048
+T 3054
+#3001
+baker~
+the @Yba@Oke@Yr@n~
+The @Yba@Oke@Yr@n works beside the ovens, dusted lightly with flour.
+~
+Flour dusts the baker's apron and forearms, and years beside hot ovens have
+left his hands broad and scarred. He moves with the easy confidence of a
+craftsman who knows exactly when a loaf is ready by smell, sound, and touch.
+~
+26635 0 0 0 16 0 0 0 900 E
+33 9 25 6d6+330 5d5+5
+330 0
+8 8 1
+GoldMin: 330
+GoldMax: 330
+E
+T 3031
+T 3048
+T 3054
+#3002
+shop clerk~
+the @Wsh@Cop @Wcl@Cer@Wk@n~
+The @Wsh@Cop @Wcl@Cer@Wk@n keeps the counter orderly and watches the shelves.
+~
+A sturdy clerk in a plain work apron keeps the shelves orderly and the counter
+clear. Lanterns, rope, bags, boxes, and other travel necessities are arranged
+within easy reach, and his quick eye notices merchandise that wanders.
+~
+26635 0 0 0 16 0 0 0 900 E
+33 9 25 6d6+330 5d5+5
+330 0
+8 8 1
+GoldMin: 330
+GoldMax: 330
+E
+T 3032
+T 3048
+T 3054
+#3003
+weaponsmith~
+the @Dwe@Oap@Won@Dsm@Oit@Wh@n~
+The @Dwe@Oap@Won@Dsm@Oit@Wh@n tends the racks with a craftsman's critical eye.
+~
+Soot marks the weaponsmith's leather apron, while small burns and old cuts score
+his forearms. He checks edges, grips, and balance with patient concentration,
+treating every weapon as a tool that must survive hard use rather than merely shine.
+~
+26635 0 0 0 16 0 0 0 900 E
+33 9 25 6d6+330 5d5+5
+330 0
+8 8 1
+GoldMin: 330
+GoldMax: 330
+E
+T 3033
+T 3048
+T 3054
+#3004
+armorer~
+the @Dar@Wmo@Ore@Dr@n~
+The @Dar@Wmo@Ore@Dr@n inspects a piece of fitted armor behind the counter.
+~
+The veteran armorer has thick forearms, a measuring cord at his belt, and the
+habit of inspecting straps and rivets whenever his hands are idle. Years of
+hammer work have left him broad through the shoulders and exacting about fit.
+~
+26635 0 0 0 16 0 0 0 900 E
+33 9 25 6d6+330 5d5+5
+330 0
+8 8 1
+GoldMin: 330
+GoldMax: 330
+E
+T 3034
+T 3048
+T 3054
+#3005
+inn steward receptionist keeper~
+the @Yin@Wn @Ost@Yew@War@Od@n~
+The @Yin@Wn @Ost@Yew@War@Od@n keeps a practiced eye on the common room.
+~
+A middle-aged woman in a neat woolen dress keeps the inn's ledgers and room keys in careful order. Her practiced smile is warm, but her sharp eyes suggest that very little escapes her notice.
+~
+59419 0 0 0 65616 0 0 0 900 E
+33 9 25 6d6+330 5d5+5
+330 0
+8 8 2
+GoldMin: 330
+GoldMax: 330
+E
+T 3036
+T 3049
+T 3054
+T 3055
+#3006
+captain stolar boatwright boat merchant river captain~
+@BCa@Cpt@Wai@Bn @BSt@Col@War@n~
+@BCa@Cpt@Wai@Bn @BSt@Col@War@n watches the river traffic with a mariner's patience.
+~
+A weathered former river captain stands with the balance of someone accustomed
+to shifting decks. Sun, wind, and river spray have roughened his face, while his
+hands remain strong enough to test rope, hull seams, and oarlocks by feel.
+~
+26635 0 0 0 16 0 0 0 900 E
+33 9 25 6d6+330 5d5+5
+330 0
+8 8 1
+GoldMin: 330
+GoldMax: 330
+E
+T 3052
+T 3054
+#3007
+river warehouse keeper sailor dockworker warehouseman~
+the @Bri@Cve@Wr @Bwa@Cre@Who@Bus@Ce @Wke@Bep@Cer@n~
+The @Bri@Cve@Wr @Bwa@Cre@Who@Bus@Ce @Wke@Bep@Cer@n checks cargo marks and warehouse tallies.
+~
+This broad-backed river worker wears a patched vest over a faded work shirt.
+Tar stains his hands and old rope burns mark his palms. He keeps the remaining
+warehouse gear sorted with the practical care of someone who knows what river travel costs.
+~
+26634 0 0 0 0 0 0 0 900 E
+33 9 25 6d6+330 5d5+5
+330 0
+8 8 1
+GoldMin: 330
+GoldMax: 330
+E
+T 3052
+T 3054
+#3009
+wally watermaster~
+@BWa@Cll@Wy @Bthe @CWa@Bter@Cmas@Bter@n~
+@BWa@Cll@Wy @Bthe @CWa@Bter@Cmas@Bter@n stands behind rows of sealed jugs and travel canteens.
+~
+Wally is a broad, cheerful merchant with strong hands and a leather apron darkened
+by splashed water. Clay jugs, stoppered bottles, and travel canteens fill the
+shelves behind him, each marked for its spring or well of origin.
+~
+26635 0 0 0 16 0 0 0 800 E
+33 9 25 6d6+330 5d5+5
+330 0
+8 8 1
+GoldMin: 330
+GoldMax: 330
+E
+T 3035
+T 3048
+T 3054
+#3010
+master courier postmaster courier~
+the @Bma@Cst@Wer @Bcou@Wri@Cer@n~
+The @Bma@Cst@Wer @Bcou@Wri@Cer@n sorts sealed letters behind the counter.
+~
+An older man in a dark blue tabard moves between rows of pigeonholes with practiced efficiency. A brass badge bearing Midgaard's seal marks him as master of the city's couriers, and a ring of wax seals hangs from his belt beside a well-worn dispatch ledger.
+~
+518154 0 0 0 65552 0 0 0 1000 E
+33 9 25 6d6+330 5d5+5
+330 0
+8 8 1
+GoldMin: 330
+GoldMax: 330
+E
+T 3027
+T 3052
+T 3054
+#3011
+travelling peddler woman merchant saleswoman~
+the @Ytr@Oav@Yel@Wli@Ong @Ype@Odd@Yle@Wr@n~
+The @Ytr@Oav@Yel@Wli@Ong @Ype@Odd@Yle@Wr@n watches passersby with a merchant's hopeful eye.
+~
+Road dust clings to the peddler's layered cloak, and dozens of little bundles hang from the straps of her weathered packs. She has the quick smile of someone who can make even the strangest trinket sound indispensable.
+~
+253962 0 0 0 0 0 0 0 0 E
+30 10 25 6d6+300 5d5+5
+300 0
+8 8 2
+GoldMin: 300
+GoldMax: 300
+E
+T 3037
+T 3048
+T 3054
+#3012
+kind soul~
+a @Wki@Cnd @Ws@Cou@Wl@n~
+A @Wki@Cnd @Ws@Cou@Wl@n lingers nearby, ready to help anyone who looks lost.
+~
+   She immediately reminds you of your mother.  Constantly worrying about
+everyone and everything.  She is always around to help out those who have hit
+hard times and need a little boost.
+~
+253962 0 0 0 0 0 0 0 0 E
+30 10 25 6d6+300 5d5+5
+300 0
+8 8 2
+GoldMin: 300
+GoldMax: 300
+E
+T 3016
+T 3053
+T 3054
+T 3055
+#3013
+city guide newcomer tour helper~
+the @Cci@Wty @Bgu@Ci@Wde@n~
+A cheerful @Cci@Wty @Bgu@Ci@Wde@n waits here to help newcomers. Tell guide help for assistance.
+~
+A young woman in Midgaard's colors carries a well-used walking staff and a leather folio of hand-drawn maps. She seems genuinely pleased to point new arrivals toward the city's guilds, markets, inns, and gates.
+~
+10 0 0 0 2128 0 0 0 0 E
+10 17 25 2d6+243 1d2+1
+100 0
+8 8 2
+SavingPara: 2
+SavingRod: 2
+SavingPetri: 2
+SavingBreath: 2
+SavingSpell: 2
+GoldMin: 100
+GoldMax: 100
+E
+T 3028
+T 3047
+T 3054
+T 3055
+#3019
+veteran guild instructor trainer adventurer guildmaster~
+the @Ygu@Wi@Yld @Gin@Ystr@Wuc@Ytor@n~
+The @Ygu@Wi@Yld @Gin@Ystr@Wuc@Ytor@n oversees adventurers practicing and training in the yard.
+~
+A seasoned adventurer in a weathered cloak studies every drill with a patient, exacting eye. Old scars, carefully maintained gear, and insignias from many different disciplines show that he has spent a lifetime learning how different paths develop. He now serves the Adventurer's Guild as its universal instructor for both practice and training.
+~
+845851 0 0 0 2360 0 0 0 0 E
+0 20 0 1d1+0 1d1+0
+0 0
+8 8 1
+E
+T 3041
+T 3050
+T 3054
+#3024
+arcane warden sorcerer guildguard~
+the @MAr@Cca@Bne @Mwa@Crd@Ben@n~
+An @MAr@Cca@Bne @Mwa@Crd@Ben@n watches over the demonstration circles.
+~
+Layered robes and a rune-marked wand identify this veteran spellcaster as one of the wardens responsible for keeping dangerous experiments under control. The warden watches visitors carefully without restricting the hall to any single class.
+~
+256010 0 0 0 80 0 0 0 900 E
+33 9 25 6d6+330 5d5+5
+330 0
+8 8 1
+GoldMin: 330
+GoldMax: 330
+EquipItem: 3053 17
+E
+T 3024
+T 3050
+T 3054
+#3025
+temple warden templar guildguard~
+the @Wte@Ymp@Cle @Wwa@Yrd@Cen@n~
+A @Wte@Ymp@Cle @Wwa@Yrd@Cen@n stands quietly near the cloister.
+~
+A disciplined temple warden in polished mail keeps watch over the cloister. The insignia on the tabard marks service to the temple rather than allegiance to any particular adventuring class.
+~
+256010 0 0 0 80 0 0 0 1000 E
+33 9 25 6d6+330 5d5+5
+330 0
+8 8 1
+GoldMin: 330
+GoldMax: 330
+EquipItem: 3024 16
+E
+T 3023
+T 3051
+T 3054
+T 3055
+#3026
+guild bounty hunter tracker assassin guildguard~
+the @Dgu@Ril@od @Rbo@Dun@Rty @Dhu@Rn@oter@n~
+A @Dgu@Ril@od @Rbo@Dun@Rty @Dhu@Rn@oter@n studies the contract traffic with a guarded expression.
+~
+A dark-cloaked veteran leans near the contract annex with the stillness of someone accustomed to tracking dangerous prey. Several sealed bounty tokens hang from a belt beside a well-kept blade.
+~
+256010 0 0 0 1572944 0 0 0 400 E
+33 9 25 6d6+330 5d5+5
+330 0
+8 8 1
+GoldMin: 330
+GoldMax: 330
+EquipItem: 3020 16
+E
+T 3025
+T 3050
+T 3054
+#3027
+guild warden knight guildguard adventurer~
+the @Bgu@Wil@Cd @Bwa@Crd@Wen@n~
+A @Bgu@Wil@Cd @Bwa@Crd@Wen@n keeps watch over the Adventurer's Guild entrance.
+~
+A broad-shouldered veteran in practical armor stands beside the guild registry. The crossed-road badge of the Adventurer's Guild is fixed to the shoulder, marking responsibility for keeping order among members of every path.
+~
+256010 0 0 0 80 0 0 0 800 E
+33 9 25 6d6+330 5d5+5
+330 0
+8 8 1
+GoldMin: 330
+GoldMax: 330
+EquipItem: 3022 16
+E
+T 3026
+T 3050
+T 3054
+#3040
+bartender~
+the @Yba@Ort@Yen@Wde@Or@n~
+The @Yba@Ort@Yen@Wde@Or@n works the counter with quick, practiced movements.
+~
+A tired but capable bartender works the counter with the calm efficiency of
+someone who has seen every kind of traveler come through the door. He keeps mugs
+moving, arguments short, and a practiced eye on anyone likely to start trouble.
+~
+24586 0 0 0 0 0 0 0 900 E
+24 12 25 4d4+240 4d4+4
+240 0
+8 8 1
+GoldMin: 240
+GoldMax: 240
+E
+T 3030
+T 3049
+T 3054
+T 3055
+#3042
+arcane commons steward server waiter scholar~
+the @Mar@Cca@Bne @Mco@Cmm@Bon@Ms @Cst@Bew@Mar@Cd@n~
+The @Mar@Cca@Bne @Mco@Cmm@Bon@Ms @Cst@Bew@Mar@Cd@n keeps the shared hall in disciplined order.
+~
+A composed steward in a dark, rune-trimmed vest serves scholars and hedge mages
+without disturbing their arguments. He has learned which tables need more lamp oil,
+which patrons forget to eat, and which experiments should remain far from the drinks.
+~
+24586 0 0 0 0 0 0 0 600 E
+23 13 25 4d4+230 3d3+3
+230 0
+8 8 1
+GoldMin: 230
+GoldMax: 230
+E
+T 3049
+T 3054
+#3043
+refectory steward server waiter temple attendant~
+the @Yre@Wfe@Oct@Yor@Wy @Ost@Yew@War@Od@n~
+The @Yre@Wfe@Oct@Yor@Wy @Ost@Yew@War@Od@n oversees meals and the steady movement of diners.
+~
+A plainly dressed temple attendant carries simple meals and drink between the
+well-used tables. His manner is patient and unobtrusive, with the steady efficiency
+of someone accustomed to feeding tired travelers, clergy, and people seeking aid.
+~
+24586 0 0 0 0 0 0 0 600 E
+23 13 25 4d4+230 3d3+3
+230 0
+8 8 1
+GoldMin: 230
+GoldMax: 230
+E
+T 3049
+T 3051
+T 3054
+T 3055
+#3044
+lantern room steward server waiter guild attendant~
+the @YLa@Ont@Wer@Yn @ORo@Yom @Wst@Yew@Oar@Wd@n~
+The @YLa@Ont@Wer@Yn @ORo@Yom @Wst@Yew@Oar@Wd@n keeps the room welcoming and orderly.
+~
+This discreet guild-side steward keeps his voice low and his attention sharp.
+He serves scouts, couriers, and bounty hunters without prying into their business,
+and seems to know exactly when a conversation would benefit from another drink.
+~
+24586 0 0 0 0 0 0 0 600 E
+23 13 25 4d4+230 3d3+3
+230 0
+8 8 1
+GoldMin: 230
+GoldMax: 230
+E
+T 3049
+T 3054
+#3045
+guild steward waiter barkeep~
+the @Ygu@Wil@Cd @Yst@Gew@War@Yd@n~
+The @Ygu@Wil@Cd @Yst@Gew@War@Yd@n manages the guild's daily traffic and requests.
+~
+A capable steward moves between the commons tables with mugs, meals, and a remarkable memory for who has just returned from which road. Between orders, the steward keeps an ear open for rumors that might interest the contract board.
+~
+4218890 0 0 0 0 0 0 0 600 E
+23 13 25 4d4+230 3d3+3
+230 0
+8 8 1
+GoldMin: 230
+GoldMax: 230
+E
+T 3029
+T 3049
+T 3054
+T 3055
+#3046
+bent copper keeper innkeeper barkeep tavern keeper~
+the @oBe@Ont @YCo@opp@Oer @oke@Yep@Oer@n~
+The @oBe@Ont @YCo@opp@Oer @oke@Yep@Oer@n keeps a wary eye on the room and its patrons.
+~
+A heavyset innkeeper in a patched leather apron runs the Bent Copper with blunt
+efficiency. Smoke has roughened his voice and years of dealing with laborers and
+mercenaries have taught him when to pour another drink and when to end an argument.
+~
+26650 0 0 0 16 0 0 0 600 E
+33 9 25 6d6+330 5d5+5
+330 0
+8 8 1
+GoldMin: 330
+GoldMax: 330
+E
+T 3049
+T 3054
+T 3055
+#3059
+keeper peacekeeper~
+the @bPe@Cac@We@bke@Cep@Wer@n~
+A @bPe@Cac@We@bke@Cep@Wer@n watches the flow of people through the busy street.
+~
+This seasoned civic officer wears practical mail beneath a clean city tabard.
+A baton, whistle, and serviceable blade hang from the belt, but the Peacekeeper's
+attention stays on crowds, disputes, and the small problems that can become large ones.
+~
+6232 0 0 0 16 0 0 0 1000 E
+17 15 25 3d3+145 2d2+2
+170 0
+8 8 1
+BareHandAttack: 10
+GoldMin: 170
+GoldMax: 170
+E
+T 3009
+T 3020
+T 3043
+T 3044
+T 3045
+T 3046
+#3060
+cityguard guard~
+the @bci@Cty@Wgu@bar@Cd@n~
+A @bci@Cty@Wgu@bar@Cd@n keeps a practiced watch over the street.
+~
+This cityguard wears a weathered tabard over practical armor and carries the
+unremarkable equipment of a working patrol. The guard watches alleys, doorways,
+carts, and passing crowds with the alert patience of someone used to city duty.
+~
+6216 0 0 0 16 0 0 0 1000 E
+10 15 25 2d6+293 1d6+3
+100 0
+8 8 1
+GoldMin: 100
+GoldMax: 100
+EquipItem: 3022 16
+E
+T 3009
+T 3021
+T 3043
+T 3044
+T 3045
+T 3046
+#3061
+street sweeper cleaner worker janitor~
+the street sweeper~
+A city street sweeper works patiently along the roadside.
+~
+Dressed in patched work clothes bearing a small Midgaard badge, the sweeper keeps the streets clear of refuse left by careless travelers. A battered handcart and stiff-bristled broom are never far from reach.
+~
+2120 0 0 0 0 0 0 0 800 E
+1 20 0 2d6+13 1d2+0
+10 0
+8 8 1
+GoldMin: 10
+GoldMax: 10
+E
+T 3011
+#3062
+stray hound dog fido~
+a stray hound~
+A hungry stray hound noses through the refuse for scraps.
+~
+This lean, rough-coated hound has learned to survive on the edges of Midgaard's streets. Its ribs show beneath dirty fur, but its eyes remain alert and clever whenever the scent of food reaches its nose.
+~
+202 0 0 0 65536 0 0 0 -200 E
+1 18 0 2d6+11 1d2+0
+11 0
+8 8 1
+BareHandAttack: 4
+GoldMin: 1
+GoldMax: 1
+E
+T 3010
+#3063
+mercenary~
+the @Dme@Wrc@Oen@Dar@Wy@n~
+The @Dme@Wrc@Oen@Dar@Wy@n watches the street with a professional soldier's caution.
+~
+Road dust stains the mercenary's boots and cloak, while a maintained sword hangs
+where it can be reached quickly. His gear is practical rather than impressive,
+and his watchful expression suggests that danger is simply another part of the price.
+~
+2058 0 0 0 0 0 0 0 -330 E
+5 17 25 2d6+103 1d4+1
+50 0
+8 8 1
+GoldMin: 3
+GoldMax: 5
+E
+T 3038
+#3064
+drunk~
+the drunk~
+A cheerful drunk sways near the tavern, singing badly to himself.
+~
+His coat is rumpled, his cheeks are flushed, and the smell of ale follows every
+unsteady movement. He seems enormously pleased with the world at the moment,
+though his grip on both his cup and his remaining coin is becoming uncertain.
+~
+10 0 0 0 0 0 0 0 400 E
+2 20 0 2d6+23 1d2+0
+20 0
+8 8 1
+GoldMin: 20
+GoldMax: 20
+E
+T 3039
+#3065
+beggar~
+the beggar~
+A weary beggar watches passersby and quietly asks for a little help.
+~
+A patched cloak and worn shoes speak of long days spent on hard streets. The
+beggar looks tired rather than helpless, watching the passing crowd with the sharp
+attention of someone who has learned to notice generosity before it disappears.
+~
+10 0 0 0 0 0 0 0 400 E
+1 20 0 2d6+13 1d2+0
+10 0
+8 8 2
+GoldMin: 10
+GoldMax: 10
+E
+T 3040
+#3066
+scarred stray hound dog~
+a scarred stray hound~
+A scarred stray hound prowls here with its hackles raised.
+~
+Older and meaner than most street dogs, this scarred hound watches every movement with hungry suspicion. Torn ears and a patchwork of old wounds suggest years spent fighting over scraps in Midgaard's alleys.
+~
+65768 0 0 0 65536 0 0 0 -200 E
+1 17 0 2d6+18 1d2+0
+10 0
+8 8 1
+BareHandAttack: 4
+GoldMin: 1
+GoldMax: 2
+E
+T 3010
+#3067
+cityguard guard~
+the @bci@Wty@Cgu@bar@Wd@n~
+A gate @bci@Wty@Cgu@bar@Wd@n watches travelers and traffic beneath the arch.
+~
+This gate guard wears practical armor beneath a city tabard and keeps a clear
+view of both the road and the gatehouse. Dust, wagon traffic, unfamiliar travelers,
+and conditions beyond the walls receive the steady attention of a veteran sentry.
+~
+6218 0 0 0 0 0 0 0 1000 E
+10 15 25 2d6+293 1d6+3
+100 0
+8 8 1
+GoldMin: 100
+GoldMax: 100
+EquipItem: 3022 16
+E
+T 3009
+T 3022
+T 3043
+T 3044
+T 3045
+T 3046
+#3068
+refuse ooze slime gelatinous scavenger~
+a @gref@Gus@ye @goo@gze@n~
+A @gref@Gus@ye @goo@gze@n slithers wetly through the filth.
+~
+A wobbling mass of translucent green-brown slime creeps along the stones, trapping bits of straw, bone, and discarded cloth within its body. Whether created by careless alchemy or drawn up from the sewers, it has become an unsettling part of Midgaard's refuse cycle.
+~
+256216 0 0 0 16 0 0 0 0 E
+20 14 25 4d4+200 3d3+3
+200 0
+8 8 0
+BareHandAttack: 6
+GoldMin: 15
+GoldMax: 22
+E
+T 3011
+#3089
+kennelmaster beastkeeper animal handler petshop keeper~
+the @Yke@Onn@Yel@Wma@Ost@Yer@n~
+The @Yke@Onn@Yel@Wma@Ost@Yer@n tends the animals with firm, practiced care.
+~
+A broad-handed animal keeper in a leather apron moves easily among cages and pens. Scratches cover his forearms, but every animal nearby seems to know his voice. A pouch of feed and several braided leads hang from his belt.
+~
+26634 0 0 0 0 0 0 0 1000 E
+10 17 25 2d6+243 1d2+1
+100 0
+8 8 1
+GoldMin: 100
+GoldMax: 100
+InvItem: 3015 1
+E
+T 3042
+#3090
+kitten cat pet~
+the kitten~
+A curious young kitten watches the room from the clean straw.
+~
+The small kitten is all oversized ears, bright eyes, and restless curiosity.
+Its coat is clean and well tended, and it alternates between stalking bits of straw
+and watching nearby people with the solemn concentration only a young cat can manage.
+~
+16398 0 0 0 0 0 0 0 0 E
+1 20 0 2d6+5 1d2+0
+10 0
+8 8 0
+BareHandAttack: 8
+PetPrice: 10
+GoldMin: 10
+GoldMax: 10
+E
+#3091
+puppy dog pet~
+the puppy~
+An eager young puppy noses through the straw and watches for attention.
+~
+The puppy has broad paws, a soft coat, and more enthusiasm than coordination.
+Its tail rarely stops moving, and every nearby sound seems to deserve immediate
+investigation before something else becomes more interesting.
+~
+16398 0 0 0 0 0 0 0 0 E
+1 20 0 2d6+8 1d2+0
+10 0
+8 8 0
+BareHandAttack: 8
+PetPrice: 10
+GoldMin: 10
+GoldMax: 10
+E
+#3092
+beagle hound dog pet~
+the beagle~
+A compact beagle sniffs eagerly along the edge of the holding pen.
+~
+The little hound has a keen nose, alert eyes, and sturdy legs built for following
+a trail much longer than its size would suggest. It tests every new scent with
+serious attention before looking up hopefully at the nearest person.
+~
+16398 0 0 0 0 0 0 0 0 E
+2 18 0 2d6+18 1d3+0
+20 0
+8 8 0
+BareHandAttack: 4
+PetPrice: 50
+GoldMin: 20
+GoldMax: 20
+E
+#3093
+rottweiler dog guardian pet~
+the rottweiler~
+A powerfully built rottweiler waits attentively in the holding pen.
+~
+The young rottweiler is broad through the chest with a dark, glossy coat and
+watchful eyes. Calm under the kennelmaster's care, it nevertheless carries itself
+with the confidence of a dog that will grow into a formidable guardian.
+~
+16398 0 0 0 0 0 0 0 0 E
+3 17 0 2d6+43 1d3+1
+30 0
+8 8 0
+BareHandAttack: 4
+PetPrice: 80
+GoldMin: 30
+GoldMax: 30
+E
+#3094
+trained wolf companion pet~
+the wolf~
+A large trained wolf rests alertly behind the sturdy pen latch.
+~
+This wolf has been raised around handlers without losing the wary intelligence of
+a wild predator. Thick fur covers a lean, powerful frame, and its pale eyes follow
+movement quietly while its ears track every unfamiliar sound.
+~
+16398 0 0 0 0 0 0 0 0 E
+4 17 25 2d6+63 1d4+1
+40 0
+8 8 0
+BareHandAttack: 4
+PetPrice: 110
+GoldMin: 2
+GoldMax: 4
+E
+#3095
+dreamwarden warden keeper sleeper guardian~
+the @Mdr@Cea@Bmw@Mar@Cde@Bn@n~
+The @Mdr@Cea@Bmw@Mar@Cde@Bn@n stands in quiet vigilance, half-shadowed by strange light.
+~
+A pale-robed woman moves quietly among the crystal alcoves, checking silver runes
+and renewing the wards that shelter sleeping travelers. A faint shimmer clings to
+her sleeves whenever she passes a warded alcove, then fades like the edge of a dream.
+~
+26634 0 0 0 65616 0 0 0 900 E
+33 9 25 6d6+330 5d5+5
+330 0
+8 8 2
+GoldMin: 330
+GoldMax: 330
+E
+$

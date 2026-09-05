@@ -12,6 +12,7 @@ hill from other bugs.
 30 900
 8 8 0
 BareHandAttack: 4
+BodyProfile: 9
 E
 #4601
 red soldier ant~
@@ -27,6 +28,7 @@ existing residents.
 70 4900
 8 8 0
 BareHandAttack: 1
+BodyProfile: 9
 E
 #4616
 green soldier ant~
@@ -41,6 +43,7 @@ anthill.  They do no work, but will sacrifice themselves for the queen.
 30 900
 8 8 0
 BareHandAttack: 11
+BodyProfile: 9
 E
 #4632
 huge green soldier ant~
@@ -56,6 +59,7 @@ anthill.
 70 4900
 8 8 0
 BareHandAttack: 4
+BodyProfile: 9
 E
 T 4603
 T 4605
@@ -74,6 +78,7 @@ guards over her newborn larvae.
 70 4900
 8 8 2
 BareHandAttack: 4
+BodyProfile: 9
 E
 T 4602
 T 4604
@@ -92,5 +97,6 @@ larvae.
 70 4900
 8 8 0
 BareHandAttack: 4
+BodyProfile: 9
 E
 $

@@ -11,6 +11,7 @@ He looks Dead!
 140 19600
 8 8 0
 BareHandAttack: 3
+BodyProfile: 1
 E
 #2201
 zombie knight~
@@ -26,6 +27,7 @@ remains of this undead monsters body.
 180 32400
 8 8 0
 BareHandAttack: 3
+BodyProfile: 1
 E
 #2202
 zombie servant~
@@ -39,6 +41,7 @@ A zombie servants rotten head almost falls off as he bows before you.
 180 32400
 8 8 0
 BareHandAttack: 13
+BodyProfile: 1
 E
 #2203
 zombie maid~
@@ -53,6 +56,7 @@ soulless husk of a human being.
 140 19600
 8 8 0
 BareHandAttack: 5
+BodyProfile: 1
 E
 #2204
 zombie lord~
@@ -69,6 +73,7 @@ eyes.
 180 32400
 8 8 0
 BareHandAttack: 6
+BodyProfile: 1
 E
 #2205
 zombie lady~
@@ -83,6 +88,7 @@ oozing green puss don't do much to help this lady now.
 100 10000
 8 8 0
 BareHandAttack: 8
+BodyProfile: 1
 E
 #2206
 skeleton bones~
@@ -97,6 +103,7 @@ actually alive and looks ready to attack.
 180 32400
 8 8 0
 BareHandAttack: 5
+BodyProfile: 1
 E
 #2207
 undead~
@@ -124,6 +131,7 @@ with an air of authority that is expected to be respected and followed.
 180 32400
 8 8 2
 BareHandAttack: 8
+BodyProfile: 1
 E
 #2209
 blistered zombie~
@@ -138,6 +146,7 @@ clothing remains, what does is slowly smoldering into ash.
 140 19600
 8 8 0
 BareHandAttack: 13
+BodyProfile: 1
 E
 #2210
 zombie~
@@ -152,6 +161,7 @@ is none too appealing and makes your eyes burn.
 180 32400
 8 8 0
 BareHandAttack: 7
+BodyProfile: 1
 E
 #2211
 zombie~
@@ -166,6 +176,7 @@ hair and flesh to make you gag.  It seems oblivious to the world.
 180 32400
 8 8 0
 BareHandAttack: 10
+BodyProfile: 1
 E
 #2212
 algae monster~
@@ -196,6 +207,7 @@ shoulders.  He looks to be much more than just your average vampire.
 180 32400
 8 8 1
 BareHandAttack: 4
+BodyProfile: 1
 E
 #2214
 damsel~
@@ -210,6 +222,7 @@ sirens you've heard of.
 140 19600
 8 8 2
 BareHandAttack: 8
+BodyProfile: 1
 E
 #2215
 prisoner~
@@ -224,6 +237,7 @@ become of him.
 140 19600
 8 8 0
 BareHandAttack: 13
+BodyProfile: 1
 E
 #2216
 Inquisitor~
@@ -281,6 +295,7 @@ with maggots.
 180 32400
 8 8 0
 BareHandAttack: 13
+BodyProfile: 1
 E
 #2220
 zombie~
@@ -294,6 +309,7 @@ A zombie covered in mold is lying on the floor.
 140 19600
 8 8 0
 BareHandAttack: 10
+BodyProfile: 1
 E
 #2221
 wraith~
@@ -309,6 +325,7 @@ imagination.
 180 32400
 8 8 0
 BareHandAttack: 6
+BodyProfile: 0
 E
 #2222
 shade~
@@ -336,6 +353,7 @@ moves even slower than normal.
 180 32400
 8 8 0
 BareHandAttack: 6
+BodyProfile: 1
 E
 #2224
 zombie king~
@@ -351,6 +369,7 @@ everyone to obey his every command.
 180 32400
 8 8 1
 BareHandAttack: 11
+BodyProfile: 1
 E
 #2225
 zombie queen~
@@ -364,6 +383,7 @@ A zombie queen sniffs in disdain at you.
 180 32400
 8 8 2
 BareHandAttack: 8
+BodyProfile: 1
 E
 #2226
 dungeon guard~
@@ -378,6 +398,7 @@ over his armor with two crossed thunderbolts emblazoned on it.
 180 32400
 8 8 2
 BareHandAttack: 6
+BodyProfile: 1
 E
 #2227
 dungeon sentry~
@@ -393,6 +414,7 @@ She doesn't move an inch.
 140 19600
 8 8 2
 BareHandAttack: 10
+BodyProfile: 1
 E
 #2228
 master~
@@ -421,6 +443,7 @@ on life, will you save her?
 140 19600
 8 8 2
 BareHandAttack: 8
+BodyProfile: 1
 E
 T 2204
 #2230
@@ -436,5 +459,6 @@ escapes confinement from his warded cell.
 180 32400
 8 8 1
 BareHandAttack: 5
+BodyProfile: 1
 E
 $

@@ -14,6 +14,7 @@ yourself and end your pain.
 0 40000
 8 8 2
 BareHandAttack: 8
+BodyProfile: 0
 E
 T 13008
 #13001
@@ -32,6 +33,7 @@ yourself and end your pain.
 0 44100
 8 8 2
 BareHandAttack: 11
+BodyProfile: 0
 E
 T 13008
 #13002
@@ -50,6 +52,7 @@ yourself and end your pain.
 0 62500
 8 8 1
 BareHandAttack: 1
+BodyProfile: 0
 E
 T 13008
 #13003
@@ -68,6 +71,7 @@ yourself and end your pain.
 0 62500
 8 8 0
 BareHandAttack: 4
+BodyProfile: 0
 E
 T 13008
 #13004

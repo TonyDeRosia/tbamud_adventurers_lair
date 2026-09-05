@@ -11,6 +11,7 @@ her.  She hobbles along aimlessly.
 3 19 8 0d0+30 1d2+0
 30 900
 8 8 2
+BodyProfile: 1
 E
 #20001
 bunny rabbit fuzzy~
@@ -24,6 +25,7 @@ A cute, furry rabbit is hopping about here.
 30 900
 8 8 0
 BareHandAttack: 8
+BodyProfile: 2
 E
 #20002
 fawn deer~
@@ -51,6 +53,7 @@ A bear cub stares warily at your intrusion.
 30 900
 8 8 0
 BareHandAttack: 4
+BodyProfile: 2
 E
 #20004
 wondering missionary~
@@ -79,6 +82,7 @@ things surprise or threaten him on his own turf.
 3 19 8 0d0+30 1d2+0
 30 900
 8 8 1
+BodyProfile: 1
 E
 #20006
 mother bear~
@@ -94,6 +98,7 @@ their young.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 2
+BodyProfile: 2
 E
 #20007
 sairith fur trader man~
@@ -108,6 +113,7 @@ never find a better bargain anywhere else.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 1
+BodyProfile: 1
 E
 #20008
 trapper man talbath~
@@ -121,6 +127,7 @@ trapline for any catch that he can take back to the trading post and sell.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 1
+BodyProfile: 1
 E
 #20009
 fox red~
@@ -135,6 +142,7 @@ have been known to raid local farms when food becomes sparse.
 3 19 8 0d0+30 1d2+0
 30 900
 8 8 1
+BodyProfile: 2
 E
 #20010
 crazy lunatic man jaron~
@@ -150,6 +158,7 @@ You suddenly realize that he is naked, solely covered by dirt and grime.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 1
+BodyProfile: 1
 E
 #20011
 Captain~
@@ -165,6 +174,7 @@ like he did.
 5 19 7 1d1+50 1d2+0
 50 2500
 5 5 1
+BodyProfile: 1
 E
 T 20011
 $

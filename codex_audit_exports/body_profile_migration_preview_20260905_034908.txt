@@ -1,0 +1,501 @@
+Adventurer's Lair BodyProfile Migration
+Generated: 2026-09-05 03:49:08
+Mode: Preview
+Repo: C:\Users\antho\Desktop\TBAMUD\TBAMUD UPDATED
+Classification: C:\Users\antho\Desktop\TBAMUD\TBAMUD UPDATED\tbamud_adventurers_lair-main\tbamud_adventurers_lair-main\mob_classified.json
+
+========================================================================================
+SOURCE PROFILE CONTRACT
+========================================================================================
+OK  BODY_PROFILE_NONE                  0
+OK  BODY_PROFILE_HUMANOID              1
+OK  BODY_PROFILE_QUADRUPED             2
+OK  BODY_PROFILE_SERPENT               3
+OK  BODY_PROFILE_AVIAN                 4
+OK  BODY_PROFILE_ARACHNID              5
+OK  BODY_PROFILE_DRAGON                6
+OK  BODY_PROFILE_HORNED_HUMANOID       7
+OK  BODY_PROFILE_TAILED_HUMANOID       8
+OK  BODY_PROFILE_INSECTOID             9
+OK  BODY_PROFILE_WINGED_INSECTOID      10
+OK  BODY_PROFILE_CONSTRUCT             11
+OK  BODY_PROFILE_AMORPHOUS             12
+OK  BODY_PROFILE_FISH                  13
+OK  BODY_PROFILE_PLANT                 14
+OK  BODY_PROFILE_CENTAUROID            15
+OK  BODY_PROFILE_CRUSTACEAN            16
+OK  BODY_PROFILE_WINGED_QUADRUPED      17
+OK  BODY_PROFILE_TENTACLED             18
+OK  BODY_PROFILE_BAT                   19
+OK  NUM_BODY_PROFILES                  20
+
+========================================================================================
+CLASSIFIER INPUT
+========================================================================================
+Normalized entries:  3785
+First entry fields:   vnum, file, keywords, short, long, description, profile, format, recommended, confidence, reason
+Total entries:       3785
+High confidence:     12
+Medium confidence:   2581
+Review untouched:    1192
+Selected for migrate:2593
+
+Selected recommendations by target profile:
+   0 None                    55
+   1 Humanoid              1802
+   2 Quadruped              315
+   3 Serpent                 37
+   4 Avian                   87
+   5 Arachnid                60
+   6 Dragon                  57
+   7 Horned Humanoid         28
+   8 Tailed Humanoid          4
+   9 Insectoid               19
+  10 Winged Insectoid        19
+  11 Construct               30
+  12 Amorphous                5
+  13 Fish                    18
+  14 Plant                    8
+  15 Centauroid               9
+  16 Crustacean              14
+  17 Winged Quadruped         2
+  18 Tentacled                6
+  19 Bat                     18
+
+========================================================================================
+FULL PREFLIGHT
+========================================================================================
+Validated selected mobs: 2593
+Files requiring edits:   171
+BodyProfile insertions:  2578
+BodyProfile replacements:11
+Already correct:         4
+Review mobs untouched:   1192
+
+========================================================================================
+ZONE 340 PLAN
+========================================================================================
+#34000 REPLACE  1 Humanoid -> 11 Construct [high]
+#34001 REPLACE  0 None -> 10 Winged Insectoid [high]
+#34002 REPLACE  1 Humanoid -> 11 Construct [high]
+#34003 REPLACE  1 Humanoid -> 11 Construct [high]
+#34004 REPLACE  0 None -> 10 Winged Insectoid [medium]
+#34005 REPLACE  0 None -> 9 Insectoid [medium]
+#34006 REPLACE  0 None -> 10 Winged Insectoid [medium]
+#34008 REPLACE  0 None -> 9 Insectoid [medium]
+#34009 ALREADY  5 Arachnid -> 5 Arachnid [medium]
+#34011 ALREADY  2 Quadruped -> 2 Quadruped [medium]
+#34013 REPLACE  0 None -> 10 Winged Insectoid [high]
+#34015 REPLACE  0 None -> 10 Winged Insectoid [medium]
+#34017 ALREADY  5 Arachnid -> 5 Arachnid [medium]
+#34018 ALREADY  5 Arachnid -> 5 Arachnid [medium]
+#34019 REPLACE  5 Arachnid -> 0 None [high]
+
+========================================================================================
+FULL CHANGE PLAN
+========================================================================================
+lib\world\mob\0.mob #0 INSERT   Automatic -> 0:None | high | Invisible DG trigger host, not a creature
+lib\world\mob\0.mob #1 INSERT   Automatic -> 6:Dragon | medium | Identity corroborated in at least two description fields: dragon
+lib\world\mob\0.mob #2 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: cleric, healer
+lib\world\mob\0.mob #3 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: questmaster
+lib\world\mob\0.mob #4 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: healer
+lib\world\mob\0.mob #5 INSERT   Automatic -> 1:Humanoid | high | Human Russell namesake
+lib\world\mob\0.mob #6 INSERT   Automatic -> 1:Humanoid | high | Human Russell namesake
+lib\world\mob\0.mob #7 INSERT   Automatic -> 2:Quadruped | medium | Identity corroborated in at least two description fields: terrier
+lib\world\mob\0.mob #8 INSERT   Automatic -> 2:Quadruped | high | Named terrier
+lib\world\mob\0.mob #9 INSERT   Automatic -> 2:Quadruped | medium | Identity corroborated in at least two description fields: dog
+lib\world\mob\0.mob #11 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: humanoid, zombie
+lib\world\mob\0.mob #12 INSERT   Automatic -> 2:Quadruped | high | Named terrier
+lib\world\mob\0.mob #14 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: questmaster
+lib\world\mob\0.mob #16 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: ogre
+lib\world\mob\0.mob #19 INSERT   Automatic -> 0:None | medium | Identity corroborated in at least two description fields: aerial servant
+lib\world\mob\0.mob #20 INSERT   Automatic -> 0:None | medium | Identity corroborated in at least two description fields: elemental
+lib\world\mob\0.mob #24 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: gateguard, guard
+lib\world\mob\0.mob #25 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: questmaster
+lib\world\mob\0.mob #27 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: man
+lib\world\mob\0.mob #29 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: man
+lib\world\mob\0.mob #30 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: spy
+lib\world\mob\0.mob #31 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: commissar
+lib\world\mob\0.mob #97 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: girl, waitress, woman
+lib\world\mob\0.mob #98 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: saleswoman, woman
+lib\world\mob\1.mob #100 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: man
+lib\world\mob\1.mob #103 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: weaponsmith
+lib\world\mob\1.mob #104 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: daughter
+lib\world\mob\1.mob #105 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: man
+lib\world\mob\1.mob #106 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: captain
+lib\world\mob\1.mob #107 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: leatherworker
+lib\world\mob\1.mob #108 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: blacksmith
+lib\world\mob\1.mob #110 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: postmaster
+lib\world\mob\1.mob #111 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: jeweler
+lib\world\mob\1.mob #112 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: woman
+lib\world\mob\1.mob #113 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: lady
+lib\world\mob\1.mob #114 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: man
+lib\world\mob\1.mob #115 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: fisherman
+lib\world\mob\1.mob #116 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: man
+lib\world\mob\1.mob #117 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: kid
+lib\world\mob\1.mob #118 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: woman
+lib\world\mob\1.mob #119 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: banker
+lib\world\mob\1.mob #120 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: guildmaster, mage
+lib\world\mob\1.mob #121 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: cleric, guildmaster
+lib\world\mob\1.mob #122 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: guildmaster, thief
+lib\world\mob\1.mob #123 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: guildmaster
+lib\world\mob\1.mob #125 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: girl
+lib\world\mob\1.mob #126 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: assassin
+lib\world\mob\1.mob #127 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: guildguard, warrior
+lib\world\mob\1.mob #128 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: magi
+lib\world\mob\1.mob #129 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: man, thief
+lib\world\mob\1.mob #130 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: maid
+lib\world\mob\1.mob #131 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: hoodlum
+lib\world\mob\1.mob #132 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: butler
+lib\world\mob\1.mob #133 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: magi
+lib\world\mob\1.mob #134 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: magi
+lib\world\mob\1.mob #135 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: magi
+lib\world\mob\1.mob #136 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: magi
+lib\world\mob\1.mob #137 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: magi, man
+lib\world\mob\1.mob #138 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: magi, man
+lib\world\mob\1.mob #139 INSERT   Automatic -> 2:Quadruped | medium | Identity corroborated in at least two description fields: cat
+lib\world\mob\1.mob #140 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: bartender
+lib\world\mob\1.mob #141 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: corporal
+lib\world\mob\1.mob #142 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: magi
+lib\world\mob\1.mob #143 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: waitress, woman
+lib\world\mob\1.mob #144 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: magi
+lib\world\mob\1.mob #145 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: magi
+lib\world\mob\1.mob #146 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: magi, man
+lib\world\mob\1.mob #148 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: magi
+lib\world\mob\1.mob #149 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: sergeant
+lib\world\mob\1.mob #150 INSERT   Automatic -> 2:Quadruped | medium | Identity corroborated in at least two description fields: mutt
+lib\world\mob\1.mob #151 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: midwife
+lib\world\mob\1.mob #152 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: baby
+lib\world\mob\1.mob #153 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: pickpocket
+lib\world\mob\1.mob #154 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: patrolman
+lib\world\mob\1.mob #157 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: sage
+lib\world\mob\1.mob #159 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: lieutenant
+lib\world\mob\1.mob #160 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: general
+lib\world\mob\1.mob #162 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: statesman
+lib\world\mob\1.mob #164 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: drunk
+lib\world\mob\1.mob #165 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: beggar
+lib\world\mob\1.mob #166 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: corporal
+lib\world\mob\1.mob #167 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: sergeant
+lib\world\mob\1.mob #168 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: bum
+lib\world\mob\1.mob #169 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: citizen
+lib\world\mob\1.mob #170 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: townsman
+lib\world\mob\1.mob #171 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: townswoman, woman
+lib\world\mob\1.mob #172 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: farmer
+lib\world\mob\1.mob #173 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: guildguard, magi
+lib\world\mob\1.mob #174 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: cleric, guildguard
+lib\world\mob\1.mob #175 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: sentry
+lib\world\mob\1.mob #177 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: guildguard, thief
+lib\world\mob\1.mob #178 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: stateswoman, woman
+lib\world\mob\1.mob #179 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: recruit
+lib\world\mob\1.mob #180 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: councillor
+lib\world\mob\1.mob #183 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: thief
+lib\world\mob\1.mob #184 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: bartender
+lib\world\mob\1.mob #185 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: sage
+lib\world\mob\1.mob #186 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: healer
+lib\world\mob\1.mob #187 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: baker
+lib\world\mob\1.mob #188 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: butcher
+lib\world\mob\1.mob #189 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: commander
+lib\world\mob\1.mob #190 INSERT   Automatic -> 2:Quadruped | medium | Identity corroborated in at least two description fields: cat
+lib\world\mob\1.mob #191 INSERT   Automatic -> 2:Quadruped | medium | Identity corroborated in at least two description fields: puppy
+lib\world\mob\1.mob #192 INSERT   Automatic -> 2:Quadruped | medium | Identity corroborated in at least two description fields: dog, german shepherd
+lib\world\mob\1.mob #193 INSERT   Automatic -> 4:Avian | medium | Identity corroborated in at least two description fields: dove
+lib\world\mob\1.mob #194 INSERT   Automatic -> 2:Quadruped | medium | Identity corroborated in at least two description fields: mouse
+lib\world\mob\1.mob #195 INSERT   Automatic -> 2:Quadruped | medium | Identity corroborated in at least two description fields: kitten
+lib\world\mob\1.mob #197 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: carpenter
+lib\world\mob\1.mob #198 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: cleric
+lib\world\mob\1.mob #199 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: butcher
+lib\world\mob\100.mob #10000 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: hermit
+lib\world\mob\100.mob #10001 INSERT   Automatic -> 2:Quadruped | medium | Identity corroborated in at least two description fields: bobcat
+lib\world\mob\100.mob #10002 INSERT   Automatic -> 2:Quadruped | medium | Identity corroborated in at least two description fields: chipmunk
+lib\world\mob\100.mob #10003 INSERT   Automatic -> 2:Quadruped | medium | Identity corroborated in at least two description fields: fox
+lib\world\mob\100.mob #10004 INSERT   Automatic -> 2:Quadruped | medium | Identity corroborated in at least two description fields: coyote
+lib\world\mob\100.mob #10005 INSERT   Automatic -> 2:Quadruped | medium | Identity corroborated in at least two description fields: doe
+lib\world\mob\100.mob #10006 INSERT   Automatic -> 2:Quadruped | medium | Identity corroborated in at least two description fields: buck
+lib\world\mob\100.mob #10007 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: merchant
+lib\world\mob\100.mob #10008 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: peddler
+lib\world\mob\100.mob #10009 INSERT   Automatic -> 2:Quadruped | medium | Identity corroborated in at least two description fields: possum
+lib\world\mob\100.mob #10010 INSERT   Automatic -> 2:Quadruped | medium | Identity corroborated in at least two description fields: alligator
+lib\world\mob\100.mob #10011 INSERT   Automatic -> 2:Quadruped | medium | Identity corroborated in at least two description fields: raccoon
+lib\world\mob\100.mob #10012 INSERT   Automatic -> 2:Quadruped | medium | Identity corroborated in at least two description fields: skunk
+lib\world\mob\100.mob #10013 INSERT   Automatic -> 2:Quadruped | medium | Identity corroborated in at least two description fields: bobcat
+lib\world\mob\100.mob #10014 INSERT   Automatic -> 2:Quadruped | medium | Identity corroborated in at least two description fields: lynx
+lib\world\mob\100.mob #10015 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: hunter
+lib\world\mob\100.mob #10016 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: huntress
+lib\world\mob\101.mob #10100 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: farmer
+lib\world\mob\101.mob #10101 INSERT   Automatic -> 2:Quadruped | medium | Identity corroborated in at least two description fields: cow
+lib\world\mob\101.mob #10102 INSERT   Automatic -> 2:Quadruped | medium | Identity corroborated in at least two description fields: weasel
+lib\world\mob\101.mob #10103 INSERT   Automatic -> 2:Quadruped | medium | Identity corroborated in at least two description fields: calf, cow
+lib\world\mob\101.mob #10104 INSERT   Automatic -> 2:Quadruped | medium | Identity corroborated in at least two description fields: heifer
+lib\world\mob\101.mob #10105 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: fisherman
+lib\world\mob\101.mob #10106 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: bandit
+lib\world\mob\101.mob #10107 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: merchant
+lib\world\mob\101.mob #10108 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: gypsy
+lib\world\mob\101.mob #10109 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: trader
+lib\world\mob\101.mob #10110 INSERT   Automatic -> 2:Quadruped | medium | Identity corroborated in at least two description fields: groundhog
+lib\world\mob\103.mob #10304 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: guardian
+lib\world\mob\103.mob #10305 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: priest
+lib\world\mob\103.mob #10307 INSERT   Automatic -> 2:Quadruped | medium | Identity corroborated in at least two description fields: wolf
+lib\world\mob\103.mob #10345 INSERT   Automatic -> 1:Humanoid | medium | Description directly identifies a humanoid with corroborating personal or bodily detail
+lib\world\mob\103.mob #10362 INSERT   Automatic -> 6:Dragon | medium | Identity corroborated in at least two description fields: dragon
+lib\world\mob\103.mob #10368 INSERT   Automatic -> 4:Avian | medium | Identity corroborated in at least two description fields: bird
+lib\world\mob\103.mob #10378 INSERT   Automatic -> 2:Quadruped | medium | Identity corroborated in at least two description fields: rabbit
+lib\world\mob\103.mob #10379 INSERT   Automatic -> 2:Quadruped | medium | Identity corroborated in at least two description fields: rabbit
+lib\world\mob\103.mob #10398 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: gambler
+lib\world\mob\103.mob #10399 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: biker
+lib\world\mob\104.mob #10403 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: elven
+lib\world\mob\104.mob #10404 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: elven, woman
+lib\world\mob\104.mob #10407 INSERT   Automatic -> 2:Quadruped | medium | Identity corroborated in at least two description fields: squirrel
+lib\world\mob\104.mob #10408 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: troll
+lib\world\mob\104.mob #10410 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: orc
+lib\world\mob\104.mob #10412 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: postmaster, postmistress
+lib\world\mob\104.mob #10414 INSERT   Automatic -> 2:Quadruped | medium | Identity corroborated in at least two description fields: hound
+lib\world\mob\104.mob #10415 INSERT   Automatic -> 2:Quadruped | medium | Identity corroborated in at least two description fields: collie, dog
+lib\world\mob\104.mob #10416 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: guard
+lib\world\mob\106.mob #10602 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: priest
+lib\world\mob\106.mob #10603 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: executioner
+lib\world\mob\106.mob #10605 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: soldier
+lib\world\mob\106.mob #10606 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: soldier
+lib\world\mob\106.mob #10607 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: commando
+lib\world\mob\106.mob #10609 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: man
+lib\world\mob\106.mob #10610 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: officer
+lib\world\mob\106.mob #10611 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: captain
+lib\world\mob\106.mob #10613 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: man
+lib\world\mob\106.mob #10615 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: prisoner
+lib\world\mob\106.mob #10616 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: guard
+lib\world\mob\106.mob #10617 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: beggar, bum
+lib\world\mob\106.mob #10632 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: weaponsmith
+lib\world\mob\106.mob #10633 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: teller
+lib\world\mob\106.mob #10634 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: armorer
+lib\world\mob\106.mob #10635 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: mayor, wife
+lib\world\mob\106.mob #10636 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: mayor
+lib\world\mob\106.mob #10638 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: grocer
+lib\world\mob\106.mob #10640 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: man
+lib\world\mob\107.mob #10705 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: assassin
+lib\world\mob\107.mob #10706 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: knight
+lib\world\mob\107.mob #10713 INSERT   Automatic -> 2:Quadruped | medium | Identity corroborated in at least two description fields: rat
+lib\world\mob\107.mob #10714 INSERT   Automatic -> 2:Quadruped | medium | Identity corroborated in at least two description fields: dog
+lib\world\mob\107.mob #10715 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: boy
+lib\world\mob\107.mob #10716 INSERT   Automatic -> 2:Quadruped | medium | Identity corroborated in at least two description fields: wolverine
+lib\world\mob\107.mob #10717 INSERT   Automatic -> 2:Quadruped | medium | Identity corroborated in at least two description fields: tiger
+lib\world\mob\107.mob #10718 INSERT   Automatic -> 16:Crustacean | medium | Identity corroborated in at least two description fields: crab
+lib\world\mob\11.mob #1100 INSERT   Automatic -> 0:None | medium | Identity corroborated in at least two description fields: wraith
+lib\world\mob\11.mob #1102 INSERT   Automatic -> 6:Dragon | medium | Identity corroborated in at least two description fields: dragon
+lib\world\mob\11.mob #1103 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: queen
+lib\world\mob\11.mob #1104 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: king
+lib\world\mob\11.mob #1105 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: princess
+lib\world\mob\115.mob #11500 INSERT   Automatic -> 2:Quadruped | medium | Identity corroborated in at least two description fields: woodchuck
+lib\world\mob\115.mob #11501 INSERT   Automatic -> 2:Quadruped | medium | Identity corroborated in at least two description fields: rat
+lib\world\mob\115.mob #11502 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: goblin
+lib\world\mob\115.mob #11503 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: goblin
+lib\world\mob\115.mob #11504 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: goblin
+lib\world\mob\115.mob #11505 INSERT   Automatic -> 19:Bat | medium | Identity corroborated in at least two description fields: bat
+lib\world\mob\115.mob #11506 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: goblin
+lib\world\mob\115.mob #11507 INSERT   Automatic -> 15:Centauroid | medium | Identity corroborated in at least two description fields: centaur
+lib\world\mob\115.mob #11508 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: monk
+lib\world\mob\115.mob #11509 INSERT   Automatic -> 15:Centauroid | medium | Identity corroborated in at least two description fields: centaur
+lib\world\mob\115.mob #11510 INSERT   Automatic -> 2:Quadruped | medium | Identity corroborated in at least two description fields: rat
+lib\world\mob\115.mob #11511 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: monk
+lib\world\mob\115.mob #11512 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: monk
+lib\world\mob\115.mob #11513 INSERT   Automatic -> 15:Centauroid | medium | Identity corroborated in at least two description fields: centaur
+lib\world\mob\115.mob #11514 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: monk
+lib\world\mob\115.mob #11515 INSERT   Automatic -> 15:Centauroid | medium | Identity corroborated in at least two description fields: centaur
+lib\world\mob\115.mob #11516 INSERT   Automatic -> 15:Centauroid | medium | Identity corroborated in at least two description fields: centaur
+lib\world\mob\115.mob #11517 INSERT   Automatic -> 15:Centauroid | medium | Identity corroborated in at least two description fields: centaur
+lib\world\mob\115.mob #11518 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: guildmaster, priest
+lib\world\mob\115.mob #11519 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: goblin
+lib\world\mob\115.mob #11520 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: goblin
+lib\world\mob\115.mob #11521 INSERT   Automatic -> 15:Centauroid | medium | Identity corroborated in at least two description fields: centaur
+lib\world\mob\115.mob #11522 INSERT   Automatic -> 15:Centauroid | medium | Identity corroborated in at least two description fields: centaur
+lib\world\mob\115.mob #11523 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: monk
+lib\world\mob\115.mob #11524 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: goblin
+lib\world\mob\115.mob #11525 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: troll
+lib\world\mob\115.mob #11526 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: troll
+lib\world\mob\115.mob #11527 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: troll
+lib\world\mob\115.mob #11528 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: guardian, priest
+lib\world\mob\115.mob #11529 INSERT   Automatic -> 2:Quadruped | medium | Identity corroborated in at least two description fields: lamb
+lib\world\mob\115.mob #11534 INSERT   Automatic -> 4:Avian | medium | Identity corroborated in at least two description fields: bird
+lib\world\mob\115.mob #11537 INSERT   Automatic -> 13:Fish | medium | Identity corroborated in at least two description fields: fish
+lib\world\mob\115.mob #11538 INSERT   Automatic -> 2:Quadruped | medium | Identity corroborated in at least two description fields: piglet
+lib\world\mob\115.mob #11539 INSERT   Automatic -> 3:Serpent | medium | Identity corroborated in at least two description fields: snake
+lib\world\mob\115.mob #11541 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: goblin
+lib\world\mob\115.mob #11553 INSERT   Automatic -> 2:Quadruped | medium | Identity corroborated in at least two description fields: toad
+lib\world\mob\115.mob #11563 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: goblin, soldier
+lib\world\mob\115.mob #11564 INSERT   Automatic -> 0:None | medium | Identity corroborated in at least two description fields: ghost
+lib\world\mob\115.mob #11575 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: troll
+lib\world\mob\115.mob #11588 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: monk
+lib\world\mob\115.mob #11589 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: orc
+lib\world\mob\117.mob #11700 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: guard
+lib\world\mob\117.mob #11701 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: guard
+lib\world\mob\117.mob #11702 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: citizen
+lib\world\mob\117.mob #11703 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: assassin
+lib\world\mob\117.mob #11704 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: waiter
+lib\world\mob\117.mob #11707 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: salesman
+lib\world\mob\117.mob #11708 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: assassin
+lib\world\mob\117.mob #11709 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: assassin, chieftain
+lib\world\mob\117.mob #11711 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: guard
+lib\world\mob\117.mob #11718 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: bodyguard, empress
+lib\world\mob\117.mob #11719 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: empress
+lib\world\mob\117.mob #11720 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: artist
+lib\world\mob\117.mob #11721 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: journalist
+lib\world\mob\117.mob #11722 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: chef
+lib\world\mob\117.mob #11723 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: man
+lib\world\mob\117.mob #11725 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: maid
+lib\world\mob\117.mob #11726 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: instructor
+lib\world\mob\117.mob #11727 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: librarian
+lib\world\mob\117.mob #11730 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: teacher
+lib\world\mob\117.mob #11731 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: janitor
+lib\world\mob\118.mob #11800 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: girl
+lib\world\mob\118.mob #11802 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: child
+lib\world\mob\118.mob #11803 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: baby
+lib\world\mob\118.mob #11804 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: girl
+lib\world\mob\118.mob #11805 INSERT   Automatic -> 4:Avian | medium | Identity corroborated in at least two description fields: bird
+lib\world\mob\118.mob #11806 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: woman
+lib\world\mob\118.mob #11807 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: man
+lib\world\mob\118.mob #11808 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: child
+lib\world\mob\118.mob #11809 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: child
+lib\world\mob\118.mob #11810 INSERT   Automatic -> 5:Arachnid | medium | Identity corroborated in at least two description fields: spider
+lib\world\mob\118.mob #11811 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: girl
+lib\world\mob\118.mob #11813 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: man
+lib\world\mob\118.mob #11814 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: baby
+lib\world\mob\118.mob #11815 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: girl
+lib\world\mob\118.mob #11816 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: girl
+lib\world\mob\118.mob #11817 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: boy
+lib\world\mob\118.mob #11818 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: man
+lib\world\mob\118.mob #11819 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: woman
+lib\world\mob\118.mob #11820 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: girl
+lib\world\mob\118.mob #11821 INSERT   Automatic -> 9:Insectoid | medium | Identity corroborated in at least two description fields: insect
+lib\world\mob\118.mob #11823 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: girl
+lib\world\mob\118.mob #11824 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: girl
+lib\world\mob\118.mob #11825 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: girl
+lib\world\mob\118.mob #11826 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: man
+lib\world\mob\118.mob #11827 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: girl
+lib\world\mob\118.mob #11829 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: girl
+lib\world\mob\118.mob #11830 INSERT   Automatic -> 13:Fish | medium | Identity corroborated in at least two description fields: fish, trout
+lib\world\mob\118.mob #11831 INSERT   Automatic -> 4:Avian | medium | Identity corroborated in at least two description fields: bird, taildove
+lib\world\mob\118.mob #11832 INSERT   Automatic -> 2:Quadruped | medium | Identity corroborated in at least two description fields: toad
+lib\world\mob\118.mob #11833 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: girl
+lib\world\mob\118.mob #11834 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: girl
+lib\world\mob\118.mob #11835 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: girl
+lib\world\mob\118.mob #11836 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: girl
+lib\world\mob\118.mob #11837 INSERT   Automatic -> 3:Serpent | medium | Identity corroborated in at least two description fields: serpent
+lib\world\mob\118.mob #11838 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: child
+lib\world\mob\118.mob #11839 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: girl
+lib\world\mob\118.mob #11840 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: woman
+lib\world\mob\118.mob #11841 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: woman
+lib\world\mob\118.mob #11842 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: girl
+lib\world\mob\118.mob #11843 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: boy
+lib\world\mob\118.mob #11844 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: girl
+lib\world\mob\118.mob #11845 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: girl
+lib\world\mob\118.mob #11846 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: boy
+lib\world\mob\118.mob #11847 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: girl
+lib\world\mob\118.mob #11848 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: girl
+lib\world\mob\118.mob #11849 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: girl
+lib\world\mob\12.mob #1200 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: innkeeper, registrar, steward
+lib\world\mob\12.mob #1202 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: warden
+lib\world\mob\12.mob #1203 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: archivist, clerk
+lib\world\mob\12.mob #1210 INSERT   Automatic -> 6:Dragon | medium | Identity corroborated in at least two description fields: dragon
+lib\world\mob\12.mob #1211 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: quartermaster
+lib\world\mob\12.mob #1217 INSERT   Automatic -> 2:Quadruped | medium | Identity corroborated in at least two description fields: dog, hound, puppy
+lib\world\mob\12.mob #1299 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: general
+lib\world\mob\120.mob #12000 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: judge
+lib\world\mob\120.mob #12003 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: spectator
+lib\world\mob\120.mob #12005 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: slave
+lib\world\mob\120.mob #12006 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: gladiator
+lib\world\mob\120.mob #12008 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: coach, trainer
+lib\world\mob\120.mob #12009 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: healer
+lib\world\mob\120.mob #12010 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: herbalist, lady
+lib\world\mob\120.mob #12011 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: shopkeeper
+lib\world\mob\120.mob #12012 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: peddler
+lib\world\mob\120.mob #12016 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: vendor
+lib\world\mob\120.mob #12017 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: citizen
+lib\world\mob\120.mob #12018 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: gateguard, guard
+lib\world\mob\120.mob #12019 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: soldier
+lib\world\mob\120.mob #12020 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: emperor
+lib\world\mob\120.mob #12021 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: bodyguard, guard
+lib\world\mob\120.mob #12022 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: judge
+lib\world\mob\120.mob #12024 INSERT   Automatic -> 12:Amorphous | medium | Identity corroborated in at least two description fields: slime, slimeball
+lib\world\mob\120.mob #12025 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: wizard
+lib\world\mob\120.mob #12027 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: senator
+lib\world\mob\120.mob #12028 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: bailiff
+lib\world\mob\120.mob #12029 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: defendant
+lib\world\mob\120.mob #12030 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: king
+lib\world\mob\120.mob #12034 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: shopkeeper
+lib\world\mob\120.mob #12035 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: executioner
+lib\world\mob\120.mob #12036 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: baker
+lib\world\mob\120.mob #12037 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: grocer
+lib\world\mob\125.mob #12500 INSERT   Automatic -> 14:Plant | medium | Identity corroborated in at least two description fields: oaken tree
+lib\world\mob\125.mob #12501 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: soldier
+lib\world\mob\125.mob #12502 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: guard
+lib\world\mob\125.mob #12503 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: orc
+lib\world\mob\125.mob #12504 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: looter
+lib\world\mob\125.mob #12506 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: doctor
+lib\world\mob\125.mob #12507 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: troll
+lib\world\mob\125.mob #12508 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: goblin
+lib\world\mob\125.mob #12509 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: girl
+lib\world\mob\125.mob #12510 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: woman
+lib\world\mob\125.mob #12511 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: man
+lib\world\mob\125.mob #12512 INSERT   Automatic -> 2:Quadruped | medium | Identity corroborated in at least two description fields: dog
+lib\world\mob\125.mob #12513 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: boy
+lib\world\mob\125.mob #12566 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: man, shopkeeper
+lib\world\mob\125.mob #12597 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: guard
+lib\world\mob\125.mob #12598 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: guard
+lib\world\mob\13.mob #1303 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: librarian
+lib\world\mob\13.mob #1307 INSERT   Automatic -> 2:Quadruped | medium | Identity corroborated in at least two description fields: rabbit
+lib\world\mob\13.mob #1309 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: dentist
+lib\world\mob\13.mob #1310 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: questmaster
+lib\world\mob\13.mob #1311 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: ogre
+lib\world\mob\13.mob #1312 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: gateguard, guard
+lib\world\mob\13.mob #1313 INSERT   Automatic -> 2:Quadruped | medium | Identity corroborated in at least two description fields: cat
+lib\world\mob\13.mob #1315 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: spy
+lib\world\mob\13.mob #1316 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: king
+lib\world\mob\13.mob #1317 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: questmaster
+lib\world\mob\13.mob #1318 INSERT   Automatic -> 2:Quadruped | medium | Identity corroborated in at least two description fields: groundhog, hog
+lib\world\mob\13.mob #1322 INSERT   Automatic -> 4:Avian | medium | Identity corroborated in at least two description fields: turkey
+lib\world\mob\13.mob #1324 INSERT   Automatic -> 9:Insectoid | medium | Identity corroborated in at least two description fields: bedbug
+lib\world\mob\130.mob #13000 INSERT   Automatic -> 0:None | medium | Identity corroborated in at least two description fields: feeling
+lib\world\mob\130.mob #13001 INSERT   Automatic -> 0:None | medium | Identity corroborated in at least two description fields: feeling
+lib\world\mob\130.mob #13002 INSERT   Automatic -> 0:None | medium | Identity corroborated in at least two description fields: feeling
+lib\world\mob\130.mob #13003 INSERT   Automatic -> 0:None | medium | Identity corroborated in at least two description fields: feeling
+lib\world\mob\140.mob #14000 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: commander, guard
+lib\world\mob\140.mob #14002 INSERT   Automatic -> 16:Crustacean | medium | Identity corroborated in at least two description fields: crab
+lib\world\mob\140.mob #14004 INSERT   Automatic -> 6:Dragon | medium | Identity corroborated in at least two description fields: dragon
+lib\world\mob\140.mob #14005 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: citizen
+lib\world\mob\140.mob #14007 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: guard
+lib\world\mob\140.mob #14008 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: sentry
+lib\world\mob\140.mob #14010 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: lord
+lib\world\mob\140.mob #14011 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: wizard
+lib\world\mob\140.mob #14012 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: worker
+lib\world\mob\140.mob #14013 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: trader
+lib\world\mob\140.mob #14016 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: cook
+lib\world\mob\140.mob #14017 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: healer
+lib\world\mob\15.mob #1506 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: jester
+lib\world\mob\15.mob #1508 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: man
+lib\world\mob\15.mob #1520 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: baby
+lib\world\mob\15.mob #1521 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: boy
+lib\world\mob\15.mob #1522 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: man
+lib\world\mob\150.mob #15000 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: guard
+lib\world\mob\150.mob #15001 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: king
+lib\world\mob\150.mob #15002 INSERT   Automatic -> 0:None | medium | Identity corroborated in at least two description fields: ghost
+lib\world\mob\150.mob #15003 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: guard
+lib\world\mob\150.mob #15004 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: guard
+lib\world\mob\150.mob #15005 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: guard
+lib\world\mob\150.mob #15006 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: guard
+lib\world\mob\150.mob #15007 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: guard
+lib\world\mob\150.mob #15008 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: guard
+lib\world\mob\150.mob #15009 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: guard
+lib\world\mob\150.mob #15010 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: guard
+lib\world\mob\150.mob #15011 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: guard
+lib\world\mob\150.mob #15012 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: captain, guard
+lib\world\mob\150.mob #15014 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: herald
+lib\world\mob\150.mob #15015 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: murderer
+lib\world\mob\150.mob #15016 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: butler
+lib\world\mob\150.mob #15017 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: woman
+lib\world\mob\150.mob #15018 INSERT   Automatic -> 9:Insectoid | medium | Identity corroborated in at least two description fields: cockroach
+lib\world\mob\150.mob #15019 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: astrologer
+lib\world\mob\150.mob #15020 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: guard, king
+lib\world\mob\150.mob #15021 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: guard, king
+lib\world\mob\150.mob #15022 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: chef, cook
+lib\world\mob\150.mob #15023 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: cook
+lib\world\mob\150.mob #15024 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: guard, man
+lib\world\mob\150.mob #15025 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: guard, man
+lib\world\mob\150.mob #15026 INSERT   Automatic -> 1:Humanoid | medium | Identity corroborated in at least two description fields: guard

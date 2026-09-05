@@ -11,6 +11,7 @@ When danger approaches, it uses its razor-sharp pincers to defend itself.
 0 10000
 8 8 0
 BareHandAttack: 8
+BodyProfile: 16
 E
 T 20110
 #20102
@@ -42,6 +43,7 @@ its main food source.
 0 40000
 8 8 0
 BareHandAttack: 4
+BodyProfile: 4
 E
 T 20111
 #20104
@@ -73,6 +75,7 @@ with streaks of gray, and her face has numerous wrinkles on it.
 10 17 4 2d2+100 1d2+1
 100 0
 8 8 2
+BodyProfile: 1
 E
 T 20129
 T 20134
@@ -90,6 +93,7 @@ strands of hair left on his head.
 70 0
 8 8 1
 BareHandAttack: 13
+BodyProfile: 1
 E
 T 20136
 T 20137
@@ -111,6 +115,7 @@ quest again or enable quest, type @rplease add/delete@n
 34 9 -10 6d6+10000 5d5+5
 10000 115600
 8 8 2
+BodyProfile: 1
 E
 T 20188
 #20198
@@ -139,6 +144,7 @@ A horizontally-challenged cook is here, awaiting your orders.
 34 9 -10 6d6+340 5d5+5
 340 115600
 8 8 2
+BodyProfile: 1
 E
 T 20199
 T 20198

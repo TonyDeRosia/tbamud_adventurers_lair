@@ -11,6 +11,7 @@ nothing amiss with his sword arm, and he doesn't seem to like you.
 3 19 8 0d0+30 1d2+0
 30 900
 8 8 1
+BodyProfile: 1
 E
 T 4401
 T 4402
@@ -26,6 +27,7 @@ unintelligent conversation with his friends.
 3 19 8 0d0+30 1d2+0
 30 900
 5 5 1
+BodyProfile: 1
 E
 T 4401
 T 4402
@@ -41,6 +43,7 @@ he's just getting ready to go back in the fray.
 3 19 8 0d0+30 1d2+0
 30 900
 4 4 1
+BodyProfile: 1
 E
 T 4401
 T 4402
@@ -57,6 +60,7 @@ he knew what that is.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 1
+BodyProfile: 1
 E
 #4405
 orc halfogre dra'l~
@@ -71,6 +75,7 @@ he knew what that is.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 1
+BodyProfile: 1
 E
 #4406
 ogre boss orc chief~
@@ -88,6 +93,7 @@ turns to you and reaches for his sword.
 70 4900
 8 8 1
 BareHandAttack: 7
+BodyProfile: 1
 Str: 21
 E
 #4407
@@ -103,5 +109,6 @@ out of his misery.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 1
+BodyProfile: 1
 E
 $

@@ -13,6 +13,7 @@ trinket looks quite valuable.
 340 115600
 8 8 1
 BareHandAttack: 5
+BodyProfile: 1
 E
 #31701
 Maree~
@@ -41,6 +42,7 @@ presence there.
 270 72900
 8 8 1
 BareHandAttack: 13
+BodyProfile: 1
 E
 #31703
 proprietor man~
@@ -68,6 +70,7 @@ lashing a day.
 15 15 1 3d3+150 2d2+2
 150 22500
 8 8 1
+BodyProfile: 1
 E
 #31705
 wife mayor~
@@ -83,6 +86,7 @@ the mayor's wife.  She moves away quickly, trying to remain unseen.
 330 108900
 8 8 2
 BareHandAttack: 3
+BodyProfile: 1
 E
 #31706
 attendant roulette~
@@ -96,6 +100,7 @@ A strikingly beautiful woman stands at the wheel, taking bets.
 30 10 -8 6d6+300 5d5+5
 300 90000
 8 8 2
+BodyProfile: 1
 E
 #31707
 dealer Baagh~
@@ -134,6 +139,7 @@ tries to be as far away from you as she can.
 22 13 -3 4d4+220 3d3+3
 220 48400
 8 8 2
+BodyProfile: 1
 E
 #31710
 sam dealer blackjack~
@@ -174,6 +180,7 @@ she knows her way around both forest and city.
 25 12 -5 5d5+250 4d4+4
 250 62500
 8 8 2
+BodyProfile: 1
 E
 #31713
 kid little boy~
@@ -187,6 +194,7 @@ looks like he couldn't be any happier than he is now.
 8 18 5 1d1+80 1d2+1
 80 6400
 8 8 1
+BodyProfile: 1
 E
 #31714
 kid little girl~
@@ -200,6 +208,7 @@ Longstocking.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 2
+BodyProfile: 1
 E
 #31715
 matre de~
@@ -225,6 +234,7 @@ falling down.
 20 14 -2 4d4+200 3d3+3
 200 40000
 8 8 1
+BodyProfile: 1
 E
 #31717
 waitress~
@@ -238,6 +248,7 @@ through the clientele dining here.
 20 14 -2 4d4+200 3d3+3
 200 40000
 8 8 2
+BodyProfile: 1
 E
 #31718
 receptionist~
@@ -264,6 +275,7 @@ happier anywhere else.
 17 15 0 3d3+170 2d2+2
 170 28900
 6 6 2
+BodyProfile: 1
 E
 #31720
 server man~
@@ -277,6 +289,7 @@ emotion on his face.  His work seems to be his passion.
 20 14 -2 4d4+200 3d3+3
 200 40000
 8 8 1
+BodyProfile: 1
 E
 #31721
 grave digger man~

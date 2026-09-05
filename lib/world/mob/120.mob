@@ -10,6 +10,7 @@ his body.  Although he is getting on in years, he remains healthy and fit.
 12 16 2 2d2+120 2d2+2
 120 14400
 8 8 1
+BodyProfile: 1
 E
 #12001
 scorekeeper~
@@ -35,6 +36,7 @@ A spectator is here watching the games.
 5 19 7 1d1+50 1d2+0
 50 2500
 6 6 0
+BodyProfile: 1
 E
 #12004
 noble nobleman~
@@ -62,6 +64,7 @@ Roman legions subjugated her land.
 3 19 8 0d0+30 1d2+0
 30 900
 8 8 2
+BodyProfile: 1
 E
 #12006
 gladiator~
@@ -75,6 +78,7 @@ lives for combat.
 14 16 1 2d2+140 2d2+2
 140 19600
 8 8 1
+BodyProfile: 1
 E
 #12007
 driver~
@@ -101,6 +105,7 @@ up at you and gives you a glare that chills you to the bone.
 11 17 3 2d2+110 1d2+1
 110 12100
 8 8 1
+BodyProfile: 1
 E
 #12009
 healer~
@@ -114,6 +119,7 @@ coat and using a stethoscope.
 14 16 1 2d2+140 2d2+2
 140 19600
 8 8 1
+BodyProfile: 1
 E
 T 12001
 #12010
@@ -129,6 +135,7 @@ proportioned and she stands about 5' 5" tall.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 2
+BodyProfile: 1
 E
 #12011
 shopkeeper~
@@ -143,6 +150,7 @@ mouth to his right ear, making it look like he is always smiling.
 23 13 -3 4d4+230 3d3+3
 230 52900
 8 8 1
+BodyProfile: 1
 E
 #12012
 peddler~
@@ -155,6 +163,7 @@ A poor peddler is standing here, trying to support his meager existence.
 4 19 7 0d0+40 1d2+0
 40 1600
 8 8 1
+BodyProfile: 1
 E
 #12013
 page~
@@ -206,6 +215,7 @@ like he has had just about enough of smart-mouthed spectators.
 8 18 5 1d1+80 1d2+1
 80 6400
 8 8 1
+BodyProfile: 1
 E
 #12017
 citizen~
@@ -218,6 +228,7 @@ A citizen of Rome is standing here.
 5 19 7 1d1+50 1d2+0
 50 2500
 8 8 1
+BodyProfile: 1
 E
 #12018
 gateguard guard~
@@ -230,6 +241,7 @@ A gateguard stands here, tending the gate.
 11 17 3 2d2+110 1d2+1
 110 12100
 8 8 1
+BodyProfile: 1
 E
 T 12002
 #12019
@@ -245,6 +257,7 @@ very wholesome activity.
 17 15 0 3d3+170 2d2+2
 170 28900
 8 8 1
+BodyProfile: 1
 E
 #12020
 emperor julius caesar~
@@ -258,6 +271,7 @@ foods and lived in the most opulent palace that Rome has ever known.
 27 11 -6 5d5+270 4d4+4
 270 72900
 8 8 1
+BodyProfile: 1
 E
 T 12001
 #12021
@@ -275,6 +289,7 @@ to take offense of anyone with less than pure intentions.
 180 32400
 8 8 1
 BareHandAttack: 6
+BodyProfile: 1
 Str: 18
 StrAdd: 90
 E
@@ -291,6 +306,7 @@ him now, later would probably be a better time.
 21 13 -2 4d4+210 3d3+3
 210 44100
 6 6 1
+BodyProfile: 1
 E
 #12023
 master scheduler~
@@ -317,6 +333,7 @@ A green ball of slime is hanging over you, oozing downward.
 120 14400
 8 8 0
 BareHandAttack: 9
+BodyProfile: 12
 Int: 3
 E
 #12025
@@ -331,6 +348,7 @@ defensive, is legendary.  He literally glows with a pink aura.
 23 13 -3 4d4+230 3d3+3
 230 52900
 8 8 1
+BodyProfile: 1
 E
 T 12001
 #12026
@@ -358,6 +376,7 @@ A senator is here, waiting for debate to begin.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 1
+BodyProfile: 1
 E
 #12028
 bailiff~
@@ -371,6 +390,7 @@ the judge has given someone permission to speak.
 16 15 0 3d3+160 2d2+2
 160 25600
 8 8 1
+BodyProfile: 1
 E
 #12029
 defendant~
@@ -383,6 +403,7 @@ The defendant stands here, pleading her case.
 11 17 3 2d2+110 1d2+1
 110 12100
 8 8 2
+BodyProfile: 1
 E
 #12030
 jupiter king god~
@@ -398,6 +419,7 @@ transcend the plane of the physical, and could easily kill an unprepared mortal.
 340 115600
 8 8 1
 BareHandAttack: 10
+BodyProfile: 1
 Str: 25
 Dex: 25
 Int: 25
@@ -473,6 +495,7 @@ mouth to his right ear, making it look like he is always smiling.
 23 13 -3 4d4+230 3d3+3
 230 52900
 8 8 1
+BodyProfile: 1
 E
 #12035
 executioner~
@@ -486,6 +509,7 @@ has a very sadistic attitude and clearly loves his work.
 20 14 -2 4d4+200 3d3+3
 200 40000
 8 8 1
+BodyProfile: 1
 E
 #12036
 baker~
@@ -499,6 +523,7 @@ body.
 33 9 -9 6d6+330 5d5+5
 330 108900
 8 8 1
+BodyProfile: 1
 E
 #12037
 grocer~
@@ -512,5 +537,6 @@ A grocer stands at the counter, with a slightly impatient look on his face.
 33 9 -9 6d6+330 5d5+5
 330 108900
 8 8 1
+BodyProfile: 1
 E
 $

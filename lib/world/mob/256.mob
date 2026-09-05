@@ -10,6 +10,7 @@ job well.
 7 18 5 1d1+70 1d2+1
 70 4900
 6 6 2
+BodyProfile: 1
 E
 T 25604
 #25601
@@ -57,6 +58,7 @@ dawdling service, at least not since the lady Penelope was taken by Mordecai.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 1
+BodyProfile: 1
 E
 T 25605
 #25604
@@ -71,6 +73,7 @@ for a transvestite.
 20 14 -2 4d4+200 3d3+3
 200 40000
 8 8 1
+BodyProfile: 1
 E
 T 25606
 T 25607
@@ -85,6 +88,7 @@ One of the Lord's cooks stands here preparing for the next meal.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 2
+BodyProfile: 1
 E
 T 25608
 T 25609
@@ -103,6 +107,7 @@ guests.
 2 20 8 0d0+20 1d2+0
 20 400
 8 8 1
+BodyProfile: 1
 E
 #25607
 lord~
@@ -116,6 +121,7 @@ enough to speak to you.
 29 11 -7 5d5+290 4d4+4
 290 84100
 8 8 1
+BodyProfile: 1
 E
 #25608
 guard~
@@ -128,6 +134,7 @@ A member of Lord's Guard stands here, ready to fight for his Lord.
 22 13 -3 4d4+220 3d3+3
 220 48400
 8 8 1
+BodyProfile: 1
 E
 #25609
 commander guard~
@@ -141,6 +148,7 @@ The Commander of the Lord's Guard stands here at attention.
 25 12 -5 5d5+250 4d4+4
 250 62500
 8 8 1
+BodyProfile: 1
 E
 #25610
 gardener~
@@ -166,6 +174,7 @@ A stablehand waits patiently for your mount.
 11 17 3 2d2+110 1d2+1
 110 12100
 8 8 1
+BodyProfile: 1
 E
 #25612
 waiter~
@@ -179,6 +188,7 @@ to get you a drink or snack.
 23 13 -3 4d4+230 3d3+3
 230 52900
 8 8 1
+BodyProfile: 1
 E
 #25613
 blacksmith~
@@ -192,6 +202,7 @@ sweat.
 20 14 -2 4d4+200 3d3+3
 200 40000
 8 8 1
+BodyProfile: 1
 E
 #25650
 sneaky servant~
@@ -205,5 +216,6 @@ guilty.
 15 15 1 3d3+150 2d2+2
 150 22500
 8 8 1
+BodyProfile: 1
 E
 $

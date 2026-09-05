@@ -47,6 +47,7 @@ A Rabid Potted Ficus sits here, grooving to the music.
 100 10000
 8 8 0
 BareHandAttack: 9
+BodyProfile: 14
 Str: 15
 Dex: 15
 Int: 15
@@ -66,6 +67,7 @@ risk to try to make you his next meal.
 150 22500
 8 8 1
 BareHandAttack: 4
+BodyProfile: 1
 Str: 15
 Dex: 15
 Int: 15
@@ -84,6 +86,7 @@ nasty expression
 220 48400
 8 8 0
 BareHandAttack: 5
+BodyProfile: 1
 Str: 15
 Dex: 15
 Int: 15
@@ -122,6 +125,7 @@ stinger drips with a nasty venom.
 260 67600
 8 8 0
 BareHandAttack: 1
+BodyProfile: 5
 Str: 15
 Dex: 15
 Int: 15
@@ -140,6 +144,7 @@ of the citadel protecting it from outside threats.
 22 13 -3 4d4+220 3d3+3
 220 48400
 8 8 0
+BodyProfile: 1
 Str: 15
 Dex: 15
 Int: 15
@@ -159,6 +164,7 @@ totally in control of its own movements.
 300 90000
 8 8 0
 BareHandAttack: 6
+BodyProfile: 1
 Str: 15
 Dex: 15
 Int: 15
@@ -196,6 +202,7 @@ What they lack in individual strength, they make up for in numbers.
 100 10000
 8 8 1
 BareHandAttack: 5
+BodyProfile: 1
 Str: 15
 Dex: 15
 Int: 15
@@ -217,6 +224,7 @@ dwenomers have been placed on this armor to give it its vital force.
 300 90000
 8 8 0
 BareHandAttack: 10
+BodyProfile: 1
 Str: 15
 Dex: 15
 Int: 15
@@ -236,6 +244,7 @@ be his next victim.
 300 90000
 8 8 1
 BareHandAttack: 9
+BodyProfile: 1
 Str: 15
 Dex: 15
 Int: 15
@@ -254,6 +263,7 @@ its lot in life.
 25 12 -5 5d5+250 4d4+4
 250 62500
 8 8 0
+BodyProfile: 1
 Str: 15
 Dex: 15
 Int: 15
@@ -271,6 +281,7 @@ from starvation.  He looks at you, pleading for mercy.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 1
+BodyProfile: 1
 Str: 15
 Dex: 15
 Int: 15
@@ -325,6 +336,7 @@ citadel.
 30 10 -8 6d6+300 5d5+5
 300 90000
 8 8 0
+BodyProfile: 1
 Str: 15
 Dex: 15
 Int: 15
@@ -360,6 +372,7 @@ prey with a long curved knife.
 100 10000
 8 8 1
 BareHandAttack: 3
+BodyProfile: 1
 Str: 15
 Dex: 15
 Int: 15
@@ -377,6 +390,7 @@ A bug, one of a swarm flies around here, pestering you.
 100 10000
 8 8 0
 BareHandAttack: 1
+BodyProfile: 10
 Str: 15
 Dex: 15
 Int: 15
@@ -393,6 +407,7 @@ A Large venus flytrap pokes itself out of the vines here.
 22 13 -3 4d4+220 3d3+3
 220 48400
 8 8 0
+BodyProfile: 14
 Str: 15
 Dex: 15
 Int: 15

@@ -11,6 +11,7 @@ To be taught what you can, type <prac> now.
 30 900
 6 6 1
 BareHandAttack: 7
+BodyProfile: 1
 E
 #2801
 piglet pig~
@@ -26,6 +27,7 @@ start fighting it.
 30 900
 4 4 0
 BareHandAttack: 4
+BodyProfile: 2
 E
 #2802
 shopkeeper keeper~
@@ -39,5 +41,6 @@ too low prices.  To see what he sells type <list>, then <buy> to buy it.
 3 19 8 0d0+30 1d2+0
 30 900
 8 8 1
+BodyProfile: 1
 E
 $

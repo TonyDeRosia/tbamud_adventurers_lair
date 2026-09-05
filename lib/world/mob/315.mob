@@ -13,6 +13,7 @@ with him.
 340 115600
 8 8 1
 BareHandAttack: 9
+BodyProfile: 1
 E
 #31501
 commoner~
@@ -39,6 +40,7 @@ a few coins just to go away.
 4 19 7 0d0+40 1d2+0
 40 1600
 8 8 1
+BodyProfile: 2
 E
 #31503
 common peddler~
@@ -53,6 +55,7 @@ large.
 60 3600
 8 8 1
 BareHandAttack: 13
+BodyProfile: 1
 E
 #31504
 guard man~
@@ -65,6 +68,7 @@ A guardsman patrols the streets and shops of McGintey Cove.
 30 10 -8 6d6+300 5d5+5
 300 90000
 8 8 1
+BodyProfile: 1
 E
 #31505
 toll booth worker~
@@ -77,6 +81,7 @@ A toll booth worker is here, taking your fare for crossing into the city.
 15 15 1 3d3+150 2d2+2
 150 22500
 8 8 2
+BodyProfile: 1
 E
 #31506
 Jon barkeep~
@@ -90,6 +95,7 @@ at this inn, serving drinks and making everyone's food.
 30 10 -8 6d6+300 5d5+5
 300 90000
 8 8 1
+BodyProfile: 1
 E
 #31507
 receptionist~
@@ -115,6 +121,7 @@ assistance.
 30 10 -8 6d6+300 5d5+5
 300 90000
 6 6 2
+BodyProfile: 1
 E
 #31509
 Samuel Faarza~
@@ -139,6 +146,7 @@ A postal worker is here, ready to send or get your mail.
 30 10 -8 6d6+300 5d5+5
 300 90000
 8 8 1
+BodyProfile: 1
 E
 #31511
 Juan pusher potion~
@@ -176,6 +184,7 @@ spite of his reputation.
 30 10 -8 6d6+300 5d5+5
 300 90000
 8 8 1
+BodyProfile: 1
 E
 #31514
 shellee shop petshops~
@@ -202,6 +211,7 @@ weaponry.
 30 10 -8 6d6+300 5d5+5
 300 90000
 8 8 1
+BodyProfile: 1
 E
 #31516
 clerk~
@@ -214,6 +224,7 @@ A clerk is here, waiting to take your money.
 30 10 -8 6d6+300 5d5+5
 300 90000
 8 8 1
+BodyProfile: 1
 E
 #31517
 Pauletra pottery~
@@ -275,6 +286,7 @@ A farmer stands next to cart selling fresh vegetables.
 18 14 0 3d3+180 3d3+3
 180 32400
 8 8 1
+BodyProfile: 1
 E
 #31522
 candle maker man wax~
@@ -288,6 +300,7 @@ A man is here selling candles.
 32 10 -9 6d6+320 5d5+5
 320 102400
 8 8 1
+BodyProfile: 1
 E
 #31523
 fisherman~
@@ -301,6 +314,7 @@ know, he's a fisherman, and...  Forget it.
 20 14 -2 4d4+200 3d3+3
 200 40000
 8 8 1
+BodyProfile: 1
 E
 #31524
 glass blower~
@@ -326,6 +340,7 @@ A carpenter is here, selling his woodwork.
 22 13 -3 4d4+220 3d3+3
 220 48400
 8 8 1
+BodyProfile: 1
 E
 #31526
 darva cape maker~
@@ -351,6 +366,7 @@ A robed man with the power to heal stands here, hands folded before him.
 30 10 -8 6d6+300 5d5+5
 300 90000
 8 8 1
+BodyProfile: 1
 E
 #31528
 leather man~
@@ -403,6 +419,7 @@ where he is forced to remain in one spot.
 30 10 -8 6d6+300 5d5+5
 300 90000
 8 8 1
+BodyProfile: 1
 E
 #31532
 man burlap~
@@ -415,6 +432,7 @@ A man is here selling various burlap goods.
 20 14 -2 4d4+200 3d3+3
 200 40000
 8 8 1
+BodyProfile: 1
 E
 #31533
 woman~
@@ -427,6 +445,7 @@ A woman is here selling scarves.
 20 14 -2 4d4+200 3d3+3
 200 40000
 8 8 2
+BodyProfile: 1
 E
 #31534
 man hat~
@@ -439,6 +458,7 @@ A man is here with stacks and stacks of hats, all of them for sale.
 20 14 -2 4d4+200 3d3+3
 200 40000
 8 8 1
+BodyProfile: 1
 E
 #31535
 elf vendor~
@@ -452,6 +472,7 @@ time.  His mistrust of most everyone is quite apparent.
 20 14 -2 4d4+200 3d3+3
 200 40000
 8 8 1
+BodyProfile: 1
 E
 #31536
 baker~
@@ -465,6 +486,7 @@ pride on her face.
 20 14 -2 4d4+200 3d3+3
 200 40000
 8 8 2
+BodyProfile: 1
 E
 #31537
 man~
@@ -478,6 +500,7 @@ something.
 20 14 -2 4d4+200 3d3+3
 200 40000
 8 8 1
+BodyProfile: 1
 E
 #31538
 dwarf helm smith~
@@ -490,6 +513,7 @@ A dwarven smith stands here selling helms.
 20 14 -2 4d4+200 3d3+3
 200 40000
 8 8 1
+BodyProfile: 1
 E
 #31539
 Shalaylia~
@@ -540,6 +564,7 @@ The jeweler stands behind the counter waiting to help you.
 30 10 -8 6d6+300 5d5+5
 300 90000
 8 8 2
+BodyProfile: 1
 E
 #31543
 local physician~
@@ -619,6 +644,7 @@ back to his sewing.
 30 10 -8 6d6+300 5d5+5
 300 90000
 6 6 1
+BodyProfile: 1
 E
 #31549
 merchant~
@@ -632,6 +658,7 @@ almost gotten you to buy several of his items more than a few times.
 15 15 1 3d3+150 2d2+2
 150 22500
 8 8 1
+BodyProfile: 1
 E
 #31550
 local youth~
@@ -658,6 +685,7 @@ before...  Ooops...  It just shit on your boots.
 20 400
 8 8 0
 BareHandAttack: 8
+BodyProfile: 4
 E
 #31552
 bird albatross~
@@ -671,6 +699,7 @@ An albatross rests on a nearby post.
 10 100
 5 5 0
 BareHandAttack: 8
+BodyProfile: 4
 E
 #31553
 McHale lieutenant~
@@ -685,6 +714,7 @@ except that he is avoiding being seen.
 300 90000
 8 8 1
 BareHandAttack: 14
+BodyProfile: 1
 E
 #31554
 Tess sergeant~
@@ -701,6 +731,7 @@ quickly in disgust.
 340 115600
 8 8 2
 BareHandAttack: 14
+BodyProfile: 1
 E
 #31555
 deputy~
@@ -729,6 +760,7 @@ something to happen.
 40 1600
 8 8 2
 BareHandAttack: 4
+BodyProfile: 2
 PetPrice: 20
 E
 #31557
@@ -744,6 +776,7 @@ with it, it may decide to peck your eyes out!
 100 10000
 8 8 0
 BareHandAttack: 4
+BodyProfile: 4
 PetPrice: 35
 E
 #31558
@@ -760,6 +793,7 @@ support most of their payment.
 34 9 -10 6d6+340 5d5+5
 340 115600
 8 8 1
+BodyProfile: 1
 E
 #31559
 newbie helper Alaantra~
@@ -787,5 +821,6 @@ help you.
 30 10 -8 6d6+300 5d5+5
 300 90000
 8 8 1
+BodyProfile: 1
 E
 $

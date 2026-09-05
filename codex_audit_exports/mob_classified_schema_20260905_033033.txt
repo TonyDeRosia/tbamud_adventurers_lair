@@ -1,0 +1,825 @@
+Codex mob_classified.json schema inspection
+Generated: 2026-09-05 03:30:33
+Entries: 3785
+
+==============================================================================
+ALL PROPERTY NAMES
+==============================================================================
+confidence                       present on  3785/3785
+description                      present on  3785/3785
+file                             present on  3785/3785
+format                           present on  3785/3785
+keywords                         present on  3785/3785
+long                             present on  3785/3785
+profile                          present on  3785/3785
+reason                           present on  3785/3785
+recommended                      present on  3785/3785
+short                            present on  3785/3785
+vnum                             present on  3785/3785
+
+==============================================================================
+PROFILE/CLASSIFICATION-LIKE PROPERTY VALUE COUNTS
+==============================================================================
+
+PROPERTY: confidence
+   2581  medium
+   1192  review
+     12  high
+
+PROPERTY: profile
+   3765  <blank/null>
+      9  0
+      4  5
+      3  1
+      2  2
+      2  3
+
+PROPERTY: reason
+   1184  No corroborated supported anatomy
+    117  Identity corroborated in at least two description fields: man
+     63  Identity corroborated in at least two description fields: guard
+     61  Identity corroborated in at least two description fields: woman
+     54  Identity corroborated in at least two description fields: dragon
+     49  Identity corroborated in at least two description fields: spider
+     36  Identity corroborated in at least two description fields: rat
+     35  Identity corroborated in at least two description fields: girl
+     31  Identity corroborated in at least two description fields: goblin
+     28  Identity corroborated in at least two description fields: minotaur
+     25  Identity corroborated in at least two description fields: orc
+     24  Identity corroborated in at least two description fields: knight
+     24  Identity corroborated in at least two description fields: snake
+     23  Identity corroborated in at least two description fields: boy
+     23  Identity corroborated in at least two description fields: soldier
+     22  Identity corroborated in at least two description fields: citizen
+     22  Identity corroborated in at least two description fields: cat
+     20  Identity corroborated in at least two description fields: king
+     20  Identity corroborated in at least two description fields: worker
+     19  Identity corroborated in at least two description fields: horse
+     18  Identity corroborated in at least two description fields: warrior
+     18  Identity corroborated in at least two description fields: bat
+     18  Identity corroborated in at least two description fields: bartender
+     18  Identity corroborated in at least two description fields: guardian
+     18  Identity corroborated in at least two description fields: child
+     18  Identity corroborated in at least two description fields: farmer
+     16  Identity corroborated in at least two description fields: dog
+     15  Identity corroborated in at least two description fields: rabbit
+     15  Identity corroborated in at least two description fields: lady
+     15  Identity corroborated in at least two description fields: zombie
+     15  Identity corroborated in at least two description fields: ghost
+     15  Identity corroborated in at least two description fields: prisoner
+     14  Identity corroborated in at least two description fields: priest
+     13  Identity corroborated in at least two description fields: wolf
+     13  Identity corroborated in at least two description fields: waiter
+     13  Identity corroborated in at least two description fields: captain
+     13  Identity corroborated in at least two description fields: cook
+     12  Identity corroborated in at least two description fields: crab
+     12  Identity corroborated in at least two description fields: troll
+     12  Identity corroborated in at least two description fields: mage
+
+PROPERTY: recommended
+   1802  1
+   1192  <blank/null>
+    315  2
+     87  4
+     60  5
+     57  6
+     55  0
+     37  3
+     30  11
+     28  7
+     19  9
+     19  10
+     18  19
+     18  13
+     14  16
+      9  15
+      8  14
+      6  18
+      5  12
+      4  8
+      2  17
+
+==============================================================================
+SAMPLE OBJECTS
+==============================================================================
+
+--- INDEX 0 ---
+{
+    "vnum":  0,
+    "file":  "lib/world/mob/0.mob",
+    "keywords":  "trigger mob",
+    "short":  "the trigger mob",
+    "long":  "A mob required to be used for triggers. DO NOT DELETE.",
+    "description":  "It looks unfinished.",
+    "profile":  null,
+    "format":  "8 0 0 0 0 0 0 0 0 E",
+    "recommended":  0,
+    "confidence":  "high",
+    "reason":  "Invisible DG trigger host, not a creature"
+}
+
+--- INDEX 1 ---
+{
+    "vnum":  1,
+    "file":  "lib/world/mob/0.mob",
+    "keywords":  "Puff dragon fractal",
+    "short":  "Puff",
+    "long":  "Puff the Fractal Dragon is here, contemplating a higher reality.",
+    "description":  "Is that some type of differential curve involving some strange, and unknown\r\ncalculus that she seems to be made out of?",
+    "profile":  null,
+    "format":  "516106 0 0 0 2128 0 0 0 1000 E",
+    "recommended":  6,
+    "confidence":  "medium",
+    "reason":  "Identity corroborated in at least two description fields: dragon"
+}
+
+--- INDEX 2 ---
+{
+    "vnum":  2,
+    "file":  "lib/world/mob/0.mob",
+    "keywords":  "cleric healer",
+    "short":  "the healer",
+    "long":  "A healer in a white luminescent robe is tending to the wounded.",
+    "description":  "This beautiful woman at one time used to piously offer her healing skills to\r\nany in need.  But times are rough and now she can only afford to help those that\r\nare just starting their adventures.  Type \u0027heal\u0027 to see what services she\r\noffers.",
+    "profile":  null,
+    "format":  "188426 0 0 0 0 0 0 0 0 E",
+    "recommended":  1,
+    "confidence":  "medium",
+    "reason":  "Identity corroborated in at least two description fields: cleric, healer"
+}
+
+--- INDEX 3 ---
+{
+    "vnum":  3,
+    "file":  "lib/world/mob/0.mob",
+    "keywords":  "questmaster",
+    "short":  "the questmaster",
+    "long":  "The questmaster is waiting for a brave adventurer to step forth.",
+    "description":  "Many adventurers come here to seek glory by attempting to solve the quests\r\ngiven to them by this old man.  The quests are not easy, sometimes nearly\r\nimpossible.  But they will always be a challenge.  The questmaster looks at you\r\nand says, \u0027Help autoquest should show you all you need to know\u0027.",
+    "profile":  null,
+    "format":  "188426 0 0 0 0 0 0 0 0 E",
+    "recommended":  1,
+    "confidence":  "medium",
+    "reason":  "Identity corroborated in at least two description fields: questmaster"
+}
+
+--- INDEX 4 ---
+{
+    "vnum":  4,
+    "file":  "lib/world/mob/0.mob",
+    "keywords":  "healer",
+    "short":  "the healer",
+    "long":  "A healer in a white luminescent robe is tending to the wounded.",
+    "description":  "This beautiful woman at one time used to piously offer her healing skills to\r\nany in need.  But times are rough and now she can only afford to help those that\r\nare just starting their adventures.  Type \u0027heal\u0027 to see what services she\r\noffers.  Type \u0027heal \u003cspell\u003e\u0027 to buy one of her spells.",
+    "profile":  null,
+    "format":  "253962 0 0 0 0 0 0 0 0 E",
+    "recommended":  1,
+    "confidence":  "medium",
+    "reason":  "Identity corroborated in at least two description fields: healer"
+}
+
+--- INDEX 10 ---
+{
+    "vnum":  10,
+    "file":  "lib/world/mob/0.mob",
+    "keywords":  "clone",
+    "short":  "the clone",
+    "long":  "A boring old clone is standing here.",
+    "description":  "This clone is nothing to look at.  No, really, it is quite boring.",
+    "profile":  null,
+    "format":  "188426 0 0 0 0 0 0 0 0 E",
+    "recommended":  null,
+    "confidence":  "review",
+    "reason":  "No corroborated supported anatomy"
+}
+
+--- INDEX 2946 ---
+{
+    "vnum":  34000,
+    "file":  "lib/world/mob/340.mob",
+    "keywords":  "crystal sentinel chromatic guardian",
+    "short":  "a @Cch@Wro@Cma@Wti@Cc @Wsentinel@n",
+    "long":  "A @Cch@Wro@Cma@Wti@Cc @Wsentinel@n turns slowly across the crystal path.",
+    "description":  "This guardian resembles a broad-shouldered figure grown rather than\ncarved from interlocking crystal plates. Threads of blue, gold, and\nviolet light travel beneath its translucent shell, flaring whenever\nmovement disturbs the grotto. Its blunt hands and heavy stance suggest\na creature made to hold ground rather than pursue prey.",
+    "profile":  1,
+    "format":  "8 0 0 0 0 0 0 0 0 E",
+    "recommended":  11,
+    "confidence":  "high",
+    "reason":  "Crystal plate guardian assembled into a humanoid outline"
+}
+
+--- INDEX 2947 ---
+{
+    "vnum":  34001,
+    "file":  "lib/world/mob/340.mob",
+    "keywords":  "glasswing scavenger insect crystal",
+    "short":  "a @Wgl@ca@Wss@cw@Wi@cn@Wg @cscavenger@n",
+    "long":  "A @Wgl@ca@Wss@cw@Wi@cn@Wg @cscavenger@n picks delicately through the fractured crystal.",
+    "description":  "This insectile scavenger balances on six needle-thin legs beneath a\nnarrow body of smoky quartz. Two broad wings, clear as freshly cut\nglass, tremble above its back and scatter tiny rainbows across nearby\nstone. Its hooked mouthparts scrape loose mineral growths and magical\nresidue from cracks in the grotto.",
+    "profile":  0,
+    "format":  "8 0 0 0 0 0 0 0 0 E",
+    "recommended":  10,
+    "confidence":  "high",
+    "reason":  "Six legs and glass wings explicitly described"
+}
+
+--- INDEX 2948 ---
+{
+    "vnum":  34002,
+    "file":  "lib/world/mob/340.mob",
+    "keywords":  "faceted custodian crystal keeper",
+    "short":  "the @Cfa@Wce@Cted @Wcustodian@n",
+    "long":  "The @Cfa@Wce@Cted @Wcustodian@n patiently adjusts a wall of mirrored crystal.",
+    "description":  "Taller and more intricate than the common sentinels, this ancient\nkeeper is built from dozens of precisely fitted crystal facets. Four\nslender hands test angles, clear mineral dust, and nudge loose growths\nback into alignment with tireless care. Light bends around its torso\nin disciplined bands, making its true outline difficult to judge.",
+    "profile":  1,
+    "format":  "8 0 0 0 0 0 0 0 0 E",
+    "recommended":  11,
+    "confidence":  "high",
+    "reason":  "Construct of fitted facets with four hands"
+}
+
+--- INDEX 2949 ---
+{
+    "vnum":  34003,
+    "file":  "lib/world/mob/340.mob",
+    "keywords":  "heart prism warden crystal guardian",
+    "short":  "the @Mheart@W-@Cprism @Wwarden@n",
+    "long":  "The @Mheart@W-@Cprism @Wwarden@n stands within the converging beams.",
+    "description":  "A towering guardian of dark crystal stands between intruders and the\nHeart Prism. A smaller living prism turns inside its chest, throwing\nhard bands of crimson, cobalt, and violet through joints that should\nbe opaque. One arm narrows into a flawless blade-like edge, while the\nother ends in a heavy faceted hand capable of crushing stone.",
+    "profile":  1,
+    "format":  "8 0 0 0 0 0 0 0 0 E",
+    "recommended":  11,
+    "confidence":  "high",
+    "reason":  "Heart-prism crystal guardian"
+}
+
+--- INDEX 2950 ---
+{
+    "vnum":  34004,
+    "file":  "lib/world/mob/340.mob",
+    "keywords":  "prismwing moth crystal insect",
+    "short":  "a @Mpr@Wis@Mm@Ww@Min@Wg @Mmoth@n",
+    "long":  "A @Mpr@Wis@Mm@Ww@Min@Wg @Mmoth@n drifts between the crystal reeds.",
+    "description":  "The moth is the size of a small hound, with four translucent wings\ndusted in shifting bands of violet and blue. Its soft body is protected\nby overlapping crystal scales, and a coiled feeding tube probes glowing\nmineral blooms for nectar.",
+    "profile":  0,
+    "format":  "8 0 0 0 0 0 0 0 0 E",
+    "recommended":  10,
+    "confidence":  "medium",
+    "reason":  "Identity corroborated in at least two description fields: moth"
+}
+
+--- INDEX 2951 ---
+{
+    "vnum":  34005,
+    "file":  "lib/world/mob/340.mob",
+    "keywords":  "crystalback beetle prismatic insect",
+    "short":  "a @Ccrystal@Wback @Cbeetle@n",
+    "long":  "A @Ccrystal@Wback @Cbeetle@n grinds mineral fragments beneath its shell.",
+    "description":  "A broad beetle nearly reaches a warrior\u0027s knee, its back covered by\noverlapping plates of cloudy blue crystal. Powerful mandibles crack\nloose mineral growths for food, while the heavy shell turns aside\nglancing blows with a sound like struck glass.",
+    "profile":  0,
+    "format":  "8 0 0 0 0 0 0 0 0 E",
+    "recommended":  9,
+    "confidence":  "medium",
+    "reason":  "Identity corroborated in at least two description fields: beetle, insect"
+}
+
+--- INDEX 2952 ---
+{
+    "vnum":  34006,
+    "file":  "lib/world/mob/340.mob",
+    "keywords":  "amberglass wasp needlewing insect",
+    "short":  "an @Ya@Wm@Yb@We@Yr@Wg@Yl@Wa@Yss @Wwasp@n",
+    "long":  "An @Ya@Wm@Yb@We@Yr@Wg@Yl@Wa@Yss @Wwasp@n hangs in the air on needle-thin wings.",
+    "description":  "This predatory wasp is built from dark chitin and translucent amber\nplates. Its four narrow wings beat too quickly to follow, and a long\ncrystal stinger folds beneath the abdomen like a dagger waiting to be\ndrawn.",
+    "profile":  0,
+    "format":  "8 0 0 0 0 0 0 0 0 E",
+    "recommended":  10,
+    "confidence":  "medium",
+    "reason":  "Identity corroborated in at least two description fields: wasp"
+}
+
+--- INDEX 2953 ---
+{
+    "vnum":  34007,
+    "file":  "lib/world/mob/340.mob",
+    "keywords":  "lumen slug crystal grazer",
+    "short":  "a @Clu@Wmen @Cslug@n",
+    "long":  "A @Clu@Wmen @Cslug@n leaves a ribbon of silver light across the wet stone.",
+    "description":  "The slow grazer is nearly three feet long and translucent enough to see\nluminous organs pulsing beneath its skin. It rasps glowing mineral film\nfrom damp crystal with a ring of tiny teeth, leaving a bright trail that\nfades over several minutes.",
+    "profile":  3,
+    "format":  "8 0 0 0 0 0 0 0 0 E",
+    "recommended":  null,
+    "confidence":  "review",
+    "reason":  "Gastropod has organized organs; not amorphous or conventional serpent"
+}
+
+--- INDEX 2954 ---
+{
+    "vnum":  34008,
+    "file":  "lib/world/mob/340.mob",
+    "keywords":  "shardmantis crystal predator mantis",
+    "short":  "a @Wsh@Car@Wdm@Can@Wti@Cs @Wpredator@n",
+    "long":  "A @Wsh@Car@Wdm@Can@Wti@Cs @Wpredator@n waits perfectly still among the razor facets.",
+    "description":  "This tall insect folds two immense crystal forelimbs against its narrow\nchest until they resemble harmless quartz blades. Its faceted eyes\nmirror the surrounding cavern, and every joint is arranged for a sudden\nexplosive strike.",
+    "profile":  0,
+    "format":  "8 0 0 0 0 0 0 0 0 E",
+    "recommended":  9,
+    "confidence":  "medium",
+    "reason":  "Identity corroborated in at least two description fields: mantis"
+}
+
+--- INDEX 2955 ---
+{
+    "vnum":  34009,
+    "file":  "lib/world/mob/340.mob",
+    "keywords":  "mirrorweb spider crystal predator",
+    "short":  "a @Wmir@cro@Wrew@ceb @Wspider@n",
+    "long":  "A @Wmir@cro@Wrew@ceb @Wspider@n crouches behind a curtain of false reflections.",
+    "description":  "Eight long legs support a flattened body plated in mirror-bright\ncrystal. The spider\u0027s web reflects whatever lies behind it, hiding both\nstrands and hunter until prey is already entangled. Its fangs are dark,\npolished, and completely free of reflection.",
+    "profile":  5,
+    "format":  "8 0 0 0 0 0 0 0 0 E",
+    "recommended":  5,
+    "confidence":  "medium",
+    "reason":  "Identity corroborated in at least two description fields: spider"
+}
+
+--- INDEX 2956 ---
+{
+    "vnum":  34010,
+    "file":  "lib/world/mob/340.mob",
+    "keywords":  "gemjaw crawler crystal beast",
+    "short":  "a @Cgem@Wjaw @Ccrawler@n",
+    "long":  "A @Cgem@Wjaw @Ccrawler@n bites chunks directly from the cavern wall.",
+    "description":  "Low, broad, and heavily muscled, the crawler is armored in dull gray\nscales except for a jaw lined with brilliant blue crystal teeth. Those\nteeth can crush quartz like bread crust, and fresh mineral dust coats\nits powerful forelimbs.",
+    "profile":  2,
+    "format":  "8 0 0 0 0 0 0 0 0 E",
+    "recommended":  null,
+    "confidence":  "review",
+    "reason":  "No corroborated supported anatomy"
+}
+
+--- INDEX 2957 ---
+{
+    "vnum":  34011,
+    "file":  "lib/world/mob/340.mob",
+    "keywords":  "prism stag antlered crystal beast",
+    "short":  "a @Rpr@Yi@Cs@Mm @Wstag@n",
+    "long":  "A @Rpr@Yi@Cs@Mm @Wstag@n watches through a crown of many-colored antlers.",
+    "description":  "The stag\u0027s lean body appears carved from pale stone until it moves with\nunmistakable living grace. A magnificent rack of translucent antlers\nbranches above its head, each tine holding a different color. Its hooves\nstrike sparks from bare crystal.",
+    "profile":  2,
+    "format":  "8 0 0 0 0 0 0 0 0 E",
+    "recommended":  2,
+    "confidence":  "medium",
+    "reason":  "Identity corroborated in at least two description fields: stag"
+}
+
+--- INDEX 2958 ---
+{
+    "vnum":  34012,
+    "file":  "lib/world/mob/340.mob",
+    "keywords":  "hollow facet mimic crystal ambusher",
+    "short":  "a @Dhollow@W-@Cfacet @Wmimic@n",
+    "long":  "A @Dhollow@W-@Cfacet @Wmimic@n unfolds from what looked like an empty geode.",
+    "description":  "At rest the creature is almost indistinguishable from a split geode.\nWhen disturbed, mirrored plates open into hooked limbs around a dark\nhollow core. Reflections inside that emptiness continue moving even when\neverything outside has gone still.",
+    "profile":  0,
+    "format":  "8 0 0 0 0 0 0 0 0 E",
+    "recommended":  null,
+    "confidence":  "review",
+    "reason":  "No corroborated supported anatomy"
+}
+
+--- INDEX 2959 ---
+{
+    "vnum":  34013,
+    "file":  "lib/world/mob/340.mob",
+    "keywords":  "spectrum broodmother queen crystal insect",
+    "short":  "the @RS@Yp@Ce@Mc@Rt@Yr@Cu@Mm @WBroodmother@n",
+    "long":  "The @RS@Yp@Ce@Mc@Rt@Yr@Cu@Mm @WBroodmother@n towers over a nest of luminous crystal eggs.",
+    "description":  "The enormous insect queen fills the heart of the geode nest. Layered\nplates of crimson, cobalt, amber, and violet crystal protect a long\nsegmented body, while six heavy legs end in hooked mineral claws. Her\nwings are too small for flight but beat hard enough to fill the chamber\nwith cutting shards of reflected light.",
+    "profile":  0,
+    "format":  "8 0 0 0 0 0 0 0 0 E",
+    "recommended":  10,
+    "confidence":  "high",
+    "reason":  "Winged insect broodmother"
+}
+
+--- INDEX 2960 ---
+{
+    "vnum":  34014,
+    "file":  "lib/world/mob/340.mob",
+    "keywords":  "glass shell larva crystal insect",
+    "short":  "a @Wgl@ca@Wss@c-@Wsh@ce@Wll @clarva@n",
+    "long":  "A @Wgl@ca@Wss@c-@Wsh@ce@Wll @clarva@n gnaws quietly at a soft mineral bloom.",
+    "description":  "The pale larva is as long as a forearm and protected by a translucent\nshell that has not yet hardened into adult crystal. Its many tiny legs\ncling easily to steep stone, while blunt mouthparts scrape mineral film\nfrom the grotto walls.",
+    "profile":  3,
+    "format":  "8 0 0 0 0 0 0 0 0 E",
+    "recommended":  null,
+    "confidence":  "review",
+    "reason":  "Larva explicitly has many tiny legs; neither serpent nor six-legged adult fits"
+}
+
+--- INDEX 2961 ---
+{
+    "vnum":  34015,
+    "file":  "lib/world/mob/340.mob",
+    "keywords":  "prism cicada crystal insect",
+    "short":  "a @Cpr@Wis@Cm @Wcicada@n",
+    "long":  "A @Cpr@Wis@Cm @Wcicada@n vibrates against the crystal with a chiming buzz.",
+    "description":  "Broad glassy wings cover a squat insect body of pale blue crystal.\nInstead of an ordinary drone, the cicada produces a layered ringing note\nthat resonates through nearby mineral formations and returns in\ndifferent colors of sound.",
+    "profile":  0,
+    "format":  "8 0 0 0 0 0 0 0 0 E",
+    "recommended":  10,
+    "confidence":  "medium",
+    "reason":  "Identity corroborated in at least two description fields: cicada"
+}
+
+--- INDEX 2962 ---
+{
+    "vnum":  34016,
+    "file":  "lib/world/mob/340.mob",
+    "keywords":  "quad beetle horned crystal insect",
+    "short":  "a @YQ@Wu@Ya@Wd @YB@We@Ye@Wt@Yl@We@n",
+    "long":  "A @YQ@Wu@Ya@Wd @YB@We@Ye@Wt@Yl@We@n lowers its massive horn and scrapes eight armored legs across the stone.",
+    "description":  "This enormous beetle is built like a living siege engine. Four pairs of\nthick armored legs support a low body protected by amber-black crystal\nplates, while a huge forward-curving horn dominates its head. When\nangered it digs every foot into the ground and launches itself with\nterrifying force.",
+    "profile":  0,
+    "format":  "40 0 0 0 0 0 0 0 0 E",
+    "recommended":  null,
+    "confidence":  "review",
+    "reason":  "Eight-legged horned beetle: not an arachnid, standard insect profile has six legs"
+}
+
+--- INDEX 2963 ---
+{
+    "vnum":  34017,
+    "file":  "lib/world/mob/340.mob",
+    "keywords":  "clown spider boss painted prismatic",
+    "short":  "The @RC@Wl@Ro@Ww@Rn @RSp@Wid@Rer@n",
+    "long":  "The @RC@Wl@Ro@Ww@Rn @RSp@Wid@Rer@n watches from its painted web with a terrible crystalline grin.",
+    "description":  "The enormous spider is nearly as broad as the chamber itself. Its\npolished white shell is slashed with vivid red, yellow, and blue\nmarkings that resemble festive paint, while eight black crystal legs\nmove with grotesque delicacy. A natural grin-like pattern spans the\nfront of its crown above clustered jewel-bright eyes.",
+    "profile":  5,
+    "format":  "42 0 0 0 0 0 0 0 0 E",
+    "recommended":  5,
+    "confidence":  "medium",
+    "reason":  "Identity corroborated in at least two description fields: spider"
+}
+
+--- INDEX 2964 ---
+{
+    "vnum":  34018,
+    "file":  "lib/world/mob/340.mob",
+    "keywords":  "painted spiderling clown spider brood",
+    "short":  "a @Rp@Wa@Ri@Wn@Rt@We@Rd @Wspiderling@n",
+    "long":  "A @Rp@Wa@Ri@Wn@Rt@We@Rd @Wspiderling@n scuttles across a stripe of bright webbing.",
+    "description":  "This young spider already bears the bright painted markings of the\ngreater Clown Spider, though its body is only the size of a large\nshield. Thin crystal legs let it move almost silently across web and\nstone alike.",
+    "profile":  5,
+    "format":  "40 0 0 0 0 0 0 0 0 E",
+    "recommended":  5,
+    "confidence":  "medium",
+    "reason":  "Identity corroborated in at least two description fields: spider, spiderling"
+}
+
+--- INDEX 2965 ---
+{
+    "vnum":  34019,
+    "file":  "lib/world/mob/340.mob",
+    "keywords":  "chromatic mite swarm crystal insects",
+    "short":  "a swarm of @Rc@Yh@Cr@Mo@Rm@Ya@Ct@Mi@Rc @Wmites@n",
+    "long":  "A swarm of @Rc@Yh@Cr@Mo@Rm@Ya@Ct@Mi@Rc @Wmites@n glitters across the cracks between crystals.",
+    "description":  "Hundreds of pinhead-sized crystal mites move as a glittering carpet,\nfeeding on mineral dust and anything organic left behind by larger\ncreatures. Individually harmless, they become a painful biting cloud\nwhen disturbed.",
+    "profile":  5,
+    "format":  "8 0 0 0 0 0 0 0 0 E",
+    "recommended":  0,
+    "confidence":  "high",
+    "reason":  "Swarm has no single harvestable body"
+}
+
+==============================================================================
+ZONE 340 RAW FIELDS
+==============================================================================
+
+VNUM 34000
+  vnum: 34000
+  file: lib/world/mob/340.mob
+  keywords: crystal sentinel chromatic guardian
+  short: a @Cch@Wro@Cma@Wti@Cc @Wsentinel@n
+  long: A @Cch@Wro@Cma@Wti@Cc @Wsentinel@n turns slowly across the crystal path.
+  description: This guardian resembles a broad-shouldered figure grown rather than
+carved from interlocking crystal plates. Threads of blue, gold, and
+violet light travel beneath its translucent shell, flaring whenever
+movement disturbs the grotto. Its blunt hands and heavy stance suggest
+a creature made to hold ground rather than pursue prey.
+  profile: 1
+  format: 8 0 0 0 0 0 0 0 0 E
+  recommended: 11
+  confidence: high
+  reason: Crystal plate guardian assembled into a humanoid outline
+
+VNUM 34001
+  vnum: 34001
+  file: lib/world/mob/340.mob
+  keywords: glasswing scavenger insect crystal
+  short: a @Wgl@ca@Wss@cw@Wi@cn@Wg @cscavenger@n
+  long: A @Wgl@ca@Wss@cw@Wi@cn@Wg @cscavenger@n picks delicately through the fractured crystal.
+  description: This insectile scavenger balances on six needle-thin legs beneath a
+narrow body of smoky quartz. Two broad wings, clear as freshly cut
+glass, tremble above its back and scatter tiny rainbows across nearby
+stone. Its hooked mouthparts scrape loose mineral growths and magical
+residue from cracks in the grotto.
+  profile: 0
+  format: 8 0 0 0 0 0 0 0 0 E
+  recommended: 10
+  confidence: high
+  reason: Six legs and glass wings explicitly described
+
+VNUM 34002
+  vnum: 34002
+  file: lib/world/mob/340.mob
+  keywords: faceted custodian crystal keeper
+  short: the @Cfa@Wce@Cted @Wcustodian@n
+  long: The @Cfa@Wce@Cted @Wcustodian@n patiently adjusts a wall of mirrored crystal.
+  description: Taller and more intricate than the common sentinels, this ancient
+keeper is built from dozens of precisely fitted crystal facets. Four
+slender hands test angles, clear mineral dust, and nudge loose growths
+back into alignment with tireless care. Light bends around its torso
+in disciplined bands, making its true outline difficult to judge.
+  profile: 1
+  format: 8 0 0 0 0 0 0 0 0 E
+  recommended: 11
+  confidence: high
+  reason: Construct of fitted facets with four hands
+
+VNUM 34003
+  vnum: 34003
+  file: lib/world/mob/340.mob
+  keywords: heart prism warden crystal guardian
+  short: the @Mheart@W-@Cprism @Wwarden@n
+  long: The @Mheart@W-@Cprism @Wwarden@n stands within the converging beams.
+  description: A towering guardian of dark crystal stands between intruders and the
+Heart Prism. A smaller living prism turns inside its chest, throwing
+hard bands of crimson, cobalt, and violet through joints that should
+be opaque. One arm narrows into a flawless blade-like edge, while the
+other ends in a heavy faceted hand capable of crushing stone.
+  profile: 1
+  format: 8 0 0 0 0 0 0 0 0 E
+  recommended: 11
+  confidence: high
+  reason: Heart-prism crystal guardian
+
+VNUM 34004
+  vnum: 34004
+  file: lib/world/mob/340.mob
+  keywords: prismwing moth crystal insect
+  short: a @Mpr@Wis@Mm@Ww@Min@Wg @Mmoth@n
+  long: A @Mpr@Wis@Mm@Ww@Min@Wg @Mmoth@n drifts between the crystal reeds.
+  description: The moth is the size of a small hound, with four translucent wings
+dusted in shifting bands of violet and blue. Its soft body is protected
+by overlapping crystal scales, and a coiled feeding tube probes glowing
+mineral blooms for nectar.
+  profile: 0
+  format: 8 0 0 0 0 0 0 0 0 E
+  recommended: 10
+  confidence: medium
+  reason: Identity corroborated in at least two description fields: moth
+
+VNUM 34005
+  vnum: 34005
+  file: lib/world/mob/340.mob
+  keywords: crystalback beetle prismatic insect
+  short: a @Ccrystal@Wback @Cbeetle@n
+  long: A @Ccrystal@Wback @Cbeetle@n grinds mineral fragments beneath its shell.
+  description: A broad beetle nearly reaches a warrior's knee, its back covered by
+overlapping plates of cloudy blue crystal. Powerful mandibles crack
+loose mineral growths for food, while the heavy shell turns aside
+glancing blows with a sound like struck glass.
+  profile: 0
+  format: 8 0 0 0 0 0 0 0 0 E
+  recommended: 9
+  confidence: medium
+  reason: Identity corroborated in at least two description fields: beetle, insect
+
+VNUM 34006
+  vnum: 34006
+  file: lib/world/mob/340.mob
+  keywords: amberglass wasp needlewing insect
+  short: an @Ya@Wm@Yb@We@Yr@Wg@Yl@Wa@Yss @Wwasp@n
+  long: An @Ya@Wm@Yb@We@Yr@Wg@Yl@Wa@Yss @Wwasp@n hangs in the air on needle-thin wings.
+  description: This predatory wasp is built from dark chitin and translucent amber
+plates. Its four narrow wings beat too quickly to follow, and a long
+crystal stinger folds beneath the abdomen like a dagger waiting to be
+drawn.
+  profile: 0
+  format: 8 0 0 0 0 0 0 0 0 E
+  recommended: 10
+  confidence: medium
+  reason: Identity corroborated in at least two description fields: wasp
+
+VNUM 34007
+  vnum: 34007
+  file: lib/world/mob/340.mob
+  keywords: lumen slug crystal grazer
+  short: a @Clu@Wmen @Cslug@n
+  long: A @Clu@Wmen @Cslug@n leaves a ribbon of silver light across the wet stone.
+  description: The slow grazer is nearly three feet long and translucent enough to see
+luminous organs pulsing beneath its skin. It rasps glowing mineral film
+from damp crystal with a ring of tiny teeth, leaving a bright trail that
+fades over several minutes.
+  profile: 3
+  format: 8 0 0 0 0 0 0 0 0 E
+  recommended: 
+  confidence: review
+  reason: Gastropod has organized organs; not amorphous or conventional serpent
+
+VNUM 34008
+  vnum: 34008
+  file: lib/world/mob/340.mob
+  keywords: shardmantis crystal predator mantis
+  short: a @Wsh@Car@Wdm@Can@Wti@Cs @Wpredator@n
+  long: A @Wsh@Car@Wdm@Can@Wti@Cs @Wpredator@n waits perfectly still among the razor facets.
+  description: This tall insect folds two immense crystal forelimbs against its narrow
+chest until they resemble harmless quartz blades. Its faceted eyes
+mirror the surrounding cavern, and every joint is arranged for a sudden
+explosive strike.
+  profile: 0
+  format: 8 0 0 0 0 0 0 0 0 E
+  recommended: 9
+  confidence: medium
+  reason: Identity corroborated in at least two description fields: mantis
+
+VNUM 34009
+  vnum: 34009
+  file: lib/world/mob/340.mob
+  keywords: mirrorweb spider crystal predator
+  short: a @Wmir@cro@Wrew@ceb @Wspider@n
+  long: A @Wmir@cro@Wrew@ceb @Wspider@n crouches behind a curtain of false reflections.
+  description: Eight long legs support a flattened body plated in mirror-bright
+crystal. The spider's web reflects whatever lies behind it, hiding both
+strands and hunter until prey is already entangled. Its fangs are dark,
+polished, and completely free of reflection.
+  profile: 5
+  format: 8 0 0 0 0 0 0 0 0 E
+  recommended: 5
+  confidence: medium
+  reason: Identity corroborated in at least two description fields: spider
+
+VNUM 34010
+  vnum: 34010
+  file: lib/world/mob/340.mob
+  keywords: gemjaw crawler crystal beast
+  short: a @Cgem@Wjaw @Ccrawler@n
+  long: A @Cgem@Wjaw @Ccrawler@n bites chunks directly from the cavern wall.
+  description: Low, broad, and heavily muscled, the crawler is armored in dull gray
+scales except for a jaw lined with brilliant blue crystal teeth. Those
+teeth can crush quartz like bread crust, and fresh mineral dust coats
+its powerful forelimbs.
+  profile: 2
+  format: 8 0 0 0 0 0 0 0 0 E
+  recommended: 
+  confidence: review
+  reason: No corroborated supported anatomy
+
+VNUM 34011
+  vnum: 34011
+  file: lib/world/mob/340.mob
+  keywords: prism stag antlered crystal beast
+  short: a @Rpr@Yi@Cs@Mm @Wstag@n
+  long: A @Rpr@Yi@Cs@Mm @Wstag@n watches through a crown of many-colored antlers.
+  description: The stag's lean body appears carved from pale stone until it moves with
+unmistakable living grace. A magnificent rack of translucent antlers
+branches above its head, each tine holding a different color. Its hooves
+strike sparks from bare crystal.
+  profile: 2
+  format: 8 0 0 0 0 0 0 0 0 E
+  recommended: 2
+  confidence: medium
+  reason: Identity corroborated in at least two description fields: stag
+
+VNUM 34012
+  vnum: 34012
+  file: lib/world/mob/340.mob
+  keywords: hollow facet mimic crystal ambusher
+  short: a @Dhollow@W-@Cfacet @Wmimic@n
+  long: A @Dhollow@W-@Cfacet @Wmimic@n unfolds from what looked like an empty geode.
+  description: At rest the creature is almost indistinguishable from a split geode.
+When disturbed, mirrored plates open into hooked limbs around a dark
+hollow core. Reflections inside that emptiness continue moving even when
+everything outside has gone still.
+  profile: 0
+  format: 8 0 0 0 0 0 0 0 0 E
+  recommended: 
+  confidence: review
+  reason: No corroborated supported anatomy
+
+VNUM 34013
+  vnum: 34013
+  file: lib/world/mob/340.mob
+  keywords: spectrum broodmother queen crystal insect
+  short: the @RS@Yp@Ce@Mc@Rt@Yr@Cu@Mm @WBroodmother@n
+  long: The @RS@Yp@Ce@Mc@Rt@Yr@Cu@Mm @WBroodmother@n towers over a nest of luminous crystal eggs.
+  description: The enormous insect queen fills the heart of the geode nest. Layered
+plates of crimson, cobalt, amber, and violet crystal protect a long
+segmented body, while six heavy legs end in hooked mineral claws. Her
+wings are too small for flight but beat hard enough to fill the chamber
+with cutting shards of reflected light.
+  profile: 0
+  format: 8 0 0 0 0 0 0 0 0 E
+  recommended: 10
+  confidence: high
+  reason: Winged insect broodmother
+
+VNUM 34014
+  vnum: 34014
+  file: lib/world/mob/340.mob
+  keywords: glass shell larva crystal insect
+  short: a @Wgl@ca@Wss@c-@Wsh@ce@Wll @clarva@n
+  long: A @Wgl@ca@Wss@c-@Wsh@ce@Wll @clarva@n gnaws quietly at a soft mineral bloom.
+  description: The pale larva is as long as a forearm and protected by a translucent
+shell that has not yet hardened into adult crystal. Its many tiny legs
+cling easily to steep stone, while blunt mouthparts scrape mineral film
+from the grotto walls.
+  profile: 3
+  format: 8 0 0 0 0 0 0 0 0 E
+  recommended: 
+  confidence: review
+  reason: Larva explicitly has many tiny legs; neither serpent nor six-legged adult fits
+
+VNUM 34015
+  vnum: 34015
+  file: lib/world/mob/340.mob
+  keywords: prism cicada crystal insect
+  short: a @Cpr@Wis@Cm @Wcicada@n
+  long: A @Cpr@Wis@Cm @Wcicada@n vibrates against the crystal with a chiming buzz.
+  description: Broad glassy wings cover a squat insect body of pale blue crystal.
+Instead of an ordinary drone, the cicada produces a layered ringing note
+that resonates through nearby mineral formations and returns in
+different colors of sound.
+  profile: 0
+  format: 8 0 0 0 0 0 0 0 0 E
+  recommended: 10
+  confidence: medium
+  reason: Identity corroborated in at least two description fields: cicada
+
+VNUM 34016
+  vnum: 34016
+  file: lib/world/mob/340.mob
+  keywords: quad beetle horned crystal insect
+  short: a @YQ@Wu@Ya@Wd @YB@We@Ye@Wt@Yl@We@n
+  long: A @YQ@Wu@Ya@Wd @YB@We@Ye@Wt@Yl@We@n lowers its massive horn and scrapes eight armored legs across the stone.
+  description: This enormous beetle is built like a living siege engine. Four pairs of
+thick armored legs support a low body protected by amber-black crystal
+plates, while a huge forward-curving horn dominates its head. When
+angered it digs every foot into the ground and launches itself with
+terrifying force.
+  profile: 0
+  format: 40 0 0 0 0 0 0 0 0 E
+  recommended: 
+  confidence: review
+  reason: Eight-legged horned beetle: not an arachnid, standard insect profile has six legs
+
+VNUM 34017
+  vnum: 34017
+  file: lib/world/mob/340.mob
+  keywords: clown spider boss painted prismatic
+  short: The @RC@Wl@Ro@Ww@Rn @RSp@Wid@Rer@n
+  long: The @RC@Wl@Ro@Ww@Rn @RSp@Wid@Rer@n watches from its painted web with a terrible crystalline grin.
+  description: The enormous spider is nearly as broad as the chamber itself. Its
+polished white shell is slashed with vivid red, yellow, and blue
+markings that resemble festive paint, while eight black crystal legs
+move with grotesque delicacy. A natural grin-like pattern spans the
+front of its crown above clustered jewel-bright eyes.
+  profile: 5
+  format: 42 0 0 0 0 0 0 0 0 E
+  recommended: 5
+  confidence: medium
+  reason: Identity corroborated in at least two description fields: spider
+
+VNUM 34018
+  vnum: 34018
+  file: lib/world/mob/340.mob
+  keywords: painted spiderling clown spider brood
+  short: a @Rp@Wa@Ri@Wn@Rt@We@Rd @Wspiderling@n
+  long: A @Rp@Wa@Ri@Wn@Rt@We@Rd @Wspiderling@n scuttles across a stripe of bright webbing.
+  description: This young spider already bears the bright painted markings of the
+greater Clown Spider, though its body is only the size of a large
+shield. Thin crystal legs let it move almost silently across web and
+stone alike.
+  profile: 5
+  format: 40 0 0 0 0 0 0 0 0 E
+  recommended: 5
+  confidence: medium
+  reason: Identity corroborated in at least two description fields: spider, spiderling
+
+VNUM 34019
+  vnum: 34019
+  file: lib/world/mob/340.mob
+  keywords: chromatic mite swarm crystal insects
+  short: a swarm of @Rc@Yh@Cr@Mo@Rm@Ya@Ct@Mi@Rc @Wmites@n
+  long: A swarm of @Rc@Yh@Cr@Mo@Rm@Ya@Ct@Mi@Rc @Wmites@n glitters across the cracks between crystals.
+  description: Hundreds of pinhead-sized crystal mites move as a glittering carpet,
+feeding on mineral dust and anything organic left behind by larger
+creatures. Individually harmless, they become a painful biting cloud
+when disturbed.
+  profile: 5
+  format: 8 0 0 0 0 0 0 0 0 E
+  recommended: 0
+  confidence: high
+  reason: Swarm has no single harvestable body

@@ -10,6 +10,7 @@ as of late.
 3 19 8 0d0+30 1d2+0
 30 900
 8 8 1
+BodyProfile: 5
 E
 #6302
 yevaud dragon usurper~
@@ -35,6 +36,7 @@ The wolf spider is here, licking its bloody fangs.
 6 18 6 1d1+60 1d2+1
 60 3600
 8 8 2
+BodyProfile: 5
 E
 #6304
 orc~
@@ -48,6 +50,7 @@ all he can do is glare at you while he's stuck in this web.
 2 20 8 0d0+20 1d2+0
 20 400
 6 6 1
+BodyProfile: 1
 E
 #6305
 wasp queen~
@@ -60,6 +63,7 @@ The queen wasp is here, thinking how tasty you look.
 14 16 1 2d2+140 2d2+2
 140 19600
 8 8 2
+BodyProfile: 10
 E
 #6306
 spider drone~
@@ -72,6 +76,7 @@ A drone spider walks around doing its master's bidding.
 6 18 6 1d1+60 1d2+1
 60 3600
 8 8 0
+BodyProfile: 5
 E
 #6307
 spider ethereal~
@@ -85,6 +90,7 @@ without a magical weapon.
 13 16 2 2d2+130 2d2+2
 130 16900
 8 8 2
+BodyProfile: 5
 E
 #6308
 slave human~
@@ -99,6 +105,7 @@ he was beguiled, you are not fully certain.
 11 17 3 2d2+110 1d2+1
 110 12100
 8 8 1
+BodyProfile: 1
 E
 #6309
 quasit~
@@ -125,6 +132,7 @@ The bird spider snaps its powerful jaws.
 14 16 1 2d2+140 2d2+2
 140 19600
 8 8 2
+BodyProfile: 5
 E
 #6311
 hermit~
@@ -138,6 +146,7 @@ The hermit sits here and warns, 'Go back before it is too late!'
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 1
+BodyProfile: 1
 E
 #6312
 donjonkeeper keeper~
@@ -164,6 +173,7 @@ The guardian is obviously not doing his job.
 17 15 0 3d3+170 2d2+2
 170 28900
 4 4 1
+BodyProfile: 1
 E
 #6314
 arachnos spider empress~
@@ -178,6 +188,7 @@ spiders, but then, as you realize, she does not need them.
 26 12 -5 5d5+260 4d4+4
 260 67600
 8 8 2
+BodyProfile: 5
 E
 T 6301
 #6315
@@ -208,6 +219,7 @@ A wyrmkin with no teeth plays here.
 9 17 4 1d1+90 1d2+1
 90 8100
 8 8 1
+BodyProfile: 6
 E
 #6317
 dragon wyrmkin elder~
@@ -221,6 +233,7 @@ though there is a first time for everything...
 16 15 0 3d3+160 2d2+2
 160 25600
 8 8 1
+BodyProfile: 6
 E
 #6318
 mahatma thief~
@@ -233,6 +246,7 @@ Mahatma, that silly thief, is here, stealing everything.
 26 12 -5 5d5+260 4d4+4
 260 67600
 8 8 1
+BodyProfile: 1
 E
 T 6300
 $

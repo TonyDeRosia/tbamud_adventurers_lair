@@ -10,6 +10,7 @@ his shop well stocked, even overstocked at times.
 33 9 -9 6d6+330 5d5+5
 330 108900
 8 8 1
+BodyProfile: 1
 E
 #25701
 provisioner~
@@ -36,6 +37,7 @@ respect me, or I'll tell.  "
 33 9 -9 6d6+330 5d5+5
 330 108900
 8 8 1
+BodyProfile: 1
 E
 #25703
 maris~
@@ -49,6 +51,7 @@ looks very capable of using any of his fine weapons.
 33 9 -9 6d6+330 5d5+5
 330 108900
 8 8 1
+BodyProfile: 1
 E
 #25704
 ilena maris wife~
@@ -62,6 +65,7 @@ Ilena exudes confidence and knowledge.
 33 9 -9 6d6+330 5d5+5
 330 108900
 8 8 2
+BodyProfile: 1
 E
 #25705
 receptionist balding man proprietor~
@@ -75,6 +79,7 @@ about his fortune to worry about sleep.
 33 9 -9 6d6+330 5d5+5
 330 108900
 6 6 1
+BodyProfile: 1
 E
 #25706
 captain vulcevic~
@@ -87,6 +92,7 @@ Captain Vulcevic, a retired captain from the naval forces, impatiently stands he
 33 9 -9 6d6+330 5d5+5
 330 108900
 8 8 1
+BodyProfile: 1
 E
 #25707
 daron bootmaster~
@@ -113,6 +119,7 @@ glance.
 33 9 -9 6d6+330 5d5+5
 330 108900
 8 8 1
+BodyProfile: 1
 E
 #25709
 wellmaster~
@@ -141,6 +148,7 @@ it would help to make a better impression.
 33 9 -9 6d6+330 5d5+5
 330 108900
 8 8 1
+BodyProfile: 1
 E
 #25712
 lease manager~
@@ -179,6 +187,7 @@ A man dealing cards in a dark suit sits behind a table, waiting to win your mone
 33 9 -9 6d6+330 5d5+5
 330 108900
 6 6 1
+BodyProfile: 1
 E
 #25715
 grigor grigor~
@@ -216,6 +225,7 @@ The trainer stands ready, waiting to train you in whatever stat you wish to incr
 33 9 -9 6d6+330 5d5+5
 330 108900
 8 8 1
+BodyProfile: 1
 E
 #25718
 librarian woman pretty plump~
@@ -230,6 +240,7 @@ man of her own.
 33 9 -9 6d6+330 5d5+5
 330 108900
 6 6 2
+BodyProfile: 1
 E
 #25719
 banker~
@@ -242,6 +253,7 @@ The banker stands behind one of his tellers, smiling.
 33 9 -9 6d6+330 5d5+5
 330 108900
 8 8 1
+BodyProfile: 1
 E
 #25720
 guildmaster master mage~
@@ -256,6 +268,7 @@ you notice that she is surrounded by a blue shimmering aura.
 34 9 -10 6d6+340 5d5+5
 340 115600
 8 8 2
+BodyProfile: 1
 E
 #25721
 guildmaster master priest~
@@ -269,6 +282,7 @@ a peaceful, loving look.  You notice that he is surrounded by a white aura.
 34 9 -10 6d6+340 5d5+5
 340 115600
 8 8 1
+BodyProfile: 1
 E
 #25722
 guildmaster master thief~
@@ -284,6 +298,7 @@ appearance of an ignorant fop.
 34 9 -10 6d6+340 5d5+5
 340 115600
 8 8 1
+BodyProfile: 1
 E
 #25723
 guildmaster master~
@@ -298,6 +313,7 @@ calm look on his face.
 34 9 -10 6d6+340 5d5+5
 340 115600
 8 8 1
+BodyProfile: 1
 E
 #25724
 clariss~
@@ -325,6 +341,7 @@ but when he talks, you can see his knowledge also comes from experience.
 33 9 -9 6d6+330 5d5+5
 330 108900
 6 6 1
+BodyProfile: 2
 E
 #25726
 guildmaster master assassin~
@@ -339,6 +356,7 @@ while training came straight from this man.
 33 9 -9 6d6+330 5d5+5
 330 108900
 8 8 1
+BodyProfile: 1
 E
 #25727
 knight~
@@ -353,6 +371,7 @@ skill combined with his experience in warfare makes him a deadly opponent.
 33 9 -9 6d6+330 5d5+5
 330 108900
 8 8 1
+BodyProfile: 1
 E
 #25728
 magistrate~
@@ -379,6 +398,7 @@ Rapas the Rat stands in this small shop, ready to serve your needs.
 33 9 -9 6d6+330 5d5+5
 330 108900
 8 8 1
+BodyProfile: 2
 E
 #25730
 nurse~
@@ -416,6 +436,7 @@ you to the next level.
 33 9 -9 6d6+330 5d5+5
 330 108900
 8 8 1
+BodyProfile: 1
 E
 #25733
 assassin man~
@@ -428,6 +449,7 @@ A man tends shop here, a wry smile on face.
 33 9 -9 6d6+330 5d5+5
 330 108900
 8 8 1
+BodyProfile: 1
 E
 #25740
 bartender~
@@ -442,6 +464,7 @@ their stories as they rest in his bar.
 24 12 -4 4d4+240 4d4+4
 240 57600
 8 8 1
+BodyProfile: 1
 E
 #25741
 nurse~
@@ -467,6 +490,7 @@ the highway kind of guy.
 23 13 -3 4d4+230 3d3+3
 230 52900
 8 8 1
+BodyProfile: 1
 E
 #25743
 hostess scantily clad woman waitress~
@@ -479,6 +503,7 @@ A scantily clad waitress hands you your menu with a more-than-friendly smile and
 23 13 -3 4d4+230 3d3+3
 230 52900
 8 8 2
+BodyProfile: 1
 E
 #25744
 waiter~
@@ -491,6 +516,7 @@ A waiter who knows where all his customers keep their money is standing here.
 23 13 -3 4d4+230 3d3+3
 230 52900
 8 8 1
+BodyProfile: 1
 E
 #25745
 waiter~
@@ -504,6 +530,7 @@ firebreathers.
 23 13 -3 4d4+230 3d3+3
 230 52900
 8 8 1
+BodyProfile: 1
 E
 #25746
 salazar waiter man~
@@ -531,6 +558,7 @@ noticing.
 33 9 -9 6d6+330 5d5+5
 330 108900
 6 6 2
+BodyProfile: 1
 E
 #25748
 karandon sly jacques jackal man~
@@ -544,6 +572,7 @@ boots, looks like a rough customer.
 20 14 -2 4d4+200 3d3+3
 200 40000
 8 8 1
+BodyProfile: 1
 E
 #25749
 saracaphos bejis harah horsemaster man~
@@ -556,6 +585,7 @@ A man hurries by, head down, dressed all in brown.
 20 14 -2 4d4+200 3d3+3
 200 40000
 8 8 1
+BodyProfile: 1
 E
 #25759
 keeper peacekeeper~
@@ -618,6 +648,7 @@ A mercenary is waiting for a job here.
 5 19 7 1d1+50 1d2+0
 50 2500
 8 8 1
+BodyProfile: 1
 E
 #25764
 drunk~
@@ -631,6 +662,7 @@ money.
 2 20 8 0d0+20 1d2+0
 20 400
 8 8 1
+BodyProfile: 1
 E
 #25765
 beggar~
@@ -643,6 +675,7 @@ A beggar is here, asking for a few coins.
 1 20 9 0d0+10 1d2+0
 10 100
 8 8 1
+BodyProfile: 1
 E
 #25766
 stableman~
@@ -732,6 +765,7 @@ that mark on her left boob?  Well, I'll be damned!  It's a tatoo!  It reads
 30 10 -8 6d6+300 5d5+5
 300 90000
 8 8 2
+BodyProfile: 1
 E
 #25773
 mage guildguard~
@@ -744,6 +778,7 @@ The Guard for the Guild of Mages stands here.
 8 18 5 1d1+80 1d2+1
 80 6400
 8 8 1
+BodyProfile: 1
 E
 T 25701
 #25774
@@ -757,6 +792,7 @@ The Guard for the Guild of Clerics stands here.
 8 18 5 1d1+80 1d2+1
 80 6400
 8 8 1
+BodyProfile: 1
 E
 T 25700
 #25775
@@ -770,6 +806,7 @@ The Guard for the Guild of Warriors stands here.
 8 18 5 1d1+80 1d2+1
 80 6400
 8 8 1
+BodyProfile: 1
 E
 T 25703
 #25776
@@ -783,6 +820,7 @@ The Guard for the Guild of Rangers stands here.
 8 18 5 1d1+80 1d2+1
 80 6400
 8 8 1
+BodyProfile: 1
 E
 T 25702
 #25777
@@ -796,6 +834,7 @@ The Guard for the Guild of Assassins stands here.
 8 18 5 1d1+80 1d2+1
 80 6400
 8 8 1
+BodyProfile: 1
 E
 T 25704
 #25779
@@ -811,6 +850,7 @@ spell, "Djinn's MY pimp!  " hmm, how interesting.
 30 10 -8 6d6+300 5d5+5
 300 90000
 8 8 2
+BodyProfile: 1
 E
 #25789
 petshops wayn shop~
@@ -849,6 +889,7 @@ A small loyal puppy is here.
 1 20 9 0d0+10 1d2+0
 10 100
 8 8 0
+BodyProfile: 2
 E
 #25792
 beagle pets~
@@ -885,6 +926,7 @@ A large, trained wolf is here.
 4 19 7 0d0+40 1d2+0
 40 1600
 8 8 0
+BodyProfile: 2
 E
 #25795
 cryogenicist~
@@ -911,5 +953,6 @@ be a tough bargainer.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 0
+BodyProfile: 1
 E
 $

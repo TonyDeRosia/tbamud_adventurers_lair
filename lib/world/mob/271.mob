@@ -28,6 +28,7 @@ than idle decoration.
 8 18 5 1d1+80 1d2+1
 80 6400
 8 8 1
+BodyProfile: 1
 E
 #27102
 hangman executioner~
@@ -42,6 +43,7 @@ course, since seen the light and sticks to legal murder.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 1
+BodyProfile: 1
 E
 T 27102
 #27103
@@ -57,6 +59,7 @@ which he watches the movements of his elusive deity.
 9 17 4 1d1+90 1d2+1
 90 8100
 8 8 1
+BodyProfile: 1
 E
 #27104
 priestess priest black~
@@ -71,6 +74,7 @@ the swirl of etherous colors that she busies herself with.
 8 18 5 1d1+80 1d2+1
 80 6400
 8 8 2
+BodyProfile: 1
 E
 #27105
 raven bird shadow~
@@ -84,6 +88,7 @@ it passes over.
 2 20 8 0d0+20 1d2+0
 20 400
 8 8 0
+BodyProfile: 4
 E
 #27106
 rat smoke~
@@ -97,6 +102,7 @@ A smoke-colored rat sits in the shadows.
 1 20 9 0d0+10 1d2+0
 10 100
 8 8 0
+BodyProfile: 2
 E
 #27107
 thief~
@@ -110,6 +116,7 @@ Better check your pockets.
 6 18 6 1d1+60 1d2+1
 60 3600
 8 8 1
+BodyProfile: 1
 E
 T 27110
 #27108
@@ -140,6 +147,7 @@ wealth.  He wears a tray of spices and other goods on a strap around his neck.
 2 20 8 0d0+20 1d2+0
 20 400
 8 8 1
+BodyProfile: 1
 E
 #27110
 mendicant beggar~
@@ -166,6 +174,7 @@ merely has a master blacksmith, or an overactive imagination.
 8 18 5 1d1+80 1d2+1
 80 6400
 8 8 1
+BodyProfile: 1
 E
 #27112
 squire~
@@ -179,6 +188,7 @@ seems to pay more attention to his cold mug of ale.
 6 18 6 1d1+60 1d2+1
 60 3600
 8 8 1
+BodyProfile: 1
 E
 #27113
 princess foreign~
@@ -192,6 +202,7 @@ interest in you as an empty keg.
 8 18 5 1d1+80 1d2+1
 80 6400
 8 8 2
+BodyProfile: 1
 E
 #27114
 minstrel gypsy~
@@ -206,6 +217,7 @@ ready for donations.
 5 19 7 1d1+50 1d2+0
 50 2500
 8 8 2
+BodyProfile: 1
 E
 #27115
 idiot village fool~
@@ -234,6 +246,7 @@ floor.
 8 18 5 1d1+80 1d2+1
 80 6400
 8 8 2
+BodyProfile: 1
 E
 #27117
 master mistress assassin thief~
@@ -261,6 +274,7 @@ Thick auburn hair and beard frame a face intelligent in battle.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 1
+BodyProfile: 1
 E
 #27119
 master archmage mage~
@@ -289,6 +303,7 @@ glances up and gives you a lopsided grin as he mumbles to the floor.
 6 18 6 1d1+60 1d2+1
 60 3600
 8 8 1
+BodyProfile: 1
 E
 #27121
 retired thief~
@@ -303,6 +318,7 @@ addicted enough to caffeine.
 8 18 5 1d1+80 1d2+1
 80 6400
 8 8 1
+BodyProfile: 1
 E
 #27122
 falconer petshops~
@@ -356,6 +372,7 @@ is carrying a hot poker though, better not mess with him.
 8 18 5 1d1+80 1d2+1
 80 6400
 8 8 1
+BodyProfile: 1
 E
 #27126
 jeweller~
@@ -383,6 +400,7 @@ wall.  Her black hair and turban remind you of her exotic origins.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 2
+BodyProfile: 1
 E
 #27128
 baker chef hobbit~
@@ -396,6 +414,7 @@ corn shed, snacking on his sticky creations perpetually.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 1
+BodyProfile: 1
 E
 #27129
 alchemist~
@@ -409,6 +428,7 @@ Glass vials of all colors surround him, attesting to his knowledge.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 1
+BodyProfile: 1
 E
 #27130
 magess magician~
@@ -436,6 +456,7 @@ a bizarre, guttural tongue.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 2
+BodyProfile: 1
 E
 #27132
 armorer~
@@ -450,6 +471,7 @@ a beautiful suit of scale mail.
 8 18 5 1d1+80 1d2+1
 80 6400
 8 8 1
+BodyProfile: 1
 E
 #27133
 weaponsmaster weapons~
@@ -477,6 +499,7 @@ You cringe as she gives you a warm toothless smile.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 2
+BodyProfile: 1
 E
 #27135
 mockingbird bird~
@@ -504,6 +527,7 @@ and they were too much for him.
 5 19 7 1d1+50 1d2+0
 50 2500
 8 8 1
+BodyProfile: 1
 E
 #27137
 trader silk~
@@ -518,6 +542,7 @@ variety of colored silk goods.
 9 17 4 1d1+90 1d2+1
 90 8100
 8 8 1
+BodyProfile: 1
 E
 T 27100
 #27138
@@ -532,6 +557,7 @@ since his sling shot was taken away, he has been playing with torches.
 2 20 8 0d0+20 1d2+0
 20 400
 8 8 1
+BodyProfile: 1
 E
 #27139
 girl dark~
@@ -545,6 +571,7 @@ must be a wealthy citizen's daughter, perhaps a merchant or judge.
 1 20 9 0d0+10 1d2+0
 10 100
 8 8 2
+BodyProfile: 1
 E
 #27140
 tabby cat~
@@ -559,6 +586,7 @@ mingling with the lines of the grasses.
 1 20 9 0d0+10 1d2+0
 10 100
 8 8 2
+BodyProfile: 2
 E
 #27141
 mage old~
@@ -572,6 +600,7 @@ in contemplation, but a wine-induced smile plays on his lips.
 8 18 5 1d1+80 1d2+1
 80 6400
 8 8 1
+BodyProfile: 1
 E
 #27142
 warrior young~
@@ -585,6 +614,7 @@ absorbed to notice you watching him.
 5 19 7 1d1+50 1d2+0
 50 2500
 8 8 1
+BodyProfile: 1
 E
 #27143
 thief wanted~
@@ -599,6 +629,7 @@ and thumbs through a magazine.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 1
+BodyProfile: 1
 E
 T 27110
 #27144
@@ -614,6 +645,7 @@ a dark water over the animal.  She asks that you take a seat and keep quiet.
 9 17 4 1d1+90 1d2+1
 90 8100
 8 8 2
+BodyProfile: 1
 E
 #27145
 black animal~
@@ -641,6 +673,7 @@ senses, as cats often are.
 1 20 9 0d0+10 1d2+0
 10 100
 8 8 1
+BodyProfile: 2
 E
 #27147
 white cat~
@@ -654,6 +687,7 @@ the sunlight.  His eyes are closed as he lies in bliss in the heat.
 1 20 9 0d0+10 1d2+0
 10 100
 8 8 1
+BodyProfile: 2
 E
 #27148
 butcher~
@@ -668,6 +702,7 @@ looking up.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 1
+BodyProfile: 1
 E
 T 27103
 #27149
@@ -697,6 +732,7 @@ fashion, awaiting its first chance to fly to freedom.
 1 20 9 0d0+10 1d2+0
 10 100
 8 8 0
+BodyProfile: 4
 E
 #27151
 blackbird bird pets~
@@ -725,6 +761,7 @@ A tiny metal ring is clasped round one leg..  It must be someone's pet.
 6 18 6 1d1+60 1d2+1
 60 3600
 8 8 0
+BodyProfile: 4
 E
 #27153
 athos knight warrior~
@@ -740,6 +777,7 @@ Something - or someone - still haunts him to this day.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 1
+BodyProfile: 1
 E
 T 27101
 #27154
@@ -756,6 +794,7 @@ she wears one of many guises and is accustomed to discarding lives.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 2
+BodyProfile: 1
 E
 #27155
 naga black guard guardian~
@@ -771,6 +810,7 @@ into the guild of rogues that is its keeping.
 6 18 6 1d1+60 1d2+1
 60 3600
 8 8 0
+BodyProfile: 1
 E
 #27156
 gryphon guard guardian~
@@ -785,6 +825,7 @@ physical battle that is its charge; only those worthy may enter.
 8 18 5 1d1+80 1d2+1
 80 6400
 8 8 0
+BodyProfile: 1
 E
 #27157
 basilisk guard guardian~
@@ -799,6 +840,7 @@ you are worthy to pass into the guild of priests.
 9 17 4 1d1+90 1d2+1
 90 8100
 8 8 0
+BodyProfile: 1
 E
 #27158
 imp horned guard guardian~
@@ -814,6 +856,7 @@ its ability to....  Well, dispose of you.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 0
+BodyProfile: 1
 E
 #27159
 guard elite watch warrior~
@@ -827,6 +870,7 @@ tireless watch over the peace of the town.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 1
+BodyProfile: 1
 E
 #27160
 guard lord elite watch~
@@ -841,6 +885,7 @@ surveys his surroundings casually over the rim of a glass of strong drink.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 1
+BodyProfile: 1
 E
 #27161
 mage blind man~
@@ -855,6 +900,7 @@ fellow once, but he would best be left alone now.
 5 19 7 1d1+50 1d2+0
 50 2500
 8 8 1
+BodyProfile: 1
 E
 T 27106
 #27162
@@ -883,6 +929,7 @@ ferns nearby.  It seems quite harmless.
 1 20 9 0d0+10 1d2+0
 10 100
 8 8 0
+BodyProfile: 10
 E
 #27164
 disgruntled courier postmasters~
@@ -912,6 +959,7 @@ affairs.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 1
+BodyProfile: 1
 E
 #27166
 stu fool~
@@ -924,6 +972,7 @@ Stu the Recruit is standing here.
 2 20 8 0d0+20 1d2+0
 20 400
 8 8 1
+BodyProfile: 1
 E
 T 27104
 $

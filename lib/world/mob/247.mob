@@ -10,6 +10,7 @@ slow and very stupid.  It looks back at you and says 'fooooooood.  '
 20 14 -2 4d4+200 3d3+3
 200 40000
 8 8 0
+BodyProfile: 1
 E
 #24701
 mourner~
@@ -52,6 +53,7 @@ really don't care about.
 21 13 -2 4d4+210 3d3+3
 210 44100
 8 8 1
+BodyProfile: 1
 E
 T 24702
 #24704
@@ -67,6 +69,7 @@ moment.
 22 13 -3 4d4+220 3d3+3
 220 48400
 5 5 1
+BodyProfile: 1
 E
 #24705
 ghoul~
@@ -80,6 +83,7 @@ of its face, probably the remains of whatever it caught last.
 23 13 -3 4d4+230 3d3+3
 230 52900
 8 8 0
+BodyProfile: 1
 E
 T 24701
 #24706
@@ -108,6 +112,7 @@ what kind of forces keep it from collapsing into a heap on the floor.
 24 12 -4 4d4+240 4d4+4
 240 57600
 8 8 0
+BodyProfile: 1
 E
 #24708
 shadow~
@@ -134,6 +139,7 @@ in its eye sockets and pus drips from between bandages.
 23 13 -3 4d4+230 3d3+3
 230 52900
 8 8 0
+BodyProfile: 1
 E
 #24710
 banshee~
@@ -147,6 +153,7 @@ cheek bones.  You wonder why she is so upset.
 22 13 -3 4d4+220 3d3+3
 220 48400
 6 6 2
+BodyProfile: 0
 E
 #24711
 spectre~
@@ -160,6 +167,7 @@ by the way he's coming after you, he'd like to see through you.
 20 14 -2 4d4+200 3d3+3
 200 40000
 8 8 1
+BodyProfile: 0
 E
 #24712
 demilich lich skull~
@@ -187,6 +195,7 @@ A huge guardian daemon with huge teeth is guarding the door.
 24 12 -4 4d4+240 4d4+4
 240 57600
 8 8 1
+BodyProfile: 1
 E
 #24714
 death master~
@@ -226,6 +235,7 @@ him to sleep.
 24 12 -4 4d4+240 4d4+4
 240 57600
 4 4 1
+BodyProfile: 1
 E
 #24717
 spider~
@@ -239,5 +249,6 @@ moves about on its thin legs and still spins its ghostlike cobwebs.
 20 14 -2 4d4+200 3d3+3
 200 40000
 8 8 0
+BodyProfile: 5
 E
 $

@@ -1,0 +1,207 @@
+#34300
+censure sentinel hall watcher restraint custodian~
+the Censure Sentinel~
+The Censure Sentinel stands silently at attention.
+~
+A tall warded construct of dark stone and pale brass has been assigned
+to the conduct wing. It exists as a controlled staff sentinel, not a
+punishment mascot. Its smooth face bears only a narrow blue-white line
+of light, and its posture is patient rather than threatening.
+~
+520282 0 0 0 2424 0 0 0 1000 E
+34 9 50 6d6+340 5d5+5
+340 0
+8 8 0
+Str: 18
+Dex: 18
+Int: 18
+Wis: 18
+Con: 18
+Cha: 18
+SavingPara: 8
+SavingRod: 8
+SavingPetri: 8
+SavingBreath: 8
+SavingSpell: 10
+E
+T 34300
+#34301
+refreshment steward attendant keeper coffee hall~
+the Refreshment Steward~
+The Refreshment Steward checks the supplies behind the counter.
+~
+A neatly dressed attendant keeps cups, hot drinks, water, and simple
+provisions organized in the refreshment alcove. His role is practical
+hospitality for staff on duty, and his manner is helpful without the old
+jokes and crude theatrics.
+~
+516186 0 0 0 2424 0 0 0 325 E
+25 12 38 5d5+250 4d4+4
+250 0
+8 8 1
+Str: 16
+Dex: 16
+Int: 14
+Wis: 12
+Con: 18
+Cha: 19
+SavingPara: 6
+SavingRod: 6
+SavingPetri: 6
+SavingBreath: 6
+SavingSpell: 6
+E
+T 34301
+#34302
+senior scribe assistant records staff~
+the Senior Scribe~
+The Senior Scribe reviews a violet rune-slate beside the records desk.
+~
+A professional staff scribe in a dark blue service coat carries a violet
+rune-slate and a ring of archive keys. She tracks correspondence,
+meeting notes, and action items for senior staff without being treated
+as decoration.
+~
+520282 0 0 0 0 0 0 0 0 E
+31 10 45 6d6+310 5d5+5
+310 0
+8 8 2
+Str: 18
+Dex: 18
+Int: 18
+Wis: 18
+Con: 18
+Cha: 18
+SavingPara: 7
+SavingRod: 7
+SavingPetri: 7
+SavingBreath: 7
+SavingSpell: 7
+E
+#34303
+conduct mediator justice staff healer aide~
+the Conduct Mediator~
+The Conduct Mediator reviews a sealed case ledger.
+~
+A composed mediator in white and deep blue robes keeps evidence ledgers
+and procedural notes for difficult conduct reviews. His authority is
+administrative and limited by policy, documentation, and the expectation
+that staff use restraint.
+~
+258120 0 0 0 2168 0 0 0 0 E
+31 10 45 6d6+310 5d5+5
+310 0
+8 8 1
+Str: 18
+Dex: 18
+Int: 18
+Wis: 18
+Con: 18
+Cha: 18
+SavingPara: 7
+SavingRod: 7
+SavingPetri: 7
+SavingBreath: 7
+SavingSpell: 7
+E
+T 34399
+#34304
+service spirit custodian hall cleaner ward~
+a service spirit~
+A quiet service spirit tends the halls.
+~
+A translucent household spirit moves through the complex carrying a
+cloth, small brush, and ring of maintenance tags. It serves by old
+agreement and cheerful habit, not punishment or debt, and quietly
+handles the ordinary upkeep that keeps the halls usable.
+~
+516170 0 0 0 589840 0 0 0 0 E
+14 16 23 2d2+140 2d2+2
+140 0
+8 8 0
+SavingPara: 3
+SavingRod: 3
+SavingPetri: 3
+SavingBreath: 3
+SavingSpell: 3
+E
+#34305
+garden keeper gardener groundskeeper lantern~
+the Garden Keeper~
+The Garden Keeper tends the lantern garden.
+~
+A practical groundskeeper in green and brown work clothes carries
+pruning shears, cord, and a small lantern. She tends paths, water
+channels, trees, and flowering beds that give staff a place to think
+away from administrative rooms.
+~
+520204 0 0 0 0 0 0 0 350 E
+14 16 23 2d2+140 2d2+2
+140 0
+8 8 2
+Str: 16
+Dex: 17
+Int: 13
+Wis: 12
+Con: 16
+Cha: 19
+SavingPara: 3
+SavingRod: 3
+SavingPetri: 3
+SavingBreath: 3
+SavingSpell: 3
+E
+#34306
+stone warden staff guardian sentinel golem~
+a stone warden~
+A stone warden keeps watch over the operations gallery.
+~
+A broad stone construct bears simple service runes across its shoulders.
+It is stationed at major staff junctions to discourage misuse of
+restricted areas and to remind visitors that access is based on assigned
+responsibility.
+~
+520266 0 0 0 2424 0 0 0 0 E
+25 12 38 5d5+250 4d4+4
+250 0
+8 8 0
+Str: 16
+Dex: 16
+Int: 16
+Wis: 16
+Con: 16
+Cha: 16
+SavingPara: 6
+SavingRod: 6
+SavingPetri: 6
+SavingBreath: 6
+SavingSpell: 6
+E
+T 34303
+#34307
+air warden staff guardian sentinel golem~
+an air warden~
+An air warden circles quietly beneath the rafters.
+~
+A translucent warden of bound air and pale runes patrols upper passages.
+Its task is observation and access control rather than intimidation, and
+it reacts only when restricted staff spaces are misused.
+~
+520266 0 0 0 133500 0 0 0 0 E
+25 12 38 5d5+250 4d4+4
+250 0
+8 8 0
+Str: 16
+Dex: 16
+Int: 16
+Wis: 16
+Con: 16
+Cha: 16
+SavingPara: 6
+SavingRod: 6
+SavingPetri: 6
+SavingBreath: 6
+SavingSpell: 6
+E
+T 34303
+$

@@ -14,6 +14,7 @@ become tangled in cord and wire around its neck.
 100 0
 8 8 0
 BareHandAttack: 4
+BodyProfile: 2
 SavingPara: 2
 SavingRod: 2
 SavingPetri: 2
@@ -65,6 +66,7 @@ the stronger rats of the upper sewer.
 70 0
 8 8 0
 BareHandAttack: 4
+BodyProfile: 2
 SavingPara: 1
 SavingRod: 1
 SavingPetri: 1
@@ -136,6 +138,7 @@ burial complex and still follows an order no living citizen remembers.
 11 19 31 1d4+55 1d2+0
 0 0
 8 8 0
+BodyProfile: 1
 SavingPara: 2
 SavingRod: 2
 SavingPetri: 2

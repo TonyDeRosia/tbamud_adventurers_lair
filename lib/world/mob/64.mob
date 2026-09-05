@@ -11,6 +11,7 @@ you and shies away a little.
 80 6400
 8 8 1
 BareHandAttack: 4
+BodyProfile: 2
 E
 #6401
 demon decay~
@@ -37,6 +38,7 @@ A mound of books rise up into a human shape and tries to hit you!
 14 16 1 2d2+140 2d2+2
 140 19600
 8 8 0
+BodyProfile: 1
 E
 #6403
 bad feeling~
@@ -50,6 +52,7 @@ tangible...  Magic?
 18 14 0 3d3+180 3d3+3
 180 32400
 8 8 0
+BodyProfile: 0
 E
 #6404
 nightmare~
@@ -77,6 +80,7 @@ guarding.
 180 32400
 8 8 0
 BareHandAttack: 9
+BodyProfile: 1
 E
 #6406
 small god~

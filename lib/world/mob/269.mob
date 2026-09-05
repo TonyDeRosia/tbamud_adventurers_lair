@@ -22,6 +22,7 @@ An oversized, hairy spider scuttles away.
 18 14 0 3d3+180 3d3+3
 180 32400
 8 8 1
+BodyProfile: 5
 E
 #26902
 cactus~
@@ -49,6 +50,7 @@ is full of brambles.  You don't think you should pet it.
 18 14 0 3d3+180 3d3+3
 180 32400
 8 8 1
+BodyProfile: 2
 E
 #26904
 rodent lemming~
@@ -80,6 +82,7 @@ surely bring him to a spastic frenzy!
 190 36100
 8 8 1
 BareHandAttack: 10
+BodyProfile: 2
 Str: 15
 Dex: 18
 E
@@ -95,6 +98,7 @@ victims usually bet attacked because they step on it.
 19 14 -1 3d3+190 3d3+3
 190 36100
 6 5 0
+BodyProfile: 3
 E
 #26907
 indian scout~
@@ -108,6 +112,7 @@ something.
 20 14 -2 4d4+200 3d3+3
 200 40000
 8 8 1
+BodyProfile: 1
 E
 #26908
 hermit mad~
@@ -122,6 +127,7 @@ knowledge of where he lives.
 19 14 -1 3d3+190 3d3+3
 190 36100
 8 8 1
+BodyProfile: 1
 E
 #26909
 Indian guard~
@@ -136,6 +142,7 @@ rocks.  You wish you were this tough.
 20 14 -2 4d4+200 3d3+3
 200 40000
 8 8 1
+BodyProfile: 1
 E
 #26910
 chief Indian slashing boar~
@@ -149,6 +156,7 @@ would just as soon kill you as look at you.
 20 14 -2 4d4+200 3d3+3
 200 40000
 5 5 1
+BodyProfile: 2
 Str: 18
 StrAdd: 100
 Dex: 18
@@ -167,6 +175,7 @@ You really shouldn't kill it, it might be illegal.
 18 14 0 3d3+180 3d3+3
 180 32400
 8 8 2
+BodyProfile: 4
 E
 #26912
 toad horny~
@@ -179,5 +188,6 @@ A spiky-looking horny toad is here, taking an afternoon nap.
 17 15 0 3d3+170 2d2+2
 170 28900
 5 5 2
+BodyProfile: 2
 E
 $

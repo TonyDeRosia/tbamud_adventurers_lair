@@ -11,6 +11,7 @@ here.  It ATTACKS.
 30 10 -8 6d6+300 5d5+5
 300 90000
 8 8 1
+BodyProfile: 6
 E
 #25001
 White Dragon~
@@ -24,6 +25,7 @@ enough for the Ice Dragon to devour you.
 30 10 -8 6d6+300 5d5+5
 300 90000
 8 8 0
+BodyProfile: 6
 E
 #25002
 Pixie~
@@ -51,6 +53,7 @@ SOUL!!!!!!!
 29 11 -7 5d5+290 4d4+4
 290 84100
 8 8 0
+BodyProfile: 6
 E
 #25004
 Ice Dragon Spirit~
@@ -65,6 +68,7 @@ dragon guardians.  The Spirit attempts to leech you life blood from your body.
 29 11 -7 5d5+290 4d4+4
 290 84100
 8 8 0
+BodyProfile: 6
 E
 #25005
 Pixie King~
@@ -79,6 +83,7 @@ The King loves to frolic and play, especially with new friends.  He asks you
 29 11 -7 5d5+290 4d4+4
 290 84100
 8 8 1
+BodyProfile: 1
 E
 #25006
 gate keeper gatekeeper~
@@ -110,6 +115,7 @@ ever did.
 30 10 -8 6d6+300 5d5+5
 300 90000
 8 8 0
+BodyProfile: 6
 E
 #25008
 pixie guard~
@@ -124,6 +130,7 @@ Pixies.
 28 11 -6 5d5+280 4d4+4
 280 78400
 8 8 1
+BodyProfile: 1
 E
 #25009
 mage pixie master~
@@ -139,5 +146,6 @@ from where you remember it.
 29 11 -7 5d5+290 4d4+4
 290 84100
 8 8 1
+BodyProfile: 1
 E
 $

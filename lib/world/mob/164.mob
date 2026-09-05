@@ -10,6 +10,7 @@ This adorable little field mouse scurries around the plains, just trying to surv
 0 0
 8 8 3
 BareHandAttack: 4
+BodyProfile: 2
 Str: 6
 Dex: 14
 Int: 3
@@ -36,6 +37,7 @@ Warm brown fur lies sleek against this small rabbit's body, broken by a pale bel
 0 0
 8 8 0
 BareHandAttack: 4
+BodyProfile: 2
 Str: 7
 Dex: 15
 Int: 4
@@ -62,6 +64,7 @@ Golden color flashes across this small plains bird whenever it shifts among the 
 0 0
 8 8 0
 BareHandAttack: 11
+BodyProfile: 4
 Str: 5
 Dex: 16
 Int: 4
@@ -89,6 +92,7 @@ Broad wings patterned in warm orange, black, and pale cream carry this delicate 
 0 0
 8 8 0
 BareHandAttack: 1
+BodyProfile: 10
 Str: 3
 Dex: 17
 Int: 3
@@ -116,6 +120,7 @@ This lean fox wears a coat of dusty red broken by darker legs and a pale throat.
 0 0
 8 8 0
 BareHandAttack: 4
+BodyProfile: 2
 Dex: 15
 Int: 7
 Wis: 10
@@ -144,6 +149,7 @@ Long-legged and wary, this plains deer feeds in short bursts before lifting its 
 0 0
 8 8 0
 BareHandAttack: 7
+BodyProfile: 2
 Str: 13
 Dex: 14
 Int: 5
@@ -174,6 +180,7 @@ Powerful forelegs and heavy claws make this low-built animal look as though it b
 0 0
 8 8 0
 BareHandAttack: 8
+BodyProfile: 2
 Str: 14
 Int: 6
 Wis: 9
@@ -202,6 +209,7 @@ Long wings carry this lean hunting bird just above the grass tops, where it ride
 0 0
 8 8 0
 BareHandAttack: 8
+BodyProfile: 4
 Str: 7
 Dex: 17
 Int: 6
@@ -231,6 +239,7 @@ Three pale stripes run the length of this slender snake's dark body. Its head re
 0 0
 8 8 0
 BareHandAttack: 4
+BodyProfile: 3
 Str: 7
 Dex: 15
 Int: 4
@@ -260,6 +269,7 @@ Thick-bodied and powerfully built for digging, this groundhog crops grass with u
 0 0
 8 8 0
 BareHandAttack: 4
+BodyProfile: 2
 Str: 12
 Dex: 9
 Int: 5
@@ -289,6 +299,7 @@ This soft glow drifts without any clear purpose, rising and falling slightly as 
 0 5
 8 8 0
 BareHandAttack: 12
+BodyProfile: 0
 Str: 3
 Dex: 18
 Int: 14
@@ -383,6 +394,7 @@ This majestic stag is unmistakably more than an ordinary animal. Fine green shoo
 0 10
 8 8 0
 BareHandAttack: 9
+BodyProfile: 2
 Str: 16
 Dex: 14
 Int: 10
@@ -413,6 +425,7 @@ At a distance this creature resembles a rangy plains wolf, but thorned vines twi
 0 15
 8 8 0
 BareHandAttack: 4
+BodyProfile: 2
 Str: 16
 Dex: 16
 Int: 8
@@ -443,6 +456,7 @@ Bristles like stiff brown thorns cover this broad-backed boar from shoulder to r
 0 20
 8 8 0
 BareHandAttack: 9
+BodyProfile: 2
 Str: 18
 Dex: 10
 Int: 6
@@ -505,6 +519,7 @@ Soft color gathers around this spirit like petals carried on a warm plains breez
 0 18
 8 8 0
 BareHandAttack: 12
+BodyProfile: 1
 Str: 13
 Dex: 13
 Int: 14
@@ -536,6 +551,7 @@ Unlike the gentler spirits of flower and grass, this dryad wears the harsher fac
 0 25
 8 8 0
 BareHandAttack: 8
+BodyProfile: 1
 Str: 17
 Dex: 13
 Int: 13
@@ -597,6 +613,7 @@ Broad shoulders of packed earth and weathered stone give this guardian the shape
 0 35
 8 8 0
 BareHandAttack: 6
+BodyProfile: 1
 Str: 20
 Dex: 8
 Int: 8
@@ -628,6 +645,7 @@ Sun and weather have faded this traveler's layered green and brown robes nearly 
 0 10
 8 8 0
 BareHandAttack: 5
+BodyProfile: 1
 Dex: 12
 Int: 15
 Wis: 17
@@ -660,6 +678,7 @@ Several small pouches hang from this druid's belt, each marked with a different 
 0 8
 8 8 0
 BareHandAttack: 5
+BodyProfile: 1
 Str: 9
 Dex: 12
 Int: 15
@@ -692,6 +711,7 @@ A long cloak the color of storm-dark grass shifts continuously around this watch
 0 25
 8 8 0
 BareHandAttack: 11
+BodyProfile: 1
 Str: 15
 Dex: 16
 Int: 13
@@ -726,6 +746,7 @@ This quiet guardian wears simple earth-toned garments beneath a mantle worked wi
 0 30
 8 8 0
 BareHandAttack: 5
+BodyProfile: 1
 Str: 16
 Int: 14
 Wis: 18
@@ -757,6 +778,7 @@ Layers of luminous petals, grass, and flowering vines gather into the tall shape
 0 50
 8 8 0
 BareHandAttack: 12
+BodyProfile: 1
 Str: 18
 Dex: 14
 Int: 17

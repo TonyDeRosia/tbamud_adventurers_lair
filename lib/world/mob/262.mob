@@ -11,6 +11,7 @@ you.
 100 10000
 8 8 0
 BareHandAttack: 8
+BodyProfile: 2
 E
 #26201
 snake rattlesnake~
@@ -25,6 +26,7 @@ trouble if you mess with it too much.  Best to just sort of ease on past.
 70 4900
 8 8 0
 BareHandAttack: 4
+BodyProfile: 3
 E
 #26202
 wolf timberwolf~
@@ -39,6 +41,7 @@ a few nips in the ass if you mess with it.
 120 14400
 8 8 0
 BareHandAttack: 4
+BodyProfile: 2
 E
 #26203
 bear black~
@@ -53,6 +56,7 @@ mouth where it intends to bodily put you!
 130 16900
 8 8 0
 BareHandAttack: 4
+BodyProfile: 2
 E
 #26204
 bear grizzly~
@@ -67,6 +71,7 @@ along on its way.
 150 22500
 8 8 0
 BareHandAttack: 9
+BodyProfile: 2
 E
 #26205
 fox~
@@ -81,5 +86,6 @@ hell out of it, the going onto its next 'victim'.
 90 8100
 8 8 0
 BareHandAttack: 4
+BodyProfile: 2
 E
 $

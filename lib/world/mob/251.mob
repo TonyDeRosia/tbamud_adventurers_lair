@@ -55,6 +55,7 @@ Don't mess with them!
 200 40000
 8 8 1
 BareHandAttack: 12
+BodyProfile: 1
 Str: 12
 Dex: 12
 Int: 12
@@ -73,6 +74,7 @@ for the ape scientists to use in experiments.
 210 44100
 8 8 1
 BareHandAttack: 12
+BodyProfile: 1
 Str: 12
 Dex: 12
 Int: 12
@@ -89,6 +91,7 @@ A small Ape Child is standing here.
 18 14 0 3d3+180 3d3+3
 180 32400
 8 8 1
+BodyProfile: 1
 E
 #25106
 wild human~
@@ -102,6 +105,7 @@ by the apes.
 18 14 0 3d3+180 3d3+3
 180 32400
 8 8 1
+BodyProfile: 1
 E
 #25107
 caged human~
@@ -115,6 +119,7 @@ by apes.  Captivity has made these humans weaker than the wild ones.
 18 14 0 3d3+180 3d3+3
 180 32400
 8 8 1
+BodyProfile: 1
 E
 #25108
 ursus gorilla captain~
@@ -129,6 +134,7 @@ strong.  Picking a fight with him would surely result in death!
 220 48400
 8 8 1
 BareHandAttack: 6
+BodyProfile: 1
 Str: 17
 Dex: 17
 Int: 17
@@ -147,6 +153,7 @@ dominated by man, but he doesn't like to share information.
 210 44100
 8 8 1
 BareHandAttack: 7
+BodyProfile: 1
 Str: 16
 Dex: 16
 Int: 16
@@ -238,5 +245,6 @@ An ape shopkeeper is here, staring at you.
 22 13 -3 4d4+220 3d3+3
 220 48400
 8 8 1
+BodyProfile: 1
 E
 $

@@ -24,6 +24,7 @@ A rat scurries near the wall.
 1 20 9 0d0+10 1d2+0
 10 100
 8 8 0
+BodyProfile: 2
 E
 #29402
 Leatherworker worker~
@@ -38,6 +39,7 @@ A hazard of the trade.
 18 14 0 3d3+180 3d3+3
 180 32400
 8 8 1
+BodyProfile: 1
 E
 #29403
 Jeweller~
@@ -68,6 +70,7 @@ you and motions for you to take a number.
 18 14 0 3d3+180 3d3+3
 180 32400
 8 8 1
+BodyProfile: 1
 E
 #29405
 Sakifan librarian~
@@ -82,6 +85,7 @@ he reads.  He puts his book down with a sigh as you come in.  Sakifan says,
 18 14 0 3d3+180 3d3+3
 180 32400
 8 8 1
+BodyProfile: 1
 E
 #29406
 Brewermaster Brewer~
@@ -124,6 +128,7 @@ not sure if you want to mess with him or not.
 16 15 0 3d3+160 2d2+2
 160 25600
 8 8 1
+BodyProfile: 1
 E
 #29409
 Sailor Merchant Sailor-Merchant~
@@ -138,6 +143,7 @@ don't think you need it.
 18 14 0 3d3+180 3d3+3
 180 32400
 8 8 1
+BodyProfile: 1
 E
 #29410
 Landlord lord land~
@@ -165,6 +171,7 @@ mines or fields.  He has devoted his life to ensuring the protection of others.
 15 15 1 3d3+150 2d2+2
 150 22500
 8 8 1
+BodyProfile: 1
 E
 #29412
 Worker brewery~
@@ -177,6 +184,7 @@ A Brewery Worker rolls a barrel right on by you.
 4 19 7 0d0+40 1d2+0
 40 1600
 8 8 1
+BodyProfile: 1
 E
 #29413
 Boarder~
@@ -205,6 +213,7 @@ get away from you?  Why would he...  Oh.  You've still got your weapon out.
 4 19 7 0d0+40 1d2+0
 40 1600
 8 8 1
+BodyProfile: 1
 E
 #29415
 Citizen~
@@ -220,6 +229,7 @@ get away from you?  Why would she...  Oh.  You've still got your weapon out.
 4 19 7 0d0+40 1d2+0
 40 1600
 8 8 2
+BodyProfile: 1
 E
 #29416
 Trader Merchant~
@@ -234,6 +244,7 @@ anyone knock over his operation here.
 18 14 0 3d3+180 3d3+3
 180 32400
 8 8 1
+BodyProfile: 1
 E
 #29417
 Woman Old~
@@ -246,6 +257,7 @@ An Old Woman sits here, remembering better times...
 4 19 7 0d0+40 1d2+0
 40 1600
 4 4 2
+BodyProfile: 1
 E
 #29418
 Child Boy Young~
@@ -259,6 +271,7 @@ sickly.
 1 20 9 0d0+10 1d2+0
 10 100
 6 6 1
+BodyProfile: 1
 E
 #29419
 Housewife woman wife~
@@ -273,6 +286,7 @@ with all those marauding bands of adventurers out there...  You never know!
 4 19 7 0d0+40 1d2+0
 40 1600
 8 8 2
+BodyProfile: 1
 E
 #29420
 Slob sleeping man~
@@ -286,6 +300,7 @@ got to you.
 4 19 7 0d0+40 1d2+0
 40 1600
 4 4 1
+BodyProfile: 1
 E
 #29421
 Man Old~
@@ -298,6 +313,7 @@ An Old Man stares at the checkerboard intently.
 4 19 7 0d0+40 1d2+0
 40 1600
 6 6 1
+BodyProfile: 1
 E
 #29422
 Bachelor man~
@@ -311,5 +327,6 @@ That's life...
 4 19 7 0d0+40 1d2+0
 40 1600
 6 6 1
+BodyProfile: 1
 E
 $

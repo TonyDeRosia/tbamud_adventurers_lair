@@ -10,6 +10,7 @@ A pelican is here, taking a break in the sun.
 200 40000
 8 8 0
 BareHandAttack: 4
+BodyProfile: 4
 E
 #26501
 otter sea~
@@ -23,6 +24,7 @@ A sea otter is here, basking in the warmth of the sun.
 210 44100
 6 8 0
 BareHandAttack: 4
+BodyProfile: 2
 E
 #26502
 seagull gull~
@@ -36,6 +38,7 @@ A seagull pokes about, looking for scraps.
 220 48400
 8 8 0
 BareHandAttack: 4
+BodyProfile: 4
 E
 #26503
 lighthouse keeper~
@@ -76,6 +79,7 @@ she is now so covered in dirt and grime, it is hard to tell.
 27 11 -6 5d5+270 4d4+4
 270 72900
 5 8 2
+BodyProfile: 1
 E
 #26506
 man tits~
@@ -89,6 +93,7 @@ sure you want to know.
 27 11 -6 5d5+270 4d4+4
 270 72900
 8 8 0
+BodyProfile: 1
 E
 #26507
 perfect companion~
@@ -114,6 +119,7 @@ the urge.
 24 12 -4 4d4+240 4d4+4
 240 57600
 6 8 2
+BodyProfile: 1
 E
 #26509
 max~
@@ -141,6 +147,7 @@ she still seems quite content with her dolls.  What a nice girl!
 29 11 -7 5d5+290 4d4+4
 290 84100
 6 8 2
+BodyProfile: 1
 E
 #26511
 takker man~
@@ -155,6 +162,7 @@ fishes.
 29 11 -7 5d5+290 4d4+4
 290 84100
 8 8 1
+BodyProfile: 1
 E
 #26512
 fisherman disciple~
@@ -167,6 +175,7 @@ A fisherman sits here, trying to imitate Takker as best he can.
 25 12 -5 5d5+250 4d4+4
 250 62500
 6 6 1
+BodyProfile: 1
 E
 #26513
 kracken~

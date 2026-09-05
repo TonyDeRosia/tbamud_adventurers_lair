@@ -11,6 +11,7 @@ of the top of the back of his shirt.
 20 14 -2 4d4+200 3d3+3
 200 40000
 8 8 1
+BodyProfile: 1
 E
 #31801
 gambler shouting~
@@ -24,6 +25,7 @@ HE would probably not understand.
 12 16 2 2d2+120 2d2+2
 120 14400
 8 8 1
+BodyProfile: 1
 E
 #31802
 dead boy~
@@ -38,6 +40,7 @@ you did to offend him but hey, it could be any...  Nothing.
 200 40000
 8 8 1
 BareHandAttack: 13
+BodyProfile: 1
 E
 #31803
 bloody scythe boy~
@@ -52,6 +55,7 @@ what you did to offend him but hey, it could be any...  Nothing.
 200 40000
 8 8 1
 BareHandAttack: 13
+BodyProfile: 1
 E
 #31804
 giant cockroach~
@@ -64,6 +68,7 @@ A giant cockroach looks about ready to eat you.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 0
+BodyProfile: 9
 E
 #31805
 beggar~
@@ -78,6 +83,7 @@ byes.
 210 44100
 8 8 0
 BareHandAttack: 4
+BodyProfile: 1
 E
 #31806
 Marcko Dead Boy~
@@ -93,6 +99,7 @@ pleasant smile fades.
 340 115600
 8 8 1
 BareHandAttack: 14
+BodyProfile: 1
 E
 #31807
 Ie Bloody scythe boy~
@@ -110,6 +117,7 @@ of her boot.  You sense that this isn't going to be pretty.
 340 115600
 6 6 2
 BareHandAttack: 12
+BodyProfile: 1
 E
 #31808
 carpenter man worker~
@@ -123,6 +131,7 @@ what motivates a man who does a job such as this to get up every morning.
 22 13 -3 4d4+220 3d3+3
 220 48400
 8 8 1
+BodyProfile: 1
 E
 #31809
 foreman shipyard~
@@ -149,6 +158,7 @@ nahhhh...
 20 14 -2 4d4+200 3d3+3
 200 40000
 8 8 1
+BodyProfile: 1
 E
 #31811
 dock master woman~
@@ -162,6 +172,7 @@ passengers to every ship that docks in this cove.
 30 10 -8 6d6+300 5d5+5
 300 90000
 8 8 2
+BodyProfile: 1
 E
 #31812
 assistant~
@@ -188,6 +199,7 @@ he's done.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 1
+BodyProfile: 1
 E
 #31814
 ticket travel woman receptionist~
@@ -201,6 +213,7 @@ for a long time.
 1 20 9 0d0+10 1d2+0
 10 100
 8 8 2
+BodyProfile: 1
 E
 #31815
 midshipman~
@@ -229,6 +242,7 @@ A pack rat is sifting through trash.
 70 4900
 8 8 0
 BareHandAttack: 4
+BodyProfile: 2
 E
 #31817
 Cap'n Darby~
@@ -269,6 +283,7 @@ A street punk is here, getting to throw a set of dice.
 25 12 -5 5d5+250 4d4+4
 250 62500
 8 8 1
+BodyProfile: 1
 E
 #31820
 sailor drunk sing~
@@ -282,6 +297,7 @@ feet still.
 20 14 -2 4d4+200 3d3+3
 200 40000
 8 8 1
+BodyProfile: 1
 E
 #31821
 myra madame~
@@ -307,5 +323,6 @@ The man reads his book behind the glass without glancing up.
 30 10 -8 6d6+300 5d5+5
 300 90000
 8 8 1
+BodyProfile: 1
 E
 $

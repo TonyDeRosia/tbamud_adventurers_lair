@@ -12,6 +12,7 @@ For the right price of course.
 70 4900
 8 8 1
 BareHandAttack: 9
+BodyProfile: 1
 E
 #701
 border guard~
@@ -25,6 +26,7 @@ attack.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 1
+BodyProfile: 1
 E
 #702
 outpost commander~
@@ -39,6 +41,7 @@ comes from a life of leading men in endless battle.
 100 10000
 8 8 2
 BareHandAttack: 3
+BodyProfile: 1
 E
 #703
 trader~
@@ -54,6 +57,7 @@ few or an extra item or two.
 70 4900
 8 8 1
 BareHandAttack: 12
+BodyProfile: 1
 E
 #704
 hermit~
@@ -68,6 +72,7 @@ can survive.
 70 4900
 8 8 1
 BareHandAttack: 7
+BodyProfile: 1
 E
 #705
 patrolman~
@@ -82,6 +87,7 @@ of the city and give warning in case of trouble.
 70 4900
 8 8 1
 BareHandAttack: 13
+BodyProfile: 1
 E
 #706
 warden~
@@ -96,6 +102,7 @@ at you suspiciously.
 70 4900
 8 8 1
 BareHandAttack: 6
+BodyProfile: 1
 E
 #707
 woodsman~
@@ -123,6 +130,7 @@ A guard is standing watch here.
 140 19600
 8 8 1
 BareHandAttack: 10
+BodyProfile: 1
 E
 #709
 woodswoman~

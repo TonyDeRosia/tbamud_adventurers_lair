@@ -32,6 +32,7 @@ Wood, leather, straw, and simple enchantment give this humanoid practice constru
 2 17 0 2d6+38 1d2+0
 20 0
 8 8 1
+BodyProfile: 11
 Wimpy: 1
 GoldMin: 20
 GoldMax: 20
@@ -47,6 +48,7 @@ This small drake is one of several creatures raised under careful supervision by
 4 17 0 2d6+73 1d3+0
 40 0
 8 8 1
+BodyProfile: 6
 SavingPara: 1
 SavingRod: 1
 SavingPetri: 1
@@ -69,6 +71,7 @@ Halric is a weathered human veteran in a dark blue Academia surcoat. A ring of p
 3 20 0 2d6+63 1d2+0
 30 0
 8 8 1
+BodyProfile: 1
 Wimpy: 1
 Evasion: 1
 GoldMin: 30
@@ -88,6 +91,7 @@ Seraphine wears a leather apron over layered scholar's robes, with small pouches
 5 20 0 2d6+93 1d2+0
 50 0
 8 8 2
+BodyProfile: 1
 SavingPara: 1
 SavingRod: 1
 SavingPetri: 1
@@ -111,6 +115,7 @@ Brass legs carry a low wooden-and-metal body fitted with padded striking nubs in
 1 18 0 2d6+18 1d2+0
 10 0
 8 8 0
+BodyProfile: 11
 Wimpy: 1
 GoldMin: 10
 GoldMax: 10
@@ -126,6 +131,7 @@ Layered cloth, wicker, leather, and minor animation magic form a sturdier oppone
 4 17 0 2d6+83 1d3+1
 40 0
 8 8 0
+BodyProfile: 11
 SavingPara: 1
 SavingRod: 1
 SavingPetri: 1
@@ -163,6 +169,7 @@ This enormous minotaur serves as one of the Academia's most demanding controlled
 7 15 0 2d6+193 1d5+2
 70 0
 8 8 1
+BodyProfile: 7
 SavingPara: 1
 SavingRod: 1
 SavingPetri: 1
@@ -207,6 +214,7 @@ Vael is a lean half-elf dressed for travel rather than ceremony. Rope, chalk, a 
 2 20 0 2d6+43 1d2+0
 20 0
 8 8 1
+BodyProfile: 1
 Wimpy: 1
 GoldMin: 20
 GoldMax: 20
@@ -224,6 +232,7 @@ Elowen is a composed human woman in the deep blue and silver of the Academia. Sh
 1 20 0 2d6+18 1d2+0
 10 0
 8 8 2
+BodyProfile: 1
 Wimpy: 1
 GoldMin: 10
 GoldMax: 10
@@ -241,6 +250,7 @@ Miriel is an elven lecturer whose robes are stitched with tiny road, star, and r
 3 20 0 2d6+63 1d2+0
 30 0
 8 8 2
+BodyProfile: 1
 Wimpy: 1
 Evasion: 1
 GoldMin: 30
@@ -259,6 +269,7 @@ Corren wears a weathered green cloak over light field armor and carries no unnec
 4 20 0 2d6+83 1d2+0
 40 0
 8 8 1
+BodyProfile: 1
 SavingPara: 1
 SavingRod: 1
 SavingPetri: 1
@@ -282,6 +293,7 @@ Aldren is an older adventurer whose formal coat cannot completely hide the postu
 5 20 0 2d6+113 1d2+0
 50 0
 8 8 1
+BodyProfile: 1
 SavingPara: 1
 SavingRod: 1
 SavingPetri: 1

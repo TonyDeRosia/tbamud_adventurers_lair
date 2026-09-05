@@ -10,6 +10,7 @@ from beneath.
 29 11 -7 5d5+290 4d4+4
 290 84100
 8 8 1
+BodyProfile: 1
 E
 #32201
 hauler cargo man~
@@ -23,6 +24,7 @@ it along with both arms as if it were nothing more than a trifle.
 30 10 -8 6d6+300 5d5+5
 300 90000
 8 8 1
+BodyProfile: 1
 E
 #32202
 representative travel woman~
@@ -36,6 +38,7 @@ She sniffs quietly and turns away.
 30 10 -8 6d6+300 5d5+5
 300 90000
 8 8 2
+BodyProfile: 1
 E
 #32203
 sailor~
@@ -49,6 +52,7 @@ will probably continue to do so, unless he finds another profession,.
 20 14 -2 4d4+200 3d3+3
 200 40000
 8 8 1
+BodyProfile: 1
 E
 #32204
 boatman man~
@@ -89,6 +93,7 @@ his free hand.  The whiskey is also swagged without blinking.
 23 13 -3 4d4+230 3d3+3
 230 52900
 8 8 1
+BodyProfile: 1
 E
 #32207
 dolphin~
@@ -116,6 +121,7 @@ might have to let a load go.
 20 14 -2 4d4+200 3d3+3
 200 40000
 8 8 0
+BodyProfile: 4
 E
 #32209
 ship owner wealthy~

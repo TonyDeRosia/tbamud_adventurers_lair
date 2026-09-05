@@ -10,6 +10,7 @@ special VISOR that lets him see things.
 28 11 -6 5d5+280 4d4+4
 280 78400
 8 8 1
+BodyProfile: 1
 Str: 16
 Dex: 16
 Int: 16
@@ -29,6 +30,7 @@ Starfleet.  He possesses super-human strength, and is extremely tough.
 290 84100
 8 8 1
 BareHandAttack: 6
+BodyProfile: 11
 Str: 20
 Dex: 20
 Int: 20
@@ -49,6 +51,7 @@ of the Enterprise, and he's plenty strong.
 290 84100
 8 8 1
 BareHandAttack: 7
+BodyProfile: 1
 Str: 19
 Dex: 17
 Int: 17
@@ -69,6 +72,7 @@ was also commanded by Captain Picard.
 260 67600
 8 8 2
 BareHandAttack: 3
+BodyProfile: 1
 Str: 16
 Dex: 16
 Int: 16
@@ -107,6 +111,7 @@ keeping the crew in line.
 290 84100
 8 8 1
 BareHandAttack: 13
+BodyProfile: 1
 Str: 18
 Dex: 18
 Int: 18
@@ -128,6 +133,7 @@ him!
 300 90000
 8 8 1
 BareHandAttack: 9
+BodyProfile: 1
 Str: 25
 Dex: 25
 Int: 25
@@ -169,6 +175,7 @@ atoms.
 280 78400
 8 8 1
 BareHandAttack: 11
+BodyProfile: 1
 Str: 16
 Dex: 16
 Int: 16
@@ -208,6 +215,7 @@ he's expensive to FEED and keep alive.
 270 72900
 8 8 1
 BareHandAttack: 4
+BodyProfile: 13
 Str: 13
 Dex: 13
 Int: 13
@@ -227,6 +235,7 @@ human, so he thinks that having a pet might help him achieve his goal.
 270 72900
 8 8 1
 BareHandAttack: 4
+BodyProfile: 2
 Str: 13
 Dex: 13
 Int: 13
@@ -313,6 +322,7 @@ to be quite skilled with his batleth.
 30 10 -8 6d6+300 5d5+5
 300 90000
 8 8 1
+BodyProfile: 1
 E
 #24117
 small gray mouse~
@@ -326,6 +336,7 @@ She peers around with large black eyes and constantly twitches her nose.
 1 20 9 0d0+10 1d2+0
 10 100
 8 8 2
+BodyProfile: 2
 E
 T 24130
 #24118
@@ -346,6 +357,7 @@ re-activated by pressing a switch up behind it's left shoulder-blade.
 25 12 -5 5d5+250 4d4+4
 250 62500
 8 8 0
+BodyProfile: 11
 E
 T 24131
 #24119
@@ -364,6 +376,7 @@ re-activated and is ready to accept vocal command programming.
 25 12 -5 5d5+250 4d4+4
 250 62500
 8 8 0
+BodyProfile: 11
 E
 T 24132
 T 24131

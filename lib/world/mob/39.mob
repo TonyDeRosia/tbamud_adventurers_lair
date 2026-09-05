@@ -47,6 +47,7 @@ see.
 100 10000
 8 8 1
 BareHandAttack: 3
+BodyProfile: 1
 Str: 15
 Dex: 13
 Int: 12
@@ -65,6 +66,7 @@ obviously very content with just seeing the sights.
 70 4900
 8 8 2
 BareHandAttack: 14
+BodyProfile: 1
 Str: 14
 Dex: 12
 Int: 14
@@ -101,6 +103,7 @@ by to buy her wonderful kitchenware!
 100 10000
 8 8 2
 BareHandAttack: 10
+BodyProfile: 1
 E
 #3918
 man selling furniture~
@@ -113,6 +116,7 @@ A man stands here, selling his furniture.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 1
+BodyProfile: 1
 Str: 14
 Int: 13
 Wis: 13
@@ -130,6 +134,7 @@ entire species if she can!
 70 4900
 8 8 2
 BareHandAttack: 1
+BodyProfile: 1
 Dex: 13
 Int: 14
 Wis: 13
@@ -163,6 +168,7 @@ first.
 140 19600
 8 8 1
 BareHandAttack: 3
+BodyProfile: 1
 Str: 13
 Dex: 13
 Int: 13
@@ -180,6 +186,7 @@ make him angry.
 14 16 1 2d2+140 2d2+2
 140 19600
 8 8 1
+BodyProfile: 1
 Str: 15
 Dex: 15
 Int: 15
@@ -198,6 +205,7 @@ bad idea to cross him.
 140 19600
 8 8 1
 BareHandAttack: 12
+BodyProfile: 1
 Str: 15
 Dex: 15
 Int: 15
@@ -216,6 +224,7 @@ sits here, enjoying all of the life that goes on around him.
 100 10000
 5 5 1
 BareHandAttack: 7
+BodyProfile: 1
 E
 #3925
 talented bard~
@@ -229,6 +238,7 @@ him coin...  Or buy him supper.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 1
+BodyProfile: 1
 Str: 12
 Int: 15
 Wis: 14
@@ -275,6 +285,7 @@ An unusual-looking mud slick is here, swirling.
 3 19 8 0d0+30 1d2+0
 30 900
 8 8 0
+BodyProfile: 3
 E
 #3929
 mud monster bubbles~
@@ -302,6 +313,7 @@ move.  This dog barks at her own shadow.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 2
+BodyProfile: 2
 E
 #3931
 swift cat~
@@ -316,6 +328,7 @@ lightning.
 30 900
 8 8 0
 BareHandAttack: 8
+BodyProfile: 2
 Dex: 15
 E
 #3932
@@ -330,6 +343,7 @@ He is obviously rabid.  He is also obviously a very LARGE dog.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 1
+BodyProfile: 2
 E
 #3933
 rat~
@@ -343,6 +357,7 @@ through you.  It appears completely unafraid.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 0
+BodyProfile: 2
 E
 #3934
 serving boy~
@@ -357,6 +372,7 @@ refill.
 70 4900
 8 8 1
 BareHandAttack: 1
+BodyProfile: 1
 E
 #3935
 a gentle man~
@@ -371,6 +387,7 @@ at such wasteful spending.  After all, this money could go to help the poor!
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 1
+BodyProfile: 1
 Str: 14
 Dex: 13
 Int: 15
@@ -390,6 +407,7 @@ feminine allure on everyone nearby.
 100 10000
 8 8 2
 BareHandAttack: 8
+BodyProfile: 1
 Str: 9
 Dex: 13
 Int: 15
@@ -423,6 +441,7 @@ walks past.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 1
+BodyProfile: 1
 Str: 14
 Dex: 14
 E
@@ -438,6 +457,7 @@ everyone that might wish harm his master...  By putting them six feet under.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 1
+BodyProfile: 1
 Str: 15
 Dex: 15
 Int: 12
@@ -457,6 +477,7 @@ sort of glint deep in her eyes that you can't quite place.
 70 4900
 8 8 2
 BareHandAttack: 1
+BodyProfile: 1
 Str: 13
 Dex: 13
 Int: 10
@@ -495,6 +516,7 @@ shadows.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 1
+BodyProfile: 1
 E
 #3943
 small child~
@@ -509,6 +531,7 @@ and gets ready to go out for a round of begging.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 2
+BodyProfile: 1
 Dex: 10
 E
 #3944
@@ -525,6 +548,7 @@ his trimming slightly.
 100 10000
 8 8 2
 BareHandAttack: 6
+BodyProfile: 1
 Str: 14
 Dex: 13
 Int: 15
@@ -558,6 +582,7 @@ A man is here, sleeping in his bedroll.
 10 17 4 2d2+100 1d2+1
 100 10000
 4 4 1
+BodyProfile: 1
 E
 #3947
 black clad bully~
@@ -593,6 +618,7 @@ itself.  Some people are just different...  Whatever floats your boat.
 100 10000
 8 8 1
 BareHandAttack: 1
+BodyProfile: 1
 Str: 14
 Dex: 12
 Int: 16
@@ -610,6 +636,7 @@ to himself.
 70 4900
 8 8 1
 BareHandAttack: 13
+BodyProfile: 1
 E
 #3950
 screaming paranoid schizophrenic~
@@ -684,6 +711,7 @@ brandishes a herring at his simmering delights.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 1
+BodyProfile: 1
 Str: 16
 Dex: 16
 Wis: 13
@@ -733,6 +761,7 @@ you while you are out adventuring.
 14 16 1 2d2+140 2d2+2
 140 19600
 8 8 1
+BodyProfile: 1
 Str: 13
 Dex: 13
 Int: 16
@@ -769,6 +798,7 @@ it.  No matter, she is angry anyway.
 70 4900
 8 8 2
 BareHandAttack: 13
+BodyProfile: 1
 Dex: 13
 Int: 10
 Wis: 10
@@ -803,6 +833,7 @@ A citizen is here, strolling past.
 100 10000
 8 8 1
 BareHandAttack: 13
+BodyProfile: 1
 Str: 15
 Dex: 15
 Int: 14
@@ -820,6 +851,7 @@ A citizen is here, strolling past.
 100 10000
 8 8 2
 BareHandAttack: 8
+BodyProfile: 1
 Str: 14
 Dex: 14
 Int: 15
@@ -837,6 +869,7 @@ A king crab is here, looking mean.
 100 10000
 8 8 0
 BareHandAttack: 11
+BodyProfile: 16
 E
 #3964
 woman~
@@ -852,6 +885,7 @@ as if she is remembering something pleasant.
 100 10000
 8 8 2
 BareHandAttack: 8
+BodyProfile: 1
 Dex: 16
 Int: 13
 Wis: 14
@@ -870,6 +904,7 @@ though his daydream is good.  He also doesn't like people in his quarters...
 140 19600
 8 8 1
 BareHandAttack: 6
+BodyProfile: 1
 Str: 16
 Dex: 15
 Int: 14
@@ -889,6 +924,7 @@ shoulder, in case the current one needs repairs.
 100 10000
 8 8 1
 BareHandAttack: 5
+BodyProfile: 1
 E
 #3967
 fish pitcher~
@@ -904,6 +940,7 @@ down there waiting for him to throw a fish down into their carts.
 100 10000
 8 8 1
 BareHandAttack: 7
+BodyProfile: 13
 Str: 16
 Dex: 15
 E
@@ -921,6 +958,7 @@ purchase the fish.
 100 10000
 8 8 1
 BareHandAttack: 10
+BodyProfile: 1
 E
 #3969
 hurrying cart man~
@@ -935,6 +973,7 @@ he is going, and he isn't going to stop for anything if he can help it.
 100 10000
 8 8 0
 BareHandAttack: 13
+BodyProfile: 1
 Str: 14
 Dex: 12
 Int: 15
@@ -973,6 +1012,7 @@ length of time.
 140 19600
 8 8 1
 BareHandAttack: 12
+BodyProfile: 1
 Str: 16
 Dex: 13
 E
@@ -993,6 +1033,7 @@ plain don't care.  They see enough of his kind since the tavern was built.
 100 10000
 8 8 1
 BareHandAttack: 1
+BodyProfile: 1
 Str: 8
 Dex: 7
 Int: 7
@@ -1037,6 +1078,7 @@ sailor, as do most of the people in Haven.
 100 10000
 8 8 1
 BareHandAttack: 13
+BodyProfile: 1
 Str: 17
 Dex: 12
 Int: 10
@@ -1057,6 +1099,7 @@ other people might not like it...
 70 4900
 6 6 2
 BareHandAttack: 8
+BodyProfile: 1
 Str: 9
 Dex: 15
 Int: 13
@@ -1079,6 +1122,7 @@ shows on her pampered face.
 70 4900
 6 6 2
 BareHandAttack: 8
+BodyProfile: 1
 Str: 9
 Dex: 15
 Int: 10
@@ -1098,6 +1142,7 @@ head cook, like so many of her smart peers.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 2
+BodyProfile: 1
 E
 #3978
 half mad prisoner~
@@ -1113,6 +1158,7 @@ should listen to him.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 1
+BodyProfile: 1
 E
 T 3901
 #3979
@@ -1141,6 +1187,7 @@ as if she isn't afraid to give any of the kitchen girls a good whack.
 100 10000
 8 8 2
 BareHandAttack: 5
+BodyProfile: 1
 E
 #3981
 Degruziel Lord Haven~
@@ -1157,6 +1204,7 @@ of hand.
 140 19600
 6 6 1
 BareHandAttack: 10
+BodyProfile: 1
 E
 #3982
 rich guest~
@@ -1186,6 +1234,7 @@ important...  Though what exactly it is he's doing is unapparent.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 1
+BodyProfile: 1
 E
 #3984
 stablemaster~
@@ -1229,6 +1278,7 @@ received from hauling things to and fro all day have given her bulging muscles.
 100 10000
 8 8 2
 BareHandAttack: 4
+BodyProfile: 2
 E
 #3987
 swearing cart man~
@@ -1257,6 +1307,7 @@ It looks more like a rider's horse, not a cart horse, and is full of spirit.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 0
+BodyProfile: 2
 E
 #3989
 loud merchant~
@@ -1272,6 +1323,7 @@ off thieves.
 140 19600
 8 8 1
 BareHandAttack: 7
+BodyProfile: 1
 E
 #3990
 sailor~
@@ -1286,6 +1338,7 @@ He also looks like he could hold his own in a fight.
 100 10000
 8 8 1
 BareHandAttack: 7
+BodyProfile: 1
 Str: 16
 Dex: 15
 Wis: 13
@@ -1330,6 +1383,7 @@ town.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 1
+BodyProfile: 1
 E
 #3994
 woman citizen~
@@ -1344,6 +1398,7 @@ merchant's wife.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 2
+BodyProfile: 1
 E
 #3995
 motherly woman~
@@ -1358,6 +1413,7 @@ has an angry look on her face.  Boy, is somebody in trouble.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 2
+BodyProfile: 1
 E
 #3996
 citizen male man~
@@ -1372,6 +1428,7 @@ looks as though he is talking to himself about the market prices.
 100 10000
 8 8 1
 BareHandAttack: 13
+BodyProfile: 1
 E
 #3997
 elite gatekeeper~

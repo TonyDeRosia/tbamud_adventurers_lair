@@ -10,6 +10,7 @@ comfortable.
 20 14 -2 4d4+200 3d3+3
 200 40000
 8 8 1
+BodyProfile: 1
 E
 #25801
 messenger man~
@@ -23,6 +24,7 @@ doing his job.
 20 14 -2 4d4+200 3d3+3
 200 40000
 8 8 1
+BodyProfile: 1
 E
 #25802
 rabbit~
@@ -36,6 +38,7 @@ A small, white rabbit hops by you, making it's way into the woods.
 200 40000
 8 8 0
 BareHandAttack: 4
+BodyProfile: 2
 E
 #25803
 hiker~

@@ -50,6 +50,7 @@ is an enormous thing, its bulk seeming endless.
 24 12 -4 4d4+240 4d4+4
 240 57600
 8 8 0
+BodyProfile: 6
 E
 #31104
 dragon blue~
@@ -64,6 +65,7 @@ wily enough to get past the guardian.
 25 12 -5 5d5+250 4d4+4
 250 62500
 8 8 0
+BodyProfile: 6
 E
 #31105
 dragon red~
@@ -76,6 +78,7 @@ A red dragon tosses back its head and jets a plume of fire into the air.
 30 10 -8 6d6+300 5d5+5
 300 90000
 8 8 0
+BodyProfile: 6
 E
 #31106
 dragon white~
@@ -90,6 +93,7 @@ of this creature.  It will kill you.
 29 11 -7 5d5+290 4d4+4
 290 84100
 8 8 0
+BodyProfile: 6
 E
 #31107
 dragon green~
@@ -104,6 +108,7 @@ It must soon find a successor.
 28 11 -6 5d5+280 4d4+4
 280 78400
 8 8 0
+BodyProfile: 6
 E
 #31108
 dragon topaz~
@@ -116,6 +121,7 @@ A topaz dragon storms in a rage at you, screeching its anger.
 27 11 -6 5d5+270 4d4+4
 270 72900
 8 8 0
+BodyProfile: 6
 E
 #31109
 dragon crystal~
@@ -130,6 +136,7 @@ conversation.
 29 11 -7 5d5+290 4d4+4
 290 84100
 8 8 0
+BodyProfile: 6
 E
 #31110
 dragon emerald~
@@ -142,6 +149,7 @@ An emerald dragon instantly assumes a defensive posture as you enter.
 28 11 -6 5d5+280 4d4+4
 280 78400
 8 8 0
+BodyProfile: 6
 E
 #31111
 dragon faerie~
@@ -155,6 +163,7 @@ spiked teeth and a forked tongue.
 26 12 -5 5d5+260 4d4+4
 260 67600
 8 8 0
+BodyProfile: 6
 E
 #31112
 fire drake~
@@ -169,6 +178,7 @@ foe.
 25 12 -5 5d5+250 4d4+4
 250 62500
 8 8 0
+BodyProfile: 6
 E
 #31113
 gryphon guardian~

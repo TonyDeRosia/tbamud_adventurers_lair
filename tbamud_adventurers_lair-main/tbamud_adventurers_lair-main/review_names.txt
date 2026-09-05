@@ -1,0 +1,1808 @@
+1|Puff|Puff dragon fractal
+10|the clone|clone
+13|a kind soul|kind soul
+15|a quest mob|quest mobile
+17|Socrates|Socrates
+18|Friedrich Nietzsche|Friedrich Nietzsche
+21|Plato|Plato
+22|Aristotle|aristotle
+23|Confucius|confucius
+26|the protector of the magic eight ball|protector magic eight ball
+27|James Stockdale|man james bond stockdale admiral
+28|Carl Von Clausewitz|carl von clausewitz
+29|Epictetus|epictetus crippled man
+30|the spy for the underground|spy underground resistance
+31|the Commissar|prison commissar
+32|the hired muscle|hired muscle
+33|Homer Simpson|Homer Simpson
+34|Chuck Norris|chuck norris
+98|the travelling saleswoman|travelling saleswoman woman
+99|Death|death grim reaper Hookah
+101|Ian|Ian
+102|Liam|liam
+104|Rhian|rhian daughter
+107|Branwen, the leatherworker|branwen leatherworker
+109|Hazel, the wellmaster|hazel wellmaster
+110|Corwin, the postmaster|corwin postmasters
+117|the annoying kid|kid annoying
+124|Fiona|fiona
+147|Logan|logan
+155|the War Master|war master
+156|the speaker of the land|speaker great land
+158|Carla|carla
+161|the streetsweeper|streetsweeper sweeper man
+163|the hired hand|hired hand
+176|Gunney|gunney
+180|Javier, the High Councillor|javier
+181|the lookout|lookout
+182|Ingrid|ingrid
+192|the german shepherd|german shepherd dog
+193|the dove|dove
+196|the newbie guide|newbie guide
+197|the carpenter|carpenter
+10000|the hermit|hermit
+10001|the bobcat|bobcat
+10004|the coyote|coyote
+10006|the buck|buck
+10009|the possum|possum
+10012|the skunk|skunk
+10014|the lynx|lynx
+10016|the huntress|huntress
+10104|the heifer|heifer
+10110|the groundhog|groundhog
+10111|the wanderer|wanderer
+10112|Bubba|Bubba
+10304|the guardian of earth|kami
+10306|the guardians helper|Mr. Popo
+10316|Matilda|Matilda
+10318|a Newbie Fighter|Newbie Fighter
+10319|Vegeta|Vegeta
+10329|Master Roshi|Roshi
+10339|Truncks|Truncks
+10345|Bulma|Bulma
+10346|a Namek Townsmen|Namekian Townsmen
+10361|the Elder Namek|Elder Namek
+10398|a Gambler|Gambler
+10399|a Biker|Biker
+10400|Lena|Lena
+10401|Chwin|Chwin
+10402|Arwin Mic'Zell|Arwin Mic'Zell
+10405|the Village Elder|Village Elder
+10406|Ligern|Ligern
+10409|Jak|Jak
+10411|a wood imp|wood imp
+10412|postmistress Elide|elide postmistress postmaster
+10413|Jewel|Jewel
+10415|a border collie|kelly dog
+10429|the Weatherman|Weatherman
+10607|a rebel commando|suncas rebel commando
+10608|Sujin Suncas|rebel leader Sujin Suncas
+10610|an Elcardorian military officer|officer elcardorian military
+10614|grandfather sunshine|grandfather sunshine
+10617|a panhandler|panhandler bum beggar
+10633|Penny, the bank teller|penny teller
+10637|grandmother sunshine|grandmother sunshine
+10638|the elcardorian grocer|grocer elcardorian
+10639|Lara|lara
+10640|a Shadowy figure|Shape Dark Hooded Man
+10700|a spirit|spirit iuel strongarm
+10701|a spirit|wisdom iuel
+10702|a spirit|iuel spirit
+10703|a spirit|iuel spirit
+10704|the thieving spirit of Iuel|spirit ieul
+10707|the trulling spirit of Iuel|trulling spirit
+10708|the dark blessing spirit of Iuel|dark blessing spirit
+10709|the vampiric spirit of Iuel|vampiric spirit
+10710|the ghoulic spirit of Iuel|ghoulic spirit
+10711|the spell chanting spirit of Iuel|spell spirit iuel
+10712|the soul snatching spirit of Iuel|spirit soul snatcher
+10716|a rabid wolverine|rabid wolverine
+10719|a spirit|messenger spirit postmasters
+1101|a mob for making triggers work|trigger mob xxmobxx
+1199|a tester dealer|tester card player dealer
+11500|the woodchuck|woodchuck
+11505|a small black bat|bat
+11530|little bow peek|little bow peek
+11538|a small piglet|piglet
+11585|the grass|grass
+11705|Cassandra Lacela|cassandra lacela
+11706|the Government Official Lesalie|official lesalie
+11707|Salesman Derresor Maosund|salesman derresor maosund
+11710|the Government Official Visconti|government official visconti
+11712|the Government Official Miranda|government official miranda
+11713|the Government Official Phel|government official phel
+11714|the Government Official Gertrude|government official gertrude
+11715|the Government Official Cecille|government official cecille
+11716|the Government Official Thedoric|government official thedoric
+11717|the Government Official Luther|government official luther
+11718|the Empress's bodyguard Verno|bodyguard verno
+11719|Empress Leraillia|empress leraillia
+11720|the artist|artist
+11721|a journalist|journalist
+11722|a really fat chef|fat chef
+11724|the Government Official Johanes|government official johanes
+11726|the Karate Instructor|karate instructor
+11727|the librarian|librarian
+11728|little Alex|little alex
+11729|clever Josie|clever josie
+11731|the janitor|janitor
+11801|the eccentric shopwoman|eccentric shopwoman woman
+11810|a nightmare|ghostly figure rearing spider nightmare
+11811|Ridley|small girl Ridley
+11813|Daniel|strange man tunnel-man daniel
+11822|a secret|secret evil figure lurking
+11828|Spine|spine creature hideous
+11831|the taildove|taildove bird soft white
+11833|Ruth|hiding Ruth girl small
+11836|Bad Sue|angry girl bad sue
+11850|a tiny shadow-toddler|tiny shadow-toddler toddler
+1200|the @WIm@Bmo@Crt@Wal @CSt@Bew@War@Cd@n|immortal steward registrar innkeeper keeper registry
+1201|the @CKe@Bep@Wer @Wof @BDi@Csp@Wat@Bch@n|immortal dispatch keeper postmaster courier records
+1202|the @DHa@Cll @WWa@Brd@Cen@n|hall warden spirit custodian service watcher
+1203|the @WRe@Cco@Brd@Ws @BCl@Cer@Ck@n|records clerk archivist custodian mortal affairs
+1204|a @Rtr@Oai@Yni@Wng @Rim@Op@n|training imp familiar test sprite laboratory
+1205|a @Rru@On@We-@Bgl@Cit@Wch@n|bug glitch mote error test creature
+1206|a @Cfr@Wos@Btb@Cou@Wnd @Wse@Crv@Bic@Ce @Cspr@Wit@Be@n|frost sprite service familiar ice cube construct
+1207|a @Mcl@Cus@Wte@Br @Cof @Mwa@Brd@Wli@Cgh@Bts@n|faeries wardlights service sprites sanctuary
+1209|the @Wse@Brv@Cic@We @Bai@Cde@n|service aide clerk assistant immortal hall
+1211|the @Rqu@War@Bte@Crm@Was@Bte@Cr@n|quartermaster aide supply keeper seasonal stores
+1212|the @Ctr@Bai@Wni@Cng @Bre@Wco@Crd@Wer@n|training recorder scoreboard clerk demonstration
+1233|the @Dhi@Cdd@Wen @Bte@Cst @Wsu@Bbj@Cec@Wt@n|hidden test subject invisible training entity
+1267|the @Rch@Oro@Yma@Wti@Cc @Bte@Cst @Wmo@Bb@n|color test mob ansi chromatic training
+12000|the adjudicator|judge adjudicator
+12001|the scorekeeper|scorekeeper
+12003|the spectator|spectator fan
+12004|the nobleman|noble nobleman
+12006|the gladiator|gladiator
+12007|the chariot driver|driver
+12008|the coach|coach trainer
+12010|the herbalist|herbalist young lady beautiful
+12013|the page|page
+12014|the plaintiff|plaintiff
+12015|the ticket master|master
+12016|the stadium vendor|vendor
+12020|Julius Caesar|emperor julius caesar
+12021|the royal bodyguard|guard royal bodyguard
+12022|the judge|judge justice
+12023|the master scheduler|master scheduler
+12025|Froboz|froboz wizard
+12026|Titus Andronicus|titus andronicus
+12027|the senator|senator
+12028|the bailiff|bailiff
+12029|the defendant|defendant
+12030|Jupiter|jupiter king god
+12031|Venus|venus goddess
+12032|Mars|mars god
+12033|Mercury|mercury messenger god
+12037|the grocer|grocer
+12504|a thieving looter|looter thieving
+12505|John|john
+12506|a doctor|doctor
+12562|Atropos|atropos
+12564|Elina|Elina
+12569|ascepleptous|ascepleptous
+1300|Friedrich Nietzsche|friedrich
+1301|Socrates|Socrates
+1302|Plato|plato
+1303|the librarian|librarian
+1304|Aristotle|aristotle
+1305|Confucius|confucius
+1306|the lag monster|lag monster
+1309|Rumble's Dentist|dentist spaulding
+1314|the annoying Verizon Wireless guy|annoying verizon wireless guy
+1315|Rumble's personal spy|spy
+1318|the groundhog|groundhog hog
+1319|Einstein|albert einstein guy
+1320|Richard Simmons|richard simmons
+1321|the protector of the magic eight ball|protector magic eight ball
+1322|the thanksgiving turkey|thanksgiving turkey
+1323|the hidden mob|hidden mob
+1324|a bedbug|bedbug
+1328|William Shakespeare|Shakespeare
+13004|the swirling mist|mist
+13005|suicide|suicide
+14001|a dust devil|Dust Devil wyv
+14003|a heat monster|Heat Monster wyv
+14006|a hatchling wyvern|Hatchling Wyvern wyv
+14009|a royal wyvern attendant|wyvern royal attendant wyv
+14014|a wyvern weapon master|wyvern weapon master wyv
+14015|a wyvern armor expert|wyvern armor expert wyv
+1500|Allah|allah god yahweh
+1501|Michael|michael angel archangel
+1502|Gabriel|gabriel angel archangel
+1503|Raphael|raphael angel archangel
+1504|Uriel|uriel angel archangel
+1505|the cherubin|cherub cherubin cherubim
+1507|the jinn|jinn sprite
+1509|al-Hakim|caliph hakim al-hakim
+1510|Judas Escariot|judas escariot apostle
+1511|Pharaoh|pharaoh
+1512|Abu Bakr|abu bakr first caliph
+1513|Umar|umar second caliph
+1514|Uthman|uthman third caliph
+1515|Ali|ali fourth last caliph
+1516|Iblis|angel beautiful iblis
+1517|the Temptation|iblis satan devil voice
+1519|the demon|demon fire
+1523|the bodyless soul|soul
+15000|Gwydion|gwydion guard royal
+15003|Jim|jim guard royal
+15004|Brian|brian guard royal
+15005|Mick|mick guard royal
+15006|Matt|matt guard royal
+15007|Jochem|jochem guard royal
+15008|Anne|anne guard royal
+15009|Andrew|andrew guard royal
+15010|Bertram|bertram bert guard royal
+15011|Jeanette|jeanette guard royal
+15013|the Training Master|master trainingmaster
+15014|the Royal Herald|herald royal
+15015|Ergan the Murderer|ergan murderer
+15019|the Astrologer|astrologer
+15022|the Chef|chef cook
+15024|David|david man guard
+15025|Dick|dick man guard
+15026|Jerry|jerry guard royal
+15027|Michael|michael guard royal
+15028|Hans|hans guard royal
+15029|Boris|boris guard royal
+15032|the pit fiend|pit fiend demon
+1600|a serf|serf
+1601|a squire|squire
+1602|Sir Benlad|benlad
+1603|Sir Galahad|Galahad
+1604|Sir Gareth|Gareth knight
+1605|Sir Garlon|Garlon
+1606|Sir Gawaine|gawaine
+1607|Merlin|merlin
+1609|Sir Tristram|tristram
+1610|Mordred|mordred boy
+1611|Barant Les Apres|knight barant
+1612|Dagonet|fool dagonet
+1613|Sir Turquine|Knight turquine
+1614|Perimones|Perimones knight
+1615|a nobleman|nobleman
+1618|a demon|demon
+1619|Iron Jack|Iron Jack
+1620|Persante of Inde|persante
+1621|Dodinas Le Savage|dodinas le savage
+1622|Lionel|lionel
+1623|Gaheris|gaheris
+1627|Master Bleise|master bleise
+1631|a dying infantryman|infantryman
+1634|a questing beast|creature beast lion
+1635|a damsel in distress|damsel
+16402|a @Ybr@Wig@Yht @Gme@gad@Gow@yla@Grk@n|meadowlark meadow lark bird
+16407|a @Gma@grs@Gh @Dha@Wrr@Die@Wr@n|marsh harrier harrier hawk bird
+16409|a @ybu@Orr@yow@Oin@yg @ygr@Oou@ynd@yho@Og@n|groundhog woodchuck burrower
+16410|a @Cfa@Win@Ct @Bwi@Cll-@Wo-@Cwi@Bsp@n|will-o-wisp wisp light spirit
+16411|a @Gpr@Yai@Gri@Ye @Csp@Gri@Cte@n|prairie sprite sprite fey
+16412|a @Ggr@gas@Gs @Csy@Wlp@Ch@n|grass sylph sylph air spirit
+16416|a @gro@Got@gbou@Gnd @Gdr@Cya@Gd@n|rootbound dryad dryad rootbound spirit
+16417|a @Gbl@Yoo@Gm @Wwa@Grd@Wen@n|bloom warden warden bloom spirit
+16418|a @gth@Gor@gnb@Gou@gnd @Gdr@Cya@Gd@n|thornbound dryad dryad thorn guardian
+16419|a @Mwi@Yld@Gfl@Cow@Mer @Gny@Cmph@n|wildflower nymph nymph flower fey
+16420|a @gmo@Gss@gb@Gac@gk @Wgu@Gar@Wdi@Gan@n|mossback guardian guardian moss stone spirit
+16422|a @Gdr@Cui@Gdi@Cc @ghe@Grb@gal@Gis@gt@n|druidic herbalist herbalist druid keeper
+16423|a @Cwa@Brd@Cen @Wof @Bth@Ce @Wop@Ben @Csk@By@n|warden open sky skywarden plains warden
+16424|a @Yke@Wep@Yer @Gof @Dth@We @Yol@Dd @Wst@Yon@Des@n|keeper old stones stonekeeper warden druid
+16425|an @Yel@Wde@Yr @Gbl@Yoo@Gm @Wwa@Grd@Wen@n|elder bloom warden warden elder bloom spirit
+16900|a bloodthirsty gibberling|gibberling bloodthirsty
+16901|the cougar|cougar
+16902|the shifty gibberling|gibberling shifty
+16903|a gibberling raider|gibberling raider
+16904|the mutant gibberling|gibberling mutant
+16905|the gibberling chieftain|gibberling king chieftain
+16906|a female gibberling|female gibberling
+16908|the gibberling shaman|gibberling shaman
+16909|a small marmot|small marmot
+16921|mutant hulk gibberling|mutant hulk gibberling
+1703|a serf|serf
+1704|a squire|squire
+1706|Sir Lamorak|lamorak knight
+1707|Sir Lancelot|lancelot
+1708|Morgan Le Fey|woman morgan
+1711|a nobleman|nobleman
+1714|a troubadour|troubadour
+1716|an entertainer|entertainer
+1718|a stablehand|stablehand
+1719|Stirrup|stirrup
+1722|a warhorse|horse warhorse
+1724|the scottish clan chief|scot clan chief
+1725|a scottish clansman|scottish clansmen
+1726|a spectator|spectator
+1730|the archbishop|archbishop bishop
+1734|a shepherd|shepherd
+17500|Shadimar|east wizard Shadimar
+17501|the large squid|large squid
+17502|the lesser Kraken|lesser Kraken squid
+17503|a Kraken|Kraken squid
+17504|a greater Kraken|greater Kraken squid
+17506|Trilless|Trilless sorceress north northern
+17507|the Light Guardian|guard guardian light
+17508|the Dark Sentinel|sentinel Dark guard
+17511|Carcophan|Carcophan south southern Wizard Evil
+1809|John Connor|john connor
+1810|a series 800 terminator|terminator
+1813|a centurion|Centurion
+1816|the T1000|T1000
+1818|an autonomous terminator|terminator
+1820|a guerilla officer|guerilla officer
+1821|a german shepherd|german shepherd
+1822|Kyle Reese|kyle reese
+18601|an @BAc@Cad@Bem@Cia@n @Wpr@Bac@Cti@Wce @Dbe@Was@Dt@n|practice beast beast academy
+18604|@BWa@Crd@Wen @BHa@Clr@Wic@n|warden halric academy gate instructor
+18605|@MMa@Cst@Mer @YAl@Och@Yem@Wis@Yt @MSe@Cra@Mph@Cin@Me@n|master alchemist seraphine instructor academy
+18606|a @Ocl@Yoc@Okw@Yor@Ok @Wpr@Bac@Cti@Wce @Dcr@Waw@Dle@Wr@n|practice crawler clockwork crawler academy
+18608|a @Msu@Cmm@Mon@Ced @Wpr@Bac@Cti@Wce @rim@Rp@n|practice imp summoned imp academy
+18610|the @Csp@Wec@Ctr@Bal @Mex@Cam@Min@Cer@n|spectral examiner examiner spirit academy
+18611|@BIn@Cst@Wru@Bct@Cor @MVa@Cel@n|instructor vael fieldcraft tutor academy
+18612|@YRe@Wgi@Yst@Ora@Wr @GEl@Cow@Gen@n|registrar elowen registrar academy
+18613|@MLec@Ctu@Mre@Cr @YMi@Wri@Yel@n|lecturer miriel lore tutor academy
+18614|@GSc@You@Gtm@Yas@Gte@Wr @CCo@Brr@Cen@n|scoutmaster corren scout navigation instructor academy
+18615|@BPr@Cov@Wos@Bt @YAl@Wdr@Yen@n|provost aldren provost dean academy
+18703|Kablooey|funny clown kablooey
+18705|Renuer, the wandering minstrel|minstrel Renuer
+18706|Matrissa|Matrissa welcomer
+18707|a mole|mole
+18708|a chick|chick
+18710|Tekus the Slaver|evil wicked slaver Tekus
+18722|the organ grinder|organ grinder
+18723|the Ringmaster|Ringmaster
+1900|a young bullywug|young bullywug xyoung
+1901|a small cricket|small cricket
+1902|the scaly leviathan|xleviathanfortrigx scaly leviathan head
+1907|a bullywug subleader|bullywug subleader xlead
+1938|a vicious drider|vicious drider
+1997|a sexy stripper|sexy stripper
+1998|a hairy gorilla|gorilla man suit
+1999|the deliverer|mob deliverer
+203|the stablemaster|stablemasters petshops
+206|a chunky philosopher|chunky philosopher man old
+207|Angel|angel jack russell terrier
+208|the haruspex|haruspex diviner
+211|the phoenix|phoenix
+213|Santa Claus|santa claus man
+216|Yoda|Yoda
+2000|a senator|senator official
+2002|an augur|augur
+2003|a magistrate|magistrate
+2004|a vestal virgin|vestal virgin
+2008|an ostrich|ostrich bird
+2009|a giraffe|horse giraffe
+2012|a murmillo|murmillo gladiator
+2015|a gladiator|Gladiator
+2016|a Gaul|Gaul
+2017|Emperor Titus|Emperor Titus
+2020|a civilian|civilian
+2021|a religious official|religious official
+2022|a lanista|lanista
+20002|the fawn|fawn deer
+20004|the missionary|wondering missionary
+20005|a woodsman|man woodsman
+20008|Talbath, the trapper|trapper man talbath
+20010|Jaron, the lunatic|crazy lunatic man jaron
+20104|a stunningly beautiful siren|creature siren
+20105|Tryny the Widow|woman lady tryny shopkeeper widow
+20197|a blonde receptionist|receptionist woman blonde
+20198|a cheerful tour guide|tourguide guide man
+21101|Sibyl|Sibyl SibylTarot reader
+21102|Esmerelda|Esmerelda EsmereldaTarot reader
+21103|Jaelle|Jaelle JaelleTarot reader
+21104|Ana|Ana receptionist AnaTarot
+2207|an undead corpse|undead
+2212|an algae monster|algae monster
+2214|a damsel in distress|damsel
+2216|the inquisitor|Inquisitor
+2217|the head inquisitor|head inquisitor
+2218|the animator of the dead|animator dead
+2222|a shade|shade
+2228|a dungeon master|master
+22000|a dust bunny|dust bunny cloud
+22003|@cthe @Cice@Dmons@Cter@n|icemonster
+22005|a @Wkitchen @Cpixie@n|kitchen pixie
+22006|a @Rspaghetti @Ddemon@n|spaghetti demon pile
+22007|a turkey sandwich|turkey sandwich
+23203|Lora Croft|Lora Croft
+23204|Tarzan|tarzan petshops
+23206|Anaconda|anaconda pets
+23301|an earthworm|earthworm worm
+23307|a small roach|roach
+23331|ladybug|ladybug
+23335|a hermit|hermit
+23400|Samantha, the clerk|samantha clerk
+23401|a newbie training mob|newbie training mob
+23402|the dummy mob|newbie dummy mob
+23403|a kobold|Kobold
+23405|a brownie|Brownie
+23406|a bulette|Bulette
+23407|a osquip|Osquip
+23408|a urd|urd
+23409|a water weird|Water weird
+23495|a brownie|Brownie
+23510|the scout|scout
+23558|the scout leader|scout leader
+23601|the stonewrights' assistant|assistant stonewright shopkeeper trader
+23602|the weaponsmiths' assistant|weaponsmith assistant trader
+23603|the armorsmiths' assistant|armorsmith assistant trader
+23609|Torg|torg weaponsmith dwarven
+23610|Ralf|ralf armorsmith dwarven
+23628|the foreman|foreman dwarf miner
+23701|the foreman|construction worker dwarf foreman
+23704|the lookout|lookout guard dwarf dwarven
+23706|a bodyguard|bodyguard guard dwarf
+23711|a small white centipede|centipede white
+23841|the ugly monster|Monster
+23849|the crystal wyvern|Crystal wyvern
+23880|the swallow|swallow
+23907|a weary travelling bugbear|travelling bugbear weary
+23908|a sand storm|sand storm twirling
+23909|a cactus|angry thorn cactus
+23910|a hairy cave dweller|cave dweller hairy
+23911|a sasquatch|gargantuan hairy bigfoot sasquatch beast
+23913|the dark|dark
+23916|a cardinal|cardinal bird
+23917|a dark root|root dark
+23918|a nice shop keeper|nice shopkeeper michelle
+23922|a guardian cyclops|cyclops guardian
+23929|an old hermit|old aged hermit man
+24009|Vorn|vorn
+24010|Zarn|zarn minotaur master grand
+24011|the War Master|master minotaur war
+24013|the interrogator|minotaur interrogator
+24014|the weapons master|minotaur master
+24016|the loremaster|loremaster minotaur
+24020|the tradesman|tradesman minotaur
+24021|the guildsman|guildsman minotaur
+24027|Trang|Trang
+24028|Targ|targ
+24029|Garge|garge
+24100|Geordi LaForge|Lieutenant Commander Geordi LaForge
+24101|Data|Lieutenant Commander Data Android
+24103|Doctor Crusher|Doctor Beverly Crusher
+24104|Counselor Troi|Counselor Deanna Troi
+24107|Guinan|Guinan
+24108|Chief O'Brien|Chief O'Brien Transporter
+24109|Wesley|Wesley Crusher
+24110|Livingston|Livingston fish
+24111|Spot|spot cat
+24112|an ensign|ensign
+24113|alexander rozhenko|alexander rozhenko
+24114|a slightly dangerous alien|slightly dangerous alien
+24115|a very dangerous alien|very dangerous alien
+24200|the cityguard|cityguard guard
+24202|the Bank Manager|bank manager
+24203|the theater manager|theater manager
+24204|the usher|usher
+24205|the computer salesman|computer salesman
+24206|the clothing salesman|clothing salesman
+24208|the stagehand|stagehand stage hand
+24209|the actor|actor
+24210|the actress|actress
+24211|the snack booth attendant|snack booth attendant
+24212|the curler|curler
+24300|the frost demon|frost demon
+24302|the furry beast|furry beast
+24303|the downhill skier|downhill skier
+24304|the snowboarder|snowboarder
+24306|the ski salesman|ski salesman
+24307|a hairy yeti|yeti
+24503|a nereid|nereid water female girl
+24505|a heucuva|heucuva skeleton
+24506|an ixitxachitl|ixitxachitl manta ray
+24507|a morkoth|morkoth serpent
+24508|a peryton|peryton eagle stag thing
+24509|a shadow|shadow
+24510|a tanar'ri|tanar'ri male warrior
+24511|a troglodyte|troglodyte
+24512|a mutten|mutten hairy humanoid creature
+24514|a fawning shade|shade fawning
+24516|a death tyrant|death tyrant
+24517|a crypt thing|crypt thing
+24701|the mourner|mourner
+24702|the undertaker|undertaker
+24706|the wight|wight
+24708|the black shadow|shadow
+24712|the demilich|demilich lich skull
+24713|the guardian|guardian daemon
+24714|the Death Master|death master
+24715|the imp|imp familiar
+24716|the church goer|man
+2500|the shadow guardian|shadow guardian
+2502|Edgar|edgar
+2506|Tatorious|tatorious wizard
+2507|Ezmerelda|ezmerelda cook
+2510|the Jailor|jailor mage
+2511|the broom|broom
+2512|the pair of disembodied hands|lesser guardian hands
+2513|the pair of disembodied eyes|guardian greater eyes
+2521|the instructor of magic|instructor teacher mage
+2527|the battle mistress|mistress battle
+2534|the Enchanter|master enchanter mage
+2535|the dancing sword|sword dancing
+2536|the Mad Alchemist|alchemist
+2537|the Master Summoner|master summoner
+2538|the Master Charmer|master charmer
+2540|the Master Spellbinder|master spellbinder
+2548|the Master of Illusions|master illusionist mage dragon
+2549|the Necromancer|necromancer master
+2553|the Librarian|librarian mage
+2556|the Master of Neutrality|master guildmaster gray
+2559|the Master of the Black Robes|master guildmaster black
+2562|the Master of Goodness|master guildmaster white
+2564|the Grand Mistress|guildmaster grand mistress
+25002|a Pixie|Pixie
+25006|the GateKeeper|gate keeper gatekeeper
+25100|the chimpanzee|chimpanzee chimp
+25101|the chimpanzee|chimpanzee chimp
+25102|the Orangutan|orangutan orang
+25109|Dr. Zaius|dr. doctor zaius
+25110|Cornelius|cornelius chimpanzee
+25111|Zira|zira chimpanzee
+25112|the rock|rock
+25113|the keeper|keeper
+25200|a huge black bat|bat
+25301|Checkpoint Charley|charley checkpoint
+25303|the Master at Arms|master arms
+25400|the villager|villager man
+25403|Penelope|penelope penelope
+25405|the little whore|little village whore
+25409|a toothless hag|hag toothless
+25410|Mordecai|mordecai mordecai
+25413|the sneaky little bastard|bastard sneaky
+25506|the pile of bones|bones pile
+25601|the firetender|firetender fire tender
+25602|the firetender|firetender
+25610|the gardener|gardener
+25611|the stablehand|stable hand stablehand
+25701|the town provisioner|provisioner
+25702|Elias Dalston|dalston elias man
+25707|Daron|daron bootmaster
+25709|the wellmaster|wellmaster
+25710|the postmaster|master head postmasters
+25712|the lease manager|lease manager
+25713|Granny|granny
+25714|the dealer|dealer mobster man poker suit dark
+25715|Grigor|grigor grigor
+25716|Franz the clothier|franz clothier
+25718|the librarian|librarian woman pretty plump
+25724|Clariss|clariss
+25728|the Magistrate|magistrate
+25729|Rapas|rapas rat thief man
+25730|the nurse|nurse
+25731|the street tough|street tough punk hood
+25741|the nurse|nurse
+25743|the hostess|hostess scantily clad woman waitress
+25746|Salazar|salazar waiter man
+25747|the receptionist|woman receptionist assassin
+25748|Jacques the Jackal|karandon sly jacques jackal man
+25749|Harah the Horsemaster|saracaphos bejis harah horsemaster man
+25759|the Peacekeeper|keeper peacekeeper
+25760|a member of the city constable|constable
+25761|the sanitary engineer|janitor sanitary engineer
+25762|a member of the city constable|constable
+25766|the stableman|stableman
+25767|a member of the city constable|constable
+25768|the pale street urchin|pale skinny street urchin
+25769|a commoner|commoner
+25770|one of the town folk of Jareth|town folk
+25771|a courtier|courtier fop
+25772|Miss Hawaii|miss hawaii beautiful woman
+25779|Miss Florida|miss florida
+25789|wayn the Pet Shop|petshops wayn shop
+25790|the cartwright|cartwright
+25792|the beagle|beagle pets
+25793|the rottweiler|rottweiler pets
+25795|the cryogenicist|cryogenicist
+25800|the roaming vagabond|man vagabond roaming
+25801|the messenger|messenger man
+25803|a hiker|hiker
+25900|the Fetch|fetch undead spectre
+25902|a sticky spiderweb|web spiderweb
+25904|the churel|churel woman moaning
+26003|a Rahn huntress|huntress rahn
+26004|a Rahn hidesman|rahn hidesman
+26005|a Rahn Keeper|rahn keeper
+26101|a five headed demon|five headed demon
+26109|a slimy green thing|thing
+26110|the Floating Face|face floating floatingfacepainting
+26115|vampiress|vampiress
+26116|Old Marty|marty bartender
+26117|Ma|ma
+26118|Pa|pa
+26120|Martin|martin
+26121|a receptionist|receptionist
+26122|Inna|inna
+26123|Igor|igor
+26201|a rattlesnake|snake rattlesnake
+26202|a timberwolf|wolf timberwolf
+26300|Ernie|ernie farmer
+26301|Sandy|sandy wife
+26302|Patty|patty daughter
+26303|the tramp|tramp man
+26305|Girschwyn|girschwyn farmer
+26306|the farmhand|farmhand hand
+26307|a tractor|tractor
+26308|a stableman|stableman man
+26309|Krandle|krandle farmer
+26310|Erik|erik son fisherman
+26317|the slopper|slopper man
+26318|a feeder|feeder man
+26402|the Goddess Cathari|cathari goddess
+26406|a visiting Toreador Cousin|cousin toreador
+26503|the Lighthouse Keeper|lighthouse keeper
+26504|the hermaphrodite|thing hermaphrodite
+26507|the Perfect Companion|perfect companion
+26509|Max|max
+26511|Takker|takker man
+26512|Takker's Disciple|fisherman disciple
+26513|the Kracken|kracken
+26600|the Barghest|barghest dog thing
+26601|a corpse candle|candle
+26602|the cucubeth|cucubeth thing pale
+26606|the buzzard|buzzard
+26706|a fat harem master|leader harem master
+26715|the Keeper of the Shrine of Vice|keeper vice
+26717|a torturer|torturer man
+26718|an interrogator|interrogator secretary
+26719|the Grand Inquisitor|interrogator inquisitor grand
+26900|the armadillo|armadillo rodent
+26902|the creeping cactus|cactus
+26904|the lemming|rodent lemming
+26906|the diamondback rattler|snake rattle
+26907|the Indian scout|indian scout
+26908|the mad hermit|hermit mad
+26910|the Indian chief|chief Indian slashing boar
+2700|a sad-looking memlin|memlin sad creature small
+2702|a small squeaking bat|small squeaking bat
+2703|a weary memlin|weary memlin
+2704|a @Ctiny wish@n|tiny wish
+2705|an armored guardian|armored guardian
+2708|the Keeper of the Temple|keeper
+2709|a @Rfire wrm@n|fire wrm
+2710|an emaciated memlin|emaciated memlin
+2711|the glassy tentacle|strange glassy stalagmite tentacle
+2712|a newly-grown @Cwish@n|newly grown wish
+2713|a skeletal creature|skeletal creature toothy
+2714|a partially-petrified memlin|dying memlin partially-petrified partially petrified
+2715|a smoking @Rfire wrm@n|smoking fire wrm
+2719|a female memlin|female memlin
+2721|the mighty Cui|mighty dragon dragon-like creature Cui
+2722|a female Ve|female humanoid Ve
+2724|a Dynar youth|Dynar youth
+2725|a little memlin|little memlin
+2726|the Revealer|Revealer memlin
+2728|a young memlin|young memlin
+2729|the Sorceress of the Underworld|sorceress Khan'li khanli powerful underworld
+27003|the earth demon|earth demon
+27005|the iodocentipedus|iodocentipedus
+27006|the fanged reindeer|fanged reindeer
+27010|the lithophiliac|lithophiliac
+27012|the stormbringer|stormbringer
+27100|the Earl of Sundhaven|earl sundhaven
+27102|the town hangman|hangman executioner
+27108|a blackberry picker|picker blackberry
+27110|a mendicant|mendicant beggar
+27112|a squire|squire
+27115|the village idiot|idiot village fool
+27117|the Mistress of Assassins|master mistress assassin thief
+27118|the Knightmaster|knightmaster knight master warrior
+27119|the Archmage|master archmage mage
+27122|the falconer|falconer petshops
+27123|the cartographer|cartographer
+27124|the town treasurer|town treasurer
+27126|the jeweller|jeweller
+27127|Phadela|phadela witch
+27129|the old alchemist|alchemist
+27130|the magess|magess magician
+27131|Mekala|mekala thai cook
+27133|the weaponsmaster|weaponsmaster weapons
+27135|a mockingbird|mockingbird bird
+27145|a black animal|black animal
+27149|the gate watchman|watchman watch guard gate
+27151|a blackbird|blackbird bird pets
+27153|Athos|athos knight warrior
+27154|Milady de Winter|milady lady winter mage
+27155|a black naga guardian|naga black guard guardian
+27156|a guardian gryphon|gryphon guard guardian
+27157|a guardian basilisk|basilisk guard guardian
+27158|a guardian imp|imp horned guard guardian
+27162|a black lamprey|lamprey black
+27164|a disgruntled courier|disgruntled courier postmasters
+27166|Stu|stu fool
+27300|a facehugger alien|facehugger alien
+27301|a drooling alien|alien
+27303|a Predator alien|Predator alien
+27306|Lt. Miko Oshura|oshura woman
+27308|a crewmember|crew crewmember
+27401|Broderick the Inn Keep|Broderick
+27403|Mick of Malvern|Mick
+27404|Charity|Charity
+27406|Hans|Hans
+27407|Floora the Grump|Floora
+27408|Elizabeth of Malvern|Elizabeth
+27409|Miriam|Miriam
+27410|Madam Gwen|Madam Gwen
+27411|Alisha|Alisha
+27413|Rebecca|Rebecca
+27414|Doris|Doris
+27415|Jenny Of Alaster|Jenny
+27417|Natasha|Natasha
+27418|Dirken|Dirken
+27419|Sphen of Sweden|Sphen
+27420|Tarus the Traveller|Tarus
+27421|Renah|Renah
+27429|Franz|Franz
+27430|Molly|Molly
+27431|Catherine|Catherine
+27433|a midget named Bridjet|hooker
+27436|a hooker|hooker
+27500|Goethe|goethe
+27503|the policeman|policeman police man
+27504|the cop|cop
+27505|the mugger|mugger
+27506|the tourist|tourist
+27507|Norm|norm peterson
+27508|Cliff Claven|cliff claven
+27509|Carla|carla labeck
+27510|Woody|woody boyd
+27512|Rebecca Howe|rebecca howe
+27513|Sam|sam malone
+27514|Frasier|frasier crane
+27515|Lilith|lilith sternen crane
+27516|Paul|paul
+27518|Pee Wee|pee wee peewee
+27520|the skinhead|skinhead head skin
+27521|the prostitute|prostitute
+27522|Jonathan Hill|jonathan hill
+27523|the Bishop|bishop
+27524|the dockworker|dockworker worker
+27525|the transvestite|prostitute transvestite
+27526|the pimp|pimp
+27537|the loyal fan|spectator loyal fan
+27539|the vendor|vendor salesman
+27544|Fire Marshall Bob|fire marshall bob
+27545|the fireman|fireman fire man
+27546|the whore|whore
+27547|the minor throat|minor throat
+27548|the throat|throat
+27549|the major throat|major throat
+27550|the senior throat|senior throat
+27551|the master throat|master throat
+27552|the cheerleader|cheerleader leader
+27553|Ilsa the Head Cheerleader|head cheerleader leader ilsa
+27554|Chief O'Hara|chief o'hara
+27555|the Warden|warden
+27557|Esprit|esprit
+27558|the cashier|cashier clerk
+27559|the cop|cop
+27560|the cop|cop
+27561|a shoplifter|shoplifter shop lifter
+27563|the arms dealer|arms dealer
+27564|Raghuram the 7-11 Manager|raghuram manager
+27565|Launchpad McQuack|launchpad duck mcquack
+27566|the bleached blonde bimbo|bimbo bleached blonde
+27567|the stripper|stripper
+27578|the receptionist|receptionist
+27584|the janitor|janitor
+27585|the beastly fido|fido beastly
+27589|the beagle|beagle pets
+27590|the rottweiler|rottweiler pets
+27701|the Keeper of the Ring|ring keeper
+27703|a toddler|toddler
+27704|a nursemaid|nursemaid
+27710|a sheriff|sheriff
+27711|a sheriff|sheriff
+27712|the Thain|thain
+27714|the Miller|miller
+27719|the grocer|grocer
+27721|the battle master|battle master
+27724|a local gossip|local gossip
+27726|a trainee|trainee
+27727|a chic urbanite|chic urbanite
+27728|a country bumpkin|country bumpkin
+27731|the receptionist|receptionist
+27732|a sheriff|sheriff
+27734|the tailor|elderly tailor
+27803|the demigod, Leviathan|leviathan
+27900|a gray bat|bat gray
+27916|a believer|believer man
+27921|a choirboy|boy choirboy
+27924|the cardinal Richelieu|Richelieu cardinal
+27926|the hunchback|man hunchback
+27934|the gargoyle|monster horrible statue gargoyle stone
+27937|D'artagnan|D'artagnan apprentice musketeer boy
+27941|a white poodle|white poodle
+27943|Pierre the magician|Pierre magician
+27951|Degas the hermit|hermit degas
+27967|Robespierre|Robespierre revolutionary
+27968|a Musketeer in service|Musketeer guard
+27972|Porthos the Musketeer|Porthos
+27977|Athos the Musketeer|Athos
+27978|Aramis the Musketeer|Aramis
+27988|a French receptionist|French woman receptionist
+27989|a royal Musketeer|Musketeer royal
+27992|a flea|flea
+27995|a sentinel|sentinel
+27996|the guardian of time and space|guardian
+27998|Toulouse|Toulouse
+2801|the piglet|piglet pig
+28000|an electron|electron
+28001|a cpu|cpu
+28002|an fpu|fpu
+28003|a 16MB EDO SIMM chip|meg megabyte mb 16 simm ram
+28004|a 28.8kbps modem|modem 28.8
+28005|a video card|video card
+28006|a sound card|sound card
+28007|an SCSI controller|scsi controller
+28100|the female|woman female pretty
+28101|a herdsman|herdsman man
+28102|the hooded wanderer|wanderer hooded man
+28104|Barumafir|barumafir keeper tavern barman
+28105|the guest|guest pale man drunken
+28106|a ragamuffin|ragamuffin fierce
+28107|the pinemarten|pinemarten brown
+28108|the brownie|brownie man bearded
+28109|the brownie|brownie man bearded
+28110|the gwytehydra|gwytehydra hydra beast green
+28111|Galeaufir|galeaufir hunter
+28112|the steinbock|steinbock large animal
+28115|the grand brownie|brownie grand
+28200|a small balrog|balrog small
+28201|the Elder Balrog|balrog winged elder
+28202|the Grand Balrog|balrog winged grand
+28205|Kerjim|kerjim lord evil
+28206|Lilith|lilith
+28300|the dungeon ruler|ruler dungeon
+28303|darkness|darkness dark
+28306|a box|box
+28307|a rock|rock
+28310|a large bat|bat large
+28311|a little bat|little bat
+28314|a roach|roach
+28321|the boogie monster|boogie monster
+28323|a stone wall|stone wall
+28400|Shamus|shamus wanderer
+28401|the barrow wight|ghenna barrow wight
+28403|the Argos|ghenna argos
+28404|the bugbear|ghenna bugbear
+28405|a Broken One|ghenna broken one
+28406|the Bullywug|ghenna bullywug
+28408|the Gorgimera|ghenna gorgimera
+28411|the Derro|ghenna derro
+28413|the Efreeti|ghenna efreeti genie
+28414|the Medusa|ghenna medusa
+28423|the Ghenna Swordmaster|ghenna swordmaster
+28431|a claw toed foot protruding from the wall|ghenna wall foot
+28432|a claw fingered arm protruding from the wall|ghenna wall arm
+28458|the Dominatrix|ghenna dominatrix woman
+28471|the prostitute|ghenna woman prostitute
+28472|Lester the molester|ghenna lester molester
+28475|the whore|ghenna whore
+28485|the Maedar|ghenna maedar
+28486|the Maedar master|ghenna maedar master
+28487|Roger the dodger|ghenna roger dodger
+28489|the Dragonet|ghenna deep dragon dragonet
+28497|the Deepspawn|ghenna deepspawn
+28601|the Guardian of Hell|Guardian guard
+28602|the pile of gold coins|pile coins
+28603|the male Dee|male dee demon
+28604|the female Dee|female dee demon
+28605|the gold bar|bar gold
+28607|a yummy beef pot pie|beef pot pie
+28608|a yummy vegetable pot pie|vegetable pot pie
+28609|a damned soul|damned soul
+28610|a tortured soul|tortured soul
+28611|the half-eaten person|half-eaten person
+28612|the living wall|living wall
+28614|bloody severed arm|bloody severed arm
+28615|bloody severed foot|bloody severed foot
+28616|bloody severed nose|bloody severed nose
+28617|the blood from the fountain|blood
+28618|the lost soul|Lost soul
+28619|crispy critter|crispy critter
+28620|pile of bones|pile bones skeleton
+28621|the manes|manes sub-demon
+28625|demonguard|demonguard demon guard
+28630|fire devil|fire devil
+28631|wall of fire|wall fire
+28633|frozen body|frozen body
+28634|ice devil|ice devil
+28635|soul trapped under the ice|trapped soul ice
+28636|half frozen body|half frozen body
+28639|Ice Screamer|Ice Screamer
+28640|Demonic Foreman|Construction Foreman Demonic
+28641|Secretary of Hell|Secretary of Hell
+28644|Santa Claus|santa claus
+28646|a bowl of blood|bowl blood
+28647|jury member|jury member
+28648|Judge Whopper|Judge Whopper
+28649|Lawyer from Hell|lawyer hell
+28650|Complaints Officer|complaints officer
+28651|bastard hiramoto|bastard hiramoto
+28653|weeds|weeds
+28654|Stanley|stanley
+28657|rancid turkey leg|rancid turkey leg
+28658|reactor specialist|reactor specialist
+28660|Homer Simpson|homer simpson
+28661|devils food cake|Devils food cake
+28664|nuclear technician|nuclear technician
+28665|stray proton|stray proton
+28666|radiation|radiation
+28667|the Chief Engineer of Hell|chief engineer hell
+28668|Greater Fire Demon|Greater Fire Demon
+28669|side of frozen beef|frozen side beef
+28671|juicy steak|juicy steak
+28701|Pater Vinci|priest pater vinci
+28702|Zeb Rykalp|sheriff zeb
+28703|Dorig Foehammer|smith dorig dwarf
+28704|Joel Kreb|carpenter joel
+28705|Maxtrum Holloknob|maxtrum halfling shopkeeper
+28706|Churt Agenris|churt elf elven alchemist
+28707|Dek Shattershock|dek ranger elf elven leatherworker
+28709|Serathana the Guardian of Lore|serathana priestess librarian
+28710|Sir Kelek|kelek guard captain
+28713|Sir Mischa|sir mischa
+28716|an Ofintine volunteer|volunteer
+28717|an Ofintine volunteer|volunteer
+28742|the mimic|mimic barrel
+28743|the mimic|mimic cabinet
+28744|the Cementipede|hybrid centipede cementipede
+28746|the hungry warg|warg
+28747|the green mold|mold
+28750|the Stalker|stalker
+28751|the kobold|kobold
+28753|the mimic|mimic boulder
+28761|the mimic|mimic pig iron
+28767|the living wall|wall
+28768|the mimic|mimic chest
+28775|Tarus|human guard Tarus
+28801|a poor mudder|poor mudder
+28802|a beautiful star|star
+28803|a young nebula|nebula young
+28804|a speedy comet|comet speedy
+28805|a red supergiant|red supergiant
+28807|a horsehead nebula|horsehead nebula
+28808|poor Andromeda|andromeda
+28809|the mighty Hercules|hercules
+28810|the wild Pegasus|pegasus
+28812|the Pleiades|pleiades
+28813|the Head of Draco|draco head
+28815|Aries|aries
+28816|Taurus|taurus
+28817|Gemini|gemini
+28818|Gemini|gemini
+28819|Cancer|cancer
+28820|Leo|leo
+28821|Virgo|virgo
+28822|Libra|libra
+28823|Scorpio|scorpio
+28824|Sagittarius|sagittarius
+28825|Capricorn|capricorn
+28826|Aquarius|aquarius
+28827|Pisces the mermaid|pisces mermaid
+28832|Polaris, the polar star|polaris polar star
+28900|Farlenian|Farlenian
+28901|Koofy|Koofy gerbil
+28902|Alerka|Alerka
+28903|Drogo|Drogo
+28904|Desslok|Desslok elf dark
+28906|Airden the Wanderer|Airden
+28907|Seemie|Seemie kid
+28908|Eshiay|Eshiay woman
+28909|Jordo|Jordo
+28914|Werith|Werith
+28916|a chef|chef
+29006|Mr. Hooper|hooper old man
+29100|the Headless Horseman|headless horseman
+29101|an Elvis Impersonator|elvis impersonator
+29107|the Crystal Monster|Crystal Monster
+29110|the DoomGuard|doom guard doomguard armor
+29111|a Clock Guardian|Clock Guardian guard
+29112|the Grim Reaper|Grim Reaper Death
+29113|an Undead Legionnaire|zombie legionnaire undead
+29119|Ilian, the Mistress of the Void|Ilian
+29130|the doomguard|doom doomguard armor
+29140|the DoomGuard|doom guard doomguard armor
+29150|Scarlet Fever|Scarlet Fever
+29199|the Band|Band
+29200|MouseRider|MouseRider
+29201|the Sentinel Beast|Sentinel Beast
+29202|Leonna|Leonna
+29203|the Bookstore Owner|Bookstore Owner guildguard
+29204|Seobagn|Seobagn Thieves Thief Guildmaster
+29208|the Gambler|lucky gambler
+29209|the Dealer|dealer
+29210|Ben|Ben Benzaldehyde
+29212|the Gambler|unlucky gambler
+29214|the Receptionist|receptionist wife
+29215|the Herbalist|herbalist shopkeeper
+29216|the Lawyer|lawyer
+29217|the Secretary|secretary
+29218|Kell|mayor kell
+29220|the Council Member|council members
+29223|the Innguard|innguard guard
+29224|Jenk|Jenk
+29225|the Black Marketeer|black marketeer
+29234|Kervin|Kervin
+29236|the Bright Light|bright light
+29237|the Guardian Wisp|guardian wisp
+29238|the Orb|orb
+29239|the Liche|liche mouserider
+29240|the Storm Demon|storm demon
+29241|Tiersten|Tiersten vampire
+29242|the Edimmu|Edimmu
+29243|Sosivia|Sosivia
+29244|Celia|Celia
+29245|Talbot|Talbot
+29246|Korino|Korino
+29247|Bungle Fleecem|Fleecem Bungle
+29248|the gravedigger|digger gravedigger
+29250|a hellhound|hellhounds hounds hell hell-hounds
+29253|the Receptionist|Receptionist
+29400|the Madman|madman man mad
+29402|the Leatherworker|Leatherworker worker
+29403|the Jeweller|Jeweller
+29405|Sakifan|Sakifan librarian
+29406|the Brewermaster|Brewermaster Brewer
+29407|Ceran|Ceran contractor
+29408|Grebe|Grebe bartender
+29410|the Landlord|Landlord lord land
+29411|the Cityguard|Cityguard guard city
+29413|the Boarder|Boarder
+29419|the Housewife|Housewife woman wife
+29420|the Slob|Slob sleeping man
+29422|the Bachelor|Bachelor man
+29502|a cannibal|cannibal
+29503|a happy cannibal|cannibal
+29506|the cannibal chief|chief cannibal
+29508|a small monkey|monkey small
+29509|a large ape|ape
+29510|a female ape|a female ape
+29511|the ape chief|ape chief
+29600|the foreman|foreman
+29601|the Car Alarm|alarm car banshee spirit guard
+29604|the Automated Vending Machine|vending machine
+29605|the Secretary|secretary
+29607|the Secretary|secretary
+29608|the Big Boss|boss big
+29609|the Machine|machine
+29801|the lag beast|lag beast
+29802|the lag monster|lag monster
+29806|the creepy lag crawler|crawler creepy lag thing
+29807|the zombiefied lag|lag zombie
+29808|the quasit lag|quasit imp lag thing
+29809|the Great Lag Monster|great lag monster
+29811|the annoying lag|annoying lag jerk
+29812|clueless lag|clueless lag moron
+29813|the talkative lag|lag talkative
+29814|the lost lag|lag lost
+29815|the smart lag|lag smart
+29820|the Dungeon Master|dungeon master
+29900|Isaac|hunchback isaac being deformed
+29905|Wyrenthoth|wyrenthoth dracolich dragon undead
+29906|Erich|vampire erich man
+29910|the shadow|shadow
+29911|the wight|wight
+300|Camille the chemist|chemist camille
+302|the unfinished mob|mob unfinished
+3002|the @Wsh@Cop @Wcl@Cer@Wk@n|shop clerk
+3005|the @Yin@Wn @Ost@Yew@War@Od@n|inn steward receptionist keeper
+3007|the @Bri@Cve@Wr @Bwa@Cre@Who@Bus@Ce @Wke@Bep@Cer@n|river warehouse keeper sailor dockworker warehouseman
+3009|@BWa@Cll@Wy @Bthe @CWa@Bter@Cmas@Bter@n|wally watermaster
+3010|the @Bma@Cst@Wer @Bcou@Wri@Cer@n|master courier postmaster courier
+3012|a @Wki@Cnd @Ws@Cou@Wl@n|kind soul
+3013|the @Cci@Wty @Bgu@Ci@Wde@n|city guide newcomer tour helper
+3019|the @Ygu@Wi@Yld @Gin@Ystr@Wuc@Ytor@n|veteran guild instructor trainer adventurer guildmaster
+3024|the @MAr@Cca@Bne @Mwa@Crd@Ben@n|arcane warden sorcerer guildguard
+3025|the @Wte@Ymp@Cle @Wwa@Yrd@Cen@n|temple warden templar guildguard
+3027|the @Bgu@Wil@Cd @Bwa@Crd@Wen@n|guild warden knight guildguard adventurer
+3042|the @Mar@Cca@Bne @Mco@Cmm@Bon@Ms @Cst@Bew@Mar@Cd@n|arcane commons steward server waiter scholar
+3043|the @Yre@Wfe@Oct@Yor@Wy @Ost@Yew@War@Od@n|refectory steward server waiter temple attendant
+3044|the @YLa@Ont@Wer@Yn @ORo@Yom @Wst@Yew@Oar@Wd@n|lantern room steward server waiter guild attendant
+3045|the @Ygu@Wil@Cd @Yst@Gew@War@Yd@n|guild steward waiter barkeep
+3046|the @oBe@Ont @YCo@opp@Oer @oke@Yep@Oer@n|bent copper keeper innkeeper barkeep tavern keeper
+3059|the @bPe@Cac@We@bke@Cep@Wer@n|keeper peacekeeper
+3060|the @bci@Cty@Wgu@bar@Cd@n|cityguard guard
+3061|the street sweeper|street sweeper cleaner worker janitor
+3067|the @bci@Wty@Cgu@bar@Wd@n|cityguard guard
+3089|the @Yke@Onn@Yel@Wma@Ost@Yer@n|kennelmaster beastkeeper animal handler petshop keeper
+3092|the beagle|beagle hound dog pet
+3093|the rottweiler|rottweiler dog guardian pet
+3095|the @Mdr@Cea@Bmw@Mar@Cde@Bn@n|dreamwarden warden keeper sleeper guardian
+30001|the deadly asp|asp snake
+30002|Morticia|morticia guildhead
+30003|Lazarus|lazarus assassin physician
+30006|the Crypt Keeper|keeper
+30007|the hermit|hermit
+30009|the flame dweller|dweller flame
+30012|the Petrified Warden|warden petrified
+30013|the umber hulk|hulk umber
+30014|the ochre jello|jello ochre
+30015|the Necromancer|necromancer
+30100|the FREC|frec
+30101|the Boss|boss
+30102|the Gael|gael
+30103|the Example Mob|mob example
+30104|the Professor|professor prof
+30105|Security|security
+30106|Security|security
+30107|Security|security
+30114|the froshie|frosh froshie
+30115|the froshie|frosh froshie
+30116|the froshie|frosh froshie
+30117|a Mary-Rotte chef|mary rotte chef
+30118|the Coke Machine|coke machine
+30119|the froshie|frosh froshie
+30120|the froshie|frosh froshie
+30121|the froshie|frosh froshie
+30122|the FREC|frec
+30123|a caf employee|caf employee
+30124|a BIG jock|jock
+30125|a mosher|mosher
+30126|a mosher|mosher
+30127|a mosher|mosher
+30128|the mailbox|box postmasters
+30132|Chris|chris
+30133|the Residence Master|residence master
+30134|Bennie Boo|bennie boo ben
+30136|the chimpster|chimpster chimp
+30137|Alex|alex
+30138|Steve|steve
+30139|Bob the storekeeper|bob
+30140|Mr. Tuck|tuck
+30141|Sue, the book-looker-after-er|sue
+30144|Chief FREC|Chief FREC
+30145|a copy of Golden World|golden world copy
+30402|the Silver Statue|silver statue
+30403|the templar of Mateon|templar
+30405|the Chambermaid|chambermaid maid
+30406|Taurus|man taurus
+30501|the Black Pawn|pawn wooden black
+30502|the White Pawn|pawn wooden white
+30503|the Black Rook|rook wooden black
+30504|the White Rook|rook wooden white
+30507|the Black Bishop|bishop wooden black
+30508|the White Bishop|bishop wooden white
+30514|a card of the suit diamonds|card playing diamonds
+30515|a card of the suit hearts|card playing hearts
+30516|a card of the suit clubs|card playing clubs
+30517|a card of the suit spades|card playing spades
+30518|the Joker|joker madman nut
+30600|a stealthy brown jaguar|jaguar brown
+30603|a jaculi|jaculi snake
+30604|a grippli|grippli frog tree
+30605|a wild baboon|baboon wild
+30606|a carnivorous ape|ape carnivorous
+30607|an Atomie Shaman|atomie shaman
+30611|a dryad|dryad
+30612|a sylph|sylph
+30613|a sprite|sprite
+30614|an ettercap|ettercap
+30615|a Grig shaman|grig shaman
+30712|a whore|whore
+30713|an entertainer|entertainer man
+30716|an ale salesman|salesman ale
+30717|Alanis|alanis sorceress
+30718|Felice|felice healer
+30802|Gilzaan|gilzaan son eldest
+30803|Necromocis|necromocis son younger
+30804|the court astronomer|astronomer court
+30807|a humble petitioner|petitioner humble
+30808|an arrogant land owner|owner land arrogant
+30810|a lab assistant|assistant lab
+30813|a visiting cousin|cousin visiting
+30814|an old farmhand|farmhand man old
+30816|a busy housewife|wife housewife busy
+30818|a lounging woodsman|woodsman lounging
+30820|a quiet housewife|housewife wife quiet
+30822|the school marm|marm school
+30824|an expansive storyteller|man storyteller expansive
+30828|Calintra|Calintra herbalist
+30829|Salaylia|salaylia kind woman
+30830|the town smithy|smithy man
+30831|the master apothecary|apothecary master
+30832|Mochaaska|mochaaska
+30833|the store owner|owner store
+30834|the town minister|minister town
+30836|a young lass|young lass
+30837|the tailor|tailor man
+30900|a guardsman|guardsman man
+30901|a tradesman|tradesman man
+30905|a serf|serf man
+30908|Gilsby|gilsby innkeep man servant
+30915|an old nag|nag mare old
+30916|a local|local man fishing
+30919|a watchman|watchman soldier
+30921|one of Westlawn's Elite|soldier guard finest
+30922|Jerrod|jerrod swordsman elite captain
+30923|a raggedy commoner|raggedy commoner
+30924|the foreman|foreman man boss
+30925|Donld|donld smithy
+30927|a serving wench|serving wench
+30930|Salida|salida chief cook
+30933|a stableman|stableman man servant
+30934|Roscoe|roscoe chief stablemaster  horse breaker
+30940|a bold noblewoman|bold noblewoman
+30942|Bud|bud alemaster
+3100|@gMa@Gra@n, steward of the @GWi@gll@Gow @gCu@Gp@n|mara willow cup steward hostess keeper
+3101|@WBr@Yot@Whe@Yr @WOre@Yn@n, the @Dch@Wap@Del @Yse@Wxt@Yon@n|brother oren sexton chapel gravedigger groundskeeper
+3103|a @bSo@Cut@Wh@bwa@Ctc@Wh@n guardsman|southwatch guardsman guard patrol watchman
+3104|@YCl@Wer@Yk @WMe@Ori@Yel@n|meriel clerk civic secretary scribe
+3106|the @YMi@Wd@Yga@War@Yd @Oto@Ywn @Wcr@Yie@Or@n|town crier herald midgaard crier
+3121|a downy duckling|downy duckling duckling park
+31001|the forest brownie|brownie forest
+31004|Tomal|tomal woodsman
+31005|the guardian demon|demon guardian
+31006|the Graye guardsman|guard graye guardsman
+31007|the demon imp|demon imp
+31008|the minor demon|minor demon
+31011|a major demon|demon major
+31012|the rift guardian|guardian rift
+31014|Rymat|rymat
+31015|the Arch-Demon Irgon|irgon arch demon
+31016|Scrytin|scrytin demon
+31017|Relnar|relnar king
+31100|a chimerae|chimerae guardian
+31101|a gorgimera|gorgimera
+31102|a dracolich|dracolich guardian
+31113|a gryphon|gryphon guardian
+31114|a wyvern|wyvern
+31200|Alain Longstride|alain longstride man
+31202|the wild old hermit|wild old hermit man leper
+31203|a lioness|lioness
+31208|Tomm Walker|tomm walker
+31210|a boa constrictor|boa constrictor
+31212|Argus|argus leper man
+31213|Jantry|Jantry woman leper
+31218|Dalgon|dalgon man
+31219|Alvah|alvah man leper
+31310|Jon Boggins|jon boggins farmer
+31312|an angry farmwife|angry farmwife
+31400|X'Raantra|x'raantra man kneel
+31401|a Believer|believer follower
+31405|a squatter|squatter man
+31409|Gunter|gunter
+31410|a torturer|guard man toturer
+31412|a Seeker|man seeker hooded
+31413|a hidden Believer|believer hidden
+31414|a brown bat|bat brown
+31416|a dazed DeathKnight|deathknight knight dazed
+31418|a blood wight|wight blood scavenger humanoid
+31419|the unrobed believer|believer unrobed slobbering
+31501|a commoner|commoner
+31504|a guardsman|guard man
+31507|the receptionist|receptionist
+31509|Samuel Faarza|Samuel Faarza
+31511|Juan the potion pusher|Juan pusher potion
+31512|Alandra|Alandra jewelry maker
+31514|Shellee|shellee shop petshops
+31515|Jak|jak weaponsmith
+31516|the clerk|clerk
+31517|Pauletra|Pauletra pottery
+31518|Herb the herbalist|Herb
+31519|Bones|Bones
+31520|Farah|Farah
+31524|the glass blower|glass blower
+31525|the carpenter|carpenter
+31526|Darva|darva cape maker
+31528|the Leatherman|leather man
+31529|Shantar|Shantar
+31530|Shades|shades
+31539|Shalaylia|Shalaylia
+31540|Sazaindin|Sazaindin
+31541|the lease manager|lease manager
+31543|a local physician|local physician
+31544|the bootsmith|Aelsa
+31545|Randon|Randon
+31546|Curley|Curley
+31547|the water guy|Tephe water guy
+31548|the gloveman|man glove
+31550|a local youth|local youth
+31551|a gull|bird gull
+31552|an albatross|bird albatross
+31554|Tess, the Bazaar Overseer|Tess sergeant
+31555|a deputy|deputy
+31556|the fearless wildcat|cat wildcat pets
+31558|the teleport operator|teleport operator man
+31559|Alaantra the Newbie Helper|newbie helper Alaantra
+31600|Cynder|guard cynder guildguard
+31602|Nnoa|nnoa guard guildguard
+31604|Deke|deke guildguard guard
+31606|Sersin|Sersin guard guildguard
+31608|Ryske|ryske guard guildguard
+31610|Alexa|Alexa guard guildguard
+31612|a Deathknight|deathknight knight
+31616|Gendar|Gendar
+31617|Wirntyn|Wirntyn
+31618|Griselda|Griselda
+31621|the bookie|bookie
+31622|the ticket master|ticket master woman
+31630|Yolanda the Bar-Slut|yolanda babe honey whore slut dancer
+31634|a Deathknight|deathknight knight
+31638|Shindoz|guard paladin Shindoz guildguard
+31639|the Master|master guildmaster paladin
+31640|Alastor|Alastor guard monk guildguard
+31701|Maree|Maree
+31703|the proprietor|proprietor man
+31706|the roulette attendant|attendant roulette
+31707|Baagh|dealer Baagh
+31708|the blank-faced dealer|dealer blank faced
+31709|a noblewoman|noble noblewoman
+31710|Sam the blackjack dealer|sam dealer blackjack
+31711|a stealthy burglar|stealthy burglar
+31715|the matre de|matre de
+31718|the receptionist|receptionist
+31720|the server|server man
+31721|the grave digger|grave digger man
+31722|the hotel manager|manager hotel
+31723|the receptionist|woman receptionist
+31801|a shouting gambler|gambler shouting
+31803|a Bloody Scythe gang member|bloody scythe boy
+31807|Ie, Bloody Scythe's leader|Ie Bloody scythe boy
+31808|a carpenter|carpenter man worker
+31809|the shipyard foreman|foreman shipyard
+31811|the Dockmaster|dock master woman
+31812|the Dockmaster's assistant|assistant
+31814|a travel agent|ticket travel woman receptionist
+31815|a midshipman|midshipman
+31817|Cap'n Darby|Cap'n Darby
+31818|the netweaver|net weaver
+31821|Madame Myra|myra madame
+31822|the motel attendant|motel man attendant
+31902|a dragon turtle|dragon turtle
+31904|a killer whale|whale killer
+31909|a walrus|walrus
+31910|a seal|seal
+31911|a merman|merman
+31912|a mermaid|mermaid maid
+31914|a sea demon|demon sea
+32201|a cargo hauler|hauler cargo man
+32202|the travel representative|representative travel woman
+32204|a boatman|boatman man
+32205|a passenger|passenger
+32207|a dolphin|dolphin
+32209|a wealthy ship owner|ship owner wealthy
+32210|a customer service representative|service representative customer
+32300|an obsidian rockman|obsidian rockman man
+32304|a large bat|large bat
+32306|a carrion crawler|carrion crawler
+32307|a Death Kiss|death kiss
+32308|the bugbear chief|bugbear chief
+32309|the bugbear leader|bugbear leader
+32310|the bugbear shaman|bugbear shaman
+32311|the DeepSpawn|deepspawn spawn
+32312|a sleeping feyr|feyr sleeping
+32313|a gargoyle|gargoyle
+32314|the margoyle|margoyle
+32315|a gibberling|gibberling
+32316|the gorgon|gorgon
+32317|a grimlock|grimlock
+32318|a hook horror|hook horror
+32319|a brown mold|brown mold
+32321|a bugbear clansman|bugbear clansman
+32404|the Forgemaster|forge master smith
+32405|the sweating smithy|smithy sweating
+32406|the smithy|smithy soldier sweating
+32407|a tanner|tanner soldier
+32409|a brander|soldier brander
+32410|a rustler|soldier rustler
+32411|a footman|soldier footman
+32414|an army scout|soldier scout
+32415|the surgeon|surgeon soldier
+32416|the medic|medic soldier
+32417|the marksman|marksman soldier
+32419|a cavalry officer|officer soldier cavalry
+32500|a tumbler|tumbler man
+32501|a juggler|juggler woman
+32503|a wandering minstrel|wandering minstrel
+32505|Milissin the Story Teller|Milissin story teller
+32506|a small monkey|monkey
+32507|the little kid|kid child small
+32508|Madame Zayla|old crone zayla madame
+32509|the tarot reader|woman palm reader tarot
+32513|Jimmy the Hand|jimmy pickpocket kid hand
+32515|the vendor|vendor woman gypsy
+32519|an actress|woman cat actress
+32520|the actor|actor man mushroom
+32524|a mime|mime
+32525|the face-painter|woman gypsy face painter
+32526|a resting performer|man resting performer
+32527|a resting performer|resting performer woman
+32529|a wide-eyed countryman|countryman man
+32535|a midget|midget
+32538|a sword juggler|sword juggler silver
+32539|a sword juggler|sword juggler red
+32540|the animal caretaker|animal caretaker
+32542|a preparing performer|preparing performer man
+32543|a preparing performer|preparing performer woman
+32549|the puppet master|puppet master
+32553|an ale quaffer|man beer drinker
+32555|a farmhand|man spectator farmhand
+32556|a cityboy|man spectator
+32564|a young lad|young lad
+32600|a footman|footman man soldier
+32601|a footman|footman man soldier
+32602|a footman|footman man soldier
+32606|the lookout|lookout out watchman man soldier
+32607|the lookout|lookout out watchman man soldier
+32608|the lookout|lookout out watchman man soldier
+32609|a logger|logger army soldier man
+32610|a logger|logger army soldier man
+32611|a logger|logger army soldier man
+32612|the logging chief|logger army soldier man chief
+32613|the dryad|dryad faerie wood nymph
+32616|a wagon driver|wagon driver man soldier
+3301|the storekeeper|storekeeper
+3302|the cowgirl|cowgirl
+3305|Aglandiir|aglandiir dragon
+3306|the Cyclops|cyclops
+3307|Salle|salle woman
+3308|Duwick|duwick man
+3309|the Receptionist|receptionist
+34001|a @Wgl@ca@Wss@cw@Wi@cn@Wg @cscavenger@n|glasswing scavenger insect crystal
+34008|a @Wsh@Car@Wdm@Can@Wti@Cs @Wpredator@n|shardmantis crystal predator mantis
+34010|a @Cgem@Wjaw @Ccrawler@n|gemjaw crawler crystal beast
+34012|a @Dhollow@W-@Cfacet @Wmimic@n|hollow facet mimic crystal ambusher
+34300|the Censure Sentinel|censure sentinel hall watcher restraint custodian
+34301|the Refreshment Steward|refreshment steward attendant keeper coffee hall
+34303|the Conduct Mediator|conduct mediator justice staff healer aide
+34304|a service spirit|service spirit custodian hall cleaner ward
+34305|the Garden Keeper|garden keeper gardener groundskeeper lantern
+34306|a stone warden|stone warden staff guardian sentinel golem
+34307|an air warden|air warden staff guardian sentinel golem
+34500|the old grounds keeper|groundskeeper keeper
+34502|the bloody doctor|doctor man red
+34503|the mental patient|mental patient
+34504|the operation victim|operation victim
+34505|the tortured patient|tortured patient
+34601|@DVa@Mel@Wre@Dth@n, @MFirst Hand of the Citadel@n|vaelreth first hand citadel executor
+34603|@MXy@Wli@Ma@n, @DMistress of the Veiled Arts@n|xylia mistress veiled arts ritualist
+34604|@DMal@Mph@Was@n, @WMaster of Whispers@n|malphas master whispers intelligence
+34605|@WSe@Mra@Wph@Mine@n, @DFirst of the Veiled Blades@n|seraphine first battlemaid veiled blades
+34606|@CMi@Wre@Cll@We@n of the @DVeiled Blades@n|mirelle battlemaid duelist veiled blade
+34607|@DNy@Mxa@Wra@n of the @DVeiled Blades@n|nyxara battlemaid shadow veiled blade
+34608|@GTh@Wali@Ga@n of the @DVeiled Blades@n|thalia battlemaid healer veiled blade
+34609|@MVes@Wpe@Mra@n of the @DVeiled Blades@n|vespera battlemaid arcane veiled blade
+34610|@RBr@Wie@Rnn@We@n of the @DVeiled Blades@n|brienne battlemaid heavy veiled blade
+34611|@WOr@Cin@Wth@n, @DGrand Archivist@n|orinth grand archivist citadel
+34612|Master Durn, Runeforger|durn master runeforger artificer
+34613|Elaris, Keeper of Doors|elaris keeper doors portals
+34614|Garrick, Master of the Citadel Kitchens|garrick citadel chef kitchen master
+34615|Ysmera, Keeper of Beasts|ysmera keeper beasts menagerie
+34616|Tovren, Citadel Steward|tovren steward household citadel
+34617|the @WP@Dale @MLi@Wbr@Maria@n|pale librarian spectral archive
+34618|the @OCl@Woc@Okk@Wee@Oper@n|clockkeeper brass temporal construct
+34619|the @DVa@Wul@Dt @MWa@Wrden@n|vault warden crimson construct
+34620|the @GCi@Wta@Gdel @DGroundskeeper@n|groundskeeper giant gentle gardener
+3500|a @rve@Rno@om-@rsp@Our@Rred @rci@Ond@Rer @rwy@Ove@Rrn@n|wyvern cinder venom spurred cindervale
+3502|an @rEm@Rbe@Or@rFa@Rng@n gnoll reaver|gnoll emberfang reaver warrior hyena beastfolk
+3503|@rVa@Rrg@Oas@rh @REm@Obe@rr-@RMa@Ow@n, packlord of @rEm@Rbe@Or@rcr@Rag@n|vargash ember-maw ember maw packlord gnoll emberfang chief beastlord
+3505|@YHa@Orl@Yan @WV@Yey@n, keeper of the @oWo@Ood@ysm@oan@O's @YHe@Oar@Yth@n|harlan vey keeper innkeeper woodsman hearth
+3507|a @DBl@Wac@rk@Dbr@riar@n rider|blackbriar rider brigand horseman outlaw mounted
+3509|a @oBr@Ois@ytl@oeh@Oid@ye@n boarfolk marauder|bristlehide boarfolk marauder beastman beastfolk tusked
+3510|a @DCa@Wrr@Ci@Don@Wwi@Cng@n ravenfolk scavenger|carrionwing ravenfolk scavenger crow beastfolk feral
+3600|an @DOb@bsi@Bdi@can @Dpa@bwn@n|obsidian pawn court construct soldier chess
+3601|an @WIv@wor@Yy @Wpa@wwn@n|ivory pawn court construct soldier chess
+3602|the @DOb@bsi@Bdi@can @Cro@Bok@n|obsidian rook court construct siege tower fortress chess
+3603|the @WIv@wor@Yy @Yro@Wok@n|ivory rook court construct siege tower fortress chess
+3606|the @DOb@bsi@Bdi@can @Mbi@Bsh@cop@n|obsidian bishop oracle warpriest construct chess
+3607|the @WIv@wor@Yy @Cbi@Wsh@yop@n|ivory bishop oracle warpriest construct chess
+3612|the @CAr@Wbi@Bte@Dr o@Cf t@Whe @BEt@cer@Dna@Bl @CGa@Wme@n|arbiter eternal game construct judge chess
+3613|a @Cru@Bne @Cwi@Wsp@n|rune wisp geometric light chess board
+3614|a @Dsh@bat@Bte@cre@Dd @Cpa@Bwn@n @Dhu@bsk@n|shattered pawn husk broken construct chess
+3615|a @Dma@Wrb@Cle @Gsc@gav@Gen@Gge@gr @Dga@Wrg@Coy@Dle@n|marble scavenger gargoyle construct chess
+3616|a @Dfa@Bll@cen @DOb@bsi@Bdi@can @Rch@Bam@cpi@Don@n|fallen obsidian champion knight broken chess
+3617|a @Wfa@Yll@wen @WIv@wor@Yy @Rch@Wam@ypi@Yon@n|fallen ivory champion knight broken chess
+3700|a sewer gnawer|sewer rat gnawer
+3704|a pipe bat|pipe bat small
+3705|a duskwing bat|duskwing bat
+3706|a cavern shrieker|cavern shrieker giant bat
+3707|a bloodwing bat|bloodwing bat vampire
+3712|a scarred underworks mouser|underworks mouser alley cat
+3801|Slaive, the Restless Knifemaster|slaive restless knifemaster revenant thief
+3803|a gravewater lurker|gravewater lurker leech crawler
+3804|a drowned ossuary crawler|drowned ossuary crawler corpse crawler
+3805|an ossuary sentinel|ossuary sentinel ancient guardian
+3806|the Pale Undertaker|pale undertaker keeper catacomb
+3912|the eunuch|eunuch
+3913|the sightseer|sightseer
+3916|the carver|carver
+3918|the furniture-seller|man selling furniture
+3920|Degruziel's advisor|Degruziel's advisor
+3921|the bodyguard|body guard
+3926|a tumbler|tumbler
+3927|a tavern wench|tavern wench
+3928|the muddy mudsnake|mud snake mudsnake
+3929|the mudmonster|mud monster bubbles
+3937|the honored guest|an honored guest
+3939|Degruziel's bodyguard|body guard
+3941|a filcher|filcher
+3945|the black-clad woman|shadowy form
+3947|the black-clad bully|black clad bully
+3950|the paranoid schizophrenic|screaming paranoid schizophrenic
+3951|a halfwit|half wit
+3952|the gibbering madman|gibbering mad man
+3953|a raving lunatic|raving lunatic
+3955|Mithroq|Mithroq
+3956|Tia|Tia
+3957|Milos|Milos Banker banker
+3958|a wandering shopper|wandering shopper
+3960|the sunbather|sun bather
+3966|the net hoistman|net hoist man
+3968|the cartman|waiting cart man
+3970|the patron|singing patron
+3971|Gilles|Gilles Bartender
+3973|Aramut|Aramut
+3974|a cartman|cart man
+3977|a kitchenmaid|kitchen maid
+3979|the Master of Torture|Master Torture
+3982|a rich guest|rich guest
+3984|the Stablemaster|stablemaster
+3985|the stableboy|stableboy
+3987|the cartman|swearing cart man
+3991|an outlander|outlander
+3992|an admirer of Haven|admirer
+3997|an elite gatekeeper|elite gatekeeper
+3998|a diligent carver|diligent carver
+403|a firefly|firefly
+406|a bluebird|bluebird bird
+415|a cricket|cricket
+433|a redbird|redbird bird
+434|a muskrat|muskrat
+435|a leech|leech
+440|a bullfrog|bullfrog frog
+444|a grasshopper|grasshopper
+449|Jedidiah|jedidiah
+450|a teenager|teenager
+453|Samuel|samuel
+460|a caterpillar|caterpillar
+475|a coyote|coyote
+481|Zachary|zachary
+491|a finch|finch
+4002|the centipede|centipede
+4003|the kobold|kobold
+4054|the centipede|centipede
+4105|the centipede|centipede
+4107|the kobold|kobold
+4298|Guldane's Income|income
+4308|the walrus|walrus
+4310|the weaponrist|eskimo weaponrist
+4311|the eskimo outfitter|eskimo outfitter
+4404|H'Ogh|orc halfogre h'ogh
+4405|Dra'L|orc halfogre dra'l
+4406|the Boss|ogre boss orc chief
+4504|the assistant|assistant
+4509|Buttercup|cook badger
+4516|Pyrobos|Pyrobos phoenix bird fire firebird
+4518|Yeral|Yeral abbot monk priest otter
+4525|the gopher|gopher furball
+500|a bunny|bunny
+511|a chick|chick
+514|a hen|hen
+543|a sheepdog|sheepdog
+544|a blackbird|blackbird
+548|a gopher|gopher
+555|a bat|bat
+580|a turkey|turkey
+584|Arthur|arthur man
+586|a coyote|coyote
+591|a roach|roach
+5000|the dervish|dervish raggedy
+5001|the dervish|dervish large
+5010|the dracolich|dracolich lich
+5011|the drider|drider
+5013|the myconoid|myconoid
+5014|the myconoid shaman|myconoid shaman
+5015|the dustdigger|dustdigger oasis
+5106|the weaponsmaster|drow weaponsmaster
+5109|the drider|drider
+5110|the drider|drider
+5111|the yochlol|yochlol
+5200|the mighty beholder|beholder
+5201|the lamia|lamia beast
+5202|the mimic|mimic chest
+5203|the mimic|mimic boulder skeleton skeletons
+5204|the mimic|mimic floor
+5205|the mimic|mimic pottery shards
+5206|the mimic|mimic planks wooden
+5209|the lamia|lamia beast
+5300|the horrible asp|asp snake
+5302|the wily little mongoose|mongoose
+5303|the pyramid watcher|pyramid watcher
+5305|Ali Baba|ali baba thief
+5306|the magic carpet|magic carpet
+5308|the sandman|sand man sandman
+5309|the efreeti|efreeti efreet
+5310|the caryatid|caryatid column
+5311|the djinn|djinn genie
+5312|the hieracosphinx|hieracosphinx sphinx
+5313|the gynosphinx|gynosphinx sphinx
+5314|the criosphinx|criosphinx sphinx
+5315|the androsphinx|androsphinx sphinx
+5316|the great sphinx|great sphinx
+5317|Ramses the Damned|ramses mummy
+5404|the receptionist|receptionist woman
+5406|Brother John|john brother singer lead
+5407|the panhandler|panhandler
+5408|the panhandler|panhandler
+5413|Ahkeem the tailor|ahkeem tailor
+5415|Butch the meatcutter|butch
+5418|Cassandra|cassandra
+5419|the foreman|foreman man
+5421|the statue of Brahman|statue brahman
+5422|the statue of Siva|statue siva
+5423|the statue of Indra|statue indra
+5424|the statue of Yama|statue yama
+5425|the statue of Surya|statue surya
+5426|the statue of Kali|statue kali
+5427|the statue of Brihaspati|statue brihaspati
+5428|the statue of Puchan|statue puchan
+5429|Aziz|aziz human canon
+5430|Mustafah|mustafah human robber
+5431|Fatima|fatima elf invoker
+5432|Kareem|kareem dwarf mercenary
+5434|the Sultan's Bodyguard|bodyguard guard
+5435|the skinny kid|kid thief
+5436|the dockworker|dockworker
+5437|the taxcollector|man taxcollector
+5438|Gord|gord
+5439|Chulainn|chulainn knight
+5440|Daghdha|daghdha
+5441|Curley GreenLeaf|curley greenleaf
+5442|the wandering prophet|man wandering prophet
+5446|Lugh the Librarian|lugh librarian
+5447|the dirt devil|dirt dust devil
+5448|the lamia|lamia beast
+5449|the raggedy dervish|dervish
+5450|the Sultan|sultan
+5453|a eunuch|eunuch
+5454|Nichole, the Sultan's favorite|sultans favorite girl nichole
+5455|Allah|allah
+5465|the shipwright|shipwright captain
+5468|the tourist|tourist
+5469|the ixitxachitl|ixitxachitl ray
+5470|the cryohydra|cryohydra
+5474|the behir|behir
+5475|the chimera|chimera creature lion goat dragon
+5476|the couatl|couatl
+5478|the pegasus|pegasus
+5479|Elriva|elriva
+5480|Braheem|braheem
+5484|Stitch, the leather dude|stitch
+5485|the gardener|gardener elf
+5486|the nightmare|nightmare demon horse
+5487|the wolverine|wolverine wolf
+5488|the mimic|mimic painting
+5490|the chef|chef
+55501|the bat|bat
+55502|the shepherd|shepherd man
+55505|Katrina the Shepherd|Katrina woman shepherd
+55509|Nystul the Librarian|Nystul librarian mage
+55513|Mr. Smithy|horse Smithy
+55522|the wisp|wisp ball
+55525|the Judge|judge
+55531|the pub owner|owner bartender
+55532|the ettin|ettin
+55533|the gremlin|gremlin creature
+55534|the headless|headless
+55535|the fighter|fighter
+55536|Geoffrey the Fighter|Geoffrey
+55538|the mimic|mimic chest
+55539|the gazer|gazer eyeball
+55540|a tinker|tinker
+55541|Julia the Tinker|Julia
+55543|the sandtrap|sandtrap tentacle
+55547|the reaper|reaper
+55548|Draxthanum the Gargoyle|gargoyle king Draxthanum
+55549|the spirit|ghost spirit
+55552|the daemon|daemon demon
+55553|the mourner|mourner
+55555|the Timelord|timelord
+55556|the Guardian|guardian
+55557|Blackthorn|Blackthorn
+55558|Exodus|Exodus
+55559|Minax|Minax
+55560|Mondain|Mondain
+55561|Sentri|Sentri guard
+55562|Batlin|Batlin
+55563|the Avatar|avatar
+55566|the seahorse|seahorse sea horse
+55567|the squid|squid
+55569|the weaponseller|weaponseller
+55570|the boatseller|boatseller
+5700|Sheila, Gatia's Assistant|Sheila
+5701|the Gemini|Gemini Twins
+5702|Pisces|Pisces
+5703|Aquarius|Aquarius
+5710|Sagittarius|Sagittarius
+5714|Virgo|Virgo
+5724|Capricorn|Capricorn
+5730|Scorpio|Scorpio
+602|a clam|clam
+622|Polly|parrot bird polly
+635|Herman|herman
+643|a coiled up rattlesnake is here.|snake rattlesnake
+6000|John the Lumberjack|john lumberjack
+6007|the bobcat|bobcat cat
+6009|the robin|robin
+6016|the young buck|buck deer
+6018|the duckling|duckling
+6100|the vicious warg|warg vicious
+6101|the ferocious warg|warg ferocious
+6115|Shargugh|shargugh brownie
+6210|Elstar|wizard elf elven Elstar
+6212|the mutant thing|mutant thing
+6213|the mutant thing|mutant thing
+6302|Yevaud|yevaud dragon usurper
+6309|the quasit|quasit
+6311|the hermit|hermit
+6312|the Donjonkeeper|donjonkeeper keeper
+6313|the guardian|guardian
+6314|Arachnos|arachnos spider empress
+6315|the Ki-Rin|ki-rin
+6316|the young wyrmkin|dragon wyrmkin young
+6317|the elder wyrmkin|dragon wyrmkin elder
+6401|the Demon of Decay|demon decay
+6402|the Book Monster|book monster guardian
+6404|Your Worst Nightmare|nightmare
+6405|the Guardian|guardian
+6406|a small God|small god
+6503|the Hide & Tooth storekeeper|storekeeper
+6508|the mine leader|mineleader dwarven dwarf mine leader
+6516|the mazekeeper|mazekeeper keeper
+704|a hermit|hermit
+706|a warden|warden
+707|a woodsman|woodsman
+709|a woodswoman|woodswoman
+710|a messenger|messenger
+711|a scoundrel|scoundrel
+7000|the @ySi@Dlt@yb@Oor@Dn @Wgu@Dar@Wdi@Dan@n|siltborn guardian mudmonster mud monster
+7001|the @Dca@Wve @Dba@Wt@n|cave bat small fierce bat
+7006|the @Dbl@Wac@Dks@Wtr@Dip@De @Gvi@gpe@Gr@n|blackstripe viper snake
+7007|the @Wlo@Dst @Dde@Wlv@Der@n|lost delver wanderer adventurer
+7008|the @Mma@Dlf@Mor@Dme@Md @Who@Dmu@Wnc@Dul@Wus@n|malformed homunculus creature
+7009|the @Dsh@Mad@Dow @Bmo@Mrk@Both@n|shadow morkoth morkoth shadowy
+7010|the @Oco@Ypp@Oer-@Yey@Oed @Dcr@Waw@Dle@Wr@n|copper eyed crawler chreffn chr-eff'n
+7041|the @Bdr@Cow@Bne@Dd @Gha@gG@n|drowned hag sea hag
+7042|the @Ggu@Car@Gdi@Can @Yna@Gga@n|guardian naga naga
+7043|the @Yva@Wul@Yt @Gba@gs@Gil@Gis@Gk@n|vault basilisk basilisk scaled
+7044|the @Mmi@Rnd@Mbu@Rrn@Med @Dhu@Wsk@n|mindburned husk lemure blob
+7045|@RGr@Oun@Rn@n, the @Dtw@Wo-@Dhe@Wad@Ded @Rbr@Out@Re@n|grunn two headed brute ettin cruncher jones
+7046|@YM@Oer@Yri@Ok@n, the @Dtw@Wo-@Dhe@Wad@Ded @yr@Oun@yt@n|merrik two headed runt ettin herald mouse killer
+7200|the master mindflayer|mindflayer master mind
+7201|the senior mindflayer|mindflayer senior mind
+7202|the junior mindflayer|mindflayer junior mind
+7203|the ugly wererat|wererat rat
+7400|a gray dove|gray dove
+7403|a squat groundskeeper|squat groundskeeper
+7404|the graverobber|twisted dwarf graverobber
+7407|a busy groundskeeper|groundskeeper busy
+7409|the head groundskeeper|stern man groundskeeper head
+7411|the ancient groundskeeper|ancient groundskeeper wizened old woman
+7414|the alchemist's shade|shade ghendry alchemist
+7417|a mourner|mourner black
+7522|the barkeeper|barkeeper woman
+7526|an angry monkey|monkey creature
+7530|a robed figure|man robe figure priest
+7531|a yellow flower|plant flower yellow hook zamba
+7558|the nobleman|man gentleman nobleman
+7567|a voodoo doll|voodoo doll
+7573|the Empress Kiona|kiona woman empress
+7902|the Cleaver|cleaver
+8306|the navigator|pirate man navigator sailor
+8397|Tai Ho|tai ho taiho fisherman
+8398|Yam Koo|Yam Koo
+8607|a bat|bat
+8609|the stone guardian|stone guardian
+900|the homba|homba
+905|Franz the Henchman|franz henchman
+906|Hanz the Henchman|hanz henchman
+908|the dragon turtle|turtle dragon
+909|the sea hag|hag sea
+910|the merman|merman
+9003|the coyote|coyote
+9005|the hyeena|hyeena
+9601|a small bushy-tailed animal|bushy animal small squirrel
+9612|the mole|mole
+9651|a gremlin|gremlin small

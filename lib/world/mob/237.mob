@@ -10,6 +10,7 @@ he loves his work.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 1
+BodyProfile: 1
 E
 #23701
 construction worker dwarf foreman~
@@ -24,6 +25,7 @@ enjoys that power...
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 1
+BodyProfile: 1
 E
 #23702
 guard dwarven~
@@ -38,6 +40,7 @@ battle.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 1
+BodyProfile: 1
 E
 #23703
 guard dwarven~
@@ -52,6 +55,7 @@ battle.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 1
+BodyProfile: 1
 E
 #23704
 lookout guard dwarf dwarven~
@@ -67,6 +71,7 @@ down the road.
 100 10000
 6 6 1
 BareHandAttack: 13
+BodyProfile: 1
 E
 #23705
 trader dwarven~
@@ -83,6 +88,7 @@ always done, and keeps his money in his hands always, lest someone steal them.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 1
+BodyProfile: 1
 E
 T 23702
 T 23706
@@ -100,6 +106,7 @@ of the world he only dreamed about.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 1
+BodyProfile: 1
 E
 T 23703
 T 23704
@@ -118,6 +125,7 @@ buried a week.
 30 900
 8 8 0
 BareHandAttack: 4
+BodyProfile: 2
 E
 #23708
 mouse~
@@ -131,6 +139,7 @@ A small mouse scurries about here.
 30 900
 8 8 0
 BareHandAttack: 4
+BodyProfile: 2
 E
 #23709
 crow~
@@ -145,6 +154,7 @@ looking at.
 30 900
 8 8 0
 BareHandAttack: 8
+BodyProfile: 4
 E
 #23710
 hawk~
@@ -158,6 +168,7 @@ A hawk has landed not far from you. It stares at you with one eye.
 30 900
 8 8 0
 BareHandAttack: 8
+BodyProfile: 4
 E
 #23711
 centipede white~

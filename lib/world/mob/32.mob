@@ -12,6 +12,7 @@ send a larger creature tumbling into the current.
 0 0
 8 8 0
 BareHandAttack: 4
+BodyProfile: 2
 Wimpy: 1
 E
 #3201
@@ -28,6 +29,7 @@ It reacts to nearby movement by raising both claws and refusing to surrender gro
 0 0
 8 8 0
 BareHandAttack: 8
+BodyProfile: 16
 Wimpy: 1
 Evasion: 1
 E
@@ -45,6 +47,7 @@ show when it opens its narrow mouth to test anything drifting close enough.
 0 0
 8 8 0
 BareHandAttack: 4
+BodyProfile: 3
 SavingPara: 1
 SavingRod: 1
 SavingPetri: 1
@@ -67,6 +70,7 @@ startling speed whenever a fish or insect breaks the surface.
 0 0
 8 8 0
 BareHandAttack: 11
+BodyProfile: 4
 Wimpy: 1
 Evasion: 1
 E
@@ -84,6 +88,7 @@ weed, shellfish, and whatever scraps the warehouse quarter loses to the river.
 0 0
 8 8 0
 BareHandAttack: 4
+BodyProfile: 2
 SavingPara: 1
 SavingRod: 1
 SavingPetri: 1

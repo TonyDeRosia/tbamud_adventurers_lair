@@ -11,6 +11,7 @@ and seems to have a lot of very fine brown body hair, even on his palms..
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 1
+BodyProfile: 1
 E
 #30402
 silver statue~
@@ -50,6 +51,7 @@ behind the mask.
 14 16 1 2d2+140 2d2+2
 140 19600
 8 8 1
+BodyProfile: 1
 E
 #30405
 chambermaid maid~
@@ -77,6 +79,7 @@ into his brown eyes, and big, wet, black nose.  "Nice nose ring", you think.
 13 16 2 2d2+130 2d2+2
 130 16900
 8 8 1
+BodyProfile: 1
 E
 #30407
 acolyte~
@@ -90,5 +93,6 @@ attempt to ignore you.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 1
+BodyProfile: 1
 E
 $

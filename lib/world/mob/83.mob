@@ -12,6 +12,7 @@ and their numbers ensure that the majority survive.
 50 2500
 8 8 0
 BareHandAttack: 2
+BodyProfile: 13
 E
 T 8301
 #8302
@@ -28,6 +29,7 @@ fish.
 100 10000
 8 8 0
 BareHandAttack: 2
+BodyProfile: 13
 E
 T 8302
 #8303
@@ -44,6 +46,7 @@ creatures when hungry.
 150 22500
 8 8 0
 BareHandAttack: 4
+BodyProfile: 3
 E
 #8304
 shark great white~
@@ -58,6 +61,7 @@ feed on almost every creature in the sea, including you!
 250 62500
 8 8 0
 BareHandAttack: 4
+BodyProfile: 13
 E
 #8305
 ship pirate Glumgold~
@@ -75,6 +79,7 @@ If they seem too tough for you, say or just type @oSURRENDER@n at the prompt.
 300 90000
 8 8 0
 BareHandAttack: 12
+BodyProfile: 1
 E
 T 8305
 T 8303
@@ -92,6 +97,7 @@ for new lands or other ships to loot.
 100 10000
 8 8 1
 BareHandAttack: 13
+BodyProfile: 1
 E
 T 8306
 #8307
@@ -107,6 +113,7 @@ when he was a child.  Hey, if you can't beat them, join them!
 50 2500
 8 8 1
 BareHandAttack: 13
+BodyProfile: 1
 E
 T 8307
 T 8304
@@ -125,6 +132,7 @@ price...  The going rate for a set of keys is 100 gold down here in the brig.
 100 10000
 8 8 1
 BareHandAttack: 13
+BodyProfile: 1
 E
 T 8308
 T 8309
@@ -141,6 +149,7 @@ plastered he can barely move, so he'll be stuck in that chair for a while.
 150 22500
 6 6 1
 BareHandAttack: 13
+BodyProfile: 1
 E
 T 8393
 #8310
@@ -156,6 +165,7 @@ plastered he can barely move, so he'll be stuck in that chair for a while.
 150 22500
 6 6 1
 BareHandAttack: 13
+BodyProfile: 1
 E
 #8311
 Glumgold pirate~
@@ -170,6 +180,7 @@ some way or another.
 300 90000
 8 8 1
 BareHandAttack: 8
+BodyProfile: 1
 E
 T 8304
 T 8310
@@ -189,6 +200,7 @@ others speak.
 50 2500
 8 8 2
 BareHandAttack: 4
+BodyProfile: 4
 E
 T 8313
 T 8314
@@ -205,6 +217,7 @@ beach.
 10 100
 8 8 1
 BareHandAttack: 8
+BodyProfile: 16
 E
 T 8319
 #8397
@@ -221,6 +234,7 @@ spots to fish and good people to gamble with.
 200 40000
 6 6 1
 BareHandAttack: 13
+BodyProfile: 1
 E
 #8398
 Yam Koo~

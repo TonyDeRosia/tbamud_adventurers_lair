@@ -11,6 +11,7 @@ looking for something to eat, it may even try to eat you.
 160 25600
 8 8 1
 BareHandAttack: 4
+BodyProfile: 3
 E
 #23901
 snake diamond rattle~
@@ -25,6 +26,7 @@ strike at anything that moves or tries to step on it.
 170 28900
 8 8 0
 BareHandAttack: 4
+BodyProfile: 3
 E
 #23902
 brown scorpion ~
@@ -39,6 +41,7 @@ it's sharp stinger and suck its life force dry.
 160 25600
 8 8 0
 BareHandAttack: 1
+BodyProfile: 5
 E
 #23903
 red scorpion~
@@ -53,6 +56,7 @@ stinger at you with confidence of victory.
 170 28900
 8 8 0
 BareHandAttack: 1
+BodyProfile: 5
 E
 #23904
 black scorpion~
@@ -67,6 +71,7 @@ armor and sharpening its deadly stinger.
 160 25600
 8 8 0
 BareHandAttack: 1
+BodyProfile: 5
 E
 #23905
 spider red~
@@ -81,6 +86,7 @@ hopes of catching some food for her new born babies.
 190 36100
 8 8 0
 BareHandAttack: 4
+BodyProfile: 5
 E
 #23906
 black spider hairy~
@@ -95,6 +101,7 @@ upon.  It looks famished and would probably eat anything, even you.
 160 25600
 8 8 0
 BareHandAttack: 4
+BodyProfile: 5
 E
 #23907
 travelling bugbear weary~
@@ -185,6 +192,7 @@ shield.
 210 44100
 8 8 0
 BareHandAttack: 5
+BodyProfile: 1
 E
 #23913
 dark~
@@ -213,6 +221,7 @@ you.
 180 32400
 8 8 0
 BareHandAttack: 8
+BodyProfile: 4
 E
 #23915
 eagle brown bird~
@@ -227,6 +236,7 @@ it's prey, and a 15 macra wingspan.
 200 40000
 8 8 0
 BareHandAttack: 8
+BodyProfile: 4
 E
 #23916
 cardinal bird~
@@ -288,6 +298,7 @@ is running around the shrubs and trees gathering fruit and nuts for its young.
 160 25600
 8 8 0
 BareHandAttack: 4
+BodyProfile: 2
 E
 #23920
 man drow mage~
@@ -303,6 +314,7 @@ Drow and could probably easily be angered into a fight.
 180 32400
 8 8 1
 BareHandAttack: 5
+BodyProfile: 1
 E
 #23921
 drow cleric~
@@ -318,6 +330,7 @@ future.
 200 40000
 8 8 2
 BareHandAttack: 7
+BodyProfile: 1
 E
 #23922
 cyclops guardian~
@@ -332,6 +345,7 @@ is about 350 stonga, very large muscles, one eye, and a bald head.
 210 44100
 8 8 1
 BareHandAttack: 7
+BodyProfile: 1
 E
 #23923
 drow guard~
@@ -346,6 +360,7 @@ gladly sacrifice their lives to defend the colony.
 21 13 -2 4d4+210 3d3+3
 210 44100
 8 8 0
+BodyProfile: 1
 E
 T 23907
 #23924
@@ -363,6 +378,7 @@ windows of her mind.
 200 40000
 8 8 2
 BareHandAttack: 8
+BodyProfile: 1
 E
 T 23908
 #23925
@@ -379,6 +395,7 @@ sanctum of the drow chapel.
 200 40000
 8 8 1
 BareHandAttack: 5
+BodyProfile: 1
 E
 #23926
 goblin guard~
@@ -396,6 +413,7 @@ battle and building his fortress.
 180 32400
 8 8 0
 BareHandAttack: 8
+BodyProfile: 1
 E
 #23927
 old guard goblin~
@@ -411,6 +429,7 @@ This one looks like he won't have to work too much longer.
 160 25600
 8 8 0
 BareHandAttack: 8
+BodyProfile: 1
 E
 #23928
 goblin warrior~
@@ -427,6 +446,7 @@ necessity rather than desire.
 170 28900
 8 8 0
 BareHandAttack: 8
+BodyProfile: 1
 E
 #23929
 old aged hermit man~
@@ -442,6 +462,7 @@ frail arms and legs, and is smoking his pipe.
 210 44100
 8 8 1
 BareHandAttack: 10
+BodyProfile: 1
 E
 T 23909
 #23930
@@ -457,6 +478,7 @@ captured by the drow.
 16 15 0 3d3+160 2d2+2
 160 25600
 8 8 1
+BodyProfile: 1
 E
 #23931
 dwarf slave~
@@ -472,6 +494,7 @@ camps of the drow.
 16 15 0 3d3+160 2d2+2
 160 25600
 8 8 1
+BodyProfile: 1
 E
 #23932
 elf slave~
@@ -487,6 +510,7 @@ rescue by his friends.
 16 15 0 3d3+160 2d2+2
 160 25600
 8 8 1
+BodyProfile: 1
 E
 #23933
 minotaur slave~
@@ -502,5 +526,6 @@ green grass.
 16 15 0 3d3+160 2d2+2
 160 25600
 8 8 1
+BodyProfile: 7
 E
 $

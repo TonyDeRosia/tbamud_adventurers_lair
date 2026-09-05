@@ -252,12 +252,7 @@ static int physical_skill_target_ok(struct char_data *ch, struct char_data *vict
  * from display text, since builders may create ordinary decorative objects. */
 static int is_embalmable_remains(const struct obj_data *obj)
 {
-  int valid_part_mask = BODY_PART_HEAD | BODY_PART_TORSO |
-    BODY_PART_ARM_LEFT | BODY_PART_ARM_RIGHT | BODY_PART_LEG_LEFT |
-    BODY_PART_LEG_RIGHT | BODY_PART_FORELEG_LEFT | BODY_PART_FORELEG_RIGHT |
-    BODY_PART_HINDLEG_LEFT | BODY_PART_HINDLEG_RIGHT | BODY_PART_TAIL |
-    BODY_PART_WING_LEFT | BODY_PART_WING_RIGHT | BODY_PART_HORN |
-    BODY_PART_TENTACLE_1 | BODY_PART_TENTACLE_2;
+  int valid_part_mask = BODY_PART_VALID_MASK;
 
   if (!obj)
     return FALSE;
@@ -612,7 +607,9 @@ ACMD(do_decapitate)
     send_to_char(ch, "Decapitate what?\r\n");
     return;
   }
-  corpse = get_obj_in_list_vis(ch, arg, NULL, world[IN_ROOM(ch)].contents);
+  corpse = get_obj_in_list_vis(ch, arg, NULL, ch->carrying);
+  if (!corpse)
+    corpse = get_obj_in_list_vis(ch, arg, NULL, world[IN_ROOM(ch)].contents);
   if (!corpse || !IS_CORPSE(corpse)) {
     send_to_char(ch, "You can only decapitate a genuine corpse.\r\n");
     return;
@@ -622,7 +619,7 @@ ACMD(do_decapitate)
     return;
   }
   if (!corpse_has_remaining_part(corpse, BODY_PART_HEAD)) {
-    if (REMAINS_PROFILE(corpse) == BODY_PROFILE_NONE)
+    if (!(body_profile_parts(REMAINS_PROFILE(corpse)) & BODY_PART_HEAD))
       send_to_char(ch, "That creature has no severable head.\r\n");
     else
       send_to_char(ch, "That corpse no longer has a head to take.\r\n");

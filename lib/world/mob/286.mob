@@ -12,6 +12,7 @@ impervious to normal weapons.
 30 10 -8 6d6+300 5d5+5
 300 90000
 8 8 0
+BodyProfile: 1
 E
 #28602
 pile coins~
@@ -74,6 +75,7 @@ A yummy looking chicken pot pie is here on the ground.
 22 13 -3 4d4+220 3d3+3
 220 48400
 8 8 0
+BodyProfile: 4
 E
 #28607
 beef pot pie~
@@ -165,6 +167,7 @@ eyes stare at you intently as it sees only you delicious and juicy brain.
 20 14 -2 4d4+200 3d3+3
 200 40000
 8 8 0
+BodyProfile: 1
 E
 #28614
 bloody severed arm~
@@ -286,6 +289,7 @@ by the God.
 23 13 -3 4d4+230 3d3+3
 230 52900
 8 8 1
+BodyProfile: 1
 E
 #28623
 prisoner hell~
@@ -299,6 +303,7 @@ burns cover her face and arms.
 26 12 -5 5d5+260 4d4+4
 260 67600
 8 8 2
+BodyProfile: 1
 E
 #28624
 prisoner hell~
@@ -313,6 +318,7 @@ hangs limply by his side.
 27 11 -6 5d5+270 4d4+4
 270 72900
 8 8 1
+BodyProfile: 1
 E
 #28625
 demonguard demon guard~
@@ -339,6 +345,7 @@ of hell consuming it and the smell of burning flesh.
 20 14 -2 4d4+200 3d3+3
 200 40000
 8 8 0
+BodyProfile: 1
 E
 #28627
 construction worker male~
@@ -353,6 +360,7 @@ Co.  '
 22 13 -3 4d4+220 3d3+3
 220 48400
 8 8 1
+BodyProfile: 1
 E
 #28628
 construction worker female~
@@ -367,6 +375,7 @@ Construction Co.  '
 21 13 -2 4d4+210 3d3+3
 210 44100
 8 8 2
+BodyProfile: 1
 E
 #28629
 construction worker female~
@@ -381,6 +390,7 @@ Construction Co.  '
 20 14 -2 4d4+200 3d3+3
 200 40000
 8 8 2
+BodyProfile: 1
 E
 #28630
 fire devil~
@@ -423,6 +433,7 @@ that runs down its dung covered coat.
 26 12 -5 5d5+260 4d4+4
 260 67600
 8 8 0
+BodyProfile: 2
 E
 #28633
 frozen body~
@@ -493,6 +504,7 @@ HEY!  Penguins don't have teeth!
 22 13 -3 4d4+220 3d3+3
 220 48400
 8 8 0
+BodyProfile: 4
 E
 #28638
 I-scream worker~
@@ -507,6 +519,7 @@ It runs about screaming, 'I SCREAM, YOU SCREAM!  WE ALL SCREAM FOR I SCREAM!!!
 22 13 -3 4d4+220 3d3+3
 220 48400
 8 8 0
+BodyProfile: 1
 E
 #28639
 Ice Screamer~
@@ -561,6 +574,7 @@ AAAAAAAAAAaaaaaaaaaaaarrrrrrrrgggggghhhhh!!!!!!!!!!!
 23 13 -3 4d4+230 3d3+3
 230 52900
 8 8 0
+BodyProfile: 1
 E
 #28643
 records worker~
@@ -574,6 +588,7 @@ someone.
 21 13 -2 4d4+210 3d3+3
 210 44100
 8 8 0
+BodyProfile: 1
 E
 #28644
 santa claus~
@@ -600,6 +615,7 @@ his emaciated face beneath his hood.
 33 9 -9 6d6+330 5d5+5
 330 108900
 8 8 1
+BodyProfile: 1
 E
 #28646
 bowl blood~
@@ -638,6 +654,7 @@ notorious for his painful and harsh punishments.
 30 10 -8 6d6+300 5d5+5
 300 90000
 8 8 0
+BodyProfile: 1
 E
 #28649
 lawyer hell~
@@ -663,6 +680,7 @@ Hell Burns'
 21 13 -2 4d4+210 3d3+3
 210 44100
 8 8 2
+BodyProfile: 1
 E
 #28651
 bastard hiramoto~
@@ -690,6 +708,7 @@ A maintenance worker is here fixing stuff.
 20 14 -2 4d4+200 3d3+3
 200 40000
 8 8 0
+BodyProfile: 1
 E
 #28653
 weeds~
@@ -729,6 +748,7 @@ has been digested already.
 20 14 -2 4d4+200 3d3+3
 200 40000
 8 8 0
+BodyProfile: 2
 E
 #28656
 stomach dragon~
@@ -742,6 +762,7 @@ each food item and proceed to barf acid all over it.
 23 13 -3 4d4+230 3d3+3
 230 52900
 8 8 0
+BodyProfile: 6
 E
 #28657
 rancid turkey leg~
@@ -755,6 +776,7 @@ disappears and you wonder if it just walked away....
 20 14 -2 4d4+200 3d3+3
 200 40000
 8 8 0
+BodyProfile: 4
 E
 #28658
 reactor specialist~
@@ -781,6 +803,7 @@ back.
 23 13 -3 4d4+230 3d3+3
 230 52900
 8 8 1
+BodyProfile: 1
 E
 #28660
 homer simpson~
@@ -820,6 +843,7 @@ A mad cook is here cooking up a storm.
 22 13 -3 4d4+220 3d3+3
 220 48400
 8 8 1
+BodyProfile: 1
 E
 #28663
 frantic lady~
@@ -832,6 +856,7 @@ A frantic lady is here tearing her hair out looking for a sale.
 21 13 -2 4d4+210 3d3+3
 210 44100
 8 8 2
+BodyProfile: 1
 E
 #28664
 nuclear technician~
@@ -882,6 +907,7 @@ floor frantically check dials and gauges while flashing lights and sirens sound.
 30 10 -8 6d6+300 5d5+5
 300 90000
 8 8 1
+BodyProfile: 1
 E
 #28668
 Greater Fire Demon~
@@ -922,6 +948,7 @@ A guard dog sits here guarding the break room.
 24 12 -4 4d4+240 4d4+4
 240 57600
 8 8 0
+BodyProfile: 2
 E
 #28671
 juicy steak~

@@ -74,6 +74,7 @@ be messed with.  Treat him with care.
 140 19600
 8 8 1
 BareHandAttack: 3
+BodyProfile: 2
 E
 #5705
 Taurus~
@@ -87,6 +88,7 @@ size!  Getting on his bad side would be a big mistake.
 14 16 1 2d2+140 2d2+2
 140 19600
 8 8 1
+BodyProfile: 2
 Str: 18
 Dex: 17
 Int: 9
@@ -106,6 +108,7 @@ things.
 140 19600
 8 8 2
 BareHandAttack: 7
+BodyProfile: 2
 E
 #5710
 Sagittarius~
@@ -138,6 +141,7 @@ claws gleam in the half light as she clacks them through the air.
 140 19600
 8 8 2
 BareHandAttack: 6
+BodyProfile: 16
 Dex: 18
 Int: 18
 Wis: 17
@@ -155,6 +159,7 @@ life in this cramped little shop.
 14 16 1 2d2+140 2d2+2
 140 19600
 8 8 1
+BodyProfile: 1
 E
 #5714
 Virgo~
@@ -197,6 +202,7 @@ the oak tree.
 12 16 2 2d2+120 2d2+2
 120 14400
 8 8 1
+BodyProfile: 2
 Str: 15
 Dex: 18
 Int: 10
@@ -228,6 +234,7 @@ best there is.  She has never missed a target...
 140 19600
 8 8 2
 BareHandAttack: 10
+BodyProfile: 1
 Str: 18
 Dex: 18
 Int: 17

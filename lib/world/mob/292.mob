@@ -24,6 +24,7 @@ multi-colored glowing eyes, the horns, the six inch long claws...
 20 14 -2 4d4+200 3d3+3
 200 40000
 8 8 0
+BodyProfile: 1
 E
 #29202
 Leonna~
@@ -66,6 +67,7 @@ practised ease.  You wonder if its your coin.
 24 12 -4 4d4+240 4d4+4
 240 57600
 8 8 1
+BodyProfile: 1
 E
 #29205
 Bartender~
@@ -79,6 +81,7 @@ orders at the same time.  Maybe you should bother him later...
 14 16 1 2d2+140 2d2+2
 140 19600
 8 8 1
+BodyProfile: 1
 E
 #29206
 Barmaid~
@@ -93,6 +96,7 @@ order pad.
 5 19 7 1d1+50 1d2+0
 50 2500
 8 8 2
+BodyProfile: 1
 E
 #29207
 drunk person~
@@ -105,6 +109,7 @@ A drunk person is here, babbling about something incessantly.
 5 19 7 1d1+50 1d2+0
 50 2500
 8 8 1
+BodyProfile: 1
 E
 #29208
 lucky gambler~
@@ -117,6 +122,7 @@ A lucky gambler is here, striking it rich!
 12 16 2 2d2+120 2d2+2
 120 14400
 8 8 1
+BodyProfile: 1
 E
 #29209
 dealer~
@@ -156,6 +162,7 @@ her establishment and invites you to browse as long as you wish.
 23 13 -3 4d4+230 3d3+3
 230 52900
 8 8 2
+BodyProfile: 1
 E
 #29212
 unlucky gambler~
@@ -170,6 +177,7 @@ chance.
 12 16 2 2d2+120 2d2+2
 120 14400
 8 8 1
+BodyProfile: 1
 E
 #29213
 citizen~
@@ -184,6 +192,7 @@ wanders until you're ready to go.
 8 18 5 1d1+80 1d2+1
 80 6400
 8 8 1
+BodyProfile: 1
 E
 #29214
 receptionist wife~
@@ -211,6 +220,7 @@ when it comes to plants.  You've no doubt this woman is an expert in her field.
 23 13 -3 4d4+230 3d3+3
 230 52900
 8 8 2
+BodyProfile: 1
 E
 #29216
 lawyer~
@@ -253,6 +263,7 @@ you.
 5 19 7 1d1+50 1d2+0
 50 2500
 8 8 1
+BodyProfile: 1
 E
 #29219
 council guard~
@@ -267,6 +278,7 @@ mess with them.
 23 13 -3 4d4+230 3d3+3
 230 52900
 8 8 1
+BodyProfile: 1
 E
 #29220
 council members~
@@ -293,6 +305,7 @@ Really!
 10 17 4 2d2+100 1d2+1
 100 10000
 6 6 1
+BodyProfile: 1
 E
 #29222
 prisoner~
@@ -306,6 +319,7 @@ gasps and looks dejected again.
 5 19 7 1d1+50 1d2+0
 50 2500
 6 6 1
+BodyProfile: 1
 E
 #29223
 innguard guard~
@@ -359,6 +373,7 @@ immortality.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 1
+BodyProfile: 1
 E
 T 29200
 #29227
@@ -373,6 +388,7 @@ glows with the same light as his soul.
 24 12 -4 4d4+240 4d4+4
 240 57600
 8 8 1
+BodyProfile: 1
 E
 #29228
 sergeant recruiting~
@@ -386,6 +402,7 @@ the same.  ARGH!!!  Resist!  Resist!!
 23 13 -3 4d4+230 3d3+3
 230 52900
 8 8 0
+BodyProfile: 1
 E
 T 29202
 #29229
@@ -400,6 +417,7 @@ you...  Shall we have a go at it?
 25 12 -5 5d5+250 4d4+4
 250 62500
 8 8 1
+BodyProfile: 1
 E
 #29230
 beggar~
@@ -413,6 +431,7 @@ shiny clenched in his hand...  What is he hiding?
 5 19 7 1d1+50 1d2+0
 50 2500
 6 6 1
+BodyProfile: 1
 E
 #29231
 citizen~
@@ -426,6 +445,7 @@ you'll butt in line.
 9 17 4 1d1+90 1d2+1
 90 8100
 8 8 1
+BodyProfile: 1
 E
 #29232
 citizen~
@@ -439,6 +459,7 @@ has too much to do.
 9 17 4 1d1+90 1d2+1
 90 8100
 8 8 1
+BodyProfile: 1
 E
 #29233
 militia guard~
@@ -451,6 +472,7 @@ A militia guard is here keeping the peace.
 13 16 2 2d2+130 2d2+2
 130 16900
 8 8 1
+BodyProfile: 1
 E
 #29234
 Kervin~
@@ -478,6 +500,7 @@ guard guard guard guard guard guard.  ' (looks like he got the right job!  )
 15 15 1 3d3+150 2d2+2
 150 22500
 8 8 1
+BodyProfile: 1
 E
 #29236
 bright light~
@@ -503,6 +526,7 @@ Some guardian wisps here attack!
 18 14 0 3d3+180 3d3+3
 180 32400
 8 8 0
+BodyProfile: 1
 E
 #29238
 orb~
@@ -555,6 +579,7 @@ And a demonologist to boot!  He growls incoherently at you as he attacks!
 24 12 -4 4d4+240 4d4+4
 240 57600
 8 8 1
+BodyProfile: 1
 E
 #29242
 Edimmu~
@@ -660,6 +685,7 @@ has far too much to do.
 9 17 4 1d1+90 1d2+1
 90 8100
 8 8 2
+BodyProfile: 1
 E
 #29250
 hellhounds hounds hell hell-hounds~
@@ -687,6 +713,7 @@ creature...
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 0
+BodyProfile: 1
 E
 #29252
 Farmer~
@@ -699,6 +726,7 @@ The farmer sells her lackluster with all the excitement it warrants.
 18 14 0 3d3+180 3d3+3
 180 32400
 8 8 2
+BodyProfile: 1
 E
 #29253
 Receptionist~
@@ -724,5 +752,6 @@ orders at the same time.  Maybe you should bother him later...
 14 16 1 2d2+140 2d2+2
 140 19600
 8 8 1
+BodyProfile: 1
 E
 $

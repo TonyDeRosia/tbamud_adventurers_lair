@@ -115,6 +115,7 @@ everyday students of the university.  They are not much more than hired help.
 8 18 5 1d1+80 1d2+1
 80 6400
 8 8 0
+BodyProfile: 1
 E
 #30109
 student constable stucon~
@@ -129,6 +130,7 @@ everyday students of the university.  They are not much more than hired help.
 8 18 5 1d1+80 1d2+1
 80 6400
 8 8 1
+BodyProfile: 1
 E
 #30110
 student constable stucon~
@@ -143,6 +145,7 @@ everyday students of the university.  They are not much more than hired help.
 8 18 5 1d1+80 1d2+1
 80 6400
 8 8 2
+BodyProfile: 1
 E
 #30111
 student~
@@ -156,6 +159,7 @@ are classes, work, and other its.
 3 19 8 0d0+30 1d2+0
 30 900
 8 8 0
+BodyProfile: 1
 E
 #30112
 student~
@@ -170,6 +174,7 @@ are classes, work, and other students of the opposite sex (females, you think).
 3 19 8 0d0+30 1d2+0
 30 900
 8 8 1
+BodyProfile: 1
 E
 #30113
 student~
@@ -183,6 +188,7 @@ has are classes, and work.
 3 19 8 0d0+30 1d2+0
 30 900
 8 8 2
+BodyProfile: 1
 E
 #30114
 frosh froshie~
@@ -234,6 +240,7 @@ isn't...  ).
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 1
+BodyProfile: 1
 E
 #30118
 coke machine~
@@ -384,6 +391,7 @@ strange.
 15 15 1 3d3+150 2d2+2
 150 22500
 8 8 0
+BodyProfile: 0
 E
 #30130
 student~
@@ -397,6 +405,7 @@ A student is snoozing here.
 3 19 8 0d0+30 1d2+0
 30 900
 4 4 0
+BodyProfile: 1
 E
 #30131
 student~
@@ -409,6 +418,7 @@ A student is furiously taking notes here.
 3 19 8 0d0+30 1d2+0
 30 900
 6 6 0
+BodyProfile: 1
 E
 #30132
 chris~
@@ -461,6 +471,7 @@ though.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 1
+BodyProfile: 1
 E
 #30136
 chimpster chimp~
@@ -551,6 +562,7 @@ orders at the same time.  Maybe you should bother him later...
 14 16 1 2d2+140 2d2+2
 140 19600
 8 8 1
+BodyProfile: 1
 E
 #30143
 drunk~
@@ -563,6 +575,7 @@ A drunk, babbling about something incessantly.
 4 19 7 0d0+40 1d2+0
 40 1600
 8 8 1
+BodyProfile: 1
 E
 #30144
 Chief FREC~
@@ -576,6 +589,7 @@ anyone proud...
 15 15 1 3d3+150 2d2+2
 150 22500
 8 8 0
+BodyProfile: 1
 E
 #30145
 golden world copy~
@@ -602,6 +616,7 @@ transparent though.
 15 15 1 3d3+150 2d2+2
 150 22500
 8 8 0
+BodyProfile: 0
 E
 #30147
 wraith~
@@ -614,5 +629,6 @@ An ethereal wraith-like shape is here.
 15 15 1 3d3+150 2d2+2
 150 22500
 8 8 0
+BodyProfile: 0
 E
 $

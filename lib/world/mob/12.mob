@@ -13,6 +13,7 @@ immortals to treat recordkeeping as part of their duty.
 14 16 23 2d2+140 2d2+2
 140 0
 8 8 2
+BodyProfile: 1
 E
 #1201
 immortal dispatch keeper postmaster courier records~
@@ -45,6 +46,7 @@ business becomes serious.
 14 16 23 2d2+140 2d2+2
 140 0
 8 8 0
+BodyProfile: 1
 E
 T 3011
 #1203
@@ -62,6 +64,7 @@ that responsibility with more pride than any title.
 30 0
 8 8 1
 BareHandAttack: 13
+BodyProfile: 1
 E
 #1204
 training imp familiar test sprite laboratory~
@@ -161,6 +164,7 @@ exists to protect the realm, not indulge itself.
 310 0
 8 8 1
 BareHandAttack: 4
+BodyProfile: 6
 Str: 25
 Dex: 25
 Int: 25
@@ -182,6 +186,7 @@ return the last borrowed item.
 30 10 45 6d6+300 5d5+5
 300 0
 8 8 2
+BodyProfile: 1
 E
 #1212
 training recorder scoreboard clerk demonstration~
@@ -216,6 +221,7 @@ significance others seem determined to assign him.
 300 0
 8 8 1
 BareHandAttack: 4
+BodyProfile: 2
 E
 #1233
 hidden test subject invisible training entity~
@@ -264,5 +270,6 @@ content elsewhere in the world.
 3 19 5 0d0+30 1d2+0
 30 0
 8 8 0
+BodyProfile: 1
 E
 $

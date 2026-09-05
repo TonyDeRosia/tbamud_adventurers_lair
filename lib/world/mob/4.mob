@@ -11,6 +11,7 @@ with his yellow eyes, ready to attack.
 100 10000
 8 8 1
 BareHandAttack: 11
+BodyProfile: 3
 E
 #401
 Giant Mosquito~
@@ -25,6 +26,7 @@ It would be wise to not upset her.
 100 10000
 8 8 2
 BareHandAttack: 1
+BodyProfile: 10
 E
 #403
 firefly~
@@ -67,6 +69,7 @@ shreds.  Maybe it would be wise to just leave him alone.
 150 22500
 8 8 1
 BareHandAttack: 9
+BodyProfile: 2
 E
 #412
 chipmunk~
@@ -82,6 +85,7 @@ razor sharp and one of her ears has a small hole in it.  No doubt a battle scar.
 140 19600
 8 8 2
 BareHandAttack: 4
+BodyProfile: 2
 E
 #415
 cricket~
@@ -110,6 +114,7 @@ looks can be deceiving.
 110 12100
 8 8 1
 BareHandAttack: 8
+BodyProfile: 2
 E
 #421
 zombie~
@@ -125,6 +130,7 @@ enough, his teeth are in perfectly chiseled condition.
 110 12100
 8 8 1
 BareHandAttack: 13
+BodyProfile: 1
 E
 #422
 ghoul~
@@ -139,6 +145,7 @@ surreal.
 100 10000
 8 8 0
 BareHandAttack: 5
+BodyProfile: 1
 E
 #423
 skeleton~
@@ -153,6 +160,7 @@ grinning teeth and large empty eyes seem to have a predatory gleam.
 150 22500
 8 8 0
 BareHandAttack: 9
+BodyProfile: 1
 E
 #426
 slug~
@@ -181,6 +189,7 @@ uncontrollably as it scuttles about searching for something to eat.
 120 14400
 8 8 2
 BareHandAttack: 4
+BodyProfile: 2
 E
 #433
 redbird bird~
@@ -195,6 +204,7 @@ likely from previous battles.
 160 25600
 8 8 1
 BareHandAttack: 11
+BodyProfile: 4
 E
 #434
 muskrat~
@@ -251,6 +261,7 @@ feathers.
 140 19600
 8 8 2
 BareHandAttack: 4
+BodyProfile: 4
 E
 #444
 grasshopper~
@@ -279,6 +290,7 @@ You can see a slight glowing aura within his eyes.
 150 22500
 8 8 1
 BareHandAttack: 6
+BodyProfile: 1
 E
 #449
 jedidiah~
@@ -349,6 +361,7 @@ and clean.  It doesn't look like he's ever been dirty.
 140 19600
 8 8 1
 BareHandAttack: 4
+BodyProfile: 2
 E
 #471
 raccoon~
@@ -363,6 +376,7 @@ a low growl begins coming from within her.
 110 12100
 8 8 2
 BareHandAttack: 8
+BodyProfile: 2
 E
 #475
 coyote~
@@ -378,6 +392,7 @@ teeth.
 150 22500
 8 8 1
 BareHandAttack: 10
+BodyProfile: 2
 E
 #480
 ghost~
@@ -392,6 +407,7 @@ You can hear a soft crying noise coming from within it.
 120 14400
 8 8 0
 BareHandAttack: 5
+BodyProfile: 0
 E
 #481
 zachary~
@@ -434,5 +450,6 @@ and sneak past him he won't attack you.  But then again, maybe not.
 140 19600
 8 8 1
 BareHandAttack: 8
+BodyProfile: 2
 E
 $

@@ -15,6 +15,7 @@ could.
 30 10 -8 6d6+300 5d5+5
 300 90000
 8 8 1
+BodyProfile: 1
 E
 #31201
 robed man leper~
@@ -29,6 +30,7 @@ leper!
 27 11 -6 5d5+270 4d4+4
 270 72900
 8 8 1
+BodyProfile: 1
 E
 #31202
 wild old hermit man leper~
@@ -42,6 +44,7 @@ affect from his leprosy.
 28 11 -6 5d5+280 4d4+4
 280 78400
 8 8 1
+BodyProfile: 1
 E
 #31203
 lioness~
@@ -70,6 +73,7 @@ mechanical is his gait.
 26 12 -5 5d5+260 4d4+4
 260 67600
 8 8 1
+BodyProfile: 1
 E
 #31205
 supplicant leper woman~
@@ -84,6 +88,7 @@ wounds all over her body.
 26 12 -5 5d5+260 4d4+4
 260 67600
 8 8 2
+BodyProfile: 1
 E
 #31206
 supplicant leper man~
@@ -97,6 +102,7 @@ with the occasional spittle dripping down his chin.
 27 11 -6 5d5+270 4d4+4
 270 72900
 8 8 1
+BodyProfile: 1
 E
 #31207
 supplicant leper woman~
@@ -110,6 +116,7 @@ wanders this small area in hopelessness.
 28 11 -6 5d5+280 4d4+4
 280 78400
 8 8 2
+BodyProfile: 1
 E
 #31208
 tomm walker~
@@ -136,6 +143,7 @@ it is a wonder why he has not been thrown to the Sternal Flame as of yet.
 25 12 -5 5d5+250 4d4+4
 250 62500
 8 8 1
+BodyProfile: 1
 E
 #31210
 boa constrictor~
@@ -162,6 +170,7 @@ thumb for wild boars...
 25 12 -5 5d5+250 4d4+4
 250 62500
 8 8 0
+BodyProfile: 2
 E
 #31212
 argus leper man~
@@ -176,6 +185,7 @@ wound without noticing it.
 28 11 -6 5d5+280 4d4+4
 280 78400
 8 8 1
+BodyProfile: 1
 E
 #31213
 Jantry woman leper~
@@ -191,6 +201,7 @@ Jareth runs into snags or delays in sending shipments.
 29 11 -7 5d5+290 4d4+4
 290 84100
 8 8 2
+BodyProfile: 1
 E
 #31215
 kneeling leper man~
@@ -204,6 +215,7 @@ position of prayer and supplication.
 27 11 -6 5d5+270 4d4+4
 270 72900
 5 5 1
+BodyProfile: 1
 E
 #31216
 crazed half naked leper man~
@@ -218,6 +230,7 @@ is enough to make even the most stalwart of men retch in agony.
 25 12 -5 5d5+250 4d4+4
 250 62500
 8 8 1
+BodyProfile: 1
 E
 #31217
 chicken~
@@ -231,6 +244,7 @@ filth.
 25 12 -5 5d5+250 4d4+4
 250 62500
 8 8 0
+BodyProfile: 4
 E
 #31218
 dalgon man~
@@ -244,6 +258,7 @@ only age can bring.  He is twenty-two.
 26 12 -5 5d5+260 4d4+4
 260 67600
 8 8 1
+BodyProfile: 1
 E
 #31219
 alvah man leper~
@@ -257,5 +272,6 @@ respected by none.
 28 11 -6 5d5+280 4d4+4
 280 78400
 8 8 1
+BodyProfile: 1
 E
 $

@@ -26,6 +26,7 @@ and blood marks got on those walls....  Or do you?
 290 84100
 8 8 2
 BareHandAttack: 4
+BodyProfile: 1
 Str: 9
 Dex: 5
 Int: 18
@@ -44,6 +45,7 @@ He reveals long, razor-sharp, 6 inch long claws and then takes a swipe at you!
 280 78400
 8 8 0
 BareHandAttack: 8
+BodyProfile: 1
 Str: 20
 Dex: 18
 Int: 3
@@ -76,6 +78,7 @@ A harmless spider sits in his web here.
 20 14 -2 4d4+200 3d3+3
 200 40000
 8 8 1
+BodyProfile: 5
 Str: 18
 Dex: 15
 E
@@ -92,6 +95,7 @@ comes in for the kill.  If I were you, I'd get out of here and fast!
 300 90000
 8 8 0
 BareHandAttack: 4
+BodyProfile: 6
 Str: 18
 StrAdd: 18
 Dex: 18
@@ -136,6 +140,7 @@ A little spider sits here.
 23 13 -3 4d4+230 3d3+3
 230 52900
 8 8 0
+BodyProfile: 5
 E
 #28309
 headless ghost~
@@ -150,6 +155,7 @@ It's is a very bloody picture.  Sick.  Actually, it makes you want to puke.
 260 67600
 8 8 0
 BareHandAttack: 1
+BodyProfile: 0
 Str: 17
 Dex: 18
 E
@@ -165,6 +171,7 @@ A large bat flies around up here.
 230 52900
 8 8 0
 BareHandAttack: 4
+BodyProfile: 19
 Str: 7
 Dex: 13
 E
@@ -180,6 +187,7 @@ A bat is flying around.
 220 48400
 8 8 0
 BareHandAttack: 4
+BodyProfile: 19
 Str: 6
 Dex: 8
 E
@@ -196,6 +204,7 @@ ground here.  It sits in the eye-hole and starts watching you now...
 210 44100
 8 8 0
 BareHandAttack: 4
+BodyProfile: 2
 Str: 10
 Dex: 4
 E
@@ -212,6 +221,7 @@ Be on your guard at every moment.
 200 40000
 8 8 0
 BareHandAttack: 4
+BodyProfile: 2
 Dex: 14
 E
 #28314
@@ -237,6 +247,7 @@ A beetle crawls around here.
 20 14 -2 4d4+200 3d3+3
 200 40000
 8 6 0
+BodyProfile: 9
 E
 #28316
 insane prisoner~
@@ -250,6 +261,7 @@ Someone is acting like an idiot.
 240 57600
 6 6 1
 BareHandAttack: 6
+BodyProfile: 1
 Str: 14
 Dex: 10
 E
@@ -266,6 +278,7 @@ this dungeon.  It looks like he's been in here for years!
 250 62500
 8 8 1
 BareHandAttack: 9
+BodyProfile: 1
 Str: 18
 Dex: 18
 Int: 16
@@ -282,6 +295,7 @@ balls, and then starts screaming of how he's here for no reason.
 24 12 -4 4d4+240 4d4+4
 240 57600
 6 6 1
+BodyProfile: 1
 Str: 4
 Dex: 7
 E
@@ -298,6 +312,7 @@ whip.
 23 13 -3 4d4+230 3d3+3
 230 52900
 6 6 1
+BodyProfile: 1
 Dex: 6
 E
 #28320
@@ -313,6 +328,7 @@ keeps mumbling to himself, and he probably is very lost.
 270 72900
 8 8 1
 BareHandAttack: 7
+BodyProfile: 1
 Str: 17
 Dex: 8
 E
@@ -344,6 +360,7 @@ A crow stands here.
 25 12 -5 5d5+250 4d4+4
 250 62500
 8 8 0
+BodyProfile: 4
 Str: 6
 Dex: 3
 E

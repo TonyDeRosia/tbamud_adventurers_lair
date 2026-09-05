@@ -106,6 +106,7 @@ A small horned lizard flicks his tongue and slithers away.
 3 19 8 0d0+30 1d2+0
 30 900
 8 8 0
+BodyProfile: 2
 E
 #5208
 golem stone~
@@ -119,6 +120,7 @@ creature.  He stands here still guarding the city.
 25 12 -5 5d5+250 4d4+4
 250 62500
 8 8 0
+BodyProfile: 11
 E
 #5209
 lamia beast~

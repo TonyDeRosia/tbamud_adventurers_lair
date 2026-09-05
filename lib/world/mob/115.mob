@@ -10,6 +10,7 @@ small dog.  It is built very low to the ground and is actually pretty quick.
 3 19 8 0d0+30 1d2+0
 30 900
 8 8 0
+BodyProfile: 2
 E
 #11501
 rat~
@@ -23,6 +24,7 @@ A large dusty rat crawls around here.
 30 900
 8 8 0
 BareHandAttack: 4
+BodyProfile: 2
 E
 #11502
 goblin raider~
@@ -36,6 +38,7 @@ up and down trying to determine what you might have of value.
 3 19 8 0d0+30 1d2+0
 30 900
 8 8 1
+BodyProfile: 1
 E
 #11503
 mon goblin~
@@ -48,6 +51,7 @@ A mon's goblin is walking around looking for more artifacts to steal.
 3 19 8 0d0+30 1d2+0
 30 900
 8 8 1
+BodyProfile: 1
 E
 #11504
 hulk goblin~
@@ -60,6 +64,7 @@ A hulk goblin is here tearing the place down.
 3 19 8 0d0+30 1d2+0
 30 900
 8 8 1
+BodyProfile: 1
 E
 #11505
 bat~
@@ -74,6 +79,7 @@ feast.
 30 900
 8 8 0
 BareHandAttack: 4
+BodyProfile: 19
 E
 #11506
 goblin bomber~
@@ -87,6 +93,7 @@ person you would trust with explosives.
 3 19 8 0d0+30 1d2+0
 30 900
 8 8 1
+BodyProfile: 1
 E
 #11507
 centaur archer~
@@ -101,6 +108,7 @@ archer.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 1
+BodyProfile: 15
 E
 #11508
 monk peaceful~
@@ -115,6 +123,7 @@ underneath his robes.
 70 4900
 8 8 1
 BareHandAttack: 11
+BodyProfile: 1
 Str: 20
 Dex: 20
 Int: 9
@@ -132,6 +141,7 @@ It looks like she has had a long battle.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 2
+BodyProfile: 15
 E
 #11510
 rat~
@@ -145,6 +155,7 @@ An oversized rat with large fangs looks at you curiously.
 70 4900
 8 8 0
 BareHandAttack: 4
+BodyProfile: 2
 E
 #11511
 crazy crazed monk~
@@ -158,6 +169,7 @@ A crazy monk stands her muttering gibberish.
 70 4900
 8 8 1
 BareHandAttack: 13
+BodyProfile: 1
 E
 #11512
 monk deranged~
@@ -172,6 +184,7 @@ upstairs.
 70 4900
 8 8 1
 BareHandAttack: 12
+BodyProfile: 1
 Str: 20
 Dex: 7
 Int: 20
@@ -189,6 +202,7 @@ breaking bones as she passes.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 2
+BodyProfile: 15
 E
 #11514
 monk prayer~
@@ -201,6 +215,7 @@ A monk who was kneeling in prayer before you interrupted him.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 1
+BodyProfile: 1
 E
 #11515
 centaur axeman~
@@ -213,6 +228,7 @@ A centaur axeman is here waiting to pick a fight.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 1
+BodyProfile: 15
 E
 #11516
 centaur warpriest~
@@ -226,6 +242,7 @@ A centaur warpriest stands his ground, casting spells on all the enemies.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 1
+BodyProfile: 15
 E
 #11517
 centaur samite healer~
@@ -238,6 +255,7 @@ A centaur samite healer runs around trying to revive the wounded centaurs
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 2
+BodyProfile: 15
 E
 #11518
 doom priest guildmaster~
@@ -252,6 +270,7 @@ unparalleled.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 1
+BodyProfile: 1
 E
 #11519
 goblin horde~
@@ -264,6 +283,7 @@ A goblin horde rushes in, attacking you from all directions.
 3 19 8 0d0+30 1d2+0
 30 900
 8 8 2
+BodyProfile: 1
 E
 #11520
 fat goblin~
@@ -277,6 +297,7 @@ as this creature can survive its own breath.
 3 19 8 0d0+30 1d2+0
 30 900
 8 8 2
+BodyProfile: 1
 E
 #11521
 white tan centaur~
@@ -289,6 +310,7 @@ A white and tan centaur gallops in your direction.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 1
+BodyProfile: 15
 E
 #11522
 centaur armored~
@@ -302,6 +324,7 @@ heavily from the added weight.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 1
+BodyProfile: 15
 E
 #11523
 dying monk~
@@ -314,6 +337,7 @@ A dying monk sits here in agony.
 7 18 5 1d1+70 1d2+1
 70 4900
 5 5 0
+BodyProfile: 1
 Str: 3
 Dex: 3
 Int: 3
@@ -331,6 +355,7 @@ An ensign goblin straight out from military camp, leads the raid at the front li
 3 19 8 0d0+30 1d2+0
 30 900
 8 8 1
+BodyProfile: 1
 E
 #11525
 raging troll~
@@ -344,6 +369,7 @@ he snorts and grunts in anger.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 1
+BodyProfile: 1
 E
 #11526
 stone skinned troll~
@@ -357,6 +383,7 @@ bludgeoning weapons against anything he comes across.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 1
+BodyProfile: 1
 E
 #11527
 enormously troll~
@@ -370,6 +397,7 @@ slaughter.  He looks your way.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 1
+BodyProfile: 1
 E
 #11528
 doom priest guild guardian~
@@ -385,6 +413,7 @@ entrance.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 1
+BodyProfile: 1
 E
 #11529
 lamb~
@@ -397,6 +426,7 @@ A small lamb is here looking for little boo peek.
 3 19 8 0d0+30 1d2+0
 30 900
 8 8 0
+BodyProfile: 2
 E
 #11530
 little bow peek~
@@ -422,6 +452,7 @@ A very small white bird is perched here.
 30 900
 8 8 2
 BareHandAttack: 8
+BodyProfile: 4
 Str: 9
 Dex: 20
 Int: 20
@@ -439,6 +470,7 @@ A small black fish swims here.
 30 900
 8 8 0
 BareHandAttack: 1
+BodyProfile: 13
 Str: 3
 Dex: 3
 Int: 3
@@ -455,6 +487,7 @@ A small piglet dashes around.
 3 19 8 0d0+30 1d2+0
 30 900
 8 8 0
+BodyProfile: 2
 E
 #11539
 snake~
@@ -468,6 +501,7 @@ A small snake lurks here waiting for something to eat.
 30 900
 8 8 0
 BareHandAttack: 4
+BodyProfile: 3
 Str: 25
 Dex: 25
 Int: 3
@@ -486,6 +520,7 @@ himself without friends to hide behind.
 30 900
 8 8 1
 BareHandAttack: 10
+BodyProfile: 1
 Str: 25
 Dex: 3
 Int: 3
@@ -503,6 +538,7 @@ A large purple toad squats here.
 30 900
 8 8 0
 BareHandAttack: 12
+BodyProfile: 2
 E
 #11563
 goblin~
@@ -517,6 +553,7 @@ smell him from here.
 30 900
 8 8 1
 BareHandAttack: 7
+BodyProfile: 1
 Str: 20
 Dex: 16
 Int: 9
@@ -534,6 +571,7 @@ The ghost of a monk who died in an unfair game of politics haunts this room fore
 70 4900
 8 8 0
 BareHandAttack: 10
+BodyProfile: 0
 E
 #11575
 troll small~
@@ -548,6 +586,7 @@ underestimated.
 70 4900
 8 8 0
 BareHandAttack: 1
+BodyProfile: 1
 Str: 3
 Dex: 20
 Int: 20
@@ -581,6 +620,7 @@ A wounded monk is scrunched up here in the corner.
 70 4900
 8 8 1
 BareHandAttack: 10
+BodyProfile: 1
 Str: 25
 Dex: 25
 Int: 20
@@ -597,5 +637,6 @@ A very large orc is here dead.
 3 19 8 0d0+30 1d2+0
 30 900
 0 0 1
+BodyProfile: 1
 E
 $

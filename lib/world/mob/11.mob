@@ -11,6 +11,7 @@ darkest thing in the room.
 33 9 -9 6d6+100 5d5+5
 0 0
 8 8 0
+BodyProfile: 0
 E
 T 1101
 T 1104
@@ -45,6 +46,7 @@ steely eyes are bright but cold, glimmering with a strange blue fire.
 500 90000
 8 8 1
 BareHandAttack: 8
+BodyProfile: 6
 E
 #1103
 pale queen~
@@ -61,6 +63,7 @@ for all eternity.
 28 11 -6 5d5+280 4d4+4
 280 78400
 8 8 2
+BodyProfile: 1
 E
 #1104
 white-haired king~
@@ -77,6 +80,7 @@ in his own abode.
 25 12 -5 5d5+250 4d4+4
 250 62500
 8 8 1
+BodyProfile: 1
 E
 #1105
 icy princess~
@@ -93,6 +97,7 @@ bejewelled.
 25 12 -5 5d5+250 4d4+4
 250 62500
 8 8 2
+BodyProfile: 1
 E
 #1199
 tester card player dealer~

@@ -61,6 +61,7 @@ only his fierce yellow eyes piercingly obvious.
 17 15 0 3d3+170 2d2+2
 170 28900
 8 8 1
+BodyProfile: 2
 E
 T 1909
 #1904
@@ -76,6 +77,7 @@ only his fierce yellow eyes piercingly obvious.
 17 15 0 3d3+170 2d2+2
 170 28900
 8 8 1
+BodyProfile: 2
 E
 T 1965
 #1905
@@ -92,6 +94,7 @@ are still squinted shut as though asleep.
 0 4900
 8 8 0
 BareHandAttack: 4
+BodyProfile: 2
 E
 #1906
 Lizard King lizard king enormously tall man~
@@ -106,6 +109,7 @@ side to side, and his cruel black eyes seem extraordinarily intelligent.
 19 14 -1 3d3+190 3d3+3
 500 43320
 8 8 1
+BodyProfile: 2
 E
 #1907
 bullywug subleader xlead~
@@ -137,6 +141,7 @@ the look in its tiny beaded eyes.
 0 10000
 8 8 0
 BareHandAttack: 4
+BodyProfile: 4
 E
 T 1901
 #1909
@@ -154,6 +159,7 @@ cannot serve as a hiding place from this predator.
 0 14400
 8 8 2
 BareHandAttack: 4
+BodyProfile: 5
 E
 #1910
 hairy spider~
@@ -170,6 +176,7 @@ cannot serve as a hiding place from this predator.
 0 10000
 8 8 0
 BareHandAttack: 4
+BodyProfile: 5
 E
 T 1910
 #1911
@@ -187,6 +194,7 @@ new meal.
 0 22500
 8 8 0
 BareHandAttack: 4
+BodyProfile: 5
 E
 #1912
 bolas spider~
@@ -203,6 +211,7 @@ its calculating eyes.
 0 22500
 8 8 0
 BareHandAttack: 4
+BodyProfile: 5
 E
 T 1914
 #1913
@@ -220,6 +229,7 @@ this creature.
 0 28900
 8 8 0
 BareHandAttack: 4
+BodyProfile: 5
 E
 #1914
 flat spider~
@@ -236,6 +246,7 @@ with the urge to kill.
 0 28900
 8 8 0
 BareHandAttack: 4
+BodyProfile: 5
 E
 #1915
 widow spider~
@@ -252,6 +263,7 @@ bite could be worse than most.
 0 28900
 8 8 0
 BareHandAttack: 4
+BodyProfile: 5
 E
 T 1913
 #1916
@@ -268,6 +280,7 @@ hide stands out strikingly.
 0 32400
 8 8 0
 BareHandAttack: 4
+BodyProfile: 5
 E
 T 1902
 #1917
@@ -284,6 +297,7 @@ pincers are slick with fresh blood, its eyes look almost murderously hungry.
 0 32400
 8 8 0
 BareHandAttack: 4
+BodyProfile: 5
 E
 T 1911
 #1918
@@ -300,6 +314,7 @@ and ready for striking as its body stays tense for a leap.
 0 22500
 8 8 0
 BareHandAttack: 4
+BodyProfile: 5
 E
 #1919
 funnel spider~
@@ -315,6 +330,7 @@ in the dark, this spider is probably all but blind in sunlight.
 0 32400
 8 8 0
 BareHandAttack: 4
+BodyProfile: 5
 E
 #1920
 crab spider~
@@ -330,6 +346,7 @@ eyes survey the surroundings, burning with a fierce predatory lust.
 0 22500
 8 8 0
 BareHandAttack: 4
+BodyProfile: 5
 E
 #1921
 trapdoor spider~
@@ -346,6 +363,7 @@ dark eyes easily betray its presence.
 0 36100
 8 8 0
 BareHandAttack: 4
+BodyProfile: 5
 E
 #1922
 water spider~
@@ -362,6 +380,7 @@ water.
 0 36100
 8 8 0
 BareHandAttack: 4
+BodyProfile: 5
 E
 T 1903
 #1923
@@ -379,6 +398,7 @@ at will from its mouth.
 0 36100
 8 8 0
 BareHandAttack: 4
+BodyProfile: 5
 E
 T 1918
 #1924
@@ -395,6 +415,7 @@ capturing and entangling unobservant prey.
 0 28900
 8 8 0
 BareHandAttack: 4
+BodyProfile: 5
 E
 T 1925
 #1925
@@ -413,6 +434,7 @@ alike.
 200 40000
 8 8 0
 BareHandAttack: 4
+BodyProfile: 5
 E
 T 1912
 T 1916
@@ -431,6 +453,7 @@ and two blood red eyes peer effortlessly through the dark.
 230 52900
 8 8 2
 BareHandAttack: 4
+BodyProfile: 5
 E
 T 1922
 #1936
@@ -447,6 +470,7 @@ they glow vaguely red, casting his regal features in an eerie crimson hue.
 23 13 -3 4d4+230 3d3+3
 230 52900
 8 8 1
+BodyProfile: 1
 E
 T 1936
 T 1938
@@ -465,6 +489,7 @@ eerily.
 23 13 -3 4d4+230 3d3+3
 230 52900
 8 8 2
+BodyProfile: 1
 E
 T 1946
 #1938
@@ -498,6 +523,7 @@ rock to rock.
 0 3600
 8 8 0
 BareHandAttack: 4
+BodyProfile: 2
 E
 T 1956
 #1940
@@ -514,6 +540,7 @@ metallic veins sparkling as they catch the light.
 0 400
 8 8 0
 BareHandAttack: 4
+BodyProfile: 10
 E
 T 1963
 #1941
@@ -531,6 +558,7 @@ wise gray eyes twinkling with a stubborn humor.
 17 15 0 3d3+170 2d2+2
 170 28900
 8 8 1
+BodyProfile: 1
 E
 T 1964
 T 1966
@@ -550,6 +578,7 @@ kind.
 0 36100
 8 8 0
 BareHandAttack: 4
+BodyProfile: 5
 E
 #1943
 spider ball~
@@ -562,6 +591,7 @@ It looks unfinished.
 1 20 9 0d0+10 1d2+0
 10 100
 8 8 0
+BodyProfile: 5
 E
 #1997
 sexy stripper~
@@ -593,6 +623,7 @@ from two cut-out sockets.
 1 20 0 0d0+10 1d2+0
 10 100
 8 8 1
+BodyProfile: 1
 E
 T 1932
 T 1933

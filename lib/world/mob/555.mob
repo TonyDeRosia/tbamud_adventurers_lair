@@ -11,6 +11,7 @@ hundreds of annoying insects.
 10 100
 8 8 0
 BareHandAttack: 1
+BodyProfile: 0
 E
 #55501
 bat~
@@ -25,6 +26,7 @@ creature usually travels in flocks, so WATCH OUT.
 10 100
 8 8 0
 BareHandAttack: 8
+BodyProfile: 19
 E
 #55502
 shepherd man~
@@ -40,6 +42,7 @@ was once a warrior.
 2 20 8 0d0+20 1d2+0
 20 400
 8 8 1
+BodyProfile: 1
 E
 #55503
 girl child~
@@ -53,6 +56,7 @@ of her culture to be humble.  She jumps rope and looks up at you expectantly.
 1 20 9 0d0+10 1d2+0
 10 100
 8 8 2
+BodyProfile: 1
 E
 #55504
 sheep~
@@ -67,6 +71,7 @@ white fleece.
 10 100
 8 8 0
 BareHandAttack: 4
+BodyProfile: 2
 E
 #55505
 Katrina woman shepherd~
@@ -82,6 +87,7 @@ New Magincia.
 5 19 7 1d1+50 1d2+0
 50 2500
 8 8 2
+BodyProfile: 1
 SavingPara: 1
 SavingRod: 1
 SavingPetri: 1
@@ -102,6 +108,7 @@ seems to be rabid, so beware its teeth.
 50 2500
 8 8 0
 BareHandAttack: 4
+BodyProfile: 2
 SavingPara: 1
 SavingRod: 1
 SavingPetri: 1
@@ -121,6 +128,7 @@ scrolls, and other scraps.  Its glistening teeth drip with poison.
 60 3600
 8 8 0
 BareHandAttack: 4
+BodyProfile: 5
 SavingPara: 1
 SavingRod: 1
 SavingPetri: 1
@@ -140,6 +148,7 @@ returns to his study.
 6 18 6 1d1+60 1d2+1
 60 3600
 8 8 1
+BodyProfile: 1
 SavingPara: 1
 SavingRod: 1
 SavingPetri: 1
@@ -158,6 +167,7 @@ of Truth.  His head is bowed over a book, but power radiates from him.
 20 14 -2 4d4+200 3d3+3
 200 40000
 8 8 1
+BodyProfile: 1
 Str: 13
 Dex: 13
 Int: 13
@@ -183,6 +193,7 @@ to the virtue of Honesty.
 8 18 5 1d1+80 1d2+1
 80 6400
 8 8 2
+BodyProfile: 1
 SavingPara: 2
 SavingRod: 2
 SavingPetri: 2
@@ -202,6 +213,7 @@ friends.  As you look at it you wonder how these things reproduce.
 70 4900
 8 8 0
 BareHandAttack: 9
+BodyProfile: 12
 SavingPara: 1
 SavingRod: 1
 SavingPetri: 1
@@ -221,6 +233,7 @@ beer and the distinctive taste of human.
 90 8100
 8 8 1
 BareHandAttack: 1
+BodyProfile: 3
 SavingPara: 2
 SavingRod: 2
 SavingPetri: 2
@@ -241,6 +254,7 @@ practiced jaw muscles can be very dangerous.
 150 22500
 8 8 1
 BareHandAttack: 6
+BodyProfile: 2
 SavingPara: 3
 SavingRod: 3
 SavingPetri: 3
@@ -261,6 +275,7 @@ Compassion, but in his spare time he sings and dances.
 9 17 4 1d1+90 1d2+1
 90 8100
 8 8 1
+BodyProfile: 1
 SavingPara: 2
 SavingRod: 2
 SavingPetri: 2
@@ -279,6 +294,7 @@ out guv, give him a few coins.
 8 18 5 1d1+80 1d2+1
 80 6400
 8 8 1
+BodyProfile: 1
 SavingPara: 2
 SavingRod: 2
 SavingPetri: 2
@@ -300,6 +316,7 @@ bottle for you.
 12 16 2 2d2+120 2d2+2
 120 14400
 8 8 1
+BodyProfile: 1
 SavingPara: 3
 SavingRod: 3
 SavingPetri: 3
@@ -320,6 +337,7 @@ hat jingle merrily.
 25 12 -5 5d5+250 4d4+4
 250 62500
 8 8 1
+BodyProfile: 1
 Str: 16
 Dex: 16
 Int: 16
@@ -345,6 +363,7 @@ a good party.
 9 17 4 1d1+90 1d2+1
 90 8100
 8 8 1
+BodyProfile: 1
 SavingPara: 2
 SavingRod: 2
 SavingPetri: 2
@@ -365,6 +384,7 @@ drunks up and leads them out the door.
 25 12 -5 5d5+250 4d4+4
 250 62500
 8 8 2
+BodyProfile: 1
 Str: 16
 Dex: 16
 Int: 16
@@ -390,6 +410,7 @@ scratches its armpits.  It travels in herds and is a coward.
 110 12100
 8 8 1
 BareHandAttack: 3
+BodyProfile: 1
 SavingPara: 2
 SavingRod: 2
 SavingPetri: 2
@@ -409,6 +430,7 @@ then you, his meaty arms swing a club at you.
 130 16900
 8 8 1
 BareHandAttack: 9
+BodyProfile: 1
 SavingPara: 3
 SavingRod: 3
 SavingPetri: 3
@@ -447,6 +469,7 @@ with nature, he has gained power.
 14 16 1 2d2+140 2d2+2
 140 19600
 8 8 1
+BodyProfile: 1
 SavingPara: 3
 SavingRod: 3
 SavingPetri: 3
@@ -466,6 +489,7 @@ at you, her hard eyes only judge, seeking Justice.
 14 16 1 2d2+140 2d2+2
 140 19600
 8 8 2
+BodyProfile: 1
 SavingPara: 3
 SavingRod: 3
 SavingPetri: 3
@@ -487,6 +511,7 @@ hands.
 25 12 -5 5d5+250 4d4+4
 250 62500
 8 8 1
+BodyProfile: 1
 Str: 16
 Dex: 16
 Int: 16
@@ -512,6 +537,7 @@ life into a corner.
 16 15 0 3d3+160 2d2+2
 160 25600
 8 8 2
+BodyProfile: 1
 SavingPara: 4
 SavingRod: 4
 SavingPetri: 4
@@ -530,6 +556,7 @@ done to him.  You glimpse light shining off something in his hands.
 11 17 3 2d2+110 1d2+1
 110 12100
 8 8 1
+BodyProfile: 1
 SavingPara: 2
 SavingRod: 2
 SavingPetri: 2
@@ -548,6 +575,7 @@ took many guards and druids to restrain this beast.
 14 16 1 2d2+140 2d2+2
 140 19600
 8 8 1
+BodyProfile: 1
 SavingPara: 3
 SavingRod: 3
 SavingPetri: 3
@@ -567,6 +595,7 @@ strolls the street, sure of his Virtue.
 13 16 2 2d2+130 2d2+2
 130 16900
 8 8 1
+BodyProfile: 1
 SavingPara: 3
 SavingRod: 3
 SavingPetri: 3
@@ -586,6 +615,7 @@ for advice.  His advice to you is to kick back and enjoy a drink.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 1
+BodyProfile: 1
 SavingPara: 2
 SavingRod: 2
 SavingPetri: 2
@@ -737,6 +767,7 @@ Lord of Serpent Hold, courage itself solidified into a human form.
 25 12 -5 5d5+250 4d4+4
 250 62500
 8 8 1
+BodyProfile: 3
 Str: 16
 Dex: 16
 Int: 16
@@ -863,6 +894,7 @@ cannot hurt this one.
 30 10 -8 6d6+300 5d5+5
 300 90000
 8 8 2
+BodyProfile: 1
 Str: 18
 Dex: 18
 Int: 18
@@ -914,6 +946,7 @@ annoying C terms.
 200 40000
 8 8 0
 BareHandAttack: 8
+BodyProfile: 6
 Str: 13
 Dex: 13
 Int: 13
@@ -940,6 +973,7 @@ battalion.
 20 14 -2 4d4+200 3d3+3
 200 40000
 8 8 1
+BodyProfile: 1
 Str: 13
 Dex: 13
 Int: 13
@@ -965,6 +999,7 @@ of attack to get the dragon.
 25 12 -5 5d5+250 4d4+4
 250 62500
 8 8 1
+BodyProfile: 1
 Str: 16
 Dex: 16
 Int: 16
@@ -1017,6 +1052,7 @@ overpowering.
 250 62500
 8 8 1
 BareHandAttack: 8
+BodyProfile: 1
 Str: 16
 Dex: 16
 Int: 16
@@ -1041,6 +1077,7 @@ some responsibility.
 25 12 -5 5d5+250 4d4+4
 250 62500
 8 8 1
+BodyProfile: 0
 Str: 16
 Dex: 16
 Int: 16
@@ -1065,6 +1102,7 @@ to you.
 25 12 -5 5d5+250 4d4+4
 250 62500
 8 8 1
+BodyProfile: 0
 Str: 16
 Dex: 16
 Int: 16
@@ -1090,6 +1128,7 @@ white teeth, perhaps from its nightly meals of flesh and bone.
 23 13 -3 4d4+230 3d3+3
 230 52900
 8 8 0
+BodyProfile: 1
 Str: 15
 Dex: 15
 Int: 15
@@ -1165,6 +1204,7 @@ Spirituality.
 25 12 -5 5d5+250 4d4+4
 250 62500
 8 8 1
+BodyProfile: 1
 Str: 16
 Dex: 16
 Int: 16
@@ -1216,6 +1256,7 @@ the joy of meeting him.
 30 10 -8 6d6+300 5d5+5
 300 90000
 8 8 1
+BodyProfile: 1
 Str: 18
 Dex: 18
 Int: 18
@@ -1342,6 +1383,7 @@ British.  In seeing this done he is completely armored and wields a heavy blade.
 25 12 -5 5d5+250 4d4+4
 250 62500
 8 8 1
+BodyProfile: 1
 Str: 16
 Dex: 16
 Int: 16
@@ -1419,6 +1461,7 @@ crown jewels.  These hold power both figuratively and literally.
 32 10 -9 6d6+320 5d5+5
 320 102400
 8 8 1
+BodyProfile: 1
 Str: 18
 Dex: 18
 Int: 18
@@ -1442,6 +1485,7 @@ The shark smells blood.
 21 13 -2 4d4+210 3d3+3
 210 44100
 8 8 1
+BodyProfile: 13
 Str: 14
 Dex: 14
 Int: 14
@@ -1492,6 +1536,7 @@ fear as it grabs for you.
 210 44100
 8 8 0
 BareHandAttack: 2
+BodyProfile: 18
 Str: 14
 Dex: 14
 Int: 14
@@ -1515,6 +1560,7 @@ The Armorer stands here.
 32 10 -9 6d6+320 5d5+5
 320 102400
 8 8 1
+BodyProfile: 1
 Str: 18
 Dex: 18
 Int: 18

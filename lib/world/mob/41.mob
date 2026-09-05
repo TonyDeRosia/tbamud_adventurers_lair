@@ -10,6 +10,7 @@ his way with magic.
 13 16 2 2d2+130 2d2+2
 130 16900
 8 8 1
+BodyProfile: 1
 E
 T 4100
 #4101
@@ -23,6 +24,7 @@ A large mean-looking troll is here.
 12 16 2 2d2+120 2d2+2
 120 14400
 8 8 1
+BodyProfile: 1
 E
 #4102
 snake~
@@ -36,6 +38,7 @@ coiled into a tight circle hissing at you.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 1
+BodyProfile: 3
 E
 T 4000
 #4103
@@ -50,6 +53,7 @@ gold too...
 8 18 5 1d1+80 1d2+1
 80 6400
 8 8 1
+BodyProfile: 1
 E
 T 4101
 #4104
@@ -63,6 +67,7 @@ A ugly orc is standing here.
 7 18 5 1d1+70 1d2+1
 70 4900
 8 8 1
+BodyProfile: 1
 E
 #4105
 centipede~
@@ -87,6 +92,7 @@ A human warrior is here.  He has a evil grin in his face.
 9 17 4 1d1+90 1d2+1
 90 8100
 8 8 1
+BodyProfile: 1
 E
 #4107
 kobold~

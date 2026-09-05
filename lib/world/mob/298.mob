@@ -38,6 +38,7 @@ truth.  But, remember, even a little lag can be a big problem.
 4 19 7 0d0+40 1d2+0
 40 1600
 8 8 1
+BodyProfile: 1
 E
 #29804
 keeper lag monster~
@@ -52,6 +53,7 @@ you seen that lag?  Master will have my head if I don't find him.  '
 3 19 8 0d0+30 1d2+0
 30 900
 8 8 1
+BodyProfile: 1
 E
 #29805
 court jester~
@@ -65,6 +67,7 @@ mix up a batch of something or other.
 5 19 7 1d1+50 1d2+0
 50 2500
 8 8 0
+BodyProfile: 1
 E
 #29806
 crawler creepy lag thing~
@@ -91,6 +94,7 @@ You would feel sorry for it, but it is moving in to attack!
 4 19 7 0d0+40 1d2+0
 40 1600
 8 8 0
+BodyProfile: 1
 E
 #29808
 quasit imp lag thing~
@@ -133,6 +137,7 @@ a chance to bring death to any who cross its path.
 6 18 6 1d1+60 1d2+1
 60 3600
 8 8 0
+BodyProfile: 0
 E
 #29811
 annoying lag jerk~
@@ -216,6 +221,7 @@ His armor is shiny and black.  He stands ready to give his life for the Crown.
 6 18 6 1d1+60 1d2+1
 60 3600
 8 8 1
+BodyProfile: 1
 E
 #29817
 royalty guard~
@@ -229,6 +235,7 @@ could very well be your doom should you tangle with him!
 27 11 -6 5d5+270 4d4+4
 270 72900
 8 8 0
+BodyProfile: 1
 E
 #29818
 black knight~
@@ -242,6 +249,7 @@ behind his visor in vengeance.
 18 14 0 3d3+180 3d3+3
 180 32400
 8 8 0
+BodyProfile: 1
 E
 #29819
 white knight~
@@ -255,6 +263,7 @@ behind his visor in joy.
 18 14 0 3d3+180 3d3+3
 180 32400
 8 8 0
+BodyProfile: 1
 E
 #29820
 dungeon master~
@@ -282,6 +291,7 @@ already be dead.
 30 10 -8 6d6+300 5d5+5
 300 90000
 8 8 0
+BodyProfile: 1
 E
 #29822
 king~
@@ -295,5 +305,6 @@ and you are not.
 30 10 -8 6d6+300 5d5+5
 300 90000
 8 8 0
+BodyProfile: 1
 E
 $

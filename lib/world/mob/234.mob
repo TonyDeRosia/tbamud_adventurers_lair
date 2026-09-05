@@ -10,6 +10,7 @@ She is very pleased to see you.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 2
+BodyProfile: 1
 E
 #23401
 newbie training mob~
@@ -64,6 +65,7 @@ to be unusually strong.
 20 400
 8 8 2
 BareHandAttack: 8
+BodyProfile: 2
 E
 #23405
 Brownie~
@@ -147,6 +149,7 @@ have been in a battle or two.  He has a kind looking face.
 10 17 4 2d2+100 1d2+1
 100 10000
 8 8 1
+BodyProfile: 1
 E
 #23495
 Brownie~

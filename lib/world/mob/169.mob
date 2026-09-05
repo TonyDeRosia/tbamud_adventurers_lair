@@ -13,6 +13,7 @@ wild black mane, almost covering it's pointed ears.
 30 900
 8 8 1
 BareHandAttack: 14
+BodyProfile: 1
 Int: 5
 E
 #16901
@@ -28,6 +29,7 @@ for fresh meat to fill it's savage belly until the next kill.
 30 900
 8 8 2
 BareHandAttack: 9
+BodyProfile: 2
 E
 #16902
 gibberling shifty~
@@ -42,6 +44,7 @@ creatures' beady black eyes.
 3 19 8 0d0+30 1d2+0
 30 900
 8 8 0
+BodyProfile: 1
 Int: 15
 E
 #16903
@@ -59,6 +62,7 @@ warriors.
 3 19 8 0d0+30 1d2+0
 30 900
 8 8 1
+BodyProfile: 1
 E
 #16904
 gibberling mutant~
@@ -73,6 +77,7 @@ vicious creatures.  Even the other gibberlings seem to avoid contact with it.
 3 19 8 0d0+30 1d2+0
 30 900
 8 8 1
+BodyProfile: 1
 Int: 5
 Wis: 5
 E
@@ -91,6 +96,7 @@ drain some of your lifeforce, to replenish his own horrifying being.
 7 18 5 1d1+70 1d2+1
 70 4900
 6 8 1
+BodyProfile: 1
 Str: 14
 Dex: 8
 Int: 6
@@ -111,6 +117,7 @@ razor-sharp teeth!
 30 900
 8 8 2
 BareHandAttack: 4
+BodyProfile: 1
 Str: 10
 Dex: 7
 Wis: 5
@@ -130,6 +137,7 @@ materials in sight!
 30 900
 8 8 2
 BareHandAttack: 9
+BodyProfile: 1
 Int: 3
 Wis: 3
 E
@@ -149,6 +157,7 @@ among the savage hordes of gibberlings.
 70 4900
 8 8 0
 BareHandAttack: 12
+BodyProfile: 1
 Wis: 15
 E
 #16909
@@ -163,6 +172,7 @@ to be in a playful mood.
 3 19 8 0d0+30 1d2+0
 30 900
 8 8 1
+BodyProfile: 2
 Int: 18
 E
 #16921
@@ -181,6 +191,7 @@ cave.
 70 4900
 8 8 1
 BareHandAttack: 10
+BodyProfile: 1
 Dex: 4
 Int: 3
 Wis: 4

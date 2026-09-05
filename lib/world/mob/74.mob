@@ -12,6 +12,7 @@ scents of the nearby blossoms.
 30 900
 8 8 0
 BareHandAttack: 1
+BodyProfile: 4
 E
 #7401
 disheveled boy~
@@ -28,6 +29,7 @@ you look on, he wanders around, digging holes in the carefully maintained lawn.
 30 900
 8 8 1
 BareHandAttack: 13
+BodyProfile: 1
 Str: 8
 Dex: 15
 Int: 9
@@ -49,6 +51,7 @@ ground.
 30 900
 8 8 2
 BareHandAttack: 4
+BodyProfile: 1
 E
 T 7402
 #7403
@@ -83,6 +86,7 @@ honest labor.
 30 900
 8 8 1
 BareHandAttack: 13
+BodyProfile: 1
 Str: 15
 Dex: 8
 Int: 10
@@ -102,6 +106,7 @@ the unhearing tomb.
 3 19 8 0d0+30 1d2+0
 30 900
 8 8 1
+BodyProfile: 1
 E
 T 7405
 #7406
@@ -117,6 +122,7 @@ for the loss of her poor, sweet child.
 3 19 8 0d0+30 1d2+0
 30 900
 8 8 2
+BodyProfile: 1
 E
 T 7406
 #7407
@@ -148,6 +154,7 @@ In time, she turns and moves on in search of another plot.
 30 900
 8 8 2
 BareHandAttack: 8
+BodyProfile: 1
 E
 T 7408
 #7409
@@ -165,6 +172,7 @@ off the soft grass.
 30 900
 8 8 1
 BareHandAttack: 7
+BodyProfile: 1
 E
 T 7409
 #7410
@@ -181,6 +189,7 @@ thong is wrapped around one leg, apparently for carrying messages.
 30 900
 5 5 0
 BareHandAttack: 8
+BodyProfile: 4
 E
 #7411
 ancient groundskeeper wizened old woman~
@@ -196,6 +205,7 @@ with a long, ashwood staff.
 3 19 8 0d0+30 1d2+0
 30 900
 8 8 2
+BodyProfile: 1
 E
 T 7411
 #7412
@@ -212,6 +222,7 @@ he lurks here, watching everyone.
 3 19 8 0d0+30 1d2+0
 30 900
 8 8 1
+BodyProfile: 1
 Str: 12
 Dex: 17
 Int: 12
@@ -232,6 +243,7 @@ wounds and crisp, blackened skin.  Even its armor is seared and burned.
 30 900
 8 8 0
 BareHandAttack: 8
+BodyProfile: 1
 Str: 18
 Dex: 6
 Int: 3
@@ -251,6 +263,7 @@ seems more a forgotten past than legend made to live again.
 3 19 8 0d0+30 1d2+0
 30 900
 8 8 0
+BodyProfile: 1
 E
 #7415
 bones lord mycea skeleton~
@@ -265,6 +278,7 @@ light rest inside the sockets of his skull.
 3 19 8 0d0+30 1d2+0
 30 900
 8 8 0
+BodyProfile: 1
 E
 #7416
 frightening apparition ghost fennywen~
@@ -281,6 +295,7 @@ circumstances.
 30 900
 8 8 0
 BareHandAttack: 4
+BodyProfile: 0
 E
 #7417
 mourner black~
