@@ -2949,7 +2949,7 @@ void mag_assign_spells(void) {
   TAR_CHAR_ROOM, FALSE, MAG_AFFECTS, "You feel less protected.");
 
   spello(SPELL_BLESS, "bless", 35, 5, 3, POS_STANDING,
-  TAR_CHAR_ROOM | TAR_OBJ_INV, FALSE, MAG_AFFECTS | MAG_ALTER_OBJS,
+  TAR_CHAR_ROOM | TAR_OBJ_INV | TAR_OBJ_EQUIP, FALSE, MAG_AFFECTS | MAG_ALTER_OBJS,
       "You feel less righteous.");
 
   spello(SPELL_BLINDNESS, "blindness", 35, 25, 1, POS_STANDING,

@@ -1908,12 +1908,12 @@ static void perform_remove(struct char_data *ch, int pos)
     log("SYSERR: perform_remove: bad pos %d passed.", pos);
     /*  This error occurs when perform_remove() is passed a bad 'pos'
      *  (location) to remove an object from. */
-  else if (OBJ_FLAGGED(obj, ITEM_NODROP) && !PRF_FLAGGED(ch, PRF_NOHASSLE))
+  else if (OBJ_FLAGGED(obj, ITEM_NODROP) && GET_LEVEL(ch) < LVL_IMMORT && !PRF_FLAGGED(ch, PRF_NOHASSLE))
     act("You can't remove $p, it must be CURSED!", FALSE, ch, obj, 0, TO_CHAR);
-  else if (IS_CARRYING_N(ch) >= CAN_CARRY_N(ch)&& !PRF_FLAGGED(ch, PRF_NOHASSLE))
+  else if (IS_CARRYING_N(ch) >= CAN_CARRY_N(ch) && GET_LEVEL(ch) < LVL_IMMORT && !PRF_FLAGGED(ch, PRF_NOHASSLE))
     act("$p: you can't carry that many items!", FALSE, ch, obj, 0, TO_CHAR);
   else {
-    if (!remove_otrigger(obj, ch))
+    if (GET_LEVEL(ch) < LVL_IMMORT && !remove_otrigger(obj, ch))
       return;
 
     obj_to_char(unequip_char(ch, pos), ch);

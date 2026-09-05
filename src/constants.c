@@ -727,7 +727,12 @@ cpp_extern const struct dex_skill_type dex_app_skill[] = {
   {20, 25, 15, 20, 20},
   {25, 25, 15, 20, 20},
   {25, 30, 15, 25, 25},
-  {25, 30, 15, 25, 25}		/* dex = 25 */
+  {25, 30, 15, 25, 25},		/* dex = 25 */
+  {25, 30, 15, 25, 25},		/* dex = 26 */
+  {25, 30, 15, 25, 25},		/* dex = 27 */
+  {25, 30, 15, 25, 25},		/* dex = 28 */
+  {25, 30, 15, 25, 25},		/* dex = 29 */
+  {25, 30, 15, 25, 25}		/* dex = 30 */
 };
 
 /** Dexterity attribute affects.
@@ -758,7 +763,12 @@ cpp_extern const struct dex_app_type dex_app[] = {
   {4, 4, -5},
   {4, 4, -5},
   {5, 5, -6},
-  {5, 5, -6}		/* dex = 25 */
+  {5, 5, -6},		/* dex = 25 */
+  {5, 5, -6},		/* dex = 26 */
+  {5, 5, -6},		/* dex = 27 */
+  {5, 5, -6},		/* dex = 28 */
+  {5, 5, -6},		/* dex = 29 */
+  {5, 5, -6}		/* dex = 30 */
 };
 
 /** Constitution attribute affects.
@@ -789,7 +799,12 @@ cpp_extern const struct con_app_type con_app[] = {
   {5},
   {5},
   {6},
-  {6}		/* con = 25 */
+  {6},		/* con = 25 */
+  {6},		/* con = 26 */
+  {6},		/* con = 27 */
+  {6},		/* con = 28 */
+  {6},		/* con = 29 */
+  {6}		/* con = 30 */
 };
 
 /** Intelligence attribute affects.
@@ -820,7 +835,12 @@ cpp_extern const struct int_app_type int_app[] = {
   {57},
   {58},
   {59},
-  {60}		/* int = 25 */
+  {60},		/* int = 25 */
+  {60},		/* int = 26 */
+  {60},		/* int = 27 */
+  {60},		/* int = 28 */
+  {60},		/* int = 29 */
+  {60}		/* int = 30 */
 };
 
 /** Wisdom attribute affects.
@@ -851,7 +871,12 @@ cpp_extern const struct wis_app_type wis_app[] = {
   {6},
   {7},
   {7},
-  {7}  /* wis = 25 */
+  {7},  /* wis = 25 */
+  {7},  /* wis = 26 */
+  {7},  /* wis = 27 */
+  {7},  /* wis = 28 */
+  {7},  /* wis = 29 */
+  {7}  /* wis = 30 */
 };
 
 /** Define a set of opposite directions from the cardinal directions. */

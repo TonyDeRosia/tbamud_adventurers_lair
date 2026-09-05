@@ -1672,6 +1672,321 @@ ACMD(do_load)
     send_to_char(ch, "That'll have to be either 'obj' or 'mob'.\r\n");
 }
 
+static struct char_data *admin_find_loaded_char(struct char_data *ch, char *name)
+{
+  struct char_data *vict;
+
+  if (!name || !*name)
+    return NULL;
+
+  vict = get_char_vis(ch, name, NULL, FIND_CHAR_WORLD);
+  if (!vict)
+    vict = get_char(name);
+
+  return vict;
+}
+
+static int admin_split_confiscate_args(char *argument, char *thing, size_t thing_sz,
+                                       char *target, size_t target_sz)
+{
+  char buf[MAX_INPUT_LENGTH];
+  char *end, *split;
+
+  if (!argument || !thing || !target || thing_sz == 0 || target_sz == 0)
+    return FALSE;
+
+  skip_spaces(&argument);
+  if (!*argument)
+    return FALSE;
+
+  strlcpy(buf, argument, sizeof(buf));
+
+  end = buf + strlen(buf);
+  while (end > buf && isspace((unsigned char)end[-1]))
+    --end;
+  *end = '\0';
+
+  split = end;
+  while (split > buf && !isspace((unsigned char)split[-1]))
+    --split;
+
+  if (split == buf)
+    return FALSE;
+
+  strlcpy(target, split, target_sz);
+
+  while (split > buf && isspace((unsigned char)split[-1]))
+    --split;
+  *split = '\0';
+
+  if (!*buf || !*target)
+    return FALSE;
+
+  strlcpy(thing, buf, thing_sz);
+  return TRUE;
+}
+
+static struct obj_data *admin_find_obj_on_char(struct char_data *vict, char *argument,
+                                               int *wear_pos)
+{
+  struct obj_data *obj;
+  char name[MAX_INPUT_LENGTH];
+  char *search;
+  int number, i;
+
+  if (wear_pos)
+    *wear_pos = -1;
+
+  if (!vict || !argument || !*argument)
+    return NULL;
+
+  strlcpy(name, argument, sizeof(name));
+  search = name;
+  number = get_number(&search);
+
+  if (number < 1 || !*search)
+    return NULL;
+
+  /* Worn objects first so cursed equipment can be confiscated directly. */
+  for (i = 0; i < NUM_WEARS; i++) {
+    obj = GET_EQ(vict, i);
+    if (obj && isname(search, obj->name) && --number == 0) {
+      if (wear_pos)
+        *wear_pos = i;
+      return obj;
+    }
+  }
+
+  for (obj = vict->carrying; obj; obj = obj->next_content) {
+    if (isname(search, obj->name) && --number == 0)
+      return obj;
+  }
+
+  return NULL;
+}
+
+static void admin_save_confiscation(struct char_data *ch, struct char_data *vict)
+{
+  if (vict && !IS_NPC(vict))
+    save_char(vict);
+  if (ch && !IS_NPC(ch))
+    save_char(ch);
+}
+
+ACMD(do_confiscate)
+{
+  struct char_data *vict;
+  struct obj_data *obj;
+  char thing[MAX_INPUT_LENGTH], target[MAX_INPUT_LENGTH];
+  int wear_pos = -1;
+
+  if (!admin_split_confiscate_args(argument, thing, sizeof(thing),
+                                    target, sizeof(target))) {
+    send_to_char(ch,
+      "Usage: confiscate <object|gold|bank|diamonds|glory> <target>\r\n");
+    return;
+  }
+
+  if (!(vict = admin_find_loaded_char(ch, target))) {
+    send_to_char(ch, "%s", CONFIG_NOPERSON);
+    return;
+  }
+
+  if (vict == ch) {
+    send_to_char(ch, "Confiscating from yourself would accomplish nothing.\r\n");
+    return;
+  }
+
+  if (!str_cmp(thing, "gold") || !str_cmp(thing, "money") || !str_cmp(thing, "coins")) {
+    long long amount = (long long)GET_GOLD(vict);
+
+    if (amount <= 0) {
+      send_to_char(ch, "%s has no carried gold to confiscate.\r\n", GET_NAME(vict));
+      return;
+    }
+
+    increase_money_gold(vict, -amount);
+    increase_money_gold(ch, amount);
+    admin_save_confiscation(ch, vict);
+
+    send_to_char(ch, "You confiscate %lld gold from %s.\r\n", amount, GET_NAME(vict));
+    send_to_char(vict, "%s confiscates %lld gold from you.\r\n", GET_NAME(ch), amount);
+    mudlog(BRF, MAX(LVL_IMMORT, GET_INVIS_LEV(ch)), TRUE,
+           "(GC) %s confiscated %lld gold from %s.",
+           GET_NAME(ch), amount, GET_NAME(vict));
+    return;
+  }
+
+  if (!str_cmp(thing, "bank") || !str_cmp(thing, "bankgold")) {
+    long long amount = (long long)GET_BANK_GOLD(vict);
+
+    if (amount <= 0) {
+      send_to_char(ch, "%s has no banked gold to confiscate.\r\n", GET_NAME(vict));
+      return;
+    }
+
+    increase_bank_gold(vict, -amount);
+    increase_bank_gold(ch, amount);
+    admin_save_confiscation(ch, vict);
+
+    send_to_char(ch, "You confiscate %lld banked gold from %s.\r\n", amount, GET_NAME(vict));
+    send_to_char(vict, "%s confiscates %lld of your banked gold.\r\n", GET_NAME(ch), amount);
+    mudlog(BRF, MAX(LVL_IMMORT, GET_INVIS_LEV(ch)), TRUE,
+           "(GC) %s confiscated %lld banked gold from %s.",
+           GET_NAME(ch), amount, GET_NAME(vict));
+    return;
+  }
+
+  if (!str_cmp(thing, "diamond") || !str_cmp(thing, "diamonds")) {
+    int amount = GET_DIAMONDS(vict);
+
+    if (amount <= 0) {
+      send_to_char(ch, "%s has no diamonds to confiscate.\r\n", GET_NAME(vict));
+      return;
+    }
+
+    decrease_diamonds(vict, amount);
+    increase_diamonds(ch, amount);
+    admin_save_confiscation(ch, vict);
+
+    send_to_char(ch, "You confiscate %d diamonds from %s.\r\n", amount, GET_NAME(vict));
+    send_to_char(vict, "%s confiscates %d diamonds from you.\r\n", GET_NAME(ch), amount);
+    mudlog(BRF, MAX(LVL_IMMORT, GET_INVIS_LEV(ch)), TRUE,
+           "(GC) %s confiscated %d diamonds from %s.",
+           GET_NAME(ch), amount, GET_NAME(vict));
+    return;
+  }
+
+  if (!str_cmp(thing, "glory")) {
+    int amount = GET_GLORY(vict);
+
+    if (amount <= 0) {
+      send_to_char(ch, "%s has no Glory to confiscate.\r\n", GET_NAME(vict));
+      return;
+    }
+
+    if (GET_GLORY(ch) > INT_MAX - amount) {
+      send_to_char(ch, "You cannot hold that much Glory.\r\n");
+      return;
+    }
+
+    GET_GLORY(vict) = 0;
+    GET_GLORY(ch) += amount;
+    admin_save_confiscation(ch, vict);
+
+    send_to_char(ch, "You confiscate %d Glory from %s.\r\n", amount, GET_NAME(vict));
+    send_to_char(vict, "%s confiscates %d Glory from you.\r\n", GET_NAME(ch), amount);
+    mudlog(BRF, MAX(LVL_IMMORT, GET_INVIS_LEV(ch)), TRUE,
+           "(GC) %s confiscated %d Glory from %s.",
+           GET_NAME(ch), amount, GET_NAME(vict));
+    return;
+  }
+
+  obj = admin_find_obj_on_char(vict, thing, &wear_pos);
+  if (!obj) {
+    send_to_char(ch, "%s does not have '%s'.\r\n", GET_NAME(vict), thing);
+    return;
+  }
+
+  /*
+   * This is an administrative seizure, not a normal remove/get/give action.
+   * It intentionally bypasses NODROP, KEPT, wear legality, carry capacity,
+   * and object triggers.
+   */
+  if (wear_pos >= 0) {
+    obj = unequip_char(vict, wear_pos);
+    if (!obj) {
+      send_to_char(ch, "Unable to remove that equipped object.\r\n");
+      return;
+    }
+  } else {
+    obj_from_char(obj);
+  }
+
+  obj_to_char(obj, ch);
+  admin_save_confiscation(ch, vict);
+
+  send_to_char(ch, "You confiscate %s from %s.\r\n",
+               GET_OBJ_SHORT(obj), GET_NAME(vict));
+  send_to_char(vict, "%s confiscates %s from you.\r\n",
+               GET_NAME(ch), GET_OBJ_SHORT(obj));
+  mudlog(BRF, MAX(LVL_IMMORT, GET_INVIS_LEV(ch)), TRUE,
+         "(GC) %s confiscated object %s from %s.",
+         GET_NAME(ch), GET_OBJ_SHORT(obj), GET_NAME(vict));
+}
+
+ACMD(do_smite)
+{
+  struct char_data *vict;
+  char arg[MAX_INPUT_LENGTH];
+
+  one_argument(argument, arg);
+
+  if (!*arg) {
+    send_to_char(ch, "Smite whom?\r\n");
+    return;
+  }
+
+  if (!(vict = admin_find_loaded_char(ch, arg))) {
+    send_to_char(ch, "%s", CONFIG_NOPERSON);
+    return;
+  }
+
+  if (GET_HIT(vict) <= 0) {
+    send_to_char(ch, "%s is already at or below zero health.\r\n", GET_NAME(vict));
+    return;
+  }
+
+  GET_HIT(vict) = 1;
+  update_pos(vict);
+
+  send_to_char(ch, "You smite %s, leaving %s at 1 HP.\r\n",
+               GET_NAME(vict), HMHR(vict));
+  if (vict != ch)
+    send_to_char(vict, "%s smites you, leaving you at 1 HP.\r\n", GET_NAME(ch));
+
+  mudlog(BRF, MAX(LVL_IMMORT, GET_INVIS_LEV(ch)), TRUE,
+         "(GC) %s smote %s to 1 HP.", GET_NAME(ch), GET_NAME(vict));
+
+  if (!IS_NPC(vict))
+    save_char(vict);
+}
+
+ACMD(do_slay)
+{
+  struct char_data *vict;
+  char arg[MAX_INPUT_LENGTH];
+  char victim_name[MAX_INPUT_LENGTH];
+
+  one_argument(argument, arg);
+
+  if (!*arg) {
+    send_to_char(ch, "Slay whom?\r\n");
+    return;
+  }
+
+  if (!(vict = admin_find_loaded_char(ch, arg))) {
+    send_to_char(ch, "%s", CONFIG_NOPERSON);
+    return;
+  }
+
+  strlcpy(victim_name, GET_NAME(vict), sizeof(victim_name));
+
+  mudlog(BRF, MAX(LVL_IMMORT, GET_INVIS_LEV(ch)), TRUE,
+         "(GC) %s slew %s.", GET_NAME(ch), victim_name);
+
+  if (vict == ch) {
+    send_to_char(ch, "You slay yourself.\r\n");
+    raw_kill(vict, ch);
+    return;
+  }
+
+  send_to_char(ch, "You slay %s instantly.\r\n", victim_name);
+  send_to_char(vict, "%s slays you instantly.\r\n", GET_NAME(ch));
+  act("$n slays $N with a word of command.", FALSE, ch, 0, vict, TO_NOTVICT);
+
+  raw_kill(vict, ch);
+}
 ACMD(do_cleanse_admin)
 {
   struct char_data *vict = ch;

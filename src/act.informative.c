@@ -108,6 +108,7 @@ enum aura_display_flag {
   AURA_BLUE_OBJ,
   AURA_GLOW_OBJ,
   AURA_HUM_OBJ,
+  AURA_INVIS_OBJ,
   AURA_KEEP_OBJ,
   AURA_MAGIC_OBJ,
   AURA_CURSED_OBJ,
@@ -324,7 +325,8 @@ static void build_player_kept_marker(struct obj_data *obj, struct char_data *ch,
   if (!out || outsz == 0)
     return;
 
-  out[0] = '\0';
+  build_obj_aura_tags(obj, ch, out, outsz, FALSE);
+
   if (obj && OBJ_FLAGGED(obj, ITEM_KEPT))
     out_append(out, outsz, "\tr[Kept]\tn ");
 }
@@ -1050,6 +1052,7 @@ const char *get_aura_color(int aura_flag)
     case AURA_BLUE_OBJ:   return BBLU;
     case AURA_GLOW_OBJ:   return BYEL;
     case AURA_HUM_OBJ:    return BCYN;
+    case AURA_INVIS_OBJ:  return KBLU;
     case AURA_KEEP_OBJ:   return BRED;
     case AURA_MAGIC_OBJ:  return BBLU;
     case AURA_CURSED_OBJ: return KWHT;
@@ -1125,11 +1128,15 @@ static void build_obj_aura_tags(struct obj_data *obj, struct char_data *ch, char
   if (include_item_tag)
     append_colored_aura_tag(ch, out, outsz, AURA_ITEM, "(Item)");
 
-  if (OBJ_FLAGGED(obj, ITEM_MAGIC) && AFF_FLAGGED(ch, AFF_DETECT_MAGIC))
+  if (OBJ_FLAGGED(obj, ITEM_MAGIC))
     append_colored_aura_tag(ch, out, outsz, AURA_MAGIC_OBJ, shortflags ? "(M)" : "(Magic)");
 
-  if (OBJ_FLAGGED(obj, ITEM_BLESS) && AFF_FLAGGED(ch, AFF_DETECT_ALIGN))
-    append_colored_aura_tag(ch, out, outsz, AURA_BLUE_OBJ, shortflags ? "(B)" : "(Blue Aura)");
+  if (OBJ_FLAGGED(obj, ITEM_BLESS)) {
+    if (shortflags)
+      append_colored_aura_tag(ch, out, outsz, AURA_BLUE_OBJ, "(B)");
+    else
+      out_append(out, outsz, "\tY(\tCB\tYl\tCe\tYs\tCs\tY)\tn ");
+  }
 
   if (OBJ_FLAGGED(obj, ITEM_GLOW))
     append_colored_aura_tag(ch, out, outsz, AURA_GLOW_OBJ, shortflags ? "(G)" : "(Glow)");
@@ -1138,11 +1145,16 @@ static void build_obj_aura_tags(struct obj_data *obj, struct char_data *ch, char
     append_colored_aura_tag(ch, out, outsz, AURA_HUM_OBJ, shortflags ? "(H)" : "(Hum)");
 
   if (OBJ_FLAGGED(obj, ITEM_INVISIBLE))
-    append_colored_aura_tag(ch, out, outsz, AURA_INVIS, shortflags ? "(I)" : "(Invis)");
+    append_colored_aura_tag(ch, out, outsz, AURA_INVIS_OBJ, shortflags ? "(I)" : "(Invisible)");
 
-  if (OBJ_FLAGGED(obj, ITEM_NODROP))
-    append_colored_aura_tag(ch, out, outsz, shortflags ? AURA_KEEP_OBJ : AURA_CURSED_OBJ,
-                            shortflags ? "(K)" : "(Cursed)");
+  if (OBJ_FLAGGED(obj, ITEM_NODROP)) {
+    if (shortflags)
+      append_colored_aura_tag(ch, out, outsz, AURA_KEEP_OBJ, "(K)");
+    else if (clr(ch, C_NRM))
+      out_append(out, outsz, "\tD(C\twu\tDrs\twe\tDd)\tn ");
+    else
+      out_append(out, outsz, "(Cursed) ");
+  }
 
   if (OBJ_FLAGGED(obj, ITEM_ANTI_GOOD))
     append_colored_aura_tag(ch, out, outsz, AURA_RED, shortflags ? "(R)" : "(Red Aura)");

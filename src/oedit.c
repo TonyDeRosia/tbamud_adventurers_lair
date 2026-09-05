@@ -1010,7 +1010,17 @@ void oedit_parse(struct descriptor_data *d, char *arg)
     } else if (number == 0)
       break;
     else {
-      TOGGLE_BIT_AR(GET_OBJ_EXTRA(OLC_OBJ(d)), oedit_extra_flag_from_menu_choice(number));
+      int extra_flag = oedit_extra_flag_from_menu_choice(number);
+
+      TOGGLE_BIT_AR(GET_OBJ_EXTRA(OLC_OBJ(d)), extra_flag);
+
+      /* OBJECT_BLESS_CURSE_OEDIT_EXCLUSIVE:
+       * Bless and Curse are opposing object states and may not coexist. */
+      if (extra_flag == ITEM_BLESS && OBJ_FLAGGED(OLC_OBJ(d), ITEM_BLESS))
+        REMOVE_BIT_AR(GET_OBJ_EXTRA(OLC_OBJ(d)), ITEM_NODROP);
+      else if (extra_flag == ITEM_NODROP && OBJ_FLAGGED(OLC_OBJ(d), ITEM_NODROP))
+        REMOVE_BIT_AR(GET_OBJ_EXTRA(OLC_OBJ(d)), ITEM_BLESS);
+
       oedit_disp_extra_menu(d);
       return;
     }

@@ -967,9 +967,17 @@ void check_killer(struct char_data *ch, struct char_data *vict)
     GET_NAME(ch), GET_NAME(vict), world[IN_ROOM(vict)].name);
 }
 
+static int npc_cannot_attack_immortal(struct char_data *attacker, struct char_data *victim)
+{
+  return attacker && victim && IS_NPC(attacker) && !IS_NPC(victim) &&
+         GET_LEVEL(victim) >= LVL_IMMORT;
+}
+
 /* start one char fighting another (yes, it is horrible, I know... )  */
 void set_fighting(struct char_data *ch, struct char_data *vict)
 {
+  if (npc_cannot_attack_immortal(ch, vict))
+    return;
   if (ch == vict)
     return;
   /* Entering real combat breaks mobile concealment.  This is centralized here
@@ -1231,6 +1239,8 @@ void death_cry(struct char_data *ch)
 
 void raw_kill(struct char_data * ch, struct char_data * killer)
 {
+  if (npc_cannot_attack_immortal(killer, ch))
+    return;
   end_character_control(ch);
 struct char_data *i;
 
@@ -1996,6 +2006,11 @@ void dual_skill_attack(struct char_data *ch, struct char_data *victim, int type)
 
 int damage(struct char_data *ch, struct char_data *victim, int dam, int attacktype)
 {
+  if (npc_cannot_attack_immortal(ch, victim)) {
+    if (FIGHTING(ch) == victim)
+      stop_fighting(ch);
+    return 0;
+  }
   if (!control_attack_allowed(ch, victim)) return 0;
   /* OFFHAND DAMAGE SCALE */
   if (g_offhand_attack) {
@@ -2549,6 +2564,11 @@ static int compute_thaco(struct char_data *ch, struct char_data *victim)
 
 void hit(struct char_data *ch, struct char_data *victim, int type)
 {
+  if (npc_cannot_attack_immortal(ch, victim)) {
+    if (FIGHTING(ch) == victim)
+      stop_fighting(ch);
+    return;
+  }
   if (!control_attack_allowed(ch, victim)) return;
   struct obj_data *wielded = GET_EQ(ch, WEAR_WIELD);
   int w_type, attacker_hit, defender_evasion, hit_chance, dam;

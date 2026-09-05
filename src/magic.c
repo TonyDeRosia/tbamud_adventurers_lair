@@ -1935,6 +1935,10 @@ void mag_unaffects(int level, struct char_data *ch, struct char_data *victim,
     act(to_room, TRUE, victim, 0, ch, TO_ROOM);
 }
 
+enum {
+  OBJ_BLESS_OVER_CURSE_CHANCE = 75,
+  OBJ_CURSE_OVER_BLESS_CHANCE = 25
+};
 void mag_alter_objs(int level, struct char_data *ch, struct obj_data *obj,
 		         int spellnum, int savetype)
 {
@@ -1945,18 +1949,64 @@ void mag_alter_objs(int level, struct char_data *ch, struct obj_data *obj,
 
   switch (spellnum) {
     case SPELL_BLESS:
-      if (!OBJ_FLAGGED(obj, ITEM_BLESS) &&
-	  (GET_OBJ_WEIGHT(obj) <= 5 * GET_LEVEL(ch))) {
-	SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_BLESS);
-	to_char = "$p glows briefly.";
+      /* OBJECT_BLESS_CURSE_CONTEST_BLESS:
+       * Bless is favored when overturning an existing object curse, but
+       * retains the normal object-weight restriction. */
+      if (GET_OBJ_WEIGHT(obj) <= 5 * GET_LEVEL(ch)) {
+        if (OBJ_FLAGGED(obj, ITEM_NODROP)) {
+          if (rand_number(1, 100) <= OBJ_BLESS_OVER_CURSE_CHANCE) {
+            REMOVE_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_NODROP);
+            if (GET_OBJ_TYPE(obj) == ITEM_WEAPON)
+              GET_OBJ_VAL(obj, 2)++;
+
+            if (!OBJ_FLAGGED(obj, ITEM_BLESS))
+              SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_BLESS);
+
+            to_char = "$p blazes blue-white as the blessing overwhelms its curse.";
+          } else {
+            /* Resolve a legacy both-flags object in favor of the defending
+             * Curse when Bless loses the contest. */
+            REMOVE_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_BLESS);
+            to_char = "$p flickers blue-white, but the curse holds.";
+          }
+        } else if (!OBJ_FLAGGED(obj, ITEM_BLESS)) {
+          SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_BLESS);
+          to_char = "$p glows briefly.";
+        }
       }
       break;
+
     case SPELL_CURSE:
-      if (!OBJ_FLAGGED(obj, ITEM_NODROP)) {
-	SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_NODROP);
-	if (GET_OBJ_TYPE(obj) == ITEM_WEAPON)
-	  GET_OBJ_VAL(obj, 2)--;
-	to_char = "$p briefly glows red.";
+      /* OBJECT_BLESS_CURSE_CONTEST_CURSE:
+       * Curse is disadvantaged when overturning an existing Bless. */
+      if (OBJ_FLAGGED(obj, ITEM_BLESS)) {
+        if (rand_number(1, 100) <= OBJ_CURSE_OVER_BLESS_CHANCE) {
+          REMOVE_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_BLESS);
+
+          if (!OBJ_FLAGGED(obj, ITEM_NODROP)) {
+            SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_NODROP);
+            if (GET_OBJ_TYPE(obj) == ITEM_WEAPON)
+              GET_OBJ_VAL(obj, 2)--;
+          }
+
+          to_char = "$p flashes red as the curse smothers its blessing.";
+        } else {
+          /* Resolve a legacy both-flags object in favor of the defending
+           * Bless when Curse loses the contest. */
+          if (OBJ_FLAGGED(obj, ITEM_NODROP)) {
+            REMOVE_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_NODROP);
+            if (GET_OBJ_TYPE(obj) == ITEM_WEAPON)
+              GET_OBJ_VAL(obj, 2)++;
+          }
+
+          to_char = "$p shines blue-white and repels the curse.";
+        }
+      } else if (!OBJ_FLAGGED(obj, ITEM_NODROP)) {
+        SET_BIT_AR(GET_OBJ_EXTRA(obj), ITEM_NODROP);
+        if (GET_OBJ_TYPE(obj) == ITEM_WEAPON)
+          GET_OBJ_VAL(obj, 2)--;
+
+        to_char = "$p briefly glows red.";
       }
       break;
     case SPELL_INVISIBLE:

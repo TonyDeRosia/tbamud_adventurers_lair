@@ -767,15 +767,17 @@ do                                                              \
 #define GET_SHIMMER_COOLDOWN_UNTIL(ch) CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->shimmer_cooldown_until))
 #define GET_HP_LAST_ROUND(ch) CHECK_PLAYER_SPECIAL((ch), ((ch)->player_specials->hp_last_round))
 
-/** Return the equivalent strength of ch if ch has level 18 strength. */
+/** Safe lookup index for the legacy strength application table.
+ * Modern effective STR may reach 30. Rows 26-30 in str_app are reserved
+ * for true legacy 18/xx values, so ordinary numeric STR above 25 uses the
+ * stat-25 legacy-table row while GET_STR(ch) itself remains 26-30. */
 #define STRENGTH_APPLY_INDEX(ch) \
-        ( ((GET_ADD(ch) ==0) || (GET_STR(ch) != 18)) ? GET_STR(ch) :\
-          (GET_ADD(ch) <= 50) ? 26 :( \
-          (GET_ADD(ch) <= 75) ? 27 :( \
-          (GET_ADD(ch) <= 90) ? 28 :( \
-          (GET_ADD(ch) <= 99) ? 29 :  30 ) ) )                   \
-        )
-
+        ( ((GET_STR(ch) == 18) && (GET_ADD(ch) > 0)) ? \
+          ((GET_ADD(ch) <= 50) ? 26 : \
+           (GET_ADD(ch) <= 75) ? 27 : \
+           (GET_ADD(ch) <= 90) ? 28 : \
+           (GET_ADD(ch) <= 99) ? 29 : 30) : \
+          MAX(0, MIN(GET_STR(ch), 25)) )
 /** Return how much weight ch can carry. */
 #define CAN_CARRY_W(ch) (str_app[STRENGTH_APPLY_INDEX(ch)].carry_w)
 /** Return how many items ch can carry. */

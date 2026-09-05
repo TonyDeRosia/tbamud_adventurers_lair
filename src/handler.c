@@ -341,15 +341,6 @@ void affect_total(struct char_data *ch)
   ch->aff_abils.wis   = MAX(0, MIN(ch->aff_abils.wis,   EFFECTIVE_STAT_CAP));
   ch->aff_abils.cha   = MAX(0, MIN(ch->aff_abils.cha,   EFFECTIVE_STAT_CAP));
 
-  /* Convert mortal strength beyond 18 into exceptional strength. */
-  if (!(IS_NPC(ch) || GET_LEVEL(ch) >= LVL_GRGOD)) {
-    if (GET_STR(ch) > 18) {
-      i = GET_ADD(ch) + ((GET_STR(ch) - 18) * 10);
-      GET_ADD(ch) = MIN(i, 100);
-      GET_STR(ch) = 18;
-    }
-  }
-
   clamp_mana_to_effective_max(ch);
   clamp_move_to_effective_max(ch);
   if (GET_HIT(ch) > GET_MAX_HIT(ch))
