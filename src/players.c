@@ -595,7 +595,21 @@ int load_char(const char *name, struct char_data *ch)
 
       case 'C':
 	     if (!strcmp(tag, "Cha "))	ch->real_abils.cha	= atoi(line);
-	else if (!strcmp(tag, "Clas"))	GET_CLASS(ch)		= atoi(line);
+        else if (!strcmp(tag, "Clas")) {
+          char *class_end;
+          long stored_class = strtol(line, &class_end, 10);
+          bool class_missing = (class_end == line);
+          while (isspace((unsigned char)*class_end)) class_end++;
+          if (class_missing || *class_end || stored_class < 0 ||
+              stored_class >= NUM_CLASSES || !is_valid_class((int)stored_class)) {
+            mudlog(NRM, LVL_GOD, TRUE,
+                   "SYSERR: Refusing player file %s: retired/invalid PC class %s; staff must correct the class. No migration performed.", filename, line);
+            GET_CLASS(ch) = CLASS_UNDEFINED;
+            fclose(fl);
+            return LOAD_CHAR_INVALID_CLASS;
+          }
+          GET_CLASS(ch) = (int)stored_class;
+        }
 	else if (!strcmp(tag, "Con "))	ch->real_abils.con	= atoi(line);
 	else if (!strcmp(tag, "Clan"))	GET_CLAN_ID(ch)		= atoi(line);
 	else if (!strcmp(tag, "Clrk"))	GET_CLAN_RANK(ch)	= atoi(line);
@@ -857,7 +871,6 @@ int load_char(const char *name, struct char_data *ch)
 
   /* Keep any existing characters in sync with their class spell/skill lists. */
   ensure_class_abilities(ch);
-  classtrack_ensure_study_skill(ch);
 
   if (!*GET_SOFT_CLASS_TITLE(ch))
     strlcpy(GET_SOFT_CLASS_TITLE(ch), "Adventurer", sizeof(ch->player_specials->saved.soft_class_title));
@@ -891,7 +904,7 @@ int save_char(struct char_data * ch)
   struct obj_data *char_eq[NUM_WEARS];
   trig_data *t;
 
-  if (IS_NPC(ch) || GET_PFILEPOS(ch) < 0)
+  if (IS_NPC(ch) || GET_PFILEPOS(ch) < 0 || !is_valid_class(GET_CLASS(ch)))
     return FALSE;
 
   /* Keep ordinary location persistence separate from the administrator-set

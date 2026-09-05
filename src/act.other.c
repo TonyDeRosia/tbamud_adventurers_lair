@@ -346,6 +346,11 @@ void show_ability_table_aligned(struct char_data *ch, int show_spells, int show_
   struct abil_row rows[TOP_SPELL_DEFINE + 1];
   int n = 0;
 
+  if (!is_valid_class(cls)) {
+    send_to_char(ch, "Your class requires administrative correction.\r\n");
+    return;
+  }
+
   send_to_char(ch, "%s:\r\n", show_spells ? "SPELLS" : "SKILLS");
 
   /* Collect rows */
@@ -360,10 +365,13 @@ void show_ability_table_aligned(struct char_data *ch, int show_spells, int show_
       if (!is_skill_id(i)) continue;
     }
 
+    /* Legacy Study percentages are not authorization. */
+    if (i == SKILL_STUDY && !character_has_ability_access(ch, i))
+      continue;
     lvl = spell_info[i].min_level[cls];
-    if (i == SKILL_STUDY && (lvl <= 0 || lvl >= LVL_IMMORT))
-      lvl = 1;
     lvl = classtrack_get_study_display_level(ch, i, lvl);
+    if (has_tome_ability(ch, i))
+      lvl = classtrack_get_study_display_level(ch, i, 1);
     if (lvl <= 0) continue;
 
     if (show_all && lvl >= LVL_IMMORT) continue;
@@ -491,15 +499,6 @@ void show_ability_table_aligned(struct char_data *ch, int show_spells, int show_
     return;
   }
 
-}
-
-static void show_adventurer_study_catalog(struct char_data *ch, int show_spells, const char *filter)
-{
-  send_to_char(ch,
-               "As an Adventurer, your future abilities are not defined by a fixed class list.\r\n"
-               "Use STUDY <ability> to pursue new techniques.\r\n");
-  send_to_char(ch, "Known %s:\r\n", show_spells ? "spells" : "skills");
-  show_ability_table_aligned(ch, show_spells, 0, filter);
 }
 
 static void show_ability_filter_help(struct char_data *ch, const char *cmd_name)
@@ -1326,10 +1325,6 @@ ACMD(do_skills)
     strlcpy(filter, arg, sizeof(filter));
 
   send_to_char(ch, "You have %d practice sessions remaining.\r\n", GET_PRACTICES(ch));
-  if (show_all && !GET_CLASS_LOCKED(ch)) {
-    show_adventurer_study_catalog(ch, 0, filter);
-    return;
-  }
   if (show_all)
     send_to_char(ch, "Showing all skills your class can learn at any level.\r\n");
   show_ability_table_aligned(ch, 0, show_all, filter);
@@ -1887,13 +1882,14 @@ ACMD(do_study)
     }
   }
 
-  if (study_is_on_cooldown(ch, now)) {
-    send_to_char(ch, "You need a moment to gather your thoughts before studying again.\r\n");
+  if (GET_LEVEL(ch) < LVL_IMMORT &&
+      (!character_has_ability_access(ch, SKILL_STUDY) || GET_SKILL(ch, SKILL_STUDY) <= 0)) {
+    send_to_char(ch, "You do not yet know how to Study abilities. You must learn Study from a Tome.\r\n");
     return;
   }
 
-  if (GET_SKILL(ch, SKILL_STUDY) <= 0) {
-    send_to_char(ch, "You do not yet understand how to study new techniques.\r\n");
+  if (study_is_on_cooldown(ch, now)) {
+    send_to_char(ch, "You need a moment to gather your thoughts before studying again.\r\n");
     return;
   }
 
@@ -3529,10 +3525,6 @@ ACMD(do_spells)
     strlcpy(filter, arg, sizeof(filter));
 
   send_to_char(ch, "You have %d practice sessions remaining.\r\n", GET_PRACTICES(ch));
-  if ((show_all || subcmd == 1) && !GET_CLASS_LOCKED(ch)) {
-    show_adventurer_study_catalog(ch, 1, filter);
-    return;
-  }
   if (show_all || subcmd == 1)
     send_to_char(ch, "Showing all spells your class can learn at any level.\r\n");
   show_ability_table_aligned(ch, 1, show_all, filter);

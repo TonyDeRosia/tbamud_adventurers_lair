@@ -121,14 +121,18 @@ static int can_character_practice_ability(struct char_data *ch, int ability_id)
   int is_reactive_identity;
   int required_level;
 
-  if (!ch || IS_NPC(ch))
+  if (!ch || IS_NPC(ch) || !is_valid_class(GET_CLASS(ch)))
     return FALSE;
 
   if (ability_id < 1 || ability_id > MAX_SKILLS)
     return FALSE;
 
+  /* Stored legacy proficiency/learned levels cannot authorize Study. */
+  if (ability_id == SKILL_STUDY && !character_has_ability_access(ch, ability_id))
+    return FALSE;
+
   learned_at = GET_STUDY_LEARN_LEVEL(ch, ability_id);
-  is_reactive_identity = (GET_CLASS(ch) == CLASS_ADVENTURER) || (learned_at > 0);
+  is_reactive_identity = (learned_at > 0);
 
   if (GET_SKILL(ch, ability_id) > 0) {
     if (has_tome_ability(ch, ability_id))

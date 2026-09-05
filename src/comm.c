@@ -471,7 +471,10 @@ void copyover_recover()
 
     /* Player file not found?! */
     if (!fOld) {
-      write_to_descriptor (desc, "\n\rSomehow, your character was lost in the copyover. Sorry.\n\r");
+      if (player_i == LOAD_CHAR_INVALID_CLASS)
+        write_to_descriptor(desc, "\r\nYour character has a retired or invalid class. Contact an administrator; your saved character is unchanged.\r\n");
+      else
+        write_to_descriptor (desc, "\n\rSomehow, your character was lost in the copyover. Sorry.\n\r");
       close_socket (d);
     } else {
       write_to_descriptor (desc, "\n\rCopyover recovery complete.\n\r");

@@ -65,7 +65,7 @@ static int can_character_cast_known_spell(struct char_data *ch, int spellnum)
   int is_reactive_identity;
   int required_level;
 
-  if (!ch || IS_NPC(ch))
+  if (!ch || IS_NPC(ch) || !is_valid_class(GET_CLASS(ch)))
     return FALSE;
 
   if (spellnum < 1 || spellnum > MAX_SPELLS)
@@ -78,7 +78,7 @@ static int can_character_cast_known_spell(struct char_data *ch, int spellnum)
     return TRUE;
 
   learned_at = GET_STUDY_LEARN_LEVEL(ch, spellnum);
-  is_reactive_identity = (GET_CLASS(ch) == CLASS_ADVENTURER) || (learned_at > 0);
+  is_reactive_identity = (learned_at > 0);
 
   if (is_reactive_identity) {
     required_level = classtrack_get_study_display_level(ch, spellnum, 1);
@@ -1102,6 +1102,8 @@ static struct syllable syls[] = { { " ", " " }, { "ar", "abra" },
         "y", "l" }, { "z", "k" }, { "", "" } };
 
 static int mag_manacost(struct char_data *ch, int spellnum) {
+  if (!IS_NPC(ch) && !is_valid_class(GET_CLASS(ch)))
+    return SINFO.mana_max;
   int mana = MAX(SINFO.mana_max - (SINFO.mana_change *
       (GET_LEVEL(ch) - SINFO.min_level[(int) GET_CLASS(ch)])),
   SINFO.mana_min);
@@ -2854,6 +2856,7 @@ void spell_level(int spell, int chclass, int level) {
   } else if (chclass >= class_count) {
     log("SYSERR: assigning '%s' to class %d, which is outside num_pc_classes (%d).",
         skill_name(spell), chclass, class_count);
+    bad = 1;
   }
 
   if (level < 1 || level > LVL_IMPL) {

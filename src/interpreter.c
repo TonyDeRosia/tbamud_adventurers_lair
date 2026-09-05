@@ -2271,6 +2271,19 @@ if (PLR_FLAGGED(d->character, PLR_DELETED)) {
           STATE(d) = CON_PASSWORD;
         }
       } else {
+        if (player_i == LOAD_CHAR_INVALID_CLASS) {
+          d->acct_roster_load_only = 0;
+          free_char(d->character);
+          d->character = NULL;
+          write_to_output(d, "\r\nThis character has a retired or invalid class. Contact an administrator to choose a supported class. Your saved character has not been changed.\r\n");
+          if (d->acct_authed) {
+            STATE(d) = CON_ACCT_MENU;
+            acct_show_character_menu(d);
+          } else {
+            STATE(d) = CON_CLOSE;
+          }
+          return;
+        }
         if (d->acct_roster_load_only) {
           mudlog(CMP, LVL_IMPL, TRUE,
                  "Account roster load failed for %s: load-result=%d, index-position=%ld, expected-account=%ld, loaded-account=none, in-use-elsewhere=0, conflicting-descriptor=none, conflicting-state=none, self-descriptor-excluded=yes",

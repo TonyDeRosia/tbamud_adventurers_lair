@@ -1462,6 +1462,8 @@ static int can_equip_weapon(struct char_data *ch, struct obj_data *obj, int wher
     if (is_two_hander(obj))
       WEAPON_REJECT("A two-handed weapon cannot be used in your offhand.\r\n");
     if (!IS_NPC(ch)) {
+      if (!is_valid_class(GET_CLASS(ch)))
+        WEAPON_REJECT("Your class requires administrative correction.\r\n");
       dual_level = spell_info[SKILL_DUAL_WIELD].min_level[(int)GET_CLASS(ch)];
       if (dual_level >= LVL_IMMORT && GET_LEVEL(ch) < LVL_IMMORT)
         WEAPON_REJECT("Your class cannot learn Dual Wield.\r\n");

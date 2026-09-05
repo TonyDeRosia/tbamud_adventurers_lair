@@ -8,6 +8,7 @@
 #include "spells.h"
 #include "db.h"
 #include "tome.h"
+#include "class.h"
 
 int tome_valid_ability(int ability)
 {
@@ -22,7 +23,7 @@ int has_tome_ability(const struct char_data *ch, int ability)
 
 int character_has_ability_access(const struct char_data *ch, int ability)
 {
-  if (!ch || ability < 1 || ability > TOP_SPELL_DEFINE)
+  if (!ch || !is_valid_class(GET_CLASS(ch)) || ability < 1 || ability > TOP_SPELL_DEFINE)
     return FALSE;
   if (GET_LEVEL(ch) >= LVL_IMMORT || has_tome_ability(ch, ability))
     return TRUE;
@@ -31,7 +32,7 @@ int character_has_ability_access(const struct char_data *ch, int ability)
 
 int get_ability_class_affinity(const struct char_data *ch, int ability)
 {
-  if (!ch || ability < 1 || ability > TOP_SPELL_DEFINE)
+  if (!ch || !is_valid_class(GET_CLASS(ch)) || ability < 1 || ability > TOP_SPELL_DEFINE)
     return 0;
   return spell_info[ability].min_level[(int)GET_CLASS(ch)] < LVL_IMMORT ? 100 : TOME_DEFAULT_OFFCLASS_AFFINITY;
 }
@@ -68,26 +69,35 @@ void tome_format_remaining(time_t until, char *buf, size_t buflen)
   else snprintf(buf, buflen, "%ld seconds", seconds);
 }
 
+/* Missing authorization is new learning even when a stale percentage survives.
+ * Native known abilities and existing Tome grants still provide nothing new. */
+static int tome_can_grant_ability(const struct char_data *ch, int ability)
+{
+  return ability && !has_tome_ability(ch, ability) &&
+      (GET_SKILL(ch, ability) <= 0 || !character_has_ability_access(ch, ability));
+}
+
 int tome_study_object(struct char_data *ch, struct obj_data *obj)
 {
   int i, learned = 0;
   char why[MAX_INPUT_LENGTH], remaining[128];
   time_t now = time(NULL);
   if (IS_NPC(ch)) { send_to_char(ch, "Only players may study tomes.\r\n"); return FALSE; }
+  if (!is_valid_class(GET_CLASS(ch))) { send_to_char(ch, "Your class requires administrative correction.\r\n"); return FALSE; }
   if (!tome_validate(obj, why, sizeof(why))) { send_to_char(ch, "%s\r\n", why); return FALSE; }
   if (GET_LEVEL(ch) < LVL_IMMORT && GET_TOME_STUDY_EXPIRES_AT(ch) > now) {
     tome_format_remaining(GET_TOME_STUDY_EXPIRES_AT(ch), remaining, sizeof(remaining));
     send_to_char(ch, "Your mind is still strained from your previous studies.\r\nYou may study another tome in %s.\r\n", remaining); return FALSE;
   }
-  for (i = 0; i < TOME_ABILITY_SLOTS; i++) if (GET_OBJ_VAL(obj, i) && !has_tome_ability(ch, GET_OBJ_VAL(obj, i)) && GET_SKILL(ch, GET_OBJ_VAL(obj, i)) <= 0) learned++;
+  for (i = 0; i < TOME_ABILITY_SLOTS; i++) if (tome_can_grant_ability(ch, GET_OBJ_VAL(obj, i))) learned++;
   if (!learned) { send_to_char(ch, "You find nothing within this tome that you have not already mastered.\r\n"); return FALSE; }
   send_to_char(ch, "You study %s and absorb its lore:\r\n", obj->short_description);
   for (i = 0; i < TOME_ABILITY_SLOTS; i++) {
     int ability = GET_OBJ_VAL(obj, i);
-    if (!ability || (has_tome_ability(ch, ability) || GET_SKILL(ch, ability) > 0)) continue;
+    if (!tome_can_grant_ability(ch, ability)) continue;
     SET_TOME_ABILITY(ch, ability);
     if (GET_SKILL(ch, ability) <= 0) SET_SKILL(ch, ability, 1);
-    send_to_char(ch, "  %s [%s] at 1%%\r\n", spell_info[ability].name, ability <= MAX_SPELLS ? "Spell" : "Skill");
+    send_to_char(ch, "  %s [%s] at %d%%\r\n", spell_info[ability].name, ability <= MAX_SPELLS ? "Spell" : "Skill", GET_SKILL(ch, ability));
   }
   GET_TOME_STUDY_EXPIRES_AT(ch) = now + obj->tome_cooldown_seconds;
   extract_obj(obj);

@@ -24,7 +24,6 @@ int classtrack_get_ability_archetype(int ability_id);
 int classtrack_can_study_ability(struct char_data *ch, int ability_id);
 int classtrack_get_study_min_level(int ability_id);
 int classtrack_is_study_catalog_ability(int ability_id, int show_spells);
-void classtrack_ensure_study_skill(struct char_data *ch);
 void classtrack_record_study_learn_level(struct char_data *ch, int ability_id, int learned_level);
 int classtrack_get_study_display_level(struct char_data *ch, int ability_id, int fallback_level);
 

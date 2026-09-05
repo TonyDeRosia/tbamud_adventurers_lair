@@ -115,7 +115,6 @@ static const struct ability_archetype_map ct_skill_archetype_map[] = {
   { SKILL_CHAIN_ASSASSAULT, ARCHETYPE_ROGUE },
   { SKILL_KILL_WINDOW, ARCHETYPE_ROGUE },
   { SKILL_APPRAISE_ENEMY, ARCHETYPE_ROGUE },
-  { SKILL_STUDY, ARCHETYPE_ARCANE },
   { 0, -1 }
 };
 
@@ -331,7 +330,7 @@ static const char *classtrack_final_title(struct char_data *ch)
   total_score = classtrack_total_score(ch);
 
   /*
-   * Adventurer is a pre-lock identity and is not a valid default final lock.
+   * "Adventurer" is the default soft title, not a playable class or final lock.
    * If hard thresholds are not met, still resolve to the broad archetype title
    * when there is any meaningful tracked identity signal.
    */
@@ -614,24 +613,6 @@ int classtrack_is_study_catalog_ability(int ability_id, int show_spells)
   return 1;
 }
 
-void classtrack_ensure_study_skill(struct char_data *ch)
-{
-  if (!ch || IS_NPC(ch))
-    return;
-
-  if (GET_SKILL(ch, SKILL_STUDY) <= 0)
-    SET_SKILL(ch, SKILL_STUDY, 1);
-
-  if (!GET_CLASS_LOCKED(ch)) {
-    if (GET_SKILL(ch, SPELL_MAGIC_MISSILE) > 0 && GET_STUDY_LEARN_LEVEL(ch, SPELL_MAGIC_MISSILE) == 0)
-      SET_STUDY_LEARN_LEVEL(ch, SPELL_MAGIC_MISSILE, 1);
-    if (GET_SKILL(ch, SKILL_RECALL) > 0 && GET_STUDY_LEARN_LEVEL(ch, SKILL_RECALL) == 0)
-      SET_STUDY_LEARN_LEVEL(ch, SKILL_RECALL, 1);
-    if (GET_SKILL(ch, SKILL_STUDY) > 0 && GET_STUDY_LEARN_LEVEL(ch, SKILL_STUDY) == 0)
-      SET_STUDY_LEARN_LEVEL(ch, SKILL_STUDY, 1);
-  }
-}
-
 void classtrack_record_study_learn_level(struct char_data *ch, int ability_id, int learned_level)
 {
   int capped_level;
@@ -655,7 +636,6 @@ int classtrack_get_study_display_level(struct char_data *ch, int ability_id, int
 {
   int learned_at;
   int is_reactive_identity;
-  int safe_fallback;
 
   if (!ch || IS_NPC(ch))
     return fallback_level;
@@ -664,7 +644,7 @@ int classtrack_get_study_display_level(struct char_data *ch, int ability_id, int
     return fallback_level;
 
   learned_at = GET_STUDY_LEARN_LEVEL(ch, ability_id);
-  is_reactive_identity = (GET_CLASS(ch) == CLASS_ADVENTURER) || (learned_at > 0);
+  is_reactive_identity = (learned_at > 0);
 
   if (GET_SKILL(ch, ability_id) <= 0)
     return fallback_level;
@@ -672,19 +652,8 @@ int classtrack_get_study_display_level(struct char_data *ch, int ability_id, int
   if (!is_reactive_identity)
     return fallback_level;
 
-  if (ability_id == SPELL_MAGIC_MISSILE || ability_id == SKILL_RECALL || ability_id == SKILL_STUDY)
+  if (ability_id == SPELL_MAGIC_MISSILE || ability_id == SKILL_RECALL)
     return 1;
 
-  if (learned_at > 0)
-    return learned_at;
-
-  /* If a learned reactive ability has no recorded learned-at level yet, avoid
-   * leaking class-table sentinel values such as LVL_IMMORT (101) in player
-   * displays. Keep a conservative per-player fallback capped below immortal.
-   */
-  safe_fallback = MAX(1, MIN(GET_LEVEL(ch), LVL_IMMORT - 1));
-  if (fallback_level >= LVL_IMMORT)
-    return safe_fallback;
-
-  return fallback_level;
+  return learned_at;
 }

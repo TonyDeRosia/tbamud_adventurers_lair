@@ -140,20 +140,11 @@ const struct pc_class_definition pc_classes[] = {
     .prac_min_per_prac = 25,
     .prac_type = SPELL
   },
-  [CLASS_ADVENTURER] = {
-    .name = "Adventurer",
-    .abbrev = "Ad",
-    .archetype_abbrev = "Adv",
-    .select_key = '\0',
-    .selectable = false,
-    .prac_learned_level = 95,
-    .prac_max_per_prac = 100,
-    .prac_min_per_prac = 25,
-    .prac_type = SPELL
-  }
 };
 
 #define NUM_PC_CLASSES ((int)ARRAY_SIZE(pc_classes))
+_Static_assert(NUM_PC_CLASSES == NUM_CLASSES, "playable class count mismatch");
+_Static_assert(NUM_PC_CLASSES <= RETIRED_PC_CLASS_ID, "retired class ID must not be reused");
 _Static_assert(NUM_PC_CLASSES <= MAX_CLASSES, "pc_classes exceeds MAX_CLASSES");
 
 const char *class_abbrevs[] = {
@@ -166,7 +157,6 @@ const char *class_abbrevs[] = {
   [CLASS_WARLOCK] = pc_classes[CLASS_WARLOCK].abbrev,
   [CLASS_DRUID] = pc_classes[CLASS_DRUID].abbrev,
   [CLASS_MYSTIC] = pc_classes[CLASS_MYSTIC].abbrev,
-  [CLASS_ADVENTURER] = pc_classes[CLASS_ADVENTURER].abbrev,
   "\n"
 };
 
@@ -180,7 +170,6 @@ const char *pc_class_types[] = {
   [CLASS_WARLOCK] = pc_classes[CLASS_WARLOCK].name,
   [CLASS_DRUID] = pc_classes[CLASS_DRUID].name,
   [CLASS_MYSTIC] = pc_classes[CLASS_MYSTIC].name,
-  [CLASS_ADVENTURER] = pc_classes[CLASS_ADVENTURER].name,
   "\n"
 };
 
@@ -274,7 +263,7 @@ int parse_class(char arg)
   arg = LOWER(arg);
 
   for (i = 0; i < ARRAY_SIZE(pc_classes); i++) {
-    if (pc_classes[i].select_key == arg)
+    if (pc_classes[i].selectable && pc_classes[i].select_key == arg)
       return i;
   }
 
@@ -293,8 +282,6 @@ static int get_class_archetype(int class_num)
   case CLASS_DRUID:
     return CLASS_CLERIC;
   case CLASS_MYSTIC:
-    return CLASS_MAGIC_USER;
-  case CLASS_ADVENTURER:
     return CLASS_MAGIC_USER;
   default:
     return class_num;
@@ -1646,7 +1633,6 @@ void roll_real_abils(struct char_data *ch)
 
   switch (GET_CLASS(ch)) {
   case CLASS_MAGIC_USER:
-  case CLASS_ADVENTURER:
     ch->real_abils.intel = table[0];
     ch->real_abils.wis = table[1];
     ch->real_abils.dex = table[2];
@@ -1745,7 +1731,6 @@ void do_start(struct char_data *ch)
   }
 
   ensure_class_abilities(ch);
-  classtrack_ensure_study_skill(ch);
 
   advance_level(ch);
 
@@ -1774,6 +1759,8 @@ static void grant_new_abilities_one_percent(struct char_data *ch)
     return;
 
   cls = GET_CLASS(ch);
+  if (!is_valid_class(cls))
+    return;
   lvl = GET_LEVEL(ch);
 
   for (i = 1; i <= MAX_SKILLS; i++) {
@@ -1790,16 +1777,19 @@ void advance_level(struct char_data *ch)
     [CLASS_THIEF] = { 28, 7, 14 }, [CLASS_WARRIOR] = { 34, 5, 11 },
     [CLASS_PALADIN] = { 29, 12, 10 }, [CLASS_BARD] = { 22, 13, 13 },
     [CLASS_WARLOCK] = { 20, 18, 9 }, [CLASS_DRUID] = { 24, 16, 11 },
-    [CLASS_MYSTIC] = { 26, 14, 12 }, [CLASS_ADVENTURER] = { 24, 12, 11 }
+    [CLASS_MYSTIC] = { 26, 14, 12 }
   };
   const struct resource_gain *gain;
   int add_hp, add_mana, add_move, i;
   int con, intel, wis, dex;
 
+  if (!ch || IS_NPC(ch) || !is_valid_class(GET_CLASS(ch)))
+    return;
+
   /* Level growth uses permanent abilities, not temporary affects. */
   con = ch->real_abils.con; intel = ch->real_abils.intel;
   wis = ch->real_abils.wis; dex = ch->real_abils.dex;
-  gain = (GET_CLASS(ch) >= 0 && GET_CLASS(ch) < NUM_CLASSES) ? &gains[GET_CLASS(ch)] : &gains[CLASS_ADVENTURER];
+  gain = &gains[GET_CLASS(ch)];
   add_hp = gain->hit + MAX(0, (con - 8) / 2);
   add_mana = gain->mana + MAX(0, (intel + wis - 16) / 3);
   add_move = gain->move + MAX(0, (con + dex - 16) / 4);
@@ -1809,7 +1799,7 @@ void advance_level(struct char_data *ch)
   GET_BASE_MAX_MANA(ch) += MAX(1, add_mana);
   affect_total(ch);
 
-  if (IS_MAGIC_USER(ch) || IS_CLERIC(ch) || GET_CLASS(ch) == CLASS_ADVENTURER)
+  if (IS_MAGIC_USER(ch) || IS_CLERIC(ch))
     GET_PRACTICES(ch) += MAX(2, wis_app[GET_WIS(ch)].bonus);
   else
     GET_PRACTICES(ch) += MIN(2, MAX(1, wis_app[GET_WIS(ch)].bonus));
@@ -1877,16 +1867,12 @@ void init_spell_levels(void)
   int i;
 
   for (i = 0; i < num_pc_classes(); i++) {
-    if (i == CLASS_ADVENTURER)
-      continue;
     spell_level(SKILL_KICK, i, 5);
   }
   for (i = 0; i < num_pc_classes(); i++)
     spell_level(SKILL_RECALL, i, 1);
   for (i = 0; i < num_pc_classes(); i++)
     spell_level(SKILL_UNARMED, i, 1);
-  spell_level(SKILL_STUDY, CLASS_ADVENTURER, 1);
-  spell_level(SPELL_MAGIC_MISSILE, CLASS_ADVENTURER, 1);
 
   /* MAGES */
   spell_level(SPELL_MAGIC_MISSILE, CLASS_MAGIC_USER, 1);

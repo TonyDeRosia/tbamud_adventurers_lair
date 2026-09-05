@@ -1465,8 +1465,8 @@ Type: Skill
 Category: Universal Passive Skill
 
 Description:
-Improves the damage of ordinary bare-handed attacks.  Every player class,
-including Adventurer, gains access at level 1.
+Improves the damage of ordinary bare-handed attacks. All nine playable
+classes gain access at level 1.
 
 Effect:
 When no ITEM_WEAPON supplies the main-hand attack, Unarmed adds an expected
@@ -22242,11 +22242,18 @@ Usage: study <tome>
        tome list
 
 A Tome permanently teaches each valid spell or skill written within it.  You
-must carry it to study it.  Abilities begin at 1 percent and use their normal
-mana, movement, target, position, and combat rules.  A Tome can teach abilities
+must carry it to study it.  New abilities begin at 1 percent; any higher stored
+proficiency is preserved when granting missing authorization. Abilities use
+their normal mana, movement, target, position, and combat rules. A Tome can
+teach abilities
 outside your class or normal level progression.  If every ability is already
 known, the Tome is not consumed.  Each Tome has a builder-set real-time study
 cooldown; logging out does not pause it.  Immortals bypass only that cooldown.
+
+STUDY <tome> does not require knowledge of the Study skill. A Tome can itself
+teach Study. No class receives Study automatically. Normal STUDY <ability>
+and studying other magical learning sources require Tome-authorized Study
+with positive proficiency. A stored percentage alone does not grant access.
 #1
 
 

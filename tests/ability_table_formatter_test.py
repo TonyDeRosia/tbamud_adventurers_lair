@@ -31,7 +31,7 @@ def render(rows):
 
 def test_shared_renderer_and_no_legacy_truncation_branch():
     start = SOURCE.index("void show_ability_table_aligned")
-    body = SOURCE[start:SOURCE.index("static void show_adventurer_study_catalog", start)]
+    body = SOURCE[start:SOURCE.index("static void show_ability_filter_help", start)]
     assert "name_width" not in body
     assert "%-*.*s" not in body
     assert "complete names and percentage cells fit" in body

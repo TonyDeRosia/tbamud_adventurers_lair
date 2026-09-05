@@ -1,12 +1,12 @@
 #16400
 field mouse~
 a @yfi@Oel@yd @Dmo@Wus@De@n~
-An adorable little field mouse is here.
+An adorable little @yfi@Oel@yd @Dmo@Wus@De@n is here.
 ~
 This adorable little field mouse scurries around the plains, just trying to survive day to day.
 ~
 200 0 0 0 2048 0 0 0 0 E
-5 20 0 2d6+43 1d2+0
+5 20 25 2d6+43 1d2+0
 0 0
 8 8 3
 BareHandAttack: 4
@@ -27,12 +27,12 @@ E
 #16401
 watchful rabbit brown rabbit~
 a @Wwa@ytc@Whf@Oul @Wra@yb@Wbi@yt@n~
-A watchful rabbit is loafing among the grass.
+A @Wwa@ytc@Whf@Oul @Wra@yb@Wbi@yt@n is loafing among the grass.
 ~
 Warm brown fur lies sleek against this small rabbit's body, broken by a pale belly and fine whiskers that tremble at every movement. Its bright eyes cautiously watch its surroundings.
 ~
 200 0 0 0 0 0 0 0 0 E
-5 20 0 2d6+43 1d2+0
+5 20 25 2d6+43 1d2+0
 0 0
 8 8 0
 BareHandAttack: 4
@@ -53,12 +53,12 @@ E
 #16402
 meadowlark meadow lark bird~
 a @Ybr@Wig@Yht @Gme@gad@Gow@yla@Grk@n~
-A bright meadowlark perches on a tall grass stem here.
+A @Ybr@Wig@Yht @Gme@gad@Gow@yla@Grk@n perches on a tall grass stem here.
 ~
 Golden color flashes across this small plains bird whenever it shifts among the grass. Its breast is warm yellow marked with darker patterns, and its sharp eyes constantly search the ground for seeds and insects. Every so often it lifts its head and releases a clear, carrying song across the open field.
 ~
 200 0 0 0 131072 0 0 0 0 E
-5 20 0 2d6+43 1d2+0
+5 20 25 2d6+43 1d2+0
 0 0
 8 8 0
 BareHandAttack: 11
@@ -80,12 +80,12 @@ E
 #16403
 painted butterfly butterfly~
 a @Mpa@Cin@Yte@Md @Cbu@Ytt@Mer@Cfl@Yy@n~
-A painted butterfly drifts lazily between the wildflowers here.
+A @Mpa@Cin@Yte@Md @Cbu@Ytt@Mer@Cfl@Yy@n drifts lazily between the wildflowers here.
 ~
 Broad wings patterned in warm orange, black, and pale cream carry this delicate insect from bloom to bloom. It seems almost weightless in flight, rising whenever the grass moves and settling again as soon as the wind eases. Fine dust clings to its wings and catches faintly in the light.
 ~
 200 0 0 0 131072 0 0 0 50 E
-5 20 0 2d6+28 1d1+0
+5 20 25 2d6+28 1d1+0
 0 0
 8 8 0
 BareHandAttack: 1
@@ -107,12 +107,12 @@ E
 #16404
 plains fox red fox~
 a @Ypl@Oai@Yns @rfo@Ox@n~
-A lean plains fox watches the grass with sharp, patient eyes.
+A lean @Ypl@Oai@Yns @rfo@Ox@n watches the grass with sharp, patient eyes.
 ~
 This lean fox wears a coat of dusty red broken by darker legs and a pale throat. Its large ears turn toward the smallest rustle in the grass, and its narrow muzzle stays low as it searches for hidden prey. It moves with measured silence, never wasting a step.
 ~
 200 0 0 0 0 0 0 0 0 E
-7 16 0 2d6+133 1d5+2
+7 16 25 2d6+133 1d5+2
 0 0
 8 8 0
 BareHandAttack: 4
@@ -135,12 +135,12 @@ E
 #16405
 grazing deer doe plains deer~
 a @Ggr@Yaz@Gin@Gg @yde@Oer@n~
-A graceful deer grazes quietly among the tall grass.
+A @Ggr@Yac@Gef@Gul @yde@Oer@n grazes quietly among the tall grass.
 ~
 Long-legged and wary, this plains deer feeds in short bursts before lifting its head to study the horizon. Its brown coat blends easily into dry grass and shadow, while a pale tail flicks at insects along its flanks. Even while feeding it never seems completely at ease.
 ~
 200 0 0 0 0 0 0 0 50 E
-7 20 0 2d6+133 1d3+0
+7 20 25 2d6+133 1d3+0
 0 0
 8 8 0
 BareHandAttack: 7
@@ -165,12 +165,12 @@ E
 #16406
 striped badger badger plains~
 a @Wst@Dri@Wpe@Dd @yba@Odg@yer@n~
-A broad striped badger digs stubbornly at the earth here.
+A broad @Wst@Dri@Wpe@Dd @yba@Odg@yer@n digs stubbornly at the earth here.
 ~
 Powerful forelegs and heavy claws make this low-built animal look as though it belongs half beneath the ground. Pale stripes run along its darker head, framing small eyes that regard the world with stubborn suspicion. Loose soil gathers behind it as it digs for roots, grubs, and anything else worth eating.
 ~
 72 0 0 0 0 0 0 0 0 E
-8 16 0 2d6+163 1d5+2
+8 16 25 2d6+163 1d5+2
 0 0
 8 8 0
 BareHandAttack: 8
@@ -193,12 +193,12 @@ E
 #16407
 marsh harrier harrier hawk bird~
 a @Gma@grs@Gh @Dha@Wrr@Die@Wr@n~
-A marsh harrier circles low over the plains here.
+A @Gma@grs@Gh @Dha@Wrr@Die@Wr@n circles low over the plains here.
 ~
 Long wings carry this lean hunting bird just above the grass tops, where it rides the slightest shifts in air without seeming to work. Its head turns constantly as it searches the ground below. When something moves beneath the reeds or grass, the harrier folds into a sudden, precise descent.
 ~
 200 0 0 0 131072 0 0 0 0 E
-8 16 0 2d6+143 1d5+2
+8 16 25 2d6+143 1d5+2
 0 0
 8 8 0
 BareHandAttack: 8
@@ -222,12 +222,12 @@ E
 #16408
 plains garter snake garter snake~
 a @Gpl@yai@Gns @gga@Grt@yer @Gsna@gke@n~
-A plains garter snake lies coiled in a patch of warm earth.
+A @Gpl@yai@Gns @gga@Grt@yer @Gsna@gke@n lies coiled in a patch of warm earth.
 ~
 Three pale stripes run the length of this slender snake's dark body. Its head rests slightly raised above the coil while a narrow tongue repeatedly tests the air. The snake relies more on camouflage and stillness than aggression, slipping quickly into cover when disturbed.
 ~
 200 0 0 0 0 0 0 0 0 E
-6 16 0 2d6+103 1d4+2
+6 16 25 2d6+103 1d4+2
 0 0
 8 8 0
 BareHandAttack: 4
@@ -251,12 +251,12 @@ E
 #16409
 groundhog woodchuck burrower~
 a @ybu@Orr@yow@Oin@yg @ygr@Oou@ynd@yho@Og@n~
-A heavy groundhog grazes near the mouth of a hidden burrow.
+A @yhe@Oav@yy @ygr@Oou@ynd@yho@Og@n grazes near the mouth of a hidden burrow.
 ~
 Thick-bodied and powerfully built for digging, this groundhog crops grass with unhurried confidence. Its claws are dark with soil, and it never strays far from a burrow entrance concealed beneath the surrounding growth. At unfamiliar movement it rises briefly to look before deciding whether to flee.
 ~
 200 0 0 0 0 0 0 0 0 E
-6 20 0 2d6+73 1d2+0
+6 20 25 2d6+73 1d2+0
 0 0
 8 8 0
 BareHandAttack: 4
@@ -279,13 +279,13 @@ LootItem: 16413 40
 E
 #16410
 will-o-wisp wisp light spirit~
-a @Cfa@Win@Ct @Bwi@Cll-@Wod-@Cwi@Bsp@n~
-A pale, drifting light bobs gently above the grass tops.
+a @Cfa@Win@Ct @Bwi@Cll-@Wo-@Cwi@Bsp@n~
+A @Cpa@Wl@Ce@n, @Bdr@Cif@Wti@Cng@n @Bli@Cgh@Wt@n bobs gently above the grass tops.
 ~
 This soft glow drifts without any clear purpose, rising and falling slightly as though breathing. It casts barely enough light to notice from a distance and seems to dim when approached directly, retreating just fast enough to stay at the edge of easy reach. Whether it is aware of those who follow it is impossible to say.
 ~
 24776 0 0 0 131072 0 0 0 0 E
-8 15 0 2d6+173 1d5+2
+8 15 25 2d6+173 1d5+2
 0 5
 8 8 0
 BareHandAttack: 12
@@ -312,12 +312,12 @@ T 16453
 #16411
 prairie sprite sprite fey~
 a @Gpr@Yai@Gri@Ye @Csp@Gri@Cte@n~
-A small, luminous figure darts between the grass stems here.
+A @Gsm@Yal@Gl@n, @Clu@Gmi@Cno@Gus@n @Gfi@Ygu@Gre@n darts between the grass stems here.
 ~
 This tiny fey creature is barely the height of a hand, its form vaguely humanoid but wrapped in something that shifts between leaf and light depending on the angle. It moves in quick, unpredictable patterns and seems to find the open grassland genuinely delightful, pausing to examine seeds and insects with equal curiosity.
 ~
 24776 0 0 0 131072 0 0 0 150 E
-8 15 0 2d6+163 1d5+2
+8 15 25 2d6+163 1d5+2
 0 5
 8 8 0
 BareHandAttack: 12
@@ -343,12 +343,12 @@ E
 #16412
 grass sylph sylph air spirit~
 a @Ggr@gas@Gs @Csy@Wlp@Ch@n~
-A slender, translucent figure moves with the swaying grass.
+A @Gsl@gen@Gder@n, @Ctr@Wan@Csl@Wuc@Cent@n @Cfi@Wgu@Cre@n moves with the swaying grass.
 ~
 This air spirit takes a form barely distinguishable from the movement of grass in wind, its body shifting and reforming with each gust. It seems more curious than threatening, turning its featureless face toward anything that moves through its territory. When the wind dies completely it grows still and almost invisible, only the faint shimmer of its outline giving it away.
 ~
 24776 0 0 0 196608 0 0 0 100 E
-9 15 0 2d6+223 1d6+2
+9 15 25 2d6+223 1d6+2
 0 8
 8 8 0
 BareHandAttack: 12
@@ -374,12 +374,12 @@ T 16454
 #16413
 verdant stag stag spirit deer~
 a @Gve@grd@Gan@Yt @Wst@Gag@n~
-A great verdant stag stands silently among the green growth.
+A great @Gve@grd@Gan@Yt @Wst@Gag@n stands silently among the green growth.
 ~
 This majestic stag is unmistakably more than an ordinary animal. Fine green shoots twist through the dark velvet of its antlers, and tiny leaves open wherever the branching crown catches the light. Its deep brown coat carries a faint mossy sheen, and every slow breath smells of rain, crushed grass, and living earth.
 ~
 24648 0 0 0 65600 0 0 0 250 E
-10 15 0 2d6+273 1d6+3
+10 15 25 2d6+273 1d6+3
 0 10
 8 8 0
 BareHandAttack: 9
@@ -404,12 +404,12 @@ E
 #16414
 briar wolf wolf thorn beast~
 a @gbr@Gia@gr @Dwo@Wlf@n~
-A lean wolf woven with thorny briars stalks through the grass.
+A lean @Dwo@Wlf@n woven with @gth@Gor@gny @gbr@Gia@grs@n stalks through the grass.
 ~
 At a distance this creature resembles a rangy plains wolf, but thorned vines twist through its fur and disappear beneath its hide as though they are part of the beast itself. Its eyes glow a muted green beneath a crown of tangled stems. Each careful step leaves bent grass slowly curling upright behind it.
 ~
 24696 0 0 0 2048 0 0 0 -100 E
-11 14 0 2d6+323 2d4+2
+11 14 25 2d6+323 2d4+2
 0 15
 8 8 0
 BareHandAttack: 4
@@ -434,12 +434,12 @@ T 16455
 #16415
 thornhide boar boar thorn beast~
 a @gth@Gor@gnh@Oid@Ge @ybo@Oar@n~
-A massive thornhide boar roots through the soil here.
+A massive @gth@Gor@gnh@Oid@Ge @ybo@Oar@n roots through the soil here.
 ~
 Bristles like stiff brown thorns cover this broad-backed boar from shoulder to rump. Patches of barklike hide protect its flanks, and curved tusks push from a muzzle stained with dark earth. Small vines cling stubbornly between the plates of its hide, growing as naturally there as they would across a fallen log.
 ~
 24680 0 0 0 0 0 0 0 -50 E
-12 14 0 2d6+373 2d4+3
+12 14 25 2d6+373 2d4+3
 0 20
 8 8 0
 BareHandAttack: 9
@@ -465,12 +465,12 @@ T 16456
 #16416
 rootbound dryad dryad rootbound spirit~
 a @gro@Got@gbou@Gnd @Gdr@Cya@Gd@n~
-A rootbound dryad stands quietly among the tall grass here.
+A @gro@Got@gbou@Gnd @Gdr@Cya@Gd@n stands quietly among the tall grass here.
 ~
 This spirit rises from the living plains themselves, its form woven from green grasses, flowering stems, and deep-running roots instead of bark and leaf. Its limbs are slender and graceful, trailing faint tendrils into the soil beneath it as though it never fully leaves the earth. It watches over the lush land in still silence, calm in posture but clearly bound to defend the life growing around it.
 ~
 57432 0 0 0 64 0 0 0 200 E
-12 14 0 2d6+413 2d4+3
+12 14 25 2d6+413 2d4+3
 0 18
 8 8 0
 BareHandAttack: 8
@@ -496,12 +496,12 @@ T 16457
 #16417
 bloom warden warden bloom spirit~
 a @Gbl@Yoo@Gm @Wwa@Grd@Wen@n~
-A bloom warden lingers near the wildflowers here.
+A @Gbl@Yoo@Gm @Wwa@Grd@Wen@n lingers near the wildflowers here.
 ~
 Soft color gathers around this spirit like petals carried on a warm plains breeze, shaping a luminous guardian of living growth. Wherever it drifts, the grass seems greener and the flowers a little brighter, as though the land itself flourishes in its presence. Its manner is serene, but there is quiet strength in the way it watches over every blossom and blade around it.
 ~
 57416 0 0 0 64 0 0 0 300 E
-12 13 0 2d6+443 2d4+3
+12 13 25 2d6+443 2d4+3
 0 18
 8 8 0
 BareHandAttack: 12
@@ -527,12 +527,12 @@ T 16458
 #16418
 thornbound dryad dryad thorn guardian~
 a @gth@Gor@gnb@Gou@gnd @Gdr@Cya@Gd@n~
-A thornbound dryad watches from within a knot of coarse brush.
+A @gth@Gor@gnb@Gou@gnd @Gdr@Cya@Gd@n watches from within a knot of coarse brush.
 ~
 Unlike the gentler spirits of flower and grass, this dryad wears the harsher face of the plains. Dark roots form its limbs, wrapped in thorny vines and dry seed husks that rasp softly whenever it moves. Its gaze is steady and severe, the expression of a guardian accustomed to meeting axes, fire, and careless destruction with equal hostility.
 ~
 57464 0 0 0 2048 0 0 0 -200 E
-13 13 0 2d6+493 2d5+3
+13 13 25 2d6+493 2d5+3
 0 25
 8 8 0
 BareHandAttack: 8
@@ -558,12 +558,12 @@ T 16459
 #16419
 wildflower nymph nymph flower fey~
 a @Mwi@Yld@Gfl@Cow@Mer @Gny@Cmph@n~
-A wildflower nymph wanders barefoot through the blossoms here.
+A @Mwi@Yld@Gfl@Cow@Mer @Gny@Cmph@n wanders barefoot through the blossoms here.
 ~
 Petals of many colors are caught throughout this fey spirit's flowing hair, yet none appear wilted or broken. Her skin carries the warm tone of sunlit earth, and tiny flowering vines trail around her wrists and ankles. She moves through the plains without bending a stem, pausing often to tend injured plants with a touch.
 ~
 24776 0 0 0 65600 0 0 0 350 E
-10 15 0 2d6+253 1d6+3
+10 15 25 2d6+253 1d6+3
 0 10
 8 8 0
 BareHandAttack: 12
@@ -588,12 +588,12 @@ E
 #16420
 mossback guardian guardian moss stone spirit~
 a @gmo@Gss@gb@Gac@gk @Wgu@Gar@Wdi@Gan@n~
-A hulking mossback guardian stands motionless among the old stones.
+A hulking @gmo@Gss@gb@Gac@gk @Wgu@Gar@Wdi@Gan@n stands motionless among the old stones.
 ~
 Broad shoulders of packed earth and weathered stone give this guardian the shape of a massive humanoid, though no flesh lies beneath its layered surface. Moss covers much of its back and arms, rooted into cracks between slabs of stone. When it moves, soil sifts from its joints and nearby grass bends toward it as though recognizing an ancient protector.
 ~
 123002 0 0 0 64 0 0 0 150 E
-14 13 0 2d6+593 2d5+4
+14 13 25 2d6+593 2d5+4
 0 35
 8 8 0
 BareHandAttack: 6
@@ -619,12 +619,12 @@ T 16460
 #16421
 wandering plains druid druid wanderer~
 a @Gwa@Ynd@Ger@Yin@Gg @gpl@Gai@gns @Gdr@Cui@Gd@n~
-A wandering druid walks slowly through the open grassland.
+A @Gwa@Ynd@Ger@Yin@Gg @Gdr@Cui@Gd@n walks slowly through the open grassland.
 ~
 Sun and weather have faded this traveler's layered green and brown robes nearly to the colors of the plains themselves. Bundles of herbs, seed pods, and small wooden charms hang from a worn belt. The druid moves without hurry, studying tracks and plants with the familiarity of someone who has spent years learning the moods of this land.
 ~
 24648 0 0 0 0 0 0 0 200 E
-11 14 0 2d6+333 2d4+2
+11 14 25 2d6+333 2d4+2
 0 10
 8 8 0
 BareHandAttack: 5
@@ -651,12 +651,12 @@ T 16461
 #16422
 druidic herbalist herbalist druid keeper~
 a @Gdr@Cui@Gdi@Cc @ghe@Grb@gal@Gis@gt@n~
-A druidic herbalist kneels among the useful plants here.
+A @Gdr@Cui@Gdi@Cc @ghe@Grb@gal@Gis@gt@n kneels among the useful plants here.
 ~
 Several small pouches hang from this druid's belt, each marked with a different leaf, root, or flower. Stained fingertips carefully separate useful growth from ordinary grass while leaving enough untouched for the plants to recover. The herbalist treats the plains less like a resource to harvest and more like a patient garden without fences.
 ~
 24776 0 0 0 0 0 0 0 300 E
-10 20 0 2d6+243 1d2+0
+10 20 25 2d6+243 1d2+0
 0 8
 8 8 0
 BareHandAttack: 5
@@ -683,12 +683,12 @@ E
 #16423
 warden open sky skywarden plains warden~
 a @Cwa@Brd@Cen @Wof @Bth@Ce @Wop@Ben @Csk@By@n~
-A cloaked warden surveys the plains beneath the open sky.
+A cloaked @Cwa@Brd@Cen@n surveys the plains beneath @Bth@Ce @Wop@Ben @Csk@By@n.
 ~
 A long cloak the color of storm-dark grass shifts continuously around this watcher's shoulders. Feathers, carved bone, and small bronze disks hang from a staff polished smooth by years of use. The warden's attention is rarely fixed on one place for long, moving from the horizon to the birds overhead and finally to anything unfamiliar crossing the plains.
 ~
 24922 0 0 0 0 0 0 0 150 E
-13 13 0 2d6+513 2d5+3
+13 13 25 2d6+513 2d5+3
 0 25
 8 8 0
 BareHandAttack: 11
@@ -717,12 +717,12 @@ T 16462
 #16424
 keeper old stones stonekeeper warden druid~
 a @Yke@Wep@Yer @Gof @Dth@We @Yol@Dd @Wst@Yon@Des@n~
-A solemn keeper stands near the weathered stones here.
+A solemn @Yke@Wep@Yer@n stands near the weathered @Wst@Yon@Des@n here.
 ~
 This quiet guardian wears simple earth-toned garments beneath a mantle worked with small stone beads. A weathered staff rests in one hand, its surface carved with lines resembling roots and winding paths. The keeper watches over the scattered stones of the plains as carefully as any druid watches a sacred grove, suggesting their forgotten arrangement still matters.
 ~
 57690 0 0 0 64 0 0 0 250 E
-14 13 0 2d6+593 2d5+4
+14 13 25 2d6+593 2d5+4
 0 30
 8 8 0
 BareHandAttack: 5
@@ -748,12 +748,12 @@ T 16463
 #16425
 elder bloom warden warden elder bloom spirit~
 an @Yel@Wde@Yr @Gbl@Yoo@Gm @Wwa@Grd@Wen@n~
-An elder bloom warden radiates quiet power over the living plains.
+An @Yel@Wde@Yr @Gbl@Yoo@Gm @Wwa@Grd@Wen@n radiates quiet power over the living plains.
 ~
 Layers of luminous petals, grass, and flowering vines gather into the tall shape of this ancient guardian. Unlike younger bloom wardens, its form is dense and clearly defined, with roots of pale light trailing briefly into the ground at every step. The air around it carries the scent of rain and spring growth, and even damaged plants seem to straighten in its presence.
 ~
 254074 0 0 0 96 0 0 0 500 E
-15 12 0 2d6+743 2d6+4
+15 12 25 2d6+743 2d6+4
 0 50
 8 8 0
 BareHandAttack: 12

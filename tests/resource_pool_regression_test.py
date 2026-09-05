@@ -53,8 +53,9 @@ def test_progression_is_deterministic_and_uses_real_abilities():
     block = classes[start:classes.index("int backstab_mult", start)]
     for cls in ("CLASS_MAGIC_USER", "CLASS_CLERIC", "CLASS_THIEF", "CLASS_WARRIOR",
                 "CLASS_PALADIN", "CLASS_BARD", "CLASS_WARLOCK", "CLASS_DRUID",
-                "CLASS_MYSTIC", "CLASS_ADVENTURER"):
+                "CLASS_MYSTIC"):
         assert f"[{cls}]" in block
+    assert "CLASS_ADVENTURER" not in block
     assert "ch->real_abils.con" in block
     assert "ch->real_abils.intel" in block
     assert "ch->real_abils.wis" in block

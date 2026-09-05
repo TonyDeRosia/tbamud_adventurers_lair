@@ -284,6 +284,7 @@ int objsave_save_obj_record(struct obj_data *obj, FILE *fl, int location);
 SPECIAL(receptionist);
 /* Functions from players.c */
 void   tag_argument(char *argument, char *tag, size_t taglen);
+#define LOAD_CHAR_INVALID_CLASS (-2) /* Existing pfile needs staff correction, not creation. */
 int    load_char(const char *name, struct char_data *ch);
 int    save_char(struct char_data *ch);
 void   init_char(struct char_data *ch);
