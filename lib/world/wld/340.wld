@@ -1,147 +1,695 @@
 #34000
 The Prismatic Threshold~
-A dark arch opens into a chamber of angled crystal. Thin bands of color travel across the floor as unseen light shifts beyond the walls, while a steady amber glow to the east offers the first reliable point of orientation.
+The stone throat of the earth opens into a grotto crowded with
+translucent crystal. @CBlue@n, @Yamber@n, and @Mviolet@n fire crawls
+through the mineral growths whenever the cavern breathes, scattering
+restless bands across the damp floor. A broad amber glow to the east
+offers the safest path deeper within.
 ~
 340 0 0 0 0 0
 D1
+Amber light spills between leaning crystal columns, marking the way
+deeper into the grotto.
 ~
 ~
 0 0 34001
 S
 #34001
 The Refraction Gallery~
-Tall facets divide a single white beam into ordered ribbons that cross the gallery floor. Scratches interrupt several bands where earlier travelers tested false turns, but the broad amber path continues toward a brighter junction.
+A natural arcade of quartz blades rises from floor to ceiling, each
+facet splitting the grotto's pale light into narrow ribbons. Tiny
+glasswing tracks glitter in the mineral dust, and old chips in the
+crystal show where travelers once tested false seams. The amber route
+continues between the brightest formations.
 ~
 340 0 0 0 0 0
+D0
+A clear-crystal climb rises north toward the fluttering Glasswing Roost.
+~
+~
+0 0 34010
 D1
+The crystal arcade widens east toward a warm amber junction.
 ~
 ~
 0 0 34002
 D3
+The refracted colors thin westward toward the grotto's shadowed
+threshold.
 ~
 ~
 0 0 34000
 S
 #34002
 The Amber Junction~
-Warm amber light gathers beneath a many-sided ceiling, making this crossing visible from every adjoining passage. A crimson stair rises north, a cobalt ramp descends south, and a pale direct passage waits to the east.
+Honey-colored crystal crowns a broad natural crossing where three
+veins of the grotto divide. A crimson shelf climbs north through
+iron-red quartz, a cobalt hollow slopes south into colder stone, and a
+pale channel leads east where nearly every hue seems to fade. Warm
+light pulses gently beneath the floor.
 ~
 340 0 0 0 0 0
 D0
+A crimson shelf rises between red-veined crystal toward the northern
+traverse.
 ~
 ~
 0 0 34003
 D1
+A pale passage drains the surrounding color as it runs east.
 ~
 ~
 0 0 34007
 D2
+Cold cobalt reflections descend south along a shallow mineral ramp.
 ~
 ~
 0 0 34004
 D3
+A low western opening leads into polished crystalback burrows.
 ~
 ~
-0 0 34001
+0 0 34012
 S
 #34003
 The Crimson Traverse~
-Red light pulses through hairline fractures in the walls, lending each step the rhythm of a slow heartbeat. The passage bends east toward reflected brightness while the amber junction remains accessible to the south.
+Iron-rich quartz stains this twisting shelf in deep crimson, and every
+step seems to wake another ember inside the walls. Broken crystal
+husks lie near narrow niches where sentinels have stood for untold
+years. Eastward, white reflections gather around a distant mirrored
+basin.
 ~
 340 0 0 0 0 0
+D0
+A razor-lined shelf climbs north through red and white crystal.
+~
+~
+0 0 34016
 D1
+Crimson reflections sharpen eastward toward the mirrored light of the
+Mirrorwell.
 ~
 ~
 0 0 34005
 D2
+The red-veined shelf descends south toward the warm Amber Junction.
 ~
 ~
 0 0 34002
 S
 #34004
 The Cobalt Descent~
-Cool blue facets draw heat from the air along a shallow descending ramp. Scuffed crystal shows where cautious travelers turned back, yet a narrow eastern way continues toward deeper violet shadow.
+The grotto drops through a cool seam of blue crystal slick with
+condensation. Water gathers along cobalt ridges and falls in slow
+silver beads, each droplet briefly holding a perfect inverted image of
+the cavern. A darker violet bend waits beyond the eastern wall of
+crystal.
 ~
 340 0 0 0 0 0
 D0
+The cobalt slope climbs north toward the amber-lit crossing.
 ~
 ~
 0 0 34002
 D1
+Blue crystal gives way eastward to a deeper violet bend.
 ~
 ~
 0 0 34006
+D2
+A wet blue-white passage continues down with the luminous runoff.
+~
+~
+0 0 34014
 S
 #34005
 The Mirrorwell~
-A circular shaft of mirrored crystal catches the crimson route and throws it downward in a clean white column. The cobalt branch can be regained through the violet chambers to the south, while a secluded facet opens north.
+A perfectly still pool fills the center of this round chamber, its
+black surface reflecting far more crystal than the ceiling above
+contains. White light descends through a natural shaft and fractures
+across the water without disturbing it. The reflections occasionally
+lag behind movement by a heartbeat.
 ~
 340 0 0 0 0 0
+D0
+A narrow northern shelf circles toward another darker mirrored pool.
+~
+~
+0 0 34019
 D2
+A strand-hung opening descends south into the Mirrorweb Hollow.
 ~
 ~
-0 0 34006
+0 0 34018
 D3
+Red mineral light stains the western way back toward the Crimson
+Traverse.
 ~
 ~
 0 0 34003
 S
 #34006
 The Violet Turn~
-Purple shadow blunts the sharpest reflections in this quiet bend. Passages north and west complete the longer circuit between cobalt and the mirrorwell, and fine marks in the eastern wall suggest an optional recess.
+Violet crystal grows here in layered fans that swallow the harshest
+glare and leave the bend in muted twilight. Shed glasswing scales
+cling to the lower facets like frost, while tiny chimes sound whenever
+the stone settles. A narrow eastern pocket glows with a softer purple
+light.
 ~
 340 0 0 0 0 0
 D0
+The violet fans open north around the mirrored basin of the
+Mirrorwell.
 ~
 ~
 0 0 34005
 D1
+A narrow seam slips east into an opaque violet recess.
 ~
 ~
 0 0 34009
+D2
+A low southern opening bears deep paired bite marks in the stone.
+~
+~
+0 0 34020
 D3
+The passage cools westward into the blue reflections of the Cobalt
+Descent.
 ~
 ~
 0 0 34004
 S
 #34007
 The Colorless Interval~
-Every hue drains from this broad, matte chamber. The visual silence makes distance easy to judge and offers a deliberate pause between the amber junction to the west and the mounting brilliance to the east.
+Color dies almost completely in this broad hollow. Matte crystal and
+pale calcite drink in every nearby hue, leaving skin, steel, and stone
+washed in ghostly gray. The sudden visual silence makes the brilliant
+pulse to the east feel stronger with every step.
 ~
 340 0 0 0 0 0
+D0
+Faint natural color returns north among antler-shaped crystal.
+~
+~
+0 0 34022
 D1
+A mounting white radiance pours from the eastern approach to the Heart
+Prism.
 ~
 ~
 0 0 34008
 D3
+Warm amber color slowly returns along the western passage.
 ~
 ~
 0 0 34002
 S
 #34008
 The Heart Prism~
-A suspended prism turns within a cage of fractured light, drawing every surrounding color into its overbright core. Stable footing circles the mechanism, but the converging beams leave nowhere to mistake this chamber for anything except the maze's culmination.
+A colossal many-sided crystal rises directly from the bedrock, turning
+almost imperceptibly within a crown of lesser shards. Every color in
+the grotto races through its core before erupting in brilliant sheets
+across the chamber walls. The ground around it is scarred by old
+impacts, and the air hums with restrained power.
 ~
 340 0 0 0 0 0
+D0
+A hidden northern fissure climbs toward a deep many-colored nest.
+~
+~
+0 0 34025
 D3
+The blinding colors fade westward into the pale quiet of the Colorless
+Interval.
 ~
 ~
 0 0 34007
 S
 #34009
 The Violet Blind~
-A narrow recess ends before a pane of opaque violet crystal. Tiny movable facets along its frame reward close observation, and the quiet dead end provides a discovery without pretending to be another route.
+This tight pocket ends before a wall of opaque amethyst crystal
+riddled with thumb-sized movable facets. Careful hands have turned
+some of them aside, exposing narrow channels where violet light
+gathers instead of scattering. A hairline crack to the east breathes
+cool air from somewhere beyond the blind.
 ~
 340 0 0 0 0 0
+D1
+A tight crack winds east through broken violet crystal into a hidden
+fractured chamber.
+~
+~
+0 0 34099
 D3
+The narrow recess opens west into the layered crystal of the Violet
+Turn.
 ~
 ~
 0 0 34006
 S
-#34099
-BECQ Calibration Chamber~
-You are in an unfinished room.
+#34010
+The Glasswing Roost~
+A vault of clear crystal opens above a shelf littered with translucent
+wing scales. @WPrismatic insects@n cling upside down to narrow mineral
+ribs, stirring only when a shadow crosses the colored light. A sweeter
+amber glow gathers deeper in the eastern hollow.
 ~
 340 0 0 0 0 0
+D0
+A narrow rib of stone climbs north above a deep buzzing fissure.
+~
+~
+0 0 34013
+D1
+Warm amber light and the scent of nectar drift from the eastern hollow.
+~
+~
+0 0 34011
+D2
+The crystal shelf slopes south toward the ordered Refraction Gallery.
+~
+~
+0 0 34001
+S
+#34011
+The Amber Nectar Hollow~
+Bulbous amber crystals grow from the stone like frozen blossoms, each
+one sweating a bead of warm luminous nectar. Tiny tracks circle the
+pools of golden fluid while larger gouges in the floor suggest that
+heavier creatures come here to feed. The air smells faintly of honey and
+rain.
+~
+340 0 0 0 0 0
+D0
+A dangerous northern shelf overlooks the buzzing Needlewing Chasm.
+~
+~
+0 0 34013
+D2
+Rounded burrows descend south through cloudy quartz.
+~
+~
+0 0 34012
+D3
+The nectar hollow opens west beneath the clear ribs of the Glasswing
+Roost.
+~
+~
+0 0 34010
+S
+#34012
+The Crystalback Burrows~
+Rounded tunnels have been chewed through a bank of cloudy quartz,
+leaving the walls polished by countless hard shells. Broken crystal
+husks lie in shallow pits beside neat piles of mineral fragments. A deep
+scraping sound travels through the stone from somewhere nearby.
+~
+340 0 0 0 0 0
+D0
+The polished tunnels climb north toward the luminous nectar hollow.
+~
+~
+0 0 34011
+D1
+The burrows widen east into the warm light of the Amber Junction.
+~
+~
+0 0 34002
+D2
+A broad scarred tunnel descends south where heavy shells have polished
+the stone.
+~
+~
+0 0 34026
+S
+#34013
+The Needlewing Chasm~
+A narrow fissure splits the grotto from floor to ceiling, crossed by
+natural ribs of glassy stone. Needle-thin wings flash in and out of the
+dark gap below, and every few moments a sharp crystalline buzz races
+through the chamber. Bright fragments glitter where prey has been
+stripped clean.
+~
+340 0 0 0 0 0
+D1
+The chasm narrows east toward the golden glow of the nectar hollow.
+~
+~
+0 0 34011
+D2
+A crystal rib drops south toward the fluttering roost.
+~
+~
+0 0 34010
+S
+#34014
+The Luminous Runoff~
+Water from hidden cracks spills across pale stone in threads of
+blue-white light. Soft-bodied crystal grazers cling to the wet walls,
+feeding on luminous mineral film and leaving winding silver trails
+behind them. The runoff descends toward a grove of cobalt growths.
+~
+340 0 0 0 0 0
+D0
+The glowing water climbs north toward the colder Cobalt Descent.
+~
+~
+0 0 34004
+D2
+The runoff slips south between enormous blue crystal blooms.
+~
+~
+0 0 34015
+S
+#34015
+The Cobalt Bloom~
+Huge fan-shaped crystals unfold from the cavern walls like blue flowers,
+their edges glowing whenever drops of runoff strike them. The chamber is
+cool enough to mist breath, and the overlapping mineral petals create
+countless hiding places for small predators.
+~
+340 0 0 0 0 0
+D0
+Silver water threads north toward the luminous runoff.
+~
+~
+0 0 34014
+D1
+A chewed opening in the eastern wall leads into a low crawlspace.
+~
+~
+0 0 34020
+D2
+A battered southern passage descends into a basin scored by enormous
+horns.
+~
+~
+0 0 34027
+S
+#34016
+The Shardmantis Shelf~
+Long blades of red and white quartz jut from a raised shelf like frozen
+grass. Several have been cut cleanly through at shoulder height by
+something impossibly sharp. The ground is scattered with neatly divided
+insect shells, each split along a single precise line.
+~
+340 0 0 0 0 0
+D1
+Broken blade-like facets crowd the eastern approach to a nest.
+~
+~
+0 0 34017
+D2
+The hunting shelf drops south toward the Crimson Traverse.
+~
+~
+0 0 34003
+S
+#34017
+The Razor-Facet Nest~
+Thin crystal plates overlap across the walls in dangerous serrated
+layers. Shallow nests have been scraped between them and lined with
+fragments of glasswing shell. Fresh scratches score the floor where a
+large hunting creature has dragged its forelimbs through the dust.
+~
+340 0 0 0 0 0
+D1
+Nearly invisible strands glimmer in the dark hollow to the east.
+~
+~
+0 0 34018
+D3
+The serrated nest opens west onto the Shardmantis Shelf.
+~
+~
+0 0 34016
+S
+#34018
+The Mirrorweb Hollow~
+Sheets of nearly invisible filament span this round hollow from crystal
+to crystal. Each strand reflects the chamber behind it instead of the
+chamber before it, filling the air with false openings and doubled
+shadows. Small wrapped husks hang motionless within the web.
+~
+340 0 0 0 0 0
+D0
+The webbed hollow climbs north toward the white light of the Mirrorwell.
+~
+~
+0 0 34005
+D2
+Painted strands thicken south into a chamber draped in geometric
+webbing.
+~
+~
+0 0 34028
+D3
+The false reflections thin west toward the Razor-Facet Nest.
+~
+~
+0 0 34017
+S
+#34019
+The Inverted Pool~
+A dark pool fills a bowl of mirrored stone, but its reflection shows a
+cavern roof descending beneath the water rather than the ceiling above.
+Rings spread across the surface without any visible cause. Pale
+hoofprints approach the edge and vanish where the reflection begins.
+~
+340 0 0 0 0 0
+D1
+Colored crystal reeds glow beyond the eastern lip of the pool.
+~
+~
+0 0 34021
+D2
+The inverted pool drains south toward the brighter Mirrorwell.
+~
+~
+0 0 34005
+S
+#34020
+The Gemjaw Crawlspace~
+The passage narrows into a low mineral throat scored by paired grooves.
+Glittering chips of blue crystal crunch underfoot, and several nearby
+formations bear semicircular bites as though some creature has been
+feeding directly on the stone. A heavier tunnel opens beyond.
+~
+340 0 0 0 0 0
+D0
+The crawlspace rises north toward muted violet crystal.
+~
+~
+0 0 34006
+D3
+The cramped tunnel opens west among the immense cobalt blooms.
+~
+~
+0 0 34015
+S
+#34021
+The Prismatic Meadow~
+A broad cavern floor is carpeted in waist-high crystal reeds that sway
+despite the still air. Their slender stems divide every passing light
+into soft curtains of color, creating the illusion of an open meadow
+beneath a jeweled sky. Delicate hoof marks weave between the glowing
+stalks.
+~
+340 0 0 0 0 0
+D0
+Branching crystal formations rise north like a forest of antlers.
+~
+~
+0 0 34022
+D3
+The crystal meadow fades west beside the uncanny Inverted Pool.
+~
+~
+0 0 34019
+S
+#34022
+The Antlered Gallery~
+Branching mineral formations arch from the walls like enormous crystal
+antlers. Many have been rubbed smooth at their bases, and chips of
+translucent horn lie among patches of luminous moss. The path here feels
+unexpectedly calm despite the distant hum of the Heart Prism.
+~
+340 0 0 0 0 0
+D1
+The calm gallery narrows east toward the colorless stone.
+~
+~
+0 0 34007
+D2
+The antlered formations open south into the Prismatic Meadow.
+~
+~
+0 0 34021
+S
+#34023
+The Hollow Facet~
+A massive geode has split open from within, leaving a person-sized
+hollow in its center. The empty shell is lined with dark facets that
+perfectly imitate whatever stands before them, but one reflection always
+moves a heartbeat too late. Fine drag marks lead deeper east.
+~
+340 0 0 0 0 0
+D1
+Drag marks and opalescent flashes lead east into a broodway.
+~
+~
+0 0 34024
+D3
+The hollow facet opens west into the broken colors of the Shattered
+Spectrum.
+~
+~
+0 0 34099
+S
+#34024
+The Spectrum Broodway~
+Clusters of opalescent eggs cling to the walls inside translucent
+mineral sacs. Colored pulses travel from one cluster to another like
+signals, and newly hatched crystal insects disappear into hairline
+cracks as soon as they sense movement. The floor slopes toward a chamber
+filled with a heavier rhythmic hum.
+~
+340 0 0 0 0 0
+D1
+The pulsing egg clusters thicken east toward a vast geode chamber.
+~
+~
+0 0 34025
+D3
+The broodway narrows west around the strange Hollow Facet.
+~
+~
+0 0 34023
+S
+#34025
+The Broodmother's Prism~
+A cathedral-sized geode forms the deepest chamber of the hidden
+broodway. At its center rises a nest of fused crystal, shed shells, and
+luminous nectar surrounding a great many-colored insect queen. Every
+facet in the chamber answers her movements with a ripple of hostile
+light.
+~
+340 0 0 0 0 0
+D2
+A steep southern fissure descends toward the overwhelming light of the
+Heart Prism.
+~
+~
+0 0 34008
+D3
+The broodmother's nest contracts west into the egg-lined Broodway.
+~
+~
+0 0 34024
+D4
+A silk-lined shaft climbs toward a brightly painted predator's court.
+~
+~
+0 0 34029
+S
+#34026
+The Beetle Run~
+A broad tunnel has been polished almost smooth by the passage of heavy
+crystal shells. Parallel grooves score the floor where four powerful
+limbs on either side of enormous beetles have scraped against the stone.
+Broken quartz lies crushed into glittering powder beneath their path.
+~
+340 0 0 0 0 0
+D0
+The beetle-worn passage climbs north into the Crystalback Burrows.
+~
+~
+0 0 34012
+D1
+The scraped tunnel opens east into a basin of shattered crystal pillars.
+~
+~
+0 0 34027
+S
+#34027
+The Horned Crucible~
+The tunnel widens into a scarred basin ringed by shattered crystal
+pillars. Deep gouges cross the floor in intersecting arcs, evidence of
+massive horned beetles testing strength against one another. Every
+impact has fused tiny rainbow sparks permanently into the stone.
+~
+340 0 0 0 0 0
+D0
+The horn-scarred basin climbs north toward great cobalt crystal blooms.
+~
+~
+0 0 34015
+D3
+A polished run leads west out of the scarred basin.
+~
+~
+0 0 34026
+S
+#34028
+The Painted Web~
+Bands of red, white, blue, and yellow silk stretch between tall black
+crystals in deliberate geometric patterns. Some strands end in bundled
+husks while others seem arranged purely for display, forming grinning
+shapes whenever the light catches them from the wrong angle.
+~
+340 0 0 0 0 0
+D0
+The painted silk thins north toward the deceptive Mirrorweb Hollow.
+~
+~
+0 0 34018
+D1
+Bright webbing leads east beneath hanging silk banners toward a vast
+nest.
+~
+~
+0 0 34029
+S
+#34029
+The Clown Spider's Court~
+A vast webbed chamber spreads beneath a ceiling lost in shadow. Painted
+sheets of silk hang like grotesque festival banners between crystal
+columns, and pale wrapped trophies sway above a circular nest. At the
+center, a monstrous spider waits amid colors far too cheerful for the
+violence surrounding it.
+~
+340 0 0 0 0 0
+D3
+The monstrous court opens west into the Painted Web.
+~
+~
+0 0 34028
+D5
+A steep web-lined shaft descends toward the deeper brood chambers.
+~
+~
+0 0 34025
+S
+#34099
+The Shattered Spectrum~
+A collapsed crystal pocket lies beyond the violet blind, carpeted in
+thousands of harmless glassy splinters. The fragments refuse to agree
+on what color they are, shifting from blue to gold to crimson when
+viewed from different angles. At the chamber's center, an ancient
+fracture exposes the dark living stone beneath the grotto's beauty.
+~
+340 0 0 0 0 0
+D1
+A black seam in the eastern wall opens into a hollow geode.
+~
+~
+0 0 34023
+D3
+The only stable way out squeezes west through the crack behind the
+Violet Blind.
+~
+~
+0 0 34009
 S
 $~

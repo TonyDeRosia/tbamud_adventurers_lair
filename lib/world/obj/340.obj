@@ -1,33 +1,331 @@
 #34000
-violet spectrum lens~
-a violet spectrum lens~
-A violet spectrum lens rests among the movable facets.~
+violet spectrum lens prism crystal~
+a @Mv@Wi@Mo@Wl@Me@Wt @Wspectrum lens@n~
+A @Mv@Wi@Mo@Wl@Me@Wt @Wspectrum lens@n rests among the movable crystal facets.~
+Cut from a single piece of deep violet crystal, the lens seems almost
+black until light strikes its beveled rim. Looking through it strips
+away ordinary color and reveals faint prismatic traces lingering on
+enchanted surfaces.
 ~
 8 0 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-0 0 0 0 0
+1 120 0 15 0
 #34001
-flawless spectrum shard~
-a flawless spectrum shard~
-A flawless spectrum shard catches every nearby color.~
+flawless spectrum shard prism crystal~
+a @Wfl@Ca@Wwl@Ce@Wss @Cspectrum shard@n~
+A @Wfl@Ca@Wwl@Ce@Wss @Cspectrum shard@n catches every nearby color at once.~
+This palm-sized shard has no visible flaw, cloud, or chipped edge.
+Every color nearby appears somewhere inside it, even when the shard is
+held in darkness, as though a fragment of the Heart Prism's radiance
+remains trapped within.
 ~
 8 0 0 0 0 a 0 0 0 0 0 0 0
 0 0 0 0
-0 0 0 0 0
+1 300 0 18 0
 #34002
-mantle tempered refraction prismatic~
-a mantle of tempered refraction~
-A mantle of tempered refraction folds the nearby light into quiet bands.~
+mantle tempered refraction prismatic crystal~
+a @Cmantle @Wof @Ctempered @Wrefraction@n~
+A @Cmantle @Wof @Ctempered @Wrefraction@n folds the nearby light into quiet bands.~
+Overlapping plates of thin translucent crystal have been bound into a
+flexible mantle that moves like heavy cloth. Light striking one plate
+is carried into the next and released somewhere else, leaving the
+wearer surrounded by soft displaced reflections.
 ~
 9 0 0 0 0 ad 0 0 0 0 0 0 0
 3 0 0 0
-8 50000 0 20 0
+6 600 0 20 0
 #34003
-heart prism edge blade~
-the heart-prism edge~
-The heart-prism edge divides every reflection along its narrow blade.~
+heart prism edge blade crystal weapon~
+the @Wheart@M-@Cprism @Wedge@n~
+The @Wheart@M-@Cprism @Wedge@n divides every reflection along its narrow blade.~
+This narrow weapon appears to have been grown from a single dark facet
+of the Heart Prism. Its edge is nearly invisible when held still, but
+movement sends a razor-thin line of spectral color racing from hilt to
+tip.
 ~
 5 0 0 0 0 an 0 0 0 0 0 0 0
 0 2 5 3
-6 75000 0 22 0
+5 850 0 22 0
+#34004
+crystalback carapace prismatic shell armor~
+a @Ccrystal@Wback @Ccarapace@n~
+A @Ccrystal@Wback @Ccarapace@n gleams with overlapping mineral plates.~
+Layered plates taken from a mature crystalback beetle have been bound
+into a surprisingly flexible cuirass. The shell bends light along its
+ridges, breaking the wearer's outline into several faint overlapping
+silhouettes.
+~
+9 g 0 0 0 ad 0 0 0 0 0 0 0
+4 0 0 0
+8 520 0 17 0
+#34005
+glasswing circlet prism crown crystal~
+a @Wgl@Ca@Wss@Cw@Wi@Cn@Wg @Ccirclet@n~
+A @Wgl@Ca@Wss@Cw@Wi@Cn@Wg @Ccirclet@n glitters like frozen wings.~
+Several flawless glasswing plates have been fitted around a narrow
+silver band. When worn, the translucent pieces tremble with nearby
+movement and cast tiny warning flashes at the edge of vision.
+~
+9 g 0 0 0 ae 0 0 0 0 0 0 0
+3 0 0 0
+2 450 0 18 0
+#34006
+violetstep boots crystal violet~
+a pair of @Mv@Wi@Mo@Wl@Me@Wt@Ms@Wt@Me@Wp @Wboots@n~
+A pair of @Mv@Wi@Mo@Wl@Me@Wt@Ms@Wt@Me@Wp @Wboots@n waits in a shimmer of purple light.~
+Dark leather has been reinforced with thin amethyst scales along the
+heel and sole. The crystal plates drink in reflected light, making each
+footfall seem to land a little farther from where it truly falls.
+~
+9 g 0 0 0 ag 0 0 0 0 0 0 0
+3 0 0 0
+4 500 0 19 0
+#34007
+amber lattice bracers crystal arms~
+a pair of @Ya@Wm@Yb@We@Yr@W-@Yl@Wa@Yt@Wt@Yi@Wc@Ye @Wbracers@n~
+A pair of @Ya@Wm@Yb@We@Yr@W-@Yl@Wa@Yt@Wt@Yi@Wc@Ye @Wbracers@n glows with warm internal light.~
+Honey-colored crystal has been grown into interlocking bands that
+protect the forearms without restricting movement. Fine channels inside
+the lattice carry a slow pulse of golden light.
+~
+9 g 0 0 0 ai 0 0 0 0 0 0 0
+3 0 0 0
+4 520 0 19 0
+#34008
+cobalt shard greaves crystal legs~
+a pair of @Ccobalt@W-@Cshard @Wgreaves@n~
+A pair of @Ccobalt@W-@Cshard @Wgreaves@n sheds cold blue reflections.~
+Dense cobalt crystal plates overlap down the front of these greaves.
+Their edges have been ground smooth, but the deep color remains cold
+enough to mist when brought into warmer air.
+~
+9 g 0 0 0 af 0 0 0 0 0 0 0
+4 0 0 0
+6 600 0 21 0
+#34009
+mirrorweb cloak silver crystal back~
+a @Wmir@cro@Wrew@ceb @Wcloak@n~
+A @Wmir@cro@Wrew@ceb @Wcloak@n hangs in layers of impossible reflection.~
+Thousands of nearly invisible reflective threads have been woven into a
+light cloak. Instead of showing its wearer directly, the cloth returns
+broken glimpses of the room around them.
+~
+9 g 0 0 0 ak 0 0 0 0 0 0 0
+3 0 0 0
+3 700 0 21 0
+#34010
+refraction band ring crystal~
+a @Cband @Wof @Crefraction@n~
+A @Cband @Wof @Crefraction@n splits nearby light across its narrow surface.~
+This clear crystal ring contains a hair-thin internal fracture that
+divides any light entering it into a perfect spectrum. The fracture
+never spreads no matter how hard the band is struck.
+~
+9 g 0 0 0 ab 0 0 0 0 0 0 0
+2 0 0 0
+1 650 0 22 0
+#34011
+heartglass gorget prism crystal neck~
+a @Mheart@Wglass @Mgorget@n~
+A @Mheart@Wglass @Mgorget@n pulses with restrained violet fire.~
+Dark violet plates surround the throat without touching the skin. A
+small captive prism at the center of the gorget turns whenever danger
+approaches, throwing a thin line of light across the wearer's chest.
+~
+9 g 0 0 0 ac 0 0 0 0 0 0 0
+3 0 0 0
+3 760 0 23 0
+#34012
+shardmantis talon blade crystal weapon~
+a @Wsh@Car@Wdm@Can@Wti@Cs @Ctalon@n~
+A @Wsh@Car@Wdm@Can@Wti@Cs @Ctalon@n lies sharp enough to divide reflected light.~
+The curved forelimb of a shardmantis has hardened into a natural crystal
+blade. Its cutting edge is almost perfectly transparent, visible only
+where spectral light crawls along the curve.
+~
+5 g 0 0 0 an 0 0 0 0 0 0 0
+0 3 5 3
+5 780 0 20 0
+#34013
+prismfang spear lance crystal weapon~
+a @Cprism@Wfang @Cspear@n~
+A @Cprism@Wfang @Cspear@n gleams with a needle of white light.~
+A long shaft of dark mineral wood supports a spearhead grown from
+flawless clear crystal. The point divides incoming light into a tight
+halo that makes its true reach difficult to judge.
+~
+5 g 0 0 0 an 0 0 0 0 0 0 0
+0 3 6 11
+7 900 0 24 0
+#34014
+amber nectar luminous phial~
+a phial of @Ylu@Wmi@Yno@Wus @Yamber nectar@n~
+A phial of @Ylu@Wmi@Yno@Wus @Yamber nectar@n glows warmly from within.~
+Thick golden nectar clings to the inside of this sealed crystal phial.
+It gives off a soft warmth and carries the rich scent of rain-soaked
+flowers despite having come from a cavern without sunlight.
+~
+8 0 0 0 0 a 0 0 0 0 0 0 0
+0 0 0 0
+1 180 0 15 0
+#34015
+broodmother crystal egg opalescent~
+an @Wo@Mp@Wa@Ml@We@Ms@Wc@Me@Wn@Mt @Wbrood crystal@n~
+An @Wo@Mp@Wa@Ml@We@Ms@Wc@Me@Wn@Mt @Wbrood crystal@n pulses with dormant color.~
+This egg-shaped crystal is warm to the touch and filled with slowly
+drifting bands of color. Whatever once grew inside has left behind a
+dense knot of prismatic magic.
+~
+8 0 0 0 0 a 0 0 0 0 0 0 0
+0 0 0 0
+2 500 0 24 0
+#34016
+prism stag antler crystal~
+a broken @Rpr@Yi@Cs@Mm@W-stag antler@n~
+A broken @Rpr@Yi@Cs@Mm@W-stag antler@n branches into translucent points.~
+The antler has the grain of bone but the clarity of quartz. Every branch
+carries a different color near its tip, and the hues shift slowly toward
+the base when held beneath open light.
+~
+8 0 0 0 0 a 0 0 0 0 0 0 0
+0 0 0 0
+3 260 0 22 0
+#34017
+kaleidoscope buckler shield crystal~
+a @Ck@Wa@Cl@We@Ci@Wd@Co@Ws@Cc@Wo@Cp@We @Wbuckler@n~
+A @Ck@Wa@Cl@We@Ci@Wd@Co@Ws@Cc@Wo@Cp@We @Wbuckler@n turns every reflection aside.~
+A round shield of layered crystal plates has been arranged so no two
+facets face the same direction. Incoming light scatters wildly across
+its surface, making the exact position of the shield difficult to
+follow.
+~
+9 g 0 0 0 aj 0 0 0 0 0 0 0
+4 0 0 0
+5 700 0 22 0
+#34018
+kaleidoscope scale prismwing crystal~
+a @Mk@Wa@Ml@We@Mi@Wd@Mo@Ws@Mc@Wo@Wp@We @Wwing-scale@n~
+A @Mk@Wa@Ml@We@Mi@Wd@Mo@Ws@Mc@Wo@Wp@We @Wwing-scale@n flashes through a dozen colors.~
+The delicate scale is almost weightless, yet it refuses to bend or tear.
+Tilting it through the light produces colors that do not seem to exist
+anywhere else in the grotto.
+~
+8 0 0 0 0 a 0 0 0 0 0 0 0
+0 0 0 0
+1 120 0 15 0
+#34019
+heart splinter flawless prism crystal~
+a @Wflawless @Mheart @Wsplinter@n~
+A @Wflawless @Mheart @Wsplinter@n burns with concentrated prismatic light.~
+This narrow fragment resembles a tiny piece of the Heart Prism itself.
+Light does not merely reflect from it; the shard seems to gather
+radiance from the room and release it moments later in a brighter pulse.
+~
+8 0 0 0 0 a 0 0 0 0 0 0 0
+0 0 0 0
+1 900 0 25 0
+#34020
+quad beetle carapace shell armor~
+a @Yq@Wu@Ya@Wd@W-@Yb@We@Ye@Wt@Yl@We @Wcarapace@n~
+A @Yq@Wu@Ya@Wd@W-@Yb@We@Ye@Wt@Yl@We @Wcarapace@n rests here like a polished shield of living amber.~
+The enormous shell plate is surprisingly light for its thickness. Four
+raised ridges divide its surface into hard defensive sections, while
+amber and black crystal bands seem to shift whenever the armor catches
+direct light.
+~
+9 g 0 0 0 ad 0 0 0 0 0 0 0
+5 0 0 0
+9 780 0 22 0
+#34021
+quad beetle horn hornblade weapon~
+a @Yq@Wu@Ya@Wd@W-@Yb@We@Ye@Wt@Yl@We @Whornblade@n~
+A @Yq@Wu@Ya@Wd@W-@Yb@We@Ye@Wt@Yl@We @Whornblade@n juts from the stone like a captured charge.~
+This curved horn once crowned a mature quad beetle. Its dense crystal
+tip remains sharp enough to pierce plate, while the thicker base has
+been wrapped in dark hide to form a brutal thrusting weapon.
+~
+5 g 0 0 0 an 0 0 0 0 0 0 0
+0 3 6 11
+7 900 0 22 0
+#34022
+jesterweb mantle clown spider silk cloak~
+a @Rj@We@Rs@Wt@Re@Wr@Rw@We@Rb @Wmantle@n~
+A @Rj@We@Rs@Wt@Re@Wr@Rw@We@Rb @Wmantle@n spills across the ground in impossible painted folds.~
+Layers of clown-spider silk have been woven into a light mantle
+patterned in violent reds, pale whites, and deep blue-black. The threads
+tighten against sudden movement, becoming far stronger than ordinary
+cloth.
+~
+9 g 0 0 0 ak 0 0 0 0 0 0 0
+4 0 0 0
+3 900 0 23 0
+#34023
+clown spider fang dagger weapon~
+a @WC@Rl@Wo@Rw@Wn@R-@Ws@Rp@Wi@Rd@We@Rr @Wfang@n~
+A @WC@Rl@Wo@Rw@Wn@R-@Ws@Rp@Wi@Rd@We@Rr @Wfang@n gleams with a thin painted-red edge.~
+The long hollow fang has been fitted to a wrapped grip, turning part of
+the Clown Spider into a wicked piercing blade. A faint red stain remains
+trapped inside the otherwise flawless crystal.
+~
+5 g 0 0 0 an 0 0 0 0 0 0 0
+0 3 5 11
+4 950 0 24 0
+#34024
+clown spider mask painted crystal helm~
+the @RC@Wl@Ro@Ww@Rn @RSp@Wid@Rer's @Wmask@n~
+The @RC@Wl@Ro@Ww@Rn @RSp@Wid@Rer's @Wmask@n grins from the floor in painted crystal.~
+A faceplate cut from the boss spider's hardened crown bears a natural
+pattern like a broad theatrical grin. Its colors are beautiful at a
+distance and deeply unsettling up close.
+~
+9 g 0 0 0 ae 0 0 0 0 0 0 0
+4 0 0 0
+3 980 0 25 0
+#34025
+quad beetle core iridescent crystal~
+an @Yi@Wr@Yi@Wd@Ye@Ws@Yc@We@Yn@Wt @Wbeetle core@n~
+An @Yi@Wr@Yi@Wd@Ye@Ws@Yc@We@Yn@Wt @Wbeetle core@n pulses with stubborn amber light.~
+A compact knot of crystalline tissue taken from inside a quad beetle's
+armored body still emits slow amber pulses. The material is prized by
+smiths who work enchanted armor.
+~
+8 0 0 0 0 a 0 0 0 0 0 0 0
+0 0 0 0
+2 340 0 22 0
+#34026
+painted spider silk bundle clown web~
+a bundle of @Rp@Wa@Ri@Wn@Rt@We@Rd @Wspider silk@n~
+A bundle of @Rp@Wa@Ri@Wn@Rt@We@Rd @Wspider silk@n clings to the crystal in bright tangled bands.~
+The silk is tougher than cord and covered in natural stripes of red,
+white, yellow, and blue. Even cut free from the web, the colors remain
+unnaturally vivid.
+~
+8 0 0 0 0 a 0 0 0 0 0 0 0
+0 0 0 0
+1 110 0 18 0
+#34027
+prism cicada wing crystal~
+a @Cpr@Wis@Cm@W-@Ccicada @Wwing@n~
+A @Cpr@Wis@Cm@W-@Ccicada @Wwing@n flashes with a clear bell-like sheen.~
+The broad transparent wing is veined with rigid crystal and rings softly
+when tapped. Each vein carries a different faint color toward the outer
+edge.
+~
+8 0 0 0 0 a 0 0 0 0 0 0 0
+0 0 0 0
+1 90 0 16 0
+#34028
+tome painted spectrum colour color spray prismatic clown spider~
+a @Wtome of the @RPa@Yi@Cn@Mt@Re@Yd @CSpectrum@n~
+A @Wtome of the @RPa@Yi@Cn@Mt@Re@Yd @CSpectrum@n lies bound in brilliant spider silk.~
+Thin crystal plates form the pages of this strange codex, each one
+bound to the next with painted strands of Clown Spider silk. Prismatic
+sigils shift across the facets when the tome is tilted, teaching the
+reader how to gather scattered color and release it as destructive light.
+~
+24 gq 0 0 0 a 0 0 0 0 0 0 0
+10 0 0 0
+1 0 0 15 0
+C
+0
 $~
