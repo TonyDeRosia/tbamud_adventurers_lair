@@ -122,8 +122,15 @@ void improve_ability_from_use(struct char_data *ch, int ability, int success)
   if (chance < 1) chance = 1;
   if (chance > 35) chance = 35;
 
-  if (rand_number(1, 100) <= chance)
-    SET_SKILL(ch, ability, MIN(100, cur + 1));
+  if (rand_number(1, 100) <= chance) {
+    int new_prof = MIN(100, cur + 1);
+
+    SET_SKILL(ch, ability, new_prof);
+    if (new_prof > cur) {
+      send_to_char(ch, "%sYou have become more proficient with %s!%s\r\n",
+                   CBYEL(ch, C_NRM), skill_name(ability), CCNRM(ch, C_NRM));
+    }
+  }
 }
 
 int MIN(int a, int b)
