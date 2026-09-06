@@ -45,6 +45,9 @@ const struct pc_class_definition pc_classes[] = {
     .name = "Mage",
     .abbrev = "Mg",
     .archetype_abbrev = "Arc",
+    .primary_stat = CLASS_STAT_INT,
+    .secondary_stat = CLASS_STAT_WIS,
+    .tertiary_stat = CLASS_STAT_DEX,
     .select_key = 'm',
     .selectable = true,
     .prac_learned_level = 95,
@@ -56,6 +59,9 @@ const struct pc_class_definition pc_classes[] = {
     .name = "Cleric",
     .abbrev = "Cl",
     .archetype_abbrev = "Div",
+    .primary_stat = CLASS_STAT_WIS,
+    .secondary_stat = CLASS_STAT_CON,
+    .tertiary_stat = CLASS_STAT_STR,
     .select_key = 'c',
     .selectable = true,
     .prac_learned_level = 95,
@@ -67,6 +73,9 @@ const struct pc_class_definition pc_classes[] = {
     .name = "Thief",
     .abbrev = "Th",
     .archetype_abbrev = "Rog",
+    .primary_stat = CLASS_STAT_DEX,
+    .secondary_stat = CLASS_STAT_INT,
+    .tertiary_stat = CLASS_STAT_STR,
     .select_key = 't',
     .selectable = true,
     .prac_learned_level = 85,
@@ -78,6 +87,9 @@ const struct pc_class_definition pc_classes[] = {
     .name = "Warrior",
     .abbrev = "Wa",
     .archetype_abbrev = "Mar",
+    .primary_stat = CLASS_STAT_STR,
+    .secondary_stat = CLASS_STAT_CON,
+    .tertiary_stat = CLASS_STAT_DEX,
     .select_key = 'w',
     .selectable = true,
     .prac_learned_level = 80,
@@ -89,6 +101,9 @@ const struct pc_class_definition pc_classes[] = {
     .name = "Paladin",
     .abbrev = "Pa",
     .archetype_abbrev = "Mar",
+    .primary_stat = CLASS_STAT_STR,
+    .secondary_stat = CLASS_STAT_WIS,
+    .tertiary_stat = CLASS_STAT_CON,
     .select_key = 'p',
     .selectable = true,
     .prac_learned_level = 80,
@@ -100,6 +115,9 @@ const struct pc_class_definition pc_classes[] = {
     .name = "Bard",
     .abbrev = "Br",
     .archetype_abbrev = "Rog",
+    .primary_stat = CLASS_STAT_CHA,
+    .secondary_stat = CLASS_STAT_DEX,
+    .tertiary_stat = CLASS_STAT_INT,
     .select_key = 'b',
     .selectable = true,
     .prac_learned_level = 85,
@@ -111,6 +129,9 @@ const struct pc_class_definition pc_classes[] = {
     .name = "Warlock",
     .abbrev = "Wl",
     .archetype_abbrev = "Spl",
+    .primary_stat = CLASS_STAT_INT,
+    .secondary_stat = CLASS_STAT_CHA,
+    .tertiary_stat = CLASS_STAT_WIS,
     .select_key = 'k',
     .selectable = true,
     .prac_learned_level = 95,
@@ -122,6 +143,9 @@ const struct pc_class_definition pc_classes[] = {
     .name = "Druid",
     .abbrev = "Dr",
     .archetype_abbrev = "Div",
+    .primary_stat = CLASS_STAT_WIS,
+    .secondary_stat = CLASS_STAT_CON,
+    .tertiary_stat = CLASS_STAT_INT,
     .select_key = 'd',
     .selectable = true,
     .prac_learned_level = 95,
@@ -133,6 +157,9 @@ const struct pc_class_definition pc_classes[] = {
     .name = "Mystic",
     .abbrev = "My",
     .archetype_abbrev = "Spl",
+    .primary_stat = CLASS_STAT_WIS,
+    .secondary_stat = CLASS_STAT_DEX,
+    .tertiary_stat = CLASS_STAT_CON,
     .select_key = 'y',
     .selectable = true,
     .prac_learned_level = 95,
@@ -176,6 +203,50 @@ const char *pc_class_types[] = {
 int num_pc_classes(void)
 {
   return NUM_PC_CLASSES;
+}
+
+const char *class_stat_name(int stat)
+{
+  switch (stat) {
+    case CLASS_STAT_STR: return "Strength";
+    case CLASS_STAT_DEX: return "Dexterity";
+    case CLASS_STAT_CON: return "Constitution";
+    case CLASS_STAT_INT: return "Intelligence";
+    case CLASS_STAT_WIS: return "Wisdom";
+    case CLASS_STAT_CHA: return "Charisma";
+    default:             return "None";
+  }
+}
+
+int get_class_primary_stat(int class_num)
+{
+  return is_valid_class(class_num) ? pc_classes[class_num].primary_stat : CLASS_STAT_NONE;
+}
+
+int get_class_secondary_stat(int class_num)
+{
+  return is_valid_class(class_num) ? pc_classes[class_num].secondary_stat : CLASS_STAT_NONE;
+}
+
+int get_class_tertiary_stat(int class_num)
+{
+  return is_valid_class(class_num) ? pc_classes[class_num].tertiary_stat : CLASS_STAT_NONE;
+}
+
+int get_class_stat_value(struct char_data *ch, int stat)
+{
+  if (!ch)
+    return 0;
+
+  switch (stat) {
+    case CLASS_STAT_STR: return GET_STR(ch);
+    case CLASS_STAT_DEX: return GET_DEX(ch);
+    case CLASS_STAT_CON: return GET_CON(ch);
+    case CLASS_STAT_INT: return GET_INT(ch);
+    case CLASS_STAT_WIS: return GET_WIS(ch);
+    case CLASS_STAT_CHA: return GET_CHA(ch);
+    default:             return 0;
+  }
 }
 
 int is_valid_class(int class_num)

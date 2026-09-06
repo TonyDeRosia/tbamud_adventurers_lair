@@ -21,10 +21,29 @@
 struct char_data;
 struct obj_data;
 
+/*
+ * Central class-stat identity used by combat progression and ability scaling.
+ * These values describe class priorities only; they do not alter gameplay by
+ * themselves. Individual abilities may later override supporting weights while
+ * still respecting the class's primary identity.
+ */
+enum class_stat_type {
+  CLASS_STAT_NONE = 0,
+  CLASS_STAT_STR,
+  CLASS_STAT_DEX,
+  CLASS_STAT_CON,
+  CLASS_STAT_INT,
+  CLASS_STAT_WIS,
+  CLASS_STAT_CHA
+};
+
 struct pc_class_definition {
   const char *name;
   const char *abbrev;
   const char *archetype_abbrev;
+  int primary_stat;
+  int secondary_stat;
+  int tertiary_stat;
   char select_key;
   bool selectable;
   int prac_learned_level;
@@ -59,6 +78,12 @@ int get_class_prac_learned_level(int class_num);
 int get_class_prac_max_per_prac(int class_num);
 int get_class_prac_min_per_prac(int class_num);
 int get_class_prac_type(int class_num);
+
+int get_class_primary_stat(int class_num);
+int get_class_secondary_stat(int class_num);
+int get_class_tertiary_stat(int class_num);
+int get_class_stat_value(struct char_data *ch, int stat);
+const char *class_stat_name(int stat);
 
 /* Global variables */
 extern const struct pc_class_definition pc_classes[];
