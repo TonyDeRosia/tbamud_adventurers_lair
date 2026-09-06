@@ -2386,6 +2386,8 @@ static void load_zones(FILE *fl, char *zonename)
       continue;
 
     ptr++;
+    ZCMD.spawn_count = 0;
+    ZCMD.spawn_chance = 100;
 
     if (ZCMD.command == 'S' || ZCMD.command == '$') {
       ZCMD.command = 'S';
@@ -2407,6 +2409,49 @@ static void load_zones(FILE *fl, char *zonename)
       if (sscanf(ptr, " %d %d %d %d ", &tmp, &ZCMD.arg1, &ZCMD.arg2,
 		 &ZCMD.arg3) != 4)
 	error = 1;
+    }
+
+    /*
+     * Optional Adventurer's Lair reset extensions.
+     *
+     * Legacy M/O lines have no count= token and retain stock global-max
+     * semantics.  A count= token explicitly enables the custom per-reset
+     * population-slot model.  Old v1 spawn=NN lines without count= remain
+     * legacy so the short-lived first implementation cannot silently convert
+     * stock resets that were merely rewritten by save_zone().
+     */
+    if (ZCMD.command == 'M' || ZCMD.command == 'O') {
+      int offset = 0;
+      const char *extra;
+
+      sscanf(ptr, " %*d %*d %*d %*d %n", &offset);
+      extra = offset ? ptr + offset : NULL;
+
+      while (extra && *extra) {
+        char token[80] = "";
+        int used = 0;
+
+        while (*extra && isspace((unsigned char)*extra))
+          extra++;
+
+        if (!*extra || *extra == '(')
+          break;
+
+        if (sscanf(extra, "%79s%n", token, &used) != 1 || used <= 0)
+          break;
+
+        if (!strncmp(token, "count=", 6)) {
+          if (!parse_reset_count(token + 6, &ZCMD.spawn_count))
+            error = 1;
+        } else if (!strncmp(token, "spawn=", 6)) {
+          if (!parse_reset_chance(token + 6, &ZCMD.spawn_chance))
+            error = 1;
+        } else {
+          break;
+        }
+
+        extra += used;
+      }
     }
 
     ZCMD.if_flag = tmp;
@@ -2920,6 +2965,42 @@ static void log_zone_error(zone_rnum zone, int cmd_no, const char *message)
 #define ZONE_ERROR(message) \
 	{ log_zone_error(zone, cmd_no, message); last_cmd = 0; }
 
+static int count_custom_reset_mobs(zone_vnum zone_vnum_value, room_vnum room_vnum_value,
+                                   mob_vnum mob_vnum_value)
+{
+  struct char_data *iter;
+  int count = 0;
+
+  for (iter = character_list; iter; iter = iter->next) {
+    if (!iter->mob_specials.reset_spawn_tracked)
+      continue;
+    if (iter->mob_specials.reset_spawn_zone == zone_vnum_value &&
+        iter->mob_specials.reset_spawn_room == room_vnum_value &&
+        iter->mob_specials.reset_spawn_vnum == mob_vnum_value)
+      count++;
+  }
+
+  return count;
+}
+
+static int count_custom_reset_objs(zone_vnum zone_vnum_value, room_vnum room_vnum_value,
+                                   obj_vnum obj_vnum_value)
+{
+  struct obj_data *iter;
+  int count = 0;
+
+  for (iter = object_list; iter; iter = iter->next) {
+    if (!iter->reset_spawn_tracked)
+      continue;
+    if (iter->reset_spawn_zone == zone_vnum_value &&
+        iter->reset_spawn_room == room_vnum_value &&
+        iter->reset_spawn_vnum == obj_vnum_value)
+      count++;
+  }
+
+  return count;
+}
+
 /* execute the reset command table of a given zone */
 void reset_zone(zone_rnum zone)
 {
@@ -2928,104 +3009,252 @@ void reset_zone(zone_rnum zone)
   struct obj_data *obj, *obj_to;
   room_vnum rvnum;
   room_rnum rrnum;
-  struct char_data *tmob=NULL; /* for trigger assignment */
-  struct obj_data *tobj=NULL;  /* for trigger assignment */
+  struct char_data *tmob = NULL; /* for trigger assignment */
+  struct obj_data *tobj = NULL;  /* for trigger assignment */
+
+  /*
+   * Custom M resets can create more than one new mob in one reset pass.
+   * Keep the newly created instances so dependent G/E/T/V commands apply to
+   * each new instance, not merely to the final one.
+   */
+  struct char_data *spawned_mobs[MAX_DUPLICATES];
+  struct obj_data *spawned_objs[MAX_DUPLICATES];
+  int spawned_mob_count = 0;
+  int spawned_obj_count = 0;
 
   for (cmd_no = 0; ZCMD.command != 'S'; cmd_no++) {
+    int i;
 
     if (ZCMD.if_flag && !last_cmd)
       continue;
 
-    /* This is the list of actual zone commands. If any new zone commands are
-     * added to the game, be certain to update the list of commands in load_zone
-     * () so that the counting will still be correct. - ae. */
     switch (ZCMD.command) {
-    case '*':			/* ignore command */
+    case '*':
       last_cmd = 0;
+      spawned_mob_count = 0;
+      spawned_obj_count = 0;
       break;
 
-    case 'M':			/* read a mobile */
-      if (mob_index[ZCMD.arg1].number < ZCMD.arg2) {
-	mob = read_mobile(ZCMD.arg1, REAL);
-	char_to_room(mob, ZCMD.arg3);
-        load_mtrigger(mob);
-        tmob = mob;
-	last_cmd = 1;
-      } else
-	last_cmd = 0;
+    case 'M': {
+      spawned_mob_count = 0;
+      spawned_obj_count = 0;
       tobj = NULL;
+
+      if (ZCMD.spawn_count > 0) {
+        zone_vnum zv = zone_table[zone].number;
+        room_vnum rv = world[ZCMD.arg3].number;
+        mob_vnum mv = mob_index[ZCMD.arg1].vnum;
+        int active = count_custom_reset_mobs(zv, rv, mv);
+        int missing = ZCMD.spawn_count - active;
+
+        mob = NULL;
+        tmob = NULL;
+
+        if (missing < 0)
+          missing = 0;
+
+        for (i = 0; i < missing && spawned_mob_count < MAX_DUPLICATES; i++) {
+          if (ZCMD.spawn_chance != 100 &&
+              rand_number(1, 100) > ZCMD.spawn_chance)
+            continue;
+
+          mob = read_mobile(ZCMD.arg1, REAL);
+          mob->mob_specials.reset_spawn_tracked = TRUE;
+          mob->mob_specials.reset_spawn_zone = zv;
+          mob->mob_specials.reset_spawn_room = rv;
+          mob->mob_specials.reset_spawn_vnum = mv;
+
+          char_to_room(mob, ZCMD.arg3);
+          load_mtrigger(mob);
+
+          spawned_mobs[spawned_mob_count++] = mob;
+          tmob = mob;
+        }
+
+        last_cmd = (spawned_mob_count > 0);
+      } else {
+        /* Legacy stock behavior: arg2 is the global prototype maximum. */
+        if (mob_index[ZCMD.arg1].number < ZCMD.arg2) {
+          mob = read_mobile(ZCMD.arg1, REAL);
+          char_to_room(mob, ZCMD.arg3);
+          load_mtrigger(mob);
+          tmob = mob;
+          last_cmd = 1;
+        } else
+          last_cmd = 0;
+      }
+      break;
+    }
+
+    case 'O': {
+      spawned_obj_count = 0;
+      spawned_mob_count = 0;
+      tmob = NULL;
+
+      if (ZCMD.spawn_count > 0) {
+        zone_vnum zv = zone_table[zone].number;
+        room_vnum rv = (ZCMD.arg3 != NOWHERE) ? world[ZCMD.arg3].number : NOWHERE;
+        obj_vnum ov = obj_index[ZCMD.arg1].vnum;
+        int active = count_custom_reset_objs(zv, rv, ov);
+        int missing = ZCMD.spawn_count - active;
+
+        tobj = NULL;
+
+        if (missing < 0)
+          missing = 0;
+
+        for (i = 0; i < missing && spawned_obj_count < MAX_DUPLICATES; i++) {
+          if (ZCMD.spawn_chance != 100 &&
+              rand_number(1, 100) > ZCMD.spawn_chance)
+            continue;
+
+          obj = read_object(ZCMD.arg1, REAL);
+          obj->reset_spawn_tracked = TRUE;
+          obj->reset_spawn_zone = zv;
+          obj->reset_spawn_room = rv;
+          obj->reset_spawn_vnum = ov;
+
+          if (ZCMD.arg3 != NOWHERE) {
+            obj_to_room(obj, ZCMD.arg3);
+            load_otrigger(obj);
+          } else
+            IN_ROOM(obj) = NOWHERE;
+
+          spawned_objs[spawned_obj_count++] = obj;
+          tobj = obj;
+        }
+
+        last_cmd = (spawned_obj_count > 0);
+      } else {
+        /* Legacy stock behavior: arg2 is the global prototype maximum. */
+        if (obj_index[ZCMD.arg1].number < ZCMD.arg2) {
+          if (ZCMD.arg3 != NOWHERE) {
+            obj = read_object(ZCMD.arg1, REAL);
+            obj_to_room(obj, ZCMD.arg3);
+            last_cmd = 1;
+            load_otrigger(obj);
+            tobj = obj;
+          } else {
+            obj = read_object(ZCMD.arg1, REAL);
+            IN_ROOM(obj) = NOWHERE;
+            last_cmd = 1;
+            tobj = obj;
+          }
+        } else
+          last_cmd = 0;
+      }
+      break;
+    }
+
+    case 'P':
+      spawned_mob_count = 0;
+      spawned_obj_count = 0;
+      if (obj_index[ZCMD.arg1].number < ZCMD.arg2) {
+        obj = read_object(ZCMD.arg1, REAL);
+        if (!(obj_to = get_obj_num(ZCMD.arg3))) {
+          ZONE_ERROR("target obj not found, command disabled");
+          ZCMD.command = '*';
+          break;
+        }
+        obj_to_obj(obj, obj_to);
+        last_cmd = 1;
+        load_otrigger(obj);
+        tobj = obj;
+      } else
+        last_cmd = 0;
+      tmob = NULL;
       break;
 
-    case 'O':			/* read an object */
-      if (obj_index[ZCMD.arg1].number < ZCMD.arg2) {
-	if (ZCMD.arg3 != NOWHERE) {
-	  obj = read_object(ZCMD.arg1, REAL);
-	  obj_to_room(obj, ZCMD.arg3);
-	  last_cmd = 1;
+    case 'G':
+      if (spawned_mob_count > 0) {
+        last_cmd = 0;
+        spawned_obj_count = 0;
+
+        for (i = 0; i < spawned_mob_count; i++) {
+          if (obj_index[ZCMD.arg1].number >= ZCMD.arg2)
+            break;
+
+          obj = read_object(ZCMD.arg1, REAL);
+          obj_to_char(obj, spawned_mobs[i]);
           load_otrigger(obj);
+          if (spawned_obj_count < MAX_DUPLICATES)
+            spawned_objs[spawned_obj_count++] = obj;
           tobj = obj;
-	} else {
-	  obj = read_object(ZCMD.arg1, REAL);
-	  IN_ROOM(obj) = NOWHERE;
-	  last_cmd = 1;
-          tobj = obj;
-	}
-      } else
-	last_cmd = 0;
-      tmob = NULL;
-      break;
+          last_cmd = 1;
+        }
 
-    case 'P':			/* object to object */
+        tmob = NULL;
+        break;
+      }
+
+      if (!mob) {
+        char error[MAX_INPUT_LENGTH];
+        snprintf(error, sizeof(error), "attempt to give obj #%d to non-existant mob, command disabled", obj_index[ZCMD.arg1].vnum);
+        ZONE_ERROR(error);
+        ZCMD.command = '*';
+        break;
+      }
       if (obj_index[ZCMD.arg1].number < ZCMD.arg2) {
-	obj = read_object(ZCMD.arg1, REAL);
-	if (!(obj_to = get_obj_num(ZCMD.arg3))) {
-	  ZONE_ERROR("target obj not found, command disabled");
-	  ZCMD.command = '*';
-	  break;
-	}
-	obj_to_obj(obj, obj_to);
-	last_cmd = 1;
+        obj = read_object(ZCMD.arg1, REAL);
+        obj_to_char(obj, mob);
+        last_cmd = 1;
         load_otrigger(obj);
         tobj = obj;
       } else
-	last_cmd = 0;
+        last_cmd = 0;
       tmob = NULL;
       break;
 
-    case 'G':			/* obj_to_char */
-      if (!mob) {
-	char error[MAX_INPUT_LENGTH];
-	snprintf(error, sizeof(error), "attempt to give obj #%d to non-existant mob, command disabled", obj_index[ZCMD.arg1].vnum);
-	ZONE_ERROR(error);
-	ZCMD.command = '*';
-	break;
-      }
-      if (obj_index[ZCMD.arg1].number < ZCMD.arg2) {
-	obj = read_object(ZCMD.arg1, REAL);
-	obj_to_char(obj, mob);
-	last_cmd = 1;
-        load_otrigger(obj);
-        tobj = obj;
-      } else
-	last_cmd = 0;
-      tmob = NULL;
-      break;
+    case 'E':
+      if (spawned_mob_count > 0) {
+        last_cmd = 0;
+        spawned_obj_count = 0;
 
-    case 'E':			/* object to equipment list */
-      if (!mob) {
-	char error[MAX_INPUT_LENGTH];
-	snprintf(error, sizeof(error), "trying to equip non-existant mob with obj #%d, command disabled", obj_index[ZCMD.arg1].vnum);
-	ZONE_ERROR(error);
-	ZCMD.command = '*';
-	break;
-      }
-      if (obj_index[ZCMD.arg1].number < ZCMD.arg2) {
-	if (ZCMD.arg3 < 0 || ZCMD.arg3 >= NUM_WEARS) {
+        if (ZCMD.arg3 < 0 || ZCMD.arg3 >= NUM_WEARS) {
           char error[MAX_INPUT_LENGTH];
-	  snprintf(error, sizeof(error), "invalid equipment pos number (mob %s, obj %d, pos %d)", GET_NAME(mob), obj_index[ZCMD.arg2].vnum, ZCMD.arg3);
-	  ZONE_ERROR(error);
-	} else {
-	  obj = read_object(ZCMD.arg1, REAL);
+          snprintf(error, sizeof(error), "invalid equipment pos number (custom reset, obj %d, pos %d)",
+                   obj_index[ZCMD.arg1].vnum, ZCMD.arg3);
+          ZONE_ERROR(error);
+          break;
+        }
+
+        for (i = 0; i < spawned_mob_count; i++) {
+          if (obj_index[ZCMD.arg1].number >= ZCMD.arg2)
+            break;
+
+          obj = read_object(ZCMD.arg1, REAL);
+          IN_ROOM(obj) = IN_ROOM(spawned_mobs[i]);
+          load_otrigger(obj);
+          if (wear_otrigger(obj, spawned_mobs[i], ZCMD.arg3)) {
+            IN_ROOM(obj) = NOWHERE;
+            equip_char(spawned_mobs[i], obj, ZCMD.arg3);
+          } else
+            obj_to_char(obj, spawned_mobs[i]);
+
+          if (spawned_obj_count < MAX_DUPLICATES)
+            spawned_objs[spawned_obj_count++] = obj;
+          tobj = obj;
+          last_cmd = 1;
+        }
+
+        tmob = NULL;
+        break;
+      }
+
+      if (!mob) {
+        char error[MAX_INPUT_LENGTH];
+        snprintf(error, sizeof(error), "trying to equip non-existant mob with obj #%d, command disabled", obj_index[ZCMD.arg1].vnum);
+        ZONE_ERROR(error);
+        ZCMD.command = '*';
+        break;
+      }
+      if (obj_index[ZCMD.arg1].number < ZCMD.arg2) {
+        if (ZCMD.arg3 < 0 || ZCMD.arg3 >= NUM_WEARS) {
+          char error[MAX_INPUT_LENGTH];
+          snprintf(error, sizeof(error), "invalid equipment pos number (mob %s, obj %d, pos %d)", GET_NAME(mob), obj_index[ZCMD.arg2].vnum, ZCMD.arg3);
+          ZONE_ERROR(error);
+        } else {
+          obj = read_object(ZCMD.arg1, REAL);
           IN_ROOM(obj) = IN_ROOM(mob);
           load_otrigger(obj);
           if (wear_otrigger(obj, mob, ZCMD.arg3)) {
@@ -3034,14 +3263,16 @@ void reset_zone(zone_rnum zone)
           } else
             obj_to_char(obj, mob);
           tobj = obj;
-	  last_cmd = 1;
-	}
+          last_cmd = 1;
+        }
       } else
-	last_cmd = 0;
+        last_cmd = 0;
       tmob = NULL;
       break;
 
-    case 'R': /* rem obj from room */
+    case 'R':
+      spawned_mob_count = 0;
+      spawned_obj_count = 0;
       if ((obj = get_obj_in_list_num(ZCMD.arg2, world[ZCMD.arg1].contents)) != NULL)
         extract_obj(obj);
       last_cmd = 1;
@@ -3049,53 +3280,62 @@ void reset_zone(zone_rnum zone)
       tobj = NULL;
       break;
 
-
-    case 'D':			/* set state of door */
+    case 'D':
+      spawned_mob_count = 0;
+      spawned_obj_count = 0;
       if (ZCMD.arg2 < 0 || ZCMD.arg2 >= DIR_COUNT ||
-	  (world[ZCMD.arg1].dir_option[ZCMD.arg2] == NULL)) {
+          (world[ZCMD.arg1].dir_option[ZCMD.arg2] == NULL)) {
         char error[MAX_INPUT_LENGTH];
-        snprintf(error, sizeof(error), "door does not exist in room %d - dir %d, command disabled",  world[ZCMD.arg1].number, ZCMD.arg2);
-	ZONE_ERROR(error);
-	ZCMD.command = '*';
+        snprintf(error, sizeof(error), "door does not exist in room %d - dir %d, command disabled", world[ZCMD.arg1].number, ZCMD.arg2);
+        ZONE_ERROR(error);
+        ZCMD.command = '*';
       } else
-	switch (ZCMD.arg3) {
-	case 0:
-	  REMOVE_BIT(world[ZCMD.arg1].dir_option[ZCMD.arg2]->exit_info,
-		     EX_LOCKED);
-	  REMOVE_BIT(world[ZCMD.arg1].dir_option[ZCMD.arg2]->exit_info,
-		     EX_CLOSED);
-	  break;
-	case 1:
-	  SET_BIT(world[ZCMD.arg1].dir_option[ZCMD.arg2]->exit_info,
-		  EX_CLOSED);
-	  REMOVE_BIT(world[ZCMD.arg1].dir_option[ZCMD.arg2]->exit_info,
-		     EX_LOCKED);
-	  break;
-	case 2:
-	  SET_BIT(world[ZCMD.arg1].dir_option[ZCMD.arg2]->exit_info,
-		  EX_LOCKED);
-	  SET_BIT(world[ZCMD.arg1].dir_option[ZCMD.arg2]->exit_info,
-		  EX_CLOSED);
-	  break;
-	}
+        switch (ZCMD.arg3) {
+        case 0:
+          REMOVE_BIT(world[ZCMD.arg1].dir_option[ZCMD.arg2]->exit_info, EX_LOCKED);
+          REMOVE_BIT(world[ZCMD.arg1].dir_option[ZCMD.arg2]->exit_info, EX_CLOSED);
+          break;
+        case 1:
+          SET_BIT(world[ZCMD.arg1].dir_option[ZCMD.arg2]->exit_info, EX_CLOSED);
+          REMOVE_BIT(world[ZCMD.arg1].dir_option[ZCMD.arg2]->exit_info, EX_LOCKED);
+          break;
+        case 2:
+          SET_BIT(world[ZCMD.arg1].dir_option[ZCMD.arg2]->exit_info, EX_LOCKED);
+          SET_BIT(world[ZCMD.arg1].dir_option[ZCMD.arg2]->exit_info, EX_CLOSED);
+          break;
+        }
       last_cmd = 1;
       tmob = NULL;
       tobj = NULL;
       break;
 
-    case 'T': /* trigger command */
-      if (ZCMD.arg1==MOB_TRIGGER && tmob) {
+    case 'T':
+      if (ZCMD.arg1 == MOB_TRIGGER && spawned_mob_count > 0) {
+        for (i = 0; i < spawned_mob_count; i++) {
+          if (!SCRIPT(spawned_mobs[i]))
+            CREATE(SCRIPT(spawned_mobs[i]), struct script_data, 1);
+          add_trigger(SCRIPT(spawned_mobs[i]), read_trigger(ZCMD.arg2), -1);
+        }
+        last_cmd = 1;
+      } else if (ZCMD.arg1 == MOB_TRIGGER && tmob) {
         if (!SCRIPT(tmob))
           CREATE(SCRIPT(tmob), struct script_data, 1);
         add_trigger(SCRIPT(tmob), read_trigger(ZCMD.arg2), -1);
         last_cmd = 1;
-      } else if (ZCMD.arg1==OBJ_TRIGGER && tobj) {
+      } else if (ZCMD.arg1 == OBJ_TRIGGER && spawned_obj_count > 0) {
+        for (i = 0; i < spawned_obj_count; i++) {
+          if (!SCRIPT(spawned_objs[i]))
+            CREATE(SCRIPT(spawned_objs[i]), struct script_data, 1);
+          add_trigger(SCRIPT(spawned_objs[i]), read_trigger(ZCMD.arg2), -1);
+        }
+        last_cmd = 1;
+      } else if (ZCMD.arg1 == OBJ_TRIGGER && tobj) {
         if (!SCRIPT(tobj))
           CREATE(SCRIPT(tobj), struct script_data, 1);
         add_trigger(SCRIPT(tobj), read_trigger(ZCMD.arg2), -1);
         last_cmd = 1;
-      } else if (ZCMD.arg1==WLD_TRIGGER) {
-        if (ZCMD.arg3 == NOWHERE || ZCMD.arg3>top_of_world) {
+      } else if (ZCMD.arg1 == WLD_TRIGGER) {
+        if (ZCMD.arg3 == NOWHERE || ZCMD.arg3 > top_of_world) {
           ZONE_ERROR("Invalid room number in trigger assignment");
         }
         if (!world[ZCMD.arg3].script)
@@ -3103,26 +3343,47 @@ void reset_zone(zone_rnum zone)
         add_trigger(world[ZCMD.arg3].script, read_trigger(ZCMD.arg2), -1);
         last_cmd = 1;
       }
-
       break;
 
     case 'V':
-      if (ZCMD.arg1==MOB_TRIGGER && tmob) {
+      if (ZCMD.arg1 == MOB_TRIGGER && spawned_mob_count > 0) {
+        int applied = 0;
+        for (i = 0; i < spawned_mob_count; i++) {
+          if (SCRIPT(spawned_mobs[i])) {
+            add_var(&(SCRIPT(spawned_mobs[i])->global_vars), ZCMD.sarg1, ZCMD.sarg2, ZCMD.arg3);
+            applied = 1;
+          }
+        }
+        if (!applied) {
+          ZONE_ERROR("Attempt to give variable to scriptless custom-reset mobile");
+        } else
+          last_cmd = 1;
+      } else if (ZCMD.arg1 == MOB_TRIGGER && tmob) {
         if (!SCRIPT(tmob)) {
           ZONE_ERROR("Attempt to give variable to scriptless mobile");
         } else
-          add_var(&(SCRIPT(tmob)->global_vars), ZCMD.sarg1, ZCMD.sarg2,
-                  ZCMD.arg3);
+          add_var(&(SCRIPT(tmob)->global_vars), ZCMD.sarg1, ZCMD.sarg2, ZCMD.arg3);
         last_cmd = 1;
-      } else if (ZCMD.arg1==OBJ_TRIGGER && tobj) {
+      } else if (ZCMD.arg1 == OBJ_TRIGGER && spawned_obj_count > 0) {
+        int applied = 0;
+        for (i = 0; i < spawned_obj_count; i++) {
+          if (SCRIPT(spawned_objs[i])) {
+            add_var(&(SCRIPT(spawned_objs[i])->global_vars), ZCMD.sarg1, ZCMD.sarg2, ZCMD.arg3);
+            applied = 1;
+          }
+        }
+        if (!applied) {
+          ZONE_ERROR("Attempt to give variable to scriptless custom-reset object");
+        } else
+          last_cmd = 1;
+      } else if (ZCMD.arg1 == OBJ_TRIGGER && tobj) {
         if (!SCRIPT(tobj)) {
           ZONE_ERROR("Attempt to give variable to scriptless object");
         } else
-          add_var(&(SCRIPT(tobj)->global_vars), ZCMD.sarg1, ZCMD.sarg2,
-                  ZCMD.arg3);
+          add_var(&(SCRIPT(tobj)->global_vars), ZCMD.sarg1, ZCMD.sarg2, ZCMD.arg3);
         last_cmd = 1;
-      } else if (ZCMD.arg1==WLD_TRIGGER) {
-        if (ZCMD.arg3 == NOWHERE || ZCMD.arg3>top_of_world) {
+      } else if (ZCMD.arg1 == WLD_TRIGGER) {
+        if (ZCMD.arg3 == NOWHERE || ZCMD.arg3 > top_of_world) {
           ZONE_ERROR("Invalid room number in variable assignment");
         } else {
           if (!(world[ZCMD.arg3].script)) {
@@ -3144,15 +3405,14 @@ void reset_zone(zone_rnum zone)
 
   zone_table[zone].age = 0;
 
-  /* handle reset_wtrigger's */
   rvnum = zone_table[zone].bot;
   while (rvnum <= zone_table[zone].top) {
     rrnum = real_room(rvnum);
-    if (rrnum != NOWHERE) reset_wtrigger(&world[rrnum]);
+    if (rrnum != NOWHERE)
+      reset_wtrigger(&world[rrnum]);
     rvnum++;
   }
 }
-
 /* for use in reset_zone; return TRUE if zone 'nr' is free of PC's  */
 int is_empty(zone_rnum zone_nr)
 {
@@ -4536,4 +4796,42 @@ void load_config( void )
   }
 
   fclose(fl);
+}
+
+/* Strict custom reset population count, shared by disk loading and builders. */
+bool parse_reset_count(const char *text, int *count)
+{
+  const char *p;
+
+  if (!text || !*text || !count || strlen(text) > 3)
+    return FALSE;
+
+  for (p = text; *p; p++)
+    if (*p < '0' || *p > '9')
+      return FALSE;
+
+  if (atoi(text) < 1 || atoi(text) > MAX_DUPLICATES)
+    return FALSE;
+
+  *count = atoi(text);
+  return TRUE;
+}
+
+/* Strict percentage input, shared by disk loading and room reset editors. */
+bool parse_reset_chance(const char *text, int *chance)
+{
+  const char *p;
+
+  if (!text || !*text || !chance || strlen(text) > 3)
+    return FALSE;
+
+  for (p = text; *p; p++)
+    if (*p < '0' || *p > '9')
+      return FALSE;
+
+  if (atoi(text) < 1 || atoi(text) > 100)
+    return FALSE;
+
+  *chance = atoi(text);
+  return TRUE;
 }

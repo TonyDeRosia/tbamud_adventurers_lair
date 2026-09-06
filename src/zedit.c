@@ -258,6 +258,8 @@ static void zedit_setup(struct descriptor_data *d, int room_num)
 
   /* Start the reset command list with a terminator. */
   CREATE(zone->cmd, struct reset_com, 1);
+  zone->cmd[0].spawn_count = 0;
+  zone->cmd[0].spawn_chance = 100;
   zone->cmd[0].command = 'S';
 
   /* Add all entries in zone_table that relate to this room. */

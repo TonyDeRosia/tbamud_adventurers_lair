@@ -126,7 +126,9 @@ static int collect_matching_room_reset_roots(zone_rnum zone_num, char reset_type
                                              room_rnum room_num, int **roots, int **chain_ends);
 static void delete_room_reset_chain(struct zone_data *zone, int root_index, int chain_end);
 static bool parse_room_reset_count(const char *count_arg, int *count_out);
-static void perform_room_reset(struct char_data *ch, char reset_type, int thing_vnum, const char *room_arg, const char *count_arg);
+static void perform_room_reset(struct char_data *ch, char reset_type, int thing_vnum,
+                               const char *room_arg, const char *count_arg,
+                               const char *chance_arg, bool custom_spawn);
 static void perform_room_reset_delete(struct char_data *ch, char reset_type, int thing_vnum, const char *room_arg);
 static void show_room_resets(struct char_data *ch, room_rnum room_num);
 static bool objtemplate_build_strings(const char *base_name, int number,
@@ -2127,7 +2129,9 @@ static bool parse_room_reset_count(const char *count_arg, int *count_out)
   return (*count_out > 0 && *count_out <= MAX_DUPLICATES);
 }
 
-static void perform_room_reset(struct char_data *ch, char reset_type, int thing_vnum, const char *room_arg, const char *count_arg)
+static void perform_room_reset(struct char_data *ch, char reset_type, int thing_vnum,
+                               const char *room_arg, const char *count_arg,
+                               const char *chance_arg, bool custom_spawn)
 {
   room_rnum room_rnum_value = NOWHERE;
   zone_rnum zone_rnum_value;
@@ -2160,6 +2164,13 @@ static void perform_room_reset(struct char_data *ch, char reset_type, int thing_
   }
 
   memset(&new_reset, 0, sizeof(new_reset));
+  new_reset.spawn_count = custom_spawn ? count : 0;
+  new_reset.spawn_chance = 100;
+  if (custom_spawn && chance_arg && *chance_arg &&
+      !parse_reset_chance(chance_arg, &new_reset.spawn_chance)) {
+    send_to_char(ch, "Spawn chance must be between 1 and 100.\r\n");
+    return;
+  }
   new_reset.if_flag = 0;
   new_reset.arg2 = count;
   new_reset.arg3 = room_rnum_value;
@@ -2190,7 +2201,23 @@ static void perform_room_reset(struct char_data *ch, char reset_type, int thing_
                                                   &match_roots, &match_chain_ends);
 
   if (match_count > 0) {
+    int previous_custom;
+    int previous_chance;
+
     keep_root = match_roots[0];
+    previous_custom = zone_table[zone_rnum_value].cmd[keep_root].spawn_count > 0;
+    previous_chance = zone_table[zone_rnum_value].cmd[keep_root].spawn_chance;
+
+    if (custom_spawn) {
+      zone_table[zone_rnum_value].cmd[keep_root].spawn_count = count;
+      zone_table[zone_rnum_value].cmd[keep_root].spawn_chance =
+        (chance_arg && *chance_arg) ? new_reset.spawn_chance :
+        (previous_custom ? previous_chance : 100);
+    } else {
+      zone_table[zone_rnum_value].cmd[keep_root].spawn_count = 0;
+      zone_table[zone_rnum_value].cmd[keep_root].spawn_chance = 100;
+    }
+
     zone_table[zone_rnum_value].cmd[keep_root].arg2 = count;
 
     for (i = match_count - 1; i >= 1; i--) {
@@ -2216,7 +2243,9 @@ static void perform_room_reset(struct char_data *ch, char reset_type, int thing_
     return;
   }
 
-  if (new_reset.command == 'M') {
+  if (custom_spawn) {
+    show_room_resets(ch, room_rnum_value);
+  } else if (new_reset.command == 'M') {
     send_to_char(ch, "Reset added: mob [%d] %s -> room [%d] %s (max: %d).\r\n",
       mob_index[new_reset.arg1].vnum,
       mob_proto[new_reset.arg1].player.short_descr,
@@ -2337,18 +2366,32 @@ static void show_room_resets(struct char_data *ch, room_rnum room_num)
       found = TRUE;
       if (cmd[i].command == 'M') {
         current_mob = (cmd[i].arg1 >= 0 && cmd[i].arg1 <= top_of_mobt) ? mob_index[cmd[i].arg1].vnum : NOWHERE;
-        send_to_char(ch, "%2d) Mob [%d] %-30.30s max: %d\r\n",
-          index++,
-          (cmd[i].arg1 >= 0 && cmd[i].arg1 <= top_of_mobt) ? mob_index[cmd[i].arg1].vnum : -1,
-          (cmd[i].arg1 >= 0 && cmd[i].arg1 <= top_of_mobt) ? mob_proto[cmd[i].arg1].player.short_descr : "<invalid mob>",
-          cmd[i].arg2);
+        if (cmd[i].spawn_count > 0)
+          send_to_char(ch, "%2d) Mob [%d] %-30.30s count:%d spawn:%d%%\r\n",
+            index++,
+            (cmd[i].arg1 >= 0 && cmd[i].arg1 <= top_of_mobt) ? mob_index[cmd[i].arg1].vnum : -1,
+            (cmd[i].arg1 >= 0 && cmd[i].arg1 <= top_of_mobt) ? mob_proto[cmd[i].arg1].player.short_descr : "<invalid mob>",
+            cmd[i].spawn_count, cmd[i].spawn_chance);
+        else
+          send_to_char(ch, "%2d) Mob [%d] %-30.30s max:%d (legacy)\r\n",
+            index++,
+            (cmd[i].arg1 >= 0 && cmd[i].arg1 <= top_of_mobt) ? mob_index[cmd[i].arg1].vnum : -1,
+            (cmd[i].arg1 >= 0 && cmd[i].arg1 <= top_of_mobt) ? mob_proto[cmd[i].arg1].player.short_descr : "<invalid mob>",
+            cmd[i].arg2);
       } else {
         current_mob = NOWHERE;
-        send_to_char(ch, "%2d) Obj [%d] %-30.30s room object max: %d\r\n",
-          index++,
-          (cmd[i].arg1 >= 0 && cmd[i].arg1 <= top_of_objt) ? obj_index[cmd[i].arg1].vnum : -1,
-          (cmd[i].arg1 >= 0 && cmd[i].arg1 <= top_of_objt) ? obj_proto[cmd[i].arg1].short_description : "<invalid object>",
-          cmd[i].arg2);
+        if (cmd[i].spawn_count > 0)
+          send_to_char(ch, "%2d) Obj [%d] %-30.30s room object count:%d spawn:%d%%\r\n",
+            index++,
+            (cmd[i].arg1 >= 0 && cmd[i].arg1 <= top_of_objt) ? obj_index[cmd[i].arg1].vnum : -1,
+            (cmd[i].arg1 >= 0 && cmd[i].arg1 <= top_of_objt) ? obj_proto[cmd[i].arg1].short_description : "<invalid object>",
+            cmd[i].spawn_count, cmd[i].spawn_chance);
+        else
+          send_to_char(ch, "%2d) Obj [%d] %-30.30s room object max:%d (legacy)\r\n",
+            index++,
+            (cmd[i].arg1 >= 0 && cmd[i].arg1 <= top_of_objt) ? obj_index[cmd[i].arg1].vnum : -1,
+            (cmd[i].arg1 >= 0 && cmd[i].arg1 <= top_of_objt) ? obj_proto[cmd[i].arg1].short_description : "<invalid object>",
+            cmd[i].arg2);
       }
 
       j = i + 1;
@@ -2504,7 +2547,7 @@ ACMD(do_mob)
 
   if (!*count_arg)
     strcpy(count_arg, "1");
-  perform_room_reset(ch, 'M', atoi(mob_arg), room_arg, count_arg);
+  perform_room_reset(ch, 'M', atoi(mob_arg), room_arg, count_arg, NULL, FALSE);
 }
 
 ACMD(do_mreset)
@@ -2522,18 +2565,23 @@ ACMD(do_mreset)
 
   if (!*count_arg)
     strcpy(count_arg, "1");
-  perform_room_reset(ch, 'M', atoi(mob_arg), room_arg, count_arg);
+  perform_room_reset(ch, 'M', atoi(mob_arg), room_arg, count_arg, NULL, FALSE);
 }
 
 ACMD(do_rreset)
 {
+  static const char usage[] =
+    "Usage: rreset list [zone number]\r\n"
+    "       rreset <mob|obj> <vnum> <room vnum|here> <spawn count> [spawn chance]\r\n"
+    "       rreset chance <mob|obj> <vnum> <room vnum|here> <percent>\r\n"
+    "       rreset del <mob|obj> <vnum> [room vnum|here]\r\n";
   char subcmd_arg[MAX_INPUT_LENGTH];
   char type_arg[MAX_INPUT_LENGTH];
   char thing_arg[MAX_INPUT_LENGTH];
   char room_arg[MAX_INPUT_LENGTH];
-  char count_arg[MAX_INPUT_LENGTH];
+  char count_arg[MAX_INPUT_LENGTH], chance_arg[MAX_INPUT_LENGTH];
 
-  half_chop(argument, subcmd_arg, argument);
+  argument = any_one_arg(argument, subcmd_arg);
 
   if (!str_cmp(subcmd_arg, "list")) {
     char zone_arg[MAX_INPUT_LENGTH];
@@ -2541,11 +2589,16 @@ ACMD(do_rreset)
     room_rnum room_num;
     bool found = FALSE;
 
-    one_argument(argument, zone_arg);
+    argument = any_one_arg(argument, zone_arg);
+    skip_spaces(&argument);
+    if (*argument) {
+      send_to_char(ch, "%s", usage);
+      return;
+    }
     if (!*zone_arg)
       zone_num = world[IN_ROOM(ch)].zone;
     else if (!is_number(zone_arg) || (zone_num = real_zone(atoi(zone_arg))) == NOWHERE) {
-      send_to_char(ch, "Usage: rreset list [zone number]\r\n");
+      send_to_char(ch, "%s", usage);
       return;
     }
     if (!can_edit_zone(ch, zone_num)) {
@@ -2570,12 +2623,91 @@ ACMD(do_rreset)
     return;
   }
 
-  if (is_abbrev(subcmd_arg, "del")) {
-    half_chop(argument, type_arg, argument);
-    half_chop(argument, thing_arg, room_arg);
+  if (!str_cmp(subcmd_arg, "chance")) {
+    room_rnum room;
+    zone_rnum zone;
+    int chance, thing, i, target = -1;
+    char type;
 
-    if (!*type_arg || !*thing_arg || !is_number(thing_arg)) {
-      send_to_char(ch, "Usage: rreset del <mob|obj> <vnum> [room vnum|here]\r\n");
+    argument = any_one_arg(argument, type_arg);
+    argument = any_one_arg(argument, thing_arg);
+    argument = any_one_arg(argument, room_arg);
+    argument = any_one_arg(argument, chance_arg);
+    skip_spaces(&argument);
+
+    if (!*type_arg || (!is_abbrev(type_arg, "mob") && !is_abbrev(type_arg, "obj")) ||
+        !is_number(thing_arg) || !*room_arg || !*chance_arg || *argument) {
+      send_to_char(ch, "%s", usage);
+      return;
+    }
+
+    if (!parse_reset_chance(chance_arg, &chance)) {
+      send_to_char(ch, "Spawn chance must be between 1 and 100.\r\n");
+      return;
+    }
+
+    room = resolve_room_reset_room(ch, room_arg);
+    if (room == NOWHERE) {
+      send_to_char(ch, "Invalid room vnum.\r\n");
+      return;
+    }
+
+    zone = world[room].zone;
+    if (!can_edit_zone(ch, zone)) {
+      send_to_char(ch, "You don't have permission to edit that zone.\r\n");
+      return;
+    }
+
+    type = is_abbrev(type_arg, "mob") ? 'M' : 'O';
+    thing = type == 'M' ? real_mobile(atoi(thing_arg)) : real_object(atoi(thing_arg));
+
+    if ((type == 'M' && thing == NOBODY) || (type == 'O' && thing == NOTHING)) {
+      send_to_char(ch, "Invalid %s vnum.\r\n", type == 'M' ? "mob" : "object");
+      return;
+    }
+
+    for (i = 0; zone_table[zone].cmd[i].command != 'S'; i++) {
+      struct reset_com *cmd = &zone_table[zone].cmd[i];
+
+      if (cmd->command == type && cmd->arg1 == thing && cmd->arg3 == room) {
+        if (target != -1) {
+          send_to_char(ch, "Multiple matching resets; use REDIT to select one by number.\r\n");
+          return;
+        }
+        target = i;
+      }
+    }
+
+    if (target == -1) {
+      send_to_char(ch, "No matching room reset found.\r\n");
+      return;
+    }
+
+    if (zone_table[zone].cmd[target].spawn_count <= 0) {
+      send_to_char(ch,
+        "That is a legacy max-based reset. Reissue rreset <mob|obj> <vnum> <room> <count> <chance> to convert it.\r\n");
+      return;
+    }
+
+    zone_table[zone].cmd[target].spawn_chance = chance;
+    add_to_save_list(zone_table[zone].number, SL_ZON);
+
+    if (!save_zone(zone))
+      send_to_char(ch, "Unable to save zone data.\r\n");
+    else
+      show_room_resets(ch, room);
+
+    return;
+  }
+
+  if (is_abbrev(subcmd_arg, "del")) {
+    argument = any_one_arg(argument, type_arg);
+    argument = any_one_arg(argument, thing_arg);
+    argument = any_one_arg(argument, room_arg);
+    skip_spaces(&argument);
+
+    if (!*type_arg || !*thing_arg || !is_number(thing_arg) || *argument) {
+      send_to_char(ch, "%s", usage);
       return;
     }
 
@@ -2584,29 +2716,29 @@ ACMD(do_rreset)
     else if (is_abbrev(type_arg, "obj"))
       perform_room_reset_delete(ch, 'O', atoi(thing_arg), room_arg);
     else
-      send_to_char(ch, "Usage: rreset del <mob|obj> <vnum> [room vnum|here]\r\n");
+      send_to_char(ch, "%s", usage);
     return;
   }
 
   strlcpy(type_arg, subcmd_arg, sizeof(type_arg));
-  half_chop(argument, thing_arg, argument);
-  half_chop(argument, room_arg, count_arg);
+  argument = any_one_arg(argument, thing_arg);
+  argument = any_one_arg(argument, room_arg);
+  argument = any_one_arg(argument, count_arg);
+  argument = any_one_arg(argument, chance_arg);
+  skip_spaces(&argument);
 
-  if (!*type_arg || !*thing_arg || !*room_arg || !*count_arg || !is_number(thing_arg)) {
-    send_to_char(ch, "Usage: rreset list [zone number]\r\n");
-    send_to_char(ch, "       rreset <mob|obj> <vnum> <room vnum|here> <count>\r\n");
-    send_to_char(ch, "       rreset del <mob|obj> <vnum> [room vnum|here]\r\n");
+  if (!*type_arg || !*thing_arg || !*room_arg || !*count_arg ||
+      !is_number(thing_arg) || *argument) {
+    send_to_char(ch, "%s", usage);
     return;
   }
 
   if (is_abbrev(type_arg, "mob"))
-    perform_room_reset(ch, 'M', atoi(thing_arg), room_arg, count_arg);
+    perform_room_reset(ch, 'M', atoi(thing_arg), room_arg, count_arg, chance_arg, TRUE);
   else if (is_abbrev(type_arg, "obj"))
-    perform_room_reset(ch, 'O', atoi(thing_arg), room_arg, count_arg);
-  else {
-    send_to_char(ch, "Usage: rreset <mob|obj> <vnum> <room vnum|here> <count>\r\n");
-    send_to_char(ch, "       rreset del <mob|obj> <vnum> [room vnum|here]\r\n");
-  }
+    perform_room_reset(ch, 'O', atoi(thing_arg), room_arg, count_arg, chance_arg, TRUE);
+  else
+    send_to_char(ch, "%s", usage);
 }
 
 ACMD(do_reset)

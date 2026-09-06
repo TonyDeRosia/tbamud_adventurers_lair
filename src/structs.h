@@ -892,7 +892,13 @@ struct obj_data
   int remains_anatomy_initialized;/**< Distinguishes initialized corpses from legacy objects */
   char *remains_source_name;      /**< Source creature identity for corpse-derived remains */
   int tome_cooldown_seconds; /**< Builder-configured study cooldown; never object timer. */
-  
+
+  /* Runtime-only ownership for custom per-reset ground-object population slots. */
+  int reset_spawn_tracked;
+  zone_vnum reset_spawn_zone;
+  room_vnum reset_spawn_room;
+  obj_vnum reset_spawn_vnum;
+
   struct list_data *events;      /**< Used for object events */
 };
 
@@ -1283,6 +1289,13 @@ struct mob_special_data
   int summon_timer;   /**< Violence-pulse countdown for temporary summons (<=0 means permanent). */
   int body_profile;   /**< Explicit BODY_PROFILE_* selection for this mobile. */
   int body_profile_set; /**< Whether body_profile was explicitly selected by a builder. */
+
+  /* Runtime-only ownership for custom per-reset mobile population slots. */
+  int reset_spawn_tracked;
+  zone_vnum reset_spawn_zone;
+  room_vnum reset_spawn_room;
+  mob_vnum reset_spawn_vnum;
+
   struct dg_cooldown_entry *dg_cooldowns; /**< Runtime DG per-player cooldowns. */
 };
 

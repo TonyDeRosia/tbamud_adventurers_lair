@@ -152,6 +152,8 @@
 
 /* structure for the reset commands */
 struct reset_com {
+   int spawn_count;  /* M/O custom per-reset population slots; 0 = legacy stock semantics */
+   int spawn_chance; /* custom M/O percentage per vacant slot, 1-100; defaults to 100 */
    char	command;   /* current command                      */
 
    bool if_flag;	/* if TRUE: exe only if preceding exe'd */
@@ -412,4 +414,6 @@ extern long top_idnum;
 
 extern time_t newsmod;
 extern time_t motdmod;
+bool parse_reset_count(const char *text, int *count);
+bool parse_reset_chance(const char *text, int *chance);
 #endif /* _DB_H_ */

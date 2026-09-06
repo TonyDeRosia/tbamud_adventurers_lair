@@ -208,6 +208,8 @@ rznum = i;
 
   /* No zone commands, just terminate it with an 'S' */
   CREATE(zone->cmd, struct reset_com, 1);
+  zone->cmd[0].spawn_count = 0;
+  zone->cmd[0].spawn_chance = 100;
   zone->cmd[0].command = 'S';
 
   top_of_zone_table++;
@@ -473,7 +475,13 @@ int save_zone(zone_rnum zone_num)
       mudlog(BRF, LVL_BUILDER, TRUE, "SYSERR: OLC: z_save_to_disk(): Unknown cmd '%c' - NOT saving", ZCMD(zone_num, subcmd).command);
       continue;
     }
-    if (ZCMD(zone_num, subcmd).command != 'V')
+    if ((ZCMD(zone_num, subcmd).command == 'M' || ZCMD(zone_num, subcmd).command == 'O') &&
+        ZCMD(zone_num, subcmd).spawn_count > 0)
+      fprintf(zfile, "%c %d %d %d %d count=%d spawn=%d \t(%s)\n",
+              ZCMD(zone_num, subcmd).command, ZCMD(zone_num, subcmd).if_flag,
+              arg1, arg2, arg3, ZCMD(zone_num, subcmd).spawn_count,
+              ZCMD(zone_num, subcmd).spawn_chance, comment);
+    else if (ZCMD(zone_num, subcmd).command != 'V')
       fprintf(zfile, "%c %d %d %d %d \t(%s)\n",
 		ZCMD(zone_num, subcmd).command, ZCMD(zone_num, subcmd).if_flag, arg1, arg2, arg3, comment);
     else
@@ -522,6 +530,8 @@ void add_cmd_to_list(struct reset_com **list, struct reset_com *newcmd, int pos)
   }
 
   /* Add terminator, then insert new list. */
+  newlist[count + 1].spawn_count = 0;
+  newlist[count + 1].spawn_chance = 100;
   newlist[count + 1].command = 'S';
   free(*list);
   *list = newlist;
@@ -548,6 +558,8 @@ static void remove_cmd_from_list(struct reset_com **list, int pos)
     }
   }
   /* Add the terminator, then insert the new list. */
+  newlist[count - 1].spawn_count = 0;
+  newlist[count - 1].spawn_chance = 100;
   newlist[count - 1].command = 'S';
   free(*list);
   *list = newlist;
@@ -567,6 +579,9 @@ int new_command(struct zone_data *zone, int pos)
     return 0;
 
   /* Ok, let's add a new (blank) command. */
+  memset(&new_com, 0, sizeof(new_com));
+  new_com.spawn_count = 0;
+  new_com.spawn_chance = 100;
   new_com.command = 'N';
   add_cmd_to_list(&zone->cmd, &new_com, pos);
   return 1;

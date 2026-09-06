@@ -671,21 +671,37 @@ static void redit_disp_resets_menu(struct descriptor_data *d)
         case 'M':
           current_mob = (cmd[zone_index].arg1 >= 0 && cmd[zone_index].arg1 <= top_of_mobt) ?
             mob_index[cmd[zone_index].arg1].vnum : NOWHERE;
-          write_to_output(d, "Mob [%d] %-30.30s max:%d\r\n",
-            (cmd[zone_index].arg1 >= 0 && cmd[zone_index].arg1 <= top_of_mobt) ?
-              mob_index[cmd[zone_index].arg1].vnum : -1,
-            (cmd[zone_index].arg1 >= 0 && cmd[zone_index].arg1 <= top_of_mobt) ?
-              mob_proto[cmd[zone_index].arg1].player.short_descr : "<invalid mob>",
-            cmd[zone_index].arg2);
+          if (cmd[zone_index].spawn_count > 0)
+            write_to_output(d, "Mob [%d] %-30.30s count:%d spawn:%d%%\r\n",
+              (cmd[zone_index].arg1 >= 0 && cmd[zone_index].arg1 <= top_of_mobt) ?
+                mob_index[cmd[zone_index].arg1].vnum : -1,
+              (cmd[zone_index].arg1 >= 0 && cmd[zone_index].arg1 <= top_of_mobt) ?
+                mob_proto[cmd[zone_index].arg1].player.short_descr : "<invalid mob>",
+              cmd[zone_index].spawn_count, cmd[zone_index].spawn_chance);
+          else
+            write_to_output(d, "Mob [%d] %-30.30s max:%d (legacy)\r\n",
+              (cmd[zone_index].arg1 >= 0 && cmd[zone_index].arg1 <= top_of_mobt) ?
+                mob_index[cmd[zone_index].arg1].vnum : -1,
+              (cmd[zone_index].arg1 >= 0 && cmd[zone_index].arg1 <= top_of_mobt) ?
+                mob_proto[cmd[zone_index].arg1].player.short_descr : "<invalid mob>",
+              cmd[zone_index].arg2);
           break;
         case 'O':
           current_mob = NOWHERE;
-          write_to_output(d, "Obj [%d] %-30.30s room object max:%d\r\n",
-            (cmd[zone_index].arg1 >= 0 && cmd[zone_index].arg1 <= top_of_objt) ?
-              obj_index[cmd[zone_index].arg1].vnum : -1,
-            (cmd[zone_index].arg1 >= 0 && cmd[zone_index].arg1 <= top_of_objt) ?
-              obj_proto[cmd[zone_index].arg1].short_description : "<invalid object>",
-            cmd[zone_index].arg2);
+          if (cmd[zone_index].spawn_count > 0)
+            write_to_output(d, "Obj [%d] %-30.30s room object count:%d spawn:%d%%\r\n",
+              (cmd[zone_index].arg1 >= 0 && cmd[zone_index].arg1 <= top_of_objt) ?
+                obj_index[cmd[zone_index].arg1].vnum : -1,
+              (cmd[zone_index].arg1 >= 0 && cmd[zone_index].arg1 <= top_of_objt) ?
+                obj_proto[cmd[zone_index].arg1].short_description : "<invalid object>",
+              cmd[zone_index].spawn_count, cmd[zone_index].spawn_chance);
+          else
+            write_to_output(d, "Obj [%d] %-30.30s room object max:%d (legacy)\r\n",
+              (cmd[zone_index].arg1 >= 0 && cmd[zone_index].arg1 <= top_of_objt) ?
+                obj_index[cmd[zone_index].arg1].vnum : -1,
+              (cmd[zone_index].arg1 >= 0 && cmd[zone_index].arg1 <= top_of_objt) ?
+                obj_proto[cmd[zone_index].arg1].short_description : "<invalid object>",
+              cmd[zone_index].arg2);
           break;
         case 'E':
           write_to_output(d, "Obj [%d] %-30.30s equip on mob [%d] (%s) max:%d\r\n",
@@ -754,6 +770,7 @@ static void redit_disp_resets_menu(struct descriptor_data *d)
   write_to_output(d,
     "\r\nA) Add mob reset\r\n"
     "B) Add object reset\r\n"
+    "C) Set spawn chance\r\n"
     "D) Delete reset\r\n"
     "Q) Quit\r\n"
     "Enter choice: ");
@@ -1179,13 +1196,18 @@ void redit_parse(struct descriptor_data *d, char *arg)
     switch (*arg) {
       case 'a':
       case 'A':
-        write_to_output(d, "Enter mob vnum and max existing (1-%d, 0 to cancel): ", MAX_DUPLICATES);
+        write_to_output(d, "Enter mob vnum and spawn count (1-%d, 0 to cancel): ", MAX_DUPLICATES);
         OLC_MODE(d) = REDIT_RESETS_ADD_MOB;
         return;
       case 'b':
       case 'B':
-        write_to_output(d, "Enter object vnum and max existing (1-%d, 0 to cancel): ", MAX_DUPLICATES);
+        write_to_output(d, "Enter object vnum and spawn count (1-%d, 0 to cancel): ", MAX_DUPLICATES);
         OLC_MODE(d) = REDIT_RESETS_ADD_OBJ;
+        return;
+      case 'c':
+      case 'C':
+        write_to_output(d, "Set chance for which room reset number (0 to cancel)? ");
+        OLC_MODE(d) = REDIT_RESETS_CHANCE_SELECT;
         return;
       case 'd':
       case 'D':
@@ -1243,15 +1265,18 @@ void redit_parse(struct descriptor_data *d, char *arg)
     }
 
     memset(&newcmd, 0, sizeof(newcmd));
+    newcmd.spawn_count = max_existing;
+    newcmd.spawn_chance = 100;
     newcmd.command = 'M';
     newcmd.if_flag = 0;
     newcmd.arg1 = mob_num;
     newcmd.arg2 = max_existing;
     newcmd.arg3 = room_num;
-    add_cmd_to_list(&OLC_ZONE(d)->cmd, &newcmd, redit_find_room_insert_pos(d));
+    OLC_VAL(d) = redit_find_room_insert_pos(d);
+    add_cmd_to_list(&OLC_ZONE(d)->cmd, &newcmd, OLC_VAL(d));
     OLC_ZONE(d)->age = 1;
-    OLC_VAL(d) = 1;
-    redit_disp_resets_menu(d);
+    write_to_output(d, "Spawn chance (1-100) [100]: ");
+    OLC_MODE(d) = REDIT_RESETS_CHANCE_VALUE;
     return;
   }
 
@@ -1295,12 +1320,63 @@ void redit_parse(struct descriptor_data *d, char *arg)
     }
 
     memset(&newcmd, 0, sizeof(newcmd));
+    newcmd.spawn_count = max_existing;
+    newcmd.spawn_chance = 100;
     newcmd.command = 'O';
     newcmd.if_flag = 0;
     newcmd.arg1 = obj_num;
     newcmd.arg2 = max_existing;
     newcmd.arg3 = room_num;
-    add_cmd_to_list(&OLC_ZONE(d)->cmd, &newcmd, redit_find_room_insert_pos(d));
+    OLC_VAL(d) = redit_find_room_insert_pos(d);
+    add_cmd_to_list(&OLC_ZONE(d)->cmd, &newcmd, OLC_VAL(d));
+    OLC_ZONE(d)->age = 1;
+    write_to_output(d, "Spawn chance (1-100) [100]: ");
+    OLC_MODE(d) = REDIT_RESETS_CHANCE_VALUE;
+    return;
+  }
+
+  case REDIT_RESETS_CHANCE_SELECT:
+  {
+    int *entries = NULL, *ends = NULL, *roots = NULL;
+    int count, entry = atoi(arg), selected = -1;
+
+    if (!strcmp(arg, "0")) {
+      redit_disp_resets_menu(d);
+      return;
+    }
+
+    count = redit_collect_room_resets(d, &entries, &ends, &roots);
+    if (is_number(arg) && entry > 0 && entry <= count)
+      selected = entries[entry - 1];
+
+    free(entries);
+    free(ends);
+    free(roots);
+
+    if (selected < 0 || (OLC_ZONE(d)->cmd[selected].command != 'M' &&
+                         OLC_ZONE(d)->cmd[selected].command != 'O') ||
+        OLC_ZONE(d)->cmd[selected].spawn_count <= 0) {
+      write_to_output(d, "Select a custom count-based mob or room object reset.\r\n");
+      redit_disp_resets_menu(d);
+      return;
+    }
+
+    OLC_VAL(d) = selected;
+    OLC_MODE(d) = REDIT_RESETS_CHANCE_VALUE;
+    write_to_output(d, "Spawn chance (1-100) [100]: ");
+    return;
+  }
+
+  case REDIT_RESETS_CHANCE_VALUE:
+  {
+    int chance = 100;
+
+    if (*arg && !parse_reset_chance(arg, &chance)) {
+      write_to_output(d, "Spawn chance must be between 1 and 100: ");
+      return;
+    }
+
+    OLC_ZONE(d)->cmd[OLC_VAL(d)].spawn_chance = chance;
     OLC_ZONE(d)->age = 1;
     OLC_VAL(d) = 1;
     redit_disp_resets_menu(d);

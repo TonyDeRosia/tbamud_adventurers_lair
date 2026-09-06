@@ -230,6 +230,8 @@ extern const char *nrm, *grn, *cyn, *yel;
 #define REDIT_RESETS_ADD_OBJ           21
 #define REDIT_RESETS_DELETE            22
 #define REDIT_REFERENCES               23
+#define REDIT_RESETS_CHANCE_SELECT     24
+#define REDIT_RESETS_CHANCE_VALUE      25
 
 /* Submodes of ZEDIT connectedness. */
 #define ZEDIT_MAIN_MENU              	0
