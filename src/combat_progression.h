@@ -70,6 +70,20 @@ int combat_progression_class_chance_basis_points(struct char_data *ch,
                                                  int proficiency,
                                                  int stage_percent);
 
+/*
+ * Physical multiattack profile used by Double / Triple / Fourth Attack.
+ * The class mapping preserves class identity rather than treating DEX as a
+ * universal attack stat. Cross-class/tome access falls back to STR/DEX/CON.
+ */
+int combat_progression_physical_multiattack_chance_basis_points(
+    struct char_data *ch,
+    int proficiency,
+    int stage_percent);
+
+bool combat_progression_physical_multiattack_roll(struct char_data *ch,
+                                                  int proficiency,
+                                                  int stage_percent);
+
 /* Random roll counterparts. */
 bool combat_progression_roll(struct char_data *ch,
                              int proficiency,

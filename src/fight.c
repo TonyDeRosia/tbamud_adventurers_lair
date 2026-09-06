@@ -23,6 +23,7 @@
 #include "dg_scripts.h"
 #include "act.h"
 #include "class.h"
+#include "combat_progression.h"
 #include "race.h"
 #include "fight.h"
 #include "shop.h"
@@ -1989,6 +1990,67 @@ int skill_message(int dam, struct char_data *ch, struct char_data *vict,
  *	= 0	No damage.
  *	> 0	How much damage done. */
 
+/*
+ * Automatic bonus-mainhand attacks reuse normal hit accuracy and damage, but
+ * must not create additional DG round opportunities.  Spirit procs, mob
+ * specials, and periodic effects are outside hit() and remain owned by the
+ * normal perform_violence() round.
+ */
+static void perform_bonus_mainhand_attack(struct char_data *ch)
+{
+  struct char_data *victim;
+  bool previous_effects_due;
+
+  if (!ch || IS_NPC(ch))
+    return;
+
+  victim = FIGHTING(ch);
+  if (!victim || IN_ROOM(ch) == NOWHERE || IN_ROOM(victim) == NOWHERE ||
+      IN_ROOM(ch) != IN_ROOM(victim))
+    return;
+
+  previous_effects_due = combat_effects_due;
+  combat_effects_due = FALSE;
+  hit(ch, victim, TYPE_UNDEFINED);
+  combat_effects_due = previous_effects_due;
+}
+
+static void do_double_attack(struct char_data *ch)
+{
+  struct char_data *victim;
+  int proficiency;
+
+  if (!ch || IS_NPC(ch))
+    return;
+
+  proficiency = GET_SKILL(ch, SKILL_DOUBLE_ATTACK);
+  if (proficiency <= 0)
+    return;
+
+  /*
+   * Re-read the live combat target after the base attack. A kill, flee,
+   * extraction, or room change must stop the automatic bonus sequence.
+   */
+  victim = FIGHTING(ch);
+  if (!victim || IN_ROOM(ch) == NOWHERE || IN_ROOM(victim) == NOWHERE ||
+      IN_ROOM(ch) != IN_ROOM(victim))
+    return;
+
+  if (!combat_progression_physical_multiattack_roll(
+          ch, proficiency, COMBAT_PROGRESSION_STAGE_FULL))
+    return;
+
+  /*
+   * Passive attacks happen every second, so do not feed every failed roll into
+   * the existing failure-boosted learning system. A successful proc may train
+   * only on the normal two-second effects pulse.
+   */
+  if (combat_effects_due)
+    improve_ability_from_use(ch, SKILL_DOUBLE_ATTACK, TRUE);
+
+  perform_bonus_mainhand_attack(ch);
+}
+
 /* dual wield offhand system */
 static int g_offhand_attack = 0;
 
@@ -3142,7 +3204,8 @@ void perform_violence(void)
     auto_assist_owned_followers(ch);
 
     hit(ch, FIGHTING(ch), TYPE_UNDEFINED);
-    
+
+    do_double_attack(ch);
     do_offhand_attack(ch, FIGHTING(ch));
     if (combat_effects_due && FIGHTING(ch))
       do_spirit_procs(ch, FIGHTING(ch));

@@ -57,14 +57,23 @@ def test_skill_registrations_exist():
     for marker in expected:
         assert marker in PARSER, marker
 
-def test_no_class_access_assigned_yet():
-    # Capacity/registration is intentionally separate from gameplay rollout.
-    for symbol in (
-        "SKILL_DOUBLE_ATTACK",
-        "SKILL_TRIPLE_ATTACK",
-        "SKILL_FOURTH_ATTACK",
-    ):
-        assert f"spell_level({symbol}," not in CLASS_C, symbol
+def test_progression_rollout_state():
+    # Double Attack has now entered its gameplay rollout phase.
+    expected_double_access = (
+        ("CLASS_WARRIOR", 10),
+        ("CLASS_THIEF", 15),
+        ("CLASS_PALADIN", 20),
+        ("CLASS_BARD", 25),
+        ("CLASS_MYSTIC", 30),
+    )
+
+    for cls, level in expected_double_access:
+        marker = f"spell_level(SKILL_DOUBLE_ATTACK, {cls}, {level});"
+        assert marker in CLASS_C, marker
+
+    # Triple and Fourth remain reserved capacity only until their own phases.
+    assert "spell_level(SKILL_TRIPLE_ATTACK," not in CLASS_C
+    assert "spell_level(SKILL_FOURTH_ATTACK," not in CLASS_C
 
 def test_no_spell_range_reclassification():
     # These remain ordinary skills above MAX_SPELLS and below DG/object IDs.
@@ -78,7 +87,7 @@ def run():
         test_runtime_save_loops_follow_max_skills,
         test_legacy_conversion_stays_versioned_separately,
         test_skill_registrations_exist,
-        test_no_class_access_assigned_yet,
+        test_progression_rollout_state,
         test_no_spell_range_reclassification,
     ]
     for test in tests:

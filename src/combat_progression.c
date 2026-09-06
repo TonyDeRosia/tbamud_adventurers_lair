@@ -136,6 +136,88 @@ int combat_progression_class_chance_basis_points(struct char_data *ch,
       stage_percent);
 }
 
+static void combat_progression_physical_multiattack_stats(
+    int class_num,
+    int *primary_stat,
+    int *secondary_stat,
+    int *tertiary_stat)
+{
+  /* Safe physical fallback for rare tome/cross-class access. */
+  *primary_stat = CLASS_STAT_STR;
+  *secondary_stat = CLASS_STAT_DEX;
+  *tertiary_stat = CLASS_STAT_CON;
+
+  switch (class_num) {
+    case CLASS_WARRIOR:
+      *primary_stat = CLASS_STAT_STR;
+      *secondary_stat = CLASS_STAT_DEX;
+      *tertiary_stat = CLASS_STAT_CON;
+      break;
+
+    case CLASS_THIEF:
+      *primary_stat = CLASS_STAT_DEX;
+      *secondary_stat = CLASS_STAT_STR;
+      *tertiary_stat = CLASS_STAT_INT;
+      break;
+
+    case CLASS_PALADIN:
+      *primary_stat = CLASS_STAT_STR;
+      *secondary_stat = CLASS_STAT_CON;
+      *tertiary_stat = CLASS_STAT_WIS;
+      break;
+
+    case CLASS_BARD:
+      *primary_stat = CLASS_STAT_DEX;
+      *secondary_stat = CLASS_STAT_CHA;
+      *tertiary_stat = CLASS_STAT_INT;
+      break;
+
+    case CLASS_MYSTIC:
+      *primary_stat = CLASS_STAT_DEX;
+      *secondary_stat = CLASS_STAT_WIS;
+      *tertiary_stat = CLASS_STAT_CON;
+      break;
+
+    default:
+      break;
+  }
+}
+
+int combat_progression_physical_multiattack_chance_basis_points(
+    struct char_data *ch,
+    int proficiency,
+    int stage_percent)
+{
+  int primary_stat;
+  int secondary_stat;
+  int tertiary_stat;
+
+  if (!ch || IS_NPC(ch))
+    return 0;
+
+  combat_progression_physical_multiattack_stats(
+      GET_CLASS(ch), &primary_stat, &secondary_stat, &tertiary_stat);
+
+  return combat_progression_chance_basis_points(
+      ch,
+      proficiency,
+      primary_stat,
+      secondary_stat,
+      tertiary_stat,
+      stage_percent);
+}
+
+bool combat_progression_physical_multiattack_roll(struct char_data *ch,
+                                                  int proficiency,
+                                                  int stage_percent)
+{
+  int chance = combat_progression_physical_multiattack_chance_basis_points(
+      ch, proficiency, stage_percent);
+
+  return chance > 0 &&
+         rand_number(1, COMBAT_PROGRESSION_CHANCE_SCALE) <= chance;
+}
+
 bool combat_progression_roll(struct char_data *ch,
                              int proficiency,
                              int primary_stat,
