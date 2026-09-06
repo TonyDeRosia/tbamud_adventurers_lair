@@ -2010,7 +2010,7 @@ void medit_autoroll_stats(struct descriptor_data *d)
   OLC_MOB(d)->mob_specials.gold_min = MAX(0, mob_lev);
   OLC_MOB(d)->mob_specials.gold_max = MAX(OLC_MOB(d)->mob_specials.gold_min, mob_lev * 2);
   GET_AC(OLC_MOB(d))      = 20 + mob_lev;                /* gentler armor scaling */
-  GET_EVASION(OLC_MOB(d)) = mob_lev / 3;                 /* conservative evasion */
+  GET_EVASION(OLC_MOB(d)) = RECOMMENDED_MOB_EVASION;     /* identity, not level scaling */
   GET_MOB_WIMP_LEV(OLC_MOB(d)) = MAX(1, mob_lev / 2);    /* default flee threshold */
 
   /* 'Advanced' stats are only rolled if advanced options are enabled */

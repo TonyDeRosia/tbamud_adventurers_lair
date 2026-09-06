@@ -1025,8 +1025,8 @@ void heartbeat(int heart_pulse)
   if (!(heart_pulse % PULSE_MOBILE))
     mobile_activity();
 
-  if (!(heart_pulse % PULSE_VIOLENCE))
-    perform_violence();
+  if (!(heart_pulse % PULSE_COMBAT))
+    perform_combat_pulse(!(heart_pulse % PULSE_COMBAT_EFFECTS));
 
   if (!(heart_pulse % (SECS_PER_MUD_HOUR * PASSES_PER_SEC))) {  /* Tick ! */
     next_tick = SECS_PER_MUD_HOUR;  /* Reset tick coundown */

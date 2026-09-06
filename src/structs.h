@@ -717,8 +717,12 @@ void clanedit_parse(struct descriptor_data *d, char *arg);
 #define PULSE_ZONE      (10 RL_SEC)
 /** Controls when mobile (NPC) actions and updates will occur. */
 #define PULSE_MOBILE    (10 RL_SEC)
-/** Controls the time between turns of combat. */
+/** Legacy action recovery unit: do not change to tune automatic attacks. */
 #define PULSE_VIOLENCE  ( 2 RL_SEC)
+/** Automatic attack cycle, shared by every character. */
+#define PULSE_COMBAT    ( 1 RL_SEC)
+/** Periodic combat effects, cooldowns, and scripted round opportunities. */
+#define PULSE_COMBAT_EFFECTS ( 2 RL_SEC)
 /** Controls when characters and houses (if implemented) will be autosaved.
  * @see CONFIG_AUTO_SAVE
  */

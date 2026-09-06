@@ -1109,7 +1109,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig,
             if (subfield && *subfield)
             {
               int addition = atoi(subfield);
-              WAIT_STATE(c, addition * ( PULSE_VIOLENCE / 2) ); // by default violence is 2 seconds
+              WAIT_STATE(c, addition * PASSES_PER_SEC ); /* DG wait field is in real seconds. */
             }
             snprintf(str, slen, "%d", GET_WAIT_STATE(c));
           }

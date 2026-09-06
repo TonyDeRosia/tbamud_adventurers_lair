@@ -5720,7 +5720,7 @@ ACMD(do_cooldown)
 {
   int spellnum;
   int found = 0;
-  const int seconds_per_round = (PULSE_VIOLENCE / PASSES_PER_SEC);
+  const int seconds_per_round = (PULSE_COMBAT_EFFECTS / PASSES_PER_SEC);
 
   if (!ch || IS_NPC(ch)) {
     send_to_char(ch, "Not for mobiles.\r\n");

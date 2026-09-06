@@ -30,7 +30,12 @@ int compute_evasion(struct char_data *ch);
 int compute_offensive_hit_value(struct char_data *ch, struct char_data *victim);
 int compute_hit_chance_from_values(int offensive_hit, int target_evasion);
 /* SCORE benchmark: visible, awake, equal-level defender, DEX 20, no applies. */
-#define STANDARD_DEFENDER_EVASION 30
+#define STANDARD_DEFENDER_EVASION 10
+/* Percent-point budgets before stats, level difference, and avoidance. */
+#define PLAYER_BASE_ACCURACY 85
+#define NPC_BASE_ACCURACY 65
+#define EVASION_RATING_PER_POINT 2
+#define RECOMMENDED_MOB_EVASION 6
 int compute_reference_hit_chance(struct char_data *ch);
 int apply_armor_mitigation(int damage, int armor);
 int armor_mitigation_basis_points(int armor);
@@ -45,6 +50,7 @@ void die(struct char_data * ch, struct char_data * killer);
 void hit(struct char_data *ch, struct char_data *victim, int type);
 void dual_skill_attack(struct char_data *ch, struct char_data *victim, int type);
 void perform_violence(void);
+void perform_combat_pulse(bool effects_due);
 void set_next_damage_type(int damage_type);
 void raw_kill(struct char_data * ch, struct char_data * killer);
 void  set_fighting(struct char_data *ch, struct char_data *victim);

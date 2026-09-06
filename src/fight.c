@@ -63,6 +63,17 @@ struct attack_hit_type attack_hit_text[] =
 static struct char_data *next_combat_list = NULL;
 static int pending_damage_type = DAM_NONE;
 static bool violence_tick_running = FALSE;
+/* Defaults preserve direct legacy calls. Only scheduled automatic attacks
+ * suppress periodic work on the intervening one-second pulse. */
+static bool combat_effects_due = TRUE;
+
+void perform_combat_pulse(bool effects_due)
+{
+  bool previous = combat_effects_due;
+  combat_effects_due = effects_due;
+  perform_violence();
+  combat_effects_due = previous;
+}
 static unsigned long combat_prompt_round = 0;
 
 void set_next_damage_type(int damage_type)
@@ -895,8 +906,10 @@ int compute_armor_class(struct char_data *ch)
 
 int compute_evasion(struct char_data *ch)
 {
-  int evasion_bonus = 10 + ((GET_DEX(ch) - 10) * 2);
-  int evasion = GET_EVASION(ch) + evasion_bonus;
+  /* Raw ratings are deliberately gentler than percentage points. Level is
+   * accounted for once, in offensive/defensive values, never here. */
+  int evasion_bonus = GET_DEX(ch) - 10;
+  int evasion = GET_EVASION(ch) / EVASION_RATING_PER_POINT + evasion_bonus;
   return MAX(0, evasion);
 }
 
@@ -936,26 +949,18 @@ int compute_offensive_hit_value(struct char_data *ch, struct char_data *victim)
   int hitroll_bonus = GET_HITROLL(ch);
   int stat_bonus = str_app[STRENGTH_APPLY_INDEX(ch)].tohit;
   int mental_bonus = (GET_INT(ch) - 10) / 4 + (GET_WIS(ch) - 10) / 4;
-  int level_gap_bonus = 0;
-  int situational_bonus = 0;
+  int base = IS_NPC(ch) ? NPC_BASE_ACCURACY : PLAYER_BASE_ACCURACY;
+  int situational_bonus = concealment_hit_modifier(ch, victim);
 
-  if (victim) {
-    int level_gap = GET_LEVEL(ch) - GET_LEVEL(victim);
-    if (level_gap > 0)
-      level_gap_bonus = (level_gap / 2) + (level_gap / 4);
-    else if (level_gap < 0)
-      level_gap_bonus = level_gap / 3;
-  }
-
-  situational_bonus = concealment_hit_modifier(ch, victim);
-
-  return 30 + level_bonus + hitroll_bonus + stat_bonus + mental_bonus +
-         level_gap_bonus + situational_bonus;
+  /* The value API retains its 50-point neutral origin. Attacker level minus
+   * defender level supplies exactly one percentage point per level. */
+  return base - 50 + level_bonus + hitroll_bonus + stat_bonus + mental_bonus +
+         situational_bonus;
 }
 
 int compute_hit_chance_from_values(int offensive_hit, int target_evasion)
 {
-  int hit_chance = 50 + (offensive_hit - target_evasion);
+  long long hit_chance = 50LL + offensive_hit - target_evasion;
 
   return MAX(5, MIN(95, hit_chance));
 }
@@ -2677,8 +2682,9 @@ void hit(struct char_data *ch, struct char_data *victim, int type)
     return;
   }
 
-  /* check if the character has a fight trigger */
-  fight_mtrigger(ch);
+  /* Preserve DG round opportunities; explicit skill attacks retain theirs. */
+  if (combat_effects_due)
+    fight_mtrigger(ch);
 
   /* Do some sanity checking, in case someone flees, etc. */
   if (IN_ROOM(ch) != IN_ROOM(victim)) {
@@ -2702,12 +2708,7 @@ void hit(struct char_data *ch, struct char_data *victim, int type)
   hitroll_bonus = GET_HITROLL(ch);
   stat_bonus = str_app[STRENGTH_APPLY_INDEX(ch)].tohit;
   mental_bonus = (GET_INT(ch) - 10) / 4 + (GET_WIS(ch) - 10) / 4;
-  if (attacker_level > victim_level)
-    level_gap_bonus = ((attacker_level - victim_level) / 2) + ((attacker_level - victim_level) / 4);
-  else if (attacker_level < victim_level)
-    level_gap_bonus = (attacker_level - victim_level) / 3;
-  else
-    level_gap_bonus = 0;
+  level_gap_bonus = attacker_level - victim_level;
   if (IS_NPC(ch) && ch->master && !IS_NPC(ch->master) &&
       is_shadow_servant_for(ch->master, ch) && victim && IS_NPC(victim)) {
     int owner_gap = GET_LEVEL(ch->master) - GET_LEVEL(victim);
@@ -2835,8 +2836,9 @@ void hit(struct char_data *ch, struct char_data *victim, int type)
       damage(ch, victim, dam, w_type);
   }
 
-  /* check if the victim has a hitprcnt trigger */
-  hitprcnt_mtrigger(victim);
+  /* Like fight triggers, periodic HP checks keep their former cadence. */
+  if (combat_effects_due)
+    hitprcnt_mtrigger(victim);
 }
 
 static void process_round_effects(void)
@@ -3054,7 +3056,8 @@ static void process_round_effects(void)
     room_tick_effects(&world[room]);
 }
 
-/* control the fights going on.  Called every 2 seconds from comm.c. */
+/* Automatic attacks run each second. Periodic effects remain two seconds;
+ * perform_combat_pulse supplies the scheduler's explicit effects deadline. */
 void perform_violence(void)
 {
   struct char_data *ch, *tch;
@@ -3064,7 +3067,7 @@ void perform_violence(void)
     ++combat_prompt_round;
   prompt_round = combat_prompt_round;
 
-  if (!violence_tick_running) {
+  if (combat_effects_due && !violence_tick_running) {
     violence_tick_running = TRUE;
     process_round_effects();
     violence_tick_running = FALSE;
@@ -3087,7 +3090,7 @@ void perform_violence(void)
 
     if (IS_NPC(ch)) {
       if (GET_MOB_WAIT(ch) > 0) {
-        GET_MOB_WAIT(ch) -= PULSE_VIOLENCE;
+        GET_MOB_WAIT(ch) = MAX(0, GET_MOB_WAIT(ch) - PULSE_COMBAT);
         continue;
       }
       GET_MOB_WAIT(ch) = 0;
@@ -3098,12 +3101,14 @@ void perform_violence(void)
     }
 
     if (GET_POS(ch) < POS_FIGHTING) {
-      send_to_char(ch, "You can't fight while sitting!!\r\n");
+      if (combat_effects_due)
+        send_to_char(ch, "You can't fight while sitting!!\r\n");
       continue;
     }
 
     if (AFF_FLAGGED(ch, AFF_STUNNED)) {
-      send_to_char(ch, "You are stunned and cannot act this round!\r\n");
+      if (combat_effects_due)
+        send_to_char(ch, "You are stunned and cannot act this round!\r\n");
       continue;
     }
 
@@ -3139,10 +3144,10 @@ void perform_violence(void)
     hit(ch, FIGHTING(ch), TYPE_UNDEFINED);
     
     do_offhand_attack(ch, FIGHTING(ch));
-    if (FIGHTING(ch))
+    if (combat_effects_due && FIGHTING(ch))
       do_spirit_procs(ch, FIGHTING(ch));
 
-    if (MOB_FLAGGED(ch, MOB_SPEC) && GET_MOB_SPEC(ch) && !MOB_FLAGGED(ch, MOB_NOTDEADYET)) {
+    if (combat_effects_due && MOB_FLAGGED(ch, MOB_SPEC) && GET_MOB_SPEC(ch) && !MOB_FLAGGED(ch, MOB_NOTDEADYET)) {
       char actbuf[MAX_INPUT_LENGTH] = "";
       (GET_MOB_SPEC(ch)) (ch, ch, 0, actbuf);
     }
