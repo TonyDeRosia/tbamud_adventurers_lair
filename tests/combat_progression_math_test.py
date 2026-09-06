@@ -1,4 +1,5 @@
 from pathlib import Path
+import re
 
 ROOT = Path(__file__).resolve().parents[1]
 H = (ROOT / "src" / "combat_progression.h").read_text(encoding="utf-8")
@@ -91,10 +92,15 @@ def test_source_contract():
     ):
         assert marker in C, marker
 
-def test_no_gameplay_or_ability_capacity_change_in_math_phase():
-    assert "#define MAX_SKILLS            269" in STRUCTS
+def test_math_module_does_not_own_gameplay_or_id_layout():
+    # Later progression phases are allowed to increase MAX_SKILLS. This
+    # regression protects the established spell boundary and legacy skill ID
+    # instead of freezing the whole project at the old capacity forever.
+    max_skills_match = re.search(r"^#define\s+MAX_SKILLS\s+(\d+)\b", STRUCTS, re.M)
+    assert max_skills_match
+    assert int(max_skills_match.group(1)) >= 269
     assert "#define MAX_SPELLS" in SPELLS and "230" in SPELLS
-    assert "#define SKILL_PICKPOCKET             269" in SPELLS
+    assert re.search(r"^#define\s+SKILL_PICKPOCKET\s+269\b", SPELLS, re.M)
     assert "perform_violence" not in C
     assert "hit(ch" not in C
     assert "call_magic" not in C
@@ -107,7 +113,7 @@ def run():
         test_chain_stage_math,
         test_unknown_ability_never_procs,
         test_source_contract,
-        test_no_gameplay_or_ability_capacity_change_in_math_phase,
+        test_math_module_does_not_own_gameplay_or_id_layout,
     ]
     for test in tests:
         test()

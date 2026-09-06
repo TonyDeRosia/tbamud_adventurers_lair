@@ -3568,4 +3568,7 @@ void mag_assign_spells(void) {
   skillo_cost(SKILL_EMBALM, "embalm", 10);
   skillo_cost(SKILL_NERVE_PINCH, "nerve pinch", 15);
   skillo_cost(SKILL_DECAPITATE, "decapitate", 0);
+  skillo_cost(SKILL_DOUBLE_ATTACK, "double attack", 0);
+  skillo_cost(SKILL_TRIPLE_ATTACK, "triple attack", 0);
+  skillo_cost(SKILL_FOURTH_ATTACK, "fourth attack", 0);
 }

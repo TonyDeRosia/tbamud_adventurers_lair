@@ -316,6 +316,9 @@
 #define SKILL_NERVE_PINCH           267
 #define SKILL_DECAPITATE             268
 #define SKILL_PICKPOCKET             269
+#define SKILL_DOUBLE_ATTACK          270
+#define SKILL_TRIPLE_ATTACK          271
+#define SKILL_FOURTH_ATTACK          272
 /* New skills may be added here up to MAX_SKILLS (see structs.h). */
 
 /* NON-PLAYER AND OBJECT SPELLS AND SKILLS: The practice levels for the spells

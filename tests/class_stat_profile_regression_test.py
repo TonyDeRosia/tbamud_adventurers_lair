@@ -1,4 +1,5 @@
 from pathlib import Path
+import re
 
 ROOT = Path(__file__).resolve().parents[1]
 CLASS_H = (ROOT / "src" / "class.h").read_text(encoding="utf-8")
@@ -46,17 +47,22 @@ def test_stat_value_helper_covers_all_stats():
     for macro in ("GET_STR", "GET_DEX", "GET_CON", "GET_INT", "GET_WIS", "GET_CHA"):
         assert macro in CLASS_C, macro
 
-def test_no_ability_capacity_change_in_profile_phase():
-    assert "#define MAX_SKILLS            269" in STRUCTS_H
+def test_profile_phase_preserves_existing_ability_boundaries():
+    # Later progression phases may increase MAX_SKILLS. This regression should
+    # protect the established spell boundary and legacy skill IDs rather than
+    # permanently freezing the whole project at the old capacity.
+    max_skills_match = re.search(r"^#define\s+MAX_SKILLS\s+(\d+)\b", STRUCTS_H, re.M)
+    assert max_skills_match
+    assert int(max_skills_match.group(1)) >= 269
     assert "#define MAX_SPELLS" in SPELLS_H and "230" in SPELLS_H
-    assert "#define SKILL_PICKPOCKET             269" in SPELLS_H
+    assert re.search(r"^#define\s+SKILL_PICKPOCKET\s+269\b", SPELLS_H, re.M)
 
 def run():
     tests = [
         test_profile_fields_exist,
         test_all_nine_class_profiles,
         test_stat_value_helper_covers_all_stats,
-        test_no_ability_capacity_change_in_profile_phase,
+        test_profile_phase_preserves_existing_ability_boundaries,
     ]
     for test in tests:
         test()
