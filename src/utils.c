@@ -86,13 +86,13 @@ void improve_ability_from_use(struct char_data *ch, int ability, int success)
 
   /* Callers invoke this only after a genuine attempt.  Class tracking records
    * that use independently of whether the proficiency roll improves. */
-  classtrack_record_ability_use(ch, ability, (ability <= MAX_SPELLS));
+  classtrack_record_ability_use(ch, ability, ability_is_spell(ability));
 
   if (cur >= 100)
     return;
 
   /* Spells: int+wis. Skills: dex+int (simple, stable default). */
-  if (ability <= MAX_SPELLS)
+  if (ability_is_spell(ability))
     stat = (GET_INT(ch) + GET_WIS(ch)) / 2;
   else
     stat = (GET_DEX(ch) + GET_INT(ch)) / 2;

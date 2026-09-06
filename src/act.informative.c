@@ -3721,7 +3721,7 @@ static void show_live_ability_topic_help(struct char_data *ch, int ability)
   if (!name || !*name || !str_cmp(name, unused_spellname))
     return;
 
-  type = (ability <= MAX_SPELLS) ? "Spell" : "Skill";
+  type = ability_kind_name(ability);
 
   outbuf[0] = '\0';
   append_help_line(outbuf, sizeof(outbuf), &len, name);

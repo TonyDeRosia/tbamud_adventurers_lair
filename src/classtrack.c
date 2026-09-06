@@ -592,10 +592,10 @@ int classtrack_is_study_catalog_ability(int ability_id, int show_spells)
     return 0;
 
   if (show_spells) {
-    if (ability_id > MAX_SPELLS)
+    if (!ability_is_spell(ability_id))
       return 0;
   } else {
-    if (ability_id <= MAX_SPELLS)
+    if (!ability_is_skill(ability_id))
       return 0;
   }
 

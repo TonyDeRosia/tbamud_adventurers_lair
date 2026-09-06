@@ -408,7 +408,15 @@
 #define TAR_OBJ_WORLD   (1 << 9)
 #define TAR_OBJ_EQUIP	  (1 << 10)
 
+enum ability_kind_type {
+   ABILITY_KIND_NONE = 0,
+   ABILITY_KIND_SPELL,
+   ABILITY_KIND_SKILL,
+   ABILITY_KIND_SYSTEM
+};
+
 struct spell_info_type {
+   byte ability_kind;	/* Explicit spell/skill/system classification */
    byte min_position;	/* Position for caster	 */
    int mana_min;	/* Min amount of mana used by a spell (highest lev) */
    int mana_max;	/* Max amount of mana used by a spell (lowest lev) */
@@ -708,6 +716,11 @@ void mag_assign_spells(void);
 extern struct spell_info_type spell_info[];
 extern char cast_arg2[];
 extern const char *unused_spellname;
+
+int ability_is_spell(int ability);
+int ability_is_skill(int ability);
+int ability_is_system(int ability);
+const char *ability_kind_name(int ability);
 
 #endif /* _SPELLS_H_ */
 

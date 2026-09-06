@@ -1207,6 +1207,35 @@ const char *skill_name(int num) {
     return ("UNDEFINED");
 }
 
+int ability_is_spell(int ability)
+{
+  return ability > 0 && ability <= TOP_SPELL_DEFINE &&
+      spell_info[ability].ability_kind == ABILITY_KIND_SPELL;
+}
+
+int ability_is_skill(int ability)
+{
+  return ability > 0 && ability <= TOP_SPELL_DEFINE &&
+      spell_info[ability].ability_kind == ABILITY_KIND_SKILL;
+}
+
+int ability_is_system(int ability)
+{
+  return ability > 0 && ability <= TOP_SPELL_DEFINE &&
+      spell_info[ability].ability_kind == ABILITY_KIND_SYSTEM;
+}
+
+const char *ability_kind_name(int ability)
+{
+  if (ability_is_spell(ability))
+    return "Spell";
+  if (ability_is_skill(ability))
+    return "Skill";
+  if (ability_is_system(ability))
+    return "System";
+  return "Unknown";
+}
+
 static bool is_available_spell(int spellnum) {
   return (spellnum > 0 && spellnum <= MAX_SPELLS && spell_info[spellnum].name
       && str_cmp(spell_info[spellnum].name, unused_spellname) != 0);
@@ -2870,13 +2899,15 @@ void spell_level(int spell, int chclass, int level) {
 }
 
 /* Assign the spells on boot up */
-static void spello(int spl, const char *name, int max_mana, int min_mana,
-    int mana_change, int minpos, int targets, int violent, int routines,
-    const char *wearoff) {
+static void abilityo(int spl, int ability_kind, const char *name,
+    int max_mana, int min_mana, int mana_change, int minpos, int targets,
+    int violent, int routines, const char *wearoff) {
   int i;
 
   for (i = 0; i < NUM_CLASSES; i++)
     spell_info[spl].min_level[i] = LVL_IMMORT;
+
+  spell_info[spl].ability_kind = ability_kind;
   spell_info[spl].mana_max = max_mana;
   spell_info[spl].mana_min = min_mana;
   spell_info[spl].mana_change = mana_change;
@@ -2888,11 +2919,18 @@ static void spello(int spl, const char *name, int max_mana, int min_mana,
   spell_info[spl].wear_off_msg = wearoff;
 }
 
+static void spello(int spl, const char *name, int max_mana, int min_mana,
+    int mana_change, int minpos, int targets, int violent, int routines,
+    const char *wearoff) {
+  abilityo(spl, ABILITY_KIND_SPELL, name, max_mana, min_mana, mana_change,
+      minpos, targets, violent, routines, wearoff);
+}
 void unused_spell(int spl) {
   int i;
 
   for (i = 0; i < NUM_CLASSES; i++)
     spell_info[spl].min_level[i] = LVL_IMPL + 1;
+  spell_info[spl].ability_kind = ABILITY_KIND_NONE;
   spell_info[spl].mana_max = 0;
   spell_info[spl].mana_min = 0;
   spell_info[spl].mana_change = 0;
@@ -2907,8 +2945,8 @@ void unused_spell(int spl) {
  * and your cast_skill / cast_spell logic decides whether to charge MOVE or MANA.
  */
 #define SKILL_DEFAULT_COST 10
-#define skillo(skill, name) spello(skill, name, SKILL_DEFAULT_COST, SKILL_DEFAULT_COST, 0, 0, 0, 0, 0, NULL);
-#define skillo_cost(skill, name, cost) spello(skill, name, (cost), (cost), 0, 0, 0, 0, 0, NULL);
+#define skillo(skill, name) abilityo(skill, ABILITY_KIND_SKILL, name, SKILL_DEFAULT_COST, SKILL_DEFAULT_COST, 0, 0, 0, 0, 0, NULL);
+#define skillo_cost(skill, name, cost) abilityo(skill, ABILITY_KIND_SKILL, name, (cost), (cost), 0, 0, 0, 0, 0, NULL);
 
 /* Arguments for spello calls:
  * spellnum, maxmana, minmana, manachng, minpos, targets, violent?, routines.
@@ -3522,7 +3560,7 @@ void mag_assign_spells(void) {
   spello(SPELL_HUNTERS_INSTINCT, "hunters instinct", 20, 20, 0, POS_STANDING, TAR_CHAR_ROOM | TAR_SELF_ONLY, FALSE, MAG_MANUAL, "Your hunter's instinct recedes.");
 
   /* you might want to name this one something more fitting to your theme -Welcor*/
-  spello(SPELL_DG_AFFECT, "Script-inflicted", 0, 0, 0, POS_SITTING,
+  abilityo(SPELL_DG_AFFECT, ABILITY_KIND_SYSTEM, "Script-inflicted", 0, 0, 0, POS_SITTING,
   TAR_IGNORE, TRUE, 0, NULL);
 
   /* Declaration of skills - this actually doesn't do anything except set it up

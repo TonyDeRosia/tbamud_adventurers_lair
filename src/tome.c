@@ -98,7 +98,7 @@ int tome_study_object(struct char_data *ch, struct obj_data *obj)
     if (!tome_can_grant_ability(ch, ability)) continue;
     SET_TOME_ABILITY(ch, ability);
     if (GET_SKILL(ch, ability) <= 0) SET_SKILL(ch, ability, 1);
-    send_to_char(ch, "  %s [%s] at %d%%\r\n", spell_info[ability].name, ability <= MAX_SPELLS ? "Spell" : "Skill", GET_SKILL(ch, ability));
+    send_to_char(ch, "  %s [%s] at %d%%\r\n", spell_info[ability].name, ability_kind_name(ability), GET_SKILL(ch, ability));
   }
   GET_TOME_STUDY_EXPIRES_AT(ch) = now + obj->tome_cooldown_seconds;
   extract_obj(obj);
@@ -117,7 +117,7 @@ ACMD(do_tome)
   }
   if (!str_cmp(arg, "list")) {
     send_to_char(ch, "Tome Abilities\r\nAbility                         Type   Proficiency Affinity\r\n");
-    for (i=1;i<=TOP_SPELL_DEFINE;i++) if (has_tome_ability(ch,i)) { send_to_char(ch, "%-31s %-7s %3d%%        %3d%%\r\n", spell_info[i].name, i<=MAX_SPELLS?"Spell":"Skill", GET_SKILL(ch,i), get_ability_class_affinity(ch,i)); any=TRUE; }
+    for (i=1;i<=TOP_SPELL_DEFINE;i++) if (has_tome_ability(ch,i)) { send_to_char(ch, "%-31s %-7s %3d%%        %3d%%\r\n", spell_info[i].name, ability_kind_name(i), GET_SKILL(ch,i), get_ability_class_affinity(ch,i)); any=TRUE; }
     if (!any)
       send_to_char(ch, "None.\r\n");
     return;
