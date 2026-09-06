@@ -22,7 +22,7 @@ def define_value(text: str, name: str) -> int:
     return int(match.group(1))
 
 def test_minimal_capacity_expansion():
-    assert define_value(STRUCTS, "MAX_SKILLS") == 272
+    assert define_value(STRUCTS, "MAX_SKILLS") == 297
     for name, value in EXPECTED.items():
         assert define_value(SPELLS, name) == value
     assert define_value(SPELLS, "MAX_SPELLS") == 230

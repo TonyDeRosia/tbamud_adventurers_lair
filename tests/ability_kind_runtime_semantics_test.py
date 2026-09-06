@@ -22,7 +22,7 @@ def define_value(text: str, name: str) -> int:
 def test_numeric_layout_contract_is_unchanged():
     assert define_value(SPELLS_H, "MAX_SPELLS") == 230
     assert define_value(SPELLS_H, "NUM_SPELLS") == 230
-    assert define_value(STRUCTS_H, "MAX_SKILLS") == 272
+    assert define_value(STRUCTS_H, "MAX_SKILLS") == 297
     assert define_value(SPELLS_H, "SPELL_DG_AFFECT") == 298
     assert define_value(SPELLS_H, "TOP_SPELL_DEFINE") == 299
 

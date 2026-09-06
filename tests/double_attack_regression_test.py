@@ -31,7 +31,7 @@ def section(text: str, start: str, end: str) -> str:
     return text[a:b]
 
 def test_reserved_ids_unchanged():
-    assert re.search(r"^#define\s+MAX_SKILLS\s+272\b", STRUCTS_H, re.M)
+    assert re.search(r"^#define\s+MAX_SKILLS\s+297\b", STRUCTS_H, re.M)
     assert re.search(r"^#define\s+SKILL_DOUBLE_ATTACK\s+270\b", SPELLS_H, re.M)
     assert re.search(r"^#define\s+SKILL_TRIPLE_ATTACK\s+271\b", SPELLS_H, re.M)
     assert re.search(r"^#define\s+SKILL_FOURTH_ATTACK\s+272\b", SPELLS_H, re.M)

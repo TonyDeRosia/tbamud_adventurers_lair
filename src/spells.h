@@ -275,7 +275,7 @@
 /* Insert new spells here, up to MAX_SPELLS */
 #define MAX_SPELLS		    230
 
-/* PLAYER SKILLS - Numbered from MAX_SPELLS+1 to MAX_SKILLS */
+/* LEGACY PLAYER SKILL IDS - 231 through 272. Extended mixed-kind IDs follow. */
 #define SKILL_BACKSTAB              231 /* Reserved Skill[] DO NOT CHANGE */
 #define SKILL_BASH                  232 /* Reserved Skill[] DO NOT CHANGE */
 #define SKILL_HIDE                  233 /* Reserved Skill[] DO NOT CHANGE */
@@ -319,7 +319,19 @@
 #define SKILL_DOUBLE_ATTACK          270
 #define SKILL_TRIPLE_ATTACK          271
 #define SKILL_FOURTH_ATTACK          272
-/* New skills may be added here up to MAX_SKILLS (see structs.h). */
+
+/*
+ * EXTENDED PLAYER ABILITY IDS
+ *
+ * Explicit ability-kind metadata is authoritative in this band.  IDs may be
+ * registered as player skills or player spells without changing MAX_SPELLS.
+ * Player proficiency/save/cooldown storage is sized through ID 297.
+ */
+#define SKILL_DOUBLE_CAST            273
+#define SKILL_TRIPLE_CAST            274
+#define SKILL_FOURTH_CAST            275
+#define SPELL_HASTE                  276
+/* IDs 277-297 remain available for future player abilities. */
 
 /* NON-PLAYER AND OBJECT SPELLS AND SKILLS: The practice levels for the spells
  * and skills below are _not_ recorded in the players file; therefore, the
