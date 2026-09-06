@@ -260,6 +260,7 @@ cpp_extern const struct command_info cmd_info[] = {
   { "kick"     , "ki"      , POS_FIGHTING, do_kick     , 1, 0 },
 
   { "look"     , "l"       , POS_RESTING , do_look     , 0, SCMD_LOOK },
+  { "light"    , "light"   , POS_RESTING , do_light    , 0, 0 },
   { "logout"   , "logout"  , POS_DEAD    , do_quit     , 0, SCMD_QUIT },
   { "last"     , "last"    , POS_DEAD    , do_last     , LVL_GOD, 0 },
   { "leave"    , "lea"     , POS_STANDING, do_leave    , 0, 0 },

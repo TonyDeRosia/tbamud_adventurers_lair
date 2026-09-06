@@ -34,11 +34,6 @@ interest, ready to bite whatever looks weakest.
 8 8 0
 BareHandAttack: 4
 BodyProfile: 2
-SavingPara: 1
-SavingRod: 1
-SavingPetri: 1
-SavingBreath: 1
-SavingSpell: 1
 Wimpy: 2
 Evasion: 1
 E
@@ -59,11 +54,6 @@ outside, this creature is defending territory.
 8 8 0
 BareHandAttack: 4
 BodyProfile: 2
-SavingPara: 1
-SavingRod: 1
-SavingPetri: 1
-SavingBreath: 1
-SavingSpell: 1
 Wimpy: 2
 Evasion: 1
 E
@@ -86,11 +76,6 @@ become part beast, part local legend.
 5 5 0
 BareHandAttack: 4
 BodyProfile: 2
-SavingPara: 1
-SavingRod: 1
-SavingPetri: 1
-SavingBreath: 1
-SavingSpell: 1
 Wimpy: 3
 Evasion: 2
 E
@@ -130,11 +115,6 @@ anything that disturbs the roost.
 8 8 0
 BareHandAttack: 4
 BodyProfile: 19
-SavingPara: 1
-SavingRod: 1
-SavingPetri: 1
-SavingBreath: 1
-SavingSpell: 1
 Wimpy: 2
 Evasion: 1
 E
@@ -155,11 +135,6 @@ before plunging teeth-first at the source.
 8 8 0
 BareHandAttack: 4
 BodyProfile: 19
-SavingPara: 1
-SavingRod: 1
-SavingPetri: 1
-SavingBreath: 1
-SavingSpell: 1
 Wimpy: 2
 Evasion: 1
 E
@@ -180,11 +155,6 @@ with unsettling focus.
 8 8 0
 BareHandAttack: 4
 BodyProfile: 19
-SavingPara: 1
-SavingRod: 1
-SavingPetri: 1
-SavingBreath: 1
-SavingSpell: 1
 Wimpy: 3
 Evasion: 2
 E
@@ -242,11 +212,6 @@ oldest specimens sometimes hide valuable pearls.
 6 6 0
 BareHandAttack: 4
 BodyProfile: 1
-SavingPara: 1
-SavingRod: 1
-SavingPetri: 1
-SavingBreath: 1
-SavingSpell: 1
 Wimpy: 2
 Evasion: 1
 E
@@ -302,11 +267,6 @@ rocks, and it keeps a careful distance from anything larger than itself.
 8 8 0
 BareHandAttack: 4
 BodyProfile: 2
-SavingPara: 1
-SavingRod: 1
-SavingPetri: 1
-SavingBreath: 1
-SavingSpell: 1
 Wimpy: 2
 Evasion: 1
 E

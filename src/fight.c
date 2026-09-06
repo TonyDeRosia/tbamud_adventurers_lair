@@ -960,6 +960,29 @@ int compute_hit_chance_from_values(int offensive_hit, int target_evasion)
   return MAX(5, MIN(95, hit_chance));
 }
 
+int compute_reference_hit_chance(struct char_data *ch)
+{
+  return compute_hit_chance_from_values(compute_offensive_hit_value(ch, NULL),
+                                       GET_LEVEL(ch) + STANDARD_DEFENDER_EVASION);
+}
+
+/* Shared denominator for combat damage and its continuous SCORE ratio.
+ * Widen intermediates so large, otherwise valid damage values do not overflow. */
+static long long armor_damage_denominator(int armor)
+{
+  return 100LL + MAX(0, armor);
+}
+
+int apply_armor_mitigation(int damage, int armor)
+{
+  return (int)((long long)MAX(0, damage) * 100 / armor_damage_denominator(armor));
+}
+
+int armor_mitigation_basis_points(int armor)
+{
+  return (int)(10000LL * MAX(0, armor) / armor_damage_denominator(armor));
+}
+
 void get_player_unarmed_profile(int level, int *dice_num, int *dice_size, int *level_bonus)
 {
   level = MAX(1, level);
@@ -2289,7 +2312,7 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
 
   if (dam > 0 && IS_WEAPON(attacktype)) {
     int armor = compute_armor(victim);
-    dam = (dam * 100) / (100 + armor);
+    dam = apply_armor_mitigation(dam, armor);
   }
 
   if (dam > 0) {
@@ -2641,7 +2664,7 @@ void hit(struct char_data *ch, struct char_data *victim, int type)
   int w_type, attacker_hit, defender_evasion, hit_chance, dam;
   int thaco_legacy, victim_ac_legacy, diceroll_legacy;
   int attacker_level, victim_level, hitroll_bonus, stat_bonus, mental_bonus;
-  int level_gap_bonus, situational_bonus, defender_level_bonus;
+  int level_gap_bonus, defender_level_bonus;
   int shadow_assist_bonus = 0;
   int melee_level_bonus = 0;
   int final_hit_roll;
@@ -2685,8 +2708,6 @@ void hit(struct char_data *ch, struct char_data *victim, int type)
     level_gap_bonus = (attacker_level - victim_level) / 3;
   else
     level_gap_bonus = 0;
-  situational_bonus = concealment_hit_modifier(ch, victim);
-
   if (IS_NPC(ch) && ch->master && !IS_NPC(ch->master) &&
       is_shadow_servant_for(ch->master, ch) && victim && IS_NPC(victim)) {
     int owner_gap = GET_LEVEL(ch->master) - GET_LEVEL(victim);
@@ -2694,8 +2715,7 @@ void hit(struct char_data *ch, struct char_data *victim, int type)
       shadow_assist_bonus = MIN(14, 4 + (owner_gap / 4));
   }
 
-  attacker_hit = 30 + attacker_level + hitroll_bonus + stat_bonus +
-                 mental_bonus + level_gap_bonus + situational_bonus + shadow_assist_bonus;
+  attacker_hit = compute_offensive_hit_value(ch, victim) + shadow_assist_bonus;
   defender_evasion = compute_defensive_evasion_value(victim, &defender_level_bonus);
   hit_chance = compute_hit_chance_from_values(attacker_hit, defender_evasion);
   final_hit_roll = rand_number(1, 100);

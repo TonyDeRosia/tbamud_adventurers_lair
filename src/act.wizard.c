@@ -5035,10 +5035,7 @@ static struct zcheck_affs {
   {APPLY_AC,         -10,  10, "magical Armor"},
   {APPLY_HITROLL,      0, -99, "hitroll"},       /* Handled seperately below */
   {APPLY_DAMROLL,      0, -99, "damroll"},       /* Handled seperately below */
-  {APPLY_SAVING_PARA, -2,   2, "saving throw (paralysis)"},
-  {APPLY_SAVING_ROD,  -2,   2, "saving throw (rod)"},
-  {APPLY_SAVING_PETRI,-2,   2, "saving throw (death)"},
-  {APPLY_SAVING_BREATH,-2,  2, "saving throw (breath)"},
+
   {APPLY_SAVING_SPELL,-2,   2, "saving throw (spell)"}
 };
 

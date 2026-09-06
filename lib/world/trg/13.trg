@@ -2485,10 +2485,6 @@ dg_affect %actor% maxmove 1 1
 dg_affect %actor% armor 1 1
 dg_affect %actor% hitroll 1 1
 dg_affect %actor% damroll 1 1
-dg_affect %actor% saving_para 1 1
-dg_affect %actor% saving_rod 1 1
-dg_affect %actor% saving_petri 1 1
-dg_affect %actor% saving_breath 1 1
 dg_affect %actor% saving_spell 1 1
 dg_affect %actor% blind on 1
 dg_affect %actor% invis on 1

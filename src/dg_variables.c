@@ -996,35 +996,7 @@ void find_replacement(void *go, struct script_data *sc, trig_data *trig,
           }
           break;
         case 's':
-          if (!str_cmp(field, "saving_breath")) {
-            if (subfield && *subfield) {
-              int addition = atoi(subfield);
-              GET_SAVE(c, SAVING_BREATH) += addition;
-            }
-            snprintf(str, slen, "%d", GET_SAVE(c, SAVING_BREATH));
-          }
-          else if (!str_cmp(field, "saving_para")) {
-            if (subfield && *subfield) {
-              int addition = atoi(subfield);
-              GET_SAVE(c, SAVING_PARA) += addition;
-            }
-            snprintf(str, slen, "%d", GET_SAVE(c, SAVING_PARA));
-          }
-          else if (!str_cmp(field, "saving_petri")) {
-            if (subfield && *subfield) {
-              int addition = atoi(subfield);
-              GET_SAVE(c, SAVING_PETRI) += addition;
-            }
-            snprintf(str, slen, "%d", GET_SAVE(c, SAVING_PETRI));
-          }
-          else if (!str_cmp(field, "saving_rod")) {
-            if (subfield && *subfield) {
-              int addition = atoi(subfield);
-              GET_SAVE(c, SAVING_ROD) += addition;
-            }
-            snprintf(str, slen, "%d", GET_SAVE(c, SAVING_ROD));
-          }
-          else if (!str_cmp(field, "saving_spell")) {
+          if (!str_cmp(field, "saving_spell")) {
             if (subfield && *subfield) {
               int addition = atoi(subfield);
               GET_SAVE(c, SAVING_SPELL) += addition;

@@ -15,11 +15,6 @@ a creature made to hold ground rather than pursue prey.
 8 8 0
 BareHandAttack: 7
 BodyProfile: 11
-SavingPara: 4
-SavingRod: 4
-SavingPetri: 4
-SavingBreath: 4
-SavingSpell: 4
 Wimpy: 8
 Evasion: 5
 GoldMin: 16
@@ -49,11 +44,6 @@ Int: 12
 Wis: 12
 Con: 12
 Cha: 12
-SavingPara: 4
-SavingRod: 4
-SavingPetri: 4
-SavingBreath: 4
-SavingSpell: 4
 Wimpy: 9
 Evasion: 6
 GoldMin: 19
@@ -84,11 +74,6 @@ Int: 14
 Wis: 14
 Con: 14
 Cha: 14
-SavingPara: 5
-SavingRod: 5
-SavingPetri: 5
-SavingBreath: 5
-SavingSpell: 5
 Wimpy: 10
 Evasion: 7
 GoldMin: 21
@@ -118,11 +103,6 @@ Int: 16
 Wis: 16
 Con: 16
 Cha: 16
-SavingPara: 6
-SavingRod: 6
-SavingPetri: 6
-SavingBreath: 6
-SavingSpell: 6
 Wimpy: 12
 Evasion: 8
 GoldMin: 25
@@ -146,11 +126,6 @@ mineral blooms for nectar.
 8 8 0
 BareHandAttack: 4
 BodyProfile: 10
-SavingPara: 3
-SavingRod: 3
-SavingPetri: 3
-SavingBreath: 3
-SavingSpell: 3
 Wimpy: 7
 Evasion: 5
 GoldMin: 15
@@ -174,11 +149,6 @@ glancing blows with a sound like struck glass.
 8 8 0
 BareHandAttack: 6
 BodyProfile: 9
-SavingPara: 4
-SavingRod: 4
-SavingPetri: 4
-SavingBreath: 4
-SavingSpell: 4
 Wimpy: 8
 Evasion: 5
 GoldMin: 17
@@ -208,11 +178,6 @@ Int: 12
 Wis: 12
 Con: 12
 Cha: 12
-SavingPara: 4
-SavingRod: 4
-SavingPetri: 4
-SavingBreath: 4
-SavingSpell: 4
 Wimpy: 9
 Evasion: 6
 GoldMin: 18
@@ -236,11 +201,6 @@ fades over several minutes.
 8 8 0
 BareHandAttack: 4
 BodyProfile: 3
-SavingPara: 4
-SavingRod: 4
-SavingPetri: 4
-SavingBreath: 4
-SavingSpell: 4
 Wimpy: 8
 Evasion: 5
 GoldMin: 16
@@ -269,11 +229,6 @@ Int: 13
 Wis: 13
 Con: 13
 Cha: 13
-SavingPara: 5
-SavingRod: 5
-SavingPetri: 5
-SavingBreath: 5
-SavingSpell: 5
 Wimpy: 10
 Evasion: 6
 GoldMin: 20
@@ -303,11 +258,6 @@ Int: 14
 Wis: 14
 Con: 14
 Cha: 14
-SavingPara: 5
-SavingRod: 5
-SavingPetri: 5
-SavingBreath: 5
-SavingSpell: 5
 Wimpy: 10
 Evasion: 7
 GoldMin: 21
@@ -337,11 +287,6 @@ Int: 14
 Wis: 14
 Con: 14
 Cha: 14
-SavingPara: 5
-SavingRod: 5
-SavingPetri: 5
-SavingBreath: 5
-SavingSpell: 5
 Wimpy: 11
 Evasion: 7
 GoldMin: 22
@@ -371,11 +316,6 @@ Int: 15
 Wis: 15
 Con: 15
 Cha: 15
-SavingPara: 5
-SavingRod: 5
-SavingPetri: 5
-SavingBreath: 5
-SavingSpell: 5
 Wimpy: 11
 Evasion: 7
 GoldMin: 23
@@ -405,11 +345,6 @@ Int: 16
 Wis: 16
 Con: 16
 Cha: 16
-SavingPara: 6
-SavingRod: 6
-SavingPetri: 6
-SavingBreath: 6
-SavingSpell: 6
 Wimpy: 12
 Evasion: 8
 GoldMin: 24
@@ -440,11 +375,6 @@ Int: 16
 Wis: 16
 Con: 16
 Cha: 16
-SavingPara: 6
-SavingRod: 6
-SavingPetri: 6
-SavingBreath: 6
-SavingSpell: 6
 Wimpy: 12
 Evasion: 8
 GoldMin: 25
@@ -469,11 +399,6 @@ from the grotto walls.
 8 8 0
 BareHandAttack: 4
 BodyProfile: 3
-SavingPara: 3
-SavingRod: 3
-SavingPetri: 3
-SavingBreath: 3
-SavingSpell: 3
 Wimpy: 7
 Evasion: 5
 E
@@ -493,11 +418,6 @@ different colors of sound.
 8 8 0
 BareHandAttack: 1
 BodyProfile: 10
-SavingPara: 4
-SavingRod: 4
-SavingPetri: 4
-SavingBreath: 4
-SavingSpell: 4
 Wimpy: 8
 Evasion: 5
 LootItem: 34027 30
@@ -525,11 +445,6 @@ Int: 14
 Wis: 14
 Con: 14
 Cha: 14
-SavingPara: 5
-SavingRod: 5
-SavingPetri: 5
-SavingBreath: 5
-SavingSpell: 5
 Wimpy: 11
 Evasion: 7
 LootItem: 34020 14
@@ -559,11 +474,6 @@ Int: 16
 Wis: 16
 Con: 16
 Cha: 16
-SavingPara: 6
-SavingRod: 6
-SavingPetri: 6
-SavingBreath: 6
-SavingSpell: 6
 Wimpy: 12
 Evasion: 8
 LootItem: 34026 100
@@ -594,11 +504,6 @@ Int: 12
 Wis: 12
 Con: 12
 Cha: 12
-SavingPara: 4
-SavingRod: 4
-SavingPetri: 4
-SavingBreath: 4
-SavingSpell: 4
 Wimpy: 9
 Evasion: 6
 LootItem: 34026 24
@@ -619,11 +524,6 @@ when disturbed.
 8 8 0
 BareHandAttack: 1
 BodyProfile: 0
-SavingPara: 3
-SavingRod: 3
-SavingPetri: 3
-SavingBreath: 3
-SavingSpell: 3
 Wimpy: 7
 Evasion: 5
 E

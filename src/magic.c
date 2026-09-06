@@ -166,33 +166,53 @@ static void sanctuary_messages(int spellnum, const char **to_vict, const char **
 }
 
 
-/* Negative apply_saving_throw[] values make saving throws better! So do
- * negative modifiers.  Though people may be used to the reverse of that.
- * It's due to the code modifying the target saving throw instead of the
- * random number of the character as in some other systems. */
-int mag_savingthrow(struct char_data *ch, int type, int modifier)
+/* Negative apply_saving_throw[] values and caller modifiers improve saves.
+ * Preserve that item/spell convention while returning actual success odds. */
+int saving_throw_chance(struct char_data *ch, int type, int modifier)
 {
-  /* NPCs use warrior tables according to some book */
+  /* Preserve the existing NPC archetype and signed apply convention. */
   int class_sav = CLASS_WARRIOR;
-  int save;
+  int chance;
+  long long adjustment;
+
+  if (!ch)
+    return 0;
+
+  /* Accept the legacy serialized save IDs, but reject invalid values.
+   * All valid save types resolve to the one canonical gameplay save:
+   * Save vs. Spell. */
+  if (type < SAVING_PARA || type > SAVING_SPELL)
+    return 0;
+
+  type = SAVING_SPELL;
 
   if (!IS_NPC(ch))
     class_sav = GET_CLASS(ch);
 
-  save = saving_throws(class_sav, type, GET_LEVEL(ch));
-  save += GET_SAVE(ch, type);
-  save += modifier;
+  chance = saving_throw_base_chance(class_sav, type, GET_LEVEL(ch));
+  if (chance <= 0)
+    return 0;
+  adjustment = (long long)GET_SAVE(ch, type) + modifier;
   if (IN_ROOM(ch) != NOWHERE &&
       room_has_effect(&world[IN_ROOM(ch)], ROOM_EFFECT_CONSECRATE) &&
       IS_GOOD(ch))
-    save -= 5;
+    adjustment -= 5;
 
-  /* Throwing a 0 is always a failure. */
-  if (MAX(1, save) < rand_number(0, 99))
-    return (TRUE);
+  /* Bonuses reduce remaining failure odds; debuffs reduce success odds.
+   * Two scaling units per apply point, with diminishing returns in both
+   * directions. Basis points preserve progression and small gear upgrades. */
+  if (adjustment < 0) {
+    long long bonus = -2 * adjustment;
+    chance += (int)((10000 - chance) * bonus / (100 + bonus));
+  } else {
+    chance = (int)(chance * 100LL / (100 + 2 * adjustment));
+  }
+  return MAX(500, MIN(9500, chance));
+}
 
-  /* Oops, failed. Sorry. */
-  return (FALSE);
+int mag_savingthrow(struct char_data *ch, int type, int modifier)
+{
+  return rand_number(1, 10000) <= saving_throw_chance(ch, type, modifier);
 }
 
 /* affect_update: called from comm.c (causes spells to wear off) */
@@ -812,7 +832,7 @@ void mag_affects(int level, struct char_data *ch, struct char_data *victim,
     af[2].modifier = 10;
     af[2].duration = buff_duration;
 
-    af[3].location = APPLY_SAVING_BREATH;
+    af[3].location = APPLY_SAVING_SPELL;
     af[3].modifier = -1;
     af[3].duration = buff_duration;
 
@@ -900,7 +920,7 @@ void mag_affects(int level, struct char_data *ch, struct char_data *victim,
     af[2].modifier = 15;
     af[2].duration = buff_duration;
 
-    af[3].location = APPLY_SAVING_BREATH;
+    af[3].location = APPLY_SAVING_SPELL;
     af[3].modifier = -2;
     af[3].duration = buff_duration;
 
@@ -1145,7 +1165,7 @@ void mag_affects(int level, struct char_data *ch, struct char_data *victim,
       send_to_char(ch, "That target is not humanoid enough for hold person.\r\n");
       return;
     }
-    if (mag_savingthrow(victim, SAVING_PARA, 0)) {
+    if (mag_savingthrow(victim, SAVING_SPELL, 0)) {
       af[0].duration = 1;
       af[0].location = APPLY_NONE;
       SET_BIT_AR(af[0].bitvector, AFF_TIME_SNARE);
@@ -1162,7 +1182,7 @@ void mag_affects(int level, struct char_data *ch, struct char_data *victim,
       send_to_char(ch, "Undead are resistant to this hold.\r\n");
       return;
     }
-    if (mag_savingthrow(victim, SAVING_PARA, 0)) {
+    if (mag_savingthrow(victim, SAVING_SPELL, 0)) {
       af[0].duration = spell_dur_short(level);
       af[0].location = APPLY_NONE;
       SET_BIT_AR(af[0].bitvector, AFF_TIME_SNARE);

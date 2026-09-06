@@ -44,7 +44,8 @@ int num_pc_classes(void);
 int level_exp(int chclass, int level);
 int parse_class(char arg);
 void roll_real_abils(struct char_data *ch);
-byte saving_throws(int class_num, int type, int level);
+/* Unmodified save success in basis points (10000 = 100%). */
+int saving_throw_base_chance(int class_num, int type, int level);
 int thaco(int class_num, int level);
 const char *title_female(int chclass, int level);
 const char *title_male(int chclass, int level);

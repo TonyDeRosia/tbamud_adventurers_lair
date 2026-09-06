@@ -1,187 +1,553 @@
 #1809
-john connor~
-John Connor~
-John Connor is giving orders here.
+archwizard caelvaris master sanctum~
+Archwizard @CCae@Wlv@Bar@Cis@n~
+Archwizard @CCae@Wlv@Bar@Cis@n waits beneath the floating sapphire at the Sanctum's apex.
 ~
-   The leader of the Resistance Force he is a hardened veteran with the scars
-to prove it.
+Caelvaris is neither young nor visibly ancient. His dark robes are
+almost plain except for a single flawless sapphire clasp, and the
+immense crystal above him responds to his smallest gesture. He regards
+challengers with the calm interest of a master finally given a
+difficult problem.
 ~
 237834 0 0 0 80 0 0 0 0 E
-34 9 -10 6d6+340 5d5+5
-340 115600
+100 8 0 16d18+500 13d10+8
+340 0
 8 8 1
-BareHandAttack: 7
+BareHandAttack: 12
+BodyProfile: 1
+Str: 18
+Dex: 18
+Int: 18
+Wis: 18
+Con: 18
+Cha: 18
+Wimpy: 50
+Evasion: 33
+GoldMin: 340
+GoldMax: 340
+LootItem: 1837 35
+LootItem: 1844 35
+LootItem: 1848 35
 E
+T 1828
+T 1829
 #1810
-terminator~
-a series 800 terminator~
-A terminator is looking for a human to kill.
+wandering tree wardwood animated~
+a @gwan@Gde@yri@gng @Gtr@yee@n~
+A @gwan@Gde@yri@gng @Gtr@yee@n drags its roots slowly across the path.
 ~
-   This metal endoskeleton is the perfect killing weapon.  The mechanical red
-eyes scan the area for anything living.
+What first appears to be an old oak has torn itself free of the soil.
+Thick roots flex beneath its trunk like many slow feet, and knots in
+the bark tighten whenever a living trespasser draws near.
 ~
-72 0 0 0 0 0 0 0 0 E
-31 10 -8 6d6+310 5d5+5
-310 96100
-8 8 0
-BareHandAttack: 9
-BodyProfile: 11
-E
-#1811
-hunter killer~
-a aerial hunter killer~
-A flying hunter killer zooms past you, it's turbines whining.
-~
-   This flying metal machine has a mind of it's own and was made for the sole
-purpose of hunting down humans and killing them.
-~
-72 0 0 0 0 0 0 0 0 E
-30 10 -8 6d6+300 5d5+5
-300 90000
-8 8 0
-BareHandAttack: 12
-BodyProfile: 1
-E
-#1812
-hunter killer tank~
-a hunter killer tank~
-A huge metal tank rolls past, bones crunching under it's weight.
-~
-   Yet another machine made by machines to purge the world of humans.
-~
-72 0 0 0 0 0 0 0 0 E
-31 10 -8 6d6+310 5d5+5
-310 96100
-8 8 0
-BareHandAttack: 12
-BodyProfile: 1
-E
-#1813
-Centurion~
-a centurion~
-A centurion runs past.
-~
-   This four legged gun pod is fast and deadly accurate.
-~
-72 0 0 0 0 0 0 0 0 E
-30 10 -8 6d6+300 5d5+5
-300 90000
-8 8 0
-BareHandAttack: 12
-E
-#1814
-silverfish~
-a silverfish~
-A silverfish is trying to sneak up on you.
-~
-   This small centipede like robot finds it's way into the resistance force
-hideouts and explodes, sending razor sharp shrapnel in all directions.
-~
-72 0 0 0 0 0 0 0 0 E
-30 10 -8 6d6+300 5d5+5
-300 90000
-8 8 0
-BareHandAttack: 10
-BodyProfile: 9
-E
-#1816
-T1000~
-the T1000~
-A T1000 is shapeshifting before you.
-~
-   A poly-alloy or liquid medal, this is the latest and greatest invention of
-the robots.
-~
-237610 0 0 0 1114188 0 0 0 0 E
-34 9 -10 6d6+340 5d5+5
-340 115600
-8 8 0
-BareHandAttack: 11
-E
-#1817
-guerilla soldier~
-a guerilla soldier~
-A soldier of the resistance force is looking for a terminator to kill.
-~
-   Born in battle, it's all this soldier has ever known.
-~
-72 0 0 0 0 0 0 0 0 E
-32 10 -9 6d6+320 5d5+5
-320 102400
-8 8 0
-BareHandAttack: 7
-BodyProfile: 1
-E
-#1818
-terminator~
-an autonomous terminator~
-An autonomous terminator is guarding skynet.
-~
-   This terminator was made as a sentry to keep all from entering skynet
-laboratories.
-~
-10 0 0 0 0 0 0 0 0 E
-32 10 -9 6d6+320 5d5+5
-320 102400
-8 8 0
-BodyProfile: 11
-E
-#1819
-guerilla child~
-a guerilla child~
-A child is learning helping the soldiers with their wounds.
-~
-   Even the children take part in this war with the machines.  They care for
-the wounded, run messages, help with the equipment.  No one is free until the
-machines are destroyed.
-~
-14 0 0 0 0 0 0 0 0 E
-30 10 -8 6d6+300 5d5+5
-300 90000
-8 8 0
-BareHandAttack: 4
-BodyProfile: 1
-E
-#1820
-guerilla officer~
-a guerilla officer~
-An officer of the resistance force is leading his soldiers into battle.
-~
-   His eyes tell you what he dares not say to his troops, this battle is
-hopeless, lives are waster killing machines that can just be rebuilt.
-~
-72 0 0 0 0 0 0 0 0 E
-32 10 -9 6d6+320 5d5+5
-320 102400
+104 0 0 0 0 0 0 0 0 E
+90 9 0 15d17+450 11d9+7
+310 0
 8 8 0
 BareHandAttack: 6
-BodyProfile: 1
+BodyProfile: 14
+Str: 18
+Dex: 18
+Int: 18
+Wis: 18
+Con: 18
+Cha: 18
+Wimpy: 45
+Evasion: 30
+GoldMin: 310
+GoldMax: 310
 E
-#1821
-german shepherd~
-a german shepherd~
-A german shepherd sniffs your hand.
+T 1800
+T 1801
+#1811
+wardwood treant guardian~
+a @gwar@Gdwo@yod @gtre@Gan@yt@n~
+A @gwar@Gdwo@yod @gtre@Gan@yt@n watches the trail with deep-set amber eyes.
 ~
-   The resistance uses this dog to detect terminators.
+This towering treant bears old sapphire ward-marks grown directly into
+its bark. Its broad limbs are heavy enough to break masonry, yet it
+moves with the quiet restraint of a sentry that has guarded the same
+forest for centuries.
 ~
-10 0 0 0 0 0 0 0 0 E
-30 10 -8 6d6+300 5d5+5
-300 90000
+104 0 0 0 0 0 0 0 0 E
+91 9 0 15d17+455 11d10+7
+300 0
+8 8 0
+BareHandAttack: 6
+BodyProfile: 14
+Str: 18
+Dex: 18
+Int: 18
+Wis: 18
+Con: 18
+Cha: 18
+Wimpy: 45
+Evasion: 30
+GoldMin: 300
+GoldMax: 300
+E
+T 1800
+T 1801
+#1812
+awakened thornbriar briar plant~
+an @gawa@Gken@red @rtho@Rrn@gbri@Gar@n~
+An @gawa@Gken@red @rtho@Rrn@gbri@Gar@n coils across the ground in a nest of hooked vines.
+~
+A dense knot of black-green vines has risen into a predatory shape.
+Red thorns line every tendril, while tiny sapphire flowers open and
+close along its core as though breathing.
+~
+104 0 0 0 0 0 0 0 0 E
+92 9 0 15d17+460 12d10+7
+310 0
+8 8 0
+BareHandAttack: 8
+BodyProfile: 14
+Str: 18
+Dex: 18
+Int: 18
+Wis: 18
+Con: 18
+Cha: 18
+Wimpy: 46
+Evasion: 30
+GoldMin: 310
+GoldMax: 310
+E
+T 1800
+T 1801
+#1813
+ember eyed forest hound wardwood~
+an @rem@Rber@O-eyed @gfor@Gest @yhoun@Wd@n~
+An @rem@Rber@O-eyed @gfor@Gest @yhoun@Wd@n prowls beneath the trees.
+~
+This enormous hound has a coat the color of damp bark and eyes glowing
+like banked embers. Sapphire runes have been branded into its leather
+collar, marking it as a deliberate guardian rather than a wild beast.
+~
+104 0 0 0 0 0 0 0 0 E
+92 9 0 15d17+460 12d10+7
+300 0
 8 8 0
 BareHandAttack: 4
 BodyProfile: 2
+Str: 18
+Dex: 18
+Int: 18
+Wis: 18
+Con: 18
+Cha: 18
+Wimpy: 46
+Evasion: 30
+GoldMin: 300
+GoldMax: 300
 E
+T 1800
+T 1801
+#1814
+ancient treant elder wardwood~
+an @yanc@Gie@gnt @Gtre@yan@gt@n~
+An @yanc@Gie@gnt @Gtre@yan@gt@n stands rooted in the path until something moves.
+~
+Age has turned this treant's bark pale and stone-hard. Ferns grow
+across its shoulders, birds once nested in hollows along its back, and
+a deep sapphire sigil burns in the center of its chest.
+~
+104 0 0 0 0 0 0 0 0 E
+94 9 0 15d17+470 12d10+7
+300 0
+8 8 0
+BareHandAttack: 9
+BodyProfile: 14
+Str: 18
+Dex: 18
+Int: 18
+Wis: 18
+Con: 18
+Cha: 18
+Wimpy: 47
+Evasion: 31
+GoldMin: 300
+GoldMax: 300
+E
+T 1800
+T 1801
+#1816
+aberrant woodmage mage warden~
+the @gAb@Ger@Drant @gWood@Cma@cge@n~
+The @gAb@Ger@Drant @gWood@Cma@cge@n stalks among the trees, roots twisting beneath his feet.
+~
+A gaunt former wizard has become something halfway between man and
+tree. One arm is a crooked branch tipped with clawlike twigs, sapphire
+light burns through cracks in his bark-covered flesh, and thorny roots
+have replaced much of his lower body.
+~
+237610 0 0 0 1114188 0 0 0 0 E
+95 9 0 15d17+475 12d10+7
+340 0
+8 8 0
+BareHandAttack: 12
+BodyProfile: 14
+Str: 18
+Dex: 18
+Int: 18
+Wis: 18
+Con: 18
+Cha: 18
+Wimpy: 47
+Evasion: 31
+GoldMin: 340
+GoldMax: 340
+LootItem: 1803 100
+E
+T 1802
+T 1803
+#1817
+sapphire thorn guardian plant~
+the @CSa@cpp@Chi@cre @gTh@Gor@rn@n~
+The @CSa@cpp@Chi@cre @gTh@Gor@rn@n rises from a crown of glittering briars.
+~
+A towering flowering horror fills the clearing. Its central stalk is
+armored in dark sapphire scales, while dozens of thorned vines unfold
+around a luminous blue blossom large enough to swallow a man.
+~
+42 0 0 0 0 0 0 0 0 E
+95 9 0 15d17+475 12d10+7
+320 0
+8 8 0
+BareHandAttack: 8
+BodyProfile: 14
+Str: 18
+Dex: 18
+Int: 18
+Wis: 18
+Con: 18
+Cha: 18
+Wimpy: 47
+Evasion: 31
+GoldMin: 320
+GoldMax: 320
+E
+T 1804
+T 1805
+#1818
+old rootthane belovar treant lord~
+Old @yRoo@Gtt@gha@yne @GBel@go@Wvar@n~
+Old @yRoo@Gtt@gha@yne @GBel@go@Wvar@n waits upon a throne of his own living roots.
+~
+Belovar is broader than the oldest oaks around him, his bark silvered
+by centuries and carved with the names of wardens long dead. Sapphire
+crystals grow from his crown like a rough circlet, and his patient
+eyes hold neither malice nor mercy.
+~
+42 0 0 0 0 0 0 0 0 E
+95 9 0 15d17+475 12d10+7
+320 0
+8 8 0
+BareHandAttack: 6
+BodyProfile: 14
+Str: 18
+Dex: 18
+Int: 18
+Wis: 18
+Con: 18
+Cha: 18
+Wimpy: 47
+Evasion: 31
+GoldMin: 320
+GoldMax: 320
+LootItem: 1805 18
+E
+T 1806
+T 1807
+#1819
+magister oren valec force wizard~
+Magister @COre@Wn @BVa@Cle@Wc@n~
+Magister @COre@Wn @BVa@Cle@Wc@n stands perfectly still while loose objects orbit him.
+~
+Oren Valec is a severe man in immaculate sapphire robes. Quills,
+books, and fist-sized stones drift around him in slow circles, held
+aloft by effortless force magic while he studies intruders with
+professional disappointment.
+~
+14 0 0 0 0 0 0 0 0 E
+100 8 0 16d18+500 13d10+8
+300 0
+8 8 0
+BareHandAttack: 12
+BodyProfile: 1
+Str: 18
+Dex: 18
+Int: 18
+Wis: 18
+Con: 18
+Cha: 18
+Wimpy: 50
+Evasion: 33
+GoldMin: 300
+GoldMax: 300
+LootItem: 1830 35
+LootItem: 1840 35
+E
+T 1808
+T 1809
+#1820
+ilyra glass tongued illusionist wizard~
+@MIly@Wra @cthe @MGl@Was@cs-T@Mong@Wued@n~
+@MIly@Wra @cthe @MGl@Was@cs-T@Mong@Wued@n smiles from several places at once.
+~
+The illusionist appears as a graceful woman in mirrored silk, though
+every reflection shows a slightly different expression. Her voice
+seems to come from behind whoever is listening.
+~
+10 0 0 0 0 0 0 0 0 E
+100 8 0 16d18+500 13d10+8
+320 0
+8 8 0
+BareHandAttack: 12
+BodyProfile: 1
+Str: 18
+Dex: 18
+Int: 18
+Wis: 18
+Con: 18
+Cha: 18
+Wimpy: 50
+Evasion: 33
+GoldMin: 320
+GoldMax: 320
+LootItem: 1831 35
+E
+T 1810
+T 1811
+#1821
+tharos emberhand wizard fire~
+@RTha@Oros @yEmb@Rer@Oha@ynd@n~
+@RTha@Oros @yEmb@Rer@Oha@ynd@n tends a blue-white flame in his bare palm.
+~
+Tharos is a broad-shouldered wizard whose hands are permanently
+blackened from years of elemental work. Sapphire-threaded robes hang
+open at the forearms, revealing glowing lines like molten cracks
+beneath his skin.
+~
+10 0 0 0 0 0 0 0 0 E
+100 8 0 16d18+500 13d10+8
+300 0
+8 8 0
+BareHandAttack: 12
+BodyProfile: 1
+Str: 18
+Dex: 18
+Int: 18
+Wis: 18
+Con: 18
+Cha: 18
+Wimpy: 50
+Evasion: 33
+GoldMin: 300
+GoldMax: 300
+LootItem: 1832 35
+LootItem: 1842 35
+E
+T 1812
+T 1813
 #1822
-kyle reese~
-Kyle Reese~
-Kyle Reese is hiding from the terminators.
+mother vaelune oracle healer wizard~
+Mother @WVa@Cel@Bune @cof the @WGent@Cle @BSta@Wrs@n~
+Mother @WVa@Cel@Bune @cof the @WGent@Cle @BSta@Wrs@n watches beneath a slowly turning constellation.
 ~
-   If only he knew what the future held for him.
+Vaelune is an elderly scholar in white and sapphire vestments, serene
+until threatened. Tiny stars move through the fabric of her sleeves,
+and her clear eyes have the unsettling focus of someone accustomed to
+seeing wounds before they happen.
 ~
-2376 0 0 0 84 0 0 0 0 E
-33 9 -9 6d6+330 5d5+5
-330 108900
+2314 0 0 0 84 0 0 0 0 E
+100 8 0 16d18+500 13d10+8
+330 0
 8 8 1
 BareHandAttack: 12
+BodyProfile: 1
+Str: 18
+Dex: 18
+Int: 18
+Wis: 18
+Con: 18
+Cha: 18
+Wimpy: 50
+Evasion: 33
+GoldMin: 330
+GoldMax: 330
+LootItem: 1833 35
+LootItem: 1839 35
 E
+T 1814
+T 1815
+#1823
+sarith nocturne shadow wizard~
+@DSar@Mith @DNo@Mctu@Drne@n~
+@DSar@Mith @DNo@Mctu@Drne@n stands where the chamber's light refuses to settle.
+~
+Sarith wears layered black robes edged in dark sapphire. His shadow
+moves a heartbeat before he does, and thin violet symbols crawl across
+his fingers whenever he considers violence.
+~
+10 0 0 0 0 0 0 0 0 E
+100 8 0 16d18+500 13d10+8
+0 0
+8 8 0
+BareHandAttack: 12
+BodyProfile: 1
+Str: 18
+Dex: 18
+Int: 18
+Wis: 18
+Con: 18
+Cha: 18
+Wimpy: 50
+Evasion: 33
+LootItem: 1834 35
+LootItem: 1841 35
+E
+T 1816
+T 1817
+#1824
+master aerion storm wizard~
+Master @BAe@Cri@Won @BSto@Crm-@WCro@Bwn@Ced@n~
+Master @BAe@Cri@Won @BSto@Crm-@WCro@Bwn@Ced@n listens to thunder no one else can hear.
+~
+Aerion's pale hair floats continuously in an unseen wind. Sparks creep
+over a sapphire circlet at his brow, and the air around him smells of
+rain striking hot stone.
+~
+10 0 0 0 0 0 0 0 0 E
+100 8 0 16d18+500 13d10+8
+0 0
+8 8 0
+BareHandAttack: 12
+BodyProfile: 1
+Str: 18
+Dex: 18
+Int: 18
+Wis: 18
+Con: 18
+Cha: 18
+Wimpy: 50
+Evasion: 33
+LootItem: 1835 35
+LootItem: 1843 35
+E
+T 1818
+T 1819
+#1825
+sapphire golem construct guardian~
+the @CSa@cpp@Chi@cre @WGo@Cle@Wm@n~
+The @CSa@cpp@Chi@cre @WGo@Cle@Wm@n stands motionless beneath layers of rotating runes.
+~
+A giant humanoid construct of pale stone and dark sapphire blocks the
+way. Its joints are held together by bands of visible spellcraft
+rather than hinges, and a faceted blue core pulses behind the armor of
+its chest.
+~
+10 0 0 0 0 0 0 0 0 E
+100 8 0 16d18+500 13d10+8
+0 0
+8 8 0
+BareHandAttack: 6
+BodyProfile: 11
+Str: 18
+Dex: 18
+Int: 18
+Wis: 18
+Con: 18
+Cha: 18
+Wimpy: 50
+Evasion: 33
+LootItem: 1846 35
+E
+T 1820
+T 1821
+#1826
+archivist meridane wizard librarian~
+Archivist @CMer@Wid@cane @Cof the @WEnd@Cless @cIn@Cde@Wx@n~
+Archivist @CMer@Wid@cane @Cof the @WEnd@Cless @cIn@Cde@Wx@n turns a page without touching it.
+~
+Meridane is a thin, ageless scholar surrounded by hovering books.
+Sapphire spectacles rest low on her nose, and animated index cards
+orbit her shoulders like an impatient flock.
+~
+10 0 0 0 0 0 0 0 0 E
+100 8 0 16d18+500 13d10+8
+0 0
+8 8 0
+BareHandAttack: 12
+BodyProfile: 1
+Str: 18
+Dex: 18
+Int: 18
+Wis: 18
+Con: 18
+Cha: 18
+Wimpy: 50
+Evasion: 33
+LootItem: 1836 35
+LootItem: 1845 35
+E
+T 1822
+T 1823
+#1827
+rune bound theurge wizard seal~
+the @BRu@Cne-@WBo@Bund @CThe@Wur@Cge@n~
+The @BRu@Cne-@WBo@Bund @CThe@Wur@Cge@n stands inside a cage of revolving sigils.
+~
+Heavy sapphire runes have been bound directly around this wizard's
+body, circling his arms and chest without touching the skin. Each
+symbol flashes in sequence as though unlocking a different spell.
+~
+10 0 0 0 0 0 0 0 0 E
+100 8 0 16d18+500 13d10+8
+0 0
+8 8 0
+BareHandAttack: 12
+BodyProfile: 1
+Str: 18
+Dex: 18
+Int: 18
+Wis: 18
+Con: 18
+Cha: 18
+Wimpy: 50
+Evasion: 33
+LootItem: 1804 100
+LootItem: 1838 35
+E
+T 1824
+T 1825
+#1828
+living arcane manifestation spell creature~
+a @Cli@Mving @WAr@Cca@Mne @WMan@Cife@Msta@Wtio@Cn@n~
+A @Cli@Mving @WAr@Cca@Mne @WMan@Cife@Msta@Wtio@Cn@n repeatedly forms and dissolves in midair.
+~
+There is no body beneath this thing, only layered spell diagrams,
+shards of sapphire light, and a vaguely humanoid outline made from
+compressed magic. New symbols are constantly born at its center and
+discarded as sparks.
+~
+10 0 0 0 0 0 0 0 0 E
+100 8 0 16d18+500 13d10+8
+0 0
+8 8 0
+BareHandAttack: 12
+BodyProfile: 12
+Str: 18
+Dex: 18
+Int: 18
+Wis: 18
+Con: 18
+Cha: 18
+Wimpy: 50
+Evasion: 33
+LootItem: 1847 35
+E
+T 1826
+T 1827
 $

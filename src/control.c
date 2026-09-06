@@ -296,7 +296,7 @@ void cast_control(struct char_data *ch, struct char_data *victim, int spellnum)
   if (!skill) { send_to_char(ch, "You do not know that spell.\r\n"); return; }
   chance = MIN(85, MAX(5, skill / 2 + 20 + 2 * (GET_LEVEL(ch) - GET_LEVEL(victim)) +
       GET_INT(ch) - GET_WIS(victim) - (!IS_NPC(victim) ? 15 : 0)));
-  if (mag_savingthrow(victim, SAVING_PARA, 0) || rand_number(1, 100) > chance) {
+  if (mag_savingthrow(victim, SAVING_SPELL, 0) || rand_number(1, 100) > chance) {
     send_to_char(ch, "Your target resists your grasp.\r\n");
     send_to_char(victim, "You resist an attempt to bind your will.\r\n");
     if (!FIGHTING(victim)) set_fighting(victim, ch);

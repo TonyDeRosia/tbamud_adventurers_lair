@@ -19,11 +19,6 @@ Int: 18
 Wis: 18
 Con: 18
 Cha: 18
-SavingPara: 8
-SavingRod: 8
-SavingPetri: 8
-SavingBreath: 8
-SavingSpell: 10
 E
 T 34300
 #34301
@@ -47,11 +42,6 @@ Int: 14
 Wis: 12
 Con: 18
 Cha: 19
-SavingPara: 6
-SavingRod: 6
-SavingPetri: 6
-SavingBreath: 6
-SavingSpell: 6
 E
 T 34301
 #34302
@@ -75,11 +65,6 @@ Int: 18
 Wis: 18
 Con: 18
 Cha: 18
-SavingPara: 7
-SavingRod: 7
-SavingPetri: 7
-SavingBreath: 7
-SavingSpell: 7
 E
 #34303
 conduct mediator justice staff healer aide~
@@ -101,11 +86,6 @@ Int: 18
 Wis: 18
 Con: 18
 Cha: 18
-SavingPara: 7
-SavingRod: 7
-SavingPetri: 7
-SavingBreath: 7
-SavingSpell: 7
 E
 T 34399
 #34304
@@ -122,11 +102,6 @@ handles the ordinary upkeep that keeps the halls usable.
 14 16 23 2d2+140 2d2+2
 140 0
 8 8 0
-SavingPara: 3
-SavingRod: 3
-SavingPetri: 3
-SavingBreath: 3
-SavingSpell: 3
 E
 #34305
 garden keeper gardener groundskeeper lantern~
@@ -148,11 +123,6 @@ Int: 13
 Wis: 12
 Con: 16
 Cha: 19
-SavingPara: 3
-SavingRod: 3
-SavingPetri: 3
-SavingBreath: 3
-SavingSpell: 3
 E
 #34306
 stone warden staff guardian sentinel golem~
@@ -175,11 +145,6 @@ Int: 16
 Wis: 16
 Con: 16
 Cha: 16
-SavingPara: 6
-SavingRod: 6
-SavingPetri: 6
-SavingBreath: 6
-SavingSpell: 6
 E
 T 34303
 #34307
@@ -202,11 +167,6 @@ Int: 16
 Wis: 16
 Con: 16
 Cha: 16
-SavingPara: 6
-SavingRod: 6
-SavingPetri: 6
-SavingBreath: 6
-SavingSpell: 6
 E
 T 34303
 $

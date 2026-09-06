@@ -9,11 +9,6 @@ This heavily built creature has been bred and trained for controlled combat dril
 5 16 0 2d6+173 1d2+0
 50 0
 8 8 0
-SavingPara: 1
-SavingRod: 1
-SavingPetri: 1
-SavingBreath: 1
-SavingSpell: 1
 Wimpy: 2
 Evasion: 1
 GoldMin: 50
@@ -49,11 +44,6 @@ This small drake is one of several creatures raised under careful supervision by
 40 0
 8 8 1
 BodyProfile: 6
-SavingPara: 1
-SavingRod: 1
-SavingPetri: 1
-SavingBreath: 1
-SavingSpell: 1
 Wimpy: 2
 Evasion: 1
 GoldMin: 40
@@ -92,11 +82,6 @@ Seraphine wears a leather apron over layered scholar's robes, with small pouches
 50 0
 8 8 2
 BodyProfile: 1
-SavingPara: 1
-SavingRod: 1
-SavingPetri: 1
-SavingBreath: 1
-SavingSpell: 1
 Wimpy: 2
 Evasion: 1
 GoldMin: 50
@@ -132,11 +117,6 @@ Layered cloth, wicker, leather, and minor animation magic form a sturdier oppone
 40 0
 8 8 0
 BodyProfile: 11
-SavingPara: 1
-SavingRod: 1
-SavingPetri: 1
-SavingBreath: 1
-SavingSpell: 1
 Wimpy: 2
 Evasion: 1
 GoldMin: 40
@@ -170,11 +150,6 @@ This enormous minotaur serves as one of the Academia's most demanding controlled
 70 0
 8 8 1
 BodyProfile: 7
-SavingPara: 1
-SavingRod: 1
-SavingPetri: 1
-SavingBreath: 1
-SavingSpell: 1
 Wimpy: 3
 Evasion: 2
 GoldMin: 70
@@ -191,11 +166,6 @@ The translucent figure wears the old field cloak of an Academia examiner from ge
 6 16 0 2d6+143 1d4+1
 60 0
 8 8 0
-SavingPara: 1
-SavingRod: 1
-SavingPetri: 1
-SavingBreath: 1
-SavingSpell: 1
 Wimpy: 3
 Evasion: 2
 GoldMin: 60
@@ -270,11 +240,6 @@ Corren wears a weathered green cloak over light field armor and carries no unnec
 40 0
 8 8 1
 BodyProfile: 1
-SavingPara: 1
-SavingRod: 1
-SavingPetri: 1
-SavingBreath: 1
-SavingSpell: 1
 Wimpy: 2
 Evasion: 1
 GoldMin: 40
@@ -294,11 +259,6 @@ Aldren is an older adventurer whose formal coat cannot completely hide the postu
 50 0
 8 8 1
 BodyProfile: 1
-SavingPara: 1
-SavingRod: 1
-SavingPetri: 1
-SavingBreath: 1
-SavingSpell: 1
 Wimpy: 2
 Evasion: 1
 GoldMin: 50

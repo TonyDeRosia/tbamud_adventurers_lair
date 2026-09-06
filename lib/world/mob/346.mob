@@ -27,11 +27,6 @@ Int: 18
 Wis: 18
 Con: 18
 Cha: 18
-SavingPara: 12
-SavingRod: 12
-SavingPetri: 12
-SavingBreath: 12
-SavingSpell: 12
 Wimpy: 25
 Evasion: 16
 E
@@ -65,11 +60,6 @@ Int: 18
 Wis: 18
 Con: 18
 Cha: 18
-SavingPara: 12
-SavingRod: 12
-SavingPetri: 12
-SavingBreath: 12
-SavingSpell: 12
 Wimpy: 24
 Evasion: 16
 E
@@ -97,11 +87,6 @@ Int: 18
 Wis: 18
 Con: 18
 Cha: 18
-SavingPara: 11
-SavingRod: 11
-SavingPetri: 11
-SavingBreath: 11
-SavingSpell: 11
 Wimpy: 22
 Evasion: 15
 E
@@ -130,11 +115,6 @@ Int: 18
 Wis: 18
 Con: 18
 Cha: 18
-SavingPara: 11
-SavingRod: 11
-SavingPetri: 11
-SavingBreath: 11
-SavingSpell: 11
 Wimpy: 23
 Evasion: 15
 E
@@ -159,11 +139,6 @@ Int: 18
 Wis: 18
 Con: 18
 Cha: 18
-SavingPara: 11
-SavingRod: 11
-SavingPetri: 11
-SavingBreath: 11
-SavingSpell: 11
 Wimpy: 22
 Evasion: 14
 E
@@ -188,11 +163,6 @@ Int: 18
 Wis: 18
 Con: 18
 Cha: 18
-SavingPara: 10
-SavingRod: 10
-SavingPetri: 10
-SavingBreath: 10
-SavingSpell: 10
 Wimpy: 21
 Evasion: 14
 E
@@ -221,11 +191,6 @@ Int: 18
 Wis: 18
 Con: 18
 Cha: 18
-SavingPara: 9
-SavingRod: 9
-SavingPetri: 9
-SavingBreath: 9
-SavingSpell: 9
 Wimpy: 19
 Evasion: 12
 E
@@ -251,11 +216,6 @@ Int: 18
 Wis: 18
 Con: 18
 Cha: 18
-SavingPara: 10
-SavingRod: 10
-SavingPetri: 10
-SavingBreath: 10
-SavingSpell: 10
 Wimpy: 20
 Evasion: 13
 E
@@ -283,11 +243,6 @@ Int: 18
 Wis: 18
 Con: 18
 Cha: 18
-SavingPara: 9
-SavingRod: 9
-SavingPetri: 9
-SavingBreath: 9
-SavingSpell: 9
 Wimpy: 19
 Evasion: 13
 E
@@ -314,11 +269,6 @@ Int: 18
 Wis: 18
 Con: 18
 Cha: 18
-SavingPara: 10
-SavingRod: 10
-SavingPetri: 10
-SavingBreath: 10
-SavingSpell: 10
 Wimpy: 20
 Evasion: 13
 E
@@ -345,11 +295,6 @@ Int: 18
 Wis: 18
 Con: 18
 Cha: 18
-SavingPara: 10
-SavingRod: 10
-SavingPetri: 10
-SavingBreath: 10
-SavingSpell: 10
 Wimpy: 21
 Evasion: 14
 E
@@ -377,11 +322,6 @@ Int: 18
 Wis: 18
 Con: 18
 Cha: 18
-SavingPara: 8
-SavingRod: 8
-SavingPetri: 8
-SavingBreath: 8
-SavingSpell: 8
 Wimpy: 17
 Evasion: 11
 E
@@ -408,11 +348,6 @@ Int: 18
 Wis: 18
 Con: 18
 Cha: 18
-SavingPara: 9
-SavingRod: 9
-SavingPetri: 9
-SavingBreath: 9
-SavingSpell: 9
 Wimpy: 19
 Evasion: 12
 E
@@ -438,11 +373,6 @@ Int: 18
 Wis: 18
 Con: 18
 Cha: 18
-SavingPara: 9
-SavingRod: 9
-SavingPetri: 9
-SavingBreath: 9
-SavingSpell: 9
 Wimpy: 18
 Evasion: 12
 E
@@ -469,11 +399,6 @@ Int: 18
 Wis: 18
 Con: 18
 Cha: 18
-SavingPara: 7
-SavingRod: 7
-SavingPetri: 7
-SavingBreath: 7
-SavingSpell: 7
 Wimpy: 15
 Evasion: 10
 E
@@ -500,11 +425,6 @@ Int: 18
 Wis: 18
 Con: 18
 Cha: 18
-SavingPara: 8
-SavingRod: 8
-SavingPetri: 8
-SavingBreath: 8
-SavingSpell: 8
 Wimpy: 17
 Evasion: 11
 E
@@ -531,11 +451,6 @@ Int: 18
 Wis: 18
 Con: 18
 Cha: 18
-SavingPara: 8
-SavingRod: 8
-SavingPetri: 8
-SavingBreath: 8
-SavingSpell: 8
 Wimpy: 16
 Evasion: 10
 E
@@ -562,11 +477,6 @@ Int: 18
 Wis: 18
 Con: 18
 Cha: 18
-SavingPara: 10
-SavingRod: 10
-SavingPetri: 10
-SavingBreath: 10
-SavingSpell: 10
 Wimpy: 20
 Evasion: 13
 E
@@ -593,11 +503,6 @@ Int: 18
 Wis: 18
 Con: 18
 Cha: 18
-SavingPara: 11
-SavingRod: 11
-SavingPetri: 11
-SavingBreath: 11
-SavingSpell: 11
 Wimpy: 22
 Evasion: 15
 E
@@ -625,11 +530,6 @@ Int: 18
 Wis: 18
 Con: 18
 Cha: 18
-SavingPara: 12
-SavingRod: 12
-SavingPetri: 12
-SavingBreath: 12
-SavingSpell: 12
 Wimpy: 25
 Evasion: 16
 E
@@ -655,11 +555,6 @@ Int: 18
 Wis: 18
 Con: 18
 Cha: 18
-SavingPara: 9
-SavingRod: 9
-SavingPetri: 9
-SavingBreath: 9
-SavingSpell: 9
 Wimpy: 18
 Evasion: 12
 E

@@ -1482,7 +1482,8 @@ static int can_equip_weapon(struct char_data *ch, struct obj_data *obj, int wher
       WEAPON_REJECT("You're already wielding a weapon.\r\n");
     if (is_two_hander(obj) && (GET_EQ(ch, WEAR_SHIELD) || GET_EQ(ch, WEAR_HOLD)))
       WEAPON_REJECT("That weapon requires two hands. Remove your shield and held item first.\r\n");
-    if (GET_EQ(ch, WEAR_SHIELD) && GET_EQ(ch, WEAR_HOLD))
+    if (GET_EQ(ch, WEAR_SHIELD) && GET_EQ(ch, WEAR_HOLD) &&
+        GET_OBJ_TYPE(GET_EQ(ch, WEAR_HOLD)) == ITEM_WEAPON)
       WEAPON_REJECT("You cannot wield a weapon while using both a shield and a held item.\r\n");
     if (GET_EQ(ch, WEAR_HOLD) && GET_OBJ_TYPE(GET_EQ(ch, WEAR_HOLD)) == ITEM_WEAPON &&
         GET_OBJ_WEIGHT(GET_EQ(ch, WEAR_HOLD)) > GET_OBJ_WEIGHT(obj))
@@ -1532,9 +1533,9 @@ static int perform_wear(struct char_data *ch, struct obj_data *obj, int where)
     struct obj_data *sh = GET_EQ(ch, WEAR_SHIELD);
     struct obj_data *held = GET_EQ(ch, WEAR_HOLD);
 
-    /* With a primary weapon equipped: shield XOR hold (not both). */
+    /* A shield conflicts with a held weapon, not a utility Hold item. */
     if (prim && GET_OBJ_TYPE(prim) == ITEM_WEAPON) {
-      if (sh && held) {
+      if (sh && held && GET_OBJ_TYPE(held) == ITEM_WEAPON) {
         send_to_char(ch, "You cannot use both a shield and a held item while wielding a weapon.\r\n");
         return FALSE;
       }
@@ -1549,15 +1550,15 @@ static int perform_wear(struct char_data *ch, struct obj_data *obj, int where)
         send_to_char(ch, "That weapon requires two hands. Remove your shield and held item first.\r\n");
         return FALSE;
       }
-      if (sh && held) {
+      if (sh && held && GET_OBJ_TYPE(held) == ITEM_WEAPON) {
         send_to_char(ch, "You cannot wield a weapon while using both a shield and a held item.\r\n");
         return FALSE;
       }
     }
 
     if (where == WEAR_SHIELD) {
-      if (held) {
-        send_to_char(ch, "You cannot use a shield while holding an item.\r\n");
+      if (held && GET_OBJ_TYPE(held) == ITEM_WEAPON) {
+        send_to_char(ch, "You cannot use a shield while holding a weapon.\r\n");
         return FALSE;
       }
       if (character_is_using_two_hander(ch)) {
@@ -1569,11 +1570,7 @@ static int perform_wear(struct char_data *ch, struct obj_data *obj, int where)
     if (where == WEAR_HOLD) {
       /* Weapon validation is centralized above. */
       if (!obj || GET_OBJ_TYPE(obj) != ITEM_WEAPON) {
-        /* Non-weapon hold item: cannot be used with a shield. Also blocked by two handers. */
-        if (sh) {
-          send_to_char(ch, "You cannot hold an item while using a shield.\r\n");
-          return FALSE;
-        }
+        /* Utility Hold items coexist with shields, but not two-handers. */
         if (character_is_using_two_hander(ch)) {
           send_to_char(ch, "Your weapon requires both hands.\r\n");
           return FALSE;
@@ -1716,7 +1713,15 @@ int find_eq_pos(struct char_data *ch, struct obj_data *obj, char *arg)
   };
 
   if (!arg || !*arg) {
-    if (CAN_WEAR(obj, ITEM_WEAR_FINGER))      where = WEAR_FINGER_R;
+        /* Adventurer's Lair: LIGHT and HOLD are independent equipment slots.
+     * A real light source always resolves to WEAR_LIGHT.  A non-weapon
+     * object explicitly flagged HOLD resolves to WEAR_HOLD. */
+    if (GET_OBJ_TYPE(obj) == ITEM_LIGHT)
+      return WEAR_LIGHT;
+
+    if (GET_OBJ_TYPE(obj) != ITEM_WEAPON && CAN_WEAR(obj, ITEM_WEAR_HOLD))
+      return WEAR_HOLD;
+if (CAN_WEAR(obj, ITEM_WEAR_FINGER))      where = WEAR_FINGER_R;
     if (CAN_WEAR(obj, ITEM_WEAR_NECK))        where = WEAR_NECK_1;
     if (CAN_WEAR(obj, ITEM_WEAR_BODY))        where = WEAR_BODY;
     if (CAN_WEAR(obj, ITEM_WEAR_HEAD))        where = WEAR_HEAD;
@@ -1915,20 +1920,35 @@ ACMD(do_grab)
     send_to_char(ch, "You don't seem to have %s %s.\r\n", AN(arg), arg);
   else if (GET_LEVEL(ch) < GET_OBJ_LEVEL(obj))
     send_to_char(ch, "You are not experienced enough to use that.\r\n");
-  else {
-    if (GET_OBJ_TYPE(obj) == ITEM_LIGHT)
-      perform_wear(ch, obj, WEAR_LIGHT);
-    else if (GET_OBJ_TYPE(obj) == ITEM_WEAPON)
-      perform_weapon_swap(ch, obj, weapon_wear_position(ch, obj));
-    else {
-      if (!CAN_WEAR(obj, ITEM_WEAR_HOLD) && GET_OBJ_TYPE(obj) != ITEM_WAND &&
-      GET_OBJ_TYPE(obj) != ITEM_STAFF && GET_OBJ_TYPE(obj) != ITEM_SCROLL &&
-	  GET_OBJ_TYPE(obj) != ITEM_POTION)
-	send_to_char(ch, "You can't hold that.\r\n");
-      else
-	perform_wear(ch, obj, WEAR_HOLD);
-    }
-  }
+  else if (GET_OBJ_TYPE(obj) == ITEM_LIGHT)
+    send_to_char(ch, "Use LIGHT to equip a light source.\r\n");
+  else if (!CAN_WEAR(obj, ITEM_WEAR_HOLD) &&
+           GET_OBJ_TYPE(obj) != ITEM_WAND &&
+           GET_OBJ_TYPE(obj) != ITEM_STAFF &&
+           GET_OBJ_TYPE(obj) != ITEM_SCROLL &&
+           GET_OBJ_TYPE(obj) != ITEM_POTION)
+    send_to_char(ch, "You can't hold that.\r\n");
+  else
+    perform_wear(ch, obj, WEAR_HOLD);
+}
+
+ACMD(do_light)
+{
+  char arg[MAX_INPUT_LENGTH];
+  struct obj_data *obj;
+
+  one_argument(argument, arg);
+
+  if (!*arg)
+    send_to_char(ch, "Light what?\r\n");
+  else if (!(obj = get_obj_in_list_vis(ch, arg, NULL, ch->carrying)))
+    send_to_char(ch, "You don't seem to have %s %s.\r\n", AN(arg), arg);
+  else if (GET_LEVEL(ch) < GET_OBJ_LEVEL(obj))
+    send_to_char(ch, "You are not experienced enough to use that.\r\n");
+  else if (GET_OBJ_TYPE(obj) != ITEM_LIGHT)
+    send_to_char(ch, "That is not a light source.\r\n");
+  else
+    perform_wear(ch, obj, WEAR_LIGHT);
 }
 
 static void perform_remove(struct char_data *ch, int pos)

@@ -1,27 +1,393 @@
 #1803
-key~
-a password key~
-A key with a password written on it is lying here.~
+thornwood sigil sapphire gate key~
+the @CS@ca@Cp@cp@Ch@ci@Cr@ce @gTh@Gor@ynw@good @CSi@cgi@Cl@n~
+The @CS@ca@Cp@cp@Ch@ci@Cr@ce @gTh@Gor@ynw@good @CSi@cgi@Cl@n lies here, warm with living magic.~
+A thumb-sized disk of living wood has grown around a sliver of
+sapphire. The sigil pulses in time with the Wardwood and fits the old
+lock at the Sapphire Gate.
 ~
 18 ac 0 0 0 ao 0 0 0 0 0 0 0
 0 0 0 0
-1 10000 0 0
+1 100 0 90 0
 #1804
-key card~
-a key card~
-An electronic key card is hidden here~
+inner sapphire seal key sanctum~
+the @WIn@cner @CS@ca@Cp@cp@Ch@ci@Cr@ce @CSe@cal@n~
+The @WIn@cner @CS@ca@Cp@cp@Ch@ci@Cr@ce @CSe@cal@n glows with tightly bound runes.~
+A flat sapphire seal is engraved with nine interlocking runes. It is
+clearly meant for a warded inner door rather than an ordinary
+mechanical lock.
 ~
 18 acd 0 0 0 ao 0 0 0 0 0 0 0
 0 0 0 0
-1 10000 0 0
+1 100 0 90 0
 #1805
-battle rifle~
-a battle rifle~
-A wicked looking rifle is lying here.~
+heartwood sapphire seed relic wardwood~
+the @gSa@Cpp@chi@Gre@Wwood @gHe@Cart-@CSe@ced@n~
+The @gSa@Cpp@chi@Gre@Wwood @gHe@Cart-@CSe@ced@n pulses faintly among a cradle of living roots.~
+A fist-sized knot of dark heartwood has grown around a flawless
+sapphire seed. Tiny leaves unfurl from it when magic gathers nearby,
+then curl closed when the power fades.
 ~
-5 mn 0 0 0 ano 0 0 0 0 0 0 0
-0 5 6 12
-10 1000000 0 0
+8 0 0 0 0 a 0 0 0 0 0 0 0
+0 0 0 0
+2 850 0 95 0
+#1830
+sapphire circlet sanctum caster gear~
+@CS@ca@Cp@cp@Ch@ci@Cr@ce @BCirclet@n~
+@CS@ca@Cp@cp@Ch@ci@Cr@ce @BCirclet@n rests here in a fold of cold blue light.~
+A narrow circlet of worked sapphire rests lightly against the brow.
+Fine runes along its inner rim sharpen thought and magical
+perception.
+~
+11 g 0 0 0 ae 0 0 0 0 0 0 0
+0 0 0 0
+2 850 0 100 0
 A
-18 2
+3 3
+A
+4 3
+A
+26 4
+A
+29 15
+#1831
+sapphire robes sanctum caster gear~
+@CS@ca@Cp@cp@Ch@ci@Cr@ce @BRobes@n~
+@CS@ca@Cp@cp@Ch@ci@Cr@ce @BRobes@n rests here in a fold of cold blue light.~
+Layered robes woven with sapphire thread fall in weightless folds.
+The cloth gathers magical energy without restricting movement.
+~
+11 g 0 0 0 ad 0 0 0 0 0 0 0
+0 0 0 0
+5 850 0 100 0
+A
+13 120
+A
+12 120
+A
+24 -4
+A
+27 2
+#1832
+sapphire sleeves sanctum caster gear~
+@CS@ca@Cp@cp@Ch@ci@Cr@ce @BSleeves@n~
+@CS@ca@Cp@cp@Ch@ci@Cr@ce @BSleeves@n rests here in a fold of cold blue light.~
+Long sapphire-threaded sleeves are embroidered with casting sigils.
+The runes brighten whenever the wearer's hands shape a spell.
+~
+11 g 0 0 0 ai 0 0 0 0 0 0 0
+0 0 0 0
+3 850 0 100 0
+A
+3 2
+A
+12 100
+A
+26 3
+A
+29 15
+#1833
+sapphire gloves sanctum caster gear~
+@CS@ca@Cp@cp@Ch@ci@Cr@ce @BGloves@n~
+@CS@ca@Cp@cp@Ch@ci@Cr@ce @BGloves@n rests here in a fold of cold blue light.~
+Supple gloves reinforced with tiny sapphire scales cover the hands.
+Their palms are marked with precise channels for controlled
+spellwork.
+~
+11 g 0 0 0 ah 0 0 0 0 0 0 0
+0 0 0 0
+2 850 0 100 0
+A
+4 2
+A
+6 3
+A
+27 3
+A
+12 75
+#1834
+sapphire sash sanctum caster gear~
+@CS@ca@Cp@cp@Ch@ci@Cr@ce @BSash@n~
+@CS@ca@Cp@cp@Ch@ci@Cr@ce @BSash@n rests here in a fold of cold blue light.~
+A deep-blue sash is clasped by a polished sapphire focus. Its
+enchantment steadies the wearer's reserves of magical power.
+~
+11 g 0 0 0 al 0 0 0 0 0 0 0
+0 0 0 0
+2 850 0 100 0
+A
+12 120
+A
+13 75
+A
+24 -3
+A
+29 10
+#1835
+sapphire leggings sanctum caster gear~
+@CS@ca@Cp@cp@Ch@ci@Cr@ce @BLeggings@n~
+@CS@ca@Cp@cp@Ch@ci@Cr@ce @BLeggings@n rests here in a fold of cold blue light.~
+Sapphire-threaded leggings are light enough for ritual movement and
+strong enough for battle, their runes supporting body and spirit
+alike.
+~
+11 g 0 0 0 af 0 0 0 0 0 0 0
+0 0 0 0
+3 850 0 100 0
+A
+13 120
+A
+12 100
+A
+14 60
+#1836
+sapphire slippers sanctum caster gear~
+@CS@ca@Cp@cp@Ch@ci@Cr@ce @BSlippers@n~
+@CS@ca@Cp@cp@Ch@ci@Cr@ce @BSlippers@n rests here in a fold of cold blue light.~
+Soft sapphire slippers carry almost no weight. Fine warding lines in
+their soles encourage quick, precise movement away from danger.
+~
+11 g 0 0 0 ag 0 0 0 0 0 0 0
+0 0 0 0
+1 850 0 100 0
+A
+2 3
+A
+31 8
+A
+14 60
+#1837
+sapphire mantle sanctum caster gear~
+@CS@ca@Cp@cp@Ch@ci@Cr@ce @BMantle@n~
+@CS@ca@Cp@cp@Ch@ci@Cr@ce @BMantle@n rests here in a fold of cold blue light.~
+A mantle of dark sapphire cloth hangs from a faceted clasp. Its
+restrained enchantment marks a spellcaster proven worthy of the
+Sanctum.
+~
+11 g 0 0 0 ak 0 0 0 0 0 0 0
+0 0 0 0
+3 850 0 100 0
+A
+3 3
+A
+4 3
+A
+6 1
+A
+26 3
+A
+27 1
+A
+29 10
+#1838
+sapphire torque sanctum caster gear neck ward~
+@CS@ca@Cp@cp@Ch@ci@Cr@ce @BTorque@n~
+@CS@ca@Cp@cp@Ch@ci@Cr@ce @BTorque@n rests here in a fold of cold blue light.~
+A rigid torque of polished sapphire and silver filigree circles
+the neck. Seven tiny ward-stones warm whenever hostile magic
+presses nearby.
+~
+11 g 0 0 0 ac 0 0 0 0 0 0 0
+0 0 0 0
+2 850 0 100 0
+A
+12 60
+A
+13 50
+A
+24 -1
+A
+27 1
+#1839
+sapphire pendant sanctum caster gear neck star~
+@CS@ca@Cp@cp@Ch@ci@Cr@ce @BPendant@n~
+@CS@ca@Cp@cp@Ch@ci@Cr@ce @BPendant@n rests here in a fold of cold blue light.~
+A flawless teardrop sapphire hangs from a chain of interlocking
+silver runes. Pale starlight drifts inside the gem and gathers
+when a spell is shaped.
+~
+11 g 0 0 0 ac 0 0 0 0 0 0 0
+0 0 0 0
+1 850 0 100 0
+A
+12 75
+A
+26 1
+A
+29 5
+#1840
+sapphire signet sanctum caster gear ring finger~
+@CS@ca@Cp@cp@Ch@ci@Cr@ce @BSignet@n~
+@CS@ca@Cp@cp@Ch@ci@Cr@ce @BSignet@n rests here in a fold of cold blue light.~
+A broad sapphire signet bears the interlocked seals of the nine
+disciplines. Its engraved lines subtly rearrange themselves
+around the wearer's intent.
+~
+11 g 0 0 0 ab 0 0 0 0 0 0 0
+0 0 0 0
+1 850 0 100 0
+A
+12 50
+A
+24 -1
+A
+26 1
+#1841
+sapphire band sanctum caster gear ring finger shadow~
+@CS@ca@Cp@cp@Ch@ci@Cr@ce @BBand@n~
+@CS@ca@Cp@cp@Ch@ci@Cr@ce @BBand@n rests here in a fold of cold blue light.~
+A narrow band of midnight sapphire seems darker than the shadows
+around it. Fine inner runes pulse in time with the wearer's
+heartbeat and spellwork.
+~
+11 g 0 0 0 ab 0 0 0 0 0 0 0
+0 0 0 0
+1 850 0 100 0
+A
+13 50
+A
+12 50
+A
+27 1
+#1842
+sapphire bracer sanctum caster gear wrist ember~
+@CS@ca@Cp@cp@Ch@ci@Cr@ce @BBracer@n~
+@CS@ca@Cp@cp@Ch@ci@Cr@ce @BBracer@n rests here in a fold of cold blue light.~
+A sapphire-scaled bracer protects the forearm beneath channels
+of blue fire. The channels brighten as gathered magic is driven
+toward the hands.
+~
+11 g 0 0 0 am 0 0 0 0 0 0 0
+0 0 0 0
+2 850 0 100 0
+A
+12 60
+A
+26 1
+A
+29 5
+#1843
+sapphire wristlet sanctum caster gear wrist storm~
+@CS@ca@Cp@cp@Ch@ci@Cr@ce @BWristlet@n~
+@CS@ca@Cp@cp@Ch@ci@Cr@ce @BWristlet@n rests here in a fold of cold blue light.~
+A delicate sapphire wristlet is threaded with hair-thin strands
+of stormglass. Tiny sparks race around it whenever its wearer
+moves to escape danger.
+~
+11 g 0 0 0 am 0 0 0 0 0 0 0
+0 0 0 0
+1 850 0 100 0
+A
+13 40
+A
+14 40
+A
+31 3
+A
+27 1
+#1844
+sapphire runestaff staff sanctum caster gear weapon~
+@CS@ca@Cp@cp@Ch@ci@Cr@ce @BRunestaff@n~
+@CS@ca@Cp@cp@Ch@ci@Cr@ce @BRunestaff@n rests here in a fold of cold blue light.~
+A tall runestaff of dark heartwood is capped by a many-faceted
+sapphire crown. Nested formulae revolve inside the crystal,
+focusing immense arcane pressure.
+~
+5 gs 0 0 0 an 0 0 0 0 0 0 0
+0 8 12 12
+6 850 0 100 0
+A
+3 2
+A
+4 2
+A
+12 100
+A
+26 3
+A
+29 15
+A
+24 -2
+#1845
+sapphire codex book tome sanctum caster gear hold~
+@CS@ca@Cp@cp@Ch@ci@Cr@ce @BCodex@n~
+@CS@ca@Cp@cp@Ch@ci@Cr@ce @BCodex@n rests here in a fold of cold blue light.~
+A slim codex bound in blue-black leather floats slightly above
+an open palm. Sapphire letters crawl across its pages,
+reorganizing themselves for each reader.
+~
+11 g 0 0 0 ao 0 0 0 0 0 0 0
+0 0 0 0
+3 850 0 100 0
+A
+6 2
+A
+12 80
+A
+26 2
+A
+29 10
+A
+24 -1
+#1846
+sapphire aegis shield sanctum caster gear ward~
+@CS@ca@Cp@cp@Ch@ci@Cr@ce @BAegis@n~
+@CS@ca@Cp@cp@Ch@ci@Cr@ce @BAegis@n rests here in a fold of cold blue light.~
+A translucent sapphire aegis is framed by silver bands etched
+with warding law. Incoming force spreads across its surface
+in concentric rings of blue light.
+~
+9 g 0 0 0 aj 0 0 0 0 0 0 0
+40 0 0 0
+7 850 0 100 0
+A
+13 100
+A
+12 75
+A
+24 -2
+A
+31 4
+#1847
+sapphire witchlight light lantern sanctum caster gear~
+@CS@ca@Cp@cp@Ch@ci@Cr@ce @BWitchlight@n~
+@CS@ca@Cp@cp@Ch@ci@Cr@ce @BWitchlight@n rests here in a fold of cold blue light.~
+A thumb-sized sapphire flame hangs in the air without fuel,
+smoke, or heat. Its cold radiance reveals the fine edges of
+enchantments and hidden sigils.
+~
+1 g 0 0 0 a 0 0 0 0 0 0 0
+0 0 -1 0
+1 850 0 100 0
+A
+12 60
+A
+14 60
+A
+26 1
+A
+27 1
+#1848
+sapphire spellsword sword blade sanctum caster gear weapon~
+@CS@ca@Cp@cp@Ch@ci@Cr@ce @BSpellsword@n~
+@CS@ca@Cp@cp@Ch@ci@Cr@ce @BSpellsword@n rests here in a fold of cold blue light.~
+A narrow one-handed blade of dark sapphire gleams with cold blue
+light. Silver spell-runes run down its fuller, flaring whenever
+steel and sorcery are brought together.
+~
+5 g 0 0 0 an 0 0 0 0 0 0 0
+0 6 10 3
+4 850 0 100 0
+A
+3 1
+A
+4 1
+A
+18 4
+A
+19 5
+A
+26 1
+A
+29 5
 $~

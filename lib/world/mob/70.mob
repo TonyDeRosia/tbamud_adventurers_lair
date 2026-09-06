@@ -10,11 +10,6 @@ Mud, mineral crust, and broken fragments of ancient masonry have gathered into a
 120 0
 6 8 0
 BodyProfile: 1
-SavingPara: 2
-SavingRod: 2
-SavingPetri: 2
-SavingBreath: 2
-SavingSpell: 2
 Wimpy: 4
 Evasion: 2
 GoldMin: 8
@@ -81,11 +76,6 @@ Plates of dark shell cover this oversized beetle like fitted armor. Dust and min
 80 0
 4 8 0
 BodyProfile: 9
-SavingPara: 1
-SavingRod: 1
-SavingPetri: 1
-SavingBreath: 1
-SavingSpell: 1
 Wimpy: 2
 Evasion: 1
 GoldMin: 3
@@ -136,11 +126,6 @@ A torn gray cloak hangs from this exhausted adventurer. Old Guild trail marks ha
 100 0
 8 8 1
 BodyProfile: 1
-SavingPara: 1
-SavingRod: 1
-SavingPetri: 1
-SavingBreath: 1
-SavingSpell: 1
 Wimpy: 3
 Evasion: 2
 GoldMin: 4
@@ -157,11 +142,6 @@ No taller than a small child, this artificial creature has green-gray skin, leat
 7 16 0 2d6+138 1d5+2
 110 0
 8 8 0
-SavingPara: 1
-SavingRod: 1
-SavingPetri: 1
-SavingBreath: 1
-SavingSpell: 1
 Wimpy: 3
 Evasion: 2
 GoldMin: 5
@@ -178,11 +158,6 @@ This hunched creature blends humanoid and ratlike features beneath a skin of shi
 7 15 0 2d6+183 1d5+2
 100 0
 8 8 0
-SavingPara: 1
-SavingRod: 1
-SavingPetri: 1
-SavingBreath: 1
-SavingSpell: 1
 Wimpy: 3
 Evasion: 2
 GoldMin: 7
@@ -200,11 +175,6 @@ Copper-colored plates cover the upper body of this strange subterranean creature
 8 15 0 2d6+193 1d5+2
 120 0
 8 8 0
-SavingPara: 2
-SavingRod: 2
-SavingPetri: 2
-SavingBreath: 2
-SavingSpell: 2
 Wimpy: 4
 Evasion: 2
 GoldMin: 7
@@ -222,11 +192,6 @@ This scarred red-scaled drake is smaller than the great dragons of legend but st
 190 0
 8 8 0
 BodyProfile: 6
-SavingPara: 2
-SavingRod: 2
-SavingPetri: 2
-SavingBreath: 2
-SavingSpell: 2
 Wimpy: 5
 Evasion: 3
 GoldMin: 12
@@ -243,11 +208,6 @@ Long limbs and slick gray-green skin mark this creature as something that has li
 9 15 0 2d6+253 1d6+2
 140 0
 8 8 2
-SavingPara: 2
-SavingRod: 2
-SavingPetri: 2
-SavingBreath: 2
-SavingSpell: 2
 Wimpy: 4
 Evasion: 3
 GoldMin: 8
@@ -265,11 +225,6 @@ Green-gold scales cover the naga's serpentine body, patterned with silver triang
 120 0
 8 8 2
 BodyProfile: 1
-SavingPara: 2
-SavingRod: 2
-SavingPetri: 2
-SavingBreath: 2
-SavingSpell: 2
 Wimpy: 4
 Evasion: 2
 GoldMin: 7
@@ -286,11 +241,6 @@ Eight powerful legs support a low reptilian body covered in dull brown scales. I
 9 15 0 2d6+253 1d6+2
 130 0
 8 8 0
-SavingPara: 2
-SavingRod: 2
-SavingPetri: 2
-SavingBreath: 2
-SavingSpell: 2
 Wimpy: 4
 Evasion: 3
 GoldMin: 8
@@ -307,11 +257,6 @@ The vaguely humanoid creature looks as though its body was softened and remade b
 4 17 0 2d6+63 1d4+1
 50 0
 8 8 0
-SavingPara: 1
-SavingRod: 1
-SavingPetri: 1
-SavingBreath: 1
-SavingSpell: 1
 Wimpy: 2
 Evasion: 1
 GoldMin: 2
@@ -328,11 +273,6 @@ Two scarred heads rise above Grunn's massive shoulders, arguing constantly in lo
 9 14 0 2d6+333 2d4+2
 100 0
 5 5 1
-SavingPara: 2
-SavingRod: 2
-SavingPetri: 2
-SavingBreath: 2
-SavingSpell: 2
 Wimpy: 4
 Evasion: 3
 GoldMin: 12
@@ -349,11 +289,6 @@ Merrik is undersized for an ettin, with one head noticeably weaker than the othe
 5 16 0 2d6+123 1d4+1
 60 0
 5 5 1
-SavingPara: 1
-SavingRod: 1
-SavingPetri: 1
-SavingBreath: 1
-SavingSpell: 1
 Wimpy: 2
 Evasion: 1
 GoldMin: 5

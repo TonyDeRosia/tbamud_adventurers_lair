@@ -143,7 +143,8 @@ int main(void) {
   GET_POS(actor)=GET_POS(guard)=GET_POS(target)=POS_STANDING;
   GET_CLASS(actor)=CLASS_MAGIC_USER;GET_LEVEL(actor)=80;GET_LEVEL(guard)=20;GET_LEVEL(target)=20;
   GET_SKILL(actor,SPELL_PUPPET)=100;GET_SKILL(actor,SPELL_MIND_CONTROL)=100;
-  CHECK(saving_throws(CLASS_MAGIC_USER,SAVING_PARA,100)==saving_throws(CLASS_MAGIC_USER,SAVING_PARA,40));
+  CHECK(saving_throw_base_chance(CLASS_MAGIC_USER, SAVING_SPELL, 100) >
+        saving_throw_base_chance(CLASS_MAGIC_USER, SAVING_SPELL, 40));
   for(int spell=SPELL_PUPPET;spell<=SPELL_MIND_CONTROL;spell++) {
     SET_BIT_AR(ROOM_FLAGS(0),ROOM_PEACEFUL);cast_control(actor,guard,spell);CHECK(!actor->control);
     REMOVE_BIT_AR(ROOM_FLAGS(0),ROOM_PEACEFUL);

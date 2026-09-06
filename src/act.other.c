@@ -2189,7 +2189,9 @@ ACMD(do_train)
     old_trains = GET_TRAINS(ch);
     old_max_hit = GET_MAX_HIT(ch);
     GET_TRAINS(ch) -= 10;
-    GET_MAX_HIT(ch) += 10;
+    GET_BASE_MAX_HIT(ch) += 10;
+    affect_total(ch);
+    save_char(ch);
     new_trains = GET_TRAINS(ch);
     new_max_hit = GET_MAX_HIT(ch);
     send_to_char(ch, "Training successful.\r\n");
@@ -2209,7 +2211,9 @@ ACMD(do_train)
     old_trains = GET_TRAINS(ch);
     old_max_mana = effective_max_mana(ch);
     GET_TRAINS(ch) -= 10;
-    GET_MAX_MANA(ch) += 10;
+    GET_BASE_MAX_MANA(ch) += 10;
+    affect_total(ch);
+    save_char(ch);
     new_trains = GET_TRAINS(ch);
     new_max_mana = effective_max_mana(ch);
     send_to_char(ch, "Training successful.\r\n");
@@ -2229,7 +2233,9 @@ ACMD(do_train)
     old_trains = GET_TRAINS(ch);
     old_max_move = effective_max_move(ch);
     GET_TRAINS(ch) -= 10;
-    GET_MAX_MOVE(ch) += 10;
+    GET_BASE_MAX_MOVE(ch) += 10;
+    affect_total(ch);
+    save_char(ch);
     new_trains = GET_TRAINS(ch);
     new_max_move = effective_max_move(ch);
     send_to_char(ch, "Training successful.\r\n");

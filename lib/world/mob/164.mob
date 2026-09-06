@@ -17,11 +17,6 @@ Int: 3
 Wis: 6
 Con: 8
 Cha: 6
-SavingPara: 1
-SavingRod: 1
-SavingPetri: 1
-SavingBreath: 1
-SavingSpell: 1
 Wimpy: 6
 Evasion: 3
 E
@@ -44,11 +39,6 @@ Int: 4
 Wis: 7
 Con: 9
 Cha: 7
-SavingPara: 1
-SavingRod: 1
-SavingPetri: 1
-SavingBreath: 1
-SavingSpell: 1
 Wimpy: 7
 Evasion: 4
 E
@@ -71,11 +61,6 @@ Int: 4
 Wis: 7
 Con: 7
 Cha: 8
-SavingPara: 1
-SavingRod: 1
-SavingPetri: 1
-SavingBreath: 1
-SavingSpell: 1
 Wimpy: 5
 Evasion: 5
 LootItem: 16405 45
@@ -99,11 +84,6 @@ Int: 3
 Wis: 5
 Con: 5
 Cha: 10
-SavingPara: 1
-SavingRod: 1
-SavingPetri: 1
-SavingBreath: 1
-SavingSpell: 1
 Wimpy: 3
 Evasion: 6
 LootItem: 16406 30
@@ -125,11 +105,6 @@ Dex: 15
 Int: 7
 Wis: 10
 Cha: 9
-SavingPara: 1
-SavingRod: 1
-SavingPetri: 1
-SavingBreath: 1
-SavingSpell: 1
 Wimpy: 8
 Evasion: 4
 GoldMin: 4
@@ -156,11 +131,6 @@ Int: 5
 Wis: 9
 Con: 14
 Cha: 10
-SavingPara: 1
-SavingRod: 1
-SavingPetri: 1
-SavingBreath: 1
-SavingSpell: 1
 Wimpy: 10
 Evasion: 3
 GoldMin: 3
@@ -186,11 +156,6 @@ Int: 6
 Wis: 9
 Con: 15
 Cha: 7
-SavingPara: 2
-SavingRod: 2
-SavingPetri: 2
-SavingBreath: 2
-SavingSpell: 2
 Evasion: 2
 GoldMin: 5
 GoldMax: 8
@@ -216,11 +181,6 @@ Int: 6
 Wis: 10
 Con: 9
 Cha: 8
-SavingPara: 2
-SavingRod: 2
-SavingPetri: 2
-SavingBreath: 2
-SavingSpell: 2
 Wimpy: 7
 Evasion: 6
 GoldMin: 4
@@ -246,11 +206,6 @@ Int: 4
 Wis: 7
 Con: 9
 Cha: 5
-SavingPara: 1
-SavingRod: 1
-SavingPetri: 1
-SavingBreath: 1
-SavingSpell: 1
 Wimpy: 6
 Evasion: 3
 GoldMin: 4
@@ -276,11 +231,6 @@ Int: 5
 Wis: 8
 Con: 13
 Cha: 6
-SavingPara: 1
-SavingRod: 1
-SavingPetri: 1
-SavingBreath: 1
-SavingSpell: 1
 Wimpy: 6
 Evasion: 1
 GoldMin: 2
@@ -306,11 +256,6 @@ Int: 14
 Wis: 13
 Con: 8
 Cha: 14
-SavingPara: 2
-SavingRod: 2
-SavingPetri: 2
-SavingBreath: 3
-SavingSpell: 4
 Wimpy: 8
 Evasion: 8
 GoldMin: 6
@@ -338,11 +283,6 @@ Int: 14
 Wis: 14
 Con: 8
 Cha: 16
-SavingPara: 2
-SavingRod: 2
-SavingPetri: 2
-SavingBreath: 3
-SavingSpell: 4
 Wimpy: 8
 Evasion: 8
 GoldMin: 6
@@ -369,11 +309,6 @@ Int: 15
 Wis: 15
 Con: 9
 Cha: 15
-SavingPara: 2
-SavingRod: 2
-SavingPetri: 2
-SavingBreath: 4
-SavingSpell: 4
 Wimpy: 8
 Evasion: 9
 GoldMin: 8
@@ -401,11 +336,6 @@ Int: 10
 Wis: 14
 Con: 16
 Cha: 15
-SavingPara: 2
-SavingRod: 2
-SavingPetri: 2
-SavingBreath: 3
-SavingSpell: 4
 Evasion: 4
 GoldMin: 8
 GoldMax: 12
@@ -432,11 +362,6 @@ Int: 8
 Wis: 12
 Con: 15
 Cha: 9
-SavingPara: 2
-SavingRod: 2
-SavingPetri: 2
-SavingBreath: 3
-SavingSpell: 3
 Evasion: 5
 GoldMin: 10
 GoldMax: 14
@@ -463,11 +388,6 @@ Int: 6
 Wis: 10
 Con: 18
 Cha: 7
-SavingPara: 3
-SavingRod: 3
-SavingPetri: 3
-SavingBreath: 3
-SavingSpell: 3
 Evasion: 2
 GoldMin: 11
 GoldMax: 15
@@ -494,11 +414,6 @@ Int: 13
 Wis: 17
 Con: 16
 Cha: 15
-SavingPara: 4
-SavingRod: 4
-SavingPetri: 4
-SavingBreath: 3
-SavingSpell: 5
 Evasion: 3
 GoldMin: 12
 GoldMax: 16
@@ -526,11 +441,6 @@ Int: 14
 Wis: 18
 Con: 15
 Cha: 17
-SavingPara: 4
-SavingRod: 4
-SavingPetri: 4
-SavingBreath: 3
-SavingSpell: 5
 Evasion: 4
 GoldMin: 14
 GoldMax: 18
@@ -558,11 +468,6 @@ Int: 13
 Wis: 16
 Con: 17
 Cha: 12
-SavingPara: 4
-SavingRod: 4
-SavingPetri: 4
-SavingBreath: 4
-SavingSpell: 5
 Evasion: 3
 GoldMin: 15
 GoldMax: 20
@@ -588,11 +493,6 @@ Dex: 17
 Int: 14
 Wis: 17
 Cha: 18
-SavingPara: 3
-SavingRod: 3
-SavingPetri: 3
-SavingBreath: 3
-SavingSpell: 4
 Wimpy: 8
 Evasion: 7
 GoldMin: 8
@@ -620,11 +520,6 @@ Int: 8
 Wis: 15
 Con: 20
 Cha: 8
-SavingPara: 5
-SavingRod: 5
-SavingPetri: 6
-SavingBreath: 4
-SavingSpell: 5
 Evasion: 1
 GoldMin: 18
 GoldMax: 24
@@ -651,11 +546,6 @@ Int: 15
 Wis: 17
 Con: 13
 Cha: 14
-SavingPara: 3
-SavingRod: 4
-SavingPetri: 3
-SavingBreath: 3
-SavingSpell: 5
 Evasion: 3
 GoldMin: 9
 GoldMax: 13
@@ -685,11 +575,6 @@ Int: 15
 Wis: 18
 Con: 13
 Cha: 16
-SavingPara: 3
-SavingRod: 4
-SavingPetri: 3
-SavingBreath: 3
-SavingSpell: 5
 Wimpy: 8
 Evasion: 3
 EquipItem: 16430 13
@@ -718,11 +603,6 @@ Int: 13
 Wis: 16
 Con: 14
 Cha: 13
-SavingPara: 4
-SavingRod: 4
-SavingPetri: 4
-SavingBreath: 6
-SavingSpell: 5
 Evasion: 5
 GoldMin: 16
 GoldMax: 21
@@ -752,11 +632,6 @@ Int: 14
 Wis: 18
 Con: 17
 Cha: 12
-SavingPara: 6
-SavingRod: 5
-SavingPetri: 6
-SavingBreath: 4
-SavingSpell: 6
 Evasion: 2
 GoldMin: 18
 GoldMax: 24
@@ -785,11 +660,6 @@ Int: 17
 Wis: 21
 Con: 20
 Cha: 20
-SavingPara: 6
-SavingRod: 6
-SavingPetri: 6
-SavingBreath: 5
-SavingSpell: 7
 Evasion: 4
 GoldMin: 22
 GoldMax: 30

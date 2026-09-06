@@ -358,7 +358,7 @@
 #define SAVING_PETRI  2
 #define SAVING_BREATH 3
 #define SAVING_SPELL  4
-#define SAVING_DEATH  SAVING_PARA
+#define SAVING_DEATH  SAVING_SPELL
 
 /* Reserved summon/portal VNUM constants for spell expansion. */
 #define OBJVNUM_SPELL_PORTAL          9300
@@ -689,6 +689,8 @@ const char *skill_name(int num);
 
 /* From magic.c */
 int mag_savingthrow(struct char_data *ch, int type, int modifier);
+/* Current-room save success; modifier is caller-specific, negative is better. */
+int saving_throw_chance(struct char_data *ch, int type, int modifier);
 void affect_update(void);
 bool is_sanctuary_spell(int spellnum);
 

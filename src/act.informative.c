@@ -2061,13 +2061,12 @@ ACMD(do_score)
   /* Combat Stats */
   {
     struct obj_data *wielded = GET_EQ(ch, WEAR_WIELD);
-    int offensive_hit = compute_offensive_hit_value(ch, NULL);
-    /* Display estimate targets an equal-level defender with your current evasion profile. */
-    int accuracy_pct = compute_hit_chance_from_values(offensive_hit,
-                                                      compute_evasion(ch) + GET_LEVEL(ch));
+    int accuracy_pct = compute_reference_hit_chance(ch);
     int shown_armor = compute_armor_class(ch);
+    int mitigation = armor_mitigation_basis_points(shown_armor);
     int shown_evasion = compute_evasion(ch);
-    int spell_save = GET_SAVE(ch, 4);
+    int spell_save = saving_throw_chance(ch, SAVING_SPELL, 0);
+    int spell_save_bonus = -GET_SAVE(ch, SAVING_SPELL);
     int b_str = ch->real_abils.str;
     int b_dex = ch->real_abils.dex;
     int b_con = ch->real_abils.con;
@@ -2092,34 +2091,41 @@ ACMD(do_score)
     int m_cha = ch->aff_abils.cha - b_cha;
 
     snprintf(line, sizeof(line),
-      "%sAttributes:%s  Str %d (%+d)  Dex %d (%+d)  Con %d (%+d)",
+      "%sAttributes:%s STR %d [%d %+d]  DEX %d [%d %+d]  CON %d [%d %+d]",
       C, R,
-      b_str, m_str,
-      b_dex, m_dex,
-      b_con, m_con);
+      GET_STR(ch), b_str, m_str,
+      GET_DEX(ch), b_dex, m_dex,
+      GET_CON(ch), b_con, m_con);
     len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
 
     snprintf(line, sizeof(line),
-      "%s           %s  Int %d (%+d)  Wis %d (%+d)  Cha %d (%+d)",
+      "%s           %s INT %d [%d %+d]  WIS %d [%d %+d]  CHA %d [%d %+d]",
       C, R,
-      b_int, m_int,
-      b_wis, m_wis,
-      b_cha, m_cha);
+      GET_INT(ch), b_int, m_int,
+      GET_WIS(ch), b_wis, m_wis,
+      GET_CHA(ch), b_cha, m_cha);
     len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
     len = append_box_line(buf, len, sizeof(buf), B, R, "", W);
 
     snprintf(line, sizeof(line),
-      "%sArmor:%s %-8d   %sBase Evasion:%s %-5d   %sSave vs. Spell:%s %-6d",
+      "%sArmor:%s %d (%d.%02d%% mitigation)   %sEvasion:%s %d",
       C, R, shown_armor,
-      C, R, shown_evasion,
-      C, R, spell_save);
+      mitigation / 100, mitigation % 100,
+      C, R, shown_evasion);
+    len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
+
+    snprintf(line, sizeof(line),
+      "%sSave vs. Spell:%s %d.%02d%%   %sBonus:%s %+d",
+      C, R, spell_save / 100, spell_save % 100,
+      C, R, spell_save_bonus);
     len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
     len = append_box_line(buf, len, sizeof(buf), B, R, "", W);
 
     snprintf(line, sizeof(line),
-      "%sOffense:%s  Hitroll %+d  Damroll %+d  Hit Chance: %d%%",
+      "%sOffense:%s Hitroll %+d  Damroll %+d   %sAccuracy:%s %d%% (vs Evasion %d)",
       C, R,
-      GET_HITROLL(ch), GET_DAMROLL(ch), accuracy_pct);
+      GET_HITROLL(ch), GET_DAMROLL(ch),
+      C, R, accuracy_pct, STANDARD_DEFENDER_EVASION);
     len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
 
     if (!(wielded && GET_OBJ_TYPE(wielded) == ITEM_WEAPON)) {
@@ -2137,13 +2143,19 @@ ACMD(do_score)
     }
   }
   len = append_box_line(buf, len, sizeof(buf), B, R, "", W);
-  /* Crit chances */
-  snprintf(line, sizeof(line),
-           "%sCritical Hit:%s %d   %sCritical Spell:%s %d   %sCritical Heal:%s %d",
-           C, R, crit_total_melee(ch),
-           C, R, crit_total_spell(ch),
-           C, R, crit_total_heal(ch));
-  len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
+  /* Chance is conditional on an eligible hit/heal, not an attempted swing. */
+  {
+    int melee_mult = crit_mult_melee(ch);
+    int spell_mult = crit_mult_spell(ch);
+    int heal_mult = crit_mult_heal(ch);
+    snprintf(line, sizeof(line),
+             "%sCritical:%s Melee %d%% x%d.%02d   Spell %d%% x%d.%02d   Heal %d%% x%d.%02d",
+             C, R,
+             crit_total_melee(ch), melee_mult / 100, melee_mult % 100,
+             crit_total_spell(ch), spell_mult / 100, spell_mult % 100,
+             crit_total_heal(ch), heal_mult / 100, heal_mult % 100);
+    len = append_box_line(buf, len, sizeof(buf), B, R, line, W);
+  }
   /* Separator */
   len += snprintf(buf + len, sizeof(buf) - len,
     "%s╠═══════════════════════════════════════════════════════════════════════════════╣%s\r\n", B, R);
@@ -3326,6 +3338,9 @@ ACMD(do_equipment)
 
   size_t n = sizeof(eq_order) / sizeof(eq_order[0]);
   size_t i;
+  struct obj_data *held = GET_EQ(ch, WEAR_HOLD);
+  int show_offhand = held && GET_OBJ_TYPE(held) == ITEM_WEAPON &&
+      OBJ_FLAGGED(held, ITEM_OFFHAND) && GET_SKILL(ch, SKILL_DUAL_WIELD);
 
   send_to_char(ch, "You are using:\r\n");
 
@@ -3333,21 +3348,22 @@ ACMD(do_equipment)
     int pos = eq_order[i];
     struct obj_data *obj = GET_EQ(ch, pos);
 
+
+    /* Omit Hold and Shield rows when displaying a two-handed weapon. */
+    if ((pos == WEAR_HOLD || pos == WEAR_SHIELD) &&
+        character_is_using_two_hander(ch))
+      continue;
+    if (pos == WEAR_SHIELD && show_offhand)
+      continue;
     const char *label = eq_labels[i];
     if (pos == WEAR_WIELD && character_is_using_two_hander(ch))
       label = "Two-Handed";
-    if (pos == WEAR_HOLD && obj && GET_OBJ_TYPE(obj) == ITEM_WEAPON && OBJ_FLAGGED(obj, ITEM_OFFHAND) && GET_SKILL(ch, SKILL_DUAL_WIELD))
+    if (pos == WEAR_HOLD && show_offhand)
       label = "Offhand";
 
     /* Slot labels bright yellow */
     send_to_char(ch, "%s%-14s%s ",
       CBYEL(ch, C_NRM), label, CCNRM(ch, C_NRM));
-
-    if (!obj && pos == WEAR_HOLD && character_is_using_two_hander(ch)) {
-      send_to_char(ch, "%s[UNAVAILABLE - TWO-HANDED]%s\r\n",
-        CBWHT(ch, C_NRM), CCNRM(ch, C_NRM));
-      continue;
-    }
 
     if (!obj) {
       /* [NOTHING] bright white */

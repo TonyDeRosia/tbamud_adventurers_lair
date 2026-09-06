@@ -48,11 +48,6 @@ show when it opens its narrow mouth to test anything drifting close enough.
 8 8 0
 BareHandAttack: 4
 BodyProfile: 3
-SavingPara: 1
-SavingRod: 1
-SavingPetri: 1
-SavingBreath: 1
-SavingSpell: 1
 Wimpy: 2
 Evasion: 1
 E
@@ -89,11 +84,6 @@ weed, shellfish, and whatever scraps the warehouse quarter loses to the river.
 8 8 0
 BareHandAttack: 4
 BodyProfile: 2
-SavingPara: 1
-SavingRod: 1
-SavingPetri: 1
-SavingBreath: 1
-SavingSpell: 1
 Wimpy: 2
 Evasion: 1
 E

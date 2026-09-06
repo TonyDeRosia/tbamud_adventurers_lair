@@ -18,11 +18,6 @@ Int: 18
 Wis: 18
 Con: 18
 Cha: 18
-SavingPara: 8
-SavingRod: 8
-SavingPetri: 8
-SavingBreath: 8
-SavingSpell: 8
 E
 T 27400
 #27401
@@ -46,11 +41,6 @@ Str: 18
 Dex: 16
 Wis: 13
 Cha: 12
-SavingPara: 8
-SavingRod: 8
-SavingPetri: 8
-SavingBreath: 8
-SavingSpell: 8
 E
 T 27405
 #27402
@@ -95,11 +85,6 @@ Str: 20
 Dex: 17
 Int: 13
 Wis: 15
-SavingPara: 8
-SavingRod: 8
-SavingPetri: 8
-SavingBreath: 8
-SavingSpell: 8
 E
 T 27407
 #27404
@@ -122,11 +107,6 @@ Str: 20
 Dex: 17
 Int: 13
 Wis: 15
-SavingPara: 8
-SavingRod: 8
-SavingPetri: 8
-SavingBreath: 8
-SavingSpell: 8
 E
 #27405
 Zino~
@@ -150,11 +130,6 @@ Str: 20
 Dex: 17
 Int: 13
 Wis: 15
-SavingPara: 8
-SavingRod: 8
-SavingPetri: 8
-SavingBreath: 8
-SavingSpell: 8
 E
 T 27407
 #27406
@@ -176,11 +151,6 @@ Int: 13
 Wis: 15
 Con: 18
 Cha: 22
-SavingPara: 8
-SavingRod: 8
-SavingPetri: 8
-SavingBreath: 8
-SavingSpell: 8
 E
 T 27402
 #27407
@@ -204,11 +174,6 @@ Str: 25
 Dex: 17
 Int: 13
 Wis: 15
-SavingPara: 8
-SavingRod: 8
-SavingPetri: 8
-SavingBreath: 8
-SavingSpell: 8
 E
 T 27407
 #27408
@@ -231,11 +196,6 @@ Str: 20
 Dex: 17
 Int: 13
 Wis: 15
-SavingPara: 8
-SavingRod: 8
-SavingPetri: 8
-SavingBreath: 8
-SavingSpell: 8
 E
 T 27407
 #27409
@@ -259,11 +219,6 @@ Str: 20
 Dex: 17
 Int: 13
 Wis: 15
-SavingPara: 8
-SavingRod: 8
-SavingPetri: 8
-SavingBreath: 8
-SavingSpell: 8
 E
 T 27407
 #27410
@@ -286,11 +241,6 @@ Dex: 15
 Wis: 13
 Con: 20
 Cha: 22
-SavingPara: 3
-SavingRod: 3
-SavingPetri: 3
-SavingBreath: 3
-SavingSpell: 3
 E
 #27411
 Alisha~
@@ -313,11 +263,6 @@ Int: 13
 Wis: 13
 Con: 18
 Cha: 13
-SavingPara: 2
-SavingRod: 2
-SavingPetri: 2
-SavingBreath: 2
-SavingSpell: 2
 E
 #27413
 Rebecca~
@@ -337,11 +282,6 @@ Dex: 15
 Wis: 12
 Con: 17
 Cha: 13
-SavingPara: 1
-SavingRod: 1
-SavingPetri: 1
-SavingBreath: 1
-SavingSpell: 1
 E
 #27414
 Doris~
@@ -362,11 +302,6 @@ Dex: 15
 Wis: 12
 Con: 17
 Cha: 13
-SavingPara: 1
-SavingRod: 1
-SavingPetri: 1
-SavingBreath: 1
-SavingSpell: 1
 E
 #27415
 Jenny~
@@ -387,11 +322,6 @@ Dex: 15
 Wis: 12
 Con: 17
 Cha: 13
-SavingPara: 1
-SavingRod: 1
-SavingPetri: 1
-SavingBreath: 1
-SavingSpell: 1
 E
 #27416
 citizen male~
@@ -435,11 +365,6 @@ Int: 14
 Wis: 18
 Con: 20
 Cha: 20
-SavingPara: 1
-SavingRod: 1
-SavingPetri: 1
-SavingBreath: 1
-SavingSpell: 1
 E
 #27418
 Dirken~
@@ -459,11 +384,6 @@ Str: 15
 Dex: 19
 Wis: 16
 Con: 20
-SavingPara: 1
-SavingRod: 1
-SavingPetri: 1
-SavingBreath: 1
-SavingSpell: 1
 E
 #27419
 Sphen~
@@ -482,11 +402,6 @@ Str: 15
 Dex: 19
 Wis: 16
 Con: 20
-SavingPara: 1
-SavingRod: 1
-SavingPetri: 1
-SavingBreath: 1
-SavingSpell: 1
 E
 #27420
 Tarus~
@@ -506,11 +421,6 @@ Str: 15
 Dex: 19
 Wis: 16
 Con: 20
-SavingPara: 1
-SavingRod: 1
-SavingPetri: 1
-SavingBreath: 1
-SavingSpell: 1
 E
 #27421
 Renah~
@@ -639,11 +549,6 @@ Int: 13
 Wis: 15
 Con: 17
 Cha: 16
-SavingPara: 2
-SavingRod: 2
-SavingPetri: 2
-SavingBreath: 2
-SavingSpell: 2
 E
 #27428
 a female farmer~
@@ -664,11 +569,6 @@ Dex: 16
 Wis: 12
 Con: 16
 Cha: 12
-SavingPara: 2
-SavingRod: 2
-SavingPetri: 2
-SavingBreath: 2
-SavingSpell: 2
 E
 #27429
 Franz~
@@ -689,11 +589,6 @@ Int: 13
 Wis: 15
 Con: 18
 Cha: 22
-SavingPara: 8
-SavingRod: 8
-SavingPetri: 8
-SavingBreath: 8
-SavingSpell: 8
 E
 T 27403
 #27430
@@ -716,11 +611,6 @@ Int: 12
 Wis: 12
 Con: 14
 Cha: 16
-SavingPara: 1
-SavingRod: 1
-SavingPetri: 1
-SavingBreath: 1
-SavingSpell: 1
 E
 #27431
 Catherine~
@@ -764,11 +654,6 @@ Dex: 16
 Wis: 12
 Con: 16
 Cha: 12
-SavingPara: 2
-SavingRod: 2
-SavingPetri: 2
-SavingBreath: 2
-SavingSpell: 2
 E
 #27433
 hooker~

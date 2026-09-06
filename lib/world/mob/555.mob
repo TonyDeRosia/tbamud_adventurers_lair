@@ -88,11 +88,6 @@ New Magincia.
 50 2500
 8 8 2
 BodyProfile: 1
-SavingPara: 1
-SavingRod: 1
-SavingPetri: 1
-SavingBreath: 1
-SavingSpell: 1
 E
 #55506
 rat~
@@ -109,11 +104,6 @@ seems to be rabid, so beware its teeth.
 8 8 0
 BareHandAttack: 4
 BodyProfile: 2
-SavingPara: 1
-SavingRod: 1
-SavingPetri: 1
-SavingBreath: 1
-SavingSpell: 1
 E
 #55507
 spider~
@@ -129,11 +119,6 @@ scrolls, and other scraps.  Its glistening teeth drip with poison.
 8 8 0
 BareHandAttack: 4
 BodyProfile: 5
-SavingPara: 1
-SavingRod: 1
-SavingPetri: 1
-SavingBreath: 1
-SavingSpell: 1
 E
 #55508
 mage~
@@ -149,11 +134,6 @@ returns to his study.
 60 3600
 8 8 1
 BodyProfile: 1
-SavingPara: 1
-SavingRod: 1
-SavingPetri: 1
-SavingBreath: 1
-SavingSpell: 1
 E
 #55509
 Nystul librarian mage~
@@ -174,11 +154,6 @@ Int: 13
 Wis: 13
 Con: 13
 Cha: 13
-SavingPara: 5
-SavingRod: 5
-SavingPetri: 5
-SavingBreath: 5
-SavingSpell: 5
 E
 #55510
 mariah mage~
@@ -194,11 +169,6 @@ to the virtue of Honesty.
 80 6400
 8 8 2
 BodyProfile: 1
-SavingPara: 2
-SavingRod: 2
-SavingPetri: 2
-SavingBreath: 2
-SavingSpell: 2
 E
 #55511
 slime puddle mass~
@@ -214,11 +184,6 @@ friends.  As you look at it you wonder how these things reproduce.
 8 8 0
 BareHandAttack: 9
 BodyProfile: 12
-SavingPara: 1
-SavingRod: 1
-SavingPetri: 1
-SavingBreath: 1
-SavingSpell: 1
 E
 #55512
 snake~
@@ -234,11 +199,6 @@ beer and the distinctive taste of human.
 8 8 1
 BareHandAttack: 1
 BodyProfile: 3
-SavingPara: 2
-SavingRod: 2
-SavingPetri: 2
-SavingBreath: 2
-SavingSpell: 2
 E
 #55513
 horse Smithy~
@@ -255,11 +215,6 @@ practiced jaw muscles can be very dangerous.
 8 8 1
 BareHandAttack: 6
 BodyProfile: 2
-SavingPara: 3
-SavingRod: 3
-SavingPetri: 3
-SavingBreath: 3
-SavingSpell: 3
 E
 T 55513
 T 55514
@@ -276,11 +231,6 @@ Compassion, but in his spare time he sings and dances.
 90 8100
 8 8 1
 BodyProfile: 1
-SavingPara: 2
-SavingRod: 2
-SavingPetri: 2
-SavingBreath: 2
-SavingSpell: 2
 E
 #55515
 beggar~
@@ -295,11 +245,6 @@ out guv, give him a few coins.
 80 6400
 8 8 1
 BodyProfile: 1
-SavingPara: 2
-SavingRod: 2
-SavingPetri: 2
-SavingBreath: 2
-SavingSpell: 2
 E
 T 55515
 #55516
@@ -317,11 +262,6 @@ bottle for you.
 120 14400
 8 8 1
 BodyProfile: 1
-SavingPara: 3
-SavingRod: 3
-SavingPetri: 3
-SavingBreath: 3
-SavingSpell: 3
 E
 #55517
 jester Chuckles~
@@ -344,11 +284,6 @@ Int: 16
 Wis: 16
 Con: 16
 Cha: 16
-SavingPara: 6
-SavingRod: 6
-SavingPetri: 6
-SavingBreath: 6
-SavingSpell: 6
 E
 #55518
 townsman man~
@@ -364,11 +299,6 @@ a good party.
 90 8100
 8 8 1
 BodyProfile: 1
-SavingPara: 2
-SavingRod: 2
-SavingPetri: 2
-SavingBreath: 2
-SavingSpell: 2
 E
 #55519
 Gwenno bard~
@@ -391,11 +321,6 @@ Int: 16
 Wis: 16
 Con: 16
 Cha: 16
-SavingPara: 6
-SavingRod: 6
-SavingPetri: 6
-SavingBreath: 6
-SavingSpell: 6
 E
 #55520
 orc ape~
@@ -411,11 +336,6 @@ scratches its armpits.  It travels in herds and is a coward.
 8 8 1
 BareHandAttack: 3
 BodyProfile: 1
-SavingPara: 2
-SavingRod: 2
-SavingPetri: 2
-SavingBreath: 2
-SavingSpell: 2
 E
 #55521
 troll~
@@ -431,11 +351,6 @@ then you, his meaty arms swing a club at you.
 8 8 1
 BareHandAttack: 9
 BodyProfile: 1
-SavingPara: 3
-SavingRod: 3
-SavingPetri: 3
-SavingBreath: 3
-SavingSpell: 3
 E
 #55522
 wisp ball~
@@ -449,11 +364,6 @@ peaceful, but will defend itself.
 15 15 1 3d3+150 2d2+2
 150 22500
 8 8 0
-SavingPara: 3
-SavingRod: 3
-SavingPetri: 3
-SavingBreath: 3
-SavingSpell: 3
 E
 #55523
 druid~
@@ -470,11 +380,6 @@ with nature, he has gained power.
 140 19600
 8 8 1
 BodyProfile: 1
-SavingPara: 3
-SavingRod: 3
-SavingPetri: 3
-SavingBreath: 3
-SavingSpell: 3
 E
 #55524
 druid~
@@ -490,11 +395,6 @@ at you, her hard eyes only judge, seeking Justice.
 140 19600
 8 8 2
 BodyProfile: 1
-SavingPara: 3
-SavingRod: 3
-SavingPetri: 3
-SavingBreath: 3
-SavingSpell: 3
 E
 #55525
 judge~
@@ -518,11 +418,6 @@ Int: 16
 Wis: 16
 Con: 16
 Cha: 16
-SavingPara: 6
-SavingRod: 6
-SavingPetri: 6
-SavingBreath: 6
-SavingSpell: 6
 E
 #55526
 Jaana druid~
@@ -538,11 +433,6 @@ life into a corner.
 160 25600
 8 8 2
 BodyProfile: 1
-SavingPara: 4
-SavingRod: 4
-SavingPetri: 4
-SavingBreath: 4
-SavingSpell: 4
 E
 #55527
 prisoner~
@@ -557,11 +447,6 @@ done to him.  You glimpse light shining off something in his hands.
 110 12100
 8 8 1
 BodyProfile: 1
-SavingPara: 2
-SavingRod: 2
-SavingPetri: 2
-SavingBreath: 2
-SavingSpell: 2
 E
 #55528
 prisoner~
@@ -576,11 +461,6 @@ took many guards and druids to restrain this beast.
 140 19600
 8 8 1
 BodyProfile: 1
-SavingPara: 3
-SavingRod: 3
-SavingPetri: 3
-SavingBreath: 3
-SavingSpell: 3
 E
 #55529
 citizen yewsman~
@@ -596,11 +476,6 @@ strolls the street, sure of his Virtue.
 130 16900
 8 8 1
 BodyProfile: 1
-SavingPara: 3
-SavingRod: 3
-SavingPetri: 3
-SavingBreath: 3
-SavingSpell: 3
 E
 #55530
 bartender~
@@ -616,11 +491,6 @@ for advice.  His advice to you is to kick back and enjoy a drink.
 100 10000
 8 8 1
 BodyProfile: 1
-SavingPara: 2
-SavingRod: 2
-SavingPetri: 2
-SavingBreath: 2
-SavingSpell: 2
 E
 #55531
 owner bartender~
@@ -634,11 +504,6 @@ eat.
 13 16 2 2d2+130 2d2+2
 130 16900
 8 8 2
-SavingPara: 3
-SavingRod: 3
-SavingPetri: 3
-SavingBreath: 3
-SavingSpell: 3
 E
 #55532
 ettin~
@@ -653,11 +518,6 @@ the intelligence.  But, in fact, it has only half.
 150 22500
 8 8 0
 BareHandAttack: 9
-SavingPara: 3
-SavingRod: 3
-SavingPetri: 3
-SavingBreath: 3
-SavingSpell: 3
 E
 #55533
 gremlin creature~
@@ -673,11 +533,6 @@ much lighter.
 150 22500
 8 8 0
 BareHandAttack: 8
-SavingPara: 3
-SavingRod: 3
-SavingPetri: 3
-SavingBreath: 3
-SavingSpell: 3
 E
 #55534
 headless~
@@ -699,11 +554,6 @@ Int: 12
 Wis: 12
 Con: 12
 Cha: 12
-SavingPara: 4
-SavingRod: 4
-SavingPetri: 4
-SavingBreath: 4
-SavingSpell: 4
 E
 #55535
 fighter~
@@ -724,11 +574,6 @@ Int: 12
 Wis: 12
 Con: 12
 Cha: 12
-SavingPara: 4
-SavingRod: 4
-SavingPetri: 4
-SavingBreath: 4
-SavingSpell: 4
 E
 #55536
 Geoffrey~
@@ -748,11 +593,6 @@ Int: 13
 Wis: 13
 Con: 13
 Cha: 13
-SavingPara: 5
-SavingRod: 5
-SavingPetri: 5
-SavingBreath: 5
-SavingSpell: 5
 E
 #55537
 lord serpent Simon~
@@ -774,11 +614,6 @@ Int: 16
 Wis: 16
 Con: 16
 Cha: 16
-SavingPara: 6
-SavingRod: 6
-SavingPetri: 6
-SavingBreath: 6
-SavingSpell: 6
 E
 #55538
 mimic chest~
@@ -798,11 +633,6 @@ Int: 14
 Wis: 14
 Con: 14
 Cha: 14
-SavingPara: 5
-SavingRod: 5
-SavingPetri: 5
-SavingBreath: 5
-SavingSpell: 5
 E
 #55539
 gazer eyeball~
@@ -823,11 +653,6 @@ Int: 14
 Wis: 14
 Con: 14
 Cha: 14
-SavingPara: 5
-SavingRod: 5
-SavingPetri: 5
-SavingBreath: 5
-SavingSpell: 5
 E
 #55540
 tinker~
@@ -848,11 +673,6 @@ Int: 14
 Wis: 14
 Con: 14
 Cha: 14
-SavingPara: 5
-SavingRod: 5
-SavingPetri: 5
-SavingBreath: 5
-SavingSpell: 5
 E
 #55541
 Julia~
@@ -875,11 +695,6 @@ Int: 16
 Wis: 16
 Con: 16
 Cha: 16
-SavingPara: 6
-SavingRod: 6
-SavingPetri: 6
-SavingBreath: 6
-SavingSpell: 6
 E
 #55542
 lady~
@@ -901,11 +716,6 @@ Int: 18
 Wis: 18
 Con: 18
 Cha: 18
-SavingPara: 7
-SavingRod: 7
-SavingPetri: 7
-SavingBreath: 7
-SavingSpell: 7
 E
 #55543
 sandtrap tentacle~
@@ -926,11 +736,6 @@ Int: 12
 Wis: 12
 Con: 12
 Cha: 12
-SavingPara: 4
-SavingRod: 4
-SavingPetri: 4
-SavingBreath: 4
-SavingSpell: 4
 E
 #55544
 dragon~
@@ -953,11 +758,6 @@ Int: 13
 Wis: 13
 Con: 13
 Cha: 13
-SavingPara: 5
-SavingRod: 5
-SavingPetri: 5
-SavingBreath: 5
-SavingSpell: 5
 E
 #55545
 paladin~
@@ -980,11 +780,6 @@ Int: 13
 Wis: 13
 Con: 13
 Cha: 13
-SavingPara: 5
-SavingRod: 5
-SavingPetri: 5
-SavingBreath: 5
-SavingSpell: 5
 E
 #55546
 Dupre paladin~
@@ -1006,11 +801,6 @@ Int: 16
 Wis: 16
 Con: 16
 Cha: 16
-SavingPara: 6
-SavingRod: 6
-SavingPetri: 6
-SavingBreath: 6
-SavingSpell: 6
 E
 #55547
 reaper~
@@ -1032,11 +822,6 @@ Int: 12
 Wis: 12
 Con: 12
 Cha: 12
-SavingPara: 4
-SavingRod: 4
-SavingPetri: 4
-SavingBreath: 4
-SavingSpell: 4
 E
 #55548
 gargoyle king Draxthanum~
@@ -1059,11 +844,6 @@ Int: 16
 Wis: 16
 Con: 16
 Cha: 16
-SavingPara: 6
-SavingRod: 6
-SavingPetri: 6
-SavingBreath: 6
-SavingSpell: 6
 E
 #55549
 ghost spirit~
@@ -1084,11 +864,6 @@ Int: 16
 Wis: 16
 Con: 16
 Cha: 16
-SavingPara: 6
-SavingRod: 6
-SavingPetri: 6
-SavingBreath: 6
-SavingSpell: 6
 E
 #55550
 ghost spirit~
@@ -1109,11 +884,6 @@ Int: 16
 Wis: 16
 Con: 16
 Cha: 16
-SavingPara: 6
-SavingRod: 6
-SavingPetri: 6
-SavingBreath: 6
-SavingSpell: 6
 E
 #55551
 skeleton~
@@ -1135,11 +905,6 @@ Int: 15
 Wis: 15
 Con: 15
 Cha: 15
-SavingPara: 5
-SavingRod: 5
-SavingPetri: 5
-SavingBreath: 5
-SavingSpell: 5
 E
 #55552
 daemon demon~
@@ -1161,11 +926,6 @@ Int: 15
 Wis: 15
 Con: 15
 Cha: 15
-SavingPara: 5
-SavingRod: 5
-SavingPetri: 5
-SavingBreath: 5
-SavingSpell: 5
 E
 #55553
 mourner~
@@ -1185,11 +945,6 @@ Int: 15
 Wis: 15
 Con: 15
 Cha: 15
-SavingPara: 5
-SavingRod: 5
-SavingPetri: 5
-SavingBreath: 5
-SavingSpell: 5
 E
 #55554
 Shamino ranger~
@@ -1211,11 +966,6 @@ Int: 16
 Wis: 16
 Con: 16
 Cha: 16
-SavingPara: 6
-SavingRod: 6
-SavingPetri: 6
-SavingBreath: 6
-SavingSpell: 6
 E
 #55555
 timelord~
@@ -1237,11 +987,6 @@ Int: 18
 Wis: 18
 Con: 18
 Cha: 18
-SavingPara: 7
-SavingRod: 7
-SavingPetri: 7
-SavingBreath: 7
-SavingSpell: 7
 E
 #55556
 guardian~
@@ -1263,11 +1008,6 @@ Int: 18
 Wis: 18
 Con: 18
 Cha: 18
-SavingPara: 7
-SavingRod: 7
-SavingPetri: 7
-SavingBreath: 7
-SavingSpell: 7
 E
 T 55556
 #55557
@@ -1289,11 +1029,6 @@ Int: 18
 Wis: 18
 Con: 18
 Cha: 18
-SavingPara: 7
-SavingRod: 7
-SavingPetri: 7
-SavingBreath: 7
-SavingSpell: 7
 E
 #55558
 Exodus~
@@ -1314,11 +1049,6 @@ Int: 18
 Wis: 18
 Con: 18
 Cha: 18
-SavingPara: 7
-SavingRod: 7
-SavingPetri: 7
-SavingBreath: 7
-SavingSpell: 7
 E
 #55559
 Minax~
@@ -1340,11 +1070,6 @@ Int: 18
 Wis: 18
 Con: 18
 Cha: 18
-SavingPara: 7
-SavingRod: 7
-SavingPetri: 7
-SavingBreath: 7
-SavingSpell: 7
 E
 #55560
 Mondain~
@@ -1365,11 +1090,6 @@ Int: 18
 Wis: 18
 Con: 18
 Cha: 18
-SavingPara: 7
-SavingRod: 7
-SavingPetri: 7
-SavingBreath: 7
-SavingSpell: 7
 E
 #55561
 Sentri guard~
@@ -1390,11 +1110,6 @@ Int: 16
 Wis: 16
 Con: 16
 Cha: 16
-SavingPara: 6
-SavingRod: 6
-SavingPetri: 6
-SavingBreath: 6
-SavingSpell: 6
 E
 T 55561
 #55562
@@ -1416,11 +1131,6 @@ Int: 18
 Wis: 18
 Con: 18
 Cha: 18
-SavingPara: 7
-SavingRod: 7
-SavingPetri: 7
-SavingBreath: 7
-SavingSpell: 7
 E
 T 55562
 #55563
@@ -1442,11 +1152,6 @@ Int: 18
 Wis: 18
 Con: 18
 Cha: 18
-SavingPara: 8
-SavingRod: 8
-SavingPetri: 8
-SavingBreath: 8
-SavingSpell: 8
 E
 #55564
 Lord British~
@@ -1468,11 +1173,6 @@ Int: 18
 Wis: 18
 Con: 18
 Cha: 18
-SavingPara: 8
-SavingRod: 8
-SavingPetri: 8
-SavingBreath: 8
-SavingSpell: 8
 E
 #55565
 shark~
@@ -1492,11 +1192,6 @@ Int: 14
 Wis: 14
 Con: 14
 Cha: 14
-SavingPara: 5
-SavingRod: 5
-SavingPetri: 5
-SavingBreath: 5
-SavingSpell: 5
 E
 #55566
 seahorse sea horse~
@@ -1517,11 +1212,6 @@ Int: 14
 Wis: 14
 Con: 14
 Cha: 14
-SavingPara: 5
-SavingRod: 5
-SavingPetri: 5
-SavingBreath: 5
-SavingSpell: 5
 E
 #55567
 squid~
@@ -1543,11 +1233,6 @@ Int: 14
 Wis: 14
 Con: 14
 Cha: 14
-SavingPara: 5
-SavingRod: 5
-SavingPetri: 5
-SavingBreath: 5
-SavingSpell: 5
 E
 #55568
 armorer~
@@ -1567,11 +1252,6 @@ Int: 18
 Wis: 18
 Con: 18
 Cha: 18
-SavingPara: 8
-SavingRod: 8
-SavingPetri: 8
-SavingBreath: 8
-SavingSpell: 8
 E
 #55569
 weaponseller~
@@ -1590,11 +1270,6 @@ Int: 18
 Wis: 18
 Con: 18
 Cha: 18
-SavingPara: 8
-SavingRod: 8
-SavingPetri: 8
-SavingBreath: 8
-SavingSpell: 8
 E
 #55570
 boatseller~
@@ -1613,10 +1288,5 @@ Int: 18
 Wis: 18
 Con: 18
 Cha: 18
-SavingPara: 8
-SavingRod: 8
-SavingPetri: 8
-SavingBreath: 8
-SavingSpell: 8
 E
 $

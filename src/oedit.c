@@ -390,10 +390,23 @@ static void oedit_liquid_type(struct descriptor_data *d)
 /* The actual apply to set. */
 static void oedit_disp_apply_menu(struct descriptor_data *d)
 {
+  int counter, columns = 0;
+
   get_char_colors(d->character);
   clear_screen(d);
-  column_list(d->character, 0, apply_types, NUM_APPLIES, TRUE);
-  write_to_output(d, "\r\nEnter apply type (0 is no apply) : ");
+
+  for (counter = 0; counter < NUM_APPLIES; counter++) {
+    if (counter >= APPLY_SAVING_PARA && counter <= APPLY_SAVING_BREATH)
+      continue;
+
+    write_to_output(d, "%s%2d%s) %-20.20s %s",
+                    grn, counter + 1, nrm, apply_types[counter],
+                    !(++columns % 2) ? "\r\n" : "");
+  }
+
+  write_to_output(d,
+                  "\r\nLegacy Para/Rod/Petri/Breath saves are retired; use SAVING_SPELL.\r\n"
+                  "Enter apply type (0 is no apply) : ");
   OLC_MODE(d) = OEDIT_APPLY;
 }
 
@@ -1270,9 +1283,13 @@ void oedit_parse(struct descriptor_data *d, char *arg)
       OLC_OBJ(d)->affected[OLC_VAL(d)].location = 0;
       OLC_OBJ(d)->affected[OLC_VAL(d)].modifier = 0;
       oedit_disp_prompt_apply_menu(d);
-    } else if (number < 0 || number > NUM_APPLIES)
+    } else if (number < 0 || number > NUM_APPLIES ||
+               ((number - 1) >= APPLY_SAVING_PARA &&
+                (number - 1) <= APPLY_SAVING_BREATH)) {
+      write_to_output(d,
+                      "That legacy saving throw apply is retired. Use SAVING_SPELL.\r\n");
       oedit_disp_apply_menu(d);
-    else {
+    } else {
       int counter;
 
       /* add in check here if already applied.. deny builders another */

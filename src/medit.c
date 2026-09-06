@@ -858,12 +858,9 @@ static void medit_disp_stats_menu(struct descriptor_data *d)
   "(%sH%s) Str: %s[%s%2d/%3d%s]%s   (%sI%s) Int: %s[%s%2d%s]%s   (%sJ%s) Wis: %s[%s%2d%s]%s\r\n"
   "(%sK%s) Dex: %s[%s%2d%s]%s     (%sL%s) Con: %s[%s%2d%s]%s   (%sM%s) Cha: %s[%s%2d%s]%s\r\n"
   "-------------------------------------------------------------------------------\r\n"
-  "SAVING THROWS\r\n"
-  "(%sN%s) Paralysis:               %s[%s%5d%s]%s\r\n"
-  "(%sO%s) Rods/Staves:             %s[%s%5d%s]%s\r\n"
-  "(%sP%s) Petrification:           %s[%s%5d%s]%s\r\n"
-  "(%sR%s) Breath:                  %s[%s%5d%s]%s\r\n"
-  "(%sS%s) Spells:                  %s[%s%5d%s]%s\r\n"
+  "SAVE VS. SPELL\r\n"
+  "(%sN%s) Modifier:                %s[%s%5d%s]%s\r\n"
+  "    Negative improves resistance; positive worsens it.\r\n"
   "-------------------------------------------------------------------------------\r\n"
   "(%sQ%s) Quit to main menu\r\n"
   "Enter choice : ",
@@ -893,10 +890,6 @@ static void medit_disp_stats_menu(struct descriptor_data *d)
       cyn, nrm, cyn, yel, GET_DEX(mob), cyn, nrm,
       cyn, nrm, cyn, yel, GET_CON(mob), cyn, nrm,
       cyn, nrm, cyn, yel, GET_CHA(mob), cyn, nrm,
-      cyn, nrm, cyn, yel, GET_SAVE(mob, SAVING_PARA), cyn, nrm,
-      cyn, nrm, cyn, yel, GET_SAVE(mob, SAVING_ROD), cyn, nrm,
-      cyn, nrm, cyn, yel, GET_SAVE(mob, SAVING_PETRI), cyn, nrm,
-      cyn, nrm, cyn, yel, GET_SAVE(mob, SAVING_BREATH), cyn, nrm,
       cyn, nrm, cyn, yel, GET_SAVE(mob, SAVING_SPELL), cyn, nrm,
       cyn, nrm);
 
@@ -1200,26 +1193,6 @@ void medit_parse(struct descriptor_data *d, char *arg)
       break;
     case 'n':
     case 'N':
-      OLC_MODE(d) = MEDIT_PARA;
-      i++;
-      break;
-    case 'o':
-    case 'O':
-      OLC_MODE(d) = MEDIT_ROD;
-      i++;
-      break;
-    case 'p':
-    case 'P':
-      OLC_MODE(d) = MEDIT_PETRI;
-      i++;
-      break;
-    case 'r':
-    case 'R':
-      OLC_MODE(d) = MEDIT_BREATH;
-      i++;
-      break;
-    case 's':
-    case 'S':
       OLC_MODE(d) = MEDIT_SPELL;
       i++;
       break;
@@ -1910,32 +1883,9 @@ void medit_parse(struct descriptor_data *d, char *arg)
     medit_disp_stats_menu(d);
     return;
 
-  case MEDIT_PARA:
-    GET_SAVE(OLC_MOB(d), SAVING_PARA) = LIMIT(i, 0, 100);
-    OLC_VAL(d) = TRUE;
-    medit_disp_stats_menu(d);
-    return;
-
-  case MEDIT_ROD:
-    GET_SAVE(OLC_MOB(d), SAVING_ROD) = LIMIT(i, 0, 100);
-    OLC_VAL(d) = TRUE;
-    medit_disp_stats_menu(d);
-    return;
-
-  case MEDIT_PETRI:
-    GET_SAVE(OLC_MOB(d), SAVING_PETRI) = LIMIT(i, 0, 100);
-    OLC_VAL(d) = TRUE;
-    medit_disp_stats_menu(d);
-    return;
-
-  case MEDIT_BREATH:
-    GET_SAVE(OLC_MOB(d), SAVING_BREATH) = LIMIT(i, 0, 100);
-    OLC_VAL(d) = TRUE;
-    medit_disp_stats_menu(d);
-    return;
 
   case MEDIT_SPELL:
-    GET_SAVE(OLC_MOB(d), SAVING_SPELL) = LIMIT(i, 0, 100);
+    GET_SAVE(OLC_MOB(d), SAVING_SPELL) = LIMIT(i, -100, 100);
     OLC_VAL(d) = TRUE;
     medit_disp_stats_menu(d);
     return;
@@ -2078,11 +2028,8 @@ void medit_autoroll_stats(struct descriptor_data *d)
     OLC_MOB(d)->real_abils.con   = GET_CON(OLC_MOB(d));
     OLC_MOB(d)->real_abils.cha   = GET_CHA(OLC_MOB(d));
 
-    GET_SAVE(OLC_MOB(d), SAVING_PARA)   = mob_lev / 4;  /* All Saving throws */
-    GET_SAVE(OLC_MOB(d), SAVING_ROD)    = mob_lev / 4;  /* set to a quarter  */
-    GET_SAVE(OLC_MOB(d), SAVING_PETRI)  = mob_lev / 4;  /* of the mobs level */
-    GET_SAVE(OLC_MOB(d), SAVING_BREATH) = mob_lev / 4;
-    GET_SAVE(OLC_MOB(d), SAVING_SPELL)  = mob_lev / 4;
+    /* Save vs. Spell now scales from the mob's level in the combat formula.
+     * MEDIT no longer auto-generates a separate save modifier here. */
   }
 
 }

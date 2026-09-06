@@ -29,6 +29,11 @@ int compute_armor_class(struct char_data *ch);
 int compute_evasion(struct char_data *ch);
 int compute_offensive_hit_value(struct char_data *ch, struct char_data *victim);
 int compute_hit_chance_from_values(int offensive_hit, int target_evasion);
+/* SCORE benchmark: visible, awake, equal-level defender, DEX 20, no applies. */
+#define STANDARD_DEFENDER_EVASION 30
+int compute_reference_hit_chance(struct char_data *ch);
+int apply_armor_mitigation(int damage, int armor);
+int armor_mitigation_basis_points(int armor);
 void get_player_unarmed_profile(int level, int *dice_num, int *dice_size, int *level_bonus);
 int unarmed_proficiency_bonus(int unarmed_component, int skill);
 int unarmed_expected_average_x100(int level, int skill);

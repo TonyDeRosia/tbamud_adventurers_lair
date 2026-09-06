@@ -675,10 +675,6 @@ if %actor.canbeseen% && %actor.is_pc%
   %echo% PRACTICES:       %actor.prac%
   %echo% QUESTPOINTS:     %actor.questpoints%
   %echo% ROOM:            %actor.room%
-  %echo% SAVING_PARA:     %actor.saving_para%
-  %echo% SAVING_ROD:      %actor.saving_rod%
-  %echo% SAVING_PETRI:    %actor.saving_petri%
-  %echo% SAVING_BREATH:   %actor.saving_breath%
   %echo% SAVING_SPELL:    %actor.saving_spell%
   %echo% SEX:             %actor.sex%
   %echo% SKILL BACKSTAB:  %actor.skill(backstab)%
