@@ -44,9 +44,7 @@ def test_double_attack_class_access():
     for cls in NO_NORMAL_ACCESS:
         assert f"spell_level(SKILL_DOUBLE_ATTACK, {cls}," not in CLASS_C
 
-    # Triple/Fourth remain capacity-only until their own rollout phase.
-    assert "spell_level(SKILL_TRIPLE_ATTACK," not in CLASS_C
-    assert "spell_level(SKILL_FOURTH_ATTACK," not in CLASS_C
+    # Later progression stages are tested in their own rollout regression.
 
 def test_physical_profiles_are_class_specific():
     block = section(
@@ -118,16 +116,26 @@ def test_double_attack_rereads_target_and_uses_normal_hit_path():
     )
 
     assert "victim = FIGHTING(ch);" in double_block
-    assert "IN_ROOM(ch) != IN_ROOM(victim)" in double_block
+    assert "physical_multiattack_target_valid(ch, victim)" in double_block
+
+    target_helper = section(
+        FIGHT_C,
+        "static int physical_multiattack_target_valid",
+        "static void do_double_attack",
+    )
+    assert "IN_ROOM(ch) != NOWHERE" in target_helper
+    assert "IN_ROOM(victim) != NOWHERE" in target_helper
+    assert "IN_ROOM(ch) == IN_ROOM(victim)" in target_helper
+    assert "FIGHTING(ch) == victim" in target_helper
+
     assert "combat_progression_physical_multiattack_roll(" in double_block
     assert "COMBAT_PROGRESSION_STAGE_FULL" in double_block
     assert "perform_bonus_mainhand_attack(ch);" in double_block
 
-    # No recursive progression from the hit() function itself.
+    # No recursive progression from the hit() function itself. Later chain
+    # stages are owned by do_double_attack(), never by hit().
     hit_block = section(FIGHT_C, "void hit(", "static void process_round_effects")
     assert "do_double_attack(" not in hit_block
-    assert "SKILL_TRIPLE_ATTACK" not in FIGHT_C
-    assert "SKILL_FOURTH_ATTACK" not in FIGHT_C
 
 def test_learning_is_success_only_and_throttled_to_effect_pulse():
     double_block = section(

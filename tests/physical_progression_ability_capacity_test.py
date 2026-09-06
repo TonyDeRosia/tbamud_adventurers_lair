@@ -58,22 +58,34 @@ def test_skill_registrations_exist():
         assert marker in PARSER, marker
 
 def test_progression_rollout_state():
-    # Double Attack has now entered its gameplay rollout phase.
-    expected_double_access = (
-        ("CLASS_WARRIOR", 10),
-        ("CLASS_THIEF", 15),
-        ("CLASS_PALADIN", 20),
-        ("CLASS_BARD", 25),
-        ("CLASS_MYSTIC", 30),
-    )
+    expected_access = {
+        "SKILL_DOUBLE_ATTACK": (
+            ("CLASS_WARRIOR", 10),
+            ("CLASS_THIEF", 15),
+            ("CLASS_PALADIN", 20),
+            ("CLASS_BARD", 25),
+            ("CLASS_MYSTIC", 30),
+        ),
+        "SKILL_TRIPLE_ATTACK": (
+            ("CLASS_WARRIOR", 40),
+            ("CLASS_THIEF", 45),
+            ("CLASS_PALADIN", 50),
+            ("CLASS_BARD", 55),
+            ("CLASS_MYSTIC", 60),
+        ),
+        "SKILL_FOURTH_ATTACK": (
+            ("CLASS_WARRIOR", 70),
+            ("CLASS_THIEF", 75),
+            ("CLASS_PALADIN", 80),
+            ("CLASS_BARD", 85),
+            ("CLASS_MYSTIC", 90),
+        ),
+    }
 
-    for cls, level in expected_double_access:
-        marker = f"spell_level(SKILL_DOUBLE_ATTACK, {cls}, {level});"
-        assert marker in CLASS_C, marker
-
-    # Triple and Fourth remain reserved capacity only until their own phases.
-    assert "spell_level(SKILL_TRIPLE_ATTACK," not in CLASS_C
-    assert "spell_level(SKILL_FOURTH_ATTACK," not in CLASS_C
+    for ability, rows in expected_access.items():
+        for cls, level in rows:
+            marker = f"spell_level({ability}, {cls}, {level});"
+            assert marker in CLASS_C, marker
 
 def test_no_spell_range_reclassification():
     # These remain ordinary skills above MAX_SPELLS and below DG/object IDs.

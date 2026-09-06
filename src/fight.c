@@ -2015,6 +2015,16 @@ static void perform_bonus_mainhand_attack(struct char_data *ch)
   combat_effects_due = previous_effects_due;
 }
 
+static int physical_multiattack_target_valid(struct char_data *ch,
+                                             struct char_data *victim)
+{
+  return ch && victim &&
+         IN_ROOM(ch) != NOWHERE &&
+         IN_ROOM(victim) != NOWHERE &&
+         IN_ROOM(ch) == IN_ROOM(victim) &&
+         FIGHTING(ch) == victim;
+}
+
 static void do_double_attack(struct char_data *ch)
 {
   struct char_data *victim;
@@ -2023,30 +2033,68 @@ static void do_double_attack(struct char_data *ch)
   if (!ch || IS_NPC(ch))
     return;
 
+  /*
+   * DOUBLE ATTACK
+   * The first bonus stage is the gateway to the entire chain.
+   */
   proficiency = GET_SKILL(ch, SKILL_DOUBLE_ATTACK);
   if (proficiency <= 0)
     return;
 
-  /*
-   * Re-read the live combat target after the base attack. A kill, flee,
-   * extraction, or room change must stop the automatic bonus sequence.
-   */
   victim = FIGHTING(ch);
-  if (!victim || IN_ROOM(ch) == NOWHERE || IN_ROOM(victim) == NOWHERE ||
-      IN_ROOM(ch) != IN_ROOM(victim))
+  if (!physical_multiattack_target_valid(ch, victim))
     return;
 
   if (!combat_progression_physical_multiattack_roll(
           ch, proficiency, COMBAT_PROGRESSION_STAGE_FULL))
     return;
 
-  /*
-   * Passive attacks happen every second, so do not feed every failed roll into
-   * the existing failure-boosted learning system. A successful proc may train
-   * only on the normal two-second effects pulse.
-   */
   if (combat_effects_due)
     improve_ability_from_use(ch, SKILL_DOUBLE_ATTACK, TRUE);
+
+  perform_bonus_mainhand_attack(ch);
+
+  /*
+   * TRIPLE ATTACK
+   * This stage cannot roll unless Double Attack actually proc'd and its bonus
+   * swing completed without killing, extracting, fleeing from, or losing the
+   * current opponent.
+   */
+  victim = FIGHTING(ch);
+  if (!physical_multiattack_target_valid(ch, victim))
+    return;
+
+  proficiency = GET_SKILL(ch, SKILL_TRIPLE_ATTACK);
+  if (proficiency <= 0)
+    return;
+
+  if (!combat_progression_physical_multiattack_roll(
+          ch, proficiency, COMBAT_PROGRESSION_STAGE_SECOND))
+    return;
+
+  if (combat_effects_due)
+    improve_ability_from_use(ch, SKILL_TRIPLE_ATTACK, TRUE);
+
+  perform_bonus_mainhand_attack(ch);
+
+  /*
+   * FOURTH ATTACK
+   * This stage cannot roll unless both prior stages succeeded.
+   */
+  victim = FIGHTING(ch);
+  if (!physical_multiattack_target_valid(ch, victim))
+    return;
+
+  proficiency = GET_SKILL(ch, SKILL_FOURTH_ATTACK);
+  if (proficiency <= 0)
+    return;
+
+  if (!combat_progression_physical_multiattack_roll(
+          ch, proficiency, COMBAT_PROGRESSION_STAGE_THIRD))
+    return;
+
+  if (combat_effects_due)
+    improve_ability_from_use(ch, SKILL_FOURTH_ATTACK, TRUE);
 
   perform_bonus_mainhand_attack(ch);
 }

@@ -1154,6 +1154,8 @@ void init_spell_levels(void)
   spell_level(SKILL_TRACK, CLASS_THIEF, 10);
   spell_level(SKILL_BANDAGE, CLASS_THIEF, 15);
   spell_level(SKILL_DOUBLE_ATTACK, CLASS_THIEF, 15);
+  spell_level(SKILL_TRIPLE_ATTACK, CLASS_THIEF, 45);
+  spell_level(SKILL_FOURTH_ATTACK, CLASS_THIEF, 75);
   spell_level(SKILL_DUAL_WIELD, CLASS_THIEF, 20);
   spell_level(SPELL_DETECT_MAGIC, CLASS_THIEF, 10);
   spell_level(SPELL_DETECT_INVIS, CLASS_THIEF, 15);
@@ -1170,6 +1172,8 @@ void init_spell_levels(void)
   spell_level(SKILL_RESCUE, CLASS_WARRIOR, 3);
   spell_level(SPELL_STRENGTH, CLASS_WARRIOR, 10);
   spell_level(SKILL_DOUBLE_ATTACK, CLASS_WARRIOR, 10);
+  spell_level(SKILL_TRIPLE_ATTACK, CLASS_WARRIOR, 40);
+  spell_level(SKILL_FOURTH_ATTACK, CLASS_WARRIOR, 70);
   spell_level(SKILL_BASH, CLASS_WARRIOR, 12);
   spell_level(SKILL_DECAPITATE, CLASS_WARRIOR, 15);
   spell_level(SKILL_DUAL_WIELD, CLASS_WARRIOR, 15);
@@ -1189,6 +1193,8 @@ void init_spell_levels(void)
   spell_level(SPELL_CURE_LIGHT, CLASS_PALADIN, 15);
   spell_level(SPELL_PROT_FROM_EVIL, CLASS_PALADIN, 20);
   spell_level(SKILL_DOUBLE_ATTACK, CLASS_PALADIN, 20);
+  spell_level(SKILL_TRIPLE_ATTACK, CLASS_PALADIN, 50);
+  spell_level(SKILL_FOURTH_ATTACK, CLASS_PALADIN, 80);
   spell_level(SPELL_REMOVE_POISON, CLASS_PALADIN, 30);
   spell_level(SPELL_STRENGTH, CLASS_PALADIN, 35);
   spell_level(SPELL_ARMOR, CLASS_PALADIN, 45);
@@ -1215,6 +1221,8 @@ void init_spell_levels(void)
   spell_level(SKILL_HIDE, CLASS_BARD, 20);
   spell_level(SPELL_CURE_CRITIC, CLASS_BARD, 25);
   spell_level(SKILL_DOUBLE_ATTACK, CLASS_BARD, 25);
+  spell_level(SKILL_TRIPLE_ATTACK, CLASS_BARD, 55);
+  spell_level(SKILL_FOURTH_ATTACK, CLASS_BARD, 85);
   spell_level(SPELL_INFRAVISION, CLASS_BARD, 30);
   spell_level(SKILL_TRACK, CLASS_BARD, 30);
   spell_level(SPELL_FLY, CLASS_BARD, 35);
@@ -1244,6 +1252,8 @@ void init_spell_levels(void)
   spell_level(SPELL_IDENTIFY, CLASS_MYSTIC, 30);
   spell_level(SKILL_DUAL_WIELD, CLASS_MYSTIC, 30);
   spell_level(SKILL_DOUBLE_ATTACK, CLASS_MYSTIC, 30);
+  spell_level(SKILL_TRIPLE_ATTACK, CLASS_MYSTIC, 60);
+  spell_level(SKILL_FOURTH_ATTACK, CLASS_MYSTIC, 90);
   spell_level(SKILL_CIRCLE, CLASS_MYSTIC, 12);
   spell_level(SKILL_NERVE_PINCH, CLASS_MYSTIC, 25);
   spell_level(SPELL_LOCATE_OBJECT, CLASS_MYSTIC, 35);
