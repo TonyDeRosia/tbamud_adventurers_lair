@@ -2102,14 +2102,33 @@ static void do_double_attack(struct char_data *ch)
 /* dual wield offhand system */
 static int g_offhand_attack = 0;
 
-static int offhand_attack_chance(int skill)
+static int offhand_attack_chance_basis_points(struct char_data *ch, int skill)
 {
-  return MIN(95, 25 + (MAX(0, skill) * 3 / 4));
+  if (!ch || IS_NPC(ch) || skill <= 0)
+    return 0;
+
+  return combat_progression_physical_multiattack_chance_basis_points(
+      ch, skill, COMBAT_PROGRESSION_STAGE_FULL);
 }
 
-static int offhand_damage_percent(int skill)
+static int offhand_damage_percent(struct char_data *ch, int skill)
 {
-  return 40 + (MAX(0, skill) / 2);
+  int chance_basis_points;
+  int percent;
+
+  if (!ch || IS_NPC(ch) || skill <= 0)
+    return 0;
+
+  skill = MAX(1, MIN(100, skill));
+  chance_basis_points = offhand_attack_chance_basis_points(ch, skill);
+
+  /*
+   * Proficiency controls weapon-hand mastery directly while the shared
+   * stat-weighted chance contributes a smaller efficiency term.
+   */
+  percent = 40 + (skill / 3) + (chance_basis_points / 400);
+
+  return MAX(40, MIN(100, percent));
 }
 
 static int can_offhand_attack(struct char_data *ch)
@@ -2176,16 +2195,45 @@ static void do_offhand_attack(struct char_data *ch, struct char_data *victim)
 {
   struct obj_data *prim = GET_EQ(ch, WEAR_WIELD);
   struct obj_data *off  = GET_EQ(ch, WEAR_HOLD);
+  bool previous_effects_due;
+  int skill;
+  int chance_basis_points;
 
-  if (!can_offhand_attack(ch)) return;
-  if (!victim) return;
-  if (rand_number(1, 100) > offhand_attack_chance(GET_SKILL(ch, SKILL_DUAL_WIELD)))
+  if (!can_offhand_attack(ch))
+    return;
+  if (!physical_multiattack_target_valid(ch, victim))
     return;
 
+  skill = GET_SKILL(ch, SKILL_DUAL_WIELD);
+  chance_basis_points = offhand_attack_chance_basis_points(ch, skill);
+
+  if (chance_basis_points <= 0 ||
+      rand_number(1, COMBAT_PROGRESSION_CHANCE_SCALE) > chance_basis_points)
+    return;
+
+  /*
+   * Automatic offhand attempts happen every second. Keep advancement aligned
+   * with physical multiattack: successful procs may train only on the normal
+   * two-second effects pulse.
+   */
+  if (combat_effects_due)
+    improve_ability_from_use(ch, SKILL_DUAL_WIELD, TRUE);
+
   ch->equipment[WEAR_WIELD] = off;
+
+  /*
+   * This is an automatic bonus weapon swing, not another combat round.
+   * Suppress the hit()-owned DG fight/hit-percent triggers while preserving
+   * the one normal spirit-proc / MOB_SPEC / periodic opportunity owned by
+   * perform_violence().
+   */
+  previous_effects_due = combat_effects_due;
+  combat_effects_due = FALSE;
   g_offhand_attack = 1;
   hit(ch, victim, TYPE_UNDEFINED);
   g_offhand_attack = 0;
+  combat_effects_due = previous_effects_due;
+
   ch->equipment[WEAR_WIELD] = prim;
 }
 
@@ -2219,7 +2267,7 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
   if (!control_attack_allowed(ch, victim)) return 0;
   /* OFFHAND DAMAGE SCALE */
   if (g_offhand_attack) {
-    dam = (dam * offhand_damage_percent(GET_SKILL(ch, SKILL_DUAL_WIELD))) / 100;
+    dam = (dam * offhand_damage_percent(ch, GET_SKILL(ch, SKILL_DUAL_WIELD))) / 100;
   }
 
   int damage_type = take_next_damage_type();

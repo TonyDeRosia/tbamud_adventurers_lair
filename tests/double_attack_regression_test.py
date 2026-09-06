@@ -160,10 +160,17 @@ def test_round_order_preserves_offhand_spirit_and_mob_special_ownership():
     assert base < double < offhand < spirit < mob_spec
     assert violence.count("do_double_attack(ch);") == 1
 
-def test_existing_offhand_path_not_reimplemented():
+def test_existing_offhand_path_remains_separate():
     assert FIGHT_C.count("static void do_offhand_attack(") == 1
     assert FIGHT_C.count("g_offhand_attack = 1;") >= 2
-    assert "offhand_attack_chance(GET_SKILL(ch, SKILL_DUAL_WIELD))" in FIGHT_C
+
+    offhand = section(
+        FIGHT_C,
+        "static void do_offhand_attack",
+        "/* Deliberate paired attacks",
+    )
+    assert "hit(ch, victim, TYPE_UNDEFINED);" in offhand
+    assert "do_double_attack(" not in offhand
 
 def run():
     tests = [
@@ -175,7 +182,7 @@ def run():
         test_double_attack_rereads_target_and_uses_normal_hit_path,
         test_learning_is_success_only_and_throttled_to_effect_pulse,
         test_round_order_preserves_offhand_spirit_and_mob_special_ownership,
-        test_existing_offhand_path_not_reimplemented,
+        test_existing_offhand_path_remains_separate,
     ]
 
     for test in tests:
