@@ -3164,8 +3164,7 @@ ACMD(do_zap)
     send_to_char(ch, "You must hold or wield a wand to zap it.\r\n");
     return;
   }
-  if (GET_OBJ_VAL(wand, 3) < 1 || GET_OBJ_VAL(wand, 3) > TOP_SPELL_DEFINE ||
-      !spell_info[GET_OBJ_VAL(wand, 3)].name) {
+  if (!ability_is_spell(GET_OBJ_VAL(wand, 3))) {
     send_to_char(ch, "That wand is malformed and cannot be activated.\r\n");
     return;
   }

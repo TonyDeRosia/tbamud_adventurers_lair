@@ -4583,16 +4583,23 @@ static int check_object_spell_number(struct obj_data *obj, int val)
   if (GET_OBJ_VAL(obj, val) == -1 || GET_OBJ_VAL(obj, val) == 0) /* no spell */
     return (error);
 
-  /* Check for negative spells, spells beyond the top define, and any spell
-   * which is actually a skill. */
+  /* Normal boot loads mag_assign_spells() before boot_world(), so explicit
+   * ability-kind metadata is authoritative here.  Syntax-check mode keeps the
+   * legacy numeric skill-band guard because spell metadata may be unavailable. */
   if (GET_OBJ_VAL(obj, val) < 0)
     error = TRUE;
   if (GET_OBJ_VAL(obj, val) > TOP_SPELL_DEFINE)
     error = TRUE;
-  if (GET_OBJ_VAL(obj, val) > MAX_SPELLS && GET_OBJ_VAL(obj, val) <= MAX_SKILLS)
+
+  if (scheck) {
+    if (GET_OBJ_VAL(obj, val) > MAX_SPELLS && GET_OBJ_VAL(obj, val) <= MAX_SKILLS)
+      error = TRUE;
+  } else if (!error && !ability_is_spell(GET_OBJ_VAL(obj, val))) {
     error = TRUE;
+  }
+
   if (error)
-    log("SYSERR: Object #%d (%s) has out of range spell #%d.",
+    log("SYSERR: Object #%d (%s) has out of range or non-spell ability #%d.",
 	GET_OBJ_VNUM(obj), obj->short_description, GET_OBJ_VAL(obj, val));
 
   if (scheck)		/* Spell names don't exist in syntax check mode. */

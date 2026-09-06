@@ -74,11 +74,10 @@ def test_live_help_lists_filter_by_kind():
     assert "int start = show_skills ? MAX_SPELLS + 1 : 1;" not in INFO
     assert "int end = show_skills ? TOP_SPELL_DEFINE : MAX_SPELLS;" not in INFO
 
-def test_object_boot_and_olc_work_is_still_deferred():
-    # Phase 2 intentionally leaves object spell authoring/boot validation
-    # for the next isolated phase.
-    assert "MAX_SPELLS" in DB
-    assert "NUM_SPELLS" in OEDIT
+def test_object_boot_and_olc_use_explicit_kind():
+    assert "!ability_is_spell(GET_OBJ_VAL(obj, val))" in DB
+    assert "ability_is_spell(counter)" in OEDIT
+    assert "NUM_SPELLS" not in OEDIT
 
 def run():
     tests = [
@@ -90,7 +89,7 @@ def run():
         test_combat_spell_hooks_use_kind,
         test_magic_affect_spell_semantics_use_kind,
         test_live_help_lists_filter_by_kind,
-        test_object_boot_and_olc_work_is_still_deferred,
+        test_object_boot_and_olc_use_explicit_kind,
     ]
 
     for test in tests:

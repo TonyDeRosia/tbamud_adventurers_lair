@@ -2219,8 +2219,7 @@ void mag_objectmagic(struct char_data *ch, struct obj_data *obj, char *argument)
     }
     break;
   case ITEM_WAND:
-    if (GET_OBJ_VAL(obj, 3) < 1 || GET_OBJ_VAL(obj, 3) > TOP_SPELL_DEFINE ||
-        !spell_info[GET_OBJ_VAL(obj, 3)].name) {
+    if (!ability_is_spell(GET_OBJ_VAL(obj, 3))) {
       send_to_char(ch, "The wand's magic is malformed and cannot be invoked.\r\n");
       return;
     }

@@ -434,11 +434,13 @@ static void oedit_disp_spells_menu(struct descriptor_data *d)
   get_char_colors(d->character);
   clear_screen(d);
 
-  for (counter = 1; counter <= NUM_SPELLS; counter++) {
+  for (counter = 1; counter <= TOP_SPELL_DEFINE; counter++) {
+    if (!ability_is_spell(counter))
+      continue;
     write_to_output(d, "%s%2d%s) %s%-20.20s %s", grn, counter, nrm, yel,
 		spell_info[counter].name, !(++columns % 3) ? "\r\n" : "");
   }
-  write_to_output(d, "\r\n%sEnter spell choice (-1 for none) : ", nrm);
+  write_to_output(d, "\r\n%sEnter listed spell ID (-1 for none) : ", nrm);
 }
 
 /* Object value #1 */
@@ -1130,8 +1132,11 @@ void oedit_parse(struct descriptor_data *d, char *arg)
     case ITEM_POTION:
       if (number == 0 || number == -1)
 	GET_OBJ_VAL(OLC_OBJ(d), 1) = -1;
-      else
-	GET_OBJ_VAL(OLC_OBJ(d), 1) = LIMIT(number, 1, NUM_SPELLS);
+      else if (!ability_is_spell(number)) {
+	oedit_disp_spells_menu(d);
+	return;
+      } else
+	GET_OBJ_VAL(OLC_OBJ(d), 1) = number;
 
       oedit_disp_val3_menu(d);
       break;
@@ -1173,8 +1178,12 @@ void oedit_parse(struct descriptor_data *d, char *arg)
 	oedit_disp_val4_menu(d);
 	return;
       }
-      min_val = 1;
-      max_val = NUM_SPELLS;
+      if (!ability_is_spell(number)) {
+	oedit_disp_spells_menu(d);
+	return;
+      }
+      min_val = number;
+      max_val = number;
       break;
     case ITEM_WEAPON:
       min_val = 1;
@@ -1213,13 +1222,21 @@ void oedit_parse(struct descriptor_data *d, char *arg)
         oedit_disp_menu(d);
 	return;
       }
-      min_val = 1;
-      max_val = NUM_SPELLS;
+      if (!ability_is_spell(number)) {
+	oedit_disp_spells_menu(d);
+	return;
+      }
+      min_val = number;
+      max_val = number;
       break;
     case ITEM_WAND:
     case ITEM_STAFF:
-      min_val = 1;
-      max_val = NUM_SPELLS;
+      if (!ability_is_spell(number)) {
+	oedit_disp_spells_menu(d);
+	return;
+      }
+      min_val = number;
+      max_val = number;
       break;
     case ITEM_WEAPON:
       min_val = 0;
