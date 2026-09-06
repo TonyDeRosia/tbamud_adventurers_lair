@@ -1,131 +1,133 @@
 #10300
-Taylor's Zone Description Room~
-Welcome to the world of:
-@R __________
-@R|_         \
-@R  |   ___   \  __
-@R  |  |   \   ||  |___                               __
-@R  |  |    |  ||   _  \   ______      _____   ____  |  |_____
-@R  |  |    |  ||  | \__\ /  __  \    / __  | / __ \ |   ___  \
-@R  |  |___/   ||  |     |  |  |  \  | |  | || |  | ||  |   \  |
-@R _|         / |  |     |  |__|   \ | |__| || |__| ||  |   |  |
-@R|__________/  |__|      \_____\___\ \____ | \____/ |__|   |__|
-@R                                  __    | |
-@R                                  \ \___| |
-@R                                   \_____/
-          @B _________                __  __
-          @B|_   ____ \              |  ||  |
-          @B  | |    | |             |  ||  |        @b__
-          @B  | |____| |             |  ||  |        @b\/
-          @B  |  _____/    ______    |  ||  |        @b::
-          @B  |  ____  \  /  __  \   |  ||  |        @b||
-          @B  | |    |  ||  |  |  \  |  ||  |        @b||
-          @B _| |____|  ||  |__|   \ |  ||  |     @b___||___
-          @B|__________/  \_____\___\|__||__|     @b\__::__/
-                                                @b___||____
-                                               @b/___||_  /
-                                                   @b||/ /
-                                                   @b|/ /
-                                                   @b/ /
-                                                  @b/ /
-                                                 @b/ /|______
-                                                @b/__||_____/
-                                                   @b||
-                                                   @b\/
+Upon the @YPa@Rin@Rte@Yd@n @YTo@Ryb@Yox@n~
+You stand upon the broad inner lip of an enormous painted toy chest, its
+lacquered walls rising like castle ramparts around a kingdom of scattered
+playthings. @YGo@Rld@Ye@nn @Ybe@Rll@Ys@n hang from red ribbons overhead, and somewhere
+below, something small rolls across wood with the unmistakable rattle of dice.
 ~
-103 0 0 0 0 0
-D5
+103 24 0 0 0 0
+D1
 ~
 ~
 0 0 10301
 S
+T 10362
 #10301
-Transportation Rooms~
-   @gThis room does not look to interesting, with its gray walls and black floor
-and ceiling.  Two sets of stairs sit in the middle of the room, one goes up, the
-other down.
+Beneath the @YHi@Rng@Yed@n @YSk@Yy@n~
+The chest's immense lid hangs overhead like a dark wooden sky, held open by
+hinges thick as fortress gates. Painted blocks, ribbons, toy shields, and
+discarded masks form a winding path toward the deeper Toybox.
 ~
-103 28 0 0 0 0
-D4
-~
-~
-0 10300 10302
-D5
-~
-~
-0 10300 10303
-S
-#10302
-Earth Teleporter~
-   @gThis room looks just like the other, it has gray walls and a black ceiling
-and floor.  But there is one difference, in the middle of the room sits a
-teleporter, this device is giving off a strange light, hums constantly.  A sign
-is nailed onto the wall.
-~
-103 28 0 0 0 0
-D5
-~
-<NONE>~
-0 10300 10301
-S
-#10303
-Namek Teleporter~
-   @gThis room looks just like the other, it has gray walls and a black ceiling
-and floor.  But there is one difference, in the middle of the room sits a
-teleporter, this device is giving off a strange light, hums constantly.
-~
-103 28 0 0 0 0
-D4
-~
-~
-0 10300 10301
-S
-#10304
-Kami's Lookout~
-   @gThe sun shines down on your face, warming up your whole body.  A short fat
-person is kneeling here tending to a well kempt flower garden whistling happily.
-Another person stands here, a tall green man with pointy ears.
-~
-103 20 0 0 0 1
-S
-#10305
-Start of Planet Namek~
-   @gThe lush ground and the tall trees surround this area, small domed
-buildings
-are also here, and many green people are walking around working here.  Some
-tending to the gardens, others training their skills.  But one thing is certain,
-all of them look male.
-~
-103 0 0 0 0 1
+103 8 0 0 0 0
 D0
 ~
 ~
-0 10300 10346
+0 0 10302
 D1
 ~
-Gate~
-1 10362 10362
-S
-T 10364
-#10306
-Base of Korins Tower~
-   @gTrees cover this area, but at the base of Korins Tower is a clearing
-allowing the sun in.  Towards the east is a dirt path in which you cannot see
-the end of.
 ~
-103 16 0 0 0 3
+0 0 10304
+D2
+~
+~
+0 0 10306
+D3
+~
+~
+0 0 10300
+S
+#10302
+The @YRi@Rbb@Yo@nn @YRa@Rvi@Yne@n~
+Great lengths of crimson and violet ribbon spill between towers of wooden
+blocks, creating a soft-sided ravine beneath dangling brass bells. Tiny
+footprints cross the dust in neat lines before vanishing beneath the folds.
+~
+103 8 0 0 0 0
+D1
+~
+~
+0 0 10303
+D2
+~
+~
+0 0 10301
+S
+#10303
+The @YFi@Rel@Yd@n of @YFa@Rll@Ye@nn @YBl@Roc@Yks@n~
+Alphabet blocks lie toppled like ruined keeps across the wooden floor. Some
+bear ordinary letters, while others carry grinning faces, card suits, or rows
+of ivory pips that seem to rearrange whenever you look away.
+~
+103 8 0 0 0 0
+D2
+~
+~
+0 0 10305
+D3
+~
+~
+0 0 10302
+S
+T 10362
+#10304
+The @YSh@Rel@Yf@n of @YFo@Rrg@Rot@Yte@nn @YGa@Rme@Ys@n~
+Boards, cards, counters, and carved playing pieces have been heaped against
+the wall in a colorful landslide. A pair of ivory dice rests atop the pile,
+though faint clicking suggests they are not as still as they appear.
+~
+103 8 0 0 0 0
+D1
+~
+~
+0 0 10305
+D3
+~
+~
+0 0 10301
+S
+#10305
+The @YPa@Yth@n of @YPa@Rin@Rte@Yd@n @YFo@Rot@Wpr@Rin@Yts@n~
+Red, blue, black, and gold footprints have been painted directly onto the
+wood, each set insisting upon a different direction. The overlapping trails
+make a maze of false instructions beneath a canopy of dangling strings.
+~
+103 8 0 0 0 0
+D0
+~
+~
+0 10300 10303
+D2
+~
+~
+0 0 10308
+D3
+~
+~
+0 0 10304
+S
+#10306
+The @YJa@Yck@n'@Ys@n @YCo@Rrn@Yer@n~
+Brightly painted boxes sit in crooked rows, each fitted with a tiny brass
+crank. Most are silent. One gives a soft metallic @Ycl@Ric@Yk@n every few breaths,
+though no hand touches it.
+~
+103 8 0 0 0 0
+D0
+~
+~
+0 0 10301
 D1
 ~
 ~
 0 10300 10307
 S
 #10307
-Forest path~
-   @gA dirt path goes further towrds the west.  The smell of death is in the
-air.  @gTrees limit you to this single path, sounds come from the woods and area
-ahead.
+The @YSt@Ruf@Rfe@Yd@n @YMe@Rna@Wge@Rri@Ye@n~
+Stuffed lions, bears, rabbits, and stranger beasts slump against one another
+in a soft hill of stitched cloth. Their glass eyes catch the light from every
+angle, giving the uncomfortable impression that the whole pile is awake.
 ~
-103 0 0 0 0 3
+103 8 0 0 0 0
 D1
 ~
 ~
@@ -136,114 +138,111 @@ D3
 0 10300 10306
 S
 #10308
-Forest Intersection~
-   @gA small clearing is here, but the path continues towards the west.  And
-towards the north is another small clearing.  A large gaping hole is in the
-middle of the ground here.
+The @YPr@Roc@Wes@Rsi@Yo@nn of @YLi@Rtt@Yle@n @YDo@Ror@Ys@n~
+A row of miniature doors has been fixed to the side of the chest, each
+painted for some tiny imagined house. Several stand open, and from beyond
+them comes the distant rhythm of drums and wooden marching feet.
 ~
-103 0 0 0 0 3
+103 8 0 0 0 0
 D0
 ~
 ~
-0 10300 10309
+0 10300 10305
 D1
 ~
 ~
-0 10300 10312
+0 10300 10309
 D3
 ~
 ~
 0 10300 10307
-D5
-~
-~
-0 10300 10310
 S
+T 10362
 #10309
-Gokus' House~
-   @gA small cottage lies here, it is very small, and very broken looking.
-This is a cleared out space in the forest.  @gThe house seems to make everything
-feel good again, as if it has some magical feeling to it.
+The @YGa@Yte@n of @YMo@Rtl@Yey@n~
+Two enormous jester masks form an archway into the next portion of the
+Toybox. One smiles in crimson and gold; the other weeps in black and ivory.
+Between them hangs a sign carved with the words,
+@RPL@MAY@n @RFA@MIR@n. @RLO@MSE@n @RBE@MAU@YTI@WFU@YLL@MY@n.
 ~
-103 0 0 0 0 3
-D2
+103 8 0 0 0 0
+D1
 ~
 ~
-0 10300 10308
+0 0 10310
+D3
+~
+~
+0 0 10308
 S
 #10310
-A Dark Hole~
-   @gThe walls are covered in a thick slime, roots pop through the ground
-surrounding you.  @gThe walls are sleek, it seems that if one were to fall into
-this hole, they would not be able to escape easily.
+The @RHa@Mll@n of @RBe@Mll@Ys@n~
+Hundreds of little bells hang from cords stretched across a vaulted hall of
+painted wood. They answer every footstep with soft, uneven music, while masked
+courtiers drift between pillars striped in crimson, violet, and gold.
 ~
-103 1 0 0 0 3
-D4
-~
-~
-0 10300 10308
-D5
-~
-~
-0 10300 10311
-S
-#10311
-The Base of the Dark Hole~
-   @gThe floor is covered in dead animal bones, and a human skeleton every now
-and then, strange plants grow all over the walls here. @gIt is dark, almost so
-dark it makes it hard to see, the only light comes from above you.
-~
-103 1 0 0 0 3
-D4
-~
-~
-0 10300 10310
-S
-#10312
-A Forest Path~
-   @gA dirt path goes further towrds the west.  The smell of death is in the
-air.  @gThe trees still cover the area around the path, just limiting you to
-this one spot.
-~
-103 0 0 0 0 3
-D1
-~
-~
-0 10300 10313
-D3
-~
-~
-0 10300 10308
-S
-#10313
-The end of the Forest~
-   @gThe forest is wide here, but trees are still lush and large.  Creatures
-still inhabbit this area, and the smell of death is still strong, but not as
-strong as it used to be.
-~
-103 0 0 0 0 3
-D1
-~
-~
-0 10300 10314
-D3
-~
-~
-0 10300 10312
-S
-#10314
-Forests end~
-   @gA small clearing is here, a boat sits here.  The dock looks old and
-battered,
-like it has been through many storms.  Off to the east you see a small island
-with an even smaller house, to the south is a large dome building marked with a
-large black CC.
-~
-103 4 0 0 0 2
+103 8 0 0 0 0
 D0
 ~
 ~
-0 10300 10321
+0 0 10311
+D1
+~
+~
+0 0 10314
+D2
+~
+~
+0 0 10318
+D3
+~
+~
+0 0 10309
+S
+T 10363
+#10311
+The @RPi@Mer@Yro@Wt@n @RGa@Mll@Yer@Wy@n~
+Black-and-white curtains divide this gallery into narrow stages. Pale
+Pierrots linger beneath moon-painted panels, their sorrowful masks turned
+toward a shallow dish filled with black dice.
+~
+103 8 0 0 0 0
+D0
+~
+~
+0 0 10312
+D2
+~
+~
+0 0 10310
+D3
+~
+~
+0 0 10321
+S
+#10312
+The @RGa@Mll@Yer@Wy@n of @RMa@Msk@Ys@n~
+Masks cover the walls from floor to ceiling: laughing, crying, furious,
+sleeping, and blank. A few have tiny numbered pips painted beneath one eye,
+as though even the faces here have been assigned a value.
+~
+103 8 0 0 0 0
+D0
+~
+~
+0 0 10313
+D2
+~
+~
+0 0 10311
+S
+#10313
+The @RCh@Mam@Ybe@Wr@n of @RQu@Mie@Yt@n @RAp@Mpl@Yau@Wse@n~
+Rows of empty wooden hands are mounted along the walls. At irregular
+intervals they clap by themselves, always three beats at a time, then fall
+perfectly still beneath a painted sign demanding silence.
+~
+103 8 0 0 0 0
 D1
 ~
 ~
@@ -251,616 +250,642 @@ D1
 D2
 ~
 ~
+0 0 10312
+S
+#10314
+The @RHa@Mrl@Yeq@Wui@Yn@n'@Rs@n @RWa@Mlk@n~
+Diamond-patterned tiles twist along a narrow promenade bordered by mirrored
+panels. Harlequin colors flicker from panel to panel, but reflections sometimes
+continue moving after their owners have stopped.
+~
+103 8 0 0 0 0
+D1
+~
+~
 0 10300 10315
 D3
 ~
 ~
-0 10300 10313
+0 10300 10310
 S
 #10315
-The Entrance to Capsul Corp~
-   @gThe grass seems a little greener here, and the sun shines more brightly.
-To the south is a large entrance to the building marked with a CC.  This dome
-shaped building seems a lot bigger than it did before.
+The @RSc@Mar@Yam@Wou@Ych@Me@n @RAr@Mca@Yde@n~
+Painted balconies overlook a dueling arcade scored by countless rapier
+marks. Wooden roses are scattered beneath the railings, each one pinned to the
+floor by a tiny silver practice blade.
 ~
-103 0 0 0 0 2
-D0
-~
-~
-0 10300 10314
-D2
+103 8 0 0 0 0
+D1
 ~
 ~
-0 10300 10316
+0 0 10316
+D3
+~
+~
+0 0 10314
 S
 #10316
-Capsul Corp Front Desk~
-   @gThis is a small room, people are rapidly moving about here.  In the center
-of the room sits a small desk, a woman sits at this desk, a sign on the desk
-says that her name is Matilda.  Lots of chairs cover the wall of the room, it is
-clear that this is no ordinary place.
-@n
-~
-103 24 0 0 0 0
-D0
-~
-~
-0 10300 10315
-D2
-~
-~
-0 10300 10317
-S
-#10317
-Entrance to the Battle Arena~
-   @gHere lies an intersection, here it seems that even more comotion has come
-about, and the smell of death lingers in the air.  @qThe walls have a reddish
-liquid like substance splattered on them, making it kind of an uncomfortable
-room.
+The @RCo@Mlu@Ymb@Win@Ye@n'@Rs@n @RRe@Mhe@Yar@Wsa@Yl@n~
+A polished circular floor lies beneath gauzy ribbons of rose and pearl.
+Delicate slippers have been arranged at its edge, and a six-sided die sits in
+the center as if deciding who dances next.
 ~
 103 8 0 0 0 0
 D0
 ~
 ~
-0 10300 10316
+0 10300 10317
+D3
+~
+~
+0 0 10315
+S
+#10317
+The @RCo@Mur@Yt@n of @RCr@Moo@Yke@Wd@n @RMi@Mrr@Yor@Ws@n~
+Tall mirrors lean at impossible angles around a many-colored court. Each
+reflection exaggerates some feature into absurdity, except one mirror that
+shows everyone present wearing the same enormous grin.
+~
+103 8 0 0 0 0
 D1
+~
+~
+0 10300 10324
+D2
+~
+~
+0 10300 10316
+S
+#10318
+The @RFo@Mol@n'@Rs@n @RBa@Mnq@Yue@Wt@n~
+A banquet table stretches beneath chandeliers made from bells and painted
+spoons. Wooden cakes, wax fruit, and empty goblets are arranged around stacks
+of dice, as though the guests wager their place at dinner.
+~
+103 8 0 0 0 0
+D0
+~
+~
+0 0 10310
+D2
+~
+~
+0 0 10319
+S
+T 10363
+#10319
+The @RCh@Mam@Ybe@Wr@n of @RWa@Mge@Yrs@n~
+Small court tables stand beneath banners embroidered with card suits and
+jester caps. Masks, ribbons, buttons, and miniature swords serve as stakes in
+games whose rules are argued with theatrical seriousness.
+~
+103 8 0 0 0 0
+D0
 ~
 ~
 0 10300 10318
 D2
 ~
 ~
-0 10300 10319
-D3
-~
-~
-0 10300 10320
-S
-#10318
-Th Newbie Arena~
-   @gThe walls are covered in a thick pad, and the floors seem to be doubled
-with some strange type of materal.  The sounds of fighting echo around you.
-@gThis room also has a random blood splatter, but the splatter here seems to be
-more consistent then in the other room.
-~
-103 8 0 0 0 0
-D3
-~
-~
-0 10300 10317
-S
-T 10315
-#10319
-Vegetas Atire~
-   @gThis looks just like a regular room, besides the fact the it is the largest
-part of the building.  @gLarge brass statues cover the walls, and even more
-strange is the fact that not a single one seems to be touching the ground.
-~
-103 8 0 0 0 0
-D0
-~
-~
-0 10300 10317
+0 0 10320
 S
 #10320
-Teleportation Room~
-   @gThis room looks just like the old teleportation rooms that took you to this
-planet.  @gOne difference is that the teleportation unit seems to be more
-technilogically advanced here, but it is hard to tell.
+The @RBa@Mlc@Yon@Wy@n of @RMo@Mck@n @RKi@Mng@Ys@n~
+Tiny wooden thrones line a high balcony overlooking the court. Every throne
+bears a different crown, but all of them have bells sewn into the lining and
+the same word scratched beneath the seat: @RFO@MOL@n.
 ~
 103 8 0 0 0 0
-D1
-~
-~
-0 10300 10317
-D2
-~
-~
-0 10300 10334
-S
-#10321
-The Ocean Shore~
-   @BThe ocean flows up onto the sandy shore, dampining the soft sand on the
-shore.  The smell of salt lingers in the air and the sun beats down hard on the
-sand.  The waves echo through the thick forest to the east, although there is
-no entrance here.  Seaguls fly overhead, adding to this beautiful scene.  Hermit
-crabs have made this area their home, digging holes in the sand.  A starfish
-lies amongst the sand here and there, and small birds chirp in the forest.
-This place seems to be perfect to just relax and take a break from the everyday
-life.  @n
-~
-103 20 0 0 0 2
 D0
 ~
 ~
-0 10300 10322
-D2
-~
-~
-0 10300 10314
-S
-T 10321
-#10322
-The Mouth of the River~
-   @BThe air seems to be a bit more soothing here, there are trees on both sides
-of the river, and the serene sun shining down into the river, making it so you
-can see the every little ripple in the water.  Magnificent fish add to the
-beautiful scene here,@n @Bswimming through the river distorting the image of the
-small pebbles on the bottom.  Leaves fall gently into the river and majesticly
-float down the stream.  This area looks to have been untouched by the
-destructive human hand,@n @Bthe trees to the northwest are to thick to see
-through much less walk through.  This also seems to be a perfect place to relax
-from the troubles of everyday.  @n
-~
-103 20 0 0 0 3
-D2
-~
-~
-0 10300 10321
-S
-T 10322
-#10323
-Taylors Credits Room~
-@B     ___________________________________________________________________
-@B    |               @RDragonball World message from Taylor.@B               |
-@B    |___________________________________________________________________|
-@B    |                                                                   |
-@B    | @RWelcome to my zone Dragonball World!@B                              |
-@B    |                                                                   |
-@B    | @YWARNING:  @RThis is my first zone, and just to say it isn't really@B
-|
-@B    |           @Rto great, so please enjoy my zone, and just have fun.@B   |
-@B    |                                                                   |
-@B    | _________________________________________________________________ |
-@B    |(                                                                 )|
-@B    |(    @RI owe my zone to a lot of people, the main people are@B        )|
-@B    |(    @Rlisted at the bottom of this anouncment board, thanks@B        )|
-@B    |(    @Rfor visiting my zone.@B                                        )|
-@B    |(    @c-----------------------------------------------------        @B)|
-@B    |(    @c-----------------------------------------------------        @B)|
-@B    |(    @c-----------------------------------------------------        @B)|
-@B    |(_________________________________________________________________)|
-@B    |                                                                   |
-@B    | _________________________________________________________________ |
-@B    | @RZone Creator: Taylor@B       _|_@RHelp: Rumble, Detta, Radiax,
-Heiach@B |
-@B ___|_____________________________|_____________________________________|____
-@B(____________________________________________________________________________)
-@n
-~
-103 28 0 0 0 0
-D5
-~
-~
-0 10300 10322
-S
-#10324
-Soaring Over the Ocean~
-   @gThe sun shines down hard, and the air smells of salt, Seaguls are more
-abundant here then they were on the beach and this does place is not as soothing
-either.  @n
-~
-103 0 0 0 0 8
+0 0 10319
 D1
-~
-~
-0 10300 10325
-D3
-~
-~
-0 10300 10314
-S
-#10325
-Soaring Over the Ocean~
-   @gThe sun shines down hard, and the air smells of salt, Seaguls are more
-abundant here then they were on the beach and this does place is not as soothing
-either.  @n
-~
-103 0 0 0 0 8
-D1
-~
-~
-0 10300 10326
-D3
 ~
 ~
 0 10300 10324
 S
-#10326
-Soaring Over the Ocean~
-   @gThe sun shines down hard, and the air smells of salt, Seaguls are more
-abundant here then they were on the beach and this does place is not as soothing
-either.  @n
+#10321
+The @RPa@Min@Yte@Wd@n @RCo@Mur@Yt@n~
+The heart of the Motley Court spreads beneath a ceiling painted as a false
+blue sky. Courtiers bow, spin, and posture around a black-and-white floor where
+six gilded circles resemble the faces of an enormous die.
 ~
-103 0 0 0 0 8
+103 8 0 0 0 0
+D1
+~
+~
+0 0 10311
+D3
+~
+~
+0 0 10322
+S
+T 10363
+#10322
+The @RJe@Mst@Yer@n'@Rs@n @RAn@Mte@Ych@Wam@Ybe@Mr@n~
+Heavy curtains of purple velvet conceal alcoves filled with props, masks,
+and ceremonial toys. A bell rings somewhere beyond the eastern wall whenever
+a die in the room lands on six.
+~
+103 8 0 0 0 0
+D1
+~
+~
+0 0 10321
+D3
+~
+~
+0 0 10323
+S
+#10323
+The @RGa@Mll@Yer@Wy@n of @RLo@Mst@n @RPu@Mnc@Yhl@Win@Yes@n~
+Framed scraps of parchment display jokes with their final lines carefully
+cut away. The missing strips have been folded into tiny paper crowns and
+stacked around a cracked red die.
+~
+103 8 0 0 0 0
+D1
+~
+~
+0 0 10322
+D2
+~
+~
+0 0 10324
+S
+#10324
+The @RMo@Mtl@Yey@n @RTh@Mro@Yne@n~
+A high-backed throne of painted blocks rises beneath a canopy of bells.
+The seat itself is empty, but the Grand Harlequin's court whirls around it in
+defiant celebration, guarding the crimson curtain that leads deeper within.
+~
+103 8 0 0 0 0
 D0
 ~
 ~
-0 10300 10327
+0 0 10320
+D1
+~
+~
+0 10300 10323
+D2
+~
+~
+0 0 10317
+D3
+~
+~
+0 10300 10313
+D5
+~
+~
+0 0 10325
+S
+#10325
+Before the @oCr@Yim@oso@nn @oCu@Yrt@oai@nn~
+A vast crimson curtain descends from darkness overhead, its hem pooling
+across the floor like a lake of velvet. Wooden playbills promise tonight's
+performance: THE @oAD@YVE@RNT@YUR@oER@n @oWH@oO@n @oFO@YRG@oOT@n THE @oST@YRI@YNG@oS@n.
+~
+103 8 0 0 0 0
+D1
+~
+~
+0 10300 10326
+D2
+~
+~
+0 0 10330
+D4
+~
+~
+0 0 10324
+S
+T 10364
+#10326
+The @oFo@Yot@Rli@Ygh@ots@n~
+Brass lamps burn along the edge of a broad puppet stage. Beyond them, rows
+of empty toy spectators stare forward with painted smiles while unseen hands
+test strings somewhere high in the rafters.
+~
+103 8 0 0 0 0
+D1
+~
+~
+0 0 10327
 D3
 ~
 ~
 0 10300 10325
 S
 #10327
-Soaring Over the Ocean~
-   @gLand seems to be coming into your line of vision, only about 25 feet.
-But the salt still lingers in the air and the Seaguls fly overhead.  @n @gThe
-sun seems to be harsher here then it is any other part of the ocean.
+Upon the @oPu@Ypp@oet@n @oSt@Yag@oe@n~
+Painted castle walls and cardboard forests stand beneath a forest of
+descending strings. The scenery is childlike from a distance, but up close
+every painted window contains a tiny watching eye.
 ~
-103 0 0 0 0 8
+103 8 0 0 0 0
 D1
 ~
 ~
 0 10300 10328
+D3
+~
+~
+0 0 10326
+S
+#10328
+The @oPa@Yin@Yte@od@n @oCa@Yst@ole@n @oSe@ot@n~
+Flat wooden towers form a convincing castle only from the audience's side.
+Behind the painted battlements, braces, counterweights, and loops of cord reveal
+the careful machinery of the illusion.
+~
+103 8 0 0 0 0
 D2
 ~
 ~
-0 10300 10326
-S
-#10328
-In Shallow Water~
-   @gYou are now in the shallow water in front of a small island, to the north is
-a house with 'KAMI' in large red letters.  A bald old man sits out front looking
-at a dirty magazine.  @n
-~
-103 0 0 0 0 8
-D0
-~
-~
-0 10300 10329
+0 0 10329
 D3
 ~
 ~
 0 10300 10327
 S
 #10329
-In front of Kami House~
-   @gThe small house sits here, and the old man is more visible, he is bald with
-white facial hair and large sunglasses.  He wears a turtle shell on his back.
-@gWaves wash gentle up onto the shore, and a gentle breeze blows here.
+The @oFo@Yre@ost@n of @oFa@Yls@oe@n @oTr@Yee@os@n~
+Two-dimensional trees slide along grooves cut into the stage floor. Their
+green-painted leaves conceal hooks, strings, and small hinged doors where
+marionettes wait folded in the dark.
 ~
-103 16 0 0 0 1
+103 8 0 0 0 0
 D0
-~
-~
-0 10300 10330
-D2
 ~
 ~
 0 10300 10328
+D1
+~
+~
+0 0 10333
 S
 #10330
-Kami House~
-   @gThe house seems larger on the inside then it did on the out side, its walls
-are an off white, and a large couch in the center of the room.  Off to the north
-seems to be the kitchin, and south is back to the shore.
+@oBa@Yck@Rst@Yag@oe@n in @oSh@Yad@oow@n~
+The glamour of the stage ends abruptly here. Props are stacked against raw
+timber walls, spare limbs hang from pegs, and labeled drawers hold eyes, teeth,
+buttons, wigs, and coils of replacement string.
 ~
-103 8 0 0 0 0
+103 9 0 0 0 0
 D0
 ~
 ~
-0 10300 10331
+0 10300 10325
+D1
+~
+~
+0 0 10331
 D2
 ~
 ~
-0 10300 10329
+0 10300 10334
 S
+T 10364
 #10331
-Kami Houses Kitchen~
-   @gThe room smells of burnt food, a turtle is rummiging through the fridge,
-and whistling.  This room looks like the other but has a large table in the
-center of it, and counters around the edge.
-~
-103 8 0 0 0 0
-D2
-~
-~
-0 10300 10330
-D3
-~
-~
-0 10300 10332
-S
-#10332
-Stair Closet~
-   @gThis room is rather small, the walls are a dark red, and the ceiling is
-noticably low.
-There is a set stairs here leading up.  @gA light glows through a crack in the
-door at the top of the stairs.
+The @oDr@Yes@Ysi@ong@n @oRo@oom@n of @oFa@Yce@os@n~
+Dozens of puppet faces rest before little mirrors, each painted with a
+different emotion. Several mirrors are fogged from the inside, though nothing
+behind the glass appears to breathe.
 ~
 103 8 0 0 0 0
 D1
 ~
 ~
-0 10300 10331
-D4
+0 0 10332
+D3
 ~
 ~
-0 10300 10333
+0 10300 10330
 S
-#10333
-Roshis' Room~
-   @gThe walls are covered with dirty pictures and the bed is unkempt, clothes
-are covering the floor and you can barely make out the wood under them.  @gThe
-windows lie open, letting the gentle breeze into the room.
+#10332
+The @oPr@oop@n @oMa@Yst@oer@n'@os@n @oPa@Yss@Yag@oe@n~
+Oversized keys, wooden moons, paper crowns, false swords, and collapsible
+thrones crowd a narrow passage. Chalk marks on the floor form a six-faced
+pattern used to decide which prop enters a scene.
 ~
 103 8 0 0 0 0
-D5
+D2
 ~
 ~
-0 10300 10332
+0 0 10333
+D3
+~
+~
+0 0 10331
+S
+#10333
+Behind the @oPa@Yin@Yte@od@n @oCa@Yst@ole@n~
+The reverse side of the castle scenery is a cage of timber supports and
+tangled cords. Marionettes hang in rows here, heads bowed and limbs slack,
+waiting for the pull that tells them what they are.
+~
+103 9 0 0 0 0
+D0
+~
+~
+0 0 10332
+D1
+~
+~
+0 0 10339
+D2
+~
+~
+0 0 10336
+D3
+~
+~
+0 0 10329
 S
 #10334
-A Small Hall~
-   @gThe walls are close together, and the floor seems to be much nicer then the
-other areas of the building, it is a sleek marble and it has been freshly
-shined.  The hall continues to the south.
+The @oTa@Yng@Yle@od@n @oFl@oy@n @oLo@oft@n~
+Ropes and puppet strings crisscross a high loft above the stage. Some are
+clearly tied to scenery below; others disappear into darkness far above, taut
+with the weight of things you cannot see.
+~
+103 9 0 0 0 0
+D0
+~
+~
+0 10300 10330
+D1
+~
+~
+0 0 10335
+D2
+~
+~
+0 10300 10337
+S
+T 10364
+#10335
+Among the @oHa@Yng@Yin@og@n @oSt@Yri@Yng@os@n~
+Strings descend so densely that movement becomes a careful negotiation.
+They brush against armor like spider silk, and several twitch away when your
+hands approach them.
+~
+103 9 0 0 0 0
+D2
+~
+~
+0 10300 10336
+D3
+~
+~
+0 0 10334
+S
+#10336
+The @oCo@Yun@Rte@Wrw@Rei@Ygh@ot@n @oGa@Yll@Yer@oy@n~
+Sandbags, carved weights, and painted lead blocks hang from pulleys along
+the wall. Numbers from one through six have been chalked beside the ropes, each
+corresponding to a different section of the stage.
 ~
 103 8 0 0 0 0
 D0
 ~
 ~
-0 10300 10320
-D2
-~
-~
 0 10300 10335
+D1
+~
+~
+0 0 10333
 S
-#10335
-A Small Hall~
-   @gThe walls are close together, and the floor seems to be much nicer then the
-other areas of the building, it is a sleek marble and it has been freshly
-shined.  The hall continues to the south.
+#10337
+The @oWo@Yrk@Ysh@oop@n of @oSp@Yar@oe@n @oPa@Yrt@os@n~
+Benches are littered with carved hands, jointed knees, painted faces, wire
+hooks, and curls of wood shavings. A little cup on the master bench contains
+six bone dice stained by years of handling.
 ~
 103 8 0 0 0 0
 D0
 ~
 ~
 0 10300 10334
-D2
-~
-~
-0 10300 10336
-S
-#10336
-End of the Small Hall~
-   @gThe walls are close together, and the floor seems to be much nicer then the
-other areas of the building, it is a sleek marble and it has been freshly
-shined.  The hall is now over, if you go west, there seems to be someone there.
-~
-103 8 0 0 0 0
-D0
-~
-~
-0 10300 10335
-D3
-~
-~
-0 10300 10337
-S
-#10337
-A Small Kitchen~
-   @gThis is also one of the nicer parts of the building, the floor is marble
-with a rug here and there, a nice chandelier hangs from the ceiling, and the
-walls are covered in a nice flowered wallpaper.  A table only large enough for
-three sits here, and three chairs are placed comfortably around it.
-~
-103 8 0 0 0 0
-D0
-~
-~
-0 10300 10338
 D1
 ~
 ~
-0 10300 10336
+0 10300 10338
 S
 #10338
-The Living Room~
-   @gThis room looks nothing like the kitchen, it has a carpeted floor, a large
-couch, and a huge plasma TV on the wall.  Pictures of Vegeta, Bulma, and Truncks
-hang from the wall.  A faint whistling comes from the west, adding to the
-homely feeling.
+The @oMa@Yst@oer@n'@os@n @oSt@Yri@ong@n @oHa@oll@n~
+Long black strings radiate from a central wooden frame like the web of some
+patient spider. Each cord bears a tiny name tag, and several are labeled only
+with question marks.
 ~
-103 8 0 0 0 0
-D2
+103 9 0 0 0 0
+D1
+~
+~
+0 0 10339
+D3
 ~
 ~
 0 10300 10337
-D3
-~
-~
-0 10300 10339
 S
 #10339
-Play Room~
-   @gThe ground is covered in explicite silver tiles, and on the wall is
-another TV like the one in the Living room, but this one has a game system
-connected to it, and a young child with purple hair sits here playing it while
-whistling.
+The @oPu@Ypp@Ret@Yee@or@n'@os@n @oWo@Yrk@Ysh@oop@n~
+An enormous control bar hangs above a circular work floor surrounded by
+unfinished puppets. The Grand Puppeteer works beneath it, where every tool,
+string, and carved limb seems poised to move at a single gesture.
 ~
-103 28 0 0 0 0
-D1
-~
-~
-0 10300 10338
-D3
-~
-~
-0 10300 10340
-S
-#10340
-The Garden~
-   @gA Large arch is here, it is positioned at the start of a garden.  Through
-the arch you are able to see a magnificent lush garden, anything you could
-possibly think of resides in this place, in the its center is a huge oak tree,
-it provides shade for anyone who sits under it.
-~
-103 16 0 0 0 3
-D1
-~
-~
-0 10300 10339
-D3
-~
-~
-0 10300 10341
-S
-#10341
-A Garden Path~
-   @gOn either side of you huge plants grow, vegetables are here, and many other
-types of plants you have never seen before.  Large rocks separate plant rows,
-acting as stepping stones for someone to walk through.
-~
-103 16 0 0 0 0
-D1
-~
-~
-0 10300 10340
-D3
-~
-~
-0 10300 10342
-S
-#10342
-A Large Oak Tree~
-   @gThis area has been cleared, nothing grows here but a comfortable lush
-grass, a large oak tree is growing here, shading everyone who comes into this
-area, the sun cannot get through the leaves of this tree, it seems to have been
-placed here on purpose, a magical feeling is coming from the tree, it makes
-your body tingle.
-~
-103 16 0 0 0 3
+103 8 0 0 0 0
 D0
 ~
 ~
-0 10300 10343
-D1
-~
-~
-0 10300 10341
-S
-#10343
-A Garden Path~
-   @gOn either side of you huge plants grow, vegetables are here, and many other
-types of plants you have never seen before.  Large rocks separate plant rows,
-acting as stepping stones for someone to walk through.
-~
-103 16 0 0 0 0
-D0
-~
-~
-0 10300 10344
+0 0 10333
 D2
 ~
 ~
-0 10300 10342
-S
-#10344
-A Garden Path~
-   @gOn either side of you huge plants grow, vegetables are here, and many other
-types of plants you have never seen before.  Large rocks separate plant rows,
-acting as stepping stones for someone to walk through.
+0 0 10340
+D3
 ~
-103 16 0 0 0 0
+~
+0 10300 10338
+S
+#10340
+The @RBl@Yoc@Wkw@Dor@Wk@n @RGa@Yte@n~
+A fortress built from lacquered building blocks rises across the Toybox
+floor. Red-painted battlements tower overhead while nutcracker sentinels stand
+beside a gate made from interlocking wooden shields.
+~
+103 8 0 0 0 0
 D0
+~
+~
+0 0 10339
+D1
+~
+~
+0 10300 10341
+S
+T 10376
+#10341
+The @RPa@Yin@Wte@Dd@n @RPa@Yra@Wde@n @RGr@You@Wnd@n~
+Perfect rows of white lines divide a broad parade square. Toy soldiers march
+in geometric formations while captains cast command dice across their shields
+to determine the next drill.
+~
+103 8 0 0 0 0
+D0
+~
+~
+0 0 10342
+D1
 ~
 ~
 0 10300 10345
 D2
 ~
 ~
-0 10300 10343
-S
-#10345
-The End of the Garden~
-   @gYou come to a wall, the garden has come to an end.  The same plants grow here
-as they did on the path, the only exit is to the south.  @gThe smell of roses
-lingers about here, making it a warm relaxing place.
+0 0 10348
+D3
 ~
-103 16 0 0 0 0
+~
+0 10300 10340
+S
+#10342
+The @RWo@Yod@We@nn @RBa@Yrr@Wac@Dks@n~
+Tiny bunks have been built at impossible scale, each neatly made beneath a
+peg holding a painted helmet. The smell of wax, pine, and weapon oil hangs in
+the regimented air.
+~
+103 8 0 0 0 0
+D1
+~
+~
+0 10300 10343
 D2
 ~
 ~
-0 10300 10344
+0 0 10341
 S
-#10346
-Namekian Village~
-   @gHouses are scarce here, but by every house is a little farm, the trees
-here are tall with a little fluff of leaves and branches at the very top.
-There are also very few people in this village, and there are less children in
-this village, it seems to be a farming village.
+#10343
+The @RSp@Yea@Wrm@Den@n'@Rs@n @RQu@Yar@Wte@Drs@n~
+Bundles of lacquered spears stand in racks beside narrow bunks. A slate at
+the end of the room records guard assignments as pairs of dice results rather
+than names.
 ~
-103 16 0 0 0 1
-D0
+103 8 0 0 0 0
+D1
+~
+~
+0 0 10344
+D3
+~
+~
+0 0 10342
+S
+#10344
+The @RSh@Yie@Wld@n @RHa@Yll@n~
+Round shields cover the walls like overlapping scales. Soldiers practice
+locking them into a wooden wall while a captain barks numbered formations
+across the room.
+~
+103 8 0 0 0 0
+D2
+~
+~
+0 10300 10351
+D3
+~
+~
+0 0 10343
+S
+#10345
+The @RAr@Yse@Wna@Dl@n of @RMa@Yke@n-@RBe@Yli@Wev@De@n~
+Wooden swords, blunt axes, painted bows, and toy lances fill carefully
+ordered racks. Harmless craftsmanship has become dangerous here through sheer
+enchantment and relentless discipline.
+~
+103 8 0 0 0 0
+D1
+~
+~
+0 0 10346
+D3
+~
+~
+0 0 10341
+S
+T 10376
+#10346
+The @RAr@Ych@Wer@n'@Rs@n @RGa@Yll@Wer@Dy@n~
+Narrow firing slits overlook painted targets across the fortress interior.
+Toy arrows hiss through the air with far more force than their bright feathers
+and rounded heads suggest.
+~
+103 8 0 0 0 0
+D2
 ~
 ~
 0 10300 10347
-D2
+D3
 ~
 ~
-0 10300 10305
+0 0 10345
 S
 #10347
-Namekian Village~
-   @gHouses are scarce here, but by every house is a little farm, the trees here
-are tall with a little fluff of leaves and branches at the very top.  There are
-also very few people in this village, and there are less children in this
-village, it seems to be a farming village.
+The @RHo@Ybb@Wy@n-@RHo@Yrs@We@n @RSt@Yab@Wle@n~
+Rows of painted hobby horses stand nose to tail beneath cavalry banners.
+Though each ends in a simple wooden pole, their hooves stamp impatiently upon
+the floor whenever a rider approaches.
 ~
-103 16 0 0 0 1
+103 8 0 0 0 0
 D0
-~
-~
-0 10300 10348
-D2
 ~
 ~
 0 10300 10346
+D1
+~
+~
+0 0 10351
 S
 #10348
-Namekian Village~
-   @gHouses are scarce here, but by every house is a little farm, the trees here
-are tall with a little fluff of leaves and branches at the very top.  There are
-also very few people in this village, and there are less children in this
-village, it seems to be a farming village.
+The @REa@Yst@Wer@nn @RBa@Ytt@Wle@Dme@Wnt@n~
+A crenellated wall overlooks the sprawling Toybox beyond the citadel. Tiny
+signal flags snap without wind, relaying orders according to the values rolled
+by captains below.
 ~
-103 16 0 0 0 1
+103 8 0 0 0 0
 D0
 ~
 ~
-0 10300 10349
-D2
+0 10300 10341
+D1
 ~
 ~
-0 10300 10347
+0 0 10349
 S
 #10349
-Namekian Village~
-   @gHouses are scarce here, but by every house is a little farm, the trees here
-are tall with a little fluff of leaves and branches at the very top.  There are
-also very few people in this village, and there are less children in this
-village, it seems to be a farming village.
+The @RWe@Yst@Wer@nn @RBa@Ytt@Wle@Dme@Wnt@n~
+Painted cannon toys and wooden ballistae line this wall, more ceremonial
+than practical but still unsettlingly animated. Brass bells mark every change
+of watch.
 ~
-103 16 0 0 0 1
+103 8 0 0 0 0
 D1
 ~
 ~
 0 10300 10350
-D2
+D3
 ~
 ~
-0 10300 10348
+0 0 10348
 S
 #10350
-Namekian Village~
-   @gHouses are scarce here, but by every house is a little farm, the trees here
-are tall with a little fluff of leaves and branches at the very top.  There are
-also very few people in this village, and there are less children in this
-village, it seems to be a farming village.
+The @RNu@Ytc@Wra@Dck@Wer@n @RWa@Ytc@Wh@n~
+Tall nutcracker sentinels stand between red pillars with jaws fixed in
+perfect square grimaces. Cracked walnuts litter the floor around their boots
+like the remains of previous judgments.
 ~
-103 16 0 0 0 1
+103 8 0 0 0 0
 D0
 ~
 ~
@@ -871,294 +896,312 @@ D3
 0 10300 10349
 S
 #10351
-Namek Road~
-   @gThe village just comes to a complete stop and a long road starts up, the
-road seems to lead off to a tall mountain.  The trees here are even more scarce
-then in the village, on the side of the road, there are many large boulders on
-the side of the road.
+The @ROf@Yfi@Wce@Drs@n' @RGa@Yme@n @RRo@Yom@n~
+A map of the Toybox covers a broad table, its districts represented by
+carved pieces. Officers roll command dice, move little soldiers, and argue over
+campaigns that appear to correspond to real patrols outside.
 ~
-103 20 0 0 0 2
+103 8 0 0 0 0
 D0
 ~
 ~
-0 10300 10352
+0 10300 10344
+D1
+~
+~
+0 0 10352
 D2
 ~
 ~
 0 10300 10350
+D3
+~
+~
+0 0 10347
 S
+T 10376
 #10352
-Namek Road~
-   @gThe road continues, as you near the mountain you notice it is still getting
-taller and taller.  You wonder what the significance of the mountain could be.
-The boulders still line the road and there are less and less trees, the ground
-seems to be harder here as well.
+The @RCa@Ypt@Wai@Dn@n'@Rs@n @RSt@Yai@Wr@n~
+Block steps climb toward the command keep beneath crossed wooden sabers.
+Every sixth step is painted gold, and each golden step bears a different order:
+ADVANCE, HOLD, TURN, GUARD, CHARGE, or LAUGH.
 ~
-103 20 0 0 0 2
-D0
-~
-~
-0 10300 10353
-D2
-~
-~
-0 10300 10351
-S
-#10353
-Namek Road~
-   @gThe mountain is straight ahead of you, it seems to be huge now, you can
-barely see the top of it, and yet there is a tree here and there, and the
-boulders are still on the side of the road.
-~
-103 20 0 0 0 2
-D0
-~
-~
-0 10300 10354
-D2
-~
-~
-0 10300 10352
-S
-#10354
-At the Foot of the Mountain~
-   @gAt the base of this huge mountain there is no grass and no trees, the
-mountain seems to just go straight up for a ways, it seems unclimbable, for it
-is just like one jagged cylindrcal piller.  It seems you are able to fy to the
-top though.
-~
-103 20 0 0 0 0
-D2
-~
-~
-0 10300 10353
-D4
-~
-~
-0 10300 10355
-S
-#10355
-Flying Up the Mountain~
-   @gThe ground is a bit further down, but if you wish to reach the top it is
-still far away, it might be easier to go back down.  @gIt seems to be getting a
-little warmer the further you go up.
-~
-103 4 0 0 0 8
-D4
-~
-~
-0 10300 10356
-D5
-~
-~
-0 10300 10354
-S
-T 10355
-#10356
-Flying Up the Mountain~
-   @gThe top is coming into view, but it is still a bit blurry, birds fly at
-this height, cawing and fluttering about.  @gIt seems to be getting a little
-warmer the further you go up.
-~
-103 4 0 0 0 8
-D4
-~
-~
-0 10300 10357
-D5
-~
-~
-0 10300 10355
-S
-T 10355
-#10357
-Flying Up the Mountain~
-   @gThe ground gets farther and farther away, the top starts to come into view
-but is not fully visible yet, it is still a little bit away.  @gIt seems to be
-getting a little warmer the further you go up.
-~
-103 4 0 0 0 8
-D4
-~
-~
-0 10300 10358
-D5
-~
-~
-0 10300 10356
-S
-T 10355
-#10358
-Flying at the Top of the Mountain~
-   @gThe long flight comes to and end here, the heat is almost unbearable, and
-the sun pounds down on you.  Towards the north is a large house, with a strange
-picture on the side.
-~
-103 4 0 0 0 8
-D0
-~
-~
-0 10300 10359
-D5
-~
-~
-0 10300 10357
-S
-T 10355
-#10359
-In front of the Elders House~
-   @gA large white building sits in front of you, it has a front door, and two
-large horns protruding off of the top of it.  Above the door is a large round
-glass window.  The sun shines down warming the area.
-~
-103 0 0 0 0 0
-D0
-~
-~
-0 10300 10360
-D2
-~
-~
-0 10300 10358
-S
-#10360
-Elders House~
-   @gThe elders house is a really large house with a tall ceiling.  There is a
-platform towards the back that will take you up to see him.  @gThe walls are
-bare here, nothing but a few cobwebs here and there, but it seems to be kept
-rather neat.
-~
-103 24 0 0 0 0
-D2
-~
-~
-0 10300 10359
-D4
-~
-~
-0 10300 10361
-S
-#10361
-Elders Room~
-   @gThis is a huge room, at the front of the room sits the large round window
-you saw outside.  In the back center of the room is the Elder.  He is huge,
-quite possibly the largest namek you have ever seen.  He sits in a huge white
-chair with a Dragon Ball atop it.
-~
-103 24 0 0 0 0
-D5
-~
-~
-0 10300 10360
-S
-#10362
-Towns Entrance~
-   @cTwo large pillars stand here, and connected within them is a large gate.
-On either side of the gate are two large Dragons, both look so real it is eerie.
-The sound of voices comes from the other side of the gate, it seems there is a
-town there.
-~
-103 4 0 0 0 3
+103 8 0 0 0 0
 D1
 ~
 ~
-0 10300 10363
+0 0 10353
+D3
+~
+~
+0 0 10351
+S
+#10353
+The @RHa@Yll@n of @RWo@Yod@We@nn @RHo@Yno@Wrs@n~
+Medals cut from tin and painted wood hang in perfect rows beside portraits
+of celebrated toy officers. Several medals commemorate victories over enemies
+that sound suspiciously like previous adventurers.
+~
+103 8 0 0 0 0
+D1
+~
+~
+0 0 10354
+D3
+~
+~
+0 0 10352
+S
+#10354
+The @RGe@Yne@Wra@Dl@n'@Rs@n @RKe@Yep@n~
+A command chamber overlooks the entire painted citadel. General
+Jack-A-Napes stands before a war table covered in soldiers, cards, and dice,
+treating the Toybox as both battlefield and game.
+~
+103 8 0 0 0 0
+D2
+~
+~
+0 10300 10355
+D3
+~
+~
+0 0 10353
+S
+#10355
+The @WDo@Mll@Cho@Mus@We@n @WFo@Mye@Wr@n~
+A towering dollhouse opens around you with wallpapered walls and perfect
+little furnishings enlarged to absurd proportions. Everything is beautiful,
+clean, and arranged with a precision that makes the room feel staged.
+~
+103 8 0 0 0 0
+D0
+~
+~
+0 0 10354
+D1
+~
+~
+0 0 10356
+D2
+~
+~
+0 0 10359
+S
+T 10389
+#10356
+The @WPe@Mrf@Mec@Wt@n @WLi@Mtt@Wle@n @WPa@Mrl@Wor@n~
+Pastel chairs surround a low tea table set for guests who never arrived.
+Porcelain dolls sit with hands folded in their laps, their glass eyes all aimed
+toward the doorway.
+~
+103 8 0 0 0 0
+D1
+~
+~
+0 0 10357
+D3
+~
+~
+0 0 10355
+S
+#10357
+The @WPa@Min@Mte@Wd@n @WKi@Mtc@Whe@nn~
+Copper pans, wooden spoons, and tiny ceramic plates hang in spotless rows.
+A cake made of painted plaster waits beneath a glass dome beside six miniature
+sugar cubes arranged like a die.
+~
+103 8 0 0 0 0
+D2
+~
+~
+0 0 10358
+D3
+~
+~
+0 0 10356
+S
+#10358
+The @WMu@Msi@Wc@n @WRo@Wom@n~
+A toy pianoforte occupies one wall beneath portraits of smiling doll
+families. The keys occasionally depress themselves, playing a simple melody
+that stops whenever anyone speaks.
+~
+103 8 0 0 0 0
+D0
+~
+~
+0 10300 10357
+D1
+~
+~
+0 0 10362
+D2
+~
+~
+0 0 10361
+S
+#10359
+The @WPo@Mrc@Mel@Wai@nn @WNu@Mrs@Mer@Wy@n~
+Small white beds line a nursery painted in gentle blue and rose. Porcelain
+children sit upright beneath embroidered blankets, and hairline cracks spread
+across several faces like frozen tears.
+~
+103 8 0 0 0 0
+D0
+~
+~
+0 10300 10355
+D1
+~
+~
+0 0 10360
+S
+T 10389
+#10360
+The @WRo@Wom@n of @WTi@Wny@n @WSh@Moe@Ws@n~
+Hundreds of tiny shoes stand in matching pairs across wall shelves. One pair
+after another turns slightly toward you as you pass, toeing the shelf edge as
+if preparing to step down.
+~
+103 8 0 0 0 0
+D1
+~
+~
+0 0 10361
+D3
+~
+~
+0 0 10359
+S
+#10361
+The @WGo@Mve@Crn@Mes@Ws@n'@Ws@n @WHa@Wll@n~
+A narrow corridor is lined with rules written in immaculate script:
+SIT STRAIGHT. SPEAK SOFTLY. NEVER CHEAT THE DICE. A final rule has been
+scratched out so violently that the wood beneath it is splintered.
+~
+103 8 0 0 0 0
+D0
+~
+~
+0 0 10358
+D2
+~
+~
+0 0 10365
+D3
+~
+~
+0 0 10360
+S
+#10362
+The @WCh@Mil@Mdr@Wen@n'@Ws@n @WBe@Mdr@Moo@Wm@n~
+Stuffed animals crowd the corners of an enormous bedroom beneath a canopy
+of paper stars. A wooden dragon curls around a bedpost, watching the door with
+gem-bright painted eyes.
+~
+103 8 0 0 0 0
+D2
+~
+~
+0 0 10363
 D3
 ~
 Gate~
-1 10363 10305
+1 10363 10358
 S
-T 10362
 #10363
-A Dirt Path~
-   @gThe ground has been trodden flat, it no longer looks like dirt, but rock,
-and it feels like it too.  @gNo creatures or people seem to come here anymore,
-it is just one deserted road.
+The @WWa@Mrd@Mro@Wbe@n @WPa@Mss@Mag@We@n~
+Open wardrobes form a passage through layers of lace, velvet, ribbons, and
+tiny formal coats. Something soft and heavy moves from wardrobe to wardrobe
+just beyond sight.
 ~
-103 4 0 0 0 3
+103 9 0 0 0 0
+D0
+~
+~
+0 0 10362
 D1
 ~
 ~
 0 10300 10364
-D3
-~
-~
-0 10300 10362
 S
 #10364
-A Dirt Path~
-   @gThe ground has been trodden flat, it no longer looks like dirt, but rock,
-and it feels like it too.  @gNo creatures or people seem to come here anymore,
-it is just one deserted road.
+The @WCr@Mac@Mke@Wd@n @WVa@Mni@Wty@n~
+A porcelain vanity has split down the middle, dividing its mirror into two
+unequal reflections. In one half everyone appears normal; in the other, every
+face is smooth white porcelain.
 ~
-103 0 0 0 0 3
+103 8 0 0 0 0
+D1
+~
+~
+0 0 10368
 D2
 ~
 ~
-0 10300 10365
+0 10300 10367
 D3
 ~
 ~
 0 10300 10363
 S
 #10365
-A Dirt Path~
-   @gThe ground has been trodden flat, it no longer looks like dirt, but rock,
-and it feels like it too.  @gNo creatures or people seem to come here anymore,
-it is just one deserted road.
+Behind the @WDo@Mll@Cho@Mus@We@n @WWa@Mll@Ws@n~
+Wallpaper gives way to bare lath and hollow wall spaces threaded with tiny
+stairs. Here the Dollhouse shows its hidden structure, including peepholes
+looking into nearly every room.
 ~
-103 0 0 0 0 3
+103 9 0 0 0 0
 D0
 ~
 ~
-0 10300 10364
-D2
+0 10300 10361
+D1
 ~
 ~
-0 10300 10366
+0 0 10366
 S
+T 10389
 #10366
-A Dirt Path~
-   @gThe long dirt path seems to be coming to an end, towards the east there is
-a large lake that seems to fill a large area.  @gNo creatures or people seem to
-come here anymore, it is just one deserted road.
+The @WCr@Maw@Cls@Mpa@Wce@n of @WBu@Mtt@Mon@Ws@n~
+Loose buttons cover the floor like colorful coins beneath the floorboards.
+Some are ordinary; others blink like eyes before rolling into cracks too narrow
+to follow.
 ~
-103 0 0 0 0 3
-D0
-~
-~
-0 10300 10365
+103 9 0 0 0 0
 D1
 ~
 ~
 0 10300 10367
+D3
+~
+~
+0 0 10365
 S
 #10367
-The Lake~
-   @BThe ground here is soft, and seems to be very fertile.  The air has a
-strange smell to it, kind of sweet in nature yet powerful.  No creatures are
-here, not even a bird.
-@n
+The @WAt@Mti@Wc@n of @WUn@Mwa@Mnt@Wed@n @WTo@Wys@n~
+Broken dolls, faded animals, bent soldiers, and discarded games lie beneath
+dusty rafters. Unlike the perfect rooms below, nothing here pretends that toys
+last forever.
 ~
-103 4 0 0 0 3
-D1
+103 9 0 0 0 0
+D0
 ~
 ~
-0 10300 10368
+0 0 10364
 D3
 ~
 ~
 0 10300 10366
 S
 #10368
-Dark Forest~
-   @T@gThis is a total change from the area west of here, the trees just seem to
-grow here, all around there are trees as far as the eye can see.  But the eye
-cannot see in here because the tree cover is so thick the light cannot penetrate
-it.  The air here smells stagnant and cold.  Sounds fill the area, making it
-impossible to think.
+The @WTe@Wa@n @WPr@Moc@Ces@Msi@Wo@nn~
+A long runner leads toward a formal tea room while porcelain servants carry
+empty trays in endless circles. Every few moments they stop together, roll a
+single die, and change direction without explanation.
 ~
-103 1 0 0 0 3
+103 8 0 0 0 0
 D1
 ~
 ~
@@ -1166,84 +1209,88 @@ D1
 D3
 ~
 ~
-0 10300 10367
+0 10300 10364
 S
 #10369
-A Small Clearing~
-   @gThe trees seem to suddenly stop growing, not even grass grows here, a large
-cylindricle rock lies in the center of this area, it seems to be the cause of
-the clearing.
+@WMa@Mda@Wme@n'@Ws@n @WTe@Wa@n @WRo@Wom@n~
+A flawless tea service waits beneath a crystal chandelier, every cup turned
+at precisely the same angle. Madame Porcelaine presides at the head of the
+table, smiling through a web of delicate cracks.
 ~
-103 0 0 0 0 3
-D1
+103 8 0 0 0 0
+D2
 ~
 ~
-0 10300 10370
+0 0 10370
 D3
 ~
 ~
 0 10300 10368
 S
 #10370
-A Short Forest Path~
-   @gDarkness crawls upon this are once more, the trees on either side of the
-path are thick, causing the area to be dark.  Sounds emit from this area,
-causing
-an eerie feeling.
+The @GHo@Yus@We@n of @GCh@Yan@Wce@n~
+Dark polished wood replaces the Dollhouse pastels at the threshold of a
+vast gaming hall. Green felt tables glow beneath hanging lamps while dice,
+cards, and masked dealers move through games played entirely by Toybox folk.
 ~
-103 1 0 0 0 3
+103 8 0 0 0 0
 D0
-~
-~
-0 10300 10371
-D3
 ~
 ~
 0 10300 10369
-S
-#10371
-A Large Clearing~
-   @gThe darkness overcomes you no more, it seems to have left this place now.
-The grass grows freely and stands about waist high on either side of a short
-dirt path leading to a large dark cave.
-~
-103 0 0 0 0 3
 D1
 ~
 ~
-0 10300 10372
-D2
-~
-~
-0 10300 10370
+0 0 10371
 S
-#10372
-Opening to a Large Cave~
-   @gA mild odor comes from the large opening of the cave.  Moss grows wildly
-from its sides, and many types of mushrooms grow here as well.  The inside of
-the cave looks dark and moist, it seems to not have been entered in years.
+T 10390
+#10371
+The @GDe@Yal@Wer@Rs@n' @GGa@Yll@Wer@Ry@n~
+House dealers stand behind narrow tables, watching Harlequins, Pierrots,
+soldiers, and dolls wager buttons, masks, ribbons, medals, and favors. No one
+offers you a seat; these games belong to the Toybox.
 ~
-103 4 0 0 0 0
+103 8 0 0 0 0
 D0
 ~
 ~
-0 10300 10393
+0 0 10372
+D1
+~
+~
+0 10300 10375
+D2
+~
+~
+0 10300 10378
+D3
+~
+~
+0 0 10370
+S
+#10372
+The @GTa@Ybl@We@n of @GSi@Yx@n @GFa@Yce@Ws@n~
+A circular table has been carved with six deep numbered wells. Living dice
+bounce from well to well while a silent crowd watches each result with the
+solemnity of a royal decree.
+~
+103 8 0 0 0 0
 D1
 ~
 ~
 0 10300 10373
-D3
+D2
 ~
 ~
-0 10300 10371
+0 0 10371
 S
 #10373
-Entering The Cave~
-   @gThe air stagnates more as you walk in to the entrance of the cave.  A
-torch presides on the wall here makeing only a little visible, further into the
-cave you cannot see though.
+The @GRa@Ytt@Wle@n of @GIv@Yor@Wy@n~
+Ivory dice spill continuously from a brass chute, tumble across green felt,
+and vanish through a slot at the far edge. The pattern never repeats, though
+the dealers insist that every roll means something.
 ~
-103 256 0 0 0 0
+103 8 0 0 0 0
 D1
 ~
 ~
@@ -1253,33 +1300,46 @@ D3
 ~
 0 10300 10372
 S
+T 10390
 #10374
-Dark Cave~
-   @gThe floor seems to steepen here, causing water to trickle down it every now
-and then, it also begins to get slimier, causing your feet to slip.  @gIt seems
-rare that anyone would ever enter such a dark dank place.
+The @GGa@Yll@Wer@Ry@n of @GSn@Yak@We@n @GEy@Yes@n~
+Pairs of dice showing double ones have been mounted behind glass like
+trophies of disaster. Small plaques beneath them record duels, demotions,
+broken engagements, and other calamities decided by those rolls.
 ~
-103 257 0 0 0 0
-D1
+103 8 0 0 0 0
+D2
 ~
 ~
-0 10300 10375
+0 0 10381
 D3
 ~
 ~
 0 10300 10373
 S
 #10375
-Caves Intersection~
-   @gThis area seems to have a kinda of natural light to it, but it does not
-originate from this room, the light seems to come from the north where a large
-ball of light can be seen.
+The @GCa@Yrd@Wsh@Rar@Wp@n'@Gs@n @GGa@Yll@Wer@Ry@n~
+Painted cards flick between gloved hands faster than the eye can follow.
+Card-knaves lean against the walls, their bodies decorated with suits that
+change whenever a dealer cuts the deck.
 ~
-103 256 0 0 0 0
-D0
+103 8 0 0 0 0
+D1
 ~
 ~
-0 10300 10376
+0 0 10376
+D3
+~
+~
+0 10300 10371
+S
+#10376
+The @GRe@Yd@n @GFe@Ylt@n @GTa@Ybl@We@n~
+A red-felt table is crowded by Harlequins wagering bells and pieces of
+costume. The dealer rolls first, then chooses his expression only after seeing
+the result.
+~
+103 8 0 0 0 0
 D2
 ~
 ~
@@ -1287,116 +1347,137 @@ D2
 D3
 ~
 ~
-0 10300 10374
+0 0 10375
 S
-#10376
-A Brightly Lit Cavern~
-   @gThe ground seems to level here, and the air in this room smells fresh and
-warm.  A small orb lies in the middle of the cavern giving off a strange amount
-of light.
-~
-103 256 0 0 0 0
-D2
-~
-~
-0 10300 10375
-S
-T 10376
 #10377
-Leaveing Dark Cave~
-   @gThe air becomes less stagnant and more breathable, light begins to crawl
-back into the cave making it easier to see.  @gThe sound of rabbits comes from
-the outside, and the smell of flowers fills your nostrils.
+The @GBl@Yac@Wk@n @GFe@Ylt@n @GTa@Ybl@We@n~
+Pierrots sit in absolute silence around black felt, rolling ivory dice one
+at a time. Wins are greeted with bowed heads; losses with the removal of a
+button, ribbon, or piece of mask.
 ~
-103 256 0 0 0 0
+103 8 0 0 0 0
 D0
 ~
 ~
-0 10300 10375
-D2
+0 10300 10376
+D1
 ~
 ~
-0 10300 10378
+0 0 10381
 S
 #10378
-Dark Caves Exit~
-   @gLight pours into the room from the large hole in the wall leading to the
-outside.  The fresh air seems to come as a shock seeing as how there was none
-inside the cave.
+The @GHa@Yll@n of @GWa@Yge@Wrs@n~
+Tall shelves hold the strange stakes of Toybox society: medals, painted
+hearts, puppet strings, names written on cards, tiny crowns, and sealed promises.
+Everything here has been won or lost at a table.
 ~
-103 256 0 0 0 0
+103 8 0 0 0 0
 D0
 ~
 ~
-0 10300 10377
-D2
+0 10300 10371
+D1
 ~
 ~
-0 10300 10379
+0 0 10379
 S
+T 10390
 #10379
-A Flower Field~
-   @gThe smell of flowers fills your nostrils, the ground is not visible
-throught the flowers yet it seems the there is a path to the south leading you
-away from the flowers.
+The @GCh@Yam@Wbe@Rr@n of @GDo@Yub@Wle@Rs@n~
+Pairs dominate every decoration in this room: twin bells, twin masks, twin
+candles, and paired dice frozen on matching faces. Dealers whisper excitedly
+whenever the same number appears twice.
 ~
-103 0 0 0 0 2
-D0
-~
-~
-0 10300 10378
-D2
+103 8 0 0 0 0
+D1
 ~
 ~
-0 10300 10380
+0 0 10380
+D3
+~
+~
+0 0 10378
 S
 #10380
-Path To the Villa~
-   @gThis path is different from any you have seen, the stones are golden and
-perfectly round, and they glow beautifully.  The path goes south towards a small
-Villa.
+The @GLo@Yad@Wed@n @GTa@Ybl@We@n~
+This table tilts so subtly that only the rolling dice seem to notice.
+Harlequins accuse dealers, dealers accuse dice, and the dice themselves bounce
+away before anyone can prove a thing.
 ~
-103 0 0 0 0 1
+103 8 0 0 0 0
 D0
-~
-~
-0 10300 10379
-D2
 ~
 ~
 0 10300 10381
+D3
+~
+~
+0 0 10379
 S
 #10381
-In front of the Villa~
-   @gA small building with what looks like graffiti on the door is here, the
-door is slightly ajar, the path you stand on has the same circular golden stones
-as to the north.
+The @GHo@Yus@We@n @GLe@Ydg@Wer@n~
+Enormous ledgers record generations of wagers in cramped handwriting.
+Several pages are devoted to a single recurring entry: THE JESTER OWES THE
+HOUSE, followed by increasingly impossible numbers.
 ~
-103 0 0 0 0 1
+103 8 0 0 0 0
 D0
+~
+~
+0 10300 10374
+D1
+~
+~
+0 0 10382
+D2
 ~
 ~
 0 10300 10380
-D2
+D3
 ~
 ~
-0 10300 10382
+0 0 10377
 S
 #10382
-Center of the Building~
-   @gThis room seems to be the exact center of the Villa, it has a tall ceiling
-and a wooden floor that looks to have been freshly polished.  @gAlthough the
-room is kept neat, it seems that no one has lived here for quite some time.
+The @GGa@Yll@Wer@Ry@n of @GLo@Yst@n @GSt@Yak@Wes@n~
+Glass cases display objects surrendered in famous wagers: a captain's
+medal, a puppetmaster's favorite string, a porcelain eye, and a black queen's
+chess piece. Each case is locked with a tiny numbered seal.
 ~
-103 2056 0 0 0 0
-D0
+103 8 0 0 0 0
+D1
+~
+~
+0 10300 10383
+D3
 ~
 ~
 0 10300 10381
+S
+#10383
+The @GLa@Yst@n @GBe@Ytt@Win@Rg@n @GRa@Yil@n~
+A brass rail separates the common gaming floor from the Croupier's private
+pit. Toybox citizens crowd along it, murmuring odds and shaking dice cups as
+though a great match is about to begin.
+~
+103 8 0 0 0 0
 D1
 ~
 ~
 0 10300 10384
+D3
+~
+~
+0 0 10382
+S
+T 10390
+#10384
+The @GCr@You@Wpi@Rer@n'@Gs@n @GPi@Yt@n~
+Green felt covers a circular fighting floor surrounded by stacked ivory
+dice. The Croupier of Chance waits behind a black table, silver cup in hand,
+ready to let two honest dice decide how the House fights.
+~
+103 8 0 0 0 0
 D2
 ~
 ~
@@ -1406,133 +1487,111 @@ D3
 ~
 0 10300 10383
 S
-#10383
-Piccolo's Bedroom~
-   @gThis is a small room, with a bed only large enough for one person, there is
-a small mat in the center of the room, it looks to be used for meditation.
-~
-103 2056 0 0 0 0
-D1
-~
-~
-0 10300 10382
-S
-#10384
-The Villas Kitchen~
-   @gThe room is small, but well lit, counters line the walls and a table sits
-in the center of the room, one chair is off to the corner of the room.  This
-room seems to be well kempt.
-~
-103 2056 0 0 0 0
-D2
-~
-~
-0 10300 10390
-D3
-~
-~
-0 10300 10382
-S
 #10385
-A Dimly Lit Room~
-   @gThere seems to be little light, the only light coming in seems to be
-distorted by the outline of your body in the doorframe.  In the center of the
-room is a hole only large enough for one person to fit in at a time.
+The @WIv@Dor@Wy@n @WSq@Dua@Wre@n~
+The gaming hall opens onto an enormous chessboard where each square is wide
+enough to serve as a room. Ivory and black pieces move in the distance with
+slow, deliberate purpose.
 ~
 103 8 0 0 0 0
-D0
-~
-~
-0 10300 10382
-D5
-~
-~
-0 10300 10386
-S
-#10386
-A Rusty Ladder~
-   @gThe ladder that leads downwards is old and rusty, it feels as if it could
-break at any time.  @gThe ladder creeks under the strain you are putting on it,
-flecks of rust fall to the ground as well.
-~
-103 2056 0 0 0 0
-D4
-~
-~
-0 10300 10385
-D5
-~
-~
-0 10300 10387
-S
-#10387
-Bottom of the Ladder~
-   @gThe ladder ends abruptly, this room has a small light hanging from the
-ceiling, casting shadows on the walls from the boxes that cover this area.
-@gThe exit to the south seems clear, but it also seems to be very small.
-~
-103 2056 0 0 0 0
-D2
-~
-~
-0 10300 10388
-D4
-~
-~
-0 10300 10386
-S
-#10388
-A Small Hallway~
-   @gThe hallway isn't long at all, it is rather skinny as well.  There is
-nothing lining the walls here, and if there were it would make it impossible to
-travel.  To the east is a room that seems to be full of junk.
-~
-103 8 0 0 0 0
-D0
-~
-~
-0 10300 10387
-D1
-~
-~
-0 10300 10389
-S
-#10389
-Storage Room~
-   @gThe walls of this room are covered with old robots and old weapons, along
-with items.  There seems to be no walking space in this area, but you can see
-clearly with the light hanging from the ceiling.
-~
-103 2056 0 0 0 0
-D3
-~
-~
-0 10300 10388
-S
-#10390
-A Ruined Room~
-   @gThis room seems to have been decimated by some sort of large energy.
-Rubble lies all over the ground here, and the stone that is actually standing
-has large scorch marks on it.
-~
-103 2048 0 0 0 0
 D0
 ~
 ~
 0 10300 10384
+D1
+~
+~
+0 0 10386
+S
+T 10391
+#10386
+The @WBl@Dac@Wk@n @WSq@Dua@Wre@n~
+Black lacquer gleams beneath your feet while towering pieces cast long
+geometric shadows. Somewhere across the board, a wooden knight strikes the
+floor with a hollow clop.
+~
+103 8 0 0 0 0
+D2
+~
+~
+0 0 10387
+D3
+~
+~
+0 0 10385
+S
+#10387
+The @WPa@Ww@nn @WLi@Wne@n~
+A rank of ivory pawns advances and retreats according to shouted moves from
+unseen players. None turns its head, yet every painted face seems aware of your
+position on the board.
+~
+103 8 0 0 0 0
+D0
+~
+~
+0 0 10386
+D1
+~
+~
+0 0 10388
+S
+#10388
+The @WKn@Dig@Wht@n'@Ws@n @WCr@Dos@Dsi@Wng@n~
+Deep gouges mark the squares where black knights land after impossible
+leaps. Their routes ignore walls, lines, and common sense, obeying only rules
+older than the Toybox itself.
+~
+103 8 0 0 0 0
+D0
+~
+~
+0 10300 10389
+D3
+~
+~
+0 0 10387
+S
+#10389
+The @WBi@Dsh@Wop@n'@Ws@n @WDi@Dag@Don@Wal@n~
+Ivory bishops glide along a diagonal lane bordered by small candles.
+Their pointed crowns never turn, but their paths intersect with unnerving
+precision.
+~
+103 8 0 0 0 0
+D1
+~
+~
+0 0 10390
+D2
+~
+~
+0 0 10388
+S
+T 10391
+#10390
+The @WRo@Wok@n'@Ws@n @WFi@Wle@n~
+A straight corridor of alternating squares leads between blocky black
+rooks. When one moves, the entire lane trembles beneath its blunt and absolute
+advance.
+~
+103 8 0 0 0 0
 D2
 ~
 ~
 0 10300 10391
+D3
+~
+~
+0 0 10389
 S
 #10391
-A Dark Room~
-   @gThis rooms electric supply seems to have been cut off by the destruction of
-the other room, but an exit to the east can still be seen.  @gIt is hard to see
-what is happening in there, but sounds of gears and electricity come from the
-room to the east.
+The @WFo@Drk@Wed@n @WPo@Dsi@Dti@Wo@nn~
+Several attack lines cross here at once, marked by scratches in the lacquer.
+Toy soldiers avoid the square entirely, leaving it to chess pieces and anyone
+foolish enough to stand where multiple moves converge.
 ~
-103 2056 0 0 0 0
+103 8 0 0 0 0
 D0
 ~
 ~
@@ -1543,123 +1602,131 @@ D1
 0 10300 10392
 S
 #10392
-Teleportation Room~
-   @gThe teleportation room sits here, the floor is made of concrete, and the
-walls are made of wood.  A large circular object sits in the middle of the room,
-glowing and humming.
+The @WQu@Dee@Wn@n'@Ws@n @WAp@Dpr@Doa@Wch@n~
+Black banners hang above the board as the pieces become more elaborate and
+dangerous. A crown-shaped shadow stretches across several squares even though
+the Queen herself cannot yet be seen.
 ~
-103 6152 0 0 0 0
+103 8 0 0 0 0
+D0
+~
+~
+0 0 10393
 D3
 ~
 ~
 0 10300 10391
 S
+T 10391
 #10393
-Going To the Cave~
-   @gThe ground is soft and moist, it feels as though a gentle rain just fell
-here, it is a calm serene place, and the smell of apples lingers in the air all
-around you.
+The @WTh@Dre@Wat@Den@Wed@n @WKi@Wng@n~
+An ivory king stands frozen behind a screen of battered pawns. Bells ring
+whenever the black pieces shift, and a painted herald repeatedly announces
+CHECK to an audience that never answers.
 ~
-103 0 0 0 0 3
-D0
+103 8 0 0 0 0
+D1
 ~
 ~
-0 10300 10394
+0 0 10394
 D2
 ~
 ~
-0 10300 10372
+0 10300 10392
 S
 #10394
-An Apple Orchard~
-   @gThe ground is moist here as well, and the air still smells of apples, but
-it is stronger here then it would be anywhere else.  Apple Trees grow wildly
-here, and there is no other tree to be seen.
+@WCh@Dec@Wkm@Dat@We@n~
+The board ends beneath a towering black throne-piece shaped like a crowned
+woman. The Black Chess Queen commands every line around her, the surrounding
+squares arranged into a position from which there appears to be no escape.
 ~
-103 0 0 0 0 3
+103 8 0 0 0 0
 D2
+~
+~
+0 10300 10395
+D3
 ~
 ~
 0 10300 10393
-D3
-~
-~
-0 10300 10395
 S
 #10395
-End of an Apple Orchard~
-   @gThe ground is moist here as well, and the air still smells of apples, but
-it is stronger here then it would be anywhere else.  Apple Trees grow wildly
-here, and there is no other tree to be seen.  To the north is a lot of brush.
+The @REm@Dpt@Wy@n @RAu@Ddi@Wen@Yce@n~
+Beyond the chessboard waits a theatre with no stage, only rows of empty
+seats facing you. Every seat bears a jester mask, and every mask is turned in
+your direction.
 ~
-103 0 0 0 0 3
+103 9 0 0 0 0
 D0
-~
-~
-0 10300 10396
-D1
 ~
 ~
 0 10300 10394
-S
-#10396
-Start of the Brush~
-   @gThe orchards end marks the beginning of the brush, it is thick, but there
-seems to be a path leading straight through it, the sounds of people come from
-the other side of the brush.
-~
-103 0 0 0 0 3
-D0
-~
-~
-0 10300 10397
-D2
-~
-~
-0 10300 10395
-S
-#10397
-Path Through the Brush~
-   @gThe brush seems to have been cleared out in this area explicitly for
-walking, the brush on both sides of you looks to be dangerious.  @g It looks as
-if there are multiple animals caught in the brush on both sides.
-~
-103 0 0 0 0 3
-D0
-~
-~
-0 10300 10398
-D2
+D1
 ~
 ~
 0 10300 10396
 S
-#10398
-A Dangerous Path~
-   @gThe large pile of brush seems to have not been placed there on purpose, it
-seems as though it has grown there over the years, and it grows here as well,
-but not as much, for it seems to have been trodden down by people.
+T 10392
+#10396
+The @RHa@Dll@n of @RCr@Doo@Wke@Yd@n @RMi@Drr@Wor@Ys@n~
+Black-and-white mirrors line a narrowing hall, each reflecting a different
+part of the Toybox behind you. In every reflection the Jester stands somewhere
+in the background, though the hall itself remains empty.
 ~
-103 0 0 0 0 2
-D2
-~
-~
-0 10300 10397
-D3
-~
-~
-0 10300 10399
-S
-#10399
-Journeys End Inn~
-   @gA large torn looking building cast shadows all over the place.  A sign on
-the door shows you that this place has been closed for many years.  The windows
-are broken, and a few are just missing.
-~
-103 0 0 0 0 1
+103 9 0 0 0 0
 D1
 ~
 ~
-0 10300 10398
+0 0 10397
+D3
+~
+~
+0 0 10395
+S
+#10397
+The @RLa@Dst@n @RCu@Drt@Wai@nn~
+A single curtain hangs from ceiling to floor, half crimson and half black.
+No breeze moves it. From the other side comes the patient rattle of one die
+being shaken in a closed hand.
+~
+103 9 0 0 0 0
+D1
+~
+~
+0 0 10398
+D3
+~
+~
+0 0 10396
+S
+T 10392
+#10398
+Before the @RSm@Dil@We@n~
+The room beyond is almost colorless. A white path crosses a black floor
+toward a doorway painted as an enormous crimson smile, and six pale pips glow
+one by one around the arch.
+~
+103 9 0 0 0 0
+D1
+~
+~
+0 0 10399
+D3
+~
+~
+0 10300 10397
+S
+T 10392
+#10399
+Behind the @RSm@Dil@We@n~
+The Toybox ends in a circular chamber of black lacquer and faded motley.
+At its center stands the Jester Behind the Smile beside a giant ivory die,
+while every bell in the realm hangs silent overhead awaiting the next roll.
+~
+103 9 0 0 0 0
+D3
+~
+~
+0 0 10398
 S
 $~

@@ -1,255 +1,940 @@
-#10304
-kami~
-the guardian of earth~
-Kami, the guardian of earth stands here.
+#10300
+pierrot pale fool mask~
+a @Yso@Rrr@Wow@Rfu@Yl@n @YPi@Rer@Rro@Yt@n~
+A @Yso@Rrr@Wow@Rfu@Yl@n @YPi@Rer@Rro@Yt@n stands beneath a black-and-white mask.
 ~
-   @WKami has long pointy ears, and green skin, he also has two antenna on his
-head.  Kami wears a white robe like thing that has a strange symbol on the
-front.
-@n
-~
-253962 0 0 0 0 0 0 0 0 E
-1 20 9 0d0+10 1d2+0
-10 100
+Painted in moon-pale white and dressed in soft black and ivory, this
+Pierrot carries sadness like a courtly office. A small black die is
+tucked between two gloved fingers.~
+8 0 0 0 0 0 0 0 0 E
+30 17 0 5d7+150 4d3+2
+0 0
 8 8 0
-BodyProfile: 1
+Str: 18
+Dex: 18
+Int: 18
+Wis: 18
+Con: 18
+Cha: 18
+Wimpy: 15
+Evasion: 10
+LootItem: 10300 25
+E
+T 10302
+#10301
+harlequin fool motley diamond~
+a @Rqu@Mic@Yk@n-@Rfo@Mot@Yed@n @RHa@Mrl@Yeq@Wui@nn~
+A @Rqu@Mic@Yk@n-@Rfo@Mot@Yed@n @RHa@Mrl@Yeq@Wui@nn dances from heel to heel.
+~
+Crimson, violet, and gold diamonds cover this acrobat's motley. Bells
+tremble at the points of the cap, and a painted die flashes constantly
+between nimble fingers.~
+8 0 0 0 0 0 0 0 0 E
+31 17 0 5d7+155 4d4+2
+0 0
+8 8 0
+Str: 18
+Dex: 18
+Int: 18
+Wis: 18
+Con: 18
+Cha: 18
+Wimpy: 15
+Evasion: 10
+LootItem: 10301 25
+E
+T 10303
+#10302
+mime grinning silent fool~
+the @WGr@Din@Dni@Wng@n @WMi@Wme@n~
+The @WGr@Din@Dni@Wng@n @WMi@Wme@n watches in perfect silence.
+~
+White greasepaint, black gloves, and a fixed impossible grin make this
+silent performer difficult to read. No matter what happens, not a sound
+escapes the mime.~
+8 0 0 0 0 0 0 0 0 E
+32 16 0 5d7+160 4d4+2
+0 0
+8 8 0
+Str: 18
+Dex: 18
+Int: 18
+Wis: 18
+Con: 18
+Cha: 18
+Wimpy: 16
+Evasion: 10
+LootItem: 10302 25
 E
 T 10304
-#10305
-Namekian Priest~
-a Namekian Priest~
-A Namekian Priest stands here looking at you.
+#10303
+motley fool jester bells~
+a @Rmo@Mtl@Yey@n @Rfo@Mol@n~
+A @Rmo@Mtl@Yey@n @Rfo@Mol@n capers here with a fistful of dice.
 ~
-   It looks unfinished.  He looks just like the other people in this village,
-his green skin, antenna, and namekian cloths.
-~
-10 0 0 0 120 0 0 0 0 E
-1 20 9 0d0+10 1d2+0
-10 100
+This lesser court fool wears mismatched motley covered in tiny bells,
+card suits, and stitched pips. Several colored dice click together in
+one hand.~
+8 0 0 0 0 0 0 0 0 E
+30 17 0 5d7+150 4d3+2
+0 0
 8 8 0
-BodyProfile: 1
+Str: 18
+Dex: 18
+Int: 18
+Wis: 18
+Con: 18
+Cha: 18
+Wimpy: 15
+Evasion: 10
 E
 T 10305
+#10304
+scaramouche masked duelist rapier~
+a @Rma@Msk@Yed@n @RSc@Mar@Yam@Wou@Ych@Me@n~
+A @Rma@Msk@Yed@n @RSc@Mar@Yam@Wou@Ych@Me@n flourishes a slender practice blade.
+~
+A swaggering half-mask hides the duelist's eyes while a bright sash
+trails behind every theatrical step. Every movement begs for an
+audience.~
+8 0 0 0 0 0 0 0 0 E
+33 16 0 5d7+165 4d4+2
+0 0
+8 8 0
+Str: 18
+Dex: 18
+Int: 18
+Wis: 18
+Con: 18
+Cha: 18
+Wimpy: 16
+Evasion: 11
+LootItem: 10303 25
+E
+T 10306
+#10305
+columbine dancer masked courtier~
+a @Rgr@Mac@Yef@Wul@n @RCo@Mlu@Ymb@Win@Ye@n~
+A @Rgr@Mac@Yef@Wul@n @RCo@Mlu@Ymb@Win@Ye@n turns slowly upon painted slippers.
+~
+Pearl and rose ribbons frame a delicate mask. Her movements are precise
+enough to look choreographed even when she simply reaches for a die.~
+8 0 0 0 0 0 0 0 0 E
+32 16 0 5d7+160 4d4+2
+0 0
+8 8 0
+Str: 18
+Dex: 18
+Int: 18
+Wis: 18
+Con: 18
+Cha: 18
+Wimpy: 16
+Evasion: 10
+LootItem: 10304 25
+E
+T 10306
 #10306
-Mr. Popo~
-the guardians helper~
-Mr. Popo is kneeling here tending to his flowers whistling.
+marionette puppet wooden strings~
+a @opa@Yin@Yte@od@n @oMa@Yri@Ron@Yet@ote@n~
+A @opa@Yin@Yte@od@n @oMa@Yri@Ron@Yet@ote@n jerks upon nearly invisible strings.
 ~
-   @WMr.  Popo is a short fat man, his skin is fully black.  He wears a turban
-with a jewel in the center, also around his body he wears a red vest, and on his
-legs he wears tan pants.
-@n
-~
-253962 0 0 0 0 0 0 0 0 E
-1 20 9 0d0+10 1d2+0
-10 100
-6 6 1
+Jointed limbs, a lacquered face, and dark cords descending from above
+give this puppet a disturbing imitation of life.~
+8 0 0 0 0 0 0 0 0 E
+34 16 0 5d7+170 4d4+2
+0 0
+8 8 0
+Str: 18
+Dex: 18
+Int: 18
+Wis: 18
+Con: 18
+Cha: 18
+Wimpy: 17
+Evasion: 11
+LootItem: 10306 25
 E
+T 10307
 #10307
-large wolf~
-a large wolf~
-A large wolf stands here growling.
+broken marionette puppet cracked strings~
+a @obr@Yok@oe@nn @oMa@Yri@Ron@Yet@ote@n~
+A @obr@Yok@oe@nn @oMa@Yri@Ron@Yet@ote@n drags a nest of snapped strings.
 ~
-   The wolf has a very dirty looking coat, she seems angry at something.
-~
-72 0 0 0 16 0 0 0 0 E
-2 20 8 0d0+20 0d2+0
-20 400
-8 8 2
-BareHandAttack: 4
-BodyProfile: 2
+One arm hangs backward at the elbow and half the painted smile has been
+scraped away. It still moves whenever unseen strings twitch.~
+8 0 0 0 0 0 0 0 0 E
+34 16 0 5d7+170 4d4+2
+0 0
+8 8 0
+Str: 18
+Dex: 18
+Int: 18
+Wis: 18
+Con: 18
+Cha: 18
+Wimpy: 17
+Evasion: 11
+LootItem: 10307 25
 E
+T 10307
+#10308
+dancing marionette puppet ballerina~
+a @oda@Ync@Yin@og@n @oMa@Yri@Ron@Yet@ote@n~
+A @oda@Ync@Yin@og@n @oMa@Yri@Ron@Yet@ote@n spins beneath taut silver strings.
+~
+Carved in the shape of a court dancer, this puppet pirouettes with
+impossible balance. Its polished wooden feet barely seem to touch the
+floor.~
+8 0 0 0 0 0 0 0 0 E
+35 16 0 5d7+175 4d4+2
+0 0
+8 8 0
+Str: 18
+Dex: 18
+Int: 18
+Wis: 18
+Con: 18
+Cha: 18
+Wimpy: 17
+Evasion: 11
+LootItem: 10310 25
+E
+T 10307
+#10309
+executioner marionette puppet axe~
+an @oex@Yec@Rut@Rio@Yne@or@n @oMa@Yri@Ron@Yet@ote@n~
+An @oex@Yec@Rut@Rio@Yne@or@n @oMa@Yri@Ron@Yet@ote@n looms beneath heavy black strings.
+~
+This oversized puppet has a square black hood painted onto its wooden
+head and both hands wrapped around an enormous toy axe.~
+8 0 0 0 0 0 0 0 0 E
+37 16 0 6d8+185 5d4+3
+0 0
+8 8 0
+Str: 18
+Dex: 18
+Int: 18
+Wis: 18
+Con: 18
+Cha: 18
+Wimpy: 18
+Evasion: 12
+LootItem: 10309 25
+E
+T 10307
+#10310
+puppetmaster master strings puppeteer~
+a @opu@Ypp@Ret@Rma@Yst@oer@n~
+A @opu@Ypp@Ret@Rma@Yst@oer@n tests a fan of black control strings.
+~
+Long fingers work a carved control bar while dozens of cords disappear
+into the rafters. Tiny bone dice hang from the puppetmaster's belt.~
+8 0 0 0 0 0 0 0 0 E
+37 16 0 6d8+185 5d4+3
+0 0
+8 8 0
+Str: 18
+Dex: 18
+Int: 18
+Wis: 18
+Con: 18
+Cha: 18
+Wimpy: 18
+Evasion: 12
+LootItem: 10308 25
+E
+T 10308
+#10311
+stringcrawler strings knot crawling~
+a @ost@Yri@Rng@Wcr@Raw@Yle@or@n~
+A crawling knot of puppet strings writhes across the floor.
+~
+Knotted cord, hooks, and tiny wooden control bars have tangled into a
+living thing that scuttles like a many-legged spider.~
+8 0 0 0 0 0 0 0 0 E
+35 16 0 5d7+175 4d4+2
+0 0
+8 8 0
+Str: 18
+Dex: 18
+Int: 18
+Wis: 18
+Con: 18
+Cha: 18
+Wimpy: 17
+Evasion: 11
+E
+T 10309
+#10312
+toy swordsman soldier wooden~
+a @Rto@Yy@n @Rsw@Yor@Wds@Dma@nn~
+A @Rto@Yy@n @Rsw@Yor@Wds@Dma@nn stands at painted attention.
+~
+Lacquered armor and a bright wooden sword make this soldier look
+harmless until its painted eyes focus with military precision.~
+8 0 0 0 0 0 0 0 0 E
+36 16 0 6d8+180 5d4+3
+0 0
+8 8 0
+Str: 18
+Dex: 18
+Int: 18
+Wis: 18
+Con: 18
+Cha: 18
+Wimpy: 18
+Evasion: 12
+LootItem: 10312 25
+E
+T 10310
+#10313
+toy spearman soldier wooden~
+a @Rto@Yy@n @Rsp@Yea@Wrm@Da@nn~
+A @Rto@Yy@n @Rsp@Yea@Wrm@Da@nn levels a lacquered spear.
+~
+Red-painted shoulder plates and a long wooden spear mark this toy as
+line infantry in the Jester's miniature army.~
+8 0 0 0 0 0 0 0 0 E
+36 16 0 6d8+180 5d4+3
+0 0
+8 8 0
+Str: 18
+Dex: 18
+Int: 18
+Wis: 18
+Con: 18
+Cha: 18
+Wimpy: 18
+Evasion: 12
+E
+T 10310
+#10314
+toy archer soldier wooden bow~
+a @Rto@Yy@n @Rar@Ych@Wer@n~
+A @Rto@Yy@n @Rar@Ych@Wer@n tests the string of a painted bow.
+~
+A green-plumed cap, tiny quiver, and rigid wooden posture distinguish
+this archer from the rank-and-file soldiers.~
+8 0 0 0 0 0 0 0 0 E
+37 16 0 6d8+185 5d4+3
+0 0
+8 8 0
+Str: 18
+Dex: 18
+Int: 18
+Wis: 18
+Con: 18
+Cha: 18
+Wimpy: 18
+Evasion: 12
+LootItem: 10314 25
+E
+T 10310
+#10315
+toy shieldbearer soldier wooden shield~
+a @Rto@Yy@n @Rsh@Yie@Wld@Dbe@War@Yer@n~
+A @Rto@Yy@n @Rsh@Yie@Wld@Dbe@War@Yer@n braces behind a round painted shield.
+~
+The soldier's shield is almost as tall as its lacquered body. Chips
+along the rim prove that the bright paint is not merely decorative.~
+8 0 0 0 0 0 0 0 0 E
+38 16 0 6d8+190 5d4+3
+0 0
+8 8 0
+Str: 18
+Dex: 18
+Int: 18
+Wis: 18
+Con: 18
+Cha: 18
+Wimpy: 19
+Evasion: 12
+LootItem: 10315 25
+E
+T 10310
 #10316
-Matilda~
-Matilda~
-Matilda sits behind her desk writing something on a piece of paper.
+nutcracker sentinel guard wooden~
+a @Rnu@Ytc@Wra@Dck@Wer@n @Rse@Ynt@Win@Del@n~
+A @Rnu@Ytc@Wra@Dck@Wer@n @Rse@Ynt@Win@Del@n guards the way with square-jawed severity.
 ~
-   She is a very pretty woman, and is also very polite, she smile sweetly at you
-and then goes back to writing on her paper.
+Towering over ordinary toy soldiers, this red-coated guardian has a
+hinged jaw, black wooden boots, and the posture of a carved executioner.~
+8 0 0 0 0 0 0 0 0 E
+39 16 0 6d8+195 5d4+3
+0 0
+8 8 0
+Str: 18
+Dex: 18
+Int: 18
+Wis: 18
+Con: 18
+Cha: 18
+Wimpy: 19
+Evasion: 13
+LootItem: 10317 25
+E
+T 10310
+#10317
+toy captain officer soldier command die~
+a @Rto@Yy@n @Rca@Ypt@Wai@nn~
+A @Rto@Yy@n @Rca@Ypt@Wai@nn rolls a command die across one gauntlet.
 ~
-26 0 0 0 120 0 0 0 0 E
-1 20 9 0d0+10 1d2+0
-10 100
-6 6 2
+Gold trim marks this wooden officer above the common ranks. A six-faced
+command die hangs beside a tiny saber.~
+8 0 0 0 0 0 0 0 0 E
+40 15 0 6d8+200 5d4+3
+0 0
+8 8 0
+Str: 18
+Dex: 18
+Int: 18
+Wis: 18
+Con: 18
+Cha: 18
+Wimpy: 20
+Evasion: 13
+LootItem: 10313 25
 E
 T 10314
 #10318
-Newbie Fighter~
-a Newbie Fighter~
-A Newbie Fighter stands here looking at you.
+hobby horse cavalier toy cavalry~
+a @Rho@Ybb@Wy@n-@Rho@Yrs@We@n @Rca@Yva@Wli@Der@n~
+A @Rho@Ybb@Wy@n-@Rho@Yrs@We@n @Rca@Yva@Wli@Der@n charges astride an impossible wooden steed.
 ~
-   He seems to be not a lot to look at, he looks kind of weak, his health seems
-to be good though.
-~
-10 0 0 0 0 0 0 0 0 E
-20 14 10 8d8+400 6d6+4
-3000 40000
-8 8 1
+The rider straddles a painted hobby horse that ends in a wooden pole,
+yet the thing paws the floor and snorts like a living charger.~
+8 0 0 0 0 0 0 0 0 E
+39 16 0 6d8+195 5d4+3
+0 0
+8 8 0
+Str: 18
+Dex: 18
+Int: 18
+Wis: 18
+Con: 18
+Cha: 18
+Wimpy: 19
+Evasion: 13
 E
+T 10314
 #10319
-Vegeta~
-Vegeta~
-Vegeta stands here, grinning evilly at you.
+rag doll stitched cloth toy~
+a @Wra@Wg@n @Wdo@Wll@n~
+A stitched @Wra@Wg@n @Wdo@Wll@n lurches forward on soft feet.
 ~
-   @YVegeta has a huge golden aura, his hair is blond and his muscles are huge.
-Occasionally bolts of electricity arc through his aura.  @n
+Mismatched cloth, button eyes, and thick black stitches hold this
+human-sized doll together. Stuffing bulges from several old repairs.~
+8 0 0 0 0 0 0 0 0 E
+39 16 0 6d8+195 5d4+3
+0 0
+8 8 0
+Str: 18
+Dex: 18
+Int: 18
+Wis: 18
+Con: 18
+Cha: 18
+Wimpy: 19
+Evasion: 13
+LootItem: 10320 25
+E
+T 10315
+#10320
+porcelain doll cracked toy~
+a @Wpo@Mrc@Mel@Wai@nn @Wdo@Wll@n~
+A @Wpo@Mrc@Mel@Wai@nn @Wdo@Wll@n watches through bright glass eyes.
 ~
-26 0 0 0 120 0 0 0 0 E
-34 9 -10 6d6+340 5d5+5
-340 115600
-8 8 1
-BareHandAttack: 13
+Fine painted features and an immaculate dress make the doll beautiful
+from a distance. Up close, hairline cracks radiate from its smile.~
+8 0 0 0 0 0 0 0 0 E
+40 15 0 6d8+200 5d4+3
+0 0
+8 8 0
+Str: 18
+Dex: 18
+Int: 18
+Wis: 18
+Con: 18
+Cha: 18
+Wimpy: 20
+Evasion: 13
+LootItem: 10318 25
+E
+T 10315
+#10321
+doll governess porcelain stern~
+the @WDo@Wll@n @WGo@Mve@Crn@Mes@Ws@n~
+The @WDo@Wll@n @WGo@Mve@Crn@Mes@Ws@n stands with hands folded in perfect disapproval.
+~
+Tall, severe, and flawlessly dressed, this porcelain governess carries a
+tiny rulebook and a gaze sharp enough to feel physical.~
+8 0 0 0 0 0 0 0 0 E
+42 15 0 7d9+210 5d5+3
+0 0
+8 8 0
+Str: 18
+Dex: 18
+Int: 18
+Wis: 18
+Con: 18
+Cha: 18
+Wimpy: 21
+Evasion: 14
+LootItem: 10319 25
+E
+T 10315
+#10322
+stuffed bear toy great~
+a @Wst@Muf@Mfe@Wd@n @Wbe@War@n~
+A huge @Wst@Muf@Mfe@Wd@n @Wbe@War@n lumbers here on padded paws.
+~
+Soft brown cloth covers a body packed with enchanted stuffing. Its
+button eyes are friendly only until the great sewn mouth opens.~
+8 0 0 0 0 0 0 0 0 E
+41 15 0 6d8+205 5d5+3
+0 0
+8 8 0
+Str: 18
+Dex: 18
+Int: 18
+Wis: 18
+Con: 18
+Cha: 18
+Wimpy: 20
+Evasion: 13
+E
+T 10316
+#10323
+stuffed lion toy mane~
+a @Wst@Muf@Mfe@Wd@n @Wli@Wo@nn~
+A @Wst@Muf@Mfe@Wd@n @Wli@Wo@nn prowls with a yarn mane bristling.
+~
+Golden cloth, thick stitching, and a mane of braided yarn form a
+children's beast given far too much strength and confidence.~
+8 0 0 0 0 0 0 0 0 E
+42 15 0 7d9+210 5d5+3
+0 0
+8 8 0
+Str: 18
+Dex: 18
+Int: 18
+Wis: 18
+Con: 18
+Cha: 18
+Wimpy: 21
+Evasion: 14
+LootItem: 10321 25
+E
+T 10316
+#10324
+wooden dragon toy carved~
+a @Wwo@Mod@We@nn @Wdr@Mag@Wo@nn~
+A carved @Wwo@Mod@We@nn @Wdr@Mag@Wo@nn coils around the room.
+~
+Painted scales overlap across articulated wooden plates. Gemlike eyes
+glow from a dragon face that was clearly meant to delight children, not
+hunt adventurers.~
+8 0 0 0 0 0 0 0 0 E
+43 15 0 7d9+215 5d5+3
+0 0
+8 8 0
+Str: 18
+Dex: 18
+Int: 18
+Wis: 18
+Con: 18
+Cha: 18
+Wimpy: 21
+Evasion: 14
+LootItem: 10322 25
+E
+T 10318
+#10325
+jack box jack-in-the-box spring toy~
+a @WJa@Wck@n-@Win@n-@Wth@We@n-@WBo@Wx@n~
+A brightly painted @WJa@Wck@n-@Win@n-@Wth@We@n-@WBo@Wx@n trembles on its spring.
+~
+A long-limbed fool erupts from a striped box on a powerful enchanted
+spring. Its hinged smile is broad enough to split the painted face.~
+8 0 0 0 0 0 0 0 0 E
+41 15 0 6d8+205 5d5+3
+0 0
+8 8 0
+Str: 18
+Dex: 18
+Int: 18
+Wis: 18
+Con: 18
+Cha: 18
+Wimpy: 20
+Evasion: 13
+E
+T 10318
+#10326
+living die dice ivory~
+a @Gli@Yvi@Wng@n @Gdi@Ye@n~
+A giant ivory die bounces and tumbles of its own accord.
+~
+Each face is cut with deep black pips. The die somehow leans toward
+opponents despite having neither limbs nor visible means of movement.~
+8 0 0 0 0 0 0 0 0 E
+43 15 0 7d9+215 5d5+3
+0 0
+8 8 0
+Str: 18
+Dex: 18
+Int: 18
+Wis: 18
+Con: 18
+Cha: 18
+Wimpy: 21
+Evasion: 14
+LootItem: 10325 25
+E
+T 10319
+#10327
+crimson card knave soldier card~
+a @Gcr@Yim@Wso@nn @Gca@Yrd@n-@Gkn@Yav@We@n~
+A @Gcr@Yim@Wso@nn @Gca@Yrd@n-@Gkn@Yav@We@n snaps to attention like a living playing card.
+~
+Lacquered red armor and heart-shaped heraldry make this guard resemble a
+court card folded into three dimensions.~
+8 0 0 0 0 0 0 0 0 E
+43 15 0 7d9+215 5d5+3
+0 0
+8 8 0
+Str: 18
+Dex: 18
+Int: 18
+Wis: 18
+Con: 18
+Cha: 18
+Wimpy: 21
+Evasion: 14
+LootItem: 10326 25
+E
+T 10319
+#10328
+ivory card knave soldier card~
+an @Giv@Yor@Wy@n @Gca@Yrd@n-@Gkn@Yav@We@n~
+An @Giv@Yor@Wy@n @Gca@Yrd@n-@Gkn@Yav@We@n patrols with a blade-thin painted sword.
+~
+Black suit marks contrast against an ivory card-body. Its edges look
+sharp enough to cut despite the painted storybook appearance.~
+8 0 0 0 0 0 0 0 0 E
+43 15 0 7d9+215 5d5+3
+0 0
+8 8 0
+Str: 18
+Dex: 18
+Int: 18
+Wis: 18
+Con: 18
+Cha: 18
+Wimpy: 21
+Evasion: 14
+LootItem: 10327 25
 E
 T 10319
 #10329
-Roshi~
-Master Roshi~
-Master Roshi sits here reading a magazine and making weird noises.
+ivory pawn chess piece~
+an @Wiv@Dor@Wy@n @Wpa@Ww@nn~
+An @Wiv@Dor@Wy@n @Wpa@Ww@nn advances one deliberate step at a time.
 ~
-   He wears a large turtle shell, and large funny looking sunglasses, the sun
-shines off of his head, and he wears an old Hawaiian shirt.
+This chest-high chess piece bears the faint shape of a helmeted face in
+its polished ivory surface.~
+8 0 0 0 0 0 0 0 0 E
+44 15 0 7d9+220 6d5+3
+0 0
+8 8 0
+Str: 18
+Dex: 18
+Int: 18
+Wis: 18
+Con: 18
+Cha: 18
+Wimpy: 22
+Evasion: 14
+LootItem: 10330 25
+E
+T 10320
+#10330
+black knight chess piece~
+a @Wbl@Dac@Wk@n @Wkn@Dig@Wht@n~
+A @Wbl@Dac@Wk@n @Wkn@Dig@Wht@n stamps across the board in impossible angles.
 ~
+Carved as a rearing horse and rider merged into one lacquered piece, the
+knight seems forever prepared to leap over whatever blocks its path.~
+8 0 0 0 0 0 0 0 0 E
+45 15 0 7d9+225 6d5+3
+0 0
+8 8 0
+Str: 18
+Dex: 18
+Int: 18
+Wis: 18
+Con: 18
+Cha: 18
+Wimpy: 22
+Evasion: 15
+LootItem: 10331 25
+E
+T 10320
+#10331
+ivory bishop chess piece~
+an @Wiv@Dor@Wy@n @Wbi@Dsh@Wop@n~
+An @Wiv@Dor@Wy@n @Wbi@Dsh@Wop@n glides along an unseen diagonal.
+~
+Tall and narrow, this polished piece carries candlelight in the slit of
+its pointed crown and moves without lifting from the board.~
+8 0 0 0 0 0 0 0 0 E
+45 15 0 7d9+225 6d5+3
+0 0
+8 8 0
+Str: 18
+Dex: 18
+Int: 18
+Wis: 18
+Con: 18
+Cha: 18
+Wimpy: 22
+Evasion: 15
+LootItem: 10332 25
+E
+T 10320
+#10332
+black rook chess piece~
+a @Wbl@Dac@Wk@n @Wro@Wok@n~
+A @Wbl@Dac@Wk@n @Wro@Wok@n advances with the certainty of a falling tower.
+~
+Squared battlements crown a heavy block of black lacquer. Every movement
+lands with the weight of a siege engine.~
+8 0 0 0 0 0 0 0 0 E
+46 15 0 7d9+230 6d5+3
+0 0
+8 8 0
+Str: 18
+Dex: 18
+Int: 18
+Wis: 18
+Con: 18
+Cha: 18
+Wimpy: 23
+Evasion: 15
+LootItem: 10333 25
+E
+T 10320
+#10333
+house dealer croupier assistant mask~
+a @Gho@Yus@We@n @Gde@Yal@Wer@n~
+A @Gho@Yus@We@n @Gde@Yal@Wer@n watches the tables from behind a blank half-mask.
+~
+Immaculate gloves, a dark vest, and a featureless half-mask mark this
+attendant of the House of Chance. Dice move between the dealer's fingers
+without pause.~
 10 0 0 0 0 0 0 0 0 E
-1 20 9 0d0+10 1d2+0
-10 100
-6 6 1
+42 15 0 7d9+210 5d5+3
+0 0
+8 8 0
+Str: 18
+Dex: 18
+Int: 18
+Wis: 18
+Con: 18
+Cha: 18
+Wimpy: 21
+Evasion: 14
+LootItem: 10324 25
+E
+T 10321
+#10334
+royal fool jester court elite~
+a @Rro@Mya@Yl@n @Rfo@Mol@n~
+A @Rro@Mya@Yl@n @Rfo@Mol@n guards the deeper Toybox beneath chiming bells.
+~
+Rich motley, silver bells, and a half-crown of painted wood mark this
+fool as one of the Jester's favored attendants.~
+8 0 0 0 0 0 0 0 0 E
+46 15 0 7d9+230 6d5+3
+0 0
+8 8 0
+Str: 18
+Dex: 18
+Int: 18
+Wis: 18
+Con: 18
+Cha: 18
+Wimpy: 23
+Evasion: 15
+E
+T 10322
+#10335
+grand harlequin boss motley~
+the @RGr@Man@Rd@n @RHa@Mrl@Meq@Rui@nn~
+The @RGr@Man@Rd@n @RHa@Mrl@Meq@Rui@nn dances before the Motley Throne.
+~
+Every diamond of this master performer's costume is edged in gold
+thread. Six colored dice orbit between gloved fingers in an effortless
+cascade.~
+106506 0 0 0 0 0 0 0 0 E
+35 16 0 5d7+175 4d4+2
+0 0
+8 8 0
+Str: 18
+Dex: 18
+Int: 18
+Wis: 18
+Con: 18
+Cha: 18
+Wimpy: 17
+Evasion: 11
+LootItem: 10386 35
+LootItem: 10305 35
+E
+T 10323
+#10336
+grand puppeteer boss master strings~
+the @DGr@Wan@Yd@n @DPu@Wpp@Yet@Ree@Yr@n~
+The @DGr@Wan@Yd@n @DPu@Wpp@Yet@Ree@Yr@n works beneath an enormous control bar.
+~
+A long coat of dark velvet hides all but the hands, which never stop
+moving. Control bars, shears, hooks, and bone dice hang from a belt of
+braided cord.~
+106506 0 0 0 0 0 0 0 0 E
+38 16 0 6d8+190 5d4+3
+0 0
+8 8 0
+Str: 18
+Dex: 18
+Int: 18
+Wis: 18
+Con: 18
+Cha: 18
+Wimpy: 19
+Evasion: 12
+LootItem: 10381 35
+LootItem: 10311 35
 E
 T 10329
+#10337
+general jack anapes boss toy soldier~
+@RGe@Yne@Yra@Rl@n @RJa@Rck@n-@RA@n-@RNa@Ype@Rs@n~
+@RGe@Yne@Yra@Rl@n @RJa@Rck@n-@RA@n-@RNa@Ype@Rs@n commands the painted citadel from a war table.
+~
+A magnificent lacquered officer with a gold-painted bicorne, General
+Jack-A-Napes carries a saber in one hand and a command die in the other.~
+106506 0 0 0 0 0 0 0 0 E
+41 15 0 6d8+205 5d5+3
+0 0
+8 8 0
+Str: 18
+Dex: 18
+Int: 18
+Wis: 18
+Con: 18
+Cha: 18
+Wimpy: 20
+Evasion: 13
+LootItem: 10382 35
+LootItem: 10316 35
+E
+T 10330
+#10338
+madame porcelaine boss doll~
+@WMa@Mda@Yme@n @WPo@Mrc@Yel@Cai@Yne@n~
+@WMa@Mda@Yme@n @WPo@Mrc@Yel@Cai@Yne@n presides over her tea table with a flawless smile.
+~
+An elegant porcelain matron in layered lace sits with impossible poise.
+A web of fine cracks has begun around one eye, but her painted smile
+remains perfect.~
+106506 0 0 0 0 0 0 0 0 E
+44 15 0 7d9+220 6d5+3
+0 0
+8 8 0
+Str: 18
+Dex: 18
+Int: 18
+Wis: 18
+Con: 18
+Cha: 18
+Wimpy: 22
+Evasion: 14
+LootItem: 10383 35
+LootItem: 10323 35
+E
 T 10331
-T 10332
 #10339
-Truncks~
-Truncks~
-Truncks is here playing his game system paying you no mind.
+black chess queen boss~
+the @DBl@Wac@Rk@n @DCh@Wes@Rs@n @DQu@Wee@nn~
+The @DBl@Wac@Rk@n @DCh@Wes@Rs@n @DQu@Wee@nn commands every line of the board.
 ~
-   The purple haired boy wears nothing more then a capsule corp t-shirt, blue
-jeans, and a pair of semi worn-out socks.
+Half woman and half towering chess piece, the Queen is carved from
+mirror-black wood beneath a crown of sharp geometric points.~
+106506 0 0 0 0 0 0 0 0 E
+48 14 0 8d10+240 6d5+4
+0 0
+8 8 0
+Str: 18
+Dex: 18
+Int: 18
+Wis: 18
+Con: 18
+Cha: 18
+Wimpy: 24
+Evasion: 16
+LootItem: 10384 35
+LootItem: 10334 35
+E
+T 10332
+#10340
+croupier chance boss dealer dice~
+the @GCr@You@Ypi@Ger@n of @GCh@Yan@Gce@n~
+The @GCr@You@Ypi@Ger@n of @GCh@Yan@Gce@n waits behind a black table, silver cup in hand.
 ~
-10 0 0 0 0 0 0 0 0 E
-1 20 9 0d0+10 1d2+0
-10 100
-6 6 1
+Dressed in black, silver, and deep green, the Croupier wears a smiling
+half-mask and carries two immaculate ivory dice that never seem to leave
+his possession.~
+106506 0 0 0 0 0 0 0 0 E
+46 15 0 7d9+230 6d5+3
+0 0
+8 8 0
+Str: 18
+Dex: 18
+Int: 18
+Wis: 18
+Con: 18
+Cha: 18
+Wimpy: 23
+Evasion: 15
+LootItem: 10385 35
+LootItem: 10328 25
+LootItem: 10329 35
 E
 T 10339
-#10345
-Bulma~
-Bulma~
-A beautiful woman is here tending to the garden.
+#10341
+jester behind smile boss fool king toybox~
+the @RJe@Dst@Wer@n Behind the @RSm@Dil@We@n~
+The @RJe@Dst@Wer@n Behind the @RSm@Dil@We@n waits beside a giant ivory die.
 ~
-   Here hair is purple and she wears no clothing you have seen, it seems to be
-made completely of a red material, she has a very shaped figure, curves in all the
-right places.
-~
-72 0 0 0 0 0 0 0 0 E
-1 20 9 0d0+10 1d2+0
-10 100
-8 8 2
-BodyProfile: 1
+Crimson, black, white, violet, and gold motley hangs from a lean figure
+whose painted smile is too calm to be sane. Every bell on the costume is
+perfectly silent.~
+106506 0 0 0 0 0 0 0 0 E
+50 14 0 8d10+250 6d5+4
+0 0
+8 8 0
+Str: 18
+Dex: 18
+Int: 18
+Wis: 18
+Con: 18
+Cha: 18
+Wimpy: 25
+Evasion: 16
+LootItem: 10387 25
+LootItem: 10335 35
 E
 T 10345
-#10346
-Namekian Townsmen~
-a Namek Townsmen~
-A Namek Townsmen is walking around here.
-~
-   You see nothing special...
-~
-72 0 0 0 120 0 0 0 0 E
-1 20 9 0d0+10 1d2+0
-10 100
-8 8 0
-E
-#10361
-Elder Namek~
-the Elder Namek~
-The Elder Namek sits in his large chair breathing heavily.
-~
-   This has to be the largest Namek ever, sitting at a height of about 8'7" and
-weighing over 800lb, he could easily crush you.  But he won't because of his age
-and he is a peace loving man that looks like any other Namek.
-~
-10 0 0 0 0 0 0 0 0 E
-1 20 9 0d0+10 1d2+0
-10 100
-6 6 0
-E
-#10362
-Statue~
-a Dragon Statue~
-A Dragon Statue sits here.
-~
-   It is a large statue of a dragon.
-~
-10 0 0 0 0 0 0 0 0 E
-1 20 9 0d0+10 1d2+0
-10 100
-8 8 0
-BodyProfile: 6
-E
-#10368
-large bird~
-a large bird~
-A large bird flies around here.
-~
-   You see nothing special...
-~
-72 0 0 0 0 0 0 0 0 E
-27 11 10 5d5+270 4d4+4
-270 72900
-8 8 0
-BodyProfile: 4
-E
-#10378
-Rabbit~
-a rabbit~
-A brown rabbit hops around happily.
-~
-   It looks like a brown fluffy rabbit.
-~
-10 0 0 0 0 0 0 0 0 E
-13 16 2 2d2+130 2d2+2
-130 16900
-8 8 2
-BodyProfile: 2
-E
-#10379
-Rabbit~
-a rabbit~
-A white rabbit hops around happily.
-~
-   It looks like a small white fluffy rabbit.
-~
-10 0 0 0 0 0 0 0 0 E
-13 16 2 2d2+130 2d2+2
-130 16900
-8 8 1
-BodyProfile: 2
-E
-#10398
-Gambler~
-a Gambler~
-A Gambler is here gambling away his money.
-~
-   He wears the usual biker outfit, all leather, and he swings a chain around
-his head.
-~
-72 0 0 0 0 0 0 0 0 E
-30 10 -8 6d6+300 5d5+5
-300 90000
-8 8 1
-BodyProfile: 1
-E
-#10399
-Biker~
-a Biker~
-A Biker stands here swinging a chain around.
-~
-   He has the usual gamblers dice, and holds a knife in his left hand.
-~
-72 0 0 0 0 0 0 0 0 E
-34 9 -10 6d6+340 5d5+5
-340 115600
-8 8 1
-BodyProfile: 1
-E
+T 10355
 $

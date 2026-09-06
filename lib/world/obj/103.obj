@@ -1,218 +1,646 @@
 #10300
-Zone Description Sign~
-the Zone Description Sign~
-The Zone Description Sign is staked in the ground here.~
+moon painted pierrot mask toybox gear~
+a @Wmo@Won@n-@Wpa@Din@Dte@Wd@n @WPi@Der@Dro@Wt@n @Wma@Wsk@n~
+A @Wmo@Won@n-@Wpa@Din@Dte@Wd@n @WPi@Der@Dro@Wt@n @Wma@Wsk@n rests here.~
+A pale half-mask is painted with a single black tear beneath one
+eye. Its lacquer feels cool even after long wear.
 ~
-12 0 0 0 0 0 0 0 0 0 0 0 0
+11 g 0 0 0 ae 0 0 0 0 0 0 0
 0 0 0 0
-0 0 0 0
-E
-sign~
-   @RThe location of this zone is the dragonball setting of Earth and Planet
-Namek.  You can be any level to enter this zone, it is just a place to have fun.
-You can also be any alignment to enter my area.  The theme is of course DB DBZ
-and DBGT.  And the plot of my zone is to allow people to fight in a dbz
-environment, letting them just have fun killing stuff.
-
-@n
-@RRooms: 100
-
-Objects: A Few
-
-Mobs: A Few@n
-~
-#10301
-sign~
-a sign~
-A sign is nailed in to the wall here.~
-~
-12 q 0 0 0 0 0 0 0 0 0 0 0
-0 0 0 0
-0 0 0 0
-E
-sign~
-   @RIf you wish to travel, there is only one way.  If you go up you will find a
-teleporter, and if you go down you will find a teleporter.  They both will take
-you somewhere new.  @N @RTo enter either teleporter, all you have to type is
-enter teleporter.  @n
-~
-#10302
-teleporter~
-a teleporter~
-A teleporter sits in the middle of the room.~
-~
-12 ab 0 0 0 0 0 0 0 0 0 0 0
-0 0 0 0
-0 0 0 0
-T 10302
-#10303
-teleporter~
-a teleporter~
-A teleporter sits in the middle of the room.~
-~
-18 ab 0 0 0 0 0 0 0 0 0 0 0
-0 0 0 0
-0 0 0 0
-T 10303
-#10304
-yellow cloud~
-a yellow cloud~
-A yellow cloud hovers here, makeing a slight noise~
-~
-18 aq 0 0 0 0 0 0 0 0 0 0 0
-0 0 0 0
-0 0 0 0
-T 10306
-E
-cloud nimbus~
-   A small yellow cloud puff.
-~
-#10306
-Ruby Emerald Necklace~
-a Ruby Emerald Necklace~
-A Ruby Emerald Necklace has fallen here.~
-~
-11 a 0 0 0 ac 0 0 0 0 0 0 0
-0 0 0 0
-1 1000 0 0
-T 10308
-#10308
-sign~
-a sign~
-A sign is on the wall here.~
-~
-12 0 0 0 0 0 0 0 0 0 0 0 0
-0 0 0 0
-0 0 0 0
-E
-sign~
-   To enter the teleporter, just type 'enter teleporter' or 'enter tele' for
-short.
-~
-#10309
-test~
-a test~
-This is a test~
-~
-0 0 0 0 0 0 0 0 0 0 0 0 0
-0 0 0 0
-0 0 0 0
-#10318
-fighters carcass~
-a fighters carcass~
-A newbie fighters carcass lies here.~
-~
-13 0 0 0 0 0 0 0 0 0 0 0 0
-0 0 0 0
-0 0 0 0
-T 10315
-#10319
-vegetas~
-Vegetas corpse~
-Vegetas corpse lies here slain.~
-~
-13 0 0 0 0 k 0 0 0 g 0 0 0
-0 0 0 0
-0 0 0 30
-T 10316
-#10320
-Teleporter~
-a teleporter~
-A teleporter sits in the middle of the room glowing and humming.~
-~
-12 ab 0 0 0 0 0 0 0 0 0 0 0
-0 0 0 0
-0 0 0 0
-T 10320
-#10329
-Turtle Hermit headband~
-a Turlte Hermit headband~
-It looks like an ordinary headband, but it looks a bit different.~
-~
-9 0 0 0 0 aen 0 0 0 0 0 0 0
-0 0 0 0
-1 1000 0 0
-T 10330
-#10333
-Turtle Shell~
-a Turtle Shell~
-A Turtle Shell that looks like Master Roshis' is here.~
-~
-9 dq 0 0 0 ak 0 0 0 0 0 0 0
-0 0 0 0
-50 25000 0 0
+1 120 0 30 0
 A
-17 10
-#10355
-book~
-a book~
-A book lies here open on the table~
+6 1
+A
+12 10
+A
+24 -1
+#10301
+diamond motley harlequin jerkin toybox gear~
+a @Rdi@Mam@Yon@Wd@n-@Rmo@Mtl@Yey@n @RHa@Mrl@Yeq@Wui@nn @Rje@Mrk@Yi@nn~
+A @Rdi@Mam@Yon@Wd@n-@Rmo@Mtl@Yey@n @RHa@Mrl@Yeq@Wui@nn @Rje@Mrk@Yi@nn rests here.~
+Crimson, violet, and gold diamonds overlap across a flexible leather
+jerkin. Tiny bells are stitched beneath the shoulders instead of
+along the hem.
 ~
-12 0 0 0 0 a 0 0 0 0 0 0 0
-0 0 0 0
-1 1000 0 0
-E
-book~
-             +--------------+
-             |Story of Sages|
-+------------+--------------+-------------+
-|  This is how you would do it, set it in |
-|a table just to make it look better. That|
-|is how you get it to be a better look,   |
-|a little touch to the table for yourself.|
-|                                         |
-|                                         |
-|  Created by: Taylor                     |
-|                                         |
-+-----------------------------------------+
+9 g 0 0 0 ad 0 0 0 0 0 0 0
+7 0 0 0
+5 140 0 31 0
+A
+2 1
+A
+14 10
+#10302
+grinning mime gloves toybox gear~
+a @Wpa@Wir@n of @WGr@Din@Dni@Wng@n @WMi@Wme@n @Wgl@Dov@Wes@n~
+A @Wpa@Wir@n of @WGr@Din@Dni@Wng@n @WMi@Wme@n @Wgl@Dov@Wes@n rests here.~
+Black-and-white gloves are stitched with faint silver lines across
+the palms. The fingers seem to outline invisible shapes even when
+held still.
 ~
-#10362
-Dragon Statue~
-a Dragon Statue~
-A Dragon Statue is on the side of the gate.~
+9 g 0 0 0 ah 0 0 0 0 0 0 0
+5 0 0 0
+2 150 0 32 0
+A
+2 1
+A
+18 1
+#10303
+scaramouche practice foil toybox gear~
+a @RSc@Mar@Yam@Wou@Ych@Me@n @Rpr@Mac@Yti@Wce@n @Rfo@Mil@n~
+A @RSc@Mar@Yam@Wou@Ych@Me@n @Rpr@Mac@Yti@Wce@n @Rfo@Mil@n rests here.~
+A slender blunted foil gleams beneath curls of crimson ribbon.
+Despite its theatrical appearance, the balance is exact and
+dangerous.
 ~
-12 g 0 0 0 0 0 0 0 0 0 0 0
-0 0 0 0
-0 0 0 0
-#10363
-Gate Key~
-a Gate Key~
-A Gate Key is here.~
+5 g 0 0 0 an 0 0 0 0 0 0 0
+0 2 5 14
+3 170 0 33 0
+A
+2 1
+A
+18 1
+#10304
+columbine dancing slippers toybox gear~
+a @Rpa@Mir@n of @RCo@Mlu@Ymb@Win@Ye@n @Rda@Mnc@Yin@Wg@n @Rsl@Mip@Ype@Wrs@n~
+A @Rpa@Mir@n of @RCo@Mlu@Ymb@Win@Ye@n @Rda@Mnc@Yin@Wg@n @Rsl@Mip@Ype@Wrs@n rests here.~
+Rose-and-pearl slippers are reinforced with impossibly thin strips
+of silver. They make even hurried steps feel measured and graceful.
 ~
-18 0 0 0 0 0 0 0 0 0 0 0 0
-0 0 0 0
-0 0 0 0
-#10369
-circular rock~
-a circular rock~
-A circular rock lies right in the middle the trees.~
+9 g 0 0 0 ag 0 0 0 0 0 0 0
+4 0 0 0
+1 150 0 32 0
+A
+2 1
+A
+14 15
+A
+31 1
+#10305
+bell cuffed motley sash toybox gear~
+a @Rbe@Mll@n-@Rcu@Mff@Yed@n @Rmo@Mtl@Yey@n @Rsa@Msh@n~
+A @Rbe@Mll@n-@Rcu@Mff@Yed@n @Rmo@Mtl@Yey@n @Rsa@Msh@n rests here.~
+A broad motley sash bears six tiny bells, each tuned to a different
+note. The bells ring only when their wearer moves with purpose.
 ~
-12 0 0 0 0 0 0 0 0 0 0 0 0
+11 g 0 0 0 al 0 0 0 0 0 0 0
 0 0 0 0
-0 0 0 0
-#10373
-torch~
-a torch~
-A torch rest in a crevice in the wall.~
+1 190 0 34 0
+A
+6 1
+A
+13 10
+A
+12 10
+#10306
+painted marionette mask toybox gear~
+a @opa@Yin@Yte@od@n @oMa@Yri@Ron@Yet@ote@n @oma@osk@n~
+A @opa@Yin@Yte@od@n @oMa@Yri@Ron@Yet@ote@n @oma@osk@n rests here.~
+A lacquered wooden face is painted with a smile too precise to be
+comforting. Hair-thin holes at the temples once anchored puppet
+strings.
 ~
-1 a 0 0 0 ao 0 0 0 0 0 0 0
-0 0 0 0
-1 1000 0 0
-#10376
-orb~
-a orb~
-A orb sits in the middle of the room letting off light.~
+9 g 0 0 0 ae 0 0 0 0 0 0 0
+7 0 0 0
+2 190 0 34 0
+A
+2 1
+A
+13 15
+#10307
+stringbound bracers toybox gear~
+a @opa@oir@n of @ost@Yri@Rng@Rbo@Yun@od@n @obr@Yac@Yer@os@n~
+A @opa@oir@n of @ost@Yri@Rng@Rbo@Yun@od@n @obr@Yac@Yer@os@n rests here.~
+Dark cord crisscrosses carved wooden bracers in mirrored knots. The
+strings tighten whenever the wearer's hands prepare to strike.
 ~
-1 0 0 0 0 0 0 0 0 0 0 0 0
-0 0 0 0
-0 0 0 0
-#10389
-Teleporter~
-a Teleporter~
-A Teleporter sits in the middle of the room.~
+9 g 0 0 0 am 0 0 0 0 0 0 0
+6 0 0 0
+2 210 0 35 0
+A
+1 1
+A
+2 1
+#10308
+puppetmaster s black coat toybox gear~
+a @oPu@Ypp@Ret@Rma@Yst@oer@n'@os@n @obl@Yac@ok@n @oco@oat@n~
+A @oPu@Ypp@Ret@Rma@Yst@oer@n'@os@n @obl@Yac@ok@n @oco@oat@n rests here.~
+A long black coat is lined with narrow channels for hooks, cord, and
+control bars. Gold stitching traces six branching lines from
+shoulder to cuff.
 ~
-12 ab 0 0 0 0 0 0 0 0 0 0 0
+9 g 0 0 0 ad 0 0 0 0 0 0 0
+11 0 0 0
+6 260 0 37 0
+A
+3 1
+A
+4 1
+A
+12 20
+#10309
+executioner s toy axe toybox gear~
+an @oex@Yec@Rut@Rio@Yne@or@n'@os@n @oto@oy@n @oax@oe@n~
+An @oex@Yec@Rut@Rio@Yne@or@n'@os@n @oto@oy@n @oax@oe@n rests here.~
+An oversized wooden axe is edged in enchanted black iron. Its square
+head looks like a stage prop until it begins to fall.
+~
+5 g 0 0 0 an 0 0 0 0 0 0 0
+0 2 6 3
+7 260 0 37 0
+A
+1 2
+A
+19 1
+#10310
+silver string marionette leggings toybox gear~
+a @opa@oir@n of @osi@Ylv@oer@n-@ost@Yri@ong@n @oMa@Yri@Ron@Yet@ote@n @ole@Ygg@Yin@ogs@n~
+A @opa@oir@n of @osi@Ylv@oer@n-@ost@Yri@ong@n @oMa@Yri@Ron@Yet@ote@n @ole@Ygg@Yin@ogs@n rests here.~
+Silver thread crosses dark fitted leggings in mirrored puppet-string
+patterns. The seams tighten and release a heartbeat ahead of every
+turn and sidestep.
+~
+9 g 0 0 0 af 0 0 0 0 0 0 0
+8 0 0 0
+3 230 0 35 0
+A
+2 2
+A
+14 20
+A
+31 1
+#10311
+silver puppetmaster control bar toybox gear~
+a @Dsi@Wlv@Yer@n @DPu@Wpp@Yet@Rma@Yst@Wer@n @Dco@Wnt@Yro@Rl@n @Dba@Wr@n~
+A @Dsi@Wlv@Yer@n @DPu@Wpp@Yet@Rma@Yst@Wer@n @Dco@Wnt@Yro@Rl@n @Dba@Wr@n rests here.~
+A polished silver control bar carries six cut grooves for invisible
+strings. It grows warm when nearby movement falls into a predictable
+rhythm.
+~
+11 g 0 0 0 ao 0 0 0 0 0 0 0
 0 0 0 0
+3 300 0 38 0
+A
+3 2
+A
+12 25
+A
+24 -1
+#10312
+lacquered toy soldier helm toybox gear~
+a @Rla@Ycq@Wue@Dre@Wd@n @Rto@Yy@n @Rso@Yld@Wie@Dr@n @Rhe@Ylm@n~
+A @Rla@Ycq@Wue@Dre@Wd@n @Rto@Yy@n @Rso@Yld@Wie@Dr@n @Rhe@Ylm@n rests here.~
+A red lacquered helm bears a white horsehair crest and a tiny brass
+badge. Its toy-like proportions somehow settle perfectly around a
+living head.
+~
+9 g 0 0 0 ae 0 0 0 0 0 0 0
+9 0 0 0
+4 230 0 36 0
+A
+1 1
+A
+5 1
+#10313
+painted parade cuirass toybox gear~
+a @Rpa@Yin@Wte@Dd@n @Rpa@Yra@Wde@n @Rcu@Yir@Was@Ds@n~
+A @Rpa@Yin@Wte@Dd@n @Rpa@Yra@Wde@n @Rcu@Yir@Was@Ds@n rests here.~
+Interlocking wooden plates have been lacquered crimson and edged in
+brass. The chest bears six tiny shield emblems arranged like the
+pips of a die.
+~
+9 g 0 0 0 ad 0 0 0 0 0 0 0
+14 0 0 0
+9 280 0 38 0
+A
+5 2
+A
+13 20
+#10314
+toy archer s painted vambraces toybox gear~
+a @Rpa@Yir@n of @Rto@Yy@n @Rar@Ych@Wer@n'@Rs@n @Rpa@Yin@Wte@Dd@n @Rva@Ymb@Wra@Dce@Ws@n~
+A @Rpa@Yir@n of @Rto@Yy@n @Rar@Ych@Wer@n'@Rs@n @Rpa@Yin@Wte@Dd@n @Rva@Ymb@Wra@Dce@Ws@n rests here.~
+Red-and-ivory vambraces are reinforced along the inner forearm where
+a bowstring would strike. Tiny target rings are painted around each
+elbow.
+~
+9 g 0 0 0 ai 0 0 0 0 0 0 0
+7 0 0 0
+2 250 0 37 0
+A
+2 2
+A
+18 1
+#10315
+shieldbearer s painted bulwark toybox gear~
+a @Rsh@Yie@Wld@Dbe@War@Yer@n'@Rs@n @Rpa@Yin@Wte@Dd@n @Rbu@Ylw@War@Dk@n~
+A @Rsh@Yie@Wld@Dbe@War@Yer@n'@Rs@n @Rpa@Yin@Wte@Dd@n @Rbu@Ylw@War@Dk@n rests here.~
+A broad round shield is painted as a smiling sun crossed by two toy
+spears. The enchantment within it is considerably less cheerful than
+the design.
+~
+9 g 0 0 0 aj 0 0 0 0 0 0 0
+17 0 0 0
+8 290 0 38 0
+A
+5 1
+A
+13 20
+#10316
+captain s command sabre toybox gear~
+a @Rca@Ypt@Yai@Rn@n'@Rs@n @Rco@Ymm@Yan@Rd@n @Rsa@Ybr@Re@n~
+A @Rca@Ypt@Yai@Rn@n'@Rs@n @Rco@Ymm@Yan@Rd@n @Rsa@Ybr@Re@n rests here.~
+A brass-hilted sabre bears six tiny command words along the fuller.
+Each word gleams when the blade is raised in a different guard.
+~
+5 g 0 0 0 an 0 0 0 0 0 0 0
+0 2 7 3
+5 330 0 40 0
+A
+1 1
+A
+2 1
+A
+18 1
+A
+19 1
+#10317
+nutcracker sentinel s gorget toybox gear~
+a @Rnu@Ytc@Wra@Dck@Wer@n @Rse@Ynt@Win@Del@n'@Rs@n @Rgo@Yrg@Wet@n~
+A @Rnu@Ytc@Wra@Dck@Wer@n @Rse@Ynt@Win@Del@n'@Rs@n @Rgo@Yrg@Wet@n rests here.~
+A rigid red-and-gold gorget is shaped like the high collar of a toy
+guardsman. Its hinged plates snap together with the sound of a
+closing jaw.
+~
+11 g 0 0 0 ac 0 0 0 0 0 0 0
 0 0 0 0
-T 10389
+3 300 0 39 0
+A
+5 2
+A
+13 20
+A
+24 -1
+#10318
+porcelain doll s tiara toybox gear~
+a @Wpo@Mrc@Mel@Wai@nn @Wdo@Wll@n'@Ws@n @Wti@Mar@Wa@n~
+A @Wpo@Mrc@Mel@Wai@nn @Wdo@Wll@n'@Ws@n @Wti@Mar@Wa@n rests here.~
+A delicate white tiara is painted with rose, pearl, and pale-blue
+flourishes. Hairline cracks form a perfect mirrored pattern around
+its center gem.
+~
+11 g 0 0 0 ae 0 0 0 0 0 0 0
+0 0 0 0
+1 300 0 40 0
+A
+6 2
+A
+12 20
+#10319
+doll governess s lace collar toybox gear~
+the @WDo@Wll@n @WGo@Mve@Crn@Mes@Ws@n'@Ws@n @Wla@Wce@n @Wco@Mll@War@n~
+The @WDo@Wll@n @WGo@Mve@Crn@Mes@Ws@n'@Ws@n @Wla@Wce@n @Wco@Mll@War@n rests here.~
+A severe lace collar has been stiffened with threads of silver and
+pearl. Tiny embroidered rules circle its inner edge in immaculate
+script.
+~
+11 g 0 0 0 ac 0 0 0 0 0 0 0
+0 0 0 0
+1 340 0 42 0
+A
+4 2
+A
+6 1
+A
+24 -1
+#10320
+rag stitched traveling coat toybox gear~
+a @Wra@Wg@n-@Wst@Mit@Mch@Wed@n @Wtr@Mav@Cel@Min@Wg@n @Wco@Wat@n~
+A @Wra@Wg@n-@Wst@Mit@Mch@Wed@n @Wtr@Mav@Cel@Min@Wg@n @Wco@Wat@n rests here.~
+Layered scraps of velvet, wool, and canvas have been stitched into a
+sturdy coat. Mismatched buttons form a deliberate pattern down the
+front.
+~
+9 g 0 0 0 ad 0 0 0 0 0 0 0
+13 0 0 0
+6 290 0 39 0
+A
+5 2
+A
+13 25
+#10321
+stuffed lion s mantle toybox gear~
+a @Wst@Muf@Mfe@Wd@n @Wli@Won@n'@Ws@n @Wma@Mnt@Wle@n~
+A @Wst@Muf@Mfe@Wd@n @Wli@Won@n'@Ws@n @Wma@Mnt@Wle@n rests here.~
+Golden cloth and braided yarn form a broad mantle shaped like a
+lion's mane. The lining is padded with enchanted stuffing that
+resists heavy blows.
+~
+9 g 0 0 0 ak 0 0 0 0 0 0 0
+11 0 0 0
+5 340 0 42 0
+A
+1 2
+A
+13 20
+#10322
+wooden dragon scale cloak toybox gear~
+a @Wwo@Mod@We@nn @Wdr@Mag@Won@n-@Wsc@Mal@We@n @Wcl@Moa@Wk@n~
+A @Wwo@Mod@We@nn @Wdr@Mag@Won@n-@Wsc@Mal@We@n @Wcl@Moa@Wk@n rests here.~
+Hundreds of tiny articulated wooden scales overlap across a dark
+cloak. Gem-bright paint catches the light whenever the scales shift.
+~
+9 g 0 0 0 ak 0 0 0 0 0 0 0
+14 0 0 0
+5 360 0 43 0
+A
+5 2
+A
+24 -1
+#10323
+porcelaine s tea ring toybox gear~
+@WMa@Mda@Yme@n @WPo@Mrc@Yel@Cai@Yne@n'@Ws@n @Wte@Ma@n-@Wri@Mng@n~
+@WMa@Mda@Yme@n @WPo@Mrc@Yel@Cai@Yne@n'@Ws@n @Wte@Ma@n-@Wri@Mng@n rests here.~
+A tiny porcelain ring resembles a white teacup balanced upon a
+silver saucer. A single painted pip rests at the bottom of the cup.
+~
+11 g 0 0 0 ab 0 0 0 0 0 0 0
+0 0 0 0
+1 400 0 44 0
+A
+4 2
+A
+6 2
+A
+12 25
+A
+24 -1
+#10324
+house dealer s half mask toybox gear~
+a @Gho@Yus@We@n @Gde@Yal@Wer@n'@Gs@n @Gha@Ylf@n-@Gma@Ysk@n~
+A @Gho@Yus@We@n @Gde@Yal@Wer@n'@Gs@n @Gha@Ylf@n-@Gma@Ysk@n rests here.~
+A blank half-mask is divided into green, ivory, red, and gold
+geometric panels. Its expression seems to change only after the dice
+have landed.
+~
+11 g 0 0 0 ae 0 0 0 0 0 0 0
+0 0 0 0
+1 350 0 42 0
+A
+6 2
+A
+2 1
+A
+12 20
+#10325
+loaded dice wrist cuff toybox gear~
+a @Glo@Yad@Wed@n-@Gdi@Yce@n @Gwr@Yis@Wt@n @Gcu@Yff@n~
+A @Glo@Yad@Wed@n-@Gdi@Yce@n @Gwr@Yis@Wt@n @Gcu@Yff@n rests here.~
+Six tiny ivory dice are fixed around a dark leather cuff on hidden
+pivots. Their faces never seem to point in quite the same directions
+twice.
+~
+11 g 0 0 0 am 0 0 0 0 0 0 0
+0 0 0 0
+1 370 0 43 0
+A
+2 2
+A
+14 25
+A
+31 2
+#10326
+crimson card knave blade toybox gear~
+a @Gcr@Yim@Wso@nn @Gca@Yrd@n-@Gkn@Yav@We@n @Gbl@Yad@We@n~
+A @Gcr@Yim@Wso@nn @Gca@Yrd@n-@Gkn@Yav@We@n @Gbl@Yad@We@n rests here.~
+A narrow crimson blade is shaped like the edge of an oversized
+playing card. Its guard carries mirrored heart and diamond cutouts.
+~
+5 g 0 0 0 an 0 0 0 0 0 0 0
+0 2 7 14
+4 390 0 43 0
+A
+2 2
+A
+18 2
+#10327
+ivory pip signet toybox gear~
+an @Giv@Yor@Wy@n @Gpi@Yp@n @Gsi@Ygn@Wet@n~
+An @Giv@Yor@Wy@n @Gpi@Yp@n @Gsi@Ygn@Wet@n rests here.~
+A heavy ivory signet bears six black pips surrounding a tiny gold
+crown. The pips subtly rearrange themselves whenever a choice is
+made.
+~
+11 g 0 0 0 ab 0 0 0 0 0 0 0
+0 0 0 0
+1 410 0 44 0
+A
+4 1
+A
+6 2
+A
+24 -1
+#10328
+snake eyes amulet toybox gear~
+a @Gsn@Yak@We@n-@Gey@Yes@n @Gam@Yul@Wet@n~
+A @Gsn@Yak@We@n-@Gey@Yes@n @Gam@Yul@Wet@n rests here.~
+Two ivory dice showing single black pips hang from a dark silver
+chain. The dice knock softly together whenever danger turns suddenly
+against the wearer.
+~
+11 g 0 0 0 ac 0 0 0 0 0 0 0
+0 0 0 0
+1 430 0 45 0
+A
+13 30
+A
+12 30
+A
+24 -1
+#10329
+croupier s housecoat toybox gear~
+the @GCr@You@Ypi@Ger@n'@Gs@n @Gho@Yus@Dec@Yoa@Gt@n~
+The @GCr@You@Ypi@Ger@n'@Gs@n @Gho@Yus@Dec@Yoa@Gt@n rests here.~
+A formal dark coat is faced in green felt and edged with narrow
+lines of gold. Ivory buttons are arranged in mirrored pairs down the
+front.
+~
+9 g 0 0 0 ad 0 0 0 0 0 0 0
+18 0 0 0
+6 470 0 46 0
+A
+2 2
+A
+6 2
+A
+31 2
+#10330
+ivory pawn s helm toybox gear~
+an @Wiv@Dor@Wy@n @Wpa@Wwn@n'@Ws@n @Whe@Wlm@n~
+An @Wiv@Dor@Wy@n @Wpa@Wwn@n'@Ws@n @Whe@Wlm@n rests here.~
+A smooth ivory helm rises into the rounded crown of a chess pawn.
+Black inlay circles the brow in a strict mirrored border.
+~
+9 g 0 0 0 ae 0 0 0 0 0 0 0
+13 0 0 0
+4 420 0 44 0
+A
+5 2
+A
+13 30
+#10331
+black knight s blade toybox gear~
+a @Wbl@Dac@Wk@n @Wkn@Dig@Wht@n'@Ws@n @Wbl@Dad@We@n~
+A @Wbl@Dac@Wk@n @Wkn@Dig@Wht@n'@Ws@n @Wbl@Dad@We@n rests here.~
+A black-lacquered blade curves slightly like the neck of a carved
+warhorse. Ivory squares mark the grip in a pattern that never
+follows a straight line.
+~
+5 g 0 0 0 an 0 0 0 0 0 0 0
+0 2 8 3
+6 450 0 45 0
+A
+1 2
+A
+18 2
+A
+19 2
+#10332
+ivory bishop s checkered stole toybox gear~
+an @Wiv@Dor@Wy@n @Wbi@Dsh@Wop@n'@Ws@n @Wch@Dec@Wke@Dre@Wd@n @Wst@Dol@We@n~
+An @Wiv@Dor@Wy@n @Wbi@Dsh@Wop@n'@Ws@n @Wch@Dec@Wke@Dre@Wd@n @Wst@Dol@We@n rests here.~
+A long ivory stole is bordered by alternating black and gold
+squares. Its central seam runs diagonally from shoulder to hem.
+~
+11 g 0 0 0 ak 0 0 0 0 0 0 0
+0 0 0 0
+2 450 0 45 0
+A
+4 2
+A
+12 35
+A
+24 -1
+#10333
+rook fortress gauntlets toybox gear~
+a @Wpa@Wir@n of @Wro@Wok@n-@Wfo@Drt@Dre@Wss@n @Wga@Dun@Wtl@Det@Ws@n~
+A @Wpa@Wir@n of @Wro@Wok@n-@Wfo@Drt@Dre@Wss@n @Wga@Dun@Wtl@Det@Ws@n rests here.~
+Heavy black gauntlets are squared at the knuckles like miniature
+battlements. Ivory lines run straight from wrist to fingertip
+without deviation.
+~
+9 g 0 0 0 ah 0 0 0 0 0 0 0
+13 0 0 0
+4 470 0 46 0
+A
+1 2
+A
+5 2
+A
+13 25
+#10334
+black chess queen s diadem toybox gear~
+the @DBl@Wac@Rk@n @DCh@Wes@Rs@n @DQu@Wee@Rn@n'@Ds@n @Ddi@Wad@Rem@n~
+The @DBl@Wac@Rk@n @DCh@Wes@Rs@n @DQu@Wee@Rn@n'@Ds@n @Ddi@Wad@Rem@n rests here.~
+A black diadem rises into five sharp points divided by narrow ivory
+seams. A crimson stone sits at the center where every line seems to
+converge.
+~
+11 g 0 0 0 ae 0 0 0 0 0 0 0
+0 0 0 0
+1 540 0 48 0
+A
+6 3
+A
+3 2
+A
+12 40
+A
+24 -1
+#10335
+fool s last laugh mantle toybox gear~
+the @RFo@Dol@n'@Rs@n @RLa@Dst@n-@RLa@Dug@Wh@n @Rma@Dnt@Wle@n~
+The @RFo@Dol@n'@Rs@n @RLa@Dst@n-@RLa@Dug@Wh@n @Rma@Dnt@Wle@n rests here.~
+Crimson, black, ivory, and gold motley forms a mantle of impossible
+symmetry. Tiny bells along the collar remain silent until the wearer
+chooses to move.
+~
+9 g 0 0 0 ak 0 0 0 0 0 0 0
+23 0 0 0
+5 650 0 50 0
+A
+6 3
+A
+2 2
+A
+3 2
+A
+13 40
+A
+12 40
+A
+24 -2
+#10380
+pierrot mask black white sorrow~
+a @Wbl@Dac@Wk@n-@Wan@Wd@n-@Wwh@Dit@We@n @WPi@Der@Dro@Wt@n @Wma@Wsk@n~
+A @Wbl@Dac@Wk@n-@Wan@Wd@n-@Wwh@Dit@We@n @WPi@Der@Dro@Wt@n @Wma@Wsk@n lies here with its painted tear turned upward.~
+~
+8 0 0 0 0 a 0 0 0 0 0 0 0
+0 0 0 0
+1 0 0 30 0
+#10381
+puppetmaster shears silver string~
+the @DGr@Wan@Yd@n @DPu@Wpp@Yet@Ree@Yr@n'@Ds@n @Dsi@Wlv@Yer@n @Dsh@Wea@Yrs@n~
+The @DGr@Wan@Yd@n @DPu@Wpp@Yet@Ree@Yr@n'@Ds@n @Dsi@Wlv@Yer@n @Dsh@Wea@Yrs@n lie here with their blades slightly open.~
+~
+8 0 0 0 0 a 0 0 0 0 0 0 0
+0 0 0 0
+2 0 0 35 0
+#10382
+general baton command die lacquered~
+@RGe@Yne@Yra@Rl@n @RJa@Rck@n-@RA@n-@RNa@Ype@Rs@n' @Rco@Ymm@Yan@Rd@n @Rba@Rto@nn~
+@RGe@Yne@Yra@Rl@n @RJa@Rck@n-@RA@n-@RNa@Ype@Rs@n' @Rco@Ymm@Yan@Rd@n @Rba@Rto@nn rests here like a fallen marshal's standard.~
+~
+8 0 0 0 0 a 0 0 0 0 0 0 0
+0 0 0 0
+2 0 0 38 0
+#10383
+porcelain crown madame cracked~
+@WMa@Mda@Yme@n @WPo@Mrc@Yel@Cai@Yne@n'@Ws@n @Wcr@Mac@Yke@Cd@n @Wcr@Mow@nn~
+@WMa@Mda@Yme@n @WPo@Mrc@Yel@Cai@Yne@n'@Ws@n @Wcr@Mac@Yke@Cd@n @Wcr@Mow@nn rests here in a scatter of white shards.~
+~
+8 0 0 0 0 a 0 0 0 0 0 0 0
+0 0 0 0
+1 0 0 40 0
+#10384
+black queen coronet chess lacquer~
+the @DBl@Wac@Rk@n @DCh@Wes@Rs@n @DQu@Wee@Rn@n'@Ds@n @Dco@Wro@Rne@Yt@n~
+The @DBl@Wac@Rk@n @DCh@Wes@Rs@n @DQu@Wee@Rn@n'@Ds@n @Dco@Wro@Rne@Yt@n lies here like a captured royal piece.~
+~
+8 0 0 0 0 a 0 0 0 0 0 0 0
+0 0 0 0
+2 0 0 44 0
+#10385
+croupier dice cup silver chance~
+the @GCr@You@Ypi@Ger@n'@Gs@n @Gsi@Ylv@Ger@n @Gdi@Gce@n @Gcu@Gp@n~
+The @GCr@You@Ypi@Ger@n'@Gs@n @Gsi@Ylv@Ger@n @Gdi@Gce@n @Gcu@Gp@n lies overturned here.~
+~
+8 0 0 0 0 a 0 0 0 0 0 0 0
+0 0 0 0
+1 0 0 44 0
+#10386
+motley throne bell grand harlequin~
+a @Rgo@Mld@Re@nn @Rbe@Rll@n from the @RMo@Mtl@Rey@n @RTh@Mro@Rne@n~
+A @Rgo@Mld@Re@nn @Rbe@Rll@n from the @RMo@Mtl@Rey@n @RTh@Mro@Rne@n rests here in silence.~
+~
+8 0 0 0 0 a 0 0 0 0 0 0 0
+0 0 0 0
+1 0 0 33 0
+#10387
+fools die ivory jester smile~
+the @RFo@Dol@n'@Rs@n @RDi@De@n~
+The @RFo@Dol@n'@Rs@n @RDi@De@n waits here with one face turned upward.~
+~
+8 0 0 0 0 a 0 0 0 0 0 0 0
+0 0 0 0
+3 0 0 50 0
 $~
