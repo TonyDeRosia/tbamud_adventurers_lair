@@ -2965,40 +2965,198 @@ static void log_zone_error(zone_rnum zone, int cmd_no, const char *message)
 #define ZONE_ERROR(message) \
 	{ log_zone_error(zone, cmd_no, message); last_cmd = 0; }
 
+static int custom_reset_mob_matches(const struct char_data *mob,
+                                    zone_vnum zone_vnum_value,
+                                    room_vnum room_vnum_value,
+                                    mob_vnum mob_vnum_value)
+{
+  if (!mob || !mob->mob_specials.reset_spawn_tracked)
+    return FALSE;
+
+  /* extract_char() is deferred; do not count a mob already queued for removal. */
+  if (MOB_FLAGGED(mob, MOB_NOTDEADYET))
+    return FALSE;
+
+  return mob->mob_specials.reset_spawn_zone == zone_vnum_value &&
+         mob->mob_specials.reset_spawn_room == room_vnum_value &&
+         mob->mob_specials.reset_spawn_vnum == mob_vnum_value;
+}
+
 static int count_custom_reset_mobs(zone_vnum zone_vnum_value, room_vnum room_vnum_value,
                                    mob_vnum mob_vnum_value)
 {
   struct char_data *iter;
   int count = 0;
 
-  for (iter = character_list; iter; iter = iter->next) {
-    if (!iter->mob_specials.reset_spawn_tracked)
-      continue;
-    if (iter->mob_specials.reset_spawn_zone == zone_vnum_value &&
-        iter->mob_specials.reset_spawn_room == room_vnum_value &&
-        iter->mob_specials.reset_spawn_vnum == mob_vnum_value)
+  for (iter = character_list; iter; iter = iter->next)
+    if (custom_reset_mob_matches(iter, zone_vnum_value, room_vnum_value, mob_vnum_value))
       count++;
-  }
 
   return count;
 }
 
+static int custom_reset_mob_in_combat(struct char_data *mob)
+{
+  struct char_data *iter;
+
+  if (!mob)
+    return FALSE;
+
+  if (FIGHTING(mob))
+    return TRUE;
+
+  /* Protect the mob even if only the other combatant currently points at it. */
+  for (iter = character_list; iter; iter = iter->next)
+    if (iter != mob && FIGHTING(iter) == mob)
+      return TRUE;
+
+  return FALSE;
+}
+
+/*
+ * A population reroll is not a kill. Destroy the NPC's carried/equipped
+ * objects before extraction so a failed presence roll cannot create free loot.
+ */
+static void despawn_custom_reset_mob(struct char_data *mob)
+{
+  int pos;
+
+  if (!mob)
+    return;
+
+  while (mob->carrying)
+    extract_obj(mob->carrying);
+
+  for (pos = 0; pos < NUM_WEARS; pos++)
+    if (GET_EQ(mob, pos))
+      extract_obj(unequip_char(mob, pos));
+
+  mob->mob_specials.reset_spawn_tracked = FALSE;
+  mob->mob_specials.reset_spawn_zone = NOWHERE;
+  mob->mob_specials.reset_spawn_room = NOWHERE;
+  mob->mob_specials.reset_spawn_vnum = NOBODY;
+
+  extract_char(mob);
+}
+
+/*
+ * Reduce a reset-owned mob population toward the newly rolled target.
+ * Combatants are never removed. A combat-protected excess simply survives
+ * until a later normal zone reset rerolls the population again.
+ */
+static int reduce_custom_reset_mobs(zone_vnum zone_vnum_value, room_vnum room_vnum_value,
+                                    mob_vnum mob_vnum_value, int active, int desired)
+{
+  struct char_data *iter, *next_iter;
+  int remove_needed = active - desired;
+  int removed = 0;
+
+  if (remove_needed <= 0)
+    return active;
+
+  /*
+   * Save next before extraction.  The production extractor is deferred, but
+   * this also makes the loop correct if extraction unlinks immediately (as
+   * the deterministic regression wrapper deliberately does).
+   */
+  for (iter = character_list; iter && removed < remove_needed; iter = next_iter) {
+    next_iter = iter->next;
+
+    if (!custom_reset_mob_matches(iter, zone_vnum_value, room_vnum_value, mob_vnum_value))
+      continue;
+
+    if (custom_reset_mob_in_combat(iter))
+      continue;
+
+    despawn_custom_reset_mob(iter);
+    removed++;
+  }
+
+  return active - removed;
+}
+
+static int custom_reset_obj_matches(const struct obj_data *obj,
+                                    zone_vnum zone_vnum_value,
+                                    room_vnum room_vnum_value,
+                                    obj_vnum obj_vnum_value)
+{
+  if (!obj || !obj->reset_spawn_tracked)
+    return FALSE;
+
+  return obj->reset_spawn_zone == zone_vnum_value &&
+         obj->reset_spawn_room == room_vnum_value &&
+         obj->reset_spawn_vnum == obj_vnum_value;
+}
+
+static int custom_reset_obj_at_origin(const struct obj_data *obj, room_rnum origin_room)
+{
+  if (!obj)
+    return FALSE;
+
+  if (origin_room == NOWHERE)
+    return IN_ROOM(obj) == NOWHERE && !obj->carried_by && !obj->worn_by && !obj->in_obj;
+
+  return IN_ROOM(obj) == origin_room &&
+         !obj->carried_by && !obj->worn_by && !obj->in_obj;
+}
+
+/*
+ * Only ground objects still sitting in their reset origin remain owned by an
+ * O reset. If a player takes/moves one, release the runtime tracking so the
+ * reset system will never delete it from a player's inventory.
+ */
 static int count_custom_reset_objs(zone_vnum zone_vnum_value, room_vnum room_vnum_value,
-                                   obj_vnum obj_vnum_value)
+                                   obj_vnum obj_vnum_value, room_rnum origin_room)
 {
   struct obj_data *iter;
   int count = 0;
 
   for (iter = object_list; iter; iter = iter->next) {
-    if (!iter->reset_spawn_tracked)
+    if (!custom_reset_obj_matches(iter, zone_vnum_value, room_vnum_value, obj_vnum_value))
       continue;
-    if (iter->reset_spawn_zone == zone_vnum_value &&
-        iter->reset_spawn_room == room_vnum_value &&
-        iter->reset_spawn_vnum == obj_vnum_value)
-      count++;
+
+    if (!custom_reset_obj_at_origin(iter, origin_room)) {
+      iter->reset_spawn_tracked = FALSE;
+      iter->reset_spawn_zone = NOWHERE;
+      iter->reset_spawn_room = NOWHERE;
+      iter->reset_spawn_vnum = NOTHING;
+      continue;
+    }
+
+    count++;
   }
 
   return count;
+}
+
+static int reduce_custom_reset_objs(zone_vnum zone_vnum_value, room_vnum room_vnum_value,
+                                    obj_vnum obj_vnum_value, room_rnum origin_room,
+                                    int active, int desired)
+{
+  struct obj_data *iter, *next_iter;
+  int remove_needed = active - desired;
+  int removed = 0;
+
+  if (remove_needed <= 0)
+    return active;
+
+  for (iter = object_list; iter && removed < remove_needed; iter = next_iter) {
+    next_iter = iter->next;
+
+    if (!custom_reset_obj_matches(iter, zone_vnum_value, room_vnum_value, obj_vnum_value))
+      continue;
+    if (!custom_reset_obj_at_origin(iter, origin_room))
+      continue;
+
+    iter->reset_spawn_tracked = FALSE;
+    iter->reset_spawn_zone = NOWHERE;
+    iter->reset_spawn_room = NOWHERE;
+    iter->reset_spawn_vnum = NOTHING;
+    extract_obj(iter);
+    removed++;
+  }
+
+  return active - removed;
 }
 
 /* execute the reset command table of a given zone */
@@ -3044,20 +3202,33 @@ void reset_zone(zone_rnum zone)
         zone_vnum zv = zone_table[zone].number;
         room_vnum rv = world[ZCMD.arg3].number;
         mob_vnum mv = mob_index[ZCMD.arg1].vnum;
-        int active = count_custom_reset_mobs(zv, rv, mv);
-        int missing = ZCMD.spawn_count - active;
+        int desired = 0;
+        int active;
+        int missing;
 
         mob = NULL;
         tmob = NULL;
 
+        /*
+         * Reroll every configured population slot on every zone reset.
+         * The number of successful rolls is the population this reset wants
+         * to have after the reset completes.
+         */
+        for (i = 0; i < ZCMD.spawn_count; i++)
+          if (ZCMD.spawn_chance == 100 ||
+              rand_number(1, 100) <= ZCMD.spawn_chance)
+            desired++;
+
+        active = count_custom_reset_mobs(zv, rv, mv);
+
+        if (active > desired)
+          active = reduce_custom_reset_mobs(zv, rv, mv, active, desired);
+
+        missing = desired - active;
         if (missing < 0)
-          missing = 0;
+          missing = 0; /* combat protection may leave a temporary excess */
 
         for (i = 0; i < missing && spawned_mob_count < MAX_DUPLICATES; i++) {
-          if (ZCMD.spawn_chance != 100 &&
-              rand_number(1, 100) > ZCMD.spawn_chance)
-            continue;
-
           mob = read_mobile(ZCMD.arg1, REAL);
           mob->mob_specials.reset_spawn_tracked = TRUE;
           mob->mob_specials.reset_spawn_zone = zv;
@@ -3071,6 +3242,7 @@ void reset_zone(zone_rnum zone)
           tmob = mob;
         }
 
+        /* Dependent E/G/T/V chains only apply to mobs newly created this pass. */
         last_cmd = (spawned_mob_count > 0);
       } else {
         /* Legacy stock behavior: arg2 is the global prototype maximum. */
@@ -3095,19 +3267,27 @@ void reset_zone(zone_rnum zone)
         zone_vnum zv = zone_table[zone].number;
         room_vnum rv = (ZCMD.arg3 != NOWHERE) ? world[ZCMD.arg3].number : NOWHERE;
         obj_vnum ov = obj_index[ZCMD.arg1].vnum;
-        int active = count_custom_reset_objs(zv, rv, ov);
-        int missing = ZCMD.spawn_count - active;
+        int desired = 0;
+        int active;
+        int missing;
 
         tobj = NULL;
 
+        for (i = 0; i < ZCMD.spawn_count; i++)
+          if (ZCMD.spawn_chance == 100 ||
+              rand_number(1, 100) <= ZCMD.spawn_chance)
+            desired++;
+
+        active = count_custom_reset_objs(zv, rv, ov, ZCMD.arg3);
+
+        if (active > desired)
+          active = reduce_custom_reset_objs(zv, rv, ov, ZCMD.arg3, active, desired);
+
+        missing = desired - active;
         if (missing < 0)
           missing = 0;
 
         for (i = 0; i < missing && spawned_obj_count < MAX_DUPLICATES; i++) {
-          if (ZCMD.spawn_chance != 100 &&
-              rand_number(1, 100) > ZCMD.spawn_chance)
-            continue;
-
           obj = read_object(ZCMD.arg1, REAL);
           obj->reset_spawn_tracked = TRUE;
           obj->reset_spawn_zone = zv;

@@ -153,7 +153,7 @@
 /* structure for the reset commands */
 struct reset_com {
    int spawn_count;  /* M/O custom per-reset population slots; 0 = legacy stock semantics */
-   int spawn_chance; /* custom M/O percentage per vacant slot, 1-100; defaults to 100 */
+   int spawn_chance; /* custom M/O presence chance per slot, rerolled each zone reset; 1-100 */
    char	command;   /* current command                      */
 
    bool if_flag;	/* if TRUE: exe only if preceding exe'd */
