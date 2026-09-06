@@ -3608,4 +3608,7 @@ void mag_assign_spells(void) {
   skillo_cost(SKILL_DOUBLE_ATTACK, "double attack", 0);
   skillo_cost(SKILL_TRIPLE_ATTACK, "triple attack", 0);
   skillo_cost(SKILL_FOURTH_ATTACK, "fourth attack", 0);
+  skillo_cost(SKILL_DOUBLE_CAST, "double cast", 0);
+  skillo_cost(SKILL_TRIPLE_CAST, "triple cast", 0);
+  skillo_cost(SKILL_FOURTH_CAST, "fourth cast", 0);
 }

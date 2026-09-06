@@ -136,6 +136,53 @@ int combat_progression_class_chance_basis_points(struct char_data *ch,
       stage_percent);
 }
 
+int combat_progression_effective_multicast_proficiency(
+    int passive_proficiency,
+    int spell_proficiency)
+{
+  passive_proficiency = MAX(0, MIN(100, passive_proficiency));
+  spell_proficiency = MAX(0, MIN(100, spell_proficiency));
+
+  if (passive_proficiency <= 0 || spell_proficiency <= 0)
+    return 0;
+
+  return (passive_proficiency * spell_proficiency + 50) / 100;
+}
+
+int combat_progression_multicast_chance_basis_points(
+    struct char_data *ch,
+    int passive_proficiency,
+    int spell_proficiency,
+    int stage_percent)
+{
+  int effective_proficiency;
+
+  if (!ch || IS_NPC(ch))
+    return 0;
+
+  effective_proficiency =
+      combat_progression_effective_multicast_proficiency(
+          passive_proficiency, spell_proficiency);
+
+  if (effective_proficiency <= 0)
+    return 0;
+
+  return combat_progression_class_chance_basis_points(
+      ch, effective_proficiency, stage_percent);
+}
+
+bool combat_progression_multicast_roll(
+    struct char_data *ch,
+    int passive_proficiency,
+    int spell_proficiency,
+    int stage_percent)
+{
+  int chance = combat_progression_multicast_chance_basis_points(
+      ch, passive_proficiency, spell_proficiency, stage_percent);
+
+  return chance > 0 &&
+         rand_number(1, COMBAT_PROGRESSION_CHANCE_SCALE) <= chance;
+}
 static void combat_progression_physical_multiattack_stats(
     int class_num,
     int *primary_stat,

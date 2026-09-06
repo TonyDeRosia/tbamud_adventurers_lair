@@ -19,6 +19,19 @@ struct char_data;
 #define COMBAT_PROGRESSION_STAGE_THIRD    50
 
 /*
+ * Multicast progression is intentionally distinct from physical multiattack.
+ * Each later packet is chained behind the previous successful Multicast stage.
+ */
+#define COMBAT_PROGRESSION_MULTICAST_STAGE_DOUBLE 100
+#define COMBAT_PROGRESSION_MULTICAST_STAGE_TRIPLE  60
+#define COMBAT_PROGRESSION_MULTICAST_STAGE_FOURTH  35
+
+/* V1 bonus spell-damage packet weights. The original cast remains 100%. */
+#define COMBAT_PROGRESSION_MULTICAST_DAMAGE_SECOND 80
+#define COMBAT_PROGRESSION_MULTICAST_DAMAGE_THIRD  65
+#define COMBAT_PROGRESSION_MULTICAST_DAMAGE_FOURTH 50
+
+/*
  * Convert an effective stat into a 0..1000 diminishing-return rating.
  *
  * 10 -> 0
@@ -83,6 +96,29 @@ int combat_progression_physical_multiattack_chance_basis_points(
 bool combat_progression_physical_multiattack_roll(struct char_data *ch,
                                                   int proficiency,
                                                   int stage_percent);
+
+/*
+ * Multicast uses both passive mastery and mastery of the spell being cast.
+ * effective proficiency = passive proficiency * spell proficiency / 100.
+ *
+ * Chance then uses the character's existing class stat-priority profile,
+ * preserving caster identity instead of making one stat universal.
+ */
+int combat_progression_effective_multicast_proficiency(
+    int passive_proficiency,
+    int spell_proficiency);
+
+int combat_progression_multicast_chance_basis_points(
+    struct char_data *ch,
+    int passive_proficiency,
+    int spell_proficiency,
+    int stage_percent);
+
+bool combat_progression_multicast_roll(
+    struct char_data *ch,
+    int passive_proficiency,
+    int spell_proficiency,
+    int stage_percent);
 
 /* Random roll counterparts. */
 bool combat_progression_roll(struct char_data *ch,

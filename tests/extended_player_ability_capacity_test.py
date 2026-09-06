@@ -63,11 +63,10 @@ def test_legacy_binary_converter_keeps_independent_bound():
     assert "PLRTOASCII_LEGACY_MAX_SKILLS" in PLRTOASCII
     assert "byte skills[PLRTOASCII_LEGACY_MAX_SKILLS + 1]" in PLRTOASCII
 
-def test_capacity_phase_does_not_activate_new_abilities():
-    # Registration/mechanics belong to later isolated phases.
-    assert "skillo_cost(SKILL_DOUBLE_CAST" not in PARSER
-    assert "skillo_cost(SKILL_TRIPLE_CAST" not in PARSER
-    assert "skillo_cost(SKILL_FOURTH_CAST" not in PARSER
+def test_reserved_multicast_passives_are_registered_but_haste_is_not():
+    assert 'skillo_cost(SKILL_DOUBLE_CAST, "double cast", 0);' in PARSER
+    assert 'skillo_cost(SKILL_TRIPLE_CAST, "triple cast", 0);' in PARSER
+    assert 'skillo_cost(SKILL_FOURTH_CAST, "fourth cast", 0);' in PARSER
     assert "spello(SPELL_HASTE" not in PARSER
 
 def test_extended_band_documentation_matches_kind_model():
@@ -84,7 +83,7 @@ def run():
         test_player_arrays_expand_automatically_with_max_skills,
         test_normal_ascii_player_persistence_tracks_max_skills,
         test_legacy_binary_converter_keeps_independent_bound,
-        test_capacity_phase_does_not_activate_new_abilities,
+        test_reserved_multicast_passives_are_registered_but_haste_is_not,
         test_extended_band_documentation_matches_kind_model,
     ]
 
