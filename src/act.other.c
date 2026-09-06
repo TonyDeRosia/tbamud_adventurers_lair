@@ -1503,7 +1503,7 @@ static int study_extract_item_spells(struct obj_data *obj, int *out, int out_cap
     int sid = spell_slots[i];
     int duplicate = FALSE;
 
-    if (sid <= 0 || sid > TOP_SPELL_DEFINE || sid > MAX_SPELLS)
+    if (!ability_is_spell(sid))
       continue;
     if (!study_is_valid_ability_id(sid))
       continue;

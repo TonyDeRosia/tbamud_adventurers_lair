@@ -1795,7 +1795,7 @@ static void nonweapon_damage_message(int dam, struct char_data *ch,
   tier = damage_severity_tier(dam, victim);
   tier = MAX(1, MIN(9, tier));
 
-  physical_skill = (attacktype > MAX_SPELLS && attacktype <= MAX_SKILLS);
+  physical_skill = ability_is_skill(attacktype);
   ability = damage_ability_name(attacktype);
   punct = (tier >= 9) ? "!!" : ((tier >= 7) ? "!" : ".");
 
@@ -1881,7 +1881,7 @@ static void nonweapon_miss_message(struct char_data *ch,
     return;
 
   ability = damage_ability_name(attacktype);
-  physical_skill = (attacktype > MAX_SPELLS && attacktype <= MAX_SKILLS);
+  physical_skill = ability_is_skill(attacktype);
 
   if (ability) {
     char to_char[192];
@@ -2320,7 +2320,7 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
   if (dam > 0 &&
       ch &&
       ch != victim &&
-      IS_SPELL(attacktype) &&
+      ability_is_spell(attacktype) &&
       affected_by_spell(ch, SPELL_TRIPLE_MAXIMIZE_MAGIC)) {
     dam *= 3;
     affect_from_char(ch, SPELL_TRIPLE_MAXIMIZE_MAGIC);
@@ -2328,7 +2328,7 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
 
   /* Every direct offensive spell shares the displayed spell-critical roll.
    * Self-inflicted ticks and environmental/script damage never reach this path. */
-  if (dam > 0 && ch && ch != victim && IS_SPELL(attacktype))
+  if (dam > 0 && ch && ch != victim && ability_is_spell(attacktype))
     crit_apply_spell(ch, victim, &dam);
 
   if (dam > 0 && IS_WEAPON(attacktype) && victim != ch && AFF_FLAGGED(victim, AFF_PHASE) && rand_number(1, 100) <= 30) {
@@ -2426,7 +2426,7 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
       damage_type == DAM_SHADOW)
     dam = (dam * 105) / 100;
 
-  if (dam > 0 && ch && ch != victim && attacktype > 0 && attacktype <= MAX_SPELLS &&
+  if (dam > 0 && ch && ch != victim && ability_is_spell(attacktype) &&
       GET_SKILL(ch, SKILL_CHAIN_ASSASSAULT) > 0 &&
       affected_by_spell(ch, SKILL_CHAIN_ASSASSAULT) &&
       !IS_SET(spell_info[attacktype].targets, TAR_IGNORE) &&
@@ -2505,7 +2505,7 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
   }
 
   if (dam > 0 && AFF_FLAGGED(victim, AFF_WARDED) &&
-      attacktype > 0 && attacktype <= MAX_SPELLS)
+      ability_is_spell(attacktype))
     dam = (dam * 7) / 10;
 
   if (dam > 0 && damage_type == DAM_LIGHTNING && AFF_FLAGGED(victim, AFF_STATIC)) {
@@ -2519,7 +2519,7 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
       (damage_type == DAM_SHADOW || damage_type == DAM_NECROTIC))
     dam = (dam * 105) / 100;
 
-  if (dam > 0 && victim && IS_SPELL(attacktype) && GET_MAX_HIT(victim) > 0) {
+  if (dam > 0 && victim && ability_is_spell(attacktype) && GET_MAX_HIT(victim) > 0) {
     int half_max = GET_MAX_HIT(victim) / 2;
     if (dam > half_max)
       dam = half_max + (dam / 4);
@@ -2734,7 +2734,7 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
 
     if (ch != victim && ch && !IS_NPC(ch) &&
         GET_SKILL(ch, SKILL_TACTICAL_SPELL_MEMORY) > 0 &&
-        attacktype > 0 && attacktype <= MAX_SPELLS) {
+        ability_is_spell(attacktype)) {
       int mana_refund = MAX(1, GET_LEVEL(ch) / 4);
       GET_MANA(ch) = MIN(effective_max_mana(ch), GET_MANA(ch) + mana_refund);
       send_to_char(ch, "You retain tactical spell memory and recover %d mana.\r\n", mana_refund);

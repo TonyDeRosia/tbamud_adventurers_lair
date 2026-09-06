@@ -113,7 +113,7 @@ static void strip_sanctuary_effects(struct char_data *victim)
     next = af->next;
 
     if (IS_SET_AR(af->bitvector, AFF_SANCTUARY) &&
-        af->spell > 0 && af->spell <= MAX_SPELLS &&
+        ability_is_spell(af->spell) &&
         is_sanctuary_spell(af->spell))
       affect_remove(victim, af);
   }
@@ -229,7 +229,7 @@ void affect_update(void)
       else if (af->duration == -1)	/* No action */
 	;
       else {
-        if ((af->spell > 0) && (af->spell <= MAX_SPELLS))
+        if (ability_is_spell(af->spell))
           if (!af->next || (af->next->spell != af->spell) ||
               (af->next->duration > 0))
             if (spell_info[af->spell].wear_off_msg) {

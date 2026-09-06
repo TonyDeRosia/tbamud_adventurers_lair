@@ -288,7 +288,7 @@ void do_dg_cast(void *go, struct script_data *sc, trig_data *trig, int type, cha
 
   /* spellnum = search_block(s, spells, 0); */
   spellnum = find_skill_num(s);
-  if ((spellnum < 1) || (spellnum > MAX_SPELLS)) {
+  if (!ability_is_spell(spellnum)) {
     script_log("Trigger: %s, VNum %d. dg_cast: invalid spell name (%s)",
       GET_TRIG_NAME(trig), GET_TRIG_VNUM(trig), orig_cmd);
     return;

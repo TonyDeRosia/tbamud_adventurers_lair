@@ -94,12 +94,12 @@ def test_live_help_type_uses_explicit_kind():
     assert "type = ability_kind_name(ability);" in INFO
     assert 'type = (ability <= MAX_SPELLS) ? "Spell" : "Skill";' not in INFO
 
-def test_casting_boundary_is_intentionally_not_converted_yet():
-    # Foundation V1 must not silently widen casting. That happens in the next,
-    # separately audited conversion phase.
-    assert "spellnum > MAX_SPELLS" in PARSER
-    assert "spellnum <= MAX_SPELLS" in PARSER
-    assert "for (spellnum = 1; spellnum <= MAX_SPELLS; spellnum++)" in PARSER
+def test_runtime_casting_now_uses_explicit_kind():
+    # Runtime Phase 2 deliberately widened spell discovery to the registered
+    # table while filtering by explicit spell kind.
+    assert "if (!ability_is_spell(spellnum))" in PARSER
+    assert "ability_is_spell(spellnum) && spell_info[spellnum].name" in PARSER
+    assert "for (spellnum = 1; spellnum <= TOP_SPELL_DEFINE; spellnum++)" in PARSER
 
 def run():
     tests = [
@@ -111,7 +111,7 @@ def run():
         test_tome_labels_use_explicit_kind,
         test_classtrack_filter_uses_explicit_kind,
         test_live_help_type_uses_explicit_kind,
-        test_casting_boundary_is_intentionally_not_converted_yet,
+        test_runtime_casting_now_uses_explicit_kind,
     ]
 
     for test in tests:

@@ -68,7 +68,7 @@ static int can_character_cast_known_spell(struct char_data *ch, int spellnum)
   if (!ch || IS_NPC(ch) || !is_valid_class(GET_CLASS(ch)))
     return FALSE;
 
-  if (spellnum < 1 || spellnum > MAX_SPELLS)
+  if (!ability_is_spell(spellnum))
     return FALSE;
 
   if (GET_SKILL(ch, spellnum) <= 0)
@@ -1237,7 +1237,7 @@ const char *ability_kind_name(int ability)
 }
 
 static bool is_available_spell(int spellnum) {
-  return (spellnum > 0 && spellnum <= MAX_SPELLS && spell_info[spellnum].name
+  return (ability_is_spell(spellnum) && spell_info[spellnum].name
       && str_cmp(spell_info[spellnum].name, unused_spellname) != 0);
 }
 
@@ -1495,7 +1495,7 @@ static int find_known_spell_by_tokens(struct char_data *ch, const char *name,
 
   *ambig_buf = '\0';
 
-  for (spellnum = 1; spellnum <= MAX_SPELLS; spellnum++) {
+  for (spellnum = 1; spellnum <= TOP_SPELL_DEFINE; spellnum++) {
     int token_count = 0;
     int input_token_count = 0;
     bool exact_name_match = FALSE;
@@ -2438,7 +2438,7 @@ static void perform_automatic_buff_sequence(struct char_data *ch,
   }
 
   start_room = IN_ROOM(ch);
-  for (spellnum = 1; spellnum <= MAX_SPELLS; spellnum++) {
+  for (spellnum = 1; spellnum <= TOP_SPELL_DEFINE; spellnum++) {
     if (DEAD(ch) || DEAD(tch) || IN_ROOM(ch) != start_room ||
         IN_ROOM(tch) != start_room)
       break;
@@ -2684,7 +2684,7 @@ ACMD(do_cast) {
     return;
   }
 
-  if ((spellnum < 1) || (spellnum > MAX_SPELLS)) {
+  if (!ability_is_spell(spellnum)) {
     send_to_char(ch, "You do not know that spell.\r\n");
     return;
   }

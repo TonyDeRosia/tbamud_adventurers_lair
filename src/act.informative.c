@@ -3672,8 +3672,6 @@ static int find_live_ability_by_name(const char *argument, int *ability_out)
 static void show_live_ability_help(struct char_data *ch, int show_skills)
 {
   int i, count = 0;
-  int start = show_skills ? MAX_SPELLS + 1 : 1;
-  int end = show_skills ? TOP_SPELL_DEFINE : MAX_SPELLS;
   char outbuf[MAX_STRING_LENGTH];
   size_t len = 0;
   const char *title = show_skills ? "SKILLS" : "SPELLS";
@@ -3685,7 +3683,9 @@ static void show_live_ability_help(struct char_data *ch, int show_skills)
   append_help_line(outbuf, sizeof(outbuf), &len, title);
   append_help_line(outbuf, sizeof(outbuf), &len, "\r\n\r\n");
 
-  for (i = start; i <= end; i++) {
+  for (i = 1; i <= TOP_SPELL_DEFINE; i++) {
+    if (show_skills ? !ability_is_skill(i) : !ability_is_spell(i))
+      continue;
     if (!spell_info[i].name || !str_cmp(spell_info[i].name, unused_spellname))
       continue;
     count++;
