@@ -23,6 +23,7 @@
 #include "act.h"
 #include "fight.h"
 #include "graph.h"
+#include "mud_event.h"
 #include "quest.h"
 #include "oasis.h" /* for buildwalk */
 
@@ -333,36 +334,118 @@ static zone_rnum find_runto_zone(const char *query, int *matches)
   return (count == 1) ? found : NOWHERE;
 }
 
-static int execute_runto_path_to_room(struct char_data *ch, room_rnum target_room)
+static long runto_step_delay(void)
 {
-  if (!ch || IN_ROOM(ch) == NOWHERE || !VALID_ROOM_RNUM(target_room))
-    return FALSE;
+  /* Running should feel faster than manual walking, but every room must be
+   * reached on its own later game pulse instead of resolving in one command. */
+  return MAX(1, PASSES_PER_SEC / 2);
+}
 
-  while (IN_ROOM(ch) != target_room) {
-    int dir;
-    room_rnum next_room;
+EVENTFUNC(event_runto)
+{
+  struct mud_event_data *pMudEvent;
+  struct char_data *ch;
+  room_vnum target_vnum;
+  room_rnum target_room;
+  room_rnum next_room;
+  room_rnum was_in;
+  zone_rnum target_zone;
+  int dir;
 
-    if (FIGHTING(ch))
-      return FALSE;
+  if (!event_obj)
+    return 0;
 
-    dir = graph_find_first_step(IN_ROOM(ch), target_room);
-    if (dir < 0 || !EXIT(ch, dir))
-      return FALSE;
+  pMudEvent = (struct mud_event_data *)event_obj;
+  ch = (struct char_data *)pMudEvent->pStruct;
 
-    next_room = EXIT(ch, dir)->to_room;
-    if (!room_is_runto_safe(next_room))
-      return FALSE;
+  if (!ch || IN_ROOM(ch) == NOWHERE)
+    return 0;
 
-    /*
-     * This is real movement, not teleportation.  perform_move() is the same
-     * normal locomotion path used by directional movement and therefore
-     * applies doors, movement cost, followers, terrain checks, and triggers.
-     */
-    if (!perform_move(ch, dir, 0))
-      return FALSE;
+  if (!pMudEvent->sVariables || !*pMudEvent->sVariables) {
+    send_to_char(ch, "Your running route fades away.\r\n");
+    return 0;
   }
 
-  return TRUE;
+  if (FIGHTING(ch)) {
+    send_to_char(ch, "Combat interrupts your run.\r\n");
+    return 0;
+  }
+
+  if (GET_POS(ch) < POS_STANDING) {
+    send_to_char(ch, "You stop running because you are no longer on your feet.\r\n");
+    return 0;
+  }
+
+  target_vnum = atoi(pMudEvent->sVariables);
+  target_room = real_room(target_vnum);
+
+  if (target_room == NOWHERE || !room_is_runto_safe(target_room)) {
+    send_to_char(ch, "Your destination is no longer reachable.\r\n");
+    return 0;
+  }
+
+  target_zone = world[target_room].zone;
+  if (target_zone == NOWHERE || ZONE_FLAGGED(target_zone, ZONE_CLOSED)) {
+    send_to_char(ch, "A barrier now prevents travel to that area.\r\n");
+    return 0;
+  }
+
+  if (IN_ROOM(ch) == target_room) {
+    send_to_char(ch, "You arrive at the start of %s.\r\n",
+                 zone_table[target_zone].name);
+    return 0;
+  }
+
+  dir = graph_find_first_step(IN_ROOM(ch), target_room);
+  if (dir < 0 || !EXIT(ch, dir)) {
+    send_to_char(ch, "You lose the route to %s and stop running.\r\n",
+                 zone_table[target_zone].name);
+    return 0;
+  }
+
+  next_room = EXIT(ch, dir)->to_room;
+  if (!room_is_runto_safe(next_room)) {
+    send_to_char(ch, "The route ahead becomes unsafe, so you stop running.\r\n");
+    return 0;
+  }
+
+  was_in = IN_ROOM(ch);
+
+  /*
+   * Exactly ONE normal movement step per event firing.
+   * No while loop, no char_to_room(), and no goto-style teleport.
+   * perform_move() handles ordinary exits, doors, move cost, followers,
+   * room/mob/object movement triggers, terrain restrictions and room display.
+   */
+  if (!perform_move(ch, dir, 0)) {
+    send_to_char(ch, "Something blocks your route, so you stop running.\r\n");
+    return 0;
+  }
+
+  if (IN_ROOM(ch) == NOWHERE)
+    return 0;
+
+  /*
+   * A movement trigger may intentionally relocate the player somewhere other
+   * than the expected next room. Do not silently continue from that result.
+   */
+  if (IN_ROOM(ch) != next_room) {
+    send_to_char(ch, "Your route is disrupted, so you stop running.\r\n");
+    return 0;
+  }
+
+  if (IN_ROOM(ch) == was_in) {
+    send_to_char(ch, "You fail to make progress and stop running.\r\n");
+    return 0;
+  }
+
+  if (IN_ROOM(ch) == target_room) {
+    send_to_char(ch, "You arrive at the start of %s.\r\n",
+                 zone_table[target_zone].name);
+    return 0;
+  }
+
+  return runto_step_delay();
 }
 
 ACMD(do_run)
@@ -420,8 +503,10 @@ ACMD(do_run)
 ACMD(do_runto)
 {
   char query[MAX_INPUT_LENGTH];
+  char event_vars[32];
   zone_rnum zone;
   room_rnum target_room;
+  struct mud_event_data *existing;
   int distance;
   int matches = 0;
 
@@ -434,6 +519,7 @@ ACMD(do_runto)
     send_to_char(ch,
                  "Run to which area?\r\n"
                  "Usage: runto <area name | zone number>\r\n"
+                 "       runto stop\r\n"
                  "\r\n"
                  "Areas:\r\n");
 
@@ -451,6 +537,19 @@ ACMD(do_runto)
     if (!shown)
       send_to_char(ch, "  No runnable areas are currently available.\r\n");
 
+    return;
+  }
+
+  existing = char_has_mud_event(ch, eRUNTO);
+
+  if (!str_cmp(argument, "stop")) {
+    if (!existing) {
+      send_to_char(ch, "You are not currently running anywhere.\r\n");
+      return;
+    }
+
+    event_cancel(existing->pEvent);
+    send_to_char(ch, "You stop running.\r\n");
     return;
   }
 
@@ -476,12 +575,6 @@ ACMD(do_runto)
     return;
   }
 
-  if (IN_ROOM(ch) == target_room) {
-    send_to_char(ch, "You are already at the start of %s.\r\n",
-                 zone_table[zone].name);
-    return;
-  }
-
   distance = runto_path_distance(IN_ROOM(ch), target_room);
   if (distance < 0) {
     send_to_char(ch, "You cannot find a traversable route to %s.\r\n",
@@ -489,23 +582,28 @@ ACMD(do_runto)
     return;
   }
 
-  send_to_char(ch, "You begin running toward %s...\r\n",
-               zone_table[zone].name);
+  if (existing) {
+    event_cancel(existing->pEvent);
+    existing = NULL;
+  }
 
-  if (!execute_runto_path_to_room(ch, target_room)) {
-    send_to_char(ch, "Your run is interrupted before you reach %s.\r\n",
+  if (IN_ROOM(ch) == target_room) {
+    send_to_char(ch, "You are already at the start of %s.\r\n",
                  zone_table[zone].name);
     return;
   }
 
-  if (IN_ROOM(ch) != target_room) {
-    send_to_char(ch, "You cannot find a traversable route to %s.\r\n",
-                 zone_table[zone].name);
-    return;
-  }
+  snprintf(event_vars, sizeof(event_vars), "%d", GET_ROOM_VNUM(target_room));
 
-  send_to_char(ch, "You arrive at the start of %s.\r\n",
+  send_to_char(ch,
+               "You begin running toward %s. Type 'runto stop' to stop.\r\n",
                zone_table[zone].name);
+
+  /*
+   * Do not move here. The first room transition happens on a later event
+   * pulse, and every later transition is likewise one event firing at a time.
+   */
+  NEW_EVENT(eRUNTO, ch, event_vars, runto_step_delay());
 }
 
 /* Simple function to determine if char can fly. */

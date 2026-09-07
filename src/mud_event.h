@@ -26,6 +26,7 @@ typedef enum {
     eNULL,
     ePROTOCOLS, /* The Protocol Detection Event */
     eWHIRLWIND, /* The Whirlwind Attack */
+    eRUNTO, /* Paced player area traversal */
     eSPL_DARKNESS, /* Darkness Spell */
     eSPL_ENFEEBLEMENT, /* Enfeeblement Spell */
     eSPL_DETER, /* Deter Spell */
@@ -60,5 +61,6 @@ void clear_char_event_list(struct char_data * ch);
 EVENTFUNC(event_countdown);
 EVENTFUNC(get_protocols);
 EVENTFUNC(event_whirlwind);
+EVENTFUNC(event_runto);
 
 #endif /* _MUD_EVENT_H_ */

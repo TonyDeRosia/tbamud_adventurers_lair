@@ -26,6 +26,7 @@ struct mud_event_list mud_event_index[] = {
   { "Null"         , NULL           , -1          },  /* eNULL */
   { "Protocol"     , get_protocols  , EVENT_DESC  },  /* ePROTOCOLS */
   { "Whirlwind"    , event_whirlwind, EVENT_CHAR  },  /* eWHIRLWIND */
+  { "RunTo"        , event_runto    , EVENT_CHAR  },  /* eRUNTO */
   { "Spell:Darkness",event_countdown, EVENT_ROOM  },  /* eSPL_DARKNESS */
   { "Spell:Enfeeblement", event_countdown, EVENT_CHAR },  /* eSPL_ENFEEBLEMENT */
   { "Spell:Deter", event_countdown, EVENT_CHAR },          /* eSPL_DETER */
@@ -103,6 +104,9 @@ EVENTFUNC(event_countdown)
     case ePROTOCOLS:
       break;
     case eWHIRLWIND:
+      break;
+    case eRUNTO:
+      /* RUNTO has its own recurring event handler. */
       break;
     case eNULL:
       break;
