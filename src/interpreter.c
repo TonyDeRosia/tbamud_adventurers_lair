@@ -677,7 +677,8 @@ void command_interpreter(struct char_data *ch, char *argument)
 
   for (length = strlen(arg), cmd = 0; *complete_cmd_info[cmd].command != '\n'; cmd++)
     if(complete_cmd_info[cmd].command_pointer != do_action &&
-       !strncmp(complete_cmd_info[cmd].command, arg, length))
+       !strncmp(complete_cmd_info[cmd].command, arg, length) &&
+       (strcmp(complete_cmd_info[cmd].command, "light") || !strcmp(arg, "light")))
       if (GET_LEVEL(ch) >= complete_cmd_info[cmd].minimum_level)
         break;
 
