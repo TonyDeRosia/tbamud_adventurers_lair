@@ -2356,6 +2356,107 @@ void dual_skill_attack(struct char_data *ch, struct char_data *victim, int type)
   ch->equipment[WEAR_WIELD] = prim;
 }
 
+static void dodge_progression_stats(int class_num, int *primary_stat,
+                                    int *secondary_stat, int *tertiary_stat)
+{
+  /* Safe rare tome/cross-class fallback. */
+  *primary_stat = CLASS_STAT_DEX;
+  *secondary_stat = CLASS_STAT_INT;
+  *tertiary_stat = CLASS_STAT_CON;
+
+  switch (class_num) {
+    case CLASS_THIEF:
+      *primary_stat = CLASS_STAT_DEX;
+      *secondary_stat = CLASS_STAT_INT;
+      *tertiary_stat = CLASS_STAT_STR;
+      break;
+
+    case CLASS_BARD:
+      *primary_stat = CLASS_STAT_DEX;
+      *secondary_stat = CLASS_STAT_CHA;
+      *tertiary_stat = CLASS_STAT_INT;
+      break;
+
+    case CLASS_MYSTIC:
+      *primary_stat = CLASS_STAT_DEX;
+      *secondary_stat = CLASS_STAT_WIS;
+      *tertiary_stat = CLASS_STAT_CON;
+      break;
+
+    case CLASS_WARRIOR:
+      *primary_stat = CLASS_STAT_DEX;
+      *secondary_stat = CLASS_STAT_STR;
+      *tertiary_stat = CLASS_STAT_CON;
+      break;
+
+    case CLASS_PALADIN:
+      *primary_stat = CLASS_STAT_DEX;
+      *secondary_stat = CLASS_STAT_WIS;
+      *tertiary_stat = CLASS_STAT_CON;
+      break;
+
+    default:
+      break;
+  }
+}
+
+static int dodge_chance_basis_points(struct char_data *victim)
+{
+  int primary_stat;
+  int secondary_stat;
+  int tertiary_stat;
+  int proficiency;
+
+  if (!victim || IS_NPC(victim))
+    return 0;
+
+  proficiency = GET_SKILL(victim, SKILL_DODGE);
+  if (proficiency <= 0)
+    return 0;
+
+  dodge_progression_stats(GET_CLASS(victim), &primary_stat,
+                          &secondary_stat, &tertiary_stat);
+
+  return combat_progression_chance_basis_points(
+      victim, proficiency, primary_stat, secondary_stat, tertiary_stat,
+      DODGE_PROGRESSION_STAGE_PERCENT);
+}
+
+static bool try_dodge_attack(struct char_data *attacker,
+                             struct char_data *victim,
+                             int attacktype)
+{
+  int chance_basis_points;
+
+  if (!attacker || !victim || attacker == victim || IS_NPC(victim) ||
+      !IS_WEAPON(attacktype) || !AWAKE(victim) ||
+      GET_POS(victim) < POS_FIGHTING ||
+      AFF_FLAGGED(victim, AFF_ROOTED) ||
+      AFF_FLAGGED(victim, AFF_STUNNED))
+    return FALSE;
+
+  chance_basis_points = dodge_chance_basis_points(victim);
+  if (chance_basis_points <= 0 ||
+      rand_number(1, COMBAT_PROGRESSION_CHANCE_SCALE) > chance_basis_points)
+    return FALSE;
+
+  act("\tCYou dodge $n's attack!\tn", FALSE, attacker, NULL, victim,
+      TO_VICT | TO_SLEEP);
+  act("\tC$N dodges your attack!\tn", FALSE, attacker, NULL, victim,
+      TO_CHAR);
+  act("$N twists aside, dodging $n's attack!", FALSE, attacker, NULL,
+      victim, TO_NOTVICT);
+
+  /*
+   * Automatic passive progression follows the same training discipline as
+   * Double/Triple/Fourth and Dual Wield: successful procs only, and only on
+   * the normal effects pulse. Bonus attack packets therefore cannot farm it.
+   */
+  if (combat_effects_due)
+    improve_ability_from_use(victim, SKILL_DODGE, TRUE);
+
+  return TRUE;
+}
 int damage(struct char_data *ch, struct char_data *victim, int dam, int attacktype)
 {
   int haste_damage_percent = next_haste_damage_percent;
@@ -2451,6 +2552,9 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
     act("$n strikes one of $N's mirror images, which shatters!", FALSE, ch, 0, victim, TO_NOTVICT);
     dam = 0;
   }
+  if (dam > 0 && try_dodge_attack(ch, victim, attacktype))
+    dam = 0;
+
   if (dam > 0 && IS_WEAPON(attacktype) && victim != ch &&
       GET_SKILL(victim, SKILL_MONARCH_REFLEXES) > 0 &&
       !affected_by_spell(victim, SKILL_MONARCH_REFLEXES) &&

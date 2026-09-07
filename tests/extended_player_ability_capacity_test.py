@@ -72,7 +72,7 @@ def test_reserved_extended_abilities_are_registered():
 def test_extended_band_documentation_matches_kind_model():
     assert "EXTENDED PLAYER ABILITY IDS" in SPELLS
     assert "Explicit ability-kind metadata is authoritative" in SPELLS
-    assert "IDs 277-297 remain available for future player abilities." in SPELLS
+    assert "IDs 278-297 remain available for future player abilities." in SPELLS
 
 def run():
     tests = [

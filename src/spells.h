@@ -331,7 +331,8 @@
 #define SKILL_TRIPLE_CAST            274
 #define SKILL_FOURTH_CAST            275
 #define SPELL_HASTE                  276
-/* IDs 277-297 remain available for future player abilities. */
+#define SKILL_DODGE                  277
+/* IDs 278-297 remain available for future player abilities. */
 
 /* NON-PLAYER AND OBJECT SPELLS AND SKILLS: The practice levels for the spells
  * and skills below are _not_ recorded in the players file; therefore, the

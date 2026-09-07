@@ -1410,6 +1410,13 @@ void init_spell_levels(void)
   spell_level(SPELL_HASTE, CLASS_MAGIC_USER, 25);
   spell_level(SPELL_HASTE, CLASS_BARD, 30);
 
+  /* Dodge progression: agile martial access. */
+  spell_level(SKILL_DODGE, CLASS_THIEF, 10);
+  spell_level(SKILL_DODGE, CLASS_BARD, 15);
+  spell_level(SKILL_DODGE, CLASS_MYSTIC, 20);
+  spell_level(SKILL_DODGE, CLASS_WARRIOR, 25);
+  spell_level(SKILL_DODGE, CLASS_PALADIN, 30);
+
   spell_level(SKILL_APPRAISE_ENEMY, CLASS_THIEF, 18);
   spell_level(SKILL_APPRAISE_ENEMY, CLASS_WARRIOR, 28);
   spell_level(SKILL_APPRAISE_ENEMY, CLASS_WARLOCK, 27);
