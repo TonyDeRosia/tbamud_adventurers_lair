@@ -1117,6 +1117,42 @@ void stop_fighting(struct char_data *ch)
   update_pos(ch);
 }
 
+static long npc_kill_gold_roll(struct char_data *victim)
+{
+  long long gold = 0;
+  long long gmin;
+  long long gmax;
+
+  if (!victim || !IS_NPC(victim))
+    return 0;
+
+  gmin = (long long)victim->mob_specials.gold_min;
+  gmax = (long long)victim->mob_specials.gold_max;
+
+  if (gmin < 0)
+    gmin = 0;
+  if (gmax < 0)
+    gmax = 0;
+  if (gmax < gmin)
+    gmax = gmin;
+
+  if (gmin > 0 || gmax > 0) {
+    int imin = (gmin > INT_MAX) ? INT_MAX : (int)gmin;
+    int imax = (gmax > INT_MAX) ? INT_MAX : (int)gmax;
+
+    gold = (imin == imax) ? (long long)imin :
+      (long long)rand_number(imin, imax);
+  } else if (GET_GOLD(victim) > 0) {
+    gold = (long long)GET_GOLD(victim);
+  }
+
+  if (gold > 0 && IS_HAPPYHOUR && IS_HAPPYGOLD) {
+    long long bonus = (gold * (long long)HAPPY_GOLD) / 100LL;
+    gold += MAX(0LL, bonus);
+  }
+
+  return (long)MIN((long long)INT_MAX, MAX(0LL, gold));
+}
 static void make_corpse(struct char_data *ch)
 {
   int inv_dropped = 0;
@@ -1203,16 +1239,39 @@ static void make_corpse(struct char_data *ch)
       send_to_char(ch, "Death penalty: You drop nothing.\r\n");
     }
     } else {
-    /* NPC gold drop: roll between gold_min and gold_max and place on corpse. */
+    /*
+     * NPC gold belongs to the corpse. The normal combat-death path stores its
+     * one authoritative roll in GET_GOLD and clears the range before calling
+     * die(). Other death callers can still fall back to the live range here.
+     */
     long long gmin = ch->mob_specials.gold_min;
     long long gmax = ch->mob_specials.gold_max;
+
     if (gmin < 0) gmin = 0;
+    if (gmax < 0) gmax = 0;
     if (gmax < gmin) gmax = gmin;
-    dropped_gold = (gmax > 0) ? rand_number((int)gmin, (int)gmax) : 0;
+
+    if (gmin > 0 || gmax > 0) {
+      int imin = (gmin > INT_MAX) ? INT_MAX : (int)gmin;
+      int imax = (gmax > INT_MAX) ? INT_MAX : (int)gmax;
+      dropped_gold = (imin == imax) ? (long long)imin :
+        (long long)rand_number(imin, imax);
+    } else if (GET_GOLD(ch) > 0) {
+      dropped_gold = (long long)GET_GOLD(ch);
+    }
+
+    dropped_gold = MIN((long long)INT_MAX, MAX(0LL, dropped_gold));
+
     if (dropped_gold > 0) {
       money = create_money((int)dropped_gold, 0);
       obj_to_obj(money, corpse);
     }
+
+    /* Consume the prepared/fallback NPC gold state exactly once. */
+    SET_GOLD(ch, 0);
+    ch->mob_specials.gold_min = 0;
+    ch->mob_specials.gold_max = 0;
+
     apply_mob_loot_table(ch, corpse);
   }
 ch->carrying = NULL;
@@ -1479,39 +1538,6 @@ void die(struct char_data * ch, struct char_data * killer)
   if (!IS_NPC(ch)) {
     REMOVE_BIT_AR(PLR_FLAGS(ch), PLR_KILLER);
     REMOVE_BIT_AR(PLR_FLAGS(ch), PLR_THIEF);
-  }
-
-  /*
-   * NPC gold payout to the killer (single, authoritative location).
-   * Uses gold_min/gold_max if set, otherwise falls back to GET_GOLD(ch).
-   * Clears NPC gold so it does not also appear on the corpse.
-   */
-  if (killer && ch && IS_NPC(ch) && !IS_NPC(killer)) {
-    long long gold_gain = 0;
-    long long gmin = (long long)ch->mob_specials.gold_min;
-    long long gmax = (long long)ch->mob_specials.gold_max;
-
-    if (gmin < 0) gmin = 0;
-    if (gmax < 0) gmax = 0;
-    if (gmax < gmin) gmax = gmin;
-
-    if (gmin > 0 || gmax > 0) {
-      int imin = (gmin > 2147483647LL) ? 2147483647 : (int)gmin;
-      int imax = (gmax > 2147483647LL) ? 2147483647 : (int)gmax;
-      gold_gain = (imin == imax) ? (long long)imin : (long long)rand_number(imin, imax);
-    } else if (GET_GOLD(ch) > 0) {
-      gold_gain = (long long)GET_GOLD(ch);
-    }
-
-    if (gold_gain > 0) {
-      increase_money_gold(killer, gold_gain);
-      send_to_char(killer, "You receive \ty%lld\tn \tYgold\tn from the kill.\r\n", gold_gain);
-    }
-
-    /* prevent corpse gold duplication */
-    ch->mob_specials.gold_min = 0;
-    ch->mob_specials.gold_max = 0;
-    SET_GOLD(ch, 0);
   }
 
   raw_kill(ch, killer);
@@ -2355,7 +2381,7 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
   int damage_type = take_next_damage_type();
   int old_hit = 0;
   int old_band = 0;
-  long local_gold = 0, happy_gold = 0;
+  long local_gold = 0;
   char local_buf[256];
   struct char_data *tmp_char;
   struct obj_data *corpse_obj;
@@ -2838,16 +2864,17 @@ int damage(struct char_data *ch, struct char_data *victim, int dam, int attackty
     }
     if (reward_killer && reward_killer != victim)
       grant_glory_for_kill(reward_killer, victim);
-    /* Cant determine GET_GOLD on corpse, so do now and store */
+    /*
+     * Roll NPC kill gold exactly once before corpse creation. This includes
+     * gold_min/gold_max, the legacy GET_GOLD fallback, and Happy Hour. Store
+     * that exact amount in GET_GOLD so make_corpse() creates one matching pile.
+     */
     if (IS_NPC(victim)) {
-      if ((IS_HAPPYHOUR) && (IS_HAPPYGOLD))
-      {
-        happy_gold = (long)(GET_GOLD(victim) * (((float)(HAPPY_GOLD))/(float)100));
-        happy_gold = MAX(0, happy_gold);
-        increase_gold(victim, happy_gold);
-      }
-      local_gold = GET_GOLD(victim);
-      sprintf(local_buf,"%ld", (long)local_gold);
+      local_gold = npc_kill_gold_roll(victim);
+      SET_GOLD(victim, (int)local_gold);
+      victim->mob_specials.gold_min = 0;
+      victim->mob_specials.gold_max = 0;
+      snprintf(local_buf, sizeof(local_buf), "%ld", local_gold);
     }
 
     die(victim, reward_killer);
