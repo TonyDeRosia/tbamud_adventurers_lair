@@ -1703,6 +1703,37 @@ static char *replace_string(const char *str, const char *weapon_singular, const 
   return (buf);
 }
 
+static const char *combat_feedback_hp_color(int hp_pct)
+{
+  if (hp_pct >= 70)
+    return "\tG";
+  if (hp_pct >= 35)
+    return "\tY";
+  return "\tR";
+}
+
+static void append_attacker_combat_telemetry(char *msg, size_t msgsz, int dam,
+                                             struct char_data *victim)
+{
+  size_t used;
+  int hp_pct;
+
+  if (!msg || msgsz == 0 || dam <= 0 || !victim ||
+      GET_MAX_HIT(victim) <= 0 || GET_HIT(victim) <= 0)
+    return;
+
+  hp_pct = (GET_HIT(victim) * 100) / MAX(1, GET_MAX_HIT(victim));
+  hp_pct = MAX(0, MIN(100, hp_pct));
+
+  used = strlen(msg);
+  if (used >= msgsz - 1)
+    return;
+
+  snprintf(msg + used, msgsz - used,
+           " \tD[\tY%d dmg\tD | %s%d%% HP\tD]\tn",
+           dam, combat_feedback_hp_color(hp_pct), hp_pct);
+}
+
 /* message for doing damage with a weapon */
 static void dam_message(int dam, struct char_data *ch, struct char_data *victim,
 		      int w_type)
@@ -1745,9 +1776,7 @@ static void dam_message(int dam, struct char_data *ch, struct char_data *victim,
            verb_base, attack_hit_text[attack_index].singular, punct);
   snprintf(to_victim, sizeof(to_victim), "$n %s you with $s %s%s",
            verb_third, attack_hit_text[attack_index].singular, punct);
-
-  if (GET_LEVEL(ch) >= LVL_IMMORT)
-    send_to_char(ch, "(%d) ", dam);
+  append_attacker_combat_telemetry(to_char, sizeof(to_char), dam, victim);
 
   act(to_room, FALSE, ch, NULL, victim, TO_NOTVICT);
   act(to_char, FALSE, ch, NULL, victim, TO_CHAR);
@@ -1840,6 +1869,7 @@ static void nonweapon_damage_message(int dam, struct char_data *ch,
     }
 
     act(to_room, FALSE, ch, NULL, victim, TO_NOTVICT);
+    append_attacker_combat_telemetry(to_char, sizeof(to_char), dam, victim);
     act(to_char, FALSE, ch, NULL, victim, TO_CHAR);
     act(to_vict, FALSE, ch, NULL, victim, TO_VICT | TO_SLEEP);
     return;
