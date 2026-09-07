@@ -23,6 +23,7 @@
 #include "db.h"
 #include "dg_scripts.h"
 #include "fight.h"  /* for hit() */
+#include "combat_progression.h"
 #include "act.h"
 #include "criticalhits.h"
 #include "tome.h"
@@ -2403,6 +2404,125 @@ int cast_spell(struct char_data *ch, struct char_data *tch,
   }
 }
 
+static bool multicast_target_valid(struct char_data *ch,
+                                   struct char_data *victim)
+{
+  if (!ch || !victim || IS_NPC(ch))
+    return FALSE;
+
+  if (IN_ROOM(ch) == NOWHERE || IN_ROOM(victim) == NOWHERE)
+    return FALSE;
+
+  return IN_ROOM(ch) == IN_ROOM(victim);
+}
+
+static bool multicast_spell_is_eligible(struct char_data *ch,
+                                        struct char_data *victim,
+                                        struct obj_data *obj,
+                                        int spellnum)
+{
+  if (!multicast_target_valid(ch, victim) || obj != NULL)
+    return FALSE;
+
+  if (!ability_is_spell(spellnum))
+    return FALSE;
+
+  /*
+   * V1 is deliberately strict: only pure MAG_DAMAGE spells qualify.
+   * Mixed damage+affect/manual spells, area/mass/group spells and utility
+   * routines are excluded even though mag_damage() may implement damage for
+   * some of them.
+   */
+  if (spell_info[spellnum].routines != MAG_DAMAGE)
+    return FALSE;
+
+  if (!IS_SET(spell_info[spellnum].targets, TAR_CHAR_ROOM | TAR_FIGHT_VICT))
+    return FALSE;
+
+  return TRUE;
+}
+
+static void perform_player_multicast_damage_chain(
+    struct char_data *ch,
+    struct char_data *victim,
+    struct obj_data *obj,
+    int spellnum)
+{
+  int spell_proficiency;
+  int passive_proficiency;
+  int result;
+
+  if (!multicast_spell_is_eligible(ch, victim, obj, spellnum))
+    return;
+
+  spell_proficiency = GET_SKILL(ch, spellnum);
+  if (spell_proficiency <= 0)
+    return;
+
+  /* Double Cast must succeed before any later Multicast stage can exist. */
+  passive_proficiency = GET_SKILL(ch, SKILL_DOUBLE_CAST);
+  if (passive_proficiency <= 0 ||
+      !combat_progression_multicast_roll(
+          ch,
+          passive_proficiency,
+          spell_proficiency,
+          COMBAT_PROGRESSION_MULTICAST_STAGE_DOUBLE))
+    return;
+
+  improve_ability_from_use(ch, SKILL_DOUBLE_CAST, TRUE);
+  result = mag_damage_scaled(
+      GET_LEVEL(ch),
+      ch,
+      victim,
+      spellnum,
+      SAVING_SPELL,
+      COMBAT_PROGRESSION_MULTICAST_DAMAGE_SECOND);
+
+  if (result == -1 || !multicast_target_valid(ch, victim))
+    return;
+
+  /* Triple Cast is chained behind a successful Double Cast proc. */
+  passive_proficiency = GET_SKILL(ch, SKILL_TRIPLE_CAST);
+  if (passive_proficiency <= 0 ||
+      !combat_progression_multicast_roll(
+          ch,
+          passive_proficiency,
+          spell_proficiency,
+          COMBAT_PROGRESSION_MULTICAST_STAGE_TRIPLE))
+    return;
+
+  improve_ability_from_use(ch, SKILL_TRIPLE_CAST, TRUE);
+  result = mag_damage_scaled(
+      GET_LEVEL(ch),
+      ch,
+      victim,
+      spellnum,
+      SAVING_SPELL,
+      COMBAT_PROGRESSION_MULTICAST_DAMAGE_THIRD);
+
+  if (result == -1 || !multicast_target_valid(ch, victim))
+    return;
+
+  /* Fourth Cast is chained behind a successful Triple Cast proc. */
+  passive_proficiency = GET_SKILL(ch, SKILL_FOURTH_CAST);
+  if (passive_proficiency <= 0 ||
+      !combat_progression_multicast_roll(
+          ch,
+          passive_proficiency,
+          spell_proficiency,
+          COMBAT_PROGRESSION_MULTICAST_STAGE_FOURTH))
+    return;
+
+  improve_ability_from_use(ch, SKILL_FOURTH_CAST, TRUE);
+  (void)mag_damage_scaled(
+      GET_LEVEL(ch),
+      ch,
+      victim,
+      spellnum,
+      SAVING_SPELL,
+      COMBAT_PROGRESSION_MULTICAST_DAMAGE_FOURTH);
+}
+
 static void perform_automatic_buff_sequence(struct char_data *ch,
     struct char_data *tch, bool other_target)
 {
@@ -2857,9 +2977,19 @@ ACMD(do_cast) {
     if (SINFO.violent && tch && IS_NPC(tch))
     hit(tch, ch, TYPE_UNDEFINED);
     improve_ability_from_use(ch, spellnum, 0);
-  } else { /* cast spell returns 1 on success; subtract mana & set waitstate */
-    if (cast_spell(ch, tch, tobj, spellnum)) {
+  } else { /* cast spell returns nonzero on success; subtract mana & set waitstate */
+    int cast_result = cast_spell(ch, tch, tobj, spellnum);
+
+    if (cast_result) {
       improve_ability_from_use(ch, spellnum, 1);
+
+      /*
+       * A dead primary target makes call_magic()/cast_spell() return -1.
+       * Never dereference that target for a bonus packet.
+       */
+      if (cast_result > 0)
+        perform_player_multicast_damage_chain(ch, tch, tobj, spellnum);
+
       WAIT_STATE(ch, PULSE_VIOLENCE);
       if (mana > 0)
         GET_MANA(ch) = MAX(0, MIN(effective_max_mana(ch), GET_MANA(ch) - mana));

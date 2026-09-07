@@ -651,6 +651,8 @@ int resolve_spell_by_player_input(struct char_data *ch, const char *name,
 
 int mag_damage(int level, struct char_data *ch, struct char_data *victim,
   int spellnum, int savetype);
+int mag_damage_scaled(int level, struct char_data *ch, struct char_data *victim,
+  int spellnum, int savetype, int damage_percent);
 
 void mag_affects(int level, struct char_data *ch, struct char_data *victim,
   int spellnum, int savetype);

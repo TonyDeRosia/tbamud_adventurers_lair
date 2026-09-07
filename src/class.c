@@ -1383,6 +1383,29 @@ void init_spell_levels(void)
   spell_level(SKILL_SOVEREIGN_PRESSURE, CLASS_WARLOCK, 42);
   spell_level(SKILL_KILL_WINDOW, CLASS_WARLOCK, 34);
   spell_level(SKILL_LEGION_MASTERY, CLASS_WARLOCK, 45);
+  /*
+   * Multicast passive progression.
+   *
+   * The runtime itself is class-neutral: rare Tome/cross-class access works
+   * whenever the character has proficiency in the passive. These are only the
+   * normal class unlocks for V1.
+   */
+  spell_level(SKILL_DOUBLE_CAST, CLASS_MAGIC_USER, 10);
+  spell_level(SKILL_TRIPLE_CAST, CLASS_MAGIC_USER, 40);
+  spell_level(SKILL_FOURTH_CAST, CLASS_MAGIC_USER, 70);
+
+  spell_level(SKILL_DOUBLE_CAST, CLASS_WARLOCK, 15);
+  spell_level(SKILL_TRIPLE_CAST, CLASS_WARLOCK, 45);
+  spell_level(SKILL_FOURTH_CAST, CLASS_WARLOCK, 75);
+
+  spell_level(SKILL_DOUBLE_CAST, CLASS_CLERIC, 20);
+  spell_level(SKILL_TRIPLE_CAST, CLASS_CLERIC, 50);
+  spell_level(SKILL_FOURTH_CAST, CLASS_CLERIC, 80);
+
+  spell_level(SKILL_DOUBLE_CAST, CLASS_DRUID, 25);
+  spell_level(SKILL_TRIPLE_CAST, CLASS_DRUID, 55);
+  spell_level(SKILL_FOURTH_CAST, CLASS_DRUID, 85);
+
   spell_level(SKILL_APPRAISE_ENEMY, CLASS_THIEF, 18);
   spell_level(SKILL_APPRAISE_ENEMY, CLASS_WARRIOR, 28);
   spell_level(SKILL_APPRAISE_ENEMY, CLASS_WARLOCK, 27);

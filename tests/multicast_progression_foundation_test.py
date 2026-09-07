@@ -79,17 +79,16 @@ def test_multicast_roll_uses_standard_basis_point_scale():
     assert "COMBAT_PROGRESSION_CHANCE_SCALE" in body
     assert "rand_number(1, COMBAT_PROGRESSION_CHANCE_SCALE)" in body
 
-def test_foundation_does_not_assign_class_access_or_damage_packets_yet():
-    for ability in (
-        "SKILL_DOUBLE_CAST",
-        "SKILL_TRIPLE_CAST",
-        "SKILL_FOURTH_CAST",
-    ):
-        assert f"spell_level({ability}," not in CLASS_C
-
-    # This phase must not touch actual spell-damage execution.
+def test_foundation_is_now_consumed_by_multicast_damage_v1():
+    # The shared probability helpers remain outside magic.c; the direct player
+    # cast path owns proc decisions and magic.c only owns scaled damage packets.
     assert "combat_progression_multicast_roll(" not in MAGIC_C
-    assert "COMBAT_PROGRESSION_MULTICAST_DAMAGE_SECOND" not in MAGIC_C
+    assert "mag_damage_scaled(" in MAGIC_C
+
+    assert "spell_level(SKILL_DOUBLE_CAST, CLASS_MAGIC_USER, 10);" in CLASS_C
+    assert "spell_level(SKILL_DOUBLE_CAST, CLASS_WARLOCK, 15);" in CLASS_C
+    assert "spell_level(SKILL_DOUBLE_CAST, CLASS_CLERIC, 20);" in CLASS_C
+    assert "spell_level(SKILL_DOUBLE_CAST, CLASS_DRUID, 25);" in CLASS_C
 
 def run():
     tests = [
@@ -102,7 +101,7 @@ def run():
         test_multicast_uses_existing_class_stat_priority_profile,
         test_multicast_excludes_npcs_in_shared_helper,
         test_multicast_roll_uses_standard_basis_point_scale,
-        test_foundation_does_not_assign_class_access_or_damage_packets_yet,
+        test_foundation_is_now_consumed_by_multicast_damage_v1,
     ]
 
     for test in tests:

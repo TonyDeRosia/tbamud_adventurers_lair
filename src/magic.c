@@ -38,6 +38,13 @@ static void strip_sanctuary_effects(struct char_data *victim);
 static void sanctuary_messages(int spellnum, const char **to_vict, const char **to_room);
 static enum damage_type current_spell_damage_type = DAM_NONE;
 
+/*
+ * One-shot scale consumed by the next mag_damage() call. The MUD is
+ * single-threaded, and mag_damage() resets this to 100 immediately on entry so
+ * nested damage triggered by damage() cannot accidentally inherit the packet.
+ */
+static int next_mag_damage_scale_percent = 100;
+
 static int spell_dur_short(int level) { return 2 + (level / 10); }
 static int spell_dur_medium(int level) { return 4 + (level / 8); }
 static int spell_dur_long(int level) { return 6 + (level / 6); }
@@ -355,6 +362,22 @@ static int mag_materials(struct char_data *ch, IDXTYPE item0,
 }
 
 
+int mag_damage_scaled(int level, struct char_data *ch, struct char_data *victim,
+                      int spellnum, int savetype, int damage_percent)
+{
+  int previous_scale, result;
+
+  if (damage_percent <= 0)
+    return 0;
+
+  previous_scale = next_mag_damage_scale_percent;
+  next_mag_damage_scale_percent = MIN(100, damage_percent);
+  result = mag_damage(level, ch, victim, spellnum, savetype);
+  next_mag_damage_scale_percent = previous_scale;
+
+  return result;
+}
+
 /* Every spell that does damage comes through here.  This calculates the amount
  * of damage, adds in any modifiers, determines what the saves are, tests for
  * save and calls damage(). -1 = dead, otherwise the amount of damage done. */
@@ -363,7 +386,11 @@ int mag_damage(int level, struct char_data *ch, struct char_data *victim,
 {
   int dam = 0;
   int save_modifier = 0;
+  int damage_scale_percent = next_mag_damage_scale_percent;
   enum damage_type local_damage_type = current_spell_damage_type;
+
+  /* Consume the one-shot scale before damage() can cause nested spell damage. */
+  next_mag_damage_scale_percent = 100;
 
   if (victim == NULL || ch == NULL)
     return (0);
@@ -552,6 +579,16 @@ case SPELL_BURNING_HANDS:
 
   if (dam > 0)
     dam = reduce_disrupted_spell_value(ch, dam);
+
+  /*
+   * Multicast scales the resolved mag_damage packet after saves and caster-side
+   * modifiers, but before shared damage() processing. damage() owns damage
+   * triggers and spell criticals, so each Multicast packet receives its own
+   * normal downstream spell-critical roll. Preserve at least one point when
+   * the unscaled packet was positive.
+   */
+  if (dam > 0 && damage_scale_percent != 100)
+    dam = MAX(1, (dam * damage_scale_percent) / 100);
 
   set_next_damage_type(local_damage_type);
   return (damage(ch, victim, dam, spellnum));
