@@ -2015,6 +2015,49 @@ static void perform_bonus_mainhand_attack(struct char_data *ch)
   combat_effects_due = previous_effects_due;
 }
 
+static int next_haste_damage_percent = 100;
+
+/*
+ * Haste packets use the current mainhand/unarmed hit path and normal accuracy,
+ * but suppress periodic/DG hit work exactly like other automatic bonus swings.
+ * Unlike physical multiattack passives, Haste is an affect and therefore works
+ * for any hasted combatant, including NPC allies.
+ */
+static void perform_haste_bonus_mainhand_attack(struct char_data *ch)
+{
+  struct char_data *victim;
+  bool previous_effects_due;
+  int previous_damage_percent;
+
+  if (!ch)
+    return;
+
+  victim = FIGHTING(ch);
+  if (!victim || IN_ROOM(ch) == NOWHERE || IN_ROOM(victim) == NOWHERE ||
+      IN_ROOM(ch) != IN_ROOM(victim) || FIGHTING(ch) != victim)
+    return;
+
+  previous_effects_due = combat_effects_due;
+  previous_damage_percent = next_haste_damage_percent;
+
+  combat_effects_due = FALSE;
+  next_haste_damage_percent = HASTE_BONUS_ATTACK_DAMAGE_PERCENT;
+  hit(ch, victim, TYPE_UNDEFINED);
+  next_haste_damage_percent = previous_damage_percent;
+  combat_effects_due = previous_effects_due;
+}
+
+static void do_haste_attacks(struct char_data *ch)
+{
+  int attack;
+
+  if (!ch || !AFF_FLAGGED(ch, AFF_HASTE))
+    return;
+
+  for (attack = 0; attack < HASTE_BONUS_ATTACKS_PER_PULSE; attack++)
+    perform_haste_bonus_mainhand_attack(ch);
+}
+
 static int physical_multiattack_target_valid(struct char_data *ch,
                                              struct char_data *victim)
 {
@@ -2259,12 +2302,21 @@ void dual_skill_attack(struct char_data *ch, struct char_data *victim, int type)
 
 int damage(struct char_data *ch, struct char_data *victim, int dam, int attacktype)
 {
+  int haste_damage_percent = next_haste_damage_percent;
+
+  /* Consume before any shared damage path can cause nested damage. */
+  next_haste_damage_percent = 100;
   if (npc_cannot_attack_immortal(ch, victim)) {
     if (FIGHTING(ch) == victim)
       stop_fighting(ch);
     return 0;
   }
   if (!control_attack_allowed(ch, victim)) return 0;
+
+  /* HASTE DAMAGE SCALE */
+  if (dam > 0 && haste_damage_percent != 100)
+    dam = MAX(1, (dam * haste_damage_percent) / 100);
+
   /* OFFHAND DAMAGE SCALE */
   if (g_offhand_attack) {
     dam = (dam * offhand_damage_percent(ch, GET_SKILL(ch, SKILL_DUAL_WIELD))) / 100;
@@ -3303,6 +3355,7 @@ void perform_violence(void)
 
     do_double_attack(ch);
     do_offhand_attack(ch, FIGHTING(ch));
+    do_haste_attacks(ch);
     if (combat_effects_due && FIGHTING(ch))
       do_spirit_procs(ch, FIGHTING(ch));
 

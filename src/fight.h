@@ -36,6 +36,10 @@ int compute_hit_chance_from_values(int offensive_hit, int target_evasion);
 #define NPC_BASE_ACCURACY 65
 #define EVASION_RATING_PER_POINT 2
 #define RECOMMENDED_MOB_EVASION 6
+
+/* Haste V1: two half-strength mainhand-style packets every combat pulse. */
+#define HASTE_BONUS_ATTACKS_PER_PULSE 2
+#define HASTE_BONUS_ATTACK_DAMAGE_PERCENT 50
 int compute_reference_hit_chance(struct char_data *ch);
 int apply_armor_mitigation(int damage, int armor);
 int armor_mitigation_basis_points(int armor);

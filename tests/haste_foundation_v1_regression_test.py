@@ -87,10 +87,10 @@ def test_existing_appraise_haste_detection_is_now_real():
     assert "#ifdef SPELL_HASTE" in APPRAISE
     assert "affected_by_spell(vict, SPELL_HASTE)" in APPRAISE
 
-def test_haste_foundation_does_not_add_combat_packets():
-    assert "perform_haste" not in FIGHT
-    assert "haste_bonus" not in FIGHT
-    assert "AFF_FLAGGED(ch, AFF_HASTE)" not in FIGHT
+def test_haste_foundation_is_consumed_by_combat_packets_v1():
+    assert "perform_haste_bonus_mainhand_attack" in FIGHT
+    assert "do_haste_attacks" in FIGHT
+    assert "AFF_FLAGGED(ch, AFF_HASTE)" in FIGHT
 
 def test_combat_scheduler_is_unchanged():
     assert "perform_combat_pulse(bool effects_due)" in FIGHT
@@ -105,7 +105,7 @@ def run():
         test_haste_affect_is_medium_and_refreshable,
         test_normal_haste_access_is_mage_and_bard_only,
         test_existing_appraise_haste_detection_is_now_real,
-        test_haste_foundation_does_not_add_combat_packets,
+        test_haste_foundation_is_consumed_by_combat_packets_v1,
         test_combat_scheduler_is_unchanged,
     ]
 
