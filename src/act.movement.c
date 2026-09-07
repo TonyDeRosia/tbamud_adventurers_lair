@@ -253,64 +253,98 @@ static int runto_path_distance(room_rnum src, room_rnum target)
   return BFS_NO_PATH;
 }
 
-static struct char_data *find_closest_mob_in_area_by_name(struct char_data *ch, const char *name)
+static room_rnum runto_zone_start_room(zone_rnum zone)
 {
-  struct char_data *mob, *best = NULL;
-  int best_distance = INT_MAX;
-  zone_rnum zone;
+  room_vnum vnum;
+  room_rnum room;
 
-  if (!ch || !name || !*name || IN_ROOM(ch) == NOWHERE)
-    return NULL;
+  if (zone < 0 || zone > top_of_zone_table)
+    return NOWHERE;
+  if (ZONE_FLAGGED(zone, ZONE_CLOSED))
+    return NOWHERE;
 
-  zone = world[IN_ROOM(ch)].zone;
-  for (mob = character_list; mob; mob = mob->next) {
-    int distance;
-
-    if (!IS_NPC(mob) || IN_ROOM(mob) == NOWHERE)
-      continue;
-    if (world[IN_ROOM(mob)].zone != zone)
-      continue;
-    if (!CAN_SEE(ch, mob))
-      continue;
-    if (!isname(name, mob->player.name))
-      continue;
-
-    distance = runto_path_distance(IN_ROOM(ch), IN_ROOM(mob));
-    if (distance < 0)
-      continue;
-    if (distance < best_distance) {
-      best = mob;
-      best_distance = distance;
-    }
+  /*
+   * The zone bottom is the canonical area starting point.  If that exact
+   * VNUM is absent or unsafe, advance only far enough to find the first
+   * real, safe room in the zone.
+   */
+  for (vnum = zone_table[zone].bot; vnum <= zone_table[zone].top; vnum++) {
+    room = real_room(vnum);
+    if (room != NOWHERE && room_is_runto_safe(room))
+      return room;
   }
 
-  return best;
+  return NOWHERE;
 }
 
-static int execute_runto_path(struct char_data *ch, struct char_data *target)
+static int runto_zone_name_matches(const char *query, const char *zone_name)
 {
-  long target_id;
-  room_rnum target_room;
-
-  if (!ch || !target || IN_ROOM(ch) == NOWHERE || IN_ROOM(target) == NOWHERE)
+  if (!query || !*query || !zone_name || !*zone_name)
     return FALSE;
 
-  target_id = char_script_id(target);
-  target_room = IN_ROOM(target);
+  if (!str_cmp(query, zone_name))
+    return TRUE;
+
+  return isname(query, zone_name);
+}
+
+static zone_rnum find_runto_zone(const char *query, int *matches)
+{
+  zone_rnum zone;
+  zone_rnum found = NOWHERE;
+  int count = 0;
+
+  if (matches)
+    *matches = 0;
+
+  if (!query || !*query)
+    return NOWHERE;
+
+  if (is_number(query)) {
+    zone_vnum wanted = atoi(query);
+
+    for (zone = 0; zone <= top_of_zone_table; zone++) {
+      if (zone_table[zone].number != wanted)
+        continue;
+      if (runto_zone_start_room(zone) == NOWHERE)
+        return NOWHERE;
+
+      if (matches)
+        *matches = 1;
+      return zone;
+    }
+
+    return NOWHERE;
+  }
+
+  for (zone = 0; zone <= top_of_zone_table; zone++) {
+    if (runto_zone_start_room(zone) == NOWHERE)
+      continue;
+    if (!runto_zone_name_matches(query, zone_table[zone].name))
+      continue;
+
+    found = zone;
+    count++;
+  }
+
+  if (matches)
+    *matches = count;
+
+  return (count == 1) ? found : NOWHERE;
+}
+
+static int execute_runto_path_to_room(struct char_data *ch, room_rnum target_room)
+{
+  if (!ch || IN_ROOM(ch) == NOWHERE || !VALID_ROOM_RNUM(target_room))
+    return FALSE;
 
   while (IN_ROOM(ch) != target_room) {
     int dir;
     room_rnum next_room;
-    struct char_data *current_target;
 
     if (FIGHTING(ch))
       return FALSE;
 
-    current_target = find_char(target_id);
-    if (!current_target || IN_ROOM(current_target) == NOWHERE)
-      return FALSE;
-
-    target_room = IN_ROOM(current_target);
     dir = graph_find_first_step(IN_ROOM(ch), target_room);
     if (dir < 0 || !EXIT(ch, dir))
       return FALSE;
@@ -319,6 +353,11 @@ static int execute_runto_path(struct char_data *ch, struct char_data *target)
     if (!room_is_runto_safe(next_room))
       return FALSE;
 
+    /*
+     * This is real movement, not teleportation.  perform_move() is the same
+     * normal locomotion path used by directional movement and therefore
+     * applies doors, movement cost, followers, terrain checks, and triggers.
+     */
     if (!perform_move(ch, dir, 0))
       return FALSE;
   }
@@ -380,63 +419,93 @@ ACMD(do_run)
 
 ACMD(do_runto)
 {
-  char arg[MAX_INPUT_LENGTH];
-  struct char_data *target = NULL;
+  char query[MAX_INPUT_LENGTH];
+  zone_rnum zone;
+  room_rnum target_room;
   int distance;
+  int matches = 0;
 
   skip_spaces(&argument);
-  one_argument(argument, arg);
-  if (!*arg) {
-    send_to_char(ch, "Run to whom or what?\r\n");
-    return;
-  }
 
-  if (!str_cmp(argument, "quest") && GET_KQUEST_ACTIVE(ch) && GET_KQUEST_COMPLETE(ch)) {
-    struct char_data *mob;
-    zone_rnum zone = (IN_ROOM(ch) != NOWHERE) ? world[IN_ROOM(ch)].zone : NOWHERE;
+  if (!*argument) {
+    zone_rnum i;
+    int shown = 0;
 
-    for (mob = character_list; mob; mob = mob->next) {
-      if (!IS_NPC(mob) || IN_ROOM(mob) == NOWHERE)
+    send_to_char(ch,
+                 "Run to which area?\r\n"
+                 "Usage: runto <area name | zone number>\r\n"
+                 "\r\n"
+                 "Areas:\r\n");
+
+    for (i = 0; i <= top_of_zone_table; i++) {
+      room_rnum start = runto_zone_start_room(i);
+
+      if (start == NOWHERE)
         continue;
-      if (world[IN_ROOM(mob)].zone != zone)
-        continue;
-      if (!CAN_SEE(ch, mob))
-        continue;
-      if (!is_questmaster_mob(mob))
-        continue;
-      if (GET_KQUEST_GIVER(ch) != NOBODY && GET_MOB_VNUM(mob) != GET_KQUEST_GIVER(ch))
-        continue;
-      target = mob;
-      break;
+
+      send_to_char(ch, "  %5d  %s\r\n",
+                   zone_table[i].number, zone_table[i].name);
+      shown++;
     }
-  }
 
-  if (!target)
-    target = find_closest_mob_in_area_by_name(ch, argument);
+    if (!shown)
+      send_to_char(ch, "  No runnable areas are currently available.\r\n");
 
-  if (!target) {
-    send_to_char(ch, "No such target found in this area.\r\n");
     return;
   }
 
-  distance = runto_path_distance(IN_ROOM(ch), IN_ROOM(target));
+  snprintf(query, sizeof(query), "%s", argument);
+
+  zone = find_runto_zone(query, &matches);
+  if (zone == NOWHERE) {
+    if (matches > 1)
+      send_to_char(ch,
+                   "That area name matches more than one zone. "
+                   "Use a more specific name or the zone number.\r\n");
+    else
+      send_to_char(ch,
+                   "No runnable area matches '%s'. "
+                   "Type 'runto' to list available areas.\r\n",
+                   query);
+    return;
+  }
+
+  target_room = runto_zone_start_room(zone);
+  if (target_room == NOWHERE) {
+    send_to_char(ch, "That area has no safe starting room.\r\n");
+    return;
+  }
+
+  if (IN_ROOM(ch) == target_room) {
+    send_to_char(ch, "You are already at the start of %s.\r\n",
+                 zone_table[zone].name);
+    return;
+  }
+
+  distance = runto_path_distance(IN_ROOM(ch), target_room);
   if (distance < 0) {
-    send_to_char(ch, "You cannot find a path to that target.\r\n");
+    send_to_char(ch, "You cannot find a traversable route to %s.\r\n",
+                 zone_table[zone].name);
     return;
   }
 
-  send_to_char(ch, "You begin running toward %s...\r\n", GET_NAME(target));
-  if (!execute_runto_path(ch, target)) {
-    send_to_char(ch, "Your path is interrupted.\r\n");
+  send_to_char(ch, "You begin running toward %s...\r\n",
+               zone_table[zone].name);
+
+  if (!execute_runto_path_to_room(ch, target_room)) {
+    send_to_char(ch, "Your run is interrupted before you reach %s.\r\n",
+                 zone_table[zone].name);
     return;
   }
 
-  if (IN_ROOM(ch) != IN_ROOM(target)) {
-    send_to_char(ch, "You cannot find a path to that target.\r\n");
+  if (IN_ROOM(ch) != target_room) {
+    send_to_char(ch, "You cannot find a traversable route to %s.\r\n",
+                 zone_table[zone].name);
     return;
   }
 
-  send_to_char(ch, "You arrive near %s.\r\n", GET_NAME(target));
+  send_to_char(ch, "You arrive at the start of %s.\r\n",
+               zone_table[zone].name);
 }
 
 /* Simple function to determine if char can fly. */
