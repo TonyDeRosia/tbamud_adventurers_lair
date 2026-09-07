@@ -32,10 +32,8 @@ def test_multicast_passives_register_as_skill_kind():
     # skillo_cost is explicitly backed by ABILITY_KIND_SKILL.
     assert "#define skillo_cost(skill, name, cost) abilityo(skill, ABILITY_KIND_SKILL" in PARSER
 
-def test_haste_remains_reserved_only():
-    assert "spello(SPELL_HASTE" not in PARSER
-    assert "case SPELL_HASTE" not in MAGIC_C
-
+def test_haste_is_registered_by_haste_foundation():
+    assert 'spello(SPELL_HASTE, "haste",' in PARSER
 def test_multicast_chain_stage_contract():
     assert define_value(PROG_H, "COMBAT_PROGRESSION_MULTICAST_STAGE_DOUBLE") == 100
     assert define_value(PROG_H, "COMBAT_PROGRESSION_MULTICAST_STAGE_TRIPLE") == 60
@@ -94,7 +92,7 @@ def run():
     tests = [
         test_reserved_ids_are_still_stable,
         test_multicast_passives_register_as_skill_kind,
-        test_haste_remains_reserved_only,
+        test_haste_is_registered_by_haste_foundation,
         test_multicast_chain_stage_contract,
         test_multicast_damage_weight_contract,
         test_effective_proficiency_combines_passive_and_spell_mastery,

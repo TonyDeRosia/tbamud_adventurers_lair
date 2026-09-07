@@ -3371,6 +3371,10 @@ void mag_assign_spells(void) {
   TAR_CHAR_ROOM | TAR_SELF_ONLY, FALSE, MAG_AFFECTS,
   "The adrenaline rush leaves your body.");
 
+  spello(SPELL_HASTE, "haste", 50, 25, 2, POS_FIGHTING,
+  TAR_CHAR_ROOM, FALSE, MAG_AFFECTS,
+  "Your magically quickened pace returns to normal.");
+
   spello(SPELL_CLARITY, "clarity", 20, 20, 0, POS_STANDING,
   TAR_CHAR_ROOM, FALSE, MAG_AFFECTS,
   "Your perfect clarity fades.");

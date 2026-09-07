@@ -404,8 +404,8 @@ void clanedit_parse(struct descriptor_data *d, char *arg);
 #define AFF_PASS_DOOR      62  /**< Char may pass ordinary physical doors */
 #define AFF_DETER          63  /**< Ordinary aggressive mobs hesitate */
 #define AFF_NERVE_DISRUPTION 64 /**< Casting is temporarily disrupted */
-/** Total number of affect flags */
-#define NUM_AFF_FLAGS   65
+#define AFF_HASTE          65/** Total number of affect flags */
+#define NUM_AFF_FLAGS   66
 
 /* Modes of connectedness: used by descriptor_data.state                */
 #define CON_PLAYING       0 /**< Playing - Nominal state                */

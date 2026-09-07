@@ -332,7 +332,7 @@ const char *affected_bits[] =
   "PASS-DOOR",
   "DETER",
   "NERVE-DISRUPTION",
-  "\n"
+  "HASTE",  "\n"
 };
 
 /** Connection type descriptions.

@@ -63,11 +63,11 @@ def test_legacy_binary_converter_keeps_independent_bound():
     assert "PLRTOASCII_LEGACY_MAX_SKILLS" in PLRTOASCII
     assert "byte skills[PLRTOASCII_LEGACY_MAX_SKILLS + 1]" in PLRTOASCII
 
-def test_reserved_multicast_passives_are_registered_but_haste_is_not():
+def test_reserved_extended_abilities_are_registered():
     assert 'skillo_cost(SKILL_DOUBLE_CAST, "double cast", 0);' in PARSER
     assert 'skillo_cost(SKILL_TRIPLE_CAST, "triple cast", 0);' in PARSER
     assert 'skillo_cost(SKILL_FOURTH_CAST, "fourth cast", 0);' in PARSER
-    assert "spello(SPELL_HASTE" not in PARSER
+    assert 'spello(SPELL_HASTE, "haste",' in PARSER
 
 def test_extended_band_documentation_matches_kind_model():
     assert "EXTENDED PLAYER ABILITY IDS" in SPELLS
@@ -83,7 +83,7 @@ def run():
         test_player_arrays_expand_automatically_with_max_skills,
         test_normal_ascii_player_persistence_tracks_max_skills,
         test_legacy_binary_converter_keeps_independent_bound,
-        test_reserved_multicast_passives_are_registered_but_haste_is_not,
+        test_reserved_extended_abilities_are_registered,
         test_extended_band_documentation_matches_kind_model,
     ]
 

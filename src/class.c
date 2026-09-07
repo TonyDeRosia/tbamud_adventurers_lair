@@ -1406,6 +1406,10 @@ void init_spell_levels(void)
   spell_level(SKILL_TRIPLE_CAST, CLASS_DRUID, 55);
   spell_level(SKILL_FOURTH_CAST, CLASS_DRUID, 85);
 
+  /* Haste V1 normal spell access. Rare alternate access remains class-neutral. */
+  spell_level(SPELL_HASTE, CLASS_MAGIC_USER, 25);
+  spell_level(SPELL_HASTE, CLASS_BARD, 30);
+
   spell_level(SKILL_APPRAISE_ENEMY, CLASS_THIEF, 18);
   spell_level(SKILL_APPRAISE_ENEMY, CLASS_WARRIOR, 28);
   spell_level(SKILL_APPRAISE_ENEMY, CLASS_WARLOCK, 27);
