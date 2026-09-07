@@ -1294,6 +1294,15 @@ struct mob_special_data
   int body_profile;   /**< Explicit BODY_PROFILE_* selection for this mobile. */
   int body_profile_set; /**< Whether body_profile was explicitly selected by a builder. */
 
+  /* Builder-configurable NPC combat progression proficiencies (0-100).
+   * Haste itself remains the existing persistent AFF_HASTE prototype flag. */
+  byte combat_double_attack;
+  byte combat_triple_attack;
+  byte combat_fourth_attack;
+  byte combat_double_cast;
+  byte combat_triple_cast;
+  byte combat_fourth_cast;
+
   /* Runtime-only ownership for custom per-reset mobile population slots. */
   int reset_spawn_tracked;
   zone_vnum reset_spawn_zone;

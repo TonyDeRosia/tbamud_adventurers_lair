@@ -22,6 +22,7 @@
 #include "constants.h"
 #include "fight.h"
 #include "act.h"
+#include "combat_progression.h"
 
 #define DG_COOLDOWN_MAX_SECONDS (7 * 24 * 60 * 60)
 
@@ -230,6 +231,108 @@ void do_dg_skill(void *go, struct script_data *sc, trig_data *trig,
 }
 
 
+static int dg_npc_multicast_target_valid(struct char_data *caster,
+                                         struct char_data *victim)
+{
+  return caster && victim && IS_NPC(caster) &&
+         IN_ROOM(caster) != NOWHERE &&
+         IN_ROOM(victim) != NOWHERE &&
+         IN_ROOM(caster) == IN_ROOM(victim);
+}
+
+static int dg_npc_multicast_spell_eligible(struct char_data *caster,
+                                           struct char_data *victim,
+                                           struct obj_data *obj,
+                                           int spellnum)
+{
+  if (!dg_npc_multicast_target_valid(caster, victim) || obj != NULL)
+    return FALSE;
+  if (spellnum < 0 || spellnum > TOP_SPELL_DEFINE || !ability_is_spell(spellnum))
+    return FALSE;
+
+  /* Match the player multicast contract: pure direct single-target damage only.
+   * Mixed damage+affect/manual/area/group spells do not multicast. */
+  if (spell_info[spellnum].routines != MAG_DAMAGE)
+    return FALSE;
+  if (IS_SET(spell_info[spellnum].targets, TAR_IGNORE))
+    return FALSE;
+  if (!IS_SET(spell_info[spellnum].targets, TAR_CHAR_ROOM | TAR_FIGHT_VICT))
+    return FALSE;
+
+  return TRUE;
+}
+
+static void dg_npc_multicast_damage(struct char_data *caster,
+                                    struct char_data *victim,
+                                    struct obj_data *obj,
+                                    int spellnum)
+{
+  int proficiency;
+  int result;
+
+  if (!dg_npc_multicast_spell_eligible(caster, victim, obj, spellnum))
+    return;
+
+  /* DG casts do not use the player learned-spell table. Treat the scripted
+   * spell itself as mastered (100) and let the builder-set passive plus the
+   * mob's INT/WIS/CHA profile determine each chained proc. */
+  proficiency = GET_MOB_DOUBLE_CAST(caster);
+  if (proficiency <= 0 ||
+      !combat_progression_multicast_roll(
+          caster,
+          proficiency,
+          100,
+          COMBAT_PROGRESSION_MULTICAST_STAGE_DOUBLE))
+    return;
+
+  result = mag_damage_scaled(
+      GET_LEVEL(caster),
+      caster,
+      victim,
+      spellnum,
+      SAVING_SPELL,
+      COMBAT_PROGRESSION_MULTICAST_DAMAGE_SECOND);
+
+  if (result == -1 || !dg_npc_multicast_target_valid(caster, victim))
+    return;
+
+  proficiency = GET_MOB_TRIPLE_CAST(caster);
+  if (proficiency <= 0 ||
+      !combat_progression_multicast_roll(
+          caster,
+          proficiency,
+          100,
+          COMBAT_PROGRESSION_MULTICAST_STAGE_TRIPLE))
+    return;
+
+  result = mag_damage_scaled(
+      GET_LEVEL(caster),
+      caster,
+      victim,
+      spellnum,
+      SAVING_SPELL,
+      COMBAT_PROGRESSION_MULTICAST_DAMAGE_THIRD);
+
+  if (result == -1 || !dg_npc_multicast_target_valid(caster, victim))
+    return;
+
+  proficiency = GET_MOB_FOURTH_CAST(caster);
+  if (proficiency <= 0 ||
+      !combat_progression_multicast_roll(
+          caster,
+          proficiency,
+          100,
+          COMBAT_PROGRESSION_MULTICAST_STAGE_FOURTH))
+    return;
+
+  (void)mag_damage_scaled(
+      GET_LEVEL(caster),
+      caster,
+      victim,
+      spellnum,
+      SAVING_SPELL,
+      COMBAT_PROGRESSION_MULTICAST_DAMAGE_FOURTH);
+}
 /* copied from spell_parser.c: */
 #define SINFO spell_info[spellnum]
 
@@ -247,7 +350,7 @@ void do_dg_cast(void *go, struct script_data *sc, trig_data *trig, int type, cha
   struct obj_data *tobj = NULL;
   struct room_data *caster_room = NULL;
   char *s, *t;
-  int spellnum, target = 0;
+  int spellnum, target = 0, cast_result = 0;
   char buf2[MAX_STRING_LENGTH], orig_cmd[MAX_INPUT_LENGTH];
 
   /* need to get the caster or the room of the temporary caster */
@@ -346,8 +449,11 @@ void do_dg_cast(void *go, struct script_data *sc, trig_data *trig, int type, cha
     caster->in_room = real_room(caster_room->number);
     call_magic(caster, tch, tobj, spellnum, DG_SPELL_LEVEL, CAST_SPELL);
     extract_char(caster);
-  } else
-    call_magic(caster, tch, tobj, spellnum, GET_LEVEL(caster), CAST_SPELL);
+  } else {
+    cast_result = call_magic(caster, tch, tobj, spellnum, GET_LEVEL(caster), CAST_SPELL);
+    if (cast_result > 0)
+      dg_npc_multicast_damage(caster, tch, tobj, spellnum);
+  }
 }
 
 /* Modify an affection on the target. affections can be of the AFF_x variety

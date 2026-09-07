@@ -1722,6 +1722,31 @@ static void interpret_espec(const char *keyword, const char *value, int i, int n
     mob_proto[i].mob_specials.body_profile_set = 1;
   }
 
+  CASE("CombatDoubleAttack") {
+    RANGE(0, 100);
+    mob_proto[i].mob_specials.combat_double_attack = num_arg;
+  }
+  CASE("CombatTripleAttack") {
+    RANGE(0, 100);
+    mob_proto[i].mob_specials.combat_triple_attack = num_arg;
+  }
+  CASE("CombatFourthAttack") {
+    RANGE(0, 100);
+    mob_proto[i].mob_specials.combat_fourth_attack = num_arg;
+  }
+  CASE("CombatDoubleCast") {
+    RANGE(0, 100);
+    mob_proto[i].mob_specials.combat_double_cast = num_arg;
+  }
+  CASE("CombatTripleCast") {
+    RANGE(0, 100);
+    mob_proto[i].mob_specials.combat_triple_cast = num_arg;
+  }
+  CASE("CombatFourthCast") {
+    RANGE(0, 100);
+    mob_proto[i].mob_specials.combat_fourth_cast = num_arg;
+  }
+
   CASE("Str") {
     RANGE(3, 25);
     mob_proto[i].real_abils.str = num_arg;

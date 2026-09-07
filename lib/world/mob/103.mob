@@ -7,17 +7,18 @@ Painted in moon-pale white and dressed in soft black and ivory, this
 Pierrot carries sadness like a courtly office. A small black die is
 tucked between two gloved fingers.~
 8 0 0 0 0 0 0 0 0 E
-30 17 0 5d7+150 4d3+2
-0 0
+30 14 50 6d10+500 5d6+4
+0 120
 8 8 0
-Str: 18
-Dex: 18
+CombatDoubleAttack: 25
+Str: 14
+Dex: 20
 Int: 18
-Wis: 18
-Con: 18
-Cha: 18
+Wis: 15
+Con: 16
+Cha: 20
 Wimpy: 15
-Evasion: 10
+Evasion: 20
 LootItem: 10300 25
 E
 T 10302
@@ -30,17 +31,19 @@ Crimson, violet, and gold diamonds cover this acrobat's motley. Bells
 tremble at the points of the cap, and a painted die flashes constantly
 between nimble fingers.~
 8 0 0 0 0 0 0 0 0 E
-31 17 0 5d7+155 4d4+2
-0 0
+31 14 51 6d10+525 5d6+4
+0 124
 8 8 0
-Str: 18
-Dex: 18
-Int: 18
-Wis: 18
-Con: 18
+CombatDoubleAttack: 31
+CombatTripleAttack: 5
+Str: 15
+Dex: 21
+Int: 16
+Wis: 15
+Con: 16
 Cha: 18
 Wimpy: 15
-Evasion: 10
+Evasion: 20
 LootItem: 10301 25
 E
 T 10303
@@ -53,17 +56,18 @@ White greasepaint, black gloves, and a fixed impossible grin make this
 silent performer difficult to read. No matter what happens, not a sound
 escapes the mime.~
 8 0 0 0 0 0 0 0 0 E
-32 16 0 5d7+160 4d4+2
-0 0
+32 14 52 6d11+550 5d6+5
+0 128
 8 8 0
-Str: 18
-Dex: 18
+CombatDoubleAttack: 27
+Str: 14
+Dex: 20
 Int: 18
-Wis: 18
-Con: 18
-Cha: 18
+Wis: 15
+Con: 16
+Cha: 20
 Wimpy: 16
-Evasion: 10
+Evasion: 20
 LootItem: 10302 25
 E
 T 10304
@@ -76,17 +80,18 @@ This lesser court fool wears mismatched motley covered in tiny bells,
 card suits, and stitched pips. Several colored dice click together in
 one hand.~
 8 0 0 0 0 0 0 0 0 E
-30 17 0 5d7+150 4d3+2
-0 0
+30 14 50 6d10+500 5d6+4
+0 120
 8 8 0
-Str: 18
-Dex: 18
+CombatDoubleAttack: 25
+Str: 14
+Dex: 20
 Int: 18
-Wis: 18
-Con: 18
-Cha: 18
+Wis: 15
+Con: 16
+Cha: 20
 Wimpy: 15
-Evasion: 10
+Evasion: 20
 E
 T 10305
 #10304
@@ -98,17 +103,19 @@ A swaggering half-mask hides the duelist's eyes while a bright sash
 trails behind every theatrical step. Every movement begs for an
 audience.~
 8 0 0 0 0 0 0 0 0 E
-33 16 0 5d7+165 4d4+2
-0 0
+33 14 53 7d11+575 6d7+5
+0 132
 8 8 0
-Str: 18
-Dex: 18
-Int: 18
-Wis: 18
-Con: 18
+CombatDoubleAttack: 39
+CombatTripleAttack: 12
+Str: 17
+Dex: 20
+Int: 17
+Wis: 15
+Con: 17
 Cha: 18
 Wimpy: 16
-Evasion: 11
+Evasion: 21
 LootItem: 10303 25
 E
 T 10306
@@ -120,17 +127,19 @@ A @Rgr@Mac@Yef@Wul@n @RCo@Mlu@Ymb@Win@Ye@n turns slowly upon painted slippers.
 Pearl and rose ribbons frame a delicate mask. Her movements are precise
 enough to look choreographed even when she simply reaches for a die.~
 8 0 0 0 0 0 0 0 0 E
-32 16 0 5d7+160 4d4+2
-0 0
+32 14 52 6d11+550 5d6+5
+0 128
 8 8 0
-Str: 18
-Dex: 18
-Int: 18
-Wis: 18
-Con: 18
+CombatDoubleAttack: 32
+CombatTripleAttack: 5
+Str: 15
+Dex: 21
+Int: 16
+Wis: 15
+Con: 16
 Cha: 18
 Wimpy: 16
-Evasion: 10
+Evasion: 20
 LootItem: 10304 25
 E
 T 10306
@@ -142,17 +151,18 @@ A @opa@Yin@Yte@od@n @oMa@Yri@Ron@Yet@ote@n jerks upon nearly invisible strings.
 Jointed limbs, a lacquered face, and dark cords descending from above
 give this puppet a disturbing imitation of life.~
 8 0 0 0 0 0 0 0 0 E
-34 16 0 5d7+170 4d4+2
-0 0
+34 14 54 7d11+600 6d7+5
+0 136
 8 8 0
-Str: 18
-Dex: 18
-Int: 18
-Wis: 18
+CombatDoubleAttack: 35
+CombatTripleAttack: 5
+Str: 17
+Dex: 20
+Int: 10
 Con: 18
-Cha: 18
+Cha: 8
 Wimpy: 17
-Evasion: 11
+Evasion: 19
 LootItem: 10306 25
 E
 T 10307
@@ -164,15 +174,17 @@ A @obr@Yok@oe@nn @oMa@Yri@Ron@Yet@ote@n drags a nest of snapped strings.
 One arm hangs backward at the elbow and half the painted smile has been
 scraped away. It still moves whenever unseen strings twitch.~
 8 0 0 0 0 0 0 0 0 E
-34 16 0 5d7+170 4d4+2
-0 0
+34 15 54 7d11+600 6d7+5
+0 136
 8 8 0
-Str: 18
-Dex: 18
-Int: 18
-Wis: 18
-Con: 18
-Cha: 18
+CombatDoubleAttack: 34
+CombatTripleAttack: 7
+Str: 20
+Dex: 14
+Int: 9
+Wis: 10
+Con: 21
+Cha: 7
 Wimpy: 17
 Evasion: 11
 LootItem: 10307 25
@@ -187,17 +199,18 @@ Carved in the shape of a court dancer, this puppet pirouettes with
 impossible balance. Its polished wooden feet barely seem to touch the
 floor.~
 8 0 0 0 0 0 0 0 0 E
-35 16 0 5d7+175 4d4+2
-0 0
+35 14 55 7d12+625 6d7+5
+0 140
 8 8 0
+CombatDoubleAttack: 36
+CombatTripleAttack: 5
 Str: 18
-Dex: 18
-Int: 18
-Wis: 18
-Con: 18
-Cha: 18
+Dex: 21
+Int: 10
+Con: 19
+Cha: 8
 Wimpy: 17
-Evasion: 11
+Evasion: 19
 LootItem: 10310 25
 E
 T 10307
@@ -209,15 +222,17 @@ An @oex@Yec@Rut@Rio@Yne@or@n @oMa@Yri@Ron@Yet@ote@n looms beneath heavy black st
 This oversized puppet has a square black hood painted onto its wooden
 head and both hands wrapped around an enormous toy axe.~
 8 0 0 0 0 0 0 0 0 E
-37 16 0 6d8+185 5d4+3
-0 0
+37 14 57 7d12+675 6d7+5
+0 148
 8 8 0
-Str: 18
-Dex: 18
-Int: 18
-Wis: 18
-Con: 18
-Cha: 18
+CombatDoubleAttack: 37
+CombatTripleAttack: 9
+Str: 21
+Dex: 14
+Int: 9
+Wis: 10
+Con: 22
+Cha: 7
 Wimpy: 18
 Evasion: 12
 LootItem: 10309 25
@@ -231,17 +246,19 @@ A @opu@Ypp@Ret@Rma@Yst@oer@n tests a fan of black control strings.
 Long fingers work a carved control bar while dozens of cords disappear
 into the rafters. Tiny bone dice hang from the puppetmaster's belt.~
 8 0 0 0 0 0 0 0 0 E
-37 16 0 6d8+185 5d4+3
-0 0
+37 14 57 7d12+675 6d7+5
+0 148
 8 8 0
-Str: 18
+CombatDoubleAttack: 26
+CombatTripleAttack: 1
+Str: 15
 Dex: 18
-Int: 18
-Wis: 18
-Con: 18
-Cha: 18
+Int: 21
+Wis: 20
+Con: 17
+Cha: 21
 Wimpy: 18
-Evasion: 12
+Evasion: 18
 LootItem: 10308 25
 E
 T 10308
@@ -253,17 +270,19 @@ A crawling knot of puppet strings writhes across the floor.
 Knotted cord, hooks, and tiny wooden control bars have tangled into a
 living thing that scuttles like a many-legged spider.~
 8 0 0 0 0 0 0 0 0 E
-35 16 0 5d7+175 4d4+2
-0 0
+35 14 55 7d12+625 6d7+5
+0 140
 8 8 0
-Str: 18
-Dex: 18
-Int: 18
-Wis: 18
-Con: 18
-Cha: 18
+CombatDoubleAttack: 36
+CombatTripleAttack: 5
+Str: 20
+Dex: 21
+Int: 8
+Wis: 13
+Con: 20
+Cha: 10
 Wimpy: 17
-Evasion: 11
+Evasion: 19
 E
 T 10309
 #10312
@@ -274,17 +293,19 @@ A @Rto@Yy@n @Rsw@Yor@Wds@Dma@nn stands at painted attention.
 Lacquered armor and a bright wooden sword make this soldier look
 harmless until its painted eyes focus with military precision.~
 8 0 0 0 0 0 0 0 0 E
-36 16 0 6d8+180 5d4+3
-0 0
+36 14 56 7d12+650 6d7+5
+0 144
 8 8 0
-Str: 18
-Dex: 18
-Int: 18
-Wis: 18
-Con: 18
-Cha: 18
+CombatDoubleAttack: 36
+CombatTripleAttack: 9
+Str: 20
+Dex: 17
+Int: 12
+Wis: 15
+Con: 21
+Cha: 12
 Wimpy: 18
-Evasion: 12
+Evasion: 16
 LootItem: 10312 25
 E
 T 10310
@@ -296,17 +317,19 @@ A @Rto@Yy@n @Rsp@Yea@Wrm@Da@nn levels a lacquered spear.
 Red-painted shoulder plates and a long wooden spear mark this toy as
 line infantry in the Jester's miniature army.~
 8 0 0 0 0 0 0 0 0 E
-36 16 0 6d8+180 5d4+3
-0 0
+36 14 56 7d12+650 6d7+5
+0 144
 8 8 0
-Str: 18
-Dex: 18
-Int: 18
-Wis: 18
-Con: 18
-Cha: 18
+CombatDoubleAttack: 36
+CombatTripleAttack: 9
+Str: 20
+Dex: 17
+Int: 12
+Wis: 15
+Con: 21
+Cha: 12
 Wimpy: 18
-Evasion: 12
+Evasion: 16
 E
 T 10310
 #10314
@@ -317,17 +340,19 @@ A @Rto@Yy@n @Rar@Ych@Wer@n tests the string of a painted bow.
 A green-plumed cap, tiny quiver, and rigid wooden posture distinguish
 this archer from the rank-and-file soldiers.~
 8 0 0 0 0 0 0 0 0 E
-37 16 0 6d8+185 5d4+3
-0 0
+37 13 57 7d12+675 6d7+5
+0 148
 8 8 0
-Str: 18
-Dex: 18
-Int: 18
-Wis: 18
-Con: 18
-Cha: 18
+CombatDoubleAttack: 38
+CombatTripleAttack: 6
+Str: 16
+Dex: 22
+Int: 14
+Wis: 17
+Con: 17
+Cha: 12
 Wimpy: 18
-Evasion: 12
+Evasion: 19
 LootItem: 10314 25
 E
 T 10310
@@ -339,15 +364,17 @@ A @Rto@Yy@n @Rsh@Yie@Wld@Dbe@War@Yer@n braces behind a round painted shield.
 The soldier's shield is almost as tall as its lacquered body. Chips
 along the rim prove that the bright paint is not merely decorative.~
 8 0 0 0 0 0 0 0 0 E
-38 16 0 6d8+190 5d4+3
-0 0
+38 14 63 8d13+700 6d8+5
+0 152
 8 8 0
-Str: 18
-Dex: 18
-Int: 18
-Wis: 18
-Con: 18
-Cha: 18
+CombatDoubleAttack: 33
+CombatTripleAttack: 9
+Str: 22
+Dex: 12
+Int: 10
+Wis: 15
+Con: 23
+Cha: 10
 Wimpy: 19
 Evasion: 12
 LootItem: 10315 25
@@ -361,17 +388,19 @@ A @Rnu@Ytc@Wra@Dck@Wer@n @Rse@Ynt@Win@Del@n guards the way with square-jawed sev
 Towering over ordinary toy soldiers, this red-coated guardian has a
 hinged jaw, black wooden boots, and the posture of a carved executioner.~
 8 0 0 0 0 0 0 0 0 E
-39 16 0 6d8+195 5d4+3
-0 0
+39 14 64 8d13+725 6d8+6
+0 156
 8 8 0
-Str: 18
-Dex: 18
-Int: 18
-Wis: 18
-Con: 18
-Cha: 18
+CombatDoubleAttack: 34
+CombatTripleAttack: 10
+Str: 22
+Dex: 12
+Int: 10
+Wis: 15
+Con: 23
+Cha: 10
 Wimpy: 19
-Evasion: 13
+Evasion: 12
 LootItem: 10317 25
 E
 T 10310
@@ -383,17 +412,20 @@ A @Rto@Yy@n @Rca@Ypt@Wai@nn rolls a command die across one gauntlet.
 Gold trim marks this wooden officer above the common ranks. A six-faced
 command die hangs beside a tiny saber.~
 8 0 0 0 0 0 0 0 0 E
-40 15 0 6d8+200 5d4+3
-0 0
+40 13 63 8d13+862 8d8+7
+0 220
 8 8 0
-Str: 18
-Dex: 18
-Int: 18
-Wis: 18
-Con: 18
-Cha: 18
+CombatDoubleAttack: 50
+CombatTripleAttack: 20
+CombatFourthAttack: 5
+Str: 22
+Dex: 19
+Int: 13
+Wis: 17
+Con: 23
+Cha: 13
 Wimpy: 20
-Evasion: 13
+Evasion: 17
 LootItem: 10313 25
 E
 T 10314
@@ -405,17 +437,18 @@ A @Rho@Ybb@Wy@n-@Rho@Yrs@We@n @Rca@Yva@Wli@Der@n charges astride an impossible w
 The rider straddles a painted hobby horse that ends in a wooden pole,
 yet the thing paws the floor and snorts like a living charger.~
 8 0 0 0 0 0 0 0 0 E
-39 16 0 6d8+195 5d4+3
-0 0
+39 13 59 8d13+725 6d8+6
+0 156
 8 8 0
-Str: 18
+CombatDoubleAttack: 41
+CombatTripleAttack: 7
+Str: 22
 Dex: 18
-Int: 18
-Wis: 18
-Con: 18
-Cha: 18
+Wis: 14
+Con: 21
+Cha: 14
 Wimpy: 19
-Evasion: 13
+Evasion: 20
 E
 T 10314
 #10319
@@ -426,17 +459,19 @@ A stitched @Wra@Wg@n @Wdo@Wll@n lurches forward on soft feet.
 Mismatched cloth, button eyes, and thick black stitches hold this
 human-sized doll together. Stuffing bulges from several old repairs.~
 8 0 0 0 0 0 0 0 0 E
-39 16 0 6d8+195 5d4+3
-0 0
+39 14 59 8d13+725 6d8+6
+0 156
 8 8 0
-Str: 18
+CombatDoubleAttack: 33
+CombatTripleAttack: 5
+Str: 14
 Dex: 18
-Int: 18
+Int: 17
 Wis: 18
 Con: 18
-Cha: 18
+Cha: 21
 Wimpy: 19
-Evasion: 13
+Evasion: 19
 LootItem: 10320 25
 E
 T 10315
@@ -448,17 +483,19 @@ A @Wpo@Mrc@Mel@Wai@nn @Wdo@Wll@n watches through bright glass eyes.
 Fine painted features and an immaculate dress make the doll beautiful
 from a distance. Up close, hairline cracks radiate from its smile.~
 8 0 0 0 0 0 0 0 0 E
-40 15 0 6d8+200 5d4+3
-0 0
+40 14 60 8d13+750 7d8+6
+0 160
 8 8 0
-Str: 18
-Dex: 18
+CombatDoubleAttack: 34
+CombatTripleAttack: 5
+Str: 15
+Dex: 19
 Int: 18
-Wis: 18
-Con: 18
-Cha: 18
+Wis: 19
+Con: 19
+Cha: 22
 Wimpy: 20
-Evasion: 13
+Evasion: 19
 LootItem: 10318 25
 E
 T 10315
@@ -470,17 +507,20 @@ The @WDo@Wll@n @WGo@Mve@Crn@Mes@Ws@n stands with hands folded in perfect disappr
 Tall, severe, and flawlessly dressed, this porcelain governess carries a
 tiny rulebook and a gaze sharp enough to feel physical.~
 8 0 0 0 0 0 0 0 0 E
-42 15 0 7d9+210 5d5+3
-0 0
+42 12 65 8d14+920 8d8+7
+0 228
 8 8 0
-Str: 18
-Dex: 18
-Int: 18
-Wis: 18
-Con: 18
-Cha: 18
+CombatDoubleAttack: 40
+CombatTripleAttack: 15
+CombatFourthAttack: 5
+Str: 16
+Dex: 19
+Int: 23
+Wis: 22
+Con: 19
+Cha: 23
 Wimpy: 21
-Evasion: 14
+Evasion: 21
 LootItem: 10319 25
 E
 T 10315
@@ -492,17 +532,19 @@ A huge @Wst@Muf@Mfe@Wd@n @Wbe@War@n lumbers here on padded paws.
 Soft brown cloth covers a body packed with enchanted stuffing. Its
 button eyes are friendly only until the great sewn mouth opens.~
 8 0 0 0 0 0 0 0 0 E
-41 15 0 6d8+205 5d5+3
-0 0
+41 14 61 8d14+775 7d8+6
+0 164
 8 8 0
-Str: 18
-Dex: 18
-Int: 18
-Wis: 18
-Con: 18
-Cha: 18
+CombatDoubleAttack: 41
+CombatTripleAttack: 12
+Str: 23
+Dex: 15
+Int: 9
+Wis: 14
+Con: 23
+Cha: 10
 Wimpy: 20
-Evasion: 13
+Evasion: 12
 E
 T 10316
 #10323
@@ -513,17 +555,19 @@ A @Wst@Muf@Mfe@Wd@n @Wli@Wo@nn prowls with a yarn mane bristling.
 Golden cloth, thick stitching, and a mane of braided yarn form a
 children's beast given far too much strength and confidence.~
 8 0 0 0 0 0 0 0 0 E
-42 15 0 7d9+210 5d5+3
-0 0
+42 12 62 8d14+800 7d8+6
+0 168
 8 8 0
-Str: 18
-Dex: 18
-Int: 18
-Wis: 18
-Con: 18
-Cha: 18
+CombatDoubleAttack: 44
+CombatTripleAttack: 10
+Str: 21
+Dex: 22
+Int: 8
+Wis: 14
+Con: 21
+Cha: 10
 Wimpy: 21
-Evasion: 14
+Evasion: 21
 LootItem: 10321 25
 E
 T 10316
@@ -536,17 +580,20 @@ Painted scales overlap across articulated wooden plates. Gemlike eyes
 glow from a dragon face that was clearly meant to delight children, not
 hunt adventurers.~
 8 0 0 0 0 0 0 0 0 E
-43 15 0 7d9+215 5d5+3
-0 0
+43 12 66 9d14+949 8d9+7
+0 232
 8 8 0
-Str: 18
-Dex: 18
+CombatDoubleAttack: 50
+CombatTripleAttack: 22
+CombatFourthAttack: 8
+Str: 24
+Dex: 20
 Int: 18
-Wis: 18
-Con: 18
+Wis: 19
+Con: 23
 Cha: 18
 Wimpy: 21
-Evasion: 14
+Evasion: 17
 LootItem: 10322 25
 E
 T 10318
@@ -558,17 +605,19 @@ A brightly painted @WJa@Wck@n-@Win@n-@Wth@We@n-@WBo@Wx@n trembles on its spring.
 A long-limbed fool erupts from a striped box on a powerful enchanted
 spring. Its hinged smile is broad enough to split the painted face.~
 8 0 0 0 0 0 0 0 0 E
-41 15 0 6d8+205 5d5+3
-0 0
+41 13 61 8d14+775 7d8+6
+0 164
 8 8 0
-Str: 18
-Dex: 18
-Int: 18
-Wis: 18
-Con: 18
-Cha: 18
+CombatDoubleAttack: 43
+CombatTripleAttack: 9
+Str: 16
+Dex: 23
+Int: 17
+Wis: 16
+Con: 17
+Cha: 19
 Wimpy: 20
-Evasion: 13
+Evasion: 21
 E
 T 10318
 #10326
@@ -579,17 +628,19 @@ A giant ivory die bounces and tumbles of its own accord.
 Each face is cut with deep black pips. The die somehow leans toward
 opponents despite having neither limbs nor visible means of movement.~
 8 0 0 0 0 0 0 0 0 E
-43 15 0 7d9+215 5d5+3
-0 0
+43 13 63 9d14+825 7d9+6
+0 172
 8 8 0
-Str: 18
-Dex: 18
-Int: 18
-Wis: 18
-Con: 18
-Cha: 18
+CombatDoubleAttack: 41
+CombatTripleAttack: 8
+Str: 15
+Dex: 22
+Int: 20
+Wis: 16
+Con: 17
+Cha: 22
 Wimpy: 21
-Evasion: 14
+Evasion: 24
 LootItem: 10325 25
 E
 T 10319
@@ -601,17 +652,19 @@ A @Gcr@Yim@Wso@nn @Gca@Yrd@n-@Gkn@Yav@We@n snaps to attention like a living play
 Lacquered red armor and heart-shaped heraldry make this guard resemble a
 court card folded into three dimensions.~
 8 0 0 0 0 0 0 0 0 E
-43 15 0 7d9+215 5d5+3
-0 0
+43 13 63 9d14+825 7d9+6
+0 172
 8 8 0
-Str: 18
+CombatDoubleAttack: 43
+CombatTripleAttack: 13
+Str: 21
 Dex: 18
-Int: 18
-Wis: 18
-Con: 18
-Cha: 18
+Int: 13
+Wis: 16
+Con: 22
+Cha: 13
 Wimpy: 21
-Evasion: 14
+Evasion: 17
 LootItem: 10326 25
 E
 T 10319
@@ -623,17 +676,19 @@ An @Giv@Yor@Wy@n @Gca@Yrd@n-@Gkn@Yav@We@n patrols with a blade-thin painted swor
 Black suit marks contrast against an ivory card-body. Its edges look
 sharp enough to cut despite the painted storybook appearance.~
 8 0 0 0 0 0 0 0 0 E
-43 15 0 7d9+215 5d5+3
-0 0
+43 13 63 9d14+825 7d9+6
+0 172
 8 8 0
-Str: 18
+CombatDoubleAttack: 43
+CombatTripleAttack: 13
+Str: 21
 Dex: 18
-Int: 18
-Wis: 18
-Con: 18
-Cha: 18
+Int: 13
+Wis: 16
+Con: 22
+Cha: 13
 Wimpy: 21
-Evasion: 14
+Evasion: 17
 LootItem: 10327 25
 E
 T 10319
@@ -645,17 +700,19 @@ An @Wiv@Dor@Wy@n @Wpa@Ww@nn advances one deliberate step at a time.
 This chest-high chess piece bears the faint shape of a helmeted face in
 its polished ivory surface.~
 8 0 0 0 0 0 0 0 0 E
-44 15 0 7d9+220 6d5+3
-0 0
+44 13 69 9d15+850 7d9+6
+0 176
 8 8 0
-Str: 18
-Dex: 18
-Int: 18
-Wis: 18
-Con: 18
-Cha: 18
+CombatDoubleAttack: 39
+CombatTripleAttack: 12
+Str: 23
+Dex: 13
+Int: 10
+Wis: 16
+Con: 24
+Cha: 10
 Wimpy: 22
-Evasion: 14
+Evasion: 13
 LootItem: 10330 25
 E
 T 10320
@@ -667,17 +724,21 @@ A @Wbl@Dac@Wk@n @Wkn@Dig@Wht@n stamps across the board in impossible angles.
 Carved as a rearing horse and rider merged into one lacquered piece, the
 knight seems forever prepared to leap over whatever blocks its path.~
 8 0 0 0 0 0 0 0 0 E
-45 15 0 7d9+225 6d5+3
-0 0
+45 12 68 9d15+1006 9d9+7
+0 240
 8 8 0
-Str: 18
-Dex: 18
-Int: 18
-Wis: 18
-Con: 18
-Cha: 18
+BodyProfile: 11
+CombatDoubleAttack: 55
+CombatTripleAttack: 25
+CombatFourthAttack: 10
+Str: 24
+Dex: 22
+Int: 17
+Wis: 17
+Con: 23
+Cha: 15
 Wimpy: 22
-Evasion: 15
+Evasion: 18
 LootItem: 10331 25
 E
 T 10320
@@ -689,17 +750,20 @@ An @Wiv@Dor@Wy@n @Wbi@Dsh@Wop@n glides along an unseen diagonal.
 Tall and narrow, this polished piece carries candlelight in the slit of
 its pointed crown and moves without lifting from the board.~
 8 0 0 0 0 0 0 0 0 E
-45 15 0 7d9+225 6d5+3
-0 0
+45 12 68 9d15+1006 9d9+7
+0 240
 8 8 0
-Str: 18
-Dex: 18
-Int: 18
-Wis: 18
-Con: 18
-Cha: 18
+CombatDoubleAttack: 40
+CombatTripleAttack: 15
+CombatFourthAttack: 5
+Str: 17
+Dex: 19
+Int: 24
+Wis: 25
+Con: 20
+Cha: 20
 Wimpy: 22
-Evasion: 15
+Evasion: 20
 LootItem: 10332 25
 E
 T 10320
@@ -711,17 +775,20 @@ A @Wbl@Dac@Wk@n @Wro@Wok@n advances with the certainty of a falling tower.
 Squared battlements crown a heavy block of black lacquer. Every movement
 lands with the weight of a siege engine.~
 8 0 0 0 0 0 0 0 0 E
-46 15 0 7d9+230 6d5+3
-0 0
+46 12 74 9d15+1035 9d9+8
+0 244
 8 8 0
-Str: 18
-Dex: 18
-Int: 18
-Wis: 18
-Con: 18
-Cha: 18
+CombatDoubleAttack: 45
+CombatTripleAttack: 18
+CombatFourthAttack: 5
+Str: 25
+Dex: 12
+Int: 15
+Wis: 20
+Con: 25
+Cha: 13
 Wimpy: 23
-Evasion: 15
+Evasion: 13
 LootItem: 10333 25
 E
 T 10320
@@ -734,17 +801,19 @@ Immaculate gloves, a dark vest, and a featureless half-mask mark this
 attendant of the House of Chance. Dice move between the dealer's fingers
 without pause.~
 10 0 0 0 0 0 0 0 0 E
-42 15 0 7d9+210 5d5+3
-0 0
+42 13 62 8d14+800 7d8+6
+0 168
 8 8 0
-Str: 18
-Dex: 18
-Int: 18
-Wis: 18
-Con: 18
-Cha: 18
+CombatDoubleAttack: 39
+CombatTripleAttack: 7
+Str: 15
+Dex: 22
+Int: 20
+Wis: 16
+Con: 17
+Cha: 22
 Wimpy: 21
-Evasion: 14
+Evasion: 24
 LootItem: 10324 25
 E
 T 10321
@@ -756,17 +825,20 @@ A @Rro@Mya@Yl@n @Rfo@Mol@n guards the deeper Toybox beneath chiming bells.
 Rich motley, silver bells, and a half-crown of painted wood mark this
 fool as one of the Jester's favored attendants.~
 8 0 0 0 0 0 0 0 0 E
-46 15 0 7d9+230 6d5+3
-0 0
+46 12 69 9d15+1035 9d9+8
+0 244
 8 8 0
-Str: 18
-Dex: 18
-Int: 18
-Wis: 18
-Con: 18
-Cha: 18
+CombatDoubleAttack: 52
+CombatTripleAttack: 23
+CombatFourthAttack: 8
+Str: 16
+Dex: 25
+Int: 22
+Wis: 16
+Con: 19
+Cha: 25
 Wimpy: 23
-Evasion: 15
+Evasion: 25
 E
 T 10322
 #10335
@@ -777,18 +849,21 @@ The @RGr@Man@Rd@n @RHa@Mrl@Meq@Rui@nn dances before the Motley Throne.
 Every diamond of this master performer's costume is edged in gold
 thread. Six colored dice orbit between gloved fingers in an effortless
 cascade.~
-106506 0 0 0 0 0 0 0 0 E
-35 16 0 5d7+175 4d4+2
-0 0
+106506 0 0 0 0 0 2 0 0 E
+35 13 60 7d12+1000 7d8+7
+0 300
 8 8 0
+CombatDoubleAttack: 55
+CombatTripleAttack: 25
+CombatFourthAttack: 10
 Str: 18
-Dex: 18
-Int: 18
-Wis: 18
-Con: 18
-Cha: 18
+Dex: 24
+Int: 21
+Wis: 17
+Con: 20
+Cha: 24
 Wimpy: 17
-Evasion: 11
+Evasion: 28
 LootItem: 10386 35
 LootItem: 10305 35
 E
@@ -802,17 +877,20 @@ A long coat of dark velvet hides all but the hands, which never stop
 moving. Control bars, shears, hooks, and bone dice hang from a belt of
 braided cord.~
 106506 0 0 0 0 0 0 0 0 E
-38 16 0 6d8+190 5d4+3
-0 0
+38 12 63 8d13+1200 7d9+7
+0 330
 8 8 0
-Str: 18
-Dex: 18
-Int: 18
-Wis: 18
-Con: 18
-Cha: 18
+CombatDoubleAttack: 45
+CombatTripleAttack: 20
+CombatFourthAttack: 5
+Str: 20
+Dex: 22
+Int: 24
+Wis: 22
+Con: 22
+Cha: 24
 Wimpy: 19
-Evasion: 12
+Evasion: 24
 LootItem: 10381 35
 LootItem: 10311 35
 E
@@ -825,17 +903,20 @@ general jack anapes boss toy soldier~
 A magnificent lacquered officer with a gold-painted bicorne, General
 Jack-A-Napes carries a saber in one hand and a command die in the other.~
 106506 0 0 0 0 0 0 0 0 E
-41 15 0 6d8+205 5d5+3
-0 0
+41 12 66 8d14+1400 8d9+8
+0 360
 8 8 0
-Str: 18
-Dex: 18
-Int: 18
-Wis: 18
-Con: 18
-Cha: 18
+CombatDoubleAttack: 60
+CombatTripleAttack: 30
+CombatFourthAttack: 10
+Str: 24
+Dex: 21
+Int: 19
+Wis: 21
+Con: 24
+Cha: 22
 Wimpy: 20
-Evasion: 13
+Evasion: 22
 LootItem: 10382 35
 LootItem: 10316 35
 E
@@ -849,17 +930,20 @@ An elegant porcelain matron in layered lace sits with impossible poise.
 A web of fine cracks has begun around one eye, but her painted smile
 remains perfect.~
 106506 0 0 0 0 0 0 0 0 E
-44 15 0 7d9+220 6d5+3
-0 0
+44 11 69 9d15+1600 8d10+8
+0 390
 8 8 0
-Str: 18
-Dex: 18
-Int: 18
-Wis: 18
-Con: 18
-Cha: 18
+CombatDoubleAttack: 45
+CombatTripleAttack: 20
+CombatFourthAttack: 5
+Str: 17
+Dex: 21
+Int: 23
+Wis: 24
+Con: 23
+Cha: 25
 Wimpy: 22
-Evasion: 14
+Evasion: 25
 LootItem: 10383 35
 LootItem: 10323 35
 E
@@ -871,18 +955,21 @@ The @DBl@Wac@Rk@n @DCh@Wes@Rs@n @DQu@Wee@nn commands every line of the board.
 ~
 Half woman and half towering chess piece, the Queen is carved from
 mirror-black wood beneath a crown of sharp geometric points.~
-106506 0 0 0 0 0 0 0 0 E
-48 14 0 8d10+240 6d5+4
-0 0
+106506 0 0 0 0 0 2 0 0 E
+48 10 73 10d16+2050 9d11+9
+0 450
 8 8 0
-Str: 18
-Dex: 18
-Int: 18
-Wis: 18
-Con: 18
-Cha: 18
+CombatDoubleAttack: 60
+CombatTripleAttack: 30
+CombatFourthAttack: 10
+Str: 23
+Dex: 24
+Int: 25
+Wis: 25
+Con: 24
+Cha: 24
 Wimpy: 24
-Evasion: 16
+Evasion: 30
 LootItem: 10384 35
 LootItem: 10334 35
 E
@@ -896,17 +983,20 @@ Dressed in black, silver, and deep green, the Croupier wears a smiling
 half-mask and carries two immaculate ivory dice that never seem to leave
 his possession.~
 106506 0 0 0 0 0 0 0 0 E
-46 15 0 7d9+230 6d5+3
-0 0
+46 11 71 9d15+1800 9d10+9
+0 420
 8 8 0
+CombatDoubleAttack: 50
+CombatTripleAttack: 25
+CombatFourthAttack: 10
 Str: 18
-Dex: 18
-Int: 18
-Wis: 18
-Con: 18
-Cha: 18
+Dex: 24
+Int: 24
+Wis: 22
+Con: 22
+Cha: 25
 Wimpy: 23
-Evasion: 15
+Evasion: 28
 LootItem: 10385 35
 LootItem: 10328 25
 LootItem: 10329 35
@@ -920,18 +1010,21 @@ The @RJe@Dst@Wer@n Behind the @RSm@Dil@We@n waits beside a giant ivory die.
 Crimson, black, white, violet, and gold motley hangs from a lean figure
 whose painted smile is too calm to be sane. Every bell on the costume is
 perfectly silent.~
-106506 0 0 0 0 0 0 0 0 E
-50 14 0 8d10+250 6d5+4
-0 0
+106506 0 0 0 0 0 2 0 0 E
+50 10 75 10d17+2450 9d11+9
+0 480
 8 8 0
-Str: 18
-Dex: 18
-Int: 18
-Wis: 18
-Con: 18
-Cha: 18
+CombatDoubleAttack: 60
+CombatTripleAttack: 30
+CombatFourthAttack: 15
+Str: 22
+Dex: 25
+Int: 25
+Wis: 24
+Con: 25
+Cha: 25
 Wimpy: 25
-Evasion: 16
+Evasion: 30
 LootItem: 10387 25
 LootItem: 10335 35
 E

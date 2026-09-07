@@ -1,12 +1,11 @@
 #3700
-sewer rat gnawer~
-a sewer gnawer~
-A lean sewer rat noses through the runoff here.
+darkwater gnawer rat~
+a darkwater gnawer~
+A darkwater gnawer noses through the wet rubble.
 ~
-This rat is large enough to make ordinary vermin look harmless. Its wet
-brown fur is patchy, its incisors are chipped from masonry, and its
-narrow body is built for slipping through the drains. It is aggressive
-when cornered but still more scavenger than monster.
+A lean black-furred rat with pale scars along its muzzle has learned to
+feed on everything the hollow gives it. Its whiskers twitch constantly
+toward cracks in the old masonry.
 ~
 232 0 0 0 0 0 0 0 -150 E
 3 20 23 1d4+15 1d2+0
@@ -19,14 +18,13 @@ Evasion: 1
 E
 T 3705
 #3701
-plague scarred sewer rat~
-a plague-scarred sewer rat~
-A scarred sewer rat prowls the brick ledge.
+mireback rat sewer~
+a mireback sewer rat~
+A mireback sewer rat prowls the blackwater ledge.
 ~
-Old sores and pale scars cross this heavy rat's muzzle and shoulders. It
-has survived traps, disease, floods, and fights with its own kind,
-leaving it wary and mean. The animal watches hands and feet with equal
-interest, ready to bite whatever looks weakest.
+This broad sewer rat is slick with dark mud and old scar tissue. Its
+heavy paws are made for wet stone, and its yellow teeth have been worn
+flat against Midgaard brick.
 ~
 232 0 0 0 0 0 0 0 100 E
 4 20 24 1d4+20 1d2+0
@@ -39,117 +37,72 @@ Evasion: 1
 E
 T 3705
 #3702
-scarred nest guard rat~
-a scarred nest-guard~
-A massive nest-guard blocks the way into the warrens.
+gristlefang nest guard rat~
+a Gristlefang nest-guard~
+A scarred Gristlefang nest-guard watches the warren.
 ~
-This broad-shouldered rat bears the scars of repeated fights around the
-colony. One ear is split and several teeth jut at crooked angles, but it
-holds its ground with deliberate aggression. Unlike the scavengers
-outside, this creature is defending territory.
+Thick scarred shoulders and a torn ear mark this rat as one of the
+colony guards. It watches passages rather than scraps, shifting its bulk
+to keep intruders away from Gristlefang's inner court.
 ~
 4202 0 0 0 0 0 0 0 -350 E
-5 20 25 1d4+25 1d2+0
+6 20 26 1d4+30 1d2+0
 30 0
 8 8 0
-BareHandAttack: 4
-BodyProfile: 2
-Wimpy: 2
-Evasion: 1
-E
-T 3705
-#3703
-gristlefang king below rat~
-Gristlefang, the King Below~
-@RA monstrous scarred rat crouches over a heap of stolen tribute.@n
-~
-Gristlefang is enormous even by the standards of the underworks colony.
-Old trap scars ring one foreleg, one eye is clouded, and a broken brass
-circlet has become tangled permanently in the fur behind his ears.
-Smaller rats defer to him instinctively. Whatever magic or brutal
-selection made him this large, he has ruled the warrens long enough to
-become part beast, part local legend.
-~
-4174 0 0 0 0 0 0 0 -350 E
-7 20 27 1d4+35 1d2+0
-70 0
-5 5 0
 BareHandAttack: 4
 BodyProfile: 2
 Wimpy: 3
 Evasion: 2
 E
+T 3705
+#3703
+gristlefang king below giant rat~
+Gristlefang, the King Below~
+Gristlefang, the King Below, looms over a mound of stolen tribute.
+~
+Gristlefang is enormous even by the standards of the hollow. Old blade
+scars cross his gray-black hide, and one cloudy eye watches from above
+a muzzle thick with broken yellow fangs. Buttons, coins, and bright
+trash cling to the fur around his neck like a crude royal collar.
+~
+110718 0 0 0 0 0 0 0 -350 E
+8 19 28 1d4+40 1d2+0
+70 0
+5 5 0
+BareHandAttack: 4
+BodyProfile: 2
+Wimpy: 4
+Evasion: 2
+E
 T 3707
 #3704
-pipe bat small~
-a pipe bat~
-A small pipe bat clings to the damp brick overhead.
+cavewing bat darkwater~
+a cavewing bat~
+A cavewing bat clings to a damp stone rib.
 ~
-This soot-gray bat is little more than wings, ears, and needle teeth. It
-sleeps through much of the day in cracks between the sewer bricks and
-becomes a frantic hunter when insects gather over the runoff.
+The small bat has charcoal wings mottled with cave-pale spots. It hangs
+from the oldest stonework and gives short clicking calls whenever light
+passes beneath it.
 ~
 4330 0 0 0 0 0 0 0 0 E
-3 20 23 1d4+15 1d2+0
+5 20 25 1d4+25 1d2+0
 30 0
 4 4 0
 BareHandAttack: 4
 BodyProfile: 19
-Wimpy: 1
+Wimpy: 2
 Evasion: 1
 E
 T 3706
 #3705
-duskwing bat~
+duskwing bat darkwater~
 a duskwing bat~
-A broad-winged bat circles restlessly through the tunnel.
+A duskwing bat wheels through the buried gallery.
 ~
-The duskwing is larger and darker than the common pipe bats. Its long
-wings let it turn sharply in confined passages, and its pale ears
-constantly twitch toward tiny sounds. It is bold enough to dive at
-anything that disturbs the roost.
+Long violet-black wings make this bat seem larger in flight than at
+rest. Its narrow muzzle and bright eyes track every motion in the roost.
 ~
 4328 0 0 0 0 0 0 0 0 E
-4 20 24 1d4+20 1d2+0
-30 0
-8 8 0
-BareHandAttack: 4
-BodyProfile: 19
-Wimpy: 2
-Evasion: 1
-E
-T 3706
-#3706
-cavern shrieker giant bat~
-a cavern shrieker~
-A huge bat hangs above, giving an ear-splitting shriek.
-~
-This bat has grown to the size of a hunting hound. The skin of its wings
-is scarred from stone and iron, and its oversized ears make every sudden
-sound an irritation. When threatened it releases a piercing shriek
-before plunging teeth-first at the source.
-~
-4328 0 0 0 0 0 0 0 0 E
-5 20 25 1d4+25 1d2+0
-30 0
-8 8 0
-BareHandAttack: 4
-BodyProfile: 19
-Wimpy: 2
-Evasion: 1
-E
-T 3706
-#3707
-bloodwing bat vampire~
-a bloodwing bat~
-A red-muzzled bloodwing bat watches from the darkness.
-~
-The bloodwing is a heavy cave bat with reddish membrane along the inner
-wings and fresh stains around its muzzle. It feeds on wounded animals
-and anything too slow to escape the roost. Its eyes track exposed skin
-with unsettling focus.
-~
-4202 0 0 0 0 0 0 0 -500 E
 6 20 26 1d4+30 1d2+0
 30 0
 8 8 0
@@ -159,70 +112,105 @@ Wimpy: 3
 Evasion: 2
 E
 T 3706
+#3706
+hollow shrieker bat~
+a hollow shrieker~
+A hollow shrieker hangs above the passage.
+~
+This heavy cave bat has a pale throat stretched by the muscles of its
+terrible cry. Chips of mortar cling to its claws from launching itself
+against the old stone ribs.
+~
+4328 0 0 0 0 0 0 0 0 E
+7 20 27 1d4+35 1d2+0
+30 0
+8 8 0
+BareHandAttack: 4
+BodyProfile: 19
+Wimpy: 3
+Evasion: 2
+E
+T 3706
+#3707
+bloodwing stalker bat~
+a bloodwing stalker~
+A bloodwing stalker circles low over the blackwater.
+~
+Rust-red membranes show beneath the stalker's black wings. It circles
+low, bold enough to test prey before striking, and its muzzle is stained
+dark from feeding in the buried vaults.
+~
+4218 0 0 0 0 0 0 0 -500 E
+9 19 29 1d4+45 1d2+0
+30 0
+8 8 0
+BareHandAttack: 4
+BodyProfile: 19
+Wimpy: 4
+Evasion: 3
+E
+T 3706
 #3708
 silverfin trout fish~
 a silverfin trout~
-A silverfin trout flashes beneath the reservoir water.
+A silverfin trout flashes beneath the dark surface.
 ~
-This healthy trout has found its way into the underworks through natural
-waterways connected to the river. Its silver scales catch even the
-faintest light as it searches the reservoir shallows for insects and
-drifting scraps.
+This hardy underground trout has bright silver scales along its flanks
+and dark fins suited to the cold basin. It darts toward lanternlight and
+away from sudden movement.
 ~
 106522 0 0 0 589952 0 0 0 0 E
-3 20 23 1d4+15 1d2+0
+4 20 24 1d4+20 1d2+0
 30 0
 8 8 0
 BareHandAttack: 4
 BodyProfile: 13
-Wimpy: 1
+Wimpy: 2
 Evasion: 1
 E
 #3709
-eyeless cavefish blind fish~
+eyeless cavefish pale fish~
 an eyeless cavefish~
-An eyeless white cavefish drifts through the dark water.
+An eyeless cavefish drifts through the cold water.
 ~
-Generations in darkness have left this pale fish without useful eyes. It
-navigates by current and vibration, moving calmly through water that
-would hide it completely from surface predators.
+Translucent skin reveals the faint shadow of bone beneath this pale
+fish. It navigates without eyes, turning before stone and hand alike as
+if it can feel every vibration in the water.
 ~
 106522 0 0 0 589954 0 0 0 0 E
-3 20 23 1d4+15 1d2+0
+5 20 25 1d4+25 1d2+0
 30 0
 8 8 0
 BareHandAttack: 4
 BodyProfile: 13
-Wimpy: 1
+Wimpy: 2
 Evasion: 1
 E
 #3710
-giant river mussel oyster~
-a giant river mussel~
-A giant pale mussel rests on the reservoir floor.
+blackwater shellback mussel giant~
+a blackwater shellback~
+A blackwater shellback grips the drowned masonry.
 ~
-This ancient freshwater shellfish has grown far beyond ordinary size in
-the mineral-rich reservoir. Its ridged shell is thick enough to turn
-blades, and it snaps shut with surprising force when disturbed. The
-oldest specimens sometimes hide valuable pearls.
+A massive freshwater shell grips the old stone with a muscular foot.
+Layered black-green plates cover it like natural armor, and a pale pearl
+gleams only briefly when the shell opens to filter the current.
 ~
 254026 0 0 0 128 0 0 0 0 E
-4 20 24 1d4+20 1d2+0
+6 20 26 1d4+30 1d2+0
 30 0
 6 6 0
 BareHandAttack: 4
 BodyProfile: 1
-Wimpy: 2
-Evasion: 1
+Wimpy: 3
+Evasion: 2
 E
 #3711
-gutter hare rabbit~
-a gutter hare~
-A lean brown hare picks through scrub near the old works.
+hollow hare rabbit~
+a hollow hare~
+A hollow hare picks its way among the rocks.
 ~
-This wary hare lives among the rocks and weeds outside Midgaard's walls,
-feeding on whatever survives around the drainage slopes. It freezes at
-unfamiliar sounds before bolting for the nearest cover.
+This lean brown hare lives among the rocks outside the hidden vent. Its
+long ears turn constantly toward the city and the dark opening below.
 ~
 72 0 0 0 0 0 0 0 1000 E
 3 20 23 1d4+15 1d2+0
@@ -234,35 +222,34 @@ Wimpy: 1
 Evasion: 1
 E
 #3712
-underworks mouser alley cat~
-a scarred underworks mouser~
-A lean striped cat watches the sewer vent with professional interest.
+dusk striped mouser cat~
+a dusk-striped mouser~
+A dusk-striped mouser watches a crack between stones.
 ~
-This half-feral cat has learned that the forgotten vent provides an
-endless supply of rats, bats, and insects. Several small scars cross its
-nose, but its yellow eyes remain bright and calculating. It tolerates
-people only when they do not interfere with the hunt.
+A scarred gray cat with dark stripes has learned to hunt along the
+western slope. It stares into the hollow with the patience of something
+that knows exactly what comes out after sunset.
 ~
 72 0 0 0 524288 0 0 0 -50 E
-3 20 23 1d4+15 1d2+0
+4 20 24 1d4+20 1d2+0
 30 0
 8 8 0
 BareHandAttack: 8
 BodyProfile: 2
-Wimpy: 1
+Wimpy: 2
 Evasion: 1
 E
 #3713
-red fox service path~
-a red fox~
-A red fox pads quietly along the old service path.
+redbrush fox~
+a redbrush fox~
+A redbrush fox slips between the old road stones.
 ~
-A healthy fox patrols the low hills outside the city, hunting rabbits
-and rodents drawn to the drainage works. Its coat is dusty from the
-rocks, and it keeps a careful distance from anything larger than itself.
+The fox is lean and bright-tailed, with mud darkening its paws. It moves
+easily across the forgotten paving and pauses often to listen toward the
+hidden mouth of the hollow.
 ~
 72 0 0 0 0 0 0 0 300 E
-4 20 24 1d4+20 1d2+0
+5 20 25 1d4+25 1d2+0
 30 0
 8 8 0
 BareHandAttack: 4
@@ -270,4 +257,283 @@ BodyProfile: 2
 Wimpy: 2
 Evasion: 1
 E
+#3714
+toman vale rat catcher darkwater~
+Toman Vale, the rat-catcher~
+Toman Vale tends a hooded lantern and a bundle of traps.
+~
+Toman is a wiry Midgaard rat-catcher in patched leather and high boots.
+A dozen clever traps hang from his belt beside chalk, twine, and a small
+hooded lantern. He looks tired rather than afraid.
+~
+90 0 0 0 0 0 0 0 0 E
+5 20 25 1d4+25 1d2+0
+0 0
+8 8 0
+Wimpy: 2
+Evasion: 1
+E
+T 3720
+T 3721
+#3715
+lantern scavenger hollow~
+a lantern scavenger~
+A lantern scavenger searches the old stones for salvage.
+~
+Layers of patched cloth protect this scavenger from cold water and sharp
+stone. A shuttered amber lantern hangs at one hip while a sack of nails,
+ceramic shards, and old metal knocks softly at the other.
+~
+76 0 0 0 0 0 0 0 0 E
+6 20 26 1d4+30 1d2+0
+0 0
+8 8 0
+Wimpy: 3
+Evasion: 2
+E
+T 3722
+#3716
+darkwater smuggler blacklamp~
+a Darkwater smuggler~
+A Darkwater smuggler keeps one hand near a shuttered lantern.
+~
+A dark wool coat and waxed boots mark this figure as one of the smugglers
+who use the buried westway. Black wax has been rubbed over every buckle
+that might catch the light.
+~
+88 0 0 0 0 0 0 0 0 E
+8 19 28 1d4+40 1d2+0
+0 0
+8 8 0
+Wimpy: 4
+Evasion: 2
+E
+T 3723
+#3717
+gutterknife cutthroat darkwater~
+a Gutterknife cutthroat~
+A Gutterknife cutthroat waits in the shadow of the westway.
+~
+This hard-eyed cutthroat wears a scarf across the lower face and keeps
+a narrow blade low beside one thigh. Blacklamp signs have been cut from
+the coat, leaving only pale stitch marks behind.
+~
+120 0 0 0 0 0 0 0 0 E
+9 19 29 1d4+45 1d2+0
+0 0
+8 8 0
+Wimpy: 4
+Evasion: 3
+E
+T 3724
+#3718
+maela blacklamp smuggler quartermaster~
+Maela Blacklamp~
+Maela Blacklamp studies a wax-marked ledger by hooded light.
+~
+Maela wears a fitted black coat over practical river leathers. A silver
+lantern clasp fastens her collar, and a waterproof ledger rests under one
+arm. Her calm expression suggests she notices every exit before every
+person.
+~
+8282 0 0 0 0 0 0 0 0 E
+10 19 30 1d4+50 1d2+0
+0 0
+8 8 0
+Wimpy: 5
+Evasion: 3
+E
+T 3725
+T 3726
+#3719
+hollow brigand westway~
+a hollow brigand~
+A hollow brigand blocks the old causeway.
+~
+Mud-darkened mail shows beneath the brigand's cloak. This is no desperate
+scavenger but a practiced road thief using the forgotten westway as a
+place where Midgaard law cannot easily follow.
+~
+4200 0 0 0 0 0 0 0 0 E
+10 19 30 1d4+50 1d2+0
+0 0
+8 8 0
+Wimpy: 5
+Evasion: 3
+E
+T 3727
+#3720
+blackwater reaver basin~
+a blackwater reaver~
+A blackwater reaver wades through the sunken commons.
+~
+The reaver has wrapped boiled leather and river chain over a scarred
+frame. Black silt reaches the knees, but the figure moves through deep
+water with practiced balance and watches the drowned ruins for prey.
+~
+4216 0 0 0 0 0 0 0 0 E
+11 19 31 1d4+55 1d2+0
+0 0
+8 8 0
+Wimpy: 5
+Evasion: 3
+E
+T 3728
+#3721
+siltbound sentinel ancient~
+a siltbound sentinel~
+A siltbound sentinel stands motionless beside the deep way.
+~
+Ancient armor is sealed beneath layers of black mineral crust and river
+silt. No flesh shows behind the narrow visor. Water trickles from the
+plates even when the sentinel stands on dry stone.
+~
+106618 0 0 0 0 0 0 0 0 E
+12 19 32 2d4+60 2d2+1
+0 0
+8 8 0
+Wimpy: 6
+Evasion: 4
+E
+T 3729
+#3722
+old hook rusk ferryman darkwater~
+Old Hook Rusk, the ferryman~
+Old Hook Rusk waits beside the mooring with one hand on a pole.
+~
+Rusk is a broad old boatman wrapped in an oilskin cloak repaired more
+times than it was originally sewn. A brass hook replaces two fingers on
+his left hand, and his beard smells faintly of lamp smoke and river mint.
+~
+90 0 0 0 0 0 0 0 0 E
+9 19 29 1d4+45 1d2+0
+0 0
+8 8 0
+Wimpy: 4
+Evasion: 3
+E
+T 3730
+T 3731
+#3723
+siltbound warden darkwater boss~
+the Siltbound Warden~
+The Siltbound Warden guards the oldest arch in the Darkwater Narrows.
+~
+A towering figure of stone-dark armor stands where the current narrows.
+Pearl-white ward marks shine through centuries of silt on its cuirass,
+and black water streams from a mace whose head resembles a drowned city
+tower.
+~
+237690 0 0 0 0 0 0 0 0 E
+13 19 33 2d4+65 2d2+1
+0 0
+8 8 0
+Wimpy: 6
+Evasion: 4
+E
+T 3732
+T 3733
+#3724
+vaska blacklamp lieutenant westway~
+Vaska Blacklamp~
+Vaska Blacklamp watches the dead-drop ledge with a drawn blade.
+~
+Vaska wears Blacklamp colors without trying to hide them. A dark captain
+coat is buckled over light mail, and an old scar pulls one corner of the
+mouth into a permanent challenge. The ledge behind Vaska is kept clear.
+~
+8314 0 0 0 0 0 0 0 0 E
+11 19 31 1d4+55 1d2+0
+0 0
+8 8 0
+Wimpy: 5
+Evasion: 3
+E
+T 3734
+T 3735
+#3725
+old city delver explorer~
+an old-city delver~
+An old-city delver measures the buried masonry.
+~
+A chalk-stained explorer carries a short measuring rod, charcoal, and a
+roll of waxed parchment. Every few steps the delver pauses to compare
+Midgaard mason marks with symbols cut into much older stone.
+~
+88 0 0 0 0 0 0 0 0 E
+7 20 27 1d4+35 1d2+0
+0 0
+8 8 0
+Wimpy: 3
+Evasion: 2
+E
+T 3736
+#3726
+mirecloak scout darkwater~
+a mirecloak scout~
+A mirecloak scout moves quietly along the flooded westway.
+~
+A mottled cloak breaks up the scout's outline against wet stone. Soft
+boots, a hooded lantern, and a coil of black cord suggest someone paid to
+move through the hollow without announcing it.
+~
+88 0 0 0 0 0 0 0 0 E
+8 19 28 1d4+40 1d2+0
+0 0
+8 8 0
+Wimpy: 4
+Evasion: 2
+E
+T 3737
+#3727
+hollow herbalist glowcap~
+a hollow herbalist~
+A hollow herbalist gathers fungus from the damp stone.
+~
+The herbalist carries wicker trays filled with glowcap, pale roots, and
+river mint. Waxed sleeves protect both arms, and a small silver charm of
+Midgaard hangs beside a bone-handled pruning knife.
+~
+90 0 0 0 0 0 0 0 0 E
+6 20 26 1d4+30 1d2+0
+0 0
+8 8 0
+Wimpy: 3
+Evasion: 2
+E
+T 3738
+#3728
+lantern thief scavenger~
+a lantern thief~
+A lantern thief tests the latch on an abandoned locker.
+~
+Quick hands and a soot-dark scarf mark this scavenger as someone who
+steals from thieves as readily as from ruins. Several mismatched keys
+hang from a cord around one wrist.
+~
+92 0 0 0 0 0 0 0 0 E
+7 20 27 1d4+35 1d2+0
+0 0
+8 8 0
+Wimpy: 3
+Evasion: 2
+E
+T 3739
+#3729
+blackwater apothecary~
+a blackwater apothecary~
+A blackwater apothecary sorts sealed jars by lanternlight.
+~
+Rows of stoppered jars fill a padded satchel at this traveler's feet.
+The apothecary studies cavefish oil, glowcap spores, and mineral salts
+with the careful interest of someone who sees value where others see mud.
+~
+90 0 0 0 0 0 0 0 0 E
+7 20 27 1d4+35 1d2+0
+0 0
+8 8 0
+Wimpy: 3
+Evasion: 2
+E
+T 3740
 $

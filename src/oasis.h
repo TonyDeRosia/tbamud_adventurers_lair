@@ -318,6 +318,13 @@ extern const char *nrm, *grn, *cyn, *yel;
 #define MEDIT_LOADOUT_REMOVE_INV        54
 #define MEDIT_LOADOUT_REMOVE_LOOT       55
 #define MEDIT_BODY_PROFILE              56
+#define MEDIT_COMBAT_ABILITIES_MENU     57
+#define MEDIT_COMBAT_DOUBLE_ATTACK      58
+#define MEDIT_COMBAT_TRIPLE_ATTACK      59
+#define MEDIT_COMBAT_FOURTH_ATTACK      60
+#define MEDIT_COMBAT_DOUBLE_CAST        61
+#define MEDIT_COMBAT_TRIPLE_CAST        62
+#define MEDIT_COMBAT_FOURTH_CAST        63
 #define MEDIT_BEHAVIOR_GENERAL                137
 #define MEDIT_BEHAVIOR_MOVEMENT               138
 #define MEDIT_BEHAVIOR_COMBAT                 139

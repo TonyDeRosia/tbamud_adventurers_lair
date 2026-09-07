@@ -19,12 +19,20 @@ struct char_data;
 #define COMBAT_PROGRESSION_STAGE_THIRD    50
 
 /*
+ * Physical Double/Triple/Fourth Attack roll weights.
+ * Separate from generic FULL because automatic offhand uses FULL.
+ */
+#define COMBAT_PROGRESSION_PHYSICAL_STAGE_DOUBLE 75
+#define COMBAT_PROGRESSION_PHYSICAL_STAGE_TRIPLE 50
+#define COMBAT_PROGRESSION_PHYSICAL_STAGE_FOURTH 25
+
+/*
  * Multicast progression is intentionally distinct from physical multiattack.
  * Each later packet is chained behind the previous successful Multicast stage.
  */
-#define COMBAT_PROGRESSION_MULTICAST_STAGE_DOUBLE 100
-#define COMBAT_PROGRESSION_MULTICAST_STAGE_TRIPLE  60
-#define COMBAT_PROGRESSION_MULTICAST_STAGE_FOURTH  35
+#define COMBAT_PROGRESSION_MULTICAST_STAGE_DOUBLE 75
+#define COMBAT_PROGRESSION_MULTICAST_STAGE_TRIPLE  50
+#define COMBAT_PROGRESSION_MULTICAST_STAGE_FOURTH  25
 
 /* V1 bonus spell-damage packet weights. The original cast remains 100%. */
 #define COMBAT_PROGRESSION_MULTICAST_DAMAGE_SECOND 80
@@ -55,7 +63,7 @@ int combat_progression_weighted_stat_rating(int primary_value,
  *
  * proficiency: 0..100
  * stat values: effective stat values, normally 0..30
- * stage_percent: 100 for a full proc check, 70 / 50 for later chain stages
+ * stage_percent: caller-supplied roll weighting
  *
  * Returns basis points in the range 0..9500.
  * Unknown abilities (proficiency <= 0) return 0.

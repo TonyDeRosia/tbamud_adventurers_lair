@@ -336,6 +336,18 @@ int write_mobile_espec(mob_vnum mvnum, struct char_data *mob, FILE *fd)
     fprintf(fd, "BareHandAttack: %d\n", GET_ATTACK(mob));
   if (MOB_BODY_PROFILE_SET(mob))
     fprintf(fd, "BodyProfile: %d\n", GET_MOB_BODY_PROFILE(mob));
+  if (GET_MOB_DOUBLE_ATTACK(mob) > 0)
+    fprintf(fd, "CombatDoubleAttack: %d\n", GET_MOB_DOUBLE_ATTACK(mob));
+  if (GET_MOB_TRIPLE_ATTACK(mob) > 0)
+    fprintf(fd, "CombatTripleAttack: %d\n", GET_MOB_TRIPLE_ATTACK(mob));
+  if (GET_MOB_FOURTH_ATTACK(mob) > 0)
+    fprintf(fd, "CombatFourthAttack: %d\n", GET_MOB_FOURTH_ATTACK(mob));
+  if (GET_MOB_DOUBLE_CAST(mob) > 0)
+    fprintf(fd, "CombatDoubleCast: %d\n", GET_MOB_DOUBLE_CAST(mob));
+  if (GET_MOB_TRIPLE_CAST(mob) > 0)
+    fprintf(fd, "CombatTripleCast: %d\n", GET_MOB_TRIPLE_CAST(mob));
+  if (GET_MOB_FOURTH_CAST(mob) > 0)
+    fprintf(fd, "CombatFourthCast: %d\n", GET_MOB_FOURTH_CAST(mob));
   if (GET_STR(mob) != 11)
     fprintf(fd, "Str: %d\n", GET_STR(mob));
   if (GET_ADD(mob) != 0)

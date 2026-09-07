@@ -9,20 +9,23 @@ immense crystal above him responds to his smallest gesture. He regards
 challengers with the calm interest of a master finally given a
 difficult problem.
 ~
-237834 0 0 0 80 0 0 0 0 E
-100 8 0 16d18+500 13d10+8
-340 0
+237834 0 0 0 80 0 2 0 0 E
+100 0 25 16d18+5064 15d13+12
+340 750
 8 8 1
 BareHandAttack: 12
 BodyProfile: 1
-Str: 18
-Dex: 18
-Int: 18
-Wis: 18
-Con: 18
-Cha: 18
+CombatDoubleAttack: 50
+CombatTripleAttack: 15
+CombatDoubleCast: 50
+Str: 14
+Dex: 20
+Int: 25
+Wis: 24
+Con: 22
+Cha: 24
 Wimpy: 50
-Evasion: 33
+Evasion: 40
 GoldMin: 340
 GoldMax: 340
 LootItem: 1837 35
@@ -41,19 +44,21 @@ Thick roots flex beneath its trunk like many slow feet, and knots in
 the bark tighten whenever a living trespasser draws near.
 ~
 104 0 0 0 0 0 0 0 0 E
-90 9 0 15d17+450 11d9+7
-310 0
+90 7 25 15d17+2790 12d10+9
+310 150
 8 8 0
 BareHandAttack: 6
 BodyProfile: 14
-Str: 18
-Dex: 18
-Int: 18
-Wis: 18
-Con: 18
-Cha: 18
+CombatDoubleAttack: 30
+CombatTripleAttack: 5
+Str: 24
+Dex: 8
+Int: 6
+Wis: 12
+Con: 24
+Cha: 6
 Wimpy: 45
-Evasion: 30
+Evasion: 18
 GoldMin: 310
 GoldMax: 310
 E
@@ -70,19 +75,21 @@ moves with the quiet restraint of a sentry that has guarded the same
 forest for centuries.
 ~
 104 0 0 0 0 0 0 0 0 E
-91 9 0 15d17+455 11d10+7
-300 0
+91 7 25 15d17+2815 12d11+9
+300 150
 8 8 0
 BareHandAttack: 6
 BodyProfile: 14
-Str: 18
-Dex: 18
-Int: 18
-Wis: 18
-Con: 18
-Cha: 18
+CombatDoubleAttack: 30
+CombatTripleAttack: 5
+Str: 25
+Dex: 7
+Int: 10
+Wis: 16
+Con: 25
+Cha: 10
 Wimpy: 45
-Evasion: 30
+Evasion: 15
 GoldMin: 300
 GoldMax: 300
 E
@@ -98,19 +105,20 @@ Red thorns line every tendril, while tiny sapphire flowers open and
 close along its core as though breathing.
 ~
 104 0 0 0 0 0 0 0 0 E
-92 9 0 15d17+460 12d10+7
-310 0
+92 6 25 15d17+2840 12d10+9
+310 180
 8 8 0
 BareHandAttack: 8
 BodyProfile: 14
-Str: 18
-Dex: 18
-Int: 18
-Wis: 18
-Con: 18
-Cha: 18
+CombatDoubleAttack: 35
+CombatTripleAttack: 10
+Str: 22
+Dex: 15
+Int: 7
+Con: 23
+Cha: 5
 Wimpy: 46
-Evasion: 30
+Evasion: 28
 GoldMin: 310
 GoldMax: 310
 E
@@ -126,19 +134,21 @@ like banked embers. Sapphire runes have been branded into its leather
 collar, marking it as a deliberate guardian rather than a wild beast.
 ~
 104 0 0 0 0 0 0 0 0 E
-92 9 0 15d17+460 12d10+7
-300 0
+92 4 25 15d17+2840 11d10+10
+300 180
 8 8 0
 BareHandAttack: 4
 BodyProfile: 2
-Str: 18
-Dex: 18
-Int: 18
-Wis: 18
-Con: 18
-Cha: 18
+CombatDoubleAttack: 45
+CombatTripleAttack: 15
+Str: 20
+Dex: 24
+Int: 6
+Wis: 12
+Con: 20
+Cha: 8
 Wimpy: 46
-Evasion: 30
+Evasion: 38
 GoldMin: 300
 GoldMax: 300
 E
@@ -154,19 +164,22 @@ across its shoulders, birds once nested in hollows along its back, and
 a deep sapphire sigil burns in the center of its chest.
 ~
 104 0 0 0 0 0 0 0 0 E
-94 9 0 15d17+470 12d10+7
-300 0
+94 6 25 15d17+2890 13d11+10
+300 220
 8 8 0
 BareHandAttack: 9
 BodyProfile: 14
-Str: 18
-Dex: 18
-Int: 18
-Wis: 18
-Con: 18
-Cha: 18
+CombatDoubleAttack: 45
+CombatTripleAttack: 20
+CombatFourthAttack: 5
+Str: 25
+Dex: 6
+Int: 14
+Wis: 20
+Con: 25
+Cha: 12
 Wimpy: 47
-Evasion: 31
+Evasion: 12
 GoldMin: 300
 GoldMax: 300
 E
@@ -183,19 +196,22 @@ light burns through cracks in his bark-covered flesh, and thorny roots
 have replaced much of his lower body.
 ~
 237610 0 0 0 1114188 0 0 0 0 E
-95 9 0 15d17+475 12d10+7
-340 0
+95 4 25 15d17+3525 13d11+9
+340 300
 8 8 0
 BareHandAttack: 12
 BodyProfile: 14
-Str: 18
-Dex: 18
-Int: 18
-Wis: 18
-Con: 18
+CombatDoubleAttack: 10
+CombatDoubleCast: 35
+CombatTripleCast: 10
+Str: 14
+Dex: 17
+Int: 24
+Wis: 22
+Con: 20
 Cha: 18
 Wimpy: 47
-Evasion: 31
+Evasion: 30
 GoldMin: 340
 GoldMax: 340
 LootItem: 1803 100
@@ -212,19 +228,23 @@ armored in dark sapphire scales, while dozens of thorned vines unfold
 around a luminous blue blossom large enough to swallow a man.
 ~
 42 0 0 0 0 0 0 0 0 E
-95 9 0 15d17+475 12d10+7
-320 0
+95 4 25 15d17+3525 14d11+10
+320 300
 8 8 0
 BareHandAttack: 8
 BodyProfile: 14
-Str: 18
-Dex: 18
-Int: 18
-Wis: 18
-Con: 18
-Cha: 18
+CombatDoubleAttack: 50
+CombatTripleAttack: 20
+CombatFourthAttack: 5
+CombatDoubleCast: 15
+Str: 25
+Dex: 12
+Int: 12
+Wis: 20
+Con: 25
+Cha: 10
 Wimpy: 47
-Evasion: 31
+Evasion: 22
 GoldMin: 320
 GoldMax: 320
 E
@@ -241,19 +261,22 @@ crystals grow from his crown like a rough circlet, and his patient
 eyes hold neither malice nor mercy.
 ~
 42 0 0 0 0 0 0 0 0 E
-95 9 0 15d17+475 12d10+7
-320 0
+95 4 25 15d17+3525 14d12+11
+320 360
 8 8 0
 BareHandAttack: 6
 BodyProfile: 14
-Str: 18
-Dex: 18
-Int: 18
-Wis: 18
-Con: 18
-Cha: 18
+CombatDoubleAttack: 55
+CombatTripleAttack: 25
+CombatFourthAttack: 10
+Str: 25
+Dex: 10
+Int: 16
+Wis: 22
+Con: 25
+Cha: 16
 Wimpy: 47
-Evasion: 31
+Evasion: 16
 GoldMin: 320
 GoldMax: 320
 LootItem: 1805 18
@@ -271,19 +294,22 @@ aloft by effortless force magic while he studies intruders with
 professional disappointment.
 ~
 14 0 0 0 0 0 0 0 0 E
-100 8 0 16d18+500 13d10+8
-300 0
+100 3 25 16d18+4086 13d11+9
+300 300
 8 8 0
 BareHandAttack: 12
 BodyProfile: 1
-Str: 18
+CombatDoubleAttack: 10
+CombatDoubleCast: 40
+CombatTripleCast: 15
+Str: 13
 Dex: 18
-Int: 18
-Wis: 18
-Con: 18
-Cha: 18
+Int: 25
+Wis: 23
+Con: 20
+Cha: 22
 Wimpy: 50
-Evasion: 33
+Evasion: 32
 GoldMin: 300
 GoldMax: 300
 LootItem: 1830 35
@@ -301,19 +327,22 @@ every reflection shows a slightly different expression. Her voice
 seems to come from behind whoever is listening.
 ~
 10 0 0 0 0 0 0 0 0 E
-100 8 0 16d18+500 13d10+8
-320 0
+100 1 25 16d18+4086 12d11+9
+320 300
 8 8 0
 BareHandAttack: 12
 BodyProfile: 1
-Str: 18
-Dex: 18
-Int: 18
-Wis: 18
+CombatDoubleAttack: 10
+CombatDoubleCast: 45
+CombatTripleCast: 20
+Str: 12
+Dex: 22
+Int: 25
+Wis: 22
 Con: 18
-Cha: 18
+Cha: 25
 Wimpy: 50
-Evasion: 33
+Evasion: 40
 GoldMin: 320
 GoldMax: 320
 LootItem: 1831 35
@@ -331,19 +360,24 @@ open at the forearms, revealing glowing lines like molten cracks
 beneath his skin.
 ~
 10 0 0 0 0 0 0 0 0 E
-100 8 0 16d18+500 13d10+8
-300 0
+100 3 25 16d18+4086 14d11+10
+300 330
 8 8 0
 BareHandAttack: 12
 BodyProfile: 1
-Str: 18
+CombatDoubleAttack: 20
+CombatTripleAttack: 5
+CombatDoubleCast: 45
+CombatTripleCast: 20
+CombatFourthCast: 5
+Str: 16
 Dex: 18
-Int: 18
-Wis: 18
-Con: 18
-Cha: 18
+Int: 24
+Wis: 20
+Con: 22
+Cha: 20
 Wimpy: 50
-Evasion: 33
+Evasion: 30
 GoldMin: 300
 GoldMax: 300
 LootItem: 1832 35
@@ -362,19 +396,22 @@ and her clear eyes have the unsettling focus of someone accustomed to
 seeing wounds before they happen.
 ~
 2314 0 0 0 84 0 0 0 0 E
-100 8 0 16d18+500 13d10+8
-330 0
+100 4 25 16d18+4086 12d11+8
+330 330
 8 8 1
 BareHandAttack: 12
 BodyProfile: 1
-Str: 18
-Dex: 18
-Int: 18
-Wis: 18
-Con: 18
-Cha: 18
+CombatDoubleAttack: 10
+CombatDoubleCast: 35
+CombatTripleCast: 10
+Str: 12
+Dex: 16
+Int: 23
+Wis: 25
+Con: 22
+Cha: 23
 Wimpy: 50
-Evasion: 33
+Evasion: 28
 GoldMin: 330
 GoldMax: 330
 LootItem: 1833 35
@@ -392,19 +429,22 @@ moves a heartbeat before he does, and thin violet symbols crawl across
 his fingers whenever he considers violence.
 ~
 10 0 0 0 0 0 0 0 0 E
-100 8 0 16d18+500 13d10+8
-0 0
+100 2 25 16d18+4086 13d11+9
+0 330
 8 8 0
 BareHandAttack: 12
 BodyProfile: 1
-Str: 18
-Dex: 18
-Int: 18
-Wis: 18
-Con: 18
-Cha: 18
+CombatDoubleAttack: 15
+CombatDoubleCast: 40
+CombatTripleCast: 15
+Str: 12
+Dex: 21
+Int: 25
+Wis: 22
+Con: 19
+Cha: 23
 Wimpy: 50
-Evasion: 33
+Evasion: 38
 LootItem: 1834 35
 LootItem: 1841 35
 E
@@ -419,20 +459,24 @@ Aerion's pale hair floats continuously in an unseen wind. Sparks creep
 over a sapphire circlet at his brow, and the air around him smells of
 rain striking hot stone.
 ~
-10 0 0 0 0 0 0 0 0 E
-100 8 0 16d18+500 13d10+8
-0 0
+10 0 0 0 0 0 2 0 0 E
+100 2 25 16d18+4086 13d12+9
+0 360
 8 8 0
 BareHandAttack: 12
 BodyProfile: 1
-Str: 18
-Dex: 18
-Int: 18
-Wis: 18
-Con: 18
-Cha: 18
+CombatDoubleAttack: 15
+CombatDoubleCast: 50
+CombatTripleCast: 20
+CombatFourthCast: 5
+Str: 14
+Dex: 23
+Int: 24
+Wis: 22
+Con: 20
+Cha: 21
 Wimpy: 50
-Evasion: 33
+Evasion: 36
 LootItem: 1835 35
 LootItem: 1843 35
 E
@@ -449,19 +493,23 @@ rather than hinges, and a faceted blue core pulses behind the armor of
 its chest.
 ~
 10 0 0 0 0 0 0 0 0 E
-100 8 0 16d18+500 13d10+8
-0 0
+100 4 25 16d18+4738 15d12+12
+0 360
 8 8 0
 BareHandAttack: 6
 BodyProfile: 11
-Str: 18
-Dex: 18
-Int: 18
-Wis: 18
-Con: 18
-Cha: 18
+CombatDoubleAttack: 60
+CombatTripleAttack: 30
+CombatFourthAttack: 10
+CombatDoubleCast: 10
+Str: 25
+Dex: 7
+Int: 8
+Wis: 12
+Con: 25
+Cha: 5
 Wimpy: 50
-Evasion: 33
+Evasion: 8
 LootItem: 1846 35
 E
 T 1820
@@ -476,19 +524,21 @@ Sapphire spectacles rest low on her nose, and animated index cards
 orbit her shoulders like an impatient flock.
 ~
 10 0 0 0 0 0 0 0 0 E
-100 8 0 16d18+500 13d10+8
-0 0
+100 3 25 16d18+4086 12d11+8
+0 330
 8 8 0
 BareHandAttack: 12
 BodyProfile: 1
-Str: 18
-Dex: 18
-Int: 18
-Wis: 18
+CombatDoubleAttack: 10
+CombatDoubleCast: 45
+CombatTripleCast: 20
+Dex: 17
+Int: 25
+Wis: 25
 Con: 18
-Cha: 18
+Cha: 24
 Wimpy: 50
-Evasion: 33
+Evasion: 32
 LootItem: 1836 35
 LootItem: 1845 35
 E
@@ -504,19 +554,23 @@ body, circling his arms and chest without touching the skin. Each
 symbol flashes in sequence as though unlocking a different spell.
 ~
 10 0 0 0 0 0 0 0 0 E
-100 8 0 16d18+500 13d10+8
-0 0
+100 2 25 16d18+4412 14d12+10
+0 420
 8 8 0
 BareHandAttack: 12
 BodyProfile: 1
-Str: 18
+CombatDoubleAttack: 10
+CombatDoubleCast: 55
+CombatTripleCast: 25
+CombatFourthCast: 5
+Str: 14
 Dex: 18
-Int: 18
-Wis: 18
-Con: 18
-Cha: 18
+Int: 25
+Wis: 25
+Con: 22
+Cha: 22
 Wimpy: 50
-Evasion: 33
+Evasion: 30
 LootItem: 1804 100
 LootItem: 1838 35
 E
@@ -532,22 +586,39 @@ shards of sapphire light, and a vaguely humanoid outline made from
 compressed magic. New symbols are constantly born at its center and
 discarded as sparks.
 ~
-10 0 0 0 0 0 0 0 0 E
-100 8 0 16d18+500 13d10+8
-0 0
+10 0 0 0 0 0 2 0 0 E
+100 1 25 16d18+4412 14d12+10
+0 480
 8 8 0
 BareHandAttack: 12
 BodyProfile: 12
+CombatDoubleAttack: 10
+CombatDoubleCast: 60
+CombatTripleCast: 30
+CombatFourthCast: 10
 Str: 18
-Dex: 18
-Int: 18
-Wis: 18
-Con: 18
-Cha: 18
+Dex: 22
+Int: 25
+Wis: 23
+Con: 22
+Cha: 20
 Wimpy: 50
-Evasion: 33
+Evasion: 38
 LootItem: 1847 35
 E
 T 1826
 T 1827
+#1829
+leveling slime~
+leveling slime is here.~
+leveling slime is here.
+~
+It looks unfinished.
+~
+8 0 0 0 0 0 0 0 0 E
+0 20 25 1d1+0 1d1+0
+0 150000
+8 8 0
+BareHandAttack: 7
+E
 $

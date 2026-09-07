@@ -85,7 +85,7 @@ int combat_progression_chance_basis_points_from_values(int proficiency,
   chance_basis_points =
       (training_basis_points * stat_multiplier_per_thousand + 500) / 1000;
 
-  /* Later chain stages use 100 / 70 / 50 percent of the calculated chance. */
+  /* Caller-supplied stage weighting scales the calculated chance. */
   chance_basis_points =
       (chance_basis_points * stage_percent + 50) / 100;
 
@@ -156,8 +156,9 @@ int combat_progression_multicast_chance_basis_points(
     int stage_percent)
 {
   int effective_proficiency;
+  int primary, secondary, tertiary, temp;
 
-  if (!ch || IS_NPC(ch))
+  if (!ch)
     return 0;
 
   effective_proficiency =
@@ -166,6 +167,37 @@ int combat_progression_multicast_chance_basis_points(
 
   if (effective_proficiency <= 0)
     return 0;
+
+  if (IS_NPC(ch)) {
+    /* NPC casters use their best mental stat first rather than interpreting
+     * overlapping NPC class IDs as PC classes. */
+    primary = GET_INT(ch);
+    secondary = GET_WIS(ch);
+    tertiary = GET_CHA(ch);
+
+    if (secondary > primary) {
+      temp = primary;
+      primary = secondary;
+      secondary = temp;
+    }
+    if (tertiary > secondary) {
+      temp = secondary;
+      secondary = tertiary;
+      tertiary = temp;
+    }
+    if (secondary > primary) {
+      temp = primary;
+      primary = secondary;
+      secondary = temp;
+    }
+
+    return combat_progression_chance_basis_points_from_values(
+        effective_proficiency,
+        primary,
+        secondary,
+        tertiary,
+        stage_percent);
+  }
 
   return combat_progression_class_chance_basis_points(
       ch, effective_proficiency, stage_percent);
@@ -239,8 +271,19 @@ int combat_progression_physical_multiattack_chance_basis_points(
   int secondary_stat;
   int tertiary_stat;
 
-  if (!ch || IS_NPC(ch))
+  if (!ch)
     return 0;
+
+  if (IS_NPC(ch)) {
+    /* NPC martial progression is identity-neutral: use the stronger of STR/DEX
+     * first, the other second, and CON third. */
+    return combat_progression_chance_basis_points_from_values(
+        proficiency,
+        MAX(GET_STR(ch), GET_DEX(ch)),
+        MIN(GET_STR(ch), GET_DEX(ch)),
+        GET_CON(ch),
+        stage_percent);
+  }
 
   combat_progression_physical_multiattack_stats(
       GET_CLASS(ch), &primary_stat, &secondary_stat, &tertiary_stat);

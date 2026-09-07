@@ -74,6 +74,7 @@ static bool medit_illegal_mob_flag(int fl);
 static int  medit_get_mob_flag_by_number(int num);
 static void medit_disp_mob_flags(struct descriptor_data *d);
 static void medit_disp_aff_flags(struct descriptor_data *d);
+static void medit_disp_combat_abilities_menu(struct descriptor_data *d);
 static void medit_disp_menu(struct descriptor_data *d);
 static void medit_disp_loadout_menu(struct descriptor_data *d);
 static int medit_slot_required_wear_flag(int wear_pos);
@@ -490,6 +491,48 @@ static void medit_disp_aff_flags(struct descriptor_data *d)
                           cyn, flags, nrm);
 }
 
+static void medit_disp_combat_abilities_menu(struct descriptor_data *d)
+{
+  struct char_data *mob = OLC_MOB(d);
+
+  get_char_colors(d->character);
+  clear_screen(d);
+
+  write_to_output(d,
+    "-------------------------------------------------------------------------------\r\n"
+    "NPC COMBAT ABILITIES: [%d] %s\r\n"
+    "-------------------------------------------------------------------------------\r\n"
+    "(%s1%s) Haste:         %s[%s%s%s]%s\r\n"
+    "(%s2%s) Double Attack: %s[%s%3d%s]%s\r\n"
+    "(%s3%s) Triple Attack: %s[%s%3d%s]%s\r\n"
+    "(%s4%s) Fourth Attack: %s[%s%3d%s]%s\r\n"
+    "\r\n"
+    "(%s5%s) Double Cast:   %s[%s%3d%s]%s\r\n"
+    "(%s6%s) Triple Cast:   %s[%s%3d%s]%s\r\n"
+    "(%s7%s) Fourth Cast:   %s[%s%3d%s]%s\r\n"
+    "-------------------------------------------------------------------------------\r\n"
+    "Physical chain: Double -> Triple -> Fourth. Roll weights: 75%% / 50%% / 25%%.\r\n"
+    "Later stages only roll after the previous succeeds. Haste uses AFF_HASTE and\r\n"
+    "adds two half-strength mainhand packets each combat pulse.\r\n"
+    "\r\n"
+    "Multicast chain: Double -> Triple -> Fourth. Roll weights: 75%% / 50%% / 25%%.\r\n"
+    "Eligible direct-damage DG casts keep 80%% / 65%% / 50%% bonus damage packets.\r\n"
+    "Values are builder proficiency from 0 to 100; 0 disables that stage.\r\n"
+    "-------------------------------------------------------------------------------\r\n"
+    "(%sQ%s) Return to main menu\r\n"
+    "Enter choice : ",
+    OLC_NUM(d), GET_SDESC(mob),
+    grn, nrm, cyn, yel, AFF_FLAGGED(mob, AFF_HASTE) ? "ON" : "OFF", cyn, nrm,
+    grn, nrm, cyn, yel, GET_MOB_DOUBLE_ATTACK(mob), cyn, nrm,
+    grn, nrm, cyn, yel, GET_MOB_TRIPLE_ATTACK(mob), cyn, nrm,
+    grn, nrm, cyn, yel, GET_MOB_FOURTH_ATTACK(mob), cyn, nrm,
+    grn, nrm, cyn, yel, GET_MOB_DOUBLE_CAST(mob), cyn, nrm,
+    grn, nrm, cyn, yel, GET_MOB_TRIPLE_CAST(mob), cyn, nrm,
+    grn, nrm, cyn, yel, GET_MOB_FOURTH_CAST(mob), cyn, nrm,
+    grn, nrm);
+
+  OLC_MODE(d) = MEDIT_COMBAT_ABILITIES_MENU;
+}
 static int medit_slot_required_wear_flag(int wear_pos)
 {
   switch (wear_pos) {
@@ -766,6 +809,7 @@ static void medit_disp_menu(struct descriptor_data *d)
       "%s9%s) Stats Menu...\r\n"
           "%sA%s) NPC Flags : %s%s\r\n"
           "%sB%s) AFF Flags : %s%s\r\n"
+          "%sC%s) Combat Abilities...\r\n"
           "%sP%s) Pet Price : %s%s\r\n"
           "%sH%s) Body Profile : %s%s\r\n"
           "%sR%s) Loadout / Loot\r\n"
@@ -782,6 +826,7 @@ static void medit_disp_menu(struct descriptor_data *d)
           grn, nrm,
           grn, nrm, cyn, flags,
           grn, nrm, cyn, flag2,
+          grn, nrm,
           grn, nrm, yel, price_buf,
           grn, nrm, yel, profile_buf,
           grn, nrm,
@@ -902,6 +947,7 @@ void medit_parse(struct descriptor_data *d, char *arg)
   char *oldtext = NULL;
 
   if (OLC_MODE(d) == MEDIT_STATS_MENU ||
+      OLC_MODE(d) == MEDIT_COMBAT_ABILITIES_MENU ||
       OLC_MODE(d) == MEDIT_GOLD ||
       OLC_MODE(d) == MEDIT_LEVEL_AUTOFILL_CONFIRM ||
       OLC_MODE(d) == MEDIT_DELETE) {
@@ -1031,6 +1077,10 @@ void medit_parse(struct descriptor_data *d, char *arg)
       OLC_MODE(d) = MEDIT_AFF_FLAGS;
       medit_disp_aff_flags(d);
       return;
+    case 'c':
+    case 'C':
+      medit_disp_combat_abilities_menu(d);
+      return;
     case 'p':
     case 'P':
       OLC_MODE(d) = MEDIT_PET_PRICE;
@@ -1086,6 +1136,45 @@ void medit_parse(struct descriptor_data *d, char *arg)
     medit_disp_menu(d);
     return;
 
+  case MEDIT_COMBAT_ABILITIES_MENU:
+    switch (*arg) {
+    case 'q':
+    case 'Q':
+      medit_disp_menu(d);
+      return;
+    case '1':
+      TOGGLE_BIT_AR(AFF_FLAGS(OLC_MOB(d)), AFF_HASTE);
+      OLC_VAL(d) = TRUE;
+      medit_disp_combat_abilities_menu(d);
+      return;
+    case '2':
+      OLC_MODE(d) = MEDIT_COMBAT_DOUBLE_ATTACK;
+      write_to_output(d, "Enter Double Attack proficiency [0-100]: ");
+      return;
+    case '3':
+      OLC_MODE(d) = MEDIT_COMBAT_TRIPLE_ATTACK;
+      write_to_output(d, "Enter Triple Attack proficiency [0-100]: ");
+      return;
+    case '4':
+      OLC_MODE(d) = MEDIT_COMBAT_FOURTH_ATTACK;
+      write_to_output(d, "Enter Fourth Attack proficiency [0-100]: ");
+      return;
+    case '5':
+      OLC_MODE(d) = MEDIT_COMBAT_DOUBLE_CAST;
+      write_to_output(d, "Enter Double Cast proficiency [0-100]: ");
+      return;
+    case '6':
+      OLC_MODE(d) = MEDIT_COMBAT_TRIPLE_CAST;
+      write_to_output(d, "Enter Triple Cast proficiency [0-100]: ");
+      return;
+    case '7':
+      OLC_MODE(d) = MEDIT_COMBAT_FOURTH_CAST;
+      write_to_output(d, "Enter Fourth Cast proficiency [0-100]: ");
+      return;
+    default:
+      medit_disp_combat_abilities_menu(d);
+      return;
+    }
   case MEDIT_STATS_MENU:
     i=0;
     switch(*arg) {
@@ -1833,6 +1922,41 @@ void medit_parse(struct descriptor_data *d, char *arg)
     medit_disp_menu(d);
     return;
 
+  case MEDIT_COMBAT_DOUBLE_ATTACK:
+    GET_MOB_DOUBLE_ATTACK(OLC_MOB(d)) = LIMIT(i, 0, 100);
+    OLC_VAL(d) = TRUE;
+    medit_disp_combat_abilities_menu(d);
+    return;
+
+  case MEDIT_COMBAT_TRIPLE_ATTACK:
+    GET_MOB_TRIPLE_ATTACK(OLC_MOB(d)) = LIMIT(i, 0, 100);
+    OLC_VAL(d) = TRUE;
+    medit_disp_combat_abilities_menu(d);
+    return;
+
+  case MEDIT_COMBAT_FOURTH_ATTACK:
+    GET_MOB_FOURTH_ATTACK(OLC_MOB(d)) = LIMIT(i, 0, 100);
+    OLC_VAL(d) = TRUE;
+    medit_disp_combat_abilities_menu(d);
+    return;
+
+  case MEDIT_COMBAT_DOUBLE_CAST:
+    GET_MOB_DOUBLE_CAST(OLC_MOB(d)) = LIMIT(i, 0, 100);
+    OLC_VAL(d) = TRUE;
+    medit_disp_combat_abilities_menu(d);
+    return;
+
+  case MEDIT_COMBAT_TRIPLE_CAST:
+    GET_MOB_TRIPLE_CAST(OLC_MOB(d)) = LIMIT(i, 0, 100);
+    OLC_VAL(d) = TRUE;
+    medit_disp_combat_abilities_menu(d);
+    return;
+
+  case MEDIT_COMBAT_FOURTH_CAST:
+    GET_MOB_FOURTH_CAST(OLC_MOB(d)) = LIMIT(i, 0, 100);
+    OLC_VAL(d) = TRUE;
+    medit_disp_combat_abilities_menu(d);
+    return;
   case MEDIT_STR:
     GET_STR(OLC_MOB(d)) = LIMIT(i, 3, 25);
     OLC_MOB(d)->real_abils.str = GET_STR(OLC_MOB(d));

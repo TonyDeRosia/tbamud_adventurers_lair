@@ -2057,7 +2057,7 @@ static void perform_bonus_mainhand_attack(struct char_data *ch)
   struct char_data *victim;
   bool previous_effects_due;
 
-  if (!ch || IS_NPC(ch))
+  if (!ch)
     return;
 
   victim = FIGHTING(ch);
@@ -2129,14 +2129,14 @@ static void do_double_attack(struct char_data *ch)
   struct char_data *victim;
   int proficiency;
 
-  if (!ch || IS_NPC(ch))
+  if (!ch)
     return;
 
   /*
    * DOUBLE ATTACK
    * The first bonus stage is the gateway to the entire chain.
    */
-  proficiency = GET_SKILL(ch, SKILL_DOUBLE_ATTACK);
+  proficiency = IS_NPC(ch) ? GET_MOB_DOUBLE_ATTACK(ch) : GET_SKILL(ch, SKILL_DOUBLE_ATTACK);
   if (proficiency <= 0)
     return;
 
@@ -2145,10 +2145,10 @@ static void do_double_attack(struct char_data *ch)
     return;
 
   if (!combat_progression_physical_multiattack_roll(
-          ch, proficiency, COMBAT_PROGRESSION_STAGE_FULL))
+          ch, proficiency, COMBAT_PROGRESSION_PHYSICAL_STAGE_DOUBLE))
     return;
 
-  if (combat_effects_due)
+  if (combat_effects_due && !IS_NPC(ch))
     improve_ability_from_use(ch, SKILL_DOUBLE_ATTACK, TRUE);
 
   perform_bonus_mainhand_attack(ch);
@@ -2163,15 +2163,15 @@ static void do_double_attack(struct char_data *ch)
   if (!physical_multiattack_target_valid(ch, victim))
     return;
 
-  proficiency = GET_SKILL(ch, SKILL_TRIPLE_ATTACK);
+  proficiency = IS_NPC(ch) ? GET_MOB_TRIPLE_ATTACK(ch) : GET_SKILL(ch, SKILL_TRIPLE_ATTACK);
   if (proficiency <= 0)
     return;
 
   if (!combat_progression_physical_multiattack_roll(
-          ch, proficiency, COMBAT_PROGRESSION_STAGE_SECOND))
+          ch, proficiency, COMBAT_PROGRESSION_PHYSICAL_STAGE_TRIPLE))
     return;
 
-  if (combat_effects_due)
+  if (combat_effects_due && !IS_NPC(ch))
     improve_ability_from_use(ch, SKILL_TRIPLE_ATTACK, TRUE);
 
   perform_bonus_mainhand_attack(ch);
@@ -2184,15 +2184,15 @@ static void do_double_attack(struct char_data *ch)
   if (!physical_multiattack_target_valid(ch, victim))
     return;
 
-  proficiency = GET_SKILL(ch, SKILL_FOURTH_ATTACK);
+  proficiency = IS_NPC(ch) ? GET_MOB_FOURTH_ATTACK(ch) : GET_SKILL(ch, SKILL_FOURTH_ATTACK);
   if (proficiency <= 0)
     return;
 
   if (!combat_progression_physical_multiattack_roll(
-          ch, proficiency, COMBAT_PROGRESSION_STAGE_THIRD))
+          ch, proficiency, COMBAT_PROGRESSION_PHYSICAL_STAGE_FOURTH))
     return;
 
-  if (combat_effects_due)
+  if (combat_effects_due && !IS_NPC(ch))
     improve_ability_from_use(ch, SKILL_FOURTH_ATTACK, TRUE);
 
   perform_bonus_mainhand_attack(ch);

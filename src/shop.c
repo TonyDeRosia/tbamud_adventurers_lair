@@ -77,6 +77,7 @@ static bool shopping_identify(char *arg, struct char_data *ch, struct char_data 
 static bool shopping_appraise(char *arg, struct char_data *ch, struct char_data *keeper, int shop_nr);
 static bool shopping_inspect_item(char *arg, struct char_data *ch, struct char_data *keeper, int shop_nr, const char *no_arg_msg);
 static void shopping_value(char *arg, struct char_data *ch, struct char_data *keeper, int shop_nr);
+static void shopping_sell_all(struct char_data *ch, struct char_data *keeper, int shop_nr);
 static void shopping_sell(char *arg, struct char_data *ch, struct char_data *keeper, int shop_nr);
 static struct obj_data *get_selling_obj(struct char_data *ch, char *name, struct char_data *keeper, int shop_nr, int msg);
 static struct obj_data *slide_obj(struct obj_data *obj, struct char_data *keeper, int shop_nr);
@@ -834,6 +835,121 @@ static void sort_keeper_objs(struct char_data *keeper, int shop_nr)
   }
 }
 
+/*
+ * Sell every carried item this shop legitimately accepts.
+ *
+ * Bare "sell all" means: walk the player's carried inventory and attempt
+ * every item at the current vendor.  Rejected/protected items are skipped
+ * rather than aborting the whole command.
+ */
+static void shopping_sell_all(struct char_data *ch, struct char_data *keeper, int shop_nr)
+{
+  struct obj_data *obj, *next_obj;
+  int sold = 0, skipped = 0, no_cash = 0;
+  long long goldamt = 0;
+
+  if (!is_ok(keeper, ch, shop_nr))
+    return;
+
+  for (obj = ch->carrying; obj; obj = next_obj) {
+    int result, price;
+    long long available;
+
+    /* obj_from_char() mutates the carrying chain, so preserve next first. */
+    next_obj = obj->next_content;
+
+    /* Explicit player safety lock: never sell kept items. */
+    if (OBJ_FLAGGED(obj, ITEM_KEPT)) {
+      skipped++;
+      continue;
+    }
+
+    result = trade_with(obj, shop_nr);
+    if (result != OBJECT_OK) {
+      skipped++;
+      continue;
+    }
+
+    price = sell_price(obj, shop_nr, keeper, ch);
+    if (price <= 0) {
+      skipped++;
+      continue;
+    }
+
+    if (!IS_SET(SHOP_BITVECTOR(shop_nr), HAS_UNLIMITED_CASH)) {
+      available = (long long)GET_GOLD(keeper) + (long long)SHOP_BANK(shop_nr);
+
+      /*
+       * Do not abort the whole sell-all if one item is too expensive.
+       * A later, cheaper item may still be affordable.
+       */
+      if (available < price) {
+        no_cash++;
+        continue;
+      }
+
+      if (GET_GOLD(keeper) >= price) {
+        GET_GOLD(keeper) -= price;
+      } else {
+        long long remaining = (long long)price - (long long)GET_GOLD(keeper);
+
+        SET_GOLD(keeper, 0);
+        SHOP_BANK(shop_nr) -= remaining;
+      }
+    }
+
+    goldamt += price;
+    sold++;
+
+    obj_from_char(obj);
+    slide_obj(obj, keeper, shop_nr);
+  }
+
+  if (sold > 0)
+    GET_GOLD(ch) += goldamt;
+
+  /* Preserve the shop's normal pocket-cash refill behavior. */
+  if (GET_GOLD(keeper) < MIN_OUTSIDE_BANK) {
+    long long refill = MIN((long long)MAX_OUTSIDE_BANK - (long long)GET_GOLD(keeper),
+                           (long long)SHOP_BANK(shop_nr));
+
+    if (refill > 0) {
+      SHOP_BANK(shop_nr) -= refill;
+      GET_GOLD(keeper) += refill;
+    }
+  }
+
+  if (sold == 0) {
+    if (no_cash > 0)
+      send_to_char(ch, "The shopkeeper cannot afford any more of your sellable items.\r\n");
+    else
+      send_to_char(ch, "You have nothing this shopkeeper will buy.\r\n");
+    return;
+  }
+
+  {
+    char moneybuf[64];
+
+    shop_format_price(moneybuf, sizeof(moneybuf), goldamt);
+    send_to_char(ch, "You sell %d item%s for %s.",
+                 sold, sold == 1 ? "" : "s", moneybuf);
+
+    if (skipped > 0 || no_cash > 0) {
+      send_to_char(ch, "  Skipped %d item%s",
+                   skipped, skipped == 1 ? "" : "s");
+
+      if (no_cash > 0)
+        send_to_char(ch, " and %d item%s the shop could not afford",
+                     no_cash, no_cash == 1 ? "" : "s");
+
+      send_to_char(ch, ".");
+    }
+
+    send_to_char(ch, "\r\n");
+  }
+
+  act("$n sells a collection of items.", FALSE, ch, 0, 0, TO_ROOM);
+}
 static void shopping_sell(char *arg, struct char_data *ch, struct char_data *keeper, int shop_nr)
 {
   char tempstr[MAX_INPUT_LENGTH - 10], name[MAX_INPUT_LENGTH], tempbuf[MAX_INPUT_LENGTH]; // - 10 to make room for constants in format
@@ -842,6 +958,20 @@ static void shopping_sell(char *arg, struct char_data *ch, struct char_data *kee
 
   if (!(is_ok(keeper, ch, shop_nr)))
     return;
+
+  {
+    char all_arg[MAX_INPUT_LENGTH];
+    char *all_ptr;
+
+    strlcpy(all_arg, arg, sizeof(all_arg));
+    all_ptr = all_arg;
+    skip_spaces(&all_ptr);
+
+    if (!str_cmp(all_ptr, "all")) {
+      shopping_sell_all(ch, keeper, shop_nr);
+      return;
+    }
+  }
 
   if ((sellnum = transaction_amt(arg)) < 0) {
     char buf[MAX_INPUT_LENGTH];

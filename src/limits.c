@@ -25,6 +25,7 @@
 #include "mud_event.h"
 
 /* local file scope function prototypes */
+static void normalize_mortal_exp_floor(struct char_data *ch);
 static void check_idling(struct char_data *ch);
 static struct affected_type *find_affect(struct char_data *ch, int spellnum);
 static int best_regen_multiplier(struct char_data *ch);
@@ -456,6 +457,36 @@ void run_autowiz(void)
 #endif /* CIRCLE_UNIX || CIRCLE_WINDOWS */
 }
 
+/*
+ * Keep cumulative mortal XP consistent with the character's current level.
+ *
+ * With fixed cumulative level thresholds, allowing XP to fall below the
+ * current-level floor creates impossible states such as:
+ *
+ *   level 42, XP 17013, TNL 24987
+ *
+ * Level 42 requires at least level_exp(class, 42) XP.  Player loading already
+ * clamps legacy pfiles, but live XP mutations must preserve the same invariant.
+ */
+static void normalize_mortal_exp_floor(struct char_data *ch)
+{
+  int floor_exp;
+
+  if (!ch || IS_NPC(ch))
+    return;
+  if (GET_LEVEL(ch) < 1 || GET_LEVEL(ch) >= LVL_IMMORT)
+    return;
+
+  floor_exp = level_exp(GET_CLASS(ch), GET_LEVEL(ch));
+
+  if (GET_EXP(ch) < floor_exp) {
+    mudlog(CMP, LVL_IMMORT, TRUE,
+           "XP invariant repair: %s level %d had %d XP below floor %d; clamping.",
+           GET_NAME(ch), GET_LEVEL(ch), GET_EXP(ch), floor_exp);
+    GET_EXP(ch) = floor_exp;
+  }
+}
+
 int final_positive_xp_gain(int raw_gain)
 {
   long long modified = raw_gain;
@@ -474,6 +505,12 @@ void gain_exp(struct char_data *ch, int gain)
   int max_mortal_level = LVL_IMMORT - 1;
   bool hit_mortal_cap = FALSE;
   int glory_awarded = 0;
+
+  /*
+   * Self-heal invalid live XP before using it for progression.  This is
+   * deliberately done before both positive and negative XP mutations.
+   */
+  normalize_mortal_exp_floor(ch);
 
   if (!IS_NPC(ch) && ((GET_LEVEL(ch) < 1 || GET_LEVEL(ch) >= LVL_IMMORT)))
     return;
@@ -526,6 +563,13 @@ void gain_exp(struct char_data *ch, int gain)
   } else if (gain < 0) {
     gain = MAX(-CONFIG_MAX_EXP_LOSS, gain);     /* Cap max exp lost per death */
     GET_EXP(ch) += gain;
+
+    /*
+     * Mortal levels do not delevel here, so XP may not cross below the
+     * cumulative threshold for the level the character still owns.
+     */
+    normalize_mortal_exp_floor(ch);
+
     if (GET_EXP(ch) < 0)
       GET_EXP(ch) = 0;
   }
